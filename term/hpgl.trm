@@ -1,5 +1,5 @@
 /*
- * $Id: hpgl.trm,v 1.8 1999/05/31 18:33:50 lhecking Exp $
+ * $Id: hpgl.trm,v 1.9 1999/06/19 20:30:50 lhecking Exp $
  */
 
 /* GNUPLOT - hpgl.trm */
@@ -83,8 +83,8 @@ TERM_PUBLIC void HPGL_text __PROTO((void));
 TERM_PUBLIC void PCL_text __PROTO((void));
 TERM_PUBLIC void HPGL_linetype __PROTO((int linetype));
 TERM_PUBLIC void HPGL2_linetype __PROTO((int linetype));
-TERM_PUBLIC void HPGL_put_text __PROTO((unsigned int x, unsigned int y, char *str));
-TERM_PUBLIC void HPGL2_put_text __PROTO((unsigned int x, unsigned int y, char *str));
+TERM_PUBLIC void HPGL_put_text __PROTO((unsigned int x, unsigned int y, const char *str));
+TERM_PUBLIC void HPGL2_put_text __PROTO((unsigned int x, unsigned int y, const char *str));
 TERM_PUBLIC void HPGL_move __PROTO((unsigned int x, unsigned int y));
 TERM_PUBLIC void HPGL_vector __PROTO((unsigned int x, unsigned int y));
 TERM_PUBLIC void HPGL2_move __PROTO((unsigned int x, unsigned int y));
@@ -183,14 +183,14 @@ TERM_PUBLIC int HPGL2_justify_text __PROTO((enum JUSTIFY just));
  */
 
 struct HPGL2_font_str {
-    char *compare, *name;
+    const char *compare, *name;
     int symbol_set, spacing;
     double pitch, height;
     int posture, stroke_weight, typeface;
 };
 
 struct PCL_mode_str {
-    char *compare, *name, *command;
+    const char *compare, *name, *command;
     int xmax, ymax;
 };
 
@@ -228,8 +228,8 @@ static struct PCL_mode_str *PCL_mode = &PCL_mode_table[0];
  * Various line types and widths to distinguish data sets
  */
 
-static char *HPGL2_lt[] = { "", "4,2", "5,2", "6,2", "7,2", "8,2" },
-	    *HPGL2_pw[] = { ".15", ".12", ".08" };
+static const char *HPGL2_lt[] = { "", "4,2", "5,2", "6,2", "7,2", "8,2" },
+		  *HPGL2_pw[] = { ".15", ".12", ".08" };
 
 #define HPGL2_LINETYPES (sizeof(HPGL2_lt) / sizeof(char *))
 #define HPGL2_PENWIDTHS (sizeof(HPGL2_pw) / sizeof(char *))
@@ -828,7 +828,7 @@ int linetype;
 TERM_PUBLIC void
 HPGL_put_text(x, y, str)
 unsigned int x, y;
-char *str;
+const char *str;
 {
     if (HPGL_ang == 1)
 	HPGL_move(x + HPGL_VCHAR / 4, y);
@@ -859,7 +859,7 @@ char *str;
 TERM_PUBLIC void
 HPGL2_put_text(x, y, str)
 unsigned int x, y;
-char *str;
+const char *str;
 {
     struct termentry *t = term;
 /*

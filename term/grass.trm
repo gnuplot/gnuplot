@@ -69,11 +69,11 @@ TERM_PUBLIC void GRASS_graphics __PROTO((void));
 TERM_PUBLIC void GRASS_text __PROTO((void));
 TERM_PUBLIC void GRASS_vector __PROTO((unsigned int x, unsigned int y));
 TERM_PUBLIC void GRASS_linetype __PROTO((int lt));
-TERM_PUBLIC void GRASS_put_text __PROTO((unsigned int x, unsigned int y, char *str));
+TERM_PUBLIC void GRASS_put_text __PROTO((unsigned int x, unsigned int y, const char *str));
 TERM_PUBLIC int GRASS_text_angle __PROTO((int ang));
 TERM_PUBLIC int GRASS_justify_text __PROTO((enum JUSTIFY mode));
 TERM_PUBLIC void GRASS_point __PROTO((unsigned int x, unsigned int y, int point));
-TERM_PUBLIC int GRASS_set_font __PROTO((char *font));
+TERM_PUBLIC int GRASS_set_font __PROTO((const char *font));
 /* TERM_PUBLIC void GRASS_set_pointsize __PROTO((double size)); */
 TERM_PUBLIC void GRASS_arrow __PROTO((unsigned int sx, unsigned int sy, unsigned int ex, unsigned int ey, int head));
 #endif /* TERM_PROTO */
@@ -332,7 +332,7 @@ int lt;
 TERM_PUBLIC void
 GRASS_put_text(x, y, str)
 unsigned int x, y;
-char *str;
+const char *str;
 {
   int R_text();
   int R_flush ();
@@ -575,7 +575,7 @@ int x,y;
 
 TERM_PUBLIC int
 GRASS_set_font(font)
-char *font;
+const char *font;
 {
   char name[32];
   int size,sep, R_font();

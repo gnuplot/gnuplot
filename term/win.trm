@@ -1,5 +1,5 @@
 /*
- * $Id: win.trm,v 1.9 1999/03/30 15:21:22 lhecking Exp $
+ * $Id: win.trm,v 1.10 1999/06/19 20:30:58 lhecking Exp $
  */
 
 /* GNUPLOT - win.trm */
@@ -93,7 +93,7 @@ TERM_PUBLIC void WIN_graphics __PROTO((void));
 TERM_PUBLIC void WIN_move __PROTO((unsigned int x, unsigned int y));
 TERM_PUBLIC void WIN_vector __PROTO((unsigned int x, unsigned int y));
 TERM_PUBLIC void WIN_linetype __PROTO((int lt));
-TERM_PUBLIC void WIN_put_text __PROTO((unsigned int x, unsigned int y, char *str));
+TERM_PUBLIC void WIN_put_text __PROTO((unsigned int x, unsigned int y, const char *str));
 TERM_PUBLIC int WIN_justify_text __PROTO((enum JUSTIFY mode));
 TERM_PUBLIC int WIN_text_angle __PROTO((int ang));
 TERM_PUBLIC void WIN_point __PROTO((unsigned int x, unsigned int y, int number));
@@ -242,7 +242,7 @@ int lt;
 TERM_PUBLIC void
 WIN_put_text(x, y, str)
 unsigned int x, y;
-char *str;
+const char *str;
 {
     GraphOp(&graphwin, W_put_text, x, y, str);
 }

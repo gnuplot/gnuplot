@@ -1,5 +1,5 @@
 /*
- * $Id: $
+ * $Id: mgr.trm,v 1.6 1999/06/19 20:30:52 lhecking Exp $
  */
 
 /* GNUPLOT - mgr.trm */
@@ -60,7 +60,7 @@ TERM_PUBLIC void MGR_text __PROTO((void));
 TERM_PUBLIC void MGR_linetype __PROTO((int linetype));
 TERM_PUBLIC void MGR_move __PROTO((unsigned int x, unsigned int y));
 TERM_PUBLIC void MGR_vector __PROTO((unsigned int x, unsigned int y));
-TERM_PUBLIC void MGR_put_text __PROTO((unsigned int x, unsigned int y, char *str));
+TERM_PUBLIC void MGR_put_text __PROTO((unsigned int x, unsigned int y, const char *str));
 TERM_PUBLIC void MGR_reset __PROTO((void));
 #define MGR_XMAX 640
 #define MGR_YMAX 400
@@ -198,7 +198,7 @@ unsigned int x, y;
 TERM_PUBLIC void
 MGR_put_text(x, y, str)
 unsigned int x, y;
-char *str;
+const char *str;
 {
     MGR_move(x, y - MGR_vchar / 2);
     m_aligntext();

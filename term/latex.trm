@@ -1,5 +1,5 @@
 /*
- * $Id: latex.trm,v 1.14 1999/06/06 18:17:24 lhecking Exp $
+ * $Id: latex.trm,v 1.15 1999/06/19 20:30:51 lhecking Exp $
  *
  */
 
@@ -88,7 +88,7 @@ TERM_PUBLIC void LATEX_options __PROTO((void));
 TERM_PUBLIC void LATEX_init __PROTO((void));
 TERM_PUBLIC void LATEX_graphics __PROTO((void));
 TERM_PUBLIC void LATEX_text __PROTO((void));
-TERM_PUBLIC void LATEX_put_text __PROTO((unsigned int x, unsigned int y, char str[]));
+TERM_PUBLIC void LATEX_put_text __PROTO((unsigned int x, unsigned int y, const char str[]));
 TERM_PUBLIC void LATEX_linetype __PROTO((int linetype));
 TERM_PUBLIC void LATEX_move __PROTO((unsigned int x, unsigned int y));
 TERM_PUBLIC void LATEX_point __PROTO((unsigned int x, unsigned int y, int number));
@@ -143,8 +143,8 @@ static int latex_angle = 0;
 
 /* POINTS */
 #define LATEX_POINT_TYPES 12	/* we supply more point types */
-static char GPFAR *GPFAR LATEX_points[] =
-{
+
+static const char GPFAR *GPFAR LATEX_points[] = {
     "\\raisebox{-.8pt}{\\makebox(0,0){$\\Diamond$}}",
     "\\makebox(0,0){$+$}",
     "\\raisebox{-.8pt}{\\makebox(0,0){$\\Box$}}",
@@ -709,9 +709,9 @@ TBOOLEAN head;
 TERM_PUBLIC void
 LATEX_put_text(x, y, str)
 unsigned int x, y;		/* reference point of string */
-char str[];			/* the text */
+const char str[];			/* the text */
 {
-    static char *justify[] = { "[l]", "", "[r]" };
+    static const char *justify[] = { "[l]", "", "[r]" };
     int flag, i;
 
     /* ignore empty strings */

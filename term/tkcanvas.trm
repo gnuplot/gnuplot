@@ -1,5 +1,5 @@
 /*
- * $Id: tkcanvas.trm,v 1.13 1999/06/10 19:54:46 lhecking Exp $
+ * $Id: tkcanvas.trm,v 1.14 1999/06/19 20:30:57 lhecking Exp $
  *
  */
 
@@ -80,10 +80,10 @@ TERM_PUBLIC void TK_text __PROTO((void));
 TERM_PUBLIC void TK_linetype __PROTO((int linetype));
 TERM_PUBLIC void TK_move __PROTO((unsigned int x, unsigned int y));
 TERM_PUBLIC void TK_vector __PROTO((unsigned int x, unsigned int y));
-TERM_PUBLIC void TK_put_text __PROTO((unsigned int x, unsigned int y, char *str));
+TERM_PUBLIC void TK_put_text __PROTO((unsigned int x, unsigned int y, const char *str));
 TERM_PUBLIC void TK_reset __PROTO((void));
 TERM_PUBLIC int TK_justify_text __PROTO((enum JUSTIFY));
-TERM_PUBLIC int TK_set_font __PROTO((char *font));
+TERM_PUBLIC int TK_set_font __PROTO((const char *font));
 TERM_PUBLIC void TK_linewidth __PROTO((double linewidth));
 
 #define TK_XMAX 1000
@@ -116,7 +116,9 @@ static char tk_anchor[7] = "w";
 static double tk_linewidth = 1.0;
 static int tk_perl = 0;
 static int tk_interactive = 0;
-static char *tk_colors[] = {"black", "gray", "red", "blue", "green", "brown", "magenta", "cyan"};
+static const char *tk_colors[] = {
+    "black", "gray", "red", "blue", "green", "brown", "magenta", "cyan"
+};
 
 TERM_PUBLIC void
 TK_options()
@@ -327,7 +329,7 @@ $can create line \
 TERM_PUBLIC void
 TK_put_text(x, y, str)
 unsigned int x, y;
-char *str;
+const char *str;
 {
     y = 1000 - y;
     if (tk_perl) {
@@ -377,17 +379,18 @@ enum JUSTIFY anchor;
 
 TERM_PUBLIC int
 TK_set_font(font)
-char *font;
+const char *font;
 {
     if (!font || *font == NUL) {
 	if (tk_perl)
-	    fprintf(gpoutfile, "undef $font;\n");
+	    fputs("undef $font;\n", gpoutfile);
 	else
-	    fprintf(gpoutfile, "catch {unset $font}\n");
+	    fputs("catch {unset $font}\n", gpoutfile);
     } else {
 	char *name;
-	int size = 0, sep;
-	sep = strcspn(font, ",");
+	int size = 0;
+	size_t sep = strcspn(font, ",");
+
 	name = malloc(sep + 1);
 	if (!name)
 	    return FALSE;
@@ -402,15 +405,14 @@ $font = $can->fontCreate(-family => q{%s}",
 		    name);
 	    if (size)
 		fprintf(gpoutfile, ", -size => %d", size);
-	    fprintf(gpoutfile, ");\n}\n");
+	    fputs(");\n}\n", gpoutfile);
 	} else {
-	    fprintf(gpoutfile,
-		    "set font [font create -family %s",
-		    name);
+	    fprintf(gpoutfile, "set font [font create -family %s", name);
 	    if (size)
 		fprintf(gpoutfile, " -size %d", size);
-	    fprintf(gpoutfile, "]\n");
+	    fputs("]\n", gpoutfile);
 	}
+	free(name);
     }
     return TRUE;
 }
@@ -507,14 +509,15 @@ TK_text()
 #endif /* TERM_BODY */
 
 #ifdef TERM_TABLE
+
 TERM_TABLE_START(tkcanvas)
-"tkcanvas", "Tk/Tcl canvas widget [perltk] [interactive]",
-TK_XMAX, TK_YMAX, TK_VCHAR, TK_HCHAR,
-TK_VTIC, TK_HTIC, TK_options, TK_init, TK_reset,
-TK_text, null_scale, TK_graphics, TK_move, TK_vector,
-TK_linetype, TK_put_text, null_text_angle,
-TK_justify_text, do_point, do_arrow, TK_set_font,
-NULL, 0, NULL, NULL, NULL, TK_linewidth
+    "tkcanvas", "Tk/Tcl canvas widget [perltk] [interactive]",
+    TK_XMAX, TK_YMAX, TK_VCHAR, TK_HCHAR,
+    TK_VTIC, TK_HTIC, TK_options, TK_init, TK_reset,
+    TK_text, null_scale, TK_graphics, TK_move, TK_vector,
+    TK_linetype, TK_put_text, null_text_angle,
+    TK_justify_text, do_point, do_arrow, TK_set_font,
+    NULL, 0, NULL, NULL, NULL, TK_linewidth
 TERM_TABLE_END(tkcanvas)
 #undef LAST_TERM
 #define LAST_TERM tkcanvas

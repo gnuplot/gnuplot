@@ -1,5 +1,5 @@
 /*
- * $Id: sun.trm,v 1.6 1998/12/14 18:41:16 lhecking Exp $
+ * $Id: sun.trm,v 1.7 1999/06/19 20:30:56 lhecking Exp $
  *
  */
 
@@ -64,7 +64,7 @@ TERM_PUBLIC void SUN_text __PROTO((void));
 TERM_PUBLIC void SUN_linetype __PROTO((int linetype));
 TERM_PUBLIC void SUN_move __PROTO((unsigned int x, unsigned int y));
 TERM_PUBLIC void SUN_vector __PROTO((unsigned int x, unsigned int y));
-TERM_PUBLIC void SUN_put_text __PROTO((unsigned int x, unsigned int y, char *str));
+TERM_PUBLIC void SUN_put_text __PROTO((unsigned int x, unsigned int y, const char *str));
 TERM_PUBLIC int SUN_justify_text __PROTO((enum JUSTIFY mode));
 TERM_PUBLIC void SUN_reset __PROTO((void));
 #define SUN_XMAX 600
@@ -209,7 +209,7 @@ unsigned int x, y;
 TERM_PUBLIC void
 SUN_put_text(x, y, str)
 unsigned int x, y;
-char *str;
+const char *str;
 {
     struct pr_subregion bound;
 

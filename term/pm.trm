@@ -1,5 +1,5 @@
 /*
- * $Id: pm.trm,v 1.17 1999/06/10 19:55:27 lhecking Exp $
+ * $Id: pm.trm,v 1.18 1999/06/19 20:30:54 lhecking Exp $
  */
 
 /* GNUPLOT - pm.trm */
@@ -61,7 +61,7 @@ TERM_PUBLIC void PM_linetype __PROTO((int lt));
 TERM_PUBLIC void PM_move __PROTO((unsigned int x, unsigned int y));
 TERM_PUBLIC void PM_vector __PROTO((unsigned int x, unsigned int y));
 TERM_PUBLIC int PM_text_angle __PROTO((int ang));
-TERM_PUBLIC void PM_put_text __PROTO((unsigned int x, unsigned int y, char *str));
+TERM_PUBLIC void PM_put_text __PROTO((unsigned int x, unsigned int y, const char *str));
 TERM_PUBLIC int PM_justify_text __PROTO((enum JUSTIFY mode));
 TERM_PUBLIC void PM_point __PROTO((unsigned int x, unsigned int y, int number));
 TERM_PUBLIC void PM_suspend __PROTO((void));
@@ -531,7 +531,7 @@ PM_text_angle(int ang)
 }
 
 TERM_PUBLIC void
-PM_put_text(unsigned int x, unsigned int y, char *str)
+PM_put_text(unsigned int x, unsigned int y, const char *str)
 {
     int len;
     if (PM_must_abort)
@@ -558,7 +558,7 @@ PM_justify_text(enum JUSTIFY mode)
 
 TERM_PUBLIC int
 PM_set_font(font) /* Entry font added by DJL */
-char *font;
+const char *font;
 {
     int len, fontsize;
     char *p;

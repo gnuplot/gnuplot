@@ -1,5 +1,5 @@
 /*
- * $Id: texdraw.trm,v 1.10 1999/02/22 15:20:49 lhecking Exp $
+ * $Id: texdraw.trm,v 1.11 1999/06/19 20:30:57 lhecking Exp $
  */
 
 /* GNUPLOT - texdraw.trm */
@@ -74,7 +74,7 @@ TERM_PUBLIC void TEXDRAW_arrow __PROTO((unsigned int sx, unsigned int sy,
 					unsigned int ex, unsigned int ey,
 					TBOOLEAN head));
 TERM_PUBLIC void TEXDRAW_put_text __PROTO((unsigned int x, unsigned int y,
-					   char str[]));
+					   const char str[]));
 TERM_PUBLIC int TEXDRAW_justify_text __PROTO((enum JUSTIFY mode));
 TERM_PUBLIC int TEXDRAW_text_angle __PROTO((int ang));
 TERM_PUBLIC void TEXDRAW_reset __PROTO((void));
@@ -113,8 +113,8 @@ static double TEXDRAW_xscale = 1.0, TEXDRAW_yscale = 1.0;
 
 /* POINTS */
 #define TEXDRAW_POINT_TYPES 12	/* we supply more point types */
-static char GPFAR *GPFAR TEXDRAW_points[] =
-{
+
+static const char GPFAR *GPFAR TEXDRAW_points[] = {
     "\\rmove(0 4)\\htext{$\\Diamond$}",
     "\\htext{$+$}",
     "\\rmove(0 4)\\htext{$\\Box$}",
@@ -131,8 +131,8 @@ static char GPFAR *GPFAR TEXDRAW_points[] =
 
 /* LINES */
 #define TEXDRAW_NUMLINES 5	/* number of linetypes below */
-static int TEXDRAW_lines[] =
-{
+
+static const int TEXDRAW_lines[] = {
     4,				/* -2 border */
     3,				/* -1 axes */
     3,				/*  0 solid thin  */
@@ -302,7 +302,7 @@ TBOOLEAN head;
 TERM_PUBLIC void
 TEXDRAW_put_text(x, y, str)
 unsigned int x, y;		/* reference point of string */
-char str[];			/* the text */
+const char str[];		/* the text */
 {
     char text;
 

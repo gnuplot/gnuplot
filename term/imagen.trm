@@ -1,5 +1,5 @@
 /*
- * $Id: imagen.trm,v 1.8 1999/05/31 18:33:51 lhecking Exp $
+ * $Id: imagen.trm,v 1.9 1999/06/19 20:30:51 lhecking Exp $
  */
 
 /* GNUPLOT - imagen.trm */
@@ -76,7 +76,7 @@ TERM_PUBLIC void IMAGEN_move __PROTO((unsigned int x, unsigned int y));
 TERM_PUBLIC void IMAGEN_vector __PROTO((unsigned int ux, unsigned int uy));
 TERM_PUBLIC int IMAGEN_text_angle __PROTO((int ang));
 TERM_PUBLIC int IMAGEN_justify_text __PROTO((enum JUSTIFY mode));
-TERM_PUBLIC void IMAGEN_put_text __PROTO((unsigned int x, unsigned int y, char str[]));
+TERM_PUBLIC void IMAGEN_put_text __PROTO((unsigned int x, unsigned int y, const char str[]));
 TERM_PUBLIC void IMAGEN_reset __PROTO((void));
 #define IMAGEN_PTS_PER_INCH (300)
 #define IMAGEN_XMAX (IMAGEN_PTS_PER_INCH * 11)	/* 10.0 inches */
@@ -544,7 +544,7 @@ int *height;
 TERM_PUBLIC void
 IMAGEN_put_text(x, y, str)
 unsigned int x, y;		/* reference point of string */
-char str[];			/* the text */
+const char str[];			/* the text */
 {
     unsigned char *cvstr, *p;
     int height;

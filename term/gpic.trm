@@ -1,5 +1,5 @@
 /*
- * $Id: gpic.trm,v 1.7 1998/12/14 18:39:28 lhecking Exp $
+ * $Id: gpic.trm,v 1.8 1999/06/19 20:30:49 lhecking Exp $
  */
 
 /* GNUPLOT - gpic.trm -*-C-*- */
@@ -71,7 +71,7 @@ TERM_PUBLIC void GPIC_arrow __PROTO((unsigned int sx, unsigned int sy,
 				     unsigned int ex, unsigned int ey,
 				     TBOOLEAN head));
 TERM_PUBLIC void GPIC_put_text __PROTO((unsigned int x, unsigned int y,
-					char str[]));
+					const char str[]));
 TERM_PUBLIC int GPIC_justify_text __PROTO((enum JUSTIFY mode));
 TERM_PUBLIC int GPIC_text_angle __PROTO((int ang));
 TERM_PUBLIC void GPIC_reset __PROTO((void));
@@ -232,7 +232,7 @@ TBOOLEAN head;
 TERM_PUBLIC void
 GPIC_put_text(x, y, str)
 unsigned int x, y;		/* reference point of string */
-char str[];			/* the text */
+const char str[];			/* the text */
 {
     GPIC_close_line();
     fprintf(gpoutfile, "\"%s\" ", str);

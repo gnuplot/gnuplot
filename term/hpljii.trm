@@ -1,5 +1,5 @@
 /*
- * $Id: hpljii.trm,v 1.10 1999/05/31 18:33:51 lhecking Exp $
+ * $Id: hpljii.trm,v 1.11 1999/06/19 20:30:51 lhecking Exp $
  *
  */
 
@@ -78,7 +78,7 @@ TERM_PUBLIC void HPLJIIinit __PROTO((void));
 TERM_PUBLIC void HPLJIIgraphics __PROTO((void));
 TERM_PUBLIC void HPLJIItext __PROTO((void));
 TERM_PUBLIC void HPLJIIlinetype __PROTO((int linetype));
-TERM_PUBLIC void HPLJIIput_text __PROTO((unsigned int x, unsigned int y, char *str));
+TERM_PUBLIC void HPLJIIput_text __PROTO((unsigned int x, unsigned int y, const char *str));
 TERM_PUBLIC void HPLJIIreset __PROTO((void));
 #define HPLJIImove b_move
 #define HPLJIIvector b_vector
@@ -261,7 +261,7 @@ int linetype;
 TERM_PUBLIC void
 HPLJIIput_text(x, y, str)
 unsigned int x, y;
-char *str;
+const char *str;
 {
     switch (b_angle) {
     case 0:

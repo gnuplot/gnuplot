@@ -1,5 +1,5 @@
 /*
- * $Id: excl.trm,v 1.9 1998/12/14 18:38:59 lhecking Exp $
+ * $Id: excl.trm,v 1.10 1999/06/19 20:30:48 lhecking Exp $
  *
  */
 
@@ -79,7 +79,7 @@ TERM_PUBLIC void EXCL_text __PROTO((void));
 TERM_PUBLIC void EXCL_linetype __PROTO((int linetype));
 TERM_PUBLIC void EXCL_move __PROTO((unsigned int x, unsigned int y));
 TERM_PUBLIC void EXCL_vector __PROTO((unsigned int x2, unsigned int y2));
-TERM_PUBLIC void EXCL_put_text __PROTO((unsigned int x, unsigned int y, char str[]));
+TERM_PUBLIC void EXCL_put_text __PROTO((unsigned int x, unsigned int y, const char str[]));
 TERM_PUBLIC void EXCL_reset __PROTO((void));
 
 #define EXCL_XMAX 9000
@@ -236,7 +236,7 @@ unsigned int x2, y2;
 TERM_PUBLIC void
 EXCL_put_text(x, y, str)
 unsigned int x, y;
-char str[];
+const char str[];
 {
     char ch;
     EXCL_move(x, y - EXCL_VCHAR / 3);

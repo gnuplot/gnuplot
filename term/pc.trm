@@ -1,5 +1,5 @@
 /*
- * $Id: pc.trm,v 1.12 1998/12/14 18:40:51 lhecking Exp $
+ * $Id: pc.trm,v 1.13 1999/06/19 20:30:54 lhecking Exp $
  *
  */
 
@@ -80,7 +80,7 @@ TERM_PUBLIC void PC_graphics __PROTO((void));
 TERM_PUBLIC void PC_linetype __PROTO((int linetype));
 TERM_PUBLIC void PC_move __PROTO((int x, int y));
 TERM_PUBLIC void PC_vector __PROTO((int x, int y));
-TERM_PUBLIC void PC_put_text __PROTO((int x, int y, char *str));
+TERM_PUBLIC void PC_put_text __PROTO((int x, int y, const char *str));
 TERM_PUBLIC int PC_text_angle __PROTO((int ang));
 TERM_PUBLIC int PC_justify_text __PROTO((enum JUSTIFY ang));
 
@@ -510,7 +510,7 @@ enum JUSTIFY just;
 TERM_PUBLIC void
 PC_put_text(x, y, str)
 int x, y;
-char *str;
+const char *str;
 {
 #ifdef __TURBOC__
     settextstyle(DEFAULT_FONT, pc_text_dir, pc_text_size);

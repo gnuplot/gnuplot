@@ -1,5 +1,5 @@
 /*
- * $Id: gpr.trm,v 1.6 1998/12/14 18:39:32 lhecking Exp $
+ * $Id: gpr.trm,v 1.7 1999/06/19 20:30:49 lhecking Exp $
  *
  */
 
@@ -66,7 +66,7 @@ TERM_PUBLIC void GPR_text __PROTO((void));
 TERM_PUBLIC void GPR_linetype __PROTO((int linetype));
 TERM_PUBLIC void GPR_move __PROTO((unsigned int x, unsigned int y));
 TERM_PUBLIC void GPR_vector __PROTO((unsigned int x, unsigned int y));
-TERM_PUBLIC void GPR_put_text __PROTO((unsigned int x, unsigned int y, char str[]));
+TERM_PUBLIC void GPR_put_text __PROTO((unsigned int x, unsigned int y, const char str[]));
 TERM_PUBLIC int GPR_text_angle __PROTO((int ang));
 TERM_PUBLIC int GPR_justify_text __PROTO((enum JUSTIFY mode));
 TERM_PUBLIC void GPR_reset __PROTO((void));
@@ -323,7 +323,7 @@ unsigned int x, y;
 TERM_PUBLIC void
 GPR_put_text(x, y, str)
 unsigned int x, y;		/* reference point of string */
-char str[];			/* the text */
+const char str[];		/* the text */
 {
     gpr_$coordinate_t xgpr, ygpr;
     gpr_$offset_t str_size_in_pixels;

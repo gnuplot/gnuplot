@@ -1,5 +1,5 @@
 /*
- * $Id: x11.trm,v 1.17 1999/05/31 18:33:52 lhecking Exp $
+ * $Id: x11.trm,v 1.18 1999/06/19 20:30:59 lhecking Exp $
  *
  */
 
@@ -55,7 +55,7 @@ TERM_PUBLIC void X11_vector __PROTO((unsigned int x, unsigned int y));
 TERM_PUBLIC void X11_linewidth __PROTO((double lw));
 TERM_PUBLIC void X11_pointsize __PROTO((double ps));
 TERM_PUBLIC void X11_linetype __PROTO((int lt));
-TERM_PUBLIC void X11_put_text __PROTO((unsigned int x, unsigned int y, char str[]));
+TERM_PUBLIC void X11_put_text __PROTO((unsigned int x, unsigned int y, const char str[]));
 TERM_PUBLIC int X11_justify_text __PROTO((enum JUSTIFY mode));
 TERM_PUBLIC void X11_point __PROTO((unsigned int x, unsigned int y, int number));
 TERM_PUBLIC void X11_fillbox __PROTO((int style, unsigned int x, unsigned y, unsigned int width, unsigned int height));
@@ -107,7 +107,7 @@ static void X11_atexit HANDLER_PROTO;
 typedef enum { hasNoArg, hasArg } OptionArg;
 
 static struct x11opt {
-    char *option;	/* Name of option */
+    const char *option;	/* Name of option */
     OptionArg arg;	/* Whether option has argument */
 }  X11_opts[] =
 {
@@ -582,7 +582,7 @@ int lt;
 TERM_PUBLIC void
 X11_put_text(x, y, str)
 unsigned int x, y;
-char str[];
+const char str[];
 {
     /* badly outrange labels can overflow into text field */
     if (x < 10000 && y < 10000) {

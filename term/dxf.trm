@@ -1,5 +1,5 @@
 /*
- * $Id: dxf.trm,v 1.7 1998/12/14 18:38:43 lhecking Exp $
+ * $Id: dxf.trm,v 1.8 1999/06/19 20:30:47 lhecking Exp $
  *
  */
 
@@ -66,7 +66,7 @@ TERM_PUBLIC void DXF_linetype __PROTO((int linetype));
 TERM_PUBLIC void DXF_move __PROTO((unsigned int x, unsigned int y));
 TERM_PUBLIC void DXF_vector __PROTO((unsigned int ux, unsigned int uy));
 TERM_PUBLIC void DXF_put_text __PROTO((unsigned int x, unsigned int y,
-				       char str[]));
+				       const char str[]));
 TERM_PUBLIC int DXF_text_angle __PROTO((int ang));
 TERM_PUBLIC int DXF_justify_text __PROTO((enum JUSTIFY mode));
 TERM_PUBLIC void DXF_reset __PROTO((void));
@@ -89,14 +89,18 @@ TERM_PUBLIC void DXF_reset __PROTO((void));
  * use the GNUPLOT 'set size' command to change the defaults */
 /* actual text height */
 #define DXF_TEXTHEIGHT (0.7 * DXF_VCHAR)
+
 /* actual text width, only a guess, we don't know the width of
  * a character of given height of the AutoCad STANDARD text font,
  * so change it if you like */
 #define DXF_TEXTWIDTH (0.7 * DXF_HCHAR)
+
 /* number of line types we support. see below  */
 #define DXF_LINE_TYPES 7
+
 /* number of layers used for the drawing. see below */
 #define MAX_LAYER 7
+
 /* line type scaling */
 #define LT_SCALE 1
 
@@ -108,22 +112,27 @@ enum JUSTIFY dxf_justify = LEFT;
 static float dxf_angle = 0.0;	/* either 0 (horizontal) or 90.0 (vertical) */
 
 /* text style used in the entire drawing */
-static char *text_style = "STANDARD";
+static const char *text_style = "STANDARD";
+
 /* text always resides on layer 0 */
 #define TEXT_LAYER 0
+
 /* each linetype resides on its own layer. each layer has its own color.
  * this avoids difficulties that AutoCad has with proper scaling of
  * the linetypes.
  * change the colors according to your needs */
-static char *layer_name[] ={ "0", "1", "2", "3", "4", "5", "6" };
+static const char *layer_name[] ={ "0", "1", "2", "3", "4", "5", "6" };
+
 /* the colours are white, red, yellow, green, cyan, blue, magenta.
  * change them according to your needs.
  * when using a black and white plotting device the colours map to different
  * line thicknesses. see description of AutoCad print / plot command */
-static char *layer_colour[] = { "7", "1", "2", "3", "4", "5", "6" };
+static const char *layer_colour[] = { "7", "1", "2", "3", "4", "5", "6" };
+
 /* support line types AutoCad has to offer by default. */
-static char *layer_lines[] = { "CONTINUOUS", "DASHED", "HIDDEN", "CENTER",
-			      "PHANTOM", "DOT", "DASHDOT" };
+static const char *layer_lines[] = {
+    "CONTINUOUS", "DASHED", "HIDDEN", "CENTER", "PHANTOM", "DOT", "DASHDOT"
+};
 
 static TBOOLEAN vector_was_last = FALSE;
 
@@ -275,7 +284,7 @@ unsigned int ux, uy;
 TERM_PUBLIC void
 DXF_put_text(x, y, str)
 unsigned int x, y;
-char str[];
+const char str[];
 {
     int stl;
     float xleftpos, yleftpos, xrightpos, yrightpos;

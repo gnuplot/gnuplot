@@ -1,6 +1,6 @@
-/* $Id: driver.h,v 1.9 1998/06/18 14:59:19 ddenholm Exp $ */
+/* $Id: driver.h,v 1.8 1998/11/25 21:05:34 lhecking Exp $ */
 
-/* GNUPLOT - driver.h  $Id: driver.h,v 1.9 1998/06/18 14:59:19 ddenholm Exp $ */
+/* GNUPLOT - driver.h  $Id: driver.h,v 1.8 1998/11/25 21:05:34 lhecking Exp $ */
 
 /*[
  * Copyright 1986 - 1993, 1998   Thomas Williams, Colin Kelley
@@ -53,7 +53,7 @@ int null_scale __PROTO((double x, double y));
 int do_scale __PROTO((double x, double y));
 void options_null __PROTO((void));
 void UNKNOWN_null __PROTO((void));
-int set_font_null __PROTO((char *s));
+int set_font_null __PROTO((const char *s));
 void null_set_pointsize __PROTO((double size));
 
 extern FILE *gpoutfile;

@@ -1,5 +1,5 @@
 /*
- * $Id: atarivdi.trm,v 1.11 1999/05/31 18:33:49 lhecking Exp $
+ * $Id: atarivdi.trm,v 1.12 1999/06/19 20:30:45 lhecking Exp $
  *
  */
 
@@ -70,7 +70,7 @@ TERM_PUBLIC void VDI_move(unsigned int x, unsigned int y);
 TERM_PUBLIC void VDI_vector(unsigned int x, unsigned int y);
 TERM_PUBLIC void VDI_linetype(int lt);
 TERM_PUBLIC int VDI_text_angle(int ang);
-TERM_PUBLIC void VDI_put_text(unsigned int x, unsigned int y, char *str);
+TERM_PUBLIC void VDI_put_text(unsigned int x, unsigned int y, const char *str);
 TERM_PUBLIC int VDI_justify_text(enum JUSTIFY mode);
 TERM_PUBLIC void VDI_point(unsigned int x, unsigned int y, int number);
 
@@ -335,7 +335,7 @@ VDI_linetype(int lt)
 }
 
 TERM_PUBLIC void
-VDI_put_text(unsigned int x, unsigned int y, char *str)
+VDI_put_text(unsigned int x, unsigned int y, const char *str)
 {
     int vchar = term->v_char;
     int dummy;

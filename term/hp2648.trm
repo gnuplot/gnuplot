@@ -1,5 +1,5 @@
 /*
- * $Id: hp2648.trm,v 1.6 1998/11/25 21:06:34 lhecking Exp $
+ * $Id: hp2648.trm,v 1.7 1999/06/19 20:30:50 lhecking Exp $
  *
  */
 
@@ -65,7 +65,7 @@ TERM_PUBLIC void HP2648text __PROTO((void));
 TERM_PUBLIC void HP2648linetype __PROTO((int linetype));
 TERM_PUBLIC void HP2648move __PROTO((unsigned int x, unsigned int y));
 TERM_PUBLIC void HP2648vector __PROTO((unsigned int x, unsigned int y));
-TERM_PUBLIC void HP2648put_text __PROTO((unsigned int x, unsigned int y, char *str));
+TERM_PUBLIC void HP2648put_text __PROTO((unsigned int x, unsigned int y, const char *str));
 TERM_PUBLIC int HP2648_text_angle __PROTO((int ang));
 TERM_PUBLIC void HP2648reset __PROTO((void));
 
@@ -152,7 +152,7 @@ unsigned int x, y;
 TERM_PUBLIC void
 HP2648put_text(x, y, str)
 unsigned int x, y;
-char *str;
+const char *str;
 {
     HP2648move(x, y - HP2648VCHAR / 2 + 1);
     fprintf(gpoutfile, "\033*l%s\n", str);

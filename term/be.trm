@@ -1,5 +1,5 @@
 /*
- * $Id: be.trm,v 1.4 1999/03/12 21:48:26 lhecking Exp $
+ * $Id: be.trm,v 1.5 1999/06/19 20:30:45 lhecking Exp $
  *
  */
 
@@ -61,7 +61,7 @@ TERM_PUBLIC void BE_vector __PROTO((unsigned int x, unsigned int y));
 TERM_PUBLIC void BE_linewidth __PROTO((double lw));
 TERM_PUBLIC void BE_pointsize __PROTO((double ps));
 TERM_PUBLIC void BE_linetype __PROTO((int lt));
-TERM_PUBLIC void BE_put_text __PROTO((unsigned int x, unsigned int y, char str[]));
+TERM_PUBLIC void BE_put_text __PROTO((unsigned int x, unsigned int y, const char str[]));
 TERM_PUBLIC int BE_justify_text __PROTO((enum JUSTIFY mode));
 TERM_PUBLIC void BE_point __PROTO((unsigned int x, unsigned int y, int number));
 TERM_PUBLIC void BE_fillbox __PROTO((int style, unsigned int x, unsigned y, unsigned int width, unsigned int height));
@@ -88,8 +88,8 @@ static void BE_atexit __PROTO((void));
 typedef enum { hasNoArg, hasArg } OptionArg;
 
 static struct beopt {
-    char *option;       /* Name of option */
-    OptionArg arg;      /* Whether option has argument */
+    const char *option;	/* Name of option */
+    OptionArg arg;	/* Whether option has argument */
 }  BE_opts[] =
 {
    { "-mono", hasNoArg }, { "-gray", hasNoArg }, { "-clear", hasNoArg },
@@ -307,7 +307,7 @@ int lt;
 TERM_PUBLIC void
 BE_put_text(x, y, str)
 unsigned int x, y;
-char str[];
+const char str[];
 {
     /* badly outrange labels can overflow into text field */
     if (x < 10000 && y < 10000) {

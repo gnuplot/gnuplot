@@ -1,5 +1,5 @@
 /*
- * $Id: mif.trm,v 1.11 1999/01/12 14:04:11 lhecking Exp $
+ * $Id: mif.trm,v 1.12 1999/06/19 20:30:52 lhecking Exp $
  */
 /* GNUPLOT -- mif.trm */
 
@@ -102,7 +102,7 @@ TERM_PUBLIC void MIF_text __PROTO((void));
 TERM_PUBLIC void MIF_linetype __PROTO((int linetype));
 TERM_PUBLIC void MIF_move __PROTO((unsigned int x, unsigned int y));
 TERM_PUBLIC void MIF_vector __PROTO((unsigned int x, unsigned int y));
-TERM_PUBLIC void MIF_put_text __PROTO((unsigned int x, unsigned int y, char *str));
+TERM_PUBLIC void MIF_put_text __PROTO((unsigned int x, unsigned int y, const char *str));
 TERM_PUBLIC int MIF_text_angle __PROTO((int ang));
 TERM_PUBLIC void MIF_reset __PROTO((void));
 TERM_PUBLIC void MIF_options __PROTO((void));
@@ -127,7 +127,7 @@ static int insert_mif_line __PROTO((double fx, double fy));
 static int proc_group_id __PROTO((int group_id));
 static void free_mif_line __PROTO((void));
 static void put_mif_line __PROTO((void));
-static void MIF_set_font __PROTO((char *));
+static void MIF_set_font __PROTO((const char *));
 static void mif_put_point __PROTO((unsigned int x, unsigned int y, int np));
 
 #ifndef cfree
@@ -726,7 +726,7 @@ unsigned int x, y;
 /* set font */
 static void
 MIF_set_font(font)
-char *font;
+const char *font;
 {
     if (font != mif_font) {
 	fprintf(gpoutfile, "\t\t<Font\n\t\t\t<FTag `%s'>\n\t\t>\n", font);
@@ -740,7 +740,7 @@ char *font;
 TERM_PUBLIC void
 MIF_put_text(x, y, str)
 unsigned int x, y;
-char str[];
+const char str[];
 {
     /* Process if inside a Frame */
     if (mif_initialized != 0 && mif_in_frame != 0) {

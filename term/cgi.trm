@@ -1,5 +1,5 @@
 /*
- * $Id: cgi.trm,v 1.8 1999/05/31 18:33:49 lhecking Exp $
+ * $Id: cgi.trm,v 1.9 1999/06/19 20:30:45 lhecking Exp $
  *
  */
 
@@ -41,7 +41,7 @@ TERM_PUBLIC void CGI_reset __PROTO((void));
 TERM_PUBLIC void CGI_move __PROTO((unsigned int x, unsigned int y));
 TERM_PUBLIC void CGI_vector __PROTO((unsigned int x, unsigned int y));
 TERM_PUBLIC void CGI_linetype __PROTO((int linetype));
-TERM_PUBLIC void CGI_put_text __PROTO((unsigned int x, unsigned int y, char *str));
+TERM_PUBLIC void CGI_put_text __PROTO((unsigned int x, unsigned int y, const char *str));
 TERM_PUBLIC int CGI_text_angle __PROTO((int ang));
 TERM_PUBLIC int CGI_justify_text __PROTO((enum JUSTIFY mode));
 TERM_PUBLIC void CGI_point __PROTO((unsigned int x, unsigned int y, int num));
@@ -208,7 +208,7 @@ int linetype;
 TERM_PUBLIC void
 CGI_put_text(x, y, str)
 unsigned int x, y;
-char *str;
+const char *str;
 {
     v_gtext(cgidev, (short) x, (short) y, str);
 }

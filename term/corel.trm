@@ -1,5 +1,5 @@
 /*
- * $Id: corel.trm,v 1.8 1998/12/14 18:38:27 lhecking Exp $
+ * $Id: corel.trm,v 1.9 1999/06/19 20:30:46 lhecking Exp $
  */
 
 /*
@@ -41,7 +41,7 @@ TERM_PUBLIC void COREL_linetype __PROTO((int linetype));
 TERM_PUBLIC void COREL_move __PROTO((unsigned int x, unsigned int y));
 TERM_PUBLIC void COREL_vector __PROTO((unsigned int x, unsigned int y));
 TERM_PUBLIC void COREL_put_text __PROTO((unsigned int x, unsigned int y,
-					 char *str));
+					 const char *str));
 TERM_PUBLIC int COREL_text_angle __PROTO((int ang));
 TERM_PUBLIC int COREL_justify_text __PROTO((enum JUSTIFY mode));
 #define CORELD_XMAX  5960	/* 8.2 inches wide */
@@ -338,7 +338,7 @@ unsigned int x, y;
 TERM_PUBLIC void
 COREL_put_text(x, y, str)
 unsigned int x, y;
-char *str;
+const char *str;
 {
     char ch;
     if (corel_stroke) {

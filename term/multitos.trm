@@ -1,5 +1,5 @@
 /*
- * $Id: multitos.trm,v 1.8 1999/05/31 18:33:51 lhecking Exp $
+ * $Id: multitos.trm,v 1.9 1999/06/19 20:30:53 lhecking Exp $
  */
 
 /* GNUPLOT - multitos.trm */
@@ -65,7 +65,7 @@ TERM_PUBLIC void MTOS_move(unsigned int x, unsigned int y);
 TERM_PUBLIC void MTOS_vector(unsigned int x, unsigned int y);
 TERM_PUBLIC void MTOS_linetype(int lt);
 TERM_PUBLIC int MTOS_text_angle(int ang);
-TERM_PUBLIC void MTOS_put_text(unsigned int x, unsigned int y, char *str);
+TERM_PUBLIC void MTOS_put_text(unsigned int x, unsigned int y, const char *str);
 TERM_PUBLIC int MTOS_justify_text(enum JUSTIFY mode);
 TERM_PUBLIC void MTOS_point(unsigned int x, unsigned int y, int number);
 
@@ -266,7 +266,7 @@ MTOS_text_angle(int ang)
 }
 
 TERM_PUBLIC void
-MTOS_put_text(unsigned int x, unsigned int y, char *str)
+MTOS_put_text(unsigned int x, unsigned int y, const char *str)
 {
     short x_1, y_1, len, buff;
 

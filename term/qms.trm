@@ -1,5 +1,5 @@
 /*
- * $Id: qms.trm,v 1.6 1998/11/25 21:07:51 lhecking Exp $
+ * $Id: qms.trm,v 1.7 1999/06/19 20:30:56 lhecking Exp $
  *
  */
 
@@ -65,7 +65,7 @@ TERM_PUBLIC void QMS_text __PROTO((void));
 TERM_PUBLIC void QMS_linetype __PROTO((int linetype));
 TERM_PUBLIC void QMS_move __PROTO((unsigned int x, unsigned int y));
 TERM_PUBLIC void QMS_vector __PROTO((unsigned int x2, unsigned int y2));
-TERM_PUBLIC void QMS_put_text __PROTO((unsigned int x, unsigned int y, char str[]));
+TERM_PUBLIC void QMS_put_text __PROTO((unsigned int x, unsigned int y, const char str[]));
 TERM_PUBLIC void QMS_reset __PROTO((void));
 
 #define QMS_XMAX 9000
@@ -186,7 +186,7 @@ unsigned int x2, y2;
 TERM_PUBLIC void
 QMS_put_text(x, y, str)
 unsigned int x, y;
-char str[];
+const char str[];
 {
     char ch;
     QMS_move(x, y + QMS_VCHAR / 3);

@@ -1,5 +1,5 @@
 /*
- * $Id: gif.trm,v 1.16 1999/06/09 12:05:11 lhecking Exp $
+ * $Id: gif.trm,v 1.17 1999/06/19 20:30:49 lhecking Exp $
  */
 
 /* GNUPLOT -- gif.trm */
@@ -103,7 +103,7 @@ TERM_PUBLIC void GIF_text __PROTO((void));
 TERM_PUBLIC void GIF_linetype __PROTO((int linetype));
 TERM_PUBLIC void GIF_move __PROTO((unsigned int x, unsigned int y));
 TERM_PUBLIC void GIF_vector __PROTO((unsigned int x, unsigned int y));
-TERM_PUBLIC void GIF_put_text __PROTO((unsigned int x, unsigned int y, char str[]));
+TERM_PUBLIC void GIF_put_text __PROTO((unsigned int x, unsigned int y, const char str[]));
 TERM_PUBLIC int GIF_text_angle __PROTO((int ang));
 TERM_PUBLIC void GIF_reset __PROTO((void));
 
@@ -529,7 +529,7 @@ GIF_linetype(int type)
  * justified according to _justify_text.
  */
 TERM_PUBLIC void
-GIF_put_text(unsigned int x, unsigned int y, char *string)
+GIF_put_text(unsigned int x, unsigned int y, const char *string)
 {
     if (gif_state.angle == 1) {
 	x -= gif_state.charh / 2;
@@ -556,7 +556,7 @@ GIF_text_angle(int ang)
 }
 
 TERM_PUBLIC int
-GIF_set_font(char *fontname)
+GIF_set_font(const char *fontname)
 {
     char name[32];
     int  sep;

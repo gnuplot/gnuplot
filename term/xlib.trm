@@ -1,5 +1,5 @@
 /*
- * $Id: xlib.trm,v 1.7 1998/11/25 21:09:11 lhecking Exp $
+ * $Id: xlib.trm,v 1.8 1999/06/19 20:30:59 lhecking Exp $
  */
 
 /* GNUPLOT - xlib.trm */
@@ -58,7 +58,7 @@ TERM_PUBLIC void Xlib_reset __PROTO((void));
 TERM_PUBLIC void Xlib_move __PROTO((unsigned int x, unsigned int y));
 TERM_PUBLIC void Xlib_vector __PROTO((unsigned int x, unsigned int y));
 TERM_PUBLIC void Xlib_linetype __PROTO((int lt));
-TERM_PUBLIC void Xlib_put_text __PROTO((unsigned int x, unsigned int y, char str[]));
+TERM_PUBLIC void Xlib_put_text __PROTO((unsigned int x, unsigned int y, const char str[]));
 TERM_PUBLIC int Xlib_justify_text __PROTO((enum JUSTIFY mode));
 
 #define Xlib_XMAX 4096
@@ -130,7 +130,7 @@ int lt;
 TERM_PUBLIC void
 Xlib_put_text(x, y, str)
 unsigned int x, y;
-char str[];
+const char str[];
 {
     fprintf(gpoutfile, "T%04d%04d%s\n", x, y, str);
 }

@@ -35,8 +35,8 @@ struct TERMENTRY {
 
 /* required entries */
 
-	char *name;
-	char *description;
+	const char *name;
+	const char *description;
 	unsigned int xmax,ymax,v_char,h_char,v_tic,h_tic;
 
 	void (*options) __PROTO((void));
@@ -48,7 +48,7 @@ struct TERMENTRY {
 	void (*move) __PROTO((unsigned int, unsigned int));
 	void (*vector) __PROTO((unsigned int, unsigned int));
 	void (*linetype) __PROTO((int));
-	void (*put_text) __PROTO((unsigned int, unsigned int,char*));
+	void (*put_text) __PROTO((unsigned int, unsigned int, const char*));
 
 /* optional entries */
 
@@ -57,7 +57,7 @@ struct TERMENTRY {
 	void (*point) __PROTO((unsigned int, unsigned int,int));
 	void (*arrow) __PROTO((unsigned int, unsigned int, unsigned int,
 			   unsigned int, int));
-   int (*set_font) __PROTO((char *font));  /* "font,size" */
+   int (*set_font) __PROTO((const char *font));  /* "font,size" */
 	void (*set_pointsize) __PROTO((double size)); /* notification of set pointsize */
 	int flags; /* various flags */
    void (*suspend) __PROTO((void)); /* after one plot of multiplot */

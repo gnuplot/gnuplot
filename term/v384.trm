@@ -1,5 +1,5 @@
 /*
- * $Id: v384.trm,v 1.6 1998/11/25 21:09:00 lhecking Exp $
+ * $Id: v384.trm,v 1.7 1999/06/19 20:30:58 lhecking Exp $
  *
  */
 
@@ -75,7 +75,7 @@ TERM_PUBLIC void V384_text __PROTO((void));
 TERM_PUBLIC void V384_linetype __PROTO((int linetype));
 TERM_PUBLIC void V384_move __PROTO((unsigned int x, unsigned int y));
 TERM_PUBLIC void V384_vector __PROTO((unsigned int x, unsigned int y));
-TERM_PUBLIC void V384_put_text __PROTO((unsigned int x, unsigned int y, char str[]));
+TERM_PUBLIC void V384_put_text __PROTO((unsigned int x, unsigned int y, const char str[]));
 TERM_PUBLIC void V384_reset __PROTO((void));
 
 #define V384_XMAX 630
@@ -167,7 +167,7 @@ unsigned int x, y;
 TERM_PUBLIC void
 V384_put_text(x, y, str)
 unsigned int x, y;
-char str[];
+const char str[];
 {
     V384_move(x, y + V384_VCHAR / 2);
     fprintf(gpoutfile, "$%s\n", str);

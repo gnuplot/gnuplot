@@ -1,5 +1,5 @@
 /*
- * $Id: pslatex.trm,v 1.18 1999/06/12 16:37:59 lhecking Exp $
+ * $Id: pslatex.trm,v 1.19 1999/06/19 20:30:55 lhecking Exp $
  */
 
 /* GNUPLOT - pslatex.trm */
@@ -60,7 +60,7 @@ register_term(pstex)
 TERM_PUBLIC void PSLATEX_options __PROTO((void));
 TERM_PUBLIC void PSLATEX_init __PROTO((void));
 TERM_PUBLIC void PSLATEX_graphics __PROTO((void));
-TERM_PUBLIC void PSLATEX_put_text __PROTO((unsigned int x, unsigned int y, char str[]));
+TERM_PUBLIC void PSLATEX_put_text __PROTO((unsigned int x, unsigned int y, const char str[]));
 TERM_PUBLIC int PSLATEX_justify_text __PROTO((enum JUSTIFY mode));
 TERM_PUBLIC int PSLATEX_text_angle __PROTO((int ang));
 TERM_PUBLIC void PSLATEX_reset __PROTO((void));
@@ -327,7 +327,7 @@ PSLATEX_graphics()
 TERM_PUBLIC void
 PSLATEX_put_text(x, y, str)
 unsigned int x, y;
-char str[];
+const char str[];
 {
     struct text_command *tc;
 

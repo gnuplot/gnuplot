@@ -1,5 +1,5 @@
 /*
- * $Id: unixpc.trm,v 1.6 1998/12/14 18:41:43 lhecking Exp $
+ * $Id: unixpc.trm,v 1.7 1999/06/19 20:30:58 lhecking Exp $
  *
  */
 
@@ -89,7 +89,7 @@ TERM_PUBLIC void uPC_text __PROTO((void));
 TERM_PUBLIC void uPC_linetype __PROTO((int linetype));
 TERM_PUBLIC void uPC_move __PROTO((unsigned int x, unsigned int y));
 TERM_PUBLIC void uPC_vector __PROTO((unsigned int x, unsigned int y));
-TERM_PUBLIC void uPC_put_text __PROTO((unsigned int x, unsigned int y, char str[]));
+TERM_PUBLIC void uPC_put_text __PROTO((unsigned int x, unsigned int y, const char str[]));
 TERM_PUBLIC int uPC_text_angle __PROTO((int ang));
 TERM_PUBLIC void uPC_reset __PROTO((void));
 #define uPC_XMAX 720
@@ -490,7 +490,7 @@ unsigned int x, y;
 TERM_PUBLIC void
 uPC_put_text(x, y, str)
 unsigned int x, y;
-char str[];
+const char str[];
 {
 /* This routine puts the text at the cursor location nearest
    to (x,y).  Obviously the exact postion would look better */
@@ -508,7 +508,7 @@ char str[];
 TERM_PUBLIC void
 uPC_put_text(x, y, str)
 unsigned int x, y;
-char str[];
+const char str[];
 {
     if (uPC_angle == 1)
 	x += uPC_VCHAR / 2;

@@ -1,6 +1,6 @@
 /* Hey Emacs this is -*- C -*-
  * 
- * $Id: pstricks.trm,v 1.13 1999/03/26 15:14:46 lhecking Exp $
+ * $Id: pstricks.trm,v 1.14 1999/06/19 20:30:55 lhecking Exp $
  */
 
 /* GNUPLOT - pstricks.trm */
@@ -93,7 +93,7 @@ TERM_PUBLIC void PSTRICKS_move __PROTO((unsigned int x, unsigned int y));
 TERM_PUBLIC void PSTRICKS_point __PROTO((unsigned int x, unsigned int y, int number));
 TERM_PUBLIC void PSTRICKS_vector __PROTO((unsigned int ux, unsigned int uy));
 TERM_PUBLIC void PSTRICKS_arrow __PROTO((unsigned int sx, unsigned int sy, unsigned int ex, unsigned int ey, TBOOLEAN head));
-TERM_PUBLIC void PSTRICKS_put_text __PROTO((unsigned int x, unsigned int y, char str[]));
+TERM_PUBLIC void PSTRICKS_put_text __PROTO((unsigned int x, unsigned int y, const char str[]));
 TERM_PUBLIC int PSTRICKS_justify_text __PROTO((enum JUSTIFY mode));
 TERM_PUBLIC int PSTRICKS_text_angle __PROTO((int ang));
 TERM_PUBLIC void PSTRICKS_reset __PROTO((void));
@@ -123,8 +123,8 @@ static int PSTRICKS_angle = 0;
 
 /* POINTS */
 #define PSTRICKS_POINT_TYPES 12	/* we supply more point types */
-static char *PSTRICKS_points[] =
-{
+
+static const char *PSTRICKS_points[] = {
     "\\PST@Diamond",
     "\\PST@Plus",
     "\\PST@Square",
@@ -141,8 +141,8 @@ static char *PSTRICKS_points[] =
 
 /* LINES */
 #define PSTRICKS_NUMLINES 6	/* number of linetypes below */
-static char *PSTRICKS_lines[] =
-{
+
+static const char *PSTRICKS_lines[] = {
     "\\PST@Border",
     "\\PST@Axes",
     "\\PST@Solid",
@@ -482,7 +482,7 @@ TERM_PUBLIC void
 PSTRICKS_put_text(x, y, str)
 unsigned int x;
 unsigned int y;
-char str[];
+const char str[];
 {
     PSTRICKS_endline();
 

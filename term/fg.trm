@@ -1,5 +1,5 @@
 /*
- * $Id: fg.trm,v 1.5 1998/12/14 18:39:04 lhecking Exp $
+ * $Id: fg.trm,v 1.6 1999/06/19 20:30:48 lhecking Exp $
  */
 
 /* GNUPLOT - fg.trm */
@@ -98,6 +98,11 @@ TERM_PUBLIC void VGAMONO_graphics __PROTO((void));
 TERM_PUBLIC void SVGA_graphics __PROTO((void));
 TERM_PUBLIC void SSVGA_graphics __PROTO((void));
 TERM_PUBLIC void VGA_linetype __PROTO((int linetype));
+TERM_PUBLIC void VGA_put_text __PROTO((unsigned int x, unsigned int y, const char *str));
+TERM_PUBLIC void VGA_move __PROTO((int x, int y));
+TERM_PUBLIC void VGA_vector __PROTO((int x, int y));
+TERM_PUBLIC void VGA_text __PROTO((void));
+TERM_PUBLIC void VGA_reset __PROTO((void));
 #define HERC_XMAX 720
 #define HERC_YMAX 348
 
@@ -294,13 +299,14 @@ VGA_linetype(linetype)
 TERM_PUBLIC void
 VGA_put_text(x, y, str)
 unsigned int x, y;
-char *str;
+const char *str;
 {
     fg_puts(vga_color, FG_MODE_SET, ~0, text_angle, x, y, str, fg.displaybox);
 }
 
 TERM_PUBLIC void
 VGA_move(x, y)
+int x, y;
 {
     line_to_draw[FG_X1] = x;
     line_to_draw[FG_Y1] = y;
@@ -309,6 +315,7 @@ VGA_move(x, y)
 
 TERM_PUBLIC void
 VGA_vector(x, y)
+int x, y;
 {
     line_to_draw[FG_X2] = x;
     line_to_draw[FG_Y2] = y;

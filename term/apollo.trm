@@ -1,5 +1,5 @@
 /*
- * $Id: apollo.trm,v 1.9 1999/01/14 19:34:40 lhecking Exp $
+ * $Id: apollo.trm,v 1.10 1999/06/19 20:30:45 lhecking Exp $
  *
  */
 
@@ -44,7 +44,7 @@ TERM_PUBLIC void APOLLO_vector __PROTO((unsigned int x, unsigned int y));
 TERM_PUBLIC void APOLLO_text __PROTO((void));
 TERM_PUBLIC int APOLLO_text_angle __PROTO((int ang));
 TERM_PUBLIC int APOLLO_justify_text __PROTO((enum JUSTIFY mode));
-TERM_PUBLIC void APOLLO_put_text __PROTO((unsigned int x, unsigned int y, char str[]));
+TERM_PUBLIC void APOLLO_put_text __PROTO((unsigned int x, unsigned int y, const char str[]));
 TERM_PUBLIC void APOLLO_reset __PROTO((void));
 /* default tick sizes for small windows */
 #define APOLLO_VTIC	 6
@@ -544,7 +544,7 @@ enum JUSTIFY mode;
 TERM_PUBLIC void
 APOLLO_put_text(x, y, str)
 unsigned int x, y;
-char str[];
+const char str[];
 {
     gpr_$offset_t size;
     status_$t status;

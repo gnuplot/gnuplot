@@ -1,5 +1,5 @@
 /*
- * $Id: emxvga.trm,v 1.8 1999/05/31 18:33:49 lhecking Exp $
+ * $Id: emxvga.trm,v 1.9 1999/06/19 20:30:47 lhecking Exp $
  */
 
 /* GNUPLOT - emxvga.trm */
@@ -71,7 +71,7 @@ TERM_PUBLIC void EMXVGA_linetype __PROTO((int));
 TERM_PUBLIC void EMXVGA_move __PROTO((unsigned int, unsigned int));
 TERM_PUBLIC void EMXVGA_vector __PROTO((unsigned int, unsigned int));
 TERM_PUBLIC int EMXVGA_text_angle __PROTO((int));
-TERM_PUBLIC void EMXVGA_put_text __PROTO((unsigned int, unsigned int, char *));
+TERM_PUBLIC void EMXVGA_put_text __PROTO((unsigned int, unsigned int, const char *));
 #define EMXVGA_VCHAR 8
 #define EMXVGA_HCHAR 8
 #define EMXVGA_VTIC 4
@@ -370,7 +370,7 @@ int ang;
 TERM_PUBLIC void
 EMXVGA_put_text(x, y, str)
 unsigned int x, y;
-char *str;
+const char *str;
 {
     g_string(x, lasty - y - 3, EMXVGA_color, EMXVGA_angle, str);
 }

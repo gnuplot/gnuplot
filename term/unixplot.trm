@@ -1,5 +1,5 @@
 /*
- * $Id: unixplot.trm,v 1.7 1998/11/25 21:08:47 lhecking Exp $
+ * $Id: unixplot.trm,v 1.8 1999/06/19 20:30:58 lhecking Exp $
  *
  */
 
@@ -71,7 +71,7 @@ TERM_PUBLIC void UP_text __PROTO((void));
 TERM_PUBLIC void UP_linetype __PROTO((int linetype));
 TERM_PUBLIC void UP_move __PROTO((unsigned int x, unsigned int y));
 TERM_PUBLIC void UP_vector __PROTO((unsigned int x, unsigned int y));
-TERM_PUBLIC void UP_put_text __PROTO((unsigned int x, unsigned int y, char str[]));
+TERM_PUBLIC void UP_put_text __PROTO((unsigned int x, unsigned int y, const char str[]));
 TERM_PUBLIC void UP_reset __PROTO((void));
 
 #define UP_XMAX 4096
@@ -144,7 +144,7 @@ unsigned int x, y;
 TERM_PUBLIC void
 UP_put_text(x, y, str)
 unsigned int x, y;
-char str[];
+const char str[];
 {
     UP_move(x + UP_HCHAR / 2, y + UP_VCHAR / 5);
     label(str);

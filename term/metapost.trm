@@ -1,5 +1,5 @@
 /*
- * $Id: metapost.trm,v 1.2 1999/06/10 19:54:47 lhecking Exp $
+ * $Id: metapost.trm,v 1.3 1999/06/19 20:30:52 lhecking Exp $
  */
 
 /* GNUPLOT - metapost.trm */
@@ -74,11 +74,11 @@ TERM_PUBLIC void MP_vector __PROTO((unsigned int ux, unsigned int uy));
 TERM_PUBLIC void MP_arrow __PROTO((unsigned int sx, unsigned int sy,
 				   unsigned int ex, unsigned int ey,
 				   TBOOLEAN head));
-TERM_PUBLIC void MP_put_text __PROTO((unsigned int x, unsigned int y, char str[]));
+TERM_PUBLIC void MP_put_text __PROTO((unsigned int x, unsigned int y, const char str[]));
 TERM_PUBLIC int MP_justify_text __PROTO((enum JUSTIFY mode));
 TERM_PUBLIC int MP_text_angle __PROTO((int ang));
 TERM_PUBLIC void MP_reset __PROTO((void));
-TERM_PUBLIC int MP_set_font __PROTO((char *font));
+TERM_PUBLIC int MP_set_font __PROTO((const char *font));
 TERM_PUBLIC void MP_boxfill __PROTO((int style,
 				     unsigned int x1, unsigned int y1,
 				     unsigned int width, unsigned int height));
@@ -522,7 +522,7 @@ TBOOLEAN head;
 TERM_PUBLIC void
 MP_put_text(x, y, str)
 unsigned int x, y;
-char str[];
+const char str[];
 {
     int i, j = 0;
 
@@ -585,10 +585,10 @@ int ang;
 
 TERM_PUBLIC int
 MP_set_font(font)
-char *font;
+const char *font;
 {
     if (*font) {
-	int sep = strcspn(font, ",");
+	size_t sep = strcspn(font, ",");
 	strncpy(MP_fontname, font, sep);
 	MP_fontname[sep] = NUL;
 	sscanf(&(font[sep + 1]), "%lf", &MP_fontsize);

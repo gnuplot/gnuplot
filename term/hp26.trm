@@ -1,5 +1,5 @@
 /*
- * $Id: hp26.trm,v 1.6 1998/12/14 18:39:41 lhecking Exp $
+ * $Id: hp26.trm,v 1.7 1999/06/19 20:30:50 lhecking Exp $
  */
 
 /* GNUPLOT - HP26.trm */
@@ -66,7 +66,7 @@ TERM_PUBLIC void HP26_graphics __PROTO((void));
 TERM_PUBLIC void HP26_text __PROTO((void));
 TERM_PUBLIC void HP26_reset __PROTO((void));
 TERM_PUBLIC int HP26_text_angle __PROTO((int ang));
-TERM_PUBLIC void HP26_put_text __PROTO((unsigned int x, unsigned int y, char *str));
+TERM_PUBLIC void HP26_put_text __PROTO((unsigned int x, unsigned int y, const char *str));
 TERM_PUBLIC void HP26_linetype __PROTO((int linetype));
 TERM_PUBLIC void HP26_line_and_point __PROTO((unsigned int x, unsigned int y, int number));
 
@@ -535,7 +535,7 @@ int ang;
 TERM_PUBLIC void
 HP26_put_text(x, y, str)
 unsigned int x, y;
-char *str;
+const char *str;
 {
     char abs_str[10], rel_str[10];
 

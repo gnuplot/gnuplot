@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: cgm.trm,v 1.20 1999/06/10 19:53:17 lhecking Exp $
+ * $Id: cgm.trm,v 1.21 1999/06/19 20:30:46 lhecking Exp $
  */
 
 /* GNUPLOT - cgm.trm */
@@ -71,13 +71,13 @@ TERM_PUBLIC void CGM_linecolor __PROTO((int color));
 TERM_PUBLIC void CGM_dashtype __PROTO((int dashtype));
 TERM_PUBLIC void CGM_linewidth __PROTO((double width));
 TERM_PUBLIC void CGM_put_text __PROTO((unsigned int x, unsigned int y,
-				       char *str));
+				       const char *str));
 TERM_PUBLIC int CGM_text_angle __PROTO((int ang));
 TERM_PUBLIC int CGM_justify_text __PROTO((enum JUSTIFY mode));
 TERM_PUBLIC void CGM_point __PROTO((unsigned int x, unsigned int y,
 				    int number));
 TERM_PUBLIC int CGM_find_font __PROTO((char *font, int numchar));
-TERM_PUBLIC int CGM_set_font __PROTO((char *font));
+TERM_PUBLIC int CGM_set_font __PROTO((const char *font));
 TERM_PUBLIC void CGM_set_pointsize __PROTO((double size));
 
 #define CGM_LARGE 32767
@@ -372,7 +372,7 @@ int numchar;
 
 TERM_PUBLIC int
 CGM_set_font(font)
-char *font;
+const char *font;
 {
     register struct termentry *t = term;
     int size, font_index;
@@ -763,11 +763,11 @@ unsigned int ux, uy;
 TERM_PUBLIC void
 CGM_put_text(x, y, str)
 unsigned int x, y;
-char str[];
+const char str[];
 {
     static int where[3] = { 0, 0, 1 };
     int data[4];
-    char *s = str;
+    const char *s = str;
 
     while (*s)
 	if (!isspace((int) *s++))
@@ -1070,8 +1070,7 @@ CGM_options()
 	quote_str(cgm_font, c_token, MAX_ID_LEN);
 	if (CGM_find_font(cgm_font, strlen(cgm_font)) == 0) {
 	    /* insert the font in the font table */
-	    int n;
-	    n = strlen(cgm_font);
+	    size_t n = strlen(cgm_font);
 	    if (n + 1 <= sizeof(cgm_font_data) && n <= 255) {
 		cgm_font_data[0] = n;
 		strncpy(cgm_font_data + 1, cgm_font, n);

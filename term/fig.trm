@@ -1,5 +1,5 @@
 /*
- * $Id: fig.trm,v 1.14 1999/05/31 18:33:50 lhecking Exp $
+ * $Id: fig.trm,v 1.15 1999/06/19 20:30:48 lhecking Exp $
  */
 
 /* GNUPLOT - fig.trm */
@@ -75,7 +75,7 @@ TERM_PUBLIC void FIG_linetype __PROTO((int linetype));
 TERM_PUBLIC void FIG_move __PROTO((unsigned int x, unsigned int y));
 TERM_PUBLIC void FIG_vector __PROTO((unsigned int ux, unsigned int uy));
 TERM_PUBLIC void FIG_arrow __PROTO((unsigned int sx, unsigned int sy, unsigned int ex, unsigned int ey, TBOOLEAN head));
-TERM_PUBLIC void FIG_put_text __PROTO((unsigned int x, unsigned int y, char *str));
+TERM_PUBLIC void FIG_put_text __PROTO((unsigned int x, unsigned int y, const char *str));
 TERM_PUBLIC int FIG_justify_text __PROTO((enum JUSTIFY mode));
 TERM_PUBLIC int FIG_text_angle __PROTO((int ang));
 TERM_PUBLIC void FIG_pointsize __PROTO((double arg_pointsize));
@@ -222,7 +222,8 @@ enum FIG_poly_stat fig_stat;
 TERM_PUBLIC void
 FIG_options()
 {
-    static char *options_list =	/* sun cc does not concat strings */
+    /* sun cc does not concat strings */
+    static const char *options_list =
     "expecting monochrome, color, small, big, portrait, landscape,\n\
  \t inches, metric, size <number> <number>,  fontsize <number>,\n\
  \t thickness <numer>, depth <number> or pointsmax <number>";
@@ -622,16 +623,16 @@ TBOOLEAN head;
 TERM_PUBLIC void
 FIG_put_text(x, y, str)
 unsigned int x, y;
-char *str;
+const char *str;
 {
-    char *s1, *s2, *outstr;
+    char *s1, *s2, *output_string;
 
     if (strlen(str) == 0)
 	return;
 
-    outstr = (char *) gp_alloc(2*strlen(str)+1, "FIG text");
+    output_string = (char *) gp_alloc(2*strlen(str)+1, "FIG text");
     s1 = str;
-    s2 = outstr;
+    s2 = output_string;
     do {
 	if (*s1 == '\\') *(s2++) = *s1;
 	*(s2++) = *s1;
@@ -639,14 +640,15 @@ char *str;
     FIG_poly_clean(FIG_polyvec_stat);
     y -= term->v_char / 2;	/* assuming vertical center justified */
 
-    fprintf(gpoutfile, "%d %d %d %d %d %d %6.3f %6.3f %d %6.3f %6.3f %d %d %s\\001\n",
     /* HBB 990329: quick hack: 'O_TEXT' is in use by POSIX header
      * <fcntl.h>. Renamed to OBJ_TEXT */
+    fprintf(gpoutfile, "\
+%d %d %d %d %d %d %6.3f %6.3f %d %6.3f %6.3f %d %d %s\\001\n",
 	    OBJ_TEXT, FIG_justify, FIG_color, 0, FIG_DEFAULT,
 	    FIG_ROMAN_FONT, (float) FIG_font_s,
 	    FIG_angle, SPECIAL_TEXT, (float) term->v_char,
 	    (float) term->h_char * strlen(str),
-	    FIG_xoff + x, term->ymax + FIG_yoff - y, outstr);
+	    FIG_xoff + x, term->ymax + FIG_yoff - y, output_string);
 
     free(outstr);
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: ai.trm,v 1.9 1999/01/13 21:49:44 lhecking Exp $
+ * $Id: ai.trm,v 1.10 1999/06/19 20:30:44 lhecking Exp $
  *
  */
 
@@ -74,14 +74,14 @@ TERM_PUBLIC void AI_text __PROTO((void));
 TERM_PUBLIC void AI_linetype __PROTO((int linetype));
 TERM_PUBLIC void AI_move __PROTO((unsigned int x, unsigned int y));
 TERM_PUBLIC void AI_vector __PROTO((unsigned int x, unsigned int y));
-TERM_PUBLIC void AI_put_text __PROTO((unsigned int x, unsigned int y, char *str));
+TERM_PUBLIC void AI_put_text __PROTO((unsigned int x, unsigned int y, const char *str));
 TERM_PUBLIC int AI_text_angle __PROTO((int ang));
 TERM_PUBLIC void AI_reset __PROTO((void));
 TERM_PUBLIC void AI_options __PROTO((void));
 TERM_PUBLIC int AI_justify_text __PROTO((enum JUSTIFY mode));
 TERM_PUBLIC void AI_suspend __PROTO(());
 TERM_PUBLIC void AI_resume __PROTO(());
-TERM_PUBLIC int AI_set_font __PROTO((char *font));
+TERM_PUBLIC int AI_set_font __PROTO((const char *font));
 
 #define AI_XOFF	50		/* page offset in pts */
 #define AI_YOFF	50
@@ -403,7 +403,7 @@ unsigned int x, y;
 TERM_PUBLIC void
 AI_put_text(x, y, str)
 unsigned int x, y;
-char *str;
+const char *str;
 {
     char ch;
     if (ai_stroke) {
@@ -459,13 +459,15 @@ enum JUSTIFY mode;
 
 TERM_PUBLIC int
 AI_set_font(font) /* Entry font added by DJL */
-char *font;
+const char *font;
 {
     char name[32];
-    int size, sep;
+    size_t sep;
+    int size;
 
     if (font && *font) {
 	sep = strcspn(font, ",");
+	assert(sep < sizeof(name));
 	strncpy(name, font, sep);
 	name[sep] = '\0';
 	size = ai_fontsize;

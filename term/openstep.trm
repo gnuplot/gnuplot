@@ -1,5 +1,5 @@
 /* -*- objc -*-
- * $Id: openstep.trm,v 1.1 1999/05/27 20:58:48 lhecking Exp $
+ * $Id: openstep.trm,v 1.2 1999/06/19 20:30:53 lhecking Exp $
  *
  */
 
@@ -101,11 +101,11 @@ TERM_PUBLIC void NEXT_reset __PROTO((void));
 TERM_PUBLIC void NEXT_linetype __PROTO((int linetype));
 TERM_PUBLIC void NEXT_move __PROTO((unsigned int x, unsigned int y));
 TERM_PUBLIC void NEXT_vector __PROTO((unsigned int x, unsigned int y));
-TERM_PUBLIC void NEXT_put_text __PROTO((unsigned int x, unsigned int y, char *str));
+TERM_PUBLIC void NEXT_put_text __PROTO((unsigned int x, unsigned int y, const char *str));
 TERM_PUBLIC int NEXT_text_angle __PROTO((int ang));
 TERM_PUBLIC int NEXT_justify_text __PROTO((enum JUSTIFY mode));
 TERM_PUBLIC void NEXT_point __PROTO((unsigned int x, unsigned int y, int number));
-TERM_PUBLIC int NEXT_set_font __PROTO((char *font));
+TERM_PUBLIC int NEXT_set_font __PROTO((const char *font));
 TERM_PUBLIC char *NEXT_RememberFont __PROTO((char *fname));
 TERM_PUBLIC void NEXT_set_pointsize __PROTO((double size));
 
@@ -830,7 +830,7 @@ enum JUSTIFY mode;
 
 TERM_PUBLIC int
 NEXT_set_font(font) /* Entry font added by DJL */
-char *font;
+const char *font;
 {
     char name[32];
     int size, sep;
@@ -1078,7 +1078,7 @@ double fontsize, base;
 TERM_PUBLIC void
 NEXT_put_text(x, y, str)
 unsigned int x, y;
-char *str;
+const char *str;
 {
     /* flush any pending graphics (all the XShow routines do this...) */
 

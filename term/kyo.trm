@@ -1,5 +1,5 @@
 /*
- * $Id: kyo.trm,v 1.6 1998/11/25 21:06:54 lhecking Exp $
+ * $Id: kyo.trm,v 1.7 1999/06/19 20:30:51 lhecking Exp $
  *
  */
 
@@ -56,7 +56,7 @@ TERM_PUBLIC void PRE_text __PROTO((void));
 TERM_PUBLIC void PRE_linetype __PROTO((int linetype));
 TERM_PUBLIC void PRE_move __PROTO((unsigned int x, unsigned int y));
 TERM_PUBLIC void PRE_vector __PROTO((unsigned int x, unsigned int y));
-TERM_PUBLIC void PRE_put_text __PROTO((unsigned int x, unsigned int y, char *str));
+TERM_PUBLIC void PRE_put_text __PROTO((unsigned int x, unsigned int y, const char *str));
 TERM_PUBLIC int PRE_justify_text __PROTO((enum JUSTIFY mode));
 TERM_PUBLIC void PRE_reset __PROTO((void));
 
@@ -145,7 +145,7 @@ unsigned int x, y;
 TERM_PUBLIC void
 PRE_put_text(x, y, str)
 unsigned int x, y;
-char *str;
+const char *str;
 {
     PRE_move(x, y);
     switch (pre_justify) {
