@@ -1,6 +1,80 @@
+1998-07-08  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* graphics.c, util3d.c: Grid clipping patch by HBB.
+
+	* datafile.c: Fortran numbers patch by HBB.
+
+	* 0PORTING, doc/gnuplot.doc, makefile.wc, national.h, stdfn.h,
+	term/pc.trm, term.c: DOS Watcom C port by Aurel Gabris
+	<gabrisa@valerie.inf.elte.hu>.
+
+	* configure.in: Change AC_PATH_X to AC_PATH_XTRA, add check
+	for snprintf().
+
+	* config.hin, configure: regenerated.
+
+	* 0INSTALL, 0README: Additions, inspired by Lucas Hart 
+	<hartl@ucs.orst.edu>.
+
+1998-07-02  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* gplt_x11.c: Change 0xffffffff to (unsigned long)(-1L).
+	Patch by Markus Dickebohm.
+
+1998-07-01  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* hidden3d.c: Fix core dump, allocated storage not free()'d in
+	case of errors. By HBB.
+
+	* Makefile.in: New target for show.o, for 'show version long'.
+
+	* acconfig.h, config.hin, configure.in: The correct file name
+	is .gnuplot, and not .gnuplotrc!
+
+	* config.hin: Add HAVE_SYS_UTSNAME_H, for 'show version long'.
+
+	* configure.in: Add check for <sys/utsname.h>.
+
+	* configure: Regenerated.
+
+	* setshow.h: Add <sys/utsname.h> and show_version_long() prototype.
+
+	* show.c: Add show_version_long(), and add 'version long' option
+	to parser.
+
+1998-06-30  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* fit.c, fit.h, matrix.c, matrix.h: Updated from HBB's hbbmisc
+	patch from 29-06-1998.
+
+	* makefile.tc, makefile.win, misc.c, set.c, show.c, docs/gnuplot.doc,
+	win/wtext.h: updated from hbbmisc patch from 29-06-1998.
+
+	* graphics.c: hbbmisc patch minus write_multiline() hunk.
+
+	* graphics.c: hbbdiffs-980630, hopefully complete fix for margin
+	calculation bug.
+
+	* term/pc.trm: hbbdiffs-980630. Let BGI graphics library take
+ 	care of vertical centering of letters.
+
+	* win/wgraph.c: hbbdiffs-980630. Make rotated letters also have the
+	correct justification to the *center* of the text height.
+
+1998-06-29  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* makefile.os2, plot.c, os2/gclient.c, term/pm.trm: OS/2 patches
+	by Roger Fearick <FEARICK@physci.uct.ac.za>.
+
+	* docs/termdoc.c: Use HAVE_CPP_STRINGIFY for ANSI_C.
+
 1998-06-23  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* Imported beta 347.
+
+	* Makefile.in: In term.o target, reverse order of $(INCLUDES) and
+	$(CPPFLAGS) to avoid problems with GNU plotutils. Fix by
+	Berthold Hoellmann <hoel@Hamburg.GermanLloyd.de>.
 
 1998-06-23  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
@@ -33,7 +107,7 @@
  	Cleanup patches by Dick Crawford <rccrawford@lanl.gov>.
 
 	* docs/gnuplot.doc, term/post.trm: Fix typos.
-	
+
 1998-05-12  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* set.c: Fix axis width in lp_style_type. HBB and Lars Hecking.
@@ -76,7 +150,7 @@
 	* term/cgm.trm: Amend help section.
 
 	* term/emxvga.trm: Add some comments, don't include math.h.
-	
+
 	* term/latex.trm (LATEX_rule): Replace valid with isvalid
 	(valid is a macro in <locale.h> under SunOS 4.1.x).
 
@@ -87,7 +161,7 @@
 
 	* makefile.*: Remove unneeded symbols AUTOCONF, HAVE_STRERROR, NOGAMMA.
 	Add stdfn.c and appropriate rules.
-	
+
 1998-04-15  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* parse.c (factor): Final, working workaround for HP 300 compiler
@@ -102,7 +176,7 @@
 	term-340.patch from Richard Crawford <u600256@gamma.lanl.gov>.
 
 	* post.trm: Fix typos in Dick's term-340 patch.
-	
+
 	* scanner.c, util.c: Escape quotes patch
 	from Glenn A. Horton-Smith <gas@SLAC.Stanford.EDU>.
 
@@ -134,7 +208,7 @@
 
 	* term.c (term_init): Memory allocation error fix.
 	From Kai Poitschke <kai.poitschke@henkel.de>.
-	
+
 1998-04-11  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* acconfig.h: Remove AUTOCONF, NOCOPY, OLD_SELECT.
@@ -143,13 +217,13 @@
 
 	* ansichek.h: Remove test for AUTOCONF, define ANSI_C if __STDC__ == 1.
 	Define HAVE_CPP_STRINGIFY and PROTOTYPES if ANSI_C == 1.
-	
+
 	* config.hin: Regenerated from acconfig.h with autoheader.
 
 	* configure.in: Add support for 'missing'. Add test for ANSI
 	stringification. Rearrange test order (ANSI first). Rewrite tests
 	for libgd and libpng, check png version.
-	
+
 	* configure: Regenerated from configure.in with autoconf.
 
 	* stdfn.c: New file, adds strchr(), strstr(). Moved memcpy() from
@@ -168,12 +242,12 @@
 	BACKUP_FILESYSTEM for VMS.
 
 	* fit.c: Move strnicmp() to stdfn.c. Use BACKUP_FILESYSTEM in update().
-	
+
 	* gplt_x11.c, readline.c, term.c, time.c, util.c: Use FPRINTF instead
 	of DEBUG, DEBUG_STR, and TRACE.
 
 	* gplt_x11.c, plot.c: Remove superfluous prototype for main.
-	
+
 	* gplt_x11.c: Use HAVE_SYS_SELECT_H instead of OLD_SELECT. Use
 	memset() instead of bzero(). In mainloop(), use ANSI_C instead
 	of __STDC__
@@ -187,7 +261,7 @@
 	* command.c: Move sleep() related declarations to stdfn.c and stdfn.h.
 
 	* datafile.c: Move purec_sscanf() to stdfn.c.
-	
+
 	* hidden3d.c, plot2d.c, plot3d.c: Use HAVE_CPP_STRINGIFY in place
 	of ANSI_C.
 
@@ -195,22 +269,22 @@
 	of vms.
 
 	* plot.c, term.c: Use AMIGA for AmigaOS compilers.
-	
+
 	* strftime.c: Replace TEST with TEST_STRFTIME.
-	
+
 	* util.c: Move strerror() to stdfn.c.
 
 	* errorfix.sh: Can now be run if compiledir != sourcedir. More
 	robust.
 
 	* term.h: Use AMIGA for Amiga compilers. Move X11 term inclusion.
-	
+
 	* vms.c: Include stdfn.h.
 
 	* makefile.g: Remove -DAUTOCONF=1.
-	
+
 1998-04-09  Lars Hecking  <lhecking@nmrc.ucc.ie>
-	
+
 	* ChangeLog: New file.
 
 	* gplt_x11.c (prepare_plot): Remove unused definition term_icon[10].
@@ -230,4 +304,3 @@
 	* aclocal.m4: Regenerated from acinclude.m4 with aclocal.
 
 	* configure: Regenerated from configure.in with autoconf.
-
