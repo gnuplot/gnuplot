@@ -1,5 +1,5 @@
 /*
- * $Id: post.trm,v 1.25 1999/05/12 13:53:19 lhecking Exp $
+ * $Id: post.trm,v 1.26 1999/06/19 20:30:54 lhecking Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -73,13 +73,13 @@ TERM_PUBLIC void PS_reset __PROTO((void));
 TERM_PUBLIC void PS_linetype __PROTO((int linetype));
 TERM_PUBLIC void PS_move __PROTO((unsigned int x, unsigned int y));
 TERM_PUBLIC void PS_vector __PROTO((unsigned int x, unsigned int y));
-TERM_PUBLIC void PS_put_text __PROTO((unsigned int x, unsigned int y, char *str));
-TERM_PUBLIC void ENHPS_put_text __PROTO((unsigned int x, unsigned int y, char *str));
+TERM_PUBLIC void PS_put_text __PROTO((unsigned int x, unsigned int y, const char *str));
+TERM_PUBLIC void ENHPS_put_text __PROTO((unsigned int x, unsigned int y, const char *str));
 TERM_PUBLIC int PS_text_angle __PROTO((int ang));
 TERM_PUBLIC int PS_justify_text __PROTO((enum JUSTIFY mode));
 TERM_PUBLIC void PS_point __PROTO((unsigned int x, unsigned int y, int number));
-TERM_PUBLIC int PS_set_font __PROTO((char * font));
-TERM_PUBLIC int ENHPS_set_font __PROTO((char * font));
+TERM_PUBLIC int PS_set_font __PROTO((const char * font));
+TERM_PUBLIC int ENHPS_set_font __PROTO((const char * font));
 TERM_PUBLIC void PS_fillbox __PROTO((int style, unsigned int x1, unsigned int y1, unsigned int width, unsigned int height));
 TERM_PUBLIC void PS_linewidth __PROTO((double linewidth)); /* JFi [linewidth] */
 TERM_PUBLIC void PS_pointsize __PROTO((double ptsize)); /* JFi [pointsize] */
@@ -114,7 +114,7 @@ extern char gnuplot_patchlevel[];
     if (ps_path_count) { fprintf(gpoutfile, "stroke "); ps_path_count = 0; }
 
 static char *PS_RememberFont __PROTO((char *fname, int reencode));
-static void ENHPS_put_text __PROTO((unsigned int x, unsigned int y, char *str));
+static void ENHPS_put_text __PROTO((unsigned int x, unsigned int y, const char *str));
 static char *ENHPS_recurse __PROTO((char *p, TBOOLEAN brace, char *fontname, double fontsize, double base, TBOOLEAN widthflag, TBOOLEAN showflag));
 static char ps_font[MAX_ID_LEN+1] = "Helvetica" ; /* name of font */
 static int ps_fontsize = 14;					 /* size of font in pts */
@@ -142,7 +142,7 @@ static enum JUSTIFY ps_justify=LEFT;	/* text is flush left */
 static TBOOLEAN ps_duplex_state = FALSE;
 static TBOOLEAN ps_duplex_option = FALSE;
 
-static char GPFAR * GPFAR PS_header[] = {
+static const char GPFAR * GPFAR PS_header[] = {
 "/M {moveto} bind def\n",
 "/L {lineto} bind def\n",
 "/R {rmoveto} bind def\n",
@@ -449,7 +449,7 @@ static char GPFAR * GPFAR PS_header[] = {
 NULL
 };
 
-static char GPFAR * GPFAR ENHPS_header[] = {
+static char const GPFAR * GPFAR ENHPS_header[] = {
 /* For MFshow and MFwidth the tos is an array with the string and font info:  */
 /*	[<fontname (a string)> <fontsize> <vertical offset> <width significant?> <printed?> <text string>]  */
 
@@ -693,11 +693,13 @@ unsigned int xoff, yoff; /* how much to translate by */
 unsigned int bb_xmin, bb_ymin, bb_xmax, bb_ymax; /* bounding box */
 char **dict; /* extra entries for the dictionary */
 {
-    static char GPFAR psi1[] = "%%%%Creator: gnuplot %s patchlevel %s\n\
+    static const char GPFAR psi1[] = "\
+%%%%Creator: gnuplot %s patchlevel %s\n\
 %%%%CreationDate: %s\
 %%%%DocumentFonts: %s\n";
 
-    static char GPFAR psi2[] = "%%%%EndComments\n\
+    static const char GPFAR psi2[] = "\
+%%%%EndComments\n\
 /gnudict 256 dict def\ngnudict begin\n\
 /Color %s def\n\
 /Solid %s def\n\
@@ -710,7 +712,7 @@ char **dict; /* extra entries for the dictionary */
 /hpt hpt_ def\n\
 /vpt vpt_ def\n";
 
-    static char GPFAR * GPFAR PS_iso_8859_1_encoding[] = {
+    static const char GPFAR * GPFAR PS_iso_8859_1_encoding[] = {
 "/reencodeISO {\n",
 "dup dup findfont dup length dict begin\n",
 "{ 1 index /FID ne { def }{ pop pop } ifelse } forall\n",
@@ -763,7 +765,7 @@ NULL };
 /*                                                                         */
 /*   version 1.1:  - added some more special characters                    */
 /*                                                                         */
-    static char GPFAR * GPFAR PS_cp_437_encoding[] = {
+    static const char GPFAR * GPFAR PS_cp_437_encoding[] = {
 "/reencodeCP437 {\n",
 "dup dup findfont dup length dict begin\n",
 "{ 1 index /FID ne { def }{ pop pop } ifelse } forall\n",
@@ -811,7 +813,7 @@ NULL };
 /*                   -- frame characters,                                  */
 /*                   -- a few special characters.                          */
 /*                                                                         */
-    static char GPFAR * GPFAR PS_cp_850_encoding[] = {
+    static const char GPFAR * GPFAR PS_cp_850_encoding[] = {
 "/reencodeCP850 {\n",
 "dup dup findfont dup length dict begin\n",
 "{ 1 index /FID ne { def }{ pop pop } ifelse } forall\n",
@@ -864,14 +866,14 @@ NULL };
     ps_page = 0;
 
     if (!encap)
-	fprintf(gpoutfile,"%%!PS-Adobe-2.0\n");
+	fputs("%!PS-Adobe-2.0\n", gpoutfile);
     else
-	fprintf(gpoutfile,"%%!PS-Adobe-2.0 EPSF-2.0\n");
+	fputs("%!PS-Adobe-2.0 EPSF-2.0\n", gpoutfile);
 
     if (outstr) fprintf(gpoutfile, "%%%%Title: %s\n", outstr );   /*  JFi  */
     time(&now);
-    fprintf(gpoutfile, psi1, gnuplot_version, gnuplot_patchlevel, asctime(localtime(&now)),
-	    uses_fonts ? "(atend)" : "");
+    fprintf(gpoutfile, psi1, gnuplot_version, gnuplot_patchlevel,
+	    asctime(localtime(&now)), uses_fonts ? "(atend)" : "");
 
     fprintf(gpoutfile,"%%%%BoundingBox: %d %d %d %d\n",
 	    xoff + bb_xmin, yoff + bb_ymin, xoff + bb_xmax, yoff + bb_ymax);
@@ -880,7 +882,7 @@ NULL };
 	    ps_portrait ? "Portrait" : "Landscape");
 
     if (!encap)
-	fprintf(gpoutfile,"%%%%Pages: (atend)\n");
+	fputs("%%Pages: (atend)\n", gpoutfile);
     fprintf(gpoutfile, psi2,
 	    ps_color ? "true" : "false",
 	    ps_solid ? "true" : "false",
@@ -921,7 +923,7 @@ NULL };
 	while (*dict)
 	    fputs(*(dict++), gpoutfile);	
 
-    fprintf(gpoutfile,"end\n%%%%EndProlog\n");
+    fputs("end\n%%EndProlog\n", gpoutfile);
 }
 
 /* the init fn for the postscript driver */
@@ -973,9 +975,12 @@ PS_graphics()
     ps_page++;
     if (!ps_common_encap)
 	fprintf(gpoutfile,"%%%%Page: %d %d\n",ps_page,ps_page);
-    fprintf(gpoutfile,"gnudict begin\ngsave\n");
-    fprintf(gpoutfile,"%d %d translate\n",ps_common_xoff, ps_common_yoff);
-    fprintf(gpoutfile,"%.3f %.3f scale\n", (ps_eps ? 0.5 : 1.0)/PS_SC,
+    fprintf(gpoutfile,"\
+gnudict begin\ngsave\n\
+%d %d translate\n\
+%.3f %.3f scale\n",
+	    ps_common_xoff, ps_common_yoff,
+	    (ps_eps ? 0.5 : 1.0)/PS_SC,
 	    (ps_eps ? 0.5 : 1.0)/PS_SC);
     if (!ps_common_portrait) {
 	fprintf(gpoutfile,"90 rotate\n0 %d translate\n", (int)(-PS_YMAX));
@@ -1007,7 +1012,7 @@ PS_text()
 TERM_PUBLIC void
 PS_reset()
 {
-    fprintf(gpoutfile,"%%%%Trailer\n");
+    fputs("%%Trailer\n", gpoutfile);
 
     /* I think the following commands should be executed 
        `if (ps_common_uses_fonts)`. So I changed the next line. 
@@ -1015,7 +1020,7 @@ PS_reset()
 
     /*	if (!ps_common_uses_fonts) {  */                             /* JFi */
     if (ps_common_uses_fonts) {
-	fprintf(gpoutfile,"%%%%DocumentFonts: ");
+	fputs("%%DocumentFonts: ", gpoutfile);
 	while (PS_DocFonts) {
 	    struct PS_FontName *fnp;
 	    fnp = PS_DocFonts->next;
@@ -1160,7 +1165,7 @@ unsigned int x,y;
     PS_pen_x = x;
     PS_pen_y = y;
     if (ps_path_count >= 400) {
-	fprintf(gpoutfile,"currentpoint stroke M\n");
+	fputs("currentpoint stroke M\n", gpoutfile);
 	ps_path_count = 0;
     }
 }
@@ -1169,17 +1174,17 @@ unsigned int x,y;
 TERM_PUBLIC void
 PS_put_text(x,y,str)
 unsigned int x, y;
-char *str;
+const char *str;
 {
     char ch;
 
     if (!str && !strlen(str)) return;
     PS_move(x,y);
     if (ps_blacktext)
-	fprintf(gpoutfile,"gsave 0 setgray\n");
+	fputs("gsave 0 setgray\n", gpoutfile);
     if (ps_ang != 0)
-	fprintf(gpoutfile,"currentpoint gsave translate %d rotate 0 0 M\n"
-		,ps_ang*90);
+	fprintf(gpoutfile,"currentpoint gsave translate %d rotate 0 0 M\n",
+		ps_ang*90);
     putc('(',gpoutfile);
     ch = *str++;
     while(ch!='\0') {
@@ -1189,17 +1194,17 @@ char *str;
 	ch = *str++;
     }
     switch(ps_justify) {
-    case LEFT : fprintf(gpoutfile,") Lshow\n");
+    case LEFT : fputs(") Lshow\n", gpoutfile);
 	break;
-    case CENTRE : fprintf(gpoutfile,") Cshow\n");
+    case CENTRE : fputs(") Cshow\n", gpoutfile);
 	break;
-    case RIGHT : fprintf(gpoutfile,") Rshow\n");
+    case RIGHT : fputs(") Rshow\n", gpoutfile);
 	break;
     }
     if (ps_ang != 0 || ps_blacktext)
-	fprintf(gpoutfile,"grestore\n");
+	fputs("grestore\n", gpoutfile);
     if (ps_ang != 0 && ps_blacktext)
-	fprintf(gpoutfile,"grestore\n");
+	fputs("grestore\n", gpoutfile);
     ps_path_count = 0;
     PS_relative_ok = FALSE;
 }
@@ -1225,14 +1230,17 @@ enum JUSTIFY mode;
 
 TERM_PUBLIC int
 PS_set_font(font)  /* Entry font added by DJL */
-char *font;
+const char *font;
 {
     char name[32];
-    int  size,sep;
+    int  size;
+    size_t sep;
 
-    sep=strcspn(font,",");
-    strncpy(name,font,sep); name[sep]=NUL;
-    size=ps_fontsize; sscanf (&(font[sep+1]),"%d",&size);
+    sep = strcspn(font,",");
+    strncpy(name,font,sep);
+    name[sep] = NUL;
+    size=ps_fontsize;
+    sscanf (&(font[sep+1]),"%d",&size);
     fprintf(gpoutfile,"/%s findfont %d scalefont setfont\n",name,size*PS_SC);
     PS_RememberFont(name,1 );
     return TRUE;
@@ -1247,25 +1255,26 @@ PS_point(x,y,number)
 unsigned int x,y;
 int number;
 {
-    static char GPFAR * GPFAR pointFNS[] = {"Pnt",  "Pls",   "Crs",    "Star",
-                           "Box",  "BoxF",  "Circle", "CircleF",
-                           "TriU", "TriUF", "TriD",   "TriDF",
-                           "Dia",  "DiaF",  "Pent",   "PentF",
-        		   "C0",   "C1",    "C2",     "C3",
-			   "C4",   "C5",    "C6",     "C7",
-          		   "C8",   "C9",    "C10",    "C11",
-			   "C12",  "C13",   "C14",    "C15",
-                           "S0",   "S1",    "S2",     "S3",
-			   "S4",   "S5",    "S6",     "S7",
-                           "S8",   "S9",    "S10",    "S11",
-			   "S12",  "S13",   "S14",    "S15",
-          		   "D0",   "D1",    "D2",     "D3",
-			   "D4",   "D5",    "D6",     "D7",
-			   "D8",   "D9",    "D10",    "D11",
-			   "D12",  "D13",   "D14",    "D15",
-                           "BoxE", "CircE", "TriUE",  "TriDE",
-                           "DiaE", "PentE", "BoxW",   "CircW",
-                           "TriUW", "TriDW", "DiaW",  "PentW"
+    static const char GPFAR * GPFAR pointFNS[] = {
+	"Pnt",  "Pls",   "Crs",    "Star",
+	"Box",  "BoxF",  "Circle", "CircleF",
+	"TriU", "TriUF", "TriD",   "TriDF",
+	"Dia",  "DiaF",  "Pent",   "PentF",
+	"C0",   "C1",    "C2",     "C3",
+	"C4",   "C5",    "C6",     "C7",
+	"C8",   "C9",    "C10",    "C11",
+	"C12",  "C13",   "C14",    "C15",
+	"S0",   "S1",    "S2",     "S3",
+	"S4",   "S5",    "S6",     "S7",
+	"S8",   "S9",    "S10",    "S11",
+	"S12",  "S13",   "S14",    "S15",
+	"D0",   "D1",    "D2",     "D3",
+	"D4",   "D5",    "D6",     "D7",
+	"D8",   "D9",    "D10",    "D11",
+	"D12",  "D13",   "D14",    "D15",
+	"BoxE", "CircE", "TriUE",  "TriDE",
+	"DiaE", "PentE", "BoxW",   "CircW",
+	"TriUW", "TriDW", "DiaW",  "PentW"
 };
     if (number < 0)
 	number = -1;		/* negative types are all 'dot' */
@@ -1370,7 +1379,7 @@ double fontsize, base;
 	    if (brace)
 		return (p);
 
-	    fprintf(stderr, "enhpost printer driver - spurious }\n");
+	    fputs("enhpost printer driver - spurious }\n", stderr);
 	    break;
 				/*}}}*/
 
@@ -1565,14 +1574,16 @@ double fontsize, base;
 
 TERM_PUBLIC int
 ENHPS_set_font(font)  /* Entry font added by DJL */
-char *font;
+const char *font;
 {
     ENHPS_DEBUG(("ENHPS_set_font(\"%s\")\n", font));
 
     if (*font) {
-	int sep=strcspn(font,",");
-	strncpy(ps_enh_font,font,sep); ps_enh_font[sep]=NUL;
-	ps_enh_fontsize=ps_fontsize; sscanf (font+sep+1,"%d",&ps_enh_fontsize);
+	size_t sep = strcspn(font,",");
+	strncpy(ps_enh_font,font,sep);
+	ps_enh_font[sep]=NUL;
+	ps_enh_fontsize = ps_fontsize;
+	sscanf (font+sep+1,"%d",&ps_enh_fontsize);
 	PS_RememberFont(ps_enh_font, 1);
     } else {
 	/* return to defaults */
@@ -1586,7 +1597,7 @@ char *font;
 TERM_PUBLIC void
 ENHPS_put_text(x, y, str)
 unsigned int x, y;
-char *str;
+const char *str;
 {
     /* flush any pending graphics (all the XShow routines do this...) */
 
@@ -1616,7 +1627,7 @@ char *str;
     PS_move(x,y);
 
     if (ps_blacktext)
-	fprintf(gpoutfile,"gsave 0 setgray\n");
+	fputs("gsave 0 setgray\n", gpoutfile);
     if (ps_ang != 0)
 	fprintf(gpoutfile,"currentpoint gsave translate %d rotate 0 0 moveto\n",
 		ps_ang*90);
@@ -1648,7 +1659,7 @@ char *str;
 
 	/* I think we can only get here if *str == '}' */
 	if (*str == '}')
-	    fprintf(stderr, "enhpost printer driver - ignoring spurious }\n");
+	    fputs("enhpost printer driver - ignoring spurious }\n", gpoutfile);
 	else
 	    fprintf(stderr, "internal error in enhpost driver - *str=0x%x\n", *str);
 
@@ -1663,11 +1674,11 @@ char *str;
     fprintf(gpoutfile, "] %.1f ", -ENHps_max_height/3);
 
     switch(ps_justify) {
-    case LEFT : fprintf(gpoutfile, "MLshow\n");
+    case LEFT : fputs("MLshow\n", gpoutfile);
 	break;
-    case CENTRE : fprintf(gpoutfile, "MCshow\n");
+    case CENTRE : fputs("MCshow\n", gpoutfile);
 	break;
-    case RIGHT : fprintf(gpoutfile, "MRshow\n");
+    case RIGHT : fputs("MRshow\n", gpoutfile);
 	break;
     }
 

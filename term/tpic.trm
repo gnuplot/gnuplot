@@ -1,5 +1,5 @@
 /*
- * $Id: tpic.trm,v 1.9 1999/01/12 19:17:13 lhecking Exp $
+ * $Id: tpic.trm,v 1.10 1999/06/19 20:30:58 lhecking Exp $
  */
 
 /* GNUPLOT - tpic.trm */
@@ -94,7 +94,7 @@ TERM_PUBLIC void TPIC_graphics __PROTO((void));
 TERM_PUBLIC void TPIC_move __PROTO((unsigned int x, unsigned int y));
 TERM_PUBLIC void TPIC_vector __PROTO((unsigned int ux, unsigned int uy));
 TERM_PUBLIC void TPIC_linetype __PROTO((int linetype));
-TERM_PUBLIC void TPIC_put_text __PROTO((unsigned int x, unsigned int y, char *str));	/* ref point and text */
+TERM_PUBLIC void TPIC_put_text __PROTO((unsigned int x, unsigned int y, const char *str));	/* ref point and text */
 TERM_PUBLIC int TPIC_text_angle __PROTO((int ang));
 TERM_PUBLIC int TPIC_justify_text __PROTO((enum JUSTIFY mode));
 TERM_PUBLIC void TPIC_point __PROTO((unsigned int x, unsigned int y, int number));
@@ -508,7 +508,7 @@ TERM_PUBLIC void
 TPIC_put_text(x, y, str)
 unsigned int x;
 unsigned int y;
-char *str;			/* ref point and text */
+const char *str;			/* ref point and text */
 {
     char *justify = NULL;
 
@@ -585,7 +585,7 @@ int number;
     fprintf(gpoutfile, "\\put(%d,%d){", x, y);	/* start putting */
 
     if (number < 0) {
-	fprintf(gpoutfile, "\\rule{.1pt}{.1pt}");	/* tiny dot */
+	fputs("\\rule{.1pt}{.1pt}", gpoutfile);	/* tiny dot */
     } else {
 	number %= tpic_point_types;
 	switch (tpic_point[number].shadestyle) {
