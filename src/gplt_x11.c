@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.27 2000/11/24 15:44:31 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.28 2000/11/24 19:17:22 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - gplt_x11.c */
@@ -1138,7 +1138,7 @@ record()
 
 #ifdef USE_MOUSE
 	case 'u':
-	    {
+	    if (!pipe_died) {
 		/* `set cursor' */
 		int c, x, y;
 		sscanf(buf, "u%4d%4d%4d", &c, &x, &y);
@@ -1178,7 +1178,7 @@ record()
 	    }
 
 	case 't':
-	    {
+	    if (!pipe_died) {
 		int where;
 		char *second;
 		if (sscanf(buf, "t%4d", &where) != 1)
@@ -1225,7 +1225,7 @@ record()
 	    }
 
 	case 'r':
-	    {
+	    if (!pipe_died) {
 		int x, y;
 		DrawRuler(plot);	/* erase previous ruler */
 		sscanf(buf, "r%4d%4d", &x, &y);

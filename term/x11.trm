@@ -1,5 +1,5 @@
 /*
- * $Id: x11.trm,v 1.32 2000/11/20 20:31:37 joze Exp $
+ * $Id: x11.trm,v 1.33 2000/11/24 15:44:31 mikulik Exp $
  *
  */
 
@@ -1135,28 +1135,34 @@ START_HELP(x11)
 " \".Xdefaults\" file (note that `raise` and `persist` can be overridden",
 " later by `set term x11 [no]raise [no]persist)`:",
 "@start table - first is interactive cleartext form",
-"  `-clear`   requests that the window be cleared momentarily before a",
-"             new plot is displayed.",
-"  `-gray`    requests grayscale rendering on grayscale or color displays.",
-"             (Grayscale displays receive monochrome rendering by default.)",
-"  `-mono`    forces monochrome rendering on color displays.",
-"  `-persist` plot windows survive after main gnuplot program exits",
-"  `-raise`   raise plot window after each plot",
-"  `-noraise` do not raise plot window after each plot",
-"  `-tvtwm`   requests that geometry specifications for position of the",
-"             window be made relative to the currently displayed portion",
-"             of the virtual root.",
+"  `-clear`    requests that the window be cleared momentarily before a",
+"              new plot is displayed.",
+"  `-gray`     requests grayscale rendering on grayscale or color displays.",
+"              (Grayscale displays receive monochrome rendering by default.)",
+"  `-mono`     forces monochrome rendering on color displays.",
+"  `-persist`  plot windows survive after main gnuplot program exits",
+"  `-raise`    raise plot window after each plot",
+"  `-noraise`  do not raise plot window after each plot",
+#ifdef USE_MOUSE
+"  `-noevents` do not process mouse and key events",
+#endif
+"  `-tvtwm`    requests that geometry specifications for position of the",
+"              window be made relative to the currently displayed portion",
+"              of the virtual root.",
 "#\\begin{tabular}{|cl|} \\hline",
-"#`-mono`  & forces monochrome rendering on color displays.\\\\",
-"#`-gray`  & requests grayscale rendering on grayscale or color displays.\\\\",
-"#         & (Grayscale displays receive monochrome rendering by default.) \\\\",
-"#`-clear` & requests that the window be cleared momentarily before a\\\\",
-"#         & new plot is displayed. \\\\",
-"#`-tvtwm` & requests that geometry specifications for position of the\\\\",
-"#         & window be made relative to the currently displayed portion\\\\",
-"#         & of the virtual root. \\\\",
-"#`-raise` & raise plot window after each plot. \\\\",
+"#`-mono`    & forces monochrome rendering on color displays.\\\\",
+"#`-gray`    & requests grayscale rendering on grayscale or color displays.\\\\",
+"#           & (Grayscale displays receive monochrome rendering by default.) \\\\",
+"#`-clear`   & requests that the window be cleared momentarily before a\\\\",
+"#           & new plot is displayed. \\\\",
+"#`-tvtwm`   & requests that geometry specifications for position of the\\\\",
+"#           & window be made relative to the currently displayed portion\\\\",
+"#           & of the virtual root. \\\\",
+"#`-raise`   & raise plot window after each plot. \\\\",
 "#`-noraise` & do not raise plot window after each plot. \\\\",
+#ifdef USE_MOUSE
+"#`-noevents` & do not process mouse and key events. \\\\",
+#endif
 "#`-persist`&plot windows survive after main gnuplot program exits. \\\\",
 "%c l .",
 "%`-mono`@forces monochrome rendering on color displays.",
@@ -1169,6 +1175,9 @@ START_HELP(x11)
 "%        @of the virtual root.",
 "%`-raise`@raise plot window after each plot",
 "%`-noraise`@do not raise plot window after each plot",
+#ifdef USE_MOUSE
+"%`-novevents`@do not process mouse and key events",
+#endif
 "%`-persist`@plot windows survive after main gnuplot program exits",
 "@end table",
 " The options are shown above in their command-line syntax.  When entered as",
@@ -1183,6 +1192,10 @@ START_HELP(x11)
 " than 0 and less than or equal to ten) used as a scaling factor for point",
 " sizes.  For example, `-pointsize 2` uses points twice the default size, and",
 " `-pointsize 0.5` uses points half the normal size.",
+"",
+" The `-noevents` switch disables all mouse and key event processing (execpt",
+" for `q` and `<space>` for closing the window). This is useful for programs",
+" which use the x11 driver independent of the gnuplot main program.",
 "2 monochome_options",
 "?commands set terminal x11 monochrome_options",
 "?set terminal x11 monochrome_options",

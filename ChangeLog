@@ -1,3 +1,9 @@
+2000-12-12  Johannes Zellner  <johannes@zellner.org>
+
+	* src/gplt_x11.c: minor changes for -noevents
+
+	* term/x11.trm: some text about -noevents
+
 2000-12-15  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* README.exp: remove section about 'mouse is experimental'.
