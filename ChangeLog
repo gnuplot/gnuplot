@@ -1,3 +1,11 @@
+1999-06-12  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* src/Makefile.am: Add AM_CPPFLAGS (hard-wired flags for CPP and CC).
+	Remove explicit targets, doesn't work with ansi2knr.
+
+	* term/pslatex.trm: Fix auxiliary ps filename creation, strip pathname
+	off filename written to LaTeX file.
+
 1999-06-11  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* Makefile.maint: Add configure options to my-distcheck.

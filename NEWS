@@ -7,8 +7,10 @@ Changes in release 3.7.1:
 * gnuplot-mode updated to 0.5g
 * FIXED errors in 'set view <z_scale>'. Related demos have
   been updated too.
-* src directory now used automake Makefile
+* src directory now uses automake Makefile
 * #error and #warning directives have been removed.
+* more efficient way of building docs/allterm.h
+* FIXED auxiliary ps filename generation in pslatex driver
 [3.7.0.7]
 * FIXED timestamp positioning problem in X11 terminal
 * FIXED exit/quit in batch files now works as documented
