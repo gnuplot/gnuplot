@@ -3,8 +3,19 @@
 	* term/emf.trm term/gd.trm term/pdf.trm term/pm.trm term/post.trm
 	term/svg.trm term/x11.trm src/gplt_x11.c src/gplt_x11.h:
 	Modify term->set_color() to handle colorspec type LC_LT.
-	This has the effect of changing the current line color to that of default
-	linetype <lc> without changing any other line properties.
+	This has the effect of changing the current line color to that of
+	default linetype <lc> without changing any other line properties.
+
+	* misc.c (lp_parse) save.c (save_set_all) show.c (show_linestyle)
+	docs/gnuplot.doc:
+	Allow line color {linecolor|lc} to be specified separately from the
+	linetype. For example, this command will give a dashed black line:
+	    set style line 1 lt 2 lc -1
+	and the following will give a dashed gold line:
+	    plot sin(x) with lines lt 2 lc rgb "gold"
+
+	* demo/dashcolor.dem: Demo of choosing both linetype (dot/dash pattern)
+	and linecolor separately.
 
 2005-03-06  Ethan Merritt  <merritt@u.washington.edu>
 

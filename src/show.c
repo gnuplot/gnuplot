@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.147 2005/03/02 20:35:36 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.148 2005/03/03 04:09:48 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -2802,14 +2802,16 @@ show_linestyle(int tag)
 	    showed = TRUE;
 	    fprintf(stderr, "\tlinestyle %d, ", this_linestyle->tag);
 
+	    fprintf(stderr, "linetype %d ", this_linestyle->lp_properties.l_type + 1);
 #ifdef PM3D
 	    if (this_linestyle->lp_properties.use_palette) {
-	    if (this_linestyle->lp_properties.pm3d_color.type != TC_LT)
-	    	fprintf(stderr, " linetype");
-		save_pm3dcolor(stderr, &this_linestyle->lp_properties.pm3d_color);
-	    } else
+	    	fprintf(stderr, " linecolor");
+		if (this_linestyle->lp_properties.pm3d_color.type == TC_LT)
+		    fprintf(stderr, " %d", this_linestyle->lp_properties.pm3d_color.lt+1);
+		else
+		    save_pm3dcolor(stderr, &this_linestyle->lp_properties.pm3d_color);
+	    }
 #endif
-		fprintf(stderr, "linetype %d, ", this_linestyle->lp_properties.l_type + 1);
 
 	    fprintf(stderr, " linewidth %.3f, pointtype %d ",
 		    this_linestyle->lp_properties.l_width,

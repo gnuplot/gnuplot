@@ -400,11 +400,14 @@ apply_pm3dcolor(struct t_colorspec *tc, const struct termentry *t)
 	(*t->linetype)(LT_BLACK);
 	return;
     }
+#ifdef PM3D
     if (tc->type == TC_LT) {
-	(*t->linetype)(tc->lt);
+	if (t->set_color)
+	    t->set_color(tc);
+	else
+	    (*t->linetype)(tc->lt);
 	return;
     }
-#ifdef PM3D
     if (tc->type == TC_RGB && t->set_color) {
 	t->set_color(tc);
 	return;
@@ -421,6 +424,10 @@ apply_pm3dcolor(struct t_colorspec *tc, const struct termentry *t)
 		      break;
     }
 #endif
+    if (tc->type == TC_LT) {
+	(*t->linetype)(tc->lt);
+	return;
+    }
 }
 
 void

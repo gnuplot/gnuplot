@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.277 2005/02/24 20:14:16 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.278 2005/03/05 04:52:13 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -1521,12 +1521,13 @@ C ... and restart the table:
 2 linetype, colors, and styles
 ?linetype
 ?colors
- Gnuplot commands use the term "linetype" to refer to the color of a line or
- other plot element.  Each terminal type provides a certain number of 
- pre-defined line types (colors).  These can be previewed by issuing
- the `test` command after setting the terminal type.  The pre-defined colors
- are not guaranteed to be consistent for all terminal types, but all terminals
- use the special index -1 to mean the primary foreground color (normally black).
+ Each gnuplot terminal type provides a set of distinct "linetypes". These may
+ differ in color, in thickness, in dot/dash pattern, or in some combination of
+ color and dot/dash. The default linetypes for a particular terminal can be
+ previewed by issuing the `test` command after setting the terminal type.
+ The pre-defined colors and dot/dash patterns are not guaranteed to be
+ consistent for all terminal types, but all terminals use the special linetype
+ -1 to mean a solid line in the primary foreground color (normally black).
  By default, successive functions or datafiles plotted by a single command will
  be assigned successive linetypes.  You can override this default by specifying
  a particular linetype for any function, datafile, or plot element.
@@ -1550,6 +1551,18 @@ C ... and restart the table:
       plot sin(x) lt palette frac 0.3   # fractional value along the palette
 
  See `show palette colornames`, `set palette`, `cbrange`.
+
+ For terminals that support dot/dash patterns, each default linetype has both
+ a dot-dash pattern and a default color. However, you can override the default
+ color by using the keyword `linecolor`, abbreviated `lc`.  For example, the
+ postscript terminal provides a dashed blue line as linetype 3.  The plot
+ commands below use this same dash pattern for three plots, one in blue (the
+ default), another in red (the default for linetype 1), and a third in gold.
+
+ Example:
+
+      set term postscript dashed color
+      plot 'foo' lt 3, 'baz' lt 3 linecolor 1, 'bar' lt 3 lc rgb 'gold'
 
  Lines can have additional properties such as linewidth.  You can associate
  these various properties, as well as equivalent properties for point symbols,
@@ -3956,6 +3969,7 @@ C ... and restart the table:
        with <style> { {linestyle | ls <line_style>}
                       | {{linetype  | lt <line_type>}
                          {linewidth | lw <line_width>}
+                         {linecolor | lc <colorspec>}
                          {pointtype | pt <point_type>}
                          {pointsize | ps <point_size>}
                          {fill | fs <fillstyle>}

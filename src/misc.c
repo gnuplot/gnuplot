@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.65 2005/03/03 04:09:48 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.66 2005/03/06 23:35:01 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -775,6 +775,8 @@ lp_parse(struct lp_style_type *lp, TBOOLEAN allow_ls, TBOOLEAN allow_point, int 
 		c_token++;
 #ifdef PM3D
 		if (almost_equals(c_token, "rgb$color")) {
+		    if (set_pal++)
+			break;
 		    c_token--;
 		    parse_colorspec(&lp->pm3d_color, TC_RGB);
  		    lp->use_palette = 1;
@@ -798,6 +800,24 @@ lp_parse(struct lp_style_type *lp, TBOOLEAN allow_ls, TBOOLEAN allow_point, int 
 		    break;
 		c_token++;
 		lp->use_palette = 1;
+		continue;
+	    }
+
+	    if (equals(c_token,"lc") || almost_equals(c_token,"linec$olor")) {
+		lp->use_palette = 1;
+		if (set_pal++)
+		    break;
+		c_token++;
+		if (almost_equals(c_token, "rgb$color")) {
+		    c_token--;
+		    parse_colorspec(&lp->pm3d_color, TC_RGB);
+		} else if (almost_equals(c_token, "pal$ette")) {
+		    c_token--;
+		    parse_colorspec(&lp->pm3d_color, TC_Z);
+		} else {
+		    lp->pm3d_color.type = TC_LT;
+		    lp->pm3d_color.lt = (int) real(const_express(&t)) - 1;
+		}
 		continue;
 	    }
 #endif
