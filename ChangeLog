@@ -1,3 +1,8 @@
+2001-09-05  Alexander Mai <st002279@hrzpub.tu-darmstadt.de>
+
+	* term/epslatex.trm term/svg.trm: Two no-op changes to
+	make gcc happy and remove (bogus) compiler warnings
+
 2001-09-08 Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* docs/gnuplot.doc src/gp_types.h src/graphics.c src/save.c

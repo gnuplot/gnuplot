@@ -524,6 +524,7 @@ SVG_put_text (unsigned int x, unsigned int y, const char *str)
 	alignment = "middle";
 	break;
     case RIGHT:
+    default:   /* can't happen, just to make gcc happy */
 	alignment = "end";
 	break;
     }
