@@ -1,5 +1,5 @@
 /*
- * $Id: post.trm,v 1.50 2000/12/06 15:22:44 broeker Exp $
+ * $Id: post.trm,v 1.51 2001/01/03 19:51:37 joze Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -1384,7 +1384,7 @@ enum JUSTIFY mode;
 
 TERM_PUBLIC int
 PS_set_font(font)  /* Entry font added by DJL */
-const char *font;
+    const char *font;
 {
     char name[32];
     int  size;
@@ -1395,8 +1395,8 @@ const char *font;
     name[sep] = NUL;
     size = ps_fontsize;
     sscanf (&(font[sep+1]),"%d",&size);
-    fprintf(gpoutfile,"/%s findfont %d scalefont setfont\n",name,size*PS_SC);
     PS_RememberFont(name,1 );
+    fprintf(gpoutfile,"/%s findfont %d scalefont setfont\n",name,size*PS_SC);
     return TRUE;
 }
 
