@@ -1,23 +1,30 @@
+2002-01-03  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* INSTALL: Added paragraph about avoiding floating point exception
+ 	crashes on Alpha CPUs caused by lack of IEEE compatibility.
+
 2001-12-19  Namio Matuda  <matuda@film.s.dendai.ac.jp>
 
 	* docs/doc2tex.c docs/titlepag.tex: Added some more hypertext
-	facilities into gnuplot.pdf (eg "see `xyz`" makes a link to the
-	page of the section of `xyz`).
+ 	facilities into gnuplot.pdf (eg "see `xyz`" makes a link to the
+ 	page of the section of `xyz`).
 
-	* docs/gnuplot.doc: Typos and fixes for better support of the above.
+	* docs/gnuplot.doc: Typos and fixes for better support of the
+ 	above.
 
 	* term/be.trm term/gnugraph.trm term/openstep.trm term/next.trm
-	term/tek.trm term/unixplot.trm: Typos and fixes to avoid various
-	LaTeX warnings (eg undefined references and multiply-defined labels)
-	in the preparation of gnuplot.pdf.Introduced definition of 
-	TERM_HELP_GNUGRAPH and TERM_HELP_NEXT. Changes labels and 
-	START_HELP/END_HELP arguments for gnugraph and openstep.
+ 	term/tek.trm term/unixplot.trm: Typos and fixes to avoid various
+ 	LaTeX warnings (eg undefined references and multiply-defined
+ 	labels) in the preparation of gnuplot.pdf.Introduced definition of
+ 	TERM_HELP_GNUGRAPH and TERM_HELP_NEXT. Changes labels and
+ 	START_HELP/END_HELP arguments for gnugraph and openstep.
 
 2001-12-18  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/win/wtext.c: Reallocate larger keyboard buffer instead of
-	silently ignoring input characters coming into an overfull buffer
-	(fixes piping 'plot "-" ... e' with large data sets, for instance).
+ 	silently ignoring input characters coming into an overfull buffer
+	(fixes piping 'plot "-" ... e' with large data sets, for
+ 	instance).
 	
 2001-12-18  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
