@@ -393,8 +393,8 @@ C
 #Home      & same as \verb~^A~. \\
 #Ctrl Home & same as \verb~^E~. \\
 #Esc       & same as \verb~^U~. \\
-#Help      & `{\bf help}' plus return. \\
-#Ctrl Help & `{\bf help }'. \\
+#Help      & `{\bf help}` plus return. \\
+#Ctrl Help & `{\bf help}`. \\
 %c l .
 %Arrow key@Function
 %_

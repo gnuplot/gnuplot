@@ -195,7 +195,7 @@ set title 'initial parameters'
 plot 'moli3.dat' w e, R(x)
 pause -1 "now start fitting...  (-> return)"
 fit R(x) 'moli3.dat' u 1:2:3 via eta, tc
-pause -1 "now look at the result (-> return)"
+pause -1 "Hit return to continue"
 set title 'fitted parameters'
 replot
 

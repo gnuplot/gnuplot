@@ -16,7 +16,7 @@ DVIPS = dvips
 srcdir = @srcdir@
 VPATH = @srcdir@
 
-prefix = /usr/local
+prefix = @prefix@
 exec_prefix = $(prefix)
 bindir = $(exec_prefix)/bin
 datadir = $(prefix)/lib
