@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: metapost.trm,v 1.30 2004/11/27 02:38:37 sfeam Exp $
+ * $Id: metapost.trm,v 1.31 2004/11/28 02:02:52 sfeam Exp $
  */
 
 /* GNUPLOT - metapost.trm */
@@ -286,7 +286,8 @@ MP_options()
 	    c_token++;
 	    if (!(END_OF_COMMAND)) {
 		int dummy_for_prologues;
-		if (sscanf(&(input_line[token[c_token].start_index]),
+
+		if (sscanf(gp_input_line + token[c_token].start_index,
 			   "%d", &dummy_for_prologues) == 1) {
 		    MP_prologues = dummy_for_prologues;
 		}

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.71 2005/01/10 21:02:46 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.72 2005/01/11 17:37:15 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -983,10 +983,12 @@ unset_logscale()
 	    reset_logscale(axis);
     } else {
 	int i = 0;
-	/* do reverse search because of "x", "x1", "x2" sequence in axisname_tbl */
+
+	/* do reverse search because of "x", "x1", "x2" sequence in
+	 * axisname_tbl */
 	while (i < token[c_token].length) {
-	    axis = lookup_table_nth_reverse( axisname_tbl, AXIS_ARRAY_SIZE,
-		       input_line+token[c_token].start_index+i );
+	    axis = lookup_table_nth_reverse(axisname_tbl, AXIS_ARRAY_SIZE,
+					    gp_input_line + token[c_token].start_index + i);
 	    if (axis < 0) {
 		token[c_token].start_index += i;
 		int_error(c_token, "unknown axis");

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.107 2004/12/10 13:38:48 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.108 2005/01/24 08:16:42 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -153,8 +153,8 @@ struct lexical_unit *token;
 int token_table_size;
 
 
-char *input_line;
-size_t input_line_len;
+char *gp_input_line;
+size_t gp_input_line_len;
 int inline_num;			/* input line number */
 
 struct udft_entry *dummy_func;
@@ -200,11 +200,11 @@ static int command_exit_status = 0;
 void
 extend_input_line()
 {
-    if (input_line_len == 0) {
+    if (gp_input_line_len == 0) {
 	/* first time */
-	input_line = gp_alloc(MAX_LINE_LEN, "input_line");
-	input_line_len = MAX_LINE_LEN;
-	input_line[0] = NUL;
+	gp_input_line = gp_alloc(MAX_LINE_LEN, "gp_input_line");
+	gp_input_line_len = MAX_LINE_LEN;
+	gp_input_line[0] = NUL;
 
 #ifdef OS2_IPC
 	sprintf( mouseSharedMemName, "\\SHAREMEM\\GP%i_Mouse_Input", getpid() );
@@ -216,11 +216,11 @@ extend_input_line()
 #endif /* OS2_IPC */
 
     } else {
-	input_line = gp_realloc(input_line, input_line_len + MAX_LINE_LEN,
+	gp_input_line = gp_realloc(gp_input_line, gp_input_line_len + MAX_LINE_LEN,
 				"extend input line");
-	input_line_len += MAX_LINE_LEN;
+	gp_input_line_len += MAX_LINE_LEN;
 	FPRINTF((stderr, "extending input line to %d chars\n",
-		 input_line_len));
+		 gp_input_line_len));
     }
 }
 
@@ -315,7 +315,7 @@ static char *input_line_SharedMem = NULL;
 	    fprintf(stderr,"shared mem received: |%s|\n",input_line_SharedMem);
 	    if (*input_line_SharedMem && input_line_SharedMem[strlen(input_line_SharedMem)-1] != '\n') fprintf(stderr,"\n");
 #  endif
-	    strcpy(input_line, input_line_SharedMem);
+	    strcpy(gp_input_line, input_line_SharedMem);
 	    input_line_SharedMem[0] = 0;
 	    thread_rl_RetCode = 0;
 	}
@@ -348,21 +348,21 @@ do_line()
 {
     /* Line continuation has already been handled
      * by read_line() */
-    char *inlptr = input_line;
+    char *inlptr = gp_input_line;
 
     /* Skip leading whitespace */
     while (isspace((unsigned char) *inlptr))
 	inlptr++;
 
-    if (inlptr != input_line) {
+    if (inlptr != gp_input_line) {
 	/* If there was leading whitespace, copy the actual
 	 * command string to the front. use memmove() because
 	 * source and target may overlap */
-	memmove(input_line, inlptr, strlen(inlptr));
+	memmove(gp_input_line, inlptr, strlen(inlptr));
 	/* Terminate resulting string */
-	input_line[strlen(inlptr)] = NUL;
+	gp_input_line[strlen(inlptr)] = NUL;
     }
-    FPRINTF((stderr, "Input line: \"%s\"\n", input_line));
+    FPRINTF((stderr, "Input line: \"%s\"\n", gp_input_line));
 
 #ifdef GP_MACROS
     /* Expand any string variables in the current input line.
@@ -373,8 +373,8 @@ do_line()
 #endif
 
     /* also used in load_file */
-    if (is_system(input_line[0])) {
-	do_system(input_line + 1);
+    if (is_system(gp_input_line[0])) {
+	do_system(gp_input_line + 1);
 	if (interactive)	/* 3.5 did it unconditionally */
 	    (void) fputs("!\n", stderr);	/* why do we need this ? */
 	return (0);
@@ -382,7 +382,7 @@ do_line()
 
     if_depth = 0;
     if_condition = TRUE;
-    num_tokens = scanner(&input_line, &input_line_len);
+    num_tokens = scanner(&gp_input_line, &gp_input_line_len);
     c_token = 0;
     while (c_token < num_tokens) {
 	command();
@@ -404,11 +404,11 @@ do_line()
 void
 do_string(char *s)
 {
-    char *orig_input_line = gp_strdup(input_line);
+    char *orig_input_line = gp_strdup(gp_input_line);
 
-    while (input_line_len < strlen(s) + 1)
+    while (gp_input_line_len < strlen(s) + 1)
 	extend_input_line();
-    strcpy(input_line, s);
+    strcpy(gp_input_line, s);
 
 #ifdef USE_MOUSE
     if (display_ipc_commands())
@@ -417,7 +417,7 @@ do_string(char *s)
 
     do_line();
 
-    strcpy(input_line, orig_input_line);
+    strcpy(gp_input_line, orig_input_line);
     free(orig_input_line);
 }
 
@@ -441,11 +441,11 @@ display_ipc_commands()
 void
 do_string_replot(char *s)
 {
-    char *orig_input_line = gp_strdup(input_line);
+    char *orig_input_line = gp_strdup(gp_input_line);
 
-    while (input_line_len < strlen(s) + 1)
+    while (gp_input_line_len < strlen(s) + 1)
 	extend_input_line();
-    strcpy(input_line, s);
+    strcpy(gp_input_line, s);
     if (display_ipc_commands())
 	fprintf(stderr, "%s\n", s);
 
@@ -453,7 +453,7 @@ do_string_replot(char *s)
     if (!replot_disabled)
 	replotrequest();
 
-    strcpy(input_line, orig_input_line);
+    strcpy(gp_input_line, orig_input_line);
     free(orig_input_line);
 }
 
@@ -535,9 +535,9 @@ command()
 #ifdef USE_MOUSE
 
 #define WHITE_AFTER_TOKEN(x) \
-(' ' == input_line[token[x].start_index + token[x].length] \
-|| '\t' == input_line[token[x].start_index + token[x].length] \
-|| '\0' == input_line[token[x].start_index + token[x].length])
+(' ' == gp_input_line[token[x].start_index + token[x].length] \
+|| '\t' == gp_input_line[token[x].start_index + token[x].length] \
+|| '\0' == gp_input_line[token[x].start_index + token[x].length])
 
 /* process the 'bind' command */
 void
@@ -555,7 +555,7 @@ bind_command()
 
     /* get left hand side: the key or key sequence */
     if (!END_OF_COMMAND) {
-	char* first = input_line + token[c_token].start_index;
+	char* first = gp_input_line + token[c_token].start_index;
 	int size = (int) (strchr(first, ' ') - first);
 	if (size < 0) {
 	    size = (int) (strchr(first, '\0') - first);
@@ -582,9 +582,9 @@ bind_command()
     }
 
     /* get right hand side: the command. allocating the size
-     * of input_line is too big, but shouldn't hurt too much. */
+     * of gp_input_line is too big, but shouldn't hurt too much. */
     if (!END_OF_COMMAND) {
-	rhs = (char*) gp_alloc(strlen(input_line) + 1, "bind_command->rhs");
+	rhs = (char*) gp_alloc(strlen(gp_input_line) + 1, "bind_command->rhs");
 	if (isstring(c_token)) {
 	    /* bind <lhs> "..." */
 	    quote_str(rhs, c_token, token_len(c_token));
@@ -637,7 +637,7 @@ call_command()
     gp_expand_tilde(&save_file);
     /* Argument list follows filename */
     load_file(loadpath_fopen(save_file, "r"), save_file, TRUE);
-    /* input_line[] and token[] now destroyed! */
+    /* gp_input_line[] and token[] now destroyed! */
     c_token = 0;
     num_tokens = 0;
     free(save_file);
@@ -729,10 +729,10 @@ history_command()
 
 	if (flag) {
 	    flag = 0;
-	    input_line = save_input_line;
+	    gp_input_line = save_input_line;
 	    c_token = save_c_token;
-	    input_line_len = save_input_line_len;
-	    num_tokens = scanner(&input_line, &input_line_len);
+	    gp_input_line_len = save_input_line_len;
+	    num_tokens = scanner(&gp_input_line, &gp_input_line_len);
 	    int_error(c_token,"recurrency forbidden");
 	}
 	c_token++;
@@ -743,18 +743,18 @@ history_command()
 	else {
 	    /* execute the command "name" */
 	    char *copy_name = gp_strdup(name);
-	    save_input_line = input_line;
+	    save_input_line = gp_input_line;
 	    save_c_token = c_token;
-	    save_input_line_len = input_line_len;
+	    save_input_line_len = gp_input_line_len;
 	    flag = 1;
-	    input_line = copy_name;
+	    gp_input_line = copy_name;
 	    printf("  Executing:\n\t%s\n",name);
 	    do_line();
 	    free(copy_name);
-	    input_line = save_input_line;
+	    gp_input_line = save_input_line;
 	    c_token = save_c_token;
-	    input_line_len = save_input_line_len;
-	    num_tokens = scanner(&input_line, &input_line_len);
+	    gp_input_line_len = save_input_line_len;
+	    num_tokens = scanner(&gp_input_line, &gp_input_line_len);
 	    flag = 0;
 	}
 	c_token++;
@@ -788,10 +788,10 @@ history_command()
 do {                                  \
     int idx = token[tok].start_index; \
     token[tok].length = 1;            \
-    input_line[idx++] = ';'; /* e */  \
-    input_line[idx++] = ' '; /* l */  \
-    input_line[idx++] = ' '; /* s */  \
-    input_line[idx++] = ' '; /* e */  \
+    gp_input_line[idx++] = ';'; /* e */  \
+    gp_input_line[idx++] = ' '; /* l */  \
+    gp_input_line[idx++] = ' '; /* s */  \
+    gp_input_line[idx++] = ' '; /* e */  \
 } while (0)
 
 #if 0
@@ -799,8 +799,8 @@ do {                                  \
 do {                                                                        \
     int i;                                                                  \
     int end_index = token[tok].start_index + token[tok].length;             \
-    for (i = token[tok].start_index; i < end_index && input_line[i]; i++) { \
-	fputc(input_line[i], stderr);                                       \
+    for (i = token[tok].start_index; i < end_index && gp_input_line[i]; i++) { \
+	fputc(gp_input_line[i], stderr);                                       \
     }                                                                       \
     fputc('\n', stderr);                                                    \
     fflush(stderr);                                                         \
@@ -825,8 +825,8 @@ if_command()
 	--c_token;
 	token[c_token].length = 1;
 	token[c_token].start_index = eolpos + 2;
-	input_line[eolpos + 2] = ';';
-	input_line[eolpos + 3] = NUL;
+	gp_input_line[eolpos + 2] = ';';
+	gp_input_line[eolpos + 3] = NUL;
 
 	if_condition = TRUE;
     } else {
@@ -884,7 +884,7 @@ load_command()
     gp_expand_tilde(&save_file);
     fp = strcmp(save_file, "-") ? loadpath_fopen(save_file, "r") : stdout;
     load_file(fp, save_file, FALSE);
-    /* input_line[] and token[] now destroyed! */
+    /* gp_input_line[] and token[] now destroyed! */
     c_token = num_tokens = 0;
     free(save_file);
 }
@@ -1324,10 +1324,10 @@ system_command()
     if (!isstring(++c_token))
 	int_error(c_token, "expecting command");
     else {
-	char *e = input_line + token[c_token].start_index + token[c_token].length - 1;
+	char *e = gp_input_line + token[c_token].start_index + token[c_token].length - 1;
 	char c = *e;
 	*e = NUL;
-	do_system(input_line + token[c_token].start_index + 1);
+	do_system(gp_input_line + token[c_token].start_index + 1);
 	*e = c;
     }
     c_token++;
@@ -1379,7 +1379,7 @@ se tit'R,G,B profiles of the current color palette';";
     if (!END_OF_COMMAND) {
 	int err = (token[c_token].length != 3);
 
-	order = input_line + token[c_token].start_index;
+	order = gp_input_line + token[c_token].start_index;
 	if (!err) {
 	    err += (memchr(order, 'r', 3) == NULL);
 	    err += (memchr(order, 'g', 3) == NULL);
@@ -1460,7 +1460,7 @@ se tit'R,G,B profiles of the current color palette';";
     is_cb_plot = save_is_cb_plot;
 #endif
 
-    /* further, input_line[] and token[] now destroyed! */
+    /* further, gp_input_line[] and token[] now destroyed! */
     c_token = num_tokens = 0;
 #endif /* PM3D */
 }
@@ -1564,7 +1564,7 @@ invalid_command()
 #ifdef OS2
    if (token[c_token].is_token) {
       int rc;
-      rc = ExecuteMacro(input_line + token[c_token].start_index,
+      rc = ExecuteMacro(gp_input_line + token[c_token].start_index,
 	      token[c_token].length);
       if (rc == 0) {
          c_token = num_tokens = 0;
@@ -1645,22 +1645,22 @@ replotrequest()
      * after do_plot has returned, whence we know all is well
      */
     if (END_OF_COMMAND) {
-	char *rest_args = &input_line[token[c_token].start_index];
+	char *rest_args = &gp_input_line[token[c_token].start_index];
 	size_t replot_len = strlen(replot_line);
 	size_t rest_len = strlen(rest_args);
 
 	/* preserve commands following 'replot ;' */
 	/* move rest of input line to the start
 	 * necessary because of realloc() in extend_input_line() */
-	memmove(input_line,rest_args,rest_len+1);
+	memmove(gp_input_line,rest_args,rest_len+1);
 	/* reallocs if necessary */
-	while (input_line_len < replot_len+rest_len+1)
+	while (gp_input_line_len < replot_len+rest_len+1)
 	    extend_input_line();
 	/* move old rest args off begin of input line to
 	 * make space for replot_line */
-	memmove(input_line+replot_len,input_line,rest_len+1);
+	memmove(gp_input_line+replot_len,gp_input_line,rest_len+1);
 	/* copy previous plot command to start of input line */
-	memcpy(input_line, replot_line, replot_len);
+	memcpy(gp_input_line, replot_line, replot_len);
     } else {
 	char *replot_args = NULL;	/* else m_capture will free it */
 	int last_token = num_tokens - 1;
@@ -1670,17 +1670,17 @@ replotrequest()
 	token[last_token].length - token[c_token].start_index + 3;
 
 	m_capture(&replot_args, c_token, last_token);	/* might be empty */
-	while (input_line_len < newlen)
+	while (gp_input_line_len < newlen)
 	    extend_input_line();
-	strcpy(input_line, replot_line);
-	strcat(input_line, ", ");
-	strcat(input_line, replot_args);
+	strcpy(gp_input_line, replot_line);
+	strcat(gp_input_line, ", ");
+	strcat(gp_input_line, replot_args);
 	free(replot_args);
     }
     plot_token = 0;		/* whole line to be saved as replot line */
 
     screen_ok = FALSE;
-    num_tokens = scanner(&input_line, &input_line_len);
+    num_tokens = scanner(&gp_input_line, &gp_input_line_len);
     c_token = 1;		/* skip the 'plot' part */
     if (is_3d_plot)
 	plot3drequest();
@@ -1802,7 +1802,7 @@ read_line(const char *prompt)
     strncat(expand_prompt, prompt, 38);
     do {
 	line_desc.dsc$w_length = MAX_LINE_LEN - start;
-	line_desc.dsc$a_pointer = &input_line[start];
+	line_desc.dsc$a_pointer = &gp_input_line[start];
 	switch (status[1] = smg$read_composed_line(&vms_vkid, &vms_ktid, &line_desc, &prompt_desc, &vms_len)) {
 	case SMG$_EOF:
 	    done(EXIT_SUCCESS);	/* ^Z isn't really an error */
@@ -1821,17 +1821,17 @@ read_line(const char *prompt)
 	    done(status[1]);	/* give the error message */
 	}
 	start += vms_len;
-	input_line[start] = NUL;
+	gp_input_line[start] = NUL;
 	inline_num++;
-	if (input_line[start - 1] == '\\') {
+	if (gp_input_line[start - 1] == '\\') {
 	    /* Allow for a continuation line. */
 	    prompt_desc.dsc$w_length = strlen(expand_prompt);
 	    prompt_desc.dsc$a_pointer = expand_prompt;
 	    more = 1;
 	    --start;
 	} else {
-	    line_desc.dsc$w_length = strlen(input_line);
-	    line_desc.dsc$a_pointer = input_line;
+	    line_desc.dsc$w_length = strlen(gp_input_line);
+	    line_desc.dsc$a_pointer = gp_input_line;
 	    more = 0;
 	}
     } while (more);
@@ -1877,7 +1877,7 @@ do_system(const char *cmd)
      if (!cmd)
 	return;
 
-    /* input_line is filled by read_line or load_file, but
+    /* gp_input_line is filled by read_line or load_file, but
      * line_desc length is set only by read_line; adjust now
      */
     line_desc.dsc$w_length = strlen(cmd);
@@ -2072,7 +2072,7 @@ help_command()
 		    } else
 			strcpy(prompt, "Help topic: ");
 		    read_line(prompt);
-		    num_tokens = scanner(&input_line, &input_line_len);
+		    num_tokens = scanner(&gp_input_line, &gp_input_line_len);
 		    c_token = 0;
 		    more_help = !(END_OF_COMMAND);
 		    if (more_help) {
@@ -2454,19 +2454,19 @@ read_line(const char *prompt)
 	/* grab some input */
 # if defined(READLINE) || defined(HAVE_LIBREADLINE)
 	if (((interactive)
-	     ? rlgets(input_line + start, input_line_len - start,
+	     ? rlgets(gp_input_line + start, gp_input_line_len - start,
 		     ((more) ? "> " : prompt))
-	     : fgets_ipc(input_line + start, input_line_len - start)
+	     : fgets_ipc(gp_input_line + start, gp_input_line_len - start)
 	    ) == (char *) NULL)
 # else /* !(READLINE || HAVE_LIBREADLINE) */
-	if (GET_STRING(input_line + start, input_line_len - start)
+	if (GET_STRING(gp_input_line + start, gp_input_line_len - start)
 	    == (char *) NULL)
 # endif /* !(READLINE || HAVE_LIBREADLINE) */
 	{
 	    /* end-of-file */
 	    if (interactive)
 		(void) putc('\n', stderr);
-	    input_line[start] = NUL;
+	    gp_input_line[start] = NUL;
 	    inline_num++;
 	    if (start > 0)	/* don't quit yet - process what we have */
 		more = FALSE;
@@ -2474,16 +2474,16 @@ read_line(const char *prompt)
 		return (1);	/* exit gnuplot */
 	} else {
 	    /* normal line input */
-	    last = strlen(input_line) - 1;
+	    last = strlen(gp_input_line) - 1;
 	    if (last >= 0) {
-		if (input_line[last] == '\n') {	/* remove any newline */
-		    input_line[last] = NUL;
+		if (gp_input_line[last] == '\n') {	/* remove any newline */
+		    gp_input_line[last] = NUL;
 		    /* Watch out that we don't backup beyond 0 (1-1-1) */
 		    if (last > 0)
 			--last;
-		} else if (last + 2 >= input_line_len) {
+		} else if (last + 2 >= gp_input_line_len) {
 		    extend_input_line();
-		    if (input_line[last] != '\\') {
+		    if (gp_input_line[last] != '\\') {
 			/* read rest of line, don't print "> " */
 			start = last + 1;
 			more = TRUE;
@@ -2491,7 +2491,7 @@ read_line(const char *prompt)
 		    }
 		    /* else fall through to continuation handling */
 		} /* if(grow buffer?) */
-		if (input_line[last] == '\\') {
+		if (gp_input_line[last] == '\\') {
 		    /* line continuation */
 		    start = last;
 		    more = TRUE;
@@ -2594,13 +2594,13 @@ string_expand()
     struct udvt_entry *udv;
 
     /* Most lines have no macros */
-    if (!strchr(input_line,'@'))
+    if (!strchr(gp_input_line,'@'))
 	return(0);
 
-    temp_string = gp_alloc(input_line_len,"string variable");
-    len = strlen(input_line);
-    if (len >= input_line_len) len = input_line_len-1;
-    strncpy(temp_string,input_line,len);
+    temp_string = gp_alloc(gp_input_line_len,"string variable");
+    len = strlen(gp_input_line);
+    if (len >= gp_input_line_len) len = gp_input_line_len-1;
+    strncpy(temp_string,gp_input_line,len);
     temp_string[len] = '\0';
 
     for (c=temp_string; len && c && *c; c++, len--) {
@@ -2617,36 +2617,38 @@ string_expand()
 		    	nfound++;
 		    	m = udv->udv_value.v.string_val;
 			FPRINTF((stderr,"Replacing @%s with \"%s\"\n",udv->udv_name,m));
-			if (strlen(m) + o + len > input_line_len)
+			if (strlen(m) + o + len > gp_input_line_len)
 			    extend_input_line();
 			while (*m)
-			    input_line[o++] = (*m++);
+			    gp_input_line[o++] = (*m++);
 		    } else {
 		    	int_warn( NO_CARET, "%s is not a string variable",m);
 		    }
 		    *c-- = temp_char;
 		} else
-		    input_line[o++] = *c;
+		    gp_input_line[o++] = *c;
 		break;
 
 	case '"':	
 		in_dquote = !in_dquote;
-		input_line[o++] = *c; break;
+		gp_input_line[o++] = *c; break;
 	case '\'':	
 		in_squote = !in_squote;
-		input_line[o++] = *c; break;
+		gp_input_line[o++] = *c; break;
 	case '#':
 		if (!in_squote && !in_dquote)
 		    in_comment = TRUE;
 	default :	
-		input_line[o++] = *c; break;
+		gp_input_line[o++] = *c; break;
 	}	
     }
-    input_line[o] = '\0';
+    gp_input_line[o] = '\0';
     free(temp_string);
 
     if (nfound)
-	FPRINTF((stderr,"After string substitution command line is:\n\t%s\n",input_line));
+	FPRINTF((stderr,
+		 "After string substitution command line is:\n\t%s\n",
+		 gp_input_line));
 
     return(nfound);
 }

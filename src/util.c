@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util.c,v 1.52 2005/01/19 23:54:19 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: util.c,v 1.53 2005/02/01 04:27:00 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - util.c */
@@ -104,7 +104,7 @@ equals(int t_num, const char *str)
     if (!token[t_num].is_token)
 	return (FALSE);		/* must be a value--can't be equal */
     for (i = 0; i < token[t_num].length; i++) {
-	if (input_line[token[t_num].start_index + i] != str[i])
+	if (gp_input_line[token[t_num].start_index + i] != str[i])
 	    return (FALSE);
     }
     /* now return TRUE if at end of str[], FALSE if not */
@@ -130,7 +130,7 @@ almost_equals(int t_num, const char *str)
     if (!token[t_num].is_token)
 	return FALSE;		/* must be a value--can't be equal */
     for (i = 0; i < length + after; i++) {
-	if (str[i] != input_line[start + i]) {
+	if (str[i] != gp_input_line[start + i]) {
 	    if (str[i] != '$')
 		return (FALSE);
 	    else {
@@ -152,8 +152,8 @@ isstring(int t_num)
 {
 
     return (token[t_num].is_token &&
-	    (input_line[token[t_num].start_index] == '\'' ||
-	     input_line[token[t_num].start_index] == '"'));
+	    (gp_input_line[token[t_num].start_index] == '\'' ||
+	     gp_input_line[token[t_num].start_index] == '"'));
 }
 
 
@@ -185,8 +185,8 @@ int
 isletter(int t_num)
 {
     return (token[t_num].is_token &&
-	    ((isalpha((unsigned char) input_line[token[t_num].start_index])) ||
-	     (input_line[token[t_num].start_index] == '_')));
+	    ((isalpha((unsigned char) gp_input_line[token[t_num].start_index])) ||
+	     (gp_input_line[token[t_num].start_index] == '_')));
 }
 
 
@@ -237,7 +237,7 @@ copy_str(char *str, int t_num, int max)
     }
 
     do {
-	str[i++] = input_line[start++];
+	str[i++] = gp_input_line[start++];
     } while (i != count);
     str[i] = NUL;
 
@@ -268,18 +268,18 @@ quote_str(char *str, int t_num, int max)
     }
     if (count > 0) {
 	do {
-	    str[i++] = input_line[start++];
+	    str[i++] = gp_input_line[start++];
 	} while (i != count);
     }
     str[i] = NUL;
     /* convert \t and \nnn (octal) to char if in double quotes */
-    if (input_line[token[t_num].start_index] == '"')
+    if (gp_input_line[token[t_num].start_index] == '"')
 	parse_esc(str);
 }
 
 
 /*
- * capture() copies into str[] the part of input_line[] which lies between
+ * capture() copies into str[] the part of gp_input_line[] which lies between
  * the begining of token[start] and end of token[end].
  */
 void
@@ -292,8 +292,8 @@ capture(char *str, int start, int end, int max)
 	e = token[start].start_index + max - 1;
 	FPRINTF((stderr, "str buffer overflow in capture"));
     }
-    for (i = token[start].start_index; i < e && input_line[i] != NUL; i++)
-	*str++ = input_line[i];
+    for (i = token[start].start_index; i < e && gp_input_line[i] != NUL; i++)
+	*str++ = gp_input_line[i];
     *str = NUL;
 }
 
@@ -311,8 +311,8 @@ m_capture(char **str, int start, int end)
     e = token[end].start_index + token[end].length;
     *str = gp_realloc(*str, (e - token[start].start_index + 1), "string");
     s = *str;
-    for (i = token[start].start_index; i < e && input_line[i] != NUL; i++)
-	*s++ = input_line[i];
+    for (i = token[start].start_index; i < e && gp_input_line[i] != NUL; i++)
+	*s++ = gp_input_line[i];
     *s = NUL;
 }
 
@@ -330,11 +330,11 @@ m_quote_capture(char **str, int start, int end)
     e = token[end].start_index + token[end].length - 1;
     *str = gp_realloc(*str, (e - token[start].start_index + 1), "string");
     s = *str;
-    for (i = token[start].start_index + 1; i < e && input_line[i] != NUL; i++)
-	*s++ = input_line[i];
+    for (i = token[start].start_index + 1; i < e && gp_input_line[i] != NUL; i++)
+	*s++ = gp_input_line[i];
     *s = NUL;
 
-    if (input_line[token[start].start_index] == '"')
+    if (gp_input_line[token[start].start_index] == '"')
 	parse_esc(*str);
 
 }
@@ -781,7 +781,7 @@ do {									\
     int i;								\
 									\
     for (i = 0; i < token[t_num].start_index; i++)			\
-	(void) fputc((input_line[i] == '\t') ? '\t' : ' ', stderr);	\
+	(void) fputc((gp_input_line[i] == '\t') ? '\t' : ' ', stderr);	\
 } while(0)
 
 #define PRINT_CARET fputs("^\n",stderr);
@@ -820,7 +820,7 @@ os_error(int t_num, const char *str, va_dcl)
 	df_showdata();
     } else if (t_num != NO_CARET) {	/* put caret under error */
 	if (!screen_ok)
-	    fprintf(stderr, "\n%s%s\n", current_prompt, input_line);
+	    fprintf(stderr, "\n%s%s\n", current_prompt, gp_input_line);
 
 	PRINT_SPACES_UNDER_PROMPT;
 	PRINT_SPACES_UPTO_TOKEN;
@@ -875,7 +875,7 @@ int_error(int t_num, const char str[], va_dcl)
         df_showdata();
     } else if (t_num != NO_CARET) { /* put caret under error */
 	if (!screen_ok)
-	    fprintf(stderr, "\n%s%s\n", current_prompt, input_line);
+	    fprintf(stderr, "\n%s%s\n", current_prompt, gp_input_line);
 
 	PRINT_SPACES_UNDER_PROMPT;
 	PRINT_SPACES_UPTO_TOKEN;
@@ -919,7 +919,7 @@ int_warn(int t_num, const char str[], va_dcl)
         df_showdata();
     } else if (t_num != NO_CARET) { /* put caret under error */
 	if (!screen_ok)
-	    fprintf(stderr, "\n%s%s\n", current_prompt, input_line);
+	    fprintf(stderr, "\n%s%s\n", current_prompt, gp_input_line);
 
 	PRINT_SPACES_UNDER_PROMPT;
 	PRINT_SPACES_UPTO_TOKEN;

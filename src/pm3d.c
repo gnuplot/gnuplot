@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.51 2005/01/08 15:37:22 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.52 2005/01/08 16:08:59 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - pm3d.c */
@@ -727,7 +727,8 @@ get_pm3d_at_option(char *pm3d_where)
 	pm3d_option_at_error();
 	return 1;
     }
-    memcpy(pm3d_where, input_line + token[c_token].start_index, token[c_token].length);
+    memcpy(pm3d_where, gp_input_line + token[c_token].start_index,
+	   token[c_token].length);
     pm3d_where[ token[c_token].length ] = 0;
     /* verify the parameter */
     for (c = pm3d_where; *c; c++) {

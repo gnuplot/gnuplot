@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: gd.trm,v 1.57 2004/12/21 00:50:07 sfeam Exp $
+ * $Id: gd.trm,v 1.58 2004/12/31 06:12:56 sfeam Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -626,7 +626,7 @@ PNG_options()
 	case PNG_OTHER:
 	default:
 	    /* not "size" */
-	    string = input_line + token[c_token].start_index;
+	    string = gp_input_line + token[c_token].start_index;
 
 #ifdef HAVE_GD_TTF
 	    /* Check for explicit TTF font size */

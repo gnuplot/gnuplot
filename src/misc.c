@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.59 2004/11/22 00:43:05 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.60 2004/12/01 21:10:35 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -189,51 +189,51 @@ load_file(FILE *fp, char *name, TBOOLEAN can_do_args)
 	}
 	while (!stop) {		/* read all commands in file */
 	    /* read one command */
-	    left = input_line_len;
+	    left = gp_input_line_len;
 	    start = 0;
 	    more = TRUE;
 
 	    while (more) {
-		if (fgets(&(input_line[start]), left, fp) == (char *) NULL) {
+		if (fgets(&(gp_input_line[start]), left, fp) == (char *) NULL) {
 		    stop = TRUE;	/* EOF in file */
-		    input_line[start] = '\0';
+		    gp_input_line[start] = '\0';
 		    more = FALSE;
 		} else {
 		    inline_num++;
-		    len = strlen(input_line) - 1;
-		    if (input_line[len] == '\n') {	/* remove any newline */
-			input_line[len] = '\0';
+		    len = strlen(gp_input_line) - 1;
+		    if (gp_input_line[len] == '\n') {	/* remove any newline */
+			gp_input_line[len] = '\0';
 			/* Look, len was 1-1 = 0 before, take care here! */
 			if (len > 0)
 			    --len;
-			if (input_line[len] == '\r') {	/* remove any carriage return */
-			    input_line[len] = NUL;
+			if (gp_input_line[len] == '\r') {	/* remove any carriage return */
+			    gp_input_line[len] = NUL;
 			    if (len > 0)
 				--len;
 			}
 		    } else if (len + 2 >= left) {
 			extend_input_line();
-			left = input_line_len - len - 1;
+			left = gp_input_line_len - len - 1;
 			start = len + 1;
 			continue;	/* don't check for '\' */
 		    }
-		    if (input_line[len] == '\\') {
+		    if (gp_input_line[len] == '\\') {
 			/* line continuation */
 			start = len;
-			left = input_line_len - start;
+			left = gp_input_line_len - start;
 		    } else
 			more = FALSE;
 		}
 	    }
 
-	    if (strlen(input_line) > 0) {
+	    if (strlen(gp_input_line) > 0) {
 		if (can_do_args) {
 		    int il = 0;
 		    char *rl;
-		    char *raw_line = gp_strdup(input_line);
+		    char *raw_line = gp_strdup(gp_input_line);
 
 		    rl = raw_line;
-		    *input_line = '\0';
+		    *gp_input_line = '\0';
 		    while (*rl) {
 			int aix;
 			if (*rl == '$'
@@ -242,34 +242,34 @@ load_file(FILE *fp, char *name, TBOOLEAN can_do_args)
 			    if (aix == '#') {
 				/* replace $# by number of passed arguments */
 				len = argc < 10 ? 1 : 2; /* argc can be 0 .. 10 */
-				while (input_line_len - il < len + 1) {
+				while (gp_input_line_len - il < len + 1) {
 				    extend_input_line();
 				}
-				sprintf(input_line + il, "%i", argc);
+				sprintf(gp_input_line + il, "%i", argc);
 				il += len;
 			    } else
 			    if (call_args[aix -= '0']) {
 				/* replace $n for n=0..9 by the passed argument */
 				len = strlen(call_args[aix]);
-				while (input_line_len - il < len + 1) {
+				while (gp_input_line_len - il < len + 1) {
 				    extend_input_line();
 				}
-				strcpy(input_line + il, call_args[aix]);
+				strcpy(gp_input_line + il, call_args[aix]);
 				il += len;
 			    }
 			} else {
 			    /* substitute for $<n> here */
-			    if (il + 1 > input_line_len) {
+			    if (il + 1 > gp_input_line_len) {
 				extend_input_line();
 			    }
-			    input_line[il++] = *rl;
+			    gp_input_line[il++] = *rl;
 			}
 			rl++;
 		    }
-		    if (il + 1 > input_line_len) {
+		    if (il + 1 > gp_input_line_len) {
 			extend_input_line();
 		    }
-		    input_line[il] = '\0';
+		    gp_input_line[il] = '\0';
 		    free(raw_line);
 		}
 		screen_ok = FALSE;	/* make sure command line is

@@ -1,5 +1,5 @@
 /*
- * $Id: command.h,v 1.33 2004/09/01 15:53:46 mikulik Exp $
+ * $Id: command.h,v 1.34 2004/11/06 21:18:45 sfeam Exp $
  */
 
 /* GNUPLOT - command.h */
@@ -40,7 +40,8 @@
 #include "gp_types.h"
 #include "stdfn.h"
 
-extern char *input_line;
+extern char *gp_input_line;
+extern size_t gp_input_line_len;
 
 extern int inline_num;
 
@@ -117,8 +118,6 @@ extern __far int num_tokens, c_token;
 #else
 extern int num_tokens, c_token;
 #endif
-
-extern size_t input_line_len;
 
 #ifdef USE_MOUSE
 void bind_command __PROTO((void));

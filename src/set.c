@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.164 2005/01/10 21:02:44 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.165 2005/01/11 17:37:14 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -234,8 +234,8 @@ set_command()
     } else if (almost_equals(c_token,"noli$nestyle") || equals(c_token, "nols" )) {
 	c_token++;
 	set_nolinestyle();
-    } else if (input_line[token[c_token].start_index] == 'n' &&
-	       input_line[token[c_token].start_index+1] == 'o') {
+    } else if (gp_input_line[token[c_token].start_index] == 'n' &&
+	       gp_input_line[token[c_token].start_index+1] == 'o') {
 	if (interactive)
 	    int_warn(c_token, "deprecated syntax, use \"unset\"");
 	token[c_token].start_index += 2;
@@ -1878,8 +1878,8 @@ set_logscale()
 	/* do reverse search because of "x", "x1", "x2" sequence in axisname_tbl */
 	int i = 0;
 	while (i < token[c_token].length) {
-	    axis = lookup_table_nth_reverse( axisname_tbl, AXIS_ARRAY_SIZE,
-		       input_line+token[c_token].start_index+i );
+	    axis = lookup_table_nth_reverse(axisname_tbl, AXIS_ARRAY_SIZE,
+		       gp_input_line + token[c_token].start_index + i);
 	    if (axis < 0) {
 		token[c_token].start_index += i;
 		int_error(c_token, "unknown axis");
@@ -1958,16 +1958,17 @@ set_separator()
 	df_separator = '\0';
 	return;
     }
-    if (almost_equals(c_token,"white$space"))
+    if (almost_equals(c_token, "white$space"))
 	df_separator = '\0';
     else if (!isstring(c_token))
 	int_error(c_token, "expected \"<separator_char>\"");
-    else if (equals(c_token,"\"\\t\"") || equals(c_token,"\'\\t\'"))
-	df_separator = '	';
-    else if (input_line[token[c_token].start_index] != input_line[token[c_token].start_index+2])
+    else if (equals(c_token, "\"\\t\"") || equals(c_token, "\'\\t\'"))
+	df_separator = '\t';
+    else if (gp_input_line[token[c_token].start_index]
+	     != gp_input_line[token[c_token].start_index + 2])
 	int_error(c_token, "extra chars after <separation_char>");
     else
-	df_separator = input_line[token[c_token].start_index+1];
+	df_separator = gp_input_line[token[c_token].start_index + 1];
     c_token++;
 }
 

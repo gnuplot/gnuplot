@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.47 2004/09/01 15:53:47 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.48 2004/09/11 17:46:02 sfeam Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -560,7 +560,7 @@ fit_interrupt()
 		    (void) Gcomplex(&v, a[i], 0.0);
 		    setvar(par_name[i], v);
 		}
-		safe_strncpy(input_line, tmp, input_line_len);
+		safe_strncpy(gp_input_line, tmp, gp_input_line_len);
 		(void) do_line();
 	    }
 	}
@@ -1624,7 +1624,7 @@ fit_command()
 	free(func.at);		/* release perm. action table */
 	func.at = (struct at_type *) NULL;
     }
-    safe_strncpy(last_fit_command, input_line, sizeof(last_fit_command));
+    safe_strncpy(last_fit_command, gp_input_line, sizeof(last_fit_command));
 }
 
 #if defined(ATARI) || defined(MTOS)

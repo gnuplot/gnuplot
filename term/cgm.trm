@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: cgm.trm,v 1.62 2004/10/19 00:24:08 sfeam Exp $
+ * $Id: cgm.trm,v 1.63 2004/11/27 02:38:37 sfeam Exp $
  */
 
 /* GNUPLOT - cgm.trm */
@@ -429,7 +429,7 @@ CGM_options()
 	    break;
 	case CGM_OTHER:
 	default:
-	    string = input_line + token[c_token].start_index;
+	    string = gp_input_line + token[c_token].start_index;
 
 	    if (string[0] == 'x') { /* set color */
 	        unsigned short red, green, blue;

@@ -1,3 +1,18 @@
+2005-02-01  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/set.c (set_separator): Replace literal TAB character in
+	source by a \t.
+
+	* src/command.c (input_line, input_line_len): Renamed to
+	gp_input_line and gp_input_line_len respectively, to avoid a
+	conflict of input_line with a like name non-standard library
+	function on QNX.
+
+	* src/command.h: Renamed declarations of these, too.
+
+	* all over the place: Renamed usages of these variables.  Some
+	CodeStyle cleanups, while at it.
+
 2005-01-31  Ethan Merritt  <merritt@u.washington.edu>
 
 	 * util.c (getusername): Don't try to free a string pointer that may

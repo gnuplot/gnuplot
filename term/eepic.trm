@@ -1,6 +1,6 @@
 /* Hello, Emacs! This is -*-C-*- !*/
 /*
- * $Id: eepic.trm,v 1.25 2004/07/01 17:10:13 broeker Exp $
+ * $Id: eepic.trm,v 1.26 2004/09/09 12:13:05 lhecking Exp $
  *
  */
 
@@ -253,13 +253,12 @@ EEPIC_graphics()
 	    (int) (t->ymax * ysize),
 	    (int) (t->xmax * xoffset),
 	    (int) (t->ymax * xoffset));
-    if ( fontsize_set )
-    {
+    if (fontsize_set) {
 	float x = t->v_char * EEPIC_UNIT + 0.5;
-	fprintf(gpoutfile,"\\fontsize{%d}{%g}\\selectfont\n",
+
+	fprintf(gpoutfile, "\\fontsize{%d}{%g}\\selectfont\n",
 		(int) x,  1.2 * x );
-    }
-    else
+    } else
 	fprintf(gpoutfile,"\\footnotesize\n" );
 
 }
@@ -479,78 +478,55 @@ EEPIC_options()
     eepic_lineset = 0;
     eepic_pointsize = 0;
 
-    while (!END_OF_COMMAND)
-    {
-	if (almost_equals(c_token, "de$fault"))
-	{
+    while (!END_OF_COMMAND) {
+	if (almost_equals(c_token, "de$fault")) {
 	    fontsize_set = FALSE;
 	    eepic_color_on = FALSE;
 	    eepic_true_rotate = FALSE;
 	    eepic_lineset = 0;
 	    eepic_pointsize = 0;
 	    c_token++;
-	}
-	else
-	if (almost_equals(c_token, "c$olor") ||
-	    almost_equals(c_token, "c$olour"))
-	{
+	} else if (almost_equals(c_token, "c$olor") ||
+		   almost_equals(c_token, "c$olour")) {
 	    eepic_color_on = TRUE;
 	    eepic_lineset = 2;
 	    c_token++;
-	}
-	else
-	if (almost_equals(c_token, "r$otate"))
-	{
+	} else if (almost_equals(c_token, "r$otate")) {
 	    eepic_true_rotate = TRUE;
 	    c_token++;
-	}
-	else
-	if (almost_equals(c_token, "da$shed"))
-	{
-	    if ( ! eepic_color_on )
+	} else if (almost_equals(c_token, "da$shed")) {
+	    if (! eepic_color_on)
 		eepic_lineset = 1;	/* ignore when color is on */
 	    c_token++;
-	}
-	else
-	if (almost_equals(c_token, "s$mall"))
-	{
+	} else if (almost_equals(c_token, "s$mall")) {
 	    eepic_pointsize = 1;
 	    c_token++;
-	}
-	else
-	if (almost_equals(c_token, "t$iny"))
-	{
+	} else if (almost_equals(c_token, "t$iny")) {
 	    eepic_pointsize = 2;
 	    c_token++;
-	}
-	else
-	if ( isdigit((unsigned char)
-		     input_line[token[c_token].start_index]) )
-	{
+	} else if (isdigit((unsigned char)
+			   gp_input_line[token[c_token].start_index])) {
 	    struct value a;
 	    fontsize = real(const_express(&a));
-	    if ( fontsize < 1 || fontsize > 100 )
+
+	    if (fontsize < 1 || fontsize > 100)
 		int_error(c_token, "font size out of bounds [1..100]");
-	    else
-	    {
+	    else {
 		fontsize_set = TRUE;
 		term->v_char = (unsigned int)(fontsize/EEPIC_UNIT);
 		term->h_char = (unsigned int)((fontsize/EEPIC_UNIT)/2);
 	    }
-	}
-	else
+	} else
 	    int_error(c_token, "unrecognized option");
-    }
+    } /* while(command) */
 
     sprintf(term_options, "default%s%s%s%s",
 	    eepic_color_on ? " color" : "",
 	    eepic_lineset == 1 ? " dashed" : "",
 	    eepic_true_rotate ? " rotate" : "",
-	    eepic_pointsize == 1 ?
-	    " small" :
-	    eepic_pointsize == 2 ?
-	    " tiny" : "" );
-    if ( fontsize_set )
+	    eepic_pointsize == 1 ? " small"
+	    : eepic_pointsize == 2 ? " tiny" : "" );
+    if (fontsize_set)
 	sprintf( term_options+strlen(term_options), " %d", (int) fontsize );
 }
 
