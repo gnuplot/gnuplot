@@ -1,12 +1,12 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot 3.7 on Unix.
 dnl
-dnl $Id: configure.in,v 1.90 1998/06/18 14:52:55 ddenholm Exp $
+dnl $Id: configure.in,v 1.66 1999/06/09 12:15:59 lhecking Exp $
 dnl
 AC_INIT(src/graphics.c)
 AM_CONFIG_HEADER(config.h:config.hin)
 AC_PREREQ(2.13)
-AC_REVISION($Revision: 1.90 $)
+AC_REVISION($Revision: 1.66 $)
 
 VERSION="`cat $srcdir/VERSION`.`cat $srcdir/PATCHLEVEL`"
 AM_INIT_AUTOMAKE(gnuplot, $VERSION)
@@ -129,17 +129,6 @@ AC_C_CONST
 AC_C_INLINE
 AC_C_STRINGIZE
 
-AC_MSG_CHECKING(if compiler handles warn and error directives correctly)
-AC_TRY_CPP([#if 0
-#error "error"
-#warning "warning"
-#endif],
-  ERRORFIX=
-  AC_MSG_RESULT(yes),dnl
-  ERRORFIX=errorfix
-  AC_MSG_RESULT(no))
-AC_SUBST(ERRORFIX)
-
 dnl X Window System files.
 AC_SUBST(LIBRARIES_FOR_X)
 AC_SUBST(GNUPLOT_X11)
@@ -161,7 +150,7 @@ gp_MSDOS
 gp_NEXT
 gp_APPLE
 gp_BEOS
-AC_SUBST(GNUPLOT_BE)
+AM_CONDITIONAL(BUILD_SRC_BEOS_SUBDIR, test x$build_beos_subdir = xyes)
 
 dnl this has to be after -lsys_s on NeXT
 AC_CHECK_LIB(m,sin)
