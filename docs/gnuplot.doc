@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.123 2002/08/15 17:59:15 mikulik Exp $
+C RCS $Id: gnuplot.doc,v 1.124 2002/08/16 08:11:36 mikulik Exp $
 C 18 September 2001
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001   Thomas Williams, Colin Kelley et al.
 C
@@ -3010,7 +3010,7 @@ C ... and restart the table:
  `dots`, `steps`, `fsteps`, `histeps`, `errorbars`, `xerrorbars`,
  `yerrorbars`, `xyerrorbars`, `errorlines`, `xerrorlines`, `yerrorlines`,
  `xyerrorlines`, `boxes`, `filledboxes`, `filledcurves`, `boxerrorbars`,
- `boxxyerrorbars`, `financebars`, `candlesticks`, `vector` or `pm3d`. Some 
+ `boxxyerrorbars`, `financebars`, `candlesticks`, `vectors` or `pm3d`. Some 
  of these styles require additional information. See `set style <style>` for
  details of each style.  Note that `filledcurves` and `pm3d` can take an 
  additional option not listed above (the latter only when used in the `splot`
@@ -6474,12 +6474,12 @@ C ... and restart the table:
 ^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/steps/steps.html">
  steps demo.
 ^ </a>
-4 vector
-?commands set style vector
-?set style vector
-?style vector
-?vector
- The `vector` style draws a vector from (x,y) to (x+xdelta,y+ydelta).  Thus
+4 vectors
+?commands set style vectors
+?set style vectors
+?style vectors
+?vectors
+ The `vectors` style draws a vector from (x,y) to (x+xdelta,y+ydelta).  Thus
  it requires four columns of data.  It also draws a small arrowhead at the
  end of the vector.
 

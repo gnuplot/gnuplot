@@ -1,3 +1,9 @@
+2002-08-19  Harald Harders  <h.harders@tu-bs.de>
+
+	* docs/gnuplot.doc src/misc.c src/tables.c: Let style 'with vectors'
+	use plural (as all other plotting styles) instead of singular
+	'with vector'. Note: it does not change any functionality.
+
 2002-08-16  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/mouse.c: Remove false warning when rotating splot by mouse and
@@ -897,7 +903,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/08/16 08:11:36 $).
+	last modification date (from the tag $Date: 2002/08/16 18:14:05 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
