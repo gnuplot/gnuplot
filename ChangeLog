@@ -1,3 +1,11 @@
+2002-03-09  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* src/internal.c: Merge purec_matherr() into matherr().
+
+	* src/plot.c: Remove purec_matherr().
+
+	* src/syscfg.h: Define GP_MATHERR as purec_matherr for Pure-C.
+
 2002-03-09  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/tables.h src/tables.c src/set.c: Set colorbox, palette and p3md
@@ -11,7 +19,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/03/09 11:33:08 $).
+	last modification date (from the tag $Date: 2002/03/09 14:23:23 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 

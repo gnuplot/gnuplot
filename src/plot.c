@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot.c,v 1.53 2002/02/21 12:27:37 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot.c,v 1.54 2002/02/25 03:10:41 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - plot.c */
@@ -597,44 +597,6 @@ char **argv;
 #endif
     exit(exit_status);
 }
-
-#if (defined(ATARI) || defined(MTOS)) && defined(__PUREC__)
-int
-purec_matherr(struct exception *e)
-{
-    char *c;
-    switch (e->type) {
-    case DOMAIN:
-	c = "domain error";
-	break;
-    case SING:
-	c = "argument singularity";
-	break;
-    case OVERFLOW:
-	c = "overflow range";
-	break;
-    case UNDERFLOW:
-	c = "underflow range";
-	break;
-    default:
-	c = "(unknown error";
-	break;
-    }
-    fprintf(stderr, "\
-math exception : %s\n\
-    name : %s\n\
-    arg 1: %e\n\
-    arg 2: %e\n\
-    ret  : %e\n",
-	    c,
-	    e->name,
-	    e->arg1,
-	    e->arg2,
-	    e->retval);
-
-    return 1;
-}
-#endif /* (ATARI || MTOS) && PUREC */
 
 
 /* Set up to catch interrupts */
