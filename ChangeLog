@@ -1,3 +1,12 @@
+2004-08-11  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/gplt_x11.c (exec_cmd): Set line properties to CapRound, JoinRound
+	while drawing plot symbols. This works around a very odd bug that
+	causes the symbols to be drawn incorrectly for some X-server settings.
+	Also modify plot symbol code so that the symbols are always drawn with
+	a 1:1 aspect ratio (crosses always fit in a square) rather than 
+	tracking the aspect ratio of the current plot window.
+
 2004-08-10  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/set.c (parse_colorspec): Allow people to set the text color

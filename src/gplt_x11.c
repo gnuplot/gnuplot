@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.107 2004/07/08 23:31:10 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.108 2004/07/13 14:11:22 broeker Exp $"); }
 #endif
 
 #define X11_POLYLINE 1
@@ -2108,71 +2108,74 @@ exec_cmd(plot_struct *plot, char *command)
 	    unsigned char fill = 0;
 	    unsigned char upside_down_fill = 0;
 	    short upside_down_sign = 1;
-	    if (plot->type != LineSolid || plot->lwidth != 0) {	/* select solid line */
-		XSetLineAttributes(dpy, *current_gc, plot->lwidth, LineSolid, CapButt, JoinBevel);
-	    }
+	    int delta = (plot->px + plot->py + 1)/2;
+
+	    /* Force line type to solid, with round ends */
+	    XSetLineAttributes(dpy, *current_gc, plot->lwidth, LineSolid, CapRound, JoinRound);
+
 	    switch (point % 13) {
 	    case 0:		/* do plus */
-		Plus[0].x1 = (short) X(x) - plot->px;
+		Plus[0].x1 = (short) X(x) - delta;
 		Plus[0].y1 = (short) Y(y);
-		Plus[0].x2 = (short) X(x) + plot->px;
+		Plus[0].x2 = (short) X(x) + delta;
 		Plus[0].y2 = (short) Y(y);
 		Plus[1].x1 = (short) X(x);
-		Plus[1].y1 = (short) Y(y) - plot->py;
+		Plus[1].y1 = (short) Y(y) - delta;
 		Plus[1].x2 = (short) X(x);
-		Plus[1].y2 = (short) Y(y) + plot->py;
+		Plus[1].y2 = (short) Y(y) + delta;
 
 		XDrawSegments(dpy, plot->pixmap, *current_gc, Plus, 2);
 		break;
 	    case 1:		/* do X */
-		Cross[0].x1 = (short) X(x) - plot->px;
-		Cross[0].y1 = (short) Y(y) - plot->py;
-		Cross[0].x2 = (short) X(x) + plot->px;
-		Cross[0].y2 = (short) Y(y) + plot->py;
-		Cross[1].x1 = (short) X(x) - plot->px;
-		Cross[1].y1 = (short) Y(y) + plot->py;
-		Cross[1].x2 = (short) X(x) + plot->px;
-		Cross[1].y2 = (short) Y(y) - plot->py;
+		fprintf(stderr,"delta = %d\n",delta);
+		Cross[0].x1 = (short) X(x) - delta;
+		Cross[0].y1 = (short) Y(y) - delta;
+		Cross[0].x2 = (short) X(x) + delta;
+		Cross[0].y2 = (short) Y(y) + delta;
+		Cross[1].x1 = (short) X(x) - delta;
+		Cross[1].y1 = (short) Y(y) + delta;
+		Cross[1].x2 = (short) X(x) + delta;
+		Cross[1].y2 = (short) Y(y) - delta;
 
 		XDrawSegments(dpy, plot->pixmap, *current_gc, Cross, 2);
 		break;
 	    case 2:		/* do star */
-		Star[0].x1 = (short) X(x) - plot->px;
+		Star[0].x1 = (short) X(x) - delta;
 		Star[0].y1 = (short) Y(y);
-		Star[0].x2 = (short) X(x) + plot->px;
+		Star[0].x2 = (short) X(x) + delta;
 		Star[0].y2 = (short) Y(y);
 		Star[1].x1 = (short) X(x);
-		Star[1].y1 = (short) Y(y) - plot->py;
+		Star[1].y1 = (short) Y(y) - delta;
 		Star[1].x2 = (short) X(x);
-		Star[1].y2 = (short) Y(y) + plot->py;
-		Star[2].x1 = (short) X(x) - plot->px;
-		Star[2].y1 = (short) Y(y) - plot->py;
-		Star[2].x2 = (short) X(x) + plot->px;
-		Star[2].y2 = (short) Y(y) + plot->py;
-		Star[3].x1 = (short) X(x) - plot->px;
-		Star[3].y1 = (short) Y(y) + plot->py;
-		Star[3].x2 = (short) X(x) + plot->px;
-		Star[3].y2 = (short) Y(y) - plot->py;
+		Star[1].y2 = (short) Y(y) + delta;
+		Star[2].x1 = (short) X(x) - delta;
+		Star[2].y1 = (short) Y(y) - delta;
+		Star[2].x2 = (short) X(x) + delta;
+		Star[2].y2 = (short) Y(y) + delta;
+		Star[3].x1 = (short) X(x) - delta;
+		Star[3].y1 = (short) Y(y) + delta;
+		Star[3].x2 = (short) X(x) + delta;
+		Star[3].y2 = (short) Y(y) - delta;
 
 		XDrawSegments(dpy, plot->pixmap, *current_gc, Star, 4);
 		break;
 	    case 3:		/* do box */
-		XDrawRectangle(dpy, plot->pixmap, *current_gc, X(x) - plot->px, Y(y) - plot->py,
-		       	(plot->px + plot->px), (plot->py + plot->py));
+		XDrawRectangle(dpy, plot->pixmap, *current_gc, X(x) - delta, Y(y) - delta,
+		       	(delta + delta), (delta + delta));
 		XDrawPoint(dpy, plot->pixmap, *current_gc, X(x), Y(y));
 		break;
 	    case 4:		/* filled box */
-		XFillRectangle(dpy, plot->pixmap, *current_gc, X(x) - plot->px, Y(y) - plot->py,
-		       	(plot->px + plot->px), (plot->py + plot->py));
+		XFillRectangle(dpy, plot->pixmap, *current_gc, X(x) - delta, Y(y) - delta,
+		       	(delta + delta), (delta + delta));
 		break;
 	    case 5:		/* circle */
-		XDrawArc(dpy, plot->pixmap, *current_gc, X(x) - plot->px, Y(y) - plot->py,
-		       	2 * plot->px, 2 * plot->py, 0, 23040 /* 360 * 64 */);
+		XDrawArc(dpy, plot->pixmap, *current_gc, X(x) - delta, Y(y) - delta,
+		       	2 * delta, 2 * delta, 0, 23040 /* 360 * 64 */);
 		XDrawPoint(dpy, plot->pixmap, *current_gc, X(x), Y(y));
 		break;
 	    case 6:		/* filled circle */
-		XFillArc(dpy, plot->pixmap, *current_gc, X(x) - plot->px, Y(y) - plot->py,
-		       	2 * plot->px, 2 * plot->py, 0, 23040 /* 360 * 64 */);
+		XFillArc(dpy, plot->pixmap, *current_gc, X(x) - delta, Y(y) - delta,
+		       	2 * delta, 2 * delta, 0, 23040 /* 360 * 64 */);
 		break;
 	    case 10:		/* filled upside-down triangle */
 		upside_down_fill = 1;
@@ -2186,17 +2189,17 @@ exec_cmd(plot_struct *plot, char *command)
 		{
 		    short temp_x, temp_y;
 
-		    temp_x = (short) (1.33 * (double) plot->px + 0.5);
-		    temp_y = (short) (1.33 * (double) plot->py + 0.5);
+		    temp_x = (short) (1.33 * (double) delta + 0.5);
+		    temp_y = (short) (1.33 * (double) delta + 0.5);
 
 		    Triangle[0].x = (short) X(x);
 		    Triangle[0].y = (short) Y(y) - upside_down_sign * temp_y;
 		    Triangle[1].x = (short) temp_x;
-		    Triangle[1].y = (short) upside_down_sign * 2 * plot->py;
+		    Triangle[1].y = (short) upside_down_sign * 2 * delta;
 		    Triangle[2].x = (short) -(2 * temp_x);
 		    Triangle[2].y = (short) 0;
 		    Triangle[3].x = (short) temp_x;
-		    Triangle[3].y = (short) -(upside_down_sign * 2 * plot->py);
+		    Triangle[3].y = (short) -(upside_down_sign * 2 * delta);
 
 		    if ((upside_down_sign == 1 && fill) || upside_down_fill) {
 			XFillPolygon(dpy, plot->pixmap, *current_gc,
@@ -2211,16 +2214,16 @@ exec_cmd(plot_struct *plot, char *command)
 		fill = 1;
 		/* FALLTHRU */
 	    case 11:		/* do diamond */
-		Diamond[0].x = (short) X(x) - plot->px;
+		Diamond[0].x = (short) X(x) - delta;
 		Diamond[0].y = (short) Y(y);
-		Diamond[1].x = (short) plot->px;
-		Diamond[1].y = (short) -plot->py;
-		Diamond[2].x = (short) plot->px;
-		Diamond[2].y = (short) plot->py;
-		Diamond[3].x = (short) -plot->px;
-		Diamond[3].y = (short) plot->py;
-		Diamond[4].x = (short) -plot->px;
-		Diamond[4].y = (short) -plot->py;
+		Diamond[1].x = (short) delta;
+		Diamond[1].y = (short) -delta;
+		Diamond[2].x = (short) delta;
+		Diamond[2].y = (short) delta;
+		Diamond[3].x = (short) -delta;
+		Diamond[3].y = (short) delta;
+		Diamond[4].x = (short) -delta;
+		Diamond[4].y = (short) -delta;
 
 		/*
 		 * Should really do a check with XMaxRequestSize()
@@ -2235,9 +2238,9 @@ exec_cmd(plot_struct *plot, char *command)
 		}
 		break;
 	    }
-	    if (plot->type != LineSolid || plot->lwidth != 0) {	/* select solid line */
-		XSetLineAttributes(dpy, *current_gc, plot->lwidth, plot->type, CapButt, JoinBevel);
-	    }
+
+	    /* Restore original line style */
+	    XSetLineAttributes(dpy, *current_gc, plot->lwidth, plot->type, CapButt, JoinBevel);
 	}
     }
 #ifdef PM3D
