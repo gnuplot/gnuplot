@@ -1,5 +1,5 @@
 /*
- * $Id: pslatex.trm,v 1.35 2002/07/26 16:42:29 mikulik Exp $
+ * $Id: pslatex.trm,v 1.36 2002/12/13 14:59:03 lhecking Exp $
  */
 
 /* GNUPLOT - pslatex.trm */
@@ -73,6 +73,7 @@ TERM_PUBLIC void PSLATEX_linetype __PROTO((int lt));
 TERM_PUBLIC void PSLATEX_point __PROTO((unsigned int x, unsigned int y, int number));
 TERM_PUBLIC void PSLATEX_pointsize __PROTO((double size));
 TERM_PUBLIC void PSLATEX_linewidth __PROTO((double width));
+TERM_PUBLIC void PSLATEX_fillbox __PROTO((int style, unsigned int x1, unsigned int y1, unsigned int width, unsigned int height));
 #ifdef PM3D
 TERM_PUBLIC int PSLATEX_make_palette (t_sm_palette *);
 TERM_PUBLIC void PSLATEX_previous_palette (void);
@@ -606,6 +607,20 @@ double ps;
 	PS_linewidth(ps);
 }
 
+TERM_PUBLIC void
+PSLATEX_fillbox(int style, unsigned int x1, unsigned int y1, 
+                unsigned int width, unsigned int height)
+{
+    if (PSLATEX_auxfile) {
+	FILE *tmp = gpoutfile;
+	gpoutfile = PSLATEX_auxfile;
+	PS_fillbox(style, x1, y1, width, height);
+	gpoutfile = tmp;
+    } else
+	PS_fillbox(style, x1, y1, width, height);
+}
+
+
 #ifdef PM3D
 
 TERM_PUBLIC int PSLATEX_make_palette (t_sm_palette *palette)
@@ -674,7 +689,8 @@ TERM_TABLE_START(pslatex_driver)
     PSLATEX_vector, PSLATEX_linetype, PSLATEX_put_text, PSLATEX_text_angle,
     PSLATEX_justify_text, PSLATEX_point, do_arrow, set_font_null,
     PSLATEX_pointsize, 0 /*flags */ , 0 /*suspend */
-    , 0 /*resume */ , 0 /*fillbox */ ,
+    , 0 /*resume */ , 
+    PSLATEX_fillbox ,
     PSLATEX_linewidth
 #ifdef PM3D
 #ifdef USE_MOUSE

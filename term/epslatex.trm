@@ -1,5 +1,5 @@
 /*
- * $Id: epslatex.trm,v 1.16 2002/10/17 19:06:19 mikulik Exp $
+ * $Id: epslatex.trm,v 1.17 2002/12/17 13:33:16 lhecking Exp $
  */
 
 /* GNUPLOT - epslatex.trm */
@@ -506,7 +506,79 @@ static char GPFAR *GPFAR EPSL_header[] = {
 "  /Gpstroke {stroke} def  \n",
 "  1 setlinecap  \n",
 "  1 setlinejoin \n",
-    NULL
+
+" %\n",
+" % PostScript level 2 pattern fill definitions\n",
+" % Ethan A Merritt April 2003\n",
+" %\n",
+" % Level-1 compatible emulation for rectfill\n",
+"  /RF { gsave newpath 4 -2 roll moveto dup 0 exch rlineto\n",
+"    exch 0 rlineto neg 0 exch rlineto closepath fill grestore\n",
+"  } bind def\n",
+"  /BoxFill { gsave RF fill grestore } def \n",
+#if USE_ULIG_FILLEDBOXES
+"  /Blank { 0 0 M 0 8 L 8 8 L 8 0 L 0 0 L\n",
+"           1.0 setgray fill 0.0 setgray 0.5 setlinewidth } bind def\n",
+"  /Tile8x8 { /PaintType 1 def /PatternType 1 def /TilingType 1 def\n",
+"             /BBox [0 0 8 8] def /XStep 8 def /YStep 8 def\n",
+"  } bind def\n",
+
+"  /P1D 12 dict def P1D begin\n",
+"      Tile8x8 /PaintProc { Blank 0 0 M 8 8 L 0 8 M 8 0 L stroke } def\n",
+"  end P1D matrix makepattern\n",
+"  /Pattern1 exch def\n",
+
+"  /P2D 12 dict def P2D begin\n",
+"      Tile8x8 /PaintProc { Blank 0 0 M 8 8 L 0 8 M 8 0 L stroke\n",
+"                           0 4 M 4 8 L 8 4 L 4 0 L 0 4 L stroke } def\n",
+"  end P2D matrix makepattern\n",
+"  /Pattern2 exch def\n",
+
+"  /P3D 12 dict def P3D begin\n",
+"      Tile8x8 /PaintProc { Blank 0 0 M 0 8 L\n",
+"                          8 8 L 8 0 L 0 0 L fill } def\n",
+"  end P3D matrix makepattern\n",
+"  /Pattern3 exch def\n",
+
+"  /P4D 12 dict def P4D begin\n",
+"      Tile8x8 /PaintProc { Blank -4 8 M 8 -4 L\n",
+"                          0 12 M 12 0 L stroke } def\n",
+"  end P4D matrix makepattern\n",
+"  /Pattern4 exch def\n",
+
+"  /P5D 12 dict def P5D begin\n",
+"      Tile8x8 /PaintProc { Blank -4 0 M 8 12 L\n",
+"                          0 -4 M 12 8 L stroke } def\n",
+"  end P5D matrix makepattern\n",
+"  /Pattern5 exch def\n",
+
+"  /P6D 12 dict def P6D begin\n",
+"      Tile8x8 /PaintProc { Blank -2 8 M 4 -4 L\n",
+"                          0 12 M 8 -4 L 4 12 M 10 0 L stroke } def\n",
+"  end P6D matrix makepattern\n",
+"  /Pattern6 exch def\n",
+
+"  /P7D 12 dict def P7D begin\n",
+"      Tile8x8 /PaintProc { Blank -2 0 M 4 12 L\n",
+"                          0 -4 M 8 12 L 4 -4 M 10 8 L stroke } def\n",
+"  end P7D matrix makepattern\n",
+"  /Pattern7 exch def\n",
+
+"  /P8D 12 dict def P8D begin\n",
+"      Tile8x8 /PaintProc { Blank 8 -2 M -4 4 L\n",
+"                          12 0 M -4 8 L 12 4 M 0 10 L stroke } def\n",
+"  end P8D matrix makepattern\n",
+"  /Pattern8 exch def\n",
+
+"  /P9D 12 dict def P9D begin\n",
+"      Tile8x8 /PaintProc { Blank 0 -2 M 12 4 L\n",
+"                          -4 0 M 12 8 L -4 4 M 8 10 L stroke } def\n",
+"  end P9D matrix makepattern\n",
+"  /Pattern9 exch def\n",
+" \n",
+#endif
+
+   NULL
 };
 
 static int EPSL_pen_x, EPSL_pen_y;
@@ -897,14 +969,37 @@ int number;
 }
 
 TERM_PUBLIC void
-EPSL_fillbox(style, x1, y1, x2, y2)
+EPSL_fillbox(style, x1, y1, width, height)
     int style;
-    unsigned int x1, y1, x2, y2;
+    unsigned int x1, y1, width, height;
 {
-    /* ULIG: the style parameter is now used for the fillboxes style
-    * (not implemented here), see the documentation */
-    (void) style;		/* avoid -Wunused warnings */
-    EPSL_FLUSH_PATH fprintf(gpoutfile, "%d %d %d %d BoxFill\n", x1, y1, x2, y2);
+
+    EPSL_FLUSH_PATH
+    switch( style & 0xf ) {
+
+#if USE_ULIG_FILLEDBOXES
+    case FS_PATTERN:
+    {
+	int pattern = (style >> 4) % 8;
+	if (pattern == 0) {
+	    fprintf(gpoutfile, "gsave 1 setgray %d %d %d %d BoxFill grestore\n", x1,y1, width,height);
+        } else {
+            /* EAM FIXME - We always print pattern as black on white */
+	    fprintf(gpoutfile,"gsave [/Pattern /DeviceGray] setcolorspace\n");
+	    fprintf(gpoutfile,"Pattern%d setpattern %d %d %d %d RF grestore\n",
+		    pattern,x1,y1,width,height);
+	}
+	break;
+    }
+
+    case FS_SOLID:
+	/* Density fill not yet implemented */
+
+#endif
+    default:
+	fprintf(gpoutfile, "%d %d %d %d BoxFill\n", x1, y1, width, height);
+	break;
+    }
 
     EPSL_relative_ok = 0;
     EPSL_linetype_last = -1;
