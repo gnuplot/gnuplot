@@ -498,8 +498,8 @@ Platform problems and testing
    This section addresses trouble shooting and testing issues. Userland
 questions are answered in the FAQ.
 
-Platform notes
-==============
+Platform and compiler notes
+===========================
 
    Generally, if you think that configure has made a mistake in detecting
 platform features, there are two ways to switch these off. 
@@ -521,6 +521,14 @@ and rerun configure, or, edit config.h and change
 'make DEFS=-DHAVE_MEMSET' is wrong, because the DEFS variable in Makefile
 may contain other defines (make DEFS='-DHAVE_CONFIG_H -DHAVE_MEMSET'
 should work, though).
+
+ - gcc -ansi
+   If you wish to compile with gcc -ansi (CC='gcc -ansi -pedantic'
+  ./configure), additional platform specific defines may be necessary
+  to include non-ANSI function prototypes. E.g. on Solaris, -D__EXTENSIONS__
+  is needed. Otherwise, non-declared functions not returning int will be
+  assumed to return int, with possibly dangerous consequences. Especially
+  scpecfun.c is vulnerable here.
 
  - HP-UX 9.x
    It is recommended to use gcc, although the native compiler cc may
