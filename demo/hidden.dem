@@ -36,7 +36,7 @@ splot sin(x) * cos(y)
 pause -1 "Hit return to continue (4)"
 
 set nogrid
-set ztics
+set ztics autofreq
 set border 31
 set view 75,230
 set contour

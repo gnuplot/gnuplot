@@ -57,8 +57,8 @@ set title "Surfaces with z log scale"
 splot x**2*y**2 + 2, x**2*y**4 + 2, x**4*y**2 + 2
 pause -1 "Hit return to continue (10)"
 set nolog z
-set xtics
-set ytics
+set xtics autofreq
+set ytics autofreq
 set xrange [-1:1]
 set yrange [-1:1]
 set samples 51
@@ -87,7 +87,7 @@ set arrow 1 from -5,-2.1,1.4 to 0,0,1
 splot [-12:12.01] [-12:12.01] sinc(u,v)
 pause -1 "Hit return to continue (15)"
 set noarrow
-set ztics
+set ztics autofreq
 set nolabel
 set log
 set auto

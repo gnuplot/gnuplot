@@ -30,8 +30,8 @@ set xrange [xmin : xmax]
 set yrange [0 : ymax]
 set xlabel "x ->"
 set ylabel "probability density ->"
-set xtics
-set ytics
+set xtics autofreq
+set ytics autofreq
 set format x "%.1f"
 set format y "%.1f"
 set sample 200
@@ -57,8 +57,8 @@ set zeroaxis
 #set yrange [0 : ymax]
 set xlabel "x ->"
 set ylabel "probability density ->"
-set xtics
-set ytics
+set xtics autofreq
+set ytics autofreq
 set format x "%.1f"
 set format y "%.1f"
 set sample 100
@@ -115,8 +115,8 @@ set zeroaxis
 #set yrange [0 : ymax]
 set xlabel "x ->"
 set ylabel "probability density ->"
-set xtics
-set ytics
+set xtics autofreq
+set ytics autofreq
 set format x "%.1f"
 set format y "%.2f"
 set sample 100
@@ -143,8 +143,8 @@ set zeroaxis
 #set yrange [0 : ymax]
 set xlabel "x ->"
 set ylabel "probability density ->"
-set xtics
-set ytics
+set xtics autofreq
+set ytics autofreq
 set format x "%.1f"
 set format y "%.2f"
 set sample 100
@@ -173,8 +173,8 @@ set zeroaxis
 #set yrange [0 : ymax]
 set xlabel "x ->"
 set ylabel "probability density ->"
-set xtics
-set ytics
+set xtics autofreq
+set ytics autofreq
 set format x "%.1f"
 set format y "%.1f"
 set sample 100
@@ -201,8 +201,8 @@ set zeroaxis
 #set yrange [0 : ymax]
 set xlabel "x ->"
 set ylabel "probability density ->"
-set xtics
-set ytics
+set xtics autofreq
+set ytics autofreq
 set format x "%.1f"
 set format y "%.2f"
 set sample 100
@@ -230,8 +230,8 @@ set zeroaxis
 #set yrange [0 : ymax]
 set xlabel "x ->"
 set ylabel "probability density ->"
-set xtics
-set ytics
+set xtics autofreq
+set ytics autofreq
 set format x "%.1f"
 set format y "%.2f"
 set sample 100
@@ -258,8 +258,8 @@ set zeroaxis
 #set yrange [0: ymax]
 set xlabel "x ->"
 set ylabel "probability density ->"
-set xtics
-set ytics
+set xtics autofreq
+set ytics autofreq
 set format x "%.1f"
 set format y "%.1f"
 set sample 100
@@ -317,8 +317,8 @@ set xrange [xmin: xmax]
 set yrange [0: ymax]
 set xlabel "x ->"
 set ylabel "probability density ->"
-set xtics
-set ytics
+set xtics autofreq
+set ytics autofreq
 set format x "%.1f"
 set format y "%.1f"
 set sample 100
@@ -374,8 +374,8 @@ set xrange [xmin: xmax]
 set yrange [0: ymax]
 set xlabel "x ->"
 set ylabel "probability density ->"
-set xtics
-set ytics
+set xtics autofreq
+set ytics autofreq
 set format x "%.1f"
 set format y "%.2f"
 set sample 100
@@ -402,8 +402,8 @@ set nokey
 set zeroaxis
 set xlabel "x ->"
 set ylabel "probability density ->"
-set xtics
-set ytics
+set xtics autofreq
+set ytics autofreq
 set format x "%.1f"
 set format y "%.1f"
 set sample 100
@@ -429,8 +429,8 @@ set xrange [xmin: xmax]
 set yrange [0: ymax]
 set xlabel "x ->"
 set ylabel "probability density ->"
-set xtics
-set ytics
+set xtics autofreq
+set ytics autofreq
 set format x "%.2f"
 set format y "%.2f"
 set sample 100
@@ -456,8 +456,8 @@ set zeroaxis
 #set yrange[0: ymax]
 set xlabel "x ->"
 set ylabel "probability density ->"
-set xtics
-set ytics
+set xtics autofreq
+set ytics autofreq
 set format x "%.1f"
 set format y "%.1f"
 set sample 100
@@ -514,8 +514,8 @@ set xrange [0: xmax]
 set yrange [0: ymax]
 set xlabel "x ->"
 set ylabel "probability density ->"
-set xtics
-set ytics
+set xtics autofreq
+set ytics autofreq
 set format x "%.2f"
 set format y "%.1f"
 set sample 100
@@ -538,8 +538,8 @@ set zeroaxis
 #set yrange [0: ymax]
 set xlabel "x ->"
 set ylabel "probability density ->"
-set xtics
-set ytics
+set xtics autofreq
+set ytics autofreq
 set format x "%.1f"
 set format y "%.1f"
 set sample 100
@@ -568,8 +568,8 @@ set xrange [xmin: xmax]
 set yrange [0: ymax]
 set xlabel "x ->"
 set ylabel "probability density ->"
-set xtics
-set ytics
+set xtics autofreq
+set ytics autofreq
 set format x "%.1f"
 set format y "%.1f"
 set sample 500
@@ -622,8 +622,8 @@ set xrange [0: xmax]
 set yrange [0: ymax]
 set xlabel "x ->"
 set ylabel "probability density ->"
-set xtics
-set ytics
+set xtics autofreq
+set ytics autofreq
 set format x "%.2f"
 set format y "%.1f"
 set sample 100
@@ -648,8 +648,8 @@ set zeroaxis
 #set yrange [0: ymax]
 set xlabel "x ->"
 set ylabel "probability density ->"
-set xtics
-set ytics
+set xtics autofreq
+set ytics autofreq
 set format x "%.2f"
 set format y "%.1f"
 set sample 100
@@ -675,8 +675,8 @@ set xrange [xmin: xmax]
 set yrange [0: ymax]
 set xlabel "x ->"
 set ylabel "probability density ->"
-set xtics
-set ytics
+set xtics autofreq
+set ytics autofreq
 set format x "%.1f"
 set format y "%.2f"
 set sample 100
@@ -703,8 +703,8 @@ set xrange [xmin: xmax]
 set yrange [0: ymax]
 set xlabel "x ->"
 set ylabel "probability density ->"
-set xtics
-set ytics
+set xtics autofreq
+set ytics autofreq
 set format x "%.1f"
 set format y "%.2f"
 set sample 100
@@ -729,8 +729,8 @@ set xrange [xmin: xmax]
 set yrange [0: ymax]
 set xlabel "x ->"
 set ylabel "probability density ->"
-set xtics
-set ytics
+set xtics autofreq
+set ytics autofreq
 set format x "%.2f"
 set format y "%.2f"
 set sample 100
@@ -757,8 +757,8 @@ set zeroaxis
 #set yrange [0: ymax]
 set xlabel "x ->"
 set ylabel "probability density ->"
-set xtics
-set ytics
+set xtics autofreq
+set ytics autofreq
 set format x "%.2f"
 set format y "%.1f"
 set sample 100
