@@ -1,3 +1,9 @@
+2000-02-04  Thomas Henlich <Thomas.Henlich@mailbox.tu-dresden.de>
+
+	* term/post.trm: Provides an oblique symbol font, e.g.
+	set xlabel 'b' "Symbol-Oblique" gives an oblique (slanted) beta
+	character.
+
 1999-12-17  Ascan Morlang  <morlang@fokus.gmd.de>
 
 	* plot2d.c(eval_plots): Fix various memory leaks.
