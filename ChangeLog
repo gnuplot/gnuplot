@@ -1,6 +1,10 @@
+2002-02-05  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* config/makefile.cyg config/makefile.mgw: Add -DHAVE_ATEXIT.
+
 2002-02-04  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
-	Patch from Levente Novák <lnovak@dragon.klte.hu>, edited by me:
+	Patch from Levente Novak <lnovak@dragon.klte.hu>, edited by me:
 
 	* term/tgif.trm (TGIF_filled_polygon): Break long TGIF command
  	into several lines to not overflow limits imposed by programs
