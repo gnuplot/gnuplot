@@ -7,6 +7,9 @@
 
 	* docs/gnuplot.doc: Add help keyword for 'newhistogram'.
 
+	* configure.in: If the user configures --without-lisp-files then
+	do not try to run configure in the lisp subdirectory.
+
 2005-03-30  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/gplt_x11.c (process_event) [!USE_MOUSE]: don't refer to
