@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: bitmap.c,v 1.6 1999/06/19 20:52:04 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: bitmap.c,v 1.7 1999/06/22 12:02:41 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - bitmap.c */
@@ -67,23 +67,24 @@ static char *RCSid() { return RCSid("$Id: bitmap.c,v 1.6 1999/06/19 20:52:04 lhe
 static void b_putc __PROTO((unsigned int, unsigned int, int, unsigned int));
 
 bitmap *b_p = (bitmap *) NULL;	/* global pointer to bitmap */
-unsigned int b_currx, b_curry;	/* the current coordinates */
+static unsigned int b_currx, b_curry; /* the current coordinates */
 unsigned int b_xsize, b_ysize;	/* the size of the bitmap */
 unsigned int b_planes;		/* number of color planes */
 unsigned int b_psize;		/* size of each plane */
 unsigned int b_rastermode;	/* raster mode rotates -90deg */
-unsigned int b_linemask = 0xffff;	/* 16 bit mask for dotted lines */
-unsigned int b_value = 1;	/* colour of lines */
-unsigned int b_hchar;		/* width of characters */
-unsigned int b_hbits;		/* actual bits in char horizontally */
-unsigned int b_vchar;		/* height of characters */
-unsigned int b_vbits;		/* actual bits in char vertically */
+unsigned int b_linemask = 0xffff; /* 16 bit mask for dotted lines */
+static unsigned int b_value = 1; /* colour of lines */
+static unsigned int b_hchar;	/* width of characters */
+static unsigned int b_hbits;	/* actual bits in char horizontally */
+static unsigned int b_vchar;	/* height of characters */
+static unsigned int b_vbits;	/* actual bits in char vertically */
 unsigned int b_angle;		/* rotation of text */
-char_box b_font[FNT_CHARS];	/* the current font */
-unsigned int b_pattern[] = { 0xffff, 0x1111, 0xffff, 0x5555, 0x3333, 0x7777,
-			     0x3f3f, 0x0f0f, 0x5f5f };
+static char_box b_font[FNT_CHARS]; /* the current font */
+static unsigned int b_pattern[] = { 0xffff, 0x1111, 0xffff, 0x5555,
+				    0x3333, 0x7777, 0x3f3f, 0x0f0f, 0x5f5f };
 int b_maskcount = 0;
-unsigned int b_lastx, b_lasty;	/* last pixel set - used by b_line */
+unsigned int b_lastx;
+static unsigned int b_lasty;	/* last pixel set - used by b_line */
 
 #define IN(i,size)  ((unsigned)i < (unsigned)size)
 
@@ -675,6 +676,110 @@ char_row GPFAR fnt13x25[FNT_CHARS][FNT13X25_VBITS] = {
           0x1249,000000,000000,0x1249,000000,000000,0x1249},
 };
 
+/* Moved here from gif.trm */
+struct rgb web_color_rgbs[] =
+{
+    { 0xff, 0xff, 0xff },		/* background: white         */
+    { 0x00, 0x00, 0x00 },		/*    borders: black         */
+    { 0x40, 0x40, 0x40 },		/* x & y axes: grey          */
+    { 0xff, 0x00, 0x00 },		/*   color 01: red           */
+    { 0x00, 0xc0, 0x00 },		/*   color 02: dark green    */
+    { 0x00, 0x80, 0xff },		/*   color 03: dark blue     */
+    { 0xc0, 0x00, 0xff },		/*   color 04: dark magenta  */
+    { 0xc0, 0xff, 0x40 },		/*   color 05: yellow        */
+    { 0xc0, 0x40, 0x00 },		/*   color 06: orange        */
+    { 0x40, 0xff, 0x80 },		/*   color 07: sea green     */
+    { 0x20, 0x20, 0xc0 },		/*   color 08: royal blue    */
+    { 0x80, 0x00, 0xc0 },		/*   color 09: dark violet   */
+    /* please note: these colors are optimized for web216 compatibility */
+    { 0x00, 0x60, 0x80 },		/* DeepSkyBlue4 */
+    { 0x00, 0x80, 0x00 },		/* green4 */
+    { 0x00, 0x80, 0x40 },		/* SpringGreen4 */
+    { 0x00, 0x80, 0x80 },		/* dark cyan, turquoise4 */
+    { 0x00, 0xc0, 0x60 },		/* SpringGreen3 */
+    { 0x00, 0xc0, 0xc0 },		/* cyan3, turquoise3 */
+    { 0x00, 0xff, 0x00 },		/* green */
+    { 0x20, 0x80, 0x20 },		/* forest green */
+    { 0x30, 0x60, 0x80 },		/* SteelBlue4 */
+    { 0x40, 0x40, 0x40 },		/* grey25-31 */
+    { 0x40, 0x80, 0x00 },		/* chartreuse4 */
+    { 0x00, 0x00, 0x80 },		/* dark blue, navy blue */
+    { 0x80, 0x60, 0x00 },		/* DarkGoldenrod4 */
+    { 0x80, 0x60, 0x10 },		/* goldenrod4 */
+    { 0x80, 0x60, 0x60 },		/* pink4 */
+    { 0x80, 0x60, 0x80 },		/* plum4 */
+    { 0x00, 0x00, 0xc0 },		/* medium blue */
+    { 0x00, 0x00, 0xff },		/* blue */
+    { 0x00, 0x60, 0x00 },		/* dark green */
+    { 0x40, 0xc0, 0x80 },		/* SeaGreen3 */
+    { 0x60, 0xa0, 0xc0 },		/* SkyBlue3 */
+    { 0x60, 0xc0, 0x00 },		/* chartreuse3 */
+    { 0x60, 0xc0, 0xa0 },		/* medium aquamarine */
+    { 0x80, 0x00, 0x00 },		/* dark red */
+    { 0x80, 0x00, 0x80 },		/* dark magenta */
+    { 0x60, 0x20, 0x80 },		/* DarkOrchid4 */
+    { 0x60, 0x60, 0x60 },		/* dim grey */
+    { 0x00, 0xff, 0xff },		/* cyan1, turquoise1 */
+    { 0x20, 0x20, 0x20 },		/* grey13-18 */
+    { 0x20, 0x40, 0x40 },		/* dark slate grey */
+    { 0x20, 0x40, 0x80 },		/* RoyalBlue4 */
+    { 0x60, 0x80, 0x20 },		/* olive drab */
+    { 0x60, 0x80, 0x60 },		/* DarkSeaGreen4 */
+    { 0x60, 0x80, 0x80 },		/* LightBlue4, PaleTurquoise4 */
+    { 0x80, 0x80, 0x40 },		/* LightGoldenrod4, khaki4 */
+    { 0x80, 0x80, 0x80 },		/* grey51-56 */
+    { 0xa0, 0xa0, 0xa0 },		/* dark grey, grey63-68 */
+    { 0xa0, 0xd0, 0xe0 },		/* light blue */
+    { 0xc0, 0x20, 0x20 },		/* firebrick3 */
+    { 0xc0, 0x60, 0x00 },		/* DarkOrange3 */
+    { 0x80, 0xc0, 0xe0 },		/* sky blue */
+    { 0xc0, 0x60, 0xc0 },		/* orchid3 */
+    { 0xc0, 0x80, 0x00 },		/* orange3 */
+    { 0xc0, 0x80, 0x60 },		/* LightSalmon3 */
+    { 0xff, 0x40, 0x00 },		/* orange red */
+    { 0xff, 0x40, 0x40 },		/* brown1, tomato */
+    { 0x80, 0xc0, 0xff },		/* light sky blue */
+    { 0xff, 0x80, 0x60 },		/* salmon */
+    { 0xff, 0x80, 0x80 },		/* light coral */
+    { 0xc0, 0xa0, 0x00 },		/* gold3 */
+    { 0xc0, 0xc0, 0xc0 },		/* grey76-81, honeydew3, ivory3, snow3 */
+    { 0xc0, 0xff, 0xc0 },		/* DarkSeaGreen1 */
+    { 0xff, 0x00, 0x00 },		/* red */
+    { 0xff, 0x00, 0xff },		/* magenta */
+    { 0xff, 0x80, 0xa0 },		/* PaleVioletRed1 */
+    { 0xff, 0x80, 0xff },		/* orchid1 */
+    { 0xc0, 0xc0, 0xa0 },		/* LemonChiffon3 */
+    { 0xff, 0x60, 0x60 },		/* IndianRed1 */
+    { 0xff, 0x80, 0x00 },		/* dark orange */
+    { 0xff, 0xa0, 0x00 },		/* orange */
+    { 0x80, 0xe0, 0xe0 },		/* CadetBlue2, DarkSlateGray2 */
+    { 0xa0, 0xe0, 0xe0 },		/* pale turquoise */
+    { 0xa0, 0xff, 0x20 },		/* green yellow */
+    { 0xc0, 0x00, 0x00 },		/* red3 */
+    { 0xc0, 0x00, 0xc0 },		/* magenta3 */
+    { 0xa0, 0x20, 0x20 },		/* brown */
+    { 0xa0, 0x20, 0xff },		/* purple */
+    { 0x80, 0x20, 0x00 },		/* OrangeRed4 */
+    { 0x80, 0x20, 0x20 },		/* brown4 */
+    { 0x80, 0x40, 0x00 },		/* DarkOrange4 */
+    { 0x80, 0x40, 0x20 },		/* sienna4 */
+    { 0x80, 0x40, 0x80 },		/* orchid4 */
+    { 0x80, 0x60, 0xc0 },		/* MediumPurple3 */
+    { 0x80, 0x60, 0xff },		/* SlateBlue1 */
+    { 0x80, 0x80, 0x00 },		/* yellow4 */
+    { 0xa0, 0x80, 0xff },		/* MediumPurple1 */
+    { 0xc0, 0x60, 0x80 },		/* PaleVioletRed3 */
+    { 0xc0, 0xc0, 0x00 },		/* yellow3 */
+    { 0xff, 0x80, 0x40 },		/* sienna1 */
+    { 0xff, 0xa0, 0x40 },		/* tan1 */
+    { 0xff, 0xa0, 0x60 },		/* sandy brown */
+    { 0xff, 0xa0, 0x70 },		/* light salmon */
+    { 0xff, 0xc0, 0x20 },		/* goldenrod1 */
+    { 0xff, 0xc0, 0xc0 },		/* RosyBrown1, pink */
+    { 0xff, 0xff, 0x00 },		/* yellow */
+    { 0xff, 0xff, 0x80 },		/* khaki1 */
+    { 0xff, 0xff, 0xc0 }		/* lemon chiffon */
+};
 
 /*
    ** The plotting area is defined as a huge bitmap.
@@ -700,7 +805,7 @@ char_row GPFAR fnt13x25[FNT_CHARS][FNT13X25_VBITS] = {
 /*
  * set pixel (x, y, value) to value value (this can be 1/0 or a color number).
  */
-void
+static void
 b_setpixel(x, y, value)
 unsigned int x, y, value;
 {
@@ -843,7 +948,7 @@ b_freebitmap()
 /*
  * set pixel at (x,y) with color b_value and dotted mask b_linemask.
  */
-void
+static void
 b_setmaskpixel(x, y, value)
 unsigned int x, y, value;
 {
@@ -861,7 +966,7 @@ unsigned int x, y, value;
  * draw a line from (x1,y1) to (x2,y2)
  * with color b_value and dotted mask b_linemask.
  */
-void
+static void
 b_line(x1, y1, x2, y2)
 unsigned int x1, y1, x2, y2;
 {

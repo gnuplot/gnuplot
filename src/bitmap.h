@@ -1,4 +1,4 @@
-/* $Id: bitmap.h,v 1.3 1999/06/14 19:19:45 lhecking Exp $ */
+/* $Id: bitmap.h,v 1.4 1999/06/22 12:02:42 lhecking Exp $ */
 
 /* GNUPLOT - bitmap.h */
 
@@ -66,34 +66,34 @@ extern char_row GPFAR fnt13x25[FNT_CHARS][FNT13X25_VBITS];
 typedef unsigned char pixels;  /* the type of one set of 8 pixels in bitmap */
 typedef pixels *bitmap[];  /* the bitmap */
 
-extern bitmap *b_p;						/* global pointer to bitmap */
-extern unsigned int b_currx, b_curry;	/* the current coordinates */
+extern bitmap *b_p;		/* global pointer to bitmap */
 extern unsigned int b_xsize, b_ysize;	/* the size of the bitmap */
 extern unsigned int b_planes;			/* number of color planes */
 extern unsigned int b_psize;			/* size of each plane */
 extern unsigned int b_rastermode;		/* raster mode rotates -90deg */
 extern unsigned int b_linemask;			/* 16 bit mask for dotted lines */
-extern unsigned int b_value;			/* colour of lines */
-extern unsigned int b_hchar;			/* width of characters */
-extern unsigned int b_hbits;			/* actual bits in char horizontally */
-extern unsigned int b_vchar;			/* height of characters */
-extern unsigned int b_vbits;			/* actual bits in char vertically */
 extern unsigned int b_angle;			/* rotation of text */
-extern char_box b_font[FNT_CHARS];		/* the current font */
-extern unsigned int b_pattern[];
 extern int b_maskcount;
-extern unsigned int b_lastx, b_lasty;	/* last pixel set - used by b_line */
+extern unsigned int b_lastx;	/* last pixel set - used by b_line */
+
+/* RGB colour table moved out of gif.trm */
+/*
+ * Common RGB color table for use by all devices.
+ * It's a subset of the 216-color Web palette.
+ */
+#define WEB_N_COLORS 99
+struct rgb
+{
+    unsigned char r, g, b;
+};
+
+extern struct rgb web_color_rgbs[];
 
 
 /* Prototypes from file "bitmap.c" */
 
 void b_makebitmap __PROTO((unsigned int, unsigned int, unsigned int));
 void b_freebitmap __PROTO((void));
-void b_setpixel __PROTO((unsigned int, unsigned int, unsigned int));
-/* unused unsigned int b_getpixel __PROTO((unsigned int, unsigned int)); */
-void b_line __PROTO((unsigned int, unsigned int, unsigned int, unsigned int));
-void b_setmaskpixel __PROTO((unsigned int, unsigned int, unsigned int));
-/* void b_putc __PROTO((unsigned int, unsigned int, char, unsigned int)); */
 void b_charsize __PROTO((unsigned int));
 void b_setvalue __PROTO((unsigned int));
 
