@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.149 2005/03/09 19:05:47 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.150 2005/03/29 08:07:17 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -195,8 +195,7 @@ show_command()
 \t'samples', 'size', 'style', 'terminal', 'tics', 'timestamp',\n\
 \t'timefmt', 'title', 'variables', 'version', 'view',\n\
 \t'[xyz,cb]{2}label', '[xyz,cb]{2}range', '{m}[xyz,cb]{2}tics',\n\
-\t'[xyz,cb]{2}[md]tics', '[xyz]{2}zeroaxis', '[xyz,cb]data', 'zero',\n\
-\t'zeroaxis'";
+\t'[xyz,cb]{2}[md]tics', '{[xy]{2}}zeroaxis', '[xyz,cb]data', 'zero'";
 
     enum set_id token_found;
     struct value a;

@@ -1,3 +1,12 @@
+2005-03-30  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/show.c (show_command): Fix display of 'zeroaxis' settings
+	reported by error message.
+
+	* src/set.c (set_command): Likewise.
+
+	* src/unset.c (unset_command): Likewise.
+
 2005-03-29  Ethan Merritt  <merritt@u.washington.edu>
 
 	* demo/candlesticks.dem: Add demo of whiskerbars option.

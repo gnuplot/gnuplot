@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.78 2005/03/25 05:01:12 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.79 2005/03/29 08:07:17 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -166,7 +166,7 @@ unset_command()
 \t'terminal', 'tics', 'ticscale', 'ticslevel', 'timestamp', 'timefmt',\n\
 \t'title', 'view', '[xyz,cb]{2}data', '[xyz,cb]{2}label',\n\
 \t'[xyz,cb]{2}range', '{m}[xyz,cb]{2}tics', '[xyz,cb]{2}[md]tics',\n\
-\t'{[xyz]{2}}zeroaxis', 'zero'";
+\t'{[xy]{2}}zeroaxis', 'zero'";
 
     int found_token;
 
@@ -1414,7 +1414,7 @@ unset_range(AXIS_INDEX axis)
     axis_array[axis].range_flags = 0;
 }
 
-/* process 'unset {x|y|z|x2|y2}zeroaxis' command */
+/* process 'unset {x|y|x2|y2}zeroaxis' command */
 static void
 unset_zeroaxis(AXIS_INDEX axis)
 {
