@@ -1,3 +1,20 @@
+1999-07-20  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* src/command.c: Add history command to table, remove duplicate
+	entry.
+
+	* src/plot.h: Add some global variables from command.c.
+
+	* src/plot2d.c, src/plot3d.c, src/set.c, src/show.c: Remove
+	references to global variables, now in plot.h.
+
+	* src/show.c: Add table for `show' commands. Remove simple one-line
+	functions and reimplement as #define's. Merge show_one() and show_two()
+	back into show_command(). Add function for table-lookup.
+
+	* src/util.c(m_capture,m_quote_capture): Don't free() string pointer,
+	use gp_realloc() instead of gp_alloc().
+
 1999-07-18  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* src/command.c: Pass command string to be executed by system() to
