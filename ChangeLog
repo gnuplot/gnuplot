@@ -1,3 +1,20 @@
+1999-10-19  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* term/png.trm: Back out Eric and HBB's changes (back to 16 colours,
+	no transparency).
+
+1999-10-19  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* graph3d.c(boundary3d): Fix division by zero problem.
+
+	* makefile.win, plot.h: Changes for compilation with newer Borland
+	Win32 compilers.
+
+	* win/pgnuplot.c: Changes to enable compilation with more compilers.
+
+	* win/wgnuplot.def: Reduce stacksize by 500 bytes to fix
+	'DGROUP exceeds 64K' problem.
+
 1999-10-16  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* syscfg.h: cc on NetBSD doesn't define unix anymore.
