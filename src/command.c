@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.49 2001/02/01 17:56:04 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.50 2001/02/08 16:44:36 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -2128,7 +2128,7 @@ winsystem(const char *s)
 {
     LPSTR comspec;
     LPSTR execstr;
-    LPSTR p;
+    LPCSTR p;
 
     /* get COMSPEC environment variable */
 # ifdef WIN32

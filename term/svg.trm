@@ -84,6 +84,7 @@ int SVG_fontAvWidth = 0;	/* estimated current font char average width*/
 static short SVG_Pen_RealID __PROTO ((int));
 static void SVG_PathOpen __PROTO ((void));
 static void SVG_PathClose __PROTO ((void));
+static void SVG_PathLimit __PROTO ((void));
 static void SVG_GroupOpen __PROTO ((void));
 static void SVG_GroupClose __PROTO ((void));
 static void SVG_SetFont __PROTO ((const char *name, double size));

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.44 2001/01/18 18:45:40 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.45 2001/02/15 17:02:40 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -2394,13 +2394,13 @@ struct curve_points *plot;
  */
 static void
 plot_vectors(plot)
-struct curve_points *plot;
+    struct curve_points *plot;
 {
     int i;
     int x1, y1, x2, y2;
     struct termentry *t = term;
     TBOOLEAN head;
-    struct coordinate GPHUGE points[2];
+    struct coordinate points[2];
     double ex, ey;
     double lx[2], ly[2];
 
