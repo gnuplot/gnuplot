@@ -1,3 +1,8 @@
+2004-10-27  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* src/term.c docs/gnuplot.doc: New 'set multiplot layout' options
+	'downwards' and 'upwards'.
+
 2004-10-26  Ethan Merritt  <merritt@u.washington.edu>
 
 	* docs/gnuplot.doc: Add separate section with indexed entry for 

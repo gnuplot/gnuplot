@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.86 2004/09/15 11:13:04 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.87 2004/09/21 08:09:20 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -236,6 +236,7 @@ static void mp_layout_size_and_offset __PROTO((void));
 
 enum set_multiplot_id {
     S_MULTIPLOT_ROWMAJOR, S_MULTIPLOT_COLUMNMAJOR, S_MULTIPLOT_SCALE,
+    S_MULTIPLOT_DOWNWARDS, S_MULTIPLOT_UPWARDS, 
     S_MULTIPLOT_OFFSET, S_MULTIPLOT_INVALID
 };
 
@@ -243,15 +244,18 @@ static const struct gen_table set_multiplot_tbl[] =
 {
     { "row$major", S_MULTIPLOT_ROWMAJOR },
     { "col$umnmajor", S_MULTIPLOT_COLUMNMAJOR },
+    { "down$wards", S_MULTIPLOT_DOWNWARDS },
+    { "up$wards", S_MULTIPLOT_UPWARDS },
     { "sca$le", S_MULTIPLOT_SCALE },
     { "off$set", S_MULTIPLOT_OFFSET },
     { NULL, S_MULTIPLOT_INVALID }
 };
 
 # define MP_LAYOUT_DEFAULT {          \
-    FALSE,  /*  auto_layout */        \
+    FALSE,  /* auto_layout */         \
     0, 0,   /* num_rows, num_cols */  \
     FALSE,  /* row_major */           \
+    TRUE,   /* downwards */           \
     0, 0,   /* act_row, act_col */    \
     1, 1,   /* xscale, yscale */      \
     0, 0    /* xoffset, yoffset */    \
@@ -262,6 +266,7 @@ static struct {
     int num_rows;          /* number of rows in layout */
     int num_cols;          /* number of columns in layout */
     TBOOLEAN row_major;    /* row major mode if true, column major else */
+    TBOOLEAN downwards;    /* prefer downwards or upwards direction */
     int act_row;           /* actual row in layout */
     int act_col;           /* actual column in layout */
     double xscale;         /* factor for horizontal scaling */
@@ -626,6 +631,14 @@ term_start_multiplot()
 		    break;
 		case S_MULTIPLOT_COLUMNMAJOR:
 		    mp_layout.row_major = FALSE;
+		    c_token++;
+		    break;
+		case S_MULTIPLOT_DOWNWARDS:
+		    mp_layout.downwards = TRUE;
+		    c_token++;
+		    break;
+		case S_MULTIPLOT_UPWARDS:
+		    mp_layout.downwards = FALSE;
 		    c_token++;
 		    break;
 		case S_MULTIPLOT_SCALE:
@@ -2467,7 +2480,10 @@ mp_layout_size_and_offset(void)
 
     /* the 'set origin' command */
     xoffset = (double)(mp_layout.act_col) / mp_layout.num_cols;
-    yoffset = 1.0 - (double)(mp_layout.act_row+1) / mp_layout.num_rows;
+    if (mp_layout.downwards)
+    	yoffset = 1.0 - (double)(mp_layout.act_row+1) / mp_layout.num_rows;
+    else
+	yoffset = (double)(mp_layout.act_row) / mp_layout.num_rows;
     /* fprintf(stderr,"xoffset==%g  yoffset==%g\n", xoffset,yoffset); */
     
     /* corrected for x/y-scaling factors and user defined offsets */
