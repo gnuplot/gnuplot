@@ -244,7 +244,7 @@ void f_erf()
 	int fsign;
 	fsign = x >= 0 ? 1 : 0;
 	x = igamma(0.5, (x)*(x));
-	if (fabs(x+1.0) < DBL_EPSILON) {
+	if (x == -1.0) {
 	    undefined = TRUE;
 	    x = 0.0;
 	} else {
@@ -269,7 +269,7 @@ void f_erfc()
 	int fsign;
 	fsign = x >= 0 ? 1 : 0;
 	x = igamma(0.5, (x)*(x));
-	if (fabs(x+1.0) < DBL_EPSILON) {
+	if (x == 1.0) {
 	    undefined = TRUE;
 	    x = 0.0;
 	} else { 
@@ -660,7 +660,7 @@ void f_normal()
 	int fsign;
 	fsign = x >= 0 ? 1 : 0;
 	x = igamma(0.5, (x)*(x));
-	if (fabs(x+1.0) < DBL_EPSILON) {
+	if (x == 1.0) {
 	    undefined = TRUE;
 	    x = 0.0;
 	} else { 
