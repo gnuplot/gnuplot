@@ -94,7 +94,7 @@ char y2format[MAX_ID_LEN+1] = DEF_FORMAT;
  * - never saved or shown ...
  */
 #if AXIS_ARRAY_SIZE != 10
-#error error in initialiser for format_is_numeric
+# error error in initialiser for format_is_numeric
 #endif
 
 int format_is_numeric[AXIS_ARRAY_SIZE] = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
@@ -1991,9 +1991,10 @@ char *tic_side;
 
 {
     int match = 0;		/* flag, set by matching a tic command */
-    char nocmd[12] = "no";	/* fill w/ "no"+'tic_side'+suffix */
+    char nocmd[12];		/* fill w/ "no"+'tic_side'+suffix */
     char *cmdptr, *sfxptr;
 
+    (void) strcpy(nocmd, "no");
     cmdptr = &nocmd[2];
     (void) strcpy(cmdptr, tic_side);
     sfxptr = &nocmd[strlen(nocmd)];
