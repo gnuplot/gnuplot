@@ -7,6 +7,9 @@
 	(naming history: nolevel2 -> ai -> level1). Audit code to confirm that
 	in fact it excutes only commands required by PostScript Level 1.
 
+	* src/save.c (save_tics) src/show.c (show_tics): Save tic level for 
+	each explicit user-added tic.
+
 2004-08-12  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/post.trm: Rename 'nolevel2' option to 'ai', since its primary
