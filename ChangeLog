@@ -1,15 +1,32 @@
+1999-03-01  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* config.hin, configure: Regenerated.
+
+	* configure.in: Add vfprintf, doprnt.
+
+	* makefile.amg: Small changes, fix typos.
+
+	* stdfn.h: Add definitions to deal with varargs.
+
+	* lisp/Makefile.in: Fixes for building in a separate directory.
+
 1999-02-25  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* Makefile.in: Fully integrate BeOS port and gnuplot-mode.
+
+	* Makefile.in, makefile.all: Add/remove added/removed files
+	to/from BEOSSRC/LISP variables.
 
 	* configure: Regenerated.
 
 	* configure.in: X_PRE_LIBS is not required in X_LIBRARIES. Add
 	tests for poll.h, poll (experimental). Configure in lisp subdir.
-	Move configiuration report to after AC_OUTPUT.
+	Move configuration report to after AC_OUTPUT.
 
 	* gplt_x11.c(mainloop): Experimental support for poll (not yet
 	complete).
+
+	* term.c(init_term): Add init code for BeOS.
 
 	* beos/makefile: Moved to beos/Makefile.in.
 
