@@ -698,7 +698,7 @@ int max_using;
     /*}}} */
 
     /* filename cannot be static array! */
-    gp_expand_tilde (filename, MAX_LINE_LEN+1);
+    gp_expand_tilde (&filename, MAX_LINE_LEN+1);
 
 /*{{{  open file */
 #if defined(PIPES)
