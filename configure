@@ -554,7 +554,7 @@ fi
 
 
 
-# From configure.in Revision: 1.41.2.6 
+# From configure.in Revision: 1.41.2.7 
 VERSION=`sed -n 's/.*version.*"\(.*\)".*/\1/p' $srcdir/version.c|tr -d ' '`
 PL=`sed -n 's/.*patchlevel.*"\(.*\)".*/\1/p' $srcdir/version.c|tr -d ' '`
 ac_aux_dir=
