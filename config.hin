@@ -277,7 +277,7 @@
 #undef GRX21
 
 /*  Define if math.h declares struct exception for matherr().  */
-#undef EXCEPTION_IN_MATH
+#undef HAVE_STRUCT_EXCEPTION_IN_MATH_H
 
 /*  Define if <errno.h> declares errno.  */
 #undef EXTERN_ERRNO
@@ -323,9 +323,6 @@
 
 /*  Define if you have the png library.  */
 #undef HAVE_LIBPNG
-
-/*  Define if you have the pdf library.  */
-#undef HAVE_LIBPDF
 
 /*  Define if you have the pdf library.  */
 #undef HAVE_LIBPDF

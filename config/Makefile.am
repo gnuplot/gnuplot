@@ -5,12 +5,12 @@ AUTOMAKE_OPTIONS = foreign 1.2h
 all:
 
 ##m4-files-begin
-EXTRA_DIST = README Makefile.am.in buildvms.com config.cyg config.mgw \
-config.nt config.os2 djconfig.sh make_vms.com term_pc.h makefile.286 \
-makefile.amg makefile.ami makefile.cyg makefile.dj2 makefile.emx \
-makefile.g makefile.mgw makefile.msc makefile.msw makefile.mto \
-makefile.nt makefile.os2 makefile.os9 makefile.st makefile.tc makefile.unx \
-makefile.vms makefile.wc makefile.win makefile.ztc 
+EXTRA_DIST = README Makefile.am.in buildvms.com config.amg config.cyg \
+config.mgw config.nt config.os2 djconfig.sh make_vms.com term_pc.h \
+makefile.286 makefile.amg makefile.ami makefile.cyg makefile.dj2 \
+makefile.emx makefile.g makefile.mgw makefile.msc makefile.msw \
+makefile.mto makefile.nt makefile.os2 makefile.os9 makefile.st makefile.tc \
+makefile.unx makefile.vms makefile.wc makefile.win makefile.ztc 
 ##m4-files-end
 
 Makefile.am: Makefile.am.in
