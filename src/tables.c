@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: tables.c,v 1.45 2003/05/17 05:59:01 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: tables.c,v 1.46 2003/10/08 13:04:58 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - tables.c */
@@ -80,8 +80,7 @@ const struct gen_ftable command_ftbl[] =
     { "sh$ow", show_command },
     { "sp$lot", splot_command },
     { "sy$stem", system_command },
-    { "test", test_term },
-    { "testt$ime", testtime_command },
+    { "test", test_command },
     { "uns$et", unset_command },
     { "up$date", update_command },
     { ";", null_command },
@@ -454,6 +453,16 @@ const struct gen_table set_pm3d_tbl[] =
     { "corners2c$olor",S_PM3D_WHICH_CORNER },
     { NULL, S_PM3D_INVALID }
 };
+
+/* 'test' command */
+const struct gen_table test_tbl[] =
+{
+    { "term$inal", TEST_TERMINAL },
+    { "pal$ette", TEST_PALETTE },
+    { "time", TEST_TIME },
+    { NULL, TEST_INVALID }
+};
+
 
 /* fixed RGB color names for 'set palette defined' */
 const struct gen_table pm3d_color_names_tbl[] =

@@ -1,5 +1,5 @@
 /*
- * $Id: tables.h,v 1.39 2003/05/17 05:59:01 sfeam Exp $
+ * $Id: tables.h,v 1.40 2003/10/08 13:04:57 mikulik Exp $
  */
 
 /* GNUPLOT - tables.h */
@@ -164,6 +164,13 @@ enum set_pm3d_id {
 };
 #endif
 
+enum test_id {
+    TEST_INVALID,
+    TEST_TERMINAL,
+    TEST_PALETTE,
+    TEST_TIME
+};
+
 enum show_style_id {
     SHOW_STYLE_INVALID,
     SHOW_STYLE_DATA, SHOW_STYLE_FUNCTION, SHOW_STYLE_LINE,
@@ -190,6 +197,7 @@ extern const struct gen_table plot_axes_tbl[];
 extern const struct gen_table plot_smooth_tbl[];
 extern const struct gen_table save_tbl[];
 extern const struct gen_table set_tbl[];
+extern const struct gen_table test_tbl[];
 extern const struct gen_table set_key_tbl[];
 #ifdef PM3D
 extern const struct gen_table set_colorbox_tbl[];

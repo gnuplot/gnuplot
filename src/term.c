@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.59 2003/06/12 00:09:08 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.60 2003/09/11 15:08:57 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -1565,8 +1565,6 @@ test_term()
     char label[MAX_ID_LEN];
     int key_entry_height;
     int p_width;
-
-    c_token++;
 
     term_start_plot();
     screen_ok = FALSE;

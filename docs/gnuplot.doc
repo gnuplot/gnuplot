@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.188 2003/11/13 08:59:08 mikulik Exp $
+C RCS $Id: gnuplot.doc,v 1.189 2003/11/24 09:51:58 lhecking Exp $
 C 18 September 2001
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001   Thomas Williams, Colin Kelley et al.
 C
@@ -6090,6 +6090,8 @@ C ... and restart the table:
  limited to 3 columns of r,g,b float values [0..1] or integer values [0..255]
  by options float or int, respectively.  This way, the current gnuplot color
  palette can be loaded into other imaging applications, for example Octave.
+ Additionally to this textual list of RGB table, you can enjoy command `test
+ palette` to draw graphically the R,G,B profiles for the current palette.
 
  The following options determine the coloring properties.
 
@@ -8672,12 +8674,23 @@ C ... and restart the table:
  more details.
 2 test
 ?commands test
+?test palette
 ?test
- `test` creates a display of line and point styles and other useful things
- appropriate for the terminal you are using.
+ This command graphically tests or presents terminal and palette capabilities.
 
  Syntax:
-       test
+       test {terminal | palette [rgb|rbg|grb|gbr|brg|bgr]}
+
+ `test` or `test terminal` creates a display of line and point styles and other
+ useful things appropriate for and supported by the `terminal` you are just
+ using.
+
+ `test palette` draws graphically profiles R(z),G(z),B(z), where 0<=z<=1, as
+ calculated by the current color `palette`. In other words, it is a beautiful
+ plot you would have to do yourself with the result of `show palette palette 256 float`.
+ The optional parameter, a permutation of letters rgb, determines the sequence of
+ r,g,b profiles drawn one after the other --- try this yourself for `set palette
+ gray`. The default sequence is rgb.
 2 unset
 ?commands unset
 ?unset

@@ -49,6 +49,7 @@ and the example script demo/mousevariables.dem.
 =============================================================================
 
 [3.8k]
+* NEW 'test palette'
 * NEW 'set palette palette <n>' options {float|int} and output to that of
   'set print'
 

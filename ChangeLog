@@ -1,3 +1,13 @@
+2003-11-24  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* NEWS docs/gnuplot.doc src/command.h src/command.c src/tables.h
+	src/tables.c src/term.c:
+	New command 'test palette' for testing rgb profiles of the current
+	palette. 
+	Command 'test' gets an optional argument of what to test:
+	'test terminal' (default) is what 'test' currently does.
+	Undocumented command 'testime' changed to 'test time'.
+
 2003-11-21  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/show.c: Remove unused variables to quiet compiler warnings.
