@@ -6,6 +6,10 @@ dnl a macro is the usual case : this saves having to update
 dnl countless makefiles when new tests are added. By usual case
 dnl I guess ansi compiler on posix system or something like that
 dnl
+dnl [Lars: this is no longer necessary. I have cut out this stuff
+dnl  out of configure.in and reduced the size of configure by 30k!
+dnl  The necessery definitions are now in syscfg.h]
+dnl
 dnl $Id: configure.in,v 1.90 1998/06/18 14:52:55 ddenholm Exp $
 dnl
 AC_PREREQ(2.1)
@@ -16,7 +20,7 @@ AM_INIT_AUTOMAKE(gnuplot, $VERSION)
 AC_CONFIG_HEADER(config.h:config.hin)
 
 
-dnl Programs. Other checks have already been done by AM_INIT_AUTOMAKE
+dnl Programs. Other checks have already been performed by AM_INIT_AUTOMAKE
 AC_PROG_CC
 
 
@@ -145,12 +149,6 @@ AM_C_PROTOTYPES
 AC_C_CONST
 AC_C_INLINE
 AC_C_STRINGIZE
-
-dnl this shell variable is set to no if above failed to set
-dnl compiler to ansi mode (see aclocal.m4)
-if test "$am_cv_prog_cc_stdc" != no; then
-  AC_DEFINE(ANSI_C)
-fi
 
 AC_MSG_CHECKING(if compiler handles warn and error directives correctly)
 dnl this used to test #warning, but that is not currently used
