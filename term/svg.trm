@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: svg.trm,v 1.38 2004/07/02 23:58:55 sfeam Exp $
+ * $Id: svg.trm,v 1.39 2004/07/04 23:58:47 sfeam Exp $
  */
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -431,7 +431,7 @@ SVG_options ()
 	    c_token++;
 
 	    if (!END_OF_COMMAND && isstring (c_token)) {
-		quote_str (SVG_fontNameCur, c_token, MAX_ID_LEN);
+		quote_str (SVG_fontNameDef, c_token, MAX_ID_LEN);
 		c_token++;
 	    } else
 		int_error(c_token,"fname: expecting font name");
@@ -443,7 +443,7 @@ SVG_options ()
 
 	    if (END_OF_COMMAND)
 		int_error(c_token,"fsize: expecting font size");
-	    SVG_fontSizeCur = real (const_express (&a));
+	    SVG_fontSizeDef = real (const_express (&a));
 	    continue;
 	}
 
@@ -471,6 +471,9 @@ SVG_options ()
 	int_error(c_token, "unrecognized terminal option");
     }
 
+    /* I don't think any error checks on font name are possible; just set it */
+    SVG_set_font("");
+
     /* Save options back into options string in normalized format */
     sprintf(term_options, "size %d %d%s %s fname '%s'  fsize %g ",
 	    SVG_xSize, SVG_ySize,
@@ -490,8 +493,8 @@ SVG_local_reset()
     SVG_xSize      = SVG_XMAX;
     SVG_ySize      = SVG_YMAX;
     SVG_fixed_size = TRUE;
-    strcpy(SVG_fontNameCur, SVG_fontNameDef);
-    SVG_fontSizeCur  = SVG_fontSizeDef;
+    strcpy(SVG_fontNameDef,"Arial");
+    SVG_fontSizeDef  = 12;
     if (SVG_embedded_font)
 	free(SVG_embedded_font);
     SVG_embedded_font = NULL;
@@ -645,9 +648,10 @@ SVG_init ()
 TERM_PUBLIC void
 SVG_graphics ()
 {
-    /* fprintf (gpoutfile, "<svg>\n"); --- disabled HBB 20001116*/
+    /* EAM 5-May-2004 We must force a new group with fill:none in order for  */
+    /* multiple plots per page to work. Otherwise new plots are black-filled */
+    SVG_GroupOpen();
 
-    SVG_groupIsOpen = FALSE;
     SVG_fillPattern = -1;
     SVG_fillPatternIndex = 0;
 #ifdef PM3D

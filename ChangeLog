@@ -1,3 +1,16 @@
+2004-08-18  Volker Dobler  <v.dobler@web.de>
+
+	* src/term.c (term_end_plot term_start_multiplot term_end_multiplot):
+	Implement auto-layout of multiplots with specified number of rows
+	and columns.
+
+	* docs/gnuplot.doc demo/layout.dem:  Document and illustrate use 
+	of 'set multiplot layout'.
+
+2004-08-18  Ethan Merritt  <merritt@u.washington.edu>
+
+	* term/svg.trm: More consistent handling of default background and font.
+
 2004-08-17  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/eval.c (real imag magnitude angle):  Move error message handling
