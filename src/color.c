@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: color.c,v 1.47 2004/07/02 23:58:35 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: color.c,v 1.48 2004/09/01 15:53:46 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - color.c */
@@ -422,6 +422,10 @@ cbtick_callback(
 
     /* draw label */
     if (text) {
+	/* get offset */
+	unsigned int offsetx, offsety;
+	map3d_position_r(&(axis_array[axis].ticdef.offset),
+			 &offsetx, &offsety, "cbtics");
 	/* User-specified different color for the tics text */
 	if (axis_array[axis].ticdef.textcolor.lt != TC_DEFAULT)
 	    apply_textcolor(&(axis_array[axis].ticdef.textcolor), term);
@@ -432,9 +436,10 @@ cbtick_callback(
 #if 1
 	    if (term->justify_text)
 		term->justify_text(CENTRE);
-	    (*term->put_text)(x2, y3, text);
+	    (*term->put_text)(x2+offsetx, y3+offsety, text);
 #else /* clipping does not work properly for text around 3d graph */
-	    clip_put_text_just(x2, y3, text, CENTRE, JUST_TOP,
+	    clip_put_text_just(x2+offsetx, y3+offsety, text, 
+			       CENTRE, JUST_TOP,
 			       axis_array[axis].ticdef.font);
 #endif
 	} else {
@@ -443,9 +448,10 @@ cbtick_callback(
 #if 1
 	    if (term->justify_text)
 		term->justify_text(LEFT);
-	    (*term->put_text)(x3, y2, text);
+	    (*term->put_text)(x3+offsetx, y2+offsety, text);
 #else /* clipping does not work properly for text around 3d graph */
-	    clip_put_text_just(x3, y2, text, LEFT, JUST_CENTRE,
+	    clip_put_text_just(x3+offsetx, y2+offsety, text, 
+			       LEFT, JUST_CENTRE,
 			       axis_array[axis].ticdef.font);
 #endif
 	}
@@ -602,9 +608,12 @@ draw_color_smooth_box()
 	apply_textcolor(&(CB_AXIS.label.textcolor),term);
 	if (color_box.rotation == 'h') {
 	    int len = ticscale * (tic_in ? 1 : -1) * (term->v_tic);
-	    x = (cb_x_from + cb_x_to) / 2 + CB_AXIS.label.xoffset * term->h_char;
+
+	    map3d_position_r(&(CB_AXIS.label.offset), &x, &y, "smooth_box");
+	    x += (cb_x_from + cb_x_to) / 2;
+
 #define DEFAULT_Y_DISTANCE 1.0
-	    y = cb_y_from + (CB_AXIS.label.yoffset - DEFAULT_Y_DISTANCE - 1.7) * term->v_char;
+	    y += cb_y_from + (- DEFAULT_Y_DISTANCE - 1.7) * term->v_char;
 #undef DEFAULT_Y_DISTANCE
 	    if (len < 0) y += len;
 	    if (x<0) x = 0;
@@ -619,11 +628,12 @@ draw_color_smooth_box()
 	      	widest_tic_strlen = 0; /* reset the global variable */
 		gen_tics(COLOR_AXIS, /* 0, */ widest_tic_callback);
 	    }
+	    map3d_position_r(&(CB_AXIS.label.offset), &x, &y, "smooth_box");
 #define DEFAULT_X_DISTANCE 1.0
-	    x = cb_x_to + (CB_AXIS.label.xoffset + widest_tic_strlen + DEFAULT_X_DISTANCE + 1.5) * term->h_char;
+	    x += cb_x_to + (widest_tic_strlen + DEFAULT_X_DISTANCE + 1.5) * term->h_char;
 #undef DEFAULT_X_DISTANCE
 	    if (len > 0) x += len;
-	    y = (cb_y_from + cb_y_to) / 2 + CB_AXIS.label.yoffset * term->v_char;
+	    y += (cb_y_from + cb_y_to) / 2;
 	    if (x<0) x = 0;
 	    if (y<0) y = 0;
 	    if ((*term->text_angle)(TEXT_VERTICAL)) {

@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.247 2004/10/19 12:59:50 persquare Exp $
+C RCS $Id: gnuplot.doc,v 1.248 2004/10/20 20:14:16 sfeam Exp $
 C 18 September 2001
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -5800,7 +5800,8 @@ C ... and restart the table:
                  {font "<name>{,<size>}"}
                  {front | back}
                  {textcolor <colorspec>}
-                 {point <pointstyle> {offset x, y} | nopoint}
+                 {point <pointstyle> | nopoint}
+                 {offset <offset>}
        unset label {<tag>}
        show label
 
@@ -5860,14 +5861,15 @@ C ... and restart the table:
  If a <pointstyle> is given, using keywords `lt`, `pt` and `ps`, see `style`,
  a point with the given style and color of the given line type is plotted at
  the label position and the text of the label is displaced slightly.
- The displacement defaults to 1, 1 in `pointsize` units and can be
- controlled by the optional `offset x, y`. Example: `offset 2, -3` would
- displace the labels 2 * pointsize horizontally and -3 * pointsize vertically
- from the actual coordinate point as given by `position`.  The size of the
- point depends also on the setting of `pointsize`.
  This option is used by default for placing labels in `mouse` enhanced
  terminals.  Use `nopoint` to turn off the drawing of a point near
  the label (this is the default).
+
+ The displacement defaults to 1,1 in `pointsize` units if a <pointstyle> is
+ given, 0,0 if no <pointstyle> is given.  The displacement can be controlled
+ by the optional `offset <offset>` where <offset> is specified by either x,y
+ or x,y,z, and may be preceded by `first`, `second`, `graph`, `screen`, or
+ `character` to select the coordinate system.  See `coordinates` for details.
 
  If one (or more) axis is timeseries, the appropriate coordinate should be
  given as a quoted time string according to the `timefmt` format string.
@@ -8455,14 +8457,17 @@ C ... and restart the table:
  the plot.  `set title` is a special case of `set label`.
 
  Syntax:
-       set title {"<title-text>"} {offset <xoff>}{,<yoff>} {"<font>{,<size>}"}
+       set title {"<title-text>"} {offset <offset>} {"<font>{,<size>}"}
                  {{textcolor | tc} {lt <line_type> | default}}
        show title
 
- Specifying constants <xoff> or <yoff> as optional offsets for the title will
- move the title <xoff> or <yoff> character screen coordinates (not graph
- coordinates).  For example, "`set title offset ,-1`" will change only the y 
- offset of the title, moving it down by roughly the height of one character.
+ If <offset> is specified the title is moved by the given offset where
+ <offset> is specified by either x,y or x,y,z, and may be preceded by
+ `first`, `second`, `graph`, `screen`, or `character` to select the
+ coordinate system.  See `coordinates` for details.  By default, the
+ `character` coordinate system is used.  For example, "`set title 0,-1`"
+ will change only the y offset of the title, moving the title down by
+ roughly the height of one character.
 
  <font> is used to specify the font with which the title is to be written;
  the units of the font <size> depend upon which terminal is used.
@@ -8701,18 +8706,21 @@ C ... and restart the table:
  on the other axes.
 
  Syntax:
-       set xlabel {"<label>"} {offset <xoff>}{,<yoff>} {font "<font>{,<size>}"}
+       set xlabel {"<label>"} {offset <offset>} {font "<font>{,<size>}"}
                   {{textcolor | tc} {lt <line_type> | default}}
        show xlabel
 
  The same syntax applies to `x2label`, `ylabel`, `y2label`, `zlabel` and
  `cblabel`.
 
- Specifying the constants <xoff> or <yoff> as optional offsets for a label
- will move it <xoff> or <yoff> character widths or heights.  For example,
- "` set xlabel offset -1`" will change only the x offset of the xlabel, moving
- the label roughly one character width to the left.   The size of a character
- depends on both the font and the terminal.
+ If <offset> is specified the label is moved by the given offset where
+ <offset> is specified by either x,y or x,y,z, and may be preceded by
+ `first`, `second`, `graph`, `screen`, or `character` to select the
+ coordinate system.  See `coordinates` for details.  By default, the
+ `character` coordinate system is used.  For example, "`set xlabel -1,0`"
+ will change only the x offset of the title, moving the label roughly one
+ character width to the left.  The size of a character depends on both the
+ font and the terminal.
 
  <font> is used to specify the font in which the label is written; the units
  of the font <size> depend upon which terminal is used.
@@ -8885,6 +8893,7 @@ C ... and restart the table:
 
  Syntax:
        set xtics {axis | border} {{no}mirror} {{no}rotate {by <ang>}}
+                 {offset <offset> | nooffset}
                  {  autofreq
                   | <incr>
                   | <start>, <incr> {,<end>}
@@ -8915,6 +8924,17 @@ C ... and restart the table:
  the `{axis | border}` option is not available and the default is
  `nomirror`.  If you do want to mirror the z-axis tics, you might want to
  create a bit more room for them with `set border`.
+
+ The <offset> is specified by either x,y or x,y,z, and may be preceded by
+ `first`, `second`, `graph`, `screen`, or `character` to select the
+ coordinate system. <offset> is the offset of the tics texts from their
+ default positions, while the default coordinate system is `character`.
+ See `coordinates` for details. `nooffset` switches off the offset.
+
+ Example:
+
+ Move xtics more closely to the plot.
+       set xtics offset 0,graph 0.05
 
  `set xtics` with no options restores the default border or axis if xtics are
  being displayed;  otherwise it has no effect.  Any previously specified tic

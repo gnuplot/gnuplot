@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.137 2004/10/19 03:26:20 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.138 2004/10/20 20:14:19 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -1577,11 +1577,11 @@ show_label(int tag)
 	    if (this_label->lp_properties.pointflag == 0)
 		fprintf(stderr, " nopoint");
 	    else {
-		fprintf(stderr, " point with color of linetype %d pointtype %d pointsize %g offset %g,%g",
+		fprintf(stderr, " point with color of linetype %d pointtype %d pointsize %g offset ",
 		    this_label->lp_properties.l_type+1,
 		    this_label->lp_properties.p_type+1,
-		    this_label->lp_properties.p_size,
-		    this_label->hoffset, this_label->voffset);
+		    this_label->lp_properties.p_size);
+		show_position(&this_label->offset);
 	    }
 
 	    /* Entry font added by DJL */
@@ -2392,10 +2392,10 @@ show_histogram()
 	fprintf(stderr, "\tHistogram style is rowstacked ");
     else if (histogram_opts.type == HT_STACKED_IN_TOWERS)
 	fprintf(stderr, "\tHistogram style is columnstacked ");
-    fprintf(stderr, " title offset %g,%g ",
-	histogram_opts.title.hoffset,histogram_opts.title.voffset);
+    fprintf(stderr, " title offset ");
+    show_position(&histogram_opts.title.offset);
     if (histogram_opts.title.textcolor.type == TC_LT)
-	fprintf(stderr,"textcolor lt %d", histogram_opts.title.textcolor.lt+1); 
+	fprintf(stderr," textcolor lt %d", histogram_opts.title.textcolor.lt+1); 
     fprintf(stderr, "\n");
 }
 #endif
@@ -2552,9 +2552,9 @@ show_range(AXIS_INDEX axis)
 static void
 show_xyzlabel(const char *name, const char *suffix, label_struct *label)
 {
-    fprintf(stderr, "\t%s%s is \"%s\", offset at %f, %f",
-	    name, suffix, conv_text(label->text),
-	    label->xoffset, label->yoffset);
+    fprintf(stderr, "\t%s%s is \"%s\", offset at ",
+	    name, suffix, conv_text(label->text));
+    show_position(&label->offset);
 
     if (label->font[0])
 	fprintf(stderr, ", using font \"%s\"", conv_text(label->font));
@@ -2900,9 +2900,12 @@ show_ticdef(AXIS_INDEX axis)
     if (axis_array[axis].tic_rotate) {
 	fprintf(stderr," rotated");
 	fprintf(stderr," by %d",axis_array[axis].tic_rotate);
-	fputs(" in 2D mode, terminal permitting.\n\t", stderr);
+	fputs(" in 2D mode, terminal permitting,\n\t", stderr);
     } else
-	fputs(" and are not rotated\n\t", stderr);
+	fputs(" and are not rotated,\n\t", stderr);
+    fputs("    offset ",stderr);
+    show_position(&axis_array[axis].ticdef.offset);
+    fputs("\n\t",stderr);
 
     switch (axis_array[axis].ticdef.type) {
     case TIC_COMPUTED:{

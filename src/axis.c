@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.47 2004/07/25 12:25:00 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.48 2004/10/20 20:14:17 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -1549,18 +1549,31 @@ get_position_type(enum position_type *type, int *axes)
 void
 get_position(struct position *pos)
 {
+    get_position_default(pos,first_axes);
+}
+
+/* get_position() - reads a position for label,arrow,key,... 
+ * with given default coordinate system
+ */
+void
+get_position_default(struct position *pos, enum position_type default_type)
+{
     int axes;
-    enum position_type type = first_axes;
+    enum position_type type = default_type;
 
     get_position_type(&type, &axes);
     pos->scalex = type;
     GET_NUMBER_OR_TIME(pos->x, axes, FIRST_X_AXIS);
-    if (!equals(c_token, ","))
-	int_error(c_token, "expected comma");
-    ++c_token;
-    get_position_type(&type, &axes);
-    pos->scaley = type;
-    GET_NUMBER_OR_TIME(pos->y, axes, FIRST_Y_AXIS);
+
+    if (equals(c_token, ",")) {
+	++c_token;
+	get_position_type(&type, &axes);
+	pos->scaley = type;
+	GET_NUMBER_OR_TIME(pos->y, axes, FIRST_Y_AXIS);
+    } else {
+	pos->y = 0;
+	pos->scaley = type;
+    }
 
     /* z is not really allowed for a screen co-ordinate, but keep it simple ! */
     if (equals(c_token, ",")) {

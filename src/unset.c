@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.67 2004/09/30 03:21:03 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.68 2004/10/17 04:52:13 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -1041,6 +1041,8 @@ unset_minitics(AXIS_INDEX axis)
 static void
 unset_tics(AXIS_INDEX axis)
 {
+    struct position tics_nooffset = { character, character, character, 0., 0., 0.};
+
     axis_array[axis].ticmode = NO_TICS;
 
     if (axis_array[axis].ticdef.font) {
@@ -1050,6 +1052,8 @@ unset_tics(AXIS_INDEX axis)
     axis_array[axis].ticdef.textcolor.type = TC_DEFAULT;
     axis_array[axis].ticdef.textcolor.lt = 0;
     axis_array[axis].ticdef.textcolor.value = 0;
+    axis_array[axis].ticdef.offset = tics_nooffset;
+    axis_array[axis].tic_rotate = 0;
     axis_array[axis].tic_rotate = 0;
 
     if (axis_array[axis].ticdef.type == TIC_USER) {
@@ -1413,10 +1417,11 @@ unset_all_zeroaxes()
 static void
 unset_axislabel_or_title(label_struct *label)
 {
+    struct position default_offset = { character, character, character, 
+				       0., 0., 0. };
     strcpy(label->text, "");
     strcpy(label->font, "");
-    label->xoffset = 0;
-    label->yoffset = 0;
+    label->offset = default_offset;
     label->textcolor.type = TC_DEFAULT;
 }
 

@@ -1,5 +1,5 @@
 /*
- * $Id: axis.h,v 1.38 2004/07/03 06:08:48 sfeam Exp $
+ * $Id: axis.h,v 1.39 2004/10/20 20:14:17 sfeam Exp $
  *
  */
 
@@ -112,6 +112,7 @@ typedef struct ticdef {
 		  double end;		/* ymax, if VERYLARGE */
 	   } series;
     } def;
+    struct position offset;
 } t_ticdef;
 
 /* we want two auto modes for minitics - default where minitics are
@@ -230,7 +231,7 @@ typedef struct axis {
     lp_style_type zeroaxis;	/* drawing style for zeroaxis, if any */
 } AXIS;
 
-#define DEFAULT_AXIS_TICDEF {TIC_COMPUTED, NULL, {TC_DEFAULT, 0, 0}, {NULL} }
+#define DEFAULT_AXIS_TICDEF {TIC_COMPUTED, NULL, {TC_DEFAULT, 0, 0}, {NULL},  { character, character, character, 0., 0., 0. } }
 #ifdef PM3D
 # define DEFAULT_AXIS_ZEROAXIS {0, -3, 0, 1.0, 1.0, 0}
 #else
@@ -649,7 +650,8 @@ void set_writeback_max __PROTO((AXIS_INDEX));
 /* set widest_tic_label: length of the longest tics label */
 void widest_tic_callback __PROTO((AXIS_INDEX, double place, char *text, struct lp_style_type grid));
 
-void get_position __PROTO((struct position * pos));
+void get_position __PROTO((struct position *pos));
+void get_position_default __PROTO((struct position *pos, enum position_type default_type));
 
 /* ------------ autoscaling of the color axis */
 #ifdef PM3D

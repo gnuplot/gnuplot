@@ -1,7 +1,31 @@
+2004-10-21  Harald Harders  <h.harders@tu-bs.de>
+
+	This patch introduces the possibilty to move many kinds of texts by an
+	offset in an arbitrary coordinate system. For example, tic marks, the 
+	title, and labels can be moved by an offset given in 'character',
+	'screen', 'graph', 'first', or 'second' coordinate system.
+	SourceForge patch #993422.
+	
+	* docs/gnuplot.doc
+	
+	* src/axis.c (get_position get_position_default):
+	New routine that accepts a default coordinate type when parsing offsets.
+
+	* src/axis.h: Add offset structure to axis tics.
+	* src/gadgets.h: Add offset structure to text labels.
+
+	* src/color.c (cbtick_callback draw_color_smooth_box)
+	* src/gadgets.c (get_offsets)
+	* src/save.c (save_set_all save_tics)
+	* src/set.c (set_label set_timestamp set_tic_prop set_xyzlabel 
+	             new_text_label parse_label_options parse_histogramstyle)
+	* src/show.c (show_label show_histogram show_xyzlabel show_ticdef)
+	* src/unset.c (unset_tics unset_axislabel_or_title)
+
 2004-10-20  Harald Harders  <h.harders@tu-bs.de>
 
 	Introduce a new coordinate system 'character' that uses character width
-	and height as units. Its is a 2d coordinate system similar to 'screen'.
+	and height as units. It is a 2d coordinate system similar to 'screen'.
 	The origin is the same as for 'screen'. SourceForge patch #993411.
 	The intended use is for setting label and text offsets in terms of 
 	character size, and generalizing this to all places where an offset is

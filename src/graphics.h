@@ -1,5 +1,5 @@
 /*
- * $Id: graphics.h,v 1.28 2004/09/01 15:53:48 mikulik Exp $
+ * $Id: graphics.h,v 1.29 2004/09/24 21:42:19 sfeam Exp $
  */
 
 /* GNUPLOT - graphics.h */
@@ -103,6 +103,8 @@ void do_plot __PROTO((struct curve_points *, int));
 int label_width __PROTO((const char *, int *));
 void map_position __PROTO((struct position * pos, unsigned int *x,
 				  unsigned int *y, const char *what));
+void map_position_r __PROTO((struct position* pos, double* x, double* y,
+			     const char* what));
 #if defined(sun386) || defined(AMIGA_SC_6_1)
 double CheckLog __PROTO((TBOOLEAN, double, double));
 #endif

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.88 2004/10/19 03:26:19 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.89 2004/10/20 20:14:19 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -399,12 +399,13 @@ set y2data%s\n",
 	if (this_label->lp_properties.pointflag == 0)
 	    fprintf(fp, " nopoint");
 	else {
-	    fprintf(fp, " point linetype %d pointtype %d pointsize %g offset %g,%g",
+	    fprintf(fp, " point linetype %d pointtype %d pointsize %g",
 		this_label->lp_properties.l_type+1,
 		this_label->lp_properties.p_type+1,
-		this_label->lp_properties.p_size,
-		this_label->hoffset, this_label->voffset);
+		this_label->lp_properties.p_size);
 	}
+	fprintf(fp," offset ");
+	save_position(fp, &this_label->offset);
 	fputc('\n', fp);
     }
     fputs("unset arrow\n", fp);
@@ -487,6 +488,8 @@ set y2data%s\n",
 	case HT_STACKED_IN_TOWERS:
 	    fprintf(fp,"columnstacked "); break;
     }
+    fprintf(fp,"title ");
+    save_position(fp, &histogram_opts.title.offset);
     fprintf(fp, "\n");
 #endif
 
@@ -678,9 +681,9 @@ set ticscale %g %g\n",
 
 #define SAVE_AXISLABEL_OR_TITLE(name,suffix,lab)		\
     {								\
-	fprintf(fp, "set %s%s \"%s\" offset %f,%f ",		\
-		name, suffix, conv_text(lab.text),		\
-		lab.xoffset, lab.yoffset);			\
+	fprintf(fp, "set %s%s \"%s\" offset ",			\
+		name, suffix, conv_text(lab.text));		\
+        save_position(fp, &(lab.offset));			\
 	fprintf(fp, " font \"%s\"", conv_text(lab.font));	\
 	save_textcolor(fp, &(lab.textcolor));			\
 	fprintf(fp, "\n");					\
@@ -689,11 +692,11 @@ set ticscale %g %g\n",
     SAVE_AXISLABEL_OR_TITLE("", "title", title);
 
     /* FIXME */
-    fprintf(fp, "set %s \"%s\" %s %srotate offset %f,%f ",
+    fprintf(fp, "set %s \"%s\" %s %srotate ",
 	    "timestamp", conv_text(timelabel.text),
 	    (timelabel_bottom ? "bottom" : "top"),
-	    (timelabel_rotate ? "" : "no"),
-	    timelabel.xoffset, timelabel.yoffset);
+	    (timelabel_rotate ? "" : "no"));
+    save_position(fp, &(timelabel.offset));
     fprintf(fp, " \"%s\"\n", conv_text(timelabel.font));
 
     save_range(fp, R_AXIS);
@@ -881,6 +884,9 @@ save_tics(FILE *fp, AXIS_INDEX axis)
 	    axis_array[axis].tic_rotate ? "rotate" : "norotate");
     if (axis_array[axis].tic_rotate)
     	fprintf(fp,"by %d ",axis_array[axis].tic_rotate);
+    fprintf(fp," offset ");
+    save_position(fp, &axis_array[axis].ticdef.offset);
+    fprintf(fp," ");
     switch (axis_array[axis].ticdef.type) {
     case TIC_COMPUTED:{
 	    fputs("autofreq ", fp);

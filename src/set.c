@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.151 2004/09/17 05:01:14 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.152 2004/10/19 23:32:38 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -1688,9 +1688,10 @@ set_label()
     }
     /* Insert this label into the list if it is a new one */
     if (this_label == NULL || tag != this_label->tag) {
+	struct position default_offset = { character, character, character, 
+					   0., 0., 0. };
 	new_label = new_text_label(tag);
-	new_label->voffset = 1.0;
-	new_label->hoffset = 1.0;
+	new_label->offset = default_offset;
 	if (prev_label == NULL)
 	    first_label = new_label;
 	else
@@ -3289,8 +3290,6 @@ set_timestamp()
 	strcpy(timelabel.text, DEFAULT_TIMESTAMP_FORMAT);
 
     if (!END_OF_COMMAND) {
-	struct value a;
-
 	if (isstring(c_token)) {
 	    /* we have a format string */
 	    quote_str(timelabel.text, c_token, MAX_LINE_LEN);
@@ -3317,11 +3316,8 @@ set_timestamp()
 	     ++c_token;
 	}
 	/* We have x,y offsets specified */
-	if (!END_OF_COMMAND && !equals(c_token,","))
-	    timelabel.xoffset = real(const_express(&a));
-	if (!END_OF_COMMAND && equals(c_token,",")) {
-	    c_token++;
-	    timelabel.yoffset = real(const_express(&a));
+	if (!END_OF_COMMAND && !equals(c_token,",")) {
+	    get_position_default(&(timelabel.offset),character);
 	}
 	if (!END_OF_COMMAND && isstring(c_token)) {
 	    quote_str(timelabel.font, c_token, MAX_LINE_LEN);
@@ -3573,6 +3569,14 @@ set_tic_prop(AXIS_INDEX axis)
 	    axis_array[axis].tic_rotate = 0;
 	    ++c_token;
 	}
+	if (almost_equals(c_token, "off$set")) {
+	    ++c_token;
+	    get_position_default(&axis_array[axis].ticdef.offset,character);
+	} else if (almost_equals(c_token, "nooff$set")) {
+ 	    struct position tics_nooffset = { character, character, character, 0., 0., 0.};
+	    ++c_token;
+	    axis_array[axis].ticdef.offset = tics_nooffset;
+	}
 	if (almost_equals(c_token, "au$tofreq")) {	/* auto tic interval */
 	    ++c_token;
 	    if (axis_array[axis].ticdef.type == TIC_USER) {
@@ -3717,14 +3721,7 @@ set_xyzlabel(label_struct *label)
 
 	if (!isstring(c_token) && !got_offsets) {
 	    /* We have x,y offsets specified */
-	    struct value a;
-	    if (!equals(c_token, ","))
-		label->xoffset = real(const_express(&a));
-
-	    if (!END_OF_COMMAND && equals(c_token, ",")) {
-		c_token++;
-		label->yoffset = real(const_express(&a));
-	    }
+	    get_position_default(&(label->offset),character);
 	    got_offsets = TRUE;
 	    continue;
 	}
@@ -4267,6 +4264,8 @@ struct text_label *
 new_text_label(int tag)
 {
     struct text_label *new;
+    struct position default_offset = { character, character, character,
+				       0., 0., 0. };
 
     new = gp_alloc( sizeof(struct text_label), "text_label");
     new->next = NULL;
@@ -4284,8 +4283,7 @@ new_text_label(int tag)
     new->font = (char *)NULL;
     new->textcolor.type = TC_DEFAULT;
     new->lp_properties.pointflag = 0;
-    new->hoffset = 0;
-    new->voffset = 0;
+    new->offset = default_offset;
 
     return(new);
 }
@@ -4307,8 +4305,7 @@ parse_label_options( struct text_label *this_label )
 	set_rot = FALSE, set_font = FALSE, set_offset = FALSE,
 	set_layer = FALSE, set_textcolor = FALSE;
     int layer = 0;
-    float hoff = 1.0;
-    float voff = 1.0;
+    struct position offset = { character, character, character, 0., 0., 0. };
     t_colorspec textcolor = {TC_DEFAULT,0,0.0};
     struct lp_style_type loc_lp = DEFAULT_LP_STYLE_TYPE;
     loc_lp.pointflag = -2;
@@ -4416,17 +4413,7 @@ parse_label_options( struct text_label *this_label )
 
 	if (! set_offset && almost_equals(c_token, "of$fset")) {
 	    c_token++;
-	    if (END_OF_COMMAND)
-		int_error(c_token, "expected horizontal offset");
-	    hoff = real(const_express(&a));
-
-	    if (!equals(c_token, ","))
-		int_error(c_token, "expected comma");
-
-	    c_token++;
-	    if (END_OF_COMMAND)
-		int_error(c_token, "expected vertical offset");
-	    voff = real(const_express(&a));
+	    get_position_default(&offset,character);
 	    set_offset = TRUE;
 	    continue;
 	}
@@ -4473,10 +4460,8 @@ parse_label_options( struct text_label *this_label )
 	    memcpy(&(this_label->textcolor), &textcolor, sizeof(t_colorspec));
 	if (loc_lp.pointflag >= 0)
 	    memcpy(&(this_label->lp_properties), &loc_lp, sizeof(loc_lp));
-	if (set_offset) {
-	    this_label->hoffset = hoff;
-	    this_label->voffset = voff;
-	}
+	if (set_offset)
+	    this_label->offset = offset;
 
     /* Make sure the z coord and the z-coloring agree */
     if (this_label->textcolor.type == TC_Z)
@@ -4521,12 +4506,10 @@ parse_histogramstyle( histogram_style *hs,
 	    else
 		int_error(c_token,"expected gap value");
 	} else if (almost_equals(c_token, "ti$tle")) {
-	    title_specs.xoffset = hs->title.hoffset;
-	    title_specs.yoffset = hs->title.voffset;
+	    title_specs.offset = hs->title.offset;
 	    set_xyzlabel(&title_specs);
 	    memcpy(&hs->title.textcolor,&title_specs.textcolor,sizeof(t_colorspec));
-	    hs->title.hoffset = title_specs.xoffset;
-	    hs->title.voffset = title_specs.yoffset;
+	    hs->title.offset = title_specs.offset;
 	    /* EAM FIXME - could allocate space and copy parsed font instead */
 	    hs->title.font = &(axis_array[FIRST_X_AXIS].label.font[0]);
 	} else

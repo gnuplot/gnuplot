@@ -35,6 +35,8 @@ static char *RCSid() { return RCSid("gadgets.c,v 1.1.3.1 2000/05/03 21:47:15 hbb
 ]*/
 
 #include "gadgets.h"
+#include "command.h"
+#include "graphics.h"
 #include "plot3d.h" /* For is_plot_with_palette() */
 
 #ifdef PM3D
@@ -458,11 +460,22 @@ get_offsets(
     int *htic, int *vtic)
 {
     if (this_label->lp_properties.pointflag) {
-	*htic = (pointsize * t->h_tic * 0.5 * this_label->hoffset);
-	*vtic = (pointsize * t->v_tic * 0.5 * this_label->voffset);
+	*htic = (pointsize * t->h_tic * 0.5);
+	*vtic = (pointsize * t->v_tic * 0.5);
     } else {
 	*htic = 0;
 	*vtic = 0;
+    }
+    if (is_3d_plot) {
+	int htic2, vtic2;
+	map3d_position_r(&(this_label->offset), &htic2, &vtic2, "get_offsets");
+	*htic += htic2;
+	*vtic += vtic2;
+    } else {
+	double htic2, vtic2;
+	map_position_r(&(this_label->offset), &htic2, &vtic2, "get_offsets");
+	*htic += (int)htic2;
+	*vtic += (int)vtic2;
     }
 }
 

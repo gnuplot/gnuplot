@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.101 2004/10/19 03:26:15 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.102 2004/10/20 20:14:17 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -166,7 +166,6 @@ static TBOOLEAN get_arrow3d __PROTO((struct arrow_def*, int*, int*, int*, int*))
 static void place_arrows3d __PROTO((int));
 static void place_labels3d __PROTO((struct text_label * listhead, int layer));
 static int map3d_getposition __PROTO((struct position* pos, const char* what, double* xpos, double* ypos, double* zpos));
-static void map3d_position_r __PROTO((struct position* pos, int* x, int* y, const char* what));
 
 /*
  * The Amiga SAS/C 6.2 compiler moans about macro envocations causing
@@ -673,6 +672,7 @@ do_3dplot(
     /* PLACE TITLE */
     if (*title.text != 0) {
 	unsigned int x, y;
+	int tmpx, tmpy;
 	if (splot_map) { /* case 'set view map' */
 	    unsigned int map_x1, map_y1, map_x2, map_y2;
 	    int tics_len = 0;
@@ -684,13 +684,15 @@ do_3dplot(
 	    map3d_xy(X_AXIS.max, Y_AXIS.max, base_z, &map_x2, &map_y2);
 	    /* Distance between the title base line and graph top line or the upper part of
 	       tics is as given by character height: */
+	    map3d_position_r(&(title.offset), &tmpx, &tmpy, "3dplot");
 #define DEFAULT_Y_DISTANCE 1.0
-	    x = (unsigned int) ((map_x1 + map_x2) / 2 + title.xoffset * t->h_char);
-	    y = (unsigned int) (map_y1 + tics_len + (DEFAULT_Y_DISTANCE + titlelin - 0.5 + title.yoffset) * t->v_char);
+	    x = (unsigned int) ((map_x1 + map_x2) / 2 + tmpx);
+	    y = (unsigned int) (map_y1 + tics_len + tmpy + (DEFAULT_Y_DISTANCE + titlelin - 0.5) * (t->v_char));
 #undef DEFAULT_Y_DISTANCE
 	} else { /* usual 3d set view ... */
-    	    x = (unsigned int) ((xleft + xright) / 2 + title.xoffset * t->h_char);
-    	    y = (unsigned int) (ytop + (titlelin + title.yoffset) * t->h_char);
+	    map3d_position_r(&(title.offset), &tmpx, &tmpy, "3dplot");
+	    x = (unsigned int) ((xleft + xright) / 2 + tmpx);
+	    y = (unsigned int) (ytop + tmpy + titlelin * (t->h_char));
     	}
 	apply_textcolor(&(title.textcolor),t);
 	/* PM: why there is JUST_TOP and not JUST_BOT? We should draw above baseline!
@@ -704,10 +706,14 @@ do_3dplot(
     if (*timelabel.text) {
 	char str[MAX_LINE_LEN+1];
 	time_t now;
-	unsigned int x = t->v_char + timelabel.xoffset * t->h_char;
-	unsigned int y = timelabel_bottom
-	    ? yoffset * Y_AXIS.max + (timelabel.yoffset + 1) * t->v_char
-	    : ytop + (timelabel.yoffset - 1) * t->v_char;
+	int tmpx, tmpy;
+	unsigned int x, y;
+
+	map3d_position_r(&(timelabel.offset), &tmpx, &tmpy, "3dplot");
+	x = t->v_char + tmpx;
+	y = timelabel_bottom
+	    ? yoffset * Y_AXIS.max + tmpy + t->v_char
+	    : ytop + tmpy - t->v_char;
 
 	time(&now);
 	strftime(str, MAX_LINE_LEN, timelabel.text, localtime(&now));
@@ -2292,6 +2298,7 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid)
 		(surface_rot_x > 90 && FRONTGRID != whichgrid)) {
 #endif
 	    unsigned int x1, y1;
+	    int tmpx, tmpy;
 
 	    if (splot_map) { /* case 'set view map' */
 		/* copied from xtick_callback(): baseline of tics labels */
@@ -2330,8 +2337,9 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid)
 		TERMCOORD(&v1, x1, y1);
 	    }
 
-	    x1 += X_AXIS.label.xoffset * t->h_char; /* user-defined label offset */
-	    y1 += X_AXIS.label.yoffset * t->v_char;
+	    map3d_position_r(&(X_AXIS.label.offset), &tmpx, &tmpy, "graphbox");
+	    x1 += tmpx; /* user-defined label offset */
+	    y1 += tmpy;
 	    apply_textcolor(&(X_AXIS.label.textcolor),t);
 	    write_multiline(x1, y1, X_AXIS.label.text,
 			    CENTRE, JUST_TOP, 0,
@@ -2373,6 +2381,7 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid)
 		(surface_rot_x > 90 && FRONTGRID != whichgrid)) {
 #endif
 		unsigned int x1, y1;
+		int tmpx, tmpy;
 		int h_just, v_just, angle;
 
 		if (splot_map) { /* case 'set view map' */
@@ -2434,8 +2443,9 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid)
 		    angle = 0;
 		}
 
-		x1 += Y_AXIS.label.xoffset * t->h_char; /* user-defined label offset */
-		y1 += Y_AXIS.label.yoffset * t->v_char;
+		map3d_position_r(&(Y_AXIS.label.offset), &tmpx, &tmpy, "graphbox");
+		x1 += tmpx; /* user-defined label offset */
+		y1 += tmpy;
 		/* vertical y-label for maps */
 		if (splot_map == TRUE)
 		    (*t->text_angle)(TEXT_VERTICAL);
@@ -2503,13 +2513,15 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid)
 #endif
 	    )
 	) {
+	int tmpx, tmpy;
 	map3d_xy(zaxis_x, zaxis_y,
 		 Z_AXIS.max
 		 + (Z_AXIS.max - base_z) / 4,
 		 &x, &y);
 
-	x += Z_AXIS.label.xoffset * t->h_char;
-	y += Z_AXIS.label.yoffset * t->v_char;
+	map3d_position_r(&(Z_AXIS.label.offset), &tmpx, &tmpy, "graphbox");
+	x += tmpx;
+	y += tmpy;
 
 	apply_textcolor(&(Z_AXIS.label.textcolor),t);
 	write_multiline(x, y, Z_AXIS.label.text,
@@ -2562,7 +2574,10 @@ xtick_callback(
     if (text) {
 	int just;
 	unsigned int x2, y2;
-
+	/* get offset */
+	unsigned int offsetx, offsety;
+	map3d_position_r(&(axis_array[axis].ticdef.offset),
+		       &offsetx, &offsety, "xtics");
 	if (tic_unitx * xscaler < -0.9)
 	    just = LEFT;
 	else if (tic_unitx * xscaler < 0.9)
@@ -2579,7 +2594,8 @@ xtick_callback(
         /* User-specified different color for the tics text */
 	if (axis_array[axis].ticdef.textcolor.lt != TC_DEFAULT)
 	    apply_textcolor(&(axis_array[axis].ticdef.textcolor), t);
-	clip_put_text_just(x2, y2, text, just, JUST_TOP,
+	clip_put_text_just(x2+offsetx, y2+offsety, text,
+			   just, JUST_TOP,
 			   axis_array[axis].ticdef.font);
 	term_apply_lp_properties(&border_lp);
     }
@@ -2634,6 +2650,10 @@ ytick_callback(
     if (text) {
 	int just;
 	unsigned int x2, y2;
+	/* get offset */
+	unsigned int offsetx, offsety;
+	map3d_position_r(&(axis_array[axis].ticdef.offset),
+		       &offsetx, &offsety, "ytics");
 
 	if (tic_unitx * xscaler < -0.9)
 	    just = LEFT;
@@ -2651,7 +2671,8 @@ ytick_callback(
 	if (axis_array[axis].ticdef.textcolor.lt != TC_DEFAULT)
 	    apply_textcolor(&(axis_array[axis].ticdef.textcolor), t);
 	TERMCOORD(&v2, x2, y2);
-	clip_put_text_just(x2, y2, text, just, JUST_TOP,
+	clip_put_text_just(x2+offsetx, y2+offsety, text, 
+			   just, JUST_TOP,
 			   axis_array[axis].ticdef.font);
 	term_apply_lp_properties(&border_lp);
     }
@@ -2699,6 +2720,10 @@ ztick_callback(
 
     if (text) {
 	unsigned int x1, y1;
+	/* get offset */
+	unsigned int offsetx, offsety;
+	map3d_position_r(&(axis_array[axis].ticdef.offset),
+		       &offsetx, &offsety, "ztics");
 
 	TERMCOORD(&v1, x1, y1);
 	x1 -= (term->h_tic) * 2;
@@ -2707,7 +2732,8 @@ ztick_callback(
         /* User-specified different color for the tics text */
 	if (axis_array[axis].ticdef.textcolor.lt != TC_DEFAULT)
 	    apply_textcolor(&(axis_array[axis].ticdef.textcolor), term);
-	clip_put_text_just(x1, y1, text, RIGHT, JUST_CENTRE,
+	clip_put_text_just(x1+offsetx, y1+offsety, text,
+			   RIGHT, JUST_CENTRE,
 			   axis_array[axis].ticdef.font);
 	term_apply_lp_properties(&border_lp);
     }
@@ -2820,7 +2846,7 @@ map3d_position(
     return;
 }
 
-static void
+void
 map3d_position_r(
     struct position *pos,
     int *x, int *y,

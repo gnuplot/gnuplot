@@ -106,8 +106,7 @@ typedef struct text_label {
     char *font;			/* Entry font added by DJL */
     struct t_colorspec textcolor;
     struct lp_style_type lp_properties;
-    double hoffset;
-    double voffset;
+    struct position offset;
 } text_label;
 
 /* Datastructure for implementing 'set arrow' */
@@ -163,10 +162,10 @@ typedef enum key_type {
 typedef struct {
     char text[MAX_LINE_LEN+1];
     char font[MAX_LINE_LEN+1];
-    double xoffset, yoffset;
+    struct position offset;
     struct t_colorspec textcolor;
 } label_struct;
-#define EMPTY_LABELSTRUCT {"", "", 0.0, 0.0,{0,0,0.0}}
+#define EMPTY_LABELSTRUCT {"", "", {character, character, character, 0.0, 0.0, 0.0}, {0,0,0.0}}
 
 #ifdef PM3D
 typedef struct {
