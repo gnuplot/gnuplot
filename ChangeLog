@@ -1,3 +1,9 @@
+1999-10-20  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* 0INSTALL, 0README, NEWS: Updated for 3.7.1.
+
+	* configure.in: Fix for linking gnuplot_x11 on LynxOS 3.0.1.
+
 1999-10-20  John Hasstedt  <manager@nuclear.physics.sunysb.edu>
 
 	* buildvms.com, makefile.vms: Updated. Create binary data files in
