@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.in,v 1.122 2003/01/22 15:12:17 lhecking Exp $
+dnl $Id: configure.in,v 1.123 2003/01/27 17:06:10 lhecking Exp $
 dnl
 AC_INIT(src/graphics.c)
 AM_CONFIG_HEADER(config.h:config.hin)
@@ -50,7 +50,7 @@ if test "$no_x" != yes; then
   CPPFLAGS="$CPPFLAGS $X_CFLAGS"
   LIBRARIES_FOR_X="$X_LIBS -lX11 $X_EXTRA_LIBS"
   GNUPLOT_X11=gnuplot_x11
-  AC_DEFINE(X11, 1, [ Define if you are using the X11 window system. ])
+  AC_DEFINE(X11,1,[ Define if you are using the X11 window system. ])
 else
   GNUPLOT_X11=
 fi
@@ -94,7 +94,7 @@ if test "$ac_cv_header_math_h" = yes ; then
   AC_TRY_LINK([#include <math.h>],
     [struct exception *x; x->type; x->name;],
     [AC_MSG_RESULT(yes)
-     AC_DEFINE(HAVE_STRUCT_EXCEPTION_IN_MATH_H, 1,
+     AC_DEFINE(HAVE_STRUCT_EXCEPTION_IN_MATH_H,1,
                [ Define if math.h declares struct exception for matherr(). ])],
     AC_MSG_RESULT(no))
 fi
@@ -116,7 +116,7 @@ AC_TRY_COMPILE(
 #include <errno.h>
 #endif],
   errno=0,AC_MSG_RESULT(yes),
-  [AC_DEFINE(EXTERN_ERRNO, 1, [ Define if <errno.h> declares errno. ])
+  [AC_DEFINE(EXTERN_ERRNO,1,[ Define if <errno.h> declares errno. ])
    AC_MSG_RESULT(no)])
 
 
@@ -125,7 +125,7 @@ AC_TYPE_SIZE_T
 AC_MSG_CHECKING(for time_t in time.h)
 AC_EGREP_HEADER(time_t,time.h,
   [AC_MSG_RESULT(yes)
-   AC_DEFINE(HAVE_TIME_T_IN_TIME_H, 1,
+   AC_DEFINE(HAVE_TIME_T_IN_TIME_H,1,
              [ Define if time_t is declared in time.h. ])])
 AC_TYPE_SIGNAL
  
@@ -154,12 +154,12 @@ dnl in <setjmp.h>. (joze)
 AC_MSG_CHECKING(for sigsetjmp)
 AC_TRY_LINK([#include <setjmp.h>], [jmp_buf env; sigsetjmp(env, 1);],
   [AC_MSG_RESULT(yes)
-   AC_DEFINE(HAVE_SIGSETJMP, 1,
+   AC_DEFINE(HAVE_SIGSETJMP,1,
              [ Define if we have sigsetjmp(). ])],
   AC_MSG_RESULT(no))
 
 if test "$ac_cv_func_pclose" = yes && test "$ac_cv_func_popen" = yes ; then
-  AC_DEFINE(PIPES, 1, [ Define if you do have the popen and pclose functions. ])
+  AC_DEFINE(PIPES,1,[ Define if you do have the popen and pclose functions. ])
 fi
 
 dnl Argument types of select()
@@ -184,7 +184,7 @@ dnl check for installed linux vgalib
 if test "$with_linux_vga" = yes; then
   AC_MSG_CHECKING(for linux vga library)
   AC_CHECK_LIB(vga, vga_init,
-    [AC_DEFINE(LINUXVGA, 1,
+    [AC_DEFINE(LINUXVGA,1,
                [ Define if this is a Linux system with SuperVGA library. ])
      LINUXSUID='chown root $(bindir)/gnuplot; chmod u+s $(bindir)/gnuplot'
      TERMLIBS="-lvga $TERMLIBS"],
@@ -205,7 +205,7 @@ AC_ARG_WITH(ggi,dnl
      fi
      AC_CHECK_LIB(ggi,ggiInit,
        [TERMLIBS="-lggi $TERMLIBS"
-        AC_DEFINE(USE_GGI_DRIVER, 1,
+        AC_DEFINE(USE_GGI_DRIVER,1,
                   [ Define if you want to use the experimental ggi driver. ])
         GGI_SUPPORT=yes
         dnl check if libggiwmh and ggi/wmh.h are found
@@ -279,7 +279,7 @@ if test "$with_readline" != no; then
       AC_MSG_WARN([GNU readline not found - falling back to builtin readline])
       with_readline=yes
     else
-      AC_DEFINE(HAVE_LIBREADLINE, 1,
+      AC_DEFINE(HAVE_LIBREADLINE,1,
                 [ Define if you are using the GNU readline library. ])
       AC_CHECK_HEADERS(readline/readline.h,,
         AC_MSG_WARN([found GNU readline library but not readline.h
@@ -290,7 +290,7 @@ please add path to history.h to CPPFLAGS in Makefile]))
 
       if test "$enable_history_file" = yes; then
         AC_CHECK_HEADERS(readline/tilde.h,
-          AC_DEFINE(GNUPLOT_HISTORY, 1,
+          AC_DEFINE(GNUPLOT_HISTORY,1,
                     [ Define if you want to use a gnuplot history file with GNU readline. ]))
       fi
 
@@ -299,7 +299,7 @@ please add path to history.h to CPPFLAGS in Makefile]))
   fi # ! with_readline != yes
 
   if test "$with_readline" = yes; then
-    AC_DEFINE(READLINE, 1,
+    AC_DEFINE(READLINE,1,
               [ Define if you want to use the included readline function. ])
   fi
 
@@ -314,7 +314,7 @@ AC_ARG_WITH(plot,dnl
   [if test "$withval" = yes; then
      dnl Unix plot library
      AC_CHECK_LIB(plot,openpl,
-       [AC_DEFINE(UNIXPLOT, 1,
+       [AC_DEFINE(UNIXPLOT,1,
                   [ Define if you want to use the standard Unix plot library. ])
         TERMLIBS="-lplot $TERMLIBS"],
        with_plot=no)
@@ -329,7 +329,7 @@ AC_ARG_WITH(plot,dnl
      TERMXLIBS="$X_LIBS -lXaw -lXmu -lXt -lXext -lX11"
      AC_CHECK_LIB(plot,pl_textangle,
        [TERMLIBS="-lplot $TERMLIBS"
-        AC_DEFINE(GNUGRAPH, 1,
+        AC_DEFINE(GNUGRAPH,1,
                   [ Define if you want to use the GNU version of the Unix plot library. ])],
        [AC_MSG_WARN([GNU plotutils v2.2 or newer required -- disabling gnugraph terminal])
         TERMXLIBS=
@@ -343,7 +343,7 @@ dnl TODO: path to zlib includes; -lz -lm specified multiple times
 dnl       we don't do anything about missing png/gd includes either
 AC_CHECK_LIB(z,deflate,
   [TERMLIBS="$TERMLIBS -lz"
-   AC_DEFINE(HAVE_LIBZ, 1, [ Define if you have zlib. ])
+   AC_DEFINE(HAVE_LIBZ,1,[ Define if you have zlib. ])
    AC_CHECK_HEADER(zlib.h,,
      [AC_MSG_WARN([found z library but not zlib.h
 please add path to zlib.h to CPPFLAGS in Makefile])])],
@@ -371,7 +371,7 @@ if test "$with_png" != no; then
   LDFLAGS="$LDFLAGS $libpng_LDFLAGS"
 
   AC_CHECK_LIB(png,png_init_io,
-    AC_DEFINE(HAVE_LIBPNG, 1, [ Define if you have the png library. ]),,[-lz -lm])
+    AC_DEFINE(HAVE_LIBPNG,1,[ Define if you have the png library. ]),,[-lz -lm])
 
   AC_CHECK_HEADERS(png.h,,
     [AC_CHECK_HEADERS(libpng/png.h,
@@ -419,18 +419,18 @@ if test "$with_gd" != no; then
 
   AC_CHECK_LIB(gd,gdImageCreate,
     [dnl found gd library
-     AC_DEFINE(HAVE_LIBGD, 1, [ Define if you have gd library. ])
+     AC_DEFINE(HAVE_LIBGD,1,[ Define if you have gd library. ])
      AC_CHECK_HEADERS(gd.h)
 
      dnl gif support in libgd
      AC_CHECK_LIB(gd,gdImageGif,
-       [AC_DEFINE(HAVE_GD_GIF, 1, [ Define if libgd supports gif. ])])
+       [AC_DEFINE(HAVE_GD_GIF,1,[ Define if libgd supports gif. ])])
 
      _libs="$LIBS"
      LIBS="$LIBS -ljpeg"
      dnl jpeg support in libgd
      AC_CHECK_LIB(gd,gdImageJpeg,
-       [AC_DEFINE(HAVE_GD_JPEG, 1, [ Define if libgd supports jpeg. ])
+       [AC_DEFINE(HAVE_GD_JPEG,1,[ Define if libgd supports jpeg. ])
         libgd_LIBS="$libgd_LIBS -ljpeg"])
 
      LIBS="$_libs $libgd_LIBS -lfreetype"
@@ -443,7 +443,7 @@ if test "$with_gd" != no; then
           have_ttf=yes])])
 
      if test "$have_ttf" = yes; then
-       AC_DEFINE(HAVE_GD_TTF, 1,
+       AC_DEFINE(HAVE_GD_TTF,1,
                  [ Define if libgd supports TrueType fonts through libfreetype. ])
        libgd_LIBS="$libgd_LIBS -lfreetype"
      fi
@@ -451,7 +451,7 @@ if test "$with_gd" != no; then
      LIBS="$_libs $libgd_LIBS -lpng"
      dnl png support in libgd
      AC_CHECK_LIB(gd,gdImagePng,
-       [AC_DEFINE(HAVE_GD_PNG, 1, [ Define if libgd supports png. ])
+       [AC_DEFINE(HAVE_GD_PNG,1,[ Define if libgd supports png. ])
         libgd_LIBS="$libgd_LIBS -lpng"
         have_gd_png=yes])
      LIBS="$_libs"
@@ -482,35 +482,53 @@ if test "$with_png" != no -a "$have_gd_png" != yes; then
   TERMLIBS="$TERMLIBS -lpng"
 fi
 
+dnl gif terminal support emulated using Tom Boutell's new gd library
+AC_ARG_WITH(gif,dnl
+[  --with-gif=png          'set term gif' produces png images instead
+                          (libgd version >= 1.8) ],
+  [if test "$withval" = png -a "$have_gd_png" = yes; then
+     AC_DEFINE(PNG_FOR_GIF,1,
+               [ Define to have 'set term gif' produce PNG images instead ])
+   fi])
+
 dnl The Portable Document Format (PDF) terminal
-dnl TODO: use config script if found
 AC_ARG_WITH(pdf,dnl
 [  --with-pdf[=DIR]        enable pdf terminal 
-                          (requires PDFLib)],
-  [if test "$withval" != no; then
-     if test -d $withval/include; then
-       CPPFLAGS="$CPPFLAGS -I$withval/include"
-     fi
-     if test -d $withval/lib; then
-       LDFLAGS="$LDFLAGS -L$withval/lib"
-     fi
-     with_pdf=yes
-   fi],
-  with_pdf=no)
+                          (requires PDFLib)],,
+  with_pdf=yes)
 
-if test "$with_pdf" = yes; then
+if test "$with_pdf" != no; then
+  AC_PATH_PROG([PDFLIB_CONFIG], [pdflib-config])
+  if test -n "$PDFLIB_CONFIG"; then
+    libpdf_CPPFLAGS=`pdflib-config --cflags`
+    # D'oh - libraries don't belong here
+    libpdf_LDFLAGS=`pdflib-config --ldflags |sed 's/ -l[[^ ]][[^ ]]*//g'`
+  elif test -d "$with_pdf"; then
+    libpdf_CPPFLAGS="-I$with_pdf/include"
+    libpdf_LDFLAGS="-L$with_pdf/lib"
+  fi
+
+  _cppflags="$CPPFLAGS"
+  _ldflags="$LDFLAGS"
+  _libs="$LIBS"
+  CPPFLAGS="$CPPFLAGS $libpdf_CPPFLAGS"
+  LDFLAGS="$LDFLAGS $libpdf_LDFLAGS"
+
   AC_CHECK_LIB(pdf,PDF_get_majorversion,
-    [TERMLIBS="-lpdf $TERMLIBS"
-     AC_DEFINE(HAVE_LIBPDF,1,[ Define if you have the pdf library. ])
-     AC_CHECK_HEADERS(pdflib.h,,
-       AC_MSG_WARN([found pdf library but not pdflib.h
-please add path to pdflib.h to CPPFLAGS in Makefile]))
-     AC_CHECK_HEADERS(zlib.h,,
-     dnl wrong; needs to be fixed
-       AC_MSG_WARN([found z library but not zlib.h
-please add path to zlib.h to CPPFLAGS in Makefile]))],
-    AC_MSG_RESULT([  PDF library not found.
-  See term/pdf.trm for download details]))
+    AC_DEFINE(HAVE_LIBPDF,1,[ Define if you have the pdf library. ]),
+     with_pdf=no)
+
+  AC_CHECK_HEADERS(pdflib.h,,
+    AC_MSG_WARN([please add path to pdflib.h to CPPFLAGS in Makefile]))
+
+  LIBS="$_libs"
+  if test "$with_pdf" = no; then
+    CPPFLAGS="$_cppflags"
+    LDFLAGS="$_ldflags"
+  else
+    TERMLIBS="$TERMLIBS -lpdf"
+  fi
+
 fi
 dnl end pdf
 
@@ -527,9 +545,8 @@ AC_EGREP_CPP(yes,
 yes
 #endif
 ],AC_CHECK_LIB(ccgi, v_opnwk,
-    AC_DEFINE(CGI, 1,
-              [ Define if you want to use the CGI terminal under SCO. ])
-              TERMLIBS="-lccgi $TERMLIBS"))
+    [AC_DEFINE(CGI,1,[ Define if you want to use the CGI terminal under SCO. ])
+     TERMLIBS="-lccgi $TERMLIBS"]))
 
 dnl Sun sunview
 AC_EGREP_CPP(yes,
@@ -538,7 +555,7 @@ yes
 #endif
 ],[AC_CHECK_LIB(suntool, window_create,
      [AC_CHECK_HEADER(suntool/sunview.h,
-        [AC_DEFINE(SUN, 1,
+        [AC_DEFINE(SUN,1,
                    [ Define if you want to use the sunview terminal (sun). ])
          TERMLIBS="-lsuntool -lsunwindow -lpixrect $TERMLIBS"])],,
     [-lsunwindow -lpixrect])])
@@ -550,32 +567,21 @@ AC_ARG_WITH(cwdrc,dnl
 [  --with-cwdrc            check current directory for .gnuplot file,
                           normally disabled for security reasons],,
   [if test "$withval" = yes; then
-     AC_DEFINE(NOCWDRC, 1,
+     AC_DEFINE(NOCWDRC,1,
                [ Define if you do not want to read .gnuplot in the current directory. ])
    fi])
 
 dnl Wether we want to build the lisp files
-config_lisp=lisp
+dnl Does nothing here, is passed on to the lisp subdir
 AC_ARG_WITH(lisp-files,dnl
-[  --without-lisp-files    do not build emacs lisp files],
-  [if test "$withval" = no; then
-     config_lisp=
-   fi])
-dnl only if X/Emacs was found
-if test "$EMACS" = no; then
-  config_lisp=
-  with_lisp_files=no
-fi
-
-test "x$config_lisp" != x && AC_CONFIG_SUBDIRS(lisp)
-AM_CONDITIONAL(BUILD_LISP_SUBDIR, test x$config_lisp = xlisp)
+[  --without-lisp-files    do not build emacs lisp files])
 
 dnl Sort help/subtopic tables by row or column
 AC_ARG_WITH(row-help,dnl
 [  --with-row-help         format help and subtopic tables by row (default)
   --without-row-help      format help and subtopic tables by column],
   [if test "$with_row_help" = no; then
-     AC_DEFINE(COLUMN_HELP, 1,
+     AC_DEFINE(COLUMN_HELP,1,
                [ Define if you want online help and subtopic tables sorted by column. ])
    fi])
 
@@ -595,9 +601,9 @@ AC_ARG_ENABLE(mouse,dnl
   test -z "$enable_mouse" && enable_mouse=yes)
 
 if test "$enable_mouse" = yes; then
-  AC_DEFINE(USE_MOUSE, 1,
+  AC_DEFINE(USE_MOUSE,1,
             [ Define if you want to have mouse support for the x11 terminal. ])
-  AC_DEFINE(PIPE_IPC, 1,
+  AC_DEFINE(PIPE_IPC,1,
             [ Unix-type of Interprocess Communication is required for mouse support. ])
 fi
 
@@ -607,21 +613,20 @@ AC_ARG_ENABLE(pm3d,dnl
   test -z "$enable_pm3d" && enable_pm3d=yes)
 
 if test "$enable_pm3d" = yes; then
-  AC_DEFINE(PM3D, 1,
-            [ Define if you want to have Petr Mikulik's fancy pm3d. ])
+  AC_DEFINE(PM3D,1,[ Define if you want to have Petr Mikulik's fancy pm3d. ])
 fi
 
 dnl check for installed linux vgagl lib if
 dnl both pm3d and linux_vga are defined.
 if test "$with_linux_vga" = yes -a "$enable_pm3d" = yes; then
-  gp_save_LIBS="$LIBS"
+  _LIBS="$LIBS"
   dnl make sure LIBS contains -lvga
   LIBS="$TERMLIBS $LIBS"
   AC_MSG_CHECKING(for the vgagl library)
   AC_CHECK_LIB(vgagl, gl_hline,
     [LIBS="-lvgagl $LIBS"
      AC_CHECK_HEADERS(vgagl.h,
-      [AC_DEFINE(VGAGL, 1, [ Define if the vgagl libray is present. ])
+      [AC_DEFINE(VGAGL,1,[ Define if the vgagl libray is present. ])
        dnl yup, we've the libvgagl.
        dnl check now, if lib3dkit is found.
        AC_CHECK_LIB(3dkit, gl_striangle,
@@ -656,7 +661,7 @@ if test "$with_linux_vga" = yes -a "$enable_pm3d" = yes; then
     ]dnl <-- libvgagl was not found
   )
   dnl restore LIBS
-  LIBS="$gp_save_LIBS"
+  LIBS="$_LIBS"
 else
   with_vgagl=no
 fi
@@ -669,7 +674,7 @@ AC_ARG_ENABLE(filledboxes,dnl
   test -z "$enable_filledboxes" && enable_filledboxes=yes)
 
 if test "$enable_filledboxes" = yes; then
-  AC_DEFINE(USE_ULIG_FILLEDBOXES, 1,
+  AC_DEFINE(USE_ULIG_FILLEDBOXES,1,
             [ Define if you want to have Uli Gruenebaum's filledboxes style. ])
 fi
 
@@ -679,7 +684,7 @@ AC_ARG_ENABLE(relative-boxwidth,dnl
   test -z "$enable_relative_boxwidth" && enable_relative_boxwidth=yes)
 
 if test "$enable_relative_boxwidth" = yes; then
-  AC_DEFINE(USE_ULIG_RELATIVE_BOXWIDTH, 1,
+  AC_DEFINE(USE_ULIG_RELATIVE_BOXWIDTH,1,
             [ Define if you want to have Uli Gruenebaum's relative boxwidth. ])
 fi
 
@@ -687,7 +692,7 @@ dnl thin plate splines patch
 AC_ARG_ENABLE(thin-splines,dnl
 [  --enable-thin-splines   enable thin plate splines],
   [if test "$enableval" = yes; then
-     AC_DEFINE(THIN_PLATE_SPLINES_GRID, 1,
+     AC_DEFINE(THIN_PLATE_SPLINES_GRID,1,
                [ Define to use thin plate spines. ])
    fi])
 
@@ -696,7 +701,7 @@ AC_ARG_ENABLE(iris,dnl
 [  --enable-iris           enable IRIS terminal (IRIS4D only)],
   [if test "$enableval" = yes; then
      AC_CHECK_LIB(gl_s,winopen,
-       [AC_DEFINE(IRIS, 1,
+       [AC_DEFINE(IRIS,1,
                   [ Define if you want to use the IRIS terminal on IRIS4D series computers. ])
         TERMLIBS="-lgl_s $TERMLIBS"],
        enable_iris=no)
@@ -707,7 +712,7 @@ AC_ARG_ENABLE(mgr,dnl
 [  --enable-mgr            enable MGR terminal],
   [if test "$enableval" = yes; then
      AC_CHECK_LIB(mgr,m_getinfo,
-       [AC_DEFINE(MGR, 1, [ Define if you want to use the MGR Window system. ])
+       [AC_DEFINE(MGR,1,[ Define if you want to use the MGR Window system. ])
         TERMLIBS="-lmgr -lpixrect $TERMLIBS"],
        enable_mgr=no,
        [-lpixrect])
@@ -717,9 +722,19 @@ dnl Redwood Graphics Interface Protocol
 AC_ARG_ENABLE(rgip,dnl
 [  --enable-rgip           enable Redwood Graphics Interface Protocol],
   [if test "$enableval" = yes; then
-     AC_DEFINE(RGIP, 1,
+     AC_DEFINE(RGIP,1,
                [ Define if you want to use the Redwood Graphics Interface Protocol. ])
    fi])
+
+dnl
+if test ! -f src/graphics.c ; then
+  AC_MSG_RESULT([Compiling outside source directory - copying needed files])
+  mkdir tutorial >/dev/null 2>&1
+  cp ${srcdir}/tutorial/eg3.dat tutorial
+fi
+
+dnl build lisp files
+AC_CONFIG_SUBDIRS(lisp)
 
 dnl Substitute variables
 AC_SUBST(PACKAGE)
