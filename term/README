@@ -58,13 +58,12 @@ struct TERMENTRY {
 	void (*arrow) __PROTO((unsigned int, unsigned int, unsigned int,
 			   unsigned int, int));
    int (*set_font) __PROTO((const char *font));  /* "font,size" */
-	void (*set_pointsize) __PROTO((double size)); /* notification of set pointsize */
+   void (*pointsize) __PROTO((double pointsize));
 	int flags; /* various flags */
    void (*suspend) __PROTO((void)); /* after one plot of multiplot */
    void (*resume) __PROTO((void));  /* before subsequent plot of multiplot */
    void (*boxfill) __PROTO((int style, unsigned int x1, unsigned int y1, unsigned int width, unsigned int height)); /* clear part of multiplot */
    void (*linewidth) __PROTO((double linewidth));
-   void (*pointsize) __PROTO((double pointsize));
 #ifdef USE_MOUSE
    int (*waitforinput) __PROTO((void));
    void (*put_tmptext) __PROTO((int i, const char str[]));
@@ -172,7 +171,7 @@ _init()  Called once, when the device is first selected.  This procedure
 should set up things that only need to be set once, like handshaking and
 character sets etc...
 There is a global variable 'pointsize' which you might want to use here.
-If set pointsize is issued after init has been called, the set_pointsize()
+If set pointsize is issued after init has been called, the pointsize()
 function is called.
 
 _reset()  Called when gnuplot is exited, the output device changed or
@@ -258,7 +257,7 @@ line type 0 before drawing the point.  line type 0 should be solid.
 There is a global variable 'pointsize' which is controlled by the
 set pointsize command. If possible, use that. pointsize should be
 examined at terminal init. If it is subsequently changed, the
-set_pointsize() fn will be called.
+pointsize() fn will be called.
 
 
 _arrow(sx,sy,ex,ey,head)  Called to draw an arrrow from (sx,sy) to (ex,ey).
