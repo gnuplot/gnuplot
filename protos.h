@@ -195,7 +195,7 @@ struct at_type * perm_at __PROTO((void));
 /* Prototypes from file "plot.c" */
 
 void interrupt_setup __PROTO((void));
-
+void gp_expand_tilde __PROTO((char *, size_t));
 
 /* prototypes from plot2d.c */
 
