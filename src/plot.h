@@ -1,5 +1,5 @@
 /*
- * $Id: plot.h,v 1.12 1999/06/22 12:01:56 lhecking Exp $
+ * $Id: plot.h,v 1.13 1999/07/13 19:53:39 lhecking Exp $
  *
  */
 
@@ -735,6 +735,14 @@ extern const char *user_shell;
 #if defined(ATARI) || defined(MTOS)
 extern const char *user_gnuplotpath;
 #endif
+/* version.c */
+extern const char gnuplot_version[];
+extern const char gnuplot_patchlevel[];
+extern const char gnuplot_date[];
+extern const char gnuplot_copyright[];
+extern const char faq_location[];
+extern const char bug_email[];
+extern const char help_email[];
 
 /* Windows needs to redefine stdin/stdout functions */
 #ifdef _Windows
