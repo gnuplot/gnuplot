@@ -1,5 +1,5 @@
 #
-# $Id: makefile.os9,v 1.4 1998/04/14 00:15:55 drd Exp $
+# $Id: makefile.os9,v 1.1 1999/03/26 21:32:41 lhecking Exp $
 #
 # GNUPLOT Makefile for OS-9 and Ultra C, with X11 support
 #
@@ -38,10 +38,10 @@ SDIR = /dd/PRJ/GNUPLOT
 
 # macros for makefile.all
 O = r
-T = TERM/
-D = DOCS/
-L = DOCS/LATEXTUT
-M = DEMO/
+T = ../TERM/
+D = ../DOCS/
+L = ../DOCS/LATEXTUT
+M = ../DEMO/
 
 DEBUG = -g
 #DEBUG =
