@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: tables.c,v 1.29 2002/02/13 17:59:36 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: tables.c,v 1.30 2002/02/14 21:14:36 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - tables.c */
@@ -467,11 +467,10 @@ lookup_table_nth_reverse(tbl, table_len, search_str)
     int table_len;
     const char *search_str;
 {
-    int i = table_len;
-    while (i >= 0) {
-	if (tbl[i].key && !strncmp(search_str, tbl[i].key, strlen(tbl[i].key)))
-	    return i;
-	i--;
+    while (--table_len >= 0) {
+	if (tbl[table_len].key && !strncmp(search_str, tbl[table_len].key, strlen(tbl[table_len].key)))
+	    return table_len;
     }
     return -1; /* not found */
 }
+
