@@ -1,4 +1,25 @@
-Fri Feb  1 19:05:57 2002  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+2002-01-25  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	Tag and release gnuplot 3.7.2.
+
+2002-01-25  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* Makefile.in: Add DESTDIR support to install/uninstall targets.
+	Don't install gnuplot man page.
+
+	* docs/Makefile.in: Fix typo in terminal driver list (Thimo Neubauer).
+	Split install target into install-gih install-info install-man, and add
+	the corresponding uninstall targets. Install man page and info page
+	from this Makefile.
+
+	* docs/doc2info.c(convert): Create INFO-DIR-SECTION statement. Patch
+	by Thimo Neubauer.
+
+	* docs/latextut/Makefile.in: Use the compiled version of gnuplot to
+	generate the .plt files, not the installed version. Patch by Thome
+	Neubauer.
+
+2002-02-01  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	Changes to avoid function pointer casts and work around HP-UX
 	gcc problem with passing around pointers to static functions.
