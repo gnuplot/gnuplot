@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot.c,v 1.45 2001/08/22 14:15:34 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot.c,v 1.46 2001/12/01 13:08:59 amai Exp $"); }
 #endif
 
 /* GNUPLOT - plot.c */
@@ -680,6 +680,7 @@ load_rcfile()
 #ifdef NOCWDRC
     /* inhibit check of init file in current directory for security reasons */
 #else
+    rcfile = PLOTRC;
     plotrc = fopen(PLOTRC, "r");
 #endif /* !NOCWDRC */
 

@@ -1,3 +1,8 @@
+2002-01-07  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* plot.c: Fix load_rcfile() to properly	report the startup filename
+	(needed if it contains a typo).
+
 2002-01-06  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/gadgets.c src/gadgets.h src/graphics.c src/graphics.h
