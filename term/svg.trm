@@ -1,5 +1,5 @@
 /*
- * $Id: svg.trm,v 1.25 2003/05/19 21:01:59 sfeam Exp $
+ * $Id: svg.trm,v 1.26 2003/11/13 08:18:18 mikulik Exp $
  *
  */
 
@@ -27,6 +27,11 @@
 /* set_color fixes by Petr Mikulik <mikulik@physics.muni.cz>, June-10-2002 */
 /* ISO-Latin encoding, Font selection fixes, option "fixed|dynamic" by
  * Wilhelm Braunschober <Wilhelm.Braunschober@t-online.de>, Feb-21-2002 */
+
+/* Conditional code for compatibility with Sodipodi svg viewer/editor
+ *   NB: Our point styles still don't work in Sodipodi
+ *   Ethan Merritt  <merritt@u.washington.edu> December 2003 */
+#define SODIPODI
 
 #include "driver.h"
 
@@ -157,7 +162,12 @@ SVG_GroupOpen ()
     SVG_GroupFilledClose();
     if (!SVG_groupIsOpen)     {
 	fprintf (gpoutfile,
+#ifdef SODIPODI
+		 "<g style=\"fill:none; color:%s; stroke:%s; stroke-width:%.2f\">\n",
+		 SVG_pens[SVG_Pen_RealID (SVG_LineType)].color,
+#else
 		 "<g style=\"fill:none; color:%s; stroke:currentColor; stroke-width:%.2f\">\n",
+#endif
 		 SVG_pens[SVG_Pen_RealID (SVG_LineType)].color,
 		 SVG_pens[SVG_Pen_RealID (SVG_LineType)].width);
 
@@ -276,7 +286,12 @@ SVG_StyleColor(const char* paint)
 	fprintf(gpoutfile, "%s = 'rgb(%3d, %3d, %3d)'", paint, SVG_red, SVG_green, SVG_blue);
     else
 #endif
+
+#ifdef SODIPODI
+	fprintf (gpoutfile, "%s='%s'", paint, SVG_pens[SVG_Pen_RealID (SVG_LineType)].color);
+#else
 	fprintf(gpoutfile, "%s = 'currentColor'", paint);
+#endif
 }
 
 static void
@@ -330,7 +345,12 @@ SVG_DefineFillPattern(int fillpat)
 		    break;
 	}
 	if (*path)
+#ifdef SODIPODI
+	    fprintf(gpoutfile, "\t\t\t<path style = '%s:%s' d='%s'/>\n",
+			style, SVG_pens[SVG_Pen_RealID (SVG_LineType)].color, path);
+#else
 	    fprintf(gpoutfile, "\t\t\t<path style = '%s:currentColor' d='%s'/>\n", style, path);
+#endif
 	fputs("\t\t</pattern>\n" "\t</defs>\n", gpoutfile);
     }
 }
@@ -688,6 +708,10 @@ SVG_linewidth (double linewidth)
 
 	for (k = 0; k < 16; k++)
 	    SVG_pens[k].width = SVG_LineWidth;
+    
+	SVG_PathClose ();
+	SVG_GroupClose ();
+	SVG_GroupOpen ();
     }
 }
 

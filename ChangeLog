@@ -1,3 +1,13 @@
+2003-12-02  Ethan Merritt  <merritt@u.washington.edu>
+
+	* term/svg.trm: Add conditional code to make svg output compatible with
+	the Sodipodi svg viewer/editor. Sodipodi does not yet implement the full
+	svg syntax, including the "currentColor" attribute. This change was
+	checked for correctness using the Adobe svg viewer, which produces the
+	same display given either the original or the simplified output.
+
+	* term/svg.trm: Force a new graphics context whenever linewidth changes.
+
 2003-12-01  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/tables.h (enum set_id): Renamed parser constant S_OUTPUT to
