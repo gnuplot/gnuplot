@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.86 2002/07/23 18:53:12 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.87 2002/07/26 16:42:28 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -2803,7 +2803,7 @@ set_style()
     case SHOW_STYLE_DATA:
 	data_style = get_style();
 #ifdef PM3D
-	if (data_style & FILLEDCURVES) {
+	if (data_style == FILLEDCURVES) {
 	    get_filledcurves_style_options(&filledcurves_opts_data);
 	    if (!filledcurves_opts_data.opt_given) /* default value */
 		filledcurves_opts_data.closeto = FILLEDCURVES_CLOSED;
@@ -2819,7 +2819,7 @@ set_style()
 	    else 
 		func_style = temp_style;
 #ifdef PM3D
-	    if (func_style & FILLEDCURVES) {
+	    if (func_style == FILLEDCURVES) {
 		get_filledcurves_style_options(&filledcurves_opts_func);
 		if (!filledcurves_opts_func.opt_given) /* default value */
 		    filledcurves_opts_func.closeto = FILLEDCURVES_CLOSED;
@@ -3440,7 +3440,7 @@ label_struct *label;
 
     /* optional keyword 'font' can go here */
 
-    if (almost_equals(c_token, "f$ont"))
+    if (almost_equals(c_token, "f$ont"))  
 	++c_token;		/* skip it */
     if (isstring(c_token)) {  
 	quote_str(label->font, c_token, MAX_LINE_LEN);

@@ -1,17 +1,26 @@
+2002-08-01  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/plot2d.c (eval_plots): Fix buggy test if current plot style
+ 	is FILLEDCURVES.
+
+	* src/set.c (set_style): Dito.
+
 2002-07-26  Ethan Merritt  <merritt@u.washington.edu>
 
-	* NEWS docs/gnuplot.doc demo/all.dem demo/textrotate.dem src/bitmap.c
-	src/color.c src/gadgets.h src/gplt_x11.c src/graph3d.c src/graphics.c
-	src/save.c src/set.c src/show.c src/term.c term/README term/cgm.trm
-	term/dxf.trm term/dxy.trm term/eepic.trm term/emf.trm term/emxvga.trm
-	term/fg.trm term/fig.trm term/gd.trm term/gif.trm term/gnugraph.trm
-	term/gpr.trm term/hp26.trm term/hp2648.trm term/hpgl.trm term/latex.trm
-	term/linux.trm term/metapost.trm term/mif.trm term/multitos.trm
-	term/pc.trm term/pdf.trm term/pm.trm term/post.trm term/pslatex.trm
-	term/pstricks.trm term/regis.trm term/svg.trm term/tgif.trm
-	term/tpic.trm term/unixpc.trm term/vgagl.trm term/vws.trm term/win.trm
-	term/x11.trm: Support for arbitrary text rotations. New option 
-	'set label ... [no]rotate [by] ...'.
+	* NEWS docs/gnuplot.doc demo/all.dem demo/textrotate.dem
+ 	src/bitmap.c src/color.c src/gadgets.h src/gplt_x11.c
+ 	src/graph3d.c src/graphics.c src/save.c src/set.c src/show.c
+ 	src/term.c term/README term/cgm.trm term/dxf.trm term/dxy.trm
+ 	term/eepic.trm term/emf.trm term/emxvga.trm term/fg.trm
+ 	term/fig.trm term/gd.trm term/gif.trm term/gnugraph.trm
+ 	term/gpr.trm term/hp26.trm term/hp2648.trm term/hpgl.trm
+ 	term/latex.trm term/linux.trm term/metapost.trm term/mif.trm
+ 	term/multitos.trm term/pc.trm term/pdf.trm term/pm.trm
+ 	term/post.trm term/pslatex.trm term/pstricks.trm term/regis.trm
+ 	term/svg.trm term/tgif.trm term/tpic.trm term/unixpc.trm
+ 	term/vgagl.trm term/vws.trm term/win.trm term/x11.trm: Support for
+ 	arbitrary text rotations. New option 'set label ... [no]rotate
+ 	[by] ...'.
 
 2002-07-26  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
@@ -841,7 +850,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/07/26 14:09:23 $).
+	last modification date (from the tag $Date: 2002/07/26 16:42:27 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 

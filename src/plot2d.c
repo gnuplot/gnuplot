@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.50 2002/04/05 17:15:51 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.51 2002/04/08 15:03:43 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -1106,7 +1106,7 @@ eval_plots()
 			int_error(c_token, "\"with\" allowed only after parametric function fully specified");
 		    this_plot->plot_style = get_style();
 #ifdef PM3D
-		    if (data_style & FILLEDCURVES)
+		    if (this_plot->plot_style == FILLEDCURVES)
 			/* read a possible option for 'with filledcurves' */
 			get_filledcurves_style_options(&this_plot->filledcurves_options);
 #endif
