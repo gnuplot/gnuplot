@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.18 2001/02/09 15:06:11 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.19 2001/02/15 18:13:23 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -300,22 +300,36 @@ MousePosToGraphPosReal(int xx, int yy, double *x, double *y, double *x2, double 
 	 * in the bottom plane, i.e., the plane of the x and y axis */
 	/* note: at present, this projection is only correct if
 	 * surface_rot_z is a multiple of 90 degrees! */
+	/* HBB 20010522: added protection against division by zero
+	 * for cases like 'set view 90,0' */
 	xx -= axis3d_o_x;
 	yy -= axis3d_o_y;
 	if (abs(axis3d_x_dx) > abs(axis3d_x_dy)) {
-	    *x = axis_array[FIRST_X_AXIS].min + ((double) xx) / axis3d_x_dx * (axis_array[FIRST_X_AXIS].max -
-									       axis_array[FIRST_X_AXIS].min);
+	    *x = axis_array[FIRST_X_AXIS].min
+		+ ((double) xx) / axis3d_x_dx * (axis_array[FIRST_X_AXIS].max -
+						 axis_array[FIRST_X_AXIS].min);
+	} else if (axis3d_x_dy != 0) {
+	    *x = axis_array[FIRST_X_AXIS].min
+		+ ((double) yy) / axis3d_x_dy * (axis_array[FIRST_X_AXIS].max -
+						 axis_array[FIRST_X_AXIS].min);
 	} else {
-	    *x = axis_array[FIRST_X_AXIS].min + ((double) yy) / axis3d_x_dy * (axis_array[FIRST_X_AXIS].max -
-									       axis_array[FIRST_X_AXIS].min);
+	    /* both diffs are zero (x axis points into the screen */
+	    *x = 1e38;
 	}
+
 	if (abs(axis3d_y_dx) > abs(axis3d_y_dy)) {
-	    *y = axis_array[FIRST_Y_AXIS].min + ((double) xx) / axis3d_y_dx * (axis_array[FIRST_Y_AXIS].max -
-									       axis_array[FIRST_Y_AXIS].min);
+	    *y = axis_array[FIRST_Y_AXIS].min
+		+ ((double) xx) / axis3d_y_dx * (axis_array[FIRST_Y_AXIS].max -
+						 axis_array[FIRST_Y_AXIS].min);
+	} else if (axis3d_y_dy != 0) {
+	    *y = axis_array[FIRST_Y_AXIS].min
+		+ ((double) yy) / axis3d_y_dy * (axis_array[FIRST_Y_AXIS].max -
+						 axis_array[FIRST_Y_AXIS].min);
 	} else {
-	    *y = axis_array[FIRST_Y_AXIS].min + ((double) yy) / axis3d_y_dy * (axis_array[FIRST_Y_AXIS].max -
-									       axis_array[FIRST_Y_AXIS].min);
+	    /* both diffs are zero (y axis points into the screen */
+	    *y = 1e38;
 	}
+
 	*x2 = *y2 = 1e38;	/* protection */
     }
     /*
