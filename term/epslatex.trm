@@ -1,5 +1,5 @@
 /*
- * $Id: epslatex.trm,v 1.11 2001/12/18 14:22:35 broeker Exp $
+ * $Id: epslatex.trm,v 1.12 2002/02/25 03:10:41 broeker Exp $
  */
 
 /* GNUPLOT - epslatex.trm */
@@ -956,7 +956,7 @@ START_HELP(post)
 "?terminal epslatex",
 "?term epslatex",
 "?epslatex",
-" Two options may be set in the `epslatex` driver.",
+" The `epslatex` driver generates output for further processing by LaTeX."
 "",
 " Syntax:",
 "       set terminal epslatex {default}",
@@ -965,7 +965,7 @@ START_HELP(post)
 "",
 " `default` mode sets all options to their defaults: `monochrome`, `dashed`,",
 " \"default\" and 11pt.",
-"  Default size of a plot is 5 inches wide and 3 inches high.",
+" Default size of a plot is 5 inches wide and 3 inches high.",
 "",
 " `solid` draws all plots with solid lines, overriding any dashed patterns;",
 " `\"<fontname>\"` is the name of font; and `<fontsize>` is",
@@ -975,15 +975,15 @@ START_HELP(post)
 " for changing fonts. If you use e.g. 12pt as font size for your LaTeX documents, ",
 " use '\"default\" 12' as options.",
 "",
-" All drivers for LaTeX offer a special way of controlling text positioning:",
-" If any text string begins with '{', you also need to include a '}' at the",
+" All drivers for LaTeX offer a special way of controlling text positioning: ",
+" (a) If any text string begins with '{', you also need to include a '}' at the",
 " end of the text, and the whole text will be centered both horizontally",
-" and vertically by LaTeX. --- If the text string begins with '[', you need",
+" and vertically by LaTeX.  (b) If the text string begins with '[', you need",
 " to continue it with: a position specification (up to two out of t,b,l,r),",
 " ']{', the text itself, and finally, '}'. The text itself may be anything",
 " LaTeX can typeset as an LR-box. \\rule{}{}'s may help for best positioning.",
-" See also the documenation of the pslatex terminal driver.",
-" To create multiline labels, use \\shortstack, example",
+" See also the documenation for the `pslatex` terminal driver.",
+" To create multiline labels, use \\shortstack, for example",
 "    set ylabel '[r]{\\shortstack{first line \\\\ second line}}' ",
 "",
 " The driver produces two different files, one for the LaTeX part and one for",
@@ -992,13 +992,14 @@ START_HELP(post)
 " the eps file given on the `set output` command; it is determined by replacing",
 " the trailing `.eps` (actually just the final extent in the file name---and",
 " the option will be turned off if there is no extent) with `.tex` in the output",
-" file name.  Remember to close the file before leaving `gnuplot`.",
+" file name.  Remember to close the `output file` before leaving `gnuplot`.",
 " There is no LaTeX output if no output file is given!",
 " In your LaTeX documents use '\\input{filename}' for inclusion of the figure.",
-" Include \\usepackage{graphics} in the preambel!",
+" Thus `.eps` file is included by the command \\includegraphics{...}, thus",
+" Include \\usepackage{graphicx} in the preambel!",
 " Via 'epstopdf' (contained e.g. in the teTeX package, requires ghostscript)",
 " pdf files can made out of the eps files. If the graphics package is properly",
 " configured, the LaTeX files can also be processed by pdflatex without",
-" changes, and the pdf files are included instead of the eps files"
+" changes, and the pdf files are included instead of the eps files."
 END_HELP(post)
 #endif

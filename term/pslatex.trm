@@ -1,5 +1,5 @@
 /*
- * $Id: pslatex.trm,v 1.32 2001/05/31 11:11:18 broeker Exp $
+ * $Id: pslatex.trm,v 1.33 2002/02/25 03:10:42 broeker Exp $
  */
 
 /* GNUPLOT - pslatex.trm */
@@ -736,8 +736,8 @@ START_HELP(pslatex)
 " in any plain-based format (including LaTeX).",
 "",
 " Syntax:",
-"       set terminal pslatex | pstex {<color>} {<dashed>} {<rotate>}",
-"                                     {auxfile} {<font_size>}",
+"       set terminal [pslatex | pstex] {<color>} {<dashed>} {<rotate>}",
+"                                      {auxfile} {<font_size>}",
 "",
 " <color> is either `color` or `monochrome`.  <dashed> is either `dashed`",
 " or `solid`.  <rotate> is either `rotate` or `norotate` and determines",
@@ -751,12 +751,15 @@ START_HELP(pslatex)
 " the TeX file given on the `set output` command; it is determined by replacing",
 " the trailing `.tex` (actually just the final extent in the file name) with",
 " `.ps` in the output file name, or, if the TeX file has no extension, `.ps`",
-" is appended.  Remember to close the file before leaving `gnuplot`.",
+" is appended.  Remember to close the `output file` before leaving `gnuplot`.",
+" The `.ps` is included into the `.tex` file by a \\special{psfile=...} command.",
+" If you would rather prefer \\includegraphics{...}, then use the `epslatex`",
+" terminal.",
 "",
-" All drivers for LaTeX offer a special way of controlling text positioning:",
-" If any text string begins with '{', you also need to include a '}' at the",
+" All drivers for LaTeX offer a special way of controlling text positioning: ",
+" (a) If any text string begins with '{', you also need to include a '}' at the",
 " end of the text, and the whole text will be centered both horizontally",
-" and vertically by LaTeX. --- If the text string begins with '[', you need",
+" and vertically by LaTeX.  (b) If the text string begins with '[', you need",
 " to continue it with: a position specification (up to two out of t,b,l,r),",
 " ']{', the text itself, and finally, '}'. The text itself may be anything",
 " LaTeX can typeset as an LR-box. \\rule{}{}'s may help for best positioning.",
@@ -765,7 +768,7 @@ START_HELP(pslatex)
 "       set term pslatex monochrome dashed rotate       # set to defaults",
 " To write the PostScript commands into the file \"foo.ps\":",
 "       set term pslatex auxfile",
-"       set output \"foo.tex\"; plot ...: set output",
+"       set output \"foo.tex\"; plot ...; set output",
 " About label positioning:",
 " Use gnuplot defaults (mostly sensible, but sometimes not really best):",
 "        set title '\\LaTeX\\ -- $ \\gamma $'",
@@ -776,6 +779,6 @@ START_HELP(pslatex)
 " The other label -- account for long ticlabels:",
 "        set ylabel '[r]{\\LaTeX\\ -- $ \\gamma $\\rule{7mm}{0pt}'",
 "",
-" Linewidths and pointsizes may be changed with `set linestyle`."
+" Linewidths and pointsizes may be changed with `set style line`."
 END_HELP(pslatex)
 #endif /* TERM_HELP */
