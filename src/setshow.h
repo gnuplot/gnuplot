@@ -41,6 +41,8 @@
 #include <sys/utsname.h>
 #endif
 
+#include "variable.h"
+
 #ifndef DEFAULT_TIMESTAMP_FORMAT
 #define DEFAULT_TIMESTAMP_FORMAT "%a %b %d %H:%M:%S %Y" /* asctime() format */
 #endif

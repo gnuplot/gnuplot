@@ -172,7 +172,7 @@ datafile.$(O) eval.$(O) fit.$(O) graph3d.$(O) graphics.$(O) help.$(O) \
 hidden3d.$(O) internal.$(O) interpol.$(O) matrix.$(O) misc.$(O) parse.$(O) \
 plot.$(O) plot2d.$(O) plot3d.$(O) readline.$(O) scanner.$(O) set.$(O) \
 show.$(O) specfun.$(O) standard.$(O) stdfn.$(O) term.$(O) time.$(O) \
-util.$(O) util3d.$(O)
+util.$(O) util3d.$(O) variable.$(O)
 
 # List of terminal driver sources
 CORETERM = $(T)aed.trm $(T)ai.trm $(T)amiga.trm $(T)apollo.trm \
@@ -201,14 +201,15 @@ CSOURCE = alloc.c binary.c bitmap.c command.c contour.c datafile.c eval.c \
 	  fit.c graphics.c graph3d.c help.c hidden3d.c internal.c interpol.c \
 	  matrix.c misc.c parse.c plot.c plot2d.c plot3d.c readline.c \
 	  scanner.c set.c show.c specfun.c standard.c stdfn.c term.c time.c \
-	  util.c util3d.c version.c
+	  util.c util3d.c variable.c version.c
 
 CSOURCE2 = bf_test.c gplt_x11.c
 
 CSOURCE3 = amiga.c corplot.c ctrl87.c ctrl87.h os9.c strftime.c vms.c
 
 HEADERS = alloc.h ansichek.h binary.h bitmap.h fit.h fnproto.h help.h \
-	  matrix.h national.h plot.h protos.h setshow.h stdfn.h syscfg.h term.h
+	  matrix.h national.h plot.h protos.h setshow.h stdfn.h syscfg.h \
+	  term.h variable.h
 
 NEXTSRC  = $(N)Controller.h $(N)Controller.m $(N)GnuTerm.iconheader \
 	   $(N)GnuTerm.tiff $(N)GnuTerm_main.m $(N)GnuView.h \
@@ -248,21 +249,71 @@ pcgraph.asm rgipgnu
 # (generate these automatically)
 # - note that VMS requires space before and after the :
 
-$(COREOBJS) : plot.h protos.h stdfn.h
-
-help.$(O) misc.$(O) : help.h
-
-protos.h : alloc.h
-
-graphics.$(O) graph3d.$(O) misc.$(O) plot.$(O) set.$(O) show.$(O) term.$(O) : setshow.h
-
-fit.$(O) : fit.c fit.h matrix.h plot.h
-
-matrix.$(O) : matrix.c matrix.h fit.h
-
-bitmap.$(O) term.$(O) : bitmap.h
-
-term.$(O) : term.h $(CORETERM)
+alloc.o: alloc.c plot.h ansichek.h stdfn.h syscfg.h protos.h alloc.h help.h
+bf_test.o: bf_test.c ansichek.h stdfn.h syscfg.h binary.h alloc.h
+binary.o: binary.c plot.h ansichek.h stdfn.h syscfg.h protos.h alloc.h \
+	  binary.h
+bitmap.o: bitmap.c plot.h ansichek.h stdfn.h syscfg.h protos.h alloc.h \
+	  bitmap.h
+command.o: command.c plot.h ansichek.h stdfn.h syscfg.h protos.h alloc.h \
+	   setshow.h variable.h fit.h binary.h help.h
+contour.o: contour.c plot.h ansichek.h stdfn.h syscfg.h protos.h alloc.h \
+	   setshow.h variable.h
+corplot.o: corplot.c
+ctrl87.o: ctrl87.c ctrl87.h
+datafile.o: datafile.c plot.h ansichek.h stdfn.h syscfg.h protos.h alloc.h \
+	    fnproto.h binary.h setshow.h variable.h
+eval.o: eval.c plot.h ansichek.h stdfn.h syscfg.h protos.h alloc.h
+fit.o: fit.c plot.h ansichek.h stdfn.h syscfg.h protos.h alloc.h matrix.h \
+	fit.h setshow.h variable.h
+gplt_x11.o: gplt_x11.c plot.h ansichek.h stdfn.h syscfg.h protos.h alloc.h
+graph3d.o: graph3d.c plot.h ansichek.h stdfn.h syscfg.h protos.h alloc.h \
+	   setshow.h variable.h
+graphics.o: graphics.c plot.h ansichek.h stdfn.h syscfg.h protos.h alloc.h \
+	    setshow.h variable.h
+help.o: help.c plot.h ansichek.h stdfn.h syscfg.h protos.h alloc.h help.h
+hidden3d.o: hidden3d.c plot.h ansichek.h stdfn.h syscfg.h protos.h alloc.h \
+	    setshow.h variable.h
+internal.o: internal.c plot.h ansichek.h stdfn.h syscfg.h protos.h alloc.h \
+	    fnproto.h
+interpol.o: interpol.c plot.h ansichek.h stdfn.h syscfg.h protos.h alloc.h \
+	    setshow.h variable.h
+matrix.o: matrix.c fit.h plot.h ansichek.h stdfn.h syscfg.h protos.h alloc.h \
+	  matrix.h
+misc.o: misc.c plot.h ansichek.h stdfn.h syscfg.h protos.h alloc.h setshow.h \
+	variable.h
+parse.o: parse.c plot.h ansichek.h stdfn.h syscfg.h protos.h alloc.h help.h
+plot.o: plot.c plot.h ansichek.h stdfn.h syscfg.h protos.h alloc.h fit.h \
+	setshow.h variable.h fnproto.h
+plot2d.o: plot2d.c plot.h ansichek.h stdfn.h syscfg.h protos.h alloc.h \
+	  setshow.h variable.h fit.h binary.h help.h
+plot3d.o: plot3d.c plot.h ansichek.h stdfn.h syscfg.h protos.h alloc.h \
+	  setshow.h variable.h binary.h matrix.h help.h
+readline.o: readline.c plot.h ansichek.h stdfn.h syscfg.h protos.h alloc.h
+scanner.o: scanner.c plot.h ansichek.h stdfn.h syscfg.h protos.h alloc.h
+set.o: set.c plot.h ansichek.h stdfn.h syscfg.h protos.h alloc.h setshow.h \
+	variable.h national.h
+show.o: show.c plot.h ansichek.h stdfn.h syscfg.h protos.h alloc.h setshow.h \
+	variable.h
+specfun.o: specfun.c plot.h ansichek.h stdfn.h syscfg.h protos.h alloc.h \
+	   fnproto.h
+standard.o: standard.c plot.h ansichek.h stdfn.h syscfg.h protos.h alloc.h \
+	    setshow.h variable.h fnproto.h
+stdfn.o: stdfn.c plot.h ansichek.h stdfn.h syscfg.h protos.h alloc.h
+strftime.o: strftime.c plot.h ansichek.h stdfn.h syscfg.h protos.h alloc.h \
+	    setshow.h variable.h
+term.o: term.c plot.h ansichek.h stdfn.h syscfg.h protos.h alloc.h bitmap.h \
+	setshow.h variable.h ../term/driver.h term.h $(CORETERM)
+time.o: time.c plot.h ansichek.h stdfn.h syscfg.h protos.h alloc.h setshow.h \
+	variable.h
+util.o: util.c plot.h ansichek.h stdfn.h syscfg.h protos.h alloc.h setshow.h \
+	variable.h
+util3d.o: util3d.c plot.h ansichek.h stdfn.h syscfg.h protos.h alloc.h \
+	  setshow.h variable.h
+variable.o: variable.c plot.h ansichek.h stdfn.h syscfg.h protos.h alloc.h \
+	    variable.h
+version.o: version.c plot.h ansichek.h stdfn.h syscfg.h protos.h alloc.h
+vms.o: vms.c plot.h ansichek.h stdfn.h syscfg.h protos.h alloc.h
 
 # List of object files except version.o
 

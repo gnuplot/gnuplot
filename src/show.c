@@ -313,6 +313,10 @@ static TBOOLEAN
 	(void) putc('\n', stderr);
 	show_locale();
 	c_token++;
+    } else if (almost_equals(c_token, "loa$dpath")) {
+	(void) putc('\n', stderr);
+	show_loadpath();
+	c_token++;
     } else if (almost_equals(c_token, "xzero$axis")) {
 	(void) putc('\n', stderr);
 	show_xzeroaxis();
@@ -631,6 +635,7 @@ static TBOOLEAN
 	show_datatype("zdata", FIRST_Z_AXIS);
 	show_timefmt();
 	show_locale();
+	show_loadpath();
 	show_zero();
 	show_missing();
 	show_plot();

@@ -921,6 +921,13 @@ set ticscale %g %g\n",
 
     fprintf(fp, "set locale \"%s\"\n", cur_locale);
 
+    fputs("set loadpath ",fp);
+    {
+	char *s;
+	while ((s=save_loadpath()) != NULL)
+	    fprintf(fp, "\"%s\" ",s);
+	fputc('\n',fp);
+    }
 }
 
 static void save_tics(fp, where, axis, tdef, rotate, text)

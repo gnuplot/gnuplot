@@ -499,6 +499,7 @@ char **argv;
 	/* first time */
 	interrupt_setup();
 	get_user_env();
+	init_loadpath();
 	load_rcfile();
 	init_fit();		/* Initialization of fitting module */
 

@@ -577,6 +577,7 @@ void reset_command()
     encoding = ENCODING_DEFAULT;
 
     set_locale("C");		/* default */
+    clear_loadpath();
 
 }
 
@@ -1256,6 +1257,37 @@ set_two()
 	} else {
 	    int_error("Expected string", c_token);
 	}
+    } else if (almost_equals(c_token,"loa$dpath")) {
+	char *assemble = NULL;
+	c_token++;
+	if (END_OF_COMMAND) {
+	    clear_loadpath();
+	} else while (!END_OF_COMMAND) {
+	    if (isstring(c_token)) {
+		int len;
+		char *ss = gp_alloc(token_len(c_token)+1, "tmp storage");
+		len = (assemble? strlen(assemble) : 0);
+		quote_str(ss,c_token,token_len(c_token));
+		assemble = gp_realloc(assemble,len+1+strlen(ss)+1, "tmp loadpath");
+		if (len != 0) {
+		    strcpy(assemble+len+1,ss);
+		    *(assemble+len) = PATHSEP;
+		}
+		else
+		    strcpy(assemble,ss);
+		free(ss);
+		++c_token;
+	    } else {
+		int_error("Expected string", c_token);
+	    }
+	}
+	if (assemble) {
+	    set_loadpath(assemble);
+	    free(assemble);
+	}
+    } else if (almost_equals(c_token,"noloa$dpath")) {
+	c_token++;
+	clear_loadpath();
     }
 
 #define DO_ZEROAX(variable, string,neg) \

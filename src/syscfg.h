@@ -218,7 +218,7 @@
 
 #ifndef HELPFILE
 # define HELPFILE "docs/gnuplot.gih"
-#endif /* !HELPFILE */
+#endif
 
 #ifndef HOME
 # define HOME "HOME"
