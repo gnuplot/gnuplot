@@ -1,5 +1,10 @@
 2000-12-20  Petr Mikulik  <mikulik@physics.muni.cz>
 
+	* src/term.c: fixed one missing 'postscript_gpoutfile = 0;' after
+	a term->reset.
+
+2000-12-20  Petr Mikulik  <mikulik@physics.muni.cz>
+
 	* term/pm.trm src/os2/gclient.c: support for filled boxes (added
 	PM_fillbox routine) --- it is used by the 'clear' command in multiplot
 	mode to clear the subfigure area.

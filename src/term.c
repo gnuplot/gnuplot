@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.32 2000/12/15 10:10:32 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.33 2000/12/18 08:21:17 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -311,6 +311,10 @@ char *dest;
     if (term && term_initialised) {
 	(*term->reset) ();
 	term_initialised = FALSE;
+#ifdef PM3D
+	/* switch off output to special postscript file (if used) */
+	postscript_gpoutfile = 0;
+#endif
     }
     if (dest == NULL) {		/* stdout */
 	UP_redirect(4);
