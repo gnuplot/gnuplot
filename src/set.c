@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.140 2004/08/08 04:45:35 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.141 2004/08/09 00:51:29 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -3565,10 +3565,8 @@ set_tic_prop(AXIS_INDEX axis)
 		END_OF_COMMAND || almost_equals(c_token, nocmd)) {
 		int_error(c_token,"expected font");
 	    } else {
-		if (isstring(c_token)) {
-		    m_quote_capture(&(axis_array[axis].ticdef.font), c_token, c_token);
-		    c_token++;
-		}
+		free(axis_array[axis].ticdef.font);
+		axis_array[axis].ticdef.font = try_to_get_string();
 	    }
 	}
 	if (equals(c_token,"tc") || almost_equals(c_token,"text$color")) {

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.74 2004/07/13 14:11:24 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.75 2004/07/25 12:25:01 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -1351,12 +1351,8 @@ eval_plots()
 			    xtitle[0] = '\0';       /* Remove default title . */
 		    }
 		    c_token++;
-		    if (isstring(c_token)) {
-			m_quote_capture(&(this_plot->title), c_token, c_token);
-		    } else {
+		    if (!(this_plot->title = try_to_get_string()))
 			int_error(c_token, "expecting \"title\" for plot");
-		    }
-		    c_token++;
 		    set_title = TRUE;
 		    continue;
 		}

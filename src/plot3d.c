@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.71 2004/07/04 23:58:45 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.72 2004/07/24 19:37:37 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -1273,12 +1273,9 @@ eval_3dplots()
 				ytitle[0] = NUL;	/* Remove default title . */
 			}
 		    }
-		    if (isstring(++c_token))
-			m_quote_capture(&(this_plot->title), c_token, c_token);
-		    else
-			int_error(c_token, "expecting \"title\" for plot");
-		    /* end of new method */
 		    c_token++;
+		    if (!(this_plot->title = try_to_get_string()))
+			int_error(c_token, "expecting \"title\" for plot");
 		    set_title = TRUE;
 		    continue;
 		}
