@@ -1,4 +1,4 @@
-/* $Id: amiga.c,v 1.3 1998/03/22 22:31:17 drd Exp $ */
+/* $Id: amiga.c,v 1.1 1999/03/26 21:47:21 lhecking Exp $ */
 
 /* GNUPLOT - amiga.c */
 
@@ -43,6 +43,9 @@
  * should the program terminate abnormally.
  */
 
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
 
 #include <stdio.h>
 #include <ios1.h>
