@@ -3580,7 +3580,9 @@ C ... and restart the table:
 
  See also `set xtics` for more information about tic labels.
 ^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/electron/electron.html"> See demo. </a>
-4 format_specifiers
+4 format specifiers
+?set format specifiers
+?format specifiers
 ?format_specifiers
  The acceptable formats (if not in date/time mode) are:
 
@@ -3673,7 +3675,9 @@ C ... and restart the table:
  If the data type for the axis is date/time, the format string must contain
  valid codes for the 'strftime' function (outside of `gnuplot`, type "man
  strftime").  See `set timefmt` for a list of the allowed input format codes.
-4 date/time_specifiers
+4 date/time specifiers
+?set format date/time_specifiers
+?format date/time_specifiers
 ?date/time_specifiers
  In date/time mode, the acceptable formats are:
 
