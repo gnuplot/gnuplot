@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.31 2002/03/07 16:22:37 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.32 2002/09/27 12:17:41 broeker Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -595,7 +595,7 @@ fit_interrupt()
 *****************************************************************/
 static TBOOLEAN
 regress(a)
-double a[];
+    double a[];
 {
     double **covar, *dpar, **C, chisq, last_chisq, lambda;
     int iter, i, j;
@@ -611,7 +611,7 @@ double a[];
 
     /* Initialize internal variables and 1st chi-square check */
     if ((res = marquardt(a, C, &chisq, &lambda)) == ERROR)
-	Eex("FIT: error occured during fit");
+	Eex("FIT: error occurred during fit");
     res = BETTER;
 
     show_fit(iter, chisq, chisq, a, lambda, STANDARD);
@@ -691,7 +691,7 @@ double a[];
     }
 
     if (res == ERROR)
-	Eex("FIT: error occured during fit");
+	Eex("FIT: error occurred during fit");
 
     /* compute errors in the parameters */
 

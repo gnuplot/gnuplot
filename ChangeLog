@@ -1,12 +1,18 @@
+2002-11-04  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* fit.c (regress): Fix SF bug # 631323: spelling "occured" -->
+ 	"occurred".
+
 2002-11-03  Harald Harders  <h.harders@tu-bs.de>
 
 	* src/save.c: Fix crash from saving arrowstyle.
 
 2002-11-01  Ethan Merritt  <merritt@u.washington.edu>
 
-        * src/axis.c src/gadgets.c src/graph3d.c src/term.c term/pdf.trm: 
-	Remove unused variables and add #include statements to pick up missing
-	function prototypes. This fixes current crop of warnings from gcc -Wall.
+        * src/axis.c src/gadgets.c src/graph3d.c src/term.c term/pdf.trm:
+ 	Remove unused variables and add #include statements to pick up
+ 	missing function prototypes. This fixes current crop of warnings
+ 	from gcc -Wall.
 
 2002-10-31  Ethan Merritt  <merritt@u.washington.edu>
 
@@ -14,19 +20,19 @@
 
 2002-10-25  Ethan Merritt  <merritt@u.washington.edu>
 
-        * term/pdf.trm: Bring pattern fill behavior into conformity with other
-	terminals (opaque background, continuous lines).
+        * term/pdf.trm: Bring pattern fill behavior into conformity with
+ 	other terminals (opaque background, continuous lines).
 
 2002-10-28  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* prepare: Added sed command to fix a bug in automake's output to
-	src/Makefile.in: missing $(EXEEXT).
+ 	src/Makefile.in: missing $(EXEEXT).
 
 2002-10-25  Ethan Merritt  <merritt@u.washington.edu>
 
         * src/graphics.c src/win/wgraph.c term/fig.trm term/pdf.trm:
-	Replace tests on fillstyle parameter to use enums FS_* instead of pure
-	constants.
+ 	Replace tests on fillstyle parameter to use enums FS_* instead of
+ 	pure constants.
 
 2002-10-25  Petr Mikulik  <mikulik@physics.muni.cz>
 
@@ -1417,7 +1423,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/11/01 20:14:30 $).
+	last modification date (from the tag $Date: 2002/11/03 20:46:58 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
