@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.63 2001/10/31 17:13:59 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.64 2001/11/10 18:27:12 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -1521,7 +1521,8 @@ int tag;			/* 0 means show all */
 	if (tag == 0 || tag == this_label->tag) {
 	    showed = TRUE;
 	    fprintf(stderr, "\tlabel %d \"%s\" at ",
-		    this_label->tag, conv_text(this_label->text));
+		    this_label->tag, 
+		    (this_label->text==NULL) ? "" : conv_text(this_label->text));
 	    show_position(&this_label->place);
 	    switch (this_label->pos) {
 	    case LEFT:{
@@ -2523,6 +2524,8 @@ conv_text(t)
 const char *t;
 {
     static char *r = NULL, *s;
+
+    if (t==NULL) return NULL;
 
     /* is this enough? */
     r = gp_realloc(r, 4 * (strlen(t) + 1), "conv_text buffer");

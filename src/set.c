@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.67 2001/11/11 21:37:56 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.68 2001/11/20 11:51:13 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -594,7 +594,8 @@ set_angles()
 
 
 /* process a 'set arrow' command */
-/* set arrow {tag} {from x,y} {to x,y} {{no}head} */
+/* set arrow {tag} {from x,y} {to x,y} {{no}head} ... */
+/* allow any order of options - pm 25.11.2001 */
 static void
 set_arrow()
 {
@@ -604,135 +605,137 @@ set_arrow()
     struct arrow_def *prev_arrow = NULL;
     struct position spos, epos, headsize;
     struct lp_style_type loc_lp = DEFAULT_LP_STYLE_TYPE;
+    TBOOLEAN relative = FALSE;
     int tag;
     int head = 1;
-    TBOOLEAN set_start, set_end;
+    TBOOLEAN set_tag = FALSE, set_start = FALSE, set_end = FALSE;
     TBOOLEAN set_line = FALSE, set_headsize = FALSE, set_layer = FALSE;
-    TBOOLEAN set_head = FALSE, relative = FALSE;
+    TBOOLEAN set_head = FALSE;
+    TBOOLEAN duplication = FALSE;
     int layer = 0;
+    /* remember current token number to see because it can be a tag: */
+    int maybe_tag_coken = ++c_token;
+
+    /* default values */
+    spos.x = spos.y = spos.z = 0;
+    spos.scalex = spos.scaley = spos.scalez = first_axes;
+    epos.x = epos.y = epos.z = 0;
+    epos.scalex = epos.scaley = epos.scalez = first_axes;
     headsize.x = 0; /* length being zero means the default head size */
 
-    c_token++;
+    while (!END_OF_COMMAND) {
 
-    /* get tag */
-    if (!END_OF_COMMAND
-	&& !equals(c_token, "from")
-	&& !equals(c_token, "to")
-	&& !equals(c_token, "rto")
-	) {
-	/* must be a tag expression! */
-	tag = (int) real(const_express(&a));
-	if (tag <= 0)
-	    int_error(c_token, "tag must be > zero");
-    } else
-	tag = assign_arrow_tag();	/* default next tag */
+	/* get start position */
+	if (equals(c_token, "from")) {
+	    if (set_start) { duplication = TRUE; break; }
+	    c_token++;
+	    if (END_OF_COMMAND)
+		int_error(c_token, "start coordinates expected");
+	    /* get coordinates */
+	    get_position(&spos);
+	    set_start = TRUE;
+	    continue;
+	}
 
-    /* HBB 20001018: removed code here that accepted 'first' or
-     * 'second' keywords. The resulting variables 'axes' and
-     * 'set_axes' effected nothing, anyway --> deleted them, too. */
+	/* get end or relative end position */
+	if (equals(c_token, "to") || equals(c_token,"rto")) {
+	    if (set_end) { duplication = TRUE; break; }
+	    c_token++;
+	    if (END_OF_COMMAND)
+		int_error(c_token, "end coordinates expected");
+	    /* get coordinates */
+	    get_position(&epos);
+	    relative = (equals(c_token,"rto")) ? TRUE : FALSE;
+	    set_end = TRUE;
+	    continue;
+	}
 
-    /* get start position */
-    if (!END_OF_COMMAND && equals(c_token, "from")) {
-	c_token++;
-	if (END_OF_COMMAND)
-	    int_error(c_token, "start coordinates expected");
-	/* get coordinates */
-	get_position(&spos);
-	set_start = TRUE;
-    } else {
-	spos.x = spos.y = spos.z = 0;
-	spos.scalex = spos.scaley = spos.scalez = first_axes;
-	set_start = FALSE;
-    }
+	if (equals(c_token, "nohead")) {
+	    if (set_head) { duplication = TRUE; break; }
+	    c_token++;
+	    head = 0;
+	    set_head = TRUE;
+	    continue;
+	}
+	if (equals(c_token, "head")) {
+	    if (set_head) { duplication = TRUE; break; }
+	    c_token++;
+	    head = 1;
+	    set_head = TRUE;
+	    continue;
+	}
+	if (equals(c_token, "heads")) {
+	    if (set_head) { duplication = TRUE; break; }
+	    c_token++;
+	    head = 2;
+	    set_head = TRUE;
+	    continue;
+	}
 
-    /* get end position */
-    if (!END_OF_COMMAND && equals(c_token, "to")) {
-	c_token++;
-	if (END_OF_COMMAND)
-	    int_error(c_token, "end coordinates expected");
-	/* get coordinates */
-	get_position(&epos);
-	set_end = TRUE;
-    } else if (!END_OF_COMMAND && equals(c_token, "rto")) {
-	c_token++;
-	if (END_OF_COMMAND)
-	    int_error(c_token, "end coordinates expected");
-	/* get coordinates */
-	get_position(&epos);
-	set_end = TRUE;
-	relative = 1;
-    } else {
-	epos.x = epos.y = epos.z = 0;
-	epos.scalex = epos.scaley = epos.scalez = first_axes;
-	set_end = FALSE;
-    }
+	if (equals(c_token, "size")) {
+	    if (set_headsize) { duplication = TRUE; break; }
+	    headsize.scalex = headsize.scaley = headsize.scalez = first_axes;
+	      /* only scalex used; scaley is angle of the head in [deg] */
+	    c_token++;
+	    if (END_OF_COMMAND)
+		int_error(c_token, "head size expected");
+	    get_position(&headsize);
+	    set_headsize = TRUE;
+	    continue;
+	}
 
-    /* get start position - what the heck, either order is ok */
-    if (!END_OF_COMMAND && equals(c_token, "from")) {
-	if (set_start)
-	    int_error(c_token, "only one 'from' is allowed");
-	c_token++;
-	if (END_OF_COMMAND)
-	    int_error(c_token, "start coordinates expected");
-	/* get coordinates */
-	get_position(&spos);
-	set_start = TRUE;
-    }
+	if (equals(c_token, "back")) {
+	    if (set_layer) { duplication = TRUE; break; }
+	    c_token++;
+	    layer = 0;
+	    set_layer = TRUE;
+	    continue;
+	}
+	if (equals(c_token, "front")) {
+	    if (set_layer) { duplication = TRUE; break; }
+	    c_token++;
+	    layer = 1;
+	    set_layer = TRUE;
+	    continue;
+	}
 
-    if (!END_OF_COMMAND && equals(c_token, "nohead")) {
-	c_token++;
-	head = 0;
-	set_head = TRUE;
-    }
-    if (!END_OF_COMMAND && equals(c_token, "head")) {
-	c_token++;
-	head = 1;
-	set_head = TRUE;
-    }
-    if (!END_OF_COMMAND && equals(c_token, "heads")) {
-	c_token++;
-	head = 2;
-	set_head = TRUE;
-    }
+	/* pick up a line spec - allow ls, but no point. */
+	/* HBB 20010807: Only set set_line to TRUE if there really was a
+	 * lp spec at the end of this command. */
+	{
+	    int stored_token = c_token;
 
-    if (!END_OF_COMMAND && equals(c_token, "size")) {
-	headsize.scalex = headsize.scaley = headsize.scalez = first_axes;
-	  /* only scalex used; scaley is angle of the head in [deg] */
-	c_token++;
-	if (END_OF_COMMAND)
-	    int_error(c_token, "head size expected");
-	get_position(&headsize);
-	set_headsize = TRUE;
-    }
-    set_layer = FALSE;
-    if (!END_OF_COMMAND && equals(c_token, "back")) {
-	c_token++;
-	layer = 0;
-	set_layer = TRUE;
-    }
-    if (!END_OF_COMMAND && equals(c_token, "front")) {
-	c_token++;
-	layer = 1;
-	set_layer = TRUE;
-    }
+	    lp_parse(&loc_lp, 1, 0, 0, 0);
+	    /* HBB 20010807: this is already taken care of by lp_parse()... */
+	    /* loc_lp.pointflag = 0; */ /* standard value for arrows, don't use points */
+	    if (stored_token != c_token) {
+		set_line = TRUE;
+		continue;
+	    }
+	}
 
-    /* pick up a line spec - allow ls, but no point. */
-    /* HBB 20010807: Only set set_line to TRUE if there really was a
-     * lp spec at the end of this command. */
-    {
-	int stored_token = c_token;
+	/* no option given, thus it could be the tag */
+	if (maybe_tag_coken == c_token) {
+	    /* must be a tag expression! */
+	    tag = (int) real(const_express(&a));
+	    if (tag <= 0)
+		int_error(--c_token, "tag must be > zero");
+	    set_tag = TRUE;
+	    continue;
+	}
+    
+	if (!END_OF_COMMAND)
+	    int_error(c_token, "wrong argument in set arrow");
 
-	lp_parse(&loc_lp, 1, 0, 0, 0);
-	/* HBB 20010807: this is already taken care of by lp_parse()... */
-	/* loc_lp.pointflag = 0; */	/* standard value for arrows, don't use points */
-	if (stored_token != c_token)
-	    set_line = TRUE;
-    }
+    } /* while (!END_OF_COMMAND) */
 
-
-    if (!END_OF_COMMAND)
-	int_error(c_token, "extraneous or out-of-order arguments in set arrow");
-
+    if (duplication)
+	int_error(c_token, "duplicated or contradicting arguments in set arrow");
+    
+    /* no tag given, the default is the next tag */
+    if (!set_tag)
+	tag = assign_arrow_tag();
+    
     /* OK! add arrow */
     if (first_arrow != NULL) {	/* skip to last arrow */
 	for (this_arrow = first_arrow; this_arrow != NULL;
@@ -1876,6 +1879,8 @@ set_label()
 	new_label->rotate = rotate;
 	new_label->layer = layer;
 	new_label->font = font;
+	if (loc_lp.pointflag == -2)
+	    loc_lp.pointflag = 0;
 	memcpy(&(new_label->lp_properties), &loc_lp, sizeof(loc_lp));
 	new_label->hoffset = hoff;
 	new_label->voffset = voff;
