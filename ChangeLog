@@ -5,6 +5,12 @@
 	properly in some svg applications was our failure to specify the 
 	xlink: namespace.
 
+	* term/post.trm:  PS_filled_polygon() must flush current path on 
+	entry if there is one.  This fixes the missing arrow-shaft problems
+	seen in arrowstyle.dem.  It is possible that the awk scripts in
+	pm3d/contrib need to be modified to parse the resulting "stroke"
+	command.
+
 2003-12-15  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* config/makefile.os2: Lowercased IF EXIST and DEL commands (there is

@@ -1,5 +1,5 @@
 /*
- * $Id: post.trm,v 1.97 2003/12/13 00:01:40 sfeam Exp $
+ * $Id: post.trm,v 1.98 2003/12/15 07:52:15 mikulik Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -2553,9 +2553,10 @@ TERM_PUBLIC void PS_set_color (double gray)
 
 TERM_PUBLIC void PS_filled_polygon ( int points, gpiPoint *corners )
 {
-    /* Stroke of the previous graphic element is automatic. */
-    ps_path_count = 0;
-    PS_relative_ok = FALSE;
+    /* Stroke the previous graphic element if required. */
+    if (PS_relative_ok)
+	PS_FLUSH_PATH;
+
     /* produce lines like:
        9055 29350 N 695 0 V 0 564 V -695 0 h  ... for quadrangles
        9055 29350 N 695 0 V 0 564 f           ... otherwise
