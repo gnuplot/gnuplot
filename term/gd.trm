@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: gd.trm,v 1.82 2005/12/31 06:37:17 sfeam Exp $
+ * $Id: gd.trm,v 1.83 2005/12/31 22:05:10 sfeam Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -238,7 +238,7 @@ enum PNG_id {
     PNG_ENHANCED, PNG_NOENHANCED,
     PNG_TRUECOLOR, PNG_NOTRUECOLOR,
     PNG_LINEWIDTH,
-    GIF_ANIMATE, GIF_DELAY, GIF_LOOP, GIF_NOOPT,
+    GIF_ANIMATE, GIF_DELAY, GIF_LOOP, GIF_NOOPT, GIF_OPT,
     PNG_OTHER
 };
 
@@ -275,7 +275,8 @@ static struct gen_table PNG_opts[] =
     { "anim$ate", GIF_ANIMATE }, /* gif animation options */
     { "delay", GIF_DELAY },
     { "loop", GIF_LOOP },
-    { "noopt$imize", GIF_NOOPT }, /* end of gif animation options */
+    { "noopt$imize", GIF_NOOPT },
+    { "opt$imize", GIF_OPT }, /* end of gif animation options */
     { "lw", PNG_LINEWIDTH },
     { NULL, PNG_OTHER }
 };
@@ -598,7 +599,7 @@ PNG_options()
 	if (png_state.previous_image) {
 	    gdImageDestroy(png_state.previous_image);
 	    png_state.previous_image = NULL;
-	    png_state.frame_optimization = TRUE;
+	    png_state.frame_optimization = FALSE;
 	    png_state.loop_count = 0;
 	}
     }
@@ -764,7 +765,7 @@ PNG_options()
 	    png_state.animate = TRUE;
 	    png_state.frame_count = 0;
 	    png_state.frame_delay = 10;
-	    png_state.frame_optimization = TRUE;
+	    png_state.frame_optimization = FALSE;
 	    gif_anim_option = 1;
 	    break;
 	case GIF_DELAY:
@@ -788,6 +789,13 @@ PNG_options()
 		int_error(c_token,"Only the gif terminal supports animation");
 	    c_token++;
 	    png_state.frame_optimization = FALSE;
+	    gif_anim_option = 1;
+	    break;
+	case GIF_OPT:
+	    if (strncmp("gif",term->name,3))
+		int_error(c_token,"Only the gif terminal supports animation");
+	    c_token++;
+	    png_state.frame_optimization = TRUE;
 	    gif_anim_option = 1;
 	    break;
 
@@ -877,6 +885,10 @@ PNG_options()
     /* This code is shared by png, gif, and jpeg terminal types */
     if (!strcmp(term->name,"jpeg"))
 	png_state.flags &= ~PNG_USE_TRANSPARENT;
+
+    /* But transparent animations cannot be optimized */
+    if (png_state.flags & PNG_USE_TRANSPARENT)
+	png_state.frame_optimization = FALSE;
 
     /* now generate options string */
 
@@ -2290,7 +2302,7 @@ START_HELP(gif)
 "                        {tiny | small | medium | large | giant}",
 "                        {{no}transparent} {{no}enhanced}",
 "                        {font <face> {<pointsize>}}",
-"                        {animate {delay <time>} {nooptimize}}",
+"                        {animate {delay <time>} {{no}optimize}}",
 "                        {size <x>,<y>} {{no}crop}",
 "                        {<color0> <color1> <color2> ...}",
 "",
@@ -2336,11 +2348,11 @@ START_HELP(gif)
 " the creation of animated gifs. The default delay between display of",
 " successive images may be specified in units of 1/100 second (default 5).",
 " The actual delay may vary depending on the program used as a viewer.",
-" By default only the difference between successive frames is stored, which",
-" can substantially reduce the output file size.  However, this means that",
-" some programs cannot extract individual frames from the sequence.",
+" The `optimize` option requests that only the difference between successive",
+" frames is stored, which can substantially reduce the output file size.",
+" However, some programs cannot handle animations encoded this way.",
 " The `nooptimize` option ensures that each frame is described independently.",
-" You may also need to select `nooptimize` in order for transparency to work.",
+" The default is `nooptimize`.",
 " An animation sequence is terminated by the next `set term` command.",
 "",
 " The size <x,y> is given in pixels---it defaults to 640x480.  The number of",

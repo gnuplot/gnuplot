@@ -1,3 +1,9 @@
+2005-01-02  Ethan Merritt  <merritt@u.washington.edu>
+
+	* term/gd.trm (PNG_options): Change default animation mode to "nooptimize".
+	Disable optimization if the background is transparent, as this combination
+	is not handled well by most viewing programs.
+
 2006-01-02  Dennis Linse <djlinse37@yahoo.com>
 
 	* term/x11.trm: Remove redundant #include <sys/select.h>
