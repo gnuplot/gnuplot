@@ -1,3 +1,7 @@
+2004-03-29  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* tutorial/Makefile.am.in: Add tutorial.toc to CLEANFILES.
+
 2004-03-29  Per Persson  <persquare@users.sf.net>
 
 	* term/aquaterm.trm: Major update to driver.

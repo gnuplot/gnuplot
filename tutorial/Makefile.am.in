@@ -8,7 +8,7 @@ EXTRA_DIST = Makefile.am.in $(PLT_FILES) \
 header.tex makefile.dst tutorial.tex eg3.dat
 
 CLEANFILES = tutorial.aux tutorial.dvi tutorial.log tutorial.pdf tutorial.ps \
-eg1.tex eg2.tex eg3.tex eg4.tex eg5.tex eg6.tex linepoin.tex
+tutorial.toc eg1.tex eg2.tex eg3.tex eg4.tex eg5.tex eg6.tex linepoin.tex
 
 DVIPS = dvips
 LATEX = @LATEX@
