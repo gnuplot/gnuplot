@@ -29,6 +29,7 @@ exec_prefix = @exec_prefix@
 bindir = @bindir@
 datadir = @datadir@
 infodir = @infodir@
+srcdir = @srcdir@
 top_builddir = .
 top_srcdir = @top_srcdir@
 VPATH = @srcdir@
@@ -54,7 +55,7 @@ LINK = $(CC) $(CFLAGS) $(LDFLAGS) -o $@
 MAKEINFO = makeinfo
 
 # Required for the temporary .info file fix
-EMACS = emacs
+EMACS = @EMACS@
 
 # substitute your troff command (and any flags) for this one
 TROFF = troff
