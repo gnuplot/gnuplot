@@ -1,3 +1,9 @@
+2000-11-12  James R. Van Zandt  <jrv@vanzandt.mv.com>
+
+	* term/README: describe pm3d and mouse API
+
+	* term/cgm.trm: add pm3d support.
+
 2000-11-10  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/gnuplot.opt: added new sourcefiles to the list.
