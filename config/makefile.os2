@@ -252,9 +252,10 @@ gplt_x11.o: gplt_x11.c
 #
 # Change the call to LaTeX if the "latex2e" is not appropiate for you
 # (and don't care about the strange way it's implemented ...)
+# Call LaTeX/2e three times to get the toc right.
 gnuplot.dvi: gnuplot.tex
 	copy gnuplot.tex $(DOCDIR)\gnuplot_2.tex
-	cd $(DOCDIR) & latex2e gnuplot_2.tex
+	cd $(DOCDIR) & latex2e gnuplot_2.tex & latex2e gnuplot_2.tex & latex2e gnuplot_2.tex
 	move $(DOCDIR)\gnuplot_2.dvi gnuplot.dvi
 	del $(DOCDIR)\gnuplot_2*
 gnuplot.tex:  $(DOCDIR)\gnuplot.doc doc2tex.exe
