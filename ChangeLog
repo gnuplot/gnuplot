@@ -1,5 +1,12 @@
 2003-11-13  Petr Mikulik  <mikulik@physics.muni.cz>
 
+	* src/history.c (write_history): Typo fixed.
+
+	* src/command.c (history_command): Better error message for the
+	"history" command not being available for GNU readline.
+
+2003-11-13  Petr Mikulik  <mikulik@physics.muni.cz>
+
 	* NEWS src/show.c docs/gnuplot.doc: Options {float | int} for 'show
 	palette palette <n>', and let the output go to that of 'set print'.
 
