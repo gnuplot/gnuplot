@@ -1,5 +1,5 @@
 #ifdef INCRCSDATA
-static char RCSid[]="$Id: gclient.c,v 1.27 2004/05/07 14:43:08 mikulik Exp $";
+static char RCSid[]="$Id: gclient.c,v 1.28 2004/07/01 17:10:09 broeker Exp $";
 #endif
 
 /****************************************************************************
@@ -333,7 +333,7 @@ static void 	gpPMmenu_update(void);
 static void     DrawZoomBox(void);
 static void	DrawRuler(void);
 
-#define IGNORE_MOUSE(!mouseTerminal || useMouse==0 || lock_mouse)
+#define IGNORE_MOUSE (!mouseTerminal || useMouse==0 || lock_mouse)
 /* || !gp4mouse.graph */
 /*  don't react to mouse in the event handler, and avoid some crashes */
 

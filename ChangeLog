@@ -1,3 +1,10 @@
+2004-09-27  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* src/os2/gclient.c: Fix typo in a #define from the previous massive
+	whitespace changes.
+
+	* config/config.os2: Let #define STDC_HEADERS 1.
+
 2004-09-26  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/plot3d.c (eval_3dplots): Fix logic of default arrow style in the
