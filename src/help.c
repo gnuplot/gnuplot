@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: help.c,v 1.4 1999/06/10 19:54:10 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: help.c,v 1.5 1999/06/11 11:18:55 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - help.c */
@@ -281,10 +281,9 @@ char *text;
     LINEBUF *new;
 
     new = (LINEBUF *) gp_alloc(sizeof(LINEBUF), "new line buffer");
-    if (text != NULL) {
-	new->line = gp_alloc(strlen(text) + 1, "help file line");
-	strcpy(new->line, text);
-    } else
+    if (text)
+	new->line = gp_strdup(text);
+    else
 	new->line = NULL;
 
     new->next = NULL;
@@ -302,10 +301,9 @@ char *key;
     key[strlen(key) - 1] = NUL;	/* cut off \n  */
 
     new = (LINKEY *) gp_alloc(sizeof(LINKEY), "new key list");
-    if (key != NULL) {
-	new->key = gp_alloc(strlen(key) + 1, "new key");
-	strcpy(new->key, key);
-    }
+    if (key)
+	new->key = gp_strdup(key);
+
     /* add to front of list */
     new->next = keylist;
     keylist = new;

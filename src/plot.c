@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot.c,v 1.12 1999/06/12 16:37:35 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot.c,v 1.13 1999/06/14 19:24:36 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - plot.c */
@@ -728,22 +728,17 @@ get_user_env()
 	char *env_home;
 
 #ifndef VMS
-	if ((env_home = getenv(HOME)) || (env_home = getenv("HOME"))) {
+	if ((env_home = getenv(HOME)) || (env_home = getenv("HOME")))
 #else
-	if (env_home = HOME) {
+	if (env_home = HOME)
 #endif
-	    size_t homelen = strlen(env_home) + 1;
-
-	    assert(homelen <= PATH_MAX);
-	    user_homedir = (const char *) gp_alloc(homelen, "user homedir");
-	    strcpy((char *) user_homedir, env_home);
-	} else
+	    user_homedir = (const char *) gp_strdup(env_home);
+	else
 	    int_warn(NO_CARET, "no HOME found");
     }
     /* Hhm ... what about VMS? */
     if (user_shell == NULL) {
 	char *env_shell;
-	size_t shell_len = 1;
 
 	if ((env_shell = getenv("SHELL")) == NULL)
 #if defined(MSDOS) || defined(_Windows) || defined(DOS386) || defined(OS2)
@@ -751,20 +746,14 @@ get_user_env()
 #endif
 		env_shell = SHELL;
 
-	shell_len += strlen(env_shell);
-	user_shell = (const char *) gp_alloc(shell_len, "user shell");
-	strcpy((char *) user_shell, env_shell);
+	user_shell = (const char *) gp_strdup(env_shell);
     }
 #if defined(ATARI) || defined(MTOS)
     if (user_gnuplotpath == NULL) {
 	char *env_gpp;
 
-	if (env_gpp = getenv("GNUPLOTPATH")) {
-	    size_t gpplen = strlen(env_gpp) + 1;
-
-	    user_gnuplotpath = (const char *) gp_alloc(gpplen, "user gnuplotpath");
-	    strcpy((char *) user_gnuplotpath, env_gpp);
-	}
+	if (env_gpp = getenv("GNUPLOTPATH"))
+	    user_gnuplotpath = (const char *) gp_strdup(env_gpp);
     }
 #endif
 }
