@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.33 2002/03/26 20:31:04 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.34 2002/04/27 08:07:35 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - pm3d.c */
@@ -123,26 +123,34 @@ pm3d_rearrange_part(src, len, dest, invert)
     scan_array = *dest = gp_alloc(len * sizeof(scanA), "pm3d scan array");
 
     if (pm3d.direction == PM3D_SCANS_AUTOMATIC) {
+
 	int cnt;
 	int len2 = len;
-	for (scanA = src; scanA && (cnt = scanA->p_count - 1) > 0; scanA = scanA->next, len2--) {
+	TBOOLEAN exit_outer_loop = 0;
+
+	for (scanA = src; scanA && 0 == exit_outer_loop; scanA = scanA->next, len2--) {
 
 	    int from, i;
-	    TBOOLEAN exit_outer_loop = 0;
 	    vertex vA, vA2;
+
+	    if ((cnt = scanA->p_count - 1) <= 0)
+		continue;
 
 	    /* ordering within one scan */
 	    for (from=0; from<=cnt; from++) /* find 1st non-undefined point */
 		if (scanA->points[from].type != UNDEFINED) {
-		    map3d_xyz(scanA->points[from].x, scanA->points[from].y, scanA->points[from].z, &vA);
+		    map3d_xyz(scanA->points[from].x, scanA->points[from].y, 0, &vA);
 		    break;
 		}
 	    for (i=cnt; i>from; i--) /* find the last non-undefined point */
-		if (scanA->points[from].type != UNDEFINED) {
-		    map3d_xyz(scanA->points[i].x, scanA->points[i].y, scanA->points[i].z, &vA2);
+		if (scanA->points[i].type != UNDEFINED) {
+		    map3d_xyz(scanA->points[i].x, scanA->points[i].y, 0, &vA2);
 		    break;
 		}
-	    if (from < i) 
+
+	    if (i - from > cnt * 0.1)
+		/* it is completely arbitrary to request at least
+		 * 10% valid samples in this scan. (joze Jun-05-2002) */
 		*invert = (vA2.z > vA.z) ? 0 : 1;
 	    else
 		continue; /* all points were undefined, so check next scan */
@@ -157,12 +165,11 @@ pm3d_rearrange_part(src, len, dest, invert)
 		    scanB = scanB->next; /* skip over to last scan */
 		if (scanB && scanB->p_count) {
 		    vertex vB;
-		    for (i=0; i<scanB->p_count; i++) { /* find 1st non-undefined point */
+		    for (i = from /* we compare vA.z with vB.z */; i<scanB->p_count; i++) {
+		       	/* find 1st non-undefined point */
 			if (scanB->points[i].type != UNDEFINED) {
-			    map3d_xyz(scanB->points[i].x, scanB->points[i].y, scanB->points[i].z, &vB);
-			    if (from<=cnt) {
-				invert_order = (vB.z > vA.z) ? 0 : 1;
-			    }
+			    map3d_xyz(scanB->points[i].x, scanB->points[i].y, 0, &vB);
+			    invert_order = (vB.z > vA.z) ? 0 : 1;
 			    exit_outer_loop = 1;
 			    break;
 			}
@@ -171,6 +178,11 @@ pm3d_rearrange_part(src, len, dest, invert)
 	    }
 	}
     }
+
+#if 0
+    fprintf(stderr, "(pm3d_rearrange_part) invert       = %d\n", *invert);
+    fprintf(stderr, "(pm3d_rearrange_part) invert_order = %d\n", invert_order);
+#endif
 
     for (scanA = src, scan = len - 1, i = 0; scan >= 0; --scan, i++) {
 	if (pm3d.direction == PM3D_SCANS_AUTOMATIC) {

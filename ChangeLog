@@ -1,5 +1,9 @@
 2002-06-05  Johannes Zellner  <johannes@zellner.org>
 
+	* src/pm3d.c: yet again improved scansautomatic
+
+2002-06-05  Johannes Zellner  <johannes@zellner.org>
+
 	* term/gd.trm:
 	- macro Y(y)
 	- PNG_point plus related functions, implementing the pointtypes
@@ -571,7 +575,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/06/04 22:50:41 $).
+	last modification date (from the tag $Date: 2002/06/05 20:23:44 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
