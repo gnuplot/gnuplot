@@ -1,5 +1,5 @@
 /*
- * $Id: contour.h,v 1.7 2004/04/13 17:23:52 broeker Exp $
+ * $Id: contour.h,v 1.8 2004/07/01 17:10:04 broeker Exp $
  */
 
 /* GNUPLOT - contour.h */
@@ -72,7 +72,7 @@ typedef double tri_diag[3];
 
 /* Variables of contour.c needed by other modules: */
 
-extern char contour_format[];
+extern char contour_format[32];
 extern t_contour_kind contour_kind;
 extern t_contour_levels_kind contour_levels_kind;
 extern int contour_levels;

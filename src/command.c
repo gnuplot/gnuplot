@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.99 2004/07/27 09:08:49 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.100 2004/08/02 21:57:43 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -612,18 +612,19 @@ call_command()
 {
     char *save_file = NULL;
 
-    if (!isstring(++c_token))
+    c_token++;
+    save_file = try_to_get_string();
+    
+    if (!save_file)
 	int_error(c_token, "expecting filename");
-    else {
-	m_quote_capture(&save_file, c_token, c_token);
-	gp_expand_tilde(&save_file);
-	/* Argument list follows filename */
-	load_file(loadpath_fopen(save_file, "r"), save_file, TRUE);
-	/* input_line[] and token[] now destroyed! */
-	c_token = 0;
-	num_tokens = 0;
-	free(save_file);
-    }
+
+    gp_expand_tilde(&save_file);
+    /* Argument list follows filename */
+    load_file(loadpath_fopen(save_file, "r"), save_file, TRUE);
+    /* input_line[] and token[] now destroyed! */
+    c_token = 0;
+    num_tokens = 0;
+    free(save_file);
 }
 
 
@@ -633,17 +634,15 @@ changedir_command()
 {
     char *save_file = NULL;
 
-    if (!isstring(++c_token))
+    c_token++;
+    save_file = try_to_get_string();
+    if (!save_file)
 	int_error(c_token, "expecting directory name");
-    else {
-	m_quote_capture(&save_file, c_token, c_token);
-	gp_expand_tilde(&save_file);
-	if (changedir(save_file)) {
-	    int_error(c_token, "Can't change to this directory");
-	}
-	c_token++;
-	free(save_file);
-    }
+
+    gp_expand_tilde(&save_file);
+    if (changedir(save_file))
+	int_error(c_token, "Can't change to this directory");
+    free(save_file);
 }
 
 
@@ -859,19 +858,19 @@ void
 load_command()
 {
     FILE *fp;
+    char *save_file;
 
-    if (isstring(++c_token)) {
-	char *save_file = NULL;
-	m_quote_capture(&save_file,c_token,c_token);
-	gp_expand_tilde(&save_file);
-	fp = strcmp(save_file, "-") ? loadpath_fopen(save_file, "r") : stdout;
-
-	load_file(fp, save_file, FALSE);
-	/* input_line[] and token[] now destroyed! */
-	c_token = num_tokens = 0;
-	free(save_file);
-    } else
+    c_token++;
+    save_file = try_to_get_string();
+    if (!save_file)
 	int_error(c_token, "expecting filename");
+
+    gp_expand_tilde(&save_file);
+    fp = strcmp(save_file, "-") ? loadpath_fopen(save_file, "r") : stdout;
+    load_file(fp, save_file, FALSE);
+    /* input_line[] and token[] now destroyed! */
+    c_token = num_tokens = 0;
+    free(save_file);
 }
 
 
@@ -1120,13 +1119,11 @@ print_command()
     screen_ok = FALSE;
     do {
 	++c_token;
-	if (isstring(c_token)) {
-	    s = NULL;
-	    m_quote_capture(&s, c_token, c_token);
+	s = try_to_get_string();
+	if (s) {
 	    fputs(s, print_out);
 	    need_space = 0;
 	    free(s);
-	    ++c_token;
 	} else {
 	    (void) const_express(&a);
 	    if (need_space)
@@ -1196,28 +1193,6 @@ reread_command()
 }
 
 
-/* reset_command() is in unset.c */
-
-/* This routine is similar to macro CAPTURE_FILENAME_AND_FOPEN,
- * with an addition to popen() on systems supporting this.
- */
-static FILE*
-capture_filename_and_pfopen (char **save_file, char *mode)
-{
-    FILE *fp;
-    m_quote_capture(save_file, c_token, c_token);
-#ifdef PIPES
-    if (*save_file && (*save_file)[0]=='|') {
-	fp = popen((*save_file)+1, (mode));
-	return fp;
-    }
-#endif
-    gp_expand_tilde(save_file);
-    fp = strcmp(*save_file, "-") ? loadpath_fopen(*save_file, mode) : stdout;
-    return fp;
-}
-
-
 /* process the 'save' command */
 void
 save_command()
@@ -1230,20 +1205,29 @@ save_command()
     what = lookup_table(&save_tbl[0], c_token);
 
     switch (what) {
-    case SAVE_FUNCS:
+	case SAVE_FUNCS:
 	case SAVE_SET:
 	case SAVE_TERMINAL:
 	case SAVE_VARS:
 	    c_token++;
 	    break;
 	default:
-	    if (!isstring(c_token))
-		int_error(c_token, "filename or keyword 'functions', 'variables', 'terminal' or 'set' expected");
+	    break;
     }
 
-    if (!isstring(c_token))
+    save_file = try_to_get_string();
+    if (!save_file)
 	    int_error(c_token, "expecting filename");
-    fp = capture_filename_and_pfopen(&save_file, "w");
+#ifdef PIPES
+    if (save_file[0]=='|')
+	fp = popen(save_file+1,"w");
+    else
+#endif
+    {
+    gp_expand_tilde(&save_file);
+    fp = strcmp(save_file,"-") ? loadpath_fopen(save_file,"w") : stdout;
+    }
+    
     if (!fp)
 	os_error(c_token, "Cannot open save file");
 
@@ -1538,18 +1522,12 @@ update_command()
     /* new parameter filename */
     char *npfname = NULL;
 
-    if (!isstring(++c_token))
+    c_token++;
+    if (!(opfname = try_to_get_string()))
 	int_error(c_token, "Parameter filename expected");
-    m_quote_capture(&opfname, c_token, c_token);
-    ++c_token;
-    if (!(END_OF_COMMAND)) {
-	if (!isstring(c_token))
-	    int_error(c_token, "New parameter filename expected");
-	else {
-	    m_quote_capture(&npfname, c_token, c_token);
-	    ++c_token;
-	}
-    }
+    if ((END_OF_COMMAND) || !(npfname = try_to_get_string()))
+	int_error(c_token, "New parameter filename expected");
+
     update(opfname, npfname);
     free(npfname);
     free(opfname);

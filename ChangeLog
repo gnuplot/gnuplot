@@ -1,3 +1,15 @@
+2004-08-08  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/util.c src/util.h: New routine try_to_get_string() that combines 
+	isstring() and m_quote_capture(). The intent is to switch call sites
+	over to using this new routine, and then extend it to handle string
+	variables as well as quoted inline string constants.
+
+	* src/contour.h: Revised declaration of contour_format[].
+
+	* src/set.c src/command.c: Begin wholesale replacement of isstring()
+	and m_quote_capture/quote_string with new routine try_to_get_string().
+
 2004-08-07  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/set.c (set_print set_output):  Do not chop whitespace from the

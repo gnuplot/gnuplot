@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util.c,v 1.47 2004/07/29 08:58:03 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: util.c,v 1.48 2004/07/29 16:34:33 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - util.c */
@@ -310,6 +310,24 @@ m_quote_capture(char **str, int start, int end)
     if (input_line[token[start].start_index] == '"')
 	parse_esc(*str);
 
+}
+
+/*
+ * Wrapper for isstring + m_quote_capture that can later be replaced
+ * by a function handling also string variables and expressions.
+ * EAM Aug 2004
+ */
+char *
+try_to_get_string()
+{
+    char *newstring = NULL;
+
+    if (!END_OF_COMMAND && isstring(c_token)) {
+	m_quote_capture(&newstring, c_token, c_token);
+	c_token++;
+    }
+
+    return newstring;
 }
 
 

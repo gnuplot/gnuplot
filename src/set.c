@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.139 2004/07/25 12:25:01 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.140 2004/08/08 04:45:35 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -954,10 +954,14 @@ set_boxwidth()
 static void
 set_clabel()
 {
+    char *new_format;
+
     c_token++;
     label_contours = TRUE;
-    if (isstring(c_token))
-	quote_str(contour_format, c_token++, 30);
+    if ((new_format = try_to_get_string())) {
+	strncpy(contour_format, new_format, sizeof(contour_format));
+	free(new_format);
+    }
 }
 
 
@@ -1153,12 +1157,8 @@ set_decimalsign()
 	if (decimalsign != NULL)
 	    free(decimalsign);
 	decimalsign=NULL;
-    } else if (!isstring(c_token)) {
+    } else if (!(decimalsign = try_to_get_string()))
 	int_error(c_token, "expecting string");
-    } else {
-	m_quote_capture(&decimalsign, c_token, c_token); /* reallocs store */
-	c_token++;
-    }
 }
 
 /* process 'set dummy' command */
@@ -1215,12 +1215,8 @@ set_fit()
 		if (fitlogfile != NULL)
 		    free(fitlogfile);
 		fitlogfile=NULL;
-	    } else if (!isstring(c_token)) {
+	    } else if (!(fitlogfile = try_to_get_string()))
 		int_error(c_token, "expecting string");
-	    } else {
-		m_quote_capture(&fitlogfile, c_token, c_token); /* reallocs store */
-		c_token++;
-	    }
 #if GP_FIT_ERRVARS
 	} else if (almost_equals(c_token, "err$orvariables")) {
 	    fit_errorvariables = TRUE;
@@ -1459,10 +1455,6 @@ set_isosamples()
 }
 
 
-/* FIXME - old bug in this parser
- * to exercise: set key left hiho
- */
-
 /* process 'set key' command */
 static void
 set_key()
@@ -1601,12 +1593,17 @@ set_key()
 		key->auto_titles = NOAUTO_KEYTITLES;
 		break;
 	    case S_KEY_TITLE:
-		if (isstring(c_token+1)) {
-		    /* We have string specified - grab it. */
-		    quote_str(key->title,++c_token, MAX_LINE_LEN);
+		{
+		char *s;
+		c_token++;
+		if ((s = try_to_get_string())) {
+		    strncpy(key->title,s,sizeof(key->title));
+		    free(s);
+		} else {
+		    key->title[0] = '\0';
+		    c_token--;
 		}
-		else
-		    key->title[0] = 0;
+		}
 		break;
 	    case S_KEY_INVALID:
 	    default:
@@ -1630,12 +1627,11 @@ set_keytitle()
     if (END_OF_COMMAND) {	/* set to default */
 	key->title[0] = NUL;
     } else {
-	if (isstring(c_token)) {
-	    /* We have string specified - grab it. */
-	    quote_str(key->title,c_token, MAX_LINE_LEN);
-	    c_token++;
+	char *s;
+	if ((s = try_to_get_string())) {
+	    strncpy(key->title,s,sizeof(key->title));
+	    free(s);
 	}
-	/* c_token++; */
     }
 }
 
@@ -1820,18 +1816,16 @@ set_fontpath()
 static void
 set_locale()
 {
+    char *s;
+
     c_token++;
     if (END_OF_COMMAND) {
 	init_locale();
-    } else if (isstring(c_token)) {
-	char *ss = gp_alloc (token_len(c_token), "tmp locale");
-	quote_str(ss,c_token,token_len(c_token));
-	set_var_locale(ss);
-	free(ss);
-	++c_token;
-    } else {
+    } else if ((s = try_to_get_string())) {
+	set_var_locale(s);
+	free(s);
+    } else
 	int_error(c_token, "expected string");
-    }
 }
 
 
@@ -1937,17 +1931,18 @@ set_separator()
 static void
 set_datafile_commentschars()
 {
+    char *s;
+
     c_token++;
-    free(df_commentschars);
+	
     if (END_OF_COMMAND) {
+	free(df_commentschars);
 	df_commentschars = gp_strdup(DEFAULT_COMMENTS_CHARS);
-	return;
-    }
-    if (!isstring(c_token))
+    } else if ((s = try_to_get_string())) {
+	free(df_commentschars);
+        df_commentschars = s;
+    } else /* Leave it the way it was */
 	int_error(c_token, "expected string with comments chars");
-    df_commentschars = gp_alloc(token_len(c_token)+1, "df_commentschars");
-    quote_str(df_commentschars, c_token, token_len(c_token)+1);
-    c_token++;
 }
 
 /* process 'set missing' command */
@@ -1956,15 +1951,10 @@ set_missing()
 {
     c_token++;
     if (END_OF_COMMAND) {
-	if (missing_val)
-	    free(missing_val);
+	free(missing_val);
 	missing_val = NULL;
-    } else {
-	if (!isstring(c_token))
-	    int_error(c_token, "expected missing-value string");
-	m_quote_capture(&missing_val, c_token, c_token);
-	c_token++;
-    }
+    } else if (!(missing_val = try_to_get_string()))
+	int_error(c_token, "expected missing-value string");
 }
 
 #ifdef USE_MOUSE
@@ -2153,6 +2143,8 @@ set_origin()
 static void
 set_output()
 {
+    char *testfile;
+
     c_token++;
     if (multiplot)
 	int_error(c_token, "you can't change the output in multiplot mode");
@@ -2163,18 +2155,12 @@ set_output()
 	    free(outstr);
 	    outstr = NULL; /* means STDOUT */
 	}
-    } else if (!isstring(c_token)) {
-	int_error(c_token, "expecting filename");
-    } else {
-	/* on int_error, we'd like to remember that this is allocated */
-	static char *testfile = NULL;
-	m_quote_capture(&testfile,c_token, c_token); /* reallocs store */
+    } else if ((testfile = try_to_get_string())) {
 	gp_expand_tilde(&testfile);
-	c_token++;
 	term_set_output(testfile);
 	/* if we get here then it worked, and outstr now = testfile */
-	testfile = NULL;
-    }
+    } else
+	int_error(c_token, "expecting filename");
 }
 
 
@@ -2183,18 +2169,13 @@ static void
 set_print()
 {
     TBOOLEAN append_p = FALSE;
+    char *testfile = NULL;
 
     c_token++;
     if (END_OF_COMMAND) {	/* no file specified */
 	print_set_output(NULL, append_p);
-    } else if (! isstring(c_token)) {
-	int_error(c_token, "expecting filename");
-    } else {
-	static char *testfile = NULL;
-
-	m_quote_capture(&testfile, c_token, c_token); /* reallocs store */
+    } else if ((testfile = try_to_get_string())) {
 	gp_expand_tilde(&testfile);
-	c_token++;
 	if (!END_OF_COMMAND) {
 	    if (equals(c_token, "append")) {
 		append_p = TRUE;
@@ -2204,7 +2185,8 @@ set_print()
 	    }
 	}
 	print_set_output(testfile, append_p);
-    }
+    } else
+	int_error(c_token, "expecting filename");
 }
 
 
