@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.69 2004/03/08 04:32:09 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.70 2004/03/23 05:40:47 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -863,16 +863,16 @@ int number;
 
 #define HEAD_COEFF  (0.3)	/* default value of head/line length ratio */
 
-int curr_arrow_headlength;    /* access head length + angle without changing API */
-double curr_arrow_headangle;  /* angle in degrees */
+int curr_arrow_headlength; /* access head length + angle without changing API */
+double curr_arrow_headangle;	/* angle in degrees */
 double curr_arrow_headbackangle;  /* angle in degrees */
-TBOOLEAN curr_arrow_headfilled; /* arrow head filled or not */
+int curr_arrow_headfilled;	/* arrow head filled or not */
 
 static void
 do_arrow(sx, sy, ex, ey, head)
-unsigned int sx, sy;		/* start point */
-unsigned int ex, ey;		/* end point (point of arrowhead) */
-TBOOLEAN head;
+    unsigned int sx, sy;	/* start point */
+    unsigned int ex, ey;	/* end point (point of arrowhead) */
+    TBOOLEAN head;
 {
     register struct termentry *t = term;
     float len_tic = ((double) (t->h_tic + t->v_tic)) / 2.0;
@@ -997,55 +997,6 @@ TBOOLEAN head;
     else
 	(*t->vector) (ex, ey);
 }
-
-#if 0				/* oiginal routine */
-#define ROOT2 (1.41421)		/* sqrt of 2 */
-
-void
-org_do_arrow(sx, sy, ex, ey, head)
-int sx, sy;			/* start point */
-int ex, ey;			/* end point (point of arrowhead) */
-TBOOLEAN head;
-{
-    register struct termentry *t = term;
-    int len = (t->h_tic + t->v_tic) / 2;	/* arrowhead size = avg of tic sizes */
-
-    /* draw the line for the arrow. That's easy. */
-    (*t->move) (sx, sy);
-    (*t->vector) (ex, ey);
-
-    if (head) {
-	/* now draw the arrow head. */
-	/* we put the arrowhead marks at 45 degrees to line */
-	if (sx == ex) {
-	    /* vertical line, special case */
-	    int delta = ((float) len / ROOT2 + 0.5);
-	    if (sy < ey)
-		delta = -delta;	/* up arrow goes the other way */
-	    (*t->move) (ex - delta, ey + delta);
-	    (*t->vector) (ex, ey);
-	    (*t->vector) (ex + delta, ey + delta);
-	} else {
-	    int dx = sx - ex;
-	    int dy = sy - ey;
-	    double coeff = len / sqrt(2.0 * ((double) dx * (double) dx
-					     + (double) dy * (double) dy));
-	    int x, y;		/* one endpoint */
-
-	    x = (int) (ex + (dx + dy) * coeff);
-	    y = (int) (ey + (dy - dx) * coeff);
-	    (*t->move) (x, y);
-	    (*t->vector) (ex, ey);
-
-	    x = (int) (ex + (dx - dy) * coeff);
-	    y = (int) (ey + (dy + dx) * coeff);
-	    (*t->vector) (x, y);
-	}
-    }
-}
-
-#endif /* original routine */
-
 
 #define TERM_PROTO
 #define TERM_BODY
