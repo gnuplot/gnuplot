@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.98 2005/01/11 17:37:15 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.99 2005/02/01 11:28:51 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -803,12 +803,14 @@ term_apply_lp_properties(struct lp_style_type *lp)
      *  The linetype might depend on the linewidth in some terminals.
      */
     (*term->linewidth) (lp->l_width);
+
+    /* Apply "linetype", which can include both color and dot/dash */
+    (*term->linetype) (lp->l_type);
 #ifdef PM3D
+    /* Possibly override the linetype color with a fancier colorspec */
     if (lp->use_palette)
 	apply_pm3dcolor(&lp->pm3d_color, term);
-    else
 #endif
-	(*term->linetype) (lp->l_type);
 }
 
 

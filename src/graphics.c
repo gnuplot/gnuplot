@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.144 2005/01/12 04:41:39 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.145 2005/02/02 07:14:03 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -3036,12 +3036,11 @@ plot_boxes(struct curve_points *plot, int xaxis_y)
 		(*t->vector) (xl, yb);
 #if USE_ULIG_FILLEDBOXES
 		if( t->fillbox && plot->fill_properties.border_linetype != LT_UNDEFINED) {
+		    (*t->linetype)(plot->lp_properties.l_type);
 #ifdef PM3D
 		    if (plot->lp_properties.use_palette)
 			apply_pm3dcolor(&plot->lp_properties.pm3d_color,t);
-		    else
 #endif
-			(*t->linetype)(plot->lp_properties.l_type);
 		}
 #endif
 		break;
@@ -4539,13 +4538,12 @@ do_key_sample(
 	}
     }
 
-    /* Draw sample in same color as the corresponding plot */
+    /* Draw sample in same style and color as the corresponding plot */
+    (*t->linetype)(this_plot->lp_properties.l_type);
 #ifdef PM3D
     if (this_plot->lp_properties.use_palette)
 	apply_pm3dcolor(&this_plot->lp_properties.pm3d_color,t);
-    else
 #endif
-	(*t->linetype)(this_plot->lp_properties.l_type);
 
     /* draw sample depending on bits set in plot_style */
 #if USE_ULIG_FILLEDBOXES
@@ -4575,12 +4573,11 @@ do_key_sample(
 	    (*t->vector)(xl + key_sample_left,  yl - key_entry_height/4);
 	}
 	if (fs->fillstyle != FS_EMPTY && fs->border_linetype != LT_UNDEFINED) {
+	    (*t->linetype)(this_plot->lp_properties.l_type);
 #ifdef PM3D
 	    if (this_plot->lp_properties.use_palette)
 		apply_pm3dcolor(&this_plot->lp_properties.pm3d_color,t);
-	    else
 #endif
-		(*t->linetype)(this_plot->lp_properties.l_type);
 	}
     } else
 #endif

@@ -1,3 +1,10 @@
+2005-02-04  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/graphics.c (do_key_sample plot_boxes)
+	src/term.c (term_apply_lp_properties):
+	Apply linetype properties (color *AND* dot/dash/solid) before applying
+	pm3d color, if any.
+
 2005-02-02  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/plot3d.c (get_3ddata): Ignore blank lines in data file input to
@@ -6,7 +13,7 @@
 	* src/set.c (set_xyzlabel): Allow set label textcolor rgb <foo>.
 
 	* src/gplt_x11.c (display): Always initialize gc_pm3d, in case we need
-	it to handle individual rgb colors even in the absense of a palette.
+	it to handle individual rgb colors even in the absence of a palette.
 
 	* src/save.c (save_textcolor) src/save.h 
 	src/show.c (show_label show_xyzlabel): Export save_textcolor() so
