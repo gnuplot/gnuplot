@@ -655,7 +655,7 @@ static char GPFAR psi1[] = "%%%%Creator: gnuplot %s patchlevel %s\n\
 %%%%CreationDate: %s\
 %%%%DocumentFonts: %s\n";
 static char GPFAR psi2[] = "%%%%EndComments\n\
-/gnudict 120 dict def\ngnudict begin\n\
+/gnudict 256 dict def\ngnudict begin\n\
 /Color %s def\n\
 /Solid %s def\n\
 /gnulinewidth %.3f def\n\
