@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: command.c,v 1.20.2.1 1999/08/19 14:42:21 lhecking Exp $";
+static char *RCSid = "$Id: command.c,v 1.20.2.2 1999/12/09 18:42:40 lhecking Exp $";
 #endif
 
 /* GNUPLOT - command.c */
@@ -961,8 +961,8 @@ int toplevel;
     /* huge static variables (1k each). Instead we dynamically allocate them */
     /* on the first call to this function...                                 */
     if (helpbuf == NULL) {
-	helpbuf = gp_alloc((unsigned long) MAX_LINE_LEN, "help buffer");
-	prompt = gp_alloc((unsigned long) MAX_LINE_LEN, "help prompt");
+	helpbuf = gp_alloc(MAX_LINE_LEN, "help buffer");
+	prompt = gp_alloc(MAX_LINE_LEN, "help prompt");
 	helpbuf[0] = prompt[0] = 0;
     }
     if (toplevel)

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: misc.c,v 1.15.2.2 1999/09/29 17:17:27 lhecking Exp $";
+static char *RCSid = "$Id: misc.c,v 1.15.2.3 2000/10/18 13:42:55 broeker Exp $";
 #endif
 
 /* GNUPLOT - misc.c */
@@ -100,12 +100,12 @@ int num;
 {
     struct curve_points *cp;
 
-    cp = (struct curve_points *) gp_alloc((unsigned long) sizeof(struct curve_points), "curve");
+    cp = (struct curve_points *) gp_alloc(sizeof(struct curve_points), "curve");
     cp->p_max = (num >= 0 ? num : 0);
 
     if (num > 0) {
 	cp->points = (struct coordinate GPHUGE *)
-	    gp_alloc((unsigned long) num * sizeof(struct coordinate), "curve points");
+	    gp_alloc(num * sizeof(struct coordinate), "curve points");
     } else
 	cp->points = (struct coordinate GPHUGE *) NULL;
     cp->next_cp = NULL;
@@ -138,7 +138,7 @@ int num;
     if (num > 0) {
 	if (cp->points == NULL) {
 	    cp->points = (struct coordinate GPHUGE *)
-		gp_alloc((unsigned long) num * sizeof(struct coordinate), "curve points");
+		gp_alloc(num * sizeof(struct coordinate), "curve points");
 	} else {
 	    cp->points = (struct coordinate GPHUGE *)
 		gp_realloc(cp->points, (unsigned long) num * sizeof(struct coordinate), "expanding curve points");
@@ -178,11 +178,11 @@ struct iso_curve *
 int num;
 {
     struct iso_curve *ip;
-    ip = (struct iso_curve *) gp_alloc((unsigned long) sizeof(struct iso_curve), "iso curve");
+    ip = (struct iso_curve *) gp_alloc(sizeof(struct iso_curve), "iso curve");
     ip->p_max = (num >= 0 ? num : 0);
     if (num > 0) {
 	ip->points = (struct coordinate GPHUGE *)
-	    gp_alloc((unsigned long) num * sizeof(struct coordinate), "iso curve points");
+	    gp_alloc(num * sizeof(struct coordinate), "iso curve points");
     } else
 	ip->points = (struct coordinate GPHUGE *) NULL;
     ip->next = NULL;
@@ -212,10 +212,10 @@ int num;
     if (num > 0) {
 	if (ip->points == NULL) {
 	    ip->points = (struct coordinate GPHUGE *)
-		gp_alloc((unsigned long) num * sizeof(struct coordinate), "iso curve points");
+		gp_alloc(num * sizeof(struct coordinate), "iso curve points");
 	} else {
 	    ip->points = (struct coordinate GPHUGE *)
-		gp_realloc(ip->points, (unsigned long) num * sizeof(struct coordinate), "expanding curve points");
+		gp_realloc(ip->points, num * sizeof(struct coordinate), "expanding curve points");
 	}
 	ip->p_max = num;
     } else {
@@ -252,7 +252,7 @@ int num_samp_1, num_iso_1, num_samp_2, num_iso_2;
 {
     struct surface_points *sp;
 
-    sp = (struct surface_points *) gp_alloc((unsigned long) sizeof(struct surface_points), "surface");
+    sp = (struct surface_points *) gp_alloc(sizeof(struct surface_points), "surface");
     sp->next_sp = NULL;
     sp->title = NULL;
     sp->contours = NULL;
@@ -1113,9 +1113,9 @@ TBOOLEAN can_do_args;
 		if (can_do_args) {
 		    register int il = 0;
 		    register char *rl;
-		    char *raw_line = rl = gp_alloc((unsigned long) strlen(input_line) + 1, "string");
+		    char *raw_line = gp_strdup(input_line);
 
-		    strcpy(raw_line, input_line);
+		    rl = raw_line;
 		    *input_line = '\0';
 		    while (*rl) {
 			register int aix;
@@ -1198,7 +1198,7 @@ FILE *fp;
     LFS *lf;
     int argindex;
 
-    lf = (LFS *) gp_alloc((unsigned long) sizeof(LFS), (char *) NULL);
+    lf = (LFS *) gp_alloc(sizeof(LFS), (char *) NULL);
     if (lf == (LFS *) NULL) {
 	if (fp != (FILE *) NULL)
 	    (void) fclose(fp);	/* it won't be otherwise */

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: contour.c,v 1.9 1998/12/03 22:23:46 lhecking Exp $";
+static char *RCSid = "$Id: contour.c,v 1.9.2.1 1999/12/02 20:39:28 lhecking Exp $";
 #endif
 
 /* GNUPLOT - contour.c */
@@ -289,10 +289,10 @@ static void end_crnt_cntr()
 {
     int i;
     struct gnuplot_contours *cntr = (struct gnuplot_contours *)
-    gp_alloc((unsigned long) sizeof(struct gnuplot_contours), "gnuplot_contour");
+	gp_alloc(sizeof(struct gnuplot_contours), "gnuplot_contour");
     cntr->coords = (struct coordinate GPHUGE *)
-	gp_alloc((unsigned long) sizeof(struct coordinate)
-		 * (unsigned long) crnt_cntr_pt_index, "contour coords");
+	gp_alloc(sizeof(struct coordinate) * crnt_cntr_pt_index,
+		 "contour coords");
 
     for (i = 0; i < crnt_cntr_pt_index; i++) {
 	cntr->coords[i].x = crnt_cntr[i * 2];
@@ -501,7 +501,7 @@ double z_level;
     t = (t > 1.0 ? 1.0 : t);
 
     p_cntr = (struct cntr_struct *)
-	gp_alloc((unsigned long) sizeof(struct cntr_struct), "contour cntr_struct");
+	gp_alloc(sizeof(struct cntr_struct), "contour cntr_struct");
 
     p_cntr->X = p_edge->vertex[1]->x * t +
 	p_edge->vertex[0]->x * (1 - t);
@@ -734,7 +734,7 @@ struct edge_struct **p_edge, **pe_tail;  /* pointers to edge list in/out */
 #endif
 
 	pe_temp = (struct edge_struct *)
-	    gp_alloc((unsigned long) sizeof(struct edge_struct), "contour edge");
+	    gp_alloc(sizeof(struct edge_struct), "contour edge");
 
 	pe_temp->poly[0] = NULL;	/* clear links           */
 	pe_temp->poly[1] = NULL;
@@ -769,7 +769,7 @@ struct poly_struct **p_poly, **pp_tail;	/* pointers to polygon list in/out */
     if (edge0 && edge1 && edge2) {
 
 	pp_temp = (struct poly_struct *)
-	    gp_alloc((unsigned long) sizeof(struct poly_struct), "contour polygon");
+	    gp_alloc(sizeof(struct poly_struct), "contour polygon");
 
 	pp_temp->edge[0] = edge0;	/* First edge of triangle */
 	pp_temp->edge[1] = edge1;	/* Second one             */
@@ -910,11 +910,11 @@ int contr_kind;
 	}
     }
     delta_t = (double *)
-	gp_alloc((unsigned long) (sizeof(double) * num_pts), "contour delta_t");
+	gp_alloc((sizeof(double) * num_pts), "contour delta_t");
     d2x = (double *)
-	gp_alloc((unsigned long) (sizeof(double) * num_pts), "contour d2x");
+	gp_alloc((sizeof(double) * num_pts), "contour d2x");
     d2y = (double *)
-	gp_alloc((unsigned long) (sizeof(double) * num_pts), "contour d2y");
+	gp_alloc((sizeof(double) * num_pts), "contour d2y");
 
     /* Width and hight of the grid is used at unit length (2d-norm) */
     unit_x = xx_max - x_min;
@@ -1042,7 +1042,7 @@ double unit_x, unit_y;	/* Unit length in x and y (norm=1), input */
     struct cntr_struct *pc_temp;
 
     m = (tri_diag *)
-	gp_alloc((unsigned long) (sizeof(tri_diag) * num_pts), "contour tridiag m");
+	gp_alloc((sizeof(tri_diag) * num_pts), "contour tridiag m");
 
     /*
      * Calculate first differences in (d2x[i], d2y[i]) and interval lengths
@@ -1402,9 +1402,9 @@ double *x, *y;
     double ti, tikp, *dx, *dy;	/* Copy p_cntr into it to make it faster. */
 
     dx = (double *)
-	gp_alloc((unsigned long) (sizeof(double) * (order + j)), "contour b_spline");
+	gp_alloc((sizeof(double) * (order + j)), "contour b_spline");
     dy = (double *)
-	gp_alloc((unsigned long) (sizeof(double) * (order + j)), "contour b_spline");
+	gp_alloc((sizeof(double) * (order + j)), "contour b_spline");
 
     /* Set the dx/dy - [0] iteration step, control points (p==0 iterat.): */
     for (i = j - order; i <= j; i++) {

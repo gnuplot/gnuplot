@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: plot2d.c,v 1.16.2.10 2000/10/20 19:01:32 lhecking Exp $";
+static char *RCSid = "$Id: plot2d.c,v 1.16.2.11 2001/03/03 17:32:42 lhecking Exp $";
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -1476,7 +1476,7 @@ int *plot_num;
 	    /* Ok, fix up the title to include both the xp and yp plots. */
 	    if (xp->title && xp->title[0] != '\0' && yp->title) {
 		tlen = strlen(yp->title) + strlen(xp->title) + 3;
-		new_title = gp_alloc((unsigned long) tlen, "string");
+		new_title = gp_alloc(tlen, "string");
 		strcpy(new_title, xp->title);
 		strcat(new_title, ", ");	/* + 2 */
 		strcat(new_title, yp->title);	/* + 1 = + 3 */

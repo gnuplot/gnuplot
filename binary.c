@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: binary.c,v 1.10 1998/04/14 00:14:49 drd Exp $";
+static char *RCSid = "$Id: binary.c,v 1.4 1998/11/04 14:52:39 lhecking Exp $";
 #endif
 
 /*
@@ -212,7 +212,7 @@ register int nl, nh;
 {
     register float GPFAR *vec;
 
-    if (!(vec = (float GPFAR *) gp_alloc((unsigned long) (nh - nl + 1) * sizeof(float), NULL))) {
+    if (!(vec = (float GPFAR *) gp_alloc((nh - nl + 1) * sizeof(float), NULL))) {
 	int_error("not enough memory to create vector", NO_CARET);
 	return NULL;		/* Not reached */
     }
@@ -286,11 +286,11 @@ register int nrl, nrh, ncl, nch;
     register int i;
     register float GPFAR *GPFAR * m;
 
-    m = (float GPFAR * GPFAR *) gp_alloc((unsigned long) (nrh - nrl + 1) * sizeof(float GPFAR *), "matrix");
+    m = (float GPFAR * GPFAR *) gp_alloc((nrh - nrl + 1) * sizeof(float GPFAR *), "matrix");
     m -= nrl;
 
     for (i = nrl; i <= nrh; i++) {
-	if (!(m[i] = (float GPFAR *) gp_alloc((unsigned long) (nch - ncl + 1) * sizeof(float), NULL))) {
+	if (!(m[i] = (float GPFAR *) gp_alloc((nch - ncl + 1) * sizeof(float), NULL))) {
 	    free_matrix(m, nrl, i - 1, ncl, nch);
 	    int_error("not enough memory to create matrix", NO_CARET);
 	    return NULL;
@@ -344,7 +344,7 @@ register int srh, sch;
 	}
     }
     for (i = nrh + 1; i <= srh; i++) {
-	if (!(m[i] = (float GPFAR *) gp_alloc((unsigned long) (nch - ncl + 1) * sizeof(float), NULL))) {
+	if (!(m[i] = (float GPFAR *) gp_alloc((nch - ncl + 1) * sizeof(float), NULL))) {
 	    free_matrix(m, nrl, i - 1, nrl, sch);
 	    int_error("not enough memory to extend matrix", NO_CARET);
 	    return NULL;
@@ -402,7 +402,7 @@ register int nrl, nrh, ncl, nch;
 
     nrow = nrh - nrl + 1;
     ncol = nch - ncl + 1;
-    m = (float GPFAR * GPFAR *) gp_alloc((unsigned long) (nrh - nrl + 1) * sizeof(float GPFAR *), "convert_matrix");
+    m = (float GPFAR * GPFAR *) gp_alloc((nrh - nrl + 1) * sizeof(float GPFAR *), "convert_matrix");
     m -= nrl;
 
     m[nrl] = a - ncl;

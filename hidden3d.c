@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: hidden3d.c,v 1.13.2.2 1999/11/17 18:12:41 lhecking Exp $";
+static char *RCSid = "$Id: hidden3d.c,v 1.13.2.3 2000/06/08 15:29:03 broeker Exp $";
 #endif
 
 /* GNUPLOT - hidden3d.c */
@@ -654,8 +654,7 @@ void init_hidden_line_removal()
 	yfact = 1;
     if (pnt == 0) {
 	i = XREDUCE(xright) - XREDUCE(xleft) + 1;
-	pnt = (tp_pnt *) gp_alloc(
-		     (unsigned long) (i * sizeof(tp_pnt)), "hidden pnt");
+	pnt = (tp_pnt *) gp_alloc(i * sizeof(tp_pnt), "hidden pnt");
 	while (--i >= 0)
 	    pnt[i] = (tp_pnt) 0;
     }
@@ -913,7 +912,7 @@ long *v, line, next, next_frag;
     (v) = 0; /* flag this as undefined */ \
     (c) = (border) = 0; \
   } else {\
-  (v) = (long *) gp_alloc ((unsigned long) sizeof (long) * (n), "hidden PREPARE_POLYGON"); \
+  (v) = (long *) gp_alloc (sizeof (long) * (n), "hidden PREPARE_POLYGON"); \
   (v)[0] = vert_free + (i0);\
   (v)[1] = vert_free + (i1);\
   (v)[2] = vert_free + (i2);\
@@ -985,9 +984,9 @@ int pcount;
 	}
     }
     vlist = (struct Vertex GPHUGE *)
-	gp_alloc((unsigned long) sizeof(struct Vertex) * nvert, "hidden vlist");
+	gp_alloc(sizeof(struct Vertex) * nvert, "hidden vlist");
     plist = (struct Polygon GPHUGE *)
-	gp_alloc((unsigned long) sizeof(struct Polygon) * npoly, "hidden plist");
+	gp_alloc(sizeof(struct Polygon) * npoly, "hidden plist");
 
     /* initialize vlist: */
     for (vert_free = 0, this_plot = plots, surface = 0;
@@ -1253,7 +1252,7 @@ int pcount;
 		    vert_free++;
 		    break;
 		case DOTS:
-		    v1 = (long *) gp_alloc((unsigned long) sizeof(long) * 1,
+		    v1 = (long *) gp_alloc(sizeof(long) * 1,
 					   "hidden v1 for dots");
 		    v1[0] = vert_free++;
 		    CHECK_PLIST();
@@ -1269,7 +1268,7 @@ int pcount;
 		case FINANCEBARS:
 		case POINTSTYLE:
 		case VECTOR:
-		    v1 = (long *) gp_alloc((unsigned long) sizeof(long) * 1,
+		    v1 = (long *) gp_alloc(sizeof(long) * 1,
 					   "hidden v1 for point");
 		    v1[0] = vert_free++;
 		    CHECK_PLIST();
@@ -1279,7 +1278,7 @@ int pcount;
 		case BOXES:	/* handle as IMPULSES */
 		case IMPULSES:
 		    n1 = 2;
-		    v1 = (long *) gp_alloc((unsigned long) sizeof(long) * n1,
+		    v1 = (long *) gp_alloc(sizeof(long) * n1,
 					   "hidden v1 for impulse");
 		    v1[0] = vert_free++;
 		    v1[1] = vert_free++;
@@ -1304,7 +1303,7 @@ static void sort_by_zmax()
 {
     long *sortarray, i;
     struct Polygon GPHUGE *this;
-    sortarray = (long *) gp_alloc((unsigned long) sizeof(long) * pfree, "hidden sortarray");
+    sortarray = (long *) gp_alloc(sizeof(long) * pfree, "hidden sortarray");
     for (i = 0; i < pfree; i++)
 	sortarray[i] = i;
     qsort(sortarray, (size_t) pfree, sizeof(long), compare_by_zmax);
@@ -1945,10 +1944,8 @@ TBOOLEAN f;			/* return value = Front(1) or Back(0) */
     /* We need two new polygons instead of the old one: */
     n1 = p->n - cross2 + cross1 + 2;
     n2 = cross2 - cross1 + 2;
-    v1 = (long *) gp_alloc((unsigned long) sizeof(long) * n1,
-			   "hidden v1 for two new poly");
-    v2 = (long *) gp_alloc((unsigned long) sizeof(long) * n2,
-			   "hidden v2 for two new poly");
+    v1 = (long *) gp_alloc(sizeof(long) * n1, "hidden v1 for two new poly");
+    v2 = (long *) gp_alloc(sizeof(long) * n2, "hidden v2 for two new poly");
 #if SHOW_SPLITTING_EDGES
     line1 = 1L << (n1 - 1);
     line2 = 1L << (n2 - 1);
@@ -2226,8 +2223,7 @@ static GP_INLINE void init_Cross_store()
     last_Cross_store = CROSS_STORE_INCREASE;
     free_Cross_store = 0;
     Cross_store = (struct Cross *)
-	gp_alloc((unsigned long) last_Cross_store * sizeof(struct Cross),
-		 "hidden cross store");
+	gp_alloc(last_Cross_store * sizeof(struct Cross), "hidden cross store");
 }
 
 static GP_INLINE unsigned int 
@@ -2678,7 +2674,7 @@ struct Polygon GPHUGE *p;
 	    if (ymin_hl[i] == HL_EXTENT_Y_MAX)
 		graph_error("Logic error #2 in hidden line");
 	    if (pnt[i] == 0) {
-		pnt[i] = (t_pnt *) gp_alloc((unsigned long) y_malloc, "hidden ymalloc");
+		pnt[i] = (t_pnt *) gp_alloc(y_malloc, "hidden ymalloc");
 		memset(pnt[i], 0, (size_t) y_malloc);
 	    }
 	    if (ymin_hl[i] < 0 || ymax_hl[i] > YREDUCE(ytop) - YREDUCE(ybot))
@@ -2725,8 +2721,8 @@ int pcount;
     y_malloc = (2 + (YREDUCE(ytop) >> 4) - (YREDUCE(ybot) >> 4)) * sizeof(t_pnt);
     /* ymin_hl, ymax_hl: */
     i = sizeof(t_hl_extent_y) * (XREDUCE(xright) - XREDUCE(xleft) + 1);
-    ymin_hl = (t_hl_extent_y *) gp_alloc((unsigned long) i, "hidden ymin_hl");
-    ymax_hl = (t_hl_extent_y *) gp_alloc((unsigned long) i, "hidden ymax_hl");
+    ymin_hl = (t_hl_extent_y *) gp_alloc(i, "hidden ymin_hl");
+    ymax_hl = (t_hl_extent_y *) gp_alloc(i, "hidden ymax_hl");
     for (i = (XREDUCE(xright) - XREDUCE(xleft)); i >= 0; i--) {
 	ymin_hl[i] = HL_EXTENT_Y_MAX;
 	ymax_hl[i] = 0;
@@ -2736,8 +2732,7 @@ int pcount;
     init_Cross_store();
     i = XREDUCE(xright) - XREDUCE(xleft) + 1;
     hl_buffer = (unsigned int GPHUGE *)
-	gp_alloc((unsigned long) (i * sizeof(unsigned int)),
-						  "hidden hl_buffer");
+	gp_alloc(i * sizeof(unsigned int), "hidden hl_buffer");
     while (--i >= 0)
 	hl_buffer[i] = (unsigned int) -1;
 

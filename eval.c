@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: eval.c,v 1.15 1998/03/22 22:31:30 drd Exp $";
+static char *RCSid = "$Id: eval.c,v 1.2 1998/11/03 12:52:12 lhecking Exp $";
 #endif
 
 /* GNUPLOT - eval.c */
@@ -53,7 +53,7 @@ int t_num;
     }
 
     *udv_ptr = (struct udvt_entry *)
-	gp_alloc((unsigned long) sizeof(struct udvt_entry), "value");
+	gp_alloc(sizeof(struct udvt_entry), "value");
     (*udv_ptr)->next_udv = NULL;
     copy_str((*udv_ptr)->udv_name, t_num, MAX_ID_LEN);
     (*udv_ptr)->udv_value.type = INTGR;		/* not necessary, but safe! */
@@ -85,7 +85,7 @@ int t_num;			/* index to token[] */
     /* create and return a new udf slot */
 
     *udf_ptr = (struct udft_entry *)
-	gp_alloc((unsigned long) sizeof(struct udft_entry), "function");
+	gp_alloc(sizeof(struct udft_entry), "function");
     (*udf_ptr)->next_udf = (struct udft_entry *) NULL;
     (*udf_ptr)->definition = NULL;
     (*udf_ptr)->at = NULL;

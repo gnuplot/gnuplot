@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: set.c,v 1.21.2.4 2000/05/07 16:46:56 lhecking Exp $";
+static char *RCSid = "$Id: set.c,v 1.21.2.5 2000/10/18 13:42:55 broeker Exp $";
 #endif
 
 /* GNUPLOT - set.c */
@@ -2350,7 +2350,7 @@ static void set_label()
     } else {
 	/* adding the label */
 	new_label = (struct text_label *)
-	    gp_alloc((unsigned long) sizeof(struct text_label), "label");
+	    gp_alloc(sizeof(struct text_label), "label");
 	if (prev_label != NULL)
 	    prev_label->next = new_label;	/* add it to end of list */
 	else
@@ -2543,7 +2543,7 @@ static void set_arrow()
     } else {
 	/* adding the arrow */
 	new_arrow = (struct arrow_def *)
-	    gp_alloc((unsigned long) sizeof(struct arrow_def), "arrow");
+	    gp_alloc(sizeof(struct arrow_def), "arrow");
 	if (prev_arrow != NULL)
 	    prev_arrow->next = new_arrow;	/* add it to end of list */
 	else
@@ -2669,7 +2669,7 @@ static void set_linestyle()
     } else {
 	/* adding the linestyle */
 	new_linestyle = (struct linestyle_def *)
-	    gp_alloc((unsigned long) sizeof(struct linestyle_def), "linestyle");
+	    gp_alloc(sizeof(struct linestyle_def), "linestyle");
 	if (prev_linestyle != NULL)
 	    prev_linestyle->next = new_linestyle;	/* add it to end of list */
 	else
@@ -2860,7 +2860,7 @@ struct ticdef *tdef;
 
     while (!END_OF_COMMAND) {
 	/* parse a new ticmark */
-	tic = (struct ticmark *) gp_alloc((unsigned long) sizeof(struct ticmark), (char *) NULL);
+	tic = (struct ticmark *) gp_alloc(sizeof(struct ticmark), (char *) NULL);
 	if (tic == (struct ticmark *) NULL) {
 	    free_marklist(list);
 	    int_error("out of memory for tic mark", c_token);
@@ -2874,7 +2874,7 @@ struct ticdef *tdef;
 	if (isstring(c_token) &&
 	    (datatype[axis] != TIME || isstring(c_token + 1))) {
 	    quote_str(temp_string, c_token, MAX_LINE_LEN);
-	    tic->label = gp_alloc((unsigned long) strlen(temp_string) + 1, "tic label");
+	    tic->label = gp_alloc(strlen(temp_string) + 1, "tic label");
 	    (void) strcpy(tic->label, temp_string);
 	    c_token++;
 	} else

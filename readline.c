@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: readline.c,v 1.9 1998/11/03 12:53:59 lhecking Exp $";
+static char *RCSid = "$Id: readline.c,v 1.9.2.1 1999/08/19 14:38:07 lhecking Exp $";
 #endif
 
 /* GNUPLOT - readline.c */
@@ -364,7 +364,7 @@ char *prompt;
 	free(cur_line);
 	line_len = 0;
     }
-    cur_line = gp_alloc((unsigned long) MAXBUF, "readline");
+    cur_line = gp_alloc(MAXBUF, "readline");
     line_len = MAXBUF;
 
     /* set the termio so we can do our own input processing */
@@ -731,8 +731,8 @@ char *line;
 	entry = entry->prev;
     }				/* end of not-storing duplicated entries */
 
-    entry = (struct hist *) gp_alloc((unsigned long) sizeof(struct hist), "history");
-    entry->line = gp_alloc((unsigned long) (strlen(line) + 1), "history");
+    entry = (struct hist *) gp_alloc(sizeof(struct hist), "history");
+    entry->line = gp_alloc((strlen(line) + 1), "history");
     strcpy(entry->line, line);
 
     entry->prev = history;
