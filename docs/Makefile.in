@@ -162,9 +162,13 @@ doc2gih: doc2gih.o termdoc.o
 	$(LINK) doc2gih.o termdoc.o $(LIBS)
 
 # To include all terminals in the .gih file
-allgih: doc2gih.c allterm.h
+allgih: alldoc2gih $(srcdir)/gnuplot.doc
+	@rm -f doc2gih
+	./alldoc2gih $(srcdir)/gnuplot.doc gnuplot.gih
+
+alldoc2gih: doc2gih.c termdoc.o allterm.h
 	$(COMPILE) -DALL_TERM_DOC -c doc2gih.c
-	$(MAKE) gih
+	$(LINK) doc2gih.o termdoc.o $(LIBS)
 
 # this is how to make Info documentation
 info: gnuplot.info
@@ -232,7 +236,7 @@ clean:
 	rm -f doc2tex gnuplot.tex gnuplot.dvi \
 	  gnuplot.aux gnuplot.log gnuplot.toc \
 	  gnuplot.ps gpcard.dvi gpcard.log gpcard.ps \
-	  doc2gih gnuplot.gih \
+	  alldoc2gih doc2gih gnuplot.gih \
 	  doc2hlp gnuplot.hlp \
 	  doc2html gnuplot.html \
 	  doc2info gnuplot.info* gpltinfo.tex \
