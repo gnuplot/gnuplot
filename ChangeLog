@@ -1,3 +1,9 @@
+2003-12-16  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* docs/gnuplot.doc: Changes in "What is New in 4.0".
+
+	* src/mouse.c (bind_display): Minor change in the hotkey help.
+
 2003-12-15  Ethan Merritt  <merritt@u.washington.edu>
 
 	* demo/Makefile.am.in demo/webify.pl demo/airfoil.dem demo/prob2.dem:

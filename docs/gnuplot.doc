@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.195 2003/12/13 00:56:28 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.196 2003/12/15 07:52:14 mikulik Exp $
 C 18 September 2001
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001   Thomas Williams, Colin Kelley et al.
 C
@@ -184,42 +184,80 @@ C
 
 2 What is New in Version 4.0
 ?new-features
- The previous official release of gnuplot was version 3.7.  Gnuplot version 4.0
- contains many new features, which were gradually introduced into a series of  
- development snapshots 3.8a through 3.8k.  This section lists major
- additions and gives a partial list of changes and minor new features.
- Sample gnuplot scripts demonstrating many of these features are provided
- in the gnuplot distribution, and are referred to here by name.
+ The previous official release of gnuplot was version 3.7, with subversions up to
+ 3.7.3. Gnuplot version 4.0 contains many new features, which were gradually
+ introduced into a series of development snapshots 3.8a through 3.8k. This
+ section lists major additions and gives a partial list of changes and minor
+ new features. Sample gnuplot scripts demonstrating many of these features are
+ provided in the gnuplot distribution, and are referred to here by name.
 
-3 Mouse support
+3 Mouse and hotkey support in interactive terminals
 
- Interaction with the current plot via mouse and hotkey input is supported for
- the X11, OS/2, ggi and windows terminals. See `mouse input` for more 
- information on mousing. See `help bind` for information on hotkeys. Also see 
- the documentation for individual mousing terminals `ggi`, `pm`, `windows` and 
- `x11`.
+ Interaction with the current plot via mouse and hotkeys is supported for
+ the X11, OS/2 Presentation Manager, ggi and windows terminals. See
+ `mouse input` for more information on mousing. See `help bind` for information
+ on hotkeys. Also see the documentation for individual mousing terminals `ggi`,
+ `pm`, `windows` and `x11`.
+
+ Here are briefly some useful hotkeys.
+ Hit 'h' in the interactive interval for help. Hit 'm' to switch mousing on/off.
+ Hit 'g' for grid, 'l' for log and 'e' for replot.
+ Hit 'r' for ruler to measure peak distances (linear scale) or peak ratios (log
+ scale), and '5' for polar coordinates inside a map.
+ Zoom by mouse (MB3), and move in the zoom history by 'p', 'u', 'n'; hit 'a' for
+ autoscale.
+ Use other mouse buttons to put current mouse coordinates to clipboard (double
+ click of MB1), add temporarily or permanently labels to the plot (middle mouse
+ button MB2).
+ Rotate a 3D surface by mouse. 
+ Hit spacebar to switch to the gnuplot command window.
 
  Sample script: mousevariables.dem
 
-3 New plotting style PM3D
+3 News in terminals
 
- The `splot` command is now capable of plotting generates 2D and 3D surfaces 
- coloured by greyscale or color palettes. See `help pm3d`, `set palette`, 
+ `aqua`: New terminal for Mac OS X.
+ 
+ `epslatex`: New terminal. Prepares eps figures for inclusion in LaTeX documents.
+
+ `gif`: Support for this terminal has been dropped in favour of the `png`
+ format for legal reasons; under usual configure conditions, `png` file is
+ written instead of `gif`.
+
+ `ggi`: New full-screen interactive terminal for Linux. Interface to the
+ General Graphics Interface Library.
+
+ `pdf`: New terminal exporting Adobe Portable Document Format. Requires libpdf.
+
+ `png` and `jpeg`: Support for both PNG and JPEG image output is provided by a
+ a new driver via libgd. The new driver supports many more features than the
+ old png driver, including TrueType fonts. Requires libgd.
+
+ `postscript`: The PostScript driver now provides an oblique symbol font, and
+ allows run-time inclusion of embedded PostScript fonts. It also supports
+ ISO-8859-2 and CP-852 character encodings. See `postscript fontfile`.
+
+ Sample script: fontfile.dem
+
+ `svg`: New terminal exporting Scalable Vector Graphics.
+
+ `x11`: The X-windows driver now allows you to specify fonts, see
+ `set term x11 x11_fonts`. There is no longer a limit to the number of x11 plot
+ windows opened simultaneously, and each plot window can be given its own
+ title. See `set term x11`.
+
+3 New plot style `pm3d`
+
+ The `splot` command is now capable of plotting 2D maps and 3D surfaces 
+ colored by greyscale or color palettes. See `help pm3d`, `set palette`, 
  `set cbrange`, `set view map`, `set colorbox` and `test palette`.
 
- Sample script: pm3d.dem
-
-3 New terminal types
-
-  epslatex - prepares eps figures for inclusion in latex documents
-  ggi      - interface to the General Graphics Interface Library
-  pdf      - Adobe Portable Document Format, requires libpdf 
-  png/jpeg - Support for both PNG and JPEG image output is provided by a
-             a new driver via libgd. The new driver supports many more features
-             than the old png driver, including TrueType fonts. Requires libgd.
-  svg      - Scalable Vector Graphics
+ Sample scripts: pm3d.dem pm3dcolors.dem pm3dgamma.dem
 
 3 New plot style `filledcurves`
+
+ The style `filledcurves` allows to fill an area between the drawn curve and a
+ horizontal line.
 
  Sample script: fillcrvs.dem
 
@@ -249,14 +287,11 @@ C
 
  Sample scripts: textcolor.dem textrotate.dem
 
-3 Data file format
+3 More text encodings
 
- The new `set datafile` command can be used to specify information about the
- format of input data files, including the characters used to separate fields, 
- to indicate comment lines, and to specify missing data.  Gnuplot now attempts 
- to recognize text fields with embedded blanks as single entities based on the 
- datafile format settings.  This allows input from csv (comma-separated value)
- files. See `set datafile`.
+ Several terminals, including `postscript`, `x11` and `pm`, support more text
+ `encodings`: ISO Latin 1, ISO Latin 2, KOI8R (cyrillic), and miscellaneous
+ codepages. See `encoding` for more details.
 
 3 Arrows
 
@@ -266,21 +301,14 @@ C
 
  Sample script: arrowstyle.dem
 
-3 PostScript output features
+3 Data file format
 
- The PostScript driver now provides an oblique symbol font, and allows run-time
- inclusion of embedded PostScript fonts. It also supports ISO-8859-2 and 
- CP-852 character encodings. See `postscript fontfile`.
-
- Sample script: fontfile.dem
-
-3 X11 output features
-
- The X-windows driver now allows you to specify fonts, text rotation, and text
- color.  It also allows interaction with the current plot using the mouse and 
- hotkeys. See `set term x11 x11_fonts`.  There is no longer a limit to the 
- number of x11 plot windows opened simultaneously, and each plot window can be
- given its own title.  See `set term x11`.
+ The new `set datafile` command can be used to specify information about the
+ format of input data files, including the characters used to separate fields, 
+ to indicate comment lines, and to specify missing data.  Gnuplot now attempts 
+ to recognize text fields with embedded blanks as single entities based on the 
+ datafile format settings.  This allows input from csv (comma-separated value)
+ files. See `set datafile`.
 
 3 Other changes and additions
 
@@ -306,11 +334,31 @@ C
  can be included in labels via format specifiers in the label text.
  See `set label`.
 
- New command `set view map` to select 2D projection view of 3D surface plot.
+ New command `set view map` to select top-view 2D projection of 3D surface plot.
 
- New commands `set term push` and `set term pop`.
+ New commands `set term push` and `set term pop` to achieve platform
+ independent restoring of the terminal after printing,
 
- The `load` command accepts piped input.
+ The `load` and `save` commands accept piped input and output, respectively.
+
+ The `history` command (for gnuplot with its own readline, not with GNU
+ readline) now includes several useful options.
+
+ MS Windows package includes an additional executable `pgnuplot.exe` to support
+ piping command through standard input pipe otherwise not available for graphical
+ applications on this system.
+
+3 Accompanying documentation
+
+ In directory docs/psdocs/ you may find new information in the gnuplot output
+ postscript file guide, list of postscript symbols in different encodings.
+
+ Improved FAQ. Please read it before asking your question in a public forum.
+
+ There are plenty of new demos *.dem in the demo/ directory. Please run them,
+ for example by
+       load "all.dem"
+ before asking for help.
 
 2 Batch/Interactive Operation
 ?batch/interactive
@@ -1314,7 +1362,7 @@ C ... and restart the table:
  data file, is a subset of a datablock.
 2 mouse input
 ?mouse input
- The `x11`, `windows`, `ggi` and `pm` terminals allow interaction with the
+ The `x11`, `pm`, `windows`, and `ggi` terminals allow interaction with the
  current plot using the mouse. They also support the definition of hotkeys
  to activate pre-defined functions by hitting a single key while the mouse
  focus is in the active plot window.  It is even possible to combine mouse
@@ -4429,6 +4477,7 @@ C ... and restart the table:
 ?set encoding iso_8859_1
 ?show encoding
 ?encoding
+?encodings
  The `set encoding` command selects a character encoding.  Valid values are
  `default`, which tells a terminal to use its default; `iso_8859_1` (known in
  the PostScript world as `ISO-Latin1`), which is used on many Unix workstations
