@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot.c,v 1.26 1999/11/08 19:24:32 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot.c,v 1.27 1999/11/24 13:35:07 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - plot.c */
@@ -96,9 +96,8 @@ extern int rl_complete_with_tilde_expansion;
 #   define GNUPLOT_HISTORY_FILE "~/.gnuplot_history"
 #  endif
 #  ifndef HISTORY_SIZE
-/* Some more or less arbitrary value :) */
-/* Well, should be bigger than that ... */
-#   define HISTORY_SIZE 42
+/* Can be overriden with the environment variable 'GNUPLOT_HISTORY_SIZE' */
+#   define HISTORY_SIZE 666
 #  endif
 /* 
  * The next variable is a pointer to the value returned from 'tilde_expand()'.
@@ -331,10 +330,8 @@ char **argv;
 
 #ifdef HAVE_LIBREADLINE
     using_history();
-    /* argv[0] may include path; need to check whether
-     * there is a standard/convention for readline's
-     * ~/.inputrc files
-     */
+    /* T.Walter 1999-06-24: 'rl_readline_name' must be this fix name.
+     * It is used to parse a 'gnuplot' specific section in '~/.inputrc' */
     rl_readline_name = "Gnuplot";
     rl_complete_with_tilde_expansion = 1;
 #endif
@@ -456,6 +453,13 @@ char **argv;
 	    expanded_history_filename = tilde_expand(GNUPLOT_HISTORY_FILE);
 	    FPRINTF((stderr, "expanded_history_filename = %s\n", expanded_history_filename));
 	    read_history(expanded_history_filename);
+	    {
+		/* BEGIN: Go local to get environment variable */
+		const char *temp_env = getenv ("GNUPLOT_HISTORY_SIZE");
+		if (temp_env)
+		    gnuplot_history_size = strtol (temp_env, (char **) NULL, 10);
+	    } /* END: Go local to get environment variable */
+
 	    /* 
 	     * It is safe to ignore the return values of 'atexit()' and
 	     * 'on_exit()'. In the worst case, there is no history of your
