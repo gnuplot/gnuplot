@@ -1,3 +1,11 @@
+
+[-- TODO BEFORE RELEASING VERSION 4.0 (EXCEPT BUG FIXES) --]
+
+- documentation for all X11 command line switches (joze)
+- similar line and point type sequences for the main terminal drivers (joze)
+
+[--]
+
 Projects, in no particular order:
 
 - revise border command to use keywords

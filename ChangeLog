@@ -1,3 +1,7 @@
+2002-10-09  Johannes Zellner  <johannes@zellner.org>
+
+	* TODO: started a section for what has to be done before releasing 4.0
+
 2002-10-09  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* term/post.trm(delete_ps_fontfile): Fix compilation for non-PM3D.
@@ -1281,7 +1285,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/10/09 14:20:18 $).
+	last modification date (from the tag $Date: 2002/10/09 14:52:46 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
