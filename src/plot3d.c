@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.63 2004/02/15 20:29:56 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.64 2004/02/18 08:11:18 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -70,7 +70,7 @@ int dgrid3d_col_fineness = 10;
 int dgrid3d_norm_value = 1;
 TBOOLEAN dgrid3d = FALSE;
 
-
+int plot_has_palette = 0;
 
 /* static prototypes */
 
@@ -318,6 +318,7 @@ set_plot_with_palette(int plot_num)
     struct surface_points *this_plot = first_3dplot;
     int surface = 0;
     struct text_label *this_label = first_label;
+
     plot_has_palette = 1;
     /* Is pm3d switched on globally? */
     if (pm3d.where[0])

@@ -1,5 +1,5 @@
 /*
- * $Id: plot3d.h,v 1.11 2002/02/28 09:36:44 mikulik Exp $
+ * $Id: plot3d.h,v 1.12 2002/07/22 09:22:18 mikulik Exp $
  */
 
 /* GNUPLOT - plot3d.h */
@@ -60,7 +60,7 @@ extern int dgrid3d_norm_value;
 extern TBOOLEAN	dgrid3d;
 
 #ifdef PM3D
-int plot_has_palette; /* current plot needs the color palette */
+extern int plot_has_palette; /* current plot needs the color palette */
 #endif
 
 /* prototypes from plot3d.c */
