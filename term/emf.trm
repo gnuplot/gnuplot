@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: emf.trm,v 1.25 2004/10/19 00:24:08 sfeam Exp $
+ * $Id: emf.trm,v 1.26 2004/12/08 04:25:00 sfeam Exp $
  */
 
 /* GNUPLOT - emf.trm */
@@ -712,7 +712,7 @@ EMF_filled_polygon(int points, gpiPoint *corners)
     int fillpar = corners->style >> 4;
     int style = corners->style &= 0xf;
 
-#define META_POLYGON 3
+#define EMF_POLYGON 3
 
     switch (style) {
 	case FS_EMPTY: /* fill with background color */
@@ -739,7 +739,7 @@ EMF_filled_polygon(int points, gpiPoint *corners)
 	EMF_CreateBrush(EMF_HANDLE_BRUSH, 0, color, 0);
 	EMF_SelectObject(EMF_HANDLE_BRUSH);
 
-	EMF_write_emr(META_POLYGON, (7 + 2*points) * 4);
+	EMF_write_emr(EMF_POLYGON, (7 + 2*points) * 4);
 	EMF_write_rectl(0,0,0,0);  /* What are these? */
 	EMF_write_long(points);
 	for (i=0; i<points; i++)

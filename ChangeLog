@@ -1,3 +1,8 @@
+2004-12-21  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* term/emf.trm (EMF_filled_polygon): Renamed macro META_POLYGON to
+	EMF_POLYGON, to avoid conflict with Win32 headers.
+
 2004-12-21  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* NEWS docs/gnuplot.doc src/pm3d.h src/pm3d.c src/save.c src/set.c
