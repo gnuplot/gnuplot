@@ -74,7 +74,13 @@ void execute_at __PROTO((struct at_type *at_ptr));
 
 /* Prototypes from file "fit.c" */
 
-void    do_fit __PROTO((void));
+char *get_next_word __PROTO((char **s, char *subst)); 
+void init_fit __PROTO((void));
+void setvar __PROTO((char *varname, struct value data));
+int getivar __PROTO((char *varname));
+void update __PROTO((char *pfile, char *npfile));
+void do_fit __PROTO((void));
+int wri_to_fil_last_fit_cmd __PROTO((FILE *fp));
 
 
 /* Prototypes from file "graphics.c" */
@@ -192,6 +198,10 @@ void add_history __PROTO((char *line));
 /* Prototypes from file "scanner.c" */
 
 int scanner __PROTO((char expression[]));
+
+/* Prototypes from "stdfn.c" */
+
+char *safe_strncpy __PROTO((char *, char *, size_t));
 
 /* Prototypes from file "term.c" */
 
