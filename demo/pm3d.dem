@@ -380,51 +380,70 @@ set samples 4
 set xrange [0:3]
 set yrange [0:3]
 set cbrange [0:9]
-splot 2*x+y
+f(x,y)=2*x+y
 unset key
+unset xtics
+unset ytics
 
 # Needed by terminals limited on colors:
 #set palette maxcolors 26
 
 # Note: no more space in the following multiplot to show demo for
 #set pm3d corners2color median
+#set pm3d corners2color geomean
 
 set multiplot
-dx = 1.0/3; dy = 1.0/2;
+# Let us do multiplot grid 3x3:
+dx = 1.0/3; dy = 1.0/3;
 set size dx,dy
 
-set origin 0,dy
-set title "set pm3d corners2color mean"
-set pm3d corners2color mean
-replot
-
-set origin 1*dx,dy
-set title "set pm3d corners2color geomean"
-set pm3d corners2color geomean
-replot
-
-set origin 2*dx,dy
+set origin 0*dx,0*dy
 set title "set pm3d corners2color c1"
 set pm3d corners2color c1
-replot
+splot f(x,y)
 
-set origin 0*dx,0
+set origin 0*dx,2*dy
 set title "set pm3d corners2color c2"
 set pm3d corners2color c2
 replot
 
-set origin 1*dx,0
-set title "set pm3d corners2color c2"
+set origin 2*dx,0*dy
 set title "set pm3d corners2color c3"
 set pm3d corners2color c3
 replot
 
-set origin 2*dx,0
+set origin 2*dx,2*dy
 set title "set pm3d corners2color c4"
 set pm3d corners2color c4
 replot
+
+set origin 0*dx,1*dy
+set title "set pm3d corners2color mean"
+set pm3d corners2color mean
+replot
+
+set origin 2*dx,1*dy
+set title "set pm3d corners2color geomean"
+set pm3d corners2color geomean
+replot
+
+set origin 1*dx,0*dy
+set title "set pm3d corners2color median"
+set pm3d corners2color median
+replot
+
+set origin 1*dx,1*dy
+set title "Original grid points"
+unset pm3d
+set border 0
+unset xtics
+unset ytics
+unset colorbox
+#splot x*2+y with points ps 3 pt 5 palette
+splot f(x,y) with linesp ps 3 pt 5 palette
 
 unset multiplot
 pause -1 "Hit return to continue"
 
 print "End of pm3d demo."
+
