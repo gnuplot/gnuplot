@@ -1,5 +1,5 @@
 #
-# $Id: makefile.os2,v 1.20 2001/09/21 20:51:14 amai Exp $
+# $Id: makefile.os2,v 1.21 2001/09/29 09:28:18 amai Exp $
 #
 # GNUPLOT Makefile for use on OS/2 2.x and above
 # using emx 0.9 (and above) and GNUMake
@@ -146,14 +146,14 @@ LDFLAGS  = -g -Zmt -Zcrtdll
 CFLAGS2 = -g $(OS2FLAGS) $(EMXSPECIFIC) -Wall              -O0 -Zmt -Zomf
 #LDFLAGS2 = -g -Zmt         -Zomf  -Zsys
 LDFLAGS2 = -g -Zmt -Zcrtdll -Zomf
-CFLAGS3 = -g $(OS2FLAGS) $(EMXSPECIFIC) -Wall -Wno-comment -O0 -I.
+CFLAGS3 = -g $(OS2FLAGS) $(EMXSPECIFIC) -Wall -Wno-comment -O0 -Zmt -I.
 LDFLAGS3 = -g -Zmt -Zcrtdll
 else
 CFLAGS  = $(OS2FLAGS) $(EMXSPECIFIC) -O4 -mpentium -Wall -Wno-unused -Wno-comment -Zmt
 LDFLAGS  = -s -Zmt -Zcrtdll
 CFLAGS2 = $(OS2FLAGS) $(EMXSPECIFIC) -O4 -mpentium -Wall -Wno-unused              -Zmt -Zomf
 LDFLAGS2 = -s -Zmt -Zcrtdll -Zomf
-CFLAGS3 = $(OS2FLAGS) $(EMXSPECIFIC) -O4 -mpentium -Wall -Wno-unused -Wno-comment -I.
+CFLAGS3 = $(OS2FLAGS) $(EMXSPECIFIC) -O4 -mpentium -Wall -Wno-unused -Wno-comment -Zmt -I.
 LDFLAGS3 = -s -Zmt -Zcrtdll
 endif
 
