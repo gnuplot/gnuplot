@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: readline.c,v 1.25 2001/09/28 13:38:37 amai Exp $"); }
+static char *RCSid() { return RCSid("$Id: readline.c,v 1.26 2002/01/23 11:16:53 joze Exp $"); }
 #endif
 
 /* GNUPLOT - readline.c */
@@ -107,13 +107,6 @@ readline_ipc(const char* prompt)
 
     rl_callback_handler_install((char*) prompt, LineCompleteHandler);
     rl_getc_function = getc_wrapper;
-
-    /* apparently multy-character inputs like escape sequences
-     * but also mouse-pasted text got buffered and therefore
-     * didn't trigger the select() function in X11_waitforinput().
-     * Switching to unbuffered input solved this (although I don't
-     * really like this solution 23 Jan 2002 (joze) */
-    setvbuf(stdin, (char*)0, _IONBF, 0);
 
     for (line_complete = 0; !line_complete; /* EMPTY */) {
 	rl_callback_read_char(); /* stdin */

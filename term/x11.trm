@@ -1,5 +1,5 @@
 /*
- * $Id: x11.trm,v 1.45 2002/01/23 11:15:10 joze Exp $
+ * $Id: x11.trm,v 1.46 2002/01/24 08:41:08 joze Exp $
  *
  */
 
@@ -563,6 +563,13 @@ X11_init()
 	if (X11_ALLOW_EVENTS) {
 	    X11_ipc_back_fd = fdes_back[0];
 	    close(fdes_back[1]); /* the parent doesn't need this */
+
+	    /* apparently multy-character inputs like escape sequences
+	     * but also mouse-pasted text got buffered and therefore
+	     * didn't trigger the select() function in X11_waitforinput().
+	     * Switching to unbuffered input solved this (although I don't
+	     * really like this solution 23 Jan 2002 (joze) */
+	    setvbuf(stdin, (char*)0, _IONBF, 0);
 	} else {
 	    /* we do not open a bidirectional communication
 	     * for non-tty's by default. If this is desired,
