@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: fit.c,v 1.23 1999/01/06 15:50:16 lhecking Exp $";
+static char *RCSid = "$Id: fit.c,v 1.23.2.1 1999/08/19 14:39:59 lhecking Exp $";
 #endif
 
 /*
@@ -724,9 +724,9 @@ double a[];
 	for (i = 0; i < num_params; i++)
 	    Dblf3("%-15.15s = %-15g\n", par_name[i], a[i]);
     } else {
-	    Dblf2("degrees of freedom (ndf) : %d\n",  num_data - num_params);
-	    Dblf2("rms of residuals      (stdfit) = sqrt(WSSR/ndf)      : %g\n", sqrt(chisq / (num_data - num_params)));
- 	    Dblf2("variance of residuals (reduced chisquare) = WSSR/ndf : %g\n\n", chisq / (num_data - num_params));
+	Dblf2("degrees of freedom (ndf) : %d\n",  num_data - num_params);
+	Dblf2("rms of residuals      (stdfit) = sqrt(WSSR/ndf)      : %g\n", sqrt(chisq / (num_data - num_params)));
+ 	Dblf2("variance of residuals (reduced chisquare) = WSSR/ndf : %g\n\n", chisq / (num_data - num_params));
  
 	/* get covariance-, Korrelations- and Kurvature-Matrix */
 	/* and errors in the parameters                     */
@@ -916,7 +916,7 @@ struct value data;
 
     if (!udv_ptr) {		/* generate new entry */
 	last->next_udv = udv_ptr = (struct udvt_entry *)
-	    gp_alloc((unsigned int) sizeof(struct udvt_entry), "fit setvar");
+	    gp_alloc(sizeof(struct udvt_entry), "fit setvar");
 	udv_ptr->next_udv = NULL;
     }
     safe_strncpy(udv_ptr->udv_name, varname, sizeof(udv_ptr->udv_name));
@@ -1288,7 +1288,31 @@ void do_fit()
 
     columns = df_open(4);	/* up to 4 using specs allowed */
     if (columns == 1)
-	int_error("Need 2 to 4 using specs", c_token);
+	int_error(c_token, "Need 2 to 4 using specs" c_token);
+
+    /* The following patch was made by Remko Scharroo, 25-Mar-1999
+     * We need to check if one of the columns is time data, like
+     * in plot2d and plot3d */
+
+    if (datatype[FIRST_X_AXIS] == TIME) {
+	if (columns < 2)
+	    int_error("Need full using spec for x time data", c_token);
+	df_timecol[0] = 1;
+    }
+    if (datatype[FIRST_Y_AXIS] == TIME) {
+	if (columns < 1)
+	    int_error("Need using spec for y time data", c_token);
+	df_timecol[1] = 1;
+    }
+    /* HBB 990326: added this check. Just in case some wants to fit
+     * time/date data depending on two other variables ... */
+    if (datatype[FIRST_Z_AXIS] == TIME) {
+	if (columns < 4)
+	    int_error("Need full using spec for z time data", c_token);
+	else
+	    df_timecol[2] = 1;
+    }
+    /* End of patch by Remko Scharroo */
 
     /* HBB 980401: if this is a single-variable fit, we shouldn't have
      * allowed a variable name specifier for 'y': */
@@ -1297,15 +1321,17 @@ void do_fit()
 
     /* HBB 981210: two range specs mean different things, depending
      * on wether this is a 2D or 3D fit */
-    if (columns<4) {
-      if (zrange_token != -1)
-	int_error("Three range-specs not allowed in on-variable fit", zrange_token);
-      else {
-	/* 2D fit, 2 ranges: second range is for *z*, not y: */
-	autorange_z = autorange_y;
-	min_z = min_y;
-	max_z = max_y;
-      }
+    if (columns < 4) {
+	if (zrange_token != -1)
+	    int_error("Three range-specs not allowed in on-variable fit", zrange_token);
+	else {
+	    /* 2D fit, 2 ranges: second range is for *z*, not y: */
+	    autorange_z = autorange_y;
+	    if (autorange_y & 1)
+		min_z = min_y;
+	    if (autorange_y & 2)
+		max_z = max_y;
+	}
     }
 
     /* defer actually reading the data until we have parsed the rest
@@ -1486,7 +1512,7 @@ void do_fit()
 	TBOOLEAN fixed;
 	double tmp_par;
 	char c, *s;
-	char sstr[MAX_LINE_LEN];
+	char sstr[MAX_LINE_LEN+1];
 	FILE *f;
 
 	quote_str(sstr, c_token++, MAX_LINE_LEN);
