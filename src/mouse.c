@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.22 2001/09/02 16:30:40 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.23 2001/09/07 18:39:11 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -556,25 +556,38 @@ GetRulerString(char *p, double x, double y)
 
 
 static struct t_zoom *zoom_head = NULL, *zoom_now = NULL;
-
 /* Applies the zoom rectangle of  z  by sending the appropriate command
    to gnuplot
 */
 static void
 apply_zoom(struct t_zoom *z)
 {
-    char s[255];
+    char s[1024];		/* HBB 20011005: made larger */
+    /* HBB 20011004: new variable, fixing 'unzoom' back to autoscaled
+     * range */
+    static t_autoscale autoscale_copies[AXIS_ARRAY_SIZE];
 
     if (zoom_now != NULL) {	/* remember the current zoom */
-	zoom_now->xmin = AXIS_DE_LOG_VALUE(FIRST_X_AXIS, axis_array[FIRST_X_AXIS].min);
-	zoom_now->ymin = AXIS_DE_LOG_VALUE(FIRST_Y_AXIS, axis_array[FIRST_Y_AXIS].min);
-	zoom_now->x2min = AXIS_DE_LOG_VALUE(SECOND_X_AXIS, axis_array[SECOND_X_AXIS].min);
-	zoom_now->y2min = AXIS_DE_LOG_VALUE(SECOND_Y_AXIS, axis_array[SECOND_Y_AXIS].min);
-	zoom_now->xmax = AXIS_DE_LOG_VALUE(FIRST_X_AXIS, axis_array[FIRST_X_AXIS].max);
-	zoom_now->ymax = AXIS_DE_LOG_VALUE(FIRST_Y_AXIS, axis_array[FIRST_Y_AXIS].max);
-	zoom_now->x2max = AXIS_DE_LOG_VALUE(SECOND_X_AXIS, axis_array[SECOND_X_AXIS].max);
-	zoom_now->y2max = AXIS_DE_LOG_VALUE(SECOND_Y_AXIS, axis_array[SECOND_Y_AXIS].max);
+	zoom_now->xmin = AXIS_DE_LOG_VALUE(FIRST_X_AXIS, axis_array[FIRST_X_AXIS].set_min);
+	zoom_now->ymin = AXIS_DE_LOG_VALUE(FIRST_Y_AXIS, axis_array[FIRST_Y_AXIS].set_min);
+	zoom_now->x2min = AXIS_DE_LOG_VALUE(SECOND_X_AXIS, axis_array[SECOND_X_AXIS].set_min);
+	zoom_now->y2min = AXIS_DE_LOG_VALUE(SECOND_Y_AXIS, axis_array[SECOND_Y_AXIS].set_min);
+	zoom_now->xmax = AXIS_DE_LOG_VALUE(FIRST_X_AXIS, axis_array[FIRST_X_AXIS].set_max);
+	zoom_now->ymax = AXIS_DE_LOG_VALUE(FIRST_Y_AXIS, axis_array[FIRST_Y_AXIS].set_max);
+	zoom_now->x2max = AXIS_DE_LOG_VALUE(SECOND_X_AXIS, axis_array[SECOND_X_AXIS].set_max);
+	zoom_now->y2max = AXIS_DE_LOG_VALUE(SECOND_Y_AXIS, axis_array[SECOND_Y_AXIS].set_max);
     }
+
+    /* HBB 20011004: implement save/restore of autoscaling if returning to
+     * original setting */
+    if (zoom_now == zoom_head) {
+	/* previous current zoom is the head --> we're leaving
+	 * original non-moused status --> save autoscales */
+	AXIS_INDEX i;
+	for (i = 0; i < AXIS_ARRAY_SIZE; i++)
+	    autoscale_copies[i] = axis_array[i].set_autoscale;
+    }
+
     zoom_now = z;
     if (zoom_now == NULL) {
 	alert();
@@ -582,9 +595,49 @@ apply_zoom(struct t_zoom *z)
     }
 
     sprintf(s, "set xr[% #g:% #g]; set yr[% #g:% #g]", zoom_now->xmin, zoom_now->xmax, zoom_now->ymin, zoom_now->ymax);
+
+    /* HBB 20011004: the final part of 'unzoom to autoscale mode'.
+     * Optionally appends 'set autoscale' commands to the string to be
+     * sent, to restore the saved settings. */
+#define OUTPUT_AUTOSCALE(axis)						     \
+    {					     \
+	t_autoscale autoscale = autoscale_copies[axis];			     \
+	t_autoscale fix = autoscale & (AUTOSCALE_FIXMIN | AUTOSCALE_FIXMAX); \
+									     \
+	autoscale &= AUTOSCALE_BOTH;					     \
+									     \
+	if (autoscale) {						     \
+	    sprintf(s + strlen(s), "; set au %s%s",			     \
+		    axis_defaults[axis].name,				     \
+		    autoscale == AUTOSCALE_MIN ? "min"			     \
+		    : autoscale == AUTOSCALE_MAX ? "max"		     \
+		    : "");						     \
+	    if (fix)							     \
+		sprintf(s + strlen(s), "; set au %sfix%s",		     \
+			axis_defaults[axis].name,			     \
+			fix == AUTOSCALE_FIXMIN ? "min"			     \
+			: fix == AUTOSCALE_FIXMAX ? "max"		     \
+			: "");						     \
+	}								     \
+    }
+	    
+    if (zoom_now == zoom_head) {
+	/* new current zoom is the head --> returning to unzoomed
+	 * settings --> restore autoscale */
+	OUTPUT_AUTOSCALE(FIRST_X_AXIS);
+	OUTPUT_AUTOSCALE(FIRST_Y_AXIS);
+    }
+
     if (!is_3d_plot) {
 	sprintf(s + strlen(s), "; set x2r[% #g:% #g]; set y2r[% #g:% #g]",
 		zoom_now->x2min, zoom_now->x2max, zoom_now->y2min, zoom_now->y2max);
+	if (zoom_now == zoom_head) {
+	    /* new current zoom is the head --> returning to unzoomed
+	     * settings --> restore autoscale */
+	    OUTPUT_AUTOSCALE(SECOND_X_AXIS);
+	    OUTPUT_AUTOSCALE(SECOND_Y_AXIS);
+	}
+#undef OUTPUT_AUTOSCALE
     }
     do_string_replot(s);
 }
