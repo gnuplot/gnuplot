@@ -1,5 +1,5 @@
 /* 
- * $Id: axis.h,v 1.18 2002/04/05 17:15:51 broeker Exp $
+ * $Id: axis.h,v 1.19 2002/07/02 17:35:19 mikulik Exp $
  *
  */
 
@@ -508,7 +508,7 @@ do {							\
  * Do OUT_ACTION or UNDEF_ACTION as appropriate
  * adjust range provided type is INRANGE (ie dont adjust y if x is outrange
  * VALUE must not be same as STORE
- * Note: not used by COLOR AXIS, see its implementation below
+ * Note: see the particular implementation for COLOR AXIS below.
  */
 
 #define STORE_WITH_LOG_AND_UPDATE_RANGE(STORE, VALUE, TYPE, AXIS,	  \
@@ -554,6 +554,20 @@ do {									  \
 	}								  \
     }									  \
 } while(0)
+
+/* Implementation of the above for the color axis. It should not change
+ * the type of the point (out-of-range color is plotted with the color
+ * of the min or max color value).
+ */
+#ifdef PM3D
+#define COLOR_STORE_WITH_LOG_AND_UPDATE_RANGE(STORE, VALUE, TYPE, AXIS,	  \
+				       OUT_ACTION, UNDEF_ACTION)	  \
+{									  \
+    int c_type_tmp = TYPE;						  \
+    STORE_WITH_LOG_AND_UPDATE_RANGE(STORE, VALUE, c_type_tmp, AXIS,	  \
+				       OUT_ACTION, UNDEF_ACTION);	  \
+}
+#endif
 
 /* use this instead empty macro arguments to work around NeXT cpp bug */
 /* if this fails on any system, we might use ((void)0) */

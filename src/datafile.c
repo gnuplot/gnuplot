@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.39 2002/07/02 17:35:27 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.40 2002/07/02 19:36:45 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -1337,8 +1337,9 @@ df_3dmatrix(this_plot, need_palette)
 	    STORE_WITH_LOG_AND_UPDATE_RANGE(point->y, used[1], point->type, FIRST_Y_AXIS, NOOP, goto skip);
 	    STORE_WITH_LOG_AND_UPDATE_RANGE(point->z, used[2], point->type, FIRST_Z_AXIS, NOOP, goto skip);
 #ifdef PM3D
-	    if (need_palette)
-		STORE_WITH_LOG_AND_UPDATE_RANGE(point->CRD_COLOR, used[3], point->type, COLOR_AXIS, NOOP, goto skip);
+	    if (need_palette) {
+		COLOR_STORE_WITH_LOG_AND_UPDATE_RANGE(point->CRD_COLOR, used[3], point->type, COLOR_AXIS, NOOP, goto skip);
+	    }
 #endif
 
 	    /* some of you won't like this, but I say goto is for this */

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.52 2002/07/03 08:44:01 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.53 2002/07/03 08:47:11 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -544,8 +544,9 @@ grid_nongrid_data(this_plot)
 #ifdef PM3D
 	    if (this_plot->pm3d_color_from_column)
 		int_error(NO_CARET, "Gridding of the color column is not implemented");
-	    else
-		STORE_WITH_LOG_AND_UPDATE_RANGE(points->CRD_COLOR, z, points->type, COLOR_AXIS, NOOP, continue);
+	    else {
+		COLOR_STORE_WITH_LOG_AND_UPDATE_RANGE(points->CRD_COLOR, z, points->type, COLOR_AXIS, NOOP, continue);
+	    }
 #endif
 	}
     }
@@ -782,10 +783,11 @@ get_3ddata(this_plot)
 		STORE_WITH_LOG_AND_UPDATE_RANGE(cp->z, z, cp->type, z_axis, NOOP, goto come_here_if_undefined);
 #ifdef PM3D
 		if (NEED_PALETTE(this_plot)) {
-		    if (pm3d_color_from_column)
-			STORE_WITH_LOG_AND_UPDATE_RANGE(cp->CRD_COLOR, color, cp->type, COLOR_AXIS, NOOP, goto come_here_if_undefined);
-		    else
-			STORE_WITH_LOG_AND_UPDATE_RANGE(cp->CRD_COLOR, z, cp->type, COLOR_AXIS, NOOP, goto come_here_if_undefined);
+		    if (pm3d_color_from_column) {
+			COLOR_STORE_WITH_LOG_AND_UPDATE_RANGE(cp->CRD_COLOR, color, cp->type, COLOR_AXIS, NOOP, goto come_here_if_undefined);
+		    } else {
+			COLOR_STORE_WITH_LOG_AND_UPDATE_RANGE(cp->CRD_COLOR, z, cp->type, COLOR_AXIS, NOOP, goto come_here_if_undefined);
+		    }
 		}
 #endif
 	    }
@@ -995,8 +997,9 @@ calculate_set_of_isolines(value_axis, cross, this_iso,
 	    STORE_WITH_LOG_AND_UPDATE_RANGE(points[i].z, temp, points[i].type,
 					    value_axis, NOOP, NOOP);
 #ifdef PM3D
-	    if (need_palette)
-		STORE_WITH_LOG_AND_UPDATE_RANGE(points[i].CRD_COLOR, temp, points[i].type, COLOR_AXIS, NOOP, NOOP);
+	    if (need_palette) {
+		COLOR_STORE_WITH_LOG_AND_UPDATE_RANGE(points[i].CRD_COLOR, temp, points[i].type, COLOR_AXIS, NOOP, NOOP);
+	    }
 #endif
 	}
 	(*this_iso)->p_count = num_sam_to_use;
