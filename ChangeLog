@@ -1,3 +1,7 @@
+2002-09-05  Johannes Zellner  <johannes@zellner.org>
+
+	* src/gplt_x11.c term/x11.trm: support for rotated text
+
 2002-09-03  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/post.trm: (Harald Harders) Report FontName of embedded fonts.
@@ -1056,7 +1060,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/09/02 21:05:18 $).
+	last modification date (from the tag $Date: 2002/09/03 21:41:05 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.46 2002/08/26 05:34:35 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.47 2002/08/30 18:45:45 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - gplt_x11.c */
@@ -341,7 +341,8 @@ static int is_shift __PROTO((KeySym mod));
 #endif
 #endif
 
-static void DrawVerticalString __PROTO((Display *dpy, Drawable d, GC gc, int x, int y, const char *str, int len));
+static void DrawRotated __PROTO((Display *dpy, Drawable d, GC gc, int xdest,
+	    int ydest, const char *str, int len, int angle, enum JUSTIFY just));
 static void exec_cmd __PROTO((plot_struct *, char *));
 
 static plot_struct *find_plot __PROTO((Window window));
@@ -1481,45 +1482,112 @@ record()
 #endif /* VMS */
 
 static void
-DrawVerticalString(Display *dpy, Drawable d, GC gc, int xdest, int ydest, const char *str, int len)
+DrawRotated(Display *dpy, Drawable d, GC gc, int xdest, int ydest,
+       	const char *str, int len, int angle, enum JUSTIFY just)
 {
-    int x, y, x2;
+    int x, y;
+    double src_x, src_y;
+    double dest_x, dest_y;
     int width = XTextWidth(font, str, len);
     int height = vchar;
-    char *data = (char *) malloc(width * height * sizeof(char));
+    double src_cen_x = (double)width * 0.5;
+    double src_cen_y = (double)height * 0.5;
+    static const double deg2rad = .01745329251994329576; /* atan2(1, 1) / 45.0; */
+    double sa = sin(angle * deg2rad);
+    double ca = cos(angle * deg2rad);
+    int dest_width = (double)height * fabs(sa) + (double)width * fabs(ca) + 2;
+    int dest_height = (double)width * fabs(sa) + (double)height * fabs(ca) + 2;
+    double dest_cen_x = (double)dest_width * 0.5;
+    double dest_cen_y = (double)dest_height * 0.5;
+    char* data = (char*) malloc(dest_width * dest_height * sizeof(char));
     Pixmap pixmap_src = XCreatePixmap(dpy, root, width, height, 1);
-    /* Pixmap pixmap_dest = XCreatePixmap(dpy, root, height, width, 1); */
     XImage *image_src;
     XImage *image_dest;
-    GC bitmapGC = XCreateGC(dpy, pixmap_src, 0, (XGCValues *) 0);
 
-    /* set font and colors for the bitmap GC */
+    unsigned long gcFunctionMask = GCFunction;
+    XGCValues gcValues;
+    int gcCurrentFunction;
+    Status s = XGetGCValues(dpy, gc, gcFunctionMask, &gcValues);
+
+    /* bitmapGC is static, so that is has to be initialized only once */
+    static GC bitmapGC = (GC) 0;
+
+    if (s) {
+	/* success */
+	gcCurrentFunction = gcValues.function; /* save current function */
+	gcValues.function = GXand; /* merge image_dest with drawable */
+	XChangeGC(dpy, gc, gcFunctionMask, &gcValues);
+    }
+
+    /* eventually initialize bitmapGC */
+    if ((GC)0 == bitmapGC) {
+	bitmapGC = XCreateGC(dpy, pixmap_src, 0, (XGCValues *) 0);
+	XSetForeground(dpy, bitmapGC, WhitePixel(dpy, scr));
+	XSetBackground(dpy, bitmapGC, BlackPixel(dpy, scr));
+    }
+
+    /* set font for the bitmap GC */
     XSetFont(dpy, bitmapGC, font->fid);
-    XSetForeground(dpy, bitmapGC, WhitePixel(dpy, scr));
-    XSetBackground(dpy, bitmapGC, BlackPixel(dpy, scr));
 
     /* draw string to the source bitmap */
     XDrawImageString(dpy, pixmap_src, bitmapGC, 0, font->ascent, str, len);
 
     /* create XImage's of depth 1 */
-    image_src = XGetImage(dpy, pixmap_src, 0, 0, width, height, 1, XYPixmap /* ZPixmap, XYBitmap */ );
-    image_dest = XCreateImage(dpy, vis, 1, XYBitmap, 0, data, height, width, 8, 0);
+    /* source from pixmap */
+    image_src = XGetImage(dpy, pixmap_src, 0, 0, width, height,
+	    1, XYPixmap /* ZPixmap, XYBitmap */ );
 
+    /* empty dest */
+    assert(data);
+    memset((void*)data, 0, dest_width * dest_height);
+    image_dest = XCreateImage(dpy, vis, 1, XYBitmap,
+	    0, data, dest_width, dest_height, 8, 0);
+
+#define RotateX(_x, _y) (( (_x) * ca + (_y) * sa + dest_cen_x))
+#define RotateY(_x, _y) ((-(_x) * sa + (_y) * ca + dest_cen_y))
     /* copy & rotate from source --> dest */
-    for (x = 0, x2 = width - 1; x < width; x++, x2--) {
-	for (y = 0; y < height; y++) {
-	    XPutPixel(image_dest, y, x2, XGetPixel(image_src, x, y));
+    for (y = 0, src_y = -src_cen_y; y < height; y++, src_y++) {
+	for (x = 0, src_x = -src_cen_x; x < width; x++, src_x++) {
+	    /* TODO: move some operations outside the inner loop (joze) */
+	    dest_x = (int)rint(RotateX(src_x, src_y));
+	    dest_y = (int)rint(RotateY(src_x, src_y));
+	    if (dest_x >= 0 && dest_x < dest_width && dest_y >= 0 && dest_y < dest_height)
+		XPutPixel(image_dest, dest_x, dest_y, XGetPixel(image_src, x, y));
 	}
     }
 
+    switch (just) {
+	case LEFT:
+	default:
+	    xdest -= RotateX(-src_cen_x, src_cen_y);
+	    ydest -= RotateY(-src_cen_x, src_cen_y);
+	    break;
+	case CENTRE:
+	    xdest -= RotateX(0, src_cen_y);
+	    ydest -= RotateY(0, src_cen_y);
+	    break;
+	case RIGHT:
+	    xdest -= RotateX(src_cen_x, src_cen_y);
+	    ydest -= RotateY(src_cen_x, src_cen_y);
+	    break;
+    }
+
+#undef RotateX
+
     /* copy the rotated image to the drawable d */
-    XPutImage(dpy, d, gc, image_dest, 0, 0, xdest, ydest, height, width);
+    XPutImage(dpy, d, gc, image_dest, 0, 0,
+	    xdest, ydest, dest_width, dest_height);
 
     /* free resources */
     XFreePixmap(dpy, pixmap_src);
     XDestroyImage(image_src);
     XDestroyImage(image_dest);
-    XFreeGC(dpy, bitmapGC);
+
+    if (s) {
+	/* restore old function of gc */
+	gcValues.function = gcCurrentFunction;
+	XChangeGC(dpy, gc, gcFunctionMask, &gcValues);
+    }
 }
 
 /*
@@ -1559,7 +1627,11 @@ exec_cmd(plot_struct *plot, char *command)
 		break;
 	case 'E':
 		/* Save the requested font encoding */
-		sscanf(buffer,"QE%d",&encoding);
+		{
+		    int tmp;
+		    sscanf(buffer,"QE%d", &tmp);
+		    encoding = (enum set_encoding_id)tmp;
+		}
 		FPRINTF((stderr,"gnuplot_x11: changing encoding to %d\n",encoding));
 		break;
 	case 'D':
@@ -1589,34 +1661,26 @@ exec_cmd(plot_struct *plot, char *command)
 	XSetForeground(dpy, gc, plot->cmap->colors[2]);
 #endif
 
+	switch (plot->jmode) {
+	    case LEFT:
+		sw = 0;
+		break;
+	    case CENTRE:
+		sw = -sw / 2;
+		break;
+	    case RIGHT:
+		sw = -sw;
+		break;
+	}
+
 	if (plot->angle != 0) {
-	    switch (plot->jmode) {
-	    case LEFT:
-		sw = -sw;
-		break;
-	    case CENTRE:
-		sw = -sw / 2;
-		break;
-	    case RIGHT:
-		sw = 0;
-		break;
-	    }
-	    /* vertical text, center horizontally about x */
-	    DrawVerticalString(dpy, plot->pixmap, *current_gc, X(x) - vchar / 2, Y(y) + sw, str, sl);
+	    /* rotated text */
+	    DrawRotated(dpy, plot->pixmap, *current_gc, X(x), Y(y),
+		    str, sl, plot->angle, plot->jmode);
 	} else {
-	    switch (plot->jmode) {
-	    case LEFT:
-		sw = 0;
-		break;
-	    case CENTRE:
-		sw = -sw / 2;
-		break;
-	    case RIGHT:
-		sw = -sw;
-		break;
-	    }
 	    /* horizontal text */
-	    XDrawString(dpy, plot->pixmap, *current_gc, X(x) + sw, Y(y) + vchar / 3, str, sl);
+	    XDrawString(dpy, plot->pixmap, *current_gc,
+		    X(x) + sw, Y(y) + vchar / 3, str, sl);
 	}
 
 #ifdef EAM_OLD_CODE
@@ -1689,7 +1753,7 @@ exec_cmd(plot_struct *plot, char *command)
 	sscanf(buffer, "J%4d", (int *) &plot->jmode);
 
     else if (*buffer == 'A')
-	sscanf(buffer, "A%d", (int *) &plot->angle);
+	sscanf(buffer + 1, "%d", (int *) &plot->angle);
 
     /*  X11_linewidth(plot->lwidth) - set line width */
     else if (*buffer == 'W')

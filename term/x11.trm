@@ -1,5 +1,5 @@
 /*
- * $Id: x11.trm,v 1.61 2002/08/30 18:45:46 mikulik Exp $
+ * $Id: x11.trm,v 1.62 2002/08/30 20:18:29 sfeam Exp $
  *
  */
 
@@ -982,7 +982,7 @@ X11_put_text(unsigned int x, unsigned int y, const char str[])
 TERM_PUBLIC int
 X11_text_angle(int ang)
 {
-    PRINT1("A%d\n", (ang ? 1 : 0));
+    PRINT1("A%d\n", ang);
     return TRUE;
 }
 
