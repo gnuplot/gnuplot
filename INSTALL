@@ -387,16 +387,16 @@ for with-PACKAGE options used by gnuplot's configure are `--with-gd',
 `--with-png'. The corresponding package variables are `with_gd',
 and `with_png'.
 
- For gnuplot, configure uses the macros `gp_SEARCH_LIBDIRS' and
-`gp_SEARCH_HEADERDIRS' to search for libraries and includes, resp.  These
+ For gnuplot, configure uses the macros `GP_SEARCH_LIBDIRS' and
+`GP_PATH_HEADER' to search for libraries and includes, resp.  These
 macros are different from the standard GNU autoconf macros for this purpose,
 `AC_CHECK_LIB' and `AC_CHECK_HEADER/S' (see autoconf manual). The
-gp_XXX macros are closely tied to gnuplot, and cannot be used for other
-packages without modification.
+GP_XXX macros are closely tied to gnuplot, and cannot be used for other
+packages without modification. [May change in the future]
 
  The difference between these package specific macros and standard
-autoconf macros is that they do search more than one (the default)
-directory to determine the location of the specified file.
+autoconf macros is that they do search more than the default directories
+known to the compiler to determine the location of the specified file.
 
  Libraries will be searched in at least three, and up to five different
 directories, depending on the PATH specified with `--with-PACKAGE=PATH':
@@ -428,20 +428,18 @@ will search the following directories for libgd.a:
  o /home/user/source/gd/lib
  o /home/user/source/gd
 
- Include files will be searched in at least two, and up to three different
-directories, depending on the PATH specified with `--with-PACKAGE=PATH':
+ Include files will be searched in the default location, /usr/local/include,
+and three additional directories. These directories are determined by the
+second argument to GP_PATH_HEADER, which should normaly be identical with
+the argument to the corresponding `--with-PACKAGE=PATH' configure option:
+GP_PATH_HEADER(header.h, [$with_package]). Here's the list:
 
- o the default include path (can be more than one diretcory)
+ o the default include path (can be more than one directory)
  o /usr/local/include, a fairly common place for 3rd party headers
+ o the PATH directory, trailing `/libPACKAGE.a' stripped off
  o the PATH directory, trailing `/lib/libPACKAGE.a' stripped off
  o the PATH directory, trailing `/lib/libPACKAGE.a' stripped off and
    `/include' added
-
- Caveat: the `gp_SEARCH_HEADERDIRS' macro should only be used after the
-corresponding `gp_SEARCH_LIBDIRS' macro to take full advantage of the
-search algorithm.  This is a reasonable assumption nevertheless, because
-it allows for structuring configure.in so that the test for a header file
-is skipped if the corresponding library is not found.
 
  Here are some more examples:
 
@@ -462,10 +460,10 @@ is skipped if the corresponding library is not found.
 
    $ ./configure --with-gd=/tmp/gd --with-png=/tmp/libpng
 
-[I would like to implement the more generic `--site-includes' and
-`--site-libraries' options for additional flexibility, but this is
-painfully difficult with the current autoconf.  It also seems that such
-a feature would not comply with GNU coding standards.]
+ o the gd and png libraries are in /usr/local/gnu, the GNU plotutils
+   stuff is in /opt/plotutils
+
+   $ ./configure --with-gd=/usr/local/gnu --with-plot=/opt/plotutils
 
 Platform problems and testing
 *****************************
