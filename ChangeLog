@@ -1,3 +1,10 @@
+2004-12-03  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/graphics.c (xtick2d_callback ytick2d_callback): Fix bug
+	reported by Mike Kay: if the grid was active and the key box was
+	entirely above or to the left of the graph itself, then an extraneous
+	grid line was drawn connecting the key box to the graph.
+
 2004-12-03  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* term/fig.trm (FIG_set_color): Fix a C99-ism. Thanks to Shigeharu

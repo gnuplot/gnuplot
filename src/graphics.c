@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.136 2004/11/22 01:38:01 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.137 2004/12/01 21:10:33 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -4080,7 +4080,8 @@ xtick2d_callback(
 		ogy = gy;
 	    }
 	} else {
-	    if (lkey && keybox.yt > ybot && x < keybox.xr && x > keybox.xl) {
+	    if (lkey && x < keybox.xr && x > keybox.xl
+	    &&  keybox.yt > ybot && keybox.yb < ytop) {
 		if (keybox.yb > ybot) {
 		    (*t->move) (x, ybot);
 		    (*t->vector) (x, keybox.yb);
@@ -4158,7 +4159,8 @@ ytick2d_callback(
 	    }
 	} else {
 	    /* Make the grid avoid the key box */
-	    if (lkey && y < keybox.yt && y > keybox.yb && keybox.xl < xright /* catch TOUT */ ) {
+	    if (lkey && y < keybox.yt && y > keybox.yb 
+	    &&  keybox.xl < xright && keybox.xr > xleft) {
 		if (keybox.xl > xleft) {
 		    (*t->move) (xleft, y);
 		    (*t->vector) (keybox.xl, y);
