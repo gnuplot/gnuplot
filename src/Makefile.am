@@ -8,7 +8,7 @@ EMAIL = bug-gnuplot@dartmouth.edu
 HELPFILE=$(datadir)/gnuplot.gih
 
 EXTRA_PROGRAMS = gnuplot_x11
-bin_PROGRAMS = gnuplot @GNUPLOT_X11@ bf_test
+bin_PROGRAMS = gnuplot @GNUPLOT_X11@ bf_test gpltconv
 
 # There is probably no need to edit anything below this line
 XLIBS = @LIBRARIES_FOR_X@
@@ -20,7 +20,7 @@ fit.h graph3d.c graphics.c graphics.h help.c help.h hidden3d.c internal.c \
 interpol.c matrix.c matrix.h misc.c national.h parse.c parse.h plot.c plot.h \
 plot2d.c plot3d.c protos.h readline.c save.c scanner.c set.c setshow.h show.c \
 specfun.c standard.c stdfn.c stdfn.h syscfg.h tables.c tables.h term.c term.h \
-time.c util.c util.h util3d.c util3d.h variable.c variable.h version.c
+time.c unset.c util.c util.h util3d.c util3d.h variable.c variable.h version.c
 
 EXTRA_gnuplot_SOURCES = @NEXTOBJS@
 
@@ -31,6 +31,8 @@ gnuplot_x11_SOURCES = gplt_x11.c
 gnuplot_x11_LDADD = $(XLIBS)
 
 bf_test_SOURCES = bf_test.c binary.c alloc.c
+
+gpltconv_SOURCES = gpltconv.c
 
 if BUILD_SRC_BEOS_SUBDIR
 d_beos = beos
