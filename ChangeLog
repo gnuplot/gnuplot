@@ -1,3 +1,9 @@
+2004-12-29  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/mouse.c (MKSTR): Do not allow embedded newlines in the format
+	used for tracking mouse motion via an extra status line at the bottom
+	of the plot window. Extra newlines freeze gnuplot_x11 badly.
+
 2004-12-23  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/ggi.trm (GGI_fillbox GGI_set_color): Implement color selection
