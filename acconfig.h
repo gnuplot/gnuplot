@@ -104,6 +104,9 @@
 /* Define if you want to use the standard Unix plot library.  */
 #undef UNIXPLOT
 
+/* Define if you want to use the system time routines.  */
+#undef USE_SYSTEM_TIME
+
 /* Define to the version of the distribution.  */
 #undef VERSION
 
