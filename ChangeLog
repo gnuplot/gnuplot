@@ -1,6 +1,6 @@
 2002-02-14  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
-	* NEWS: Mention changes to X11 outboard driver path and removel of
+	* NEWS: Mention changes to X11 outboard driver path and removal of
  	--with-x11-driver.
 
 	* INSTALL: Update configure --help excerpt: mention --exec-prefix,
@@ -17,6 +17,11 @@
 	compilers, or uses usleep() if defined HAVE_USLEEP.
 
 2002-02-14  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* configure.in: Add check for usleep().
+
+	* demo/Makefile.am.in: Pass GNUPLOT_DRIVER_DIR in the environment to
+	let gnuplot use the uninstalled X11 driver.
 
 	* man/Makefile.am: Fix lasergnu installation to honour DESTDIR.
 
