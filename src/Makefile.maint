@@ -27,11 +27,7 @@ makefile.all: Makefile.maint
 	@echo CORETERM = $(patsubst %.trm,$$\(T\)%.trm,$(coreterm)) \
 	 | fmt | (tr '\012' @; echo) | sed 's/@$$/%/;s/@/ \\@/g' \
 	 | tr @% '\012\012' >>$@t
-	@if cmp -s $@ $@t; then \
-	  rm -f $@t; \
-	else \
-	  mv $@t $@; \
-	fi
+	@if cmp -s $@ $@t; then rm -f $@t; else mv $@t $@; fi
 
 Makefile.in: makefile.all
 	@echo Making $@
@@ -39,11 +35,7 @@ Makefile.in: makefile.all
 	@sed -n '1,/^##makefile-all-begin/p' $@ > $@t
 	@cat $< >> $@t
 	@sed -n '/^##makefile-all-end/,$$p' $@ >> $@t
-	@if cmp -s $@ $@t; then \
-	  rm -f $@t; \
-	else \
-	  mv $@t $@; \
-	fi
+	@if cmp -s $@ $@t; then rm -f $@t; else mv $@t $@; fi
 
 version.c: ../VERSION ../PATCHLEVEL Makefile.maint
 	@echo Making $@
@@ -56,9 +48,5 @@ version.c: ../VERSION ../PATCHLEVEL Makefile.maint
 	      -e '/^char date/ s/"[^"]*"/"@DATE@"/' \
 	      -e "s/@VERS@/$(version)/" -e "s/@PLVL@/$(patchlevel)/" \
 	      -e "s/@DATE@/$(date)/" $@ >$@t; \
-	  if cmp -s $@ $@t; then \
-	    rm -f $@t; \
-	  else \
-	    mv $@t $@; \
-	  fi \
+	  if cmp -s $@ $@t; then rm -f $@t; else mv $@t $@; fi \
 	fi

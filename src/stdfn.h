@@ -129,11 +129,11 @@ double strtod();
 # else
 #  include <varargs.h>
 #  define VA_START(args, lastarg) va_start(args)
-# endif
-#else
+# endif /* !ANSI_C */
+#else /* HAVE_VFPRINTF || HAVE_DOPRNT */
 # define va_alist a1, a2, a3, a4, a5, a6, a7, a8
 # define va_dcl char *a1, *a2, *a3, *a4, *a5, *a6, *a7, *a8;
-#endif /* HAVE_VFPRINTF */
+#endif /* !(HAVE_VFPRINTF || HAVE_DOPRNT) */
 
 #ifdef HAVE_UNISTD_H
 # include <unistd.h>
