@@ -261,9 +261,6 @@
 /*  Define if you are using the X11 window system.  */
 #undef X11
 
-/*  Define the default x11 driver name.  */
-#undef GNUPLOT_X11
-
 /*  Define if this is an MSDOS system.  */
 #undef MSDOS
 

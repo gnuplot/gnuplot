@@ -76,6 +76,7 @@ LINUXSUID = @LINUXSUID@
 OBJEXT = @OBJEXT@
 PACKAGE = @PACKAGE@
 PDFLATEX = @PDFLATEX@
+PKG_MAJOR = @PKG_MAJOR@
 PLAINTEX = @PLAINTEX@
 TERMLIBS = @TERMLIBS@
 TERMXLIBS = @TERMXLIBS@
@@ -107,7 +108,7 @@ bin_PROGRAMS = gnuplot $(GNUPLOT_X11)
 noinst_PROGRAMS = bf_test
 
 XLIBS = @LIBRARIES_FOR_X@
-AM_CPPFLAGS = -I../term -I$(top_srcdir)/term -DBINDIR=\"$(bindir)\" -DCONTACT=\"$(EMAIL)\" -DHELPFILE=\"$(HELPFILE)\"
+AM_CPPFLAGS = -I../term -I$(top_srcdir)/term -DBINDIR=\"$(bindir)\" -DX11_DRIVER_DIR=\"$(pkglibdir)/$(PKG_MAJOR)\" -DCONTACT=\"$(EMAIL)\" -DHELPFILE=\"$(HELPFILE)\"
 
 gnuplot_SOURCES = alloc.c alloc.h ansichek.h axis.c axis.h binary.c \
 binary.h bitmap.c bitmap.h color.c color.h command.c command.h \
@@ -730,9 +731,6 @@ uninstall-info: uninstall-info-recursive
 	uninstall-am uninstall-binPROGRAMS uninstall-info-am \
 	uninstall-info-recursive uninstall-recursive
 
-
-@ALT_X11_DRIVER_TRUE@$(GNUPLOT_X11): gnuplot_x11
-@ALT_X11_DRIVER_TRUE@	cp gnuplot_x11 $(GNUPLOT_X11)
 # begin makefile.all
 # end makefile.all
 term$U.o: $(CORETERM)

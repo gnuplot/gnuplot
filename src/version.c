@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: version.c,v 1.43 2001/11/28 18:02:49 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: version.c,v 1.44 2002/01/22 17:45:17 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - version.c */
@@ -41,7 +41,7 @@ static char *RCSid() { return RCSid("$Id: version.c,v 1.43 2001/11/28 18:02:49 l
 
 const char gnuplot_version[] = "3.8i";
 const char gnuplot_patchlevel[] = "0";
-const char gnuplot_date[] = "Mon Jan 21 21:21:20 GMT 2002";
+const char gnuplot_date[] = "Wed Feb 13 18:22:43 GMT 2002";
 const char gnuplot_copyright[] = "Copyright(C) 1986 - 1993, 1999 - 2002";
 
 const char faq_location[] = FAQ_LOCATION;
