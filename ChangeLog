@@ -1,8 +1,14 @@
 2001-05-11  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
+	* docs/gnuplot.doc: Inaccuracy regarding yerrorbars fixed --- it's
+ 	really more like `points', not like `dots', i.e. the central point
+ 	is drawn with a normal point symbol.
+
+2001-05-11  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
 	* config/makefile.nt: add "mouse" and "gpexecute" to the linker
-	response file, too, and add #define options for USE_MOUSE and
-	WIN_IPC. Thanks to Theo Hopman for noticing these.
+ 	response file, too, and add #define options for USE_MOUSE and
+ 	WIN_IPC. Thanks to Theo Hopman for noticing these.
 
 2001-04-24  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 

@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.64 2001/03/21 17:05:34 mikulik Exp $
+C RCS $Id: gnuplot.doc,v 1.65 2001/03/27 09:15:17 mikulik Exp $
 C 3 December 1998
 C Copyright (C) 1986 - 1993, 1998   Thomas Williams, Colin Kelley
 C
@@ -6046,7 +6046,7 @@ C  The `lines` style connects adjacent points with straight line segments.
 ?yerrorbars
 ?errorbars
  The `yerrorbars` (or `errorbars`) style is only relevant to 2-d data plots.
- `yerrorbars` is like `dots`, except that a vertical error bar is also drawn.
+ `yerrorbars` is like `points`, except that a vertical error bar is also drawn.
  At each point (x,y), a line is drawn from (x,y-ydelta) to (x,y+ydelta) or
  from (x,ylow) to (x,yhigh), depending on how many data columns are provided.
  A tic mark is placed at the ends of the error bar (unless `set bars` is
