@@ -67,7 +67,7 @@ case "$with_$1" in
     gp_lib_list="$gp_lib_prefix $gp_lib_prefix/lib $gp_lib_path"
 esac
 for ac_dir in '' /usr/local/lib $gp_lib_list ; do
-  TERMLIBS="`test x${ac_dir} != x && echo -L${ac_dir}` $gp_save_TERMLIBS"
+  test x${ac_dir} != x && TERMLIBS="-L${ac_dir} $gp_save_TERMLIBS"
   gp_CHECK_LIB_QUIET($1,$2,dnl
     TERMLIBS="$TERMLIBS -l$1"; break, dnl ACTION-IF-FOUND
     TERMLIBS="$gp_save_TERMLIBS",     dnl ACTION-IF-NOT-FOUND
