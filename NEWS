@@ -1,4 +1,18 @@
 Changes in release 4.0:
+* NEW experimental driver for Enhanced Metafile Format,
+  configure with --enable-emf
+* FIXED bug in 3d plot introduced by mouse code (using variables
+  before initialisation)
+* FIXED 3d key clipping
+* FIXED zeroaxes bug introduced by vector clipping
+* FIXED bug with "smooth unique" inrange/outrange conditions
+* FIXED autoscale writeback bug (see BUGS entry 3)
+* FIXED png parser bug
+* FIXED buggy `show m[xyz][2]tics' command
+* FIXED bug in `show key' if key is boxed
+* FIXED building on VMS
+* terminal-dependent configuration of GNU readline
+
 [3.8c]
 * NEW mouse support for OS/2 and X11
   - --enable-mouse option
