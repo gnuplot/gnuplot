@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*- */
-/* $Id: tgif.trm,v 1.29 2004/11/07 10:27:03 mikulik Exp $ */
+/* $Id: tgif.trm,v 1.30 2004/11/27 02:38:38 sfeam Exp $ */
 
 /* GNUPLOT - tgif.trm */
 
@@ -64,6 +64,11 @@
 /*          - break long "polygon()" directives into lines, as it made     */
 /*            Tgif fail polygons had >8 sides                              */
 /*            (e.g. when using "filledcurves")                             */
+/*                                                                         */
+/* Modified  29 November 2004  Shigeharu TAKENO <shige@iee.niit.ac.jp>     */
+/*          - add linewidth and monochrome options                         */
+/*            update option parsing to be order-independent                */
+/*                                                                         */
 /***************************************************************************/
 
 /*}}}  */
@@ -73,6 +78,9 @@
 #ifdef TERM_REGISTER
 register_term(tgif)
 #endif
+
+#define USE_LINEWIDTH
+#define USE_MONO_MODE
 
 #ifdef TERM_PROTO
 TERM_PUBLIC void TGIF_options __PROTO((void));
@@ -90,6 +98,9 @@ TERM_PUBLIC void TGIF_point __PROTO((unsigned int ux, unsigned int uy, int numbe
 TERM_PUBLIC void TGIF_arrow __PROTO((unsigned int sx, unsigned int sy, unsigned int ex, unsigned int ey, int head));
 TERM_PUBLIC int TGIF_set_font __PROTO((const char *font));
 TERM_PUBLIC void TGIF_set_pointsize __PROTO((double size));
+#ifdef USE_LINEWIDTH
+TERM_PUBLIC void TGIF_set_linewidth __PROTO((double size));
+#endif
 #ifdef PM3D
 TERM_PUBLIC int TGIF_make_palette (t_sm_palette *);
 /* TERM_PUBLIC void TGIF_previous_palette (void); */
@@ -147,7 +158,7 @@ static unsigned int uLastTgifX, uLastTgifY;	/* last Coordinate         */
 
 static unsigned int uActNr;	/* current elementnumber                   */
 static unsigned int uActPage;	/* current pagenumber                      */
-static unsigned int uActResolution;	/* resolution in percent           */
+static unsigned int uActResolution=100;	/* resolution in percent           */
 static unsigned int uActZoom;	/* zoom factor                             */
 static unsigned int uActAngle;	/* current textangle                       */
 static unsigned int uActThick;	/* actual linethickness                    */
@@ -157,16 +168,24 @@ static unsigned int uActJust;	/* actual textjustification                */
 static unsigned int uXshift;	/* actual shift x                          */
 static unsigned int uYshift;	/* actual shift y                          */
 static unsigned int uTgifPlotCount;	/* counts number of plots          */
-static unsigned int uTgifPlotRow, uTgifPlotCol;		/* actual plot row and col   */
-static unsigned int uTgif_win_horiz, /* number of plots in x and  */ uTgif_win_verti;	/*      y direction [x,y]         */
+static unsigned int uTgifPlotRow=1, uTgifPlotCol=1;		/* actual plot row and col   */
+static unsigned int uTgif_win_horiz=1, /* number of plots in x and  */ 
+    uTgif_win_verti=1;	/*      y direction [x,y]         */
 
 
+#ifdef USE_LINEWIDTH
+static double uActThick_factor=1.0;
+static double uActThick_default=1.0;
+#endif
+#ifdef USE_MONO_MODE
+static TBOOLEAN TgifUseColor = TRUE;
+#endif
 
 static char sActColor[TGIF_STRLEN_MAX];		/* current color         */
-static unsigned int uDefaultFontSize;	/* default font size         */
-static unsigned int uActFontSize;	/* current font size         */
-static char sDefaultFont[TGIF_STRLEN_MAX];	/* default font          */
-static char sActFont[TGIF_STRLEN_MAX];	/* current font          */
+static unsigned int uDefaultFontSize = 18;	/* default font size         */
+static unsigned int uActFontSize = 18;	/* current font size         */
+static char sDefaultFont[TGIF_STRLEN_MAX] = "Helvetica";	/* default font          */
+static char sActFont[TGIF_STRLEN_MAX] = "Helvetica";	/* current font          */
 /* static char          sActPointString[TGIF_STRLEN_MAX]; HBB: unused */
 
 static TBOOLEAN TgifSolid = FALSE;
@@ -241,6 +260,35 @@ TGIF_flush_poly()
 }				/* TGIF_flush_poly */
 /*}}}  */
 /***************************************************************************/
+
+enum TGIF_id {
+    TGIF_MONOCHROME, TGIF_COLOR,
+    TGIF_LINEWIDTH,
+    TGIF_PORTRAIT, TGIF_LANDSCAPE,
+    TGIF_GRAPHS,
+    TGIF_SOLID, TGIF_DASHED,
+    TGIF_FONT,
+    TGIF_OTHER,
+    TGIF_DEFAULT
+};
+
+static struct gen_table TGIF_opts[] =
+{
+    {"mo$nochrome", TGIF_MONOCHROME},
+    {"c$olor", TGIF_COLOR},
+    {"c$olour", TGIF_COLOR},
+    {"linew$idth", TGIF_LINEWIDTH},
+    {"lw", TGIF_LINEWIDTH},
+    {"p$ortrait", TGIF_PORTRAIT},
+    {"l$andscape", TGIF_LANDSCAPE},
+    {"[", TGIF_GRAPHS},
+    {"s$olid", TGIF_SOLID},
+    {"d$ashed", TGIF_DASHED},
+    {"font", TGIF_FONT},
+    {"default", TGIF_DEFAULT},
+    {NULL, TGIF_OTHER}
+};
+
 TERM_PUBLIC void
 TGIF_options()
 {
@@ -248,39 +296,67 @@ TGIF_options()
     struct value a, b;
     double dscaleH, dscaleV;
 
+    while (!END_OF_COMMAND) {
+	switch(lookup_table(&TGIF_opts[0],c_token)) {
+	case TGIF_DEFAULT:
+	    strcpy(sActFont, "Helvetica");
+	    strcpy(sDefaultFont, "Helvetica");
+	    uActFontSize = 18;
+	    uDefaultFontSize = 18;
+	    term->v_char = (unsigned int) (uActFontSize);
+	    term->h_char = (unsigned int) (uActFontSize * 6 / 10);
 
-    strcpy(sActFont, "Helvetica");
-    strcpy(sDefaultFont, "Helvetica");
-    uActFontSize = 18;
-    uDefaultFontSize = 18;
-    term->v_char = (unsigned int) (uActFontSize);
-    term->h_char = (unsigned int) (uActFontSize * 6 / 10);
-
-    TgifPortrait = TRUE;
-    uTgifPlotsPerPage = 1;
-    uTgifPlotRow = 1;
-    uTgifPlotCol = 1;
-    uTgif_win_horiz = 1;
-    uTgif_win_verti = 1;
-    uActResolution = 100;
-
-
-/*}}}  */
-
-    if (!END_OF_COMMAND) {
-	if (almost_equals(c_token, "p$ortrait")) {
+	    TgifPortrait = TRUE;
+#ifdef USE_MONO_MODE
+	    TgifUseColor = TRUE;
+#endif
+	    TgifSolid = FALSE;
+	    uTgifPlotsPerPage = 1;
+	    uTgifPlotRow = 1;
+	    uTgifPlotCol = 1;
+	    uTgif_win_horiz = 1;
+	    uTgif_win_verti = 1;
+	    uActResolution = 100;
+#ifdef USE_LINEWIDTH
+	    uActThick_factor = 1.0;
+	    uActThick_default = 1.0;
+#endif
+	    c_token++;
+	    break;
+#ifdef USE_MONO_MODE
+	case TGIF_MONOCHROME:
+	    TgifUseColor = FALSE;
+	    c_token++;
+	    break;
+	case TGIF_COLOR:
+	    TgifUseColor = TRUE;
+	    c_token++;
+	    break;
+#endif
+#ifdef USE_LINEWIDTH
+	case TGIF_LINEWIDTH:
+	    c_token++;
+	    if (END_OF_COMMAND) {
+		int_error(c_token, "linewidth: width is not specified.");
+	    } else {
+		if((uActThick_default = real(const_express(&a)))<=0.0){
+		    int_error(c_token-1,"linewidth: out of range");
+		    uActThick_default = 1.0;
+		}
+	    }
+	    break;
+#endif
+	case TGIF_PORTRAIT:
 	    TgifPortrait = TRUE;
 	    c_token++;
-	} else if (almost_equals(c_token, "l$andscape")) {
+	    break;
+	case TGIF_LANDSCAPE:
 	    TgifPortrait = FALSE;
-	    uActResolution = 140;
+	    /* uActResolution = 140; 
+	    */
 	    c_token++;
-	}
-    }
-/*}}}  */
-
-    if (!END_OF_COMMAND) {
-	if (equals(c_token, "[")) {	/* windows specified */
+	    break;
+	case TGIF_GRAPHS:
 	    c_token++;
 	    if (END_OF_COMMAND) {
 		int_error(c_token, "no. windows: [horizontal,vertical] expected");
@@ -296,39 +372,33 @@ TGIF_options()
 	    if (!equals(c_token, "]"))
 		int_error(c_token, "expecting ']'");
 	    c_token++;
-
 	    uTgifPlotsPerPage = uTgif_win_verti * uTgif_win_horiz;
-
-
-	}
-    }
-/*}}}  */
-
-    if (!END_OF_COMMAND) {
-	if (almost_equals(c_token, "s$olid")) {
+	    break;
+	case TGIF_SOLID:
 	    TgifSolid = TRUE;
 	    c_token++;
-	} else if (almost_equals(c_token, "d$ashed")) {
+	    break;
+	case TGIF_DASHED:
 	    TgifSolid = FALSE;
 	    c_token++;
+	    break;
+	case TGIF_FONT:
+	case TGIF_OTHER:
+	default:
+	    if (isstring(c_token)) {
+		quote_str(sActFont, c_token, MAX_LINE_LEN);
+		strcpy(sDefaultFont, sActFont);
+		c_token++;
+	    } else {
+		/* We have font size specified */
+		uActFontSize = (unsigned int) real(const_express(&b));
+		uDefaultFontSize = uActFontSize;
+		term->v_char = (unsigned int) (uActFontSize);
+		term->h_char = (unsigned int) (uActFontSize * 6 / 10);
+	    }
+	    break;
 	}
     }
-/*}}}  */
-
-    if (!END_OF_COMMAND && isstring(c_token)) {
-	quote_str(sActFont, c_token, MAX_LINE_LEN);
-	strcpy(sDefaultFont, sActFont);
-	c_token++;
-    }
-    if (!END_OF_COMMAND) {
-	/* We have font size specified */
-	uActFontSize = (unsigned int) real(const_express(&b));
-	uDefaultFontSize = uActFontSize;
-	term->v_char = (unsigned int) (uActFontSize);
-	term->h_char = (unsigned int) (uActFontSize * 6 / 10);
-    }
-/*}}}  */
-
     if (TgifPortrait) {
 	dscaleH = (double) 100.0 *(TGIF_XTOT) / (xsize * (TGIF_XMAX + (uTgif_win_horiz - 1) * TGIF_XSHIFT));
 	dscaleV = (double) 100.0 *(TGIF_YTOT) / (ysize * (TGIF_YMAX + (uTgif_win_verti - 1) * TGIF_YSHIFT));
@@ -366,11 +436,22 @@ TGIF_options()
 	}
     }
 
-/*}}}  */
-
-    sprintf(term_options, "%s [%u,%u] %s \"%s\" %u",
+    sprintf(term_options, "%s%s%s [%u,%u]",
+	    term_options, term_options[0]!='\0' ? " ":"",
 	    TgifPortrait ? "portrait" : "landscape",
-	    uTgif_win_horiz, uTgif_win_verti,
+	    uTgif_win_horiz, uTgif_win_verti);
+#ifdef USE_MONO_MODE
+    sprintf(term_options, "%s%s%s",
+	    term_options, term_options[0]!='\0' ? " ":"",
+	    TgifUseColor ? "color" : "monochrome");
+#endif
+#ifdef USE_LINEWIDTH
+    sprintf(term_options, "%s%s%s %f",
+	    term_options, term_options[0]!='\0' ? " ":"",
+	    "linewidth",uActThick_default);
+#endif
+    sprintf(term_options, "%s%s%s \"%s\" %u",
+	    term_options, term_options[0]!='\0' ? " ":"",
 	    TgifSolid ? "solid" : "dashed",
 	    sActFont, uActFontSize);
 }
@@ -394,7 +475,7 @@ TGIF_init()
 %%TGIF 2.15-p7\n\
 state(%d,30,%u,0,0,%u,16,1,9,1,1,0,0,0,0,1,0,'%s',0,%u,0,0,1,10,0,0,1,1,0,16,0,0,1,1,1).\n\
 %%\n\
-%% @(#)$Header: /cvsroot/gnuplot/gnuplot/term/tgif.trm,v 1.29 2004/11/07 10:27:03 mikulik Exp $\n\
+%% @(#)$Header: /cvsroot/gnuplot/gnuplot/term/tgif.trm,v 1.30 2004/11/27 02:38:38 sfeam Exp $\n\
 %% %%W%%\n\
 %%\n\
 page(1,\"\").\n",
@@ -461,8 +542,12 @@ TGIF_graphics()
     uActThick = 1;
     uActStyle = 0;
     uActJust = LEFT;
+#ifndef USE_MONO_MODE
     strcpy(sActColor, psColors[0]);
-
+#else
+    if(TgifUseColor == FALSE) strcpy(sActColor,"black");
+    else strcpy(sActColor, psColors[0]);
+#endif
 
 }				/* TGIF_graphics */
 /*}}}  */
@@ -507,8 +592,17 @@ TGIF_linetype(int linetype)
     else
 	ult = linetype + 2;
 
+#ifndef USE_MONO_MODE
     strcpy(sActColor, psColors[ult]);
+#else
+    if(TgifUseColor == FALSE) strcpy(sActColor,"black");
+    else strcpy(sActColor, psColors[ult]);
+#endif
+#ifndef USE_LINEWIDTH
     uActThick = uLineThick[ult];
+#else
+    uActThick = uActThick_factor * uActThick_default * uLineThick[ult]+0.5;
+#endif
     if (!TgifSolid)
 	uActStyle = uLineStyle[ult];
     else {
@@ -1481,6 +1575,14 @@ TGIF_set_pointsize(double size)
     uActPointSize = size < 0. ? 1. : size;
 }
 
+#ifdef USE_LINEWIDTH
+TERM_PUBLIC void
+TGIF_set_linewidth(double size)
+{
+    uActThick_factor = size < 0. ? 1. : size;
+}
+#endif
+
 /*}}}  */
 /***************************************************************************/
 TERM_PUBLIC int
@@ -1509,6 +1611,21 @@ TGIF_make_palette(t_sm_palette *palette)
     TGIF_flush_poly(); /* Clean up current data */
 
     if (TGIF_palette_set == FALSE) {
+#ifdef USE_MONO_MODE
+	if (TgifUseColor == FALSE 
+	    || sm_palette.colorMode == SMPAL_COLOR_MODE_GRAY) {
+            /* Gray palette */
+	    if (TgifUseColor == FALSE 
+		&& sm_palette.colorMode == SMPAL_COLOR_MODE_RGB){
+		fprintf(stderr, "Monochrome Tgif file: ");
+		fprintf(stderr, "using gray palette instead of color\n");
+	    }
+            for (i = 0; i < sm_palette.colors; i++) {
+                int j = (int)(i * 255.0 / (sm_palette.colors-1) + 0.5);
+                sprintf(TGIF_colours[i],"#%.2x%.2x%.2x",j,j,j);
+            }
+	} else {
+#endif    
 	/* Create new palette */
 	for (i = 0; i < sm_palette.colors; i++) {
 	    sprintf(TGIF_colours[i],"#%.2x%.2x%.2x",
@@ -1516,6 +1633,9 @@ TGIF_make_palette(t_sm_palette *palette)
 		(int)( palette->color[i].g * 255 + 0.5 ),
 		(int)( palette->color[i].b * 255 + 0.5 ) );
 	}
+#ifdef USE_MONO_MODE
+	}
+#endif
 	TGIF_palette_set = TRUE;
     } else {
 	fprintf(stderr, "Attempt to set palette twice\n");
@@ -1584,7 +1704,11 @@ TERM_TABLE_START(tgif_driver)
     TGIF_text, null_scale, TGIF_graphics, TGIF_move, TGIF_vector,
     TGIF_linetype, TGIF_put_text, TGIF_text_angle,
     TGIF_justify_text, TGIF_point, TGIF_arrow, TGIF_set_font,
+#ifndef USE_LINEWIDTH
     TGIF_set_pointsize, TERM_CAN_MULTIPLOT, 0, 0, 0, 0
+#else
+    TGIF_set_pointsize, TERM_CAN_MULTIPLOT, 0, 0, 0, TGIF_set_linewidth
+#endif
 #ifdef USE_MOUSE
     ,0, 0, 0, 0, 0 /* no mouse support for the tgif terminal */
 #endif
@@ -1617,14 +1741,18 @@ START_HELP(tgif)
 " axes are not changed.",
 "",
 " Syntax:",
-"       set terminal tgif {portrait | landscape} {<[x,y]>}",
+"       set terminal tgif {portrait | landscape | default} {<[x,y]>}",
+"                         {monochrome | color}",
+"                         {{linewidth | lw} <LW>}",
 "                         {solid | dashed}",
 "                         {\"<fontname>\"} {<fontsize>}",
 "",
 " where <[x,y]> specifies the number of graphs in the x and y directions on the",
-" page, \"<fontname>\" is the name of a valid PostScript font, and <fontsize>",
-" specifies the size of the PostScript font.  Defaults are `portrait`, `[1,1]`,",
-" `dashed`, `\"Helvetica\"`, and `18`.",
+" page, `color` enables color, `linewidth` scales all linewidths by <LW>,",
+" \"<fontname>\" is the name of a valid PostScript font, and <fontsize>",
+" specifies the size of the PostScript font.",
+" `defaults` sets all options to their defaults: `portrait`, `[1,1]`, `color`,",
+" `linwidth 1.0`, `dashed`, `\"Helvetica\"`, and `18`.",
 "",
 " The `solid` option is usually prefered if lines are colored, as they often",
 " are in the editor.  Hardcopy will be black-and-white, so `dashed` should be",
