@@ -1,3 +1,8 @@
+2004-11-23  Ethan Merritt  <merritt@u.washington.edu>
+
+	src/gplt_x11.c: Initialize mouse_format to null string. Fixes bug that
+	in some circumstances the mouse position is printed as random garbage.
+
 2004-11-21  Ethan Merritt  <merritt@u.washington.edu>
 
 	Rearrange code so that pm3d support routines are available to both 2D
