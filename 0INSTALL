@@ -135,10 +135,10 @@ $ ./configure --help
   --with-readline (*)     use the builtin minimal readline function (default)
   --without-readline      do not use the builtin readline function
   --with-readline=gnu     use the GNU readline library
-  --with-readline=[PATH]          Specify the location of GNU readline
+  --with-readline[=PATH]          Specify the location of GNU readline
   --with-gd[=PATH]        enable gif terminal with Tom Boutell's gd library
                           (requires GD library)
-  --with-plot=[PATH]      use the Unix plot library
+  --with-plot[=PATH]      use the Unix plot library
   --with-png[=PATH] (*)   enable png terminal
                           (requires libpng and libz)
   --with-cwdrc            check current directory for .gnuplot file,
@@ -409,7 +409,7 @@ only three different possible values for the `with_package' variable:
 
    Use the GNU readline library instead of gnuplot's builtin readline.
 
-  --with-readline=[PATH]
+  --with-readline[=PATH]
 
    Use the GNU readline library instead of gnuplot's builtin readline.
    This form is required if GNU readline is not installed in a default
@@ -425,7 +425,7 @@ only three different possible values for the `with_package' variable:
 
     Dto. for the png library. This option is on by default.
 
-  --with-plot=[PATH]
+  --with-plot[=PATH]
 
     If used without the PATH argument, this option selects the standard
     UNIX plot library, if available. If used with the PATH argument,
