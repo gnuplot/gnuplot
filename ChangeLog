@@ -1,8 +1,17 @@
+2002-05-29  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/internal.c (BAD_DEFAULT): Fix typo in message text:
+ 	"internal" <-- "interal".
+
+	* term/svg.trm (SVG_init): Change self-description of SVG output
+ 	file to no longer give the name of the original author of svg.trm.
+  	Output the version number and patchlevel of gnuplot instead.
+
 2002-05-29  Johannes Zellner  <johannes@zellner.org>
 
-	* term/x11.trm src/gplt_x11.c term/README: first 13 pointtypes like
-	in the postscript driver. --> new point types circle and upside-down
-	triangle and all shapes also filled.
+	* term/x11.trm src/gplt_x11.c term/README: first 13 pointtypes
+ 	like in the postscript driver. --> new point types circle and
+ 	upside-down triangle and all shapes also filled.
 
 	point  pointtype
 	    0          1  plus
@@ -19,20 +28,21 @@
 	   11         12  diamond
 	   12         13  diamond               filled
 
-	* gplt_x11.c: replaced the info 'drawing ...' in the xwindow's title
-	bar by a watch cursor. Removed the message which tells how many pm3d
-	colors could be allocated.
+	* gplt_x11.c: replaced the info 'drawing ...' in the xwindow's
+ 	title bar by a watch cursor. Removed the message which tells how
+ 	many pm3d colors could be allocated.
 
 2002-05-23  Petr Mikulik  <mikulik@physics.muni.cz>
 
-	* config/makefile.cyg config/makefile.mgw config/makefile.os2: Support
-	all compile options for the new gd driver.
+	* config/makefile.cyg config/makefile.mgw config/makefile.os2:
+ 	Support all compile options for the new gd driver.
 
 	* config/makefile.mgw: Added compile options for the pdf driver.
 
 2002-05-23  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
-	* lisp/Makefile.in: New install-els target to install the .el files.
+	* lisp/Makefile.in: New install-els target to install the .el
+ 	files.
 
 2002-05-21  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
@@ -60,24 +70,25 @@
 
 2002-05-16  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
-	* specfun.c: Add new implementation of lngamma(), inverse_normal_func(),
-	inverse_error_func(), based on CEPHES library, and NIST. Contributed
-	by Dietmar Warning.
+	* specfun.c: Add new implementation of lngamma(),
+ 	inverse_normal_func(), inverse_error_func(), based on CEPHES
+ 	library, and NIST. Contributed by Dietmar Warning.
 
 2002-05-16  Johannes Zellner  <johannes@zellner.org>
 
 	* term/gd.trm, term/linux.trm: Added prototypes, removed unused
-	variable.
+ 	variable.
 
 2002-05-16  Johannes Zellner  <johannes@zellner.org>
 
-	* term/svg.trm: Added shape-rendering:crispEdges to render surfaces
-	correctly, changed color spec to rgb() which is	more readable.
+	* term/svg.trm: Added shape-rendering:crispEdges to render
+ 	surfaces correctly, changed color spec to rgb() which is more
+ 	readable.
 
 2002-05-16  Johannes Zellner  <johannes@zellner.org>
 
-	* term/svg.trm, docs/gnuplot.doc pm3d/README: pm3d support for the svg
-	driver.
+	* term/svg.trm, docs/gnuplot.doc pm3d/README: pm3d support for the
+ 	svg driver.
 
 2002-05-16  Johannes Zellner  <johannes@zellner.org>
 
@@ -510,7 +521,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/05/23 20:28:35 $).
+	last modification date (from the tag $Date: 2002/05/29 10:41:05 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
