@@ -233,7 +233,7 @@ C
 
  25. Point styles and sizes, line types and widths can be specified on the
  `plot` command.  Line types and widths can also be specified for grids,
- borders, tics and arrows.  See `plot with`.  Furthermore these types may be
+ borders tics and arrows.  See `plot with`.  Furthermore these types may be
  combined and stored for further use.  See `set linestyle`.
 
  26. Text (labels, tic labels, and the time stamp) can be written vertically
@@ -2887,7 +2887,7 @@ C ... and restart the table:
 ?set angles
 ?show angles
 ?angles
-?set angles degrees
+?degrees
  By default, `gnuplot` assumes the independent variable in polar graphs is in
  units of radians.  If `set angles degrees` is specified before `set polar`,
  then the default range is [0:360] and the independent variable has units of
@@ -3583,7 +3583,6 @@ C ... and restart the table:
 4 format specifiers
 ?set format specifiers
 ?format specifiers
-?format_specifiers
  The acceptable formats (if not in date/time mode) are:
 
 @start table - first is interactive cleartext form
@@ -3676,9 +3675,8 @@ C ... and restart the table:
  valid codes for the 'strftime' function (outside of `gnuplot`, type "man
  strftime").  See `set timefmt` for a list of the allowed input format codes.
 4 date/time specifiers
-?set format date/time_specifiers
-?format date/time_specifiers
-?date/time_specifiers
+?set date/time specifiers
+?date/time specifiers
  In date/time mode, the acceptable formats are:
 
 @start table - first is interactive cleartext form
@@ -5314,7 +5312,7 @@ C ... and restart the table:
 ?x2dtics
 ?nox2dtics
  The `set x2dtics` command changes tics on the x2 (top) axis to days of the
- week.  Please see `set xmtics` for details.
+ week.  Please see `set xdtics` for details.
 3 x2label
 ?set x2label
 ?show x2label
@@ -5677,7 +5675,7 @@ C ... and restart the table:
 ?y2dtics
 ?noy2dtics
  The `set y2dtics` command changes tics on the y2 (right-hand) axis to days of
- the week.  Please see `set xmtics` for details.
+ the week.  Please see `set xdtics` for details.
 3 y2label
 ?set y2label
 ?show y2label
@@ -5726,7 +5724,7 @@ C ... and restart the table:
 ?ydtics
 ?noydtics
  The `set ydtics` command changes tics on the y axis to days of the week.
- Please see `set xmtics` for details.
+ Please see `set xdtics` for details.
 3 ylabel
 ?set ylabel
 ?show ylabel
@@ -5774,7 +5772,7 @@ C ... and restart the table:
 ?zdtics
 ?nozdtics
  The `set zdtics` command changes tics on the z axis to days of the week.
- Please see `set xmtics` for details.
+ Please see `set xdtics` for details.
 3 zero
 ?set zero
 ?show zero
