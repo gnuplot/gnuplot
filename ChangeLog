@@ -1,5 +1,11 @@
 2002-02-16  Petr Mikulik  <mikulik@physics.muni.cz>
 
+	* src/plot3d.h src/plot3d.c src/datafile.c src/pm3d.c: New fix of
+	cb-axis autoscale for binary datafiles. Now pm3d splots should work
+	with all combinations of linear and logarithmic z and cb axes.
+
+2002-02-15  Petr Mikulik  <mikulik@physics.muni.cz>
+
 	* src/plot3d.c: Let the default legend title for  splot 'a.dat' binary
 	is just  'a.dat'  instead of the current  'a.dat' binary  while for
 	'a.dat' binary using 2:1:3  all 4 words as now.

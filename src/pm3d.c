@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.22 2002/02/13 22:58:18 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.23 2002/02/15 14:03:50 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - pm3d.c */
@@ -61,14 +61,13 @@ int
 set_pm3d_zminmax()
 {
     if (CB_AXIS.set_autoscale & AUTOSCALE_MIN) {
-	if (PM3D_IMPLICIT == pm3d.implicit) {
-	    CB_AXIS.min = get_non_pm3d_min();
+	double cb = get_non_pm3d_min();
+	if (cb < CB_AXIS.min) /* unused cb is usually VERYLARGE */
+	    CB_AXIS.min = cb;
 	    if (CB_AXIS.min >= VERYLARGE)
-		/* fallback, currently happens for "splot ... binary" and 
-		 * "splot ... with ... palette" */
-		CB_AXIS.min = axis_array[FIRST_Z_AXIS].min;
+	    /* fallback, happens for "splot ... binary" and for "with ... palette */
+	    CB_AXIS.min = AXIS_DE_LOG_VALUE(FIRST_Z_AXIS,Z_AXIS.min);
 	    CB_AXIS.min = axis_log_value_checked(COLOR_AXIS, CB_AXIS.min, "color axis");
-	}
     } else {
 	/* Negative z: Call graph_error(), thus stop by an error message
 	 * without any plot as in the case of other negative-range-and-log
@@ -81,14 +80,13 @@ set_pm3d_zminmax()
     if (CB_AXIS.set_autoscale & AUTOSCALE_MAX) {
 	/* CB_AXIS.min has been initialized to -VERYLARGE
 	 * in plot3d.c:plot3drequest() */
-	if (PM3D_IMPLICIT == pm3d.implicit) {
-	    CB_AXIS.max = get_non_pm3d_max();
+	double cb = get_non_pm3d_max();
+	if (cb > CB_AXIS.max) /* unused cb is usually -VERYLARGE */
+	    CB_AXIS.max = cb;
 	    if (CB_AXIS.max <= -VERYLARGE)
-		/* fallback, currently happens for "splot ... binary" and 
-		 * "splot ... with ... palette" */
-		CB_AXIS.max = axis_array[FIRST_Z_AXIS].max;
+	/* fallback, happens for "splot ... binary" and for "with ... palette */
+	    CB_AXIS.max = AXIS_DE_LOG_VALUE(FIRST_Z_AXIS,Z_AXIS.max);
 	    CB_AXIS.max = axis_log_value_checked(COLOR_AXIS, CB_AXIS.max, "color axis");
-	}
     } else {
 	/* Negative z: see above */
 	CB_AXIS.max = axis_log_value_checked(COLOR_AXIS, CB_AXIS.set_max, "color axis");

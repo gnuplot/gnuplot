@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.30 2001/11/29 14:12:55 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.31 2002/02/15 17:07:18 amai Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -1319,7 +1319,14 @@ df_3dmatrix(this_plot)
 	    STORE_WITH_LOG_AND_UPDATE_RANGE(point->x, used[0], point->type, FIRST_X_AXIS, NOOP, goto skip);
 	    STORE_WITH_LOG_AND_UPDATE_RANGE(point->y, used[1], point->type, FIRST_Y_AXIS, NOOP, goto skip);
 	    STORE_WITH_LOG_AND_UPDATE_RANGE(point->z, used[2], point->type, FIRST_Z_AXIS, NOOP, goto skip);
-	    /* some of you wont like this, but I say goto is for this */
+#ifdef PM3D
+	    /* see also: plot3d.c: get_3ddata(this_plot) */
+#define NEED_PALETTE(plot) (PM3DSURFACE == (this_plot)->plot_style || 1 == (this_plot)->lp_properties.use_palette)
+	    /* there should be `color' instead of used[2], when this is
+	     * implemented for binary files */
+	    update_pm3d_zrange(used[2], NEED_PALETTE(this_plot));
+#endif
+	    /* some of you won't like this, but I say goto is for this */
 
 	  skip:
 	    ;			/* ansi requires this */

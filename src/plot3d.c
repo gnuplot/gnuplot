@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.40 2002/02/15 15:40:58 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.41 2002/02/15 22:59:08 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -83,7 +83,6 @@ static void calculate_set_of_isolines __PROTO((AXIS_INDEX value_axis, TBOOLEAN c
 					       AXIS_INDEX iso_axis, double iso_min, double iso_step, int num_iso_to_use,
 					       AXIS_INDEX sam_axis, double sam_min, double sam_step, int num_sam_to_use,
 					       TBOOLEAN need_palette));
-static void update_pm3d_zrange __PROTO((double value, TBOOLEAN need_palette));
 #define NEED_PALETTE(plot) (PM3DSURFACE == (plot)->plot_style || 1 == (plot)->lp_properties.use_palette)
 #else
 static void calculate_set_of_isolines __PROTO((AXIS_INDEX value_axis, TBOOLEAN cross, struct iso_curve **this_iso,
@@ -299,7 +298,7 @@ static double
 splines_kernel(h)
 double h;
 {
-    /* this is normaly not usefull ... */
+    /* this is normaly not useful ... */
     h = fabs(h);
 
     if (h != 0.0) {
@@ -324,19 +323,20 @@ get_non_pm3d_max()
     return g_non_pm3d_max;
 }
 
-static void
+void
 update_pm3d_zrange(value, pal)
     double value;
     TBOOLEAN pal;
 {
+    if (CB_AXIS.log && value < 0.0)
+	/* ignore negative points on log axis */
+	return;
     if (pal) {
 	if (value < CB_AXIS.min) {
-	    /* if (axis_array[FIRST_Z_AXIS].autoscale & AUTOSCALE_MIN) // XXX ??? */
 	    if (CB_AXIS.set_autoscale & AUTOSCALE_MIN)
 		CB_AXIS.min = value;
 	}
 	if (value > CB_AXIS.max) {
-	    /* if (axis_array[FIRST_Z_AXIS].autoscale & AUTOSCALE_MAX) // XXX ??? */
 	    if (CB_AXIS.set_autoscale & AUTOSCALE_MAX)
 		CB_AXIS.max = value;
 	}
@@ -1108,7 +1108,7 @@ eval_3dplots()
      */
     while (TRUE) {
 	if (END_OF_COMMAND)
-	    int_error(c_token, "function to plt3d expected");
+	    int_error(c_token, "function to plot expected");
 
 	start_token = c_token;
 
