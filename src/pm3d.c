@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.57 2005/03/15 15:59:39 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.58 2005/03/28 23:37:32 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - pm3d.c */
@@ -39,7 +39,7 @@ static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.57 2005/03/15 15:59:39 miku
 */
 
 pm3d_struct pm3d = {
-    "",				/* where[6] */
+    "s",			/* where[6] */
     PM3D_FLUSH_BEGIN,		/* flush */
     0,				/* no flushing triangles */
     PM3D_SCANS_AUTOMATIC,	/* scans direction is determined automatically */
@@ -48,7 +48,7 @@ pm3d_struct pm3d = {
 #if PM3D_HAVE_SOLID
     0,				/* solid (off by default, that means `transparent') */
 #endif /* PM3D_HAVE_SOLID */
-    PM3D_IMPLICIT,		/* implicit */
+    PM3D_EXPLICIT,		/* implicit */
     PM3D_WHICHCORNER_MEAN	/* color from which corner(s) */
 };
 
@@ -644,7 +644,7 @@ filled_color_contour_plot(struct surface_points *this_plot, int contours_where)
 void
 pm3d_reset()
 {
-    pm3d.where[0] = 0;
+    strcpy(pm3d.where, "s");
     pm3d.flush = PM3D_FLUSH_BEGIN;
     pm3d.ftriangles = 0;
     pm3d.direction = PM3D_SCANS_AUTOMATIC;
@@ -653,7 +653,7 @@ pm3d_reset()
 #if PM3D_HAVE_SOLID
     pm3d.solid = 0;
 #endif /* PM3D_HAVE_SOLID */
-    pm3d.implicit = PM3D_IMPLICIT;
+    pm3d.implicit = PM3D_EXPLICIT;
     pm3d.which_corner_color = PM3D_WHICHCORNER_MEAN;
 }
 
@@ -758,7 +758,7 @@ set_plot_with_palette(int plot_num, int plot_mode)
     plot_has_palette = TRUE;
     plot_wants_colorbox = TRUE;
     /* Is pm3d switched on globally? */
-    if (pm3d.where[0])
+    if (pm3d.implicit == PM3D_IMPLICIT)
 	return;
 
     /* Check 2D plots */
@@ -786,6 +786,10 @@ set_plot_with_palette(int plot_num, int plot_mode)
 
     /* Check 3D plots */
     if (plot_mode == MODE_SPLOT) {
+#ifdef PM3D
+	if (this_3dplot->plot_style == PM3DSURFACE)
+    	    return;
+#endif
 #ifdef WITH_IMAGE
 	if (this_3dplot->plot_style == IMAGE || this_3dplot->plot_style == RGBIMAGE)
     	    return;

@@ -1,5 +1,5 @@
 /*
- * $Id: pm3d.h,v 1.22 2004/12/21 08:09:34 mikulik Exp $
+ * $Id: pm3d.h,v 1.23 2005/02/11 11:37:20 mikulik Exp $
  */
 
 /* GNUPLOT - pm3d.h */
@@ -42,10 +42,8 @@
 
 /*
   where to plot pm3d: base or top (color map) or surface (color surface)
-    - if pm3d.where is "", then don't plot in pm3d mode
-    - pm3d_at_where can be any combination of the #defines below. For instance,
-	"b" plot at botton only, "st" plots firstly surface, then top, etc.
-  (for pm3d.where)
+  The string pm3d.where can be any combination of the #defines below.
+  For instance, "b" plot at botton only, "st" plots firstly surface, then top, etc.
 */
 #define PM3D_AT_BASE	'b'
 #define PM3D_AT_TOP	't'

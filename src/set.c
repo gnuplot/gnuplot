@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.169 2005/03/02 20:35:36 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.170 2005/03/25 05:01:10 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -2829,10 +2829,11 @@ set_colorbox()
 static void
 set_pm3d()
 {
-    c_token++;
+    int c_token0 = ++c_token;
 
     if (END_OF_COMMAND) { /* assume default settings */
-	pm3d_reset(); /* sets pm3d.where to 0; setting 'at s' below */
+	pm3d_reset(); /* sets pm3d.implicit to PM3D_IMPLICIT and pm3d.where to "s" */
+	pm3d.implicit = PM3D_IMPLICIT; /* for historical reasons */
     }
     else { /* go through all options of 'set pm3d' */
 	for ( ; !END_OF_COMMAND; c_token++ ) {
@@ -2843,6 +2844,12 @@ set_pm3d()
 		if (get_pm3d_at_option(&pm3d.where[0]))
 		    return; /* error */
 		c_token--;
+#if 1
+		if (c_token == c_token0+1)
+		    /* for historical reasons: if "at" is the first option of pm3d,
+		     * like "set pm3d at X other_opts;", then implicit is switched on */
+		    pm3d.implicit = PM3D_IMPLICIT;
+#endif
 		continue;
 	    /* forward and backward drawing direction */
 	    case S_PM3D_SCANSFORWARD: /* "scansfor$ward" */
@@ -2968,8 +2975,6 @@ set_pm3d()
 #endif
 	}
     }
-    if (!pm3d.where[0]) /* default: draw at surface */
-	strcpy(pm3d.where,"s");
 }
 #endif
 

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.102 2005/03/03 04:09:48 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.103 2005/03/09 19:05:46 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -735,7 +735,9 @@ set ticscale %g %g\n",
     fprintf(fp, "set locale \"%s\"\n", get_locale());
 
 #ifdef PM3D
-    if (pm3d.where[0]) fprintf(fp, "set pm3d at %s\n", pm3d.where);
+    fputs("set pm3d ", fp);
+    fputs((PM3D_IMPLICIT == pm3d.implicit ? "implicit" : "explicit"), fp);
+    fprintf(fp, " at %s\n", pm3d.where);
     fputs("set pm3d ", fp);
     switch (pm3d.direction) {
     case PM3D_SCANS_AUTOMATIC: fputs("scansautomatic", fp); break;
@@ -755,7 +757,6 @@ set ticscale %g %g\n",
 #if PM3D_HAVE_SOLID
     fputs((pm3d.solid ? " solid" : " transparent"), fp);
 #endif
-    fputs((PM3D_IMPLICIT == pm3d.implicit ? " implicit" : " explicit"), fp);
     fputs(" corners2color ", fp);
     switch (pm3d.which_corner_color) {
 	case PM3D_WHICHCORNER_MEAN:    fputs("mean", fp); break;
@@ -766,7 +767,6 @@ set ticscale %g %g\n",
 	default: /* PM3D_WHICHCORNER_C1 ... _C4 */
 	     fprintf(fp, "c%i", pm3d.which_corner_color - PM3D_WHICHCORNER_C1 + 1);
     }
-    if (!pm3d.where[0]) fputs("\nunset pm3d", fp);
     fputs("\n", fp);
 
     /*

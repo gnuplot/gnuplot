@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.282 2005/03/25 05:01:06 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.283 2005/03/26 22:06:48 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -6879,8 +6879,7 @@ C ... and restart the table:
  3. To use pm3d coloring to generate a two-dimensional plot rather than a 3D 
  surface, use `set view map` or `set pm3d map`.
 
- Syntax:
-       set pm3d
+ Syntax (the options can be given in any order):
        set pm3d {
                   { at <bst combination> }
                   { scansautomatic | scansforward | scansbackward }
@@ -6895,8 +6894,10 @@ C ... and restart the table:
        show pm3d
        unset pm3d
 
- Setting `set pm3d` (i.e. without options) sets up the default values.
- Otherwise, the options can be given in any order.
+ Color surface is drawn if data or function `style` is set to pm3d globally or
+ via 'with' option, or if the option `implicit` is on---then the pm3d surface
+ is combined with the line surface mesh. See bottom of this section for mode
+ details.
 
  Color surface can be drawn at the base or top (then it is a gray/color planar
  map) or at z-coordinates of surface points (gray/color surface).  This is
@@ -6948,7 +6949,8 @@ C ... and restart the table:
 
  Another drawing algorithm, which would draw quadrangles around a given node
  by taking corners from averaged (x,y)-coordinates of its surrounding 4 nodes
- while using node's color, could be implemented in the future.
+ while using node's color, could be implemented in the future. This is already
+ done for drawing images (2D grids) via `image` and `rgbimage` styles.
 
  Notice that ranges of z-values and color-values for surfaces are adjustable
  independently by `set zrange`, `set cbrange`, as well as `set log` for z or
@@ -6985,17 +6987,26 @@ C ... and restart the table:
  with fixed `origin` and `size`; don't forget to use `set palette maxcolors`
  when your terminal is running out of available colors.
 
- If the option `implicit` is on (which is the default), all surface plots
- will be plotted additionally to the default type, e.g.
+ On gnuplot start-up, mode is `explicit`. For historical and thus compatibility
+ reasons, commands `set pm3d;` (i.e. no options) and `set pm3d at X ...` (i.e.
+ `at` is the first option) sets mode `implicit`. Further, `set pm3d;` sets up
+ the other options to their default.
+
+ If the option `implicit` is on, all surface plots will be plotted additionally
+ to the default type, e.g.
        splot 'fred.dat' with lines, 'lola.dat' with lines
- would give both plots additionally to a pm3d surface.
- If the option `implicit` is off (or `explicit` is on) only plots specified
+ would give both plots (meshes) additionally to a pm3d surface. That's what you
+ are used to after `set pm3d;`.
+
+ If the option `explicit` is on (or `implicit` is off) only plots specified
  by the `with pm3d` attribute are plotted with a pm3d surface, e.g.:
        splot 'fred.dat' with lines, 'lola.dat' with pm3d
  would plot 'fred.dat' with lines (and only lines) and 'lola.dat' with
  a pm3d surface.
- If `explicit` is on, you can also switch to the default style `pm3d`, e.g.:
+
+ If you set the default data or function style to `pm3d`, e.g.:
        set style data pm3d
+ then the options `implicit` and `explicit` have no effect.
 
  Note that when plotting several plots, they are plotted in the order given
  on the command line. This can be of interest especially for filled surfaces

@@ -1,3 +1,13 @@
+2005-03-29  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* NEWS docs/gnuplot.doc src/plot3d.c src/pm3d.c src/pm3d.h src/save.c
+	src/set.c src/show.c src/unset.c: Let pm3d drawing be always available
+	without prior "set pm3d": now you can "splot x*y with pm3d" without
+	prior "set pm3d". The "explicit" be the default pm3d value after reset.
+	For compatibility (historical) reasons (color filled pm3d plot
+	combined with mesh line plot): commands "set pm3d;" and "set pm3d at X
+	other_opts;" switch pm3d to "implicit". No change for "set pm3d map".
+
 2005-03-29  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/pm3d.c (set_plot_with_palette): Add a missing #ifdef

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.97 2005/03/25 05:01:10 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.98 2005/03/25 07:30:45 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -1542,16 +1542,6 @@ eval_3dplots()
 		    point_num += 1 + (draw_contour != 0) + (hidden3d != 0);
 		line_num += 1 + (draw_contour != 0) + (hidden3d != 0);
 	    }
-
-#ifdef PM3D
-	    /* For historical reasons, "set pm3d" must be set before drawing a
-	     * pm3d surface. Maybe it is no more necessary as "with ... palette"
-	     * does neither require that. We can refrain from this requirement in
-	     * future => there should be a 'pm3d.on' accompanying 'pm3d.where'.
-	     */
-	    if (this_plot->plot_style == PM3DSURFACE && !pm3d.where[0])
-		int_warn(NO_CARET, "ignoring pm3d style without previous 'set pm3d'");
-#endif
 
 #ifdef WITH_IMAGE
 	    /* Styles that utilize palettes. */
