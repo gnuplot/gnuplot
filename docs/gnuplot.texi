@@ -10200,7 +10200,8 @@ allowing essentially  any TeX symbols in titles and labels.
 
 Syntax:
 @example
-   set term mp @{color@} @{solid@} @{notex@} @{mag <magsize>@} @{"<name>"@} @{<size>@}
+   set term mp @{color@} @{solid@} @{notex|tex|latex@} @{mag <magsize>@} @{"<name>"@}
+               @{<size>@}
 
 @end example
 
@@ -10216,6 +10217,14 @@ labels under this option.  This is intended for use on old plot files or files
 that make frequent use of common characters like `$` and `%` that require
 special handling in TeX.
 
+The option `tex` sets the terminal to output its text for TeX to process.
+
+The option `latex' sets the terminal to output its text for processing by
+LaTeX. This allows things like \\frac for fractions which LaTeX knows about
+but TeX does not.  Note that you must set the environment variable TEX to the
+name of your LaTeX executable (normally latex) if you use this option. 
+Otherwise metapost will try and use TeX to process the text and it won't work.
+
 Changing font sizes in TeX has no effect on the size of mathematics, and there
 is no foolproof way to make such a change, except by globally  setting a
 magnification factor. This is the purpose of the `magnification` option. It
@@ -10227,7 +10236,7 @@ the discussion below on editing the MP output. `mag` will also work under
 works as well.
 
 A name in quotes selects the font that will be used when no explicit font is
-given in a @ref{label} or `set title`.  A name recognized by TeX (a TFM file
+given in a `set label` or `set title`.  A name recognized by TeX (a TFM file
 exists) must be used.  The default is "cmr10" unless `notex` is selected,
 then it is "pcrr8r" (Courier).  Even under `notex`, a TFM file is needed by
 Metapost. The file `pcrr8r.tfm` is the name given to Courier in LaTeX's psnfss
@@ -10259,7 +10268,7 @@ some guidance.
 If you type your labels inside double quotes, backslashes in TeX code need to
 be escaped (doubled). Using single quotes will avoid having to do this, but
 then you cannot use `\\n` for line breaks.  As of this writing, version 3.7 of
-gnuplot processess titles given in a @ref{plot} command differently than in other
+gnuplot processess titles given in a `plot` command differently than in other
 places, and backslashes in TeX commands need to be doubled regardless of the
 style of quotes.
 
@@ -10389,8 +10398,8 @@ Syntax:
 `monochrome` plots all line types in black (MIF sep. 0).
 `polyline` plots curves as continuous curves and `vectors` plots curves as
 collections of vectors.
-@ref{help} and `?` print online help on standard error output---both print a
-short description of the usage; @ref{help} also lists the options;
+`help` and `?` print online help on standard error output---both print a
+short description of the usage; `help` also lists the options;
 
 Examples:
 @example
@@ -10423,7 +10432,7 @@ Syntax:
 
 where <fontsize> is `small`, `medium`, or `large` and <mode> is `monochrome`,
 `gray` or `color`.  The default plot size is 640 pixels wide and 480 pixels
-high; this may be changed by @ref{size}.
+high; this may be changed by `set size`.
 
 The output of the `pbm` driver depends upon <mode>: `monochrome` produces a
 portable bitmap (one bit per pixel), `gray` a portable graymap (three bits
@@ -10550,10 +10559,10 @@ Examples:
 
 @end example
 
-Linewidths and pointsizes may be changed with @ref{linestyle}.
+Linewidths and pointsizes may be changed with `set linestyle`.
 
 The `postscript` driver supports about 70 distinct pointtypes, selectable
-through the `pointtype` option on @ref{plot} and @ref{linestyle}.
+through the `pointtype` option on `plot` and `set linestyle`.
 
 Several possibly useful files about `gnuplot`'s PostScript are included
 in the /docs/ps subdirectory of the `gnuplot` distribution and at the
@@ -10601,7 +10610,7 @@ form:  @{/[fontname][=fontsize | *fontscale] text@}.  Thus @{/Symbol=20 G@} is a
 is currently in effect.  (The '/' character MUST be the first character after
 the '@{'.)
 
-If the encoding vector has been changed by @ref{encoding}, the default
+If the encoding vector has been changed by `set encoding`, the default
 encoding vector can be used instead by following the slash with a dash.  This
 is unnecessary if you use the Symbol font, however---since /Symbol uses its
 own encoding vector, `gnuplot` will not apply any other encoding vector to
@@ -10732,7 +10741,7 @@ If `auxfile` is specified, it directs the driver to put the PostScript
 commands into an auxiliary file instead of directly into the LaTeX file.
 This is useful if your pictures are large enough that dvips cannot handle
 them.  The name of the auxiliary PostScript file is derived from the name of
-the TeX file given on the @ref{output} command; it is determined by replacing
+the TeX file given on the `set output` command; it is determined by replacing
 the trailing `.tex` (actually just the final extent in the file name) with
 `.ps` in the output file name, or, if the TeX file has no extension, `.ps`
 is appended.  Remember to close the `output file` before leaving `gnuplot`.
@@ -10936,7 +10945,7 @@ terminals.  It has no options."
 
 
 Instead of producing a graph, the `table` terminal prints out the points on
-which a graph would be based, i.e., the results of processing the @ref{plot} or
+which a graph would be based, i.e., the results of processing the `plot` or
 `splot` command, in a multicolumn ASCII table of X Y @{Z@} R values.  The
 character R takes on one of three values: "i" if the point is in the active
 range, "o" if it is out-of-range, or "u" if it is undefined.  The data
@@ -10946,8 +10955,8 @@ and the columns are separated by single spaces.
 For those times when you want the numbers, you can display them on the
 screen or save them to a file.  This can be useful if you want to generate
 contours and then save them for further use, perhaps for plotting with
-@ref{plot};  see @ref{contour} for an example.  The same method can be used to
-save interpolated data (see @ref{samples} and @ref{dgrid3d})."
+`plot`;  see `set contour` for an example.  The same method can be used to
+save interpolated data (see `set samples` and `set dgrid3d`)."
 
 @node tek40, texdraw, table, terminal
 @subsubsection tek40
@@ -11049,7 +11058,7 @@ It has no options."
 
 Tgif is an X11-based drawing tool---it has nothing to do with GIF.
 
-The `tgif` driver supports different pointsizes (with @ref{pointsize}),
+The `tgif` driver supports different pointsizes (with `set pointsize`),
 different label fonts and font sizes (e.g. `set label "Hallo" at x,y font
 "Helvetica,34"`) and multiple graphs on the page.  The proportions of the
 axes are not changed.
@@ -11089,12 +11098,12 @@ The first multiplot implementation is the standard gnuplot multiplot feature:
 
 @end example
 
-See @ref{multiplot} for further information.
+See `set multiplot` for further information.
 
 The second version is the [x,y] option for the driver itself.  The advantage
 of this implementation is that everything is scaled and placed automatically
 without the need for setting origins and sizes; the graphs keep their natural
-x/y proportions of 3/2 (or whatever is fixed by @ref{size}).
+x/y proportions of 3/2 (or whatever is fixed by `set size`).
 
 If both multiplot methods are selected, the standard method is chosen and a
 warning message is given.
@@ -11168,7 +11177,7 @@ that takes the name of a canvas as its argument.  When the procedure is
 called, it clears the canvas, finds the size of the canvas and draws the plot
 in it, scaled to fit.
 
-For 2-dimensional plotting (@ref{plot}) two additional procedures are defined:
+For 2-dimensional plotting (`plot`) two additional procedures are defined:
 "gnuplot_plotarea" will return a list containing the borders of the plotting
 area "xleft, xright, ytop, ybot" in canvas screen coordinates, while the ranges
 of the two axes "x1min, x1max, y1min, y1max, x2min, x2max, y2min, y2max" in plot
@@ -11182,7 +11191,7 @@ the name of the canvas and the id of the line segment followed by the
 coordinates of its start and end point in the two possible axis ranges; the
 coordinates of the midpoint are only filled for logarithmic axes.
 
-The current version of `tkcanvas` supports neither @ref{multiplot} nor @ref{replot}."
+The current version of `tkcanvas` supports neither `multiplot` nor `replot`."
 
 @node tpic, unixpc, tkcanvas, terminal
 @subsubsection tpic
@@ -11206,7 +11215,7 @@ Syntax:
 
 @end example
 
-where @ref{pointsize} and `linewidth` are integers in milli-inches and `interval`
+where `pointsize` and `linewidth` are integers in milli-inches and `interval`
 is a float in inches.  If a non-positive value is specified, the default is
 chosen: pointsize = 40, linewidth = 6, interval = 0.1.
 
@@ -11322,7 +11331,7 @@ to crosshair.)
 Plot windows remain open even when the `gnuplot` driver is changed to a
 different device.  A plot window can be closed by pressing the letter q
 while that window has input focus, or by choosing `close` from a window
-manager menu.  All plot windows can be closed by specifying @ref{reset}, which
+manager menu.  All plot windows can be closed by specifying `reset`, which
 actually terminates the subprocess which maintains the windows (unless
 `-persist` was specified).
 
@@ -11354,7 +11363,7 @@ The size or aspect ratio of a plot may be changed by resizing the `gnuplot`
 window.
 
 Linewidths and pointsizes may be changed from within `gnuplot` with
-@ref{linestyle}.
+`set linestyle`.
 
 For terminal type `x11`, `gnuplot` accepts (when initialized) the standard
 X Toolkit options and resources such as geometry, font, and name from the
@@ -11656,8 +11665,8 @@ Syntax:
 
 where <direction> may be `in` (the default) or `out`.
 
-See also @ref{xtics} for more control of major (labelled) tic marks and 
-@ref{mxtics} for control of minor tic marks.
+See also `set xtics` for more control of major (labelled) tic marks and 
+`set mxtics` for control of minor tic marks.
 
 @node ticslevel, ticscale, tics, set-show
 @subsection ticslevel
@@ -11671,12 +11680,12 @@ See also @ref{xtics} for more control of major (labelled) tic marks and
 
 
 Using `splot`, one can adjust the relative height of the vertical (Z) axis
-using @ref{ticslevel}.  The numeric argument provided specifies the location
+using `set ticslevel`.  The numeric argument provided specifies the location
 of the bottom of the scale (as a fraction of the z-range) above the xy-plane.
 The default value is 0.5.  Negative values are permitted, but tic labels on
 the three axes may overlap.
 
-To place the xy-plane at a position 'pos' on the z-axis, @ref{ticslevel} should
+To place the xy-plane at a position 'pos' on the z-axis, `ticslevel` should
 be set equal to  (pos - zmin) / (zmin - zmax).
 
 Syntax:
@@ -11686,7 +11695,7 @@ Syntax:
 
 @end example
 
-See also @ref{view}.
+See also `set view`.
 
 @node ticscale, timestamp, ticslevel, set-show
 @subsection ticscale
@@ -11699,7 +11708,7 @@ See also @ref{view}.
 @opindex ticscale
 
 
-The size of the tic marks can be adjusted with @ref{ticscale}.
+The size of the tic marks can be adjusted with `set ticscale`.
 
 Syntax:
 @example
@@ -11729,7 +11738,7 @@ marks pointing outward by specifying a negative size.
 
 @cindex notimestamp
 
-The command @ref{timestamp} places the time and date of the plot in the left
+The command `set timestamp` places the time and date of the plot in the left
 margin.
 
 Syntax:
@@ -11751,7 +11760,7 @@ timestamp vertically, if your terminal supports vertical text.  The constants
 screen coordinates.  <font> is used to specify the font with which the time
 is to be written.
 
-The abbreviation `time` may be used in place of @ref{timestamp}.
+The abbreviation `time` may be used in place of `timestamp`.
 
 Example:
 @example
@@ -11759,7 +11768,7 @@ Example:
 
 @end example
 
-See @ref{timefmt} for more information about time format strings.
+See `set timefmt` for more information about time format strings.
 
 @node timefmt, title_, timestamp, set-show
 @subsection timefmt
@@ -11815,7 +11824,7 @@ to read "1220" and "12     20" as well as "12 20".
 Each set of non-blank characters in the timedata counts as one column in the
 `using n:n` specification.  Thus `11:11  25/12/76  21.0` consists of three
 columns.  To avoid confusion, `gnuplot` requires that you provide a complete
-@ref{using} specification if your file contains timedata.
+`using` specification if your file contains timedata.
 
 Since `gnuplot` cannot read non-numerical text, if the date format includes
 the day or month in words, the format string must exclude this text.  But
@@ -11824,7 +11833,7 @@ see `set format` for more details about these and other options for printing
 timedata.  (`gnuplot` will determine the proper month and weekday from the
 numerical values.)
 
-See also @ref{xdata} and `Time/date` for more information.
+See also `set xdata` and `Time/date` for more information.
 
 Example:
 @example
@@ -11850,7 +11859,7 @@ See also
 
 
 The `set title` command produces a plot title that is centered at the top of
-the plot.  `set title` is a special case of @ref{label}.
+the plot.  `set title` is a special case of `set label`.
 
 Syntax:
 @example
@@ -11881,8 +11890,8 @@ the distinction between single- and double-quotes.
 @opindex tmargin
 
 
-The command @ref{tmargin} sets the size of the top margin.  
-Please see @ref{margin} for details.
+The command `set tmargin` sets the size of the top margin.  
+Please see `set margin` for details.
 
 @node trange, urange, tmargin, set-show
 @subsection trange
@@ -11895,8 +11904,8 @@ Please see @ref{margin} for details.
 @opindex trange
 
 
-The @ref{trange} command sets the parametric range used to compute x and y
-values when in parametric or polar modes.  Please see @ref{xrange} for
+The `set trange` command sets the parametric range used to compute x and y
+values when in parametric or polar modes.  Please see `set xrange` for
 details.
 
 @node urange, variables, trange, set-show
@@ -11910,16 +11919,16 @@ details.
 @opindex urange
 
 
-The @ref{urange} and @ref{vrange} commands set the parametric ranges used
+The `set urange` and `set vrange` commands set the parametric ranges used
 to compute x, y, and z values when in `splot` parametric mode.  
-Please see @ref{xrange} for details.
+Please see `set xrange` for details.
 
 @node variables, version, urange, set-show
 @subsection variables
 
 @c ?commands show variables
 @c ?show variables
-The @ref{variables} command lists all user-defined variables and their
+The `show variables` command lists all user-defined variables and their
 values.
 
 Syntax:
@@ -11932,7 +11941,7 @@ Syntax:
 @subsection version
 
 @c ?show version
-The @ref{version} command lists the version of gnuplot being run, its last
+The `show version` command lists the version of gnuplot being run, its last
 modification date, the copyright holders, and email addresses for the FAQ,
 the info-gnuplot mailing list, and reporting bugs--in short, the information
 listed on the screen when the program is invoked interactively.
@@ -11958,7 +11967,7 @@ help file, and (again) the useful email addresses.
 @opindex view
 
 
-The @ref{view} command sets the viewing angle for `splot`s.  It controls how
+The `set view` command sets the viewing angle for `splot`s.  It controls how
 the 3-d coordinates of the plot are mapped into the 2-d screen space.  It
 provides controls for both rotation and scaling of the plotted data, but
 supports orthographic projections only.
@@ -11992,7 +12001,7 @@ Examples:
 The first sets all the four default values.  The second changes only scale,
 to 0.5.
 
-See also @ref{ticslevel}.
+See also `set ticslevel`.
 .
 
 @node vrange, x2data, view, set-show
@@ -12006,9 +12015,9 @@ See also @ref{ticslevel}.
 @opindex vrange
 
 
-The @ref{urange} and @ref{vrange} commands set the parametric ranges used
+The `set urange` and `set vrange` commands set the parametric ranges used
 to compute x, y, and z values when in `splot` parametric mode.  
-Please see @ref{xrange} for details.
+Please see `set xrange` for details.
 
 @node x2data, x2dtics, vrange, set-show
 @subsection x2data
@@ -12021,8 +12030,8 @@ Please see @ref{xrange} for details.
 @opindex x2data
 
 
-The @ref{x2data} command sets data on the x2 (top) axis to timeseries
-(dates/times).  Please see @ref{xdata}.
+The `set x2data` command sets data on the x2 (top) axis to timeseries
+(dates/times).  Please see `set xdata`.
 
 @node x2dtics, x2label, x2data, set-show
 @subsection x2dtics
@@ -12039,8 +12048,8 @@ The @ref{x2data} command sets data on the x2 (top) axis to timeseries
 
 @cindex nox2dtics
 
-The @ref{x2dtics} command changes tics on the x2 (top) axis to days of the
-week.  Please see @ref{xdtics} for details.
+The `set x2dtics` command changes tics on the x2 (top) axis to days of the
+week.  Please see `set xdtics` for details.
 
 @node x2label, x2mtics, x2dtics, set-show
 @subsection x2label
@@ -12053,8 +12062,8 @@ week.  Please see @ref{xdtics} for details.
 @opindex x2label
 
 
-The @ref{x2label} command sets the label for the x2 (top) axis.  
-Please see @ref{xlabel}.
+The `set x2label` command sets the label for the x2 (top) axis.  
+Please see `set xlabel`.
 
 @node x2mtics, x2range, x2label, set-show
 @subsection x2mtics
@@ -12071,8 +12080,8 @@ Please see @ref{xlabel}.
 
 @cindex nox2mtics
 
-The @ref{x2mtics} command changes tics on the x2 (top) axis to months of the
-year.  Please see @ref{xmtics} for details.
+The `set x2mtics` command changes tics on the x2 (top) axis to months of the
+year.  Please see `set xmtics` for details.
 
 @node x2range, x2tics, x2mtics, set-show
 @subsection x2range
@@ -12085,8 +12094,8 @@ year.  Please see @ref{xmtics} for details.
 @opindex x2range
 
 
-The @ref{x2range} command sets the horizontal range that will be displayed on
-the x2 (top) axis.  Please see @ref{xrange} for details.
+The `set x2range` command sets the horizontal range that will be displayed on
+the x2 (top) axis.  Please see `set xrange` for details.
 
 @node x2tics, x2zeroaxis, x2range, set-show
 @subsection x2tics
@@ -12103,8 +12112,8 @@ the x2 (top) axis.  Please see @ref{xrange} for details.
 
 @cindex nox2tics
 
-The @ref{x2tics} command controls major (labelled) tics on the x2 (top) axis.
-Please see @ref{xtics} for details.
+The `set x2tics` command controls major (labelled) tics on the x2 (top) axis.
+Please see `set xtics` for details.
 
 @node x2zeroaxis, xdata, x2tics, set-show
 @subsection x2zeroaxis
@@ -12121,8 +12130,8 @@ Please see @ref{xtics} for details.
 
 @cindex nox2zeroaxis
 
-The @ref{x2zeroaxis} command draws a line at the origin of the x2 (top) axis
-(y2 = 0).  For details, please see @ref{zeroaxis}.
+The `set x2zeroaxis` command draws a line at the origin of the x2 (top) axis
+(y2 = 0).  For details, please see `set zeroaxis`.
 
 @node xdata, xdtics, x2zeroaxis, set-show
 @subsection xdata
@@ -12145,12 +12154,12 @@ Syntax:
 
 @end example
 
-The same syntax applies to @ref{ydata}, @ref{zdata}, @ref{x2data}, @ref{y2data} and `mcbtics`.
+The same syntax applies to `ydata`, `zdata`, `x2data`, `y2data` and `mcbtics`.
 
 The `time` option signals that the datatype is indeed time/date.  If the
 option is not specified, the datatype reverts to normal.
 
-See @ref{timefmt} to tell gnuplot how to read date or time data.  The
+See `set timefmt` to tell gnuplot how to read date or time data.  The
 time/date is converted to seconds from start of the century.  There is
 currently only one timefmt, which implies that all the time/date columns must
 confirm to this format.  Specification of ranges should be supplied as quoted
@@ -12179,7 +12188,7 @@ See also `Time/date` for more information.
 
 @cindex noxdtics
 
-The @ref{xdtics} commands converts the x-axis tic marks to days of the week
+The `set xdtics` commands converts the x-axis tic marks to days of the week
 where 0=Sun and 6=Sat.  Overflows are converted modulo 7 to dates.  `set
 noxdtics` returns the labels to their default values.  Similar commands do
 the same things for the other axes.
@@ -12192,8 +12201,8 @@ Syntax:
 
 @end example
 
-The same syntax applies to @ref{ydtics}, @ref{zdtics}, @ref{x2dtics}, @ref{y2dtics} and
-@ref{cbdtics}.
+The same syntax applies to `ydtics`, `zdtics`, `x2dtics`, `y2dtics` and
+`cbdtics`.
 
 See also the `set format` command.
 
@@ -12208,7 +12217,7 @@ See also the `set format` command.
 @opindex xlabel
 
 
-The @ref{xlabel} command sets the x axis label.  Similar commands set labels
+The `set xlabel` command sets the x axis label.  Similar commands set labels
 on the other axes.
 
 Syntax:
@@ -12218,8 +12227,8 @@ Syntax:
 
 @end example
 
-The same syntax applies to @ref{x2label}, @ref{ylabel}, @ref{y2label}, @ref{zlabel} and
-@ref{cblabel}.
+The same syntax applies to `x2label`, `ylabel`, `y2label`, `zlabel` and
+`cblabel`.
 
 Specifying the constants <xoff> or <yoff> as optional offsets for a label
 will move it <xoff> or <yoff> character widths or heights.  For example,
@@ -12230,7 +12239,7 @@ depends on both the font and the terminal.
 <font> is used to specify the font in which the label is written; the units
 of the font <size> depend upon which terminal is used.
 
-To clear a label, put no options on the command line, e.g., "@ref{y2label}".
+To clear a label, put no options on the command line, e.g., "`set y2label`".
 
 The default positions of the axis labels are as follows:
 
@@ -12240,7 +12249,7 @@ ylabel:  The position of the y-axis label depends on the terminal, and can be
 one of the following three positions:
 
 1. Horizontal text flushed left at the top left of the plot.  Terminals that
-cannot rotate text will probably use this method.  If @ref{x2tics} is also
+cannot rotate text will probably use this method.  If `set x2tics` is also
 in use, the ylabel may overwrite the left-most x2tic label.  This may be
 remedied by adjusting the ylabel position or the left margin.
 
@@ -12274,7 +12283,8 @@ characters to make a multi-line plot title, e.g.,
 Note that double quotes must be used.  The same font will be used for both
 lines, of course.
 
-If you are not satisfied with the default position of an axis label, use @ref{label} instead--that command gives you much more control over where text is
+If you are not satisfied with the default position of an axis label, use `set
+label` instead--that command gives you much more control over where text is
 placed.
 
 Please see `syntax` for further information about backslash processing
@@ -12295,9 +12305,9 @@ and the difference between single- and double-quoted strings.
 
 @cindex noxmtics
 
-The @ref{xmtics} commands converts the x-axis tic marks to months of the
+The `set xmtics` commands converts the x-axis tic marks to months of the
 year where 1=Jan and 12=Dec.  Overflows are converted modulo 12 to months.
-The tics are returned to their default labels by @ref{xmtics}.  Similar
+The tics are returned to their default labels by `unset xmtics`.  Similar
 commands perform the same duties for the other axes.
 
 Syntax:
@@ -12308,8 +12318,8 @@ Syntax:
 
 @end example
 
-The same syntax applies to @ref{x2mtics}, @ref{ymtics}, @ref{y2mtics}, @ref{zmtics} and
-@ref{cbmtics}.
+The same syntax applies to `x2mtics`, `ymtics`, `y2mtics`, `zmtics` and
+`cbmtics`.
 
 See also the `set format` command.
 
@@ -12328,7 +12338,7 @@ See also the `set format` command.
 @opindex xrange
 
 
-The @ref{xrange} command sets the horizontal range that will be displayed.
+The `set xrange` command sets the horizontal range that will be displayed.
 A similar command exists for each of the other axes, as well as for the
 polar radius r and the parametric variables t, u, and v.
 
@@ -12342,21 +12352,21 @@ Syntax:
 
 where <min> and <max> terms are constants, expressions or an asterisk to set
 autoscaling.  If the data are time/date, you must give the range as a quoted
-string according to the @ref{timefmt} format.  Any value omitted will not be
+string according to the `set timefmt` format.  Any value omitted will not be
 changed.
 
-The same syntax applies to @ref{yrange}, @ref{zrange}, @ref{x2range}, @ref{y2range}, @ref{cbrange},
-@ref{rrange}, @ref{trange}, @ref{urange} and @ref{vrange}.
+The same syntax applies to `yrange`, `zrange`, `x2range`, `y2range`, `cbrange`,
+`rrange`, `trange`, `urange` and `vrange`.
 
 The `reverse` option reverses the direction of the axis, e.g., `set xrange
 [0:1] reverse` will produce an axis with 1 on the left and 0 on the right.
 This is identical to the axis produced by `set xrange [1:0]`, of course.
-`reverse` is intended primarily for use with @ref{autoscale}.
+`reverse` is intended primarily for use with `autoscale`.
 
-The `writeback` option essentially saves the range found by @ref{autoscale} in
-the buffers that would be filled by @ref{xrange}.  This is useful if you wish
+The `writeback` option essentially saves the range found by `autoscale` in
+the buffers that would be filled by `set xrange`.  This is useful if you wish
 to plot several functions together but have the range determined by only
-some of them.  The `writeback` operation is performed during the @ref{plot}
+some of them.  The `writeback` operation is performed during the `plot`
 execution, so it must be specified before that command.  To restore,
 the last saved horizontal range use `set xrange restore`.  For example,
 
@@ -12370,26 +12380,26 @@ the last saved horizontal range use `set xrange restore`.  For example,
 @end example
 
 results in a yrange of [-1:1] as found only from the range of sin(x); the
-[-5:5] range of x/2 is ignored.  Executing @ref{yrange} after each command
+[-5:5] range of x/2 is ignored.  Executing `show yrange` after each command
 in the above example should help you understand what is going on.
 
-In 2-d, @ref{xrange} and @ref{yrange} determine the extent of the axes, @ref{trange}
+In 2-d, `xrange` and `yrange` determine the extent of the axes, `trange`
 determines the range of the parametric variable in parametric mode or the
-range of the angle in polar mode.  Similarly in parametric 3-d, @ref{xrange},
-@ref{yrange}, and @ref{zrange} govern the axes and @ref{urange} and @ref{vrange} govern the
+range of the angle in polar mode.  Similarly in parametric 3-d, `xrange`,
+`yrange`, and `zrange` govern the axes and `urange` and `vrange` govern the
 parametric variables.
 
-In polar mode, @ref{rrange} determines the radial range plotted.  <rmin> acts as
+In polar mode, `rrange` determines the radial range plotted.  <rmin> acts as
 an additive constant to the radius, whereas <rmax> acts as a clip to the
-radius---no point with radius greater than <rmax> will be plotted.  @ref{xrange}
-and @ref{yrange} are affected---the ranges can be set as if the graph was of
+radius---no point with radius greater than <rmax> will be plotted.  `xrange`
+and `yrange` are affected---the ranges can be set as if the graph was of
 r(t)-rmin, with rmin added to all the labels.
 
 Any range may be partially or totally autoscaled, although it may not make
 sense to autoscale a parametric variable unless it is plotted with data.
 
-Ranges may also be specified on the @ref{plot} command line.  A range given on
-the plot line will be used for that single @ref{plot} command; a range given by
+Ranges may also be specified on the `plot` command line.  A range given on
+the plot line will be used for that single `plot` command; a range given by
 a `set` command will be used for all subsequent plots that do not specify
 their own ranges.  The same holds true for `splot`.
 
@@ -12435,8 +12445,8 @@ To autoscale xmin while leaving xmax unchanged:
 @cindex noxtics
 
 Fine control of the major (labelled) tics on the x axis is possible with the
-@ref{xtics} command.  The tics may be turned off with the @ref{xtics}
-command, and may be turned on (the default state) with @ref{xtics}.  Similar
+`set xtics` command.  The tics may be turned off with the `unset xtics`
+command, and may be turned on (the default state) with `set xtics`.  Similar
 commands control the major tics on the y, z, x2 and y2 axes.
 
 Syntax:
@@ -12451,9 +12461,9 @@ Syntax:
 
 @end example
 
-The same syntax applies to @ref{ytics}, @ref{ztics}, @ref{x2tics}, @ref{y2tics} and @ref{cbtics}.
+The same syntax applies to `ytics`, `ztics`, `x2tics`, `y2tics` and `cbtics`.
 
-`axis` or @ref{border} tells `gnuplot` to put the tics (both the tics themselves
+`axis` or `border` tells `gnuplot` to put the tics (both the tics themselves
 and the accompanying labels) along the axis or the border, respectively.  If
 the axis is very close to the border, the `axis` option can result in tic
 labels overwriting other text written in the margin.
@@ -12469,9 +12479,9 @@ The defaults are `border mirror norotate` for tics on the x and y axes, and
 `border nomirror norotate` for tics on the x2 and y2 axes.  For the z axis,
 the `@{axis | border@}` option is not available and the default is
 `nomirror`.  If you do want to mirror the z-axis tics, you might want to
-create a bit more room for them with @ref{border}.
+create a bit more room for them with `set border`.
 
-@ref{xtics} with no options restores the default border or axis if xtics are
+`set xtics` with no options restores the default border or axis if xtics are
 being displayed;  otherwise it has no effect.  Any previously specified tic
 frequency or position @{and labels@} are retained.
 
@@ -12532,11 +12542,11 @@ However they are specified, tics will only be plotted when in range.
 Format (or omission) of the tic labels is controlled by `set format`, unless
 the explicit text of a labels is included in the `set xtic (`<label>`)` form.
 
-Minor (unlabelled) tics can be added by the @ref{mxtics} command.
+Minor (unlabelled) tics can be added by the `set mxtics` command.
 
 In case of timeseries data, position values must be given as quoted dates
-or times according to the format @ref{timefmt}.  If the <start>, <incr>, <end>
-form is used, <start> and <end> must be given according to @ref{timefmt}, but
+or times according to the format `timefmt`.  If the <start>, <incr>, <end>
+form is used, <start> and <end> must be given according to `timefmt`, but
 <incr> must be in seconds.  Times will be written out according to the format
 given on `set format`, however.
 
@@ -12577,8 +12587,8 @@ second example the tic at "Dec 3" will be unlabelled.
 
 @cindex noxzeroaxis
 
-The @ref{xzeroaxis} command draws a line at y = 0.  For details, 
-please see @ref{zeroaxis}.
+The `set xzeroaxis` command draws a line at y = 0.  For details, 
+please see `set zeroaxis`.
 
 @node y2data, y2dtics, xzeroaxis, set-show
 @subsection y2data
@@ -12591,8 +12601,8 @@ please see @ref{zeroaxis}.
 @opindex y2data
 
 
-The @ref{y2data} command sets y2 (right-hand) axis data to timeseries
-(dates/times).  Please see @ref{xdata}.
+The `set y2data` command sets y2 (right-hand) axis data to timeseries
+(dates/times).  Please see `set xdata`.
 
 @node y2dtics, y2label, y2data, set-show
 @subsection y2dtics
@@ -12608,8 +12618,8 @@ The @ref{y2data} command sets y2 (right-hand) axis data to timeseries
 
 @cindex noy2dtics
 
-The @ref{y2dtics} command changes tics on the y2 (right-hand) axis to days of
-the week.  Please see @ref{xdtics} for details.
+The `set y2dtics` command changes tics on the y2 (right-hand) axis to days of
+the week.  Please see `set xdtics` for details.
 
 @node y2label, y2mtics, y2dtics, set-show
 @subsection y2label
@@ -12622,8 +12632,8 @@ the week.  Please see @ref{xdtics} for details.
 @opindex y2label
 
 
-The @ref{y2dtics} command sets the label for the y2 (right-hand) axis.
-Please see @ref{xlabel}.
+The `set y2dtics` command sets the label for the y2 (right-hand) axis.
+Please see `set xlabel`.
 
 @node y2mtics, y2range, y2label, set-show
 @subsection y2mtics
@@ -12640,8 +12650,8 @@ Please see @ref{xlabel}.
 
 @cindex noy2mtics
 
-The @ref{y2mtics} command changes tics on the y2 (right-hand) axis to months
-of the year.  Please see @ref{xmtics} for details.
+The `set y2mtics` command changes tics on the y2 (right-hand) axis to months
+of the year.  Please see `set xmtics` for details.
 
 @node y2range, y2tics, y2mtics, set-show
 @subsection y2range
@@ -12654,8 +12664,8 @@ of the year.  Please see @ref{xmtics} for details.
 @opindex y2range
 
 
-The @ref{y2range} command sets the vertical range that will be displayed on
-the y2 (right-hand) axis.  Please see @ref{xrange} for details.
+The `set y2range` command sets the vertical range that will be displayed on
+the y2 (right-hand) axis.  Please see `set xrange` for details.
 
 @node y2tics, y2zeroaxis, y2range, set-show
 @subsection y2tics
@@ -12672,8 +12682,8 @@ the y2 (right-hand) axis.  Please see @ref{xrange} for details.
 
 @cindex noy2tics
 
-The @ref{y2tics} command controls major (labelled) tics on the y2 (right-hand)
-axis.  Please see @ref{xtics} for details.
+The `set y2tics` command controls major (labelled) tics on the y2 (right-hand)
+axis.  Please see `set xtics` for details.
 
 @node y2zeroaxis, ydata, y2tics, set-show
 @subsection y2zeroaxis
@@ -12690,8 +12700,8 @@ axis.  Please see @ref{xtics} for details.
 
 @cindex noy2zeroaxis
 
-The @ref{y2zeroaxis} command draws a line at the origin of the y2 (right-hand)
-axis (x2 = 0).  For details, please see @ref{zeroaxis}.
+The `set y2zeroaxis` command draws a line at the origin of the y2 (right-hand)
+axis (x2 = 0).  For details, please see `set zeroaxis`.
 
 @node ydata, ydtics, y2zeroaxis, set-show
 @subsection ydata
@@ -12704,7 +12714,7 @@ axis (x2 = 0).  For details, please see @ref{zeroaxis}.
 @opindex ydata
 
 
-Sets y-axis data to timeseries (dates/times).  Please see @ref{xdata}.
+Sets y-axis data to timeseries (dates/times).  Please see `set xdata`.
 
 @node ydtics, ylabel, ydata, set-show
 @subsection ydtics
@@ -12721,8 +12731,8 @@ Sets y-axis data to timeseries (dates/times).  Please see @ref{xdata}.
 
 @cindex noydtics
 
-The @ref{ydtics} command changes tics on the y axis to days of the week.
-Please see @ref{xdtics} for details.
+The `set ydtics` command changes tics on the y axis to days of the week.
+Please see `set xdtics` for details.
 
 @node ylabel, ymtics, ydtics, set-show
 @subsection ylabel
@@ -12735,7 +12745,7 @@ Please see @ref{xdtics} for details.
 @opindex ylabel
 
 
-This command sets the label for the y axis.  Please see @ref{xlabel}.
+This command sets the label for the y axis.  Please see `set xlabel`.
 
 @node ymtics, yrange, ylabel, set-show
 @subsection ymtics
@@ -12752,8 +12762,8 @@ This command sets the label for the y axis.  Please see @ref{xlabel}.
 
 @cindex noymtics
 
-The @ref{ymtics} command changes tics on the y axis to months of the year.
-Please see @ref{xmtics} for details.
+The `set ymtics` command changes tics on the y axis to months of the year.
+Please see `set xmtics` for details.
 
 @node yrange, ytics, ymtics, set-show
 @subsection yrange
@@ -12766,8 +12776,8 @@ Please see @ref{xmtics} for details.
 @opindex yrange
 
 
-The @ref{yrange} command sets the vertical range that will be displayed on
-the y axis.  Please see @ref{xrange} for details.
+The `set yrange` command sets the vertical range that will be displayed on
+the y axis.  Please see `set xrange` for details.
 
 @node ytics, yzeroaxis, yrange, set-show
 @subsection ytics
@@ -12784,8 +12794,8 @@ the y axis.  Please see @ref{xrange} for details.
 
 @cindex noytics
 
-The @ref{ytics} command controls major (labelled) tics on the y axis.
-Please see @ref{xtics} for details.
+The `set ytics` command controls major (labelled) tics on the y axis.
+Please see `set xtics` for details.
 
 @node yzeroaxis, zdata, ytics, set-show
 @subsection yzeroaxis
@@ -12802,8 +12812,8 @@ Please see @ref{xtics} for details.
 
 @cindex noyzeroaxis
 
-The @ref{yzeroaxis} command draws a line at x = 0.  For details, 
-please see @ref{zeroaxis}.
+The `set yzeroaxis` command draws a line at x = 0.  For details, 
+please see `set zeroaxis`.
 
 @node zdata, zdtics, yzeroaxis, set-show
 @subsection zdata
@@ -12816,7 +12826,7 @@ please see @ref{zeroaxis}.
 @opindex zdata
 
 
-Set zaxis date to timeseries (dates/times).  Please see @ref{xdata}.
+Set zaxis date to timeseries (dates/times).  Please see `set xdata`.
 
 @node zdtics, cbdata, zdata, set-show
 @subsection zdtics
@@ -12833,8 +12843,8 @@ Set zaxis date to timeseries (dates/times).  Please see @ref{xdata}.
 
 @cindex nozdtics
 
-The @ref{zdtics} command changes tics on the z axis to days of the week.
-Please see @ref{xdtics} for details.
+The `set zdtics` command changes tics on the z axis to days of the week.
+Please see `set xdtics` for details.
 
 @node cbdata, cbdtics, zdtics, set-show
 @subsection cbdata
@@ -12847,7 +12857,7 @@ Please see @ref{xdtics} for details.
 @opindex cbdata
 
 
-Set color box axis date to timeseries (dates/times).  Please see @ref{xdata}.
+Set color box axis date to timeseries (dates/times).  Please see `set xdata`.
 
 @node cbdtics, zero, cbdata, set-show
 @subsection cbdtics
@@ -12864,8 +12874,8 @@ Set color box axis date to timeseries (dates/times).  Please see @ref{xdata}.
 
 @cindex nocbdtics
 
-The @ref{cbdtics} command changes tics on the color box axis to days of the
-week. Please see @ref{cbdtics} for details.
+The `set cbdtics` command changes tics on the color box axis to days of the
+week. Please see `set cbdtics` for details.
 
 @node zero, zeroaxis, cbdtics, set-show
 @subsection zero
@@ -12909,7 +12919,7 @@ it is not unreasonable to set `zero` to 0.0.
 
 @cindex nozeroaxis
 
-The x axis may be drawn by @ref{xzeroaxis} and removed by @ref{xzeroaxis}.
+The x axis may be drawn by `set xzeroaxis` and removed by `unset xzeroaxis`.
 Similar commands behave similarly for the y, x2, and y2 axes.
 
 Syntax:
@@ -12931,8 +12941,8 @@ by the terminal driver currently in use), or a user-defined style
 If no linetype is specified, any zero axes selected will be drawn
 using the axis linetype (linetype 0).
 
-@ref{zeroaxis} is equivalent to @ref{yzeroaxis}.
-`set nozeroaxis` is equivalent to @ref{yzeroaxis}.
+`set zeroaxis` is equivalent to `set xzeroaxis; set yzeroaxis`.
+`set nozeroaxis` is equivalent to `unset xzeroaxis; unset yzeroaxis`.
 
 Examples:
 
@@ -12961,7 +12971,7 @@ If you want a thick line in a different color or pattern, instead:
 @opindex zlabel
 
 
-This command sets the label for the z axis.  Please see @ref{xlabel}.
+This command sets the label for the z axis.  Please see `set xlabel`.
 
 @node zmtics, zrange, zlabel, set-show
 @subsection zmtics
@@ -12978,8 +12988,8 @@ This command sets the label for the z axis.  Please see @ref{xlabel}.
 
 @cindex nozmtics
 
-The @ref{zmtics} command changes tics on the z axis to months of the year.
-Please see @ref{xmtics} for details.
+The `set zmtics` command changes tics on the z axis to months of the year.
+Please see `set xmtics` for details.
 
 @node zrange, ztics, zmtics, set-show
 @subsection zrange
@@ -12992,9 +13002,9 @@ Please see @ref{xmtics} for details.
 @opindex zrange
 
 
-The @ref{zrange} command sets the range that will be displayed on the z axis.
-The zrange is used only by `splot` and is ignored by @ref{plot}.  Please see 
-@ref{xrange} for details.
+The `set zrange` command sets the range that will be displayed on the z axis.
+The zrange is used only by `splot` and is ignored by `plot`.  Please see 
+`set xrange` for details.
 
 @node ztics, cblabel, zrange, set-show
 @subsection ztics
@@ -13011,8 +13021,8 @@ The zrange is used only by `splot` and is ignored by @ref{plot}.  Please see
 
 @cindex noztics
 
-The @ref{ztics} command controls major (labelled) tics on the z axis.
-Please see @ref{xtics} for details.
+The `set ztics` command controls major (labelled) tics on the z axis.
+Please see `set xtics` for details.
 
 @node cblabel, cbmtics, ztics, set-show
 @subsection cblabel
@@ -13025,7 +13035,7 @@ Please see @ref{xtics} for details.
 @opindex cblabel
 
 
-This command sets the label for the color box axis.  Please see @ref{xlabel}.
+This command sets the label for the color box axis.  Please see `set xlabel`.
 
 @node cbmtics, cbrange, cblabel, set-show
 @subsection cbmtics
@@ -13042,8 +13052,8 @@ This command sets the label for the color box axis.  Please see @ref{xlabel}.
 
 @cindex nocbmtics
 
-The @ref{cbmtics} command changes tics on the color box axis to months of the
-year. Please see @ref{xmtics} for details.
+The `set cbmtics` command changes tics on the color box axis to months of the
+year. Please see `set xmtics` for details.
 
 @node cbrange, cbtics, cbmtics, set-show
 @subsection cbrange
@@ -13056,11 +13066,11 @@ year. Please see @ref{xmtics} for details.
 @opindex cbrange
 
 
-The @ref{cbrange} command sets the range of z-values which are colored by 
-@ref{pm3d} mode of `splot`. If the cb-axis is autoscaled, then the @ref{pm3d} /
-@ref{palette} range is taken from @ref{zrange}.
+The `set cbrange` command sets the range of z-values which are colored by 
+`pm3d` mode of `splot`. If the cb-axis is autoscaled, then the `pm3d` /
+`palette` range is taken from `zrange`.
 
-Please see @ref{xrange} for details on @ref{cbrange} syntax.
+Please see `set xrange` for details on `set cbrange` syntax.
 
 @node cbtics,  , cbrange, set-show
 @subsection cbtics
@@ -13077,8 +13087,8 @@ Please see @ref{xrange} for details on @ref{cbrange} syntax.
 
 @cindex nocbtics
 
-The @ref{cbtics} command controls major (labelled) tics on the color box axis.
-Please see @ref{xtics} for details.
+The `set cbtics` command controls major (labelled) tics on the color box axis.
+Please see `set xtics` for details.
 
 @node shell, splot, set-show, Commands
 @section shell
@@ -13088,11 +13098,11 @@ Please see @ref{xtics} for details.
 @cmindex shell
 
 
-The @ref{shell} command spawns an interactive shell.  To return to `gnuplot`,
-type `logout` if using VMS, @ref{exit} or the END-OF-FILE character if using
-Unix, `endcli` if using AmigaOS, or @ref{exit} if using MS-DOS or OS/2.
+The `shell` command spawns an interactive shell.  To return to `gnuplot`,
+type `logout` if using VMS, `exit` or the END-OF-FILE character if using
+Unix, `endcli` if using AmigaOS, or `exit` if using MS-DOS or OS/2.
 
-There are two ways of spawning a shell command: using @ref{system} command 
+There are two ways of spawning a shell command: using `system` command 
 or via `!` ($ if using VMS). The former command takes a string as a
 parameter and thus it can be used anywhere among other gnuplot commands,
 while the latter syntax requires to bethe only command on the line. Control
@@ -13134,12 +13144,12 @@ and uses it, if available.  This is practical if `gnuplot` is run from
 
 `splot` is the command for drawing 3-d plots (well, actually projections on
 a 2-d surface, but you knew that).  It can create a plot from functions or
-a data file in a manner very similar to the @ref{plot} command.
+a data file in a manner very similar to the `plot` command.
 
-See @ref{plot} for features common to the @ref{plot} command; only differences are
-discussed in detail here.  Note specifically that the @ref{binary} and @ref{matrix}
-options (discussed under "datafile-modifiers") are not available for @ref{plot},
-and @ref{plot}'s `axes` option is not available for `splot`.
+See `plot` for features common to the `plot` command; only differences are
+discussed in detail here.  Note specifically that the `binary` and `matrix`
+options (discussed under "datafile-modifiers") are not available for `plot`,
+and `plot`'s `axes` option is not available for `splot`.
 
 Syntax:
 @example
@@ -13155,18 +13165,19 @@ supplied.  The function can be a mathematical expression, or a triple of
 mathematical expressions in parametric mode.
 
 By default `splot` draws the xy plane completely below the plotted data.
-The offset between the lowest ztic and the xy plane can be changed by @ref{ticslevel}.  The orientation of a `splot` projection is controlled by
-@ref{view}.  See @ref{view} and @ref{ticslevel} for more information.
+The offset between the lowest ztic and the xy plane can be changed by `set
+ticslevel`.  The orientation of a `splot` projection is controlled by
+`set view`.  See `set view` and `set ticslevel` for more information.
 
 The syntax for setting ranges on the `splot` command is the same as for
-@ref{plot}.  In non-parametric mode, the order in which ranges must be given is
-@ref{xrange}, @ref{yrange}, and @ref{zrange}.  In parametric mode, the order is @ref{urange},
-@ref{vrange}, @ref{xrange}, @ref{yrange}, and @ref{zrange}.
+`plot`.  In non-parametric mode, the order in which ranges must be given is
+`xrange`, `yrange`, and `zrange`.  In parametric mode, the order is `urange`,
+`vrange`, `xrange`, `yrange`, and `zrange`.
 
-The `title` option is the same as in @ref{plot}.  The operation of @ref{with} is also
-the same as in @ref{plot}, except that the plotting styles available to `splot`
-are limited to `lines`, `points`, @ref{linespoints}, @ref{dots}, and @ref{impulses};  the
-error-bar capabilities of @ref{plot} are not available for `splot`.
+The `title` option is the same as in `plot`.  The operation of `with` is also
+the same as in `plot`, except that the plotting styles available to `splot`
+are limited to `lines`, `points`, `linespoints`, `dots`, and `impulses`;  the
+error-bar capabilities of `plot` are not available for `splot`.
 
 The datafile options have more differences.
 
@@ -13182,7 +13193,7 @@ The datafile options have more differences.
 @c ?commands splot datafile
 @c ?splot datafile
 @c ?splot data-file
-As for @ref{plot}, discrete data contained in a file can be displayed by
+As for `plot`, discrete data contained in a file can be displayed by
 specifying the name of the data file, enclosed in quotes,  on the `splot`
 command line.
 
@@ -13195,22 +13206,22 @@ Syntax:
 
 @end example
 
-The special filenames `""` and `"-"` are permitted, as in @ref{plot}.
+The special filenames `""` and `"-"` are permitted, as in `plot`.
 
-In brief, @ref{binary} and @ref{matrix} indicate that the data are in a special
-form, @ref{index} selects which data sets in a multi-data-set file are to be
-plotted, @ref{every} specifies which datalines (subsets) within a single data
-set are to be plotted, and @ref{using} determines how the columns within a single
+In brief, `binary` and `matrix` indicate that the data are in a special
+form, `index` selects which data sets in a multi-data-set file are to be
+plotted, `every` specifies which datalines (subsets) within a single data
+set are to be plotted, and `using` determines how the columns within a single
 record are to be interpreted.
 
-The options @ref{index} and @ref{every} behave the same way as with @ref{plot};  @ref{using}
-does so also, except that the @ref{using} list must provide three entries
+The options `index` and `every` behave the same way as with `plot`;  `using`
+does so also, except that the `using` list must provide three entries
 instead of two.
 
-The @ref{plot} options @ref{thru} and @ref{smooth} are not available for `splot`, but
-@ref{cntrparam} and @ref{dgrid3d} provide limited smoothing cabilities.
+The `plot` options `thru` and `smooth` are not available for `splot`, but
+`cntrparam` and `dgrid3d` provide limited smoothing cabilities.
 
-Data file organization is essentially the same as for @ref{plot}, except that
+Data file organization is essentially the same as for `plot`, except that
 each point is an (x,y,z) triple.  If only a single value is provided, it
 will be used for z, the datablock number will be used for y, and the index
 of the data point in the datablock will be used for x.  If two or four values
@@ -13223,8 +13234,8 @@ treats datablocks as the equivalent of function y-isolines.  No line will
 join points separated by a blank record.  If all datablocks contain the same
 number of points, `gnuplot` will draw cross-isolines between datablocks,
 connecting corresponding points.  This is termed "grid data", and is required
-for drawing a surface, for contouring (@ref{contour}) and hidden-line removal
-(@ref{hidden3d}). See also @ref{grid_data}.
+for drawing a surface, for contouring (`set contour`) and hidden-line removal
+(`set hidden3d`). See also `splot grid_data`.
 
 It is no longer necessary to specify `parametric` mode for three-column
 `splot`s.
@@ -13251,7 +13262,7 @@ It is no longer necessary to specify `parametric` mode for three-column
 system with a compatible binary file representation.)
 
 In previous versions, `gnuplot` dynamically detected binary data files.  It
-is now necessary to specify the keyword @ref{binary} directly after the filename.
+is now necessary to specify the keyword `binary` directly after the filename.
 
 Single precision floats are stored in a binary file as follows:
 
@@ -13294,8 +13305,8 @@ in `binary.c`.  The routine to write binary data is
 An example of using these routines is provided in the file `bf_test.c`, which
 generates binary files for the demo file `demo/binary.dem`.
 
-The @ref{index} keyword is not supported, since the file format allows only one
-surface per file.  The @ref{every} and @ref{using} filters are supported.  @ref{using}
+The `index` keyword is not supported, since the file format allows only one
+surface per file.  The `every` and `using` filters are supported.  `using`
 operates as if the data were read in the above triplet form.
 See also 
 @uref{http://www.nas.nasa.gov/~woo/gnuplot/binary/binary.html,Binary File Splot Demo.
@@ -13371,7 +13382,7 @@ on a case-by-case basis.
 @c ?datafile matrix
 @cindex matrix
 
-The @ref{matrix} flag indicates that the ASCII data are stored in matrix format.
+The `matrix` flag indicates that the ASCII data are stored in matrix format.
 The z-values are read in a row at a time, i. e.,
 @example
       z11 z12 z13 z14 ...
@@ -13383,7 +13394,7 @@ and so forth.  The row and column indices are used for the x- and y-values.
 
 A blank line or comment line ends the matrix, and starts a new
 surface mesh. You can select among the meshes inside a file by the
-@ref{index} option to the @ref{plot} command, as usual.
+`index` option to the `plot` command, as usual.
 
 @node grid_data, splot_overview, data-file_, splot
 @subsection grid_data
@@ -13394,10 +13405,10 @@ surface mesh. You can select among the meshes inside a file by the
 
 The 3D routines are designed for points in a grid format, with one sample,
 datapoint, at each mesh intersection; the datapoints may originate from
-either evaluating a function, see @ref{isosamples}, or reading a datafile,
+either evaluating a function, see `set isosamples`, or reading a datafile,
 see `splot datafile`.  The term "isoline" is applied to the mesh lines for
 both functions and data.  Note that the mesh need not be rectangular in x
-and y, as it may be parameterized in u and v, see @ref{isosamples}.
+and y, as it may be parameterized in u and v, see `set isosamples`.
 
 However, `gnuplot` does not require that format.  In the case of functions,
 'samples' need not be equal to 'isosamples', i.e., not every x-isoline
@@ -13407,7 +13418,7 @@ are an equal number of scattered data points in each datablock, then
 will connect the corresponding points in each datablock to generate a
 "surface".  In either case, contour and hidden3d modes may give different
 plots than if the points were in the intended format.  Scattered data can be
-converted to a @{different@} grid format with @ref{dgrid3d}.
+converted to a @{different@} grid format with `set dgrid3d`.
 
 The contour code tests for z intensity along a line between a point on a
 y-isoline and the corresponding point in the next y-isoline.  Thus a `splot`
@@ -13432,24 +13443,24 @@ a y-isoline intersection will ignore such samples. Try:
 @cindex splot_overview
 
 `splot` can display a surface as a collection of points, or by connecting
-those points.  As with @ref{plot}, the points may be read from a data file or
+those points.  As with `plot`, the points may be read from a data file or
 result from evaluation of a function at specified intervals, see 
-@ref{isosamples}.  The surface may be approximated by connecting the points
-with straight line segments, see @ref{surface}, in which case the surface
+`set isosamples`.  The surface may be approximated by connecting the points
+with straight line segments, see `set surface`, in which case the surface
 can be made opaque with `set hidden3d.`  The orientation from which the 3d
-surface is viewed can be changed with @ref{view}.
+surface is viewed can be changed with `set view`.
 
 Additionally, for points in a grid format, `splot` can interpolate points
-having a common amplitude (see @ref{contour}) and can then connect those
+having a common amplitude (see `set contour`) and can then connect those
 new points to display contour lines, either directly with straight-line
-segments or smoothed lines (see @ref{cntrparam}).  Functions are already
-evaluated in a grid format, determined by @ref{isosamples} and @ref{samples},
+segments or smoothed lines (see `set cntrparam`).  Functions are already
+evaluated in a grid format, determined by `set isosamples` and `set samples`,
 while file data must either be in a grid format, as described in `data-file`,
-or be used to generate a grid (see @ref{dgrid3d}).
+or be used to generate a grid (see `set dgrid3d`).
 
 Contour lines may be displayed either on the surface or projected onto the
 base.  The base projections of the contour lines may be written to a
-file, and then read with @ref{plot}, to take advantage of @ref{plot}'s additional
+file, and then read with `plot`, to take advantage of `plot`'s additional
 formatting capabilities.
 
 @node system, test, splot, Commands
@@ -13460,7 +13471,7 @@ formatting capabilities.
 @cmindex system
 
 
-@ref{system} spawns shell to execute a command. Please type @ref{shell} for
+`system` spawns shell to execute a command. Please type `help shell` for
 more details.
 
 @node test, update, system, Commands
@@ -13471,7 +13482,7 @@ more details.
 @cmindex test
 
 
-@ref{test} creates a display of line and point styles and other useful things
+`test` creates a display of line and point styles and other useful things
 appropriate for the terminal you are using.
 
 Syntax:
@@ -13567,7 +13578,7 @@ may be located via the official distribution site:
 @uref{http://www.gnuplot.info,http://www.gnuplot.info
 }
 
-Please e-mail any bugs to bug-gnuplot mailinglist (see @ref{Seeking-assistance})
+Please e-mail any bugs to bug-gnuplot mailinglist (see `Seeking-assistance`)
 
 
 @menu
