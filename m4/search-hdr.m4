@@ -20,7 +20,7 @@ for ac_dir in '' /usr/local/include $gp_lib_prefix $gp_lib_prefix/include ; do
   if eval "test \"`echo '$ac_cv_header_'$ac_safe`\" = yes"; then
     break
   else
-    CPPFLAGS="${ac_save_CPPFLAGS}"
+    CPPFLAGS="$ac_save_CPPFLAGS"
   fi
 done
 if eval "test \"`echo '$ac_cv_header_'$ac_safe`\" = yes"; then
