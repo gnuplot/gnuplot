@@ -72,6 +72,9 @@
 /* Define if this is a Linux system with SuperVGA library.  */
 #undef LINUXVGA
 
+/* Define if you want to use the MGR Window system.  */
+#undef MGR
+
 /* Define if this is an MSDOS system with djgpp.  */
 #undef MSDOS
 
@@ -143,6 +146,9 @@
 
 /* Define if you want to use the included readline function.  */
 #undef READLINE
+
+/* Define if you want to use the Redwood Graphics Interface Protocol.  */
+#undef RGIP
 
 /* Define as the type of the first argument to select.  */
 #undef SELECT_ARGTYPE_1

@@ -121,7 +121,7 @@ fi
 AC_DEFUN(gp_MSDOS,
 [AC_MSG_CHECKING(for MS-DOS/djgpp/libGRX)
 AC_EGREP_CPP(yes,
-[#ifdef __DJGPP__ && __DJGPP__ == 2
+[#if __DJGPP__ && __DJGPP__ == 2
   yes
 #endif
 ], AC_MSG_RESULT(yes)
@@ -144,7 +144,7 @@ AC_EGREP_CPP(yes,
 AC_DEFUN(gp_NEXT,
 [AC_MSG_CHECKING(for NeXT)
 AC_EGREP_CPP(yes,
-[#ifdef __NeXT__
+[#if __NeXT__
   yes
 #endif
 ], AC_MSG_RESULT(yes)
