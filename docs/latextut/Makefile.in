@@ -24,6 +24,9 @@ mandir = $(prefix)/man
 top_builddir = .
 top_srcdir = @top_srcdir@
 
+# which gnuplot-binary to use
+# use the just compiled version instead of a pre-installed version
+GNUPLOT = $(top_srcdir)/gnuplot
 
 # To touch it up after changes:
 remake: tutorial.dvi
@@ -42,7 +45,11 @@ tutorial.dvi: eg1.tex eg2.tex eg3.tex eg4.tex eg5.tex eg6.tex linepoin.tex \
 
 .plt.tex:
 	@test "$(srcdir)" = "$(top_builddir)" || cp $(srcdir)/*.dat .
-	gnuplot $<
+	@if test -x $(top_srcdir)/src/gnuplot ; then \
+	  $(top_srcdir)/src/gnuplot $< ; \
+	else \
+	  gnuplot $< ; \
+	fi
 
 clean:
 	rm -f *.aux *.dvi *.log *.ps eg?.tex linepoin.tex
