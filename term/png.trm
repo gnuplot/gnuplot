@@ -308,7 +308,7 @@ void PNGtext()
   pngtext.text_length=strlen(text);
 
   info_ptr->num_text=1;
-  info_ptr->text=&pngtext;
+  info_ptr->text = &pngtext;
 
   png_write_info(png_ptr, info_ptr);
 
