@@ -12,11 +12,10 @@ binary1 binary2 binary3: ../src/bf_test
 check-local: check-noninteractive
 
 check-interactive:
-	@( bdir=`pwd` ; cd $(srcdir) && PATH=$$bdir/../src gnuplot all.dem )
+	@( bdir=`pwd` ; PATH=$$bdir/../src GNUPLOT_LIB=$(srcdir) gnuplot all.dem )
 
 check-noninteractive:
-	@( bdir=`pwd` ; cd $(srcdir) && \
-	  PATH=$$bdir/../src gnuplot all.dem </dev/null )
+	@( bdir=`pwd` ; PATH=$$bdir/../src GNUPLOT_LIB=$(srcdir) gnuplot all.dem </dev/null )
 
 ##m4-files-begin
 EXTRA_DIST = Makefile.am.in reread.bor world.cor 1.dat 2.dat 3.dat \
