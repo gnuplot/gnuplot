@@ -1,5 +1,5 @@
 /*
- * $Id: png.trm,v 1.11.2.5 1999/10/19 13:31:28 lhecking Exp $
+ * $Id: png.trm,v 1.11.2.6 1999/11/17 18:13:00 lhecking Exp $
  *
  */
 
@@ -331,8 +331,8 @@ PNG_text()
 	    png_palette[i].green = green * 85;
 	    png_palette[i].blue = blue * 85;
 	}
-    sprintf(text, "gnuplot %sversion %s patchlevel %s",
-	    OS, version, patchlevel);
+    sprintf(text, "gnuplot version %s patchlevel %s on %s %s",
+	    gnuplot_version, gnuplot_patchlevel, os_name, os_rel);
 
     pngtext.compression = -1;
     pngtext.key = "Software";

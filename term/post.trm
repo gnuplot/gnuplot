@@ -1,5 +1,5 @@
 /*
- * $Id: post.trm,v 1.21 1999/01/12 19:16:54 lhecking Exp $
+ * $Id: post.trm,v 1.21.2.1 1999/08/19 14:16:33 lhecking Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -105,10 +105,6 @@ TERM_PUBLIC void PS_pointsize __PROTO((double ptsize)); /* JFi [pointsize] */
 
 #ifdef TERM_BODY
 /* PostScript driver by Russell Lang, rjl@monu1.cc.monash.edu.au */
-
-/* From version.c */
-extern char version[];
-extern char patchlevel[];
 
 #define PS_FLUSH_PATH \
     if (ps_path_count) { fprintf(gpoutfile, "stroke "); ps_path_count = 0; }
@@ -832,11 +828,14 @@ NULL };
 
 	if (outstr) fprintf(gpoutfile, "%%%%Title: %s\n", outstr );             /*  JFi  */
 	time(&now);
-	fprintf(gpoutfile, psi1, version, patchlevel, asctime(localtime(&now)), uses_fonts ? "(atend)" : "");
+	fprintf(gpoutfile, psi1, gnuplot_version, gnuplot_patchlevel,
+		asctime(localtime(&now)), uses_fonts ? "(atend)" : "");
 
-	fprintf(gpoutfile,"%%%%BoundingBox: %d %d %d %d\n", xoff + bb_xmin, yoff + bb_ymin, xoff + bb_xmax, yoff + bb_ymax);
+	fprintf(gpoutfile,"%%%%BoundingBox: %d %d %d %d\n", xoff + bb_xmin,
+		yoff + bb_ymin, xoff + bb_xmax, yoff + bb_ymax);
 
-	fprintf(gpoutfile,"%%%%Orientation: %s\n", ps_portrait ? "Portrait" : "Landscape");
+	fprintf(gpoutfile,"%%%%Orientation: %s\n",
+		ps_portrait ? "Portrait" : "Landscape");
 
 	if (!encap)
 		fprintf(gpoutfile,"%%%%Pages: (atend)\n");

@@ -1,5 +1,5 @@
 /*
- * $Id: $
+ * $Id: mif.trm,v 1.11 1999/01/12 14:04:11 lhecking Exp $
  */
 /* GNUPLOT -- mif.trm */
 
@@ -136,10 +136,6 @@ static void mif_put_point __PROTO((unsigned int x, unsigned int y, int np));
 
 /* Declared in ../setshow.c */
 extern char term_options[];
-
-/* From version.c */
-extern char version[];
-extern char patchlevel[];
 
 static struct mif_line {	/* Line point structure specification */
     float fpos_x;		/* Line point X coordinate */
@@ -464,7 +460,7 @@ TERM_PUBLIC void MIF_init()
 \t<Font <FTag `%s'><FFamily `Symbol'><FSize 5.0 pt><FPlain Yes>>\n\
 >\n\
 #\n",
-		version, patchlevel,
+		gnuplot_version, gnuplot_patchlevel,
 		zgnuplot, MIF_PSIZE,
 		zgnuplotp,
 		zgnuplotd);
