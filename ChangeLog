@@ -1,3 +1,8 @@
+2005-01-31  Ethan Merritt  <merritt@u.washington.edu>
+
+	 * util.c (getusername): Don't try to free a string pointer that may
+	 have been returned by getenv.  Fixes bug #1111804.
+
 2005-01-27  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* config/config.mgw: Mingw 2.x does not HAVE_SYS_PARAM_H.

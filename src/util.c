@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util.c,v 1.51 2005/01/12 00:05:42 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: util.c,v 1.52 2005/01/19 23:54:19 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - util.c */
@@ -1146,11 +1146,9 @@ getusername ()
 	}
     }
 #else
-    fullname = username;
-    username = NULL;
+    fullname = gp_alloc(strlen(username)+1,"getusername");
+    strcpy(fullname, username);
 #endif /* HAVE_PWD_H */
 
-    if (username)
-	free(username);
     return fullname;
 }
