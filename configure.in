@@ -121,6 +121,8 @@ else
   else
     X_LIBRARIES="-lX11"
   fi
+  CPPFLAGS="$CPPFLAGS $X_CFLAGS"
+  X_LIBRARIES="$X_PRE_LIBS $X_LIBRARIES $X_LIBS $X_EXTRA_LIBS"
   GNUPLOT_X11=gnuplot_x11
   AC_DEFINE(X11)
 fi
@@ -138,6 +140,9 @@ LIBS="$LIBS -lm"
 
 
 dnl Header files. ANSI first
+dnl We prefer that the absense of a macro is the norm, so we
+dnl define NO_WHATEVER if an ansi header/fn is missing, but HAVE_SOMETHING
+dnl if it is a non-ansi header/fn we would like to use if available
 AC_HEADER_STDC
 dnl check for errno.h header and if it declares errno
 AC_CHECK_HEADER(errno.h, , AC_DEFINE(NO_ERRNO_H))
@@ -176,9 +181,6 @@ AC_TYPE_SIGNAL
  
 
 dnl Functions. ANSI first, then others
-dnl We prefer that the absense of a macro is the norm, so we
-dnl define NO_WHATEVER if an ansi fn is missing, but HAVE_SOMETHING
-dnl if it is a non-ansi fn we would like to use if available
 
 dnl sunos 4 has on_exit() in place of atexit()
 AC_CHECK_FUNC(atexit, ,AC_DEFINE(NO_ATEXIT) AC_CHECK_FUNCS(on_exit))
@@ -204,12 +206,15 @@ dnl On SVR3.
 dnl FIXME AC_DEFINE(CRIPPLED_SELECT)
 
 
-dnl Libraries.
-dnl -lsocket is needed on SVR4.
-dnl
-dnl Is this true ?  Can anyone remember why ?
-dnl I believe it is needed by gnuplot_x11 for gethostname and friends? lars
-AC_CHECK_LIB(socket, main, LIBS="$LIBS -lnsl -lsocket")
+dnl Cached variables - required for the library checks below
+if test ."$gp_cv_prog_make_cppflags" != "."; then
+  CPPFLAGS="$gp_cv_prog_make_cppflags"
+fi
+dnl Need two pairs of square brackets because m4 strips out one pair.
+dnl There is a space and a tab between the square brackets.
+if test ."$gp_cv_prog_make_termlibs" != "."; then
+  TERMLIBS="`echo $gp_cv_prog_make_termlibs | sed 's/-l[[^     ]]*//g'`"
+fi
 
 dnl check for installed linux vgalib
 if test "$with_linux_vga" = yes; then
@@ -240,7 +245,7 @@ if test "$with_gnu_readline" = yes; then
 
   elif test "$with_gnu_readline" != no; then
     if test ! -f $with_gnu_readline ; then
-      AC_MSG_ERROR(No such file $withval)
+      AC_MSG_ERROR(No such file $with_gnu_readline)
     fi
 
     AC_CHECK_LIB(termcap, tputs, gp_tcap=" -ltermcap", gp_tcap="")
@@ -251,22 +256,22 @@ dnl end readline
 
 dnl check for Tom Boutell's gd library
 if test "$with_gd" != no; then
-gp_CHECK_LIB_PATH(gd, gdImageCreate)
-if test "$ac_cv_lib_gd_gdImageCreate" = yes; then
+  gp_CHECK_LIB_PATH(gd, gdImageCreate)
+  if test "$ac_cv_lib_gd_gdImageCreate" = yes; then
     gp_CHECK_HEADER(gd.h,,
      AC_MSG_WARN(please add path to `echo $ac_safe|sed 's/\_/\./'` to INCLUDES in Makefile)
     )dnl gp_CHECK_HEADER
-  AC_DEFINE(HAVE_LIBGD)
-else
-  AC_MSG_RESULT(- see term/gif.trm for download details)
-fi
+    AC_DEFINE(HAVE_LIBGD)
+  else
+    AC_MSG_RESULT(- see term/gif.trm for download details)
+  fi
 fi
 dnl end gd
 
 dnl check for png and z library
 if test "$with_png" != no; then
-gp_CHECK_LIB_PATH(png, png_info_init, -lz)
-if test "$ac_cv_lib_png_png_info_init" = yes; then
+  gp_CHECK_LIB_PATH(png, png_info_init, -lz)
+  if test "$ac_cv_lib_png_png_info_init" = yes; then
     gp_CHECK_HEADER(png.h,,
      AC_MSG_WARN(please add path to `echo $ac_safe|sed 's/\_/\./'` to INCLUDES in Makefile)
     )dnl gp_CHECK_HEADER
@@ -274,14 +279,15 @@ if test "$ac_cv_lib_png_png_info_init" = yes; then
      AC_MSG_WARN(please add path to `echo $ac_safe|sed 's/\_/\./'` to INCLUDES in Makefile)
     )dnl gp_CHECK_HEADER
     AC_EGREP_CPP(yes,
-    [#include "png.h"
-    # if PNG_LIBPNG_VER < 89
-      yes
-    # endif
-    ], AC_MSG_WARN(- not using old libpng version), AC_DEFINE(HAVE_LIBPNG))
-else
-  AC_MSG_RESULT(- see term/png.trm for download details)
-fi
+     [#include "png.h"
+     # if PNG_LIBPNG_VER < 89
+       yes
+     # endif
+     ], AC_MSG_WARN(- not using old libpng version), AC_DEFINE(HAVE_LIBPNG)
+    )dnl AC_EGREP_CPP
+  else
+    AC_MSG_RESULT(- see term/png.trm for download details)
+  fi
 fi
 dnl end png and z
 
@@ -289,6 +295,9 @@ dnl How do we detect the Ultrix X libraries?
 dnl Or is it really a server (run-time) problem?
 dnl FIXME AC_DEFINE(ULTRIX_KLUDGE)
 
+dnl Cached variables
+AC_CACHE_CHECK(for CPPFLAGS variable,gp_cv_prog_make_cppflags,gp_cv_prog_make_cppflags="$CPPFLAGS")
+AC_CACHE_CHECK(for TERMLIBS variable,gp_cv_prog_make_termlibs,gp_cv_prog_make_termlibs="$TERMLIBS")
 
 dnl Substitute variables
 AC_SUBST(LASERGNU)

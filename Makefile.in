@@ -128,7 +128,7 @@ AUTOMAKE = @AUTOMAKE@
 AUTOHEADER = @AUTOHEADER@
 ACCONFIG = acconfig.h
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-CONFIG_HEADER_IN = $(top_srcdir)/config.hin
+CONFIG_HEADER_IN = config.hin
 CONFIG_HEADER = config.h
 GZIP = --best
 TAR = tar
@@ -281,9 +281,9 @@ ETC = 00test 0BUGS 0FAQ 0INSTALL 0PORTING 0README CodeStyle Copyright History \
 	makefile.all makefile.amg makefile.ami makefile.dj2 makefile.djg \
 	makefile.emx makefile.g makefile.msc makefile.msw makefile.mto \
 	makefile.nt makefile.os2 makefile.os9 makefile.r makefile.st \
-	makefile.tc makefile.unx makefile.vms makefile.win makefile.ztc \
-	missing mkdist mkinstalldirs os9.c pcgraph.asm rgipgnu stamp-h.in \
-	strftime.c upd_make.sh vms.c $(T)README 
+	makefile.tc makefile.unx makefile.vms makefile.wc makefile.win \
+	makefile.ztc missing mkdist mkinstalldirs os9.c pcgraph.asm rgipgnu \
+	stamp-h.in strftime.c upd_make.sh vms.c $(T)README 
 
 # Documentation and help files
 DOCS1 = $(D)Makefile.in $(D)README $(D)checkdoc.c $(D)doc2gih.c \
@@ -471,17 +471,15 @@ distclean: clean
 realclean: distclean
 	rm -f TAGS docs/TAGS
 
-# LGH: Kludge alert - just make it work somehow
 distdir = gnuplot
 top_distdir = $(distdir)
-version=beta347
+version=`sed -n 's/.*patchlevel.*"\(.*\)".*/\1/p' gnuplot/version.c|tr -d ' '`
 
-# LGH: Need to change this if not using GNU tar
 dist: distdir
 	-mv $(distdir)/docs/makefile.dst $(distdir)/docs/makefile
 	-mv $(distdir)/docs/latextut/makefile.dst $(distdir)/docs/latextut/makefile
 	-chmod -R a+r $(distdir)
-	GZIP=$(GZIP) $(TAR) chozf $(distdir)-$(version).tar.gz $(distdir)
+	$(TAR) chf - $(distdir) | gzip $(GZIP) > $(distdir)-$(version).tar.gz
 	-rm -rf $(distdir)
 
 distdir: $(DISTFILES)
