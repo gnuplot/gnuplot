@@ -11,6 +11,14 @@
 	Syntax:
 	    plot 'foo' using (stringcolumn(1) eq "baz" ? column(2) : column(3))
 
+	* src/datafile.c (df_readline df_3dmatrix df_readbinary):
+	Set a flag to indicate that we are in the process of evaluating a
+	"using" specification.
+
+	* src/datafile.c (f_column f_timecolumn f_stringcolumn):
+	Report an error if any of the <xxx>column() functions  are called
+	outside the context of a "using" specification.
+
 2005-03-02  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/unset.c (unset_historysize): Rearrange #ifdefs for GNUPLOT_HISTORY

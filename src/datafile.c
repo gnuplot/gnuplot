@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.70 2005/03/05 04:18:20 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.71 2005/03/05 04:52:14 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -294,6 +294,7 @@ static int line_count = 0;	/* line counter */
 /* parsing stuff */
 struct use_spec_s use_spec[MAXDATACOLS];
 static char df_format[MAX_LINE_LEN + 1];
+static TBOOLEAN evaluate_inside_using = FALSE;
 
 /* rather than three arrays which all grow dynamically, make one
  * dynamic array of this structure
@@ -1875,7 +1876,9 @@ df_readline(double v[], int max)
 		if (use_spec[output].at) {
 		    struct value a;
 		    /* no dummy values to set up prior to... */
+		    evaluate_inside_using = TRUE;
 		    evaluate_at(use_spec[output].at, &a);
+		    evaluate_inside_using = FALSE;
 		    if (undefined)
 			return DF_UNDEFINED;	/* store undefined point in plot */
 
@@ -2137,7 +2140,9 @@ df_3dmatrix(struct surface_points *this_plot, int need_palette)
 		    used[i] = df_column[i].datum;
 		else if (use_spec[i].at) {
 		    struct value a;
+		    evaluate_inside_using = TRUE;
 		    evaluate_at(use_spec[i].at, &a);
+		    evaluate_inside_using = FALSE;
 		    if (undefined) {
 			point->type = UNDEFINED;
 			goto skip;	/* continue _outer_ loop */
@@ -2340,6 +2345,10 @@ f_column(union argument *arg)
     (void) arg;			/* avoid -Wunused warning */
     (void) pop(&a);
     column = (int) real(&a);
+
+    if (!evaluate_inside_using)
+	int_error(c_token-1, "column() called from invalid context");
+    
     if (column == -2)
 	push(Ginteger(&a, df_current_index));
     else if (column == -1)
@@ -2366,10 +2375,10 @@ f_stringcolumn(union argument *arg)
     (void) arg;			/* avoid -Wunused warning */
     (void) pop(&a);
     column = (int) real(&a);
-/*
+
     if (!evaluate_inside_using)
 	int_error(c_token-1, "stringcolumn() called from invalid context");
- */   
+
     if (column < 1 || column > df_no_cols) {
 	undefined = TRUE;
 	push(&a);		/* any objection to this ? */
@@ -2409,6 +2418,9 @@ f_timecolumn(union argument *arg)
     (void) arg;			/* avoid -Wunused warning */
     (void) pop(&a);
     column = (int) magnitude(&a) - 1;
+
+    if (!evaluate_inside_using)
+	int_error(c_token-1, "timecolumn() called from invalid context");
 
     /* try to match datafile column with output field number */
     for (output=0; output<limit; output++)
@@ -4751,7 +4763,9 @@ df_readbinary(double v[], int max)
 		if (use_spec[output].at) {
 		    struct value a;
 		    /* no dummy values to set up prior to... */
+		    evaluate_inside_using = TRUE;
 		    evaluate_at(use_spec[output].at, &a);
+		    evaluate_inside_using = FALSE;
 		    if (undefined)
 			return DF_UNDEFINED;	/* store undefined point in plot */
 
