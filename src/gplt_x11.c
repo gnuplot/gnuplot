@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.108 2004/07/13 14:11:22 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.109 2004/08/11 20:52:59 sfeam Exp $"); }
 #endif
 
 #define X11_POLYLINE 1
@@ -2127,7 +2127,6 @@ exec_cmd(plot_struct *plot, char *command)
 		XDrawSegments(dpy, plot->pixmap, *current_gc, Plus, 2);
 		break;
 	    case 1:		/* do X */
-		fprintf(stderr,"delta = %d\n",delta);
 		Cross[0].x1 = (short) X(x) - delta;
 		Cross[0].y1 = (short) Y(y) - delta;
 		Cross[0].x2 = (short) X(x) + delta;
