@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.167 2005/02/02 21:05:01 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.168 2005/02/18 09:47:41 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -943,13 +943,10 @@ set_boxwidth()
     c_token++;
     if (END_OF_COMMAND) {
 	boxwidth = -1.0;
-#if USE_ULIG_RELATIVE_BOXWIDTH
 	boxwidth_is_absolute = TRUE;
-#endif /* USE_ULIG_RELATIVE_BOXWIDTH */
     } else {
 	boxwidth = real(const_express(&a));
     }
-#if USE_ULIG_RELATIVE_BOXWIDTH
     if (END_OF_COMMAND)
 	return;
     else {
@@ -961,7 +958,6 @@ set_boxwidth()
 	    int_error(c_token, "expecting 'absolute' or 'relative' ");
     }
     c_token++;
-#endif  /* USE_ULIG_RELATIVE_BOXWIDTH */
 }
 
 /* process 'set clabel' command */

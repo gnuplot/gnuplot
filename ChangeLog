@@ -9,6 +9,15 @@
 	in appropriate places.  Without this it was impossible to build gnuplot
 	with post.trm but not pslatex.trm.
 
+	* src/term.h: Remove aed.trm and tek.trm from SHORT_TERMLIST set of
+	terminals, but add estimate.trm if it is enabled.
+
+	* configure.in src/graphics.c src/plot2d.c src/save.c src/set.c
+	src/show.c src/unset.c src/plot2d.h: Remove configuration option
+	--disable-relative-boxwidth. 
+	Remove the #ifdef USE_ULIG_RELATIVE_BOXWIDTH / #endif brackets around
+	code that implements it.
+
 2005-02-28  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/pslatex.trm: EPSLATEX_set_color must be protected by #ifdef PM3D.

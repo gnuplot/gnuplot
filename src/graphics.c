@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.150 2005/02/18 22:56:04 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.151 2005/02/24 20:14:16 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -2887,10 +2887,8 @@ plot_boxes(struct curve_points *plot, int xaxis_y)
 		    if (prev != UNDEFINED)
 			if (boxwidth < 0)
 			    dxl = (plot->points[i-1].x - plot->points[i].x) / 2.0;
-#if USE_ULIG_RELATIVE_BOXWIDTH
 			else if (! boxwidth_is_absolute)
 			    dxl = (plot->points[i-1].x - plot->points[i].x) * boxwidth / 2.0;
-#endif /* USE_RELATIVE_BOXWIDTH */
 			else /* Hits here on 3 column BOXERRORBARS */
 			    dxl = -boxwidth / 2.0;
 		    else
@@ -2900,10 +2898,8 @@ plot_boxes(struct curve_points *plot, int xaxis_y)
 			if (plot->points[i + 1].type != UNDEFINED)
 			    if (boxwidth < 0)
 				dxr = (plot->points[i+1].x - plot->points[i].x) / 2.0;
-#if USE_ULIG_RELATIVE_BOXWIDTH
 			    else if (! boxwidth_is_absolute)
 				dxr = (plot->points[i+1].x - plot->points[i].x) * boxwidth / 2.0;
-#endif /* USE_RELATIVE_BOXWIDTH */
 			    else /* Hits here on 3 column BOXERRORBARS */
 				dxr = boxwidth / 2.0;
 			else
@@ -3344,19 +3340,15 @@ plot_c_bars(struct curve_points *plot)
 
 	    dxl = -boxwidth / 2.0;
 	    if (prev != UNDEFINED)
-#if USE_ULIG_RELATIVE_BOXWIDTH
 		if (! boxwidth_is_absolute)
 		    dxl = (plot->points[i-1].x - plot->points[i].x) * boxwidth / 2.0;
-#endif
 
 	    dxr = -dxl;
 	    if (i < plot->p_count - 1) {
 		if (plot->points[i + 1].type != UNDEFINED) {
-#if USE_ULIG_RELATIVE_BOXWIDTH
 		    if (! boxwidth_is_absolute)
 			dxr = (plot->points[i+1].x - plot->points[i].x) * boxwidth / 2.0;
 		    else
-#endif
 			dxr = boxwidth / 2.0;
 		}
 	    }

@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.in,v 1.158 2005/02/13 18:29:50 sfeam Exp $
+dnl $Id: configure.in,v 1.159 2005/02/17 20:48:00 sfeam Exp $
 dnl
 AC_INIT(src/graphics.c)
 AM_CONFIG_HEADER(config.h:config.hin)
@@ -769,16 +769,6 @@ if test "$enable_filledboxes" = yes; then
             [ Define if you want to have Uli Gruenebaum's filledboxes style. ])
 fi
 
-dnl relative boxwidth
-AC_ARG_ENABLE(relative-boxwidth,dnl
-[  --disable-relative-boxwidth   disable relative_boxwidths],,
-  test -z "$enable_relative_boxwidth" && enable_relative_boxwidth=yes)
-
-if test "$enable_relative_boxwidth" = yes; then
-  AC_DEFINE(USE_ULIG_RELATIVE_BOXWIDTH,1,
-            [ Define if you want to have Uli Gruenebaum's relative boxwidth. ])
-fi
-
 dnl isvar function patch
 AC_ARG_ENABLE(isvar,dnl
 [  --disable-defined-var         disable defined(var) function ],,
@@ -1061,10 +1051,6 @@ fi
 
 if test "$enable_filledboxes" = yes; then
   AC_MSG_RESULT([  Enable filledboxes])
-fi
-
-if test "$enable_relative_boxwidth" = yes; then
-  AC_MSG_RESULT([  Enable relative boxwidths])
 fi
 
 if test "$enable_defined_var" = yes; then

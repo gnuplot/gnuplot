@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.145 2005/02/03 06:47:59 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.146 2005/02/16 05:17:41 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -1151,12 +1151,8 @@ show_boxwidth()
     if (boxwidth < 0.0)
 	fputs("\tboxwidth is auto\n", stderr);
     else {
-#if USE_ULIG_RELATIVE_BOXWIDTH
 	fprintf(stderr, "\tboxwidth is %g %s\n", boxwidth,
 		(boxwidth_is_absolute) ? "absolute" : "relative");
-#else
-	fprintf(stderr, "\tboxwidth is %g\n", boxwidth);
-#endif /* USE_ULIG_RELATIVE_BOXWIDTH */
     }
 }
 

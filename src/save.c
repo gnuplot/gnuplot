@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.99 2005/02/06 05:05:50 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.100 2005/02/16 05:17:41 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -245,12 +245,8 @@ set y2data%s\n",
     if (boxwidth < 0.0)
 	fputs("set boxwidth\n", fp);
     else
-#if USE_ULIG_RELATIVE_BOXWIDTH
 	fprintf(fp, "set boxwidth %g %s\n", boxwidth,
 		(boxwidth_is_absolute) ? "absolute" : "relative");
-#else
-    fprintf(fp, "set boxwidth %g\n", boxwidth);
-#endif /* USE_ULIG_RELATIVE_BOXWIDTH */
 
 #if USE_ULIG_FILLEDBOXES
     fprintf(fp, "set style fill ");

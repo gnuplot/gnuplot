@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.91 2004/12/05 08:04:42 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.92 2005/02/24 20:14:17 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -83,10 +83,8 @@ static struct udft_entry plot_func;
 
 /* box width (automatic) */
 double   boxwidth              = -1.0;
-#if USE_ULIG_RELATIVE_BOXWIDTH
-/* whether box width is absolute (default) or relative (ULIG) */
+/* whether box width is absolute (default) or relative */
 TBOOLEAN boxwidth_is_absolute  = TRUE;
-#endif
 
 #ifdef EAM_HISTOGRAMS
 static double histogram_rightmost = 0.0;	/* Highest x-coord of histogram so far */
@@ -496,11 +494,7 @@ get_data(struct curve_points *current_plot)
 	    /* ylow and yhigh are same as y */
 
 	    if ( (current_plot->plot_style == BOXES)
-                 && boxwidth > 0
-#if USE_ULIG_RELATIVE_BOXWIDTH
-		 && boxwidth_is_absolute
-#endif /* USE_ULIG_RELATIVE_BOXWIDTH */
-		 ) {
+                 && boxwidth > 0 && boxwidth_is_absolute) {
 		/* calc width now */
 		store2d_point(current_plot, i++, v[0], v[1],
 			      v[0] - boxwidth / 2, v[0] + boxwidth / 2,
@@ -515,11 +509,7 @@ get_data(struct curve_points *current_plot)
 		    histogram_rightmost = v[0] + current_plot->histogram->start;
 		    current_plot->histogram->end = histogram_rightmost;
 		}
-		if (boxwidth > 0
-#if USE_ULIG_RELATIVE_BOXWIDTH
-		     && boxwidth_is_absolute
-#endif /* USE_ULIG_RELATIVE_BOXWIDTH */
-		)
+		if (boxwidth > 0 && boxwidth_is_absolute)
 		    store2d_point(current_plot, i++, v[0], v[1],
 			      v[0] - boxwidth / 2, v[0] + boxwidth / 2,
 			      v[1], v[1], 0.0);
@@ -1965,12 +1955,8 @@ eval_plots()
 			    /* ignored, actually... */
 			    this_plot->points[i].x = t;
 			    this_plot->points[i].y = temp;
-                            if (boxwidth >= 0) {
-#if USE_ULIG_RELATIVE_BOXWIDTH
-			    if (boxwidth_is_absolute )
-#endif /* USE_ULIG_RELATIVE_BOXWIDTH */
+                            if (boxwidth >= 0 && boxwidth_is_absolute )
                                 this_plot->points[i].z = 0;
-                            }
 			} else if (polar) {
 			    double y;
 			    if (!(axis_array[R_AXIS].autoscale & AUTOSCALE_MAX) && temp > axis_array[R_AXIS].max)
@@ -1979,11 +1965,7 @@ eval_plots()
 				temp -= axis_array[R_AXIS].min;
 			    y = temp * sin(x * ang2rad);
 			    x = temp * cos(x * ang2rad);
-                            if (boxwidth >= 0
-#if USE_ULIG_RELATIVE_BOXWIDTH
-			    &&  boxwidth_is_absolute
-#endif /* USE_ULIG_RELATIVE_BOXWIDTH */
-			    ) {
+                            if (boxwidth >= 0 &&  boxwidth_is_absolute) {
                                 int dmy_type = INRANGE;
                                 this_plot->points[i].z = 0;
                                 STORE_WITH_LOG_AND_UPDATE_RANGE( this_plot->points[i].xlow, x - boxwidth/2, dmy_type, x_axis, NOOP, NOOP );
@@ -1997,11 +1979,7 @@ eval_plots()
 			    /* If non-para, it must be INRANGE */
 			    /* logscale ? log(x) : x */
 			    this_plot->points[i].x = t;
-                            if (boxwidth >= 0
-#if USE_ULIG_RELATIVE_BOXWIDTH
-			    && boxwidth_is_absolute
-#endif /* USE_ULIG_RELATIVE_BOXWIDTH */
-			    ) {
+                            if (boxwidth >= 0 && boxwidth_is_absolute) {
                                 int dmy_type = INRANGE;
                                 this_plot->points[i].z = 0;
                                 STORE_WITH_LOG_AND_UPDATE_RANGE( this_plot->points[i].xlow, x - boxwidth/2, dmy_type, x_axis, NOOP, NOOP );
@@ -2226,11 +2204,7 @@ parametric_fixup(struct curve_points *start_plot, int *plot_num)
 		    }
 		    x = r * cos(t);
 		    y = r * sin(t);
-                    if (boxwidth >= 0
-#if USE_ULIG_RELATIVE_BOXWIDTH
-		    && boxwidth_is_absolute
-#endif	/* USE_ULIG_RELATIVE_BOXWIDTH */
-		    ) {
+                    if (boxwidth >= 0 && boxwidth_is_absolute) {
                         int dmy_type = INRANGE;
                         STORE_WITH_LOG_AND_UPDATE_RANGE( yp->points[i].xlow, x - boxwidth/2, dmy_type, xp->x_axis, NOOP, NOOP );
                         dmy_type = INRANGE;
@@ -2243,11 +2217,7 @@ parametric_fixup(struct curve_points *start_plot, int *plot_num)
 		    double x = xp->points[i].y;
 		    double y = yp->points[i].y;
 
-                    if (boxwidth >= 0
-#if USE_ULIG_RELATIVE_BOXWIDTH
-		    && boxwidth_is_absolute
-#endif /* USE_ULIG_RELATIVE_BOXWIDTH */
-		    ) {
+                    if (boxwidth >= 0 && boxwidth_is_absolute) {
                         int dmy_type = INRANGE;
                         STORE_WITH_LOG_AND_UPDATE_RANGE( yp->points[i].xlow, x - boxwidth/2, dmy_type, yp->x_axis, NOOP, NOOP );
                         dmy_type = INRANGE;
