@@ -288,12 +288,13 @@ ETC =   0BUGS 0FAQ 0INSTALL 0PORTING 0README ChangeLog CodeStyle Copyright \
 	hrcgraph.asm install-sh intergra.x11 lasergnu lineproc.mac \
 	linkopt.vms linkopt.ztc make_vms.com makefile.286 makefile.all \
 	makefile.amg makefile.ami makefile.dj2 makefile.djg makefile.emx \
-	makefile.g makefile.msc makefile.msw makefile.mto makefile.nt \
-	makefile.os2 makefile.os9 makefile.r makefile.st makefile.tc \
-	makefile.unx makefile.vms makefile.wc makefile.win makefile.ztc \
-	missing mkinstalldirs os9.c pcgraph.asm rgipgnu stamp-h.in \
-	strftime.c upd_make.sh vms.c m4/msdos.m4 m4/next.m4 m4/search-hdr.m4 \
-	m4/search-lib.m4 m4/select-types.m4 m4/stringize.m4 $(T)README 
+	makefile.g makefile.mgw makefile.msc makefile.msw makefile.mto \
+	makefile.nt makefile.os2 makefile.os9 makefile.r makefile.st \
+	makefile.tc makefile.unx makefile.vms makefile.wc makefile.win \
+	makefile.ztc missing mkinstalldirs os9.c pcgraph.asm rgipgnu \
+	stamp-h.in strftime.c upd_make.sh vms.c m4/msdos.m4 m4/next.m4 \
+	m4/search-hdr.m4 m4/search-lib.m4 m4/select-types.m4 m4/stringize.m4 \
+	$(T)README 
 
 # Documentation and help files
 DOCS1 = $(D)Makefile.in $(D)README $(D)checkdoc.c $(D)doc2gih.c \
