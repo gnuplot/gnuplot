@@ -1,5 +1,5 @@
 /*
- * $Id: x11.trm,v 1.84 2003/11/02 05:19:47 sfeam Exp $
+ * $Id: x11.trm,v 1.85 2003/11/24 15:48:18 mikulik Exp $
  *
  */
 
@@ -341,7 +341,7 @@ X11_options()
 #define NOT_PROCESS_IF_DUPLICATION 1
 
     struct value a;
-    int c_title_token;
+    int c_title_token = 0;
     TBOOLEAN duplication = FALSE;
     TBOOLEAN set_reset = FALSE, set_persist = FALSE, set_raise = FALSE, set_font = FALSE;
     TBOOLEAN set_title = FALSE, set_number = FALSE, set_close = FALSE;
@@ -460,7 +460,7 @@ X11_options()
 	     */
 	    int i;
 	    fputc('n', X11_ipc);
-	    for (i=0; i < X11_COMMAND_BUFFER_LENGTH-3, title[i] != '\0'; i++)
+	    for (i=0; i < X11_COMMAND_BUFFER_LENGTH-3 && title[i] != '\0'; i++)
 		fputc(title[i], X11_ipc);
 	    fputc('\0', X11_ipc);
 	    fputc('\n', X11_ipc);

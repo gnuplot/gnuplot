@@ -1,3 +1,12 @@
+2003-11-25  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/gplt_x11.c term/x11.trm: Clean up code to remove compiler 
+	warnings.
+
+	* src/parse.h src/unset.c: Export a prototype for cleanup_udvlist().
+
+	* src/command.c: Include "getcolor.h" for rgb1_to_gray prototype.
+
 2003-11-25  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/variable.c (PATHSEP_TO_NUL): Reindented.  Applied do {}

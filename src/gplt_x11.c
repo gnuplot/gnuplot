@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.71 2003/11/13 08:18:15 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.72 2003/11/24 15:48:17 mikulik Exp $"); }
 #endif
 
 #define X11_POLYLINE 1
@@ -1346,7 +1346,7 @@ record()
 		int itmp;
 		if (strcspn(buf+1," \n") && sscanf(buf, "C%d", &itmp)) {
 		  plot_struct *psp;
-		  if (psp = Find_Plot_In_Linked_List_By_Number(itmp))
+		  if ((psp = Find_Plot_In_Linked_List_By_Number(itmp)))
 		    Remove_Plot_From_Linked_List(psp->window);
 		} else if (current_plot) {
 		  Remove_Plot_From_Linked_List(current_plot->window);
@@ -1362,7 +1362,7 @@ record()
 		    char *cp;
 		    if (current_plot->titlestring)
 			free(current_plot->titlestring);
-		    if (current_plot->titlestring = (char *) malloc(strlen(buf+1) + 1) ) {
+		    if ((current_plot->titlestring = (char *) malloc(strlen(buf+1) + 1) )) {
 			strcpy(current_plot->titlestring, buf+1);
 			cp = current_plot->titlestring;
 		    } else
@@ -2579,7 +2579,7 @@ PaletteMake(plot_struct * plot, t_sm_palette * tpal)
 	char *added_text = " allocating colors ...";
 	int orig_len = (plot->titlestring ? strlen(plot->titlestring) : 0);
 	XFetchName(dpy, plot->window, &save_title);
-	if (msg = (char *) malloc(orig_len + strlen(added_text) + 1)) {
+	if ((msg = (char *) malloc(orig_len + strlen(added_text) + 1))) {
 	    if (plot->titlestring)
 		strcpy(msg, plot->titlestring);
 	    else
@@ -4371,7 +4371,7 @@ pr_window(plot_struct *plot)
 	if (!title) title = Class;
 	orig_len = strlen(title);
 	/* memory for text, white space, number and terminating \0 */
-	if (plot->titlestring = (char *) malloc(orig_len + ((orig_len && plot->plot_number) ? 1 : 0) + strlen(numstr) - strlen(ICON_TEXT) + 1)) {
+	if ((plot->titlestring = (char *) malloc(orig_len + ((orig_len && plot->plot_number) ? 1 : 0) + strlen(numstr) - strlen(ICON_TEXT) + 1))) {
 	    strcpy(plot->titlestring, title);
 	    if (orig_len && plot->plot_number)
 		plot->titlestring[orig_len++] = ' ';
