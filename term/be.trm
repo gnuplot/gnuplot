@@ -85,13 +85,15 @@ int BE_Display = 0;
 
 static void BE_atexit __PROTO((void));
 
+typedef enum { hasNoArg, hasArg } OptionArg;
+
 static struct beopt {
     char *option;       /* Name of option */
     OptionArg arg;      /* Whether option has argument */
 }  BE_opts[] =
 {
    { "-mono", hasNoArg }, { "-gray", hasNoArg }, { "-clear", hasNoArg },
-   { "-tvtwm", hasNoArg }, { "-pointsize", hasArg },
+   { "-pointsize", hasArg },
    { "-iconic", hasNoArg }, { "-rv", hasNoArg },
    { "-reverse", hasNoArg }, { "+rv", hasNoArg },
    { "-synchronous", hasNoArg },
@@ -101,8 +103,8 @@ static struct beopt {
    { "-borderwidth", hasArg }, { "-fg", hasArg },
    { "-foreground", hasArg }, { "-fn", hasArg }, { "-font", hasArg },
    { "-name", hasArg },
-   { "-selectionTimeout", hasArg }, { "-title", hasArg },
-   { "-xnllanguage", hasArg }, { "-xrm", hasArg },
+   { "-title", hasArg },
+//   { "-xnllanguage", hasArg }, { "-xrm", hasArg },
    { "-raise", hasNoArg }, { "-noraise", hasNoArg },
    { "-persist", hasNoArg }
 };
