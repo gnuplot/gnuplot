@@ -1,3 +1,9 @@
+2000-12-04  Petr Mikulik  <mikulik@physics.muni.cz>
+
+        * docs/gnuplot.doc docs/psdoc/README docs/psdoc/ps_guide.ps
+	lisp/gnuplot-gui.el src/set.c src/term.c src/term_api.h term/post.trm:
+	a patch enabling the PostScript	terminal to use CP-852 encoding. 
+
 2000-11-30  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* term/pm.trm src/os2/gclient.c docs/gnuplot.doc: change PM terminal
@@ -6,7 +12,7 @@
 
 2000-11-29  Petr Mikulik  <mikulik@physics.muni.cz>
 
-	*src/syscfg.h: #define FAQ_LOCATION "http://www.gnuplot.org/faq".
+	* src/syscfg.h: #define FAQ_LOCATION "http://www.gnuplot.org/faq".
 
 2000-11-29  Levente Novak  <novak@jaguar.dote.hu>
 
