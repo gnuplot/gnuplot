@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.143 2005/01/04 20:12:52 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.144 2005/01/10 21:02:45 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -1582,21 +1582,8 @@ show_label(int tag)
 	    fprintf(stderr, " %s ", this_label->layer ? "front" : "back");
 	    if (this_label->font != NULL)
 		fprintf(stderr, " font \"%s\"", this_label->font);
-	    if (this_label->textcolor.type) {
-	    	fprintf(stderr, " textcolor");
-		switch(this_label->textcolor.type) {
-		case TC_LT:   fprintf(stderr," lt %d", this_label->textcolor.lt+1);
-			      break;
-		case TC_Z:    fprintf(stderr," palette z");
-			      break;
-		case TC_CB:   fprintf(stderr," palette cb %g", this_label->textcolor.value);
-			      break;
-		case TC_FRAC: fprintf(stderr," palette fraction %4.2f", this_label->textcolor.value);
-			      break;
-		case TC_RGB:  fprintf(stderr," rgb \"#%6.6x\" ", this_label->textcolor.lt);
-			      break;
-		}
-	    }
+	    if (this_label->textcolor.type)
+		save_textcolor(stderr, &this_label->textcolor);
 	    if (this_label->lp_properties.pointflag == 0)
 		fprintf(stderr, " nopoint");
 	    else {
@@ -2584,8 +2571,8 @@ show_xyzlabel(const char *name, const char *suffix, label_struct *label)
     if (label->font[0])
 	fprintf(stderr, ", using font \"%s\"", conv_text(label->font));
 
-    if (label->textcolor.type == TC_LT)
-    	fprintf(stderr,", textcolor lt %d", label->textcolor.lt+1);
+    if (label->textcolor.type)
+	save_textcolor(stderr, &label->textcolor);
 
     if (label->noenhanced)
 	fprintf(stderr," noenhanced");
@@ -2835,11 +2822,14 @@ show_linestyle(int tag)
 			      break;
 		case TC_Z:    fprintf(stderr," palette z ");
 			      break;
-		case TC_CB:   fprintf(stderr," palette cb %g ", this_linestyle->lp_properties.pm3d_color.value);
+		case TC_CB:   fprintf(stderr," palette cb %g ", 
+					this_linestyle->lp_properties.pm3d_color.value);
 			      break;
-		case TC_FRAC: fprintf(stderr," palette fraction %4.2f ", this_linestyle->lp_properties.pm3d_color.value);
+		case TC_FRAC: fprintf(stderr," palette fraction %4.2f ",
+					this_linestyle->lp_properties.pm3d_color.value);
 			      break;
-		case TC_RGB:  fprintf(stderr," rgb \"#%6.6x\" ", this_linestyle->lp_properties.pm3d_color.lt);
+		case TC_RGB:  fprintf(stderr," rgb \"#%6.6x\" ",
+					this_linestyle->lp_properties.pm3d_color.lt);
 			      break;
 		}
 	    } else

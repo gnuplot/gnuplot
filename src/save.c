@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.96 2005/01/04 20:12:46 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.97 2005/01/10 21:02:43 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -62,7 +62,6 @@ static void save_tics __PROTO((FILE *, AXIS_INDEX));
 static void save_position __PROTO((FILE *, struct position *));
 static void save_zeroaxis __PROTO((FILE *,AXIS_INDEX));
 static void save_set_all __PROTO((FILE *));
-static void save_textcolor __PROTO((FILE *, const struct t_colorspec *));
 
 /*
  *  functions corresponding to the arguments of the GNUPLOT `save` command
@@ -1046,7 +1045,7 @@ save_zeroaxis(FILE *fp, AXIS_INDEX axis)
 
 }
 
-static void
+void
 save_textcolor(FILE *fp, const struct t_colorspec *tc)
 {
     if (tc->type) {
@@ -1060,7 +1059,9 @@ save_textcolor(FILE *fp, const struct t_colorspec *tc)
 		      break;
 	case TC_FRAC: fprintf(fp," palette fraction %4.2f", tc->value);
 		      break;
-	case TC_RGB:  {
+	case TC_RGB:
+#ifdef PM3D
+			{
 			const char *color = reverse_table_lookup(pm3d_color_names_tbl, tc->lt);
 			if (color)
 			    fprintf(fp," rgb \"%s\" ", color);
@@ -1068,6 +1069,8 @@ save_textcolor(FILE *fp, const struct t_colorspec *tc)
 			    fprintf(fp," rgb \"#%6.6x\" ", tc->lt);
 			break;
 			}
+#endif
+	default:       break;
 	}
     }
 }

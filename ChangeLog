@@ -8,6 +8,12 @@
 	* src/gplt_x11.c (display): Always initialize gc_pm3d, in case we need
 	it to handle individual rgb colors even in the absense of a palette.
 
+	* src/save.c (save_textcolor) src/save.h 
+	src/show.c (show_label show_xyzlabel): Export save_textcolor() so
+	that various "show ...label" routines can use it also. Also fixes
+	compile error if configured --disable-pm3d.
+
+
 2005-02-01  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c (plot_boxes): Plot with boxerrorbars and three columns
