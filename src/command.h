@@ -1,4 +1,4 @@
-/* $Id: command.h,v 1.8 1999/08/07 17:20:22 lhecking Exp $ */
+/* $Id: command.h,v 1.9 1999/08/08 17:03:00 lhecking Exp $ */
 
 /* GNUPLOT - command.h */
 
@@ -91,4 +91,35 @@ extern int num_tokens, c_token;
   gp_expand_tilde(&save_file); \
   fp = strcmp(save_file, "-") ? fopen(save_file, (mode)) : stdout;
 
+/**/
+void call_command __PROTO((void));
+void changedir_command __PROTO((void));
+void clear_command __PROTO((void));
+void exit_command __PROTO((void));
+void help_command __PROTO((void));
+void history_command __PROTO((void));
+void if_command __PROTO((void));
+void invalid_command __PROTO((void));
+void load_command __PROTO((void));
+void null_command __PROTO((void));
+void pause_command __PROTO((void));
+void plot_command __PROTO((void));
+void print_command __PROTO((void));
+void pwd_command __PROTO((void));
+void replot_command __PROTO((void));
+void reread_command __PROTO((void));
+void save_command __PROTO((void));
+void screendump_command __PROTO((void));
+void splot_command __PROTO((void));
+void system_command __PROTO((void));
+void testtime_command __PROTO((void));
+void update_command __PROTO((void));
+void do_shell __PROTO((void));
+
+void reset_command __PROTO((void));
+void set_command __PROTO((void));
+void show_command __PROTO((void));
+void unset_command __PROTO((void));
+
+/**/
 #endif /* GNUPLOT_COMMAND_H */
