@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.80 2002/03/09 22:41:45 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.81 2002/03/12 10:23:45 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -610,7 +610,7 @@ set_arrow()
     struct position spos, epos, headsize;
     struct lp_style_type loc_lp = DEFAULT_LP_STYLE_TYPE;
     TBOOLEAN relative = FALSE;
-    int tag;
+    int tag = -999;
     int head = 1;
     TBOOLEAN set_tag = FALSE, set_start = FALSE, set_end = FALSE;
     TBOOLEAN set_line = FALSE, set_headsize = FALSE, set_layer = FALSE;
