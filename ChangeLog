@@ -1,3 +1,8 @@
+2005-02-10  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/misc.c (lp_parse): Accept full keyword "rgbcolor" for the line
+	attribute.
+
 2005-02-09  Harald Harders  <h.harders@tu-bs.de>
 
 	SourceForge patch #1040192 "Merge post, epslatex, pslatex, pstex

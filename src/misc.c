@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.61 2005/02/01 11:28:51 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.62 2005/02/06 05:05:49 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -774,7 +774,7 @@ lp_parse(struct lp_style_type *lp, TBOOLEAN allow_ls, TBOOLEAN allow_point, int 
 		    break;
 		c_token++;
 #ifdef PM3D
-		if (equals(c_token, "rgb")) {
+		if (almost_equals(c_token, "rgb$color")) {
 		    c_token--;
 		    parse_colorspec(&lp->pm3d_color, TC_RGB);
  		    lp->use_palette = 1;
