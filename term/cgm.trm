@@ -383,7 +383,7 @@ TERM_PUBLIC int CGM_set_font(font)
 				/* set font size */
   size=cgm_fontsize; sscanf(comma+1,"%d",&size);
   if (sep > 31) sep = 31;
-  strncpy(cgm_font,font, sep); cgm_font[sep]='\0';
+  strncpy(cgm_font,font, sep); cgm_font[sep]=NUL;
   t->v_char = size*CGM_PT;
   t->h_char = (t->v_char*5)/9;
   CGM_write_int_record(5, 15, 2, (int *)&t->v_char);

@@ -262,7 +262,7 @@ unsigned int x,y;
 TERM_PUBLIC void DJSVGA_vector(x,y)
 unsigned int x,y;
 {
-#if GRX21
+#ifdef GRX21
 	GrLineOption dj_lineoption = {dj_color, dj_linewidth, 0, ""};
 
         GrCustomLine(dj_startx,dj_ylast-dj_starty,x,dj_ylast-y,&dj_lineoption);
@@ -331,10 +331,10 @@ char *fontname;
 	char *cp;
 	GrFont *font;
 
-	strncpy(DJSVGA_fontname, fontname, MAX_ID_LEN+1);
+	safe_strncpy(DJSVGA_fontname, fontname, sizeof(DJSVGA_fontname);
 	cp = strstr(DJSVGA_fontname, ",");
 	if (cp != NULL) 
-		*cp = '\0';
+		*cp = NUL;
 	font = GrLoadFont(DJSVGA_fontname);
 /*HBB: if no font found, do *not* report success! */
 	if (font != NULL) {

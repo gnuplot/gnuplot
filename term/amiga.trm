@@ -651,7 +651,7 @@ char *font;
     {
       sep = strcspn(font,",");
       strncpy(name,font,sep);
-      name[sep] = '\0';
+      name[sep] = NUL;
       size = AMIGA_FontSize;
       sscanf(&(font[sep+1]),"%d",&size);
 

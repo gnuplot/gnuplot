@@ -545,7 +545,7 @@ char *font;
   /* G_warning(font); */
 
   sep=strcspn(font,",");
-  strncpy(name,font,sep); name[sep]='\0';
+  strncpy(name,font,sep); name[sep]=NUL;
   sscanf (&(font[sep+1]),"%d",&size);
 
   if (size==0)

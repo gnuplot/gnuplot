@@ -1329,7 +1329,7 @@ char name[32];
 int  size,sep;
 
         sep=strcspn(font,",");
-        strncpy(name,font,sep); name[sep]='\0';
+        strncpy(name,font,sep); name[sep]=NUL;
         size=uActFontSize; sscanf (&(font[sep+1]),"%d",&size);
         uActFontSize=size;
         return TRUE;

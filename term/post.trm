@@ -1172,7 +1172,7 @@ char name[32];
 int  size,sep;
 
         sep=strcspn(font,",");
-        strncpy(name,font,sep); name[sep]='\0';
+        strncpy(name,font,sep); name[sep]=NUL;
         size=ps_fontsize; sscanf (&(font[sep+1]),"%d",&size);
         fprintf(gpoutfile,"/%s findfont %d scalefont setfont\n",name,size*PS_SC);
         PS_RememberFont(name,1 );
@@ -1522,7 +1522,7 @@ char *font;
 	if (*font)
 	{
 		int sep=strcspn(font,",");
-		strncpy(ps_enh_font,font,sep); ps_enh_font[sep]='\0';
+		strncpy(ps_enh_font,font,sep); ps_enh_font[sep]=NUL;
 		ps_enh_fontsize=ps_fontsize; sscanf (font+sep+1,"%d",&ps_enh_fontsize);
 		PS_RememberFont(ps_enh_font, 1);
 	}
