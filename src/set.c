@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.121 2003/11/30 11:19:33 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.122 2003/12/01 16:15:51 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -3893,7 +3893,7 @@ load_tic_user(axis)
     axis_array[axis].ticdef.def.user = NULL;
 
     while (!END_OF_COMMAND) {
-	/* syntax is  (  ['format'] value , ... )
+	/* syntax is  (  ['format'] value[, ...] )
 	 * but for timedata, the value itself is a string, which
 	 * complicates things somewhat
 	 */
