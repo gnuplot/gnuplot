@@ -1,4 +1,4 @@
-/* $Id: graphics.h,v 1.1 1999/06/11 18:55:51 lhecking Exp $ */
+/* $Id: graphics.h,v 1.2 1999/06/14 19:20:59 lhecking Exp $ */
 
 /* GNUPLOT - graphics.h */
 
@@ -53,7 +53,6 @@ extern int xleft, xright, ybot, ytop;
 
 extern double xscale3d, yscale3d, zscale3d;
 
-
 /* Formerly in plot2d.c; where they don't belong */
 extern double min_array[AXIS_ARRAY_SIZE], max_array[AXIS_ARRAY_SIZE];
 extern int auto_array[AXIS_ARRAY_SIZE];
@@ -73,5 +72,29 @@ extern double log_base_array[AXIS_ARRAY_SIZE];
 extern char timefmt[];
 
 extern int datatype[];
+
+/* function prototypes */
+
+#if defined(VA_START) && defined(ANSI_C)
+extern void graph_error __PROTO((const char *, ...));
+#else
+extern void graph_error __PROTO(());
+#endif
+extern void fixup_range __PROTO((int, const char *));
+extern void timetic_format __PROTO((int, double, double));
+extern void do_plot __PROTO((struct curve_points *, int));
+extern double time_tic_just __PROTO((int, double));
+extern double make_ltic __PROTO((int, double));
+extern int label_width __PROTO((const char *, int *));
+extern double set_tic __PROTO((double, int));
+extern void setup_tics __PROTO((int, struct ticdef *, char *, int));
+/* is this valid use of __P ? */
+typedef void (*tic_callback) __PROTO((int, double, char *, struct lp_style_type ));
+extern void gen_tics __PROTO((int, struct ticdef *, int, int, double, tic_callback));
+extern void write_multiline __PROTO((unsigned int, unsigned int, const char *, enum JUSTIFY, int, int, const char *));
+extern double LogScale __PROTO((double, int, double, const char *, const char *));
+#if defined(sun386) || defined(AMIGA_SC_6_1)
+extern double CheckLog __PROTO((TBOOLEAN, double, double));
+#endif
 
 #endif /* GNUPLOT_GRAPHICS_H */
