@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.12 1999/06/11 18:54:37 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.13 1999/06/14 19:23:21 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -75,8 +75,8 @@ extern const char *user_gnuplotpath;
 
 /******** Local functions ********/
 
-static void show_style __PROTO((char name[], enum PLOT_STYLE style));
-static void show_range __PROTO((int axis, double min, double max, int autosc, char *text));
+static void show_style __PROTO((const char *name, enum PLOT_STYLE style));
+static void show_range __PROTO((int axis, double min, double max, int autosc, const char *text));
 static void show_zero __PROTO((void));
 static void show_border __PROTO((void));
 static void show_dgrid3d __PROTO((void));
@@ -87,7 +87,7 @@ static void show_output __PROTO((void));
 static void show_view __PROTO((void));
 static void show_size __PROTO((void));
 static void show_origin __PROTO((void));
-static void show_xyzlabel __PROTO((char *name, label_struct * label));
+static void show_xyzlabel __PROTO((const char *name, label_struct * label));
 static void show_angles __PROTO((void));
 static void show_boxwidth __PROTO((void));
 static void show_bars __PROTO((void));
@@ -99,13 +99,13 @@ static void show_arrow __PROTO((int tag));
 static void show_grid __PROTO((void));
 static void show_key __PROTO((void));
 static void show_keytitle __PROTO((void));
-static void show_mtics __PROTO((int mini, double freq, char *name));
+static void show_mtics __PROTO((int mini, double freq, const char *name));
 static void show_pointsize __PROTO((void));
 static void show_encoding __PROTO((void));
 static void show_polar __PROTO((void));
 static void show_parametric __PROTO((void));
 static void show_tics __PROTO((int showx, int showy, int showz, int showx2, int showy2));
-static void show_ticdef __PROTO((int tics, int axis, struct ticdef * tdef, char *text, int rotate_tics, char *ticfmt));
+static void show_ticdef __PROTO((int tics, int axis, struct ticdef * tdef, const char *text, int rotate_tics, const char *ticfmt));
 static void show_term __PROTO((void));
 static void show_plot __PROTO((void));
 static void show_autoscale __PROTO((void));
@@ -125,7 +125,7 @@ static TBOOLEAN show_one __PROTO((void));
 static TBOOLEAN show_two __PROTO((void));
 static void show_timefmt __PROTO((void));
 static void show_missing __PROTO((void));
-static void show_datatype __PROTO((char *name, int axis));
+static void show_datatype __PROTO((const char *name, int axis));
 
 /* following code segment appears over and over again */
 
@@ -652,7 +652,7 @@ show_two()
 /* perhaps these need to be put into a constant array ? */
 static void
 show_style(name, style)
-char name[];
+const char *name;
 enum PLOT_STYLE style;
 {
     fprintf(stderr, "\t%s are plotted with ", name);
@@ -759,7 +759,7 @@ show_range(axis, min, max, autosc, text)
 int axis;
 double min, max;
 TBOOLEAN autosc;
-char *text;
+const char *text;
 {
     /* this probably ought to just invoke save_range(stderr) from misc.c
      * since I think it is identical
@@ -897,7 +897,7 @@ show_origin()
 
 static void
 show_xyzlabel(name, label)
-char *name;
+const char *name;
 label_struct *label;
 {
     char str[MAX_LINE_LEN + 1];
@@ -1077,7 +1077,7 @@ static void
 show_mtics(minitic, minifreq, name)
 int minitic;
 double minifreq;
-char *name;
+const char *name;
 {
     switch (minitic) {
     case MINI_OFF:
@@ -1228,8 +1228,8 @@ show_ticdef(tics, axis, tdef, text, rotate_tics, ticfmt)
 int tics;			/* xtics ytics or ztics */
 int axis;
 struct ticdef *tdef;		/* xticdef yticdef or zticdef */
-char *text;			/* "x", ..., "x2", "y2" */
-char *ticfmt;
+const char *text;		/* "x", ..., "x2", "y2" */
+const char *ticfmt;
 int rotate_tics;
 {
     register struct ticmark *t;
@@ -1717,7 +1717,7 @@ HELPMAIL     = <%s>\n", helpfile, bug_email, help_email);
 
 static void
 show_datatype(name, axis)
-char *name;
+const char *name;
 int axis;
 {
     fprintf(stderr, "\t%s is set to %s\n", name,
