@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.6 2000/11/03 01:15:05 joze Exp $"); }
+static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.7 2000/11/09 01:35:11 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - pm3d.c */
@@ -146,7 +146,8 @@ pm3d_rearrange_part(struct iso_curve* src, const int len, struct iso_curve*** de
 
 	    /* check the z ordering between scans */
 	    /* find last scan */
-	    for (scanB = scanA->next, i = len - 2; i; i--)
+	    if (scanB) 
+		for (i = len - 2; i; i--)
 		scanB = scanB->next;
 	    if (scanB && scanB->p_count) {
 		vertex vB;

@@ -1,3 +1,9 @@
+2000-11-20  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* src/pm3d.c: bugfix crash when plotting surface with 1 scan only
+
+	* src/mouse.c: disable changing 3D view and scale during 'set pm3d map'
+
 2000-11-15  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/graphics.c (map_position_double): added back a missing 'break'.

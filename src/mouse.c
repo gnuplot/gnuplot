@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.11 2000/11/02 17:52:16 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.12 2000/11/09 16:14:01 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -51,6 +51,9 @@ static char *RCSid() { return RCSid("$Id: mouse.c,v 1.11 2000/11/02 17:52:16 bro
 #ifdef USE_MOUSE /* comment out whole file, otherwise... */
 
 #include "mouse.h"
+#ifdef PM3D
+#include "pm3d.h"
+#endif
 
 
 #include "alloc.h"
@@ -1463,7 +1466,12 @@ event_motion(struct gp_event_t *ge)
     mouse_x = ge->mx;
     mouse_y = ge->my;
 
-    if (is_3d_plot) {
+    if (is_3d_plot
+#ifdef PM3D
+	&& !pm3d_map_rotate_ylabel /* Rotate the surface if it is 3D graph and "set pm3d map" was not used. */
+#endif
+       ) {
+
 	TBOOLEAN redraw = FALSE;
 
 	if (button & (1 << 1)) {
