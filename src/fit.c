@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.13 1999/07/09 21:05:35 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.14 1999/07/27 19:43:32 lhecking Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -1277,15 +1277,6 @@ fit_command()
 	if (!equals(c_token, "]"))
 	    int_error(c_token, "']' expected");
 	c_token++;
-#if 0				/* HBB 981210: move this to a later point */
-    } else {
-	/* Just in case I muck up things below: make sure that the z
-	 * range is the same as the y range, if it didn't get specified
-	 */
-	autorange_z = autorange_y;
-	min_z = min_y;
-	max_z = max_y;
-#endif
     }
 
 
@@ -1361,8 +1352,10 @@ fit_command()
 	else {
 	    /* 2D fit, 2 ranges: second range is for *z*, not y: */
 	    autorange_z = autorange_y;
-	    min_z = min_y;
-	    max_z = max_y;
+	    if (autorange_y & 1)
+		min_z = min_y;
+	    if (autorange_y & 2)
+		max_z = max_y;
 	}
     }
     /* defer actually reading the data until we have parsed the rest

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.16 1999/07/30 19:37:31 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.17 1999/08/07 17:21:30 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -3604,8 +3604,17 @@ double *lx, *ly;		/* lx[2], ly[2]: points where it crosses edges */
     /*
      * Can only have 0 or 2 intersection points -- only need test one coord
      */
+#if 0 
+    /* HBB 19990510: this version didn't have the necessary safety
+     * margin to account for limited precision calculations: */
     if (inrange(lx[0], x_min, x_max) &&
-	inrange(ly[0], y_min, y_max)) {
+       inrange(ly[0], y_min, y_max))
+#else
+    /* FIXME: this is UGLY. Need an 'almost_inrange()' function */  
+    if (inrange(lx[0], (x_min-1e-5*(x_max-x_min)), (x_max+1e-5*(x_max-x_min))) && inrange(ly[0], (y_min-1e-5*(y_max-y_min)), (y_max+1e-5*(y_max-y_min))))
+#endif
+    {
+
 #if 0
 	fprintf(stderr, "(%g %g) -> (%g %g)",
 		lx[0], ly[0], lx[1], ly[1]);
