@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: hidden3d.c,v 1.33 1998/06/18 14:55:10 ddenholm Exp $";
+static char *RCSid = "$Id: hidden3d.c,v 1.13 1998/12/09 15:23:56 lhecking Exp $";
 #endif
 
 /* GNUPLOT - hidden3d.c */
@@ -199,7 +199,7 @@ int hiddenHandleBentoverQuadrangles = HANDLE_BENTOVER_QUADRANGLES;
 /* The functions to map from user 3D space into normalized -1..1 */
 #define map_x3d(x) ((x-min_array[FIRST_X_AXIS])*xscale3d-1.0)
 #define map_y3d(y) ((y-min_array[FIRST_Y_AXIS])*yscale3d-1.0)
-#define map_z3d(z) ((z-base_z)*zscale3d-1.0)
+#define map_z3d(z) ((z-floor_z)*zscale3d-1.0)
 
 extern int suppressMove;
 extern int xright, xleft, ybot, ytop;
@@ -208,7 +208,7 @@ extern double min_array[], max_array[];
 extern int auto_array[], log_array[];
 extern double base_array[], log_base_array[];
 extern double xscale3d, yscale3d, zscale3d;
-extern double base_z;
+extern double floor_z;
 
 extern int hidden_no_update, hidden_active;
 extern int hidden_line_type_above, hidden_line_type_below;
