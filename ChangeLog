@@ -22,6 +22,18 @@
 
 	* pm3d/demo: Directory removed (contents merged with demo/).
 
+2002-01-31  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* src/contour.c(chk_contour_kind): Remove unnecessary FPRINTF
+	statements.
+
+	* src/gplt_x11.c, term/x11.trm: Cleaning up, indentation, ANSIfication.
+
+	* src/plot.c(main): Fix two minor bugs which only show if neither
+	atexit() nor on_exit() are available.
+
+	* src/util.c(os_error): Replace fprintf errno with perror().
+
 2002-01-30  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* pm3d/demo/pm3dColumn.gpi: Use 'set term push/pop' and close
