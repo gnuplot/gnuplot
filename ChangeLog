@@ -1,3 +1,8 @@
+2002-12-04  Shigeharu TAKENO  <shige@iee.niit.ac.jp>
+
+	* docs/gnuplot.doc, term/be.trm, term/cgm.trm, term/x11.trm: Fix
+	documentation misprints.
+
 2002-11-20  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* win/winmain.c (WinMain) [MSC, WIN32]: Use predefined __argc and
