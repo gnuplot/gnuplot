@@ -1,5 +1,5 @@
 /*
- * $Id: post.trm,v 1.88 2003/02/11 06:08:01 sfeam Exp $
+ * $Id: post.trm,v 1.89 2003/02/18 16:35:11 broeker Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -1763,8 +1763,12 @@ PS_vector(x,y)
 
     sprintf(abso, "%d %d L\n", x, y);
     sprintf(rel, "%d %d V\n", dx, dy);
-
-    if (strlen(rel) < strlen(abso) && PS_relative_ok) {
+    
+    /* HBB NEW 20030221: ensure path is started by a Move */
+    if (!PS_relative_ok)
+	PS_move(x,y);
+    
+    if (strlen(rel) < strlen(abso)) {
 	fputs(rel, gpoutfile);
 	PS_taken++;
     } else
