@@ -77,6 +77,7 @@ static char RCSid[]="$Id: gclient.c,v 1.15 1998/03/22 22:34:21 drd Exp $" ;
 #include <stdio.h>
 #include <io.h>
 #include <fcntl.h>
+#include <math.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <process.h>
@@ -2031,7 +2032,6 @@ void FontExpand( char *name )
     }
 
 /*=======================================*/
-#include <math.h>
 static POINTL pCur ;
 static int iLinebegin = 1 ;
 static int iLtype = 0 ;
