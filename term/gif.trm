@@ -1,5 +1,5 @@
 /*
- * $Id: gif.trm,v 1.12.2.3 1999/09/29 13:53:53 lhecking Exp $
+ * $Id: gif.trm,v 1.12.2.4 2000/05/07 16:40:18 lhecking Exp $
  */
 
 /* GNUPLOT -- gif.trm */
@@ -83,6 +83,10 @@
  * gd is not distributed with gnuplot, because of the UNISYS license thing.
  *
  * find out about gd from http://www.boutell.com/gd/
+ *
+ * We recommend to use gd library version 1.3 or 1.4 because it uses
+ * Run Length Encoding (RLE) instead of LZW compression. LZW compression
+ * is licensed by UNISYS.
  *
  * Gd library versions before 1.3, and gd library 1.5 are subject to
  * the Unisys license. Use at your own risk. From version 1.6 on, gd
@@ -285,7 +289,8 @@ GIF_options()
     sprintf(term_options + strlen(term_options),
 	    "size %d,%d ", GIF_XMAX, GIF_YMAX);
 
-    for (i = 0; i < gif_state.n_colors; i++) {
+    for (i = 0; strlen(term_options) + 9 < MAX_LINE_LEN && 
+	     i < gif_state.n_colors; i++) {
 	sprintf(term_options + strlen(term_options),
 		"x%06x ", gif_state.rgb_table[i]);
     }
