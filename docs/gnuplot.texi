@@ -2195,9 +2195,15 @@ buttons cannot be rebound.
 
 Note that multikey-bindings with modifiers have to be quoted.
 
+Normally hotkeys are only recognized when the currently active plot window
+has focus. `bind allwindows <key> ...` (short form: `bind all <key> ...`)
+causes the binding for <key> to apply to all gnuplot plot windows, active
+or not.  In this case gnuplot variable MOUSE_KEY_WINDOW is set to the ID
+of the originating window, and may be used by the bound command.
+
 Syntax:
 @example
-      bind [<key-sequence>] ["<gnuplot commands>"]
+      bind @{allwindows@} [<key-sequence>] ["<gnuplot commands>"]
       bind!
 
 @end example
@@ -2211,6 +2217,7 @@ Examples:
     bind "ctrl-a" "plot x*x"
     bind "ctrl-alt-a" 'print "great"'
     bind Home "set view 60,30; replot"
+    bind all Home 'print "This is window ",MOUSE_KEY_WINDOW'
 
 @end example
 
@@ -2307,11 +2314,11 @@ code.
 
 @end example
 
-If `pause mouse keypress` is terminated by a mouse click rather than by a
-keypress, then MOUSE_KEY will contain the button number, otherwise it will
-contain the ascii character value of the key that was pressed. If the
-pause command is terminated abnormally (e.g. by ctrl-C or by externally
-closing the plot window) then MOUSE_KEY will equal -1.
+When `pause mouse keypress` is terminated by a keypress, then MOUSE_KEY will
+contain the ascii character value of the key that was pressed. MOUSE_CHAR will
+contain the character itself as a string variable.  If the pause command is
+terminated abnormally (e.g. by ctrl-C or by externally closing the plot window)
+then MOUSE_KEY will equal -1.
 
 @node Plotting, Start-up, mouse_input, gnuplot
 @section Plotting
@@ -3716,11 +3723,14 @@ platform.  `pause 0` is synonymous with `print`.
 
 If the current terminal supports mousing, then `pause mouse` will terminate
 on either a mouse click or on ctrl-C.  For all other terminals, or if mousing
-is not active, `pause mouse` is equivalent to `pause -1`.  The variant command
-`pause mouse keypress` will terminate on either a mouse click or on a 
-keypress in the plot window.  In all cases the coordinates of the mouse are
-returned in variables MOUSE_X, MOUSE_Y, MOUSE_X2, MOUSE_Y2.  The button number
-or the ascii value of the key pressed is returned in MOUSE_KEY.
+is not active, `pause mouse` is equivalent to `pause -1`.
+
+The variant command `pause mouse keypress` will terminate on a keypress in the
+plot window.  The ascii value of the key pressed is returned in MOUSE_KEY.
+The character itself is returned as a one character string in MOUSE_CHAR.
+
+In all cases the coordinates of the mouse are returned in variables MOUSE_X,
+MOUSE_Y, MOUSE_X2, MOUSE_Y2.
 See @ref{variables}.
 
 Note: Since @ref{pause} communicates with the operating system rather than the
@@ -3734,6 +3744,24 @@ Examples:
       pause -1  "Hit return to continue"
       pause 10  "Isn't this pretty?  It's a cubic spline."
       pause mouse "Click mouse on selected data point"
+
+@end example
+
+The variant "pause mouse key" will resume after any keypress in the active
+plot window. If you want to wait for a particular key to be pressed, you can
+use a reread loop such as:
+
+@example
+      printf "I will resume after you hit the Tab key in the plot window"
+      load "wait_for_tab"
+
+@end example
+
+File "wait_for_tab" contains the lines
+
+@example
+      pause mouse key
+      if (MOUSE_KEY != 9) reread
 
 @end example
 
@@ -5215,7 +5243,7 @@ changed by using the `title` option.
 
 Syntax:
 @example
-      title "<title>" | notitle
+      title "<title>" | notitle ["<ignored title>"]
 
 @end example
 
@@ -5228,7 +5256,8 @@ character "\n" is not processed in key entries in either type of string.
 
 The line title and sample can be omitted from the key by using the keyword
 `notitle`.  A null title (`title ''`) is equivalent to `notitle`.  If only
-the sample is wanted, use one or more blanks (`title ' '`).
+the sample is wanted, use one or more blanks (`title ' '`).  If `notitle`
+is followed by a string this string is ignored.
 
 If `key autotitles` is set (which is the default) and neither `title` nor
 `notitle` are specified the line title is the function name or the file name as
@@ -5755,6 +5784,7 @@ when the variable was initially defined.
 * size::                        
 * style::                       
 * surface::                     
+* table::                       
 * terminal::                    
 * termoption::                  
 * tics::                        
@@ -6771,10 +6801,9 @@ the contour information to a file, and rereading it as a 2-d datafile plot:
       unset surface
       set contour
       set cntrparam ...
-      set term table
-      set out 'filename'
+      set table 'filename'
       splot ...
-      set out
+      unset table
       # contour info now in filename
       set term <whatever>
       plot 'filename'
@@ -11089,7 +11118,7 @@ See also
 @uref{http://www.gnuplot.info/demo/mgr.html,errorbar demo.
 }
 
-@node surface, terminal, style, set-show
+@node surface, table, style, set-show
 @subsection surface
 
 @c ?commands set surface
@@ -11123,7 +11152,39 @@ drawn on the surface, depending on the @ref{contour} option. `unset surface;
 set contour base` is useful for displaying contours on the grid base.  See
 also @ref{contour}.
 
-@node terminal, termoption, surface, set-show
+@node table, terminal, surface, set-show
+@subsection table
+
+@c ?commands set table
+@c ?set table
+@cindex table
+@opindex table
+
+
+When @ref{table} mode is enabled, `plot` and `splot` commands print out a
+multicolumn ASCII table of X Y @{Z@} R values rather than creating an actual
+plot on the current terminal.  The character R takes on one of three values:
+"i" if the point is in the active range, "o" if it is out-of-range, or "u"
+if it is undefined.  The data format is determined by the format of the axis 
+labels (see `set format`), and the columns are separated by single spaces.
+This can be useful if you want to generate contours and then save them for
+further use, perhaps for plotting with `plot`;  see @ref{contour} for example.
+The same method can be used to save interpolated data 
+(see @ref{samples} and @ref{dgrid3d}).
+
+Syntax:
+@example
+      set table @{"outfile"@}
+      plot <whatever>
+      unset table
+
+@end example
+
+Tabular output is written to the named file, if any, otherwise it is written
+to the current value of @ref{output}.  You must explicitly @ref{table}
+in order to go back to normal plotting on the current terminal.
+
+@node terminal, termoption, table, set-show
 @subsection terminal
 
 @c ?commands set terminal
@@ -13281,7 +13342,6 @@ with no modifiers.
 * svg::                         
 * tek410x::                     
 * tek410x_::                    
-* table::                       
 * tek40::                       
 * texdraw::                     
 * tgif::                        
@@ -16375,7 +16435,7 @@ directory list in the GNUPLOT_FONTPATH environmental variable."
 The `tek410x` terminal driver supports the 410x and 420x family of Tektronix
 terminals.  It has no options."
 
-@node tek410x_, table, tek410x, terminal_
+@node tek410x_, tek40, tek410x, terminal_
 @subsubsection tek410x
 
 @c ?commands set terminal tek410x
@@ -16390,33 +16450,7 @@ terminals.  It has no options."
 The `tek410x` terminal driver supports the 410x and 420x family of Tektronix
 terminals.  It has no options."
 
-@node table, tek40, tek410x_, terminal_
-@subsubsection table
-
-@c ?commands set terminal table
-@c ?set terminal table
-@c ?set term table
-@c ?terminal table
-@c ?term table
-@cindex table
-@tmindex table
-
-
-Instead of producing a graph, the `table` terminal prints out the points on
-which a graph would be based, i.e., the results of processing the `plot` or
-`splot` command, in a multicolumn ASCII table of X Y @{Z@} R values.  The
-character R takes on one of three values: "i" if the point is in the active
-range, "o" if it is out-of-range, or "u" if it is undefined.  The data
-format is determined by the format of the axis labels (see `set format`),
-and the columns are separated by single spaces.
-
-For those times when you want the numbers, you can display them on the
-screen or save them to a file.  This can be useful if you want to generate
-contours and then save them for further use, perhaps for plotting with
-`plot`;  see @ref{contour} for an example.  The same method can be used to
-save interpolated data (see @ref{samples} and @ref{dgrid3d})."
-
-@node tek40, texdraw, table, terminal_
+@node tek40, texdraw, tek410x_, terminal_
 @subsubsection tek40
 
 @c ?commands set terminal tek40xx
