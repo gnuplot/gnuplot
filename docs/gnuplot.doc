@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.86 2001/11/10 18:27:13 mikulik Exp $
+C RCS $Id: gnuplot.doc,v 1.87 2001/11/24 11:30:32 mikulik Exp $
 C 18 September 2001
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001   Thomas Williams, Colin Kelley et al.
 C
@@ -1575,7 +1575,7 @@ C ... and restart the table:
        set size 0.4,0.4
        clear
        plot cos(x)
-       set nomultiplot
+       unset multiplot
 
  Please see `set multiplot`, `set size`, and `set origin` for details of these
  commands.
@@ -3139,11 +3139,11 @@ C ... and restart the table:
  and from within `gnuplot` you submit the commands
        n_p=6
        c_p=1
-       set nokey
+       unset key
        set yrange [0:10]
        set multiplot
        call 'plotter' 'data'
-       set nomultiplot
+       unset multiplot
  The result is a single graph consisting of five plots.  The yrange must be
  set explicitly to guarantee that the five separate graphs (drawn on top of
  each other in multiplot mode) will have exactly the same axes.  The linetype
@@ -3260,10 +3260,10 @@ C ... and restart the table:
 ^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/poldat/poldat.html"> Polar plot using `set angles`. </a>
 3 arrow
 ?commands set arrow
-?commands set noarrow
+?commands unset arrow
 ?commands show arrow
 ?set arrow
-?set noarrow
+?unset arrow
 ?show arrow
 ?arrow
 ?noarrow
@@ -3277,7 +3277,7 @@ C ... and restart the table:
                  { {linestyle | ls <line_style>}
                    | {linetype | lt <line_type>}
                      {linewidth | lw <line_width} }
-       set noarrow {<tag>}
+       unset arrow {<tag>}
        show arrow
 
  <tag> is an integer that identifies the arrow.  If no tag is given, the
@@ -3345,21 +3345,21 @@ C ... and restart the table:
        set arrow from 0,-5 rto graph 0.1,0.1
 
  To delete arrow number 2, use:
-       set noarrow 2
+       unset arrow 2
 
  To delete all arrows, use:
-       set noarrow
+       unset arrow
 
  To show all arrows (in tag order), use:
        show arrow
 ^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/arrows/arrows.html"> Arrows Demos. </a>
 3 autoscale
 ?commands set autoscale
-?commands set noautoscale
+?commands unset autoscale
 ?commands unset autoscale
 ?commands show autoscale
 ?set autoscale
-?set noautoscale
+?unset autoscale
 ?unset autoscale
 ?show autoscale
 ?autoscale
@@ -3436,10 +3436,10 @@ C ... and restart the table:
        set autoscale
 
  This disables autoscaling of the x, y, z, x2 and y2 axes:
-       set noautoscale
+       unset autoscale
 
  This disables autoscaling of the z axis only:
-       set noautoscale z
+       unset autoscale z
 4 parametric mode
 ?commands set autoscale parametric
 ?set autoscale parametric
@@ -3491,7 +3491,7 @@ C ... and restart the table:
 
  Syntax:
        set bars {small | large | <size>}
-       set nobars
+       unset bars
        show bars
 
  `small` is a synonym for 0.0, and `large` for 1.0.
@@ -3504,14 +3504,14 @@ C ... and restart the table:
  `set margin` for details.
 3 border
 ?commands set border
-?commands set noborder
+?commands unset border
 ?commands show border
 ?set border
-?set noborder
+?unset border
 ?show border
 ?border
 ?noborder
- The `set border` and `set noborder` commands control the display of the graph
+ The `set border` and `unset border` commands control the display of the graph
  borders for the `plot` and `splot` commands.  Note that the borders do not
  necessarily coincide with the axes; with `plot` they often do, but with
  `splot` they usually do not.
@@ -3520,7 +3520,7 @@ C ... and restart the table:
        set border {<integer> { {linestyle | ls <line_style>}
                                | {linetype | lt <line_type> }
                                  {linewidth | lw <line_width>} } }
-       set noborder
+       unset border
        show border
 
  With a `splot` displayed in an arbitrary orientation, like `set view 56,103`,
@@ -3595,7 +3595,7 @@ C ... and restart the table:
  For `plot`, tics may be drawn on edges other than bottom and left by enabling
  the second axes -- see `set xtics` for details..
 
- If a `splot` draws only on the base, as is the case with "`set nosurface; set
+ If a `splot` draws only on the base, as is the case with "`unset surface; set
  contour base`", then the verticals and the top are not drawn even if they are
  specified.
 
@@ -3615,7 +3615,7 @@ C ... and restart the table:
        set border 127+256+512 # or set border 1023-128
 
  Draw only the top and right borders for a `plot` and label them as axes:
-       set noxtics; set noytics; set x2tics; set y2tics; set border 12
+       unset xtics; unset ytics; set x2tics; set y2tics; set border 12
 
 ^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/borders/borders.html"> Borders Demo. </a>
 3 boxwidth
@@ -3694,10 +3694,10 @@ C ... and restart the table:
  to the `solid` option with a <density> parameter of zero.
 3 clabel
 ?commands set clabel
-?commands set noclabel
+?commands unset clabel
 ?commands show clabel
 ?set clabel
-?set noclabel
+?unset clabel
 ?show clabel
 ?clabel
 ?noclabel
@@ -3708,7 +3708,7 @@ C ... and restart the table:
 
  Syntax:
        set clabel {'<format>'}
-       set noclabel
+       unset clabel
        show clabel
 
  The default for the format string is %8.3g, which gives three decimal places.
@@ -3721,10 +3721,10 @@ C ... and restart the table:
  See also `set contour`.
 3 clip
 ?commands set clip
-?commands set noclip
+?commands unset clip
 ?commands show clip
 ?set clip
-?set noclip
+?unset clip
 ?show clip
 ?clip
 ?noclip
@@ -3733,7 +3733,7 @@ C ... and restart the table:
 
  Syntax:
        set clip <clip-type>
-       set noclip <clip-type>
+       unset clip <clip-type>
        show clip
 
  Three clip types are supported by `gnuplot`: `points`, `one`, and `two`.
@@ -3764,9 +3764,9 @@ C ... and restart the table:
  For backward compatibility with older versions, the following forms are also
  permitted:
        set clip
-       set noclip
+       unset clip
 
- `set clip` is synonymous with `set clip points`; `set noclip` turns off all
+ `set clip` is synonymous with `set clip points`; `unset clip` turns off all
  three types of clipping.
 3 cntrparam
 ?commands set cntrparam
@@ -3866,10 +3866,10 @@ C ... and restart the table:
 ^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/discrete/discrete.html">contours with User Defined Levels.</a>
 3 contour
 ?commands set contour
-?commands set nocontour
+?commands unset contour
 ?commands show contour
 ?set contour
-?set nocontour
+?unset contour
 ?show contour
 ?contour
 ?nocontour
@@ -3878,7 +3878,7 @@ C ... and restart the table:
 
  Syntax:
        set contour {base | surface | both}
-       set nocontour
+       unset contour
        show contour
 
  The three options specify where to draw the contours: `base` draws the
@@ -3894,7 +3894,7 @@ C ... and restart the table:
  the screen, more control over the output format can be obtained by writing
  the contour information to a file, and rereading it as a 2-d datafile plot:
 
-       set nosurface
+       unset surface
        set contour
        set cntrparam ...
        set term table
@@ -3932,10 +3932,10 @@ C ... and restart the table:
  listed.  `show style data` shows the current default data plotting style.
 3 dgrid3d
 ?commands set dgrid3d
-?commands set nodgrid3d
+?commands unset dgrid3d
 ?commands show dgrid3d
 ?set dgrid3d
-?set nodgrid3d
+?unset dgrid3d
 ?show dgrid3d
 ?dgrid3d
 ?nodgrid3d
@@ -3944,7 +3944,7 @@ C ... and restart the table:
 
  Syntax:
        set dgrid3d {<row_size>} {,{<col_size>} {,<norm>}}
-       set nodgrid3d
+       unset dgrid3d
        show dgrid3d
 
  By default `dgrid3d` is disabled.  When enabled, 3-d data read from a file
@@ -4063,7 +4063,7 @@ C ... and restart the table:
  string is omitted, the format will be returned to the default "%g".  For
  LaTeX users, the format "$%g$" is often desirable.  If the empty string "" is
  used, no label will be plotted with each tic, though the tic mark will still
- be plotted.  To eliminate all tic marks, use `set noxtics` or `set noytics`.
+ be plotted.  To eliminate all tic marks, use `unset xtics` or `unset ytics`.
 
  Newline (\n) is accepted in the format string.  Use double-quotes rather than
  single-quotes to enable such interpretation.  See also `syntax`.
@@ -4308,10 +4308,10 @@ C ... and restart the table:
 ^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/airfoil/airfoil.html">Use of functions and complex variables for airfoils </a>
 3 grid
 ?commands set grid
-?commands set nogrid
+?commands unset grid
 ?commands show grid
 ?set grid
-?set nogrid
+?unset grid
 ?show grid
 ?grid
 ?nogrid
@@ -4329,7 +4329,7 @@ C ... and restart the table:
                   { , {linestyle | ls <minor_linestyle>}
                       | {linetype | lt <minor_linetype>}
                         {linewidth | lw <minor_linewidth>} } }
-       set nogrid
+       unset grid
        show grid
 
  The grid can be enabled and disabled for the major and/or minor tic
@@ -4359,10 +4359,10 @@ C ... and restart the table:
  partial box is drawn around the plot---see `set border`.
 3 hidden3d
 ?commands set hidden3d
-?commands set nohidden3d
+?commands unset hidden3d
 ?commands show hidden3d
 ?set hidden3d
-?set nohidden3d
+?unset hidden3d
 ?show hidden3d
 ?hidden3d
 ?nohidden3d
@@ -4377,7 +4377,7 @@ C ... and restart the table:
                       {{undefined <level>} | {noundefined}}
                       {{no}altdiagonal}
                       {{no}bentover} }
-       set nohidden3d
+       unset hidden3d
        show hidden3d
 
  In contrast to the usual display in gnuplot, hidden line removal actually
@@ -4468,7 +4468,7 @@ C ... and restart the table:
 3 historysize
 ?commands set historysize
 ?set historysize
-?set nohistorysize
+?unset historysize
 ?historysize
 ?nohistorysize
  Note: the command `set historysize` is only available when
@@ -4517,10 +4517,10 @@ C ... and restart the table:
  the resolution of a function surface/contour.
 3 key
 ?commands set key
-?commands set nokey
+?commands unset key
 ?commands show key
 ?set key
-?set nokey
+?unset key
 ?show key
 ?key
 ?nokey
@@ -4542,7 +4542,7 @@ C ... and restart the table:
                {{no}box { {linestyle | ls <line_style>}
                           | {linetype | lt <line_type>}
                             {linewidth | lw <line_width>}}}
-       set nokey
+       unset key
        show key
 
  By default the key is placed in the upper right corner of the graph.  The
@@ -4625,7 +4625,7 @@ C ... and restart the table:
        set key
 
  This disables the key:
-       set nokey
+       unset key
 
  This places a key at coordinates 2,3.5,2 in the default (first) coordinate
  system:
@@ -4639,10 +4639,10 @@ C ... and restart the table:
        set key left bottom Left title 'Legend' box 3
 3 label
 ?commands set label
-?commands set nolabel
+?commands unset label
 ?commands show label
 ?set label
-?set nolabel
+?unset label
 ?show label
 ?label
 ?nolabel
@@ -4655,7 +4655,7 @@ C ... and restart the table:
                  {<justification>} {{no}rotate} {font "<name>{,<size>}"}
                  {front | back}
                  {<pointstyle> {offset x, y}| nopoint}
-       set nolabel {<tag>}
+       unset label {<tag>}
        show label
 
  The <position> is specified by either x,y or x,y,z, and may be preceded by
@@ -4729,10 +4729,10 @@ C ... and restart the table:
        set label 3 center
 
  To delete label number 2, use:
-       set nolabel 2
+       unset label 2
 
  To delete all labels, use:
-       set nolabel
+       unset label
 
  To show all labels (in tag order), use:
        show label
@@ -4751,10 +4751,10 @@ C ... and restart the table:
 
 3 linestyle
 ?commands set style line
-?commands set nolinestyle
+?commands unset style line
 ?commands show style line
 ?set style line
-?set nolinestyle
+?unset style line
 ?show style line
 ?linestyle
  Each terminal has a default set of line and point types, which can be seen
@@ -4768,7 +4768,7 @@ C ... and restart the table:
                               {pointtype | pt <point_type>}
                               {pointsize | ps <point_size>}
                               {palette}
-       set nolinestyle
+       unset linestyle
        show style line
 
  The line and point types are taken from the default types for the terminal
@@ -4875,10 +4875,10 @@ C ... and restart the table:
  is determined from the LANG environment variable.
 3 logscale
 ?commands set logscale
-?commands set nologscale
+?commands unset logscale
 ?commands show logscale
 ?set logscale
-?set nologscale
+?unset logscale
 ?show logscale
 ?logscale
 ?nologscale
@@ -4886,13 +4886,13 @@ C ... and restart the table:
 
  Syntax:
        set logscale <axes> <base>
-       set nologscale <axes>
+       unset logscale <axes>
        show logscale
 
  where <axes> may be any combinations of `x`, `y`, and `z`, in any order, or
  `x2` or `y2` and where <base> is the base of the log scaling.  If <base> is
  not given, then 10 is assumed.  If <axes> is not given, then all axes are
- assumed.  `set nologscale` turns off log scaling for the specified axes.
+ assumed.  `unset logscale` turns off log scaling for the specified axes.
 
  Examples:
 
@@ -4903,7 +4903,7 @@ C ... and restart the table:
        set logscale y 2
 
  To disable z axis log scaling:
-       set nologscale z
+       unset logscale z
 3 mapping
 ?commands set mapping
 ?commands show mapping
@@ -5027,9 +5027,9 @@ C ... and restart the table:
  There is no default character for `missing`.
 
 3 mouse
-?commands set nomouse
+?commands unset mouse
 ?set mouse
-?set nomouse
+?unset mouse
 ?mouse
 ?nomouse
  The command `set mouse` enables mouse actions. Currently the pm, x11,
@@ -5139,9 +5139,9 @@ C ... and restart the table:
  See also `help bind` and `help label`.
 3 multiplot
 
-?commands set nomultiplot
+?commands unset multiplot
 ?set multiplot
-?set nomultiplot
+?unset multiplot
 ?multiplot
 ?nomultiplot
  The command `set multiplot` places `gnuplot` in the multiplot mode, in which
@@ -5149,9 +5149,9 @@ C ... and restart the table:
 
  Syntax:
        set multiplot
-       set nomultiplot
+       unset multiplot
 
- For some terminals, no plot is displayed until the command `set nomultiplot`
+ For some terminals, no plot is displayed until the command `unset multiplot`
  is given, which causes the entire page to be drawn and then returns `gnuplot`
  to its normal single-plot mode.  For other terminals, each separate `plot`
  command produces a plot, but the screen may not be cleared between plots.
@@ -5161,8 +5161,8 @@ C ... and restart the table:
  defined in the `screen` system).  Just about everything else that can be
  `set` is applied to each plot, too.  If you want something to appear only
  once on the page, for instance a single time stamp, you'll need to put a `set
- time`/`set notime` pair around one of the `plot`, `splot` or `replot`
- commands within the `set multiplot`/`set nomultiplot` block.
+ time`/`unset time` pair around one of the `plot`, `splot` or `replot`
+ commands within the `set multiplot`/`unset multiplot` block.
 
  The commands `set origin` and `set size` must be used to correctly position
  each plot; see `set origin` and `set size` for details of their usage.
@@ -5177,7 +5177,7 @@ C ... and restart the table:
        set size 0.2,0.2
        set origin 0.5,0.5
        plot cos(x)
-       set nomultiplot
+       unset multiplot
 
  displays a plot of cos(x) stacked above a plot of sin(x).  Note the initial
  `set size` and `set origin`.  While these are not always required, their
@@ -5196,10 +5196,10 @@ C ... and restart the table:
 ^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/multiplot/multiplt.html"> See demo. </a>
 3 mx2tics
 ?commands set mx2tics
-?commands set nomx2tics
+?commands unset mx2tics
 ?commands show mx2tics
 ?set mx2tics
-?set nomx2tics
+?unset mx2tics
 ?show mx2tics
 ?mx2tics
 ?nomx2tics
@@ -5207,20 +5207,20 @@ C ... and restart the table:
  Please see `set mxtics`.
 3 mxtics
 ?commands set mxtics
-?commands set nomxtics
+?commands unset mxtics
 ?commands show mxtics
 ?set mxtics
-?set nomxtics
+?unset mxtics
 ?show mxtics
 ?mxtics
 ?nomxtics
  Minor tic marks along the x axis are controlled by `set mxtics`.  They can be
- turned off with `set nomxtics`.  Similar commands control minor tics along
+ turned off with `unset mxtics`.  Similar commands control minor tics along
  the other axes.
 
  Syntax:
        set mxtics {<freq> | default}
-       set nomxtics
+       unset mxtics
        show mxtics
 
  The same syntax applies to `mytics`, `mztics`, `mx2tics` and `my2tics`.
@@ -5246,10 +5246,10 @@ C ... and restart the table:
  the major tics.  Please see `set xtics` for information about these.
 3 my2tics
 ?commands set my2tics
-?commands set nomy2tics
+?commands unset my2tics
 ?commands show my2tics
 ?set my2tics
-?set nomy2tics
+?unset my2tics
 ?show my2tics
 ?my2tics
 ?nomy2tics
@@ -5257,10 +5257,10 @@ C ... and restart the table:
  my2tics`.  Please see `set mxtics`.
 3 mytics
 ?commands set mytics
-?commands set nomytics
+?commands unset mytics
 ?commands show mytics
 ?set mytics
-?set nomytics
+?unset mytics
 ?show mytics
 ?mytics
 ?nomytics
@@ -5268,10 +5268,10 @@ C ... and restart the table:
  see `set mxtics`.
 3 mztics
 ?commands set mztics
-?commands set nomztics
+?commands unset mztics
 ?commands show mztics
 ?set mztics
-?set nomztics
+?unset mztics
 ?show mztics
 ?mztics
 ?nomztics
@@ -5279,10 +5279,10 @@ C ... and restart the table:
  see `set mxtics`.
 3 offsets
 ?commands set offsets
-?commands set nooffsets
+?commands unset offsets
 ?commands show offsets
 ?set offsets
-?set nooffsets
+?unset offsets
 ?show offsets
 ?offsets
 ?nooffsets
@@ -5291,7 +5291,7 @@ C ... and restart the table:
 
  Syntax:
        set offsets <left>, <right>, <top>, <bottom>
-       set nooffsets
+       unset offsets
        show offsets
 
  Each offset may be a constant or an expression.  Each defaults to 0.  Left
@@ -5364,20 +5364,20 @@ C ... and restart the table:
  some flexibility.
 3 parametric
 ?commands set parametric
-?commands set noparametric
+?commands unset parametric
 ?commands show parametric
 ?set parametric
-?set noparametric
+?unset parametric
 ?show parametric
 ?parametric
 ?noparametric
  The `set parametric` command changes the meaning of `plot` (`splot`) from
- normal functions to parametric functions.  The command `set noparametric`
+ normal functions to parametric functions.  The command `unset parametric`
  restores the plotting style to normal, single-valued expression plotting.
 
  Syntax:
        set parametric
-       set noparametric
+       unset parametric
        show parametric
 
  For 2-d plotting, a parametric function is determined by a pair of parametric
@@ -5550,7 +5550,7 @@ C ... and restart the table:
 
  The `set pm3d map` is actually a macro which facilitates plotting maps. It 
  is equivalent to these user commands:
-       set pm3d at b; set nosurface; set nocontour
+       set pm3d at b; unset surface; unset contour
        set view 180,0,1.3
        set yrange [*:*] reverse
        a trick to rotate the ylabel
@@ -5725,10 +5725,10 @@ C ... and restart the table:
  types.
 3 polar
 ?commands set polar
-?commands set nopolar
+?commands unset polar
 ?commands show polar
 ?set polar
-?set nopolar
+?unset polar
 ?show polar
 ?polar
 ?nopolar
@@ -5737,7 +5737,7 @@ C ... and restart the table:
 
  Syntax:
        set polar
-       set nopolar
+       unset polar
        show polar
 
  There have been changes made to polar mode in version 3.7, so that scripts
@@ -5755,7 +5755,7 @@ C ... and restart the table:
  of t is [0:2*pi], or, if degree units have been selected, to [0:360] (see
  `set angles`).
 
- The command `set nopolar` changes the meaning of the plot back to the default
+ The command `unset polar` changes the meaning of the plot back to the default
  rectangular coordinate system.
 
  The `set polar` command is not supported for `splot`s.  See the `set mapping`
@@ -6290,10 +6290,10 @@ C ... and restart the table:
 ^<a href="http://www.nas.nasa.gov/~woo/gnuplot/errorbar/errorbar.html"> See demo. </a>
 3 surface
 ?commands set surface
-?commands set nosurface
+?commands unset surface
 ?commands show surface
 ?set surface
-?set nosurface
+?unset surface
 ?show surface
 ?surface
 ?nosurface
@@ -6301,15 +6301,15 @@ C ... and restart the table:
 
  Syntax:
        set surface
-       set nosurface
+       unset surface
        show surface
 
  The surface is drawn with the style specifed by `with`, or else the
  appropriate style, data or function.
 
- Whenever `set nosurface` is issued, `splot` will not draw points or lines
+ Whenever `unset surface` is issued, `splot` will not draw points or lines
  corresponding to the function or data file points.  Contours may be still be
- drawn on the surface, depending on the `set contour` option. `set nosurface;
+ drawn on the surface, depending on the `set contour` option. `unset surface;
  set contour base` is useful for displaying contours on the grid base.  See
  also `set contour`.
 ^ <h2> Terminal Types </h2>
@@ -6403,11 +6403,11 @@ C ... and restart the table:
 3 timestamp
 ?commands set timestamp
 ?commands set time
-?commands set notimestamp
+?commands unset timestamp
 ?commands show timestamp
 ?set timestamp
 ?set time
-?set notimestamp
+?unset timestamp
 ?show timestamp
 ?timestamp
 ?notimestamp
@@ -6417,7 +6417,7 @@ C ... and restart the table:
  Syntax:
        set timestamp {"<format>"} {top|bottom} {{no}rotate}
                      {<xoff>}{,<yoff>} {"<font>"}
-       set notimestamp
+       unset timestamp
        show timestamp
 
  The format string allows you to choose the format used to write the date and
@@ -6647,10 +6647,10 @@ C ... and restart the table:
  (dates/times).  Please see `set xdata`.
 3 x2dtics
 ?commands set x2dtics
-?commands set nox2dtics
+?commands unset x2dtics
 ?commands show x2dtics
 ?set x2dtics
-?set nox2dtics
+?unset x2dtics
 ?show x2dtics
 ?x2dtics
 ?nox2dtics
@@ -6666,10 +6666,10 @@ C ... and restart the table:
  `set xlabel`.
 3 x2mtics
 ?commands set x2mtics
-?commands set nox2mtics
+?commands unset x2mtics
 ?commands show x2mtics
 ?set x2mtics
-?set nox2mtics
+?unset x2mtics
 ?show x2mtics
 ?x2mtics
 ?nox2mtics
@@ -6685,10 +6685,10 @@ C ... and restart the table:
  the x2 (top) axis.  Please see `set xrange` for details.
 3 x2tics
 ?commands set x2tics
-?commands set nox2tics
+?commands unset x2tics
 ?commands show x2tics
 ?set x2tics
-?set nox2tics
+?unset x2tics
 ?show x2tics
 ?x2tics
 ?nox2tics
@@ -6696,10 +6696,10 @@ C ... and restart the table:
  Please see `set xtics` for details.
 3 x2zeroaxis
 ?commands set x2zeroaxis
-?commands set nox2zeroaxis
+?commands unset x2zeroaxis
 ?commands show x2zeroaxis
 ?set x2zeroaxis
-?set nox2zeroaxis
+?unset x2zeroaxis
 ?show x2zeroaxis
 ?x2zeroaxis
 ?nox2zeroaxis
@@ -6739,10 +6739,10 @@ C ... and restart the table:
  See also `Time/date` for more information.
 3 xdtics
 ?commands set xdtics
-?commands set noxdtics
+?commands unset xdtics
 ?commands show xdtics
 ?set xdtics
-?set noxdtics
+?unset xdtics
 ?show xdtics
 ?xdtics
 ?noxdtics
@@ -6753,7 +6753,7 @@ C ... and restart the table:
 
  Syntax:
        set xdtics
-       set noxdtics
+       unset xdtics
        show xdtics
 
  The same syntax applies to `ydtics`, `zdtics`, `x2dtics` and `y2dtics`.
@@ -6833,21 +6833,21 @@ C ... and restart the table:
  and the difference between single- and double-quoted strings.
 3 xmtics
 ?commands set xmtics
-?commands set noxmtics
+?commands unset xmtics
 ?commands show xmtics
 ?set xmtics
-?set noxmtics
+?unset xmtics
 ?show xmtics
 ?xmtics
 ?noxmtics
  The `set xmtics` commands converts the x-axis tic marks to months of the
  year where 1=Jan and 12=Dec.  Overflows are converted modulo 12 to months.
- The tics are returned to their default labels by `set noxmtics`.  Similar
+ The tics are returned to their default labels by `unset xmtics`.  Similar
  commands perform the same duties for the other axes.
 
  Syntax:
        set xmtics
-       set noxmtics
+       unset xmtics
        show xmtics
 
  The same syntax applies to `x2mtics`, `ymtics`, `y2mtics`, and `zmtics`.
@@ -6935,15 +6935,15 @@ C ... and restart the table:
        set xrange [*:]
 3 xtics
 ?commands set xtics
-?commands set noxtics
+?commands unset xtics
 ?commands show xtics
 ?set xtics
-?set noxtics
+?unset xtics
 ?show xtics
 ?xtics
 ?noxtics
  Fine control of the major (labelled) tics on the x axis is possible with the
- `set xtics` command.  The tics may be turned off with the `set noxtics`
+ `set xtics` command.  The tics may be turned off with the `unset xtics`
  command, and may be turned on (the default state) with `set xtics`.  Similar
  commands control the major tics on the y, z, x2 and y2 axes.
 
@@ -6953,7 +6953,7 @@ C ... and restart the table:
                   | <incr>
                   | <start>, <incr> {,<end>}
                   | ({"<label>"} <pos> {,{"<label>"} <pos>}...) }
-       set noxtics
+       unset xtics
        show xtics
 
  The same syntax applies to `ytics`, `ztics`, `x2tics`, `y2tics` and `cbtics`.
@@ -7050,10 +7050,10 @@ C ... and restart the table:
 
 3 xzeroaxis
 ?commands set xzeroaxis
-?commands set noxzeroaxis
+?commands unset xzeroaxis
 ?commands show xzeroaxis
 ?set xzeroaxis
-?set noxzeroaxis
+?unset xzeroaxis
 ?show xzeroaxis
 ?xzeroaxis
 ?noxzeroaxis
@@ -7069,9 +7069,9 @@ C ... and restart the table:
  (dates/times).  Please see `set xdata`.
 3 y2dtics
 ?commands set y2dtics
-?commands set noy2dtics
+?commands unset y2dtics
 ?set y2dtics
-?set noy2dtics
+?unset y2dtics
 ?show y2dtics
 ?y2dtics
 ?noy2dtics
@@ -7087,10 +7087,10 @@ C ... and restart the table:
  Please see `set xlabel`.
 3 y2mtics
 ?commands set y2mtics
-?commands set noy2mtics
+?commands unset y2mtics
 ?commands show y2mtics
 ?set y2mtics
-?set noy2mtics
+?unset y2mtics
 ?show y2mtics
 ?y2mtics
 ?noy2mtics
@@ -7106,10 +7106,10 @@ C ... and restart the table:
  the y2 (right-hand) axis.  Please see `set xrange` for details.
 3 y2tics
 ?commands set y2tics
-?commands set noy2tics
+?commands unset y2tics
 ?commands show y2tics
 ?set y2tics
-?set noy2tics
+?unset y2tics
 ?show y2tics
 ?y2tics
 ?noy2tics
@@ -7117,10 +7117,10 @@ C ... and restart the table:
  axis.  Please see `set xtics` for details.
 3 y2zeroaxis
 ?commands set y2zeroaxis
-?commands set noy2zeroaxis
+?commands unset y2zeroaxis
 ?commands show y2zeroaxis
 ?set y2zeroaxis
-?set noy2zeroaxis
+?unset y2zeroaxis
 ?show y2zeroaxis
 ?y2zeroaxis
 ?noy2zeroaxis
@@ -7135,10 +7135,10 @@ C ... and restart the table:
  Sets y-axis data to timeseries (dates/times).  Please see `set xdata`.
 3 ydtics
 ?commands set ydtics
-?commands set noydtics
+?commands unset ydtics
 ?commands show ydtics
 ?set ydtics
-?set noydtics
+?unset ydtics
 ?show ydtics
 ?ydtics
 ?noydtics
@@ -7153,10 +7153,10 @@ C ... and restart the table:
  This command sets the label for the y axis.  Please see `set xlabel`.
 3 ymtics
 ?commands set ymtics
-?commands set noymtics
+?commands unset ymtics
 ?commands show ymtics
 ?set ymtics
-?set noymtics
+?unset ymtics
 ?show ymtics
 ?ymtics
 ?noymtics
@@ -7172,10 +7172,10 @@ C ... and restart the table:
  the y axis.  Please see `set xrange` for details.
 3 ytics
 ?commands set ytics
-?commands set noytics
+?commands unset ytics
 ?commands show ytics
 ?set ytics
-?set noytics
+?unset ytics
 ?show ytics
 ?ytics
 ?noytics
@@ -7183,10 +7183,10 @@ C ... and restart the table:
  Please see `set xtics` for details.
 3 yzeroaxis
 ?commands set yzeroaxis
-?commands set noyzeroaxis
+?commands unset yzeroaxis
 ?commands show yzeroaxis
 ?set yzeroaxis
-?set noyzeroaxis
+?unset yzeroaxis
 ?show yzeroaxis
 ?yzeroaxis
 ?noyzeroaxis
@@ -7201,10 +7201,10 @@ C ... and restart the table:
  Set zaxis date to timeseries (dates/times).  Please see `set xdata`.
 3 zdtics
 ?commands set zdtics
-?commands set nozdtics
+?commands unset zdtics
 ?commands show zdtics
 ?set zdtics
-?set nozdtics
+?unset zdtics
 ?show zdtics
 ?zdtics
 ?nozdtics
@@ -7219,10 +7219,10 @@ C ... and restart the table:
  Set color box axis date to timeseries (dates/times).  Please see `set xdata`.
 3 cbdtics
 ?commands set cbdtics
-?commands set nocbdtics
+?commands unset cbdtics
 ?commands show cbdtics
 ?set cbdtics
-?set nocbdtics
+?unset cbdtics
 ?show cbdtics
 ?cbdtics
 ?nocbdtics
@@ -7248,21 +7248,21 @@ C ... and restart the table:
  it is not unreasonable to set `zero` to 0.0.
 3 zeroaxis
 ?commands set zeroaxis
-?commands set nozeroaxis
+?commands unset zeroaxis
 ?commands show zeroaxis
 ?set zeroaxis
-?set nozeroaxis
+?unset zeroaxis
 ?show zeroaxis
 ?zeroaxis
 ?nozeroaxis
- The x axis may be drawn by `set xzeroaxis` and removed by `set noxzeroaxis`.
+ The x axis may be drawn by `set xzeroaxis` and removed by `unset xzeroaxis`.
  Similar commands behave similarly for the y, x2, and y2 axes.
 
  Syntax:
        set {x|x2|y|y2|}zeroaxis { {linestyle | ls <line_style>}
                                   | { linetype | lt <line_type>}
                                     { linewidth | lw <line_width>}}
-       set no{x|x2|y|y2|}zeroaxis
+       unset {x|x2|y|y2|}zeroaxis
        show {x|y|}zeroaxis
 
 
@@ -7275,7 +7275,7 @@ C ... and restart the table:
  using the axis linetype (linetype 0).
 
  `set zeroaxis l` is equivalent to `set xzeroaxis l; set yzeroaxis l`. `set
- nozeroaxis` is equivalent to `set noxzeroaxis; set noyzeroaxis`.
+ nozeroaxis` is equivalent to `unset xzeroaxis; unset yzeroaxis`.
 3 zlabel
 ?commands set zlabel
 ?commands show zlabel
@@ -7285,10 +7285,10 @@ C ... and restart the table:
  This command sets the label for the z axis.  Please see `set xlabel`.
 3 zmtics
 ?commands set zmtics
-?commands set nozmtics
+?commands unset zmtics
 ?commands show zmtics
 ?set zmtics
-?set nozmtics
+?unset zmtics
 ?show zmtics
 ?zmtics
 ?nozmtics
@@ -7305,10 +7305,10 @@ C ... and restart the table:
  xrange` for details.
 3 ztics
 ?commands set ztics
-?commands set noztics
+?commands unset ztics
 ?commands show ztics
 ?set ztics
-?set noztics
+?unset ztics
 ?show ztics
 ?ztics
 ?noztics
@@ -7323,10 +7323,10 @@ C ... and restart the table:
  This command sets the label for the color box axis.  Please see `set xlabel`.
 3 cbmtics
 ?commands set cbmtics
-?commands set nocbmtics
+?commands unset cbmtics
 ?commands show cbmtics
 ?set cbmtics
-?set nocbmtics
+?unset cbmtics
 ?show cbmtics
 ?cbmtics
 ?nocbmtics
@@ -7345,10 +7345,10 @@ C ... and restart the table:
  Please see `set xrange` for details on `set cbrange` syntax.
 3 cbtics
 ?commands set cbtics
-?commands set nocbtics
+?commands unset cbtics
 ?commands show cbtics
 ?set cbtics
-?set nocbtics
+?unset cbtics
 ?show cbtics
 ?cbtics
 ?nocbtics
