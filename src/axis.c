@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.23 2001/10/31 17:13:59 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.24 2001/12/04 19:10:59 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -154,6 +154,9 @@ double polar_grid_angle = 0;	/* nonzero means a polar grid */
 AXIS_INDEX x_axis = FIRST_X_AXIS;
 AXIS_INDEX y_axis = FIRST_Y_AXIS;
 AXIS_INDEX z_axis = FIRST_Z_AXIS;
+
+/* decimal sign */
+char *decimalsign = NULL;
 
 
 /* --------- internal prototypes ------------------------- */
@@ -743,6 +746,30 @@ gprintf(dest, count, format, log10_base, x)
 	    int_error(NO_CARET, "Bad format character");
 	} /* switch */
 	/*}}} */
+
+    /* change decimal `.' to the actual entry in decimalsign */
+	if (decimalsign != NULL) {
+	    char *dotpos1 = dest, *dotpos2;
+	    size_t newlength = strlen(decimalsign);
+
+	    /* replace every `.' by the contents of decimalsign */
+	    while ((dotpos2 = strchr(dotpos1,'.')) != NULL) {
+		size_t taillength = strlen(dotpos2);
+
+		dotpos1 = dotpos2 + newlength;
+		/* test if the new value for dest would be too long */
+		if (dotpos1 - dest + taillength > count)
+		    int_error(NO_CARET,
+			      "format too long due to long decimalsign string");
+		/* move tail end of string out of the way */
+		memmove(dotpos1, dotpos2 + 1, taillength);
+		/* insert decimalsign */
+		memcpy(dotpos2, decimalsign, newlength);
+	    }
+	    /* clear temporary variables for safety */
+	    dotpos1=NULL;
+	    dotpos2=NULL;
+	}
 
 	/* this was at the end of every single case, before: */
 	dest += strlen(dest);

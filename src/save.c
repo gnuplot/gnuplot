@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.37 2002/01/25 18:02:08 joze Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.38 2002/02/02 12:03:31 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -458,6 +458,11 @@ set encoding %s\n\
 	    encoding_names[encoding],
 	    (polar) ? "" : "un",
 	    (parametric) ? "" : "un");
+    if (decimalsign != NULL)
+	fprintf(fp, "set decimalsign '%s'\n", decimalsign);
+    else
+        fprintf(fp, "unset decimalsign\n");
+
     fprintf(fp, "\
 set view %g, %g, %g, %g\n\
 set samples %d, %d\n\

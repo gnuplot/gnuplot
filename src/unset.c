@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.26 2002/01/22 15:52:25 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.27 2002/02/02 12:03:31 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -74,6 +74,7 @@ static void unset_contour __PROTO((void));
 static void unset_dgrid3d __PROTO((void));
 static void unset_dummy __PROTO((void));
 static void unset_encoding __PROTO((void));
+static void unset_decimalsign __PROTO((void));
 static void unset_format __PROTO((void));
 static void unset_grid __PROTO((void));
 static void unset_hidden3d __PROTO((void));
@@ -142,16 +143,17 @@ unset_command()
 {
     static char GPFAR unsetmess[] = 
     "valid unset options:  [] = choose one, {} means optional\n\n\
-\t'angles', 'arrow', 'autoscale',  'bar', 'border', 'boxwidth', 'clabel',\n\
-\t'clip', 'cntrparam', 'colorbox', 'contour', 'dgrid3d',  'dummy',\n\
-\t'encoding',  'format', 'grid', 'hidden3d',  'historysize',  'isosamples',\n\
-\t'key',  'label', 'loadpath', 'locale', 'logscale', '[blrt]margin',\n\
-\t'mapping',  'missing', 'mouse', 'multiplot', 'offsets', 'origin',\n\
-\t'output', 'palette', 'parametric', 'pm3d', 'pointsize', 'polar',\n\
-\t'[rtuv]range',  'samples', 'size', 'style', 'surface', 'terminal',\n\
-\t'tics',  'ticscale', 'ticslevel', 'timestamp',  'timefmt', 'title',\n\
-\t'view', '[xyz,cb]{2}data', '[xyz,cb]{2}label', '[xyz,cb]{2}range',\n\
-\t'{m}[xyz,cb]{2}tics', '[xyz,cb]{2}[md]tics', '{[xyz]{2}}zeroaxis', 'zero'";
+\t'angles', 'arrow', 'autoscale', 'bar', 'border', 'boxwidth', 'clabel',\n\
+\t'clip', 'cntrparam', 'colorbox', 'contour', 'dgrid3d', 'decimalsign',\n\
+\t'dummy', 'encoding', 'format', 'grid', 'hidden3d', 'historysize',\n\
+\t'isosamples', 'key', 'label', 'loadpath', 'locale', 'logscale',\n\
+\t'[blrt]margin', 'mapping', 'missing', 'mouse', 'multiplot', 'offsets',\n\
+\t'origin', 'output', 'palette', 'parametric', 'pm3d', 'pointsize',\n\
+\t'polar', '[rtuv]range', 'samples', 'size', 'style', 'surface',\n\
+\t'terminal', 'tics', 'ticscale', 'ticslevel', 'timestamp', 'timefmt',\n\
+\t'title', 'view', '[xyz,cb]{2}data', '[xyz,cb]{2}label',\n\
+\t'[xyz,cb]{2}range', '{m}[xyz,cb]{2}tics', '[xyz,cb]{2}[md]tics',\n\
+\t'{[xyz]{2}}zeroaxis', 'zero'";
 
     int found_token;
 
@@ -202,6 +204,9 @@ unset_command()
 	break;
     case S_ENCODING:
 	unset_encoding();
+	break;
+    case S_DECIMALSIGN:
+	unset_decimalsign();
 	break;
     case S_FORMAT:
 	unset_format();
@@ -689,6 +694,16 @@ static void
 unset_encoding()
 {
     encoding = S_ENC_DEFAULT;
+}
+
+
+/* process 'unset encoding' command */
+static void
+unset_decimalsign()
+{
+    if (decimalsign != NULL)
+        free(decimalsign);
+    decimalsign = NULL;
 }
 
 
@@ -1450,6 +1465,7 @@ reset_command()
     unset_tmargin();
     unset_pointsize();
     unset_encoding();
+    unset_decimalsign();
 #ifdef PM3D
     pm3d_reset();
 #endif

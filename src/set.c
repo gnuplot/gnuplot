@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.72 2002/01/25 18:02:08 joze Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.73 2002/02/02 12:03:31 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -83,6 +83,7 @@ static void set_clip __PROTO((void));
 static void set_cntrparam __PROTO((void));
 static void set_contour __PROTO((void));
 static void set_dgrid3d __PROTO((void));
+static void set_decimalsign __PROTO((void));
 static void set_dummy __PROTO((void));
 static void set_encoding __PROTO((void));
 static void set_format __PROTO((void));
@@ -165,7 +166,7 @@ set_command()
     static char GPFAR setmess[] = 
     "valid set options:  [] = choose one, {} means optional\n\n\
 \t'angles', 'arrow', 'autoscale', 'bars', 'border', 'boxwidth',\n\
-\t'clabel', 'clip', 'cntrparam', 'colorbox', 'contour',\n\
+\t'clabel', 'clip', 'cntrparam', 'colorbox', 'contour', 'decimalsign',\n\
 \t'dgrid3d', 'dummy', 'encoding', 'format', 'grid',\n\
 \t'hidden3d', 'historysize', 'isosamples', 'key', 'label',  'locale',\n\
 \t'logscale', '[blrt]margin', 'mapping', 'missing', 'mouse',\n\
@@ -257,6 +258,9 @@ set_command()
 	    break;
 	case S_DGRID3D:
 	    set_dgrid3d();
+	    break;
+	case S_DECIMALSIGN:
+	    set_decimalsign();
 	    break;
 	case S_DUMMY:
 	    set_dummy();
@@ -1205,6 +1209,24 @@ set_dgrid3d()
     dgrid3d = TRUE;
 }
 
+
+/* process 'set decimalsign' command */
+static void
+set_decimalsign()
+{
+    c_token++;
+
+    if (END_OF_COMMAND) {
+        if (decimalsign != NULL)
+            free(decimalsign);
+        decimalsign=NULL;
+    } else if (!isstring(c_token)) {
+        int_error(c_token, "expecting string");
+    } else {
+        m_quote_capture(&decimalsign, c_token, c_token); /* reallocs store */
+        c_token++;
+    }
+}
 
 /* process 'set dummy' command */
 static void

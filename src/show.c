@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.70 2002/01/25 18:02:08 joze Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.71 2002/02/02 12:03:31 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -110,6 +110,7 @@ static void show_colorbox __PROTO((void));
 #endif
 static void show_pointsize __PROTO((void));
 static void show_encoding __PROTO((void));
+static void show_decimalsign __PROTO((void));
 static void show_polar __PROTO((void));
 static void show_angles __PROTO((void));
 static void show_samples __PROTO((void));
@@ -169,17 +170,17 @@ show_command()
     /* show at is undocumented/hidden... */
     static char GPFAR showmess[] =
     "valid set options:  [] = choose one, {} means optional\n\n\
-\t'all', 'angles', 'arrow', 'autoscale', 'bars', 'border',\n\
-\t'boxwidth', 'clip', 'cntrparam', 'colorbox', 'contour', 'dgrid3d',\n\
-\t'dummy', 'encoding', 'format', 'functions',  'grid',  'hidden',\n\
+\t'all', 'angles', 'arrow', 'autoscale', 'bars', 'border', 'boxwidth',\n\
+\t'clip', 'cntrparam', 'colorbox', 'contour', 'decimalsign', 'dgrid3d',\n\
+\t'dummy', 'encoding', 'format', 'functions', 'grid', 'hidden',\n\
 \t'isosamples', 'key', 'label', 'loadpath', 'locale', 'logscale',\n\
 \t'mapping', 'margin', 'missing', 'offsets', 'origin', 'output', 'plot',\n\
-\t'palette', 'parametric', 'pm3d', 'pointsize', 'polar',\n\
-\t'[rtuv]range', 'samples', 'size', 'style', 'terminal', 'tics',\n\
-\t'timestamp', 'timefmt', 'title', 'variables', 'version', 'view',\n\
-\t'[xyz,cb]{2}label',  '[xyz,cb]{2}range', '{m}[xyz,cb]{2}tics',\n\
-\t'[xyz,cb]{2}[md]tics', '[xyz]{2}zeroaxis', '[xyz,cb]data',\n\
-\t'zero', 'zeroaxis'";
+\t'palette', 'parametric', 'pm3d', 'pointsize', 'polar', '[rtuv]range',\n\
+\t'samples', 'size', 'style', 'terminal', 'tics', 'timestamp',\n\
+\t'timefmt', 'title', 'variables', 'version', 'view',\n\
+\t'[xyz,cb]{2}label', '[xyz,cb]{2}range', '{m}[xyz,cb]{2}tics',\n\
+\t'[xyz,cb]{2}[md]tics', '[xyz]{2}zeroaxis', '[xyz,cb]data', 'zero',\n\
+\t'zeroaxis'";
 
     enum set_id token_found; 
     struct value a;
@@ -320,6 +321,9 @@ show_command()
 #endif
     case S_POINTSIZE:
 	show_pointsize();
+	break;
+    case S_DECIMALSIGN:
+	show_decimalsign();
 	break;
     case S_ENCODING:
 	show_encoding();
@@ -749,6 +753,7 @@ show_all()
 #endif
     show_pointsize();
     show_encoding();
+    show_decimalsign();
     show_polar();
     show_angles();
     show_samples();
@@ -1954,6 +1959,16 @@ show_encoding()
 }
 
 
+/* process 'show decimalsign' command */
+static void
+show_decimalsign()
+{
+    SHOW_ALL_NL;
+    if (decimalsign!=NULL)
+        fprintf(stderr, "\tdecimalsign is '%s'\n", decimalsign);
+    else
+        fprintf(stderr, "\tdecimalsign has default value (normally '.')\n");
+}
 /* process 'show polar' command */
 static void
 show_polar()

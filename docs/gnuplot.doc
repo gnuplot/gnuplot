@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.97 2002/02/01 19:11:17 mikulik Exp $
+C RCS $Id: gnuplot.doc,v 1.98 2002/02/02 12:03:31 mikulik Exp $
 C 18 September 2001
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001   Thomas Williams, Colin Kelley et al.
 C
@@ -3952,6 +3952,33 @@ C ... and restart the table:
 
  See `set style` for the choices.  If no choice is given, the choices are
  listed.  `show style data` shows the current default data plotting style.
+3 decimalsign
+?commands set decimalsign
+?commands show decimalsign
+?commands unset decimalsign
+?set decimalsign
+?show decimalsign
+?unset decimalsign
+?decimalsign
+ The `set decimalsign` command selects a decimal sign for numbers printed
+ into tic labels or `set label` strings.  
+
+ Syntax:
+       set decimalsign {<value>}
+       unset decimalsign
+       show decimalsign
+
+ The argument <value> is the string to be used in place of the usual
+ decimal point. Typical choices include the period, '.', and the comma,
+ ',', but others may be useful, too.  If you omit the <value> argument,
+ the decimal separator is not modified from the usual default, which is
+ a period.  Unsetting decimalsign has the same effect as omitting
+ <value>.
+
+ Example:
+
+ If you're in Germany, you probably want:
+       set decimalsign ','
 3 dgrid3d
 ?commands set dgrid3d
 ?commands unset dgrid3d
@@ -4101,7 +4128,9 @@ C ... and restart the table:
  spaces and labels in your format string, such as "%g m", which will put " m"
  after each number.  If you want "%" itself, double it: "%g %%".
 
- See also `set xtics` for more information about tic labels.
+ See also `set xtics` for more information about tic labels, and 
+ `set decimalsign` for how to use non-default decimal separators in numbers
+ printed this way.
 ^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/electron/electron.html"> See demo. </a>
 4 format specifiers
 ?commands set format specifiers
@@ -4711,7 +4740,8 @@ C ... and restart the table:
  pairs of <label text> and <value> may be given. Note that <value> is
  treated as a constant expression, i.e. if it contains variables, the
  label text will not change if the variable values are modified,
- later on.
+ later on.  The `set decimalsign` option, if active, overrides the
+ decimal separator character of numbers entered into label texts.
 
  By default, the text is placed flush left against the point x,y,z.  To adjust
  the way the label is positioned with respect to the point x,y,z, add the
