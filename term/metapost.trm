@@ -1,5 +1,5 @@
 /*
- * $Id: metapost.trm,v 1.9.2.1 2000/10/22 14:02:04 joze Exp $
+ * $Id: metapost.trm,v 1.11 2000/10/31 19:59:32 joze Exp $
  */
 
 /* GNUPLOT - metapost.trm */
@@ -136,7 +136,20 @@ static TBOOLEAN MP_color = FALSE;
 static TBOOLEAN MP_solid = FALSE;
 
 /* compatability mode*/
-static TBOOLEAN MP_notex = FALSE;
+/* static TBOOLEAN MP_notex = FALSE; */
+#define MP_NO_TEX 0
+#define MP_TEX 1
+#define MP_LATEX 2
+static int MP_tex = MP_TEX;
+/* add usepackage instructions for PSNFSS ? */
+#define MP_PSNFSS_NONE 0
+#define MP_PSNFSS_7    1
+#define MP_PSNFSS_8    2
+static int MP_psnfss = MP_PSNFSS_NONE;
+/* add a4paper option to documentclass */
+static int MP_a4paper = 0;
+/* write a prologues line */
+static int MP_prologues = -1;
 
 /* has a font change taken place? */
 static TBOOLEAN MP_fontchanged = FALSE;
@@ -155,24 +168,35 @@ static void MP_endline __PROTO((void));
 #define MP_LINEMAX 5
 
 enum MP_id {
-    MP_MONOCHROME, MP_COLOR,
-    MP_SOLID, MP_DASHED,
-    MP_NOTEX, MP_TEX,
-    MP_DEFAULT, MP_MAGNIFICATION, MP_OTHER
+    MP_OPT_MONOCHROME, MP_OPT_COLOUR,
+    MP_OPT_SOLID, MP_OPT_DASHED,
+    MP_OPT_NOTEX, MP_OPT_TEX, MP_OPT_LATEX,
+    MP_OPT_A4PAPER,
+    MP_OPT_PSNFSS, MP_OPT_PSNFSS_V7, MP_OPT_NOPSNFSS,
+    MP_OPT_DEFAULT,
+    MP_OPT_PROLOGUES, MP_OPT_NOPROLOGUES,
+    MP_OPT_MAGNIFICATION, MP_OPT_OTHER
 };
 
 static struct gen_table MP_opts[] = 
 {
-    { "mo$nochrome", MP_MONOCHROME },
-    { "c$olor", MP_COLOR },
-    { "c$olour", MP_COLOR },
-    { "s$olid", MP_SOLID },
-    { "da$shed", MP_DASHED },
-    { "n$otex", MP_NOTEX },
-    { "t$ex", MP_TEX },
-    { "de$fault", MP_DEFAULT },
-    { "ma$gnification", MP_MAGNIFICATION },
-    { NULL, MP_OTHER }
+    { "mo$nochrome", MP_OPT_MONOCHROME },
+    { "c$olor", MP_OPT_COLOUR },
+    { "c$olour", MP_OPT_COLOUR },
+    { "s$olid", MP_OPT_SOLID },
+    { "da$shed", MP_OPT_DASHED },
+    { "n$otex", MP_OPT_NOTEX },
+    { "t$ex", MP_OPT_TEX },
+    { "la$tex", MP_OPT_LATEX },
+    { "a4$paper", MP_OPT_A4PAPER },
+    { "ps$nfss", MP_OPT_PSNFSS },
+    { "psnfss-v$ersion7", MP_OPT_PSNFSS_V7 },
+    { "nops$nfss", MP_OPT_NOPSNFSS },
+    { "de$fault", MP_OPT_DEFAULT },
+    { "pro$logues", MP_OPT_PROLOGUES },
+    { "nopro$logues", MP_OPT_NOPROLOGUES },
+    { "ma$gnification", MP_OPT_MAGNIFICATION },
+    { NULL, MP_OPT_OTHER }
 };
 
 TERM_PUBLIC void
@@ -182,7 +206,9 @@ MP_options()
 
     MP_color = FALSE;
     MP_solid = FALSE;
-    MP_notex = FALSE;
+    MP_tex = MP_TEX;
+    MP_a4paper = 0;
+    MP_psnfss  = MP_PSNFSS_NONE;
     MP_fontsize = 10.0;
     MP_textmag = 1.0;
     strcpy(MP_fontname, "cmr10");
@@ -190,41 +216,75 @@ MP_options()
 
     while (!END_OF_COMMAND) {
 	switch(lookup_table(&MP_opts[0],c_token)) {
-	case MP_MONOCHROME:
+	case MP_OPT_MONOCHROME:
 	    MP_color = FALSE;
 	    c_token++;
 	    break;
-	case MP_COLOR:
+	case MP_OPT_COLOUR:
 	    MP_color = TRUE;
 	    c_token++;
 	    break;
-	case MP_SOLID:
+	case MP_OPT_SOLID:
 	    MP_solid = TRUE;
 	    c_token++;
 	    break;
-	case MP_DASHED:
+	case MP_OPT_DASHED:
 	    MP_solid = FALSE;
 	    c_token++;
 	    break;
-	case MP_NOTEX:
-	    MP_notex = TRUE;
+	case MP_OPT_NOTEX:
+	    MP_tex = MP_NO_TEX;
 	    strcpy(MP_fontname, "pcrr8r");
 	    c_token++;
 	    break;
-	case MP_TEX:
-	    MP_notex = FALSE;
+	case MP_OPT_TEX:
+	    MP_tex = MP_TEX;
 	    c_token++;
 	    break;
-	case MP_DEFAULT:
+	case MP_OPT_LATEX:
+	    MP_tex= MP_LATEX;
 	    c_token++;
 	    break;
-	case MP_MAGNIFICATION:
+	case MP_OPT_A4PAPER:
+	    MP_a4paper = 1;
+	    c_token++;
+	    break;
+	case MP_OPT_PSNFSS:
+	    MP_psnfss = MP_PSNFSS_8;
+	    c_token++;
+	    break;
+	case MP_OPT_PSNFSS_V7:
+	    MP_psnfss = MP_PSNFSS_7;
+	    c_token++;
+	    break;
+	case MP_OPT_NOPSNFSS:
+	    MP_psnfss = MP_PSNFSS_NONE;
+	    c_token++;
+	    break;
+	case MP_OPT_DEFAULT:
+	    c_token++;
+	    break;
+	case MP_OPT_PROLOGUES:
+	    c_token++;
+	    if(!(END_OF_COMMAND)) {
+		int dummy_for_prologues;
+		if(sscanf(&(input_line[token[c_token].start_index]), "%d", &dummy_for_prologues) == 1) {
+		    MP_prologues = dummy_for_prologues;
+		}
+		c_token++;
+	    }
+	    break;
+	case MP_OPT_NOPROLOGUES:
+	    MP_prologues = -1;
+	    c_token++;
+	    break;
+	case MP_OPT_MAGNIFICATION:
 	    c_token++;
 	    if (!END_OF_COMMAND) /* global text scaling */
 		MP_textmag = (double) real(const_express(&a));
 	    /* c_token++; */ /* Needed ??? */
 	    break;
-	case MP_OTHER:
+	case MP_OPT_OTHER:
 	default:
 	    if (isstring(c_token)) {		/* font name */
 		quote_str(MP_fontname, c_token, MAX_ID_LEN);
@@ -245,16 +305,16 @@ MP_options()
 	MP_fontsize = 99.99;
 
     term->v_char = (unsigned int) (MP_DPI * MP_fontsize * MP_textmag * 11 / 720);
-    if (MP_notex) {		/* Courier is a little wider than cmtt */
+    if (MP_tex == MP_NO_TEX) {		/* Courier is a little wider than cmtt */
 	term->h_char = (unsigned int) (MP_DPI * MP_fontsize * MP_textmag * 6.0 / 720 + 0.5);
     } else {
 	term->h_char = (unsigned int) (MP_DPI * MP_fontsize * MP_textmag * 5.3 / 720 + 0.5);
     }
 
-    sprintf(term_options, "%s%s%s%s%6.3f \"%s\" %5.2f",
+    sprintf(term_options, "%s%s%s%s%6.3f \"%s\" %5.2f %d %d",
 	    MP_color ? "color " : "", MP_solid ? "solid " : "",
-	    MP_notex ? "notex " : "", "mag ",
-	    MP_textmag, MP_fontname, MP_fontsize);
+	    (MP_tex == MP_NO_TEX) ? "notex " : (MP_tex == MP_LATEX) ? "latex " : "", "mag ",
+	    MP_textmag, MP_fontname, MP_fontsize, MP_psnfss, MP_prologues);
 }
 
 TERM_PUBLIC void
@@ -264,13 +324,58 @@ MP_init()
     time(&now);
     MP_posx = MP_posy = 0;
     fprintf(gpoutfile, "%%GNUPLOT Metapost output: %s\n", asctime(localtime(&now)));
+    if(MP_prologues > -1) {
+	fprintf(gpoutfile, "prologues:=%d;\n", MP_prologues);
+    }
+    if (MP_tex == MP_LATEX) {
+	fputs("\n\
+%% Add \\documentclass and \\begin{dcoument} for latex\n\
+%% NB you should set the environment variable TEX to the name of your\n\
+%% latex executable (normally latex) inorder for metapost to work\n\
+%% or run\n\
+%% mpost --tex=latex ...\n\
+\n\
+% BEGPRE\n\
+\\verbatimtex\n", gpoutfile);
+	if(MP_a4paper) {
+	  fputs("\\documentclass[a4paper]{article}\n", gpoutfile);
+	} else {
+	  fputs("\\documentclass{article}\n", gpoutfile);
+	}
+	switch(MP_psnfss) {
+	  case MP_PSNFSS_7: {
+            fputs("\\usepackage[latin1]{inputenc}\n\
+\\usepackage[T1]{fontenc}\n\
+\\usepackage{times,mathptmx}\n\
+\\usepackage{helvet}\n\
+\\usepackage{courier}\n", gpoutfile);
+	  } break;
+	  case MP_PSNFSS_8: {
+	    fputs("\\usepackage[latin1]{inputenc}\n\
+\\usepackage[T1]{fontenc}\n\
+\\usepackage{textcomp}\n\
+\\usepackage{mathptmx}\n\
+\\usepackage[scaled=.92]{helvet}\n\
+\\usepackage{courier}\n\
+\\usepackage{latexsym}\n", gpoutfile);
+	  } break;
+	}
+	fputs("\\begin{document}\n\
+etex\n% ENDPRE\n",
+              gpoutfile);
+    }
+
     fputs("\n\
 warningcheck:=0;\n\
 defaultmpt:=mpt:=4;\n\
 th:=.6;\n\
+%% Have nice sharp joins on our lines\n\
+linecap:=butt;\n\
+linejoin:=mitered;\n\
 \n\
 def scalepen expr n = pickup pencircle scaled (n*th) enddef;\n\
-def ptsize expr n = mpt:=n*defaultmpt enddef;\n",
+def ptsize expr n = mpt:=n*defaultmpt enddef;\n\
+\n",
 	  gpoutfile);
 
     fprintf(gpoutfile, "\ntextmag:=%6.3f;\n", MP_textmag);
@@ -288,22 +393,22 @@ def infontsize(expr str, size) =\n\
 enddef;\n",
 	  gpoutfile);
 
-    if (MP_notex) {
+    if (MP_tex == MP_NO_TEX) {
 	fprintf(gpoutfile, "\n\
 defaultfont:= \"%s\";\n\
 defaultscale := %6.3f/fontsize defaultfont;\n",
 		MP_fontname, MP_fontsize);
     } else {
-	fputs("\n\
+	if(MP_tex != MP_LATEX) {
+	    fputs("\n\
 %font changes\n\
 verbatimtex\n\
-  \\def\\setfont#1#2{%.\n\
-    \\font\\gpfont=#1 at #2pt\n\
-    \\gpfont}\n",
-	      gpoutfile);
-
-	fprintf(gpoutfile, "\\setfont{%s}{%5.2f}\netex\n",
-		MP_fontname, MP_fontsize);
+\\def\\setfont#1#2{%.\n\
+  \\font\\gpfont=#1 at #2pt\n\
+\\gpfont}\n", gpoutfile);
+	    fprintf(gpoutfile, "\\setfont{%s}{%5.2f}\netex\n",
+		    MP_fontname, MP_fontsize);
+	}
     }
     fputs("\n\
 color currentcolor; currentcolor=black;\n\
@@ -577,7 +682,7 @@ const char str[];
 	j = 3;
 	break;
     }
-    if (MP_notex) {
+    if (MP_tex == MP_NO_TEX) {
 	for (i = 0; i < strlen(text); i++)
 	    if (text[i] == '"')
 		text[i] = '\'';	/* Replace " with ' */
@@ -590,9 +695,14 @@ put_text(\"%s\" infontsize(\"%s\",%5.2f), %.1fa, %.1fb, %d, %d);\n",
 		    text, x/10.0, y/10.0, MP_ang, j);
 	}
     } else if (MP_fontchanged) {
-	fprintf(gpoutfile, "\
+	if(MP_tex != MP_LATEX) {
+	    fprintf(gpoutfile, "\
 put_text( btex \\setfont{%s}{%5.2f} %s etex, %.1fa, %.1fb, %d, %d);\n",
 		MP_fontname, MP_fontsize, text, x/10.0, y/10.0, MP_ang, j);
+	} else {
+	    fprintf(gpoutfile, "put_text( btex %s etex, %.1fa, %.1fb, %d, %d);\n",
+		    text, x/10.0, y/10.0, MP_ang, j);
+	}
     } else {
 	fprintf(gpoutfile, "put_text( btex %s etex, %.1fa, %.1fb, %d, %d);\n",
 		text, x/10.0, y/10.0, MP_ang, j);
@@ -697,7 +807,8 @@ START_HELP(mp)
 " allowing essentially  any TeX symbols in titles and labels.",
 "",
 " Syntax:",
-"    set term mp {color} {solid} {notex} {mag <magsize>} {\"<name>\"} {<size>}",
+"    set term mp {color} {solid} {notex|tex|latex} {mag <magsize>} {\"<name>\"}",
+"                {<size>}",
 "",
 " The option `color` causes lines to be drawn in color (on a printer or display",
 " that supports it), `monochrome` (or nothing) selects black lines.  The option",
@@ -710,6 +821,14 @@ START_HELP(mp)
 " labels under this option.  This is intended for use on old plot files or files",
 " that make frequent use of common characters like `$` and `%` that require",
 " special handling in TeX.",
+"",
+" The option `tex` sets the terminal to output its text for TeX to process.",
+"",
+" The option `latex' sets the terminal to output its text for processing by",
+" LaTeX. This allows things like \\frac for fractions which LaTeX knows about",
+" but TeX does not.  Note that you must set the environment variable TEX to the",
+" name of your LaTeX executable (normally latex) if you use this option. ",
+" Otherwise metapost will try and use TeX to process the text and it won't work.",
 "",
 " Changing font sizes in TeX has no effect on the size of mathematics, and there",
 " is no foolproof way to make such a change, except by globally  setting a",
