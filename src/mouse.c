@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.37 2003/06/09 13:25:25 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.38 2003/06/20 04:54:36 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -1755,8 +1755,12 @@ do_event(struct gp_event_t *ge)
     case GE_fontprops:
 	term->h_char = ge->par1;
 	term->v_char = ge->par2;
-	FPRINTF((stderr, "mouse do_event: font hchar %d vchar %d\n",
-		ge->par1,ge->par2));
+	/* Update aspect ratio based on current window size */
+	term->v_tic = term->h_tic * (double)ge->mx / (double)ge->my;
+	/* EAM FIXME - We could also update term->xmax and term->ymax here, */
+	/*             but the existing code doesn't expect it to change.   */
+	FPRINTF((stderr, "mouse do_event: window size %d X %d, font hchar %d vchar %d\n",
+		ge->mx, ge->my, ge->par1,ge->par2));
 	break;
     default:
 	fprintf(stderr, "%s:%d protocol error\n", __FILE__, __LINE__);

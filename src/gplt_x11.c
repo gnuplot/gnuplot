@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.60 2003/06/20 17:24:40 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.61 2003/06/21 05:32:45 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - gplt_x11.c */
@@ -1431,7 +1431,7 @@ record()
 #endif
 #ifdef USE_MOUSE
 	case 'Q':		
-	    /* Set default font immediately and return size through pipe */
+	    /* Set default font immediately and return size info through pipe */
 	    if (buf[1] == 'D') {
 		int scaled_hchar, scaled_vchar;
 		char *c = &(buf[strlen(buf)-1]);
@@ -1446,7 +1446,8 @@ record()
 		scaled_vchar = (1.0/yscale) * vchar;
 		FPRINTF((stderr,"gplt_x11: preset default font to %s hchar = %d vchar = %d \n", 
 			default_font, scaled_hchar, scaled_vchar));
-		gp_exec_event(GE_fontprops, 0, 0, scaled_hchar, scaled_vchar);
+		gp_exec_event(GE_fontprops, plot->width, plot->height, 
+				scaled_hchar, scaled_vchar);
 	        continue;
 	    }
 	    /* fall through */
