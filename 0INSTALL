@@ -52,13 +52,16 @@ several different ways:
 
  o with configure's --prefix= option, eg.
    ./configure --prefix=/gnuplot
-   Attention: This affects the location of *all* installed files!
+   gnuplot will look for the online help file, gnuplot.gih, in /gnuplot/share.
+   Attention: This option affects the location of *all* installed files!
 
  o with configure's --datadir= option, eg.
    ./configure --datadir='/gnuplot/docs'
+   gnuplot will look for the online help file, gnuplot.gih, in /gnuplot/docs.
 
  o at make time, eg.
    make HELPFILE='/gnuplot/docs/gnuplot.gih'
+   gnuplot will look for the online help file /gnuplot/docs/gnupot.gih.
 
  o at execution time by specifying the helpfile with the environment
    variable GNUHELP (see "Environment Variables" below).
@@ -68,13 +71,16 @@ ways:
 
  o with configure's --prefix= option, eg.
    ./configure --prefix=/gnuplot
+   gnuplot will be installed as /gnuplot/bin/gnuplot.
    Attention: This affects the location of *all* installed files!
 
  o with configure's --bindir= option, eg.
    ./configure --bindir='/gnuplot/bin'
+   gnuplot will be installed as /gnuplot/bin/gnuplot.
 
  o at make time, eg.
-   make GNUPLOT_BINDIR='/gnuplot/bin'
+   make BINDIR='/gnuplot/bin'
+   gnuplot will be installed as /gnuplot/bin/gnuplot.
 
    If the executables are not installed in the default location, files
 written by the `save' command cannot be used as scripts on Un*x platforms.
@@ -121,12 +127,10 @@ $ ./configure --help
   --libdir=DIR            object code libraries in DIR [EPREFIX/lib]
   --includedir=DIR        C header files in DIR [PREFIX/include]
   --mandir=DIR            Man documentation in DIR [PREFIX/man]
-  --without-readline      Do not use the included readline function
-  --with-gnu-readline     Use the GNU readline version  If you don't use this,
-                          you won't have file name completion.
-  --with-gnu-readline=PATH        Specify the location of libreadline.
-                          Use this form if your libreadline is not installed
-                          where your linker can find it.
+  --with-readline (*)     use the builtin minimal readline function
+  --without-readline      do not use the builtin readline function
+  --with-readline=gnu     use the GNU readline library
+  --with-readline=PATH            Specify the location of GNU readline
   --with-plot             use the Unix plot library
   --with-plot=PATH                Specify the location of GNU libplot
   --with-gd (*)           Enable gif terminal with Tom Boutell's gd library
@@ -135,13 +139,11 @@ $ ./configure --help
   --with-png (*)          Enable png terminal
                           (requires libpng and libz)
   --with-png=PATH                 Specify the location of libpng
-  --with-cwdrc            Check current directory for .gnuplotrc file,
-                          normally disabled for security reasons. However,
-                          the home directory is always checked for a
-                          .gnuplotrc file.
-  --with-lasergnu         Install lasergnu printer script
-  --without-linux-vga (*) Do not use the Linux console driver
-                          (requires Linux SVGAlib /usr/lib/libvga)
+  --with-cwdrc            check current directory for .gnuplot file,
+                          normally disabled for security reasons
+  --with-lasergnu         install lasergnu printer script
+  --with-linux-vga        use the Linux SVGA console driver
+                          (requires /usr/lib/libvga)
   --enable-apollo         Apollo Graphics Primitive Resource
   --enable-gpr            Apollo Graphics Primitive Resource (fixed-size window)
   --enable-cgi            enable CGI terminal (SCO only)
@@ -208,6 +210,18 @@ Using Aztec C 5.2a
       make -f makefile.ami
 Using SAS/C 6.1 or later versions
       smake -f makefile.amg
+      You can also copy makefile.amg to smakefile and just type `smake'.
+
+      At the beginning of makefile.amg you will find a configuration
+      section where you have to adjust all settings which control the build
+      process. Most important is probably to select the terminal devices
+      which should be supported. You can create a version offering
+      png graphics as well as gif support. Use the appropriate settings
+      for CPU and MATH to compile for a specific machine type.
+      Be sure to enable only those devices for which you have the 
+      necessary software already installed. Also ensure that the
+      libraries and the sources are all compiled using the same
+      settings for CPU and MATH.
 Using gcc: see Unix
 
 Atari/TOS
@@ -237,6 +251,12 @@ Using Borland C++ 3.1 and compiling for MS-Windows
       make
   Put wgnuplot.exe, wgnuplot.dll, wgnuplot.hlp and wgnuplot.mnu
   in the windows directory.
+
+Using Visual C++ and compiling for Windows NT/95/98
+      nmake -f makefile.nt
+ or
+      copy makefile.nt makefile
+      nmake
 
 Using the MinGW32 port of egcs: you need the Micrsoft SDK for the
 moment.
@@ -335,10 +355,12 @@ The CGI drivers need the CGIPATH environment variable to set the path
 to the CGI agents, and the CGIDISP and/or CGIPRNT environment variables
 to set the output devices.
 
- If using dynamically linked executables with the X11 Window System, it
-may be necessary to define LD_LIBRARY_PATH - see man ld for details.
-It is, however, prefered to use the appropriate linker options, eg.
--R under Solaris, or -rpath under DEC Unix and Irix.
+ If creating dynamically linked executables for the X11 Window System, it
+may be necessary to add flags to the LIBS variable in Makefile
+to make sure gnuplot finds all required libraries at runtime.  Systems like
+SunOS and Solaris use -R to specify the runtime library search path, whereas
+OSF/Dec Unix, Irix and Linux use -rpath. If this is not possible, the
+LD_LIBRARY_PATH environment variable should be set.
 
 About --with-PACKAGE[=PATH]
 ***************************

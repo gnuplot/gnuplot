@@ -1,6 +1,6 @@
 ############################################################
 #
-# $Id: Makefile.in,v 1.50 1998/06/18 14:55:00 ddenholm Exp $
+# $Id: Makefile.in,v 1.42 1999/01/14 19:34:08 lhecking Exp $
 #
 # GNUPLOT Makefile.in for autoconf (Unix X11 support)
 # Adapted from makefile.unx by djm@gnu.ai.mit.edu
@@ -151,7 +151,7 @@ T=$(srcdir)/term/
 D=$(srcdir)/docs/
 L=$(srcdir)/docs/latextut/
 Q=$(srcdir)/docs/old/
-S=$(srcdir)/docs/ps/
+S=$(srcdir)/docs/psdoc/
 M=$(srcdir)/demo/
 N=$(srcdir)/NeXT/
 P=$(srcdir)/os2/
@@ -165,7 +165,7 @@ W=$(srcdir)/win/
 #<<<makefile.all>>>
 ########################################################
 #
-# $Id: Makefile.in,v 1.50 1998/06/18 14:55:00 ddenholm Exp $
+# $Id: Makefile.in,v 1.42 1999/01/14 19:34:08 lhecking Exp $
 #
 ########################################################
 #
@@ -191,7 +191,7 @@ W=$(srcdir)/win/
 # D as the prefix for docs (eg docs/)
 # L as the prefix for latex tutorial (eg docs/latextut/ or [.docs.latextut])
 # Q as the prefix for old doc files (eg docs/old)
-# S as the prefix for postscript docs (eg docs/ps)
+# S as the prefix for postscript docs (eg docs/psdoc)
 # M as the prefix for demos (eg demo/)
 # N as the prefix for NeXT (eg NeXT/)
 # P as the prefix for OS/2 (eg os2/)
@@ -256,10 +256,10 @@ OS2SRC = $(P)dialogs.c $(P)dialogs.h $(P)gclient.c $(P)gnuplot.ico \
 	 $(P)gnupmdrv.c $(P)gnupmdrv.def $(P)gnupmdrv.h $(P)gnupmdrv.ipf \
 	 $(P)gnupmdrv.rc $(P)print.c
 
-WINDOWS = $(W)geticon.c $(W)wcommon.h $(W)wgnupl32.def $(W)wgnuplib.c \
-	  $(W)wgnuplib.def $(W)wgnuplib.h $(W)wgnuplib.rc $(W)wgnuplot.def \
-	  $(W)wgnuplot.hpj $(W)wgnuplot.mnu $(W)wgnuplot.rc $(W)wgraph.c \
-	  $(W)winmain.c $(W)wmenu.c $(W)wpause.c $(W)wprinter.c \
+WINDOWS = $(W)pgnuplot.c $(W)geticon.c $(W)wcommon.h $(W)wgnupl32.def \
+	  $(W)wgnuplib.c $(W)wgnuplib.def $(W)wgnuplib.h $(W)wgnuplib.rc \
+	  $(W)wgnuplot.def $(W)wgnuplot.hpj $(W)wgnuplot.mnu $(W)wgnuplot.rc \
+	  $(W)wgraph.c $(W)winmain.c $(W)wmenu.c $(W)wpause.c $(W)wprinter.c \
 	  $(W)wresourc.h $(W)wtext.c $(W)wtext.h
 
 # not C code, but still needed
@@ -293,7 +293,7 @@ ETC =   0BUGS 0FAQ 0INSTALL 0PORTING 0README ChangeLog CodeStyle Copyright \
 	makefile.st makefile.tc makefile.unx makefile.vms makefile.wc \
 	makefile.win makefile.ztc missing mkinstalldirs os9.c pcgraph.asm \
 	rgipgnu stamp-h.in strftime.c vms.c m4/msdos.m4 m4/next.m4 \
-	m4/search-hdr.m4 m4/search-lib.m4 $(T)README 
+	m4/path-hdr.m4 m4/path-lib.m4 $(T)README 
 
 # Documentation and help files
 DOCS1 = $(D)Makefile.in $(D)README $(D)checkdoc.c $(D)doc2gih.c \
@@ -423,8 +423,8 @@ Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	cd $(top_builddir) \
 	  && CONFIG_FILES=$@ CONFIG_HEADERS= $(SHELL) ./config.status
 
-$(ACLOCAL_M4): configure.in m4/msdos.m4 m4/next.m4 m4/search-hdr.m4 \
-		m4/search-lib.m4
+$(ACLOCAL_M4): configure.in m4/msdos.m4 m4/next.m4 m4/path-hdr.m4 \
+		m4/path-lib.m4
 	cd $(srcdir) && $(ACLOCAL) $(ACLOCAL_AMFLAGS)
 
 config.status: $(srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
@@ -456,7 +456,7 @@ DISTFILES = $(ETC) $(SOURCES) $(DEMOS) $(DOCS)
 
 SUBDIRS = NeXT NeXT/English.lproj NeXT/English.lproj/GnuTerm.nib \
 	  NeXT/English.lproj/gnuview.nib demo docs docs/latextut docs/old \
-	  docs/ps m4 os2 term win
+	  docs/psdoc m4 os2 term win
 
 clean:
 	rm -f gnuplot gnuplot_x11 bf_test *.o core *~
