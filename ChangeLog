@@ -1,7 +1,12 @@
+2004-03-26  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* config/config.nt: Remove HAVE_STDBOOL_H and HAVE__BOOL again ---
+	turns out MSVC doesn't have them.
+
 2004-03-26  Petr Mikulik  <mikulik@physics.muni.cz>
 
-	* config/makefile.cyg: Added -DHAVE_STDBOOL_H to the compile command
-	for pgnuplot.exe to avoid compiler warnings.
+	* config/makefile.cyg: Added -DHAVE_STDBOOL_H to the compile
+	command for pgnuplot.exe to avoid compiler warnings.
 
 2004-03-25  Ethan Merritt  <merritt@u.washington.edu>
 
