@@ -123,12 +123,12 @@ AC_TRY_CPP([#if 0
 AC_SUBST(ERRORFIX)
 
 dnl X Window System files.
-AC_SUBST(X_LIBRARIES)
+AC_SUBST(LIBRARIES_FOR_X)
 AC_SUBST(GNUPLOT_X11)
 AC_PATH_XTRA
 if test "$no_x" != yes; then
   CPPFLAGS="$CPPFLAGS $X_CFLAGS"
-  X_LIBRARIES="$X_LIBS -lX11 $X_EXTRA_LIBS"
+  LIBRARIES_FOR_X="$X_LIBS -lX11 $X_EXTRA_LIBS"
   GNUPLOT_X11=gnuplot_x11
   AC_DEFINE(X11, 1,
             [ Define if you are using the X11 window system. ])
@@ -145,6 +145,7 @@ gp_BEOS
 AC_SUBST(GNUPLOT_BE)
 
 dnl this has to be after -lsys_s on NeXT
+dnl FIXME test for a math function that is actually needed
 LIBS="$LIBS -lm"
 
 
@@ -215,9 +216,7 @@ if test "$ac_cv_func_pclose" = yes && test "$ac_cv_func_popen" = yes ; then
 fi
 
 dnl arg types for select - works only with ANSI compilers!
-if test "$am_cv_prog_cc_stdc" != no; then
-  AC_FUNC_SELECT
-fi
+test "$am_cv_prog_cc_stdc" != no && AC_FUNC_SELECT
 
 dnl On SVR3.
 dnl FIXME AC_DEFINE(CRIPPLED_SELECT)
@@ -293,6 +292,7 @@ if test "$with_readline" != no; then
   fi
 
 fi
+dnl end readline
 
 dnl libplot
 if test "$with_plot" != no; then
@@ -377,18 +377,6 @@ You lose.
   fi
 fi
 dnl end png and z
-
-dnl create list of terminal drivers
-AC_MSG_CHECKING([terminal driver sources])
-( cd $srcdir/term && for i in *.trm ; do echo '${srcdir}'/../term/$i ; done )\
- |tr '\012' @ |sed 's/@$/%/;s/@/ \\@/g' |tr @% '\012\012' >termlist
-TERM_LIST=termlist
-AC_SUBST_FILE(TERM_LIST)
-if test -s termlist ; then
-   AC_MSG_RESULT([list created])
-else
-   AC_MSG_RESULT([cannot create list - you may need to edit docs/Makefile])
-fi
 
 dnl How do we detect the Ultrix X libraries?
 dnl Or is it really a server (run-time) problem?
