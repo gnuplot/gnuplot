@@ -1,5 +1,10 @@
 2004-06-12  Ethan Merritt  <merritt@u.washington.edu>
 
+	* show.c (show_datafile): Provide missing show commands for suboptions
+	"show datafile {separator|comment|missing}".
+
+2004-06-12  Ethan Merritt  <merritt@u.washington.edu>
+
 	* datafile.h: define DF_MISSING as a return code from df_readline().
 	* datatile.c (df_readline): If a data field contains the missing data
 	string, return DF_MISSING rather than DF_UNDEFINED.

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.124 2004/04/15 10:02:11 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.125 2004/05/04 02:56:26 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -2649,16 +2649,24 @@ show_datafile()
 {
     SHOW_ALL_NL;
 
-    if (missing_val == NULL)
-	fputs("\tNo missing data string set for datafile\n", stderr);
-    else
-	fprintf(stderr, "\t\"%s\" in datafile is interpreted as missing value\n",
+    if (END_OF_COMMAND || almost_equals(c_token,"miss$ing")) {
+	if (missing_val == NULL)
+	    fputs("\tNo missing data string set for datafile\n", stderr);
+	else
+	    fprintf(stderr, "\t\"%s\" in datafile is interpreted as missing value\n",
 		missing_val);
-    if (df_separator != '\0')
-	fprintf(stderr, "\tdatafile fields separated by \"%c\"\n", df_separator);
-    else
-	fprintf(stderr, "\tdatafile fields separated by whitespace\n");
-    fprintf(stderr, "\tComments chars are \"%s\"\n", df_commentschars);
+    }
+    if (END_OF_COMMAND || almost_equals(c_token,"sep$arator")) {
+	if (df_separator != '\0')
+	    fprintf(stderr, "\tdatafile fields separated by \"%c\"\n", df_separator);
+	else
+	    fprintf(stderr, "\tdatafile fields separated by whitespace\n");
+    }
+    if (END_OF_COMMAND || almost_equals(c_token,"com$ments")) {
+	fprintf(stderr, "\tComments chars are \"%s\"\n", df_commentschars);
+    }
+    if (!END_OF_COMMAND)
+	c_token++;
 }
 
 #ifdef USE_MOUSE
