@@ -19,6 +19,10 @@
 	text processing while writing out plot title or axis label text if the
 	noenhanced flag is set in the corresponding label_struct.
 
+	* docs/gnuplot.doc: Correct the documentation to say
+	'set multiplot layout <rows>,<cols>' (rows/cols were reversed in the
+	previous version, and mis-described in the example).
+
 2005-01-04  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/os2/gclient.c: Contains my attempt to implement pattern filling

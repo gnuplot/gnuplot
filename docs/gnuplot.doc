@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.268 2004/12/21 08:09:31 mikulik Exp $
+C RCS $Id: gnuplot.doc,v 1.269 2005/01/04 20:12:25 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -6442,7 +6442,7 @@ C ... and restart the table:
  several plots are placed on the same page, window, or screen.
 
  Syntax:
-       set multiplot { layout <cols>,<rows>
+       set multiplot { layout <rows>,<cols>
                        {rowmajor|columnmajor} {downwards|upwards}
                        {scale <xscale>{,<yscale>}} {offset <xoff>{,<yoff>}} 
                      }
@@ -6495,8 +6495,8 @@ C ... and restart the table:
  With the `layout` option you can generate simple multiplots without having
  to give the `set size` and `set origin` commands before each plot:  Those
  are generated automatically, but can be overridden at any time.  With
- `layout` the display will be divided by a grid with <cols> columns and 
- <rows> rows.  This grid is filled rows first or columns first depending on
+ `layout` the display will be divided by a grid with <rows> rows and 
+ <cols> columns.  This grid is filled rows first or columns first depending on
  whether `rowmajor` or `columnmajor` is given by the subsequent option of the 
  multiplot command.  The stack of plots can grow `downwards` or `upwards`.
  Default is `columnmajor` and `downwards`.
@@ -6513,7 +6513,7 @@ C ... and restart the table:
        [ up to 6 plot commands here ]
        unset multiplot
 
- The above example will produce 6 plots in 3 columns filled top to bottom,
+ The above example will produce 6 plots in 2 columns filled top to bottom,
  left to right.  Each plot will have a horizontal size of 1.1/2 and a vertical
  size of 0.9/3. 
 
