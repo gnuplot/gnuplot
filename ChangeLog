@@ -1,5 +1,16 @@
 2004-03-23  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
+	* configure.in (AC_HEADER_STDBOOL): Added call to this macro.
+
+	* src/syscfg.h: Rewrite the definition of FALSE, TRUE and TBOOLEAN
+	from scratch, this time based on autoconf's recommendations.  The
+	previous version collided with a "#define bool _Bool" found
+	somewhere deep in the Mac OS X system headers.
+
+	
+	
+2004-03-23  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
 	* src/axis.c (t_timelevel): Start enum values at 1, to avoid
 	wrap-around of expression TIMELEVEL_SECONDS - 1.
 	(make_auto_time_minitics): Fine-tune thresholds and generate tick

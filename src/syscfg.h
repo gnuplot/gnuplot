@@ -1,5 +1,5 @@
 /*
- * $Id: syscfg.h,v 1.25 2003/01/22 15:09:58 lhecking Exp $
+ * $Id: syscfg.h,v 1.26 2003/04/29 07:04:31 mikulik Exp $
  */
 
 /* GNUPLOT - syscfg.h */
@@ -443,27 +443,27 @@ typedef RETSIGTYPE (*sigfunc)__PROTO((void));
 # endif
 #endif
 
-/* avoid precompiled header conflict with redefinition */
-#ifdef NEXT
-# include <mach/boolean.h>
+#if HAVE_STDBOOL_H
+# include <stdbool.h>
 #else
-/* Sheer, raging paranoia */
-# ifdef TRUE
-#  undef TRUE
+# if ! HAVE__BOOL
+#  ifdef __cplusplus
+typedef bool _Bool;
+#  else
+typedef unsigned char _Bool;
+#  endif
 # endif
-# ifdef FALSE
-#  undef FALSE
-# endif
-# define TRUE 1
-# define FALSE 0
+# define bool _Bool
+# define false 0
+# define true 1
+# define __bool_true_false_are_defined 1
 #endif
 
-#ifndef __cplusplus
-#undef bool
-typedef unsigned int bool;
-#endif
+#undef TRUE
+#define TRUE true
+#undef FALSE
+#define FALSE false
 
-/* TRUE or FALSE */
 #define TBOOLEAN bool
 
 #endif /* !SYSCFG_H */
