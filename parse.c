@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: parse.c,v 1.62 1998/06/18 14:55:13 ddenholm Exp $";
+static char *RCSid = "$Id: parse.c,v 1.9 1998/11/19 10:41:13 lhecking Exp $";
 #endif
 
 /* GNUPLOT - parse.c */
@@ -34,10 +34,23 @@ static char *RCSid = "$Id: parse.c,v 1.62 1998/06/18 14:55:13 ddenholm Exp $";
  * to the extent permitted by applicable law.
 ]*/
 
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
+
 #include <signal.h>
+#include <setjmp.h>
+
+#ifdef HAVE_SIGSETJMP
+# define SETJMP(env, save_signals) sigsetjmp(env, save_signals)
+# define LONGJMP(env, retval) siglongjmp(env, retval)
+#else
+# define SETJMP(env, save_signals) setjmp(env)
+# define LONGJMP(env, retval) longjmp(env, retval)
+#endif
+
 #include "plot.h"
 #include "help.h"
-#include <setjmp.h>
 
 RETSIGTYPE fpe __PROTO((int an_int));
 static void extend_at __PROTO((void));
@@ -89,7 +102,7 @@ int an_int;
     (void) signal(SIGFPE, (sigfunc) fpe);
 #endif
     undefined = TRUE;
-    longjmp(fpe_env, TRUE);
+    LONGJMP(fpe_env, TRUE);
 }
 
 
@@ -135,7 +148,7 @@ struct value *val_ptr;
     reset_stack();
 
 #ifndef DOSX286
-    if (setjmp(fpe_env))
+    if (SETJMP(fpe_env, 1))
 	return;			/* just bail out */
     (void) signal(SIGFPE, (sigfunc) fpe);
 #endif

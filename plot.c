@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: plot.c,v 1.18.2.2 1999/09/23 13:26:36 lhecking Exp $";
+static char *RCSid = "$Id: plot.c,v 1.18.2.3 1999/11/20 17:56:58 lhecking Exp $";
 #endif
 
 /* GNUPLOT - plot.c */
@@ -34,13 +34,25 @@ static char *RCSid = "$Id: plot.c,v 1.18.2.2 1999/09/23 13:26:36 lhecking Exp $"
  * to the extent permitted by applicable law.
 ]*/
 
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
+
 #include <signal.h>
+#include <setjmp.h>
+
+#ifdef HAVE_SIGSETJMP
+# define SETJMP(env, save_signals) sigsetjmp(env, save_signals)
+# define LONGJMP(env, retval) siglongjmp(env, retval)
+#else
+# define SETJMP(env, save_signals) setjmp(env)
+# define LONGJMP(env, retval) longjmp(env, retval)
+#endif
 
 #include "plot.h"
 #include "fit.h"
 #include "setshow.h"
 #include "fnproto.h"
-#include <setjmp.h>
 
 #ifdef HAVE_SYS_UTSNAME_H
 # include <sys/utsname.h>
@@ -91,6 +103,7 @@ char *infile_name = NULL;	/* name of command file; NULL if terminal */
 #ifdef HAVE_LIBREADLINE
 extern char *rl_readline_name;
 extern int rl_complete_with_tilde_expansion;
+extern char *rl_terminal_name;
 #endif
 
 #ifdef X11
@@ -258,7 +271,7 @@ int anint;
 #else
     term_reset();
     (void) putc('\n', stderr);
-    longjmp(command_line_env, TRUE);	/* return to prompt */
+    LONGJMP(command_line_env, TRUE);	/* return to prompt */
 #endif
 }
 
@@ -314,7 +327,7 @@ take_privilege()
 /* a wrapper for longjmp so we can keep everything local */
 void bail_to_command_line()
 {
-    longjmp(command_line_env, TRUE);
+    LONGJMP(command_line_env, TRUE);
 }
 
 #if defined(_Windows) || defined(_Macintosh)
@@ -386,6 +399,7 @@ char **argv;
 #ifdef HAVE_LIBREADLINE
     rl_readline_name = argv[0];
     rl_complete_with_tilde_expansion = 1;
+    rl_terminal_name = getenv("TERM");
 #endif
 
 #ifdef X11
@@ -488,7 +502,7 @@ char **argv;
 	done(status[1]);
 #endif /* VMS */
 
-    if (!setjmp(command_line_env)) {
+    if (!SETJMP(command_line_env, 1)) {
 	/* first time */
 	interrupt_setup();
 	load_rcfile();
@@ -736,7 +750,7 @@ ULONG RexxInterface(PRXSTRING rxCmd, PUSHORT pusErr, PRXSTRING rxRc)
     int cmdlen;
 
     memcpy(keepenv, command_line_env, sizeof(jmp_buf));
-    if (!setjmp(command_line_env)) {
+    if (!SETJMP(command_line_env, 1)) {
 	/* set variable input_line.
 	 * Watch out for line length of NOT_ZERO_TERMINATED strings ! */
 	cmdlen = rxCmd->strlength + 1;
