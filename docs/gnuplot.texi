@@ -232,8 +232,7 @@ if the entire command is "command a b c", then "command a c" will probably
 work, but "command c a" will fail.
 
 Commands may extend over several input lines by ending each line but the last
-with a backslash (\).  Also, any line ending with a comma is treated as a
-continuation line. The backslash or comma must be the _last_ character on each
+with a backslash (\).  The backslash must be the _last_ character on each
 line.  The effect is as if the backslash and newline were not there.  That
 is, no white space is implied, nor is a comment terminated.  Therefore,
 commenting out a continued line comments out the entire command (see
@@ -362,7 +361,8 @@ left, both for plotting and labels.  See @ref{plot}.
 
 14. The @ref{call} command: `load` with arguments.
 
-15. More flexible `range` commands with `reverse` and `writeback` keywords.
+15. More flexible `range` commands with `reverse`, `writeback`, and `restore`
+keywords.
 
 16. @ref{encoding} for multi-lingual encoding.
 
@@ -7387,8 +7387,8 @@ The @ref{vector} style draws a vector from (x,y) to (x+xdelta,y+ydelta).  Thus
 it requires four columns of data.  It also draws a small arrowhead at the
 end of the vector.
 
-The @ref{vector} style is still experimental: it doesn't get clipped properly
-and other things may also be wrong with it.  Use it at your own risk.
+`set clip one` and `set clip two` affect drawing vectors.
+Please see @ref{clip}.
 
 @node xerrorbars, xyerrorbars, vector, style
 @subsubsection xerrorbars
@@ -7589,16 +7589,26 @@ to you, depending on its output format.
 @@c <4 -- all terminal stuff is pulled from the .trm files
 
 @menu
+* aed767::                      
 * aifm::                        
+* apollo::                      
+* apollo_::                     
 * cgm::                         
 * corel::                       
+* debug::                       
 * dumb::                        
 * dxf::                         
+* dxy800a::                     
 * eepic::                       
+* emf::                         
 * epson-180dpi::                
+* excl::                        
 * fig::                         
 * gif::                         
+* unixplot::                    
 * gpic::                        
+* gpr::                         
+* grass::                       
 * hp2623a::                     
 * hp2648::                      
 * hp500c::                      
@@ -7606,8 +7616,11 @@ to you, depending on its output format.
 * hpljii::                      
 * hppj::                        
 * imagen::                      
+* kyo::                         
 * latex::                       
 * mf::                          
+* mp::                          
+* mgr::                         
 * mif::                         
 * pbm::                         
 * png::                         
@@ -7616,6 +7629,7 @@ to you, depending on its output format.
 * pstricks::                    
 * qms::                         
 * regis::                       
+* rgip::                        
 * sun::                         
 * tek410x::                     
 * table::                       
@@ -7624,11 +7638,40 @@ to you, depending on its output format.
 * tgif::                        
 * tkcanvas::                    
 * tpic::                        
+* unixpc::                      
+* unixplot_::                   
+* vx384::                       
 * x11::                         
 * xlib::                        
 @end menu
 
-@node aifm, cgm, terminal, terminal
+@node aed767, aifm, terminal, terminal
+@subsubsection aed767
+
+@c ?commands set terminal aed767
+@c ?set terminal aed767
+@c ?set term aed767
+@c ?terminal aed767
+@c ?term aed767
+@cindex aed767
+@tmindex aed767
+
+
+@c ?commands set terminal aed512
+@c ?set terminal aed512
+@c ?set term aed512
+@c ?terminal aed512
+@c ?term aed512
+@cindex aed512
+@tmindex aed512
+
+
+The `aed512` and `aed767` terminal drivers support AED graphics terminals.
+The two drivers differ only in their horizontal ranges, which are 512 and
+768 pixels, respectively.  Their vertical range is 575 pixels.  There are
+no options for these drivers."
+
+@node aifm, apollo, aed767, terminal
 @subsubsection aifm
 
 @c ?commands set terminal aifm
@@ -7666,7 +7709,41 @@ Examples:
 
 @end example
 
-@node cgm, corel, aifm, terminal
+@node apollo, apollo_, aifm, terminal
+@subsubsection apollo
+
+@c ?commands set terminal apollo
+@c ?set terminal apollo
+@c ?set term apollo
+@c ?terminal apollo
+@c ?term apollo
+@cindex apollo
+@tmindex apollo
+
+
+The `apollo` terminal driver supports the Apollo Graphics Primitive Resource
+with rescaling after window resizing.  It has no options.
+
+If a fixed-size window is desired, the `gpr` terminal may be used instead."
+
+@node apollo_, cgm, apollo, terminal
+@subsubsection apollo
+
+@c ?commands set terminal apollo
+@c ?set terminal apollo
+@c ?set term apollo
+@c ?terminal apollo
+@c ?term apollo
+@cindex apollo
+@tmindex apollo
+
+
+The `apollo` terminal driver supports the Apollo Graphics Primitive Resource
+with rescaling after window resizing.  It has no options.
+
+If a fixed-size window is desired, the `gpr` terminal may be used instead."
+
+@node cgm, corel, apollo_, terminal
 @subsubsection cgm
 
 @c ?commands set terminal cgm
@@ -7856,7 +7933,7 @@ table included, Microsoft Word displays black for color 7.
 
 Linewidths and pointsizes may be changed with @ref{linestyle}."
 
-@node corel, dumb, cgm, terminal
+@node corel, debug, cgm, terminal
 @subsubsection corel
 
 @c ?commands set terminal corel
@@ -7882,7 +7959,22 @@ Syntax:
 where the fontsize and linewidth are specified in points and the sizes in
 inches.  The defaults are monochrome, "SwitzerlandLight", 22, 8.2, 10 and 1.2."
 
-@node dumb, dxf, corel, terminal
+@node debug, dumb, corel, terminal
+@subsubsection debug
+
+@c ?commands set terminal debug
+@c ?set terminal debug
+@c ?set term debug
+@c ?terminal debug
+@c ?term debug
+@cindex debug
+@tmindex debug
+
+
+This terminal is provided to allow for the debugging of `gnuplot`.  It is
+likely to be of use only for users who are modifying the source code."
+
+@node dumb, dxf, debug, terminal
 @subsubsection dumb
 
 @c ?commands set terminal dumb
@@ -7913,7 +8005,7 @@ Examples:
 
 @end example
 
-@node dxf, eepic, dumb, terminal
+@node dxf, dxy800a, dumb, terminal
 @subsubsection dxf
 
 @c ?commands set terminal dxf
@@ -7934,7 +8026,21 @@ modifying the source file.  If a black-and-white plotting device is used, the
 colors are mapped to differing line thicknesses.  See the description of the
 AutoCad print/plot command."
 
-@node eepic, epson-180dpi, dxf, terminal
+@node dxy800a, eepic, dxf, terminal
+@subsubsection dxy800a
+
+@c ?commands set terminal dxy800a
+@c ?set terminal dxy800a
+@c ?set term dxy800a
+@c ?terminal dxy800a
+@c ?term dxy800a
+@cindex dxy800a
+@tmindex dxy800a
+
+
+This terminal driver supports the Roland DXY800A plotter.  It has no options."
+
+@node eepic, emf, dxy800a, terminal
 @subsubsection eepic
 
 @c ?commands set terminal eepic
@@ -7999,7 +8105,44 @@ The other label -- account for long ticlabels:
 
 @end example
 
-@node epson-180dpi, fig, eepic, terminal
+@node emf, epson-180dpi, eepic, terminal
+@subsubsection emf
+
+@c ?commands set terminal emf
+@c ?set terminal emf
+@c ?set term emf
+@c ?terminal emf
+@c ?term emf
+@cindex emf
+@tmindex emf
+
+
+The `emf` terminal generates an Enhanced Metafile Format file.  This file format
+is the metafile standard on MS Win32 Systems"
+
+Syntax:
+@example
+      set terminal emf @{<color>@} @{solid | dashed@}
+                       @{"<font>"@} @{<fontsize>@}
+
+@end example
+
+<color> is either `color` or `monochrome`; 
+`solid` draws all curves with solid lines, overriding any dashed patterns;
+<font> is the name of a font; and 
+`<fontsize>` is the size of the font in points.
+
+The first two options can be in any order.  Selecting `default` sets all
+options to their default values.
+
+Examples:
+@example
+      set terminal emf 'Times Roman Italic' 12
+      set terminal emf color solid    # no pesky dashes!"
+
+@end example
+
+@node epson-180dpi, excl, emf, terminal
 @subsubsection epson-180dpi
 
 @c ?commands set terminal epson-180dpi
@@ -8096,7 +8239,22 @@ which defaults to monochrome.
 With each of these drivers, a binary copy is required on a PC to print.  Do
 not use @ref{print}---use instead `copy file /b lpt1:`."
 
-@node fig, gif, epson-180dpi, terminal
+@node excl, fig, epson-180dpi, terminal
+@subsubsection excl
+
+@c ?commands set terminal excl
+@c ?set terminal excl
+@c ?set term excl
+@c ?terminal excl
+@c ?term excl
+@cindex excl
+@tmindex excl
+
+
+The `excl` terminal driver supports Talaris printers such as the EXCL Laser
+printer and the 1590.  It has no options."
+
+@node fig, gif, excl, terminal
 @subsubsection fig
 
 @c ?commands set terminal fig
@@ -8193,7 +8351,7 @@ To plot the error bars on top of the circles use
 
 @end example
 
-@node gif, gpic, fig, terminal
+@node gif, unixplot, fig, terminal
 @subsubsection gif
 
 @c ?commands set terminal gif
@@ -8263,7 +8421,49 @@ or monochromatic output, but you have no control over which is produced.
 
 The current version of the `gif` driver does not support animated GIFs."
 
-@node gpic, hp2623a, gif, terminal
+@node unixplot, gpic, gif, terminal
+@subsubsection unixplot
+
+@c ?commands set terminal unixplot
+@c ?set terminal unixplot
+@c ?set term unixplot
+@c ?terminal unixplot
+@c ?term unixplot
+@cindex unixplot
+@tmindex unixplot
+
+
+The `unixplot` driver produces device-independent output in the GNU plot
+graphics language.  The default size of the PostScript results generated by
+"plot2ps" is 5 x 3 inches; this can be increased up to about 8.25 x 8.25 by
+@ref{size}.
+
+Syntax:
+@example
+      set terminal unixplot @{"<fontname>"@} @{<fontsize>@}
+                            @{type <pt>@} @{size "<size>"@}
+
+@end example
+
+which defaults to 10-point "Courier".
+
+For `type`, the following options are accepted: `X`, `pnm`, `gif`, `ai`,
+`ps`, `cgm`, `fig`, `pcl5`, `hpgl`, `tek`, and `meta` (default). The
+@ref{size} option (default is a4) is passed straight through to plotutils, it's
+the user's responsibility to provide correct values. Details can be found
+in the plotutils documentation.
+
+Examples:
+@example
+      set terminal unixplot type hpgl size "a4"
+      set terminal unixplot size "a4,xoffset=-5mm,yoffset=2.0cm" type pnm
+
+@end example
+
+There is a non-GNU version of the `unixplot` driver which cannot be compiled
+unless this version is left out."
+
+@node gpic, gpr, unixplot, terminal
 @subsubsection gpic
 
 @c ?commands set terminal gpic
@@ -8351,7 +8551,41 @@ for example, using
 
 @end example
 
-@node hp2623a, hp2648, gpic, terminal
+@node gpr, grass, gpic, terminal
+@subsubsection gpr
+
+@c ?commands set terminal gpr
+@c ?set terminal gpr
+@c ?set term gpr
+@c ?terminal gpr
+@c ?term gpr
+@cindex gpr
+@tmindex gpr
+
+
+The `gpr` terminal driver supports the Apollo Graphics Primitive Resource
+for a fixed-size window.  It has no options.
+
+If a variable window size is desired, use the `apollo` terminal instead."
+
+@node grass, hp2623a, gpr, terminal
+@subsubsection grass
+
+@c ?commands set terminal grass
+@c ?set terminal grass
+@c ?set term grass
+@c ?terminal grass
+@c ?term grass
+@cindex grass
+@tmindex grass
+
+
+The `grass` terminal driver gives `gnuplot` capabilities to users of the 
+GRASS geographic information system.  Contact grassp-list@@moon.cecer.army.mil
+for more information.  Pages are written to the current frame of the GRASS
+Graphics Window.  There are no options."
+
+@node hp2623a, hp2648, grass, terminal
 @subsubsection hp2623a
 
 @c ?commands set terminal hp2623a
@@ -8568,7 +8802,7 @@ Syntax:
 
 with the middle-sized font (FNT9X17) being the default."
 
-@node imagen, latex, hppj, terminal
+@node imagen, kyo, hppj, terminal
 @subsubsection imagen
 
 @c ?commands set terminal imagen
@@ -8602,7 +8836,32 @@ Example:
 
 puts six graphs on the page in three rows of two in portrait orientation."
 
-@node latex, mf, imagen, terminal
+@node kyo, latex, imagen, terminal
+@subsubsection kyo
+
+@c ?commands set terminal kyo
+@c ?set terminal kyo
+@c ?set term kyo
+@c ?terminal kyo
+@c ?term kyo
+@cindex kyo
+@tmindex kyo
+
+
+@c ?commands set terminal prescribe
+@c ?set terminal prescribe
+@c ?set term prescribe
+@c ?terminal prescribe
+@c ?term prescribe
+@cindex prescribe
+@tmindex prescribe
+
+
+The `kyo` and `prescribe` terminal drivers support the Kyocera laser printer.
+The only difference between the two is that `kyo` uses "Helvetica" whereas
+`prescribe` uses "Courier".  There are no options."
+
+@node latex, mf, kyo, terminal
 @subsubsection latex
 
 @c ?commands set terminal emtex
@@ -8680,7 +8939,7 @@ The other label -- account for long ticlabels:
 
 @end example
 
-@node mf, mif, latex, terminal
+@node mf, mp, latex, terminal
 @subsubsection mf
 
 @c ?commands set terminal mf
@@ -8811,7 +9070,185 @@ saves a lot of TeX memory.  One last advantage of using the METAFONT driver
 is that the DVI file really remains device independent, because no \\special
 commands are used as in the eepic and tpic drivers."
 
-@node mif, pbm, mf, terminal
+@node mp, mgr, mf, terminal
+@subsubsection mp
+
+@c ?commands set terminal mpost
+@c ?set terminal mp
+@c ?set term mp
+@c ?terminal mp
+@c ?term mp
+@cindex mp
+
+@cindex metapost
+
+
+The `mp` driver produces output intended to be input to the Metapost program.
+Running Metapost on the file creates EPS files containing the plots. By
+default, Metapost passes all text through TeX.  This has the advantage of
+allowing essentially  any TeX symbols in titles and labels.
+
+Syntax:
+@example
+   set term mp @{color@} @{solid@} @{notex@} @{mag <magsize>@} @{"<name>"@} @{<size>@}
+
+@end example
+
+The option `color` causes lines to be drawn in color (on a printer or display
+that supports it), `monochrome` (or nothing) selects black lines.  The option
+`solid` draws solid lines, while `dashed` (or nothing) selects lines with
+different patterns of dashes.  If `solid` is selected but `color` is not,
+nearly all lines will be identical.  This may occasionally be useful, so it is
+allowed.
+
+The option `notex` bypasses TeX entirely, therefore no TeX code can be used in
+labels under this option.  This is intended for use on old plot files or files
+that make frequent use of common characters like `$` and `%` that require
+special handling in TeX.
+
+Changing font sizes in TeX has no effect on the size of mathematics, and there
+is no foolproof way to make such a change, except by globally  setting a
+magnification factor. This is the purpose of the `magnification` option. It
+must be followed by a scaling factor. All text (NOT the graphs) will be scaled
+by this factor. Use this if you have math that you want at some size other
+than the default 10pt. Unfortunately, all math will be the same size, but see
+the discussion below on editing the MP output. `mag` will also work under
+`notex` but there seems no point in using it as the font size option (below)
+works as well.
+
+A name in quotes selects the font that will be used when no explicit font is
+given in a @ref{label} or `set title`.  A name recognized by TeX (a TFM file
+exists) must be used.  The default is "cmr10" unless `notex` is selected,
+then it is "pcrr8r" (Courier).  Even under `notex`, a TFM file is needed by
+Metapost. The file `pcrr8r.tfm` is the name given to Courier in LaTeX's psnfss
+package.  If you change the font from the `notex` default, choose a font that
+matches the ASCII encoding at least in the range 32-126.  `cmtt10` almost
+works, but it has a nonblank character in position 32 (space).
+
+The size can be any number between 5.0 and 99.99.  If it is omitted, 10.0 is
+used.  It is advisable to use `magstep` sizes: 10 times an integer or
+half-integer power of 1.2, rounded to two decimals, because those are the most
+available sizes of fonts in TeX systems.
+
+All the options are optional.  If font information is given, it must be at the
+end, with size (if present) last.  The size is needed to select a size for the
+font, even if the font name includes size information.  For example,
+`set term mp "cmtt12"` selects cmtt12 shrunk to the default size 10.  This
+is probably not what you want or you would have used cmtt10.
+
+The following common ascii characters need special treatment in TeX:
+@example
+   $, &, #, %, _;  |, <, >;  ^, ~,  \\, @{, and @}
+@end example
+
+The five characters $, #, &, _, and % can simply be escaped, e.g., `\\$`.
+The three characters <, >, and | can be wrapped in math mode, e.g., `$<$`.
+The remainder require some TeX work-arounds.  Any good book on TeX will give
+some guidance.
+
+If you type your labels inside double quotes, backslashes in TeX code need to
+be escaped (doubled). Using single quotes will avoid having to do this, but
+then you cannot use `\\n` for line breaks.  As of this writing, version 3.7 of
+gnuplot processess titles given in a @ref{plot} command differently than in other
+places, and backslashes in TeX commands need to be doubled regardless of the
+style of quotes.
+
+Metapost pictures are typically used in TeX documents.  Metapost deals with
+fonts pretty much the same way TeX does, which is different from most other
+document preparation programs.  If the picture is included in a LaTeX document
+using the graphics package, or in a plainTeX document via epsf.tex, and then
+converted to PostScript with dvips (or other dvi-to-ps converter), the text in
+the plot will usually be handled correctly.  However, the text may not appear
+if you send the Metapost output as-is to a PostScript interpreter.
+
+
+
+@noindent --- METAPOST INSTRUCTIONS ---
+
+@c ?commands set terminal mp detailed
+@c ?set terminal mp detailed
+@c ?set term mp detailed
+@c ?mp detailed
+@c ?metapost detailed
+
+- Set your terminal to Metapost, e.g.:
+@example
+   set terminal mp mono "cmtt12" 12
+
+@end example
+
+- Select an output-file, e.g.:
+@example
+   set output "figure.mp"
+
+@end example
+
+- Create your pictures.  Each plot (or multiplot group) will generate a
+separate Metapost beginfig...endfig group.  Its default size will be 5 by 3
+inches.  You can change the size by saying `set size 0.5,0.5` or whatever
+fraction of the default size you want to have.
+
+- Quit gnuplot.
+
+- Generate EPS files by running Metapost on the output of gnuplot:
+@example
+   mpost figure.mp  OR  mp figure.mp
+@end example
+
+The name of the Metapost program depends on the system, typically `mpost` for
+a Unix machine and `mp` on many others.  Metapost will generate one EPS file
+for each picture.
+
+- To include your pictures in your document you can use the graphics package
+in LaTeX or epsf.tex in plainTeX:
+@example
+   \\usepackage@{graphics@} % LaTeX
+   \\input epsf.tex       % plainTeX
+@end example
+
+If you use a driver other than dvips for converting TeX DVI output to PS, you
+may need to add the following line in your LaTeX document:
+@example
+   \\DeclareGraphicsRule@{*@}@{eps@}@{*@}@{@}
+@end example
+
+Each picture you made is in a separate file.  The first picture is in, e.g.,
+figure.0, the second in figure.1, and so on....  To place the third picture in
+your document, for example, all you have to do is:
+@example
+   \\includegraphics@{figure.2@} % LaTeX
+   \\epsfbox@{figure.2@}         % plainTeX
+
+@end example
+
+The advantage, if any, of the mp terminal over a postscript terminal is
+editable output.  Considerable effort went into making this output as clean as
+possible.  For those knowledgeable in the Metapost language, the default line
+types and colors can be changed by editing the arrays `lt[]` and `col[]`.
+The choice of solid vs dashed lines, and color vs black lines can be change by
+changing the values assigned to the booleans `dashedlines` and `colorlines`.
+If the default `tex` option was in effect, global changes to the text of
+labels can be achieved by editing the `vebatimtex...etex` block.  In
+particular, a LaTeX preamble can be added if desired, and then LaTeX's
+built-in size changing commands can be used for maximum flexibility. Be sure
+to set the appropriate MP configuration variable to force Metapost to run
+LaTeX instead of plainTeX."
+
+@node mgr, mif, mp, terminal
+@subsubsection mgr
+
+@c ?commands set terminal mgr
+@c ?set terminal mgr
+@c ?set term mgr
+@c ?terminal mgr
+@c ?term mgr
+@cindex mgr
+@tmindex mgr
+
+
+The `mgr` terminal driver supports the Mgr Window system.  It has no options."
+
+@node mif, pbm, mgr, terminal
 @subsubsection mif
 
 @c ?commands set terminal mif
@@ -9257,7 +9694,7 @@ has to do with plot scaling.  The defaults are `hacktext` and `nounit`."
 The `qms` terminal driver supports the QMS/QUIC Laser printer, the Talaris
 1200 and others.  It has no options."
 
-@node regis, sun, qms, terminal
+@node regis, rgip, qms, terminal
 @subsubsection regis
 
 @c ?commands set terminal regis
@@ -9278,7 +9715,51 @@ Syntax:
 
 @end example
 
-@node sun, tek410x, regis, terminal
+@node rgip, sun, regis, terminal
+@subsubsection rgip
+
+@c ?commands set terminal rgip
+@c ?set terminal rgip
+@c ?set term rgip
+@c ?terminal rgip
+@c ?term rgip
+@cindex rgip
+@tmindex rgip
+
+
+@c ?commands set terminal uniplex
+@c ?set terminal uniplex
+@c ?set term uniplex
+@c ?terminal uniplex
+@c ?term uniplex
+@cindex uniplex
+@tmindex uniplex
+
+
+The `rgip` and `uniplex` terminal drivers support RGIP metafiles.  They can
+combine several graphs on a single page, but only one page is allowed in a
+given output file.
+
+Syntax:
+@example
+      set terminal rgip | uniplex @{portrait | landscape@}
+                                  @{[<horiz>,<vert>]@} @{<fontsize>@}
+
+@end example
+
+permissible values for the font size are in the range 1--8, with the default
+being 1.  The default layout is landscape.  Graphs are placed on the page in
+a `horiz`x`vert` grid, which defaults to [1,1].
+
+Example:
+@example
+      set terminal uniplex portrait [2,3]
+
+@end example
+
+puts six graphs on a page in three rows of two in portrait orientation."
+
+@node sun, tek410x, rgip, terminal
 @subsubsection sun
 
 @c ?commands set terminal sun
@@ -9570,7 +10051,7 @@ coordinates of the midpoint are only filled for logarithmic axes.
 
 The current version of `tkcanvas` supports neither @ref{multiplot} nor @ref{replot}."
 
-@node tpic, x11, tkcanvas, terminal
+@node tpic, unixpc, tkcanvas, terminal
 @subsubsection tpic
 
 @c ?commands set terminal tpic
@@ -9627,7 +10108,55 @@ The other label -- account for long ticlabels:
 
 @end example
 
-@node x11, xlib, tpic, terminal
+@node unixpc, unixplot_, tpic, terminal
+@subsubsection unixpc
+
+@c ?commands set terminal unixpc
+@c ?set terminal unixpc
+@c ?set term unixpc
+@c ?terminal unixpc
+@c ?term unixpc
+@cindex unixpc
+@tmindex unixpc
+
+
+The `unixpc` terminal driver supports AT&T 3b1 and AT&T 7300 Unix PC.  It has
+no options."
+
+@node unixplot_, vx384, unixpc, terminal
+@subsubsection unixplot
+
+@c ?comands set terminal unixplot
+@c ?set terminal unixplot
+@c ?set term unixplot
+@c ?terminal unixplot
+@c ?term unixplot
+@cindex unixplot
+@tmindex unixplot
+
+
+The `unixplot` terminal driver generates output in the Unix "plot" graphics
+language.  It has no options.
+
+This terminal cannot be compiled if the GNU version of plot is to be used;
+in that case, use the `gnugraph` terminal instead."
+
+@node vx384, x11, unixplot_, terminal
+@subsubsection vx384
+
+@c ?commands set terminal vx384
+@c ?set terminal vx384
+@c ?set term vx384
+@c ?terminal vx384
+@c ?term vx384
+@cindex vx384
+@tmindex vx384
+
+
+The `vx384` terminal driver supports the Vectrix 384 and Tandy color
+printers.  It has no options."
+
+@node x11, xlib, vx384, terminal
 @subsubsection x11
 
 @c ?commands set terminal x11
@@ -10578,6 +11107,10 @@ See also the `set format` command.
 @c ?commands show xrange
 @c ?set xrange
 @c ?show xrange
+@cindex writeback
+
+@cindex restore
+
 @cindex xrange
 @opindex xrange
 
@@ -10588,7 +11121,8 @@ polar radius r and the parametric variables t, u, and v.
 
 Syntax:
 @example
-      set xrange [@{@{<min>@}:@{<max>@}@}] @{@{no@}reverse@} @{@{no@}writeback@}
+      set xrange @{ [@{@{<min>@}:@{<max>@}@}] @{@{no@}reverse@} @{@{no@}writeback@} @}
+                 | restore
       show xrange
 
 @end example
@@ -10610,13 +11144,14 @@ The `writeback` option essentially saves the range found by @ref{autoscale} in
 the buffers that would be filled by @ref{xrange}.  This is useful if you wish
 to plot several functions together but have the range determined by only
 some of them.  The `writeback` operation is performed during the @ref{plot}
-execution, so it must be specified before that command.  For example,
+execution, so it must be specified before that command.  To restore,
+the last saved horizontal range use `set xrange restore`.  For example,
 
 @example
       set xrange [-10:10]
       set yrange [] writeback
       plot sin(x)
-      set noautoscale y
+      set yrange restore
       replot x/2
 
 @end example

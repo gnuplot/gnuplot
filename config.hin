@@ -312,3 +312,6 @@
 /*  Define if you want to have mouse support for the x11 terminal.  */
 #undef USE_MOUSE
 
+/*  Define if you want to use the experimental Enhanced Metafile Format driver.  */
+#undef USE_EMF_DRIVER
+
