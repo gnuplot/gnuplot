@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot.c,v 1.30 2000/02/11 19:18:11 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot.c,v 1.31 2000/03/28 21:28:34 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - plot.c */
@@ -341,6 +341,7 @@ char **argv;
      * It is used to parse a 'gnuplot' specific section in '~/.inputrc' */
     rl_readline_name = "Gnuplot";
     rl_complete_with_tilde_expansion = 1;
+    rl_terminal_name = getenv("TERM");
 #endif
 
 #ifdef X11
