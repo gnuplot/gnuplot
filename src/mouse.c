@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.43 2003/07/22 19:34:42 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.44 2003/07/27 22:28:36 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -2003,12 +2003,12 @@ bind_display(char *lhs)
 	/* display all bindings */
 	char fmt[] = " %-17s  %s\n";
 	fprintf(stderr, "\n");
-	fprintf(stderr, fmt, "<B1>",
+	fprintf(stderr, fmt, "2x<B1>",
 		"print coordinates to clipboard using `clipboardformat`\n                    (see keys '3', '4')");
 	fprintf(stderr, fmt, "<B2>", "annotate the graph using `mouseformat` (see keys '1', '2')");
 	fprintf(stderr, fmt, "", "or draw labels if `set mouse labels is on`");
 	fprintf(stderr, fmt, "<Ctrl-B2>", "remove label close to pointer if `set mouse labels` is on");
-	fprintf(stderr, fmt, "<B3>", "mark zoom region (only for 2d-plots).");
+	fprintf(stderr, fmt, "<B3>", "mark zoom region (only for 2d-plots and maps).");
 	fprintf(stderr, fmt, "<B1-Motion>", "change view (rotation). Use <ctrl> to rotate the axes only.");
 	fprintf(stderr, fmt, "<B2-Motion>", "change view (scaling). Use <ctrl> to scale the axes only.");
 	fprintf(stderr, fmt, "<Shift-B2-Motion>", "vertical motion -- change ticslevel");
