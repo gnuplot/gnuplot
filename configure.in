@@ -167,7 +167,7 @@ AC_CHECK_HEADERS(sys/systeminfo.h, AC_CHECK_FUNCS(sysinfo))
 AC_CHECK_HEADER(sys/types.h, , AC_DEFINE(NO_SYS_TYPES_H))
 AC_CHECK_HEADERS(sys/utsname.h)
 AC_CHECK_HEADERS(libc.h malloc.h)
-AC_CHECK_HEADERS(termios.h, ,AC_CHECK_HEADERS(sgtty.h))
+AC_CHECK_HEADERS(termios.h sgtty.h)
 dnl
 dnl check if unistd actually declares anything. On NeXT 3.2 unistd is
 dnl conditionalized for _POSIX_SOURCE
@@ -198,7 +198,7 @@ dnl math lib is already available, see operating systems part
 AC_CHECK_FUNCS(erf)
 AC_CHECK_FUNC(lgamma,AC_DEFINE(HAVE_LGAMMA),AC_CHECK_FUNCS(gamma))
 
-AC_CHECK_FUNCS(getcwd snprintf sleep tcgetattr)
+AC_CHECK_FUNCS(getcwd sleep snprintf tcgetattr)
 AC_CHECK_FUNC(popen,AC_CHECK_FUNC(pclose,AC_DEFINE(PIPES)))
 AC_CHECK_FUNC(strncasecmp,AC_DEFINE(HAVE_STRNCASECMP),AC_CHECK_FUNCS(strnicmp))
 
@@ -213,7 +213,7 @@ fi
 dnl Need two pairs of square brackets because m4 strips out one pair.
 dnl There is a space and a tab between the square brackets.
 if test ."$gp_cv_prog_make_termlibs" != "."; then
-  TERMLIBS="`echo $gp_cv_prog_make_termlibs | sed 's/-l[[^     ]]*//g'`"
+  TERMLIBS="`echo $gp_cv_prog_make_termlibs | sed 's/-l[[^ 	]]*//g'`"
 fi
 
 dnl check for installed linux vgalib
