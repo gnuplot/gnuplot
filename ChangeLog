@@ -1,3 +1,8 @@
+2004-10-28  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/datafile.c (df_open): initialize_user_spec() is needed whether or
+	not the input mode is binary. Fixes bug reported under Windows.
+
 2004-10-27  Ethan Merritt  <merritt@u.washington.edu>
 
 	String variables - extra features

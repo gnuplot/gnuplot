@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.62 2004/10/15 18:08:56 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.63 2004/10/26 04:30:51 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -974,7 +974,6 @@ df_read_matrix(int *rows, int *cols)
 #endif
 
 
-#ifdef BINARY_DATA_FILE
 static void
 initialize_use_spec()
 {
@@ -992,7 +991,6 @@ initialize_use_spec()
 	df_axis[i] = -1; /* no timefmt for this output column */
     }
 }
-#endif
 
 
 #ifdef BINARY_DATA_FILE
@@ -1036,9 +1034,7 @@ df_open(int max_using)
     df_no_tic_specs = 0;
 #endif
 
-#ifdef BINARY_DATA_FILE
     initialize_use_spec();
-#endif
 
     df_datum = -1;		/* it will be preincremented before use */
     df_line_number = 0;		/* ditto */
