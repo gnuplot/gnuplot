@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.47 2002/08/30 18:45:45 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.48 2002/09/05 19:42:49 joze Exp $"); }
 #endif
 
 /* GNUPLOT - gplt_x11.c */
@@ -3858,13 +3858,17 @@ char *fontname;
     if (!font) {
 	/* EAM 19-Aug-2002 Try to construct a plausible X11 full font spec */
 	/* We are passed "font<,size><,slant>"                             */
-	char fontspec[128], shortname[32], *fontencoding, slant;
+	char fontspec[128], shortname[64], *fontencoding, slant;
 	int  fontsize, sep;
 	sep = strcspn(fontname,",");
+	if (sep >= sizeof(shortname))
+	    sep = sizeof(shortname) - 1;
 	strncpy(shortname,fontname,sep);
 	shortname[sep] = '\0';
 	fontsize = 12;		/* FIXME EAM - is there a better default? */
 	sscanf( &(fontname[sep+1]),"%d",&fontsize);
+	if (fontsize > 99 || fontsize < 1)
+	    fontsize = 12;
 	   
 	slant = strstr(&fontname[sep+1],"italic")  ? 'i' :
 		strstr(&fontname[sep+1],"oblique") ? 'o' :
@@ -3880,7 +3884,7 @@ char *fontname;
 		encoding == S_ENC_ISO8859_2 ? "iso8859-2" :
 		"*-*" ) ;
 
-	snprintf(fontspec, sizeof(fontspec), "-*-%s-*-%c-*-*-%d-*-*-*-*-*-%s",
+	sprintf(fontspec, "-*-%s-*-%c-*-*-%d-*-*-*-*-*-%s",
 		shortname, slant, fontsize, fontencoding
 		);
 	font = XLoadQueryFont(dpy, fontspec);
@@ -3888,28 +3892,28 @@ char *fontname;
 	if (!font) {
 	    /* Try to decode some common PostScript font names */
 	    if (!strcmp("Times-Bold",shortname) || !strcmp("times-bold",shortname)) {
-		snprintf(fontspec, sizeof(fontspec), 
+		sprintf(fontspec,
 			"-*-times-bold-r-*-*-%d-*-*-*-*-*-%s", fontsize, fontencoding);
 	    } else if (!strcmp("Times-Roman",shortname) || !strcmp("times-roman",shortname)) {
-		snprintf(fontspec, sizeof(fontspec), 
+		sprintf(fontspec,
 			"-*-times-medium-r-*-*-%d-*-*-*-*-*-%s", fontsize, fontencoding);
 	    } else if (!strcmp("Times-Italic",shortname) || !strcmp("times-italic",shortname)) {
-		snprintf(fontspec, sizeof(fontspec), 
+		sprintf(fontspec,
 			"-*-times-medium-i-*-*-%d-*-*-*-*-*-%s", fontsize, fontencoding);
 	    } else if (!strcmp("Times-BoldItalic",shortname) || !strcmp("times-bolditalic",shortname)) {
-		snprintf(fontspec, sizeof(fontspec), 
+		sprintf(fontspec,
 			"-*-times-bold-i-*-*-%d-*-*-*-*-*-%s", fontsize, fontencoding);
 	    } else if (!strcmp("Helvetica-Bold",shortname) || !strcmp("helvetica-bold",shortname)) {
-		snprintf(fontspec, sizeof(fontspec), 
+		sprintf(fontspec,
 			"-*-helvetica-bold-r-*-*-%d-*-*-*-*-*-%s", fontsize, fontencoding);
 	    } else if (!strcmp("Helvetica-Oblique",shortname) || !strcmp("helvetica-oblique",shortname)) {
-		snprintf(fontspec, sizeof(fontspec), 
+		sprintf(fontspec,
 			"-*-helvetica-medium-o-*-*-%d-*-*-*-*-*-%s", fontsize, fontencoding);
 	    } else if (!strcmp("Helvetica-BoldOblique",shortname) || !strcmp("helvetica-boldoblique",shortname)) {
-		snprintf(fontspec, sizeof(fontspec), 
+		sprintf(fontspec,
 			"-*-helvetica-bold-o-*-*-%d-*-*-*-*-*-%s", fontsize, fontencoding);
 	    } else if (!strcmp("Helvetica-Narrow-Bold",shortname) || !strcmp("helvetica-narrow-bold",shortname)) {
-		snprintf(fontspec, sizeof(fontspec), 
+		sprintf(fontspec,
 			"-*-arial narrow-bold-r-*-*-%d-*-*-*-*-*-%s", fontsize, fontencoding);
 	    }
 	    font = XLoadQueryFont(dpy, fontspec);
