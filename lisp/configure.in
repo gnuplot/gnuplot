@@ -1,7 +1,7 @@
 # $HEader$
 
 AC_INIT(dot.el)
-AC_PREREQ(2.13)
+AC_PREREQ(2.52)
 
 PACKAGE=gnuplot-mode
 GPM_MAJOR=0
