@@ -32,9 +32,6 @@
 /* Define if the type in arguments 2-4 to select() is fd_set.  */
 #undef SELECT_FD_SET_CAST
 
-/* Define if you are using the GNU readline library.  */
-#undef HAVE_LIBREADLINE
-
 /* Define if your libplot.a is from GNU plotutils.  */
 #undef GNU_PLOTUTILS
 
@@ -52,6 +49,9 @@
 
 /* Define if you have the png library.  */
 #undef HAVE_LIBPNG
+
+/* Define if you are using the GNU readline library.  */
+#undef HAVE_LIBREADLINE
 
 /* Define if you want to use the IRIS terminal on IRIS4D series computers.  */
 #undef IRIS
@@ -88,9 +88,6 @@
 
 /* Define if you want to use the standard Unix plot library.  */
 #undef UNIXPLOT
-
-/* Define if you want to use the system time routines.  */
-#undef USE_SYSTEM_TIME
 
 /* Define to the version of the distribution.  */
 #undef VERSION
