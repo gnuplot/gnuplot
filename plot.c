@@ -89,6 +89,10 @@ extern char *rl_readline_name;
 extern int rl_complete_with_tilde_expansion;
 #endif
 
+#ifdef X11
+extern int X11_args __PROTO((int, char **));
+#endif
+
 /* patch to get home dir, see command.c */
 #if (defined (__TURBOC__) && (defined (MSDOS) || defined(DOS386))) || defined(DJGPP)
 # include <dir.h>		/* MAXPATH */
@@ -332,7 +336,6 @@ char **argv;
 
 #ifdef X11
     {
-	extern int X11_args __PROTO((int argc, char *argv[]));
 	int n = X11_args(argc, argv);
 	argv += n;
 	argc -= n;
