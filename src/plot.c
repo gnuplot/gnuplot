@@ -766,17 +766,18 @@ static void get_user_env ()
 /* expand tilde in path
  * path cannot be a static array!
  */
-void gp_expand_tilde (pathp, pathsize)
+void gp_expand_tilde (pathp)
 char **pathp;
-size_t pathsize;
 {
+    if (!*pathp)
+	int_error (NO_CARET, "Cannot expand empty path");
+
     if ((*pathp)[0] == '~' && (*pathp)[1] == DIRSEP1) {
 
 	if (user_homedir) {
 	    size_t n = strlen(*pathp);
 
-	    if (n + strlen(user_homedir) >= pathsize)
-		*pathp = gp_realloc (*pathp, n - 1 + strlen(user_homedir), "tilde expanded path");
+	    *pathp = gp_realloc (*pathp, n - 1 + strlen(user_homedir), "tilde expansion");
 
 	    /* include null at end ... */
 	    memmove (*pathp + strlen(user_homedir) - 1, *pathp, n+1);
