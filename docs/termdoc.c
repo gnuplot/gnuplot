@@ -185,6 +185,25 @@ FILE *fp;
 }
 
 
+/* Safe, '\0'-terminated version of strncpy()
+ * safe_strncpy(dest, src, n), where n = sizeof(dest)
+ * This is basically the old fit.c(copy_max) function
+ */
+
+char *safe_strncpy(d, s, n)
+char *d, *s;
+size_t n;
+{
+    char *ret;
+
+    ret = strncpy(d, s, n);
+    if (strlen(s) >= n)
+        d[n-1] = NUL;
+
+    return ret;
+}
+
+
 #ifdef TEST_TERMDOC
 int main()
 {
