@@ -1,4 +1,4 @@
-2003-07-27  Ethan Merritt <merritt@u.washington.edu>
+2003-07-31  Ethan Merritt <merritt@u.washington.edu>
 
 	* src/gplt_x11.c:  Fix incorrect bracketing of switch statement entries
 	introduced way back in Dec 2000. This fixes the "x11 clipboard" bug.
