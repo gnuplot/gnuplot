@@ -1,5 +1,5 @@
 /*
- * $Id: metapost.trm,v 1.11 2000/10/31 19:59:32 joze Exp $
+ * $Id: metapost.trm,v 1.12 2002/05/22 11:37:53 lhecking Exp $
  */
 
 /* GNUPLOT - metapost.trm */
@@ -54,6 +54,15 @@
  * 	 	L Srinivasa Mohan <mohan@chemeng.iisc.ernet.in>
  */
 
+/* FIXME: pm3d support by Arun Persaud <apersaud@lbl.gov>
+ It seems to be working quite well, but there is one bug which I haven't 
+been able to fix: the colored box drawn next to the figure has the tics 
+and the text colored in the `highest' color of the palette (white for 
+gray images, yellow for default colored ones). I guess there should be a 
+call to term->set_color somewhere before the tics are made and the text 
+is written, but I couldn't figure out where should go...perhaps you can 
+help me on this one...
+ */
 #include "driver.h"
 
 #ifdef TERM_REGISTER
@@ -79,9 +88,17 @@ TERM_PUBLIC int MP_justify_text __PROTO((enum JUSTIFY mode));
 TERM_PUBLIC int MP_text_angle __PROTO((int ang));
 TERM_PUBLIC void MP_reset __PROTO((void));
 TERM_PUBLIC int MP_set_font __PROTO((const char *font));
-TERM_PUBLIC void MP_boxfill __PROTO((int style,
-				     unsigned int x1, unsigned int y1,
-				     unsigned int width, unsigned int height));
+TERM_PUBLIC void MP_boxfill __PROTO((int style, unsigned int x1,
+				     unsigned int y1, unsigned int width,
+				     unsigned int height));
+#ifdef PM3D
+TERM_PUBLIC int MP_make_palette __PROTO((t_sm_palette *));
+TERM_PUBLIC void MP_previous_palette __PROTO((void));
+TERM_PUBLIC void MP_set_color __PROTO((double));
+TERM_PUBLIC void MP_filled_polygon __PROTO((int, gpiPoint *));
+
+#include "getcolor.h"
+#endif /* PM3D */
 
 /* 5 inches wide by 3 inches high (default) */
 #define MP_XSIZE 5.0
@@ -178,8 +195,7 @@ enum MP_id {
     MP_OPT_MAGNIFICATION, MP_OPT_OTHER
 };
 
-static struct gen_table MP_opts[] = 
-{
+static struct gen_table MP_opts[] = {
     { "mo$nochrome", MP_OPT_MONOCHROME },
     { "c$olor", MP_OPT_COLOUR },
     { "c$olour", MP_OPT_COLOUR },
@@ -208,14 +224,14 @@ MP_options()
     MP_solid = FALSE;
     MP_tex = MP_TEX;
     MP_a4paper = 0;
-    MP_psnfss  = MP_PSNFSS_NONE;
+    MP_psnfss = MP_PSNFSS_NONE;
     MP_fontsize = 10.0;
     MP_textmag = 1.0;
     strcpy(MP_fontname, "cmr10");
     strcpy(default_font, "");	/* output file will store default font info */
 
     while (!END_OF_COMMAND) {
-	switch(lookup_table(&MP_opts[0],c_token)) {
+	switch (lookup_table(&MP_opts[0], c_token)) {
 	case MP_OPT_MONOCHROME:
 	    MP_color = FALSE;
 	    c_token++;
@@ -242,7 +258,7 @@ MP_options()
 	    c_token++;
 	    break;
 	case MP_OPT_LATEX:
-	    MP_tex= MP_LATEX;
+	    MP_tex = MP_LATEX;
 	    c_token++;
 	    break;
 	case MP_OPT_A4PAPER:
@@ -266,9 +282,10 @@ MP_options()
 	    break;
 	case MP_OPT_PROLOGUES:
 	    c_token++;
-	    if(!(END_OF_COMMAND)) {
+	    if (!(END_OF_COMMAND)) {
 		int dummy_for_prologues;
-		if(sscanf(&(input_line[token[c_token].start_index]), "%d", &dummy_for_prologues) == 1) {
+		if (sscanf(&(input_line[token[c_token].start_index]),
+			   "%d", &dummy_for_prologues) == 1) {
 		    MP_prologues = dummy_for_prologues;
 		}
 		c_token++;
@@ -280,13 +297,13 @@ MP_options()
 	    break;
 	case MP_OPT_MAGNIFICATION:
 	    c_token++;
-	    if (!END_OF_COMMAND) /* global text scaling */
+	    if (!END_OF_COMMAND)	/* global text scaling */
 		MP_textmag = (double) real(const_express(&a));
-	    /* c_token++; */ /* Needed ??? */
+/* c_token++; *//* Needed ??? */
 	    break;
 	case MP_OPT_OTHER:
 	default:
-	    if (isstring(c_token)) {		/* font name */
+	    if (isstring(c_token)) {	/* font name */
 		quote_str(MP_fontname, c_token, MAX_ID_LEN);
 		c_token++;
 	    }
@@ -305,7 +322,7 @@ MP_options()
 	MP_fontsize = 99.99;
 
     term->v_char = (unsigned int) (MP_DPI * MP_fontsize * MP_textmag * 11 / 720);
-    if (MP_tex == MP_NO_TEX) {		/* Courier is a little wider than cmtt */
+    if (MP_tex == MP_NO_TEX) {	/* Courier is a little wider than cmtt */
 	term->h_char = (unsigned int) (MP_DPI * MP_fontsize * MP_textmag * 6.0 / 720 + 0.5);
     } else {
 	term->h_char = (unsigned int) (MP_DPI * MP_fontsize * MP_textmag * 5.3 / 720 + 0.5);
@@ -324,7 +341,7 @@ MP_init()
     time(&now);
     MP_posx = MP_posy = 0;
     fprintf(gpoutfile, "%%GNUPLOT Metapost output: %s\n", asctime(localtime(&now)));
-    if(MP_prologues > -1) {
+    if (MP_prologues > -1) {
 	fprintf(gpoutfile, "prologues:=%d;\n", MP_prologues);
     }
     if (MP_tex == MP_LATEX) {
@@ -337,32 +354,33 @@ MP_init()
 \n\
 % BEGPRE\n\
 \\verbatimtex\n", gpoutfile);
-	if(MP_a4paper) {
-	  fputs("\\documentclass[a4paper]{article}\n", gpoutfile);
+	if (MP_a4paper) {
+	    fputs("\\documentclass[a4paper]{article}\n", gpoutfile);
 	} else {
-	  fputs("\\documentclass{article}\n", gpoutfile);
+	    fputs("\\documentclass{article}\n", gpoutfile);
 	}
-	switch(MP_psnfss) {
-	  case MP_PSNFSS_7: {
-            fputs("\\usepackage[latin1]{inputenc}\n\
+	switch (MP_psnfss) {
+	case MP_PSNFSS_7:{
+		fputs("\\usepackage[latin1]{inputenc}\n\
 \\usepackage[T1]{fontenc}\n\
 \\usepackage{times,mathptmx}\n\
 \\usepackage{helvet}\n\
 \\usepackage{courier}\n", gpoutfile);
-	  } break;
-	  case MP_PSNFSS_8: {
-	    fputs("\\usepackage[latin1]{inputenc}\n\
+	    }
+	    break;
+	case MP_PSNFSS_8:{
+		fputs("\\usepackage[latin1]{inputenc}\n\
 \\usepackage[T1]{fontenc}\n\
 \\usepackage{textcomp}\n\
 \\usepackage{mathptmx}\n\
 \\usepackage[scaled=.92]{helvet}\n\
 \\usepackage{courier}\n\
 \\usepackage{latexsym}\n", gpoutfile);
-	  } break;
+	    }
+	    break;
 	}
 	fputs("\\begin{document}\n\
-etex\n% ENDPRE\n",
-              gpoutfile);
+etex\n% ENDPRE\n", gpoutfile);
     }
 
     fputs("\n\
@@ -375,8 +393,7 @@ linejoin:=mitered;\n\
 \n\
 def scalepen expr n = pickup pencircle scaled (n*th) enddef;\n\
 def ptsize expr n = mpt:=n*defaultmpt enddef;\n\
-\n",
-	  gpoutfile);
+\n", gpoutfile);
 
     fprintf(gpoutfile, "\ntextmag:=%6.3f;\n", MP_textmag);
 
@@ -390,16 +407,14 @@ enddef;\n\
 \n\
 def infontsize(expr str, size) =\n\
   infont str scaled (size / fontsize str)\n\
-enddef;\n",
-	  gpoutfile);
+enddef;\n", gpoutfile);
 
     if (MP_tex == MP_NO_TEX) {
 	fprintf(gpoutfile, "\n\
 defaultfont:= \"%s\";\n\
-defaultscale := %6.3f/fontsize defaultfont;\n",
-		MP_fontname, MP_fontsize);
+defaultscale := %6.3f/fontsize defaultfont;\n", MP_fontname, MP_fontsize);
     } else {
-	if(MP_tex != MP_LATEX) {
+	if (MP_tex != MP_LATEX) {
 	    fputs("\n\
 %font changes\n\
 verbatimtex\n\
@@ -412,8 +427,7 @@ verbatimtex\n\
     }
     fputs("\n\
 color currentcolor; currentcolor=black;\n\
-boolean colorlines,dashedlines;\n",
-	  gpoutfile);
+boolean colorlines,dashedlines;\n", gpoutfile);
     if (MP_color) {
 	fputs("colorlines:=true;\n", gpoutfile);
     } else {
@@ -497,8 +511,7 @@ def put_text(expr pic, x, y, r, j) =\n\
     fi\n\
     rotated if r > 0: 90 else: 0 fi;\n\
   draw GPtext shifted (x,y)\n\
-enddef;\n",
-	  gpoutfile);
+enddef;\n", gpoutfile);
 }
 
 TERM_PUBLIC void
@@ -511,11 +524,12 @@ MP_graphics()
     fprintf(gpoutfile, "\nbeginfig(%d);\nw:=%.3fin;h:=%.3fin;\n",
 	    MP_char_code, MP_xsize, MP_ysize);
     /* MetaPost can only handle numbers up to 4096. When MP_DPI
-       is larger than 819, this is exceeded by (term->xmax). So we
-       scale it and all coordinates down by factor of 10.0. And
-       compensate by scaling a and b up.
-    */
-    fprintf(gpoutfile, "a:=w/%.1f;b:=h/%.1f;\n", (term->xmax)/10.0, (term->ymax)/10.0);
+     * is larger than 819, this is exceeded by (term->xmax). So we
+     * scale it and all coordinates down by factor of 10.0. And
+     * compensate by scaling a and b up.
+     */
+    fprintf(gpoutfile, "a:=w/%.1f;b:=h/%.1f;\n",
+	    (term->xmax) / 10.0, (term->ymax) / 10.0);
     fprintf(gpoutfile, "scalepen 1; ptsize %.3f;linetype -2;\n", pointsize);
     MP_char_code++;
 }
@@ -529,8 +543,7 @@ MP_text()
 }
 
 TERM_PUBLIC void
-MP_linetype(lt)
-int lt;
+MP_linetype(int lt)
 {
     int linetype = lt;
     if (linetype >= MP_LINE_TYPES)
@@ -544,9 +557,7 @@ int lt;
 }
 
 TERM_PUBLIC void
-MP_move(x, y)
-unsigned int x;
-unsigned int y;
+MP_move(unsigned int x, unsigned int y)
 {
     if ((x != MP_posx) || (y != MP_posy)) {
 	if (MP_inline)
@@ -557,10 +568,7 @@ unsigned int y;
 }
 
 TERM_PUBLIC void
-MP_point(x, y, pt)
-unsigned int x;
-unsigned int y;
-int pt;
+MP_point(unsigned int x, unsigned int y, int pt)
 {
     int pointtype = pt;
     if (MP_inline)
@@ -572,12 +580,11 @@ int pt;
     if (pointtype >= MP_POINT_TYPES)
 	pointtype %= MP_POINT_TYPES;
 /* Change %d to %f, divide x,y by 10 */
-    fprintf(gpoutfile, "gpdraw(%d,%.1fa,%.1fb);\n", pointtype, x/10.0, y/10.0);
+    fprintf(gpoutfile, "gpdraw(%d,%.1fa,%.1fb);\n", pointtype, x / 10.0, y / 10.0);
 }
 
 TERM_PUBLIC void
-MP_pointsize(ps)
-double ps;
+MP_pointsize(double ps)
 {
     if (MP_oldptsize != ps) {
 	if (MP_inline)
@@ -589,8 +596,7 @@ double ps;
 
 
 TERM_PUBLIC void
-MP_linewidth(lw)
-double lw;
+MP_linewidth(double lw)
 {
     if (MP_oldpen != lw) {
 	if (MP_inline)
@@ -602,9 +608,7 @@ double lw;
 
 
 TERM_PUBLIC void
-MP_vector(ux, uy)
-unsigned int ux;
-unsigned int uy;
+MP_vector(unsigned int ux, unsigned int uy)
 {
     if ((ux == MP_posx) && (uy == MP_posy))
 	return;			/* Zero length line */
@@ -616,12 +620,12 @@ unsigned int uy;
 	}
     } else {
 	MP_inline = TRUE;
-	fprintf(gpoutfile, "draw (%.1fa,%.1fb)", MP_posx/10.0, MP_posy/10.0);
+	fprintf(gpoutfile, "draw (%.1fa,%.1fb)", MP_posx / 10.0, MP_posy / 10.0);
 	MP_linecount = 2;
     }
     MP_posx = ux;
     MP_posy = uy;
-    fprintf(gpoutfile, "--(%.1fa,%.1fb)", MP_posx/10.0, MP_posy/10.0);
+    fprintf(gpoutfile, "--(%.1fa,%.1fb)", MP_posx / 10.0, MP_posy / 10.0);
 }
 
 static void
@@ -632,30 +636,23 @@ MP_endline()
 }
 
 TERM_PUBLIC void
-MP_arrow(sx, sy, ex, ey, head)
-unsigned int sx;
-unsigned int sy;
-unsigned int ex;
-unsigned int ey;
-TBOOLEAN head;
+MP_arrow(unsigned int sx, unsigned int sy, unsigned int ex, unsigned int ey, TBOOLEAN head)
 {
     MP_move(sx, sy);
     if (head) {
 	fprintf(gpoutfile, "drawarrow (%.1fa,%.1fb)--(%.1fa,%.1fb);\n",
-		sx/10.0, sy/10.0, ex/10.0, ey/10.0);
+		sx / 10.0, sy / 10.0, ex / 10.0, ey / 10.0);
     } else if ((sx != ex) || (sy != ey)) {
 	fprintf(gpoutfile, "draw (%.1fa,%.1fb)--(%.1fa,%.1fb);\n",
-		sx/10.0, sy/10.0, ex/10.0, ey/10.0);
-    }				/* else: arrow with no length and no head = sound of one hand clapping? */
+		sx / 10.0, sy / 10.0, ex / 10.0, ey / 10.0);
+    }	/* else: arrow with no length and no head = sound of one hand clapping? */
     MP_posx = ex;
     MP_posy = ey;
 
 }
 
 TERM_PUBLIC void
-MP_put_text(x, y, str)
-unsigned int x, y;
-const char str[];
+MP_put_text(unsigned int x, unsigned int y, const char str[])
 {
     int i, j = 0;
     char *text;
@@ -689,39 +686,39 @@ const char str[];
 	if (MP_fontchanged) {
 	    fprintf(gpoutfile, "\
 put_text(\"%s\" infontsize(\"%s\",%5.2f), %.1fa, %.1fb, %d, %d);\n",
-		    text, MP_fontname, MP_fontsize, x/10.0, y/10.0, MP_ang, j);
+		    text, MP_fontname, MP_fontsize,
+		    x / 10.0, y / 10.0, MP_ang, j);
 	} else {
 	    fprintf(gpoutfile, "put_text(\"%s\", %.1fa, %.1fb, %d, %d);\n",
-		    text, x/10.0, y/10.0, MP_ang, j);
+		    text, x / 10.0, y / 10.0, MP_ang, j);
 	}
     } else if (MP_fontchanged) {
-	if(MP_tex != MP_LATEX) {
+	if (MP_tex != MP_LATEX) {
 	    fprintf(gpoutfile, "\
 put_text( btex \\setfont{%s}{%5.2f} %s etex, %.1fa, %.1fb, %d, %d);\n",
-		MP_fontname, MP_fontsize, text, x/10.0, y/10.0, MP_ang, j);
+		    MP_fontname, MP_fontsize, text,
+		    x / 10.0, y / 10.0, MP_ang, j);
 	} else {
 	    fprintf(gpoutfile, "put_text( btex %s etex, %.1fa, %.1fb, %d, %d);\n",
-		    text, x/10.0, y/10.0, MP_ang, j);
+		    text, x / 10.0, y / 10.0, MP_ang, j);
 	}
     } else {
 	fprintf(gpoutfile, "put_text( btex %s etex, %.1fa, %.1fb, %d, %d);\n",
-		text, x/10.0, y/10.0, MP_ang, j);
+		text, x / 10.0, y / 10.0, MP_ang, j);
     }
 
     free(text);
 }
 
 TERM_PUBLIC int
-MP_justify_text(mode)
-enum JUSTIFY mode;
+MP_justify_text(enum JUSTIFY mode)
 {
     MP_justify = mode;
     return (TRUE);
 }
 
 TERM_PUBLIC int
-MP_text_angle(ang)
-int ang;
+MP_text_angle(int ang)
 {
     /* Metapost code does the conversion */
     MP_ang = ang;
@@ -729,8 +726,7 @@ int ang;
 }
 
 TERM_PUBLIC int
-MP_set_font(font)
-const char *font;
+MP_set_font(const char *font)
 {
     if (*font) {
 	size_t sep = strcspn(font, ",");
@@ -767,9 +763,60 @@ unsigned int x1, y1, wd, ht;
     if (sty <= 0)
 	fprintf(gpoutfile, "\
 fill (%.1fa,%.1fb)--(%.1fa,%.1fb)--(%.1fa,%.1fb)--(%.1fa,%.1fb)--cycle withcolor background;\n",
-		x1/10.0, y1/10.0, (x1 + wd)/10.0, y1/10.0, (x1 + wd)/10.0, (y1 +
-  ht)/10.0, x1/10.0, (y1 + ht)/10.0);
+		x1 / 10.0, y1 / 10.0, (x1 + wd) / 10.0, y1 / 10.0,
+		(x1 + wd) / 10.0, (y1 + ht) / 10.0, x1 / 10.0,
+		(y1 + ht) / 10.0);
 }
+
+#ifdef PM3D
+
+TERM_PUBLIC int
+MP_make_palette(t_sm_palette *palette)
+{
+    /* metapost can do continous number of colours */
+    return 0;
+}
+
+
+TERM_PUBLIC void
+MP_set_color(double gray)
+{
+    if (MP_inline)
+	MP_endline();
+
+    if (!MP_color) {		/* gray mode */
+	fprintf(gpoutfile, "currentcolor:=%3fwhite;\n", gray);
+    } else {			/* color mode */
+	fprintf(gpoutfile, "currentcolor:=%4f*red+%4f*green+%4f*blue;\n",
+		GetColorValueFromFormula(sm_palette.formulaR, gray),
+		GetColorValueFromFormula(sm_palette.formulaG, gray),
+		GetColorValueFromFormula(sm_palette.formulaB, gray));
+    }
+    return;
+}
+
+TERM_PUBLIC void
+MP_filled_polygon(int points, gpiPoint *corners)
+{
+    int i;
+
+    if (MP_inline)
+	MP_endline();
+
+    fprintf(gpoutfile, "fill ");
+    for (i = 0; i < points; i++)
+	fprintf(gpoutfile, "(%.1fa,%.1fb)--",
+		corners[i].x / 10.0, corners[i].y / 10.0);
+    fprintf(gpoutfile, "cycle withcolor currentcolor;\n");
+}
+
+TERM_PUBLIC void
+MP_previous_palette(void)
+{
+    return;
+}
+
+#endif /* PM3D */
 
 #endif /* TERM_BODY */
 
@@ -783,12 +830,21 @@ TERM_TABLE_START(mp_driver)
     MP_linetype, MP_put_text, MP_text_angle,
     MP_justify_text, MP_point, MP_arrow, MP_set_font, MP_pointsize,
     0, 0, 0, MP_boxfill, MP_linewidth
-    TERM_TABLE_END(mp_driver)
+#ifdef PM3D
+#ifdef USE_MOUSE
+    , 0, 0, 0, 0, 0		/* no mouse support for postscript */
+#endif
+    , MP_make_palette,
+    MP_previous_palette,	/* write grestore */
+    MP_set_color,
+    MP_filled_polygon
+#endif /* PM3D */
+TERM_TABLE_END(mp_driver)
 #undef LAST_TERM
 #define LAST_TERM mp_driver
 
-#endif /* TERM_TABLE */
-#endif /* TERM_PROTO_ONLY */
+#endif				/* TERM_TABLE */
+#endif				/* TERM_PROTO_ONLY */
 
 #ifdef TERM_HELP
 START_HELP(mp)
@@ -934,4 +990,4 @@ START_HELP(mp)
 " to set the appropriate MP configuration variable to force Metapost to run",
 " LaTeX instead of plainTeX."
 END_HELP(mp)
-#endif /* TERM_HELP */
+#endif				/* TERM_HELP */
