@@ -284,6 +284,7 @@ _linewidth() - sets the linewidth
 The following should illustrate the order in which calls to these
 routines are made:
 
+ _options()
   _init()
     _scale(xs,ys)
     _graphics()
