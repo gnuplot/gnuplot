@@ -1,3 +1,7 @@
+2004-07-18  Ethan Merritt  <merritt@u.washington.edu>
+
+	* term/pdf.trm: Update "Creator: " field to report version 4.1
+
 2004-07-17  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/post.trm (PS_filled_polygon): Remove extraneous gsave
