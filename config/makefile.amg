@@ -1,5 +1,5 @@
 #
-# $Id: makefile.amg,v 1.7 1999/12/01 22:07:56 lhecking Exp $
+# $Id: makefile.amg,v 1.8 2001/12/09 19:04:06 lhecking Exp $
 #
 # GNUPLOT Makefile for SAS/C 6.1 or better on the Amiga
 #
@@ -57,7 +57,7 @@ MATH = MATH=IEEE
 OFLAGS = opt
 
 # Defines; format is def=SYMBOL[=value]
-DEFS = def=AMIGA_SC_6_1 def=ANSI_C def=HAVE_SYS_STAT_H def=HAVE_GETCWD def=HAVE_STRNICMP def=HAVE_VFPRINTF def=PIPES def=GP_INLINE=__inline $(GD_DEF) $(PNG_DEF)
+DEFS = def=AMIGA_SC_6_1 def=HAVE_CONFIG_H def=GP_INLINE=__inline $(GD_DEF) $(PNG_DEF)
 
 # Other options; if you have SAS/C 6.57 or newer, you may wish to disable
 # warning 317
@@ -103,7 +103,7 @@ CFLAGS = $(COPTS) $(CPU) $(MATH) $(OFLAGS) $(DEFS) $(DEBUG) DATA=f
 #.c.oo:
 #	$(CC) $(CFLAGS) code=f objname=$@ $<
 
-all: gnuplot $(DEMODIR)/bf_test docs
+all: config.h gnuplot $(DEMODIR)/bf_test docs
 
 # Normal compilation rule
 .c.o:
@@ -195,13 +195,16 @@ $(DOCDIR)/checkdoc: $(DOCDIR)/checkdoc.c $(DOCDIR)/allterm.h $(DOCDIR)/termdoc.o
 $(DOCDIR)/allterm.h: $(CORETERM)
 	join $(TERMDIR)/\#?.trm as $(DOCDIR)/allterm.h
 
+config.h: /config/config.amg
+	copy $< $@
+
 clean:
 	@-delete $(OBJS) bf_test.o quiet
 	@-delete $(DOCDIR)/\#?.o $(DOCDIR)/\#?.lnk quiet
 
 veryclean: clean
 	@-delete $(DEMODIR)/binary[1-3] $(DEMODIR)/fit.log quiet
-	@-delete bf_test gnuplot $(DOCDIR)/gnuplot.gih $(DOCDIR)/gnuplot.tex $(DOCDIR)/gnuplot.html quiet
+	@-delete bf_test gnuplot config.h $(DOCDIR)/gnuplot.gih $(DOCDIR)/gnuplot.tex $(DOCDIR)/gnuplot.html quiet
 	@-delete $(DOCDIR)/doc2gih $(DOCDIR)/doc2tex $(DOCDIR)/checkdoc quiet
 
 install: gnuplot $(DOCDIR)/gnuplot.gih
