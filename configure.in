@@ -100,25 +100,13 @@ AC_TRY_CPP([#if 0
 #endif],ERRORFIX= AC_MSG_RESULT(yes),ERRORFIX=errorfix AC_MSG_RESULT(no))
 AC_SUBST(ERRORFIX)
 
-
 dnl X Window System files.
-AC_SUBST(X_INCLUDES)
 AC_SUBST(X_LIBRARIES)
 AC_SUBST(GNUPLOT_X11)
 AC_PATH_XTRA
-if test "$no_x" = yes; then
-  X_INCLUDES= X_LIBRARIES= GNUPLOT_X11=
-else
-  if test -n "$x_includes"; then
-    X_INCLUDES="-I$x_includes"
-  fi
-  if test -n "$x_libraries"; then
-    X_LIBRARIES="-L$x_libraries -lX11"
-  else
-    X_LIBRARIES="-lX11"
-  fi
+if test "$no_x" != yes; then
   CPPFLAGS="$CPPFLAGS $X_CFLAGS"
-  X_LIBRARIES="$X_PRE_LIBS $X_LIBRARIES $X_LIBS $X_EXTRA_LIBS"
+  X_LIBRARIES="$X_PRE_LIBS $X_LIBS -lX11 $X_EXTRA_LIBS"
   GNUPLOT_X11=gnuplot_x11
   AC_DEFINE(X11)
 fi
@@ -139,6 +127,7 @@ dnl Header files. ANSI first
 dnl We prefer that the absense of a macro is the norm, so we
 dnl define NO_WHATEVER if an ansi header/fn is missing, but HAVE_SOMETHING
 dnl if it is a non-ansi header/fn we would like to use if available
+AC_HEADER_STDC
 
 dnl check for errno.h header and if it declares errno
 AC_CHECK_HEADER(errno.h, , AC_DEFINE(NO_ERRNO_H))
@@ -201,20 +190,6 @@ gp_FIND_SELECT_ARGTYPES
 
 dnl On SVR3.
 dnl FIXME AC_DEFINE(CRIPPLED_SELECT)
-
-
-dnl Cached variables - required for the library checks below
-if test ."$gp_cv_prog_make_cppflags" != "."; then
-  CPPFLAGS="$gp_cv_prog_make_cppflags"
-fi
-if test ."$gp_cv_prog_make_termlibs" != "."; then
-dnl Temporarily change the quoting character because autoconf
-dnl is using brackets internally.
-  changequote(,)dnl
-dnl There is a space and a tab between the square brackets.
-  TERMLIBS="`echo $gp_cv_prog_make_termlibs | sed 's/-l[^ 	]*//g'`"
-  changequote([,])dnl
-fi
 
 dnl check for installed linux vgalib
 if test "$with_linux_vga" = yes; then
@@ -295,9 +270,6 @@ dnl How do we detect the Ultrix X libraries?
 dnl Or is it really a server (run-time) problem?
 dnl FIXME AC_DEFINE(ULTRIX_KLUDGE)
 
-dnl Cached variables
-AC_CACHE_CHECK(CPPFLAGS,gp_cv_prog_make_cppflags,gp_cv_prog_make_cppflags="$CPPFLAGS")
-AC_CACHE_CHECK(TERMLIBS,gp_cv_prog_make_termlibs,gp_cv_prog_make_termlibs="$TERMLIBS")
 
 dnl Substitute variables
 AC_SUBST(PACKAGE)
@@ -327,7 +299,7 @@ dnl Report configuration
 AC_MSG_RESULT([
 ** Configuration summary for $PACKAGE $VERSION:
 
-  Where is the help file?                    $datadir/gnuplot.gih
+  Where is the help file?           `eval echo $datadir/gnuplot.gih`
 ])
 test "$ac_cv_header_gd_h" = yes && \
   AC_MSG_RESULT([  Enable generation of GIF files.])
