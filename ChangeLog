@@ -1,3 +1,19 @@
+2001-11-29  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* src/datafile.c src/misc.c src/plot2d.c src/plot3d.c: Allow
+	(nearly) any order of options in plot and splot commands. Actually,
+	this "any order" applies separately inside the group of options
+	- for a datafile [see df_open() in datafile.c]
+		every matrix binary index thru using
+	- for plot commands [see plot2d.c]
+		smooth title notitle axes with
+	- for splot commands [see plot3d.c]
+		title notitle with
+
+	* src/tables.h src/tables.c: Comment out plot_tbl[] as (1) it has
+	not been used for 2 years, (2) if used any later, it will have to
+	be split into datafile_tbl[] and plot_tbl[].
+
 2001-11-29  Guillaume Allegre  <Guillaume.Allegre@imag.fr>
 
 	* docs/gnuplot.doc: Fix inconsistency in the document: many examples

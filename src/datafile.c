@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.28 2001/09/16 17:01:14 vanzandt Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.29 2001/11/07 18:50:38 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -527,6 +527,10 @@ int max_using;
     int i;
     int name_token;
 
+    TBOOLEAN duplication = FALSE;
+    TBOOLEAN set_index = FALSE, set_every = FALSE, set_thru = FALSE;
+    TBOOLEAN set_using = FALSE;
+
     fast_columns = 1;		/* corey@cac */
 
     /*{{{  close file if necessary */
@@ -584,48 +588,71 @@ int max_using;
 
     /* defer opening until we have parsed the modifiers... */
 
-    /*{{{  look for binary / matrix */
-    df_binary = df_matrix = FALSE;
-
-    if (almost_equals(c_token, "bin$ary")) {
-	++c_token;
-	df_binary = TRUE;
-	df_matrix = TRUE;
-    } else if (almost_equals(c_token, "mat$rix")) {
-	++c_token;
-	df_matrix = TRUE;
-    }
-    /*}}} */
-
-    /*{{{  deal with index */
-    if (almost_equals(c_token, "i$ndex")) {
-	plot_option_index();
-    }
-    /*}}} */
-
-    /*{{{  deal with every */
-    if (almost_equals(c_token, "ev$ery")) {
-	plot_option_every();
-    }
-    /*}}} */
-
-    /*{{{  deal with thru */
-    /* jev -- support for passing data from file thru user function */
-
-    if (ydata_func.at)
+    if (ydata_func.at) /* something for thru (?) */
 	free(ydata_func.at);
     ydata_func.at = NULL;
 
-    if (almost_equals(c_token, "thru$")) {
-	plot_option_thru();
-    }
-    /*}}} */
+    df_binary = df_matrix = FALSE;
 
-    /*{{{  deal with using */
-    if (almost_equals(c_token, "u$sing")) {
-	plot_option_using(max_using);
+    /* pm 25.11.2001 allow any order of options */
+    while (!END_OF_COMMAND) {
+
+	/* look for binary / matrix */
+    if (almost_equals(c_token, "bin$ary")) {
+	    if (df_matrix) { duplication=TRUE; break; }
+	    c_token++;
+	df_binary = TRUE;
+	df_matrix = TRUE;
+	    continue;
+	}
+	
+	/* deal with matrix */
+	if (almost_equals(c_token, "mat$rix")) {
+	    if (df_matrix) { duplication=TRUE; break; }
+	    c_token++;
+	df_matrix = TRUE;
+	    continue;
     }
-    /*}}} */
+
+	/* deal with index */
+    if (almost_equals(c_token, "i$ndex")) {
+	    if (set_index) { duplication=TRUE; break; }
+	plot_option_index();
+	    set_index = TRUE;
+	    continue;
+    }
+
+	/* deal with every */
+    if (almost_equals(c_token, "ev$ery")) {
+	    if (set_every) { duplication=TRUE; break; }
+	plot_option_every();
+	    set_every = TRUE;
+	    continue;
+    }
+
+	/* deal with thru */
+    /* jev -- support for passing data from file thru user function */
+    if (almost_equals(c_token, "thru$")) {
+	    if (set_thru) { duplication=TRUE; break; }
+	plot_option_thru();
+	    set_thru = TRUE;
+	    continue;
+    }
+
+	/* deal with using */
+    if (almost_equals(c_token, "u$sing")) {
+	    if (set_using) { duplication=TRUE; break; }
+	plot_option_using(max_using);
+	    set_using = TRUE;
+	    continue;
+    }
+
+	break; /* unknown option */
+
+    } /* while (!END_OF_COMMAND) */
+
+    if (duplication)
+	int_error(c_token, "duplicated or contradicting arguments in datafile options");
 
     /*{{{  more variable inits */
     point_count = -1;		/* we preincrement */

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.30 2001/08/27 15:02:14 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.31 2001/11/24 11:30:32 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -503,7 +503,7 @@ lp_parse(lp, allow_ls, allow_point, def_line, def_point)
 	lp->pointflag = allow_point;
 	lp->p_type = def_point;
 	lp->p_size = pointsize; /* as in "set pointsize" */
-	while (1) {
+	while (!END_OF_COMMAND) {
 	    if (almost_equals(c_token, "linet$ype") || equals(c_token, "lt")) {
 		if (set_lt++) break;
 		c_token++;

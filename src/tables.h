@@ -1,5 +1,5 @@
 /*
- * $Id: tables.h,v 1.19 2001/08/22 14:15:34 broeker Exp $
+ * $Id: tables.h,v 1.20 2001/08/27 15:02:14 broeker Exp $
  */
 
 /* GNUPLOT - tables.h */
@@ -137,7 +137,11 @@ enum show_style_id {
 };
 
 extern const struct gen_table command_tbl[];
+/* pm 011129: unused for 2 yers, therefore #if 0 .. #endif; in future should
+ * be split into datafile_tbl and plot_tbl: */
+#if 0
 extern const struct gen_table plot_tbl[];
+#endif
 extern const struct gen_table plot_axes_tbl[];
 extern const struct gen_table plot_smooth_tbl[];
 extern const struct gen_table save_tbl[];

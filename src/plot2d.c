@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.43 2001/08/22 14:15:34 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.44 2001/08/27 15:02:14 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -914,6 +914,10 @@ eval_plots()
 	    /* for datafile plot, record datafile spec for title */
 	    int start_token = c_token, end_token;
 
+	    TBOOLEAN duplication = FALSE;
+	    TBOOLEAN set_smooth = FALSE, set_axes = FALSE, set_title = FALSE;
+	    TBOOLEAN set_with = FALSE;
+
 	    plot_num++;
 
 	    if (isstring(c_token)) {	/* data file to plot */
@@ -967,10 +971,14 @@ eval_plots()
 	    x_axis = FIRST_X_AXIS;
 	    y_axis = FIRST_Y_AXIS;
 
+	    /* pm 25.11.2001 allow any order of options */
+	    while (!END_OF_COMMAND) {
+
 	    /*  deal with smooth */
 	    if (almost_equals(c_token, "s$mooth")) {
-	        int found_token =
-		    lookup_table(plot_smooth_tbl, ++c_token);
+		    int found_token;
+		    if (set_smooth) { duplication=TRUE; break; }
+		    found_token = lookup_table(plot_smooth_tbl, ++c_token);
 
 		switch(found_token) {
 		case SMOOTH_ACSPLINES:
@@ -988,10 +996,13 @@ eval_plots()
 		}
 		this_plot->plot_style = LINES;
 		c_token++;      /* skip format */
+		    set_smooth = TRUE;
+		    continue;
 	    }
 
 	    /* look for axes/axis */
 	    if (almost_equals(c_token, "ax$es") || almost_equals(c_token, "ax$is")) {
+		    if (set_axes) { duplication=TRUE; break; }
 		if (parametric && xparam)
 		    int_error(c_token, "previous parametric function not fully specified");
 
@@ -1022,9 +1033,13 @@ eval_plots()
 		    int_error(c_token, "axes must be x1y1, x1y2, x2y1 or x2y2");
 		    break;
 		}
+		    set_axes = TRUE;
+		    continue;
 	    }
 
+		/* deal with title */
 	    if (almost_equals(c_token, "t$itle")) {
+		    if (set_title) { duplication=TRUE; break; }
 		this_plot->title_no_enhanced = 0; /* can be enhanced */
 		if (parametric) {
 		    if (xparam)
@@ -1039,18 +1054,22 @@ eval_plots()
 		    int_error(c_token, "expecting \"title\" for plot");
 		}
 		c_token++;
-	    } else if (almost_equals(c_token, "not$itle")) {
+		    set_title = TRUE;
+		    continue;
+		}
+
+		if (almost_equals(c_token, "not$itle")) {
+		    if (set_title) { duplication=TRUE; break; }
 		if (xtitle != NULL)
 		    xtitle[0] = '\0';
 		c_token++;
-	    } else {
-		this_plot->title_no_enhanced = 1; /* filename or function cannot be enhanced */
-		m_capture(&(this_plot->title), start_token, end_token);
-		if (xparam)
-		    xtitle = this_plot->title;
+		    set_title = TRUE;
+		    continue;
 	    }
 
+		/* deal with style */
 	    if (almost_equals(c_token, "w$ith")) {
+		    if (set_with) { duplication=TRUE; break; }
 		if (parametric && xparam)
 		    int_error(c_token, "\"with\" allowed only after parametric function fully specified");
 		this_plot->plot_style = get_style();
@@ -1060,15 +1079,41 @@ eval_plots()
 			int_warn(c_token, "This plot style is only for datafiles, reverting to \"points\"");
 			this_plot->plot_style = POINTSTYLE;
 		    }
+		    set_with = TRUE;
+		    continue;
 	    }
 
 	    /* pick up line/point specs
 	     * - point spec allowed if style uses points, ie style&2 != 0
 	     * - keywords for lt and pt are optional
 	     */
-	    lp_parse(&(this_plot->lp_properties), 1,
+		{
+		    int stored_token = c_token;
+
+		    lp_parse(&this_plot->lp_properties, 1,
 		     this_plot->plot_style & PLOT_STYLE_HAS_POINT,
 		     line_num, point_num);
+		    if (stored_token != c_token) {
+			/* the following would be just too restrictive */
+			/* set_line = TRUE; */
+			continue;
+		    }
+		}
+
+		break; /* unknown option */
+
+	    } /* while (!END_OF_COMMAND) */
+
+	    if (duplication)
+		int_error(c_token, "duplicated or contradicting arguments in plot options");
+
+	    /* set default values for title if this has not been specified */
+	    if (!set_title) {
+		this_plot->title_no_enhanced = 1; /* filename or function cannot be enhanced */
+		m_capture(&(this_plot->title), start_token, end_token);
+		if (xparam)
+		    xtitle = this_plot->title;
+	    }
 
 	    /* allow old-style syntax too - ignore case lt 3 4 for example */
 	    if (!equals(c_token, ",") && !END_OF_COMMAND) {

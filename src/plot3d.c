@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.28 2001/08/22 14:15:34 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.29 2001/10/05 16:58:55 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -943,6 +943,9 @@ eval_3dplots()
 	    int specs;
 	    struct surface_points *this_plot;
 
+	    TBOOLEAN duplication = FALSE;
+	    TBOOLEAN set_title = FALSE, set_with = FALSE;
+
 	    if (isstring(c_token)) {	/* data file to plot */
 
 		/*{{{  data file */
@@ -1042,13 +1045,26 @@ eval_3dplots()
 
 	    }			/* end of IS THIS A FILE OR A FUNC block */
 
-
-	    /*{{{  title */
+	    /* clear current title, if exist */
 	    if (this_plot->title) {
 		free(this_plot->title);
 		this_plot->title = NULL;
 	    }
+
+	    /* default line and point types, no palette */
+#ifdef PM3D
+	    this_plot->lp_properties.use_palette = 0;
+#endif
+	    this_plot->lp_properties.l_type = line_num;
+	    this_plot->lp_properties.p_type = point_num;
+
+
+	    /* pm 25.11.2001 allow any order of options */
+	    while (!END_OF_COMMAND) {
+
+		/* deal with title */
 	    if (almost_equals(c_token, "t$itle")) {
+		    if (set_title) { duplication=TRUE; break; }
 		this_plot->title_no_enhanced = 0; /* can be enhanced */
 		if (parametric) {
 		    if (crnt_param != 0)
@@ -1065,33 +1081,26 @@ eval_3dplots()
 		else
 		    int_error(c_token, "expecting \"title\" for plot");
 		/* end of new method */
-		++c_token;
-	    } else if (almost_equals(c_token, "not$itle")) {
+		    c_token++;
+		    set_title = TRUE;
+		    continue;
+		}
+
+		if (almost_equals(c_token, "not$itle")) {
+		    if (set_title) { duplication=TRUE; break; }
 		if (xtitle != NULL)
 		    xtitle[0] = '\0';
 		if (ytitle != NULL)
 		    ytitle[0] = '\0';
 		/*   this_plot->title = NULL;   */
-		++c_token;
-	    } else {
-		this_plot->title_no_enhanced = 1; /* filename or function cannot be enhanced */
-		m_capture(&(this_plot->title), start_token, end_token);
-		if (crnt_param == 2)
-		    xtitle = this_plot->title;
-		else if (crnt_param == 1)
-		    ytitle = this_plot->title;
+		    c_token++;
+		    set_title = TRUE;
+		    continue;
 	    }
-	    /*}}} */
 
-
-	    /*{{{  line types, widths, ... */
-#ifdef PM3D
-	    this_plot->lp_properties.use_palette = 0;
-#endif
-	    this_plot->lp_properties.l_type = line_num;
-	    this_plot->lp_properties.p_type = point_num;
-
+		/* deal with style */
 	    if (almost_equals(c_token, "w$ith")) {
+		    if (set_with) { duplication=TRUE; break; }
 		this_plot->plot_style = get_style();
 	        if ((this_plot->plot_type == FUNC3D)
                     && (this_plot->plot_style & PLOT_STYLE_HAS_ERRORBAR))
@@ -1099,14 +1108,43 @@ eval_3dplots()
                         int_warn(c_token, "This plot style is only for datafiles , reverting to \"points\"");
                         this_plot->plot_style = POINTSTYLE;
                     }
+		    set_with = TRUE;
+		    continue;
 	    }
+
 	    /* pick up line/point specs
 	     * - point spec allowed if style uses points, ie style&2 != 0
 	     * - keywords are optional
 	     */
+		{
+		    int stored_token = c_token;
+
 	    lp_parse(&this_plot->lp_properties, 1,
 		     this_plot->plot_style & PLOT_STYLE_HAS_POINT,
 		     line_num, point_num);
+		    if (stored_token != c_token) {
+			/* the following would be just too restrictive */
+			/* set_line = TRUE; */
+			continue;
+		    }
+		}
+
+		break; /* unknown option */
+
+	    } /* while (!END_OF_COMMAND) */
+
+	    if (duplication)
+		int_error(c_token, "duplicated or contradicting arguments in plot options");
+
+	    /* set default values for title if this has not been specified */
+	    if (!set_title) {
+		this_plot->title_no_enhanced = 1; /* filename or function cannot be enhanced */
+		m_capture(&(this_plot->title), start_token, end_token);
+		if (crnt_param == 2)
+		    xtitle = this_plot->title;
+		else if (crnt_param == 1)
+		    ytitle = this_plot->title;
+	    }
 
 	    /* allow old-style syntax too - ignore case lt 3 4 for example */
 	    if (!equals(c_token, ",") && !END_OF_COMMAND) {
@@ -1126,7 +1164,6 @@ eval_3dplots()
 	    if (crnt_param == 0)
 		line_num += 1 + (draw_contour != 0)
 		    + (hidden3d != 0);
-	    /*}}} */
 
 
 	    /* now get the data... having to think hard here...

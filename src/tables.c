@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: tables.c,v 1.22 2001/08/27 15:02:14 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: tables.c,v 1.23 2001/09/08 00:50:01 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - tables.c */
@@ -88,6 +88,12 @@ const struct gen_ftable command_ftbl[] =
 /* 'plot' and 'splot' */
 /* HBB 990829: unused, yet? */
 /* Lars 991108: yes, because the 'plot' parser is a real bitch :( */
+/* pm 011129: ...and therefore I'm putting it into #if 0 ... #endif.
+ * Anyway, this table can't be used as below because some options
+ * belong to the group of data file options and others to the group
+ * of plot options
+ */
+#if 0
 const struct gen_table plot_tbl[] =
 {
     { "ax$es", P_AXES },
@@ -104,6 +110,7 @@ const struct gen_table plot_tbl[] =
     { "w$ith", P_WITH },
     { NULL, P_INVALID }
 };
+#endif
 
 /* 'plot ax[ei]s' parameter */
 const struct gen_table plot_axes_tbl[] =
