@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: history.c,v 1.5 2000/11/01 18:57:33 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: history.c,v 1.6 2001/02/01 17:56:05 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - history.c */
@@ -33,6 +33,8 @@ static char *RCSid() { return RCSid("$Id: history.c,v 1.5 2000/11/01 18:57:33 br
  * This software is provided "as is" without express or implied warranty
  * to the extent permitted by applicable law.
 ]*/
+
+#include <stdio.h>
 
 #include "gp_hist.h"
 
