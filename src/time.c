@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: time.c,v 1.17 2004/07/01 17:10:08 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: time.c,v 1.18 2004/07/25 12:25:01 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - time.c */
@@ -515,7 +515,7 @@ xstrftime(
 		break;
 
 	    case 'I':
-		FORMAT_STRING(1, 2, tm->tm_hour % 12);	/* %02d */
+		FORMAT_STRING(1, 2, (tm->tm_hour + 11) % 12 + 1); /* %02d */
 		break;
 
 	    case 'j':
@@ -528,7 +528,7 @@ xstrftime(
 		break;
 
 	    case 'l':
-		FORMAT_STRING(0, 2, tm->tm_hour % 12);	/* %2d */
+		FORMAT_STRING(0, 2, (tm->tm_hour + 11) % 12 + 1); /* %2d */
 		break;
 
 	    case 'm':
