@@ -179,6 +179,7 @@
 # ifdef MTOS
 #  define OS "TOS & MiNT & MULTITOS & Magic - "
 # endif /* MTOS */
+# undef HELPFILE
 # define HELPFILE "gnuplot.gih"
 # define HOME "GNUPLOT"
 # define PLOTRC "gnuplot.ini"
