@@ -1,3 +1,10 @@
+1999-10-01  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* fit.c, docs/Makefile.in: Fix typos.
+
+	* term/pslatex.trm(PSLATEX_graphics): Fix segfault when `auxfile'
+	option is not used.
+
 1999-10-01  John Hasstedt  <manager@nuclear.physics.sunysb.edu>
 
 	* 0INSTALL, make_vms.com: Make VMS builds easier and add note
