@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.34 2002/03/18 18:19:10 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.35 2002/03/26 20:31:04 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - hidden3d.c */
@@ -198,6 +198,14 @@ typedef struct polygon {
 } polygon;
 typedef polygon GPHUGE *p_polygon;
 
+#if TEST_GRIDBOX
+# define UINT_BITS (CHAR_BIT * sizeof(unsigned int))
+# define COORD_TO_BITMASK(x,shift)					\
+    (~0U << (unsigned int) (((x) + 1.0) / 2.0 * UINT_BITS + (shift)))
+# define CALC_BITRANGE(range_min, range_max)				   \
+    ((~COORD_TO_BITMASK((range_max), 1)) & COORD_TO_BITMASK(range_min, 0))
+#endif
+
 /* Enumeration of possible types of line, for use with the
  * store_edge() function. Influences the position in the grid the
  * second vertex will be put to, relative to the one that is passed
@@ -248,6 +256,9 @@ typedef qtreelist GPHUGE *p_qtreelist;
 #endif
 /* indices of the heads of all the cells' chains: */
 static long quadtree[QUADTREE_GRANULARITY][QUADTREE_GRANULARITY];
+/* and a macro to calculate the cells' position in that array: */
+#define COORD_TO_TREECELL(x)					\
+    ((unsigned int)((((x)+1.0)/2.0)*QUADTREE_GRANULARITY))
 
 /* the dynarray to actually store all that stuff in: */
 static dynarray qtree;
@@ -297,10 +308,10 @@ static int in_front __PROTO((long int edgenum,
 void
 set_hidden3doptions()
 {
-	struct value t;
-	int tmp;
+    struct value t;
+    int tmp;
 
-	while (!END_OF_COMMAND) {
+    while (!END_OF_COMMAND) {
 	switch (lookup_table(&set_hidden3d_tbl[0], c_token)) {
 	case S_HI_DEFAULTS:
 	    /* reset all parameters to defaults */
@@ -357,56 +368,60 @@ set_hidden3doptions()
 	    break;
 	}
 	c_token++;
-	}
+    }
 }
 
 void
 show_hidden3doptions()
 {
-	fprintf(stderr,"\
+    fprintf(stderr,"\
 \t  Back side of surfaces has linestyle offset of %d\n\
 \t  Bit-Mask of Lines to draw in each triangle is %ld\n\
 \t  %d: ",
-					hiddenBacksideLinetypeOffset, hiddenTriangleLinesdrawnPattern,
-					hiddenHandleUndefinedPoints);
+	    hiddenBacksideLinetypeOffset, hiddenTriangleLinesdrawnPattern,
+	    hiddenHandleUndefinedPoints);
 
-	switch (hiddenHandleUndefinedPoints) {
+    switch (hiddenHandleUndefinedPoints) {
     case OUTRANGE:
-			fputs("Outranged and undefined datapoints are omitted from the surface.\n", stderr);
-			break;
+	fputs("Outranged and undefined datapoints are omitted from the surface.\n",
+	      stderr);
+	break;
     case UNDEFINED:
-			fputs("Only undefined datapoints are omitted from the surface.\n", stderr);
-			break;
+	fputs("Only undefined datapoints are omitted from the surface.\n",
+	      stderr);
+	break;
     case UNHANDLED:
-			fputs("Will not check for undefined datapoints (may cause crashes).\n", stderr);
-			break;
+	fputs("Will not check for undefined datapoints (may cause crashes).\n",
+	      stderr);
+	break;
     default:
-			fputs("This value is illegal!!!\n", stderr);
-			break;
-	}
+	fputs("Value stored for undefined datapoint handling is illegal!!!\n",
+	      stderr);
+	break;
+    }
 
-	fprintf(stderr,"\
+    fprintf(stderr,"\
 \t  Will %suse other diagonal if it gives a less jaggy outline\n\
 \t  Will %sdraw diagonal visibly if quadrangle is 'bent over'\n",
-					hiddenShowAlternativeDiagonal ? "" : "not ",
-					hiddenHandleBentoverQuadrangles ? "" : "not ");
+	    hiddenShowAlternativeDiagonal ? "" : "not ",
+	    hiddenHandleBentoverQuadrangles ? "" : "not ");
 }
 
 /* Implements proper 'save'ing of the new hidden3d options... */
 void 
 save_hidden3doptions(fp)
-		 FILE *fp;
+    FILE *fp;
 {
-	if (!hidden3d) {
-		fputs("unset hidden3d\n", fp);
-		return;
-	}
-	fprintf(fp, "set hidden3d offset %d trianglepattern %ld undefined %d %saltdiagonal %sbentover\n",
-					hiddenBacksideLinetypeOffset,
-					hiddenTriangleLinesdrawnPattern,
-					hiddenHandleUndefinedPoints,
-					hiddenShowAlternativeDiagonal ? "" : "no",
-					hiddenHandleBentoverQuadrangles ? "" : "no");
+    if (!hidden3d) {
+	fputs("unset hidden3d\n", fp);
+	return;
+    }
+    fprintf(fp, "set hidden3d offset %d trianglepattern %ld undefined %d %saltdiagonal %sbentover\n",
+	    hiddenBacksideLinetypeOffset,
+	    hiddenTriangleLinesdrawnPattern,
+	    hiddenHandleUndefinedPoints,
+	    hiddenShowAlternativeDiagonal ? "" : "no",
+	    hiddenHandleBentoverQuadrangles ? "" : "no");
 }
 
 /* Initialize the necessary steps for hidden line removal and
@@ -414,21 +429,21 @@ save_hidden3doptions(fp)
 void 
 init_hidden_line_removal()
 {
-	/* Check for some necessary conditions to be set elsewhere: */
-	/* HandleUndefinedPoints mechanism depends on these: */
-	assert(OUTRANGE == 1);
-	assert(UNDEFINED == 2);
+    /* Check for some necessary conditions to be set elsewhere: */
+    /* HandleUndefinedPoints mechanism depends on these: */
+    assert(OUTRANGE == 1);
+    assert(UNDEFINED == 2);
 
-	/* Re-mapping of this value makes the test easier in the critical
-	 * section */
-	if (hiddenHandleUndefinedPoints < OUTRANGE)
-		hiddenHandleUndefinedPoints = UNHANDLED;
+    /* Re-mapping of this value makes the test easier in the critical
+     * section */
+    if (hiddenHandleUndefinedPoints < OUTRANGE)
+	hiddenHandleUndefinedPoints = UNHANDLED;
 
-	init_dynarray(&vertices, sizeof(vertex), 100, 100);
-	init_dynarray(&edges, sizeof(edge), 100, 100);
-	init_dynarray(&polygons, sizeof(polygon), 100, 100);
+    init_dynarray(&vertices, sizeof(vertex), 100, 100);
+    init_dynarray(&edges, sizeof(edge), 100, 100);
+    init_dynarray(&polygons, sizeof(polygon), 100, 100);
 #if TEST_QUADTREE
-	init_dynarray(&qtree, sizeof(qtreelist), 100, 100);
+    init_dynarray(&qtree, sizeof(qtreelist), 100, 100);
 #endif
 
 }
@@ -523,40 +538,40 @@ store_vertex (point, pointtype, color_from_column)
  * in_front(), as well, so I separated it out. */
 static long int 
 make_edge(vnum1, vnum2, lp, style, next)
-		 long int vnum1, vnum2;
-		 struct lp_style_type *lp;
-		 int style;
-		 int next;
+    long int vnum1, vnum2;
+    struct lp_style_type *lp;
+    int style;
+    int next;
 {
-	p_edge thisedge = nextfrom_dynarray(&edges);
-	p_vertex v1 = vlist + vnum1;
-	p_vertex v2 = vlist + vnum2;
+    p_edge thisedge = nextfrom_dynarray(&edges);
+    p_vertex v1 = vlist + vnum1;
+    p_vertex v2 = vlist + vnum2;
 
-	/* ensure z ordering inside each edge */
-	if (v1->z >= v2->z) {
-		thisedge->v1 = vnum1;
-		thisedge->v2 = vnum2;
-	} else {
-		thisedge->v1 = vnum2;
-		thisedge->v2 = vnum1;
-	}
+    /* ensure z ordering inside each edge */
+    if (v1->z >= v2->z) {
+	thisedge->v1 = vnum1;
+	thisedge->v2 = vnum2;
+    } else {
+	thisedge->v1 = vnum2;
+	thisedge->v2 = vnum1;
+    }
 
-	thisedge->style = style;
-	thisedge->lp = lp;
-	thisedge->next = next;
+    thisedge->style = style;
+    thisedge->lp = lp;
+    thisedge->next = next;
 
-	return thisedge - elist;
+    return thisedge - elist;
 }
 
 /* store the edge from vnum1 to vnum2 into the edge list. Ensure that
  * the vertex with higher z is stored in v1, to ease sorting by zmax */
 static long int
 store_edge(vnum1, direction, crvlen, lp, style)
-long int vnum1;
-edge_direction direction;
-long int crvlen;
-struct lp_style_type *lp;
-int style;
+    long int vnum1;
+    edge_direction direction;
+    long int crvlen;
+    struct lp_style_type *lp;
+    int style;
 {
     p_vertex v1 = vlist + vnum1;
     p_vertex v2 = NULL;		/* just in case: initialize... */
@@ -610,75 +625,75 @@ int style;
  * naive cross product method does. */
 static TBOOLEAN
 get_plane(poly, plane)
-		 p_polygon poly;
-		 t_plane plane;
+    p_polygon poly;
+    t_plane plane;
 {
-	int i;
-	p_vertex v1, v2;
-	double x, y, z, s;
-	TBOOLEAN frontfacing=1;
+    int i;
+    p_vertex v1, v2;
+    double x, y, z, s;
+    TBOOLEAN frontfacing=1;
 	
-	/* calculate the signed areas of the polygon projected onto the
-	 * planes x=0, y=0 and z=0, respectively. The three areas form
-	 * the components of the plane's normal vector: */
-	v1 = vlist + poly->vertex[POLY_NVERT - 1];
-	v2 = vlist + poly->vertex[0];
-	plane[0] = (v1->y - v2->y) * (v1->z + v2->z);
-	plane[1] = (v1->z - v2->z) * (v1->x + v2->x);
-	plane[2] = (v1->x - v2->x) * (v1->y + v2->y);
+    /* calculate the signed areas of the polygon projected onto the
+     * planes x=0, y=0 and z=0, respectively. The three areas form
+     * the components of the plane's normal vector: */
+    v1 = vlist + poly->vertex[POLY_NVERT - 1];
+    v2 = vlist + poly->vertex[0];
+    plane[0] = (v1->y - v2->y) * (v1->z + v2->z);
+    plane[1] = (v1->z - v2->z) * (v1->x + v2->x);
+    plane[2] = (v1->x - v2->x) * (v1->y + v2->y);
+    for (i = 1; i < POLY_NVERT; i++) {
+	v1 = v2;
+	v2 = vlist + poly->vertex[i];
+	plane[0] += (v1->y - v2->y) * (v1->z + v2->z);
+	plane[1] += (v1->z - v2->z) * (v1->x + v2->x);
+	plane[2] += (v1->x - v2->x) * (v1->y + v2->y);
+    }
+
+    /* Normalize the resulting normal vector */
+    s = sqrt(plane[0] * plane[0] + plane[1] * plane[1] + plane[2] * plane[2]);
+
+    if (GE(0.0, s)) {
+	/* The normal vanishes, i.e. the polygon is degenerate. We build
+	 * another vector that is orthogonal to the line of the polygon */
+	v1 = vlist + poly->vertex[0];
 	for (i = 1; i < POLY_NVERT; i++) {
-		v1 = v2;
-		v2 = vlist + poly->vertex[i];
-		plane[0] += (v1->y - v2->y) * (v1->z + v2->z);
-		plane[1] += (v1->z - v2->z) * (v1->x + v2->x);
-		plane[2] += (v1->x - v2->x) * (v1->y + v2->y);
-	}
-
-	/* Normalize the resulting normal vector */
-	s = sqrt(plane[0] * plane[0] + plane[1] * plane[1] + plane[2] * plane[2]);
-
-	if (GE(0.0, s)) {
-		/* The normal vanishes, i.e. the polygon is degenerate. We build
-		 * another vector that is orthogonal to the line of the polygon */
-		v1 = vlist + poly->vertex[0];
-		for (i = 1; i < POLY_NVERT; i++) {
 	    v2 = vlist + poly->vertex[i];
 	    if (!V_EQUAL(v1, v2))
-				break;
-		}
+		break;
+	}
 
-		/* build (x,y,z) that should be linear-independant from <v1, v2> */
-		x = v1->x;
-		y = v1->y;
-		z = v1->z;
-		if (EQ(y, v2->y))
+	/* build (x,y,z) that should be linear-independant from <v1, v2> */
+	x = v1->x;
+	y = v1->y;
+	z = v1->z;
+	if (EQ(y, v2->y))
 	    y += 1.0;
-		else
+	else
 	    x += 1.0;
 
-		/* Re-do the signed area computations */
-		plane[0] = v1->y * (v2->z - z) + v2->y * (z - v1->z) + y * (v1->z - v2->z);
-		plane[1] = v1->z * (v2->x - x) + v2->z * (x - v1->x) + z * (v1->x - v2->x);
-		plane[2] = v1->x * (v2->y - y) + v2->x * (y - v1->y) + x * (v1->y - v2->y);
-		s = sqrt(plane[0] * plane[0] + plane[1] * plane[1] + plane[2] * plane[2]);
-	}
+	/* Re-do the signed area computations */
+	plane[0] = v1->y * (v2->z - z) + v2->y * (z - v1->z) + y * (v1->z - v2->z);
+	plane[1] = v1->z * (v2->x - x) + v2->z * (x - v1->x) + z * (v1->x - v2->x);
+	plane[2] = v1->x * (v2->y - y) + v2->x * (y - v1->y) + x * (v1->y - v2->y);
+	s = sqrt(plane[0] * plane[0] + plane[1] * plane[1] + plane[2] * plane[2]);
+    }
 
-	/* ensure that normalized c is > 0 */
-	if (plane[2] < 0.0) {
-		s *= -1.0;
-		frontfacing = 0;
-	}
+    /* ensure that normalized c is > 0 */
+    if (plane[2] < 0.0) {
+	s *= -1.0;
+	frontfacing = 0;
+    }
 	
-	plane[0] /= s;
-	plane[1] /= s;
-	plane[2] /= s;
+    plane[0] /= s;
+    plane[1] /= s;
+    plane[2] /= s;
 
-	/* Now we have the normalized normal vector, insert one of the
-	 * vertices into the equation to get 'd'. For an even better result,
-	 * an average over all the vertices might be used */
-	plane[3] = -plane[0] * v1->x - plane[1] * v1->y - plane[2] * v1->z;
+    /* Now we have the normalized normal vector, insert one of the
+     * vertices into the equation to get 'd'. For an even better result,
+     * an average over all the vertices might be used */
+    plane[3] = -plane[0] * v1->x - plane[1] * v1->y - plane[2] * v1->z;
 
-	return frontfacing;
+    return frontfacing;
 }
 
 
@@ -687,10 +702,10 @@ get_plane(poly, plane)
  * < 0 is 'away' from the polygon, > 0 is infront of it */
 static GP_INLINE double 
 eval_plane_equation(p, v)
-		 t_plane p;
-		 p_vertex v;
+    t_plane p;
+    p_vertex v;
 {
-	return (p[0]*v->x + p[1]*v->y + p[2]*v->z + p[3]);
+    return (p[0]*v->x + p[1]*v->y + p[2]*v->z + p[3]);
 }
 
 
@@ -700,79 +715,72 @@ eval_plane_equation(p, v)
  * one. */
 static long int
 store_polygon(vnum1, direction, crvlen)
-		 long int vnum1;
-		 polygon_direction direction;
-		 long int crvlen;
+    long int vnum1;
+    polygon_direction direction;
+    long int crvlen;
 {
-	long int v[POLY_NVERT];
-	p_vertex v1, v2, v3;
-	p_polygon p;
+    long int v[POLY_NVERT];
+    p_vertex v1, v2, v3;
+    p_polygon p;
 	
-	switch (direction) {
-	case pdir_NE:
-		v[0] = vnum1; 
-		v[2] = vnum1 - crvlen;
-		v[1] = v[2] - 1;
-		break;
-	case pdir_SW:
-		/* triangle points southwest, here */
-		v[0] = vnum1;
-		v[1] = vnum1 - 1;
-		v[2] = v[1] - crvlen;
-		break;
-	case pdir_SE:
-		/* alt-diagonal, case 1: southeast triangle: */
-		v[0] = vnum1;
-		v[2] = vnum1 - crvlen;
-		v[1] = vnum1 - 1;
-		break;
-	case pdir_NW:
-		v[2] = vnum1 - crvlen;
-		v[0] = vnum1 - 1;
-		v[1] = v[0] - crvlen;
-		break;
-	}
+    switch (direction) {
+    case pdir_NE:
+	v[0] = vnum1; 
+	v[2] = vnum1 - crvlen;
+	v[1] = v[2] - 1;
+	break;
+    case pdir_SW:
+	/* triangle points southwest, here */
+	v[0] = vnum1;
+	v[1] = vnum1 - 1;
+	v[2] = v[1] - crvlen;
+	break;
+    case pdir_SE:
+	/* alt-diagonal, case 1: southeast triangle: */
+	v[0] = vnum1;
+	v[2] = vnum1 - crvlen;
+	v[1] = vnum1 - 1;
+	break;
+    case pdir_NW:
+	v[2] = vnum1 - crvlen;
+	v[0] = vnum1 - 1;
+	v[1] = v[0] - crvlen;
+	break;
+    }
 
-	v1 = vlist + v[0];
-	v2 = vlist + v[1];
-	v3 = vlist + v[2];
+    v1 = vlist + v[0];
+    v2 = vlist + v[1];
+    v3 = vlist + v[2];
 	
-	if (VERTEX_IS_UNDEFINED(*v1)
-			|| VERTEX_IS_UNDEFINED(*v2)
-			|| VERTEX_IS_UNDEFINED(*v3)
-			)
-		return (-2);
+    if (VERTEX_IS_UNDEFINED(*v1)
+	|| VERTEX_IS_UNDEFINED(*v2)
+	|| VERTEX_IS_UNDEFINED(*v3)
+	)
+	return (-2);
 
-	/* All else OK, fill in the polygon: */
+    /* All else OK, fill in the polygon: */
 	
-	p = nextfrom_dynarray(&polygons);
+    p = nextfrom_dynarray(&polygons);
 
-	memcpy (p->vertex, v, sizeof(v));
+    memcpy (p->vertex, v, sizeof(v));
 #if ! TEST_QUADTREE
-	p->next = -1;
+    p->next = -1;
 #endif
-	GET_MIN(p, x, p->xmin);
-	GET_MIN(p, y, p->ymin);
-	GET_MIN(p, z, p->zmin);
-	GET_MAX(p, x, p->xmax);
-	GET_MAX(p, y, p->ymax);
-	GET_MAX(p, z, p->zmax);
+    GET_MIN(p, x, p->xmin);
+    GET_MIN(p, y, p->ymin);
+    GET_MIN(p, z, p->zmin);
+    GET_MAX(p, x, p->xmax);
+    GET_MAX(p, y, p->ymax);
+    GET_MAX(p, z, p->zmax);
 
 #if TEST_GRIDBOX
-# define UINT_BITS (CHAR_BIT * sizeof(unsigned int))
-# define COORD_TO_BITMASK(x,shift)					\
-  (~0U << (unsigned int) (((x) + 1.0) / 2.0 * UINT_BITS + (shift)))
-
-# define CALC_BITRANGE(range_min, range_max)				 \
-  ((~COORD_TO_BITMASK((range_max), 1)) & COORD_TO_BITMASK(range_min, 0))
-	
-	p->xbits = CALC_BITRANGE(p->xmin, p->xmax);
-	p->ybits = CALC_BITRANGE(p->ymin, p->ymax);
+    p->xbits = CALC_BITRANGE(p->xmin, p->xmax);
+    p->ybits = CALC_BITRANGE(p->ymin, p->ymax);
 #endif
 	
-	p->frontfacing = get_plane(p, p->plane);
+    p->frontfacing = get_plane(p, p->plane);
 
-	return (p - plist);
+    return (p - plist);
 }
 
 /* color edges, based on the orientation of polygon(s). One of the two
@@ -1076,9 +1084,9 @@ build_networks(plots, pcount)
 						      color_from_column);
 			    points[i].z = remember_z;
 			}
-			if (basevertex > 0)
-			    store_edge(thisvertex, edir_impulse, 0, lp, above);
-			break;
+		    if (basevertex > 0)
+			store_edge(thisvertex, edir_impulse, 0, lp, above);
+		    break;
 			
 		    case POINTSTYLE:
 		    default:	/* treat all the others like 'points' */
@@ -1096,8 +1104,10 @@ build_networks(plots, pcount)
 	/* initialize stored indices of north-of-this-isoline polygons and
 	 * edges properly */
 	for (i=0; i < this_plot->iso_crvs->p_count; i++) {
-	    north_polygons[2 * i] = north_polygons[2 * i + 1]
-		=	north_edges[3 * i] = north_edges[3 * i + 1]
+	    north_polygons[2 * i]
+		= north_polygons[2 * i + 1]
+		= north_edges[3 * i]
+		= north_edges[3 * i + 1]
 		= north_edges[3 * i + 2]
 		= -3;
 	}
@@ -1287,6 +1297,7 @@ build_networks(plots, pcount)
 	    }
 	} /* for(isocrv) */
     } /* for(plot) */
+
     free (these_polygons);
     free (north_polygons);
     free (these_edges);
@@ -1351,73 +1362,71 @@ compare_polys_by_zmax(p1, p2)
 static void 
 sort_polys_by_z()
 {
-	long *sortarray, i;
-	p_polygon this;
+    long *sortarray, i;
+    p_polygon this;
 	
-	if (!polygons.end)
-		return;
+    if (!polygons.end)
+	return;
 
-	sortarray = (long *) gp_alloc((unsigned long) sizeof(long) * polygons.end,
-				      "hidden sortarray");
+    sortarray = (long *) gp_alloc((unsigned long) sizeof(long) * polygons.end,
+				  "hidden sortarray");
 
-	/* initialize sortarray with an identity mapping */
-	for (i = 0; i < polygons.end; i++)
-		sortarray[i] = i;
+    /* initialize sortarray with an identity mapping */
+    for (i = 0; i < polygons.end; i++)
+	sortarray[i] = i;
 
-	/* sort it */
-	qsort(sortarray, (size_t) polygons.end, sizeof(long),
-	      compare_polys_by_zmax);
+    /* sort it */
+    qsort(sortarray, (size_t) polygons.end, sizeof(long),
+	  compare_polys_by_zmax);
 
-	/* traverse plist in the order given by sortarray, and set the
-	 * 'next' pointers */
+    /* traverse plist in the order given by sortarray, and set the
+     * 'next' pointers */
 #if TEST_QUADTREE
-	/* HBB 20000716: Loop backwards, to ease construction of
-	 * linked lists from the head: */
-	{
-	    unsigned int grid_x, grid_y;
-	    unsigned int grid_x_low, grid_x_high, grid_y_low, grid_y_high;
+    /* HBB 20000716: Loop backwards, to ease construction of
+     * linked lists from the head: */
+    {
+	unsigned int grid_x, grid_y;
+	unsigned int grid_x_low, grid_x_high, grid_y_low, grid_y_high;
 
-	    for (grid_x = 0; grid_x < QUADTREE_GRANULARITY; grid_x++)
-		for (grid_y = 0; grid_y < QUADTREE_GRANULARITY; grid_y++)
-		    quadtree[grid_x][grid_y] = -1;
+	for (grid_x = 0; grid_x < QUADTREE_GRANULARITY; grid_x++)
+	    for (grid_y = 0; grid_y < QUADTREE_GRANULARITY; grid_y++)
+		quadtree[grid_x][grid_y] = -1;
 	    
-	    for (i=polygons.end - 1; i >= 0; i--) {
-		this = plist + sortarray[i];
+	for (i=polygons.end - 1; i >= 0; i--) {
+	    this = plist + sortarray[i];
 		
-#define COORD_TO_TREECELL(x)						\
-		((unsigned int)((((x)+1.0)/2.0)*QUADTREE_GRANULARITY))
 		
-		grid_x_low = COORD_TO_TREECELL(this->xmin);
-		grid_x_high = COORD_TO_TREECELL(this->xmax);
-		grid_y_low = COORD_TO_TREECELL(this->ymin);
-		grid_y_high = COORD_TO_TREECELL(this->ymax);
+	    grid_x_low = COORD_TO_TREECELL(this->xmin);
+	    grid_x_high = COORD_TO_TREECELL(this->xmax);
+	    grid_y_low = COORD_TO_TREECELL(this->ymin);
+	    grid_y_high = COORD_TO_TREECELL(this->ymax);
 
 
-		for (grid_x = grid_x_low; grid_x <= grid_x_high; grid_x++) {
-		    for (grid_y = grid_y_low; grid_y <= grid_y_high; grid_y++) {
-			p_qtreelist newhead = nextfrom_dynarray(&qtree);
+	    for (grid_x = grid_x_low; grid_x <= grid_x_high; grid_x++) {
+		for (grid_y = grid_y_low; grid_y <= grid_y_high; grid_y++) {
+		    p_qtreelist newhead = nextfrom_dynarray(&qtree);
 			
-			newhead->next = quadtree[grid_x][grid_y];
-			newhead->p = sortarray[i];
+		    newhead->next = quadtree[grid_x][grid_y];
+		    newhead->p = sortarray[i];
 			
-			quadtree[grid_x][grid_y] = newhead - qlist;
-		    }
+		    quadtree[grid_x][grid_y] = newhead - qlist;
 		}
 	    }
 	}
+    }
 	    
 #else /* TEST_QUADTREE */
-	this = plist + sortarray[0];
-	for (i = 1; i < polygons.end; i++) {
-	    this->next = sortarray[i];
-	    this = plist + sortarray[i];
-	}
-	this->next = -1L;
-	/* 'pfirst' is the index of the leading element of plist */
+    this = plist + sortarray[0];
+    for (i = 1; i < polygons.end; i++) {
+	this->next = sortarray[i];
+	this = plist + sortarray[i];
+    }
+    this->next = -1L;
+    /* 'pfirst' is the index of the leading element of plist */
 #endif /* TEST_QUADTREE */
-	pfirst = sortarray[0];
+    pfirst = sortarray[0];
 	
-	free(sortarray);
+    free(sortarray);
 }
 
 
@@ -1693,7 +1702,7 @@ in_front(edgenum, vnum1, vnum2, firstpoly)
 	    coordval polyfacing;
 	    int whichside;
 	    /* stores classification of cases as 4 2-bit patterns, mainly */
-	    unsigned int classification[4];					 
+	    unsigned int classification[POLY_NVERT + 1];
 
 	    /* OK, off we go with the real work. This algo is mainly
 	     * following the one of 'HLines.java', as described in the
@@ -1900,11 +1909,16 @@ in_front(edgenum, vnum1, vnum2, firstpoly)
 
 		/* Check if edge really doesn't intersect the triangle
 		 * (this happens in roughly one third of the
-		 * cases). */
-		if (!classification[POLY_NVERT])
-		    /* If both edges have been classified as 'behind',
-		     * the result is true even in the case of possibly
-		     * intersecting polygons */
+		 * cases). If both vertices have been classified as
+		 * 'behind', the result is true even in the case of
+		 * possibly intersecting polygons */
+		/* HBB 20020408: softened this check to allow edges
+		 * not to be hidden by polygons they're fully inside.
+		 * I.e. only declare the edge invisible if at least
+		 * one of its endpoints is truly behind, not inside
+		 * the polygon's plane. ---> FIXME 20001108 above */
+		if (!classification[POLY_NVERT]
+		    && (GR(0, v1_rel_pplane) || GR(0, v2_rel_pplane)))
 		    return 0;
 	    }
 
@@ -1917,14 +1931,16 @@ in_front(edgenum, vnum1, vnum2, firstpoly)
 
 	    /* Test 9 (3D): The final 'catch-all' handler. We now know
 	     * that the edges passes through the walls of the
-	     * 'cylinder' stamped out by the polygon, somewhere, so we
-	     * have to compute the intersection points and check
-	     * whether they are infront of or behind the polygon, to
-	     * isolate the visible fragments of the line. Method is to
-	     * calc. the [0..1] parameter that describes the way from
-	     * V1 to V2, for all intersections of the edge with any of
-	     * the planes that define the 'shadow volume' of this
-	     * polygon, and deciding what to do, with all this.
+	     * semifinite polygonal cylinder of invisible space
+	     * stamped out by the polygon, somewhere, so we have to
+	     * compute the intersection points with the 2D projection
+	     * of the polygon and check whether they are infront of or
+	     * behind the polygon, to isolate the visible fragments of
+	     * the line. Method is to calc. the [0..1] parameter that
+	     * describes the way from V1 to V2, for all intersections
+	     * of the edge with any of the planes that define the
+	     * 'shadow volume' of this polygon, and deciding what to
+	     * do, with all this.
 	     *
 	     * The remaining work can be classified by the values of
 	     * the variables calculated in previous tests:
@@ -2269,9 +2285,9 @@ in_front(edgenum, vnum1, vnum2, firstpoly)
 	    } /* end of part 'T9' */
 	} /* for (polygons in list) */
 
-    /* Came here, so there's something left of this polygon, which
-     * needs to be drawn.  But the vertices are different, now, so
-     * copy our new vertices back into 'e' */
+    /* Came here, so there's something left of this edge, which needs
+     * to be drawn.  But the vertices are different, now, so copy our
+     * new vertices back into 'e' */
 
     draw_edge(elist + edgenum, vlist + vnum1, vlist + vnum2);
 
