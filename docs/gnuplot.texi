@@ -572,7 +572,7 @@ The editing commands are as follows:
       ^K    deletes from current position to the end of line.
       ^L,^R redraws line in case it gets trashed.
       ^U    deletes the entire line.
-      ^W    delete from the current word to the end of line.
+      ^W    deletes from the current word to the end of line.
 
 @end example
 
@@ -636,7 +636,7 @@ substitutions, etc.  In short, it works anywhere it makes sense to work.
 
 @cindex coordinates
 
-The commands @ref{arrow}, @ref{key}, and @ref{label} allow you to draw
+The commands `set arrow`, @ref{key}, and @ref{label} allow you to draw
 something at an arbitrary position on the graph.  This position is specified
 by the syntax:
 
@@ -1795,7 +1795,7 @@ Ranges are separated by colons and enclosed in brackets [], text and file
 names are enclosed in quotes, and a few miscellaneous things are enclosed
 in parentheses.  Braces @{@} are used for a few special purposes.
 
-Commas are used to separate coordinates on the `set` commands @ref{arrow},
+Commas are used to separate coordinates on the `set` commands `arrow`,
 @ref{key}, and @ref{label}; the list of variables being fitted (the list after the
 `via` keyword on the `fit` command); lists of discrete contours or the loop
 parameters which specify them on the @ref{cntrparam} command; the arguments
@@ -2539,7 +2539,7 @@ the chi-squared target function increased or decreased significantly.
 Setting FIT_LAMBDA_FACTOR to zero re-enables the default factor of
 10.0.
 
-Oher variables with the FIT_ prefix may be added to `fit`, so it is safer
+Other variables with the FIT_ prefix may be added to `fit`, so it is safer
 not to use that prefix for user-defined variables.
 
 The variables FIT_SKIP and FIT_INDEX were used by earlier releases of
@@ -4015,9 +4015,9 @@ This plots sin(x) with impulses:
 
 @end example
 
-This plots x*y with points, x**2 with the default:
+This plots x with points, x**2 with the default:
 @example
-      plot x*y w points, x**2
+      plot x w points, x**2
 
 @end example
 
@@ -4366,6 +4366,7 @@ when the variable was initially defined.
 * key::                         
 * label::                       
 * linestyle::                   
+* arrowstyle::                  
 * lmargin::                     
 * loadpath::                    
 * locale::                      
@@ -4530,27 +4531,28 @@ See also
 
 @cindex noarrow
 
-Arbitrary arrows can be placed on a plot using the @ref{arrow} command.
+Arbitrary arrows can be placed on a plot using the `set arrow` command.
 
 Syntax:
 @example
       set arrow @{<tag>@} @{from <position>@} @{to|rto <position>@}
-                @{nohead | head | heads@}
-                @{size <length>,<angle>@}
-                @{filled | nofilled@}
-                @{front | back@}
-                @{ @{linestyle | ls <line_style>@}
-                  | @{linetype | lt <line_type>@}
-                    @{linewidth | lw <line_width@} @}
+                @{ @{arrowstyle | as <arrow_style>@}
+                  | @{nohead | head | heads@}
+                    @{size <length>,<angle>@}
+                    @{filled | nofilled@}
+                    @{front | back@}
+                    @{ @{linestyle | ls <line_style>@}
+                      | @{linetype | lt <line_type>@}
+                        @{linewidth | lw <line_width@} @} @}
       unset arrow @{<tag>@}
-      show arrow
+      show arrow @{<tag>@}
 
 @end example
 
 <tag> is an integer that identifies the arrow.  If no tag is given, the
 lowest unused tag value is assigned automatically.  The tag can be used to
 delete or change a specific arrow.  To change any attribute of an existing
-arrow, use the @ref{arrow} command with the appropriate tag and specify the
+arrow, use the `set arrow` command with the appropriate tag and specify the
 parts of the arrow to be changed.
 
 The <position>s are specified by either x,y or x,y,z, and may be preceded by
@@ -4588,7 +4590,7 @@ The line style may be selected from a user-defined list of line styles
 
 Note, however, that if a user-defined line style has been selected, its
 properties (type and width) cannot be altered merely by issuing another
-@ref{arrow} command with the appropriate index and `lt` or `lw`.
+`set arrow` command with the appropriate index and `lt` or `lw`.
 
 If `front` is given, the arrow is written on top of the graphed data. If
 `back` is given (the default), the arrow is written underneath the graphed
@@ -6543,7 +6545,7 @@ point on a 3D splot colored using pm3d:
 @end example
 
 
-@node linestyle, lmargin, label, set-show
+@node linestyle, arrowstyle, label, set-show
 @subsection linestyle
 
 @c ?commands set style line
@@ -6591,7 +6593,7 @@ Not all terminals support the `linewidth` and @ref{pointsize} features; if
 not supported, the option will be ignored.
 
 Note that this feature is not completely implemented; linestyles defined by
-this mechanism may be used with `plot`, `splot`, @ref{replot}, and @ref{arrow},
+this mechanism may be used with `plot`, `splot`, @ref{replot}, and `set arrow`,
 but not by other commands that allow the default index to be used, such as
 `set grid`.
 
@@ -6643,7 +6645,100 @@ that this works only on some terminals.
 See also @ref{palette}, @ref{pm3d}.
 
 
-@node lmargin, loadpath, linestyle, set-show
+@node arrowstyle, lmargin, linestyle, set-show
+@subsection arrowstyle
+
+@c ?commands set style arrow
+@c ?commands unset style arrow
+@c ?commands show style arrow
+@c ?set style arrow
+@c ?unset style arrow
+@c ?show style arrow
+@cindex arrowstyle
+@opindex arrowstyle
+
+
+@c ?help set style arrow
+^ <a name="arrowtype">
+^ <a name="arrowwidth">
+Each terminal has a default set of arrow and point types, which can be seen
+by using the command @ref{test}.  `set style arrow` defines a set of arrow types
+and widths and point types and sizes so that you can refer to them later by
+an index instead of repeating all the information at each invocation.
+
+Syntax:
+@example
+      set style arrow <index> @{nohead | head | heads@}
+                              @{size <length>,<angle>@{,<backangle>@}@}
+                              @{filled | empty | nofilled@}
+                              @{front | back@}
+                              @{ @{linestyle | ls <line_style>@}
+                                | @{linetype | lt <line_type>@}
+                                  @{linewidth | lw <line_width@} @}
+      unset style arrow
+      show style arrow
+
+@end example
+
+<index> is an integer that identifies the arrowstyle.
+
+Specifying `nohead` produces arrows drawn without a head---a line segment.
+This gives you yet another way to draw a line segment on the plot.  By
+default, arrows have one head. Specifying `heads` draws arrow heads on both
+ends of the line.
+
+Head size can be controlled by `size <length>,<angle>` or 
+`size <length>,<angle>,<backangle>` where `<length>` defines length of each 
+branch of the arrow head and `<angle>` the angle (in degrees) they make with 
+the arrow. `<Length>` is in x-axis units; this can be
+changed by `first`, `second`, `graph` or `screen` before the `<length>`; 
+see `coordinates` for details.
+`<Backangle>` only takes effect when `filled` or `empty` is also used. Then, 
+`<backangle>` is the angle (in degrees) the back branches make with the 
+arrow (in the same direction as `<angle>`).
+The `fig` terminal has a restricted backangle function. It supports three
+different angles. There are two thresholds: Below 70 degrees, the arrow head
+gets an indented back angle. Above 110 degrees, the arrow head has an acute
+back angle. Between these thresholds, the back line is straight.
+
+Specifying `filled` produces filled arrow heads (if heads are used). 
+Filling is supported on filled-polygon capable terminals, see @ref{pm3d}
+for their list, otherwise the arrow heads are closed but not filled.
+The same result (closed but not filled arrow head) is reached by specifying
+`empty`.
+Further, filling and outline is obviously not supported on terminals drawing
+arrows by their own specific routines, like `metafont`, `metapost`, `latex` 
+or `tgif`. 
+
+The line style may be selected from a user-defined list of line styles 
+(see `set style line`) or may be defined here by providing values for 
+`<line_type>` (an index from the default list of styles) and/or 
+`<line_width>` (which is a  multiplier for the default width).
+
+Note, however, that if a user-defined line style has been selected, its
+properties (type and width) cannot be altered merely by issuing another
+`set style arrow` command with the appropriate index and `lt` or `lw`.
+
+If `front` is given, the arrows are written on top of the graphed data. If
+`back` is given (the default), the arrow is written underneath the graphed
+data.  Using `front` will prevent a arrow from being obscured by dense data.
+
+Examples:
+
+To draw an arrow without an arrow head and double width, use:
+@example
+      set style arrow 1 nohead lw 2
+      set arrow arrowstyle 1
+
+@end example
+
+@example
+ See also 'set arrow' for further examples.
+
+@end example
+
+
+@node lmargin, loadpath, arrowstyle, set-show
 @subsection lmargin
 
 @c ?commands set lmargin
@@ -6872,26 +6967,27 @@ to tic labels overwriting other text if the axis is very close to the border.
 @node missing, mouse, margin, set-show
 @subsection missing
 
-@c ?commands set missing
-@c ?set missing
+@c ?set datafile
+@c ?set datafile missing
 @cindex missing
 @opindex missing
 
 
-The @ref{missing} command allows you to tell `gnuplot` what character is
-used in a data file to denote missing data.  Exactly how this missing value
-will be treated depends on the @ref{using} specifier on the @{`s`@}`plot` command.
+The @ref{missing} command allows you to tell `gnuplot` what character
+string is used in a data file to denote missing data.  Exactly how this missing
+value will be treated depends on the @ref{using} specifier on the @{`s`@}`plot` 
+command.
 
 Syntax:
 @example
-      set missing @{"<character>"@}
-      show missing
+      set datafile missing @{"<string>"@}
+      show datafile missing
 
 @end example
 
 Example:
 @example
-      set missing "?"
+      set datafile missing "?"
       set style data lines
       plot '-'
          1 10
@@ -7438,6 +7534,7 @@ more curves to the current plot and you want to edit the whole command now.
 @c ?commands set pm3d
 @c ?commands show pm3d
 @c ?set pm3d
+@c ?set pm3d at b
 @c ?show pm3d
 @cindex pm3d
 @opindex pm3d
@@ -7508,9 +7605,7 @@ Notes:
    1. The term 'scan' referenced above is used more among physicists then the
       the term 'iso_curve' in gnuplot documentation and sources.  You measure
       maps recording one scan after another scan, that's why.
-   2. Map is obtained by `set view 180,0,1.25; set yrange [*:*] reverse`,
-      plus something more.  This can be easily switched on by using
-      `set pm3d map`.  Use @ref{pm3d} before switching to 2d plots.
+   2. Two-dimensional color (or gray) map is obtained by `set view map`.
 
 @end example
 
@@ -7597,22 +7692,11 @@ compatible with the standard splot hidden3d style. If the option is off
 surface. This is accomplished by drawing the surface and decorations in the
 right order and looks more realistic.
 
-The `set pm3d map` is actually a macro which facilitates plotting maps. It is
-equivalent to these user commands:
-@example
-      set pm3d at b; unset surface; unset contour
-      set view 180,0,1.3
-      set yrange [*:*] reverse
-      a trick to rotate the ylabel
-@end example
-
-Notice that *now* the ylabel is rotated by an internal 'set pm3d map' switch,
-as far as no user option is available to rotate x,y,z labels explicitly.
-Furthermore, the graph area is smaller than that of 2D graphs (some more
-white space than I would like). Thus could be solved if someone (why
-not you?!) likes to implement a 2d layout for 3d maps, e.g. 'set view map').
-Please use @ref{pm3d} to correctly get rid of the pm3d setup, notably the
-reversed y axis and rotated ylabel.
+The `set pm3d map` is an abbreviation for `set pm3d at b`; `set view map`;
+@ref{pm3d}; @ref{pm3d};.
+It is used for backwards compatibility, when `set view map` was not available.
+Take care that you properly use @ref{zrange} and @ref{cbrange} for input data point
+filtering and color range scaling, respectively.
 
 The coloring setup as well as the color box drawing are determined by
 @ref{palette}.  There can be only one palette for the current plot.  Drawing
@@ -8430,6 +8514,13 @@ Syntax:
       set style data <style>
       show style function
       show style data
+
+@end example
+
+@example
+      set style arrow <n> <arrowstyle>
+      set style fill <fillstyle>
+      set style line <n> <linestyle>
 
 @end example
 
@@ -9268,7 +9359,7 @@ Examples:
 @example
       set terminal cgm landscape color rotate dashed width 432 \\
                      linewidth 1  'Helvetica Bold' 12       # defaults
-      set terminal cgm 14 linewidth 2  14  # wider lines & larger font
+      set terminal cgm linewidth 2  14  # wider lines & larger font
       set terminal cgm portrait "Times Italic" 12
       set terminal cgm color solid      # no pesky dashes!
 
@@ -9390,7 +9481,7 @@ scaled up or down accordingly.  To change the assumed width, use the
 @c ?cgm linewidth
 The `linewidth` option sets the width of lines in pt.  The default width
 is 1 pt.  Scaling is affected by the actual width of the page, as
-discussed under the `fontsize` and `width` options
+discussed under the `fontsize` and `width` options.
 
 
 
@@ -12104,18 +12195,18 @@ on the command line when starting `gnuplot` or as resources in your
 later by `set term x11 [no]raise [no]persist)`:
 
 @example
- `-clear`    requests that the window be cleared momentarily before a
-             new plot is displayed.
+ `-mono`     forces monochrome rendering on color displays.
  `-gray`     requests grayscale rendering on grayscale or color displays.
              (Grayscale displays receive monochrome rendering by default.)
- `-mono`     forces monochrome rendering on color displays.
- `-persist`  plot windows survive after main gnuplot program exits
- `-raise`    raise plot window after each plot
- `-noraise`  do not raise plot window after each plot
- `-noevents` do not process mouse and key events
+ `-clear`    requests that the window be cleared momentarily before a
+             new plot is displayed.
  `-tvtwm`    requests that geometry specifications for position of the
              window be made relative to the currently displayed portion
              of the virtual root.
+ `-raise`    raises plot window after each plot
+ `-noraise`  does not raise plot window after each plot
+ `-noevents` does not process mouse and key events
+ `-persist`  plots windows survive after main gnuplot program exits
 
 @end example
 
@@ -12678,6 +12769,7 @@ help file, and (again) the useful email addresses.
 @c ?commands set view
 @c ?commands show view
 @c ?set view
+@c ?set view map
 @c ?show view
 @cindex view
 @opindex view
@@ -12686,11 +12778,12 @@ help file, and (again) the useful email addresses.
 The @ref{view} command sets the viewing angle for `splot`s.  It controls how
 the 3-d coordinates of the plot are mapped into the 2-d screen space.  It
 provides controls for both rotation and scaling of the plotted data, but
-supports orthographic projections only.
+supports orthographic projections only.  It supports both 3D projection or
+orthogonal 2D projection into a 2D plot-like map.
 
 Syntax:
 @example
-      set view <rot_x> @{,@{<rot_z>@}@{,@{<scale>@}@{,<scale_z>@}@}@}
+      set view @{ <rot_x>@{,@{<rot_z>@}@{,@{<scale>@}@{,<scale_z>@}@}@} | map @}
       show view
 
 @end example
@@ -12701,6 +12794,11 @@ virtual 3-d coordinate system aligned with the screen such that initially
 x, screen vertical axis is y, and the axis perpendicular to the screen is z.
 The first rotation applied is <rot_x> around the x axis.  The second rotation
 applied is <rot_z> around the new z axis.
+
+Command `set view map` is used to represent the drawing as a map. It can be
+used for @ref{contour} plots, or for color @ref{pm3d} maps. In the latter, take care
+that you properly use @ref{zrange} and @ref{cbrange} for input data point filtering
+and color range scaling, respectively.
 
 <rot_x> is bounded to the [0:180] range with a default of 60 degrees, while
 <rot_z> is bounded to the [0:360] range with a default of 30 degrees.
@@ -12718,7 +12816,6 @@ The first sets all the four default values.  The second changes only scale,
 to 0.5.
 
 See also @ref{ticslevel}.
-.
 
 @node vrange, x2data, view, set-show
 @subsection vrange
@@ -12878,7 +12975,7 @@ option is not specified, the datatype reverts to normal.
 See @ref{timefmt} to tell gnuplot how to read date or time data.  The
 time/date is converted to seconds from start of the century.  There is
 currently only one timefmt, which implies that all the time/date columns must
-confirm to this format.  Specification of ranges should be supplied as quoted
+conform to this format.  Specification of ranges should be supplied as quoted
 strings according to this format to avoid interpretation of the time/date as
 an expression.
 
@@ -13433,7 +13530,7 @@ axis (x2 = 0).  For details, please see @ref{zeroaxis}.
 @opindex ydata
 
 
-The @ref{ydata} commands ets y-axis data to timeseries (dates/times).
+The @ref{ydata} commands sets y-axis data to timeseries (dates/times).
 Please see @ref{xdata}.
 
 @node ydtics, ylabel, ydata, set-show
@@ -13546,7 +13643,8 @@ please see @ref{zeroaxis}.
 @opindex zdata
 
 
-Set zaxis date to timeseries (dates/times).  Please see @ref{xdata}.
+The @ref{zdata} command sets zaxis data to timeseries (dates/times).
+Please see @ref{xdata}.
 
 @node zdtics, cbdata, zdata, set-show
 @subsection zdtics
@@ -14388,7 +14486,7 @@ the printer afterwards using a shell command.
 
 On AIX 4, the literal 'NaNq' in a datafile causes the special internal value
 'not-a-number' to be stored, rather than setting an internal 'undefined'
-flag.  A workaround is to use `set missing 'NaNq'`.
+flag.  A workaround is to use `set datafile missing 'NaNq'`.
 @node Concept_Index, Command_Index, Bugs, Top
 @unnumbered Concept Index
 @printindex cp
