@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.20 1999/08/09 15:57:49 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.21 1999/08/11 18:08:55 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -47,7 +47,6 @@ static char *RCSid() { return RCSid("$Id: set.c,v 1.20 1999/08/09 15:57:49 lheck
 #include "national.h"
 #include "alloc.h"
 
-#define DEF_FORMAT   "%g"	/* default format for tic mark labels */
 #define SIGNIF (0.01)		/* less than one hundredth of a tic mark */
 
 /*
@@ -60,29 +59,43 @@ static char *RCSid() { return RCSid("$Id: set.c,v 1.20 1999/08/09 15:57:49 lheck
  * done in reset_command() as well (if that makes sense).
  */
 
-TBOOLEAN autoscale_r = DTRUE;
-TBOOLEAN autoscale_t = DTRUE;
-TBOOLEAN autoscale_u = DTRUE;
-TBOOLEAN autoscale_v = DTRUE;
+/* set angles */
+int angles_format = ANGLES_RADIANS;
+double ang2rad = 1.0;		/* 1 or pi/180, tracking angles_format */
+
+/* set arrow */
+struct arrow_def *first_arrow = NULL;
+
+/* set autoscale */
 TBOOLEAN autoscale_x = DTRUE;
 TBOOLEAN autoscale_y = DTRUE;
 TBOOLEAN autoscale_z = DTRUE;
 TBOOLEAN autoscale_x2 = DTRUE;
 TBOOLEAN autoscale_y2 = DTRUE;
+TBOOLEAN autoscale_r = DTRUE;
+TBOOLEAN autoscale_t = DTRUE;
+TBOOLEAN autoscale_u = DTRUE;
+TBOOLEAN autoscale_v = DTRUE;
 TBOOLEAN autoscale_lt = DTRUE;
 TBOOLEAN autoscale_lu = DTRUE;
 TBOOLEAN autoscale_lv = DTRUE;
 TBOOLEAN autoscale_lx = DTRUE;
 TBOOLEAN autoscale_ly = DTRUE;
 TBOOLEAN autoscale_lz = DTRUE;
+
+/* set bars */
+double bar_size = 1.0;
+
+/* set border */
+struct lp_style_type border_lp = { 0, -2, 0, 1.0, 1.0 };
+int draw_border = 31;
+
 TBOOLEAN multiplot = FALSE;
 
 double boxwidth = -1.0;		/* box width (automatic) */
 TBOOLEAN clip_points = FALSE;
 TBOOLEAN clip_lines1 = TRUE;
 TBOOLEAN clip_lines2 = FALSE;
-struct lp_style_type border_lp = { 0, -2, 0, 1.0, 1.0 };
-int draw_border = 31;
 TBOOLEAN draw_surface = TRUE;
 char dummy_var[MAX_NUM_VAR][MAX_ID_LEN+1] = { "x", "y" };
 char default_font[MAX_ID_LEN+1] = "";	/* Entry font added by DJL */
@@ -104,7 +117,7 @@ int format_is_numeric[AXIS_ARRAY_SIZE] = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
 
 enum PLOT_STYLE data_style = POINTSTYLE;
 enum PLOT_STYLE func_style = LINES;
-double bar_size = 1.0;
+
 struct lp_style_type work_grid = { 0, GRID_OFF, 0, 1.0, 1.0 };
 struct lp_style_type grid_lp   = { 0, -1, 0, 1.0, 1.0 };
 struct lp_style_type mgrid_lp  = { 0, -1, 0, 1.0, 1.0 };
@@ -141,8 +154,6 @@ TBOOLEAN polar = FALSE;
 TBOOLEAN hidden3d = FALSE;
 TBOOLEAN label_contours = TRUE;	/* different linestyles are used for contours when set */
 char contour_format[32] = "%8.3g";	/* format for contour key entries */
-int angles_format = ANGLES_RADIANS;
-double ang2rad = 1.0;		/* 1 or pi/180, tracking angles_format */
 int mapping3d = MAP3D_CARTESIAN;
 int samples = SAMPLES;		/* samples is always equal to samples_1 */
 int samples_1 = SAMPLES;
@@ -256,7 +267,6 @@ struct ticdef y2ticdef = { TIC_COMPUTED };
 TBOOLEAN tic_in = TRUE;
 
 struct text_label *first_label = NULL;
-struct arrow_def *first_arrow = NULL;
 struct linestyle_def *first_linestyle = NULL;
 
 /* space between left edge and xleft in chars (-1: computed) */
@@ -316,76 +326,54 @@ char abbrev_day_names[7][8] =
 
 static void set_angles __PROTO((void));
 static void set_arrow __PROTO((void));
-static void set_noarrow __PROTO((void));
 static int assign_arrow_tag __PROTO((void));
 static void delete_arrow __PROTO((struct arrow_def *, struct arrow_def *));
 static void set_autoscale __PROTO((void));
-static void set_noautoscale __PROTO((void));
 static void set_bars __PROTO((void));
-static void set_nobars __PROTO((void));
+
 static void set_border __PROTO((void));
-static void set_noborder __PROTO((void));
 static void set_boxwidth __PROTO((void));
 static void set_clabel __PROTO((void));
-static void set_noclabel __PROTO((void));
 static void set_clip __PROTO((void));
-static void set_noclip __PROTO((void));
 static void set_cntrparam __PROTO((void));
 static void set_contour __PROTO((void));
-static void set_nocontour __PROTO((void));
-static void set_data __PROTO((void));
 static void set_dgrid3d __PROTO((void));
-static void set_nodgrid3d __PROTO((void));
 static void set_dummy __PROTO((void));
 static void set_encoding __PROTO((void));
 static void set_format __PROTO((void));
-static void set_function __PROTO((void));
 static void set_grid __PROTO((void));
-static void set_nogrid __PROTO((void));
 static void set_hidden3d __PROTO((void));
-static void set_nohidden3d __PROTO((void));
 static void set_isosamples __PROTO((void));
 static void set_key __PROTO((void));
-static void set_nokey __PROTO((void));
 static void set_keytitle __PROTO((void));
-static void set_nokeytitle __PROTO((void));
 static void set_label __PROTO((void));
-static void set_nolabel __PROTO((void));
 static int assign_label_tag __PROTO((void));
 static void delete_label __PROTO((struct text_label * prev, struct text_label * this));
 static void set_loadpath __PROTO((void));
-static void set_noloadpath __PROTO((void));
 static void set_locale __PROTO((void));
 static void set_logscale __PROTO((void));
-static void set_nologscale __PROTO((void));
 static void set_mapping __PROTO((void));
 static void set_bmargin __PROTO((void));
 static void set_lmargin __PROTO((void));
 static void set_rmargin __PROTO((void));
 static void set_tmargin __PROTO((void));
 static void set_missing __PROTO((void));
-static void set_nomissing __PROTO((void));
 static void set_offsets __PROTO((void));
-static void set_nooffsets __PROTO((void));
 static void set_origin __PROTO((void));
 static void set_output __PROTO((void));
 static void set_parametric __PROTO((void));
-static void set_noparametric __PROTO((void));
 static void set_pointsize __PROTO((void));
 static void set_polar __PROTO((void));
-static void set_nopolar __PROTO((void));
 static void set_samples __PROTO((void));
 static void set_size __PROTO((void));
 static void set_style __PROTO((void));
 static void set_surface __PROTO((void));
-static void set_nosurface __PROTO((void));
 static void set_terminal __PROTO((void));
 static void set_tics __PROTO((void));
 static void set_ticscale __PROTO((void));
 static void set_ticslevel __PROTO((void));
 static void set_timefmt __PROTO((void));
 static void set_timestamp __PROTO((void));
-static void set_notimestamp __PROTO((void));
 static void set_view __PROTO((void));
 static void set_zero __PROTO((void));
 static void set_xdata __PROTO((void));
@@ -403,15 +391,10 @@ static void set_trange __PROTO((void));
 static void set_urange __PROTO((void));
 static void set_vrange __PROTO((void));
 static void set_xzeroaxis __PROTO((void));
-static void set_noxzeroaxis __PROTO((void));
 static void set_yzeroaxis __PROTO((void));
-static void set_noyzeroaxis __PROTO((void));
 static void set_x2zeroaxis __PROTO((void));
-static void set_nox2zeroaxis __PROTO((void));
 static void set_y2zeroaxis __PROTO((void));
-static void set_noy2zeroaxis __PROTO((void));
 static void set_zeroaxis __PROTO((void));
-static void set_nozeroaxis __PROTO((void));
 
 
 /******** Local functions ********/
@@ -426,11 +409,8 @@ static void load_tic_series __PROTO((int axis, struct ticdef * tdef));
 static void load_offsets __PROTO((double *a, double *b, double *c, double *d));
 
 static void set_linestyle __PROTO((void));
-static void set_nolinestyle __PROTO((void));
 static int assign_linestyle_tag __PROTO((void));
-static void delete_linestyle __PROTO((struct linestyle_def * prev, struct linestyle_def * this));
 static int looks_like_numeric __PROTO((char *));
-static void set_lp_properties __PROTO((struct lp_style_type * arg, int allow_points, int lt, int pt, double lw, double ps));
 static void reset_lp_properties __PROTO((struct lp_style_type *arg));
 
 static int set_tic_prop __PROTO((int *TICS, int *MTICS, double *FREQ,
@@ -671,17 +651,16 @@ set_command()
 {
     static char GPFAR setmess[] = 
     "valid set options:  [] = choose one, {} means optional\n\n\
-\t'angles',  '{no}arrow',  '{no}autoscale',  'bar',  '{no}border',\n\
-\t'boxwidth', '{no}clabel', '{no}clip', 'cntrparam', '{no}contour',\n\
-\t'{no}dgrid3d',  'dummy',  'encoding',  'format', '{no}grid',\n\
-\t'{no}hidden3d',   'isosamples', '{no}key', '{no}label', '{no}loadpath',\n\
-\t'locale', '{no}logscale', '[blrt]margin', 'mapping', '{no}missing',\n\
-\t'{no}multiplot', '{no}offsets', 'origin', 'output', '{no}parametric',\n\
-\t'pointsize', '{no}polar', '[rtuv]range',  'samples',  'size', 'style',\n\
-\t'{no}surface', 'terminal', 'tics',  'ticscale',  'ticslevel',\n\
-\t'{no}timestamp', 'timefmt', 'title', 'view', '[xyz]{2}data',\n\
-\t'[xyz]{2}label', '[xyz]{2}range', '{no}{m}[xyz]{2}tics',\n\
-\t'{no}[xyz]{2}[md]tics', '{no}{[xyz]{2}}zeroaxis', 'zero'";
+\t'angles',  'arrow',  'autoscale',  'bars',  'border', 'boxwidth',\n\
+\t'clabel', 'clip', 'cntrparam', 'contour', 'data style',  'dgrid3d',\n\
+\t'dummy',  'encoding',  'format', 'function style',   'grid',\n\
+\t'hidden3d',   'isosamples', 'key', 'label', 'linestyle', 'locale',\n\
+\t'logscale', '[blrt]margin', 'mapping', 'missing', 'multiplot',\n\
+\t'offsets', 'origin', 'output', 'parametric', 'pointsize', 'polar',\n\
+\t'[rtuv]range',  'samples',  'size',  'surface',  'terminal',\n\
+\t'tics',  'ticscale',  'ticslevel',  'timestamp',  'timefmt',\n\
+\t'title', 'view', '[xyz]{2}data', '[xyz]{2}label', '[xyz]{2}range',\n\
+\t'{no}{m}[xyz]{2}tics', '[xyz]{2}[md]tics', '{[xyz]{2}}zeroaxis', 'zero'";
 
     c_token++;
 
@@ -696,26 +675,14 @@ set_command()
     case S_ARROW:
 	set_arrow();
 	break;
-    case S_NOARROW:
-	set_noarrow();
-	break;
     case S_AUTOSCALE:
 	set_autoscale();
-	break;
-    case S_NOAUTOSCALE:
-	set_noautoscale();
 	break;
     case S_BARS:
 	set_bars();
 	break;
-    case S_NOBARS:
-	set_nobars();
-	break;
     case S_BORDER:
 	set_border();
-	break;
-    case S_NOBORDER:
-	set_noborder();
 	break;
     case S_BOXWIDTH:
 	set_boxwidth();
@@ -723,14 +690,8 @@ set_command()
     case S_CLABEL:
 	set_clabel();
 	break;
-    case S_NOCLABEL:
-	set_noclabel();
-	break;
     case S_CLIP:
 	set_clip();
-	break;
-    case S_NOCLIP:
-	set_noclip();
 	break;
     case S_CNTRPARAM:
 	set_cntrparam();
@@ -738,19 +699,8 @@ set_command()
     case S_CONTOUR:
 	set_contour();
 	break;
-    case S_NOCONTOUR:
-	set_nocontour();
-	break;
-/*
-    case S_DATA:
-	set_data();
-	break;
-*/
     case S_DGRID3D:
 	set_dgrid3d();
-	break;
-    case S_NODGRID3D:
-	set_nodgrid3d();
 	break;
     case S_DUMMY:
 	set_dummy();
@@ -761,22 +711,11 @@ set_command()
     case S_FORMAT:
 	set_format();
 	break;
-/*
-    case S_FUNCTIONS:
-	set_function();
-	break;
-*/
     case S_GRID:
 	set_grid();
 	break;
-    case S_NOGRID:
-	set_nogrid();
-	break;
     case S_HIDDEN3D:
 	set_hidden3d();
-	break;
-    case S_NOHIDDEN3D:
-	set_nohidden3d();
 	break;
     case S_ISOSAMPLES:
 	set_isosamples();
@@ -784,45 +723,20 @@ set_command()
     case S_KEY:
 	set_key();
 	break;
-    case S_NOKEY:
-	set_nokey();
-	break;
     case S_KEYTITLE:
 	set_keytitle();
-	break;
-    case S_NOKEYTITLE:
-	set_nokeytitle();
 	break;
     case S_LABEL:
 	set_label();
 	break;
-    case S_NOLABEL:
-	set_nolabel();
-	break;
-/*
-    case S_LINESTYLE:
-	c_token++;
-	set_linestyle();
-	break;
-*/
-    case S_NOLINESTYLE:
-	c_token++;
-	set_nolinestyle();
-	break;
     case S_LOADPATH:
 	set_loadpath();
-	break;
-    case S_NOLOADPATH:
-	set_noloadpath();
 	break;
     case S_LOCALE:
 	set_locale();
 	break;
     case S_LOGSCALE:
 	set_logscale();
-	break;
-    case S_NOLOGSCALE:
-	set_nologscale();
 	break;
     case S_MAPPING:
 	set_mapping();
@@ -842,20 +756,11 @@ set_command()
     case S_MISSING:
 	set_missing();
 	break;
-    case S_NOMISSING:
-	set_nomissing();
-	break;
     case S_MULTIPLOT:
 	term_start_multiplot();
 	break;
-    case S_NOMULTIPLOT:
-	term_end_multiplot();
-	break;
     case S_OFFSETS:
 	set_offsets();
-	break;
-    case S_NOOFFSETS:
-	set_nooffsets();
 	break;
     case S_ORIGIN:
 	set_origin();
@@ -866,17 +771,11 @@ set_command()
     case S_PARAMETRIC:
 	set_parametric();
 	break;
-    case S_NOPARAMETRIC:
-	set_noparametric();
-	break;
     case S_POINTSIZE:
 	set_pointsize();
 	break;
     case S_POLAR:
 	set_polar();
-	break;
-    case S_NOPOLAR:
-	set_nopolar();
 	break;
     case S_SAMPLES:
 	set_samples();
@@ -889,9 +788,6 @@ set_command()
 	break;
     case S_SURFACE:
 	set_surface();
-	break;
-    case S_NOSURFACE:
-	set_nosurface();
 	break;
     case S_TERMINAL:
 	set_terminal();
@@ -910,9 +806,6 @@ set_command()
 	break;
     case S_TIMESTAMP:
 	set_timestamp();
-	break;
-    case S_NOTIMESTAMP:
-	set_notimestamp();
 	break;
     case S_TITLE:
 	set_xyzlabel(&title);
@@ -1038,32 +931,17 @@ set_command()
     case S_XZEROAXIS:
 	set_xzeroaxis();
 	break;
-    case S_NOXZEROAXIS:
-	set_noxzeroaxis();
-	break;
     case S_YZEROAXIS:
 	set_yzeroaxis();
-	break;
-    case S_NOYZEROAXIS:
-	set_noyzeroaxis();
 	break;
     case S_X2ZEROAXIS:
 	set_x2zeroaxis();
 	break;
-    case S_NOX2ZEROAXIS:
-	set_nox2zeroaxis();
-	break;
     case S_Y2ZEROAXIS:
 	set_y2zeroaxis();
 	break;
-    case S_NOY2ZEROAXIS:
-	set_noy2zeroaxis();
-	break;
     case S_ZEROAXIS:
 	set_zeroaxis();
-	break;
-    case S_NOZEROAXIS:
-	set_nozeroaxis();
 	break;
     default:
 	int_error(c_token, setmess);
@@ -1272,39 +1150,6 @@ assign_arrow_tag()
 }
 
 
-/* process 'set noarrow' command */
-static void
-set_noarrow()
-{
-    struct value a;
-    struct arrow_def *this_arrow;
-    struct arrow_def *prev_arrow;
-    int tag;
-
-    c_token++;
-
-    if (END_OF_COMMAND) {
-	/* delete all arrows */
-	while (first_arrow != NULL)
-	    delete_arrow((struct arrow_def *) NULL, first_arrow);
-    } else {
-	/* get tag */
-	tag = (int) real(const_express(&a));
-	if (!END_OF_COMMAND)
-	    int_error(c_token, "extraneous arguments to set noarrow");
-	for (this_arrow = first_arrow, prev_arrow = NULL;
-	     this_arrow != NULL;
-	     prev_arrow = this_arrow, this_arrow = this_arrow->next) {
-	    if (this_arrow->tag == tag) {
-		delete_arrow(prev_arrow, this_arrow);
-		return;		/* exit, our job is done */
-	    }
-	}
-	int_error(c_token, "arrow not found");
-    }
-}
-
-
 /* delete arrow from linked list started by first_arrow.
  * called with pointers to the previous arrow (prev) and the 
  * arrow to delete (this).
@@ -1337,7 +1182,8 @@ set_autoscale()
 {
     c_token++;
     if (END_OF_COMMAND) {
-	autoscale_r = autoscale_t = autoscale_x = autoscale_y = autoscale_z = autoscale_x2 = autoscale_y2 = DTRUE;
+	autoscale_r = autoscale_t = autoscale_x = autoscale_y = autoscale_z =
+	    autoscale_x2 = autoscale_y2 = DTRUE;
     } else if (equals(c_token, "xy") || equals(c_token, "yx")) {
 	autoscale_x = autoscale_y = DTRUE;
 	c_token++;
@@ -1353,46 +1199,6 @@ set_autoscale()
     PROCESS_AUTO_LETTER(autoscale_y2, "y2", "y2mi$n", "y2ma$x")
     else
 	int_error(c_token, "Invalid range");
-}
-
-/* process 'set noautoscale' command */
-static void
-set_noautoscale()
-{
-    c_token++;
-    if (END_OF_COMMAND) {
-	autoscale_r = autoscale_t = autoscale_x = autoscale_y = autoscale_z = FALSE;
-    } else if (equals(c_token, "xy") || equals(c_token, "tyx")) {
-	autoscale_x = autoscale_y = FALSE;
-	c_token++;
-    } else if (equals(c_token, "r")) {
-	autoscale_r = FALSE;
-	c_token++;
-    } else if (equals(c_token, "t")) {
-	autoscale_t = FALSE;
-	c_token++;
-    } else if (equals(c_token, "u")) {
-	autoscale_u = FALSE;
-	c_token++;
-    } else if (equals(c_token, "v")) {
-	autoscale_v = FALSE;
-	c_token++;
-    } else if (equals(c_token, "x")) {
-	autoscale_x = FALSE;
-	c_token++;
-    } else if (equals(c_token, "y")) {
-	autoscale_y = FALSE;
-	c_token++;
-    } else if (equals(c_token, "x2")) {
-	autoscale_x2 = FALSE;
-	c_token++;
-    } else if (equals(c_token, "y2")) {
-	autoscale_y2 = FALSE;
-	c_token++;
-    } else if (equals(c_token, "z")) {
-	autoscale_z = FALSE;
-	c_token++;
-    }
 }
 
 
@@ -1414,15 +1220,6 @@ set_bars()
     } else {
 	bar_size = real(const_express(&a));
     }
-}
-
-
-/* process 'set nobars' command */
-static void
-set_nobars()
-{
-    c_token++;
-    bar_size = 0.0;
 }
 
 
@@ -1448,15 +1245,6 @@ set_border()
     } else {
 	lp_parse(&border_lp, 1, 0, -2, 0);
     }
-}
-
-
-/* process 'set noborder' command */
-static void
-set_noborder()
-{
-    c_token++;
-    draw_border = 0;
 }
 
 
@@ -1488,15 +1276,6 @@ set_clabel()
 }
 
 
-/* process 'set noclabel' command */
-static void
-set_noclabel()
-{
-    c_token++;
-    label_contours = FALSE;
-}
-
-
 /* process 'set clip' command */
 static void
 set_clip()
@@ -1511,28 +1290,6 @@ set_clip()
 	clip_lines1 = TRUE;
     else if (almost_equals(c_token, "t$wo"))
 	clip_lines2 = TRUE;
-    else
-	int_error(c_token, "expecting 'points', 'one', or 'two'");
-    c_token++;
-}
-
-
-/* process 'set noclip' command */
-static void
-set_noclip()
-{
-    c_token++;
-    if (END_OF_COMMAND) {
-	/* same as all three */
-	clip_points = FALSE;
-	clip_lines1 = FALSE;
-	clip_lines2 = FALSE;
-    } else if (almost_equals(c_token, "p$oints"))
-	clip_points = FALSE;
-    else if (almost_equals(c_token, "o$ne"))
-	clip_lines1 = FALSE;
-    else if (almost_equals(c_token, "t$wo"))
-	clip_lines2 = FALSE;
     else
 	int_error(c_token, "expecting 'points', 'one', or 'two'");
     c_token++;
@@ -1657,26 +1414,6 @@ set_contour()
 }
 
 
-/* process 'set nocontour' command */
-static void
-set_nocontour()
-{
-    c_token++;
-    draw_contour = CONTOUR_NONE;
-}
-
-
-/* process 'set data style' command */
-static void
-set_data()
-{
-    c_token++;
-    if (!almost_equals(c_token,"s$tyle"))
-	int_error(c_token, "expecting keyword 'style'");
-    data_style = get_style();
-}
-
-
 /* process 'set dgrid3d' command */
 static void
 set_dgrid3d()
@@ -1716,15 +1453,6 @@ set_dgrid3d()
     dgrid3d_col_fineness = local_vals[1];
     dgrid3d_norm_value = local_vals[2];
     dgrid3d = TRUE;
-}
-
-
-/* process 'set nodgrid3d' command */
-static void
-set_nodgrid3d()
-{
-    c_token++;
-    dgrid3d = FALSE;
 }
 
 
@@ -1855,17 +1583,6 @@ set_format()
 }
 
 
-/* process 'set function style' command */
-static void
-set_function()
-{
-    c_token++;
-    if (!almost_equals(c_token,"s$tyle"))
-	int_error(c_token, "expecting keyword 'style'");
-    func_style = get_style();
-}
-
-
 /* process 'set grid' command */
 
 #define GRID_MATCH(string, neg, mask) \
@@ -1940,15 +1657,6 @@ set_grid()
 }
 
 
-/* process 'set nogrid' command */
-static void
-set_nogrid()
-{
-    work_grid.l_type = GRID_OFF;
-    c_token++;
-}
-
-
 /* process 'set hidden3d' command */
 static void
 set_hidden3d()
@@ -1960,19 +1668,6 @@ set_hidden3d()
     /* HBB 970618: new parsing engine for hidden3d options */
     set_hidden3doptions();
     hidden3d = TRUE;
-#endif
-}
-
-
-/* process 'set nohidden3d' command */
-static void
-set_nohidden3d()
-{
-    c_token++;
-#ifdef LITE
-    printf(" Hidden Line Removal Not Supported in LITE version\n");
-#else
-    hidden3d = FALSE;
 #endif
 }
 
@@ -2134,15 +1829,6 @@ set_key()
 }
 
 
-/* process 'set nokey' command */
-static void
-set_nokey()
-{
-    key = 0;
-    c_token++;
-}
-
-
 /* process 'set keytitle' command */
 static void
 set_keytitle()
@@ -2158,15 +1844,6 @@ set_keytitle()
 	}
 	/* c_token++; */
     }
-}
-
-
-/* process 'set nokeytitle' command */
-static void
-set_nokeytitle()
-{
-    c_token++;
-    *key_title = 0;
 }
 
 
@@ -2359,40 +2036,6 @@ set_label()
 }				/* Entry font added by DJL */
 
 
-/* process 'set nolabel' command */
-/* set nolabel {tag} */
-static void
-set_nolabel()
-{
-    struct value a;
-    struct text_label *this_label;
-    struct text_label *prev_label;
-    int tag;
-
-    c_token++;
-
-    if (END_OF_COMMAND) {
-	/* delete all labels */
-	while (first_label != NULL)
-	    delete_label((struct text_label *) NULL, first_label);
-    } else {
-	/* get tag */
-	tag = (int) real(const_express(&a));
-	if (!END_OF_COMMAND)
-	    int_error(c_token, "extraneous arguments to set nolabel");
-	for (this_label = first_label, prev_label = NULL;
-	     this_label != NULL;
-	     prev_label = this_label, this_label = this_label->next) {
-	    if (this_label->tag == tag) {
-		delete_label(prev_label, this_label);
-		return;		/* exit, our job is done */
-	    }
-	}
-	int_error(c_token, "label not found");
-    }
-}
-
-
 /* assign a new label tag
  * labels are kept sorted by tag number, so this is easy
  * returns the lowest unassigned tag number
@@ -2471,15 +2114,6 @@ set_loadpath()
 	set_var_loadpath(collect);
 	free(collect);
     }
-}
-
-
-/* process 'set noloadpath' command */
-static void
-set_noloadpath()
-{
-    c_token++;
-    clear_loadpath();
 }
 
 
@@ -2572,38 +2206,6 @@ set_logscale()
 }
 
 
-/* process 'set nologscale' command */
-static void
-set_nologscale()
-{
-    c_token++;
-    if (END_OF_COMMAND) {
-	is_log_x = is_log_y = is_log_z = is_log_x2 = is_log_y2 = FALSE;
-    } else if (equals(c_token, "x2")) {
-	is_log_x2 = FALSE; ++c_token;
-    } else if (equals(c_token, "y2")) {
-	is_log_y2 = FALSE; ++c_token;
-    } else {
-	if (chr_in_str(c_token, 'x')) {
-	    is_log_x = FALSE;
-	    base_log_x = 0.0;
-	    log_base_log_x = 0.0;
-	}
-	if (chr_in_str(c_token, 'y')) {
-	    is_log_y = FALSE;
-	    base_log_y = 0.0;
-	    log_base_log_y = 0.0;
-	}
-	if (chr_in_str(c_token, 'z')) {
-	    is_log_z = FALSE;
-	    base_log_z = 0.0;
-	    log_base_log_z = 0.0;
-	}
-	c_token++;
-    }
-}
-
-
 /* process 'set mapping3d' command */
 static void
 set_mapping()
@@ -2681,17 +2283,6 @@ set_missing()
 }
 
 
-/* process 'set nomissing' command */
-static void
-set_nomissing()
-{
-    c_token++;
-    if (missing_val)
-	free(missing_val);
-    missing_val = NULL;
-}
-
-
 /* process 'set offsets' command */
 static void
 set_offsets()
@@ -2702,15 +2293,6 @@ set_offsets()
     } else {
 	load_offsets (&loff,&roff,&toff,&boff);
     }
-}
-
-
-/* process 'set nooffsets' command */
-static void
-set_nooffsets()
-{
-    c_token++;
-    loff = roff = toff = boff = 0.0;
 }
 
 
@@ -2784,24 +2366,6 @@ set_parametric()
 }
 
 
-/* process 'set noparametric' command */
-static void
-set_noparametric()
-{
-    c_token++;
-
-    if (parametric) {
-	parametric = FALSE;
-	if (!polar) { /* keep t for polar */
-	    strcpy (dummy_var[0], "x");
-	    strcpy (dummy_var[1], "y");
-	    if (interactive)
-		(void) fprintf(stderr,"\n\tdummy variable is x for curves, x/y for surfaces\n");
-	}
-    }
-}
-
-
 /* process 'set pointsize' command */
 static void
 set_pointsize()
@@ -2834,28 +2398,6 @@ set_polar()
 	    /* only if user has not set a range manually */
 	    tmin = 0.0;
 	    tmax = 2 * M_PI / ang2rad;  /* 360 if degrees, 2pi if radians */
-	}
-    }
-}
-
-
-/* process 'set nopolar' command */
-static void
-set_nopolar()
-{
-    c_token++;
-
-    if (polar) {
-	polar = FALSE;
-	if (parametric && autoscale_t) {
-	    /* only if user has not set an explicit range */
-	    tmin = -5.0;
-	    tmax = 5.0;
-	}
-	if (!parametric) {
-	    strcpy (dummy_var[0], "x");
-	    if (interactive)
-		(void) fprintf(stderr,"\n\tdummy variable is x for curves\n");
 	}
     }
 }
@@ -2950,15 +2492,6 @@ set_surface()
 {
     c_token++;
     draw_surface = TRUE;
-}
-
-
-/* process 'set nosurface' command */
-static void
-set_nosurface()
-{
-    c_token++;
-    draw_surface = FALSE;
 }
 
 
@@ -3111,15 +2644,6 @@ set_timestamp()
 }
 
 
-/* process 'set notimestamp' command */
-static void
-set_notimestamp()
-{
-    c_token++;
-    *timelabel.text = 0;
-}
-
-
 /* process 'set view' command */
 static void
 set_view()
@@ -3174,7 +2698,6 @@ set_zero()
     struct value a;
     c_token++;
     zero = magnitude(const_express(&a));
-
 }
 
 /* FIXME - merge set_*data() functions into one */
@@ -3375,15 +2898,6 @@ set_xzeroaxis()
 }
 
 
-/* process 'set noxzeroaxis' command */
-static void
-set_noxzeroaxis()
-{
-    c_token++;
-    xzeroaxis.l_type = -3;
-}
-
-
 /* process 'set yzeroaxis' command */
 static void
 set_yzeroaxis()
@@ -3391,29 +2905,11 @@ set_yzeroaxis()
     PROCESS_ZEROAXIS(yzeroaxis);
 }
 
-/* process 'set noyzeroaxis' command */
-static void
-set_noyzeroaxis()
-{
-    c_token++;
-    yzeroaxis.l_type = -3;
-}
-
-
 /* process 'set x2zeroaxis' command */
 static void
 set_x2zeroaxis()
 {
     PROCESS_ZEROAXIS(x2zeroaxis);
-}
-
-
-/* process 'set nox2zeroaxis' command */
-static void
-set_nox2zeroaxis()
-{
-    c_token++;
-    x2zeroaxis.l_type = -3;
 }
 
 
@@ -3425,15 +2921,6 @@ set_y2zeroaxis()
 }
 
 
-/* process 'set noy2zeroaxis' command */
-static void
-set_noy2zeroaxis()
-{
-    c_token++;
-    y2zeroaxis.l_type = -3;
-}
-
-
 /* process 'set zeroaxis' command */
 static void
 set_zeroaxis()
@@ -3441,18 +2928,6 @@ set_zeroaxis()
     c_token++;
     lp_parse(&xzeroaxis,1,0,-1,0);
     memcpy(&yzeroaxis,&xzeroaxis,sizeof(struct lp_style_type));
-}
-
-
-/* process 'set nozeroaxis' command */
-static void
-set_nozeroaxis()
-{
-    c_token++;
-    xzeroaxis.l_type  = -3;
-    yzeroaxis.l_type  = -3;
-    x2zeroaxis.l_type = -3;
-    y2zeroaxis.l_type = -3;
 }
 
 
@@ -3732,36 +3207,6 @@ set_linestyle()
     }
 }
 
-/* process 'set nolinestyle' command */
-/* set nolinestyle {tag} */
-static void
-set_nolinestyle()
-{
-    struct value a;
-    struct linestyle_def *this, *prev;
-    int tag;
-
-    if (END_OF_COMMAND) {
-	/* delete all linestyles */
-	while (first_linestyle != NULL)
-	    delete_linestyle((struct linestyle_def *) NULL, first_linestyle);
-    } else {
-	/* get tag */
-	tag = (int) real(const_express(&a));
-	if (!END_OF_COMMAND)
-	    int_error(c_token, "extraneous arguments to set nolinestyle");
-	for (this = first_linestyle, prev = NULL;
-	     this != NULL;
-	     prev = this, this = this->next) {
-	    if (this->tag == tag) {
-		delete_linestyle(prev, this);
-		return;		/* exit, our job is done */
-	    }
-	}
-	int_error(c_token, "linestyle not found");
-    }
-}
-
 /* assign a new linestyle tag
  * linestyles are kept sorted by tag number, so this is easy
  * returns the lowest unassigned tag number
@@ -3787,7 +3232,7 @@ assign_linestyle_tag()
  * If there is no previous linestyle (the linestyle to delete is
  * first_linestyle) then call with prev = NULL.
  */
-static void
+void
 delete_linestyle(prev, this)
 struct linestyle_def *prev, *this;
 {
