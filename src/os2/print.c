@@ -1,5 +1,5 @@
 #ifdef INCRCSDATA
-static char RCSid[]="$Id: print.c,v 1.2 2004/04/13 17:24:05 broeker Exp $" ;
+static char RCSid[]="$Id: print.c,v 1.3 2004/07/01 17:10:10 broeker Exp $" ;
 #endif
 
 /****************************************************************************
@@ -102,7 +102,6 @@ MPARAM PrintCmdProc( HWND hWnd, ULONG msg, MPARAM mp1, MPARAM mp2 )
 ** (i.e for the appropriate 1-and 2-d child windows )
 */
     {
-    static BYTE abStack[4096] ;
     static PRINTPARAMS tp ;
     static char szBusy[] = "Busy - try again later" ;
     static char szStart[] = "Printing started" ;
@@ -110,9 +109,8 @@ MPARAM PrintCmdProc( HWND hWnd, ULONG msg, MPARAM mp1, MPARAM mp2 )
     static HWND hwndCancel = NULLHANDLE ;
     char szTemp[32] ;
     unsigned short lErr ;
-    PBYTE pStack = abStack;
     TID tid ;
-    char *pszMess, *szPrinter ;
+    char *pszMess;
 
     if( semPrint == 0L ) {
         DosCreateMutexSem( NULL, &semPrint, 0L, 0L ) ;
@@ -311,7 +309,6 @@ static void ThreadPrintPage( PRINTPARAMS *ptp )
     HAB         hab ;       // thread anchor block nandle
     HDC         hdc ;       // printer device context handle
     HPS         hps ;       // presentation space handle
-    HDC         hdcOld ;    // old hdc associated with hps
     SHORT       msgRet ;    // message posted prior to return (end of thread)
     SIZEL       sizPage ;   // size of page for creation of presentation space
     LONG        alPage[2] ; // actual size of printer page in pixels
@@ -436,7 +433,6 @@ HDC OpenPrinterDC( HAB hab, PQPRINT pqp, LONG lMode, char *szPrintFile )
 **                   = DEV_ERROR (=0) if error
 */
     {
-    CHAR   *pchDelimiter ;
     LONG   lType ;
     static CHAR   achPrinterData[256] ;
 
