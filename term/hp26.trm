@@ -1,5 +1,5 @@
 /*
- * $Id: hp26.trm,v 1.9 1999/10/01 15:09:11 lhecking Exp $
+ * $Id: hp26.trm,v 1.10 1999/10/29 18:39:39 lhecking Exp $
  */
 
 /* GNUPLOT - HP26.trm */
@@ -239,7 +239,7 @@ HP26_Buffer_Node *the_buff;
     }
     /* try to compress the stream */
     if (the_buff->next > 30 && the_buff->linetype != POINT) {
-    	HP26_reduction_slope += compact_slope(buff_x, buff_y, isa_move, &(the_buff->next), 0.1);
+    	HP26_reduction_slope += compact_slope(buff_x, buff_y, (int *)isa_move, &(the_buff->next), 0.1);
     }
     /* start escape sequence */
     fputs("\033*p", gpoutfile);
