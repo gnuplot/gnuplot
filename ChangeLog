@@ -1,4 +1,4 @@
-2000-10-24  Lars Hecking  <lhecking@nmrc.ucc.ie>
+2000-10-24 Johannes Zellner <johannes@zellner.org>
 
 	* term/ggi.trm: increased the speed of ggi command line
 	input by redrawing ruler / statusline coordinates / zoombox
