@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.8 1999/06/11 18:54:37 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.9 1999/06/14 19:19:47 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -813,14 +813,14 @@ int t;
 void
 PUTTEXT_null(x, y, s)
 unsigned int x, y;
-char *s;
+const char *s;
 {
 }
 
 
 int
 set_font_null(s)
-char *s;
+const char *s;
 {
     return FALSE;
 }
@@ -872,10 +872,10 @@ void
 list_terms()
 {
     register int i;
-    char line_buffer[BUFSIZ];
+    char *line_buffer = gp_alloc(BUFSIZ, "list_terms");
 
     StartOutput();
-    sprintf(line_buffer, "\nAvailable terminal types:\n");
+    strcpy(line_buffer, "\nAvailable terminal types:\n");
     OutLine(line_buffer);
 
     for (i = 0; i < TERMCOUNT; i++) {
@@ -885,6 +885,7 @@ list_terms()
     }
 
     EndOutput();
+    free(line_buffer);
 }
 
 
@@ -1224,7 +1225,7 @@ void
 test_term()
 {
     register struct termentry *t = term;
-    char *str;
+    const char *str;
     int x, y, xl, yl, i;
     unsigned int xmax_t, ymax_t;
     char label[MAX_ID_LEN];
