@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.121 2004/08/13 06:13:20 sfeam Exp $
+ * $Id: post.trm,v 1.122 2004/08/13 22:39:17 sfeam Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -788,7 +788,7 @@ enum PS_id {
 #ifdef PM3D
     PS_PALFUNCPARAM,
 #endif /* PM3D */
-    PS_LEVEL1,
+    PS_LEVEL1, PS_FONT,
     PS_OTHER
 };
 
@@ -822,6 +822,7 @@ static struct gen_table PS_opts[] =
     { "palf$uncparam", PS_PALFUNCPARAM },
 #endif /* PM3D */
     { "level1", PS_LEVEL1 },
+    { "font", PS_FONT },
     { NULL, PS_OTHER }
 };
 
@@ -830,6 +831,7 @@ TERM_PUBLIC void
 PS_options()
 {
     struct value a;
+    char *s;
     char *ps_fontfile_char = NULL;
     ps_level1 = FALSE;
 
@@ -1060,6 +1062,15 @@ PS_options()
 	    ++c_token;
 	    break;
 #endif /* PM3D */
+
+	case PS_FONT:
+	    c_token++;
+	    if (!(s = try_to_get_string()))
+		int_error(c_token,"expecting font name");
+	    strncpy(ps_font,s,sizeof(ps_font));
+	    free(s);
+	    break;
+
 	case PS_OTHER:
 	default:
 	    if (isstring(c_token)) {
