@@ -1,5 +1,5 @@
 /*
- * $Id: gif.trm,v 1.42 2002/12/13 14:58:46 lhecking Exp $
+ * $Id: gif.trm,v 1.43 2003/03/21 17:18:21 mikulik Exp $
  */
 
 /* GNUPLOT -- gif.trm */
@@ -416,7 +416,7 @@ TERM_PUBLIC int GIF_make_palette (t_sm_palette *palette)
 	if (i == 0) {
 	    i = (sm_palette.colors <= 0) ? -1 : sm_palette.colors;
 		/* (no more colours) : (previous palette (obviously multiplot mode)) */
-#if 1
+#if 0
 	    if (i > 0) fprintf(stderr,"reusing it again\n");
 #endif
 	}
