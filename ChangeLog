@@ -1,3 +1,9 @@
+2002-07-22  Ethan Merritt  <merritt@u.washington.edu>
+
+	* demo/textcolor.dem demo/all.dem: Demo for text color.
+
+	* src/gadgets.c: Fix for default textcolor.
+
 2002-07-21  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* term/metapost.trm: Fix wrong indentation in the documentation
@@ -765,7 +771,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/07/21 13:17:56 $).
+	last modification date (from the tag $Date: 2002/07/21 13:21:30 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
