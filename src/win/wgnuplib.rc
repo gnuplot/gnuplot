@@ -91,7 +91,6 @@ BEGIN
     LTEXT   "", AB_TEXT3,  4, 70, 172, 48
 END
 
-IDC_CROSSHAIR CURSOR "ptrcross.cur"
 IDC_SCALING   CURSOR "scaling.cur"
 IDC_ROTATING  CURSOR "rotating.cur"
 

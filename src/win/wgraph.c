@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: wgraph.c,v 1.16 2001/02/19 17:08:24 broeker Exp $";
+static char *RCSid = "$Id: wgraph.c,v 1.17 2001/02/21 18:50:16 mikulik Exp $";
 #endif
 
 /* GNUPLOT - win/wgraph.c */
@@ -628,11 +628,11 @@ SelFont(LPGW lpgw)
 static void
 LoadCursors(LPGW lpgw)
 {
-	/* 2 of them are standard cursor shapes: */
+	/* 3 of them are standard cursor shapes: */
 	hptrDefault = LoadCursor(NULL, IDC_ARROW);
 	hptrZooming = LoadCursor(NULL, IDC_SIZEALL);
-	/* the other 3 are kept in the resource file: */
-	hptrCrossHair = LoadCursor( lpgw->hInstance, MAKEINTRESOURCE(IDC_CROSSHAIR));
+	hptrCrossHair = LoadCursor( NULL, IDC_CROSS);
+	/* the other 2 are kept in the resource file: */
 	hptrScaling = LoadCursor( lpgw->hInstance, MAKEINTRESOURCE(IDC_SCALING));
 	hptrRotating = LoadCursor( lpgw->hInstance, MAKEINTRESOURCE(IDC_ROTATING));
 
@@ -1118,7 +1118,7 @@ CopyPrint(LPGW lpgw)
 	DOCINFO docInfo;
 #endif
 
-#if WINVER >= 0x030a
+#if WINVER >= 0x030a	/* If Win 3.0, this whole function does nothing at all ... */
 	HDC printer;
 	DLGPROC lpfnAbortProc;
 	DLGPROC lpfnPrintDlgProc;
@@ -1162,14 +1162,14 @@ CopyPrint(LPGW lpgw)
 	docInfo.lpszDocName = lpgw->Title;
 
 	if (StartDoc(printer, &docInfo) > 0) {
-#else
+# else /* WIN32 */
 #ifdef __DLL__
 	lpfnPrintDlgProc = (DLGPROC)GetProcAddress(hdllInstance, "PrintDlgProc");
 	lpfnAbortProc = (DLGPROC)GetProcAddress(hdllInstance, "PrintAbortProc");
-#else
+#  else /* __DLL__ */
 	lpfnPrintDlgProc = (DLGPROC)MakeProcInstance((FARPROC)PrintDlgProc, hdllInstance);
 	lpfnAbortProc = (DLGPROC)MakeProcInstance((FARPROC)PrintAbortProc, hdllInstance);
-#endif
+#  endif /* __DLL__ */
 	pr.hDlgPrint = CreateDialogParam(hdllInstance,"CancelDlgBox",hwnd,lpfnPrintDlgProc,(LPARAM)lpgw->Title);
 	Escape(printer,SETABORTPROC,0,(LPSTR)lpfnAbortProc,NULL);  
 	if (Escape(printer, STARTDOC, lstrlen(lpgw->Title),lpgw->Title, NULL) > 0) {
@@ -1187,10 +1187,10 @@ CopyPrint(LPGW lpgw)
 #ifdef WIN32
 		if (EndPage(printer) > 0)
 			EndDoc(printer);
-#else
+# else /* WIN32 */
 		if (Escape(printer,NEWFRAME,0,NULL,NULL) > 0)
 			Escape(printer,ENDDOC,0,NULL,NULL);
-#endif
+# endif /* WIN32 */
 	}
 	if (!pr.bUserAbort) {
 		EnableWindow(hwnd,TRUE);
@@ -1200,16 +1200,16 @@ CopyPrint(LPGW lpgw)
 #ifndef __DLL__
 	FreeProcInstance((FARPROC)lpfnPrintDlgProc);
 	FreeProcInstance((FARPROC)lpfnAbortProc);
-#endif
-#endif
+# endif /* __DLL__ */
+#endif /* WIN32 */
 	DeleteDC(printer);
 	SetWindowLong(hwnd, 4, (LONG)(0L));
 #ifdef WIN32
 	PrintUnregister((LPPRINT)&pr);
-#endif
+#endif /* WIN32 */
 	/* make certain that the screen pen set is restored */
 	SendMessage(lpgw->hWndGraph,WM_COMMAND,M_REBUILDTOOLS,0L);
-#endif
+#endif /* WIN Version >= 3.1 */
 	return;
 }
 
