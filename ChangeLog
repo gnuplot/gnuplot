@@ -1,3 +1,16 @@
+2004-02-22  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	Fix SF bug: [ 666462 ] steps/histeps calculation/display problem.
+	
+	* src/graphics.c (edge_intersect_steps, ): Replace invidual tests
+	against axis range ends by calls to macro cliptorange(), which can
+	handle reverted ranges.
+	(edge_intersect_fsteps): Likewise.
+	(two_edge_intersect): Use GPMAX() of axis endpoints instead of
+	axis.max element to compare to, again to avoid surprises with
+	reverted axes.
+	(do_key_sample): De-ANSI-fied.  Reindented.
+
 2004-02-21  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	Tagged a patchlevel 1 to incorporate some post-last-minute

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.98 2003/11/22 04:49:58 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.99 2003/12/14 22:08:57 vanzandt Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -1334,7 +1334,9 @@ do_plot(plots, pcount)
 		    (*t->put_text) (center, yl, s);
 		} else {
 		    int x = center - (t->h_char) * strlen(s) / 2;
-		    if (key->hpos == TOUT || key->vpos == TUNDER || inrange(x, xleft, xright))
+		    if (key->hpos == TOUT
+			|| key->vpos == TUNDER
+			|| inrange(x, xleft, xright))
 			(*t->put_text) (x, yl, s);
 		}
 		s = ++e;
@@ -3152,9 +3154,9 @@ double *ex, *ey;		/* the point where it crosses an edge */
  */
 static void
 edge_intersect_steps(points, i, ex, ey)
-struct coordinate GPHUGE *points;	/* the points array */
-int i;				/* line segment from point i-1 to point i */
-double *ex, *ey;		/* the point where it crosses an edge */
+    struct coordinate GPHUGE *points; /* the points array */
+    int i;			/* line segment from point i-1 to point i */
+    double *ex, *ey;		/* the point where it crosses an edge */
 {
     /* global X_AXIS.min, X_AXIS.max, Y_AXIS.min, X_AXIS.max */
     double ax = points[i - 1].x;
@@ -3165,30 +3167,22 @@ double *ex, *ey;		/* the point where it crosses an edge */
     if (points[i].type == INRANGE) {	/* from OUTRANGE to INRANG */
 	if (inrange(ay, Y_AXIS.min, Y_AXIS.max)) {
 	    *ey = ay;
-	    if (ax > X_AXIS.max)
-		*ex = X_AXIS.max;
-	    else		/* x < X_AXIS.min */
-		*ex = X_AXIS.min;
+	    cliptorange(ax, X_AXIS.min, X_AXIS.max);
+	    *ex = ax;
 	} else {
 	    *ex = bx;
-	    if (ay > Y_AXIS.max)
-		*ey = Y_AXIS.max;
-	    else		/* y < Y_AXIS.min */
-		*ey = Y_AXIS.min;
+	    cliptorange(ay, Y_AXIS.min, Y_AXIS.max);
+	    *ey = ay;
 	}
     } else {			/* from INRANGE to OUTRANGE */
 	if (inrange(bx, X_AXIS.min, X_AXIS.max)) {
 	    *ex = bx;
-	    if (by > Y_AXIS.max)
-		*ey = Y_AXIS.max;
-	    else		/* y < Y_AXIS.min */
-		*ey = Y_AXIS.min;
+	    cliptorange(by, Y_AXIS.min, Y_AXIS.max);
+	    *ey = by;
 	} else {
 	    *ey = ay;
-	    if (bx > X_AXIS.max)
-		*ex = X_AXIS.max;
-	    else		/* x < X_AXIS.min */
-		*ex = X_AXIS.min;
+	    cliptorange(bx, X_AXIS.min, X_AXIS.max);
+	    *ex = bx;
 	}
     }
     return;
@@ -3207,9 +3201,9 @@ double *ex, *ey;		/* the point where it crosses an edge */
  */
 static void
 edge_intersect_fsteps(points, i, ex, ey)
-struct coordinate GPHUGE *points;	/* the points array */
-int i;				/* line segment from point i-1 to point i */
-double *ex, *ey;		/* the point where it crosses an edge */
+    struct coordinate GPHUGE *points; /* the points array */
+    int i;			/* line segment from point i-1 to point i */
+    double *ex, *ey;		/* the point where it crosses an edge */
 {
     /* global X_AXIS.min, X_AXIS.max, Y_AXIS.min, X_AXIS.max */
     double ax = points[i - 1].x;
@@ -3220,30 +3214,22 @@ double *ex, *ey;		/* the point where it crosses an edge */
     if (points[i].type == INRANGE) {	/* from OUTRANGE to INRANG */
 	if (inrange(ax, X_AXIS.min, X_AXIS.max)) {
 	    *ex = ax;
-	    if (ay > Y_AXIS.max)
-		*ey = Y_AXIS.max;
-	    else		/* y < Y_AXIS.min */
-		*ey = Y_AXIS.min;
+	    cliptorange(ay, Y_AXIS.min, Y_AXIS.max);
+	    *ey = ay;
 	} else {
 	    *ey = by;
-	    if (bx > X_AXIS.max)
-		*ex = X_AXIS.max;
-	    else		/* x < X_AXIS.min */
-		*ex = X_AXIS.min;
+	    cliptorange(bx, X_AXIS.min, X_AXIS.max);
+	    *ex = bx;
 	}
     } else {			/* from INRANGE to OUTRANGE */
 	if (inrange(by, Y_AXIS.min, Y_AXIS.max)) {
 	    *ey = by;
-	    if (bx > X_AXIS.max)
-		*ex = X_AXIS.max;
-	    else		/* x < X_AXIS.min */
-		*ex = X_AXIS.min;
+	    cliptorange(bx, X_AXIS.min, X_AXIS.max);
+	    *ex = bx;
 	} else {
 	    *ex = ax;
-	    if (by > Y_AXIS.max)
-		*ey = Y_AXIS.max;
-	    else		/* y < Y_AXIS.min */
-		*ey = Y_AXIS.min;
+	    cliptorange(by, Y_AXIS.min, Y_AXIS.max);
+	    *ey = by;
 	}
     }
     return;
@@ -3387,9 +3373,9 @@ two_edge_intersect_fsteps(points, i, lx, ly)
  */
 static TBOOLEAN			/* any intersection? */
 two_edge_intersect(points, i, lx, ly)
-struct coordinate GPHUGE *points;	/* the points array */
-int i;				/* line segment from point i-1 to point i */
-double *lx, *ly;		/* lx[2], ly[2]: points where it crosses edges */
+    struct coordinate GPHUGE *points; /* the points array */
+    int i;			/* line segment from point i-1 to point i */
+    double *lx, *ly;		/* lx[2], ly[2]: points where it crosses edges */
 {
     /* global X_AXIS.min, X_AXIS.max, Y_AXIS.min, X_AXIS.max */
     int count;
@@ -3400,14 +3386,17 @@ double *lx, *ly;		/* lx[2], ly[2]: points where it crosses edges */
     double t[4];
     double swap;
     double t_min, t_max;
+
 #if 0
     fprintf(stderr, "\ntwo_edge_intersect (%g, %g) and (%g, %g) : ", points[i - 1].x, points[i - 1].y, points[i].x, points[i].y);
 #endif
-    /* nasty degenerate cases, effectively drawing to an infinity point (?)
-       cope with them here, so don't process them as a "real" OUTRANGE point 
 
-       If more than one coord is -VERYLARGE, then can't ratio the "infinities"
-       so drop out by returning FALSE */
+    /* nasty degenerate cases, effectively drawing to an infinity
+     * point (?)  cope with them here, so don't process them as a
+     * "real" OUTRANGE point
+
+     * If more than one coord is -VERYLARGE, then can't ratio the
+     * "infinities" so drop out by returning FALSE */
 
     count = 0;
     if (ix == -VERYLARGE)
@@ -3419,15 +3408,18 @@ double *lx, *ly;		/* lx[2], ly[2]: points where it crosses edges */
     if (oy == -VERYLARGE)
 	count++;
 
-    /* either doesn't pass through graph area *or* 
-       can't ratio infinities to get a direction to draw line, so simply return(FALSE) */
+    /* either doesn't pass through graph area *or* can't ratio
+     * infinities to get a direction to draw line, so simply
+     * return(FALSE) */
     if (count > 1) {
 #if 0
 	fprintf(stderr, "\tA\n");
 #endif
 	return (FALSE);
     }
+
     if (ox == -VERYLARGE || ix == -VERYLARGE) {
+	/* Horizontal line */
 	if (ix == -VERYLARGE) {
 	    /* swap points so ix/iy don't have a -VERYLARGE component */
 	    swap = ix;
@@ -3438,7 +3430,8 @@ double *lx, *ly;		/* lx[2], ly[2]: points where it crosses edges */
 	    oy = swap;
 	}
 	/* check actually passes through the graph area */
-	if (ix > X_AXIS.max && inrange(iy, Y_AXIS.min, Y_AXIS.max)) {
+	if (ix > GPMAX(X_AXIS.max, X_AXIS.min)
+	    && inrange(iy, Y_AXIS.min, Y_AXIS.max)) {
 	    lx[0] = X_AXIS.min;
 	    ly[0] = iy;
 
@@ -3456,6 +3449,7 @@ double *lx, *ly;		/* lx[2], ly[2]: points where it crosses edges */
 	}
     }
     if (oy == -VERYLARGE || iy == -VERYLARGE) {
+	/* Vertical line */
 	if (iy == -VERYLARGE) {
 	    /* swap points so ix/iy don't have a -VERYLARGE component */
 	    swap = ix;
@@ -3466,7 +3460,8 @@ double *lx, *ly;		/* lx[2], ly[2]: points where it crosses edges */
 	    oy = swap;
 	}
 	/* check actually passes through the graph area */
-	if (iy > Y_AXIS.max && inrange(ix, X_AXIS.min, X_AXIS.max)) {
+	if (iy > GPMAX(Y_AXIS.min, Y_AXIS.max)
+	    && inrange(ix, X_AXIS.min, X_AXIS.max)) {
 	    lx[0] = ix;
 	    ly[0] = Y_AXIS.min;
 
@@ -3973,92 +3968,99 @@ plot_border()
 }
 
 /*
- * Make this code a subroutine, rather than in-line, so that it can eventually be
- * shared by other callers. It would be nice to share it with the 3d code also,
- * but as of now the two code sections are not very parallel.
- * EAM Nov 2003
+ * Make this code a subroutine, rather than in-line, so that it can
+ * eventually be shared by other callers. It would be nice to share it
+ * with the 3d code also, but as of now the two code sections are not
+ * very parallel.  EAM Nov 2003
  */
 
 static void
-do_key_sample(struct curve_points *this_plot, legend_key *key, char *title, struct termentry *t, int xl, int yl)
+do_key_sample(this_plot, key, title, t, xl, yl)
+    struct curve_points *this_plot;
+    legend_key *key;
+    char *title;
+    struct termentry *t;
+    int xl, yl;
 {
-	/* Draw key text in black */ 
-	    (*t->linetype)(LT_BLACK);
+    /* Draw key text in black */ 
+    (*t->linetype)(LT_BLACK);
 
-	if (key->just == JLEFT) {
-	    (*t->justify_text) (LEFT);
-	    (*t->put_text) (xl + key_text_left, yl, title);
+    if (key->just == JLEFT) {
+	(*t->justify_text) (LEFT);
+	(*t->put_text) (xl + key_text_left, yl, title);
+    } else {
+	if ((*t->justify_text) (RIGHT)) {
+	    (*t->put_text) (xl + key_text_right, yl, title);
 	} else {
-	    if ((*t->justify_text) (RIGHT)) {
-		(*t->put_text) (xl + key_text_right, yl, title);
-	    } else {
-		int x = xl + key_text_right - (t->h_char) * strlen(title);
-		if (key->hpos == TOUT || key->vpos == TUNDER ||	/* HBB 990327 */
-		    i_inrange(x, xleft, xright))
-		    (*t->put_text) (x, yl, title);
-	    }
+	    int x = xl + key_text_right - (t->h_char) * strlen(title);
+	    if (key->hpos == TOUT || key->vpos == TUNDER ||	/* HBB 990327 */
+		i_inrange(x, xleft, xright))
+		(*t->put_text) (x, yl, title);
 	}
-	/* Draw sample in same color as the corresponding plot */
-	    (*t->linetype)(this_plot->lp_properties.l_type); 
+    }
+    /* Draw sample in same color as the corresponding plot */
+    (*t->linetype)(this_plot->lp_properties.l_type); 
 
-	/* draw sample depending on bits set in plot_style */
+    /* draw sample depending on bits set in plot_style */
 #if USE_ULIG_FILLEDBOXES
-	if (this_plot->plot_style & PLOT_STYLE_HAS_BOXES && t->fillbox) {
-	    int style;
-	    struct fill_style_type *fs = &this_plot->fill_properties;
-	    switch(fs->fillstyle) {
-		case FS_SOLID:
-		    style = (fs->filldensity << 4) + FS_SOLID;
-		    break;
-		case FS_PATTERN:
-		    style = (fs->fillpattern << 4) + FS_PATTERN;
-		    break;
-		default: style = FS_EMPTY;
-	    }
-	    (*t->fillbox)( style,
-			  xl + key_sample_left, yl - key_entry_height/4, 
-			  key_sample_right - key_sample_left,
-			  key_entry_height/2);
-	    if (fs->fillstyle != FS_EMPTY && fs->border_linetype != LT_UNDEFINED)
-		(*t->linetype)(fs->border_linetype);
-	    if (fs->border_linetype != LT_NODRAW) {
-		(*t->move)  (xl + key_sample_left,  yl - key_entry_height/4);
-		(*t->vector)(xl + key_sample_right, yl - key_entry_height/4);
-		(*t->vector)(xl + key_sample_right, yl + key_entry_height/4);
-		(*t->vector)(xl + key_sample_left,  yl + key_entry_height/4);
-		(*t->vector)(xl + key_sample_left,  yl - key_entry_height/4);
-	    }
-	    if (fs->fillstyle != FS_EMPTY && fs->border_linetype != LT_UNDEFINED)
-		(*t->linetype)(this_plot->lp_properties.l_type);
-	} else
+    if (this_plot->plot_style & PLOT_STYLE_HAS_BOXES
+	&& t->fillbox) {
+	int style;
+	struct fill_style_type *fs = &this_plot->fill_properties;
+
+	switch(fs->fillstyle) {
+	case FS_SOLID:
+	    style = (fs->filldensity << 4) + FS_SOLID;
+	    break;
+	case FS_PATTERN:
+	    style = (fs->fillpattern << 4) + FS_PATTERN;
+	    break;
+	default:
+	    style = FS_EMPTY;
+	}
+
+	(*t->fillbox)(style,
+		      xl + key_sample_left, yl - key_entry_height/4, 
+		      key_sample_right - key_sample_left,
+		      key_entry_height/2);
+	if (fs->fillstyle != FS_EMPTY && fs->border_linetype != LT_UNDEFINED)
+	    (*t->linetype)(fs->border_linetype);
+	if (fs->border_linetype != LT_NODRAW) {
+	    (*t->move)  (xl + key_sample_left,  yl - key_entry_height/4);
+	    (*t->vector)(xl + key_sample_right, yl - key_entry_height/4);
+	    (*t->vector)(xl + key_sample_right, yl + key_entry_height/4);
+	    (*t->vector)(xl + key_sample_left,  yl + key_entry_height/4);
+	    (*t->vector)(xl + key_sample_left,  yl - key_entry_height/4);
+	}
+	if (fs->fillstyle != FS_EMPTY && fs->border_linetype != LT_UNDEFINED)
+	    (*t->linetype)(this_plot->lp_properties.l_type);
+    } else
 #endif
 	if (this_plot->plot_style == VECTOR && t->arrow) {
 	    apply_head_properties(&(this_plot->arrow_properties));
 	    curr_arrow_headlength = -1;
 	    (*t->arrow)(xl + key_sample_left, yl, xl + key_sample_right, yl,
 			this_plot->arrow_properties.head);
-	} else
-
-	if ((this_plot->plot_style & PLOT_STYLE_HAS_LINE)
-	    || ((this_plot->plot_style & PLOT_STYLE_HAS_ERRORBAR)
-		&& this_plot->plot_type == DATA)) {
+	} else if ((this_plot->plot_style & PLOT_STYLE_HAS_LINE)
+		   || ((this_plot->plot_style & PLOT_STYLE_HAS_ERRORBAR)
+		       && this_plot->plot_type == DATA)) {
 	    /* errors for data plots only */
 	    (*t->move) (xl + key_sample_left, yl);
 	    (*t->vector) (xl + key_sample_right, yl);
 	} 
+    
+    if ((this_plot->plot_type == DATA)
+	&& (this_plot->plot_style & PLOT_STYLE_HAS_ERRORBAR)
+	&& (bar_size > 0.0)) {
+	(*t->move) (xl + key_sample_left, yl + ERRORBARTIC);
+	(*t->vector) (xl + key_sample_left, yl - ERRORBARTIC);
+	(*t->move) (xl + key_sample_right, yl + ERRORBARTIC);
+	(*t->vector) (xl + key_sample_right, yl - ERRORBARTIC);
+    }
 
-	if ((this_plot->plot_type == DATA)
-	    && (this_plot->plot_style & PLOT_STYLE_HAS_ERRORBAR)
-	    && (bar_size > 0.0)) {
-	    (*t->move) (xl + key_sample_left, yl + ERRORBARTIC);
-	    (*t->vector) (xl + key_sample_left, yl - ERRORBARTIC);
-	    (*t->move) (xl + key_sample_right, yl + ERRORBARTIC);
-	    (*t->vector) (xl + key_sample_right, yl - ERRORBARTIC);
-	}
-
-	/* oops - doing the point sample now would break the postscript
-	 * terminal for example, which changes current line style
-	 * when drawing a point, but does not restore it.
-	 * We must wait, then draw the point sample after plotting
-	 */
+    /* oops - doing the point sample now would break the postscript
+     * terminal for example, which changes current line style
+     * when drawing a point, but does not restore it.
+     * We must wait, then draw the point sample after plotting
+     */
 }
