@@ -5,6 +5,10 @@ CLEANFILES = binary1 binary2 binary3 defaults.ini fit.log soundfit.par temp.set
 
 BINARY_FILES = binary1 binary2 binary3
 
+DEMO = all.dem
+
+GNUPLOT = gnuplot
+
 all: $(BINARY_FILES)
 
 $(BINARY_FILES): ../src/bf_test
@@ -15,16 +19,16 @@ check-local: check-noninteractive
 
 check-interactive: $(BINARY_FILES)
 	@if test -z "$(GNUTERM)" ; then \
-	  ( bdir=`pwd` ; PATH=$$bdir/../src GNUPLOT_LIB=$(srcdir) gnuplot all.dem ); \
+	  ( bdir=`pwd` ; PATH=$$bdir/../src GNUPLOT_LIB=$(srcdir) $(GNUPLOT) $(DEMO) ); \
 	else \
-	  ( bdir=`pwd` ; PATH=$$bdir/../src GNUTERM=$(GNUTERM) GNUPLOT_LIB=$(srcdir) gnuplot all.dem ); \
+	  ( bdir=`pwd` ; PATH=$$bdir/../src GNUTERM=$(GNUTERM) GNUPLOT_LIB=$(srcdir) $(GNUPLOT) $(DEMO) ); \
 	fi
 
 check-noninteractive: $(BINARY_FILES)
 	@if test -z "$(GNUTERM)" ; then \
-	  ( bdir=`pwd` ; PATH=$$bdir/../src GNUPLOT_LIB=$(srcdir) gnuplot all.dem </dev/null ); \
+	  ( bdir=`pwd` ; PATH=$$bdir/../src GNUPLOT_LIB=$(srcdir) $(GNUPLOT) $(DEMO) </dev/null ); \
 	else \
-	  ( bdir=`pwd` ; PATH=$$bdir/../src GNUTERM=$(GNUTERM) GNUPLOT_LIB=$(srcdir) gnuplot all.dem </dev/null ); \
+	  ( bdir=`pwd` ; PATH=$$bdir/../src GNUTERM=$(GNUTERM) GNUPLOT_LIB=$(srcdir) $(GNUPLOT) $(DEMO) </dev/null ); \
 	fi
 
 
