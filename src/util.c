@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util.c,v 1.29 2001/09/16 17:01:14 vanzandt Exp $"); }
+static char *RCSid() { return RCSid("$Id: util.c,v 1.30 2001/09/18 15:56:29 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - util.c */
@@ -572,7 +572,7 @@ graph_error(fmt, va_alist)
 #endif /* 1/0 */
     va_end(args);
 #else
-    int_error(fmt, a1, a2, a3, a4, a5, a6, a7, a8);
+    int_error(NO_CARET, fmt, a1, a2, a3, a4, a5, a6, a7, a8);
 #endif
 
 }

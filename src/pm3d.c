@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.16 2001/06/11 16:47:59 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.17 2001/12/16 18:41:28 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - pm3d.c */
@@ -63,24 +63,27 @@ set_pm3d_zminmax()
     if (CB_AXIS.set_autoscale & AUTOSCALE_MIN)
 	CB_AXIS.min = axis_array[FIRST_Z_AXIS].min;
     else {
-	/* FIXME 20001031 from merge: this will call graph_error() on
-	 * negative z, instead of just returning 0! */
+	/* Negative z: Call graph_error(), thus stop by an error message
+	 * without any plot as in the case of other negative-range-and-log
+	 * axes. Note that another possibility is to return 0 to make a plot
+	 * with disabled pm3d, but this is not useful.
+	 */
 	CB_AXIS.min = 
 	    axis_log_value_checked(FIRST_Z_AXIS,
 				   CB_AXIS.set_min, 
-				   "pm3d z-min");
+				   "color axis");
     }
     if (CB_AXIS.set_autoscale & AUTOSCALE_MAX)
 	CB_AXIS.max = axis_array[FIRST_Z_AXIS].max;
     else {
-	/* FIXME 20001031: see above */
+	/* Negative z: see above */
 	CB_AXIS.max = 
 	    axis_log_value_checked(FIRST_Z_AXIS,
 				   CB_AXIS.set_max,
-				   "pm3d z-max");
+				   "color axis");
     }
     if (CB_AXIS.min == CB_AXIS.max) {
-	fprintf(stderr, "pm3d: cannot display empty range");
+	int_error(NO_CARET, "cannot display empty color axis range");
 	return 0;
     }
     if (CB_AXIS.min > CB_AXIS.max) {
