@@ -1,5 +1,5 @@
 /*
- * $Id: gd.trm,v 1.29 2003/04/25 03:23:01 sfeam Exp $
+ * $Id: gd.trm,v 1.30 2003/06/19 03:07:06 sfeam Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -1399,7 +1399,8 @@ START_HELP(png)
 "",
 "       set terminal png transparent xffffff \\",
 "                        x000000 x202020 x404040 x606060 \\",
-"                        x808080 xA0A0A0 xC0C0C0 xE0E0E0 \\",
+"                        x808080 xA0A0A0 xC0C0C0 xE0E0E0",
+"",
 " which uses white for the transparent background, black for borders, dark",
 " gray for axes, and a gray-scale for the six plotting colors.",
 ""
@@ -1510,7 +1511,7 @@ START_HELP(jpeg)
 " option. <face> is either the full pathname to the font file, or a font ",
 " face name that is assumed to be the first part of a filename in one of the ",
 " directories listed in the GDFONTPATH environmental variable. That is, ",
-" 'set term png font \"Face\"' will look for a font file named either ",
+" 'set term jpeg font \"Face\"' will look for a font file named either ",
 " <somedirectory>/Face.ttf or <somedirectory>/Face.pfa. Both TrueType and ",
 " Adobe Type 1 fonts are fully scalable and may be rotated through any angle.",
 "",

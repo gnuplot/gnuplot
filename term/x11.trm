@@ -1,5 +1,5 @@
 /*
- * $Id: x11.trm,v 1.78 2003/07/22 17:36:32 sfeam Exp $
+ * $Id: x11.trm,v 1.79 2003/08/05 05:25:59 sfeam Exp $
  *
  */
 
@@ -1348,7 +1348,7 @@ START_HELP(x11)
 "  <size> is the point size (defaults to 12 if not specified)",
 "  <s> is `i` if <slant>==\"italic\" `o` if <slant>==\"oblique\" `r` otherwise",
 "  <weight> is `medium` or `bold` if explicitly requested, otherwise `*`",
-"  <encoding> is set based on the current character set (help set encoding).",
+"  <encoding> is set based on the current character set (`help set encoding`).",
 " So `set term x11 font \"arial,15,italic\"` will be translated to",
 " -*-arial-*-i-*-*-15-*-*-*-*-*-iso8859-1 (assuming default encoding).",
 " The <size>, <slant>, and <weight> specifications are all optional.",
@@ -1659,13 +1659,13 @@ START_HELP(x11)
 "",
 " Gnuplot first starts to allocate the maximal number of colors as stated",
 " above.  If this fails, the number of colors is reduced by the factor 2",
-" until gnuplot gets all colors wich are requested. If dividing `maxcolors`",
+" until gnuplot gets all colors which are requested. If dividing `maxcolors`",
 " by 2 repeatedly results in a number which is smaller than `mincolors`",
 " `gnuplot` tries to install a private colormap. In this case the window",
 " manager is responsible for swapping colormaps when the pointer is moved",
 " in and out the x11 driver's window.",
 "",
-" The default for `mincolors` is maxcolors / (num_colormaps > 1 ? 2 : 8,",
+" The default for `mincolors` is maxcolors / (num_colormaps > 1 ? 2 : 8),",
 " where num_colormaps is the number of colormaps which are currently used",
 " by gnuplot (usually 1, if only one x11 window is open).",
 "",

@@ -1,5 +1,5 @@
 /*
- * $Id: fig.trm,v 1.37 2003/01/22 15:07:28 lhecking Exp $
+ * $Id: fig.trm,v 1.38 2003/02/18 16:38:12 broeker Exp $
  */
 
 /* GNUPLOT - fig.trm */
@@ -1213,7 +1213,7 @@ START_HELP(fig)
 " `landscape` mode and 3x5 or 5x8 inches in `portrait` mode.",
 " `size` sets (overrides) the size of the drawing",
 " area to <xsize>*<ysize> in units of inches or centimeters depending on the",
-" `metric` or `inches` setting in effect.",
+" `inches` or `metric` setting in effect.",
 " The latter settings is also used as default units for editing with \"xfig\".",
 "",
 " `pointsmax <max_points>` sets the maximum number of points per polyline.",

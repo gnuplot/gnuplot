@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.184 2003/08/05 16:06:33 lhecking Exp $
+C RCS $Id: gnuplot.doc,v 1.185 2003/08/20 17:48:47 sfeam Exp $
 C 18 September 2001
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001   Thomas Williams, Colin Kelley et al.
 C
@@ -191,7 +191,7 @@ C
  Interaction with the current plot via mouse and hotkey input is supported for
  the X11, OS/2, ggi and windows terminals. See `mouse input` for more 
  information on mousing. See `help bind` for information on hotkeys. Also see 
- the documentation for indivual mousing terminals `ggi`, `pm`, `windows` and 
+ the documentation for individual mousing terminals `ggi`, `pm`, `windows` and 
  `x11`.
 
  Sample script: mousevariables.dem
@@ -274,7 +274,7 @@ C
 
 3 Other changes and additions
 
- The preferred syntax to undue a command `set <something>` is now 
+ The preferred syntax to undo a command `set <something>` is now 
  `unset <something>` rather than `set no<something>`. The older form has been
  deprecated.  Version 3.8 continues to allow the older syntax, but such 
  backwards compatibility may be lost in future versions.
@@ -4437,7 +4437,7 @@ C ... and restart the table:
 
  The <filename> argument must be enclosed in single or double quotes.
 
- If no filename ist given or `unset fit` is used the log file is 
+ If no filename is given or `unset fit` is used the log file is 
  reset to its default value "fit.log" or the value of the environmental
  variable `FIT_LOG`.
 
@@ -4945,7 +4945,7 @@ C ... and restart the table:
  When leaving gnuplot, the value of historysize is used for
  truncating the history to at most that much lines. The default
  is 500.
- "unset historysize" will disable history truncation and thus
+ `unset historysize` will disable history truncation and thus
  allow an infinite number of lines to be written to the history
  file.
 3 isosamples
@@ -5016,8 +5016,8 @@ C ... and restart the table:
  to place the key in the other corners inside the graph or to the right
  (outside) or below the graph.  They may be given alone or combined.
 
- Plots may be drawn with no visible key by requesting 'set key off' or
- 'unset key'.
+ Plots may be drawn with no visible key by requesting `set key off` or
+ `unset key`.
 
  Justification of the labels within the key is controlled by `Left` or `Right`
  (default is `Right`).  The text and sample can be reversed (`reverse`) and a
@@ -5441,7 +5441,7 @@ C ... and restart the table:
  Syntax:
        set mouse [doubleclick <ms>] [nodoubleclick] \
                  [[no]zoomcoordinates] \
-                 [[no]polarcoordinates] \
+                 [[no]polardistance] \
                  [format <string>] \
                  [clipboardformat <int>/<string>] \
                  [mouseformat <int>/<string>] \
@@ -5454,10 +5454,10 @@ C ... and restart the table:
  to be done by single clicking a value of 0 ms can be used. The default value
  is 300 ms.
 
- The option zoomcoordinates determines if the coordinates of the zoom box are
+ The option `zoomcoordinates` determines if the coordinates of the zoom box are
  drawn at the edges while zooming. This is on by default.
 
- The option polarcoordinates determines if the distance to the ruler is also
+ The option `polardistance` determines if the distance to the ruler is also
  shown in polar coordinates. This corresponds to the default key binding '5'.
 
  The `format` option takes a fprintf like format string which determines how
@@ -5472,7 +5472,7 @@ C ... and restart the table:
  float specifiers, e.g. `set mouse mouseformat "mouse = %5.2g, %10.2f"`. Use
  `set mouse mouseformat ""` to turn this string off again.
 
- The following formats are available (format 5 may only be selected if the
+ The following formats are available (format 6 may only be selected if the
  format string was specified already):
 
   0   real coordinates in  brackets e.g. [1.23, 2.45]
@@ -5877,7 +5877,7 @@ C ... and restart the table:
  for the complete description.
 
  2. splot of data file with two or four data columns: The gray/color value is
- obtained by `using` the last-column coordinate instead of the z-value, thus
+ obtained by using the last-column coordinate instead of the z-value, thus
  allowing the color and the z-coordinate be mutually independent.  This can be
  used for 4d data drawing.
 
@@ -6075,7 +6075,7 @@ C ... and restart the table:
  Otherwise, the options can be given in any order. `show palette` shows the
  current palette properties. `show palette palette <n>` shows RGB triplets for
  the current settings and a palette having <n> discrete colors.  `show palette
- gradient` displays the gradient defining the palette (if apropriate).  `show
+ gradient` displays the gradient defining the palette (if appropriate).  `show
  palette rgbformulae` prints the available fixed gray --> color transformation
  formulas.  `show palette colornames` prints the implemented color names.
 
@@ -6316,7 +6316,7 @@ C ... and restart the table:
        set palette functions gray**0.64, gray**0.67, gray**0.70
 
  To use gamma correction with interpolated gradients specify intermediate
- gray values with apropriate colors.  Instead of
+ gray values with appropriate colors.  Instead of
 
        set palette defined ( 0 0 0 0, 1 1 1 1 )
 
@@ -6450,7 +6450,7 @@ C ... and restart the table:
 ?show print
  The `set print` command redirects the output of the `print` command to a file.
 
- Syntax:o
+ Syntax:
        set print
        set print "-"
        set print "<filename>"
@@ -6661,7 +6661,7 @@ C ... and restart the table:
        set style arrow 1 nohead lw 2
        set arrow arrowstyle 1
 
-  See also 'set arrow' for further examples.
+  See also `set arrow` for further examples.
 
 4 set style data
 ?commands set style data
@@ -6727,7 +6727,7 @@ C ... and restart the table:
        show style function
 
  See `plotting styles` for the choices.  If no choice is given, the choices are
- listed.  Show style function shows the current default function plotting
+ listed.  `show style function` shows the current default function plotting
  style.
 4 set style line
 ?commands set style line
@@ -7041,6 +7041,7 @@ C ... and restart the table:
 5 financebars
 ?commands set style financebars
 ?set style financebars
+?plotting styles financebars
 ?style financebars
 ?financebars
  The `financebars` style is only relevant for 2-d data plotting of financial
@@ -7241,7 +7242,7 @@ C ... and restart the table:
  `plot` command should be used to set up the appropriate form.  For example,
  if the data are of the form (x,y,xdelta,ylow,yhigh), then you can use
 
-       plot 'data' using 1:2:($1-$3):($1+$3):4:5 with xyerrorbars
+       plot 'data' using 1:2:($1-$3):($1+$3):4:5 with xyerrorlines
 5 yerrorlines
 ?commands set style yerrorlines
 ?commands set style errorlines
