@@ -46,11 +46,6 @@ if test ! -f ./gnuplot.el ; then
   cp ${srcdir}/gpelcard.tex .
 fi
 
-# needed for make dist - removed by make distclean
-if test ! -f install-sh; then
-  cp ../install-sh ../missing ../mkinstalldirs .
-fi
-
 INFO_LOOK_ELC=info-look.elc
 dnl
 dnl There are many possibilities for info-look:
