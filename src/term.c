@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.11 1999/07/05 13:12:02 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.12 1999/07/27 19:44:04 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -107,7 +107,6 @@ static TBOOLEAN term_force_init = FALSE;
 
 extern FILE *gpoutfile;
 extern char *outstr;
-extern float xsize, ysize;
 
 /* internal pointsize for do_point */
 static double term_pointsize;
@@ -1236,8 +1235,8 @@ test_term()
 
     term_start_plot();
     screen_ok = FALSE;
-    xmax_t = (unsigned int) (t->xmax * xsize);
-    ymax_t = (unsigned int) (t->ymax * ysize);
+    xmax_t = (unsigned int) (t->xmax * x_props.size);
+    ymax_t = (unsigned int) (t->ymax * y_props.size);
 
     p_width = pointsize * (t->h_tic);
     key_entry_height = pointsize * (t->v_tic) * 1.25;

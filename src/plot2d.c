@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.14 1999/07/18 17:39:46 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.15 1999/07/20 15:33:35 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -52,6 +52,8 @@ static void store2d_point __PROTO((struct curve_points * this_plot, int i, doubl
 static void print_table __PROTO((struct curve_points * first_plot, int plot_num));
 static void eval_plots __PROTO((void));
 static void parametric_fixup __PROTO((struct curve_points * start_plot, int *plot_num));
+static void plot_option_smooth __PROTO((struct curve_points *));
+
 
 
 /* the curves/surfaces of the plot */
@@ -94,12 +96,16 @@ extern TBOOLEAN df_binary;
  * dont know we have to support ranges [10:-10] - lets reverse
  * it for now, then fix it at the end.
  */
-#define INIT_ARRAYS(axis, min, max, auto, is_log, base, log_base, infinite) \
-do{auto_array[axis] = auto; \
-   min_array[axis] = (infinite && (auto&1)) ? VERYLARGE : min; \
-   max_array[axis] = (infinite && (auto&2)) ? -VERYLARGE : max; \
-   log_array[axis] = is_log; base_array[axis] = base; log_base_array[axis] = log_base;\
-}while(0)
+
+#define INIT_ARRAYS(axis, axisp, infinite) \
+  do { auto_array[axis] = (axisp).autoscale; \
+     min_array[axis] = (infinite && ((axisp).autoscale & 1)) ? VERYLARGE : (axisp).min; \
+     max_array[axis] = (infinite && ((axisp).autoscale & 2)) ? -VERYLARGE : (axisp).max; \
+     log_array[axis] = (axisp).is_log; \
+     base_array[axis] = (axisp).base_log; \
+     log_base_array[axis] = (axisp).log_base_log; \
+  } while (0)
+
 /* handle reversed ranges */
 #define CHECK_REVERSE(axis) \
 do{\
@@ -190,11 +196,10 @@ plotrequest()
 	strcpy(dummy_var[0], "t");
 
     /* initialise the arrays from the 'set' scalars */
-
-    INIT_ARRAYS(FIRST_X_AXIS, xmin, xmax, autoscale_x, is_log_x, base_log_x, log_base_log_x, 0);
-    INIT_ARRAYS(FIRST_Y_AXIS, ymin, ymax, autoscale_y, is_log_y, base_log_y, log_base_log_y, 1);
-    INIT_ARRAYS(SECOND_X_AXIS, x2min, x2max, autoscale_x2, is_log_x2, base_log_x2, log_base_log_x2, 0);
-    INIT_ARRAYS(SECOND_Y_AXIS, y2min, y2max, autoscale_y2, is_log_y2, base_log_y2, log_base_log_y2, 1);
+    INIT_ARRAYS(FIRST_X_AXIS, x_props, 0);
+    INIT_ARRAYS(FIRST_Y_AXIS, x_props, 1);
+    INIT_ARRAYS(SECOND_X_AXIS, x2_props, 0);
+    INIT_ARRAYS(SECOND_Y_AXIS, y2_props, 1);
 
     min_array[T_AXIS] = tmin;
     max_array[T_AXIS] = tmax;
@@ -719,7 +724,8 @@ int plot_num;
 	}
 	fputc('\n', gpoutfile);
     }
-/* two blank lines between plots in table output */
+
+    /* two blank lines between plots in table output */
     fputc('\n', gpoutfile);
     fflush(gpoutfile);
 }
@@ -741,8 +747,9 @@ eval_plots()
     register struct curve_points *this_plot, **tp_ptr;
 
     int some_functions = 0;
-    int plot_num, line_num, point_num, xparam = 0;
-    char *xtitle;
+    /* ?, default line type, default point type, ? */
+    int plot_num = 0, line_num = 0, point_num = 0, xparam = 0;
+    char *xtitle = NULL;
     int begin_token = c_token;	/* so we can rewind for second pass */
 
     int uses_axis[AXIS_ARRAY_SIZE];
@@ -759,11 +766,6 @@ eval_plots()
     first_plot = NULL;
 
     tp_ptr = &(first_plot);
-    plot_num = 0;
-    line_num = 0;		/* default line type */
-    point_num = 0;		/* default point type */
-
-    xtitle = NULL;
 
     /*** First Pass: Read through data files ***
      * This pass serves to set the xrange and to parse the command, as well
@@ -835,28 +837,45 @@ eval_plots()
 
 	    /*  deal with smooth */
 	    if (almost_equals(c_token, "s$mooth")) {
-
-		if (END_OF_COMMAND)
-		    int_error(c_token, "expecting smooth parameter");
-		else {
-		    c_token++;
-		    if (almost_equals(c_token, "u$nique"))
-			this_plot->plot_smooth = UNIQUE;
-		    else if (almost_equals(c_token, "a$csplines"))
-			this_plot->plot_smooth = ACSPLINES;
-		    else if (almost_equals(c_token, "c$splines"))
-			this_plot->plot_smooth = CSPLINES;
-		    else if (almost_equals(c_token, "b$ezier"))
-			this_plot->plot_smooth = BEZIER;
-		    else if (almost_equals(c_token, "s$bezier"))
-			this_plot->plot_smooth = SBEZIER;
-		    else
-			int_error(c_token, "expecting 'unique', 'acsplines', 'csplines', 'bezier' or 'sbezier'");
-		}
-		this_plot->plot_style = LINES;
-		c_token++;	/* skip format */
+		plot_option_smooth(this_plot);
 	    }
+
+	    /* plot title */
+	    if (almost_equals(c_token, "t$itle")) {
+		if (parametric) {
+		    if (xparam)
+			int_error(c_token, "\"title\" allowed only after parametric function fully specified");
+		    else if (xtitle != NULL)
+			xtitle[0] = '\0';	/* Remove default title . */
+		}
+		c_token++;
+		if (isstring(c_token)) {
+		    m_quote_capture(&(this_plot->title), c_token, c_token);
+		} else {
+		    int_error(c_token, "expecting \"title\" for plot");
+		}
+		c_token++;
+	    } else if (almost_equals(c_token, "not$itle")) {
+		if (xtitle != NULL)
+		    xtitle[0] = '\0';
+		c_token++;
+	    } else {
+		m_capture(&(this_plot->title), start_token, end_token);
+		if (xparam)
+		    xtitle = this_plot->title;
+	    }
+
+	    /* with keyword */
+	    if (almost_equals(c_token, "w$ith")) {
+		if (parametric && xparam)
+		    int_error(c_token, "\"with\" allowed only after parametric function fully specified");
+		this_plot->plot_style = get_style();
+	    }
+
 	    /* look for axes/axis */
+
+	    x_axis = FIRST_X_AXIS;
+	    y_axis = FIRST_Y_AXIS;
 
 	    if (almost_equals(c_token, "ax$es") || almost_equals(c_token, "ax$is")) {
 		if (parametric && xparam)
@@ -880,11 +899,7 @@ eval_plots()
 		    ++c_token;
 		} else
 		    int_error(c_token, "axes must be x1y1, x1y2, x2y1 or x2y2");
-	    } else {
-		x_axis = FIRST_X_AXIS;
-		y_axis = FIRST_Y_AXIS;
 	    }
-
 
 	    this_plot->x_axis = x_axis;
 	    this_plot->y_axis = y_axis;
@@ -919,36 +934,8 @@ eval_plots()
 		uses_axis[x_axis] |= 2;
 		uses_axis[y_axis] |= 2;
 	    }
-	    if (almost_equals(c_token, "t$itle")) {
-		if (parametric) {
-		    if (xparam)
-			int_error(c_token, "\"title\" allowed only after parametric function fully specified");
-		    else if (xtitle != NULL)
-			xtitle[0] = '\0';	/* Remove default title . */
-		}
-		c_token++;
-		if (isstring(c_token)) {
-		    m_quote_capture(&(this_plot->title), c_token, c_token);
-		} else {
-		    int_error(c_token, "expecting \"title\" for plot");
-		}
-		c_token++;
-	    } else if (almost_equals(c_token, "not$itle")) {
-		if (xtitle != NULL)
-		    xtitle[0] = '\0';
-		c_token++;
-	    } else {
-		m_capture(&(this_plot->title), start_token, end_token);
-		if (xparam)
-		    xtitle = this_plot->title;
-	    }
 
 
-	    if (almost_equals(c_token, "w$ith")) {
-		if (parametric && xparam)
-		    int_error(c_token, "\"with\" allowed only after parametric function fully specified");
-		this_plot->plot_style = get_style();
-	    }
 	    /* pick up line/point specs
 	     * - point spec allowed if style uses points, ie style&2 != 0
 	     * - keywords for lt and pt are optional
@@ -1280,10 +1267,10 @@ if(range_flags[axis]&RANGE_WRITEBACK) \
    if (auto_array[axis]&2) max = max_array[axis]; \
   }
 
-    WRITEBACK(FIRST_X_AXIS, xmin, xmax)
-	WRITEBACK(FIRST_Y_AXIS, ymin, ymax)
-	WRITEBACK(SECOND_X_AXIS, x2min, x2max)
-	WRITEBACK(SECOND_Y_AXIS, y2min, y2max)
+	WRITEBACK(FIRST_X_AXIS, x_props.min, x_props.max)
+	WRITEBACK(FIRST_Y_AXIS, y_props.min, y_props.max)
+	WRITEBACK(SECOND_X_AXIS, x2_props.min, x2_props.max)
+	WRITEBACK(SECOND_Y_AXIS, y2_props.min, y2_props.max)
 	if (strcmp(term->name, "table") == 0)
 	print_table(first_plot, plot_num);
     else {
@@ -1419,4 +1406,31 @@ int *plot_num;
 
     /* Ok, stick the free list at the end of the curve_points plot list. */
     *last_pointer = free_list;
+}
+
+
+static void
+plot_option_smooth(this_plot)
+struct curve_points *this_plot;
+{
+
+    if (END_OF_COMMAND)
+	int_error(c_token, "expecting smooth parameter");
+    else {
+	c_token++;
+	if (almost_equals(c_token, "u$nique"))
+	    this_plot->plot_smooth = UNIQUE;
+	else if (almost_equals(c_token, "a$csplines"))
+	    this_plot->plot_smooth = ACSPLINES;
+	else if (almost_equals(c_token, "c$splines"))
+	    this_plot->plot_smooth = CSPLINES;
+	else if (almost_equals(c_token, "b$ezier"))
+	    this_plot->plot_smooth = BEZIER;
+	else if (almost_equals(c_token, "s$bezier"))
+	    this_plot->plot_smooth = SBEZIER;
+	else
+	    int_error(c_token, "expecting 'unique', 'acsplines', 'csplines', 'bezier' or 'sbezier'");
+    }
+    this_plot->plot_style = LINES;
+    c_token++;	/* skip format */
 }

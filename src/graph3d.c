@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.10 1999/06/22 12:00:48 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.11 1999/07/13 19:54:52 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -334,7 +334,7 @@ int count;
 	xleft = (t->h_char) * lmargin;
     else
 	xleft = (t->h_char) * 2 + (t->h_tic);
-    xright = (scaling ? 1 : xsize) * (t->xmax) - (t->h_char) * 2 - (t->h_tic);
+    xright = (scaling ? 1 : x_props.size) * (t->xmax) - (t->h_char) * 2 - (t->h_tic);
     key_rows = ptitl_cnt;
     key_cols = 1;
     if (key == -1 && key_vpos == TUNDER) {
@@ -365,7 +365,7 @@ int count;
 		titlelin++;
 	}
     }
-    ytop = (scaling ? 1 : ysize) * (t->ymax) - (t->v_char) * (titlelin + 1.5) - 1;
+    ytop = (scaling ? 1 : y_props.size) * (t->ymax) - (t->v_char) * (titlelin + 1.5) - 1;
     if (key == -1 && key_vpos != TUNDER) {
 	/* calculate max no rows, limited be ytop-ybot */
 	i = (int) (ytop - ybot) / (t->v_char) - 1 - ktitle_lines;
@@ -473,7 +473,7 @@ int pcount;			/* count of plots in linked list */
      */
 
     /* If we are to draw the bottom grid make sure zmin is updated properly. */
-    if (xtics || ytics || work_grid.l_type) {
+    if (x_props.tics || y_props.tics || work_grid.l_type) {
 	base_z = z_min3d - (z_max3d - z_min3d) * ticslevel;
 	if (ticslevel >= 0)
 	    floor_z = base_z;
@@ -515,7 +515,7 @@ int pcount;			/* count of plots in linked list */
     term_start_plot();
 
     screen_ok = FALSE;
-    scaling = (*t->scale) (xsize, ysize);
+    scaling = (*t->scale) (x_props.size, y_props.size);
 
     /* now compute boundary for plot (xleft, xright, ytop, ybot) */
     boundary3d(scaling, plots, pcount);
@@ -546,7 +546,7 @@ int pcount;			/* count of plots in linked list */
 	time_t now;
 	unsigned int x = t->v_char + timelabel.xoffset * t->h_char;
 	unsigned int y = timelabel_bottom ?
-	yoffset * ymax + (timelabel.yoffset + 1) * t->v_char :
+	yoffset * y_props.max + (timelabel.yoffset + 1) * t->v_char :
 	ytop + (timelabel.yoffset - 1) * t->v_char;
 
 	time(&now);
@@ -1595,7 +1595,7 @@ else if (height[i][j] != depth[i][j]) \
 #endif /* LITE */
 
     }
-    if (xtics || *xlabel.text) {
+    if (x_props.tics || *x_props.label.text) {
 	unsigned int x0, y0, x1, y1;
 	double mid_x = (x_max3d + x_min3d) / 2;
 	double len;
@@ -1614,26 +1614,26 @@ else if (height[i][j] != depth[i][j]) \
 	    }
 	}
 
-	if (xtics) {
-	    gen_tics(FIRST_X_AXIS, &xticdef,
+	if (x_props.tics) {
+	    gen_tics(FIRST_X_AXIS, &x_props.ticdef,
 		     work_grid.l_type & (GRID_X | GRID_MX),
-		     mxtics, mxtfreq, xtick_callback);
+		     x_props.mtics, x_props.mtfreq, xtick_callback);
 	}
-	if (*xlabel.text) {
+	if (*x_props.label.text) {
 	    /* label at xaxis_y + 1/4 of (xaxis_y-other_y) */
 	    double step = (2 * xaxis_y - y_max3d - y_min3d) / 4;
 	    map3d_xy(mid_x, xaxis_y + step, base_z, &x1, &y1);
-	    x1 += xlabel.xoffset * t->h_char;
-	    y1 += xlabel.yoffset * t->v_char;
+	    x1 += x_props.label.xoffset * t->h_char;
+	    y1 += x_props.label.yoffset * t->v_char;
 	    if (!tic_in) {
 		x1 -= tic_unitx * ticscale * (t->h_tic);
 		y1 -= tic_unity * ticscale * (t->v_tic);
 	    }
 	    /* write_multiline mods it */
-	    write_multiline(x1, y1, xlabel.text, CENTRE, JUST_TOP, 0, xlabel.font);
+	    write_multiline(x1, y1, x_props.label.text, CENTRE, JUST_TOP, 0, x_props.label.font);
 	}
     }
-    if (ytics || *ylabel.text) {
+    if (y_props.tics || *y_props.label.text) {
 	unsigned int x0, y0, x1, y1;
 	double mid_y = (y_max3d + y_min3d) / 2;
 	double len;
@@ -1651,38 +1651,38 @@ else if (height[i][j] != depth[i][j]) \
 		tic_unitx = tic_unity = 0;
 	    }
 	}
-	if (ytics) {
-	    gen_tics(FIRST_Y_AXIS, &yticdef,
+	if (y_props.tics) {
+	    gen_tics(FIRST_Y_AXIS, &y_props.ticdef,
 		     work_grid.l_type & (GRID_Y | GRID_MY),
-		     mytics, mytfreq, ytick_callback);
+		     y_props.mtics, y_props.mtfreq, ytick_callback);
 	}
-	if (*ylabel.text) {
+	if (*y_props.label.text) {
 	    double step = (x_max3d + x_min3d - 2 * yaxis_x) / 4;
 	    map3d_xy(yaxis_x - step, mid_y, base_z, &x1, &y1);
-	    x1 += ylabel.xoffset * t->h_char;
-	    y1 += ylabel.yoffset * t->v_char;
+	    x1 += y_props.label.xoffset * t->h_char;
+	    y1 += y_props.label.yoffset * t->v_char;
 	    if (!tic_in) {
 		x1 -= tic_unitx * ticscale * (t->h_tic);
 		y1 -= tic_unity * ticscale * (t->v_tic);
 	    }
 	    /* write_multiline mods it */
-	    write_multiline(x1, y1, ylabel.text, CENTRE, JUST_TOP, 0, ylabel.font);
+	    write_multiline(x1, y1, y_props.label.text, CENTRE, JUST_TOP, 0, y_props.label.font);
 	}
     }
     /* do z tics */
 
-    if (ztics && (draw_surface || (draw_contour & CONTOUR_SRF))) {
-	gen_tics(FIRST_Z_AXIS, &zticdef, work_grid.l_type & (GRID_Z | GRID_MZ),
-		 mztics, mztfreq, ztick_callback);
+    if (z_props.tics && (draw_surface || (draw_contour & CONTOUR_SRF))) {
+	gen_tics(FIRST_Z_AXIS, &z_props.ticdef, work_grid.l_type & (GRID_Z | GRID_MZ),
+		 z_props.mtics, z_props.mtfreq, ztick_callback);
     }
-    if ((xzeroaxis.l_type >= -2) && !is_log_y && inrange(0, y_min3d, y_max3d)) {
+    if ((xzeroaxis.l_type >= -2) && !y_props.is_log && inrange(0, y_min3d, y_max3d)) {
 	unsigned int x, y, x1, y1;
 	term_apply_lp_properties(&xzeroaxis);
 	map3d_xy(0.0, y_min3d, base_z, &x, &y);		/* line through x=0 */
 	map3d_xy(0.0, y_max3d, base_z, &x1, &y1);
 	draw_clip_line(x, y, x1, y1);
     }
-    if ((yzeroaxis.l_type >= -2) && !is_log_x && inrange(0, x_min3d, x_max3d)) {
+    if ((yzeroaxis.l_type >= -2) && !x_props.is_log && inrange(0, x_min3d, x_max3d)) {
 	unsigned int x, y, x1, y1;
 	term_apply_lp_properties(&yzeroaxis);
 	map3d_xy(x_min3d, 0.0, base_z, &x, &y);		/* line through y=0 */
@@ -1690,13 +1690,13 @@ else if (height[i][j] != depth[i][j]) \
 	draw_clip_line(x, y, x1, y1);
     }
     /* PLACE ZLABEL - along the middle grid Z axis - eh ? */
-    if (*zlabel.text && (draw_surface || (draw_contour & CONTOUR_SRF))) {
+    if (*z_props.label.text && (draw_surface || (draw_contour & CONTOUR_SRF))) {
 	map3d_xy(zaxis_x, zaxis_y, z_max3d + (z_max3d - base_z) / 4, &x, &y);
 
-	x += zlabel.xoffset * t->h_char;
-	y += zlabel.yoffset * t->v_char;
+	x += z_props.label.xoffset * t->h_char;
+	y += z_props.label.yoffset * t->v_char;
 
-	write_multiline(x, y, zlabel.text, CENTRE, CENTRE, 0, zlabel.font);
+	write_multiline(x, y, z_props.label.text, CENTRE, CENTRE, 0, z_props.label.font);
 
     }
 }
@@ -1722,7 +1722,7 @@ struct lp_style_type grid;	/* linetype or -2 for none */
 	draw_clip_line(x, y, x1, y1);
 	term_apply_lp_properties(&border_lp);
     }
-    if (xtics & TICS_ON_AXIS) {
+    if (x_props.tics & TICS_ON_AXIS) {
 	map3d_xy(place, (y_min3d + y_max3d) / 2, base_z, &x, &y);
     }
     x1 = x + tic_unitx * scale * (t->h_tic) * dirn;
@@ -1751,7 +1751,7 @@ struct lp_style_type grid;	/* linetype or -2 for none */
 	}
 	clip_put_text_just(x1, y1, text, just);
     }
-    if (xtics & TICS_MIRROR) {
+    if (x_props.tics & TICS_MIRROR) {
 	map3d_xy(place, y_min3d + y_max3d - xaxis_y, base_z, &x, &y);
 	x1 = x - tic_unitx * scale * (t->h_tic) * dirn;
 	y1 = y - tic_unity * scale * (t->v_tic) * dirn;
@@ -1778,7 +1778,7 @@ struct lp_style_type grid;
 	draw_clip_line(x, y, x1, y1);
 	term_apply_lp_properties(&border_lp);
     }
-    if (ytics & TICS_ON_AXIS) {
+    if (y_props.tics & TICS_ON_AXIS) {
 	map3d_xy((x_min3d + x_max3d) / 2, place, base_z, &x, &y);
     }
     x1 = x + tic_unitx * scale * dirn * (t->h_tic);
@@ -1806,7 +1806,7 @@ struct lp_style_type grid;
 	}
 	clip_put_text_just(x1, y1, text, just);
     }
-    if (ytics & TICS_MIRROR) {
+    if (y_props.tics & TICS_MIRROR) {
 	map3d_xy(x_min3d + x_max3d - yaxis_x, place, base_z, &x, &y);
 	x1 = x - tic_unitx * scale * (t->h_tic) * dirn;
 	y1 = y - tic_unity * scale * (t->v_tic) * dirn;
@@ -1845,7 +1845,7 @@ struct lp_style_type grid;
 	    x1 -= (term->h_tic) * ticscale;
 	clip_put_text_just(x1, y, text, RIGHT);
     }
-    if (ztics & TICS_MIRROR) {
+    if (z_props.tics & TICS_MIRROR) {
 	double other_x = x_min3d + x_max3d - zaxis_x;
 	double other_y = y_min3d + y_max3d - zaxis_y;
 	map3d_xy(other_x, other_y, place, &x, &y);
@@ -1868,7 +1868,7 @@ const char *what;
     switch (pos->scalex) {
     case first_axes:
     case second_axes:
-	xpos = LogScale(xpos, is_log_x, log_base_log_x, what, "x");
+	xpos = LogScale(xpos, x_props.is_log, x_props.log_base_log, what, "x");
 	break;
     case graph:
 	xpos = min_array[FIRST_X_AXIS] +
@@ -1881,7 +1881,7 @@ const char *what;
     switch (pos->scaley) {
     case first_axes:
     case second_axes:
-	ypos = LogScale(ypos, is_log_y, log_base_log_y, what, "y");
+	ypos = LogScale(ypos, y_props.is_log, y_props.log_base_log, what, "y");
 	break;
     case graph:
 	ypos = min_array[FIRST_Y_AXIS] +
@@ -1894,7 +1894,7 @@ const char *what;
     switch (pos->scalez) {
     case first_axes:
     case second_axes:
-	zpos = LogScale(zpos, is_log_z, log_base_log_z, what, "z");
+	zpos = LogScale(zpos, z_props.is_log, z_props.log_base_log, what, "z");
 	break;
     case graph:
 	zpos = min_array[FIRST_Z_AXIS] +

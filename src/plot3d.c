@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.8 1999/06/19 20:52:06 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.9 1999/07/20 15:33:36 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -96,16 +96,14 @@ extern int reverse_range[];
  * dont know we have to support ranges [10:-10] - lets reverse
  * it for now, then fix it at the end.
  */
-#define INIT_ARRAYS(axis, min, max, auto, is_log, base, log_base, infinite) \
-do{if ((auto_array[axis] = auto) == 0 && max<min) {\
-	min_array[axis] = max;\
-   max_array[axis] = min; /* we will fix later */ \
- } else { \
-	min_array[axis] = (infinite && (auto&1)) ? VERYLARGE : min; \
-	max_array[axis] = (infinite && (auto&2)) ? -VERYLARGE : max; \
- } \
- log_array[axis] = is_log; base_array[axis] = base; log_base_array[axis] = log_base;\
-}while(0)
+#define INIT_ARRAYS(axis, axisp, infinite) \
+  do { auto_array[axis] = (axisp).autoscale; \
+     min_array[axis] = (infinite && ((axisp).autoscale & 1)) ? VERYLARGE : (axisp).min; \
+     max_array[axis] = (infinite && ((axisp).autoscale & 2)) ? -VERYLARGE : (axisp).max; \
+     log_array[axis] = (axisp).is_log; \
+     base_array[axis] = (axisp).base_log; \
+     log_base_array[axis] = (axisp).log_base_log; \
+  } while (0)
 
 /* handle reversed ranges */
 #define CHECK_REVERSE(axis) \
@@ -200,9 +198,9 @@ plot3drequest()
 	strcpy(dummy_var[0], "u");
 	strcpy(dummy_var[1], "v");
     }
-    autoscale_lx = autoscale_x;
-    autoscale_ly = autoscale_y;
-    autoscale_lz = autoscale_z;
+    autoscale_lx = x_props.autoscale;
+    autoscale_ly = y_props.autoscale;
+    autoscale_lz = z_props.autoscale;
 
     if (!term)			/* unknown */
 	int_error(c_token, "use 'set term' to set terminal type first");
@@ -220,7 +218,7 @@ plot3drequest()
 	    }
 	}
 	changed = parametric ? load_range(U_AXIS, &umin, &umax, autoscale_lu) :
-	    load_range(FIRST_X_AXIS, &xmin, &xmax, autoscale_lx);
+	    load_range(FIRST_X_AXIS, &x_props.min, &x_props.max, autoscale_lx);
 	if (!equals(c_token, "]"))
 	    int_error(c_token, "']' expected");
 	c_token++;
@@ -245,7 +243,7 @@ plot3drequest()
 	    }
 	}
 	changed = parametric ? load_range(V_AXIS, &vmin, &vmax, autoscale_lv) :
-	    load_range(FIRST_Y_AXIS, &ymin, &ymax, autoscale_ly);
+	    load_range(FIRST_Y_AXIS, &y_props.min, &y_props.max, autoscale_ly);
 	if (!equals(c_token, "]"))
 	    int_error(c_token, "']' expected");
 	c_token++;
@@ -261,7 +259,7 @@ plot3drequest()
 	/* set optional x (parametric) or z ranges */
 	if (equals(c_token, "[")) {
 	    c_token++;
-	    autoscale_lx = load_range(FIRST_X_AXIS, &xmin, &xmax, autoscale_lx);
+	    autoscale_lx = load_range(FIRST_X_AXIS, &x_props.min, &x_props.max, autoscale_lx);
 	    if (!equals(c_token, "]"))
 		int_error(c_token, "']' expected");
 	    c_token++;
@@ -269,7 +267,7 @@ plot3drequest()
 	/* set optional y ranges */
 	if (equals(c_token, "[")) {
 	    c_token++;
-	    autoscale_ly = load_range(FIRST_Y_AXIS, &ymin, &ymax, autoscale_ly);
+	    autoscale_ly = load_range(FIRST_Y_AXIS, &y_props.min, &y_props.max, autoscale_ly);
 	    if (!equals(c_token, "]"))
 		int_error(c_token, "']' expected");
 	    c_token++;
@@ -277,7 +275,7 @@ plot3drequest()
     }				/* parametric */
     if (equals(c_token, "[")) {	/* set optional z ranges */
 	c_token++;
-	autoscale_lz = load_range(FIRST_Z_AXIS, &zmin, &zmax, autoscale_lz);
+	autoscale_lz = load_range(FIRST_Z_AXIS, &z_props.min, &z_props.max, autoscale_lz);
 	if (!equals(c_token, "]"))
 	    int_error(c_token, "']' expected");
 	c_token++;
@@ -975,9 +973,9 @@ eval_3dplots()
     first_3dplot = NULL;
 
     /* put stuff into arrays to simplify access */
-    INIT_ARRAYS(FIRST_X_AXIS, xmin, xmax, autoscale_lx, is_log_x, base_log_x, log_base_log_x, 0);
-    INIT_ARRAYS(FIRST_Y_AXIS, ymin, ymax, autoscale_ly, is_log_y, base_log_y, log_base_log_y, 0);
-    INIT_ARRAYS(FIRST_Z_AXIS, zmin, zmax, autoscale_lz, is_log_z, base_log_z, log_base_log_z, 1);
+    INIT_ARRAYS(FIRST_X_AXIS, x_props, 0);
+    INIT_ARRAYS(FIRST_Y_AXIS, y_props, 0);
+    INIT_ARRAYS(FIRST_Z_AXIS, z_props, 1);
 
     x_axis = FIRST_X_AXIS;
     y_axis = FIRST_Y_AXIS;
@@ -1348,24 +1346,24 @@ eval_3dplots()
 	    v_max = vmax;
 	} else {
 	    /*{{{  figure ranges, taking logs etc into account */
-	    if (is_log_x) {
+	    if (x_props.is_log) {
 		if (min_array[FIRST_X_AXIS] <= 0.0 ||
 		    max_array[FIRST_X_AXIS] <= 0.0)
 		    int_error(NO_CARET, "x range must be greater than 0 for log scale!");
-		u_min = log(min_array[FIRST_X_AXIS]) / log_base_log_x;
-		u_max = log(max_array[FIRST_X_AXIS]) / log_base_log_x;
+		u_min = log(min_array[FIRST_X_AXIS]) / x_props.log_base_log;
+		u_max = log(max_array[FIRST_X_AXIS]) / x_props.log_base_log;
 	    } else {
 		u_min = min_array[FIRST_X_AXIS];
 		u_max = max_array[FIRST_X_AXIS];
 	    }
 
-	    if (is_log_y) {
+	    if (y_props.is_log) {
 		if (min_array[FIRST_Y_AXIS] <= 0.0 ||
 		    max_array[FIRST_Y_AXIS] <= 0.0) {
 		    int_error(NO_CARET, "y range must be greater than 0 for log scale!");
 		}
-		v_min = log(min_array[FIRST_Y_AXIS]) / log_base_log_y;
-		v_max = log(max_array[FIRST_Y_AXIS]) / log_base_log_y;
+		v_min = log(min_array[FIRST_Y_AXIS]) / y_props.log_base_log;
+		v_max = log(max_array[FIRST_Y_AXIS]) / y_props.log_base_log;
 	    } else {
 		v_min = min_array[FIRST_Y_AXIS];
 		v_max = max_array[FIRST_Y_AXIS];
@@ -1424,10 +1422,10 @@ eval_3dplots()
 		    for (j = 0; j < num_iso_to_use; j++) {
 			double y = v_min + j * visodiff;
 			/* if (is_log_y) PEM fix logscale y axis */
-			/* y = pow(log_base_log_y,y); 26-Sep-89 */
+			/* y = pow(y_props.log_base_log,y); 26-Sep-89 */
 			/* parametric => NOT a log quantity (?) */
 			(void) Gcomplex(&plot_func.dummy_values[1],
-					!parametric && is_log_y ? pow(base_log_y, y) : y,
+					!parametric && y_props.is_log ? pow(y_props.base_log, y) : y,
 					0.0);
 
 			for (i = 0; i < num_sam_to_use; i++) {
@@ -1439,7 +1437,7 @@ eval_3dplots()
 			    /* x = pow(base_log_x,x); 26-Sep-89 */
 			    /* parametric => NOT a log quantity (?) */
 			    (void) Gcomplex(&plot_func.dummy_values[0],
-					    !parametric && is_log_x ? pow(base_log_x, x) : x, 0.0);
+					    !parametric && x_props.is_log ? pow(x_props.base_log, x) : x, 0.0);
 
 			    points[i].x = x;
 			    points[i].y = y;
@@ -1471,16 +1469,16 @@ eval_3dplots()
 			    /* x = pow(base_log_x,x); 26-Sep-89 */
 			    /* if parametric, no logs involved - 3.6 */
 			    (void) Gcomplex(&plot_func.dummy_values[0],
-					    (!parametric && is_log_x) ? pow(base_log_x, x) : x, 0.0);
+					    (!parametric && x_props.is_log) ? pow(x_props.base_log, x) : x, 0.0);
 
 			    for (j = 0; j < num_sam_to_use; j++) {
 				double y = v_min + j * v_step;
 				struct value a;
 				double temp;
 				/* if (is_log_y) PEM fix logscale y axis */
-				/* y = pow(base_log_y,y); 26-Sep-89 */
+				/* y = pow(y_props.base_log,y); 26-Sep-89 */
 				(void) Gcomplex(&plot_func.dummy_values[1],
-						(!parametric && is_log_y) ? pow(base_log_y, y) :
+						(!parametric && y_props.is_log) ? pow(y_props.base_log, y) :
 						y, 0.0);
 
 				points[j].x = x;
@@ -1557,12 +1555,12 @@ eval_3dplots()
      * as 3.5 which will do for the moment
      */
 
-    if (xtics)
-	setup_tics(FIRST_X_AXIS, &xticdef, xformat, 20);
-    if (ytics)
-	setup_tics(FIRST_Y_AXIS, &yticdef, yformat, 20);
-    if (ztics)
-	setup_tics(FIRST_Z_AXIS, &zticdef, zformat, 20);
+    if (x_props.tics)
+	setup_tics(FIRST_X_AXIS, &x_props, 20);
+    if (y_props.tics)
+	setup_tics(FIRST_Y_AXIS, &y_props, 20);
+    if (z_props.tics)
+	setup_tics(FIRST_Z_AXIS, &z_props, 20);
 
 #define WRITEBACK(axis,min,max) \
 if(range_flags[axis]&RANGE_WRITEBACK) \
@@ -1570,9 +1568,9 @@ if(range_flags[axis]&RANGE_WRITEBACK) \
    if (auto_array[axis]&2) max = max_array[axis]; \
   }
 
-    WRITEBACK(FIRST_X_AXIS, xmin, xmax);
-    WRITEBACK(FIRST_Y_AXIS, ymin, ymax);
-    WRITEBACK(FIRST_Z_AXIS, zmin, zmax);
+    WRITEBACK(FIRST_X_AXIS, x_props.min, x_props.max);
+    WRITEBACK(FIRST_Y_AXIS, y_props.min, y_props.max);
+    WRITEBACK(FIRST_Z_AXIS, z_props.min, z_props.max);
 
     if (plot_num == 0 || first_3dplot == NULL) {
 	int_error(c_token, "no functions or data to plot");
