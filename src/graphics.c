@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.111 2004/07/03 06:08:48 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.112 2004/07/04 21:21:59 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -3683,7 +3683,7 @@ static TBOOLEAN
 bound_intersect(
 struct coordinate GPHUGE *points,
 int i,				/* line segment from point i-1 to point i */
-double *ex, *ey,		/* the point where it crosses a boundary */
+double *ex, double *ey,		/* the point where it crosses a boundary */
 filledcurves_opts *filledcurves_options)
 {
     double dx1, dx2, dy1, dy2;
