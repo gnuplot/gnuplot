@@ -1,5 +1,5 @@
 /*
- * $Id: graphics.h,v 1.24 2004/04/13 17:23:56 broeker Exp $
+ * $Id: graphics.h,v 1.25 2004/07/01 17:10:06 broeker Exp $
  */
 
 /* GNUPLOT - graphics.h */
@@ -53,6 +53,7 @@ typedef struct curve_points {
     enum PLOT_SMOOTH plot_smooth; /* which "smooth" method to be used? */
     char *title;		/* plot title, a.k.a. key entry */
     int title_no_enhanced;	/* don't typeset title in enhanced mode */
+    TBOOLEAN title_is_filename;	/* TRUE if title was auto-generated from filename */
     struct lp_style_type lp_properties;
     struct arrow_style_type arrow_properties;
     struct fill_style_type fill_properties;
@@ -67,6 +68,9 @@ typedef struct curve_points {
     filledcurves_opts filledcurves_options;
 #endif
     struct coordinate GPHUGE *points;
+#ifdef EAM_DATASTRINGS
+    struct text_label *labels;	/* Only used if plot_style == LABELPOINTS */
+#endif
 } curve_points;
 
 /* From ESR's "Actual code patch" :) */

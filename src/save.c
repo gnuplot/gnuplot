@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.76 2004/06/16 06:53:48 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.77 2004/07/01 17:10:07 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -358,13 +358,15 @@ set y2data%s\n",
 	    save_position(fp, &key->user_pos);
 	    break;
 	}
-	fprintf(fp, " %s %sreverse %senhanced box linetype %d linewidth %.3f samplen %g spacing %g width %g height %g %sautotitles\n",
+	fprintf(fp, " %s %sreverse %senhanced box linetype %d linewidth %.3f samplen %g spacing %g width %g height %g %s\n",
 		key->just == JLEFT ? "Left" : "Right",
 		key->reverse ? "" : "no",
 		key->enhanced ? "" : "no",
 		key->box.l_type + 1, key->box.l_width,
 		key->swidth, key->vert_factor, key->width_fix, key->height_fix,
-		key->auto_titles ? "" : "no" );
+		key->auto_titles == COLUMNHEAD_KEYTITLES ? "autotitles columnhead"
+		: key->auto_titles == FILENAME_KEYTITLES ? "autotitles"
+		: "noautotitles" );
     }
 
     fputs("unset label\n", fp);
@@ -1068,6 +1070,11 @@ save_data_func_style(FILE *fp, char *which, enum PLOT_STYLE style)
 #ifdef PM3D
     case PM3DSURFACE:
 	fputs("pm3d\n", fp);
+	break;
+#endif
+#ifdef EAM_DATASTRINGS
+    case LABELPOINTS:
+	fputs("labels\n", fp);
 	break;
 #endif
     default:

@@ -1,5 +1,5 @@
 /*
- * $Id: util.h,v 1.15 2004/04/13 17:24:02 broeker Exp $
+ * $Id: util.h,v 1.16 2004/07/01 17:10:09 broeker Exp $
  */
 
 /* GNUPLOT - util.h */
@@ -73,6 +73,7 @@ void quote_str __PROTO((char *, int, int));
 void capture __PROTO((char *, int, int, int));
 void m_capture __PROTO((char **, int, int));
 void m_quote_capture __PROTO((char **, int, int));
+void parse_esc __PROTO((char *));
 
 /* HBB 20010726: IMHO this one belongs into alloc.c: */
 char *gp_strdup __PROTO((const char *));

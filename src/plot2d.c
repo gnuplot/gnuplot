@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.69 2004/07/02 23:58:35 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.70 2004/07/03 00:27:38 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -34,8 +34,8 @@ static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.69 2004/07/02 23:58:35 sf
  * to the extent permitted by applicable law.
 ]*/
 
-#include "plot2d.h"
 #include "gp_types.h"
+#include "plot2d.h"
 
 #include "alloc.h"
 #include "axis.h"
@@ -48,6 +48,7 @@ static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.69 2004/07/02 23:58:35 sf
 #include "interpol.h"
 #include "misc.h"
 #include "parse.h"
+#include "setshow.h"
 #include "tables.h"
 #include "term_api.h"
 #include "util.h"
@@ -107,6 +108,9 @@ cp_alloc(int num)
 	cp->points = (struct coordinate GPHUGE *) NULL;
     cp->next = NULL;
     cp->title = NULL;
+#ifdef EAM_DATASTRINGS
+    cp->labels = NULL;	/* Will be allocated later if plot_style == LABELPOINTS */
+#endif
     return (cp);
 }
 
@@ -164,6 +168,12 @@ cp_free(struct curve_points *cp)
 	    free(cp->title);
 	if (cp->points)
 	    free(cp->points);
+#ifdef EAM_DATASTRINGS
+	if (cp->labels) {
+	    free_labels(cp->labels);
+	    cp->labels = (struct text_label *)NULL;
+	}
+#endif
 	free(cp);
 	cp = next;
     }
@@ -226,10 +236,6 @@ plotrequest()
     eval_plots();
 }
 
-/* Use up to 7 columns in data file at once -- originally it was 5 */
-#define NCOL 7
-
-
 /* A quick note about boxes style. For boxwidth auto, we cannot
  * calculate widths yet, since it may be sorted, etc. But if
  * width is set, we must do it now, before logs of xmin/xmax
@@ -245,7 +251,7 @@ get_data(struct curve_points *current_plot)
 {
     int i /* num. points ! */ , j;
     int max_cols, min_cols;    /* allowed range of column numbers */
-    double v[NCOL];
+    double v[MAXDATACOLS];
     int storetoken = current_plot->token;
 
     /* eval_plots has already opened file */
@@ -303,6 +309,15 @@ get_data(struct curve_points *current_plot)
 	min_cols = 1;
 	max_cols = 3;
 	break;
+
+#ifdef EAM_DATASTRINGS
+    case LABELPOINTS:
+	/* 3 column data: X Y Label */
+    	min_cols = 3;
+	max_cols = 3;
+	expect_string( 3 );
+	break;
+#endif
 
     default:
 	min_cols = 1;
@@ -363,6 +378,14 @@ get_data(struct curve_points *current_plot)
 	     */
 	    continue;
 
+#ifdef EAM_DATASTRINGS
+	case DF_FOUND_KEY_TITLE:
+	    df_set_key_title(current_plot);
+	    continue;
+	case DF_KEY_TITLE_MISSING:
+	    fprintf(stderr,"get_data: key title not found in requested column\n");
+	    continue;
+#endif
 	case 0:		/* not blank line, but df_readline couldn't parse it */
 	    {
 		df_close();
@@ -445,6 +468,21 @@ get_data(struct curve_points *current_plot)
 				  v[0] - v[2] / 2, v[0] + v[2] / 2,
 				  v[1], v[1], 0.0);
 		    break;
+
+#ifdef EAM_DATASTRINGS
+		case LABELPOINTS:
+		    /* Load the coords just as we would have for a point plot */
+		    store2d_point(current_plot, i, v[0], v[1], v[0], v[0], v[1],
+			      v[1], -1.0);
+		    /* Allocate and fill in a text_label structure to match it */
+		    if (df_tokens[2])
+			store_label(current_plot->labels,
+		    		  &(current_plot->points[i]), i, df_tokens[2]);
+		    else
+			current_plot->points[i].type = UNDEFINED;
+		    i++;
+		    break;
+#endif
 
 		}		/*inner switch */
 
@@ -664,7 +702,70 @@ store2d_point(
 	cp->z = width;
 }				/* store2d_point */
 
+#ifdef EAM_DATASTRINGS
+/* store_label() is called by get_data for each point */
+/* This routine is exported so it can be shared by plot3d */
+void
+store_label(
+    struct text_label *listhead,
+    struct coordinate *cp,
+    int i,			/* point number */
+    char *string)		/* start of label string */
+{
+    register struct text_label *tl = listhead;
+    int textlen;
 
+    /* Walk through list to get to the end. Yes I know this is inefficient */
+    /* but is anyone really going to plot so many labels that it matters?  */
+    if (!tl) int_error(NO_CARET,"text_label list was not initialized");
+    while (tl->next) tl = tl->next;
+
+    /* Allocate a new label structure and fill it in */
+    tl->next = gp_alloc(sizeof(struct text_label),"labelpoint label");
+    memcpy(tl->next,tl,sizeof(text_label));
+    tl = tl->next;
+    tl->next = (text_label *)NULL;
+    tl->tag = i;
+    tl->place.x = cp->x;
+    tl->place.y = cp->y;
+    tl->place.z = cp->z;
+
+    textlen = 0;
+    /* FIXME EAM - this code is ugly but seems to work */
+    /* We need to handle quoted separators and quoted quotes */
+    if (df_separator) {
+	TBOOLEAN in_quote = FALSE;
+	while (string[textlen]) {
+	    if (string[textlen] == '"')
+		in_quote = !in_quote;
+	    else if (string[textlen] == df_separator && !in_quote)
+		break;
+	    textlen++;
+	}
+	while (textlen > 0 && isspace(string[textlen-1]))
+	    textlen--;
+    } else {
+    /* This is the normal case (no special separator character) */
+	if (*string == '"') {
+	    for (textlen=1; string[textlen] && string[textlen] != '"'; textlen++);
+	}
+	while (string[textlen] && !isspace(string[textlen]))
+	    textlen++;
+    }
+
+    /* Strip double quote from both ends */
+    if (string[0] == '"' && string[textlen-1] == '"')
+	textlen -= 2, string++;
+
+    tl->text = gp_alloc(textlen+1,"labelpoint text");
+    strncpy( tl->text, string, textlen );
+    tl->text[textlen] = '\0';
+    parse_esc(tl->text);
+
+    FPRINTF((stderr,"LABELPOINT %f %f \"%s\" \n", tl->place.x, tl->place.y, tl->text));
+}
+
+#endif
 
 /*
  * print_points: a debugging routine to print out the points of a curve, and
@@ -919,6 +1020,9 @@ eval_plots()
 	    TBOOLEAN set_smooth = FALSE, set_axes = FALSE, set_title = FALSE;
 	    TBOOLEAN set_with = FALSE, set_lpstyle = FALSE;
 	    TBOOLEAN set_fillstyle = FALSE;
+#ifdef EAM_DATASTRINGS
+	    TBOOLEAN set_labelstyle = FALSE;
+#endif
 
 	    plot_num++;
 
@@ -940,7 +1044,7 @@ eval_plots()
 		this_plot->filledcurves_options.opt_given = 0;
 #endif
 
-		specs = df_open(NCOL);	/* up to NCOL cols */
+		specs = df_open(MAXDATACOLS);	/* up to MAXDATACOLS cols */
 		/* this parses data-file-specific modifiers only */
 		/* we'll sort points when we know style, if necessary */
 		if (df_binary)
@@ -1105,8 +1209,19 @@ eval_plots()
 			get_filledcurves_style_options(&this_plot->filledcurves_options);
 		    }
 #endif
-		    if ((this_plot->plot_type == FUNC)
-			&& (this_plot->plot_style & PLOT_STYLE_HAS_ERRORBAR))
+#ifdef EAM_DATASTRINGS
+		    if (this_plot->plot_style == LABELPOINTS && this_plot->labels == NULL) {
+			this_plot->labels = new_text_label(-1);
+			this_plot->labels->pos = JUST_CENTRE;
+			this_plot->labels->layer = 1;
+		    }
+#endif
+		    if ((this_plot->plot_type == FUNC) &&
+			((this_plot->plot_style & PLOT_STYLE_HAS_ERRORBAR)
+#ifdef EAM_DATASTRINGS
+			|| (this_plot->plot_style == LABELPOINTS)
+#endif
+			))
 			{
 			    int_warn(c_token, "This plot style is only for datafiles, reverting to \"points\"");
 			    this_plot->plot_style = POINTSTYLE;
@@ -1114,6 +1229,25 @@ eval_plots()
 		    set_with = TRUE;
 		    continue;
 		}
+
+#ifdef EAM_DATASTRINGS
+		/* Labels can have font and text property info as plot options */
+		/* In any case we must allocate one instance of the text style */
+		/* that all labels in the plot will share.                     */
+		if (this_plot->plot_style == LABELPOINTS) {
+		    int stored_token = c_token;
+		    parse_label_options(this_plot->labels);
+		    if (stored_token != c_token) {
+			if (set_labelstyle) {
+			    duplication = TRUE;
+			    break;
+			} else {
+			    set_labelstyle = TRUE;
+			    continue;
+			}
+		    }
+		}
+#endif
 
 		/* pick up line/point specs
 		 * - point spec allowed if style uses points, ie style&2 != 0
@@ -1179,12 +1313,14 @@ eval_plots()
 		int_error(c_token, "duplicated or contradicting arguments in plot options");
 
 	    /* set default values for title if this has not been specified */
+	    this_plot->title_is_filename = FALSE;
 	    if (!set_title) {
 		this_plot->title_no_enhanced = 1; /* filename or function cannot be enhanced */
-		if (key->auto_titles) {
+		if (key->auto_titles == FILENAME_KEYTITLES) {
   		    m_capture(&(this_plot->title), start_token, end_token);
 		    if (xparam)
 		        xtitle = this_plot->title;
+		    this_plot->title_is_filename = TRUE;
 		} else if (xtitle != NULL)
 		    xtitle[0] = '\0';
 	    }

@@ -1,5 +1,5 @@
 /*
- * $Id: gp_types.h,v 1.21 2004/07/02 23:58:35 sfeam Exp $
+ * $Id: gp_types.h,v 1.22 2004/07/03 00:27:38 sfeam Exp $
  */
 
 /* GNUPLOT - gp_types.h */
@@ -98,6 +98,9 @@ typedef enum PLOT_STYLE {
 #ifdef PM3D
     , FILLEDCURVES = 21*PLOT_STYLE_BITS + PLOT_STYLE_HAS_LINE + PLOT_STYLE_HAS_FILL
     , PM3DSURFACE  = 22*PLOT_STYLE_BITS + 0
+#endif
+#ifdef EAM_DATASTRINGS
+    , LABELPOINTS  = 23*PLOT_STYLE_BITS + 0
 #endif
 } PLOT_STYLE;
 

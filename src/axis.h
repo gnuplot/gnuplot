@@ -1,5 +1,5 @@
 /*
- * $Id: axis.h,v 1.36 2004/04/13 17:23:51 broeker Exp $
+ * $Id: axis.h,v 1.37 2004/07/01 17:10:03 broeker Exp $
  *
  */
 
@@ -639,6 +639,7 @@ void axis_output_tics __PROTO((AXIS_INDEX, int *, AXIS_INDEX, tic_callback));
 void axis_set_graphical_range __PROTO((AXIS_INDEX, unsigned int lower, unsigned int upper));
 void axis_draw_2d_zeroaxis __PROTO((AXIS_INDEX, AXIS_INDEX));
 TBOOLEAN some_grid_selected __PROTO((void));
+void add_tic_user __PROTO((AXIS_INDEX, char *, double, int));
 
 double get_writeback_min __PROTO((AXIS_INDEX));
 double get_writeback_max __PROTO((AXIS_INDEX));

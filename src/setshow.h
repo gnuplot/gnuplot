@@ -1,5 +1,5 @@
 /*
- * $Id: setshow.h,v 1.35 2003/11/30 11:19:33 mikulik Exp $
+ * $Id: setshow.h,v 1.36 2004/04/13 17:24:01 broeker Exp $
  */
 
 /* GNUPLOT - setshow.h */
@@ -81,5 +81,9 @@ void free_marklist __PROTO((struct ticmark * list));
 extern int enable_reset_palette;
 void reset_palette __PROTO((void));
 #endif
+
+/* Called from set_label(), plot2d.c and plot3d.c */
+extern void parse_label_options __PROTO((struct text_label *this_label));
+extern struct text_label * new_text_label __PROTO((int tag));
 
 #endif /* GNUPLOT_SETSHOW_H */

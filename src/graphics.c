@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.109 2004/07/02 23:58:35 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.110 2004/07/03 00:27:38 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -1467,6 +1467,12 @@ do_plot(struct curve_points *plots, int pcount)
 #ifdef PM3D
 	case PM3DSURFACE:
 	    fprintf(stderr, "** warning: can't use pm3d for 2d plots\n");
+	    break;
+#endif
+
+#ifdef EAM_DATASTRINGS
+	case LABELPOINTS:
+	    place_labels( this_plot->labels->next, 1);
 	    break;
 #endif
 	}

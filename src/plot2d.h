@@ -1,5 +1,5 @@
 /*
- * $Id: plot2d.h,v 1.8 2001/08/27 15:02:14 broeker Exp $
+ * $Id: plot2d.h,v 1.9 2004/04/13 17:23:59 broeker Exp $
  */
 
 /* GNUPLOT - plot2d.h */
@@ -53,5 +53,11 @@ extern TBOOLEAN boxwidth_is_absolute;
 void plotrequest __PROTO((void));
 void cp_free __PROTO((struct curve_points *cp));
 void cp_extend __PROTO((struct curve_points *cp, int num));
+
+#ifdef EAM_DATASTRINGS
+#include "gp_types.h"
+#include "gadgets.h"
+void store_label __PROTO((struct text_label *, struct coordinate *, int i, char * string));
+#endif
 
 #endif /* GNUPLOT_PLOT2D_H */

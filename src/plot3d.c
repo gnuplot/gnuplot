@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.68 2004/06/30 20:01:56 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.69 2004/07/01 17:10:07 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -47,8 +47,12 @@ static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.68 2004/06/30 20:01:56 br
 #include "graph3d.h"
 #include "misc.h"
 #include "parse.h"
+#include "setshow.h"
 #include "term_api.h"
 #include "util.h"
+#ifdef EAM_DATASTRINGS
+#include "plot2d.h"
+#endif
 #ifdef PM3D
 # include "pm3d.h"
 #endif
@@ -139,6 +143,10 @@ sp_alloc(int num_samp_1, int num_iso_1, int num_samp_2, int num_iso_2)
     } else
 	sp->iso_crvs = NULL;
 
+#ifdef EAM_DATASTRINGS
+    sp->labels = NULL; /* Will be allocated later if plot_style === LABELPOINTS */
+#endif
+
     return (sp);
 }
 
@@ -206,6 +214,13 @@ sp_free(struct surface_points *sp)
 	    iso_free(sp->iso_crvs);
 	    sp->iso_crvs = next_icrvs;
 	}
+
+#ifdef EAM_DATASTRINGS
+	if (sp->labels) {
+	    free_labels(sp->labels);
+	    sp->labels = (struct text_label *)NULL;
+	}
+#endif
 
 	free(sp);
 	sp = next;
@@ -603,11 +618,7 @@ get_3ddata(struct surface_points *this_plot)
     int xdatum = 0;
     int ydatum = 0;
     int j;
-#ifdef PM3D
-    double v[4];
-#else
-    double v[3];
-#endif
+    double v[MAXDATACOLS];
     int pt_in_iso_crv = 0;
     struct iso_curve *this_iso;
 
@@ -655,19 +666,12 @@ get_3ddata(struct surface_points *this_plot)
 	double color = VERYLARGE;
 	int pm3d_color_from_column = FALSE;
 #endif
+#ifdef EAM_DATASTRINGS
+	if (this_plot->plot_style == LABELPOINTS)
+	    expect_string( 4 );
+#endif
 
-	while ((j = df_readline(v,
-#ifdef PM3D
-		    /* currently pm3d mapping is only implemented for
-		     * MAP3D_CARTESIAN; and it is used if the 4th column is
-		     * explicitly given */
-				(MAP3D_CARTESIAN
-				 == mapping3d && df_no_use_specs==4)
-				? 4 : 3
-#else
-				3
-#endif /* PM3D */
-		    )) != DF_EOF) {
+	while ((j = df_readline(v,MAXDATACOLS)) != DF_EOF) {
 	    if (j == DF_SECOND_BLANK)
 		break;		/* two blank lines */
 	    if (j == DF_FIRST_BLANK) {
@@ -732,8 +736,21 @@ get_3ddata(struct surface_points *this_plot)
 		    y = ydatum;
 		    z = v[0];
 		    break;
-#ifdef PM3D
 		case 4:
+#ifdef EAM_DATASTRINGS
+		    if (this_plot->plot_style == LABELPOINTS) {
+		    /* FIXME EAM - as it stands we cannot have LABELPOINTS   */
+		    /* with pm3d colors, because they don't agree on columns */
+			/* 4th column holds label text */
+			pm3d_color_from_column = FALSE;
+			x = v[0];
+			y = v[1];
+			z = v[2];
+			/* text = df_tokens[3]; */
+			break;
+		    }
+#endif
+#ifdef PM3D
 		    if (df_no_use_specs==4) {
 			/* getting color from an explicitly given 4th column */
 			pm3d_color_from_column = TRUE;
@@ -820,6 +837,17 @@ get_3ddata(struct surface_points *this_plot)
 #endif
 	    }
 
+#ifdef EAM_DATASTRINGS
+	    /* At this point we have stored the point coordinates. Now we need to copy */
+	    /* x,y,z into the text_label structure and add the actual text string.     */
+	    if (this_plot->plot_style == LABELPOINTS) {
+		if (df_tokens[3])
+		    store_label(this_plot->labels, cp, xdatum, df_tokens[3]);
+		else
+		    this_plot->iso_crvs->points[xdatum].type = UNDEFINED;
+	    }
+#endif
+
 	    /* some may complain, but I regard this as the correct use
 	     * of goto
 	     */
@@ -886,7 +914,6 @@ get_3ddata(struct surface_points *this_plot)
 	this_iso->next = new_icrvs;
     }
 }
-
 
 static void
 print_3dtable(int pcount)
@@ -1108,6 +1135,10 @@ eval_3dplots()
 	    TBOOLEAN duplication = FALSE;
 	    TBOOLEAN set_title = FALSE, set_with = FALSE;
 	    TBOOLEAN set_lpstyle = FALSE;
+	    TBOOLEAN checked_once = FALSE;
+#ifdef EAM_DATASTRINGS
+	    TBOOLEAN set_labelstyle = FALSE;
+#endif
 
 	    if (isstring(c_token)) {	/* data file to plot */
 
@@ -1141,18 +1172,8 @@ eval_3dplots()
 		this_plot->plot_type = DATA3D;
 		this_plot->plot_style = data_style;
 
-#ifdef PM3D
-		specs = df_open(4);
-#if 0
-		/* PM 3.7.2002: this fallback is no more necessary */
-		if ((2 == specs || 4 == specs) && MAP3D_CARTESIAN == mapping3d) {
-		    /* switch default to pm3d */
-		    this_plot->plot_style = PM3DSURFACE;
-		}
-#endif
-#else
-		specs = df_open(3);
-#endif
+		specs = df_open(MAXDATACOLS);
+
 		/* parses all datafile-specific modifiers */
 		/* we will load the data after parsing title,with,... */
 
@@ -1232,9 +1253,8 @@ eval_3dplots()
 	    this_plot->lp_properties.l_type = line_num;
 	    this_plot->lp_properties.p_type = point_num;
 
-
 	    /* pm 25.11.2001 allow any order of options */
-	    while (!END_OF_COMMAND) {
+	    while (!END_OF_COMMAND || !checked_once) {
 
 		/* deal with title */
 		if (almost_equals(c_token, "t$itle")) {
@@ -1286,8 +1306,12 @@ eval_3dplots()
 			break;
 		    }
 		    this_plot->plot_style = get_style();
-		    if ((this_plot->plot_type == FUNC3D)
-			&& (this_plot->plot_style & PLOT_STYLE_HAS_ERRORBAR))
+		    if ((this_plot->plot_type == FUNC3D) &&
+			((this_plot->plot_style & PLOT_STYLE_HAS_ERRORBAR)
+#ifdef EAM_DATASTRINGS
+			|| (this_plot->plot_style == LABELPOINTS)
+#endif
+			))
 			{
 			    int_warn(c_token, "This plot style is only for datafiles , reverting to \"points\"");
 			    this_plot->plot_style = POINTSTYLE;
@@ -1302,9 +1326,35 @@ eval_3dplots()
 			}
 		    }
 #endif
+
 		    set_with = TRUE;
 		    continue;
 		}
+
+#ifdef EAM_DATASTRINGS
+		/* Labels can have font and text property info as plot options */
+		/* In any case we must allocate one instance of the text style */
+		/* that all labels in the plot will share.                     */
+		if (this_plot->plot_style == LABELPOINTS)  {
+		    int stored_token = c_token;
+		    if (this_plot->labels == NULL) {
+			this_plot->labels = new_text_label(-1);
+			this_plot->labels->pos = JUST_CENTRE;
+			this_plot->labels->layer = 1;
+		    }
+		    parse_label_options(this_plot->labels);
+		    checked_once = TRUE;
+		    if (stored_token != c_token) {
+			if (set_labelstyle) {
+			    duplication = TRUE;
+			    break;
+			} else {
+			    set_labelstyle = TRUE;
+			    continue;
+			}
+		    }
+		}
+#endif
 
 		/* pick up line/point specs
 		 * - point spec allowed if style uses points, ie style&2 != 0
@@ -1317,6 +1367,7 @@ eval_3dplots()
  		    lp_parse(&lp, 1,
 			     this_plot->plot_style & PLOT_STYLE_HAS_POINT,
 			     line_num, point_num);
+		    checked_once = TRUE;
 		    if (stored_token != c_token) {
 			if (set_lpstyle) {
 			    duplication=TRUE;
@@ -1331,7 +1382,7 @@ eval_3dplots()
 
 		break; /* unknown option */
 
-	    } /* while (!END_OF_COMMAND) */
+	    }  /* while (!END_OF_COMMAND)*/
 
 	    if (duplication)
 		int_error(c_token, "duplicated or contradicting arguments in plot options");
@@ -1346,7 +1397,7 @@ eval_3dplots()
 	    /* set default values for title if this has not been specified */
 	    if (!set_title) {
 		this_plot->title_no_enhanced = 1; /* filename or function cannot be enhanced */
-		if (key->auto_titles) {
+		if (key->auto_titles == FILENAME_KEYTITLES) {
 		    if (this_plot->plot_type == DATA3D && df_binary==TRUE && end_token==start_token+1)
 			/* let default title for  splot 'a.dat' binary  is 'a.dat'
 			 * while for  'a.dat' binary using 2:1:3  will be all 4 words */

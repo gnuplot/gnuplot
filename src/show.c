@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.127 2004/06/20 05:53:04 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.128 2004/07/01 17:10:07 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -1710,13 +1710,15 @@ show_key()
 \tvertical spacing is %g characters\n\
 \twidth adjustment is %g characters\n\
 \theight adjustment is %g characters\n\
-\tcurves are%s automatically titled\n\
+\tcurves are%s automatically titled %s\n\
 \tkey title is \"%s\"\n",
 		    key->swidth,
 		    key->vert_factor,
 		    key->width_fix,
 		    key->height_fix,
                     key->auto_titles ? "" : " not",
+		    key->auto_titles == FILENAME_KEYTITLES ? "with filename" :
+		    key->auto_titles == COLUMNHEAD_KEYTITLES ? "with column header" : "",
 		    key->title);
 
 }

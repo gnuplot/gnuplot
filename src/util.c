@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util.c,v 1.41 2004/07/01 15:44:52 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: util.c,v 1.42 2004/07/01 17:10:08 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - util.c */
@@ -59,7 +59,6 @@ char *decimalsign = NULL;
 
 /* internal prototypes */
 
-static void parse_esc __PROTO((char *instr));
 static void mant_exp __PROTO((double, double, TBOOLEAN, double *, int *, const char *));
 
 /*
@@ -962,7 +961,7 @@ squash_spaces(char *s)
 }
 
 
-static void
+void
 parse_esc(char *instr)
 {
     char *s = instr, *t = instr;
@@ -1000,6 +999,9 @@ parse_esc(char *instr)
 		    *t++ = *s++;
 		}
 	    }
+	} else if (df_separator && *s == '\"' && *(s+1) == '\"') {
+	/* EAM Mar 2003 - For parsing CSV strings with quoted quotes */
+	    *t++ = *s++; s++;
 	} else {
 	    *t++ = *s++;
 	}

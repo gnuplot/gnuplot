@@ -1,5 +1,5 @@
 /*
- * $Id: datafile.h,v 1.11 2004/04/13 17:23:53 broeker Exp $
+ * $Id: datafile.h,v 1.12 2004/06/13 00:34:32 sfeam Exp $
  */
 
 /* GNUPLOT - datafile.h */
@@ -50,6 +50,11 @@
 #define DF_FIRST_BLANK  (-3)
 #define DF_SECOND_BLANK (-4)
 #define DF_MISSING      (-5)
+#ifdef EAM_DATASTRINGS
+#define DF_FOUND_KEY_TITLE   (-6)
+#define DF_KEY_TITLE_MISSING (-7)
+#endif
+
 
 #ifndef MAXINT			/* should there be one already defined ? */
 # ifdef INT_MAX			/* in limits.h ? */
@@ -61,8 +66,9 @@
 
 /* Variables of datafile.c needed by other modules: */
 
-/* how many using columns were specified */
+/* how many using columns were specified, and max possible */
 extern int df_no_use_specs;
+#define MAXDATACOLS 7
 
 /* suggested x value if none given */
 extern int df_datum;
@@ -77,6 +83,11 @@ extern int df_eof;
 extern int df_line_number;
 extern AXIS_INDEX df_axis[];
 extern struct udft_entry ydata_func; /* HBB 990829: moved from command.h */
+
+#ifdef EAM_DATASTRINGS
+/* Returned to caller by df_readline() */
+extern char *df_tokens[];
+#endif
 
 /* string representing missing values, ascii datafiles */
 extern char *missing_val;
@@ -99,6 +110,10 @@ void df_close __PROTO((void));
 void df_showdata __PROTO((void));
 int df_2dbinary __PROTO((struct curve_points *));
 int df_3dmatrix __PROTO((struct surface_points *, int));
+#ifdef EAM_DATASTRINGS
+void df_set_key_title __PROTO((struct curve_points *));
+int expect_string __PROTO((const char column ));
+#endif
 
 void f_dollars __PROTO((union argument *x));
 void f_column  __PROTO((union argument *x));

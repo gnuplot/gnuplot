@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.90 2004/06/20 05:53:04 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.91 2004/07/01 17:10:05 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -1048,6 +1048,12 @@ do_3dplot(
 		break;
 #endif
 
+#ifdef EAM_DATASTRINGS
+	    case LABELPOINTS:
+		if (!(hidden3d && draw_surface))
+		    place_labels3d(this_plot->labels->next, 1);
+		break;
+#endif
 	    }			/* switch(plot-style) */
 
 		/* move key on a line */
@@ -1124,6 +1130,10 @@ do_3dplot(
 		    case PM3DSURFACE: /* ignored */
 			break;
 #endif
+#ifdef EAM_DATASTRINGS
+		    case LABELPOINTS: /* Already handled above */
+			break;
+#endif
 		    }
 		    NEXT_KEY_LINE();
 		}
@@ -1186,6 +1196,10 @@ do_3dplot(
 			    case PM3DSURFACE: /* ignored */
 				break;
 #endif
+#ifdef EAM_DATASTRINGS
+			    case LABELPOINTS: /* Already handled above */
+				break;
+#endif
 			    }	/* switch */
 
 			    NEXT_KEY_LINE();
@@ -1235,6 +1249,10 @@ do_3dplot(
 			break;
 #ifdef PM3D
 		    case PM3DSURFACE: /* ignored */
+			break;
+#endif
+#ifdef EAM_DATASTRINGS
+		    case LABELPOINTS: /* Already handled above */
 			break;
 #endif
 		    } /*switch */

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.44 2004/04/22 13:41:37 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.45 2004/07/01 17:10:03 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -38,6 +38,7 @@ static char *RCSid() { return RCSid("$Id: axis.c,v 1.44 2004/04/22 13:41:37 broe
 
 #include "stdfn.h"
 
+#include "alloc.h"
 #include "command.h"
 #include "gadgets.h"
 #include "gp_time.h"
@@ -1569,3 +1570,62 @@ get_position(struct position *pos)
 	pos->scalez = type;	/* same as y */
     }
 }
+
+/*
+ * Add a single tic mark, with label, to the list for this axis.
+ * To avoid duplications and overprints, sort the list and allow
+ * only one label per position.
+ * EAM - called from set.c during `set xtics`
+ *       called from datafile.c during `plot using ::xtic()`
+ */
+void
+add_tic_user(AXIS_INDEX axis, char *label, double position, int level)
+{
+    struct ticmark *tic, *newtic;
+    struct ticmark listhead;
+
+    /* Make sure this axis is marked as having user tics */
+    if (axis_array[axis].ticdef.type != TIC_USER) {
+	axis_array[axis].ticdef.type = TIC_USER;
+	axis_array[axis].ticdef.def.user = NULL;
+    }
+
+    /* Walk along list to sorted positional order */
+    listhead.next = axis_array[axis].ticdef.def.user;
+    listhead.position = -DBL_MAX;
+    for (tic = &listhead;
+	 tic->next && (position > tic->next->position);
+	 tic = tic->next) {
+    }
+
+    if ((tic->next == NULL) || (position < tic->next->position)) {
+	/* Make a new ticmark */
+	newtic = (struct ticmark *) gp_alloc(sizeof(struct ticmark), (char *) NULL);
+	newtic->position = position;
+	newtic->level = level;
+	/* Insert it in the list */
+	newtic->next = tic->next;
+	tic->next = newtic;
+    } else {
+	/* The new tic must duplicate position of tic->next */
+	if (position != tic->next->position)
+	    fprintf(stderr,"add_tic_user: list sort error\n");
+	newtic = tic->next;
+	/* Don't over-write a major tic with a minor tic */
+	if (newtic->level < level)
+	    return;
+	if (newtic->label) {
+	    free(newtic->label);
+	    newtic->label = NULL;
+	}
+    }
+
+    if (label)
+	newtic->label = gp_strdup(label);
+    else
+	newtic->label = NULL;
+
+    /* Make sure the listhead is kept */
+    axis_array[axis].ticdef.def.user = listhead.next;
+}
+

@@ -1,10 +1,49 @@
 2004-07-03  Ethan Merritt  <merritt@u.washington.edu>
 
+	* configure.in: --disable-datastrings
+
+	* demo/ctg-y2.dat demo/datastrings.dem demo/labelplot.pdb
+	demo/nearmap.csv demo/starmap.dem demo/table.dat:
+	Various demos for 'plot with labels' and for reading axis tic labels
+	and plot labels from a data file.
+
+	* docs/gnuplot.doc: Documentation for 'plot with labels'
+	and for reading tic and plot labels from a data file.
+
+	* src/axis.c src/axis.h src/datafile.c src/datafile.h
+	src/gadgets.c src/gadgets.h src/gp_types.h src/graph3d.c
+	src/graph3d.h src/graphics.c src/graphics.h src/plot2d.c
+	src/plot2d.h src/plot3d.c src/save.c src/set.c src/setshow.h
+	src/show.c src/tables.c src/util.c src/util.h:
+	Integrate the "datastrings" patchset (SourceForge #595850). 
+
+	New plot style "with labels" will read a string, possibly delimited
+	by quotes, from the data file and place it at the x, y, {z} 
+	coordinates specified. E.g.:
+	    plot 'datafile' using 1:2:3 with labels 
+	    splot 'datafile' using 7:8:9:4 with labels
+
+	New internal functions specific to the 'using' option that specify
+	that string data from a datafile column is to be used for tic labels,
+	or that string data from a datafile row is to be used for plot key
+	titles. E.g.:
+	    plot '-' using 0:2:xticlabels(1) title 1 with boxes
+	    xxx  "2001"
+	    Jan	  123
+	    Feb	  456
+	    Mar	   78
+	    e
+	This will plot a histogram with each an x-axis tic label under
+	each box: "Jan", "Feb" etc.  The plot key will list the plot with
+	title "2001".
+
+2004-07-02  Ethan Merritt  <merritt@u.washington.edu>
+
 	* gnuplot/src/gp_types.h gnuplot/src/graphics.c gnuplot/src/plot2d.c:
 	Rename PLOT_STYLE_HAS_BOXES to PLOT_STYLE_HAS_FILL since it now 
 	applies to objects other than boxes.
 
-2004-07-03  Ethan Merritt  <merritt@u.washington.edu>
+2004-07-02  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/color.c src/color.h src/gadgets.h src/gp_types.h src/graphics.c 
 	src/misc.c src/plot2d.c src/pm3d.c src/set.c src/tables.c src/tables.h
@@ -27,11 +66,11 @@
 	* src/gplt_x11.c: Back-end support for applying explicit fill style
 	to filled_polygon.  Beware of incompatibility with early versions.
 
-2004-07-03  Ethan Merritt  <merritt@u.washington.edu>
+2004-07-02  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/post.trm: Minor cleanup of enhanced text "phantom box" macros.
 
-2004-07-03  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+2004-07-02  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* PATCHLEVEL, VERSION: Changed to version 4.1, patchlevel 0.
 

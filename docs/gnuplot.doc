@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.227 2004/07/02 22:19:13 broeker Exp $
+C RCS $Id: gnuplot.doc,v 1.228 2004/07/02 23:58:34 sfeam Exp $
 C 18 September 2001
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -564,6 +564,42 @@ C
  be given as a quoted time string according to the `timefmt` format string.
  See `set xdata` and `set timefmt`.  `gnuplot` will also accept an integer
  expression, which will be interpreted as seconds from 1 January 2000.
+2 Datastrings
+?datastrings
+ The configuration option --enable-datastrings (currently EXPERIMENTAL) allows
+ gnuplot to read and process text fields in datafiles. A text field consists 
+ of either an arbitrary string of printable characters containing no whitespace
+ or an arbitrary string of characters, possibly including whitespace, delimited
+ by double quotes. The following sample line from a datafile is interpreted to
+ contain four columns, with a text field in column 3:
+
+   1.000 2.000 "Third column is all of this text" 4.00
+ 
+ Text fields can be positioned within a 2-D or 3-D plot using the commands:
+   
+   plot 'datafile' using 1:2:4 with labels
+   splot 'datafile using 1:2:3:4 with labels
+
+ A column of text data can also be used to label the ticmarks along one or more
+ of the plot axes. The example below plots a line through a series of points
+ with (X,Y) coordinates taken from columns 3 and 4 of the input datafile.
+ However, rather than generating regularly spaced tics along the x axis
+ labeled numerically, gnuplot will position a tic mark along the x axis at the
+ X coordinate of each point and label the tic mark with text taken from column
+ 1 of the input datafile.
+
+   set xtics
+   plot 'datafile' using 3:4:xticlabels(1) with linespoints
+
+ There is also an option that will interpret the first entry in a column of
+ input data as a text field, and use it as the key title for data plotted from
+ that column. The example given below will use the first entry in column 2 to
+ generate a title in the key box, while processing the remainder of columns 
+ 2 and 4 to draw the required line:
+
+   plot 'datafile' using 1:(f($2)/$4) title 2 with lines
+
+ See `set style labels`, `using xticlabels`, `plot title`, `using`.
 2 Environment
 ?environment
  A number of shell environment variables are understood by `gnuplot`.  None of
@@ -3016,6 +3052,54 @@ C ... and restart the table:
 ^ <a href="http://www.gnuplot.info/demo/using.html">
  Feeble using demos.
 ^ </a>
+
+ If gnuplot is built with configuration option --enable-datastrings, then
+ additional modifiers to `using` can specify handling of text fields in the 
+ datafile. See `datastrings`, `using xticlabels`, `using title`.
+5 using title
+?using title
+?plot using title
+ If gnuplot is built with configuration option --enable-datastrings, then
+ the first entry of a column of the input data file can be used as a string
+ to provide the plot title in the key box.  The column containing specified
+ is independent of the column[s] used for the plot itself.
+
+    plot 'data' using 1:($2/$3) title 2 
+
+ In this case the entry in the first row of column 2 will be used for the 
+ key entry of the plot constructed from dividing column 2 by column 3.
+ The entry in the first row of column 3 will be ignored.
+ 
+5 xticlabels
+?using xticlabels
+?plot using xticlabels
+ If gnuplot is built with configuration option --enable-datastrings, then
+ a column of the input data file can be used to label axis tic marks in a 2-D
+ plot command. The format of such a plot command is
+
+   plot 'datafile' using <xcol>:<ycol>:xticlabels(<labelcol>) with <plotstyle>
+
+ The `xticlabels(<val>)` option must be the final entry of the `using` column 
+ specifications. For each point which has a valid pair of X,Y coordinates,
+ the text field found in column <labelcol> is added to the list of xtic labels
+ at the same X coordinate as the point it belongs to. `xticlabels(<labelcol>)`
+ may be shortened to `xtic(<labelcol>)`.
+5 x2ticlabels
+?using x2ticlabels
+?plot using x2ticlabels
+ See plot using xticlabels.
+5 yticlabels
+?using yticlabels
+?plot using yticlabels
+ See plot using xticlabels.
+5 y2ticlabels
+?using y2ticlabels
+?plot using y2ticlabels
+ See plot using xticlabels.
+5 zticlabels
+?using zticlabels
+?plot using zticlabels
+ See plot using xticlabels.
 3 errorbars
 ?commands plot errorbars
 ?commands splot errorbars
@@ -3278,7 +3362,7 @@ C ... and restart the table:
                     }
 
  where <style> is either `lines`, `points`, `linespoints`, `impulses`,
- `dots`, `steps`, `fsteps`, `histeps`, `errorbars`, `xerrorbars`,
+ `dots`, `steps`, `fsteps`, `histeps`, `errorbars`, `labels`, `xerrorbars`,
  `yerrorbars`, `xyerrorbars`, `errorlines`, `xerrorlines`, `yerrorlines`,
  `xyerrorlines`, `boxes`, `filledcurves`, `boxerrorbars`,
  `boxxyerrorbars`, `financebars`, `candlesticks`, `vectors` or `pm3d`. Some
@@ -5170,7 +5254,7 @@ C ... and restart the table:
                {samplen <sample_length>} {spacing <vertical_spacing>}
                {width <width_increment>}
                {height <height_increment>}
-               {{no}autotitles}
+               {{no}autotitle {columnheader}}
                {title "<text>"} {{no}enhanced}
                {{no}box { {linestyle | ls <line_style>}
                           | {linetype | lt <line_type>}
@@ -5218,6 +5302,14 @@ C ... and restart the table:
  default option `autotitles`. The automatic generation of titles can be
  suppressed by `noautotitles`; then only those titles explicitly defined
  by `(s)plot ... title ...` will be drawn.
+
+ The `set key autotitle columnheader` option is available if gnuplot was built
+ with --enable-datastrings. This command causes the first entry in each column
+ of plotted data to be interpreted as a text string and used as a title for
+ the corresponding plot. If the quantity being plotted is a function of data
+ from several columns, gnuplot may be confused as to which column to draw the
+ title from. In this case it is necessary to specify the column explicitly in
+ the plot command, e.g. `plot "datafile" using (($2+$3)/$4) title 3 with lines`.
 
  A title can be put on the key (`title "<text>"`)---see also `syntax` for the
  distinction between text in single- or double-quotes.  The key title uses the
@@ -6997,6 +7089,10 @@ C ... and restart the table:
  of the `steps` styles can be used with `splot`s. If an inappropriate style
  is specified, it will be changed to `points`.
 
+ The above caveat does not apply to `plot with labels`, for which the third
+ column specifies a data source rather than coordinate information.
+ See `set style labels`.
+
  For 2-d data with more than two columns, `gnuplot` is picky about the
  allowed `errorbars` and `errorlines` styles. The `using` option on the
  `plot` command can be used to set up the correct columns for the style
@@ -7277,6 +7373,29 @@ C ... and restart the table:
 ?impulses
  The `impulses` style displays a vertical line from the x axis (not the graph
  border), or from the grid base for `splot`, to each point.
+5 labels
+?commands set style labels
+?set style labels
+?plotting styles labels
+?style labels
+?labels
+ The `labels` style is available only if gnuplot is built with configuration 
+ option --enable-datastrings. For a 2-D plot with labels you must specify
+ 3 input data columns; the text string found in the third column is printed at
+ the X and Y coordinates generated by the first two column specifiers. The 
+ font, color, rotation angle and other properties of the printed text may be
+ specified as additional command options (see `set label`). The example below
+ will generate a 2-D plot with text labels taken from column 4 of the input
+ file (`tc lt 2` is shorthand for `textcolor linetype 2`, which is green).
+
+   plot 'datafile' using 1:(0.5 * $2):4 with labels font "arial,11" tc lt 2
+
+ The `labels` style can also be used in 3-D plots. In this case four input
+ column specifiers are required, corresponding to X Y Z and text.
+
+   splot 'datafile' using 1:2:3:4 with labels
+
+ See also `datastrings`, `set style data`.
 5 lines
 ?commands set style lines
 ?set style lines

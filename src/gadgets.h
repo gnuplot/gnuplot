@@ -188,6 +188,9 @@ typedef struct {
 /* EAM Feb 2003 - Move all global variables related to key into a */
 /* single structure. Eventually this will allow multiple keys.    */
 
+typedef enum keytitle_type {
+    NOAUTO_KEYTITLES, FILENAME_KEYTITLES, COLUMNHEAD_KEYTITLES
+} keytitle_type;
 
 typedef struct {
     TBOOLEAN visible;		/* Do we show this key at all? */
@@ -200,7 +203,7 @@ typedef struct {
     double vert_factor;		/* user specified vertical spacing multiplier */
     double width_fix;		/* user specified additional (+/-) width of key titles */
     double height_fix;
-    TBOOLEAN auto_titles;	/* auto title curves unless plotted 'with notitle' */
+    keytitle_type auto_titles;	/* auto title curves unless plotted 'with notitle' */
     TBOOLEAN reverse;		/* key back to front */
     TBOOLEAN enhanced;		/* enable/disable enhanced text of key titles */
     struct lp_style_type default_keybox_lp; /* linetype of box around key:  */
@@ -224,7 +227,7 @@ extern legend_key keyT;
 		DEFAULT_KEY_POSITION, \
 		TTOP, TRIGHT, JRIGHT,  \
 		4.0, 1.0, 0.0, 0.0, \
-		TRUE, FALSE, TRUE,  \
+		FILENAME_KEYTITLES, FALSE, TRUE,  \
 		DEFAULT_KEYBOX_LP, \
 		DEFAULT_KEYBOX_LP, \
 		"" }
@@ -326,5 +329,9 @@ extern filledcurves_opts filledcurves_opts_func;
 #endif
 
 void default_arrow_style __PROTO((struct arrow_style_type *arrow));
+
+#ifdef EAM_DATASTRINGS
+void free_labels __PROTO((struct text_label *tl));
+#endif
 
 #endif /* GNUPLOT_GADGETS_H */
