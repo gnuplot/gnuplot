@@ -1757,7 +1757,9 @@ int pcount;			/* count of plots in linked list */
 			(*t->put_text) (xl + key_text_right, yl, s);
 		    } else {
 			int x = xl + key_text_right - (t->h_char) * strlen(s);
-			if (key_hpos == TOUT || inrange(x, xleft, xright))
+			if (key_hpos == TOUT ||
+			    key_vpos == TUNDER || /* HBB 990327 */
+			    inrange(x, xleft, xright))
 			    (*t->put_text) (x, yl, s);
 		    }
 		}
@@ -1809,6 +1811,7 @@ int pcount;			/* count of plots in linked list */
 		    } else {
 			int x = xl + key_text_right - (t->h_char) * strlen(this_plot->title);
 			if (key_hpos == TOUT ||
+			    key_vpos == TUNDER || /* HBB 990327 */
 			    i_inrange(x, xleft, xright))
 			    (*t->put_text) (x, yl, this_plot->title);
 		    }
@@ -4444,7 +4447,8 @@ tic_callback callback;		/* fn to call to actually do the work */
 			    gstrftime(label, 24, ticfmt[axis], (double) user);
 			} else if (polar) {
 			    /* if rmin is set, we stored internally with r-rmin */
-#if 0				/* Igor's polar-grid patch */
+			  /* HBB 990327: reverted to 'pre-Igor' version... */
+#if 1				/* Igor's polar-grid patch */
 			    double r = fabs(user) + (autoscale_r & 1 ? 0 : rmin);
 #else
 			    /* Igor removed fabs to allow -ve labels */
