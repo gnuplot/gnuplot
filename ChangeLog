@@ -1,3 +1,16 @@
+1998-06-19  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* fit.c, fit.h, matrix.c, matrix.h: Re-re-import new improved
+	versions from beta344. Suggested by HBB.
+
+1998-06-18  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* graph3d.c, util3d.c: Remove spurious ^M.
+
+	* 0PORTING: Fix typos.
+
+	* set.c: Complete axis width fix.
+
 1998-06-17  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* Imported beta 345.
@@ -6,7 +19,7 @@
 	docs/ps_guide.ps, term/cgm.trm, term/post.trm,term/x11.trm:
  	Cleanup patches by Dick Crawford <rccrawford@lanl.gov>.
 
-	* docs/gnuplot.doc, term/post.trm: FIx typos.
+	* docs/gnuplot.doc, term/post.trm: Fix typos.
 	
 1998-05-12  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
@@ -118,7 +131,7 @@
 	* ansichek.h: Remove test for AUTOCONF, define ANSI_C if __STDC__ == 1.
 	Define HAVE_CPP_STRINGIFY and PROTOTYPES if ANSI_C == 1.
 	
-	* config.hin: Regenerated from acconfig.h wiyh autoheader.
+	* config.hin: Regenerated from acconfig.h with autoheader.
 
 	* configure.in: Add support for 'missing'. Add test for ANSI
 	stringification. Rearrange test order (ANSI first). Rewrite tests
