@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.15 1999/06/19 20:50:44 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.16 1999/07/18 17:38:50 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -40,88 +40,126 @@ static char *RCSid() { return RCSid("$Id: show.c,v 1.15 1999/06/19 20:50:44 lhec
  * Added user-specified bases for log scaling.
  */
 
+
 #include "plot.h"
 #include "setshow.h"
 
 #define DEF_FORMAT   "%g"	/* default format for tic mark labels */
 #define SIGNIF (0.01)		/* less than one hundredth of a tic mark */
 
-/* input data, parsing variables */
 
-static struct show_entry {
-    const char *show_name;
-    enum show_id id;
-} show_tbl[] = 
+static struct setshow_entry {
+    const char *setshow_name;
+    enum setshow_id id;
+} show_tbl[] =
 {
-    { "ac$tion_table", SHOW_ACTIONTABLE },
-    { "at", SHOW_ACTIONTABLE },
-    { "ar$row", SHOW_ARROW },
-    { "au$toscale", SHOW_AUTOSCALE },
-    { "b$ars", SHOW_BARS },
-    { "bor$der", SHOW_BORDER },
-    { "box$width", SHOW_BOXWIDTH },
-    { "c$lip", SHOW_CLIP },
-    { "ma$pping", SHOW_MAPPING },
-    { "co$ntour", SHOW_CONTOUR },
-    { "cn$trparam", SHOW_CNTRPARAM },
-    { "da$ta", SHOW_DATA },
-    { "dg$rid3d", SHOW_DGRID3D },
-    { "du$mmy", SHOW_DUMMY },
-    { "fo$rmat", SHOW_FORMAT },
-    { "fu$nctions", SHOW_FUNCTIONS },
-    { "lo$gscale", SHOW_LOGSCALE },
-    { "of$fsets", SHOW_OFFSETS },
-    { "ma$rgin", SHOW_MARGIN },
-    { "o$utput", SHOW_OUTPUT },
-    { "tit$le", SHOW_TITLE },
-    { "mis$sing", SHOW_MISSING },
-    { "xl$abel", SHOW_XLABEL },
-    { "x2l$abel", SHOW_X2LABEL },
-    { "yl$abel", SHOW_YLABEL },
-    { "y2l$abel", SHOW_Y2LABEL },
-    { "zl$abel", SHOW_ZLABEL },
-    { "keyt$itle", SHOW_KEYTITLE },
-    { "xda$ta", SHOW_XDATA },
-    { "yda$ta", SHOW_YDATA },
-    { "x2da$ta", SHOW_X2DATA },
-    { "y2da$ta", SHOW_Y2DATA },
-    { "zda$ta", SHOW_ZDATA },
-    { "timef$mt", SHOW_TIMEFMT },
-    { "loca$le", SHOW_LOCALE },
-    { "loa$dpath", SHOW_LOADPATH },
-    { "xzero$axis", SHOW_XZEROAXIS },
-    { "yzero$axis", SHOW_YZEROAXIS },
-    { "zeroa$xis", SHOW_ZEROAXIS },
-    { "la$bel", SHOW_LABEL },
-    { "li$nestyle", SHOW_LINESTYLE },
-    { "ls", SHOW_LINESTYLE },
-    { "g$rid", SHOW_GRID },
-    { "mxt$ics", SHOW_MXTICS },
-    { "myt$ics", SHOW_MYTICS },
-    { "mzt$ics", SHOW_MZTICS },
-    { "mx2t$ics", SHOW_MX2TICS },
-    { "my2t$ics", SHOW_MY2TICS },
-    { "k$ey", SHOW_KEY }
+    { "a$ll", S_ALL },
+    { "ac$tion_table", S_ACTIONTABLE },
+    { "at", S_ACTIONTABLE },
+    { "an$gles", S_ANGLES },
+    { "ar$row", S_ARROW },
+    { "au$toscale", S_AUTOSCALE },
+    { "b$ars", S_BARS },
+    { "bor$der", S_BORDER },
+    { "box$width", S_BOXWIDTH },
+    { "c$lip", S_CLIP },
+    { "cl$abel", S_CLABEL },
+    { "cn$trparam", S_CNTRPARAM },
+    { "co$ntour", S_CONTOUR },
+    { "da$ta", S_DATA },
+    { "dg$rid3d", S_DGRID3D },
+    { "du$mmy", S_DUMMY },
+    { "enc$oding", S_ENCODING },
+    { "fo$rmat", S_FORMAT },
+    { "fu$nctions", S_FUNCTIONS },
+    { "g$rid", S_GRID },
+    { "hi$dden3d", S_HIDDEN3D },
+    { "is$osamples", S_ISOSAMPLES },
+    { "k$ey", S_KEY },
+    { "keyt$itle", S_KEYTITLE },
+    { "la$bel", S_LABEL },
+    { "li$nestyle", S_LINESTYLE },
+    { "ls", S_LINESTYLE },
+    { "loa$dpath", S_LOADPATH },
+    { "loc$ale", S_LOCALE },
+    { "log$scale", S_LOGSCALE },
+    { "map$ping", S_MAPPING },
+    { "mar$gin", S_MARGIN },
+    { "mis$sing", S_MISSING },
+    { "mx2t$ics", S_MX2TICS },
+    { "mxt$ics", S_MXTICS },
+    { "my2t$ics", S_MY2TICS },
+    { "myt$ics", S_MYTICS },
+    { "mzt$ics", S_MZTICS },
+    { "o$utput", S_OUTPUT },
+    { "of$fsets", S_OFFSETS },
+    { "or$igin", S_ORIGIN },
+    { "p$lot", S_PLOT },
+    { "pa$rametric", S_PARAMETRIC },
+    { "poi$ntsize", S_POINTSIZE },
+    { "pol$ar", S_POLAR },
+    { "rr$ange", S_RRANGE },
+    { "sa$mples", S_SAMPLES },
+    { "si$ze", S_SIZE },
+    { "su$rface", S_SURFACE },
+    { "t$erminal", S_TERMINAL },
+    { "ti$cs", S_TICS },
+    { "tim$estamp", S_TIMESTAMP },
+    { "timef$mt", S_TIMEFMT },
+    { "tit$le", S_TITLE },
+    { "tr$ange", S_TRANGE },
+    { "ur$ange", S_URANGE },
+    { "v$ariables", S_VARIABLES },
+    { "ve$rsion", S_VERSION },
+    { "vi$ew", S_VIEW },
+    { "vr$ange", S_VRANGE },
+    { "xda$ta", S_XDATA },
+    { "yda$ta", S_YDATA },
+    { "zda$ta", S_ZDATA },
+    { "x2da$ta", S_X2DATA },
+    { "y2da$ta", S_Y2DATA },
+    { "xti$cs", S_XTICS },
+    { "yti$cs", S_YTICS },
+    { "zti$cs", S_ZTICS }
+    { "xdti$cs", S_XDTICS },
+    { "ydti$cs", S_YDTICS },
+    { "zdti$cs", S_ZDTICS },
+    { "xmti$cs", S_XMTICS },
+    { "ymti$cs", S_YMTICS },
+    { "zmti$cs", S_ZMTICS },
+    { "x2ti$cs", S_X2TICS },
+    { "y2ti$cs", S_Y2TICS },
+    { "x2dti$cs", S_X2DTICS },
+    { "y2dti$cs", S_Y2DTICS },
+    { "x2mti$cs", S_X2MTICS },
+    { "y2mti$cs", S_Y2MTICS },
+    { "xl$abel", S_XLABEL },
+    { "yl$abel", S_YLABEL },
+    { "zl$abel", S_ZLABEL },
+    { "x2l$abel", S_X2LABEL },
+    { "y2l$abel", S_Y2LABEL },
+    { "xr$ange", S_XRANGE },
+    { "yr$ange", S_YRANGE },
+    { "zr$ange", S_ZRANGE },
+    { "x2r$ange", S_X2RANGE },
+    { "y2r$ange", S_Y2RANGE },
+    { "xzeroa$xis", S_XZEROAXIS },
+    { "yzeroa$xis", S_YZEROAXIS },
+    { "zeroa$xis", S_ZEROAXIS },
+    { "z$ero", S_ZERO },
 };
 
 #define NSHOWS (sizeof(show_tbl) / sizeof(show_tbl[0]))
-
-extern TBOOLEAN is_3d_plot;
 
 /******** Local functions ********/
 
 static void show_style __PROTO((const char *name, enum PLOT_STYLE style));
 static void show_range __PROTO((int axis, double min, double max, int autosc, const char *text));
-static void show_zero __PROTO((void));
 static void show_border __PROTO((void));
 static void show_dgrid3d __PROTO((void));
 static void show_offsets __PROTO((void));
-static void show_samples __PROTO((void));
-static void show_isosamples __PROTO((void));
 static void show_output __PROTO((void));
-static void show_view __PROTO((void));
 static void show_size __PROTO((void));
-static void show_origin __PROTO((void));
 static void show_xyzlabel __PROTO((const char *name, label_struct * label));
 static void show_angles __PROTO((void));
 static void show_boxwidth __PROTO((void));
@@ -135,14 +173,9 @@ static void show_grid __PROTO((void));
 static void show_key __PROTO((void));
 static void show_keytitle __PROTO((void));
 static void show_mtics __PROTO((int mini, double freq, const char *name));
-static void show_pointsize __PROTO((void));
-static void show_encoding __PROTO((void));
-static void show_polar __PROTO((void));
-static void show_parametric __PROTO((void));
 static void show_tics __PROTO((int showx, int showy, int showz, int showx2, int showy2));
 static void show_ticdef __PROTO((int tics, int axis, struct ticdef * tdef, const char *text, int rotate_tics, const char *ticfmt));
 static void show_term __PROTO((void));
-static void show_plot __PROTO((void));
 static void show_autoscale __PROTO((void));
 static void show_clip __PROTO((void));
 static void show_contour __PROTO((void));
@@ -150,18 +183,49 @@ static void show_mapping __PROTO((void));
 static void show_format __PROTO((void));
 static void show_logscale __PROTO((void));
 static void show_variables __PROTO((void));
-static void show_surface __PROTO((void));
 static void show_hidden3d __PROTO((void));
 static void show_label_contours __PROTO((void));
 static void show_margin __PROTO((void));
 static void show_position __PROTO((struct position * pos));
 
-static TBOOLEAN show_one __PROTO((void));
-static TBOOLEAN show_two __PROTO((void));
 static void show_timefmt __PROTO((void));
 static void show_missing __PROTO((void));
-static void show_datatype __PROTO((const char *name, int axis));
-static enum show_id lookup_show __PROTO((int));
+static enum setshow_id lookup_show __PROTO((int));
+
+/* Some defines for consistency */
+#define show_datatype(n,a) \
+	fprintf(stderr, "\t%s is set to %s\n", (n), \
+		datatype[a] == TIME ? "time" : "numerical");
+#define show_dummy() \
+	fprintf(stderr, "\tdummy variables are \"%s\" and \"%s\"\n", \
+		dummy_var[0], dummy_var[1])
+#define show_encoding() \
+	fprintf(stderr, "\tencoding is %s\n", encoding_names[encoding]);
+#define show_isosamples() \
+	fprintf(stderr, "\tiso sampling rate is %d, %d\n", \
+		iso_samples_1, iso_samples_2);
+#define show_offsets() \
+	fprintf(stderr, "\toffsets are %g, %g, %g, %g\n", \
+		loff, roff, toff, boff);
+#define show_origin() \
+	fprintf(stderr, "\torigin is set to %g,%g\n", xoffset, yoffset);
+#define show_parametric() \
+	fprintf(stderr, "\tparametric is %s\n", (parametric) ? "ON" : "OFF");
+#define show_plot() \
+	fprintf(stderr, "\tlast plot command was: %s\n", replot_line);
+#define show_pointsize() \
+	fprintf(stderr, "\tpointsize is %g\n", pointsize);
+#define show_polar() \
+	fprintf(stderr, "\tpolar is %s\n", (polar) ? "ON" : "OFF");
+#define show_samples() \
+	fprintf(stderr, "\tsampling rate is %d, %d\n", samples_1, samples_2);
+#define show_surface() \
+	fprintf(stderr, "\tsurface is %sdrawn\n", draw_surface ? "" : "not ");
+#define show_view() \
+	fprintf(stderr, "\tview is %g rot_x, %g rot_z, %g scale, %g scale_z\n",\
+		surface_rot_x, surface_rot_z, surface_scale, surface_zscale);
+#define show_zero() \
+	fprintf(stderr, "\tzero is %g\n", zero)
 
 /* following code segment appears over and over again */
 
@@ -182,545 +246,466 @@ do{if (datatype[axis]==TIME) { \
 }} while(0)
 
 
+#define BREAK if (!show_all) { c_token++; break; }
+#define PUT_NEWLINE if (!show_all) (void) putc('\n',stderr)
+#define CHECK_TAG_GT_ZERO \
+  c_token++; \
+  if (!END_OF_COMMAND) { \
+    tag = (int) real(const_express(&a)); \
+    if (tag <= 0) int_error(c_token, "tag must be > zero"); \
+  }
+
 /******* The 'show' command *******/
 void
 show_command()
 {
     /* show at is undocumented/hidden... */
     static char GPFAR showmess[] = SETSHOWMSG;
+    struct value a;
+    int tag = 0;
+    int show_all = 0;
 
     c_token++;
 
-    if (!show_one() && !show_two())
-	int_error(c_token, showmess);
-    screen_ok = FALSE;
-    (void) putc('\n', stderr);
-}
-
-#define CHECK_TAG_GT_ZERO \
-  tag = 0; c_token++; \
-  if (!END_OF_COMMAND) { \
-    tag = (int) real(const_express(&a)); \
-    if (tag <= 0) \
-      int_error(c_token, "tag must be > zero"); \
-  } \
-  (void) putc('\n', stderr);
-  
-/* return TRUE if a command match, FALSE if not */
-static TBOOLEAN
-show_one()
-{
-    struct value a;
-    int tag;
-
     switch(lookup_show(c_token)) {
-    case SHOW_ACTIONTABLE:
+    case S_INVALID:
+	int_error(c_token, showmess);
+    case S_ACTIONTABLE:
 	c_token++;
 	show_at();
 	c_token++;
 	break;
-    case SHOW_ARROW: {
-	CHECK_TAG_GT_ZERO;
-	(void) putc('\n', stderr);
-	show_arrow(tag);
-	break;
-    }
-    case SHOW_AUTOSCALE:
-	(void) putc('\n', stderr);
-	show_autoscale();
-	c_token++;
-	break;
-    case SHOW_BARS:
-	(void) putc('\n', stderr);
-	show_bars();
-	c_token++;
-	break;
-    case SHOW_BORDER:
-	(void) putc('\n', stderr);
-	show_border();
-	c_token++;
-	break;
-    case SHOW_BOXWIDTH:
-	(void) putc('\n', stderr);
-	show_boxwidth();
-	c_token++;
-	break;
-    case SHOW_CLIP:
-	(void) putc('\n', stderr);
-	show_clip();
-	c_token++;
-	break;
-    case SHOW_MAPPING:
-	(void) putc('\n', stderr);
-	show_mapping();
-	c_token++;
-	break;
-    case SHOW_CONTOUR:
-    case SHOW_CNTRPARAM:
-	(void) putc('\n', stderr);
-	show_contour();
-	c_token++;
-	break;
-    case SHOW_DATA:
-	c_token++;
-	if (!almost_equals(c_token, "s$tyle"))
-	    int_error(c_token, "expecting keyword 'style'");
-	(void) putc('\n', stderr);
-	show_style("data", data_style);
-	c_token++;
-	break;
-    case SHOW_DGRID3D:
-	(void) putc('\n', stderr);
-	show_dgrid3d();
-	c_token++;
-	break;
-    case SHOW_DUMMY:
-	(void) fprintf(stderr, "\n\tdummy variables are \"%s\" and \"%s\"\n",
-		       dummy_var[0], dummy_var[1]);
-	c_token++;
-	break;
-    case SHOW_FORMAT:
-	show_format();
-	c_token++;
-	break;
-    case SHOW_FUNCTIONS:
-	c_token++;
-	if (almost_equals(c_token, "s$tyle")) {
-	    (void) putc('\n', stderr);
-	    show_style("functions", func_style);
-	    c_token++;
-	} else
-	    show_functions();
-	break;
-    case SHOW_LOGSCALE:
-	(void) putc('\n', stderr);
-	show_logscale();
-	c_token++;
-	break;
-    case SHOW_OFFSETS:
-	(void) putc('\n', stderr);
-	show_offsets();
-	c_token++;
-	break;
-    case SHOW_MARGIN:
-	(void) putc('\n', stderr);
-	show_margin();
-	c_token++;
-	break;
-    case SHOW_OUTPUT:
-	(void) putc('\n', stderr);
-	show_output();
-	c_token++;
-	break;
-    case SHOW_TITLE:
-	(void) putc('\n', stderr);
-	show_xyzlabel("title", &title);
-	c_token++;
-	break;
-    case SHOW_MISSING:
-	(void) putc('\n', stderr);
-	show_missing();
-	c_token++;
-	break;
-    case SHOW_XLABEL:
-	(void) putc('\n', stderr);
-	show_xyzlabel("xlabel", &xlabel);
-	c_token++;
-	break;
-    case SHOW_X2LABEL:
-	(void) putc('\n', stderr);
-	show_xyzlabel("x2label", &x2label);
-	c_token++;
-	break;
-    case SHOW_YLABEL:
-	(void) putc('\n', stderr);
-	show_xyzlabel("ylabel", &ylabel);
-	c_token++;
-	break;
-    case SHOW_Y2LABEL:
-	(void) putc('\n', stderr);
-	show_xyzlabel("y2label", &y2label);
-	c_token++;
-	break;
-    case SHOW_ZLABEL:
-	(void) putc('\n', stderr);
-	show_xyzlabel("zlabel", &zlabel);
-	c_token++;
-	break;
-    case SHOW_KEYTITLE:
-	(void) putc('\n', stderr);
-	show_keytitle();
-	c_token++;
-	break;
-    case SHOW_XDATA:
-	(void) putc('\n', stderr);
-	show_datatype("xdata", FIRST_X_AXIS);
-	c_token++;
-	break;
-    case SHOW_YDATA:
-	(void) putc('\n', stderr);
-	show_datatype("ydata", FIRST_Y_AXIS);
-	c_token++;
-	break;
-    case SHOW_X2DATA:
-	(void) putc('\n', stderr);
-	show_datatype("x2data", SECOND_X_AXIS);
-	c_token++;
-	break;
-    case SHOW_Y2DATA:
-	(void) putc('\n', stderr);
-	show_datatype("y2data", SECOND_Y_AXIS);
-	c_token++;
-	break;
-    case SHOW_ZDATA:
-	(void) putc('\n', stderr);
-	show_datatype("zdata", FIRST_Z_AXIS);
-	c_token++;
-	break;
-    case SHOW_TIMEFMT:
-	(void) putc('\n', stderr);
-	show_timefmt();
-	c_token++;
-	break;
-    case SHOW_LOCALE:
-	(void) putc('\n', stderr);
-	show_locale();
-	c_token++;
-	break;
-    case SHOW_LOADPATH:
-	(void) putc('\n', stderr);
-	show_loadpath();
-	c_token++;
-	break;
-    case SHOW_XZEROAXIS:
-	(void) putc('\n', stderr);
-	show_xzeroaxis();
-	c_token++;
-	break;
-    case SHOW_YZEROAXIS:
-	(void) putc('\n', stderr);
-	show_yzeroaxis();
-	c_token++;
-	break;
-    case SHOW_ZEROAXIS:
-	(void) putc('\n', stderr);
-	show_xzeroaxis();
-	show_yzeroaxis();
-	c_token++;
-	break;
-    case SHOW_LABEL: {
-	CHECK_TAG_GT_ZERO;
-	show_label(tag);
-	break;
-    }
-    case SHOW_LINESTYLE: {
-	CHECK_TAG_GT_ZERO;
-	show_linestyle(tag);
-	break;
-    }
-    case SHOW_GRID:
-	(void) putc('\n', stderr);
-	show_grid();
-	c_token++;
-	break;
-    case SHOW_MXTICS:
-	(void) putc('\n', stderr);
-	show_mtics(mxtics, mxtfreq, "x");
-	c_token++;
-	break;
-    case SHOW_MYTICS:
-	(void) putc('\n', stderr);
-	show_mtics(mytics, mytfreq, "y");
-	c_token++;
-	break;
-    case SHOW_MZTICS:
-	(void) putc('\n', stderr);
-	show_mtics(mztics, mztfreq, "z");
-	c_token++;
-	break;
-    case SHOW_MX2TICS:
-	(void) putc('\n', stderr);
-	show_mtics(mx2tics, mx2tfreq, "x2");
-	c_token++;
-	break;
-    case SHOW_MY2TICS:
-	(void) putc('\n', stderr);
-	show_mtics(my2tics, my2tfreq, "y2");
-	c_token++;
-	break;
-    case SHOW_KEY:
-	(void) putc('\n', stderr);
-	show_key();
-	c_token++;
-	break;
-    case SHOW_INVALID:
-    case SHOW_NULL:
-    default:
-	return FALSE;
-	break;
-    } /* switch() */
-
-    return TRUE;
-}
-
-/* return TRUE if a command match, FALSE if not */
-static TBOOLEAN
-show_two()
-{
-    if (almost_equals(c_token, "p$lot")) {
-	(void) putc('\n', stderr);
-	show_plot();
-	c_token++;
-    } else if (almost_equals(c_token, "par$ametric")) {
-	(void) putc('\n', stderr);
-	show_parametric();
-	c_token++;
-    } else if (almost_equals(c_token, "poi$ntsize")) {
-	(void) putc('\n', stderr);
-	show_pointsize();
-	c_token++;
-    } else if (almost_equals(c_token, "enc$oding")) {
-	(void) putc('\n', stderr);
-	show_encoding();
-	c_token++;
-    } else if (almost_equals(c_token, "pol$ar")) {
-	(void) putc('\n', stderr);
-	show_polar();
-	c_token++;
-    } else if (almost_equals(c_token, "an$gles")) {
-	(void) putc('\n', stderr);
-	show_angles();
-	c_token++;
-    } else if (almost_equals(c_token, "ti$cs")) {
-	(void) putc('\n', stderr);
-	show_tics(TRUE, TRUE, TRUE, TRUE, TRUE);
-	c_token++;
-    } else if (almost_equals(c_token, "tim$estamp")) {
-	(void) putc('\n', stderr);
-	show_xyzlabel("time", &timelabel);
-	fprintf(stderr, "\twritten in %s corner\n", (timelabel_bottom ? "bottom" : "top"));
-	if (timelabel_rotate)
-	    fputs("\trotated if the terminal allows it\n\t", stderr);
-	else
-	    fputs("\tnot rotated\n\t", stderr);
-	c_token++;
-    } else if (almost_equals(c_token, "su$rface")) {
-	(void) putc('\n', stderr);
-	show_surface();
-	c_token++;
-    } else if (almost_equals(c_token, "hi$dden3d")) {
-	(void) putc('\n', stderr);
-	show_hidden3d();
-	c_token++;
-    } else if (almost_equals(c_token, "cla$bel")) {
-	(void) putc('\n', stderr);
-	show_label_contours();
-	c_token++;
-    } else if (almost_equals(c_token, "xti$cs")) {
+    case S_XTICS:
 	show_tics(TRUE, FALSE, FALSE, TRUE, FALSE);
 	c_token++;
-    } else if (almost_equals(c_token, "yti$cs")) {
+	break;
+    case S_YTICS:
 	show_tics(FALSE, TRUE, FALSE, FALSE, TRUE);
 	c_token++;
-    } else if (almost_equals(c_token, "zti$cs")) {
+	break;
+    case S_ZTICS:
 	show_tics(FALSE, FALSE, TRUE, FALSE, FALSE);
 	c_token++;
-    } else if (almost_equals(c_token, "x2ti$cs")) {
+	break;
+    case S_X2TICS:
 	show_tics(FALSE, FALSE, FALSE, TRUE, FALSE);
 	c_token++;
-    } else if (almost_equals(c_token, "y2ti$cs")) {
+	break;
+    case S_Y2TICS:
 	show_tics(FALSE, FALSE, FALSE, FALSE, TRUE);
 	c_token++;
-    } else if (almost_equals(c_token, "xdti$cs")) {
+	break;
+    case S_XDTICS:
 	show_tics(TRUE, FALSE, FALSE, TRUE, FALSE);
 	c_token++;
-    } else if (almost_equals(c_token, "ydti$cs")) {
+	break;
+    case S_YDTICS:
 	show_tics(FALSE, TRUE, FALSE, FALSE, TRUE);
 	c_token++;
-    } else if (almost_equals(c_token, "zdti$cs")) {
+	break;
+    case S_ZDTICS:
 	show_tics(FALSE, FALSE, TRUE, FALSE, FALSE);
 	c_token++;
-    } else if (almost_equals(c_token, "x2dti$cs")) {
+	break;
+    case S_X2DTICS:
 	show_tics(FALSE, FALSE, FALSE, TRUE, FALSE);
 	c_token++;
-    } else if (almost_equals(c_token, "y2dti$cs")) {
+	break;
+    case S_Y2DTICS:
 	show_tics(FALSE, FALSE, FALSE, FALSE, TRUE);
 	c_token++;
-    } else if (almost_equals(c_token, "xmti$cs")) {
+	break;
+    case S_XMTICS:
 	show_tics(TRUE, FALSE, FALSE, TRUE, FALSE);
 	c_token++;
-    } else if (almost_equals(c_token, "ymti$cs")) {
+	break;
+    case S_YMTICS:
 	show_tics(FALSE, TRUE, FALSE, FALSE, TRUE);
 	c_token++;
-    } else if (almost_equals(c_token, "zmti$cs")) {
+	break;
+    case S_ZMTICS:
 	show_tics(FALSE, FALSE, TRUE, FALSE, FALSE);
 	c_token++;
-    } else if (almost_equals(c_token, "x2mti$cs")) {
+	break;
+    case S_X2MTICS:
 	show_tics(FALSE, FALSE, FALSE, TRUE, FALSE);
 	c_token++;
-    } else if (almost_equals(c_token, "y2mti$cs")) {
+	break;
+    case S_Y2MTICS:
 	show_tics(FALSE, FALSE, FALSE, FALSE, TRUE);
 	c_token++;
-    } else if (almost_equals(c_token, "sa$mples")) {
-	(void) putc('\n', stderr);
-	show_samples();
+	break;
+    /* The following cases are fall-through if `show all' is requested
+     */
+    case S_ALL:
 	c_token++;
-    } else if (almost_equals(c_token, "isosa$mples")) {
-	(void) putc('\n', stderr);
-	show_isosamples();
-	c_token++;
-    } else if (almost_equals(c_token, "si$ze")) {
-	(void) putc('\n', stderr);
-	show_size();
-	c_token++;
-    } else if (almost_equals(c_token, "orig$in")) {
-	(void) putc('\n', stderr);
-	show_origin();
-	c_token++;
-    } else if (almost_equals(c_token, "t$erminal")) {
-	(void) putc('\n', stderr);
-	show_term();
-	c_token++;
-    } else if (almost_equals(c_token, "rr$ange")) {
-	(void) putc('\n', stderr);
-	show_range(R_AXIS, rmin, rmax, autoscale_r, "r");
-	c_token++;
-    } else if (almost_equals(c_token, "tr$ange")) {
-	(void) putc('\n', stderr);
-	show_range(T_AXIS, tmin, tmax, autoscale_t, "t");
-	c_token++;
-    } else if (almost_equals(c_token, "ur$ange")) {
-	(void) putc('\n', stderr);
-	show_range(U_AXIS, umin, umax, autoscale_u, "u");
-	c_token++;
-    } else if (almost_equals(c_token, "vi$ew")) {
-	(void) putc('\n', stderr);
-	show_view();
-	c_token++;
-    } else if (almost_equals(c_token, "vr$ange")) {
-	(void) putc('\n', stderr);
-	show_range(V_AXIS, vmin, vmax, autoscale_v, "v");
-	c_token++;
-    } else if (almost_equals(c_token, "v$ariables")) {
-	show_variables();
-	c_token++;
-    } else if (almost_equals(c_token, "ve$rsion")) {
+	show_all = 1;
+    case S_VERSION:
 	show_version(stderr);
-	c_token++;
-	if (almost_equals(c_token, "l$ong")) {
-	    show_version_long();
+	if (!show_all) {
 	    c_token++;
-	}
-    } else if (almost_equals(c_token, "xr$ange")) {
-	(void) putc('\n', stderr);
-	show_range(FIRST_X_AXIS, xmin, xmax, autoscale_x, "x");
-	c_token++;
-    } else if (almost_equals(c_token, "yr$ange")) {
-	(void) putc('\n', stderr);
-	show_range(FIRST_Y_AXIS, ymin, ymax, autoscale_y, "y");
-	c_token++;
-    } else if (almost_equals(c_token, "x2r$ange")) {
-	(void) putc('\n', stderr);
-	show_range(SECOND_X_AXIS, x2min, x2max, autoscale_x2, "x2");
-	c_token++;
-    } else if (almost_equals(c_token, "y2r$ange")) {
-	(void) putc('\n', stderr);
-	show_range(SECOND_Y_AXIS, y2min, y2max, autoscale_y2, "y2");
-	c_token++;
-    } else if (almost_equals(c_token, "zr$ange")) {
-	(void) putc('\n', stderr);
-	show_range(FIRST_Z_AXIS, zmin, zmax, autoscale_z, "z");
-	c_token++;
-    } else if (almost_equals(c_token, "z$ero")) {
-	(void) putc('\n', stderr);
-	show_zero();
-	c_token++;
-    } else if (almost_equals(c_token, "a$ll")) {
-	c_token++;
-	show_version(stderr);
-	show_autoscale();
-	show_bars();
-	show_border();
-	show_boxwidth();
-	show_clip();
-	show_contour();
-	show_dgrid3d();
-	show_mapping();
-	(void) fprintf(stderr, "\tdummy variables are \"%s\" and \"%s\"\n",
-		       dummy_var[0], dummy_var[1]);
-	show_format();
-	show_style("data", data_style);
-	show_style("functions", func_style);
-	show_grid();
-	show_xzeroaxis();
-	show_yzeroaxis();
-	show_label(0);
-	show_arrow(0);
-	show_linestyle(0);
-	show_keytitle();
-	show_key();
-	show_logscale();
-	show_offsets();
-	show_margin();
-	show_output();
-	show_parametric();
-	show_pointsize();
-	show_encoding();
-	show_polar();
-	show_angles();
-	show_samples();
-	show_isosamples();
-	show_view();
-	show_surface();
-#ifndef LITE
-	show_hidden3d();
-#endif
-	show_size();
-	show_origin();
-	show_term();
-	show_tics(TRUE, TRUE, TRUE, TRUE, TRUE);
-	show_mtics(mxtics, mxtfreq, "x");
-	show_mtics(mytics, mytfreq, "y");
-	show_mtics(mztics, mztfreq, "z");
-	show_mtics(mx2tics, mx2tfreq, "x2");
-	show_mtics(my2tics, my2tfreq, "y2");
-	show_xyzlabel("time", &timelabel);
-	if (parametric || polar) {
-	    if (!is_3d_plot)
-		show_range(T_AXIS, tmin, tmax, autoscale_t, "t");
-	    else {
-		show_range(U_AXIS, umin, umax, autoscale_u, "u");
-		show_range(V_AXIS, vmin, vmax, autoscale_v, "v");
+	    if (almost_equals(c_token, "l$ong")) {
+		show_version_long();
+		c_token++;
 	    }
+	    break;
 	}
+    case S_AUTOSCALE:
+	PUT_NEWLINE;
+	show_autoscale();
+	BREAK;
+    case S_BARS:
+	PUT_NEWLINE;
+	show_bars();
+	BREAK;
+    case S_BORDER:
+	PUT_NEWLINE;
+	show_border();
+	BREAK;
+    case S_BOXWIDTH:
+	PUT_NEWLINE;
+	show_boxwidth();
+	BREAK;
+    case S_CLIP:
+	PUT_NEWLINE;
+	show_clip();
+	BREAK;
+    case S_CLABEL:
+	PUT_NEWLINE;
+	show_label_contours();
+	BREAK;
+    case S_CONTOUR:
+    case S_CNTRPARAM:
+	PUT_NEWLINE;
+	show_contour();
+	BREAK;
+    case S_DGRID3D:
+	PUT_NEWLINE;
+	show_dgrid3d();
+	BREAK;
+    case S_MAPPING:
+	PUT_NEWLINE;
+	show_mapping();
+	BREAK;
+    case S_DUMMY:
+	PUT_NEWLINE;
+	show_dummy();
+	BREAK;
+    case S_FORMAT:
+	PUT_NEWLINE;
+	show_format();
+	BREAK;
+    case S_DATA:
+	if (!show_all) {
+	    c_token++;
+	    if (!almost_equals(c_token, "s$tyle"))
+		int_error(c_token, "expecting keyword 'style'");
+	}
+	PUT_NEWLINE;
+	show_style("data", data_style);
+	BREAK;
+    case S_FUNCTIONS:
+	if (!show_all) {
+	    c_token++;
+	    if (almost_equals(c_token, "s$tyle")) {
+		(void) putc('\n', stderr);
+		show_style("functions", func_style);
+		c_token++;
+	    } else
+		show_functions();
+	    break;
+	}
+	PUT_NEWLINE;
+	show_style("functions", func_style);
+	BREAK;
+    case S_GRID:
+	PUT_NEWLINE;
+	show_grid();
+	BREAK;
+    case S_XZEROAXIS:
+	PUT_NEWLINE;
+	show_xzeroaxis();
+	BREAK;
+    case S_YZEROAXIS:
+	PUT_NEWLINE;
+	show_yzeroaxis();
+	BREAK;
+    case S_ZEROAXIS:
+	if (!show_all) {
+	    (void) putc('\n', stderr);
+	    show_xzeroaxis();
+	    show_yzeroaxis();
+	    c_token++;
+	    break;
+	}
+    case S_LABEL:
+	tag = 0;
+	if (!show_all) {
+	    CHECK_TAG_GT_ZERO;
+	}
+	PUT_NEWLINE;
+	show_label(tag);
+	BREAK;
+    case S_ARROW:
+	tag = 0;
+	if (!show_all) {
+	    CHECK_TAG_GT_ZERO;
+	}
+	PUT_NEWLINE;
+	show_arrow(tag);
+	BREAK;
+    case S_LINESTYLE:
+	tag = 0;
+	if (!show_all) {
+	    CHECK_TAG_GT_ZERO;
+	}
+	PUT_NEWLINE;
+	show_linestyle(tag);
+	BREAK;
+    case S_KEYTITLE:
+	PUT_NEWLINE;
+	show_keytitle();
+	BREAK;
+    case S_KEY:
+	PUT_NEWLINE;
+	show_key();
+	BREAK;
+    case S_LOGSCALE:
+	PUT_NEWLINE;
+	show_logscale();
+	BREAK;
+    case S_OFFSETS:
+	PUT_NEWLINE;
+	show_offsets();
+	BREAK;
+    case S_MARGIN:
+	PUT_NEWLINE;
+	show_margin();
+	BREAK;
+    case S_OUTPUT:
+	PUT_NEWLINE;
+	show_output();
+	BREAK;
+    case S_PARAMETRIC:
+	PUT_NEWLINE;
+	show_parametric();
+	BREAK;
+    case S_POINTSIZE:
+	PUT_NEWLINE;
+	show_pointsize();
+	BREAK;
+    case S_ENCODING:
+	PUT_NEWLINE;
+	show_encoding();
+	BREAK;
+    case S_POLAR:
+	PUT_NEWLINE;
+	show_polar();
+	BREAK;
+    case S_ANGLES:
+	PUT_NEWLINE;
+	show_angles();
+	BREAK;
+    case S_SAMPLES:
+	PUT_NEWLINE;
+	show_samples();
+	BREAK;
+    case S_ISOSAMPLES:
+	PUT_NEWLINE;
+	show_isosamples();
+	BREAK;
+    case S_VIEW:
+	PUT_NEWLINE;
+	show_view();
+	BREAK;
+    case S_SURFACE:
+	PUT_NEWLINE;
+	show_surface();
+	BREAK;
+#ifndef LITE
+    case S_HIDDEN3D:
+	PUT_NEWLINE;
+	show_hidden3d();
+	BREAK;
+#endif
+    case S_SIZE:
+	PUT_NEWLINE;
+	show_size();
+	BREAK;
+    case S_ORIGIN:
+	PUT_NEWLINE;
+	show_origin();
+	BREAK;
+    case S_TERMINAL:
+	PUT_NEWLINE;
+	show_term();
+	BREAK;
+    case S_TICS:
+	PUT_NEWLINE;
+	show_tics(TRUE, TRUE, TRUE, TRUE, TRUE);
+	BREAK;
+    case S_MXTICS:
+	PUT_NEWLINE;
+	show_mtics(mxtics, mxtfreq, "x");
+	BREAK;
+    case S_MYTICS:
+	PUT_NEWLINE;
+	show_mtics(mytics, mytfreq, "y");
+	BREAK;
+    case S_MZTICS:
+	PUT_NEWLINE;
+	show_mtics(mztics, mztfreq, "z");
+	BREAK;
+    case S_MX2TICS:
+	PUT_NEWLINE;
+	show_mtics(mx2tics, mx2tfreq, "x2");
+	BREAK;
+    case S_MY2TICS:
+	PUT_NEWLINE;
+	show_mtics(my2tics, my2tfreq, "y2");
+	BREAK;
+    case S_TIMESTAMP:
+	PUT_NEWLINE;
+	show_xyzlabel("time", &timelabel);
+	if (!show_all) {
+	    fprintf(stderr, "\twritten in %s corner\n",
+		    (timelabel_bottom ? "bottom" : "top"));
+	    if (timelabel_rotate)
+		fputs("\trotated if the terminal allows it\n\t", stderr);
+	    else
+		fputs("\tnot rotated\n\t", stderr);
+	}
+	BREAK;
+    case S_RRANGE:
+	PUT_NEWLINE;
+	if (!show_all)
+	    show_range(R_AXIS, rmin, rmax, autoscale_r, "r");
+	BREAK;
+    case S_TRANGE:
+	PUT_NEWLINE;
+	if (!show_all)
+	    show_range(T_AXIS, tmin, tmax, autoscale_t, "t");
+	else if ((parametric || polar) && !is_3d_plot)
+	    show_range(T_AXIS, tmin, tmax, autoscale_t, "t");
+	BREAK;
+    case S_URANGE:
+	PUT_NEWLINE;
+	if (!show_all)
+	    show_range(U_AXIS, umin, umax, autoscale_u, "u");
+	else if ((parametric || polar) && is_3d_plot)
+	    show_range(V_AXIS, vmin, vmax, autoscale_v, "v");
+	BREAK;
+    case S_VRANGE:
+	PUT_NEWLINE;
+	if (!show_all)
+	    show_range(V_AXIS, vmin, vmax, autoscale_v, "v");
+	else if ((parametric || polar) && is_3d_plot)
+	    show_range(V_AXIS, vmin, vmax, autoscale_v, "v");
+	BREAK;
+    case S_XRANGE:
+	PUT_NEWLINE;
 	show_range(FIRST_X_AXIS, xmin, xmax, autoscale_x, "x");
+	BREAK;
+    case S_YRANGE:
+	PUT_NEWLINE;
 	show_range(FIRST_Y_AXIS, ymin, ymax, autoscale_y, "y");
+	BREAK;
+    case S_X2RANGE:
+	PUT_NEWLINE;
 	show_range(SECOND_X_AXIS, x2min, x2max, autoscale_x2, "x2");
+	BREAK;
+    case S_Y2RANGE:
+	PUT_NEWLINE;
 	show_range(SECOND_Y_AXIS, y2min, y2max, autoscale_y2, "y2");
+	BREAK;
+    case S_ZRANGE:
+	PUT_NEWLINE;
 	show_range(FIRST_Z_AXIS, zmin, zmax, autoscale_z, "z");
+	BREAK;
+    case S_TITLE:
+	PUT_NEWLINE;
 	show_xyzlabel("title", &title);
+	BREAK;
+    case S_XLABEL:
+	PUT_NEWLINE;
 	show_xyzlabel("xlabel", &xlabel);
+	BREAK;
+    case S_YLABEL:
+	PUT_NEWLINE;
 	show_xyzlabel("ylabel", &ylabel);
+	BREAK;
+    case S_ZLABEL:
+	PUT_NEWLINE;
 	show_xyzlabel("zlabel", &zlabel);
+	BREAK;
+    case S_X2LABEL:
+	PUT_NEWLINE;
 	show_xyzlabel("x2label", &x2label);
+	BREAK;
+    case S_Y2LABEL:
+	PUT_NEWLINE;
 	show_xyzlabel("y2label", &y2label);
+	BREAK;
+    case S_XDATA:
+	PUT_NEWLINE;
 	show_datatype("xdata", FIRST_X_AXIS);
+	BREAK;
+    case S_YDATA:
+	PUT_NEWLINE;
 	show_datatype("ydata", FIRST_Y_AXIS);
+	BREAK;
+    case S_X2DATA:
+	PUT_NEWLINE;
 	show_datatype("x2data", SECOND_X_AXIS);
+	BREAK;
+    case S_Y2DATA:
+	PUT_NEWLINE;
 	show_datatype("y2data", SECOND_Y_AXIS);
+	BREAK;
+    case S_ZDATA:
+	PUT_NEWLINE;
 	show_datatype("zdata", FIRST_Z_AXIS);
+	BREAK;
+    case S_TIMEFMT:
+	PUT_NEWLINE;
 	show_timefmt();
+	BREAK;
+    case S_LOCALE:
+	PUT_NEWLINE;
 	show_locale();
+	BREAK;
+    case S_LOADPATH:
+	PUT_NEWLINE;
 	show_loadpath();
+	BREAK;
+    case S_ZERO:
+	PUT_NEWLINE;
 	show_zero();
+	BREAK;
+    case S_MISSING:
+	PUT_NEWLINE;
 	show_missing();
+	BREAK;
+    case S_PLOT:
+	PUT_NEWLINE;
 	show_plot();
+	BREAK;
+    case S_VARIABLES:
+	PUT_NEWLINE;
 	show_variables();
-	show_functions();
-	c_token++;
-    } else
-	return (FALSE);
-    return (TRUE);
+	BREAK;
+    default:
+	if (show_all) {
+	    /* Urgh ... */
+	    show_functions();
+	    c_token++;
+	}
+	break;
+    }
+
+    screen_ok = FALSE;
+    (void) putc('\n', stderr);
+
 }
 
 
@@ -876,18 +861,6 @@ const char *text;
 }
 
 static void
-show_zero()
-{
-    fprintf(stderr, "\tzero is %g\n", zero);
-}
-
-static void
-show_offsets()
-{
-    fprintf(stderr, "\toffsets are %g, %g, %g, %g\n", loff, roff, toff, boff);
-}
-
-static void
 show_border()
 {
     fprintf(stderr, "\tborder is %sdrawn %d\n", draw_border ? "" : "not ",
@@ -904,25 +877,6 @@ show_output()
 	fprintf(stderr, "\toutput is sent to '%s'\n", outstr);
     else
 	fputs("\toutput is sent to STDOUT\n", stderr);
-}
-
-static void
-show_samples()
-{
-    fprintf(stderr, "\tsampling rate is %d, %d\n", samples_1, samples_2);
-}
-
-static void
-show_isosamples()
-{
-    fprintf(stderr, "\tiso sampling rate is %d, %d\n",
-	    iso_samples_1, iso_samples_2);
-}
-
-static void
-show_surface()
-{
-    fprintf(stderr, "\tsurface is %sdrawn\n", draw_surface ? "" : "not ");
 }
 
 static void
@@ -946,13 +900,6 @@ show_label_contours()
 }
 
 static void
-show_view()
-{
-    fprintf(stderr, "\tview is %g rot_x, %g rot_z, %g scale, %g scale_z\n",
-	    surface_rot_x, surface_rot_z, surface_scale, surface_zscale);
-}
-
-static void
 show_size()
 {
     fprintf(stderr, "\tsize is scaled by %g,%g\n", xsize, ysize);
@@ -963,12 +910,6 @@ show_size()
     else
 	fprintf(stderr, "\tTry to set LOCKED aspect ratio to %g:1.0\n",
 		-aspect_ratio);
-}
-
-static void
-show_origin()
-{
-    fprintf(stderr, "\torigin is set to %g,%g\n", xoffset, yoffset);
 }
 
 static void
@@ -1229,30 +1170,6 @@ show_key()
 }
 
 static void
-show_parametric()
-{
-    fprintf(stderr, "\tparametric is %s\n", (parametric) ? "ON" : "OFF");
-}
-
-static void
-show_pointsize()
-{
-    fprintf(stderr, "\tpointsize is %g\n", pointsize);
-}
-
-static void
-show_encoding()
-{
-    fprintf(stderr, "\tencoding is %s\n", encoding_names[encoding]);
-}
-
-static void
-show_polar()
-{
-    fprintf(stderr, "\tpolar is %s\n", (polar) ? "ON" : "OFF");
-}
-
-static void
 show_angles()
 {
     fputs("\tAngles are in ", stderr);
@@ -1415,12 +1332,6 @@ show_term()
 		term->name, term_options);
     else
 	fputs("\tterminal type is unknown\n", stderr);
-}
-
-static void
-show_plot()
-{
-    fprintf(stderr, "\tlast plot command was: %s\n", replot_line);
 }
 
 static void
@@ -1791,15 +1702,6 @@ CONTACT      = <%s>\n\
 HELPMAIL     = <%s>\n", helpfile, bug_email, help_email);
 }
 
-static void
-show_datatype(name, axis)
-const char *name;
-int axis;
-{
-    fprintf(stderr, "\t%s is set to %s\n", name,
-	    datatype[axis] == TIME ? "time" : "numerical");
-}
-
 char *
 conv_text(s, t)
 char *s, *t;
@@ -1872,17 +1774,18 @@ show_missing()
 	fprintf(stderr, "\t\"%s\" is interpreted as missing value\n", missing_val);
 }
 
-static enum show_id
+
+static enum setshow_id
 lookup_show(token)
 int token;
 {
     int i = 0;
 
     while (i < NSHOWS) {
-	if (almost_equals(token, show_tbl[i].show_name))
+	if (almost_equals(token, show_tbl[i].setshow_name))
 	    return show_tbl[i].id;
 	i++;
     }
 
-    return SHOW_INVALID;
+    return S_INVALID;
 }
