@@ -319,7 +319,9 @@ static Notify_value local_notice_destroy(frame, status)
    if (status != DESTROY_CHECKING)
    {
       SUN_reset();
-      term_init = FALSE;
+      /* extern TBOOLEAN term_init is gone; is it sufficient just */
+      /* to comment it out? -lh */
+      /* term_init = FALSE; */
    }
    return(NOTIFY_DONE);
 }
