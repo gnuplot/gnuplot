@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.145 2005/02/14 10:19:16 mikulik Exp $
+ * $Id: post.trm,v 1.146 2005/02/16 21:46:45 sfeam Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -302,8 +302,8 @@ static const char GPFAR * GPFAR PS_linetypes[] = {
 "/LT3 { PL [1 dl1 1.5 dl2] 1 0 1 DL } def\n",
 "/LT4 { PL [6 dl1 2 dl2 1 dl1 2 dl2] 0 1 1 DL } def\n",
 "/LT5 { PL [3 dl1 3 dl2 1 dl1 3 dl2] 1 1 0 DL } def\n",
-"/LT6 { PL [2 dl1 2 dl2 2 dl1 4 dl2] 0 0 0 DL } def\n",
-"/LT7 { PL [2 dl1 2 dl2 2 dl1 2 dl2 2 dl1 4 dl2] 1 0.3 0 DL } def\n",
+"/LT6 { PL [2 dl1 2 dl2 2 dl1 6 dl2] 0 0 0 DL } def\n",
+"/LT7 { PL [1 dl1 2 dl2 6 dl1 2 dl2 1 dl1 2 dl2] 1 0.3 0 DL } def\n",
 "/LT8 { PL [2 dl1 2 dl2 2 dl1 2 dl2 2 dl1 2 dl2 2 dl1 4 dl2] 0.5 0.5 0.5 DL } def\n",
 NULL
 };
