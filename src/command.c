@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.33 1999/11/08 19:24:28 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.34 1999/11/24 13:01:15 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -496,23 +496,26 @@ exit_command()
 void
 history_command()
 {
-#if defined(READLINE) && !defined(HAVE_LIBREADLINE)
     struct value a;
     char *name = NULL; /* name of the output file; NULL for stdout */
     int n = 0;         /* print only <last> entries */
 
     c_token++;
-    if (!END_OF_COMMAND && equals(c_token,"?")) { /* find and show the entries */
+
+    if (!END_OF_COMMAND && equals(c_token,"?")) {
+	/* find and show the entries */
 	c_token++;
 	m_capture(&name, c_token, c_token);
+	printf ("history ?%s\n", name);
 	if (!history_find_all(name))
 	    int_error(c_token,"not in history");
 	c_token++;
-    }
-    else if (!END_OF_COMMAND && equals(c_token,"!")) { /* execute the entry */
+    } else if (!END_OF_COMMAND && equals(c_token,"!")) {
+	/* execute the entry */
 	static char flag = 0;
 	static char *save_input_line;
 	static int save_c_token, save_input_line_len;
+
 	if (flag) {
 	    flag = 0;
 	    input_line = save_input_line;
@@ -526,7 +529,8 @@ history_command()
 	name = history_find(name);
 	if (name == NULL)
 	    int_error(c_token,"not in history");
-	else { /* execute the command "name" */
+	else {
+	    /* execute the command "name" */
 	    save_input_line = input_line;
 	    save_c_token = c_token;
 	    save_input_line_len = input_line_len;
@@ -541,8 +545,8 @@ history_command()
 	    flag = 0;
 	}
 	c_token++;
-    }
-    else { /* show history entries */
+    } else {
+	/* show history entries */
 	if (!END_OF_COMMAND && isanumber(c_token)) {
 	    n = (int)real(const_express(&a));
 	}
@@ -552,9 +556,6 @@ history_command()
 	}
 	write_history_n(n, name);
     }
-#else
-    int_error(c_token, "History not supported with GNU readline");
-#endif
 }
 
 
