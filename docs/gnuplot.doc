@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.121 2002/07/23 18:53:11 mikulik Exp $
+C RCS $Id: gnuplot.doc,v 1.122 2002/07/26 16:42:27 mikulik Exp $
 C 18 September 2001
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001   Thomas Williams, Colin Kelley et al.
 C
@@ -2536,7 +2536,7 @@ C ... and restart the table:
 ?special-filenames
  A special filename of `'-'` specifies that the data are inline; i.e., they
  follow the command.  Only the data follow the command; `plot` options like
- filters, titles, and line styles remain on the 'plot' command line.  This is
+ filters, titles, and line styles remain on the `plot` command line.  This is
  similar to << in unix shell script, and $DECK in VMS DCL.  The data are
  entered as though they are being read from a file, one data point per record.
  The letter "e" at the start of the first column terminates data entry.  The
@@ -4909,7 +4909,7 @@ C ... and restart the table:
        set label "Harvest" at "25/8/93",1
 
  To display a freshly fitted parameter on the plot with the data and the
- fitted function, do this after the 'fit', but before the 'plot':
+ fitted function, do this after the `fit`, but before the `plot`:
        set label 'a = %3.5g',par_a     at 30, 15
        set label 'b = %s*10^%S',par_b  at 30, 20
 
@@ -4948,7 +4948,7 @@ C ... and restart the table:
  The line and point types are taken from the default types for the terminal
  currently in use.  The line width and point size are multipliers for the
  default width and size (but note that <point_size> here is unaffected by
- the multiplier given on 'set pointsize').
+ the multiplier given on `set pointsize`).
 
  The defaults for the line and point types is the index.  The defaults for
  the width and size are both unity.
@@ -4960,9 +4960,9 @@ C ... and restart the table:
  not supported, the option will be ignored.
 
  Note that this feature is not completely implemented; linestyles defined by
- this mechanism may be used with 'plot', 'splot', 'replot', and 'set arrow',
+ this mechanism may be used with `plot`, `splot`, `replot`, and `set arrow`,
  but not by other commands that allow the default index to be used, such as
- 'set grid'.
+ `set grid`.
 
  If gnuplot was built with pm3d support, the special keyword `palette` is
  allowed as `linetype` for splots (the 2d `plot` command ignores `palette`).

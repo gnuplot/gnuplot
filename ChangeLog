@@ -1,3 +1,7 @@
+2002-08-15  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* docs/gnuplot.doc: Added some hyperlinks.
+
 2002-08-15  Harald Harders  <h.harders@tu-bs.de>
 
 	* term/post.trm: Documentation about Symbol-Oblique.
@@ -882,7 +886,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/08/14 18:43:42 $).
+	last modification date (from the tag $Date: 2002/08/15 17:56:45 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
