@@ -220,7 +220,8 @@ C
 
  17. New `x11` driver with persistent and multiple windows.
 
- 18. New plotting styles: `xerrorbars`, `histeps`, `financebars` and more.
+ 18. New plotting styles: `xerrorbars`, `errorlines`, `yerrorlines`,
+ `xerrorlines`, `xyerrorlines`, `histeps`, `financebars` and more.
  See `set style`.
 
  19. New tic label formats, including `"%l %L"` which uses the mantissa and
@@ -2143,15 +2144,17 @@ C ... and restart the table:
  `smooth` allows for simple interpolation and approximation.  ('splot' has a
  similar syntax, but does not support the `smooth` and `thru` options.)
 
- Data files should contain at least one data point per record (`using` can
- select one data point from the record).  Records beginning with `#` (and
- also with `!` on VMS) will be treated as comments and ignored.  Each data
- point represents an (x,y) pair.  For `plot`s with error bars (see `set style
- errorbars`), each data point is (x,y,ydelta), (x,y,ylow,yhigh), (x,y,xdelta),
- (x,y,xlow,xhigh), or (x,y,xlow,xhigh,ylow,yhigh).  In all cases, the numbers
- on each record of a data file must be separated by white space (one or more
- blanks or tabs), unless a format specifier is provided by the `using` option.
- This white space divides each record into columns.
+ Data files should contain at least one data point per record (`using`
+ can select one data point from the record). Records beginning with `#`
+ (and also with `!` on VMS) will be treated as comments and ignored.
+ Each data point represents an (x,y) pair. For `plot`s with error bars
+ or error bars with lines (see `set style errorbars` or `set style
+ errorlines`), each data point is (x,y,ydelta), (x,y,ylow,yhigh),
+ (x,y,xdelta), (x,y,xlow,xhigh), or (x,y,xlow,xhigh,ylow,yhigh). In all
+ cases, the numbers on each record of a data file must be separated by
+ white space (one or more blanks or tabs), unless a format specifier is
+ provided by the `using` option. This white space divides each record
+ into columns.
 
  Data may be written in exponential format with the exponent preceded by the
  letter e, E, d, D, q, or Q.
@@ -2624,19 +2627,65 @@ C ... and restart the table:
  relative x and absolute y errors.  The `using` entry generates absolute x min
  and max from the relative error.
 
- The y error bar is a vertical line plotted from (x, ylow) to (x, yhigh).
- If ydelta is specified instead of ylow and yhigh, ylow = y - ydelta and
- yhigh = y + ydelta are derived.  If there are only two numbers on the record,
- yhigh and ylow are both set to y.  The x error bar is a horizontal line
- computed in the same fashion.  To get lines plotted between the data points,
- `plot` the data file twice, once with errorbars and once with lines (but
- remember to use the `notitle` option on one to avoid two entries in the key).
+ The y error bar is a vertical line plotted from (x, ylow) to (x,
+ yhigh). If ydelta is specified instead of ylow and yhigh, ylow = y -
+ ydelta and yhigh = y + ydelta are derived. If there are only two
+ numbers on the record, yhigh and ylow are both set to y. The x error
+ bar is a horizontal line computed in the same fashion. To get lines
+ plotted between the data points, `plot` the data file twice, once with
+ errorbars and once with lines (but remember to use the `notitle`
+ option on one to avoid two entries in the key). Alternately, use the
+ errorlines command (see `errorlines`).
 
  The error bars have crossbars at each end unless `set bar` is used (see `set
  bar` for details).
 
  If autoscaling is on, the ranges will be adjusted to include the error bars.
 ^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/errorbar/errorbar.html"> Errorbar demos. </a>
+
+ See `plot using`, `plot with`, and `set style` for more information.
+3 errorlines
+?commands plot errorlines
+?commands splot errorlines
+?plot errorlines
+?splot errorlines
+?errorlines
+ Lines with error bars are supported for 2-d data file plots by reading
+ one to four additional columns (or `using` entries); these additional
+ values are used in different ways by the various errorlines styles.
+
+ In the default situation, `gnuplot` expects to see three, four, or six
+ numbers on each line of the data file---either
+
+       (x, y, ydelta),
+       (x, y, ylow, yhigh),
+       (x, y, xdelta),
+       (x, y, xlow, xhigh),
+       (x, y, xdelta, ydelta), or
+       (x, y, xlow, xhigh, ylow, yhigh).
+
+ The x coordinate must be specified. The order of the numbers must be
+ exactly as given above, though the `using` qualifier can manipulate
+ the order and provide values for missing columns. For example,
+
+       plot 'file' with errorlines
+       plot 'file' using 1:2:(sqrt($1)) with xerrorlines
+       plot 'file' using 1:2:($1-$3):($1+$3):4:5 with xyerrorlines
+
+ The last example is for a file containing an unsupported combination
+ of relative x and absolute y errors. The `using` entry generates
+ absolute x min and max from the relative error.
+
+ The y error bar is a vertical line plotted from (x, ylow) to (x,
+ yhigh). If ydelta is specified instead of ylow and yhigh, ylow = y -
+ ydelta and yhigh = y + ydelta are derived. If there are only two
+ numbers on the record, yhigh and ylow are both set to y. The x error
+ bar is a horizontal line computed in the same fashion.
+
+ The error bars have crossbars at each end unless `set bar` is used
+ (see `set bar` for details).
+
+ If autoscaling is on, the ranges will be adjusted to include the error bars.
 
  See `plot using`, `plot with`, and `set style` for more information.
 3 parametric
@@ -2797,11 +2846,13 @@ C ... and restart the table:
                          {pointtype | pt <point_type>}
                          {pointsize | ps <point_size>}} }
 
- where <style> is either `lines`, `points`, `linespoints`, `impulses`, `dots`,
- `steps`, `fsteps`, `histeps`, `errorbars`, `xerrorbars`, `yerrorbars`,
- `xyerrorbars`, `boxes`, `boxerrorbars`, `boxxyerrorbars`, `financebars`,
- `candlesticks` or `vector`.  Some of these styles require additional
- information.  See `set style <style>` for details of each style.
+ where <style> is either `lines`, `points`, `linespoints`, `impulses`,
+ `dots`, `steps`, `fsteps`, `histeps`, `errorbars`, `xerrorbars`,
+ `yerrorbars`, `xyerrorbars`, `errorlines`, `xerrorlines`, `yerrorlines`,
+ `xyerrorlines`, `boxes`, `boxerrorbars`, `boxxyerrorbars`,
+ `financebars`, `candlesticks` or `vector`. Some of these styles
+ require additional information. See `set style <style>` for details of
+ each style.
 
  Default styles are chosen with the `set function style` and `set data style`
  commands.
@@ -2856,6 +2907,10 @@ C ... and restart the table:
  This plots "exper.dat" with errorbars and lines connecting the points
  (errorbars require three or four columns):
        plot 'exper.dat' w lines, 'exper.dat' notitle w errorbars
+
+ Another way to plot "exper.dat" with errorlines (errorbars require three 
+ or four columns):
+       plot 'exper.dat' w errorlines
 
  This plots sin(x) and cos(x) with linespoints, using the same line type but
  different point types:
@@ -3064,10 +3119,10 @@ C ... and restart the table:
 
  Syntax:
        set arrow {<tag>} {from <position>} {to <position>} {{no}head}
+                 {front | back}
                  { {linestyle | ls <line_style>}
                    | {linetype | lt <line_type>}
                      {linewidth | lw <line_width} }
-                 {front | back}
        set noarrow {<tag>}
        show arrow
 
@@ -3248,7 +3303,7 @@ C ... and restart the table:
 ?commands show bar
 ?set bar
 ?show bar
- The `set bar` command controls the tics at the ends of errorbars.
+ The `set bar` command controls the tics at the ends of error bars.
 
  Syntax:
        set bar {small | large | <size>}
@@ -3886,10 +3941,14 @@ C ... and restart the table:
  valid codes for the 'strftime' function (outside of `gnuplot`, type "man
  strftime").  See `set timefmt` for a list of the allowed input format codes.
 4 time/date specifiers
-?commands set format time/date_specifiers
-?set format time/date_specifiers
-?set time/date_specifiers
-?time/date_specifiers
+?commands set format date_specifiers
+?commands set format time_specifiers
+?set format date_specifiers
+?set format time_specifiers
+?set date_specifiers
+?set time_specifiers
+?date_specifiers
+?time_specifiers
  In time/date mode, the acceptable formats are:
 
 @start table - first is interactive cleartext form
@@ -5101,24 +5160,27 @@ C ... and restart the table:
  sequentially from the types available to the terminal in use.  Use the
  command `test` to see what is available.
 
- None of the styles requiring more than two columns of information (e.g.,
- `errorbars`) can be used with `splot`s or function `plot`s.  Neither `boxes`
- nor any of the `steps` styles can be used with `splot`s.  If an inappropriate
- style is specified, it will be changed to `points`.
+ None of the styles requiring more than two columns of information
+ (e.g., `errorbars` or `errorlines`) can be used with `splot`s or
+ function `plot`s. Neither `boxes` nor any of the `steps` styles can be
+ used with `splot`s. If an inappropriate style is specified, it will be
+ changed to `points`.
 
- For 2-d data with more than two columns, `gnuplot` is picky about the allowed
- `errorbar` styles.  The `using` option on the `plot` command can be used to
- set up the correct columns for the style you want.  (In this discussion,
- "column" will be used to refer both to a column in the data file and an entry
- in the `using` list.)
+ For 2-d data with more than two columns, `gnuplot` is picky about the
+ allowed `errorbar` and `errorline` styles. The `using` option on the
+ `plot` command can be used to set up the correct columns for the style
+ you want. (In this discussion, "column" will be used to refer both to
+ a column in the data file and an entry in the `using` list.)
 
- For three columns, only `xerrorbars`, `yerrorbars` (or `errorbars`), `boxes`,
- and `boxerrorbars` are allowed.  If another plot style is used, the style
- will be changed to `yerrorbars`.  The `boxerrorbars` style will calculate the
- boxwidth automatically.
+ For three columns, only `xerrorbars`, `yerrorbars` (or `errorbars`),
+ `xerrorlines`, `yerrorlines` (or `errorlines`), `boxes`, and
+ `boxerrorbars` are allowed. If another plot style is used, the style
+ will be changed to `yerrorbars`. The `boxerrorbars` style will
+ calculate the boxwidth automatically.
 
- For four columns, only `xerrorbars`, `yerrorbars` (or `errorbars`),
- `xyerrorbars`, `boxxyerrorbars`, and `boxerrorbars` are allowed.  An illegal
+ For four columns, only `xerrorbars`, `yerrorbars` (or `errorbars`), 
+ `xyerrorbars`, `xerrorlines`, `yerrorlines` (or `errorlines`), `xyerrorlines`, 
+ `boxxyerrorbars`, and `boxerrorbars` are allowed.  An illegal
  style will be changed to `yerrorbars`.
 
  Five-column data allow only the `boxerrorbars`, `financebars`, and
@@ -5126,10 +5188,12 @@ C ... and restart the table:
  of financial prices.)  An illegal style will be changed to `boxerrorbars`
  before plotting.
 
- Six- and seven-column data only allow the `xyerrorbars` and `boxxyerrorbars`
- styles.  Illegal styles will be changed to `xyerrorbars` before plotting.
+ Six- and seven-column data only allow the `xyerrorbars`,
+ `xyerrorlines`, and `boxxyerrorbars` styles. Illegal styles will be
+ changed to `xyerrorbars` before plotting.
 
- For more information about error bars, please see `plot errorbars`.
+ For more information about error bars with and without lines, please see 
+ `plot errorlines` and `plot errorbars`.
 4 boxerrorbars
 ?commands set style boxerrorbars
 ?set style boxerrorbars
@@ -5343,6 +5407,53 @@ C ... and restart the table:
  from (x,ylow) to (x,yhigh), depending on how many data columns are provided.
  A tic mark is placed at the ends of the error bar (unless `set bar` is
  used---see `set bar` for details).
+^<a href="http://www.nas.nasa.gov/~woo/gnuplot/errorbar/errorbar.html"> See demo. </a>
+4 xerrorlines
+?commands set style xerrorlines
+?set style xerrorlines
+?style xerrorlines
+?xerrorlines
+ The `xerrorlines` style is only relevant to 2-d data plots.
+ `xerrorlines` is like `linespoints`, except that a horizontal error
+ line is also drawn. At each point (x,y), a line is drawn from (xlow,y)
+ to (xhigh,y) or from (x-xdelta,y) to (x+xdelta,y), depending on how
+ many data columns are provided. A tic mark is placed at the ends of
+ the error bar (unless `set bar` is used---see `set bar` for details).
+4 xyerrorlines
+?commands set style xyerrorlines
+?set style xyerrorlines
+?style xyerrorlines
+?xyerrorlines
+ The `xyerrorlines` style is only relevant to 2-d data plots.
+ `xyerrorlines` is like `linespoints`, except that horizontal and
+ vertical error bars are also drawn. At each point (x,y), lines are
+ drawn from (x,y-ydelta) to (x,y+ydelta) and from (x-xdelta,y) to
+ (x+xdelta,y) or from (x,ylow) to (x,yhigh) and from (xlow,y) to
+ (xhigh,y), depending upon the number of data columns provided. A tic
+ mark is placed at the ends of the error bar (unless `set bar` is
+ used---see `set bar` for details).
+
+ If data are provided in an unsupported mixed form, the `using` filter on the
+ `plot` command should be used to set up the appropriate form.  For example,
+ if the data are of the form (x,y,xdelta,ylow,yhigh), then you can use
+
+       plot 'data' using 1:2:($1-$3),($1+$3),4,5 with xyerrorbars
+4 yerrorlines
+?commands set style yerrorlines
+?commands set style errorlines
+?set style yerrorlines
+?set style errorlines
+?style yerrorlines
+?style errorlines
+?yerrorlines
+?errorlines
+ The `yerrorlines` (or `errorlines`) style is only relevant to 2-d data
+ plots. `yerrorlines` is like `linespoints`, except that a vertical
+ error line is also drawn. At each point (x,y), a line is drawn from
+ (x,y-ydelta) to (x,y+ydelta) or from (x,ylow) to (x,yhigh), depending
+ on how many data columns are provided. A tic mark is placed at the
+ ends of the error bar (unless `set bar` is used---see `set bar` for
+ details).
 ^<a href="http://www.nas.nasa.gov/~woo/gnuplot/errorbar/errorbar.html"> See demo. </a>
 3 surface
 ?commands set surface
