@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: cgm.trm,v 1.16 1998/12/14 18:38:22 lhecking Exp $
+ * $Id: cgm.trm,v 1.16.2.1 1999/08/19 14:18:43 lhecking Exp $
  */
 
 /* GNUPLOT - cgm.trm */
@@ -1018,7 +1018,7 @@ TERM_PUBLIC void CGM_options()
 	    if (!END_OF_COMMAND) {
 		struct value a;
 		cgm_linewidth_pt = (unsigned int) real(const_express(&a));
-		if (cgm_linewidth_pt > 10000) {
+		if (cgm_linewidth_pt == 0 || cgm_linewidth_pt > 10000) {
 		    fputs("gnuplot(cgm.trm): linewidth out of range\n", stderr);
 		    cgm_linewidth_pt = 1;
 		}
