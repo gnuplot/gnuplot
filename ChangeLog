@@ -1,3 +1,30 @@
+1999-03-31  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* NEWS: Updated.
+
+	* config.hin, configure, config/Makefile.am, config/Makefile.in,
+	tutorial/Makefile.am, tutorial/Makefile.in: Regenerated.
+
+	* configure.in: Clean up, eliminate duplicate AC_DEFINE()'s.
+
+	* config/Makefile.am.in, config/makefile.ami, config/makefile.unx,
+	config/makefile.vms, docs/Makefile.in: Rename doc2hlp.com doc2hlp.vms.
+
+	* docs/Makefile.in: Add alternative to doc2info.c.
+
+	* docs/doc2texi.el, docs/gnuplot.texi: New files.
+
+	* lisp/Makefile.in: Add mkinstalldirs variable.
+
+	* src/Makefile.in: Clean up.
+
+	* tutorial/Makefile.am.in: Fix typo.
+
+1999-03-31  Berthold Höllmann  <se6y095@public.uni-hamburg.de>
+
+	* configure.in, term/gnugraph.trm: Patch to make things work
+	with GNU plotutils-2.2.
+	
 1999-03-30  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* Makefile.am: Reorder SUBDIRS.
@@ -7,8 +34,6 @@
 	tutorial/Makefile.am, tutorial/Makefile.in: Regenerated.
 
 	* config/Makefile.am.in: Add term_pc.h to EXTRA_DIST files.
-
-	* configure.in: Only configure lisp/ if emacs is found.
 
 	* lisp/Makefile.in: Add some tests for EMACS=no, remove unnecessary
 	targets.

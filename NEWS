@@ -1,4 +1,34 @@
 Changes in release 3.7.1:
+[3.7.0.5]
+* another off-by-one error fixed in pstricks driver. sigh ...
+* updated to latest version of gnuplot-mode
+* added tilde-expansion of filenames
+* win/pgnuplot.c added, stdin redirection for gnuplot
+  under Windows
+* extended interactive Tk/Tcl capabilities
+* only read from stdin if the complete filename given is '-'
+* added fitting of time format data
+* workaround for the bug that made 'set key below' sometimes
+  lack some of the key texts
+* build lisp files, LaTeX tutorial only if emacs, latex, resp.
+  are found
+* moved CVS repository over to new dir structure
+* gnuplot can now be compiled with GNU libplot 2.2
+* docs/doc2hlp.com renamed to docs/doc2hlp.vms pending better solution
+
+[3.7.0.4]
+* switched to new directory structure!
+* fix to plot all lines in multiline labels within plot borders
+* hardwire terminal sources into docs/Makefile.in
+* better docs for 'set missing'
+* hopefully complete fix for off-by-one error in pslatex driver
+* fix core dump in alloc.c (only relevant for memory debugging)
+
+[3.7.0.3] (released as patch only)
+* brush up the various platform makefiles
+* typo in plot.c free() statement fixed
+* some fixes in the Be driver
+
 [3.7.0.2]
 * add pgp keys
 * new driver for BeOS
