@@ -159,8 +159,28 @@
 #endif
 
 /* End OS section */
-  
-  
+
+/* Overriden by Makefile */
+/* Define helpfile location */
+#ifndef HELPFILE
+# if defined( MSDOS ) || defined( OS2 ) || defined(DOS386)
+#  define HELPFILE "gnuplot.gih"
+# else
+#  if defined(AMIGA_SC_6_1) || defined(AMIGA_AC_5)
+#   define HELPFILE "S:gnuplot.gih"
+#  else
+#   define HELPFILE "docs/gnuplot.gih"  /* changed by makefile */
+#  endif /* AMIGA_SC_6_1 || AMIGA_AC_5 */
+# endif /* MSDOS || OS2 || DOS386 */
+#endif /* !HELPFILE */
+
+#ifndef CONTACT
+# define CONTACT "bug-gnuplot@dartmouth.edu"
+#endif
+#ifndef HELPMAIL
+# define HELPMAIL "info-gnuplot@dartmouth.edu"
+#endif
+
 #define SAMPLES 100		/* default number of samples for a plot */
 #define ISO_SAMPLES 10		/* default number of isolines per splot */
 #define ZERO	1e-8		/* default for 'zero' set option */
