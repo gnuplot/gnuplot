@@ -1,6 +1,6 @@
 #
 #
-# $Id: makefile.cyg,v 1.23 2004/01/19 17:41:12 mikulik Exp $
+# $Id: makefile.cyg,v 1.24 2004/02/12 09:03:11 mikulik Exp $
 #
 # GNUPLOT Makefile for Cygwin on WinNT and Win95/98/2000
 #
@@ -267,7 +267,7 @@ wgnuplot.exe: $(OBJS) $(WINOBJS) win/wgnuplot.def wgplt_res.o texticon.ico grpic
 		wgplt_res.o $(LDLIBS) $(TERMLIBS)
 
 pgnuplot.exe: win/pgnuplot.c version.o
-	gcc -O2 -s -mno-cygwin -o pgnuplot.exe win/pgnuplot.c version.o -I. -luser32
+	gcc -O2 -s -mno-cygwin -DHAVE_STDBOOL_H -o pgnuplot.exe win/pgnuplot.c version.o -I. -luser32
 
 
 # Rules:
