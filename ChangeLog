@@ -1,5 +1,8 @@
 2004-04-01  Petr Mikulik  <mikulik@physics.muni.cz>
 
+	* src/plot.c: Fix OS/2 release version string if wrong in using
+	utsname.h.
+
 	* src/mouse.c: On OS/2, don't start with mouse on by default. For some
 	unknown reason, it clashes with arrow keys and even palette color
 	allocation in multiplot mode... I guess these strange features are in

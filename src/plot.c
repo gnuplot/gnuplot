@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot.c,v 1.66 2004/02/12 09:08:40 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot.c,v 1.67 2004/02/23 13:34:59 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - plot.c */
@@ -481,6 +481,12 @@ main(argc, argv)
 # else
 	    strcpy(os_name, uts.sysname);
 	    strcpy(os_rel, uts.release);
+# ifdef OS2
+	    if (!strchr(os_rel,'.'))
+		/* write either "2.40" or "4.0", or empty -- don't print "OS/2 1" */
+		strcpy(os_rel, "");
+# endif
+
 # endif
 	}
     }
