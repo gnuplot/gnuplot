@@ -1,5 +1,5 @@
 /*
- * $Id: command.h,v 1.21 2002/03/26 09:42:34 mikulik Exp $
+ * $Id: command.h,v 1.22 2002/03/30 13:15:21 broeker Exp $
  */
 
 /* GNUPLOT - command.h */
@@ -161,5 +161,14 @@ void replotrequest __PROTO((void)); /* used in command.c & mouse.c */
 void print_set_output __PROTO((char *, TBOOLEAN)); /* set print output file */
 char *print_show_output __PROTO((void)); /* show print output file */
 
-/**/
+/* Activate/deactive effects of 'set view map' before 'splot'/'plot',
+ * respectively. Required for proper mousing during 'set view map';
+ * actually it won't be necessary if gnuplot keeps a copy of all variables for
+ * the current plot and don't share them with 'set' commands.
+ *   These routines need to be executed before each plotrequest() and
+ * plot3drequest().
+ */
+void splot_map_activate __PROTO((void));
+void splot_map_deactivate __PROTO((void));
+
 #endif /* GNUPLOT_COMMAND_H */

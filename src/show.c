@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.91 2002/09/27 00:12:26 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.92 2002/09/27 12:17:41 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -2246,7 +2246,12 @@ static void
 show_view()
 {
     SHOW_ALL_NL;
-    fprintf(stderr, "\tview is %g rot_x, %g rot_z, %g scale, %g scale_z\n",
+    fputs("\tview is ", stderr);
+    if (splot_map == TRUE) {
+	fputs("map\n", stderr);
+	return;
+    }
+    fprintf(stderr, "%g rot_x, %g rot_z, %g scale, %g scale_z\n",
 		surface_rot_x, surface_rot_z, surface_scale, surface_zscale);
 }
 

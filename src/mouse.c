@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.32 2002/09/11 22:58:06 joze Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.33 2002/10/08 19:29:27 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -1554,9 +1554,7 @@ event_motion(struct gp_event_t *ge)
     mouse_y = ge->my;
 
     if (is_3d_plot
-#ifdef PM3D
-	&& !pm3d.map		/* Rotate the surface if it is 3D graph and "set pm3d map" was not used. */
-#endif
+	&& (splot_map == FALSE) /* Rotate the surface if it is 3D graph but not "set view map". */
 	) {
 
 	TBOOLEAN redraw = FALSE;

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.36 2002/07/07 18:15:55 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.37 2002/10/09 08:58:48 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - pm3d.c */
@@ -38,7 +38,6 @@ static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.36 2002/07/07 18:15:55 miku
 
 pm3d_struct pm3d = {
     "",				/* where[6] */
-    0,				/* no map */
     PM3D_FLUSH_BEGIN,		/* flush */
     0,				/* no flushing triangles */
     PM3D_SCANS_AUTOMATIC,	/* scans direction is determined automatically */
@@ -543,7 +542,6 @@ void
 pm3d_reset(void)
 {
     pm3d.where[0] = 0;
-    pm3d.map = 0;
     pm3d.flush = PM3D_FLUSH_BEGIN;
     pm3d.ftriangles = 0;
     pm3d.direction = PM3D_SCANS_AUTOMATIC;

@@ -1,5 +1,5 @@
 /*
- * $Id: pm3d.h,v 1.14 2002/03/09 22:41:45 mikulik Exp $
+ * $Id: pm3d.h,v 1.15 2002/07/07 18:15:55 mikulik Exp $
  */
 
 /* GNUPLOT - pm3d.h */
@@ -82,8 +82,6 @@ typedef enum {
 */
 typedef struct {
   char where[7];	/* base, top, surface */
-  char map;		/* set to 1 during 'set pm3d map' (workaround for
-			   non-existing 2D map plot) */
   char flush;   	/* left, right, center */
   char ftriangles;   	/* 0/1 (don't) draw flushing triangles */
   char direction;	/* forward, backward */

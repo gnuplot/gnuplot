@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.57 2002/08/16 08:11:37 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.58 2002/08/22 14:27:30 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -233,6 +233,10 @@ plot3drequest()
     AXIS_INDEX u_axis, v_axis;
 
     is_3d_plot = TRUE;
+
+    /* change view to become map if requested by 'set view map' */
+    if (splot_map == TRUE)
+	splot_map_activate();
 
     if (parametric && strcmp(set_dummy_var[0], "t") == 0) {
 	strcpy(set_dummy_var[0], "u");

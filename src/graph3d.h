@@ -1,5 +1,5 @@
 /*
- * $Id: graph3d.h,v 1.12 2002/02/18 15:03:33 mikulik Exp $
+ * $Id: graph3d.h,v 1.13 2002/03/18 18:19:10 broeker Exp $
  */
 
 /* GNUPLOT - graph3d.h */
@@ -124,6 +124,7 @@ extern float surface_rot_z;
 extern float surface_rot_x;
 extern float surface_scale;
 extern float surface_zscale;
+extern int splot_map;
 
 extern float ticslevel;
 

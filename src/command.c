@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.63 2002/07/20 14:56:19 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.64 2002/07/20 15:01:41 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -1438,6 +1438,63 @@ replotrequest()
 	plot3drequest();
     else
 	plotrequest();
+}
+
+
+/* Is 'set view map' currently working inside 'splot' or not? Calculation of
+ * mouse coordinates and the corresponding routines must know it, because
+ * 'splot' can be either true 3D plot or a 2D map.
+ * This flag is set when entering splot command and 'set view map', i.e. by
+ * splot_map_activate(), and reset when calling splot_map_deactivate().
+ */
+static int splot_map_active = 0;
+/* Store values reset by 'set view map' during splot, used by those two
+ * routines below.
+ */
+static float splot_map_surface_rot_x;
+static float splot_map_surface_rot_z;
+static float splot_map_surface_scale;
+
+/* This routine is called at the beginning of 'splot'. It sets up some splot
+ * parameters needed to present the 'set view map'.
+ */
+void
+splot_map_activate(void)
+{
+    if (splot_map_active)
+	return;
+    splot_map_active = 1;
+    /* save current values */
+    splot_map_surface_rot_x = surface_rot_x;
+    splot_map_surface_rot_z = surface_rot_z ;
+    splot_map_surface_scale = surface_scale;
+    /* set new values */
+    surface_rot_x = 180;
+    surface_rot_z = 0;
+    surface_scale = 1.3;
+    axis_array[FIRST_Y_AXIS].range_flags  ^= RANGE_REVERSE;
+    axis_array[SECOND_Y_AXIS].range_flags ^= RANGE_REVERSE;
+	/* note: ^ is xor */
+}
+
+
+/* This routine is called when the current 'set view map' is no more needed,
+ * i.e., when calling "plot" --- the reversed y-axis et al must still be
+ * available for mousing.
+ */
+void
+splot_map_deactivate(void)
+{
+    if (!splot_map_active)
+	return;
+    splot_map_active = 0;
+    /* restore the original values */
+    surface_rot_x = splot_map_surface_rot_x;
+    surface_rot_z = splot_map_surface_rot_z;
+    surface_scale = splot_map_surface_scale;
+    axis_array[FIRST_Y_AXIS].range_flags  ^= RANGE_REVERSE;
+    axis_array[SECOND_Y_AXIS].range_flags ^= RANGE_REVERSE;
+	/* note: ^ is xor */
 }
 
 

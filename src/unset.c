@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.40 2002/10/05 00:12:02 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.41 2002/10/08 19:15:54 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -1132,15 +1132,10 @@ static void
 unset_pm3d()
 {
     c_token++;
-    if (pm3d.map) {
-	axis_array[FIRST_Y_AXIS].range_flags &= ~RANGE_REVERSE; /* unset reversed y axis */
-	draw_surface = TRUE;	/* set surface */
-	surface_rot_x = 60.0;	/* set view 60,30,1.3 */
-	surface_rot_z = 30;
-	surface_scale = 1.0;
-    }
     pm3d.where[0] = 0;
-    pm3d.map = 0;  /* trick for rotating ylabel */
+    /* reset styles, required to 'plot something' after e.g. 'set pm3d map' */
+    if (data_style == PM3DSURFACE) data_style = POINTSTYLE;
+    if (func_style == PM3DSURFACE) func_style = LINES;
 }
 #endif
 
@@ -1325,6 +1320,8 @@ unset_timestamp()
 static void
 unset_view()
 {
+    splot_map_deactivate();
+    splot_map = FALSE;
     surface_rot_z = 30.0;
     surface_rot_x = 60.0;
     surface_scale = 1.0;

@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.138 2002/10/10 20:14:00 mikulik Exp $
+C RCS $Id: gnuplot.doc,v 1.139 2002/10/18 10:03:00 lhecking Exp $
 C 18 September 2001
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001   Thomas Williams, Colin Kelley et al.
 C
@@ -5707,6 +5707,7 @@ C ... and restart the table:
 ?commands set pm3d
 ?commands show pm3d
 ?set pm3d
+?set pm3d at b
 ?show pm3d
 ?pm3d
 ?help pm3d
@@ -5764,9 +5765,7 @@ C ... and restart the table:
     1. The term 'scan' referenced above is used more among physicists then the
        the term 'iso_curve' in gnuplot documentation and sources.  You measure
        maps recording one scan after another scan, that's why.
-    2. Map is obtained by `set view 180,0,1.25; set yrange [*:*] reverse`,
-       plus something more.  This can be easily switched on by using
-       `set pm3d map`.  Use `unset pm3d` before switching to 2d plots.
+    2. Two-dimensional color (or gray) map is obtained by `set view map`.
 
  Syntax:
        set pm3d
@@ -5845,19 +5844,11 @@ C ... and restart the table:
  surface. This is accomplished by drawing the surface and decorations in the
  right order and looks more realistic.
 
- The `set pm3d map` is actually a macro which facilitates plotting maps. It is
- equivalent to these user commands:
-       set pm3d at b; unset surface; unset contour
-       set view 180,0,1.3
-       set yrange [*:*] reverse
-       a trick to rotate the ylabel
- Notice that *now* the ylabel is rotated by an internal 'set pm3d map' switch,
- as far as no user option is available to rotate x,y,z labels explicitly.
- Furthermore, the graph area is smaller than that of 2D graphs (some more
- white space than I would like). Thus could be solved if someone (why
- not you?!) likes to implement a 2d layout for 3d maps, e.g. 'set view map').
- Please use `unset pm3d` to correctly get rid of the pm3d setup, notably the
- reversed y axis and rotated ylabel.
+ The `set pm3d map` is an abbreviation for `set pm3d at b`; `set view map`;
+ `set style data pm3d`; `set style func pm3d`;.
+ It is used for backwards compatibility, when `set view map` was not available.
+ Take care that you properly use `zrange` and `cbrange` for input data point
+ filtering and color range scaling, respectively.
 
  The coloring setup as well as the color box drawing are determined by
  `set palette`.  There can be only one palette for the current plot.  Drawing
@@ -7220,15 +7211,17 @@ C ... and restart the table:
 ?commands set view
 ?commands show view
 ?set view
+?set view map
 ?show view
 ?view
  The `set view` command sets the viewing angle for `splot`s.  It controls how
  the 3-d coordinates of the plot are mapped into the 2-d screen space.  It
  provides controls for both rotation and scaling of the plotted data, but
- supports orthographic projections only.
+ supports orthographic projections only.  It supports both 3D projection or
+ orthogonal 2D projection into a 2D plot-like map.
 
  Syntax:
-       set view <rot_x> {,{<rot_z>}{,{<scale>}{,<scale_z>}}}
+       set view { <rot_x>{,{<rot_z>}{,{<scale>}{,<scale_z>}}} | map }
        show view
 
  where <rot_x> and <rot_z> control the rotation angles (in degrees) in a
@@ -7237,6 +7230,11 @@ C ... and restart the table:
  x, screen vertical axis is y, and the axis perpendicular to the screen is z.
  The first rotation applied is <rot_x> around the x axis.  The second rotation
  applied is <rot_z> around the new z axis.
+
+ Command `set view map` is used to represent the drawing as a map. It can be
+ used for `contour` plots, or for color `pm3d` maps. In the latter, take care
+ that you properly use `zrange` and `cbrange` for input data point filtering
+ and color range scaling, respectively.
 
  <rot_x> is bounded to the [0:180] range with a default of 60 degrees, while
  <rot_z> is bounded to the [0:360] range with a default of 30 degrees.
@@ -7251,7 +7249,6 @@ C ... and restart the table:
  to 0.5.
 
  See also `set ticslevel`.
- .
 3 vrange
 ?commands set vrange
 ?commands show vrange

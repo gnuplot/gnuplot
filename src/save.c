@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.53 2002/09/27 00:12:26 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.54 2002/09/27 12:17:41 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -477,13 +477,18 @@ set encoding %s\n\
     else
         fprintf(fp, "unset decimalsign\n");
 
-    fprintf(fp, "\
-set view %g, %g, %g, %g\n\
+    fputs("set view ", fp);
+    if (splot_map == TRUE)
+	fputs("map", fp);
+    else
+	fprintf(fp, "%g, %g, %g, %g",
+	    surface_rot_x, surface_rot_z, surface_scale, surface_zscale);
+
+    fprintf(fp, "\n\
 set samples %d, %d\n\
 set isosamples %d, %d\n\
 %sset surface\n\
 %sset contour",
-	    surface_rot_x, surface_rot_z, surface_scale, surface_zscale,
 	    samples_1, samples_2,
 	    iso_samples_1, iso_samples_2,
 	    (draw_surface) ? "" : "un",
@@ -688,8 +693,7 @@ set ticscale %g %g\n",
     fprintf(fp, "set locale \"%s\"\n", get_locale());
 
 #ifdef PM3D
-    if (pm3d.map) fputs("set pm3d map\n", fp);
-	else if (pm3d.where[0]) fprintf(fp, "set pm3d at %s\n", pm3d.where);
+    if (pm3d.where[0]) fprintf(fp, "set pm3d at %s\n", pm3d.where);
     fputs("set pm3d ", fp);
     switch (pm3d.direction) {
     case PM3D_SCANS_AUTOMATIC: fputs("scansautomatic", fp); break;

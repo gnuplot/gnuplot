@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.71 2002/09/02 18:15:31 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.72 2002/09/27 00:12:24 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -84,11 +84,13 @@ TBOOLEAN draw_surface = TRUE;
 /* Was hidden3d display selected by user? */
 TBOOLEAN hidden3d = FALSE;
 
-/* rotation and scale of the 3d view, as controlled by 'set view */
+/* Rotation and scale of the 3d view, as controlled by 'set view': */
 float surface_rot_z = 30.0;
 float surface_rot_x = 60.0;
 float surface_scale = 1.0;
 float surface_zscale = 1.0;
+/* Set by 'set view map': */
+int splot_map = FALSE;
 
 /* position of the base plane, as given by 'set ticslevel' */
 float ticslevel = 0.5;
@@ -673,10 +675,31 @@ do_3dplot(plots, pcount, quick)
 
     /* PLACE TITLE */
     if (*title.text != 0) {
+	unsigned int x, y;
+	if (splot_map) { /* case 'set view map' */
+	    unsigned int map_x1, map_y1, map_x2, map_y2;
+	    int tics_len = 0;
+	    if (X_AXIS.ticmode & TICS_MIRROR) {
+		tics_len = (int)(ticscale * (tic_in ? -1 : 1) * (term->v_tic));
+		if (tics_len < 0) tics_len = 0; /* take care only about upward tics */
+	    }
+	    map3d_xy(X_AXIS.min, Y_AXIS.min, base_z, &map_x1, &map_y1);
+	    map3d_xy(X_AXIS.max, Y_AXIS.max, base_z, &map_x2, &map_y2);
+	    /* Distance between the title base line and graph top line or the upper part of
+	       tics is as given by character height: */
+#define DEFAULT_Y_DISTANCE 1.0
+	    x = (unsigned int) ((map_x1 + map_x2) / 2 + title.xoffset * t->h_char);
+	    y = (unsigned int) (map_y1 + tics_len + (DEFAULT_Y_DISTANCE + titlelin - 0.5 + title.yoffset) * (t->v_char));
+#undef DEFAULT_Y_DISTANCE
+	} else { /* usual 3d set view ... */
+    	    x = (unsigned int) ((xleft + xright) / 2 + title.xoffset * t->h_char);
+    	    y = (unsigned int) (ytop + (titlelin + title.yoffset) * (t->h_char));
+    	}
 	apply_textcolor(&(title.textcolor),t);
-	write_multiline((unsigned int) ((xleft + xright) / 2 + title.xoffset * t->h_char),
-			(unsigned int) (ytop + (titlelin + title.yoffset) * (t->h_char)),
-			title.text, CENTRE, JUST_TOP, 0, title.font);
+	/* PM: why there is JUST_TOP and not JUST_BOT? We should draw above baseline!
+	 * But which terminal understands that? It seems vertical justification does
+	 * not work... */
+	write_multiline(x, y, title.text, CENTRE, JUST_TOP, 0, title.font);
 	reset_textcolor(&(title.textcolor),t);
     }
 
@@ -2194,18 +2217,46 @@ draw_3d_graphbox(plot, plot_num)
 	    if ((surface_rot_x <= 90 && BACKGRID != whichgrid) ||
 		(surface_rot_x > 90 && FRONTGRID != whichgrid)) {
 #endif
-	    double step = (xaxis_y - other_end) / 4;
 	    unsigned int x1, y1;
 
+	    if (splot_map) { /* case 'set view map' */
+		/* copied from xtick_callback(): baseline of tics labels */
+		vertex v1, v2;
+		map3d_xyz(mid_x, xaxis_y, base_z, &v1);
+		v2.x = v1.x;
+		v2.y = v1.y - tic_unity * (t->v_char) * 1;
+		if (!tic_in) {
+		    /* FIXME
+		     * This code and its source in xtick_callback() is wrong --- tics
+		     * can be "in" but ticscale <0 ! To be corrected in both places!
+		     */
+		    v2.y -= tic_unity * t->v_tic * ticscale;
+		}
+#if 0
+		/* PM: correct implementation for map should probably be like this: */
+		if (X_AXIS.ticmode) {
+		    int tics_len = (int)(ticscale * (tic_in ? -1 : 1) * (term->v_tic));
+		    if (tics_len < 0) tics_len = 0; /* take care only about upward tics */
+		    v2.y += tics_len;
+		}
+#endif
+    	    TERMCOORD(&v2, x1, y1);
+	    /* DEFAULT_Y_DISTANCE is with respect to baseline of tics labels */
+#define DEFAULT_Y_DISTANCE 0.5
+	    y1 -= (unsigned int) ((1 + DEFAULT_Y_DISTANCE) * t->v_char);
+#undef DEFAULT_Y_DISTANCE
+	    } else { /* usual 3d set view ... */
+    		double step = (xaxis_y - other_end) / 4;
 	    map3d_xyz(mid_x, xaxis_y + step, base_z, &v1);
 	    if (!tic_in) {
 		v1.x -= tic_unitx * ticscale * t->v_tic;
 		v1.y -= tic_unity * ticscale * t->v_tic;
 	    }
 	    TERMCOORD(&v1, x1, y1);
-	    x1 += X_AXIS.label.xoffset * t->h_char;
-	    y1 += X_AXIS.label.yoffset * t->v_char;
+	    }
 
+	    x1 += X_AXIS.label.xoffset * t->h_char; /* user-defined label offset */
+	    y1 += X_AXIS.label.yoffset * t->v_char;
 	    apply_textcolor(&(X_AXIS.label.textcolor),t);
 	    write_multiline(x1, y1, X_AXIS.label.text,
 			    CENTRE, JUST_TOP, 0,
@@ -2241,37 +2292,90 @@ draw_3d_graphbox(plot, plot_num)
 	    if ((surface_rot_x <= 90 && BACKGRID != whichgrid) ||
 		(surface_rot_x > 90 && FRONTGRID != whichgrid)) {
 #endif
-		double step = (other_end - yaxis_x) / 4;
 		unsigned int x1, y1;
+		int h_just, v_just, angle;
 
+		if (splot_map) { /* case 'set view map' */
+		    /* copied from ytick_callback(): baseline of tics labels */
+		    vertex v1, v2, len;
+		    double scale = ticscale * (tic_in ? 1 : -1);
+		    map3d_xyz(yaxis_x, mid_y, base_z, &v1);
+		    if (Y_AXIS.ticmode & TICS_ON_AXIS
+			    && !X_AXIS.log
+			    && inrange (0.0, X_AXIS.min, X_AXIS.max)
+		       ) {
+			map3d_xyz(0.0, yaxis_x, base_z, &v1);
+		    }
+		    v2.x = v1.x - tic_unitx * (t->h_char) * 1;
+		    v2.y = v1.y;
+	    	    if (!tic_in)
+			v2.x -= tic_unitx * (t->h_tic) * ticscale;
+		    TERMCOORD(&v2, x1, y1);
+		    /* calculate max length of y-tics labels */
+		    widest_tic_strlen = 0;
+		    if (Y_AXIS.ticmode & TICS_ON_BORDER) {
+			widest_tic_strlen = 0; /* reset the global variable */
+		      	gen_tics(FIRST_Y_AXIS, /* 0, */ widest_tic_callback);
+		    }
+		    /* DEFAULT_Y_DISTANCE is with respect to baseline of tics labels */
+#define DEFAULT_X_DISTANCE 0.
+		    x1 -= (unsigned int) ((DEFAULT_X_DISTANCE + 0.5 + widest_tic_strlen) * t->h_char);
+#undef DEFAULT_X_DISTANCE
+#if 0
+		    /* another method ... but not compatible */
+		    unsigned int map_y1, map_x2, map_y2;
+		    int tics_len = 0;
+		    if (Y_AXIS.ticmode) {
+			tics_len = (int)(ticscale * (tic_in ? 1 : -1) * (term->v_tic));
+			if (tics_len > 0) tics_len = 0; /* take care only about left tics */
+		    }
+		    map3d_xy(X_AXIS.min, Y_AXIS.min, base_z, &x1, &map_y1);
+		    map3d_xy(X_AXIS.max, Y_AXIS.max, base_z, &map_x2, &map_y2);
+		    y1 = (unsigned int)((map_y1 + map_y2) * 0.5);
+		    /* Distance between the title base line and graph top line or the upper part of
+	 	       tics is as given by character height: */
+#define DEFAULT_X_DISTANCE 0
+		    x1 += (unsigned int) (tics_len + (-0.5 + Y_AXIS.label.xoffset) * t->h_char);
+		    y1 += (unsigned int) ((DEFAULT_X_DISTANCE + Y_AXIS.label.yoffset) * (t->v_char));
+#undef DEFAULT_X_DISTANCE
+#endif
+		    h_just = CENTRE; /* vertical justification for rotated text */
+		    v_just = JUST_BOT; /* horizontal -- does not work for rotated text? */
+		    angle = TEXT_VERTICAL; /* seems it has not effect ... why? */
+		} else { /* usual 3d set view ... */
+		    double step = (other_end - yaxis_x) / 4;
 		map3d_xyz(yaxis_x - step, mid_y, base_z, &v1);
 		if (!tic_in) {
 		    v1.x -= tic_unitx * ticscale * t->h_tic;
 		    v1.y -= tic_unity * ticscale * t->h_tic;
 		}
 		TERMCOORD(&v1, x1, y1);
-		x1 += Y_AXIS.label.xoffset * t->h_char;
+		    h_just = CENTRE;
+		    v_just = JUST_TOP;
+		    angle = 0;
+		}
+
+		x1 += Y_AXIS.label.xoffset * t->h_char; /* user-defined label offset */
 		y1 += Y_AXIS.label.yoffset * t->v_char;
-		/* write_multiline mods it */
-#ifdef PM3D
-		if (pm3d.map)
+		/* vertical y-label for maps */
+		if (splot_map == TRUE)
 		    (*t->text_angle)(TEXT_VERTICAL);
-#endif
+		/* write_multiline mods it */
 		apply_textcolor(&(Y_AXIS.label.textcolor),t);
 		write_multiline(x1, y1, Y_AXIS.label.text,
-				CENTRE, JUST_TOP, 0,
+				h_just, v_just, angle,
 				Y_AXIS.label.font);
 		reset_textcolor(&(Y_AXIS.label.textcolor),t);
-#ifdef PM3D
-		if (pm3d.map)
+		/* revert from vertical y-label for maps */
+		if (splot_map == TRUE)
 		    (*t->text_angle)(0);
 	    }
-#endif
 	}
     }
 
     /* do z tics */
     if (Z_AXIS.ticmode
+	&& (splot_map == FALSE)
 	&& (draw_surface
 	    || (draw_contour & CONTOUR_SRF)
 #ifdef PM3D

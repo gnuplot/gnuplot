@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.99 2002/10/05 00:12:02 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.100 2002/10/09 19:24:23 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -3036,13 +3036,9 @@ set_pm3d()
 	    /* setup everything for plotting a map */
 	    case S_PM3D_MAP: /* "map" */
 		pm3d.where[0] = 'b'; pm3d.where[1] = 0; /* set pm3d at b */
-		draw_surface = FALSE;        /* set nosurface */
-		draw_contour = CONTOUR_NONE; /* set nocontour */
-		surface_rot_x = 180;         /* set view 180,0,1.3 */
-		surface_rot_z = 0;
-		surface_scale = 1.3;
-		axis_array[FIRST_Y_AXIS].range_flags |= RANGE_REVERSE; /* set yrange reverse */
-		pm3d.map = 1;  /* trick for rotating ylabel */
+		data_style = PM3DSURFACE;
+		func_style = PM3DSURFACE;
+		splot_map = TRUE;
 		continue;
 	    /* flushing triangles */
 	    case S_PM3D_FTRIANGLES: /* "ftr$iangles" */
@@ -3522,11 +3518,22 @@ set_view()
     double local_vals[4];
     struct value a;
 
+    c_token++;
+    if (equals(c_token,"map")) {
+	    splot_map = TRUE;
+	    c_token++;
+	    return;
+    };
+
+    if (splot_map == TRUE) {
+	splot_map_deactivate();
+	splot_map = FALSE; /* default is no map */
+    }
+
     local_vals[0] = surface_rot_x;
     local_vals[1] = surface_rot_z;
     local_vals[2] = surface_scale;
     local_vals[3] = surface_zscale;
-    c_token++;
     for (i = 0; i < 4 && !(END_OF_COMMAND);) {
 	if (equals(c_token,",")) {
 	    if (was_comma) i++;
