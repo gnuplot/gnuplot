@@ -6235,6 +6235,6 @@ C ... and restart the table:
  flag.  A workaround is to use `set missing 'NaNq'`.
 
  There may be an up-to-date list of bugs since the release on the WWW page:
-       http://www.cs.dartmouth.edu/gnuplot
+       http://www.cs.dartmouth.edu/gnuplot_info.html
 
  Please report any bugs to bug-gnuplot@dartmouth.edu.
