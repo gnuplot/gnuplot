@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: binary.c,v 1.5 1999/06/19 20:52:03 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: binary.c,v 1.6 1999/06/22 12:03:47 lhecking Exp $"); }
 #endif
 
 /*
@@ -23,8 +23,9 @@ static char *RCSid() { return RCSid("$Id: binary.c,v 1.5 1999/06/19 20:52:03 lhe
  */
 
 #include "plot.h"		/* We have to get TRUE and FALSE */
-#include "stdfn.h"
+#include "alloc.h"
 #include "binary.h"
+#include "util.h"
 
 /* 
  * This routine scans the first block of the file to see if the file is a 
@@ -101,7 +102,7 @@ int *nr, *nc;
 {
     float GPFAR *GPFAR * m, GPFAR * rt, GPFAR * ct;
     int num_rows = START_ROWS;
-    int num_cols;
+    size_t num_cols;
     int current_row = 0;
     float GPFAR *GPFAR * temp_array;
     float fdummy;
@@ -109,7 +110,7 @@ int *nr, *nc;
     if (fread(&fdummy, sizeof(fdummy), 1, fin) != 1)
 	return FALSE;
 
-    num_cols = (int) fdummy;
+    num_cols = (size_t) fdummy;
 
     /* 
        Choose a reasonable number of rows,
