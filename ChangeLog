@@ -1,3 +1,21 @@
+1999-03-12  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* makefile.286, makefile.amg, makefile.ami, makefile.cyg, makefile.dj2,
+	makefile.djg, makefile.emx, makefile.g, makefile.mgw, makefile.msc,
+	makefile.msw, makefile.mto, makefile.nt, makefile.os2, makefile.os9,
+	makefile.st, makefile.tc, makefile.vms, makefile.wc, makefile.win,
+	makefile.ztc: Add missing RCS Id's. Make file headers more uniform
+	for easier identification.
+
+	* plot.c(load_rcfile): Fix typo in free() statement.
+
+	* demo/surface1.dem: Increase zrange.
+
+	* term/be.trm: Some fixes by Xavier.
+
+	* term/x11(X11_init): Better coding style, suggested by A. Mai.
+	Use execvp() in CRIPPLED_SELECT version of X11_init.
+
 1999-03-11  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* 0INSTALL: Configure options updated.
@@ -131,10 +149,6 @@
 
 1999-03-02  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
-	* amiga.c, command.c, fit.c, gplt_x11.c, readline.c, set.c, term.c,
-	vms.c, term/linux.trm: Replace strcmp() and strncmp() with STREQ()
-	and STREQN() macros, respectively.
-
 	* help.c: Test for DOS16 instead of MSDOS.
 
 	* term/latex.trm: Indentation.
@@ -264,11 +278,6 @@
 
 1999-02-16  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
-	* command.c: Move STREQ and STREQN mcaros to plot.h.
-
-	* command.c, datafile.c, fit.c, gplt_x11.c, help.c, plot.c, plot2d.c,
-	plot3d.c, readline.c, stdfn.c, term.c: Replace strcmp() with STREQ().
-
 	* configure: Regenerated.
 
 	* configure.in: Warning message if terminal list could not be created.
@@ -278,7 +287,7 @@
 	M_PI/M_PI_2/DEG2RAD where appropriate.
 
 	* plot.h: Cleaning up. Remove "Pi" symbol, define M_PI and M_PI_2
-	instead. Add STREQ() and STREQN() macros from command.c.
+	instead.
 
 	* term/x11.trm: Merge X11_opts[] and X11_optarg[] into one array.
 	Indentation.
