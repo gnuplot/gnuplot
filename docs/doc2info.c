@@ -51,13 +51,15 @@
 /* be formatted correctly and tabs are forbidden */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+# include "config.h"
 #endif
 
 #include "ansichek.h"
 #include "stdfn.h"
 
-#define MAX_LINE_LEN    255
+#define MAX_LINE_LEN 1023
+
+#include "doc2x.h"
 #include "xref.h"
 
 struct BUFFER {			/* buffer to reformat paragraphs with xrefs */
@@ -87,18 +89,12 @@ char ifile[MAX_LINE_LEN+1];
 char ofile[MAX_LINE_LEN+1];
 struct XREFLIST *refhead = NULL;
 
-/* Replace the previous #ifdef */
-int single_top_level = 0;
-
-/* We are using the fgets() replacement from termdoc.c */
-extern char *get_line __PROTO((char *, int, FILE *));
-
-static void convert __PROTO((FILE * a, FILE * b));
-static void process_line __PROTO((char *line, FILE * b));
-static void node_head __PROTO((char *node, char *prev, char *next, char *up, FILE * b));
+static void convert __PROTO((FILE *, FILE *));
+static void process_line __PROTO((char *, FILE *));
+static void node_head __PROTO((char *, char *, char *, char *, FILE *));
 static void name_free __PROTO((char **));
 static char **name_alloc __PROTO(());
-static void clear_buffer __PROTO((struct BUFFER * buf_head, FILE * b));
+static void clear_buffer __PROTO((struct BUFFER *, FILE *));
 static int inxreflist __PROTO((struct LIST *));
 static void xref_free __PROTO((void));
 
@@ -129,14 +125,15 @@ char **argv;
 	if ((outfile = fopen(argv[2], "w")) == (FILE *) NULL) {
 	    fprintf(stderr, "%s: Can't open %s for writing\n",
 		    argv[0], argv[2]);
+	    exit(EXIT_FAILURE);
 	}
     } else
-	strcpy(ofile, "gnuplot.info");	/* default value */
+	strncpy(ofile, "gnuplot.info", sizeof(ofile));	/* default value */
 
-    strcpy(title, ofile);
+    strncpy(title, ofile, sizeof(title));
     strtok(title, ".");		/* without type */
     convert(infile, outfile);
-    exit (EXIT_SUCCESS);
+    exit(EXIT_SUCCESS);
 }
 
 
@@ -188,11 +185,11 @@ FILE *b;
     static struct BUFFER *buffer;	/* buffer to hold the lines of a paragraph */
     static struct BUFFER *buf_head = NULL;
     int inbuf = 0;		/* offset into buffer */
-    char line2[3 * MAX_LINE_LEN+1];	/* line of text with added xrefs */
+    char line2[3*MAX_LINE_LEN+1];	/* line of text with added xrefs */
     struct LIST *reflist;
     static struct XREFLIST *lastref = NULL;	/* xrefs that are already mentioned in this node */
 
-    line2[0] = '\0';
+    line2[0] = NUL;
     if (!prev)			/* last node visited */
 	prev = head;
     if (!lastref)
@@ -208,14 +205,14 @@ FILE *b;
     line_count++;
 
     if (line[0] == ' ')		/* scan line for xrefs  */
-	for (i = 0; line[i] != '\0'; ++i)
-	    if (line[i] == '`')	/* Reference or boldface (ignore the latter) */
+	for (i = 0; line[i] != NUL; ++i)
+	    if (line[i] == '`') {	/* Reference or boldface (ignore the latter) */
 		if (!inref && !inbold) {
 		    k = i + 1;	/* next character */
 		    j = 0;	/* index into topic */
-		    while (line[k] != '`' && line[k] != '\0')
+		    while (line[k] != '`' && line[k] != NUL)
 			topic[j++] = line[k++];
-		    topic[j] = '\0';
+		    topic[j] = NUL;
 
 		    /* try to find the xref */
 		    reflist = lookup(topic);
@@ -240,11 +237,11 @@ FILE *b;
 			    buffer->next = NULL;
 			}
 			/* eliminate leading spaces of topic */
-			for (j = 0; isspace(reflist->string[j]); ++j);
+			for (j = 0; isspace((int) reflist->string[j]); ++j);
 			/* encountered end of line */
-			if (line[k] == '\0') {
+			if (line[k] == NUL) {
 			    if (line[k - 1] == '\n')	/* throw away new-lines */
-				line[--k] = '\0';
+				line[--k] = NUL;
 			    /* insert xref into line */
 			    sprintf(line2, "%s%s (*note %s:: )", line2, line + inbuf, reflist->string + j);
 			    inref = TRUE;
@@ -252,12 +249,12 @@ FILE *b;
 			    break;
 			}
 			/* eliminate spaces before the second ` */
-			if (isspace(line[k - 1]))
-			    for (l = k - 1; line[l] != '\0'; ++l)
+			if (isspace((int) line[k - 1]))
+			    for (l = k - 1; line[l] != NUL; ++l)
 				line[l] = line[l + 1];
 
 			/* let `plot`s look nicer */
-			if (isalpha(line[k + 1]))
+			if (isalpha((int) line[k + 1]))
 			    ++k;
 			sprintf(line2, "%s%.*s (*note %s:: )", line2, k - inbuf + 1, line + inbuf, reflist->string + j);
 			/* line2 contains first inbuf characters of line */
@@ -265,11 +262,13 @@ FILE *b;
 		    } else {	/* found no reference */
 			inbold = TRUE;
 		    }
-		} else if (inref)	/* inref || inbold */
-		    inref = FALSE;
-		else
-		    inbold = FALSE;
-
+		} else {
+		    if (inref)	/* inref || inbold */
+			inref = FALSE;
+		    else
+			inbold = FALSE;
+		}
+	    }
     /* just copy normal characters of line with xref */
 	    else if (inbuf) {
 		strncat(line2, line + i, 1);
@@ -305,7 +304,7 @@ FILE *b;
 		buffer->next->prev = buffer;
 		buffer = buffer->next;
 		buffer->next = NULL;
-		if (line2[0] == '\0') {		/* line doesn't contain xref */
+		if (line2[0] == NUL) {	/* line doesn't contain xref */
 		    buffer->content = (char *) xmalloc(strlen(line) + 1);
 		    strcpy(buffer->content, line);
 		} else {	/* line contains xref */
@@ -317,7 +316,7 @@ FILE *b;
 	    break;
 	}
     default:
-	if (isdigit(line[0])) {	/* start of section */
+	if (isdigit((int) line[0])) {	/* start of section */
 	    /* clear xref-list */
 	    xref_free();
 	    lastref = 0;
@@ -367,13 +366,13 @@ char *node, *prev, *next, *up;
 FILE *b;
 {
     /* eliminate leading spaces */
-    while (node && isspace(*node))
+    while (node && isspace((int) *node))
 	node++;
-    while (next && isspace(*next))
+    while (next && isspace((int) *next))
 	next++;
-    while (prev && isspace(*prev))
+    while (prev && isspace((int) *prev))
 	prev++;
-    while (up && isspace(*up))
+    while (up && isspace((int) *up))
 	up++;
 
     if (!prev) {		/* Top node */
@@ -443,7 +442,7 @@ FILE *b;
 
 	/* eliminate new-lines */
 	if (run->next->content[todo - 1] == '\n')
-	    run->next->content[--todo] = '\0';
+	    run->next->content[--todo] = NUL;
 
 	while (todo)
 	    if (79 - in_line > todo) {	/* buffer fits into line */
@@ -455,7 +454,7 @@ FILE *b;
 
 		/* search for whitespace to split at */
 		for (i = 79 - in_line; i > 2; --i)
-		    if (isspace(run->next->content[in_buf + i])) {
+		    if (isspace((int) (run->next->content[in_buf + i]))) {
 			char *beginnote, *linestart;
 			c = run->next->content[in_buf + i - 1];
 			if (c == '.')	/* don't split at end of sentence */

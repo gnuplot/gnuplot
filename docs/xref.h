@@ -51,21 +51,21 @@ struct LIST {
     struct LIST *prev;
 };
 
-void parse __PROTO((FILE * a));
-struct LIST *lookup __PROTO((char *));
-struct LIST *lkup_by_number __PROTO((int line));
-void list_free __PROTO(());
-void refs __PROTO((int l, FILE * f, char *start, char *end, char *format));
-
-#ifndef MAX_LINE_LEN
-# define MAX_LINE_LEN 1023
+#ifdef DOCS_XREF_MAIN
+# define EXTERN /* nought */
+#else
+# define EXTERN extern
 #endif
 
-#ifdef TRUE
-# undef TRUE
-# undef FALSE
+EXTERN void parse __PROTO((FILE * a));
+EXTERN struct LIST *lookup __PROTO((char *));
+EXTERN struct LIST *lkup_by_number __PROTO((int line));
+EXTERN void list_free __PROTO(());
+EXTERN void refs __PROTO((int l, FILE * f, char *start, char *end, char *format));
+
+#ifdef PROTOTYPES
+void *xmalloc __PROTO((size_t size));
+#else
 #endif
-#define TRUE 1
-#define FALSE 0
 
 #endif /* DOCS_XREF_H */

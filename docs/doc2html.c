@@ -51,24 +51,23 @@
 /* be formatted correctly and tabs are forbidden */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+# include "config.h"
 #endif
 
 #include "ansichek.h"
 #include "stdfn.h"
+
+#define MAX_LINE_LEN 1023
+
+#include "doc2x.h"
 #include "xref.h"
 
-int debug = FALSE;
+static boolean debug = FALSE;
 char title[256];
 
 void convert __PROTO((FILE *, FILE *));
 void process_line __PROTO((char *, FILE *));
 
-/* Replace the previous #ifdef */
-int single_top_level = 0;
-
-/* We are using the fgets() replacement from termdoc.c */
-extern char *get_line __PROTO((char *, int, FILE *));
 /* From xref.c */
 extern struct LIST *lookup __PROTO((char *));
 
@@ -96,6 +95,7 @@ char **argv;
 	if ((outfile = fopen(argv[2], "w")) == (FILE *) NULL) {
 	    fprintf(stderr, "%s: Can't open %s for writing\n",
 		    argv[0], argv[2]);
+	    exit(EXIT_FAILURE);
 	}
 	strncpy(title, argv[2], sizeof(title));
     } else {
@@ -142,10 +142,8 @@ FILE *b;
     static char line2[MAX_LINE_LEN+1];
     static int last_line;
     char hyplink1[64];
-    char *pt, *tablerow;
     int i, j;
     static int startpage = 1;
-    char str[MAX_LINE_LEN+1];
     char topic[MAX_LINE_LEN+1];
     int k, l;
     struct LIST *klist;
@@ -182,11 +180,8 @@ FILE *b;
 	    if ((!inref) && (!inquote)) {
 		k = i + 1;	/* index into current string */
 		l = 0;		/* index into topic string */
-		while ((line[k] != '`') && (line[k] != '\0')) {
-		    topic[l] = line[k];
-		    k++;
-		    l++;
-		}
+		while ((line[k] != '`') && (line[k] != NUL))
+		    topic[l++] = line[k++];
 		topic[l] = NUL;
 		klist = lookup(topic);
 		if (klist && ((k = klist->line) != last_line)) {
@@ -228,7 +223,7 @@ FILE *b;
 	}
 	i++;
 	j++;
-	line2[j] = '\0';
+	line2[j] = NUL;
     }
 
     i = 1;
@@ -277,8 +272,7 @@ FILE *b;
 		para = 0;
 	    } else {
 		if (tabl) {
-		    fprintf(b, "</PRE>\n");	/* rjl */
-		    fprintf(b, "<P>");	/* rjl */
+		    fprintf(b, "</PRE>\n<P>");	/* rjl */
 		}
 		tabl = 0;
 		if (!para)
@@ -288,7 +282,7 @@ FILE *b;
 	    break;
 	}
     default:{
-	    if (isdigit(line[0])) {	/* start of section */
+	    if (isdigit((int)line[0])) {	/* start of section */
 		if (tabl)
 		    fprintf(b, "</PRE>\n");	/* rjl */
 		if (startpage) {	/* use the new level 0 */

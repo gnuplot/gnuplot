@@ -56,39 +56,22 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+# include "config.h"
 #endif
 
 #include "ansichek.h"
 #include "stdfn.h"
+#include "doc2x.h"
 
+void init __PROTO((FILE *));
+void convert __PROTO((FILE *, FILE *));
+void process_line __PROTO((char *, FILE *));
+void section __PROTO((char *, FILE *));
+void puttex __PROTO((char *, FILE *));
+void finish __PROTO((FILE *));
 
-#define MAX_NAME_LEN	256
-#define MAX_LINE_LEN	255
-#ifdef TRUE
-# undef TRUE
-# undef FALSE
-#endif
-#define TRUE 1
-#define FALSE 0
-
-void init __PROTO((FILE * b));
-void convert __PROTO((FILE * a, FILE * b));
-void process_line __PROTO((char *line, FILE * b));
-void section __PROTO((char *line, FILE * b));
-void puttex __PROTO((char *str, FILE * file));
-void finish __PROTO((FILE * b));
-
-/* Replace the previous #ifdef */
-int single_top_level = 0;
-
-/* We are using the fgets() replacement from termdoc.c */
-extern char *get_line __PROTO((char *, int, FILE *));
-
-typedef int boolean;
-
-boolean intable = FALSE;
-boolean verb = FALSE;
+static boolean intable = FALSE;
+static boolean verb = FALSE;
 
 int main(argc, argv)
 int argc;
@@ -115,6 +98,7 @@ char **argv;
 	if ((outfile = fopen(argv[2], "w")) == (FILE *) NULL) {
 	    fprintf(stderr, "%s: Can't open %s for writing\n",
 		    argv[0], argv[2]);
+	    exit(EXIT_FAILURE);
 	}
     }
     init(outfile);
@@ -136,9 +120,9 @@ FILE *a, *b;
 {
     static char line[MAX_LINE_LEN+1];
 
-    while (get_line(line, sizeof(line), a)) {
+    while (get_line(line, sizeof(line), a))
 	process_line(line, b);
-    }
+
 }
 
 void process_line(line, b)
@@ -211,7 +195,7 @@ FILE *b;
 	    break;
 	}
     default:{
-	    if (isdigit(line[0])) {	/* start of section */
+	    if (isdigit((int) line[0])) {	/* start of section */
 		if (!intable)	/* ignore while in table */
 		    section(line, b);
 	    } else
@@ -259,7 +243,7 @@ FILE *b;
 	(void) fprintf(b, "\\paragraph{");
 	break;
     }
-    if (islower(string[0]))
+    if (islower((int) string[0]))
 	string[0] = toupper(string[0]);
     puttex(string, b);
     (void) fprintf(b, "}\n");
@@ -274,7 +258,7 @@ register char *str;
     static boolean inquote = FALSE;
     int i;
 
-    while ((ch = *str++) != '\0') {
+    while ((ch = *str++) != NUL) {
 	switch (ch) {
 	case '#':
 	case '$':
@@ -330,9 +314,9 @@ register char *str;
 	    }
 	    break;
 	case '_':		/* emphasised text ? */
-	    for (i = 0; isalpha(*(str + i)); i++) {
-	    };
-	    if ((i > 0) && (*(str + i) == '_') && isspace(*(str + i + 1))) {
+	    for (i = 0; isalpha((int) (*(str + i))); i++);
+	    if ((i > 0) && (*(str + i) == '_') &&
+		           isspace((int) (*(str + i + 1)))) {
 		(void) fputs("{\\em ", file);
 		for (; *str != '_'; str++) {
 		    (void) fputc(*str, file);

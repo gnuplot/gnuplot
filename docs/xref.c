@@ -58,9 +58,11 @@
 # include "config.h"
 #endif
 
+#define DOCS_XREF_MAIN
+
 #include "ansichek.h"
 #include "stdfn.h"
-
+#include "doc2x.h"
 #include "xref.h"
 
 struct LIST *list = NULL;
@@ -71,9 +73,6 @@ struct LIST *keyhead = NULL;
 
 int maxlevel = 0;		/* how deep are the topics nested? */
 int listitems = 0;		/* number of topics */
-
-/* We are using the fgets() replacement from termdoc.c */
-extern char *get_line __PROTO((char *, int, FILE *));
 
 /* for debugging (invoke from gdb !) */
 void dump_list()
@@ -130,7 +129,7 @@ FILE *a;
 
     while (get_line(line, sizeof(line), a)) {
 	lineno++;
-	if (isdigit(line[0])) {	/* start of new section */
+	if (isdigit((int)line[0])) {	/* start of new section */
 	    listitems++;
 
 	    if (list == NULL) {	/* impossible with the new level 0 item */
@@ -206,7 +205,7 @@ char *s;
     list = head;
     while (list != NULL) {
 	c = list->string;
-	while (isspace(*c))
+	while (isspace((int)(*c)))
 	    c++;
 	if (!strcmp(match, c)) {
 	    l = list->level;
@@ -224,7 +223,7 @@ char *s;
     keylist = keyhead;
     while (keylist != NULL) {
 	c = keylist->string;
-	while (isspace(*c))
+	while (isspace((int)(*c)))
 	    c++;
 	if (!strcmp(s, c))
 	    return (keylist);
@@ -310,14 +309,16 @@ char *start, *end, *format;
 	/* these are the next topics down the list */
 	if (list->level == curlevel + 1) {
 	    c = list->string;
-	    while (isspace(*c))
+	    while (isspace((int)(*c)))
 		c++;		/* strip leading whitespace */
 
 	    if (format != NULL) {
 		for (i = 0; format[i] != '%' && format[i] != '\0'; i++);
-		if (format[i] != '\0')
-		    if (format[i + 1] == 'd')	/* line number has to be printed first */
+		if (format[i] != '\0') {
+		    if (format[i + 1] == 'd') {
+			/* line number has to be printed first */
 			fprintf(f, format, list->line, c);
+		    }
 		    else {
 			++i;
 			for (; format[i] != '%' && format[i] != '\0'; i++);
@@ -326,6 +327,7 @@ char *start, *end, *format;
 			else	/* no line number at all */
 			    fprintf(f, format, c);
 		    }
+		}
 	    }
 	}
 	list = list->next;

@@ -62,39 +62,23 @@ static char *RCSid = "$Id: doc2rno.c,v 0.01 1997/03/09 21:00:00 lph Exp $";
  */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+# include "config.h"
 #endif
 
 #include "ansichek.h"
 #include "stdfn.h"
+#include "doc2x.h"
 
-#define MAX_NAME_LEN	256
-#define MAX_LINE_LEN	255
 #define LINE_SKIP		3
 #define DSR_RM		70
 
-#ifdef TRUE
-# undef TRUE
-# undef FALSE
-#endif
-#define TRUE 1
-#define FALSE 0
-
-void init __PROTO((FILE * b));
-void convert __PROTO((FILE * a, FILE * b));
-void process_line __PROTO((char *line, FILE * b));
-void section __PROTO((char *line, FILE * b));
-void putrnh __PROTO((char *s, FILE * file));
-void putrnh_ __PROTO((char *s, FILE * file));
-void finish __PROTO((FILE * b));
-
-/* Replace the previous #ifdef */
-int single_top_level = 1;
-
-/* We are using the fgets() replacement from termdoc.c */
-extern char *get_line __PROTO((char *, int, FILE *));
-
-typedef int boolean;
+void init __PROTO((FILE *));
+void convert __PROTO((FILE *, FILE *));
+void process_line __PROTO((char *, FILE *));
+void section __PROTO((char *, FILE *));
+void putrnh __PROTO((char *, FILE *));
+void putrnh_ __PROTO((char *, FILE *));
+void finish __PROTO((FILE *));
 
 static boolean intable = FALSE;
 static boolean rnh_table = FALSE;
@@ -124,6 +108,7 @@ char **argv;
 	if ((outfile = fopen(argv[2], "w")) == (FILE *) NULL) {
 	    fprintf(stderr, "%s: Can't open %s for writing\n",
 		    argv[0], argv[2]);
+	    exit(EXIT_FAILURE);
 	}
     }
     init(outfile);
@@ -137,11 +122,11 @@ void init(b)
 FILE *b;
 {
     /*     */
-    (void) fputs(".no paging\n", b);
-    (void) fputs(".no flags all\n", b);
-    (void) fputs(".left margin 1\n", b);
-    (void) fputs(".right margin 70\n", b);
-    (void) fputs(".no justify\n", b);
+    (void) fputs(".no paging\n\
+.no flags all\n\
+.left margin 1\n\
+.right margin 70\n\
+.no justify\n", b);
 }
 
 
@@ -186,11 +171,12 @@ FILE *b;
     case '%':{			/* troff table entry */
 	    break;		/* ignore */
 	}
+#if 0
 /* 'C' is taken care of by termdoc.c */
-/*         case 'C': {                  /*  new Comment designator */
-/*                break;                        /* ignore */
-/*         }
- */
+         case 'C': {                  /*  new Comment designator */
+                break;                        /* ignore */
+         }
+#endif
     case '\n':			/* empty text line */
     case ' ':{			/* normal text line */
 
@@ -257,7 +243,7 @@ FILE *b;
 	    break;
 	}
     default:{
-	    if (isdigit(line[0])) {	/* start of section */
+	    if (isdigit((int)line[0])) {	/* start of section */
 
 /* some HELP text is surrounded by table flags */
 /* doc2rnh will ignore the flags */
@@ -286,7 +272,6 @@ void section(line, b)
 char *line;
 FILE *b;
 {
-    static char string[MAX_LINE_LEN+1];
     int sh_i;
     static int old = 1;
 /*  

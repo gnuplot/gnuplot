@@ -54,34 +54,24 @@ static char *RCSid = "$Id: doc2hlp.c,v 1.15 1998/04/14 00:16:58 drd Exp $";
 
 #include "ansichek.h"
 #include "stdfn.h"
+#include "doc2x.h"
 
-#define MAX_LINE_LEN	255
-#ifdef TRUE
-# undef TRUE
-# undef FALSE
-#endif
-#define TRUE 1
-#define FALSE 0
+extern boolean single_top_level;
 
-/* Replace the previous #ifdef */
-int single_top_level = 1;
-
-void convert __PROTO((FILE * a, FILE * b));
-void process_line __PROTO((char *line, FILE * b));
-
-/* We are using the fgets() replacement from termdoc.c */
-extern char *get_line __PROTO((char *, int, FILE *));
+void convert __PROTO((FILE *, FILE *));
+void process_line __PROTO((char *, FILE *));
 
 int main(argc, argv)
 int argc;
 char **argv;
 {
-    char line[MAX_LINE_LEN+1];
     FILE *infile;
     FILE *outfile;
 
     infile = stdin;
     outfile = stdout;
+
+    single_top_level = TRUE;
 
     if (argc > 3) {
 	fprintf(stderr, "Usage: %s [infile [outfile]]\n", argv[0]);
@@ -98,12 +88,23 @@ char **argv;
 	if ((outfile = fopen(argv[2], "w")) == (FILE *) NULL) {
 	    fprintf(stderr, "%s: Can't open %s for writing\n",
 		    argv[0], argv[2]);
+	    exit(EXIT_FAILURE);
 	}
     }
-    while (get_line(line, sizeof(line), infile))
-	process_line(line, outfile);
+
+    convert(infile, outfile);
 
     exit(EXIT_SUCCESS);
+}
+
+
+void convert (inf, outf)
+FILE *inf, *outf;
+{
+    static char line[MAX_LINE_LEN+1];
+
+    while (get_line(line, sizeof(line), inf))
+        process_line(line, outf);
 }
 
 
@@ -137,7 +138,7 @@ FILE *b;
 	    break;
 	}
     default:{
-	    if (isdigit(line[0])) {	/* start of section */
+	    if (isdigit((int)line[0])) { /* start of section */
 		(void) fputs(line, b);
 	    } else
 		fprintf(stderr, "unknown control code '%c' in column 1, line %d\n",

@@ -56,27 +56,10 @@
 
 #include "ansichek.h"
 #include "stdfn.h"
+#include "doc2x.h"
 
-#define MAX_LINE_LEN	255
-#ifdef TRUE
-# undef TRUE
-# undef FALSE
-#endif
-#define TRUE 1
-#define FALSE 0
-
-/* Replace the previous #ifdef */
-int single_top_level = 0;
-
-/* In termdoc.c */
-extern int termdoc_lineno;
-extern char termdoc_filename[];
-
-/* We are using the fgets() replacement from termdoc.c */
-extern char *get_line __PROTO((char *, int, FILE *));
-
-void convert __PROTO((FILE * a, FILE * b));
-void process_line __PROTO((char *line, FILE * b));
+void convert __PROTO((FILE *, FILE *));
+void process_line __PROTO((char *, FILE *));
 
 int main(argc, argv)
 int argc;
@@ -173,7 +156,7 @@ FILE *b;
 	    break;
 	}
     default:{
-	    if (isdigit(line[0])) {	/* start of section */
+	    if (isdigit((int)line[0])) {	/* start of section */
 		/* ignore */
 	    } else
 		/* output bad line */

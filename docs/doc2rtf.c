@@ -56,15 +56,11 @@
 
 #include "ansichek.h"
 #include "stdfn.h"
+#define MAX_LINE_LEN 1023
+#include "doc2x.h"
 #include "xref.h"
 
-/* Replace the previous #ifdef */
-int single_top_level = 0;
-
-/* We are using the fgets() replacement from termdoc.c */
-extern char *get_line __PROTO((char *, int, FILE *));
-
-int debug = FALSE;
+static boolean debug = FALSE;
 
 void footnote __PROTO((int, char *, FILE *));
 void convert __PROTO((FILE *, FILE *));
@@ -84,7 +80,7 @@ char **argv;
 	exit(EXIT_FAILURE);
     }
     if ((infile = fopen(argv[1], "r")) == (FILE *) NULL) {
-	fprintf(stderr, "%s: Can't open %ODs for reading\n",
+	fprintf(stderr, "%s: Can't open %s for reading\n",
 		argv[0], argv[1]);
 	exit(EXIT_FAILURE);
     }
@@ -110,7 +106,7 @@ FILE *b;
 void convert(a, b)
 FILE *a, *b;
 {
-    static char line[MAX_LINE_LEN + 1];
+    static char line[MAX_LINE_LEN+1];
 
     /* generate rtf header */
     fprintf(b, "{\\rtf1\\ansi ");	/* vers 1 rtf, ansi char set */
@@ -153,7 +149,7 @@ FILE *b;
 
     i = 0;
     j = 0;
-    while (line[i] != '\0') {
+    while (line[i] != NUL) {
 	switch (line[i]) {
 	case '\\':
 	case '{':
@@ -171,12 +167,9 @@ FILE *b;
 	    else if ((!inref) && (!inquote)) {
 		k = i + 1;	/* index into current string */
 		l = 0;		/* index into topic string */
-		while ((line[k] != '`') && (line[k] != '\0')) {
-		    topic[l] = line[k];
-		    k++;
-		    l++;
-		}
-		topic[l] = '\0';
+		while ((line[k] != '`') && (line[k] != NUL))
+		    topic[l++] = line[k++];
+		topic[l] = NUL;
 		klist = lookup(topic);
 		if (klist && (k = klist->line) > 0 && (k != last_line)) {
 		    line2[j++] = '{';
@@ -215,10 +208,8 @@ FILE *b;
 		    line2[j++] = 'o';
 		    line2[j++] = 'c';
 		    k = 0;
-		    while (topic[k] != '\0') {
-			line2[j++] = topic[k];
-			k++;
-		    }
+		    while (topic[k] != NUL)
+			line2[j++] = topic[k++];
 		    line2[j] = '}';
 		    inref = 0;
 		}
@@ -229,14 +220,14 @@ FILE *b;
 	}
 	i++;
 	j++;
-	line2[j] = '\0';
+	line2[j] = NUL;
     }
 
     i = 1;
 
     switch (line[0]) {		/* control character */
     case '?':{			/* interactive help entry */
-	    if ((line2[1] != '\0') && (line2[1] != ' '))
+	    if ((line2[1] != NUL) && (line2[1] != ' '))
 		footnote('K', &(line2[1]), b);
 	    break;
 	}
@@ -259,7 +250,7 @@ FILE *b;
 	tabl = 0;
 	break;
     case ' ':{			/* normal text line */
-	    if ((line2[1] == '\0') || (line2[1] == '\n')) {
+	    if ((line2[1] == NUL) || (line2[1] == '\n')) {
 		fprintf(b, "\\par\n");
 		llpara = para;
 		para = 0;
@@ -289,7 +280,7 @@ FILE *b;
 	    break;
 	}
     default:{
-	    if (isdigit(line[0])) {	/* start of section */
+	    if (isdigit((int)line[0])) {	/* start of section */
 		if (startpage) {	/* use new level 0 item */
 		    refs(0, b, "\\par", NULL, "\\par{\\uldb %s}{\\v loc%d}\n");
 		    fprintf(b, "}{\\plain \\page}\n");

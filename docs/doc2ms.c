@@ -59,38 +59,22 @@ static char *RCSid = "$Id: doc2ms.c,v 1.19 1998/06/18 14:59:11 ddenholm Exp $";
  */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+# include "config.h"
 #endif
 
 #include "ansichek.h"
 #include "stdfn.h"
+#include "doc2x.h"
 
-#define MAX_NAME_LEN	256
-#define MAX_LINE_LEN	255
 #define LINE_SKIP		3
 
-#ifdef TRUE
-# undef TRUE
-# undef FALSE
-#endif
-#define TRUE 1
-#define FALSE 0
-
-void init __PROTO((FILE * b));
-void convert __PROTO((FILE * a, FILE * b));
-void process_line __PROTO((char *line, FILE * b));
-void section __PROTO((char *line, FILE * b));
-void putms __PROTO((char *s, FILE * file));
-void putms_verb __PROTO((char *s, FILE * file));
-void finish __PROTO((FILE * b));
-
-/* Replace the previous #ifdef */
-int single_top_level = 0;
-
-/* We are using the fgets() replacement from termdoc.c */
-extern char *get_line __PROTO((char *, int, FILE *));
-
-typedef int boolean;
+void init __PROTO((FILE *));
+void convert __PROTO((FILE *, FILE *));
+void process_line __PROTO((char *, FILE *));
+void section __PROTO((char *, FILE *));
+void putms __PROTO((char *, FILE *));
+void putms_verb __PROTO((char *, FILE *));
+void finish __PROTO((FILE *));
 
 static boolean intable = FALSE;
 
@@ -117,6 +101,7 @@ char **argv;
 	if ((outfile = fopen(argv[2], "w")) == (FILE *) NULL) {
 	    fprintf(stderr, "%s: Can't open %s for writing\n",
 		    argv[0], argv[2]);
+	    exit(EXIT_FAILURE);
 	}
     }
     init(outfile);
@@ -130,13 +115,14 @@ void init(b)
 FILE *b;
 {
     /* in nroff, increase line length by 8 and don't adjust lines */
-    (void) fputs(".if n \\{.nr LL +8m\n.na \\}\n", b);
-    (void) fputs(".nr PO +0.3i\n", b);
-    (void) fputs(".so titlepag.ms\n", b);
-    (void) fputs(".pn 1\n", b);
-    (void) fputs(".bp\n", b);
-    (void) fputs(".ta 1.5i 3.0i 4.5i 6.0i 7.5i\n", b);
-    (void) fputs("\\&\n.sp 3\n.PP\n", b);
+    (void) fputs(".if n \\{.nr LL +8m\n.na \\}\n\
+.nr PO +0.3i\n\
+.so titlepag.ms\n\
+.pn 1\n\
+.bp\n\
+.ta 1.5i 3.0i 4.5i 6.0i 7.5i\n\
+\\&\n.sp 3\n.PP\n", b);
+
     /* following line commented out by rjl
        (void) fputs(".so intro\n",b);
      */
@@ -224,7 +210,7 @@ FILE *b;
 	    break;
 	}
     default:{
-	    if (isdigit(line[0])) {	/* start of section */
+	    if (isdigit((int)line[0])) {	/* start of section */
 		if (!intable)	/* ignore while in table */
 		    section(line, b);
 	    } else
@@ -264,7 +250,7 @@ FILE *b;
 	while (--old > sh_i);
     }
     /* added by dfk to capitalize section headers */
-    if (islower(string[0]))
+    if (islower((int)string[0]))
 	string[0] = toupper(string[0]);
 
     /* next 3 lines added by rjl */

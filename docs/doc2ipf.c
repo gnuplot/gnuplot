@@ -48,31 +48,24 @@ static char *RCSid = "$Id: doc2ipf.c,v 1.20 1998/04/14 00:16:59 drd Exp $";
 /* be formatted correctly and tabs are forbidden */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+# include "config.h"
 #endif
 
 #include "ansichek.h"
 #include "stdfn.h"
+
+#define MAX_LINE_LEN 1023
+
+#include "doc2x.h"
 #include "xref.h"
 
 #define MAX_COL 6
-#ifdef TRUE
-# undef TRUE
-# undef FALSE
-#endif
-#define TRUE 1
-#define FALSE 0
 
-/* Replace the previous #ifdef */
-int single_top_level = 0;
-
-/* We are using the fgets() replacement from termdoc.c */
-extern char *get_line __PROTO((char *, int, FILE *));
 /* From xref.c */
 extern void *xmalloc __PROTO((size_t));
 
-void convert __PROTO((FILE * a, FILE * b));
-void process_line __PROTO((char *line, FILE * b));
+void convert __PROTO((FILE *, FILE *));
+void process_line __PROTO((char *, FILE *));
 
 /* malloc's are not being checked ! */
 
@@ -87,7 +80,7 @@ int tablecols = 0;
 int tablewidth[MAX_COL] = {0, 0, 0, 0, 0, 0};	/* there must be the correct */
 int tablelines = 0;		/* number of zeroes here */
 
-int debug = FALSE;
+static boolean debug = FALSE;
 
 
 int main(argc, argv)
@@ -274,7 +267,7 @@ FILE *b;
 	    }
 	i++;
 	j++;
-	if ((j >= MAX_LINE_LEN+1)) {
+	if ((j >= sizeof(line2))) {
 	    fprintf(stderr, "MAX_LINE_LEN exceeded\n");
 	    if (inref || inquote)
 		fprintf(stderr, "Possible missing link character (`) near above line number\n");
@@ -382,8 +375,8 @@ FILE *b;
 			    tablecols = j;
 		    }
 		}
-		for (j; j < MAX_COL; j++)
-		    tableins->col[j][0] = NUL;
+		while (j < MAX_COL)
+		    tableins->col[j++][0] = NUL;
 	    }
 	    break;		/* ignore */
 	}
@@ -433,7 +426,7 @@ FILE *b;
     case '^':
 	break;			/* ignore */
     default:{
-	    if (isdigit(line[0])) {	/* start of section */
+	    if (isdigit((int)line[0])) {	/* start of section */
 		if (intable) {
 		    intablebut = TRUE;
 		    if (bt == NULL) {
