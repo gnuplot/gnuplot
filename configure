@@ -563,7 +563,7 @@ fi
 
 
 
-# From configure.in Revision: 1.41.2.12 
+# From configure.in Revision: 1.41.2.13 
 VERSION=`sed -n 's/.*version.*"\(.*\)".*/\1/p' $srcdir/version.c|tr -d ' '`
 PL=`sed -n 's/.*patchlevel.*"\(.*\)".*/\1/p' $srcdir/version.c|tr -d ' '`
 ac_aux_dir=
@@ -4101,7 +4101,7 @@ for ac_dir in $gp_l_list '' /usr/local/lib ; do
   test x${ac_dir} != x && TERMLIBS="-L${ac_dir} $gp_save_TERMLIBS"
   ac_lib_var=`echo gd'_'gdImageCreate | sed 'y%./+-%__p_%'`
 ac_save_LIBS="$LIBS"
-LIBS="$TERMLIBS $TERMXLIBS -lgd  $LIBS"
+LIBS="$TERMLIBS $TERMXLIBS -lgd13  $LIBS"
 cat > conftest.$ac_ext <<EOF
 #line 4107 "configure"
 #include "confdefs.h"
@@ -4136,7 +4136,7 @@ fi
 done
 
 if eval "test \"`echo '$ac_cv_lib_'$ac_lib_var`\" = yes"; then
-  TERMLIBS="$TERMLIBS -lgd"
+  TERMLIBS="$TERMLIBS -lgd13"
   echo "$ac_t""yes" 1>&6
 else
   echo "$ac_t""no" 1>&6
@@ -4161,7 +4161,7 @@ for ac_dir in $gp_h_list '' /usr/local/include ; do
   cat > conftest.$ac_ext <<EOF
 #line 4163 "configure"
 #include "confdefs.h"
-#include <gd.h>
+#include <gd13.h>
 EOF
 ac_try="$ac_cpp conftest.$ac_ext >/dev/null 2>conftest.out"
 { (eval echo configure:4168: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
@@ -4205,11 +4205,11 @@ fi
 fi
 
 if test "$with_png" != no; then
-  ac_lib_var=`echo png'_'png_info_init | sed 'y%./+-%__p_%'`
+  ac_lib_var=`echo png'_'png_init_io | sed 'y%./+-%__p_%'`
   gp_tr_lib=HAVE_LIB`echo png | sed -e 's/[^a-zA-Z0-9_]/_/g' \
     -e 'y/abcdefghijklmnopqrstuvwxyz/ABCDEFGHIJKLMNOPQRSTUVWXYZ/'`
-echo $ac_n "checking for png_info_init in -lpng""... $ac_c" 1>&6
-echo "configure:4213: checking for png_info_init in -lpng" >&5
+echo $ac_n "checking for png_init_io in -lpng""... $ac_c" 1>&6
+echo "configure:4213: checking for png_init_io in -lpng" >&5
 gp_save_TERMLIBS="$TERMLIBS"
 if test "$with_png" != yes && test "$with_png" != no; then
   gp_l_path=`echo "$with_png" | sed -e 's%/libpng\.a$%%'`
@@ -4220,7 +4220,7 @@ else
 fi
 for ac_dir in $gp_l_list '' /usr/local/lib ; do
   test x${ac_dir} != x && TERMLIBS="-L${ac_dir} $gp_save_TERMLIBS"
-  ac_lib_var=`echo png'_'png_info_init | sed 'y%./+-%__p_%'`
+  ac_lib_var=`echo png'_'png_init_io | sed 'y%./+-%__p_%'`
 ac_save_LIBS="$LIBS"
 LIBS="$TERMLIBS $TERMXLIBS -lpng -lz $LIBS"
 cat > conftest.$ac_ext <<EOF
@@ -4229,10 +4229,10 @@ cat > conftest.$ac_ext <<EOF
 /* Override any gcc2 internal prototype to avoid an error.  */
 /* We use char because int might match the return type of a gcc2
     builtin and then its argument prototype would still apply.  */
-char png_info_init();
+char png_init_io();
 
 int main() {
-png_info_init()
+png_init_io()
 ; return 0; }
 EOF
 if { (eval echo configure:4239: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
@@ -4264,7 +4264,7 @@ else
   TERMLIBS="$gp_save_TERMLIBS"
 fi
 
-  if test "$ac_cv_lib_png_png_info_init" = yes; then
+  if test "$ac_cv_lib_png_png_init_io" = yes; then
     TERMLIBS="$TERMLIBS -lz"
     ac_safe=`echo "png.h" | sed 'y%./+-%__p_%'`
   ac_tr_hdr=HAVE_`echo png.h | sed 'y%abcdefghijklmnopqrstuvwxyz./-%ABCDEFGHIJKLMNOPQRSTUVWXYZ___%'`
