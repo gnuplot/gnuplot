@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.34 1999/08/11 18:14:00 lhecking Exp $
+C RCS $Id: gnuplot.doc,v 1.35 1999/09/14 15:25:52 lhecking Exp $
 C 3 December 1998
 C Copyright (C) 1986 - 1993, 1998   Thomas Williams, Colin Kelley
 C
@@ -3575,13 +3575,17 @@ C ... and restart the table:
  well as `contour`.
 
  Syntax:
-       set cntrparam {  {linear | cubicspline | bspline}
-                       { points <n>} { order <n> }
-                       { levels   auto {<n>} | <n>
-                                | discrete <z1> {,<z2>{,<z3>...}}
-                                | incremental <start>, <incr> {,<end>}
-                        }
-                      }
+       set cntrparam { { linear 
+                       | cubicspline 
+                       | bspline
+                       | points <n> 
+                       | order <n> 
+                       | levels { auto {<n>} | <n>
+                                  | discrete <z1> {,<z2>{,<z3>...}}
+                                  | incremental <start>, <incr> {,<end>}
+                                }
+                       }
+                     }
        show contour
 
  This command has two functions.  First, it sets the values of z for which
