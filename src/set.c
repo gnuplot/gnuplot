@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.141 2004/08/09 00:51:29 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.142 2004/08/10 03:55:35 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -4188,7 +4188,7 @@ parse_colorspec(struct t_colorspec *tc, int options)
     	    int_error(c_token, "expected linetype");
 	tc->type = TC_LT;
     	tc->lt = (int)real(const_express(&a))-1;
-	if (tc->lt <= LT_NODRAW) {
+	if (tc->lt < LT_NODRAW) {
 	    tc->type = TC_DEFAULT;
 	    int_warn(c_token,"illegal linetype");
 	}
