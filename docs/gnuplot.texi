@@ -607,7 +607,7 @@ The Atari version of readline defines some additional key aliases:
       Ctrl Home       - same as ^E.
       Esc             - same as ^U.
       Help            - @ref{help} plus return.
-      Ctrl Help       - @ref{help}.
+      Ctrl Help       - `help `.
 
 @end example
 
@@ -3895,10 +3895,12 @@ The @ref{with} keyword provides the means of selection.
 Syntax:
 @example
       with <style> @{ @{linestyle | ls <line_style>@}
-                     | @{@{linetype | lt <line_type>@}
+                     | @{@{linetype  | lt <line_type>@}
                         @{linewidth | lw <line_width>@}
                         @{pointtype | pt <point_type>@}
-                        @{pointsize | ps <point_size>@}@} @}
+                        @{pointsize | ps <point_size>@}
+                        @{palette@}@}
+                   @}
 
 @end example
 
@@ -3938,10 +3940,16 @@ If you have defined specific line type/width and point type/size combinations
 with `set style line`, one of these may be selected by setting <line_style> to
 the index of the desired style.
 
+If gnuplot was built with @ref{pm3d} support, the special keyword 'palette' is
+allowed for smooth color change of lines, points and dots in splots. The
+color is choosen from a smooth palette which was set previously with the 
+command @ref{palette}. The color value corresponds to the z-value of the
+point coordinates. The 2d @ref{plot} command ignores this option.
+
 The keywords may be abbreviated as indicated.
 
-Note that the `linewidth` and @ref{pointsize} options are not supported by all
-terminals.
+Note that the `linewidth`, @ref{pointsize} and palette options are not supported
+by all terminals.
 
 Examples:
 
@@ -4005,6 +4013,12 @@ This plots file "data" with points of type 3 and twice usual size:
 This plots two data sets with lines differing only by weight:
 @example
       plot 'd1' t "good" w l lt 2 lw 3, 'd2' t "bad" w l lt 2 lw 1
+
+@end example
+
+This plots a surface with color lines:
+@example
+      splot x*x-y*y with line palette
 
 @end example
 
@@ -4176,7 +4190,7 @@ the `set` command to see the default values that the various options take.
 
 
 The @ref{save} command saves user-defined functions, variables, the `set
-term` status, all `set` options, or all of these, plus the last @ref{plot}
+term` status, all `set` options, or all of these, plus the last `plot `
 (`splot`) command to the specified file.
 
 Syntax:
@@ -4550,9 +4564,11 @@ To show all arrows (in tag order), use:
 
 @c ?commands set autoscale
 @c ?commands set noautoscale
+@c ?commands unset autoscale
 @c ?commands show autoscale
 @c ?set autoscale
 @c ?set noautoscale
+@c ?unset autoscale
 @c ?show autoscale
 @cindex autoscale
 @opindex autoscale
@@ -4565,8 +4581,8 @@ axes. The default is to autoscale all axes.
 
 Syntax:
 @example
-      set autoscale @{<axes>@{|min|max|fixmin|fixmax@}@}
-      set noautoscale @{<axes>@{|min|max|fixmin|fixmax@}@}
+      set autoscale @{<axes>@{|min|max|fixmin|fixmax|fix@} | fix | keepfix@}
+      unset autoscale @{<axes>@}
       show autoscale
 
 @end example
@@ -4576,9 +4592,11 @@ where <axes> is either `x`, `y`, `z`, `x2`, `y2` or `xy`.  A keyword with
 autoscale just the minimum or maximum of that axis.  If no keyword is given,
 all axes are autoscaled. 
 
-A keyword with `fixmin` or `fixmax` appended tells gnuplot to disable
-extension the axis range to the next tic mark position, for autoscaled axes
-using equidistant tics.
+A keyword with `fixmin`, `fixmax` or `fix` appended tells gnuplot to disable
+extension of the axis range to the next tic mark position, for autoscaled
+axes using equidistant tics; `set autoscale fix` sets this for all axes.
+Command `set autoscale keepfix` autoscales all axes while keeping the fix
+settings.
 
 When autoscaling, the axis range is automatically computed and the dependent
 axis (y for a @ref{plot} and z for `splot`) is scaled to include the range of the
@@ -5684,6 +5702,7 @@ Syntax:
                @{@{no@}@{m@}x2tics@} @{@{no@}@{m@}y2tics@}
                @{@{no@}@{m@}cbtics@}
                @{polar @{<angle>@}@}
+               @{layerdefault | front | back@}
                @{ @{linestyle <major_linestyle>@}
                  | @{linetype | lt <major_linetype>@}
                    @{linewidth | lw <major_linewidth>@}
@@ -5702,7 +5721,7 @@ far as the active terminal driver supports this.
 
 Additionally, a polar grid can be selected for 2-d plots---circles are drawn
 to intersect the selected tics, and radial lines are drawn at definable
-intervals.  (The interval is given in degrees or radians ,depending on the
+intervals.  (The interval is given in degrees or radians, depending on the
 @ref{angles} setting.)  Note that a polar grid is no longer automatically
 generated in polar mode.
 
@@ -5713,7 +5732,12 @@ they will appear if the tics are subsequently enabled.
 If no linetype is specified for the minor gridlines, the same linetype as the
 major gridlines is used.  The default polar angle is 30 degrees.
 
-Z grid lines are drawn on the back of the plot.  This looks better if a
+If `front` is given, the grid is drawn on top of the graphed data. If
+`back` is given, the grid is drawn underneath the graphed data. Using 
+`front` will prevent the grid from being obscured by dense data. The default
+setup, `layerdefault`, is 'back' for 2d plots and 'front' for 3d plots.
+
+Z grid lines are drawn on the bottom of the plot.  This looks better if a
 partial box is drawn around the plot---see @ref{border}.
 
 @node hidden3d, historysize, grid, set-show
@@ -6076,7 +6100,7 @@ Syntax:
                 @{at <position>@}
                 @{<justification>@} @{@{no@}rotate@} @{font "<name>@{,<size>@}"@}
                 @{front | back@}
-                @{pointstyle <style> @{offset x, y@}| nopointstyle@}
+                @{<pointstyle> @{offset x, y@}| nopoint@}
       set nolabel @{<tag>@}
       show label
 
@@ -6117,15 +6141,16 @@ If `front` is given, the label is written on top of the graphed data. If
 `back` is given (the default), the label is written underneath the graphed
 data.  Using `front` will prevent a label from being obscured by dense data.
 
-If `pointstyle` is given, a point with the given style is plotted at
-the label position and the text of the label is displaced slightly.
+If a style is given, using keywords `lw`, `pt` and `ps`, see @ref{style}, a point
+with the given style and colour of the given line type is plotted at the
+label position and the text of the label is displaced slightly.
 The displacement defaults to 1, 1 in @ref{pointsize} units and can be
 controlled by the optional `offset x, y`. Example: `offset 2, -3` would
 displace the labels 2 * pointsize horizontally and -3 * pointsize vertically
 from the actual coordinate point as given by `position`.  The size of the
 point depends also on the setting of @ref{pointsize}.
 This option is used by default for placing labels in mouse enhanced
-terminals.  Use `nopointstyle` to turn off the drawing of a point near
+terminals.  Use `nopoint` to turn off the drawing of a point near
 the label (this is the default).
 
 If one (or more) axis is timeseries, the appropriate coordinate should be
@@ -6196,6 +6221,9 @@ fitted function, do this after the 'fit', but before the 'plot':
 
 @end example
 
+To set a label displaced a little bit from a small point:
+	set label 'origin' at 0,0 lt 1 pt 2 ps 3 offset 1,-1
+
 
 @node linestyle, lmargin, label, set-show
 @subsection linestyle
@@ -6217,10 +6245,10 @@ an index instead of repeating all the information at each invocation.
 
 Syntax:
 @example
-      set style line <index> @{linetype | lt <line_type>@}
-                            @{linewidth | lw <line_width>@}
-                            @{pointtype | pt <point_type>@}
-                            @{pointsize | ps <point_size>@}
+      set style line <index> @{linetype  | lt <line_type>@}
+                             @{linewidth | lw <line_width>@}
+                             @{pointtype | pt <point_type>@}
+                             @{pointsize | ps <point_size>@}
                              @{palette@}
       set nolinestyle
       show style line
@@ -6250,7 +6278,7 @@ If gnuplot was built with pm3d support, the special keyword @ref{palette} is
 allowed as `linetype` for splots (the 2d @ref{plot} command ignores @ref{palette}).
 In this case the line color is choosen from a smooth palette which was
 set previously with the command @ref{palette}.  The color value corresponds
-to the z-Value (elevation) of the splot.
+to the z-value (elevation) of the splot.
 
 Example:
 Suppose that the default lines for indices 1, 2, and 3 are red, green, and
@@ -6284,12 +6312,12 @@ will create a plot of p(x) using the default triangles connected by a red
 line and q(x) using small triangles connected by a green line.
 
 @example
-      splot sin(sqrt(x*x+y*y))/sqrt(x*x+y*y) w l lt pal
+      splot sin(sqrt(x*x+y*y))/sqrt(x*x+y*y) w l pal
 
 @end example
 
-creates a surface plot using smooth colors according @ref{palette}. Note, that
-this works only on few terminals.
+creates a surface plot using smooth colors according to @ref{palette}. Note,
+that this works only on some terminals.
 
 See also @ref{palette}, @ref{pm3d}.
 
@@ -7727,6 +7755,7 @@ For more information about error bars with and without lines, please see
 * fsteps::                      
 * histeps::                     
 * impulses::                    
+* lines::                       
 * linespoints::                 
 * points::                      
 * steps::                       
@@ -7921,9 +7950,10 @@ prices.  The symbol is an open rectangle, centered horizontally at the x
 coordinate and limited vertically by the opening and closing prices.  A
 vertical line segment at the x coordinate extends up from the top of the
 rectangle to the high price and another down to the low.  The width of the
-rectangle may be changed by @ref{bars}.  The symbol will be unchanged if the
-low and high prices are interchanged or if the opening and closing prices
-are interchanged.  See @ref{bars} and @ref{financebars}.
+rectangle may be changed by @ref{bars}.  The symbol will be unchanged
+if the low and high prices are interchanged.  The rectangle is pseudo-filled 
+by three vertical lines inside it, if the open value is larger than
+the close. Otherwise it's left empty. See @ref{bars} and @ref{financebars}.
 @uref{http://www.nas.nasa.gov/~woo/gnuplot/finance/finance.html,See demos.}
 
 @node dots, financebars, candlesticks, style
@@ -7991,7 +8021,7 @@ the steps, so the end points will appear only half as wide as the others.
 @ref{histeps} is only a plotting style; `gnuplot` does not have the ability to
 create bins and determine their population from some data set.
 
-@node impulses, linespoints, histeps, style
+@node impulses, lines, histeps, style
 @subsubsection impulses
 
 @c ?commands set style impulses
@@ -8002,7 +8032,18 @@ create bins and determine their population from some data set.
 The @ref{impulses} style displays a vertical line from the x axis (not the graph
 border), or from the grid base for `splot`, to each point.
 
-@node linespoints, points, impulses, style
+@node lines, linespoints, impulses, style
+@subsubsection lines
+
+@c ?commands set style lines
+@c ?set style lines
+@c ?style lines
+@cindex lines
+
+The `lines` style connects adjacent points with straight line segments.
+See also `linetype`, `linewidth`, and @ref{linestyle}.
+
+@node linespoints, points, lines, style
 @subsubsection linespoints
 
 @c ?commands set style linespoints
@@ -8295,7 +8336,6 @@ to you, depending on its output format.
 * imagen::                      
 * kyo::                         
 * latex::                       
-* linux::                       
 * mf::                          
 * mp::                          
 * mgr::                         
@@ -8308,6 +8348,7 @@ to you, depending on its output format.
 * qms::                         
 * regis::                       
 * rgip::                        
+* sun::                         
 * tek410x::                     
 * table::                       
 * tek40::                       
@@ -9669,7 +9710,7 @@ The `kyo` and `prescribe` terminal drivers support the Kyocera laser printer.
 The only difference between the two is that `kyo` uses "Helvetica" whereas
 `prescribe` uses "Courier".  There are no options."
 
-@node latex, linux, kyo, terminal
+@node latex, mf, kyo, terminal
 @subsubsection latex
 
 @c ?commands set terminal emtex
@@ -9747,24 +9788,7 @@ The other label -- account for long ticlabels:
 
 @end example
 
-@node linux, mf, latex, terminal
-@subsubsection linux
-
-@c ?commands set terminal linux
-@c ?set terminal linux
-@c ?set term linux
-@c ?terminal linux
-@c ?term linux
-@cindex linux
-@tmindex linux
-
-
-The `linux` driver has no additional options to specify.  It looks at the
-environment variable GSVGAMODE for the default mode; if not set, it uses
-1024x768x256 as default mode or, if that is not possible, 640x480x16
-(standard VGA)."
-
-@node mf, mp, linux, terminal
+@node mf, mp, latex, terminal
 @subsubsection mf
 
 @c ?commands set terminal mf
@@ -10559,7 +10583,7 @@ Syntax:
 
 @end example
 
-@node rgip, tek410x, regis, terminal
+@node rgip, sun, regis, terminal
 @subsubsection rgip
 
 @c ?commands set terminal rgip
@@ -10603,7 +10627,22 @@ Example:
 
 puts six graphs on a page in three rows of two in portrait orientation."
 
-@node tek410x, table, rgip, terminal
+@node sun, tek410x, rgip, terminal
+@subsubsection sun
+
+@c ?commands set terminal sun
+@c ?set terminal sun
+@c ?set term sun
+@c ?terminal sun
+@c ?term sun
+@cindex sun
+@tmindex sun
+
+
+The `sun` terminal driver supports the SunView window system.  It has no
+options."
+
+@node tek410x, table, sun, terminal
 @subsubsection tek410x
 
 @c ?commands set terminal tek410x
@@ -10851,10 +10890,9 @@ Or, for Perl/Tk use a program like this:
 @example
  use Tk;
  my $top = MainWindow->new;
- my $c = $top->Canvas;
- $c->pack();
- do "plot.pl";
- gnuplot->($c);
+ my $c = $top->Canvas->pack;
+ my $gnuplot = do "plot.pl";
+ $gnuplot->($c);
  MainLoop;
 
 @end example
@@ -11108,7 +11146,7 @@ for `q` and `<space>` for closing the window). This is useful for programs
 which use the x11 driver independent of the gnuplot main program.
 
 
-@noindent --- MONOCHOME_OPTIONS ---
+@noindent --- MONOCHROME_OPTIONS ---
 
 @c ?commands set terminal x11 monochrome_options
 @c ?set terminal x11 monochrome_options
@@ -13188,9 +13226,10 @@ interface at
 
 
 Also several X11 interfaces exist.
-One of them is called xgfe (
-@uref{http://www.flash.net/~dmishee/xgfe/xgfe.html,http://www.flash.net/~dmishee/xgfe/xgfe.html } ) 
-which uses the Qt library.
+One of them is called xgfe. It uses the Qt library and can be found on
+@uref{http://www.flash.net/~dmishee/xgfe/xgfe.html,http://www.flash.net/~dmishee/xgfe/xgfe.html
+} 
+
 In addition three Tcl/Tk located at the usual Tcl/Tk repositories exist.
 
 Bruce Ravel (ravel@@phys.washington.edu) has written a new version of
@@ -13198,8 +13237,8 @@ gnuplot-mode for GNU emacs and XEmacs. This version is based on
 the gnuplot.el file by Gershon Elber.
 While the gnuplot CVS repository has its own copy the most recent
 version of this package is available from
-@uref{http://feff.phys.washington.edu/~ravel/gnuplot/,http://feff.phys.washington.edu/~ravel/gnuplot }
-
+@uref{http://feff.phys.washington.edu/~ravel/gnuplot/,http://feff.phys.washington.edu/~ravel/gnuplot
+}
 
 
 @node Bugs, Concept_Index, Graphical_User_Interfaces, Top
@@ -13225,7 +13264,6 @@ no longer be relevant.
 
 Bugs reported since the current release as well as older ones
 may be located via the official distribution site:
-@uref{ftp://ftp.gnuplot.org,ftp://ftp.gnuplot.org }
 
 @uref{http://www.gnuplot.org,http://www.gnuplot.org }
 
@@ -13233,7 +13271,7 @@ Please e-mail any bugs to bug-gnuplot mailinglist (see @ref{Seeking-assistance})
 
 
 @menu
-* Old_bugs::                    
+* Old_bugs::			
 @end menu
 
 @node Old_bugs,  , Bugs, Bugs
