@@ -5,6 +5,9 @@
 
 	* src/set.c (set_xyzlabel): Allow set label textcolor rgb <foo>.
 
+	* src/gplt_x11.c (display): Always initialize gc_pm3d, in case we need
+	it to handle individual rgb colors even in the absense of a palette.
+
 2005-02-01  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c (plot_boxes): Plot with boxerrorbars and three columns

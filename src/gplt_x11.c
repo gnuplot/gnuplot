@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.123 2004/11/25 04:33:53 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.124 2004/11/28 02:02:51 sfeam Exp $"); }
 #endif
 
 #define X11_POLYLINE 1
@@ -3090,6 +3090,7 @@ display(plot_struct *plot)
     gc = XCreateGC(dpy, plot->pixmap, 0, (XGCValues *) 0);
 
     XSetFont(dpy, gc, font->fid);
+
 #if USE_ULIG_FILLEDBOXES
     XSetFillStyle(dpy, gc, FillSolid);
 
@@ -3098,22 +3099,30 @@ display(plot_struct *plot)
 	int i;
 	for (i = 0; i < stipple_halftone_num; i++)
 	    stipple_halftone[i] =
-		XCreateBitmapFromData(dpy, plot->pixmap, stipple_halftone_bits[i], stipple_halftone_width, stipple_halftone_height);
+		XCreateBitmapFromData(dpy, plot->pixmap, stipple_halftone_bits[i],
+				stipple_halftone_width, stipple_halftone_height);
 	for (i = 0; i < stipple_pattern_num; i++)
 	    stipple_pattern[i] =
-		XCreateBitmapFromData(dpy, plot->pixmap, stipple_pattern_bits[i], stipple_pattern_width, stipple_pattern_height);
+		XCreateBitmapFromData(dpy, plot->pixmap, stipple_pattern_bits[i],
+				stipple_pattern_width, stipple_pattern_height);
 	stipple_initialized = 1;
     }
 #endif /* USE_ULIG_FILLEDBOXES */
+
+#ifdef PM3D
+    /* Always initialize a gc_pm3d, in case we need it for a single rgb color */
+    if (!gc_pm3d)
+	GetGCpm3d(plot, &gc_pm3d);
+#endif
 
     /* set pixmap background */
     XSetForeground(dpy, gc, plot->cmap->colors[0]);
     XFillRectangle(dpy, plot->pixmap, gc, 0, 0, plot->width, PIXMAP_HEIGHT(plot) + vchar);
     XSetBackground(dpy, gc, plot->cmap->colors[0]);
 
-    if (!plot->window) {
+    if (!plot->window)
 	pr_window(plot);
-    }
+
     /* top the window but don't put keyboard or mouse focus into it. */
     if (do_raise)
 	XMapRaised(dpy, plot->window);
