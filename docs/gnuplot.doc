@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.182 2003/07/31 16:16:37 lhecking Exp $
+C RCS $Id: gnuplot.doc,v 1.183 2003/08/05 05:25:59 sfeam Exp $
 C 18 September 2001
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001   Thomas Williams, Colin Kelley et al.
 C
@@ -4811,7 +4811,7 @@ C ... and restart the table:
  If `front` is given, the grid is drawn on top of the graphed data. If
  `back` is given, the grid is drawn underneath the graphed data. Using
  `front` will prevent the grid from being obscured by dense data. The default
- setup, `layerdefault`, is 'back' for 2d plots and 'front' for 3d plots.
+ setup, `layerdefault`, is `back` for 2d plots and `front` for 3d plots.
 
  Z grid lines are drawn on the bottom of the plot.  This looks better if a
  partial box is drawn around the plot---see `set border`.
@@ -5198,7 +5198,7 @@ C ... and restart the table:
     `tc palette fraction <val>`, with 0<=val<=1, selects a color corresponding to
         the mapping [0:1] to grays/colors of the `palette`.
 
- If a <pointstyle> is given, using keywords `lw`, `pt` and `ps`, see `style`,
+ If a <pointstyle> is given, using keywords `lt`, `pt` and `ps`, see `style`,
  a point with the given style and color of the given line type is plotted at
  the label position and the text of the label is displaced slightly.
  The displacement defaults to 1, 1 in `pointsize` units and can be
@@ -6909,7 +6909,7 @@ C ... and restart the table:
  Examples:
 
  To plot a data file with solid filled boxes with a small vertical space
- seperating them (bargraph):
+ separating them (bargraph):
 
        set boxwidth 0.9 relative
        set style fill solid 1.0
@@ -6918,7 +6918,7 @@ C ... and restart the table:
  To plot a sine and a cosine curve in pattern-filled boxes style:
 
        set style fill pattern
-       plot sin(x), cos(x) with boxes
+       plot sin(x) with boxes, cos(x) with boxes
 
  The sin plot will use pattern 0; the cos plot will use pattern 1.
  Any additional plots would cycle through the patterns supported by the
@@ -6926,9 +6926,9 @@ C ... and restart the table:
 
  To specify explicit fillstyles for each dataset:
 
-      plot 'file1' with boxes fs bsolid 0.25, \
-           'file2' with boxes fs bsolid 0.50, \
-           'file3' with boxes fs bsolid 0.75, \
+      plot 'file1' with boxes fs solid 0.25, \
+           'file2' with boxes fs solid 0.50, \
+           'file3' with boxes fs solid 0.75, \
            'file4' with boxes fill pattern 1, \
            'file5' with boxes fill empty
 
@@ -8223,7 +8223,7 @@ C ... and restart the table:
 ?set cbdata
 ?show cbdata
 ?cbdata
- Set color box axis date to timeseries (dates/times).  Please see `set xdata`.
+ Set color box axis data to timeseries (dates/times).  Please see `set xdata`.
 3 cbdtics
 ?commands set cbdtics
 ?commands unset cbdtics
@@ -8234,7 +8234,7 @@ C ... and restart the table:
 ?cbdtics
 ?nocbdtics
  The `set cbdtics` command changes tics on the color box axis to days of the
- week. Please see `set cbdtics` for details.
+ week. Please see `set xdtics` for details.
 3 zero
 ?commands set zero
 ?commands show zero
