@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.45 2003/02/05 00:01:00 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.46 2003/04/29 07:04:29 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -160,7 +160,7 @@ static char *RCSid() { return RCSid("$Id: datafile.c,v 1.45 2003/02/05 00:01:00 
 #define is_EOF(c) ((c) == 'e' || (c) == 'E')
 
 /* is it a comment line? */
-#define is_comment(c) (strchr(df_commentschars, (c)))
+#define is_comment(c) ((c) && (strchr(df_commentschars, (c)) != NULL))
 
 /*{{{  static fns */
 #if 0				/* not used */

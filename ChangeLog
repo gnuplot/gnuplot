@@ -1,3 +1,8 @@
+2003-05-04  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* src/datafile.c: Fixed #define is_comment(c): strchr(s,c) returns
+	!NULL for c=0.
+
 2003-05-03  Ethan Merritt <merritt@u.washington.edu>
 
 	* term/mif.trm: Implement support for filled boxes, pattern fill
