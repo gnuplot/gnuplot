@@ -1,23 +1,32 @@
+2002-10-09  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/misc.c (parse_fillstyle): Make the bulk of this function
+ 	conditional on USE_ULIG_FILLEDBOXES.  If that's not defined, bail
+ 	out with an int_error(), instead of a mere int_warn().
+
+	* src/plot2d.c (eval_plots): Fix --disable-filledboxes compile by
+ 	adding an #ifdef USE_ULIG_FILLEDBOXES around a block.
+
 2002-10-09  Harald Harders  <h.harders@tu-bs.de>
 
-	* src/variable.c: Patch #611546 "Save wrong for loadpath and fontpath".
-	 If the local values for fontpath or loadpath is empty while system 
-	 values are defined, the save command saves the first path entry which
-	 it shouldn't. 
+	* src/variable.c: Patch #611546 "Save wrong for loadpath and
+ 	fontpath".  If the local values for fontpath or loadpath is empty
+ 	while system values are defined, the save command saves the first
+ 	path entry which it shouldn't.
 
 2002-10-09  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
-	* configure.in: Enable filledboxes and relative-boxwidth by default.
-	Remove EXPERIMENTAL labels. Rename help text for options that are
-	enabled by default.
+	* configure.in: Enable filledboxes and relative-boxwidth by
+ 	default.  Remove EXPERIMENTAL labels. Rename help text for options
+ 	that are enabled by default.
 
-	* src/plot.c(main): Remove non-standard and undocumented -? and -help
-	switches.
+	* src/plot.c(main): Remove non-standard and undocumented -? and
+ 	-help switches.
 
 2002-10-09  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/pm3d.c: Changed default value from 'set pm3d clip1in' to
-	'set pm3d clip4in'.
+ 	'set pm3d clip4in'.
 
 	* docs/gnuplot.doc: Pronounce 'set pm3d clip...' in 'help clip'.
 
@@ -27,8 +36,8 @@
 
 2002-10-08  Petr Mikulik  <mikulik@physics.muni.cz>
 
-	* src/mouse.c: Format for string of zoomed coordinates changed to %.12g
-	to avoid error message "Can't plot with an empty range".
+	* src/mouse.c: Format for string of zoomed coordinates changed to
+ 	%.12g to avoid error message "Can't plot with an empty range".
 
 2002-10-08  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
@@ -1264,7 +1273,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/10/09 09:27:42 $).
+	last modification date (from the tag $Date: 2002/10/09 12:40:56 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 

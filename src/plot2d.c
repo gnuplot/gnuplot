@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.53 2002/08/16 08:11:37 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.54 2002/09/27 00:12:25 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -1182,9 +1182,10 @@ eval_plots()
 		}
 	    }
 
+#ifdef USE_ULIG_FILLEDBOXES
 	    /* Similar argument for check that all fill styles were set */
 	    if (this_plot->plot_style == BOXES
-	    ||  this_plot->plot_style == CANDLESTICKS) {
+		||  this_plot->plot_style == CANDLESTICKS) {
 		if (! set_fillstyle)
 		    parse_fillstyle(&this_plot->fill_properties,
 				default_fillstyle.fillstyle, 
@@ -1194,6 +1195,7 @@ eval_plots()
 		if (this_plot->fill_properties.fillstyle == FS_PATTERN)
 		    pattern_num = this_plot->fill_properties.fillpattern + 1;
 	    }
+#endif
 
 	    this_plot->x_axis = x_axis;
 	    this_plot->y_axis = y_axis;

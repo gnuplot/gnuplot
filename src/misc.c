@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.40 2002/09/16 18:24:58 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.41 2002/09/27 00:12:25 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -753,6 +753,10 @@ parse_fillstyle( struct fill_style_type *fs,
     fs->fillpattern = def_pattern;
     fs->border_linetype = def_bordertype;
 
+#ifndef USE_ULIG_FILLEDBOXES
+    int_error(NO_CARET, "This build of gnuplot does not support filled boxes");
+    return;
+#else
     if (END_OF_COMMAND)
 	return;
     if (!equals(c_token,"fs") && !equals(c_token,"fill"))
@@ -806,7 +810,5 @@ parse_fillstyle( struct fill_style_type *fs,
 	    set_param = TRUE;
 	}
     }
-#ifndef USE_ULIG_FILLEDBOXES
-    int_warn(NO_CARET,"This gnuplot was not built with --enable-fillboxes");
 #endif /* USE_ULIG_FILLEDBOXES */
 }
