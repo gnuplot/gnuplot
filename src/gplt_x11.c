@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.19 2000/11/03 17:40:02 joze Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.20 2000/11/06 17:37:58 joze Exp $"); }
 #endif
 
 /* GNUPLOT - gplt_x11.c */
@@ -173,16 +173,16 @@ Error. Incompatible options.
 
 #ifdef USE_MOUSE
 
-# define _GPLT_X11 /* define before including mouse.h */
-# include "gpexecute.h"
-# include "mouse.h"
-
 # if defined(OS2) && !defined(GNUPMDRV)
 #  define INCL_DOSPROCESS
 #  define INCL_DOSSEMAPHORES
 #  include <os2.h>
 #  include "os2/dialogs.h"
 # endif
+
+# define _GPLT_X11 /* define before including mouse.h */
+# include "gpexecute.h"
+# include "mouse.h"
 
 # if !defined(OS2)
 #  include <unistd.h>

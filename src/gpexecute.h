@@ -46,7 +46,7 @@
 #ifdef OS2
 
 void gp_execute(char *command);
-extern char mouseShareMemName;
+extern char mouseShareMemName[];
 extern PVOID input_from_PM_Terminal;
 extern HEV semInputReady;
 extern int pausing;

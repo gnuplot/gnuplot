@@ -1,3 +1,7 @@
+2000-11-14  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* make the branched version compile under OS/2
+
 2000-11-12  James R. Van Zandt  <jrv@vanzandt.mv.com>
 
 	* term/README: describe pm3d and mouse API

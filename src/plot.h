@@ -1,5 +1,5 @@
 /*
- * $Id: plot.h,v 1.37 2000/10/31 19:59:31 joze Exp $
+ * $Id: plot.h,v 1.38 2000/11/01 18:57:33 broeker Exp $
  */
 
 /* GNUPLOT - plot.h */
@@ -63,7 +63,7 @@ extern long int gnuplot_history_size;
 #endif
 
 #ifdef OS2
-extern TBOOLEAN CallFromRexx = FALSE;
+extern TBOOLEAN CallFromRexx;
 #endif
 
 /* Prototypes of functions exported by plot.c */

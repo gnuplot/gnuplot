@@ -37,6 +37,13 @@
  *     Johannes Zellner <johannes@zellner.org>
  */
 
+
+#ifdef OS2
+# define INCL_DOSPROCESS
+# define INCL_DOSSEMAPHORES
+# include <os2.h>
+#endif
+
 #include "gpexecute.h"
 
 #ifndef OS2
