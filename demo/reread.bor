@@ -1,5 +1,0 @@
-bb=(bb+1)%16
-set border bb
-show border
-replot
-reread

@@ -1,3 +1,10 @@
+2004-09-14  Ethan Merritt  <merritt@u.washington.edu>
+
+	* demo/borders.dem: Rewrite the borders demo to terminate after 16
+	possible settings, to display the border setting in a label, and to
+	execute from inside a single demo file rather than a combination of
+	two.  Thanks to Daniel Sebald for identifying that it needed an update.
+
 2004-09-13  Daniel Sebald  <daniel.sebald@ieee.org>
 
 	* src/datafile.c: Rework the layout of the df_bin_default_columns
