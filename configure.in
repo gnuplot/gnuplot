@@ -296,8 +296,8 @@ dnl Or is it really a server (run-time) problem?
 dnl FIXME AC_DEFINE(ULTRIX_KLUDGE)
 
 dnl Cached variables
-AC_CACHE_CHECK(for CPPFLAGS variable,gp_cv_prog_make_cppflags,gp_cv_prog_make_cppflags="$CPPFLAGS")
-AC_CACHE_CHECK(for TERMLIBS variable,gp_cv_prog_make_termlibs,gp_cv_prog_make_termlibs="$TERMLIBS")
+AC_CACHE_CHECK(CPPFLAGS variable,gp_cv_prog_make_cppflags,gp_cv_prog_make_cppflags="$CPPFLAGS")
+AC_CACHE_CHECK(TERMLIBS variable,gp_cv_prog_make_termlibs,gp_cv_prog_make_termlibs="$TERMLIBS")
 
 dnl Substitute variables
 AC_SUBST(LASERGNU)

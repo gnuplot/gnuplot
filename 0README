@@ -54,7 +54,7 @@ has been tested on the following systems (incomplete), but be aware that
 this list is not necessarily up to date with regard to the current version
 of GNUPLOT:
 
- o Sun3, sun4c, sun4m, sun4u (SunOS 4.03, SunOS 4.1.x, Solaris 2.5.1)
+ o Sun3, sun4c, sun4m, sun4u (SunOS 4.03, SunOS 4.1.x, Solaris 2.5.1/2.6)
  o uVAX 3100 (VMS 5.4, 5.5, 6.0, 6.1)
  o VAX 6410 (VMS 5.2)
  o DECStation 5000/200PXG (ULTRIX V4.1)
