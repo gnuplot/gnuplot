@@ -369,7 +369,10 @@ TERM_PUBLIC void PSLATEX_text()
 
     for (tc = PSLATEX_labels; tc != (struct text_command*)NULL; tc = tc->next) {
 	fprintf(gpoutfile, "\\put(%d,%d){", tc->x, tc->y);
-	switch (tc->angle) {
+        if (PSLATEX_output &&
+                     ((tc->label[0] == '{') || (tc->label[0] == '['))) {
+           fprintf(gpoutfile, "\\makebox(0,0)%s", tc->label);
+        } else switch (tc->angle) {
 	case 0:
 	    switch (tc->justify) {
 	    case LEFT:
@@ -591,11 +594,28 @@ START_HELP(pslatex)
 " the option will be turned off if there is no extent) with `.ps` in the output",
 " file name.  Remember to close the file before leaving `gnuplot`.",
 "",
+" All drivers for LaTeX offer a special way of controlling text positioning:",
+" If any text string begins with '{', you also need to include a '}' at the",
+" end of the text, and the whole text will be centered both horizontally",
+" and vertically by LaTeX. --- If the text string begins with '[', you need",
+" to continue it with: a position specification (up to two out of t,b,l,r),",
+" ']{', the text itself, and finally, '}'. The text itself may be anything",
+" LaTeX can typeset as an LR-box. \\rule{}{}'s may help for best positioning.",
+"",
 " Examples:",
 "       set term pslatex monochrome dashed rotate       # set to defaults",
 " To write the PostScript commands into the file \"foo.ps\":",
 "       set term pslatex auxfile",
 "       set output \"foo.tex\"; plot ...: set output",
+" About label positioning:",
+" Use gnuplot defaults (mostly sensible, but sometimes not really best):",
+"        set title '\\LaTeX\\ -- $ \\gamma $'",
+" Force centering both horizontally and vertically:",
+"        set label '{\\LaTeX\\ -- $ \\gamma $}' at 0,0",
+" Specify own positioning (top here):",
+"        set xlabel '[t]{\\LaTeX\\ -- $ \\gamma $}'",
+" The other label -- account for long ticlabels:",
+"        set ylabel '[r]{\\LaTeX\\ -- $ \\gamma $\\rule{7mm}{0pt}'",
 "",
 " Linewidths and pointsizes may be changed with `set linestyle`."
 END_HELP(pslatex)

@@ -692,7 +692,9 @@ TERM_PUBLIC void LATEX_put_text(x, y, str)
         flag = (str[i++] == '\\') && (str[i++] == '\\');
 
     fprintf(gpoutfile, "\\put(%d,%d)", x, y);
-    if (flag)
+    if ((str[0] == '{') || (str[0] == '[')) {
+       fprintf(gpoutfile, "{\\makebox(0,0)%s}\n", str);
+    } else if (flag)
         fprintf(gpoutfile, "{\\makebox(0,0)%s{\\shortstack{%s}}}\n",
             justify[latex_justify], str);
     else
@@ -825,6 +827,25 @@ START_HELP(latex)
 " Unless your driver is capable of building fonts at any size (e.g. dvips),",
 " stick to the standard 10, 11 and 12 point sizes.",
 "",
-" METAFONT users beware: METAFONT does not like odd sizes."
+" METAFONT users beware: METAFONT does not like odd sizes.",
+"",
+" All drivers for LaTeX offer a special way of controlling text positioning:",
+" If any text string begins with '{', you also need to include a '}' at the",
+" end of the text, and the whole text will be centered both horizontally",
+" and vertically by LaTeX. --- If the text string begins with '[', you need",
+" to continue it with: a position specification (up to two out of t,b,l,r),",
+" ']{', the text itself, and finally, '}'. The text itself may be anything",
+" LaTeX can typeset as an LR-box. \\rule{}{}'s may help for best positioning.",
+"",
+" Examples:",
+" About label positioning:",
+" Use gnuplot defaults (mostly sensible, but sometimes not really best):",
+"        set title '\\LaTeX\\ -- $ \\gamma $'",
+" Force centering both horizontally and vertically:",
+"        set label '{\\LaTeX\\ -- $ \\gamma $}' at 0,0",
+" Specify own positioning (top here):",
+"        set xlabel '[t]{\\LaTeX\\ -- $ \\gamma $}'",
+" The other label -- account for long ticlabels:",
+"        set ylabel '[r]{\\LaTeX\\ -- $ \\gamma $\\rule{7mm}{0pt}'"
 END_HELP(latex)
 #endif
