@@ -1,12 +1,12 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot 3.7 on Unix.
 dnl
-dnl $Id: configure.in,v 1.90 2000/11/02 19:09:24 lhecking Exp $
+dnl $Id: configure.in,v 1.91 2000/11/03 13:45:53 lhecking Exp $
 dnl
 AC_INIT(src/graphics.c)
 AM_CONFIG_HEADER(config.h:config.hin)
 AC_PREREQ(2.13)
-AC_REVISION($Revision: 1.90 $)
+AC_REVISION($Revision: 1.91 $)
 
 VERSION="`cat $srcdir/VERSION`"
 PATCHLEVEL="`cat $srcdir/PATCHLEVEL`"
@@ -459,8 +459,8 @@ dnl end gd
 
 dnl check for png and z library
 if test "$with_png" != no; then
-  GP_PATH_LIB(png,png_info_init,[$with_png],[-lz])
-  if test "$ac_cv_lib_png_png_info_init" = yes; then
+  GP_PATH_LIB(png,png_init_io,[$with_png],[-lz])
+  if test "$ac_cv_lib_png_png_init_io" = yes; then
     TERMLIBS="$TERMLIBS -lz"
     GP_PATH_HEADER(png.h,[$with_png],,
      AC_MSG_WARN([found png library but not png.h])
