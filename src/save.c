@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.92 2004/11/06 21:18:45 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.93 2004/11/10 16:16:48 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -444,9 +444,28 @@ set y2data%s\n",
 	 this_linestyle = this_linestyle->next) {
 	fprintf(fp, "set style line %d ", this_linestyle->tag);
 #ifdef PM3D
-	if (this_linestyle->lp_properties.use_palette)
-	    fprintf(fp, "linetype palette ");
-	else
+	if (this_linestyle->lp_properties.use_palette) {
+	    fprintf(fp, " linetype");
+	    switch(this_linestyle->lp_properties.pm3d_color.type) {
+	    case TC_LT:   fprintf(fp," %d ", this_linestyle->lp_properties.pm3d_color.lt+1);
+			  break;
+	    case TC_Z:    fprintf(fp," palette z ");
+			  break;
+	    case TC_CB:   fprintf(fp," palette cb %g ", this_linestyle->lp_properties.pm3d_color.value);
+			  break;
+	    case TC_FRAC: fprintf(fp," palette fraction %4.2f ", this_linestyle->lp_properties.pm3d_color.value);
+			  break;
+	    case TC_RGB:  {
+			  const char *color = reverse_table_lookup(pm3d_color_names_tbl,
+						this_linestyle->lp_properties.pm3d_color.lt);
+			  if (color)
+			    fprintf(fp," rgb \"%s\" ", color);
+			  else
+			    fprintf(fp," rgb \"#%6.6x\" ", this_linestyle->lp_properties.pm3d_color.lt);
+			  break;
+			  }
+	    }
+	} else
 #endif
 	    fprintf(fp, "linetype %d ", this_linestyle->lp_properties.l_type + 1);
 	fprintf(fp, "linewidth %.3f pointtype %d ",
@@ -1039,6 +1058,14 @@ save_textcolor(FILE *fp, const struct t_colorspec *tc)
 		      break;
 	case TC_FRAC: fprintf(fp," palette fraction %4.2f", tc->value);
 		      break;
+	case TC_RGB:  {
+			const char *color = reverse_table_lookup(pm3d_color_names_tbl, tc->lt);
+			if (color)
+			    fprintf(fp," rgb \"%s\" ", color);
+			else
+			    fprintf(fp," rgb \"#%6.6x\" ", tc->lt);
+			break;
+			}
 	}
     }
 }

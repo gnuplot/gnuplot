@@ -1,9 +1,67 @@
-2004-11-27  Ethan Merritt  <merritt@u.washington.edu>
+2004-12-01  Ethan Merritt  <merritt@u.washington.edu>
+
+	Add colorspec to linetype, and hence to all 2D and 3D plot elements.
+	These changes all depend on configuration with --enable-pm3d
+	Add support and demo example of using explicit RGB colors or gnuplot's
+	internal pre-defined color names:
+	    set style line 1 lt rgbcolor "violet" lw 2
+	    set style line 2 lt rgbcolor "#FFA080" lw 2   # salmon pink
+
+	* src/term_api.h: 
+	Add new field "struct t_colorspec pm3d_color" to lp_style_type, so that
+	any plot element with an associated line type can use palette-based or
+	RGB colors.
+
+	* src/term.c (term_apply_lp_properties):
+	Check lp_style_type.use_palette flag, and if set apply the colorspec
+	rather than a simple linetype color.
+
+	* src/misc.c (lp_parse parse_colorspec):
+	Call parse_colorspec() as part of normal line type parsing. This allows
+	"lt {rgbcolor 'name'} | {palette {cb <val> | frac <val> | z}}" anywhere
+	that "lt <val>" is currently valid.
+
+	* src/graphics.c (do_plot plot_boxes plot_c_bars do_key_sample):
+	Everywhere that we would normally call t->linetype(), check use_palette
+	and instead call apply_pm3dcolor()
+	Everywhere that we would normally call t->fillbox(), check use_palette
+	and instead call t->filled_polygon() via new routine fill_corners()
+
+	* src/plot2d.c (eval_plots): Do not allow "lt palette z" in 2D plots
+
+	* src/save.c src/show.c: 
+	save/show colorspec options associated with line styles and text colors
+
+	* src/set.c:
+	Allow text color to use full colorspec options.
+
+	* src/tables.c src/tables.h: New function reverse_table_lookup() that
+	returns the keyword associated with a table value; this is used to look
+	up the colorname associated with an RGB value.
+
+	* NEWS docs/gnuplot.doc: Document new functionality and syntax.
+
+	* demo/colorwheel.dem:
+	Set palette mode to standard HSV color wheel and define common colors as
+	macros. Allows terminal-independent commands such as
+		plot sin(x) with lines @orange
+
+	* demo/rainbow.dem:
+	Demonstrate two approaches to defining terminal-independent colors for
+	plot elements. (1) Load 'colorwheel.dem' to create a palette from which
+	colors can be selected. (2) Use the new colorspec type RGB to request
+	specific named colors, as in
+	    set style line 1 lt rgbcolor "sea-green"
+	This only works well on terminals that support full RGB color modes.
+	Some palette-based terminals will approximate the requested color using
+	whatever palette color is closest, but the results may not be pleasing.
+
+2004-12-01  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/plot2d.c (eval_plots) src/plot3d.c (eval_3dplots): Add 
 	END_OF_COMMAND check before trying to parse possible backwards
-	compatibility options.  Fixes incorrect error message if the
-	text option parsing consumes the rest of the command line.
+	compatibility options.  Fixes incorrect error message if text
+	option parsing consumes the rest of the command line.
 
 2004-11-30  Petr Mikulik  <mikulik@physics.muni.cz>
 

@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.265 2004/11/28 05:56:42 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.266 2004/11/30 08:21:56 mikulik Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -1463,7 +1463,6 @@ C ... and restart the table:
  with a letter, but subsequent characters may be letters, digits, "$", or "_".
 
  See `show functions`, `functions`, `gnuplot-defined variables`.
-
 2 Glossary
 ?glossary
  Throughout this document an attempt has been made to maintain consistency of
@@ -1509,6 +1508,94 @@ C ... and restart the table:
  a single record.  A "datablock" is a set of points from consecutive records,
  delimited by blank records.  A line, when referred to in the context of a
  data file, is a subset of a datablock.
+2 linetype, colors, and styles
+?linetype
+?colors
+ Gnuplot commands use the term "linetype" to refer to the color of a line or
+ other plot element.  Each terminal type provides a certain number of 
+ pre-defined line types (colors).  These can be previewed by issuing
+ the `test` command after setting the terminal type.  The pre-defined colors
+ are not guaranteed to be consistent for all terminal types, but all terminals
+ use the special index -1 to mean the primary foreground color (normally black).
+ By default, successive functions or datafiles plotted by a single command will
+ be assigned successive linetypes.  You can override this default by specifying
+ a particular linetype for any function, datafile, or plot element.
+
+ Examples:
+
+      plot "foo", "bar"                 # plot two files using linetypes 1, 2
+      plot sin(x) linetype 4            # terminal-specific linetype color 4
+      plot sin(x) lt -1                 # black
+
+ For many terminal types it is also possible to assign user-defined colors
+ using explicit rgb (red, green, blue) values, named colors, or color values
+ that refer to the current PM3D palette.
+
+ Examples:
+
+      plot sin(x) lt rgb "violet"       # one of gnuplot's named colors
+      plot sin(x) lt rgb "#FF00FF"      # explicit RGB triple in hexadecimal
+      plot sin(x) lt palette cb -45     # whatever color corresponds to -45
+                                        # in the current cbrange of the palette
+      plot sin(x) lt palette frac 0.3   # fractional value along the palette
+
+ See `show palette colornames`, `set palette`, `cbrange`.
+ 
+ Lines can have additional properties such as linewidth.  You can associate
+ these various properties, as well as equivalent properties for point symbols,
+ into user-defined "line styles" using the command `set style line`.  Once
+ you have defined a linestyle, you can use it in a plot command to control
+ the appearance of one or more plot elements.
+
+ Examples:
+
+      # define a new line style with terminal-independent color cyan,
+      # linewidth 3, and associated point type 6 (a circle with a dot in it).
+      set style line 5 lt rgb "cyan" lw 3 pt 6
+      plot sin(x) with linespoints ls 5          # user-defined line style 5
+
+ See `linestyle`, `set style line`.
+3 colorspec
+?colorspec
+?rgbcolor
+ Many commands allow you to specify a linetype with an explicit color.
+ This option is only available if your gnuplot has been built with pm3d support,
+ and only for terminals that support RGB color and/or pm3d palettes.
+
+ Syntax:
+
+       ... {linetype | lt} <colorspec>
+
+ where <colorspec> has one of the following forms:
+
+       rgbcolor "colorname"
+       rgbcolor "#RRGGBB"
+       palette frac <val>      # <val> runs from 0 to 1
+       palette cb <value>      # <val> lies within cbrange
+       palette z
+
+ "colorname" refers to one of the color names built in to gnuplot. For a list
+ of the available names, see `show palette colornames`.
+
+ "#RRGGBB" is a hexadecimal constant preceded by the "#" symbol. The RRGGBB
+ represents the red, green, and blue components of the color, each on a scale
+ from 0 - 255.  For example, magenta = full-scale red + full-scale blue would
+ be represented by #FF00FF, which is the hexadecimal representation of
+ (255 << 16) + (0 << 8) + (255).
+
+ The color palette is a linear gradient of colors that smoothly maps a
+ single numerical value onto a particular color.  Two such mappings are always
+ in effect. The first maps a fractional value between 0 and 1 onto the full
+ range of the color palette.  The second maps a separate color axis onto
+ the same palette using an arbitrary scale and range.  This mapping is set
+ by the command `set cbrange`.  See also `set colorbox`.  You can use either
+ of these mappings to assign a constant color from the current palette.
+ 
+ The final option, "palette z", is available only in 3d plots, and treats the
+ z value of each plot segment or plot element as an index into the cbrange
+ mapping of the palette. This allows smoothly-varying color along a 3d line
+ or surface.
+       
 2 mouse input
 ?mouse input
  The `x11`, `pm`, `windows`, and `ggi` terminals allow interaction with the
@@ -1519,7 +1606,6 @@ C ... and restart the table:
  and then using the mouse variables returned by mouse clicking as parameters
  for subsequent scripted actions. See `bind` and `mouse variables`.  
  See also the command `set mouse`.
-
 3 bind
 ?commands bind
 ?bind
@@ -1611,7 +1697,6 @@ C ... and restart the table:
  contain the ascii character value of the key that was pressed. If the
  pause command is terminated abnormally (e.g. by ctrl-C or by externally
  closing the plot window) then MOUSE_KEY will equal -1.
-
 2 Plotting
 ?plotting
  There are three `gnuplot` commands which actually create a plot: `plot`,
@@ -1794,7 +1879,6 @@ C ... and restart the table:
 
        machine_id = sprintf('"`uname -n`"')
        mycomputer = @machine_id
-
 2 Syntax
 ?syntax
 ?specify
@@ -2707,7 +2791,7 @@ C ... and restart the table:
                      axes x1y2 notitle with lines 5
 
  See also `show plot`.
-3 data-file
+3 data
 ?commands plot datafile
 ?plot datafile
 ?data-file
@@ -3918,7 +4002,10 @@ C ... and restart the table:
  color is chosen from a smooth palette which was set previously with the
  command `set palette`. The color value corresponds to the z-value of the
  point coordinates or to the color coordinate if specified by the 4th parameter
- in `using`. The 2d `plot` command ignores this option.
+ in `using`. Both 2d and 3d plots (`plot` and `splot` commands) can use palette
+ colors as specified by either their fractional value or the corresponding value
+ mapped to the colorbox range. 2d plots can not use palette colors mapped by
+ Z value. See `colors`, `set palette`, `linetype`.
 
  The keywords may be abbreviated as indicated.
 
@@ -7209,7 +7296,15 @@ C ... and restart the table:
 
  You may manually change the postscript output from gray to color and vice
  versa and change the definition of <maxcolors>.
-
+4 colornames
+?colornames
+?show palette colornames
+?show colornames
+ Gnuplot knows a limited number of color names. You can use these to define
+ the color range spanned by a pm3d palette, or to assign a terminal-independent
+ colot to a particular linetype or linestyle. To see the list of know color
+ names, use the command `show palette colornames`.  
+ See `set palette`, `linestyle`.
 3 pointsize
 ?commands set pointsize
 ?commands show pointsize
@@ -7588,7 +7683,6 @@ C ... and restart the table:
 ?unset style line
 ?show style line
 ?linestyle
-^ <a name="linetype"></a>
 ^ <a name="linewidth"></a>
  Each terminal has a default set of line and point types, which can be seen
  by using the command `test`.  `set style line` defines a set of line types
@@ -7596,10 +7690,10 @@ C ... and restart the table:
  an index instead of repeating all the information at each invocation.
 
  Syntax:
-       set style line <index> {linetype  | lt <line_type>}
-                              {linewidth | lw <line_width>}
-                              {pointtype | pt <point_type>}
-                              {pointsize | ps <point_size>}
+       set style line <index> {{linetype  | lt} <line_type> | <colorspec>}
+                              {{linewidth | lw} <line_width>}
+                              {{pointtype | pt} <point_type>}
+                              {{pointsize | ps} <point_size>}
                               {palette}
        unset style line
        show style line
@@ -7623,11 +7717,15 @@ C ... and restart the table:
  but not by other commands that allow the default index to be used, such as
  `set grid`.
 
- If gnuplot was built with pm3d support, the special keyword `palette` is
- allowed as `linetype` for splots (the 2d `plot` command ignores `palette`).
- In this case the line color is chosen from a smooth palette which was
- set previously with the command `set palette`.  The color value corresponds
- to the z-value (elevation) of the splot.
+ If gnuplot was built with pm3d support, terminal-independent colors may be
+ assigned using the <colorspec>.  This requires giving a RGB color triple,
+ a known palette color name, a fractional index into the current palette, or
+ a constant value from the current mapping of the palette onto cbrange.
+ See `colors`, `colorspec`, `set palette`, `colornames`, `cbrange`.
+
+ In 3d mode (`splot` command), the special keyword `palette` is allowed as a
+ shorthand for "linetype palette z".  The color value corresponds to the
+ z-value (elevation) of the splot, and varies smoothly along a line or surface.
 
  Example:
  Suppose that the default lines for indices 1, 2, and 3 are red, green, and

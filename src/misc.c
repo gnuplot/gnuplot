@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.58 2004/10/19 03:26:17 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.59 2004/11/22 00:43:05 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -767,11 +767,17 @@ lp_parse(struct lp_style_type *lp, TBOOLEAN allow_ls, TBOOLEAN allow_point, int 
 		    break;
 		c_token++;
 #ifdef PM3D
+		if (equals(c_token, "rgb")) {
+		    c_token--;
+		    parse_colorspec(&lp->pm3d_color, TC_RGB);
+ 		    lp->use_palette = 1;
+		} else
 		/* both syntaxes allowed: 'with lt pal' as well as 'with pal' */
 		if (almost_equals(c_token, "pal$ette")) {
 		    if (set_pal++)
 			break;
-		    c_token++;
+		    c_token--;
+		    parse_colorspec(&lp->pm3d_color, TC_Z);
 		    lp->use_palette = 1;
 		} else
 #endif
@@ -931,7 +937,7 @@ parse_fillstyle(struct fill_style_type *fs, int def_style, int def_density, int 
  * Parse the sub-options of text color specification
  *   { def$ault | lt <linetype> | pal$ette { cb <val> | frac$tion <val> | z }
  * The ordering of alternatives shown in the line above is kept in the symbol definitions
- * TC_DEFAULT TC_LT TC_CB TC_FRAC TC_Z  (0 1 2 3 4)
+ * TC_DEFAULT TC_LT TC_RGB TC_CB TC_FRAC TC_Z  (0 1 2 3 4 5)
  * and the "options" parameter to parse_colorspec limits legal input to the
  * corresponding point in the series. So TC_LT allows only default or linetype
  * coloring, while TC_Z allows all coloring options up to and including pal z
@@ -960,6 +966,23 @@ parse_colorspec(struct t_colorspec *tc, int options)
     } else if (options <= TC_LT) {
 	tc->type = TC_DEFAULT;
 	int_error(c_token, "only tc lt <n> possible here");
+#ifdef PM3D
+    } else if (almost_equals(c_token,"rgb$color")) {
+	char *color;
+	int rgbtriple;
+	c_token++;
+	if (END_OF_COMMAND || !(color = try_to_get_string()))
+	    int_error(c_token, "expected a color name or a string of form \"#RRGGBB\"");
+	if ((rgbtriple = lookup_table_nth(pm3d_color_names_tbl, color)) >= 0)
+	    rgbtriple = pm3d_color_names_tbl[rgbtriple].value;
+	else
+	    sscanf(color,"#%x",&rgbtriple);
+	free(color);
+	if (rgbtriple < 0)
+	    int_error(c_token, "expected a known color name or a string of form \"#RRGGBB\"");
+	tc->type = TC_RGB;
+	tc->lt = rgbtriple;
+#endif
     } else if (almost_equals(c_token,"pal$ette")) {
     	c_token++;
 	if (END_OF_COMMAND || equals(c_token,"z")) {

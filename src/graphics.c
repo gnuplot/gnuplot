@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.135 2004/11/22 00:43:05 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.136 2004/11/22 01:38:01 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -129,6 +129,7 @@ static void finish_filled_curve __PROTO((int, gpiPoint *, struct curve_points *)
 static void plot_betweencurves __PROTO((struct curve_points * plot));
 static void fill_between __PROTO((double, double, double, double, double, double, struct curve_points *));
 static TBOOLEAN bound_intersect __PROTO((struct coordinate GPHUGE * points, int i, double *ex, double *ey, filledcurves_opts *filledcurves_options));
+static gpiPoint *fill_corners __PROTO((int, unsigned int, unsigned int, unsigned int, unsigned int));
 #endif
 static void plot_vectors __PROTO((struct curve_points * plot));
 static void plot_f_bars __PROTO((struct curve_points * plot));
@@ -320,7 +321,7 @@ boundary(struct curve_points *plots, int count)
     int ytic_width;
     int y2tic_width;
 
-    int key_cols;		/* # columns of keys */
+    int key_cols = 1;		/* # columns of keys */
 
     /* figure out which rotatable items are to be rotated
      * (ylabel and y2label are rotated if possible) */
@@ -2986,7 +2987,12 @@ plot_boxes(struct curve_points *plot, int xaxis_y)
 			style += (i<<4);
 #endif
 
-		    (*t->fillbox) (style, x, y, w, h);
+#ifdef PM3D
+		    if (plot->lp_properties.use_palette) {
+			(*t->filled_polygon)(4, fill_corners(style,x,y,w,h));
+		    } else
+#endif
+			(*t->fillbox) (style, x, y, w, h);
 
 		    /* FIXME EAM - Is this still correct??? */
 		    if (strcmp(t->name, "fig") == 0) break;
@@ -3004,9 +3010,14 @@ plot_boxes(struct curve_points *plot, int xaxis_y)
 		(*t->vector) (xr, yb);
 		(*t->vector) (xl, yb);
 #if USE_ULIG_FILLEDBOXES
-		if( t->fillbox &&
-		    plot->fill_properties.border_linetype != LT_UNDEFINED)
-		    (*t->linetype)(plot->lp_properties.l_type);
+		if( t->fillbox && plot->fill_properties.border_linetype != LT_UNDEFINED) {
+#ifdef PM3D
+		    if (plot->lp_properties.use_palette)
+			apply_pm3dcolor(&plot->lp_properties.pm3d_color,t);
+		    else
+#endif
+			(*t->linetype)(plot->lp_properties.l_type);
+		}
 #endif
 		break;
 	    }			/* case OUTRANGE, INRANGE */
@@ -3333,7 +3344,16 @@ plot_c_bars(struct curve_points *plot)
 	    } else {
 		ymax = map_y(yopen); ymin = map_y(yclose);
 	    }
-	    term->fillbox( style,
+#ifdef PM3D
+	    if (plot->lp_properties.use_palette) {
+		unsigned int x = xlowM;
+		unsigned int y = ymin;
+		unsigned int w = (xhighM-xlowM);
+		unsigned int h = (ymax-ymin);
+		(*t->filled_polygon)(4, fill_corners(style,x,y,w,h));
+	    } else
+#endif
+		term->fillbox( style,
 		    (unsigned int)(xlowM), (unsigned int)(ymin),
 		    (unsigned int)(xhighM-xlowM), (unsigned int)(ymax-ymin) );
 	}
@@ -4490,19 +4510,33 @@ do_key_sample(
 		write_multiline(x, yl, title, LEFT, JUST_TOP, 0, NULL);
 	}
     }
+
     /* Draw sample in same color as the corresponding plot */
-    (*t->linetype)(this_plot->lp_properties.l_type);
+#ifdef PM3D
+    if (this_plot->lp_properties.use_palette)
+	apply_pm3dcolor(&this_plot->lp_properties.pm3d_color,t);
+    else
+#endif
+	(*t->linetype)(this_plot->lp_properties.l_type);
 
     /* draw sample depending on bits set in plot_style */
 #if USE_ULIG_FILLEDBOXES
     if (this_plot->plot_style & PLOT_STYLE_HAS_FILL
 	&& t->fillbox) {
 	struct fill_style_type *fs = &this_plot->fill_properties;
+	int style = style_from_fill(fs);
+	unsigned int x = xl + key_sample_left;
+	unsigned int y = yl - key_entry_height/4;
+	unsigned int w = key_sample_right - key_sample_left;
+	unsigned int h = key_entry_height/2;
 
-	(*t->fillbox)(style_from_fill(fs),
-		      xl + key_sample_left, yl - key_entry_height/4,
-		      key_sample_right - key_sample_left,
-		      key_entry_height/2);
+#ifdef PM3D
+	if (this_plot->lp_properties.use_palette) {
+	    (*t->filled_polygon)(4, fill_corners(style,x,y,w,h));
+	} else
+#endif
+	    (*t->fillbox)(style,x,y,w,h);
+
 	if (fs->fillstyle != FS_EMPTY && fs->border_linetype != LT_UNDEFINED)
 	    (*t->linetype)(fs->border_linetype);
 	if (fs->border_linetype != LT_NODRAW) {
@@ -4512,8 +4546,14 @@ do_key_sample(
 	    (*t->vector)(xl + key_sample_left,  yl + key_entry_height/4);
 	    (*t->vector)(xl + key_sample_left,  yl - key_entry_height/4);
 	}
-	if (fs->fillstyle != FS_EMPTY && fs->border_linetype != LT_UNDEFINED)
-	    (*t->linetype)(this_plot->lp_properties.l_type);
+	if (fs->fillstyle != FS_EMPTY && fs->border_linetype != LT_UNDEFINED) {
+#ifdef PM3D
+	    if (this_plot->lp_properties.use_palette)
+		apply_pm3dcolor(&this_plot->lp_properties.pm3d_color,t);
+	    else
+#endif
+		(*t->linetype)(this_plot->lp_properties.l_type);
+	}
     } else
 #endif
 	if (this_plot->plot_style == VECTOR && t->arrow) {
@@ -4579,6 +4619,29 @@ style_from_fill(struct fill_style_type *fs)
     return style;
 }
 
+#ifdef PM3D
+/*
+ * The equivalent of t->fillbox() except that it uses PM3D colors instead
+ * of plain line types
+ */
+static gpiPoint *
+fill_corners(int style, unsigned int x, unsigned int y, unsigned int w, unsigned int h)
+{
+    static gpiPoint corner[4];
+
+    corner[0].style = style;
+    corner[0].x = x;
+    corner[0].y = y;
+    corner[1].x = x;
+    corner[1].y = y+h;
+    corner[2].x = x+w;
+    corner[2].y = y+h;
+    corner[3].x = x+w;
+    corner[3].y = y;
+
+    return corner;
+}
+#endif
 
 #ifdef WITH_IMAGE
 
@@ -4892,7 +4955,7 @@ plot_image_or_update_axes(void *plot, t_imagecolor pixel_planes, TBOOLEAN projec
 
 	image = (coordval *) malloc(array_size*sizeof(image[0]));
 
-	/* Place points into image array based upon the arrangement of point indeces and
+	/* Place points into image array based upon the arrangement of point indices and
 	 * the visibility of pixels.
 	 */
 	if (image != NULL) {
@@ -5194,3 +5257,4 @@ plot_image_or_update_axes(void *plot, t_imagecolor pixel_planes, TBOOLEAN projec
 
 }
 #endif
+

@@ -1,5 +1,5 @@
 /*
- * $Id: tables.h,v 1.46 2004/07/05 03:49:22 sfeam Exp $
+ * $Id: tables.h,v 1.47 2004/11/06 21:18:46 sfeam Exp $
  */
 
 /* GNUPLOT - tables.h */
@@ -227,6 +227,7 @@ int lookup_table __PROTO((const struct gen_table *, int));
 parsefuncp_t lookup_ftable __PROTO((const struct gen_ftable *, int));
 int lookup_table_nth __PROTO((const struct gen_table *tbl, const char *search_str));
 int lookup_table_nth_reverse __PROTO((const struct gen_table *tbl, int table_len, const char *search_str));
+const char * reverse_table_lookup __PROTO((const struct gen_table *tbl, int entry));
 
 
 #endif /* GNUPLT_TABLES_H */

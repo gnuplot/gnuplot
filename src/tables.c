@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: tables.c,v 1.55 2004/09/01 15:53:49 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: tables.c,v 1.56 2004/11/06 21:18:46 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - tables.c */
@@ -540,10 +540,10 @@ const struct gen_table pm3d_color_names_tbl[] =
     { "aquamarine"      , 127*(1<<16) + 255*(1<<8) + 212 },
     { "khaki"           , 240*(1<<16) + 230*(1<<8) + 140 },
     { "dark-khaki"      , 189*(1<<16) + 183*(1<<8) + 107 },
-    { "gold"            , 255*(1<<16) + 215*(1<<8) +   0 },
     { "goldenrod"       , 218*(1<<16) + 165*(1<<8) +  32 },
     { "light-goldenrod" , 238*(1<<16) + 221*(1<<8) + 130 },
     { "dark-goldenrod"  , 184*(1<<16) + 134*(1<<8) +  11 },
+    { "gold"            , 255*(1<<16) + 215*(1<<8) +   0 },
     { "beige"           , 245*(1<<16) + 245*(1<<8) + 220 },
     { "brown"           , 165*(1<<16) +  42*(1<<8) +  42 },
     { "orange"          , 255*(1<<16) + 165*(1<<8) +   0 },
@@ -685,3 +685,15 @@ lookup_table_nth_reverse(
     return -1; /* not found */
 }
 
+/* Returns the key associated with this indexed value
+ * or NULL if the key/value pair is not found.
+ */
+const char *
+reverse_table_lookup(const struct gen_table *tbl, int entry)
+{
+    int k = -1;
+    while (tbl[++k].key)
+	if (tbl[k].value == entry)
+	    return(tbl[k].key);
+    return NULL;
+}

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.156 2004/11/06 21:18:45 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.157 2004/11/22 00:43:05 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -3635,7 +3635,11 @@ set_tic_prop(AXIS_INDEX axis)
 	    }
 	}
 	if (equals(c_token,"tc") || almost_equals(c_token,"text$color")) {
+#ifdef PM3D
+	    parse_colorspec(&axis_array[axis].ticdef.textcolor, TC_FRAC);
+#else
 	    parse_colorspec(&axis_array[axis].ticdef.textcolor, TC_LT);
+#endif
 	}
     }
     if (almost_equals(c_token, nocmd)) {	/* NOSTRING */

@@ -1,5 +1,5 @@
 /*
- * $Id: term_api.h,v 1.34 2004/09/15 11:13:04 mikulik Exp $
+ * $Id: term_api.h,v 1.35 2004/11/27 02:38:36 sfeam Exp $
  */
 
 /* GNUPLOT - term_api.h */
@@ -73,6 +73,7 @@ typedef struct lp_style_type {	/* contains all Line and Point properties */
     double  p_size;
 #ifdef PM3D
     TBOOLEAN use_palette;
+    struct t_colorspec pm3d_color;
 #endif
     /* ... more to come ? */
 } lp_style_type;

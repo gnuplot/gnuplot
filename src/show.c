@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.139 2004/10/22 01:30:52 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.140 2004/11/06 21:18:45 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -1593,6 +1593,8 @@ show_label(int tag)
 			      break;
 		case TC_FRAC: fprintf(stderr," palette fraction %4.2f", this_label->textcolor.value);
 			      break;
+		case TC_RGB:  fprintf(stderr," rgb \"#%6.6x\" ", this_label->textcolor.lt);
+			      break;
 		}
 	    }
 	    if (this_label->lp_properties.pointflag == 0)
@@ -2821,9 +2823,21 @@ show_linestyle(int tag)
 	    fprintf(stderr, "\tlinestyle %d, ", this_linestyle->tag);
 
 #ifdef PM3D
-	    if (this_linestyle->lp_properties.use_palette)
-		fprintf(stderr, "linetype palette, ");
-	    else
+	    if (this_linestyle->lp_properties.use_palette) {
+	    	fprintf(stderr, " linetype");
+		switch(this_linestyle->lp_properties.pm3d_color.type) {
+		case TC_LT:   fprintf(stderr," %d ", this_linestyle->lp_properties.pm3d_color.lt+1);
+			      break;
+		case TC_Z:    fprintf(stderr," palette z ");
+			      break;
+		case TC_CB:   fprintf(stderr," palette cb %g ", this_linestyle->lp_properties.pm3d_color.value);
+			      break;
+		case TC_FRAC: fprintf(stderr," palette fraction %4.2f ", this_linestyle->lp_properties.pm3d_color.value);
+			      break;
+		case TC_RGB:  fprintf(stderr," rgb \"#%6.6x\" ", this_linestyle->lp_properties.pm3d_color.lt);
+			      break;
+		}
+	    } else
 #endif
 		fprintf(stderr, "linetype %d, ", this_linestyle->lp_properties.l_type + 1);
 
