@@ -233,11 +233,11 @@ char *dest;
 
 #if defined(PIPES)
 	if (*dest == '|') {
-#ifdef OS2
+# ifdef OS2
 	    if ((f = popen(dest + 1, "wb")) == (FILE *) NULL)
-#else
+# else
 	    if ((f = popen(dest + 1, "w")) == (FILE *) NULL)
-#endif
+# endif
 		os_error("cannot create pipe; output not changed", c_token);
 	    else
 		pipe_open = TRUE;
