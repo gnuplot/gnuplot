@@ -337,6 +337,7 @@ static TBOOLEAN set_two __PROTO((void));
 static TBOOLEAN set_three __PROTO((void));
 static int looks_like_numeric __PROTO((char *));
 static void set_lp_properties __PROTO((struct lp_style_type * arg, int allow_points, int lt, int pt, double lw, double ps));
+static void reset_lp_properties __PROTO((struct lp_style_type *arg));
 static void set_locale __PROTO((char *));
 
 static int set_tic_prop __PROTO((int *TICS, int *MTICS, double *FREQ,
@@ -2396,19 +2397,14 @@ static void set_arrow()
     struct arrow_def *new_arrow = NULL;
     struct arrow_def *prev_arrow = NULL;
     struct position spos, epos;
-#ifndef ANSI_C
     struct lp_style_type loc_lp;
-#else
-    struct lp_style_type loc_lp = LP_DEFAULT;
-#endif
     int axes = FIRST_AXES;
     int tag;
     TBOOLEAN set_start, set_end, head = 1, set_axes = 0, set_line = 0;
 
-#ifndef ANSI_C
-    loc_lp.pointflag = loc_lp.l_type = loc_lp.p_type = 0;
-    loc_lp.l_width = loc_lp.p_size = 1.0;
-#endif
+    /* Init struct lp_style_type loc_lp */
+    reset_lp_properties (&arg);
+
     /* get tag */
     if (!END_OF_COMMAND
 	&& !equals(c_token, "from")
@@ -2598,17 +2594,12 @@ static void set_linestyle()
     struct linestyle_def *this_linestyle = NULL;
     struct linestyle_def *new_linestyle = NULL;
     struct linestyle_def *prev_linestyle = NULL;
-#ifndef ANSI_C
     struct lp_style_type loc_lp;
-#else
-    struct lp_style_type loc_lp = LP_DEFAULT;
-#endif
     int tag;
 
-#ifndef ANSI_C
-    loc_lp.pointflag = loc_lp.l_type = loc_lp.p_type = 0;
-    loc_lp.l_width = loc_lp.p_size = 1.0;
-#endif
+    /* Init struct lp_style_type loc_lp */
+    reset_lp_properties (&arg);
+
     /* get tag */
     if (!END_OF_COMMAND) {
 	/* must be a tag expression! */
@@ -3131,6 +3122,14 @@ double lw, ps;
     arg->p_type = pt;
     arg->l_width = lw;
     arg->p_size = ps;
+}
+
+static void reset_lp_properties(arg)
+struct lp_style_type *arg;
+{
+    /* See plot.h for struct lp_style_type */
+    arg->pointflag = arg->l_type = arg->p_type = 0;
+    arg->l_width = arg->p_size = 1.0;
 }
 
 static void set_locale(lcl)
