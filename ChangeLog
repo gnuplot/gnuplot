@@ -1,3 +1,8 @@
+2004-09-29  Ethan Merritt  <merritt@u.washington.edu>
+	* demo/all.dem:  Remove vector.dem again, since it turns out that it
+	breaks for any terminal type whose default value of 'set output' is
+	not the current display.
+
 2004-09-29  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/datafile.c (df_show_binary): In fprintf(), use "%f" not "%lf" for
