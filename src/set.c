@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.166 2005/02/01 11:28:51 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.167 2005/02/02 21:05:01 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -308,11 +308,14 @@ set_command()
 	case S_HIDDEN3D:
 	    set_hidden3d();
 	    break;
-#if defined(HAVE_LIBREADLINE) && defined(GNUPLOT_HISTORY)
 	case S_HISTORYSIZE:
+fprintf(stderr,"BLA \n");
+#if defined(HAVE_LIBREADLINE) && defined(GNUPLOT_HISTORY)
 	    set_historysize();
-	    break;
+#else
+	    int_error(c_token, "Command 'set historysize' requires GNU readline, but this gnuplot was configured with the default readline.");
 #endif
+	    break;
 	case S_ISOSAMPLES:
 	    set_isosamples();
 	    break;

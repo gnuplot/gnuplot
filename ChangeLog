@@ -1,3 +1,9 @@
+2005-02-18  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* src/command.c src/tables.c src/set.c src/unset.c docs/gnuplot.doc: Let
+	command '{un}set historysize' be always available, but report a
+	descriptive error if gnuplot has not been configured with GNU readline.
+
 2005-02-17  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/pdf.trm: Add terminal options for monochrome and for dashed

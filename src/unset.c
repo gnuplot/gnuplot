@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.72 2005/01/11 17:37:15 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.73 2005/02/01 11:28:51 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -91,9 +91,7 @@ static void unset_hidden3d __PROTO((void));
 #ifdef EAM_HISTOGRAMS
 static void unset_histogram __PROTO((void));
 #endif
-#if defined(HAVE_LIBREADLINE) && defined(GNUPLOT_HISTORY)
 static void unset_historysize __PROTO((void));
-#endif
 static void unset_isosamples __PROTO((void));
 static void unset_key __PROTO((void));
 static void unset_keytitle __PROTO((void));
@@ -236,11 +234,13 @@ unset_command()
     case S_HIDDEN3D:
 	unset_hidden3d();
 	break;
-#if defined(HAVE_LIBREADLINE) && defined(GNUPLOT_HISTORY)
     case S_HISTORYSIZE:
+#if defined(HAVE_LIBREADLINE) && defined(GNUPLOT_HISTORY)
 	unset_historysize();
-	break;
+#else
+	    int_error(c_token, "Command 'unset historysize' requires GNU readline, but this gnuplot was configured with the default readline.");
 #endif
+	break;
     case S_ISOSAMPLES:
 	unset_isosamples();
 	break;

@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.273 2005/02/06 05:05:48 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.274 2005/02/09 11:43:07 mikulik Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -5829,7 +5829,7 @@ C ... and restart the table:
 ?historysize
 ?nohistorysize
  Note: the command `set historysize` is only available when
- compiled with the gnu readline.
+ gnuplot has been configured with the GNU readline.
 
  Syntax:
        set historysize <int>
