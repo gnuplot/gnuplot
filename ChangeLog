@@ -1,3 +1,45 @@
+1998-04-13  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* atariaes.trm, atarivdi.trm, cgi.trm, cgm.trm, corel.trm, epson.trm,
+	fig.trm, linux.trm, next.trm, pbm.trm, pc.trm, pm.trm, png.trm,
+	post.trm, pslatex.trm, pstricks.trm, table.trm, tek.trm, texdraw.trm,
+	unixplot.trm, vws.trm, win.trm, x11.trm:
+	term-340.patch from Richard Crawford <u600256@gamma.lanl.gov>.
+
+	* post.trm: Fix typos in Dick's term-340 patch.
+	
+	* scanner.c, util.c: Escape quotes patch
+	from Glenn A. Horton-Smith <gas@SLAC.Stanford.EDU>.
+
+	* post.trm, pbm.trm: X11 vs. ps (and pbm) colour inconsistency patch
+	from Stephen Eglen <stephen@cns.ed.ac.uk>.
+
+	* fit.c, matrix.c, matrix.h: fit-unlimited.diff.980105 from
+	Hans-Bernhard Broeker <broeker@physik.rwth-aachen.de>.
+
+	* cgm.trm: Updated version, fixes "plot size change" bug, and "ugly
+	dashed lines" bug. From "James R. Van Zandt" <jrv@vanzandt.mv.com>.
+
+	* term/README: Documentation fix from
+	"James R. Van Zandt" <jrv@vanzandt.mv.com>.
+
+	* fig.trm: Fix pointsize in fig terminal, from
+	Hans-Martin Keller <hkeller@gwdg.de>, and
+	Konrad Bernloehr <bernlohr@ik3.fzk.de>.
+
+	* hp500c.trm, hppj.trm, pbm.trm, png.trm: Fix changing plot size bug.
+	From Hans-Bernhard Broeker <broeker@physik.rwth-aachen.de>.
+
+	* fit.c: Fix segfault in fit.c (fit_chisq_undef.diff.980304).
+	From Hans-Bernhard Broeker <broeker@physik.rwth-aachen.de>.
+
+	* command.c (define): Fix segfault where allocated structure
+	(action table) is freed twice.
+	From Konrad Bernloehr <bernlohr@ik3.fzk.de>
+
+	* term.c (term_init): Memory allocation error fix.
+	From Kai Poitschke <kai.poitschke@henkel.de>.
+	
 1998-04-11  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* acconfig.h: Remove AUTOCONF, NOCOPY, OLD_SELECT.
