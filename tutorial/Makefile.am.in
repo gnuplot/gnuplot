@@ -45,15 +45,16 @@ tutorial.pdf: eg1.tex eg2.tex eg3.tex eg4.tex eg5.tex eg6.tex linepoin.tex \
 	$(DVIPS) -o $@ $<
 
 .plt.tex:
-	@test -f eg3.dat || cp $(srcdir)/*.dat .
 	@if test -x $(top_srcdir)/src/gnuplot ; then \
 	  $(top_srcdir)/src/gnuplot $< ; \
 	else \
 	  gnuplot $< ; \
 	fi
 
-clean-local:
-	@test "$(top_srcdir)" = "$(top_builddir)" || rm -f eg?.dat
+distclean-local:
+	@if test "$(top_srcdir)" != "$(top_builddir)" ; then \
+	  rm -f eg3.dat; \
+	fi
 
 Makefile.am: Makefile.am.in
 	rm -f $@ $@t
