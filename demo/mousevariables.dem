@@ -1,0 +1,20 @@
+#
+# Demonstrate use of user variables 
+# MOUSE_BUTTON MOUSE_X MOUSE_Y MOUSE_X2 MOUSE_Y2
+# and built-in function defined(<varname>)
+#
+set grid
+set title "Demonstration of reading mouse variables from gnuplot input script"
+plot sin(x)
+pause -1 "Click on the plot, then hit <cr>"
+#
+if (defined(MOUSE_BUTTON)) \
+    print "Mouse button ", MOUSE_BUTTON, " at ", MOUSE_X, " ", MOUSE_Y ;\
+    set label 1 "   Mouse button %.0s\n   clicked here!", MOUSE_BUTTON ;\
+    set label 1 at MOUSE_X, MOUSE_Y ;\
+    set label 1 point pt 6 ps 6 ;\
+    replot ;\
+else \
+    print "No mouse click?" ;\
+#
+pause -1
