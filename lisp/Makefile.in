@@ -42,11 +42,11 @@ default: $(ELCS)
 
 gnuplot.elc: gnuplot.el
 	@test -f gnuplot.el || cp $(srcdir)/gnuplot.el .
-	@test "$(EMACS)" != no && $(BYTEC) gnuplot.el
+	$(BYTEC) gnuplot.el
 
 gnuplot-gui.elc: gnuplot.elc gnuplot-gui.el
 	@test -f gnuplot-gui.el || cp $(srcdir)/gnuplot-gui.el .
-	@test "$(EMACS)" != no && $(BYTEC) gnuplot-gui.el
+	$(BYTEC) gnuplot-gui.el
 
 ## There are many possibilities for info-look:
 ##
@@ -88,7 +88,7 @@ info-look.elc:  info-look.20.2.el info-look.20.3.el
 	  cp $(srcdir)/info-look.20.2.el info-look.el; \
 	fi ;\
 	if [ ! \( $(EMACS) = "emacs" -a $$version -ge 2030 \) ]; \
-	  then test "$(EMACS)" != no && $(BYTEC) info-look.el; fi;
+	  then $(BYTEC) info-look.el; fi;
 
 
 ps: gpelcard.ps
@@ -98,7 +98,7 @@ gpelcard.ps: gpelcard.dvi
 
 gpelcard.dvi: gpelcard.tex
 	@test -f gpelcard.tex || cp $(srcdir)/gpelcard.tex .
-	@test "$(LATEX)" != no && $(LATEX) gpelcard.tex
+	$(LATEX) gpelcard.tex
 
 all: gnuplot.elc info-look.elc gnuplot-gui.elc
 

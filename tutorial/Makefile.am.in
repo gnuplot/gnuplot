@@ -11,12 +11,16 @@ CLEANFILES = tutorial.aux tutorial.dvi tutorial.log tutorial.ps eg1.tex \
 eg2.tex eg3.tex eg4.tex eg5.tex eg6.tex linepoin.tex
 
 DVIPS = dvips
-LATEX = latex
+LATEX = @LATEX@
 
 SUFFIXES = .dvi .plt .tex .ps
 
 # default target
-all: tutorial.dvi
+all: @TUTORIAL@
+
+tutorial: tutorial.dvi
+
+notutorial:
 
 # To touch it up after changes:
 remake: tutorial.dvi
@@ -25,11 +29,9 @@ tutorial.ps: tutorial.dvi
 
 tutorial.dvi: eg1.tex eg2.tex eg3.tex eg4.tex eg5.tex eg6.tex linepoin.tex \
 	tutorial.tex header.tex
-	@if [ "$(LATEX)" != no ]; then \
-	  echo Building LaTeX tutorial ; \
-	  TEXINPUTS=.:$(srcdir): $(LATEX) tutorial ; \
-	  TEXINPUTS=.:$(srcdir): $(LATEX) tutorial ; \
-	fi
+	@echo Building LaTeX tutorial
+	TEXINPUTS=.:$(srcdir): $(LATEX) tutorial
+	TEXINPUTS=.:$(srcdir): $(LATEX) tutorial
 
 .dvi.ps:
 	$(DVIPS) -o $@ $<
