@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: eval.c,v 1.13 2003/03/20 14:36:58 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: eval.c,v 1.14 2003/07/22 17:22:47 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - eval.c */
@@ -66,11 +66,6 @@ struct udvt_entry *first_udv = &udv_pi;
 struct udft_entry *first_udf = NULL;
 
 TBOOLEAN undefined;
-
-#ifdef GP_ISVAR
-/* Do we want to push variables or their defined state? */
-TBOOLEAN push_vars=TRUE;
-#endif  /*GP_ISVAR*/
 
 /* The stack this operates on */
 static struct value stack[STACK_DEPTH];

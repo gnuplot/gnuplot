@@ -1,5 +1,5 @@
 /*
- * $Id: eval.h,v 1.7 2003/03/20 14:36:59 broeker Exp $
+ * $Id: eval.h,v 1.8 2003/07/22 17:22:47 sfeam Exp $
  */
 
 /* GNUPLOT - eval.h */
@@ -127,14 +127,6 @@ extern struct udft_entry *first_udf; /* user-def'd functions */
 extern struct udvt_entry *first_udv; /* user-def'd variables */
 extern struct udvt_entry udv_pi; /* 'pi' variable */
 extern TBOOLEAN undefined;
-
-#ifdef GP_ISVAR
-/* isvar - When this variable is true PUSH operations become PUSHV */
-/* So the variable's definition state get's pushed */
-/* instead of the actual value */
-extern TBOOLEAN push_vars;
-#endif  /*GP_ISVAR*/
-
 
 /* Prototypes of functions exported by eval.c */
 

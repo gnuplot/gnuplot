@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: parse.c,v 1.17 2003/07/22 17:22:47 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: parse.c,v 1.18 2003/07/22 17:41:10 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - parse.c */
@@ -79,6 +79,11 @@ static int is_builtin_function __PROTO((int t_num));
 
 static struct at_type *at = NULL;
 static int at_size = 0;
+
+#ifdef GP_ISVAR
+/* isvar - When this variable is true PUSH operations become PUSHV */
+static TBOOLEAN push_vars = FALSE;
+#endif
 
 static void
 convert(val_ptr, t_num)
