@@ -1,5 +1,6 @@
 .deps
 Makefile
+Makefile.in
 gnuplot
 gnuplot_x11
 bf_test

@@ -28,10 +28,13 @@ core
 # CVS default ignores end
 .deps
 Makefile
+Makefile.in
+aclocal.m4
 config.cache
 config.h
+config.hin
 config.log
 config.status
-depcomp
+configure
 stamp-h
 stamp-h1

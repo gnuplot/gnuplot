@@ -1,5 +1,5 @@
 #! /bin/sh --
-# $Id: prepare,v 1.5 2002/10/31 20:01:57 sfeam Exp $
+# $Id: prepare,v 1.6 2002/12/19 15:56:44 lhecking Exp $
 # Small shell script to prepare the gnuplot sources when
 # checked out from CVS.
 
@@ -15,7 +15,6 @@ chmod og-w docs/* >/dev/null 2>&1
 rm -f config.cache config.status
 
 if aclocal -I m4 && autoheader \
-  && (cd config && make -f Makefile.am.in Makefile.am ) \
   && (cd config && make -f Makefile.am.in Makefile.am ) \
   && (cd demo && make -f Makefile.am.in Makefile.am ) \
   && (cd lisp && aclocal && autoconf ) \
@@ -39,3 +38,5 @@ else
   echo
   exit 1
 fi
+
+exit 0
