@@ -1,5 +1,5 @@
 /*
- * $Id: term_api.h,v 1.12 2000/12/18 08:21:17 mikulik Exp $
+ * $Id: term_api.h,v 1.13 2001/02/28 16:41:09 broeker Exp $
  */
 
 /* GNUPLOT - term_api.h */
@@ -64,9 +64,10 @@ typedef enum VERT_JUSTIFY {
     JUST_BOT
 } VERT_JUSTIFY;
 
+
 typedef struct lp_style_type {	/* contains all Line and Point properties */
     int     pointflag;		/* 0 if points not used, otherwise 1 */
-    int     l_type;		/* -3 if line is not to be drawn */
+    int     l_type;
     int	    p_type;
     double  l_width;
     double  p_size;
@@ -75,6 +76,8 @@ typedef struct lp_style_type {	/* contains all Line and Point properties */
 #endif
     /* ... more to come ? */
 } lp_style_type;
+
+#define L_TYPE_NODRAW -3	/* use if line is not to be drawn */
 
 #ifdef PM3D
 # define DEFAULT_LP_STYLE_TYPE {0, 0, 0, 1.0, 1.0, FALSE}

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.55 2001/03/19 14:52:23 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.56 2001/03/27 12:23:01 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -1417,7 +1417,7 @@ set_key()
 		c_token--;  /* is incremented after loop */
 		break;
 	    case S_KEY_NOBOX:
-		key_box.l_type = -3;
+		key_box.l_type = L_TYPE_NODRAW;
 		break;
 	    case S_KEY_SAMPLEN:
 		c_token++;

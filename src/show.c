@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.51 2001/01/30 20:01:43 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.52 2001/03/19 14:52:24 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -1347,7 +1347,7 @@ show_zeroaxis(axis)
 {
     SHOW_ALL_NL;
 
-    if (axis_array[axis].zeroaxis.l_type > -3)
+    if (axis_array[axis].zeroaxis.l_type > L_TYPE_NODRAW)
 	fprintf(stderr, "\
 \t%szeroaxis is drawn with linestyle %d, linewidth %.3f\n",
 		axis_defaults[axis].name,
@@ -1500,7 +1500,7 @@ show_key()
 	fprintf(stderr, "\tkey is %s justified, %s reversed and ",
 		key_just == JLEFT ? "left" : "right",
 		key_reverse ? "" : "not");
-	if (key_box.l_type >= -2)
+	if (key_box.l_type > L_TYPE_NODRAW)
 	    fprintf(stderr, "boxed\n\twith linetype %d, linewidth %.3f\n",
 		    key_box.l_type + 1, key_box.l_width);
 	else

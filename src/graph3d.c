@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.40 2001/01/22 18:30:21 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.41 2001/03/19 14:52:23 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -740,7 +740,7 @@ do_3dplot(plots, pcount, quick)
     if (key == KEY_USER_PLACEMENT) {
 	map3d_position(&key_user_pos, &xl, &yl, "key");
     }
-    if (key != KEY_NONE && key_box.l_type > -3) {
+    if (key != KEY_NONE && key_box.l_type > L_TYPE_NODRAW) {
 	int yt = yl;
 	int yb = yl - key_entry_height * (key_rows - ktitle_lines) - ktitle_lines * t->v_char;
 	int key_xr = xl + key_col_wth * (key_cols - 1) + key_size_right;
@@ -2121,7 +2121,7 @@ draw_3d_graphbox(plot, plot_num)
 	gen_tics(FIRST_Z_AXIS, grid_selection & (GRID_Z | GRID_MZ),
 		 ztick_callback);
     }
-    if ((Y_AXIS.zeroaxis.l_type >= -2)
+    if ((Y_AXIS.zeroaxis.l_type > L_TYPE_NODRAW)
 	&& !X_AXIS.log
 	&& inrange(0, X_AXIS.min, X_AXIS.max)
 	) {
@@ -2132,7 +2132,7 @@ draw_3d_graphbox(plot, plot_num)
 	map3d_xyz(0.0, Y_AXIS.max, base_z, &v2);
 	draw3d_line(&v1, &v2, &Y_AXIS.zeroaxis);
     }
-    if ((X_AXIS.zeroaxis.l_type >= -2)
+    if ((X_AXIS.zeroaxis.l_type > L_TYPE_NODRAW)
 	&& !Y_AXIS.log
 	&& inrange(0, Y_AXIS.min, Y_AXIS.max)
 	) {
@@ -2190,7 +2190,7 @@ xtick_callback(axis, place, text, grid)
 	(surface_rot_x > 90 && FRONTGRID != whichgrid)) {
 #endif
     map3d_xyz(place, xaxis_y, base_z, &v1);
-    if (grid.l_type > -2) {
+    if (grid.l_type > L_TYPE_NODRAW) {
 	/* to save mapping twice, map non-axis y */
 	map3d_xyz(place, other_end, base_z, &v2);
 	draw3d_line(&v1, &v2, &grid);
@@ -2245,10 +2245,10 @@ xtick_callback(axis, place, text, grid)
 
 void
 ytick_callback(axis, place, text, grid)
-AXIS_INDEX axis;
-double place;
-char *text;
-struct lp_style_type grid;
+    AXIS_INDEX axis;
+    double place;
+    char *text;
+    struct lp_style_type grid;
 {
     vertex v1, v2;
     double scale = (text ? ticscale : miniticscale);
@@ -2262,7 +2262,7 @@ struct lp_style_type grid;
 	(surface_rot_x > 90 && FRONTGRID != whichgrid)) {
 #endif
     map3d_xyz(yaxis_x, place, base_z, &v1);
-    if (grid.l_type > -2) {
+    if (grid.l_type > L_TYPE_NODRAW) {
 	map3d_xyz(other_end, place, base_z, &v2);
 	draw3d_line(&v1, &v2, &grid);
     }
@@ -2315,10 +2315,10 @@ struct lp_style_type grid;
 
 void
 ztick_callback(axis, place, text, grid)
-AXIS_INDEX axis;
-double place;
-char *text;
-struct lp_style_type grid;
+    AXIS_INDEX axis;
+    double place;
+    char *text;
+    struct lp_style_type grid;
 {
 /* HBB: inserted some ()'s to shut up gcc -Wall, here and below */
     int len = (text ? ticscale : miniticscale)
@@ -2326,7 +2326,7 @@ struct lp_style_type grid;
     vertex v1, v2, v3;
 
     map3d_xyz(zaxis_x, zaxis_y, place, &v1);
-    if (grid.l_type > -2) {
+    if (grid.l_type > L_TYPE_NODRAW) {
 	map3d_xyz(back_x, back_y, place, &v2);
 	map3d_xyz(right_x, right_y, place, &v3);
 	draw3d_line(&v1, &v2, &grid);

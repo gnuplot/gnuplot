@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.8 2001/02/15 17:02:40 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.9 2001/03/19 14:52:23 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -1018,8 +1018,12 @@ gen_tics(axis, grid, callback)
 
     memcpy(&lgrd, &grid_lp, sizeof(struct lp_style_type));
     memcpy(&mgrd, &mgrid_lp, sizeof(struct lp_style_type));
-    lgrd.l_type = (grid & (GRID_X | GRID_Y | GRID_X2 | GRID_Y2 | GRID_Z | GRID_CB)) ? grid_lp.l_type : -2;
-    mgrd.l_type = (grid & (GRID_MX | GRID_MY | GRID_MX2 | GRID_MY2 | GRID_MZ | GRID_MCB)) ? mgrid_lp.l_type : -2;
+    lgrd.l_type = (grid & (GRID_X | GRID_Y | GRID_X2 |
+			   GRID_Y2 | GRID_Z | GRID_CB))
+      ? grid_lp.l_type : L_TYPE_NODRAW;
+    mgrd.l_type = (grid & (GRID_MX | GRID_MY | GRID_MX2 |
+			   GRID_MY2 | GRID_MZ | GRID_MCB))
+      ? mgrid_lp.l_type : L_TYPE_NODRAW;
 
     if (def->type == TIC_USER) {	/* special case */
 	/*{{{  do user tics then return */
@@ -1501,7 +1505,7 @@ axis_draw_2d_zeroaxis(axis, crossaxis)
     AXIS *this = axis_array + axis;
 
     if (axis_position_zeroaxis(crossaxis)
-	    && (this->zeroaxis.l_type > -3)) {
+	    && (this->zeroaxis.l_type > L_TYPE_NODRAW)) {
 	term_apply_lp_properties(&this->zeroaxis);
 	if ((axis % SECOND_AXES) == FIRST_X_AXIS) {
 	    (*term->move) (this->term_lower, axis_array[crossaxis].term_zero);

@@ -1,3 +1,27 @@
+2001-04-03  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/term_api.h (L_TYPE_NODRAW): New macro to remove magic number
+ 	'-3' that signalled: "do not draw this line at all".
+
+	* src/axis.c (gen_tics): Use new macro. Fix 'set grid lt -1' bug
+ 	as a byproduct.
+	(axis_draw_2d_zeroaxis): Use new macro.
+
+	* src/color.c (cbtick_callback): Use new macro and fix bug using
+ 	lt -1.
+	
+	* src/graph3d.c (do_3dplot, draw_3d_graphbox): Use new macro.
+	(xtick_callback, ytick_callback, ztick_callback): Use it and fix
+ 	grid lt -1 bug.
+
+	* src/graphics.c (do_plot): Use new macro.
+	(xtick2d_callback, ytick2d_callback): Use it and fix grid lt -1
+ 	bug.
+
+	* src/set.c (set_key): Use new macro.
+
+	* src/show.c (show_key, show_zeroaxis): Use new macro.
+
 2001-04-01  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* configure.in: Remove AC_REVISION to avoid unnecessary cvs updates.

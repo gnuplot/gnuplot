@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.45 2001/02/15 17:02:40 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.46 2001/02/19 17:12:14 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -988,8 +988,8 @@ apply_head_properties(struct position* headsize)
 
 void
 do_plot(plots, pcount)
-struct curve_points *plots;
-int pcount;			/* count of plots in linked list */
+    struct curve_points *plots;
+    int pcount;			/* count of plots in linked list */
 {
     register struct termentry *t = term;
     register int curve;
@@ -1310,7 +1310,7 @@ int pcount;			/* count of plots in linked list */
 	yl_ref = yl -= key_entry_height / 2;	/* centralise the keys */
 	key_count = 0;
 
-	if (key_box.l_type > -3) {
+	if (key_box.l_type > L_TYPE_NODRAW) {
 	    term_apply_lp_properties(&key_box);
 	    (*t->move) (keybox.xl, keybox.yb);
 	    (*t->vector) (keybox.xl, keybox.yt);
@@ -3223,17 +3223,17 @@ double *lx, *ly;		/* lx[2], ly[2]: points where it crosses edges */
 /* also uses global tic_start, tic_direction, tic_text and tic_just */
 void
 xtick2d_callback(axis, place, text, grid)
-AXIS_INDEX axis;
-double place;
-char *text;
-struct lp_style_type grid;	/* linetype or -2 for no grid */
+    AXIS_INDEX axis;
+    double place;
+    char *text;
+    struct lp_style_type grid;	/* linetype or -2 for no grid */
 {
     register struct termentry *t = term;
     /* minitick if text is NULL - beware - h_tic is unsigned */
     int ticsize = tic_direction * (int) (t->v_tic) * (text ? ticscale : miniticscale);
     unsigned int x = map_x(place);
 
-    if (grid.l_type > -2) {
+    if (grid.l_type > L_TYPE_NODRAW) {
 	term_apply_lp_properties(&grid);
 	if (polar_grid_angle) {
 	    double x = place, y = 0, s = sin(0.1), c = cos(0.1);
@@ -3297,17 +3297,17 @@ struct lp_style_type grid;	/* linetype or -2 for no grid */
 /* also uses global tic_start, tic_direction, tic_text and tic_just */
 void
 ytick2d_callback(axis, place, text, grid)
-AXIS_INDEX axis;
-double place;
-char *text;
-struct lp_style_type grid;	/* linetype or -2 */
+    AXIS_INDEX axis;
+    double place;
+    char *text;
+    struct lp_style_type grid;	/* linetype or -2 */
 {
     register struct termentry *t = term;
     /* minitick if text is NULL - v_tic is unsigned */
     int ticsize = tic_direction * (int) (t->h_tic) * (text ? ticscale : miniticscale);
     unsigned int y = map_y(place);
 
-    if (grid.l_type > -2) {
+    if (grid.l_type > L_TYPE_NODRAW) {
 	term_apply_lp_properties(&grid);
 	if (polar_grid_angle) {
 	    double x = 0, y = place, s = sin(0.1), c = cos(0.1);

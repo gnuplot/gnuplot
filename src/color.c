@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: color.c,v 1.15 2001/03/20 16:34:36 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: color.c,v 1.16 2001/03/21 17:05:34 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - color.c */
@@ -388,10 +388,10 @@ FILE * out;
 
 void
 cbtick_callback(axis, place, text, grid)
-AXIS_INDEX axis;
-double place;
-char *text;
-struct lp_style_type grid; /* linetype or -2 for no grid */
+    AXIS_INDEX axis;
+    double place;
+    char *text;
+    struct lp_style_type grid; /* linetype or -2 for no grid */
 {
     int len = (text ? ticscale : miniticscale)
 	* (tic_in ? -1 : 1) * (term->h_tic);
@@ -415,7 +415,7 @@ struct lp_style_type grid; /* linetype or -2 for no grid */
     }
 
     /* draw grid line */
-    if (grid.l_type > -2) {
+    if (grid.l_type > L_TYPE_NODRAW) {
 	term_apply_lp_properties(&grid);	/* grid linetype */
 	if (color_box.rotation == 'h') {
 	    (*term->move) (x1, cb_y_from);
