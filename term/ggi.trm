@@ -1,0 +1,219 @@
+#include "driver.h"
+#ifdef TERM_REGISTER
+register_term(ggi)
+#endif
+
+#ifdef TERM_PROTO
+TERM_PUBLIC void GGI_graphics __PROTO((void));
+TERM_PUBLIC void GGI_init __PROTO((void)); /* Done. */
+TERM_PUBLIC void GGI_linetype __PROTO((int));
+TERM_PUBLIC void GGI_move __PROTO((unsigned int,unsigned int));
+TERM_PUBLIC void GGI_options __PROTO((void)); /* Done. */
+TERM_PUBLIC void GGI_put_text __PROTO((unsigned int,unsigned int,char*));
+TERM_PUBLIC void GGI_reset __PROTO((void)); /* Done. */
+TERM_PUBLIC void GGI_text __PROTO((void));
+TERM_PUBLIC void GGI_vector __PROTO((unsigned int,unsigned int));
+#define GOT_GGI_PROTO
+#endif
+
+#define GGI_XMAX 800
+#define GGI_YMAX 600
+#define GGI_VCHAR 8
+#define GGI_HCHAR 8
+#define GGI_VTIC 8
+#define GGI_HTIC 8
+
+#ifndef TERM_PROTO_ONLY
+#ifdef TERM_BODY
+
+#include <ggi/ggi.h>
+#include <ggi/wmh.h>
+
+/* First to some global variables
+ *
+ * GGIvisual is our 'piece of paper.'
+ * GGIborderColor and axixColor have the obvious meanings.
+ * GGIcolors are the colors for linestyles 0 and up.
+ * GGImap is for initializing colors.
+ * GGIx,GGIy are the current coordinates.
+ * GGIxmax,GGIymax are the maximum coordinates in the visual.
+ */
+static ggi_visual_t GGIvisual=NULL;
+static ggi_pixel GGIborderColor;
+static ggi_pixel GGIaxisColor;
+static ggi_pixel GGIblack;
+static ggi_pixel GGIcolors[6];
+static ggi_color GGImap;
+static unsigned int GGIx,GGIy;
+static unsigned int GGIxmax,GGIymax;
+static unsigned int Xenv;
+
+static void init_ggi_driver()
+{
+    ggi_pixel GGIwhite,GGIred,GGIgreen,GGIblue,GGIcyan,GGImagenta;
+    ggi_pixel GGIyellow;
+    if(GGIvisual==NULL)
+    {
+	if(ggiInit()) {}
+	if(NULL==(GGIvisual=ggiOpen(NULL))) ggiExit();
+	if(ggiSetSimpleMode(GGIvisual,GGI_AUTO,GGI_AUTO,GGI_AUTO,GT_AUTO)) ggiExit();
+    }
+    ggiAddFlags(GGIvisual, GGIFLAG_ASYNC);
+    GGImap.r=0xFFFF; GGImap.g=0xFFFF; GGImap.b=0xFFFF; GGIwhite=ggiMapColor(GGIvisual,&GGImap);
+    GGImap.r=0x0000; GGImap.g=0x0000; GGImap.b=0x0000; GGIblack=ggiMapColor(GGIvisual,&GGImap);
+    GGImap.r=0xFFFF; GGImap.g=0x0000; GGImap.b=0x0000; GGIred=ggiMapColor(GGIvisual,&GGImap);
+    GGImap.r=0x0000; GGImap.g=0xFFFF; GGImap.b=0x0000; GGIgreen=ggiMapColor(GGIvisual,&GGImap);
+    GGImap.r=0x0000; GGImap.g=0x0000; GGImap.b=0xFFFF; GGIblue=ggiMapColor(GGIvisual,&GGImap);
+    GGImap.r=0x0000; GGImap.g=0xFFFF; GGImap.b=0xFFFF; GGIcyan=ggiMapColor(GGIvisual,&GGImap);
+    GGImap.r=0xFFFF; GGImap.g=0x0000; GGImap.b=0xFFFF; GGImagenta=ggiMapColor(GGIvisual,&GGImap);
+    GGImap.r=0xFFFF; GGImap.g=0xFFFF; GGImap.b=0x0000; GGIyellow=ggiMapColor(GGIvisual,&GGImap);
+    GGIborderColor=GGIwhite;
+    GGIaxisColor=GGIwhite;
+    GGIcolors[0]=GGIred;
+    GGIcolors[1]=GGIgreen;
+    GGIcolors[2]=GGIblue;
+    GGIcolors[3]=GGImagenta;
+    GGIcolors[4]=GGIcyan;
+    GGIcolors[5]=GGIyellow;
+}
+
+/* Called begore a graphic is displayed */
+TERM_PUBLIC void GGI_graphics()
+{ 
+    if(!Xenv)
+    {
+	init_ggi_driver();
+	return;
+    }
+    ggiSetGCForeground(GGIvisual,GGIblack);
+    ggiDrawBox(GGIvisual,0,0,GGIxmax,GGIymax);
+}
+
+/*
+ * init
+ * -----------------------
+ * Called only once, when the terminal is initialized. We have to open the visual here because it
+ * is during 'init' that we have to change the terminal dimensions (xmax, ymax).
+ */ 
+TERM_PUBLIC void GGI_init() 
+{ 
+    ggi_mode GGImode;
+    if(ggiInit()) { }
+    if(NULL==(GGIvisual=ggiOpen(NULL))) ggiExit();
+    if(ggiSetSimpleMode(GGIvisual,GGI_AUTO,GGI_AUTO,GGI_AUTO,GT_AUTO)) ggiExit();
+    ggiGetMode(GGIvisual,&GGImode);
+    term->xmax=GGImode.virt.x;
+    term->ymax=GGImode.virt.y;
+    GGIxmax=term->xmax-1;
+    GGIymax=term->ymax-1;
+    Xenv=!ggiWmhInit();
+    if(!(Xenv=!ggiWmhAttach(GGIvisual))) ggiWmhDetach(GGIvisual);
+    else Xenv=!ggiWmhSetTitle(GGIvisual,"GGI Gnuplot Driver");
+    if(!Xenv)
+    {
+	ggiWmhDetach(GGIvisual);
+	ggiWmhExit();
+    	ggiClose(GGIvisual);
+	GGIvisual=NULL;
+	ggiExit();
+    }
+    else init_ggi_driver();
+}
+
+TERM_PUBLIC void GGI_linetype(linetype)
+int linetype;
+{
+    if(linetype==-2) ggiSetGCForeground(GGIvisual,GGIborderColor);
+    if(linetype==-1) ggiSetGCForeground(GGIvisual,GGIaxisColor);
+    if(linetype<0) return;
+    if(linetype>=6) linetype%=6;
+    ggiSetGCForeground(GGIvisual,GGIcolors[linetype]);
+}
+
+TERM_PUBLIC void GGI_move(x,y)
+unsigned int x,y;
+{
+    GGIx=x;
+    GGIy=y;
+}
+
+TERM_PUBLIC void GGI_options() { }
+/* Called when terminal is terminated */
+TERM_PUBLIC void GGI_reset() 
+{
+    if(GGIvisual!=NULL)
+    {
+	if(Xenv)
+	{
+	    ggiWmhDetach(GGIvisual);
+	    ggiWmhExit();
+	}
+	ggiClose(GGIvisual); 
+    	ggiExit();
+    }
+}
+
+TERM_PUBLIC void GGI_put_text(x,y,str)
+unsigned int x,y;
+char *str;
+{
+    ggi_pixel current_foreground;
+    ggiGetGCForeground(GGIvisual,&current_foreground);
+    ggiSetGCForeground(GGIvisual,GGIborderColor);
+    ggiPuts(GGIvisual,x,GGIymax-y-4,str);
+    ggiSetGCForeground(GGIvisual,current_foreground);
+}
+
+/* Wait for a key to be pressed and exit graphics mode if running in console mode. */
+TERM_PUBLIC void GGI_text(void)
+{
+    ggiFlush(GGIvisual);
+    if(Xenv) return;
+    ggiGetc(GGIvisual);
+    ggiClose(GGIvisual);
+    ggiExit();
+    GGIvisual=NULL;
+}
+
+TERM_PUBLIC void GGI_vector(x,y)
+unsigned int x,y;
+{
+    ggiDrawLine(GGIvisual,GGIx,GGIymax-GGIy,x,GGIymax-y);
+    GGIx=x;
+    GGIy=y;
+}
+
+#endif /* TERM_BODY */
+
+#ifdef TERM_TABLE
+
+TERM_TABLE_START(ggi_driver)
+    "ggi", "GGI target",
+    GGI_XMAX, GGI_YMAX, GGI_VCHAR, GGI_HCHAR, GGI_VTIC, GGI_HTIC,
+    GGI_options, GGI_init, GGI_reset, GGI_text,
+    null_scale, GGI_graphics, GGI_move, GGI_vector,
+    GGI_linetype, GGI_put_text,
+    0, /* angle */
+    0, /* justify text */
+    0, /* point */
+    0, /* arrow */
+    0, /* set_font */
+    0, /* set_pointsize */
+    0, /* flags */
+    0, /* suspend */
+    0, /* resume */
+    0, /* fillbox */
+    0 /* linewidth */
+TERM_TABLE_END(ggi_driver)
+
+#endif /* TERM_TABLE */
+#endif /* TERM_PROTO_ONLY */
+
+#ifdef TERM_HELP
+START_HELP(ggi)
+"1 ggi",
+"?set terminal ggi",
+"?ggi",
+" The GGI terminal generates output to a GGI target."
+END_HELP(ggi)
+#endif
