@@ -1,5 +1,5 @@
 /*
- * $Id: doc2tex.c,v 1.20 1998/04/14 00:17:01 drd Exp $
+ * $Id: doc2tex.c,v 1.21 1998/06/18 14:59:12 ddenholm Exp $
  *
  */
 

@@ -1,5 +1,5 @@
 #ifndef lint
-static char    *RCSid = "$Id: plot3d.c,v 1.35 1998/04/14 00:16:10 drd Exp $";
+static char    *RCSid = "$Id: plot3d.c,v 1.36 1998/06/18 14:55:14 ddenholm Exp $";
 #endif
 
 /* GNUPLOT - plot3d.c */

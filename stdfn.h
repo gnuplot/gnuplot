@@ -1,5 +1,5 @@
 /*
- * $Id: stdfn.h,v 1.22 1998/04/14 00:16:23 drd Exp $
+ * $Id: stdfn.h,v 1.23 1998/06/18 14:55:18 ddenholm Exp $
  *
  */
 
