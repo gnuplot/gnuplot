@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.38 2003/12/26 22:59:12 vanzandt Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.39 2004/03/15 12:37:23 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -83,8 +83,9 @@ static char ticfmt[AXIS_ARRAY_SIZE][MAX_ID_LEN+1];
 /* HBB 20010831: new enum typedef, to make code using this more
  * self-explanatory */
 /* The unit the tics of a given time/date axis are to interpreted in */
+/* HBB 20040318: start at one, to avoid undershoot */
 typedef enum e_timelevel {
-    TIMELEVEL_SECONDS, TIMELEVEL_MINUTES, TIMELEVEL_HOURS,
+    TIMELEVEL_SECONDS = 1, TIMELEVEL_MINUTES, TIMELEVEL_HOURS,
     TIMELEVEL_DAYS, TIMELEVEL_WEEKS, TIMELEVEL_MONTHS,
     TIMELEVEL_YEARS
 } t_timelevel;
@@ -363,18 +364,22 @@ make_auto_time_minitics(tlevel, incr)
     switch (tlevel) {
     case TIMELEVEL_SECONDS:
     case TIMELEVEL_MINUTES:
+	if (incr >= 5)
+	    tinc = 1;
+	if (incr >= 10)
+	    tinc = 5;
 	if (incr >= 20)
 	    tinc = 10;
 	if (incr >= 60)
-	    tinc = 30;
+	    tinc = 20;
 	if (incr >= 2 * 60)
 	    tinc = 60;
-	if (incr >= 5 * 60)
+	if (incr >= 6 * 60)
 	    tinc = 2 * 60;
-	if (incr >= 10 * 60)
-	    tinc = 5 * 60;
-	if (incr >= 20 * 60)
-	    tinc = 10 * 60;
+	if (incr >= 12 * 60)
+	    tinc = 3 * 60;
+	if (incr >= 24 * 60)
+	    tinc = 6 * 60;
 	break;
     case TIMELEVEL_HOURS:
 	if (incr >= 20 * 60)
@@ -383,12 +388,12 @@ make_auto_time_minitics(tlevel, incr)
 	    tinc = 30 * 60;
 	if (incr >= 2 * 3600)
 	    tinc = 3600;
-	if (incr >= 5 * 3600)
+	if (incr >= 6 * 3600)
 	    tinc = 2 * 3600;
-	if (incr >= 10 * 3600)
-	    tinc = 5 * 3600;
-	if (incr >= 20 * 3600)
-	    tinc = 10 * 3600;
+	if (incr >= 12 * 3600)
+	    tinc = 3 * 3600;
+	if (incr >= 24 * 3600)
+	    tinc = 6 * 3600;
 	break;
     case TIMELEVEL_DAYS:
 	if (incr > 2 * 3600)
@@ -688,23 +693,20 @@ quantize_time_tics(axis, tic, xr, guide)
     if (tic > 5) {
 	/* turn tic into units of minutes */
 	tic = quantize_duodecimal_tics(xr / 60.0, guide12) * 60;
-	timelevel[axis] = TIMELEVEL_MINUTES;
+	if (tic >= 60)
+	    timelevel[axis] = TIMELEVEL_MINUTES;
     }
     if (tic > 5 * 60) {
 	/* turn tic into units of hours */
 	tic = quantize_duodecimal_tics(xr / 3600.0, guide12) * 3600;
-	timelevel[axis] = TIMELEVEL_HOURS;
+	if (tic >= 3600)
+	    timelevel[axis] = TIMELEVEL_HOURS;
     }
-#if 0
-    if (tic > 2 * 3600) {
-	/* need some tickling */
-	tic = quantize_normal_tics(xr / (3 * 3600.0), guide) * 3 * 3600;
-    }
-#endif
     if (tic > 3600) {
 	/* turn tic into units of days */
         tic = quantize_duodecimal_tics(xr / DAY_SEC, guide12) * DAY_SEC;
-	timelevel[axis] = TIMELEVEL_DAYS;
+	if (tic >= DAY_SEC)
+	    timelevel[axis] = TIMELEVEL_DAYS;
     }
     if (tic > 2 * DAY_SEC) {
 	/* turn tic into units of weeks */
@@ -712,7 +714,8 @@ quantize_time_tics(axis, tic, xr, guide)
 	if (tic < WEEK_SEC) {	/* force */
 	    tic = WEEK_SEC;
 	}
-	timelevel[axis] = TIMELEVEL_WEEKS;
+	if (tic >= WEEK_SEC)
+	    timelevel[axis] = TIMELEVEL_WEEKS;
     }
     if (tic > 3 * WEEK_SEC) {
 	/* turn tic into units of month */
@@ -720,23 +723,14 @@ quantize_time_tics(axis, tic, xr, guide)
 	if (tic < MON_SEC) {	/* force */
 	    tic = MON_SEC;
 	}
-	timelevel[axis] = TIMELEVEL_MONTHS;
+	if (tic >= MON_SEC)
+	    timelevel[axis] = TIMELEVEL_MONTHS;
     }
-#if 0
-    if (tic > 2 * MON_SEC) {
-	/* turn tic into units of month */
-	tic = quantize_normal_tics(xr / (3 * MON_SEC), guide) * 3 * MON_SEC;
-    }
-#endif
     if (tic > MON_SEC) {
 	/* turn tic into units of years */
 	tic = quantize_duodecimal_tics(xr / YEAR_SEC, guide12) * YEAR_SEC;
-#if 0
-	if (tic < (YEAR_SEC / 2)) {
-	    tic = YEAR_SEC / 2;
-	}
-#endif
-	timelevel[axis] = TIMELEVEL_YEARS;
+	if (tic >= YEAR_SEC)
+	    timelevel[axis] = TIMELEVEL_YEARS;
     }
     return (tic);
 }
@@ -1204,14 +1198,6 @@ time_tic_just(level, ticplace)
 	    tm.tm_mday = 0;
 	    tm.tm_yday++;
 	    ggmtime(&tm, gtimegm(&tm));
-#if 0
-	} else if (tm.tm_hour > 7) {
-	    tm.tm_hour = 12;
-	} else if (tm.tm_hour > 3) {
-	    tm.tm_hour = 6;
-	} else {
-	    tm.tm_hour = 0;
-#endif /* 0 */
 	}
     }
     /* skip it, I have not bothered with weekday so far */
@@ -1225,16 +1211,8 @@ time_tic_just(level, ticplace)
 	}
 	tm.tm_mday = 1;
     }
-#if 0
-    if (level > TIMELEVEL_MONTHS) {
-	if (tm.tm_mon >= 11)
-	    tm.tm_year++;
-	tm.tm_mon = 0;
-    }
-#endif
     
     ticplace = gtimegm(&tm);
-    ggmtime(&tm, gtimegm(&tm));
     return (ticplace);
 }
 

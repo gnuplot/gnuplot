@@ -1,3 +1,14 @@
+2004-03-23  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/axis.c (t_timelevel): Start enum values at 1, to avoid
+	wrap-around of expression TIMELEVEL_SECONDS - 1.
+	(make_auto_time_minitics): Fine-tune thresholds and generate tick
+	step sizes to get more sensible minor tick steps.
+	(quantize_time_tics): Only set timelevel[axis] to a higher value
+	if the tic step is at least one unit long.
+	(time_tic_just): Remove superfluous update of local variable just
+	before exit from function.
+
 2004-03-22  Ethan Merritt  <merritt@u.washington.edu>
 	
 	* src/term.c src/gplt_x11.c term/gd.trm term/pdf.trm term/x11.trm
