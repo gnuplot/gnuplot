@@ -1,3 +1,12 @@
+2000-12-08  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/datafile.c (df_3dmatrix): implement missing 'index' option
+ 	for 'matrix'-type splot datafiles. 'index' increases for every
+ 	blank or comment-only line, as both terminate mesh reading in
+ 	df_read_matrix().
+	
+	* docs/gnuplot.doc: document this.
+
 2000-12-08  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* term/gif.trm: don't crash on pm3d in multiplot (reuse the previous

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.21 2000/10/31 19:59:30 joze Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.22 2000/11/01 18:57:27 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -436,13 +436,13 @@ char *s;
 /*}}} */
 
 /*{{{  static float **df_read_matrix() */
-/* reads a matrix from a text file
- * stores in same storage format as fread_matrix
- */
-
+/* reads a matrix from a text file stores in same storage format as
+ * fread_matrix */
+/* FIXME HBB 20001207: doesn't respect 'index' at all, even though it
+ * could, and probably should. */
 static float **
 df_read_matrix(rows, cols)
-int *rows, *cols;
+    int *rows, *cols;
 {
     int max_rows = 0;
     int c;
@@ -1158,7 +1158,7 @@ struct curve_points *this_plot;
 
 int
 df_3dmatrix(this_plot)
-struct surface_points *this_plot;
+    struct surface_points *this_plot;
 {
     float GPFAR *GPFAR * dmatrix, GPFAR * rt, GPFAR * ct;
     int nr, nc;
@@ -1183,6 +1183,18 @@ struct surface_points *this_plot;
 	    df_eof = 1;
 	    return 0;
 	}
+	/* HBB 20001208: implement 'index' for matrix files: don't return
+	 * the data to caller if index is not among of the selected
+	 * ones */
+	if (df_current_index < df_lower_index
+	    || df_current_index > df_upper_index
+	    || (df_current_index - df_lower_index) % df_index_step != 0
+	    ) {
+	    free_matrix(dmatrix, 0, nr - 1, 0, nc - 1);
+	    df_current_index ++;
+	    return 0;
+	}
+	    
 	rt = NULL;
 	ct = NULL;
     }
@@ -1270,6 +1282,10 @@ struct surface_points *this_plot;
 	free_vector(rt, 0, nr - 1);
     if (ct)
 	free_vector(ct, 0, nc - 1);
+
+    /* HBB 20001208: implement 'index' for matrix datafiles */
+    df_current_index ++;
+
     return (nc);
 }
 

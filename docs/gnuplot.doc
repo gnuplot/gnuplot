@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.58 2000/12/04 12:01:08 mikulik Exp $
+C RCS $Id: gnuplot.doc,v 1.59 2000/12/06 12:38:55 mikulik Exp $
 C 3 December 1998
 C Copyright (C) 1986 - 1993, 1998   Thomas Williams, Colin Kelley
 C
@@ -7309,6 +7309,10 @@ C  The `lines` style connects adjacent points with straight line segments.
        z21 z22 z23 z24 ...
        z31 z32 z33 z34 ...
  and so forth.  The row and column indices are used for the x- and y-values.
+
+ A blank line or comment line ends the matrix, and starts a new
+ surface mesh. You can select among the meshes inside a file by the
+ `index` option to the `plot` command, as usual.
 3 grid_data
 ?commands splot grid_data
 ?splot grid_data
