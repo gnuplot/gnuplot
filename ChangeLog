@@ -1,3 +1,9 @@
+2004-01-19  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* config/makefile.cyg config/makefile.mgw config/makefile.os2: Copy file
+	VERSION into the latexing directory (setting TEXINPUTS from within
+	Makefile does not portably work).
+
 2004-01-17  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/save.c src/save.h src/show.c: Consolidate the save and show

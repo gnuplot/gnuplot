@@ -1,5 +1,5 @@
 #
-# $Id: makefile.mgw,v 1.28 2003/02/19 18:59:21 mikulik Exp $
+# $Id: makefile.mgw,v 1.29 2003/05/16 09:56:56 mikulik Exp $
 #
 # GNUPLOT Makefile for MinGW32 MinGW32 on WinNT and Win95/98/..
 #
@@ -397,6 +397,7 @@ gnuplot.ps: gnuplot.dvi
 	dvips -o gnuplot.ps gnuplot.dvi
 gnuplot.pdf: gnuplot.tex $(D)titlepag.tex
 	cp gnuplot.tex $(D)gp_tex2.tex
+	cp $(D)../VERSION $(D)
 	cd $(D) && pdflatex gp_tex2.tex && pdflatex gp_tex2.tex && pdflatex gp_tex2.tex
 	mv $(D)gp_tex2.pdf gnuplot.pdf
 	rm -f $(D)gp_tex2.*
