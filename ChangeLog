@@ -1,3 +1,7 @@
+1999-09-16  "Daniel H. Luecking"  <luecking@comp.uark.edu>
+
+	* term/metapost.trm: Minor updates.
+
 1999-09-15  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* graph3d.c, graphics.c: write_multiline() is not modifying its
