@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.89 2004/03/23 19:08:14 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.90 2004/03/24 02:20:50 sfeam Exp $"); }
 #endif
 
 #define X11_POLYLINE 1
@@ -3439,6 +3439,7 @@ process_event(XEvent *event)
 	    case 'm': /* Toggle mouse display, but only if we control the window here */
 		if (plot != current_plot || pipe_died) {
 		    plot->mouse_on = !(plot->mouse_on);
+		    DisplayCoords(plot,plot->mouse_on ? " " : "");
 		}
 		break;
 #endif

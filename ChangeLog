@@ -1,3 +1,8 @@
+2004-03-24  Ethan Merritt  <merritt@u.washington.edu>
+	
+	* src/gplt_x11.c: Change window size immediately on 'm' toggle.
+	* term/gd.trm: Update comments on libgd version requirements.
+
 2004-03-23  Ethan Merritt  <merritt@u.washington.edu>
 	
 	* src/gplt_x11.c: If gnuplot exits while "x11 -persist" is active,
