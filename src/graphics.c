@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.27 2000/02/11 19:17:19 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.28 2000/03/30 14:00:14 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -280,7 +280,9 @@ const char *axis;		/* which axis is this for ("x" or "y")? */
 {
     if (is_log) {
 	if (coord <= 0.0) {
-	    graph_error("%s has %s coord of %g; must be above 0 for log scale!", what, axis, coord);
+	    char errbuf[100];   /* place to write error message */
+	    (void) sprintf(errbuf, "%s has %s coord of %g; must be above 0 for log scale!", what, axis, coord);
+	    graph_error(errbuf);
 	} else
 	    return (log(coord) / log_base_log);
     }
@@ -291,31 +293,13 @@ const char *axis;		/* which axis is this for ("x" or "y")? */
 
 /*{{{  graph_error() */
 /* handle errors during graph-plot in a consistent way */
-#if defined(VA_START) && defined(ANSI_C)
 void
-graph_error(const char *fmt, ...)
-#else
-void
-graph_error(fmt, va_alist)
-const char *fmt;
-va_dcl
-#endif
+graph_error(text)
+const char *text;
 {
-#ifdef VA_START
-    va_list args;
-#endif
-
     multiplot = FALSE;
     term_end_plot();
-
-#ifdef VA_START
-    VA_START(args, fmt);
-    int_error(NO_CARET, fmt, args);
-    va_end(args);
-#else
-    int_error(fmt, a1, a2, a3, a4, a5, a6, a7, a8);
-#endif
-
+    int_error(NO_CARET, text);
 }
 
 /*}}} */
@@ -1600,6 +1584,7 @@ int pcount;			/* count of plots in linked list */
 	}
 	draw_clip_line(ox, oy, map_x(largest_polar_circle * cos(theta)), map_y(largest_polar_circle * sin(theta)));
     }
+
 /* DRAW AXES */
 
     /* after grid so that axes linetypes are on top */
@@ -1612,7 +1597,7 @@ int pcount;			/* count of plots in linked list */
     else if (y_min <= 0.0 && y_max <= 0.0)
 	axis_zero[FIRST_Y_AXIS] = ytop;
     else {
-	axis_zero[FIRST_X_AXIS] = map_y(0.0);
+	axis_zero[FIRST_Y_AXIS] = map_y(0.0);
 	if (xzeroaxis.l_type > -3) {
 	    term_apply_lp_properties(&xzeroaxis);
 	    (*t->move) (xleft, axis_zero[FIRST_Y_AXIS]);
@@ -1620,11 +1605,11 @@ int pcount;			/* count of plots in linked list */
 	}
     }
     if (x_min >= 0.0 && x_max >= 0.0)
-	axis_zero[FIRST_Y_AXIS] = xleft;
+	axis_zero[FIRST_X_AXIS] = xleft;
     else if (x_min <= 0.0 && x_max <= 0.0)
-	axis_zero[FIRST_Y_AXIS] = xright;
+	axis_zero[FIRST_X_AXIS] = xright;
     else {
-	axis_zero[FIRST_Y_AXIS] = map_x(0.0);
+	axis_zero[FIRST_X_AXIS] = map_x(0.0);
 	if ((yzeroaxis.l_type > -3) && !is_log_x) {
 	    term_apply_lp_properties(&yzeroaxis);
 	    (*t->move) (axis_zero[FIRST_X_AXIS], ybot);
@@ -1640,7 +1625,7 @@ int pcount;			/* count of plots in linked list */
     else if (y_min <= 0.0 && y_max <= 0.0)
 	axis_zero[SECOND_Y_AXIS] = ytop;
     else {
-	axis_zero[SECOND_X_AXIS] = map_y(0.0);
+	axis_zero[SECOND_Y_AXIS] = map_y(0.0);
 	if (x2zeroaxis.l_type > -3) {
 	    term_apply_lp_properties(&x2zeroaxis);
 	    (*t->move) (xleft, axis_zero[SECOND_Y_AXIS]);
@@ -1648,11 +1633,11 @@ int pcount;			/* count of plots in linked list */
 	}
     }
     if (y_min >= 0.0 && y_max >= 0.0)
-	axis_zero[SECOND_Y_AXIS] = xleft;
+	axis_zero[SECOND_X_AXIS] = xleft;
     else if (x_min <= 0.0 && x_max <= 0.0)
-	axis_zero[SECOND_Y_AXIS] = xright;
+	axis_zero[SECOND_X_AXIS] = xright;
     else {
-	axis_zero[SECOND_Y_AXIS] = map_x(0.0);
+	axis_zero[SECOND_X_AXIS] = map_x(0.0);
 	if ((y2zeroaxis.l_type > -3) && !is_log_x2) {
 	    term_apply_lp_properties(&y2zeroaxis);
 	    (*t->move) (axis_zero[SECOND_X_AXIS], ybot);
@@ -1808,7 +1793,6 @@ int pcount;			/* count of plots in linked list */
 
 /* WORK OUT KEY SETTINGS AND DO KEY TITLE / BOX */
 
-
     if (lkey) {			/* may have been cancelled if something went wrong */
 	/* just use keybox.xl etc worked out in boundary() */
 	xl = keybox.xl + key_size_left;
@@ -1889,7 +1873,8 @@ int pcount;			/* count of plots in linked list */
 		}
 
 		/* draw sample depending on bits set in plot_style */
-		if ((this_plot->plot_style & 1) || ((this_plot->plot_style & 4) && this_plot->plot_type == DATA)) {	/* errors for data plots only */
+		if ((this_plot->plot_style & 1) || ((this_plot->plot_style & 4) && this_plot->plot_type == DATA)) {
+		    /* errors for data plots only */
 		    (*t->move) (xl + key_sample_left, yl);
 		    (*t->vector) (xl + key_sample_right, yl);
 		}
