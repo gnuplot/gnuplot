@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.259 2004/10/30 03:44:16 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.260 2004/11/06 21:18:45 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -325,9 +325,10 @@ C
 
 3 Other changes and additions
 
- `unset <something>` is now preferred to`set no<something>`. The older form hasi
- been deprecated.  Version 4.1 continues to allow the older syntax, but such 
- backwards compatibility may be lost in future versions.
+ Since gnuplot 4.0, `unset <something>` is preferred to `set no<something>`.
+ The older form has been deprecated.
+ Version 4.1 continues to allow the older syntax, but such backwards
+ compatibility may be lost in future versions.
 
  Commands of the form `set <something> <style>` also are deprectated in favor
  of the more general form `set style <something> <options>`.  Many more plot

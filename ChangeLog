@@ -1,5 +1,7 @@
 2004-11-07  Petr Mikulik  <mikulik@physics.muni.cz>
 
+	* docs/gnuplot.doc: Typos.
+
 	* term/tgif.trm: Replace "set nomultiplot" by "unset multiplot" in the
 	docs section.
 
