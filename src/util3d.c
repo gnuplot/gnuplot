@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util3d.c,v 1.14 2001/08/22 13:29:46 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: util3d.c,v 1.15 2002/02/13 22:58:18 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - util3d.c */
@@ -57,6 +57,7 @@ static char *RCSid() { return RCSid("$Id: util3d.c,v 1.14 2001/08/22 13:29:46 br
 
 /* Prototypes for local functions */
 static void mat_unit __PROTO((transform_matrix mat));
+static GP_INLINE void draw3d_point_unconditional __PROTO((p_vertex, struct lp_style_type *));
 
 static void
 mat_unit(mat)
@@ -1029,29 +1030,43 @@ map3d_xy(x, y, z, xt, yt)
 }
 
 
-void
-draw3d_line (v1, v2, lp)
-    p_vertex v1, v2;
+/* HBB 20020313: New routine, broken out of draw3d_point, to be used
+ * to output a single point without any checks for hidden3d */
+static GP_INLINE void
+draw3d_point_unconditional(v, lp)
+    p_vertex v;
     struct lp_style_type *lp;
 {
-#ifndef LITE
-    /* hidden3d routine can't work if no surface was drawn at all */
-    if (hidden3d && draw_surface) {
-	draw_line_hidden(v1, v2, lp);
-	return;
+    unsigned int x, y;
+
+    TERMCOORD(v, x, y);
+    term_apply_lp_properties(lp);
+#ifdef PM3D
+    /* HBB 20010822: implemented "linetype palette" for points, too */
+    if (lp->use_palette) {
+	set_color(cb2gray( z2cb(v->real_z) ));
     }
 #endif
-    
-    draw3d_line_unconditional(v1, v2, lp, lp->l_type);
+    if (!clip_point(x, y))
+	(term->point) (x, y, lp->p_type);
+}    
 
-}
-
-void draw3d_line_unconditional(v1, v2, lp, linetype)
+/* Moved this upward, to make optional inlining in draw3d_line easier
+ * for compilers */
+GP_INLINE void
+draw3d_line_unconditional(v1, v2, lp, linetype)
     p_vertex v1, v2;
     struct lp_style_type *lp;
     int linetype;
 {    
     unsigned int x1, y1, x2, y2;
+
+    /* HBB 20020312: v2 can be NULL, if this call is coming from
+    draw_line_hidden. --> redirect to point drawing routine */
+    if (! v2) {
+	draw3d_point_unconditional(v1, lp);
+	return;
+    }
 
     TERMCOORD(v1, x1, y1);
     TERMCOORD(v2, x2, y2);
@@ -1069,14 +1084,30 @@ void draw3d_line_unconditional(v1, v2, lp, linetype)
     (term->vector)(x2, y2);
 }
 
+void
+draw3d_line (v1, v2, lp)
+    p_vertex v1, v2;
+    struct lp_style_type *lp;
+{
+#ifndef LITE
+    /* hidden3d routine can't work if no surface was drawn at all */
+    if (hidden3d && draw_surface) {
+	draw_line_hidden(v1, v2, lp);
+	return;
+    }
+#endif
+    
+    draw3d_line_unconditional(v1, v2, lp, lp->l_type);
+
+}
+
 /* HBB 20000621: new routine, to allow for hiding point symbols behind
  * the surface */
-void draw3d_point(v, lp)
+void
+draw3d_point(v, lp)
     p_vertex v;
     struct lp_style_type *lp;
 {
-    unsigned int x, y;
-
 #ifndef LITE
     /* hidden3d routine can't work if no surface was drawn at all */
     if (hidden3d && draw_surface) {
@@ -1085,15 +1116,6 @@ void draw3d_point(v, lp)
 	return;
     }
 #endif
-    
-    TERMCOORD(v, x, y);
-    term_apply_lp_properties(lp);
-#ifdef PM3D
-    /* HBB 20010822: implemented "linetype palette" for points, too */
-    if (lp->use_palette) {
-	set_color(cb2gray( z2cb(v->real_z) ));
-    }
-#endif
-    if (!clip_point(x, y))
-	(term->point) (x, y, lp->p_type);
+
+    draw3d_point_unconditional(v, lp);
 }    

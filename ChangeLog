@@ -1,3 +1,15 @@
+2002-03-12  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/util3d.c (draw3d_point_unconditional): New routine
+ 	containing the main part of former draw3d_point.  Provides an
+ 	second entry point to be used by:
+	(draw3d_line_unconditional): If v2 is NULL, redirect call to
+ 	draw3d_point_unconditional.  Moved code before draw3d_line and
+ 	flagged it GP_INLINE, to make automatic inlining of this routine
+ 	easier for the compilers.
+	(draw3d_point): Call new routine draw3d_point_unconditional to do
+ 	the real work, if hidden3d isn't applicable.
+
 2002-03-12  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/setshow.h src/set.c src/unset.c docs/gnuplot.doc: Added reset
@@ -45,7 +57,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/03/11 08:43:10 $).
+	last modification date (from the tag $Date: 2002/03/12 10:23:44 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
