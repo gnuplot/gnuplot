@@ -1,5 +1,5 @@
 /*
- * $Id: datafile.h,v 1.5 2001/08/22 14:15:33 broeker Exp $
+ * $Id: datafile.h,v 1.6 2001/09/05 02:01:49 vanzandt Exp $
  */
 
 /* GNUPLOT - datafile.h */
@@ -74,8 +74,6 @@ extern TBOOLEAN df_binary;
 
 extern int df_eof;
 extern int df_line_number;
-extern char *df_string;
-extern char *df_filename;
 extern AXIS_INDEX df_axis[];
 extern struct udft_entry ydata_func; /* HBB 990829: moved from command.h */
 
@@ -91,6 +89,7 @@ extern TBOOLEAN plotted_data_from_stdin;
 int df_open __PROTO((int));
 int df_readline __PROTO((double [], int));
 void df_close __PROTO((void));
+void df_showdata __PROTO((void));
 int df_2dbinary __PROTO((struct curve_points *));
 int df_3dmatrix __PROTO((struct surface_points *));
 

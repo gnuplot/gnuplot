@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.26 2001/08/22 14:15:33 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.27 2001/09/05 02:01:49 vanzandt Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -188,7 +188,6 @@ struct use_spec_s {
 
 int df_no_use_specs;		/* how many using columns were specified */
 int df_line_number;
-char *df_string;		/* current data from data file */
 char *df_filename;		/* name of data file */
 int df_datum;			/* suggested x value if none given */
 TBOOLEAN df_matrix = FALSE;	/* is this a matrix splot */
@@ -325,7 +324,6 @@ df_tokenise(s)
      */
 
     df_no_cols = 0;
-    df_string = s;		/* save for error messages */
 
     while (*s) {
 
@@ -715,6 +713,24 @@ df_close()
     }
     mixed_data_fp = FALSE;
     data_fp = NULL;
+}
+
+/*}}} */
+
+/*{{{  void df_showdata() */
+void
+df_showdata()
+
+/* display the current data file line for an error message
+ */
+{
+  int long_line;
+  if (data_fp && df_filename && line) {
+    /* display no more than 77 characters */
+    fprintf(stderr, "%.77s%s\n%s:%d:", line,
+	    (strlen(line) > 77) ? "..." : "",
+	    df_filename, df_line_number);
+  }									
 }
 
 /*}}} */

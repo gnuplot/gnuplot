@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util.c,v 1.27 2001/08/22 14:15:34 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: util.c,v 1.28 2001/09/05 02:01:49 vanzandt Exp $"); }
 #endif
 
 /* GNUPLOT - util.c */
@@ -36,7 +36,6 @@ static char *RCSid() { return RCSid("$Id: util.c,v 1.27 2001/08/22 14:15:34 broe
 
 #include "util.h"
 
-#include "datafile.h"		/* for: df_line_number df_string df_filename */
 #include "alloc.h"
 #include "command.h"
 #include "misc.h"
@@ -369,14 +368,6 @@ const char *s;
         else fprintf(stderr, "line %d: ", inline_num); \
  }
 
-#define PRINT_DATAFILE_STRING						 \
-{									 \
-    if (df_filename && df_string) {					 \
-	fputs(df_string, stderr);					 \
-	fprintf(stderr, "\n%s:%d:", df_filename, df_line_number);	 \
-    }									 \
-}
-
 /* TRUE if command just typed; becomes FALSE whenever we
  * send some other output to screen.  If FALSE, the command line
  * will be echoed to the screen before the ^ error message.
@@ -404,7 +395,7 @@ va_dcl
     /* reprint line if screen has been written to */
 
     if (t_num == DATAFILE) {
-	PRINT_DATAFILE_STRING;
+	df_showdata();
     } else if (t_num != NO_CARET) {	/* put caret under error */
 	if (!screen_ok)
 	    fprintf(stderr, "\n%s%s\n", PROMPT, input_line);
@@ -461,7 +452,7 @@ va_dcl
     /* reprint line if screen has been written to */
 
     if (t_num == DATAFILE) {
-        PRINT_DATAFILE_STRING;
+        df_showdata();
     } else if (t_num != NO_CARET) { /* put caret under error */
 	if (!screen_ok)
 	    fprintf(stderr, "\n%s%s\n", PROMPT, input_line);
@@ -508,7 +499,7 @@ va_dcl
     /* reprint line if screen has been written to */
 
     if (t_num == DATAFILE) {
-        PRINT_DATAFILE_STRING;
+        df_showdata();
     } else if (t_num != NO_CARET) { /* put caret under error */
 	if (!screen_ok)
 	    fprintf(stderr, "\n%s%s\n", PROMPT, input_line);

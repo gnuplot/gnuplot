@@ -1,3 +1,15 @@
+2001-09-16  James R. Van Zandt  <jrv@vanzandt.mv.com>
+
+	* src/datafile.c: New function df_showdata() displays the current
+	data file line (up to 77 characters, including leading spaces) for
+	an error message.
+
+	* src/datafile.h: export df_showdata(), but not df_filename or
+	df_string.
+
+	* src/util.c: display file data using function rather than
+	macro. 
+
 2001-09-13  Alexander Mai <st002279@hrzpub.tu-darmstadt.de>
 
 	* term/post.trm: Replace code like "if (float f)" at
