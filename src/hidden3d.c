@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.15 1999/11/15 22:21:22 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.16 1999/11/24 13:04:21 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - hidden3d.c */
@@ -278,7 +278,7 @@ set_hidden3doptions()
 
     while (!END_OF_COMMAND) {
 	switch (lookup_table(&set_hidden3d_tbl[0], c_token)) {
-	case H_DEFAULTS:
+	case S_HI_DEFAULTS:
 	    /* reset all parameters to defaults */
 	    hiddenBacksideLinetypeOffset = BACKSIDE_LINETYPE_OFFSET;
 	    hiddenTriangleLinesdrawnPattern = TRIANGLE_LINESDRAWN_PATTERN;
@@ -291,20 +291,20 @@ set_hidden3doptions()
 			  "No further options allowed after 'defaults'");
 	    return;
 	    break;
-	case H_OFFSET:
+	case S_HI_OFFSET:
 	    c_token++;
 	    hiddenBacksideLinetypeOffset = (int) real(const_express(&t));
 	    c_token--;
 	    break;
-	case H_NOOFFSET:
+	case S_HI_NOOFFSET:
 	    hiddenBacksideLinetypeOffset = 0;
 	    break;
-	case H_TRIANGLEPATTERN:
+	case S_HI_TRIANGLEPATTERN:
 	    c_token++;
 	    hiddenTriangleLinesdrawnPattern = (int) real(const_express(&t));
 	    c_token--;
 	    break;
-	case H_UNDEFINED:
+	case S_HI_UNDEFINED:
 	    c_token++;
 	    tmp = (int) real(const_express(&t));
 	    if (tmp <= 0 || tmp > UNHANDLED)
@@ -312,22 +312,22 @@ set_hidden3doptions()
 	    hiddenHandleUndefinedPoints = tmp;
 	    c_token--;
 	    break;
-	case H_NOUNDEFINED:
+	case S_HI_NOUNDEFINED:
 	    hiddenHandleUndefinedPoints = UNHANDLED;
 	    break;
-	case H_ALTDIAGONAL:
+	case S_HI_ALTDIAGONAL:
 	    hiddenShowAlternativeDiagonal = 1;
 	    break;
-	case H_NOALTDIAGONAL:
+	case S_HI_NOALTDIAGONAL:
 	    hiddenShowAlternativeDiagonal = 0;
 	    break;
-	case H_BENTOVER:
+	case S_HI_BENTOVER:
 	    hiddenHandleBentoverQuadrangles = 1;
 	    break;
-	case H_NOBENTOVER:
+	case S_HI_NOBENTOVER:
 	    hiddenHandleBentoverQuadrangles = 0;
 	    break;
-	case H_INVALID:
+	case S_HI_INVALID:
 	    int_error(c_token, "No such option to hidden3d (or wrong order)");
 	default:
 	    break;
