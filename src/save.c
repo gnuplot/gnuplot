@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.7 1999/11/08 19:24:33 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.8 1999/11/15 22:01:49 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -47,7 +47,7 @@ static char *RCSid() { return RCSid("$Id: save.c,v 1.7 1999/11/08 19:24:33 lheck
 /* HBB 990825 FIXME: how come these strings are only used for
  * _displaying_ encodings (-->no use in set.c) ? */
 const char *encoding_names[] = {
-  "default", "iso_8859_1", "cp437", "cp850", NULL };
+    "default", "iso_8859_1", "cp437", "cp850", NULL };
 
 static void save_functions__sub __PROTO((FILE *));
 static void save_variables__sub __PROTO((FILE *));
@@ -806,7 +806,7 @@ save_position(fp, pos)
 FILE *fp;
 struct position *pos;
 {
-    static const char *msg[] = { "first_axes ", "second axes ", "graph ", "screen " };
+    static const char *msg[] = { "first ", "second ", "graph ", "screen " };
 
     assert(first_axes == 0 && second_axes == 1 && graph == 2 && screen == 3);
 
