@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: doc2ipf.c,v 1.10 2001/09/20 19:02:38 amai Exp $"); }
+static char *RCSid() { return RCSid("$Id: doc2ipf.c,v 1.11 2001/09/29 09:45:00 amai Exp $"); }
 #endif
 
 /* GNUPLOT - doc2ipf.c */
@@ -51,7 +51,7 @@ static char *RCSid() { return RCSid("$Id: doc2ipf.c,v 1.10 2001/09/20 19:02:38 a
 # include "config.h"
 #endif
 
-#include "ansichek.h"
+#include "syscfg.h"
 #include "stdfn.h"
 
 #define MAX_LINE_LEN 1023

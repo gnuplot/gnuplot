@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: xref.c,v 1.5 1999/06/14 19:17:09 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: xref.c,v 1.6 1999/11/03 16:06:47 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - xref.c */
@@ -59,7 +59,7 @@ static char *RCSid() { return RCSid("$Id: xref.c,v 1.5 1999/06/14 19:17:09 lheck
 
 #define DOCS_XREF_MAIN
 
-#include "ansichek.h"
+#include "syscfg.h"
 #include "stdfn.h"
 #include "doc2x.h"
 #include "xref.h"

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: bf_test.c,v 1.5 1999/10/29 18:49:23 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: bf_test.c,v 1.6 2001/08/22 14:15:33 broeker Exp $"); }
 #endif
 
 
@@ -22,7 +22,7 @@ static char *RCSid() { return RCSid("$Id: bf_test.c,v 1.5 1999/10/29 18:49:23 lh
 
 #define GPFAR /**/
 
-#include "ansichek.h"
+#include "syscfg.h"
 #include "stdfn.h"
 #include "binary.h"
 

@@ -453,27 +453,27 @@ Makefile: Makefile.in ../config.status
 
 TERM_H = $(top_srcdir)/src/term.h
 
-checkdoc.o: checkdoc.c ../config.h $(top_srcdir)/src/ansichek.h \
+checkdoc.o: checkdoc.c ../config.h $(top_srcdir)/src/syscfg.h \
 		$(top_srcdir)/src/stdfn.h doc2x.h allterm.h
-alldoc2gih.o: doc2gih.c ../config.h $(top_srcdir)/src/ansichek.h \
+alldoc2gih.o: doc2gih.c ../config.h $(top_srcdir)/src/syscfg.h \
 		$(top_srcdir)/src/stdfn.h doc2x.h allterm.h
-doc2gih.o: doc2gih.c ../config.h $(top_srcdir)/src/ansichek.h \
+doc2gih.o: doc2gih.c ../config.h $(top_srcdir)/src/syscfg.h \
 		$(top_srcdir)/src/stdfn.h doc2x.h $(TERM_H)
-doc2hlp.o: doc2hlp.c ../config.h $(top_srcdir)/src/ansichek.h \
+doc2hlp.o: doc2hlp.c ../config.h $(top_srcdir)/src/syscfg.h \
 		$(top_srcdir)/src/stdfn.h doc2x.h $(TERM_H)
-doc2ipf.o: doc2ipf.c ../config.h $(top_srcdir)/src/ansichek.h \
+doc2ipf.o: doc2ipf.c ../config.h $(top_srcdir)/src/syscfg.h \
 		$(top_srcdir)/src/stdfn.h doc2x.h $(TERM_H)
-doc2ms.o: doc2ms.c ../config.h $(top_srcdir)/src/ansichek.h \
+doc2ms.o: doc2ms.c ../config.h $(top_srcdir)/src/syscfg.h \
 		$(top_srcdir)/src/stdfn.h doc2x.h allterm.h
-doc2rnh.o: doc2rnh.c ../config.h $(top_srcdir)/src/ansichek.h \
+doc2rnh.o: doc2rnh.c ../config.h $(top_srcdir)/src/syscfg.h \
 		$(top_srcdir)/src/stdfn.h doc2x.h $(TERM_H)
-doc2rtf.o: doc2rtf.c ../config.h $(top_srcdir)/src/ansichek.h \
+doc2rtf.o: doc2rtf.c ../config.h $(top_srcdir)/src/syscfg.h \
 		$(top_srcdir)/src/stdfn.h doc2x.h $(TERM_H)
-doc2tex.o: doc2tex.c ../config.h $(top_srcdir)/src/ansichek.h \
+doc2tex.o: doc2tex.c ../config.h $(top_srcdir)/src/syscfg.h \
 		$(top_srcdir)/src/stdfn.h doc2x.h allterm.h
-termdoc.o: termdoc.c ../config.h $(top_srcdir)/src/ansichek.h \
+termdoc.o: termdoc.c ../config.h $(top_srcdir)/src/syscfg.h \
 		$(top_srcdir)/src/stdfn.h doc2x.h
-xref.o: xref.c ../config.h $(top_srcdir)/src/ansichek.h \
+xref.o: xref.c ../config.h $(top_srcdir)/src/syscfg.h \
 		$(top_srcdir)/src/stdfn.h doc2x.h xref.h
 
 #the end
