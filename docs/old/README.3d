@@ -1,0 +1,106 @@
+
+                   A tutorial on explicit/parametric
+                                   and
+                    everything you did not dare to ask
+                                  about
+                           curves and surfaces
+                                    in
+                                  gnuplot
+
+Several types of curves and surface are supported in gnuplot. Of those
+not every operation is supported for every curve or surface type and it
+can be therefore useful to understand the different types, their advantages
+and limitations.
+
+Curves in gnuplot are almost always planar (with one exception which we
+will deal with in the end) and are assumed to be in the XY plane.
+Therefore only X and Y coordinates are needed for plotting curves.
+The simplest curve is the `explicit function`. This curve is in fact a
+function and for each given x, there is one and only one y value associated
+with it. A gnuplot example for such type is `plot sin(x)` or
+`plot "datafile" using 1". Note the later is using only a single column from
+the data file which is assumed to be the y values.
+
+Alternatively one can define a `parametric curve` form. In this case
+x and y are both functions of a third free parameter t, while independent
+of each other. A circle can be expressed parametrically as x = cos(t),
+y = sin(t) and be plotted using gnuplot as
+'set parametric; plot cos(t),sin(t)'.
+This form is not a function since there can be unlimited number of y values
+associated with same x. Furthermore the explicit form is a special case of
+the parametric representation by letting x equal to t. The curve y = sin(x)
+can be written in parametric form as y = sin(t), x = t.
+
+We are used to think of the plane in cartesian coordinate system.
+In practice, some coordinate systems may be easier to use then others
+under some circumstances. The polar form uses a different basis
+to span the XY plane. In this representation the cartesian x coordinate
+is equal to r cos(t) and the cartesian y coordinate is equal to r sin(t).
+To draw a unit circle using the polar coordinate system in gnuplot use the
+following simple command: 'set polar; plot 1'. To better understand this
+explicit form lets backup a little.
+When we plot a regular explicit function like `y = sin(x)` we march in equal
+steps in x, evaluate the provided function and plot a piecewise linear curve
+between the sampled points approximating the real function. In the polar
+explicit form we do exactly the same thing, but we march along the angular
+direction - we turn around the origin, computing the length of the radius
+at that angle. Since for the unit circle, this radius is a constant 1,
+`plot 1` in polar form plots a circle (if t domain is from 0 or 2Pi).
+Note the polar form is explicit in that for each angle there is only a
+single radius.
+
+Surprisingly (or maybe not so surprising) surfaces share the same
+representations. Since surfaces are two dimensional entities, they
+require two free parameters (like t for curves).
+
+A surface explicit function uses x and y as the free parameters. For
+each such pair it provides a single z value. An example for this form
+can be `splot sin(sqrt(x**2+y**2))/sqrt(x**2+y**2)` for a three dimensional
+sinc function or `splot 'datafile' using 1`. As for curves, the single column
+used from the data file defines the function value or z in this case.
+The order of the x and y function values is very strict in this form and
+simply defines a rectangular grid in the XY plane. Fortunately this
+strict form allows us to apply a very simplistic hidden line algorithm
+called "the floating horizon". This hidden line algorithm exploits the
+rectangular XY domain of the surface and therefore may be used for this
+type of surfaces only. Since in gnuplot this is the only form of hidden
+lines removing algorithm provided, only explicit surfaces may have their
+hidden lines removed.
+
+Parametric surfaces are the exact extension for explicit surfaces as in
+the curves case. the x, y, and z are defined in terms of two new free
+variables and are totally independent of each other as x(u, v), y(u, v),
+and z(u, v). Again the explicit surface is a special case of the parametric
+representation where x = u, and y = v. Examples for plotting parametric
+surfaces in gnuplot can be `splot cos(u)*cos(v),cos(u)*sin(v),sin(u)` which
+defines a sphere, or `splot "datafile" using 1:2:3`. Since these are
+parametric surfaces, gnuplot must be informed to handle them by issuing
+`set parametric`.
+
+The curve polar form takes the obvious extensions in the surface world.
+The first possible extension is spherical coordinate system, while the
+second is the cylindrical one. These modes currently work for data files
+only and both requires two parameters, theta and phi for mapping onto the
+unit sphere, and theta and z form mapping on a unit radius cylinder as follow:
+
+        Spherical coord.                        Cylin. coord.
+        ----------------                        -------------
+        x = cos( theta ) * cos( phi )           x = cos( theta )
+        y = sin( theta ) * cos( phi )           y = sin( theta )
+        z = sin( phi )                          z = z
+
+This subject brings us back to non planar curves. When surfaces are displayed
+under gnuplot, isocurves are actually getting plotted. An isocurve is a
+curve on the surface in which one of the two free parameters of the
+surface is fixed. For example the u isolines of a surface are drawn by
+setting u to be fixed and varying v along the entire v domain. The v isolines
+are similarly drawn by fixing v. When data files are specified they are
+classified internally into two types. A surface is tagged to have grid
+topology if all its specified isolines are of the same length. A data mesh
+of five isolines, seven points each is an example. In such a case the
+surface cross isolines are drawn as well. Seven isolines with five points
+each will be automatically created and drawn for grid type data. If
+however, isolines of different length are found in the data, it is
+tagged as nongrid surface and in fact is nothing more than a collection
+of three dimensional curves. Only the provided data is plotted in that
+case (see world.dem for such an example).

@@ -1,0 +1,75 @@
+
+You can say "set isosamples 30,40" now to get different isosampling
+rates for the first and second dummy variables (x,u resp. y,v). This
+will affect surface-plots in hidden3d- and nohidden3d-mode. It gets
+rid of the necessity of having to change samples in hidden3d-mode when
+you actually want to change the isosamples for the first dummy
+variable. For people that are lazy and for compatibility you can also
+type "set isosamples 30". This will set the value to 30 in both
+directions. For completeness I did the same with "samples". Thus you
+can say "set samples 50,100" to get different sampling rates for each
+dummy variable. This only affects surface-plots in nohidden3d-mode.
+Again, you still can say "set samples 50". This will set both sampling
+rates to 50. For 2d-plots the first value of samples is used.
+
+Summary:
+
+Suppose isosamples is set to 4,5 in hidden3d-mode. The grid evaluated
+for hidden3d-plots will look like this (* denotes points that get
+evaluated):
+
+      |------ isosamples #1 -----|
+
+  -   *--------*--------*--------*
+  |   |        |        |        |
+      |        |        |        |
+  i   |        |        |        |
+  s   *--------*--------*--------*
+  o   |        |        |        |
+  s   |        |        |        |
+  a   |        |        |        |
+  m   *--------*--------*--------*
+  p   |        |        |        |
+  .   |        |        |        |
+      |        |        |        |
+  #   *--------*--------*--------*
+  2   |        |        |        |
+      |        |        |        |
+  |   |        |        |        |
+  -   *--------*--------*--------*
+
+Suppose isosamples is set to 4,5 and samples to 10, 9 in
+nohidden3d-mode. The grid evaluated for hidden3d-plots will look like
+this:
+
+      |------ isosamples #1 -----|
+
+  -   *--*--*--*--*--*--*--*--*--*   -
+  |   |        |        |        |   |
+      *        *        *        *   |
+  i   |        |        |        |    
+  s   *--*--*--*--*--*--*--*--*--*   s
+  o   |        |        |        |   a
+  s   *        *        *        *   m
+  a   |        |        |        |   p
+  m   *--*--*--*--*--*--*--*--*--*   l
+  p   |        |        |        |   e
+  .   *        *        *        *   s
+      |        |        |        |    
+  #   *--*--*--*--*--*--*--*--*--*   #
+  2   |        |        |        |   2
+      *        *        *        *    
+  |   |        |        |        |   |
+  -   *--*--*--*--*--*--*--*--*--*   -
+
+      |------- samples #1 -------|
+
+
+BTW: The examples above also show how the bottom grids will look like
+both in noparametric- and in parametric-mode. Thus you can get a rough
+idea of how the mapping from (u,v)-space to (x,y,z)-space works by
+drawing a bottom grid in parametric-mode.
+
+Best regards,
+
+Carsten

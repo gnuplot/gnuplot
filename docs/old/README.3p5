@@ -1,0 +1,116 @@
+This is a bugfix to version 3.4.
+
+
+# $Id: README.3p5,v 1.1 1993/09/27 17:07:30 alex Exp $
+#
+# $Log: README.3p5,v $
+# Revision 1.1  1993/09/27 17:07:30  alex
+# gnuplot 3.5 release
+#
+# Revision 3.50.1.17  1993/08/27  05:21:33  woo
+# V. Khera's fig patch
+#
+# Revision 3.50.1.16  1993/08/27  05:04:42  woo
+# Added <errno.h> to help.c and added support routines to binary.c
+#
+# Revision 3.50.1.15  1993/08/21  15:23:42  woo
+# Rewrote print_3dtable
+#
+# Revision 3.50.1.14  1993/08/19  04:10:23  woo
+# V. Broman sun_mgr driver
+#
+# Revision 3.50.1.13  1993/08/19  03:21:26  woo
+# R. Lang fix to MS-Windows print driver
+#
+# Revision 3.50.1.11  1993/08/10  03:55:03  woo
+# R. Lang mod to change location of plot in hppj.trm
+#
+# Revision 3.50.1.10  1993/08/07  16:06:34  woo
+# Fix using n bug, configure 1.3
+#
+# Revision 3.50.1.9  1993/08/05  05:38:59  woo
+# Fix timedate location for splot and plot + CONFIGURE ROUTINE
+#
+# Revision 3.50.1.8  1993/07/27  05:37:15  woo
+# More mods for SOLARIS 2.2 using gcc
+#
+# Revision 3.50.1.7  1993/07/27  04:57:58  woo
+# Fix impulse plot style if logscale y
+#
+# Revision 3.50.1.6  1993/07/27  03:35:12  woo
+# Fix epsviewe.m 
+#
+# Revision 3.50.1.4  1993/07/26  06:17:24  woo
+# Solaris mods to sun_x11 and gplt_x11.c
+#
+# Revision 3.50.1.3  1993/07/26  05:38:19  woo
+# DEC ALPHA OSF1 mods
+#
+# Revision 3.50.1.2  1993/07/26  05:12:42  woo
+# fix of replot of replot bug
+#
+# Revision 3.50.1.1  1993/07/26  04:59:54  woo
+# fix of splot notitle bug
+#
+# Revision 3.50  1993/07/09  05:35:24  woo
+# Baseline version 3.5 version
+#
+# Revision 3.38.2.153  1993/07/08  03:43:32  woo
+# Added dgrid3d save to misc.c and updated titlepages
+#
+# Revision 3.38.2.153  1993/07/08  03:43:32  woo
+# Added dgrid3d save to misc.c and updated titlepages
+#
+# Revision 3.38.2.152  1993/07/06  15:03:56  woo
+# A. Lehmann cleanup of 3_5b1
+#
+# Revision 3.38.2.151  1993/07/06  14:33:51  woo
+# New 0FAQ and AXPVMS fix to gplt_x11.c
+#
+# Revision 3.38.2.150  1993/07/02  16:42:43  woo
+# A. Reeh fix for monochrome X11 under VMS
+#
+# Revision 3.38.2.149  1993/07/01  20:31:55  woo
+# New version of GRASS makefile
+#
+# Revision 3.38.2.148  1993/07/01  13:54:25  woo
+# T. Collins changes to Latex line types
+#
+# Revision 3.38.2.147  1993/07/01  13:41:44  woo
+# A. Lehmann fix for hpux internal.c
+#
+# Revision 3.38.2.146  1993/06/30  21:24:08  woo
+# Fix to flash graphics, rosenbrock function in contours.dem
+#
+# Revision 3.38.2.145  1993/06/30  20:16:22  woo
+# Yehavi fixes for AXPVMS
+#
+# Revision 3.38.2.144  1993/06/23  00:34:39  woo
+# Reordered latex line types -- lighter default line
+#
+# Revision 3.38.2.143  1993/06/23  00:10:28  woo
+# R. Shouman fix of blank title induced linetype bug
+#
+# Revision 3.38.2.142  1993/06/21  14:43:21  woo
+# P. Egghart check on PLOSS for matherr and pass MY_FLAGS to subdirectories
+#
+# Revision 3.38.2.141  1993/06/19  13:00:21  woo
+# Okidata driver and time_t for sun386 mod
+#
+# Revision 3.38.2.140  1993/06/19  12:29:34  woo
+# J. Abbey fixes for Alliant
+#
+# Revision 3.38.2.139  1993/06/19  01:03:49  woo
+# Fix for 3d clipping bug
+#
+# Revision 3.38.2.138  1993/06/16  00:38:14  woo
+# O. Franksson MIF mod for vertical text and better char size
+#
+# Revision 3.38.2.137  1993/06/15  23:57:02  woo
+# Linux fixes
+#
+# Revision 3.38.2.136  1993/06/15  23:33:29  woo
+# V. Khera non-interactive stderr fix
+#
+# Revision 3.38.2.135  1993/06/15  22:02:26  woo
+# splot fix for x & y tics and labels

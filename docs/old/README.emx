@@ -1,0 +1,20 @@
+EMXVGA is another terminal type for OS/2, which runs on the PM of OS/2
+as well as in full screen mode on DOS running on 386 or better PC.
+The driver is compiled using EMX GCC with VESA and SVGAKIT which supports
+VESA, Trident, Cirrus, ET4000, WD and S3, and is maintained by
+Johannes Martin (JMARTIN@GOOFY.ZDV.UNI-MAINZ.DE), with additions of
+putting string at an arbitrary angle by David J. Liu (liu@phri.nyu.edu).
+
+"
+The file gstring.c contains the display string function for SVGAKIT of emx GCC.
+The function, g_string (x,y,color,angle,*string), displays the string at (x,y)
+which is the upper left corner of the string, in color at an arbitrary angle.
+To install, copy gstring.c to SVGAKIT directory and update the files graph.h
+and makefile with references to g_string(...), gstring.c and gstring.o.
+"
+
+To install, add -lgraph -lvesa as linker parameters and enable EMXVGA
+in term.h
+
+
+To use with DOS, it is necessary to do emxbind -a gnuplot.exe -acim.
