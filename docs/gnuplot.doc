@@ -1,5 +1,5 @@
-C RCS $Id: gnuplot.doc,v 1.61 1997/11/25 23:03:25 drd Exp $
-C 10 October 1997
+C RCS $Id: gnuplot.doc,v 1.60 1997/07/22 23:24:24 drd Exp $
+C 8 May 1998
 C Copyright (C) 1986 - 1993, 1997   Thomas Williams, Colin Kelley
 C
 ^ <h2> An Interactive Plotting Program </h2><p>
@@ -28,7 +28,7 @@ C
 ^   Mailing list for bug reports: bug-gnuplot@dartmouth.edu<p>
 ^</h2><p>
 ^<h3> This manual was prepared by Dick Crawford</h3><p>
-^<h3> 10 October 1997</h3><p>
+^<h3> 8 May 1998</h3><p>
 ^<hr>
 1 gnuplot
 2 Copyright
@@ -96,13 +96,16 @@ C
  In this document, curly braces ({}) denote optional arguments and a vertical
  bar (|) separates mutually exclusive choices.  `gnuplot` keywords or `help`
  topics are indicated by backquotes or `boldface` (where available).  Angle
- brackets (<>) are used to mark replaceable tokens.
+ brackets (<>) are used to mark replaceable tokens.  In many cases, a default
+ value of the token will be taken for optional arguments if the token is 
+ omitted, but these cases are not always denoted with braces around the angle
+ brackets.
 
  For on-line help on any topic, type `help` followed by the name of the topic
  or just `help` or `?` to get a menu of available topics.
 
- The new `gnuplot` user should begin by reading about the `plot` command (if
- on-line, type `help plot`).
+ The new `gnuplot` user should begin by reading about `plotting` (if on-line,
+ type `help plotting`).
 ^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/simple/simple.html"> Simple Plots Demo </a>
 2 Seeking-assistance
 ?seeking-assistance
@@ -128,7 +131,7 @@ C
  There is also a World Wide Web page with up-to-date information, including
  known bugs:
 ^ <a href="http://www.cs.dartmouth.edu/gnuplot_info.html">
-       http://www.cs.dartmouth.edu/gnuplot
+       http://www.cs.dartmouth.edu/gnuplot_info.html
 ^ </a>
 
  Before seeking help, please check the
@@ -136,7 +139,9 @@ C
  FAQ (Frequently Asked Questions) list.
 ^ </a>
  If you do not have a copy of the FAQ, you may request a copy by email from
- the Majordomo address above, or see the WWW `gnuplot` page.
+ the Majordomo address above, ftp a copy from
+       ftp://ftp.dartmouth.edu/pub/gnuplot
+ or see the WWW `gnuplot` page.
 
  When posting a question, please include full details of the version of
  `gnuplot`, the machine, and operating system you are using.  A _small_ script
@@ -253,38 +258,41 @@ C
 
        ^P    moves back through history.
        ^N    moves forward through history.
-#Character && Function \\ \hline
-#\multicolumn{3}{|c|}{Line Editing}\\
-#\verb~^B~ && move back a single character.\\
-#\verb~^F~ && move forward a single character.\\
-#\verb~^A~ && move to the beginning of the line.\\
-#\verb~^E~ && move to the end of the line.\\
-#\verb~^H, DEL~ && delete the previous character.\\
-#\verb~^D~ && delete the current character.\\
-#\verb~^K~ && delete from current position to the end of line.\\
-#\verb~^L, ^R~ && redraw line in case it gets trashed.\\
-#\verb~^U~ && delete the entire line. \\
-#\verb~^W~ && delete from the current word to the end of line. \\ \hline
-#\multicolumn{3}{|c|}{History} \\
-#\verb~^P~ && move back through history.\\
-#\verb~^N~ && move forward through history.\\
-%Character@@Function
+#\begin{tabular}{|cl|} \hline
+#\multicolumn{2}{|c|}{Command-line Editing Commands} \\ \hline \hline
+#Character & Function \\ \hline
+# & \multicolumn{1}{|c|}{Line Editing}\\ \cline{2-2}
+#\verb~^B~ & move back a single character.\\
+#\verb~^F~ & move forward a single character.\\
+#\verb~^A~ & move to the beginning of the line.\\
+#\verb~^E~ & move to the end of the line.\\
+#\verb~^H, DEL~ & delete the previous character.\\
+#\verb~^D~ & delete the current character.\\
+#\verb~^K~ & delete from current position to the end of line.\\
+#\verb~^L, ^R~ & redraw line in case it gets trashed.\\
+#\verb~^U~ & delete the entire line. \\
+#\verb~^W~ & delete from the current word to the end of line. \\ \hline
+# & \multicolumn{1}{|c|}{History} \\ \cline{2-2}
+#\verb~^P~ & move back through history.\\
+#\verb~^N~ & move forward through history.\\
+%c l .
+%Character@Function
 %_
-%@@Line Editing
-%^B@@move back a single character.
-%^F@@move forward a single character.
-%^A@@move to the beginning of the line.
-%^E@@move to the end of the line.
-%^H, DEL@@delete the previous character.
-%^D@@delete the current character.
-%^K@@delete from current position to the end of line.
-%^L, ^R@@redraw line in case it gets trashed.
-%^U@@delete the entire line.
-%^W@@delete from the current word to the end of line.
+%@Line Editing
+%^B@move back a single character.
+%^F@move forward a single character.
+%^A@move to the beginning of the line.
+%^E@move to the end of the line.
+%^H, DEL@delete the previous character.
+%^D@delete the current character.
+%^K@delete from current position to the end of line.
+%^L, ^R@redraw line in case it gets trashed.
+%^U@delete the entire line.
+%^W@delete from the current word to the end of line.
 %_
-%@@History
-%^P@@move back through history.
-%^N@@move forward through history.
+%@History
+%^P@move back through history.
+%^N@move forward through history.
 @end table
 
  On the IBM PC, the use of a TSR program such as DOSEDIT or CED may be desired
@@ -301,21 +309,23 @@ C
        Ctrl Right Arrow - same as ^E.
        Up    Arrow      - same as ^P.
        Down  Arrow      - same as ^N.
-#Arrow key  & Function & \\ \hline
-#Left       & same as \verb~^B~. & \\
-#Right      & same as \verb~^F~. & \\
-#Ctrl Left  & same as \verb~^A~. & \\
-#Ctrl Right & same as \verb~^E~. & \\
-#Up         & same as \verb~^P~. & \\
-#Down       & same as \verb~^N~. & \\
-%Arrow key@@Function
+#\begin{tabular}{|cl|} \hline
+#Arrow key  & Function \\ \hline
+#Left       & same as \verb~^B~. \\
+#Right      & same as \verb~^F~. \\
+#Ctrl Left  & same as \verb~^A~. \\
+#Ctrl Right & same as \verb~^E~. \\
+#Up         & same as \verb~^P~. \\
+#Down       & same as \verb~^N~. \\
+%c l .
+%Arrow key@Function
 %_
-%Left Arrow@@same as ^B.
-%Right Arrow@@same as ^F.
-%Ctrl Left Arrow@@same as ^A.
-%Ctrl Right Arrow@@same as ^E.
-%Up Arrow@@same as ^P.
-%Down Arrow@@same as ^N.
+%Left Arrow@same as ^B.
+%Right Arrow@same as ^F.
+%Ctrl Left Arrow@same as ^A.
+%Ctrl Right Arrow@same as ^E.
+%Up Arrow@same as ^P.
+%Down Arrow@same as ^N.
 %_
 @end table
 
@@ -328,26 +338,28 @@ C
        Esc             - same as ^U.
        Help            - `help` plus return.
        Ctrl Help       - `help `.
-#Arrow key & Function & \\ \hline
-#Undo      & same as \verb~^L~. & \\
-#Home      & same as \verb~^A~. & \\
-#Ctrl Home & same as \verb~^E~. & \\
-#Esc       & same as \verb~^U~. & \\
-#Help      & `{\bf help}' plus return. & \\
-#Ctrl Help & `{\bf help }'. & \\
-%Arrow key@@Function
+#\begin{tabular}{|cl|} \hline
+#Arrow key & Function \\ \hline
+#Undo      & same as \verb~^L~. \\
+#Home      & same as \verb~^A~. \\
+#Ctrl Home & same as \verb~^E~. \\
+#Esc       & same as \verb~^U~. \\
+#Help      & `{\bf help}' plus return. \\
+#Ctrl Help & `{\bf help }'. \\
+%c l .
+%Arrow key@Function
 %_
-%Undo@@same as ^L.
-%Home@@same as ^A.
-%Ctrl Home@@same as ^E.
-%Esc@@same as ^U.
-%Help@@help plus return.
-%Ctrl Help@@help .
+%Undo@same as ^L.
+%Home@same as ^A.
+%Ctrl Home@same as ^E.
+%Esc@same as ^U.
+%Help@help plus return.
+%Ctrl Help@help .
 %_
 @end table
 2 Comments
 ?comments
- Comments are supported as follows: a # may appear in most places in a line
+ Comments are supported as follows: a `#` may appear in most places in a line
  and `gnuplot` will ignore the rest of the line.  It will not have this effect
  inside quotes, inside numbers (including complex numbers), inside command
  substitutions, etc.  In short, it works anywhere it makes sense to work.
@@ -386,22 +398,22 @@ C
  is itself overridden by the .gnuplot (or equivalent) start-up file (see
  `start-up`) and, of course, by later explicit changes.
 
- On Unix, AmigaDOS, AtariTOS, MS-DOS and OS/2, GNUHELP may be defined to be
- the pathname of the HELP file (gnuplot.gih).
+ On Unix, AmigaOS, AtariTOS, MS-DOS and OS/2, GNUHELP may be defined to be the
+ pathname of the HELP file (gnuplot.gih).
 
- On VMS, the logical name gnuplot$HELP should be defined as the name of the
+ On VMS, the logical name GNUPLOT$HELP should be defined as the name of the
  help library for `gnuplot`.  The `gnuplot` help can be put inside any system
  help library, allowing access to help from both within and outside `gnuplot`
  if desired.
 
  On Unix, HOME is used as the name of a directory to search for a .gnuplot
- file if none is found in the current directory.  On AmigaDOS, AtariTOS,
+ file if none is found in the current directory.  On AmigaOS, AtariTOS,
  MS-DOS and OS/2, gnuplot is used.  On VMS, SYS$LOGIN: is used. See `help
  start-up`.
 
  On Unix, PAGER is used as an output filter for help messages.
 
- On Unix, AtariTOS and AmigaDOS, SHELL is used for the `shell` command.  On
+ On Unix, AtariTOS and AmigaOS, SHELL is used for the `shell` command.  On
  MS-DOS and OS/2, COMSPEC is used for the `shell` command.
 
  On MS-DOS, if the BGI interface is used, BGI is used to point to the full
@@ -436,6 +448,9 @@ C
  by a positive one may vary among compilers.  Try a test like "print -5/2" to
  determine if your system chooses -2 or -3 as the answer.
 
+ The integer expression "1/0" may be used to generate an "undefined" flag,
+ which causes a point to ignored; the `ternary` operator gives an example.
+
  The real and imaginary parts of complex expressions are always real, whatever
  the form in which they are entered: in {3,2} the "3" and "2" are reals, not
  integers.
@@ -452,18 +467,21 @@ C
  defaults to radians.
 
 @start table
+#\begin{tabular}{|ccl|} \hline
+#\multicolumn{3}{|c|}{Math library functions} \\ \hline \hline
 #Function & Arguments & Returns \\ \hline
+%c c l .
 %Function@Arguments@Returns
 %_
 4 abs
 ?expressions functions abs
 ?functions abs
 ?abs
-#abs(x) & any  &  absolute value of {\tt x}, $|x|$; same type \\
-#abs(x) & complex &  length of {\tt x}, $\sqrt{{\mbox{real}(x)^{2} +
+#abs(x) & any  &  absolute value of $x$, $|x|$; same type \\
+#abs(x) & complex &  length of $x$, $\sqrt{{\mbox{real}(x)^{2} +
 #\mbox{imag}(x)^{2}}}$ \\
-%abs(x)@any@absolute value of x, $|x|$; same type
-%abs(x)@complex@length of x, $sqrt{roman real (x) sup 2 + roman imag (x) sup 2}$
+%abs(x)@any@absolute value of $x$, $|x|$; same type
+%abs(x)@complex@length of $x$, $sqrt{roman real (x) sup 2 + roman imag (x) sup 2}$
  The `abs` function returns the absolute value of its argument.  The returned
  value is of the same type as the argument.
 
@@ -599,7 +617,7 @@ C
 ?expressions functions erf
 ?functions erf
 ?erf
-#erf(x) & any & $\mbox{Erf}(\mbox{real}(x))$,  error function of real($x$) \\
+#erf(x) & any & $\mbox{erf}(\mbox{real}(x))$,  error function of real($x$) \\
 %erf(x)@any@$erf ( roman real (x))$, error function of real ($x$)
  The `erf` function returns the error function of the real part of its
  argument.  If the argument is a complex value, the imaginary component is
@@ -608,7 +626,7 @@ C
 ?expressions functions erfc
 ?functions erfc
 ?erfc
-#erfc(x) & any & $\mbox{Erfc}(\mbox{real}(x))$,  1.0 - error function of real($x$) \\
+#erfc(x) & any & $\mbox{erfc}(\mbox{real}(x))$,  1.0 - error function of real($x$) \\
 %erfc(x)@any@$erfc ( roman real (x))$, 1.0 - error function of real ($x$)
  The `erfc` function returns 1.0 - the error function of the real part of its
  argument.  If the argument is a complex value, the imaginary component is
@@ -637,7 +655,7 @@ C
 ?expressions functions gamma
 ?functions gamma
 ?gamma
-#gamma(x) & any & $\mbox{Gamma}(\mbox{real}(x))$,  gamma function of real($x$) \\
+#gamma(x) & any & $\mbox{gamma}(\mbox{real}(x))$,  gamma function of real($x$) \\
 %gamma(x)@any@$GAMMA ( roman real (x))$, gamma function of real ($x$)
  The `gamma` function returns the gamma function of the real part of its
  argument.  For integer n, gamma(n+1) = n!.  If the argument is a complex
@@ -646,8 +664,8 @@ C
 ?expressions functions ibeta
 ?functions ibeta
 ?ibeta
-#ibeta(p,q,x) & any & $\mbox{Ibeta}(\mbox{real}(p,q,x))$,  ibeta function of real($p$,$q$,$x$) \\
-%ibeta(p,q,x)@any@$Ibeta ( roman real (p,q,x))$, ibeta function of real ($p$,$q$,$x$)
+#ibeta(p,q,x) & any & $\mbox{ibeta}(\mbox{real}(p,q,x))$,  ibeta function of real($p$,$q$,$x$) \\
+%ibeta(p,q,x)@any@$ibeta ( roman real (p,q,x))$, ibeta function of real ($p$,$q$,$x$)
  The `ibeta` function returns the incomplete beta function of the real parts
  of its arguments. p, q > 0 and x in [0:1].  If the arguments are complex,
  the imaginary components are ignored.
@@ -663,8 +681,8 @@ C
 ?expressions functions igamma
 ?functions igamma
 ?igamma
-#igamma(a,x) & any & $\mbox{Igamma}(\mbox{real}(a,x))$,  igamma function of real($a$,$x$) \\
-%igamma(a,x)@any@$Igamma ( roman real (a,x))$, igamma function of real ($a$,$x$)
+#igamma(a,x) & any & $\mbox{igamma}(\mbox{real}(a,x))$,  igamma function of real($a$,$x$) \\
+%igamma(a,x)@any@$igamma ( roman real (a,x))$, igamma function of real ($a$,$x$)
  The `igamma` function returns the incomplete gamma function of the real
  parts of its arguments.  a > 0 and x >= 0.  If the arguments are complex,
  the imaginary components are ignored.
@@ -696,8 +714,8 @@ C
 ?expressions functions lgamma
 ?functions lgamma
 ?lgamma
-#lgamma(x) & any & $\mbox{Lgamma}(\mbox{real}(x))$,  lgamma function of real($x$) \\
-%lgamma(x)@any@$Lgamma ( roman real (x))$, lgamma function of real ($x$)
+#lgamma(x) & any & $\mbox{lgamma}(\mbox{real}(x))$,  lgamma function of real($x$) \\
+%lgamma(x)@any@$lgamma ( roman real (x))$, lgamma function of real ($x$)
  The `lgamma` function returns the natural logarithm of the gamma function
  of the real part of its argument.  If the argument is a complex value, the
  imaginary component is ignored.
@@ -727,7 +745,7 @@ C
 ?expressions functions rand
 ?functions rand
 ?rand
-#rand(x) & any & $\mbox{Rand}(\mbox{real}(x))$,  pseudo random number generator \\
+#rand(x) & any & $\mbox{rand}(\mbox{real}(x))$,  pseudo random number generator \\
 %rand(x)@any@$rand ( roman real (x))$, pseudo random number generator
  The `rand` function returns a pseudo random number in the interval [0:1]
  using the real part of its argument as a seed.  If seed < 0, the sequence
@@ -793,7 +811,10 @@ C
  A few additional functions are also available.
 
 @start table
+#\begin{tabular}{|ccl|} \hline
+#\multicolumn{3}{|c|}{other {\bf gnuplot} functions} \\ \hline \hline
 #Function & Arguments & Returns \\ \hline
+%c c l .
 %Function@Arguments@Returns
 %_
 4 column
@@ -896,7 +917,8 @@ C
        !           !a        * logical negation
        !           a!        * factorial
        $           $3        * call arg/column during `using` manipulation
-#\multicolumn{3}{|c|}{Unary Operators}\\
+#\begin{tabular}{|ccl|} \hline
+#\multicolumn{3}{|c|}{Unary Operators}\\ \hline \hline
 #Symbol & Example & Explanation \\ \hline
 #\verb@-@ & \verb@-a@ & unary minus \\
 #\verb@+@ & \verb@+a@ & unary plus (no-operation) \\
@@ -961,7 +983,8 @@ C ... and restart the table:
        |           a|b         * bitwise inclusive OR
        &&          a&&b        * logical AND
        ||          a||b        * logical OR
-#\multicolumn{3}{|c|}{Binary Operators} \\
+#\begin{tabular}{|ccl|} \hline
+#\multicolumn{3}{|c|}{Binary Operators} \\ \hline \hline
 #Symbol & Example & Explanation \\ \hline
 #\verb~**~ & \verb~a**b~ & exponentiation\\
 #\verb~*~ & \verb~a*b~ & multiplication\\
@@ -980,6 +1003,7 @@ C ... and restart the table:
 #\verb~|~ & \verb~a|b~ & * bitwise inclusive OR\\
 #\verb~&&~ & \verb~a&&b~ & * logical AND\\
 #\verb~||~ & \verb~a||b~ & * logical OR\\
+%c c l .
 %Symbol@Example@Explanation
 %_
 %**@a**b@exponentiation
@@ -1016,9 +1040,11 @@ C ... and restart the table:
 @start table - first is interactive cleartext form
      Symbol       Example      Explanation
        ?:          a?b:c     ternary operation
-#\multicolumn{3}{|c|}{Ternary Operator} \\
+#\begin{tabular}{|ccl|} \hline
+#\multicolumn{3}{|c|}{Ternary Operator} \\ \hline \hline
 #Symbol & Example & Explanation \\ \hline
 #\verb~?:~ & \verb~a?b:c~ & ternary operation\\
+%c c l .
 %Symbol@Example@Explanation
 %_
 %?:@a?b:c@* ternary operation
@@ -1088,7 +1114,7 @@ C ... and restart the table:
  that begin "FIT_".  It is safest to avoid using such names.  "FIT_LIMIT",
  however, is one that you may wish to redefine.
 
- See `show functions` and `show variables`.
+ See `show functions`, `show variables`, and `fit`.
 2 Glossary
 ?glossary
  Throughout this document an attempt has been made to maintain consistency of
@@ -1098,24 +1124,22 @@ C ... and restart the table:
  some of these terms are used.
 
  A "page" or "screen" is the entire area addressable by `gnuplot`.  On a
- monitor, it is the full screen; on a plotter, it is a single sheet of
- paper.
+ monitor, it is the full screen; on a plotter, it is a single sheet of paper.
 
- A screen may contain one or more "plots".  A plot is defined by an
- abscissa and an ordinate, although these need not actually appear on it, as
- well as the margins and any text written therein.
+ A screen may contain one or more "plots".  A plot is defined by an abscissa
+ and an ordinate, although these need not actually appear on it, as well as
+ the margins and any text written therein.
 
  A plot contains one "graph".  A graph is defined by an abscissa and an
  ordinate, although these need not actually appear on it.
 
  A graph may contain one or more "lines".  A line is a single function or
  data set.  "Line" is also a plotting style.  The word will also be used in
- sense "a line of text".  Presumably the context will always remove the
- ambiguity.
+ sense "a line of text".  Presumably the context will remove any ambiguity.
 
- The lines on a graph may have individual names.  These may be listed together
- with a sample of the plotting style used to represent them in the "key",
- sometimes also called the "legend".
+ The lines on a graph may have individual names.  These may be listed 
+ together with a sample of the plotting style used to represent them in 
+ the "key", sometimes also called the "legend".
 
  The word "title" occurs with multiple meanings in `gnuplot`.  In this
  document, it will always be preceded by the adjective "plot", "line", or
@@ -1128,11 +1152,12 @@ C ... and restart the table:
  of the plot, "y" for the left border, "x2" for the top border, and "y2" for
  the right border.  "z" also occurs in commands used with 3-d plotting.
 
- When discussing data files, the term "record" will be resurrected and used to
- denote a single line in the file, that is, the characters between newline or
- end-of-record characters.  A "point" is the datum on a single record, and a
- "dataline" is a set of points on consecutive records, delimited by blank
- records.
+ When discussing data files, the term "record" will be resurrected and used
+ to denote a single line of text in the file, that is, the characters between
+ newline or end-of-record characters.  A "point" is the datum extracted from
+ a single record.  A "datablock" is a set of points from consecutive records,
+ delimited by blank records.  A line, when referred to in the context of a
+ data file, is a subset of a datablock.
 2 Plotting
 ?plotting
  There are three `gnuplot` commands which actually create a plot: `plot`,
@@ -1150,19 +1175,19 @@ C ... and restart the table:
  treated.  In addition, the `using` option allows both `plot` and `splot` to
  treat almost any coordinate system you'd care to define.
 
- `splot` can plot surfaces and contours in addition to lines.  See `splot
- datafile` for information about the requisite file structure for both of
- these; see `set isosamples` for information about defining the grid for a 3-d
- function.  See `set contour` and `set cntrparam` for information about
- contours.
+ `splot` can plot surfaces and contours in addition to points and/or lines.
+ In addition to `splot`, see `set isosamples` for information about defining
+ the grid for a 3-d function;  `splot datafile` for information about the 
+ requisite file structure for 3-d data values; and `set contour` and `set
+ cntrparam` for information about contours.
 2 Start-up
 ?startup
 ?start
 ?.gnuplot
  When `gnuplot` is run, it looks for an initialization file to load.  This
- file is called `.gnuplot` on Unix and AmigaDOS systems, and `GNUPLOT.INI`
- on other systems.  If this file is not found in the current directory, the
- program will look for it in the home directory (under AmigaDOS,
+ file is called `.gnuplot` on Unix and AmigaOS systems, and `GNUPLOT.INI` on
+ other systems.  If this file is not found in the current directory, the
+ program will look for it in the home directory (under AmigaOS,
  Atari(single)TOS, MS-DOS and OS/2, the environment variable `gnuplot` should
  contain the name of this directory).  Note: if NOCWDRC is defined during the
  installation, `gnuplot` will not read from the current directory.
@@ -1174,7 +1199,8 @@ C ... and restart the table:
 ?substitution
  Command-line substitution is specified by a system command enclosed in
  backquotes.  This command is spawned and the output it produces replaces
- the name of the command (and backquotes) on the command line.
+ the name of the command (and backquotes) on the command line.  Some
+ implementations also support pipes;  see `plot data-file special-filenames`.
 
  Newlines in the output produced by the spawned command are replaced with
  blanks.
@@ -1197,9 +1223,9 @@ C ... and restart the table:
  The general rules of syntax and punctuation in `gnuplot` are that keywords
  and options are order-dependent.  Options and any accompanying parameters are
  separated by spaces whereas lists and coordinates are separated by commas.
- Ranges are separated by colons and enclosed in braces [], text and file names
- are enclosed in quotes, and a few miscellaneous things are enclosed in
- parentheses.  Brackets {} are used for a few special purposes.
+ Ranges are separated by colons and enclosed in brackets [], text and file
+ names are enclosed in quotes, and a few miscellaneous things are enclosed
+ in parentheses.  Braces {} are used for a few special purposes.
 
  Commas are used to separate coordinates on the `set` commands `arrow`,
  `key`, and `label`; the list of variables being fitted (the list after the
@@ -1219,8 +1245,8 @@ C ... and restart the table:
 
  (Parentheses and commas are also used as usual in function notation.)
 
- Braces are used to delimit ranges, whether they are given on `set`, `plot` or
- `splot` commands.
+ Brackets are used to delimit ranges, whether they are given on `set`, `plot`
+ or `splot` commands.
 
  Colons are used to separate extrema in `range` specifications (whether they
  are given on `set`, `plot` or `splot` commands) and to separate entries in
@@ -1228,7 +1254,7 @@ C ... and restart the table:
 
  Semicolons are used to separate commands given on a single command line.
 
- Brackets are used in text to be specially processed by some terminals, like
+ Braces are used in text to be specially processed by some terminals, like
  `postscript`.  They are also used to denote complex numbers: {3,2} = 3 + 2i.
 
  Text may be enclosed in single- or double-quotes.  Backslash processing of
@@ -1245,6 +1271,10 @@ C ... and restart the table:
        'This is the first line of text.\nThis is the second line.'
  will produce
            This is the first line of text.\nThis is the second line.
+
+ Filenames may be entered with either single- or double-quotes.  In this
+ manual the command examples generally single-quote filenames and double-quote
+ other string tokens for clarity.
 
  At present you should not embed \n inside {} when using the enhanced option
  of the postscript terminal.
@@ -1266,6 +1296,13 @@ C ... and restart the table:
  be in force at a given time, all time/date quantities being input at the same
  time must be presented in the same format.  Thus if both x and y data in a
  file are time/date, they must be in the same format.
+
+ The conversion to and from seconds assumes Universal Time (which is the same
+ as Greenwich Standard Time).  There is no provision for changing the time
+ zone or for daylight savings.  If all your data refer to the same time zone
+ (and are all either daylight or standard) you don't need to worry about these
+ things.  But if the absolute time is crucial for your application, you'll
+ need to convert to UT yourself.  
 
  Commands like `show xrange` will re-interpret the integer according to
  `timefmt`.  If you change `timefmt`, and then `show` the quantity again, it
@@ -1291,8 +1328,8 @@ C ... and restart the table:
  This file can be plotted by
 
        set xdata time
-       set timefmt "%m/%d"
-       set xrange ["03/21":"03/22"]
+       set timefmt "%m/%d/%y"
+       set xrange ["03/21/95":"03/22/95"]
        set format x "%m/%d"
        set timefmt "%m/%d/%y %H:%M"
        plot "data" using 1:3
@@ -1389,274 +1426,443 @@ C ... and restart the table:
  the `clear` command) before exiting.
 2 fit
 ?fit
- This implementation incorporates the capability of nonlinear least squares
- fitting using the Marquardt-Levenberg Algorithm.  It may fit any user-defined
- function to any set of data points (x,y) or (x,y,z).  x, y, z and the
- function's return type _must_ be real!  Any variable occurring in the
- function body may serve as a fit parameter (fitting functions without
- adjustable parameters make no sense).
+?least-squares
+?Marquardt
+ The `fit` command can fit a user-defined function to a set of data points
+ (x,y) or (x,y,z), using an implementation of the nonlinear least-squares
+ (NLLS) Marquardt-Levenberg algorithm.  Any user-defined variable occurring in
+ the function body may serve as a fit parameter, but the return type of the
+ function must be real.
 
  Syntax:
-       fit {[xrange]} {[yrange]} <function>
-           '<datafile>' {datafile-modifiers}
-            via {'<parameter file>' | <var1>,<var2>,...}
+       fit {[xrange] {[yrange]}} <function> '<datafile>'
+           {datafile-modifiers}
+           via '<parameter file>' | <var1>{,<var2>,...}
 
- Notice that `via` is now a required keyword, to distinguish it from a 'scanf'
- format string.
+ Ranges may be specified to temporarily limit the data which is to be fitted;
+ any out-of-range data points are ignored. The syntax is
+       [{dummy_variable=}{<min>}{:<max>}],
+ analogous to `plot`; see `plot ranges`.
 
- [xrange] and [yrange] are of the form [{variable=}{<min>}{:<max>}], allowing
- the range of the fit to be limited temporarily in a manner analogous to
- `plot`.  <function> is any valid `gnuplot` expression, although it is usual
- to use a previously user-defined function of the form f(x) or f(x,y).
- <datafile> is treated as in the `plot` command.  All the modifiers for
- datafiles (`using`, `every`,...) in `plot` are available here (except
- `smooth`)---see `plot datafile` for full details.  The default columns for x
- and y are 1 and 2.  These may be changed by the `using x:y` mechanism.  If
- `using` has a third entry (a column or an expression), it will be interpreted
- as the standard deviation of each y value and will be used to compute the
- weight; otherwise all data will be weighted equally.  If four columns are
- specified, they are x:y:z:error---note that an error _must_ be specified in
- order to perform a 3-d fit.  If errors are not available, a constant value
- can be specified, e.g., `using ...:(1)`.
+ <function> is any valid `gnuplot` expression, although it is usual to use a
+ previously user-defined function of the form f(x) or f(x,y). 
 
- Initial values for the parameters to be fit may be specified in a (load-)file
- wherein each line is of the form:
+ <datafile> is treated as in the `plot` command.  All the `plot datafile`
+ modifiers (`using`, `every`,...) except `smooth` are applicable to `fit`. 
+ See `plot datafile`.  
 
-       varname = value
+ The default data formats for fitting functions with a single independent 
+ variable, y=f(x), are {x:}y or x:y:s; those formats can be changed with 
+ the datafile `using` qualifier.  The third item, (a column number or an 
+ expression), if present, is interpreted as the standard deviation of the 
+ corresponding y value and is used to compute a weight for the datum, 1/s**2.
+ Otherwise, all data points are weighted equally, with a weight of one.  
 
- Comments, marked by '#', and blank lines are permissible.  The special form
+ To fit a function with two independent variables, z=f(x,y), the required
+ format is `using` with four items, x:y:z:s.  The complete format must be
+ given---no default columns are assumed for a missing token.  Weights for 
+ each data point are evaluated from 's' as above.  If error estimates are 
+ not available, a constant value can be specified as a constant expression
+ (see `plot datafile using`), e.g., `using 1:2:3:(1)`. 
 
-       varname = value       # FIXED
+ Multiple datasets may be simultaneously fit with functions of one 
+ independent variable by making y a 'pseudo-variable', e.g., the dataline 
+ number, and fitting as two independent variables.  See `fit multibranch`.
 
- means that the variable is treated as a `fixed parameter` that is initialized
- but will not be adjusted.  It is not necessary (but sometimes useful for
- clarity) to specify them at all.  The keyword `# FIXED` has to appear in
- exactly this form.
-
- The other means of specifying the adjustable parameters is to provide a
- comma-separated list of variable names after the `via` keyword.  If any of
- these variables do not yet exist within the current `gnuplot` session, they
- are created with an initial value of 1.0, but the fit is more likely to
- converge if a more appropriate starting value is given.  If this form is
- used, it may prove beneficial to iterate the fit, allowing only one or two
- variables to be adjusted at a time until a reasonably close fit is obtained,
- before allowing `fit` to vary all parameters.
-
- After each iteration step, detailed information is given about the fit's
- state, both on the screen and on a logfile "fit.log".  This file will never be
- erased but always appended to so that the fit's history isn't lost.  After
- each iteration step, the fit may be interrupted by pressing Ctrl-C (any key
- _but_ Ctrl-C under MSDOS and Atari Multitasking Systems).  Then you have the
- options of stopping (and accepting the current parameter values), continuing
- the iteration of the fit, or executing a `gnuplot` command specified by an
- environment variable FIT_SCRIPT.  A `plot` or `load` command may be useful in
- this context.
-
- Special `gnuplot` variables:
-
-       FIT_LIMIT
- may be specified to change the default epsilon limit (1e-5).  When the sum
- of squared residuals changes between two iteration steps by less than a
- factor of this number, the fit is considered to have 'converged'.
-
- Once the fit is converged, the final values may be stored in (load-)file
- suitable for use as an initial-value file, as discussed above.  Please see
- `update` for details.
-
-       FIT_MAXITER
- may be specified to limit the number of iterations performed without
- convergence by FIT_LIMIT.  A value of 0 (or not defining it at all) means
- that there is no limit.
-
- [FIT_SKIP was available in previous releases of gnufit.  Its functionality
- is now obtained using the `every` modifier for datafiles.  FIT_INDEX was
- previously available in order to allow multi-branch fitting.  Multi-branch
- fitting in 2-d can now be done as a pseudo-3-d fit in which the y values are
- the dataline number (`using 1:-1:...`) or index (`using 1:-2:...`).]
-
- Environment variables:
-
-       FIT_LOG
- changes the logfile's path from './fit.log' (write permission is necessary).
-
-       FIT_SCRIPT
- specifies a command to be executed after an user interrupt.
+ The `via` qualifier specifies which parameters are to be adjusted, either
+ directly, or by referencing a parameter file. 
 
  Examples:
        f(x) = a*x**2 + b*x + c
+       g(x,y) = a*x**2 + b*y**2 + c*x*y
        FIT_LIMIT = 1e-6
        fit f(x) 'measured.dat' via 'start.par'
        fit f(x) 'measured.dat' using 3:($7-5) via 'start.par'
        fit f(x) './data/trash.dat' using 1:2:3 via a, b, c
-       fit f(x,y) 'surface.dat' using 1:2:3:(1) via a, b, c
-^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/fit/fit.html"> See the `fit` demos. </a>
-3 Introduction To Fitting
-?fit introduction
- Beginner's guide to fitting in general
+       fit g(x,y) 'surface.dat' using 1:2:3:(1) via a, b, c
 
- `fit` is used to find a set of parameters to be used in a parametric function
- to make it fit to your data optimally.  The quantity to be minimized is the
- sum of squared differences between your input data points and the function
- values at the same places, usually called 'chisquared' (i.e. the Greek letter
- chi, to the power of 2).  (To be precise, the differences will be divided by
- the input data errors before being squared; see `fit errors` for details.)
+ After each iteration step, detailed information about the current state 
+ of the fit is written to the display.  The same information about the 
+ initial and final states is written to a log file, "fit.log".  This file 
+ is always appended to, so as to not lose any previous fit history;  it 
+ should be deleted or renamed as desired.
 
- Now that you know why it's called 'least squares fitting', let's see why it's
- 'nonlinear'.  That's because the function's dependence on the parameters (not
- the data!) may be non-linear.  Of course, this might not tell you much if you
- didn't know already, so let me try to describe it.  If the fitting problem
- were to be linear, the target function would have to be a sum of simple,
- non-parametric functions, each multiplied by one parameter.  (For example,
- consider the function f(x) = c*sin(x), where we want to find the best value
- for the constant c.  This is nonlinear in x, of course, but it is linear in
- c.  Since the fitting procedure solves for c, it has a linear equation to
- solve.)  For such a linear case, the task of fitting can be performed by
- comparatively simple linear algebra in one direct step.  But `fit` can do
- more for you:  the parameters may be used in your function in any way you can
- imagine.  To handle this more general case, however, it has to perform an
- iteration, i.e. it will repeat a sequence of steps until it finds the fit to
- have 'converged', or until you stop it.
+ The fit may be interrupted by pressing Ctrl-C (any key but Ctrl-C under
+ MSDOS and Atari Multitasking Systems).  After the current iteration 
+ completes, you have the option to (1) stop the fit and accept the current
+ parameter values, (2) continue the fit, (3) execute a `gnuplot` command 
+ as specified by the environment variable FIT_SCRIPT.  The default for 
+ FIT_SCRIPT is `replot`, so if you had previously plotted both the data 
+ and the fitting function in one graph, you can display the current state
+ of the fit.
 
- Generally, the function to be fitted will come from some kind of theory (some
- prefer the term 'model' here) that makes a prediction about how the data
- should behave, and `fit` is then used to find the free parameters of the
- theory.  This is a typical task in scientific work, where you have lots of
- data that depend in more or less complicated ways on the values you're
- interested in.  The results will then usually be of the form 'the measured
- data can be described by the {foo} theory, for the following set of
- parameters', and then a set of values is given, together with the errors of
- your determination of these values.
+ Once `fit` has finished, the `update` command may be used to store final
+ values in a file for subsequent use as a parameter file.   See `update`
+ for details.
+3 adjustable_parameters
+?fit adjustable_parameters
+?fit parameters
+?adjustable_parameters
+ There are two ways that `via` can specify the parameters to be adjusted,
+ either directly on the command line or indirectly, by referencing a
+ parameter file.  The two use different means to set initial values.
 
- This reasoning implies that `fit` is probably _not_ your tool of choice if
- all you really want is a smooth line through your data points.  If you want
- this, the `smooth` option to `plot` is what you've been looking for, not
- `fit`.  See `plot datafile smooth` for details.
-3 Errors In Fitting
-?fit errors
- One of the most important things to keep in mind when using `fit` is the
- handling of errors.  Here, this term refers to the measurement errors
- accompanying both your input data and resulting parameters.
+ Adjustable parameters can be specified by a comma-separated list of variable 
+ names after the `via` keyword.  Any variable that is not already defined is
+ is created with an initial value of 1.0.  However, the fit is more likely 
+ to converge rapidly if the variables have been previously declared with more
+ appropriate starting values.
 
- The reason for the importance of input data errors to fitting is that
- normally the single measurements aren't all of the same quality, so they
- shouldn't have the same importance in determining the results.  That's one
- major reason for dividing the differences between data and function by the
- input errors, also known as 'weighting', in the computation of chisquared.
+ In a parameter file, each parameter to be varied and a corresponding initial
+ value are specified, one per line, in the form
+       varname = value
 
- By weighting, deviations from your function at places where the data have
- large errors will have a smaller part in chisquared, as the division will
- make them smaller compared to the better measurements.  Another reason for
- the division is that, for mathematical reasons, chisquared has to be a
- dimensionless variable, i.e. chisquared should be something like '15.3', not
- '15.3 square seconds'.
+ Comments, marked by '#', and blank lines are permissible.  The
+ special form
+       varname = value       # FIXED
 
- Without input data errors being given, all data will be weighted equally, and
- the resulting errors of the parameters won't have much of a real meaning.
- Therefore, you should always try to find a sensible set of y-errors for your
- data.  An important example is that of data representing a histogram.  In
- such a case, the square root of the y value is often the correct input error
- to use.
+ means that the variable is treated as a 'fixed parameter', initialized by the
+ parameter file, but not adjusted by `fit`.  For clarity, it may be useful to
+ designate variables as fixed parameters so that their values are reported by
+ `fit`.  The keyword `# FIXED` has to appear in exactly this form.
 
- Once the fit iteration has stopped, it will display a load of valuable
- information which you will have to learn to interpret before you can use it.
- The 'sum of squares residuals' is the distance between the data and your fit
- function, shortly called 'chisquared'.  This is what `fit` tries to minimize.
- To quickly test if your fit went well, check that this is about the same as
- the number of data points minus the number of parameters (all this is only
- valid if you supplied y-errors, and the number of data points is large
- enough).  For details on this, look up the 'Chi-squared distribution' in your
- favourite statistics textbook.
+3 beginner's_guide
+?fit beginner's_guide
+?fitting
+ `fit` is used to find a set of parameters that 'best' fits your data to your
+ user-defined function.  The fit is judged on the basis of the the sum of the
+ squared differences or 'residuals' (SSR) between the input data points and
+ the function values, evaluated at the same places.  This quantity is often
+ called 'chisquare' (i.e., the Greek letter chi, to the power of 2).  The
+ algorithm attempts to minimize SSR, or more precisely, WSSR, as the residuals
+ are 'weighted' by the input data errors (or 1.0) before being squared; see
+ `fit error_estimates` for details.
 
- If chisquared is much larger than that, then your function didn't fit the
- data very well.  Try another, more general one, or allow more of the
- parameters to be adjusted by `fit`.  Another possible reason could be that
- the y-errors you supplied were a bit optimistic, i.e. too small.
+ That's why it is called 'least-squares fitting'.  Let's look at an example
+ to see what is meant by 'non-linear', but first we had better go over some
+ terms.  Here it is convenient to use z as the dependent variable for 
+ user-defined functions of either one independent variable, z=f(x), or two
+ independent variables, z=f(x,y).  A parameter is a user-defined variable
+ that `fit` will adjust, i.e., an unknown quantity in the function 
+ declaration.  Linearity/non-linearity refers to the relationship of the 
+ dependent variable, z, to the parameters which `fit` is adjusting, not of 
+ z to the independent variables, x and/or y.  (To be technical, the 
+ second {and higher} derivatives of the fitting function with respect to
+ the parameters are zero for a linear least-squares problem).
 
- If, on the other hand, chisquared is too small, then the function fit the
- data _too_ well.  Either the given y-errors were too large, or the function
- is too general.  You should try to restrict it by either fixing some
- parameters, or just make it simpler one way or the other.
+ For linear least-squares (LLS), the user-defined function will be a sum of 
+ simple functions, not involving any parameters, each multiplied by one 
+ parameter.  NLLS handles more complicated functions in which parameters can
+ be used in a large number of ways.  An example that illustrates the
+ difference between linear and nonlinear least-squares is the Fourier series.
+ One member may be written as 
+      z=a*sin(c*x) + b*cos(c*x).  
+ If a and b are the unknown parameters and c is constant, then estimating
+ values of the parameters is a linear least-squares problem.  However, if
+ c is an unknown parameter, the problem is nonlinear.
 
- If all else went well, you'll see a list of the resulting parameter values,
- together with estimates of the errors of these values.  And you should
- always be aware of this:  they're _estimates_, not more.  You'll have to get
- used to both `fit` and kind of problems you usually apply it to before you
- can use these errors for anything serious.  To start with, the errors
- reported by `fit` are insensitive to the global scale of the y-errors, i.e.
- if you multiply all y-errors by a constant, the resulting parameter errors
- don't change.
+ In the linear case, parameter values can be determined by comparatively 
+ simple linear algebra, in one direct step.  However LLS is a special case
+ which is also solved along with more general NLLS problems by the iterative 
+ procedure that `gnuplot` uses.  `fit` attempts to find the minimum by doing 
+ a search.  Each step (iteration) calculates WSSR with a new set of parameter 
+ values.  The Marquardt-Levenberg algorithm selects the parameter values for
+ the next iteration.  The process continues until a preset criterium is met, 
+ either (1) the fit has "converged" (the relative change in WSSR is less than
+ FIT_LIMIT), or (2) it reaches a preset iteration count limit, FIT_MAXITER
+ (see `fit environment control variables`).  The fit may also be interrupted 
+ and subsequently halted from the keyboard (see `fit`).
 
- And, to repeat this once more: if you didn't supply y-errors, the parameter
- errors will normally be meaningless.
+ Often the function to be fitted will be based on a model (or theory) that
+ attempts to describe or predict the behaviour of the data.  Then `fit` can 
+ be used to find values for the free parameters of the model, to determine 
+ how well the data fits the model, and to estimate an error range for each 
+ parameter.  See `fit error_estimates`.
 
-3 Tips and Tricks
+ Alternatively, in curve-fitting, functions are selected independent of
+ a model (on the basis of experience as to which are likely to describe
+ the trend of the data with the desired resolution and a minimum number
+ of parameters*functions.)  The `fit` solution then provides an analytic 
+ representation of the curve.
+
+ However, if all you really want is a smooth curve through your data points,
+ the `smooth` option to `plot` may be what you've been looking for rather
+ than `fit`.
+3 error_estimates
+?fit error_estimates
+? error_estimate
+ In `fit`, the term "error" is used in two different contexts, data error
+ estimates and parameter error estimates.
+
+ Data error estimates are used to calculate the relative weight of each data
+ point when determining the weighted sum of squared residuals, WSSR or 
+ chisquare.  They can affect the parameter estimates, since they determine 
+ how much influence the deviation of each data point from the fitted function
+ has on the final values.  Some of the `fit` output information, including 
+ the parameter error estimates, is more meaningful if accurate data error 
+ estimates have been provided.
+
+ The 'statistical overview' describes some of the `fit` output and gives some
+ background for the 'practical guidelines'.   
+4 statistical_overview
+?fit error_estimates statistical_overview
+?statistical_overview
+ The theory of non-linear least-squares (NLLS) is generally described in terms
+ of a normal distribution of errors, that is, the input data is assumed to be
+ a sample from a population having a given mean and a Gaussian (normal)
+ distribution about the mean with a given standard deviation.  For a sample of
+ sufficiently large size, and knowing the population standard deviation, one
+ can use the statistics of the chisquare distribution to describe a "goodness
+ of fit" by looking at the variable often called "chisquare".  Here, it is
+ sufficient to say that a reduced chisquare (chisquare/degrees of freedom,
+ where degrees of freedom is the number of datapoints less the number of
+ parameters being fitted) of 1.0 is an indication that the weighted sum of
+ squared deviations between the fitted function and the data points is the
+ same as that expected for a random sample from a population characterized by
+ the function with the current value of the parameters and the given standard
+ deviations.
+
+ If the standard deviation for the population is not constant, as in counting
+ statistics where variance = counts, then each point should be individually
+ weighted when comparing the observed sum of deviations and the expected sum
+ of deviations.
+
+ To estimate confidence levels for the parameters, one can use the minimum
+ chisquare obtained from the fit and chisquare statistics to determine the
+ value of chisquare corresponding to the desired confidence level, but
+ considerably more calculation is required to determine the combinations of
+ parameters which produce such values.
+
+ Rather than determine confidence intervals, `fit` reports parameter error
+ estimates which are readily obtained from the variance-covariance matrix
+ after the final iteration.  By convention, these estimates are called
+ "standard errors" or "asymptotic standard errors", since they are calculated
+ in the same way as the standard errors (standard deviation of each parameter)
+ of a linear least-squares problem, even though the statistical conditions for
+ designating the quantity calculated to be a standard deviation are not
+ generally valid for the NLLS problem.  The asymptotic standard errors are
+ generally over-optimistic and should not be used for determining confidence
+ levels, but are useful for qualitative purposes.
+
+ The final solution also produces a correlation matrix, which gives an
+ indication of the correlation of parameters in the region of the solution;
+ if one parameter is changed, increasing chisquare, does changing another
+ compensate?  The main diagonal elements, autocorrelation, are all 1; if
+ all parameters were independent, all other elements would be nearly 0.  Two
+ variables which completely compensate each other would have an off-diagonal
+ element of unit magnitude, with a sign depending on whether the relation is
+ proportional or inversely proportional.  The smaller the magnitudes of the 
+ off-diagonal elements, the closer the estimates of the standard deviation 
+ of each parameter would be to the aymptotic standard error.
+4 practical_guidelines
+?fit error_estimates practical_guidelines
+?practical_guidelines
+?guidelines
+ If you have a basis for assigning weights to each data point, doing so lets
+ you make use of additional knowledge about your measurements, e.g., take into
+ account that some points may be more reliable than others.  That may affect
+ the final values of the parameters.
+
+ Weighting the data provides a basis for interpreting the additional `fit`
+ output after the last iteration.  Even if you weight each point equally,
+ estimating an average standard deviation rather than using a weight of 1
+ makes WSSR a dimensionless variable, as chisquare is by definition.
+
+ Once the fit iteration has stopped, it will display information which can
+ be used to evaluate the fit.  The 'sum of squares residuals', also called
+ 'chisquare', is the WSSR between the data and your fitted function; `fit` has
+ minimized that.  To quickly test if your fit went well, check that this is
+ about the same as the number of data points minus the number of parameters
+ (all this is only valid if you supplied data errors, and the number of data
+ points is large enough).  For details on this, look up the 'Chi-squared
+ distribution' in your favourite statistics textbook.
+
+ The reduced chisquare is not reported, but is readily calculated as above.
+ If you have weighted your data points and find the reduced chisquare to be
+ about 1.0, there are additional tests, beyond the scope of this overview,
+ for determining how well the model fits the data. 
+
+ A reduced chisquare much larger than 1.0 may be due to incorrect data error
+ estimates, data errors not normally distributed, systematic measurement
+ errors, 'outliers', or an incorrect model function.  A plot of the residuals,
+ e.g., `plot 'datafile' using 1:($2-f($1))`, may help to show any systematic
+ trends.  Plotting both the data points and the function may help to suggest
+ another model.
+
+ Similarly, a reduced chisquare less than 1.0 indicates WSSR is less than that
+ expected for a random sample from the function with normally distributed
+ errors.  The data error estimates may be too large, the statistical
+ assumptions may not be justified, or the model function may be too general,
+ fitting fluctuations in a particular sample in addition to the underlying
+ trends.  In the latter case, a simpler function may be more appropriate.
+
+ You'll have to get used to both `fit` and the kind of problems you apply it
+ to before you can relate the standard errors to some more practical estimates
+ of parameter uncertainties or evaluate the significance of the correlation
+ matrix.
+
+ Note that `fit`, in common with most NLLS implementations, minimizes the
+ weighted sum of squared distances (y-f(x))**2.  It does not provide any means
+ to account for "errors" in the values of x, only in y.  Also, any "outliers"
+ (data points outside the normal distribution of the model) will have an
+ exaggerated effect on the solution.
+3 fit_environment
+?fit_environment
+?fit environment
+?environment
+ There are a number of `gnuplot` variables that can be defined to affect
+ `fit`.  Those which can be defined once `gnuplot` is running are listed
+ under 'control_variables' while those defined before starting `gnuplot`
+ are listed under 'environment_variables'.
+
+4 control_variables
+? fit control_variables
+? fit_control
+? control_variables
+
+ The default epsilon limit (1e-5) may be changed by declaring a value for
+       FIT_LIMIT
+ When the sum of squared residuals changes between two iteration steps by
+ a factor less than this number (epsilon), the fit is considered to have
+ 'converged'.
+
+ The maximum number of iterations may be limited by declaring a value for
+       FIT_MAXITER
+ A value of 0 (or not defining it at all)  means that there is no limit.
+
+ Oher variables with the FIT_ prefix may be added to `fit`, so it is safer
+ not to use that prefix for user-defined variables.
+
+ Two variables, FIT_SKIP and FIT_INDEX, were used by earlier releases of
+ `gnuplot` with a 'fit' patch called `gnufit` and are no longer available.
+ The datafile `every` modifier provides the functionality of FIT_SKIP.
+ FIT_INDEX was used for multi-branch fitting, but multi-branch fitting of
+ one independent variable is now done as a pseudo-3D fit in which the
+ second independent variable and `using` are used to specify the branch.
+ See `fit multi-branch`.
+4 environment_variables
+?fit_environment
+?environment_variables
+?fit environment_variables
+ The environment variables must be defined before `gnuplot` is executed; how
+ to do so depends on your operating system.
+
+       FIT_LOG
+ changes the name (and/or path) of the file to which the fit log will be
+ written from the default of "fit.log" in the working directory.
+
+       FIT_SCRIPT
+ specifies a command that may be executed after an user interrupt. The default
+ is `replot`, but a `plot` or `load` command may be useful to display a plot
+ customized to highlight the progress of the fit.
+3 multi-branch
+?fit multi-branch
+?multi-branch
+?branch
+ In multi-branch fitting, multiple data sets can be simultaneously fit with
+ functions of one independent variable having common parameters by minimizing
+ the total WSSR.  The function and parameters (branch) for each data set are
+ selected by using a 'pseudo-variable', e.g., either the dataline number (a
+ 'column' index of -1) or the datafile index (-2), as the second independent
+ variable.
+
+ Example:  Given two exponential decays of the form, z=f(x), each describing
+ a different data set but having a common decay time, estimate the values of
+ the parameters.  If the datafile has the format x:z:s, then
+      f(x,y) = (y==0) ? a*exp(-x/tau) : b*exp(-x/tau)
+      fit f(x,y) 'datafile' using  1:-1:2:3  via a, b, tau
+
+ For a more complicated example, see the file "hexa.fnc" used by the 
+ "fit.dem" demo.
+
+ Appropriate weighting may be required since unit weights may cause one
+ branch to predominate if there is a difference in the scale of the dependent
+ variable.  Fitting each branch separately, using the multi-branch solution
+ as initial values, may give an indication as to the relative effect of each 
+ branch on the joint solution.
+3 Starting_values
+?fit starting_values
+?starting_values
+ Nonlinear fitting is not guaranteed to converge to the global optimum (the
+ solution with the smallest sum of squared residuals, SSR), and can get stuck
+ at a local minimum.  The routine has no way to determine that;  it is up to
+ you to judge whether this has happened.
+
+ `fit` may, and often will get "lost" if started far from a solution, where
+ SSR is large and changing slowly as the parameters are varied, or it may 
+ reach a numerically unstable region (e.g., too large a number causing a 
+ floating point overflow) which results in an "undefined value" message
+ or `gnuplot` halting. 
+
+ To improve the chances of finding the global optimum, you should set the
+ starting values at least roughly in the vicinity of the solution, e.g.,
+ within an order of magnitude, if possible.  The closer your starting values
+ are to the solution, the less chance of stopping at another minimum.  One way
+ to find starting values is to plot data and the fitting function on the same
+ graph and change parameter values and `replot` until reasonable similarity
+ is reached.  The same plot is also useful to check whether the fit stopped at
+ a minimum with a poor fit.
+
+ Of course, a reasonably good fit is not proof there is not a "better" fit (in
+ either a statistical sense, characterized by an improved goodness-of-fit
+ criterion, or a physical sense, with a solution more constistent with the
+ model.)  Depending on the problem, it may be desirable to `fit` with various
+ sets of starting values, covering a reasonable range for each parameter.
+3 tips
 ?fit tips
+?tips
  Here are some tips to keep in mind to get the most out of `fit`.  They're not
  very organized, so you'll have to read them several times until their essence
  has sunk in.
 
  The two forms of the `via` argument to `fit` serve two largely distinct
- purposes.  The `via "file"` form is best used for batch operation (possibly
- unattended), where you just supply the startup values in a file and perhaps
- later use `update` to copy the results back into another file (or the same
- one).
+ purposes.  The `via "file"` form is best used for (possibly unattended) batch
+ operation, where you just supply the startup values in a file and can later
+ use `update` to copy the results back into another (or the same) parameter
+ file.
 
- The `via var1, var2, ...` form is best used interactively.  Using the command
- history mechanism built into gnuplot, you can easily edit the list of
- parameters to be fitted or supply new startup values for the next try.  This
- is particularly useful for hard problems, where a direct fit to all the
- parameters at once won't work, at least not without really _good_ values to
- start with.  To find such a set of good starting parameters, you can iterate
- several times, fitting only some of the parameters each time, until the
- values are close enough to the goal that the final fit (to all the
- parameters at once) will work.
-
- A general word about starting values:  `fit` may, and often will, get really
- badly lost in searching for the optimal parameter set if you start it way off
- any possible solution.  The main reason for this is that nonlinear fitting is
- not guaranteed to converge to a global optimum.  It can get stuck in a local
- optimum, and there's no way for the routine to find out about that.  You'll
- have to use your own judgement in checking whether this has happened to you
- or not.
-
- To partly avoid that problem, you should put all starting values at least
- roughly into the vicinity of the solution.  At least the order of magnitude
- should be correct, if possible.  The better your starting values are, the
- less error-prone the fit.  A good way to find starting values is to draw data
- and fit-function into one plot, and iterate, changing the values and
- `replot`-ting until reasonable similarity is reached.  The same plot is also
- useful to check if the fit got stuck in a non-global minimum.
+ The `via var1, var2, ...` form is best used interactively, where the command
+ history mechanism may be used to edit the list of parameters to be fitted or
+ to supply new startup values for the next try.  This is particularly useful
+ for hard problems, where a direct fit to all parameters at once won't work
+ without good starting values.  To find such, you can iterate several times, 
+ fitting only some of the parameters, until the values are close enough to the
+ goal that the final fit to all parameters at once will work.
 
  Make sure that there is no mutual dependency among parameters of the function
- you are fitting.  E.g., don't try to fit a*exp(x+b), because a*exp(x+b) =
- a*exp(b)*exp(x).  Instead, fit either a*exp(x) or exp(x+b).
+ you are fitting.  For example, don't try to fit a*exp(x+b), because
+ a*exp(x+b)=a*exp(b)*exp(x).  Instead, fit either a*exp(x) or exp(x+b).
 
  A technical issue:  the parameters must not be too different in magnitude.
- The larger the quotient of the largest and the smallest absolute parameter
- values, the slower the fit will converge.  If the quotient is close to or
- above the inverse of the machine floating point precision, it may take next
- to forever to converge, or refuse to converge at all.  You'll have to adapt
- your function to avoid this, e.g. replace 'parameter' by '1e9*parameter' in
+ The larger the ratio of the largest and the smallest absolute parameter
+ values, the slower the fit will converge.  If the ratio is close to or above
+ the inverse of the machine floating point precision, it may take next to
+ forever to converge, or refuse to converge at all.  You will have to adapt
+ your function to avoid this, e.g., replace 'parameter' by '1e9*parameter' in
  the function definition, and divide the starting value by 1e9.
 
  If you can write your function as a linear combination of simple functions
  weighted by the parameters to be fitted, by all means do so.  That helps a
- lot, because the problem is then not nonlinear any more.  It should take only
- a really small number of iterations to converge on a linear case, maybe even
- only one.
+ lot, because the problem is no longer nonlinear and should converge with only
+ a small number of iterations, perhaps just one.
 
- In prescriptions for analysing data from practical experimentation courses,
- you'll often find descriptions how to first fit your data to some functions,
- maybe in a multi-step process accounting for several aspects of the
- underlying theory one by one, and then extract the data you really wanted
- from the fitting parameters of that function.  With `fit`, this last step can
- often be eliminated by rewriting the model function to directly use the
- desired final parameters.  Transforming data can also be avoided quite often,
- although sometimes at the cost of a harder fit problem.  If you think this
- contradicts the previous paragraph about keeping the fit function as simple
- as possible, you're correct.
+ Some prescriptions for analysing data, given in practical experimentation
+ courses, may have you first fit some functions to your data, perhaps in a
+ multi-step process of accounting for several aspects of the underlying
+ theory one by one, and then extract the information you really wanted from
+ the fitting parameters of those functions.  With `fit`, this may often be
+ done in one step by writing the model function directly in terms of the
+ desired parameters.  Transforming data can also quite often be avoided,
+ though sometimes at the cost of a more difficult fit problem.  If you think
+ this contradicts the previous paragraph about simplifying the fit function,
+ you are correct.
 
- Finally, a nice quote from the manual of another fitting package (fudgit)
+ A "singular matrix" message indicates that this implementation of the
+ Marquardt-Levenberg algorithm can't calculate parameter values for the next
+ iteration.  Try different starting values, writing the function in another
+ form, or a simpler function.
+
+ Finally, a nice quote from the manual of another fitting package (fudgit),
  that kind of summarizes all these issues:  "Nonlinear fitting is an art!"
 2 help
 ?help
@@ -1705,7 +1911,7 @@ C ... and restart the table:
  later be `load`ed.  Any text file containing valid commands can be created
  and then executed by the `load` command.  Files being `load`ed may themselves
  contain `load` or `call` commands.  See `comment` for information about
- comments in commands.
+ comments in commands.  To `load` with arguments, see `call`.
 
  The `load` command _must_ be the last command on a multi-command line.
 
@@ -1720,7 +1926,7 @@ C ... and restart the table:
 
  The `load` command is performed implicitly on any file names given as
  arguments to `gnuplot`.  These are loaded in the order specified, and
- then `gnuplot` exits.  See also `call`.
+ then `gnuplot` exits.
 2 pause
 ?pause
  The `pause` command displays any text associated with the command and then
@@ -1787,10 +1993,10 @@ C ... and restart the table:
 ?datafile
 ?data
  Discrete data contained in a file can be displayed by specifying the name of
- the data file (enclosed in quotes) on the `plot` or `splot` command line.
+ the data file (enclosed in single or double quotes) on the `plot` command line.
 
  Syntax:
-       {s}plot '<file_name>' {index <index list>}
+       plot '<file_name>' {index <index list>}
                              {every <every list>}
                              {thru <thru expression>}
                              {using <using list>}
@@ -1801,11 +2007,13 @@ C ... and restart the table:
  file are to be plotted, `every` specifies which points within a single data
  set are to be plotted, `using` determines how the columns within a single
  record are to be interpreted (`thru` is a special case of `using`), and
- `smooth` allows for simple interpolation and approximation.
+ `smooth` allows for simple interpolation and approximation.  ('splot' has a
+ similar syntax, but does not support the `smooth` and `thru` options.)
 
- Data files should contain one data point per record.  Records beginning with
- # (or ! on VMS) will be treated as comments and ignored.  Each data point
- represents an (x,y) pair.  For `plot`s with error bars (see `set style
+ Data files should contain at least one data point per record (`using` can
+ select one data point from the record).  Records beginning with `#` (and 
+ also with `!` on VMS) will be treated as comments and ignored.  Each data
+ point represents an (x,y) pair.  For `plot`s with error bars (see `set style
  errorbars`), each data point is (x,y,ydelta), (x,y,ylow,yhigh), (x,y,xdelta),
  (x,y,xlow,xhigh), or (x,y,xlow,xhigh,ylow,yhigh).  In all cases, the numbers
  on each record of a data file must be separated by white space (one or more
@@ -1853,36 +2061,35 @@ C ... and restart the table:
  The `every` keyword allows a periodic sampling of a data set to be plotted.
 
  In the discussion a "point" is a datum defined by a single record in the
- file.
+ file; "block" here will mean the same thing as "datablock" (see `glossary`).
 
  Syntax:
        plot 'file' every {<point_incr>}
-                           {:{<line_incr>}
+                           {:{<block_incr>}
                              {:{<start_point>}
-                               {:{<start_line>}
+                               {:{<start_block>}
                                  {:{<end_point>}
-                                   {:<end_line>}}}}}
+                                   {:<end_block>}}}}}
 
  The data points to be plotted are selected according to a loop from
  <`start_point`> to <`end_point`> with increment <`point_incr`> and the
- datalines according to a loop from <`start_line`> to <`end_line`> with
- increment <`line_incr`>.
+ blocks according to a loop from <`start_block`> to <`end_block`> with
+ increment <`block_incr`>.
 
- The first datum in each dataline is numbered '0', as is the first dataline in
- the file.
+ The first datum in each block is numbered '0', as is the first block in the
+ file.
 
  Note that records containing unplottable information are counted.
 
  Any of the numbers can be omitted; the increments default to unity, the start
- values to the first point or dataline, and the end values to the last point
- or dataline.  If `every` is not specified, all points in all datalines are
- plotted.
+ values to the first point or block, and the end values to the last point or
+ block.  If `every` is not specified, all points in all lines are plotted.
 
  Examples:
-       every :::3::3    # selects just the fourth dataline ('0' is first)
-       every :::::9     # selects the first 10 datalines
-       every 2:2        # selects every other point in every other dataline
-       every ::5::15    # selects points 5 through 15 in each dataline
+       every :::3::3    # selects just the fourth block ('0' is first)
+       every :::::9     # selects the first 10 blocks
+       every 2:2        # selects every other point in every other block
+       every ::5::15    # selects points 5 through 15 in each block
 ^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/simple/simple.html">Simple Plot Demos </a>,
 ^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/surfacea/surfacea.html">Non-parametric splot demos </a>, and
 ^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/surfaceb/surfaceb.html">Parametric splot demos.</a>
@@ -1893,7 +2100,7 @@ C ... and restart the table:
 ?datafile example
 ?data-file example
 ?example
- This example compares the data in the file population.dat to a theoretical
+ This example plots the data in the file "population.dat" and a theoretical
  curve:
 
        pop(x) = 103*exp((1965-x)/10)
@@ -1971,12 +2178,12 @@ C ... and restart the table:
 ?plot acsplines
 ?smooth acsplines
 ?acsplines
- `acsplines` approximates the data with a "natural smoothing spline".  After
- the data are made monotonic in x (see `smooth unique`), a curve is piecewise
- constructed from segments of cubic polynomials whose coefficients are found
- by the weighting the data points; the weights are taken from the third column
- in the data file.  That default can be modified by the third entry in the
- `using` list, e.g.,
+ The `acsplines` option approximates the data with a "natural smoothing spline".
+ After the data are made monotonic in x (see `smooth unique`), a curve is 
+ piecewise constructed from segments of cubic polynomials whose coefficients
+ are found by the weighting the data points; the weights are taken from the
+ third column in the data file.  That default can be modified by the third
+ entry in the `using` list, e.g.,
        plot 'data-file' using 1:2:(1.0) smooth acsplines
 
  Qualitatively, the absolute magnitude of the weights determines the number
@@ -2206,7 +2413,7 @@ C ... and restart the table:
 
  In this example the data are read from the file "MyData" using a more
  complicated format:
-       plot "MyData" using "%*lf%lf%*20[^\n]%lf"
+       plot 'MyData' using "%*lf%lf%*20[^\n]%lf"
 
  The meaning of this format is:
 
@@ -2249,7 +2456,7 @@ C ... and restart the table:
 
        plot 'file' using 1:2
 
- If you want to leave text in your data files, it is always safe to put the
+ However, if you want to leave text in your data files, it is safer to put the
  comment character (#) in the first column of the text lines.
 ^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/using/using.html"> Feeble using demos. </a>
 3 errorbars
@@ -2422,9 +2629,9 @@ C ... and restart the table:
  This plots y=x with the title 'x':
        plot x
 
- This plots x squared with title "x^2" and "data.1" with title 'measured
- data':
-       plot x**2 title "x^2", "data.1" t 'measured data'
+ This plots x squared with title "x^2" and file "data.1" with title 
+ "measured data":
+       plot x**2 title "x^2", 'data.1' t "measured data"
 
  This puts an untitled circular border around a polar graph:
        set polar; plot my_function(t), 1 notitle
@@ -2481,7 +2688,7 @@ C ... and restart the table:
 
  The keywords may be abbreviated as indicated.
 
- Note that the linewidth and pointsize options are not supported by all
+ Note that the `linewidth` and `pointsize` options are not supported by all
  terminals.
 
  Examples:
@@ -2492,17 +2699,17 @@ C ... and restart the table:
  This plots x with points, x**2 with the default:
        plot x*y w points, x**2 + y**2
 
- This plots tan(x) with the default function style, "data.1" with lines:
-       plot [ ] [-2:5] tan(x), "data.1" with l
+ This plots tan(x) with the default function style, file "data.1" with lines:
+       plot [ ] [-2:5] tan(x), 'data.1' with l
 
  This plots "leastsq.dat" with impulses:
        plot 'leastsq.dat' w i
 
- This plots the data file 'population' with boxes:
-       plot "population" with boxes
+ This plots the data file "population" with boxes:
+       plot 'population' with boxes
 
  This plots "exper.dat" with errorbars and lines connecting the points
- ('exper.dat' should have three or four data columns):
+ (errorbars require three or four columns):
        plot 'exper.dat' w lines, 'exper.dat' notitle w errorbars
 
  This plots sin(x) and cos(x) with linespoints, using the same line type but
@@ -2510,10 +2717,10 @@ C ... and restart the table:
        plot sin(x) with linesp lt 1 pt 3, cos(x) with linesp lt 1 pt 4
 
  This plots file "data" with points of type 3 and twice usual size:
-       plot "data" with points pointtype 3 pointsize 2
+       plot 'data' with points pointtype 3 pointsize 2
 
  This plots two data sets with lines differing only by weight:
-       plot "d1" t "good" w l lt 2 lw 3, "d2" t "bad" w l lt 2 lw 1
+       plot 'd1' t "good" w l lt 2 lw 3, 'd2' t "bad" w l lt 2 lw 1
 
  See `set style` to change the default styles.
 ^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/styles/styles.html"> Styles demos. </a>
@@ -2619,7 +2826,7 @@ C ... and restart the table:
  or all three, plus the last `plot` (`splot`) command to the specified file.
 
  Syntax:
-       save  {<option>} "<filename>"
+       save  {<option>} '<filename>'
 
  where <option> is `functions`, `variables` or `set`. If no option is used,
  `gnuplot` saves functions, variables, `set` options and the last `plot`
@@ -2631,18 +2838,18 @@ C ... and restart the table:
  The filename must be enclosed in quotes.
 
  Examples:
-       save "work.gnu"
+       save 'work.gnu'
        save functions 'func.dat'
        save var 'var.dat'
-       save set "options.dat"
+       save set 'options.dat'
 2 set-show
 ?set
 ?show
 ?show all
- The `set` command sets _lots_ of options.  No screen is drawn, however, until
- a `plot`, `splot`, or `replot` command is given.
+ The `set` command can be used to sets _lots_ of options.  No screen is 
+ drawn, however, until a `plot`, `splot`, or `replot` command is given.
 
- The `show` command shows their settings.  `show all` shows all the
+ The `show` command shows their settings;  `show all` shows all the
  settings.
 
  If a variable contains time/date data, `show` will display it according to
@@ -2669,9 +2876,10 @@ C ... and restart the table:
  `set angles` also affects the arguments of the machine-defined functions
  sin(x), cos(x) and tan(x), and the outputs of asin(x), acos(x), atan(x),
  atan2(x), and arg(x).  It has no effect on the arguments of hyperbolic
- functions or Bessel functions.  Note that the output of inverse hyperbolic
- functions of complex arguments are effected, however; if these functions are
- used, `set angles radians` must be in effect:
+ functions or Bessel functions.  However, the output arguments of inverse 
+ hyperbolic functions of complex arguments are affected; if these functions
+ are used, `set angles radians` must be in effect to maintain consistency 
+ between input and output arguments.
 
        x={1.0,0.1}
        set angles radians
@@ -2893,31 +3101,31 @@ C ... and restart the table:
        set noborder
        show border
 
- The borders are encoded in a 12-bit integer.  The bottom four bits control
- the border for `plot` and the sides of the base for `splot`, the next four
- bits control the verticals in `splot` and the top four bits control the edges
- on top of the `splot`.  In detail, the `<integer>` should be the sum of the
+ The borders are encoded in a 12-bit integer: the bottom four bits control the
+ border for `plot` and the sides of the base for `splot`; The next four bits
+ control the verticals in `splot`; the top four bits control the edges on top
+ of the `splot`.  In detail, the `<integer>` should be the sum of the
  appropriate entries from the following table:
 
 @start table - first is interactive cleartext form
-                         plot border
-                             and
-                         splot base    splot verticals    splot top
-       bottom (south)         1              16              256
-       left   (west)          2              32              512
-       top    (north)         4              64             1024
-       right  (east)          8             128             2048
-#\multicolumn{4}{|c|}{Border Specification} \\
-# & plot border & & \\
-# & and & & \\
-# & splot base & splot verticals & splot top \\ \hline
-#bottom (south) & 1 & 16 & 256 \\
-#left   (west) & 2 & 32 & 512 \\
-#top    (north) & 4 & 64 & 1024 \\
-#right  (east) & 8 & 128 & 2048 \\
-%@plot border@@
-%@and@@
-%@splot base@splot verticals@splot top
+                         plot border     splot         splot
+           Side          splot base    verticals        top
+       bottom (south)         1            16           256
+       left   (west)          2            32           512
+       top    (north)         4            64          1024
+       right  (east)          8           128          2048
+#\begin{tabular}{|cc|ccc|} \hline
+#\multicolumn{5}{|c|}{Graph Border Encoding} \\ \hline \hline
+# & & \multicolumn{3}{|c|}{Integer value of selection bit} \\ \cline{3-5}
+# & & plot border & splot & splot \\
+#\multicolumn{2}{|c|}{Side}& splot base & verticals & top \\ \hline
+#bottom & (south) & 1 & 16 & 256 \\
+#left   & (west)  & 2 & 32 & 512 \\
+#top    & (north) & 4 & 64 & 1024 \\
+#right  & (east)  & 8 & 128 & 2048 \\
+%c c c c c .
+%@plot border@splot@splot
+%@splot base@verticals@top
 %_
 %bottom (south)@1@16@256
 %left   (west)@2@32@512
@@ -2927,6 +3135,8 @@ C ... and restart the table:
 
  The default is 31, which is all four sides for `plot`, and base and z axis
  for `splot`.
+
+ Various axes or combinations of axes may be added together in the command.
 
  To have tics on edges other than bottom and left, disable the usual tics and
  enable the second axes.
@@ -2997,6 +3207,9 @@ C ... and restart the table:
  This may produce poor label alignment if the key is altered from its default
  configuration.
 
+ The first contour linetype, or only contour linetype when clabel is off, is
+ the surface linetype +1; contour points are the same style as surface points.
+
  See also `set contour`.
 3 clip
 ?set clip
@@ -3049,30 +3262,37 @@ C ... and restart the table:
 ?show cntrparam
 ?cntrparam
  `set cntrparam` controls the generation of contours and their smoothness for
- a contour plot.
+ a contour plot. `show contour` displays current settings of `cntrparam` as
+ well as `contour`.
 
  Syntax:
        set cntrparam {  {linear | cubicspline | bspline}
-                      | points <n> | order <n>
-                      | levels  {auto} {<n>}
-                              | discrete <z1> {,<z2>} ...
-                              | incremental {<start>, <incr> {,<end>}} }
-       show cntrparam
+                       { points <n>} { order <n> }
+                       { levels   auto {<n>} | <n>
+                                | discrete <z1> {,<z2>{,<z3>...}}
+                                | incremental <start>, <incr> {,<end>}
+                        }
+                      }
+       show contour      
 
- This command controls the way contours are plotted.  <n> should be an
+ This command has two functions.  First, it sets the values of z for which 
+ contour points are to be determined (by linear interpolation between data 
+ points or function isosamples.)  Second, it controls the way contours are
+ drawn between the points determined to be of equal z.  <n> should be an
  integral constant expression and <z1>, <z2> ... any constant expressions.
  The parameters are:
 
  `linear`, `cubicspline`, `bspline`---Controls type of approximation or
- interpolation.  If `linear`, then the contours are drawn piecewise linear, as
- extracted from the surface directly.  If `cubicspline`, then piecewise linear
- contours are interpolated to form somewhat smoother contours, but which may
- undulate.  If `bspline`, a guaranteed-smoother curve is drawn, which only
- approximates the piecewise linear data.
+ interpolation.  If `linear`, then straight line segments connect points of
+ equal z magnitude.  If `cubicspline`, then piecewise-linear contours are
+ interpolated between the same equal z points to form somewhat smoother
+ contours, but which may undulate.  If `bspline`, a guaranteed-smoother curve
+ is drawn, which only approximates the position of the points of equal-z.
 
- `points`---Eventually all drawings are done with piecewise linear strokes.
- This number controls the number of points used to approximate a curve.
- It is relevant only for `cubicspline` and `bspline` modes.
+ `points`---Eventually all drawings are done with piecewise-linear strokes.
+ This number controls the number of line segments used to approximate the
+ `bspline` or `cubicspline` curve.  Number of cubicspline or bspline 
+ segments (strokes) = `points` * number of linear segments. 
 
  `order`---Order of the bspline approximation to be used.  The bigger this
  order is, the smoother the resulting contour.  (Of course, higher order
@@ -3080,26 +3300,34 @@ C ... and restart the table:
  data.)  This option is relevant for `bspline` mode only.  Allowed values are
  integers in the range from 2 (linear) to 10.
 
- `levels`---Approximate number of contour levels.  Selection of the levels is
- controlled by `auto` (default), `discrete`, and `incremental`.  For `auto`,
- if the surface is bounded by zmin and zmax, contours will be generated at
- integer multiples of dz between zmin and zmax, where dz is 1, 2, or 5 times
- some power of ten (like the step between two tic marks).  For `discrete`,
- contours will be generated at z = <z1>, <z2> ... as specified.  The number of
- discrete levels is limited to MAX_DISCRETE_LEVELS, defined in plot.h to be
- 30.  If `incremental`, contours are generated at values of z beginning at
- <start> and increasing by <increment> until <end> is reached.  If <end> is
- not specified, MAX_DISCRETE_LEVELS will be generated.
+ `levels`--- Selection of contour levels,  controlled by `auto` (default),
+ `discrete`, `incremental`, and <n>, number of contour levels, limited to
+  MAX_DISCRETE_LEVELS as defined in plot.h (30 is standard.)
+
+ For `auto`, <n> specifies a nominal number of levels; the actual number will
+ be adjusted to give simple labels. If the surface is bounded by zmin and zmax,
+ contours will be generated at integer multiples of dz between zmin and zmax,
+ where dz is 1, 2, or 5 times some power of ten (like the step between two 
+ tic marks).
+
+ For `levels discrete`, contours will be generated at z = <z1>, <z2> ... as
+ specified; the number of discrete levels sets the number of contour levels.
+ In `discrete` mode, any `set cntrparms levels <n>` are ignored.
+
+ For `incremental`, contours are generated at values of z beginning at <start>
+ and increasing by <increment>, until the number of contours is reached. <end>
+ is used to determine the number of contour levels, which will be changed by
+ any subsequent `set cntrparam levels <n>`.
 
  If the command `set cntrparam` is given without any arguments specified,  the
- defaults are used: linear, 5 points, order 4, 5 `auto` levels.
+ defaults are used: linear, 5 points, order 4, 5 auto levels.
 
  Examples:
        set cntrparam bspline
        set cntrparam points 7
        set cntrparam order 10
 
- To select 5 levels automatically:
+ To select levels automatically, 5 if the level increment criteria are met:
        set cntrparam levels auto 5
 
  To specify discrete levels at .1, .37, and .9:
@@ -3108,15 +3336,15 @@ C ... and restart the table:
  To specify levels from 0 to 4 with increment 1:
        set cntrparam levels incremental  0,1,4
 
- To set the number of levels to 10 (retaining the current settings of auto,
- discr. and increment's start and increment value, while changing its end):
+ To set the number of levels to 10 (changing an incremental end or possibly
+ the number of auto levels):
        set cntrparam levels 10
 
  To set the start and increment while retaining the number of levels:
        set cntrparam levels incremental 100,50
 
  See also `set contour` for control of where the contours are drawn, and `set
- clabel` for control of the format of the contour labels.
+ clabel` for control of the format of the contour labels and linetypes.
 ^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/contours/contours.html">Contours Demo</a> and
 ^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/discrete/discrete.html">contours with User Defined Levels.</a>
 3 contour
@@ -3142,9 +3370,9 @@ C ... and restart the table:
  contours, and `set clabel` for control of labelling of the contours.
 
  The surface can be switched off (see `set surface`), giving a contour-only
- graph.  Though it is possible to use `set view` to enlarge the plot to fill
- the screen, better results can be obtained by writing the contour information
- out to a file, and rereading it as a 2-d datafile plot:
+ graph.  Though it is possible to use `set size` to enlarge the plot to fill
+ the screen, more control over the output format can be obtained by writing 
+ the contour information to a file, and rereading it as a 2-d datafile plot:
 
        set nosurface
        set contour
@@ -3157,11 +3385,11 @@ C ... and restart the table:
        set term <whatever>
        plot 'filename'
 
- In order to draw contours, the data must be organized as "grid data".  In
- such a file all of the points for a single y value are listed, then all the
- points for the next y, and so on.  A single blank line (a line containing no
- characters other than blank spaces and a carriage return and/or a line feed)
- separates one y value group from the next.  See also `plot datafile`.
+ In order to draw contours, the data should be organized as "grid data".  In
+ such a file all the points for a single y-isoline are listed, then all the
+ points for the next y-isoline, and so on.  A single blank line (a line
+ containing no characters other than blank spaces and a carriage return and/or
+ a line feed) separates one y-isoline from the next.  See also `splot datafile`.
 
  If contours are desired from non-grid data, `set dgrid3d` can be used to
  create an appropriate grid.  See `set dgrid3d` for more information.
@@ -3186,8 +3414,8 @@ C ... and restart the table:
 ?show dgrid3d
 ?dgrid3d
 ?nodgrid3d
- The `set dgrid3d` command enables and sets the different parameters for
- non-grid to grid data mapping.
+ The `set dgrid3d` command enables, and can set parameters for, non-grid 
+ to grid data mapping.
 
  Syntax:
        set dgrid3d {<row_size>} {,{<col_size>} {,<norm>}}
@@ -3197,31 +3425,46 @@ C ... and restart the table:
  By default `dgrid3d` is disabled.  When enabled, 3-d data read from a file
  are always treated as a scattered data set.  A grid with dimensions derived
  from a bounding box of the scattered data and size as specified by the
- row/col_size parameters is created for plotting and contouring.  The grid is
- equally spaced in x and y; the z values are computed as weighted averages of
- the scattered points' values.
+ row/col_size parameters is created for plotting and contouring.  The grid 
+ is equally spaced in x (rows) and in y (columns); the z values are computed
+ as weighted averages of the scattered points' z values.
 
- The third parameter, norm, controls the weighting: each point is weighted
- inversely by its distance (from the grid point) raised to the norm power.
- (Actually it's not quite the distance: the weights are given by the inverse
- of dx^norm + dy^norm, where dx and dy are the components of the separation
- of the grid point from each data point.)  Thus the closer the data point is
- to a grid point, the more effect it has on that grid point.  In `gnuplot`,
- this distance computation is optimized for norms that are powers of 2,
- specifically 1, 2, 4, 8, and 16, but any non-negative integer can be used.
+ The third parameter, norm, controls the weighting:  Each data point is 
+ weighted inversely by its distance from the grid point raised to the norm
+ power.  (Actually, the weights are given by the inverse of dx^norm + dy^norm,
+ where dx and dy are the components of the separation of the grid point from 
+ each data point.  For some norms that are powers of two, specifically 4, 8,
+ and 16, the computation is optimized by using the Euclidean distance in the 
+ weight calculation, (dx^2+dx^2)^norm/2.  However, any non-negative integer
+ can be used.)
 
- The `dgrid3d` option is a simple low pass filter that converts scattered data
- to a grid data set.  More sophisticated approaches to this problem exist and
- should be used to preprocess the data outside `gnuplot` if this simple
- solution is found inadequate.
+ The closer the data point is to a grid point, the more effect it has on 
+ that grid point and the larger the value of norm the less effect more 
+ distant data points have on that grid point.
+
+ The `dgrid3d` option is a simple low pass filter that converts scattered 
+ data to a grid data set.  More sophisticated approaches to this problem 
+ exist and should be used to preprocess the data outside `gnuplot` if this 
+ simple solution is found inadequate.
+
+ (The z values are found by weighting all data points, not by interpolating
+ between nearby data points;  also edge effects may produce unexpected / 
+ undesired results.  In some cases, small norm values produce a grid point
+ reflecting the average of distant data points rather than a local average,
+ while large values of norm may produce "steps" with several grid points 
+ having the same value as the closest data point, rather than making a smooth
+ transition between adjacent data points.  Some areas of a grid may be filled
+ by extrapolation, to an arbitrary boundary condition.  The variables are 
+ not normalized; consequently the units used for x and y will affect the 
+ relative weights of points in the x and y directions.)
 
  Examples:
        set dgrid3d 10,10,1     # defaults
        set dgrid3d ,,4
 
  The first specifies that a grid of size 10 by 10 is to be constructed using
- the L2 norm (a norm of 2 is to be used in the distance computation).  The
- second only modifies the norm to be used to L4.
+ a norm value of 1 in the weight computation.  The second only modifies the 
+ norm, changing it to 4.
 ^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/scatter/scatter.html"> Dgrid3d Demo.</a>
 
 3 dummy
@@ -3259,16 +3502,16 @@ C ... and restart the table:
 ?show encoding
 ?encoding
  The `set encoding` command selects a character encoding.  Valid values are
- `default`, which does nothing; `iso_8859_1` (known in the PostScript world as
- `ISO-Latin1`), which is used on many Unix workstations and with MS-Windows;
- `cp850`, for OS/2; and `cp437`, for MS-DOS.
+ `default`, which tells a terminal to use its default; `iso_8859_1` (known in
+ the PostScript world as `ISO-Latin1`), which is used on many Unix workstations
+ and with MS-Windows; `cp850`, for OS/2; and `cp437`, for MS-DOS.
 
  Syntax:
-       set encoding <value>
+       set encoding {<value>}
        show encoding
 
- Please note that this is not supported on all terminal types.  Note also that
- the device must be able to produce the non-standard characters.
+ Note that encoding is not supported by all terminal drivers and that
+ the device must be able to produce the desired non-standard characters.
 3 format
 ?set format
 ?show format
@@ -3301,6 +3544,10 @@ C ... and restart the table:
  spaces and labels in your format string, such as "%g m", which will put " m"
  after each number.  If you want "%" itself, double it: "%g %%".
 
+ See also `set xtics` for more information about tic labels.
+^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/electron/electron.html"> See demo. </a>
+4 format_specifiers
+?format_specifiers
  The acceptable formats (if not in date/time mode) are:
 
 @start table - first is interactive cleartext form
@@ -3318,21 +3565,24 @@ C ... and restart the table:
        %S           scientific power
        %c           character replacement for scientific power
        %P           multiple of pi
-#\multicolumn{3}{|c|}{Format Specifiers}\\
-#Format && Explanation \\ \hline
-#\verb@%f@ && floating point notation \\
-#\verb@%e@ or \verb@%E@ && exponential notation; an "e" or "E" before the power \\
-#\verb@%g@ or \verb@%G@ && the shorter of \verb@%e@ (or \verb@%E@) and \verb@%f@ \\
-#\verb@%x@ or \verb@%X@ && hex \\
-#\verb@%o@ or \verb@%O@ && octal \\
-#\verb@%t@ && mantissa to base 10 \\
-#\verb@%l@ && mantissa to base of current logscale \\
-#\verb@%s@ && mantissa to base of current logscale; scientific power \\
-#\verb@%T@ && power to base 10 \\
-#\verb@%L@ && power to base of current logscale \\
-#\verb@%S@ && scientific power \\
-#\verb@%c@ && character replacement for scientific power \\
-#\verb@%P@ && multiple of pi \\
+#\begin{tabular}{|cl|} \hline
+#\multicolumn{2}{|c|}{Tic-mark label numerical format specifiers}\\ 
+#\hline \hline
+#Format & Explanation \\ \hline
+#\verb@%f@ & floating point notation \\
+#\verb@%e@ or \verb@%E@ & exponential notation; an "e" or "E" before the power \\
+#\verb@%g@ or \verb@%G@ & the shorter of \verb@%e@ (or \verb@%E@) and \verb@%f@ \\
+#\verb@%x@ or \verb@%X@ & hex \\
+#\verb@%o@ or \verb@%O@ & octal \\
+#\verb@%t@ & mantissa to base 10 \\
+#\verb@%l@ & mantissa to base of current logscale \\
+#\verb@%s@ & mantissa to base of current logscale; scientific power \\
+#\verb@%T@ & power to base 10 \\
+#\verb@%L@ & power to base of current logscale \\
+#\verb@%S@ & scientific power \\
+#\verb@%c@ & character replacement for scientific power \\
+#\verb@%P@ & multiple of pi \\
+%c l .
 %Format@Explanation
 %_
 %%f@floating point notation
@@ -3389,7 +3639,8 @@ C ... and restart the table:
  If the data type for the axis is date/time, the format string must contain
  valid codes for the 'strftime' function (outside of `gnuplot`, type "man
  strftime").  See `set timefmt` for a list of the allowed input format codes.
-
+4 date/time_specifiers
+?date/time_specifiers
  In date/time mode, the acceptable formats are:
 
 @start table - first is interactive cleartext form
@@ -3415,29 +3666,32 @@ C ... and restart the table:
        %W           week of the year (week starts on Monday)
        %y           year, 0-99
        %Y           year, 4-digit
-#\multicolumn{3}{|c|}{Date/Time Format Specifiers}\\
-#Format && Explanation \\ \hline
-#\verb@%a@ && abbreviated name of day of the week \\
-#\verb@%A@ && full name of day of the week \\
-#\verb@%b@ or \verb@%h@ && abbreviated name of the month \\
-#\verb@%B@ && full name of the month \\
-#\verb@%d@ && day of the month, 1--31 \\
-#\verb@%D@ && shorthand for \verb@"%m/%d/%y"@ \\
-#\verb@%H@ or \verb@%k@ && hour, 0--24 \\
-#\verb@%I@ or \verb@%l@ && hour, 0--12 \\
-#\verb@%j@ && day of the year, 1--366 \\
-#\verb@%m@ && month, 1--12 \\
-#\verb@%M@ && minute, 0--60 \\
-#\verb@%p@ && "am" or "pm" \\
-#\verb@%r@ && shorthand for \verb@"%I:%M:%S %p"@ \\
-#\verb@%R@ && shorthand for \verb@%H:%M"@ \\
-#\verb@%S@ && second, 0--60 \\
-#\verb@%T@ && shorthand for \verb@"%H:%M:%S"@ \\
-#\verb@%U@ && week of the year (week starts on Sunday) \\
-#\verb@%w@ && day of the week, 0--6 (Sunday = 0) \\
-#\verb@%W@ && week of the year (week starts on Monday) \\
-#\verb@%y@ && year, 0-99 \\
-#\verb@%Y@ && year, 4-digit \\
+#\begin{tabular}{|cl|} \hline
+#\multicolumn{2}{|c|}{Tic-mark label Date/Time Format Specifiers}\\
+#\hline \hline
+#Format & Explanation \\ \hline
+#\verb@%a@ & abbreviated name of day of the week \\
+#\verb@%A@ & full name of day of the week \\
+#\verb@%b@ or \verb@%h@ & abbreviated name of the month \\
+#\verb@%B@ & full name of the month \\
+#\verb@%d@ & day of the month, 1--31 \\
+#\verb@%D@ & shorthand for \verb@"%m/%d/%y"@ \\
+#\verb@%H@ or \verb@%k@ & hour, 0--24 \\
+#\verb@%I@ or \verb@%l@ & hour, 0--12 \\
+#\verb@%j@ & day of the year, 1--366 \\
+#\verb@%m@ & month, 1--12 \\
+#\verb@%M@ & minute, 0--60 \\
+#\verb@%p@ & "am" or "pm" \\
+#\verb@%r@ & shorthand for \verb@"%I:%M:%S %p"@ \\
+#\verb@%R@ & shorthand for \verb@%H:%M"@ \\
+#\verb@%S@ & second, 0--60 \\
+#\verb@%T@ & shorthand for \verb@"%H:%M:%S"@ \\
+#\verb@%U@ & week of the year (week starts on Sunday) \\
+#\verb@%w@ & day of the week, 0--6 (Sunday = 0) \\
+#\verb@%W@ & week of the year (week starts on Monday) \\
+#\verb@%y@ & year, 0-99 \\
+#\verb@%Y@ & year, 4-digit \\
+%c l .
 %Format@Explanation
 %_
 %%a@abbreviated name of day of the week
@@ -3479,9 +3733,6 @@ C ... and restart the table:
 
  Suppose the text is "98/07/06 05:04:03".  Then
        set format x "%1y/%2m/%3d %01H:%02M:%03S"  # "98/ 7/  6 5:04:003"
-
- See also `set xtics` for more information about tic labels.
-^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/electron/electron.html"> See demo. </a>
 3 function style
 ?set function style
 ?show function style
@@ -3505,7 +3756,7 @@ C ... and restart the table:
        show functions
 
  For information about the definition and usage of functions in `gnuplot`,
- please see `expressions` and `user-defined`.
+ please see `expressions`.
 ^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/spline/spline.html"> Splines as User Defined Functions.</a>
 ^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/airfoil/airfoil.html">Use of functions and complex variables for airfoils </a>
 3 grid
@@ -3550,42 +3801,121 @@ C ... and restart the table:
 ?show hidden3d
 ?hidden3d
 ?nohidden3d
- The `set hidden3d` command enables hidden line removal for explicit surface
- plotting (see `splot`).
+ The `set hidden3d` command enables hidden line removal for surface plotting
+ (see `splot`).  Some optional features of the underlying algorithm can also
+ be controlled using this command.
 
  Syntax:
-       set hidden3d
+       set hidden3d {defaults} |
+                    { {{offset <offset>} | {nooffset}}
+                      {trianglepattern <bitpattern>}
+                      {{undefined <level>} | {noundefined}}
+                      {{no}altdiagonal}
+                      {{no}bentover} }
        set nohidden3d
        show hidden3d
 
- Hidden line removal may be used for both explicit functions and for explicit
- data.  It now works for parametric surfaces as well.  This mode is meaningful
- only when surfaces are `splot`ted `with lines`.
+ In contrast to the usual display in gnuplot, hidden line removal actually
+ treats the given function or data grids as real surfaces that can't be seen
+ through, so parts behind the surface will be hidden by it.  For this to be
+ possible, the surface needs to have 'grid structure' (see `splot datafile`
+ about this), and it has to be drawn `with lines` or `with linespoints`.
 
- When this flag is set, both the hidden portion of the surface and possibly
- its hidden contours (see `set contour`) as well as the hidden grid will be
- removed.  Each surface has its hidden parts removed with respect to itself
- and to other surfaces, if more than one surface is plotted.  But contours
- drawn on the surface (`set contour surface`) don't seem to work.  Labels and
- arrows are always visible and are unaffected.
+ When `hidden3d` is set, both the hidden portion of the surface and possibly
+ its contours drawn on the base (see `set contour`) as well as the grid will
+ be hidden.  Each surface has its hidden parts removed with respect to itself
+ and to other surfaces, if more than one surface is plotted.  Contours drawn
+ on the surface (`set contour surface`) don't work.  Labels and arrows are
+ always visible and are unaffected.  The key is also never hidden by the
+ surface.
+
+ Functions are evaluated at isoline intersections.  The algorithm interpolates
+ linearly between function points or data points when determining the visible
+ line segments.  This means that the appearance of a function may be different
+ when plotted with `hidden3d` than when plotted with `nohidden3d` because in
+ the latter case functions are evaluated at each sample.  Please see `set
+ samples` and `set isosamples` for discussion of the difference.
+
+ The algorithm used to remove the hidden parts of the surfaces has some
+ additional features controllable by this command.  Specifying `defaults` will
+ set them all to their default settings, as detailed below.  If `defaults` is
+ not given, only explicitly specified options will be influenced: all others
+ will keep their previous values, so you can turn on/off hidden line removal
+ via `set {no}hidden3d`, without modifying the set of options you chose.
+
+ The first option, `offset`, influences the linestyle used for lines on the
+ 'back' side.  Normally, they are drawn in a linestyle one index number higher
+ than the one used for the front, to make the two sides of the surface
+ distinguishable.  You can specify a different line style offset to add
+ instead of the default 1, by `offset <offset>`.  Option `nooffset` stands for
+ `offset 0`, making the two sides of the surface use the same linestyle.
+
+ Next comes the option `trianglepattern <bitpattern>`.  <bitpattern> must be
+ a number between 0 and 7, interpreted as a bit pattern.  Each bit determines
+ the visibility of one edge of the triangles each surface is split up into.
+ Bit 0 is for the 'horizontal' edges of the grid, Bit 1 for the 'vertical'
+ ones, and Bit 2 for the diagonals that split each cell of the original grid
+ into two triangles.  The default pattern is 3, making all horizontal and
+ vertical lines visible, but not the diagonals.  You may want to choose 7 to
+ see those diagonals as well.
+
+ The `undefined <level>` option lets you decide what the algorithm is to do
+ with data points that are undefined (missing data, or undefined function
+ values), or exceed the given x-, y- or z-ranges.  Such points can either be
+ plotted nevertheless, or taken out of the input data set.  All surface
+ elements touching a point that is taken out will be taken out as well, thus
+ creating a hole in the surface.  If <level> = 3, equivalent to option
+ `noundefined`, no points will be thrown away at all.  This may produce all
+ kinds of problems elsewhere, so you should avoid this.  <level> = 2 will
+ throw away undefined points, but keep the out-of-range ones.  <level> = 1,
+ the default, will get rid of out-of-range points as well.
+
+ By specifying `noaltdiagonal`, you can override the default handling of a
+ special case can occur if `undefined` is active (i.e. <level> is not 3).
+ Each cell of the grid-structured input surface will be divided in two
+ triangles along one of its diagonals.  Normally, all these diagonals have
+ the same orientation relative to the grid.  If exactly one of the four cell
+ corners is excluded by the `undefined` handler, and this is on the usual
+ diagonal, both triangles will be excluded.  However if the default setting
+ of `altdiagonal` is active, the other diagonal will be chosen for this cell
+ instead, minimizing the size of the hole in the surface.
+
+ The `bentover` option controls what happens to another special case, this
+ time in conjunction with the `trianglepattern`.  For rather crumply surfaces,
+ it can happen that the two triangles a surface cell is divided into are seen
+ from opposite sides (i.e. the original quadrangle is 'bent over'), as
+ illustrated in the following ASCII art:
+
+                                                               C----B
+     original quadrangle:  A--B      displayed quadrangle:     |\   |
+       ("set view 0,0")    | /|    ("set view 75,75" perhaps)  | \  |
+                           |/ |                                |  \ |
+                           C--D                                |   \|
+                                                               A    D
+
+ If the diagonal edges of the surface cells aren't generally made visible by
+ bit 2 of the <bitpattern> there, the edge CB above wouldn't be drawn at all,
+ normally, making the resulting display hard to understand.  Therefore, the
+ default option of `bentover` will turn it visible in this case.  If you don't
+ want that, you may choose `nobentover` instead.
 ^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/hidden/hidden.html"> Hidden Line Removal Demo</a> and
 ^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/singulr/singulr.html"> Complex Hidden Line Demo. </a>
 3 isosamples
 ?set isosamples
 ?show isosamples
 ?isosamples
- The isoline density of surfaces may be changed by the `set isosamples`
- command.
+ The isoline density (grid) for plotting functions as surfaces may be changed 
+ by the `set isosamples` command.
 
  Syntax:
        set isosamples <iso_1> {,<iso_2>}
        show isosamples
 
- Each surface plot will have <iso_1> iso-u lines and <iso_2> iso-v lines.  If
- you only specify <iso_1>, <iso_2> will be set to the same value as <iso_1>.
- By default, sampling is set to 10 isolines per u or v axis.  A higher
- sampling rate will produce more accurate plots, but will take longer.  These
- parameters have no effect on data file plotting.
+ Each function surface plot will have <iso_1> iso-u lines and <iso_2> iso-v
+ lines.  If you only specify <iso_1>, <iso_2> will be set to the same value
+ as <iso_1>.  By default, sampling is set to 10 isolines per u or v axis. 
+ A higher sampling rate will produce more accurate plots, but will take longer.
+ These parameters have no effect on data file plotting.
 
  An isoline is a curve parameterized by one of the surface parameters while
  the other surface parameter is fixed.  Isolines provide a simple means to
@@ -3593,9 +3923,12 @@ C ... and restart the table:
  lines of the form c(v) = s(u0,v) are produced, and by fixing the v parameter,
  the iso-v lines of the form c(u) = s(u,v0) are produced.
 
- When a surface plot is being done without the removal of hidden lines, `set
- samples` also has an effect on the number of points being evaluated---it
- controls the number of points sampled along each isoline.  See `set samples`.
+ When a function surface plot is being done without the removal of hidden 
+ lines, `set samples`  controls the number of points sampled along each
+ isoline;  see `set samples` and `set hidden3d`.  The contour algorithm
+ assumes that a function sample occurs at each isoline intersection, so
+ change in `samples` as well as `isosamples` may be desired when changing
+ the resolution of a function surface/contour.
 3 key
 ?set key
 ?set nokey
@@ -3759,7 +4092,8 @@ C ... and restart the table:
  To set a label at (1,2) to "y=x", use:
        set label "y=x" at 1,2
 
- To set a label of the sign Sigma of size 24 at the center of the graph, use:
+ To set a Sigma of size 24, from the Symbol font set, at the center of 
+ the graph, use:
        set label "S" at graph 0.5,0.5 center font "Symbol,24"
 
  To set a label "y=x^2" with the right of the text at (2,3,4), and tag the
@@ -3810,10 +4144,10 @@ C ... and restart the table:
  Linestyles created by this mechanism do not replace the default styles;
  both may be used.
 
- Not all terminals support the line width and point size features, so these
- terminals obviously cannot fully support `set linestyle`.
+ Not all terminals support the `linewidth` and `pointsize` features; if
+ not supported, the option will be ignored.
 
- Note that this feature is not completely installed; linestyles defined by
+ Note that this feature is not completely implemented; linestyles defined by
  this mechanism may be used with 'plot', 'splot', 'replot', and 'set arrow',
  but not by other commands that allow the default index to be used, such as
  'set grid'.
@@ -3924,15 +4258,16 @@ C ... and restart the table:
  to be processed.  However even if `mapping` is used, `using` may still be
  necessary if the data in the file are not in the required order.
 
- `mapping` has no effect on `plot`s.
+ `mapping` has no effect on `plot`.
 ^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/world/world.html">Mapping Demos.</a>
 3 margin
 ?set margin
 ?show margin
 ?margin
- Normally the margins of the plot are automatically calculated based on tics
- and axis labels.  These computed values can be overridden by the `set margin`
- commands.  `show margin` shows the current settings.
+ Normally the margins of a plot are automatically calculated based on tics
+ and axis labels (and the size of the graph correspondingly adjusted.)  These
+ computed values can be overridden by the `set margin` commands.  `show margin`
+ shows the current settings.
 
  Syntax:
        set bmargin {<margin>}
@@ -3942,8 +4277,8 @@ C ... and restart the table:
        show margin
 
  The units of <margin> are character heights or widths, as appropriate.  A
- positive value defines the absolute size of the margin.  A negative value (or
- none) causes `gnuplot` to revert to the computed value.
+ positive value defines the absolute size of the margin.  A negative value 
+ (or none) causes `gnuplot` to revert to the computed value.
 3 missing
 ?set missing
 ?missing
@@ -4013,10 +4348,12 @@ C ... and restart the table:
  rather than just the bounding box of the first plot.
 
  `set size` and `set origin` refer to the entire plotting area used for each
- plot.  If you want to have the axes themselves line up, perhaps to avoid
- having to label all of them, you need to guarantee that the margins are the
- same size.  This can be done with the `set margin` commands.  Please see `set
- margin` for their use.
+ plot.  If you want to have the axes themselves line up, you can guarantee 
+ that the margins are the same size with the `set margin` commands.  See
+ `set margin` for their use.  Note that the margin settings are absolute, 
+ in character units, so the appearance of the graph in the remaining space 
+ will depend on the screen size of the display device, e.g., perhaps quite
+ different on a video display and a printer.
 ^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/multiplot/multiplt.html"> See demo. </a>
 3 mx2tics
 ?set mx2tics
@@ -4211,19 +4548,19 @@ C ... and restart the table:
 ?set pointsize
 ?show pointsize
 ?pointsize
- The `set pointsize` command changes the size of the points used in plots.
+ The `set pointsize` command scales the size of the points used in plots.
 
  Syntax:
-       set pointsize <pointsize>
+       set pointsize <multiplier>
        show pointsize
 
- Default is pointsize 1.0.  Larger pointsizes (>1.0) are useful for high
- resolution in bitmapped graphics.
+ The default is a multiplier of 1.0.  Larger pointsizes may be useful to
+ make points more visible in bitmapped graphics.
 
  The pointsize of a single plot may be changed on the `plot` command.  See
  `plot with` for details.
 
- Please note that the pointsize setting is not supported with all terminal
+ Please note that the pointsize setting is not supported by all terminal
  types.
 3 polar
 ?set polar
@@ -4296,7 +4633,8 @@ C ... and restart the table:
 ?set samples
 ?show samples
 ?samples
- The sampling rate of functions may be changed by the `set samples` command.
+ The sampling rate of functions, or for interpolating data, may be changed
+ by the `set samples` command.
 
  Syntax:
        set samples <samples_1> {,<samples_2>}
@@ -4304,15 +4642,18 @@ C ... and restart the table:
 
  By default, sampling is set to 100 points.  A higher sampling rate will
  produce more accurate plots, but will take longer.  This parameter has no
- effect on data-file plotting unless one of the `smooth` options is used.
+ effect on data file plotting unless one of the interpolation/approximation
+ options is used.  See `plot smooth` re 2-d data and `set cntrparam` and
+ `set dgrid3d` re 3-d data.
 
  When a 2-d graph is being done, only the value of <samples_1> is relevant.
 
  When a surface plot is being done without the removal of hidden lines, the
  value of samples specifies the number of samples that are to be evaluated for
- isoline.  Each iso-v line will have <sample_1> samples and each iso-u line
- will have <sample_2> samples.  If you only specify <samples_1>, <samples_2>
- will be set to the same value as <samples_1>.  See also `set isosamples`.
+ the isolines.  Each iso-v line will have <sample_1> samples and each iso-u 
+ line will have <sample_2> samples.  If you only specify <samples_1>,
+ <samples_2> will be set to the same value as <samples_1>.  See also `set
+ isosamples`.
 3 size
 ?set size
 ?show size
@@ -4342,9 +4683,9 @@ C ... and restart the table:
 
  `square` is a synonym for `ratio 1`.
 
- Both `noratio` and `nosquare` return the graph to its default aspect ratio
- (1.0), but do not return <xscale> or <yscale> to their default values (also
- 1.0).
+ Both `noratio` and `nosquare` return the graph to the default aspect ratio
+ of the terminal, but do not return <xscale> or <yscale> to their default 
+ values (1.0).
 
  `ratio` and `square` have no effect on 3-d plots.
 
@@ -4620,17 +4961,21 @@ C ... and restart the table:
 ?show surface
 ?surface
 ?nosurface
- The command `set surface` controls the display of surfaces, which are drawn
- as a mesh of isolines.
+ The command `set surface` controls the display of surfaces by `splot`.
 
  Syntax:
        set surface
        set nosurface
        show surface
 
- Whenever `set nosurface` is issued, no surface isolines/mesh will be drawn.
- This is useful if contours are to be displayed by themselves.  See also `set
- contour`.
+ The surface is drawn with the syle specifed by `with`, or else the 
+ appropriate style, data or function.
+
+ Whenever `set nosurface` is issued, `splot` will not draw points or lines
+ corresponding to the function or data file points.  Contours may be still be
+ drawn on the surface, depending on the `set contour` option. `set nosurface;
+ set contour base` is useful for displaying contours on the grid base.  See 
+ also `set contour`.
 ^ <h2> Terminal Types </h2>
 3 terminal
 ?set terminal
@@ -4639,7 +4984,8 @@ C ... and restart the table:
 ?terminal
 ?term
  `gnuplot` supports many different graphics devices.  Use `set terminal` to
- tell `gnuplot` what kind of output to generate.
+ tell `gnuplot` what kind of output to generate. Use `set output` to redirect
+ that output to a file or device.
 
  Syntax:
        set terminal {<terminal-type>}
@@ -4647,8 +4993,6 @@ C ... and restart the table:
 
  If <terminal-type> is omitted, `gnuplot` will list the available terminal
  types.  <terminal-type> may be abbreviated.
-
- Use `set output` to redirect this output to a file or device.
 
  If both `set terminal` and `set output` are used together, it is safest to
  give `set terminal` first, because some terminals set a flag which is needed
@@ -4764,18 +5108,21 @@ C ... and restart the table:
        %S           second, 0--60
        %b           three-character abbreviation of the name of the month
        %B           name of the month
-#\multicolumn{3}{|c|}{Format Specifiers}\\
-#Format && Explanation \\ \hline
-#\verb@%d@ && day of the month, 1--31 \\
-#\verb@%m@ && month of the year, 1--12 \\
-#\verb@%y@ && year, 0--99 \\
-#\verb@%Y@ && year, 4-digit \\
-#\verb@%j@ && day of the year, 1--365 \\
-#\verb@%H@ && hour, 0--24 \\
-#\verb@%M@ && minute, 0--60 \\
-#\verb@%S@ && second, 0--60 \\
-#\verb@%b@ && three-character abbreviation of the name of the month \\
-#\verb@%B@ && name of the month \\
+#\begin{tabular}{|cl|} \hline
+#\multicolumn{2}{|c|}{Time Series timedata Format Specifiers}\\
+#\hline \hline
+#Format & Explanation \\ \hline
+#\verb@%d@ & day of the month, 1--31 \\
+#\verb@%m@ & month of the year, 1--12 \\
+#\verb@%y@ & year, 0--99 \\
+#\verb@%Y@ & year, 4-digit \\
+#\verb@%j@ & day of the year, 1--365 \\
+#\verb@%H@ & hour, 0--24 \\
+#\verb@%M@ & minute, 0--60 \\
+#\verb@%S@ & second, 0--60 \\
+#\verb@%b@ & three-character abbreviation of the name of the month \\
+#\verb@%B@ & name of the month \\
+%c l .
 %Format@Explanation
 %_
 %%d@day of the month, 1--31
@@ -4958,7 +5305,7 @@ C ... and restart the table:
 ?x2zeroaxis
 ?nox2zeroaxis
  The `set x2zeroaxis` command draws a line at the origin of the x2 (top) axis
- (x2 = 0).  For details, please see
+ (y2 = 0).  For details, please see
  `set zeroaxis`.
 3 xdata
 ?set xdata
@@ -5270,7 +5617,7 @@ C ... and restart the table:
 ?show xzeroaxis
 ?xzeroaxis
 ?noxzeroaxis
- The `set xzeroaxis` command draws a line at x = 0.  For details, please see
+ The `set xzeroaxis` command draws a line at y = 0.  For details, please see
  `set zeroaxis`.
 3 y2data
 ?set y2data
@@ -5321,7 +5668,7 @@ C ... and restart the table:
 ?y2zeroaxis
 ?noy2zeroaxis
  The `set y2zeroaxis` command draws a line at the origin of the y2 (right-hand)
- axis (y2 = 0).  For details, please see `set zeroaxis`.
+ axis (x2 = 0).  For details, please see `set zeroaxis`.
 3 ydata
 ?set ydata
 ?show ydata
@@ -5368,7 +5715,7 @@ C ... and restart the table:
 ?show yzeroaxis
 ?yzeroaxis
 ?noyzeroaxis
- The `set yzeroaxis` command draws a line at y = 0.  For details, please see
+ The `set yzeroaxis` command draws a line at x = 0.  For details, please see
  `set zeroaxis`.
 3 zdata
 ?set zdata
@@ -5458,12 +5805,12 @@ C ... and restart the table:
 ?shell
  The `shell` command spawns an interactive shell.  To return to `gnuplot`,
  type `logout` if using VMS, `exit` or the END-OF-FILE character if using
- Unix, `endcli` if using AmigaDOS, or `exit` if using MS-DOS or OS/2.
+ Unix, `endcli` if using AmigaOS, or `exit` if using MS-DOS or OS/2.
 
  A single shell command may be spawned by preceding it with the ! character
  ($ if using VMS) at the beginning of a command line.  Control will return
  immediately to `gnuplot` after this command is executed.  For example, in
- Unix, AmigaDOS, MS-DOS or OS/2,
+ Unix, AmigaOS, MS-DOS or OS/2,
 
        ! dir
 
@@ -5474,27 +5821,27 @@ C ... and restart the table:
  `gulam`, for example.
 2 splot
 ?splot
- `splot` is the primary command for drawing 3-d plots (well, actually
- projections on a 2-d surface, but you knew that).  It can create a plot from
- functions or data in a manner very similar to the `plot` command.
+ `splot` is the command for drawing 3-d plots (well, actually projections on
+ a 2-d surface, but you knew that).  It can create a plot from functions or 
+ a data file in a manner very similar to the `plot` command.
 
- Please see `plot` for features common to the `plot` command; only differences
- are discussed in detail here.
+ See `plot` for features common to the `plot` command; only differences are
+ discussed in detail here.
 
  Syntax:
        splot {<ranges>}
-             {<function> | {"<datafile>" {datafile-modifiers}}}
+             <function> | "<datafile>" {datafile-modifiers}}
              {<title-spec>} {with <style>}
              {, {definitions,} <function> ...}
 
  where either a <function> or the name of a data file enclosed in quotes is
- supplied.  A function is a mathematical expression, or a triple (`splot`) of
+ supplied.  The function can be a mathematical expression, or a triple of
  mathematical expressions in parametric mode.
 
- By default `splot` draws the xy plane completely below the plotted data.  The
- offset between the lowest ztic and the xy plane can be changed by `set
- ticslevel`.  The orientation of a 'splot' is controlled by `set view`.  See
- `set view` and `set ticslevel` for more information.
+ By default `splot` draws the xy plane completely below the plotted data.
+ The offset between the lowest ztic and the xy plane can be changed by `set
+ ticslevel`.  The orientation of an `splot` projection is controlled by 
+ `set view`.  See `set view` and `set ticslevel` for more information.
 
  The syntax for setting ranges on the `splot` command is the same as for
  `plot`.  In non-parametric mode, the order in which ranges must be given is
@@ -5510,8 +5857,9 @@ C ... and restart the table:
 3 data-file
 ?splot data-file
 ?splot datafile
- Discrete data contained in a file can be displayed by specifying the name of
- the data file (enclosed in quotes) on the `plot` or `splot` command line.
+ As for `plot`, discrete data contained in a file can be displayed by 
+ specifying the name of the data file, enclosed in quotes,  on the `splot`
+ command line.
 
  Syntax:
        splot '<file_name>' {binary | matrix}
@@ -5521,32 +5869,34 @@ C ... and restart the table:
 
  The special filenames `""` and `"-"` are permitted, as in `plot`.
 
- In brief, `binary` indicates that the file is binary, `matrix` indicates that
- the data are in matrix form, `index` selects which data sets in a
- multi-data-set file are to be plotted, `every` specifies which datalines
- within a single data set are to be plotted, and `using` determines how the
- columns within a single record are to be interpreted.
+ In brief, `binary` and `matrix` indicate that the the data are in a special
+ form, `index` selects which data sets in a multi-data-set file are to be 
+ plotted, `every` specifies which datalines (subsets) within a single data 
+ set are to be plotted, and `using` determines how the columns within a single
+ record are to be interpreted.
 
- The options `index` and `every` behave the same way as with `plot`.  `using`
- also does, with the obvious difference that the `using` list must provide
- three entries instead of two.
+ The options `index` and `every` behave the same way as with `plot`;  `using`
+ does so also, except that the `using` list must provide three entries 
+ instead of two.
 
- The `plot` options `thru` and `smooth` are not available for `splot`.
+ The `plot` options `thru` and `smooth` are not available for `splot`, but
+ `cntrparams` and `dgrid3d` provide limited smoothing cabilities.
 
  Data file organization is essentially the same as for `plot`, except that
- each point is an (x,y,z) triple.  If only a single value is provided, it will
- be used for z, the data point number will be used for x, and the y-isoline
- number will be used for y; thus "`splot 'file' using 1`" is identical to
- "`splot 'file' using 0:-1:1`".  If two values are provided, `gnuplot` gives
- you an error message.  Three values are interpreted as an (x,y,z) triple.
- Additional values are generally used as errors, which can be used by `fit`.
+ each point is an (x,y,z) triple.  If only a single value is provided, it
+ will be used for z, the datablock number will be used for y, and the index
+ of the data point in the datablock will be used for x.  If two values are
+ provided, `gnuplot` gives you an error message.  Three values are interpreted
+ as an (x,y,z) triple.  Additional values are generally used as errors, which
+ can be used by `fit`.
 
- Single blank records separate datalines (which are interpreted as y-isolines)
- in a `splot` datafile.  No line will join points separated by a blank record.
- If all datalines contain the same number of points,`gnuplot` will draw
- cross-isolines in the opposite direction.  This is termed "grid data", and is
- required for drawing a surface, for contouring (`set contour`) and
- hidden-line removal (`set hidden3d`).
+ Single blank records separate datablocks in a `splot` datafile; `splot`
+ treats datablocks as the equivalent of function y-isolines.  No line will
+ join points separated by a blank record.  If all datablocks contain the same
+ number of points, `gnuplot` will draw cross-isolines between datablocks, 
+ connecting corresponding points.  This is termed "grid data", and is required
+ for drawing a surface, for contouring (`set contour`) and hidden-line removal
+ (`set hidden3d`). See also `splot grid data`
 
  It is no longer necessary to specify `parametric` mode for three-column
  `splot`s.
@@ -5559,6 +5909,9 @@ C ... and restart the table:
 ?binary
 ?binary data
 ?binary files
+ `splot` can read binary files written with a specific format (and on a
+ system with a compatible binary file representation.)
+
  In previous versions, `gnuplot` dynamically detected binary data files.  It
  is now necessary to specify the keyword `binary` directly after the filename.
 
@@ -5569,9 +5922,7 @@ C ... and restart the table:
         <x1> <z1,0> <z1,1> <z1,2> ... <z1,N>
          :      :      :      :   ...    :
 
-
  which are converted into triplets:
-
        <x0> <y0> <z0,0>
        <x0> <y1> <z0,1>
        <x0> <y2> <z0,2>
@@ -5625,7 +5976,7 @@ C ... and restart the table:
           3 2 10
 
  Note that "datafile.dat" defines a 4 by 3 grid ( 4 rows of 3 points each ).
- Rows are separated by blank records.
+ Rows (datablocks) are separated by blank records.
 
 ^ <img align=bottom src="http://www.nas.nasa.gov/~woo/gnuplot/doc/splot.gif" alt="[splot.gif]" width=640 height=480>
  Note also that the x value is held constant within each dataline.  If you
@@ -5633,9 +5984,12 @@ C ... and restart the table:
  find that the surface is drawn 'inside-out'.
 
  Actually for grid data it is not necessary to keep the x values constant
- within an dataline, nor is it necessary to keep the y values the same along
- the perpendicular datalines.  `gnuplot` requires only that the number of
- points be the same for each dataline.
+ within a datablock, nor is it necessary to keep the same sequence of y
+ values.  `gnuplot` requires only that the number of points be the same for
+ each datablock.  However since the surface mesh, from which contours are
+ derived, connects sequentially corresponding points, the effect of an
+ irregular grid on a surface plot is unpredictable and should be examined
+ on a case-by-case basis.
 4 matrix
 ?splot data-file matrix
 ?splot datafile matrix
@@ -5643,13 +5997,66 @@ C ... and restart the table:
 ?data-file matrix
 ?datafile matrix
 ?matrix
- The `matrix` flag indicates that the data are stored in matrix format.  In
- its present implementation the z-values are read in a row at a time, i. e.,
+ The `matrix` flag indicates that the ASCII data are stored in matrix format.
+ The z-values are read in a row at a time, i. e.,
        z11 z12 z13 z14 ...
        z21 z22 z23 z24 ...
        z31 z32 z33 z34 ...
  and so forth.  The row and column indices are used for the x- and y-values.
- used as x, y, and z.
+3 grid_data
+?grid_data
+?splot grid_data
+ The 3D routines are designed for points in a grid format, with one sample,
+ datapoint, at each mesh intersection; the datapoints may originate from
+ either evaluating a function, see `set isosamples`, or reading a datafile,
+ see `splot datafile`.  The term "isoline" is applied to the mesh lines for
+ both functions and data.  Note that the mesh need not be rectangular in x
+ and y, as it may be parameterized in u and v, see `set isosamples`.
+
+ However, `gnuplot` does not require that format.  In the case of functions,
+ 'samples' need not be equal to 'isosamples', i.e., not every x-isoline
+ sample need intersect a y-isoline. In the case of data files, if there
+ are an equal number of scattered data points in each datablock, then
+ "isolines" will connect the points in a datablock, and "cross-isolines"
+ will connect the corresponding points in each datablock to generate a
+ "surface".  In either case, contour and hidden3d modes may give different
+ plots than if the points were in the intended format.  Scattered data can be
+ converted to a {different} grid format with `set dgrid3d`.
+
+ The contour code tests for z intensity along a line between a point on a 
+ y-isoline and the corresponding point in the next y-isoline.  Thus a `splot`
+ contour of a surface with samples on the x-isolines that do not coincide with
+ an y-isoline intesection will ignore such samples. Try:
+        set xrange [-pi/2:pi/2]; set yrange [-pi/2:pi/2]
+        set function style lp
+        set contour
+        set isosamples 10,10; set samples 10,10;
+        splot cos(x)*cos(y)
+        set samples 4,10; replot
+        set samples 10,4; replot
+
+3 splot_overview
+? splot_overview
+ `splot` can display a surface as a collection of points, or by connecting
+ those points.  As with `plot`, the points may be read from a data file or
+ result from evaluation of a function at specified intervals, see `set
+ isosamples`.  The surface may be approximated by connecting the points
+ with straight line segments, see `set surface`, in which case the surface
+ can be made opaque with `set hidden3d.`  The orientation from which the 3d
+ surface is viewed can be changed with `set view`.
+
+ Additionally, for points in a grid format, `splot` can interpolate points 
+ having a common amplitude (see `set contour`) and can then connect those
+ new points to display contour lines, either directly with straight-line
+ segments or smoothed lines (see `set cntrparams`).  Functions are already
+ evaluated in a grid format, determined by `set isosamples` and `set samples`,
+ while file data must either be in a grid format, as described in `data-file`,
+ or be used to generate a grid (see `set dgrid3d`).
+
+ Contour lines may be displayed either on the surface or projected onto the 
+ base.  The base projections of the contour lines may be written to a
+ file, and then read with `plot`, to take advantage of `plot`'s additional
+ formatting capabilities.
 2 test
 ?test
  `test` creates a display of line and point styles and other useful things
@@ -5660,23 +6067,23 @@ C ... and restart the table:
 2 update
 ?update
  This command writes the current values of the fit parameters into the given
- file, which is formatted as an initial-value file (as described in the `fit`
- section).  This is useful for saving the current values for later use or for
- restarting a converged or stopped fit.
+ file, formatted as an initial-value file (as described in the `fit`section).
+ This is useful for saving the current values for later use or for restarting
+ a converged or stopped fit.
 
  Syntax:
        update <filename> {<filename>}
 
- If the file already exists, `gnuplot` first renames it by appending `.old`
- and then opens a new file.  That is, "`update 'fred'`" behaves the same way
- as "`!rename fred fred.old; update 'fred.old' 'fred'`".  [On DOS and other
- systems that use the twelve-character "filename.ext" naming convention, "ext"
- will be "`old`" and "filename" will be related (hopefully recognizably) to
- the initial name.  Renaming is not done at all on VMS systems, since they use
- file-versioning.]
-
  If a second filename is supplied, the updated values are written to this
- file instead, and the original parameter file is left unmodified.
+ file, and the original parameter file is left unmodified.
+
+ Otherwise, if the file already exists, `gnuplot` first renames it by 
+ appending `.old` and then opens a new file.  That is, "`update 'fred'`"
+ behaves the same as "`!rename fred fred.old; update 'fred.old' 'fred'`".
+ [On DOS and other systems that use the twelve-character "filename.ext" 
+ naming convention, "ext" will be "`old`" and "filename" will be related
+ (hopefully recognizably) to the initial name.  Renaming is not done at all
+ on VMS systems, since they use file-versioning.]
 
  Please see `fit` for more information.
 1 Graphical User Interfaces
@@ -5696,6 +6103,20 @@ C ... and restart the table:
 
  The gamma function does not work for complex arguments.
 
+ As of `gnuplot` version 3.6, all development has been done using ANSII C.
+ With current operating system, compiler, and library releases, the OS 
+ specific bugs documented in release 3.5, now relegated to `old_bugs`, may
+ no longer be relevant.
+
+ Bugs reported since the current release may be located via the official
+ distribution site:
+        ftp://ftp.dartmouth.edu/pub/gnuplot
+       http://www.cs.dartmouth.edu/gnuplot_info.html
+
+ Please e-mail any bugs to bug-gnuplot@dartmouth.edu.
+2 Old_bugs
+?old_bugs
+?os_bugs
  There is a bug in the stdio library for old Sun operating systems (SunOS
  Sys4-3.2).  The "%g" format for 'printf' sometimes incorrectly prints numbers
  (e.g., 200000.0 as "2").  Thus, tic mark labels may be incorrect on a Sun4

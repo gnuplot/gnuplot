@@ -23,7 +23,7 @@ gnuplot.doc -> gnuplot.gih
             -> gnuplot.rtf
             -> gnuplot.tex
     	   	  	 	    		
-On Unix, AmigaDOS, and MSDOS the interactive help is built into the
+On Unix, AmigaOS, and MSDOS the interactive help is built into the
 program, and uses the file "gnuplot.gih" ('make gih').
 
 On VMS, the interactive help is supplied by the system help facility,
@@ -57,7 +57,7 @@ PostScript converter to generate "gnuplot.ps".
 
 Manual entries for the terminals are not included in "gnuplot.doc";
 instead, each "driver.trm" file (in the directory /term) contains its
-own documentation section.
+own documentation section.  See "term/README" for details.
 
 When you build gnuplot, only some of the terminal drivers are loaded;
 these are selected in "term.h" by compiler directives specified in the
@@ -154,8 +154,67 @@ C    comment (mainly for RCS ID line)
 C#   reserved form of comment (used internally by termdoc.c)
 
 
+Tables:
+-------
+
+Here is a sample table:
+
+@start table - first is interactive cleartext form
+     Symbol       Example      Explanation
+       ?:          a?b:c     ternary operation
+#\begin{tabular}{|ccl|} \hline
+#\multicolumn{3}{|c|}{Ternary Operator} \\
+#Symbol & Example & Explanation \\ \hline
+#\verb~?:~ & \verb~a?b:c~ & ternary operation\\
+%c c l .
+%Symbol@Example@Explanation
+%_
+%?:@a?b:c@* ternary operation
+
+@end table
+
+"doc2tex" and "doc2ms" are the formats that do something with tables
+other than copy them verbatim.  It is best to bracket a table in a
+"@start table"/"@end table" pair.
+
+Inside the "@start"/"@end" block are three independent sets of commands:
+those that begin with "#" will be processed by "doc2tex" only, those
+that begin with "%" will be processed by "doc2ms" only, and all others
+will be copied verbatim by all other "doc2"s.  So the commands may be
+shuffled together, as long as the order of each of the three sets is
+unchanged.  That is, the example could be written this way without any
+effect on the result:
+
+@start table - first is interactive cleartext form
+#\begin{tabular}{|ccl|} \hline
+%c c l .
+#\multicolumn{3}{|c|}{Ternary Operator} \\
+%Symbol@Example@Explanation
+     Symbol       Example      Explanation
+#Symbol & Example & Explanation \\ \hline
+%_
+       ?:          a?b:c     ternary operation
+#\verb~?:~ & \verb~a?b:c~ & ternary operation\\
+%?:@a?b:c@* ternary operation
+
+@end table
+
+In LaTeX, the command "\begin{tabular}{|ccl|} \hline" creates a
+three-column table having the first two columns centered, the third column
+left-justified, a vertical line at each side, and a horizontal line drawn
+first.  Thus the table will be enclosed in a box ("doc2tex" provides the
+closing "\hline").  A double-backslash is a line skip.  In the table
+entries themselves, the ampersand is the column separator.  If any LaTeX
+special characters are in the table, they must be written within "\verb"
+constructs, as is the case with the question mark in the example.
+
+In nroff, the command "c c l ." creates a three-column table justified
+the same way as the LaTeX table discussed above.  The ampersand is the
+column separator.
+
 
 Rules for stylistic consistency (courtesy Jens Emmerich):
+---------------------------------------------------------
 
 0. General
 
