@@ -1,5 +1,5 @@
 /*
- * $Id: readline.h,v 1.1 1999/10/01 14:04:20 lhecking Exp $
+ * $Id: readline.h,v 1.2 1999/11/08 19:24:17 lhecking Exp $
  *
  */
 
@@ -48,14 +48,9 @@
 
 /* Prototypes of functions exported by readline.c */
 
-#ifndef HAVE_LIBREADLINE
-char *readline __PROTO((const char *prompt));
-void add_history __PROTO((char *line));
-void write_history_n __PROTO((int, char *));
-void write_history __PROTO((char *));
-char *history_find __PROTO((char *));
-int history_find_all __PROTO((char *));
-#endif /* HAVE_LIBREADLINE */
+#if defined(READLINE) && !defined(HAVE_LIBREADLINE)
+char *readline __PROTO((char *));
+#endif
 
 #if defined(ATARI) || defined(MTOS)
 char tos_getch __PROTO((void));
