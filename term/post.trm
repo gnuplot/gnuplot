@@ -1,5 +1,5 @@
 /*
- * $Id: post.trm,v 1.85 2002/12/15 17:17:23 mikulik Exp $
+ * $Id: post.trm,v 1.86 2003/01/22 08:47:56 mikulik Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -2013,32 +2013,30 @@ static float ENHps_max_height, ENHps_min_height;
 
 static char *
 ENHPS_recurse(p, brace, fontname, fontsize, base, widthflag, showflag, overprint)
-char *p, *fontname;
-TBOOLEAN brace, widthflag, showflag;
-double fontsize, base;
-int overprint;
+    char *p, *fontname;
+    TBOOLEAN brace, widthflag, showflag;
+    double fontsize, base;
+    int overprint;
 {
 
 /* close a postscript string if it has been opened */
-#define ENHPS_FLUSH      \
-{	if (ENHps_opened_string)  \
-	{	fputs(")]\n", gpoutfile);   \
-		ENHps_opened_string = FALSE; \
-	}                         \
-}
+#define ENHPS_FLUSH				\
+	if (ENHps_opened_string) {		\
+	    fputs(")]\n", gpoutfile);		\
+	    ENHps_opened_string = FALSE;	\
+	}
 
-#define ENHPS_OPEN	\
-{	if (!ENHps_opened_string) \
-	{ fprintf(gpoutfile, "[(%s) %.1f %.1f %s %s %d (",  \
-		  fontname, fontsize, base, \
- 		  widthflag ? "true" : "false",  \
- 		  showflag ? "true" : "false",  \
-		  overprint); \
- 	  ENHps_opened_string = TRUE; \
- 	}	\
-}
+#define ENHPS_OPEN  						\
+	if (!ENHps_opened_string) {				\
+	    fprintf(gpoutfile, "[(%s) %.1f %.1f %s %s %d (",	\
+		    fontname, fontsize, base,			\
+		    widthflag ? "true" : "false",		\
+		    showflag ? "true" : "false",		\
+		    overprint);					\
+	    ENHps_opened_string = TRUE;				\
+	}
 
-    ENHPS_DEBUG(("RECURSE WITH [%p] \"%s\", %d %s %.1f %.1f %d %d %d\n", p, p, brace, fontname, fontsize, base, widthflag, showflag, overprint))
+    ENHPS_DEBUG(("RECURSE WITH [%p] \"%s\", %d %s %.1f %.1f %d %d %d\n", p, p, brace, fontname, fontsize, base, widthflag, showflag, overprint));
 
 /* Start each recursion with a clean string */
     ENHPS_FLUSH;
@@ -2056,133 +2054,130 @@ int overprint;
     while (*p) {
 	float shift;
 
-	switch (*p)
-	{
+	switch (*p) {
 	case '}'  :
-				/*{{{  deal with it*/
+	    /*{{{  deal with it*/
 	    if (brace)
 		return (p);
 
 	    fputs("enhpost printer driver - spurious }\n", stderr);
 	    break;
-				/*}}}*/
+	    /*}}}*/
 
 	case '_'  :
 	case '^'  :
 	    /*{{{  deal with super/sub script*/
-
 	    shift = (*p == '^') ? 0.5 : -0.3;
-
 	    ENHPS_FLUSH;
-
-	    p = ENHPS_recurse(p+1, FALSE, fontname, fontsize*0.8, base+shift*fontsize, widthflag, showflag, overprint);
-
+	    p = ENHPS_recurse(p + 1, FALSE, fontname, fontsize * 0.8,
+			      base + shift * fontsize, widthflag,
+			      showflag, overprint);
 	    break;
 	    /*}}}*/
 	case '{'  :
-	{
-	    char *savepos = NULL, save = 0;
-	    char *localfontname = fontname, ch;
-	    int recode = 1;
-	    float f = fontsize, ovp, overprint_voffset = 0.0;
+	    {
+		char *savepos = NULL, save = 0;
+		char *localfontname = fontname, ch;
+		int recode = 1;
+		float f = fontsize, ovp, overprint_voffset = 0.0;
 
-	    /*{{{  recurse (possibly with a new font) */
+		/*{{{  recurse (possibly with a new font) */
 
-	    ENHPS_DEBUG(("Dealing with {\n"));
+		ENHPS_DEBUG(("Dealing with {\n"));
 	    
-	    /* get vertical offset (if present) for overprinted text */
-	    while (*++p == ' ');
-	    if (overprint == 2)	{
-	 	 ovp = (float)strtod(p,&p);
-		 if (ovp != 0) {
-		    overprint_voffset = ovp*f;
-		 }
-	    }
-	    --p;		/* HBB 20001021: bug fix: 10^{2} broken */
-
-	    if (*++p == '/') {
-		/* then parse a fontname, optional fontsize */
+		/* get vertical offset (if present) for overprinted text */
 		while (*++p == ' ');
-		if (*p=='-') {
-		    recode = 0;
-		    while (*++p == ' ');
-		}
-		localfontname = p;
-		while ((ch = *p) > ' ' && ch != '=' && ch != '*')
-		    ++p;
-		save = *(savepos=p);
-		if (ch == '=') {
-		    *p++ = '\0';				
-		    /*{{{  get optional font size*/
-		    ENHPS_DEBUG(("Calling strtod(\"%s\") ...", p));
-		    f = (float)strtod(p, &p);
-		    ENHPS_DEBUG(("Returned %.1f and \"%s\"\n", f, p));
-
-		    if (f)
-			f *= PS_SC;  /* remember the scaling */
-		    else
-			f = fontsize;
-
-		    ENHPS_DEBUG(("Font size %.1f\n", f));
-		    /*}}}*/
-		}
-		else if (ch == '*') {
-		    *p++ = '\0';				
-		    /*{{{  get optional font size scale factor*/
-		    ENHPS_DEBUG(("Calling strtod(\"%s\") ...", p));
-		    f = (float)strtod(p, &p);
-		    ENHPS_DEBUG(("Returned %.1f and \"%s\"\n", f, p));
-
-		    if (f)
-			f *= fontsize;  /* apply the scale factor */
-		    else
-			f = fontsize;
-
-		    ENHPS_DEBUG(("Font size %.1f\n", f));
-		    /*}}}*/
-		} else {
-		    *p++ = '\0';
-		    f = fontsize;
-		}				
-
-		while (*p == ' ')
-		    ++p;
-		if (*localfontname) {
-		    /* only allow RememberFont to re-encode it if no string
-		     * active */
-		    char *recodestring = PS_RememberFont(localfontname,
-							 recode && !ENHps_opened_string);
-		    if (recode && recodestring) {
-			ENHPS_FLUSH;
-			fprintf(gpoutfile, "/%s %s",
-				localfontname, recodestring);
+		if (overprint == 2) {
+		    ovp = (float)strtod(p,&p);
+		    if (ovp != 0) {
+			overprint_voffset = ovp*f;
 		    }
-		} else
-		    localfontname = fontname;
-	    }
-	    /*}}}*/
+		}
+		--p;		/* HBB 20001021: bug fix: 10^{2} broken */
 
-	    ENHPS_DEBUG(("Before recursing, we are at [%p] \"%s\"\n", p, p));
+		if (*++p == '/') {
+		    /* then parse a fontname, optional fontsize */
+		    while (*++p == ' ')
+			;	/* do nothing */
+		    if (*p=='-') {
+			recode = 0;
+			while (*++p == ' ')
+			    ;	/* do nothing */
+		    }
+		    localfontname = p;
+		    while ((ch = *p) > ' ' && ch != '=' && ch != '*')
+			++p;
+		    save = *(savepos=p);
+		    if (ch == '=') {
+			*p++ = '\0';				
+			/*{{{  get optional font size*/
+			ENHPS_DEBUG(("Calling strtod(\"%s\") ...", p));
+			f = (float)strtod(p, &p);
+			ENHPS_DEBUG(("Returned %.1f and \"%s\"\n", f, p));
 
-	    p = ENHPS_recurse(p, TRUE, localfontname, f, base,
-			      widthflag, showflag, overprint);
+			if (f)
+			    f *= PS_SC;  /* remember the scaling */
+			else
+			    f = fontsize;
 
-	    ENHPS_DEBUG(("BACK WITH \"%s\"\n", p));
+			ENHPS_DEBUG(("Font size %.1f\n", f));
+			/*}}}*/
+		    } else if (ch == '*') {
+			*p++ = '\0';				
+			/*{{{  get optional font size scale factor*/
+			ENHPS_DEBUG(("Calling strtod(\"%s\") ...", p));
+			f = (float)strtod(p, &p);
+			ENHPS_DEBUG(("Returned %.1f and \"%s\"\n", f, p));
 
-	    ENHPS_FLUSH;
+			if (f)
+			    f *= fontsize;  /* apply the scale factor */
+			else
+			    f = fontsize;
 
-	    if (savepos)
-		/* restore overwritten character */
-		*savepos = save;
-	    break;
-	}
+			ENHPS_DEBUG(("Font size %.1f\n", f));
+			/*}}}*/
+		    } else {
+			*p++ = '\0';
+			f = fontsize;
+		    }				
+
+		    while (*p == ' ')
+			++p;
+		    if (*localfontname) {
+			/* only allow RememberFont to re-encode it if no string
+			 * active */
+			char *recodestring = PS_RememberFont(localfontname,
+							     recode && !ENHps_opened_string);
+			if (recode && recodestring) {
+			    ENHPS_FLUSH;
+			    fprintf(gpoutfile, "/%s %s",
+				    localfontname, recodestring);
+			}
+		    } else
+			localfontname = fontname;
+		}
+		/*}}}*/
+
+		ENHPS_DEBUG(("Before recursing, we are at [%p] \"%s\"\n", p, p));
+
+		p = ENHPS_recurse(p, TRUE, localfontname, f, base,
+				  widthflag, showflag, overprint);
+
+		ENHPS_DEBUG(("BACK WITH \"%s\"\n", p));
+
+		ENHPS_FLUSH;
+
+		if (savepos)
+		    /* restore overwritten character */
+		    *savepos = save;
+		break;
+	    } /* case '{' */
 	case '@' :
 	    /*{{{  phantom box - prints next 'char', then restores currentpoint */
 
 	    ENHPS_FLUSH;
 	    p = ENHPS_recurse(++p, FALSE, fontname, fontsize, base,
 			      FALSE, showflag, overprint);
-
 	    break;
 	    /*}}}*/
 
@@ -2192,33 +2187,30 @@ int overprint;
 
 	    p = ENHPS_recurse(++p, FALSE, fontname, fontsize, base,
 			      widthflag, FALSE, overprint);
-
 	    break;
 	    /*}}}*/
 
-
 	case '~' :
-	    /*{{{  overprinted text - the second string is overwritten on the
-	      first, centered horizontally on the first and (optionally)
-	      vertically shifted by an amount specified (as a fraction of
-	      the current fontsize) at the beginning of the second string
+	    /*{{{ overprinted text */
+	    /* the second string is overwritten on the first, centered
+	     * horizontally on the first and (optionally) vertically
+	     * shifted by an amount specified (as a fraction of the
+	     * current fontsize) at the beginning of the second string
 	      
-	      Note that in this implementation neither the under- nor
-	      overprinted string can contain syntax that would result in
-	      additional recursions -- no subscripts, superscripts, or
-	      anything else, with the exception of a font definition at
-	      the beginning of the text */
+	     * Note that in this implementation neither the under- nor
+	     * overprinted string can contain syntax that would result
+	     * in additional recursions -- no subscripts,
+	     * superscripts, or anything else, with the exception of a
+	     * font definition at the beginning of the text */
 	    
-	    ENHPS_FLUSH
+	    ENHPS_FLUSH;
+	    p = ENHPS_recurse(++p, FALSE, fontname, fontsize, base,
+			      widthflag, showflag, 1);
+	    ENHPS_FLUSH;
+	    p = ENHPS_recurse(++p, FALSE, fontname, fontsize, base,
+			      FALSE, showflag, 2);
 		
-	    p = ENHPS_recurse(++p, FALSE, fontname, fontsize, base, widthflag, showflag, 1);
-	    
-	    ENHPS_FLUSH
-		
-	    p = ENHPS_recurse(++p, FALSE, fontname, fontsize, base, FALSE, showflag, 2);
-	    
 	    overprint = 0;   /* may not be necessary, but just in case . . . */
-	    
 	    break;
 	    /*}}}*/
 
@@ -2241,8 +2233,8 @@ int overprint;
 		fputc('\\', gpoutfile);
 	    } else if (p[1] >= '0' && p[1] <= '7') {
 		/* up to 3 octal digits */
-		ENHPS_OPEN
-		    fputc('\\', gpoutfile);
+		ENHPS_OPEN;
+		fputc('\\', gpoutfile);
 		fputc(p[1], gpoutfile);
 		++p;
 		if (p[1] >= '0' && p[1] <= '7') {
@@ -2256,18 +2248,22 @@ int overprint;
 		break;
 	    }
 	    ++p;
-	    /* just go and print it (fall into the 'default' case) */
 
+	    /* HBB 20030122: Avoid broken PS output if there's a \
+	     * exactly at the end of the line */
+	    if (*p == '\0') {
+		fputs("enhpost printer driver -- spurious backslash\n", stderr);
+		break;
+	    }
+
+	    /* just go and print it (fall into the 'default' case) */
 	    /*}}}*/
 	default:
 	    /*{{{  print it */
 	    ENHPS_OPEN;
-
 	    fputc(*p, gpoutfile);
-
 	    /*}}}*/
-
-	}
+	} /* switch (*p) */
 
 	/* like TeX, we only do one character in a recursion, unless it's
 	 * in braces
@@ -2280,7 +2276,7 @@ int overprint;
 
 	if (*p) /* only not true if { not terminated, I think */
 	    ++p;	
-    }
+    } /* while (*p) */
 
     ENHPS_FLUSH;
     return p;

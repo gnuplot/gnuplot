@@ -1,3 +1,8 @@
+2003-01-22  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* term/post.trm (ENHPS_recurse): Fix buggy PS output if backslash
+ 	is at the end of the input string.
+
 2003-01-22  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* term/pstricks.trm: Support for PM3D. Thanks to Tim Piessens for
@@ -1725,7 +1730,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2003/01/22 08:47:53 $).
+	last modification date (from the tag $Date: 2003/01/22 10:30:00 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
