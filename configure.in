@@ -221,8 +221,8 @@ AC_TYPE_SIGNAL
 dnl Functions. ANSI first, then others
 
 dnl sunos 4 has on_exit() in place of atexit()
-AC_CHECK_FUNCS(atexit on_exit memcpy bcopy memset bzero setvbuf strerror \
-  strchr index strrchr rindex strstr)
+AC_CHECK_FUNCS(atexit on_exit memcpy memmove memset bcopy bzero setvbuf \
+  strerror strchr index strrchr rindex strstr)
 
 dnl gamma is called lgamma on apollos and linux
 dnl we prefer lgamma over gamma, see specfun.c
