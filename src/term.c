@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.56 2003/04/14 18:11:54 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.57 2003/05/06 20:36:48 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -1768,9 +1768,11 @@ test_term()
     (*t->linetype)(2);
     /* test pm3d -- filled_polygon(), but not set_color() */
     if (t->filled_polygon) {
-	const int n = 6; /* number of corners of the polygon */
+#define NUMBER_OF_VERTICES 6
+	int n = NUMBER_OF_VERTICES;
+	gpiPoint corners[NUMBER_OF_VERTICES+1];
+#undef  NUMBER_OF_VERTICES
 	int i;
-	gpiPoint corners[n+1];
 	for (i = 0; i < n; i++) {
 	    corners[i].x = cen_x + radius * cos(2*M_PI*i/n);
 	    corners[i].y = cen_y + radius * sin(2*M_PI*i/n);

@@ -1,6 +1,7 @@
 2003-05-09  Ethan Merritt <merritt@u.washington.edu>
 
 	* term/cgm.trm: Add missing prototype for CGM_fillbox().
+	* src/term.c: Work around Microsoft compiler inadequacy.
 
 2003-05-06  James R. Van Zandt  <jrv@vanzandt.mv.com>
 
