@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.91 2002/08/30 18:45:45 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.92 2002/08/30 20:18:50 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -3976,18 +3976,17 @@ static void
 load_tic_user(axis)
 AXIS_INDEX axis;
 {
-    struct ticmark *list = NULL;	/* start of list */
-    struct ticmark *last = NULL;	/* end of list */
-    struct ticmark *tic = NULL;	/* new ticmark */
     char temp_string[MAX_LINE_LEN];
+    char *ticlabel;
+    double ticposition;
+
+    /* Free any old tic labels */
+    if (axis_array[axis].ticdef.type == TIC_USER) {
+	free_marklist(axis_array[axis].ticdef.def.user);
+	axis_array[axis].ticdef.def.user = NULL;
+    }
 
     while (!END_OF_COMMAND) {
-	/* parse a new ticmark */
-	tic = (struct ticmark *) gp_alloc(sizeof(struct ticmark), (char *) NULL);
-	if (tic == (struct ticmark *) NULL) {
-	    free_marklist(list);
-	    int_error(c_token, "out of memory for tic mark");
-	}
 	/* syntax is  (  ['format'] value , ... )
 	 * but for timedata, the value itself is a string, which
 	 * complicates things somewhat
@@ -3997,23 +3996,16 @@ AXIS_INDEX axis;
 	if (isstring(c_token) &&
 	    (!axis_array[axis].is_timedata || isstring(c_token + 1))) {
 	    quote_str(temp_string, c_token, MAX_LINE_LEN);
-	    tic->label = gp_alloc(strlen(temp_string) + 1, "tic label");
-	    (void) strcpy(tic->label, temp_string);
+	    ticlabel = temp_string;
 	    c_token++;
 	} else
-	    tic->label = NULL;
+	    ticlabel = NULL;
 
 	/* in any case get the value */
-	GET_NUM_OR_TIME(tic->position, axis);
-	tic->next = NULL;
+	GET_NUM_OR_TIME(ticposition, axis);
 
-	/* append to list */
-	if (list == NULL)
-	    last = list = tic;	/* new list */
-	else {			/* append to list */
-	    last->next = tic;
-	    last = tic;
-	}
+	/* add to list */
+	add_tic_user( axis, ticlabel, ticposition );
 
 	/* expect "," or ")" here */
 	if (!END_OF_COMMAND && equals(c_token, ","))
@@ -4023,20 +4015,40 @@ AXIS_INDEX axis;
     }
 
     if (END_OF_COMMAND || !equals(c_token, ")")) {
-	free_marklist(list);
+	free_marklist(axis_array[axis].ticdef.def.user);
+	axis_array[axis].ticdef.def.user = NULL;
 	int_error(c_token, "expecting right parenthesis )");
     }
     c_token++;
+}
 
-    /* successful list */
-    if (axis_array[axis].ticdef.type == TIC_USER) {
-	/* remove old list */
-	/* VAX Optimiser was stuffing up following line. Turn Optimiser OFF */
-	free_marklist(axis_array[axis].ticdef.def.user);
-	axis_array[axis].ticdef.def.user = NULL;
-    }
+/*
+ * Add a single tic mark, with label, to the list for this axis.
+ */
+void
+add_tic_user(axis,label,position)
+AXIS_INDEX axis;
+double position;
+char *label;
+{
+    struct ticmark *tic = NULL;		/* new ticmark */
+
+    /* Make a new ticmark */
+    tic = (struct ticmark *) gp_alloc(sizeof(struct ticmark), (char *) NULL);
+    if (tic == (struct ticmark *) NULL)
+	int_error(c_token, "out of memory for tic mark");
+    if (label && *label) {
+	tic->label = gp_alloc(strlen(label) + 1, "tic label");
+	(void) strcpy(tic->label, label);
+    } else
+	tic->label = NULL;
+    tic->position = position;
+
+    /* Insert this tic at head of tic list for this axis */
     axis_array[axis].ticdef.type = TIC_USER;
-    axis_array[axis].ticdef.def.user = list;
+    tic->next = axis_array[axis].ticdef.def.user;
+    axis_array[axis].ticdef.def.user = tic;
+    
 }
 
 static void

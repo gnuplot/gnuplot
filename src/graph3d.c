@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.69 2002/07/26 16:42:27 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.70 2002/08/25 13:10:11 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -150,7 +150,7 @@ static void key_text __PROTO((int xl, int yl, char *text));
 
 static void get_arrow3d __PROTO((struct arrow_def*, unsigned int*, unsigned int*, unsigned int*, unsigned int*));
 static void place_arrows3d __PROTO((int));
-static void place_labels3d __PROTO((int));
+static void place_labels3d __PROTO((struct text_label * listhead, int layer));
 static int map3d_getposition __PROTO((struct position* pos, const char* what, double* xpos, double* ypos, double* zpos));
 static void map3d_position_r __PROTO((struct position* pos1, struct position* pos2, unsigned int* x, unsigned int* y, const char* what));
 
@@ -462,7 +462,8 @@ get_arrow3d(arrow, sx, sy, ex, ey)
 }
 
 static void
-place_labels3d(layer)
+place_labels3d(listhead, layer)
+    struct text_label *listhead;
     int layer;
 {
     struct termentry *t = term;
@@ -470,7 +471,7 @@ place_labels3d(layer)
     if ((t->pointsize)) {
 	(*t->pointsize)(pointsize);
     }
-    for (this_label = first_label; this_label != NULL;
+    for (this_label = listhead; this_label != NULL;
 	 this_label = this_label->next) {
 
 	unsigned int x, y;
@@ -707,7 +708,7 @@ do_3dplot(plots, pcount, quick)
     }
 
     /* PLACE LABELS */
-    place_labels3d(0);
+    place_labels3d(first_label, 0);
 
     /* PLACE ARROWS */
     place_arrows3d(0);
@@ -1237,7 +1238,7 @@ do_3dplot(plots, pcount, quick)
 	draw_3d_graphbox(plots, pcount);
 
     /* PLACE LABELS */
-    place_labels3d(1);
+    place_labels3d(first_label, 1);
 
     /* PLACE ARROWS */
     place_arrows3d(1);

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.73 2002/08/30 20:18:46 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.74 2002/08/31 00:28:12 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -121,7 +121,7 @@ static void plot_vectors __PROTO((struct curve_points * plot));
 static void plot_f_bars __PROTO((struct curve_points * plot));
 static void plot_c_bars __PROTO((struct curve_points * plot));
 
-static void place_labels __PROTO((int layer));
+static void place_labels __PROTO((struct text_label * listhead, int layer));
 static void place_arrows __PROTO((int layer));
 static void place_grid __PROTO((void));
 
@@ -1072,7 +1072,8 @@ place_arrows(layer)
 }
 
 static void
-place_labels(layer)
+place_labels(listhead, layer)
+    struct text_label *listhead;
     int layer;
 {
     struct text_label *this_label;
@@ -1080,7 +1081,7 @@ place_labels(layer)
     if ((t->pointsize)) {
 	(*t->pointsize) (pointsize);
     }
-    for (this_label = first_label; this_label != NULL; this_label = this_label->next) {
+    for (this_label = listhead; this_label != NULL; this_label = this_label->next) {
 
 	unsigned int x, y;
 	int htic;
@@ -1091,7 +1092,7 @@ place_labels(layer)
 	if (this_label->layer != layer)
 	    continue;
 	map_position(&this_label->place, &x, &y, "label");
-	
+
 	/* EAM - textcolor support in progress */
 	apply_textcolor(&(this_label->textcolor),t);
 
@@ -1313,7 +1314,7 @@ do_plot(plots, pcount)
     }
 
 /* PLACE LABELS */
-    place_labels( 0 );
+    place_labels( first_label, 0 );
 
 /* PLACE ARROWS */
     place_arrows( 0 );
@@ -1632,7 +1633,7 @@ do_plot(plots, pcount)
 	place_grid();
 
 /* PLACE LABELS */
-    place_labels( 1 );
+    place_labels( first_label, 1 );
 
 /* PLACE ARROWS */
     place_arrows( 1 );
