@@ -3,6 +3,7 @@ Changes in release 3.7.2:
   clause. The effect is that this removes the gamma, inverse normal, and
   inverse error function from platforms that have no native implementation.
 * Support for BeOS
+* timefmt can read Unix 'seconds since the epoch' type input.
 * New terminal drivers: emf (Enhanced Metafile Format), epslatex,
   ggi (General Graphics Interface), pdf, svg (W3C Scalable Vector Graphics)
 * Updated png driver: web-friendly palette, transparent images,
