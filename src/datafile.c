@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.29 2001/11/07 18:50:38 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.30 2001/11/29 14:12:55 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -751,7 +751,6 @@ df_showdata()
 /* display the current data file line for an error message
  */
 {
-  int long_line;
   if (data_fp && df_filename && line) {
     /* display no more than 77 characters */
     fprintf(stderr, "%.77s%s\n%s:%d:", line,
