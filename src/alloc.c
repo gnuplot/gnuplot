@@ -41,21 +41,21 @@ static char *RCSid = "$Id: alloc.c,v 1.12 1998/03/22 22:31:16 drd Exp $";
  *
  */
 
-#include "plot.h" /* includes "alloc.h" */
+#include "plot.h"		/* includes "alloc.h" */
 
 #if defined(MSDOS) && defined(__TURBOC__) && !defined(DOSX286)
-#include <alloc.h>		/* for farmalloc, farrealloc */
+# include <alloc.h>		/* for farmalloc, farrealloc */
 #endif
 
 #if defined(_Windows) && !defined(WIN32)
-#include <windows.h>
-#include <windowsx.h>
-#define farmalloc(s) GlobalAllocPtr(GHND,s)
-#define farrealloc(p,s) GlobalReAllocPtr(p,s,GHND)
+# include <windows.h>
+# include <windowsx.h>
+# define farmalloc(s) GlobalAllocPtr(GHND,s)
+# define farrealloc(p,s) GlobalReAllocPtr(p,s,GHND)
 #endif
 
 #ifndef NO_GIH
-#include "help.h"
+# include "help.h"
 #endif
 
 #ifndef GP_FARMALLOC
@@ -69,7 +69,7 @@ static char *RCSid = "$Id: alloc.c,v 1.12 1998/03/22 22:31:16 drd Exp $";
 #endif
 
 /* uncomment if you want to trace all allocs */
-#define TRACE_ALLOC(x) /*printf x*/
+#define TRACE_ALLOC(x)		/*printf x */
 
 
 #ifdef CHECK_HEAP_USE
@@ -80,19 +80,19 @@ static char *RCSid = "$Id: alloc.c,v 1.12 1998/03/22 22:31:16 drd Exp $";
  */
 
 struct frame_struct {
-	char *use;
-	int requested_size;
-	int pad; /* preserve 8-byte alignment */
-	int checksum;
+    char *use;
+    int requested_size;
+    int pad;			/* preserve 8-byte alignment */
+    int checksum;
 };
 
 struct leak_struct {
-	char *file;
-	int line;
-	int allocated;
+    char *file;
+    int line;
+    int allocated;
 };
 
-static struct leak_struct leak_stack[40];  /* up to 40 nested leak checks */
+static struct leak_struct leak_stack[40];	/* up to 40 nested leak checks */
 static struct leak_struct *leak_frame = leak_stack;
 
 static long bytes_allocated = 0;
@@ -107,32 +107,29 @@ struct frame_struct *p;
 unsigned long size;
 char *usage;
 {
-	p->use = usage;
-	p->requested_size = size;
-	p->checksum = (CHECKSUM_INT ^ (int)(p->use) ^ size);
-	((unsigned char *)(p+1))[size] = CHECKSUM_CHAR;
+    p->use = usage;
+    p->requested_size = size;
+    p->checksum = (CHECKSUM_INT ^ (int) (p->use) ^ size);
+    ((unsigned char *) (p + 1))[size] = CHECKSUM_CHAR;
 }
 
 #define mark_free(p) ( ((struct frame_struct *)p)[-1].checksum = CHECKSUM_FREE)
-	
+
 static void validate(x)
 void *x;
 {
-	struct frame_struct *p = (struct frame_struct *)x - 1;
-	if (p->checksum != (CHECKSUM_INT ^ (int)(p->use) ^ p->requested_size))
-	{
-		fprintf(stderr, "Heap corruption at start of block for %s\n", p->use);
-		if (p->checksum == CHECKSUM_FREE)
-			fprintf(stderr, "Looks like it has already been freed ?\n");
-		abort();
-	}
-
-	if ( ((unsigned char *)(p+1))[p->requested_size] != CHECKSUM_CHAR)
-	{
-		fprintf(stderr, "Heap corruption at end of block for %-60s\n", p->use);
-		int_error(NO_CARET, "Argh !");
-	}
-}		
+    struct frame_struct *p = (struct frame_struct *) x - 1;
+    if (p->checksum != (CHECKSUM_INT ^ (int) (p->use) ^ p->requested_size)) {
+	fprintf(stderr, "Heap corruption at start of block for %s\n", p->use);
+	if (p->checksum == CHECKSUM_FREE)
+	    fprintf(stderr, "Looks like it has already been freed ?\n");
+	abort();
+    }
+    if (((unsigned char *) (p + 1))[p->requested_size] != CHECKSUM_CHAR) {
+	fprintf(stderr, "Heap corruption at end of block for %-60s\n", p->use);
+	int_error(NO_CARET, "Argh !");
+    }
+}
 
 /* used to confirm that a pointer is inside an allocated region via
  * macro CHECK_POINTER. Nowhere near as good as using a bounds-checking
@@ -144,33 +141,33 @@ void *x;
 
 void check_pointer_in_block(void *block, void *p, int size, char *file, int line)
 {
-	struct frame_struct *f = (struct frame_struct *)block - 1;
-	validate(block);
-	if (p < block || p >= (block + f->requested_size))
-	{
-		fprintf(stderr, "argh - pointer %p outside block %p->%p for %s at %s:%d\n",
-		  p, block, (char *)block + f->requested_size, f->use, file, line);
-		int_error(NO_CARET, "argh - pointer misuse !");
-	}
+    struct frame_struct *f = (struct frame_struct *) block - 1;
+    validate(block);
+    if (p < block || p >= (block + f->requested_size)) {
+	fprintf(stderr, "argh - pointer %p outside block %p->%p for %s at %s:%d\n",
+		p, block, (char *) block + f->requested_size, f->use, file, line);
+	int_error(NO_CARET, "argh - pointer misuse !");
+    }
 }
 
 char *gp_alloc(size, usage)
 unsigned long size;
 char *usage;
 {
-	struct frame_struct *p;
-	unsigned long total_size = size + RESERVED_SIZE + 1;
-	
-	TRACE_ALLOC(("gp_alloc %d for %s\n", (int) size, usage?usage:"<unknown>"));
-	
-	p=malloc(total_size);
-	if (!p) int_error(NO_CARET, "Out of memory");
+    struct frame_struct *p;
+    unsigned long total_size = size + RESERVED_SIZE + 1;
 
-	bytes_allocated += size;
-	
-	mark(p,size,usage);
-	
-	return (char *)(p+1);
+    TRACE_ALLOC(("gp_alloc %d for %s\n", (int) size, usage ? usage : "<unknown>"));
+
+    p = malloc(total_size);
+    if (!p)
+	int_error(NO_CARET, "Out of memory");
+
+    bytes_allocated += size;
+
+    mark(p, size, usage);
+
+    return (char *) (p + 1);
 }
 
 generic *gp_realloc(old, size, usage)
@@ -178,29 +175,31 @@ generic *old;
 unsigned long size;
 char *usage;
 {
-	if (!old) return gp_alloc(size, usage);
-	validate(old);
-	mark_free(old); /* if block gets moved, old block is marked free */
-	                /* if not, we'll remark it later */
+    if (!old)
+	return gp_alloc(size, usage);
+    validate(old);
+    mark_free(old);		/* if block gets moved, old block is marked free */
+    /* if not, we'll remark it later */
 
-	
-	{
-		struct frame_struct *p = (struct frame_struct *)old - 1;
-		unsigned long total = size + RESERVED_SIZE + 1;
 
-		p = realloc(p, total);
+    {
+	struct frame_struct *p = (struct frame_struct *) old - 1;
+	unsigned long total = size + RESERVED_SIZE + 1;
 
-		if (!p) int_error(NO_CARET, "Out of memory");
+	p = realloc(p, total);
 
-		TRACE_ALLOC(("gp_realloc %d for %s (was %d)\n",
-		  (int)size, usage?usage:"<unknown>", p->requested_size));
+	if (!p)
+	    int_error(NO_CARET, "Out of memory");
 
-		bytes_allocated += size - p->requested_size;
-		
-		mark(p,size,usage);
+	TRACE_ALLOC(("gp_realloc %d for %s (was %d)\n",
+		     (int) size, usage ? usage : "<unknown>", p->requested_size));
 
-		return (generic *)(p+1);
-	}
+	bytes_allocated += size - p->requested_size;
+
+	mark(p, size, usage);
+
+	return (generic *) (p + 1);
+    }
 }
 
 #undef free
@@ -208,13 +207,14 @@ char *usage;
 void checked_free(p)
 void *p;
 {
-	validate(p);
-	mark_free(p);  /* trap attempts to free twice */
-	TRACE_ALLOC(("free %d for %s\n",
-	  ((struct frame_struct *)p - 1)->requested_size,
-	  (((struct frame_struct *)p - 1)->use ? ((struct frame_struct *)p - 1)->use : "(NULL)" )));
-	bytes_allocated -= ((struct frame_struct *)p - 1) -> requested_size;
-	free( (struct frame_struct *) p - 1);
+    validate(p);
+    mark_free(p);		/* trap attempts to free twice */
+    TRACE_ALLOC(("free %d for %s\n",
+		 ((struct frame_struct *) p - 1)->requested_size,
+		 (((struct frame_struct *) p - 1)->use ? ((struct frame_struct *) p - 1)->use :
+		  "(NULL)")));
+    bytes_allocated -= ((struct frame_struct *) p - 1)->requested_size;
+    free((struct frame_struct *) p - 1);
 }
 
 
@@ -222,36 +222,31 @@ void *p;
 
 void start_leak_check(char *file, int line)
 {
-	if (leak_frame >= leak_stack+40)
-	{
-		fprintf(stderr, "too many nested memory-leak checks - %s:%d\n", file, line);
-		return;
-	}
+    if (leak_frame >= leak_stack + 40) {
+	fprintf(stderr, "too many nested memory-leak checks - %s:%d\n", file, line);
+	return;
+    }
+    leak_frame->file = file;
+    leak_frame->line = line;
+    leak_frame->allocated = bytes_allocated;
 
-	leak_frame->file = file;
-	leak_frame->line = line;
-	leak_frame->allocated = bytes_allocated;
-
-	++leak_frame;
+    ++leak_frame;
 }
 
 void end_leak_check(char *file, int line)
 {
-	if (--leak_frame < leak_stack)
-	{
-		fprintf(stderr, "memory-leak stack underflow at %s:%d\n", file, line);
-		return;
-	}
-
-	if (leak_frame->allocated != bytes_allocated)
-	{
-		fprintf(stderr, "net change of %+d heap bytes between %s:%d and %s:%d\n",
-			(int)(bytes_allocated - leak_frame->allocated),
-			leak_frame->file, leak_frame->line, file, line);
-	}
+    if (--leak_frame < leak_stack) {
+	fprintf(stderr, "memory-leak stack underflow at %s:%d\n", file, line);
+	return;
+    }
+    if (leak_frame->allocated != bytes_allocated) {
+	fprintf(stderr, "net change of %+d heap bytes between %s:%d and %s:%d\n",
+		(int) (bytes_allocated - leak_frame->allocated),
+		leak_frame->file, leak_frame->line, file, line);
+    }
 }
 
-#else  /* CHECK_HEAP_USE */
+#else /* CHECK_HEAP_USE */
 
 /* gp_alloc:
  * allocate memory 
@@ -263,31 +258,30 @@ void end_leak_check(char *file, int line)
  * so it depends on this using malloc().
  */
 
-char *
-gp_alloc(size, message)
-	unsigned long size;		/* # of bytes */
-	char *message;			/* description of what is being allocated */
+char *gp_alloc(size, message)
+unsigned long size;		/* # of bytes */
+char *message;			/* description of what is being allocated */
 {
-    char *p;				/* the new allocation */
+    char *p;			/* the new allocation */
 
 #ifndef NO_GIH
     p = GP_FARMALLOC(size);
-    if (p == (char *)NULL) {
-	   FreeHelp();			/* out of memory, try to make some room */
+    if (p == (char *) NULL) {
+	FreeHelp();		/* out of memory, try to make some room */
 #endif /* NO_GIH */
-	   p = GP_FARMALLOC(size);	/* try again */
-	   if (p == (char *)NULL) {
-		  /* really out of memory */
-		  if (message != NULL) {
-			 int_error(NO_CARET, "out of memory for %s", message);
-			 /* NOTREACHED */
-		  }
-		  /* else we return NULL */
-	   }
+	p = GP_FARMALLOC(size);	/* try again */
+	if (p == (char *) NULL) {
+	    /* really out of memory */
+	    if (message != NULL) {
+		int_error(NO_CARET, "out of memory for %s", message);
+		/* NOTREACHED */
+	    }
+	    /* else we return NULL */
+	}
 #ifndef NO_GIH
     }
 #endif
-    return(p);
+    return (p);
 }
 
 /*
@@ -296,36 +290,35 @@ gp_alloc(size, message)
  * realloc function has to be used.
  */
 
-generic *
-gp_realloc(p, size, message)
-	generic *p;			/* old mem block */
-	unsigned long size;		/* # of bytes */
-	char *message;			/* description of what is being allocated */
+generic *gp_realloc(p, size, message)
+generic *p;			/* old mem block */
+unsigned long size;		/* # of bytes */
+char *message;			/* description of what is being allocated */
 {
-    char *res;				/* the new allocation */
+    char *res;			/* the new allocation */
 
     /* realloc(NULL,x) is meant to do malloc(x), but doesn't always */
     if (!p)
-	return gp_alloc(size,message);
+	return gp_alloc(size, message);
 
 #ifndef NO_GIH
-    res = GP_FARREALLOC(p,size);
-    if (res == (char *)NULL) {
-	   FreeHelp();			/* out of memory, try to make some room */
+    res = GP_FARREALLOC(p, size);
+    if (res == (char *) NULL) {
+	FreeHelp();		/* out of memory, try to make some room */
 #endif /* NO_GIH */
-	   res = GP_FARREALLOC(p,size);	/* try again */
-	   if (res == (char *)NULL) {
-		  /* really out of memory */
-		  if (message != NULL) {
-			 int_error(NO_CARET, "out of memory for %s", message);
-			 /* NOTREACHED */
-		  }
-		  /* else we return NULL */
-	   }
+	res = GP_FARREALLOC(p, size);	/* try again */
+	if (res == (char *) NULL) {
+	    /* really out of memory */
+	    if (message != NULL) {
+		int_error(NO_CARET, "out of memory for %s", message);
+		/* NOTREACHED */
+	    }
+	    /* else we return NULL */
+	}
 #ifndef NO_GIH
     }
 #endif
-    return(res);
+    return (res);
 }
 
 #endif /* CHECK_HEAP_USE */
@@ -335,11 +328,12 @@ void gpfree(p)
 generic *p;
 {
 #ifdef _Windows
-HGLOBAL hGlobal = GlobalHandle(SELECTOROF(p));
-	GlobalUnlock(hGlobal);
-	GlobalFree(hGlobal);
+    HGLOBAL hGlobal = GlobalHandle(SELECTOROF(p));
+    GlobalUnlock(hGlobal);
+    GlobalFree(hGlobal);
 #else
-	farfree(p);
+    farfree(p);
 #endif
 }
+
 #endif
