@@ -381,7 +381,7 @@ clean:
 	-rm -f doc2tex gnuplot.tex gnuplot.dvi \
 	  gnuplot.aux gnuplot.log gnuplot.toc \
 	  gnuplot.ps gpcard.dvi gpcard.log gpcard.ps \
-	  alldoc2gih doc2gih gnuplot.gih \
+	  alldoc2gih doc2gih gnuplot.gih gnuplot.pdf \
 	  doc2hlp gnuplot.hlp \
 	  doc2html gnuplot.html \
 	  doc2info gnuplot.info* gpltinfo.tex \
