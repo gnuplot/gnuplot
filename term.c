@@ -1340,12 +1340,14 @@ void reopen_binary()
 
 #ifdef VMS
 /* these are needed to modify terminal characteristics */
+#ifndef VWS_XMAX	/* avoid duplicate warning; VWS includes these */
 #include <descrip.h>
+#include <ssdef.h>
+#endif
 #include <iodef.h>
 #include <ttdef.h>
 #include <tt2def.h>
 #include <dcdef.h>
-#include <ssdef.h>
 #include <stat.h>
 #include <fab.h>
 /* If you use WATCOM C, you may have to comment out the following branch */
