@@ -1,5 +1,5 @@
 %
-% $Id: titlepag.tex,v 1.4 2001/03/07 10:06:31 mikulik Exp $
+% $Id: titlepag.tex,v 1.5 2001/12/19 09:14:55 mikulik Exp $
 %
 \ifx\LaTeXe\undefined
 % old LaTeX version
@@ -12,11 +12,35 @@
 % see below if you add 11pt or 12pt
    \documentclass{article} % DSL 24 May 1995
    \usepackage{toc_entr}
+%
+% Those macros are available from
+%    DANTE:/macros/latex/contrib/supported/oberdiek/
+% They are required to distinguish between various
+% PDF creating LaTeX systems.
+% If you have dvipdfm installed outcomment the according
+% line in the DEFAULT branch below.
+%
+   \usepackage{ifpdf, ifvtex}
 \fi
 
-\ifx\pdfoutput\undefined
+%
+% pdflatex
+%
+\ifpdf
   \usepackage[
-    dvipdfm,
+	pdftex, hyperindex, bookmarks,
+	pdftitle={gnuplot documentation},
+	pdfauthor={gnuplot},
+	pdfsubject={see www.gnuplot.org}
+	,pdfcreator={}
+	,pdfkeywords={...}
+  ]{hyperref}
+\else
+%
+% v(la)tex
+%
+\ifvtex
+  \usepackage[
     hyperindex,
     bookmarks=true,
     bookmarksnumbered=true,
@@ -25,14 +49,19 @@
     pdfauthor={gnuplot},
     pdfsubject={see www.gnuplot.org}
   ]{hyperref}
-\else  
+\else
+%
+% DEFAULT:
+%
   \usepackage[
-	pdftex, hyperindex, bookmarks,
-	pdftitle={gnuplot documentation},
-	pdfauthor={gnuplot},
-	pdfsubject={see www.gnuplot.org}
-	,pdfcreator={}
-	,pdfkeywords={...}
+%    dvipdfm,
+    hyperindex,
+    bookmarks=true,
+    bookmarksnumbered=true,
+    bookmarkstype=toc,
+    pdftitle={gnuplot documentation},
+    pdfauthor={gnuplot},
+    pdfsubject={see www.gnuplot.org}
   ]{hyperref}
 \fi
 
@@ -123,8 +152,4 @@
 \setcounter{page}{1}
 \pagestyle{myheadings}
 \markboth{{\bf gnuplot} 3.7}{{\bf gnuplot} 3.7}
-
-
-
-
 
