@@ -1,3 +1,10 @@
+2001-09-27  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* src/set.c docs/gnuplot.doc: new autoscale option:
+	`set autoscale {{axis}{...|fix} | fix}` to easily set fixmin and
+	fixmax in one command for one or all axes.
+	* src/unset.c: wrong indentation of two "}" in unset_autoscale().
+
 2001-09-19  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/gplt_x11.c (GR_MAKE_PALETTE, GR_RELEASE_PALETTE,

@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.80 2001/09/19 11:08:39 amai Exp $
+C RCS $Id: gnuplot.doc,v 1.81 2001/09/19 11:26:50 amai Exp $
 C 18 September 2001
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001   Thomas Williams, Colin Kelley et al.
 C
@@ -3345,9 +3345,11 @@ C ... and restart the table:
 3 autoscale
 ?commands set autoscale
 ?commands set noautoscale
+?commands unset autoscale
 ?commands show autoscale
 ?set autoscale
 ?set noautoscale
+?unset autoscale
 ?show autoscale
 ?autoscale
 ?noautoscale
@@ -3355,8 +3357,8 @@ C ... and restart the table:
  axes. The default is to autoscale all axes.
 
  Syntax:
-       set autoscale {<axes>{|min|max|fixmin|fixmax}}
-       set noautoscale {<axes>{|min|max|fixmin|fixmax}}
+       set autoscale {<axes>{|min|max|fixmin|fixmax|fix} | fix}
+       unset autoscale {<axes>}
        show autoscale
 
  where <axes> is either `x`, `y`, `z`, `x2`, `y2` or `xy`.  A keyword with
@@ -3364,10 +3366,10 @@ C ... and restart the table:
  autoscale just the minimum or maximum of that axis.  If no keyword is given,
  all axes are autoscaled. 
 
- A keyword with `fixmin` or `fixmax` appended tells gnuplot to disable
- extension the axis range to the next tic mark position, for autoscaled axes
- using equidistant tics.
-
+ A keyword with `fixmin`, `fixmax` or `fix` appended tells gnuplot to disable
+ extension of the axis range to the next tic mark position, for autoscaled
+ axes using equidistant tics; `set autoscale fix` sets this for all axes.
+ 
  When autoscaling, the axis range is automatically computed and the dependent
  axis (y for a `plot` and z for `splot`) is scaled to include the range of the
  function or data being plotted.

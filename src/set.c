@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.61 2001/08/22 14:15:34 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.62 2001/08/27 15:02:14 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -817,6 +817,14 @@ set_autoscale()
 	    axis_array[FIRST_Y_AXIS].set_autoscale =  AUTOSCALE_BOTH;
 	c_token++;
 	return;
+    } else if (equals(c_token, "fix")) {
+	int a = 0;
+	while (a < AXIS_ARRAY_SIZE) {
+	    axis_array[a].set_autoscale |= AUTOSCALE_FIXMIN | AUTOSCALE_FIXMAX;
+	    a++;
+	}
+	c_token++;
+	return;
     }
 
     /* save on replication with a macro */
@@ -838,6 +846,12 @@ set_autoscale()
 	sprintf(max_string, "%sma$x", axis_defaults[axis].name);	\
 	if (almost_equals(c_token, max_string)) {			\
 	    this->set_autoscale |= AUTOSCALE_MAX;			\
+	    ++c_token;							\
+	    return;							\
+	}								\
+	sprintf(min_string, "%sfix", axis_defaults[axis].name);		\
+	if (equals(c_token, min_string)) {				\
+	    this->set_autoscale |= AUTOSCALE_FIXMIN | AUTOSCALE_FIXMAX;	\
 	    ++c_token;							\
 	    return;							\
 	}								\
