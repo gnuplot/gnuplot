@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: readline.c,v 1.69 1998/04/14 00:16:12 drd Exp $";
+static char *RCSid = "$Id: readline.c,v 1.9 1998/11/03 12:53:59 lhecking Exp $";
 #endif
 
 /* GNUPLOT - readline.c */
@@ -52,7 +52,7 @@ static char *RCSid = "$Id: readline.c,v 1.69 1998/04/14 00:16:12 drd Exp $";
 /* get prototype for alloc and gpfaralloc */
 #include "plot.h"
 
-#if defined(READLINE) && !defined(GNU_READLINE)
+#if defined(READLINE) && !defined(HAVE_LIBREADLINE)
 
 /* a small portable version of GNU's readline
  * this is not the BASH or GNU EMACS version of READLINE due to Copyleft 
@@ -1101,4 +1101,4 @@ static void reset_termio()
 }
 
 
-#endif /* READLINE && not GNU_READLINE */
+#endif /* READLINE && not HAVE_LIBREADLINE */

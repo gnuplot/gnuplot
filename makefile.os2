@@ -1,5 +1,5 @@
 #
-# $Id: makefile.os2,v 1.27 1998/04/14 00:15:54 drd Exp $
+# $Id: makefile.os2,v 1.13 1998/12/06 21:55:07 lhecking Exp $
 #
 # Makefile for use with emx (and above) and GNUMake
 #   on OS/2 3.0 and above (might also work for OS/2 2.x)
@@ -118,7 +118,7 @@ OS2FLAGS = -DOS2 -DHELPFILE=\"$(HELPFILE)\"
 EMXSPECIFIC = -ffloat-store -DREADLINE -DHAVE_STRNICMP -DPIPES -DHAVE_STRERROR -DHAVE_SYS_SELECT_H -DHAVE_SYS_STAT_H
 LIBS = 
 ifdef GNU_RL
-  EMXSPECIFIC += -DGNU_READLINE
+  EMXSPECIFIC += -DHAVE_LIBREADLINE
   LIBS += -lreadline -ltermcap
 endif
 
