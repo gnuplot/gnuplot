@@ -1578,16 +1578,16 @@ void show_version_long()
 	/* The following code could be a lot simpler if
 	 * it wasn't for Borland's broken compiler ...
 	 */
-	const char *readline, *gnu_readline, *libgd, *libpng, *linuxvga,
+	const char *rdline, *gnu_rdline, *libgd, *libpng, *linuxvga,
 	*nocwdrc, *x11, *unixplot, *gnugraph;
 
-	readline =
+	rdline =
 #ifdef READLINE
 	    "+READLINE  "
 #else
 	    "-READLINE  "
 #endif
-	    ,gnu_readline =
+	    ,gnu_rdline =
 #ifdef GNU_READLINE
 	    "+GNU_READLINE  "
 #else
@@ -1637,7 +1637,7 @@ void show_version_long()
 	    ""
 #endif
 	    ;
-	fprintf(stderr, "%s%s%s%s%s%s%s%s%s\n\n", readline, gnu_readline,
+	fprintf(stderr, "%s%s%s%s%s%s%s%s%s\n\n", rdline, gnu_rdline,
 	      libgd, libpng, linuxvga, nocwdrc, x11, unixplot, gnugraph);
     }
 
