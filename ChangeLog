@@ -1,9 +1,12 @@
 2005-03-27  Ethan Merritt  <merritt@u.washington.edu>
 
-	NEWS configure.in term/gd.trm: Allow storage of a sequence of plots
+	* NEWS configure.in term/gd.trm: Allow storage of a sequence of plots
 	into a single animated gif file.
 	    set term gif animate {delay <time>} {nooptimize}
 	Requires libgd version 2.0.29 or better (2.0.33 is recommended).
+
+	* src/plot2d.c (histogram_range_fiddling): Make it more obvious in the
+	code that histograms always use FIRST_X_AXIS.
 
 2005-03-26  Ethan Merritt  <merritt@u.washington.edu>
 
@@ -14,31 +17,31 @@
 	The code is general, although currently only the x11 terminal tracks the
 	ID of multiple windows in order to report who is who.
 
-	src/command.c (bind_command): New keyword "bind {all$windows} ..."
+	* src/command.c (bind_command): New keyword "bind {all$windows} ..."
 
-	src/gpexecute.c (gp_exec_event) src/gpexecute.h:
+	* src/gpexecute.c (gp_exec_event) src/gpexecute.h:
 	New parameter holds ID of window from which this event was triggered.
 	
-	src/gplt_x11.c (process_event): Pass ID of originating window to
+	* src/gplt_x11.c (process_event): Pass ID of originating window to
 	gp_exec_event() along with the x,y coordinates and keystroke.
 	Distinguish between active and inactive window by using event code
 	GE_keypress or GE_keypress_old. You get the window ID in either case.
 
-	src/mousecmn.h: Add new field int winid to struct gp_event_t.
+	* src/mousecmn.h: Add new field int winid to struct gp_event_t.
 
-	src/mouse.c src/mouse.h
+	* src/mouse.c src/mouse.h:
 	Add new TBOOLEAN allwindows to the bind_t structure.
 	New routine bind_all() sets this flag from "bind all <foo> <baz>".
 	Teach event_keypress() to distinguish between keystrokes from active
 	or inactive windows, and to load originating window ID into udv
 	MOUSE_KEY_WINDOW so that it is visible to user-defined commands.
 
-	src/os2/gclient.c src/win/wgraph.c:
+	* src/os2/gclient.c src/win/wgraph.c:
 	Add extra parameter for window ID in all calls to gp_exec_event().
 
-	docs/gnuplot.doc: Document new command option "bind all <key> <command>".
+	* docs/gnuplot.doc: Document new command option "bind all <key> <command>".
 
-	src/mouse.c (event_buttonpress) term/x11.trm (X11_waitforinput):
+	* src/mouse.c (event_buttonpress) term/x11.trm (X11_waitforinput):
 	Do not terminate "pause mouse key" on mouse button clicks. This allows
 	zoom, select, and other mouse-click operations during the pause.
 

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.99 2005/03/25 14:03:32 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.100 2005/03/26 18:45:53 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -866,7 +866,7 @@ histogram_range_fiddling(struct curve_points *plot)
     double xlow, xhigh, yhigh;
     int i;
     /*
-     * EAM FIXME - HT_STACKED_IN_TOWERS forcibly resets xman, which is only
+     * EAM FIXME - HT_STACKED_IN_TOWERS forcibly resets xmin, which is only
      *   correct if no other plot came first.
      */
     switch (histogram_opts.type) {
@@ -894,7 +894,7 @@ histogram_range_fiddling(struct curve_points *plot)
 	    }
 		/* fall through to checks on x range */
 	case HT_CLUSTERED:	
-		if (!axis_array[plot->x_axis].autoscale)
+		if (!axis_array[FIRST_X_AXIS].autoscale)
 		    break;
 		if (axis_array[FIRST_X_AXIS].autoscale & AUTOSCALE_MIN) {
 		    xlow = plot->histogram->start - 1.0;
@@ -909,7 +909,7 @@ histogram_range_fiddling(struct curve_points *plot)
 		}
 		break;
 	case HT_STACKED_IN_TOWERS:
-		if (!axis_array[plot->x_axis].set_autoscale)
+		if (!axis_array[FIRST_X_AXIS].set_autoscale)
 		    break;
 		xlow = 0.0;
 		xhigh = plot->histogram_sequence;
