@@ -297,9 +297,7 @@ AC_EGREP_CPP(yes,
 #endif
 ], AC_MSG_RESULT(yes)
    LIBS="$LIBS -lsys_s -lNeXT_s"
-   NEXTOBJS=epsviewe.o
    CFLAGS="$CFLAGS -ObjC",dnl
-   NEXTOBJS=
    AC_MSG_RESULT(no))
 ])
 
