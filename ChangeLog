@@ -1,3 +1,11 @@
+2004-05-20  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* docs/doc2texi.el (d2t-handle-html): Handle anchor-only <a> tags
+	more sensibly: output them to the texinfo file as a @c comment.
+	Patch from Shigharu Takeno.
+	
+	* docs/gnuplot.texi: Regenerated.
+
 2004-05-19  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/mouse.c: Fix broken zoom history with a log axis.

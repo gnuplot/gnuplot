@@ -769,7 +769,8 @@ This must be run after `d2t-first-column'."
 					 ","
 					 (remove* ?^ (match-string 2)
 						  :test 'char-equal)
-					 "}"))))
+					 "}"))
+		  (insert "@c ")))
 	     ;; translate <ul> </ul> to @itemize environment
 	     ((and (string= bracket "<") (string-match "^ul" tag))
 	      (delete-region (point) eol)

@@ -274,7 +274,7 @@ See the simple.dem demo, also available together with other demos on the web pag
 @node Seeking-assistance, What_is_New_in_Version_4.0, Introduction, gnuplot
 @section Seeking-assistance
 
-^ <a name="Seeking-assistance"></a>
+@c ^ <a name="Seeking-assistance"></a>
 @cindex help-desk
 
 @cindex seeking-assistance
@@ -839,7 +839,8 @@ integers.
 @menu
 * Functions::                   
 * Operators::                   
-* User-defined::                
+* Gnuplot-defined_variables::   
+* User-defined_variables_and_functions::  
 @end menu
 
 @node Functions, Operators, Expressions, Expressions
@@ -1559,7 +1560,7 @@ The current behavior is as follows:
 @end example
 
 
-@node Operators, User-defined, Functions, Expressions
+@node Operators, Gnuplot-defined_variables, Functions, Expressions
 @subsection Operators
 
 @c ?expressions operators
@@ -1697,10 +1698,36 @@ the datum in column 1, but only if the datum in column 4 is non-negative:
 
 Please see @ref{using} for an explanation of the @ref{using} syntax.
 
-@node User-defined,  , Operators, Expressions
-@subsection User-defined
+
+@node Gnuplot-defined_variables, User-defined_variables_and_functions, Operators, Expressions
+@subsection Gnuplot-defined variables
+
+@c ?gnuplot-defined variables
+The variable `pi` is defined to be pi, see
+@example
+      print pi
+
+@end example
+
+Additionally, gnuplot may define some variables under various operations.
+
+Working with interactive terminals with `mouse` functionality defines
+variables with names that begin "MOUSE_", see @ref{variables} for details.
+
+The `fit` mechanism uses several variables with names that begin "FIT_".  It
+is safest to avoid using such names.  "FIT_LIMIT", however, is one that you
+may wish to redefine. Under `set fit errorvariables`, the error for each
+fitted parameter will be stored in a variable named like the parameter, but
+with "_err" appended. See the documentation on `fit` for details.
+
+See @ref{variables}, @ref{variables}, and `fit`.
+
+
+@node User-defined_variables_and_functions,  , Gnuplot-defined_variables, Expressions
+@subsection User-defined variables and functions
 
 @c ?expressions user-defined
+@c ?user-defined variables
 @cindex user-defined
 
 @cindex variables
@@ -1741,16 +1768,23 @@ Examples:
 
 @c ^ <img align=bottom src="http://www.gnuplot.info/doc/userdefined.gif" alt="[userdefined.gif]" width=640 height=480>
 Note that the variable `pi` is already defined.  But it is in no way magic;
-you may redefine it to be whatever you like.
+you may redefine it to be whatever you like. Some other variables may be
+defined under various gnuplot operations like mousing in interactive terminals
+or fitting; see @ref{variables} for details.
+
+You can check for existence of a given variable by the defined(v) expression,
+for example
+@example
+      a = 10
+      if (defined(a)) print "a is defined"
+      if (!defined(b)) print "b is not defined"
+
+@end example
 
 Valid names are the same as in most programming languages: they must begin
 with a letter, but subsequent characters may be letters, digits, "$", or "_".
-Note, however, that the `fit` mechanism uses several variables with names
-that begin "FIT_".  It is safest to avoid using such names.  "FIT_LIMIT",
-however, is one that you may wish to redefine. See the documentation
-on `fit` for details.
 
-See `show functions`, @ref{variables}, and `fit`.
+See `show functions`, `functions`, @ref{variables}.
 
 
 @node Glossary, mouse_input, Expressions, gnuplot
@@ -1818,10 +1852,10 @@ See also the command `set mouse`.
 
 @menu
 * bind::                        
-* mouse_variables::             
+* Mouse_variables::             
 @end menu
 
-@node bind, mouse_variables, mouse_input, mouse_input
+@node bind, Mouse_variables, mouse_input, mouse_input
 @subsection bind
 
 @c ?commands bind
@@ -1917,8 +1951,8 @@ List of supported special keys:
 See also help for `mouse` and @ref{if}.
 
 
-@node mouse_variables,  , bind, mouse_input
-@subsection mouse_variables
+@node Mouse_variables,  , bind, mouse_input
+@subsection Mouse variables
 
 @c ?mouse variables
 When mousing is active, clicking in the active window will set several user
@@ -1985,7 +2019,7 @@ data formats.  See `splot` for details.
 @node Start-up, Substitution, Plotting, gnuplot
 @section Start-up
 
-^ <a name="start-up"></a>
+@c ^ <a name="start-up"></a>
 @cindex startup
 
 @cindex start
@@ -2130,8 +2164,8 @@ Back-quotes are used to enclose system commands for substitution.
 @node Time/Date_data,  , Syntax, gnuplot
 @section Time/Date data
 
-^ <a name="Time/Date data"></a>
-^ <a name="Time/date"></a>
+@c ^ <a name="Time/Date data"></a>
+@c ^ <a name="Time/date"></a>
 @cindex time/date
 
 `gnuplot` supports the use of time and/or date information as input data.
@@ -4552,7 +4586,7 @@ unchanged: the terminal set with `set term`, the output file set with @ref{outpu
 @node save, set-show, reset, Commands
 @section save
 
-^ <a name="save set"></a>
+@c ^ <a name="save set"></a>
 @c ?commands save
 @cindex save
 @cmindex save
@@ -6080,10 +6114,11 @@ Valid values are
                  known in the PostScript world as 'ISO-Latin1'.
    iso_8859_2  - used in Central and Eastern Europe
    iso_8859_15 - a variant of iso_8859_1 that includes the Euro symbol
-   cp850       - codepage for OS/2
-   cp852       - codepage for OS/2
-   cp437       - codepage for MS-DOS
    koi8r       - popular Unix cyrillic encoding
+   cp437       - codepage for MS-DOS
+   cp850       - codepage for OS/2, Western Europe
+   cp852       - codepage for OS/2, Central and Eastern Europe
+   cp1250      - codepage for MS Windows, Central and Eastern Europe
 
 @end example
 
@@ -6219,7 +6254,7 @@ Syntax:
 where <axes> is either `x`, `y`, `z`, `cb`, `xy`, `x2`, `y2` or nothing (which is
 the same as `xy`).  The length of the string representing a tic mark (after
 formatting with 'printf') is restricted to 100 characters.  If the format
-string is omitted, the format will be returned to the default "%g".  For
+string is omitted, the format will be returned to the default "% g".  For
 LaTeX users, the format "$%g$" is often desirable.  If the empty string "" is
 used, no label will be plotted with each tic, though the tic mark will still
 be plotted.  To eliminate all tic marks, use @ref{xtics} or @ref{ytics}.
@@ -6227,7 +6262,7 @@ be plotted.  To eliminate all tic marks, use @ref{xtics} or @ref{ytics}.
 Newline (\n) is accepted in the format string.  Use double-quotes rather than
 single-quotes to enable such interpretation.  See also `syntax`.
 
-The default format for both axes is "%g", but other formats such as "%.2f" or
+The default format for both axes is "% g", but other formats such as "%.2f" or
 "%3.0em" are often desirable.  Anything accepted by 'printf' when given a
 double precision number, and accepted by the terminal, will work.  Some other
 options have been added.  If the format string looks like a floating point
@@ -6286,7 +6321,9 @@ format reverts to exponential.
 
 Other acceptable modifiers (which come after the "%" but before the format
 specifier) are "-", which left-justifies the number; "+", which forces all
-numbers to be explicitly signed; "#", which places a decimal point after
+numbers to be explicitly signed; " " (a space), which makes positive numbers
+have a space in front of them where negative numbers have "-";
+"#", which places a decimal point after
 floats that have only zeroes following the decimal point; a positive integer,
 which defines the field width; "0" (the digit, not the letter) immediately
 preceding the field width, which indicates that leading zeroes are to be used
@@ -8080,20 +8117,26 @@ z-coordinate of the 4 corners of surface quadrangles into the range
 as the gray for gray maps. The color map requires a transformation gray -->
 (R,G,B), i.e. a mapping [0:1] --> ([0:1],[0:1],[0:1]).
 
-Basically two different types of mappings can be used:  Analytic formulae
-to convert gray to color, or discrete mapping tables which are interpolated.
-@ref{rgbformulae} and `functions` use analytic formulae whereas `defined` and
-@ref{file} use interpolated tables.  @ref{rgbformulae} reduces the size of postscript
-output to a minimum.
+Basically two different types of mappings can be used:  Analytic formulae to
+convert gray to color, or discrete mapping tables which are interpolated.
+@ref{rgbformulae} and `palette functions` use analytic formulae whereas
+`palette defined` and @ref{file} use interpolated tables.  @ref{rgbformulae} reduces the size of postscript output to a minimum.
 
 The command `show palette fit2rgbformulae` finds the best matching @ref{rgbformulae} for the current @ref{palette}. Naturally, it makes sense
 to use it for non-rgbformulae palettes. This command can be found useful
 mainly for external programs using the same rgbformulae definition of palettes
-as gnuplot, like zimg.
+as gnuplot, like zimg (
+@uref{http://zimg.sourceforge.net,http://zimg.sourceforge.net
+}
+@example
+ ).
 
-`set palette gray` switches to a gray only palette.  @ref{rgbformulae}, `defined`,
-@ref{file} and `functions` switch to a color mapping.  `set palette color` is an
-easy way to switch back from the gray palette to the last color mapping.
+@end example
+
+`set palette gray` switches to a gray only palette. @ref{rgbformulae},
+`set palette defined`, @ref{file} and `set palette functions` switch
+to a color mapping. `set palette color` is an easy way to switch back from the
+gray palette to the last color mapping.
 
 Automatic gamma correction via `set palette gamma <gamma>` can be done for
 gray maps only (`set palette gray`).  Linear mapping to gray is for gamma
@@ -8109,12 +8152,13 @@ steps, thus to emulate filled contours. Default value of 0 stays for
 allocating all remaining entries in the terminal palette or for to use exact
 mapping to RGB.
 
-RGB color space might not be the most useful color space to work in.  For
-that reason you may change the color space with `model` to one of `RGB`,
-`HSV`, `CMY`, `YIQ` and `XYZ`.  Using color names for `defined` tables and a
-color space other than RGB will result in funny colors.  All explanation have
-been written for RGB color space, so please note, that `R` can be `H`, `C`,
-`Y`, or `X`, depending on the actual color space (`G` and `B` accordingly).
+RGB color space might not be the most useful color space to work in.  For that
+reason you may change the color space with `model` to one of `RGB`, `HSV`,
+`CMY`, `YIQ` and `XYZ`.  Using color names for `set palette defined` tables
+and a color space other than RGB will result in funny colors.  All explanation
+have been written for RGB color space, so please note, that `R` can be `H`,
+`C`, `Y`, or `X`, depending on the actual color space (`G` and `B`
+accordingly).
 
 All values for all color spaces are limited to [0,1].
 
@@ -8178,8 +8222,8 @@ Please note that even if called @ref{rgbformulae} the formulas might actually
 determine the <H>,<S>,<V> or <X>,<Y>,<Z> or ... color components as usual.
 
 Use `positive` and `negative` to invert the figure colors.
-^ <a name="positive"></a>
-^ <a name="negative"></a>
+@c ^ <a name="positive"></a>
+@c ^ <a name="negative"></a>
 
 Note that it is possible to find a set of the best matching rgbformulae for any
 other color scheme by the command
@@ -8194,11 +8238,7 @@ other color scheme by the command
 @c ?commands set palette defined
 @c ?set palette defined
 @c ?palette defined
-@cindex defined
-@findex defined
-
-
-Gray-to-rgb mapping can be manually set by use of `defined`:  A color gradient
+Gray-to-rgb mapping can be manually set by use of `palette defined`:  A color gradient
 is defined and used to give the rgb values.  Such a  gradient is a piecewise
 linear mapping from gray values in [0,1] to the RGB space [0,1]x[0,1]x[0,1].
 You have to specify the gray values and the corresponding RGB values in
@@ -8326,8 +8366,6 @@ A gamma-corrected black and white palette
 @c ?commands set palette file
 @c ?set palette file
 @c ?palette file
-@cindex file
-
 @ref{file} is basically a `set palette defined (<gradient>)` where
 <gradient> is read from a datafile.  Either 4 columns (gray,R,G,B) or
 just three columns (R,G,B) have to be selected via the @ref{using} data file
@@ -8720,7 +8758,7 @@ See also
 
 @c ?set style
 @c ?show style
-^ <a name="set style <style>"></a>
+@c ^ <a name="set style <style>"></a>
 Default plotting styles are chosen with the `set style data` and 
 `set style function` commands.  See @ref{with} for information about how to
 override the default plotting style for individual functions and data sets.
@@ -8766,8 +8804,8 @@ Syntax:
 @c ?show style arrow
 @cindex arrowstyle
 
-^ <a name="arrowtype"></a>
-^ <a name="arrowwidth"></a>
+@c ^ <a name="arrowtype"></a>
+@c ^ <a name="arrowwidth"></a>
 Each terminal has a default set of arrow and point types, which can be seen
 by using the command @ref{test}.  @ref{arrow} defines a set of arrow types
 and widths and point types and sizes so that you can refer to them later by
@@ -8941,8 +8979,8 @@ style.
 @c ?show style line
 @cindex linestyle
 
-^ <a name="linetype"></a>
-^ <a name="linewidth"></a>
+@c ^ <a name="linetype"></a>
+@c ^ <a name="linewidth"></a>
 Each terminal has a default set of line and point types, which can be seen
 by using the command @ref{test}.  `set style line` defines a set of line types
 and widths and point types and sizes so that you can refer to them later by
