@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util.c,v 1.50 2004/10/26 04:31:12 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: util.c,v 1.51 2005/01/12 00:05:42 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - util.c */
@@ -56,6 +56,9 @@ static char *RCSid() { return RCSid("$Id: util.c,v 1.50 2004/10/26 04:31:12 sfea
 # include <pwd.h>
 #elif defined(_Windows)
 # include <windows.h>
+# if !defined(INFO_BUFFER_SIZE)
+#  define INFO_BUFFER_SIZE 32767
+# endif
 #endif
 
 /* Exported (set-table) variables */
@@ -1137,7 +1140,7 @@ getusername ()
     if (username) {
 	DWORD bufCharCount = INFO_BUFFER_SIZE;
 	fullname = gp_alloc(INFO_BUFFER_SIZE + 1,"getusername");
-	if (!GetUserName(fullname,bufCharCount)) {
+	if (!GetUserName(fullname,&bufCharCount)) {
 	    free(fullname);
 	    fullname = NULL;
 	}

@@ -1,3 +1,7 @@
+2004-01-19  Dietmar Warning  <warning@danalyse.de>
+
+	* src/util.c: Correct the GetUserName call for windows.
+
 2005-01-11  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* term/tgif.trm: Fix two bugs related to font handling.
