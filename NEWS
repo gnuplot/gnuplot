@@ -1,11 +1,15 @@
 Changes in release 3.7.1:
 [3.7.0.7]
-* fixed timestamp positioning problem in X11 terminal
-* exit/quit in batch files now works as documented
+* FIXED timestamp positioning problem in X11 terminal
+* FIXED exit/quit in batch files now works as documented
 * no more fixed limit to the number of contour leves,
   now allocated dynamically
 * improvements in the OS/2 mouse driver
 * backtic command substitution now works inside quoted strings
+* NEW driver for metapost output
+* NEW driver for openstep/MacOS X Server
+* NEW perltk driver integrated into tkcanvas driver
+* NEW loadpath feature, uses GNUPLOT_LIB env var
 * CHANGE in command line substitution:
   Newlines in the output produced by the spawned command are
   stripped. They are NOT replaced with blanks anymore. This is

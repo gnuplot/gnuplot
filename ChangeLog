@@ -1,3 +1,32 @@
+1999-05-27  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* Makefile.in, aclocal.m4, config.hin, configure, m4/Makefile.am,
+	m4/Makefile.in, src/makefile.all, term/Makefile.am, term/Makefile.in:
+	Regenerated.
+
+	* configure.in: Replace unconditional addition of "-lm" to LIBS
+	with test for sin in math lib.
+
+	* term/gif.trm: Change contributor email address.
+
+1999-05-27  Leigh Smith  <leigh@tomandandy.com>
+
+	* m4/apple.m4, term/openstep.trm: New files for MacOS X Server port.
+
+	* configure.in, src/Makefile.in, src/term.h: Patch for MacOS X
+	Server port.
+
+1999-05-26  "Jürgen v.Hagen"  <vonhagen@ihefiji.etec.uni-karlsruhe.de>
+
+	* docs/gnuplot.doc: Minor correction for set arrow front/back.
+
+1999-05-20  "Mark K. Gardner"  <mkgardne@rtsl3.cs.uiuc.edu>
+
+	* docs/gnuplot.doc, src/graph3d.c, src/graphics.c, src/hidden3d.c,
+	src/misc.c, src/plot.h, src/plot2d.c, src/set.c, src/show.c:
+	Implementation of "errorlines", "xerrorlines", "yerrorlines", and
+	"xyerrorlines" styles.
+
 1999-05-20  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* config/makefile.os2: Add HAVE_UNISTD_H to EMXSPECIFIC.
@@ -33,7 +62,7 @@
 
 	* term/Makefile.am, term/Makefile.in: Add metapost.trm.
 
-1999-04-29  "Daniel H. Luecking"  <luecking@comp.uark.edu>
+1999-05-15  "Daniel H. Luecking"  <luecking@comp.uark.edu>
 
 	* term/metapost.trm: New gnuplot driver for metapost output.
 
