@@ -27,9 +27,6 @@
 /* Define if the X Window System is missing or not being used.  */
 /* #undef X_DISPLAY_MISSING */
 
-/* Define to `long' if <sys/types.h> doesn't define.  */
-/* #undef time_t */
-
 /* Define if you have the atexit function.  */
 #define HAVE_ATEXIT 1
 

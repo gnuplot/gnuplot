@@ -1,5 +1,5 @@
 /*
- * $Id: stdfn.h,v 1.21 2002/02/25 03:10:41 broeker Exp $
+ * $Id: stdfn.h,v 1.22 2002/03/07 16:22:37 lhecking Exp $
  */
 
 /* GNUPLOT - stdfn.h */
@@ -253,12 +253,13 @@ extern char *sys_errlist[];
 # endif /* HAVE_VALUES_H */
 #endif /* HAVE_LIMITS_H */
 
-#ifndef HAVE_TIME_H
-# ifndef time_t /* should be #defined by config.h, then... */
-#  define time_t long
-# endif
-#else
-# include <time.h> /* ctime etc, should also define time_t and struct tm */
+/* ctime etc, should also define time_t and struct tm */
+#ifdef HAVE_TIME_H
+# include <time.h>
+#endif
+
+#ifndef HAVE_TIME_T_IN_TIME_H
+# define time_t long
 #endif
 
 #if defined(PIPES) && (defined(VMS) || (defined(OSK) && defined(_ANSI_EXT))) || defined(PIPES) && defined(AMIGA_SC_6_1)
