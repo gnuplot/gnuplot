@@ -98,6 +98,8 @@ vga_modeinfo *modeinfo;
 static int linux_startx, linux_starty, linux_lasty;
 static int linux_angle;
 int LINUX_graphics_allowed;
+extern void drop_privilege();
+extern void take_privilege();
 
 typedef (*linux_line_func_ptr) __PROTO((int x1, int y1, int x2, int y2));
 
@@ -129,7 +131,9 @@ void LINUX_setup(void)
 	    LINUX_graphics_allowed = TRUE;
     }
     if (LINUX_graphics_allowed) {
+	take_privilege();
 	vga_init();
+	drop_privilege();
     } else {
 	/* err - shouldn't we give up root uid whatever happens ?
 	 * or perhaps vga_init() does it ?
