@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.111 2004/09/01 15:53:47 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.112 2004/09/07 19:44:34 sfeam Exp $"); }
 #endif
 
 #define X11_POLYLINE 1
@@ -4018,8 +4018,6 @@ static void
 process_configure_notify_event(XEvent *event)
 {
     plot_struct *plot;
-    KeySym keysym;
-    char key_sequence[8];
 #if 0
     fprintf(stderr, "Event 0x%x\n", event->type);
 #endif
@@ -4153,7 +4151,7 @@ process_event(XEvent *event)
 		}
 		return;
 	    case 'm': /* Toggle mouse display, but only if we control the window here */
-		if (plot != current_plot && (!modifier_mask)
+		if (((plot != current_plot) && (!modifier_mask))
 #ifdef PIPE_IPC
 		    || pipe_died
 #endif
