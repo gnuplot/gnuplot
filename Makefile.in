@@ -228,6 +228,7 @@ CORETERM = $(T)aed.trm $(T)ai.trm $(T)amiga.trm $(T)apollo.trm \
 	   $(T)tek.trm $(T)texdraw.trm $(T)tgif.trm $(T)tkcanvas.trm \
 	   $(T)tpic.trm $(T)unixpc.trm $(T)unixplot.trm $(T)v384.trm \
 	   $(T)vws.trm $(T)win.trm $(T)x11.trm $(T)xlib.trm
+
 CSOURCE8 = bf_test.c gplt_x11.c
 
 NEXTSRC  = $(N)Controller.h $(N)Controller.m $(N)GnuTerm.iconheader \
@@ -241,7 +242,7 @@ NEXTSRC  = $(N)Controller.h $(N)Controller.m $(N)GnuTerm.iconheader \
 	   $(N)English.lproj/gnuview.nib/bigger.tiff \
 	   $(N)English.lproj/gnuview.nib/data.classes \
 	   $(N)English.lproj/gnuview.nib/data.nib \
-	   $(N)English.lproj/gnuview.nib/smaller.tiff \
+	   $(N)English.lproj/gnuview.nib/smaller.tiff
 
 OS2SRC = $(P)dialogs.c $(P)dialogs.h $(P)gclient.c $(P)gnuplot.ico \
 	 $(P)gnupmdrv.c $(P)gnupmdrv.def $(P)gnupmdrv.h $(P)gnupmdrv.ipf \
