@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.150 2002/12/13 20:12:57 mikulik Exp $
+C RCS $Id: gnuplot.doc,v 1.151 2002/12/13 20:47:35 mikulik Exp $
 C 18 September 2001
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001   Thomas Williams, Colin Kelley et al.
 C
@@ -8499,7 +8499,7 @@ C ... and restart the table:
            http://www.gnuplot.info
 ^ </a>
 
- Please e-mail any bugs to bug-gnuplot mailinglist (see `Seeking-assistance`)
+ Please e-mail any bugs to bug-gnuplot mailing list (see `Seeking-assistance`).
 
 2 Old_bugs
 ?old_bugs
