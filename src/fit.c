@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.15 1999/09/14 15:25:05 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.16 1999/10/01 14:54:30 lhecking Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -62,10 +62,17 @@ static char *RCSid() { return RCSid("$Id: fit.c,v 1.15 1999/09/14 15:25:05 lheck
 #include <signal.h>
 
 #include "plot.h"
-#include "matrix.h"
-#include "fit.h"
-#include "setshow.h"		/* for load_range */
 #include "alloc.h"
+#include "command.h"
+#include "datafile.h"
+#include "eval.h"
+#include "fit.h"
+#include "graphics.h"
+#include "matrix.h"
+#include "misc.h"
+#include "parse.h"
+#include "setshow.h"
+#include "util.h"
 
 /* Just temporary */
 #if defined(VA_START) && defined(ANSI_C)
@@ -683,22 +690,22 @@ double a[];
     /* compute errors in the parameters */
 
     if (num_data == num_params) {
-	int i;
+	int k;
 
 	Dblf("\nExactly as many data points as there are parameters.\n");
 	Dblf("In this degenerate case, all errors are zero by definition.\n\n");
 	Dblf("Final set of parameters \n");
 	Dblf("======================= \n\n");
-	for (i = 0; i < num_params; i++)
-	    Dblf3("%-15.15s = %-15g\n", par_name[i], a[i]);
+	for (k = 0; k < num_params; k++)
+	    Dblf3("%-15.15s = %-15g\n", par_name[k], a[k]);
     } else if (chisq < NEARLY_ZERO) {
-	int i;
+	int k;
 
 	Dblf("\nHmmmm.... Sum of squared residuals is zero. Can't compute errors.\n\n");
 	Dblf("Final set of parameters \n");
 	Dblf("======================= \n\n");
-	for (i = 0; i < num_params; i++)
-	    Dblf3("%-15.15s = %-15g\n", par_name[i], a[i]);
+	for (k = 0; k < num_params; k++)
+	    Dblf3("%-15.15s = %-15g\n", par_name[k], a[k]);
     } else {
 	Dblf2("degrees of freedom (ndf) : %d\n", num_data - num_params);
 	Dblf2("rms of residuals      (stdfit) = sqrt(WSSR/ndf)      : %g\n", sqrt(chisq /

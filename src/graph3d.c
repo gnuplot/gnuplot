@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.15 1999/10/01 14:54:31 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.16 1999/10/21 21:05:18 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -51,9 +51,15 @@ static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.15 1999/10/01 14:54:31 l
  */
 
 #include "plot.h"
-#include "graph3d.h"		/* HBB 990826: new file */
+#include "alloc.h"
+#include "graph3d.h"
+#include "graphics.h"
 #include "hidden3d.h"
+#include "misc.h"
 #include "setshow.h"
+#include "term_api.h"
+#include "util.h"
+#include "util3d.h"
 
 static int p_height;
 static int p_width;		/* pointsize * t->h_tic */
@@ -235,7 +241,7 @@ struct lp_style_type style;
 }
 
 /* And the functions to map from user 3D space to terminal coordinates */
-void
+static void
 map3d_xy(x, y, z, xt, yt)
 double x, y, z;
 unsigned int *xt, *yt;
@@ -1003,8 +1009,8 @@ static void
 plot3d_impulses(plot)
 struct surface_points *plot;
 {
-    int i;			/* point index */
-    unsigned int x, y, x0, y0;	/* point in terminal coordinates */
+    int i;				/* point index */
+    unsigned int x, y, xx0, yy0;	/* point in terminal coordinates */
     struct iso_curve *icrvs = plot->iso_crvs;
 
     while (icrvs) {
@@ -1017,14 +1023,14 @@ struct surface_points *plot;
 		    map3d_xy(points[i].x, points[i].y, points[i].z, &x, &y);
 
 		    if (inrange(0.0, min3d_z, max3d_z)) {
-			map3d_xy(points[i].x, points[i].y, 0.0, &x0, &y0);
+			map3d_xy(points[i].x, points[i].y, 0.0, &xx0, &yy0);
 		    } else if (inrange(min3d_z, 0.0, points[i].z)) {
-			map3d_xy(points[i].x, points[i].y, min3d_z, &x0, &y0);
+			map3d_xy(points[i].x, points[i].y, min3d_z, &xx0, &yy0);
 		    } else {
-			map3d_xy(points[i].x, points[i].y, max3d_z, &x0, &y0);
+			map3d_xy(points[i].x, points[i].y, max3d_z, &xx0, &yy0);
 		    }
 
-		    clip_move(x0, y0);
+		    clip_move(xx0, yy0);
 		    clip_vector(x, y);
 
 		    break;
@@ -1037,7 +1043,7 @@ struct surface_points *plot;
 
 		    if (inrange(0.0, min3d_z, max3d_z)) {
 			/* zero point is INRANGE */
-			map3d_xy(points[i].x, points[i].y, 0.0, &x0, &y0);
+			map3d_xy(points[i].x, points[i].y, 0.0, &xx0, &yy0);
 
 			/* must cross z = min3d_z or max3d_z limits */
 			if (inrange(min3d_z, 0.0, points[i].z) &&
@@ -1052,14 +1058,14 @@ struct surface_points *plot;
 			    inrange(max3d_z, 0.0, points[i].z)) {
 			    /* crosses z = min3d_z or max3d_z limits */
 			    map3d_xy(points[i].x, points[i].y, max3d_z, &x, &y);
-			    map3d_xy(points[i].x, points[i].y, min3d_z, &x0, &y0);
+			    map3d_xy(points[i].x, points[i].y, min3d_z, &xx0, &yy0);
 			} else {
 			    /* doesn't cross z = min3d_z or max3d_z limits */
 			    break;
 			}
 		    }
 
-		    clip_move(x0, y0);
+		    clip_move(xx0, yy0);
 		    clip_vector(x, y);
 
 		    break;
@@ -1087,7 +1093,7 @@ plot3d_lines(plot)
 struct surface_points *plot;
 {
     int i;
-    unsigned int x, y, x0, y0;	/* point in terminal coordinates */
+    unsigned int x, y, xx0, yy0;	/* point in terminal coordinates */
     double clip_x, clip_y, clip_z;
     struct iso_curve *icrvs = plot->iso_crvs;
     struct coordinate GPHUGE *points;
@@ -1122,9 +1128,9 @@ struct surface_points *plot;
 				 */
 				edge3d_intersect(points, i, &clip_x, &clip_y, &clip_z);
 
-				map3d_xy(clip_x, clip_y, clip_z, &x0, &y0);
+				map3d_xy(clip_x, clip_y, clip_z, &xx0, &yy0);
 
-				clip_move(x0, y0);
+				clip_move(xx0, yy0);
 				clip_vector(x, y);
 			    }
 			} else {
@@ -1145,9 +1151,9 @@ struct surface_points *plot;
 
 			    edge3d_intersect(points, i, &clip_x, &clip_y, &clip_z);
 
-			    map3d_xy(clip_x, clip_y, clip_z, &x0, &y0);
+			    map3d_xy(clip_x, clip_y, clip_z, &xx0, &yy0);
 
-			    clip_vector(x0, y0);
+			    clip_vector(xx0, yy0);
 			}
 		    } else if (prev == OUTRANGE) {
 			/* from outrange to outrange */
@@ -1160,10 +1166,10 @@ struct surface_points *plot;
 
 				map3d_xy(lx[0], ly[0], lz[0], &x, &y);
 
-				map3d_xy(lx[1], ly[1], lz[1], &x0, &y0);
+				map3d_xy(lx[1], ly[1], lz[1], &xx0, &yy0);
 
 				clip_move(x, y);
-				clip_vector(x0, y0);
+				clip_vector(xx0, yy0);
 			    }
 			}
 		    }
@@ -1247,17 +1253,17 @@ cntr3d_impulses(cntr, plot)
 struct gnuplot_contours *cntr;
 struct surface_points *plot;
 {
-    int i;			/* point index */
-    unsigned int x, y, x0, y0;	/* point in terminal coordinates */
+    int i;				/* point index */
+    unsigned int x, y, xx0, yy0;	/* point in terminal coordinates */
 
     if (draw_contour & CONTOUR_SRF) {
 	for (i = 0; i < cntr->num_pts; i++) {
 	    map3d_xy(cntr->coords[i].x, cntr->coords[i].y, cntr->coords[i].z,
 		     &x, &y);
 	    map3d_xy(cntr->coords[i].x, cntr->coords[i].y, base_z,
-		     &x0, &y0);
+		     &xx0, &yy0);
 
-	    clip_move(x0, y0);
+	    clip_move(xx0, yy0);
 	    clip_vector(x, y);
 	}
     } else {
