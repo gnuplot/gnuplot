@@ -207,7 +207,8 @@ AC_TYPE_SIZE_T
 AC_MSG_CHECKING(for time_t in time.h)
 AC_EGREP_HEADER(time_t,time.h,dnl
   [ ac_cv_type_time_t=yes; AC_MSG_RESULT(yes) ],dnl
-  [ AC_MSG_RESULT(no) AC_CHECK_TYPE(time_t, long)])
+  AC_MSG_RESULT(no)
+  AC_CHECK_TYPE(time_t, long))
 AC_TYPE_SIGNAL
  
 
