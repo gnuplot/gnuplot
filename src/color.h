@@ -1,5 +1,5 @@
 /*
- * $Id: color.h,v 1.11 2002/08/20 16:50:14 mikulik Exp $
+ * $Id: color.h,v 1.12 2002/08/30 18:45:45 mikulik Exp $
  */
 
 /* GNUPLOT - color.h */
@@ -56,13 +56,18 @@ typedef struct {
     double r, g, b;
 } rgb_color;
 
+/* Contains a colour in RGB scheme.
+   Values of  r, g and b  are uchars in range [0;255] */
+typedef struct {
+    unsigned char r, g, b;
+} rgb255_color;
+
 #ifdef EXTENDED_COLOR_SPECS
 typedef struct {
     double gray;
     /* to be extended */
 } colorspec_t;
 #endif
-
 
 /* a point (with integer coordinates) for use in polygon drawing */
 typedef struct {

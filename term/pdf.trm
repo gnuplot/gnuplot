@@ -1,5 +1,5 @@
 /*
- * $Id: pdf.trm,v 1.23 2003/05/03 02:47:16 sfeam Exp $
+ * $Id: pdf.trm,v 1.24 2003/11/06 23:43:05 sfeam Exp $
  */
 
 /*------------------------------
@@ -1115,7 +1115,7 @@ PDF_set_color(double gray)
     }
 
 
-    color_from_gray( gray, &color );
+    rgb1_from_gray( gray, &color );
 
     /* make sure that the path is stroked with the current color
      * before changing the color */

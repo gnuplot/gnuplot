@@ -1,3 +1,12 @@
+2003-11-13  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* src/color.h src/color.c src/getcolor.h src/getcolor.c src/gplt_x11.c
+	src/show.c src/win/wgraph.c term/metapost.trm term/pdf.trm term/svg.trm:
+	- New structure rgb255_color for uchar r,g,b.
+	- Renamed color_from_gray() to rgb1_from_gray().
+	- Renamed rgb_from_gray() to rgb255_from_gray().
+	- New routine rgb255_from_rgb1().
+
 2003-11-10  Ethan Merritt <merritt@u.washington.edu>
 
 	* src/color.c: Don't try to set color of non-supporting terminals.

@@ -1,5 +1,5 @@
 /*
- * $Id: metapost.trm,v 1.21 2002/08/30 20:18:25 sfeam Exp $
+ * $Id: metapost.trm,v 1.22 2003/02/18 16:38:13 broeker Exp $
  */
 
 /* GNUPLOT - metapost.trm */
@@ -839,7 +839,7 @@ MP_set_color(double gray)
 	fprintf(gpoutfile, "currentcolor:=%.3gwhite;\n", gray);
     } else {			/* color mode */
         rgb_color color;
-	color_from_gray( gray, &color );
+	rgb1_from_gray( gray, &color );
 	if (color.r < 1e-4) color.r = 0;
 	if (color.g < 1e-4) color.g = 0;
 	if (color.b < 1e-4) color.b = 0;

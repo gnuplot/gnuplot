@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.69 2003/09/08 12:56:00 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.70 2003/10/31 10:13:09 mikulik Exp $"); }
 #endif
 
 #define X11_POLYLINE 1
@@ -2535,10 +2535,10 @@ PaletteMake(plot_struct * plot, t_sm_palette * tpal)
 
 	    double gray = (double) plot->cmap->allocated * fact;
 	    rgb_color color;
-	    color_from_gray( gray, &color );
-	    xcolor.red = 0xffff * color.r;
-	    xcolor.green = 0xffff * color.g;
-	    xcolor.blue = 0xffff * color.b;
+	    rgb1_from_gray( gray, &color );
+	    xcolor.red = 0xffff * color.r + 0.5;
+	    xcolor.green = 0xffff * color.g + 0.5;
+	    xcolor.blue = 0xffff * color.b + 0.5;
 	    
 	    if (XAllocColor(dpy, plot->cmap->colormap, &xcolor)) {
 		plot->cmap->pixels[plot->cmap->allocated] = xcolor.pixel;

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: color.c,v 1.39 2003/01/22 08:47:55 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: color.c,v 1.40 2003/11/11 06:07:41 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - color.c */
@@ -163,7 +163,7 @@ make_palette(void)
     /*  fill sm_palette.color[]  */
     for (i = 0; i < sm_palette.colors; i++) {
 	gray = (double) i / (sm_palette.colors - 1);	/* rescale to [0;1] */
-	color_from_gray( gray, &(sm_palette.color[i]) );
+	rgb1_from_gray( gray, &(sm_palette.color[i]) );
     }
     
     /* let the terminal make the palette from the supplied RGB triplets */

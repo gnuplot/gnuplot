@@ -1,5 +1,5 @@
 /*
- * $Id: svg.trm,v 1.24 2003/05/17 19:15:10 mikulik Exp $
+ * $Id: svg.trm,v 1.25 2003/05/19 21:01:59 sfeam Exp $
  *
  */
 
@@ -927,7 +927,7 @@ SVG_make_palette(t_sm_palette *palette)
 TERM_PUBLIC void
 SVG_set_color(double gray)
 {
-    unsigned char red, green, blue;
+    rgb255_color rgb255;
 
     if (sm_palette.use_maxcolors != 0) {
         /* finite nb of colors explicitly requested */
@@ -939,17 +939,17 @@ SVG_set_color(double gray)
 	           / sm_palette.use_maxcolors;
     }
 
-    rgb_from_gray( gray, &red, &green, &blue );
+    rgb255_from_gray( gray, &rgb255 );
     SVG_use_pm3d_color = 1;
 
-    if (red != SVG_red || green != SVG_green || blue != SVG_blue) {
+    if (rgb255.r != SVG_red || rgb255.g != SVG_green || rgb255.b != SVG_blue) {
 	/* pm3d color has changed. We've to start a new path
 	 * with a different line color. This is necessary when
 	 * using "linetype palette". */
 	SVG_PathClose();
-	SVG_red = red;
-	SVG_green = green;
-	SVG_blue = blue;
+	SVG_red = rgb255.r;
+	SVG_green = rgb255.g;
+	SVG_blue = rgb255.b;
     }
 
     return;

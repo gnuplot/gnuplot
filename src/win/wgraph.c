@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.32 2003/04/24 21:38:53 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.33 2003/04/25 03:23:01 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - win/wgraph.c */
@@ -1019,7 +1019,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 	case W_pm3d_setcolor:
 	    {
 		double level = curptr->x / 256.0;
-		unsigned char R, G, B;
+		rgb255_color rgb255;
 		static HBRUSH last_pm3d_brush = NULL;
 		HBRUSH this_brush;
 		COLORREF c;
@@ -1034,8 +1034,8 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 		    }
 		}
 
-		rgb_from_gray( level, &R, &G, &B );
-		c = RGB(R,G,B);
+		rgb255_from_gray( level, &rgb255 );
+		c = RGB(rgb255.R, rgb255.G, rgb255.B);
 		this_brush = CreateSolidBrush(c);
 		SelectObject(hdc, this_brush);
 		if (last_pm3d_brush != NULL)

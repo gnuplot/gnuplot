@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.112 2003/07/23 23:58:53 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.113 2003/08/20 17:48:45 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -1942,7 +1942,7 @@ show_palette_fit2rgbformulae()
     currRGB = (rgb_color*)gp_alloc(pts * sizeof(rgb_color), "RGB pts");
     for (p = 0; p < pts; p++) {
 	gray = (double)p / (pts - 1);
-	color_from_gray(gray, &(currRGB[p]));
+	rgb1_from_gray(gray, &(currRGB[p]));
     }
     /* organize sequence of rgb formulae */
     formulaeSeq = gp_alloc((2*maxFormula+1) * sizeof(int), "formulaeSeq");
@@ -1999,7 +1999,8 @@ show_palette_palette()
     int colors, i;
     struct value a;
     double gray, r, g, b;
-    rgb_color color;
+    rgb_color rgb1;
+    rgb255_color rgb255;
 
     c_token++;
     if (END_OF_COMMAND)
@@ -2014,19 +2015,17 @@ show_palette_palette()
     for (i = 0; i < colors; i++) {
 	/* colours equidistantly from [0,1]  */
 	gray = (double)i / (colors - 1); 
-	if (sm_palette.positive == SMPAL_NEGATIVE) {
+	if (sm_palette.positive == SMPAL_NEGATIVE)
 	    /* needed, since printing without call to set_color()  */
-	    color_from_gray( 1 - gray , &color );
-	}
-	else
-	    color_from_gray( gray , &color );
-	r = color.r;  g = color.g;  b = color.b; 
+	    gray = 1 - gray;
+	rgb1_from_gray(gray, &rgb1);
+	rgb255_from_rgb1(rgb1, &rgb255);
 
 	fprintf( stderr, 
 		"%3i. gray=%0.4f, (r,g,b)=(%0.4f,%0.4f,%0.4f), #%02x%02x%02x = %3i %3i %3i\n",
-		i, gray, r,g,b,
-		(int)(255*r+.5),(int)(255*g+.5),(int)(255*b+.5),
-		(int)(255*r+.5),(int)(255*g+.5),(int)(255*b+.5)  );
+		i, gray, rgb1.r, rgb1.g, rgb1.b,
+		(int)rgb255.r, (int)rgb255.g, (int)rgb255.b,
+		(int)rgb255.r, (int)rgb255.g, (int)rgb255.b );
     }
 }
 
