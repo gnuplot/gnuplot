@@ -1,5 +1,5 @@
 /*
- * $Id: vws.trm,v 1.14 1998/04/14 00:18:14 drd Exp $
+ * $Id: vws.trm,v 1.7 1998/12/14 18:41:49 lhecking Exp $
  *
  */
 
@@ -257,7 +257,7 @@ if (ws_type >=  UIS$C_DEV_INTENSITY) {
   */
 
 /* lph: default value for the background index into the virtual color
-/* table is 0, and the back_attr block is never used
+ * table is 0, and the back_attr block is never used
  *
   uis$set_background_index(&vd_id, &default_attr, &back_attr, &i0);
  *
