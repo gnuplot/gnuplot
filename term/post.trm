@@ -1,5 +1,5 @@
 /*
- * $Id: post.trm,v 1.62 2002/07/04 15:58:04 mikulik Exp $
+ * $Id: post.trm,v 1.63 2002/07/04 16:37:00 mikulik Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -2097,6 +2097,11 @@ PS_relative_ok = FALSE; /* "M" required because "g" forces stroke */
 TERM_PUBLIC void PS_filled_polygon ( int points, gpiPoint *corners )
 {
     int i;
+    /* Needed to stroke the previous graphic element. */
+    if (PS_relative_ok == TRUE) {
+	fputs("stroke\n", gpoutfile);
+	PS_relative_ok = FALSE;
+    }	 
     /* produce lines like:
        9055 29350 N 695 0 V 0 564 V -695 0 h  ... for quadrangles
        9055 29350 N 695 0 V 0 564 f           ... otherwise
