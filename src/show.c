@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.88 2002/08/30 20:18:54 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.89 2002/09/02 21:03:25 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -1609,7 +1609,7 @@ int tag;			/* 0 means show all */
 		switch(this_label->textcolor.type) {
 		case TC_LT:   fprintf(stderr," lt %d", this_label->textcolor.lt+1); 
 			      break;
-		case TC_Z:    fprintf(stderr," palette z", this_label->textcolor.value);
+		case TC_Z:    fprintf(stderr," palette z");
 			      break;
 		case TC_CB:   fprintf(stderr," palette cb %g", this_label->textcolor.value);
 			      break;
