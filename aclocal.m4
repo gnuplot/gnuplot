@@ -248,16 +248,16 @@ AC_EGREP_CPP(yes,
   AC_DEFINE(DOS32, 1,
             [ Define if this system uses a 32-bit DOS extender (djgpp/emx). ])
   with_linux_vga=no
-  AC_CHECK_LIB(grx20,GrLine,dnl
+  AC_CHECK_LIB(grx20,GrLine,
     LIBS="-lgrx20 $LIBS"
     CFLAGS="$CFLAGS -fno-inline-functions"
     AC_DEFINE(DJSVGA, 1,
               [ Define if you want to use libgrx20 with MSDOS/djgpp. ])
-    AC_CHECK_LIB(grx20,GrCustomLine,dnl
+    AC_CHECK_LIB(grx20,GrCustomLine,
       AC_DEFINE(GRX21, 1,
                 [ Define if you want to use a newer version of libgrx under MSDOS/djgpp. ])dnl
     )dnl
-  ),dnl
+  ),
   AC_MSG_RESULT(no)
   )dnl 
 ])
@@ -274,7 +274,7 @@ AC_EGREP_CPP(yes,
 #endif
 ], AC_MSG_RESULT(yes)
    LIBS="$LIBS -lsys_s -lNeXT_s"
-   CFLAGS="$CFLAGS -ObjC",dnl
+   CFLAGS="$CFLAGS -ObjC",
    AC_MSG_RESULT(no))
 ])
 
@@ -286,27 +286,28 @@ AC_DEFUN(AC_FUNC_SELECT,
 if test "$ac_cv_func_select" = yes; then
   AC_CHECK_HEADERS(unistd.h sys/types.h sys/time.h sys/select.h sys/socket.h)
   AC_MSG_CHECKING([argument types of select()])
-  AC_CACHE_VAL(ac_cv_type_fd_set_size_t,dnl
-    [AC_CACHE_VAL(ac_cv_type_fd_set,dnl
+  AC_CACHE_VAL(ac_cv_type_fd_set_size_t,
+    [AC_CACHE_VAL(ac_cv_type_fd_set,
       [for ac_cv_type_fd_set in 'fd_set' 'int' 'void'; do
         for ac_cv_type_fd_set_size_t in 'int' 'size_t' 'unsigned long' 'unsigned'; do
 	  for ac_type_timeval in 'struct timeval' 'const struct timeval'; do
-            AC_TRY_COMPILE(dnl
+            AC_TRY_COMPILE(
 [#ifdef HAVE_SYS_TIME_H
-#include <sys/time.h>
+# include <sys/time.h>
 #endif
 #ifdef HAVE_SYS_TYPES_H
-#include <sys/types.h>
+# include <sys/types.h>
 #endif
 #ifdef HAVE_UNISTD_H
-#include <unistd.h>
+# include <unistd.h>
 #endif
 #ifdef HAVE_SYS_SELECT_H
-#include <sys/select.h>
+# include <sys/select.h>
 #endif
 #ifdef HAVE_SYS_SOCKET_H
-#include <sys/socket.h>
-#endif],
+# include <sys/socket.h>
+#endif
+],
 [#ifdef __STDC__
 extern int select ($ac_cv_type_fd_set_size_t, 
  $ac_cv_type_fd_set *,	$ac_cv_type_fd_set *, $ac_cv_type_fd_set *,
@@ -316,7 +317,8 @@ extern int select ();
   $ac_cv_type_fd_set_size_t s;
   $ac_cv_type_fd_set *p;
   $ac_type_timeval *t;
-#endif],
+#endif
+],
 [ac_found=yes ; break 3],ac_found=no)
           done
         done
@@ -329,39 +331,40 @@ extern int select ();
 
   AC_MSG_RESULT([select($ac_cv_type_fd_set_size_t,$ac_cv_type_fd_set *,...)])
   AC_DEFINE_UNQUOTED(fd_set_size_t, $ac_cv_type_fd_set_size_t,
-                     [ First arg for select(). ])
+                     [ First arg for select. ])
   ac_cast=
   if test "$ac_cv_type_fd_set" != fd_set; then
     # Arguments 2-4 are not fd_set.  Some weirdo systems use fd_set type for
     # FD_SET macros, but insist that you cast the argument to select.  I don't
     # understand why that might be, but it means we cannot define fd_set.
-    AC_EGREP_CPP(dnl
+    AC_EGREP_CPP(
 changequote(<<,>>)dnl
 <<(^|[^a-zA-Z_0-9])fd_set[^a-zA-Z_0-9]>>dnl
 changequote([,]),dnl
 [#ifdef HAVE_SYS_TIME_H
-#include <sys/time.h>
+# include <sys/time.h>
 #endif
 #ifdef HAVE_SYS_TYPES_H
-#include <sys/types.h>
+# include <sys/types.h>
 #endif
 #ifdef HAVE_UNISTD_H
-#include <unistd.h>
+# include <unistd.h>
 #endif
 #ifdef HAVE_SYS_SELECT_H
-#include <sys/select.h>
+# include <sys/select.h>
 #endif
 #ifdef HAVE_SYS_SOCKET_H
-#include <sys/socket.h>
-#endif],dnl
+# include <sys/socket.h>
+#endif
+],
     # We found fd_set type in a header, need special cast
     ac_cast="($ac_cv_type_fd_set *)",dnl
     # No fd_set type; it is safe to define it
     AC_DEFINE_UNQUOTED(fd_set,$ac_cv_type_fd_set,
-                       [ Define if the type in arguments 2-4 to select() is fd_set. ]))
+                       [ Define if the type in arguments 2-4 to select is fd_set. ]))
   fi
   AC_DEFINE_UNQUOTED(SELECT_FD_SET_CAST,$ac_cast,
-                     [ Define if the type in arguments 2-4 to select() is fd_set. ])
+                     [ Define if the type in arguments 2-4 to select is fd_set. ])
 fi
 ])
 
@@ -415,8 +418,10 @@ if test "$3" != yes && test "$3" != no; then
   gp_l_path=`echo "$3" | sed -e 's%/lib$1\.a$%%'`
   gp_l_prfx=`echo $gp_l_path | sed -e 's%/lib$%%' -e 's%/include$%%'`
   gp_l_list="$gp_l_prfx $gp_l_prfx/lib $gp_l_path"
+else
+  gp_l_list=''
 fi
-for ac_dir in $gp_l_list '' /usr/local/lib ; do
+for ac_dir in '' $gp_l_list /usr/local/lib ; do
   test x${ac_dir} != x && TERMLIBS="-L${ac_dir} $gp_save_TERMLIBS"
   GP_CHECK_LIB_QUIET($1,$2,$4)
   TERMLIBS="$gp_save_TERMLIBS"
@@ -457,7 +462,7 @@ if test "$2" != yes && test "$2" != no; then
 else
   gp_h_list=''
 fi
-for ac_dir in $gp_h_list '' /usr/local/include ; do
+for ac_dir in '' $gp_h_list /usr/local/include ; do
   test x${ac_dir} != x && CPPFLAGS="$gp_save_CPPFLAGS -I${ac_dir}"
   AC_TRY_CPP([#include <$1>], eval "ac_cv_header_$ac_safe=${ac_dir}",
     eval "ac_cv_header_$ac_safe=no")

@@ -216,13 +216,13 @@
 /*  Define if you do have the popen and pclose functions.  */
 #undef PIPES
 
-/*  First arg for select().  */
+/*  First arg for select.  */
 #undef fd_set_size_t
 
-/*  Define if the type in arguments 2-4 to select() is fd_set.  */
+/*  Define if the type in arguments 2-4 to select is fd_set.  */
 #undef fd_set
 
-/*  Define if the type in arguments 2-4 to select() is fd_set.  */
+/*  Define if the type in arguments 2-4 to select is fd_set.  */
 #undef SELECT_FD_SET_CAST
 
 /*  Define if this is a Linux system with SuperVGA library.  */
