@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: fig.trm,v 1.41 2004/04/13 17:24:31 broeker Exp $
+ * $Id: fig.trm,v 1.42 2004/07/01 17:10:13 broeker Exp $
  */
 
 /* GNUPLOT - fig.trm */
@@ -418,7 +418,8 @@ FIG_options()
 	    /* Skip the word and then expect the number ! */
 	    c_token++;
 	    if (END_OF_COMMAND) {
-		int_error(c_token, "max. points per polyline: number expected");
+		int_error(c_token,
+			  "max. points per polyline: number expected");
 	    } else {
 		temp_max = (long) real(const_express(&a));
 		/* Now check the range for the number */
@@ -426,7 +427,9 @@ FIG_options()
 		    /* OK. subtract one to the right number! See other numbers... */
 		    FIG_poly_vec_max = temp_max - 1;
 		} else {
-		    int_error(c_token, "pointsmax: number out of range (2,%ld)", (FIG_MAX_POINTS + 1));
+		    int_error(c_token,
+			      "pointsmax: number out of range (2,%ld)",
+			      (FIG_MAX_POINTS + 1));
 		}
 	    }
 	    break;
@@ -453,8 +456,7 @@ FIG_options()
 
     if( FIG_text_flags == FIG_TEXT_NORMAL ) {
         strcpy( text_flags, " textnormal" );
-    }
-    else {
+    } else {
         sprintf( text_flags, "%s%s%s",
                  (FIG_text_flags & FIG_TEXT_SPECIAL) ? " textspecial" : "",
                  (FIG_text_flags & FIG_TEXT_HIDDEN) ? " texthidden" : "",
@@ -591,7 +593,7 @@ FIG_init()
     /* Add further versions headers below (ULIG). There is probably more work to be done */
     /* than only changing the header in future xfig versions */
 
-    if( strcmp( FIG_version, "3.1" ) == 0 ) {
+    if( strcmp(FIG_version, "3.1") == 0 ) {
         fprintf( gpoutfile,
                  "#FIG 3.1\n%s\n%s\n%s\n%d %d\n",
                  FIG_ORIENT,
@@ -599,8 +601,7 @@ FIG_init()
                  FIG_UNIT,
                  FIG_IRES, FIG_COORD_SYS
                );
-    }
-    else if( strcmp( FIG_version, "3.2" ) == 0 ) {
+    } else if( strcmp(FIG_version, "3.2") == 0 ) {
         fprintf( gpoutfile,
                  "#FIG 3.2\n%s\n%s\n%s\n%s\n%6.2f\n%s\n%d\n%d %d\n",
                  FIG_ORIENT,
@@ -722,6 +723,7 @@ FIG_move(unsigned int x, unsigned int y)
 {
     int last_FIG_posx = FIG_posx;
     int last_FIG_posy = FIG_posy;
+
     FIG_posx = x;
     FIG_posy = y;
     if (FIG_posx != last_FIG_posx || FIG_posy != last_FIG_posy)
@@ -774,12 +776,13 @@ FIG_arrow(
 {
     int cap_style;
     double awidth, aheight;	/* arrow head sizes */
+
     FIG_poly_clean(FIG_polyvec_stat);
     cap_style = (FIG_line.style==DOTTED_LINE)? CAP_ROUND : FIG_line.cap_style;
     fprintf(gpoutfile, "%d %d %d %d %d %d %d %d %d %9.3f %d %d %d %d %d %d\n",
-	    O_POLYLINE, FIG_line.type, FIG_line.style, FIG_line.thickness,
-	    FIG_line.pen_color, FIG_line.fill_color, FIG_line.depth,
-	    FIG_line.pen_style, FIG_line.fill_style, FIG_line.style_val,
+	    O_POLYLINE, FIG_line.type, FIG_type, FIG_thickness,
+	    FIG_color, FIG_color, FIG_linedepth,
+	    FIG_line.pen_style, FIG_line.fill_style, FIG_spacing,
 	    FIG_line.join_style, cap_style, FIG_line.radius,
 	    head ? 1 : 0, head==2 ? 1 : 0, 2);
 
@@ -787,6 +790,7 @@ FIG_arrow(
     if (head) {
 	unsigned int headbackangleparameter = 0;
 	unsigned int headfillparameter = 0;
+
 	/* arrow head size */
 	if (curr_arrow_headlength==0) {
 	    awidth  = (double) (term->h_tic / 2 + 1);
@@ -795,6 +799,7 @@ FIG_arrow(
 	    awidth  = (double) curr_arrow_headlength * 2*sin(curr_arrow_headangle*M_PI/180);
 	    aheight = (double) curr_arrow_headlength * cos(curr_arrow_headangle*M_PI/180);
 	}
+
 	/* arrow head geometry */
 	if ( curr_arrow_headbackangle < 70 )
 	    headbackangleparameter = 2;

@@ -1,3 +1,9 @@
+2004-07-15  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* term/fig.trm (FIG_arrow): Use actual linetype variables rather
+	than those in FIG_line --- those are only set by FIG_vector, which
+	isn't being called by FIG_arrow.
+
 2004-07-13  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/show.c (show_version): Removed text about backwards
