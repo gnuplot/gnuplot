@@ -1,3 +1,9 @@
+2001-10-18  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+        * win/pgnuplot.c (cbGetTextWindow): Revert return value to behave
+        like the documentation of the EnumThreadWindows() Win32 API call
+        expects it.
+
 2001-10-11  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/graph3d.c (boundary) Add code to handle `set size square' or
