@@ -1,5 +1,51 @@
 2001-02-15  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
+	* src/win/wtext.h: Added #include <stdarg.h> needed to declare
+ 	va_list for prototypes.
+
+	* src/win/wgraph.c: Bracketed all mouse-specific within #ifdef
+ 	USE_MOUSE, as they should be. Removed some remains of the old
+ 	'numsolid' stuff.
+	(Wnd_exec_event): Pass message timestamp to gp_exec_event(),
+ 	replacing the fourth input parameter.
+	(WndGraphProc) [WM_MOUSEMOVE]: Rewrite and uncomment the Cursor
+ 	shape call. Also for the section used regardless of 'set mouse
+ 	off'.
+	(WndGraphProc) [WM_CHAR]: moved all the "special" keys into a new
+ 	WM_KEYDOWN case --- they don't generate WM_CHAR messages.
+	(WndGraphProc) [WM_KEYDOWN]: have all keys immediately call
+ 	Wnd_exec_event, so the default action can fall through to the
+ 	default handler.  Handled some open ends introduced by Petr.
+	(WndGraphProc) [WM_KEYDOWN]: Moved the modifier key status check
+ 	to before the individual keys, and translated it from OS/2 to
+ 	Windows API. Code #ifdef'ed out for now, because it doesn't work,
+ 	yet.
+
+	* src/win/ptrcross.cur, src/win/scaling.cur, src/win/rotating.cur:
+	New files.
+
+	* src/win/wgnuplib.rc: Added definition of new cursor resources
+	for interactive mousing by reference to files.
+
+	* src/mouse.c (event_buttonrelease): Fixed FPRINTF() debugging
+ 	call.
+
+	* src/graphics.c (plot_vectors): Removed GPHUGE attribute.
+
+	* src/dynarray.c (nextfrom_dynarray): Corrected position of GPHUGE
+ 	attribute of the returned type.
+
+	* src/dynarray.h (nextfrom_dynarray): Prototype updated.
+
+	* config/makefile.win (CFLAGS) [WIN32]: Added -DVFPRINTF,
+ 	-DWIN_IPC and -DUSE_MOUSE to the list of flags.
+	(CFLAGS, CAUXFLAGS) [!WIN32]: Added -DVFPRINTF.
+	(DLLOBJS): Added gpexecute.obj.
+	(wgnupl32.exe): Added gpexecute to list of input files.
+	(DLLCC): Added -DUSE_MOUSE and -DWIN_IPC
+
+2001-02-15  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
 	* src/axis.c (axis_position_zeroaxis): Fixed behaviour for
  	reversed axes if 0.0 is not inside the range.
 	

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: dynarray.c,v 1.7 2000/10/31 19:59:30 joze Exp $"); }
+static char *RCSid() { return RCSid("$Id: dynarray.c,v 1.8 2000/11/01 18:57:28 broeker Exp $"); }
 #endif
 
 /*[
@@ -103,7 +103,7 @@ extend_dynarray(array, increment)
 /* Get pointer to the element one past the current end of the dynamic
  * array. Resize it if necessary. Returns a pointer-to-void to that
  * element. */
-GPHUGE void *
+void GPHUGE *
 nextfrom_dynarray(array)
      dynarray *array;		/* the 'this' pointer */
 {

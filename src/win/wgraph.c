@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: wgraph.c,v 1.13 2001/02/10 16:25:11 mikulik Exp $";
+static char *RCSid = "$Id: wgraph.c,v 1.14 2001/02/10 17:12:53 mikulik Exp $";
 #endif
 
 /* GNUPLOT - win/wgraph.c */
@@ -599,6 +599,7 @@ SelFont(LPGW lpgw) {
 #endif
 }
 
+#ifdef USE_MOUSE
 /* ================================== */
 
 static void
@@ -622,7 +623,10 @@ DestroyCursors(LPGW lpgw)
 	/* CODEME */
 }
 
+#endif /* USE_MOUSE */
+
 /* ================================== */
+
 
 static void
 dot(HDC hdc, int xdash, int ydash)
@@ -642,7 +646,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 	int htic, vtic;
 	int hshift, vshift;
 	unsigned int lastop=-1;		/* used for plotting last point on a line */
-	int pen, numsolid;
+        int pen;
 	int polymax = 200;
 	int polyi = 0;
 	POINT *ppt;
@@ -680,8 +684,6 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 	pen = 0;
 	SelectObject(hdc, lpgw->hapen);
 	SelectObject(hdc, lpgw->colorbrush[pen+2]);
-
-	numsolid = lpgw->numsolid;
 
 	/* do the drawing */
 	blkptr = lpgw->gwopblk_head;
@@ -1083,7 +1085,6 @@ CopyPrint(LPGW lpgw)
 	HWND hwnd;
 	RECT rect;
 	PRINT pr;
-	UINT widabort;
 
 	hwnd = lpgw->hWndGraph;
 
@@ -1603,6 +1604,7 @@ LS ls;
 	return status;
 }
 
+#ifdef USE_MOUSE
 /* ================================== */
 /* HBB 20010207: new helper functions: wrapper around gp_exec_event
  * and DoZoombox. These may vanish again, as has the original idea I
@@ -1613,8 +1615,10 @@ Wnd_exec_event(LPGW lpgw, LPARAM lparam, char type, int par1, int par2)
 {
     int mx, my;
 
+    (void) par2;
+
     GetMousePosViewport(lpgw, &mx, &my);
-    gp_exec_event(type, mx, my, par1, par2);
+    gp_exec_event(type, mx, my, par1, GetMessageTime());
 }
 
 static void
@@ -1627,6 +1631,7 @@ Wnd_refresh_zoombox(LPGW lpgw, LPARAM lParam)
     zoombox.to.x = mx; zoombox.to.y = my;
     DrawZoomBox(lpgw); /*  draw new zoom box */
 }
+#endif /* USE_MOUSE */
 
 /* ================================== */
 
@@ -1647,12 +1652,10 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	if (mouse_setting.on /* AND NOT mouse_lock */ ) {
 		switch (message) {
 			case WM_MOUSEMOVE:
-#ifdef POINTERS_ie_ICONs_FOR_POINTERS__are_IMPLEMENTED /* @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ */
 #if 1
-				WinSetPointer( HWND_DESKTOP, hptrCurrent );
+				SetCursor(hptrCurrent );
 #else
-				WinSetPointer( HWND_DESKTOP, hptrCrossHair );
-#endif
+				SetCursor(hptrCrossHair );
 #endif
 				if (zoombox.on) {
 					Wnd_refresh_zoombox(lpgw, lParam);
@@ -1676,7 +1679,7 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 				return 0L;
 
 			case WM_LBUTTONDBLCLK:
-				Wnd_exec_event(lpgw, lParam,  GE_buttonrelease, 1, 0 ); /* Note: 9999 should be replaced by time! */
+				Wnd_exec_event(lpgw, lParam, GE_buttonrelease, 1, 9999 ); /* Note: 9999 should be replaced by time! */
 				return 0L;
 
 			case WM_RBUTTONDBLCLK:
@@ -1716,12 +1719,6 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 #endif /* USE_MOUSE */
 
 
-#if 0 /* @@@@@@@@@@@@@@@@ SHOULD BE ADDED BELOW: */
- 
-WM_MOUSEMOVE: set default pointer, i.e.:
-	WinSetPointer( HWND_DESKTOP, hptrDefault ); /* set default pointer */
-	return 0L;
-#endif
 
 	switch(message)
 	{
@@ -1753,6 +1750,8 @@ WM_MOUSEMOVE: set default pointer, i.e.:
 			}
 			break;
 		case WM_CHAR:
+			/* All 'normal' keys (letters, digits and the likes) end up
+			 * here... */
 			if (wParam == VK_SPACE) {
 				/* HBB 20001023: implement the '<space> in graph returns to
 				 * text window' --- feature already present in OS/2 and X11 */
@@ -1763,103 +1762,138 @@ WM_MOUSEMOVE: set default pointer, i.e.:
 				return 0;
 			}
 #ifdef USE_MOUSE
-			/* Remap virtual keys to gnuplot's codes. */
-/* I WONDER IF PRESSING F1 OR OTHER KEY: COMES REALLY HERE?????? @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ */
-			if (HIWORD(wParam))
+			Wnd_exec_event(lpgw, lParam, GE_keypress, (TCHAR)wParam, 0);
+#endif
+			return 0L;
+#ifdef USE_MOUSE
+		case WM_KEYDOWN:
+			/* "special" keys have to be caught from WM_KEYDOWN, as they
+			 * don't generate WM_CHAR messages. */
+			/* NB: It may not be possible to catch Alt-keys, this way */
+#if 0 /* try modifier handling? */
+			/* FIXME HBB 20010215: something's severely broken, here.
+			 * For some reason, the Mod_Ctrl bit in the modifier masks
+			 * is _always_ set. */
+			{
+				/* First, look for a change in modifier status */
+				static unsigned int last_modifier_mask = -99;
+				unsigned int modifier_mask = 0;
+				modifier_mask = ( GetKeyState(VK_SHIFT) ? Mod_Shift : 0 )
+					| ( GetKeyState(VK_CONTROL) ? Mod_Ctrl : 0)
+					| ( GetKeyState(VK_MENU) ? Mod_Alt : 0);
+				if (modifier_mask != last_modifier_mask) {
+					Wnd_exec_event ( lpgw, lParam, GE_modifier, modifier_mask, 0 );
+					last_modifier_mask = modifier_mask;
+				}
+#if 0
+				if (!(usFlag & KC_SCANCODE))
+					return 0L; /* only modifier mask has changed */
+				if (lParam & KF_UP)
+					return 0L;   /* ignore key release events? */
+#endif
+			}
+#endif /* try modifiers??? */
 			    switch (wParam) { 
 				case VK_BACK:
-					wParam = GP_BackSpace; break;
+				Wnd_exec_event(lpgw, lParam, GE_keypress, GP_BackSpace, 0);
+				break;
 				case VK_TAB:
-					wParam = GP_Tab; break;
+				Wnd_exec_event(lpgw, lParam, GE_keypress, GP_Tab, 0);
+				break;
 				case VK_RETURN:
-					wParam = GP_Return; break;
+				Wnd_exec_event(lpgw, lParam, GE_keypress, GP_Return, 0);
+				break;
 				case VK_PAUSE:
-					wParam = GP_Pause; break;
+				Wnd_exec_event(lpgw, lParam, GE_keypress, GP_Pause, 0);
+				break;
 				case VK_SCROLL:
-					wParam = GP_Scroll_Lock; break;
-#if HOW_IS_THIS_FOR_WINDOWS //??? @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+				Wnd_exec_event(lpgw, lParam, GE_keypress, GP_Scroll_Lock, 0);
+				break;
+#if 0 /* HOW_IS_THIS_FOR_WINDOWS */
+/* HBB 20010215: not at all, AFAICS... :-( */
 				case VK_SYSRQ:
-					wParam = GP_Sys_Req; break;
+				Wnd_exec_event(lpgw, lParam, GE_keypress, GP_Sys_Req, 0);
+				break;
 #endif
 				case VK_ESCAPE:
-					wParam = GP_Escape; break;
+				Wnd_exec_event(lpgw, lParam, GE_keypress, GP_Escape, 0);
+				break;
 				case VK_DELETE:
-					wParam = GP_Delete; break;
+				Wnd_exec_event(lpgw, lParam, GE_keypress, GP_Delete, 0);
+				break;
 				case VK_INSERT:
-					wParam = GP_KP_Insert; break;
+				Wnd_exec_event(lpgw, lParam, GE_keypress, GP_KP_Insert, 0);
+				break;
 				case VK_HOME:
-					wParam = GP_Home; break;
+				Wnd_exec_event(lpgw, lParam, GE_keypress, GP_Home, 0);
+				break;
 				case VK_LEFT:
-					wParam = GP_Left; break;
+				Wnd_exec_event(lpgw, lParam, GE_keypress, GP_Left, 0);
+				break;
 				case VK_UP:
-					wParam = GP_Up; break;
+				Wnd_exec_event(lpgw, lParam, GE_keypress, GP_Up, 0);
+				break;
 				case VK_RIGHT:
-					wParam = GP_Right; break;
+				Wnd_exec_event(lpgw, lParam, GE_keypress, GP_Right, 0);
+				break;
 				case VK_DOWN:
-					wParam = GP_Down; break;
+				Wnd_exec_event(lpgw, lParam, GE_keypress, GP_Down, 0);
+				break;
 				case VK_END:
-					wParam = GP_End; break;
-
-#if HOW_IS_THIS_FOR_WINDOWS //??? @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-				case VK_PAGEUP:
-					wParam = GP_PageUp; break;
-				case VK_PAGEDOWN:
-					wParam = GP_PageDown; break;
-#endif
+				Wnd_exec_event(lpgw, lParam, GE_keypress, GP_End, 0);
+				break;
+			case VK_PRIOR:
+				Wnd_exec_event(lpgw, lParam, GE_keypress, GP_PageUp, 0);
+				break;
+			case VK_NEXT:
+				Wnd_exec_event(lpgw, lParam, GE_keypress, GP_PageDown, 0);
+				break;
 				case VK_F1:
-					wParam = GP_F1; break;
+				Wnd_exec_event(lpgw, lParam, GE_keypress, GP_F1, 0);
+				break;
 				case VK_F2:
-					wParam = GP_F2; break;
+				Wnd_exec_event(lpgw, lParam, GE_keypress, GP_F2, 0);
+				break;
 				case VK_F3:
-					wParam = GP_F3; break;
+				Wnd_exec_event(lpgw, lParam, GE_keypress, GP_F3, 0);
+				break;
 				case VK_F4:
-					wParam = GP_F4; break;
+				Wnd_exec_event(lpgw, lParam, GE_keypress, GP_F4, 0);
+				break;
 				case VK_F5:
-					wParam = GP_F5; break;
+				Wnd_exec_event(lpgw, lParam, GE_keypress, GP_F5, 0);
+				break;
 				case VK_F6:
-					wParam = GP_F6; break;
+				Wnd_exec_event(lpgw, lParam, GE_keypress, GP_F6, 0);
+				break;
 				case VK_F7:
-					wParam = GP_F7; break;
+				Wnd_exec_event(lpgw, lParam, GE_keypress, GP_F7, 0);
+				break;
 				case VK_F8:
-					wParam = GP_F8; break;
+				Wnd_exec_event(lpgw, lParam, GE_keypress, GP_F8, 0);
+				break;
 				case VK_F9:
-					wParam = GP_F9; break;
+				Wnd_exec_event(lpgw, lParam, GE_keypress, GP_F9, 0);
+				break;
 				case VK_F10:
-					wParam = GP_F10; break;
+				Wnd_exec_event(lpgw, lParam, GE_keypress, GP_F10, 0);
+				break;
 				case VK_F11:
-					wParam = GP_F11; break;
+				Wnd_exec_event(lpgw, lParam, GE_keypress, GP_F11, 0);
+				break;
 				case VK_F12:
-					wParam = GP_F12; break;
-				case VK_SHIFT:
-				case VK_CONTROL:
-#if HOW_IS_THIS_FOR_WINDOWS //??? @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-				case VK_ALT:
-#endif
-					{
-					static int last_modifier_mask = -99;
-					int modifier_mask = 0;
-#if THE_CODE_BELOW_WAS_UPDATED_FOR_WINDOWS //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-// note: you can test it on "splot x*y" + zoom and rotate by mouse
-					modifier_mask = ( (usFlag & KC_SHIFT) ? Mod_Shift : 0 )
-						| ( (usFlag & KC_CTRL) ? Mod_Ctrl : 0)
-						| ( (usFlag & KC_ALT) ? Mod_Alt : 0);
-					if (modifier_mask != last_modifier_mask) {
-						gp_exec_event ( GE_modifier, mx, my, modifier_mask, 0 );
-						last_modifier_mask = modifier_mask;
-					}
+				Wnd_exec_event(lpgw, lParam, GE_keypress, GP_F12, 0);
+				break;
+			} /* switch (wParam) */
+
+			return 0L;
 #if 0					
-					if (!(usFlag & KC_SCANCODE)) return 0L; /* only modifier mask has changed */
-#endif
-					if (usFlag & KC_KEYUP) return 0L;   /* ignore key release events? */
-#endif
-					Wnd_exec_event ( lpgw, 0, GE_modifier, modifier_mask, 0);
+		case WM_MOUSEMOVE:
+			/* set default pointer: */
+			SetCursor(hptrDefault);
 					return 0L;
-					}
-			}
-			if (wParam)
-				Wnd_exec_event(lpgw, lParam, GE_keypress, wParam, 0);
 #endif
-			return 0;			
+#endif /* USE_MOUSE */
 		case WM_COMMAND:
 			switch(LOWORD(wParam))
 			{
@@ -1937,13 +1971,16 @@ WM_MOUSEMOVE: set default pointer, i.e.:
 			lpgw->hWndGraph = hwnd;
 			hdc = GetDC(hwnd);
 			MakePens(lpgw, hdc);
+#ifdef USE_MOUSE
 			LoadCursors(lpgw);
+#endif
 			GetClientRect(hwnd, &rect);
 			MakeFonts(lpgw, (LPRECT)&rect, hdc);
 			ReleaseDC(hwnd, hdc);
 #if WINVER >= 0x030a
 			{
 			WORD version = LOWORD(GetVersion());
+
 			if ((LOBYTE(version)*100 + HIBYTE(version)) >= 310)
 				if ( lpgw->lptw && (lpgw->lptw->DragPre!=(LPSTR)NULL) && (lpgw->lptw->DragPost!=(LPSTR)NULL) )
 					DragAcceptFiles(hwnd, TRUE);
@@ -1986,7 +2023,9 @@ WM_MOUSEMOVE: set default pointer, i.e.:
 		case WM_DESTROY:
 			DestroyPens(lpgw);
 			DestroyFonts(lpgw);
+#ifdef USE_MOUSE
 			DestroyCursors(lpgw);
+#endif
 #if __TURBOC__ >= 0x410    /* Borland C++ 3.1 or later */
 			{
 			WORD version = LOWORD(GetVersion());
@@ -2021,10 +2060,8 @@ Graph_set_cursor (LPGW lpgw, int c, int x, int y )
 {
 	/* CODEME !!! */
     switch (c) {
-
 	case -2:
 		{ /* move mouse to the given point */
-
 			RECT rc;
 			POINT pt;
 
@@ -2043,27 +2080,15 @@ Graph_set_cursor (LPGW lpgw, int c, int x, int y )
 		     break;
 	case 0:  /* standard cross-hair cursor */
 		SetCursor( (hptrCurrent = mouse_setting.on ? hptrCrossHair : hptrDefault) );
-#if 0
-		     WinSetPointer( HWND_DESKTOP, hptrCurrent = (mouse_setting.on ? hptrCrossHair : hptrDefault) );
-#endif
 		     break;
 	case 1:  /* cursor during rotation */
 		SetCursor(hptrCurrent = hptrRotating);
-#if 0
-		     WinSetPointer( HWND_DESKTOP, hptrCurrent = hptrRotating);
-#endif
 		     break;
 	case 2:  /* cursor during scaling */
 		SetCursor(hptrCurrent = hptrScaling);
-#if 0
-		     WinSetPointer( HWND_DESKTOP, hptrCurrent = hptrScaling );
-#endif
 		     break;
 	case 3:  /* cursor during zooming */
 		SetCursor(hptrCurrent = hptrZooming);
-#if 0
-		     WinSetPointer( HWND_DESKTOP, hptrCurrent = hptrZooming );
-#endif
 		     break;
     }
     if (c>=0 && zoombox.on) { /* erase zoom box */

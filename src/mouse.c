@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.17 2000/11/24 19:17:22 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.18 2001/02/09 15:06:11 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -1391,7 +1391,7 @@ event_buttonrelease(struct gp_event_t *ge)
 
     MousePosToGraphPosReal(mouse_x, mouse_y, &real_x, &real_y, &real_x2, &real_y2);
 
-    FPRINTF(("MOUSE.C: doublclick=%i, set=%i, motion=%i, ALMOST2D=%i\n", (int) doubleclick, (int) mouse_setting.doubleclick,
+    FPRINTF((stderr, "MOUSE.C: doublclick=%i, set=%i, motion=%i, ALMOST2D=%i\n", (int) doubleclick, (int) mouse_setting.doubleclick,
 	     (int) motion, (int) ALMOST2D));
 
     if (ALMOST2D) {
