@@ -1,5 +1,5 @@
 /*
- * $Id: graph3d.h,v 1.4 2000/05/02 18:01:03 lhecking Exp $
+ * $Id: graph3d.h,v 1.3.2.2 2000/10/23 18:57:54 joze Exp $
  */
 
 /* GNUPLOT - graph3d.h */
@@ -76,6 +76,9 @@ void do_3dplot __PROTO((struct surface_points *plots, int pcount, int quick));
 
 void clip_move __PROTO((unsigned int x, unsigned int y));
 void clip_vector __PROTO((unsigned int x, unsigned int y));
+#ifdef PM3D /* HBB 20000813: export this prototype non-static, for PM3D */
+void map3d_xy __PROTO((double x, double y, double z, unsigned int *xt, unsigned int *yt));
+#endif
 void map3d_position __PROTO((struct position * pos, unsigned int *x,
 				  unsigned int *y, const char *what));
 

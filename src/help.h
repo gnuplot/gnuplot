@@ -1,5 +1,5 @@
 /*
- * $Id: help.h,v 1.4 1999/11/08 19:24:15 lhecking Exp $
+ * $Id: help.h,v 1.4.2.1 2000/05/03 21:26:11 joze Exp $
  */
 
 /* GNUPLOT - help.h */

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.41 2000/09/20 00:59:25 joze Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.36.2.7 2000/10/23 04:35:28 joze Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -54,6 +54,10 @@ static char *RCSid() { return RCSid("$Id: show.c,v 1.41 2000/09/20 00:59:25 joze
 # include "mouse.h"
 #endif
 
+#ifdef PM3D
+# include "pm3d.h"
+#endif
+
 /******** Local functions ********/
 
 static void show_at __PROTO((void));
@@ -83,6 +87,10 @@ static void show_offsets __PROTO((void));
 static void show_margin __PROTO((void));
 static void show_output __PROTO((void));
 static void show_parametric __PROTO((void));
+#ifdef PM3D
+static void show_pm3d __PROTO((void));
+static void show_palette __PROTO((void));
+#endif
 static void show_pointsize __PROTO((void));
 static void show_encoding __PROTO((void));
 static void show_polar __PROTO((void));
@@ -181,10 +189,11 @@ show_command()
 \t'encoding', 'format', 'functions',  'grid',  'hidden', 'isosamples',\n\
 \t'key', 'label', 'loadpath', 'locale', 'logscale', 'mapping',\n\
 \t'margin', 'missing', 'offsets', 'origin', 'output', 'plot',\n\
-\t'parametric', 'pointsize', 'polar', '[rtuv]range', 'samples',\n\
-\t'size', 'style', 'terminal', 'tics', 'timestamp', 'timefmt', 'title',\n\
-\t'variables', 'version', 'view',  '[xyz]{2}label',   '[xyz]{2}range',\n\
-\t'{m}[xyz]{2}tics', '[xyz]{2}[md]tics', '[xyz]{2}zeroaxis', '[xyz]data',\n\
+\t'palette', 'parametric', 'pm3d', 'pointsize', 'polar',\n\
+\t'[rtuv]range', 'samples', 'size', 'style', 'terminal', 'tics',\n\
+\t'timestamp', 'timefmt', 'title', 'variables', 'version', 'view',\n\
+\t'[xyz]{2}label',   '[xyz]{2}range', '{m}[xyz]{2}tics',\n\
+\t'[xyz]{2}[md]tics', '[xyz]{2}zeroaxis', '[xyz]data',\n\
 \t'zero', 'zeroaxis'";
 
 
@@ -305,6 +314,14 @@ show_command()
     case S_PARAMETRIC:
 	show_parametric();
 	break;
+#ifdef PM3D
+    case S_PALETTE:
+	show_palette();
+	break;
+    case S_PM3D:
+	show_pm3d();
+	break;
+#endif
     case S_POINTSIZE:
 	show_pointsize();
 	break;
@@ -645,6 +662,10 @@ show_all()
     show_margin();
     show_output();
     show_parametric();
+#ifdef PM3D
+	show_palette();
+	show_pm3d();
+#endif
     show_pointsize();
     show_encoding();
     show_polar();
@@ -1608,6 +1629,165 @@ show_parametric()
     fprintf(stderr, "\tparametric is %s\n", (parametric) ? "ON" : "OFF");
 }
 
+#ifdef PM3D
+static void show_palette()
+{
+    c_token++;
+    /* no option given, i.e. "show palette" */
+    if (END_OF_COMMAND) {
+	fprintf(stderr,"\tfigure is %s\n",
+	    sm_palette.colorMode == SMPAL_COLOR_MODE_GRAY ? "GRAY" : "COLOR");
+	fprintf(stderr,"\trgb color mapping formulae are %i,%i,%i\n",
+	    sm_palette.formulaR, sm_palette.formulaG, sm_palette.formulaB);
+	fprintf(stderr,"\t  * there are %i available rgb color mapping formulae:",
+	    sm_palette.colorFormulae);
+	/* take the description of the color formulae from the comment to their
+	   PostScript definition */
+	{
+	    extern char *( PostScriptColorFormulae[] );
+	    char *s;
+	    int i = 0;
+	    while ( *(PostScriptColorFormulae[i]) ) {
+		if (i % 3 == 0) fprintf(stderr, "\n\t    ");
+		s = strchr( PostScriptColorFormulae[ i ], '%' ) + 2;
+		fprintf(stderr, "%2i: %-15s",i,s);
+		i++;
+	    }
+	    fprintf(stderr, "\n");
+	}
+	fprintf(stderr,"\t  * negative numbers mean inverted=negative colour component\n");
+	fprintf(stderr,"\t  * thus the ranges in `set pm3d rgbformulae' are -%i..%i\n",
+	    sm_palette.colorFormulae-1,sm_palette.colorFormulae-1);
+	fprintf(stderr,"\tfigure is %s\n",
+	    sm_palette.positive == SMPAL_POSITIVE ? "POSITIVE" : "NEGATIVE");
+	fprintf(stderr,"\tall color formulae ARE%s written into output postscript file\n",
+	    sm_palette.ps_allcF == 0 ? "" : " NOT");
+	fprintf(stderr,"\tallocating ");
+	if (sm_palette.use_maxcolors) fprintf(stderr,"MAX %i",sm_palette.use_maxcolors);
+	else fprintf(stderr,"ALL remaining");
+	fprintf(stderr," color positions for discrete palette terminals\n");
+	if (color_box.border) {
+	    fprintf(stderr,"\tcolor box with border, ");
+	    if (color_box.border_lt_tag >= 0)
+		fprintf(stderr,"line type %d is ", color_box.border_lt_tag);
+	    else
+		fprintf(stderr,"DEFAULT line type is ");
+	} else {
+	    fprintf(stderr,"\tcolor box without border is ");
+	}
+	if (color_box.where == SMCOLOR_BOX_NO ) {
+	    fprintf(stderr,"NOT drawn\n");
+	} else if (color_box.where == SMCOLOR_BOX_DEFAULT ) {
+	    fprintf(stderr,"drawn at DEFAULT position\n");
+	} else if (color_box.where == SMCOLOR_BOX_USER ) {
+	    fprintf(stderr,"drawn at USER position:\n");
+	    fprintf(stderr,"\t\torigin: %f, %f\n", color_box.xorigin, color_box.yorigin);
+	    fprintf(stderr,"\t\tsize  : %f, %f\n", color_box.xsize  , color_box.ysize  );
+	} else {
+	    /* should *never* happen */
+	    fprintf(stderr, "%s:%d please report this bug to <johannes@zellner.org>\n", __FILE__, __LINE__);
+	}
+	fprintf(stderr,"\tcolor gradient is %s in the color box\n",
+	    color_box.rotation == 'v' ? "VERTICAL" : "HORIZONTAL");
+	return;
+    }
+    /* option: "show palette palette <n>" */
+    if (almost_equals(c_token, "pal$ette")) {
+	int colors, i;
+	struct value a;
+	double gray, r, g, b;
+	extern double GetColorValueFromFormula (int formula, double x);
+	c_token++;
+	if (END_OF_COMMAND)
+	    int_error(c_token,"palette size required");
+	colors = (int) real(const_express(&a));
+	if (colors<2) colors = 100;
+	if (sm_palette.colorMode == SMPAL_COLOR_MODE_GRAY)
+	    printf("Gray palette with %i discrete colors\n", colors);
+	else
+	    printf("Color palette with %i discrete colors, formulae R=%i, G=%i, B=%i\n",
+		colors, sm_palette.formulaR, sm_palette.formulaG, sm_palette.formulaB);
+	for (i = 0; i < colors; i++) {
+	    gray = (double)i / (colors - 1); /* colours equidistantly from [0,1] */
+	    if (sm_palette.positive == SMPAL_NEGATIVE)
+		gray = 1 - gray; /* needed, since printing without call to set_color() */
+	    if (sm_palette.colorMode == SMPAL_COLOR_MODE_GRAY) /* gray scale only */
+		r = g = b = gray;
+	    else { /* i.e. sm_palette.colorMode == SMPAL_COLOR_MODE_RGB */
+		r = GetColorValueFromFormula(sm_palette.formulaR, gray);
+		g = GetColorValueFromFormula(sm_palette.formulaG, gray);
+		b = GetColorValueFromFormula(sm_palette.formulaB, gray);
+	    }
+	    printf("%3i. gray=%0.4f, (r,g,b)=(%0.4f,%0.4f,%0.4f), #%02x%02x%02x = %3i %3i %3i\n",
+		i, gray, r,g,b,
+		(int)(colors*r),(int)(colors*g),(int)(colors*b),
+		(int)(colors*r),(int)(colors*g),(int)(colors*b));
+	}
+	return;
+    }
+    /* wrong option to "show palette" */
+    int_error(c_token,"required 'show palette' or 'show palette palette <n>'");
+}
+
+
+static void show_pm3d()
+{
+    c_token++;
+    if (!pm3d.where[0]) {
+	fprintf(stderr, "\tpm3d is OFF\n");
+	return;
+    }
+    fprintf(stderr,"\tpm3d plotted at ");
+    { int i=0;
+	for ( ; pm3d.where[i]; i++ ) {
+	    if (i>0) fprintf(stderr,", then ");
+	    switch (pm3d.where[i]) {
+		case PM3D_AT_BASE: fprintf(stderr,"BOTTOM"); break;
+		case PM3D_AT_SURFACE: fprintf(stderr,"SURFACE"); break;
+		case PM3D_AT_TOP: fprintf(stderr,"TOP"); break;
+	    }
+	}
+	fprintf(stderr,"\n");
+    }
+    if (pm3d.direction != PM3D_SCANS_AUTOMATIC) {
+	fprintf(stderr,"\ttaking scans in %s direction\n",
+	    pm3d.direction == PM3D_SCANS_FORWARD ? "FORWARD" : "BACKWARD");
+    } else {
+	fprintf(stderr,"\ttaking scans direction automatically\n");
+    }
+    fprintf(stderr,"\tsubsequent scans with different nb of pts are ");
+    if (pm3d.flush == PM3D_FLUSH_CENTER) fprintf(stderr,"CENTERED\n");
+    else fprintf(stderr,"flushed from %s\n",
+	pm3d.flush == PM3D_FLUSH_BEGIN ? "BEGIN" : "END");
+    fprintf(stderr,"\tclipping: ");
+    if (pm3d.clip == PM3D_CLIP_1IN)
+	fprintf(stderr,"at least 1 point of the quadrangle in x,y ranges\n");
+    else
+	fprintf(stderr, "all 4 points of the quadrangle in x,y ranges\n");
+    fprintf(stderr,"\tz-range is ");
+    if (pm3d.pm3d_zmin==0 && pm3d.pm3d_zmax==0)
+	fprintf(stderr,"the same as `set zrange`\n");
+    else {
+	fprintf(stderr,"[");
+	if (pm3d.pm3d_zmin) fprintf(stderr,"%g,",pm3d.zmin);
+	else fprintf(stderr,"*,");
+	if (pm3d.pm3d_zmax) fprintf(stderr,"%g]\n",pm3d.zmax);
+	else fprintf(stderr,"*]\n");
+    }
+    if (pm3d.hidden3d_tag) {
+	fprintf(stderr,"\tpm3d-hidden3d is on an will use linestyle %d\n",
+	    pm3d.hidden3d_tag);
+    } else {
+	fprintf(stderr,"\tpm3d-hidden3d is off\n");
+    }
+    if (pm3d.solid) {
+	fprintf(stderr,"\tborders, tics and labels may be hidden by the surface\n");
+    } else {
+	fprintf(stderr,"\tsurface is transparent for borders, tics and labels\n");
+    }
+}
+
+#endif
 
 /* process 'show pointsize' command */
 static void
@@ -2197,9 +2377,16 @@ int tag;			/* 0 means show all */
 	 this_linestyle = this_linestyle->next) {
 	if (tag == 0 || tag == this_linestyle->tag) {
 	    showed = TRUE;
-	    fprintf(stderr, "\tlinestyle %d, linetype %d, linewidth %.3f, pointtype %d, pointsize %.3f\n",
-		    this_linestyle->tag,
-		    this_linestyle->lp_properties.l_type + 1,
+	    fprintf(stderr, "\tlinestyle %d, ", this_linestyle->tag);
+
+#ifdef PM3D
+	    if (this_linestyle->lp_properties.use_palette)
+		fprintf(stderr, "linetype palette, ");
+	    else
+#endif
+		fprintf(stderr, "linetype %d, ", this_linestyle->lp_properties.l_type + 1);
+
+	    fprintf(stderr, "linewidth %.3f, pointtype %d, pointsize %.3f\n",
 		    this_linestyle->lp_properties.l_width,
 		    this_linestyle->lp_properties.p_type + 1,
 		    this_linestyle->lp_properties.p_size);

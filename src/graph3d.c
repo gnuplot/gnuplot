@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.30 2000/09/20 00:59:25 joze Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.23.2.8 2000/10/23 18:57:54 joze Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -61,6 +61,11 @@ static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.30 2000/09/20 00:59:25 j
 #include "util3d.h"
 #include "util.h"
 
+#ifdef PM3D
+#   include "pm3d.h"
+#   include "color.h"
+#endif
+
 static int p_height;
 static int p_width;		/* pointsize * t->h_tic */
 static int key_entry_height;	/* bigger of t->v_size, pointsize*t->v_tick */
@@ -84,19 +89,30 @@ int hidden_no_update;
 
 double xscale3d, yscale3d, zscale3d;
 
+#ifdef PM3D
+typedef enum { ALLGRID, FRONTGRID, BACKGRID } WHICHGRID;
+WHICHGRID whichgrid = ALLGRID;
+#endif
+
+#ifndef PM3D
+/* *not* static, we use it in color.c (joze) */
+/* HBB 20000813: provide either static prototype here, or non-static in graph3d.h */
 static void map3d_xy __PROTO((double x, double y, double z, unsigned int *xt, unsigned int *yt));
-/* static int map3d_z __PROTO((double x, double y, double z)); */
+#endif
 
 static void plot3d_impulses __PROTO((struct surface_points * plot));
+static void plot3d_points __PROTO((struct surface_points * plot, int p_type));
 static void plot3d_lines __PROTO((struct surface_points * plot));
-static void plot3d_points __PROTO((struct surface_points * plot));
-static void plot3d_dots __PROTO((struct surface_points * plot));
+#ifdef PM3D
+/* no pm3d for impulses */
+static void plot3d_lines_pm3d __PROTO((struct surface_points * plot));
+static void plot3d_points_pm3d __PROTO((struct surface_points * plot, int p_type));
+#endif
 static void cntr3d_impulses __PROTO((struct gnuplot_contours * cntr,
 				     struct surface_points * plot));
 static void cntr3d_lines __PROTO((struct gnuplot_contours * cntr));
 static void cntr3d_points __PROTO((struct gnuplot_contours * cntr,
-				   struct surface_points * plot));
-static void cntr3d_dots __PROTO((struct gnuplot_contours * cntr));
+				   int p_type));
 static void check_corner_height __PROTO((struct coordinate GPHUGE * point,
 					 double height[2][2], double depth[2][2]));
 static void draw_bottom_grid __PROTO((struct surface_points * plot,
@@ -190,7 +206,10 @@ static int ktitle_lines = 0;
  */
 
 double floor_z;
-static double ceiling_z, base_z;
+#ifndef PM3D /* used in color.c */
+static
+#endif
+double ceiling_z, base_z;
 
 /* HBB 990826: {min|max}3d_z #defines, and transform_matrix typedef
  * moved to grahp3d.h */
@@ -239,7 +258,10 @@ struct lp_style_type style;
 }
 
 /* And the functions to map from user 3D space to terminal coordinates */
-static void
+#ifndef PM3D
+static
+#endif
+void
 map3d_xy(x, y, z, xt, yt)
 double x, y, z;
 unsigned int *xt, *yt;
@@ -493,6 +515,9 @@ int quick;			/* !=0 means plot only axes etc., for quick rotation */
     transform_matrix mat;
     int key_count;
     char *s, *e;
+#ifdef PM3D
+    TBOOLEAN can_pm3d = 0;
+#endif
 
     /* Initiate transformation matrix using the global view variables. */
     mat_rot_z(surface_rot_z, trans_mat);
@@ -579,6 +604,39 @@ int quick;			/* !=0 means plot only axes etc., for quick rotation */
     xscale3d = 2.0 / (x_max3d - x_min3d);
 
     term_apply_lp_properties(&border_lp);	/* border linetype */
+
+#ifdef PM3D
+    /* DRAW PM3D ALL COLOUR SURFACES */
+    can_pm3d = 0;
+    if (!quick) {
+	int palette = 0;
+	if (!pm3d.where[0]) {
+	    for (this_plot = plots, surface = 0; surface < pcount;
+		this_plot = this_plot->next_sp, surface++) {
+		if (this_plot->lp_properties.use_palette) {
+		    palette = 1;
+		    break;
+		}
+	    }
+	} else {
+	    palette = 1;
+	}
+	if (palette)
+	    can_pm3d = set_pm3d_zminmax() && !make_palette() && term->set_color;
+	if (pm3d.where[0] && can_pm3d) {
+	    if (pm3d.solid) {
+		whichgrid = BACKGRID;
+		draw_bottom_grid(plots, pcount);
+	    }
+	    pm3d_draw_all(plots, pcount);
+	}
+
+	if (can_pm3d) {
+	    /* draw colour box */
+	    draw_color_smooth_box();
+	}
+    }
+#endif
 
     /* PLACE TITLE */
     if (*title.text != 0) {
@@ -793,6 +851,11 @@ int quick;			/* !=0 means plot only axes etc., for quick rotation */
 	 surface < pcount;
 	 this_plot = this_plot->next_sp, surface++) {
 
+#ifdef PM3D
+	/* just an abbreviation */
+	TBOOLEAN use_palette = can_pm3d && this_plot->lp_properties.use_palette;
+#endif
+
 #ifndef LITE
 	if (hidden3d)
 	    hidden_no_update = FALSE;
@@ -801,6 +864,7 @@ int quick;			/* !=0 means plot only axes etc., for quick rotation */
 	if (draw_surface) {
 	    int lkey = (key != 0 && this_plot->title && this_plot->title[0]);
 	    term_apply_lp_properties(&(this_plot->lp_properties));
+
 
 	    if (lkey) {
 		ignore_enhanced_text = this_plot->title_no_enhanced == 1;
@@ -824,8 +888,14 @@ int quick;			/* !=0 means plot only axes etc., for quick rotation */
 		    if (lkey) {
 			key_sample_line(xl, yl);
 		    }
-		    if (!(hidden3d && draw_surface))
-			plot3d_lines(this_plot);
+		    if (!(hidden3d && draw_surface)) {
+#ifdef PM3D
+			if (use_palette)
+			    plot3d_lines_pm3d(this_plot);
+			else
+#endif
+			    plot3d_lines(this_plot);
+		    }
 		    break;
 		}
 	    case YERRORLINES:	/* ignored; treat like points */
@@ -843,8 +913,14 @@ int quick;			/* !=0 means plot only axes etc., for quick rotation */
 		if (lkey) {
 		    key_sample_point(xl, yl, this_plot->lp_properties.p_type);
 		}
-		if (!(hidden3d && draw_surface))
-		    plot3d_points(this_plot);
+		if (!(hidden3d && draw_surface)) {
+#ifdef PM3D
+		    if (use_palette)
+			plot3d_points_pm3d(this_plot, this_plot->lp_properties.p_type);
+		    else
+#endif
+			plot3d_points(this_plot, this_plot->lp_properties.p_type);
+		}
 		break;
 
 	    case LINESPOINTS:
@@ -852,15 +928,27 @@ int quick;			/* !=0 means plot only axes etc., for quick rotation */
 		if (lkey)
 		    key_sample_line(xl, yl);
 
-		if (!(hidden3d && draw_surface))
-		    plot3d_lines(this_plot);
+		if (!(hidden3d && draw_surface)) {
+#ifdef PM3D
+		    if (use_palette)
+			plot3d_lines_pm3d(this_plot);
+		    else
+#endif
+			plot3d_lines(this_plot);
+		}
 
 		/* put points */
 		if (lkey)
 		    key_sample_point(xl, yl, this_plot->lp_properties.p_type);
 
-		if (!(hidden3d && draw_surface))
-		    plot3d_points(this_plot);
+		if (!(hidden3d && draw_surface)) {
+#ifdef PM3D
+		    if (use_palette)
+			plot3d_points_pm3d(this_plot, this_plot->lp_properties.p_type);
+		    else
+#endif
+			plot3d_points(this_plot, this_plot->lp_properties.p_type);
+		}
 
 		break;
 
@@ -874,8 +962,14 @@ int quick;			/* !=0 means plot only axes etc., for quick rotation */
 			/* (*t->point)(xl+2*(t->h_char),yl, -1); */
 		    }
 		}
-		if (!(hidden3d && draw_surface))
-		    plot3d_dots(this_plot);
+		if (!(hidden3d && draw_surface)) {
+#ifdef PM3D
+		    if (use_palette)
+			plot3d_points_pm3d(this_plot, -1);
+		    else
+#endif
+			plot3d_points(this_plot, -1);
+		}
 
 		break;
 
@@ -941,7 +1035,12 @@ int quick;			/* !=0 means plot only axes etc., for quick rotation */
 	    linetypeOffset = this_plot->lp_properties.l_type + (hidden3d ? 2 : 1);
 	    while (cntrs) {
 		if (label_contours && cntrs->isNewLevel) {
-		    (*t->linetype) (linetypeOffset++);
+#ifdef PM3D
+		    if (use_palette)
+			set_color(z2gray(cntrs->z));
+		    else
+#endif
+			(*t->linetype) (linetypeOffset++);
 		    if (key) {
 
 			key_text(xl, yl, cntrs->label);
@@ -1003,14 +1102,14 @@ int quick;			/* !=0 means plot only axes etc., for quick rotation */
 		case FINANCEBARS:
 		case VECTOR:
 		case POINTSTYLE:
-		    cntr3d_points(cntrs, this_plot);
+		    cntr3d_points(cntrs, this_plot->lp_properties.p_type);
 		    break;
 		case LINESPOINTS:
 		    cntr3d_lines(cntrs);
-		    cntr3d_points(cntrs, this_plot);
+		    cntr3d_points(cntrs, this_plot->lp_properties.p_type);
 		    break;
 		case DOTS:
-		    cntr3d_dots(cntrs);
+		    cntr3d_points(cntrs, -1);
 		    break;
 		}		/*switch */
 
@@ -1019,6 +1118,14 @@ int quick;			/* !=0 means plot only axes etc., for quick rotation */
 	}			/* draw contours */
     }				/* loop over surfaces */
 
+#ifdef PM3D
+    /* draw grid and coordinate system */
+    if (pm3d.where[0] && pm3d.solid && !quick) {
+	whichgrid = FRONTGRID;
+    } else {
+	whichgrid = ALLGRID;
+    }
+#endif
     draw_bottom_grid(plots, pcount);
 
     /* PLACE LABELS */
@@ -1275,12 +1382,165 @@ struct surface_points *plot;
     }
 }
 
+#ifdef PM3D
+/* this is basically the same function as above, but:
+ *  - it splits the bunch of scans in two sets corresponding to
+ *    the two scan directions.
+ *  - reorders the two sets -- from behind to front
+ *  - checks if inside on scan of a set the order should be inverted
+ */
+static void
+plot3d_lines_pm3d(plot)
+    struct surface_points *plot;
+{
+    struct iso_curve** icrvs_pair[2];
+    int invert[2];
+    int n[2];
+
+    int i, set, scan;
+    unsigned int x, y, xx0, yy0;	/* point in terminal coordinates */
+    double clip_x, clip_y, clip_z;
+    struct coordinate GPHUGE *points;
+    enum coord_type prev = UNDEFINED;
+    double lx[2], ly[2], lz[2];	/* two edge points */
+    double z;
+
+
+#ifndef LITE
+/* These are handled elsewhere.  */
+    if (plot->has_grid_topology && hidden3d)
+	return;
+#endif /* not LITE */
+
+    /* split the bunch of scans in two sets in
+     * which the scans are already depth ordered */
+    pm3d_rearrange_scan_array(plot,
+	icrvs_pair, n, invert,
+	icrvs_pair + 1, n + 1, invert + 1);
+
+    for (set = 0; set < 2; set++) {
+
+	int begin = 0;
+	int step;
+
+	if (invert[set]) {
+	    /* begin is set below to the length of the scan - 1 */
+	    step = -1;
+	} else {
+	    step = 1;
+	}
+
+	for (scan = 0; scan < n[set]; scan++) {
+
+	    int cnt;
+	    struct iso_curve *icrvs = icrvs_pair[set][scan];
+
+	    if (invert[set]) {
+		begin = icrvs->p_count - 1;
+	    }
+
+	    prev = UNDEFINED;	/* type of previous plot */
+
+	    for (cnt = 0, i = begin, points = icrvs->points; cnt < icrvs->p_count; cnt++, i += step) {
+		switch (points[i].type) {
+		    case INRANGE:
+			map3d_xy(points[i].x, points[i].y, points[i].z, &x, &y);
+
+			if (prev == INRANGE) {
+			    z =  (points[i - step].z + points[i].z) * .5;
+			    set_color(z2gray(z));
+			    clip_vector(x, y);
+			} else {
+			    if (prev == OUTRANGE) {
+				/* from outrange to inrange */
+				if (!clip_lines1) {
+				    clip_move(x, y);
+				} else {
+				    /*
+				     * Calculate intersection point and draw
+				     * vector from there
+				     */
+				    edge3d_intersect(points, i, &clip_x, &clip_y, &clip_z);
+
+				    map3d_xy(clip_x, clip_y, clip_z, &xx0, &yy0);
+
+				    clip_move(xx0, yy0);
+				    z =  (points[i - step].z + points[i].z) * .5;
+				    set_color(z2gray(z));
+				    clip_vector(x, y);
+				}
+			    } else {
+				clip_move(x, y);
+			    }
+			}
+
+			break;
+		    case OUTRANGE:
+			if (prev == INRANGE) {
+			    /* from inrange to outrange */
+			    if (clip_lines1) {
+				/*
+				 * Calculate intersection point and draw
+				 * vector to it
+				 */
+
+				edge3d_intersect(points, i, &clip_x, &clip_y, &clip_z);
+
+				map3d_xy(clip_x, clip_y, clip_z, &xx0, &yy0);
+
+				z =  (points[i - step].z + points[i].z) * .5;
+				set_color(z2gray(z));
+				clip_vector(xx0, yy0);
+			    }
+			} else if (prev == OUTRANGE) {
+			    /* from outrange to outrange */
+			    if (clip_lines2) {
+				/*
+				 * Calculate the two 3D intersection points
+				 * if present
+				 */
+				if (two_edge3d_intersect(points, i, lx, ly, lz)) {
+
+				    map3d_xy(lx[0], ly[0], lz[0], &x, &y);
+
+				    map3d_xy(lx[1], ly[1], lz[1], &xx0, &yy0);
+
+				    clip_move(x, y);
+				    z =  (points[i - step].z + points[i].z) * .5;
+				    set_color(z2gray(z));
+				    clip_vector(xx0, yy0);
+				}
+			    }
+			}
+			break;
+		    case UNDEFINED:
+			break;
+		    default:
+			graph_error("Unknown point type in plot3d_lines");
+		}
+
+		prev = points[i].type;
+
+	    } /* one scan */
+
+	} /* while (icrvs)  */
+
+    } /* for (scan = 0; scan < 2; scan++) */
+
+    if (icrvs_pair[0])
+	free(icrvs_pair[0]);
+    if (icrvs_pair[1])
+	free(icrvs_pair[1]);
+}
+#endif
+
 /* plot3d_points:
  * Plot the surfaces in POINTSTYLE style
  */
 static void
-plot3d_points(plot)
-struct surface_points *plot;
+plot3d_points(plot, p_type)
+    struct surface_points *plot;
+    int p_type;
 {
     int i;
     unsigned int x, y;
@@ -1295,7 +1555,7 @@ struct surface_points *plot;
 		map3d_xy(points[i].x, points[i].y, points[i].z, &x, &y);
 
 		if (!clip_point(x, y))
-		    (*t->point) (x, y, plot->lp_properties.p_type);
+		    (*t->point) (x, y, p_type);
 	    }
 	}
 
@@ -1303,33 +1563,64 @@ struct surface_points *plot;
     }
 }
 
-/* plot3d_dots:
- * Plot the surfaces in DOTS style
- */
+#ifdef PM3D
 static void
-plot3d_dots(plot)
-struct surface_points *plot;
+plot3d_points_pm3d(plot, p_type)
+    struct surface_points *plot;
+    int p_type;
 {
-    int i;
+    struct iso_curve** icrvs_pair[2];
+    int invert[2];
+    int n[2];
+
+    int i, set, scan;
+    unsigned int x, y;
     struct termentry *t = term;
-    struct iso_curve *icrvs = plot->iso_crvs;
 
-    while (icrvs) {
-	struct coordinate GPHUGE *points = icrvs->points;
+    /* split the bunch of scans in two sets in
+     * which the scans are already depth ordered */
+    pm3d_rearrange_scan_array(plot,
+	icrvs_pair, n, invert,
+	icrvs_pair + 1, n + 1, invert + 1);
 
-	for (i = 0; i < icrvs->p_count; i++) {
-	    if (points[i].type == INRANGE) {
-		unsigned int x, y;
-		map3d_xy(points[i].x, points[i].y, points[i].z, &x, &y);
+    for (set = 0; set < 2; set++) {
 
-		if (!clip_point(x, y))
-		    (*t->point) (x, y, -1);
-	    }
+	int begin = 0;
+	int step;
+
+	if (invert[set]) {
+	    /* begin is set below to the length of the scan - 1 */
+	    step = -1;
+	} else {
+	    step = 1;
 	}
 
-	icrvs = icrvs->next;
-    }
+	for (scan = 0; scan < n[set]; scan++) {
+
+	    int cnt;
+	    struct iso_curve *icrvs = icrvs_pair[set][scan];
+	    struct coordinate GPHUGE *points;
+
+	    if (invert[set]) {
+		begin = icrvs->p_count - 1;
+	    }
+
+	    for (cnt = 0, i = begin, points = icrvs->points; cnt < icrvs->p_count; cnt++, i += step) {
+
+		if (points[i].type == INRANGE) {
+		    map3d_xy(points[i].x, points[i].y, points[i].z, &x, &y);
+
+		    if (!clip_point(x, y)) {
+			set_color(z2gray(points[i].z));
+			(*t->point) (x, y, p_type);
+		    }
+		}
+	    }
+	} /* scan */
+    } /* set */
 }
+#endif
+
 
 /* cntr3d_impulses:
  * Plot a surface contour in IMPULSES style
@@ -1354,7 +1645,7 @@ struct surface_points *plot;
 	}
     } else {
 	/* Must be on base grid, so do points. */
-	cntr3d_points(cntr, plot);
+	cntr3d_points(cntr, plot->lp_properties.p_type);
     }
 }
 
@@ -1407,9 +1698,9 @@ struct gnuplot_contours *cntr;
  * Plot a surface contour in POINTSTYLE style
  */
 static void
-cntr3d_points(cntr, plot)
+cntr3d_points(cntr, p_type)
 struct gnuplot_contours *cntr;
-struct surface_points *plot;
+int p_type;
 {
     int i;
     unsigned int x, y;
@@ -1420,7 +1711,7 @@ struct surface_points *plot;
 	    map3d_xy(cntr->coords[i].x, cntr->coords[i].y, cntr->coords[i].z, &x, &y);
 
 	    if (!clip_point(x, y))
-		(*t->point) (x, y, plot->lp_properties.p_type);
+		(*t->point) (x, y, p_type);
 	}
     }
     if (draw_contour & CONTOUR_BASE) {
@@ -1429,41 +1720,10 @@ struct surface_points *plot;
 		     &x, &y);
 
 	    if (!clip_point(x, y))
-		(*t->point) (x, y, plot->lp_properties.p_type);
+		(*t->point) (x, y, p_type);
 	}
     }
 }
-
-/* cntr3d_dots:
- * Plot a surface contour in DOTS style
- */
-static void
-cntr3d_dots(cntr)
-struct gnuplot_contours *cntr;
-{
-    int i;
-    unsigned int x, y;
-    struct termentry *t = term;
-
-    if (draw_contour & CONTOUR_SRF) {
-	for (i = 0; i < cntr->num_pts; i++) {
-	    map3d_xy(cntr->coords[i].x, cntr->coords[i].y, cntr->coords[i].z, &x, &y);
-
-	    if (!clip_point(x, y))
-		(*t->point) (x, y, -1);
-	}
-    }
-    if (draw_contour & CONTOUR_BASE) {
-	for (i = 0; i < cntr->num_pts; i++) {
-	    map3d_xy(cntr->coords[i].x, cntr->coords[i].y, base_z,
-		     &x, &y);
-
-	    if (!clip_point(x, y))
-		(*t->point) (x, y, -1);
-	}
-    }
-}
-
 
 
 /* map xmin | xmax to 0 | 1 and same for y
@@ -1555,6 +1815,9 @@ int plot_num;
 	map3d_xy(x_min3d + x_max3d - back_x, y_min3d + y_max3d - back_y, base_z, &bf_x, &bf_y);
 
 	/* border around base */
+#ifdef PM3D
+	if (BACKGRID != whichgrid)
+#endif
 	{
 	    int save = hidden_active;
 	    hidden_active = FALSE;	/* this is in front */
@@ -1564,12 +1827,21 @@ int plot_num;
 		draw_clip_line(bl_x, bl_y, bf_x, bf_y);
 	    hidden_active = save;
 	}
-	if (draw_border & 2)
-	    draw_clip_line(bl_x, bl_y, bb_x, bb_y);
-	if (draw_border & 8)
-	    draw_clip_line(br_x, br_y, bb_x, bb_y);
+#ifdef PM3D
+	if (FRONTGRID != whichgrid)
+#endif
+	{
+	    if (draw_border & 2)
+		draw_clip_line(bl_x, bl_y, bb_x, bb_y);
+	    if (draw_border & 8)
+		draw_clip_line(br_x, br_y, bb_x, bb_y);
+	}
 
-	if (draw_surface || (draw_contour & CONTOUR_SRF)) {
+	if (draw_surface || (draw_contour & CONTOUR_SRF)
+#ifdef PM3D
+	    || strpbrk(pm3d.where,"st") != NULL
+#endif
+	   ) {
 	    int save = hidden_active;
 	    /* map the 8 corners to screen */
 	    unsigned int fl_x, fl_y;	/* floor left */
@@ -1594,13 +1866,22 @@ int plot_num;
 
 	    /* vertical lines, to surface or to very top */
 	    if ((draw_border & 0xf0) == 0xf0) {
-		/* all four verticals drawn - save some time */
-		draw_clip_line(fl_x, fl_y, tl_x, tl_y);
-		draw_clip_line(fb_x, fb_y, tb_x, tb_y);
-		draw_clip_line(fr_x, fr_y, tr_x, tr_y);
-		hidden_active = FALSE;	/* this is in front */
-		draw_clip_line(ff_x, ff_y, tf_x, tf_y);
-		hidden_active = save;
+#ifdef PM3D
+		if (FRONTGRID != whichgrid) {
+#endif
+		    draw_clip_line(fl_x, fl_y, tl_x, tl_y);
+		    draw_clip_line(fb_x, fb_y, tb_x, tb_y);
+		    draw_clip_line(fr_x, fr_y, tr_x, tr_y);
+#ifdef PM3D
+		}
+		if (BACKGRID != whichgrid) {
+#endif
+		    hidden_active = FALSE;	/* this is in front */
+		    draw_clip_line(ff_x, ff_y, tf_x, tf_y);
+		    hidden_active = save;
+#ifdef PM3D
+		}
+#endif
 	    } else {
 		/* search surfaces for heights at corners */
 		double height[2][2];
@@ -1643,28 +1924,48 @@ else if (height[i][j] != depth[i][j]) \
   draw_clip_line(a0,b0,a1,b1); \
 }
 
+#ifdef PM3D
+		if (FRONTGRID != whichgrid) {
+#endif
 		VERTICAL(16, zaxis_x, zaxis_y, zaxis_i, zaxis_j, fl_x, fl_y, tl_x, tl_y);
 		VERTICAL(32, back_x, back_y, back_i, back_j, fb_x, fb_y, tb_x, tb_y);
 		VERTICAL(64, x_min3d + x_max3d - zaxis_x, y_min3d + y_max3d - zaxis_y, 1 -
 			 zaxis_i, 1 - zaxis_j, fr_x, fr_y, tr_x, tr_y);
+#ifdef PM3D
+		}
+		if (BACKGRID != whichgrid) {
+#endif
 		hidden_active = FALSE;
 		VERTICAL(128, x_min3d + x_max3d - back_x, y_min3d + y_max3d - back_y, 1 - back_i,
 			 1 - back_j, ff_x, ff_y, tf_x, tf_y);
 		hidden_active = save;
+#ifdef PM3D
+		}
+#endif
 	    }
 
 	    /* now border lines on top */
-	    if (draw_border & 256)
-		draw_clip_line(tl_x, tl_y, tb_x, tb_y);
-	    if (draw_border & 512)
-		draw_clip_line(tr_x, tr_y, tb_x, tb_y);
+#ifdef PM3D
+	    if (FRONTGRID != whichgrid)
+#endif
+	    {
+		if (draw_border & 256)
+		    draw_clip_line(tl_x, tl_y, tb_x, tb_y);
+		if (draw_border & 512)
+		    draw_clip_line(tr_x, tr_y, tb_x, tb_y);
+	    }
 	    /* these lines are in front of surface (?) */
-	    hidden_active = FALSE;
-	    if (draw_border & 1024)
-		draw_clip_line(tl_x, tl_y, tf_x, tf_y);
-	    if (draw_border & 2048)
-		draw_clip_line(tr_x, tr_y, tf_x, tf_y);
-	    hidden_active = save;
+#ifdef PM3D
+	    if (BACKGRID != whichgrid)
+#endif
+	    {
+		hidden_active = FALSE;
+		if (draw_border & 1024)
+		    draw_clip_line(tl_x, tl_y, tf_x, tf_y);
+		if (draw_border & 2048)
+		    draw_clip_line(tr_x, tr_y, tf_x, tf_y);
+		hidden_active = save;
+	    }
 	}
 #ifndef LITE
 	hidden_no_update = save_update;
@@ -1697,6 +1998,10 @@ else if (height[i][j] != depth[i][j]) \
 	}
 	if (*xlabel.text) {
 	    /* label at xaxis_y + 1/4 of (xaxis_y-other_y) */
+#ifdef PM3D
+	    if ((surface_rot_x <= 90 && BACKGRID != whichgrid) ||
+		(surface_rot_x > 90 && FRONTGRID != whichgrid)) {
+#endif
 	    double step = (2 * xaxis_y - y_max3d - y_min3d) / 4;
 	    map3d_xy(mid_x, xaxis_y + step, base_z, &x1, &y1);
 	    x1 += xlabel.xoffset * t->h_char;
@@ -1707,6 +2012,9 @@ else if (height[i][j] != depth[i][j]) \
 	    }
 	    /* write_multiline mods it */
 	    write_multiline(x1, y1, xlabel.text, CENTRE, JUST_TOP, 0, xlabel.font);
+#ifdef PM3D
+	    }
+#endif
 	}
     }
     if (ytics || *ylabel.text) {
@@ -1733,6 +2041,10 @@ else if (height[i][j] != depth[i][j]) \
 		     mytics, mytfreq, ytick_callback);
 	}
 	if (*ylabel.text) {
+#ifdef PM3D
+	    if ((surface_rot_x <= 90 && BACKGRID != whichgrid) ||
+		(surface_rot_x > 90 && FRONTGRID != whichgrid)) {
+#endif
 	    double step = (x_max3d + x_min3d - 2 * yaxis_x) / 4;
 	    map3d_xy(yaxis_x - step, mid_y, base_z, &x1, &y1);
 	    x1 += ylabel.xoffset * t->h_char;
@@ -1742,12 +2054,28 @@ else if (height[i][j] != depth[i][j]) \
 		y1 -= tic_unity * ticscale * (t->v_tic);
 	    }
 	    /* write_multiline mods it */
+#ifdef PM3D
+	    if (pm3d_map_rotate_ylabel)
+		(*t->text_angle)(1);
+#endif
 	    write_multiline(x1, y1, ylabel.text, CENTRE, JUST_TOP, 0, ylabel.font);
+#ifdef PM3D
+	    if (pm3d_map_rotate_ylabel)
+		(*t->text_angle)(0);
+#endif
+#ifdef PM3D
+	    }
+#endif
 	}
     }
     /* do z tics */
 
+#ifndef PM3D
     if (ztics && (draw_surface || (draw_contour & CONTOUR_SRF))) {
+#else
+    if (ztics && (draw_surface || (draw_contour & CONTOUR_SRF) ||
+		  strchr(pm3d.where,'s') != NULL)) {
+#endif
 	gen_tics(FIRST_Z_AXIS, &zticdef, work_grid.l_type & (GRID_Z | GRID_MZ),
 		 mztics, mztfreq, ztick_callback);
     }
@@ -1766,7 +2094,12 @@ else if (height[i][j] != depth[i][j]) \
 	draw_clip_line(x, y, x1, y1);
     }
     /* PLACE ZLABEL - along the middle grid Z axis - eh ? */
+#ifndef PM3D
     if (*zlabel.text && (draw_surface || (draw_contour & CONTOUR_SRF))) {
+#else
+    if (*zlabel.text && (draw_surface || (draw_contour & CONTOUR_SRF) ||
+			 strpbrk(pm3d.where,"st") != NULL)) {
+#endif
 	map3d_xy(zaxis_x, zaxis_y, z_max3d + (z_max3d - base_z) / 4, &x, &y);
 
 	x += zlabel.xoffset * t->h_char;
@@ -1789,6 +2122,11 @@ struct lp_style_type grid;	/* linetype or -2 for none */
     double scale = (text ? ticscale : miniticscale);
     int dirn = tic_in ? 1 : -1;
     register struct termentry *t = term;
+
+#ifdef PM3D
+    if ((surface_rot_x <= 90 && BACKGRID != whichgrid) ||
+	(surface_rot_x > 90 && FRONTGRID != whichgrid)) {
+#endif
 
     map3d_xy(place, xaxis_y, base_z, &x, &y);
     if (grid.l_type > -2) {
@@ -1827,12 +2165,20 @@ struct lp_style_type grid;	/* linetype or -2 for none */
 	}
 	clip_put_text_just(x1, y1, text, just);
     }
+#ifdef PM3D
+    }
+    if ((surface_rot_x <= 90 && FRONTGRID != whichgrid) ||
+	(surface_rot_x > 90 && BACKGRID != whichgrid)) {
+#endif
     if (xtics & TICS_MIRROR) {
 	map3d_xy(place, y_min3d + y_max3d - xaxis_y, base_z, &x, &y);
 	x1 = x - tic_unitx * scale * (t->h_tic) * dirn;
 	y1 = y - tic_unity * scale * (t->v_tic) * dirn;
 	draw_clip_line(x, y, x1, y1);
     }
+#ifdef PM3D
+    }
+#endif
 }
 
 static void
@@ -1846,6 +2192,11 @@ struct lp_style_type grid;
     double scale = (text ? ticscale : miniticscale);
     int dirn = tic_in ? 1 : -1;
     register struct termentry *t = term;
+
+#ifdef PM3D
+    if ((surface_rot_x <= 90 && BACKGRID != whichgrid) ||
+	(surface_rot_x > 90 && FRONTGRID != whichgrid)) {
+#endif
 
     map3d_xy(yaxis_x, place, base_z, &x, &y);
     if (grid.l_type > -2) {
@@ -1882,12 +2233,20 @@ struct lp_style_type grid;
 	}
 	clip_put_text_just(x1, y1, text, just);
     }
+#ifdef PM3D
+    }
+    if ((surface_rot_x <= 90 && FRONTGRID != whichgrid) ||
+	(surface_rot_x > 90 && BACKGRID != whichgrid)) {
+#endif
     if (ytics & TICS_MIRROR) {
 	map3d_xy(x_min3d + x_max3d - yaxis_x, place, base_z, &x, &y);
 	x1 = x - tic_unitx * scale * (t->h_tic) * dirn;
 	y1 = y - tic_unity * scale * (t->v_tic) * dirn;
 	draw_clip_line(x, y, x1, y1);
     }
+#ifdef PM3D
+    }
+#endif
 }
 
 static void

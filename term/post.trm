@@ -1,5 +1,5 @@
 /*
- * $Id: post.trm,v 1.39 2000/03/28 21:20:31 lhecking Exp $
+ * $Id: post.trm,v 1.39.2.5 2000/10/24 10:02:37 mikulik Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -55,6 +55,7 @@
  *
  * Erik Luijten 30/5/97: added %%CreationDate, made %%DocumentFonts conform
  *                       to DSC, added version no. and patchl. to %%Creator
+ * Petr Mikulik, Jan 1999: terminal entries for PM3D functionality
  */
 
 #include "driver.h"
@@ -83,6 +84,12 @@ TERM_PUBLIC int ENHPS_set_font __PROTO((const char * font));
 TERM_PUBLIC void PS_fillbox __PROTO((int style, unsigned int x1, unsigned int y1, unsigned int width, unsigned int height));
 TERM_PUBLIC void PS_linewidth __PROTO((double linewidth)); /* JFi [linewidth] */
 TERM_PUBLIC void PS_pointsize __PROTO((double ptsize)); /* JFi [pointsize] */
+#ifdef PM3D
+TERM_PUBLIC int PS_make_palette (t_sm_palette *);
+TERM_PUBLIC void PS_previous_palette (void);
+TERM_PUBLIC void PS_set_color (double);
+TERM_PUBLIC void PS_filled_polygon (int, gpiPoint *);
+#endif
 
 #endif
 
@@ -940,7 +947,8 @@ NULL };
     if (ps_duplex_option)
 	fprintf(gpoutfile, "statusdict begin %s setduplexmode end\n",
 		ps_duplex_state ? "true" : "false");
-    PS_RememberFont(ps_font, 1);
+    if (uses_fonts)
+	PS_RememberFont(ps_font, 1);
 
     if (dict)
 	while (*dict)
@@ -1721,6 +1729,180 @@ const char *str;
     PS_relative_ok = FALSE;
 }
 
+#ifdef PM3D
+
+/* implementation of pm3dGetColorValue() in the postscript way.
+   Notice that the description, i.e. the part after %, is important 
+   since it is used in `show pm3d' for displaying the analytical formulae.
+*/
+char *( PostScriptColorFormulae[] ) = {
+  "/cF0 {pop 0} bind def\t% 0",
+  "/cF1 {pop 0.5} bind def\t% 0.5",
+  "/cF2 {pop 1} bind def\t% 1",
+  "/cF3 {} bind def\t% x",
+  "/cF4 {dup mul} bind def\t% x^2",
+  "/cF5 {dup dup mul mul} bind def\t% x^3",
+  "/cF6 {dup mul dup mul} bind def\t% x^4",
+  "/cF7 {sqrt} bind def\t% sqrt(x)",
+  "/cF8 {sqrt sqrt} bind def\t% sqrt(sqrt(x))",
+  "/cF9 {90 mul sin} bind def\t% sin(90x)",
+  "/cF10 {90 mul cos} bind def\t% cos(90x)",
+  "/cF11 {0.5 sub abs} bind def\t% |x-0.5|",
+  "/cF12 {2 mul 1 sub dup mul} bind def\t% (2x-1)^2",
+  "/cF13 {180 mul sin} bind def\t% sin(180x)",
+  "/cF14 {180 mul cos abs} bind def\t% |cos(180x)|",
+  "/cF15 {360 mul sin} bind def\t% sin(360x)",
+  "/cF16 {360 mul cos} bind def\t% cos(360x)",
+  "/cF17 {360 mul sin abs} bind def\t% |sin(360x)|",
+  "/cF18 {360 mul cos abs} bind def\t% |cos(360x)|",
+  "/cF19 {720 mul sin abs} bind def\t% |sin(720x)|",
+  "/cF20 {720 mul cos abs} bind def\t% |cos(720x)|",
+  "/cF21 {3 mul} bind def\t% 3x",
+  "/cF22 {3 mul 1 sub} bind def\t% 3x-1",
+  "/cF23 {3 mul 2 sub} bind def\t% 3x-2",
+  "/cF24 {3 mul 1 sub abs} bind def\t% |3x-1|",
+  "/cF25 {3 mul 2 sub abs} bind def\t% |3x-2|",
+  "/cF26 {1.5 mul .5 sub} bind def\t% (3x-1)/2",
+  "/cF27 {1.5 mul 1 sub} bind def\t% (3x-2)/2",
+  "/cF28 {1.5 mul .5 sub abs} bind def\t% |(3x-1)/2|",
+  "/cF29 {1.5 mul 1 sub abs} bind def\t% |(3x-2)/2|",
+  "/cF30 {0.32 div 0.78125 sub} def\t% x/0.32-0.78125",
+  "/cF31 {2 mul 0.84 sub} def\t% 2*x-0.84",
+  "/cF32 {dup 0.42 le {4 mul} {dup 0.92 le {-2 mul 1.84 add} {0.08 div 11.5 sub} ifelse} ifelse } def\t% 4x;1;-2x+1.84;x/0.08-11.5",
+  "/cF33 {2 mul 0.5 sub abs} def\t% |2*x - 0.5|",
+  "/cF34 {2 mul} def\t% 2*x",
+  "/cF35 {2 mul 0.5 sub} def\t% 2*x - 0.5",
+  "/cF36 {2 mul 1 sub} def\t% 2*x - 1",
+  "" };
+
+TERM_PUBLIC int PS_make_palette (t_sm_palette *palette)
+{
+#define R sm_palette.formulaR
+#define G sm_palette.formulaG
+#define B sm_palette.formulaB
+if (palette == NULL)
+  /* postscript can do continous number of colours */
+  return 0;
+/* write header for smooth colours */
+
+fprintf(gpoutfile, "gsave %% colour palette begin\n");
+/* print the definition of R,G,B formulae */
+
+if (sm_palette.ps_allcF == 0) { /* print only those 3 used formulae */
+    fprintf(gpoutfile, "%s\n",PostScriptColorFormulae[ abs(R) ]);
+    if (abs(G) != abs(R))
+      fprintf(gpoutfile, "%s\n",PostScriptColorFormulae[ abs(G) ]);
+    if ((abs(B) != abs(R)) && (abs(B) != abs(G)))
+      fprintf(gpoutfile, "%s\n",PostScriptColorFormulae[ abs(B) ]);
+    }
+  else { /* all color formulae are written into the output PostScript file */
+    int i = 0;
+    while ( *(PostScriptColorFormulae[i]) )
+      fprintf(gpoutfile, "%s\n",PostScriptColorFormulae[ i++ ]);
+    }
+
+/* now print something like
+/g {dup cF7 exch dup cF5 exch cF15 setrgbcolor} bind def
+*/
+fprintf(gpoutfile,"Color %s and { %% COLOUR vs. GRAY map\n",
+  (sm_palette.colorMode == SMPAL_COLOR_MODE_RGB) ? "true" : "false"
+  );
+fprintf(gpoutfile,"  /g {stroke dup ");
+if (R < 0) fprintf(gpoutfile, "1 exch sub "); /* negate */
+fprintf(gpoutfile,"cF%i exch dup ", abs(R));
+if (G < 0) fprintf(gpoutfile, "1 exch sub "); /* negate */
+fprintf(gpoutfile,"cF%i exch ", abs(G));
+if (R<0 || G<0 || B<0) fprintf(gpoutfile,"\n\t");
+if (B < 0) fprintf(gpoutfile, "1 exch sub "); /* negate */
+fprintf(gpoutfile,"cF%i ", abs(B));
+fprintf(gpoutfile,"setrgbcolor} bind def\n");
+fprintf(gpoutfile, "  /h {rlineto rlineto rlineto fill} bind def\n");
+/*
+fprintf(gpoutfile, "%%  /G {currentrgbcolor 3 index stroke g} bind def\n");
+fprintf(gpoutfile, "%%  /H {h setrgbcolor pop} bind def\n");
+*/
+fprintf(gpoutfile, "  /F {rlineto fill setrgbcolor pop} bind def\n");
+fprintf(gpoutfile, "}{\n");
+fprintf(gpoutfile, "  /g {stroke setgray} bind def\n");
+fprintf(gpoutfile, "  /h {rlineto rlineto rlineto fill setgray} bind def\n");
+/*
+fprintf(gpoutfile, "%%  /g {currentgray exch stroke setgray} bind def\n");
+fprintf(gpoutfile, "%%  /G {currentgray exch stroke g} bind def\n");
+fprintf(gpoutfile, "%%  /H {h setgray} bind def\n");
+*/
+fprintf(gpoutfile, "  /F {rlineto fill setgray} bind def\n");
+fprintf(gpoutfile, "} ifelse\n");
+fprintf(gpoutfile, "/N {newpath moveto} def\n");
+fprintf(gpoutfile, "/f {rlineto fill} bind def\n");
+return 0;
+#undef R
+#undef G
+#undef B
+}
+
+
+#if 0 /* caching of color value removed; won't be so efficient for z=const 
+	 surfaces/map, but will save a lot of headache (linetype changes 
+	 color, for instance) */
+double pm3d_last_color;
+  /* last choosen colour */
+
+double pm3d_ps_color;
+  /* keep here the last set color */
+#endif
+
+TERM_PUBLIC void PS_set_color (double gray)
+{
+/* map [0;1] to interval [16;255] */
+/* Note: command G puts on stack current colour/gray values to be restored 
+   afterwards!
+*/
+#if 0
+pm3d_ps_color = gray;
+pm3d_last_color = gray;
+#endif
+/* printing the gray with 4 digits and without the leading 0 ... saving space */
+if (gray <= 0) fprintf(gpoutfile, "0 g "); else
+if (gray >= 1) fprintf(gpoutfile, "1 g "); else {
+   char s[15];
+   gray = 0.0001*(int)(gray*10000+0.5); /* round it to 4 digits */
+   sprintf(s,"%.4g g ",gray);
+   if (s[0] == '0' && s[1] == '.') fprintf(gpoutfile, "%s", &(s[1]));
+     else fprintf(gpoutfile, "%s", s);
+  }
+PS_relative_ok = FALSE; /* "M" required because "g" forces stroke */
+}
+
+TERM_PUBLIC void PS_filled_polygon ( int points, gpiPoint *corners )
+{
+    int i;
+    /* produce lines like:
+       .9335 g 9055 29350 N 695 0 V 0 564 V -695 0 f
+       .9335 g 9055 29350 N 695 0 V 0 564 V -695 0 f
+     */
+    fprintf(gpoutfile, "%i %i N", corners[0].x, corners[0].y);
+    if (points == 4) /* shorter version */
+	fprintf(gpoutfile, " %i %i %i %i %i %i h\n",
+	    corners[3].x-corners[2].x, corners[3].y-corners[2].y,
+	    corners[2].x-corners[1].x, corners[2].y-corners[1].y,
+	    corners[1].x-corners[0].x, corners[1].y-corners[0].y
+	       );
+    else {  
+	for (i = 1; i < points-1; i++)
+	    fprintf(gpoutfile, " %i %i V",
+		corners[i].x-corners[i-1].x, corners[i].y-corners[i-1].y);
+	fprintf(gpoutfile, " %i %i F\n",
+	    corners[i].x-corners[i-1].x, corners[i].y-corners[i-1].y);
+    }
+    PS_relative_ok = FALSE;
+}
+
+TERM_PUBLIC void PS_previous_palette(void)
+{
+fprintf(gpoutfile, "grestore %% colour palette end\n");
+}
+
+#endif /* PM3D */
 
 #endif /* TERM_BODY */
 
@@ -1734,7 +1916,16 @@ TERM_TABLE_START(post_driver)
    PS_text, null_scale, PS_graphics, PS_move, PS_vector, 
    PS_linetype, PS_put_text, PS_text_angle, 
    PS_justify_text, PS_point, do_arrow, PS_set_font, PS_pointsize,
-   0 /*flags*/, 0 /*suspend*/, 0 /*resume*/, PS_fillbox, PS_linewidth
+   TERM_BINARY /*flags*/, 0 /*suspend*/, 0 /*resume*/, PS_fillbox, PS_linewidth
+#ifdef PM3D
+#ifdef USE_MOUSE
+   , 0, 0, 0, 0, 0 /* no mouse support for postscript */
+#endif
+   , PS_make_palette,
+   PS_previous_palette, /* write grestore */
+   PS_set_color,
+   PS_filled_polygon
+#endif
 TERM_TABLE_END(post_driver)
 
 #undef LAST_TERM

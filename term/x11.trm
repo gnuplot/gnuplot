@@ -1,5 +1,5 @@
 /*
- * $Id: x11.trm,v 1.28 2000/05/02 20:56:27 broeker Exp $
+ * $Id: x11.trm,v 1.26.2.2 2000/05/16 11:27:10 joze Exp $
  *
  */
 
@@ -43,6 +43,11 @@
  * Implementation and functionality is based on pm.trm
  */
 
+/* X11 support for Petr Mikulik's pm3d 
+ * by Johannes Zellner <johannes@zellner.org>
+ * (November 1999 - January 2000)
+ */
+
 #include "driver.h"
 
 #ifdef TERM_REGISTER
@@ -75,6 +80,19 @@ TERM_PUBLIC void X11_set_cursor __PROTO((int, int, int));
 TERM_PUBLIC void X11_put_tmptext __PROTO((int, const char str[]));
 TERM_PUBLIC void X11_set_clipboard __PROTO((const char[]));
 #endif
+
+#ifdef PM3D
+TERM_PUBLIC int X11_make_palette __PROTO((t_sm_palette*));
+/* not static! */ void X11_unset_pm3d __PROTO((void)); /*not previous_palette*/
+TERM_PUBLIC void X11_set_color __PROTO((double));
+TERM_PUBLIC void X11_filled_polygon __PROTO((int, gpiPoint*));
+/* these must match the definitions in gplt_x11.c */
+#define X11_GR_MAKE_PALETTE     'p'
+#define X11_GR_RELEASE_PALETTE  'e'
+#define X11_GR_SET_COLOR        'c'
+#define X11_GR_FILLED_POLYGON   'f'
+#endif
+
 #define X11_XMAX 4096
 #define X11_YMAX 4096
 
@@ -167,7 +185,6 @@ static char X11_default_command[] = "gnuplot_x11.exe";
 # endif /* !OS/2 */
 static char* X11_command = X11_default_command;
 /* must match the definition in src/gplt_x11.c: */
-enum { UNSET = -1, no = 0, yes = 1 };
 static int persist = UNSET;
 static int do_raise = UNSET;
 
@@ -934,7 +951,62 @@ const char s[];
 	FFLUSH();
     }
 }
-#endif
+
+#endif /* USE_MOUSE */
+
+#ifdef PM3D
+
+TERM_PUBLIC int X11_make_palette(t_sm_palette *palette)
+{
+    /* TODO: also a check for abs(formula[RGB]) < colorFormulae ?
+     *       or is this /certainly/ done here ? */
+    if (palette) {
+	if (X11_ipc) {
+	    fprintf(X11_ipc, "%c%c %d %d %d %c\n",
+		X11_GR_MAKE_PALETTE, palette->colorMode, palette->formulaR,
+		palette->formulaG, palette->formulaB, palette->positive);
+	    /* we don't need the rest of the struct (joze) */
+	    fflush(X11_ipc);
+	} else {
+	    fprintf(stderr, "(X11_make_palette) 0 == X11_ipc\n");
+	    return -1;
+	}
+    }
+    return 0;
+}
+
+/* we use it from unset.c */
+void
+X11_unset_pm3d(void)
+{
+    if (X11_ipc) {
+	PRINT1("%c\n", X11_GR_RELEASE_PALETTE);
+	FFLUSH();
+    }
+    return;
+}
+
+TERM_PUBLIC void X11_set_color(double gray)
+{
+    fputc(X11_GR_SET_COLOR, X11_ipc);
+    PRINT1("%f\n", gray);
+    FFLUSH();
+    return;
+}
+
+TERM_PUBLIC void X11_filled_polygon(int points, gpiPoint *corners)
+{
+    int i;
+    fputc(X11_GR_FILLED_POLYGON, X11_ipc);
+    PRINT1("%04d", points);
+    for (i = 0; i < points; i++)
+	PRINT2("%04d%04d", corners[i].x, corners[i].y);
+    fputc('\n', X11_ipc);
+    FFLUSH();
+    return;
+}
+
+#endif /* PM3D */
 
 
 #endif /* TERM_BODY */
@@ -954,6 +1026,12 @@ TERM_TABLE_START(x11_driver)
 #ifdef USE_MOUSE
     , X11_waitforinput, X11_put_tmptext, X11_set_ruler, X11_set_cursor, X11_set_clipboard
 #endif
+#ifdef PM3D
+    , X11_make_palette,
+    0 /* X11_previous_palette */,
+    X11_set_color,
+    X11_filled_polygon
+#endif
 TERM_TABLE_END(x11_driver)
 
 #undef LAST_TERM
@@ -971,6 +1049,12 @@ TERM_TABLE_START(X11_driver)
     X11_fillbox, X11_linewidth
 #ifdef USE_MOUSE
     , X11_waitforinput, X11_put_tmptext, X11_set_ruler, X11_set_cursor, X11_set_clipboard
+#endif
+#ifdef PM3D
+    , X11_make_palette,
+    0 /* X11_previous_palette */,
+    X11_set_color,
+    X11_filled_polygon
 #endif
 TERM_TABLE_END(X11_driver)
 
@@ -1310,5 +1394,67 @@ START_HELP(x11)
 "%@gnuplot*line7Dashes: 42",
 "%@gnuplot*line8Dashes: 13",
 "@end table"
+#ifdef PM3D
+, "",
+"2 pm3d_resources",
+"?commands set terminal x11 pm3d_resources",
+"?set terminal x11 pm3d_resources",
+"?set term x11 pm3d_resources",
+"?x11 pm3d_resources",
+"?pm3d_resources",
+" Choosing the appropriate visual class and number of colors is a crucial",
+" point in X11 applications and a bit awkward, since X11 supports six visual",
+" types in different depths.",
+"",
+" By default `gnuplot` uses the default visual of the screen. The number of",
+" colors which can be allocated depends on the visual class chosen. On a",
+" visual class with a depth > 12bit, gnuplot starts with a maximal number",
+" of 0x200 colors.  On a visual class with a depth > 8bit (but <= 12 bit)",
+" the maximal number of colors is 0x100, on <= 8bit displays the maximum",
+" number of colors is 240 (16 are left for line colors).",
+"",
+" Gnuplot first starts to allocate the maximal number of colors as stated",
+" above.  If this fails, the number of colors is reduced by the factor 2",
+" until gnuplot gets all colors wich are requested. If dividing `maxcolors`",
+" by 2 repeatedly results in a number which is smaller than `mincolors`",
+" `gnuplot` tries to install a private colormap. In this case the window",
+" manager is responsible for swapping colormaps when the pointer is moved",
+" in and out the x11 driver's window.",
+"",
+" The default for `mincolors` is maxcolors / (num_colormaps > 1 ? 2 : 8,",
+" where num_colormaps is the number of colormaps which are currently used",
+" by gnuplot (usually 1, if only one x11 window is open).",
+"",
+" Some systems support multiple (different) visual classes together on one",
+" screen. On these systems it might be necessary to force gnuplot to use a",
+" specific visual class, e.g. the default visual might be 8bit PseudoColor",
+" but the screen would also support 24bit TrueColor which would be the",
+" preferred choice.",
+"",
+" The information about an Xserver's capabilities can be obtained with the",
+" program `xdpyinfo`.  For the visual names below you can choose one of",
+" StaticGray, GrayScale, StaticColor, PseudoColor, TrueColor, DirectColor.",
+" If an Xserver supports a requested visual type at different depths,",
+" `gnuplot` chooses the visual class with the highest depth (deepest).",
+" If the requested visual class matches the default visual and multiple",
+" classes of this type are supported, the default visual is preferred.",
+"",
+" Example: on an 8bit PseudoColor visual you can force a private color map",
+" by specifying `gnuplot*maxcolors: 240` and `gnuplot*mincolors: 240`.",
+"",
+"@start table - first is interactive cleartext form",
+"  gnuplot*maxcolors:  <integer number>",
+"  gnuplot*mincolors:  <integer number>",
+"  gnuplot*visual:     <visual name>",
+"#\\begin{tabular}{|cl|} \\hline",
+"#&gnuplot*maxcolors:  <integer number>\\\\",
+"#&gnuplot*mincolors:  <integer number>\\\\",
+"#&gnuplot*visual:     <visual name>\\\\",
+"%c l .",
+"%@gnuplot*maxcolors:  <integer number>",
+"%@gnuplot*mincolors:  <integer number>",
+"%@gnuplot*visual:     <visual name>",
+"@end table"
+#endif /* PM3D */
 END_HELP(x11)
 #endif /* TERM_HELP */

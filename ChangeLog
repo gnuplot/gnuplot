@@ -22,6 +22,19 @@
 	* docs/gnuplot.doc: added documentation for the "history" and 
 	  "system" commands.
 
+2000-10-25  Johannes Zellner <johannes@zellner.org>
+
+	* src/pm3d.c, src/color.[ch]:
+	repaired supplying of extended color specs in pm3d
+	(make it working in vgagl.trm)
+
+2000-10-24  Petr Mikulik <mikulik@physics.muni.cz>
+
+	* trm/post.trm: "g" makes stroke + set(gray/rgb), "G" and "H" removed;
+	  finally supporting 'with l lt pal' too
+
+	* docs/gnuplot.doc, pm3d/README: say PM3D works under Win too
+
 2000-10-24  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* docs/gnuplot.texi: Regenerate to include new arrow heads options
@@ -33,11 +46,29 @@
  	pressing SPC in graph window transfers the focus to the gnuplot
  	text window.
 
-2000-10-24 Johannes Zellner <johannes@zellner.org>
+2000-10-24  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* missing: Update from automake-cvs.
+
+	* src/depcomp: Add from automake-cvs.
+
+	* term/cgm.trm(CGM_graphics): Use gnuplot_version instead of VERSION.
+	Add gnuplot_patchlevel to description string.
+
+	* term/cgm.trm(CGM_set_font): Eliminate compiler warning.
+
+	* term/emf.trm: Update to latest version.
+
+2000-10-24  Johannes Zellner <johannes@zellner.org>
 
 	* term/ggi.trm: increased the speed of ggi command line
 	input by redrawing ruler / statusline coordinates / zoombox
 	only if they've changed.
+
+	* term/ggi.trm: masking also key repeat events
+
+	* term/ggi.trm: 'q' closes the terminal, so it's
+	compatible with X11 and vgagl.
 
 2000-10-24  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
@@ -70,6 +101,51 @@
 	centimeter position in metric mode. Output sizes for metrix are now
 	12x8cm and 12x15cm.
 
+2000-10-23  Johannes Zellner <johannes@zellner.org>
+
+	* repaired `pm3d hidden'
+
+2000-10-23  Petr Mikulik <mikulik@physics.muni.cz>
+
+	* src/os2/gclient.c: support for 'with l lt pal'
+
+2000-10-23  Johannes Zellner <johannes@zellner.org>
+
+	* `linetype palette' linetype, e.g.:
+	  - set style line 1 lt pal
+	  - splot sin(sqrt(x*x+y*y))/sqrt(x*x+y*y) w l lt pal
+	draws lines using a smooth palette which is set with the
+	command `set palette'. This works only for splots and
+	lines / points / dots (not impulses). It works also
+	for contours. For normal surface plots, the scans are
+	scan-wise depth-ordered. This is not perfect, but it's
+	better than nothing and it's still pretty fast. If speed
+	is not an issue, hidden3d can be used. Currently, the
+	following terminals are supported:
+	  - X11, gif, fig, vgagl, ggi
+
+2000-10-22  Johannes Zellner <johannes@zellner.org>
+
+	* repaired `gnuplot -rv' (src/gplt_x11.c) so that it takes
+	white as foreground for border / text ...
+
+	* `linetype palette' option: uses the smooth palette as
+	specified by `set pal' (only possible for pm3d enhanced
+	terminals). Works for splots:
+
+	    lines
+	    points
+	    dots
+
+	/not/ for impulses (would this make sense ?)
+	Currently only implemented in the following terminals:
+
+	    X11
+	    gif
+	    fig
+	    vgagl
+	    ggi
+
 2000-10-22  Johannes Zellner <johannes@zellner.org>
 
 	* ggi driver:
@@ -77,6 +153,16 @@
 	  - multiplot support
 	  - autoconf support
 	  - mode selection support
+
+2000-10-20  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* term/win.trm (WIN_make_palette): new function to implement PM3D
+ 	support for the Windows driver
+	(WIN_set_color): dito
+	(WIN_filled_polygon): dito
+
+	* src/win/wgraph.c (drawgraph): add low-level parts of PM3D
+ 	implementation, here.
 
 2000-10-20  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
@@ -142,7 +228,7 @@
         by default.
 
 	* term/cgm.crm (CGM_put_text): Was using the same distance as
-	the declared baseline-to-baseline text dimension (used by
+	the the declared baseline-to-baseline text dimension (used by
 	gnuplot) and the baseline-to-capline height declared in the
 	output file.  Reducing the character height (by factor of 2/3)
 	in the output file.  Increase default font size from 10 to 12
@@ -204,7 +290,6 @@
 	the mouse stuff.
 
 2000-09-21  Petr Mikulik <mikulik@physics.muni.cz>
-
 	* src/graphics.c src/graph3d.c: bugfix "if ((*t->pointsize))"
 	changed to "if (t->pointsize)
 
@@ -228,7 +313,6 @@
 	exponential notation). Changed MP_DPI from 300 to 2400.
 
 2000-08-02  Petr Mikulik <mikulik@physics.muni.cz>
-
 	* src/graph3d.c src/graphics.c src/set.c src/show.c src/term.c
 	  src/plot.h docs/gnuplot.doc term/fig.trm:
 	allow setting arrow head(s) sizes --- new keywords `heads` and
@@ -253,6 +337,30 @@
 	this would not work if the same plot is replotted subsequently on
 	enhanced and non-enhanced terminals.
 
+2000-07-13  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* pm3d: src/os2/gclient.c, term/pm.trm: bugfix for color palette
+	allocation ('set palette maxcolors' was ignored)
+
+2000-07-10  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* src/color.c: boundary around the color box is drawn by move&line
+	for bitmap as well as postscript-including terminals.
+	Contributed by Gregor Thalhammer <Gregor.Thalhammer@uibk.ac.at>
+
+2000-06-24  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* src/color.c: if is_log_z, then print the non-logged values of z_min
+	and z_max around the color box
+
+	* src/unset.c: 'unset pm3d' sets the y axis to noreversed if the reversed
+	has been set by 'set pm3d map'
+
+	* pm3d: a trick for rotating the ylabel via 'set pm3d map' (see variable
+	`pm3d_map_rotate_ylabel`). That's needed because gnuplot does not have an
+	option for rotating x,y,z axes labels; once it possesses it, the above 
+	mentioned variable would be replaced by the new one.
+
 2000-06-23  Johannes Zellner <johannes@zellner.org>
 
 	* src/gplt_x11.c: repaired `selection' (by left mouse).
@@ -266,6 +374,16 @@
 
 	* term/cgm.trm(CGM_option): reject linewidth zero to avoid
 	infinite looping in CGM_dashed_vector(), later
+
+2000-06-14  Johannes Zellner <johannes@zellner.org>
+
+	* epslatex.trm also for pm3d
+
+2000-06-14  Johannes Zellner <johannes@zellner.org>
+
+	* src/color.c: modified the postscript color box drawing for user borders
+	* term/post.trm: repaired the broken pslatex if using `encoding'
+	as proposed by Petr Mikulik.
 
 2000-06-13  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
@@ -294,6 +412,16 @@
 
 	* src/save.c: don't close the fp's if it's stdout
 
+2000-06-09  Johannes Zellner <johannes@zellner.org>
+
+	* implemented the palette `origin', `size', `border',
+	`noborder', `bdefault' subcommands and did a few changes
+	for the placement of the labels at horizontal color boxes.
+
+2000-06-04  Johannes Zellner <johannes@zellner.org>
+
+	* included the supported terminals for pm3d to gnuplot.doc
+
 2000-05-31  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* Ignore `replot` command called from mouse/hotkey-event-enhanced
@@ -301,6 +429,31 @@
 	i.e., no mouse replot after `plot '-'`). See also "no replot after
 	`plot '-'`" discussion in the gnuplot-beta newsgroup.
 	New variables: plotted_data_from_stdin, replot_disabled.
+
+2000-05-25  Petr Mikulik <mikulik@physics.muni.cz>
+	* pm3d: support for pm3d functionality in 'pslatex / pstex' terminals
+
+2000-05-25  Petr Mikulik <mikulik@physics.muni.cz>
+	* pm3d: unset.c: #ifdef X11 .. #endif missing in unset_pm3d()
+
+2000-05-24  Lars Hecking  <lhecking@nmrc.ie>
+
+	* configure.in: configure should always exit with an exit code
+	of zero.
+
+2000-05-16  Petr Mikulik <mikulik@physics.muni.cz>
+	* pm3d/contrib: updated pm3dConvertToImage.awk to support colour images
+
+2000-05-11  Petr Mikulik <mikulik@physics.muni.cz>
+	* pm3d/contrib: added pm3dConvertToImage.awk
+
+2000-05-09  Petr Mikulik <mikulik@physics.muni.cz>
+	* pm3d: three new color mapping formulae 34--36: 2x,2x-0.5,2x-1
+
+2000-05-04  Johannes Zellner <johannes@zellner.org>
+
+	* reimplemented the Linux vgagl terminal driver with
+	mouse and pm3d support (uses the lib3dkit library)
 
 2000-05-04  Johannes Zellner <johannes@zellner.org>
 
@@ -316,6 +469,10 @@
 
 	* term/x11.trm: added a few ifdef USE_MOUSE's to exclude mouse
 	code, if compiling w/o mouse support.
+
+2000-05-03  Johannes Zellner <johannes@zellner.org>
+
+	* merged pre-pm3d - pre-pm3d-01 from the MAIN trunk.
 
 2000-05-02  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
@@ -356,6 +513,10 @@
 
 	* term/gif.trm(GIF_put_text): Fix compiler warnings, patch from
 	Alexander Mai.
+
+2000-05-01  Johannes Zellner <johannes@zellner.org>
+
+	* branched off pm3d
 
 2000-05-01  Johannes Zellner <johannes@zellner.org>
 

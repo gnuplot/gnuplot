@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.18 2000/02/11 19:16:20 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.18.2.2 2000/10/23 04:35:27 joze Exp $"); }
 #endif
 
 /* GNUPLOT - hidden3d.c */
@@ -43,6 +43,11 @@ static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.18 2000/02/11 19:16:20 
  */
 
 #include "hidden3d.h"
+
+#ifdef PM3D
+# include "color.h"
+# include "pm3d.h"
+#endif
 
 #include "alloc.h"
 #include "command.h"
@@ -145,14 +150,6 @@ static int hiddenHandleBentoverQuadrangles = HANDLE_BENTOVER_QUADRANGLES;
 #define GE(X,Y)  ((X) >= (Y) - EPSILON)		/* X >= Y */
 #define SIGN(X)  ( ((X)<-EPSILON) ? -1: ((X)>EPSILON) )
 
-/* All the necessary information about one vertex. FIXME: Might need
- * an lp_style_type pointer element? */
-typedef struct vertex {
-    coordval x, y, z;		/* vertex coordinates */
-    int style;			/* point symbol type (if any) */
-} vertex;
-typedef vertex GPHUGE *p_vertex;
-
 
 /* Utility macros for vertices: */
 #define FLAG_VERTEX_AS_UNDEFINED(v) \
@@ -236,8 +233,6 @@ static long efirst;		/* first edges in zsorted chain */
 #define GETBIT(a,i) (((a)>>(i))&1L)
 
 /* Prototypes for internal functions of this module. */
-static void map3d_xyz __PROTO((double x, double y, double z,
-			       p_vertex v));
 static long int store_vertex __PROTO((struct coordinate GPHUGE * point,
 				      int pointtype));
 static long int make_edge __PROTO((long int vnum1, long int vnum2,
@@ -439,7 +434,7 @@ term_hidden_line_removal()
 
 /* Performs transformation from 'user coordinates' to a normalized
  * vector in 'graph coordinates' (-1..1 in all three directions) */
-static void
+void
 map3d_xyz(x, y, z, v)
 double x, y, z;			/* user coordinates */
 p_vertex v;			/* the point in normalized space */
@@ -466,6 +461,10 @@ p_vertex v;			/* the point in normalized space */
     v->x = Res[0] / Res[3];
     v->y = Res[1] / Res[3];
     v->z = Res[2] / Res[3];
+#ifdef PM3D
+    /* store z for later color calculation */
+    v->real_z = z;
+#endif
 }
 
 
@@ -2131,6 +2130,12 @@ p_edge e;
     TERMCOORD(v1, x1, y1);
     TERMCOORD(v2, x2, y2);
     term_apply_lp_properties(e->lp);
+#ifdef PM3D
+    if (e->lp->use_palette) {
+	double z =  (v1->real_z + v2->real_z) * .5;
+	set_color(z2gray(z));
+    } else
+#endif
     (term->linetype) (e->style);
     (*term->move) (x1, y1);
     (*term->vector) (x2, y2);

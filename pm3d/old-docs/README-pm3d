@@ -1,0 +1,258 @@
+Sub: pm3d: new splot mode for gray/colour maps and surfaces
+
+		Dear colleagues, 
+
+I'd like to announce here a new type of splot mode:  pm3d.  This adds the
+possibility to draw colour/gray maps and surfaces to contours and wired 
+surfaces currently supported. 
+Please look at some snapshots of the new 
+functionality at
+	http://www.sci.muni.cz/~mikulik/gnuplot.html
+
+This text is something between the announcement, documentation, notes 
+and proposals ...
+  Sorry that this documentation and the accompanying email on terminal 
+entry additions are somehow long.  I hope that someone will like it.
+
+Firstly I'd like to say that the implementation is based on the 
+following new terminal entries:
+	term->make_palette
+	term->previous_palette
+	term->set_color
+	term->filled_polygon
+which I have coded for Postscript, GIF and OS/2 PM terminals.  Since 
+there is not yet design for colours in gnuplot, these functions should be 
+considered as `proposed and working', surely not `final'.  The pm3d
+algorithm can be easily updated for whatever are such functions called in
+gnuplot 4.0 (yes?).  Description of my current coding for them comes in a 
+separate email, here please suppose that they are working. 
+
+
+=== History of the pm3d algorithm ===
+
+In April 1994 I was calculating diffractometer resolution functions. The 
+program produced large data files but I had no program for DOS to plot 
+them (quickly, easily and without preprocessing/artefacts).  Then I've
+developed the pm3d algorithm and implemented it in the "pmgraf" plotting 
+program (for DOS), see
+	http://www.sci.muni.cz/~mikulik/freeware.html#pmgraf
+Unfortunately, I could plot maps in 16 colours only (and usually in 
+size of 640x480 pixels), and printing was possible only by screen hardcopy. 
+
+Thus later, in March 1995, I wrote program pm3d (freeware/GPL), see
+	http://www.sci.muni.cz/~mikulik/freeware.html#pm3d
+It prints the gray or colour map into a postscript file.  Since the
+program is written in C++ and ghostscript is available for any operating
+system, this is was a perfectly portable solution.  The program has been
+greatly improved until now and me and my colleagues use it mainly for fast
+plotting of our maps of scattered intensity measured in home labs or
+synchrotrons.  I know that also a mathematician has used it for
+representation of elements of large matrices.
+
+Later I though that it would be nice to add the algorithm into gnuplot, so
+that it would be possible to draw the map on the screen immeditately.  So I
+coded the thing from December 1998 to January 1999.  Now I hope that it
+will arise discussion on colours for gnuplot and hopefully make it ready
+for gnuplot 4.0.
+
+
+=== The pm3d algorithm ===
+
+The pm3d algorithm (in pmgraf, pm3d and now in gnuplot) draws a gray/colour
+map (or surface, in gnuplot only) of a 3D data file, those syntax is 
+gnuplot's one: a sequence of scans (scan is the same what is called 
+`iso_curve' in gnuplot).
+
+It takes each scan until the last but one.  For a scan J look at the
+subsequent scan J+1.  Take each point on scan J, and make a polygon with 4
+corners:  two subsequent points at scan J and two points at scan J+1.
+(This produces a rectangle if the data file is like matrix, otherwise a
+trapezoid or a quadrangle in general.)  Fill the polygon by a colour
+corresponding to the averaged Z coordinate of those 4 corners.
+
+Therefore it can plot matricial as well as non-rectangular non-gridded data
+without any preprocessing, and on one pass.  You could see such figures on 
+the URL's cited above. 
+
+
+=== Running ===
+
+(*) At gnuplot's prompt, type something like
+	set pm3d b   or   set pm3d bs    or ...
+
+look at pm3d.h (after knowing the snapshots on web), which says:
+
+/*
+  where to plot pm3d: base or top (colour map) or surface (colour surface)
+    - if pm3d.where is "", then don't plot in pm3d mode
+    - pm3d_at_where can be any combination of the #defines below. For instance,
+	"b" plots at bottom only, "st" plots firstly surface, then top, etc.
+  (for pm3d.where)	
+*/
+
+#define PM3D_AT_BASE	'b'
+#define PM3D_AT_TOP	't'
+#define PM3D_AT_SURFACE	's'
+
+
+(*) initialization of the structure of all other pm3d variables is 
+hardcoded in graph3d.c, after /* PLACE ARROWS */.  This should be 
+accessible via "set pm3d _suboption_" for the final release. The following 
+is proposed:
+
+  set nopm3d
+  set pm3d		# defaults at="b"
+  set pm3d at bs	# b, s, t, st, bstbst, see above
+  set pm3d gray	# gray or rgb
+  set pm3d rgbformulae 7,5,15 # transformation formulae for R,G,B
+  set pm3d flush left	# left, right, center
+  set pm3d color_box position _position_ size _size_ vertical|horizontal
+
+
+=== Sources ===
+
+(*) In gnuplot sources, all code for pm3d is surrounded by 
+	#ifdef PM3D
+	...
+	#endif
+Therefore gnuplot with pm3d has to be compiled with option -DPM3D. 
+In the pm3d patches, this option has been added only to makefile.os2.
+
+(*) New files added to the gnuplot sources are pm3d.h, pm3d.c, color.h,
+color.c
+
+
+=== Implementation ===
+
+(*) create the palette of continous(=smooth) colours for the given terminal
+        if (pm3d.where[0] &&  /* is pm3d plot requested? */
+            !make_palette()   /* (can) make palette of smooth colours */
+            ) {
+	... OK, process on pm3d...
+Routine make_palette is coded in pm3d.c.  Some comments on it will be 
+discussed later.
+
+(*) pm3d plot is called from graph3d.c, just before the stuff for 
+hidden line removal, i.e. before plotting surfaces and contours.  
+For each surface, it calls
+               pm3d_plot(this_plot,pm3d.where[i]);
+This routine will be discussed below. 
+
+(*) after that loop over all surfaces, draw the colour box which shows the 
+sequence of continuous colours:
+	  draw_color_smooth_box();
+Notice that the box is highly optimized for postscript. 
+
+(*) finally, it calls 
+            term->previous_palette();
+Actually, I needed it only for printing "grestore" into a postscript file. 
+
+
+
+=== Implementation of pm3d_plot(this_plot, at_which_z) in pm3d.c ===
+
+(*) this will plot the map (at_which_z=PM3D_AT_BASE or PM3D_AT_TOP) 
+or surface (at_which_z=PM3D_AT_SURFACE) for the given surface this_plot 
+
+(*) the implementation of the pm3d algorithm comes now. Schematically:
+
+for scan J=1 to scans-1 {
+  for pt=1 to min( points(J), points(J+1) ) {
+    pt' = ...; pt'' = ... // see below
+    ptJa = point(J,pt')
+    ptJb = point(J,pt'+1)
+    ptJ+1a = point(J+1,pt'')
+    ptJ+1b = point(J+1,pt'')
+    averagedZ = ( z(ptJa) + z(ptJb) + z(ptJ+1a) + z(ptJ+1b) ) / 4
+    set_color( averagedZ normalized to [0;1] )
+    fill_polygon( 4 corners, 
+                  those 4 points transformed into coordinates of
+                  the map or surface on the terminal )
+    }
+  }
+If the two subsequent scans have the same number of points, then 
+pt''=pt'=pt. Otherwise, pt''=pt'=pt if `scans flushed left', 
+pt'=points(J)-pt and pt''=points(J+1)-pt if `scans flushed right', and 
+similarly for `scans centered'.  And nothing is printed if there is only 
+one point on the scan.
+
+
+=== Implementation of make_palette in pm3d.c ===
+
+(*) please look into color.h, structure t_sm_palette: declaration of smooth 
+palette, i.e.  palette for smooth colours.  It documents how gray [0,1] is
+mapped into (R,G,B)=([0,1],[0,1],[0,1]).
+
+(*) ask for number of colours that can be used for the terminal:
+	i = term->make_palette(NULL);
+
+Postscript terminal returns 0 since it has its own mapping (transformation 
+gray [0,1] is coded as postscript functions, and also in order to make the
+output size of the postscript file as small as possible, i.e.  the same as
+the output from the pm3d program), not 3 values of RGB but 1 gray value is
+written into the postscript file and the analytical functions from
+pm3dGetColorValue are coded as postscript functions, see post.trm:
+PostScriptColorFormulae[] used in PS_make_palette entry.  PS->make_palette
+looks itself into sm_palette and writes a header with the appropriate
+postscript codes for formulaR, formulaG, formulaB transformations:
+post.trm:  PostScriptColorFormulae[] used in PS_make_palette.  Return from
+make_palette.
+
+  Other terminals have discrete number of colours.  Currently an (RGB)
+palette is allocated for the returned number of available colours; if pm3d
+is used in gnuplot's multiplot mode, then the result will be unpredictable
+(and should be disabled now; later must not allocate so many colours):
+
+Make the array of (RGB) triplets according to items in sm_palette (not
+for postscript) 
+	sm_palette.color = malloc( sm_palette.colors * sizeof(rgb_color) );
+Then
+for (i = 0; i < sm_palette.colors; i++) {
+  gray = (double)i / (sm_palette.colors - 1); /* rescale to [0;1] */
+  if (sm_palette.ColorMode == colorModeGRAY) /* gray scale only */
+     sm_palette.color[i].r = sm_palette.color[i].g = sm_palette.color[i].b = gray;
+  else { /* i.e. sm_palette.ColorMode == colorModeRGB */
+    sm_palette.color[i].r = pm3dGetColorValue(sm_palette.formulaR, gray);
+    sm_palette.color[i].g = pm3dGetColorValue(sm_palette.formulaG, gray);
+    sm_palette.color[i].b = pm3dGetColorValue(sm_palette.formulaB, gray);
+    }
+  }
+
+Finally tell the terminal to allocate the palette for the (RGB) triplets 
+(not for postscript) 
+	term->make_palette(&sm_palette);
+
+
+=== Transformation of Z-coordinate to gray and RGB ===
+
+How a colour is choosen from a gray?  AveragedZ is mapped into the interval
+[min_z:max_z] which is transformed into [0:1], see routine
+	double z2gray ( double z ) 
+/* Rescale z into the interval [0,1]. It's OK also for logarithmic z axis too
+   BUT: What about reversed axis range, i.e. max<min? Verify!
+*/
+Later it is used by
+	gray = z2gray ( avgZ );
+This value can be used directly as the gray for gray maps.
+For the colour map it needs to transform gray->(R,G,B):
+[0:1]->([0:1],[0:1],[0:1]) thus some nice three functions has to be
+choosen---see pm3d.c, function pm3dGetColorValue, for the available mapping
+functions.
+
+
+===================================
+
+Most probably not everything is clear from this brief documentation, 
+but hopefully at least some basic ideas.  Please study the code or ask 
+here. 
+
+
+Finally, the pm3d stuff is complete, and I do not suppose to develop it 
+any further.  The only missing thing is "set pm3d _pm3d_options_", but it
+makes no sense to code this before it is decided that pm3d is integrated
+into gnuplot.  I wish that it is.  So I wait for the response...
+
+Enjoy pm3d!
+
+
+Petr Mikulik, 14. 3. 1999

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: contour.c,v 1.11 1999/12/10 16:51:28 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: contour.c,v 1.11.2.2 2000/10/23 04:35:27 joze Exp $"); }
 #endif
 
 /* GNUPLOT - contour.c */
@@ -228,6 +228,7 @@ double *cont_levels_list;
 	dz = fabs(z_max - z_min);
 	if (dz == 0)
 	    return NULL;	/* empty z range ? */
+	/* what is the deeper sense of this ? (joze) */
 	dz = set_tic(log10(dz), ((int) ZLevels + 1) * 2);
 	z = floor(z_min / dz) * dz;
 	num_of_z_levels = (int) floor((z_max - z) / dz);
@@ -250,6 +251,9 @@ double *cont_levels_list;
 	if (contour_list != save_contour_list) {
 	    contour_list->isNewLevel = 1;
 	    sprintf(contour_list->label, contour_format, is_log_z ? pow(base_log_z, z) : z);
+#ifdef PM3D
+	    contour_list->z = is_log_z ? pow(base_log_z, z) : z;
+#endif
 	}
     }
 

@@ -1,5 +1,5 @@
 /*
- * $Id: graphics.h,v 1.14 2000/05/02 20:56:27 broeker Exp $
+ * $Id: graphics.h,v 1.11.2.2 2000/09/20 01:25:58 joze Exp $
  */
 
 /* GNUPLOT - graphics.h */

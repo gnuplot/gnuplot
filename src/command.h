@@ -1,5 +1,5 @@
 /*
- * $Id: command.h,v 1.16 2000/05/02 18:01:03 lhecking Exp $
+ * $Id: command.h,v 1.15.2.2 2000/06/04 12:53:20 joze Exp $
  */
 
 /* GNUPLOT - command.h */

@@ -1,0 +1,33 @@
+Demo are available for pm3d stuff. All posibilities below draw same pictures 
+directly to terminal, via one postscript file or by series of gif files.
+
+Requirements: gnuplot with pm3d; awk, sed; ghostview; gif viewer
+
+
+Demo.gp
+  This demo can be run if your default terminal supports pm3d.
+  The following terminals are currently supporting this:
+	- OS/2 Presentation Manager
+	- X11
+	- Linux VGA
+
+Demo-PostScript.gp
+  Makes one postscript file with all demo pictures.
+  Use ghostview for previewing
+
+Demo-Gif-pmview.gp
+  gif output, preview by `pmview` program (shareware for OS/2, Win). 
+  Edit yourself if you prefer another program (i.e. pmjpeg, explore -q)
+
+Demo-Gif-xv.gp
+  gif output, preview by `xv` for X11. 
+  This script equals to Demo-Gif-pmview.gp with `pmview` changed to `xv`
+  
+Demo-Gif-xv-pipe.gp
+  Similar to above, but data are piped into xv without any temporary file
+
+
+Note: Xfig demo is not available, try this yourself.
+
+Petr Mikulik, 30. 4. 1999, and March 2000
+

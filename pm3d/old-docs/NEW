@@ -1,0 +1,36 @@
+**********************************************************************
+21. 7. 1999
+
+Differences of gp37pl08e-pm3d.zip with respect to gp37pl08d-pm3d.zip:
+
+make pm3d draw before title and labels (patch by Ian MacPhedran)
+
+**********************************************************************
+14. 7. 1999
+
+Differences of gp37pl08d-pm3d.zip with respect to gp37pl08c-pm3d.zip:
+
+bugfix of negative colour formulae in post.trm
+
+
+**********************************************************************
+9. 7. 1999
+
+Differences of gp37pl08c-pm3d.zip with respect to gp37pl08b2-pm3d.zip:
+
+update of fig.trm by Ian MacPhedran (Ian_MacPhedran@engr.USask.CA)
+
+
+**********************************************************************
+21. 6. 1999
+
+Differences of gp37pl08b2-pm3d.zip with respect to gp37pl08b-pm3d.zip:
+
+(***) correction according to following bug report:
+
+Just so not everyone interested in this has to find and fix that himself: 
+the patch has some problems, if you don't have automake installed.  Adding
+color$U.o and pm3d$U.o to the list of gnuplot_OBJECTES in src/Makefile.in
+helps. 
+
+Reported by: Hans-Bernhard Broeker (broeker@physik.rwth-aachen.de)

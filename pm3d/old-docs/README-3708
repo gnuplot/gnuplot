@@ -1,0 +1,24 @@
+Subj: pm3d mode for gnuplot 3.7.0.8
+
+I have updated pm3d for gnuplot 3.7.0.8. It is available at 
+  http://www.sci.muni.cz/~mikulik/gnuplot/
+
+Changes:  splitting of `set pm3d` to `set pm3d` and `set palette` so that
+colour palettes can be later used for pm3d, filled colour contours or
+polygons, colour histograms, colour gradient background, and whatever it is
+or it will be implemented...
+
+New: `set palette`
+	`show palette`
+	`show palette palette <n>`
+
+According to the feedback from other users, the following features
+are highly requested:
+(*) X11 terminal support (could be coded according to pm.trm / gclient.c)
+(*) PNG terminal support (could be coded according to gif.trm)
+(*) colour box positioning
+
+Are there some skilled programmers to implement the above features? 
+(I cannot do this myself).
+
+

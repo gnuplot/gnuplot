@@ -1,5 +1,5 @@
 /*
- * $Id: hidden3d.h,v 1.2 1999/11/08 19:24:15 lhecking Exp $
+ * $Id: hidden3d.h,v 1.2.2.2 2000/10/23 04:35:27 joze Exp $
  */
 
 /* GNUPLOT - hidden3d.h */
@@ -43,6 +43,17 @@
 
 /* Type definitions */
 
+/* All the necessary information about one vertex. FIXME: Might need
+ * an lp_style_type pointer element? */
+typedef struct vertex {
+    coordval x, y, z;		/* vertex coordinates */
+    int style;			/* point symbol type (if any) */
+#ifdef PM3D
+    coordval real_z;
+#endif
+} vertex;
+typedef vertex GPHUGE *p_vertex;
+
 /* Variables of hidden3d.c needed by other modules: */
 
 /* Prototypes of functions exported by hidden3d.c */
@@ -50,6 +61,7 @@
 void set_hidden3doptions __PROTO((void));
 void show_hidden3doptions __PROTO((void));
 void save_hidden3doptions __PROTO((FILE *fp));
+void map3d_xyz __PROTO((double x, double y, double z, p_vertex v));
 #ifndef LITE
 void init_hidden_line_removal __PROTO((void));
 void reset_hidden_line_removal __PROTO((void));
@@ -57,7 +69,6 @@ void term_hidden_line_removal __PROTO((void));
 void plot3d_hidden __PROTO((struct surface_points *plots, int pcount));
 void draw_line_hidden __PROTO((unsigned int, unsigned int, unsigned int, unsigned int));
 #endif
-
 
 
 #endif /* GNUPLOT_HIDDEN3D_H */

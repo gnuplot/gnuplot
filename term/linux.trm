@@ -1,5 +1,5 @@
 /*
- * $Id: linux.trm,v 1.17 2000/05/02 20:56:27 broeker Exp $
+ * $Id: linux.trm,v 1.15.2.1 2000/05/01 00:17:20 joze Exp $
  *
  */
 
@@ -97,7 +97,7 @@ static int graphics_on = FALSE;
 static vga_modeinfo *modeinfo;
 static int linux_startx, linux_starty, linux_lasty;
 static int linux_angle;
-static int LINUX_graphics_allowed;
+int LINUX_graphics_allowed; /* also used in vgagl.trm */
 extern void drop_privilege();
 extern void take_privilege();
 
@@ -128,8 +128,20 @@ LINUX_setup(void)
 	pclose(pipe);
 	line[strlen(line) - 1] = '\0';
 	if (strcmp(line, "/dev/console") == 0 ||
-	    (strncmp(line, "/dev/tty", 8) == 0 && isdigit(line[8])))
+	    (strncmp(line, "/dev/tty", 8) == 0 && isdigit(line[8]))) {
 	    LINUX_graphics_allowed = TRUE;
+	} else {
+	    /* check for socket name as set for example by `screen' */
+	    char* sty = getenv("STY");
+	    if (sty) {
+		int n1, n2;
+		if (3 == sscanf(sty, "%d.tty%d.%s", &n1, &n2, line)) {
+		    /* we could check here, if host is the
+		     * same as gethostname() returns. */
+		    LINUX_graphics_allowed = TRUE;
+		}
+	    }
+	}
     }
     if (LINUX_graphics_allowed) {
 	take_privilege();

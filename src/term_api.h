@@ -1,5 +1,5 @@
 /*
- * $Id: $
+ * $Id: term_api.h,v 1.2.2.2 2000/05/03 21:26:12 joze Exp $
  */
 
 /* GNUPLOT - term_api.h */
@@ -71,5 +71,8 @@ void LINUX_setup __PROTO((void));
 #ifdef VMS
 void vms_reset();
 #endif
+
+/* in set.c (used in pm3d.c) */
+void lp_use_properties __PROTO((struct lp_style_type *lp, int tag, int pointflag));
 
 #endif /* GNUPLOT_TERM_API_H */

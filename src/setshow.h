@@ -1,5 +1,5 @@
 /*
- * $Id: setshow.h,v 1.24 2000/05/02 18:21:37 lhecking Exp $
+ * $Id: setshow.h,v 1.23.2.1 2000/05/03 21:26:12 joze Exp $
  */
 
 /* GNUPLOT - setshow.h */

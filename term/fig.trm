@@ -1,5 +1,5 @@
 /*
- * $Id: fig.trm,v 1.21 2000/08/02 13:53:11 mikulik Exp $
+ * $Id: fig.trm,v 1.19.2.5 2000/10/31 14:48:19 joze Exp $
  */
 
 /* GNUPLOT - fig.trm */
@@ -58,6 +58,7 @@
  * Point-count option joachim.selinger@ins.uni-stuttgart.de (JFS) Feb  9 1996
  * More options (portrait/landscape, metric/inches, size, fontsize, thickness)
  * plus symbols and depth/thickness by bernlohr@eu1.mpi-hd.mpg.de (KB) Aug 15 1996
+ * Added PM3D functionality Ian MacPhedran, April 15 1999
  */
 
 #include "driver.h"
@@ -82,6 +83,12 @@ TERM_PUBLIC void FIG_pointsize __PROTO((double arg_pointsize));
 TERM_PUBLIC void FIG_linewidth __PROTO((double linewidth));
 TERM_PUBLIC void FIG_reset __PROTO((void));
 TERM_PUBLIC void FIG_lpoint __PROTO((unsigned int x, unsigned int y, int number));
+#ifdef PM3D
+TERM_PUBLIC int FIG_make_palette (t_sm_palette *);
+/* TERM_PUBLIC void FIG_previous_palette (void); */
+TERM_PUBLIC void FIG_set_color (double);
+TERM_PUBLIC void FIG_filled_polygon (int, gpiPoint *);
+#endif
 
 #define GOT_FIG_PROTO
 #endif /* TERM_PROTO */
@@ -194,6 +201,12 @@ static int FIG_yoff = FIG_YOFF(INCH);
 static int FIG_font_s = FIG_FONT_S;
 static int FIG_portrait = FALSE;
 static int FIG_inches = INCH;
+#ifdef PM3D
+static int FIG_palette_set = FALSE;	/* PM3D Palette Set ? */
+static int FIG_palette_size = 128;	/* Number of colours in palette */
+static int FIG_palette_offst = 32;	/* Offset from zero for user colours */
+static int FIG_fill_style = 20;		/* Full saturation */
+#endif /* PM3D */
 
 static void FIG_poly_clean __PROTO((enum FIG_poly_stat fig_stat));
 
@@ -467,6 +480,10 @@ FIG_init()
     FIG_linetype(-1);
     FIG_justify_text(LEFT);
     FIG_text_angle(0);
+
+#ifdef PM3D
+    FIG_palette_set = FALSE;    /* PM3D Palette Set ? */
+#endif /* PM3D */
 
     FIG_line.tagged = FIG_DEFAULT;
     FIG_line.distrib = FIG_DEFAULT;
@@ -874,6 +891,104 @@ FIG_reset()
     fflush(gpoutfile);
 }
 
+#ifdef PM3D
+TERM_PUBLIC int FIG_make_palette(t_sm_palette *palette)
+{
+    int i;
+
+    /* Query to determine palette size */
+    if (palette==NULL) {
+	return(FIG_palette_size); /* How big is palette ? */
+    }
+
+    FIG_poly_clean(FIG_polyvec_stat); /* Clean up current data */
+
+    if (FIG_palette_set == FALSE) {
+	/* Create new palette */
+	FIG_palette_set = TRUE;
+	if ((FIG_use_color != TRUE) && (sm_palette.colorMode == SMPAL_COLOR_MODE_RGB)) { /* Force mono palette */
+	    /* NOTE: This is a bad way of doing this, but we have no way
+	       at this time of telling the main program to use grey */
+	    fprintf(stderr,
+		"Attempt to set colour palette in monochrome mode\n");
+	    sm_palette.colorMode = SMPAL_COLOR_MODE_GRAY;
+	    for (i = 0; i < sm_palette.colors; i++) {
+		int j = i * 255 / sm_palette.colors + 0.5;
+		fprintf(gpoutfile, "%d %d #%2.2x%2.2x%2.2x\n",
+		O_COLOR_DEF, (i + FIG_palette_offst),j,j,j);
+	    }
+	} else {
+	    /* Create colour/normal palette */
+	    for (i = 0; i < sm_palette.colors; i++) {
+		fprintf(gpoutfile, "%d %d #%2.2x%2.2x%2.2x\n",
+		O_COLOR_DEF, (i + FIG_palette_offst),
+		(int)( palette->color[i].r * 255 + 0.5 ),
+		(int)( palette->color[i].g * 255 + 0.5 ),
+		(int)( palette->color[i].b * 255 + 0.5 ) );
+	    }
+	}
+    } else {
+	fprintf(stderr, "Attempt to set palette twice\n");
+    }
+    return(0);
+}
+
+/* This doesn't apply for FIG format files
+TERM_PUBLIC void FIG_previous_palette()
+{
+}
+*/
+
+TERM_PUBLIC void FIG_set_color(double gray)
+{
+    int new_color;
+    if (FIG_palette_set == FALSE) {
+	fprintf(stderr,"Palette used before set\n"); /* Error condition */
+    }
+    new_color = (int)((gray*(FIG_palette_size-1)) + 0.5) + FIG_palette_offst;
+    if (FIG_color != new_color) {
+	FIG_poly_clean(FIG_polyvec_stat);
+	FIG_color = new_color;
+    }
+}
+
+TERM_PUBLIC void FIG_filled_polygon(int points, gpiPoint *corners)
+{
+    int i,j;
+
+    if (FIG_palette_set == FALSE) {
+	fprintf(stderr,"Palette used before set\n"); /* Error condition */
+    }
+
+    FIG_poly_clean(FIG_polyvec_stat); /* Clean up current data */
+
+    fprintf(gpoutfile, "%d %d %d %d %d %d %d %d %d %9.3f %d %d %d %d %d %ld\n\t"
+,
+	O_POLYLINE, T_POLYGON, FIG_line.style, 0,
+	FIG_color, FIG_color, FIG_line.depth,
+	FIG_line.pen_style, FIG_fill_style, FIG_line.style_val,
+	FIG_line.join_style, FIG_line.cap_style, FIG_line.radius,
+	0, 0, (long)(points+1));
+/* set thickness (arg 4) to 0 */
+
+    j = 0;
+    for (i = 0; i < points; i++) {
+	fprintf(gpoutfile, " %d %d", FIG_xoff + corners[i].x,
+	    term->ymax + FIG_yoff - corners[i].y);
+	if (j++ > 4 && i != points - 1) {
+		fputs("\n\t", gpoutfile);
+		j = 0;		/* JFS */
+	}
+    }
+    fprintf(gpoutfile, " %d %d", FIG_xoff + corners[0].x,
+	term->ymax + FIG_yoff - corners[0].y);
+    j++;
+    if (j != 0) {
+	putc('\n', gpoutfile);
+    }
+}
+#endif /* PM3D */
+
 #endif /* TERM_BODY */
 
 #ifdef TERM_TABLE
@@ -887,6 +1002,12 @@ TERM_TABLE_START(fig_driver)
     FIG_lpoint, FIG_arrow, set_font_null, FIG_pointsize,
     TERM_BINARY /*flags */ , 0 /*suspend */ , 0 /*resume */ , 0 /*fillbox */ ,
     FIG_linewidth
+#ifdef PM3D
+#ifdef USE_MOUSE
+    ,0, 0, 0, 0, 0 /* no mouse support for the fig terminal */
+#endif
+    , FIG_make_palette, 0 /*previous_palette*/, FIG_set_color, FIG_filled_polygon
+#endif /* PM3D */
 TERM_TABLE_END(fig_driver)
 
 #undef LAST_TERM

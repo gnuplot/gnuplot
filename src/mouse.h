@@ -1,5 +1,5 @@
 /*
- * $Id: mouse.h,v 1.3 2000/05/02 18:01:03 lhecking Exp $
+ * $Id: mouse.h,v 1.2.2.1 2000/05/03 21:26:11 joze Exp $
  */
 
 /* GNUPLOT - mouse.h */

@@ -1,0 +1,62 @@
+Here you find a release of patches for gnuplot's new pm3d splot 
+mode.
+
+
+Files:
+------
+
+README		this file
+README-pm3d	some doc for pm3d (e-mailed to info-gnuplot mail list)
+README-termentry some doc for new terminal entries (e-mailed to info-gnuplot mail list)
+
+gp3708b-pm3d.diff pm3d patch for gnuplot 3.7 pl 0.8, pm3d version (b)
+color.h		new file for pm3d things
+color.c		"
+pm3d.h		"
+pm3d.c		"
+
+pm3dCompress.awk script to shorten postscript files with pm3d splot and regular
+		(grided) data
+
+ApplyPM3D.cmd	my OS/2 script to apply all patches
+ApplyPM3D.sh	my shell script "
+
+demo-pm3d/*	demo for pm3d, see README therein
+
+
+Compiling:
+----------
+
+The patch must be applied after the mouse patches for PM terminal. If not, 
+then you can find some patches to be rejected; however, the rejects effect 
+only the OS/2 code, so don't care on other platforms. 
+
+Files color.h, color.c, pm3d.h, pm3d.c have to be copied to src/
+
+Compiling gnuplot+pm3d on OS/2, you may use my script ApplyPM3D.cmd
+On Unix, see ApplyPM3D.sh.
+
+
+Snapshots:
+----------
+Please look first look at http://www.sci.muni.cz/~mikulik/gnuplot.html
+or something like that for the snapshot of this new splot functionality.
+
+Notes:
+------
+README-pm3d and README-termentry enclosed here close are those from 
+14. 3. 1999, thus NOT updated for new things developed, like `fig` terminal
+support. But both are surely useful anyway.
+
+
+History of public releases:
+---------------------------
+ 15. 6. 1999 update: splitting `set pm3d` and `set palette`
+  1. 5. 1999 update: some improvements, `set pm3d map`, demo
+ 22. 4. 1999 update: fig terminal; formulae 30,31,32; ps: /Color; pm3dCompress
+ 15. 4. 1999 update: (help) set/show pm3d + several new options
+  6. 4. 1999 (gp 3.7 pl 0.5);
+ 14. 3. 1999 (version for gp 3.7)
+
+
+Petr Mikulik, mikulik@physics.muni.cz

@@ -1,0 +1,157 @@
+Sub: terminal entries for colours and filled polygons
+
+		Dear colleagues, 
+
+in this letter I'll briefly discuss the following new terminal entries:
+	term->make_palette
+	term->previous_palette
+	term->set_color
+	term->filled_polygon
+which I needed to make pm3d to work.  Please consider their implementation
+as experimental, or as my proposal for this job.  I hope it will be useful
+for the people developing the design of colours for gnuplot, as its
+necessity has been already discussed on the info gnuplot mailing list.
+
+
+Files considered here: color.h, color.c, plot.h,
+	gif.trm (GIF terminal implementation),
+	post.trm (PostScript terminal implementation),
+	pm.trm (OS/2 PM terminal implementation).
+
+
+All my new code is surrounded by 
+	#ifdef PM3D
+	...
+	#endif
+Considering my additions to the code, it hasn't been `cleaned'. There are 
+a lot of comments, commented printf's for development... to make it easier
+for others to look inside.
+  Therefore gnuplot with pm3d has to be compiled with option -DPM3D. 
+In the pm3d patches, this option has been added only to makefile.os2.
+
+
+In plot.h, the following new terminal entries are added into struct 
+TERMENTRY:
+
+
+#ifdef PM3D
+	int (*make_palette) __PROTO((t_sm_palette *palette));
+	  /* 1. if palette==NULL, then return nice/suitable
+		maximal number of colours supported by this terminal.
+		Returns 0 if it can make colours without palette (like 
+		postscript).
+	     2. if palette!=NULL, then allocate its own palette
+		return value is undefined
+	     3. available: some negative values of max_colors for whatever 
+		can be useful
+	  */
+
+	void (*previous_palette) __PROTO((void));	
+	  /* release the palette that the above routine allocated and get 
+	     back the palette that was active before.
+	     Some terminals, like displays, may draw parts of the figure
+	     using their own palette. Those terminals that possess only 
+	     one palette for the whole plot don't need this routine.
+	  */
+
+	void (*set_color) __PROTO((double gray));
+	  /* gray is from [0;1], terminal uses its palette or another way
+	     to transform in into gray or r,g,b
+	     This routine (for each terminal separately) remembers or not
+	       this colour so that it can apply it for the subsequent drawings
+	  */
+
+	void (*filled_polygon) __PROTO((int points, gpiPoint *corners));
+#endif
+
+
+
+=== make_palette ===
+
+Look into
+	gif.trm
+	pm.trm
+	post.trm
+what's there... Actually, those three terminals are quite different:
+
+(*) Terminals with palette (GIF, PM): there are already some basic colours 
+allocated, thus an offset for the `part with smooth colours' is needed. 
+
+(*) GIF: can allocate up to 256 colours, i.e. discrete number of colours.  
+
+(*) PM: discrete number of colours.  Passes the rgbTable through the pipe 
+into standalone gnupmdrv driver.  X11 should be implemented in the same 
+way.
+
+(*) PostScript: continuous colours, as "setrgbcolor" PS command takes the 
+triplet of intervals [0,1].  
+
+
+=== previous_palette ===
+
+Notice that previous_palette() is currently used only for postscript 
+terminal, where it writes "grestore" as make_palette starts by "gsave"... 
+that's because there are the analytical mapping functions gray->RGB 
+defined in the local header.
+
+
+=== set_color ===
+
+see the description in TERMENTRY above
+
+
+=== filled_polygon ===
+
+The declaration has been made the same as in GIF's gd.h.  The colour for 
+filling is taken from what it has been set (i.e. remembered) by set_color. 
+
+
+
+=== Example of postscript code ===
+
+Example of the beginning of the pm3d map in the output file is presented
+here:
+
+make_palette produces:
+
+gsave % colour palette begin
+/cF7 {sqrt} bind def		% sqrt(x)
+/cF5 {dup dup mul mul} bind def	% x^3
+/cF15 {360 mul sin} bind def	% sin(360x)
+/g {dup cF7 exch dup cF5 exch
+	cF15 setrgbcolor} bind def	% uncomment this for COLOUR RGB map
+% /g {setgray} bind def			% uncomment this for GRAY map
+/N {newpath moveto} def
+/f {rlineto fill} bind def
+/h {rlineto rlineto rlineto fill} bind def
+
+
+filled_polygon produces:
+
+.1049 g 1097 4252 N 0 369 556 0 0 -369 h
+.1975 g 1653 4252 N 0 369 556 0 0 -369 h
+
+
+previous_palette produces:
+
+grestore
+
+
+===
+
+A note for new `set' option:
+
+set filled_polygon 1,2;1,1;2,2;3,4 [closed(default)|open] [color_options]
+	rgb 0.2,0.4,0.6
+	pcolor 15 % colour from palette
+	color 0.156 % gray given; to be transformed as `smooth colours' in pm3d
+
+===
+
+Finally, I do not have any more power to develop anything more on the topic
+of colours.  But I hope that somebody will do this wonderful job.  Then we 
+could enjoy not only colour pm3d mode, but also colours read from file, 
+coloured areas between contours, colour histograms, and much more.
+  That's time for united colours of gnuplot!
+
+Petr Mikulik, 14. 3. 1999

@@ -1,5 +1,5 @@
 #
-# $Id: makefile.os2,v 1.11 1999/12/01 22:07:57 lhecking Exp $
+# $Id: makefile.os2,v 1.12.2.1 2000/05/01 00:17:19 joze Exp $
 #
 # GNUPLOT Makefile for use on OS/2 3.x and above (might also work for OS/2 2.x)
 # using emx 0.9 (and above) and GNUMake
@@ -44,6 +44,9 @@ VESA=1
 
 # MOUSE support for PM and X11 terminals
 MOUSE=1
+
+# PM3D splot mode + colours and filled polygons
+PM3D=1
 
 #
 # ****************** End of Configuration section ****************************
@@ -184,6 +187,11 @@ endif
 ifdef MOUSE
 TERMFLAGS += -DUSE_MOUSE
 endif
+# PM3D support
+ifdef PM3D
+CFLAGS += -DPM3D
+CFLAGS2 += -DPM3D
+endif
 
 #
 # Default Rules
@@ -252,7 +260,11 @@ ifdef MOUSE
 X11FLAGS += -DUSE_MOUSE
 endif
 
+ifdef PM3D
+gnuplot_x11.exe: gplt_x11.o getcolor.o
+else
 gnuplot_x11.exe: gplt_x11.o
+endif
 	$(CC) $(LFLAGS) $(X11FLAGS) $(EMXSPECIFIC) -o $@ $^ $(X11LIBS)
 
 gplt_x11.o: gplt_x11.c mouse.h gpexecute.inc

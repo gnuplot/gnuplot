@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.9 2000/03/30 14:11:53 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.9.2.4 2000/06/24 21:57:33 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -46,6 +46,10 @@ static char *RCSid() { return RCSid("$Id: unset.c,v 1.9 2000/03/30 14:11:53 lhec
 #include "util.h"
 #ifdef USE_MOUSE
 #   include "mouse.h"
+#endif
+
+#ifdef PM3D
+#include "pm3d.h"
 #endif
 
 static void unset_angles __PROTO((void));
@@ -106,6 +110,10 @@ static void unset_offsets __PROTO((void));
 static void unset_origin __PROTO((void));
 static void unset_output __PROTO((void));
 static void unset_parametric __PROTO((void));
+#ifdef PM3D
+static void unset_palette __PROTO((void));
+static void unset_pm3d __PROTO((void));
+#endif
 static void unset_pointsize __PROTO((void));
 static void unset_polar __PROTO((void));
 static void unset_samples __PROTO((void));
@@ -153,11 +161,11 @@ unset_command()
 \t'encoding',  'format', 'grid', 'hidden3d',  'historysize',  'isosamples',\n\
 \t'key',  'label', 'loadpath', 'locale', 'logscale', '[blrt]margin',\n\
 \t'mapping',  'missing', 'mouse', 'multiplot', 'offsets', 'origin',\n\
-\t'output', 'parametric', 'pointsize', 'polar', '[rtuv]range',  'samples',\n\
-\t'size', 'style', 'surface', 'terminal', 'tics',  'ticscale', 'ticslevel',\n\
-\t'timestamp',  'timefmt', 'title', 'view', '[xyz]{2}data', '[xyz]{2}label',\n\
-\t'[xyz]{2}range', '{m}[xyz]{2}tics', '[xyz]{2}[md]tics',\n\
-\t'{[xyz]{2}}zeroaxis', 'zero'";
+\t'output', 'palette', 'parametric', 'pm3d', 'pointsize', 'polar',\n\
+\t'[rtuv]range',  'samples', 'size', 'style', 'surface', 'terminal',\n\
+\t'tics',  'ticscale', 'ticslevel', 'timestamp',  'timefmt', 'title',\n\
+\t'view', '[xyz]{2}data', '[xyz]{2}label', '[xyz]{2}range',\n\
+\t'{m}[xyz]{2}tics', '[xyz]{2}[md]tics', '{[xyz]{2}}zeroaxis', 'zero'";
 
     c_token++;
 
@@ -275,6 +283,14 @@ unset_command()
     case S_PARAMETRIC:
 	unset_parametric();
 	break;
+#ifdef PM3D
+    case S_PALETTE:
+	unset_palette();
+	break;
+    case S_PM3D:
+	unset_pm3d();
+	break;
+#endif
     case S_POINTSIZE:
 	unset_pointsize();
 	break;
@@ -1108,6 +1124,33 @@ unset_parametric()
     }
 }
 
+#ifdef PM3D
+/* process 'unset palette' command */
+static void
+unset_palette()
+{
+    c_token++;
+    fprintf(stderr, "you can't unset the palette.\n");
+}
+
+
+/* process 'unset pm3d' command */
+static void
+unset_pm3d()
+{
+    c_token++;
+    if (pm3d.where[0]=='b' && !pm3d.where[1]) /* unset reversed y axis from 'set pm3d map' */
+	range_flags[FIRST_Y_AXIS] &= ~RANGE_REVERSE;
+    pm3d.where[0] = 0;
+    pm3d_map_rotate_ylabel = 0;  /* trick for rotating ylabel */
+#ifdef X11
+    if (!strcmp(term->name, "x11")) {
+	extern void X11_unset_pm3d __PROTO((void)); /* defined in x11.trm */
+	X11_unset_pm3d();
+    }
+#endif
+}
+#endif
 
 /* process 'unset pointsize' command */
 static void

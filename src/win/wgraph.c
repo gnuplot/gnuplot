@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: wgraph.c,v 1.3 2000/10/20 15:33:51 broeker Exp $";
+static char *RCSid = "$Id: wgraph.c,v 1.2.2.2 2000/10/31 14:48:19 joze Exp $";
 #endif
 
 /* GNUPLOT - win/wgraph.c */
@@ -61,6 +61,9 @@ static char *RCSid = "$Id: wgraph.c,v 1.3 2000/10/20 15:33:51 broeker Exp $";
 #include "wgnuplib.h"
 #include "wresourc.h"
 #include "wcommon.h"
+#ifdef PM3D
+#include "plot.h"
+#endif
 
 LRESULT CALLBACK WINEXPORT WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
 
@@ -772,6 +775,55 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 				 * state */
 				line_width = curptr->x == 100 ? 1 : (curptr->x / 100.0);
 				break;
+#ifdef PM3D /* HBB 20000813: implemented PM3D for Windows terminal */
+			case W_pm3d_setcolor:
+                        	{
+                                	double level = curptr->x / 256.0;
+					unsigned char R, G, B;
+                                        static HBRUSH last_pm3d_brush = NULL;
+                                        HBRUSH this_brush;
+                                        COLORREF c;
+
+                                        if (sm_palette.colorMode == SMPAL_COLOR_MODE_GRAY) {
+                                            R = G = B = curptr->x;
+                                        } else {
+                                            R = 0xff * GetColorValueFromFormula(sm_palette.formulaR, level);
+                                            G = 0xff * GetColorValueFromFormula(sm_palette.formulaG, level);
+                                            B = 0xff * GetColorValueFromFormula(sm_palette.formulaB, level);
+                                        }
+
+                                        c = RGB(R,G,B);
+                                        this_brush = CreateSolidBrush(c);
+                                        SelectObject(hdc, this_brush);
+                                        if (last_pm3d_brush != NULL)
+                                        	DeleteObject(last_pm3d_brush);
+                                        last_pm3d_brush = this_brush;
+                                        /* create new pen, too: */
+                                        DeleteObject(SelectObject(hdc, 
+                                            CreatePen(PS_SOLID, 1, c)));
+                                }
+                        	break;
+			case W_pm3d_filled_polygon:
+                        	{
+#define MAX_POLYGON_CORNERS 10
+                                	char *str;
+
+                                 	str = LocalLock(curptr->htext);
+                                 	if (str[0] == 'p') {
+                                    		/* a *point* is coming */
+                                                assert(polyi<polymax);
+                                        	ppt[polyi].x = xdash;
+                                                ppt[polyi].y = ydash;
+                                                polyi++;
+                                 	} else if (str[0] == 'n') {
+                                    		/* end of point series --> draw  polygon now */
+                                        	Polygon(hdc, ppt, polyi);
+                                                polyi = 0;
+                                        }
+                                }
+
+				break;
+#endif /* PM3D */
 			default:	/* A plot mark */
 #if 0 /* HBB 980118: fix 'sumsolid' gotcha: */
 				if (pen >= numsolid) {

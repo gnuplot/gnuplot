@@ -1,5 +1,5 @@
 /*
- * $Id: $
+ * $Id: save.h,v 1.2.2.1 2000/05/03 21:26:12 joze Exp $
  */
 
 /* GNUPLOT - save.h */

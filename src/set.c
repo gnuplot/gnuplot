@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.39 2000/10/06 03:56:38 joze Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.32.2.10 2000/10/23 04:35:28 joze Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -57,6 +57,10 @@ static char *RCSid() { return RCSid("$Id: set.c,v 1.39 2000/10/06 03:56:38 joze 
 #   include "mouse.h"
 #endif
 
+#ifdef PM3D
+#include "pm3d.h"
+#endif
+
 #define BACKWARDS_COMPATIBLE
 
 /*
@@ -96,7 +100,11 @@ TBOOLEAN autoscale_lz = DTRUE;
 double bar_size = 1.0;
 
 /* set border */
+#ifdef PM3D
+struct lp_style_type border_lp = { 0, -2, 0, 1.0, 1.0, 0 };
+#else
 struct lp_style_type border_lp = { 0, -2, 0, 1.0, 1.0 };
+#endif
 int draw_border = 31;
 
 TBOOLEAN multiplot = FALSE;
@@ -126,14 +134,21 @@ int format_is_numeric[AXIS_ARRAY_SIZE] = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
 enum PLOT_STYLE data_style = POINTSTYLE;
 enum PLOT_STYLE func_style = LINES;
 
+#ifdef PM3D
+struct lp_style_type work_grid = { 0, GRID_OFF, 0, 1.0, 1.0, 0 };
+struct lp_style_type grid_lp   = { 0, -1, 0, 1.0, 1.0, 0 };
+struct lp_style_type mgrid_lp  = { 0, -1, 0, 1.0, 1.0, 0 };
+struct lp_style_type key_box = { 0, -3, 0, 1.0, 1.0, 0 };
+#else
 struct lp_style_type work_grid = { 0, GRID_OFF, 0, 1.0, 1.0 };
 struct lp_style_type grid_lp   = { 0, -1, 0, 1.0, 1.0 };
 struct lp_style_type mgrid_lp  = { 0, -1, 0, 1.0, 1.0 };
+struct lp_style_type key_box = { 0, -3, 0, 1.0, 1.0 };		/* -3 = no linetype */
+#endif
 double polar_grid_angle = 0;	/* nonzero means a polar grid */
 int key = -1;			/* default position */
 struct position key_user_pos;	/* user specified position for key */
 TBOOLEAN key_reverse = FALSE;	/* reverse text & sample ? */
-struct lp_style_type key_box = { 0, -3, 0, 1.0, 1.0 };		/* -3 = no linetype */
 double key_swidth = 4.0;
 double key_vert_factor = 1.0;
 double key_width_fix = 0.0;
@@ -231,10 +246,17 @@ int dgrid3d_col_fineness = 10;
 int dgrid3d_norm_value = 1;
 TBOOLEAN dgrid3d = FALSE;
 
+#ifdef PM3D
+struct lp_style_type xzeroaxis = { 0, -3, 0, 1.0, 1.0, 0 };
+struct lp_style_type yzeroaxis = { 0, -3, 0, 1.0, 1.0, 0 };
+struct lp_style_type x2zeroaxis = { 0, -3, 0, 1.0, 1.0, 0 };
+struct lp_style_type y2zeroaxis = { 0, -3, 0, 1.0, 1.0, 0 };
+#else
 struct lp_style_type xzeroaxis = { 0, -3, 0, 1.0, 1.0 };
 struct lp_style_type yzeroaxis = { 0, -3, 0, 1.0, 1.0 };
 struct lp_style_type x2zeroaxis = { 0, -3, 0, 1.0, 1.0 };
 struct lp_style_type y2zeroaxis = { 0, -3, 0, 1.0, 1.0 };
+#endif
 
 /* perhaps make these into an array one day */
 
@@ -356,6 +378,10 @@ static void set_offsets __PROTO((void));
 static void set_origin __PROTO((void));
 static void set_output __PROTO((void));
 static void set_parametric __PROTO((void));
+#ifdef PM3D
+static void set_palette __PROTO((void));
+static void set_pm3d __PROTO((void));
+#endif
 static void set_pointsize __PROTO((void));
 static void set_polar __PROTO((void));
 static void set_samples __PROTO((void));
@@ -408,7 +434,6 @@ static int assign_linestyle_tag __PROTO((void));
 static int looks_like_numeric __PROTO((char *));
 static void set_lp_properties __PROTO((struct lp_style_type *, int, int, int, double, double));
 static void reset_lp_properties __PROTO((struct lp_style_type *arg));
-static void lp_use_properties __PROTO((struct lp_style_type *lp, int tag, int pointflag));
 
 static int set_tic_prop __PROTO((int *TICS, int *MTICS, double *FREQ,
      struct ticdef * tdef, int AXIS, TBOOLEAN * ROTATE, const char *tic_side));
@@ -665,6 +690,10 @@ reset_command()
     pointsize = 1.0;
     encoding = S_ENC_DEFAULT;
 
+#ifdef PM3D
+    pm3d_reset();
+#endif
+
     init_locale();
     clear_loadpath();
 
@@ -681,11 +710,12 @@ set_command()
 \t'dummy',  'encoding',  'format', 'function style',   'grid',\n\
 \t'hidden3d',  'historysize', 'isosamples', 'key', 'label', 'linestyle',\n\
 \t'locale',  'logscale', '[blrt]margin', 'mapping', 'missing', 'mouse',\n\
-\t'multiplot',  'offsets', 'origin', 'output', 'parametric', 'pointsize',\n\
-\t'polar',  '[rtuv]range',  'samples',  'size',  'surface',  'terminal',\n\
-\t'tics',  'ticscale',  'ticslevel',  'timestamp',  'timefmt',\n\
-\t'title', 'view', '[xyz]{2}data', '[xyz]{2}label', '[xyz]{2}range',\n\
-\t'{no}{m}[xyz]{2}tics', '[xyz]{2}[md]tics', '{[xyz]{2}}zeroaxis', 'zero'";
+\t'multiplot',  'offsets', 'origin', 'output', 'palette', 'parametric',\n\
+\t'pm3d', 'pointsize', 'polar', '[rtuv]range', 'samples', 'size',\n\
+\t'surface', 'terminal', 'tics', 'ticscale', 'ticslevel', 'timestamp',\n\
+\t'timefmt', 'title', 'view', '[xyz]{2}data', '[xyz]{2}label',\n\
+\t'[xyz]{2}range', '{no}{m}[xyz]{2}tics', '[xyz]{2}[md]tics',\n\
+\t'{[xyz]{2}}zeroaxis', 'zero'";
 
     c_token++;
 
@@ -846,6 +876,14 @@ set_command()
 	case S_PARAMETRIC:
 	    set_parametric();
 	    break;
+#ifdef PM3D
+    case S_PALETTE:
+	set_palette();
+	break;
+    case S_PM3D:
+	set_pm3d();
+	break;
+#endif
 	case S_POINTSIZE:
 	    set_pointsize();
 	    break;
@@ -2710,6 +2748,319 @@ set_parametric()
     }
 }
 
+#ifdef PM3D
+/* process 'set palette' command */
+static void
+set_palette()
+{
+    c_token++;
+
+    if (END_OF_COMMAND) { /* assume default settings */
+	sm_palette.colorMode = SMPAL_COLOR_MODE_RGB;
+	sm_palette.formulaR = 7; sm_palette.formulaG = 5;
+	sm_palette.formulaB = 15;
+	sm_palette.positive = SMPAL_POSITIVE;
+	sm_palette.ps_allcF = 0;
+	sm_palette.use_maxcolors = 0;
+
+	color_box.where = SMCOLOR_BOX_DEFAULT;
+	color_box.rotation = 'v';
+	color_box.border = 1;
+	color_box.border_lt_tag = -1; /* use default border */
+    }
+    else { /* go through all options of 'set palette' */
+	for ( ; !END_OF_COMMAND && !equals(c_token,";"); c_token++ ) {
+	    /* positive and negative picture */
+	    if (almost_equals(c_token, "pos$itive")) {
+		sm_palette.positive = SMPAL_POSITIVE;
+		continue;
+	    }
+	    if (almost_equals(c_token, "neg$ative")) {
+		sm_palette.positive = SMPAL_NEGATIVE;
+		continue;
+	    }
+	    /* Now the options that determine the palette of smooth colours */
+	    /* gray or rgb-coloured */
+	    if (equals(c_token, "gray")) {
+		sm_palette.colorMode = SMPAL_COLOR_MODE_GRAY;
+		continue;
+	    }
+	    if (almost_equals(c_token, "col$or")) {
+		sm_palette.colorMode = SMPAL_COLOR_MODE_RGB;
+		continue;
+	    }
+	    /* rgb color mapping formulae: rgb$formulae r,g,b (three integers) */
+	    if (almost_equals(c_token, "rgb$formulae")) {
+		struct value a;
+		int i;
+		c_token++;
+		i = (int)real(const_express(&a));
+		if ( abs(i) >= sm_palette.colorFormulae )
+		    int_error(c_token,"color formula out of range (use `show pm3d' to display the range)");
+		sm_palette.formulaR = i;
+		if (!equals(c_token,",")) { c_token--; continue; }
+		c_token++;
+		i = (int)real(const_express(&a));
+		if ( abs(i) >= sm_palette.colorFormulae )
+		    int_error(c_token,"color formula out of range (use `show pm3d' to display the range)");
+		sm_palette.formulaG = i;
+		if (!equals(c_token,",")) { c_token--; continue; }
+		c_token++;
+		i = (int)real(const_express(&a));
+		if ( abs(i) >= sm_palette.colorFormulae )
+		    int_error(c_token,"color formula out of range (`show pm3d' displays the range)");
+		sm_palette.formulaB = i;
+		c_token--;
+		continue;
+	    } /* rgbformulae */
+	    /* ps_allcF: write all rgb formulae into PS file? */
+	    if (equals(c_token, "nops_allcF")) {
+		sm_palette.ps_allcF = 0;
+		continue;
+	    }
+	    if (equals(c_token, "ps_allcF")) {
+		sm_palette.ps_allcF = 1;
+		continue;
+	    }
+	    /* max colors used */
+	    if (almost_equals(c_token, "maxc$olors")) {
+		struct value a;
+		int i;
+		c_token++;
+		i = (int)real(const_express(&a));
+		if (i<0) int_error(c_token,"non-negative number required");
+		sm_palette.use_maxcolors = i;
+		continue;
+	    }
+	    /* Now color box properties */
+	    /* vertical or horizontal color gradient */
+	    if (almost_equals(c_token, "cbv$ertical")) {
+		color_box.rotation = 'v';
+		continue;
+	    }
+	    if (almost_equals(c_token, "cbh$orizontal")) {
+		color_box.rotation = 'h';
+		continue;
+	    }
+	    /* color box where: no box, default position, position by user */
+	    if (equals(c_token, "nocb")) {
+		color_box.where = SMCOLOR_BOX_NO;
+		continue;
+	    }
+	    if (almost_equals(c_token, "cbdef$ault")) {
+		color_box.where = SMCOLOR_BOX_DEFAULT;
+		continue;
+	    }
+	    if (almost_equals(c_token, "cbu$ser")) {
+		color_box.where = SMCOLOR_BOX_USER;
+		continue;
+	    }
+	    if (almost_equals(c_token, "bo$rder")) {
+
+		color_box.border = 1;
+		c_token++;
+
+		if (!END_OF_COMMAND) {
+		    /* expecting a border line type */
+		    struct value a;
+		    color_box.border_lt_tag = real(const_express(&a));
+		    if (color_box.border_lt_tag <= 0) {
+			color_box.border_lt_tag = 0;
+			int_error(c_token, "tag must be strictly positive (see `help set style line')");
+		    }
+		    --c_token; /* why ? (joze) */
+		}
+		continue;
+	    }
+	    if (almost_equals(c_token, "bd$efault")) {
+		color_box.border_lt_tag = -1; /* use default border */
+		continue;
+	    }
+	    if (almost_equals(c_token, "nob$order")) {
+		color_box.border = 0;
+		continue;
+	    }
+	    if (almost_equals(c_token, "o$rigin")) {
+		c_token++;
+		if (END_OF_COMMAND) {
+		    int_error(c_token, "expecting screen value [0 - 1]");
+		} else {
+		    struct value a;
+		    color_box.xorigin = real(const_express(&a));
+		    if (!equals(c_token,","))
+			int_error(c_token, "',' expected");
+		    c_token++;
+		    color_box.yorigin = real(const_express(&a));
+		    c_token--;
+		} 
+		continue;
+	    }
+	    if (almost_equals(c_token, "s$ize")) {
+		c_token++;
+		if (END_OF_COMMAND) {
+		    int_error(c_token, "expecting screen value [0 - 1]");
+		} else {
+		    struct value a;
+		    color_box.xsize = real(const_express(&a));
+		    if (!equals(c_token,","))
+			int_error(c_token, "',' expected");
+		    c_token++;
+		    color_box.ysize = real(const_express(&a));
+		    c_token--;
+		} 
+		continue;
+	    }
+	    int_error(c_token,"invalid palette option");
+	} /* end of while over palette options */
+    }
+}
+
+
+/* process 'set pm3d' command */
+static void
+set_pm3d()
+{
+    c_token++;
+
+    if (END_OF_COMMAND) { /* assume default settings */
+	pm3d_reset();
+	strcpy(pm3d.where,"s"); /* draw at surface */
+    }
+    else { /* go through all options of 'set pm3d' */
+	for ( ; !END_OF_COMMAND && !equals(c_token,";"); c_token++ ) {
+	    if (equals(c_token, "at")) {
+		char* c;
+		c_token++;
+		if (token[c_token].length >= sizeof(pm3d.where)) {
+		    int_error(c_token,"ignoring so many redrawings");
+		    return /* (TRUE) */;
+		}
+		strncpy(pm3d.where, input_line + token[c_token].start_index, token[c_token].length);
+		pm3d.where[ token[c_token].length ] = 0;
+		for (c = pm3d.where; *c; c++) {
+		    if (*c != 'C') /* !!!!! CONTOURS, UNDOCUMENTED, THIS LINE IS TEMPORARILY HERE !!!!! */
+			if (*c != PM3D_AT_BASE && *c != PM3D_AT_TOP && *c != PM3D_AT_SURFACE) {
+			    int_error(c_token,"parameter to pm3d requires combination of characters b,s,t\n\t(drawing at bottom, surface, top)");
+			    return /* (TRUE) */;
+			}
+		}
+		continue;
+	    }  /* at */
+	    /* forward and backward drawing direction */
+	    if (almost_equals(c_token, "scansfor$ward")) {
+		pm3d.direction = PM3D_SCANS_FORWARD;
+		continue;
+	    }
+	    if (almost_equals(c_token, "scansback$ward")) {
+		pm3d.direction = PM3D_SCANS_BACKWARD;
+		continue;
+	    }
+	    if (almost_equals(c_token, "scansauto$matic")) {
+		pm3d.direction = PM3D_SCANS_AUTOMATIC;
+		continue;
+	    }
+	    /* flush scans: left, right or center */
+	    if (almost_equals(c_token, "fl$ush")) {
+		c_token++;
+		if (almost_equals(c_token, "b$egin"))
+		    pm3d.flush = PM3D_FLUSH_BEGIN;
+		else if (almost_equals(c_token, "c$enter"))
+		    pm3d.flush = PM3D_FLUSH_CENTER;
+		else if (almost_equals(c_token, "e$nd"))
+		    pm3d.flush = PM3D_FLUSH_END;
+		else int_error(c_token,"expecting flush 'begin', 'center' or 'end'");
+		continue;
+	    }
+	    /* clipping method */
+	    if (almost_equals(c_token, "clip1$in")) {
+		pm3d.clip = PM3D_CLIP_1IN;
+		continue;
+	    }
+	    if (almost_equals(c_token, "clip4$in")) {
+		pm3d.clip = PM3D_CLIP_4IN;
+		continue;
+	    }
+	    /* zrange [{zmin|*}:{zmax|*}] */
+	    /* Note: here, we cannot use neither PROCESS_RANGE or load_range */
+	    if (almost_equals(c_token, "zr$ange")) {
+		struct value a;
+		if (!equals(++c_token,"[")) int_error(c_token,"expecting '['");
+		c_token++;
+		if (!equals(c_token,":")) { /* no change for zmin */
+		    if (equals(c_token,"*")) {
+			pm3d.pm3d_zmin = 0; /* from gnuplot's set zrange */
+			c_token++;
+		    }
+		    else {
+			pm3d.pm3d_zmin = 1; /* use pm3d's zmin */
+			pm3d.zmin = real(const_express(&a)); /* explicit value given */
+		    }
+		}
+		if (!equals(c_token,":")) int_error(c_token,"expecting ':'");
+		c_token++;
+		if (!equals(c_token,"]")) { /* no change for zmax */
+		    if (equals(c_token,"*")) {
+			pm3d.pm3d_zmax = 0; /* from gnuplot's set zrange */
+			c_token++;
+		    }
+		    else {
+			pm3d.pm3d_zmax = 1; /* use pm3d's zmin */
+			pm3d.zmax = real(const_express(&a)); /* explicit value given */
+		    }
+		}
+		if (!equals(c_token,"]")) int_error(c_token,"expecting ']'");
+		continue;
+	    }
+	    /* setup everything for plotting a map */
+	    if (equals(c_token, "map")) {
+		pm3d.where[0] = 'b'; pm3d.where[1] = 0; /* set pm3d at b */
+		draw_surface = FALSE;        /* set nosurface */
+		draw_contour = CONTOUR_NONE; /* set nocontour */
+		surface_rot_x = 180;         /* set view 180,0,1.3 */
+		surface_rot_z = 0;
+		surface_scale = 1.3;
+		range_flags[FIRST_Y_AXIS] |= RANGE_REVERSE; /* set yrange reverse */
+		pm3d_map_rotate_ylabel = 1;  /* trick for rotating ylabel */
+		continue;
+	    }
+	    if (almost_equals(c_token, "hi$dden3d")) {
+		struct value a;
+		c_token++;
+		pm3d.hidden3d_tag = real(const_express(&a));
+		if (pm3d.hidden3d_tag <= 0) {
+		    pm3d.hidden3d_tag = 0;
+		    int_error(c_token,"tag must be strictly positive (see `help set style line')");
+		}
+		--c_token; /* why ? (joze) */
+		continue;
+	    }
+	    if (almost_equals(c_token, "nohi$dden3d")) {
+		pm3d.hidden3d_tag = 0;
+		continue;
+	    }
+	    if (almost_equals(c_token, "so$lid") || almost_equals(c_token, "notr$ansparent")) {
+		pm3d.solid = 1;
+		continue;
+	    }
+	    if (almost_equals(c_token, "noso$lid") || almost_equals(c_token, "tr$ansparent")) {
+		pm3d.solid = 0;
+		continue;
+	    }
+	    int_error(c_token,"invalid pm3d option");
+	} /* end of while over pm3d options */
+	if (PM3D_SCANS_AUTOMATIC == pm3d.direction
+	    && PM3D_FLUSH_BEGIN != pm3d.flush) {
+	    pm3d.direction = PM3D_SCANS_FORWARD;
+	    /* Petr Mikulik said that he wants no warning message here (joze) */
+#if 0
+	    fprintf(stderr, "pm3d: `scansautomatic' and %s are incompatible\n",
+		PM3D_FLUSH_END == pm3d.flush ? "`flush end'": "`flush center'");
+	    fprintf(stderr, "      setting scansforward\n");
+#endif
+	}
+    }
+}
+#endif
 
 /* process 'set pointsize' command */
 static void
@@ -2853,6 +3204,11 @@ set_terminal()
 	list_terms();
 	screen_ok = FALSE;
     } else {
+#ifdef EXTENDED_COLOR_SPECS
+	/* each terminal is supposed to turn this on, probably
+	 * somewhere when the graphics is initialized */
+	supply_extended_color_specs = 0;
+#endif
 #ifdef USE_MOUSE
         event_reset((void *)1);   /* cancel zoombox etc. */
 #endif
@@ -3620,7 +3976,7 @@ struct linestyle_def *prev, *this;
  * auxiliary functions for the `set linestyle` command
  */
 
-static void
+void
 lp_use_properties(lp, tag, pointflag)
 struct lp_style_type *lp;
 int tag, pointflag;
@@ -4039,6 +4395,9 @@ struct lp_style_type *arg;
     /* See plot.h for struct lp_style_type */
     arg->pointflag = arg->l_type = arg->p_type = 0;
     arg->l_width = arg->p_size = 1.0;
+#ifdef PM3D
+    arg->use_palette = 0;
+#endif
 }
 
 
@@ -4057,7 +4416,18 @@ int allow_ls, allow_point, def_line, def_point;
     } else {
 	if (almost_equals(c_token, "linet$ype") || equals(c_token, "lt" )) {
 	    c_token++;
-	    lp->l_type = (int) real(const_express(&t))-1;
+#ifdef PM3D
+	    if (almost_equals(c_token, "pal$ette")) {
+		lp->use_palette = 1;
+		lp->l_type = def_line;
+		++c_token;
+	    } else {
+		lp->use_palette = 0;
+#endif
+		lp->l_type = (int) real(const_express(&t))-1;
+#ifdef PM3D
+	    }
+#endif
 	} else lp->l_type = def_line;
 	if (almost_equals(c_token, "linew$idth") || equals(c_token, "lw" )) {
 	    c_token++;
@@ -4154,7 +4524,7 @@ int axis;
 double val;
 {
     TBOOLEAN islog;
-    double logbase;
+    double logbase = 0;
 
     /* check whether value is in logscale */
     switch( axis ) {

@@ -1,5 +1,5 @@
 /*
- * $Id: gif.trm,v 1.27 2000/05/02 14:19:15 lhecking Exp $
+ * $Id: gif.trm,v 1.26.2.3 2000/10/23 04:35:28 joze Exp $
  */
 
 /* GNUPLOT -- gif.trm */
@@ -92,6 +92,7 @@
  * the Unisys license. Use at your own risk. From version 1.6 on, gd
  * library creates png files instead of gif.
  *
+ * Petr Mikulik, Jan 1999: terminal entries for PM3D functionality
  */
 
 #include "driver.h"
@@ -112,6 +113,12 @@ TERM_PUBLIC void GIF_put_text __PROTO((unsigned int x, unsigned int y, const cha
 TERM_PUBLIC int GIF_text_angle __PROTO((int ang));
 TERM_PUBLIC void GIF_reset __PROTO((void));
 TERM_PUBLIC int GIF_set_font __PROTO((const char *fontname));
+#ifdef PM3D
+TERM_PUBLIC int GIF_make_palette (t_sm_palette *);
+/* TERM_PUBLIC void GIF_previous_palette (void); */
+TERM_PUBLIC void GIF_set_color (double);
+TERM_PUBLIC void GIF_filled_polygon (int, gpiPoint *);
+#endif
 
 #include "gd.h"
 
@@ -352,6 +359,108 @@ GIF_reset()
 {
 }
 
+#ifdef PM3D
+
+#if 1
+/* use  #if 1  that's just for debuggin */
+void GIF_show_current_palette()
+{
+int i;
+fprintf(stderr,"*****\n SHOW THE PALETTE! total=%i\n",gdImageColorsTotal(gif_state.image));
+for (i=0; i < gdImageColorsTotal(gif_state.image); i++) {
+  /* Use access macros to learn colors. */
+  fprintf(stderr,"%i\tr=%d\t g=%d\tb=%d\n", i,
+    gdImageRed(gif_state.image,i),
+    gdImageGreen(gif_state.image,i),
+    gdImageBlue(gif_state.image,i));
+  }
+}
+#endif
+
+/*
+How this works:
+Gray interval [0;1] will be mapped to interval [0;sm_palette.colors-1]
+those r,g,b components are mapped by the array below
+palette.offset equals 0 since gif_smooth_color[0..colors] are from ColorAllocate
+*/
+int gif_smooth_color[ gdMaxColors ];
+  /* chooser from the colour palette */
+  /* TODO: how to recover from a multiplot with two colour pm3d maps?
+     They must use the same palette! Or palette size must be
+     restricted to certain number of colours---a new user's option
+  */
+
+TERM_PUBLIC int GIF_make_palette (t_sm_palette *palette)
+{
+    int i;
+    if (palette == NULL) {
+	/* return maximal number of colours in a GIF palette */
+	i = gdMaxColors /*256*/ - gdImageColorsTotal(gif_state.image);
+	/* the latter is the number of currently allocated colours. We want
+	   to allocate the rest */
+	/*BACK PLEASE  fprintf(stderr,"colors in GIF palette=%i\n",(int)gdMaxColors); */
+	return i;
+    }
+    for (i = 0; i < sm_palette.colors; i++) {
+	gif_smooth_color[i] = gdImageColorAllocate(gif_state.image,
+	    (int)( palette->color[i].r * 255 + 0.5 ), /* r,g,b values for gif */
+	    (int)( palette->color[i].g * 255 + 0.5 ), /* terminal are [0;255] */
+	    (int)( palette->color[i].b * 255 + 0.5 ) );
+	if (gif_smooth_color[i] < 0) { /* this should never happen! take away? */
+	    FPRINTF("gif_smooth_color[i]<0 cannot happen")
+		exit(1);
+	}
+#if 0
+	fprintf(stderr,"ALLOCATED: i=%i\t=> pal_index=%i\tr=%g g=%g b=%g\n",
+	    i, gif_smooth_color[i],
+	    palette->color[i].r, palette->color[i].g, palette->color[i].b );
+#endif
+    }
+    return 0;
+}
+
+
+TERM_PUBLIC void GIF_set_color (double gray)
+{
+    int gif_color = (int)( gray * (sm_palette.colors-1) + 0.5 );
+    /* map [0;1] to interval [0;gif_smooth_colors-1] */
+    gif_state.color = gif_smooth_color[ gif_color ]; /* index to the palette */
+    /*fprintf(stderr,"GIF terminal sets color gif_color=%i\n",gif_color); */
+}
+
+
+TERM_PUBLIC
+void GIF_filled_polygon(int points, gpiPoint *corners)
+{
+    int i;
+    /* since gpiPoint carries more than just x and y if
+     * we have EXTENDED_COLOR_SPECS defined, we need to
+     * copy it to the gdPointPtr struct; make it static
+     * so that is faster (joze) */
+    static gdPointPtr gd_corners = (gdPointPtr) 0;
+    static unsigned int size = 0;
+    if (points > size) {
+	size = points;
+	gd_corners = gp_realloc(gd_corners, sizeof(gdPoint) * size,
+	    "GIF_filled_polygon->gd_corners");
+    }
+    for (i = 0; i < points; i++) {
+	gd_corners[i].x = corners[i].x;
+	gd_corners[i].y = gif_state.height - corners[i].y;
+    }
+    gdImageFilledPolygon(gif_state.image, gd_corners, points, gif_state.color);
+    /* easy, since gdPointPtr is the same as (gdiPoint*) */
+    /* if someone someday needs this routine to be NON-DESTRUCTIVE, then change
+       the following line to #if 1 */
+#if 0
+    for (i = 0; i < points; i++)
+	corners[i].y = gif_state.height - corners[i].y;
+#endif
+}
+
+
+#endif
+
 /*
  * _graphics()  Called just before a plot is going to be displayed.  This
  * procedure should set the device into graphics mode.  Devices which can't
@@ -541,6 +650,17 @@ TERM_TABLE_START(gif_driver)
     null_justify_text, do_point, do_arrow, GIF_set_font,
     0,				/* pointsize */
     TERM_CAN_MULTIPLOT | TERM_BINARY
+#ifdef PM3D
+    , 0 /*suspend*/, 0 /*resume*/, 
+    0 /*fillbox*/,   0 /*linewidth*/
+#ifdef USE_MOUSE
+    , 0, 0, 0, 0, 0 /* no mouse support for gif terminal */
+#endif
+    , GIF_make_palette,
+    0, /* previous_palette() ... no, single array of 256 colours for GIF */
+    GIF_set_color,
+    GIF_filled_polygon
+#endif
 TERM_TABLE_END(gif_driver)
 
 #undef LAST_TERM

@@ -1,5 +1,5 @@
 /*
- * $Id: pm.trm,v 1.21 2000/03/28 21:28:46 lhecking Exp $
+ * $Id: pm.trm,v 1.21.2.4 2000/08/04 14:01:29 joze Exp $
  */
 
 /* GNUPLOT - pm.trm */
@@ -43,6 +43,7 @@
  *	 last change: January 2000
  *	 for mouse support, pm.trm has to be compiled with USE_MOUSE, e.g.
  *	 gcc ... -DUSE_MOUSE ... 
+ *    January 1999: terminal entries for PM3D functionality by Petr Mikulik
  */
 
 #include "driver.h"
@@ -72,6 +73,12 @@ TERM_PUBLIC void PM_set_ruler __PROTO((int, int));
 TERM_PUBLIC void PM_set_cursor __PROTO((int, int, int));
 TERM_PUBLIC void PM_put_tmptext __PROTO((int, const char str[]));
 TERM_PUBLIC void PM_set_clipboard __PROTO((const char[]));
+#endif
+#ifdef PM3D
+TERM_PUBLIC int PM_make_palette (t_sm_palette *);
+TERM_PUBLIC void PM_previous_palette (void);
+TERM_PUBLIC void PM_set_color (double);
+TERM_PUBLIC void PM_filled_polygon (int, gpiPoint *);
 #endif
 
 /* define PM world coordinate limits */
@@ -135,6 +142,12 @@ TERM_PUBLIC void PM_set_clipboard __PROTO((const char[]));
 #define SET_RULER	'u'
 #define SET_CURSOR	'c'
 #define SET_CLIPBOARD	'l'
+#ifdef PM3D
+#define GR_MAKE_PALETTE    'p'
+#define GR_RELEASE_PALETTE 'e'
+#define GR_SET_COLOR       'C'
+#define GR_FILLED_POLYGON  'f'
+#endif
 #define PM_nopts 1
 
 /* path for pm program */
@@ -665,6 +678,87 @@ PM_linewidth(double linewidth)
     fwrite(&lw, sizeof(int), 1, PM_pipe);
 }
 
+#ifdef PM3D
+
+/* Note: gvpm sources have also limit 256, is it limit of PM palette?
+   I suppose yes, thus let colours passed as unsigned char through the pipe.
+   Gray interval [0;1] will be mapped to interval [0;255] whose r,g,b
+   components are mapped by the array below.
+*/
+
+TERM_PUBLIC int PM_make_palette (t_sm_palette *palette)
+{
+    int i;
+    int rc;
+    ULONG cbR, r, g, b, rgbTable[256];
+    putc(GR_MAKE_PALETTE, PM_pipe);
+    if (palette == NULL) {
+	/* return maximal number of colours in palette */
+	int PM_nColors;
+	putc(0, PM_pipe);
+	fflush(PM_pipe);
+	rc = DosRead(fileno(PM_pipe), &PM_nColors, sizeof(int), &cbR);
+	return PM_nColors; // usually = 256-18;
+    }
+    putc(1, PM_pipe);
+    for (i = 0; i < sm_palette.colors; i++) {
+	r = (int)( palette->color[i].r * 255 + 0.5 );
+	g = (int)( palette->color[i].g * 255 + 0.5 );
+	b = (int)( palette->color[i].b * 255 + 0.5 );
+	rgbTable[i] = (r<<16) + (g<<8) + b; // PM API likes this form
+    }
+    fwrite(&sm_palette.colors, sizeof(int), 1, PM_pipe);
+    fwrite(&rgbTable, sizeof(rgbTable[0])*sm_palette.colors, 1, PM_pipe);
+    return 0;
+}
+
+
+/* switch back to the palette used before calling make_palette */
+TERM_PUBLIC void PM_previous_palette ()
+{
+    putc(GR_RELEASE_PALETTE, PM_pipe);
+}
+
+
+#if 0 /* caching of color value removed; won't be so efficient for z=const 
+	 surfaces/map, but will save a lot of headache (linetype changes
+	 color, for instance) */
+int pm_color = -1;
+  /* keep here the last set color
+     it is not unsigned char since -1 says that no value has been set
+   */
+#endif
+
+TERM_PUBLIC void PM_set_color (double gray)
+{
+    unsigned char c = (int)( gray * (sm_palette.colors-1) + 0.5 );
+    /* map [0;1] to interval [0;smooth_colors-1] */
+#if 0 // color caching
+    if (c == pm_color) return;
+    pm_color = c;
+#endif
+    putc(GR_SET_COLOR, PM_pipe);
+    //{int k=c; fprintf(stderr,"pm.trm: PM_set_color c=%i\n",k);}
+    putc(c, PM_pipe);
+}
+
+
+TERM_PUBLIC void PM_filled_polygon ( int points, gpiPoint *corners )
+{
+    int i;
+    putc(GR_FILLED_POLYGON, PM_pipe);
+    fwrite(&points, sizeof(int), 1, PM_pipe); // tell him number of corners
+    for (i = 0; i < points; i++) {
+	fwrite(&corners[i].x, sizeof(int), 1, PM_pipe);
+	fwrite(&corners[i].y, sizeof(int), 1, PM_pipe);
+    }
+}
+
+
+#endif /* PM3D */
+
+#ifdef USE_MOUSE
+
 TERM_PUBLIC void
 PM_put_tmptext(int i, const char str[])
 {
@@ -713,7 +807,9 @@ PM_set_clipboard(const char s[])
     }
 }
 
-#endif
+#endif /* USE_MOUSE */
+
+#endif /* TERM_BODY */
 
 #ifdef TERM_TABLE
 TERM_TABLE_START(PM_driver)
@@ -728,6 +824,12 @@ TERM_TABLE_START(PM_driver)
 #ifdef USE_MOUSE
     , 0 /* PM_waitforinput */, 
     PM_put_tmptext, PM_set_ruler, PM_set_cursor, PM_set_clipboard
+#endif
+#ifdef PM3D
+    , PM_make_palette,
+    PM_previous_palette,
+    PM_set_color,
+    PM_filled_polygon
 #endif
 TERM_TABLE_END(PM_driver)
 

@@ -96,12 +96,12 @@ noinst_PROGRAMS = bf_test
 XLIBS = @LIBRARIES_FOR_X@
 AM_CPPFLAGS = -I../term -I$(top_srcdir)/term -DBINDIR=\"$(bindir)\" -DCONTACT=\"$(EMAIL)\" -DHELPFILE=\"$(HELPFILE)\"
 
-gnuplot_SOURCES = alloc.c alloc.h ansichek.h binary.c binary.h bitmap.c bitmap.h command.c command.h contour.c contour.h datafile.c datafile.h dynarray.c dynarray.h eval.c eval.h fit.c fit.h gp_hist.h gp_time.h graph3d.c graph3d.h graphics.c graphics.h help.c help.h hidden3d.c hidden3d.h history.c internal.c internal.h interpol.c interpol.h ipc.h matrix.c matrix.h misc.c misc.h mouse.c mouse.h mousecmn.h national.h parse.c parse.h plot.c plot.h plot2d.c plot2d.h plot3d.c plot3d.h readline.c readline.h save.c save.h scanner.c scanner.h set.c setshow.h show.c specfun.c specfun.h standard.c standard.h stdfn.c stdfn.h syscfg.h tables.c tables.h template.h term_api.h term.c term.h time.c unset.c util.c util.h util3d.c util3d.h variable.c variable.h version.c
+gnuplot_SOURCES = alloc.c alloc.h ansichek.h binary.c binary.h bitmap.c bitmap.h color.c color.h command.c command.h contour.c contour.h datafile.c datafile.h dynarray.c dynarray.h eval.c eval.h fit.c fit.h getcolor.c gp_hist.h gp_time.h graph3d.c graph3d.h graphics.c graphics.h help.c help.h hidden3d.c hidden3d.h history.c internal.c internal.h interpol.c interpol.h ipc.h matrix.c matrix.h misc.c misc.h mouse.c mouse.h mousecmn.h national.h parse.c parse.h plot.c plot.h plot2d.c plot2d.h plot3d.c plot3d.h pm3d.c pm3d.h protos.h readline.c readline.h save.c save.h scanner.c scanner.h set.c setshow.h show.c specfun.c specfun.h standard.c standard.h stdfn.c stdfn.h syscfg.h tables.c tables.h template.h term_api.h term.c term.h time.c unset.c util.c util.h util3d.c util3d.h variable.c variable.h version.c
 
 
 gnuplot_LDADD = $(TERMLIBS) $(TERMXLIBS)
 
-gnuplot_x11_SOURCES = gplt_x11.c
+gnuplot_x11_SOURCES = gplt_x11.c getcolor.c
 
 gnuplot_x11_LDADD = $(XLIBS)
 
@@ -119,11 +119,11 @@ EXTRA_DIST = GNUmakefile Makefile.maint NeXT OpenStep corgraph.asm genopt.com gn
 O = o
 T = $(top_srcdir)/term/
 
-COREOBJS = alloc.$(O) binary.$(O) bitmap.$(O) command.$(O) contour.$(O) datafile.$(O) dynarray.$(O) eval.$(O) fit.$(O) graph3d.$(O) graphics.$(O) help.$(O) hidden3d.$(O) history.$(O) internal.$(O) interpol.$(O) matrix.$(O) misc.$(O) mouse.$(O) parse.$(O) plot.$(O) plot2d.$(O) plot3d.$(O) readline.$(O) save.$(O) scanner.$(O) set.$(O) show.$(O) specfun.$(O) standard.$(O) stdfn.$(O) tables.$(O) term.$(O) time.$(O) unset.$(O) util.$(O) util3d.$(O) variable.$(O)
+COREOBJS = alloc.$(O) binary.$(O) bitmap.$(O) color.$(O) command.$(O) contour.$(O) datafile.$(O) dynarray.$(O) eval.$(O) fit.$(O) getcolor.$(O) graph3d.$(O) graphics.$(O) help.$(O) hidden3d.$(O) history.$(O) internal.$(O) interpol.$(O) matrix.$(O) misc.$(O) mouse.$(O) parse.$(O) plot.$(O) plot2d.$(O) plot3d.$(O) pm3d.$(O) readline.$(O) save.$(O) scanner.$(O) set.$(O) show.$(O) specfun.$(O) standard.$(O) stdfn.$(O) tables.$(O) term.$(O) time.$(O) unset.$(O) util.$(O) util3d.$(O) variable.$(O)
 
 
 # List of terminal driver sources
-CORETERM = $(T)aed.trm $(T)ai.trm $(T)amiga.trm $(T)apollo.trm $(T)atariaes.trm $(T)atarivdi.trm $(T)be.trm $(T)cgi.trm $(T)cgm.trm $(T)corel.trm $(T)debug.trm $(T)djsvga.trm $(T)dumb.trm $(T)dxf.trm $(T)dxy.trm $(T)eepic.trm $(T)emf.trm $(T)emxvga.trm $(T)epslatex.trm $(T)epson.trm $(T)excl.trm $(T)fg.trm $(T)fig.trm $(T)ggi.trm $(T)gif.trm $(T)gnugraph.trm $(T)gpic.trm $(T)gpr.trm $(T)grass.trm $(T)hp26.trm $(T)hp2648.trm $(T)hp500c.trm $(T)hpgl.trm $(T)hpljii.trm $(T)hppj.trm $(T)imagen.trm $(T)iris4d.trm $(T)kyo.trm $(T)latex.trm $(T)linux.trm $(T)mac.trm $(T)metafont.trm $(T)metapost.trm $(T)mgr.trm $(T)mif.trm $(T)multitos.trm $(T)next.trm $(T)openstep.trm $(T)pbm.trm $(T)pc.trm $(T)pm.trm $(T)png.trm $(T)post.trm $(T)pslatex.trm $(T)pstricks.trm $(T)qms.trm $(T)regis.trm $(T)rgip.trm $(T)sun.trm $(T)t410x.trm $(T)table.trm $(T)tek.trm $(T)texdraw.trm $(T)tgif.trm $(T)tkcanvas.trm $(T)tpic.trm $(T)unixpc.trm $(T)unixplot.trm $(T)v384.trm $(T)vws.trm $(T)win.trm $(T)x11.trm $(T)xlib.trm
+CORETERM = $(T)aed.trm $(T)ai.trm $(T)amiga.trm $(T)apollo.trm $(T)atariaes.trm $(T)atarivdi.trm $(T)be.trm $(T)cgi.trm $(T)cgm.trm $(T)corel.trm $(T)debug.trm $(T)djsvga.trm $(T)dumb.trm $(T)dxf.trm $(T)dxy.trm $(T)eepic.trm $(T)emf.trm $(T)emxvga.trm $(T)epslatex.trm $(T)epson.trm $(T)excl.trm $(T)fg.trm $(T)fig.trm $(T)ggi.trm $(T)gif.trm $(T)gnugraph.trm $(T)gpic.trm $(T)gpr.trm $(T)grass.trm $(T)hp26.trm $(T)hp2648.trm $(T)hp500c.trm $(T)hpgl.trm $(T)hpljii.trm $(T)hppj.trm $(T)imagen.trm $(T)iris4d.trm $(T)kyo.trm $(T)latex.trm $(T)linux.trm $(T)mac.trm $(T)metafont.trm $(T)metapost.trm $(T)mgr.trm $(T)mif.trm $(T)multitos.trm $(T)next.trm $(T)openstep.trm $(T)pbm.trm $(T)pc.trm $(T)pm.trm $(T)png.trm $(T)post.trm $(T)pslatex.trm $(T)pstricks.trm $(T)qms.trm $(T)regis.trm $(T)rgip.trm $(T)sun.trm $(T)t410x.trm $(T)table.trm $(T)tek.trm $(T)texdraw.trm $(T)tgif.trm $(T)tkcanvas.trm $(T)tpic.trm $(T)unixpc.trm $(T)unixplot.trm $(T)v384.trm $(T)vgagl.trm $(T)vws.trm $(T)win.trm $(T)x11.trm $(T)xlib.trm
 
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = ../config.h
@@ -140,15 +140,15 @@ X_LIBS = @X_LIBS@
 X_EXTRA_LIBS = @X_EXTRA_LIBS@
 X_PRE_LIBS = @X_PRE_LIBS@
 ANSI2KNR = @ANSI2KNR@
-gnuplot_x11_OBJECTS =  gplt_x11$U.o
+gnuplot_x11_OBJECTS =  gplt_x11$U.o getcolor$U.o
 gnuplot_x11_DEPENDENCIES = 
 gnuplot_x11_LDFLAGS = 
-gnuplot_OBJECTS =  alloc$U.o binary$U.o bitmap$U.o command$U.o \
-contour$U.o datafile$U.o dynarray$U.o eval$U.o fit$U.o graph3d$U.o \
-graphics$U.o help$U.o hidden3d$U.o history$U.o internal$U.o \
+gnuplot_OBJECTS =  alloc$U.o binary$U.o bitmap$U.o color$U.o command$U.o \
+contour$U.o datafile$U.o dynarray$U.o eval$U.o fit$U.o getcolor$U.o \
+graph3d$U.o graphics$U.o help$U.o hidden3d$U.o history$U.o internal$U.o \
 interpol$U.o matrix$U.o misc$U.o mouse$U.o parse$U.o plot$U.o \
-plot2d$U.o plot3d$U.o readline$U.o save$U.o scanner$U.o set$U.o \
-show$U.o specfun$U.o standard$U.o stdfn$U.o tables$U.o term$U.o \
+plot2d$U.o plot3d$U.o pm3d$U.o readline$U.o save$U.o scanner$U.o \
+set$U.o show$U.o specfun$U.o standard$U.o stdfn$U.o tables$U.o term$U.o \
 time$U.o unset$U.o util$U.o util3d$U.o variable$U.o version$U.o
 gnuplot_DEPENDENCIES = 
 gnuplot_LDFLAGS = 
@@ -276,6 +276,8 @@ binary_.c: binary.c $(ANSI2KNR)
 	$(CPP) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/binary.c; then echo $(srcdir)/binary.c; else echo binary.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > binary_.c
 bitmap_.c: bitmap.c $(ANSI2KNR)
 	$(CPP) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/bitmap.c; then echo $(srcdir)/bitmap.c; else echo bitmap.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > bitmap_.c
+color_.c: color.c $(ANSI2KNR)
+	$(CPP) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/color.c; then echo $(srcdir)/color.c; else echo color.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > color_.c
 command_.c: command.c $(ANSI2KNR)
 	$(CPP) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/command.c; then echo $(srcdir)/command.c; else echo command.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > command_.c
 contour_.c: contour.c $(ANSI2KNR)
@@ -288,6 +290,8 @@ eval_.c: eval.c $(ANSI2KNR)
 	$(CPP) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/eval.c; then echo $(srcdir)/eval.c; else echo eval.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > eval_.c
 fit_.c: fit.c $(ANSI2KNR)
 	$(CPP) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/fit.c; then echo $(srcdir)/fit.c; else echo fit.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > fit_.c
+getcolor_.c: getcolor.c $(ANSI2KNR)
+	$(CPP) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/getcolor.c; then echo $(srcdir)/getcolor.c; else echo getcolor.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > getcolor_.c
 gplt_x11_.c: gplt_x11.c $(ANSI2KNR)
 	$(CPP) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/gplt_x11.c; then echo $(srcdir)/gplt_x11.c; else echo gplt_x11.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > gplt_x11_.c
 graph3d_.c: graph3d.c $(ANSI2KNR)
@@ -318,6 +322,8 @@ plot2d_.c: plot2d.c $(ANSI2KNR)
 	$(CPP) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/plot2d.c; then echo $(srcdir)/plot2d.c; else echo plot2d.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > plot2d_.c
 plot3d_.c: plot3d.c $(ANSI2KNR)
 	$(CPP) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/plot3d.c; then echo $(srcdir)/plot3d.c; else echo plot3d.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > plot3d_.c
+pm3d_.c: pm3d.c $(ANSI2KNR)
+	$(CPP) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/pm3d.c; then echo $(srcdir)/pm3d.c; else echo pm3d.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > pm3d_.c
 readline_.c: readline.c $(ANSI2KNR)
 	$(CPP) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/readline.c; then echo $(srcdir)/readline.c; else echo readline.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > readline_.c
 save_.c: save.c $(ANSI2KNR)
@@ -350,13 +356,13 @@ variable_.c: variable.c $(ANSI2KNR)
 	$(CPP) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/variable.c; then echo $(srcdir)/variable.c; else echo variable.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > variable_.c
 version_.c: version.c $(ANSI2KNR)
 	$(CPP) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/version.c; then echo $(srcdir)/version.c; else echo version.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > version_.c
-alloc_.o bf_test_.o binary_.o bitmap_.o command_.o contour_.o \
-datafile_.o dynarray_.o eval_.o fit_.o gplt_x11_.o graph3d_.o \
-graphics_.o help_.o hidden3d_.o history_.o internal_.o interpol_.o \
-matrix_.o misc_.o mouse_.o parse_.o plot_.o plot2d_.o plot3d_.o \
-readline_.o save_.o scanner_.o set_.o show_.o specfun_.o standard_.o \
-stdfn_.o tables_.o term_.o time_.o unset_.o util_.o util3d_.o \
-variable_.o version_.o : $(ANSI2KNR)
+alloc_.o bf_test_.o binary_.o bitmap_.o color_.o command_.o contour_.o \
+datafile_.o dynarray_.o eval_.o fit_.o getcolor_.o gplt_x11_.o \
+graph3d_.o graphics_.o help_.o hidden3d_.o history_.o internal_.o \
+interpol_.o matrix_.o misc_.o mouse_.o parse_.o plot_.o plot2d_.o \
+plot3d_.o pm3d_.o readline_.o save_.o scanner_.o set_.o show_.o \
+specfun_.o standard_.o stdfn_.o tables_.o term_.o time_.o unset_.o \
+util_.o util3d_.o variable_.o version_.o : $(ANSI2KNR)
 
 # This directory's subdirectories are mostly independent; you can cd
 # into them and run `make' without going through this Makefile.

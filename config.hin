@@ -138,6 +138,9 @@
 /* Define if you have the vfprintf function.  */
 #undef HAVE_VFPRINTF
 
+/* Define if you have the <3dkit.h> header file.  */
+#undef HAVE_3DKIT_H
+
 /* Define if you have the <errno.h> header file.  */
 #undef HAVE_ERRNO_H
 
@@ -216,6 +219,9 @@
 /* Define if you have the <values.h> header file.  */
 #undef HAVE_VALUES_H
 
+/* Define if you have the <vgagl.h> header file.  */
+#undef HAVE_VGAGL_H
+
 /* Define if you have the m library (-lm).  */
 #undef HAVE_LIBM
 
@@ -267,6 +273,15 @@
 /*  Define if this is a Linux system with SuperVGA library.  */
 #undef LINUXVGA
 
+/*  Define if the vgagl libray is present.  */
+#undef VGAGL
+
+/*  Define if the 3dkit libray is present.  */
+#undef THREEDKIT
+
+/*  Define if color information should be passed for each vertex.  */
+#undef EXTENDED_COLOR_SPECS
+
 /*  Define if you are using the GNU readline library.  */
 #undef HAVE_LIBREADLINE
 
@@ -314,6 +329,9 @@
 
 /*  Define if you want to have mouse support for the x11 terminal.  */
 #undef USE_MOUSE
+
+/*  Define if you want to have Petr Mikulik's fancy pm3d.  */
+#undef PM3D
 
 /*  Define if you want to use the experimental Enhanced Metafile Format driver.  */
 #undef USE_EMF_DRIVER

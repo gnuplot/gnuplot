@@ -1,5 +1,5 @@
 /*
- * $Id: plot.h,v 1.35 2000/08/02 13:53:11 mikulik Exp $
+ * $Id: plot.h,v 1.29.2.8 2000/10/23 18:57:54 joze Exp $
  */
 
 /* GNUPLOT - plot.h */
@@ -545,6 +545,9 @@ struct lp_style_type {          /* contains all Line and Point properties */
 	double  l_width,
 	        p_size;
 	                        /* more to come ? */
+#ifdef PM3D
+	TBOOLEAN use_palette;
+#endif
 };
 
 /* Now unused; replaced with set.c(reset_lp_properties) */
@@ -574,6 +577,9 @@ struct gnuplot_contours {
  	char isNewLevel;
  	char label[32];
 	int num_pts;
+#ifdef PM3D
+	double z;
+#endif
 };
 
 struct iso_curve {
@@ -597,6 +603,20 @@ struct surface_points {
 	struct gnuplot_contours *contours;	/* Not NULL If have contours. */
 	struct iso_curve *iso_crvs;
 };
+
+/* we might specify a co-ordinate in first/second/graph/screen coords */
+/* allow x,y and z to be in separate co-ordinates ! */
+enum position_type { first_axes, second_axes, graph, screen };
+
+struct position {
+	enum position_type scalex,scaley,scalez;
+	double x,y,z;
+};
+
+#ifdef PM3D
+/* color.h is included here, since it requires the definition of `coordinate' */
+#include "color.h"
+#endif
 
 /* It should go without saying that additional entries may be made
  * only at the end of this structure. Any fields added must be
@@ -654,6 +674,33 @@ struct TERMENTRY {
     void (*set_cursor) __PROTO((int, int, int));   /* set cursor style and corner of rubber band */
     void (*set_clipboard) __PROTO((const char[]));  /* write text into cut&paste buffer (clipboard) */
 #endif
+#ifdef PM3D
+    int (*make_palette) __PROTO((t_sm_palette *palette));
+    /* 1. if palette==NULL, then return nice/suitable
+       maximal number of colours supported by this terminal.
+       Returns 0 if it can make colours without palette (like 
+       postscript).
+       2. if palette!=NULL, then allocate its own palette
+       return value is undefined
+       3. available: some negative values of max_colors for whatever 
+       can be useful
+     */
+    void (*previous_palette) __PROTO((void));	
+    /* release the palette that the above routine allocated and get 
+       back the palette that was active before.
+       Some terminals, like displays, may draw parts of the figure
+       using their own palette. Those terminals that possess only 
+       one palette for the whole plot don't need this routine.
+     */
+
+    void (*set_color) __PROTO((double gray));
+    /* gray is from [0;1], terminal uses its palette or another way
+       to transform in into gray or r,g,b
+       This routine (for each terminal separately) remembers or not
+       this colour so that it can apply it for the subsequent drawings
+     */
+    void (*filled_polygon) __PROTO((int points, gpiPoint *corners));
+#endif
 };
 
 #ifdef WIN16
@@ -662,15 +709,6 @@ struct TERMENTRY {
 # define termentry TERMENTRY
 #endif
 
-
-/* we might specify a co-ordinate in first/second/graph/screen coords */
-/* allow x,y and z to be in separate co-ordinates ! */
-enum position_type { first_axes, second_axes, graph, screen };
-
-struct position {
-	enum position_type scalex,scaley,scalez;
-	double x,y,z;
-};
 
 struct text_label {
 	struct text_label *next;	/* pointer to next label in linked list */

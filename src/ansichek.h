@@ -1,5 +1,5 @@
 /*
- * $Id: ansichek.h,v 1.2 1999/06/17 14:27:34 lhecking Exp $
+ * $Id: ansichek.h,v 1.2.2.1 2000/05/03 21:26:10 joze Exp $
  */
 
 /* GNUPLOT - ansichek.h */

@@ -1,5 +1,5 @@
 /*
- * $Id: util3d.h,v 1.3 2000/02/11 19:13:12 lhecking Exp $
+ * $Id: util3d.h,v 1.3.2.1 2000/05/03 21:26:12 joze Exp $
  */
 
 /* GNUPLOT - util3d.h */

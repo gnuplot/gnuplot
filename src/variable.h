@@ -1,5 +1,5 @@
 /*
- * $Id: variable.h,v 1.7 1999/11/08 19:24:18 lhecking Exp $
+ * $Id: variable.h,v 1.7.2.1 2000/05/03 21:26:12 joze Exp $
  */
 
 /* GNUPLOT - variable.h */

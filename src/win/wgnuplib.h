@@ -1,5 +1,5 @@
 /*
- * $Id: wgnuplib.h,v 1.2 1999/07/27 19:42:16 lhecking Exp $
+ * $Id: wgnuplib.h,v 1.2.2.2 2000/10/22 13:50:51 joze Exp $
  */
 
 /* GNUPLOT - win/wgnuplib.h */
