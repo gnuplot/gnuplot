@@ -1,5 +1,5 @@
 /*
- * $Id: plot.h,v 1.119 1998/03/22 22:31:56 drd Exp $
+ * $Id: plot.h,v 1.120 1998/04/14 00:16:06 drd Exp $
  *
  */
 
@@ -43,51 +43,124 @@
 #endif
 
 #include "ansichek.h"
-
-/* #define NDEBUG */
-#include <assert.h>
+#include "stdfn.h"
 
 #define PROGRAM "G N U P L O T"
 #define PROMPT "gnuplot> "
-#if defined(AMIGA_SC_6_1) || defined(AMIGA_AC_5)
-#define SHELL "NewShell"
-#else /* AMIGA */
-#ifdef ATARI
-#define SHELL "gulam.prg"
-#else /* ATARI */
-#ifdef OS2
-#define SHELL "c:\\cmd.exe"
-#else /* OS2 */
-#ifdef OSK
-#define SHELL "/dd/cmds/shell"
-#else /* OSK */
-#define SHELL "/bin/sh"		/* used if SHELL env variable not set */
-#endif /* OSK */
-#endif /* OS2 */
-#endif /* ATARI */
-#endif /* AMIGA  */
 
-#if defined(__unix__) && !defined(unix)
-#define unix
-#endif
+/* Define operating system name, shell, and OS specific defines */
+
+#if defined(AMIGA_SC_6_1) || defined(AMIGA_AC_5) || defined(__amigaos__)
+# define OS "Amiga "
+# ifndef __amigaos__
+#define SHELL "NewShell"
+# endif
+# ifndef AMIGA
+#  define AMIGA
+# endif
+#endif /* Amiga */
+
+#ifdef ATARI
+# define OS "TOS "
+#define SHELL "gulam.prg"
+#endif /* Atari */
+
+#ifdef DOS386
+# define OS "DOS 386 "
+#endif /* DOS386 */
+
+#ifdef linux
+# define OS "Linux "
+#endif /* Linux */
 
 #if defined(__NeXT__) && !defined(NEXT)
-#define NEXT
+# define NEXT
 #endif
 
-#if defined(MSDOS) && !defined(DOS32) && !defined(DOS16)
-#define DOS16
+#ifdef OS2
+# define OS "OS/2 "
+#define SHELL "c:\\cmd.exe"
+#endif /* OS/2 */
+
+#ifdef OSK
+# define OS "OS-9 "
+#define SHELL "/dd/cmds/shell"
+#endif /* OS-9 */
+
+#if defined(vms) || defined(VMS)
+# ifndef VMS
+#  define VMS
+#endif
+# define OS "VMS "
+# if !defined(VAXCRTL) && !defined(DECCRTL)
+#  error Please /define either VAXCRTL or DECCRTL
+# endif
+/* avoid some IMPLICITFUNC warnings */
+# ifdef __DECC
+#  include <starlet.h>
+# endif  /* __DECC */
+#endif /* VMS */
+
+#if defined(_WINDOWS) || defined(_Windows)
+# ifndef _Windows
+#  define _Windows
+#endif
+# ifdef WIN32
+#  define OS "MS-Windows 32 bit "
+# else
+#  ifndef WIN16
+#   define WIN16
+#  endif
+#  define OS "MS-Windows "
+# endif /* WIN32 */
+#endif /* _WINDOWS */
+
+#if defined(MSDOS) && !defined(_Windows)
+# if !defined(DOS32) && !defined(DOS16)
+#  define DOS16
+# endif
+# ifdef MTOS
+#  define OS "TOS & MiNT & MULTITOS & Magic - "
+# endif /* MTOS */
+# define OS "MS-DOS "
+#endif /* MSDOS */
+
+#if defined(__unix__) || defined(unix)
+# ifndef unix
+#  define unix
+# endif
+# ifndef OS
+#  define OS "Unix "
+# endif
+#endif /* Unix */
+
+/* Note: may not catch all IBM AIX compilers */
+#ifdef _AIX
+# ifndef unix
+#  define unix
+# endif
+# define OS "Unix "
 #endif
 
-#if defined(_WINDOWS) && !defined(_Windows)
-#define _Windows
+/* Attempted fix for SCO */
+#ifdef SCO
+# ifndef unix
+#  define unix
+# endif
+# define OS "Unix "
 #endif
 
-
-#if defined(_Windows) && !defined(WIN32) && !defined(WIN16)
-#define WIN16
+#ifndef OS
+# define OS ""
 #endif
 
+#ifndef SHELL
+#define SHELL "/bin/sh"    /* used if SHELL env variable not set */
+#endif
+
+/* End OS section */
+  
+  
 #define SAMPLES 100		/* default number of samples for a plot */
 #define ISO_SAMPLES 10		/* default number of isolines per splot */
 #define ZERO	1e-8		/* default for 'zero' set option */
@@ -128,7 +201,7 @@
 #define STACK_DEPTH 100
 #define NO_CARET (-1)
 
-#if defined(MSDOS) && !defined(DOS32)
+#ifdef DOS16
 #define MAX_NUM_VAR	3	/* Ploting projection of func. of max. five vars. */
 #else
 #define MAX_NUM_VAR	5	/* Ploting projection of func. of max. five vars. */
@@ -225,67 +298,6 @@
 #define GRID_MX2    256
 #define GRID_MY2    512
 
-#if defined(AMIGA_SC_6_1) || defined(AMIGA_AC_5) || defined(__amigaos__)
-#define OS "Amiga "
-#endif /* Amiga */
-
-#ifdef OS2
-#define OS "OS/2 "
-#endif  /* OS2 */
-
-#ifdef OSK
-#define OS "OS-9 "
-#endif  /* OSK */
-
-#ifdef vms
-#define OS "VMS "
-#if !defined(VAXCRTL) && !defined(DECCRTL)
-#error Please /define either VAXCRTL or DECCRTL
-#endif
-#endif /* VMS */
-
-#ifdef linux
-#define OS "Linux "
-#endif /* Linux */
-
-#ifdef DOS386
-#define OS "DOS 386 "
-#endif /* DOS386 */
-
-#ifdef _Windows
-#ifdef WIN32
-#define OS "MS-Windows 32 bit "
-#else
-#define OS "MS-Windows "
-#endif /* WIN32 */
-#else
-#ifdef MSDOS
-#ifdef MTOS
-#define OS "TOS & MiNT & MULTITOS & Magic - "
-#endif /* MTOS */
-#define OS "MS-DOS "
-#endif /* MSDOS */
-#endif /* _Windows */
-
-#ifdef ATARI
-#define OS "TOS "
-#endif /* ATARI */
-
-/* Note: may not catch all IBM AIX compilers */
-#ifdef _AIX
-#define OS "Unix "
-#endif
-
-#if defined(unix) && !defined(OS)
-#define OS "Unix "
-#endif
- 
-/* FIXME: OS might be empty for certain SCO and IBM AIX compilers. */
-#ifndef OS
-#define OS ""
-#endif
-
-
 /* To access curves larger than 64k, MSDOS needs to use huge pointers */
 #if (defined(__TURBOC__) && defined(MSDOS)) || defined(WIN16)
 #define GPHUGE huge
@@ -295,7 +307,7 @@
 #define GPFAR
 #endif
 
-#if (defined(MSDOS) && !defined(DOS32)) || (defined(_Windows) && !defined(WIN32))
+#if defined(DOS16) || defined(WIN16)
 typedef float coordval;		/* memory is tight on PCs! */
 #define COORDVAL_FLOAT 1
 #else
@@ -306,10 +318,6 @@ typedef double coordval;
 #ifdef WIN32
 #define far 
 #endif
-
-/* get prototypes for str??? functions. this is so much better that clogging
-   up all files with loads of #ifdefs for incompatible return types */
-#include "stdfn.h"
 
 /*
  * Note about VERYLARGE:  This is the upper bound double (or float, if PC)
@@ -331,40 +339,12 @@ typedef double coordval;
  * DBL_MAX).
  */
 
-#ifndef NO_FLOAT_H
-#  include <float.h>
-#endif
-
 /* both min/max and MIN/MAX are defined by some compilers.
  * we are now on GPMIN / GPMAX
  */
 
 #define GPMAX(a,b) ( (a) > (b) ? (a) : (b) )
 #define GPMIN(a,b) ( (a) < (b) ? (a) : (b) )
-
-
-/* ATARI and SAS/C 6.x need prototypes
- * As this is ANSI standard, you should try to add your compiler to the
- * list so that in the end, the conditionals might fall.
- *
- * Actually, most of these headers are now included in stdfn.h above, so
- * maybe we can get rid of them completely.
- */
-
-#if defined(ATARI) || defined(MTOS) || defined(AMIGA_SC_6_1) || defined(__amigaos__)
-# include <stdio.h>
-# include <stdlib.h>
-# include <string.h>
-# include <math.h>
-#endif
-
-/* Manx wants math.h only. Try to add it to the above list to get rid
- * of those lines
- */
-
-#ifdef AMIGA_AC_5
-# include <math.h>
-#endif
 
 /* There is a bug in the NEXT OS. This is a workaround. Lookout for
  * an OS correction to cancel the following dinosaur
@@ -378,14 +358,14 @@ typedef double coordval;
  */
 
 #if defined ( NEXT ) && NX_CURRENT_COMPILER_RELEASE<310
-#   if defined ( DBL_MAX)
-#      undef DBL_MAX
-#   endif
-#   define DBL_MAX 1.7976931348623157e+308
-#   undef HUGE
-#   define HUGE    DBL_MAX
-#   undef HUGE_VAL
-#   define HUGE_VAL DBL_MAX
+# if defined ( DBL_MAX)
+#  undef DBL_MAX
+# endif
+# define DBL_MAX 1.7976931348623157e+308
+# undef HUGE
+# define HUGE    DBL_MAX
+# undef HUGE_VAL
+# define HUGE_VAL DBL_MAX
 #endif
 
 /* Now define VERYLARGE. This is usually DBL_MAX/2 - 1. On MS-DOS however
@@ -393,25 +373,25 @@ typedef double coordval;
  */
 
 #ifndef COORDVAL_FLOAT
-#ifdef DBL_MAX
-#define VERYLARGE (DBL_MAX/2-1)
-#endif
+# ifdef DBL_MAX
+#  define VERYLARGE (DBL_MAX/2-1)
+# endif
 #else /* COORDVAL_FLOAT */
-#ifdef FLT_MAX
-#define VERYLARGE (FLT_MAX/2-1)
-#endif
+# ifdef FLT_MAX
+#  define VERYLARGE (FLT_MAX/2-1)
+# endif
 #endif /* COORDVAL_FLOAT */
 
 #ifndef VERYLARGE
-#ifdef HUGE
-#define VERYLARGE (HUGE/2-1)
-#elif defined(HUGE_VAL)
-#define VERYLARGE (HUGE_VAL/2-1)
-#else
+# ifdef HUGE
+#  define VERYLARGE (HUGE/2-1)
+# elif defined(HUGE_VAL)
+#  define VERYLARGE (HUGE_VAL/2-1)
+# else
 /* as a last resort */
-#define VERYLARGE (1e37)
-#warning "using last resort 1e37 as VERYLARGE define, please check your headers"
-#endif
+#  define VERYLARGE (1e37)
+#  warning "using last resort 1e37 as VERYLARGE define, please check your headers"
+# endif
 #endif
 
 /* argument: char *fn */
@@ -420,57 +400,15 @@ typedef double coordval;
 #define END_OF_COMMAND (c_token >= num_tokens || equals(c_token,";"))
 #define is_EOF(c) ((c) == 'e' || (c) == 'E')
 
-#ifdef vms
-
-
-#define is_comment(c) ((c) == '#' || (c) == '!')
-#define is_system(c) ((c) == '$')
-
-
-#else /* vms */
-
-#define is_comment(c) ((c) == '#')
-#define is_system(c) ((c) == '!')
-
-#endif /* vms */
-
-/* 
- * memcpy() and memset() come by many names. The default is now to assume
- * these functions as defined by ANSI.
- * Define NO_MEMCPY to use bcopy(), NO_MEMSET to use bzero()
- *  NOCOPY to use a handwritten version in parse.c
- */
-
-#if defined(NO_MEMCPY) && !defined(NOCOPY)
-#  define memcpy(dest,src,len) bcopy(src,dest,len)
-#else 
-   /* use memcpy directly, define bcopy to cause an error */
-#  ifdef bcopy
-#   undef bcopy
-#  endif
-#  define bcopy(s,d,l) bcopy->dont
-#endif /* NO_MEMCPY */
-
-/*
- * Since we want to use memset, we have to map a possibly nonzero fill byte
- * to the bzero function. The following defined might seem a bit odd, but I
- * think this is the only possible way.
- */
-
-#if defined(NO_MEMCPY)
-#include <assert.h>
-#define memset(s, b, l)	\
-do {			\
-  assert((b)==0);	\
-  bzero(s, l);		\
-} while(0)
-#else
-  /* use memset, define bzero to cause an error */
-# ifdef bzero
-#  undef bzero
-# endif
-# define bzero(s,l) bzero->dont
-#endif
+#ifdef VMS
+# define is_comment(c) ((c) == '#' || (c) == '!')
+# define is_system(c) ((c) == '$')
+/* maybe configure could check this? */
+# define BACKUP_FILESYSTEM 1
+#else /* VMS */
+# define is_comment(c) ((c) == '#')
+# define is_system(c) ((c) == '!')
+#endif /* VMS */
 
 #define top_of_stack stack[s_p]
 
@@ -758,7 +696,7 @@ struct TERMENTRY {
 	int flags;
 	void (*suspend) __PROTO((void)); /* called after one plot of multiplot */
 	void (*resume)  __PROTO((void)); /* called before plots of multiplot */
-	void (*fillbox) __PROTO((int style, unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2)); /* clear in multiplot mode */
+	void (*fillbox) __PROTO((int, unsigned int, unsigned int, unsigned int, unsigned int)); /* clear in multiplot mode */
    void (*linewidth) __PROTO((double linewidth));
 };
 
@@ -839,19 +777,20 @@ struct ticmark {
  from:	Martin Minow
 	decvax!minow
  */
-#ifdef	vms
-#include		<ssdef.h>
-#include		<stsdef.h>
-#define	IO_SUCCESS	(SS$_NORMAL | STS$M_INHIB_MSG)
-#define	IO_ERROR	SS$_ABORT
-#endif /* vms */
+#ifdef VMS
+# include		<ssdef.h>
+# include		<stsdef.h>
+# define	IO_SUCCESS	(SS$_NORMAL | STS$M_INHIB_MSG)
+# define	IO_ERROR	SS$_ABORT
+#endif /* VMS */
 
 
 #ifndef	IO_SUCCESS	/* DECUS or VMS C will have defined these already */
-#define	IO_SUCCESS	0
+# define	IO_SUCCESS	0
 #endif
+
 #ifndef	IO_ERROR
-#define	IO_ERROR	1
+# define	IO_ERROR	1
 #endif
 
 /* Some key global variables */
@@ -876,7 +815,7 @@ extern char dummy_var[MAX_NUM_VAR][MAX_ID_LEN+1];	/* from setshow.c */
 
 /* Windows needs to redefine stdin/stdout functions */
 #ifdef _Windows
-#include "win/wtext.h"
+# include "win/wtext.h"
 #endif
 
 #define TTOP 0
@@ -904,17 +843,19 @@ extern char dummy_var[MAX_NUM_VAR][MAX_ID_LEN+1];	/* from setshow.c */
 #define DF_FIRST_BLANK  (-3)
 #define DF_SECOND_BLANK (-4)
 
-/* if GP_INLINE has not yet been defined, set to __inline for gcc,
+/* HBB: changed to __inline__, which seems more usually
+ * understood by tools like, e.g., lclint */
+/* if GP_INLINE has not yet been defined, set to __inline__ for gcc,
  * nothing. I'd prefer that any other compilers have the defn in
  * the makefile, rather than having a huge list of compilers here.
  * But gcc is sufficiently ubiquitous that I'll allow it here !!!
  */
 #ifndef GP_INLINE
-#ifdef __GNUC__
-#define GP_INLINE __inline
-#else
-#define GP_INLINE /*nothing*/
-#endif
+# ifdef __GNUC__
+#  define GP_INLINE __inline__
+# else
+#  define GP_INLINE /*nothing*/
+# endif
 #endif
 
 #include "protos.h"
@@ -928,12 +869,12 @@ extern char dummy_var[MAX_NUM_VAR][MAX_ID_LEN+1];	/* from setshow.c */
  * We assume compiler will optimise away if(0) or if(1)
  */
 #if defined(ANSI_C) && defined(DEBUG_LP)
-#define LP_DUMP(lp) \
+# define LP_DUMP(lp) \
  fprintf(stderr, \
   "lp_properties at %s:%d : lt: %d, lw: %.3f, pt: %d, ps: %.3f\n", \
   __FILE__, __LINE__, lp.l_type, lp.l_width, lp.p_type, lp.p_size)
 #else
-#define LP_DUMP(lp)
+# define LP_DUMP(lp)
 #endif
 
 #define LP_PARSE(lp, allow_ls, allow_point, def_line, def_point) \

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: graph3d.c,v 1.104 1998/03/22 23:31:10 drd Exp $";
+static char *RCSid = "$Id: graph3d.c,v 1.105 1998/04/14 00:15:26 drd Exp $";
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -50,10 +50,6 @@ static char *RCSid = "$Id: graph3d.c,v 1.104 1998/03/22 23:31:10 drd Exp $";
  *
  */
 
-#include <math.h>
-#if !defined(sequent) && !defined(apollo) && !defined(alliant)
-#include <limits.h>
-#endif
 #include "plot.h"
 #include "setshow.h"
 
@@ -72,6 +68,7 @@ int suppressMove = 0;  /* for preventing moveto while drawing contours */
  * hidden_active - TRUE if hidden lines are to be removed.
  */
 int hidden_active = FALSE;
+int hidden_no_update;   /* HBB 980324: made this visible despite LITE */
 
 /* LITE defines a restricted memory version for MS-DOS, which doesn't
  * use the routines in hidden3d.c
@@ -79,7 +76,6 @@ int hidden_active = FALSE;
 
 #ifndef LITE
 int hidden_line_type_above, hidden_line_type_below;
-int hidden_no_update;
 #endif /* LITE */
 
 
@@ -95,10 +91,10 @@ static void cntr3d_points __PROTO((struct gnuplot_contours *cntr, struct surface
 static void cntr3d_dots __PROTO((struct gnuplot_contours *cntr));
 static void check_corner_height __PROTO((struct coordinate GPHUGE *point, double height[2][2], double depth[2][2]));
 static void draw_bottom_grid __PROTO((struct surface_points *plot, int plot_count));
-static void xtick_callback __PROTO((int axis, double place, char *text, int grid));
-static void ytick_callback __PROTO((int axis, double place, char *text, int grid));
-static void ztick_callback __PROTO((int axis, double place, char *text, int grid));
-static void setlinestyle __PROTO((int style));
+static void xtick_callback __PROTO((int axis, double place, char *text, struct lp_style_type grid));
+static void ytick_callback __PROTO((int axis, double place, char *text, struct lp_style_type grid));
+static void ztick_callback __PROTO((int axis, double place, char *text, struct lp_style_type grid));
+static void setlinestyle __PROTO((struct lp_style_type style));
 
 static void boundary3d __PROTO((int scaling, struct surface_points *plots, int count));
 #if 0 /* not used */
@@ -246,16 +242,16 @@ static double tic_unitx, tic_unity;
 /* Initialize the line style using the current device and set hidden styles  */
 /* to it as well if hidden line removal is enabled.			     */
 static void setlinestyle(style)
-int style;
+struct lp_style_type style;
 {
     register struct termentry *t = term;
 
-    (*t->linetype)(style);
+    term_apply_lp_properties(&style);
 
 #ifndef LITE
     if (hidden3d) {
-	hidden_line_type_above = style;
-	hidden_line_type_below = style;
+	hidden_line_type_above = style.l_type;
+	hidden_line_type_below = style.l_type;
     }
 #endif  /* LITE */
 }
@@ -520,7 +516,7 @@ char ss[MAX_LINE_LEN+1], *s, *e;
  */
 
     /* If we are to draw the bottom grid make sure zmin is updated properly. */
-    if (xtics || ytics || grid) {
+    if (xtics || ytics || work_grid.l_type) {
 	base_z = z_min3d - (z_max3d - z_min3d) * ticslevel;
 	if (ticslevel >= 0)
 		floor_z = base_z;
@@ -572,7 +568,7 @@ char ss[MAX_LINE_LEN+1], *s, *e;
 	yscale3d = 2.0/(y_max3d - y_min3d);
 	xscale3d = 2.0/(x_max3d - x_min3d);
 
-	(*t->linetype)(-2); /* border linetype */
+	term_apply_lp_properties(&border_lp); /* border linetype */
 
 /* PLACE TITLE */
 	if (*title.text != 0) {
@@ -710,12 +706,12 @@ char ss[MAX_LINE_LEN+1], *s, *e;
   		map_position(&key_user_pos, &xl, &yl, "key");
 	}
 
-	if (key && key_box>-3) {
+	if (key && key_box.l_type>-3) {
 		int yt=yl;
 		int yb=yl - key_entry_height*(key_rows-ktitle_lines) - ktitle_lines*t->v_char;
 	   int key_xr = xl + key_col_wth * (key_cols-1) + key_size_right;
 		/* key_rows seems to contain title at this point ??? */
-		(*t->linetype)(key_box);
+		term_apply_lp_properties(&key_box);
 		(*t->move)(xl-key_size_left,yb);
 		(*t->vector)(xl-key_size_left,yt);
 		(*t->vector)(key_xr,yt);
@@ -1478,7 +1474,7 @@ static void draw_bottom_grid(plot, plot_num)
 	int save_update=hidden_no_update;
 	hidden_no_update=TRUE;
 #endif /* LITE */
-	setlinestyle(-2);
+	setlinestyle(border_lp); /* Here is the one and only call to this function. */
 
 	map3d_xy(zaxis_x, zaxis_y, base_z, &bl_x, &bl_y);
 	map3d_xy( back_x,  back_y, base_z, &bb_x, &bb_y);
@@ -1611,7 +1607,7 @@ else if (height[i][j]!=depth[i][j]) \
 		}
 
 		if (xtics) {
-			gen_tics(FIRST_X_AXIS, &xticdef,grid&(GRID_X|GRID_MX),mxtics,mxtfreq, xtick_callback);
+			gen_tics(FIRST_X_AXIS, &xticdef,work_grid.l_type&(GRID_X|GRID_MX),mxtics,mxtfreq, xtick_callback);
 		}
 
 		if (*xlabel.text) {
@@ -1648,7 +1644,7 @@ else if (height[i][j]!=depth[i][j]) \
 			}
 		}
 		if (ytics) {
-			gen_tics(FIRST_Y_AXIS, &yticdef,grid&(GRID_Y|GRID_MY),mytics,mytfreq, ytick_callback);
+			gen_tics(FIRST_Y_AXIS, &yticdef,work_grid.l_type&(GRID_Y|GRID_MY),mytics,mytfreq, ytick_callback);
 		}
 
 		if (*ylabel.text) {
@@ -1668,21 +1664,21 @@ else if (height[i][j]!=depth[i][j]) \
 	/* do z tics */
 
 	if (ztics && (draw_surface || (draw_contour&CONTOUR_SRF))) {
-		gen_tics(FIRST_Z_AXIS, &zticdef, grid&(GRID_Z|GRID_MZ), mztics, mztfreq, ztick_callback);
+		gen_tics(FIRST_Z_AXIS, &zticdef, work_grid.l_type&(GRID_Z|GRID_MZ), mztics, mztfreq, ztick_callback);
 	}
 
-	if ( (xzeroaxis>=-2) && !is_log_y && inrange(0,y_min3d, y_max3d)) {
+	if ( (xzeroaxis.l_type>=-2) && !is_log_y && inrange(0,y_min3d, y_max3d)) {
 		unsigned int x,y,x1,y1;
-		(*t->linetype)(xzeroaxis);
-		map3d_xy(x_min3d, 0.0, base_z, &x, &y);
-		map3d_xy(x_max3d, 0.0, base_z, &x1, &y1);
+		term_apply_lp_properties(&xzeroaxis);
+		map3d_xy(0.0, y_min3d, base_z, &x, &y); /* line through x=0 */
+		map3d_xy(0.0, y_max3d, base_z, &x1, &y1);
 		draw_clip_line(x,y,x1,y1);
 	}
-	if ((yzeroaxis>=-2) && !is_log_x && inrange(0,x_min3d, x_max3d)) {
+	if ((yzeroaxis.l_type>=-2) && !is_log_x && inrange(0,x_min3d, x_max3d)) {
 		unsigned int x,y,x1,y1;
-		(*t->linetype)(yzeroaxis);
-		map3d_xy(0.0, y_min3d, base_z, &x, &y);
-		map3d_xy(0.0, y_max3d, base_z, &x1, &y1);
+		term_apply_lp_properties(&yzeroaxis);
+		map3d_xy(x_min3d, 0.0, base_z, &x, &y); /* line through y=0 */
+		map3d_xy(x_max3d, 0.0, base_z, &x1, &y1);
 		draw_clip_line(x,y,x1,y1);
 	}
 
@@ -1704,19 +1700,19 @@ static void xtick_callback(axis,place,text,grid)
 int axis;
 double place;
 char *text;
-int grid; /* linetype or -2 for none */
+struct lp_style_type grid; /* linetype or -2 for none */
 {
 	unsigned int x,y,x1,y1;
 	double scale=(text?ticscale:miniticscale);
 	int dirn=tic_in?1:-1;
 	register struct termentry *t = term;
 	map3d_xy(place, xaxis_y, base_z, &x, &y);
-	if (grid > -2) {
-		(*t->linetype)(grid);
+	if (grid.l_type > -2) {
+		term_apply_lp_properties(&grid);
 		/* to save mapping twice, map non-axis y */
 		map3d_xy(place, y_min3d+y_max3d-xaxis_y, base_z, &x1, &y1);
 		draw_clip_line(x,y,x1,y1);
-		(*t->linetype)(-2);
+		term_apply_lp_properties(&border_lp);
 	}
 	if (xtics&TICS_ON_AXIS) {
 		map3d_xy(place, (y_min3d+y_max3d)/2, base_z, &x, &y);
@@ -1732,8 +1728,15 @@ int grid; /* linetype or -2 for none */
 			just=CENTRE;
 		else
 			just=RIGHT;
+#if 1 
+/* HBB 970729: let's see if the 'tic labels collide with axes' problem
+ * may be fixed this way: */
+		x1=x-tic_unitx*(t->h_char)*1;
+		y1=y-tic_unity*(t->v_char)*1;
+#else
 		x1=x-tic_unitx*(t->h_tic)*2;
 		y1=y-tic_unity*(t->v_tic)*2;
+#endif
 		if (!tic_in) {
 			x1 -= tic_unitx*(t->h_tic)*ticscale;
 			y1 -= tic_unity*(t->v_tic)*ticscale;
@@ -1752,18 +1755,18 @@ static void ytick_callback(axis,place,text,grid)
 int axis;
 double place;
 char *text;
-int grid;
+struct lp_style_type grid;
 {
 	unsigned int x,y,x1,y1;
 	double scale=(text?ticscale:miniticscale);
 	int dirn=tic_in?1:-1;
 	register struct termentry *t = term;
 	map3d_xy(yaxis_x, place, base_z, &x, &y);
-	if (grid > -2) {
-		(*t->linetype)(grid);
+	if (grid.l_type > -2) {
+		term_apply_lp_properties(&grid);
 		map3d_xy(x_min3d+x_max3d-yaxis_x, place, base_z, &x1, &y1);
 		draw_clip_line(x,y,x1,y1);
-		(*t->linetype)(-2);
+		term_apply_lp_properties(&border_lp);
 	}
 	if (ytics&TICS_ON_AXIS) {
 		map3d_xy( (x_min3d+x_max3d)/2, place, base_z, &x, &y);
@@ -1779,8 +1782,13 @@ int grid;
 			just=CENTRE;
 		else
 			just=RIGHT;
+#if 1 /* HBB 970729: same as above in xtics_callback */
+		x1=x-tic_unitx*(t->h_char)*1;
+		y1=y-tic_unity*(t->v_char)*1;
+#else
 		x1=x-tic_unitx*(t->h_tic)*2;
 		y1=y-tic_unity*(t->v_tic)*2;
+#endif
 		if (!tic_in) {
 			x1 -= tic_unitx*(t->h_tic)*ticscale;
 			y1 -= tic_unity*(t->v_tic)*ticscale;
@@ -1799,23 +1807,23 @@ static void ztick_callback(axis,place,text,grid)
 int axis;
 double place;
 char *text;
-int grid;
+struct lp_style_type grid;
 {
 /* HBB: inserted some ()'s to shut up gcc -Wall, here and below */
 	int len=(text?ticscale:miniticscale)*(tic_in?1:-1)*(term->h_tic);
 	unsigned int x,y;
 	register struct termentry *t = term;
-	if (grid > -2) {
+	if (grid.l_type > -2) {
 		unsigned int x1,y1,x2,y2,x3,y3;
 		double other_x=x_min3d+x_max3d-zaxis_x;
 		double other_y=y_min3d+y_max3d-zaxis_y;
-		(*t->linetype)(grid);
+		term_apply_lp_properties(&grid);
 		map3d_xy(zaxis_x, zaxis_y, place, &x1, &y1);
 		map3d_xy(back_x, back_y, place, &x2, &y2);
 		map3d_xy(other_x, other_y, place, &x3, &y3);
 		draw_clip_line(x1,y1,x2,y2);
 		draw_clip_line(x2,y2,x3,y3);
-		(*t->linetype)(-2);
+		term_apply_lp_properties(&border_lp);
 	}
 	map3d_xy(zaxis_x, zaxis_y, place, &x, &y);
 	draw_clip_line(x,y,x+len, y);

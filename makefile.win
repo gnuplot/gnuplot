@@ -41,13 +41,15 @@ CAUXFLAGS = -ml -w-par -w-use -w-aus -f -N -M -y -v -d -I$(TC)\include -DMSDOS -
 !endif
 
 OBJS = 	bitmap.obj command.obj contour.obj eval.obj graphics.obj graph3d.obj \
-	internal.obj misc.obj parse.obj plot.obj plot2d.obj plot3d.obj readline.obj scanner.obj \
-	set.obj show.obj specfun.obj standard.obj term.obj util.obj version.obj \
-	binary.obj winmain.obj interpol.obj fit.obj matrix.obj \
-	datafile.obj alloc.obj util3d.obj hidden3d.obj time.obj
+	internal.obj misc.obj parse.obj plot.obj plot2d.obj plot3d.obj \
+	readline.obj scanner.obj set.obj show.obj specfun.obj standard.obj \
+	stdfn.obj term.obj util.obj version.obj binary.obj winmain.obj \
+	interpol.obj fit.obj matrix.obj datafile.obj alloc.obj util3d.obj \
+	hidden3d.obj time.obj
 DLLOBJS = wgnuplib.obj wtext.obj wmenu.obj wpause.obj wgraph.obj wprinter.obj 
 
-CSOURCE5 = term\aed.trm term\cgi.trm term\dumb.trm term\dxy.trm \
+CSOURCE5 = term\aed.trm term\cgi.trm term\cgm.trm term\debug.trm \
+	term\dumb.trm term\dxy.trm \
 	term\eepic.trm term\epson.trm term\fig.trm term\hp26.trm \
 	term\hp2648.trm term\hpgl.trm term\hpljii.trm 
 CSOURCE6 = term\impcodes.h term\imagen.trm term\object.h \
@@ -74,7 +76,7 @@ wgnuplot.exe: $(OBJS) win\wgnuplot.def win\wgnuplot.rc winmain.obj wgnuplot.lib
 	$(BIN)tlink /Twe /c /s /v /l @&&!
 $(TC)\lib\C0Wl +
 bitmap command eval graphics graph3d internal misc parse +
-plot plot2d plot3d scanner set show specfun standard term util version contour +
+plot plot2d plot3d scanner set show specfun standard stdfn term util version contour +
 binary interpol +
 winmain +
 readline +
@@ -96,7 +98,7 @@ wgnupl32.exe: $(OBJS) $(DLLOBJS) win\wgnupl32.def wgnupl32.res winmain.obj
 	$(BIN)tlink32 /Tpe /c /m /s /v @&&!
 $(TC)\lib\C0W32 +
 bitmap command eval graphics graph3d internal misc parse +
-plot plot2d plot3d scanner set show specfun standard term util version contour +
+plot plot2d plot3d scanner set show specfun standard stdfn term util version contour +
 wgnuplib wtext wmenu wpause wgraph wprinter +
 binary interpol +
 winmain +
@@ -171,6 +173,8 @@ show.obj: show.c plot.h setshow.h
 specfun.obj: specfun.c
 
 standard.obj: standard.c plot.h
+
+stdfn.obj: stdfn.c stdfn.h
 
 interpol.obj: interpol.c plot.h setshow.h
 
@@ -276,6 +280,7 @@ clean:
 	del wgnupl32.map
 	del wgnupl32.res
 	del win\gnuplot.rtf
+	del doc2rtf.map
 	del doc2rtf.exe
 	del win\wgnuplib.res
 	del wgnuplib.map

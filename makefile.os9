@@ -1,6 +1,6 @@
 ############################################################
 #
-# $Id: makefile.os9,v 1.3 1996/09/18 23:15:04 drd Exp $
+# $Id: makefile.os9,v 1.4 1998/04/14 00:15:55 drd Exp $
 #
 # GNUPLOT 3.6 makefile (X11 support) for OS-9 and Ultra C
 #   by Martijn Schipper 18-6-1996
@@ -45,8 +45,8 @@ M = DEMO/
 
 DEBUG = -g
 #DEBUG =
-CDFLAGS = -DOSK -DPIPES -DREADLINE -DNO_SYS_TYPES_H -DHAVE_STRERROR \
-			-DHAVE_LOCALE -DNOGAMMA $(PLOTXFLAG)
+CDFLAGS = -DOSK -DPIPES -DREADLINE -DNO_SYS_TYPES_H -DHAVE_LOCALE \
+		$(PLOTXFLAG)
 CFLAGS = $(DEBUG) -td=/h0 -tp=020ld $(CDFLAGS)
 CCFLAGS = -eas=$(RDIR)
 

@@ -1,5 +1,5 @@
 #
-# $Id: stat.inc,v 1.2 1993/09/27 17:11:54 alex Exp $
+# $Id: stat.inc,v 1.3 1998/04/14 00:16:54 drd Exp $
 #
 # Library of Statistical Functions version 3.0
 #
@@ -83,7 +83,7 @@ beta(x)=Binv(p,q)*x**(p-1.0)*(1.0-x)**(q-1.0)
 bin_s(x)=n!/(n-int(x))!/int(x)!*p**int(x)*(1.0-p)**(n-int(x))
 bin_l(x)=exp(lgamma(n+1)-lgamma(n-int(x)+1)-lgamma(int(x)+1)\
 +int(x)*log(p)+(n-int(x))*log(1.0-p))
-binom(x)=(n<50)?bin_s(x):bin_l(x)
+binom(x)=(n<20)?bin_s(x):bin_l(x)
 
 # Cauchy PDF
 cauchy(x)=b/(pi*(b*b+(x-a)**2))

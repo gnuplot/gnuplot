@@ -1,5 +1,5 @@
 /*
- * $Id: pbm.trm,v 1.17 1998/03/22 22:34:54 drd Exp $
+ * $Id: pbm.trm,v 1.18 1998/04/14 00:17:58 drd Exp $
  *
  */
 
@@ -60,9 +60,7 @@
    the Portable BitMap format and for programs to convert PBM files  
    to other bitmap formats. */
 
-#ifndef GOT_DRIVER_H
 #include "driver.h"
-#endif
 
 #ifdef TERM_REGISTER
 register_term(pbm_driver)
@@ -146,14 +144,15 @@ TERM_PUBLIC void PBMoptions()
 
 TERM_PUBLIC void PBMinit()
 {
+  PBMsetfont();			/* HBB 980226: call it here! */
 }
 
 
 TERM_PUBLIC void PBMreset()
 {
-#ifdef vms
+#ifdef VMS
    fflush_binary();
-#endif /* vms */
+#endif /* VMS */
 }
 
 
@@ -194,7 +193,10 @@ TERM_PUBLIC void PBMgraphics()
     case 2: numplanes=4; break;
   }
 
-  PBMsetfont();
+  /* HBB 980226: this is not the right place to do this: setfont() influences
+   * fields of the termtable entry, and therefore must be called by init()
+   * already. */
+  /* PBMsetfont(); */
   /* rotate plot -90 degrees by reversing XMAX and YMAX and by 
   setting b_rastermode to TRUE */
   b_makebitmap((unsigned int)(PBM_YMAX*ysize),

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: fit.c,v 1.57 1998/03/22 23:31:07 drd Exp $";
+static char *RCSid = "$Id: fit.c,v 1.58 1998/04/14 00:15:19 drd Exp $";
 #endif
 
 /*
@@ -43,43 +43,19 @@ static char *RCSid = "$Id: fit.c,v 1.57 1998/03/22 23:31:07 drd Exp $";
  *
  * Lars Hecking : review update command, for VMS in particular, where
  * it is not necessary to rename the old file.
+ *
+ * HBB, 971023: lifted fixed limit on number of datapoints, and number
+ * of parameters.
  */
 
 
 #define FIT_MAIN
 
-#include <math.h>
-#include <ctype.h>
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include <signal.h>
-
-#if defined(MSDOS) || defined(DOS386)	     /* non-blocking IO stuff */
-#include <io.h>
-#include <conio.h>
-#include <dos.h>
-#if (DJGPP==2) /* HBB: for unlink() */
-#include <unistd.h>
-#endif
-#else
-#ifdef OSK
-#include <stdio.h>
-#else
-#ifndef VMS
-#include <fcntl.h>
-#endif	/* VMS */
-#endif /* OSK */
-#endif	/* DOS */
-
-#if defined(ATARI) || defined(MTOS)
-#include <osbind.h>
-#include <stdio.h>
-#include <time.h>
-#define getchx() Crawcin()
-int kbhit(void);
-#endif
-
-#define STANDARD    stderr	/* compatible with gnuplot philosophy */
-
-#define BACKUP_SUFFIX ".old"
 
 #include "plot.h"
 #include "type.h"               /* own types */
@@ -87,6 +63,29 @@ int kbhit(void);
 #include "fit.h"
 #include "setshow.h"   /* for load_range */
 #include "alloc.h"
+
+#if defined(MSDOS) || defined(DOS386)	     /* non-blocking IO stuff */
+# include <io.h>
+# if !defined(_Windows)  /* WIN16 does define MSDOS .... */
+#  include <conio.h>
+# endif
+# include <dos.h>
+#else
+# ifndef VMS
+#  include <fcntl.h>
+# endif	/* VMS */
+#endif	/* DOS */
+
+#if defined(ATARI) || defined(MTOS)
+# include <osbind.h>
+# include <time.h>
+# define getchx() Crawcin()
+int kbhit(void);
+#endif
+
+#define STANDARD    stderr	/* compatible with gnuplot philosophy */
+
+#define BACKUP_SUFFIX ".old"
 
 
 /* access external global variables  (ought to make a globals.h someday) */
@@ -107,20 +106,26 @@ typedef enum marq_res marq_res_t;
 #define INFINITY    1e30
 #define NEARLY_ZERO 1e-30
 #define INITIAL_VALUE 1.0  /* create new variables with this value (was NEARLY_ZERO) */
-#define DELTA	    0.001
+#define DELTA	    0.001					/* Relative change for derivatives */
 #define MAX_DATA    2048
 #define MAX_PARAMS  32
 #define MAX_LAMBDA  1e20
-#define MAX_VALUES_PER_LINE	32
-#define MAX_VARLEN  32
-#define START_LAMBDA 0.01
+#define MIN_LAMBDA  1e-20
+#define LAMBDA_UP_FACTOR 10
+#define LAMBDA_DOWN_FACTOR 10
+/*#define MAX_VALUES_PER_LINE	32*/  /* HBB 971023: turned out to be unused! */
+/*#define MAX_VARLEN  32*/          /* HBB 971023: use MAX_ID_LEN instead! */
 #if defined(MSDOS) || defined(OS2) || defined(DOS386)
 #define PLUSMINUS   "\xF1"                      /* plusminus sign */
 #else
 #define PLUSMINUS   "+/-"
 #endif
 
-static double epsilon	   = 1e-5;		/* convergence criteria */
+/* HBB 971023: new, allow for dynamic adjustment of these: */
+static int max_data;
+static int max_params;
+
+static double epsilon	   = 1e-5;		/* convergence limit */
 static int maxiter         = 0;	    /* HBB 970304: maxiter patch */
 
 static char fit_script[127];
@@ -128,6 +133,8 @@ static char logfile[128]    = "fit.log";
 static char *FIXED	    = "# FIXED";
 static char *GNUFITLOG	    = "FIT_LOG";
 static char *FITLIMIT	    = "FIT_LIMIT";
+static char *FITSTARTLAMBDA = "FIT_START_LAMBDA";
+static char *FITLAMBDAFACTOR = "FIT_LAMBDA_FACTOR";
 static char *FITMAXITER     = "FIT_MAXITER"; /* HBB 970304: maxiter patch */
 static char *FITSCRIPT	    = "FIT_SCRIPT";
 static char *DEFAULT_CMD    = "replot";         /* if no fitscript spec. */
@@ -135,21 +142,25 @@ static char *DEFAULT_CMD    = "replot";         /* if no fitscript spec. */
 
 static FILE	    *log_f = NULL;
 
-static word	    num_data,
+static int	    num_data,
 		    num_params;
-static int	    columns; /* HBB: file-global now, for use in regress() */
-static double	    *fit_x,
-		    *fit_y,
-		    *fit_z,
-		    *err_data,
-		    *a;
-static boolean	    ctrlc_flag = FALSE;
+static int	    columns; 
+static double	    *fit_x=0, 
+		    *fit_y=0,
+		    *fit_z=0,
+		    *err_data = 0,
+		    *a = 0;
+static TBOOLEAN	    ctrlc_flag = FALSE;
 
 static struct udft_entry func;
 
-typedef char fixstr[MAX_VARLEN+1];
+typedef char fixstr[MAX_ID_LEN+1];
+
 static fixstr	    *par_name;
 
+static double       startup_lambda = 0,
+                    lambda_down_factor = LAMBDA_DOWN_FACTOR,
+                    lambda_up_factor = LAMBDA_UP_FACTOR;
 
 /*****************************************************************
 			 internal Prototypes
@@ -158,19 +169,16 @@ static fixstr	    *par_name;
 static RETSIGTYPE ctrlc_handle __PROTO((int an_int));
 static void ctrlc_setup __PROTO((void));
 static marq_res_t marquardt __PROTO((double a[], double **alpha, double *chisq,
-			        double *lambda, double *varianz));
-static boolean analyze __PROTO((double a[], double **alpha, double beta[],
-			    double *chisq, double *varianz));
-static void calculate __PROTO((double *yfunc, double **dyda, double a[]));
+			        double *lambda));
+static TBOOLEAN analyze __PROTO((double a[], double **alpha, double beta[],
+			    double *chisq));
+static void calculate __PROTO((double *zfunc, double **dzda, double a[]));
 static void call_gnuplot __PROTO((double *par, double *data));
 static void show_fit __PROTO((int i, double chisq, double last_chisq, double *a,
 		          double lambda, FILE *device));
-static boolean regress __PROTO((double a[]));
-#if 0 /* not used */
-static int scan_num_entries __PROTO((char *s, double vlist[]));
-#endif
-static boolean is_variable __PROTO((char *s));
-static void copy_max __PROTO((char *d, char *s, int n));
+static TBOOLEAN regress __PROTO((double a[]));
+static TBOOLEAN is_variable __PROTO((char *s));
+static void copy_max __PROTO((char *d, char *s, unsigned int n)); 
 static double getdvar __PROTO((char *varname));
 static double createdvar __PROTO((char *varname, double value));
 static void splitpath __PROTO((char *s, char *p, char *f));
@@ -178,8 +186,8 @@ static void backup_file __PROTO((char *, const char *));
 #if defined(MSDOS) || defined(DOS386)
 static void subst __PROTO((char *s, char from, char to));
 #endif
-static boolean fit_interrupt __PROTO((void));
-static boolean is_empty __PROTO((char *s));
+static TBOOLEAN fit_interrupt __PROTO((void));
+static TBOOLEAN is_empty __PROTO((char *s));
 
 /*****************************************************************
     Useful macros
@@ -234,6 +242,7 @@ static void ctrlc_setup()
     getch that handles also function keys etc.
 *****************************************************************/
 #if defined(MSDOS) || defined(DOS386)
+
 /* HBB 980317: added a prototype... */
 int getchx __PROTO((void));
 
@@ -263,7 +272,7 @@ void error_ex ()
     fprintf (STANDARD, fitbuf);
       if ( log_f ) {
 	fprintf (log_f, "BREAK: %s", fitbuf);
-  	fclose (log_f);
+  	(void) fclose (log_f); 
   	log_f = NULL;
       }
     if ( func.at ) {
@@ -281,183 +290,190 @@ void error_ex ()
 
 
 /*****************************************************************
+    New utility routine: print a matrix (for debugging the alg.)
+*****************************************************************/
+static void printmatrix (double **C, int m, int n) 
+{
+  int i, j;
+  
+  for (i=0; i<m; i++) {
+    for (j=0; j<n-1; j++) 
+      Dblf2("%.8g |", C[i][j]);
+    Dblf2("%.8g\n", C[i][j]);
+  }
+  Dblf("\n");
+}
+
+/**************************************************************************
+    Yet another debugging aid: print matrix, with diff. and residue vector
+**************************************************************************/
+static void print_matrix_and_vectors (double **C, double *d, double *r,
+                                      int m, int n) 
+{
+  int i, j;
+  
+  for (i=0; i<m; i++) {
+    for (j=0; j<n; j++) 
+      Dblf2("%8g ", C[i][j]);
+    Dblf3("| %8g | %8g\n", d[i], r[i]);
+  }
+  Dblf("\n");
+}
+
+
+/*****************************************************************
     Marquardt's nonlinear least squares fit
 *****************************************************************/
-static marq_res_t marquardt (a, alpha, chisq, lambda, varianz)
+static marq_res_t marquardt (a, C, chisq, lambda)
 double a[];
-double **alpha;
+double **C;
 double *chisq;
 double *lambda;
-double *varianz;
 {
-    int 	    j;
-    static double   *da,	    /* delta-step of the parameter */
-		    *temp_a,	    /* temptative new params set   */
-		    **one_da,
-		    *beta,
-		    *tmp_beta,
-		    **tmp_alpha,
-		    **covar,
-		    old_chisq;
+    int 	    i, j;
+    static double   *da=0,	    /* delta-step of the parameter */ 
+		    *temp_a=0,	    /* temptative new params set   */
+		    *d=0,
+		    *tmp_d=0,
+		    **tmp_C=0, 
+		    *residues=0;
+    double          tmp_chisq;		    
 
-    /* Initialization when lambda < 0 */
+    /* Initialization when lambda == -1 */
 
-    if ( *lambda < 0 ) {	/* Get first chi-square check */
-	one_da	    = matr (num_params, 1);
+    if ( *lambda == -1 ) {	/* Get first chi-square check */
+	TBOOLEAN	    analyze_ret;		    
+
 	temp_a	    = vec (num_params);
-	beta	    = vec (num_params);
-	tmp_beta    = vec (num_params);
+	d	    = vec (num_data+num_params);
+	tmp_d       = vec (num_data+num_params);
 	da	    = vec (num_params);
-	covar	    = matr (num_params, num_params);
-	tmp_alpha   = matr (num_params, num_params);
+	residues    = vec (num_data+num_params);
+	tmp_C       = matr (num_data+num_params, num_params); 
 
-	*lambda  = -*lambda;	  /* make lambda positive */
-	return analyze (a, alpha, beta, chisq, varianz) ? OK : ERROR;
+	analyze_ret = analyze (a, C, d, chisq);
+
+	/* Calculate a useful startup value for lambda, as given by Schwarz */
+	/* FIXME: this is doesn't turn out to be much better, really... */
+	if ( startup_lambda != 0 )
+	    *lambda = startup_lambda;
+	else {
+	    *lambda = 0;
+	    for (i=0; i<num_data; i++)
+		for (j=0; j<num_params; j++)
+		    *lambda += C[i][j]*C[i][j];
+	    *lambda = sqrt(*lambda/num_data/num_params);
     }
-    old_chisq = *chisq;
 
-    for ( j=0 ; j<num_params ; j++ ) {
-	memcpy (covar[j], alpha[j], num_params*sizeof(double));
-	covar[j][j] *= 1 + *lambda;
-	one_da[j][0] = beta [j];
+ 	/* Fill in the lower square part of C (the diagonal is filled in on
+ 	   each iteration, see below) */
+ 	for (i=0; i<num_params; i++) 
+	    for (j=0; j<i;  j++) 
+	     	C[num_data+i][j] = 0, C[num_data+j][i] = 0;
+        /*printmatrix(C, num_data+num_params, num_params); */
+	return analyze_ret ? OK : ERROR;
     }
-
-    solve (covar, num_params, one_da, 1);	/* Equation solution */
-
-    for ( j=0 ; j<num_params ; j++ )
-	da[j] = one_da[j][0];			/* changes in paramss */
 
     /* once converged, free dynamic allocated vars */
 
-    if ( *lambda == 0.0 ) {
-	free (beta);
-	free (tmp_beta);
+    if ( *lambda == -2 ) { 
+	free (d);
+	free (tmp_d);
 	free (da);
 	free (temp_a);
-	free_matr (one_da, num_params);
-	free_matr (tmp_alpha, num_params);
-	free_matr (covar, num_params);
+	free (residues);
+	free_matr (tmp_C); 
         return OK;
     }
 
+    /* Givens calculates in-place, so make working copies of C and d */
+
+    for ( j=0 ; j<num_data+num_params ; j++ ) 
+	memcpy (tmp_C[j], C[j], num_params*sizeof(double));
+    memcpy (tmp_d, d, num_data*sizeof(double));
+
+    /* fill in additional parts of tmp_C, tmp_d */
+
+    for ( i=0; i<num_params ; i++) {	
+    	tmp_C[num_data+i][i] = *lambda; /* fill in low diag. of tmp_C ... */ 
+    	tmp_d[num_data+i] = 0;          /* ... and low part of tmp_d */
+    }
+    /*printmatrix(tmp_C, num_data+num_params, num_params);*/
+
+    /* FIXME: residues[] isn't used at all. Why? Should it be used? */
+
+    Givens ( tmp_C, tmp_d, da, residues, num_params+num_data, num_params, 1);
+    /*print_matrix_and_vectors (tmp_C, tmp_d, residues,
+                                num_params+num_data, num_params);*/
+    
     /* check if trial did ameliorate sum of squares */
 
-    for ( j=0 ; j<num_params ; j++ ) {
+    for ( j=0 ; j<num_params ; j++ ) 
 	temp_a[j] = a[j] + da[j];
-	tmp_beta[j] = beta [j];
-	memcpy (tmp_alpha[j], alpha[j], num_params*sizeof(double));
-    }
 
-    if ( !analyze (temp_a, tmp_alpha, tmp_beta, chisq, varianz) )
-	return ERROR;
+    if ( !analyze (temp_a, tmp_C, tmp_d, &tmp_chisq) )
+	return ERROR;  /* FIXME: will never be reached: always returns TRUE */
 
-    if ( *chisq < old_chisq ) {     /* Success, accept new solution */
-	if ( *lambda > 1e-20 )
-	    *lambda /= 10;
-	old_chisq = *chisq;
-	for ( j=0 ; j<num_params ; j++ ) {
-	    memcpy (alpha[j], tmp_alpha[j], num_params*sizeof(double));
-	    beta[j] = tmp_beta[j];
-	    a[j] = temp_a[j];
+    if ( tmp_chisq < *chisq ) {     /* Success, accept new solution */
+        if ( *lambda > MIN_LAMBDA ) {
+            (void)putc('/',stderr);
+	    *lambda /= lambda_down_factor;
+        }
+	*chisq = tmp_chisq;
+	for ( j=0 ; j<num_data ; j++ ) {
+	    memcpy (C[j], tmp_C[j], num_params*sizeof(double));
+	    d[j] = tmp_d[j];
 	}
+	for ( j=0 ; j<num_params ; j++ ) 
+	    a[j] = temp_a[j];
 	return BETTER;
     }
     else {			    /* failure, increase lambda and return */
-	*lambda *= 10;
-	*chisq = old_chisq;
+      	(void)putc('*',stderr); 
+	*lambda *= lambda_up_factor;
 	return WORSE;
     }
 }
 
 
+/* FIXME: in the new code, this function doesn't really do enough to be
+ * useful. Maybe it ought to be deleted, i.e. integrated with
+ * calculate() ?
+ */
 /*****************************************************************
     compute chi-square and numeric derivations
 *****************************************************************/
-static boolean analyze (a, alpha, beta, chisq, varianz)
+static TBOOLEAN analyze (a, C, d, chisq)
 double a[];
-double **alpha;
-double beta[];
+double **C;
+double d[];
 double *chisq;
-double *varianz;
 {
-
 /*
- *  used by marquardt to evaluate the linearized fitting matrix alpha
- *  and vector beta
+ *  used by marquardt to evaluate the linearized fitting matrix C
+ *  and vector d, fills in only the top part of C and d
+ *  I don't use a temporary array zfunc[] any more. Just use
+ *  d[] instead.
  */
+    int    i, j;
 
-    word    k, j, i;
-    double  wt, sig2i, dz, **dzda, *zfunc;
-#if !defined(ATARI) && !defined(MTOS)
-    double *edp, *zp, *fp, **dr, **ar, *dc, *bp, *ac;
-#endif
+    *chisq = 0;
+    calculate (d, C, a);
 
-    zfunc = vec (num_data);
-    dzda = matr (num_data, num_params);
-
-    /* initialize alpha beta */
-    for ( j=0 ; j<num_params ; j++ ) {
-	for ( k=0 ; k<=j ; k++ )
-	    alpha[j][k] = 0;
-	beta[j] = 0;
+    for (i=0; i<num_data; i++) {
+        d[i] = (d[i] - fit_z[i]) / err_data[i];         /* note: order reversed, as used by Schwarz */
+    	*chisq += d[i]*d[i];
+        for (j=0; j<num_params; j++)
+	  C[i][j] /= err_data[i];
     }
 
-    *chisq = *varianz = 0;
-    calculate (zfunc, dzda, a);
-
-#if !defined(ATARI) && !defined(MTOS)
-    edp = err_data;
-    zp = fit_z;
-    fp = zfunc;
-    dr = dzda;
-
-    /* Summation loop over all data */
-    for ( i=0 ; i<num_data ; i++, dr++ ) {
-	/* The original code read: sig2i = 1/(*edp * *edp++); */
-	/* There are some compilers that evaluate the operation */
-	/* from right to left, although it is an error to do so. */
-	/* Hence the following modification: */
-	sig2i = 1/(*edp * *edp);
-	edp++;
-	dz = *zp++ - *fp++;
-	*varianz += dz*dz;
-	ar = alpha;
-        dc = *dr;
-	bp = beta;
-	for ( j=0 ; j<num_params ; j++ ) {
-	    wt = *dc++ * sig2i;
-	    ac = *ar++;
-            for ( k=0 ; k<=j ; k++ )
-		*ac++ += wt * (*dr)[k];
-	    *bp++ += dz * wt;
-	}
-	*chisq += dz*dz*sig2i;		    /* and find chi-square */
-    }
-#else
-     /* Summation loop over all data */
-    for ( i=0 ; i<num_data ; i++) {
-        sig2i = 1/(err_data[i] * err_data[i]);
-        dz = fit_z[i] - zfunc[i];
-	*varianz += dz*dz;
-        for ( j=0 ; j<num_params ; j++ ) {
-	    wt = dzda[i][j] * sig2i;
-            for ( k=0 ; k<=j ; k++ )
-		alpha[j][k] += wt * dzda[i][k];
-            beta[j] += dz * wt;
-	}
-	*chisq += dz*dz*sig2i;		    /* and find chi-square */
-    }
-#endif
-    *varianz /= num_data;
-    for ( j=1 ; j<num_params ; j++ )	    /* fill in the symmetric side */
-	for ( k=0 ; k<=j-1 ; k++ )
-	    alpha[k][j] = alpha [j][k];
-    free (zfunc);
-    free_matr (dzda, num_data);
-    return TRUE;
+    return TRUE;     /* FIXME: why return a value that is always TRUE ? */
 }
 
 
+/* To use the more exact, but slower two-side formula, activate the
+   following line: */
+/*#define TWO_SIDE_DIFFERENTIATION*/
 /*****************************************************************
     compute function values and partial derivatives of chi-square
 *****************************************************************/
@@ -466,14 +482,18 @@ double *zfunc;
 double **dzda;
 double a[];
 {
-    word    k, p;
+    int    k, p;
     double  tmp_a;
-    double  *tmp_low,
-	    *tmp_high,
+    double  *tmp_high,
 	    *tmp_pars;
+#ifdef TWO_SIDE_DIFFERENTIATION
+    double  *tmp_low;
+#endif
 
-    tmp_low = vec (num_data);	      /* numeric derivations */
-    tmp_high = vec (num_data);
+    tmp_high = vec (num_data);	      /* numeric derivations */
+#ifdef TWO_SIDE_DIFFERENTIATION
+    tmp_low  = vec (num_data);
+#endif
     tmp_pars = vec (num_params);
 
     /* first function values */
@@ -485,25 +505,25 @@ double a[];
     for ( p=0 ; p<num_params ; p++ )
 	tmp_pars[p] = a[p];
     for ( p=0 ; p<num_params ; p++ ) {
-	tmp_pars[p] = tmp_a = fabs(a[p]) < NEARLY_ZERO ? NEARLY_ZERO : a[p];
-/*
- *  the more exact method costs double execution time and is therefore
- *  commented out here. Change if you like!
- */
-/*	  tmp_pars[p] *= 1-DELTA;
-	call_gnuplot (tmp_pars, tmp_low);  */
-
+	tmp_a = fabs(a[p]) < NEARLY_ZERO ? NEARLY_ZERO : a[p];
 	tmp_pars[p] = tmp_a * (1+DELTA);
 	call_gnuplot (tmp_pars, tmp_high);
+#ifdef TWO_SIDE_DIFFERENTIATION
+	tmp_pars[p] = tmp_a * (1-DELTA);
+	call_gnuplot (tmp_pars, tmp_low);  
+#endif
 	for ( k=0 ; k<num_data ; k++ )
-
-/*            dyda[k][p] = (tmp_high[k] - tmp_low[k])/(2*tmp_a*DELTA); */
-
+#ifdef TWO_SIDE_DIFFERENTIATION
+	    dzda[k][p] = (tmp_high[k] - tmp_low[k])/(2*tmp_a*DELTA); 
+#else
 	    dzda[k][p] = (tmp_high[k] - zfunc[k])/(tmp_a*DELTA);
+#endif
         tmp_pars[p] = a[p];
     }
 
+#ifdef TWO_SIDE_DIFFERENTIATION
     free (tmp_low);
+#endif
     free (tmp_high);
     free (tmp_pars);
 }
@@ -516,12 +536,12 @@ static void call_gnuplot (par, data)
 double *par;
 double *data;
 {
-    word    i;
+    int    i;
     struct value v;
 
     /* set parameters first */
     for ( i=0 ; i<num_params ; i++ ) {
-	Gcomplex (&v, par[i], 0.0);
+	(void) Gcomplex (&v, par[i], 0.0); 
 	setvar (par_name[i], v);
     }
 
@@ -540,7 +560,7 @@ double *data;
 /*****************************************************************
     handle user interrupts during fit
 *****************************************************************/
-static boolean fit_interrupt ()
+static TBOOLEAN fit_interrupt ()
 {
     while ( TRUE ) {
 	fprintf (STANDARD, "\n\n(S)top fit, (C)ontinue, (E)xecute:  ");
@@ -561,11 +581,11 @@ static boolean fit_interrupt ()
 			struct value v;
 			char *tmp;
 
-			tmp = *fit_script ? fit_script : DEFAULT_CMD;
+			tmp = (fit_script !=0 && *fit_script ) ? fit_script : DEFAULT_CMD;
 			fprintf (STANDARD, "executing: %s", tmp);
 			/* set parameters visible to gnuplot */
 			for ( i=0 ; i<num_params ; i++ ) {
-			    Gcomplex (&v, a[i], 0.0);
+			    (void)Gcomplex (&v, a[i], 0.0); 
 			    setvar (par_name[i], v);
 			}
 			sprintf (input_line, tmp);
@@ -573,41 +593,41 @@ static boolean fit_interrupt ()
 		    }
 	}
     }
+    return TRUE; 
 }
 
 
 /*****************************************************************
     frame routine for the marquardt-fit
 *****************************************************************/
-static boolean regress (a)
+static TBOOLEAN regress (a)
 double a[];
 {
-    double	**alpha,
+    double	**covar,
+		*dpar,
+		**C,
 		chisq,
 		last_chisq,
-		varianz,
 		lambda;
-    word         iter; /* iteration count */
+    int 	iter, i, j;
     marq_res_t	res;
 
     chisq   = last_chisq = INFINITY;
-    alpha   = matr (num_params, num_params);
-    lambda  = -START_LAMBDA;			/* use sign as flag */
+    C	    = matr (num_data+num_params, num_params);
+    lambda  = -1;				/* use sign as flag */
     iter = 0;					/* iteration counter  */
 
     /* ctrlc now serves as Hotkey */
     ctrlc_setup ();
 
     /* Initialize internal variables and 1st chi-square check */
-    if ( (res = marquardt (a, alpha, &chisq, &lambda, &varianz)) == ERROR )
+    if ( (res = marquardt (a, C, &chisq, &lambda)) == ERROR )
 	Eex ("FIT: error occured during fit")
     res = BETTER;
 
     Dblf ("\nInitial set of free parameters:\n")
     show_fit (iter, chisq, chisq, a, lambda, STANDARD);
     show_fit (iter, chisq, chisq, a, lambda, log_f);
-
-
 
     /* MAIN FIT LOOP: do the regression iteration */
 
@@ -621,6 +641,9 @@ double a[];
  *
  *  I hope that other OSes do it better, if not... add #ifdefs :-(
  *  EMX does not have kbhit.
+ * 
+ *  HBB: I think this can be enabled for DJGPP V2. SIGINT is actually
+ *  handled there, AFAIK.
  */
 #if ((defined(MSDOS) || defined(DOS386)) && !defined(__EMX__)) || defined(ATARI) || defined(MTOS)
  	if ( kbhit () ) {
@@ -640,14 +663,17 @@ double a[];
             iter++;
             last_chisq = chisq;
 	}
-	
-        if ( (res = marquardt (a, alpha, &chisq, &lambda, &varianz)) == BETTER )
+        if ( (res = marquardt (a, C, &chisq, &lambda)) == BETTER )
 	    show_fit (iter, chisq, last_chisq, a, lambda, STANDARD);
-	    
-    }
-    while ( res != ERROR  &&  lambda < MAX_LAMBDA  &&
-            ((maxiter == 0) || (iter <= maxiter)) && /* HBB 970304: maxiter patch */
-	    (res == WORSE  ||  ( chisq > NEARLY_ZERO ? (last_chisq-chisq)/chisq : (last_chisq-chisq)) > epsilon) );
+    } while ( (res != ERROR)
+	      && (lambda < MAX_LAMBDA)
+	      && ((maxiter == 0) || (iter <=maxiter))
+	      && (res == WORSE
+		  || ( (chisq > NEARLY_ZERO)
+		       ? ((last_chisq-chisq)/chisq)
+		       : (last_chisq-chisq)) > epsilon
+		  ) 
+	      );
 
     /* fit done */
 
@@ -677,56 +703,72 @@ double a[];
     /* compute errors in the parameters */
 
     if (num_data==num_params) {
+      int i;
     	
-      word i;
       Dblf("\nExactly as many data points as there are parameters.\n");
       Dblf("In this degenerate case, all errors are zero by definition.\n\n");
       Dblf ("Final set of parameters \n");
       Dblf ("======================= \n\n");
       for ( i=0 ; i<num_params; i++ ) 
         Dblf3 ("%-15.15s = %-15g\n", par_name[i], a[i]);
+    } else if (chisq < NEARLY_ZERO) { 
+      int i;
         
-    } else if (varianz < NEARLY_ZERO) {
-    	
-      word i;
       Dblf("\nHmmmm.... Sum of squared residuals is zero. Can't compute errors.\n\n");
       Dblf ("Final set of parameters \n");
       Dblf ("======================= \n\n");
       for ( i=0 ; i<num_params; i++ ) 
         Dblf3 ("%-15.15s = %-15g\n", par_name[i], a[i]);
-        
     } else {
 
-      double **covar, **correl, *dpar;
-      word i,j;
-
-      for ( i=0 ; i<num_params; i++ )
-	for ( j=0 ; j<num_params; j++ )
-	  if (columns <= 2)      /* HBB: if no errors were given:  */
-	    alpha[i][j] /= varianz;
-	  else                   /* HBB: but if they *were*: */
-	    alpha[i][j] /= chisq / (num_data - num_params);
+    Dblf2 ("chisquared / # degrees of freedom : %g\n", chisq/(num_data-num_params))
 	 
       /* get covariance-, Korrelations- and Kurvature-Matrix */
       /* and errors in the parameters			  */
 
-      covar   = matr (num_params, num_params);
-      correl  = matr (num_params, num_params);
-      dpar = vec (num_params);
+    /* compute covar[][] directly from C */
+    Givens ( C, 0, 0, 0, num_data, num_params, 0) ;
+    /*printmatrix(C, num_params, num_params);*/
+    covar   =  C + num_data;     /* Use lower square of C for covar */
+    Invert_RtR ( C, covar, num_params );
+    /*printmatrix(covar, num_params, num_params);*/
 
-      inverse (alpha, covar, num_params);
+    /* calculate unscaled parameter errors in dpar[]: */
+      dpar = vec (num_params);
+    for (i=0; i<num_params; i++) {
+      /* FIXME: can this still happen ? */
+      if (covar[i][i]<=0.0) /* HBB: prevent floating point exception later on */
+	Eex("Calculation error: non-positive diagonal element in covar. matrix");
+      dpar[i]=sqrt(covar[i][i]);
+    }
+
+    /* transform covariances into correlations */
+    for (i=0; i<num_params; i++) 
+      for (j=0; j<=i; j++)   /* only lower triangle needs to be handled */
+	covar[i][j] /= dpar[i]*dpar[j];
+
+    /* scale parameter errors based on chisq */
+    if (columns == 2)
+      /* FIXME: maybe it should be num_data - num_params here as well?  */
+      chisq = sqrt ( chisq / (num_data)); 
+    else
+      chisq = sqrt ( chisq / (num_data - num_params));
+#if 1  /* HBB: For some I don't really understand yet, this seems to
+        * be incorrect, at least for one demo case I know of
+        * (thanks to clegelan@physik.uni-bielefeld.de)
+        * OTOH, this makes most of the demo's results simply
+        * ridiculous... :-( */
+    for (i=0; i<num_params; i++)
+      dpar[i] *= chisq;
+#endif
 
       Dblf ("Final set of parameters            68.3%% confidence interval (one at a time)\n")
       Dblf ("=======================            =========================================\n\n")
       for ( i=0 ; i<num_params; i++ ) {
-      	double t1, t2;
-        if (covar[i][i]<=0.0)     /* HBB: prevent floating point exception later on */
-	  Eex("Calculation error: non-positive diagonal element in covar. matrix");
-	dpar[i] = sqrt (covar[i][i]);
-        t1 = fabs(a[i]);
-        t2 = fabs(100.0*dpar[i]/a[i]);
+        double temp =
+            (fabs(a[i]) < NEARLY_ZERO)? 0.0 : fabs(100.0*dpar[i]/a[i]);
 	Dblf6 ("%-15.15s = %-15g  %-3.3s %-15g (%g%%)\n", par_name[i], a[i],
-	       PLUSMINUS, dpar[i], (t1 < NEARLY_ZERO)? 0 : t2)
+               PLUSMINUS, dpar[i], temp)
       }
 
       Dblf ("\n\ncorrelation matrix of the fit parameters:\n\n")
@@ -736,34 +778,29 @@ double a[];
       Dblf ("\n")
 
       for ( i=0 ; i<num_params; i++ ) {
-	Dblf2 ("%-15.15s", par_name[i])
-	for ( j=0 ; j<num_params; j++ ) {
-	    correl[i][j] = covar[i][j] / (dpar[i]*dpar[j]);
-	    Dblf2 ("%6.3f ", correl[i][j])
-        }
+	Dblf2 ("%-15.15s", par_name[i]) ;
+	for ( j=0 ; j<=i; j++ )   /* Only print lower triangle of symmetric matrix */
+	  Dblf2 ("%6.3f ", covar[i][j] ); 
 	Dblf ("\n")
       }
       
-      free_matr (covar, num_params);
-      free_matr (correl, num_params);
       free (dpar);
+    } 
       
-    }    /* num_data>num_params && varianz>0 */
-
+#if 0 /* FIXME: what is this for? Well, let's see what happens without it... */
     /* restore last parameter's value (not done by calculate) */
     {
       struct value val;
       Gcomplex (&val, a[num_params-1], 0.0);
       setvar (par_name[num_params-1], val);
     }
+#endif
 
+    /* call destructor for allocated vars */
+    lambda = -2;   /* flag value, meaning 'destruct!' */
+    (void)marquardt (a, C, &chisq, &lambda);
     
-    /* call destruktor for allocated vars */
-    lambda = 0;
-    marquardt (a, alpha, &chisq, &lambda, &varianz);
-
-    free_matr (alpha, num_params);
-
+    free_matr (C);
     return TRUE;
 }
 
@@ -796,12 +833,12 @@ i, chisq, chisq > NEARLY_ZERO ? (chisq - last_chisq)/chisq : 0.0, chisq - last_c
 /*****************************************************************
     is_empty: check for valid string entries
 *****************************************************************/
-static boolean is_empty (s)
+static TBOOLEAN is_empty (s)
 char *s;
 {
     while ( *s == ' '  ||  *s == '\t'  ||  *s == '\n' )
 	s++;
-    return (boolean)( *s == '#'  ||  *s == '\0' );
+    return (TBOOLEAN)( *s == '#'  ||  *s == '\0' );
 }
 
 
@@ -826,33 +863,13 @@ char *subst;
 }
 
 
-
-/*****************************************************************
-    get valid numerical entries
-*****************************************************************/
-#if 0 /* not used */
-static int scan_num_entries (s, vlist)
-char *s;
-double vlist[];
-{
-    int num = 0;
-    char c, *tmp;
-
-    while ( (tmp = get_next_word (&s, &c)) != NULL
-					&&  num <= MAX_VALUES_PER_LINE )
-	if ( !sscanf (tmp, "%lf", &vlist[++num]) )
-	    Eex ("syntax error in data file")
-    return num;
-}
-#endif
-
 /*****************************************************************
     check for variable identifiers
 *****************************************************************/
-static boolean is_variable (s)
+static TBOOLEAN is_variable (s)
 char *s;
 {
-    while ( *s ) {
+    while ( *s != '\0' ) { 
 	if ( !isalnum(*s) && *s!='_' )
 	    return FALSE;
 	s++;
@@ -867,38 +884,12 @@ char *s;
 static void copy_max (d, s, n)
 char *d;
 char *s;
-int n;
+unsigned int n;
 {
-    strncpy (d, s, n);
-    if ( strlen(s) >= n )
+    strncpy (d, s, (size_t)n);
+    if ( strlen(s) >= (size_t)n )
 	d[n-1] = '\0';
 }
-
-
-/*****************************************************************
-    portable implementation of strnicmp (hopefully)
-*****************************************************************/
-
-#ifdef NEED_STRNICMP
-int strnicmp (s1, s2, n)
-char *s1;
-char *s2;
-int n;
-{
-    char c1,c2;
-
-    if(n==0) return 0;
-
-    do {
-	c1 = *s1++; if(islower(c1)) c1=toupper(c1);
-	c2 = *s2++; if(islower(c2)) c2=toupper(c2);
-    } while(c1==c2 && c1 && c2 && --n>0);
-
-    if(n==0 || c1==c2) return 0;
-    if(c1=='\0' || c1<c2) return 1;
-    return -1;
-}
-#endif
 
 
 /*****************************************************************
@@ -935,7 +926,7 @@ struct value data;
 	  gp_alloc ((unsigned int)sizeof(struct udvt_entry), "fit setvar");
 	udv_ptr->next_udv = NULL;
     }
-    copy_max (udv_ptr->udv_name, varname, sizeof(udv_ptr->udv_name));
+    copy_max (udv_ptr->udv_name, varname, (int)sizeof(udv_ptr->udv_name));
     udv_ptr->udv_value = data;
     udv_ptr->udv_undef = FALSE;
 }
@@ -992,9 +983,9 @@ double value;
 	    if ( strcmp (varname, udv_ptr->udv_name)==0) {
 	    	if (udv_ptr->udv_undef) {
 	    		udv_ptr->udv_undef=0;
-	    		Gcomplex(&udv_ptr->udv_value, value, 0.0);
+	    		(void)Gcomplex(&udv_ptr->udv_value, value, 0.0); 
 	    	} else if (udv_ptr->udv_value.type==INTGR) {
-	    		Gcomplex(&udv_ptr->udv_value, (double)udv_ptr->udv_value.v.int_val, 0.0);
+	    		(void)Gcomplex(&udv_ptr->udv_value, (double)udv_ptr->udv_value.v.int_val, 0.0); 
 	    	}
 		   return real(&(udv_ptr->udv_value));
 		 }
@@ -1002,9 +993,9 @@ double value;
     /* get here => not found */
 
     {
-        struct value a;
-        Gcomplex(&a, value, 0.0);
-        setvar(varname, a);
+        struct value tempval; 
+        (void)Gcomplex(&tempval, value, 0.0);
+        setvar(varname, tempval); 
     }
     
     return value;
@@ -1024,7 +1015,7 @@ char *f;
     while ( *tmp != '\\'  &&  *tmp != '/'  &&  *tmp != ':'  &&  tmp-s >= 0 )
 	tmp--;
     strcpy (f, tmp+1);
-    strncpy (p, s, tmp-s+1);
+    strncpy (p, s, (size_t) (tmp-s+1)); 
     p[tmp-s+1] = '\0';
 }
 
@@ -1080,7 +1071,7 @@ char *pfile, *npfile;
 		strncpy (ifilename, pfile, sizeof ifilename);
 		ofilename = npfile;
 	} else {
-#ifdef VMS
+#ifdef BACKUP_FILESYSTEM
 		/* filesystem will keep original as previous version */
 		strncpy (ifilename, pfile, sizeof ifilename);
 #else
@@ -1104,37 +1095,38 @@ char *pfile, *npfile;
             continue;
         }
         if ( (tmp = strchr (s, '#')) != NULL ) {
-	    copy_max (tail, tmp, sizeof(tail));
+	    copy_max (tail, tmp, (int) sizeof(tail)); 
 	    *tmp = '\0';
 	}
 	else
 	    strcpy (tail, "\n");
+
 	tmp = get_next_word (&s, &c);
-	if ( !is_variable (tmp)  ||  strlen(tmp) > MAX_VARLEN ) {
-	    fclose (nf);
-	    fclose (of);
+	if ( !is_variable (tmp)  ||  strlen(tmp) > MAX_ID_LEN ) {
+	    (void)fclose (nf);
+	    (void)fclose (of);
 	    Eex2 ("syntax error in parameter file %s", fnam)
 	}
-	copy_max (pname, tmp, sizeof(pname));
+	copy_max (pname, tmp, (int)sizeof(pname)); 
 	/* next must be '=' */
 	if ( c != '=' ) {
 	    tmp = strchr (s, '=');
 	    if ( tmp == NULL ) {
-	        fclose (nf);
-		fclose (of);
+				(void)fclose (nf);
+				(void)fclose (of);
 		Eex2 ("syntax error in parameter file %s", fnam)
 	    }
 	    s = tmp+1;
 	}
 	tmp = get_next_word (&s, &c);
 	if ( !sscanf (tmp, "%lf", &pval) ) {
-	    fclose (nf);
-	    fclose (of);
+	    (void)fclose (nf);
+	    (void)fclose (of);
 	    Eex2 ("syntax error in parameter file %s", fnam)
 	}
 	if ( (tmp = get_next_word (&s, &c)) != NULL ) {
-	    fclose (nf);
-	    fclose (of);
+	    (void)fclose (nf);
+	    (void)fclose (of);
 	    Eex2 ("syntax error in parameter file %s", fnam)
 	}
 
@@ -1227,7 +1219,7 @@ const char *fromfile;
 
 void do_fit ()
 {
-    int autorange_x=3, autorange_y=3;  /* yes */
+	TBOOLEAN autorange_x=3, autorange_y=3;  /* yes */ 
     double min_x, max_x;  /* range to fit */
     double min_y, max_y;  /* range to fit */
     int dummy_x=-1, dummy_y=-1; /* eg  fit [u=...] [v=...] */
@@ -1310,7 +1302,9 @@ void do_fit ()
     columns = df_open(4);  /* up to 4 using specs allowed */
     if (columns==1)
 	int_error("Need 2 to 4 using specs", c_token);
-    /* defer actually reading the data until we have parsed the rest of the line */
+
+	/* defer actually reading the data until we have parsed the rest of
+     the line */
     
 	token3 = c_token;
 
@@ -1320,6 +1314,18 @@ void do_fit ()
 
     /* HBB 970304: maxiter patch */
     maxiter = getivar (FITMAXITER);
+
+	tmpd = getdvar (FITSTARTLAMBDA); /* get startup value for lambda, if given */
+	if ( tmpd > 0.0 ) {
+		startup_lambda = tmpd;
+		printf("Lambda Start value set: %g\n", startup_lambda);
+	}
+
+	tmpd = getdvar (FITLAMBDAFACTOR); /* get lambda up/down factor, if given */
+	if ( tmpd > 0.0 ) {
+		lambda_up_factor = lambda_down_factor = tmpd;
+		printf("Lambda scaling factors reset:  %g\n", lambda_up_factor);
+	}
 
     *fit_script = '\0';
     if ( (tmp = getenv (FITSCRIPT)) != NULL )
@@ -1336,27 +1342,43 @@ void do_fit ()
     if ( !log_f && /* div */ !(log_f = fopen (logfile, "a")) )
 	Eex2 ("could not open log-file %s", logfile)
     fprintf (log_f, "\n\n*******************************************************************************\n");
-    time (&timer);
+	(void)time (&timer); 
     fprintf (log_f, "%s\n\n", ctime (&timer));
-	{	char line[MAX_LINE_LEN];
-		capture(line, token2,token3-1,MAX_LINE_LEN);
+	{
+		char *line = NULL;
+      
+		m_capture(&line, token2,token3-1);
 			fprintf (log_f, "FIT:    data read from %s\n", line);
+		free(line);
 	}
 
-    fit_x = vec (MAX_DATA);		 /* start with max. value */
-    fit_y = vec (MAX_DATA);
-    fit_z = vec (MAX_DATA);
+	max_data = MAX_DATA;
+	fit_x = vec (max_data);		 /* start with max. value */
+	fit_y = vec (max_data);
+	fit_z = vec (max_data);
 
 /* first read in experimental data */
 
-    err_data = vec (MAX_DATA);
+	err_data = vec (max_data);
     num_data = 0;
 
 	while ( (i=df_readline(v, 4)) != EOF ) {
-
-		if ( num_data==MAX_DATA ) {
+		if ( num_data>=max_data ) {
+			max_data = (max_data * 3) / 2; /* increase max_data by factor of 1.5 */
+			if ( 0
+					 || redim_vec (&fit_x, max_data)
+					 || redim_vec (&fit_y, max_data)
+					 || redim_vec (&fit_z, max_data)
+					 || redim_vec (&err_data, max_data)
+					 ) {
+				/* Some of the reallocations went bad: */
 			df_close();
-			Eex2 ("max. # of datapoints %d exceeded", MAX_DATA);
+				Eex2 ("Out of memory in fit: too many datapoints (%d)?", max_data);
+			} else {
+				/* Just so we know that the routine is at work: */
+				fprintf(STANDARD, "Max. number of data points scaled up to: %d\n",
+								max_data);
+			}
 		}
 
 		switch (i)
@@ -1366,11 +1388,11 @@ void do_fit ()
 			case DF_SECOND_BLANK:
 				continue;
 			case 0:
-				Eex2("bad data on line %d", df_line_number);
+				Eex2("bad data on line %d of datafile", df_line_number);
 				break;
 			case 1:  /* only z provided */
 				v[2] = v[0];
-				v[0] = df_datum;
+				v[0] = (double)df_datum; 
 				break;
 			case 2: /* x and z */
 				v[2] = v[1];
@@ -1384,7 +1406,6 @@ void do_fit ()
 				if (columns == 4)
 					break;
 				/* else fall through */
-
 			case 3: /* x, z, error */
 				v[3] = v[2]; /* error */
 				v[2] = v[1]; /* z */
@@ -1416,7 +1437,7 @@ void do_fit ()
 	if (num_data <= 1)
 		Eex("No data to fit ");
 	
-    /* now resize fields */
+	/* now resize fields to actual length:*/
     redim_vec (&fit_x, num_data);
     redim_vec (&fit_y, num_data);
     redim_vec (&fit_z, num_data);
@@ -1427,22 +1448,27 @@ void do_fit ()
     if ( columns < 3 )
 	fprintf (log_f, "        y-errors assumed equally distributed\n\n");
 
-	{	char line[MAX_LINE_LEN];
-		capture(line, token1, token2-1,MAX_LINE_LEN);		
+	{
+		char *line=NULL;
+		
+		m_capture(&line, token1, token2-1);		
 		fprintf (log_f, "function used for fitting: %s\n", line);
+		free(line);
 	}
 
     /* read in parameters */
 
+	max_params = MAX_PARAMS;			/* HBB 971023: make this resizeable */
+
 	if (!equals(c_token, "via"))
 		int_error("Need via and either parameter list or file", c_token);
 
-    a = vec (MAX_PARAMS);
-    par_name = (fixstr *) gp_alloc ((MAX_PARAMS+1)*sizeof(fixstr), "fit param");
+	a = vec (max_params);
+	par_name = (fixstr *) gp_alloc ((max_params+1)*sizeof(fixstr), "fit param");
     num_params = 0;
 
 	if (isstring(++c_token)) {
-		boolean fixed;
+		TBOOLEAN fixed;
 		double	tmp_par;
 		char c, *s;
 		char sstr[MAX_LINE_LEN];
@@ -1456,7 +1482,7 @@ void do_fit ()
 		if ( !(f = fopen (sstr, "r")) )
 			Eex2 ("could not read parameter-file %s", sstr);
 		while ( TRUE ) {
-			if ( !fgets (s = sstr, sizeof(sstr), f) )		/* EOF found */
+			if ( !fgets (s = sstr, (int)sizeof(sstr), f) )		/* EOF found */ 
 				break;
 			if ( (tmp = strstr (s, FIXED)) != NULL ) {	      /* ignore fixed params */
 				*tmp = '\0';
@@ -1470,56 +1496,69 @@ void do_fit ()
 			if ( is_empty(s) )
 				continue;
 			tmp = get_next_word (&s, &c);
-			if ( !is_variable (tmp)  ||  strlen(tmp) > MAX_VARLEN ) {
-				fclose (f);
+			if ( !is_variable (tmp)  ||  strlen(tmp) > MAX_ID_LEN ) {
+				(void)fclose (f); 
 				Eex ("syntax error in parameter file");
 			}
 			
-			copy_max (par_name[num_params], tmp, sizeof(fixstr));
+			copy_max (par_name[num_params], tmp, (int)sizeof(fixstr)); 
 			/* next must be '=' */
 			if ( c != '=' ) {
 				tmp = strchr (s, '=');
 				if ( tmp == NULL ) {
-					fclose (f);
+					(void)fclose (f); 
 					Eex ("syntax error in parameter file");
 				}
 				s = tmp+1;
 			}
 			tmp = get_next_word (&s, &c);
 			if ( sscanf (tmp, "%lf", &tmp_par) != 1 ) {
-				fclose (f);
+				(void)fclose (f);
 				Eex ("syntax error in parameter file");
 			}
 			
 			/* make fixed params visible to GNUPLOT */
 			if ( fixed ) {
-				struct value val;
-				Gcomplex (&val, tmp_par, 0.0);
-				setvar (par_name[num_params], val);   /* use parname as temp */
+				struct value tempval; 
+				(void)Gcomplex (&tempval, tmp_par, 0.0); 
+				setvar (par_name[num_params], tempval);   /* use parname as temp */ 
 			}
 			else {
-				if (num_params>=MAX_PARAMS) {
+				if (num_params>=max_params) {
+					max_params = (max_params * 3) / 2;
+					if (0
+							|| !redim_vec(&a, max_params)
+							|| !(par_name = gp_realloc (par_name, (max_params+1)*sizeof(fixstr), "fit param resize"))
+							) {
 /* HBB: maybe it would be better to realloc a and v instead ? */
-					fclose(f);
-					Eex("too many parameters to fit");
+						(void)fclose(f); 
+						Eex("Out of memory in fit: too many parameters?");
+					}
 				}
 				a[num_params++] = tmp_par;
 			}
 			
 			if ( (tmp = get_next_word (&s, &c)) != NULL ) {
-				fclose (f);
+				(void)fclose (f); 
 				Eex ("syntax error in parameter file");
 			}
 		}
-		fclose (f);
+		(void)fclose (f); 
 	} else { /* not a string after via */
 		fprintf (log_f, "use actual parameter values\n\n");
 		do {
 			if (!isletter(c_token))
 				Eex ("no parameter specified");
-			capture(par_name[num_params], c_token, c_token, sizeof(par_name[0]));
-			if (num_params >= MAX_PARAMS) 
-				Eex ("too many parameters to fit");
+			capture(par_name[num_params], c_token, c_token, (int)sizeof(par_name[0])); 
+			if (num_params >= max_params) {
+				max_params = (max_params * 3) / 2;
+				if (0
+						|| !redim_vec(&a, max_params)
+						|| !(par_name = gp_realloc (par_name, (max_params+1)*sizeof(fixstr), "fit param resize"))
+						) {
+					Eex("Out of memory in fit: too many parameters?");
+				}
+			}
 			/* create variable if it doesn't exist */
 			a[num_params] = createdvar (par_name[num_params], INITIAL_VALUE);
 			++num_params;
@@ -1536,9 +1575,9 @@ void do_fit ()
 	if ( a[i] == 0 )
 	    a[i] = NEARLY_ZERO;
 
-    regress (a);
+	(void)regress (a);  
 
-    fclose (log_f);
+	(void)fclose (log_f);
     log_f = NULL;
     free (fit_x);
     free (fit_y);
@@ -1565,5 +1604,3 @@ int kbhit()
 	return((select(0, &rfds, NULL, NULL, &timeout) > 0) ? 1 : 0);
 }
 #endif
-
-

@@ -395,9 +395,7 @@ I think a file layout like the following will leave most flexibility
 to the gnuplot maintainers. I use REGIS for example.
 
 
-#ifndef GOT_DRIVER_H
 #include "driver.h"
-#endif
 
 
 #ifdef TERM_REGISTER

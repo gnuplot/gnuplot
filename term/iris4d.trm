@@ -1,5 +1,5 @@
 /*
- * $Id: iris4d.trm,v 1.15 1998/03/22 22:34:48 drd Exp $
+ * $Id: iris4d.trm,v 1.16 1998/04/14 00:17:52 drd Exp $
  *
  */
 
@@ -53,9 +53,7 @@
  * adapted to the new terminal layout by Stefan Bodewig (Dec. 1995)
  */
 
-#ifndef GOT_DRIVER_H
 #include "driver.h"
-#endif
 
 #ifdef TERM_REGISTER
 register_term(iris4d)

@@ -1,5 +1,5 @@
 /*
- * $Id: qms.trm,v 1.13 1998/03/22 22:35:02 drd Exp $
+ * $Id: qms.trm,v 1.14 1998/04/14 00:18:05 drd Exp $
  *
  */
 
@@ -51,9 +51,7 @@
  * adapted to the new terminal layout by Stefan Bodewig (Dec. 1995)
  */
 
-#ifndef GOT_DRIVER_H
 #include "driver.h"
-#endif
 
 #ifdef TERM_REGISTER
 register_term(qms)

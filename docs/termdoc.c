@@ -1,5 +1,5 @@
 /*
- * $Id: termdoc.c,v 1.18 1997/07/22 23:24:28 drd Exp $
+ * $Id: termdoc.c,v 1.19 1998/04/14 00:17:14 drd Exp $
  *
  */
 
@@ -53,18 +53,12 @@
 #include "config.h"
 #endif
 
-#ifdef TEST
-#include <stdio.h>
-#include <ctype.h>
-#endif
-
-/*#if (DJGPP==2)*/ /* HBB: this should be included for *all* compilers, IMHO */
-#include <string.h>
-/*#endif*/
+#include "ansichek.h"
+#include "stdfn.h"
 
 /* may need to something more clever for 64k machines ? */
 
-#define GOT_DRIVER_H   /* a complete lie, but they dont need it ! */
+#define TERM_DRIVER_H   /* a complete lie, but they dont need it ! */
 #define TERM_HELP
 
 /* for error reporting, we arrange for each terminals help to start
@@ -75,7 +69,7 @@
  * doesn't work, since it is really for use by doc maintainer.
  */
 
-#ifdef __STDC__
+#ifdef ANSI_C
 #define START_HELP(driver) "C#" #driver , 
 #define END_HELP(driver)   ,"C#",
 #else
@@ -85,7 +79,7 @@
 
 
 char *termtext[] = {
-#ifdef ALL_TERM
+#ifdef ALL_TERM_DOC
 #include "allterm.h"
 #else
 #include "term.h"

@@ -1,5 +1,5 @@
 /*
- * $Id: epson.trm,v 1.18 1998/03/22 22:34:38 drd Exp $
+ * $Id: epson.trm,v 1.19 1998/04/14 00:17:41 drd Exp $
  *
  */
 
@@ -55,9 +55,7 @@
  * adapted to the new terminal layout by Stefan Bodewig (1995)
  */
 
-#ifndef GOT_DRIVER_H
 #include "driver.h"
-#endif
 
 #ifdef TERM_REGISTER
 #ifdef EPS180
@@ -214,7 +212,7 @@ TERM_PUBLIC void EPSONtext()
 
 TERM_PUBLIC void EPSONreset()
 {
-#ifdef vms
+#ifdef VMS
 	fflush_binary();
 #endif
 }
@@ -331,7 +329,7 @@ int linetype;
 	
 TERM_PUBLIC void NECreset()
 {
-#ifdef vms
+#ifdef VMS
 	fflush_binary();
 #endif
 }
@@ -395,7 +393,7 @@ char column3, column2, column1;
 #ifdef PC
 	fprintf(stderr,"Print using: COPY /B\n");
 #endif
-#ifdef vms
+#ifdef VMS
 	fflush_binary();
 #endif
 }
@@ -486,7 +484,7 @@ int linetype;
 
 TERM_PUBLIC void STARCreset()
 {
-#ifdef vms
+#ifdef VMS
 	fflush_binary();
 #endif
 }
@@ -882,12 +880,12 @@ START_HELP(epson_180dpi)
 " The `tandy-60dpi` driver is for the Tandy DMP-130 series of 9-pin, 60-dpi",
 " printers.",
 "",
-" Only `nec-cp6` has any options."
+" Only `nec-cp6` has any options.",
 "",
 " Syntax:",
 "       set terminal nec-cp6 {monochrome | colour | draft}",
 "",
-" which defaults to monochrome."
+" which defaults to monochrome.",
 "",
 " With each of these drivers, a binary copy is required on a PC to print.  Do",
 " not use `print`---use instead `copy file /b lpt1:`."

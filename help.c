@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: help.c,v 1.28 1998/03/22 22:31:45 drd Exp $";
+static char *RCSid = "$Id: help.c,v 1.29 1998/04/14 00:15:36 drd Exp $";
 #endif
 
 /* GNUPLOT - help.c */
@@ -43,7 +43,7 @@ static char *RCSid = "$Id: help.c,v 1.28 1998/03/22 22:31:45 drd Exp $";
 /* since there are only two external references, we won't include protos.h */
 
 void int_error __PROTO((char str[], int t_num));
-int instring __PROTO((char *str, char c));
+extern int instring __PROTO((char *str, char c));
 
 #if defined(__EMX__) || defined(DJGPP) || defined(DOS386)
 #ifdef MSDOS

@@ -1,5 +1,5 @@
 /*
- * $Id: latex.trm,v 1.62 1998/03/22 22:34:49 drd Exp $
+ * $Id: latex.trm,v 1.63 1998/04/14 00:17:53 drd Exp $
  *
  */
 
@@ -74,9 +74,7 @@
  * - drd, Sept 1996
  */
 
-#ifndef GOT_DRIVER_H
 #include "driver.h"
-#endif
 
 #ifdef TERM_REGISTER
 register_term(latex)
@@ -462,7 +460,7 @@ LATEX_rule(code, x,y, width, height)
 {  
     static float lastx, lasty;
     static float lastw, lasth;
-    static TBOOLEAN valid = FALSE; /* is 'last' data valid? */
+    static TBOOLEAN isvalid = FALSE; /* is 'last' data valid? */
     TBOOLEAN combine = (code == 1);
     TBOOLEAN flush = (code == 2);
 
@@ -470,7 +468,7 @@ LATEX_rule(code, x,y, width, height)
 	 if (width == 0 || height == 0)
 	   return;			/* ignore this rule */
 
-    if (valid && combine) {
+    if (isvalid && combine) {
 	   /* try to combine new rule with old rule */
 	   if ((int)lastx == (int)x && lastw == width) { /* vertical rule */
 		  if (lasth * height >= 0) { /* same sign */
@@ -486,7 +484,7 @@ LATEX_rule(code, x,y, width, height)
 	   /* oh well, output last and remember the new one */
     }
 
-    if (valid) {
+    if (isvalid) {
 	   /* output the rule */
 	   if (lastw < 0) {
 		  lastx += lastw;
@@ -508,11 +506,11 @@ LATEX_rule(code, x,y, width, height)
     }
     
     if (flush) {
-	   valid = FALSE;
+	   isvalid = FALSE;
     } else {
 	   lastx = x; lasty = y;
 	   lastw = width; lasth = height;
-	   valid = TRUE;
+	   isvalid = TRUE;
     }
 }
 

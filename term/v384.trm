@@ -1,5 +1,5 @@
 /*
- * $Id: v384.trm,v 1.12 1998/03/22 22:35:11 drd Exp $
+ * $Id: v384.trm,v 1.13 1998/04/14 00:18:13 drd Exp $
  *
  */
 
@@ -62,9 +62,7 @@
  * adapted to the new terminal layout by Stefan Bodewig (Dec. 1995)
  */
 
-#ifndef GOT_DRIVER_H
 #include "driver.h"
-#endif
 
 #ifdef TERM_REGISTER
 register_term(vx384)

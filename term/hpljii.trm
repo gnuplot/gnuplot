@@ -1,5 +1,5 @@
 /*
- * $Id: hpljii.trm,v 1.19 1998/03/22 22:34:47 drd Exp $
+ * $Id: hpljii.trm,v 1.20 1998/04/14 00:17:51 drd Exp $
  *
  */
 
@@ -65,9 +65,7 @@
  * adapted to the new terminal layout by Stefan Bodewig (Dec. 1995)
  */
 
-#ifndef GOT_DRIVER_H
 #include "driver.h"
-#endif
 
 #ifdef TERM_REGISTER
 register_term(hpljii)
@@ -232,9 +230,9 @@ TERM_PUBLIC void HPLJIItext()
 
    b_freebitmap();
 
-#ifndef vms  /* most vms spoolers add a formfeed character */
+#ifndef VMS  /* most vms spoolers add a formfeed character */
    fprintf(outfile,"\f");
-#endif /* not vms */
+#endif /* !VMS */
 }
 
 
@@ -300,9 +298,9 @@ char c;
 
 TERM_PUBLIC void HPLJIIreset()
 {
-#ifdef vms
+#ifdef VMS
    fflush_binary();
-#endif /* vms */
+#endif /* VMS */
 }
 
 
@@ -360,9 +358,9 @@ TERM_PUBLIC void HPDJtext()
 
    b_freebitmap();
 
-#ifndef vms  /* most vms spoolers add a formfeed character */
+#ifndef VMS  /* most vms spoolers add a formfeed character */
    fprintf(outfile,"\f");
-#endif /* not vms */
+#endif /* !VMS */
 }
 
 #endif 

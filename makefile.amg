@@ -1,6 +1,6 @@
 # Makefile for SAS/C 6.1 on the Amiga
 #
-# $Id: makefile.amg,v 1.28 1997/04/08 06:14:14 drd Exp $
+# $Id: makefile.amg,v 1.29 1998/04/14 00:15:50 drd Exp $
 #
 #
 
@@ -41,12 +41,13 @@ HELPDEST = S:
 OBJS = alloc.o amiga.o binary.o bitmap.o command.o contour.o datafile.o \
        eval.o fit.o graph3d.o graphics.oo help.o hidden3d.o internal.o \
        interpol.o matrix.o misc.o parse.o plot.o plot2d.o plot3d.o scanner.o \
-       set.oo show.o specfun.o standard.o term.oo time.o util.o util3d.o \
-       version.o
+       set.oo show.o specfun.o standard.o stdfn.o term.oo time.o util.o \
+       util3d.o version.o
 
 CSOURCE1 = alloc.c bf_test.c binary.c bitmap.c command.c set.c show.c 
 CSOURCE2 = help.c graphics.c graph3d.o internal.c 
-CSOURCE3 = misc.c eval.c parse.c plot.c plot2d.c plot3d.c scanner.c standard.c 
+CSOURCE3 = misc.c eval.c parse.c plot.c plot2d.c plot3d.c scanner.c \
+	standard.c stdfn.c 
 CSOURCE4 = bitmap.c term.c util.c util3d.c version.c interpol.c fit.c matrix.c
 CSOURCE5 = term/ai.trm term/amiga.trm term/aed.trm term/atariaes.trm \
 	term/atarivdi.trm term/cgi.trm term/corel.trm \
@@ -125,6 +126,7 @@ set.oo: set.c plot.h setshow.h
 show.o: show.c plot.h setshow.h
 specfun.o: specfun.c plot.h
 standard.o: standard.c plot.h
+stdfn.o: stdfn.c stdfn.h
 term.oo: term.c term.h plot.h setshow.h bitmap.h $(CSOURCE5) $(CSOURCE6) $(CSOURCE7)
 time.o: time.c plot.h setshow.h
 util.o: util.c plot.h

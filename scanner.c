@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: scanner.c,v 1.54 1998/03/22 22:32:04 drd Exp $";
+static char *RCSid = "$Id: scanner.c,v 1.55 1998/04/14 00:16:14 drd Exp $";
 #endif
 
 /* GNUPLOT - scanner.c */
@@ -34,8 +34,6 @@ static char *RCSid = "$Id: scanner.c,v 1.54 1998/03/22 22:32:04 drd Exp $";
  * to the extent permitted by applicable law.
 ]*/
 
-#include <ctype.h>
-#include <math.h>
 #include "plot.h"
 
 static int get_num __PROTO((char str[]));
@@ -45,16 +43,13 @@ static void substitute __PROTO((char *str, int max));
 #define O_RDONLY	0
 int open(const char * _name, int _mode, ...);
 int close(int);
-#endif
+#endif /* AMIGA_AC_5 */
 
-#ifdef vms
-
+#ifdef VMS
 #include <descrip.h>
-
 #define MAILBOX "PLOT$MAILBOX"
 #define pclose(f) fclose(f)
-
-#endif /* vms */
+#endif /* VMS */
 
 
 #define isident(c) (isalnum(c) || (c) == '_')
@@ -260,7 +255,7 @@ register long lval;
 	return(count);
 }
 
-#if defined(vms) || defined(PIPES) || (defined(ATARI) && defined(__PUREC__)) || (defined(MTOS) && defined(__PUREC__))
+#if defined(VMS) || defined(PIPES) || (defined(ATARI) && defined(__PUREC__)) || (defined(MTOS) && defined(__PUREC__))
 
 /* this really ought to make use of the dynamic-growth of the
  * input line in 3.6.  And it definitely should not have
@@ -276,19 +271,19 @@ register int i,c;
 register FILE *f;
 #ifdef AMIGA_AC_5
 int fd;
-#else
-#if (defined(ATARI) && defined(__PUREC__)) || (defined(MTOS) && defined(__PUREC__))
+#else /* AMIGA_AC_5 */
+#if (defined(ATARI) || defined(MTOS)) && defined(__PUREC__)
 char	*atari_tmpfile;
 char	*atari_pgm[MAX_LINE_LEN+100];
-#endif /* ATARI && PUREC || MTOS && PUREC */
+#endif /* (ATARI || MTOS) && PUREC */
 #endif /* AMIGA_AC_5 */
 static char pgm[MAX_LINE_LEN+1],output[MAX_LINE_LEN+1];
 
-#ifdef vms
+#ifdef VMS
 int chan, one = 1;
 static $DESCRIPTOR(pgmdsc,pgm);
 static $DESCRIPTOR(lognamedsc,MAILBOX);
-#endif /* vms */
+#endif /* VMS */
 
 	/* forgive missing closing backquote at end of line */
 	i = 0;
@@ -303,7 +298,7 @@ static $DESCRIPTOR(lognamedsc,MAILBOX);
 	pgm[i] = '\0';		/* end with null */
 	max -= strlen(last);	/* max is now the max length of output sub. */
   
-#ifdef vms
+#ifdef VMS
   	pgmdsc.dsc$w_length = i;
    	if (!((vaxc$errno = sys$crembx(0,&chan,0,0,0,0,&lognamedsc)) & 1))
    		os_error("sys$crembx failed",NO_CARET);
@@ -313,8 +308,8 @@ static $DESCRIPTOR(lognamedsc,MAILBOX);
    
    	if ((f = fopen(MAILBOX,"r")) == NULL)
    		os_error("mailbox open failed",NO_CARET);
-#else /* vms */
-#if (defined(ATARI) && defined(__PUREC__)) || (defined(MTOS) && defined(__PUREC__))
+#else /* VMS */
+#if (defined(ATARI) || defined(MTOS)) && defined(__PUREC__)
 		if (system(NULL) == 0)
 			os_error("no command shell", NO_CARET);
 		if ((strlen(atari_tmpfile) + strlen(pgm) + 5) > MAX_LINE_LEN+100)
@@ -328,12 +323,12 @@ static $DESCRIPTOR(lognamedsc,MAILBOX);
 #else
 #ifdef AMIGA_AC_5
   	if ((fd = open(pgm,"O_RDONLY")) == -1)
-#else
+#else /* AMIGA_AC_5 */
   	if ((f = popen(pgm,"r")) == NULL)
-#endif
-#endif	/* ATARI && PUREC || MTOS && PUREC */
+#endif /* AMIGA_AC_5 */
+#endif	/* (ATARI || MTOS) && PUREC */
   		os_error("popen failed",NO_CARET);
-#endif /* vms */
+#endif /* VMS */
 
 	i = 0;
 	while ((c = getc(f)) != EOF) {
@@ -341,27 +336,27 @@ static $DESCRIPTOR(lognamedsc,MAILBOX);
 		if (i == max) {
 #ifdef AMIGA_AC_5
 			(void) close(fd);
-#else
-#if (defined(ATARI) && defined(__PUREC__)) || (defined(MTOS) && defined(__PUREC__))
+#else /* AMIGA_AC_5 */
+#if (defined(ATARI) || defined(MTOS)) && defined(__PUREC__)
 			(void) fclose(f);
 			(void) unlink(atari_tmpfile);
-#else
+#else /* (ATARI || MTOS) && PUREC */
 			(void) pclose(f);
-#endif /* ATARI && PUREC || MTOS && PUREC */
-#endif
+#endif /* (ATARI || MTOS) && PUREC */
+#endif /* AMIGA_AC_5 */
 			int_error("substitution overflow", t_num);
 		}
 	}
 #ifdef AMIGA_AC_5
 	(void) close(fd);
 #else
-#if (defined(ATARI) && defined(__PUREC__)) || (defined(MTOS) && defined(__PUREC__))
+#if (defined(ATARI) || defined(MTOS)) && defined(__PUREC__)
 	(void) fclose(f);
 	(void) unlink(atari_tmpfile);
-#else
+#else /* (ATARI || MTOS) && PUREC */
 	(void) pclose(f);
-#endif /* ATARI && PUREC || MTOS && PUREC */
-#endif
+#endif /* (ATARI || MTOS) && PUREC */
+#endif /* AMIGA_AC_5 */
 
 	if (i + strlen(last) > max)
 		int_error("substitution overflowed rest of line", t_num);
@@ -371,7 +366,7 @@ static $DESCRIPTOR(lognamedsc,MAILBOX);
 	screen_ok = FALSE;
 }
 
-#else /* vms || PIPES || ATARI && PUREC */
+#else /* VMS || PIPES || ATARI && PUREC */
 
 static void substitute(str,max)
 char *str;
@@ -381,4 +376,4 @@ int max;
 
 	int_error( strcat(strcpy(line,"substitution not supported by "),OS),t_num);
 }
-#endif /* unix || vms || PIPES || ATARI && PUREC */
+#endif /* unix || VMS || PIPES || ATARI && PUREC */

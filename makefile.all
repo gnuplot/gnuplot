@@ -1,7 +1,7 @@
 #<<<makefile.all>>>
 ########################################################
 #
-# $Id: makefile.all,v 1.7 1996/12/08 12:28:35 drd Exp $
+# $Id: makefile.all,v 1.8 1998/04/14 00:15:49 drd Exp $
 #
 ########################################################
 #
@@ -34,7 +34,7 @@
 COREOBJS = alloc.$(O) binary.$(O) bitmap.$(O) command.$(O) contour.$(O) datafile.$(O) eval.$(O) fit.$(O)\
        graphics.$(O) graph3d.$(O) help.$(O) hidden3d.$(O) internal.$(O) interpol.$(O)\
        matrix.$(O) misc.$(O) parse.$(O) plot.$(O) plot2d.$(O) plot3d.$(O) readline.$(O)\
-       scanner.$(O) set.$(O) show.$(O) specfun.$(O) standard.$(O) term.$(O) time.$(O) util.$(O) \
+       scanner.$(O) set.$(O) show.$(O) specfun.$(O) standard.$(O) stdfn.$(O) term.$(O) time.$(O) util.$(O) \
        util3d.$(O)
 
 ####################################################################
@@ -45,7 +45,7 @@ DIRS = term demo docs $(D)latextut
 CSOURCE1 = alloc.c binary.c bitmap.c command.c contour.c datafile.c eval.c fit.c
 CSOURCE2 = graphics.c graph3d.c help.c hidden3d.c internal.c interpol.c
 CSOURCE3 = matrix.c misc.c parse.c plot.c plot2d.c plot3d.c readline.c
-CSOURCE4 = scanner.c set.c show.c specfun.c standard.c term.c time.c util.c util3d.c version.c
+CSOURCE4 = scanner.c set.c show.c specfun.c standard.c stdfn.c term.c time.c util.c util3d.c version.c
 
 
 CSOURCE5 = $(T)ai.trm $(T)amiga.trm $(T)aed.trm \

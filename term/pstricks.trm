@@ -1,6 +1,6 @@
 /* Hey Emacs this is -*- C -*-
  * 
- * $Id: pstricks.trm,v 1.14 1998/03/22 22:35:02 drd Exp $
+ * $Id: pstricks.trm,v 1.15 1998/04/14 00:18:05 drd Exp $
  */
 
 /* GNUPLOT - pstricks.trm */
@@ -77,9 +77,7 @@
  * adapted to the new terminal layout by Stefan Bodewig (Dec. 1995)
  */
 
-#ifndef GOT_DRIVER_H
 #include "driver.h"
-#endif
 
 #ifdef TERM_REGISTER
 register_term(pstricks)

@@ -1,5 +1,5 @@
 /*
- * $Id: regis.trm,v 1.17 1998/03/22 22:35:03 drd Exp $
+ * $Id: regis.trm,v 1.18 1998/04/14 00:18:06 drd Exp $
  *
  */
 
@@ -48,9 +48,7 @@
  * 
  */
 
-#ifndef GOT_DRIVER_H
 #include "driver.h"
-#endif
 
 #ifdef TERM_REGISTER
 register_term(regis)

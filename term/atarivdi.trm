@@ -1,5 +1,5 @@
 /*
- * $Id: atarivdi.trm,v 1.5 1998/03/22 22:34:32 drd Exp $
+ * $Id: atarivdi.trm,v 1.6 1998/04/14 00:17:32 drd Exp $
  *
  */
 
@@ -52,9 +52,7 @@
  *
  */
 
-#ifndef GOT_DRIVER_H
 #include "driver.h"
-#endif
 
 #ifdef TERM_REGISTER
 register_term(vdi)

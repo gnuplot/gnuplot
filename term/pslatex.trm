@@ -1,5 +1,5 @@
 /*
- * $Id: pslatex.trm,v 1.33 1998/03/22 22:34:59 drd Exp $
+ * $Id: pslatex.trm,v 1.34 1998/04/14 00:18:03 drd Exp $
  */
 
 /* GNUPLOT - pslatex.trm */
@@ -49,9 +49,7 @@
  * send your comments or suggestions to (info-gnuplot@dartmouth.edu).
  */
 
-#ifndef GOT_DRIVER_H
 #include "driver.h"
-#endif
 
 #ifdef TERM_REGISTER
 register_term(pslatex)

@@ -1,5 +1,5 @@
 /*
- * $Id: next.trm,v 1.20 1998/03/22 22:34:54 drd Exp $
+ * $Id: next.trm,v 1.21 1998/04/14 00:17:57 drd Exp $
  *
  */
 
@@ -79,9 +79,7 @@
  * 'set term next old'
  */
 
-#ifndef GOT_DRIVER_H
 #include "driver.h"
-#endif
 
 #ifdef TERM_REGISTER
 register_term(next)

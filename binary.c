@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: binary.c,v 1.9 1997/04/10 02:32:40 drd Exp $";
+static char *RCSid = "$Id: binary.c,v 1.10 1998/04/14 00:14:49 drd Exp $";
 #endif
 
 /*
@@ -21,9 +21,6 @@ static char *RCSid = "$Id: binary.c,v 1.9 1997/04/10 02:32:40 drd Exp $";
  * Copyright (c) 1991,1992 Robert K. Cunningham, MIT Lincoln Laboratory
  *
  */
-
-#include <math.h>
-
 
 #include "plot.h"   /* We have to get TRUE and FALSE */
 #include "stdfn.h"

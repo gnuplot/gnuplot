@@ -1,5 +1,5 @@
 /*
- * $Id: gpr.trm,v 1.12 1998/03/22 22:34:43 drd Exp $
+ * $Id: gpr.trm,v 1.13 1998/04/14 00:17:46 drd Exp $
  *
  */
 
@@ -53,9 +53,7 @@
  * adapted to the new terminal layout by Stefan Bodewig (Dec. 1995)
  */
 
-#ifndef GOT_DRIVER_H
 #include "driver.h"
-#endif
 
 #ifdef TERM_REGISTER
 register_term(gpr)

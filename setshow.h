@@ -1,5 +1,5 @@
 /*
- * $Id: setshow.h,v 1.38 1998/03/22 22:32:08 drd Exp $
+ * $Id: setshow.h,v 1.39 1998/04/14 00:16:18 drd Exp $
  *
  */
 
@@ -74,6 +74,7 @@ extern double			boxwidth;
 extern TBOOLEAN			clip_points;
 extern TBOOLEAN			clip_lines1;
 extern TBOOLEAN			clip_lines2;
+extern struct lp_style_type     border_lp;
 extern int			draw_border;
 #define SOUTH			1 /* 0th bit */
 #define WEST			2 /* 1th bit */
@@ -97,7 +98,7 @@ extern int format_is_numeric[];
 extern char			key_title[];
 extern enum PLOT_STYLE data_style, func_style;
 extern double bar_size;
-extern int			grid, grid_linetype, mgrid_linetype;
+extern struct lp_style_type     work_grid, grid_lp, mgrid_lp;
 extern double     polar_grid_angle; /* angle step in polar grid in radians */
 extern int			key;
 extern struct position key_user_pos; /* user specified position for key */
@@ -105,7 +106,7 @@ extern int 			key_vpos, key_hpos, key_just;
 extern double       key_swidth, key_vert_factor; /* user specified vertical spacing multiplier */
 extern double                   key_width_fix; /* user specified additional (+/-) width of key titles */
 extern TBOOLEAN			key_reverse;  /* key back to front */
-extern int			key_box;  /* linetype round box < -2 = none */
+extern struct lp_style_type 	key_box;  /* linetype round box < -2 = none */
 extern TBOOLEAN			is_log_x, is_log_y, is_log_z;
 extern double			base_log_x, base_log_y, base_log_z;
 				/* base, for computing pow(base,x) */
@@ -181,10 +182,10 @@ extern int			encoding;
 extern char			*encoding_names[];
 
 /* -3 for no axis, or linetype */
-extern int xzeroaxis;
-extern int yzeroaxis;
-extern int x2zeroaxis;
-extern int y2zeroaxis;
+extern struct lp_style_type xzeroaxis;
+extern struct lp_style_type yzeroaxis;
+extern struct lp_style_type x2zeroaxis;
+extern struct lp_style_type y2zeroaxis;
 
 extern int xtics;
 extern int ytics;

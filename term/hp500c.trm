@@ -1,5 +1,5 @@
 /*
- * $Id: hp500c.trm,v 1.16 1998/03/22 22:34:44 drd Exp $
+ * $Id: hp500c.trm,v 1.17 1998/04/14 00:17:48 drd Exp $
  *
  */
 
@@ -66,9 +66,7 @@
  * adapted to the new terminal layout by Stefan Bodewig (Dec. 1995)
  */
 
-#ifndef GOT_DRIVER_H
 #include "driver.h"
-#endif
 
 #ifdef TERM_REGISTER
 register_term(hp500c)
@@ -218,11 +216,35 @@ TERM_PUBLIC void HP500Coptions()
 
 TERM_PUBLIC void HP500Cinit()
 {
+  /* HBB 980226: all changes to term-> fields *must* happen here, not
+   * in graphics() !*/
+	switch(hpdj_dpp) {
+	case 1:
+		b_charsize(FNT13X25);
+		term->v_char = FNT13X25_VCHAR;
+		term->h_char = FNT13X25_HCHAR;
+		break;
+	case 2:
+		b_charsize(FNT13X25);
+		term->v_char = FNT13X25_VCHAR;
+		term->h_char = FNT13X25_HCHAR;
+		break;
+	case 3:
+		b_charsize(FNT9X17);
+		term->v_char = FNT9X17_VCHAR;
+		term->h_char = FNT9X17_HCHAR;
+		break;
+	case 4:
+		b_charsize(FNT5X9);
+		term->v_char = FNT5X9_VCHAR;
+		term->h_char = FNT5X9_HCHAR;
+		break;
+	}
 }
 
 TERM_PUBLIC void HP500Creset()
 {
-#ifdef vms
+#ifdef VMS
 	fflush_binary();
 #endif
 }
@@ -278,28 +300,7 @@ int value;
 
 TERM_PUBLIC void HP500Cgraphics()
 {
-	switch(hpdj_dpp) {
-	case 1:
-		b_charsize(FNT13X25);
-		term->v_char = FNT13X25_VCHAR;
-		term->h_char = FNT13X25_HCHAR;
-		break;
-	case 2:
-		b_charsize(FNT13X25);
-		term->v_char = FNT13X25_VCHAR;
-		term->h_char = FNT13X25_HCHAR;
-		break;
-	case 3:
-		b_charsize(FNT9X17);
-		term->v_char = FNT9X17_VCHAR;
-		term->h_char = FNT9X17_HCHAR;
-		break;
-	case 4:
-		b_charsize(FNT5X9);
-		term->v_char = FNT5X9_VCHAR;
-		term->h_char = FNT5X9_HCHAR;
-		break;
-	}
+  /* HBB 980226: moved block of code from here to init() */
 	/* rotate plot -90 degrees by reversing XMAX and YMAX and by 
 	setting b_rastermode to TRUE */
 	b_makebitmap(HP500C_YMAX,HP500C_XMAX,3);
@@ -487,9 +488,9 @@ TERM_PUBLIC void HP500Ctext()
   free(obuf);  
   b_freebitmap();
   
-#ifndef vms  /* most vms spoolers add a formfeed character */
+#ifndef VMS  /* most vms spoolers add a formfeed character */
   fprintf(outfile,"\f");
-#endif /* not vms */
+#endif /* !VMS */
 }
 
 #endif

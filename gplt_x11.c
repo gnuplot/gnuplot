@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: gplt_x11.c,v 1.70 1998/03/22 22:31:34 drd Exp $";
+static char *RCSid = "$Id: gplt_x11.c,v 1.71 1998/04/14 00:15:22 drd Exp $";
 #endif
 
 /* GNUPLOT - gplt_x11.c */
@@ -103,15 +103,9 @@ static char *RCSid = "$Id: gplt_x11.c,v 1.70 1998/03/22 22:31:34 drd Exp $";
 #if defined(VMS) || defined(CRIPPLED_SELECT)
 #undef DEFAULT_X11
 #endif
+
 #if defined(VMS) && defined(CRIPPLED_SELECT)
 Error. Incompatible options.
-#endif
-
-
-#ifdef DEBUGGING
-#define DEBUG(x) printf x
-#else
-#define DEBUG(x) /* nowt */
 #endif
 
 
@@ -122,36 +116,33 @@ Error. Incompatible options.
 #include <X11/Xatom.h>
 #include <X11/keysym.h>
  
-#include <stdio.h>
-#include <stdlib.h>
 #include <signal.h>
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
 
-#include "ansichek.h"   /* for stdfn.h */
-#include "stdfn.h"     /* for index() / strchr() */
+#include "ansichek.h"
+#include "stdfn.h"
 
 #ifdef HAVE_SYS_BSDTYPES_H
 #include <sys/bsdtypes.h>
 #endif /* HAVE_SYS_BSDTYPES_H */
 
-#if !defined(VMS) && !defined(FD_SET) && !defined(OLD_SELECT)
+#if defined(HAVE_SYS_SELECT_H) && !defined(VMS) && !defined(FD_SET)
 #include <sys/select.h>
-#endif /* !VMS && !FD_SET && !OLD_SELECT */
+#endif /* HAVE_SYS_SELECT_H && !VMS && !FD_SET */
  
 #ifndef FD_SET
 
 #define FD_SET(n, p)    ((p)->fds_bits[0] |= (1 << ((n) % 32)))
 #define FD_CLR(n, p)    ((p)->fds_bits[0] &= ~(1 << ((n) % 32)))
 #define FD_ISSET(n, p)  ((p)->fds_bits[0] & (1 << ((n) % 32)))
-#define FD_ZERO(p)      bzero((char *)(p), sizeof(*(p)))
+#define FD_ZERO(p)      memset((char *)(p),'\0',sizeof(*(p))) 
 
 #endif /* !FD_SET */
 
 #if defined(HAVE_SYS_SYSTEMINFO_H) && defined(HAVE_SYSINFO)
-/* Solaris */
 #include <sys/systeminfo.h>
 #define SYSINFO_METHOD "sysinfo"
 #define GP_SYSTEMINFO(host) sysinfo (SI_HOSTNAME, (host), MAXHOSTNAMELEN)
@@ -159,9 +150,6 @@ Error. Incompatible options.
 #define SYSINFO_METHOD "gethostname"
 #define GP_SYSTEMINFO(host) gethostname ((host), MAXHOSTNAMELEN)
 #endif /* HAVE_SYS_SYSTEMINFO_H && HAVE_SYSINFO */
-
-#include <errno.h>
-extern int errno;
 
 #ifdef VMS
 #ifdef __DECC
@@ -188,8 +176,6 @@ typedef struct plot_struct {
 	int ncommands, max_commands;
 	char **commands;
 } plot_struct;
-
-int main __PROTO((int argc,  char *argv[]));
 
 void store_command __PROTO((char *line, plot_struct *plot));
 void prepare_plot __PROTO((plot_struct *plot, int term_number));
@@ -296,7 +282,7 @@ int main(argc, argv) int argc; char *argv[]; {
    _mallocmin (102400);
 #endif
 
-	DEBUG(("gnuplot_X11 starting up\n"));
+	FPRINTF((stderr,"gnuplot_X11 starting up\n"));
 
    preset(argc, argv);
 
@@ -307,7 +293,7 @@ int main(argc, argv) int argc; char *argv[]; {
 
 	if (persist)
 	{
-		DEBUG(("waiting for %d windows\n, windows_open"));
+		FPRINTF((stderr,"waiting for %d windows\n, windows_open"));
 		/* read x events until all windows have been quit */
 		while (windows_open > 0)
 		{
@@ -319,7 +305,7 @@ int main(argc, argv) int argc; char *argv[]; {
 		
   	XCloseDisplay(dpy);
 
-	DEBUG(("exiting\n"));
+	FPRINTF((stderr,"exiting\n"));
 
 	EXIT(0);
 }
@@ -381,7 +367,7 @@ void mainloop() {
 		XFlush(dpy);
 		
 		tset = rset;
-#if defined(__hpux) && defined(__STDC__)
+#if defined(__hpux) && defined(ANSI_C)
 		nf = select(nfds, (int *)&tset, (int *)0, (int *)0, timer);
 #else
 		nf = select(nfds, &tset, (fd_set *)0, (fd_set *)0, timer);
@@ -523,12 +509,12 @@ void mainloop()
 			    xe.xclient.format == 8 &&
 			    strcmp(xe.xclient.data.b, "die gnuplot die") == 0)
 			{
-				DEBUG(("quit message from ast\n"));
+				FPRINTF((stderr,"quit message from ast\n"));
 				return;
 			}
 			else
 			{
-				DEBUG(("Bogus XClientMessage event from window manager ?\n"));
+				FPRINTF((stderr,"Bogus XClientMessage event from window manager ?\n"));
 			}
 		}
 		process_event(&xe);
@@ -544,7 +530,7 @@ plot_struct *plot;
 {
 	int i;
 
-	DEBUG(("Delete plot %d\n", plot - plot_array));
+	FPRINTF((stderr,"Delete plot %d\n", plot - plot_array));
 	
 	for (i=0; i<plot->ncommands; ++i)
 		free(plot->commands[i]);
@@ -552,7 +538,7 @@ plot_struct *plot;
 
 	if (plot->window)
 	{
-		DEBUG(("Destroy window 0x%x\n", plot->window));
+		FPRINTF((stderr,"Destroy window 0x%x\n", plot->window));
 		XDestroyWindow(dpy,plot->window);
 		plot->window = None;
 		--windows_open;
@@ -575,7 +561,7 @@ plot_struct *plot;
 int term_number;
 {
 	int i;
-        char *term_name, tmp_nam[4], term_icon[10]="gplt";
+        char *term_name, tmp_nam[4];
 	for (i=0; i<plot->ncommands; ++i)
 		free(plot->commands[i]);
 	plot->ncommands = 0;
@@ -603,10 +589,10 @@ int term_number;
       		{
       			char new_name[60];
       			XFetchName(dpy,plot->window,&term_name);
-      			DEBUG(("Window title is %s\n",term_name));
+      			FPRINTF((stderr,"Window title is %s\n",term_name));
       			
       			sprintf(new_name,"%.55s%3d",term_name, term_number);
-      			DEBUG(("term_number  is %d\n",term_number));
+      			FPRINTF((stderr,"term_number  is %d\n",term_number));
       			
       			XStoreName(dpy,plot->window,new_name);
 
@@ -632,7 +618,7 @@ plot_struct *plot;
 {
 	char *p;
 
-	DEBUG(("Store in %d : %s", plot - plot_array, buf));
+	FPRINTF((stderr,"Store in %d : %s", plot - plot_array, buf));
 	
 	if (plot->ncommands >= plot->max_commands)
 	{
@@ -665,7 +651,7 @@ int record()
 				int plot_number = atoi(buf+1); /* 0 if none specified */
 				if (plot_number < 0 || plot_number >= MAX_WINDOWS)
 					plot_number = 0;
-				DEBUG(("plot for window number %d\n", plot_number));
+				FPRINTF((stderr,"plot for window number %d\n", plot_number));
 				plot = plot_array + plot_number;
 				prepare_plot(plot, plot_number);
 				continue;
@@ -718,7 +704,7 @@ record()
 			int plot_number = atoi(buf+1); /* 0 if none specified */
 			if (plot_number < 0 || plot_number >= MAX_WINDOWS)
 				plot_number = 0;
-			DEBUG(("plot for window number %d\n", plot_number));
+			FPRINTF((stderr,"plot for window number %d\n", plot_number));
 			plot = plot_array + plot_number;
 			prepare_plot(plot, plot_number);
 			break;
@@ -727,7 +713,7 @@ record()
 			display(plot);
 			break;
 		case 'R': /* exit x11 mode */
-			DEBUG(("received R - sending ClientMessage\n"));
+			FPRINTF((stderr,"received R - sending ClientMessage\n"));
       			reset_cursor();
 			sys$cancel(STDIINchannel);
 			/* this is ridiculous - cook up an event to ourselves,
@@ -768,7 +754,7 @@ plot_struct *plot;
    int user_width = 1; /* as specified by plot...linewidth */
    char *buf, *str;
 
-   DEBUG(("Display %d ; %d commands\n", plot - plot_array, plot->ncommands));
+   FPRINTF((stderr,"Display %d ; %d commands\n", plot - plot_array, plot->ncommands));
    
 	if (plot->ncommands == 0) return;
 
@@ -785,7 +771,7 @@ plot_struct *plot;
 
 	if (!plot->pixmap)
 	{
-		DEBUG(("Create pixmap %d : %dx%dx%d\n", plot - plot_array, plot->width, plot->height, D));
+		FPRINTF((stderr,"Create pixmap %d : %dx%dx%d\n", plot - plot_array, plot->width, plot->height, D));
 		plot->pixmap = XCreatePixmap(dpy, root, plot->width, plot->height, D);
 	}
 	
@@ -1023,12 +1009,12 @@ void reset_cursor()
       	{
       		if (plot->window)
       		{
-      			DEBUG(("Window for plot %d exists\n", plot_number));
+      			FPRINTF((stderr,"Window for plot %d exists\n", plot_number));
       			XUndefineCursor(dpy,plot->window);;
       		}
       	}
 
-      	DEBUG(("Cursors reset\n"));
+      	FPRINTF((stderr,"Cursors reset\n"));
       	return;
 }
 
@@ -1048,19 +1034,19 @@ Window window;
 	{
 		if (plot->window == window)
 		{
-			DEBUG(("Event for plot %d\n", plot_number));
+			FPRINTF((stderr,"Event for plot %d\n", plot_number));
 			return plot;
 		}
 	}
 	
-	DEBUG(("Bogus window 0x%x in event !\n", window));
+	FPRINTF((stderr,"Bogus window 0x%x in event !\n", window));
 	return NULL;
 }
 
 void process_event(event)
 XEvent *event;
 {
-	DEBUG(("Event 0x%x\n", event->type));
+	FPRINTF((stderr,"Event 0x%x\n", event->type));
 
 	switch (event->type)
 	{
@@ -1083,7 +1069,7 @@ XEvent *event;
 					if (plot->pixmap)
 					{
 						/* it is the wrong size now */
-						DEBUG(("Free pixmap %d\n", 0));
+						FPRINTF((stderr,"Free pixmap %d\n", 0));
 						XFreePixmap(dpy, plot->pixmap);
 						plot->pixmap = None;
 					}
@@ -1623,7 +1609,7 @@ static struct plot_struct *exported_plot;
 void export_graph(plot)
 struct plot_struct *plot;
 {
-	DEBUG(("export_graph(0x%x)\n", plot));
+	FPRINTF((stderr,"export_graph(0x%x)\n", plot));
 	
 	XSetSelectionOwner(dpy, EXPORT_SELECTION, plot->window, CurrentTime);
 	/* to check we have selection, we would have to do a
@@ -1654,22 +1640,22 @@ XEvent *event;
 			reply.xselection.property = event->xselectionrequest.property;
 			reply.xselection.time = event->xselectionrequest.time;
 			
-			DEBUG(("selection request\n"));
+			FPRINTF((stderr,"selection request\n"));
 
 			if (reply.xselection.target == XA_TARGETS) {
 				static Atom targets[] = { XA_PIXMAP, XA_COLORMAP };
-				DEBUG(("Targets request from %d\n", reply.xselection.requestor));
+				FPRINTF((stderr,"Targets request from %d\n", reply.xselection.requestor));
 				XChangeProperty(dpy, reply.xselection.requestor,
 				  reply.xselection.property, reply.xselection.target, 32, PropModeReplace,
 				  (unsigned char *)targets, 2);
 			} else if (reply.xselection.target == XA_COLORMAP) {
 				Colormap cmap = DefaultColormap(dpy,0);
-				DEBUG(("colormap request from %d\n", reply.xselection.requestor));
+				FPRINTF((stderr,"colormap request from %d\n", reply.xselection.requestor));
 				XChangeProperty(dpy, reply.xselection.requestor,
 				  reply.xselection.property, reply.xselection.target, 32, PropModeReplace,
 				  (unsigned char *)&cmap, 1);
 			} else if (reply.xselection.target == XA_PIXMAP) {
-				DEBUG(("pixmap request from %d\n", reply.xselection.requestor));
+				FPRINTF((stderr,"pixmap request from %d\n", reply.xselection.requestor));
 				XChangeProperty(dpy, reply.xselection.requestor,
 				  reply.xselection.property, reply.xselection.target, 32, PropModeReplace,
 				  (unsigned char *)&(exported_plot->pixmap), 1);

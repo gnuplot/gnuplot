@@ -13,6 +13,7 @@ set xlabel "Mesh or Network 0"
 splot "whale.dat" index 0
 pause -1 "Press Return"
 
+set autoscale z
 set xlabel "Mesh or Network 6"
 set autoscale z
 splot "whale.dat" index 6 using 3:2:1 

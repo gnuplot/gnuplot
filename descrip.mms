@@ -31,17 +31,22 @@ ALL : DEFAULT gnuplot.html $(D)gnuplot.tex
 
 .IFDEF GNUC
 CC = GCC
-CFLAGS = /NOOP/define=(ANSI_C,NOGAMMA,NO_GIH,NO_LOCALE_H,X11,PIPES,VAXCRTL)
+CFLAGS = /NOOP/define=(ANSI_C,NO_GIH,NO_LOCALE_H,X11,PIPES,VAXCRTL)
 CRTL_SHARE = ,GNU_CC:[000000]GCCLIB.OLB/lib,$(CWD)linkopt.vms/opt
 .ENDIF
 
 .IFDEF VAXC
-CFLAGS = /STAND=VAXC/NOOP/define=(NOGAMMA,NO_GIH,NO_LOCALE_H,X11,PIPES,VAXCRTL)
+CFLAGS = /STAND=VAXC/NOOP/define=(NO_GIH,NO_LOCALE_H,X11,PIPES,VAXCRTL)
 CRTL_SHARE = ,linkopt.vms/opt
 .ENDIF
 
 .IFDEF DECC
-CFLAGS = /NOOP/define=(ANSI_C,NOGAMMA,NO_GIH,NO_LOCALE_H,X11,PIPES,DECCRTL)/prefix=all
+! A more conservative set of definitions is
+!CFLAGS = /NOOP/define=(ANSI_C,NO_GIH,NO_LOCALE_H,X11,PIPES,DECCRTL)-
+!/prefix=all
+! but the following definitions work with OpenVMS Alpha V6.2 and DEC C V5.3
+CFLAGS = /define=(ANSI_C,HAVE_LGAMMA,HAVE_ERF,HAVE_UNISTD_H,HAVE_GETCWD,-
+NO_GIH,X11,PIPES,DECCRTL) /prefix=all/warnings=disable=ADDRCONSTEXT
 CRTL_SHARE =
 .ENDIF	
 	
@@ -74,10 +79,10 @@ OBJS = $(COREOBJS) version.$(O) vms.$(O)
      
 .LAST
 !	@ IF F$SEARCH("$(OPT_FILE)") .NES. "" THEN DELETE /NOLOG $(OPT_FILE);*
-	@ IF F$SEARCH("*.$(O)",).NES."" THEN $(PURGE) *.$(O)
-	@ IF F$SEARCH("*.$(X)",).NES."" THEN $(PURGE) *.$(X)
-	@ IF F$SEARCH("*.HLP",).NES."" THEN $(PURGE) *.HLP
-	@ IF F$SEARCH("*.HLB",).NES."" THEN $(PURGE) *.HLB
+!	@ IF F$SEARCH("*.$(O)",).NES."" THEN $(PURGE) *.$(O)
+!	@ IF F$SEARCH("*.$(X)",).NES."" THEN $(PURGE) *.$(X)
+!	@ IF F$SEARCH("*.HLP",).NES."" THEN $(PURGE) *.HLP
+!	@ IF F$SEARCH("*.HLB",).NES."" THEN $(PURGE) *.HLB
 	@ IF F$SEARCH("*.HTML",).NES."" THEN $(PURGE) *.HTML
 	@ IF F$SEARCH("*.DVI",).NES."" THEN $(PURGE) *.DVI
 	
@@ -109,9 +114,16 @@ gnuplot.hlb : gnuplot.hlp
 	@ IF "''F$SEARCH("$@")'" .EQS. "" THEN LIBRARY/CREATE/HELP $@
 	LIBRARY $@ $<    
 	
-gnuplot.hlp : doc2hlp.$(X) $(D)gnuplot.doc 
+!gnuplot.hlp : doc2hlp.$(X) $(D)gnuplot.doc 
+!        CREATE_DOC := $ $(CWD)$<
+!        CREATE_DOC $(D)gnuplot.doc $@
+
+$(D)gnuplot.rnh : doc2rnh.$(X) $(D)gnuplot.doc
         CREATE_DOC := $ $(CWD)$<
         CREATE_DOC $(D)gnuplot.doc $@
+
+gnuplot.hlp : $(D)gnuplot.rnh 
+        RUNOFF $(D)gnuplot.rnh 
 
 gnuplot.html : doc2html.$(X) $(D)gnuplot.doc 
         CREATE_DOC := $ $(CWD)$<
@@ -128,11 +140,14 @@ gnuplot.dvi : $(D)gnuplot.tex $(D)titlepag.tex $(D)toc_entr.sty
 	RENAME $@ 'MAKEDIR'$@
 	$(CD) 'MAKEDIR'
         
+doc2rnh.$(X) : doc2rnh.$(O)    	
 doc2hlp.$(X) : doc2hlp.$(O)    	
 doc2html.$(X) : doc2html.$(O)          
 doc2tex.$(X) : doc2tex.$(O)  
 
-doc2hlp.$(O) doc2html.$(O) doc2tex.$(O) : $(D)termdoc.c $(D)allterm.h
+!doc2hlp.$(O) doc2html.$(O) doc2tex.$(O) : $(D)termdoc.c $(D)allterm.h
+!	$(CC) /OBJ=$@ $(CFLAGS) $(TERMFLAGS) $(D)$*.c
+doc2rnh.$(O) doc2hlp.$(O) doc2html.$(O) doc2tex.$(O) : $(D)termdoc.c $(D)allterm.h
 	$(CC) /OBJ=$@ $(CFLAGS) $(TERMFLAGS) $(D)$*.c
 		  		
 $(D)allterm.h : $(CORETERM)

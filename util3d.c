@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: util3d.c,v 1.15 1998/03/22 22:32:20 drd Exp $";
+static char *RCSid = "$Id: util3d.c,v 1.16 1998/04/14 00:16:29 drd Exp $";
 #endif
 
 
@@ -46,15 +46,11 @@ static char *RCSid = "$Id: util3d.c,v 1.15 1998/03/22 22:32:20 drd Exp $";
  *
  */
 
-#include <math.h>
-#if !defined(sequent) && !defined(apollo) && !defined(alliant)
-#include <limits.h>
-#endif
 #include "plot.h"
 #include "setshow.h"
 
 extern int xleft,xright,ybot,ytop;
-extern int hidden_active, hidden_no_update;
+extern int hidden_active; /* HBB 980324: hidden_no_update was unused here */
 
 /* ACCESS THINGS THAT OUGHT TO BE HIDDEN IN hidden3d.c - perhaps we
  * can move the relevant code into hidden3d.c sometime

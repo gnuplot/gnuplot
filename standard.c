@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: standard.c,v 1.23 1998/03/22 23:31:27 drd Exp $";
+static char *RCSid = "$Id: standard.c,v 1.24 1998/04/14 00:16:21 drd Exp $";
 #endif
 
 /* GNUPLOT - standard.c */
@@ -34,7 +34,6 @@ static char *RCSid = "$Id: standard.c,v 1.23 1998/03/22 23:31:27 drd Exp $";
  * to the extent permitted by applicable law.
 ]*/
 
-#include <math.h>
 #include "plot.h"
 #include "setshow.h" /* for ang2rad */
 #include "fnproto.h"

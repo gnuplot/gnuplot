@@ -1,7 +1,7 @@
 /*{{{}}}*/
 /***************************************************************************/
 /*                                                                         */
-/* $Id: tgif.trm,v 1.65 1998/03/22 22:35:08 drd Exp $                     */
+/* $Id: tgif.trm,v 1.66 1998/04/14 00:18:10 drd Exp $                     */
 /*                                                                         */
 /***************************************************************************/
 /* GNUPLOT - tgif.trm                                                      */
@@ -66,9 +66,7 @@
 
 /*}}}  */
 /***************************************************************************/
-#ifndef GOT_DRIVER_H
 #include "driver.h"
-#endif
 
 #ifdef TERM_REGISTER
 register_term(tgif)
@@ -379,7 +377,7 @@ if(multiplot) {
 fprintf(outfile,"%%TGIF 2.15-p7\n");
 fprintf(outfile,"state(%d,30,%u,0,0,%u,16,1,9,1,1,0,0,0,0,1,0,'%s',0,%u,0,0,1,10,0,0,1,1,0,16,0,0,1,1,1).\n",
 	TgifPortrait ? 0 : 1,uActResolution,uActZoom,sActFont,uActFontSize);
-fprintf(outfile,"%%\n%% @(#)$Header: /cvs/gnuplot/term/tgif.trm,v 1.65 1998/03/22 22:35:08 drd Exp $\n%% %%W%%\n%%\n");
+fprintf(outfile,"%%\n%% @(#)$Header: /cvs/gnuplot/term/tgif.trm,v 1.66 1998/04/14 00:18:10 drd Exp $\n%% %%W%%\n%%\n");
 fprintf(outfile,"page(1,\"\").\n");
 eTgifState = NEWPOLY;
 iTgifPolyCount = 0;

@@ -1,5 +1,5 @@
 /*
- * $Id: tek.trm,v 1.19 1998/03/22 22:35:05 drd Exp $
+ * $Id: tek.trm,v 1.20 1998/04/14 00:18:07 drd Exp $
  *
  */
 
@@ -59,9 +59,7 @@
 #define SELANAR
 #define BITGRAPH
 
-#ifndef GOT_DRIVER_H
 #include "driver.h"
-#endif /* GOT_DRIVER_H */
 
 #ifdef TERM_REGISTER
 register_term(tek40)
@@ -143,9 +141,9 @@ TERM_PUBLIC void TEK40init()
 
 TERM_PUBLIC void TEK40graphics()
 {
-#ifdef vms
+#ifdef VMS
 	term_pasthru();
-#endif /* vms */
+#endif /* VMS */
 	fprintf(outfile,"\033\014");
 /*                   1
 	1. clear screen
@@ -163,9 +161,9 @@ TERM_PUBLIC void TEK40text()
 /*                   1
 	1. into alphanumerics
 */
-#ifdef vms
+#ifdef VMS
 	term_nopasthru();
-#endif /* vms */
+#endif /* VMS */
 }
 
 
@@ -271,10 +269,10 @@ char str[];
 
 TERM_PUBLIC void KTEK40graphics()
 {
-#ifdef vms
+#ifdef VMS
         term_mode_tek();
 	term_pasthru();
-#endif /* vms */
+#endif /* VMS */
 	fprintf(outfile,"\033\014");
 /*                   1
 	1. clear screen
@@ -286,9 +284,9 @@ TERM_PUBLIC void KTEK40Ctext()
 {
 	TEK40text();
 	KTEK40Clinetype(0);  /* change to green */
-#ifdef vms
+#ifdef VMS
 	term_nopasthru();
-#endif /* vms */
+#endif /* VMS */
 }
 
 /* special color linetypes for MS-DOS Kermit v2.31 tektronix emulator */
@@ -326,9 +324,9 @@ int linetype;
 TERM_PUBLIC void KTEK40reset()
 {
 	fprintf(outfile,"\030\n");  /* turn off Tek emulation */
-#ifdef vms
+#ifdef VMS
 	term_mode_native();
-#endif /* vms */
+#endif /* VMS */
 }
 
 #endif /* KERMIT */
@@ -388,9 +386,9 @@ TERM_PUBLIC void VTTEK40init()
         fflush(outfile);
         sleep(1);
         /* sleep 1 second to allow screen time to clear on some terminals */
-#ifdef vms
+#ifdef VMS
         term_mode_tek();
-#endif /* vms */
+#endif /* VMS */
 }
 
 TERM_PUBLIC void VTTEK40reset()
@@ -399,9 +397,9 @@ TERM_PUBLIC void VTTEK40reset()
         fflush(outfile);
         sleep(1);
         /* sleep 1 second to allow screen time to clear on some terminals */
-#ifdef vms
+#ifdef VMS
         term_mode_native();
-#endif /* vms */
+#endif /* VMS */
 }
 
 /* linetypes for VT-type terminals in tektronix emulator mode */
@@ -459,14 +457,14 @@ static void CT_pattern_vector __PROTO((int x1, int y1));
 
 /* CT_lines are line types defined as bit pattern */
 static unsigned long CT_lines[]=
-{  0xffffffffU,  /* solid line */
-   0x000fffffU,  /* long dash */
-   0x00ff00ffU,  /* short dash */
-   0x00f00fffU,  /* dash-dot */
-   0x00f07fffU,  /* long dash - dot */
-   0x07070707U,
-   0x07ff07ffU,
-   0x070707ffU};
+{  0xffffffff,  /* solid line */
+   0x000fffff,  /* long dash */
+   0x00ff00ff,  /* short dash */
+   0x00f00fff,  /* dash-dot */
+   0x00f07fff,  /* long dash - dot */
+   0x07070707,
+   0x07ff07ff,
+   0x070707ff};
 
 /* current line pattern */
 static unsigned long *CT_pattern = &CT_lines[0];
@@ -525,7 +523,7 @@ int last;
       yy0=yy1=y;
       CT_penon=1;
     }
-    *CT_pattern = ((*CT_pattern)>>1) | 0x80000000U; /* rotate the pattern */
+    *CT_pattern = ((*CT_pattern)>>1) | 0x80000000; /* rotate the pattern */
     if(last) { /* draw the line anyway if this is the last point */
       TEK40move(xx0,yy0);
       TEK40vector(xx1,yy1);

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: contour.c,v 1.30 1998/03/22 23:31:04 drd Exp $";
+static char *RCSid = "$Id: contour.c,v 1.31 1998/04/14 00:15:15 drd Exp $";
 #endif
 
 /* GNUPLOT - contour.c */
@@ -46,10 +46,8 @@ static char *RCSid = "$Id: contour.c,v 1.30 1998/03/22 23:31:04 drd Exp $";
  *
  */
 
-#include <math.h> /* get prototype for sqrt */
 #include "plot.h"
 #include "setshow.h"
-#include <stdio.h>
 
 #define DEFAULT_NUM_APPROX_PTS  5
 #define DEFAULT_BSPLINE_ORDER  3
@@ -141,9 +139,9 @@ static int fuzzy_equal __PROTO((struct cntr_struct *p_cntr1,
 static void gen_triangle __PROTO((int num_isolines, 
     struct iso_curve *iso_lines, struct poly_struct **p_polys, 
     struct edge_struct **p_edges));
-static void calc_min_max(int num_isolines, struct iso_curve *iso_lines,
-    double *x_min, double *y_min, double *z_min,
-    double *x_max, double *y_max, double *z_max);
+static void calc_min_max __PROTO((int num_isolines,
+    struct iso_curve *iso_lines, double *x_min, double *y_min, double *z_min,
+    double *x_max, double *y_max, double *z_max));
 static struct edge_struct *add_edge __PROTO((struct coordinate GPHUGE *point0,
     struct coordinate GPHUGE *point1, struct edge_struct **p_edge, 
     struct edge_struct **pe_tail));

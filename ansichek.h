@@ -1,4 +1,4 @@
-/* $Id: ansichek.h,v 1.12 1998/03/22 22:31:17 drd Exp $ */
+/* $Id: ansichek.h,v 1.13 1998/04/14 00:14:48 drd Exp $ */
 
 /* GNUPLOT - ansichek.h */
 
@@ -44,22 +44,27 @@
 #ifndef ANSI_CHECK_H
 #define ANSI_CHECK_H
 
-#ifndef AUTOCONF
-/* configure already tested the ANSI feature */
-
-#if !defined(ANSI_C) && defined(__STDC__) && __STDC__
+#if defined(__STDC__) && __STDC__
+# ifndef ANSI_C
 #define ANSI_C
-#endif
+# endif /* ANSI_C */
+#endif /* __STDC__ */
 
 /* are all these compiler tests necessary ? - can the makefiles not
  * just set ANSI_C ?
  */
+/* must encapsulate HAVE_CPP_STRINGIFY to avoid having it defined
+ * on autoconfiscated platforms where it's unavailable
+ */ 
 
 #if defined(ANSI_C) || defined(__TURBOC__) || defined (__PUREC__) || defined (__ZTC__) || defined (_MSC_VER) || (defined(OSK) && defined(_ANSI_EXT))
-#define PROTOTYPES
-#endif
-
-#endif /* AUTOCONF */
+# ifndef PROTOTYPES
+#  define PROTOTYPES
+# endif /* PROTOTYPES */
+# ifndef HAVE_CPP_STRINGIFY
+#  define HAVE_CPP_STRINGIFY
+# endif
+#endif /* ANSI_C ... */
 
 /* used to be __P be it was just too difficult to guess whether
  * standard headers define it. It's not as if the defn is
@@ -67,9 +72,9 @@
  */
 
 #ifdef PROTOTYPES
-#define __PROTO(proto) proto
+# define __PROTO(proto) proto
 #else
-#define __PROTO(proto) ()
+# define __PROTO(proto) ()
 #endif
 
 
@@ -83,7 +88,7 @@
  */
 
 #ifndef ANSI_C
-#define const
+# define const
 #endif
 
 #endif /* ANSI_CHECK_H */

@@ -1,5 +1,5 @@
 #ifndef lint
-static char    *RCSid = "$Id: datafile.c,v 1.41 1998/03/22 23:31:06 drd Exp $";
+static char    *RCSid = "$Id: datafile.c,v 1.42 1998/04/14 00:15:17 drd Exp $";
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -139,13 +139,6 @@ static char    *RCSid = "$Id: datafile.c,v 1.41 1998/03/22 23:31:06 drd Exp $";
  */
 /*}}}*/
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
-#include <ctype.h>
-#include <time.h>
-#include <assert.h>
-
 #include "plot.h"
 #include "fnproto.h"  /* check prototypes against our defns */
 #include "binary.h"
@@ -232,6 +225,7 @@ typedef struct df_column_struct {
 static df_column_struct *df_column=NULL; /* we'll allocate space as needed */
 static int df_max_cols=0; /* space allocated */
 static int df_no_cols;    /* cols read */
+static int fast_columns;	/* corey@cac optimization */
 
 /* external variables we need */
 
@@ -246,130 +240,6 @@ extern char dummy_var[MAX_NUM_VAR][MAX_ID_LEN+1];
 extern char c_dummy_var[MAX_NUM_VAR][MAX_ID_LEN+1];
 
 extern double min_array[], max_array[];
-/*}}}*/
-
-/*{{{  replacement sscanf for purec*/
-#ifdef __PUREC__
-/*
- * a substitute for PureC's buggy sscanf.
- * this uses the normal sscanf and fixes the following bugs:
- * - whitespace in format matches whitespace in string, but doesn't
- *   require any. ( "%f , %f" scans "1,2" correctly )
- * - the ignore value feature works (*). this created an address error
- *   in PureC.
- */
-
-#include <stdarg.h>
-#include <string.h>
-
-int purec_sscanf( const char *string, const char *format, ... )
-{
-  va_list args;
-  int cnt=0;
-  char onefmt[256];
-  char buffer[256];
-  const char *f=format;
-  const char *s=string;
-  char *f2;
-  char ch;
-  int ignore;
-  void *p;
-  int *ip;
-  int pos;
-
-  va_start(args,format);
-  while( *f && *s ) {
-    ch=*f++;
-    if( ch!='%' ) {
-      if(isspace(ch)) {
-        /* match any number of whitespace */
-        while(isspace(*s)) s++;
-      } else {
-        /* match exactly the character ch */
-        if( *s!=ch ) goto finish;
-        s++;
-      }
-    } else {
-      /* we have got a '%' */
-      ch=*f++;
-      if( ch=='%' ) {
-        /* match exactly % */
-        if( *s!=ch ) goto finish;
-        s++;
-      } else {
-        f2=onefmt;
-        *f2++='%';
-        *f2++=ch;
-        ignore=0;
-        if( ch=='*' ) {
-          ignore=1;
-          ch=f2[-1]=*f++;
-        }
-        while( isdigit(ch) ) {
-          ch=*f2++=*f++;
-        }
-        if( ch=='l' || ch=='L' || ch=='h' ) {
-          ch=*f2++=*f++;
-        }
-        switch(ch) {
-          case '[':
-            while( ch && ch!=']' ) {
-              ch=*f2++=*f++;
-            }
-            if( !ch ) goto error;
-            break;
-          case 'e':
-          case 'f':
-          case 'g':
-          case 'd':
-          case 'o':
-          case 'i':
-          case 'u':
-          case 'x':
-          case 'c':
-          case 's':
-          case 'p':
-          case 'n': /* special case handled below */
-            break;
-          default:
-            goto error;
-        }
-        if( ch!='n' ) {
-          strcpy(f2,"%n");
-          if( ignore ) {
-            p=buffer;
-          } else {
-            p=va_arg(args,void *);
-          }
-          switch( sscanf( s, onefmt, p, &pos ) ) {
-            case EOF: goto error;
-            case  0 : goto finish;
-          }
-          if( !ignore ) cnt++;
-          s+=pos;
-        } else {
-          if( !ignore ) {
-            ip=va_arg(args,int *);
-            *ip=(int)(s-string);
-          }
-        }
-      }
-    }
-  }
-
-  if( !*f ) goto finish;
-
-error:
-  cnt=EOF;
-finish:
-  va_end(args);
-  return cnt;
-}
-
-/* use the substitute now. I know this is dirty trick, but it works. */
-#define sscanf purec_sscanf
-
-#endif /* __PUREC__ */
 /*}}}*/
 
 
@@ -452,12 +322,42 @@ char *s;
 #else
 			/* cannot trust strtod - eg strtod("-",&p) */
 			int used;
-			int count = sscanf(s, "%lf%n", &df_column[df_no_cols].datum, &used);
+			int count;
+			int dfncp1 = df_no_cols+1;
+
+/*
+ * optimizations by Corey Satten, corey@cac.washington.edu
+ */
+			if (fast_columns == 0 ||
+			    df_no_use_specs > 0 && (use_spec[0].column == dfncp1 ||
+			    df_no_use_specs > 1 && (use_spec[1].column == dfncp1 ||
+			    df_no_use_specs > 2 && (use_spec[2].column == dfncp1 ||
+			    df_no_use_specs > 3 && (use_spec[3].column == dfncp1 ||
+			    df_no_use_specs > 5 && (use_spec[5].column == dfncp1 ||
+			    df_no_use_specs > 5))))) ||
+			    df_no_use_specs == 0) {
+			
+#ifdef FORTRAN_NUMS
+				count = sscanf(s, "%lf%n", &df_column[df_no_cols].datum, &used);
+#else
+				while (isspace(*s)) ++s;
+				count = *s ? 1 : 0;
+				df_column[df_no_cols].datum = atof(s);
+#endif /* FORTRAN_NUMS */
+				}
+			else {
+				/* skip any space at start of column */
+				while (isspace(*s)) ++s;
+				count = *s ? 1 : 0;
+				/* skip chars to end of column */
+				for (used=0; !isspace(*s) && (*s != '\0'); ++used, ++s) ;
+			    }
 
 			/* it might be a fortran double or quad precision. 'used'
 			 * is only safe if count is 1
 			 */
 			 
+#ifdef FORTRAN_NUMS
 			if (count==1 &&
 			    (s[used]=='d' || s[used]=='D' || s[used]=='q' || s[used]=='Q')
 			   ) {
@@ -466,6 +366,7 @@ char *s;
 				/* and try again */
 				count = sscanf(s, "%lf", &df_column[df_no_cols].datum);
 			}
+#endif /* FORTRAN_NUMS */
 #endif
 			df_column[df_no_cols].good = count==1 ? DF_GOOD : DF_BAD;
 		}
@@ -578,6 +479,8 @@ int max_using;
 	int i;
 	int name_token;
 	
+	fast_columns = 1;		/* corey@cac */
+	
 	/*{{{  close file if necessary*/
 	if (data_fp)
 		df_close();
@@ -680,6 +583,7 @@ int max_using;
 	if (almost_equals(c_token, "ev$ery")) {
 		struct value a;
 	
+		fast_columns = 0; 	/* corey@cac */
 		/* allow empty fields - every a:b:c::e
 		 * we have already established the defaults
 		 */
@@ -772,6 +676,7 @@ int max_using;
 				}
 				else if (equals(c_token, "("))
 				{
+					fast_columns = 0;	/* corey@cac */
 					dummy_func=NULL;  /* no dummy variables active */
 					use_spec[df_no_use_specs++].at = perm_at();  /* it will match ()'s */
 				}

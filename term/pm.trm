@@ -34,10 +34,7 @@
  * to the extent permitted by applicable law.
 ]*/
 
-
-#ifndef GOT_DRIVER_H
 #include "driver.h"
-#endif
 
 #ifdef TERM_REGISTER
 register_term(pm)
@@ -581,7 +578,7 @@ START_HELP(pm)
 "",
 " If `widelines` is specified, all plots will be drawn with wide lines.  If",
 " `enhanced` is specified, sub- and superscripts and multiple fonts are",
-" enabled using the same syntax as the `enhanced postscript` option (see"
+" enabled using the same syntax as the `enhanced postscript` option (see",
 " `set terminal postscript enhanced` for details).  Font names for the basic",
 " PostScript fonts may be abbreviated to single letters.",
 "",

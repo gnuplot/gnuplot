@@ -1,5 +1,5 @@
 /*
- * $Id: ai.trm,v 1.17 1998/03/22 22:34:29 drd Exp $
+ * $Id: ai.trm,v 1.18 1998/04/14 00:17:28 drd Exp $
  *
  */
 
@@ -61,9 +61,7 @@
 /* Compatiblity with Illustrator 7.0, David C. Schooley, 6/5/95 */
 /* Font and size support for labels, David C. Schooley, 6/5/95 */
 
-#ifndef GOT_DRIVER_H
 #include "driver.h"
-#endif
 
 #ifdef TERM_REGISTER
 register_term(aifm)

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: term.c,v 1.102 1998/03/22 22:32:14 drd Exp $";
+static char *RCSid = "$Id: term.c,v 1.103 1998/04/14 00:16:25 drd Exp $";
 #endif
 
 /* GNUPLOT - term.c */
@@ -75,18 +75,7 @@ static char *RCSid = "$Id: term.c,v 1.102 1998/03/22 22:32:14 drd Exp $";
   */
 
 
-#include <ctype.h>
-#include <math.h>
-
-#define TRACE(x)  /*printf x*/
-
-
-#include "driver.h" /* gets plot.h, setshow.h, bitmap.h */
-
-
-#ifdef OS2
-#include <stdlib.h>
-#endif /* OS2 */
+#include "driver.h" /* gets plot.h, setshow.h, bitmap.h, stdfn.h */
 
 #ifdef _Windows
 FILE * open_printer __PROTO((void));  /* in wprinter.c */
@@ -95,10 +84,10 @@ void close_printer __PROTO((FILE *outfile));
 #include <malloc.h>
 #else
 #include <alloc.h>
-#endif
-#endif
+#endif /* MSC */
+#endif /* _Windows */
 
-#ifdef vms
+#ifdef VMS
 /* for a quiet life */
 extern sys$crembx();
 extern sys$assign();
@@ -107,7 +96,7 @@ extern sys$qio();
 extern sys$qiow();
 extern void lib$signal();
 extern unsigned int lib$spawn();
-#endif
+#endif /* VMS */
 
 #if 0 /* defined in driver.h */
 /* for use by all drivers */
@@ -152,7 +141,7 @@ char *ztc_init();
 /* #undef TGIF */
 #endif
 
-#ifdef vms
+#ifdef VMS
 char *vms_init();
 void vms_reset();
 void term_mode_tek();
@@ -161,9 +150,9 @@ void term_pasthru();
 void term_nopasthru();
 void fflush_binary();
 #define FOPEN_BINARY(file) fopen(file, "wb", "rfm=fix", "bls=512", "mrs=512")
-#else /* vms */
+#else /* VMS */
 #define FOPEN_BINARY(file) fopen(file, "wb")
-#endif
+#endif /* VMS */
 
 
 /* This is needed because the unixplot library only writes to stdout. */
@@ -192,7 +181,7 @@ static TBOOLEAN pipe_open = FALSE;
 
 static void term_close_output()
 {
-	TRACE(("term_close_output\n"));
+	FPRINTF(("term_close_output\n"));
 	
 	opened_binary = FALSE;
 	
@@ -226,7 +215,7 @@ char *dest;
 {
 	FILE *f;
 
-	TRACE(("term_set_output\n"));
+	FPRINTF(("term_set_output\n"));
 	assert(dest == NULL || dest != outstr);
 
 	 if (multiplot) {
@@ -291,7 +280,7 @@ char *dest;
 
 void term_init()
 {
-	TRACE(("term_init()\n"));
+	FPRINTF(("term_init()\n"));
 	
 	if (!term)
 		int_error("No terminal defined", NO_CARET);
@@ -312,7 +301,7 @@ void term_init()
 			 */
 			char *temp = gp_alloc(strlen(outstr+1), "temp file string");
 			if (temp) {
-				TRACE(("term_init : reopening \"%s\" as %s\n",
+				FPRINTF(("term_init : reopening \"%s\" as %s\n",
 				   outstr, term->flags & TERM_BINARY ? "binary" : "text"));
 				strcpy(temp, outstr);
 				term_set_output(temp); /* will free outstr */
@@ -332,7 +321,7 @@ void term_init()
 
 	if (!term_initialised || term_force_init )
 	{
-		TRACE(("- calling term->init()\n"));
+		FPRINTF(("- calling term->init()\n"));
 		(*term->init)();
 		term_initialised = TRUE;
 	}
@@ -341,18 +330,18 @@ void term_init()
 
 void term_start_plot()
 {
-	TRACE(("term_start_plot()\n"));
+	FPRINTF(("term_start_plot()\n"));
 
 	if (!term_initialised)
 		term_init();
 	
 	if (!term_graphics) {
-		TRACE(("- calling term->graphics()\n"));
+		FPRINTF(("- calling term->graphics()\n"));
 		(*term->graphics)();
 		term_graphics = TRUE;
 	} else if (multiplot && term_suspended) {
 		if (term->resume) {
-			TRACE(("- calling term->resume()\n"));
+			FPRINTF(("- calling term->resume()\n"));
 			(*term->resume)();
 		}
 		term_suspended = FALSE;
@@ -361,29 +350,29 @@ void term_start_plot()
 
 void term_end_plot()
 {
-	TRACE(("term_end_plot()\n"));
+	FPRINTF(("term_end_plot()\n"));
 
 	if (!term_initialised)
 		return;
 		
 	if (!multiplot) {
-		TRACE(("- calling term->text()\n"));
+		FPRINTF(("- calling term->text()\n"));
 		(*term->text)();
 		term_graphics = FALSE;
 	}
 
-#ifdef vms
+#ifdef VMS
 	if (opened_binary)
 		fflush_binary();
 	else
-#endif
+#endif /* VMS */
 
 	(void) fflush(outfile);
 }
 
 void term_start_multiplot()
 {
-	TRACE(("term_start_multiplot()\n"));
+	FPRINTF(("term_start_multiplot()\n"));
 	if (multiplot)
 		term_end_multiplot();
 
@@ -393,7 +382,7 @@ void term_start_multiplot()
 
 void term_end_multiplot()
 {
-	TRACE(("term_end_multiplot()\n"));
+	FPRINTF(("term_end_multiplot()\n"));
 	if (!multiplot)
 		return;
 
@@ -413,10 +402,10 @@ void term_end_multiplot()
 
 static void term_suspend()
 {
-	TRACE(("term_suspend()\n"));
+	FPRINTF(("term_suspend()\n"));
 	if (term_initialised && !term_suspended && term->suspend)
 	{
-		TRACE(("- calling term->suspend()\n"));
+		FPRINTF(("- calling term->suspend()\n"));
 		(*term->suspend)();
 		term_suspended = TRUE;
 	}
@@ -424,7 +413,7 @@ static void term_suspend()
 
 void term_reset()
 {
-	TRACE(("term_reset()\n"));
+	FPRINTF(("term_reset()\n"));
 
 	if (!term_initialised)
 		return;
@@ -433,7 +422,7 @@ void term_reset()
 	{
 		if (term->resume)
 		{
-			TRACE(("- calling term->resume()\n"));
+			FPRINTF(("- calling term->resume()\n"));
 			(*term->resume)();
 		}
 		term_suspended = FALSE;
@@ -486,7 +475,7 @@ struct lp_style_type *lp;
 void term_check_multiplot_okay(interactive)
 TBOOLEAN interactive;
 {
-	TRACE(("term_multiplot_okay(%d)\n", interactive));
+	FPRINTF(("term_multiplot_okay(%d)\n", interactive));
 
 	if (!term_initialised)
 		return; /* they've not started yet */
@@ -984,9 +973,9 @@ void init_terminal()
 	  term_name = ztc_init();
 #endif
 
-#ifdef vms
+#ifdef VMS
 	   term_name = vms_init();
-#endif
+#endif /* VMS */
 
 #ifdef NEXT
 	term = getenv("TERM");
@@ -1026,7 +1015,7 @@ void init_terminal()
 		term_name = "x11";
 #endif /* x11 */
 
-#if defined(AMIGA_SC_6_1) || defined(AMIGA_AC_5) || defined(__amigaos__)
+#ifdef AMIGA
 	   term_name = "amiga";
 #endif
 
@@ -1338,7 +1327,7 @@ reopen_binary()
 #endif
 #endif /* 0 */
 
-#ifdef vms
+#ifdef VMS
 /* these are needed to modify terminal characteristics */
 #include <descrip.h>
 #include <iodef.h>
@@ -1348,6 +1337,9 @@ reopen_binary()
 #include <ssdef.h>
 #include <stat.h>
 #include <fab.h>
+#ifndef TT2$M_DECCRT3         /* VT300 not defined as of VAXC v2.4 */
+#define TT2$M_DECCRT3 0X80000000
+#endif 
 static unsigned short   chan;
 static int  old_char_buf[3], cur_char_buf[3];
 $DESCRIPTOR(sysoutput_desc,"SYS$OUTPUT");
@@ -1493,4 +1485,4 @@ fflush_binary()
        fflush(outfile);
    }
 }
-#endif
+#endif /* VMS */

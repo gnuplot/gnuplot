@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.62 1997/12/16 23:01:31 drd Exp $
+C RCS $Id: gnuplot.doc,v 1.63 1998/04/14 00:17:08 drd Exp $
 C 10 October 1997
 C Copyright (C) 1986 - 1993, 1997   Thomas Williams, Colin Kelley
 C
@@ -386,7 +386,7 @@ C
  is itself overridden by the .gnuplot (or equivalent) start-up file (see
  `start-up`) and, of course, by later explicit changes.
 
- On Unix, AmigaDOS, AtariTOS, MS-DOS and OS/2, GNUHELP may be defined to be
+ On Unix, AmigaOS, AtariTOS, MS-DOS and OS/2, GNUHELP may be defined to be
  the pathname of the HELP file (gnuplot.gih).
 
  On VMS, the logical name gnuplot$HELP should be defined as the name of the
@@ -395,13 +395,13 @@ C
  if desired.
 
  On Unix, HOME is used as the name of a directory to search for a .gnuplot
- file if none is found in the current directory.  On AmigaDOS, AtariTOS,
+ file if none is found in the current directory.  On AmigaOS, AtariTOS,
  MS-DOS and OS/2, gnuplot is used.  On VMS, SYS$LOGIN: is used. See `help
  start-up`.
 
  On Unix, PAGER is used as an output filter for help messages.
 
- On Unix, AtariTOS and AmigaDOS, SHELL is used for the `shell` command.  On
+ On Unix, AtariTOS and AmigaOS, SHELL is used for the `shell` command.  On
  MS-DOS and OS/2, COMSPEC is used for the `shell` command.
 
  On MS-DOS, if the BGI interface is used, BGI is used to point to the full
@@ -1160,9 +1160,9 @@ C ... and restart the table:
 ?start
 ?.gnuplot
  When `gnuplot` is run, it looks for an initialization file to load.  This
- file is called `.gnuplot` on Unix and AmigaDOS systems, and `GNUPLOT.INI`
+ file is called `.gnuplot` on Unix and AmigaOS systems, and `GNUPLOT.INI`
  on other systems.  If this file is not found in the current directory, the
- program will look for it in the home directory (under AmigaDOS,
+ program will look for it in the home directory (under AmigaOS,
  Atari(single)TOS, MS-DOS and OS/2, the environment variable `gnuplot` should
  contain the name of this directory).  Note: if NOCWDRC is defined during the
  installation, `gnuplot` will not read from the current directory.
@@ -1401,26 +1401,40 @@ C ... and restart the table:
            '<datafile>' {datafile-modifiers}
             via {'<parameter file>' | <var1>,<var2>,...}
 
- Notice that `via` is now a required keyword, to distinguish it from a 'scanf'
- format string.
+ [xrange] and [yrange] are of the form [{variable=}{<min>}{:<max>}],
+ allowing the range of the fit to be limited temporarily in a manner
+ analogous to `plot`.  <function> is any valid `gnuplot` expression,
+ although it is usual to use a previously user-defined function of the
+ form f(x) or f(x,y).  <datafile> is treated as in the `plot` command.
+ All the modifiers for data files (`using`, `every`,...) in `plot` are
+ available here (except `smooth`)---see `plot datafile` for full
+ details.  
 
- [xrange] and [yrange] are of the form [{variable=}{<min>}{:<max>}], allowing
- the range of the fit to be limited temporarily in a manner analogous to
- `plot`.  <function> is any valid `gnuplot` expression, although it is usual
- to use a previously user-defined function of the form f(x) or f(x,y).
- <datafile> is treated as in the `plot` command.  All the modifiers for
- datafiles (`using`, `every`,...) in `plot` are available here (except
- `smooth`)---see `plot datafile` for full details.  The default columns for x
- and y are 1 and 2.  These may be changed by the `using x:y` mechanism.  If
- `using` has a third entry (a column or an expression), it will be interpreted
- as the standard deviation of each y value and will be used to compute the
- weight; otherwise all data will be weighted equally.  If four columns are
- specified, they are x:y:z:error---note that an error _must_ be specified in
- order to perform a 3-d fit.  If errors are not available, a constant value
- can be specified, e.g., `using ...:(1)`.
+ The default columns for x and y are 1 and 2.  These may be changed 
+ by the `using x:y` mechanism.
 
- Initial values for the parameters to be fit may be specified in a (load-)file
- wherein each line is of the form:
+ If `using` has a third entry (a column or an expression), it will be
+ used as the standard deviation of each y value, or 'y-error' for
+ short. This will be used to weight the y values and compute the errors
+ in the final parameter values. See `fit errors` for further
+ explanations.
+
+ If four columns are specified, they are x:y:z:error. This is for
+ fitting a function of _two_ variables x and y, to a 3-dimensional
+ data set. It can also be used to fit a combination of multiple 
+ functions to a similar combine of data files, by using a pseudo
+ column number of -1 or -2 instead of y (The fit demo contains an
+ example of this kind). `fit` needs four columns to distinguish 
+ this from the previously described cases, so  you will have to 
+ specify the default of `using ...:(1)` explicitly here, if no
+ input data errors are available.
+
+ The last item on the `fit` command line holds the list of parameters
+ to fit, in one of two possible forms, both starting with the keyword
+ `via`. 
+
+ The first form, `via 'filename'`, works by parsing the given file and
+ reading lines of the following syntax from it:
 
        varname = value
 
@@ -5536,12 +5550,12 @@ C ... and restart the table:
 ?shell
  The `shell` command spawns an interactive shell.  To return to `gnuplot`,
  type `logout` if using VMS, `exit` or the END-OF-FILE character if using
- Unix, `endcli` if using AmigaDOS, or `exit` if using MS-DOS or OS/2.
+ Unix, `endcli` if using AmigaOS, or `exit` if using MS-DOS or OS/2.
 
  A single shell command may be spawned by preceding it with the ! character
  ($ if using VMS) at the beginning of a command line.  Control will return
  immediately to `gnuplot` after this command is executed.  For example, in
- Unix, AmigaDOS, MS-DOS or OS/2,
+ Unix, AmigaOS, MS-DOS or OS/2,
 
        ! dir
 

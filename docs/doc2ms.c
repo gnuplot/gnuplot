@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: doc2ms.c,v 1.17 1997/07/22 23:24:21 drd Exp $";
+static char *RCSid = "$Id: doc2ms.c,v 1.18 1998/04/14 00:17:00 drd Exp $";
 #endif
 
 /* GNUPLOT - doc2ms.c */
@@ -47,14 +47,8 @@ static char *RCSid = "$Id: doc2ms.c,v 1.17 1997/07/22 23:24:21 drd Exp $";
 #include "config.h"
 #endif
 
-#include <stdio.h>
-#include <ctype.h>
-
 #include "ansichek.h"
-
-#ifndef NO_STDLIB_H
-#include <stdlib.h>
-#endif
+#include "stdfn.h"
 
 #define MAX_NAME_LEN	256
 #define MAX_LINE_LEN	256
@@ -75,11 +69,11 @@ typedef int boolean;
 
 static boolean intable = FALSE;
 
-#ifndef ALL_TERM
-#define ALL_TERM
+#ifndef ALL_TERM_DOC
+#define ALL_TERM_DOC
 #endif
 
-#define GOT_DRIVER_H
+#define TERM_DRIVER_H
 #include "termdoc.c"
 
 int main(argc,argv)

@@ -1,6 +1,6 @@
-/* $Id: driver.h,v 1.7 1998/03/22 22:34:34 drd Exp $ */
+/* $Id: driver.h,v 1.8 1998/04/14 00:17:36 drd Exp $ */
 
-/* GNUPLOT - driver.h  $Id: driver.h,v 1.7 1998/03/22 22:34:34 drd Exp $ */
+/* GNUPLOT - driver.h  $Id: driver.h,v 1.8 1998/04/14 00:17:36 drd Exp $ */
 
 /*[
  * Copyright 1986 - 1993, 1998   Thomas Williams, Colin Kelley
@@ -33,14 +33,17 @@
 ]*/
 
 
-#ifndef GOT_DRIVER_H
+#ifndef TERM_DRIVER_H
 
-#define GOT_DRIVER_H
+#define TERM_DRIVER_H
 #define GOT_TERM_DRIVER /* I started using this name for some reason */
 
 #include "plot.h"
 #include "bitmap.h"
 #include "setshow.h"
+
+/* corey@cac added the next line for efficiency */
+#define fputc putc
 
 /* functions provided by in term.c */
 
@@ -69,7 +72,7 @@ static int sign(int x)
 {
   return x >=0 ? 1 : -1;
 }
-#endif
+#endif /* NEXT */
 
 /* abs as macro is now uppercase, there are conflicts with a few C compilers
    that have abs as macro, even though ANSI defines abs as function
@@ -78,11 +81,11 @@ static int sign(int x)
    all calls are done via the macro */
 #ifndef ABS
 #define ABS(x) ((x) >= 0 ? (x) : -(x))
-#endif
+#endif /* ABS */
 
 /*  GPMIN/GPMAX are already defined in "plot.h"  */
 
 #define NICE_LINE		0
 #define POINT_TYPES		6
 
-#endif
+#endif /* TERM_DRIVER_H */

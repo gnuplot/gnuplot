@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: cgm.trm,v 1.14 1998/03/22 22:34:32 drd Exp $
+ * $Id: cgm.trm,v 1.15 1998/04/14 00:17:34 drd Exp $
  */
 
 /* GNUPLOT - cgm.trm */
@@ -51,9 +51,7 @@
  * send your comments or suggestions to (info-gnuplot@dartmouth.edu).
 */
 
-#ifndef GOT_DRIVER_H
 #include "driver.h"
-#endif
 
 #ifdef TERM_REGISTER
 register_term(cgm)
@@ -149,7 +147,7 @@ static int cgm_step = 0;	/* amount of current dash not yet
 static int cgm_tic, cgm_tic707, cgm_tic866, cgm_tic500, cgm_tic1241, 
 	cgm_tic1077, cgm_tic621; /* marker dimensions */
 	/* Each font string is preceded by a byte with its length */
-static char cgm_font_data[]={"\
+static char GPFAR cgm_font_data[]={"\
 \005Arial\
 \014Arial Italic\
 \012Arial Bold\
@@ -199,7 +197,7 @@ TERM_PUBLIC void CGM_graphics()
 {
   register struct termentry *t = term;
   static int version_data[] = {1};
-  static char description_data[] = 
+  static char GPFAR description_data[] =
     "Computer Graphics Metafile version of Gnuplot";
   static int vdc_type_data[] = {0};
   static int integer_precision_data[] = {16};
@@ -210,7 +208,7 @@ TERM_PUBLIC void CGM_graphics()
   static int maximum_color_index_data_data[] = {CGM_COLORS};
   static int scaling_mode_data[] = {0, 0, 0};
   static int color_value_extent_data[] = {0, 0, 0, 255, 255, 255};
-  static int color_table_data[] =
+  static int GPFAR color_table_data[] =
 /* for testing
     {
       8, 0,0,0, 64,64,64, 128,128,128, 196,196,196, 0,255,255, 255,0,255, 
@@ -234,7 +232,7 @@ TERM_PUBLIC void CGM_graphics()
   static int line_type_data[]={1};
   static int interior_style_data[]={1};	/* 1=filled */
 
-  static int elements_list_data[] = {
+  static int GPFAR elements_list_data[] = {
     0,				/* will be set to # elements in this list */
     0,  1,			/* Begin Metafile */
     0,  2,			/* End Metafile */
@@ -604,7 +602,9 @@ static void CGM_write_int(value)
 {	
   union {short s; char c[2];} u;
 
+#if !defined(DOS16) && !defined(WIN16)
   assert(-32768 <= value && value <= 32767);
+#endif
 
   u.c[0] = (value >> 8) & 255;	/* convert to network order */
   u.c[1] = value & 255;

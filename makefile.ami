@@ -1,5 +1,5 @@
 #
-# $Id: makefile.ami,v 1.15 1997/03/09 23:50:06 drd Exp $
+# $Id: makefile.ami,v 1.16 1998/04/14 00:15:50 drd Exp $
 #
 #
 #
@@ -23,7 +23,7 @@ EMAIL="bug-gnuplot@dartmouth.edu"
 #
 #
 CC     = cc
-CFLAGS = -mcd -DNOGAMMA -DAMIGA_AC_5 -DNO_FLOAT_H -fa -sab -wosw -MR
+CFLAGS = -mcd -DAMIGA_AC_5 -DNO_FLOAT_H -fa -sab -wosw -MR
 
 # note that current versions of Aztec may very well have float.h
 # if anyone can verify this, please fix it.
@@ -43,16 +43,16 @@ TERMFLAGS = -Iterm -I.
 # List of object files except term.o, version.o
 #
 OBJS = binary.o bitmap.o command.o contour.o eval.o graphics.o \
-	   graph3d.o help.o internal.o misc.o parse.o plot.o plot2d.c plot3d.c scanner.o \
-	   set.o show.o specfun.o standard.o util.o interpol.o fit.o matrix.o \
-	   datafile.o alloc.o
+	   graph3d.o help.o internal.o misc.o parse.o plot.o plot2d.o \
+	   plot3d.o scanner.o set.o show.o specfun.o standard.o stdfn.o \
+	   util.o interpol.o fit.o matrix.o datafile.o alloc.o
 
 #
 # List of sources
 #
 CSOURCE1 = binary.c command.c setshow.c 
 CSOURCE2 = help.c graphics.c graph3d.c internal.c 
-CSOURCE3 = misc.c eval.c parse.c plot.c plot2d.c plot3d.c readline.c scanner.c standard.c 
+CSOURCE3 = misc.c eval.c parse.c plot.c plot2d.c plot3d.c readline.c scanner.c standard.c stdfn.c
 CSOURCE4 = bitmap.c term.c util.c version.c fit.c matrix.c
 CSOURCE5 = term/amiga.trm term/aed.trm term/cgi.trm term/dumb.trm term/dxf.trm \
 	term/dxy.trm term/eepic.trm term/epson.trm term/fig.trm \

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: time.c,v 1.10 1998/03/22 22:32:18 drd Exp $";
+static char *RCSid = "$Id: time.c,v 1.11 1998/04/14 00:16:27 drd Exp $";
 #endif
 
 /* GNUPLOT - time.c */
@@ -48,11 +48,9 @@ static char *RCSid = "$Id: time.c,v 1.10 1998/03/22 22:32:18 drd Exp $";
  */
 
 
-#include <time.h>
-#include <assert.h>
+#include "plot.h"
 
 #ifdef TEST_TIME  /* build as a standalone test */
-#include "plot.h"
 #include <sys/timeb.h>  /* for linux */
 #define int_error(x,y) fprintf(stderr, "Error: " x "\n")
 #define int_warn(x,y) fprintf(stderr, "Warn: " x "\n")
@@ -70,18 +68,11 @@ extern char *full_month_names[];
 extern char *abbrev_day_names[];
 extern char *full_day_names[];
 
-#else
+#else /* TEST_TIME */
 
-#include "plot.h"
 #include "setshow.h" /* for month names etc */
 
 #endif /* TEST_TIME */
-
-#ifdef DEBUGGING
-#define DEBUG(x) printf x
-#else
-#define DEBUG(x) /*nothing*/
-#endif
 
 static char *read_int __PROTO((char *s, int nr, int *d));
 static int gdysize __PROTO((int yr));
@@ -261,7 +252,7 @@ struct tm *tm;
 		fmt++;
 	}
 
-	DEBUG(("read date-time : %d/%d/%d:%d:%d:%d\n", tm->tm_mday, tm->tm_mon+1, tm->tm_year, tm->tm_hour, tm->tm_min, tm->tm_sec));
+	FPRINTF((stderr,"read date-time : %d/%d/%d:%d:%d:%d\n", tm->tm_mday, tm->tm_mon+1, tm->tm_year, tm->tm_hour, tm->tm_min, tm->tm_sec));
 
 	/* now check the date/time entered, normalising if necessary
 	 * read_int cannot read a -ve number, but can read %m=0 then decrement
@@ -287,7 +278,7 @@ struct tm *tm;
 #undef M
 #undef H
 
-	DEBUG(("normalised time : %d/%d/%d:%d:%d:%d\n", tm->tm_mday, tm->tm_mon+1, tm->tm_year, tm->tm_hour, tm->tm_min, tm->tm_sec));
+	FPRINTF((stderr,"normalised time : %d/%d/%d:%d:%d:%d\n", tm->tm_mday, tm->tm_mon+1, tm->tm_year, tm->tm_hour, tm->tm_min, tm->tm_sec));
 
 	if (date)
 	{
@@ -624,7 +615,7 @@ struct tm *tm;
 	dsec *= 60.0;
 	dsec += tm->tm_sec;
 	
-	DEBUG(("broken-down time : %d/%d/%d:%d:%d:%d = %g seconds\n", tm->tm_mday, tm->tm_mon+1, tm->tm_year, tm->tm_hour, tm->tm_min, tm->tm_sec, dsec));
+	FPRINTF((stderr,"broken-down time : %d/%d/%d:%d:%d:%d = %g seconds\n", tm->tm_mday, tm->tm_mon+1, tm->tm_year, tm->tm_hour, tm->tm_min, tm->tm_sec, dsec));
 
 	return(dsec);
 }
@@ -642,7 +633,7 @@ double clock;
 	
 	int wday = JAN_FIRST_WDAY; /* eg 6 for 2000 */
 	
-	DEBUG(("%g seconds = ", clock));
+	FPRINTF((stderr,"%g seconds = ", clock));
 	
 	tm->tm_year = ZERO_YEAR;
 	tm->tm_mday = tm->tm_yday = tm->tm_mon = tm->tm_hour = tm->tm_min = tm->tm_sec = 0; 
@@ -682,7 +673,7 @@ double clock;
 	}
 	tm->tm_mday = days+1;
 	
-	DEBUG(("broken-down time : %d/%d/%d:%d:%d:%d\n", tm->tm_mday, tm->tm_mon+1, tm->tm_year, tm->tm_hour, tm->tm_min, tm->tm_sec));
+	FPRINTF((stderr,"broken-down time : %d/%d/%d:%d:%d:%d\n", tm->tm_mday, tm->tm_mon+1, tm->tm_year, tm->tm_hour, tm->tm_min, tm->tm_sec));
 
 	return(0);
 }
@@ -730,7 +721,7 @@ char *s;
 char *fmt;
 struct tm *tm;
 {
-	DEBUG(("gstrptime(\"%s\", \"%s\")\n", s, fmt));
+	FPRINTF((stderr,"gstrptime(\"%s\", \"%s\")\n", s, fmt));
 
 	/* linux does not appear to like years before 1902
 	 * NT complains if its before 1970
@@ -774,16 +765,16 @@ struct tm *tm;
 		}
 	}
 
-	DEBUG(("Before mktime : %d/%d/%d:%d:%d:%d\n", tm->tm_mday, tm->tm_mon, tm->tm_year, tm->tm_hour, tm->tm_min, tm->tm_sec));
+	FPRINTF((stderr,"Before mktime : %d/%d/%d:%d:%d:%d\n", tm->tm_mday, tm->tm_mon, tm->tm_year, tm->tm_hour, tm->tm_min, tm->tm_sec));
 	/* mktime range-checks the time */
 
 	if (mktime(tm) == -1)
 	{
-		DEBUG(("mktime() was not happy\n"));
+		FPRINTF((stderr,"mktime() was not happy\n"));
 		int_error("Invalid date/time [mktime() did not like it]", NO_CARET);
 	}
 
-	DEBUG(("After mktime : %d/%d/%d:%d:%d:%d\n", tm->tm_mday, tm->tm_mon, tm->tm_year, tm->tm_hour, tm->tm_min, tm->tm_sec));
+	FPRINTF((stderr,"After mktime : %d/%d/%d:%d:%d:%d\n", tm->tm_mday, tm->tm_mon, tm->tm_year, tm->tm_hour, tm->tm_min, tm->tm_sec));
 
 	return s;
 }

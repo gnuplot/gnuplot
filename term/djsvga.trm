@@ -1,5 +1,5 @@
 /*
- * $Id: djsvga.trm,v 1.16 1998/03/22 22:34:34 drd Exp $
+ * $Id: djsvga.trm,v 1.17 1998/04/14 00:17:36 drd Exp $
  */
 
 /* GNUPLOT - djsvga.trm */
@@ -49,9 +49,13 @@
  *
  */
 
-#ifndef GOT_DRIVER_H
+/* HBB: A new version, called grx21a was released recently. To
+ * tell gnuplot you have it, add '-DGRX21' to your compilation flags.
+ * Currently, that only enables the drawing of wide lines. Maybe more
+ *  to come.
+ */
+
 #include "driver.h"
-#endif
 
 #ifdef TERM_REGISTER
 register_term(djsvga) /* no ; */
@@ -84,6 +88,7 @@ TERM_PUBLIC int DJSVGA_set_font __PROTO((char *fontname));
 TERM_PUBLIC void DJSVGA_suspend __PROTO((void));
 TERM_PUBLIC void DJSVGA_resume __PROTO((void));
 TERM_PUBLIC void DJSVGA_fillbox __PROTO((int style, unsigned int x1, unsigned int y1, unsigned int width, unsigned int height)); /* clear part of multiplot */
+TERM_PUBLIC void DJSVGA_linewidth __PROTO((double linewidth));
 
 #define GOT_DJSVGA_PROTO
 #endif /* TERM_PROTO */
@@ -92,10 +97,6 @@ TERM_PUBLIC void DJSVGA_fillbox __PROTO((int style, unsigned int x1, unsigned in
 #ifdef TERM_BODY
  
 /* SVGA driver using DJGPP */
-/*
- * HBB: This didn't take care of the (quite useful) combination of DJGPP
- * V1 with GRX V2 ! I've changed that (see also makefile.djg)
- */
 #if (DJGPP==2)
 # define GRX20
 #endif
@@ -124,9 +125,12 @@ char DJSVGA_fontname[MAX_ID_LEN+1] = "";
 #else
 char DJSVGA_fontname[MAX_ID_LEN+1] = "@:pc8x14.fnt"; /* EGA bios font */
 #endif
-static GrContext *DJSVGA_context=0;  /* HBB: save screen for suspend/resume */
-static char *dj_textsave=0;          /* HBB: for text-screen-saving */
+static GrContext *DJSVGA_context=0;  /* save screen for suspend/resume */
+static char *dj_textsave=0;          /* for text-screen-saving */
 static int dj_cursorx, dj_cursory;
+#ifdef GRX21
+static double dj_linewidth;          /* store linewidth assignments here */
+#endif
 
 TERM_PUBLIC void DJSVGA_init()
 {
@@ -258,7 +262,13 @@ unsigned int x,y;
 TERM_PUBLIC void DJSVGA_vector(x,y)
 unsigned int x,y;
 {
+#if GRX21
+	GrLineOption dj_lineoption = {dj_color, dj_linewidth, 0, ""};
+
+        GrCustomLine(dj_startx,dj_ylast-dj_starty,x,dj_ylast-y,&dj_lineoption);
+#else
 	GrLine(dj_startx,dj_ylast-dj_starty,x,dj_ylast-y,dj_color);
+#endif
 	dj_startx = x;
 	dj_starty = y;
 }
@@ -373,6 +383,13 @@ unsigned int left, bottom, width, height;
         GrFilledBox(left, dj_ylast-bottom, left+width, dj_ylast-bottom-height, 0);
 }
 
+TERM_PUBLIC void DJSVGA_linewidth(double linewidth)
+{
+#ifdef GRX21
+	dj_linewidth = linewidth;
+#endif
+}
+
 #endif /* TERM_BODY */
 
 #ifdef TERM_TABLE
@@ -392,7 +409,7 @@ TERM_TABLE_START(djsvga_driver)
   0, /* no pointsize() */
   TERM_CAN_MULTIPLOT,
   DJSVGA_suspend, DJSVGA_resume,
-  DJSVGA_fillbox
+  DJSVGA_fillbox, DJSVGA_linewidth
 TERM_TABLE_END(djsvga_driver)
 
 #undef LAST_TERM

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: plot.c,v 1.86 1998/03/22 22:31:55 drd Exp $";
+static char *RCSid = "$Id: plot.c,v 1.87 1998/04/14 00:16:05 drd Exp $";
 #endif
 
 /* GNUPLOT - plot.c */
@@ -45,22 +45,23 @@ static char *RCSid = "$Id: plot.c,v 1.86 1998/03/22 22:31:55 drd Exp $";
 #if defined(MSDOS) || defined(DOS386)
 #include <io.h>
 #endif
+
 /* HBB: for the control87 function, if used with DJGPP V1: */
 #if defined(DJGPP) && (DJGPP!=2)
 #include "ctrl87.h"
 #endif
-/* HBB: for isatty() */
-#if (DJGPP==2)
-#include <unistd.h>
-#endif
-#ifdef vms
+
+#ifdef VMS
 #ifndef __GNUC__
 #include <unixio.h>
 #endif
 #include <smgdef.h>
 extern int vms_vkid;
 extern smg$create_virtual_keyboard();
-#endif
+extern int vms_ktid;
+extern smg$create_key_table();
+#endif /* VMS */
+
 #ifdef AMIGA_SC_6_1
 #include <proto/dos.h>
 #endif
@@ -89,7 +90,6 @@ extern int rl_complete_with_tilde_expansion;
 #endif
 
 #if defined(__TURBOC__) && (defined(MSDOS) || defined(DOS386))  /* patch to get home dir, see command.c */
-#include <string.h>
 char HelpFile[80] ;
 #endif             /*   - DJL */
 
@@ -104,7 +104,6 @@ static jmp_buf far command_line_env;
 static jmp_buf command_line_env;
 #endif
 
-int main __PROTO((int argc, char **argv));
 static void load_rcfile __PROTO((void));
 RETSIGTYPE inter __PROTO((int anint));
 
@@ -180,37 +179,35 @@ struct udft_entry *first_udf = NULL;
 
 
 
-#ifdef vms
-
+#ifdef VMS
 #define HOME "sys$login:"
+#else /* VMS */
 
-#else /* vms */
 #if defined(MSDOS) ||  defined(AMIGA_AC_5) || defined(AMIGA_SC_6_1) || defined(ATARI) || defined(OS2) || defined(_Windows) || defined(DOS386)
 
 #define HOME "GNUPLOT"
 
-#else /* MSDOS || AMIGA || ATARI || OS2 || _Windows || defined(DOS386)*/
+#else /* MSDOS || AMIGA_AC/SC || ATARI || OS2 || _Windows || defined(DOS386)*/
 
 #define HOME "HOME"
 
-#endif /* MSDOS || AMIGA || ATARI || OS2 || _Windows || defined(DOS386)*/
-#endif /* vms */
+#endif /* MSDOS || AMIGA_AC/SC || ATARI || OS2 || _Windows || defined(DOS386)*/
+#endif /* VMS */
 
 #ifdef OS2
 #define INCL_DOS
 #define INCL_REXXSAA
-#include <stdlib.h>
 #include <os2.h>
 #include <process.h>
 ULONG RexxInterface( PRXSTRING, PUSHORT, PRXSTRING ) ;
 int   ExecuteMacro( char* , int) ;  
 #endif
 
-#if defined(unix) || defined(AMIGA_AC_5) || defined(AMIGA_SC_6_1) || defined(__amigaos__) || defined(OSK)
+#if defined(unix) || defined(AMIGA) || defined(OSK)
 #define PLOTRC ".gnuplot"
-#else /* AMIGA || unix */
+#else /* AMIGA || unix || OSK */
 #define PLOTRC "gnuplot.ini"
-#endif /* AMIGA || unix */
+#endif /* AMIGA || unix || OSK */
 
 #if defined(ATARI) || defined(MTOS)
 void appl_exit(void);
@@ -265,7 +262,8 @@ int main(argc, argv)
 #if defined(MSDOS) && !defined(_Windows) && !defined(__GNUC__)
   PC_setup();
 #endif /* MSDOS !Windows */
-#if defined(DJGPP)       /* HBB: disable all floating point exceptions, just keep running... */
+/* HBB: Seems this isn't needed any more for DJGPP V2? */
+#if defined(DJGPP) && (DJGPP!=2)       /* HBB: disable all floating point exceptions, just keep running... */
   _control87(MCW_EM, MCW_EM); 
 #endif
 
@@ -364,10 +362,12 @@ rl_complete_with_tilde_expansion = 1;
 
      if (interactive)
 	  show_version();
-#ifdef vms   /* initialise screen management routines for command recall */
+#ifdef VMS   /* initialise screen management routines for command recall */
           if (status[1] = smg$create_virtual_keyboard(&vms_vkid) != SS$_NORMAL)
                done(status[1]);
-#endif
+	  if (status[1] = smg$create_key_table(&vms_ktid) != SS$_NORMAL)
+	       done(status[1]);
+#endif /* VMS */
 
 	if (!setjmp(command_line_env)) {
 	    /* first time */
@@ -387,7 +387,7 @@ rl_complete_with_tilde_expansion = 1;
 #ifdef _Windows
 	SetCursor(LoadCursor((HINSTANCE)NULL, IDC_ARROW));
 #endif
-#ifdef vms
+#ifdef VMS
 	    /* after catching interrupt */
 	    /* VAX stuffs up stdout on SIGINT while writing to stdout,
 		  so reopen stdout. */
@@ -451,8 +451,7 @@ rl_complete_with_tilde_expansion = 1;
     return(IO_SUCCESS);
 }
 
-#if (defined(ATARI) && defined(__PUREC__)) || (defined(MTOS) && defined(__PUREC__))
-#include <math.h>
+#if (defined(ATARI) || defined(MTOS)) && defined(__PUREC__)
 int purec_matherr(struct exception *e)
 {	char *c;
 	switch (e->type) {
@@ -469,7 +468,7 @@ int purec_matherr(struct exception *e)
 	fprintf(stderr, "    ret  : %e\n", e->retval);
 	return 1;
 }
-#endif
+#endif /* (ATARI || MTOS) && PUREC */
 
 
 /* Set up to catch interrupts */
@@ -500,9 +499,9 @@ static void load_rcfile()
     char const *const ext[] = {NULL};
 #endif
     /* Look for a gnuplot init file in . or home directory */
-#ifdef vms
+#ifdef VMS
     (void) strcpy(home,HOME);
-#else /* vms */
+#else /* VMS */
     char *tmp_home=getenv(HOME);
     char *p;	/* points to last char in home path, or to \0, if none */
     char c='\0';/* character that should be added, or \0, if none */
@@ -530,7 +529,7 @@ static void load_rcfile()
 	    *p='\0';
 	}
     }
-#endif /* vms */
+#endif /* VMS */
 
 #ifdef NOCWDRC
     /* inhibit check of init file in current directory for security reasons */
@@ -540,7 +539,7 @@ static void load_rcfile()
     plotrc = fopen(rcfile,"r");
     if (plotrc == (FILE *)NULL) {
 #endif
-#ifndef vms
+#ifndef VMS
 	if( tmp_home ) {
 #endif
 	   (void) sprintf(rcfile, "%s%s", home, PLOTRC);
@@ -551,15 +550,16 @@ static void load_rcfile()
 	   ini_ptr = findfile(PLOTRC,getenv("GNUPLOTPATH"),ext);
 	   if (ini_ptr)  plotrc = fopen(ini_ptr,"r");
         }
-#endif
-#if !defined(vms) && !defined(ATARI) && !defined(MTOS)
+#endif /* ATARI || MTOS */
+#if !defined(VMS) && !defined(ATARI) && !defined(MTOS)
 	} else
 	   plotrc=NULL;
-#endif
+#endif /* !VMS && !ATARI && !MTOS */
     }
     if (plotrc)
 	 load_file(plotrc, rcfile, FALSE);
 }
+
 #ifdef OS2
 int ExecuteMacro( char *argv, int namelength ) 
     {

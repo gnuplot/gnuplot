@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: util.c,v 1.44 1998/03/22 22:32:19 drd Exp $";
+static char *RCSid = "$Id: util.c,v 1.45 1998/04/14 00:16:28 drd Exp $";
 #endif
 
 /* GNUPLOT - util.c */
@@ -35,8 +35,6 @@ static char *RCSid = "$Id: util.c,v 1.44 1998/03/22 22:32:19 drd Exp $";
 ]*/
 
 
-#include <ctype.h>
-#include <math.h> /* get prototype for sqrt */
 #include "plot.h"
 #include "setshow.h" /* for month names etc */
 
@@ -135,7 +133,7 @@ int t_num;
 	
 	return(token[t_num].is_token &&
 		   (input_line[token[t_num].start_index] == '\'' ||
-		   input_line[token[t_num].start_index] == '\"'));
+		    input_line[token[t_num].start_index] == '"'));
 }
 
 
@@ -201,9 +199,7 @@ register int count;
 
 	if ((count = token[t_num].length) >= max) {
 		count = max-1;
-#ifdef DEBUG_STR
-		fprintf(stderr, "str buffer overflow in copy_str");
-#endif
+		FPRINTF((stderr, "str buffer overflow in copy_str"));
 	}
 	do {
 		str[i++] = input_line[start++];
@@ -234,9 +230,7 @@ register int count;
 
 	if ((count = token[t_num].length - 2) >= max) {
 		count = max-1;
-#ifdef DEBUG_STR
-		fprintf(stderr, "str buffer overflow in quote_str");
-#endif
+		FPRINTF((stderr, "str buffer overflow in quote_str"));
 	}
 	if (count>0) {
 		do {
@@ -264,9 +258,7 @@ register int i,e;
 	e = token[end].start_index + token[end].length;
 	if(e-token[start].start_index>=max) {
 		e=token[start].start_index+max-1;
-#ifdef DEBUG_STR
-		fprintf(stderr, "str buffer overflow in capture");
-#endif
+		FPRINTF((stderr, "str buffer overflow in capture"));
 	}
 
 	for (i = token[start].start_index; i < e && input_line[i] != '\0'; i++)
@@ -466,34 +458,13 @@ int i;
 }
 
 
-#if !defined(vms) && !defined(HAVE_STRERROR)
-/* substitute for systems that don't have ANSI function strerror */
-
-extern int sys_nerr;
-extern char *sys_errlist[];
-
-char *strerror(no)
-int no;
-{
-  static char res_str[30];
-
-  if(no>sys_nerr) {
-    sprintf(res_str, "unknown errno %d", no);
-    return res_str;
-  } else {
-    return sys_errlist[no];
-  }
-}
-#endif
-
-
 void os_error(str,t_num)
 char str[];
 int t_num;
 {
-#ifdef vms
+#ifdef VMS
 static status[2] = {1, 0};		/* 1 is count of error msgs */
-#endif
+#endif /* VMS */
 
 register int i;
 
@@ -525,13 +496,13 @@ register int i;
 	    fprintf(stderr,"line %d: ", inline_num);
 
 
-#ifdef vms
+#ifdef VMS
 	status[1] = vaxc$errno;
 	sys$putmsg(status);
 	(void) putc('\n',stderr);
-#else /* vms */
+#else /* VMS */
 	fprintf(stderr,"(%s)\n\n", strerror(errno));
-#endif /* vms */
+#endif /* VMS */
 
 	bail_to_command_line();
 }

@@ -1,7 +1,11 @@
 
-# $Id: makefile.r,v 1.6 1996/01/28 16:31:40 drd Exp $
+# $Id: makefile.r,v 1.7 1998/04/14 00:15:55 drd Exp $
 #
 # $Log: makefile.r,v $
+# Revision 1.7  1998/04/14  00:15:55  drd
+# HBB, Lars : latest mega monster patches. (Yes, this was supposed
+#             to be frozen...)
+#
 # Revision 1.6  1996/01/28  16:31:40  drd
 # drd: take out defunct atari.trm from some makefiles
 #      (try to) choose real(sqrt(z)) >= 0
@@ -733,7 +737,7 @@ DIRS = term demo docs docs/latextut
 
 CSOURCE1 = bf_test.c binary.c command.c setshow.c
 CSOURCE2 = help.c graphics.c graph3d.c internal.c
-CSOURCE3 = misc.c eval.c parse.c plot.c readline.c scanner.c standard.c
+CSOURCE3 = misc.c eval.c parse.c plot.c readline.c scanner.c standard.c stdfn.c
 CSOURCE4 = bitmap.c term.c util.c version.c
 CSOURCE5 = term/ai.trm term/amiga.trm term/aed.trm \
 	term/cgi.trm term/corel.trm \

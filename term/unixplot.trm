@@ -1,5 +1,5 @@
 /*
- * $Id: unixplot.trm,v 1.12 1998/03/22 22:35:10 drd Exp $
+ * $Id: unixplot.trm,v 1.13 1998/04/14 00:18:13 drd Exp $
  *
  */
 
@@ -58,9 +58,7 @@ stdout.  All other terminals write to outfile.
  * adapted to the new terminal layout by Stefan Bodewig (Dec. 1995)
  */
 
-#ifndef GOT_DRIVER_H
 #include "driver.h"
-#endif
 
 #ifdef TERM_REGISTER
 register_term(unixplot)
@@ -176,7 +174,7 @@ START_HELP(unixplot)
 "?term unixplot",
 "?unixplot",
 " The `unixplot` terminal driver generates output in the Unix \"plot\" graphics",
-" language.  It has no options."
+" language.  It has no options.",
 "",
 " This terminal cannot be compiled if the GNU version of plot is to be used; in",
 " that case, use the `gnugraph` terminal instead."

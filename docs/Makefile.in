@@ -93,6 +93,7 @@ doc2info.o : doc2info.c $(TERM_H) termdoc.c
 doc2ipf.o  : doc2ipf.c  $(TERM_H) termdoc.c
 doc2ms.o   : doc2ms.c   allterm.h termdoc.c
 doc2rtf.o  : doc2rtf.c  $(TERM_H) termdoc.c
+doc2rnh.o  : doc2rnh.c  $(TERM_H) termdoc.c
 doc2tex.o  : doc2tex.c  allterm.h termdoc.c
 checkdoc.o : checkdoc.c allterm.h termdoc.c
 
@@ -169,6 +170,16 @@ gnuplot.rtf: doc2rtf $(srcdir)/gnuplot.doc
 doc2rtf: doc2rtf.o
 	$(CC) -o $@ doc2rtf.o $(LDFLAGS) $(LIBS)
 
+# this is how to make rnh documentation (VMS help format)
+rnh: gnuplot.rnh
+
+gnuplot.rnh: doc2rnh $(srcdir)/gnuplot.doc
+	./doc2rnh $(srcdir)/gnuplot.doc gnuplot.rnh
+
+doc2rnh: doc2rnh.o
+	$(CC) -o $@ doc2rnh.o $(LDFLAGS) $(LIBS)
+
+
 tutorial: latextut/tutorial.tex
 	( cd latextut; $(MAKE) )
 
@@ -198,7 +209,10 @@ clean:
               gnuplot.aux gnuplot.log gnuplot.toc \
               gnuplot.ps gpcard.dvi gpcard.log gpcard.ps \
               doc2hlp gnuplot.hlp \
+              doc2html gnuplot.html \
               doc2gih gnuplot.gih \
+              doc2rnh gnuplot.rnh \
+              doc2rtf gnuplot.rtf \
               checkdoc *.o core a.out allterm.h \
               doc2info gnuplot.info* gpltinfo.tex
 	( cd latextut; $(MAKE) clean )

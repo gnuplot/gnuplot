@@ -1,5 +1,5 @@
 #
-# $Id: makefile.os2,v 1.26 1997/05/27 01:28:52 drd Exp $
+# $Id: makefile.os2,v 1.27 1998/04/14 00:15:54 drd Exp $
 #
 # Makefile for use with emx and nmake
 # for compiling for OS/2 2.0 and above
@@ -62,7 +62,7 @@ O3=o
 # generic flags for compiler and linker under OS/2
 OS2FLAGS = -DOS2
 # flags for compiling with EMX/GCC
-EMXSPECIFIC = -DGETCWD -DREADLINE -DHAVE_STRNICMP -DPIPES -DHAVE_STRERROR -DNOGAMMA
+EMXSPECIFIC = -DGETCWD -DREADLINE -DHAVE_STRNICMP -DPIPES
 ! IFDEF DEBUG
 CFLAGS  = $(OS2FLAGS) -g
 LFLAGS  = -Zstack 32768

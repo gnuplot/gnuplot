@@ -1,5 +1,5 @@
 /*
- * $Id: wtext.h,v 1.4 1998/03/22 22:35:33 drd Exp $
+ * $Id: wtext.h,v 1.5 1998/04/14 00:18:29 drd Exp $
  */
 
 /* GNUPLOT - win/wtext.h */
@@ -34,7 +34,7 @@
  * to the extent permitted by applicable law.
 ]*/
 
- *
+/*
  * AUTHORS
  * 
  *   Russell Lang

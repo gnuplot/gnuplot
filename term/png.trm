@@ -1,5 +1,5 @@
 /*
- * $Id: png.trm,v 1.11 1998/03/22 22:34:57 drd Exp $
+ * $Id: png.trm,v 1.12 1998/04/14 00:18:01 drd Exp $
  *
  */
 
@@ -62,9 +62,7 @@
    xmax and ymax, and then setting b_rastermode to TRUE.  b_setpixel()
    will then perform the interchange before each pixel is plotted */
 
-#ifndef GOT_DRIVER_H
 #include "driver.h"
-#endif
 
 #ifdef TERM_REGISTER
 register_term(png_driver)
@@ -157,14 +155,15 @@ void PNGoptions()
 
 void PNGinit()
 {
+  PNGsetfont();			/* HBB 980226: do this here! */
 }
 
 
 void PNGreset()
 {
-#ifdef vms
+#ifdef VMS
    fflush_binary();
-#endif /* vms */
+#endif /* VMS */
 }
 
 
@@ -206,7 +205,7 @@ void PNGgraphics()
     case 2: numplanes=4; break;
   }
 
-  PNGsetfont();
+  /* PNGsetfont(); */ /* HBB 980226: do this in init() ! */
   /* rotate plot -90 degrees by reversing XMAX and YMAX and by
      setting b_rastermode to TRUE */
   b_makebitmap((unsigned int)(PNG_YMAX*ysize),

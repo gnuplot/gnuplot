@@ -1,5 +1,5 @@
 #ifndef lint
-static char    *RCSid = "$Id: parse.c,v 1.60 1998/03/22 22:31:55 drd Exp $";
+static char    *RCSid = "$Id: parse.c,v 1.61 1998/04/14 00:16:03 drd Exp $";
 #endif
 
 /* GNUPLOT - parse.c */
@@ -35,7 +35,6 @@ static char    *RCSid = "$Id: parse.c,v 1.60 1998/03/22 22:31:55 drd Exp $";
 ]*/
 
 #include <signal.h>
-#include <math.h>
 #include "plot.h"
 #include "help.h"
 #include <setjmp.h>
@@ -158,6 +157,18 @@ void evaluate_at(at_ptr, val_ptr)
 			undefined = TRUE;
 		}
 	}
+#if defined(NeXT) || defined(ultrix) || defined(__osf__)
+    /*
+     * linux was able to fit curves which NeXT gave up on -- traced it to
+     * silently returning NaN for the undefined cases and plowing ahead
+     * I can force that behavior this way.  (0.0/0.0 generates NaN)
+     */
+	if (undefined && (errno == EDOM || errno == ERANGE)) {	/* corey@cac */
+		undefined = FALSE;
+		errno = 0;
+		Gcomplex(val_ptr, 0.0/0.0, 0.0/0.0);
+	}
+#endif /* NeXT || ultrix || __osf__ */
 }
 
 
@@ -219,24 +230,8 @@ static void extend_at()
 
   at=gp_realloc(at, newsize, "extend_at");
   at_size+=MAX_AT_LEN;
-#ifdef DEBUG_STR
-  fprintf(stderr, "Extending at size to %d\n", at_size);
-#endif
+  FPRINTF((stderr, "Extending at size to %d\n", at_size));
 }
-
-#ifdef NOCOPY
-/*
- * cheap and slow version of memcpy() in case you don't have one 
- */
-memcpy(dest, src, len)
-	char           *dest, *src;
-	unsigned int    len;
-{
-	while (len--)
-		*dest++ = *src++;
-}
-#endif				/* NOCOPY */
-
 
 /* moved from eval.c, the function is only called from this module */
 static union argument *
@@ -337,7 +332,13 @@ static void factor()
 			int_error("Positive integer expected", c_token);
 		add_action(DOLLARS)->v_arg = a;
 	} else if (isanumber(c_token)) {
+	        /* work around HP-UX 9.10 cc limitation ... */
+#if defined(__hpux) && !defined(__GCC__)
+	        struct value foo = add_action(PUSHC)->v_arg;
+		convert (&foo, c_token);
+#else
 		convert(&(add_action(PUSHC)->v_arg), c_token);
+#endif
 		c_token++;
 	} else if (isletter(c_token)) {
 		if ((c_token + 1 < num_tokens) && equals(c_token + 1, "(")) {

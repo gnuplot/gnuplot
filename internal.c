@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: internal.c,v 1.22 1998/03/22 22:31:50 drd Exp $";
+static char *RCSid = "$Id: internal.c,v 1.23 1998/04/14 00:15:44 drd Exp $";
 #endif
 
 /* GNUPLOT - internal.c */
@@ -35,7 +35,6 @@ static char *RCSid = "$Id: internal.c,v 1.22 1998/03/22 22:31:50 drd Exp $";
 ]*/
 
 
-#include <math.h>
 #include "plot.h"
 #include "fnproto.h"
 

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: doc2hlp.c,v 1.14 1997/07/22 23:24:19 drd Exp $";
+static char *RCSid = "$Id: doc2hlp.c,v 1.15 1998/04/14 00:16:58 drd Exp $";
 #endif
 
 /* GNUPLOT - doc2hlp.c */
@@ -37,13 +37,8 @@ static char *RCSid = "$Id: doc2hlp.c,v 1.14 1997/07/22 23:24:19 drd Exp $";
 #include "config.h"
 #endif
 
-#include <stdio.h>
-#ifndef NO_STDLIB_H
-#include <stdlib.h>
-#endif
-#include <ctype.h>
-
 #include "ansichek.h"
+#include "stdfn.h"
 
 #define MAX_LINE_LEN	256
 #define TRUE 1

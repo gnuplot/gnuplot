@@ -1,5 +1,5 @@
 /*
- * $Id: hppj.trm,v 1.12 1998/03/22 22:34:47 drd Exp $
+ * $Id: hppj.trm,v 1.13 1998/04/14 00:17:51 drd Exp $
  *
  */
 
@@ -61,9 +61,7 @@
  * adapted to the new terminal layout by Stefan Bodewig (Dec. 1995)
  */
 
-#ifndef GOT_DRIVER_H
 #include "driver.h"
-#endif
 
 #ifdef TERM_REGISTER
 register_term(hppj)
@@ -114,7 +112,7 @@ TERM_PUBLIC void HPPJoptions()
             int_error(HPPJERROR, c_token);
        }
 
-        capture(opt, c_token, c_token, 4);
+        capture(opt, c_token, c_token, /*4*/ 9); /* HBB 980226 */
         if ( !strcmp(opt, "FNT5X9") ) {
             hppj_font = FNT5X9;
             strcpy(term_options, "FNT5X9");
@@ -134,19 +132,8 @@ TERM_PUBLIC void HPPJoptions()
 
 TERM_PUBLIC void HPPJinit()
 {
-}
-
-
-TERM_PUBLIC void HPPJreset()
-{
-#ifdef vms
-    fflush_binary();
-#endif /* vms */
-}
-
-
-TERM_PUBLIC void HPPJgraphics()
-{
+  /* HBB 980226: moved this here, from graphics(): only init() may
+   * change fields of *term ! */
     switch ( hppj_font ) {
       case FNT5X9 :
 	term->v_char = FNT5X9_VCHAR;
@@ -167,6 +154,20 @@ TERM_PUBLIC void HPPJgraphics()
 	term->h_tic = FNT13X25_HCHAR / 2;
 	break;
     }
+}
+
+
+TERM_PUBLIC void HPPJreset()
+{
+#ifdef VMS
+    fflush_binary();
+#endif /* VMS */
+}
+
+
+TERM_PUBLIC void HPPJgraphics()
+{
+  /* HBB 980226: move a block of code from here to init() */
     b_charsize(hppj_font);
 
     b_makebitmap(HPPJ_XMAX, HPPJ_YMAX, HPPJ_PLANES);

@@ -1,5 +1,5 @@
 #ifndef lint
-static char    *RCSid = "$Id: command.c,v 1.123 1998/03/22 23:31:00 drd Exp $";
+static char    *RCSid = "$Id: command.c,v 1.124 1998/04/14 00:14:57 drd Exp $";
 #endif
 
 /* GNUPLOT - command.c */
@@ -50,114 +50,88 @@ static char    *RCSid = "$Id: command.c,v 1.123 1998/03/22 23:31:00 drd Exp $";
  * Added user-specified bases for log scaling.
  */
 
-#include <math.h>
-#include <ctype.h>
-#include <assert.h>
-
-#ifdef VMS
-#include <signal.h>  /* for sleep() */
-#endif
-
-#if defined(MSDOS) || defined(DOS386)
-#ifdef DJGPP
-#include <dos.h>
-#include <dir.h>            /* HBB: for setdisk() */
-#else
-#include <process.h>
-#endif
-
-#ifdef __ZTC__
-#define HAVE_SLEEP 1
-#define P_WAIT 0
-#else
-
-#ifdef __TURBOC__
-#ifndef _Windows
-#define HAVE_SLEEP 1
-#include <conio.h>
-#include <dir.h>    /* setdisk() */
-extern unsigned _stklen = 16394;/* increase stack size */
-extern char HelpFile[80] ;      /* patch for do_help  - DJL */
-#endif
-
-#else				/* must be MSC */
-#if !defined(__EMX__) && !defined(DJGPP)
-#ifdef __MSC__
-#include <direct.h>		/* for _chdrive() */
-#endif				/* __MSC__ */
-#endif				/* !__EMX__ && !DJGPP */
-#endif				/* TURBOC */
-#endif				/* ZTC */
-
-#endif				/* MSDOS */
-
-#ifdef _Windows
-#ifdef __MSC__
-#include <direct.h>		/* for _chdrive() */
-#endif
-#endif /* _Windows */
-
-#ifndef GP_SLEEP
-# ifdef __ZTC__
-#  define GP_SLEEP(delay) usleep ((unsigned long) (delay))
-# else
-#  define GP_SLEEP(delay) sleep ((unsigned int) (delay))
-# endif
-#endif
-
 #include "plot.h"
 #include "setshow.h"
 #include "fit.h"
 #include "binary.h"
+
+#if defined(MSDOS) || defined(DOS386)
+# ifdef DJGPP
+#  include <dos.h>
+#  include <dir.h>            /* HBB: for setdisk() */
+# else
+#  include <process.h>
+# endif /* DJGPP */
+
+# ifdef __ZTC__
+#  define HAVE_SLEEP 1
+#  define P_WAIT 0
+# else
+
+#  ifdef __TURBOC__
+#   ifndef _Windows
+#    define HAVE_SLEEP 1
+#    include <conio.h>
+#    include <dir.h>    /* setdisk() */
+extern unsigned _stklen = 16394;/* increase stack size */
+extern char HelpFile[80] ;      /* patch for do_help  - DJL */
+#   endif /* _Windows */
+
+#  else				/* must be MSC */
+#   if !defined(__EMX__) && !defined(DJGPP)
+#    ifdef __MSC__
+#     include <direct.h>		/* for _chdrive() */
+#    endif				/* __MSC__ */
+
+#   endif				/* !__EMX__ && !DJGPP */
+#  endif				/* TURBOC */
+# endif				/* ZTC */
+#endif				/* MSDOS */
+
 #ifndef _Windows
-#include "help.h"
+# include "help.h"
 #else
-#define MAXSTR 255
-#endif
+# define MAXSTR 255
+#endif /* _Windows */
 
 #if defined(ATARI) || defined(MTOS)
-#ifdef __PUREC__
-#include <ext.h>
-#include <tos.h>
-#include <aes.h>
+# ifdef __PUREC__
+#  include <ext.h>
+#  include <tos.h>
+#  include <aes.h>
 /* #include <float.h> - already in plot.h */
-#else
-#include <osbind.h>
-#include <aesbind.h>
-#include <support.h>
-#endif /* __PUREC__ */
+# else
+#  include <osbind.h>
+#  include <aesbind.h>
+#  include <support.h>
+# endif /* __PUREC__ */
 #endif /* ATARI || MTOS */
 
-#ifndef HAVE_SLEEP
-/* POSIX.1 synopsis */
-unsigned int sleep __PROTO((unsigned int));
-#endif
-
 #ifndef STDOUT
-#define STDOUT 1
+# define STDOUT 1
 #endif
 
 #ifndef HELPFILE
-#if defined( MSDOS ) || defined( OS2 ) || defined(DOS386)
-#define HELPFILE "gnuplot.gih"
-#else
-#ifdef AMIGA_SC_6_1
-#define HELPFILE "S:gnuplot.gih"
-#else
-#define HELPFILE "docs/gnuplot.gih"	/* changed by makefile */
-#endif				/* AMIGA_SC_6_1 */
-#endif
+# if defined( MSDOS ) || defined( OS2 ) || defined(DOS386)
+#  define HELPFILE "gnuplot.gih"
+# else
+#  if defined(AMIGA_SC_6_1) || defined(AMIGA_AC_5)
+#   define HELPFILE "S:gnuplot.gih"
+#  else
+#   define HELPFILE "docs/gnuplot.gih"	/* changed by makefile */
+#  endif /* AMIGA_SC_6_1 || AMIGA_AC_5 */
+# endif /* MSDOS || OS2 || DOS386 */
 #endif				/* HELPFILE */
 
 #ifdef _Windows
-#include <windows.h>
-#ifdef __MSC__
-#include <malloc.h>
-#else
-#include <alloc.h>
-#include <dir.h>    /* setdisk() */
-#endif
-#include "win/wgnuplib.h"
+# include <windows.h>
+# ifdef __MSC__
+#  include <malloc.h>
+# else
+#  include <alloc.h>
+#  include <dir.h>    /* setdisk() */
+# endif
+# include "win/wgnuplib.h"
 extern TW textwin;
 extern LPSTR winhelpname;
 extern void screen_dump(void);	/* in term/win.trm */
@@ -166,24 +140,21 @@ extern int Pause(LPSTR mess); /* in winmain.c */
 
 #define inrange(z,min,max) ((min<max) ? ((z>=min)&&(z<=max)) : ((z>=max)&&(z<=min)) )
 
-/* purec_sscanf is now in datafile.c */
-#ifdef __PUREC__
-# define sscanf purec_sscanf
-#endif
-
 #ifdef OS2
  /* emx has getcwd, chdir that can handle drive names */
-#define chdir  _chdir2
+# define chdir  _chdir2
 #endif /* OS2 */
 
-#ifdef vms
+#ifdef VMS
 int             vms_vkid;	/* Virtual keyboard id */
-#endif
+int             vms_ktid;       /* key table id, for translating keystrokes */
+#endif /* VMS */
+
+/* Used by vws.trm */
+void replotrequest __PROTO((void));
 
 
 /* static prototypes */
-
-static void replotrequest __PROTO((void));
 static int command __PROTO((void));
 static int read_line __PROTO((char *prompt));
 static void do_shell __PROTO((void));
@@ -243,9 +214,7 @@ void extend_input_line()
   } else {
     input_line=gp_realloc(input_line, input_line_len+MAX_LINE_LEN, "extend input line");
     input_line_len+=MAX_LINE_LEN;
-#ifdef DEBUG_STR
-    fprintf(stderr, "extending input line to %d chars\n", input_line_len);
-#endif
+    FPRINTF ((stderr, "extending input line to %d chars\n", input_line_len));
   }
 }
 
@@ -258,9 +227,7 @@ void extend_token_table()
   } else {
     token=gp_realloc(token, (token_table_size+MAX_TOKENS)*sizeof(struct lexical_unit), "extend token table");
     token_table_size+=MAX_TOKENS;
-#ifdef DEBUG_STR
-    fprintf(stderr, "extending token table to %d elements\n", token_table_size);
-#endif
+    FPRINTF ((stderr, "extending token table to %d elements\n", token_table_size));
   }
 }
 
@@ -775,7 +742,7 @@ char *path;
 }
 
 
-static void replotrequest()
+void replotrequest()
 {
     if (equals(c_token, "["))
 	int_error("cannot set range with replot", c_token);
@@ -818,60 +785,10 @@ static void replotrequest()
 	else  plotrequest();
 }
 
-#ifndef HAVE_SLEEP
-/* The implementations below do not even come close
-   to what is required by POSIX, but I suppose
-   it doesn't really matter on these systems. lh
- */
-#ifdef AMIGA_SC_6_1
-#include <proto/dos.h>
-
-unsigned int
-sleep(delay)
-    unsigned int    delay;
-{
-    Delay(50 * delay);
-
-    return (unsigned int)0;
-}
-#endif /* AMIGA_SC_6_1 */
-
-#ifdef WIN32
-/* the WIN32 API has a Sleep function that does not consume CPU cycles */
-#include <windows.h>
-
-unsigned int
-sleep(delay)
-    unsigned int    delay;
-{
-    Sleep( (DWORD) delay*1000 );
-
-    return (unsigned int)0;
-}
-#else
-#if defined(MSDOS) || defined(_Windows) || defined(DOS386) || defined(AMIGA_AC_5)
-#if (!defined(__TURBOC__) && !defined(__EMX__) && !defined(DJGPP)) || defined(_Windows) /* Turbo C already has sleep() */
-/* kludge to provide sleep() for msc 5.1 */
-unsigned int
-sleep(delay)
-    unsigned int    delay;
-{
-    unsigned long   time_is_up;
-
-    time_is_up = time(NULL) + (unsigned long) delay;
-    while (time(NULL) < time_is_up)
-	 /* wait */ ;
-
-    return (unsigned int)0;
-}
-#endif				/* (!TURBOC && !__EMX__ && !DJGPP) or _Windows */
-#endif				/* MSDOS || _Windows || AMIGA_AC_5 */
-#endif				/* WIN32 */
-#endif                          /* HAVE_SLEEP */
 
 /* Support for input, shell, and help for various systems */
 
-#ifdef vms
+#ifdef VMS
 
 #include <descrip.h>
 #include <rmsdef.h>
@@ -914,7 +831,7 @@ static int read_line(prompt)
     do {
 	line_desc.dsc$w_length = MAX_LINE_LEN - start;
 	line_desc.dsc$a_pointer = &input_line[start];
-	switch (status[1] = smg$read_composed_line(&vms_vkid, 0, &line_desc, &prompt_desc, &vms_len)) {
+	switch (status[1] = smg$read_composed_line(&vms_vkid, &vms_ktid, &line_desc, &prompt_desc, &vms_len)) {
 	case SMG$_EOF:
 	    done(IO_SUCCESS);	/* ^Z isn't really an error */
 	    break;
@@ -950,6 +867,7 @@ static int read_line(prompt)
 }
 
 
+#ifdef NO_GIH
 static void do_help(toplevel)
 int toplevel; /* not used for VMS version */
 {
@@ -972,6 +890,7 @@ static void do_shell()
 	os_error("spawn error", NO_CARET);
     }
 }
+#endif /* NO_GIH */
 
 
 static void do_system()
@@ -984,9 +903,12 @@ static void do_system()
     (void) putc('\n', stderr);
 }
 
-#else				/* vms */
+#endif /* VMS */
+
 
 #ifdef _Windows
+
+#ifdef NO_GIH
 static void do_help(toplevel)
 int toplevel; /* not used for windows */
 {
@@ -1001,7 +923,8 @@ int toplevel; /* not used for windows */
 		WinHelp(textwin.hWndParent,(LPSTR)winhelpname,HELP_PARTIALKEY,(DWORD)buf);
 	}
 }
-#else
+#endif /* NO_GIH */
+#endif /* _Windows */
 
 /*
  * do_help: (not VMS, although it would work) Give help to the user. It
@@ -1017,6 +940,7 @@ int toplevel; /* not used for windows */
  * whilst in the help.
  */
 
+#ifndef NO_GIH
 static void do_help(toplevel)
 int toplevel;
 {
@@ -1152,7 +1076,9 @@ int toplevel;
 
     helpbuf[base] = '\0';	/* cut it off where we started */
 }
-#endif  /* _Windows */
+#endif  /* !NO_GIH */
+
+#ifndef VMS
 
 #ifdef _Windows
 /* this function is used before its definition */
@@ -1344,7 +1270,7 @@ static void do_shell()
 #endif				/* AMIGA_SC_6_1 */
 #endif				/* MSDOS */
 
-/* read from stdin, everything except vms */
+/* read from stdin, everything except VMS */
 
 #ifndef READLINE
 #if (defined(MSDOS) || defined(DOS386)) && !defined(_Windows) && !defined(__EMX__) && !defined(DJGPP)
@@ -1497,7 +1423,7 @@ static int read_line(prompt)
     } while (more);
     return(0);
 }
-#endif				/* vms */
+#endif/* !VMS */
 
 #ifdef _Windows
 /* there is a system like call on MS Windows but it is a bit difficult to 

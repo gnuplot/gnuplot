@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: specfun.c,v 1.20 1998/03/22 23:31:26 drd Exp $";
+static char *RCSid = "$Id: specfun.c,v 1.21 1998/04/14 00:16:20 drd Exp $";
 #endif
 
 
@@ -43,7 +43,6 @@ static char *RCSid = "$Id: specfun.c,v 1.20 1998/03/22 23:31:26 drd Exp $";
  *
  */
 
-#include <math.h>
 #include "plot.h"
 #include "fnproto.h"
 

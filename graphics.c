@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: graphics.c,v 1.136 1998/03/22 23:31:15 drd Exp $";
+static char *RCSid = "$Id: graphics.c,v 1.137 1998/04/14 00:15:32 drd Exp $";
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -35,9 +35,6 @@ static char *RCSid = "$Id: graphics.c,v 1.136 1998/03/22 23:31:15 drd Exp $";
 ]*/
 
 
-#include <math.h>
-#include <assert.h>
-#include <ctype.h>
 #include "plot.h"
 #include "setshow.h"
 
@@ -129,9 +126,9 @@ static double dbl_raise __PROTO((double x, int y));
 static void boundary __PROTO((int scaling, struct curve_points *plots, int count));
 static double make_tics __PROTO((int axis, int guide));
 static int widest_tic;  /* widest2d_callback keeps longest so far in here */
-static void widest2d_callback __PROTO((int axis, double place, char *text, int grid));
-static void ytick2d_callback __PROTO((int axis, double place, char *text, int grid));
-static void xtick2d_callback __PROTO((int axis, double place, char *text, int grid));
+static void widest2d_callback __PROTO((int axis, double place, char *text, struct lp_style_type grid));
+static void ytick2d_callback __PROTO((int axis, double place, char *text, struct lp_style_type grid));
+static void xtick2d_callback __PROTO((int axis, double place, char *text, struct lp_style_type grid));
 static void map_position __PROTO((struct position *pos, unsigned int *x, unsigned int *y, char *what));
 static void mant_exp __PROTO((double log_base, double x, int scientific, double *m, int *p));
 static void gprintf __PROTO((char *dest, char *format, double log_base, double x));
@@ -301,7 +298,7 @@ static void widest2d_callback(axis, place, text, grid)
 int axis;
 double place;
 char *text;
-int grid;
+struct lp_style_type grid;
 {
 	int len=label_width(text, NULL);
 	if (len>widest_tic)
@@ -1007,7 +1004,7 @@ char ss[MAX_LINE_LEN+1], *s, *e;
 	term_start_plot();
 		
 /* DRAW TICS AND GRID */
-	(*t->linetype)(-2); /* border linetype */
+        term_apply_lp_properties(&border_lp); /* border linetype */
 	largest_polar_circle=0;
 
 	/* select first mapping */
@@ -1048,7 +1045,7 @@ char ss[MAX_LINE_LEN+1], *s, *e;
 		}
 		/* go for it */
 		gen_tics(FIRST_Y_AXIS, &yticdef,
-		   grid&(GRID_Y|GRID_MY),
+		   work_grid.l_type&(GRID_Y|GRID_MY),
 		   mytics, mytfreq, ytick2d_callback);
                 (*t->text_angle)(0);    /* reset rotation angle */
 
@@ -1091,7 +1088,7 @@ char ss[MAX_LINE_LEN+1], *s, *e;
 		}
 		/* go for it */
 		gen_tics(FIRST_X_AXIS, &xticdef,
-		   grid&(GRID_X|GRID_MX),
+		   work_grid.l_type&(GRID_X|GRID_MX),
 		   mxtics, mxtfreq, xtick2d_callback);
                 (*t->text_angle)(0);    /* reset rotation angle */
 	}
@@ -1133,7 +1130,7 @@ char ss[MAX_LINE_LEN+1], *s, *e;
 		}
 		/* go for it */
 		gen_tics(SECOND_Y_AXIS, &y2ticdef,
-		  grid&(GRID_Y2|GRID_MY2),
+		  work_grid.l_type&(GRID_Y2|GRID_MY2),
 		  my2tics, my2tfreq, ytick2d_callback);
                 (*t->text_angle)(0);    /* reset rotation angle */
 	}
@@ -1171,7 +1168,7 @@ char ss[MAX_LINE_LEN+1], *s, *e;
 		}
 		/* go for it */
 		gen_tics(SECOND_X_AXIS, &x2ticdef,
-		  grid&(GRID_X2|GRID_MX2),
+		  work_grid.l_type&(GRID_X2|GRID_MX2),
 		  mx2tics, mx2tfreq, xtick2d_callback);
                 (*t->text_angle)(0);    /* reset rotation angle */
 	}
@@ -1189,7 +1186,7 @@ char ss[MAX_LINE_LEN+1], *s, *e;
 		double theta=0;
 		int ox=map_x(0);
 		int oy=map_y(0);
-		(*t->linetype)(grid_linetype);
+		term_apply_lp_properties(&grid_lp);
 		for (theta=0; theta<6.29; theta += polar_grid_angle)
 		{
 			/* copy ox in case it gets moved (but it shouldn't) */
@@ -1203,6 +1200,9 @@ char ss[MAX_LINE_LEN+1], *s, *e;
 				(*t->vector)( (unsigned int) x, (unsigned int) y);
 			}
 		}
+			draw_clip_line(ox,oy,
+			  map_x(largest_polar_circle*cos(theta)),
+			  map_y(largest_polar_circle*sin(theta)));
 	}
 
 
@@ -1218,14 +1218,14 @@ char ss[MAX_LINE_LEN+1], *s, *e;
 		axis_zero[FIRST_X_AXIS] = ybot;				/* save for impulse plotting */
 	else if (axis_zero[FIRST_X_AXIS] >= ytop)
 		axis_zero[FIRST_X_AXIS] = ytop ;
-	else if (xzeroaxis > -3) {
-		(*t->linetype)(xzeroaxis);
+	else if (xzeroaxis.l_type > -3) {
+		term_apply_lp_properties(&xzeroaxis);
 		(*t->move)(xleft,axis_zero[FIRST_X_AXIS]);
 		(*t->vector)(xright,axis_zero[FIRST_X_AXIS]);
 	}
 
-	if ((yzeroaxis>-3) && !is_log_x && axis_zero[FIRST_Y_AXIS] >= xleft && axis_zero[FIRST_Y_AXIS] < xright ) {
-		(*t->linetype)(yzeroaxis);
+	if ((yzeroaxis.l_type>-3) && !is_log_x && axis_zero[FIRST_Y_AXIS] >= xleft && axis_zero[FIRST_Y_AXIS] < xright ) {
+		term_apply_lp_properties(&yzeroaxis);
 		(*t->move)(axis_zero[FIRST_Y_AXIS],ybot);
 		(*t->vector)(axis_zero[FIRST_Y_AXIS],ytop);
 	}
@@ -1238,21 +1238,21 @@ char ss[MAX_LINE_LEN+1], *s, *e;
 		axis_zero[SECOND_X_AXIS] = ybot;				/* save for impulse plotting */
 	else if (axis_zero[SECOND_X_AXIS] >= ytop)
 		axis_zero[SECOND_X_AXIS] = ytop ;
-	else if (x2zeroaxis>-3) {
-		(*t->linetype)(x2zeroaxis);
+	else if (x2zeroaxis.l_type>-3) {
+		term_apply_lp_properties(&x2zeroaxis);
 		(*t->move)(xleft,axis_zero[SECOND_X_AXIS]);
 		(*t->vector)(xright,axis_zero[SECOND_X_AXIS]);
 	}
 
-	if ((y2zeroaxis>-3) && !is_log_x2 && axis_zero[SECOND_Y_AXIS] >= xleft && axis_zero[SECOND_Y_AXIS] < xright ) {
-		(*t->linetype)(y2zeroaxis);
+	if ((y2zeroaxis.l_type>-3) && !is_log_x2 && axis_zero[SECOND_Y_AXIS] >= xleft && axis_zero[SECOND_Y_AXIS] < xright ) {
+		term_apply_lp_properties(&y2zeroaxis);
 		(*t->move)(axis_zero[SECOND_Y_AXIS],ybot);
 		(*t->vector)(axis_zero[SECOND_Y_AXIS],ytop);
 	}
 
 
 /* DRAW PLOT BORDER */
-	(*t->linetype)(-2); /* border linetype */
+	term_apply_lp_properties(&border_lp); /* border linetype */
 	if (draw_border) {
 		(*t->move)(xleft,ybot);
 		if(border_south){
@@ -1418,8 +1418,8 @@ char ss[MAX_LINE_LEN+1], *s, *e;
  		yl_ref = yl -= key_entry_height/2;  /* centralise the keys */
  		key_count = 0;
  	
- 		if (key_box>-3) {
- 			(*t->linetype)(key_box);
+ 		if (key_box.l_type>-3) {
+ 			term_apply_lp_properties(&key_box);
  			(*t->move)(key_xl,key_yb);
  			(*t->vector)(key_xl,key_yt);
  			(*t->vector)(key_xr,key_yt);
@@ -3308,14 +3308,15 @@ static void xtick2d_callback(axis, place, text, grid)
 int axis;
 double place;
 char *text;
-int grid; /* linetype or -2 for no grid */
+struct lp_style_type grid; /* linetype or -2 for no grid */
 {
     register struct termentry *t = term;
     /* minitick if text is NULL - beware - h_tic is unsigned */
     int ticsize = tic_direction*(int)(t->v_tic)*(text ? ticscale : miniticscale);
     unsigned int x=map_x(place);
-  if (grid > -2) {
-    (*t->linetype)(grid);
+
+  if (grid.l_type > -2) {
+    term_apply_lp_properties(&grid);
     if (polar_grid_angle) {
 	double x=place, y=0, s=sin(0.1), c=cos(0.1);
 	int i;
@@ -3347,7 +3348,7 @@ int grid; /* linetype or -2 for no grid */
 	        (*t->vector)(x, ytop);
 	    }
     }
-    (*t->linetype)(-2); /* border linetype */
+    term_apply_lp_properties(&border_lp); /* border linetype */
   }
 
     /* we precomputed tic posn and text posn in global vars */
@@ -3370,14 +3371,14 @@ static void ytick2d_callback(axis, place, text, grid)
 int axis;
 double place;
 char *text;
-int grid; /* linetype or -2 */
+struct lp_style_type grid; /* linetype or -2 */
 {
     register struct termentry *t = term;
     /* minitick if text is NULL - v_tic is unsigned */
     int ticsize = tic_direction*(int)(t->h_tic)*(text ? ticscale : miniticscale);
     unsigned int y=map_y(place);
-  if (grid > -2) {
-    (*t->linetype)(grid);
+  if (grid.l_type > -2) {
+    term_apply_lp_properties(&grid);
     if (polar_grid_angle) {
 	double x=0, y=place, s=sin(0.1), c=cos(0.1);
 	int i;
@@ -3409,7 +3410,7 @@ int grid; /* linetype or -2 */
 	        (*t->vector)(xright, y);
 	     }
     }
-    (*t->linetype)(-2); /* border linetype */
+    term_apply_lp_properties(&border_lp); /* border linetype */
   }
   
     /* we precomputed tic posn and text posn */
@@ -3726,8 +3727,12 @@ double minifreq; /* frequency */
 tic_callback callback;  /* fn to call to actually do the work */
 {
     /* seperate main-tic part of grid */
-    int lgrd= (grid&(GRID_X|GRID_Y|GRID_X2|GRID_Y2|GRID_Z)) ? grid_linetype : -2;
-    int mgrd= (grid&(GRID_MX|GRID_MY|GRID_MX2|GRID_MY2|GRID_MZ)) ? mgrid_linetype : -2;
+    struct lp_style_type lgrd, mgrd;
+
+    memcpy(&lgrd, &grid_lp,sizeof(struct lp_style_type));
+    memcpy(&mgrd,&mgrid_lp,sizeof(struct lp_style_type));
+    lgrd.l_type= (grid&(GRID_X|GRID_Y|GRID_X2|GRID_Y2|GRID_Z)) ? grid_lp.l_type : -2;
+    mgrd.l_type= (grid&(GRID_MX|GRID_MY|GRID_MX2|GRID_MY2|GRID_MZ)) ? mgrid_lp.l_type : -2;
 
     if (def->type==TIC_USER) {  /* special case */
 	/*{{{  do user tics then return*/

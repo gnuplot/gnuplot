@@ -1,5 +1,5 @@
 /*
- * $Id: stdfn.h,v 1.21 1998/03/22 22:32:11 drd Exp $
+ * $Id: stdfn.h,v 1.22 1998/04/14 00:16:23 drd Exp $
  *
  */
 
@@ -45,9 +45,19 @@
 #ifndef STDFN_H
 #define STDFN_H
 
+#include <ctype.h>
 #include <stdio.h>
 
+#ifdef __PUREC__
+# define sscanf purec_sscanf
+#endif
+
+#if defined(apollo) || defined(alliant)
+#define NO_LIMITS_H
+#endif
+
 #ifdef sequent
+#define NO_LIMITS_H
 #define NO_STRCHR
 #endif
 
@@ -61,25 +71,43 @@
 #ifdef strchr
 #undef strchr
 #endif
+#ifdef HAVE_INDEX
 #define strchr index
+#endif
 #ifdef strrchr
 #undef strrchr
 #endif
+#ifdef HAVE_RINDEX
 #define strrchr rindex
+#endif
 #endif
 
 #ifdef NO_STDLIB_H
+# ifdef HAVE_MALLOC_H
+#  include <malloc.h>
+# else
+void free();
 char *malloc();
 char *realloc();
+# endif /* HAVE_MALLOC_H */
 char *getenv();
 int system();
 double atof();
 int atoi();
 long atol();
 double strtod();
+/* need to find out about VMS */
+# ifndef VMS
+#  ifndef EXIT_FAILURE
+#   define EXIT_FAILURE (1)
+#  endif
+#  ifndef EXIT_SUCCESS
+#   define EXIT_SUCCESS (0)
+#  endif
+# endif /* VMS */
 #else
 #include <stdlib.h>
-#endif
+#endif /* NO_STDLIB_H */
 
 #ifdef HAVE_UNISTD_H
 #include <unistd.h>
@@ -87,7 +115,13 @@ double strtod();
 #ifdef HAVE_LIBC_H /* NeXT uses libc instead of unistd */
 #include <libc.h>
 #endif
-#endif
+#ifdef VMS
+#include <signal.h>
+#ifndef HAVE_SLEEP
+#define HAVE_SLEEP
+#endif /* HAVE_SLEEP */
+#endif /* VMS */
+#endif /* HAVE_UNISTD_H */
 
 #ifndef NO_ERRNO_H
 #include <errno.h>
@@ -112,7 +146,7 @@ extern int errno;
 #ifndef time_t /* should be #defined by config.h, then... */
 #define time_t long
 #endif
-#else /* OK, have time.h: */
+#else
 #include <time.h> /* ctime etc, should also define time_t and struct tm */
 #endif
 
@@ -121,19 +155,25 @@ FILE *popen __PROTO((char *, char *));
 int pclose __PROTO((FILE *));
 #endif
 
+#ifndef NO_FLOAT_H
+#include <float.h>
+#endif
+
 #ifndef NO_LOCALE_H
 #include <locale.h>
+#endif
+
+#ifndef NO_MATH_H
+#include <math.h>
 #endif
 
 #ifndef HAVE_STRNICMP
 #  ifdef HAVE_STRNCASECMP
 #    define strnicmp strncasecmp
 #  else
-#    define NEED_STRNICMP
-int strnicmp __PROTO((char *s1, char *s2, int n));
+int strnicmp __PROTO((char *, char *, int));
 #  endif
 #endif
-
 
 #ifndef GP_GETCWD
 # ifdef OS2
@@ -147,5 +187,32 @@ int strnicmp __PROTO((char *s1, char *s2, int n));
 # endif
 #endif
 
+#ifdef __TURBOC__ /* HBB 980324: for sleep() prototype */
+# include <dos.h>
+#endif
+
+#ifndef GP_SLEEP
+# ifdef __ZTC__
+#  define GP_SLEEP(delay) usleep ((unsigned long) (delay))
+# else
+#  define GP_SLEEP(delay) sleep ((unsigned int) (delay))
+# endif
+#endif
+
+/* Definitions for debugging */
+/* #define NDEBUG */
+#include <assert.h>
+
+#ifdef DEBUG
+
+#define DEBUG_WHERE do { fprintf(stderr,"%s:%d ",__FILE__,__LINE__); } while (0)
+#define FPRINTF(a) do { DEBUG_WHERE; fprintf a; } while (0)
+
+#else
+
+#define DEBUG_WHERE     /* nought */
+#define FPRINTF(a)      /* nought */
+
+#endif /* DEBUG */
 
 #endif /* STDFN_H */

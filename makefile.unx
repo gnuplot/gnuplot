@@ -1,5 +1,5 @@
 #
-# $Id: makefile.unx,v 1.91 1997/07/22 23:20:42 drd Exp $
+# $Id: makefile.unx,v 1.92 1998/04/14 00:15:57 drd Exp $
 #
 #
 ############################################################
@@ -93,8 +93,6 @@ X11LIBS = -lX11
 X11INCLUDES =
 
 #>>> List additional CFLAGS for X11 compilation
-# -DOLD_SELECT if you have an old 4.2 BSD OS (e.g. Sun OS 3.5) and
-#   encounter compile error for missing include file <sys/select.h>
 # -DBSD_TYPES if your system defines FD_* macros for select in
 #   <sys/bsdtypes.h>
 # -ISC22 to circumvent missing plots past the first on ISC 2.2
@@ -127,7 +125,7 @@ MY_FLAGS  = CC="$(CC)" COPTS="$(COPTS)" DEST="$(DEST)" \
 # line or make a new target for it and a new _FLAGS definition.
 #  -DNO_MEMSET if you need to use bzero() instead of memset()
 #  -DNO_MEMCPY if your memcpy() is called bcopy()
-#  -DNOCOPY if you don't have bcopy() either
+#  -DHAVE_COPY if you have bcopy() and no memcpy()
 #  -DHAVE_STRNICMP if you have strnicmp()
 #  -DHAVE_STRNCASECMP if you have strncasecmp() (GNU Libc, bsd)
 #  -DNO_TEMPNAM if you don't have tempnam()
@@ -156,7 +154,7 @@ MY_FLAGS  = CC="$(CC)" COPTS="$(COPTS)" DEST="$(DEST)" \
 #    (but -fswitch is buggy on some systems, so watch out)
 #  -DRETSIGTYPE=int if the argument to signal is an int function
 #  -DSIGFUNC_NO_INT_ARG if the signal function may not have an int argument
-#  -DHAVE_STRERROR if your library includes strerror
+#  -DNO_STRERROR if your library does not have strerror()
 
 # Defaults in case the user types 'make All' directly
 # Should match X11_FLAGS's CFLAGS definition
@@ -202,9 +200,10 @@ LIBS = -lm # -lplot is no longer shipped on SUNs
 ####################################################################
 # List of object files except version.o
 OBJS = bitmap.o command.o contour.o eval.o graphics.o graph3d.o help.o \
-       internal.o misc.o parse.o plot.o plot2d.o plot3d.o readline.o scanner.o \
-       set.o show.o specfun.o standard.o term.o time.o util.o binary.o \
-       interpol.o fit.o matrix.o datafile.o alloc.o util3d.o hidden3d.o
+       internal.o misc.o parse.o plot.o plot2d.o plot3d.o readline.o \
+       scanner.o set.o show.o specfun.o standard.o stdfn.o term.o time.o \
+       util.o binary.o interpol.o fit.o matrix.o datafile.o alloc.o \
+       util3d.o hidden3d.o
 
 NEXTOBJS = epsviewe.o
 ############################################################
@@ -379,7 +378,7 @@ AIXO_FLAGS = \
            TERMFLAGS="$(TERMFLAGS)"
 
 NEXT_FLAGS = \
-           CFLAGS="$(COPTS) -DGAMMA=lgamma -DNEXT -DREADLINE -DHAVE_SGTTY_H -DHAVE_STRNCASECMP -DHAVE_LIBC_H -DHAVE_STRERROR $(OPTIONS)" \
+           CFLAGS="$(COPTS) -DGAMMA=lgamma -DNEXT -DREADLINE -DHAVE_SGTTY_H -DHAVE_STRNCASECMP -DHAVE_LIBC_H $(OPTIONS)" \
            LIBS="-lNeXT_s -lsys_s $(LIBS)" \
            X11FLAGS="$(X11FLAGS)" \
            X11INCLUDES=" " X11LIBS=" " PLOTXFLAG=" " \
@@ -387,7 +386,7 @@ NEXT_FLAGS = \
            TERMFLAGS="-I. -Iterm -ObjC -DANSI" OBJS=" $(OBJS) $(NEXTOBJS)"
 
 NEXT_X11_FLAGS = \
-           CFLAGS="$(COPTS) -DGAMMA=lgamma -DNEXT -DREADLINE -DHAVE_SGTTY_H -DHAVE_STRNCASECMP -DX_NOT_POSIX -DHAVE_LIBC_H -DHAVE_STRERROR $(OPTIONS)" \
+           CFLAGS="$(COPTS) -DGAMMA=lgamma -DNEXT -DREADLINE -DHAVE_SGTTY_H -DHAVE_STRNCASECMP -DX_NOT_POSIX -DHAVE_LIBC_H $(OPTIONS)" \
            LIBS="-lNeXT_s -lsys_s $(LIBS)" \
            X11LIBS="-L/usr/lib/X11 -lX11" \
            X11INCLUDES="$(X11INCLUDES)" X11FLAGS="$(X11FLAGS)" \
@@ -468,7 +467,7 @@ DIRS = term demo docs docs/latextut
 
 CSOURCE1 = bf_test.c binary.c command.c set.c show.c
 CSOURCE2 = help.c graphics.c graph3d.c internal.c
-CSOURCE3 = misc.c eval.c parse.c plot.c plot2d.o plot3d.o readline.c scanner.c standard.c
+CSOURCE3 = misc.c eval.c parse.c plot.c plot2d.o plot3d.o readline.c scanner.c standard.c stdfn.c
 CSOURCE4 = bitmap.c term.c time.c util.c version.c fit.c matrix.c
 CSOURCE5 = term/ai.trm term/amiga.trm term/aed.trm term/atariaes.trm term/atarivdi.trm \
 	term/cgi.trm term/corel.trm \

@@ -1,5 +1,5 @@
 /*
- * $Id: tpic.trm,v 1.18 1998/03/22 22:35:09 drd Exp $
+ * $Id: tpic.trm,v 1.19 1998/04/14 00:18:12 drd Exp $
  */
 
 /* GNUPLOT - tpic.trm */
@@ -79,9 +79,7 @@
  * adapted to the new terminal layout by Stefan Bodewig (Dec. 1995)
  */
 
-#ifndef GOT_DRIVER_H
 #include "driver.h"
-#endif
 
 #ifdef TERM_REGISTER
 register_term(tpic)
