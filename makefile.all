@@ -1,7 +1,7 @@
 #<<<makefile.all>>>
 ########################################################
 #
-# $Id: makefile.all,v 1.28.2.5 2000/10/20 19:37:31 lhecking Exp $
+# $Id: makefile.all,v 1.28.2.6 2000/10/24 20:11:17 lhecking Exp $
 #
 ########################################################
 #
@@ -135,8 +135,7 @@ ETC =   0BUGS 0FAQ 0INSTALL 0PORTING 0README ChangeLog CodeStyle Copyright \
 	makefile.st makefile.tc makefile.unx makefile.vms makefile.wc \
 	makefile.win makefile.ztc missing mkinstalldirs os9.c pcgraph.asm \
 	rgipgnu stamp-h.in strftime.c vms.c x11.opt m4/apple.m4 m4/beos.m4 \
-	m4/msdos.m4 m4/next.m4 m4/path-hdr.m4 m4/path-lib.m4 m4/select.m4 \
-	$(T)README
+	m4/msdos.m4 m4/next.m4 m4/select.m4 $(T)README
 
 # Documentation and help files
 DOCS1 = $(D)Makefile.in $(D)README $(D)checkdoc.c $(D)doc2gih.c \
