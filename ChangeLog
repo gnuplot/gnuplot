@@ -1,3 +1,44 @@
+1998-09-25  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* 0INSTALL, makefile.os2: Some patches from Alexander Mai.
+
+	* command.c, plot.c: DJGPP patches from Andris Pavenis
+	<pavenis@lanet.lv>.
+
+1998-09-24  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* 0PORTING: Mention HAVE_SYS_STAT_H. Add info about plot.h.
+
+	* acconfig.h: Remove NO_SYS_STAT_H, re-add X11.
+
+	* acinclude.m4: Cleanup.
+
+	* aclocal.m4, config.hin, configure: Regenerated.
+
+	* configure.in: Change test for <sys/stat.h>, re-add X11.
+
+	* datefile.c, stdfn.h: Invert #ifdef logic for <sys/stat.h>.
+
+	* gplt_x11.c(mainloop): Fix typo.
+
+	* makefile.amg: Add comment about compiler warning.
+
+	* makefile.ami, makefile.nt, makefile.os9, makefile.tc, makefile.wc,
+	makefile.win: Escape quotes in CFLAGS line.
+
+	* makefile.amg, makefile.nt: Define HAVE_SYS_STAT_H in DEFS/CFLAGS.
+	
+	* stdfn.h: Add missing stat macros for WIN32 and AMIGA_SC_6_1.
+
+	* term/x11.trm: VMS diffs by Lucas Hart.
+
+	* win/wgnuplib.def, win/wgnuplot.def: Re-add ^M's at end of line.
+
+	* plot.h: Remove X_DISPLAY_MISSING and re-addX11. Move definition of
+	PLOTRC into OS specific section.
+
+	* term.h: Remove X_DISPLAY_MISSING.
+
 1998-09-23  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* 0INSTALL: Rewrite part about unproto.
