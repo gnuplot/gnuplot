@@ -53,8 +53,7 @@ changequote(, )dnl
     -e 'y/abcdefghijklmnopqrstuvwxyz/ABCDEFGHIJKLMNOPQRSTUVWXYZ/'`
 changequote([, ])dnl
 AC_MSG_CHECKING([for $2 in -l$1])
-AC_CACHE_VAL(ac_cv_lib_$ac_lib_var,
-[gp_save_TERMLIBS="$TERMLIBS"
+gp_save_TERMLIBS="$TERMLIBS"
 if test "$3" != yes && test "$3" != no; then
   gp_l_path=`echo "$3" | sed -e 's%/lib$1\.a$%%'`
   gp_l_prfx=`echo $gp_l_path | sed -e 's%/lib$%%' -e 's%/include$%%'`
@@ -62,24 +61,20 @@ if test "$3" != yes && test "$3" != no; then
 else
   gp_l_list=''
 fi
-for ac_dir in '' $gp_l_list /usr/local/lib ; do
+for ac_dir in $gp_l_list '' /usr/local/lib ; do
   test x${ac_dir} != x && TERMLIBS="-L${ac_dir} $gp_save_TERMLIBS"
   GP_CHECK_LIB_QUIET($1,$2,$4)
-  TERMLIBS="$gp_save_TERMLIBS"
   if eval "test \"`echo '$ac_cv_lib_'$ac_lib_var`\" = yes"; then
-    eval "ac_cv_lib_$ac_lib_var=${ac_dir}"
     break
   fi
 done
-])
-if eval "test \"`echo '$ac_cv_lib_'$ac_lib_var`\" != no"; then
-  if eval "test \"`echo x'$ac_cv_lib_'$ac_lib_var`\" != x" && eval "test \"`echo x'$ac_cv_lib_'$ac_lib_var`\" != xyes"; then
-    eval "TERMLIBS=\"$gp_save_TERMLIBS -L`echo '$ac_cv_lib_'$ac_lib_var`\""
-  fi
+
+if eval "test \"`echo '$ac_cv_lib_'$ac_lib_var`\" = yes"; then
   TERMLIBS="$TERMLIBS -l$1"
   AC_MSG_RESULT(yes)
 else
   AC_MSG_RESULT(no)
+  TERMLIBS="$gp_save_TERMLIBS"
 fi
 ])
 
