@@ -1,3 +1,8 @@
+2002-12-01  Ethan Merritt  <merritt@u.washington.edu>
+
+        * term/cgm.trm: Tweak code so gcc3.2 does not complain about
+	ill-defined behavior of a[i]=b[i++].
+
 2002-11-28  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/util3d.c (draw3d_line_unconditional): Removed the GP_INLINE
@@ -1478,7 +1483,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/11/27 20:47:49 $).
+	last modification date (from the tag $Date: 2002/11/28 16:14:56 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 

@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: cgm.trm,v 1.50 2002/11/27 19:56:34 joze Exp $
+ * $Id: cgm.trm,v 1.51 2002/11/27 20:45:35 lhecking Exp $
  */
 
 /* GNUPLOT - cgm.trm */
@@ -529,10 +529,10 @@ CGM_options()
 		     (CGM_COLORS * 3 + 1) * sizeof (int), "CGM color table");
 
 	     for (i = cgm_user_color_count, j = cgm_user_color_count * 3 + 1;
-		     i < CGM_COLORS; i++) {
-		 cgm_user_color_table[j] = cgm_default_color_table[j++];
-		 cgm_user_color_table[j] = cgm_default_color_table[j++];
-		 cgm_user_color_table[j] = cgm_default_color_table[j++];
+		     i < CGM_COLORS; i++, j+=3) {
+		 cgm_user_color_table[j]   = cgm_default_color_table[j];
+		 cgm_user_color_table[j+1] = cgm_default_color_table[j+1];
+		 cgm_user_color_table[j+2] = cgm_default_color_table[j+2];
 	     }
 
 	     cgm_user_color_count = CGM_COLORS;
