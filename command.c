@@ -126,11 +126,11 @@ extern void screen_dump(void);	/* in term/win.trm */
 extern int Pause(LPSTR mess); /* in winmain.c */
 #endif
 
-#define inrange(z,min,max) ((min<max) ? ((z>=min)&&(z<=max)) : ((z>=max)&&(z<=min)) )
-
 #ifdef OS2
  /* emx has getcwd, chdir that can handle drive names */
 # define chdir  _chdir2
+int  PM_pause (char*);
+int   ExecuteMacro( char* , int) ;
 #endif /* OS2 */
 
 #ifdef VMS
@@ -254,7 +254,7 @@ int com_line()
 }
 
 #ifdef OS2
-int set_input_line( char *line, int nchar )
+void set_input_line( char *line, int nchar )
 {
     strncpy( input_line, line, nchar ) ;
     input_line[nchar]='\0';
@@ -273,12 +273,13 @@ int do_line()
     c_token = 0;
     while (c_token < num_tokens) {
 	if (command())
-           return(1);
-	if (c_token < num_tokens)	/* something after command */
+	    return(1);
+	if (c_token < num_tokens) {	/* something after command */
 	    if (equals(c_token, ";"))
 		c_token++;
 	    else
 		int_error("';' expected", c_token);
+	}
     }
     return(0);
 }
