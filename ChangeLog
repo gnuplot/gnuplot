@@ -1,3 +1,15 @@
+1999-09-14  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* src/term.c(test_term): Fix bug where test pattern is drawn before
+	line properties are fully specified. Combined effort by
+	"Jürgen v.Hagen" <vonhagen@ihefiji.etec.uni-karlsruhe.de> and
+	Dick Crawford <crawford@arete.com>.
+
+1999-09-14  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* graph3d.c: Fix old bug which caused 'xzeroaxis' and 'yzeroaxis' to
+	mean the opposite of each other in splots.
+
 1999-08-25  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* Makefile.in, makefile.all: Updated.
