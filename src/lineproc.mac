@@ -1,0 +1,126 @@
+; lineproc.mac
+; MASM macro definition for Bresenham line-drawing routine
+; Colin Kelley
+; January 13, 1987
+
+
+INCAX	equ 40h			; for Self-Modifying Code
+INCBX	equ 43h
+DECAX	equ 48h
+DECBX	equ 4bh
+
+; usage:
+;   lineproc linename, pixelname
+;
+; where linemane is the name you want for the proc, and pixelname is the
+;   name of the routine that linename is to call to set pixels
+;
+
+lineproc macro linename, pixelname
+beginproc linename
+
+	push bp
+	mov bp,sp
+	push si
+	push di
+	mov ax,[bp+X]		; x1
+	mov bx,[bp+X+2]		; y1
+	mov cx,[bp+X+4]		; x2
+	mov si,[bp+X+6]		; y2
+
+	cmp ax,cx		; x1,x2
+	jne i19
+	cmp bx,si		; y1,y2
+	jne i19
+
+	call pixelname
+
+	jmp i28
+i19:
+	mov dx,ax		; dx,x1
+	sub dx,cx		; x2
+	jnc noabsx
+	neg dx
+noabsx:
+	mov di,bx		; dy,y1
+	sub di,si		; y2
+	jnc noabsy
+	neg di			; dy
+noabsy:
+	cmp dx,di		; dx,dy
+	jb i21			; go iterate y's
+;
+; iterate x's
+;
+	cmp bx,si		; y1,y2
+	jb forwardy
+	mov byte ptr cs:yinc1,DECBX
+	jmp short i22
+forwardy:
+	mov byte ptr cs:yinc1,INCBX
+i22:
+	cmp ax,cx		; x1,x2
+	jae l20004
+	mov byte ptr cs:xinc1,INCAX
+	jmp short l20005
+l20004:
+	mov byte ptr cs:xinc1,DECAX
+l20005:
+	mov bp,dx		; sum,dx
+	shr bp,1		; sum
+d23:
+	cmp ax,cx		; x1,x2
+	je i28			; done
+xinc1:	inc ax			; may become inc or dec
+	add bp,di		; sum,dy
+	cmp bp,dx
+	jb i27
+	sub bp,dx		; sum,dx
+yinc1:	inc bx			; may become inc or dec
+i27:
+	call pixelname
+	jmp short d23
+
+;
+; else iterate y's
+;
+i21:
+	cmp ax,cx		; x1,x2
+	jae l20006
+	mov byte ptr cs:xinc2,INCAX
+	jmp short l20007
+l20006:
+	mov byte ptr cs:xinc2,DECAX
+l20007:
+	cmp bx,si		; y1,y2
+	jb forwardy2
+	mov byte ptr cs:yinc2,DECBX
+	jmp short i29
+forwardy2:
+	mov byte ptr cs:yinc2,INCBX
+i29:
+	mov bp,di		; sum,dy
+	shr bp,1		; sum,1
+d30:
+	cmp bx,si		; y1,y2
+	je i28
+yinc2:	inc bx			; may become inc or dec
+	add bp,dx		; sum,dx
+	cmp bp,di		; sum,dy
+	jb i34
+	sub bp,di		; sum,dy
+xinc2:	inc ax			; may become inc or dec
+i34:
+	call near ptr pixelname
+	jmp short d30
+;
+; clean up and exit
+;
+i28:
+	pop di
+	pop si
+	pop bp
+	ret
+
+linename endp
+	endm

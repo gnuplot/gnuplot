@@ -1,0 +1,153 @@
+#!/bin/csh -f
+#
+# Print gnuplot output on RGIP (Uniplex) format.
+
+set input_files = ()    # the plot input command files
+set lpr_opts = ()	    # options to lpr
+set fontsize = ()
+
+# File for plot commands, and for plot output
+set TMP=/tmp/plot$$
+set outfile="|mail $USER"	#mail user if no outputfile
+set out=0
+set windows = ()	#windows nr i x-dir and y-dir
+onintr cleanup
+
+# default is Imagen mode for Imagen printer; see -p option
+set setterm="set terminal imagen"
+
+set usage="usage: rgipgnu [-f fontsize] [-w [winx,winy]] [-t title] [-o outputfile] [-p 'plot command'] [plot-files....]"
+
+# Loop through the command-line arguments.
+
+
+top:
+	if ($#argv > 0) then
+
+		switch ("$argv[1]")
+
+		case -   :	# print to stdout 
+			set outfile=""
+			set out=1
+			shift argv
+			goto top
+
+		case -f?*:		# Specify font size
+			set fontsize = `echo $argv[1] | sed 's/^-f//'`)
+			shift argv
+			goto top
+
+		case -f:	# Specify font size
+			shift argv
+			if ($#argv > 0) then
+				set fontsize = $argv[1]
+				shift argv
+			else
+				echo "Usage: -f fontsize (1-8)"
+				echo "Type    rgipgnu -help    for help."
+				exit (1)
+			endif
+			goto top
+
+		case -o?*:	# Specify output-file of plot
+			set outfile = `echo $argv[1] | sed 's/^-o//'`
+			set out=1
+			shift argv
+			goto top
+
+		case -o:	# Specify title of plot
+			shift argv
+			if ($#argv > 0) then
+			 	set outfile = $argv[1]
+				set out=1
+				shift argv
+			else
+				echo "Usage: -o outputfile"
+				echo "Include a 'X' in filename if multiple plots"
+				echo "Type    lasergnu -help    for help."
+				exit (1)
+			endif
+			goto top
+
+		case -t?*:	# Specify title of plot
+			echo set title \""`echo $argv[1] | sed 's/^-t//'`"\" >> $TMP
+			shift argv
+			goto top
+
+		case -t:	# Specify title of plot
+			shift argv
+			if ($#argv > 0) then
+				echo set title \""$1"\" >> $TMP
+				shift argv
+			else
+				echo "Usage: -t title ..."
+				echo "Type    lasergnu -help    for help."
+				exit (1)
+			endif
+			goto top
+          case -help:
+			echo "$usage"
+			exit(1)
+
+		case -p?*:	# plot-commds 
+	                echo "$argv[1]" | sed "s/^-p//"	>> $TMP
+			shift argv
+			goto top
+
+		case -p:	# Set the printer, exactly as by itroff.
+			shift argv
+			if ($#argv > 0) then
+	                	echo "$argv[1]"	>> $TMP
+				shift argv
+			else
+				echo "Usage: -P 'plot-commands ...'"
+				echo "Type    rgipgnu -help    for help."
+				exit (1)
+			endif
+			goto top
+
+		case -w:	# Specify split page
+			shift argv
+			if ($#argv > 0) then
+				set windows="[$argv[1]]"
+				shift argv
+			else
+				echo "Usage: -w no_horiz,no_vertical"
+				echo "Type    lasergnu -help    for help."
+				exit (1)
+			endif
+			goto top
+
+		case -?*:
+			echo "I do not recognize option $argv[1]."
+			echo "$usage"
+			exit (1)
+
+		default:
+	          	set input_files = ($input_files $argv[1])
+			shift argv
+			goto top
+
+		endsw
+	endif
+
+set setterm="set term rgip $fontsize $windows"
+
+# Set up input file
+echo "$setterm" > $TMP.plt
+echo set output \"$outfile\" >> $TMP.plt
+if (-e $TMP) cat $TMP >> $TMP.plt
+
+# If input file is specified AND command line contains plot commands, then
+#	do command line args first, then plot commands in input file.
+#if ( "$input_files" != "" ) then
+if ( "$out" ) then
+grep -v "set te" $input_files | grep -v "set out" >> $TMP.plt
+else
+grep -v "set te" $input_files >> $TMP.plt
+endif
+echo "quit" >> $TMP.plt
+gnuplot $TMP.plt < /dev/null
+
+cleanup:
+rm -f $TMP* 

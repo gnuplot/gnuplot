@@ -1,0 +1,61 @@
+if1
+LARGE	equ 1			; define your memory model here
+
+ifdef	SMALL
+	; default, so do nothing
+	else
+
+ifdef	MEDIUM
+	LARGE_CODE equ 1
+	else
+
+ifdef	COMPACT
+	LARGE_DATA equ 1
+	else
+
+ifdef	LARGE
+	LARGE_DATA equ 1
+	LARGE_CODE equ 1
+
+else
+	%out No memory model defined--assuming SMALL
+
+endif	; LARGE
+endif	; COMPACT
+endif	; MEDIUM
+endif	; SMALL
+
+
+beginproc macro procname
+
+ifdef	LARGE_CODE
+	procname proc far
+else
+	procname proc near
+endif	; LARGE_CODE
+
+	endm	; beginproc
+
+
+endif	; if1
+
+
+_TEXT	SEGMENT	BYTE PUBLIC 'CODE'
+_TEXT	ENDS
+_DATA	SEGMENT WORD PUBLIC 'DATA'
+_DATA	ENDS
+CONST	SEGMENT WORD PUBLIC 'CONST'
+CONST	ENDS
+_BSS	SEGMENT WORD PUBLIC 'BSS'
+_BSS	ENDS
+
+DGROUP	GROUP	CONST, _BSS, _DATA
+	assume cs:_text, ds:dgroup, ss:dgroup, es:dgroup
+
+; define X as the offset of first argument on stack frame
+
+ifdef LARGE_CODE
+	X	equ 6			; return offset and segment + old BP
+else
+	X	equ 4			; return offset + old BP
+endif	; LARGE_CODE
