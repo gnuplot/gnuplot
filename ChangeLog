@@ -1,3 +1,11 @@
+2001-03-09  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/parse.c (xterms, aterms, bterms): Avoid storing pointers
+ 	into the dynamical array at->actions[]. They break if the action
+ 	table has to be reallocated. This caused a really strange endless
+ 	loop bug for a very complicated function using 8 nested levels of
+ 	conditional operators plus lots of function calls.
+
 2001-03-09  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* term/win.trm src/win/wgnuplib.h src/win/wgraph.c: bugfix for windows
