@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.7 1999/06/11 18:53:14 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.8 1999/06/14 19:19:45 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -80,8 +80,6 @@ int hidden_line_type_above, hidden_line_type_below;
 
 double xscale3d, yscale3d, zscale3d;
 
-static double LogScale __PROTO((double coord, TBOOLEAN is_log,
-				double log_base_log, char *what, char *axis));
 static void plot3d_impulses __PROTO((struct surface_points * plot));
 static void plot3d_lines __PROTO((struct surface_points * plot));
 static void plot3d_points __PROTO((struct surface_points * plot));
@@ -110,17 +108,13 @@ static void boundary3d __PROTO((int scaling, struct surface_points * plots,
 static double dbl_raise __PROTO((double x, int y));
 #endif
 static void map_position __PROTO((struct position * pos, unsigned int *x,
-				  unsigned int *y, char *what));
+				  unsigned int *y, const char *what));
 
 /* put entries in the key */
 static void key_sample_line __PROTO((int xl, int yl));
 static void key_sample_point __PROTO((int xl, int yl, int pointtype));
 static void key_text __PROTO((int xl, int yl, char *text));
 
-
-#if defined(sun386) || defined(AMIGA_SC_6_1)
-static double CheckLog __PROTO((TBOOLEAN is_log, double base_log, double x));
-#endif
 
 /*
  * The Amiga SAS/C 6.2 compiler moans about macro envocations causing
@@ -245,49 +239,6 @@ struct lp_style_type style;
 	hidden_line_type_below = style.l_type;
     }
 #endif /* LITE */
-}
-
-/* (DFK) For some reason, the Sun386i compiler screws up with the CheckLog 
- * macro, so I write it as a function on that machine.
- *
- * Amiga SAS/C 6.2 thinks it will do too much work calling functions in
- * macro arguments twice, thus I inline theese functions. (MGR, 1993)
- */
-#if defined(sun386) || defined(AMIGA_SC_6_1)
-GP_INLINE static double
-CheckLog(is_log, base_log, x)
-TBOOLEAN is_log;
-double base_log;
-double x;
-{
-    if (is_log)
-	return (pow(base_log, x));
-    else
-	return (x);
-}
-#else
-/* (DFK) Use 10^x if logscale is in effect, else x */
-# define CheckLog(is_log, base_log, x) ((is_log) ? pow(base_log, (x)) : (x))
-#endif /* sun386 || SAS/C */
-
-static double
-LogScale(coord, is_log, log_base_log, what, axis)
-double coord;			/* the value */
-TBOOLEAN is_log;		/* is this axis in logscale? */
-double log_base_log;		/* if so, the log of its base */
-char *what;			/* what is the coord for? */
-char *axis;			/* which axis is this for ("x" or "y")? */
-{
-    if (is_log) {
-	if (coord <= 0.0) {
-	    char errbuf[100];	/* place to write error message */
-	    (void) sprintf(errbuf, "%s has %s coord of %g; must be above 0 for log scale!",
-			   what, axis, coord);
-	    graph_error(errbuf);
-	} else
-	    return (log(coord) / log_base_log);
-    }
-    return (coord);
 }
 
 /* And the functions to map from user 3D space to terminal coordinates */
@@ -488,7 +439,7 @@ int pcount;			/* count of plots in linked list */
     TBOOLEAN scaling;
     transform_matrix mat;
     int key_count;
-    char ss[MAX_LINE_LEN+1], *s, *e;
+    char *s, *e;
 
     /* Initiate transformation matrix using the global view variables. */
     mat_rot_z(surface_rot_z, trans_mat);
@@ -585,10 +536,9 @@ int pcount;			/* count of plots in linked list */
 
     /* PLACE TITLE */
     if (*title.text != 0) {
-	safe_strncpy(ss, title.text, sizeof(ss));
 	write_multiline((unsigned int) ((xleft + xright) / 2 + title.xoffset * t->h_char),
 			(unsigned int) (ytop + (titlelin + title.yoffset) * (t->h_char)),
-			ss, CENTRE, JUST_TOP, 0, title.font);
+			title.text, CENTRE, JUST_TOP, 0, title.font);
     }
     /* PLACE TIMEDATE */
     if (*timelabel.text) {
@@ -624,7 +574,6 @@ int pcount;			/* count of plots in linked list */
 	if (this_label->layer)
 	    continue;
 	map_position(&this_label->place, &x, &y, "label");
-	safe_strncpy(ss, this_label->text, sizeof(ss));
 	if (this_label->rotate && (*t->text_angle) (1)) {
 	    write_multiline(x, y, this_label->text, this_label->pos, CENTRE, 1, this_label->font);
 	    (*t->text_angle) (0);
@@ -746,6 +695,7 @@ int pcount;			/* count of plots in linked list */
 
     /* KEY TITLE */
     if (key != 0 && strlen(key_title)) {
+	char *ss = gp_alloc(strlen(key_title) + 1, "tmp string ss");
 	sprintf(ss, "%s\n", key_title);
 	s = ss;
 	yl -= t->v_char / 2;
@@ -768,6 +718,7 @@ int pcount;			/* count of plots in linked list */
 	    yl -= t->v_char;
 	}
 	yl += t->v_char / 2;
+	free(ss);
     }
     key_count = 0;
     yl_ref = yl -= key_entry_height / 2;	/* centralise the keys */
@@ -1029,7 +980,6 @@ int pcount;			/* count of plots in linked list */
 	if (this_label->layer == 0)
 	    continue;
 	map_position(&this_label->place, &x, &y, "label");
-	safe_strncpy(ss, this_label->text, sizeof(ss));
 	if (this_label->rotate && (*t->text_angle) (1)) {
 	    write_multiline(x, y, this_label->text, this_label->pos, CENTRE, 1, this_label->font);
 	    (*t->text_angle) (0);
@@ -1477,7 +1427,6 @@ int plot_num;
 {
     unsigned int x, y;		/* point in terminal coordinates */
     struct termentry *t = term;
-    char ss[MAX_LINE_LEN + 1];
 
     /* work out where the axes and tics are drawn */
 
@@ -1680,8 +1629,7 @@ else if (height[i][j] != depth[i][j]) \
 		y1 -= tic_unity * ticscale * (t->v_tic);
 	    }
 	    /* write_multiline mods it */
-	    safe_strncpy(ss, xlabel.text, sizeof(ss));
-	    write_multiline(x1, y1, ss, CENTRE, JUST_TOP, 0, xlabel.font);
+	    write_multiline(x1, y1, xlabel.text, CENTRE, JUST_TOP, 0, xlabel.font);
 	}
     }
     if (ytics || *ylabel.text) {
@@ -1717,8 +1665,7 @@ else if (height[i][j] != depth[i][j]) \
 		y1 -= tic_unity * ticscale * (t->v_tic);
 	    }
 	    /* write_multiline mods it */
-	    safe_strncpy(ss, ylabel.text, sizeof(ss));
-	    write_multiline(x1, y1, ss, CENTRE, JUST_TOP, 0, ylabel.font);
+	    write_multiline(x1, y1, ylabel.text, CENTRE, JUST_TOP, 0, ylabel.font);
 	}
     }
     /* do z tics */
@@ -1748,8 +1695,7 @@ else if (height[i][j] != depth[i][j]) \
 	x += zlabel.xoffset * t->h_char;
 	y += zlabel.yoffset * t->v_char;
 
-	safe_strncpy(ss, zlabel.text, sizeof(ss));
-	write_multiline(x, y, ss, CENTRE, CENTRE, 0, zlabel.font);
+	write_multiline(x, y, zlabel.text, CENTRE, CENTRE, 0, zlabel.font);
 
     }
 }
@@ -1911,7 +1857,7 @@ static void
 map_position(pos, x, y, what)
 struct position *pos;
 unsigned int *x, *y;
-char *what;
+const char *what;
 {
     double xpos = pos->x;
     double ypos = pos->y;
