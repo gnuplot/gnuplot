@@ -1,5 +1,7 @@
 #
-# GNUPLOT makefile for GCC-ST 1.x and 2.x
+# $Id: $
+#
+# GNUPLOT Makefile for GCC-ST 1.x and 2.x
 # in a cross development environment (unix) or a native TOS environment
 # (see configuration section)
 #

@@ -1,11 +1,9 @@
 #
 # $Id: makefile.ami,v 1.16 1998/04/14 00:15:50 drd Exp $
 #
-#
-#
-#   Makefile for the Amiga             Pat R. Empleo
-#                                      Sept 1991
-#      Manx Aztec C 5.2 beta version
+# GNUPLOT Makefile for Manx Aztec C 5.2 beta of better on the Amiga
+# 
+# Pat R. Empleo Sept 1991
 #
 #   Usage:
 #

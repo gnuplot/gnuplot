@@ -1,4 +1,8 @@
-# make file for Borland C++ 3.x
+#
+# $Id: $
+#
+# GNUPLOT Makefile for Borland C++ 3.x
+#
 # uses Borland proprietary overlay manager
 # Modified from the TurboC makefile by Maurice Castro
 # The compile and link includes debug flags.  Take them out if you

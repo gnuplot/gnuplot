@@ -1,10 +1,10 @@
 #
 # $Id: makefile.os2,v 1.27 1998/04/14 00:15:54 drd Exp $
 #
-# Makefile for use on OS/2 3.x and above (might also work for OS/2 2.x)
+# GNUPLOT Makefile for use on OS/2 3.x and above (might also work for OS/2 2.x)
 # using emx 0.9 (and above) and GNUMake
 #
-# last modification date: 19990210
+# last modification date: 19990312
 #
 
 # We depend on using cmd.exe (or a compatible one)

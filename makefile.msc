@@ -1,8 +1,8 @@
 #
 # $Id: makefile.msc,v 1.17 1998/04/14 00:15:52 drd Exp $
 #
-# Make file for use with Microsoft C  Version 5.10
-# and Microsoft Program Maintenance Utility  Version 4.07
+# GNUPLOT Makefile for use with Microsoft C  Version 5.10
+#  and Microsoft Program Maintenance Utility  Version 4.07
 # 
 
 # where to place gnuplot.gih helpfile

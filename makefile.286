@@ -1,5 +1,9 @@
-# make file for Borland C++ 3.x
+#
+# $Id: $
+#
+# GNUPLOT Makefile for Borland C++ 3.x
 #   and Phar Lap LITE286 DOS extender
+#
 # both LITE286 bin and BORLANDC bin directories must be on the path
 
 # where to place gnuplot.gih helpfile

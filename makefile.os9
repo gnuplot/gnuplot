@@ -1,8 +1,8 @@
-############################################################
 #
 # $Id: makefile.os9,v 1.4 1998/04/14 00:15:55 drd Exp $
 #
-# GNUPLOT 3.7 makefile (X11 support) for OS-9 and Ultra C
+# GNUPLOT Makefile for OS-9 and Ultra C, with X11 support
+#
 #   by Martijn Schipper 18-6-1996
 #   schipper@iri.tudelft.nl
 #

@@ -1,11 +1,17 @@
-# make file for DJGPP 
-# compile it by   make -f makefile.djg
+#
+# $Id: $
+#
+# GNUPLOT Makefile for DJGPP on DOS
+#
+# Usage:
+#       make -f makefile.djg
+#
 
 # where to place gnuplot.gih helpfile
 HELPFILE = gnuplot.gih
 
-# exe file will be  gp36.exe:
-EXENAME = gp36
+# exe file will be  gp37.exe:
+EXENAME = gp37
 
 # compiler
 CCDIR = c:\djgpp\bin\

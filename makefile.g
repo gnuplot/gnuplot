@@ -1,4 +1,8 @@
-# This file is for GRASS, a geographic information system. 
+#
+# $Id: $
+#
+# GNUPLOT Makefile for GRASS, a geographic information system. 
+#
 # To compile, make modifications below (if necessary) then
 # % gmake4.1
 # % MAKELINKS

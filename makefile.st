@@ -1,9 +1,7 @@
 #
 # $Id: makefile.st,v 1.19 1998/04/14 00:15:56 drd Exp $
 #
-
-#
-# GNUPLOT makefile for GCC-ST 1.x and 2.x
+# GNUPLOT Makefile for GCC-ST 1.x and 2.x
 # in a cross development environment (unix) or a native TOS environment
 # (see configuration section)
 #

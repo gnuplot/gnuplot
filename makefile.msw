@@ -1,8 +1,8 @@
 #
 # $Id: makefile.msw,v 1.15 1998/04/14 00:15:53 drd Exp $
 #
-# Make file for Microsoft C  Version 7.0 Windows Version
-# and Microsoft Program Maintenance Utility  Version 1.20
+# GNUPLOT Makefile for Microsoft C  Version 7.0 Windows Version
+#  and Microsoft Program Maintenance Utility  Version 1.20
 # 
 
 # where to place gnuplot.gih helpfile

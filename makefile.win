@@ -1,5 +1,9 @@
-# make file for Borland C++ 3.1 Windows version
-# and Win32 using Borland C++ 4 (4.52 is known to work)
+#
+# $Id: $
+#
+# GNUPLOT Makefile for Borland C++ 3.1 Windows version
+#  and Win32 using Borland C++ 4 (4.52 is known to work)
+#
 # CAVEAT: may not work correctly with BC 5 due to changes in flags
 # The compile and link includes debug flags.  Take them out if you
 # do not want them included  (-y -v -M, /m /s /v /l)

@@ -1,4 +1,8 @@
-# makefile for Watcom C 9.5a
+#
+# $Id: $
+#
+# GNUPLOT Makefile for Watcom C 9.5a
+#
 # Modified from the TurboC makefile by Aurel Gabris
 #
 # the makefile does longer depends on a linker options file.

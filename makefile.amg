@@ -1,11 +1,12 @@
-# Makefile for SAS/C 6.1 or better on the Amiga
 #
 # $Id: makefile.amg,v 1.29 1998/04/14 00:15:50 drd Exp $
+#
+# GNUPLOT Makefile for SAS/C 6.1 or better on the Amiga
 #
 # Makefile for use with SAS/C 6.50 or newer
 #   on AmigaOS 2.0 and above
 #
-# last modification date: 19990226
+# last modification date: 19990312
 #
 
 #

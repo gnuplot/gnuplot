@@ -1,9 +1,7 @@
 #
 # $Id: makefile.vms,v 1.26 1998/04/14 00:15:59 drd Exp $
 #
-#
-# GNUPLOT Makefile
-# for VMS
+# GNUPLOT Makefile for VMS
 # 
 # use with the MAKE that was posted by Tony Ivanov (tony@gvgpvd.GVG.TEK.COM)
 # in comp.os.vms on 5 December 1988

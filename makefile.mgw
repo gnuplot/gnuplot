@@ -1,3 +1,8 @@
+#
+# $Id: $
+#
+# GNUPLOT Makefile for Cygwin/MinGW32 on WinNT and Win95/98
+#
 # To compile gnuplot for WinNT and Win95
 #
 # Changed for use with Cygwin/MinGW32 by HBB

@@ -1,4 +1,7 @@
-# To compile gnuplot for WinNT and Win95
+#
+# $Id: $
+#
+# GNUPLOT Makefile to compile gnuplot for WinNT and Win95/98
 #
 # Make file for microsoft nmake with visual c++ on NT
 # run this on the command line with "nmake -f makefile.nt"
