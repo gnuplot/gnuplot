@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: specfun.c,v 1.30 2004/07/25 12:25:01 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: specfun.c,v 1.31 2004/11/10 23:30:30 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - specfun.c */
@@ -1863,56 +1863,13 @@ erf(double x)
 }
 #endif /* !HAVE_ERF */
 
-/*                                                      ndtr.c
- *
- *      Normal distribution function
- *
- *
- *
- * SYNOPSIS:
- *
- * double x, y, ndtr();
- *
- * y = ndtr( x );
- *
- *
- *
- * DESCRIPTION:
- *
- * Returns the area under the Gaussian probability density
- * function, integrated from minus infinity to x:
- *
- *                            x
- *                             -
- *                   1        | |          2
- *    ndtr(x)  = ---------    |    exp( - t /2 ) dt
- *               sqrt(2pi)  | |
- *                           -
- *                          -inf.
- *
- *             =  ( 1 + erf(z) ) / 2
- *             =  erfc(z) / 2
- *
- * where z = x/sqrt(2). Computation is via the functions
- * erf and erfc.
- *
- *
- * ACCURACY:
- *
- *                      Relative error:
- * arithmetic   domain     # trials      peak         rms
- *    DEC      -13,0         8000       2.1e-15     4.8e-16
- *    IEEE     -13,0        30000       3.4e-14     6.7e-15
- *
- *
- * ERROR MESSAGES:
- *
- *   message         condition         value returned
- * erfc underflow    x > 37.519379347       0.0
- *
+/* ----------------------------------------------------------------
+   Following function for the inverse error function is taken from
+   NIST on 16. May 2002.
+   Use Newton-Raphson correction also for range -1 to -y0 and
+   add 3rd cycle to improve convergence -  E A Merritt 21.10.2003
+   ----------------------------------------------------------------
  */
-
-/* Note: changed here to have more mnemonic name than the original */
 
 static double
 inverse_error_func(double y)
