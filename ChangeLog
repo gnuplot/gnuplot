@@ -1,13 +1,48 @@
+1999-06-10  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* Codestyle: Add note about #error and #warning directives.
+
+	* configure.in: Remove errorfix stuff.
+
+	* src/Makefile.maint: Remove Makefile.in target.
+
+	* src/bf_test.c, src/stdfn.c, src/variable.c: Indentation.
+
+	* src/gplt_x11.c, src/stdfn.h, src/time.c, term/cgm.trm: Make
+	strncasecmp() default instead of strnicmp().
+
+	* src/help.c, src/plot.h, src/set.c, src/syscfg.h, src/term.c: Remove
+	#error and #warning directives.
+
+	* term/pm.trm: Minor fixes.
+
 1999-06-09  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* configure.in: Use TERMLIBS instead of LIBS in readline test.
+	Use AM_CONDITIONAL for BeOS build.
+
+	* m4/beos.m4: Replace GNUPLOT_BE with build_src_beos_subdir.
+
+	* src/Makefile.am: New file.
+
+	* src/Makefile.maint: Remove Makefile.in target.
+
+	* src/beos/Makefile: Add some variables and targets required for
+	'make dist'.
 
 	* src/command.c(command): Remove a few static arrays.
 
+	* term/metapost.trm, term/tkcanvas.trm: Comment out some unused vars.
+
+	* term/vws.trm: Remove nested comment.
+
 1999-06-09  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
+	* demo/contours.dem, demo/singulr.dem, demo/surface2.dem,
+	demo/world.dem: Adjust to new 'set view <z_scale>' method.
+
 	* src/graph3d.c(boundary3d, do_3dplot): Suppress calculation of
-	key_cols and key_rows if key is empty.
+	key_cols and key_rows if key is empty. Fix 'set view <z_scale>'.
 
 1999-06-08  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
