@@ -133,6 +133,12 @@ pulldown menu causes the plot window to pop to the front of the
 window stack each time a graph is plotted. If this item is unchecked,
 the user will have to bring the window to the front by manual selection.
 
+:h1 res=211. Options Menu Help
+:i2 refid=mopt. Keep aspect ratio
+:p.If this menu is checked, then the sides of the plot keep the aspect ratio 
+of 1.56 thus filling only partially the plotting window. 
+If it is unchecked, then the plot occupies the whole window.
+
 :h1 res=500. Edit Menu Help
 :i1 id=medit. Edit menu
 :i2 refid=medit. The Edit menu
@@ -154,6 +160,85 @@ clipboard. The plot is copied in bitmap and in metafile format.
 :p.Selecting the :hp2.Gnuplot:ehp2. menu item causes the GNUPLOT
 command window to be brought to the foreground. The same result can be be
 obtained by pressing the ESC key when the Gnushell window is active.
+
+:h1 res=600. Mouse Menu Help
+:i1 id=mmouse. Mouse menu
+:i2 refid=mmouse. The Mouse menu
+:p.The :hp2.Mouse:ehp2. menu gives you access to mouse (pointer)-related 
+functions.
+
+:h1 res=601. Use Mouse Menu Help
+:i2 refid=mmouse. Use mouse
+:p.Checking this menu item enables the mouse (pointer device) functionality:
+tracing the position over graph, zooming, annotating graph etc. At the moment, 
+mousing works for 2d graphs. It is not available in multiplot mode. 
+Except for the functions available from the menu, 
+mouse buttons have the following functions:
+:p.:hp2.MB2:ehp2. presents the zoom rectangle. Press :hp2.MB1:ehp2. to force 
+zoom, or :hp2.Esc:ehp2. to cancel zooming. Zooming can be canceled if 
+pressed <Esc> or at least one of the chosen sizes is smaller than 8 pixels.
+FULL FUNCTIONALITY IN FUTURE: The chosen rectangle is automatically zoomed.
+You can return to the original values of ranges by choosing the 
+:hp2.Unzoom:ehp2. menu option.
+CURRENT STATUS: the pipe gnupmdrv->gnuplot is not implemented (programmers
+welcome!). Thus the desired range is just put as xrange; yrange; replot 
+command into clipboard, from which you have to paste it to gnuplot window. 
+:p.:hp2.Double click of MB1:ehp2. writes the current pointer position to
+clipbord according to the format chosen in :hp2.sprintf format:ehp2. menu.
+:p.:hp2.MB3:ehp2. annotates temporarily the graph.
+
+:h1 res=602. Mouse Coordinates Menu Help
+:i2 refid=mmouse. Coordinates
+:p.Choose the coordinates which are used for showing the mouse position, 
+clipboard copy and annotation. 
+:p.:hp2.Real coordinates:ehp2. are coordinates of x and y axes of the current 
+graph.
+:p.:hp2.Screen coordinates:ehp2. are relative coordinates of the screen, 
+i.e. [0,0]..[1,1]. These may be used in gnuplot commands like 
+:hp2.set label "ahoj" at screen 0.85,0.85:ehp2.
+:p.:hp2.Pixel coordinates:ehp2. are the coordinates of the window depending 
+on the screen resolution. They determine the precision of the other 
+coordinates.
+
+:h1 res=603. Sprintf Format Menu Help
+:i2 refid=mmouse. sprintf format
+:p.Choose here the format for writing the cursor position into clipboard
+(via double click of MB1).
+
+:h1 res=604. Zoom Menu Help
+:i2 refid=mmouse. Zoom
+:p.Well, this menu item does nothing just remembers you to use MB2 to 
+start zooming. So click (=press and release) MB2, move your mouse 
+left and up to select the zooming rectangle. Press MB1 to put the 
+replot command into clipboard, or press ESC to cancel the command.
+
+:h1 res=605. Unzoom Menu Help
+:i2 refid=mmouse. Unzoom
+:p.This choise returns back the x and y ranges of the last plot. 
+CURRENT STATUS: puts the required command to clipboard. 
+Waiting till the pipe gnupmdrv->gnuplot is implemented! 
+
+:h1 res=606. Ruler Menu Help
+:i2 refid=mmouse. Ruler
+:p.Disables the ruler if it is already on.
+:p.If the ruler has been off, then show it at the current pointer position. 
+For every mouse movement, print the ruler position aside of the current 
+pointer position, and show their distance (for linear scale) or ratio 
+(for log scale). 
+
+:h1 res=607. Grid Menu Help
+:i2 refid=mmouse. Grid on/off
+:p.Switches quickly on or off grid of the graph. Equivalent to the command 
+:hp2.set grid; replot:ehp2. or :hp2.set nogrid; replot:ehp2. typed in the 
+gnuplot window.
+
+:h1 res=608. Lin/Log Y Axis Menu Help
+:i2 refid=mmouse. lin/log y axis
+:p.Switches quickly between linear and logarithmic y axis. 
+Equivalent to the command :hp2.set log y; replot:ehp2. or 
+:hp2.set nolog y; replot:ehp2. types in the gnuplot window.
+
+
 
 :h1 res=400. Continue Menu Help
 :i1 id=mcont. Continue menu

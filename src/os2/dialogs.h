@@ -25,11 +25,36 @@
 #define IDM_LINES_THICK       208
 #define IDM_LINES_SOLID       209
 #define IDM_FRONT             210
+#define IDM_KEEPRATIO         211      //PM
 #define IDM_EDIT              500
 #define IDM_COPY              501
 #define IDM_CUT               502
 #define IDM_PASTE             503
 #define IDM_CLEARCLIP         504
+
+#define IDM_MOUSE              600     //PM
+#define IDM_USEMOUSE           601
+#define IDM_MOUSE_COORDINATES  602
+#define IDM_MOUSE_COORDINATES_REAL     603
+#define IDM_MOUSE_COORDINATES_PIXELS   604
+#define IDM_MOUSE_COORDINATES_SCREEN   605
+#define IDM_MOUSE_UNZOOM       606
+#define IDM_MOUSE_UNZOOMPREV   607
+#define IDM_MOUSE_RULER                608
+#define IDM_MOUSE_RULERWINDOW  609
+#define IDM_MOUSE_FORMAT       610 // keep this order of *_FORMAT_* constants!
+#define IDM_MOUSE_FORMAT_X_Y   611
+#define IDM_MOUSE_FORMAT_XcY   612
+#define IDM_MOUSE_FORMAT_XsY   613
+#define IDM_MOUSE_FORMAT_XcYc  614
+#define IDM_MOUSE_FORMAT_XcYs  615
+#define IDM_MOUSE_FORMAT_pXdYp 616
+#define IDM_MOUSE_FORMAT_pXcYp 617
+#define IDM_MOUSE_FORMAT_pXsYp 618
+#define IDM_MOUSE_FORMAT_LABEL 619
+#define IDM_MOUSE_GRID         621
+#define IDM_MOUSE_LINLOGY      622
+
 #define ID_ABOUT              10
 #define IDD_COLOURS           20
 #define IDD_PRINTQNAME        5106
@@ -70,3 +95,6 @@
 #define IDH_FORHELP           901
 
 #define IDD_PRINTNAME               5010
+
+// Cursors
+#define IDP_CROSSHAIR  651

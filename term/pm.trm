@@ -38,6 +38,11 @@
  *    pm.trm  --- inboard terminal driver for Presentation Manager
  *            --- after X-11 driver, by R.W.Fearick 31/1/92.
  *    v1.1 11/8/92 -- speed things up
+ *
+ *    March/April 1998: additions for mouse support implemented by Petr Mikulik
+ *	 last change: 7. 4. 1998
+ *	 for mouse support, pm.trm has to be compiled with USE_MOUSE, e.g.
+ *	 gcc ... -DUSE_MOUSE ... 
  */
 
 #include "driver.h"
@@ -106,6 +111,7 @@ TERM_PUBLIC void PM_linewidth __PROTO((double linewidth));
 #define GR_TEXT         'T'
 #define GR_PAUSE        'P'
 #define GR_HELP         'H'
+#define GR_MOUSECAPABLE 'm' //PM: say gnupmdrv we are mouseable
 #define PM_nopts 1
 
 /* path for pm program */
@@ -121,6 +127,8 @@ static char PM_opts[256] = "";
 static int PM_optargs = 0;
 static int PM_plot_number = 0;
 static char PM_term_title[128] = "";
+
+static char mouseGnupmdrv = 0; //PM set to 1 if we are connected to a mouseable gnupmdrv
 
 FILE *fopen();
 static FILE *PM_pipe = NULL;
@@ -230,6 +238,12 @@ TERM_PUBLIC void PM_init()
 	if (PM_must_reset_opts)
 	    PM_reset_opts();
     }
+    #ifdef USE_MOUSE
+    //PM: notify gnupmdrv that this is mouse-enhanced terminal
+    putc( GR_MOUSECAPABLE, PM_pipe ) ;
+    fflush( PM_pipe ) ;
+    //we catch mouseable gnupmdrv's answer in PM_query by 0xABCD
+    #endif
     PM_query();
 }
 
@@ -331,6 +345,11 @@ static void PM_query()
     putc(GR_QUERY, PM_pipe);
     fflush(PM_pipe);
     rc = DosRead(fileno(PM_pipe), &term->h_char, sizeof(int), &cbR);
+    if (term->h_char == 0xABCD) {
+      //PM we have got greetings from mouseable gnupmdrv
+      mouseGnupmdrv = 1; // thus set mouseGnupmdrv on and reread h_char
+      rc = DosRead( fileno(PM_pipe), &term->h_char, sizeof(int), &cbR ) ;
+      }
     rc = DosRead(fileno(PM_pipe), &term->v_char, sizeof(int), &cbR);
 }
 
@@ -371,7 +390,57 @@ TERM_PUBLIC void PM_text()
 
 TERM_PUBLIC void PM_graphics()
 {
+    #ifdef USE_MOUSE //PM
+    extern int xleft, xright, ybot, ytop;
+    extern double min_array[], max_array[];
+    extern int /*TBOOLEAN*/ is_3d_plot;
+    #endif
     putc(SET_GRAPHICS, PM_pipe);
+    #ifdef USE_MOUSE //PM
+    if (mouseGnupmdrv) { // we are connected to mouseable gnupmdrv
+    /*
+    For mouse: propagate plot information to gclient.c. This must correspond
+    to the order in the structure gp4mouse in gclient.c since it is
+    read by BufRead there.
+    */
+    /*
+    // For development purposes:
+    printf("pm.trm: [xleft,ybot] [xright,ytop] = [%i,%i]..[%i,%i]\n",xleft,ybot,xright,ytop);
+    printf("pm.trm: [xmin,ymin] [xmax,ymax] = [%g,%g]..[%g,%g]\n",xmin,ymin,xmax,ymax);
+    printf("pm.trm: autoscale_x=%i,  _y=%i\n",autoscale_x,autoscale_y);
+    printf("pm.trm: true min,max = [%g,%g]..[%g,%g]\n",min_array[FIRST_X_AXIS],min_array[FIRST_Y_AXIS],max_array[FIRST_X_AXIS],max_array[FIRST_Y_AXIS]);
+    printf("pm.trm: multiplot=%i\n",multiplot);
+    printf("pm.trm: draw_surface=%i\n",draw_surface);
+    printf("pm.trm: draw_contour=%i\n",draw_contour);
+    */
+    {
+    // what the mouse is going over? 2d, 3d graph... disable mouse for multiplot
+    int graph_mouse=0;
+    if (!multiplot) {
+      if (is_3d_plot==TRUE)
+	  graph_mouse = 0; // for future: graph_mouse=3;
+	else // 2d plot
+	  graph_mouse = (polar) ? 1 : 2;
+      }
+    // printf("pm.trm: graph_mouse=%i\n",0+graph_mouse);
+    fwrite(&graph_mouse,sizeof(graph_mouse),1,PM_pipe);
+    }
+    fwrite(&min_array[FIRST_X_AXIS],sizeof(double),1,PM_pipe);
+    fwrite(&min_array[FIRST_Y_AXIS],sizeof(double),1,PM_pipe);
+    fwrite(&max_array[FIRST_X_AXIS],sizeof(double),1,PM_pipe);
+    fwrite(&max_array[FIRST_Y_AXIS],sizeof(double),1,PM_pipe);
+    fwrite(&xleft,sizeof(int),1,PM_pipe);
+    fwrite(&ybot,sizeof(int),1,PM_pipe);
+    fwrite(&xright,sizeof(int),1,PM_pipe);
+    fwrite(&ytop,sizeof(int),1,PM_pipe);
+    fwrite(&is_log_x,sizeof(int /*TBOOLEAN*/),1,PM_pipe);
+    fwrite(&is_log_y,sizeof(int /*TBOOLEAN*/),1,PM_pipe);
+    fwrite(&base_log_x,sizeof(double),1,PM_pipe);
+    fwrite(&base_log_y,sizeof(double),1,PM_pipe);
+    fwrite(&log_base_log_x,sizeof(double),1,PM_pipe);
+    fwrite(&log_base_log_y,sizeof(double),1,PM_pipe);
+    } // of mouseGnupmdrv
+    #endif //PM end for mouse
     fflush(PM_pipe);
     PM_mode = SET_GRAPHICS;
 }

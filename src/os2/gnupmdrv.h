@@ -97,6 +97,10 @@
 #define INIPRPR      "Printer"  
 #define INIOPTS      "DefOpts"      
 #define INICHAR      "Fontdata"      
+#define INIKEEPRATIO "KeepRatio"	//PM      
+#define INIUSEMOUSE  "UseMouse"		//PM      
+#define INIMOUSECOORD "MouseCoord"	//PM      
+
 
 /*==== global data  ==========================================================*/
 

@@ -1,3 +1,6 @@
+// For mousing: changed by Petr Mikulik, last change 26. 9. 1998
+// See  //PM  labels
+
 #ifdef INCRCSDATA
 static char RCSid[]="$Id: gclient.c,v 1.15 1998/03/22 22:34:21 drd Exp $" ;
 #endif
@@ -129,6 +132,10 @@ static LONG alColourTable[ 16 ] ;
 #define   PAUSE_BTN 2           /* pause handled by menu item */
 #define   PAUSE_GNU 3           /* pause handled by Gnuplot */
 
+#define   MOUSE_COORDINATES_REAL     1 //PM which mouse coordinates
+#define   MOUSE_COORDINATES_PIXELS   2
+#define   MOUSE_COORDINATES_SCREEN   3
+
 #define   DEFLW     50
 
 static ULONG    ppidGnu=0L ;      /* gnuplot pid */
@@ -144,8 +151,20 @@ static BOOL     bColours = TRUE ;
 static BOOL     bShellPos = FALSE ;
 static BOOL     bPlotPos = FALSE ;
 static BOOL     bPopFront = TRUE ;
+static BOOL     bKeepRatio = TRUE ;	//PM
 static BOOL     bNewFont = FALSE ;
 static BOOL     bHorz = TRUE ;
+
+//PM:
+static BOOL	bUseMouse = FALSE;
+static int 	ulMouseSprintfFormatItem = IDM_MOUSE_FORMAT_XcY;
+const  int	nMouseSprintfFormats = IDM_MOUSE_FORMAT_LABEL - IDM_MOUSE_FORMAT;
+const  char  *( MouseSprintfFormats[ /*nMouseSprintfFormats*/ ] ) = {
+		"%g %g","%g,%g","%g;%g",
+		"%g,%g,","%g,%g;",
+		"[%g:%g]","[%g,%g]","[%g;%g]",
+		"set label \"\" at %g,%g"
+		 };
 
 static ULONG    ulPlotPos[4] ;
 static ULONG    ulShellPos[4] ;
@@ -180,6 +199,65 @@ static int lCharWidth = 217 ;
 static int lCharHeight = 465 ; 
 
 
+//PM: Now variables for mouse
+
+static ULONG mouse_mode = MOUSE_COORDINATES_REAL;
+
+/* gnuplot's PM terminal sends 'm' message from its init routine, which
+sets the variable below to 1. Then we are sure that we talk to the mouseable
+terminal and can read the mouseable data from the pipe. Non-mouseable versions
+of PM terminal or non-new-gnuplot programs using gnupmdrv will let this
+variable set to 0, thus no mousing occurs.
+*/
+static char mouseTerminal = 0;
+
+/* Lock the mouse showing when building the plot (redrawing screen)
+Otherwise gnupmdrv would crash when trying to display mouse position
+in non-plotted window.
+*/
+static char lock_mouse = 1;
+
+/*
+Structure for mouse used for the recalculation of the mouse coordinates
+in pixels into the true coordinates of the plot.
+Note: all change to this structure must be accompanied by the appropriate
+pushes into PM_pipe in file pm.trm, routine PM_graphics() !
+*/
+static struct {
+    int graph;
+      /*
+      What the mouse is moving over?
+	0 ... cannot use mouse with this graph---multiplot, for instance.
+	1 ... 2d polar graph
+	2 ... 2d graph
+	3 ... 3d graph (not implemented, thus pm.trm sends 0)
+      */
+    double xmin, ymin, xmax, ymax; // range of x1 and y1 axes of 2d plot
+    int xleft, ybot, xright, ytop; // pixel positions of the above
+    int /*TBOOLEAN*/ is_log_x, is_log_y; // are x and y axes log?
+    double base_log_x, base_log_y; // bases of log
+    double log_base_log_x, log_base_log_y; // log of bases
+    } gp4mouse;
+
+static double unzoom_xmin, unzoom_xmax, unzoom_ymin, unzoom_ymax;
+static char zooming = 0; // set to 1 if zooming by mouse
+
+/* Structure for the ruler: on/off, position,... */
+static struct {
+   char on;
+   double x, y;  // ruler position in real units of the graph
+   long px, py;  // ruler position in the viewport units
+   } ruler;
+
+// pointer definition
+HWND hptrDefault, hptrCrossHair;
+
+// colours of mouse-relating drawings
+#define COLOR_MOUSE    CLR_DEFAULT  // mouse position
+#define COLOR_ANNOTATE CLR_DEFAULT  // annotating strings (MB3)
+#define COLOR_RULER    CLR_DARKPINK // colour of the ruler
+
+
 /*==== f u n c t i o n s =====================================================*/
 
 int             DoPrint( HWND ) ;
@@ -211,6 +289,14 @@ static void      LMove( HPS hps, POINTL *p ) ;
 static void      LLine( HPS hps, POINTL *p ) ;
 static void      LType( int iType ) ;
 
+/* //PM: new functions related to the mouse processing */
+static void	TextToClipboard ( PCSZ );
+static void     MousePosToGraphPos ( double *, double *,
+			HWND, SHORT, SHORT, ULONG );
+#define IGNORE_MOUSE !mouseTerminal || bUseMouse==FALSE || lock_mouse || !gp4mouse.graph
+  // don't react to mouse in the event handler
+/* //PM: end of new functions related to the mouse processing */
+
 /*==== c o d e ===============================================================*/
 
 MRESULT EXPENTRY DisplayClientWndProc(HWND hWnd, ULONG message, MPARAM mp1, MPARAM mp2)
@@ -237,6 +323,8 @@ MRESULT EXPENTRY DisplayClientWndProc(HWND hWnd, ULONG message, MPARAM mp1, MPAR
             ChangeCheck( hWnd, IDM_LINES_SOLID, bLineTypes?0:IDM_LINES_SOLID ) ;
             ChangeCheck( hWnd, IDM_COLOURS, bColours?IDM_COLOURS:0 ) ;
             ChangeCheck( hWnd, IDM_FRONT, bPopFront?IDM_FRONT:0 ) ;
+	    ChangeCheck( hWnd, IDM_KEEPRATIO, bKeepRatio?IDM_KEEPRATIO:0 ) ; //PM
+	    ChangeCheck( hWnd, IDM_USEMOUSE, bUseMouse?IDM_USEMOUSE:0 ) ;    //PM
                 // disable close from system menu (close only from gnuplot)
             hApp = WinQueryWindow( hWnd, QW_PARENT ) ; /* temporary assignment.. */
             hSysMenu = WinWindowFromID( hApp, FID_SYSMENU ) ;
@@ -254,11 +342,20 @@ MRESULT EXPENTRY DisplayClientWndProc(HWND hWnd, ULONG message, MPARAM mp1, MPAR
                            PU_HIMETRIC|GPIT_NORMAL|GPIA_ASSOC) ;
                 // spawn server for GNUPLOT ...
             tidSpawn = _beginthread( ReadGnu, NULL, 32768, NULL ) ;
+		// initialize pointers
+	    hptrDefault = WinQuerySysPointer( HWND_DESKTOP, SPTR_ARROW, FALSE );
+	    hptrCrossHair = WinLoadPointer( HWND_DESKTOP, (ULONG)0, IDP_CROSSHAIR );
             }
             break ;
             
         case WM_GPSTART:
 
+		//PM: show the Mouse menu if connected to mouseable PM terminal
+	   if (1 || mouseTerminal)
+//	   if (mouseTerminal)
+	     WinEnableMenuItem(
+	       WinWindowFromID( WinQueryWindow( hApp, QW_PARENT ), FID_MENU ),
+	       IDM_MOUSE, TRUE ) ;
                 // get details of command-line window
             hSwitch = WinQuerySwitchHandle( 0, ppidGnu ) ;
             WinQuerySwitchEntry( hSwitch, &swGnu ) ;
@@ -328,18 +425,22 @@ MRESULT EXPENTRY DisplayClientWndProc(HWND hWnd, ULONG message, MPARAM mp1, MPAR
             if (( ulCount > 0 ) && (tid != tidDraw)) {
                 /* simple repaint while building plot or metafile */
                 /* use temporary PS                   */
+              lock_mouse = 1; //PM (will this help against occassional gnupmdrv crashes?)
               hps_tmp = WinBeginPaint(hWnd,0,&rectl_tmp );
               WinFillRect(hps_tmp,&rectl_tmp,CLR_BACKGROUND);
               WinEndPaint(hps_tmp);
                 /* add dirty rectangle to saved rectangle     */
                 /* to be repainted when PS is available again */
               WinUnionRect(hab,&rectlPaint,&rectl_tmp,&rectlPaint);
+              lock_mouse = 0; //PM
                 iPaintCount ++ ;
                 break ;
                 } 
+            lock_mouse = 1; //PM
             WinInvalidateRect( hWnd, &rectlPaint, TRUE ) ;
             DoPaint( hWnd, hpsScreen ) ;
             WinSetRectEmpty( hab, &rectlPaint ) ;
+            lock_mouse = 0; //PM
             }
             break ;     
 
@@ -380,12 +481,14 @@ MRESULT EXPENTRY DisplayClientWndProc(HWND hWnd, ULONG message, MPARAM mp1, MPAR
 
         case WM_GNUPLOT:
                 // display the plot         
+	    lock_mouse=1; //PM
             if( bPopFront )
                 WinSetWindowPos( hwndFrame, HWND_TOP, 0,0,0,0, SWP_ACTIVATE|SWP_ZORDER ) ;
             if( iPaintCount > 0 ) { /* if outstanding paint messages, repaint */
                 WinInvalidateRect( hWnd, &rectlPaint, TRUE ) ;
                 iPaintCount = 0 ;
                 }
+	    lock_mouse=0; //PM
             return 0L ;
 
         case WM_PAUSEPLOT:
@@ -413,6 +516,204 @@ MRESULT EXPENTRY DisplayClientWndProc(HWND hWnd, ULONG message, MPARAM mp1, MPAR
             DosPostEventSem( semPause ) ;
             return 0L ;
     
+/* //PM: new event handles for mouse processing */
+
+case WM_MOUSEMOVE:
+  if (IGNORE_MOUSE) {
+    WinSetPointer( HWND_DESKTOP, hptrDefault ); // set default pointer
+    return 0L;
+    }
+  WinSetPointer( HWND_DESKTOP, hptrCrossHair );
+
+  // track (show) mouse position
+  { // this parenthnesis is for hiding the local variables
+  SHORT mx = MOUSEMSG(&message)->x;  // macro which gets mouse coord.
+  SHORT my = MOUSEMSG(&message)->y;
+
+  HPS hps;
+  POINTL pt;
+  RECTL rc;
+  double x,y;
+  char s[256];
+  /* Position of the "table" of values resulting from mouse movement (and clicks).
+  Negative y value would position it at the top of the window---not implemented.
+  */
+  static long xMouseTableOrig = 0, yMouseTableOrig = 0;
+
+  MousePosToGraphPos( &x, &y, hWnd, mx, my, mouse_mode ); // transform mouse->real graph coords
+
+  sprintf(s,"[%g,%g]",x,y);
+
+  /* For negative table position, shift it to the top of the window.
+  This could be done like that: */
+  if (yMouseTableOrig<0) {
+    WinQueryWindowRect(hWnd,&rc);
+    yMouseTableOrig=rc.yTop-17;
+    }
+  hps = WinGetPS(hWnd);
+  GpiSetMix(hps, FM_OVERPAINT);
+  // clear the rectangle below the text
+//  GpiSetColor( hps, CLR_CYAN );
+  GpiSetColor( hps, CLR_BACKGROUND );
+  pt.x=xMouseTableOrig; pt.y=yMouseTableOrig; GpiMove(hps,&pt);
+  if (!ruler.on) pt.x+=220; 
+    else { RECTL rc; // clear the whole line
+	   GpiQueryPageViewport(hpsScreen,&rc);
+	   pt.x=xMouseTableOrig+rc.xRight;
+	 }
+  pt.y=yMouseTableOrig+16;
+  GpiBox(hps, DRO_FILL, &pt,0,0); // DRO_OUTLINEFILL, FILL or OUTLINE
+  // now write the mouse position to the screen
+  GpiSetColor( hps, COLOR_MOUSE );    // set color of the text
+  GpiSetCharMode(hps,CM_MODE1);
+
+  pt.x=xMouseTableOrig+2; pt.y=yMouseTableOrig+2;
+
+  if (ruler.on) { // append this info coming from the ruler position
+    char p[255];
+    if (mouse_mode!=MOUSE_COORDINATES_REAL) 
+	sprintf(p,"  ruler: [%g,%g]",ruler.x,ruler.y); // distance makes no sense
+      else {
+	double dx, dy;
+	if (gp4mouse.is_log_x) // ratio for log, distance for linear
+	    dx = (ruler.x==0) ? 99999 : x / ruler.x;
+	  else dx = x - ruler.x;
+	if (gp4mouse.is_log_y) dy = (ruler.y==0) ? 99999 : y / ruler.y;
+	  else dy = y - ruler.y;
+	if (mouse_mode==MOUSE_COORDINATES_REAL)
+	sprintf(p,"  ruler: [%g,%g]  distance: %g;%g",ruler.x,ruler.y,dx,dy);
+	}
+    strcat(s,p);
+    }
+
+  GpiCharStringAt(hps,&pt,(long)strlen(s),s);
+  WinReleasePS(hps);
+
+  }
+  return 0L;  // return from: case WM_MOUSEMOVE
+
+
+case WM_BUTTON1DBLCLK:
+  if (IGNORE_MOUSE) return 0L;
+  // put the mouse coordinates to the clipboard
+  {
+  SHORT mx = MOUSEMSG(&message)->x;
+  SHORT my = MOUSEMSG(&message)->y;
+  double x,y;
+  char s[256];
+  int frm = ulMouseSprintfFormatItem-IDM_MOUSE_FORMAT_X_Y;
+  if (frm<0 || frm>=nMouseSprintfFormats) frm=1;
+  MousePosToGraphPos( &x, &y, hWnd, mx, my, mouse_mode ); // transform mouse->real graph coords
+  sprintf( s, MouseSprintfFormats[frm], x,y );
+  TextToClipboard ( s );
+  /*
+  Note:
+  Another solution of getting mouse position (available at any
+  method, not just in this handle event) is the following one:
+  ok = WinQueryPointerPos(HWND_DESKTOP, &pt); // pt contains pos wrt desktop
+  WinMapWindowPoints(HWND_DESKTOP, hWnd, &pt, 1); // pt contains pos wrt our hwnd window
+  sprintf(s,"[%li,%li]",pt.x,pt.y);
+  */
+
+  }
+  return 0L; // end of case WM_BUTTON1DBLCLK
+
+
+case WM_BUTTON2CLICK: // WM_BUTTON2UP:
+  if (IGNORE_MOUSE) return 0L;
+  // make zoom
+  {
+
+  TRACKINFO ti;
+  char s[256];
+  double x1,y1,x2,y2; // result---request this zomming
+
+  ti.cxBorder = 1;        // set border width
+  ti.cyBorder = 1;
+  ti.cxGrid = 0;          // set tracking grid
+  ti.cyGrid = 0;
+  ti.cxKeyboard = 4;      // set keyboard increment
+  ti.cyKeyboard = 4;
+
+  // set screen boundaries for tracking
+  WinQueryWindowRect(hWnd,&ti.rclBoundary);
+
+  // set minimum/maximum size for window = size of the present window
+  ti.ptlMinTrackSize.x = ti.rclBoundary.xLeft;
+  ti.ptlMinTrackSize.y = ti.rclBoundary.yBottom;
+  ti.ptlMaxTrackSize.x = ti.rclBoundary.xRight;
+  ti.ptlMaxTrackSize.y = ti.rclBoundary.yTop;
+
+  // set initial initial tracking (zoomed) window
+  ti.rclTrack.xRight = 50 + (ti.rclTrack.xLeft=MOUSEMSG(&message)->x);
+  ti.rclTrack.yTop = 50 + (ti.rclTrack.yBottom=MOUSEMSG(&message)->y);
+
+  // track the zooming rectangle, return when mouse is lifted
+  ti.fs = TF_TOP | TF_RIGHT | TF_SETPOINTERPOS;
+  if (!WinTrackRect(hWnd,NULLHANDLE,&ti)) break;
+
+  // return if the selected area is too small (8 pixels for canceling)
+  if (abs(ti.rclTrack.xRight-ti.rclTrack.xLeft)<=8 ||
+      abs(ti.rclTrack.yTop-ti.rclTrack.yBottom)<=8)
+      return 0L;
+
+  // transform mouse->real graph coordinates
+  MousePosToGraphPos( &x1, &y1, hWnd, ti.rclTrack.xLeft,ti.rclTrack.yBottom, MOUSE_COORDINATES_REAL );
+  MousePosToGraphPos( &x2, &y2, hWnd, ti.rclTrack.xRight,ti.rclTrack.yTop, MOUSE_COORDINATES_REAL );
+
+  // Make an action with the resulting [x1,y1]..[x2,y1] zoom box.
+
+  // Just for testing: write it to clipboard
+  // sprintf(s,"zoom from [%li,%li]..[%li,%li] => [%g,%g]..[%g,%g]",ti.rclTrack.xLeft,ti.rclTrack.yBottom,ti.rclTrack.xRight,ti.rclTrack.yTop,x1,y1,x2,y2);
+  // TextToClipboard ( s );
+
+  sprintf(s,"set xrange [%g:%g]; set yrange [%g:%g]; replot\n",x1,x2,y1,y2);
+  TextToClipboard ( s );
+
+  zooming = 1; // the 'G' thread does not remember the next xmin, xmax,... values
+  WinEnableMenuItem( // this situation can be unzoomed
+    WinWindowFromID( WinQueryWindow( hApp, QW_PARENT ), FID_MENU ),
+    IDM_MOUSE_UNZOOM, TRUE ) ;
+
+  /*
+  True action: connect to gnuplot and ask him for executing this command:
+  "set xrange [x1:y1]; set yrange [x2,y2]; replot"
+  Thus: send x1,y1,x2 and y2 through pipe. gnuplots fills xmin,ymin,xmax,ymax
+  and then executes replot.
+
+TODO THIS!!!
+
+  */
+
+  }
+  return 0; // return from: case WM_BUTTON3DOWN (zoom)
+
+
+case WM_BUTTON3UP: // WM_BUTTON3DBLCLK:
+  // write mouse position to screen
+  if (IGNORE_MOUSE) return 0L;
+  {
+  SHORT mx=MOUSEMSG(&message)->x; // mouse position
+  SHORT my=MOUSEMSG(&message)->y;
+  char s[256];
+  POINTL pt;
+  double x,y;
+  HPS hps = WinGetPS(hWnd);
+
+  MousePosToGraphPos( &x, &y, hWnd, mx, my, mouse_mode ); // transform mouse->real graph coords
+  sprintf(s,"[%g,%g]",x,y);
+
+  GpiSetColor( hps, COLOR_ANNOTATE );    // set color of the text
+  GpiSetCharMode(hps,CM_MODE1);
+  pt.x=mx; pt.y=my;
+  GpiCharStringAt(hps,&pt,(long)strlen(s),s);
+  WinReleasePS(hps);
+  }
+  return 0L; // end of case WM_BUTTON3...
+
+
+  //PM: end of new event handles for mouse processing
+
 	default:         /* Passes it on if unproccessed    */
 	    return (WinDefWindowProc(hWnd, message, mp1, mp2));
     }
@@ -426,6 +727,7 @@ MRESULT WmClientCmdProc(HWND hWnd, ULONG message, MPARAM mp1, MPARAM mp2)
     {
     extern HWND hApp ;
     static ulPauseItem = IDM_PAUSEDLG ;
+    static ulMouseCoordItem = IDM_MOUSE_COORDINATES_REAL ;
 
     switch( (USHORT) SHORT1FROMMP( mp1 ) ) {
                 
@@ -502,6 +804,13 @@ MRESULT WmClientCmdProc(HWND hWnd, ULONG message, MPARAM mp1, MPARAM mp2)
             bPopFront = !bPopFront ;        
             ChangeCheck( hWnd, IDM_FRONT, bPopFront?IDM_FRONT:0 ) ;
             break ;
+
+        case IDM_KEEPRATIO: //PM
+		/* toggle keep aspect ratio */
+	    bKeepRatio = !bKeepRatio ;
+	    ChangeCheck( hWnd, IDM_KEEPRATIO, bKeepRatio?IDM_KEEPRATIO:0 ) ;
+	    WinInvalidateRect( hWnd, NULL, TRUE ) ; // redraw screen
+	    break ;
 
         case IDM_FONTS:
         
@@ -593,6 +902,93 @@ MRESULT WmClientCmdProc(HWND hWnd, ULONG message, MPARAM mp1, MPARAM mp2)
             WinSendMsg(WinQueryHelpInstance(hWnd),
                        HM_HELP_INDEX, 0L, 0L);
             return 0L ;
+
+
+	//PM Now new mousing stuff:
+
+	case IDM_USEMOUSE: // toggle using/not using mouse cursor tracking
+	    bUseMouse = !bUseMouse ;
+	    ChangeCheck( hWnd, IDM_USEMOUSE, bUseMouse?IDM_USEMOUSE:0 ) ;
+	    if(!bUseMouse) // redraw screen
+	      WinInvalidateRect( hWnd, NULL, TRUE ) ;
+	    return 0L;
+
+	case IDM_MOUSE_COORDINATES_REAL:
+	    ChangeCheck( hWnd, ulMouseCoordItem, IDM_MOUSE_COORDINATES_REAL ) ;
+	    ulMouseCoordItem = IDM_MOUSE_COORDINATES_REAL;
+	    mouse_mode = MOUSE_COORDINATES_REAL;
+	    return 0L;
+
+	case IDM_MOUSE_COORDINATES_PIXELS:
+	    ChangeCheck( hWnd, ulMouseCoordItem, IDM_MOUSE_COORDINATES_PIXELS ) ;
+	    ulMouseCoordItem = IDM_MOUSE_COORDINATES_PIXELS;
+	    mouse_mode = MOUSE_COORDINATES_PIXELS;
+	    return 0L;
+
+	case IDM_MOUSE_COORDINATES_SCREEN:
+	    ChangeCheck( hWnd, ulMouseCoordItem, IDM_MOUSE_COORDINATES_SCREEN ) ;
+	    ulMouseCoordItem = IDM_MOUSE_COORDINATES_SCREEN;
+	    mouse_mode = MOUSE_COORDINATES_SCREEN;
+	    return 0L;
+
+	case IDM_MOUSE_FORMAT_X_Y:
+	case IDM_MOUSE_FORMAT_XcY:
+	case IDM_MOUSE_FORMAT_XsY:
+	case IDM_MOUSE_FORMAT_XcYc:
+	case IDM_MOUSE_FORMAT_XcYs:
+	case IDM_MOUSE_FORMAT_pXdYp:
+	case IDM_MOUSE_FORMAT_pXcYp:
+	case IDM_MOUSE_FORMAT_pXsYp:
+	case IDM_MOUSE_FORMAT_LABEL:
+	    ChangeCheck( hWnd, ulMouseSprintfFormatItem, SHORT1FROMMP( mp1 ) ) ;
+	    ulMouseSprintfFormatItem = SHORT1FROMMP( mp1 );
+	    return 0L;
+
+	case IDM_MOUSE_UNZOOM:
+	    {
+	    char s[255];
+	    sprintf(s,"set xrange [%g:%g]; set yrange [%g:%g]; replot\n",unzoom_xmin,unzoom_xmax,unzoom_ymin,unzoom_ymax);
+	    TextToClipboard ( s );
+	    WinEnableMenuItem( // this situation cannot be unzoomed
+	      WinWindowFromID( WinQueryWindow( hApp, QW_PARENT ), FID_MENU ),
+	      IDM_MOUSE_UNZOOM, FALSE ) ;
+	    }
+	    return 0L;
+
+	case IDM_MOUSE_RULER:
+	    ruler.on = ! ruler.on;
+	    ChangeCheck( hWnd, IDM_MOUSE_RULER, ruler.on?IDM_MOUSE_RULER:0 ) ;
+	    if (ruler.on) {
+		// remember the ruler position
+		POINTL p;
+		WinQueryPointerPos(HWND_DESKTOP, &p);
+		    // this is position wrt desktop
+		WinMapWindowPoints(HWND_DESKTOP, hWnd, &p, 1);
+		    // pos. wrt our window in pixels
+		MousePosToGraphPos( &ruler.x, &ruler.y, hWnd, // mouse -> screen relative
+		  p.x, p.y, MOUSE_COORDINATES_SCREEN );
+		ruler.px = ruler.x * 19500; // screen relative -> viewport coordinates
+		ruler.py = ruler.y * 12500;
+		MousePosToGraphPos( &ruler.x, &ruler.y, hWnd, // mouse->real graph coordinates
+		  p.x, p.y, MOUSE_COORDINATES_REAL );
+		// { char s[255];
+		// sprintf(s,"ruler at %i,%i",ruler.px,ruler.py);
+		// sprintf(s,"ruler at %g,%g",ruler.x,ruler.y);
+		// TextToClipboard(s); }
+		}
+	    WinInvalidateRect( hWnd, NULL, TRUE ) ; // redraw screen
+	    return 0L;
+
+	case IDM_MOUSE_GRID:
+	    // NOT IMPLEMENTED; WAITING TO gnupmdrv->gnuplot PIPE
+	    { TextToClipboard( "set grid; replot #set nogrid" ); }
+	    return 0L;
+
+	case IDM_MOUSE_LINLOGY:
+	    // NOT IMPLEMENTED; WAITING TO gnupmdrv->gnuplot PIPE
+	    // NOTE: if log, then take care of positive y min!
+	    { TextToClipboard( "set log y; replot #set nolog y" ); }
+	    return 0L;
 
         default : 
     
@@ -781,6 +1177,24 @@ BOOL QueryIni( HAB hab )
         lCharWidth = 217 ;
         lCharHeight = 465 ;
         }
+    ulCB = sizeof( bKeepRatio ) ; //PM --- keep ratio
+    bData = PrfQueryProfileData( hini, APP_NAME, INIKEEPRATIO, &ulOpts, &ulCB ) ;
+    if( bData ) bKeepRatio = (BOOL)ulOpts[0] ;
+    //PM Mousing:
+    /* ignore reading "Use mouse" --- no good idea to have mouse on by default
+       Maybe it was the reason of some crashes (mouse init before draw)
+    ulCB = sizeof( bUseMouse ) ;
+    bData = PrfQueryProfileData( hini, APP_NAME, INIUSEMOUSE, &ulOpts, &ulCB ) ;
+    if( bData ) bUseMouse = (BOOL)ulOpts[0] ;
+    */
+    /* ignore reading mouse cursor (real, relative or pixels)
+       Reason/bug: it does not switch the check mark in the menu, even
+       though it works as expected.
+    ulCB = sizeof( mouse_mode ) ;
+    bData = PrfQueryProfileData( hini, APP_NAME, INIMOUSECOORD, &ulOpts, &ulCB ) ;
+    if( bData ) mouse_mode = (ULONG)ulOpts[0] ;
+    */
+
     PrfCloseProfile( hini ) ;
 
     if( qPrintData.szPrinterName[0] == '\0' ) {
@@ -840,6 +1254,15 @@ static void SaveIni( HWND hWnd )
         ulOpts[0] = (ULONG)lCharWidth ;
         ulOpts[1] = (ULONG)lCharHeight ;
         PrfWriteProfileData( hini, APP_NAME, INICHAR, &ulOpts, sizeof(ulOpts) ) ;
+	PrfWriteProfileData( hini, APP_NAME, INIKEEPRATIO, &bKeepRatio, sizeof(bKeepRatio) ) ; //PM
+	//PM mouse stuff
+	/* ignore reading "Use mouse" --- no good idea to have mouse on by default
+	   Maybe it was the reason of some crashes (mouse init before draw)
+	PrfWriteProfileData( hini, APP_NAME, INIUSEMOUSE, &bUseMouse, sizeof(bUseMouse) ) ;
+	*/
+	/* Do not write the mouse coord. mode
+	PrfWriteProfileData( hini, APP_NAME, INIMOUSECOORD, &mouse_mode, sizeof(mouse_mode) ) ;
+	*/
         PrfCloseProfile( hini ) ;
         }
     else {
@@ -893,6 +1316,14 @@ static void ThreadDraw( void* arg )
     GpiSetStopDraw( hpsScreen, SDW_OFF ) ;  
     GpiSetDrawingMode( hpsScreen, DM_DRAW ) ;
     GpiDrawChain( hpsScreen ) ;
+    if (ruler.on) { //PM: draw the ruler
+      POINTL p;
+      GpiSetColor( hpsScreen, COLOR_RULER );
+      p.x=0; p.y=ruler.py; GpiMove( hpsScreen, &p ) ;
+      p.x=19500; GpiLine( hpsScreen, &p ) ;
+      p.x=ruler.px; p.y=0; GpiMove( hpsScreen, &p ) ;
+      p.y=12500; GpiLine( hpsScreen, &p ) ;
+      }
     WinEndPaint( hpsScreen ) ;
     DosReleaseMutexSem( semHpsAccess ) ;
     WinTerminate( hab ) ;
@@ -911,6 +1342,7 @@ HPS InitScreenPS()
     GpiErase(hpsScreen);
  
     WinQueryWindowRect( hApp, (PRECTL)&rectClient ) ;
+    if (bKeepRatio) //PM
     {
     double ratio = 1.560 ;
     double xs = rectClient.xRight - rectClient.xLeft ;
@@ -922,6 +1354,11 @@ HPS InitScreenPS()
         rectClient.xRight = rectClient.xLeft + (int)(ys*ratio) ;
         }
     }
+    else rectClient.xRight -= 10; //PM
+	/* //PM: why this -10? Otherwise right axis too close to the right border
+	 However, this -10 should be taken into account for mousing!
+	 Or can it be inside a transformation?
+	 */
        
     GpiSetPageViewport( hpsScreen, &rectClient ) ;
     if( !bColours ) {
@@ -1251,10 +1688,62 @@ server:
                     GpiSetLineEnd( hps, LINEEND_ROUND ) ;
                     GpiSetLineWidthGeom( hps, linewidth ) ;
                     GpiSetCharBox (hps, &sizBaseFont) ;
+		    //PM beg: get some other information about real plot coord.:
+		    if (mouseTerminal) { //we are connected to mouseable terminal
+		      BufRead(hRead,&gp4mouse, sizeof(gp4mouse), &cbR);
+		      if (!zooming) { // remember these values if this isn't zoom
+			unzoom_xmin=gp4mouse.xmin;
+			unzoom_ymin=gp4mouse.ymin;
+			unzoom_xmax=gp4mouse.xmax;
+			unzoom_ymax=gp4mouse.ymax;
+			if  (gp4mouse.is_log_x) {
+			  unzoom_xmin = exp( unzoom_xmin * gp4mouse.log_base_log_x );
+			  unzoom_xmax = exp( unzoom_xmax * gp4mouse.log_base_log_x );
+			  }
+			if  (gp4mouse.is_log_y) {
+			  unzoom_ymin = exp( unzoom_ymin * gp4mouse.log_base_log_y );
+			  unzoom_ymax = exp( unzoom_ymax * gp4mouse.log_base_log_y );
+			  }
+			WinEnableMenuItem( // this situation cannot be unzoomed
+			  WinWindowFromID( WinQueryWindow( hApp, QW_PARENT ), FID_MENU ),
+			  IDM_MOUSE_UNZOOM, FALSE ) ;
+			}
+		      zooming=0;
+		      if (ruler.on) {
+			// ruler is on, thus recalc its (px,py) from (x,y) for
+			// the current zoom and log axes
+			double P;
+			if (gp4mouse.is_log_x && ruler.x<0)
+			    ruler.px = -1;
+			  else {
+			    P = gp4mouse.is_log_x ?
+				  log(ruler.x) / gp4mouse.log_base_log_x
+				  : ruler.x;
+			    P = (P-gp4mouse.xmin) / (gp4mouse.xmax-gp4mouse.xmin);
+			    P *= gp4mouse.xright-gp4mouse.xleft;
+			    ruler.px = (long)( gp4mouse.xleft + P );
+			    }
+			if (gp4mouse.is_log_y && ruler.y<0)
+			    ruler.py = -1;
+			  else {
+			    P = gp4mouse.is_log_y ?
+				  log(ruler.y) / gp4mouse.log_base_log_y
+				  : ruler.y;
+			    P = (P-gp4mouse.ymin) / (gp4mouse.ymax-gp4mouse.ymin);
+			    P *= gp4mouse.ytop-gp4mouse.ybot;
+			    ruler.py = (long)( gp4mouse.ybot + P );
+			    }
+			}
+		      }
                     }
                     break ;
                     
                 case 'Q' :     /* query terminal info */
+		    //PM mouseable gnupmdrv sends greetings to mouseable PM terminal
+		    if (mouseTerminal) {
+		      int i=0xABCD;
+		      DosWrite( hRead, &i, sizeof(int), &cbR ) ;
+		      }
                     DosWrite( hRead, &lCharWidth, sizeof(int), &cbR ) ;
                     DosWrite( hRead, &lCharHeight, sizeof(int), &cbR ) ;
                     break ;
@@ -1544,6 +2033,10 @@ lOldLine=lt ;
                     }
                     break ;
                 
+		case 'm' :
+		    //PM notification of being connected to a mouse-enabled terminal
+		    mouseTerminal=1;
+		    break ;
 
                  default :  /* should handle error */
                     break ;
@@ -2133,3 +2626,73 @@ void LType( int iType )
     togo = iPatt[iLtype][0] ;
     }
 
+
+
+/* //PM: new functions related to the mouse processing */
+
+static void TextToClipboard ( PCSZ szTextIn ) {
+// copy string given by szTextIn to the clipboard
+HAB hab;
+PSZ szTextOut = NULL;
+ULONG ulRC = DosAllocSharedMem( (PVOID*)&szTextOut, NULL,
+		       strlen( szTextIn ) + 1,
+		       PAG_WRITE | PAG_COMMIT | OBJ_GIVEABLE );
+if( !ulRC ) {
+  strcpy( szTextOut, szTextIn );
+  WinOpenClipbrd(hab);
+  WinEmptyClipbrd(hab);
+  WinSetClipbrdData( hab, (ULONG) szTextOut, CF_TEXT, CFI_POINTER );
+    // Msg( "RestClipboardText WinSetClipbrdData failed" );
+  WinCloseClipbrd(hab);
+  }
+}
+
+
+/*
+This routine recalculates mouse/pointer position [mx,my] in [in pixels]
+current window to the real/true [x,y] coordinates of the plotted graph.
+*/
+void MousePosToGraphPos ( double *x, double *y,
+	HWND hWnd, SHORT mx, SHORT my, ULONG mouse_mode ) {
+RECTL rc;
+
+if (mouse_mode==MOUSE_COORDINATES_PIXELS) {
+  *x=mx; *y=my;
+  return;
+  }
+
+// Rectangle where we are moving: viewport, not the full window!
+GpiQueryPageViewport(hpsScreen,&rc);
+
+rc.xRight-=rc.xLeft; rc.yTop-=rc.yBottom; // only distance is important
+
+if (mouse_mode==MOUSE_COORDINATES_SCREEN) {
+  *x=(double)mx/rc.xRight; *y=(double)my/rc.yTop;
+  return;
+  }
+
+*x = mx * 19500.0/rc.xRight; // px=px(mx); mouse=>gnuplot driver coordinates
+*y = my * 12500.0/rc.yTop;
+
+if (gp4mouse.xright==gp4mouse.xleft) *x = 1e38; else // protection
+*x = gp4mouse.xmin + (*x-gp4mouse.xleft)/(gp4mouse.xright-gp4mouse.xleft)
+	      * (gp4mouse.xmax-gp4mouse.xmin);
+if (gp4mouse.ytop==gp4mouse.ybot) *y = 1e38; else // protection
+*y = gp4mouse.ymin + (*y-gp4mouse.ybot)/(gp4mouse.ytop-gp4mouse.ybot)
+	      * (gp4mouse.ymax-gp4mouse.ymin);
+// Note: there is xleft+0.5 in "#define map_x" in graphics.c, which
+// makes no major impact here. It seems that the mistake of the real
+// coordinate is at about 0.5%, which corresponds to the screen resolution.
+// It would be better to round the distance to this resolution, and thus
+// *x = gp4mouse.xmin + rounded-to-screen-resolution (xdistance)
+
+// Now take into account possible log scales of x and y axes
+if  (gp4mouse.is_log_x) *x = exp( *x * gp4mouse.log_base_log_x );
+if  (gp4mouse.is_log_y) *y = exp( *y * gp4mouse.log_base_log_y );
+
+}
+
+/* //PM: end of new functions related to the mouse processing */
+
+
+/* eof gclient.c */
