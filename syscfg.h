@@ -103,10 +103,11 @@
 # define HELPFILE "gnuplot.gih"
 # define HOME  "GNUPLOT"
 # define PLOTRC "gnuplot.ini"
+# define SHELL "\\command.com"
 # define DIRSEP1 '\\'
 #endif /* DOS386 */
 
-#ifdef linux
+#if defined(linux) || defined(__linux)
 # define OS "Linux "
 #endif /* Linux */
 
@@ -130,10 +131,10 @@
 #endif /* OS-9 */
 
 #if defined(vms) || defined(VMS)
+# define OS "VMS "
 # ifndef VMS
 #  define VMS
 # endif
-# define OS "VMS "
 # define HOME "sys$login:"
 # define PLOTRC "gnuplot.ini"
 # ifdef NO_GIH
@@ -162,13 +163,14 @@
  */
 #  define S_IFIFO  _S_IFIFO
 # else
+#  define OS "MS-Windows "
 #  ifndef WIN16
 #   define WIN16
 #  endif
-#  define OS "MS-Windows "
 # endif /* WIN32 */
 # define HOME  "GNUPLOT"
 # define PLOTRC "gnuplot.ini"
+# define SHELL "\\command.com"
 # define DIRSEP1 '\\'
 #endif /* _WINDOWS */
 
@@ -176,14 +178,16 @@
 # if !defined(DOS32) && !defined(DOS16)
 #  define DOS16
 # endif
+/* should this be here ? */
 # ifdef MTOS
 #  define OS "TOS & MiNT & MULTITOS & Magic - "
 # endif /* MTOS */
+# define OS "MS-DOS "
 # undef HELPFILE
 # define HELPFILE "gnuplot.gih"
 # define HOME "GNUPLOT"
 # define PLOTRC "gnuplot.ini"
-# define OS "MS-DOS "
+# define SHELL "\\command.com"
 # define DIRSEP1 '\\'
 # ifdef __DJGPP__
 #  define DIRSEP2 '/'
