@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.97 2002/12/18 17:38:52 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.98 2003/01/07 22:29:33 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -958,9 +958,10 @@ show_version(fp)
 # ifdef HAVE_GD_GIF
 		"+GD_GIF  "
 # endif
-# ifdef HAVE_GD_TTY
+# ifdef HAVE_GD_TTF
 		"+GD_TTF  "
 # endif
+		""
 #else
 		"-LIBGD  "
 #endif
