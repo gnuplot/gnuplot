@@ -890,14 +890,13 @@ SVG_set_color(double gray)
 {
     unsigned char red, green, blue;
 
-    red = (int)(255.0 * GetColorValueFromFormula(SVG_palette.formulaR, gray));
 
     switch (SVG_palette.colorMode) {
 	case SMPAL_COLOR_MODE_GRAY:
-	    green = red;
-	    blue  = red;
+	    red = green = blue = gray;
 	    break;
 	case SMPAL_COLOR_MODE_RGB:
+	    red   = (int)(255.0 * GetColorValueFromFormula(SVG_palette.formulaR, gray));
 	    green = (int)(255.0 * GetColorValueFromFormula(SVG_palette.formulaG, gray));
 	    blue  = (int)(255.0 * GetColorValueFromFormula(SVG_palette.formulaB, gray));
 	    break;

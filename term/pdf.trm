@@ -1057,14 +1057,12 @@ PDF_set_color(double gray)
 {
     double red, green, blue;
 
-    red = GetColorValueFromFormula(PDF_palette.formulaR, gray);
-
     switch (PDF_palette.colorMode) {
 	case SMPAL_COLOR_MODE_GRAY:
-	    green = red;
-	    blue  = red;
+	    red = green = blue = gray;
 	    break;
 	case SMPAL_COLOR_MODE_RGB:
+	    red   = GetColorValueFromFormula(PDF_palette.formulaR, gray);
 	    green = GetColorValueFromFormula(PDF_palette.formulaG, gray);
 	    blue  = GetColorValueFromFormula(PDF_palette.formulaB, gray);
 	    break;
@@ -1073,7 +1071,6 @@ PDF_set_color(double gray)
 		    __FILE__, __LINE__);
 	    return;
     }
-
     /* make sure that the path is stroked with the current color
      * before changing the color */
     PDF_PathClose();
