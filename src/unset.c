@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.44 2002/11/26 18:50:01 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.45 2002/12/11 01:31:09 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -1467,6 +1467,7 @@ reset_command()
     unset_keytitle();
 
     unset_timefmt();
+    unset_view(); /* has to be called in advance to reset reversed yrange if splot_map_active */
 
     for (axis=0; axis<AXIS_ARRAY_SIZE; axis++) {
 	SET_DEFFORMAT(axis, set_for_axis);
@@ -1488,7 +1489,7 @@ reset_command()
 	axis_array[axis].ticdef = default_axis_ticdef;
 
 	reset_logscale(axis);
-}
+    }
 
     unset_boxwidth();
 
@@ -1521,10 +1522,9 @@ reset_command()
     unset_mapping();
 
     unset_size();
-    aspect_ratio = 0.0;		/* dont force it */
+    aspect_ratio = 0.0;		/* don't force it */
 
     unset_origin();
-    unset_view();
     unset_timestamp();
     unset_offsets();
     unset_contour();

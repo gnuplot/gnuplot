@@ -1,17 +1,23 @@
 2002-12-12  Petr Mikulik  <mikulik@physics.muni.cz>
 
+	* src/unset.c(reset_command): Call unset_view() before resetting
+	yrange because its reverse status depends on splot_map_active.
+
+2002-12-12  Petr Mikulik  <mikulik@physics.muni.cz>
+
 	* term/gd.trm term/gif.trm term/png.trm: Replaced typo "ingoring" by
 	"ignoring".
 
 2002-12-11  Johannes Zellner  <johannes@zellner.org>
 
 	* docs/titlepag.ms docs/titlepag.tex docs/gnuplot.doc docs/gnuplot.texi:
-	added my name to the authors section
+	Added my name to the authors section.
 
 2002-12-09  Ethan Merritt  <merritt@u.washington.edu>
-	* src/unset.c: Implement 'unset style arrow'
-	* src/set.c src/setshow.h: 
-	  Comment out unused function delete_arrowstyle(prev,next).
+
+	* src/unset.c: Implement 'unset style arrow'.
+	* src/set.c src/setshow.h: Comment out unused function
+	delete_arrowstyle(prev,next).
 
 2002-12-07  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
@@ -19,9 +25,9 @@
 
 2002-11-27  Johannes Zellner  <johannes@zellner.org>
 
-	* src/gplt_x11.c: subtract 1 from plot->cmap->allocated
+	* src/gplt_x11.c: Subtract 1 from plot->cmap->allocated
 	in PaletteSetColor so that the resulting color index is
-	always valid
+	always valid.
 
 2002-12-04  Ethan Merritt  <merritt@u.washington.edu>
 
@@ -1529,7 +1535,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/12/11 20:37:36 $).
+	last modification date (from the tag $Date: 2002/12/12 11:10:45 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
