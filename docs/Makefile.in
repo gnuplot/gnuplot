@@ -318,7 +318,7 @@ doc2rnh: doc2rnh.o termdoc.o
 # end doc2xxx section
 
 # this is how to check the gnuplot.doc file
-check: checkdoc $(srcdir)/gnuplot.doc
+check: all checkdoc
 	@./checkdoc < $(srcdir)/gnuplot.doc; \
 	if test $$? -eq 0; then \
 	  echo "PASS: gnuplot.doc"; \
@@ -326,7 +326,7 @@ check: checkdoc $(srcdir)/gnuplot.doc
 	  :; \
 	fi
 
-checkdoc: checkdoc.o termdoc.o
+checkdoc: checkdoc.o termdoc.o $(srcdir)/gnuplot.doc
 	$(LINK) checkdoc.o termdoc.o $(LIBS)
 
 checkdoc.o: checkdoc.c allterm.h
