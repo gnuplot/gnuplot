@@ -1,12 +1,17 @@
+2002-02-15  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/show.c (show_version): Have "show version long" display the
+ 	currently selected path to the X11 driver, too.
+
 2002-02-15  Petr Mikulik  <mikulik@physics.muni.cz>
 
-	* src/set.c: Command 'set grid front|back' should select the default
-	grid.
+	* src/set.c: Command 'set grid front|back' should select the
+ 	default grid.
 
 2002-02-14  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/set.c src/unset.c: Commands '(un)set log ...' now correctly
-	parse the argument.
+ 	parse the argument.
 
 	* src/tables.h src/tables.c: New routine lookup_table_nth_reverse.
 

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.71 2002/02/02 12:03:31 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.72 2002/02/13 17:59:36 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -821,7 +821,7 @@ show_all()
 /* process 'show version' command */
 void
 show_version(fp)
-FILE *fp;
+    FILE *fp;
 {
     /* If printed to a file, we prefix everything with
      * a hash mark to comment out the version information.
@@ -984,6 +984,17 @@ FILE *fp;
 	    helpfile = HELPFILE;
 #endif
 	}
+
+#ifdef X11
+	{
+	    char *driverdir = getenv("GNUPLOT_DRIVER_DIR");
+
+	    if (driverdir == NULL) 
+		driverdir = X11_DRIVER_DIR;
+	    fprintf(stderr, "\
+DRIVER_DIR   = \"%s\"\n", driverdir);
+	}
+#endif
 
 	fprintf(stderr, "\
 HELPFILE     = \"%s\"\n\
