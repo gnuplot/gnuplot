@@ -8,7 +8,8 @@ EMAIL = bug-gnuplot@dartmouth.edu
 HELPFILE=$(datadir)/gnuplot.gih
 
 EXTRA_PROGRAMS = gnuplot_x11
-bin_PROGRAMS = gnuplot @GNUPLOT_X11@ bf_test gpltconv
+bin_PROGRAMS = gnuplot @GNUPLOT_X11@
+noinst_PROGRAMS = bf_test gpltconv
 
 # There is probably no need to edit anything below this line
 XLIBS = @LIBRARIES_FOR_X@
