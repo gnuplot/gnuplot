@@ -1,5 +1,5 @@
 /*
- * $Id: fig.trm,v 1.10.2.3 2000/10/20 19:04:34 lhecking Exp $
+ * $Id: fig.trm,v 1.10.2.4 2002/01/26 19:06:13 lhecking Exp $
  */
 
 /* GNUPLOT - fig.trm */
@@ -632,7 +632,10 @@ char *str;
     if (strlen(str) == 0)
 	return;
     FIG_poly_clean(FIG_polyvec_stat);
-    y -= term->v_char / 2;	/* assuming vertical center justified */
+    if(FIG_angle != 0.0)
+	x += term->v_char / 2;  /* assuming horizontally center justified */
+    else
+	y -= term->v_char / 2;	/* assuming vertical center justified */
     /*
      * gnuplot used to create SPECIAL_TEXT for all text strings, but this
      * is only really needed if str contains LaTeX commands. we assume that
@@ -675,7 +678,7 @@ TERM_PUBLIC int FIG_text_angle(ang)
 int ang;
 {
     if (ang)
-	FIG_angle = Pi / 2.0;	/* vertical is pi/2 radians */
+	FIG_angle = M_PI_2;	/* vertical is pi/2 radians */
     else
 	FIG_angle = 0.0;	/* horizontal */
     return (TRUE);
@@ -785,7 +788,7 @@ TERM_PUBLIC void FIG_reset()
 #ifdef TERM_TABLE
 
 TERM_TABLE_START(fig_driver)
-    "fig", "FIG 3.1 graphics language: X graphics editor",
+    "fig", "FIG 3.2 graphics language: X graphics editor",
     FIG_XMAX(INCH), FIG_YMAX(INCH), FIG_VCHAR, FIG_HCHAR,
     FIG_VTIC(INCH), FIG_HTIC(INCH), FIG_options, FIG_init, FIG_reset,
     FIG_text, null_scale, FIG_graphics, FIG_move, FIG_vector,
