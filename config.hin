@@ -81,60 +81,6 @@
 /* Define if you do not want to read .gnuplot in the current directory.  */
 #undef NOCWDRC
 
-/* Define if you do not have the atexit function.  */
-#undef NO_ATEXIT
-
-/* Define if you do not have the <errno.h> header file.  */
-#undef NO_ERRNO_H
-
-/* Define if you do not have the <float.h> header file.  */
-#undef NO_FLOAT_H
-
-/* Define if you do not have the <limits.h> header file.  */
-#undef NO_LIMITS_H
-
-/* Define if you do not have the <locale.h> header file.  */
-#undef NO_LOCALE_H
-
-/* Define if you do not have the <math.h> header file.  */
-#undef NO_MATH_H
-
-/* Define if you do not have the memcpy function.  */
-#undef NO_MEMCPY
-
-/* Define if you do not have the memset function.  */
-#undef NO_MEMSET
-
-/* Define if you do not have the setvbuf function.  */
-#undef NO_SETVBUF
-
-/* Define if you do not have the <stdlib.h> header file.  */
-#undef NO_STDLIB_H
-
-/* Define if you do not have the strchr function.  */
-#undef NO_STRCHR
-
-/* Define if you do not have the strerror function.  */
-#undef NO_STRERROR
-
-/* Define if you do not have the <string.h> header file.  */
-#undef NO_STRING_H
-
-/* Define if you do not have the strrchr function.  */
-#undef NO_STRRCHR
-
-/* Define if you do not have the strstr function.  */
-#undef NO_STRSTR
-
-/* Define if you do not have the <sys/time.h> header file.  */
-#undef NO_SYS_TIME_H
-
-/* Define if you do not have the <sys/types.h> header file.  */
-#undef NO_SYS_TYPES_H
-
-/* Define if you do not have the <time.h> header file.  */
-#undef NO_TIME_H
-
 /* Define to the name of the distribution.  */
 #undef PACKAGE
 
@@ -177,6 +123,9 @@
 /* Define to `long' if <sys/types.h> doesn't define.  */
 #undef time_t
 
+/* Define if you have the atexit function.  */
+#undef HAVE_ATEXIT
+
 /* Define if you have the bcopy function.  */
 #undef HAVE_BCOPY
 
@@ -198,6 +147,12 @@
 /* Define if you have the lgamma function.  */
 #undef HAVE_LGAMMA
 
+/* Define if you have the memcpy function.  */
+#undef HAVE_MEMCPY
+
+/* Define if you have the memset function.  */
+#undef HAVE_MEMSET
+
 /* Define if you have the on_exit function.  */
 #undef HAVE_ON_EXIT
 
@@ -210,11 +165,20 @@
 /* Define if you have the rindex function.  */
 #undef HAVE_RINDEX
 
+/* Define if you have the setvbuf function.  */
+#undef HAVE_SETVBUF
+
 /* Define if you have the sleep function.  */
 #undef HAVE_SLEEP
 
 /* Define if you have the snprintf function.  */
 #undef HAVE_SNPRINTF
+
+/* Define if you have the strchr function.  */
+#undef HAVE_STRCHR
+
+/* Define if you have the strerror function.  */
+#undef HAVE_STRERROR
 
 /* Define if you have the strncasecmp function.  */
 #undef HAVE_STRNCASECMP
@@ -222,20 +186,44 @@
 /* Define if you have the strnicmp function.  */
 #undef HAVE_STRNICMP
 
+/* Define if you have the strrchr function.  */
+#undef HAVE_STRRCHR
+
+/* Define if you have the strstr function.  */
+#undef HAVE_STRSTR
+
 /* Define if you have the sysinfo function.  */
 #undef HAVE_SYSINFO
 
 /* Define if you have the tcgetattr function.  */
 #undef HAVE_TCGETATTR
 
+/* Define if you have the <errno.h> header file.  */
+#undef HAVE_ERRNO_H
+
+/* Define if you have the <float.h> header file.  */
+#undef HAVE_FLOAT_H
+
 /* Define if you have the <libc.h> header file.  */
 #undef HAVE_LIBC_H
+
+/* Define if you have the <limits.h> header file.  */
+#undef HAVE_LIMITS_H
+
+/* Define if you have the <locale.h> header file.  */
+#undef HAVE_LOCALE_H
 
 /* Define if you have the <malloc.h> header file.  */
 #undef HAVE_MALLOC_H
 
+/* Define if you have the <math.h> header file.  */
+#undef HAVE_MATH_H
+
 /* Define if you have the <sgtty.h> header file.  */
 #undef HAVE_SGTTY_H
+
+/* Define if you have the <stdlib.h> header file.  */
+#undef HAVE_STDLIB_H
 
 /* Define if you have the <string.h> header file.  */
 #undef HAVE_STRING_H
@@ -255,11 +243,20 @@
 /* Define if you have the <sys/systeminfo.h> header file.  */
 #undef HAVE_SYS_SYSTEMINFO_H
 
+/* Define if you have the <sys/time.h> header file.  */
+#undef HAVE_SYS_TIME_H
+
+/* Define if you have the <sys/types.h> header file.  */
+#undef HAVE_SYS_TYPES_H
+
 /* Define if you have the <sys/utsname.h> header file.  */
 #undef HAVE_SYS_UTSNAME_H
 
 /* Define if you have the <termios.h> header file.  */
 #undef HAVE_TERMIOS_H
+
+/* Define if you have the <time.h> header file.  */
+#undef HAVE_TIME_H
 
 /* Define if you have the <values.h> header file.  */
 #undef HAVE_VALUES_H
