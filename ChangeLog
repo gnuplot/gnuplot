@@ -1,3 +1,10 @@
+2002-02-18  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* demo/fillbox.dem: New demo for filled boxes plotting style.
+
+	* src/win/wgraph.c (drawgraph): Handle case where one GWOPBLK is
+	exactly full, but a next one hasn't been allocated.
+
 2002-02-17  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* demo/all.dem: Added fillcrvs.dem demo.
