@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.7 2000/02/11 19:14:34 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.8 2000/03/28 21:31:53 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -1017,7 +1017,7 @@ static void
 unset_xtics()
 {
     c_token++;
-    xtics = TICS_ON_BORDER | TICS_MIRROR;
+    xtics = NO_TICS;
 }
 
 
@@ -1026,7 +1026,7 @@ static void
 unset_ytics()
 {
     c_token++;
-    ytics = TICS_ON_BORDER | TICS_MIRROR;
+    ytics = NO_TICS;
 }
 
 
@@ -1053,7 +1053,7 @@ static void
 unset_ztics()
 {
     c_token++;
-    ztics = TICS_ON_BORDER;
+    ztics = NO_TICS;
 }
 
 
