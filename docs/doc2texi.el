@@ -5,8 +5,8 @@
 ;; Author:     Bruce Ravel <ravel@phys.washington.edu>
 ;; Maintainer: Bruce Ravel <ravel@phys.washington.edu>
 ;; Created:    March 23 1999
-;; Updated:
-;; Version:    $Id:$
+;; Updated:    May 28 1999
+;; Version:    0.2
 ;; Keywords:   gnuplot, document, info
 
 ;; This file is not part of GNU Emacs.
@@ -20,7 +20,7 @@
 ;; provided the copyright notice and this permission are preserved in
 ;; all copies.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; send bug reports to the authors (ravel@phys.washington.edu)
+;; send bug reports to the author (ravel@phys.washington.edu)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Commentary:
 ;;
@@ -52,20 +52,29 @@
 ;; replacement in place, and move on until the end of the buffer.
 ;; These text manipulations are actually quite speedy.  The slow part
 ;; of the process is using the texinfo-mode function to update the
-;; nodes and menus.  Still, I think this approach compares well with
-;; the time cost of compiling and running a C program.
+;; nodes and menus.  However, using these slow functions has one
+;; advantage -- the texinfo-mode functions for doing menus and nodes
+;; are certain to do the job correctly.  Although rather slow, this
+;; approach doesn't totally suck compared to the time cost of
+;; compiling and running a C program.  And the output from this is
+;; much more useful than the output from the doc2info program.
 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Use:
 ;;
+;; Customize the variables at the start of the executable code.  Then
 ;; I intend that this be used from the command line or from a Makefile
 ;; like so:
 ;;
 ;;      emacs -batch -l doc2texi.el -f d2t-doc-to-texi
 ;;
+;; or
+;;
+;;      emacs -batch -l doc2texi.el -f d2t-doc-to-texi-verbosely
+;;
 ;; This will start emacs in batch mode, load this file, run the
 ;; converter, then quit.  This takes about 30 seconds my 133 MHz
-;; Pentium.  It also sends a large number of mesages to stderr, do you
+;; Pentium.  It also sends a large number of mesages to stderr, so you
 ;; may want to redirect stderr to /dev/null or to a file.
 ;;
 ;; Then you can do
@@ -74,19 +83,12 @@
 ;;
 ;; You may want to use the --no-split option.
 ;;
-;; The converter makes some serious assumptions about where files are
-;; located.  I am assuming that this will be used as a part of a
-;; normal gnuplot installation.  Thus it assumes that the file
-;; "gnuplot.doc" is in the current working directory, and that the
-;; various .trm files are in "../term/".  Walking the directories is
-;; done using Emacs' platform non-specific functions.  If these files
-;; are not found, an error will be signaled and the converter will
-;; quit.
-;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; History:
 ;;
 ;;  0.1  Mar 23 1999 <BR> Initial version
+;;  0.2  May 28 1999 <BR>
+;;  0.3  Jun  2 1999 <BR> Added terminal information, fixed uref problem.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Acknowledgements:
 ;;
@@ -95,26 +97,51 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; To do:
 ;;
-;;  1. internal cross-references: these appear as `blah blah`.  need
-;;     to watch out for "`blah blah`" which appear sometimes.  also
-;;     need to pluck off last word in between `` for use with
-;;     @ref{blah}
-;;  2. html anchors <a>..</a> are currently commented out.  these need
-;;     to be fixed up
-;;  3. save the file to gnuplot.info, overwriting the old one
-;;  4. catch errors gracefully, particularly when looking for files.
-;;  5. fetch terminal information (can configure tell me which ones to
-;;     use? or should I use them all?)
+;;  -- internal cross-references: these are not perfect due to
+;;     inconsistencies in the use of `` and case inconsistencies in
+;;     the text.  The latter can be fixed.  Also I need a way to not
+;;     make the @ref if point is currently in that region.
+;;  -- catch errors gracefully, particularly when looking for files.
+;;  -- are guesses about OS specific terminal information correct?
+;;  -- turn the lists in the "What's New" and "xlabel" sections into
+;;     proper lists.  "^\\([0-9]\\)+\." finds the list items.  If
+;;     (match-string 1) is "1" then insert "@enumerate\n@item\n", else
+;;     insert "@item\n".  also use (replace-match "").  need to find
+;;     the end somehow.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Code:
 
+;;; You may need to customize these variables:
+(defvar d2t-doc-file-name "gnuplot.doc"
+  "Name of the gnuplot.doc file.")
+(defvar d2t-terminal-directory (expand-file-name "../term/")
+  "Location of .trm files in gnuplot source tree.")
+
+
+;;; You should not need to touch anything below here ;;;;;;;;;;;;;;;;;;;;;
+
 (require 'cl)
+(eval-and-compile			; need split-string to do xrefs
+  (if (fboundp 'split-string)
+      ()
+    (defun split-string (string &optional pattern)
+      "Return a list of substrings of STRING which are separated by PATTERN.
+If PATTERN is omitted, it defaults to \"[ \\f\\t\\n\\r\\v]+\"."
+      (or pattern
+	  (setq pattern "[ \f\t\n\r\v]+"))
+      (let (parts (start 0))
+	(while (string-match pattern string start)
+	  (setq parts (cons (substring string start (match-beginning 0)) parts)
+		start (match-end 0)))
+	(nreverse (cons (substring string start) parts)))) ))
 
 (defconst d2t-work-buffer-name "*doc2texi*"
   "Name of scratch buffer where the doc file will be converted into a
   texi file.")
-(defconst d2t-doc-file-name "gnuplot.doc"
-  "Name of the gnuplot.doc file.")
+(defconst d2t-scratch-buffer-name "*doc2texi-output*")
+(defconst d2t-terminal-buffer-name "*doc2texi-terminal*")
+(defvar d2t-verbose nil)
+(defconst d2t-texi-filename "gnuplot.texi")
 
 (defconst d2t-texi-header
   "\\input texinfo   @c -*-texinfo-*-
@@ -128,15 +155,16 @@
 @c define the command and options indeces
 @defindex cm
 @defindex op
+@defindex tm
 
 @direntry
 * GNUPLOT: (gnuplot).             An Interactive Plotting Program
 @end direntry
 
-@ifnottex
-@node Top, Introduction, (dir), (dir)
+@ifinfo
+@node Top, gnuplot, (dir), (dir)
 @top Master Menu
-@end ifnottex
+@end ifinfo
 
 @example
                        GNUPLOT
@@ -166,21 +194,25 @@ Major contributors (alphabetic order):
   "Main menu.")
 
 (defconst d2t-texi-footer
-  "@node Concept_Index
+  "@node Concept_Index, Command_Index, Bugs, Top
 @unnumbered Concept Index
 @printindex cp
 
-@node Command_Index
+@node Command_Index, Option_Index, Concept_Index, Top
 @unnumbered Command Index
 @printindex cm
 
-@node Options_Index
+@node Options_Index, Function_Index, Command_Index, Top
 @unnumbered Options Index
 @printindex op
 
-@node Function_Index
+@node Function_Index, Terminal_Index, Options_Index, Top
 @unnumbered Function Index
 @printindex fn
+
+@node Terminal_Index, , Options_Index, Top
+@unnumbered Terminal Index
+@printindex tm
 
 @c @shortcontents
 @contents
@@ -190,14 +222,63 @@ Major contributors (alphabetic order):
 
 (defvar d2t-level-1-alist nil
   "Alist of level 1 tags and markers.")
+(defvar d2t-level-2-alist nil
+  "Alist of level 2 tags and markers.")
+(defvar d2t-level-3-alist nil
+  "Alist of level 3 tags and markers.")
+(defvar d2t-level-4-alist nil
+  "Alist of level 4 tags and markers.")
+(defvar d2t-level-5-alist nil
+  "Alist of level 5 tags and markers.")
 (defvar d2t-commands-alist nil
   "Alist of commands and markers.")
 (defvar d2t-set-show-alist nil
   "Alist of options and markers.")
 (defvar d2t-functions-alist nil
   "Alist of functions and markers.")
+(defvar d2t-terminals-alist nil
+  "Alist of terminal types and markers.")
 (defvar d2t-node-list nil
   "List of nodes.")
+
+(defvar d2t-terminal-list ())
+(setq d2t-terminal-list
+      '("ai"
+	"cgm"
+	"corel"
+	"dumb"
+	"dxf"
+	"eepic"
+	"epson"
+	"fig"
+	"gif"
+	"hp26"
+	"hp2648"
+	"hp500c"
+	"hpgl"
+	"hpljii"
+	"hppj"
+	"imagen"
+	"latex"
+	"metafont"
+	"mif"
+	"pbm"
+	"png"
+	"post"
+	"pslatex"
+	"pstricks"
+	"qms"
+	"table"
+	"tek"
+	"texdraw"
+	"tkcanvas"
+	"tpic"))
+
+(defun d2t-doc-to-texi-verbosely ()
+  "Run `d2t-doc-to-texi' noisily"
+  (interactive)
+  (setq d2t-verbose t)
+  (d2t-doc-to-texi))
 
 (defun d2t-doc-to-texi ()
   "This is the doc to texi converter function.
@@ -205,31 +286,44 @@ It calls a bunch of other functions, each of which handles one
 particular conversion chore."
   (interactive)
   (setq d2t-level-1-alist   nil ;; initialize variables
+	d2t-level-2-alist   nil
+	d2t-level-3-alist   nil
+	d2t-level-4-alist   nil
+	d2t-level-5-alist   nil
 	d2t-commands-alist  nil
 	d2t-set-show-alist  nil
 	d2t-functions-alist nil
+	d2t-terminals-alist nil
 	d2t-node-list       nil)
   ;; open the doc file and get some data about its contents
   (d2t-prepare-workspace)
-  (d2t-get-level-1)
+  (message "Inserting help for terminals ...")
+  (d2t-get-terminals)
+  (message "Analyzing doc file ...")
+  (d2t-get-levels)
   (d2t-get-commands)
   (d2t-get-set-show)
   (d2t-get-functions)
   ;; convert the buffer from doc to texi, one element at a time
+  (message "Converting to texinfo ...")
   (d2t-braces-atsigns)   ;; this must be the first conversion function
+  (d2t-comments)         ;; delete comments
   (d2t-sectioning)       ;; chapters, sections, etc
   (d2t-indexing)         ;; index markup
   (d2t-tables)           ;; fix up tables
   (d2t-handle-html)      ;; fix up html markup
   (d2t-first-column)     ;; left justify normal text
-  (d2t-comments)         ;; delete comments
   (d2t-enclose-examples) ;; turn indented text into @examples
+  (message "Menus, nodes, xrefs ...")
+  (d2t-make-refs)
+  ;(d2t-make-menus)
+  ;(d2t-set-nodes)
   (save-excursion        ;; fix a few more things explicitly
     (goto-char (point-min))
     (insert d2t-texi-header)
     (search-forward "@node")
-    (beginning-of-line)
-    (insert "\n\n" d2t-main-menu "\n\n")
+    ;; (beginning-of-line)
+    ;; (insert "\n\n" d2t-main-menu "\n\n")
     (search-forward "@node Old_bugs")	; `texinfo-all-menus-update' seems
     (beginning-of-line)			; to miss this one.  how odd.
     (insert "@menu\n* Old_bugs::\t\t\t\n@end menu\n\n")
@@ -237,35 +331,154 @@ particular conversion chore."
     (insert d2t-texi-footer))
   (load-library "texinfo") ;; now do the hard stuff with texinfo-mode
   (texinfo-mode)
-  (let ((message-log-max 0))
+  (let ((message-log-max 0)
+	(standard-output (get-buffer-create d2t-scratch-buffer-name)))
+    (message "Making texinfo nodes ...\n")
     (texinfo-every-node-update)
+    (message "Making texinfo menus ...\n")
     (texinfo-all-menus-update))
-  (write-file "gnuplot.texi")  ; save it and done!
-  (message "Texinfo output written to gnuplot.texi.  Bye."))
+  (write-file d2t-texi-filename) )  ; save it and done!
 
 (defun d2t-prepare-workspace ()
   "Create a scratch buffer and populate it with gnuplot.doc."
+  (and d2t-verbose (message "  Doing d2t-prepare-workspace ..."))
   (if (get-buffer d2t-work-buffer-name)
       (kill-buffer d2t-work-buffer-name))
+  (if (get-buffer d2t-texi-filename)
+      (kill-buffer d2t-texi-filename))
+  (if (get-buffer d2t-terminal-buffer-name)
+      (kill-buffer d2t-terminal-buffer-name))
+  (get-buffer-create d2t-terminal-buffer-name)
   (set-buffer (get-buffer-create d2t-work-buffer-name))
-  (insert-file d2t-doc-file-name)
+  (insert-file-contents d2t-doc-file-name)
   (goto-char (point-min)))
+
+
+(defun d2t-get-terminals ()
+  "Insert all appropriate terminal help."
+  (let ((case-fold-search t))
+    (if (string-match "linux" system-configuration)
+	(setq d2t-terminal-list (append d2t-terminal-list
+					'("linux"))))
+    (if (string-match "amiga" system-configuration)
+	(setq d2t-terminal-list (append d2t-terminal-list
+					'("amiga"))))
+    (if (string-match "atari" system-configuration)
+	(setq d2t-terminal-list (append d2t-terminal-list
+					'("atarivdi" "multitos" "atariaes"))))
+    (if (string-match "mac" system-configuration)
+	(setq d2t-terminal-list (append d2t-terminal-list
+					'("mac"))))
+    (if (string-match "beos" system-configuration)
+	(setq d2t-terminal-list (append d2t-terminal-list
+					'("be"))))
+    (if (string-match "dos" system-configuration)
+	(setq d2t-terminal-list (append d2t-terminal-list
+					'("emxvga" "djsvga" "fg" "pc"))))
+    (if (string-match "windows" (format "%s" system-type))
+	(setq d2t-terminal-list (append d2t-terminal-list
+					'("win"))))
+    (if (string-match "next" system-configuration)
+	(setq d2t-terminal-list (append d2t-terminal-list
+					'("next"))))
+    (if (string-match "os2" system-configuration)
+	(setq d2t-terminal-list (append d2t-terminal-list
+					'("pm" "emxvga"))))
+    (if (string-match "irix" system-configuration)
+	(setq d2t-terminal-list (append d2t-terminal-list
+					'("iris4d"))))
+    (if (string-match "sco" system-configuration)
+	(setq d2t-terminal-list (append d2t-terminal-list
+					'("cgi"))))
+    (if (string-match "sun" system-configuration)
+	(setq d2t-terminal-list (append d2t-terminal-list
+					'("sun"))))
+    (if (string-match "vms" system-configuration)
+	(setq d2t-terminal-list (append d2t-terminal-list
+					'("vws"))))
+    (unless (member* system-configuration '("dos" "windows" "atari" "amiga")
+		     :test 'string-match)
+      (setq d2t-terminal-list
+	    (append d2t-terminal-list
+		    '("x11" "tgif" "gpic" "regis" "t410x" "tex" "xlib")))) )
+  (setq d2t-terminal-list (sort d2t-terminal-list 'string<))
+  (let ((list d2t-terminal-list) file node marker)
+    (save-excursion
+      (when (re-search-forward "^<4" (point-max) t)
+	(beginning-of-line)
+	(insert "@c ")
+	(forward-line 1)
+	(while list
+	  (and d2t-verbose (message "    %s ..." (car list)))
+	  (setq file (concat d2t-terminal-directory (car list) ".trm"))
+	  (when (file-exists-p file)
+	    (set-buffer d2t-terminal-buffer-name)
+	    (erase-buffer)
+	    (insert-file-contents file)
+	    ;; find the terminal help
+	    (when (search-forward "START_HELP" (point-max) "to_end")
+	      (forward-line 1)
+	      (delete-region (point-min) (point-marker))
+	      (search-forward "END_HELP" (point-max) "to_end")
+	      (beginning-of-line)
+	      (delete-region (point-marker) (point-max))
+	      ;; tidy up the terminal help content
+	      (goto-char (point-min))
+	      (while (re-search-forward "\",[ \t]*$" nil t)
+		(replace-match "" nil nil))
+	      (goto-char (point-min))
+	      (while (re-search-forward "^\"" nil t)
+		(replace-match "" nil nil))
+	      (goto-char (point-min))
+	      (while (re-search-forward "\\\\\"" nil t)
+		(replace-match "\"" nil nil))
+	      (goto-char (point-min))
+	      (while (re-search-forward "^1[ \t]+\\(.+\\)$" nil t)
+		(setq node   (match-string 1)
+		      marker (point-marker))
+		(replace-match (concat "4  " node) nil nil))
+	      (goto-char (point-min))
+	      (while (re-search-forward "^2" nil t)
+		(replace-match "5 " nil nil))
+	      (goto-char (point-min))
+	      ;; set up terminals index
+	      (while (re-search-forward "^\?\\([^ ]+\\)$" nil t)
+		(let ((word (match-string 1)))
+		  (unless (string-match "_\\|command-line-options" word)
+		    (setq d2t-terminals-alist
+			  (append d2t-terminals-alist
+				  (list (cons word (point-marker))))))))
+	      ;; and cram it into the doc buffer
+	      (set-buffer d2t-work-buffer-name)
+	      (insert-buffer-substring d2t-terminal-buffer-name)
+	      ))
+	  (setq list (cdr list))
+	  )))))
 
 ;;; functions for obtaining lists of nodes in the document
 
-(defun d2t-get-level-1 ()
-  "Find all level 1 entries in the doc."
-  (save-excursion
-    (while (not (eobp))
-      (when (re-search-forward "^1 \\(.+\\)$" (point-max) "to_end")
-	(beginning-of-line)
-	(setq d2t-level-1-alist
-	      (append d2t-level-1-alist
-		      (list (cons (match-string 1) (point-marker)))))
-	(forward-line 1)))))
+(defun d2t-get-levels ()
+  "Find positions of all nodes in the doc."
+  (and d2t-verbose (message "  Doing d2t-get-levels ..."))
+  (let ((list '("1" "2" "3" "4" "5")) str)
+    (while list
+      (setq str (concat "d2t-level-" (car list) "-alist"))
+      (and d2t-verbose (message "    %s ..." str))
+      (save-excursion
+	(while (not (eobp))
+	  (when (re-search-forward (concat "^" (car list) " \\(.+\\)$")
+				   (point-max) "to_end")
+	    (beginning-of-line)
+	    (set (intern str)
+		 (append (eval (intern str))
+			 (list (cons (match-string 1) (point-marker)))))
+	    (forward-line 1))))
+      (setq list (cdr list)))))
+
 
 (defun d2t-get-commands ()
   "Find all commands in the doc."
+  (and d2t-verbose (message "  Doing d2t-get-commands ..."))
   (save-excursion
     (let ((alist d2t-level-1-alist) start end)
       (while alist
@@ -287,6 +500,7 @@ particular conversion chore."
 
 (defun d2t-get-set-show ()
   "Find all set-show options in the doc."
+  (and d2t-verbose (message "  Doing d2t-get-set-show ..."))
   (save-excursion
     (let ((alist d2t-commands-alist) start end)
       (while alist
@@ -309,6 +523,7 @@ particular conversion chore."
 
 (defun d2t-get-functions ()
   "Find all functions in the doc."
+  (and d2t-verbose (message "  Doing d2t-get-functions ..."))
   (let (begin end)
     (save-excursion			; determine bounds of functions
       (when (re-search-forward "^3 Functions" (point-max) "to_end")
@@ -330,13 +545,16 @@ particular conversion chore."
 
 ;; buffer manipulation functions
 
+;; this can probably be made faster using a let-scoped alist rather
+;; than the big cons block
 (defun d2t-sectioning ()
   "Find all lines starting with a number.
 These are chapters, sections, etc.  Delete these lines and insert the
 appropriate sectioning and @node commands."
+  (and d2t-verbose (message "  Doing d2t-sectioning ..."))
   (save-excursion
     (while (not (eobp))
-      (re-search-forward "^\\([1-9]\\) \\(.+\\)$" (point-max) "to_end")
+      (re-search-forward "^\\([1-9]\\) +\\(.+\\)$" (point-max) "to_end")
       (unless (eobp)
 	(let* ((number (match-string 1))
 	       (word (match-string 2))
@@ -359,13 +577,14 @@ appropriate sectioning and @node commands."
 		((string= number "4")
 		 (insert "@subsubsection " word "\n"))
 		(t
-		 (insert "\n\n@noindent --- " word "\n")) ) )))))
+		 (insert "\n\n@noindent --- " (upcase word) " ---\n")) ) )))))
 
 (defun d2t-indexing ()
   "Find all lines starting with a question mark.
 These are index references.  Delete these lines and insert the
 appropriate indexing commands.  Only index one word ? entries,
 comment out the multi-word ? entries."
+  (and d2t-verbose (message "  Doing d2t-indexing ..."))
   (save-excursion
     (while (not (eobp))
       (re-search-forward "^\\\?\\([^ \n]+\\) *$" (point-max) "to_end")
@@ -379,6 +598,8 @@ comment out the multi-word ? entries."
 		 (insert "@cmindex " word "\n\n"))
 		((assoc word d2t-set-show-alist)
 		 (insert "@opindex " word "\n\n"))
+		((assoc word d2t-terminals-alist)
+		 (insert "@tmindex " word "\n\n"))
 		((assoc word d2t-functions-alist)
 		 (insert "@findex " word "\n\n"))) )))
     (goto-char (point-min))
@@ -393,8 +614,9 @@ comment out the multi-word ? entries."
 	  (insert "@c ")))) ))
 
 (defun d2t-comments ()
-  "Delete comments and line beginning with # or %.
+  "Delete comments and lines beginning with # or %.
 # and % lines are used in converting tables into various formats."
+  (and d2t-verbose (message "  Doing d2t-comments ..."))
   (save-excursion
     (while (not (eobp))
       (re-search-forward "^[C#%]" (point-max) "to_end")
@@ -406,17 +628,21 @@ comment out the multi-word ? entries."
 	  (delete-region (point-marker) eol) )))))
 
 (defun d2t-first-column ()
-  "Justify normal text to the 0th column."
+  "Justify normal text to the 0th column.
+This must be run before `d2t-enclose-examples'.
+This is rather slow since there are almost 9000 lines of text."
+  (and d2t-verbose (message "  Doing d2t-first-column ..."))
   (save-excursion
     (while (not (eobp))
-      (if (looking-at "^ [^ \n]")
-	  (delete-char 1))
+      (and (char-equal (char-after (point)) ? )
+	   (delete-char 1))
       (forward-line))))
 
 (defun d2t-braces-atsigns ()
   "Prepend @ to @, {, or } everywhere in the doc.
 This MUST be the first conversion function called in
 `d2t-doc-to-texi'."
+  (and d2t-verbose (message "  Doing d2t-braces-atsigns ..."))
   (save-excursion
     (while (not (eobp))
       (re-search-forward "[@{}]" (point-max) "to_end")
@@ -426,28 +652,32 @@ This MUST be the first conversion function called in
 	(forward-char 1)))))
 
 (defun d2t-tables ()
-  "Convert doc tables to texi example environments.
-That is, use the plain text formatting already in the doc."
+  "Remove @start table and @end table tags.
+These will be made into @example's by `d2t-enclose-examples'.
+Thus, the plain text formatting already in the doc is used."
+  (and d2t-verbose (message "  Doing d2t-tables ..."))
   (save-excursion
     (while (not (eobp))
-      (re-search-forward "^ *@start table" (point-max) "to_end")
+      (re-search-forward "^ *@+start table" (point-max) "to_end")
       (unless (eobp)
 	(let ((eol  (save-excursion (end-of-line) (point-marker))))
 	  (beginning-of-line)
-	  (delete-region (point-marker) eol)
-	  (insert "@example"))))
+	  (delete-region (point-marker) eol))))
+	  ;;(insert "@example")
     (goto-char (point-min))
     (while (not (eobp))
-      (re-search-forward "^ *@end table" (point-max) "to_end")
+      (re-search-forward "^ *@+end table" (point-max) "to_end")
       (unless (eobp)
 	(let ((eol  (save-excursion (end-of-line) (point-marker))))
 	  (beginning-of-line)
-	  (delete-region (point-marker) eol)
-	  (insert "@end example"))))))
+	  (delete-region (point-marker) eol))))))
+	  ;;(insert "@end example")
 
 
 (defun d2t-enclose-examples ()
-  "Turn indented text in the doc into @examples."
+  "Turn indented text in the doc into @examples.
+This must be run after `d2t-first-column'."
+  (and d2t-verbose (message "  Doing d2t-enclose-examples ..."))
   (save-excursion
     (while (not (eobp))
       (re-search-forward "^ +[^ \n]" (point-max) "to_end")
@@ -461,6 +691,7 @@ That is, use the plain text formatting already in the doc."
 
 (defun d2t-handle-html ()
   "Deal with all of the html markup in the doc."
+  (and d2t-verbose (message "  Doing d2t-handle-html ..."))
   (save-excursion
     (while (not (eobp))
       (let ((rx (concat "^" (regexp-quote "^")
@@ -477,7 +708,19 @@ That is, use the plain text formatting already in the doc."
 	      (insert "@c "))
 	     ;; tyepset anchors
 	     ((and (string= bracket "<") (string-match "^/?a" tag))
-	      (insert "@c fix me!!  "))
+	      ;(insert "@c fix me!!  ")
+	      (beginning-of-line)
+	      (if (looking-at (concat "\\^\\s-*<a\\s-+href=" ; opening tag
+				      "\"\\([^\"]+\\)\">\\s-*" ; url
+				      "\\([^<]+\\)" ; text
+				      "[ \t]*\\^?</a>" ; closing tag
+				      ))
+		  (replace-match (concat "@uref{"
+					 (match-string 1)
+					 ","
+					 (remove* ?^ (match-string 2)
+						  :test 'char-equal)
+					 "}"))))
 	     ;; translate <ul> </ul> to @itemize environment
 	     ((and (string= bracket "<") (string-match "^ul" tag))
 	      (delete-region (point) eol)
@@ -494,5 +737,31 @@ That is, use the plain text formatting already in the doc."
 	     (t ;;(looking-at ".*Terminal Types")
 	      (insert "@c ")) )
 	    (forward-line))) ))))
+
+
+(defvar d2t-dont-make-ref
+  "^fit f\(x\)\\|gnuplot\\|help\\s-+plotting")
+(defun d2t-make-refs ()
+  "Make cross-references in the text."
+  (and d2t-verbose (message "  Doing d2t-make-refs ..."))
+  (let ((big-alist (append d2t-level-1-alist
+			   d2t-level-2-alist
+			   d2t-level-3-alist
+			   d2t-level-4-alist)))
+    (save-excursion
+      (while (not (eobp))
+	(re-search-forward "\\(`\\([^`]+\\)`\\)" (point-max) "to_end")
+	(unless (eobp)
+	  (let* ((b (match-beginning 1))
+		 (e (match-end 1))
+		 (list (split-string (match-string 2)))
+		 (last (car (reverse list)))
+		 (text (concat "@ref{" last "}")))
+	    ;;(message "%s %s" (match-string 1) last)
+	    (when (and (equal t (try-completion last big-alist))
+		       (not (string= last "gnuplot")))
+	      (delete-region b e)
+	      (insert text))))
+	))))
 
 ;;; doc2texi.el ends here
