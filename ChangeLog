@@ -1,3 +1,8 @@
+2003-07-02  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* src/command.c (do_string_replot): Don't allocate so much of the
+	temporary buffer.
+
 2003-07-01  Ethan Merritt <merritt@u.washington.edu>
 
 	* src/graphics.c: Make sample arrow in plot key match the arrow 

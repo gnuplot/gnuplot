@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.67 2003/06/16 07:30:55 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.68 2003/06/25 18:01:24 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -410,7 +410,7 @@ char *s;
     char *buf;
 
     orig_input_line = input_line;
-    buf = gp_alloc(strlen(s)+9999, "do_string_replot");
+    buf = gp_alloc(strlen(s)+9, "do_string_replot"); /*9=strlen("; replot")+1*/
     strcpy(buf, s);
     input_line = buf;
     if (!replot_disabled)
