@@ -24,7 +24,10 @@ Mouse and hotkey support in screen terminals
   MOUSE_X2, MOUSE_Y2, and MOUSE_BUTTON accessible from the gnuplot command
   line. This allows gnuplot scripts to alter their behaviour based on
   interactive mouse input. See 'help mouse variables' and 'help pause mouse',
-  and the example script demo/mousevariables.dem.
+  and the example script demo/mousevariables.dem. Further it allows interaction
+  of a gnuplot mouseable terminal and external programs in C, Python, Octave,
+  etc. using gnuplot as their graph engine. This is demonstrated on gnuplot web
+  page in section "Programming interfaces - bidirectional interaction".
 
 
 Brief list of news in gnuplot 4.0:
