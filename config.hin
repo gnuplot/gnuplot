@@ -162,6 +162,9 @@
 /* Define if you have the <math.h> header file.  */
 #undef HAVE_MATH_H
 
+/* Define if you have the <pdflib.h> header file.  */
+#undef HAVE_PDFLIB_H
+
 /* Define if you have the <png.h> header file.  */
 #undef HAVE_PNG_H
 
@@ -282,6 +285,12 @@
 /*  Define if you have the png library.  */
 #undef HAVE_LIBPNG
 
+/*  Define if you have the pdf library.  */
+#undef HAVE_LIBPDF
+
+/*  Define if you have the pdf library.  */
+#undef HAVE_LIBPDF
+
 /*  Define if you want to use the CGI terminal under SCO.  */
 #undef CGI
 
@@ -290,12 +299,6 @@
 
 /*  Define if you do not want to read .gnuplot in the current directory.  */
 #undef NOCWDRC
-
-/*  Define if you want to use the experimental Enhanced Metafile Format driver.  */
-#undef USE_EMF_DRIVER
-
-/*  Define if you want to use the experimental epslatex driver.  */
-#undef USE_EPSLATEX_DRIVER
 
 /*  Define if you have the required ggi libraries.  */
 #undef HAVE_GGI
