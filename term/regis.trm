@@ -1,5 +1,5 @@
 /*
- * $Id: regis.trm,v 1.8 1999/06/22 11:54:23 lhecking Exp $
+ * $Id: regis.trm,v 1.9 1999/12/10 16:59:48 lhecking Exp $
  *
  */
 
@@ -213,8 +213,8 @@ TERM_PUBLIC int
 REGIS_text_angle(ang)
 int ang;
 {
-    REGISang = ang;
-    if (ang == 1)
+    REGISang = (ang ? 1 : 0);
+    if (REGISang == 1)
 	fputs("T(D90,S1)\n", gpoutfile);
     else
 	fputs("T(D0,S1)\n", gpoutfile);

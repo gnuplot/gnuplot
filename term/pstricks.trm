@@ -1,6 +1,6 @@
 /* Hey Emacs this is -*- C -*-
  * 
- * $Id: pstricks.trm,v 1.17.2.1 2000/10/31 14:48:20 joze Exp $
+ * $Id: pstricks.trm,v 1.19 2000/10/31 19:59:32 joze Exp $
  */
 
 /* GNUPLOT - pstricks.trm */
@@ -549,7 +549,7 @@ TERM_PUBLIC int
 PSTRICKS_text_angle(ang)
 int ang;
 {
-    PSTRICKS_angle = ang;
+    PSTRICKS_angle = (ang ? 1 : 0);
     return (TRUE);
 }
 

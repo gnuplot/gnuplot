@@ -1,5 +1,5 @@
 /*
- * $Id: latex.trm,v 1.21 1999/10/29 18:39:40 lhecking Exp $
+ * $Id: latex.trm,v 1.22 2000/03/28 21:29:49 lhecking Exp $
  *
  */
 
@@ -765,7 +765,7 @@ int ang;
     /* we can't really write text vertically, but this will 
        put the ylabel centred at the left of the plot, and
        then we'll make a \shortstack */
-    latex_angle = ang;
+    latex_angle = (ang ? 1 : 0);
     return (TRUE);
 }
 

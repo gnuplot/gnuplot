@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.43 2002/07/21 12:32:53 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.44 2002/07/23 19:00:03 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -392,7 +392,10 @@ set y2data%s\n",
 	    fputs(" right", fp);
 	    break;
 	}
-	fprintf(fp, " %srotate", this_label->rotate ? "" : "no");
+	if (this_label->rotate)
+	    fprintf(fp, " rotate by %d", this_label->rotate);
+	else
+	    fprintf(fp, " norotate");
 	if (this_label->font != NULL)
 	    fprintf(fp, " font \"%s\"", this_label->font);
 	fprintf(fp, " %s", (this_label->layer==0) ? "back" : "front");

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: color.c,v 1.30 2002/07/21 12:32:52 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: color.c,v 1.31 2002/07/22 11:28:07 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - color.c */
@@ -586,8 +586,9 @@ draw_color_smooth_box()
 	} else {
 	    x = cb_x_to + (CB_AXIS.label.xoffset + 6) * term->h_char;
 	    y = (cb_y_from + cb_y_to) / 2 + CB_AXIS.label.yoffset * term->v_char;
-	    if ((*term->text_angle)(1)) {
-		write_multiline(x, y, CB_AXIS.label.text, CENTRE, JUST_TOP, 1, CB_AXIS.label.font);
+	    if ((*term->text_angle)(TEXT_VERTICAL)) {
+		write_multiline(x, y, CB_AXIS.label.text, CENTRE, JUST_TOP, 
+				TEXT_VERTICAL, CB_AXIS.label.font);
 		(*term->text_angle)(0);
 	    } else {
 		write_multiline(x, y, CB_AXIS.label.text, LEFT, JUST_TOP, 0, CB_AXIS.label.font);

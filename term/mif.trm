@@ -1,5 +1,5 @@
 /*
- * $Id: mif.trm,v 1.20 2002/07/21 12:32:53 mikulik Exp $
+ * $Id: mif.trm,v 1.21 2002/07/21 13:06:54 mikulik Exp $
  */
 
 /* GNUPLOT -- mif.trm */
@@ -164,9 +164,7 @@ static char mif_justify[64];	/* How to justify the used text */
 static char mif_pen[64], mif_pen_width[64], mif_separation[64];		/* How to plot */
 static char mif_textcolor[64];	/* EAM parallels separation */
 
-#define MIF_TEXT_HOR  0
-#define MIF_TEXT_VER  1
-static int mif_text_ang = MIF_TEXT_HOR;		/* Rotation angle of text */
+static int mif_text_ang = 0;		/* Rotation angle of text */
 
 #define MIF_NPENS 16		/* Number of MIF pen types */
 static int mif_pentype = 0;	/* Pen type to use. Also used to create groups for graphics */
@@ -652,16 +650,12 @@ int linetype;
     }				/* Primitive processed */
 }
 
-/* Draw the text horisontally or vertically (90 degrees counterclockwise) */
+/* Allow arbitrary text rotation */
 TERM_PUBLIC int
 MIF_text_angle(ang)
 int ang;
 {
-    if (ang != 0)
-	mif_text_ang = MIF_TEXT_VER;
-    else
-	mif_text_ang = MIF_TEXT_HOR;
-
+    mif_text_ang = ang;
     return (TRUE);
 }
 
@@ -778,11 +772,10 @@ const char str[];
 	    MIF_set_font(zgnuplot);
 
 	    fprintf(gpoutfile, "\
-\t\t<TLOrigin  %.3f %.3f> %s %s <String `%s'>\n\
+\t\t<TLOrigin  %.3f %.3f> %s <Angle %d> <String `%s'>\n\
 \t>\n",
 		    mif_line.fpos_x, mif_line.fpos_y, mif_justify,
-		    (mif_text_ang == MIF_TEXT_VER) ? "<Angle 90>" : "",
-		    str);
+		    mif_text_ang, str);
 
 	    /* Register the used group ID */
 	    proc_group_id(MIF_PEN_TO_GROUP(mif_pentype));

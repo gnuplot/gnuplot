@@ -1,5 +1,5 @@
 /*
- * $Id: emxvga.trm,v 1.9 1999/06/19 20:30:47 lhecking Exp $
+ * $Id: emxvga.trm,v 1.10 1999/06/22 11:54:16 lhecking Exp $
  */
 
 /* GNUPLOT - emxvga.trm */
@@ -363,7 +363,7 @@ TERM_PUBLIC int
 EMXVGA_text_angle(ang)
 int ang;
 {
-    EMXVGA_angle = ang * 90;
+    EMXVGA_angle = (ang ? 90 : 0);
     return (TRUE);
 }
 

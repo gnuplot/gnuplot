@@ -1,5 +1,5 @@
 /*
- * $Id: post.trm,v 1.65 2002/07/24 14:32:12 mikulik Exp $
+ * $Id: post.trm,v 1.66 2002/07/25 12:25:10 mikulik Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -1377,7 +1377,7 @@ const char *str;
 	fputs("gsave 0 setgray\n", gpoutfile);
     if (ps_ang != 0)
 	fprintf(gpoutfile,"currentpoint gsave translate %d rotate 0 0 M\n",
-		ps_ang*90);
+		ps_ang);
     putc('(',gpoutfile);
     ch = *str++;
     while(ch!='\0') {

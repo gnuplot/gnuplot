@@ -1,5 +1,5 @@
 /*
- * $Id: gnugraph.trm,v 1.16 1999/12/10 17:06:15 lhecking Exp $
+ * $Id: gnugraph.trm,v 1.17 2001/12/19 09:14:55 mikulik Exp $
  */
 
 /* GNUPLOT -- gnugraph.trm */
@@ -389,7 +389,7 @@ TERM_PUBLIC int
 UP_text_angle(ang)
 int ang;
 {
-    ROTATE(ang);
+    ROTATE(ang ? 1 : 0);
     return TRUE;
 }
 

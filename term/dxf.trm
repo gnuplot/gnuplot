@@ -1,5 +1,5 @@
 /*
- * $Id: dxf.trm,v 1.9 1999/06/22 11:54:16 lhecking Exp $
+ * $Id: dxf.trm,v 1.10 1999/10/01 15:09:10 lhecking Exp $
  *
  */
 
@@ -367,9 +367,7 @@ TERM_PUBLIC int
 DXF_text_angle(ang)
 int ang;
 {
-    dxf_angle = 0.0;
-    if (ang == 1)
-	dxf_angle = 90.0;
+    dxf_angle = (ang ? 90.0 : 0.0);
     return (TRUE);
 }
 

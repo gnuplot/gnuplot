@@ -1,5 +1,5 @@
 /*
- * $Id: vgagl.trm,v 1.4 2002/02/25 03:10:42 broeker Exp $
+ * $Id: vgagl.trm,v 1.5 2002/06/10 18:53:01 mikulik Exp $
  */
 
 #if defined(USE_MOUSE) && defined(PM3D)
@@ -876,7 +876,7 @@ TERM_PUBLIC int
 VGAGL_text_angle(ang)
     int ang;
 {
-    VGAGL_angle = ang;
+    VGAGL_angle = (ang ? 1 : 0);
     return TRUE;
 }
 

@@ -1,5 +1,5 @@
 /*
- * $Id: metapost.trm,v 1.17 2002/07/10 19:28:05 mikulik Exp $
+ * $Id: metapost.trm,v 1.18 2002/07/21 13:21:30 mikulik Exp $
  */
 
 /* GNUPLOT - metapost.trm */
@@ -758,7 +758,7 @@ TERM_PUBLIC int
 MP_text_angle(int ang)
 {
     /* Metapost code does the conversion */
-    MP_ang = ang;
+    MP_ang = (ang ? 1 : 0);
     return (TRUE);
 }
 

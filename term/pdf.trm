@@ -1,5 +1,5 @@
 /*
- * $Id: $
+ * $Id: pdf.trm,v 1.11 2002/06/10 21:11:17 mikulik Exp $
  */
 
 /*------------------------------
@@ -29,6 +29,7 @@
 
 /* 'filledboxes' with patterns are really lousy,
    but I don't know why. 04 Jun 2002 (joze) */
+/* Text rotation 24-Jul-2002 Ethan A Merritt <merritt@u.washington.edu> */
 
 #include "driver.h"
 
@@ -874,13 +875,8 @@ PDF_justify_text (enum JUSTIFY mode)
 TERM_PUBLIC int
 PDF_text_angle (int ang)
 {
-    if (ang == 0 || ang == 1) {
-	/* FIXME: need to do this in a different way? */
-	PDF_TextAngle = ang;
-	return (TRUE);
-    }
-
-    return (FALSE);
+    PDF_TextAngle = ang;
+    return (TRUE);
 }
 
 
@@ -905,22 +901,17 @@ PDF_put_text (unsigned int x, unsigned int y, const char *str)
 	break;
     }
 
-    /* vertical justification*/
-    switch (PDF_TextAngle) {
-    case 1:
-	h += (PDF_fontAscent - PDF_fontDescent) / 2;
-	break;		/* vertical text*/
-    default:
-	v -= (PDF_fontAscent - PDF_fontDescent) / 2;
-	break;		/* horizontal text*/
-    }
-
     if (PDF_TextAngle) {
 	PDF_save(myPDF);
-	PDF_rotate(myPDF, 90);
-	PDF_show_boxed(myPDF, str, v , -h, 0, 0, alignment, NULL);
+	PDF_translate(myPDF, h, v);
+	PDF_rotate(myPDF, PDF_TextAngle);
+ 	/* vertical justification*/
+	PDF_translate(myPDF, 0, -(PDF_fontAscent-PDF_fontDescent)/2);
+	PDF_show_boxed(myPDF, str, 0,0, 0, 0, alignment, NULL);
 	PDF_restore(myPDF);
     } else {
+ 	/* vertical justification*/
+	v -= (PDF_fontAscent - PDF_fontDescent) / 2;
 	PDF_show_boxed(myPDF, str, h , v, 0, 0, alignment, NULL);
     }
 

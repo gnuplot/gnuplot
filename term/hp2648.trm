@@ -1,5 +1,5 @@
 /*
- * $Id: hp2648.trm,v 1.7 1999/06/19 20:30:50 lhecking Exp $
+ * $Id: hp2648.trm,v 1.8 1999/06/22 11:54:18 lhecking Exp $
  *
  */
 
@@ -163,7 +163,9 @@ TERM_PUBLIC int
 HP2648_text_angle(ang)
 int ang;
 {
-    fprintf(gpoutfile, "\033*m%dnZ\n", ang + 1);
+int hp_ang = (ang ? 1 : 0);
+
+    fprintf(gpoutfile, "\033*m%dnZ\n", hp_ang+1);
     return TRUE;
 }
 

@@ -1,5 +1,5 @@
 /*
- * $Id: hp26.trm,v 1.10.2.1 2000/05/03 21:26:12 joze Exp $
+ * $Id: hp26.trm,v 1.12 2000/10/31 19:59:32 joze Exp $
  */
 
 /* GNUPLOT - HP26.trm */
@@ -524,7 +524,7 @@ TERM_PUBLIC int
 HP26_text_angle(ang)
 int ang;
 {
-    HP26_angle = ang + 1;
+    HP26_angle = (ang ? 2 : 1);
     fprintf(gpoutfile, "\033*m%dN", HP26_angle);
     return (TRUE);
 }

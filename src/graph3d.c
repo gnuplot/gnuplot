@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.67 2002/07/22 09:22:18 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.68 2002/07/23 18:53:12 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -486,9 +486,11 @@ place_labels3d(layer)
 	/* EAM - textcolor support in progress */
 	apply_textcolor(&(this_label->textcolor),t);
 
-	if (this_label->rotate && (*t->text_angle) (1)) {
+	/* EAM - Allow arbitrary rotation of label text */
+	if (this_label->rotate && (*t->text_angle) (this_label->rotate)) {
 	    write_multiline(x + htic, y + vtic, this_label->text,
-			    this_label->pos, CENTRE, 1, this_label->font);
+			    this_label->pos, CENTRE, this_label->rotate, 
+			    this_label->font);
 	    (*t->text_angle) (0);
 	} else {
 	    write_multiline(x + htic, y + vtic, this_label->text,
@@ -689,11 +691,11 @@ do_3dplot(plots, pcount, quick)
 	time(&now);
 	strftime(str, MAX_LINE_LEN, timelabel.text, localtime(&now));
 
-	if (timelabel_rotate && (*t->text_angle) (1)) {
+	if (timelabel_rotate && (*t->text_angle) (TEXT_VERTICAL)) {
 	    if (timelabel_bottom)
-		write_multiline(x, y, str, LEFT, JUST_TOP, 1, timelabel.font);
+		write_multiline(x, y, str, LEFT, JUST_TOP, TEXT_VERTICAL, timelabel.font);
 	    else
-		write_multiline(x, y, str, RIGHT, JUST_TOP, 1, timelabel.font);
+		write_multiline(x, y, str, RIGHT, JUST_TOP, TEXT_VERTICAL, timelabel.font);
 
 	    (*t->text_angle) (0);
 	} else {
@@ -2264,7 +2266,7 @@ draw_3d_graphbox(plot, plot_num)
 		/* write_multiline mods it */
 #ifdef PM3D
 		if (pm3d.map)
-		    (*t->text_angle)(1);
+		    (*t->text_angle)(TEXT_VERTICAL);
 #endif
 		apply_textcolor(&(Y_AXIS.label.textcolor),t);
 		write_multiline(x1, y1, Y_AXIS.label.text,

@@ -228,8 +228,8 @@ The following are optional
 
 
 _text_angle(ang)  Called to rotate the text angle when placing the y label.
-If ang = 0 then text is horizontal.  If ang = 1 then text is vertically
-upwards.  Returns TRUE if text can be rotated, FALSE otherwise.
+Ang is the rotation angle in degrees. If ang = 0 then text is horizontal.  
+Returns TRUE if text can be rotated, FALSE otherwise.
 [But you must return TRUE if called with ang=0]
 
 _justify_text(mode)  Called to justify text left, right or centre.

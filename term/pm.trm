@@ -1,5 +1,5 @@
 /*
- * $Id: pm.trm,v 1.29 2002/02/15 20:29:56 amai Exp $
+ * $Id: pm.trm,v 1.30 2002/06/10 18:53:00 mikulik Exp $
  */
 
 /* GNUPLOT - pm.trm */
@@ -503,8 +503,9 @@ PM_linetype(int lt)
 TERM_PUBLIC int
 PM_text_angle(int ang)
 {
+    int pm_ang = (ang ? 1 : 0);
     putc(SET_ANGLE, PM_pipe);
-    fwrite(&ang, sizeof(int), 1, PM_pipe);
+    fwrite(&pm_ang, sizeof(int), 1, PM_pipe);
     return (TRUE);
 }
 

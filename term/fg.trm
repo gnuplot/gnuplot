@@ -1,5 +1,5 @@
 /*
- * $Id: fg.trm,v 1.6 1999/06/19 20:30:48 lhecking Exp $
+ * $Id: fg.trm,v 1.7 1999/06/22 11:54:16 lhecking Exp $
  */
 
 /* GNUPLOT - fg.trm */
@@ -219,7 +219,7 @@ TERM_PUBLIC int
 VGA_text_angle(ang)
 int ang;
 {
-    text_angle = ang;
+    text_angle = (ang ? 1 : 0);
     return TRUE;
 }
 

@@ -1,5 +1,5 @@
 /*
- * $Id: gpr.trm,v 1.7 1999/06/19 20:30:49 lhecking Exp $
+ * $Id: gpr.trm,v 1.8 1999/06/22 11:54:17 lhecking Exp $
  *
  */
 
@@ -430,7 +430,7 @@ int ang;
 {
     if (gpr_ang != ang) {
 	gpr_ang = ang;
-	gpr_path = (gpr_ang == 1 ? gpr_$up : gpr_$right);
+	gpr_path = (gpr_ang ? gpr_$up : gpr_$right);
     }
     return (TRUE);
 }

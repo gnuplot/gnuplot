@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: cgm.trm,v 1.43 2002/06/16 12:07:40 vanzandt Exp $
+ * $Id: cgm.trm,v 1.44 2002/07/21 12:32:53 mikulik Exp $
  */
 
 /* GNUPLOT - cgm.trm */
@@ -1353,7 +1353,7 @@ CGM_text_angle(ang)
 int ang;
 {
     if (cgm_rotate) {
-	cgm_next.angle = ang ? M_PI_2 : 0;
+	cgm_next.angle = ang * M_PI_2 / 90.;
 	return TRUE;
     }
     return ang ? FALSE : TRUE;

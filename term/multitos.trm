@@ -1,5 +1,5 @@
 /*
- * $Id: multitos.trm,v 1.9 1999/06/19 20:30:53 lhecking Exp $
+ * $Id: multitos.trm,v 1.10 1999/06/22 11:54:21 lhecking Exp $
  */
 
 /* GNUPLOT - multitos.trm */
@@ -258,7 +258,7 @@ MTOS_text_angle(int ang)
 {
     short ta_1, buff;
 
-    ta_1 = (short) ang;
+    ta_1 = (short) (ang ? 1 : 0);
     buff = (short) SET_ANGLE;
     write(handle, &buff, SIZE);
     write(handle, &ta_1, SIZE);

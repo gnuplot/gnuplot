@@ -54,6 +54,10 @@
 #define LT_BLACK      (-2)
 #define LT_BACKGROUND (-3)
 
+/* Constant value passed to (term->text_angle)(ang) to generate vertical 
+ * text. Current implementation has ang equal to rotation in degrees. 
+ */
+#define TEXT_VERTICAL (90)
 
 /* Type definitions */
 

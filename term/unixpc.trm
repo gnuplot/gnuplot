@@ -1,5 +1,5 @@
 /*
- * $Id: unixpc.trm,v 1.7 1999/06/19 20:30:58 lhecking Exp $
+ * $Id: unixpc.trm,v 1.8 1999/06/22 11:54:24 lhecking Exp $
  *
  */
 
@@ -569,7 +569,7 @@ TERM_PUBLIC int
 uPC_text_angle(ang)
 int ang;
 {
-    uPC_angle = ang;
+    uPC_angle = (ang ? 1 : 0);
     return TRUE;
 }
 

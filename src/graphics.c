@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.68 2002/07/23 06:36:10 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.69 2002/07/23 18:53:12 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -297,7 +297,7 @@ boundary(plots, count)
      * text orientation, just for finding out if the terminal can do
      * that. *But* we're not in graphical mode, yet, so this call
      * yields undesirable results */
-    int can_rotate = (*t->text_angle) (1);
+    int can_rotate = (*t->text_angle) (TEXT_VERTICAL);
 
     int xtic_textheight;	/* height of xtic labels */
     int x2tic_textheight;	/* height of x2tic labels */
@@ -1126,12 +1126,15 @@ place_labels(layer)
 	
 	/* EAM - textcolor support in progress */
 	apply_textcolor(&(this_label->textcolor),t);
-	
-	if (this_label->rotate && (*t->text_angle) (1)) {
-	    write_multiline(x + htic, y + vtic, this_label->text, this_label->pos, JUST_TOP, 1, this_label->font);
+
+	/* EAM - Allow arbitrary rotation of label text */
+	if (this_label->rotate && (*t->text_angle) (this_label->rotate)) {
+	    write_multiline(x + htic, y + vtic, this_label->text, this_label->pos, JUST_TOP, 
+	    		    TEXT_VERTICAL, this_label->font);
 	    (*t->text_angle) (0);
 	} else {
-	    write_multiline(x + htic, y + vtic, this_label->text, this_label->pos, JUST_TOP, 0, this_label->font);
+	    write_multiline(x + htic, y + vtic, this_label->text, this_label->pos, JUST_TOP, 
+	    		    0, this_label->font);
 	}
 	if (this_label->lp_properties.pointflag) {
 	    term_apply_lp_properties(&this_label->lp_properties);
@@ -1252,10 +1255,11 @@ do_plot(plots, pcount)
     if (*axis_array[FIRST_Y_AXIS].label.text) {
 	apply_textcolor(&(axis_array[FIRST_Y_AXIS].label.textcolor),t);
 	/* we worked out x-posn in boundary() */
-	if ((*t->text_angle) (1)) {
+	if ((*t->text_angle) (TEXT_VERTICAL)) {
 	    unsigned int x = ylabel_x + (t->v_char / 2);
 	    unsigned int y = (ytop + ybot) / 2 + axis_array[FIRST_Y_AXIS].label.yoffset * (t->h_char);
-	    write_multiline(x, y, axis_array[FIRST_Y_AXIS].label.text, CENTRE, JUST_TOP, 1, axis_array[FIRST_Y_AXIS].label.font);
+	    write_multiline(x, y, axis_array[FIRST_Y_AXIS].label.text, CENTRE, JUST_TOP, 
+	    		    TEXT_VERTICAL, axis_array[FIRST_Y_AXIS].label.font);
 	    (*t->text_angle) (0);
 	} else {
 	    /* really bottom just, but we know number of lines 
@@ -1270,10 +1274,11 @@ do_plot(plots, pcount)
     if (*axis_array[SECOND_Y_AXIS].label.text) {
 	apply_textcolor(&(axis_array[SECOND_Y_AXIS].label.textcolor),t);
 	/* we worked out coordinates in boundary() */
-	if ((*t->text_angle) (1)) {
+	if ((*t->text_angle) (TEXT_VERTICAL)) {
 	    unsigned int x = y2label_x + (t->v_char / 2) - 1;
 	    unsigned int y = (ytop + ybot) / 2 + axis_array[SECOND_Y_AXIS].label.yoffset * (t->h_char);
-	    write_multiline(x, y, axis_array[SECOND_Y_AXIS].label.text, CENTRE, JUST_TOP, 1, axis_array[SECOND_Y_AXIS].label.font);
+	    write_multiline(x, y, axis_array[SECOND_Y_AXIS].label.text, CENTRE, JUST_TOP, 
+	    		    TEXT_VERTICAL, axis_array[SECOND_Y_AXIS].label.font);
 	    (*t->text_angle) (0);
 	} else {
 	    /* really bottom just, but we know number of lines */
@@ -1322,12 +1327,12 @@ do_plot(plots, pcount)
 	str = gp_alloc(MAX_LINE_LEN + 1, "timelabel.text");
 	strftime(str, MAX_LINE_LEN, timelabel.text, localtime(&now));
 
-	if (timelabel_rotate && (*t->text_angle) (1)) {
+	if (timelabel_rotate && (*t->text_angle) (TEXT_VERTICAL)) {
 	    x += t->v_char / 2;	/* HBB */
 	    if (timelabel_bottom)
-		write_multiline(x, y, str, LEFT, JUST_TOP, 1, timelabel.font);
+		write_multiline(x, y, str, LEFT, JUST_TOP, TEXT_VERTICAL, timelabel.font);
 	    else
-		write_multiline(x, y, str, RIGHT, JUST_TOP, 1, timelabel.font);
+		write_multiline(x, y, str, RIGHT, JUST_TOP, TEXT_VERTICAL, timelabel.font);
 	    (*t->text_angle) (0);
 	} else {
 	    y -= t->v_char / 2;	/* HBB */

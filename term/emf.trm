@@ -1,5 +1,5 @@
 		    /* Hey Emacs this is -*- C -*-
- * $Id: emf.trm,v 1.11 2002/02/25 03:10:41 broeker Exp $
+ * $Id: emf.trm,v 1.12 2002/04/30 14:08:53 broeker Exp $
  */
 
 /* GNUPLOT - emf.trm */
@@ -44,6 +44,8 @@
  *
  * HISTORY
  *
+ * 1.0.6 25-Jul-2002 Ethan A Merritt <merritt@u.washington.edu> 
+ * - generalized text rotation and justification
  * 1.0.5 2000/07/20
  * - Handles were not freed at all, resulting to resource leaks when viewing on Windows 9x (not on NT4/W2000!!!)
  * 1.0.4 2000/06/28
@@ -780,7 +782,6 @@ TERM_PUBLIC int
 EMF_text_angle(ang)
 int ang;
 {
-    /* Note : why did they use choose only 0 and 1? That's stupid! */
     /* Win GDI rotation is scaled in tenth of degrees, so... */
     switch (ang) {
     case 0:			/* left right */
@@ -789,11 +790,15 @@ int ang;
 	    EMF_setfont();
 	}
 	break;
-    case 1:			/* bottom up */
+    case TEXT_VERTICAL:		/* bottom up */
 	if (emf_vert_text != 900) {
 	    emf_vert_text = 900;
 	    EMF_setfont();
 	}
+	break;
+    default:			/* the general case */
+    	emf_vert_text = 10 * ang;
+	EMF_setfont();
 	break;
     }
     return TRUE;

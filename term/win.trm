@@ -1,5 +1,5 @@
 /*
- * $Id: win.trm,v 1.27 2002/06/10 18:53:01 mikulik Exp $
+ * $Id: win.trm,v 1.28 2002/06/10 21:33:31 mikulik Exp $
  */
 
 /* GNUPLOT - win.trm */
@@ -306,7 +306,7 @@ WIN_text_angle(ang)
 {
     if (graphwin.rotate)
 	/* Notice HBB 20010208: --> WIN_move() */
-	GraphOp(&graphwin, W_text_angle, ang, 0, NULL);
+	GraphOp(&graphwin, W_text_angle, (int)(ang ? 1 : 0), 0, NULL);
     return graphwin.rotate;
 }
 

@@ -1,5 +1,5 @@
 /*
- * $Id: gd.trm,v 1.9 2002/07/10 19:26:04 mikulik Exp $
+ * $Id: gd.trm,v 1.10 2002/07/21 12:32:53 mikulik Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -1006,40 +1006,33 @@ PNG_put_text(unsigned int x, unsigned int y, const char *string)
 	/* then draw it again, centered.                             */
 	err = gdImageStringFT(NULL, brect, png_state.color, 
 			png_state.ttffont, (double)png_state.ttfsize,
-			(png_state.angle == 1) ? M_PI_2 : 0.0,
+			(double)png_state.angle * M_PI_2 / 90. ,
 			x, Y(y), (char *)string);
 	if (err) {
 	    fprintf(stderr,"gdImageStringFT: %s while printing string %s with font %s\n",
 	    	err,string,png_state.ttffont);
 	} else {
-	    if (png_state.angle == 0) { 
-		y += (brect[7]-brect[1]) / 2;
-	    	switch (png_state.justify) {
-		    case RIGHT:	x -= (brect[2]-brect[0]);     
+	    x -= (brect[6]-brect[0]) / 2.;
+	    y += (brect[7]-brect[1]) / 2.;
+	    switch (png_state.justify) {
+		case RIGHT:	
+		    		x -= (brect[2]-brect[0]);
+		    		y += (brect[3]-brect[1]);
 		    		break;
-		    case CENTRE:x -= (brect[2]-brect[0]) / 2;
+		case CENTRE:
+		    		x -= (brect[2]-brect[0]) / 2.;
+		    		y += (brect[3]-brect[1]) / 2.;
 				break;
-		    case LEFT:
-		    default:	break;
-		}
-	    } else {
-		x -= (brect[6]-brect[0]) / 2; 
-	    	switch (png_state.justify) {
-		    case RIGHT:	y += (brect[3]-brect[1]);     
-		    		break;
-		    case CENTRE:y += (brect[3]-brect[1]) / 2;
-				break;
-		    case LEFT:
-		    default:	break;
-		}
+		case LEFT:
+		default:	break;
 	    }
 	    err = gdImageStringFT(png_state.image, brect, png_state.color, 
 			png_state.ttffont, (double)png_state.ttfsize,
-			(png_state.angle == 1) ? M_PI_2 : 0.0,
+			(double)png_state.angle * M_PI_2 / 90.,
 			x, Y(y), (char *)string);
 	    if (err) fprintf(stderr,"gdImageStringFT: %s\n",err);
 	}
-    } else if (png_state.angle == 1) {
+    } else if (png_state.angle != 0) {
 	x -= png_state.charh / 2;
 	switch (png_state.justify) {
 	    case RIGHT:	y -= png_state.charw * strlen(string);
@@ -1073,26 +1066,22 @@ PNG_put_text(unsigned int x, unsigned int y, const char *string)
 TERM_PUBLIC void
 PNG_put_text(unsigned int x, unsigned int y, const char *string)
 {
-    if (png_state.angle == 1) {
-	x -= png_state.charh / 2;
-	gdImageStringUp(png_state.image, png_state.font,
-			x, Y(y),
-			(unsigned char *)string, png_state.color);
-    } else {
+    if (png_state.angle == 0) {
 	y += png_state.charh / 2;
 	gdImageString(png_state.image, png_state.font,
 		      x, Y(y),
 		      (unsigned char *)string, png_state.color);
+    } else {
+	x -= png_state.charh / 2;
+	gdImageStringUp(png_state.image, png_state.font,
+			x, Y(y),
+			(unsigned char *)string, png_state.color);
     }
 }
 
 #endif /* HAVE_TTF */
 
 
-/* _text_angle(ang)  Called to rotate the text angle when placing the y label.
- * If ang = 0 then text is horizontal.  If ang = 1 then text is vertically
- * upwards.  Returns TRUE if text can be rotated, FALSE otherwise.
- */
 TERM_PUBLIC int
 PNG_text_angle(int ang)
 {

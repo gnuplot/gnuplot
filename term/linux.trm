@@ -1,5 +1,5 @@
 /*
- * $Id: linux.trm,v 1.21 2002/02/25 03:10:42 broeker Exp $
+ * $Id: linux.trm,v 1.22 2002/05/16 21:29:18 joze Exp $
  *
  */
 
@@ -260,7 +260,7 @@ TERM_PUBLIC int
 LINUX_text_angle(ang)
 int ang;
 {
-    linux_angle = ang;
+    linux_angle = (ang ? 1 : 0);
     return TRUE;
 }
 

@@ -1,5 +1,5 @@
 /*
- * $Id: dxy.trm,v 1.7 1999/06/19 20:30:47 lhecking Exp $
+ * $Id: dxy.trm,v 1.8 1999/06/22 11:54:16 lhecking Exp $
  *
  */
 
@@ -164,7 +164,7 @@ TERM_PUBLIC int
 DXY_text_angle(ang)
 int ang;
 {
-    dxy_angle = ang;
+    dxy_angle = (ang ? 1 : 0);
     fprintf(gpoutfile, "Q%d\n", ang);
     return TRUE;
 }

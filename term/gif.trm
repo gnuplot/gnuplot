@@ -1,5 +1,5 @@
 /*
- * $Id: gif.trm,v 1.37 2002/06/07 23:03:06 joze Exp $
+ * $Id: gif.trm,v 1.38 2002/06/10 18:53:00 mikulik Exp $
  */
 
 /* GNUPLOT -- gif.trm */
@@ -627,7 +627,7 @@ GIF_put_text(unsigned int x, unsigned int y, const char *string)
 TERM_PUBLIC int
 GIF_text_angle(int ang)
 {
-    gif_state.angle = ang;
+    gif_state.angle = (ang ? 1 : 0);
     return TRUE;
 }
 

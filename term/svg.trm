@@ -1,5 +1,5 @@
 /*
- * $Id: svg.trm,v 1.16 2002/06/10 21:11:17 mikulik Exp $
+ * $Id: svg.trm,v 1.17 2002/07/21 13:07:06 mikulik Exp $
  *
  */
 
@@ -768,12 +768,9 @@ SVG_justify_text (enum JUSTIFY mode)
 TERM_PUBLIC int
 SVG_text_angle (int ang)
 {
-    if (ang == 0 || ang == 1) {
-	SVG_TextAngle = ang;
-	return (TRUE);
-    }
-
-    return (FALSE);
+    /* Can only do pure horizontal or vertical */
+    SVG_TextAngle = (ang ? 1 : 0);
+    return (TRUE);
 }
 
 /*------------------------------------------------------------------------------------------------------------------------------------

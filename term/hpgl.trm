@@ -1,5 +1,5 @@
 /*
- * $Id: hpgl.trm,v 1.12 1999/12/10 17:09:52 lhecking Exp $
+ * $Id: hpgl.trm,v 1.13 2002/02/25 03:10:41 broeker Exp $
  */
 
 /* GNUPLOT - hpgl.trm */
@@ -1229,17 +1229,17 @@ TERM_PUBLIC int
 HPGL_text_angle(ang)
 int ang;
 {
-    HPGL_ang = ang;
-    if (ang == 1)
-/*
- *  Vertical
- */
-	fputs("DI0,1;\n", gpoutfile);
+    if (ang == -90 || ang == 270)
+	HPGL_ang = -1;
     else
-/*
- * Horizontal
- */
+	HPGL_ang = (ang ? 1 : 0);
+    
+    if (HPGL_ang == 0) 			/* Horizontal */
 	fputs("DI1,0;\n", gpoutfile);
+    else if (HPGL_ang == -1)		/* Vertical Down */
+	fputs("DI0,-1;\n", gpoutfile);
+    else				/* Vertical Up */
+	fputs("DI0,1;\n", gpoutfile);
     return TRUE;
 }
 
@@ -1250,21 +1250,21 @@ int ang;
 /*
  * If in Polyline Encoded command, leave Polyline Encoded command
  */
+    if (ang == -90 || ang == 270)
+	HPGL_ang = -1;
+    else
+	HPGL_ang = (ang ? 1 : 0);
+
     if (HPGL2_in_pe) {
 	fputs(";", gpoutfile);
 	HPGL2_in_pe = 0;
     }
-    if (ang == 1)
-/*
- *  Vertical
- */
+    if (HPGL_ang == 1)			/* Vertical Up */
 	fputs("DI0,1", gpoutfile);
-    else
-/*
- * Horizontal
- */
+    else if (HPGL_ang == -1)		/* Vertical Down */
+	fputs("DI0,-1", gpoutfile);
+    else				/* Horizontal */
 	fputs("DI1,0", gpoutfile);
-    HPGL_ang = ang;
     return TRUE;
 }
 

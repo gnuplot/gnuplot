@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.42 2002/06/07 22:52:37 joze Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.43 2002/07/21 12:32:52 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - gplt_x11.c */
@@ -1470,7 +1470,7 @@ exec_cmd(plot_struct *plot, char *command)
 	XSetForeground(dpy, gc, plot->cmap->colors[2]);
 #endif
 
-	if (1 == plot->angle) {
+	if (plot->angle != 0) {
 	    switch (plot->jmode) {
 	    case LEFT:
 		sw = -sw;

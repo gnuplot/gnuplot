@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.81 2002/07/23 18:53:12 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.82 2002/07/26 14:09:23 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -1584,7 +1584,10 @@ int tag;			/* 0 means show all */
 		    break;
 		}
 	    }
-	    fprintf(stderr, " %s ", this_label->rotate ? "rotated (if possible)" : "not rotated");
+	    if (this_label->rotate)
+	    	fprintf(stderr, " rotated by %d degrees (if possible)", this_label->rotate); 
+	    else
+	    	fprintf(stderr, " not rotated");
 	    fprintf(stderr, " %s ", this_label->layer ? "front" : "back");
 	    if (this_label->font != NULL)
 		fprintf(stderr, " font \"%s\"", this_label->font);

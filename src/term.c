@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.42 2002/07/23 18:53:13 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.43 2002/07/24 14:16:52 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -1601,7 +1601,7 @@ test_term()
 			ymax_t / 2 + t->v_char * 4, str);
     /* test text angle */
     str = "rotated ce+ntred text";
-    if ((*t->text_angle) (1)) {
+    if ((*t->text_angle) (TEXT_VERTICAL)) {
 	if ((*t->justify_text) (CENTRE))
 	    (*t->put_text) (t->v_char,
 			    ymax_t / 2, str);

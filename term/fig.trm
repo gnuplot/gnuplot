@@ -1,5 +1,5 @@
 /*
- * $Id: fig.trm,v 1.28 2002/06/07 22:52:36 joze Exp $
+ * $Id: fig.trm,v 1.30 2002/06/11 07:59:09 mikulik Exp $
  */
 
 /* GNUPLOT - fig.trm */
@@ -873,10 +873,7 @@ TERM_PUBLIC int
 FIG_text_angle(ang)
 int ang;
 {
-    if (ang)
-	FIG_angle = M_PI_2;	/* vertical is pi/2 radians */
-    else
-	FIG_angle = 0.0;	/* horizontal */
+    FIG_angle = ang * M_PI_2 / 90. ;
     return (TRUE);
 }
 

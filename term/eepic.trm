@@ -1,6 +1,6 @@
 /* Hello, Emacs! This is -*-C-*- !*/
 /*
- * $Id: eepic.trm,v 1.17 2000/12/18 20:06:18 broeker Exp $
+ * $Id: eepic.trm,v 1.18 2000/12/18 20:58:39 broeker Exp $
  *
  */
 
@@ -466,7 +466,7 @@ TERM_PUBLIC int
 EEPIC_text_angle(ang)
 int ang;
 {
-    eepic_angle = ang;
+    eepic_angle = (ang ? 1 : 0);
     return (TRUE);
 }
 

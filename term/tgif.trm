@@ -1,4 +1,4 @@
-/* $Id: tgif.trm,v 1.20 2002/02/04 16:49:17 broeker Exp $ */
+/* $Id: tgif.trm,v 1.21 2002/06/10 18:53:00 mikulik Exp $ */
 
 /* GNUPLOT - tgif.trm */
 
@@ -172,8 +172,6 @@ static TBOOLEAN TgifSolid = FALSE;
 static TBOOLEAN TgifPortrait = TRUE;
 
 static unsigned int uTgifPlotsPerPage = 1;
-static unsigned int uTextAngle[] =
-{0, 3};
 
 /*
  * 10 different pointtypes need 10 different linetypes
@@ -394,7 +392,7 @@ TGIF_init()
     fprintf(gpoutfile, "\
 %%TGIF 2.15-p7\n\
 state(%d,30,%u,0,0,%u,16,1,9,1,1,0,0,0,0,1,0,'%s',0,%u,0,0,1,10,0,0,1,1,0,16,0,0,1,1,1).\n\
-%%\n%% @(#)$Header: /cvsroot/gnuplot/gnuplot/term/tgif.trm,v 1.20 2002/02/04 16:49:17 broeker Exp $\n%% %%W%%\n%%\n\
+%%\n%% @(#)$Header: /cvsroot/gnuplot/gnuplot/term/tgif.trm,v 1.21 2002/06/10 18:53:00 mikulik Exp $\n%% %%W%%\n%%\n\
 page(1,\"\").\n",
 	    TgifPortrait ? 0 : 1, uActResolution, uActZoom, sActFont, uActFontSize);
     eTgifState = NEWPOLY;
@@ -617,15 +615,13 @@ const char *str;
     x = ux + uXshift;
     y = uYshift - uy - t->v_char / 2;
 
-
-
     if (strlen(str) == 0)
 	return;
 
-
     fprintf(gpoutfile, "\
 text('%s',%u,%u,'%s',0,%u,1,%u,%u,1,55,119,%u,0,15,4,0,0,0,0,[\n\t\"%s\"]).\n",
-	    sActColor, x, y, sActFont, uActFontSize, uActJust, uActAngle,
+	    sActColor, x, y, sActFont, uActFontSize, 
+	    (uActAngle ? CENTRE : uActJust), uActAngle,
 	    uActNr, str);
 
     uActNr += 2;
@@ -641,7 +637,14 @@ TERM_PUBLIC int
 TGIF_text_angle(ang)
 int ang;
 {
-    uActAngle = uTextAngle[ang];	/* 0=waag.  1=senkrecht */
+    switch (ang) {
+	case   90:	uActAngle = 3; break;
+	case  180:
+	case -180:	uActAngle = 2; break;
+	case  -90:
+	case  270:	uActAngle = 1; break;
+	default:	uActAngle = 0; break;
+    }
     return (TRUE);
 }				/* TGIF_text_angle */
 
