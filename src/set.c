@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.171 2005/03/29 08:07:16 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.172 2005/03/30 17:18:31 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -3254,6 +3254,10 @@ set_terminal()
  * options for which we can test in advance to see if the terminal will
  * support it; that allows us to silently ignore the command rather than
  * issuing an error when the current terminal would not be affected anyhow.
+ *
+ * If necessary, the code in term->options() can detect that it was called
+ * from here because in this case (c_token == 2), whereas when called from 
+ * 'set term foo ...' it will see (c_token == 3).
  */
 
 static void
@@ -3280,6 +3284,11 @@ set_termoptions()
 	    (term->options)();
 	} else
 	    c_token += 2;
+#ifdef GIF_ANIMATION
+    } else if (!strcmp(term->name,"gif") && equals(c_token,"delay") && num_tokens==4) {
+	*term_options = 0;
+	(term->options)();
+#endif
     } else {
 	int_error(c_token,"This option cannot be changed using 'set termoption'");
     }

@@ -1,3 +1,13 @@
+2005-04-03  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/set.c: Allow 'set termoption delay <n>' to change the interframe
+	gap of a gif animation in progress.
+
+	* term/gd.trm (PNG_options):
+	Add gif animation option 'loop <repeatcount>'. Protect current animation
+	state from being reset by a 'set termoption' command, but alow the frame
+	delay to be changed. List animation options in terminal options string.
+
 2005-04-03  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* docs/gnuplot.doc: Remove blanks from whitespace-only lines.

@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: gd.trm,v 1.63 2005/03/09 18:26:44 sfeam Exp $
+ * $Id: gd.trm,v 1.65 2005/03/28 04:21:26 sfeam Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -207,6 +207,7 @@ static struct {
     TBOOLEAN  TrueColor;
 #ifdef GIF_ANIMATION
     TBOOLEAN  animate;		/* Only gif supports animation */
+    int       loop_count;	/* Number of times to repeat sequence */
     int       frame_count;	/* Number of frames in animation */
     int       frame_delay;	/* Time between frames in .01 seconds */
     TBOOLEAN  frame_optimization;
@@ -232,6 +233,7 @@ enum PNG_id {
 #ifdef GIF_ANIMATION
     GIF_ANIMATE,
     GIF_DELAY,
+    GIF_LOOP,
     GIF_NOOPT,
 #endif
     PNG_OTHER
@@ -265,6 +267,7 @@ static struct gen_table PNG_opts[] =
 #ifdef GIF_ANIMATION
     { "animate", GIF_ANIMATE },
     { "delay", GIF_DELAY },
+    { "loop", GIF_LOOP },
     { "noopt$imize", GIF_NOOPT },
 #endif
     { "lw", PNG_LINEWIDTH },
@@ -506,12 +509,19 @@ PNG_options()
     }
 
 #ifdef GIF_ANIMATION
-    /* Always reset animation */
-    png_state.animate = FALSE;
-    if (png_state.previous_image) {
-	gdImageDestroy(png_state.previous_image);
-	png_state.previous_image = NULL;
-	png_state.frame_optimization = TRUE;
+    /* Annoying hack to handle the case of 'set termoption' after */
+    /* we are already in animation mode.                          */
+    if (c_token == 2)
+	FPRINTF(("gif: Maintaining animation state\n"));
+    else {
+	/* Otherwise reset animation */
+	png_state.animate = FALSE;
+	if (png_state.previous_image) {
+	    gdImageDestroy(png_state.previous_image);
+	    png_state.previous_image = NULL;
+	    png_state.frame_optimization = TRUE;
+	    png_state.loop_count = 0;
+	}
     }
 #endif
 
@@ -676,6 +686,14 @@ PNG_options()
 		int_error(c_token,"Only the gif terminal supports animation");
 	    c_token++;
 	    png_state.frame_delay = (int)real(const_express(&s));
+	    if (png_state.frame_delay <= 0)
+		png_state.frame_delay = 10;
+	    break;
+	case GIF_LOOP:
+	    if (strncmp("gif",term->name,3))
+		int_error(c_token,"Only the gif terminal supports animation");
+	    c_token++;
+	    png_state.loop_count = (int)real(const_express(&s));
 	    break;
 	case GIF_NOOPT:
 	    if (strncmp("gif",term->name,3))
@@ -813,6 +831,14 @@ PNG_options()
     if (PNG_linewidth_factor != 1.0)
 	sprintf(term_options + strlen(term_options),
 	    "linewidth %3.1f ", PNG_linewidth_factor);
+
+#ifdef GIF_ANIMATION
+    if (png_state.animate) {
+	sprintf(term_options + strlen(term_options),
+	    "animate delay %d loop %d ", 
+	    png_state.frame_delay, png_state.loop_count);
+    }
+#endif
 
     sprintf(term_options + strlen(term_options),
 	    "size %d,%d ", PNG_XMAX, PNG_YMAX);
@@ -1158,7 +1184,7 @@ PNG_graphics()
 	/* Initialize the animation with a global colormap */
 	gdImageGifAnimBegin(png_state.image, gpoutfile, 
 		1 /* Global Colormap */, 
-		0 /* Loop forever on playback */);
+		png_state.loop_count );
     }
 #endif
 
