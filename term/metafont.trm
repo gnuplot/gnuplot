@@ -1,5 +1,5 @@
 /*
- * $Id: metafont.trm,v 1.12 1999/06/25 17:07:55 lhecking Exp $
+ * $Id: metafont.trm,v 1.13 1999/07/05 13:10:38 lhecking Exp $
  */
 
 /* GNUPLOT - metafont.trm */
@@ -268,7 +268,7 @@ else: font_coding_scheme:=\n\
   spanish_shriek=oct\"016\"; spanish_query=oct\"017\"; fi\n\
 font_setup;\n\
 input romanu.mf %Roman uppercase.\n\
-input romanl.mf %Roman lowerrcase.\n\
+input romanl.mf %Roman lowercase.\n\
 input greeku.mf %Greek uppercase.\n\
 input romand.mf %Numerals.\n\
 input romanp.mf %Ampersand, question marks, currency sign.\n\
