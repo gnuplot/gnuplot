@@ -28,7 +28,7 @@ Changes in release 4.0:
 * CHANGE use either two or five minitic steps, never 4 (in logscale)
 * CHANGE reject candlesticks/financebars plots of to few colums --- warn
   and then plot with "points", instead
-* NEW Hotkeys to access keyboard in MS Windows version
+* NEW Hotkeys to access clipboard in MS Windows version
 * NEW set style [data | function] filledcurves [options]
       plot ... with filledcurves [options]
 * NEW autoscale options: `fix`, `keepfix`
@@ -80,8 +80,7 @@ Changes in release 4.0:
 * FIXED reject many-column plot styles when plotting a function
 
 [3.8e]
-* NEW Major new featrue "pm3d" for color-coded plotting (formerly a
-  branch version).
+* NEW Major new feature "pm3d" for color plotting (formerly a branch version)
 * NEW set label can print numbers into the label text
 * NEW hidden3d allows non-grid datasets to be part of the plot
 * NEW hidden3d works with contour lines

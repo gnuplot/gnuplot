@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.65 2001/10/31 17:13:59 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.66 2001/11/10 18:27:12 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -1633,8 +1633,9 @@ set_keytitle()
 }
 
 /* process 'set label' command */
-/* set label {tag} {label_text} {at x,y} {pos} {font name,size} */
+/* set label {tag} {label_text} {at x,y} {pos} {font name,size} {...} */
 /* Entry font added by DJL */
+/* allow any order of options - pm 10.11.2001 */
 static void
 set_label()
 {
@@ -1647,9 +1648,9 @@ set_label()
     enum JUSTIFY just = LEFT;
     int rotate = 0;
     int tag;
-    TBOOLEAN set_text, set_position = FALSE, set_just = FALSE, set_rot = FALSE;
-    TBOOLEAN set_font = FALSE, set_offset = FALSE;
-    TBOOLEAN set_layer = FALSE;
+    TBOOLEAN set_text = FALSE, set_position = FALSE, set_just = FALSE,
+	     set_rot = FALSE, set_font = FALSE, set_offset = FALSE,
+	     set_layer = FALSE;
     int layer = 0;
     struct lp_style_type loc_lp = DEFAULT_LP_STYLE_TYPE;
     float hoff = 1.0;
@@ -1694,31 +1695,28 @@ set_label()
 	 * appropriate %f format string) */
 	if (!END_OF_COMMAND && equals(c_token, ",")) 
 	    text = fill_numbers_into_string(text);
-
 	set_text = TRUE;
-    } else
-	set_text = FALSE; /* default no text */
+    }
 
-    /* pm: tricky way for any order of opts */
-    while (!END_OF_COMMAND) while (1) {
+    while (!END_OF_COMMAND) {
     /* get justification - what the heck, let him put it here */
 	if (almost_equals(c_token, "l$eft")) {
 	    just = LEFT;
 	    c_token++;
 	    set_just = TRUE;
-	    break;
+	    continue;
     }
     if (almost_equals(c_token, "c$entre") || almost_equals(c_token, "c$enter")) {
 	    just = CENTRE;
 	    c_token++;
 	    set_just = TRUE;
-	    break;
+	    continue;
     }
     if (almost_equals(c_token, "r$ight")) {
 	    just = RIGHT;
 	    c_token++;
 	    set_just = TRUE;
-	    break;
+	    continue;
     }
 
     /* get position */
@@ -1726,13 +1724,14 @@ set_label()
 	c_token++;
 	get_position(&pos);
 	set_position = TRUE;
-	break;
+	continue;
 #if 0 /* pm, 10.11.2001: don't support position without "at" keyword */
     } else {
 	pos.x = pos.y = pos.z = 0;
 	pos.scalex = pos.scaley = pos.scalez = first_axes;
-#endif
 	set_position = FALSE;
+	continue;
+#endif
     }
 
     /* get justification */
@@ -1740,19 +1739,19 @@ set_label()
 	    just = LEFT;
 	    c_token++;
 	    set_just = TRUE;
-	    break;
+	    continue;
     }
     if (almost_equals(c_token, "c$entre") || almost_equals(c_token, "c$enter")) {
 	    just = CENTRE;
 	    c_token++;
 	    set_just = TRUE;
-	    break;
+	    continue;
     }
     if (almost_equals(c_token, "r$ight")) {
 	    just = RIGHT;
 	    c_token++;
 	    set_just = TRUE;
-	    break;
+	    continue;
     }
 
     /* get rotation (added by RCC) */
@@ -1760,13 +1759,13 @@ set_label()
 	    rotate = TRUE;
 	    c_token++;
 	    set_rot = TRUE;
-	    break;
+	    continue;
     }
     if (almost_equals(c_token, "norot$ate")) {
 	    rotate = FALSE;
 	    c_token++;
 	    set_rot = TRUE;
-	    break;
+	    continue;
     }
 
     /* get font */
@@ -1783,22 +1782,23 @@ set_label()
 	} else
 	    int_error(c_token, "'fontname,fontsize' expected");
 	c_token++;
-	break;
+	continue;
     }
 
     /* get front/back (added by JDP) */
-    set_layer = FALSE;
-    if (!END_OF_COMMAND && equals(c_token, "back")) {
+    if (equals(c_token, "back")) {
 	layer = 0;
 	c_token++;
 	set_layer = TRUE;
+	continue;
     }
-    if(!END_OF_COMMAND && equals(c_token, "front")) {
+    if (equals(c_token, "front")) {
 	if (set_layer)
 	    int_error(c_token, "only one of front or back expected");
 	layer = 1;
 	c_token++;
 	set_layer = TRUE;
+	continue;
     }
     
     { /* read point type */
@@ -1809,14 +1809,14 @@ set_label()
 	    loc_lp = tmp_lp;
 	    loc_lp.pointflag = 1;
 	    if (loc_lp.p_type < -1) loc_lp.p_type = 0;
-	    break;
+	    continue;
 	}
     }
 
     if (almost_equals(c_token, "nopo$int")) {
 	loc_lp.pointflag = 0;
 	c_token++;
-	break;
+	continue;
     }
 
     if (almost_equals(c_token, "of$fset")) {
@@ -1834,11 +1834,11 @@ set_label()
 	    int_error(c_token, "Expected vertical offset");
 	voff = real(const_express(&a));
 	set_offset = TRUE;
-	break;
+	continue;
     }
 
     int_error(c_token, "extraenous argument in set label");
-    } /* while(1) loop */
+    }
 
     /* OK! add label */
     if (first_label != NULL) {	/* skip to last label */
