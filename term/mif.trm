@@ -331,9 +331,9 @@ static void put_mif_line()
 	    fprintf(gpoutfile, "\t\t<NumPoints %d> ", np);
 	    for (i = 0, tline = &mif_line; i < np; i++, tline = tline->next) {
 		if (i % 4 == 0)
-		    fprintf(gpoutfile, "\
-\n\t\t\
-<Point  %.3f %.3f> ", tline->fpos_x, tline->fpos_y);
+		    fputs("\n\t\t", gpoutfile);
+		fprintf(gpoutfile, "<Point  %.3f %.3f> ",
+			tline->fpos_x, tline->fpos_y);
 	    }
 
 	    /* Line post amble */
