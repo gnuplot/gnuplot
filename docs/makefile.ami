@@ -50,9 +50,9 @@ nroff gnuplot.nroff: gnuplot.ms titlepage.ms
 ms gnuplot.ms: doc2ms gnuplot.doc
 	doc2ms < gnuplot.doc > gnuplot.ms
 
-doc2ms: doc2ms.c
-	$(CC) $(CFLAGS) -o doc2ms.o doc2ms.c
-	$(LN) -o doc2ms doc2ms.o $(LFLAGS)
+doc2ms: doc2ms.c termdoc.c
+	$(CC) $(CFLAGS) -DALL_TERM_DOC -o doc2ms.o doc2ms.c termdoc.c
+	$(LN) -o doc2ms doc2ms.o termdoc.o $(LFLAGS)
 
 ### LaTeX documentation
 tex gnuplot.tex: doc2tex gnuplot.doc
@@ -62,33 +62,33 @@ dvi gnuplot.dvi: gnuplot.tex titlepage.tex
 	latex gnuplot.tex
 	latex gnuplot.tex
 
-doc2tex: doc2tex.c
-	$(CC) $(CFLAGS) -o doc2tex.o doc2tex.c
-	$(LN) -o doc2tex doc2tex.o $(LFLAGS)
+doc2tex: doc2tex.c termdoc.c
+	$(CC) $(CFLAGS) -DALL_TERM_DOC -o doc2tex.o doc2tex.c termdoc.c
+	$(LN) -o doc2tex doc2tex.o termdoc.o $(LFLAGS)
 
 # this is how to make gnuplot.hlp
 hlp gnuplot.hlp: doc2hlp gnuplot.doc
 	doc2hlp < gnuplot.doc > gnuplot.hlp
 
-doc2hlp: doc2hlp.c
-	$(CC) $(CFLAGS) -o doc2hlp.o doc2hlp.c
-	$(LN) -o doc2hlp doc2hlp.o $(LFLAGS)
+doc2hlp: doc2hlp.c termdoc.c
+	$(CC) $(CFLAGS) -o doc2hlp.o doc2hlp.c termdoc.c
+	$(LN) -o doc2hlp doc2hlp.o termdoc.o $(LFLAGS)
 
 # this is how to make gnuplot.gih
 gih gnuplot.gih: doc2gih gnuplot.doc
 	doc2gih < gnuplot.doc > gnuplot.gih
 
-doc2gih: doc2gih.c
-	$(CC) $(CFLAGS) -o doc2gih.o doc2gih.c
-	$(LN) -o doc2gih doc2gih.o $(LFLAGS)
+doc2gih: doc2gih.c termdoc.c
+	$(CC) $(CFLAGS) -o doc2gih.o doc2gih.c termdoc.c
+	$(LN) -o doc2gih doc2gih.o termdoc.o $(LFLAGS)
 
 # this is how to check the gnuplot.doc file
 check: checkdoc gnuplot.doc
 	checkdoc < gnuplot.doc
 
-checkdoc: checkdoc.c
-	$(CC) $(CFLAGS) -o checkdoc.o checkdoc.c
-	$(LN) -o checkdoc checkdoc.o $(LFLAGS)
+checkdoc: checkdoc.c termdoc.c
+	$(CC) $(CFLAGS) -DALL_TERM_DOC -o checkdoc.o checkdoc.c termdoc.c
+	$(LN) -o checkdoc checkdoc.o termdoc.o $(LFLAGS)
 
 # For Unix and MSDOS only
 install-unix: gnuplot.gih
