@@ -1137,8 +1137,28 @@ char *prompt;
 	line = readline((interactive) ? prompt : "");
 	leftover = 0;
 	/* If it's not an EOF */
-	if (line && *line)
+	if (line && *line) {
+#ifdef GNU_READLINE
+#define STREQ(a, b) ((a)[0] == (b)[0] && strcmp(a, b) == 0)
+#define STREQN(a, b, n) ((a)[0] == (b)[0] && strncmp(a, b, n) == 0)
+
+	    HIST_ENTRY *temp;
+
+	    /* Must be called always at this point or
+	     * 'temp' has the wrong value. */
+	    using_history();   
+	    temp = previous_history ();
+
+	    if (temp == 0 || STREQ (temp->line, line) == 0)
+		add_history(line);
+
+#undef STREQN
+#undef STREQ
+#else /* !GNU_READLINE */
 	    add_history(line);
+#endif
+	}
+
     }
     if (line) {
 	safe_strncpy(s, line + leftover, n);
