@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.26 1999/12/10 16:51:52 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.27 2000/02/11 19:17:19 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -67,7 +67,7 @@ static int ktitl_lines = 0;	/* no lines in key_title (key header) */
 static int ptitl_cnt;		/* count keys with len > 0  */
 static int key_cols;		/* no cols of keys */
 static int key_rows, key_col_wth, yl_ref;
-static struct clipbox keybox;   /* boundaries for key field */
+static struct clipbox keybox;	/* boundaries for key field */
 
 /* penalty for doing tics by callback in gen_tics is need for
  * global variables to communicate with the tic routines
@@ -93,7 +93,7 @@ double base_array[AXIS_ARRAY_SIZE];
 double log_base_array[AXIS_ARRAY_SIZE];
 
 /* HBB 990829 FIXME: this is never modified at all !?? */
-char default_font[MAX_ID_LEN+1] = "";	/* Entry font added by DJL */
+char default_font[MAX_ID_LEN + 1] = "";	/* Entry font added by DJL */
 
 /* Define the boundary of the plot
  * These are computed at each call to do_plot, and are constant over
@@ -121,8 +121,7 @@ static int ylabel_y, y2label_y, xtic_y, x2tic_y, ytic_x, y2tic_x;
 /*}}} */
 
 /*{{{  static fns and local macros */
-static void plot_impulses __PROTO((struct curve_points * plot, int yaxis_x,
-				   int xaxis_y));
+static void plot_impulses __PROTO((struct curve_points * plot, int yaxis_x, int xaxis_y));
 static void plot_lines __PROTO((struct curve_points * plot));
 static void plot_points __PROTO((struct curve_points * plot));
 static void plot_dots __PROTO((struct curve_points * plot));
@@ -132,42 +131,31 @@ static void plot_vectors __PROTO((struct curve_points * plot));
 static void plot_f_bars __PROTO((struct curve_points * plot));
 static void plot_c_bars __PROTO((struct curve_points * plot));
 
-static void edge_intersect __PROTO((struct coordinate GPHUGE * points, int i,
-				    double *ex, double *ey));
-static TBOOLEAN two_edge_intersect __PROTO((struct coordinate GPHUGE * points,
-				       int i, double *lx, double *ly));
+static void edge_intersect __PROTO((struct coordinate GPHUGE * points, int i, double *ex, double *ey));
+static TBOOLEAN two_edge_intersect __PROTO((struct coordinate GPHUGE * points, int i, double *lx, double *ly));
 static TBOOLEAN two_edge_intersect_steps __PROTO((struct coordinate GPHUGE * points, int i, double *lx, double *ly));
 
 static void plot_steps __PROTO((struct curve_points * plot));	/* JG */
 static void plot_fsteps __PROTO((struct curve_points * plot));	/* HOE */
 static void plot_histeps __PROTO((struct curve_points * plot));	/* CAC */
-static void histeps_horizontal __PROTO((int *xl, int *yl, double x1, double x2,
-					double y));	/* CAC */
-static void histeps_vertical __PROTO((int *xl, int *yl, double x, double y1,
-				      double y2));	/* CAC */
-static void edge_intersect_steps __PROTO((struct coordinate GPHUGE * points,
-					  int i, double *ex, double *ey));      /* JG */
-static void edge_intersect_fsteps __PROTO((struct coordinate GPHUGE * points,
-					   int i, double *ex, double *ey));	/* HOE */
+static void histeps_horizontal __PROTO((int *xl, int *yl, double x1, double x2, double y));	/* CAC */
+static void histeps_vertical __PROTO((int *xl, int *yl, double x, double y1, double y2));	/* CAC */
+static void edge_intersect_steps __PROTO((struct coordinate GPHUGE * points, int i, double *ex, double *ey));	/* JG */
+static void edge_intersect_fsteps __PROTO((struct coordinate GPHUGE * points, int i, double *ex, double *ey));	/* HOE */
 static TBOOLEAN two_edge_intersect_steps __PROTO((struct coordinate GPHUGE * points, int i, double *lx, double *ly));	/* JG */
 static TBOOLEAN two_edge_intersect_fsteps __PROTO((struct coordinate GPHUGE * points, int i, double *lx, double *ly));
 
 static double dbl_raise __PROTO((double x, int y));
-static void boundary __PROTO((TBOOLEAN scaling, struct curve_points * plots,
-			      int count));
+static void boundary __PROTO((TBOOLEAN scaling, struct curve_points * plots, int count));
 static double make_tics __PROTO((int axis, int guide));
 
 /* widest2d_callback keeps longest so far in here */
 static int widest_tic;
 
-static void widest2d_callback __PROTO((int axis, double place, char *text,
-				       struct lp_style_type grid));
-static void ytick2d_callback __PROTO((int axis, double place, char *text,
-				      struct lp_style_type grid));
-static void xtick2d_callback __PROTO((int axis, double place, char *text,
-				      struct lp_style_type grid));
-static void mant_exp __PROTO((double log_base, double x, int scientific,
-			      double *m, int *p));
+static void widest2d_callback __PROTO((int axis, double place, char *text, struct lp_style_type grid));
+static void ytick2d_callback __PROTO((int axis, double place, char *text, struct lp_style_type grid));
+static void xtick2d_callback __PROTO((int axis, double place, char *text, struct lp_style_type grid));
+static void mant_exp __PROTO((double log_base, double x, int scientific, double *m, int *p));
 static double make_ltic __PROTO((int, double));
 static double time_tic_just __PROTO((int, double));
 static void timetic_format __PROTO((int, double, double));
@@ -298,6 +286,7 @@ const char *axis;		/* which axis is this for ("x" or "y")? */
     }
     return (coord);
 }
+
 /*}}} */
 
 /*{{{  graph_error() */
@@ -306,7 +295,8 @@ const char *axis;		/* which axis is this for ("x" or "y")? */
 void
 graph_error(const char *fmt, ...)
 #else
-void graph_error(fmt, va_alist)
+void
+graph_error(fmt, va_alist)
 const char *fmt;
 va_dcl
 #endif
@@ -323,7 +313,7 @@ va_dcl
     int_error(NO_CARET, fmt, args);
     va_end(args);
 #else
-    int_error (fmt, a1, a2, a3, a4, a5, a6, a7, a8);
+    int_error(fmt, a1, a2, a3, a4, a5, a6, a7, a8);
 #endif
 
 }
@@ -421,16 +411,11 @@ const char *axis_name;
 	if (auto_array[axis]) {
 	    /* range came from autoscaling ==> widen it */
 	    double widen = (dmax == 0.0)
-	    ? FIXUP_RANGE__WIDEN_ZERO_ABS
-	    : FIXUP_RANGE__WIDEN_NONZERO_REL * dmax;
-	    fprintf(stderr,
-		    "Warning: empty %s range [%g:%g], ",
-		    axis_name, dmin, dmax);
+		? FIXUP_RANGE__WIDEN_ZERO_ABS : FIXUP_RANGE__WIDEN_NONZERO_REL * dmax;
+	    fprintf(stderr, "Warning: empty %s range [%g:%g], ", axis_name, dmin, dmax);
 	    min_array[axis] -= widen;
 	    max_array[axis] += widen;
-	    fprintf(stderr,
-		    "adjusting to [%g:%g]\n",
-		    min_array[axis], max_array[axis]);
+	    fprintf(stderr, "adjusting to [%g:%g]\n", min_array[axis], max_array[axis]);
 	} else {
 	    /* user has explicitly set the range */
 	    /* (to something empty) ==> we're in trouble */
@@ -458,6 +443,7 @@ struct lp_style_type grid;
     if (len > widest_tic)
 	widest_tic = len;
 }
+
 /*}}} */
 
 
@@ -701,7 +687,7 @@ int count;
 	    ybot += timebot_textheight;
 	/* HBB 19990616: round to nearest integer, required to escape
 	 * floating point inaccuracies */
-	if (ybot == (int)(0.5 + (t->ymax) * yoffset)) {
+	if (ybot == (int) (0.5 + (t->ymax) * yoffset)) {
 	    /* make room for the end of rotated ytics or y2tics */
 	    ybot += (int) ((t->h_char) * 2);
 	}
@@ -779,7 +765,8 @@ int count;
 		 * do one integer division to maximise accuracy (hope we
 		 * don't overflow !)
 		 */
-		keybox.xl = xleft - key_size_left + ((xright - xleft) * key_size_left) / (key_cols * (key_size_left + key_size_right));
+		keybox.xl =
+		    xleft - key_size_left + ((xright - xleft) * key_size_left) / (key_cols * (key_size_left + key_size_right));
 		keybox.xr = keybox.xl + key_col_wth * (key_cols - 1) + key_size_left + key_size_right;
 		keybox.yb = t->ymax * yoffset;
 		keybox.yt = keybox.yb + key_rows * key_entry_height + ktitl_lines * t->v_char;
@@ -878,7 +865,7 @@ int count;
 	 */
 	if (!vertical_timelabel && xleft - ytic_width - ytic_textwidth < -(int) (timelabel.xoffset * (t->h_char)))
 	    xleft = ytic_width + ytic_textwidth - (int) (timelabel.xoffset * (t->h_char));
-	if (xleft == (int)(0.5 + (t->xmax) * xoffset)) {
+	if (xleft == (int) (0.5 + (t->xmax) * xoffset)) {
 	    /* make room for end of xtic or x2tic label */
 	    xleft += (int) ((t->h_char) * 2);
 	}
@@ -941,7 +928,7 @@ int count;
 	    xright -= key_col_wth * key_cols;
 	    keybox.xl = xright + (int) (t->h_tic);
 	}
-	if (xright == (int)(0.5 + (t->xmax) * (xsize + xoffset))) {
+	if (xright == (int) (0.5 + (t->xmax) * (xsize + xoffset))) {
 	    /* make room for end of xtic or x2tic label */
 	    xright -= (int) ((t->h_char) * 2);
 	}
@@ -1042,8 +1029,7 @@ int count;
 	}
     } else {
 	if (timelabel_bottom)
-	    time_y = ybot - xtic_height - xtic_textheight - xlabel_textheight - timebot_textheight
-		+ t->v_char;
+	    time_y = ybot - xtic_height - xtic_textheight - xlabel_textheight - timebot_textheight + t->v_char;
 	else if (ylabel_textheight > 0)
 	    time_y = ylabel_y + timetop_textheight;
 	else
@@ -1087,10 +1073,10 @@ int count;
 		keybox.yt = keybox.yb + key_h;
 	    }
 	    if (key_hpos == TLEFT) {
-		keybox.xl = xleft + (t->h_char);        /* for Left just */
+		keybox.xl = xleft + (t->h_char);	/* for Left just */
 		keybox.xr = keybox.xl + key_w;
 	    } else if (key_hpos == TRIGHT) {
-		keybox.xr = xright - (t->h_char);       /* for Right just */
+		keybox.xr = xright - (t->h_char);	/* for Right just */
 		keybox.xl = keybox.xr - key_w;
 	    } else {		/* TOUT */
 		/* do this here for do_plot() */
@@ -1129,6 +1115,7 @@ int y;
 	return (1.0 / val);
     return (val);
 }
+
 /*}}} */
 
 /*{{{  timetic_format() */
@@ -1144,8 +1131,7 @@ double amin, amax;
     ggmtime(&t_min, (double) time_tic_just(timelevel[axis], amin));
     ggmtime(&t_max, (double) time_tic_just(timelevel[axis], amax));
 
-    if (t_max.tm_year == t_min.tm_year &&
-	t_max.tm_yday == t_min.tm_yday) {
+    if (t_max.tm_year == t_min.tm_year && t_max.tm_yday == t_min.tm_yday) {
 	/* same day, skip date */
 	if (t_max.tm_hour != t_min.tm_hour) {
 	    strcpy(ticfmt[axis], "%H");
@@ -1185,6 +1171,7 @@ double amin, amax;
 	}
     }
 }
+
 /*}}} */
 
 /*{{{  set_tic() */
@@ -1234,6 +1221,7 @@ int guide;
 
     return (tics * dbl_raise(10.0, fl));
 }
+
 /*}}} */
 
 /*{{{  make_tics() */
@@ -1306,11 +1294,11 @@ int axis, guide;
     }
     return (tic);
 }
+
 /*}}} */
 
 void
-get_offsets(struct text_label* this_label, struct termentry* t,
-    int* htic, int* vtic)
+get_offsets(struct text_label *this_label, struct termentry *t, int *htic, int *vtic)
 {
     if (-1 != this_label->pointstyle) {
 	*htic = (pointsize * t->h_tic * 0.5 * this_label->hoffset);
@@ -1322,9 +1310,8 @@ get_offsets(struct text_label* this_label, struct termentry* t,
 }
 
 int
-nearest_label_tag(int xref, int yref, struct termentry* t,
-    void (*map_func)(struct position * pos, unsigned int *x,
-	unsigned int *y, const char *what))
+nearest_label_tag(int xref, int yref, struct termentry *t,
+		  void (*map_func) (struct position * pos, unsigned int *x, unsigned int *y, const char *what))
 {
     double min = -1;
     int min_tag = -1;
@@ -1334,8 +1321,7 @@ nearest_label_tag(int xref, int yref, struct termentry* t,
     int xd;
     int yd;
 
-    for (this_label = first_label; this_label != NULL;
-	 this_label = this_label->next) {
+    for (this_label = first_label; this_label != NULL; this_label = this_label->next) {
 	map_func(&this_label->place, &x, &y, "label");
 	xd = (int) x - (int) xref;
 	yd = (int) y - (int) yref;
@@ -1474,9 +1460,7 @@ int pcount;			/* count of plots in linked list */
 	    tic_text = ytic_x;
 	}
 	/* go for it */
-	gen_tics(FIRST_Y_AXIS, &yticdef,
-		 work_grid.l_type & (GRID_Y | GRID_MY),
-		 mytics, mytfreq, ytick2d_callback);
+	gen_tics(FIRST_Y_AXIS, &yticdef, work_grid.l_type & (GRID_Y | GRID_MY), mytics, mytfreq, ytick2d_callback);
 	(*t->text_angle) (0);	/* reset rotation angle */
 
     }
@@ -1514,9 +1498,7 @@ int pcount;			/* count of plots in linked list */
 	    tic_text = xtic_y;
 	}
 	/* go for it */
-	gen_tics(FIRST_X_AXIS, &xticdef,
-		 work_grid.l_type & (GRID_X | GRID_MX),
-		 mxtics, mxtfreq, xtick2d_callback);
+	gen_tics(FIRST_X_AXIS, &xticdef, work_grid.l_type & (GRID_X | GRID_MX), mxtics, mxtfreq, xtick2d_callback);
 	(*t->text_angle) (0);	/* reset rotation angle */
     }
     /* select second mapping */
@@ -1554,9 +1536,7 @@ int pcount;			/* count of plots in linked list */
 	    tic_text = y2tic_x;
 	}
 	/* go for it */
-	gen_tics(SECOND_Y_AXIS, &y2ticdef,
-		 work_grid.l_type & (GRID_Y2 | GRID_MY2),
-		 my2tics, my2tfreq, ytick2d_callback);
+	gen_tics(SECOND_Y_AXIS, &y2ticdef, work_grid.l_type & (GRID_Y2 | GRID_MY2), my2tics, my2tfreq, ytick2d_callback);
 	(*t->text_angle) (0);	/* reset rotation angle */
     }
     /* label second x axis tics */
@@ -1590,9 +1570,7 @@ int pcount;			/* count of plots in linked list */
 	    tic_text = x2tic_y;
 	}
 	/* go for it */
-	gen_tics(SECOND_X_AXIS, &x2ticdef,
-		 work_grid.l_type & (GRID_X2 | GRID_MX2),
-		 mx2tics, mx2tfreq, xtick2d_callback);
+	gen_tics(SECOND_X_AXIS, &x2ticdef, work_grid.l_type & (GRID_X2 | GRID_MX2), mx2tics, mx2tfreq, xtick2d_callback);
 	(*t->text_angle) (0);	/* reset rotation angle */
     }
     /* select first mapping */
@@ -1620,9 +1598,7 @@ int pcount;			/* count of plots in linked list */
 		(*t->vector) ((unsigned int) x, (unsigned int) y);
 	    }
 	}
-	draw_clip_line(ox, oy,
-		       map_x(largest_polar_circle * cos(theta)),
-		       map_y(largest_polar_circle * sin(theta)));
+	draw_clip_line(ox, oy, map_x(largest_polar_circle * cos(theta)), map_y(largest_polar_circle * sin(theta)));
     }
 /* DRAW AXES */
 
@@ -1632,9 +1608,9 @@ int pcount;			/* count of plots in linked list */
     y_axis = FIRST_Y_AXIS;	/* chose scaling */
 
     if ((y_min >= 0.0 && y_max >= 0.0) || is_log_y)
-        axis_zero[FIRST_Y_AXIS] = ybot;         /* save for impulse plotting */
+	axis_zero[FIRST_Y_AXIS] = ybot;	/* save for impulse plotting */
     else if (y_min <= 0.0 && y_max <= 0.0)
-        axis_zero[FIRST_Y_AXIS] = ytop;
+	axis_zero[FIRST_Y_AXIS] = ytop;
     else {
 	axis_zero[FIRST_X_AXIS] = map_y(0.0);
 	if (xzeroaxis.l_type > -3) {
@@ -1657,12 +1633,12 @@ int pcount;			/* count of plots in linked list */
     }
 
     x_axis = SECOND_X_AXIS;
-    y_axis = SECOND_Y_AXIS;   /* chose scaling */
+    y_axis = SECOND_Y_AXIS;	/* chose scaling */
 
     if (is_log_y2 || (y_min >= 0.0 && y_max >= 0.0))
-        axis_zero[SECOND_Y_AXIS] = ybot;  /* save for impulse plotting */
+	axis_zero[SECOND_Y_AXIS] = ybot;	/* save for impulse plotting */
     else if (y_min <= 0.0 && y_max <= 0.0)
-        axis_zero[SECOND_Y_AXIS] = ytop;
+	axis_zero[SECOND_Y_AXIS] = ytop;
     else {
 	axis_zero[SECOND_X_AXIS] = map_y(0.0);
 	if (x2zeroaxis.l_type > -3) {
@@ -1793,10 +1769,9 @@ int pcount;			/* count of plots in linked list */
     }
 /* PLACE LABELS */
     if ((*t->pointsize)) {
-	(*t->pointsize)(pointsize);
+	(*t->pointsize) (pointsize);
     }
-    for (this_label = first_label; this_label != NULL;
-	 this_label = this_label->next) {
+    for (this_label = first_label; this_label != NULL; this_label = this_label->next) {
 
 	unsigned int x, y;
 	int htic;
@@ -1814,13 +1789,12 @@ int pcount;			/* count of plots in linked list */
 	    write_multiline(x + htic, y + vtic, this_label->text, this_label->pos, JUST_TOP, 0, this_label->font);
 	}
 	if (-1 != this_label->pointstyle) {
-	    (*t->point)(x, y, this_label->pointstyle);
+	    (*t->point) (x, y, this_label->pointstyle);
 	}
     }
 
 /* PLACE ARROWS */
-    for (this_arrow = first_arrow; this_arrow != NULL;
-	 this_arrow = this_arrow->next) {
+    for (this_arrow = first_arrow; this_arrow != NULL; this_arrow = this_arrow->next) {
 	unsigned int sx, sy, ex, ey;
 
 	if (this_arrow->layer)
@@ -1835,7 +1809,7 @@ int pcount;			/* count of plots in linked list */
 /* WORK OUT KEY SETTINGS AND DO KEY TITLE / BOX */
 
 
-    if (lkey) {		/* may have been cancelled if something went wrong */
+    if (lkey) {			/* may have been cancelled if something went wrong */
 	/* just use keybox.xl etc worked out in boundary() */
 	xl = keybox.xl + key_size_left;
 	yl = keybox.yt;
@@ -1857,8 +1831,7 @@ int pcount;			/* count of plots in linked list */
 			(*t->put_text) (xl + key_text_right, yl, s);
 		    } else {
 			int x = xl + key_text_right - (t->h_char) * strlen(s);
-			if (key_hpos == TOUT ||
-			    key_vpos == TUNDER ||	/* HBB 990327 */
+			if (key_hpos == TOUT || key_vpos == TUNDER ||	/* HBB 990327 */
 			    inrange(x, xleft, xright))
 			    (*t->put_text) (x, yl, s);
 		    }
@@ -1883,7 +1856,8 @@ int pcount;			/* count of plots in linked list */
 	    (*t->move) (keybox.xl, keybox.yt - (ktitl_lines) * t->v_char);
 	    (*t->vector) (keybox.xr, keybox.yt - (ktitl_lines) * t->v_char);
 	}
-    }				/* lkey */
+    } /* lkey */
+
     /* DRAW CURVES */
     this_plot = plots;
     for (curve = 0; curve < pcount; this_plot = this_plot->next, curve++) {
@@ -1902,24 +1876,20 @@ int pcount;			/* count of plots in linked list */
 		key_count++;
 		if (key_just == JLEFT) {
 		    (*t->justify_text) (LEFT);
-		    (*t->put_text) (xl + key_text_left,
-				    yl, this_plot->title);
+		    (*t->put_text) (xl + key_text_left, yl, this_plot->title);
 		} else {
 		    if ((*t->justify_text) (RIGHT)) {
-			(*t->put_text) (xl + key_text_right,
-					yl, this_plot->title);
+			(*t->put_text) (xl + key_text_right, yl, this_plot->title);
 		    } else {
 			int x = xl + key_text_right - (t->h_char) * strlen(this_plot->title);
-			if (key_hpos == TOUT ||
-			    key_vpos == TUNDER ||	/* HBB 990327 */
+			if (key_hpos == TOUT || key_vpos == TUNDER ||	/* HBB 990327 */
 			    i_inrange(x, xleft, xright))
 			    (*t->put_text) (x, yl, this_plot->title);
 		    }
 		}
 
 		/* draw sample depending on bits set in plot_style */
-		if ((this_plot->plot_style & 1) ||
-		    ((this_plot->plot_style & 4) && this_plot->plot_type == DATA)) {	/* errors for data plots only */
+		if ((this_plot->plot_style & 1) || ((this_plot->plot_style & 4) && this_plot->plot_type == DATA)) {	/* errors for data plots only */
 		    (*t->move) (xl + key_sample_left, yl);
 		    (*t->vector) (xl + key_sample_right, yl);
 		}
@@ -1929,9 +1899,7 @@ int pcount;			/* count of plots in linked list */
 		 * We simply draw the point sample after plotting
 		 */
 
-		if (this_plot->plot_type == DATA &&
-		    (this_plot->plot_style & 4) &&
-		    bar_size > 0.0) {
+		if (this_plot->plot_type == DATA && (this_plot->plot_style & 4) && bar_size > 0.0) {
 		    (*t->move) (xl + key_sample_left, yl + ERRORBARTIC);
 		    (*t->vector) (xl + key_sample_left, yl - ERRORBARTIC);
 		    (*t->move) (xl + key_sample_right, yl + ERRORBARTIC);
@@ -2070,8 +2038,7 @@ int pcount;			/* count of plots in linked list */
 	if (localkey && this_plot->title) {
 	    /* we deferred point sample until now */
 	    if (this_plot->plot_style & 2)
-		(*t->point) (xl + key_point_offset, yl,
-			     this_plot->lp_properties.p_type);
+		(*t->point) (xl + key_point_offset, yl, this_plot->lp_properties.p_type);
 
 	    if (key_count >= key_rows) {
 		yl = yl_ref;
@@ -2084,10 +2051,9 @@ int pcount;			/* count of plots in linked list */
 
 /* PLACE LABELS */
     if ((*t->pointsize)) {
-	(*t->pointsize)(pointsize);
+	(*t->pointsize) (pointsize);
     }
-    for (this_label = first_label; this_label != NULL;
-	 this_label = this_label->next) {
+    for (this_label = first_label; this_label != NULL; this_label = this_label->next) {
 
 	unsigned int x, y;
 	int htic;
@@ -2105,13 +2071,12 @@ int pcount;			/* count of plots in linked list */
 	    write_multiline(x + htic, y + vtic, this_label->text, this_label->pos, JUST_TOP, 0, this_label->font);
 	}
 	if (-1 != this_label->pointstyle) {
-	    (*t->point)(x, y, this_label->pointstyle);
+	    (*t->point) (x, y, this_label->pointstyle);
 	}
     }
 
 /* PLACE ARROWS */
-    for (this_arrow = first_arrow; this_arrow != NULL;
-	 this_arrow = this_arrow->next) {
+    for (this_arrow = first_arrow; this_arrow != NULL; this_arrow = this_arrow->next) {
 	unsigned int sx, sy, ex, ey;
 
 	if (this_arrow->layer == 0)
@@ -2155,10 +2120,8 @@ int yaxis_x, xaxis_y;
 		if (!inrange(plot->points[i].x, x_min, x_max))
 		    continue;
 		x = map_x(plot->points[i].x);
-		if ((y_min < y_max
-		     && plot->points[i].y < y_min)
-		    || (y_max < y_min
-			&& plot->points[i].y > y_min))
+		if ((y_min < y_max && plot->points[i].y < y_min)
+		    || (y_max < y_min && plot->points[i].y > y_min))
 		    y = map_y(y_min);
 		else
 		    y = map_y(y_max);
@@ -2315,6 +2278,7 @@ struct curve_points *plot;
 	prev = plot->points[i].type;
     }
 }
+
 /* XXX - HOE  */
 /* plot_fsteps:                         
  * Plot the curves in STEPS style by step on forward yvalue
@@ -2404,22 +2368,19 @@ struct curve_points *plot;
     /* preliminary count of points inside array */
     goodcount = 0;
     for (i = 0; i < plot->p_count; i++)
-	if (plot->points[i].type == INRANGE ||
-	    plot->points[i].type == OUTRANGE)
+	if (plot->points[i].type == INRANGE || plot->points[i].type == OUTRANGE)
 	    ++goodcount;
     if (goodcount < 2)
 	return;			/* cannot plot less than 2 points */
 
-    gl = (int *) gp_alloc(goodcount * sizeof(int),
-			  "histeps valid point mapping");
+    gl = (int *) gp_alloc(goodcount * sizeof(int), "histeps valid point mapping");
     if (gl == NULL)
 	return;
 
 /* fill gl array with indexes of valid (non-undefined) points.  */
     goodcount = 0;
     for (i = 0; i < plot->p_count; i++)
-	if (plot->points[i].type == INRANGE ||
-	    plot->points[i].type == OUTRANGE) {
+	if (plot->points[i].type == INRANGE || plot->points[i].type == OUTRANGE) {
 	    gl[goodcount] = i;
 	    ++goodcount;
 	}
@@ -2463,6 +2424,7 @@ struct curve_points *plot;
 
     free(gl);
 }
+
 /* CAC 
  * Draw vertical line for the histeps routine.
  * Performs clipping.
@@ -2476,10 +2438,7 @@ double x, y1, y2;		/* coordinates of vertical line */
     /* global x_min, x_max, y_min, y_max */
     int xm, y1m, y2m;
 
-    if ((y1 < y_min && y2 < y_min) ||
-	(y1 > y_max && y2 > y_max) ||
-	x < x_min ||
-	x > x_max)
+    if ((y1 < y_min && y2 < y_min) || (y1 > y_max && y2 > y_max) || x < x_min || x > x_max)
 	return;
 
     if (y1 < y_min)
@@ -2503,6 +2462,7 @@ double x, y1, y2;		/* coordinates of vertical line */
 
     return;
 }
+
 /* CAC 
  * Draw horizontal line for the histeps routine.
  * Performs clipping.
@@ -2518,8 +2478,7 @@ double x1, x2, y;		/* coordinates of vertical line */
 
     if ((x1 < x_min && x2 < x_min) ||
 	(x1 > x_max && x2 > x_max) ||
-	y < y_min ||
-	y > y_max)
+	 y < y_min || y > y_max)
 	return;
 
     if (x1 < x_min)
@@ -2568,9 +2527,7 @@ struct curve_points *plot;
 
     if ((plot->plot_style == YERRORBARS) ||
 	(plot->plot_style == XYERRORBARS) ||
-	(plot->plot_style == BOXERROR) ||
-	(plot->plot_style == YERRORLINES) ||
-	(plot->plot_style == XYERRORLINES)) {
+	(plot->plot_style == BOXERROR) || (plot->plot_style == YERRORLINES) || (plot->plot_style == XYERRORLINES)) {
 /* Draw the vertical part of the bar */
 	for (i = 0; i < plot->p_count; i++) {
 	    /* undefined points don't count */
@@ -2713,9 +2670,7 @@ struct curve_points *plot;
 	}			/* for loop */
     }				/* if yerrorbars OR xyerrorbars OR yerrorlines OR xyerrorlines */
     if ((plot->plot_style == XERRORBARS) ||
-	(plot->plot_style == XYERRORBARS) ||
-	(plot->plot_style == XERRORLINES) ||
-	(plot->plot_style == XYERRORLINES)) {
+	(plot->plot_style == XYERRORBARS) || (plot->plot_style == XERRORLINES) || (plot->plot_style == XYERRORLINES)) {
 
 /* Draw the horizontal part of the bar */
 	for (i = 0; i < plot->p_count; i++) {
@@ -2888,9 +2843,7 @@ struct curve_points *plot;
 	    x = map_x(plot->points[i].x);
 	    y = map_y(plot->points[i].y);
 	    /* do clipping if necessary */
-	    if (!clip_points ||
-		(x >= xleft + p_width && y >= ybot + p_height
-		 && x <= xright - p_width && y <= ytop - p_height))
+	    if (!clip_points || (x >= xleft + p_width && y >= ybot + p_height && x <= xright - p_width && y <= ytop - p_height))
 		(*t->point) (x, y, plot->lp_properties.p_type);
 	}
     }
@@ -2936,8 +2889,7 @@ struct curve_points *plot;
 	points[0] = plot->points[i];
 	points[1].x = plot->points[i].xhigh;
 	points[1].y = plot->points[i].yhigh;
-	if (inrange(points[1].x, x_min, x_max) &&
-	    inrange(points[1].y, y_min, y_max)) {
+	if (inrange(points[1].x, x_min, x_max) && inrange(points[1].y, y_min, y_max)) {
 	    /* to inrange */
 	    points[1].type = INRANGE;
 	    x2 = map_x(points[1].x);
@@ -3421,9 +3373,7 @@ double *lx, *ly;		/* lx[2], ly[2]: points where it crosses edges */
     double by = points[i].y;
 
     if (GPMAX(ax, bx) < x_min || GPMIN(ax, bx) > x_max ||
-	GPMAX(ay, by) < y_min || GPMIN(ay, by) > y_max ||
-	((ay > y_max || ay < y_min) &&
-	 (bx > x_max || bx < x_min))) {
+	GPMAX(ay, by) < y_min || GPMIN(ay, by) > y_max || ((ay > y_max || ay < y_min) && (bx > x_max || bx < x_min))) {
 	return (FALSE);
     } else if (inrange(ay, y_min, y_max) && inrange(bx, x_min, x_max)) {	/* corner of step inside plotspace */
 	*ly++ = ay;
@@ -3483,9 +3433,7 @@ double *lx, *ly;		/* lx[2], ly[2]: points where it crosses edges */
     double by = points[i].y;
 
     if (GPMAX(ax, bx) < x_min || GPMIN(ax, bx) > x_max ||
-	GPMAX(ay, by) < y_min || GPMIN(ay, by) > y_max ||
-	((by > y_max || by < y_min) &&
-	 (ax > x_max || ax < x_min))) {
+	GPMAX(ay, by) < y_min || GPMIN(ay, by) > y_max || ((by > y_max || by < y_min) && (ax > x_max || ax < x_min))) {
 	return (FALSE);
     } else if (inrange(by, y_min, y_max) && inrange(ax, x_min, x_max)) {	/* corner of step inside plotspace */
 	*lx++ = ax;
@@ -3543,9 +3491,7 @@ double *lx, *ly;		/* lx[2], ly[2]: points where it crosses edges */
     double swap;
     double t_min, t_max;
 #if 0
-    fprintf(stderr, "\ntwo_edge_intersect (%g, %g) and (%g, %g) : ",
-	    points[i - 1].x, points[i - 1].y,
-	    points[i].x, points[i].y);
+    fprintf(stderr, "\ntwo_edge_intersect (%g, %g) and (%g, %g) : ", points[i - 1].x, points[i - 1].y, points[i].x, points[i].y);
 #endif
     /* nasty degenerate cases, effectively drawing to an infinity point (?)
        cope with them here, so don't process them as a "real" OUTRANGE point 
@@ -3589,8 +3535,7 @@ double *lx, *ly;		/* lx[2], ly[2]: points where it crosses edges */
 	    lx[1] = x_max;
 	    ly[1] = iy;
 #if 0
-	    fprintf(stderr, "(%g %g) -> (%g %g)",
-		    lx[0], ly[0], lx[1], ly[1]);
+	    fprintf(stderr, "(%g %g) -> (%g %g)", lx[0], ly[0], lx[1], ly[1]);
 #endif
 	    return (TRUE);
 	} else {
@@ -3618,8 +3563,7 @@ double *lx, *ly;		/* lx[2], ly[2]: points where it crosses edges */
 	    lx[1] = ix;
 	    ly[1] = y_max;
 #if 0
-	    fprintf(stderr, "(%g %g) -> (%g %g)",
-		    lx[0], ly[0], lx[1], ly[1]);
+	    fprintf(stderr, "(%g %g) -> (%g %g)", lx[0], ly[0], lx[1], ly[1]);
 #endif
 	    return (TRUE);
 	} else {
@@ -3662,8 +3606,7 @@ double *lx, *ly;		/* lx[2], ly[2]: points where it crosses edges */
 	    lx[1] = ix;
 	    ly[1] = y_max;
 #if 0
-	    fprintf(stderr, "(%g %g) -> (%g %g)",
-		    lx[0], ly[0], lx[1], ly[1]);
+	    fprintf(stderr, "(%g %g) -> (%g %g)", lx[0], ly[0], lx[1], ly[1]);
 #endif
 	    return (TRUE);
 	} else
@@ -3685,8 +3628,7 @@ double *lx, *ly;		/* lx[2], ly[2]: points where it crosses edges */
 	    lx[1] = x_max;
 	    ly[1] = iy;
 #if 0
-	    fprintf(stderr, "(%g %g) -> (%g %g)",
-		    lx[0], ly[0], lx[1], ly[1]);
+	    fprintf(stderr, "(%g %g) -> (%g %g)", lx[0], ly[0], lx[1], ly[1]);
 #endif
 	    return (TRUE);
 	} else
@@ -3736,20 +3678,19 @@ double *lx, *ly;		/* lx[2], ly[2]: points where it crosses edges */
     /*
      * Can only have 0 or 2 intersection points -- only need test one coord
      */
-#if 0 
+#if 0
     /* HBB 19990510: this version didn't have the necessary safety
      * margin to account for limited precision calculations: */
-    if (inrange(lx[0], x_min, x_max) &&
-       inrange(ly[0], y_min, y_max))
+    if (inrange(lx[0], x_min, x_max) && inrange(ly[0], y_min, y_max))
 #else
-    /* FIXME: this is UGLY. Need an 'almost_inrange()' function */  
-    if (inrange(lx[0], (x_min-1e-5*(x_max-x_min)), (x_max+1e-5*(x_max-x_min))) && inrange(ly[0], (y_min-1e-5*(y_max-y_min)), (y_max+1e-5*(y_max-y_min))))
+    /* FIXME: this is UGLY. Need an 'almost_inrange()' function */
+    if (inrange(lx[0], (x_min - 1e-5 * (x_max - x_min)), (x_max + 1e-5 * (x_max - x_min)))
+	&& inrange(ly[0], (y_min - 1e-5 * (y_max - y_min)), (y_max + 1e-5 * (y_max - y_min))))
 #endif
     {
 
 #if 0
-	fprintf(stderr, "(%g %g) -> (%g %g)",
-		lx[0], ly[0], lx[1], ly[1]);
+	fprintf(stderr, "(%g %g) -> (%g %g)", lx[0], ly[0], lx[1], ly[1]);
 #endif
 	return (TRUE);
     }
@@ -4126,7 +4067,7 @@ int *lines;
     int mlen, len, l;
 
     l = mlen = len = 0;
-    lab = gp_alloc(strlen(str)+2, "in label_width");
+    lab = gp_alloc(strlen(str) + 2, "in label_width");
     strcpy(lab, str);
     strcat(lab, "\n");
     s = lab;
@@ -4226,6 +4167,7 @@ int *p;				/* results */
     if (p)
 	*p = power;
 }
+
 /*}}} */
 
 /*
@@ -4246,7 +4188,7 @@ void
 gprintf(dest, count, format, log_base, x)
 char *dest, *format;
 size_t count;
-double log_base, x;	/* we print one number in a number of different formats */
+double log_base, x;		/* we print one number in a number of different formats */
 {
     char temp[MAX_LINE_LEN + 1];
     char *t;
@@ -4270,8 +4212,7 @@ double log_base, x;	/* we print one number in a number of different formats */
 	t = temp;
 	*t++ = '%';
 	/* dont put isdigit first since sideeffect in macro is bad */
-	while (*++format == '.' || isdigit((int) *format) ||
-	       *format == '-' || *format == '+' || *format == ' ')
+	while (*++format == '.' || isdigit((int) *format) || *format == '-' || *format == '+' || *format == ' ')
 	    *t++ = *format;
 	/*}}} */
 
@@ -4424,6 +4365,7 @@ double log_base, x;	/* we print one number in a number of different formats */
 	/*}}} */
     }
 }
+
 /*}}} */
 #ifdef HAVE_SNPRINTF
 # undef sprintf
@@ -4527,14 +4469,17 @@ tic_callback callback;		/* fn to call to actually do the work */
 	case TIC_SERIES:
 	    if (log_array[axis]) {
 		/* we can tolerate start <= 0 if step and end > 0 */
-		if (def->def.series.end <= 0 ||
-		    def->def.series.incr <= 0)
+		if (def->def.series.end <= 0 || def->def.series.incr <= 0)
 		    return;	/* just quietly ignore */
 		step = log(def->def.series.incr) / log_base_array[axis];
-		end = log(def->def.series.end) / log_base_array[axis];
-		start = def->def.series.start > 0 ?
-		    log(def->def.series.start) / log_base_array[axis] :
-		    step;
+		if (def->def.series.start <= 0)	/* includes case 'undefined, i.e. -VERYLARGE */
+		    start = step * floor(lmin / step);
+		else
+		    start = log(def->def.series.start) / log_base_array[axis];
+		if (def->def.series.end == VERYLARGE)
+		    end = step * ceil(lmax / step);
+		else
+		    end = log(def->def.series.end) / log_base_array[axis];
 	    } else {
 		start = def->def.series.start;
 		step = def->def.series.incr;
@@ -4587,13 +4532,13 @@ tic_callback callback;		/* fn to call to actually do the work */
 		/* they have said what they want */
 		if (minifreq <= 0)
 		    minitics = 0;	/* not much else we can do */
-		else if (log_array[axis]) {
-		    ministart = ministep = step / minifreq * base_array[axis];
-		    miniend = step * base_array[axis];
-		} else {
-		    ministart = ministep = step / minifreq;
-		    miniend = step;
-		}
+/* 		else if (log_array[axis]) { */
+/* 		    ministart = ministep = step / minifreq * base_array[axis]; */
+/* 		    miniend = step * base_array[axis]; */
+/* 		} else { */
+		ministart = ministep = step / minifreq;
+		miniend = step;
+/* 		} */
 	    } else if (log_array[axis]) {
 		if (step > 1.5) {	/* beware rounding errors */
 		    /*{{{  10,100,1000 case */
@@ -4712,10 +4657,8 @@ tic_callback callback;		/* fn to call to actually do the work */
 		    if (datatype[axis] == TIME)
 			mtic = time_tic_just(timelevel[axis] - 1, internal + mplace);
 		    else
-			mtic = internal + (log_array[axis] && step <= 1.5 ? log(mplace) /
-					   log_base_array[axis] : mplace);
-		    if (inrange(mtic, internal_min, internal_max) &&
-			inrange(mtic, start - step * SIGNIF, end + step * SIGNIF))
+			mtic = internal + (log_array[axis] && step <= 1.5 ? log(mplace) / log_base_array[axis] : mplace);
+		    if (inrange(mtic, internal_min, internal_max) && inrange(mtic, start - step * SIGNIF, end + step * SIGNIF))
 			(*callback) (axis, mtic, NULL, mgrd);
 		}
 		/*}}} */
@@ -4723,6 +4666,7 @@ tic_callback callback;		/* fn to call to actually do the work */
 	}
     }
 }
+
 /*}}} */
 
 /*{{{  map_position */
@@ -4787,4 +4731,5 @@ const char *what;
 	}
     }
 }
+
 /*}}} */
