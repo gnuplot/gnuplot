@@ -1,3 +1,8 @@
+2003-06-15  Ethan Merritt <merritt@u.washington.edu>
+
+	* src/graphics.c: Center key title over entire key box rather than
+	cramming it into the first column only.
+
 2003-06-14  Ethan Merritt <merritt@u.washington.edu>
 
 	* term/epslatex.trm: Clean up file name handling; now it is OK to give

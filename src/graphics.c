@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.90 2003/04/14 18:11:55 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.91 2003/05/17 05:59:00 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -254,7 +254,6 @@ boundary(plots, count)
     struct curve_points *plots;
     int count;
 {
-    int ytlen;
     int yticlin = 0, y2ticlin = 0, timelin = 0;
     legend_key *key = &keyT;
 
@@ -496,6 +495,7 @@ boundary(plots, count)
 
     if (lkey) {
 	/*{{{  essential key features */
+	int ytlen;
 	p_width = pointsize * t->h_tic;
 	p_height = pointsize * t->v_tic;
 
@@ -513,8 +513,11 @@ boundary(plots, count)
 
 	/* count max_len key and number keys with len > 0 */
 	max_ptitl_len = find_maxl_keys(plots, count, &ptitl_cnt);
-	if ((ytlen = label_width(key->title, &ktitl_lines)) > max_ptitl_len)
-	    max_ptitl_len = ytlen;
+	ytlen = label_width(key->title, &ktitl_lines);
+#if (0)
+	/* This is wrong, as the title may span multiple key columns */
+	if (ytlen > max_ptitl_len) max_ptitl_len = ytlen;
+#endif
 
 	if (key->reverse) {
 	    key_sample_left = -key_sample_width;
@@ -1317,19 +1320,15 @@ do_plot(plots, pcount)
 	    s = ss;
 	    yl -= t->v_char / 2;
 	    while ((e = (char *) strchr(s, '\n')) != NULL) {
+		/* EAM June 2003 - Always center the title */
+		int center = (keybox.xl + keybox.xr) / 2;
 		*e = '\0';
-		if (key->just == JLEFT) {
-		    (*t->justify_text) (LEFT);
-		    (*t->put_text) (xl + key_text_left, yl, s);
+		if ((*t->justify_text) (CENTRE)) {
+		    (*t->put_text) (center, yl, s);
 		} else {
-		    if ((*t->justify_text) (RIGHT)) {
-			(*t->put_text) (xl + key_text_right, yl, s);
-		    } else {
-			int x = xl + key_text_right - (t->h_char) * strlen(s);
-			if (key->hpos == TOUT || key->vpos == TUNDER ||	/* HBB 990327 */
-			    inrange(x, xleft, xright))
-			    (*t->put_text) (x, yl, s);
-		    }
+		    int x = center - (t->h_char) * strlen(s) / 2;
+		    if (key->hpos == TOUT || key->vpos == TUNDER || inrange(x, xleft, xright))
+			(*t->put_text) (x, yl, s);
 		}
 		s = ++e;
 		yl -= t->v_char;
