@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.98 2005/03/25 07:30:45 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.99 2005/03/25 14:03:32 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -871,7 +871,7 @@ histogram_range_fiddling(struct curve_points *plot)
      */
     switch (histogram_opts.type) {
 	case HT_STACKED_IN_LAYERS:
-	    if (axis_array[plot->y_axis].set_autoscale & AUTOSCALE_MAX) {
+	    if (axis_array[plot->y_axis].autoscale & AUTOSCALE_MAX) {
 		if (plot->histogram_sequence == 0) {
 		    if (stackheight)
 			free(stackheight);
@@ -894,15 +894,19 @@ histogram_range_fiddling(struct curve_points *plot)
 	    }
 		/* fall through to checks on x range */
 	case HT_CLUSTERED:	
-		if (!axis_array[plot->x_axis].set_autoscale)
+		if (!axis_array[plot->x_axis].autoscale)
 		    break;
-		xlow = -1.0;
-		xhigh = plot->points[plot->p_count-1].x;
-		xhigh += plot->histogram->start + 1.0;
-		if (axis_array[FIRST_X_AXIS].min > xlow)
-		    axis_array[FIRST_X_AXIS].min = xlow;
-		if (axis_array[FIRST_X_AXIS].max < xhigh)
-		    axis_array[FIRST_X_AXIS].max = xhigh;
+		if (axis_array[FIRST_X_AXIS].autoscale & AUTOSCALE_MIN) {
+		    xlow = plot->histogram->start - 1.0;
+		    if (axis_array[FIRST_X_AXIS].min > xlow)
+			axis_array[FIRST_X_AXIS].min = xlow;
+		}
+		if (axis_array[FIRST_X_AXIS].autoscale & AUTOSCALE_MAX) {
+		    xhigh = plot->points[plot->p_count-1].x;
+		    xhigh += plot->histogram->start + 1.0;
+		    if (axis_array[FIRST_X_AXIS].max < xhigh)
+			axis_array[FIRST_X_AXIS].max = xhigh;
+		}
 		break;
 	case HT_STACKED_IN_TOWERS:
 		if (!axis_array[plot->x_axis].set_autoscale)
