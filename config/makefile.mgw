@@ -1,90 +1,144 @@
 #
-# $Id: makefile.mgw,v 1.5 2000/11/09 16:14:00 broeker Exp $
+# $Id: makefile.mgw,v 1.6 2001/02/05 11:36:37 mikulik Exp $
 #
-# GNUPLOT Makefile for Cygwin/MinGW32 on WinNT and Win95/98
+# GNUPLOT Makefile for MinGW32 and Cygwin/MinGW32 on WinNT and Win95/98/..
 #
-# To compile gnuplot for WinNT and Win95
+# To compile gnuplot for WinXX:
 #
-# compile the package with 'make -C src -f ../config/makefile.mgw'
-# the make utility for MinGW32 can be obtained the MinGW sites
+# - compile the package: go to directory 'gnuplot' and therefrom run
+#	 make -C src -f ../config/makefile.mgw
+# - the make utility for MinGW32 can be obtained the MinGW sites;
+# - you need Cygwin's 'windres'.
 #
-# you need Cygwin's windres as of Mingw32-egcs-1.1b
-# this makefile was tested with Ming32egcs-1.1b and 
-# Microsoft Help Workshop 4.03
-#
+# This makefile was tested with GNU make, MingW32 and Microsoft Help
+# Workshop 4.03.
 #
 
-# where to place gnuplot.gih helpfile
+#
+# ************** Begin of Configuration section ************************
+#
+
+# Comment out the definition lines to disable the according features:
+
+# GD (GIF) device driver
+# requires GD library (not part of gnuplot)
+GD=1
+
+# PNG device driver
+# requires PNG and Z libraries (not part of gnuplot)
+PNG=1
+
+# DEBUGging support
+# creates binaries suitable for debugging. Some bugs may come and go
+# as opposed to a production build since we lower the optimization level
+DEBUG=1
+
+# MOUSE support for the windows terminal
+MOUSE=1
+
+# PM3D splot mode + colours and filled polygons
+PM3D=1
+
+
+# Below you can adapt paths according to your software setup:
+
+# Where to place gnuplot.gih helpfile:
 HELPFILE = wgnuplot.hlp
-TOP = ..
 
-DESTDIR=/Progra~1/Gnuplot3.7
+# Destination directory, used in 'make install':
+DESTDIR = c:/Progra~1/Gnuplot3.7
 
-# give here the path to your compiler (preferrably MinGW's one)
-#GCCPATH=g:/mingw32/bin/
+# give here the path to MinGW compiler unless it is already in PATH
+#GCCPATH = g:/mingw32/bin/
+#GCCPATH = c:/apps/mingw/bin/
 
-# -c  means don't link
-# -I  means extra include directory
-# -O2 means optimize for speed
-# -g  means prepare for debugging
+# Do you want some special optimization?
 # -mpentium means optimise for Pentium processor
 # -mpentiumpro means optimize for Pentium II and Pro procesors
+CFLAGS =
+
+
+# To compile the .hlp file you need hcw either out of Microsoft SDK or MS Help
+# Workshop. The latter can be obtained at www.helpmaster.com/help/devaids.htm.
+# Put the path to hcw here unless it is already in PATH:
+#HCWPATH = /Program\ Files/Help\ Workshop/
+#HCWPATH = h:/mssdk/bin/
+HCW = $(HCWPATH)hcw
+# Switches are for HCW 4.03:
+HCWFLAG =
+
+# Choose which windres/rc do you want to use (GNU windres or MS RC):
+GNU_RC = 1
+ifndef GNU_RC
+  # If uncommented GNU_RC above and rc.exe not in PATH, then set:
+  MSSDK = c:/mssdk
+endif
+
+#
+# *************** End of Configuration section *************************
+#
+#         There shouldn't be anything to be changed below this line
+# **********************************************************************
+#
+
 
 CC = $(GCCPATH)gcc
 LD = $(GCCPATH)gcc
-CFLAGS = -g -O2 -I$(TOP) -I. -D_Windows -DNO_GIH -DHAVE_STRNICMP \
-	-DREADLINE -DGP_INLINE=inline -D_NO_OLDNAMES -DANSI_C \
-	-DHAVE_GETCWD -DNEAR= -DPM3D=1 -DUSE_MOUSE=1 -DWIN_IPC=1 \
-	$(OPTS) -DHAVE_LIBGD # -DHAVE_LIBPNG
-LDFLAGS = -g 
 
 RM = rm -f
 CP = cp -p
 
-#
-# to compile the .hlp file you need hcw
-# either out of Microsoft SDK or
-# Microsoft Help Workshop
-# the latter can be obtained at www.helpmaster.com/help/devaids.htm
-# put the path to hcw here
-#
-# the followind switches are for HCW 4.03
-#
-#HCWPATH=/Program\ Files/Help\ Workshop/
-#HCWPATH=h:/mssdk/bin/
-HCW = $(HCWPATH)hcw
-HCWFLAG=
+ifdef DEBUG
+  CFLAGS += -g
+  LDFLAGS += -g
+else
+  CFLAGS += -O2
+  LDFLAGS += -s
+endif
 
-# 
-# it seems for the moment that we need cygwin's windres
-# as the one shipped with mingw32/egcs 1.1b is buggy
-# the one with cygwin b20.1 is ok, so give here the complete path
-#
-RCPATH = d:/cygnus/cygwin-b20/H-i586-cygwin32/bin
-RC  = windres
-RCFLAGS=--include-dir /mingw32/include \
+TOP = ..
+TERMFLAGS = -I$(TOP)/term
+TERMLIBS = 
+
+CFLAGS += -I$(TOP) -I. -D_Windows -DNO_GIH -DHAVE_STRNICMP \
+	-DREADLINE -DGP_INLINE=inline -D_NO_OLDNAMES -DANSI_C \
+	-DHAVE_GETCWD -DNEAR= \
+	$(OPTS)
+
+ifdef MOUSE
+  CFLAGS += -DUSE_MOUSE=1 -DWIN_IPC=1
+endif
+
+ifdef PM3D
+  CFLAGS += -DPM3D=1
+endif
+
+ifdef GD
+  CFLAGS += -DHAVE_LIBGD
+  TERMLIBS += -lgd
+endif
+
+ifdef PNG
+  CFLAGS += -DHAVE_LIBPNG
+  TERMLIBS += -lpng -lz
+endif
+
+ifdef GNU_RC
+  # RC = d:/cygnus/cygwin-b20/H-i586-cygwin32/bin/windres
+  RC  = $(GCCPATH)windres
+  RCFLAGS = --include-dir /mingw32/include \
+	--include-dir=win \
 	--define __WIN32__ --define __WIN95__ --define MSRC \
 	--define __GNUWIN32__
-RCOUT=wgplt_res.o
-RES2COFF=echo wgplt_res.o
-
-#
-# you can also use MS SDK's 
-#
-#MSSDK=f:/mssdk/
-#RC=$(MSSDK)/bin/rc
-#RCFLAGS=-v -i$(MSSDK)/include -iwin \
-#	-dWIN32 -dMSRC
-#RCOUT=-fowgnuplot.res
-#RES2COFF=res2coff -i wgnuplot.res -o wgplt_res.o
-
-
-# see other terminal defines in term.h
-TERMFLAGS = -I$(TOP)/term
-TERMLIBS = -lgd # -lpng -lz
-
-# There shouldn't be anything to be changed below this line
-#=======================================================================
+  RCOUT = wgplt_res.o
+  RES2COFF = echo wgplt_res.o
+else
+  RC = $(MSSDK)/bin/rc
+  RCFLAGS = -v -i$(MSSDK)/include -iwin \
+  	-dWIN32 -dMSRC
+  RCOUT = -fowgnuplot.res
+  RES2COFF = res2coff -i wgnuplot.res -o wgplt_res.o
+endif
 
 # macros for makefile.all
 O=o
@@ -124,7 +178,7 @@ wgnuplot.exe: $(OBJS) $(WINOBJS) win/wgnuplot.def wgplt_res.o texticon.ico grpic
 # rules
 
 wgplt_res.o :  win/wgnuplot.rc win/wgnuplib.rc win/wresourc.h texticon.ico grpicon.ico
-	$(RC) $(RCFLAGS) win/wgnuplot.rc $(RCOUT)
+	$(RC) $(RCFLAGS) --include-dir=win win/wgnuplot.rc $(RCOUT)
 	$(RES2COFF)
 
 show.o: show.c plot.h setshow.h
@@ -201,7 +255,7 @@ veryclean: clean
 
 # now move the whole stuff to its destination
 install: default
-	-mkdir -p $(DESTDIR)
+	mkdir -p $(DESTDIR)
 	cp wgnuplot.exe $(DESTDIR)/wgnuplot.exe
 	cp win/wgnuplot.mnu $(DESTDIR)/wgnuplot.mnu
 	cp wgnuplot.hlp $(DESTDIR)/wgnuplot.hlp
