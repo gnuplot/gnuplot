@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.100 2004/02/22 19:34:14 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.101 2004/04/13 17:23:55 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -813,6 +813,15 @@ boundary(plots, count)
 	xtic_textheight = (int) ((t->h_char) * widest_tic_strlen);
 	ybot += xtic_textheight;
     }
+
+    /* EAM - FIXME
+     * Notwithstanding all these fancy calculations, ytop must always be above ybot
+     */
+    if (ytop < ybot) {
+	int i = ytop; ytop = ybot; ybot = i;
+	FPRINTF((stderr,"boundary: Big problems! ybot > ytop\n"));
+    }
+    
     /*  compute coordinates for axis labels, title et al
      *     (some of these may not be used) */
 
