@@ -5125,8 +5125,8 @@ if test "$with_linux_vga" = yes; then
   echo "$ac_t""    gnuplot is installed suid root!" 1>&6
 fi
 
-if test "$enable_thin_splines" = yes && \
-  echo "$ac_t""  Enable thin plate splines (EXPERIMENTAL" 1>&6
+test "$enable_thin_splines" = yes && \
+  echo "$ac_t""  Enable thin plate splines (EXPERIMENTAL)" 1>&6
 
 test "$enable_iris" = yes && \
   echo "$ac_t""  Enable IRIS terminal" 1>&6
