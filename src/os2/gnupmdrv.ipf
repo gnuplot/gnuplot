@@ -161,7 +161,17 @@ obtained by pressing the ESC key when the Gnushell window is active.
 :i1 id=mmouse. Mouse menu
 :i2 refid=mmouse. The Mouse menu
 :p.The :hp2.Mouse:ehp2. menu gives you access to mouse (pointer)-related 
-functions.
+functions. Recently the mouse code has been rearranged so that many hotkeys 
+and other actions are configurable in gnuplot itself; see 'help mouse' and
+'help bind'. Help on current mouse configuration is available via hotkey 'h'.
+Consequently, the behaviour of the submenu items may be changed according 
+to gnuplot or user settings. Menu items showing two hotkeys: the first one 
+is user-configurable (so it may not corresponding to the actual settings), 
+the other is fixed (has precedence over user settings). 
+:p.Note that the new mouse style adds formats 'format', 'clipboardformat' and
+'mouseformat' which are not well cared about in the menu; I mean that menu 
+items 'Coordinates' and 'Coords. format' are out of date now (no more 
+pixels, for instance). You are welcome to update this if you have time.
 
 :h2 res=601. Use mouse
 :i2 refid=mmouse. Use mouse

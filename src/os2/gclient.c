@@ -1,5 +1,5 @@
-#ifdef INCRCSDATA
-static char RCSid[]="$Id: gclient.c,v 1.5 1999/06/22 11:55:53 lhecking Exp $" ;
+gplt_x11.c#ifdef INCRCSDATA
+static char RCSid[]="$Id: gclient.c,v 1.10 2000/01/25 16:58:47 mikulik Exp $" ;
 #endif
 
 /****************************************************************************
@@ -62,6 +62,8 @@ static char RCSid[]="$Id: gclient.c,v 1.5 1999/06/22 11:55:53 lhecking Exp $" ;
  *	      remap keys in 'case WM_CHAR';
  *	      Ctrl-C for breaking long drawings;
  *	      new menu items under 'Mouse' and 'Utilities' (August 1999)
+ *	- rewrite of mouse support for the new scheme common with X11
+ *	      (October 1999 - January 2000)
  *
  *   Franz Bakan  (see  //fraba  labels)
  *       - communication gnupmdrv -> gnuplot via shared memory (April 1999)
@@ -70,8 +72,8 @@ static char RCSid[]="$Id: gclient.c,v 1.5 1999/06/22 11:55:53 lhecking Exp $" ;
  *
  * Send your comments or suggestions to 
  *  info-gnuplot@dartmouth.edu.
- * This is a mailing list; to join it send a note to 
- *  majordomo@dartmouth.edu.  
+ * This is a mailing list; to join it send a note to
+ *  majordomo@dartmouth.edu.
  * Send bug reports to
  *  bug-gnuplot@dartmouth.edu.
 **/
@@ -103,7 +105,12 @@ static char RCSid[]="$Id: gclient.c,v 1.5 1999/06/22 11:55:53 lhecking Exp $" ;
 #include <process.h>
 #include <signal.h>
 #include <time.h>
+#include <os2.h>
 #include "gnupmdrv.h"
+
+#define GNUPMDRV
+#include "../mousecmn.h"
+
 
 /*==== g l o b a l    d a t a ================================================*/
 
@@ -139,7 +146,11 @@ static long lCols[16] =     { CLR_BLACK,
                               CLR_PALEGRAY,
                               CLR_WHITE } ;
 
-static LONG alColourTable[ 16 ] ;
+static long lCols_init = 0;
+static long lCols_num = 16;
+static long bkColor = -1;
+
+static LONG alColourTable[ 18 ] ;
 
 #define   GNUBUF    1024        /* buffer for gnuplot commands */
 #define   PIPEBUF   4096        /* size of pipe buffers */
@@ -150,16 +161,9 @@ static LONG alColourTable[ 16 ] ;
 #define   PAUSE_BTN 2           /* pause handled by menu item */
 #define   PAUSE_GNU 3           /* pause handled by Gnuplot */
 
-#define   MOUSE_COORDINATES_REAL     1 //PM which mouse coordinates
-#define   MOUSE_COORDINATES_PIXELS   2
-#define   MOUSE_COORDINATES_SCREEN   3
-#define   MOUSE_COORDINATES_XDATE	4
-#define   MOUSE_COORDINATES_XTIME	5
-#define   MOUSE_COORDINATES_XDATETIME	6
-
 #define   DEFLW     50
 
-static ULONG    ppidGnu=0L ;      /* gnuplot pid */
+       ULONG    ppidGnu = 0L ;  /* gnuplot pid */
 static HPS      hpsScreen ;     /* screen pres. space */
 static int      iSeg = 1 ;
 
@@ -176,40 +180,28 @@ static BOOL     bKeepRatio = TRUE ;	//PM
 static BOOL     bNewFont = FALSE ;
 static BOOL     bHorz = TRUE ;
 
-//PM:
-static BOOL	bUseMouse = FALSE;
 static int 	ulMouseSprintfFormatItem = IDM_MOUSE_FORMAT_XcY;
-static BOOL     bSend2gp = FALSE ;
 const  int	nMouseSprintfFormats = IDM_MOUSE_FORMAT_LABEL - IDM_MOUSE_FORMAT;
 const  char  *( MouseSprintfFormats[ /*nMouseSprintfFormats*/ ] ) = {
 		"%g %g","%g,%g","%g;%g",
 		"%g,%g,","%g,%g;",
 		"[%g:%g]","[%g,%g]","[%g;%g]",
-		"set label \"\" at %g,%g"
+		"set label  at %g,%g"
 		 };
+static BOOL     bSend2gp = FALSE ;
 const  char  *( SetDataStyles[] ) = {
 		"boxes", "dots", "fsteps", "histeps", "impulses",
 		"lines", "linespoints", "points", "steps"
 		 };
 
+struct {
+  int on;  // set to 1 during zooming
+  POINTL from, to; // corners
+} zoombox = { 0 };
 
-static BOOL	bMousePolarDistance = FALSE;
 
-#define NEW_TRACK_ZOOM
-  //PM 23. 8. 1999
-  // define the above for using new method for tracing the zooming rectangle,
-  // undefine for using previous WinTracRect API (zooming in 1 quadrant only)
-
-#ifdef NEW_TRACK_ZOOM
 int zooming = 0;  // set to 1 during zooming
 POINTL zoomrect_from, zoomrect_now;
-//#define ZOOM_SETUP GpiSetLineType(hps,LINETYPE_SHORTDASH); GpiSetMix(hps,FM_XOR); GpiSetColor(hps,CLR_WHITE);
-#define ZOOM_SETUP GpiSetLineType(hps,LINETYPE_SHORTDASH); GpiSetMix(hps,FM_INVERT);
-#endif // NEW_TRACK_ZOOM
-
-//fraba:
-static BOOL bhave_grid = FALSE ; // for toggling grid by mouse
-static BOOL bhave_log = FALSE ;  // for toggling lin/log by mouse
 
 static ULONG    ulPlotPos[4] ;
 static ULONG    ulShellPos[4] ;
@@ -226,7 +218,7 @@ static ULONG    ulPauseMode  = PAUSE_DLG ;
 
 static HWND     hSysMenu ;
             /* stuff for screen-draw thread control */
-            
+
 static BOOL     bExist ; 
 //static HEV      semDrawDone ;
 
@@ -234,9 +226,8 @@ static BOOL     bExist ;
 
 static TID     tidDraw, tidSpawn ;
 
-            /* //PM flag for stopping (long) drawings */
-
 static int breakDrawing = 0;
+            /* //PM flag for stopping (long) drawings */
 
             /* font data */
 
@@ -250,76 +241,47 @@ static int lCharHeight = 465 ;
 
 //PM: Now variables for mouse
 
-static ULONG mouse_mode = MOUSE_COORDINATES_REAL;
+/* useMouse is set to 1 when user switches mousing on, e.g. the mouse is
+   allowed
+*/
+static int useMouse = 0;
 
 /* gnuplot's PM terminal sends 'm' message from its init routine, which
    sets the variable below to 1. Then we are sure that we talk to the
-   mouseable terminal and can read the mouseable data from the pipe. 
-   Non-mouseable versions of PM terminal or non-new-gnuplot programs 
+   mouseable terminal and can read the mouseable data from the pipe.
+   Non-mouseable versions of PM terminal or non-new-gnuplot programs
    using gnupmdrv will let this variable set to 0, thus no mousing occurs.
 */
 static char mouseTerminal = 0;
 
+
 /* Lock (hide) mouse when building the plot (redrawing screen).
-Otherwise gnupmdrv would crash when trying to display mouse position
+   Otherwise gnupmdrv would crash when trying to display mouse position
    in a window not yet plotted.
 */
 static char lock_mouse = 1;
 
-/* Structure for mouse used for the recalculation of the mouse coordinates
-in pixels into the true coordinates of the plot.
-   Note: any change to this structure must be accompanied by the appropriate
-pushes into PM_pipe in file pm.trm, routine PM_graphics() !
-*/
-static struct {
-    int graph;
-      /*
-      What the mouse is moving over?
-	0 ... cannot use mouse with this graph---multiplot, for instance.
-	1 ... 2d polar graph
-	2 ... 2d graph
-	3 ... 3d graph (not implemented, thus pm.trm sends 0)
-	// note: 3d picture plotted as a 2d map is treated as 2d graph
-      */
-    double xmin, ymin, xmax, ymax; // range of x1 and y1 axes of 2d plot
-    int xleft, ybot, xright, ytop; // pixel positions of the above
-    int /*TBOOLEAN*/ is_log_x, is_log_y; // are x and y axes log?
-    double base_log_x, base_log_y; // bases of log
-    double log_base_log_x, log_base_log_y; // log of bases
-    } gp4mouse;
-
-/* Zoom queue
-*/
-
-struct t_zoom {
-  double xmin, ymin, xmax, ymax;
-  struct t_zoom *prev, *next;
-  };
-
-struct t_zoom *zoom_head = NULL,
-	      *zoom_now = NULL;
-
 /* Structure for the ruler: on/off, position,...
 */
 static struct {
-   char on;
-   double x, y;  // ruler position in real units of the graph
-   long px, py;  // ruler position in the viewport units
-   } ruler;
+   int on;
+   int x, y;  /* ruler position */
+} ruler = {0,0,0,};
 
-// pointer definition
-HWND hptrDefault, hptrCrossHair;
+// Pointer definition
+HWND hptrDefault, hptrCrossHair, hptrScaling, hptrRotating, hptrZooming, hptrCurrent;
+
+struct t_gpPMmenu gpPMmenu;
+int gpPMmenu_update_req = 0;
+  // After passing gpPMmenu in PM_pipe and 'G', it seems not to be possible
+  // to update the menu. Thus this flag is set on and menu is updated
+  // afterwards.
 
 // colours of mouse-relating drawings
 #define COLOR_MOUSE    CLR_DEFAULT  // mouse position
 #define COLOR_ANNOTATE CLR_DEFAULT  // annotating strings (MB3)
 #define COLOR_RULER    CLR_DARKPINK // colour of the ruler
-
-PVOID input_from_PM_Terminal; //fraba
-
-HEV semInputReady = 0; //PM
-
-int pausing = 0; // avoid passing data back to gnuplot in `pause' mode
+#define COLOR_ERROR    CLR_RED      // colour of error messages
 
 
 /*==== f u n c t i o n s =====================================================*/
@@ -355,19 +317,185 @@ static void      LType( int iType ) ;
 
 /* //PM: new functions related to the mouse processing */
 static void	TextToClipboard ( PCSZ );
-static void	draw_ruler ( void );
-static char*	xDateTimeFormat ( double x, char* b );
-       void     gp_execute ();
-static void     MousePosToGraphPos ( double *, double *,
-			HWND, SHORT, SHORT, ULONG );
-static void	apply_zoom ();
-static void	do_zoom ( double xmin, double ymin, double xmax, double ymax );
-static void	recalc_ruler_pos ();
-#define IGNORE_MOUSE (!mouseTerminal || bUseMouse==FALSE || lock_mouse || !gp4mouse.graph)
-  // don't react to mouse in the event handler
+static void     GetMousePosViewport ( HWND hWnd, int *mx, int *my );
+static void     MousePosToViewport ( int *x, int *y, SHORT mx, SHORT my );
+static void     DisplayStatusLine ( HPS hps );
+static void     UpdateStatusLine ( HPS hps, char *text );
+static void 	gpPMmenu_update ( void );
+static void     DrawZoomBox ( void );
+static void	DrawRuler ( );
+
+#define IGNORE_MOUSE (!mouseTerminal || useMouse==0 || lock_mouse)
+// || !gp4mouse.graph
+  // don't react to mouse in the event handler, and avoid some crashes
+
+// Drag'n'Drop support from PMEmacs
+struct drop
+{
+  unsigned long cookie;
+  unsigned len;
+  char str[CCHMAXPATH];
+};
+
+/* Circular buffer of objects recently dropped.  */
+
+#define DROP_MAX 8
+static int drop_in = 0;
+static int drop_out = 0;
+static int drop_count = 0;
+static HMTX drop_mutex;
+static struct drop drop_list[DROP_MAX];
+
+/* Each drop action is assigned a number, for relating drop events
+   with PMR_DROP requests. */
+
+static int drop_cookie = 0;
+
+// Finally, include the common mousing declarations and routines:
+#define GNUPMDRV
+  /* let mousing.c know whether called from gclient.c or gplt_x11.c */
+#include "../gpexecute.inc"
+
 /* //PM: end of new functions related to the mouse processing */
 
 /*==== c o d e ===============================================================*/
+
+/* An object is being dragged over the client window.  Check whether
+   it can be dropped or not. */
+
+void
+report_error(HWND hWnd, char* s)
+{
+      HPS hps;
+      POINTL pt;
+      RECTL rc;
+      double x,y;
+
+      hps = WinGetPS(hWnd);
+      GpiSetMix(hps, FM_OVERPAINT);
+      // clear the rectangle below the text
+      //  GpiSetColor( hps, CLR_CYAN );
+      GpiSetColor( hps, CLR_BACKGROUND );
+      pt.x = 0;
+      pt.y = 0;
+      GpiMove(hps,&pt);
+      // clear the whole line
+      GpiQueryPageViewport(hpsScreen,&rc);
+      pt.x = rc.xRight;
+      pt.y = 16;
+      GpiBox(hps, DRO_FILL, &pt, 0,0);
+      // now write the mouse position on the screen
+      GpiSetColor( hps, COLOR_ERROR ); // set text color
+      GpiSetCharMode(hps,CM_MODE1);
+
+      pt.x = 2;
+      pt.y = 2;
+      GpiCharStringAt(hps,&pt,(long)strlen(s),s);
+      WinReleasePS(hps);
+}
+
+MRESULT drag_over (HWND hWnd, PDRAGINFO pDraginfo)
+{
+  PDRAGITEM pditem;
+  USHORT indicator, operation;
+
+/* Redefine this macro for debugging. */
+#define DRAG_FAIL(x) report_error(hWnd,x)
+
+  indicator = DOR_NODROPOP; operation = DO_COPY;
+  if (!DrgAccessDraginfo (pDraginfo))
+    DRAG_FAIL ("DrgAccessDraginfo failed");
+  else if (!(pDraginfo->usOperation == DO_DEFAULT
+             || pDraginfo->usOperation == DO_COPY))
+    DRAG_FAIL ("Invalid operation");
+  else if (DrgQueryDragitemCount (pDraginfo) < 1)
+    DRAG_FAIL ("Invalid count");
+  else if (DrgQueryDragitemCount (pDraginfo) > DROP_MAX - drop_count)
+    DRAG_FAIL ("Circular buffer full");
+  else
+    {
+      pditem = DrgQueryDragitemPtr (pDraginfo, 0);
+      if (!(pditem->fsSupportedOps & DO_COPYABLE))
+        DRAG_FAIL ("Not copyable");
+      else if (!DrgVerifyRMF (pditem, "DRM_OS2FILE", NULL))
+        DRAG_FAIL ("DrgVerifyRMF failed");
+      else
+        {
+          /* The object can be dropped (copied). */
+          indicator = DOR_DROP; operation = DO_COPY;
+	}
+    }
+  DrgFreeDraginfo (pDraginfo);
+  return (MRFROM2SHORT (indicator, operation));
+}
+
+
+/* An object is dropped on the client window. */
+
+MRESULT drag_drop (HWND hwnd, PDRAGINFO pDraginfo)
+{
+  PDRAGITEM pditem;
+  POINTL ptl;
+  char name[CCHMAXPATH];
+  char path[CCHMAXPATH];
+  char *p;
+  int count, idx, len;
+
+  DrgAccessDraginfo (pDraginfo);
+  ptl.x = pDraginfo->xDrop; ptl.y = pDraginfo->yDrop;
+  WinMapWindowPoints (HWND_DESKTOP, hwnd, &ptl, 1);
+  count = DrgQueryDragitemCount (pDraginfo);
+  for (idx = 0; idx < count && drop_count < DROP_MAX; ++idx)
+    {
+      pditem = DrgQueryDragitemPtr (pDraginfo, idx);
+      DrgQueryStrName (pditem->hstrContainerName, sizeof (path), path);
+      DrgQueryStrName (pditem->hstrSourceName, sizeof (name), name);
+      DrgSendTransferMsg (pditem->hwndItem, DM_ENDCONVERSATION,
+                          MPFROMLONG (pditem->ulItemID),
+                          MPFROMSHORT (DMFL_TARGETSUCCESSFUL));
+      len = strlen (path);
+      if (len >= 1 && strchr ("\\/:", path[len-1]) == NULL)
+        path[len++] = '/';
+      if (len + strlen (name) + 1 <= sizeof (path))
+        {
+          strcpy (path + len, name);
+          for (p = path; *p != 0; ++p)
+	    if (*p == '\\')
+              *p = '/';
+	  if (input_from_PM_Terminal) {
+	    sprintf(input_from_PM_Terminal,"set loadpath \"%.*s\"; load \"%s\"", len, path, path);
+	    gp_execute(0);
+          }
+        }
+      else
+	report_error(hwnd, "Dropped path name too long");
+    }
+  DrgDeleteDraginfoStrHandles (pDraginfo);
+  DrgFreeDraginfo (pDraginfo);
+  return (0);
+}
+
+/* A color has been dropped on a frame (or the background color has
+   been changed with WinSetPresParam). */
+
+static void drop_color (HWND hwnd)
+{
+  RGB rgb;
+  char buf[3];
+
+  if (WinQueryPresParam (hwnd, PP_BACKGROUNDCOLOR, 0, NULL,
+			 sizeof (rgb), &rgb,
+			 QPF_NOINHERIT | QPF_PURERGBCOLOR) == sizeof (rgb))
+    {
+      buf[0] = rgb.bRed;
+      buf[1] = rgb.bGreen;
+      buf[2] = rgb.bBlue;
+#if CAN_DROP_COLOR
+      send_drop_color (buf, 3);
+#endif
+    }
+
+}
 
 MRESULT EXPENTRY DisplayClientWndProc(HWND hWnd, ULONG message, MPARAM mp1, MPARAM mp2)
 /*
@@ -377,198 +505,134 @@ MRESULT EXPENTRY DisplayClientWndProc(HWND hWnd, ULONG message, MPARAM mp1, MPAR
 */
 {
     static BOOL    bSw = FALSE ;
-    static BOOL    bFirst = TRUE ; 
+    static BOOL    bFirst = TRUE ;
     static RECTL   rectlPaint = { 0, 0, 0, 0 } ;
     static int     iPaintCount = 0 ;
     static int     firstcall = 1 ;
-    
 
-    if (message == WM_MOUSEMOVE && !IGNORE_MOUSE) {
-      // track (show) mouse position---code shared with zooming
-      SHORT mx = MOUSEMSG(&message)->x;  // macro which gets mouse coord.
-      SHORT my = MOUSEMSG(&message)->y;
+    char s[256];
+#if 1
+    int mx, my;
+    GetMousePosViewport(hWnd,&mx,&my);
+#else
+    // The following cannot be used because `message' is not OK for WM_CHAR
+    int mx = MOUSEMSG(&message)->x; // macro which gets mouse coords in pixels
+    int my = MOUSEMSG(&message)->y;
+    MousePosToViewport(&mx,&my,mx,my); // viewport units --- this trashes mx,my!
+#endif
 
-      HPS hps;
-      POINTL pt;
-      RECTL rc;
-      double x,y;
-      char s[256];
+    // Graphics part, 'G', required to update menu
+    if (gpPMmenu_update_req) gpPMmenu_update();
 
-      /* Position of the "table" of values resulting from mouse movement (and clicks).
-	 Negative y value would position it at the top of the window---not implemented.
-      */
-      static long xMouseTableOrig = 0, yMouseTableOrig = 0;
+    // mouse events first
+    switch (message) {
 
-      MousePosToGraphPos( &x, &y, hWnd, mx, my, mouse_mode ); // transform mouse->real graph coords
-
-      if (mouse_mode==MOUSE_COORDINATES_XDATE ||
-	  mouse_mode==MOUSE_COORDINATES_XTIME ||
-	  mouse_mode==MOUSE_COORDINATES_XDATETIME) { // time is on the x axis
-	    char buf[100];
-	    sprintf(s, "[%s, %g]", xDateTimeFormat(x,buf), y);
-	    }
-	else {
-	    sprintf(s,"[%g,%g]",x,y); // default presentation of x,y values
-	    }
-      /* For negative table position, shift it to the top of the window.
-      This could be done like that: */
-      if (yMouseTableOrig<0) {
-	WinQueryWindowRect(hWnd,&rc);
-	yMouseTableOrig = rc.yTop - 17;
+      case WM_MOUSEMOVE:
+	if (IGNORE_MOUSE) {
+	  WinSetPointer( HWND_DESKTOP, hptrDefault ); // set default pointer
+	  return 0L;
 	}
-      hps = WinGetPS(hWnd);
-      GpiSetMix(hps, FM_OVERPAINT);
-      // clear the rectangle below the text
-      //  GpiSetColor( hps, CLR_CYAN );
-      GpiSetColor( hps, CLR_BACKGROUND );
-      pt.x = xMouseTableOrig;
-      pt.y = yMouseTableOrig;
-      GpiMove(hps,&pt);
-      if (mouse_mode == MOUSE_COORDINATES_XDATETIME) pt.x += 30;
-      if (!ruler.on) pt.x += 220; // "ad-hoc" length for clearing the line
-	else { RECTL rc; // clear the whole line
-	       GpiQueryPageViewport(hpsScreen,&rc);
-	       pt.x = xMouseTableOrig + rc.xRight;
-	     }
-      pt.y = yMouseTableOrig + 16;
-      GpiBox(hps, DRO_FILL, &pt, 0,0);
-      // now write the mouse position on the screen
-      GpiSetColor( hps, COLOR_MOUSE ); // set text color
-      GpiSetCharMode(hps,CM_MODE1);
-
-      pt.x = xMouseTableOrig + 2;
-      pt.y = yMouseTableOrig + 2;
-
-      if (ruler.on) { // append this info coming from the ruler position
-	char p[255];
-	if (mouse_mode != MOUSE_COORDINATES_REAL)
-	    sprintf(p,"  ruler: [%g,%g]", ruler.x,ruler.y); // distance makes no sense
-	  else {
-	    double dx, dy;
-	    if (gp4mouse.is_log_x) // ratio for log, distance for linear
-		dx = (ruler.x==0) ? 99999 : x / ruler.x;
-	      else dx = x - ruler.x;
-	    if (gp4mouse.is_log_y) dy = (ruler.y==0) ? 99999 : y / ruler.y;
-	      else dy = y - ruler.y;
-	    if (mouse_mode==MOUSE_COORDINATES_REAL)
-	    sprintf(p,"  ruler: [%g,%g]  distance: %g;%g",ruler.x,ruler.y,dx,dy);
-	    // polar coords of distance (axes cannot be logarithmic)
-	    if (bMousePolarDistance && !gp4mouse.is_log_x && !gp4mouse.is_log_y) {
-	      double rho = sqrt( (x-ruler.x)*(x-ruler.x) + (y-ruler.y)*(y-ruler.y) );
-	      double phi = (180/M_PI) * atan2(y-ruler.y,x-ruler.x);
-	      strcat(s,p);
-	      sprintf(p," (%g;%.4gø)",rho,phi);
-	      }
-	    }
-	strcat(s,p);
+#if 1
+	WinSetPointer( HWND_DESKTOP, hptrCurrent );
+#else
+	WinSetPointer( HWND_DESKTOP, hptrCrossHair );
+#endif
+	if (zoombox.on) {
+	  DrawZoomBox(); // erase zoom box
+	  zoombox.to.x = mx; zoombox.to.y = my;
+	  DrawZoomBox(); // draw new zoom box
 	}
+	// track (show) mouse position -- send the event to gnuplot
+	gp_exec_event ( GE_motion, mx, my, 0, 0 );
+	return 0L; // end of WM_MOUSEMOVE
 
-      GpiCharStringAt(hps,&pt,(long)strlen(s),s);
-      WinReleasePS(hps);
-    } // end of WM_MOUSEMOVE
+      case WM_BUTTON1DOWN:
+	WinSetFocus( HWND_DESKTOP, hWnd ) ;
+	if (IGNORE_MOUSE) return 0L;
+	gp_exec_event ( GE_buttonpress, mx, my, 1, 0 );
+	return 0L;
 
+      case WM_BUTTON2DOWN:
+	WinSetFocus( HWND_DESKTOP, hWnd ) ;
+	if (IGNORE_MOUSE) return 0L;
+	gp_exec_event ( GE_buttonpress, mx, my, 3, 0 );
+	return 0L;
 
-#ifdef NEW_TRACK_ZOOM
-    if (zooming)
-    switch (message) { // messages accepted during zooming
+      case WM_BUTTON3DOWN:
+	WinSetFocus( HWND_DESKTOP, hWnd ) ;
+	if (IGNORE_MOUSE) return 0L;
+	gp_exec_event ( GE_buttonpress, mx, my, 2, 0 );
+	return 0L;
 
-	case WM_MOUSEMOVE: // track the zoom rectangle
-	    {
-	    HPS hps = WinGetPS(hWnd);
-	    ZOOM_SETUP
-	    GpiMove( hps, &zoomrect_from ) ;
-	    GpiBox( hps, DRO_OUTLINE, &zoomrect_now, 0,0 );
-	    zoomrect_now.x = MOUSEMSG(&message)->x;
-	    zoomrect_now.y = MOUSEMSG(&message)->y;
-	    GpiBox( hps, DRO_OUTLINE, &zoomrect_now, 0,0 );
-	    WinReleasePS(hps);
-	    }
-	    return 0;
+      case WM_BUTTON1DBLCLK:
+	if (IGNORE_MOUSE) return 0L;
+	gp_exec_event ( GE_buttonrelease, mx, my, 1, 0 ); // Note: 9999 should be replaced by time!
+	return 0L;
 
-	case WM_BUTTON1CLICK: // finish zooming
-	    {
-	    HPS hps = WinGetPS(hWnd);
-	    POINTL pt1, pt2;
-	    double x1,y1,x2,y2; // result---request this zooming
-	    zooming = 0;
-	    ZOOM_SETUP
-	    GpiMove( hps, &zoomrect_from ) ;
-	    GpiBox( hps, DRO_OUTLINE, &zoomrect_now, 0,0 );
-	    zoomrect_now.x = MOUSEMSG(&message)->x;
-	    zoomrect_now.y = MOUSEMSG(&message)->y;
-	    WinReleasePS(hps);
-	    // Return if the selected area is too small (8 pixels for canceling)
-	    if (abs(zoomrect_from.x - zoomrect_now.x) <= 8 ||
-		abs(zoomrect_from.y - zoomrect_now.y) <= 8)
-	      return 0L;
-	    // pt1 and pt2 are the left lower and right upper corner, respectively
-	    if (zoomrect_from.x < zoomrect_now.x) {
-		pt1.x = zoomrect_from.x; pt2.x = zoomrect_now.x; }
-	      else {
-		pt2.x = zoomrect_from.x; pt1.x = zoomrect_now.x; }
-	    if (zoomrect_from.y < zoomrect_now.y) {
-		pt1.y = zoomrect_from.y; pt2.y = zoomrect_now.y; }
-	      else {
-		pt2.y = zoomrect_from.y; pt1.y = zoomrect_now.y; }
-	    // Transform mouse->real graph coordinates
-	    MousePosToGraphPos( &x1, &y1, hWnd, pt1.x,pt1.y, MOUSE_COORDINATES_REAL );
-	    MousePosToGraphPos( &x2, &y2, hWnd, pt2.x,pt2.y, MOUSE_COORDINATES_REAL );
-	    #if 0 // Just for testing: write it to clipboard
-	    { char s[255];
-	    sprintf(s,"zoom from [%li,%li]..[%li,%li] => [%g,%g]..[%g,%g]", pt1.x,pt1.y,pt2.x,pt2.y, x1,y1,x2,y2);
-	    TextToClipboard ( s ); }
-	    #endif
-	    // This situation can be unzoomed
-	    WinEnableMenuItem(
-	      WinWindowFromID( WinQueryWindow( hApp, QW_PARENT ), FID_MENU ),
-	      IDM_MOUSE_UNZOOM, TRUE ) ;
-	    WinEnableMenuItem(
-	      WinWindowFromID( WinQueryWindow( hApp, QW_PARENT ), FID_MENU ),
-	      IDM_MOUSE_UNZOOMALL, TRUE ) ;
-	    // Make zoom of the box [x1,y1]..[x2,y1]
-	    do_zoom( x1, y1, x2, y2);
-	    }
-	    return 0;
+      case WM_BUTTON2DBLCLK:
+	if (IGNORE_MOUSE) return 0L;
+	gp_exec_event ( GE_buttonrelease, mx, my, 3, 9999 );
+	return 0L;
 
-	case WM_CHAR: // hitting ESC cancels zooming
-	    if ( CHAR1FROMMP(mp2) == 0x1B ) {
-		HPS hps = WinGetPS(hWnd);
-		ZOOM_SETUP
-		GpiMove( hps, &zoomrect_from ) ;
-		GpiBox( hps, DRO_OUTLINE, &zoomrect_now, 0,0 );
-		WinReleasePS(hps);
-		zooming = 0;
-	    }
-	    return 0;
+      case WM_BUTTON3DBLCLK:
+	if (IGNORE_MOUSE) return 0L;
+	gp_exec_event ( GE_buttonrelease, mx, my, 2, 9999 );
+	return 0L;
 
-	default:
-	    return (WinDefWindowProc(hWnd, message, mp1, mp2));
-    } // zooming messages
-#endif // NEW_TRACK_ZOOM
+#if 1
+      case WM_BUTTON1UP:
+#else
+      case WM_BUTTON1CLICK:
+#endif
+	if (IGNORE_MOUSE) return 0L;
+	gp_exec_event ( GE_buttonrelease, mx, my, 1, 9999 );
+	return 0L;
+
+#if 0
+      case WM_BUTTON2UP:
+#else
+      case WM_BUTTON2CLICK:
+#endif
+	if (IGNORE_MOUSE) return 0L;
+	gp_exec_event ( GE_buttonrelease, mx, my, 3, 9999 );
+	return 0L;
+
+#if 1
+      case WM_BUTTON3UP:
+#else
+      case WM_BUTTON3CLICK:
+#endif
+	if (IGNORE_MOUSE) return 0L;
+	gp_exec_event ( GE_buttonrelease, mx, my, 2, 9999 );
+	return 0L;
+
+    } // switch over mouse events
 
 
     switch (message) {
 
-        case WM_CREATE:
-            {
-            HDC     hdcScreen ;
-            SIZEL   sizlPage ;
-                // set initial values
-            ChangeCheck( hWnd, IDM_LINES_THICK, bWideLines?IDM_LINES_THICK:0 ) ;
-            ChangeCheck( hWnd, IDM_LINES_SOLID, bLineTypes?0:IDM_LINES_SOLID ) ;
-            ChangeCheck( hWnd, IDM_COLOURS, bColours?IDM_COLOURS:0 ) ;
-            ChangeCheck( hWnd, IDM_FRONT, bPopFront?IDM_FRONT:0 ) ;
+	case WM_CREATE:
+	    {
+	    HDC     hdcScreen ;
+	    SIZEL   sizlPage ;
+		// set initial values
+	    ChangeCheck( hWnd, IDM_LINES_THICK, bWideLines?IDM_LINES_THICK:0 ) ;
+	    ChangeCheck( hWnd, IDM_LINES_SOLID, bLineTypes?0:IDM_LINES_SOLID ) ;
+	    ChangeCheck( hWnd, IDM_COLOURS, bColours?IDM_COLOURS:0 ) ;
+	    ChangeCheck( hWnd, IDM_FRONT, bPopFront?IDM_FRONT:0 ) ;
 	    ChangeCheck( hWnd, IDM_KEEPRATIO, bKeepRatio?IDM_KEEPRATIO:0 ) ; //PM
-	    ChangeCheck( hWnd, IDM_USEMOUSE, bUseMouse?IDM_USEMOUSE:0 ) ;    //PM
-	    ChangeCheck( hWnd, IDM_MOUSE_POLAR_DISTANCE, bMousePolarDistance?IDM_MOUSE_POLAR_DISTANCE:0 ) ;    //PM
-                // disable close from system menu (close only from gnuplot)
+	    ChangeCheck( hWnd, IDM_USEMOUSE, useMouse?IDM_USEMOUSE:0 ) ;    //PM
+#if 0
+	    ChangeCheck( hWnd, IDM_MOUSE_POLAR_DISTANCE, mousePolarDistance?IDM_MOUSE_POLAR_DISTANCE:0 ) ;    //PM
+#endif
+		// disable close from system menu (close only from gnuplot)
             hApp = WinQueryWindow( hWnd, QW_PARENT ) ; /* temporary assignment.. */
             hSysMenu = WinWindowFromID( hApp, FID_SYSMENU ) ;
                 // setup semaphores
 //            DosCreateEventSem( NULL, &semDrawDone, 0L, 0L ) ;
 //            DosCreateEventSem( NULL, &semStartSeq, 0L, 0L ) ;
             DosCreateEventSem( NULL, &semPause, 0L, 0L ) ;
-            DosCreateMutexSem( NULL, &semHpsAccess, 0L, 1L ) ;
+	    DosCreateMutexSem( NULL, &semHpsAccess, 0L, 1L ) ;
 
             bExist = TRUE ;
                 // create a dc and hps to draw on the screen
@@ -578,13 +642,17 @@ MRESULT EXPENTRY DisplayClientWndProc(HWND hWnd, ULONG message, MPARAM mp1, MPAR
             hpsScreen = GpiCreatePS( hab, hdcScreen, &sizlPage,
                            PU_HIMETRIC|GPIT_NORMAL|GPIA_ASSOC) ;
                 // spawn server for GNUPLOT ...
-            tidSpawn = _beginthread( ReadGnu, NULL, 32768, NULL ) ;
+	    tidSpawn = _beginthread( ReadGnu, NULL, 32768, NULL ) ;
 		// initialize pointers
 	    hptrDefault = WinQuerySysPointer( HWND_DESKTOP, SPTR_ARROW, FALSE );
 	    hptrCrossHair = WinLoadPointer( HWND_DESKTOP, (ULONG)0, IDP_CROSSHAIR );
-            }
-            break ;
-            
+	    hptrScaling = WinLoadPointer( HWND_DESKTOP, (ULONG)0, IDP_SCALING );
+	    hptrRotating = WinLoadPointer( HWND_DESKTOP, (ULONG)0, IDP_ROTATING );
+	    hptrZooming = WinQuerySysPointer( HWND_DESKTOP, SPTR_MOVE, FALSE );
+	    hptrCurrent = hptrCrossHair;
+	    }
+	    break ;
+
         case WM_GPSTART:
 
 		//PM: show the Mouse menu if connected to mouseable PM terminal
@@ -593,6 +661,17 @@ MRESULT EXPENTRY DisplayClientWndProc(HWND hWnd, ULONG message, MPARAM mp1, MPAR
 	     WinEnableMenuItem(
 	       WinWindowFromID( WinQueryWindow( hApp, QW_PARENT ), FID_MENU ),
 	       IDM_MOUSE, TRUE ) ;
+	   if (!input_from_PM_Terminal) { // no feedback
+		#define NOFEEDBACK(X) WinEnableMenuItem( WinWindowFromID( WinQueryWindow( hApp, QW_PARENT ), FID_MENU ), X, FALSE ) ;
+		NOFEEDBACK(IDM_SET_GRID)
+		NOFEEDBACK(IDM_SET_LINLOGY)
+		NOFEEDBACK(IDM_SET_AUTOSCALE)
+		NOFEEDBACK(IDM_DO_REPLOT)
+		NOFEEDBACK(IDM_DO_RELOAD)
+		NOFEEDBACK(IDM_DO_SENDCOMMAND)
+		NOFEEDBACK(IDM_SET)
+		#undef NOFEEDBACK
+	    }
                 // get details of command-line window
             hSwitch = WinQuerySwitchHandle( 0, ppidGnu ) ;
             WinQuerySwitchEntry( hSwitch, &swGnu ) ;
@@ -602,108 +681,184 @@ MRESULT EXPENTRY DisplayClientWndProc(HWND hWnd, ULONG message, MPARAM mp1, MPAR
                              bPopFront?HWND_TOP:swGnu.hwnd,
                              ulShellPos[0],
                              ulShellPos[1],
-                             ulShellPos[2],
+			     ulShellPos[2],
                              ulShellPos[3], 
                              bShellPos?(bPopFront?SWP_SIZE|SWP_MOVE|SWP_SHOW|SWP_ACTIVATE
                                                  :SWP_SIZE|SWP_MOVE|SWP_SHOW|SWP_ZORDER)
-                                      :(bPopFront?SWP_SHOW|SWP_ACTIVATE:SWP_SHOW|SWP_ZORDER) ) ;
+				      :(bPopFront?SWP_SHOW|SWP_ACTIVATE:SWP_SHOW|SWP_ZORDER) ) ;
             signal( SIGTERM, SigHandler ) ;
                 firstcall = 0 ;
                 }
             if( !bPopFront ) WinSwitchToProgram( hSwitch ) ;
 //            DosPostEventSem( semDrawDone ) ;
-            DosReleaseMutexSem( semHpsAccess ) ;
-            return 0 ;
-            
-        case WM_COMMAND:
+	    DosReleaseMutexSem( semHpsAccess ) ;
+	    return 0 ;
 
-            return WmClientCmdProc( hWnd , message , mp1 , mp2 ) ;
+	case WM_COMMAND:
 
-        case WM_CHAR:    
-                    /* If the user types a command in the driver window,
-                       we route it to the gnuplot window and switch that
-                       to the front. Doesn't work for full-screen
-                       sessions, though (but does switch).  */
-            {
-            USHORT  usFlag = SHORT1FROMMP( mp1 ) ;
-            SHORT   key = SHORT1FROMMP( mp2 ) ;
-	    // { FILE *ff = fopen( "deb", "a" ); fprintf( ff, "key = %i\n", (int)key ); fclose(ff); }
-	    switch (key) { // remap keys (PM scancodes to getc(stdin) codes)
-		case 18656: case 18432: key = 72*256; break; // <Up Arrow> (the 2nd code comes from the key on the numerical keypad)
-		case 20704: case 20480: key = 80*256; break; // <Down Arrow>
-		case 19424: case 19200: key = 75*256; break; // <Left Arrow>
-		case 19936: case 19712: key = 77*256; break; // <Right Arrow>
-		case 18400: key = 71*256; break; // <Home>
-		case 20448: key = 79*256; break; // <End>
-		default: if (key >= 256) key = -1; // don't pass other special keys
-		}
-            if( !(usFlag & (KC_KEYUP|KC_ALT|KC_CTRL)) && key > 0 ) {
-                    HWND hw = WinQueryWindow( swGnu.hwnd, QW_BOTTOM ) ;
-                    WinSetFocus( HWND_DESKTOP, hw ) ; 
-                WinSendMsg( hw, message, 
-                            MPFROM2SHORT((USHORT)(KC_SCANCODE), 1), 
-			    MPFROMSHORT(key) ) ;
-                    WinSwitchToProgram( hSwitch ) ;
-                    }
-            }
-            break ;        
+	    return WmClientCmdProc( hWnd , message , mp1 , mp2 ) ;
 
-        case WM_DESTROY:
+	case WM_CHAR:
+	    {
+	    // Note: doc for WM_CHAR is available in PMMSG.INF
+	    USHORT usFlag = SHORT1FROMMP( mp1 ); // keyboard control codes
+	    SHORT  key = SHORT2FROMMP( mp2 );    // virtual key code
+	    static int last_modifier_mask = -99;
+	    int modifier_mask = 0;
+	    modifier_mask =   ( (usFlag & KC_SHIFT) ? Mod_Shift : 0 )
+			    | ( (usFlag & KC_CTRL) ? Mod_Ctrl : 0)
+			    | ( (usFlag & KC_ALT) ? Mod_Alt : 0);
+	    if (modifier_mask != last_modifier_mask) {
+	      gp_exec_event ( GE_modifier, mx, my, modifier_mask, 0 );
+	      last_modifier_mask = modifier_mask;
+	    }
+//	    if (!(usFlag & KC_SCANCODE)) return 0L; // only modifier mask has changed
+	    if (usFlag & KC_KEYUP) return 0L;   // ignore key release events
+#if 0
+{ FILE *ff = fopen( "deb", "a" ); fprintf( ff, "key = %i c=%c\n", (int)key, (char)key ); fclose(ff); }
+#endif
+	    switch (key) {
+	      case VK_SPACE: {
+			// raise gnuplot's window
+			HWND hw = WinQueryWindow( swGnu.hwnd, QW_BOTTOM ) ;
+			WinSetFocus( HWND_DESKTOP, hw ) ;
+			WinSendMsg( hw, message,
+			    MPFROM2SHORT((USHORT)(KC_SCANCODE), 1),
+			    0 /* MPFROMSHORT(key) */
+			    ) ;
+			WinSwitchToProgram( hSwitch ) ;
+			break;
+			}
+	      // remap virtual keys to gnuplot's codes:
+	      case VK_BACKSPACE:
+		  key = GP_BackSpace; break;
+	      case VK_TAB:
+		  key = GP_Tab; break;
+	      case VK_NEWLINE:
+		  key = GP_Return; break;
+	      case VK_PAUSE:
+		  key = GP_Pause; break;
+	      case VK_SCRLLOCK:
+		  key = GP_Scroll_Lock; break;
+	      case VK_SYSRQ:
+		  key = GP_Sys_Req; break;
+	      case VK_ESC:
+		  key = GP_Escape; break;
+	      case VK_DELETE:
+		  key = GP_Delete; break;
+	      case VK_INSERT:
+		  key = GP_KP_Insert; break;
+	      case VK_HOME:
+		  key = GP_Home; break;
+	      case VK_LEFT:
+		  key = GP_Left; break;
+	      case VK_UP:
+		  key = GP_Up; break;
+	      case VK_RIGHT:
+		  key = GP_Right; break;
+	      case VK_DOWN:
+		  key = GP_Down; break;
+	      case VK_END:
+		  key = GP_End; break;
 
-            if( WinSendMsg( hWnd, WM_USER_PRINT_QBUSY, 0L, 0L ) != 0L ) {
-                WinMessageBox( HWND_DESKTOP,
-                               hWnd, 
-                               "Still printing - not closed",
+	      case VK_PAGEUP:
+		  key = GP_PageUp; break;
+	      case VK_PAGEDOWN:
+		  key = GP_PageDown; break;
+	      case VK_F1:
+		  key = GP_F1; break;
+	      case VK_F2:
+		  key = GP_F2; break;
+	      case VK_F3:
+		  key = GP_F3; break;
+	      case VK_F4:
+		  key = GP_F4; break;
+	      case VK_F5:
+		  key = GP_F5; break;
+	      case VK_F6:
+		  key = GP_F6; break;
+	      case VK_F7:
+		  key = GP_F7; break;
+	      case VK_F8:
+		  key = GP_F8; break;
+	      case VK_F9:
+		  key = GP_F9; break;
+	      case VK_F10:
+		  key = GP_F10; break;
+	      case VK_F11:
+		  key = GP_F11; break;
+	      case VK_F12:
+		  key = GP_F12; break;
+	      case VK_SHIFT:
+	      case VK_CTRL:
+	      case VK_ALT:
+		   gp_exec_event ( GE_modifier, mx, my, modifier_mask, 0);
+		   return 0L;
+	      default:
+		  key = SHORT1FROMMP( mp2 ) ; // character key code
+	    }
+	    if (key) {
+	      gp_exec_event ( GE_keypress, mx, my, key, 0);
+	    }
+	    }
+	    return 0L;
+
+	case WM_DESTROY:
+
+	    if( WinSendMsg( hWnd, WM_USER_PRINT_QBUSY, 0L, 0L ) != 0L ) {
+		WinMessageBox( HWND_DESKTOP,
+			       hWnd,
+			       "Still printing - not closed",
                                APP_NAME,
                                0,
-                               MB_OK | MB_ICONEXCLAMATION ) ;
+			       MB_OK | MB_ICONEXCLAMATION ) ;
                 return 0L ;
                 }
       	    return (WinDefWindowProc(hWnd, message, mp1, mp2));
 
         case WM_PAINT:
-            {
-            ULONG ulCount ;
-            PID pid; TID tid;
-            HPS hps_tmp;
-            RECTL rectl_tmp;
-              DosQueryMutexSem( semHpsAccess, &pid, &tid, &ulCount ) ;
-            if (( ulCount > 0 ) && (tid != tidDraw)) {
-                /* simple repaint while building plot or metafile */
-                /* use temporary PS                   */
-              lock_mouse = 1; //PM (will this help against occassional gnupmdrv crashes?)
-              hps_tmp = WinBeginPaint(hWnd,0,&rectl_tmp );
-              WinFillRect(hps_tmp,&rectl_tmp,CLR_BACKGROUND);
-              WinEndPaint(hps_tmp);
-                /* add dirty rectangle to saved rectangle     */
-                /* to be repainted when PS is available again */
-              WinUnionRect(hab,&rectlPaint,&rectl_tmp,&rectlPaint);
-              lock_mouse = 0; //PM
-                iPaintCount ++ ;
-                break ;
-                } 
-            lock_mouse = 1; //PM
-            WinInvalidateRect( hWnd, &rectlPaint, TRUE ) ;
-            DoPaint( hWnd, hpsScreen ) ;
-            WinSetRectEmpty( hab, &rectlPaint ) ;
-            lock_mouse = 0; //PM
-            }
-            break ;     
+	    {
+	    ULONG ulCount ;
+	    PID pid; TID tid;
+	    HPS hps_tmp;
+	    RECTL rectl_tmp;
+	      DosQueryMutexSem( semHpsAccess, &pid, &tid, &ulCount ) ;
+	    if (( ulCount > 0 ) && (tid != tidDraw)) {
+		/* simple repaint while building plot or metafile */
+		/* use temporary PS                   */
+	      lock_mouse = 1; //PM (will this help against occassional gnupmdrv crashes?)
+	      hps_tmp = WinBeginPaint(hWnd,0,&rectl_tmp );
+	      WinFillRect(hps_tmp,&rectl_tmp,CLR_BACKGROUND);
+	      WinEndPaint(hps_tmp);
+		/* add dirty rectangle to saved rectangle     */
+		/* to be repainted when PS is available again */
+	      WinUnionRect(hab,&rectlPaint,&rectl_tmp,&rectlPaint);
+	      lock_mouse = 0; //PM
+		iPaintCount ++ ;
+		break ;
+		}
+	    lock_mouse = 1; //PM
+	    WinInvalidateRect( hWnd, &rectlPaint, TRUE ) ;
+	    DoPaint( hWnd, hpsScreen ) ;
+	    WinSetRectEmpty( hab, &rectlPaint ) ;
+	    lock_mouse = 0; //PM
+	    }
+	    break ;
 
-        case WM_SIZE :
-            
-            {
+	case WM_SIZE :
+
+	    {
             WinInvalidateRect( hWnd, NULL, TRUE ) ;
             }
             break ;
 
         case WM_PRESPARAMCHANGED:
             {        
-            char *pp ;
+	    char *pp ;
             ULONG ulID ;
             pp = malloc(FONTBUF) ;
             if( WinQueryPresParam( hWnd, 
-                                   PP_FONTNAMESIZE, 
+				   PP_FONTNAMESIZE,
                                    0, 
                                    &ulID, 
                                    FONTBUF, 
@@ -723,64 +878,61 @@ MRESULT EXPENTRY DisplayClientWndProc(HWND hWnd, ULONG message, MPARAM mp1, MPAR
         case WM_USER_PRINT_ERROR :
         case WM_USER_PRINT_QBUSY :
 
-            return( PrintCmdProc( hWnd, message, mp1, mp2 ) ) ;
+	    return( PrintCmdProc( hWnd, message, mp1, mp2 ) ) ;
 
-        case WM_GNUPLOT:
-                // display the plot         
+	case WM_GNUPLOT:
+		// display the plot
 	    lock_mouse = 1; //PM
 	    if( bPopFront ) {
 		SWP swp; // pop to front only if the window is not minimized
 		if (  (WinQueryWindowPos( hwndFrame, (PSWP)&swp) == TRUE)
 		   && ((swp.fl & SWP_MINIMIZE) == 0) )
-                WinSetWindowPos( hwndFrame, HWND_TOP, 0,0,0,0, SWP_ACTIVATE|SWP_ZORDER ) ;
+		WinSetWindowPos( hwndFrame, HWND_TOP, 0,0,0,0, SWP_ACTIVATE|SWP_ZORDER ) ;
 	    }
-            if( iPaintCount > 0 ) { /* if outstanding paint messages, repaint */
-                WinInvalidateRect( hWnd, &rectlPaint, TRUE ) ;
-                iPaintCount = 0 ;
-                }
+	    if( iPaintCount > 0 ) { /* if outstanding paint messages, repaint */
+		WinInvalidateRect( hWnd, &rectlPaint, TRUE ) ;
+		iPaintCount = 0 ;
+		}
 	    lock_mouse = 0; //PM
-            return 0L ;
+	    return 0L ;
 
-        case WM_PAUSEPLOT:
+	case WM_PAUSEPLOT:
 	    {
 	    SWP swp; // restore the window if it has been minimized
 	    if( (WinQueryWindowPos( hwndFrame, &swp) == TRUE)
 		&& ((swp.fl & SWP_MINIMIZE) != 0) )
 		WinSetWindowPos( hwndFrame, HWND_TOP, 0,0,0,0, SWP_RESTORE|SWP_SHOW|SWP_ACTIVATE ) ;
 	    }
-                /* put pause message on screen, or enable 'continue' button */
-            if( ulPauseMode == PAUSE_DLG ) {
-                pausedata.pszMessage = (char*)mp1 ;
-                WinLoadDlg( HWND_DESKTOP,
-                            hWnd,
-                            (PFNWP)PauseMsgDlgProc,
-                            0L,
-                            IDD_PAUSEBOX,
-                            &pausedata ) ; 
+		/* put pause message on screen, or enable 'continue' button */
+	    if( ulPauseMode == PAUSE_DLG ) {
+		pausedata.pszMessage = (char*)mp1 ;
+		WinLoadDlg( HWND_DESKTOP,
+			    hWnd,
+			    (PFNWP)PauseMsgDlgProc,
+			    0L,
+			    IDD_PAUSEBOX,
+			    &pausedata ) ;
                 }
             else { 
                 WinEnableMenuItem( WinWindowFromID( 
                                    WinQueryWindow( hWnd, QW_PARENT ), FID_MENU ),
                                    IDM_CONTINUE,
-                                   TRUE ) ;            
-                }
-            return 0L ;
+				   TRUE ) ;
+		}
+	    return 0L ;
 
-        case WM_PAUSEEND:
-            /* resume plotting */
-            ulPauseReply = (ULONG) mp1 ;
-            DosPostEventSem( semPause ) ;
-            return 0L ;
-    
+	case WM_PAUSEEND:
+	    /* resume plotting */
+	    ulPauseReply = (ULONG) mp1 ;
+	    DosPostEventSem( semPause ) ;
+	    return 0L ;
+
 /* //PM: new event handles for mouse processing */
 
+#if 0 // already defined
 case WM_MOUSEMOVE:
-  if (IGNORE_MOUSE) {
-    WinSetPointer( HWND_DESKTOP, hptrDefault ); // set default pointer
-    return 0L;
-    }
-  WinSetPointer( HWND_DESKTOP, hptrCrossHair );
   return  0L;
+#endif
 
 case WM_BUTTON1DBLCLK:
   if (IGNORE_MOUSE) return 0L;
@@ -791,10 +943,6 @@ case WM_BUTTON1DBLCLK:
   double x,y;
   char s[256];
   int frm = ulMouseSprintfFormatItem-IDM_MOUSE_FORMAT_X_Y;
-  if (frm<0 || frm>=nMouseSprintfFormats) frm=1;
-  MousePosToGraphPos( &x, &y, hWnd, mx, my, mouse_mode ); // transform mouse->real graph coords
-  sprintf( s, MouseSprintfFormats[frm], x,y );
-  TextToClipboard ( s );
   /*
   Note:
   Another solution of getting mouse position (available at any
@@ -807,90 +955,24 @@ case WM_BUTTON1DBLCLK:
   }
   return 0L; // end of case WM_BUTTON1DBLCLK
 
-
 case WM_BUTTON2CLICK: // WM_BUTTON2UP:
   if (IGNORE_MOUSE) return 0L;
   // make zoom
   {
-#ifdef NEW_TRACK_ZOOM
-
   POINTL tmp;
   HPS hps = WinGetPS(hWnd);
   if (pausing) { // zoom is not allowed during pause
       DosBeep(440,111); break;
   }
+DosBeep(555,155);
   zoomrect_from.x = MOUSEMSG(&message)->x;
   zoomrect_from.y = MOUSEMSG(&message)->y;
   tmp.x = zoomrect_now.x = zoomrect_from.x + 50; // set opposite corner
   tmp.y = zoomrect_now.y = zoomrect_from.y + 50;
-  ZOOM_SETUP
-  GpiMove( hps, &zoomrect_from ) ;
-  GpiBox(hps, DRO_OUTLINE, &zoomrect_now, 0,0 );
   WinMapWindowPoints( hWnd, HWND_DESKTOP, &tmp, 1); // move mouse to opposite corner
   WinSetPointerPos( HWND_DESKTOP, tmp.x, tmp.y);
   WinReleasePS(hps);
   zooming = 1;
-
-#else
-
-  TRACKINFO ti;
-  // char s[256];
-  double x1,y1,x2,y2; // result---request this zooming
-
-  if (pausing) { // zoom is not allowed during pause
-      DosBeep(440,111); break;
-  }
-
-  ti.cxBorder = 1;        // set border width
-  ti.cyBorder = 1;
-  ti.cxGrid = 0;          // set tracking grid
-  ti.cyGrid = 0;
-  ti.cxKeyboard = 4;      // set keyboard increment
-  ti.cyKeyboard = 4;
-
-  // set screen boundaries for tracking
-  WinQueryWindowRect(hWnd,&ti.rclBoundary);
-
-  // set minimum/maximum size for window = size of the present window
-  ti.ptlMinTrackSize.x = ti.rclBoundary.xLeft;
-  ti.ptlMinTrackSize.y = ti.rclBoundary.yBottom;
-  ti.ptlMaxTrackSize.x = ti.rclBoundary.xRight;
-  ti.ptlMaxTrackSize.y = ti.rclBoundary.yTop;
-
-  // set initial initial tracking (zoomed) window
-  ti.rclTrack.xRight = 50 + (ti.rclTrack.xLeft=MOUSEMSG(&message)->x);
-  ti.rclTrack.yTop = 50 + (ti.rclTrack.yBottom=MOUSEMSG(&message)->y);
-
-  // track the zooming rectangle, return when mouse is lifted
-  ti.fs = TF_TOP | TF_RIGHT | TF_SETPOINTERPOS;
-  if (!WinTrackRect(hWnd,NULLHANDLE,&ti)) break;
-
-  // return if the selected area is too small (8 pixels for canceling)
-  if (abs(ti.rclTrack.xRight-ti.rclTrack.xLeft)<=8 ||
-      abs(ti.rclTrack.yTop-ti.rclTrack.yBottom)<=8)
-      return 0L;
-
-  // transform mouse->real graph coordinates
-  MousePosToGraphPos( &x1, &y1, hWnd, ti.rclTrack.xLeft,ti.rclTrack.yBottom, MOUSE_COORDINATES_REAL );
-  MousePosToGraphPos( &x2, &y2, hWnd, ti.rclTrack.xRight,ti.rclTrack.yTop, MOUSE_COORDINATES_REAL );
-
-  // Just for testing: write it to clipboard
-  // sprintf(s,"zoom from [%li,%li]..[%li,%li] => [%g,%g]..[%g,%g]",ti.rclTrack.xLeft,ti.rclTrack.yBottom,ti.rclTrack.xRight,ti.rclTrack.yTop,x1,y1,x2,y2);
-  // TextToClipboard ( s );
-
-  // Make an action with the resulting [x1,y1]..[x2,y1] zoom box.
-
-  // this situation can be unzoomed
-  WinEnableMenuItem(
-    WinWindowFromID( WinQueryWindow( hApp, QW_PARENT ), FID_MENU ),
-    IDM_MOUSE_UNZOOM, TRUE ) ;
-  WinEnableMenuItem(
-    WinWindowFromID( WinQueryWindow( hApp, QW_PARENT ), FID_MENU ),
-    IDM_MOUSE_UNZOOMALL, TRUE ) ;
-
-  do_zoom( x1, y1, x2, y2);
-
-#endif // NEW_TRACK_ZOOM
   }
   return 0; // return from: case WM_BUTTON3DOWN (zoom)
 
@@ -906,34 +988,55 @@ case WM_BUTTON3UP: // WM_BUTTON3DBLCLK:
   double x,y;
   HPS hps = WinGetPS(hWnd);
 
-  MousePosToGraphPos( &x, &y, hWnd, mx, my, mouse_mode ); // transform mouse->real graph coords
-
-  if (mouse_mode==MOUSE_COORDINATES_XDATE ||
-      mouse_mode==MOUSE_COORDINATES_XTIME ||
-      mouse_mode==MOUSE_COORDINATES_XDATETIME) { // time is on the x axis
-	char buf[100];
-	sprintf(s, "[%s, %g]", xDateTimeFormat(x,buf), y);
-	}
-    else {
-        sprintf(s,"[%g,%g]",x,y); // usual x,y values
-	}
-
   GpiSetColor( hps, COLOR_ANNOTATE );    // set color of the text
   GpiSetCharMode(hps,CM_MODE1);
-  pt.x = mx; pt.y = my;
+  pt.x = mx; pt.y = my+4;
   GpiCharStringAt(hps,&pt,(long)strlen(s),s);
+  // draw a cross at the clicked position
+  pt.x = mx-3; pt.y = my; GpiMove(hps,&pt);
+  pt.x += 7; GpiLine(hps,&pt);
+  pt.x = mx; pt.y = my - 3; GpiMove(hps,&pt);
+  pt.y += 7; GpiLine(hps,&pt);
   WinReleasePS(hps);
   }
   return 0L; // end of case WM_BUTTON3...
 
-
   //PM: end of new event handles for mouse processing
+
+#if 0
+       case WM_PRESPARAMCHANGED:
+	 if (LONGFROMMP (mp1) == PP_BACKGROUNDCOLOR)
+           drop_color (hWnd);
+         return 0;
+#endif
+       case DM_DRAGOVER:
+         /* Determine whether the object can be dropped. */
+         return (drag_over (hWnd, (PDRAGINFO)mp1));
+
+       case DM_DROP:
+         /* Drop an object. */
+         return (drag_drop (hWnd, (PDRAGINFO)mp1));
 
 	default:         /* Passes it on if unproccessed    */
 	    return (WinDefWindowProc(hWnd, message, mp1, mp2));
     }
     return (NULL);
 }
+
+
+#if 0 // unused
+/*
+ * Gets the pointer position (in pixels) in the window hWnd
+ */
+void GetPointerPos ( HWND hWnd, PPOINTL p )
+{
+WinQueryPointerPos(HWND_DESKTOP, p);
+  // this is position wrt desktop
+WinMapWindowPoints(HWND_DESKTOP, hWnd, p, 1);
+  // pos. wrt our window in pixels
+}
+#endif
+
 
 MRESULT WmClientCmdProc(HWND hWnd, ULONG message, MPARAM mp1, MPARAM mp2)
 /*
@@ -944,39 +1047,42 @@ MRESULT WmClientCmdProc(HWND hWnd, ULONG message, MPARAM mp1, MPARAM mp2)
     static int ulPauseItem = IDM_PAUSEDLG ;
     static int ulMouseCoordItem = IDM_MOUSE_COORDINATES_REAL ;
 
+int mx, my;
+GetMousePosViewport(hWnd,&mx,&my);
+
     switch( (USHORT) SHORT1FROMMP( mp1 ) ) {
-                
-        case IDM_ABOUT :    /* show the 'About' box */
-             
-            WinDlgBox( HWND_DESKTOP,
-                       hWnd , 
-                       (PFNWP)About ,
-                       0L,
-                       ID_ABOUT, 
-                       NULL ) ;
-            break ;
+
+	case IDM_ABOUT :    /* show the 'About' box */
+
+	    WinDlgBox( HWND_DESKTOP,
+		       hWnd ,
+		       (PFNWP)About ,
+		       0L,
+		       ID_ABOUT,
+		       NULL ) ;
+	    break ;
 
 
-        case IDM_GPLOTINF:  /* view gnuplot.inf */
-            {
+	case IDM_GPLOTINF:  /* view gnuplot.inf */
+	    {
 	    /* should be bigger or dynamic */
-            char path[256] ;
+	    char path[256] ;
 	    char *p;
-            strcpy( path, "start view " ) ;
+	    strcpy( path, "start view " ) ;
 	    if( (p=getenv("GNUPLOT")) != NULL ) {
 		strcat( path, p ) ;
                 strcat( path, "/" ) ;
                 }    
-            strcat( path, "gnuplot" ) ;
+	    strcat( path, "gnuplot" ) ;
             system( path ) ;
             }
             break ;
             
         case IDM_PRINT :    /* print plot */
 
-            if( SetupPrinter( hWnd, &qPrintData ) ) {
+	    if( SetupPrinter( hWnd, &qPrintData ) ) {
                             WinPostMsg( hWnd, 
-                            WM_USER_PRINT_BEGIN, 
+			    WM_USER_PRINT_BEGIN,
                             (MPARAM) &qPrintData, 
                             (MPARAM) hpsScreen ) ; 
                             }
@@ -984,7 +1090,7 @@ MRESULT WmClientCmdProc(HWND hWnd, ULONG message, MPARAM mp1, MPARAM mp2)
 
         case IDM_PRINTSETUP :    /* select printer */
 
-            WinDlgBox( HWND_DESKTOP,
+	    WinDlgBox( HWND_DESKTOP,
                        hWnd ,
                        (PFNWP)QPrintersDlgProc,
                        0L,
@@ -995,12 +1101,12 @@ MRESULT WmClientCmdProc(HWND hWnd, ULONG message, MPARAM mp1, MPARAM mp2)
         case IDM_LINES_THICK:
                 // change line setting
             bWideLines = !bWideLines ;
-            ChangeCheck( hWnd, IDM_LINES_THICK, bWideLines?IDM_LINES_THICK:0 ) ;
+	    ChangeCheck( hWnd, IDM_LINES_THICK, bWideLines?IDM_LINES_THICK:0 ) ;
             WinInvalidateRect( hWnd, NULL, TRUE ) ;
             break ;
 
         case IDM_LINES_SOLID:
-                // change line setting
+		// change line setting
             bLineTypes = !bLineTypes ;
             ChangeCheck( hWnd, IDM_LINES_SOLID, bLineTypes?0:IDM_LINES_SOLID ) ;
             EditLineTypes( hWnd, hpsScreen, bLineTypes ) ;
@@ -1015,8 +1121,8 @@ MRESULT WmClientCmdProc(HWND hWnd, ULONG message, MPARAM mp1, MPARAM mp2)
             break ;
 
         case IDM_FRONT:
-                /* toggle z-order forcing */
-            bPopFront = !bPopFront ;        
+		/* toggle z-order forcing */
+	    bPopFront = !bPopFront ;
             ChangeCheck( hWnd, IDM_FRONT, bPopFront?IDM_FRONT:0 ) ;
             break ;
 
@@ -1028,12 +1134,12 @@ MRESULT WmClientCmdProc(HWND hWnd, ULONG message, MPARAM mp1, MPARAM mp2)
 	    break ;
 
         case IDM_FONTS:
-        
+
             if( GetNewFont( hWnd, hpsScreen ) ) {
                 bNewFont = TRUE ;
                 WinInvalidateRect( hWnd, NULL, TRUE ) ;
                 }
-            break ;
+	    break ;
             
         case IDM_SAVE :
             SaveIni( hWnd ) ;
@@ -1049,12 +1155,12 @@ MRESULT WmClientCmdProc(HWND hWnd, ULONG message, MPARAM mp1, MPARAM mp2)
                                "Can't open clipboard",
                                APP_NAME,
                                0,
-                               MB_OK | MB_ICONEXCLAMATION ) ;
+			       MB_OK | MB_ICONEXCLAMATION ) ;
                 }
             break ;
 
         case IDM_CLEARCLIP :         /* clear clipboard */
-            if( WinOpenClipbrd( hab ) ) {
+	    if( WinOpenClipbrd( hab ) ) {
                 WinEmptyClipbrd( hab ) ;
                 WinCloseClipbrd( hab ) ;
                 }
@@ -1066,7 +1172,7 @@ MRESULT WmClientCmdProc(HWND hWnd, ULONG message, MPARAM mp1, MPARAM mp2)
                                0,
                                MB_OK | MB_ICONEXCLAMATION ) ;
                 }
-            break ;
+	    break ;
 
         case IDM_COMMAND:       /* go back to GNUPLOT command window */
             WinSwitchToProgram( hSwitch ) ;
@@ -1082,7 +1188,7 @@ MRESULT WmClientCmdProc(HWND hWnd, ULONG message, MPARAM mp1, MPARAM mp2)
             
         case IDM_PAUSEGNU:  /* gnuplot handles pause */
             ChangeCheck( hWnd, ulPauseItem, IDM_PAUSEGNU ) ;
-            ulPauseItem = IDM_PAUSEGNU ;
+	    ulPauseItem = IDM_PAUSEGNU ;
             ulPauseMode = PAUSE_GNU ;
             break ;
             
@@ -1091,15 +1197,15 @@ MRESULT WmClientCmdProc(HWND hWnd, ULONG message, MPARAM mp1, MPARAM mp2)
             ulPauseItem = IDM_PAUSEDLG ;
             ulPauseMode = PAUSE_DLG ;
             break ;
-            
+
         case IDM_PAUSEBTN:  /* pause uses menu button, no message */
-            ChangeCheck( hWnd, ulPauseItem, IDM_PAUSEBTN ) ;
+	    ChangeCheck( hWnd, ulPauseItem, IDM_PAUSEBTN ) ;
             ulPauseItem = IDM_PAUSEBTN ;
             ulPauseMode = PAUSE_BTN ;
             break ;
           
         case IDM_HELPFORHELP:
-            WinSendMsg(WinQueryHelpInstance(hWnd),
+	    WinSendMsg(WinQueryHelpInstance(hWnd),
                        HM_DISPLAY_HELP, 0L, 0L ) ;
             return 0L ;
 
@@ -1115,56 +1221,53 @@ MRESULT WmClientCmdProc(HWND hWnd, ULONG message, MPARAM mp1, MPARAM mp2)
 
         case IDM_HELPINDEX:
             WinSendMsg(WinQueryHelpInstance(hWnd),
-                       HM_HELP_INDEX, 0L, 0L);
+		       HM_HELP_INDEX, 0L, 0L);
             return 0L ;
 
 
 	//PM Now new mousing stuff:
 
 	case IDM_USEMOUSE: // toggle using/not using mouse cursor tracking
-	    bUseMouse = !bUseMouse ;
-	    ChangeCheck( hWnd, IDM_USEMOUSE, bUseMouse?IDM_USEMOUSE:0 ) ;
-	    if(!bUseMouse) // redraw screen
+	    useMouse = !useMouse ;
+	    ChangeCheck( hWnd, IDM_USEMOUSE, useMouse?IDM_USEMOUSE:0 ) ;
+	    gp_execute( useMouse ? "set mouse" : "unset mouse");
+#if 0
+	    if(!useMouse) // redraw screen
 	      WinInvalidateRect( hWnd, NULL, TRUE ) ;
+#endif
 	    return 0L;
 
 	case IDM_MOUSE_COORDINATES_REAL:
 	    ChangeCheck( hWnd, ulMouseCoordItem, IDM_MOUSE_COORDINATES_REAL ) ;
 	    ulMouseCoordItem = IDM_MOUSE_COORDINATES_REAL;
-	    mouse_mode = MOUSE_COORDINATES_REAL;
 	    return 0L;
 
 	case IDM_MOUSE_COORDINATES_PIXELS:
 	    ChangeCheck( hWnd, ulMouseCoordItem, IDM_MOUSE_COORDINATES_PIXELS ) ;
 	    ulMouseCoordItem = IDM_MOUSE_COORDINATES_PIXELS;
-	    mouse_mode = MOUSE_COORDINATES_PIXELS;
 	    return 0L;
 
 	case IDM_MOUSE_COORDINATES_SCREEN:
 	    ChangeCheck( hWnd, ulMouseCoordItem, IDM_MOUSE_COORDINATES_SCREEN ) ;
 	    ulMouseCoordItem = IDM_MOUSE_COORDINATES_SCREEN;
-	    mouse_mode = MOUSE_COORDINATES_SCREEN;
 	    return 0L;
 
 	case IDM_MOUSE_COORDINATES_XDATE:
 	    ChangeCheck( hWnd, ulMouseCoordItem, IDM_MOUSE_COORDINATES_XDATE ) ;
 	    ulMouseCoordItem = IDM_MOUSE_COORDINATES_XDATE;
-	    mouse_mode = MOUSE_COORDINATES_XDATE;
 	    return 0L;
 
 	case IDM_MOUSE_COORDINATES_XTIME:
 	    ChangeCheck( hWnd, ulMouseCoordItem, IDM_MOUSE_COORDINATES_XTIME ) ;
 	    ulMouseCoordItem = IDM_MOUSE_COORDINATES_XTIME;
-	    mouse_mode = MOUSE_COORDINATES_XTIME;
 	    return 0L;
 
 	case IDM_MOUSE_COORDINATES_XDATETIME:
 	    ChangeCheck( hWnd, ulMouseCoordItem, IDM_MOUSE_COORDINATES_XDATETIME ) ;
 	    ulMouseCoordItem = IDM_MOUSE_COORDINATES_XDATETIME;
-	    mouse_mode = MOUSE_COORDINATES_XDATETIME;
 	    return 0L;
 
-        case IDM_MOUSE_CMDS2CLIP:
+	case IDM_MOUSE_CMDS2CLIP:
 		// toggle copying the command sent to gnuplot to clipboard
 	    bSend2gp = !bSend2gp ;
 	    ChangeCheck( hWnd, IDM_MOUSE_CMDS2CLIP, bSend2gp?IDM_MOUSE_CMDS2CLIP:0 ) ;
@@ -1179,130 +1282,75 @@ MRESULT WmClientCmdProc(HWND hWnd, ULONG message, MPARAM mp1, MPARAM mp2)
 	case IDM_MOUSE_FORMAT_pXcYp:
 	case IDM_MOUSE_FORMAT_pXsYp:
 	case IDM_MOUSE_FORMAT_LABEL:
+	    {
+	    char s[100];
 	    ChangeCheck( hWnd, ulMouseSprintfFormatItem, SHORT1FROMMP( mp1 ) ) ;
 	    ulMouseSprintfFormatItem = SHORT1FROMMP( mp1 );
+	    sprintf(s,"set mouse mouseformat \"%s\"",MouseSprintfFormats[ulMouseSprintfFormatItem-IDM_MOUSE_FORMAT_X_Y]);
+	    sprintf(s,"set mouse clipboardformat \"%s\"",MouseSprintfFormats[ulMouseSprintfFormatItem-IDM_MOUSE_FORMAT_X_Y]);
+	    gp_execute(s);
+	    }
 	    return 0L;
 
 	case IDM_MOUSE_POLAR_DISTANCE: // toggle using/not using polar coords of distance
-	    bMousePolarDistance = !bMousePolarDistance ;
-	    ChangeCheck( hWnd, IDM_MOUSE_POLAR_DISTANCE, bMousePolarDistance?IDM_MOUSE_POLAR_DISTANCE:0 ) ;
+	    gp_execute( gpPMmenu.polar_distance ? "set mouse nopolardistance" : "set mouse polardistance" );
 	    return 0L;
 
 	case IDM_MOUSE_ZOOMNEXT: // zoom to next level
 	    {
-	    char s[255];
-	    if (zoom_now == NULL || zoom_now->next == NULL)
-		DosBeep(440,111);
-	    else
-		apply_zoom( zoom_now->next );
+	    char s[80]; gp_exec_event ( GE_keypress, mx, my, 'n', 1);
 	    }
 	    return 0L;
 
 	case IDM_MOUSE_UNZOOM: // unzoom one level back
 	    {
-	    char s[255];
-	    if (zoom_now == NULL || zoom_now->prev == NULL)
-		DosBeep(440,111);
-	    else
-		apply_zoom( zoom_now->prev );
+	    char s[80]; gp_exec_event ( GE_keypress, mx, my, 'p', 1);
 	    }
 	    return 0L;
 
 	case IDM_MOUSE_UNZOOMALL: // unzoom to the first level
-	    {
-	    char s[255];
-	    WinEnableMenuItem( // this situation cannot be unzoomed
-	      WinWindowFromID( WinQueryWindow( hApp, QW_PARENT ), FID_MENU ),
-	      IDM_MOUSE_UNZOOM, FALSE ) ;
-	    if (zoom_head == NULL || zoom_now == zoom_head)
-		DosBeep(440,111);
-	    else
-		apply_zoom( zoom_head );
-	    }
+	    { char s[80]; gp_exec_event ( GE_keypress, mx, my, 'u', 1); }
 	    return 0L;
 
 	case IDM_MOUSE_RULER:
-	    ruler.on = ! ruler.on;
-	    ChangeCheck( hWnd, IDM_MOUSE_RULER, ruler.on?IDM_MOUSE_RULER:0 ) ;
-	    if (ruler.on) {
-		// remember the ruler position
-		POINTL p;
-		WinQueryPointerPos(HWND_DESKTOP, &p);
-		    // this is position wrt desktop
-		WinMapWindowPoints(HWND_DESKTOP, hWnd, &p, 1);
-		    // pos. wrt our window in pixels
-		MousePosToGraphPos( &ruler.x, &ruler.y, hWnd, // mouse -> screen relative
-		  p.x, p.y, MOUSE_COORDINATES_SCREEN );
-		ruler.px = ruler.x * 19500; // screen relative -> viewport coordinates
-		ruler.py = ruler.y * 12500;
-		MousePosToGraphPos( &ruler.x, &ruler.y, hWnd, // mouse->real graph coordinates
-		  p.x, p.y, MOUSE_COORDINATES_REAL );
-		// { char s[255];
-		// sprintf(s,"ruler at %i,%i",ruler.px,ruler.py);
-		// sprintf(s,"ruler at %g,%g",ruler.x,ruler.y);
-		// TextToClipboard(s); }
-		}
-	    WinInvalidateRect( hWnd, NULL, TRUE ) ; // redraw screen
+	    {
+	    int mx, my;
+	    char s[80];
+	    GetMousePosViewport(hWnd,&mx,&my);
+	    gp_exec_event ( GE_keypress, mx, my, 'r', 1);
+	    }
 	    return 0L;
 
-        case IDM_BREAK_DRAWING:
+	case IDM_BREAK_DRAWING:
 	    breakDrawing = 1;
-            return 0L;
+	    return 0L;
 
 	case IDM_SET_GRID:
-            if (bhave_grid) { //fraba
-		bhave_grid = FALSE;
-		strcpy(input_from_PM_Terminal,"set nogrid; replot");
-            } else {
-		bhave_grid = TRUE;
-		#if 0 /* 0 ... main grid, 1 ... fine grid */
-		strcpy(input_from_PM_Terminal,"set grid; replot");
-		#else
-		strcpy(input_from_PM_Terminal,"set mxtics 2; set mytics 2; set grid x y mx my; replot");
-		#endif
-            }
-	    gp_execute();
+	    { char s[80]; gp_exec_event ( GE_keypress, mx, my, 'g', 1); }
 	    return 0L;
 
 	case IDM_SET_LINLOGY:
-	    if (bhave_log) { //fraba
-	       bhave_log = FALSE;
-	       strcpy(input_from_PM_Terminal, "set nolog y; replot" );
-	       gp_execute();
-	    } else {
-	       #if 0 // take care of positive y min
-	       if (gp4mouse.ymin <= 0 || gp4mouse.ymax <= 0) {
-		 // strcpy(input_from_PM_Terminal, "# Hey! y range must be greater than 0 for log scale.");
-		 // gp_execute();
-		 DosBeep(300,10);
-		 return 0L;
-	       }
-	       #endif
-	       bhave_log = TRUE;
-	       strcpy(input_from_PM_Terminal, "set log y; replot" );
-	       gp_execute();
-            } /* endif */
+	    { char s[80]; gp_exec_event ( GE_keypress, mx, my, 'l', 1); }
 	    return 0L;
 
 	case IDM_SET_AUTOSCALE:
-            strcpy(input_from_PM_Terminal,"set autoscale; replot");
-	    gp_execute();
+	    gp_execute("set autoscale; replot");
 	    return 0L;
 
 	case IDM_DO_REPLOT:
-            strcpy(input_from_PM_Terminal,"replot");
-	    gp_execute();
+	    gp_execute("replot");
 	    return 0L;
 
 	case IDM_DO_RELOAD:
-            strcpy(input_from_PM_Terminal,"history !load");
-	    gp_execute();
+	    gp_execute("history !load");
 	    return 0L;
 
         case IDM_DO_SENDCOMMAND:
+	  if (input_from_PM_Terminal) {
 	  if (pausing) DosBeep(440,111);
 	    else WinDlgBox (HWND_DESKTOP, hWnd, SendCommandDlgProc,
 			    NULLHANDLE, IDM_DO_SENDCOMMAND, input_from_PM_Terminal);
+	       }
           return (MRESULT)0;
 
 	case IDM_SET_D_S_BOXES:
@@ -1314,9 +1362,10 @@ MRESULT WmClientCmdProc(HWND hWnd, ULONG message, MPARAM mp1, MPARAM mp2)
 	case IDM_SET_D_S_LINESPOINTS:
 	case IDM_SET_D_S_POINTS:
 	case IDM_SET_D_S_STEPS:
+	    if (input_from_PM_Terminal)
             sprintf(input_from_PM_Terminal, "set data style %s; replot",
 		SetDataStyles[ (USHORT) SHORT1FROMMP( mp1 ) - IDM_SET_D_S_BOXES ] );
-	    gp_execute();
+	    gp_execute(0);
 	    return 0L;
 
 	case IDM_SET_F_S_BOXES:
@@ -1328,9 +1377,10 @@ MRESULT WmClientCmdProc(HWND hWnd, ULONG message, MPARAM mp1, MPARAM mp2)
 	case IDM_SET_F_S_LINESPOINTS:
 	case IDM_SET_F_S_POINTS:
 	case IDM_SET_F_S_STEPS:
+	    if (input_from_PM_Terminal)
             sprintf(input_from_PM_Terminal, "set function style %s; replot",
 		SetDataStyles[ (USHORT) SHORT1FROMMP( mp1 ) - IDM_SET_F_S_BOXES ] );
-	    gp_execute();
+	    gp_execute(0);
 	    return 0L;
 
         default : 
@@ -1526,9 +1576,9 @@ BOOL QueryIni( HAB hab )
     //PM Mousing:
     /* ignore reading "Use mouse" --- no good idea to have mouse on by default.
        Maybe it was the reason of some crashes (mouse init before draw).
-    ulCB = sizeof( bUseMouse ) ;
+    ulCB = sizeof( useMouse ) ;
     bData = PrfQueryProfileData( hini, APP_NAME, INIUSEMOUSE, &ulOpts, &ulCB ) ;
-    if( bData ) bUseMouse = (BOOL)ulOpts[0] ;
+    if( bData ) useMouse = (int)ulOpts[0] ;
     */
     /* ignore reading mouse cursor (real, relative or pixels).
        Reason/bug: it does not switch the check mark in the menu, even
@@ -1601,7 +1651,7 @@ static void SaveIni( HWND hWnd )
 	//PM mouse stuff
 	/* ignore reading "Use mouse" --- no good idea to have mouse on by default.
 	   Maybe it was the reason of some crashes (mouse init before draw).
-	PrfWriteProfileData( hini, APP_NAME, INIUSEMOUSE, &bUseMouse, sizeof(bUseMouse) ) ;
+	PrfWriteProfileData( hini, APP_NAME, INIUSEMOUSE, &useMouse, sizeof(useMouse) ) ;
 	*/
 	/* Do not write the mouse coord. mode.
 	PrfWriteProfileData( hini, APP_NAME, INIMOUSECOORD, &mouse_mode, sizeof(mouse_mode) ) ;
@@ -1611,34 +1661,34 @@ static void SaveIni( HWND hWnd )
     else {
         WinMessageBox( HWND_DESKTOP,
                        HWND_DESKTOP,
-                       "Can't write ini file",
-                       APP_NAME,
-                       0,
-                       MB_OK | MB_ICONEXCLAMATION ) ;
-        }    
+		       "Can't write ini file",
+		       APP_NAME,
+		       0,
+		       MB_OK | MB_ICONEXCLAMATION ) ;
+	}
     }
 
-static void DoPaint( HWND hWnd, HPS hps  ) 
+static void DoPaint( HWND hWnd, HPS hps  )
 /*
-**  Paint the screen with current data 
+**  Paint the screen with current data
 */
     {
     ULONG ulCount ;
 
-    static RECTL rectl ;    
+    static RECTL rectl ;
     if( tidDraw != 0 ) {
-            /* already drawing - stop it; include the rectl now
-               being drawn in, in the update region; and return
-               without calling beginpaint so that the paint 
-               message is resent */
-        GpiSetStopDraw( hpsScreen, SDW_ON ) ;
-        DosSleep(1) ;
-        WinInvalidateRect( hWnd, &rectl, TRUE ) ;
-        return ;
-        }
-            /* winbeginpaint here, so paint message is
-               not resent when we return, then spawn a 
-               thread to do the drawing */
+	    /* already drawing - stop it; include the rectl now
+	       being drawn in, in the update region; and return
+	       without calling beginpaint so that the paint
+	       message is resent */
+	GpiSetStopDraw( hpsScreen, SDW_ON ) ;
+	DosSleep(1) ;
+	WinInvalidateRect( hWnd, &rectl, TRUE ) ;
+	return ;
+	}
+	    /* winbeginpaint here, so paint message is
+	       not resent when we return, then spawn a
+	       thread to do the drawing */
     WinBeginPaint( hWnd, hps, &rectl ) ;                 //rl
     tidDraw = _beginthread( ThreadDraw, NULL, 32768, NULL ) ;
     }
@@ -1652,18 +1702,27 @@ static void ThreadDraw( void* arg )
 
     hab = WinInitialize( 0 ) ;
 
-    InitScreenPS() ;        
+    /* Create a Mutex semaphore for protecting drop_list.  */
+
+    DosCreateMutexSem (NULL, &drop_mutex, 0, FALSE);
+
+    InitScreenPS() ;
 
     DosRequestMutexSem( semHpsAccess, (ULONG) SEM_INDEFINITE_WAIT ) ;
     ScalePS( hpsScreen ) ;
-    GpiSetStopDraw( hpsScreen, SDW_OFF ) ;  
+    GpiSetStopDraw( hpsScreen, SDW_OFF ) ;
     GpiSetDrawingMode( hpsScreen, DM_DRAW ) ;
     GpiDrawChain( hpsScreen ) ;
-    draw_ruler(); //PM
+    DrawRuler(); //PM
+    DisplayStatusLine(hpsScreen);
     WinEndPaint( hpsScreen ) ;
     DosReleaseMutexSem( semHpsAccess ) ;
     WinTerminate( hab ) ;
     tidDraw = 0 ;
+#if 0
+    // This does not work here (why?!), thus moved to pm.trm: PM_text();
+    gp_exec_event ( GE_plotdone, mx, my, 0, 0 ); // enable again zoom and scale by mouse motions
+#endif
     }
 
 HPS InitScreenPS()
@@ -1708,6 +1767,22 @@ HPS InitScreenPS()
                             LCOL_RESET,
                             LCOLF_CONSECRGB,
                             0, nColour, alColourTable ) ;
+    if (!lCols_init) { // Ilya: avoid white line on white background
+	int i = -1;
+	lCols_init = 1;
+	GpiQueryLogColorTable( hpsScreen, 0, 0, 16, alColourTable + 2 ) ;
+	alColourTable[2+CLR_WHITE] = 0xffffff;		// -2 
+	alColourTable[2+CLR_BLACK] = 0;			// -1
+	bkColor = alColourTable[2+CLR_BACKGROUND];
+	while (i++ < 16) {
+	    if (alColourTable[2+lCols[i]] == bkColor) {
+		while (i++ < 16)
+		    lCols[i - 1] = lCols[i];
+		lCols_num--;
+		break;
+	    }
+	}
+    }
     return hpsScreen ;
     }
 
@@ -1843,7 +1918,7 @@ void SwapFont( HPS hps, char *szFNS )
          GpiSetCharBox (hps, &sizBaseFont) ;
         }
      else {
-        sscanf( szFNS, "%hd", &shPointSize ) ;
+	sscanf( szFNS, "%hd", &shPointSize ) ;
         szFontName = strchr( szFNS, '.' ) + 1 ;
 
         {
@@ -1879,7 +1954,7 @@ void SwapFont( HPS hps, char *szFNS )
 
 //        lcid = 11L ;
         GpiSetCharSet( hps, 0L) ;
-        GpiDeleteSetId( hps, lcid ) ;
+	GpiDeleteSetId( hps, lcid ) ;
         GpiCreateLogFont (hps, NULL, lcid, &fat) ;
         }
         GpiSetCharSet( hps, lcid ) ;
@@ -1911,7 +1986,7 @@ void SwapFont( HPS hps, char *szFNS )
      lSupOffset = fm.lSuperscriptYOffset ;
      }
         }
-        
+
      }
 
 static void ReadGnu( void* arg )
@@ -1921,9 +1996,9 @@ static void ReadGnu( void* arg )
 ** Reads commands and builds a command list.
 */
     {
-    HPIPE    hRead = 0L ; 
+    HPIPE    hRead = 0L ;
     POINTL ptl ;
-    POINTL aptl[4] ;    
+    POINTL aptl[4] ;
     long lCurCol ;
     long lOldLine = 0 ;
     BOOL bBW = FALSE ; /* passed frpm print.c ?? */
@@ -1931,7 +2006,7 @@ static void ReadGnu( void* arg )
     BOOL bDots = FALSE ;
     char *szEnv ;
     char *szFileBuf ;
-    ULONG rc; 
+    ULONG rc;
     USHORT usErr ;
     ULONG cbR ;
     USHORT i ;
@@ -1941,9 +2016,8 @@ static void ReadGnu( void* arg )
     static char *szPauseText = NULL ;
     ULONG ulPause ;
     char *pszPipeName, *pszSemName ;
-    char  mouseShareMemName[40]; //PM
     LONG  commands[4] ;
-    HPS hps ;    
+    HPS hps ;
     HAB hab ;
     int linewidth = DEFLW ;
 
@@ -1957,55 +2031,55 @@ static void ReadGnu( void* arg )
     strcat( pszPipeName, szIPCName ) ;
     strcat( pszSemName, szIPCName ) ;
 
-            /* open a named pipe for communication with gnuplot */
- 
+	    /* open a named pipe for communication with gnuplot */
+
     rc = DosCreateNPipe( pszPipeName,
-                         &hRead, 
-                         NP_ACCESS_DUPLEX|NP_NOINHERIT|NP_NOWRITEBEHIND ,
-                         1|NP_WAIT|NP_READMODE_MESSAGE|NP_TYPE_MESSAGE,
-                         PIPEBUF,
-                         PIPEBUF,
-                         0xFFFFFFFF) ;
+			 &hRead,
+			 NP_ACCESS_DUPLEX|NP_NOINHERIT|NP_NOWRITEBEHIND ,
+			 1|NP_WAIT|NP_READMODE_MESSAGE|NP_TYPE_MESSAGE,
+			 PIPEBUF,
+			 PIPEBUF,
+			 0xFFFFFFFF) ;
     hev = 0 ;       /* OK, gnuplot can try to open npipe ... */
     DosOpenEventSem( pszSemName, &hev ) ;
     DosPostEventSem( hev ) ;
-    
 
-    
-        /* attach to gnuplot */
+
+
+	/* attach to gnuplot */
 
 server:
 
     if( DosConnectNPipe( hRead ) == 0L ) {
 
-        WinPostMsg( hSysMenu,
-                    MM_SETITEMATTR,
-                    MPFROM2SHORT(SC_CLOSE, TRUE ),
-                    MPFROM2SHORT(MIA_DISABLED, MIA_DISABLED) ) ;
+	WinPostMsg( hSysMenu,
+		    MM_SETITEMATTR,
+		    MPFROM2SHORT(SC_CLOSE, TRUE ),
+		    MPFROM2SHORT(MIA_DISABLED, MIA_DISABLED) ) ;
 
-        /* store graphics commands */
-        /* use semaphore to prevent problems with drawing while reallocating
-           the command buffers */
+	/* store graphics commands */
+	/* use semaphore to prevent problems with drawing while reallocating
+	   the command buffers */
 
         DosRead( hRead, &ppidGnu, 4, &cbR ) ;
 
-	sprintf( mouseShareMemName, "\\SHAREMEM\\GP%i_Mouse_Input", (int)ppidGnu ); //PM 11.5.1999
-	if (DosGetNamedSharedMem(&input_from_PM_Terminal, //fraba
+	sprintf( mouseShareMemName, "\\SHAREMEM\\GP%i_Mouse_Input", (int)ppidGnu );
+	if (DosGetNamedSharedMem(&input_from_PM_Terminal,
 		mouseShareMemName,
-		PAG_WRITE))
-	   DosBeep(1440L,1000L); /* indicates error */
+		PAG_WRITE)) {
+	   //now: gray menu items; old code: DosBeep(1440L,1000L); /* indicates error */
+	   input_from_PM_Terminal = 0;
+	   }
 
-	semInputReady = 0; //PM
-	bhave_grid = FALSE ;
-	bhave_log = FALSE ;
+	semInputReady = 0;
 	  // semaphore 'semInputReady' must be open later in order to avoid problems
 	  // with the server mode; also 'bhave_*' init here because of server
 
 //        DosPostEventSem( semStartSeq ) ;         /* once we've got pidGnu */
-        WinPostMsg( hApp, WM_GPSTART, 0, 0 ) ;
+	WinPostMsg( hApp, WM_GPSTART, 0, 0 ) ;
 
 
-        hps = hpsScreen ;
+	hps = hpsScreen ;
    InitScreenPS() ;
         while (1) {
         
@@ -2031,44 +2105,34 @@ server:
 
             switch( *buff ) {
                 case 'G' :    /* enter graphics mode */
-                    {
+		    {
                     ULONG ulCount ;    
                     
                     if( tidDraw != 0 ) {
                       /* already drawing - stop it */
-                        GpiSetStopDraw( hpsScreen, SDW_ON ) ;
+			GpiSetStopDraw( hpsScreen, SDW_ON ) ;
                         while(tidDraw != 0) DosSleep(1) ;
                         }
-    	            /* wait for access to command list and lock it */
+		    /* wait for access to command list and lock it */
 //                    DosWaitEventSem( semDrawDone, SEM_INDEFINITE_WAIT ) ;                    
 //                    DosEnterCritSec() ;
                     DosRequestMutexSem( semHpsAccess, (ULONG) SEM_INDEFINITE_WAIT ) ;
                     InitScreenPS() ;
                     ScalePS( hps ) ;
 //                    DosResetEventSem( semDrawDone, &ulCount ) ;
-                    GpiSetDrawingMode( hps, DM_DRAWANDRETAIN ) ;
-                    for(i=1;i<=iSeg;i++)
-                        GpiDeleteSegment( hps, i ) ;
-                    iSeg = 1 ;
-                    GpiOpenSegment( hps, iSeg ) ;
+		    GpiSetDrawingMode( hps, DM_DRAWANDRETAIN ) ;
+		    for(i=1;i<=iSeg;i++)
+			GpiDeleteSegment( hps, i ) ;
+		    iSeg = 1 ;
+		    GpiOpenSegment( hps, iSeg ) ;
 //                    DosExitCritSec() ;
-                    GpiSetLineEnd( hps, LINEEND_ROUND ) ;
-                    GpiSetLineWidthGeom( hps, linewidth ) ;
-                    GpiSetCharBox (hps, &sizBaseFont) ;
-		    //PM get some other information about real plot coord.:
-		    if (mouseTerminal) { // we are connected to mouseable terminal
-		      BufRead(hRead,&gp4mouse, sizeof(gp4mouse), &cbR);
-		      if (ruler.on) recalc_ruler_pos();
-		      }
-                    }
-                    break ;
-                    
-                case '#' :    /* do_3dplot() and boundary3d() changed [xleft..ytop] */
-		    BufRead(hRead,&gp4mouse.xleft, 4*sizeof(gp4mouse.xleft), &cbR);
-		    if (ruler.on) recalc_ruler_pos();
-                    break ;
+		    GpiSetLineEnd( hps, LINEEND_ROUND ) ;
+		    GpiSetLineWidthGeom( hps, linewidth ) ;
+		    GpiSetCharBox (hps, &sizBaseFont) ;
+		    }
+		    break ;
 
-                case 'Q' :     /* query terminal info */
+		case 'Q' :     /* query terminal info */
 		    //PM mouseable gnupmdrv sends greetings to mouseable PM terminal
 		    if (mouseTerminal) {
 		      int i=0xABCD;
@@ -2076,7 +2140,7 @@ server:
 		      }
                     DosWrite( hRead, &lCharWidth, sizeof(int), &cbR ) ;
                     DosWrite( hRead, &lCharHeight, sizeof(int), &cbR ) ;
-                    break ;
+		    break ;
 
                 case 'E' :     /* leave graphics mode (graph completed) */
                     if( bPath ) {
@@ -2085,36 +2149,37 @@ server:
                         bPath = FALSE ;
                         }
                     GpiCloseSegment( hps ) ;
-		    draw_ruler(); //PM
+		    DrawRuler(); //PM
+		    DisplayStatusLine(hps);
 //                    DosPostEventSem( semDrawDone ) ;
                     DosReleaseMutexSem( semHpsAccess ) ;
-                    WinPostMsg( hApp, WM_GNUPLOT, 0L, 0L ) ;
-                    break ;
+		    WinPostMsg( hApp, WM_GNUPLOT, 0L, 0L ) ;
+		    break ;
                     
-                case 'R' :
+		case 'R' :
                     /* gnuplot has reset drivers, allow user to kill this */
                     WinPostMsg( hSysMenu,
                                 MM_SETITEMATTR,
-                                MPFROM2SHORT(SC_CLOSE, TRUE ),
+				MPFROM2SHORT(SC_CLOSE, TRUE ),
                                 MPFROM2SHORT(MIA_DISABLED, (USHORT)0 ) ) ;
                     /* if we are keeping us on the screen, wait for new connection */
-                    if( bServer||bPersist ) {
-                        DosDisConnectNPipe( hRead ) ;
+		    if( bServer||bPersist ) {
+			DosDisConnectNPipe( hRead ) ;
                         goto server ;
                         }    
-                    break ;
+		    break ;
                 
                 case 'r' :
                     /* resume after multiplot */
                     {
                     ULONG ulCount ;    
-                    DosRequestMutexSem( semHpsAccess, (ULONG) SEM_INDEFINITE_WAIT ) ;
+		    DosRequestMutexSem( semHpsAccess, (ULONG) SEM_INDEFINITE_WAIT ) ;
 //                    DosWaitEventSem( semDrawDone, SEM_INDEFINITE_WAIT ) ;
                     iSeg++ ;
 //                    DosResetEventSem( semDrawDone, &ulCount ) ;
                     GpiSetDrawingMode( hps, DM_DRAWANDRETAIN ) ;
                     GpiOpenSegment( hps, iSeg ) ;
-                    }
+		    }
                     break ;
                     
                 case 's' :
@@ -2134,11 +2199,11 @@ server:
                         if( bWideLines/*bWideLines*/ && !bPath ) {
                             GpiBeginPath( hps, 1 ) ;
                             bPath = TRUE ;
-                            }
+			    }
                         }
-                    BufRead(hRead,&ptl.x, 2*sizeof(int), &cbR) ;
+		    BufRead(hRead,&ptl.x, 2*sizeof(int), &cbR) ;
                     if( (*buff=='V') && bDots ) ptl.x += 5 ;
-                    else if( (*buff=='M') && bDots ) ptl.x -= 5 ;
+		    else if( (*buff=='M') && bDots ) ptl.x -= 5 ;
                     if( *buff == 'M' ) LMove( hps, &ptl ) ;
                     else LLine( hps, &ptl ) ;
                     break ;
@@ -2153,7 +2218,7 @@ server:
                         DosEnterCritSec() ;
                         szPauseText = malloc( len*sizeof(int) ) ;
                         DosExitCritSec() ;
-                        BufRead(hRead,szPauseText, len*sizeof(int), &cbR) ;
+			BufRead(hRead,szPauseText, len*sizeof(int), &cbR) ;
                         }
                     if( ulPauseMode != PAUSE_GNU ) {
                              /* pause and wait for semaphore to be cleared */
@@ -2173,18 +2238,18 @@ server:
 		    pausing = 0;
                     }
                     break ; 
-                       
-                case 'T' :   /* write text */
+
+		case 'T' :   /* write text */
                         /* read x, y, len */
                     if( bPath ) {
-                        GpiEndPath( hps ) ;
+			GpiEndPath( hps ) ;
                         GpiStrokePath( hps, 1, 0 ) ;
                         bPath = FALSE ;
                         }
                     {
                     int x, y, len, sw ;
                     char *str ;
-                    BufRead(hRead,&x, sizeof(int), &cbR) ;
+		    BufRead(hRead,&x, sizeof(int), &cbR) ;
                     BufRead(hRead,&y, sizeof(int), &cbR) ;
                     BufRead(hRead,&len, sizeof(int), &cbR) ;
 
@@ -2192,7 +2257,7 @@ server:
                     len = (len+sizeof(int)-1)/sizeof(int) ;
                     if( len == 0 ) len = 1 ; //?? how about read
                     str = malloc( len*sizeof(int) ) ;
-                    *str = '\0' ;
+		    *str = '\0' ;
                     DosExitCritSec() ;
                     BufRead(hRead, str, len*sizeof(int), &cbR) ;
                     lCurCol = GpiQueryColor( hps ) ;
@@ -2204,7 +2269,7 @@ server:
 	                case RIGHT:  sw = -sw;   break;
                         }
                     if( bHorz ) {
-                        ptl.x = (LONG)(x+sw) ; ptl.y = (LONG)(y-lVOffset/4) ;
+			ptl.x = (LONG)(x+sw) ; ptl.y = (LONG)(y-lVOffset/4) ;
                         }
                     else {
                         ptl.x = (LONG)x ; ptl.y = (LONG)(y+sw) ;
@@ -2212,17 +2277,17 @@ server:
                     if(bEnhanced)
                         CharStringAt( hps, ptl.x, ptl.y, strlen( str ) , str ) ;
                     else
-                        GpiCharStringAt( hps, &ptl, strlen( str ), str ) ;
+			GpiCharStringAt( hps, &ptl, strlen( str ), str ) ;
                     GpiSetColor( hps, lCurCol ) ;
                     DosEnterCritSec() ;
                     free(str) ;
-                    DosExitCritSec() ;
+		    DosExitCritSec() ;
                     }
                     break ;
                     
                 case 'J' :   /* justify */
                     BufRead(hRead,&jmode, sizeof(int), &cbR) ;
-                    break ;
+		    break ;
 
                 case 'A' :   /* text angle */
                     {
@@ -2231,36 +2296,36 @@ server:
                     SIZEF sizHor, sizVer ;
                     if( bPath ) {
                         GpiEndPath( hps ) ;
-                        GpiStrokePath( hps, 1, 0 ) ;
+			GpiStrokePath( hps, 1, 0 ) ;
                         bPath = FALSE ;
                         }
                     BufRead(hRead,&ta, sizeof(int), &cbR) ;
                     if( ta == 0 ) {
                         grdl.x = 0L ; grdl.y = 0L ;
                         GpiSetCharAngle( hps, &grdl ) ;
-                        if( !bHorz ) {
+			if( !bHorz ) {
                             bHorz = TRUE ;
                             }
                         }
                     else if( ta == 1 ) {
                         grdl.x = 0L ; grdl.y = 1L ;
-                        GpiSetCharAngle( hps, &grdl ) ;
+			GpiSetCharAngle( hps, &grdl ) ;
                         if( bHorz ) {
                             bHorz = FALSE ;
                             }
                         }
                     }
-                    break ;
+		    break ;
 
                 case 'L' :   /* line type */
                     {
                     int lt, col ;
-                    if( bPath ) {
+		    if( bPath ) {
                         GpiEndPath( hps ) ;
                         GpiStrokePath( hps, 1, 0 ) ;
                         bPath = FALSE ;
                         }
-                    BufRead(hRead,&lt, sizeof(int), &cbR) ;
+		    BufRead(hRead,&lt, sizeof(int), &cbR) ;
 	            /* linetype = -2 axes, -1 border, 0 arrows, all to 0 */
 	            col = lt ;
                     if( lt == -2 )     GpiSetLineWidthGeom( hps, DEFLW*0.85 ) ;
@@ -2276,7 +2341,8 @@ lOldLine=lt ;
                     if( !bBW ) { /* maintain some flexibility here in case we don't want
                            the model T option */ 
                         if( bColours ) GpiSetColor( hps, lCols[col] ) ;
-                        else GpiSetColor( hps, CLR_BLACK ) ;
+//                        else GpiSetColor( hps, CLR_BLACK ) ;
+                        else GpiSetColor( hps, CLR_NEUTRAL ) ;
                         }
                     }
                     break ;
@@ -2287,17 +2353,17 @@ lOldLine=lt ;
                     if( bPath ) {
                         GpiEndPath( hps ) ;
                         GpiStrokePath( hps, 1, 0 ) ;
-                        bPath = FALSE ;
+			bPath = FALSE ;
                         }
-                    BufRead(hRead,&lw, sizeof(int), &cbR) ;
+		    BufRead(hRead,&lw, sizeof(int), &cbR) ;
                     GpiSetLineWidthGeom( hps, DEFLW*lw/100 ) ;
                     linewidth = DEFLW*lw/100 ;
                     }
-                    break ;
+		    break ;
                     
                  case 'D' :   /* points mode */
                     {
-                    int lt ;
+		    int lt ;
                     BufRead(hRead,&lt, sizeof(int), &cbR) ;
     	              /* 1: enter point mode, 0: exit */
                     if( bLineTypes || bBW ) {
@@ -2305,10 +2371,10 @@ lOldLine=lt ;
                         else LType( lOldLine ) ;
 //                        if( lt == 1 ) lOldLine = GpiSetLineType( hps, lLineTypes[0] ) ;
 //                        else GpiSetLineType( hps, lOldLine ) ;
-                        }
+			}
 //                    if( lt == 1 ) GpiSetLineWidthGeom( hps, 20 ) ;
 //                    else GpiSetLineWidthGeom( hps, 50 ) ;
-                    bDots = lt ;
+		    bDots = lt ;
                     }
                     break ;
                 
@@ -2325,31 +2391,31 @@ lOldLine=lt ;
                         }
                     else {
                         char *p ;
-                        str = malloc( len*sizeof(int) ) ;
+			str = malloc( len*sizeof(int) ) ;
                         BufRead(hRead, str, len*sizeof(int), &cbR) ;
                         p = strchr(str, ',') ;
-                        if( p==NULL ) strcpy( font, "14" ) ;
+			if( p==NULL ) strcpy( font, "14" ) ;
                         else {
                             *p = '\0' ;
-                            strcpy( font, p+1 ) ;
-                            }
+			    strcpy( font, p+1 ) ;
+			    }
                         strcat( font,"." ) ;
                         strcat( font, str ) ;
-                        free( str ) ;
+			free( str ) ;
                         SwapFont( hps, font ) ;
-                        } 
+			}
                     }
-                    break ;
-                    
+		    break ;
+
                 case 'O' :   /* set options */
 
                     {
                     int len ;
                     char *str ;
                     BufRead(hRead,&len, sizeof(int), &cbR) ;
-                    len = (len+sizeof(int)-1)/sizeof(int) ;
+		    len = (len+sizeof(int)-1)/sizeof(int) ;
                     bWideLines = FALSE ; /* reset options */
-                    bEnhanced = FALSE ;
+		    bEnhanced = FALSE ;
                     
                     if( len > 0 ) {
                         char *p ;
@@ -2360,25 +2426,127 @@ lOldLine=lt ;
                             if( *p == 'w' ) bWideLines = TRUE ;
                             if( *p == 'e' ) bEnhanced = TRUE ;
                             ++p ;
-                            }
-                        free( str ) ;
-                        } 
-                    }
-                    break ;
-                
+			    }
+			free( str ) ;
+			}
+		    }
+		    break ;
+
+		case 't' : {  /* put_tmptext(int i, char c[]) term API */
+			      /* i: 0..at statusline, 1,2: at corners of zoom box, with \r separating text */
+		    int where, l;
+		    static char *text = NULL;
+		    static int text_alloc = -1;
+      /* Position of the "table" of values resulting from mouse movement (and clicks).
+	 Negative y value would position it at the top of the window---not implemented.
+      */
+		    BufRead(hRead,&where, sizeof(int), &cbR);
+		    BufRead(hRead,&l, sizeof(int), &cbR);
+		    if (text_alloc < l)
+		      text = realloc(text, text_alloc = l+10);
+		    BufRead(hRead,&text[0], l, &cbR);
+		    switch (where) {
+		      case 0: UpdateStatusLine(hps,text);
+			      break;
+		      case 1: break; // not implemented
+		      case 2: break; // not implemented
+		    }
+		    }
+		    break ;
+
+		case 'u' : {  /* set_ruler(int x, int y) term API: x<0 switches ruler off */
+		    int x, y;
+		    BufRead(hRead,&x, sizeof(x), &cbR);
+		    BufRead(hRead,&y, sizeof(y), &cbR);
+		    DrawRuler(); // remove previous drawing, if any
+		    if (x < 0) {
+		      ruler.on = 0; break; }
+		    ruler.on = 1;
+		    ruler.x = x; ruler.y = y;
+		    DrawRuler();
+		    }
+		    break ;
+
+		case 'c' : {  /* set_cursor(int c, int x, int y) term API */
+		    int c, x, y;
+		    BufRead(hRead,&c, sizeof(x), &cbR);
+		    BufRead(hRead,&x, sizeof(x), &cbR);
+		    BufRead(hRead,&y, sizeof(y), &cbR);
+		    switch (c) {
+		      case -2: { // move mouse to the given point
+			       RECTL rc;
+			       POINTL pt;
+			       GpiQueryPageViewport(hpsScreen,&rc);
+			       rc.xRight -= rc.xLeft; rc.yTop -= rc.yBottom; // only distance is important
+			       // window => pixels coordinates
+			       pt.x = (long int)((x*(double)rc.xRight) / 19500.0);
+			       pt.y = (long int)((x*(double)rc.yTop) / 12500.0);
+			       WinMapWindowPoints( hApp, HWND_DESKTOP, &pt, 1);
+			       WinSetPointerPos( HWND_DESKTOP, pt.x, pt.y);
+			       }
+			       break;
+		      case -1: // start zooming; zooming cursor
+			       zoombox.on = 1;
+			       zoombox.from.x = zoombox.to.x = x;
+			       zoombox.from.y = zoombox.to.y = y;
+			       break;
+		      case 0:  // standard cross-hair cursor
+			       WinSetPointer( HWND_DESKTOP, hptrCurrent = (useMouse?hptrCrossHair:hptrDefault) );
+			       break;
+		      case 1:  // cursor during rotation
+			       WinSetPointer( HWND_DESKTOP, hptrCurrent = hptrRotating);
+			       break;
+		      case 2:  // cursor during scaling
+			       WinSetPointer( HWND_DESKTOP, hptrCurrent = hptrScaling );
+			       break;
+		      case 3:  // cursor during zooming
+			       WinSetPointer( HWND_DESKTOP, hptrCurrent = hptrZooming );
+			       break;
+		      }
+		    if (c>=0 && zoombox.on) { /* erase zoom box */
+		      DrawZoomBox();
+		      zoombox.on = 0;
+		      }
+		    }
+		    break ;
+
+		case 'l' : {  /* set_clipboard(const char s[]) term API */
+		    int len;
+		    char *s;
+		    BufRead(hRead,&len, sizeof(int), &cbR);
+		    s = malloc( len + 1 );
+		    BufRead(hRead,s, len+1, &cbR);
+		    TextToClipboard(s);
+		    free(s);
+		    break ;
+		    }
+
+		case '#' :   /* update menu according to the gnuplot core settings,
+				e.g. (un)checking menu items
+			      */
+		    if (mouseTerminal) { // we are connected to mouseable terminal
+		      BufRead(hRead,&gpPMmenu, sizeof(gpPMmenu), &cbR);
+		      if (useMouse != gpPMmenu.use_mouse)
+			WinSetPointer( HWND_DESKTOP, hptrCurrent = (gpPMmenu.use_mouse?hptrCrossHair:hptrDefault) );
+		      useMouse = gpPMmenu.use_mouse;
+		      gpPMmenu_update_req = 1;
+		      }
+		    break ;
+
 		case 'm' :
 		    //PM notification of being connected to a mouse-enabled terminal
 		    mouseTerminal = 1;
 		    break ;
 
-                 default :  /* should handle error */
-                    break ;
-                 }
-             }
-        }
+
+		 default :  /* should handle error */
+		    break ;
+		 }
+	     }
+	}
 exitserver:
     DosDisConnectNPipe( hRead ) ;
-    WinPostMsg( hApp, WM_CLOSE, 0L, 0L ) ;    
+    WinPostMsg( hApp, WM_CLOSE, 0L, 0L ) ;
     }
 
 static void EditLineTypes( HWND hwnd, HPS hps, BOOL bDashed )
@@ -2942,7 +3110,7 @@ void LLine( HPS hps, POINTL *p )
                 iState++ ;
                 if( iPatt[iLtype][iState] < 0 ) {
                     togo = iPatt[iLtype][0] ;
-                    iState = 0 ;
+		    iState = 0 ;
                     }
                 else togo = iPatt[iLtype][iState] ;
                 }
@@ -2962,14 +3130,15 @@ void LType( int iType )
 
 //PM Now routines for mouse etc.
 
-static void TextToClipboard ( PCSZ szTextIn ) {
+static void TextToClipboard ( PCSZ szTextIn )
+{
 // copy string given by szTextIn to the clipboard
 PSZ szTextOut = NULL;
 ULONG ulRC = DosAllocSharedMem( (PVOID*)&szTextOut, NULL,
 		       strlen( szTextIn ) + 1,
-		       PAG_WRITE | PAG_COMMIT | OBJ_GIVEABLE );
+		       PAG_READ | PAG_WRITE | PAG_COMMIT | OBJ_GIVEABLE );
 if( !ulRC ) {
-  HAB hab;
+  HAB hab = 0;
   strcpy( szTextOut, szTextIn );
   WinOpenClipbrd(hab);
   WinEmptyClipbrd(hab);
@@ -2981,106 +3150,31 @@ if( !ulRC ) {
 
 /* Draw the ruler
 */
-static void draw_ruler ( void )
+static void DrawRuler ()
 {
 POINTL p;
-if (!ruler.on) return; 
-GpiSetColor( hpsScreen, COLOR_RULER );
+if (!ruler.on || ruler.x < 0) return;
+// GpiSetColor( hpsScreen, COLOR_RULER );
+GpiSetColor( hpsScreen, CLR_RED );
+GpiSetLineWidth(hpsScreen, LINEWIDTH_THICK);
+GpiSetMix(hpsScreen,FM_INVERT);
 //GpiBeginPath( hpsScreen, 1 ) ; // will this help? I don't know, but makes thic cross
-p.x = 0;	p.y = ruler.py; GpiMove( hpsScreen, &p ) ;
-p.x = 19500;			GpiLine( hpsScreen, &p ) ;
-p.x = ruler.px;	p.y = 0;	GpiMove( hpsScreen, &p ) ;
-p.y = 12500;			GpiLine( hpsScreen, &p ) ;
+p.x = 0;	p.y = ruler.y; GpiMove( hpsScreen, &p ) ;
+p.x = 19500;		       GpiLine( hpsScreen, &p ) ;
+p.x = ruler.x;	p.y = 0;       GpiMove( hpsScreen, &p ) ;
+p.y = 12500;		       GpiLine( hpsScreen, &p ) ;
 //GpiEndPath( hpsScreen ) ;
 //GpiStrokePath( hpsScreen, 1, 0 ) ;
 }
 
 
-/* Format x according to the date/time mouse mode. Uses and returns b as 
-   a buffer
-*/
-static char* xDateTimeFormat ( double x, char* b )
-{
-#define SEC_OFFS_SYS 946684800
-time_t xtime_position = SEC_OFFS_SYS + x;
-struct tm *pxtime_position = gmtime(&xtime_position);
-switch (mouse_mode) {
-  case MOUSE_COORDINATES_XDATE:
-	sprintf(b,"%d. %d. %04d",
-		pxtime_position->tm_mday,
-		(pxtime_position->tm_mon)+1,
-#if 1
-		(pxtime_position->tm_year) +
-		  ((pxtime_position->tm_year <= 68) ? 2000 : 1900)
-#else
-		((pxtime_position->tm_year)<100) ? 
-		  (pxtime_position->tm_year) : (pxtime_position->tm_year)-100
-//              (pxtime_position->tm_year)+1900
-#endif
-		);
-	break;
-  case MOUSE_COORDINATES_XTIME:
-	sprintf(b,"%d:%02d", pxtime_position->tm_hour, pxtime_position->tm_min);
-	break;
-  case MOUSE_COORDINATES_XDATETIME:
-	sprintf(b,"%d. %d. %04d %d:%02d",
-		pxtime_position->tm_mday,
-		(pxtime_position->tm_mon)+1,
-#if 1
-		(pxtime_position->tm_year) +
-		  ((pxtime_position->tm_year <= 68) ? 2000 : 1900),
-#else
-		((pxtime_position->tm_year)<100) ? 
-		  (pxtime_position->tm_year) : (pxtime_position->tm_year)-100,
-//              (pxtime_position->tm_year)+1900,
-#endif
-		pxtime_position->tm_hour,
-		pxtime_position->tm_min
-		);
-	break;
-  default: sprintf(b, "%g", x);
-  }
-return b;
-}
-
-
-/* Let the command in the shared memory to be executed by gnuplot.
-	If this routine is called during a 'pause', then the command is
-   ignored (shared memory is cleared). Needed for actions launched by a
-   hotkey.
-	Firstly, the command is copied from shared memory to clipboard
-   if this option is set on.
-	Secondly, gnuplot is informed that shared memory contains a command
-   by posting semInputReady event semaphore. 
-*/
-void gp_execute ( void )
-{
-    APIRET rc;
-    if (input_from_PM_Terminal==NULL || ((char*)input_from_PM_Terminal)[0]==0)
-	return;
-    if (pausing) { // no communication during pause
-	DosBeep(440,111);
-	((char*)input_from_PM_Terminal)[0] = 0;
-	return;
-    }
-    // write the command to clipboard
-    if (bSend2gp == TRUE)
-	TextToClipboard ( input_from_PM_Terminal );
-    // let the command in the shared memory be executed...
-    if (semInputReady == 0) { // but it must be open for the first time
-	char semInputReadyName[40]; 
-	sprintf( semInputReadyName, "\\SEM32\\GP%i_Input_Ready", (int)ppidGnu );
-	DosOpenEventSem( semInputReadyName,  &semInputReady);
-    }
-    rc = DosPostEventSem(semInputReady);
-}
-
-
+#if 0
 /* This routine recalculates mouse/pointer position [mx,my] in [in pixels]
 current window to the real/true [x,y] coordinates of the plotted graph.
 */
 void MousePosToGraphPos ( double *x, double *y,
-	HWND hWnd, SHORT mx, SHORT my, ULONG mouse_mode ) {
+	HWND hWnd, SHORT mx, SHORT my, ULONG mouse_mode )
+{
 RECTL rc;
 
 if (mouse_mode==MOUSE_COORDINATES_PIXELS) {
@@ -3101,108 +3195,117 @@ if (mouse_mode==MOUSE_COORDINATES_SCREEN) {
 *x = mx * 19500.0/rc.xRight; // px=px(mx); mouse=>gnuplot driver coordinates
 *y = my * 12500.0/rc.yTop;
 
-if (gp4mouse.xright==gp4mouse.xleft) *x = 1e38; else // protection
-*x = gp4mouse.xmin + (*x-gp4mouse.xleft)/(gp4mouse.xright-gp4mouse.xleft)
-	      * (gp4mouse.xmax-gp4mouse.xmin);
-if (gp4mouse.ytop==gp4mouse.ybot) *y = 1e38; else // protection
-*y = gp4mouse.ymin + (*y-gp4mouse.ybot)/(gp4mouse.ytop-gp4mouse.ybot)
-	      * (gp4mouse.ymax-gp4mouse.ymin);
-// Note: there is xleft+0.5 in "#define map_x" in graphics.c, which
-// makes no major impact here. It seems that the mistake of the real
-// coordinate is at about 0.5%, which corresponds to the screen resolution.
-// It would be better to round the distance to this resolution, and thus
-// *x = gp4mouse.xmin + rounded-to-screen-resolution (xdistance)
+/* main job of transformation, which is not device dependent */
+MousePosToGraphPosReal( x, y );
+}
+#endif
 
-// Now take into account possible log scales of x and y axes
-if  (gp4mouse.is_log_x) *x = exp( *x * gp4mouse.log_base_log_x );
-if  (gp4mouse.is_log_y) *y = exp( *y * gp4mouse.log_base_log_y );
 
+/*
+ * This routine recalculates mouse/pointer position [mx,my] in [in pixels]
+ * current window to the viewport coordinates
+ */
+static void MousePosToViewport ( int *x, int *y, SHORT mx, SHORT my )
+{
+RECTL rc;
+
+// Rectangle where we are moving: viewport, not the full window!
+GpiQueryPageViewport(hpsScreen,&rc);
+
+rc.xRight -= rc.xLeft; rc.yTop -= rc.yBottom; // only distance is important
+
+// px=px(mx); mouse=>gnuplot driver coordinates
+*x = (int)(mx * 19500.0/rc.xRight + 0.5);
+*y = (int)(my * 12500.0/rc.yTop + 0.5);
 }
 
 
-/* Ruler is on, thus recalc its (px,py) from (x,y) for
-   the current zoom and log axes
-*/
-void recalc_ruler_pos()
- {
-			double P;
-			if (gp4mouse.is_log_x && ruler.x<0)
-			    ruler.px = -1;
-			  else {
-			    P = gp4mouse.is_log_x ?
-				  log(ruler.x) / gp4mouse.log_base_log_x
-				  : ruler.x;
-			    P = (P-gp4mouse.xmin) / (gp4mouse.xmax-gp4mouse.xmin);
-			    P *= gp4mouse.xright-gp4mouse.xleft;
-			    ruler.px = (long)( gp4mouse.xleft + P );
-			    }
-			if (gp4mouse.is_log_y && ruler.y<0)
-			    ruler.py = -1;
-			  else {
-			    P = gp4mouse.is_log_y ?
-				  log(ruler.y) / gp4mouse.log_base_log_y
-				  : ruler.y;
-			    P = (P-gp4mouse.ymin) / (gp4mouse.ymax-gp4mouse.ymin);
-			    P *= gp4mouse.ytop-gp4mouse.ybot;
-			    ruler.py = (long)( gp4mouse.ybot + P );
-			    }
-			}
-
-
-void do_zoom ( double xmin, double ymin, double xmax, double ymax )
+/*
+ * This routine gets the mouse/pointer position in the current window and
+ * recalculates it to the viewport coordinates
+ */
+static void GetMousePosViewport ( HWND hWnd, int *mx, int *my )
 {
-struct t_zoom *z;
-if (zoom_head == NULL) { // queue not yet created, thus make its head
-    zoom_head = malloc( sizeof(struct t_zoom) );
-    zoom_head->prev = NULL;
-    zoom_head->next = NULL;
+    POINTL p;
+    WinQueryPointerPos(HWND_DESKTOP, &p); // this is position wrt desktop
+    WinMapWindowPoints(HWND_DESKTOP, hWnd, &p, 1); // pos. wrt our window in pixels
+    MousePosToViewport(mx,my,p.x,p.y);
+}
+
+
+/*
+ * Status line previous and current text:
+ */
+static char *sl_curr_text = NULL;
+
+/*
+ * Display the status line by the text
+ */
+static void DisplayStatusLine ( HPS hps )
+{
+POINTL pt;
+if (!sl_curr_text) return;
+GpiSetColor( hps, COLOR_MOUSE ); // set text color
+GpiSetCharMode(hps,CM_MODE1);
+pt.x = 2;
+pt.y = 2;
+GpiSetMix(hps,FM_INVERT);
+// GpiSetMix(hps,FM_XOR);
+GpiCharStringAt(hps,&pt,(long)strlen(sl_curr_text),sl_curr_text);
+}
+
+
+/*
+ * Update the status line by the text; firstly erase the previous text
+ */
+static void UpdateStatusLine ( HPS hps, char *text )
+{
+if (gpPMmenu_update_req) gpPMmenu_update(); // check for updated menu
+if (sl_curr_text) { // erase the previous text
+  DisplayStatusLine(hps);
+  free(sl_curr_text);
+  }
+if (!text || !*text)
+    sl_curr_text = 0;
+  else { // display new text
+    sl_curr_text = strdup(text);
+    DisplayStatusLine(hps);
     }
-if (zoom_now == NULL) zoom_now = zoom_head;
-if (zoom_now->next == NULL) { // allocate new item
-    z = malloc( sizeof(struct t_zoom) );
-    z->prev = zoom_now;
-    z->next = NULL; 
-    zoom_now->next = z;
-    z->prev = zoom_now;
-} else // overwrite next item
-    z = zoom_now->next;
-z->xmin = xmin; z->ymin = ymin;
-z->xmax = xmax; z->ymax = ymax;
-apply_zoom( z );
 }
 
 
-/* Applies the zoom rectangle of  z  by sending the appropriate command
-   to gnuplot
-*/
-static void apply_zoom ( struct t_zoom *z )
+/*
+ * Graphics part 'G' or anything else required to update menu according to
+ * the items in gpPMmenu
+ */
+static void gpPMmenu_update ( void )
 {
-char s[256];
-if (zoom_now != NULL) { // remember the current zoom
-  zoom_now->xmin = (!gp4mouse.is_log_x) ? gp4mouse.xmin : exp( gp4mouse.xmin * gp4mouse.log_base_log_x );
-  zoom_now->ymin = (!gp4mouse.is_log_y) ? gp4mouse.ymin : exp( gp4mouse.ymin * gp4mouse.log_base_log_y );
-  zoom_now->xmax = (!gp4mouse.is_log_x) ? gp4mouse.xmax : exp( gp4mouse.xmax * gp4mouse.log_base_log_x );
-  zoom_now->ymax = (!gp4mouse.is_log_y) ? gp4mouse.ymax : exp( gp4mouse.ymax * gp4mouse.log_base_log_y );
-}
-zoom_now = z;
-if (zoom_now == NULL) {
-    DosBeep(444,111);
-    return;
-}
-WinEnableMenuItem( // can this situation be zoomed back?
+// if (!gpPMmenu_update_req) return;
+ChangeCheck( hApp, IDM_USEMOUSE, useMouse ? IDM_USEMOUSE:0 ) ;
+WinEnableMenuItem( /* can this situation be unzoomed back? */
   WinWindowFromID( WinQueryWindow( hApp, QW_PARENT ), FID_MENU ),
-  IDM_MOUSE_ZOOMNEXT, (zoom_now->next == NULL) ? FALSE : TRUE ) ;
-WinEnableMenuItem( // can this situation be unzoomed back?
+  IDM_MOUSE_UNZOOM, (gpPMmenu.where_zoom_queue & 1) ? TRUE : FALSE ) ;
+WinEnableMenuItem( /* can this situation be unzoomed to the beginning? */
   WinWindowFromID( WinQueryWindow( hApp, QW_PARENT ), FID_MENU ),
-  IDM_MOUSE_UNZOOM, (zoom_now->prev == NULL) ? FALSE : TRUE ) ;
-WinEnableMenuItem( // can this situation be unzoomed to the beginning?
+  IDM_MOUSE_UNZOOMALL, (gpPMmenu.where_zoom_queue & 2) ? TRUE : FALSE ) ;
+if (
+WinEnableMenuItem( /* can this situation be zoomed next? */
   WinWindowFromID( WinQueryWindow( hApp, QW_PARENT ), FID_MENU ),
-  IDM_MOUSE_UNZOOMALL, (zoom_now == zoom_head) ? FALSE : TRUE ) ;
-sprintf(s,"set xr[%g:%g]; set yr[%g:%g]; replot", // the command for gnuplot
-	zoom_now->xmin, zoom_now->xmax, zoom_now->ymin, zoom_now->ymax);
-sprintf(input_from_PM_Terminal,"%s",s); // send the command to shared memory...
-gp_execute();				// and let gnuplot know about it
+  IDM_MOUSE_ZOOMNEXT, (gpPMmenu.where_zoom_queue & 4) ? TRUE : FALSE )
+== TRUE) gpPMmenu_update_req = 0;
+ChangeCheck( hApp, IDM_MOUSE_POLAR_DISTANCE, gpPMmenu.polar_distance?IDM_MOUSE_POLAR_DISTANCE:0 ) ;
 }
 
+static void DrawZoomBox ( void )
+{
+if (!zoombox.on) return;
+GpiSetLineWidth(hpsScreen, LINEWIDTH_NORMAL);
+GpiSetLineType(hpsScreen,LINETYPE_SHORTDASH);
+GpiSetMix(hpsScreen,FM_INVERT);
+GpiMove( hpsScreen, &zoombox.from) ;
+GpiBox(hpsScreen, DRO_OUTLINE, &zoombox.to, 0,0 );
+GpiSetLineType(hpsScreen,LINETYPE_DEFAULT);
+}
 
 /* eof gclient.c */
+

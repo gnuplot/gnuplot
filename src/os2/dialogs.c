@@ -1,5 +1,5 @@
 #ifdef INCRCSDATA
-static char RCSid[]="$Id: dialogs.c,v 1.1 1999/03/26 22:15:38 lhecking Exp $" ;
+static char RCSid[]="$Id: dialogs.c,v 1.2 1999/09/21 18:24:39 lhecking Exp $" ;
 #endif
 
 /****************************************************************************
@@ -454,8 +454,7 @@ MRESULT EXPENTRY SendCommandDlgProc (HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp
 {
 #define TEXT_LENGTH 80
 static char buf[TEXT_LENGTH+1];
-extern void gp_execute ();
-extern PVOID input_from_PM_Terminal;
+extern void gp_execute (char *s);
 
   switch (msg)
     {
@@ -473,8 +472,7 @@ extern PVOID input_from_PM_Terminal;
         case DID_OK:
           WinQueryDlgItemText( hwnd, IDM_DO_SENDCOMMAND, sizeof(buf), buf );
           WinDismissDlg( hwnd, TRUE );
-	  strcpy( input_from_PM_Terminal, buf);
-	  gp_execute();
+	  gp_execute(buf);
           break;
         default:
           WinDismissDlg( hwnd, FALSE );

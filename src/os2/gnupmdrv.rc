@@ -5,6 +5,8 @@
 ICON 1 "gnuplot.ico"
 
 POINTER IDP_CROSSHAIR  "ptrcross.ptr"
+POINTER IDP_SCALING    "scaling.ptr"
+POINTER IDP_ROTATING   "rotating.ptr"
 
 MENU 1
 BEGIN
@@ -38,7 +40,7 @@ BEGIN
 
     SUBMENU  "~Mouse" , IDM_MOUSE,,MIA_DISABLED
     BEGIN
-        MENUITEM    "~Use mouse\tCtrl-M", IDM_USEMOUSE,,MIA_CHECKED
+        MENUITEM    "~Use mouse\tm,Ctrl-M", IDM_USEMOUSE,,MIA_CHECKED
         SUBMENU    "Coordinates", IDM_MOUSE_COORDINATES
         BEGIN
             MENUITEM  "~real", IDM_MOUSE_COORDINATES_REAL,,MIA_CHECKED
@@ -71,21 +73,20 @@ BEGIN
             MENUITEM  SEPARATOR
             MENUITEM  "set label...", IDM_MOUSE_FORMAT_LABEL
         END
-        MENUITEM  "Unzoom all\tF10", IDM_MOUSE_UNZOOMALL,,MIA_DISABLED
-        MENUITEM  "Unzoom back\tF11", IDM_MOUSE_UNZOOM,,MIA_DISABLED
-        MENUITEM  "Zoom next\tF12", IDM_MOUSE_ZOOMNEXT,,MIA_DISABLED
+        MENUITEM  "Unzoom all\tu,F10", IDM_MOUSE_UNZOOMALL,,MIA_DISABLED
+        MENUITEM  "Unzoom back\tp,F11", IDM_MOUSE_UNZOOM,,MIA_DISABLED
+        MENUITEM  "Zoom next\tn,F12", IDM_MOUSE_ZOOMNEXT,,MIA_DISABLED
         MENUITEM  SEPARATOR
-        MENUITEM  "~Ruler\tCtrl-R", IDM_MOUSE_RULER
-//        MENUITEM  "(todo?)Ruler ~window\tCtrl-F2", IDM_MOUSE_RULERWINDOW
-        MENUITEM  "~Polar distance", IDM_MOUSE_POLAR_DISTANCE,,
+        MENUITEM  "~Ruler\tr,Ctrl-R", IDM_MOUSE_RULER
+        MENUITEM  "~Polar distance\t5", IDM_MOUSE_POLAR_DISTANCE,,
     END
 
     SUBMENU "~Utilities" , IDM_UTILS
     BEGIN
 	MENUITEM "~Break drawing\tCtrl-C" , IDM_BREAK_DRAWING
         MENUITEM  SEPARATOR
-	MENUITEM  "~grid on/off\tCtrl-G", IDM_SET_GRID
-	MENUITEM  "~lin/log y\tCtrl-L", IDM_SET_LINLOGY
+	MENUITEM  "~grid on/off\tg,Ctrl-G", IDM_SET_GRID
+	MENUITEM  "~lin/log y\tl,Ctrl-L", IDM_SET_LINLOGY
 	SUBMENU "~set",IDM_SET
         BEGIN
             SUBMENU "~data style",IDM_SET_D_S
@@ -114,8 +115,8 @@ BEGIN
             END
         END
         MENUITEM   SEPARATOR
-        MENUITEM   "autoscale\tF3", IDM_SET_AUTOSCALE
-        MENUITEM   "replot\tF4", IDM_DO_REPLOT
+        MENUITEM   "autoscale\ta,F3", IDM_SET_AUTOSCALE
+        MENUITEM   "replot\te,F4", IDM_DO_REPLOT
         MENUITEM   "reload\tF5", IDM_DO_RELOAD
         MENUITEM  SEPARATOR
         MENUITEM   "~command...", IDM_DO_SENDCOMMAND
@@ -139,7 +140,7 @@ END
 
 ACCELTABLE 1
 BEGIN
-    VK_ESC, IDM_COMMAND, VIRTUALKEY 
+//  VK_ESC, IDM_COMMAND, VIRTUALKEY 
     VK_DELETE, IDM_CLEARCLIP, VIRTUALKEY
     VK_INSERT, IDM_COPY, VIRTUALKEY, CONTROL
     VK_F1, IDM_GPLOTINF, VIRTUALKEY
@@ -218,7 +219,7 @@ BEGIN
     BEGIN
         CTEXT           "GnuplotPM", -1, 8, 65, 128, 8
         CTEXT           "Gnuplot display for OS/2", -1, 8, 50, 128, 8
-        CTEXT           "$Revision: 1.6 $", -1, 8, 35, 128, 8
+        CTEXT           "$Revision: 1.2 $", -1, 8, 35, 128, 8
         DEFPUSHBUTTON   "OK", DID_OK, 56, 10, 32, 14, WS_GROUP
     END
 END
