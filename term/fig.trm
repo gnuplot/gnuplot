@@ -1,5 +1,5 @@
 /*
- * $Id: fig.trm,v 1.16 1999/06/22 11:54:17 lhecking Exp $
+ * $Id: fig.trm,v 1.17 1999/06/25 17:07:54 lhecking Exp $
  */
 
 /* GNUPLOT - fig.trm */
@@ -180,44 +180,38 @@ static int FIG_inches = FALSE;
 
 static void FIG_poly_clean __PROTO((enum FIG_poly_stat fig_stat));
 
+/* we use the same points */
+#define FIG_POINT_TYPES POINT_TYPES
 
-#define FIG_POINT_TYPES POINT_TYPES	/* we use the same points */
+enum FIG_id {
+    FIG_MONOCHROME, FIG_COLOR,
+    FIG_SMALL, FIG_BIG,
+    FIG_INCHES, FIG_METRIC,
+    FIG_PORTRAIT, FIG_LANDSCAPE,
+    FIG_SIZE, FIG_FONTSIZE,
+    FIG_THICKNESS, FIG_DEPTH, FIG_POINTSMAX,
+    FIG_OTHER
+};
 
-
-static void
-FIG_poly_clean(fig_stat)
-enum FIG_poly_stat fig_stat;
+static struct gen_table FIG_opts[] =
 {
-    int i, j;
-    int cap_style;
-    if (fig_stat == FIG_poly_part) {
-	cap_style = (FIG_line.style==DOTTED_LINE)? CAP_ROUND : FIG_line.cap_style;
-	fprintf(gpoutfile, "%d %d %d %d %d %d %d %d %d %9.3f %d %d %d %d %d %ld\n\t",
-		O_POLYLINE, FIG_line.type, FIG_line.style, FIG_line.thickness,
-		FIG_line.pen_color, FIG_line.fill_color, FIG_line.depth,
-		FIG_line.pen_style, FIG_line.fill_style, FIG_line.style_val,
-		FIG_line.join_style, cap_style, FIG_line.radius,
-		0, 0, FIG_poly_vec_cnt);
+    { "mo$nochrome", FIG_MONOCHROME },
+    { "c$olor", FIG_COLOR },
+    { "c$olour", FIG_COLOR },
+    { "sm$all", FIG_SMALL },
+    { "b$ig", FIG_BIG },
+    { "in$ches", FIG_INCHES },
+    { "me$tric", FIG_METRIC },
+    { "por$trait", FIG_PORTRAIT },
+    { "l$andscape", FIG_LANDSCAPE },
+    { "si$ze", FIG_SIZE },
+    { "f$ontsize", FIG_FONTSIZE },
+    { "t$hickness", FIG_THICKNESS },
+    { "d$epth", FIG_DEPTH },
+    { "poi$ntsmax", FIG_POINTSMAX },
+    { NULL, FIG_OTHER }
+};
 
-	j = 0;
-	for (i = 0; i < FIG_poly_vec_cnt; i++) {
-	    fprintf(gpoutfile, " %d %d", FIG_points[i].x, FIG_points[i].y);
-	    if (j++ > 4 && i != FIG_poly_vec_cnt - 1) {
-		fputs("\n\t", gpoutfile);
-		j = 0;		/* JFS */
-	    }
-	}
-	if (j != 0) {
-	    putc('\n', gpoutfile);
-	}
-	/* Give the memory back to the system because we are done with this 
-	 * polyline. Make sure FIG_points contains NULL afterwards!
-	 */
-	free(FIG_points);
-	FIG_points = NULL;
-    }
-    FIG_polyvec_stat = FIG_poly_new;
-}
 
 TERM_PUBLIC void
 FIG_options()
@@ -246,34 +240,42 @@ FIG_options()
     FIG_inches = TRUE;
 #endif
     while (!END_OF_COMMAND) {
-	if (almost_equals(c_token, "mo$nochrome")) {
+	switch(lookup_table(&FIG_opts[0],c_token)) {
+	case FIG_MONOCHROME:
 	    FIG_use_color = FALSE;
 	    c_token++;
-	} else if (almost_equals(c_token, "c$olor")
-		   || almost_equals(c_token, "c$olour")) {
+	    break;
+	case FIG_COLOR:
 	    FIG_use_color = TRUE;
 	    c_token++;
-	} else if (almost_equals(c_token, "sm$all")) {
+	    break;
+	case FIG_SMALL:
 	    FIG_is_big = FALSE;
 	    c_token++;
-	} else if (almost_equals(c_token, "b$ig")) {
+	    break;
+	case FIG_BIG:
 	    FIG_is_big = TRUE;
 	    c_token++;
-	} else if (almost_equals(c_token, "in$ches")) {		/* KB */
+	    break;
+	case FIG_INCHES:
 	    FIG_inches = TRUE;
 	    c_token++;
-	} else if (almost_equals(c_token, "me$tric")) {		/* KB */
+	    break;
+	case FIG_METRIC:
 	    FIG_inches = FALSE;
 	    c_token++;
-	} else if (almost_equals(c_token, "por$trait")) {	/* KB */
+	    break;
+	case FIG_PORTRAIT:
 	    /* KB: Would have preferred "p$ortrait" but that would */
 	    /*     collide with "p$ointsmax" below. */
 	    FIG_portrait = TRUE;
 	    c_token++;
-	} else if (almost_equals(c_token, "l$andscape")) {	/* KB */
+	    break;
+	case FIG_LANDSCAPE:
 	    FIG_portrait = FALSE;
 	    c_token++;
-	} else if (almost_equals(c_token, "si$ze")) {	/* KB */
+	    break;
+	case FIG_SIZE:
 	    c_token++;
 	    if (END_OF_COMMAND) {
 		int_error(c_token, "size: 2 numbers expected");
@@ -291,7 +293,8 @@ FIG_options()
 		    xsize_t = ysize_t = 0.;
 		}
 	    }
-	} else if (almost_equals(c_token, "f$ontsize")) {	/* KB */
+	    break;
+	case FIG_FONTSIZE:
 	    c_token++;
 	    if (END_OF_COMMAND) {
 		int_error(c_token, "fontsize: number expected");
@@ -302,7 +305,8 @@ FIG_options()
 		    FIG_font_s = 0;
 		}
 	    }
-	} else if (almost_equals(c_token, "t$hickness")) {	/* KB */
+	    break;
+	case FIG_THICKNESS:
 	    c_token++;
 	    if (END_OF_COMMAND) {
 		int_error(c_token, "thickness: number expected");
@@ -313,7 +317,8 @@ FIG_options()
 		    FIG_default_thickness = 1;
 		}
 	    }
-	} else if (almost_equals(c_token, "d$epth")) {	/* KB */
+	    break;
+	case FIG_DEPTH:
 	    c_token++;
 	    if (END_OF_COMMAND) {
 		int_error(c_token, "depth: number expected");
@@ -325,7 +330,8 @@ FIG_options()
 		}
 		FIG_linedepth = FIG_depth;
 	    }
-	} else if (almost_equals(c_token, "poi$ntsmax")) {	/* JFS */
+	    break;
+	case FIG_POINTSMAX:
 	    /* Skip the word and then expect the number ! */
 	    c_token++;
 	    if (END_OF_COMMAND) {
@@ -340,9 +346,12 @@ FIG_options()
 		    int_error(c_token, "pointsmax: number out of range (2,%ld)", (FIG_MAX_POINTS + 1));
 		}
 	    }
-	} else {
+	    break;
+	case FIG_OTHER:
+	default:
 	    parse_error = TRUE;
 	    int_error(c_token, options_list);
+	    break;
 	}
     }
 
@@ -404,6 +413,43 @@ FIG_options()
 	int_error(c_token, options_list);
     }
 }
+
+
+static void
+FIG_poly_clean(fig_stat)
+enum FIG_poly_stat fig_stat;
+{
+    int i, j;
+    int cap_style;
+    if (fig_stat == FIG_poly_part) {
+	cap_style = (FIG_line.style==DOTTED_LINE)? CAP_ROUND : FIG_line.cap_style;
+	fprintf(gpoutfile, "%d %d %d %d %d %d %d %d %d %9.3f %d %d %d %d %d %ld\n\t",
+		O_POLYLINE, FIG_line.type, FIG_line.style, FIG_line.thickness,
+		FIG_line.pen_color, FIG_line.fill_color, FIG_line.depth,
+		FIG_line.pen_style, FIG_line.fill_style, FIG_line.style_val,
+		FIG_line.join_style, cap_style, FIG_line.radius,
+		0, 0, FIG_poly_vec_cnt);
+
+	j = 0;
+	for (i = 0; i < FIG_poly_vec_cnt; i++) {
+	    fprintf(gpoutfile, " %d %d", FIG_points[i].x, FIG_points[i].y);
+	    if (j++ > 4 && i != FIG_poly_vec_cnt - 1) {
+		fputs("\n\t", gpoutfile);
+		j = 0;		/* JFS */
+	    }
+	}
+	if (j != 0) {
+	    putc('\n', gpoutfile);
+	}
+	/* Give the memory back to the system because we are done with this 
+	 * polyline. Make sure FIG_points contains NULL afterwards!
+	 */
+	free(FIG_points);
+	FIG_points = NULL;
+    }
+    FIG_polyvec_stat = FIG_poly_new;
+}
+
 
 TERM_PUBLIC void
 FIG_init()

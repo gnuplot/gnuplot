@@ -1,5 +1,5 @@
 /*
- * $Id: imagen.trm,v 1.9 1999/06/19 20:30:51 lhecking Exp $
+ * $Id: imagen.trm,v 1.10 1999/06/22 11:54:18 lhecking Exp $
  */
 
 /* GNUPLOT - imagen.trm */
@@ -175,6 +175,73 @@ char IMPdrpattern[10][10] =
 /*  7 */ {16, 4, 1, 8, 1, 4, 0}
 };
 
+enum IMAGEN_id { IMAGEN_PORTRAIT, IMAGEN_LANDSCAPE, IMAGEN_OTHER };
+
+static struct gen_table IMAGEN_opts[] =
+{
+    { "p$ortrait", IMAGEN_PORTRAIT },
+    { "l$andscape", IMAGEN_LANDSCAPE },
+    { NULL, IMAGEN_OTHER }
+};
+
+TERM_PUBLIC void
+IMAGEN_options()
+{
+    struct value a;
+
+    while (!END_OF_COMMAND) {
+	switch(lookup_table(&IMAGEN_opts[0],c_token)) {
+	case IMAGEN_PORTRAIT:
+	    IMAGEN_portrait = TRUE;
+	    IMAGEN_page_h = IMAGEN_A4_W;
+	    IMAGEN_page_w = IMAGEN_A4_H;
+	    IMAGEN_Xmax = IMAGEN_YMAX;
+	    IMAGEN_Ymax = IMAGEN_XMAX;
+	    c_token++;
+	    break;
+	case IMAGEN_LANDSCAPE:
+	    IMAGEN_portrait = FALSE;
+	    c_token++;
+	    break;
+	case IMAGEN_OTHER:
+	default:
+	    if (equals(c_token, "[")) {	/* windows spesified */
+		c_token++;
+		/* if (IM_plot_nr>1) */
+		if (equals(c_token, "]")) {
+		    IM_page();
+		    c_token++;
+		    break;
+		}
+		if (END_OF_COMMAND) {
+		    int_error(c_token, "no. windows: [horizontal,vertical] expected");
+		} else if (!equals(c_token, ",")) {
+		    IM_win_horiz = (int) real(const_express(&a));
+		}
+		if (!equals(c_token, ","))
+		    int_error(c_token, "',' expected");
+		c_token++;
+		if (!equals(c_token, "]")) {
+		    IM_win_verti = (int) real(const_express(&a));
+		}
+		if (!equals(c_token, "]"))
+		    int_error(c_token, "expecting ']'");
+		c_token++;
+	    } else {
+		/* We have font size specified */
+		IMAGEN_fontsize = (int) real(const_express(&a));
+		if (IMAGEN_fontsize < 8)
+		    IMAGEN_fontsize = 8;
+		if (IMAGEN_fontsize > 15)
+		    IMAGEN_fontsize = 15;
+	    }
+	}
+    }
+    sprintf(term_options, "%d %s [%1d,%1d]", IMAGEN_fontsize, (IMAGEN_portrait) ? "portrait" :
+	    "landscape", IM_win_horiz, IM_win_verti);
+}
+
+
 TERM_PUBLIC void
 IMAGEN_init()
 {
@@ -259,57 +326,6 @@ IMAGEN_graphics()
     tmpy = IMAGEN_orgY + ((IM_win_verti - 1) - (int) ((IM_plot_nr - 1) / IM_win_horiz)) * IMAGEN_winy;
     IMAGEN_orgx = tmpx + (int) ((IMAGEN_winx - IMAGEN_xmax) / 2);
     IMAGEN_orgy = tmpy + (int) ((IMAGEN_winy - IMAGEN_ymax) / 2);
-}
-
-TERM_PUBLIC void
-IMAGEN_options()
-{
-    struct value a;
-
-    while (!END_OF_COMMAND) {
-	if (almost_equals(c_token, "p$ortrait")) {
-	    IMAGEN_portrait = TRUE;
-	    IMAGEN_page_h = IMAGEN_A4_W;
-	    IMAGEN_page_w = IMAGEN_A4_H;
-	    IMAGEN_Xmax = IMAGEN_YMAX;
-	    IMAGEN_Ymax = IMAGEN_XMAX;
-	    c_token++;
-	} else if (almost_equals(c_token, "l$andscape")) {
-	    IMAGEN_portrait = FALSE;
-	    c_token++;
-	} else if (equals(c_token, "[")) {	/* windows spesified */
-	    c_token++;
-	    /* if (IM_plot_nr>1) */
-	    if (equals(c_token, "]")) {
-		IM_page();
-		c_token++;
-		continue;
-	    }
-	    if (END_OF_COMMAND) {
-		int_error(c_token, "no. windows: [horizontal,vertical] expected");
-	    } else if (!equals(c_token, ",")) {
-		IM_win_horiz = (int) real(const_express(&a));
-	    }
-	    if (!equals(c_token, ","))
-		int_error(c_token, "',' expected");
-	    c_token++;
-	    if (!equals(c_token, "]")) {
-		IM_win_verti = (int) real(const_express(&a));
-	    }
-	    if (!equals(c_token, "]"))
-		int_error(c_token, "expecting ']'");
-	    c_token++;
-	} else {
-	    /* We have font size specified */
-	    IMAGEN_fontsize = (int) real(const_express(&a));
-	    if (IMAGEN_fontsize < 8)
-		IMAGEN_fontsize = 8;
-	    if (IMAGEN_fontsize > 15)
-		IMAGEN_fontsize = 15;
-	}
-    }
-    sprintf(term_options, "%d %s [%1d,%1d]", IMAGEN_fontsize, (IMAGEN_portrait) ? "portrait" :
-	    "landscape", IM_win_horiz, IM_win_verti);
 }
 
 

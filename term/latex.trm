@@ -1,5 +1,5 @@
 /*
- * $Id: latex.trm,v 1.17 1999/07/30 19:06:45 lhecking Exp $
+ * $Id: latex.trm,v 1.18 1999/08/07 17:19:12 lhecking Exp $
  *
  */
 
@@ -215,25 +215,43 @@ static struct vslope {
 /* figure out the best arrow */
 void best_latex_arrow __PROTO((int, int, int, int, int, TBOOLEAN));
 
+enum LATEX_id { LATEX_COURIER, LATEX_ROMAN, LATEX_DEFAULT, LATEX_OTHER };
+
+static struct gen_table LATEX_opts[] =
+{
+    { "c$ourier", LATEX_COURIER },
+    { "r$oman", LATEX_ROMAN },
+    { "d$efault", LATEX_DEFAULT },
+    { NULL, LATEX_OTHER }
+};
+
+
 TERM_PUBLIC void
 LATEX_options()
 {
-    if (!END_OF_COMMAND) {
-	if (almost_equals(c_token, "c$ourier")) {
+    struct value a;
+
+    while (!END_OF_COMMAND) {
+	switch(lookup_table(&LATEX_opts[0],c_token)) {
+	case LATEX_COURIER:
 	    strcpy(LATEX_font, "cmtt");
 	    c_token++;
-	} else if (almost_equals(c_token, "r$oman")) {
+	    break;
+	case LATEX_ROMAN:
 	    strcpy(LATEX_font, "cmr");
 	    c_token++;
-	} else if (almost_equals(c_token, "d$efault")) {
+	    break;
+	case LATEX_DEFAULT:
 	    strcpy(LATEX_font, "doc");
 	    c_token++;
+	    break;
+	case LATEX_OTHER:
+	default:
+	    /* if isannumber? */
+	    LATEX_fontsize = (int) real(const_express(&a));
 	}
     }
-    if (!END_OF_COMMAND) {
-	struct value a;
-	LATEX_fontsize = (int) real(const_express(&a));
-    }
+
     /* tell gnuplot core about char. sizes. Horizontal spacing
      * is about half the text pointsize
      */
@@ -243,8 +261,8 @@ LATEX_options()
     if (strcmp(LATEX_font, "doc")==0)
 	strncpy(term_options, "(document specific font)",MAX_LINE_LEN);
     else
-	sprintf(term_options, "%s %d", LATEX_font[2] == 't' ? "courier" : "roman",
-		LATEX_fontsize);
+	sprintf(term_options, "%s %d",
+		LATEX_font[2] == 't' ? "courier" : "roman", LATEX_fontsize);
 }
 
 

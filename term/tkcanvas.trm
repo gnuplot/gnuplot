@@ -1,5 +1,5 @@
 /*
- * $Id: tkcanvas.trm,v 1.14 1999/06/19 20:30:57 lhecking Exp $
+ * $Id: tkcanvas.trm,v 1.15 1999/06/22 11:54:24 lhecking Exp $
  *
  */
 
@@ -120,21 +120,37 @@ static const char *tk_colors[] = {
     "black", "gray", "red", "blue", "green", "brown", "magenta", "cyan"
 };
 
+enum TK_id { TK_PERLTK, TK_INTERACTIVE, TK_OTHER };
+
+static struct gen_table TK_opts[] =
+{
+    { "p$erltk", TK_PERLTK },
+    { "i$nteractive", TK_INTERACTIVE },
+    { NULL, TK_OTHER }
+};
+
 TERM_PUBLIC void
 TK_options()
 {
     tk_perl = 0;
     tk_interactive = 0;
-    if (!END_OF_COMMAND) {
-	if (almost_equals(c_token, "p$erltk")) {
+
+    while (!END_OF_COMMAND) {
+	switch(lookup_table(&TK_opts[0],c_token)) {
+	case TK_PERLTK:
 	    tk_perl = 1;
 	    c_token++;
-	}
-	if (almost_equals(c_token, "i$nteractive")) {
+	    break;
+	case TK_INTERACTIVE:
 	    tk_interactive = 1;
 	    c_token++;
+	    break;
+	case TK_OTHER:
+	default:
+	    break;
 	}
     }
+
     sprintf(term_options, "%s %s",
 	    tk_perl ? "perltk" : "",
 	    tk_interactive ? "interactive" : "");

@@ -1,5 +1,5 @@
 /*
- * $Id: mif.trm,v 1.14 1999/06/25 17:07:55 lhecking Exp $
+ * $Id: mif.trm,v 1.15 1999/07/18 17:35:32 lhecking Exp $
  */
 /* GNUPLOT -- mif.trm */
 
@@ -239,40 +239,53 @@ struct mpt *mif_point = &(mpt[1]);
 static int insert_mif_line __PROTO((double fx, double fy));
 static int proc_group_id __PROTO((int group_id));
 
+enum MIF_id {
+    MIF_MONOCHROME, MIF_COLOR, MIF_VECTORS, MIF_POLYLINE, MIF_HELP,
+    MIF_OTHER
+};
+
+static struct gen_table MIF_opts[] =
+{
+    { "m$onochrome", MIF_MONOCHROME },
+    { "c$olor", MIF_COLOR },
+    { "c$olour", MIF_COLOR },
+    { "v$ectors", MIF_VECTORS },
+    { "p$olyline", MIF_POLYLINE },
+    { "h$elp", MIF_HELP },
+    { "?$", MIF_HELP },
+    { NULL, MIF_OTHER }
+};
+
 /** Routine/s **/
 
 /* Called when this terminal type is set in order to parse options */
 TERM_PUBLIC void
 MIF_options()
 {
-    if (!END_OF_COMMAND) {
+    while (!END_OF_COMMAND) {
+	switch(lookup_table(&MIF_opts[0],c_token)) {
 	/* Colour options */
-	if (!END_OF_COMMAND && almost_equals(c_token, "m$onochrome")) {
-	    /* Compare up to $ */
+	case MIF_MONOCHROME:
 	    mif_colour = FALSE;
 	    c_token++;
-	}
-	if (!END_OF_COMMAND && (almost_equals(c_token, "c$olor")
-				|| almost_equals(c_token, "c$olour"))) {
-	    /* Compare up to $ */
+	    break;
+	case MIF_COLOR:
 	    mif_colour = TRUE;
 	    c_token++;
-	}
+	    break;
 	/* Curve options */
-	if (!END_OF_COMMAND && almost_equals(c_token, "v$ectors")) {
-	    /* Compare up to $ */
+	case MIF_VECTORS:
 	    mif_polyline = FALSE;
 	    c_token++;
-	}
-	if (!END_OF_COMMAND && almost_equals(c_token, "p$olyline")) {
-	    /* Compare up to $ */
+	    break;
+	case MIF_POLYLINE:
 	    mif_polyline = TRUE;
 	    c_token++;
-	}
+	    break;
 	/* Short help */
-	if (!END_OF_COMMAND &&
-	    (almost_equals(c_token, "h$elp") ||
-	     almost_equals(c_token, "?$"))) {	/* Compare up to $ */
+	case MIF_HELP:
+	case MIF_OTHER:
+	default:
 	    fprintf(stderr, "\
 Usage: set terminal mif [options]\n\
 \toptions:\n\
@@ -281,8 +294,8 @@ Usage: set terminal mif [options]\n\
 \t\tpolyline /      Draw lines as continous curves\n\
 \t\tvectors         Draw lines as collections of vectors\n\n\
 \t\thelp / ?        Print short usage description on stderr\n");
-
 	    c_token++;
+	    break;
 	}
     }
     sprintf(term_options, "%s %s",

@@ -1,5 +1,5 @@
 /*
- * $Id: djsvga.trm,v 1.11 1999/06/19 20:30:46 lhecking Exp $
+ * $Id: djsvga.trm,v 1.12 1999/06/22 11:54:15 lhecking Exp $
  */
 
 /* GNUPLOT - djsvga.trm */
@@ -140,6 +140,17 @@ static int dj_width, dj_height;
 static double dj_linewidth;	/* store linewidth assignments here */
 #endif
 
+
+TERM_PUBLIC void
+DJSVGA_options()
+{
+    if (!END_OF_COMMAND && isstring(c_token)) {
+	quote_str(DJSVGA_fontname, c_token, MAX_ID_LEN);
+	c_token++;
+    }
+    sprintf(term_options, "\"%s\"", DJSVGA_fontname);
+}
+
 TERM_PUBLIC void
 DJSVGA_init()
 {
@@ -246,16 +257,6 @@ DJSVGA_reset()
 {
     GrResetColors();
     free(dj_textsave);
-}
-
-TERM_PUBLIC void
-DJSVGA_options()
-{
-    if (!END_OF_COMMAND && isstring(c_token)) {
-	quote_str(DJSVGA_fontname, c_token, MAX_ID_LEN);
-	c_token++;
-    }
-    sprintf(term_options, "\"%s\"", DJSVGA_fontname);
 }
 
 TERM_PUBLIC void

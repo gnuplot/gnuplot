@@ -1,5 +1,5 @@
 /*
- * $Id: win.trm,v 1.10 1999/06/19 20:30:58 lhecking Exp $
+ * $Id: win.trm,v 1.11 1999/06/22 11:54:24 lhecking Exp $
  */
 
 /* GNUPLOT - win.trm */
@@ -126,44 +126,61 @@ extern GW graphwin;
 
 /* Interface routines - create list of actions for Windows */
 
+enum WIN_id { WIN_DEFAULT, WIN_MONOCHROME, WIN_COLOR, WIN_OTHER };
+
+static struct gen_table WIN_opts[] =
+{
+    { "d$efault", WIN_DEFAULT },
+    { "m$onochrome", WIN_MONOCHROME },
+    { "c$olor", WIN_COLOR },
+    { "c$olour", WIN_COLOR },
+    { NULL, WIN_OTHER }
+};
+
 TERM_PUBLIC void
 WIN_options()
 {
-    if (!END_OF_COMMAND) {
-	if (almost_equals(c_token, "d$efault")) {
+    struct value a;
+
+    while (!END_OF_COMMAND) {
+	switch(lookup_table(&WIN_opst[0],c_token)) {
+	case WIN_DEFAULT:
 	    graphwin.color = TRUE;
 	    strcpy(graphwin.fontname, WINFONT);
 	    graphwin.fontsize = WINFONTSIZE;
 	    c_token++;
-	}
-    }
-    if (!END_OF_COMMAND) {
-	if (almost_equals(c_token, "m$onochrome")) {
+	    break;
+	case WIN_MONOCHROME:
 	    graphwin.color = FALSE;
 	    c_token++;
-	} else if (almost_equals(c_token, "c$olor")
-		   || almost_equals(c_token, "c$olour")) {
+	    break;
+	case WIN_COLOR:
 	    graphwin.color = TRUE;
 	    c_token++;
+	    break;
+	case WIN_OTHER:
+	default:
+	    if (isstring(c_token)) {
+		quote_str(graphwin.fontname, c_token, MAX_ID_LEN);
+		c_token++;
+	    } else {
+		/* We have font size specified */
+		graphwin.fontsize = (int) real(const_express(&a));
+	    }
+	    break;
 	}
     }
-    if (!END_OF_COMMAND && isstring(c_token)) {
-	quote_str(graphwin.fontname, c_token, MAX_ID_LEN);
-	c_token++;
-    }
-    if (!END_OF_COMMAND) {
-	/* We have font size specified */
-	struct value a;
-	graphwin.fontsize = (int) real(const_express(&a));
-    }
+
     if (graphwin.fontname[0] == '\0')
 	sprintf(term_options, "%s", graphwin.color ? "color" : "monochrome");
     else
-	sprintf(term_options, "%s \"%s\" %d", graphwin.color ? "color" : "monochrome",
+	sprintf(term_options, "%s \"%s\" %d",
+		graphwin.color ? "color" : "monochrome",
 		graphwin.fontname, graphwin.fontsize);
-    if (IsWindow(graphwin.hWndGraph) && IsIconic(graphwin.hWndGraph)) {
+
+    if (IsWindow(graphwin.hWndGraph) && IsIconic(graphwin.hWndGraph))
 	ShowWindow(graphwin.hWndGraph, SW_SHOWNORMAL);
-    }
+
     GraphRedraw(&graphwin);
 }
 

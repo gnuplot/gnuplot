@@ -1,5 +1,5 @@
 /*
- * $Id: pslatex.trm,v 1.22 1999/07/30 19:06:47 lhecking Exp $
+ * $Id: pslatex.trm,v 1.23 1999/08/07 17:19:14 lhecking Exp $
  */
 
 /* GNUPLOT - pslatex.trm */
@@ -105,65 +105,80 @@ struct text_command {
 
 static struct text_command *PSLATEX_labels;
 
+enum PSLATEX_id {
+    PSLATEX_DEFAULT, PSLATEX_COLOR, PSLATEX_MONOCHROME,
+    PSLATEX_SOLID, PSLATEX_DASHED, PSLATEX_ROTATE, PSLATEX_NOROTATE,
+    PSLATEX_AUXFILE,
+    PSLATEX_OTHER
+};
+
+static struct gen_table PSLATEX_opts[] =
+{
+    { "d$efault", PSLATEX_DEFAULT },
+    { "c$olor", PSLATEX_COLOR },
+    { "c$olour", PSLATEX_COLOR },
+    { "m$onochrome", PSLATEX_MONOCHROME },
+    { "so$lid", PSLATEX_SOLID },
+    { "da$shed", PSLATEX_DASHED },
+    { "r$otate", PSLATEX_ROTATE },
+    { "n$orotate", PSLATEX_NOROTATE },
+    { "a$uxfile", PSLATEX_AUXFILE },
+    { NULL, PSLATEX_OTHER }
+};
+
 TERM_PUBLIC void
 PSLATEX_options()
 {
-    if (!END_OF_COMMAND) {
-	if (almost_equals(c_token, "d$efault")) {
+    struct value a;
+    int ps_fontsize;
+
+    while (!END_OF_COMMAND) {
+	switch(lookup_table(&PSLATEX_opts[0],c_token)) {
+	case PSLATEX_DEFAULT:
 	    ps_color = FALSE;
 	    ps_solid = FALSE;
 	    PSLATEX_rotate = TRUE;
 	    PSLATEX_useAuxFile = FALSE;
 	    c_token++;
-	}
-    }
-    if (!END_OF_COMMAND) {
-	if (almost_equals(c_token, "c$olor")
-	    || almost_equals(c_token, "c$olour")) {
+	    break;
+	case PSLATEX_COLOR:
 	    ps_color = TRUE;
 	    c_token++;
-	}
-    }
-    if (!END_OF_COMMAND) {
-	if (almost_equals(c_token, "m$onochrome")) {
+	    break;
+	case PSLATEX_MONOCHROME:
 	    ps_color = FALSE;
 	    c_token++;
-	}
-    }
-    if (!END_OF_COMMAND) {
-	if (almost_equals(c_token, "so$lid")) {
+	    break;
+	case PSLATEX_SOLID:
 	    ps_solid = TRUE;
 	    c_token++;
-	} else if (almost_equals(c_token, "da$shed")) {
+	    break;
+	case PSLATEX_DASHED:
 	    ps_solid = FALSE;
 	    c_token++;
-	}
-    }
-    if (!END_OF_COMMAND) {
-	if (almost_equals(c_token, "r$otate")) {
+	    break;
+	case PSLATEX_ROTATE:
 	    PSLATEX_rotate = TRUE;
 	    c_token++;
-	}
-    }
-    if (!END_OF_COMMAND) {
-	if (almost_equals(c_token, "n$orotate")) {
+	    break;
+	case PSLATEX_NOROTATE:
 	    PSLATEX_rotate = FALSE;
 	    c_token++;
-	}
-    }
-    if (!END_OF_COMMAND) {
-	if (almost_equals(c_token, "a$uxfile")) {
+	    break;
+	case PSLATEX_AUXFILE:
 	    PSLATEX_useAuxFile = TRUE;
 	    c_token++;
+	    break;
+	case PSLATEX_OTHER:
+	default:
+	    /* We have font size specified */
+	    ps_fontsize = (int) real(const_express(&a));
+	    term->v_char = (unsigned int) (ps_fontsize * PS_SC);
+	    term->h_char = (unsigned int) (ps_fontsize * PS_SC / 2);
+	    break;
 	}
     }
-    if (!END_OF_COMMAND) {
-	/* We have font size specified */
-	struct value a;
-	int ps_fontsize = (int) real(const_express(&a));
-	term->v_char = (unsigned int) (ps_fontsize * PS_SC);
-	term->h_char = (unsigned int) (ps_fontsize * PS_SC / 2);
-    }
+
     /* be sure to generate an options string that PSLATEX_init understands */
 
     sprintf(term_options, "%s %s %s%s",
@@ -625,7 +640,7 @@ START_HELP(pslatex)
 " in any plain-based format (including LaTeX).",
 "",
 " Syntax:",
-"       set terminal pslatex | |pstex {<color>} {<dashed>} {<rotate>}",
+"       set terminal pslatex | pstex {<color>} {<dashed>} {<rotate>}",
 "                                     {auxfile} {<font_size>}",
 "",
 " <color> is either `color` or `monochrome`.  <rotate> is either `rotate` or",

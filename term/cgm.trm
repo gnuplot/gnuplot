@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: cgm.trm,v 1.22 1999/06/22 11:54:14 lhecking Exp $
+ * $Id: cgm.trm,v 1.23 1999/06/25 17:07:54 lhecking Exp $
  */
 
 /* GNUPLOT - cgm.trm */
@@ -160,8 +160,10 @@ static char GPFAR cgm_font_data[] =
 \005Roman\
 "};
 
+#define DEFAULT_CGMFONT "Arial Bold"
+
 /* variables to record the options */
-static char cgm_font[32] = "Arial Bold";
+static char cgm_font[32] = DEFAULT_CGMFONT;
 static unsigned int cgm_fontsize = 10;
 static unsigned cgm_linewidth;	/* line width in plot units */
 static unsigned cgm_linewidth_pt = 1;	/* line width in pt */
@@ -173,6 +175,7 @@ static TBOOLEAN cgm_dashed = TRUE;	/* dashed linestyles enabled? */
 static TBOOLEAN cgm_winword6_mode = FALSE;	/* workaround for WinWord bug? */
 
 /* prototypes for static functions */
+static void CGM_local_reset __PROTO((void));
 static void CGM_flush_polyline __PROTO((void));
 static void CGM_flush_polygon __PROTO((void));
 static void CGM_write_char_record __PROTO((int class, int cgm_id, int length,
@@ -187,7 +190,166 @@ static void CGM_write_mixed_record __PROTO((int class, int cgm_id,
 static void CGM_write_byte_record __PROTO((int class, int cgm_id, int length,
 					   char *data));
 
+enum CGM_id {
+    /* cgm mode */
+    CGM_PORTRAIT, CGM_LANDSCAPE, CGM_DEFAULT,
+    /* color */
+    CGM_MONOCHROME, CGM_COLOR,
+    /* rotation */
+    CGM_ROTATE, CGM_NOROTATE,
+    CGM_DASHED, CGM_SOLID,
+    CGM_LINEWIDTH, CGM_WIDTH, CGM_WINWORD6, CGM_OTHER
+};
 
+static struct gen_table CGM_opts[] =
+{
+    { "p$ortrait", CGM_PORTRAIT },
+    { "la$ndscape", CGM_LANDSCAPE },
+    { "de$fault", CGM_DEFAULT },
+    { "w$inword6", CGM_WINWORD6 },
+    { "m$onochrome", CGM_MONOCHROME },
+    { "c$olor", CGM_COLOR },
+    { "c$olour", CGM_COLOR },
+    { "r$otate", CGM_ROTATE },
+    { "nor$otate", CGM_NOROTATE },
+    { "da$shed", CGM_DASHED },
+    { "s$olid", CGM_SOLID },
+    { "li$newidth", CGM_LINEWIDTH },
+    { "wid$th", CGM_WIDTH },
+    { NULL, CGM_OTHER }
+};
+
+
+TERM_PUBLIC void
+CGM_options()
+{
+    struct value a;
+
+    CGM_local_reset();
+
+    while (!END_OF_COMMAND) {
+	switch(lookup_table(&CGM_opts[0],c_token)) {
+	case CGM_PORTRAIT:
+	    cgm_portrait = TRUE;
+	    c_token++;
+	    break;
+	case CGM_LANDSCAPE:
+	    cgm_portrait = FALSE;
+	    c_token++;
+	    break;
+	case CGM_DEFAULT:
+	    CGM_local_reset();
+	    c_token++;
+	    break;
+	case CGM_WINWORD6:
+	    cgm_winword6_mode = TRUE;
+	    c_token++;
+	    break;
+	case CGM_MONOCHROME:
+	    cgm_monochrome = TRUE;
+	    c_token++;
+	    break;
+	case CGM_COLOR:
+	    cgm_monochrome = FALSE;
+	    c_token++;
+	    break;
+	case CGM_ROTATE:
+	    cgm_rotate = TRUE;
+	    c_token++;
+	    break;
+	case CGM_NOROTATE:
+	    cgm_rotate = FALSE;
+	    c_token++;
+	    break;
+	case CGM_DASHED:
+	    cgm_dashed = TRUE;
+	    c_token++;
+	    break;
+	case CGM_SOLID:
+	    cgm_dashed = TRUE;
+	    c_token++;
+	    break;
+	case CGM_LINEWIDTH:
+	    c_token++;
+	    if (!END_OF_COMMAND) {
+		cgm_linewidth_pt = (unsigned int) real(const_express(&a));
+		if (cgm_linewidth_pt > 10000) {
+		    fputs("gnuplot(cgm.trm): linewidth out of range\n",
+			  stderr);
+		    cgm_linewidth_pt = 1;
+		}
+	    }
+	    break;
+	case CGM_WIDTH:
+	    c_token++;
+	    if (!END_OF_COMMAND) {
+		cgm_plotwidth = (int) real(const_express(&a));
+		if (cgm_plotwidth < 0 || cgm_plotwidth > 10000) {
+		    fputs("gnuplot(cgm.trm): width out of range\n", stderr);
+		    cgm_plotwidth = 6 * 72;
+		}
+	    }
+	    break;
+	case CGM_OTHER:
+	default:
+	    if (isstring(c_token)) {
+		quote_str(cgm_font, c_token, MAX_ID_LEN);
+		if (CGM_find_font(cgm_font, strlen(cgm_font)) == 0) {
+		    /* insert the font in the font table */
+		    size_t n = strlen(cgm_font);
+		    if (n + 1 <= sizeof(cgm_font_data) && n <= 255) {
+			cgm_font_data[0] = n;
+			strncpy(cgm_font_data + 1, cgm_font, n);
+			cgm_font_data[n + 1] = 0;
+		    }
+		}
+		c_token++;
+	    } else {
+		/* We have font size specified */
+		cgm_fontsize = (int) real(const_express(&a));
+		term->v_char = (unsigned int) (cgm_fontsize * CGM_PT);
+		term->h_char = (unsigned int) (cgm_fontsize * CGM_PT * 5 / 9);
+	    }
+	    break;
+	}
+    }
+
+    if (cgm_portrait) {
+	term->xmax = CGM_SMALL - CGM_MARGIN;
+	term->ymax = CGM_LARGE - CGM_MARGIN;
+    } else {
+	term->xmax = CGM_LARGE - CGM_MARGIN;
+	term->ymax = CGM_SMALL - CGM_MARGIN;
+    }
+
+    sprintf(default_font, "%s,%d", cgm_font, cgm_fontsize);
+    /* default_font holds the font and size set at 'set term' */
+    sprintf(term_options, "%s %s %s %s %s width %d linewidth %d \"%s\" %d",
+	    cgm_portrait ? "portrait" : "landscape",
+	    cgm_monochrome ? "monochrome" : "color",
+	    cgm_rotate ? "rotate" : "norotate",
+	    cgm_dashed ? "dashed" : "solid",
+	    cgm_winword6_mode ? "winword6" : "",
+	    cgm_plotwidth,
+	    cgm_linewidth_pt,
+	    cgm_font, cgm_fontsize);
+}
+
+static void
+CGM_local_reset()
+{
+    strcpy(cgm_font, DEFAULT_CGMFONT);
+    cgm_fontsize = 10;
+    term->v_char = (unsigned int) (cgm_fontsize * CGM_PT);
+    term->h_char = (unsigned int) (cgm_fontsize * CGM_PT * 5 / 9);
+    cgm_linewidth_pt = 1;
+    cgm_monochrome = FALSE;
+    cgm_plotwidth = 6 * 72;
+    cgm_portrait = FALSE;
+    cgm_rotate = TRUE;
+    cgm_dashed = TRUE;
+    cgm_winword6_mode = FALSE;
+}
 
 TERM_PUBLIC void
 CGM_init()
@@ -963,149 +1125,6 @@ CGM_flush_polygon()
     cgm_coords = 0;
 }
 
-TERM_PUBLIC void
-CGM_options()
-{
-    strcpy(cgm_font, "Arial Bold");
-    cgm_fontsize = 10;
-    term->v_char = (unsigned int) (cgm_fontsize * CGM_PT);
-    term->h_char = (unsigned int) (cgm_fontsize * CGM_PT * 5 / 9);
-    cgm_linewidth_pt = 1;
-    cgm_monochrome = FALSE;
-    cgm_plotwidth = 6 * 72;
-    cgm_portrait = FALSE;
-    cgm_rotate = TRUE;
-    cgm_dashed = TRUE;
-    cgm_winword6_mode = FALSE;
-    while (!END_OF_COMMAND) {
-	if (almost_equals(c_token, "p$ortrait")) {
-	    cgm_portrait = TRUE;
-	    c_token++;
-	    continue;
-	}
-	if (almost_equals(c_token, "la$ndscape")) {
-	    cgm_portrait = FALSE;
-	    c_token++;
-	    continue;
-	}
-	if (almost_equals(c_token, "de$fault")) {
-	    strcpy(cgm_font, "Arial Bold");
-	    cgm_fontsize = 10;
-	    term->v_char = (unsigned int) (cgm_fontsize * CGM_PT);
-	    term->h_char = (unsigned int) (cgm_fontsize * CGM_PT * 5 / 9);
-	    cgm_linewidth_pt = 1;
-	    cgm_monochrome = FALSE;
-	    cgm_plotwidth = 6 * 72;
-	    cgm_portrait = FALSE;
-	    cgm_rotate = TRUE;
-	    cgm_dashed = TRUE;
-	    cgm_winword6_mode = FALSE;
-	    c_token++;
-	    continue;
-	}
-	if (almost_equals(c_token, "w$inword6")) {
-	    cgm_winword6_mode = TRUE;
-	    c_token++;
-	    continue;
-	}
-	if (almost_equals(c_token, "m$onochrome")) {
-	    cgm_monochrome = TRUE;
-	    c_token++;
-	    continue;
-	}
-	if (almost_equals(c_token, "c$olor")
-	    || almost_equals(c_token, "c$olour")) {
-	    cgm_monochrome = FALSE;
-	    c_token++;
-	    continue;
-	}
-	if (almost_equals(c_token, "r$otate")) {
-	    cgm_rotate = TRUE;
-	    c_token++;
-	    continue;
-	}
-	if (almost_equals(c_token, "nor$otate")) {
-	    cgm_rotate = FALSE;
-	    c_token++;
-	    continue;
-	}
-	if (almost_equals(c_token, "da$shed")) {
-	    cgm_dashed = TRUE;
-	    c_token++;
-	    continue;
-	}
-	if (almost_equals(c_token, "s$olid")) {
-	    cgm_dashed = FALSE;
-	    c_token++;
-	    continue;
-	}
-	if (almost_equals(c_token, "li$newidth")) {
-	    c_token++;
-	    if (!END_OF_COMMAND) {
-		struct value a;
-		cgm_linewidth_pt = (unsigned int) real(const_express(&a));
-		if (cgm_linewidth_pt > 10000) {
-		    fputs("gnuplot(cgm.trm): linewidth out of range\n", stderr);
-		    cgm_linewidth_pt = 1;
-		}
-	    }
-	    continue;
-	}
-	if (almost_equals(c_token, "wid$th")) {
-	    c_token++;
-	    if (!END_OF_COMMAND) {
-		struct value a;
-		cgm_plotwidth = (int) real(const_express(&a));
-		if (cgm_plotwidth < 0 || cgm_plotwidth > 10000) {
-		    fputs("gnuplot(cgm.trm): width out of range\n", stderr);
-		    cgm_plotwidth = 6 * 72;
-		}
-	    }
-	    continue;
-	}
-	break;
-    }
-
-    if (!END_OF_COMMAND && isstring(c_token)) {
-	quote_str(cgm_font, c_token, MAX_ID_LEN);
-	if (CGM_find_font(cgm_font, strlen(cgm_font)) == 0) {
-	    /* insert the font in the font table */
-	    size_t n = strlen(cgm_font);
-	    if (n + 1 <= sizeof(cgm_font_data) && n <= 255) {
-		cgm_font_data[0] = n;
-		strncpy(cgm_font_data + 1, cgm_font, n);
-		cgm_font_data[n + 1] = 0;
-	    }
-	}
-	c_token++;
-    }
-    if (!END_OF_COMMAND) {
-	/* We have font size specified */
-	struct value a;
-	cgm_fontsize = (int) real(const_express(&a));
-	term->v_char = (unsigned int) (cgm_fontsize * CGM_PT);
-	term->h_char = (unsigned int) (cgm_fontsize * CGM_PT * 5 / 9);
-    }
-    if (cgm_portrait) {
-	term->xmax = CGM_SMALL - CGM_MARGIN;
-	term->ymax = CGM_LARGE - CGM_MARGIN;
-    } else {
-	term->xmax = CGM_LARGE - CGM_MARGIN;
-	term->ymax = CGM_SMALL - CGM_MARGIN;
-    }
-
-    sprintf(default_font, "%s,%d", cgm_font, cgm_fontsize);
-    /* default_font holds the font and size set at 'set term' */
-    sprintf(term_options, "%s %s %s %s %s width %d linewidth %d \"%s\" %d",
-	    cgm_portrait ? "portrait" : "landscape",
-	    cgm_monochrome ? "monochrome" : "color",
-	    cgm_rotate ? "rotate" : "norotate",
-	    cgm_dashed ? "dashed" : "solid",
-	    cgm_winword6_mode ? "winword6" : "",
-	    cgm_plotwidth,
-	    cgm_linewidth_pt,
-	    cgm_font, cgm_fontsize);
-}
 
 #ifdef DEFEAT_ASSERTIONS
 #define NDEBUG

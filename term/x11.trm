@@ -1,5 +1,5 @@
 /*
- * $Id: x11.trm,v 1.19 1999/06/22 11:54:25 lhecking Exp $
+ * $Id: x11.trm,v 1.20 1999/06/30 11:58:44 lhecking Exp $
  *
  */
 
@@ -109,7 +109,7 @@ typedef enum { hasNoArg, hasArg } OptionArg;
 static struct x11opt {
     const char *option;	/* Name of option */
     OptionArg arg;	/* Whether option has argument */
-}  X11_opts[] =
+}  X11_cmdopts[] =
 {
    { "-mono", hasNoArg }, { "-gray", hasNoArg }, { "-clear", hasNoArg },
    { "-tvtwm", hasNoArg }, { "-pointsize", hasArg },
@@ -128,7 +128,7 @@ static struct x11opt {
    { "-persist", hasNoArg }
 };
 
-#define X11_nopts (sizeof(X11_opts) / sizeof(X11_opts[0]))
+#define X11_nopts (sizeof(X11_cmdopts) / sizeof(X11_cmdopts[0]))
 
 static FILE *X11_ipc;
 
@@ -165,11 +165,11 @@ char *argv[];
 
     while (++argv, ++xargv, --argc > 0) {
 	for (n = 0; n < X11_nopts; n++) {
-	    if (strcmp(*argv, X11_opts[n].option) == 0) {
+	    if (strcmp(*argv, X11_cmdopts[n].option) == 0) {
 		optvec[i++] = *xargv;
 		if (strcmp(*argv, "-display") == 0)
 		    X11_Display++;
-		if (X11_opts[n].arg == hasArg) {
+		if (X11_cmdopts[n].arg == hasArg) {
 		    if (--argc <= 0)
 			return nx11;
 		    optvec[i++] = *++xargv, ++argv;
@@ -189,17 +189,31 @@ char *argv[];
 
 static unsigned int X11_plot_number;
 
+enum X11_id { X11_RESET, X11_OTHER };
+
+static struct gen_table X11_opts[] = 
+{
+    { "res$et", X11_RESET },
+    { NULL, X11_OTHER }
+};
+
 TERM_PUBLIC void
 X11_options()
 {
-    if (almost_equals(c_token, "res$et")) {
-	X11_atexit HANDLER_PARAMS;	/* tell gnuplot_x11 to shut down */
-	++c_token;
-    }
-    if (!END_OF_COMMAND) {
-	struct value a;
-	X11_plot_number = (int) real(const_express(&a));
-	/* let gnuplot_x11 check range */
+    struct value a;
+
+    while (!END_OF_COMMAND) {
+	switch(lookup_table(&X11_opts[0],c_token)) {
+	case X11_RESET:
+	    X11_atexit HANDLER_PARAMS;	/* tell gnuplot_x11 to shut down */
+	    ++c_token;
+	    break;
+	case X11_OTHER:
+	default:
+	    X11_plot_number = (int) real(const_express(&a));
+	    /* let gnuplot_x11 check range */
+	    break;
+	}
     }
     sprintf(term_options, "%d", X11_plot_number);
 }

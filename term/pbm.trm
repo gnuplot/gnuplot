@@ -1,5 +1,5 @@
 /*
- * $Id: pbm.trm,v 1.14 1999/07/30 19:06:46 lhecking Exp $
+ * $Id: pbm.trm,v 1.15 1999/08/07 17:19:13 lhecking Exp $
  *
  */
 
@@ -98,6 +98,24 @@ static int pgm_gray[] = { 7, 1, 6, 5, 4, 3, 2, 1, 7 };	/* grays  */
 /* bit3=!intensify, bit2=!red, bit1=!green, bit0=!blue */
 static int ppm_color[] ={ 15, 8, 3, 5, 6, 2, 4, 1, 11, 13, 14 };  /* colors */
 
+enum PBM_id {
+    PBM_SMALL, PBM_MEDIUM, PBM_LARGE,
+    PBM_MONOCHROME, PBM_GRAY, PBM_COLOR,
+    PBM_OTHER
+};
+
+static struct gen_table PBM_opts[] =
+{
+    { "s$mall", PBM_SMALL },
+    { "me$dium", PBM_MEDIUM },
+    { "l$arge", PBM_LARGE },
+    { "mo$nochrome", PBM_MONOCHROME },
+    { "g$ray", PBM_GRAY },
+    { "c$olor", PBM_COLOR },
+    { "c$olour", PBM_COLOR },
+    { NULL, PBM_OTHER }
+};
+
 TERM_PUBLIC void
 PBMoptions()
 {
@@ -107,26 +125,39 @@ PBMoptions()
     term_options[0] = NUL;
 
     while (!END_OF_COMMAND) {
-	if (almost_equals(c_token, "s$mall"))
+	switch(lookup_table(&PBM_opts[0],c_token)) {
+	case PBM_SMALL:
 	    pbm_font = 1;
-	else if (almost_equals(c_token, "me$dium"))
+	    c_token++;
+	    break;
+	case PBM_MEDIUM:
 	    pbm_font = 2;
-	else if (almost_equals(c_token, "l$arge"))
+	    c_token++;
+	    break;
+	case PBM_LARGE:
 	    pbm_font = 3;
-	else if (almost_equals(c_token, "mo$nochrome"))
+	    c_token++;
+	    break;
+	case PBM_MONOCHROME:
 	    pbm_mode = 0;
-	else if (almost_equals(c_token, "g$ray"))
+	    c_token++;
+	    break;
+	case PBM_GRAY:
 	    pbm_mode = 1;
-	else if (almost_equals(c_token, "c$olor")
-		 || almost_equals(c_token, "c$olour"))
+	    c_token++;
+	    break;
+	case PBM_COLOR:
 	    pbm_mode = 2;
-	else {
+	    c_token++;
+	    break;
+	case PBM_OTHER:
+	default:
 	    /* reset to default, since term is already set */ 
 	    pbm_font = 1;
 	    pbm_mode = 0;
 	    int_error(c_token, "expecting: {small, medium, large} and {monochrome, gray, color}");
+	    break;
 	}
-	c_token++;
     }
 
     /* setup options string */

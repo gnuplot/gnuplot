@@ -1,5 +1,5 @@
 /*
- * $Id: gif.trm,v 1.21 1999/07/30 19:06:45 lhecking Exp $
+ * $Id: gif.trm,v 1.22 1999/08/07 17:19:11 lhecking Exp $
  */
 
 /* GNUPLOT -- gif.trm */
@@ -116,6 +116,7 @@ TERM_PUBLIC int GIF_text_angle __PROTO((int ang));
 TERM_PUBLIC void GIF_reset __PROTO((void));
 
 #include "gd.h"
+
 extern gdFontPtr gdFontSmall;	/* 6x12 */
 extern gdFontPtr gdFontLarge;	/* 8x16 */
 extern gdFontPtr gdFontMediumBold;	/* 7x13 */
@@ -277,6 +278,27 @@ static unsigned int gif_color_rgbs[] =
 };
 #define GIF_N_DEFAULT_COLORS (sizeof(gif_color_rgbs)/sizeof(gif_color_rgbs[0]))
 
+enum GIF_id {
+    GIF_TRANSPARENT, GIF_INTERLACE,
+    /* FOnt size */
+    GIF_TINY, GIF_SMALL, GIF_MEDIUM, GIF_LARGE, GIF_GIANT,
+    GIF_SIZE,
+    GIF_OTHER
+};
+
+static struct gen_table GIF_opts[] =
+{
+    { "tr$ansparent", GIF_TRANSPARENT },
+    { "i$nterlace", GIF_INTERLACE },
+    { "ti$ny", GIF_TINY },
+    { "s$mall", GIF_SMALL },
+    { "m$edium", GIF_MEDIUM },
+    { "l$arge", GIF_LARGE },
+    { "g$iant", GIF_GIANT },
+    { "si$ze", GIF_SIZE },
+    { NULL, GIF_OTHER }
+};
+
 /*
  * _options()  Called when terminal type is selected.  
  * This procedure should parse options on the command line.  A list of the 
@@ -287,7 +309,11 @@ static unsigned int gif_color_rgbs[] =
 TERM_PUBLIC void
 GIF_options()
 {
+    struct value s;
     int gif_font, i;
+    char *string;
+    unsigned long color;
+    
     term_options[0] = NUL;
     gif_state.n_colors = 0;
     gif_state.flags = 0;
@@ -295,44 +321,50 @@ GIF_options()
     GIF_font = gdfont;
 
     while (!END_OF_COMMAND) {
-	if (almost_equals(c_token, "tr$ansparent")) {
+	switch(lookup_table(&GIF_opts[0],c_token)) {
+	case GIF_TRANSPARENT:
 	    gif_state.flags |= GIF_USE_TRANSPARENT;
 	    ++c_token;
-	} else if (almost_equals(c_token, "i$nterlace")) {
+	    break;
+	case GIF_INTERLACE:
 	    gif_state.flags |= GIF_USE_INTERLACE;
 	    ++c_token;
-	} else if (almost_equals(c_token,"ti$ny")) {
+	    break;
+	case GIF_TINY:
 	    GIF_font=gdFontTiny;
 	    gif_font = 0;
 	    term->v_char = (unsigned int)(8);
 	    term->h_char = (unsigned int)(5);
 	    ++c_token;
-	} else if (almost_equals(c_token, "s$mall")) {
+	case GIF_SMALL:
 	    GIF_font = gdFontSmall;
 	    gif_font = 1;
 	    term->v_char = (unsigned int) (12);
 	    term->h_char = (unsigned int) (6);
 	    ++c_token;
-	} else if (almost_equals(c_token, "m$edium")) {
+	    break;
+	case GIF_MEDIUM:
 	    GIF_font = gdFontMediumBold;
 	    gif_font = 2;
 	    term->v_char = (unsigned int) (13);
 	    term->h_char = (unsigned int) (7);
 	    ++c_token;
-	} else if (almost_equals(c_token, "l$arge")) {
+	    break;
+	case GIF_LARGE:
 	    GIF_font = gdFontLarge;
 	    gif_font = 3;
 	    term->v_char = (unsigned int) (16);
 	    term->h_char = (unsigned int) (8);
 	    ++c_token;
-	} else if(almost_equals(c_token,"g$iant")) {
+	    break;
+	case GIF_GIANT:
 	    GIF_font=gdFontGiant;
 	    gif_font = 4;
 	    term->v_char = (unsigned int)(15);
 	    term->h_char = (unsigned int)(9);
 	    ++c_token;
-	} else if (almost_equals(c_token, "si$ze")) {
-	    struct value s;
+	    break;
+	case GIF_SIZE:
 	    c_token++;
 	    if (END_OF_COMMAND) {
 		GIF_XMAX = GREG_XMAX;
@@ -350,9 +382,12 @@ GIF_options()
 		    term->xmax = GIF_XMAX;
 		}
 	    }
-	} else {		/* not "size" */
-	    char *string = input_line + token[c_token].start_index;
-	    unsigned long color;
+	    break;
+	case GIF_OTHER:
+	default:
+	    /* not "size" */
+	    string = input_line + token[c_token].start_index;
+
 	    if (sscanf(string, "x%lx", &color) != 1) {
 		int_error(c_token, "invalid color spec, must be xRRGGBB");
 	    } else if (gif_state.n_colors == GIF_MAX_COLORS) {
@@ -362,6 +397,7 @@ GIF_options()
 		gif_state.rgb_table[gif_state.n_colors++] = color;
 		++c_token;
 	    }
+	    break;
 	}
     }
 

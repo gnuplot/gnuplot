@@ -1,5 +1,5 @@
 /*
- * $Id: corel.trm,v 1.9 1999/06/19 20:30:46 lhecking Exp $
+ * $Id: corel.trm,v 1.10 1999/06/22 11:54:15 lhecking Exp $
  */
 
 /*
@@ -55,8 +55,10 @@ TERM_PUBLIC int COREL_justify_text __PROTO((enum JUSTIFY mode));
 #ifndef TERM_PROTO_ONLY
 #ifdef TERM_BODY
 
+#define DEFAULT_CORELFONT "SwitzerlandLight"
+
 /* plots for publication should be sans-serif (don't use TimesRoman) */
-char corel_font[MAX_ID_LEN + 1] = "SwitzerlandLight";	/* name of font */
+char corel_font[MAX_ID_LEN + 1] = DEFAULT_CORELFONT;	/* name of font */
 int corel_fontsize = 22;	/* size of font in pts */
 TBOOLEAN corel_color = FALSE;
 TBOOLEAN corel_stroke = FALSE;
@@ -75,39 +77,59 @@ unsigned int corel_xmax = CORELD_XMAX;
 unsigned int corel_ymax = CORELD_YMAX;
 float corel_lw = CORELD_LW;
 
+enum COREL_id {COREL_DEFAULT, COREL_MONOCHROME, COREL_COLOR, COREL_OTHER };
+
+static struct gen_table COREL_opts[] =
+{
+    { "def$ault", COREL_DEFAULT},
+    { "mono$chrome", COREL_MONOCHROME },
+    { "color$", COREL_COLOR },
+    { "colour$", COREL_COLOR },
+    { NULL, COREL_OTHER }
+};
+
 TERM_PUBLIC void
 COREL_options()
 {
     struct value a;
 
-    if (!END_OF_COMMAND && almost_equals(c_token, "def$ault")) {
-	corel_color = FALSE;
-	strcpy(corel_font, "SwitzerlandLight");
-	corel_fontsize = 22;
-	corel_lw = CORELD_LW;
-	corel_xmax = CORELD_XMAX;
-	corel_ymax = CORELD_YMAX;
-	c_token++;
+    while (!END_OF_COMMAND) {
+	switch(lookup_table(&COREL_opts[0],c_token)) {
+	case COREL_DEFAULT:
+	    corel_color = FALSE;
+	    strcpy(corel_font, DEFAULT_CORELFONT);
+	    corel_fontsize = 22;
+	    corel_lw = CORELD_LW;
+	    corel_xmax = CORELD_XMAX;
+	    corel_ymax = CORELD_YMAX;
+	    c_token++;
+	    break;
+	case COREL_MONOCHROME:
+	    corel_color = FALSE;
+	    c_token++;
+	    break;
+	case COREL_COLOR:
+	    corel_color = TRUE;
+	    c_token++;
+	    break;
+	case COREL_OTHER:
+	default:
+	    /* font name */
+	    if (isstring(c_token)) {
+		quote_str(corel_font, c_token, MAX_ID_LEN);
+		c_token++;
+	    } else {
+		/* We have font size specified */
+		corel_fontsize = (int) real(const_express(&a));
+		c_token++;
+		term->v_char = (unsigned int) (corel_fontsize * COREL_SC);
+		term->h_char = (unsigned int) (corel_fontsize * COREL_SC * 6 / 10);
+	    }
+	    break;
+	}
     }
-    if (!END_OF_COMMAND && almost_equals(c_token, "mono$chrome")) {
-	corel_color = FALSE;
-	c_token++;
-    } else if (!END_OF_COMMAND && (almost_equals(c_token, "color$")
-				   || almost_equals(c_token, "colour$"))) {
-	corel_color = TRUE;
-	c_token++;
-    }
-    if (!END_OF_COMMAND && isstring(c_token)) {
-	quote_str(corel_font, c_token, MAX_ID_LEN);
-	c_token++;
-    }
-    if (!END_OF_COMMAND) {
-	/* We have font size specified */
-	corel_fontsize = (int) real(const_express(&a));
-	c_token++;
-	term->v_char = (unsigned int) (corel_fontsize * COREL_SC);
-	term->h_char = (unsigned int) (corel_fontsize * COREL_SC * 6 / 10);
-    }
+
+    /* FIXME - argh. Stupid syntax alert here */
     if (!END_OF_COMMAND) {
 	corel_xmax = (unsigned int) (real(const_express(&a)) * 720);
 	c_token++;
@@ -428,7 +450,7 @@ START_HELP(corel)
 " Syntax:",
 "       set terminal corel {  default",
 "                           | {monochrome | color",
-"                                {<fontname> {\"<fontsize>\" ",
+"                                {\"<font>\" {<fontsize> ",
 "                                   {<xsize> <ysize> {<linewidth> }}}}}",
 "",
 " where the fontsize and linewidth are specified in points and the sizes in",

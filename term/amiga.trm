@@ -1,5 +1,5 @@
 /*
- * $Id: amiga.trm,v 1.9 1999/06/19 20:30:44 lhecking Exp $
+ * $Id: amiga.trm,v 1.10 1999/06/22 11:52:55 lhecking Exp $
  *
  */
 
@@ -110,7 +110,6 @@ TERM_PUBLIC void AMIGA_resume __PROTO((void));
 
 
 #ifndef TERM_PROTO_ONLY
-
 #ifdef TERM_BODY
 
 #ifdef AMIGA_AC_5
@@ -168,8 +167,8 @@ struct Library *DiskfontBase;
 
 /* Name of font, size in pts */
 static char *AMIGA_FontName = NULL;
-static int AMIGA_FontNameLen;
-static int AMIGA_FontSize;
+static int AMIGA_FontNameLen = 0;
+static int AMIGA_FontSize = 8;
 #define AMIGA_DEFAULTFONT "topaz"
 
 /* Font stuff */
@@ -258,6 +257,80 @@ static unsigned int AMIGA_ymax, AMIGA_xmax;
 static WORD AMIGA_cwd, AMIGA_cht, AMIGA_bsl, AMIGA_vadj;
 /* Common RastPort */
 static struct RastPort *AMIGA_RastPort;
+
+
+enum AMIGA_id { AMI_SCREEN, AMI_WINDOW, AMI_OTHER };
+
+static struct gen_table AMIGA_opts[] =
+{
+    {"scr$een", AMI_SCREEN },
+    {"win$dow", AMI_WINDOW },
+    { NULL, AMI_OTHER }
+};
+
+
+/*
+ * Scan terminal options
+ */
+TERM_PUBLIC void
+AMIGA_options()
+{
+
+    while (!END_OF_COMMAND) {
+	switch(lookup_table(&AMIGA_opts[0],c_token)) {
+	case AMI_SCREEN:
+	    AMIGA_window_mode = FALSE;
+	    c_token++;
+	    break;
+	case AMI_WINDOW:
+	    AMIGA_window_mode = TRUE;
+	    c_token++;
+	case AMI_OTHER:
+	default:
+	    /* Font name */
+	    if (isstring(c_token)) {
+		if (AMIGA_FontName != NULL) {
+		    FreeMem(AMIGA_FontName,AMIGA_FontNameLen);
+		    AMIGA_FontName = NULL;
+		    AMIGA_FontNameLen = 0;
+		}
+
+		AMIGA_FontNameLen = token_len(c_token);
+	    
+		AMIGA_FontName = AllocMem(AMIGA_FontNameLen,0);
+		if (AMIGA_FontName == NULL)
+		    AMIGA_ERROR("No memory for font name", RETURN_FAIL);
+		quote_str(AMIGA_FontName, c_token, AMIGA_FontNameLen);
+		c_token++;
+	    } else {
+		/* Font size */
+		struct value a;
+		AMIGA_FontSize = (int) real(const_express(&a));
+	    }
+
+	    break;
+	}
+    }
+
+    if (AMIGA_FontName == NULL && AMIGA_FontSize != 0) {
+	AMIGA_FontNameLen = strlen(AMIGA_DEFAULTFONT) + 1;
+	AMIGA_FontName = AllocMem(AMIGA_FontNameLen,0);
+	if (AMIGA_FontName == NULL)
+	    AMIGA_ERROR("No memory for font name", RETURN_FAIL);
+	strcpy(AMIGA_FontName, AMIGA_DEFAULTFONT);
+    }
+    if (AMIGA_FontName != NULL && AMIGA_FontSize == 0)
+	AMIGA_FontSize = 8;
+
+    if (AMIGA_FontName != NULL && AMIGA_FontSize != 0) {
+	sprintf(default_font, "%s,%d", AMIGA_FontName, AMIGA_FontSize);
+	sprintf(term_options, "%s \"%s\" %d", \
+		(AMIGA_window_mode != TRUE ? "screen" : "window"), \
+		AMIGA_FontName, AMIGA_FontSize);
+    } else
+	sprintf(term_options, "%s", (AMIGA_window_mode != TRUE ? "screen" : "window"));
+}
+
 
 /*
  * Close open font, screen and libraries.
@@ -427,63 +500,6 @@ AMIGA_init()
 
     SetDrMd(AMIGA_RastPort, JAM1);
 
-}
-
-
-/*
- * Scan terminal options
- */
-TERM_PUBLIC void
-AMIGA_options()
-{
-
-    /* Screen/Window mode */
-    if (!END_OF_COMMAND) {
-	if (almost_equals(c_token, "scr$een")) {
-	    AMIGA_window_mode = FALSE;
-	    c_token++;
-	} else if (almost_equals(c_token, "win$dow")) {
-	    AMIGA_window_mode = TRUE;
-	    c_token++;
-	}
-    }
-    /* Font name */
-    if (AMIGA_FontNameLen != 0) {
-	FreeMem(AMIGA_FontName,AMIGA_FontNameLen);
-	AMIGA_FontName = NULL;
-	AMIGA_FontNameLen = 0;
-    }
-    if (!END_OF_COMMAND && isstring(c_token)) {
-	AMIGA_FontNameLen = token_len(c_token);
-	AMIGA_FontName = AllocMem(AMIGA_FontNameLen,0);
-	if (AMIGA_FontName == NULL)
-	    AMIGA_ERROR("No memory for font name", RETURN_FAIL);
-	quote_str(AMIGA_FontName, c_token, AMIGA_FontNameLen);
-	c_token++;
-    }
-    /* Font size */
-    if (!END_OF_COMMAND) {
-	/* We have font size specified */
-	struct value a;
-	AMIGA_FontSize = (int) real(const_express(&a));
-    }
-    if (AMIGA_FontName == NULL && AMIGA_FontSize != 0) {
-	AMIGA_FontNameLen = strlen(AMIGA_DEFAULTFONT) + 1;
-	AMIGA_FontName = AllocMem(AMIGA_FontNameLen,0);
-	if (AMIGA_FontName == NULL)
-	    AMIGA_ERROR("No memory for font name", RETURN_FAIL);
-	strcpy(AMIGA_FontName, AMIGA_DEFAULTFONT);
-    }
-    if (AMIGA_FontName != NULL && AMIGA_FontSize == 0)
-	AMIGA_FontSize = 8;
-
-    if (AMIGA_FontName != NULL && AMIGA_FontSize != 0) {
-	sprintf(default_font, "%s,%d", AMIGA_FontName, AMIGA_FontSize);
-	sprintf(term_options, "%s \"%s\" %d", \
-		(AMIGA_window_mode != TRUE ? "screen" : "window"), \
-		AMIGA_FontName, AMIGA_FontSize);
-    } else
-	sprintf(term_options, "%s", (AMIGA_window_mode != TRUE ? "screen" : "window"));
 }
 
 

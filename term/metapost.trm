@@ -1,5 +1,5 @@
 /*
- * $Id: metapost.trm,v 1.4 1999/06/22 11:54:20 lhecking Exp $
+ * $Id: metapost.trm,v 1.5 1999/06/25 17:07:55 lhecking Exp $
  */
 
 /* GNUPLOT - metapost.trm */
@@ -152,9 +152,32 @@ static void MP_endline __PROTO((void));
 /* max number of path nodes before a newline */
 #define MP_LINEMAX 5
 
+enum MP_id {
+    MP_MONOCHROME, MP_COLOR,
+    MP_SOLID, MP_DASHED,
+    MP_NOTEX, MP_TEX,
+    MP_DEFAULT, MP_MAGNIFICATION, MP_OTHER
+};
+
+static struct gen_table MP_opts[] = 
+{
+    { "m$onochrome", MP_MONOCHROME },
+    { "c$olor", MP_COLOR },
+    { "c$olour", MP_COLOR },
+    { "s$olid", MP_SOLID },
+    { "da$shed", MP_DASHED },
+    { "n$otex", MP_NOTEX },
+    { "t$ex", MP_TEX },
+    { "de$fault", MP_DEFAULT },
+    { "m$agnification", MP_MAGNIFICATION },
+    { NULL, MP_OTHER }
+};
+
 TERM_PUBLIC void
 MP_options()
 {
+    struct value a;
+
     MP_color = FALSE;
     MP_solid = FALSE;
     MP_notex = FALSE;
@@ -162,62 +185,57 @@ MP_options()
     MP_textmag = 1.0;
     strcpy(MP_fontname, "cmr10");
     strcpy(default_font, "");	/* output file will store default font info */
+
     while (!END_OF_COMMAND) {
-	if (almost_equals(c_token, "m$onochrome")) {
+	switch(lookup_table(&MP_opts[0],c_token)) {
+	case MP_MONOCHROME:
 	    MP_color = FALSE;
 	    c_token++;
-	    continue;
-	}
-	if (almost_equals(c_token, "c$olor") || almost_equals(c_token, "c$olour")) {
+	    break;
+	case MP_COLOR:
 	    MP_color = TRUE;
 	    c_token++;
-	    continue;
-	}
-	if (almost_equals(c_token, "s$olid")) {
+	    break;
+	case MP_SOLID:
 	    MP_solid = TRUE;
 	    c_token++;
-	    continue;
-	}
-	if (almost_equals(c_token, "da$shed")) {
+	    break;
+	case MP_DASHED:
 	    MP_solid = FALSE;
 	    c_token++;
-	    continue;
-	}
-	if (almost_equals(c_token, "n$otex")) {
+	    break;
+	case MP_NOTEX:
 	    MP_notex = TRUE;
 	    strcpy(MP_fontname, "pcrr8r");
 	    c_token++;
-	    continue;
-	}
-	if (almost_equals(c_token, "t$ex")) {
+	    break;
+	case MP_TEX:
 	    MP_notex = FALSE;
 	    c_token++;
-	    continue;
-	}
-	if (almost_equals(c_token, "de$fault")) {
+	    break;
+	case MP_DEFAULT:
 	    c_token++;
-	    continue;
-	}
-	if (almost_equals(c_token, "m$agnification")) {
+	    break;
+	case MP_MAGNIFICATION:
 	    c_token++;
-	    if (!END_OF_COMMAND) {	/* global text scaling */
-		struct value a;
+	    if (!END_OF_COMMAND) /* global text scaling */
 		MP_textmag = (double) real(const_express(&a));
+	    /* c_token++; */ /* Needed ??? */
+	    break;
+	case MP_OTHER:
+	default:
+	    if (isstring(c_token)) {		/* font name */
+		quote_str(MP_fontname, c_token, MAX_ID_LEN);
+		c_token++;
 	    }
-	    c_token++;
-	    continue;
+	    if (!END_OF_COMMAND) {	/*font size */
+		MP_fontsize = (double) real(const_express(&a));
+		c_token++;
+	    }
+	    break;
 	}
-	break;
     }
-    if (!END_OF_COMMAND && isstring(c_token)) {		/* font name */
-	quote_str(MP_fontname, c_token, MAX_ID_LEN);
-	c_token++;
-    }
-    if (!END_OF_COMMAND) {	/*font size */
-	struct value a;
-	MP_fontsize = (double) real(const_express(&a));
-	c_token++;
-    }
+
     /* minimal error recovery: */
     if (MP_fontsize < 5.0)
 	MP_fontsize = 5.0;
@@ -230,6 +248,7 @@ MP_options()
     } else {
 	term->h_char = (unsigned int) (MP_DPI * MP_fontsize * MP_textmag * 5.25 / 720 + 0.5);
     }
+
     sprintf(term_options, "%s%s%s%s%6.3f \"%s\" %5.2f",
 	    MP_color ? "color " : "", MP_solid ? "solid " : "",
 	    MP_notex ? "notex " : "", "mag ",
@@ -667,8 +686,9 @@ START_HELP(mp)
 " default, Metapost passes all text through TeX.  This has the advantage of",
 " allowing essentially  any TeX symbols in titles and labels.",
 "",
-" The `mp` terminal is selected with a command of the form",
+" Syntax:",
 "    set term mp {color} {solid} {notex} {mag <magsize>} {\"<name>\"} {<size>}",
+????"",
 " The option `color` causes lines to be drawn in color (on a printer or display",
 " that supports it), `monochrome` (or nothing) selects black lines.  The option",
 " `solid` draws solid lines, while `dashed` (or nothing) selects lines with",

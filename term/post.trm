@@ -1,5 +1,5 @@
 /*
- * $Id: post.trm,v 1.32 1999/07/30 19:06:47 lhecking Exp $
+ * $Id: post.trm,v 1.33 1999/08/07 17:19:13 lhecking Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -517,23 +517,63 @@ static int PS_taken;
 static int PS_linetype_last;
 static TBOOLEAN PS_relative_ok;
 
+enum PS_id {
+    PS_PORTRAIT, PS_LANDSCAPE,
+    PS_EPSF, PS_DEFAULT, PS_ENHANCED, PS_NOENHANCED,
+    PS_MONOCHROME, PS_COLOR, PS_BLACKTEXT, PS_COLORTEXT,
+    PS_SOLID, PS_DASHED, PS_DASHLENGTH, PS_LINEWIDTH,
+    PS_SIMPLEX, PS_DUPLEX, PS_DEFAULTPLEX,
+    PS_OTHER
+};
+
+static struct gen_table PS_opts[] =
+{
+    { "p$ortrait", PS_PORTRAIT },
+    { "l$andscape", PS_LANDSCAPE },
+    { "ep$sf", PS_LANDSCAPE },
+    { "enh$anced", PS_ENHANCED },
+    { "noenh$anced", PS_NOENHANCED },
+    { "m$onochrome", PS_MONOCHROME },
+    { "c$olor", PS_COLOR },
+    { "c$olour", PS_COLOR },
+    { "b$lacktext", PS_BLACKTEXT },
+    { "color$text", PS_COLORTEXT },
+    { "colour$text", PS_COLORTEXT },
+    { "so$lid", PS_SOLID },
+    { "da$shed", PS_DASHED },
+    { "dashl$ength", PS_DASHLENGTH },
+    { "dl", PS_DASHLENGTH },
+    { "linew$idth", PS_LINEWIDTH },
+    { "lw", PS_LINEWIDTH },
+    { "si$mplex", PS_SIMPLEX },
+    { "du$plex", PS_DUPLEX },
+    { "defaultp$lex", PS_DEFAULTPLEX },
+    { NULL, PS_OTHER }
+};
+
 TERM_PUBLIC void
 PS_options()
 {
-    if (!END_OF_COMMAND) {
-	if (almost_equals(c_token,"p$ortrait")) {
+    struct value a;
+
+    while (!END_OF_COMMAND) {
+	switch(lookup_table(&PS_opts[0],c_token)) {
+	case PS_PORTRAIT:
 	    ps_portrait = TRUE;
 	    ps_eps = FALSE;
 	    c_token++;
-	} else if (almost_equals(c_token,"l$andscape")) {
+	    break;
+	case PS_LANDSCAPE:
 	    ps_portrait = FALSE;
 	    ps_eps = FALSE;
 	    c_token++;
-	} else if (almost_equals(c_token,"ep$sf")) {
+	    break;
+	case PS_EPSF:
 	    ps_portrait = TRUE;
 	    ps_eps = TRUE;
 	    c_token++;
-	} else if (almost_equals(c_token,"d$efault")) {
+	    break;
+	case PS_DEFAULT:
 	    ps_portrait = FALSE;
 	    ps_eps = FALSE;
 	    ps_color = FALSE;
@@ -548,100 +588,84 @@ PS_options()
 	    term->h_char = (unsigned int)(ps_fontsize*PS_SC*6/10);
 	    term->put_text = PS_put_text;
 	    c_token++;
-	}
-    }
-
-    if (almost_equals(c_token, "enh$anced")) {
-	term->put_text = ENHPS_put_text;
-	term->set_font = ENHPS_set_font;
-	++c_token;
-    } else if (almost_equals(c_token, "noenh$anced")) {
-	term->put_text = PS_put_text;
-	term->set_font = PS_set_font;
-	++c_token;
-    }
-
-    if (!END_OF_COMMAND) {
-	if (almost_equals(c_token,"m$onochrome")) {
+	    break;
+	case PS_ENHANCED:
+	    term->put_text = ENHPS_put_text;
+	    term->set_font = ENHPS_set_font;
+	    ++c_token;
+	    break;
+	case PS_NOENHANCED:
+	    term->put_text = PS_put_text;
+	    term->set_font = PS_set_font;
+	    ++c_token;
+	    break;
+	case PS_MONOCHROME:
 	    ps_color = FALSE;
 	    c_token++;
-	} else if (almost_equals(c_token,"c$olor")
-		   || almost_equals(c_token,"c$olour")) {
+	    break;
+	case PS_COLOR:
 	    ps_color = TRUE;
 	    c_token++;
-	}
-    }
-
-    if (!END_OF_COMMAND) {
-	if (almost_equals(c_token,"b$lacktext")) {
+	    break;
+	case PS_BLACKTEXT:
 	    ps_blacktext = TRUE;
 	    c_token++;
-	} else if (almost_equals(c_token,"color$text") ||
-		   almost_equals(c_token,"colour$text")) {
+	    break;
+	case PS_COLORTEXT:
 	    ps_blacktext = FALSE;
 	    c_token++;
-	}
-    }
-
-    if (!END_OF_COMMAND) {
-	if (almost_equals(c_token,"so$lid")) {
+	    break;
+	case PS_SOLID:
 	    ps_solid = TRUE;
 	    c_token++;
-	} else if (almost_equals(c_token,"da$shed")) {
+	    break;
+	case PS_DASHED:
 	    ps_solid = FALSE;
 	    c_token++;
-	}
-    }
-
-    if (!END_OF_COMMAND) {
-	if (almost_equals(c_token,"dashl$ength") ||
-	    almost_equals(c_token,"dl")) {
-	    struct value a;
+	    break;
+	case PS_DASHLENGTH:
 	    c_token++;
 	    ps_dash_length = real(const_express(&a));
-	    if (ps_dash_length <= 0.0) ps_dash_length = 1.0;
-	}
-    }
-
-    if (!END_OF_COMMAND) {
-	if (almost_equals(c_token,"linew$idth") ||
-	    almost_equals(c_token,"lw")) {
-	    struct value a;
+	    if (ps_dash_length <= 0.0)
+		ps_dash_length = 1.0;
+	    break;
+	case PS_LINEWIDTH:
 	    c_token++;
 	    ps_linewidth_factor = real(const_express(&a));
-	    if (ps_linewidth_factor <= 0.0) ps_linewidth_factor = 1.0;
-	}
-    }
-
-    if (!END_OF_COMMAND) {
-	if (almost_equals(c_token,"si$mplex")) {
+	    if (ps_linewidth_factor <= 0.0)
+		ps_linewidth_factor = 1.0;
+	    break;
+	case PS_SIMPLEX:
 	    ps_duplex_state  = FALSE;
 	    ps_duplex_option = TRUE;
 	    c_token++;
-	} else if (almost_equals(c_token,"du$plex")) {
+	    break;
+	case PS_DUPLEX:
 	    ps_duplex_state  = TRUE;
 	    ps_duplex_option = TRUE;
 	    c_token++;
-	} else if (almost_equals(c_token,"defaultp$lex")) {
+	    break;
+	case PS_DEFAULTPLEX:
 	    ps_duplex_option = FALSE;
 	    c_token++;
+	    break;
+	case PS_OTHER:
+	default:
+	    if (isstring(c_token)) {
+		quote_str(ps_font,c_token, MAX_ID_LEN);
+		c_token++;
+	    } else {
+		/* We have font size specified */
+		ps_fontsize = (int)real(const_express(&a));
+		term->v_char = (unsigned int)(ps_fontsize*PS_SC);
+		term->h_char = (unsigned int)(ps_fontsize*PS_SC*6/10);
+	    }
+	    break;
 	}
     }
 
-    if (!END_OF_COMMAND && isstring(c_token)) {
-	quote_str(ps_font,c_token, MAX_ID_LEN);
-	c_token++;
-    }
-
-    if (!END_OF_COMMAND) {
-	/* We have font size specified */
-	struct value a;
-	ps_fontsize = (int)real(const_express(&a));
-	term->v_char = (unsigned int)(ps_fontsize*PS_SC);
-	term->h_char = (unsigned int)(ps_fontsize*PS_SC*6/10);
-    }
-
-    if (!ps_color) ps_blacktext = TRUE;
+    if (!ps_color)
+	ps_blacktext = TRUE;
 
     sprintf(default_font,"%s,%d",ps_font,ps_fontsize);
     /* default_font holds the font and size set at 'set term' */

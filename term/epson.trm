@@ -1,5 +1,5 @@
 /*
- * $Id: epson.trm,v 1.11 1999/07/30 19:06:44 lhecking Exp $
+ * $Id: epson.trm,v 1.12 1999/08/07 17:19:11 lhecking Exp $
  *
  */
 
@@ -269,31 +269,54 @@ static unsigned int necpcolor[] = { 0, 2, 1, 4 };
 
 static int NECmode;
 
+enum NEC_id { NEC_MONOCHROME, NEC_COLOR, NEC_DRAFT, NEC_OTHER };
+
+static struct gen_table NEC_opts[] =
+{
+    { "m$onochrome", NEC_MONOCHROME },
+    { "c$olor", NEC_COLOR },
+    { "c$olour", NEC_COLOR },
+    { "d$raft", NEC_DRAFT },
+    { NULL, NEC_OTHER }
+};
+
 TERM_PUBLIC void
 NECoptions()
 {
+    /* default */
     if (END_OF_COMMAND) {
 	strcpy(term_options, "monochrome");
 	NECmode = 'm';
-    } else if (almost_equals(c_token, "m$onochrome")) {
-	c_token++;
-	strcpy(term_options, "monochrome");
-	NECmode = 'm';
-    } else if (almost_equals(c_token, "c$olor")
-	       || almost_equals(c_token, "c$olour")) {
-	c_token++;
-	strcpy(term_options, "color");
-	NECmode = 'c';
-    } else if (almost_equals(c_token, "d$raft")) {
-	c_token++;
-	strcpy(term_options, "draft");
-	NECmode = 'd';
-    } else {
-	/* error, but since the terminal is already set, default to mono */
-	strcpy(term_options, "monochrome");
-	NECmode = 'm';
-	int_error(c_token, "modes: color, monochrome, draft");
     }
+
+    while (!END_OF_COMMAND) {
+	switch(lookup_table(&NEC_opts[0],c_token)) {
+	case NEC_MONOCHROME:
+	    c_token++;
+	    strcpy(term_options, "monochrome");
+	    NECmode = 'm';
+	    break;
+	case NEC_COLOR:
+	    c_token++;
+	    strcpy(term_options, "color");
+	    NECmode = 'c';
+ 	    break;
+	case NEC_DRAFT:
+	    c_token++;
+	    strcpy(term_options, "draft");
+	    NECmode = 'd';
+	    break;
+	case NEC_OTHER:
+	default:
+	    /* FIXME - not the most sensible thing to do */
+	    /* error, but since the terminal is already set, default to mono */
+	    strcpy(term_options, "monochrome");
+	    NECmode = 'm';
+	    int_error(c_token, "modes: color, monochrome, draft");
+	    break;
+	}
+    }
+
 }
 
 TERM_PUBLIC void

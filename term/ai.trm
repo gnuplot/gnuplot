@@ -1,5 +1,5 @@
 /*
- * $Id: ai.trm,v 1.11 1999/06/22 11:54:13 lhecking Exp $
+ * $Id: ai.trm,v 1.12 1999/07/18 17:35:32 lhecking Exp $
  *
  */
 
@@ -101,17 +101,37 @@ TERM_PUBLIC int AI_set_font __PROTO((const char *font));
 #define AI_VCHAR (14*AI_SC)	/* default is 14 point characters */
 #define AI_HCHAR (14*AI_SC*6/10)
 
-#endif
-
+#endif /* TERM_PROTO */
 
 
 #ifndef TERM_PROTO_ONLY
 #ifdef TERM_BODY
 
-char ai_font[MAX_ID_LEN + 1] = "Times-Roman";	/* name of font */
-int ai_fontsize = 14;		/* size of font in pts */
-char ai_oldfont[MAX_ID_LEN + 1] = "Times-Roman";	/* name of font */
-int ai_oldfontsize = 14;	/* size of font in pts */
+enum AI_id { AI_DEFAULT, AI_MONOCHROME, AI_COLOUR, AI_OTHER };
+
+static struct gen_table AI_opts[] =
+{
+    { "d$efault", AI_DEFAULT },
+    { "m$onochrome", AI_MONOCHROME },
+    { "c$olor", AI_COLOUR },
+    { "c$olour", AI_COLOUR },
+    { NULL, AI_OTHER }
+};
+
+#define DEFAULT_FONT "Times-Roman"
+
+/* name of font */
+char ai_font[MAX_ID_LEN + 1] = DEFAULT_FONT;
+
+/* size of font in pts */
+int ai_fontsize = 14;
+
+/* name of font */
+char ai_oldfont[MAX_ID_LEN + 1] = DEFAULT_FONT;
+
+/* size of font in pts */
+int ai_oldfontsize = 14;
+
 TBOOLEAN ai_color = FALSE;
 TBOOLEAN ai_stroke = FALSE;
 int ai_page = 0;		/* page count */
@@ -125,40 +145,42 @@ enum JUSTIFY ai_justify = LEFT;	/* text is flush left */
 TERM_PUBLIC void
 AI_options()
 {
-    if (!END_OF_COMMAND) {
-	if (almost_equals(c_token, "d$efault")) {
+    while (!END_OF_COMMAND) {
+        switch(lookup_table(&AI_opts[0],c_token)) {
+	case AI_DEFAULT:
+	    c_token++;
 	    ai_color = FALSE;
-	    strcpy(ai_font, "Times-Roman");
+	    strncpy(ai_font,DEFAULT_FONT,sizeof(ai_font));
 	    ai_fontsize = 14;
-	    strcpy(ai_oldfont, "Times-Roman");
+	    strncpy(ai_oldfont,DEFAULT_FONT,sizeof(ai_oldfont));
 	    ai_oldfontsize = 14;
+	    break;
+	case AI_MONOCHROME:
 	    c_token++;
-	}
-    }
-    if (!END_OF_COMMAND) {
-	if (almost_equals(c_token, "m$onochrome")) {
 	    ai_color = FALSE;
+	    break;
+	case AI_COLOUR:
 	    c_token++;
-	} else if (almost_equals(c_token, "c$olor")
-		   || almost_equals(c_token, "c$olour")) {
 	    ai_color = TRUE;
-	    c_token++;
-	}
+	    break;
+	case AI_OTHER:
+	default:
+	    if (isstring(c_token)) {
+		quote_str(ai_font, c_token, MAX_ID_LEN);
+		strcpy(ai_oldfont, ai_font);
+		c_token++;
+	    } else { /* is a number */
+		/* We have font size specified */
+		struct value a;
+		ai_fontsize = (int) real(const_express(&a));
+		ai_oldfontsize = ai_fontsize;
+		term->v_char = (unsigned int) (ai_fontsize * AI_SC);
+		term->h_char = (unsigned int) (ai_fontsize * AI_SC * 6 / 10);
+ 	    }
+	    break;
+        }
     }
-    if (!END_OF_COMMAND && isstring(c_token)) {
-	quote_str(ai_font, c_token, MAX_ID_LEN);
-	strcpy(ai_oldfont, ai_font);
-	c_token++;
-    }
-    if (!END_OF_COMMAND) {
-	/* We have font size specified */
-	struct value a;
-	ai_fontsize = (int) real(const_express(&a));
-	ai_oldfontsize = ai_fontsize;
-	c_token++;
-	term->v_char = (unsigned int) (ai_fontsize * AI_SC);
-	term->h_char = (unsigned int) (ai_fontsize * AI_SC * 6 / 10);
-    }
+
     sprintf(term_options, "%s \"%s\" %d",
 	    ai_color ? "color" : "monochrome", ai_font, ai_fontsize);
 }
@@ -529,7 +551,7 @@ START_HELP(aifm)
 " <color> is either `color` or `monochrome`; \"<fontname>\" is the name of a",
 " valid PostScript font; <fontsize> is the size of the font in PostScript",
 " points, before scaling by the `set size` command.  Selecting `default` sets",
-" all options to their default values: `monochrome`, \"Helvetica\", and 14pt.",
+" all options to their default values: `monochrome`, \"Times-Roman\", and 14pt.",
 "",
 " Since AI does not really support multiple pages, multiple graphs will be",
 " drawn directly on top of one another.  However, each graph will be grouped",

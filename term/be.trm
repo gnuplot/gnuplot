@@ -1,5 +1,5 @@
 /*
- * $Id: be.trm,v 1.5 1999/06/19 20:30:45 lhecking Exp $
+ * $Id: be.trm,v 1.6 1999/06/22 11:54:14 lhecking Exp $
  *
  */
 
@@ -90,7 +90,7 @@ typedef enum { hasNoArg, hasArg } OptionArg;
 static struct beopt {
     const char *option;	/* Name of option */
     OptionArg arg;	/* Whether option has argument */
-}  BE_opts[] =
+}  BE_cmdargs[] =
 {
    { "-mono", hasNoArg }, { "-gray", hasNoArg }, { "-clear", hasNoArg },
    { "-pointsize", hasArg },
@@ -109,7 +109,7 @@ static struct beopt {
    { "-persist", hasNoArg }
 };
 
-#define BE_nopts (sizeof(BE_opts) / sizeof(BE_opts[0]))
+#define BE_nopts (sizeof(BE_cmdargs) / sizeof(BE_cmdargs[0]))
 
 static FILE *BE_ipc;
 
@@ -118,8 +118,42 @@ static char *optvec[2*BE_nopts+1];
 
 static char BE_command[] = "gnuplot_be";
 
-/*   BE_args - scan gnuplot command line for standard Toolkit options (to be done)
- * called from plot.c so must not be TERM_PUBLIC (which may be static)
+/* Almost not worth the hassle, be want a uniform interface */
+enum BE_id { BE_RESET, BE_OTHER };
+
+static struct gen_table BE_opts[] =
+{
+    { "res$et", BE_RESET },
+    { NULL, BE_OTHER }
+};
+
+static unsigned int BE_plot_number;
+
+TERM_PUBLIC void
+BE_options()
+{
+    struct value a;
+ 
+    while (!END_OF_COMMAND) {
+	switch(lookup_table(&BE_opts[0],c_token)) {
+	case BE_RESET:
+	    c_token++;
+	    BE_atexit ();	/* tell gnuplot_be to shut down */
+	    break;
+	case BE_OTHER:
+	default:
+	    BE_plot_number = (int) real(const_express(&a));
+	    /* let gnuplot_be check range */
+	    break;
+	}
+    }
+
+    sprintf(term_options, "%d", BE_plot_number);
+}
+
+
+/* BE_args - scan gnuplot command line for standard Toolkit options (to be
+ * done) called from plot.c so must not be TERM_PUBLIC (which may be static)
  */
 
 int
@@ -143,11 +177,11 @@ char *argv[];
 
     while (++argv, --argc > 0) {
 	for (n = 0; n < BE_nopts; n++) {
-	    if (strcmp(*argv, BE_opts[n].option) == 0) {
+	    if (strcmp(*argv, BE_cmdargs[n].option) == 0) {
 		optvec[i++] = *xargv;
 		if (strcmp(*argv, "-display") == 0)
 		    BE_Display++;
-		if (BE_opts[n].arg == hasArg) {
+		if (BE_cmdargs[n].arg == hasArg) {
 		    if (--argc <= 0)
 			return nbe;
 		    optvec[i++] = *++xargv, ++argv;
@@ -163,23 +197,6 @@ char *argv[];
     return nbe;
 }
 
-
-static unsigned int BE_plot_number;
-
-TERM_PUBLIC void
-BE_options()
-{
-    if (almost_equals(c_token, "res$et")) {
-	BE_atexit ();	/* tell gnuplot_be to shut down */
-	++c_token;
-    }
-    if (!END_OF_COMMAND) {
-	struct value a;
-	BE_plot_number = (int) real(const_express(&a));
-	/* let gnuplot_be check range */
-    }
-    sprintf(term_options, "%d", BE_plot_number);
-}
 
 /* we do not want to have to duplicate all the code, so we
  * do most of it with macros.

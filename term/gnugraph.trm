@@ -1,5 +1,5 @@
 /*
- * $Id: gnugraph.trm,v 1.10 1999/06/19 20:30:49 lhecking Exp $
+ * $Id: gnugraph.trm,v 1.11 1999/06/22 11:53:27 lhecking Exp $
  */
 
 /* GNUPLOT -- gnugraph.trm */
@@ -114,8 +114,10 @@ TERM_PUBLIC void UP_reset __PROTO((void));
 #ifndef TERM_PROTO_ONLY
 #ifdef TERM_BODY
 
+#define DEFAULT_GNUGRAPHFONT "Courier"
 
-char up_font[MAX_ID_LEN+1] = "Courier";	/* name of font */
+/* Name of font */
+char up_font[MAX_ID_LEN+1] = DEFAULT_GNUGRAPHFONT;
 int up_fontsize = 10;
 
 /* plot2ps produces a 8.25" x 8.25" square. */
@@ -171,29 +173,43 @@ extern int textangle __PROTO((int));
 extern int closepl __PROTO((void));
 #endif
 
+enum UP_id { UP_DEFAULT, UP_OTHER };
+
+static struct gen_table UP_opts[] =
+{
+    { "d$efault", UP_DEFAULT },
+    { NULL, UP_OTHER }
+};
+
 TERM_PUBLIC void
 UP_options()
 {
-    if (!END_OF_COMMAND) {
-	if (almost_equals(c_token, "d$efault")) {
-	    strcpy(up_font, "Courier");
+    struct value a;
+  
+    while (!END_OF_COMMAND) {
+	switch(lookup_table(&UP_opts[0],c_token)) {
+	case UP_DEFAULT:
+	    strcpy(up_font, DEFAULT_GNUGRAPHFONT);
 	    up_fontsize = 10;
 	    term->v_char = (unsigned int) (up_fontsize * UP_VFONTSC);
 	    term->h_char = (unsigned int) (up_fontsize * UP_HFONTSC);
 	    c_token++;
+	    break;
+	case UP_OTHER:
+	default:
+	    if (isstring(c_token)) {
+		quote_str(up_font, c_token, MAX_ID_LEN);
+		c_token++;
+	    }
+	    if (!END_OF_COMMAND) {
+		/* We have font size specified */
+		up_fontsize = (int) real(const_express(&a));
+		term->v_char = (unsigned int) (up_fontsize * UP_VFONTSC);
+		term->h_char = (unsigned int) (up_fontsize * UP_HFONTSC);
+	    }
 	}
     }
-    if (!END_OF_COMMAND && isstring(c_token)) {
-	quote_str(up_font, c_token, MAX_ID_LEN);
-	c_token++;
-    }
-    if (!END_OF_COMMAND) {
-	/* We have font size specified */
-	struct value a;
-	up_fontsize = (int) real(const_express(&a));
-	term->v_char = (unsigned int) (up_fontsize * UP_VFONTSC);
-	term->h_char = (unsigned int) (up_fontsize * UP_HFONTSC);
-    }
+
     sprintf(term_options, "\"%s\" %d", up_font, up_fontsize);
 }
 

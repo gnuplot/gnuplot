@@ -1,5 +1,5 @@
 /*
- * $Id: dumb.trm,v 1.7 1999/06/19 20:30:47 lhecking Exp $
+ * $Id: dumb.trm,v 1.8 1999/06/22 11:54:15 lhecking Exp $
  *
  */
 
@@ -99,6 +99,47 @@ static int dumb_feed = 1;
 
 static void dumb_set_pixel __PROTO((int x, int y, int v, int p));
 
+enum DUMB_id { DUMB_FEED, DUMB_NOFEED, DUMB_OTHER };
+
+static struct gen_table DUMB_opts[] =
+{
+    { "f$eed", DUMB_FEED },
+    { "nof$eed", DUMB_NOFEED },
+    { NULL, DUMB_OTHER }
+};
+
+TERM_PUBLIC void
+DUMB_options()
+{
+    int x, y;
+    struct value a;
+
+    while (!END_OF_COMMAND) {
+	switch(lookup_table(&DUMB_opts[0],c_token)) {
+	case DUMB_FEED:
+	    c_token++;
+	    dumb_feed = 1;
+	    break;
+	case DUMB_NOFEED:
+	    c_token++;
+	    dumb_feed = 0;
+	    break;
+	case DUMB_OTHER:
+	default:
+	    x = (int) real(const_express(&a));
+	    if (!END_OF_COMMAND) {
+		y = (int) real(const_express(&a));
+		dumb_xmax = term->xmax = x;
+		dumb_ymax = term->ymax = y;
+	    }
+ 	    break;
+	}
+    }
+
+    sprintf(term_options, "%sfeed %d %d",
+	    dumb_feed ? "" : "no", dumb_xmax, dumb_ymax);
+}
+
 
 static void
 dumb_set_pixel(x, y, v, p)
@@ -110,30 +151,6 @@ int x, y, v, p;
 	dumb_matrix[dumb_xmax * y + x] = v;
 	dumb_priority[dumb_xmax * y + x] = p;
     }
-}
-
-
-TERM_PUBLIC void
-DUMB_options()
-{
-    int x, y;
-    struct value a;
-
-    if (almost_equals(c_token, "f$eed"))
-	++c_token, dumb_feed = 1;
-    else if (almost_equals(c_token, "nof$eed"))
-	++c_token, dumb_feed = 0;
-
-    if (!END_OF_COMMAND) {
-	x = (int) real(const_express(&a));
-	if (!END_OF_COMMAND) {
-	    y = (int) real(const_express(&a));
-	    dumb_xmax = term->xmax = x;
-	    dumb_ymax = term->ymax = y;
-	}
-    }
-    sprintf(term_options, "%sfeed %d %d",
-	    dumb_feed ? "" : "no", dumb_xmax, dumb_ymax);
 }
 
 
