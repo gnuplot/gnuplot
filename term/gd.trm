@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: gd.trm,v 1.62 2005/03/03 04:09:51 sfeam Exp $
+ * $Id: gd.trm,v 1.63 2005/03/09 18:26:44 sfeam Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -205,6 +205,12 @@ static struct {
     char      default_ttffont[64];
     int       default_ttfsize;
     TBOOLEAN  TrueColor;
+#ifdef GIF_ANIMATION
+    TBOOLEAN  animate;		/* Only gif supports animation */
+    int       frame_count;	/* Number of frames in animation */
+    int       frame_delay;	/* Time between frames in .01 seconds */
+    gdImagePtr previous_image;	/* Needed to encode animation as a series of deltas */
+#endif
 } png_state;
 
 #define PNG_USE_TRANSPARENT 1
@@ -222,6 +228,7 @@ enum PNG_id {
     PNG_ENHANCED, PNG_NOENHANCED,
     PNG_TRUECOLOR, PNG_NOTRUECOLOR,
     PNG_LINEWIDTH,
+    GIF_ANIMATE,
     PNG_OTHER
 };
 
@@ -250,6 +257,7 @@ static struct gen_table PNG_opts[] =
     { "true$color", PNG_TRUECOLOR },
     { "notrue$color", PNG_NOTRUECOLOR },
     { "linew$idth", PNG_LINEWIDTH },
+    { "animate", GIF_ANIMATE },
     { "lw", PNG_LINEWIDTH },
     { NULL, PNG_OTHER }
 };
@@ -488,6 +496,15 @@ PNG_options()
 	}
     }
 
+#ifdef GIF_ANIMATION
+    /* Always reset animation */
+    png_state.animate = FALSE;
+    if (png_state.previous_image) {
+	gdImageDestroy(png_state.previous_image);
+	png_state.previous_image = NULL; 
+    }
+#endif
+
     while (!END_OF_COMMAND) {
 	switch(lookup_table(&PNG_opts[0],c_token)) {
 	case PNG_TRANSPARENT:
@@ -634,6 +651,21 @@ PNG_options()
 	    if (PNG_linewidth_factor < 0)
 		PNG_linewidth_factor = 1.0;
 	    break;
+
+#ifdef GIF_ANIMATION
+	case GIF_ANIMATE:
+	    if (strncmp("gif",term->name,3))
+		int_error(c_token,"Only gif terminal supports animation");
+	    c_token++;
+	    png_state.animate = TRUE;
+	    png_state.frame_count = 0;
+	    png_state.frame_delay = 10;
+	    if (equals(c_token,"delay"))
+		c_token++;
+		png_state.frame_delay = (int)real(const_express(&s));
+	    break;
+#endif
+
 	case PNG_OTHER:
 	default:
 	    /* not "size" */
@@ -1101,7 +1133,20 @@ PNG_graphics()
 				png_state.color_table[0]);
     else
 	gdImageColorTransparent(png_state.image, -1);
+
+#ifdef GIF_ANIMATION
+    if (png_state.animate && png_state.frame_count == 0) {
+	/* FIXME - I can't get transparency to work right */
+	png_state.flags &= ~PNG_USE_TRANSPARENT;
+	gdImageColorTransparent(png_state.image, -1);
+	/* Initialize the animation with a global colormap */
+	gdImageGifAnimBegin(png_state.image, gpoutfile, 
+		1 /* Global Colormap */, 
+		0 /* Loop forever on playback */);
     }
+#endif
+
+}
 
 /*
  * _text()  Called immediately after a plot is displayed.  This procedure
@@ -2070,6 +2115,26 @@ TERM_PUBLIC void GIF_text __PROTO((void));
 TERM_PUBLIC void
 GIF_text()
 {
+#ifdef GIF_ANIMATION
+    /* FIXME - a global colormap would be better, but it breaks if */
+    /* the individual frames specify ad-hoc RGB colors.            */
+    /* Also, the very last frame should be followed by a call to   */
+    /* gdImageGifAnimEnd(gpoutfile)  though in practice it doesn't */
+    /* seem to matter.                                             */
+    if (png_state.animate) {
+	gdImageGifAnimAdd(png_state.image, gpoutfile, 
+		1 /* local colormap */,
+		0, 0 /* No offset */,
+		png_state.frame_delay,
+		gdDisposalNone, 
+		png_state.previous_image /* save changed pixels only */ );
+	png_state.frame_count++;
+	if (png_state.previous_image)
+	    gdImageDestroy(png_state.previous_image);
+	png_state.previous_image = png_state.image;
+	return;
+    }
+#endif
     gdImageGif(png_state.image, gpoutfile);
     gdImageDestroy(png_state.image);
 }
@@ -2127,6 +2192,7 @@ START_HELP(gif)
 "                        {tiny | small | medium | large | giant}",
 "                        {{no}transparent} {{no}enhanced}",
 "                        {font <face> {<pointsize>}}",
+"                        {animate {delay <time>}}",
 "                        {size <x>,<y>} {{no}crop}",
 "                        {<color0> <color1> <color2> ...}",
 "",
@@ -2157,6 +2223,12 @@ START_HELP(gif)
 " Adobe Type 1 fonts are fully scalable and may be rotated through any angle.",
 " If no font is specified, gnuplot checks the environmental variable ",
 " GNUPLOT_DEFAULT_GDFONT to see if there is a preferred default font. ",
+"",
+" The `animate` option is available only if your local gd library supports",
+" the creation of animated gifs. The default delay between display of",
+" successive images may be specified in units of 1/100 second (default 5).",
+" The actual delay may vary depending on the program used as a viewer.",
+" An animation sequence is terminated by the next `set term` command.",
 "",
 " The size <x,y> is given in pixels---it defaults to 640x480.  The number of",
 " pixels can be also modified by scaling with the `set size` command.",
