@@ -1,5 +1,5 @@
 /*
- * $Id: png.trm,v 1.34 2002/08/27 21:22:19 sfeam Exp $
+ * $Id: png.trm,v 1.35 2002/12/05 01:46:41 sfeam Exp $
  *
  */
 
@@ -218,7 +218,7 @@ PNG_options()
 		int_error(c_token, "expecting: {small, medium, large},[no]transparent, or {monochrome, gray, color, [xRRGGBB] }");
 
 	    if (n_colors >= WEB_N_COLORS) {
-		int_warn(c_token, "too many colors, ingoring");
+		int_warn(c_token, "too many colors, ignoring");
 		/* Magic number abuse guards against
 		 * "> WEB_N_COLORS warning" scroll fests. */
 		if (!END_OF_COMMAND) {

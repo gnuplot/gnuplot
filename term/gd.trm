@@ -1,5 +1,5 @@
 /*
- * $Id: gd.trm,v 1.17 2002/09/27 00:12:26 sfeam Exp $
+ * $Id: gd.trm,v 1.18 2002/12/03 19:38:13 sfeam Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -582,7 +582,7 @@ PNG_options()
 	    if (sscanf(string, "x%lx", &color) != 1) {
 		    int_error(c_token, "invalid color spec, must be xRRGGBB");
 	    } else if (png_state.n_colors == PNG_MAX_COLORS) {
-		int_warn(c_token, "too many colors, ingoring");
+		int_warn(c_token, "too many colors, ignoring");
 		++c_token;
 	    } else {
 		png_state.rgb_table[png_state.n_colors++] = color;
