@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.26 2000/11/23 16:50:05 amai Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.27 2000/11/24 15:44:31 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - gplt_x11.c */
@@ -131,8 +131,8 @@ Error. Incompatible options.
 #include <X11/keysym.h>
 
 #ifdef PM3D
-#   include <math.h> /* pow() */
-#   include "getcolor.h"
+# include <math.h>		/* pow() */
+# include "getcolor.h"
 #endif
 
 #ifdef USE_MOUSE
@@ -173,22 +173,18 @@ Error. Incompatible options.
 #endif /* HAVE_SYS_SYSTEMINFO_H && HAVE_SYSINFO */
 
 #ifdef USE_MOUSE
-
 # ifdef OS2_IPC
 #  define INCL_DOSPROCESS
 #  define INCL_DOSSEMAPHORES
 #  include <os2.h>
 #  include "os2/dialogs.h"
 # endif
-
-# define _GPLT_X11 /* define before including mouse.h */
+# define _GPLT_X11		/* define before including mouse.h */
 # include "gpexecute.h"
 # include "mouse.h"
-
-#include <unistd.h>
-#include <fcntl.h>
-#include <errno.h>
-
+# include <unistd.h>
+# include <fcntl.h>
+# include <errno.h>
 unsigned long gnuplotXID = 0;	/* WINDOWID of gnuplot */
 
 #endif /* USE_MOUSE */
@@ -209,7 +205,7 @@ unsigned long gnuplotXID = 0;	/* WINDOWID of gnuplot */
     } while (0)
 # else
 #  define EXIT(status) exit(status)
-# endif /* PIPE_IPC */
+# endif	/* PIPE_IPC */
 #endif /* !VMS */
 
 #ifdef OSK
@@ -220,17 +216,17 @@ unsigned long gnuplotXID = 0;	/* WINDOWID of gnuplot */
 #define Ncolors 13
 
 typedef struct cmap_t {
-    Colormap       colormap;
-    unsigned long  colors[Ncolors]; /* line colors */
+    Colormap colormap;
+    unsigned long colors[Ncolors];	/* line colors */
 #ifdef             PM3D
-    unsigned long  xorpixel;        /* line colors */
-    int            total;
-    int            allocated;
-    unsigned long* pixels;          /* pm3d colors */
+    unsigned long xorpixel;	/* line colors */
+    int total;
+    int allocated;
+    unsigned long *pixels;	/* pm3d colors */
 #endif
 } cmap_t;
 
-cmap_t cmap; /* always allocate a default colormap (done in preset()) */
+cmap_t cmap;			/* always allocate a default colormap (done in preset()) */
 
 
 /* information about one window/plot */
@@ -265,7 +261,7 @@ typedef struct plot_struct {
     /* points to the cmap which is currently used for drawing.
      * This is always the default colormap, if not in pm3d.
      */
-    cmap_t*        cmap;
+    cmap_t *cmap;
 } plot_struct;
 
 #ifdef USE_MOUSE
@@ -310,15 +306,15 @@ static char selection[SEL_LEN] = "";
 #endif
 
 #ifdef PM3D
-void GetGCpm3d __PROTO((plot_struct* plot, GC* ret));
-void CmapClear __PROTO((cmap_t* cmap_ptr));
-void RecolorWindow __PROTO((plot_struct* plot));
-void FreeColors __PROTO((plot_struct* plot));
-void ReleaseColormap __PROTO((plot_struct* plot));
-unsigned long* ReallocColors __PROTO((plot_struct* plot, int n));
-void PaletteMake __PROTO((plot_struct* plot, t_sm_palette* tpal));
-void PaletteSetColor __PROTO((plot_struct* plot, double gray));
-int GetVisual __PROTO((int class, Visual** best, int* depth));
+void GetGCpm3d __PROTO((plot_struct * plot, GC * ret));
+void CmapClear __PROTO((cmap_t * cmap_ptr));
+void RecolorWindow __PROTO((plot_struct * plot));
+void FreeColors __PROTO((plot_struct * plot));
+void ReleaseColormap __PROTO((plot_struct * plot));
+unsigned long *ReallocColors __PROTO((plot_struct * plot, int n));
+void PaletteMake __PROTO((plot_struct * plot, t_sm_palette * tpal));
+void PaletteSetColor __PROTO((plot_struct * plot, double gray));
+int GetVisual __PROTO((int class, Visual ** best, int *depth));
 #endif
 
 void store_command __PROTO((char *line, plot_struct * plot));
@@ -339,11 +335,10 @@ void EventuallyDrawMouseAddOns __PROTO((plot_struct * plot));
 void DrawBox __PROTO((plot_struct * plot));
 void AnnotatePoint __PROTO((plot_struct * plot, int x, int y, const char[], const char[]));
 long int SetTime __PROTO((plot_struct * plot, Time t));
-unsigned long AllocateXorPixel __PROTO((cmap_t* cmap_ptr));
-void GetGCXor __PROTO((plot_struct* plot, GC* gc));
-void GetGCXorDashed __PROTO((plot_struct* plot, GC* gc));
-void GetGCBlackAndWhite __PROTO((plot_struct* plot,
-	GC* ret, Pixmap pixmap, int mode));
+unsigned long AllocateXorPixel __PROTO((cmap_t * cmap_ptr));
+void GetGCXor __PROTO((plot_struct * plot, GC * gc));
+void GetGCXorDashed __PROTO((plot_struct * plot, GC * gc));
+void GetGCBlackAndWhite __PROTO((plot_struct * plot, GC * ret, Pixmap pixmap, int mode));
 int SplitAt __PROTO((char **args, int maxargs, char *buf, char splitchar));
 void DisplayMessageAt __PROTO((plot_struct * plot, char *msg, int x, int y));
 void xfree(void *fred);
@@ -361,13 +356,13 @@ void reset_cursor __PROTO((void));
 
 void preset __PROTO((int argc, char *argv[]));
 char *pr_GetR __PROTO((XrmDatabase db, char *resource));
-void pr_color __PROTO((cmap_t* cmap_ptr));
+void pr_color __PROTO((cmap_t * cmap_ptr));
 void pr_dashes __PROTO((void));
 void pr_font __PROTO((void));
 void pr_geometry __PROTO((void));
 void pr_pointsize __PROTO((void));
 void pr_width __PROTO((void));
-void pr_window __PROTO((plot_struct* plot));
+void pr_window __PROTO((plot_struct * plot));
 void ProcessEvents __PROTO((Window win));
 void pr_raise __PROTO((void));
 void pr_persist __PROTO((void));
@@ -394,15 +389,15 @@ char dashes[Ndashes][5];
 #define GR_SET_COLOR        'c'
 #define GR_FILLED_POLYGON   'f'
 t_sm_palette sm_palette = {
-    -1,                          /* colorFormulae */
-    SMPAL_COLOR_MODE_NONE,       /* colorMode */
-    0, 0, 0,                     /* formula[RGB] */
-    0,                           /* positive */
-    0,                           /* use_maxcolors */
-    -1,                          /* colors */
-    (rgb_color*) 0,
-    0,                           /* offset */
-    0,                           /* ps_allcF */
+    -1,				/* colorFormulae */
+    SMPAL_COLOR_MODE_NONE,	/* colorMode */
+    0, 0, 0,			/* formula[RGB] */
+    0,				/* positive */
+    0,				/* use_maxcolors */
+    -1,				/* colors */
+    (rgb_color *) 0,
+    0,				/* offset */
+    0,				/* ps_allcF */
 };
 static GC gc_pm3d = (GC) 0;
 static int have_pm3d = 1;
@@ -413,14 +408,14 @@ unsigned int minimal_possible_colors;
 /* the following visual names must match the
  * definitions in X.h in this order ! I hope
  * this is standard (joze) */
-static char* visual_name[] = {
+static char *visual_name[] = {
     "StaticGray",
     "GrayScale",
     "StaticColor",
     "PseudoColor",
     "TrueColor",
     "DirectColor",
-    (char*) 0
+    (char *) 0
 };
 #endif /* PM3D */
 
@@ -432,7 +427,7 @@ struct plot_struct *current_plot = NULL;
 Display *dpy;
 int scr;
 Window root;
-Visual *vis = (Visual*) 0;
+Visual *vis = (Visual *) 0;
 GC gc = (GC) 0;
 /* current_gc points to either the `line' GC `gc' or
  * to the pm3d smooth palette GC `gc_pm3d'. If pm3d
@@ -440,7 +435,7 @@ GC gc = (GC) 0;
  * points to the `line' GC `gc'. Thus the purpose of
  * current_gc is to switch between the `line' and the
  * pm3d GC's. */
-static GC* current_gc = (GC*) 0;
+static GC *current_gc = (GC *) 0;
 GC gc_xor = (GC) 0;
 GC gc_xor_dashed = (GC) 0;
 XFontStruct *font;
@@ -462,7 +457,7 @@ unsigned int gW = 640, gH = 450;
 unsigned int gFlags = PSize;
 
 unsigned int BorderWidth = 2;
-unsigned int dep;			/* depth */
+unsigned int dep;		/* depth */
 
 Bool Mono = 0, Gray = 0, Rv = 0, Clear = 0;
 char Name[64] = "gnuplot";
@@ -470,9 +465,9 @@ char Class[64] = "Gnuplot";
 
 int cx = 0, cy = 0, vchar;
 /* Speficy negative values as indicator of uninitialized state */
-double xscale=-1.;
-double yscale=-1.;
-double pointsize=-1.;
+double xscale = -1.;
+double yscale = -1.;
+double pointsize = -1.;
 /* Avoid a crash upon using uninitialized variables from
    above and avoid unnecessary calls to display().
    Probably this is not the best fix ... */
@@ -902,7 +897,7 @@ int term_number;
 #endif
     }
     if (!plot->window) {
-	plot->cmap = &cmap; /* default color space */
+	plot->cmap = &cmap;	/* default color space */
 	pr_window(plot);
 
 	/* append the X11 terminal number (if greater than zero) */
@@ -1110,11 +1105,9 @@ record()
 		t_sm_palette tpal;
 		FPRINTF((stderr, "GR_MAKE_PALETTE\n"));
 		if (6 != sscanf(buf + 1, "%c %d %d %d %c %d\n",
-			&(tpal.colorMode), &(tpal.formulaR), &(tpal.formulaG),
-			&(tpal.formulaB), &(tpal.positive),
-			&(tpal.use_maxcolors))) {
-		    fprintf(stderr, "%s:%d error in setting palette.\n",
-			__FILE__, __LINE__);
+				&(tpal.colorMode), &(tpal.formulaR), &(tpal.formulaG),
+				&(tpal.formulaB), &(tpal.positive), &(tpal.use_maxcolors))) {
+		    fprintf(stderr, "%s:%d error in setting palette.\n", __FILE__, __LINE__);
 		} else {
 		    /* dump_sm_palette(&tpal); */
 		    PaletteMake(plot, &tpal);
@@ -1252,7 +1245,7 @@ record()
 	    export_graph(plot);
 #endif
 	    {
-		int len = strlen(buf + 1) - 1 /* discard newline '\n' */;
+		int len = strlen(buf + 1) - 1;	/* discard newline '\n' */
 		strncpy(selection, buf + 1, len < SEL_LEN ? len : SEL_LEN);
 		/* terminate */
 		selection[len + 1 < SEL_LEN ? len + 1 : SEL_LEN - 1] = '\0';
@@ -1472,7 +1465,8 @@ char *command;
 		XDrawSegments(dpy, plot->pixmap, *current_gc, Plus, 2);
 		break;
 	    case 3:		/* do box */
-		    XDrawRectangle(dpy, plot->pixmap, *current_gc, X(x) - plot->px, Y(y) - plot->py, (plot->px + plot->px), (plot->py + plot->py));
+		XDrawRectangle(dpy, plot->pixmap, *current_gc, X(x) - plot->px, Y(y) - plot->py, (plot->px + plot->px),
+			       (plot->py + plot->py));
 		XDrawPoint(dpy, plot->pixmap, *current_gc, X(x), Y(y));
 		break;
 	    case 4:		/* do X */
@@ -1534,23 +1528,23 @@ char *command;
 	}
     }
 #if PM3D
-    else if (*buffer == GR_SET_COLOR) { /* set color */
-	if (have_pm3d) { /* ignore, if your X server is not supported */
+    else if (*buffer == GR_SET_COLOR) {	/* set color */
+	if (have_pm3d) {	/* ignore, if your X server is not supported */
 	    double gray;
 	    sscanf(buffer + 1, "%lf", &gray);
 	    PaletteSetColor(plot, gray);
 	    current_gc = &gc_pm3d;
 	}
-    } else if (*buffer == GR_FILLED_POLYGON) { /* filled polygon */
-	if (have_pm3d) { /* ignore, if your X server is not supported */
-	    static XPoint* points = (XPoint*) 0;
+    } else if (*buffer == GR_FILLED_POLYGON) {	/* filled polygon */
+	if (have_pm3d) {	/* ignore, if your X server is not supported */
+	    static XPoint *points = (XPoint *) 0;
 	    static int st_npoints = 0;
 	    int i, npoints;
-	    char* ptr = buffer + 1;
+	    char *ptr = buffer + 1;
 	    sscanf(ptr, "%4d", &npoints);
 	    ptr += 4;
 	    if (npoints > st_npoints) {
-		points = realloc((void*) points, sizeof(XPoint) * npoints);
+		points = realloc((void *) points, sizeof(XPoint) * npoints);
 		st_npoints = npoints;
 		if (!points) {
 		    perror("gnuplot_x11: exec_cmd()->points");
@@ -1563,8 +1557,7 @@ char *command;
 		points[i].x = X(x);
 		points[i].y = Y(y);
 	    }
-	    XFillPolygon(dpy, plot->pixmap, *current_gc,
-		points, npoints, Nonconvex, CoordModeOrigin);
+	    XFillPolygon(dpy, plot->pixmap, *current_gc, points, npoints, Nonconvex, CoordModeOrigin);
 	}
     }
 #endif
@@ -1595,10 +1588,8 @@ plot_struct *plot;
 
     /* create new pixmap & GC */
     if (!plot->pixmap) {
-	FPRINTF((stderr, "Create pixmap %d : %dx%dx%d\n",
-		plot - plot_array, plot->width, PIXMAP_HEIGHT(plot), dep));
-	plot->pixmap = XCreatePixmap(dpy, root,
-	    plot->width, PIXMAP_HEIGHT(plot), dep);
+	FPRINTF((stderr, "Create pixmap %d : %dx%dx%d\n", plot - plot_array, plot->width, PIXMAP_HEIGHT(plot), dep));
+	plot->pixmap = XCreatePixmap(dpy, root, plot->width, PIXMAP_HEIGHT(plot), dep);
     }
 
     if (gc)
@@ -1610,8 +1601,7 @@ plot_struct *plot;
 
     /* set pixmap background */
     XSetForeground(dpy, gc, plot->cmap->colors[0]);
-    XFillRectangle(dpy, plot->pixmap, gc, 0, 0,
-	plot->width, PIXMAP_HEIGHT(plot)+vchar);
+    XFillRectangle(dpy, plot->pixmap, gc, 0, 0, plot->width, PIXMAP_HEIGHT(plot) + vchar);
     XSetBackground(dpy, gc, plot->cmap->colors[0]);
 
     if (!plot->window) {
@@ -1656,18 +1646,15 @@ UpdateWindow(plot_struct * plot)
 
     if (!plot->pixmap) {
 	/* create a black background pixmap */
-	FPRINTF((stderr, "Create pixmap %d : %dx%dx%d\n",
-		plot - plot_array, plot->width, PIXMAP_HEIGHT(plot), dep));
-	plot->pixmap = XCreatePixmap(dpy, root,
-	    plot->width, PIXMAP_HEIGHT(plot), dep);
+	FPRINTF((stderr, "Create pixmap %d : %dx%dx%d\n", plot - plot_array, plot->width, PIXMAP_HEIGHT(plot), dep));
+	plot->pixmap = XCreatePixmap(dpy, root, plot->width, PIXMAP_HEIGHT(plot), dep);
 	if (gc)
 	    XFreeGC(dpy, gc);
 	gc = XCreateGC(dpy, plot->pixmap, 0, (XGCValues *) 0);
 	XSetFont(dpy, gc, font->fid);
 	/* set pixmap background */
 	XSetForeground(dpy, gc, plot->cmap->colors[0]);
-	XFillRectangle(dpy, plot->pixmap, gc, 0, 0,
-	    plot->width, PIXMAP_HEIGHT(plot)+vchar);
+	XFillRectangle(dpy, plot->pixmap, gc, 0, 0, plot->width, PIXMAP_HEIGHT(plot) + vchar);
 	XSetBackground(dpy, gc, plot->cmap->colors[0]);
     }
     XSetWindowBackgroundPixmap(dpy, plot->window, plot->pixmap);
@@ -1690,15 +1677,15 @@ UpdateWindow(plot_struct * plot)
 #ifdef PM3D
 
 void
-CmapClear(cmap_t* cmap_ptr)
+CmapClear(cmap_t * cmap_ptr)
 {
     cmap_ptr->total = (int) 0;
     cmap_ptr->allocated = (int) 0;
-    cmap_ptr->pixels = (unsigned long*) 0;
+    cmap_ptr->pixels = (unsigned long *) 0;
 }
 
 void
-GetGCpm3d(plot_struct* plot, GC* ret)
+GetGCpm3d(plot_struct * plot, GC * ret)
 {
     XGCValues values;
     unsigned long mask = 0;
@@ -1711,7 +1698,7 @@ GetGCpm3d(plot_struct* plot, GC* ret)
 }
 
 void
-RecolorWindow(plot_struct* plot)
+RecolorWindow(plot_struct * plot)
 {
     if (None != plot->window) {
 	XSetWindowColormap(dpy, plot->window, plot->cmap->colormap);
@@ -1721,7 +1708,7 @@ RecolorWindow(plot_struct* plot)
 	if (gc_xor) {
 	    XFreeGC(dpy, gc_xor);
 	    gc_xor = (GC) 0;
-	    GetGCXor(plot, &gc_xor); /* recreate gc_xor */
+	    GetGCXor(plot, &gc_xor);	/* recreate gc_xor */
 	}
 #endif
     }
@@ -1732,13 +1719,12 @@ RecolorWindow(plot_struct* plot)
  * or the default colormap.  Note, that the line colors are not
  * free'd nor even touched. */
 void
-FreeColors(plot_struct* plot)
+FreeColors(plot_struct * plot)
 {
     if (plot->cmap->total && plot->cmap->pixels) {
 	if (plot->cmap->allocated) {
 	    /* fprintf(stderr, "(FreeColors) XFreeColors\n"); */
-	    XFreeColors(dpy, plot->cmap->colormap, plot->cmap->pixels,
-		plot->cmap->allocated, 0 /* XXX ??? XXX */);
+	    XFreeColors(dpy, plot->cmap->colormap, plot->cmap->pixels, plot->cmap->allocated, 0 /* XXX ??? XXX */ );
 	}
 	free(plot->cmap->pixels);
     }
@@ -1751,7 +1737,7 @@ FreeColors(plot_struct* plot)
  * colormap.
  */
 void
-ReleaseColormap(plot_struct* plot)
+ReleaseColormap(plot_struct * plot)
 {
     FreeColors(plot);
     if (plot->cmap && plot->cmap != &cmap) {
@@ -1759,18 +1745,18 @@ ReleaseColormap(plot_struct* plot)
 	if (plot->cmap->colormap && plot->cmap->colormap != cmap.colormap) {
 	    XFreeColormap(dpy, plot->cmap->colormap);
 	}
-	free((char*) plot->cmap);
-	plot->cmap = &cmap; /* switching to default colormap */
+	free((char *) plot->cmap);
+	plot->cmap = &cmap;	/* switching to default colormap */
 	RecolorWindow(plot);
     }
 }
 
-unsigned long*
-ReallocColors(plot_struct* plot, int n)
+unsigned long *
+ReallocColors(plot_struct * plot, int n)
 {
     FreeColors(plot);
     plot->cmap->total = n;
-    plot->cmap->pixels = (unsigned long*)
+    plot->cmap->pixels = (unsigned long *)
 	malloc(sizeof(unsigned long) * plot->cmap->total);
     return plot->cmap->pixels;
 }
@@ -1790,9 +1776,9 @@ ReallocColors(plot_struct* plot, int n)
  * could be found else 0.
  */
 int
-GetVisual(int class, Visual** visual, int* depth)
+GetVisual(int class, Visual ** visual, int *depth)
 {
-    XVisualInfo* visualsavailable;
+    XVisualInfo *visualsavailable;
     int nvisuals = 0;
     long vinfo_mask = VisualClassMask;
     XVisualInfo vinfo;
@@ -1812,8 +1798,7 @@ GetVisual(int class, Visual** visual, int* depth)
 	    }
 	}
 	XFree(visualsavailable);
-	if (*visual && (*visual)->class == (DefaultVisual(dpy, scr))->class &&
-	    *depth == DefaultDepth(dpy, scr)) {
+	if (*visual && (*visual)->class == (DefaultVisual(dpy, scr))->class && *depth == DefaultDepth(dpy, scr)) {
 	    /* prefer the default visual */
 	    *visual = DefaultVisual(dpy, scr);
 	}
@@ -1822,27 +1807,26 @@ GetVisual(int class, Visual** visual, int* depth)
 }
 
 void
-PaletteMake(plot_struct* plot, t_sm_palette* tpal)
+PaletteMake(plot_struct * plot, t_sm_palette * tpal)
 {
     static int virgin = yes;
     static int recursion = 0;
     int max_colors;
     int min_colors;
-    char* save_title = (char*) 0;
-    
+    char *save_title = (char *) 0;
+
     if (tpal && tpal->use_maxcolors > 0)
-       max_colors = tpal->use_maxcolors;
+	max_colors = tpal->use_maxcolors;
     else
-       max_colors = maximal_possible_colors;
-	 
-    min_colors = minimal_possible_colors < max_colors ?
-	 minimal_possible_colors : max_colors / (num_colormaps > 1 ? 2 : 8);
+	max_colors = maximal_possible_colors;
+
+    min_colors = minimal_possible_colors < max_colors ? minimal_possible_colors : max_colors / (num_colormaps > 1 ? 2 : 8);
 
     if (tpal)
-      FPRINTF((stderr, "(PaletteMake) tpal->use_maxcolors = %d\n", tpal->use_maxcolors));
+	FPRINTF((stderr, "(PaletteMake) tpal->use_maxcolors = %d\n", tpal->use_maxcolors));
     else
-      FPRINTF((stderr, "(PaletteMake) tpal=NULL\n"));
-    
+	FPRINTF((stderr, "(PaletteMake) tpal=NULL\n"));
+
 
     /* reallocate the palette
      * only if it has changed.
@@ -1852,8 +1836,7 @@ PaletteMake(plot_struct* plot, t_sm_palette* tpal)
 	tpal->formulaG == sm_palette.formulaG &&
 	tpal->formulaB == sm_palette.formulaB &&
 	tpal->colorMode == sm_palette.colorMode &&
-	tpal->positive == sm_palette.positive &&
-	tpal->use_maxcolors == sm_palette.use_maxcolors) {
+	tpal->positive == sm_palette.positive && tpal->use_maxcolors == sm_palette.use_maxcolors) {
 	FPRINTF((stderr, "(PaletteMake) palette didn't change.\n"));
 	return;
     } else if (tpal) {
@@ -1908,28 +1891,23 @@ PaletteMake(plot_struct* plot, t_sm_palette* tpal)
      * Note that I make no difference for different
      * visual types here. (joze)
      */
-    for (/* EMPTY */; max_colors >= min_colors; max_colors /= 2) {
+    for ( /* EMPTY */ ; max_colors >= min_colors; max_colors /= 2) {
 
 	XColor xcolor;
 	double fact = 1.0 / (double) max_colors;
 
 	ReallocColors(plot, max_colors);
 
-	for (plot->cmap->allocated = 0;
-	    plot->cmap->allocated < max_colors;
-	    plot->cmap->allocated++) {
+	for (plot->cmap->allocated = 0; plot->cmap->allocated < max_colors; plot->cmap->allocated++) {
 
 	    double gray = (double) plot->cmap->allocated * fact;
 	    if (sm_palette.colorMode == SMPAL_COLOR_MODE_GRAY) {
 		/* gray scale only */
 		xcolor.red = xcolor.green = xcolor.blue = 0xffff * gray;
 	    } else {
-		xcolor.red = 0xffff
-		    * GetColorValueFromFormula(sm_palette.formulaR, gray);
-		xcolor.green = 0xffff
-		    * GetColorValueFromFormula(sm_palette.formulaG, gray);
-		xcolor.blue = 0xffff
-		    * GetColorValueFromFormula(sm_palette.formulaB, gray);
+		xcolor.red = 0xffff * GetColorValueFromFormula(sm_palette.formulaR, gray);
+		xcolor.green = 0xffff * GetColorValueFromFormula(sm_palette.formulaG, gray);
+		xcolor.blue = 0xffff * GetColorValueFromFormula(sm_palette.formulaB, gray);
 	    }
 	    if (XAllocColor(dpy, plot->cmap->colormap, &xcolor)) {
 		plot->cmap->pixels[plot->cmap->allocated] = xcolor.pixel;
@@ -1942,7 +1920,7 @@ PaletteMake(plot_struct* plot, t_sm_palette* tpal)
 	}
 
 	if (plot->cmap->allocated == max_colors) {
-	    break; /* success! */
+	    break;		/* success! */
 	}
 
 	/* reduce the number of max_colors to at
@@ -1962,20 +1940,19 @@ PaletteMake(plot_struct* plot, t_sm_palette* tpal)
 	ReleaseColormap(plot);
 	/* create a private colormap. */
 	fprintf(stderr, "switching to private colormap\n");
-	plot->cmap = (cmap_t*) malloc(sizeof (cmap_t));
+	plot->cmap = (cmap_t *) malloc(sizeof(cmap_t));
 	assert(plot->cmap);
 	CmapClear(plot->cmap);
 	plot->cmap->colormap = XCreateColormap(dpy, root, vis, AllocNone);
 	assert(plot->cmap->colormap);
-	pr_color(plot->cmap); /* set default colors for lines */
+	pr_color(plot->cmap);	/* set default colors for lines */
 	RecolorWindow(plot);
 	recursion = 1;
-	PaletteMake(plot, (t_sm_palette*) 0);
+	PaletteMake(plot, (t_sm_palette *) 0);
     } else {
 	/* this is just for calculating the number of unique colors */
 	int i;
-	unsigned long previous
-	    = plot->cmap->allocated ? plot->cmap->pixels[0]: 0;
+	unsigned long previous = plot->cmap->allocated ? plot->cmap->pixels[0] : 0;
 	int unique_colors = 1;
 	for (i = 0; i < plot->cmap->allocated; i++) {
 	    if (plot->cmap->pixels[i] != previous) {
@@ -1998,7 +1975,7 @@ PaletteMake(plot_struct* plot, t_sm_palette* tpal)
 }
 
 void
-PaletteSetColor(plot_struct* plot, double gray)
+PaletteSetColor(plot_struct * plot, double gray)
 {
     if (plot->cmap->allocated) {
 	int index = gray * (plot->cmap->allocated - 1);
@@ -2133,12 +2110,12 @@ SetTime(plot_struct * plot, Time t)
 }
 
 unsigned long
-AllocateXorPixel(cmap_t* cmap_ptr)
+AllocateXorPixel(cmap_t * cmap_ptr)
 {
     unsigned long pixel;
     XColor xcolor;
 
-    xcolor.pixel = cmap_ptr->colors[0]; /* background color */
+    xcolor.pixel = cmap_ptr->colors[0];	/* background color */
     XQueryColor(dpy, cmap_ptr->colormap, &xcolor);
 
     if (xcolor.red + xcolor.green + xcolor.blue < 0xffff) {
@@ -2170,7 +2147,7 @@ AllocateXorPixel(cmap_t* cmap_ptr)
 }
 
 void
-GetGCXor(plot_struct* plot, GC* ret)
+GetGCXor(plot_struct * plot, GC * ret)
 {
     XGCValues values;
     unsigned long mask = 0;
@@ -2185,18 +2162,17 @@ GetGCXor(plot_struct* plot, GC* ret)
 }
 
 void
-GetGCXorDashed(plot_struct* plot, GC* gc)
+GetGCXorDashed(plot_struct * plot, GC * gc)
 {
     GetGCXor(plot, gc);
-    XSetLineAttributes(dpy, *gc,
-	0, /* line width, X11 treats 0 as a `thin' line */
+    XSetLineAttributes(dpy, *gc, 0,	/* line width, X11 treats 0 as a `thin' line */
 		       LineOnOffDash,	/* also: LineDoubleDash */
 		       CapNotLast,	/* also: CapButt, CapRound, CapProjecting */
 		       JoinMiter /* also: JoinRound, JoinBevel */ );
 }
 
 void
-GetGCBlackAndWhite(plot_struct* plot, GC* ret, Pixmap pixmap, int mode)
+GetGCBlackAndWhite(plot_struct * plot, GC * ret, Pixmap pixmap, int mode)
     /* returns the newly created gc      */
     /* pixmap: where the gc will be used */
     /* mode == 0 --> black on white      */
@@ -2277,8 +2253,7 @@ EraseCoords(plot_struct * plot)
     }
 
     if (plot->str[0]) {
-	XDrawString(dpy, plot->window, gc_xor, 1, plot->gheight + vchar - 1,
-	    plot->str, strlen(plot->str));
+	XDrawString(dpy, plot->window, gc_xor, 1, plot->gheight + vchar - 1, plot->str, strlen(plot->str));
     }
 
     /*
@@ -2292,12 +2267,11 @@ void
 DrawCoords(plot_struct * plot, const char *str)
 {
     if (!gc_xor) {
-        GetGCXor(plot, &gc_xor);
+	GetGCXor(plot, &gc_xor);
     }
 
     if (str[0] != 0)
-	XDrawString
-	    (dpy, plot->window, gc_xor, 1, plot->gheight + vchar - 1, str, strlen(str));
+	XDrawString(dpy, plot->window, gc_xor, 1, plot->gheight + vchar - 1, str, strlen(str));
 
     /*
        XFlush(dpy);
@@ -2350,8 +2324,7 @@ int
 is_meta(KeySym mod)
 {
     /* we make no difference between alt and meta */
-    return (XK_Meta_R == mod || XK_Meta_L == mod
-	|| XK_Alt_R == mod || XK_Alt_L == mod);
+    return (XK_Meta_R == mod || XK_Meta_L == mod || XK_Alt_R == mod || XK_Alt_L == mod);
 }
 
 int
@@ -2372,9 +2345,7 @@ reset_cursor()
     int plot_number;
     plot_struct *plot = plot_array;
 
-    for (plot_number = 0, plot = plot_array;
-	 plot_number < MAX_WINDOWS;
-	 ++plot_number, ++plot) {
+    for (plot_number = 0, plot = plot_array; plot_number < MAX_WINDOWS; ++plot_number, ++plot) {
 	if (plot->window) {
 	    FPRINTF((stderr, "Window for plot %d exists\n", plot_number));
 	    XUndefineCursor(dpy, plot->window);
@@ -2396,9 +2367,7 @@ Window window;
     int plot_number;
     plot_struct *plot = plot_array;
 
-    for (plot_number = 0, plot = plot_array;
-	 plot_number < MAX_WINDOWS;
-	 ++plot_number, ++plot) {
+    for (plot_number = 0, plot = plot_array; plot_number < MAX_WINDOWS; ++plot_number, ++plot) {
 	if (plot->window == window) {
 	    FPRINTF((stderr, "Event for plot %d\n", plot_number));
 	    return plot;
@@ -2462,10 +2431,8 @@ XEvent *event;
 	    if (event->xconfigure.x != 0 || event->xconfigure.y != 0) {
 		plot->x = event->xconfigure.x;
 		plot->y = event->xconfigure.y;
-		    plot->posn_flags
-			= (plot->posn_flags & ~PPosition) | USPosition;
+		plot->posn_flags = (plot->posn_flags & ~PPosition) | USPosition;
 	    }
-
 #ifdef USE_MOUSE
 	    /* first, check whether we were waiting
 	     * for completion of a resize */
@@ -2476,17 +2443,14 @@ XEvent *event;
 		 * make a good guess which can only fail if the user
 		 * resizes the window while we're also resizing it
 		 * ourselves: */
-		    if (w == plot->width &&
-			(h == plot->gheight || h == plot->gheight+vchar)) {
+		if (w == plot->width && (h == plot->gheight || h == plot->gheight + vchar)) {
 		    /* most likely, it's a resize for showing/hiding
 		     * the status line: test whether the height is now
 		     * correct; if not, start another resize: */
-			if (w == plot->width
-			    && h == plot->gheight+(plot->str[0]?vchar:0) ) {
+		    if (w == plot->width && h == plot->gheight + (plot->str[0] ? vchar : 0)) {
 			plot->resizing = FALSE;
 		    } else {
-			    XResizeWindow(dpy, plot->window, plot->width,
-				plot->gheight + (plot->str[0]?vchar:0));
+			XResizeWindow(dpy, plot->window, plot->width, plot->gheight + (plot->str[0] ? vchar : 0));
 		    }
 		    plot->height = h;
 		    break;
@@ -2495,8 +2459,7 @@ XEvent *event;
 	    }
 #endif
 
-		if (w > 1 && h > 1 &&
-		    (w != plot->width || h != plot->height)) {
+	    if (w > 1 && h > 1 && (w != plot->width || h != plot->height)) {
 
 		plot->width = w;
 		plot->height = h;
@@ -2517,8 +2480,7 @@ XEvent *event;
     case KeyPress:
 	plot = find_plot(event->xkey.window);
 #if 0
-	if (0 == XLookupString(&(event->xkey), key_string, sizeof(key_string),
-		(KeySym*) NULL, (XComposeStatus*) NULL))
+	if (0 == XLookupString(&(event->xkey), key_string, sizeof(key_string), (KeySym *) NULL, (XComposeStatus *) NULL))
 	    key_string[0] = 0;
 #endif
 
@@ -2550,8 +2512,8 @@ XEvent *event;
 		break;
 	    }			/* switch (keysym) */
 #ifdef USE_MOUSE
-	} /* if (!modifier_mask) */
-
+	}
+	/* if (!modifier_mask) */
 	switch (keysym) {
 
 #define KNOWN_KEYSYMS(gp_keysym)                                             \
@@ -2753,8 +2715,7 @@ XEvent *event;
 	break;
     case ClientMessage:
 	if (event->xclient.message_type == WM_PROTOCOLS &&
-	    event->xclient.format == 32 &&
-	    event->xclient.data.l[0] == WM_DELETE_WINDOW) {
+	    event->xclient.format == 32 && event->xclient.data.l[0] == WM_DELETE_WINDOW) {
 	    plot = find_plot(event->xclient.window);
 	    if (plot) {
 		delete_plot(plot);
@@ -2774,7 +2735,7 @@ XEvent *event;
 	 */
 	plot = find_plot(event->xexpose.window);
 	if (!plot)
-	   break;
+	    break;
 	if (!event->xexpose.count) {
 	    /* XXX jitters display while resizing */
 	    UpdateWindow(plot);
@@ -2783,7 +2744,7 @@ XEvent *event;
     case EnterNotify:
 	plot = find_plot(event->xcrossing.window);
 	if (!plot)
-	   break;
+	    break;
 	if (plot == current_plot) {
 	    Call_display(plot);
 	    gp_exec_event(GE_motion, (int) RevX(event->xcrossing.x), (int) RevY(event->xcrossing.y), 0, 0);
@@ -2799,15 +2760,16 @@ XEvent *event;
 	update_modifiers(event->xmotion.state);
 	plot = find_plot(event->xmotion.window);
 	if (!plot)
-	   break;
+	    break;
 	{
 	    Window root, child;
 	    int root_x, root_y, pos_x, pos_y;
 	    unsigned int keys_buttons;
-	    if (!XQueryPointer(dpy,event->xmotion.window,&root,&child,&root_x,&root_y,&pos_x,&pos_y,&keys_buttons)) break;
+	    if (!XQueryPointer(dpy, event->xmotion.window, &root, &child, &root_x, &root_y, &pos_x, &pos_y, &keys_buttons))
+		break;
 
 	    if (plot == current_plot) {
-	        Call_display(plot);
+		Call_display(plot);
 		gp_exec_event(GE_motion, (int) RevX(pos_x), (int) RevY(pos_y), 0, 0);
 	    }
 
@@ -2823,20 +2785,18 @@ XEvent *event;
 	update_modifiers(event->xbutton.state);
 	plot = find_plot(event->xbutton.window);
 	if (!plot)
-	   break;
+	    break;
 	{
 	    if (plot == current_plot) {
-	        Call_display(plot);
-		gp_exec_event(GE_buttonpress,
-		    (int)RevX(event->xbutton.x), (int)RevY(event->xbutton.y),
-		    event->xbutton.button, 0);
+		Call_display(plot);
+		gp_exec_event(GE_buttonpress, (int) RevX(event->xbutton.x), (int) RevY(event->xbutton.y), event->xbutton.button, 0);
 	    }
 	}
 	break;
     case ButtonRelease:
 	plot = find_plot(event->xbutton.window);
 	if (!plot)
-	   break;
+	    break;
 	if (plot == current_plot) {
 
 	    long int doubleclick = SetTime(plot, event->xbutton.time);
@@ -2844,8 +2804,7 @@ XEvent *event;
 	    update_modifiers(event->xbutton.state);
 	    Call_display(plot);
 	    gp_exec_event(GE_buttonrelease,
-		(int)RevX(event->xbutton.x), (int)RevY(event->xbutton.y),
-		event->xbutton.button, (int) doubleclick );
+			  (int) RevX(event->xbutton.x), (int) RevY(event->xbutton.y), event->xbutton.button, (int) doubleclick);
 	}
 	break;
 #endif /* USE_MOUSE */
@@ -2933,8 +2892,8 @@ char *argv[];
     Visual *TrueColor_vis, *PseudoColor_vis, *StaticGray_vis, *GrayScale_vis;
     int TrueColor_depth, PseudoColor_depth, StaticGray_depth, GrayScale_depth;
 #endif
-    char* db_string;
-    sm_palette.colorMode = SMPAL_COLOR_MODE_NONE; /* color is off by default */
+    char *db_string;
+    sm_palette.colorMode = SMPAL_COLOR_MODE_NONE;	/* color is off by default */
 #endif
 
     FPRINTF((stderr, "(preset) \n"));
@@ -3080,18 +3039,17 @@ gnuplot: X11 aborted.\n", ldisplay);
 
 #if PM3D
     /* a specific visual can be forced by the X resource visual */
-    db_string = pr_GetR(db, ".visual") ? (char *) value.addr : (char*) 0;
+    db_string = pr_GetR(db, ".visual") ? (char *) value.addr : (char *) 0;
     if (db_string) {
-	Visual* visual = (Visual*) 0;
+	Visual *visual = (Visual *) 0;
 	int depth = (int) 0;
-	char** ptr = visual_name;
+	char **ptr = visual_name;
 	int i;
 	for (i = 0; *ptr; i++, ptr++) {
 	    if (!strcmp(db_string, *ptr)) {
 #if 0
 		if (DirectColor == i) {
-		    fprintf(stderr,
-			"DirectColor not supported by pm3d, using default.\n");
+		    fprintf(stderr, "DirectColor not supported by pm3d, using default.\n");
 		} else
 #endif
 		if (GetVisual(i, &visual, &depth)) {
@@ -3099,12 +3057,10 @@ gnuplot: X11 aborted.\n", ldisplay);
 		    dep = depth;
 		    if (vis != DefaultVisual(dpy, scr)) {
 			/* this will be the default colormap */
-			cmap.colormap
-			    = XCreateColormap(dpy, root, vis, AllocNone);
+			cmap.colormap = XCreateColormap(dpy, root, vis, AllocNone);
 		    }
 		} else {
-		    fprintf(stderr, "%s not supported by %s, using default.\n",
-			*ptr, ldisplay);
+		    fprintf(stderr, "%s not supported by %s, using default.\n", *ptr, ldisplay);
 		}
 		break;
 	    }
@@ -3118,9 +3074,8 @@ gnuplot: X11 aborted.\n", ldisplay);
 #if 0
     /* removed this message as it is annoying
      * when using gnuplot in a pipe (joze) */
-    if (vis->class < (sizeof(visual_name) / sizeof(char**)) - 1) {
-	fprintf(stderr, "Using %s at depth %d.\n",
-	    visual_name[vis->class], dep);
+    if (vis->class < (sizeof(visual_name) / sizeof(char **)) - 1) {
+	fprintf(stderr, "Using %s at depth %d.\n", visual_name[vis->class], dep);
     }
 #endif
     CmapClear(&cmap);
@@ -3132,11 +3087,11 @@ gnuplot: X11 aborted.\n", ldisplay);
 	maximal_possible_colors = 0x100;
     } else {
 	/* will be something like PseudoColor * 8 */
-	maximal_possible_colors = 240; /* leave 16 for line colors */
+	maximal_possible_colors = 240;	/* leave 16 for line colors */
     }
 
     /* check database for maxcolors */
-    db_string = pr_GetR(db, ".maxcolors") ? (char *) value.addr : (char*) 0;
+    db_string = pr_GetR(db, ".maxcolors") ? (char *) value.addr : (char *) 0;
     if (db_string) {
 	int itmp;
 	if (sscanf(db_string, "%d", &itmp)) {
@@ -3153,10 +3108,9 @@ gnuplot: X11 aborted.\n", ldisplay);
     }
 
     /* setting a default for minimal_possible_colors */
-    minimal_possible_colors = maximal_possible_colors /
-	(num_colormaps > 1 ? 2 : 8); /* 0x20 / 30 */
+    minimal_possible_colors = maximal_possible_colors / (num_colormaps > 1 ? 2 : 8);	/* 0x20 / 30 */
     /* check database for mincolors */
-    db_string = pr_GetR(db, ".mincolors") ? (char *) value.addr : (char*) 0;
+    db_string = pr_GetR(db, ".mincolors") ? (char *) value.addr : (char *) 0;
     if (db_string) {
 	int itmp;
 	if (sscanf(db_string, "%d", &itmp)) {
@@ -3165,8 +3119,7 @@ gnuplot: X11 aborted.\n", ldisplay);
 	    } else if (itmp > pow((double) 2, (double) dep)) {
 		fprintf(stderr, "\noops, cannot use this many colors on a %d bit deep display.\n", dep);
 	    } else if (itmp > maximal_possible_colors) {
-		fprintf(stderr, "\nmincolors must be <= %d\n",
-		    maximal_possible_colors);
+		fprintf(stderr, "\nmincolors must be <= %d\n", maximal_possible_colors);
 	    } else {
 		minimal_possible_colors = itmp;
 	    }
@@ -3178,7 +3131,7 @@ gnuplot: X11 aborted.\n", ldisplay);
 
     pr_geometry();
     pr_font();
-    pr_color(&cmap); /* set colors for default colormap */
+    pr_color(&cmap);		/* set colors for default colormap */
     pr_width();
     pr_dashes();
     pr_pointsize();
@@ -3202,8 +3155,7 @@ char *resource;
     strcpy(class, Class);
     strcat(class, resource);
     rc = XrmGetResource(xrdb, name, class, type, &value)
-    ? (char *) value.addr
-    : (char *) 0;
+	? (char *) value.addr : (char *) 0;
     return (rc);
 }
 
@@ -3233,7 +3185,7 @@ char gray_values[Ncolors][30] = {
 };
 
 void
-pr_color(cmap_t* cmap_ptr)
+pr_color(cmap_t * cmap_ptr)
 {
     unsigned long black = BlackPixel(dpy, scr), white = WhitePixel(dpy, scr);
     char option[20], color[30], *v, *ctype;
@@ -3273,7 +3225,7 @@ pr_color(cmap_t* cmap_ptr)
 		strcat(option, ctype);
 	    v = pr_GetR(db, option)
 		? (char *) value.addr : ((Gray) ? gray_values[n]
-		    : (Rv ? color_values_rv[n] : color_values[n]));
+					 : (Rv ? color_values_rv[n] : color_values[n]));
 
 	    if (sscanf(v, "%30[^,],%lf", color, &intensity) == 2) {
 		if (intensity < 0 || intensity > 1) {
@@ -3286,8 +3238,7 @@ pr_color(cmap_t* cmap_ptr)
 	    }
 
 	    if (!XParseColor(dpy, cmap_ptr->colormap, color, &xcolor)) {
-		fprintf(stderr, "\ngnuplot: unable to parse '%s'. Using black.\n",
-			color);
+		fprintf(stderr, "\ngnuplot: unable to parse '%s'. Using black.\n", color);
 		cmap_ptr->colors[n] = black;
 	    } else {
 		xcolor.red *= intensity;
@@ -3296,8 +3247,7 @@ pr_color(cmap_t* cmap_ptr)
 		if (XAllocColor(dpy, cmap_ptr->colormap, &xcolor)) {
 		    cmap_ptr->colors[n] = xcolor.pixel;
 		} else {
-		    fprintf(stderr, "\ngnuplot: can't allocate '%s'. Using black.\n",
-			    v);
+		    fprintf(stderr, "\ngnuplot: can't allocate '%s'. Using black.\n", v);
 		    cmap_ptr->colors[n] = black;
 		}
 	    }
@@ -3490,8 +3440,7 @@ ProcessEvents(Window win)
 
 void
 pr_window(plot)
-plot_struct *
-    plot;
+plot_struct *plot;
 {
     char *title = pr_GetR(db, ".title");
     static XSizeHints hints;
@@ -3507,23 +3456,21 @@ plot_struct *
 	attr.border_pixel = plot->cmap->colors[1];
 	attr.colormap = plot->cmap->colormap;
 	plot->window = XCreateWindow(dpy, root, plot->x, plot->y, plot->width,
-	    plot->height, BorderWidth, dep, InputOutput, vis, mask, &attr);
+				     plot->height, BorderWidth, dep, InputOutput, vis, mask, &attr);
 	/* XXX need this ? yes. (joze) XXX */
 	if (plot->window && SMPAL_COLOR_MODE_NONE != sm_palette.colorMode) {
-	    PaletteMake(plot, (t_sm_palette*) 0);
+	    PaletteMake(plot, (t_sm_palette *) 0);
 	}
     } else
 #endif
-    plot->window = XCreateSimpleWindow(dpy, root, plot->x, plot->y,
-	plot->width, plot->height, BorderWidth,
-	plot->cmap->colors[1], plot->cmap->colors[0]);
+	plot->window = XCreateSimpleWindow(dpy, root, plot->x, plot->y,
+					   plot->width, plot->height, BorderWidth, plot->cmap->colors[1], plot->cmap->colors[0]);
 
     /* ask ICCCM-compliant window manager to tell us when close window
      * has been chosen, rather than just killing us
      */
 
-    XChangeProperty(dpy, plot->window, WM_PROTOCOLS, XA_ATOM, 32,
-	PropModeReplace, (unsigned char *) &WM_DELETE_WINDOW, 1);
+    XChangeProperty(dpy, plot->window, WM_PROTOCOLS, XA_ATOM, 32, PropModeReplace, (unsigned char *) &WM_DELETE_WINDOW, 1);
 
     if (pr_GetR(db, ".clear") && On(value.addr))
 	Clear++;
@@ -3633,8 +3580,7 @@ XEvent *event;
 
 		XChangeProperty(dpy, reply.xselection.requestor,
 				reply.xselection.property, reply.xselection.target,
-			32, PropModeReplace,
-				(unsigned char *) &(cmap.colormap), 1);
+				32, PropModeReplace, (unsigned char *) &(cmap.colormap), 1);
 	    } else if (reply.xselection.target == XA_PIXMAP) {
 
 		FPRINTF((stderr, "pixmap request from %d\n", reply.xselection.requestor));
@@ -3647,7 +3593,7 @@ XEvent *event;
 		FPRINTF((stderr, "XA_STRING request\n"));
 		XChangeProperty(dpy, reply.xselection.requestor,
 				reply.xselection.property, reply.xselection.target,
-				8, PropModeReplace, (unsigned char *)selection, strlen(selection));
+				8, PropModeReplace, (unsigned char *) selection, strlen(selection));
 #endif
 	    } else {
 		reply.xselection.property = None;

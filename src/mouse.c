@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.15 2000/11/21 14:15:24 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.16 2000/11/23 08:35:39 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -48,7 +48,7 @@ static char *RCSid() { return RCSid("$Id: mouse.c,v 1.15 2000/11/21 14:15:24 mik
 #include "gp_types.h"
 
 #define _MOUSE_C
-#ifdef USE_MOUSE /* comment out whole file, otherwise... */
+#ifdef USE_MOUSE		/* comment out whole file, otherwise... */
 
 #include "mouse.h"
 #ifdef PM3D
@@ -119,16 +119,15 @@ static int setting_zoom_x, setting_zoom_y;
 /* do we allow motion to result in a replot right now? */
 TBOOLEAN allowmotion = TRUE;	/* used by pm.trm, too */
 /* did we already postpone a replot because allowmotion was FALSE ? */
-static TBOOLEAN needreplot = FALSE; 
+static TBOOLEAN needreplot = FALSE;
 /* mouse position when dragging started */
 static int start_x, start_y;
 /* ButtonPress sets this to 0, ButtonMotion to 1 */
 static int motion = 0;
 /* values for rot_x and rot_z corresponding to zero position of mouse */
-static float zero_rot_x, zero_rot_z; 
+static float zero_rot_x, zero_rot_z;
 
-typedef void (map_func_type) __PROTO((struct position * pos, unsigned int *x,
-				      unsigned int *y, const char *what));
+typedef void (map_func_type) __PROTO((struct position * pos, unsigned int *x, unsigned int *y, const char *what));
 
 /* bind related stuff */
 
@@ -141,7 +140,7 @@ typedef struct bind_t {
     struct bind_t *next;
 } bind_t;
 
-static bind_t* bindings = (bind_t*) 0;
+static bind_t *bindings = (bind_t *) 0;
 static const int NO_KEY = -1;
 static TBOOLEAN trap_release = FALSE;
 
@@ -218,8 +217,7 @@ static void bind_append __PROTO((char *lhs, char *rhs, char *(*builtin) (struct 
 /* void bind_remove_all __PROTO((void)); */
 static void recalc_ruler_pos __PROTO((void));
 static void turn_ruler_off __PROTO((void));
-static int nearest_label_tag __PROTO((int x, int y, struct termentry* t,
-				      map_func_type *));
+static int nearest_label_tag __PROTO((int x, int y, struct termentry * t, map_func_type *));
 static void remove_label __PROTO((int x, int y));
 static void put_label __PROTO((char *label, double x, double y));
 # ifdef OS2
@@ -280,8 +278,7 @@ MousePosToGraphPosReal(int xx, int yy, double *x, double *y, double *x2, double 
 {
     if (!is_3d_plot) {
 # if 0
-	printf("POS: xleft=%i, xright=%i, ybot=%i, ytop=%i\n",
-	       xleft, xright, ybot, ytop);
+	printf("POS: xleft=%i, xright=%i, ybot=%i, ytop=%i\n", xleft, xright, ybot, ytop);
 # endif
 	if (xright == xleft)
 	    *x = *x2 = 1e38;	/* protection */
@@ -296,7 +293,7 @@ MousePosToGraphPosReal(int xx, int yy, double *x, double *y, double *x2, double 
 	    *y2 = AXIS_MAPBACK(SECOND_Y_AXIS, yy);
 	}
 #if 0
-	printf("POS: xx=%i, yy=%i  =>  x=%g  y=%g\n",xx, yy, *x, *y);
+	printf("POS: xx=%i, yy=%i  =>  x=%g  y=%g\n", xx, yy, *x, *y);
 #endif
     } else {
 	/* for 3D plots, we treat the mouse position as if it is
@@ -306,14 +303,18 @@ MousePosToGraphPosReal(int xx, int yy, double *x, double *y, double *x2, double 
 	xx -= axis3d_o_x;
 	yy -= axis3d_o_y;
 	if (abs(axis3d_x_dx) > abs(axis3d_x_dy)) {
-	    *x = axis_array[FIRST_X_AXIS].min + ((double) xx) / axis3d_x_dx * (axis_array[FIRST_X_AXIS].max - axis_array[FIRST_X_AXIS].min);
+	    *x = axis_array[FIRST_X_AXIS].min + ((double) xx) / axis3d_x_dx * (axis_array[FIRST_X_AXIS].max -
+									       axis_array[FIRST_X_AXIS].min);
 	} else {
-	    *x = axis_array[FIRST_X_AXIS].min + ((double) yy) / axis3d_x_dy * (axis_array[FIRST_X_AXIS].max - axis_array[FIRST_X_AXIS].min);
+	    *x = axis_array[FIRST_X_AXIS].min + ((double) yy) / axis3d_x_dy * (axis_array[FIRST_X_AXIS].max -
+									       axis_array[FIRST_X_AXIS].min);
 	}
 	if (abs(axis3d_y_dx) > abs(axis3d_y_dy)) {
-	    *y = axis_array[FIRST_Y_AXIS].min + ((double) xx) / axis3d_y_dx * (axis_array[FIRST_Y_AXIS].max - axis_array[FIRST_Y_AXIS].min);
+	    *y = axis_array[FIRST_Y_AXIS].min + ((double) xx) / axis3d_y_dx * (axis_array[FIRST_Y_AXIS].max -
+									       axis_array[FIRST_Y_AXIS].min);
 	} else {
-	    *y = axis_array[FIRST_Y_AXIS].min + ((double) yy) / axis3d_y_dy * (axis_array[FIRST_Y_AXIS].max - axis_array[FIRST_Y_AXIS].min);
+	    *y = axis_array[FIRST_Y_AXIS].min + ((double) yy) / axis3d_y_dy * (axis_array[FIRST_Y_AXIS].max -
+									       axis_array[FIRST_Y_AXIS].min);
 	}
 	*x2 = *y2 = 1e38;	/* protection */
     }
@@ -371,8 +372,7 @@ xy1_format(char *leader)
 static char *
 GetAnnotateString(char *s, double x, double y, int mode, char *fmt)
 {
-    if (mode == MOUSE_COORDINATES_XDATE || mode == MOUSE_COORDINATES_XTIME ||
-	mode == MOUSE_COORDINATES_XDATETIME || mode == MOUSE_COORDINATES_TIMEFMT) {	/* time is on the x axis */
+    if (mode == MOUSE_COORDINATES_XDATE || mode == MOUSE_COORDINATES_XTIME || mode == MOUSE_COORDINATES_XDATETIME || mode == MOUSE_COORDINATES_TIMEFMT) {	/* time is on the x axis */
 	char buf[0xff];
 	char format[0xff] = "[%s, ";
 	strcat(format, mouse_setting.fmt);
@@ -492,7 +492,7 @@ GetCoordinateString(char *s, double x, double y)
 # endif
 
 
-/* ratio for log, distance for linear */	
+/* ratio for log, distance for linear */
 # define DIST(x,rx,axis)			\
    (axis_array[axis].log)			\
     ? ( (rx==0) ? 99999 : x / rx )		\
@@ -520,7 +520,7 @@ GetRulerString(char *p, double x, double y)
 
     dx = DIST(x, ruler.x, FIRST_X_AXIS);
     dy = DIST(y, ruler.y, FIRST_Y_AXIS);
-    sprintf(p, format, ruler.x,ruler.y, dx, dy);
+    sprintf(p, format, ruler.x, ruler.y, dx, dy);
 
     if (mouse_setting.polardistance && !axis_array[FIRST_X_AXIS].log && !axis_array[FIRST_Y_AXIS].log) {
 	/* polar coords of distance (axes cannot be logarithmic) */
@@ -542,8 +542,7 @@ GetRulerString(char *p, double x, double y)
 }
 
 
-static struct t_zoom *zoom_head = NULL,
-	      *zoom_now = NULL;
+static struct t_zoom *zoom_head = NULL, *zoom_now = NULL;
 
 /* Applies the zoom rectangle of  z  by sending the appropriate command
    to gnuplot
@@ -553,7 +552,7 @@ apply_zoom(struct t_zoom *z)
 {
     char s[255];
 
-    if (zoom_now != NULL) { /* remember the current zoom */
+    if (zoom_now != NULL) {	/* remember the current zoom */
 	zoom_now->xmin = AXIS_DE_LOG_VALUE(FIRST_X_AXIS, axis_array[FIRST_X_AXIS].min);
 	zoom_now->ymin = AXIS_DE_LOG_VALUE(FIRST_Y_AXIS, axis_array[FIRST_Y_AXIS].min);
 	zoom_now->x2min = AXIS_DE_LOG_VALUE(SECOND_X_AXIS, axis_array[SECOND_X_AXIS].min);
@@ -569,10 +568,9 @@ apply_zoom(struct t_zoom *z)
 	return;
     }
 
-    sprintf(s, "set xr[% #g:% #g]; set yr[% #g:% #g]",
-		zoom_now->xmin, zoom_now->xmax, zoom_now->ymin, zoom_now->ymax);
+    sprintf(s, "set xr[% #g:% #g]; set yr[% #g:% #g]", zoom_now->xmin, zoom_now->xmax, zoom_now->ymin, zoom_now->ymax);
     if (!is_3d_plot) {
-	sprintf(s+strlen(s), "; set x2r[% #g:% #g]; set y2r[% #g:% #g]",
+	sprintf(s + strlen(s), "; set x2r[% #g:% #g]; set y2r[% #g:% #g]",
 		zoom_now->x2min, zoom_now->x2max, zoom_now->y2min, zoom_now->y2max);
     }
     do_string_replot(s);
@@ -892,19 +890,19 @@ builtin_nearest_log(struct gp_event_t *ge)
 	 * would be better to derive that from the ..tics settings */
 	TBOOLEAN change = FALSE;
 	if (mouse_y < ybot + (ytop - ybot) / 4 && mouse_x > xleft && mouse_x < xright) {
-	    do_string( axis_array[FIRST_X_AXIS].log ? "unset log x" : "set log x");
+	    do_string(axis_array[FIRST_X_AXIS].log ? "unset log x" : "set log x");
 	    change = TRUE;
 	}
 	if (mouse_y > ytop - (ytop - ybot) / 4 && mouse_x > xleft && mouse_x < xright) {
-	    do_string( axis_array[SECOND_X_AXIS].log ? "unset log x2" : "set log x2");
+	    do_string(axis_array[SECOND_X_AXIS].log ? "unset log x2" : "set log x2");
 	    change = TRUE;
 	}
 	if (mouse_x < xleft + (xright - xleft) / 4 && mouse_y > ybot && mouse_y < ytop) {
-	    do_string( axis_array[FIRST_Y_AXIS].log ? "unset log y" : "set log y");
+	    do_string(axis_array[FIRST_Y_AXIS].log ? "unset log y" : "set log y");
 	    change = TRUE;
 	}
 	if (mouse_x > xright - (xright - xleft) / 4 && mouse_y > ybot && mouse_y < ytop) {
-	    do_string( axis_array[SECOND_Y_AXIS].log ? "unset log y2" : "set log y2");
+	    do_string(axis_array[SECOND_Y_AXIS].log ? "unset log y2" : "set log y2");
 	    change = TRUE;
 	}
 	if (change)
@@ -1391,10 +1389,10 @@ event_buttonrelease(struct gp_event_t *ge)
 	return;
     }
 
-    MousePosToGraphPosReal(mouse_x, mouse_y,
-	&real_x, &real_y, &real_x2, &real_y2);
+    MousePosToGraphPosReal(mouse_x, mouse_y, &real_x, &real_y, &real_x2, &real_y2);
 
-    FPRINTF(("MOUSE.C: doublclick=%i, set=%i, motion=%i, ALMOST2D=%i\n", (int) doubleclick, (int) mouse_setting.doubleclick, (int) motion, (int) ALMOST2D));
+    FPRINTF(("MOUSE.C: doublclick=%i, set=%i, motion=%i, ALMOST2D=%i\n", (int) doubleclick, (int) mouse_setting.doubleclick,
+	     (int) motion, (int) ALMOST2D));
 
     if (ALMOST2D) {
 	char s0[256];
@@ -1469,28 +1467,28 @@ event_motion(struct gp_event_t *ge)
 
     if (is_3d_plot
 #ifdef PM3D
-	&& !pm3d.map /* Rotate the surface if it is 3D graph and "set pm3d map" was not used. */
+	&& !pm3d.map		/* Rotate the surface if it is 3D graph and "set pm3d map" was not used. */
 #endif
-       ) {
+	) {
 
 	TBOOLEAN redraw = FALSE;
 
 	if (button & (1 << 1)) {
 
 	    /* dragging with button 1 -> rotate */
-#if 0 /* HBB 20001109: what's rint()? */
+#if 0				/* HBB 20001109: what's rint()? */
 	    surface_rot_x = rint(zero_rot_x + 180.0 * mouse_y / term->ymax);
 #else
-            surface_rot_x = floor(0.5 + zero_rot_x + 180.0 * mouse_y / term->ymax);
+	    surface_rot_x = floor(0.5 + zero_rot_x + 180.0 * mouse_y / term->ymax);
 #endif
 	    if (surface_rot_x < 0)
 		surface_rot_x = 0;
 	    if (surface_rot_x > 180)
 		surface_rot_x = 180;
-#if 0 /* HBB 20001109: what's rint()? */
+#if 0				/* HBB 20001109: what's rint()? */
 	    surface_rot_z = rint(fmod(zero_rot_z - 360.0 * mouse_x / term->xmax, 360));
 #else
-            surface_rot_z = floor(0.5 + fmod(zero_rot_z - 360.0 * mouse_x / term->xmax, 360));
+	    surface_rot_z = floor(0.5 + fmod(zero_rot_z - 360.0 * mouse_x / term->xmax, 360));
 #endif
 	    if (surface_rot_z < 0)
 		surface_rot_z += 360;
@@ -1676,7 +1674,7 @@ do_event(struct gp_event_t *ge)
 	break;
     }
 
-    replot_disabled = FALSE; /* enable replot again */
+    replot_disabled = FALSE;	/* enable replot again */
 }
 
 static void
@@ -2005,13 +2003,13 @@ recalc_ruler_pos(void)
 	ruler.px = -1;
     else {
 	P = AXIS_LOG_VALUE(FIRST_X_AXIS, ruler.x);
-	ruler.px = AXIS_MAP(FIRST_X_AXIS,P);
+	ruler.px = AXIS_MAP(FIRST_X_AXIS, P);
     }
     if (axis_array[FIRST_Y_AXIS].log && ruler.y < 0)
 	ruler.py = -1;
     else {
 	P = AXIS_LOG_VALUE(FIRST_Y_AXIS, ruler.y);
-	ruler.py = AXIS_MAP(FIRST_Y_AXIS,P);
+	ruler.py = AXIS_MAP(FIRST_Y_AXIS, P);
     }
     MousePosToGraphPosReal(ruler.px, ruler.py, &dummy, &dummy, &ruler.x2, &ruler.y2);
 }
@@ -2055,8 +2053,7 @@ turn_ruler_off(void)
 }
 
 static int
-nearest_label_tag(int xref, int yref, struct termentry *t,
-		  map_func_type *map_func)
+nearest_label_tag(int xref, int yref, struct termentry *t, map_func_type * map_func)
 {
     double min = -1;
     int min_tag = -1;

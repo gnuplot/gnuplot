@@ -45,7 +45,7 @@ static char *RCSid() { return RCSid("gadgets.c,v 1.1.3.1 2000/05/03 21:47:15 hbb
  * used to have it, in set.c and setshow.h */
 
 /* Control variables for the 'key' */
-t_key_flag key = KEY_AUTO_PLACEMENT; /* default position */
+t_key_flag key = KEY_AUTO_PLACEMENT;	/* default position */
 struct position key_user_pos;	/* user specified position for key */
 /* horizontal auto-positioning: left/right/'out' */
 t_key_horizontal_position key_hpos = TRIGHT;
@@ -60,15 +60,15 @@ TBOOLEAN key_reverse = FALSE;	/* reverse text & sample ? */
 double key_swidth = 4.0;
 double key_vert_factor = 1.0;
 double key_width_fix = 0.0;
-char key_title[MAX_LINE_LEN+1] = "";
+char key_title[MAX_LINE_LEN + 1] = "";
 
 #ifdef PM3D
-# define DEFAULT_KEYBOX_LP { 0, -3, 0, 1.0, 1.0, 0 } /* -3 = no linetype */
+# define DEFAULT_KEYBOX_LP { 0, -3, 0, 1.0, 1.0, 0 }	/* -3 = no linetype */
 #else
-# define DEFAULT_KEYBOX_LP { 0, -3, 0, 1.0, 1.0 } /* -3 = no linetype */
+# define DEFAULT_KEYBOX_LP { 0, -3, 0, 1.0, 1.0 }	/* -3 = no linetype */
 #endif
 const struct lp_style_type default_keybox_lp = DEFAULT_KEYBOX_LP;
-struct lp_style_type key_box = DEFAULT_KEYBOX_LP; 
+struct lp_style_type key_box = DEFAULT_KEYBOX_LP;
 
 /* The graph box, in terminal coordinates, as calculated by boundary()
  * or boundary3d(): */
@@ -187,7 +187,7 @@ unsigned int x, y;
 /* FIXME HBB 20000522: The parameter type has to become unsigned int */
 void
 draw_clip_line(x1, y1, x2, y2)
-    int x1, y1, x2, y2;
+int x1, y1, x2, y2;
 {
     register struct termentry *t = term;
 
@@ -202,7 +202,7 @@ draw_clip_line(x1, y1, x2, y2)
      * clip_line(), in a movement to reduce code duplication. There
      * was one very small difference between these two routines. See
      * clip_line() for a comment about it, at the relevant place. */
-    if (!clip_line(&x1,&y1,&x2,&y2))
+    if (!clip_line(&x1, &y1, &x2, &y2))
 	/* clip_line() returns zero --> segment completely outside
 	 * bounding box */
 	return;
@@ -323,7 +323,7 @@ int *x1, *y1, *x2, *y2;
 	x_max = *x1;
     }
     if (*y1 < *y2) {
-	y_min = *y1; 
+	y_min = *y1;
 	y_max = *y2;
     } else {
 	y_min = *y2;
@@ -356,10 +356,7 @@ int *x1, *y1, *x2, *y2;
 	}
     }
 
-    if (*x1 < x_min || *x1 > x_max ||
-	*x2 < x_min || *x2 > x_max ||
-	*y1 < y_min || *y1 > y_max ||
-	*y2 < y_min || *y2 > y_max)
+    if (*x1 < x_min || *x1 > x_max || *x2 < x_min || *x2 > x_max || *y1 < y_min || *y1 > y_max || *y2 < y_min || *y2 > y_max)
 	return 0;
 
     return 1;
@@ -385,4 +382,3 @@ unsigned int x, y;
     move_pos_x = x;
     move_pos_y = y;
 }
-
