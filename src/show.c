@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.67 2002/01/06 16:31:12 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.68 2002/01/22 15:52:24 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -51,6 +51,7 @@ static char *RCSid() { return RCSid("$Id: show.c,v 1.67 2002/01/06 16:31:12 miku
 #include "gp_time.h"
 #include "graphics.h"
 #include "hidden3d.h"
+#include "misc.h"
 #include "plot.h" /* for gnuplot_history_size */
 #include "plot2d.h"
 #include "plot3d.h"
