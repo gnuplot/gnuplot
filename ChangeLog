@@ -1,3 +1,9 @@
+2004-04-05  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* config/README: Small update.
+
+	* config/makefile.os2: Mention compiler optimization problem from BUGS.
+
 2004-04-04  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/svg.trm: 'Set term svg {fontfile <filename>}' option to embed a
