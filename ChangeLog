@@ -1,3 +1,10 @@
+2004-11-07  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/term.c (enhanced_recursion): Always allow backslash to escape the
+	5 special formatting characters @^_~& in postscript enhanced text mode.
+	This breaks certain character sequences in Shift-JIS, but the 
+	alternative makes these characters unavailable for all other encodings.
+
 2004-11-07  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* docs/gnuplot.doc: Typos.
