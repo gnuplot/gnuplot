@@ -148,7 +148,7 @@ if test "$am_cv_prog_cc_stdc" != no; then
 fi
 
 dnl check for ANSI style stringification
-gp_PROG_CPP_STRINGIFY
+AC_C_STRINGIZE
 
 AC_MSG_CHECKING(if compiler handles warn and error directives correctly)
 dnl this used to test #warning, but that is not currently used
@@ -312,10 +312,10 @@ if test "$with_plot" != no; then
   else
     dnl GNU plot library - test for new version first
     TERMXLIBS="$X_LIBS -lXaw -lXmu -lXt -lXext -lX11"
-    gp_CHECK_LIB_PATH(plot,textangle,[$TERMXLIBS])
+    gp_SEARCH_LIBDIRS(plot,textangle,[$TERMXLIBS])
     if test "$ac_cv_lib_plot_textangle" = no; then
       TERMXLIBS=
-      gp_CHECK_LIB_PATH(plot,rotate)
+      gp_SEARCH_LIBDIRS(plot,rotate)
       if test "$ac_cv_lib_plot_rotate" = no; then
         AC_MSG_WARN([can't find GNU libplot -- disabling gnugraph terminal])
         with_plot=no
@@ -334,11 +334,11 @@ dnl end plot
 
 dnl check for Tom Boutell's gd library
 if test "$with_gd" != no; then
-  gp_CHECK_LIB_PATH(gd,gdImageCreate)
+  gp_SEARCH_LIBDIRS(gd,gdImageCreate)
   if test "$ac_cv_lib_gd_gdImageCreate" = yes; then
-    gp_CHECK_HEADER(gd.h,,
+    gp_SEARCH_HEADERDIRS(gd.h,,
      AC_MSG_WARN([please add path to gd.h to INCLUDES in Makefile])
-    )dnl gp_CHECK_HEADER
+    )dnl gp_SEARCH_HEADERDIRS
     AC_DEFINE(HAVE_LIBGD)
   else
     AC_MSG_RESULT([- see term/gif.trm for download details])
@@ -348,15 +348,15 @@ dnl end gd
 
 dnl check for png and z library
 if test "$with_png" != no; then
-  gp_CHECK_LIB_PATH(png,png_info_init,[-lz])
+  gp_SEARCH_LIBDIRS(png,png_info_init,[-lz])
   if test "$ac_cv_lib_png_png_info_init" = yes; then
     TERMLIBS="$TERMLIBS -lz"
-    gp_CHECK_HEADER(png.h,,
+    gp_SEARCH_HEADERDIRS(png.h,,
      AC_MSG_WARN([please add path to png.h to INCLUDES in Makefile])
-    )dnl gp_CHECK_HEADER
-    gp_CHECK_HEADER(zlib.h,,
+    )dnl gp_SEARCH_HEADERIRS
+    gp_SEARCH_HEADERDIRS(zlib.h,,
      AC_MSG_WARN([please add path to zlib.h to INCLUDES in Makefile])
-    )dnl gp_CHECK_HEADER
+    )dnl gp_SEARCH_HEADERDIRS
     AC_EGREP_CPP(yes,
      [#include "png.h"
      # if PNG_LIBPNG_VER < 89
