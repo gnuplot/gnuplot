@@ -730,7 +730,7 @@ int max_using;
 		mixed_data_fp = TRUE; /* don't close command file */
 	} else {
 	        char msg[MAX_LINE_LEN];
-#ifndef NO_SYS_STAT_H
+#ifdef HAVE_SYS_STAT_H
 		struct stat statbuf;
 
 		if ((stat(filename,&statbuf) > -1) &&
@@ -738,7 +738,7 @@ int max_using;
 			sprintf(msg, "\"%s\" is not a regular file or pipe", filename);
 			os_error(msg, name_token);
 		}
-#endif /* NO_SYS_STAT_H */
+#endif /* HAVE_SYS_STAT_H */
 		if ((data_fp = fopen(filename, df_binary ? "rb" : "r")) == (FILE *) NULL) {
 			/* one day we will have proper printf-style error reporting fns */
 			sprintf(msg, "can't read data file \"%s\"", filename);
