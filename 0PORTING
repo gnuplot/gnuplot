@@ -1,6 +1,8 @@
 
  The following information is mainly geared towards people who want
-to port gnuplot to new platforms. Please do also read the file CodeStyle.
+to port gnuplot to new platforms not covered by the installation
+instructions in 0INSTALL and INSTALL.gnu. Please do also read the
+file CodeStyle.
 
  Some operating system dependent preprocessor symbols are defined near
 the top of plot.h. If you add a new platform, some definitions must

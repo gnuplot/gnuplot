@@ -89,6 +89,8 @@ Unix, configure
    On Unix, use
 $ ./configure
 $ make
+[ Optionally run demos--see "How to test gnuplot" below. ]
+$ make install
 
    If gcc is installed, it is used by default. A different compiler can be
 used through the CC environment variable:
@@ -524,19 +526,21 @@ Unix Bourne shell syntax.
    The demo files can be run interactively by eg.
 
 $ cd gnuplot/demo
-$ ../gnuplot simple.dem
+$ PATH=..:$PATH ../gnuplot simple.dem
 
 and gnuplot prompts the user to "Hit return to continue" to cycle
-through all the plots.
+through all the plots.  (The PATH= statement is only required if you are 
+using the X11 plotting device and the gnuplot_x11 binary has not been
+installed yet.)
 
    To run the demos in a specified file without interaction, one
 can use
 
-$ ../gnuplot simple.dem </dev/null
+$ PATH=..:$PATH ../gnuplot simple.dem </dev/null
 
    To run all demos non-interactively, use
 
-$ ../gnuplot all.dem </dev/null
+$ PATH=..:$PATH ../gnuplot all.dem </dev/null
 
    To use a different plotting device than the default (usually X11
 under Unix), use eg.
