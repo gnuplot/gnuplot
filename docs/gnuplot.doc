@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.35 1999/09/14 15:25:52 lhecking Exp $
+C RCS $Id: gnuplot.doc,v 1.36 1999/09/21 18:08:00 lhecking Exp $
 C 3 December 1998
 C Copyright (C) 1986 - 1993, 1998   Thomas Williams, Colin Kelley
 C
@@ -108,7 +108,8 @@ C
  work, but "command c a" will fail.
 
  Commands may extend over several input lines by ending each line but the last
- with a backslash (\).  The backslash must be the _last_ character on each
+ with a backslash (\).  Also, any line ending with a comma is treated as a
+ continuation line. The backslash or comma must be the _last_ character on each
  line.  The effect is as if the backslash and newline were not there.  That
  is, no white space is implied, nor is a comment terminated.  Therefore,
  commenting out a continued line comments out the entire command (see
@@ -4549,11 +4550,11 @@ C ... and restart the table:
  The command `set lmargin` sets the size of the left margin.  Please see
  `set margin` for details.
 3 loadpath
-? commands set loadpath
-? commands show loadpath
-? set loadpath
-? show loadpath
-? loadpath
+?commands set loadpath
+?commands show loadpath
+?set loadpath
+?show loadpath
+?loadpath
  The `loadpath` setting defines additional locations for data and command
  files searched by the `call`, `load`, `plot` and `splot` commands.  If a
  file cannot be found in the current directory, the directories in
@@ -6747,7 +6748,7 @@ C  The `lines` style connects adjacent points with straight line segments.
 
 3 splot_overview
 ?commands splot_overview
-? splot_overview
+?splot_overview
  `splot` can display a surface as a collection of points, or by connecting
  those points.  As with `plot`, the points may be read from a data file or
  result from evaluation of a function at specified intervals, see `set
