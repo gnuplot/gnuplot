@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.252 2004/10/25 14:44:38 mikulik Exp $
+C RCS $Id: gnuplot.doc,v 1.253 2004/10/26 04:30:50 sfeam Exp $
 C 18 September 2001
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -1747,7 +1747,7 @@ C ... and restart the table:
 
  (Parentheses and commas are also used as usual in function notation.)
 
- Brackets are used to delimit ranges, whether they are given on `set`, `plot`
+ Square brackets are used to delimit ranges given in `set`, `plot`
  or `splot` commands.
 
  Colons are used to separate extrema in `range` specifications (whether they
@@ -1759,12 +1759,31 @@ C ... and restart the table:
  Braces are used in text to be specially processed by some terminals, like
  `postscript`.  They are also used to denote complex numbers: {3,2} = 3 + 2i.
 
- Text may be enclosed in single- or double-quotes.  Backslash processing of
- sequences like \n (newline) and \345 (octal character code) is performed for
- double-quoted strings, but not for single-quoted strings.
+ At present you should not embed \n inside {} when using the `enhanced postscript`
+ terminal.
 
- The justification is the same for each line of a multi-line string.  Thus the
- center-justified string
+ The EEPIC, Imagen, Uniplex, LaTeX, and TPIC drivers allow a newline to be
+ specified by \\ in a single-quoted string or \\\\ in a double-quoted string.
+3 Quote Marks
+?quotes
+?syntax quotes
+ Gnuplot uses three forms of quote marks for delimiting text strings,
+ double-quote (ascii 34), single-quote (ascii 39), and backquote (ascii 96).
+
+ Filenames may be entered with either single- or double-quotes.  In this
+ manual the command examples generally single-quote filenames and double-quote
+ other string tokens for clarity.
+
+ String constants and text strings used for labels, titles, or other plot
+ elements may be enclosed in either single quotes or double quotes. Further
+ processing of the quoted text depends on the choice of quote marks.
+
+ Backslash processing of special characters like \n (newline) and 
+ \345 (octal character code) is performed for double-quoted strings,
+ but not for single-quoted strings.
+
+ Text justification is the same for each line of a multi-line string.
+ Thus the center-justified string
        "This is the first line of text.\nThis is the second line."
  will produce
                         This is the first line of text.
@@ -1774,17 +1793,12 @@ C ... and restart the table:
  will produce
            This is the first line of text.\nThis is the second line.
 
- Filenames may be entered with either single- or double-quotes.  In this
- manual the command examples generally single-quote filenames and double-quote
- other string tokens for clarity.
+ Enhanced text processing is performed for both double-quoted text and
+ single-quoted text, but only by terminals supporting this mode.
+ See `enhanced text`.
 
- At present you should not embed \n inside {} when using the `enhanced postscript`
- terminal.
-
- The EEPIC, Imagen, Uniplex, LaTeX, and TPIC drivers allow a newline to be
- specified by \\ in a single-quoted string or \\\\ in a double-quoted string.
-
- Back-quotes are used to enclose system commands for substitution.
+ Back-quotes are used to enclose system commands for substitution into the
+ command line.  See `substitution`.
 2 Time/Date data
 ^ <a name="Time/Date data"></a>
 ^ <a name="Time/date"></a>

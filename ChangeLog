@@ -1,3 +1,8 @@
+2004-10-26  Ethan Merritt  <merritt@u.washington.edu>
+
+	* docs/gnuplot.doc: Add separate section with indexed entry for 
+	discussion of quote marks.
+
 2004-10-25  Ethan Merritt  <merritt@u.washington.edu>
 
 	String variables - basic functionality
