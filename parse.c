@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: parse.c,v 1.9.2.1 2000/05/07 16:48:37 lhecking Exp $";
+static char *RCSid = "$Id: parse.c,v 1.9.2.2 2001/03/09 18:12:41 broeker Exp $";
 #endif
 
 /* GNUPLOT - parse.c */
@@ -352,12 +352,10 @@ static void factor()
 	add_action(DOLLARS)->v_arg = a;
     } else if (isanumber(c_token)) {
 	/* work around HP 9000S/300 HP-UX 9.10 cc limitation ... */
-#if defined(__hpux) && defined(__hp9000s300) && !defined(__GNUC__)
+	/* HBB 20010724: use this code for all platforms, then */
+
 	union argument *foo = add_action(PUSHC);
 	convert(&(foo->v_arg), c_token);
-#else
-	convert(&(add_action(PUSHC)->v_arg), c_token);
-#endif
 	c_token++;
     } else if (isletter(c_token)) {
 	if ((c_token + 1 < num_tokens) && equals(c_token + 1, "(")) {
