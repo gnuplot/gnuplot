@@ -1,3 +1,9 @@
+2003-01-22  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* FAQ, src/syscfg.h: Update FAQ location.
+
+	* configure.in: Fix faulty regexp in sed command and vgagl reporting.
+
 2003-01-22  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* term/post.trm (ENHPS_recurse): Fix buggy PS output if backslash
@@ -12,6 +18,10 @@
 
 	* src/README src/color.c term/post.trm: Changed "continous" to
 	"continuous".
+
+2003-01-13  Hans Werner Strube  <strube@physik3.gwdg.de>
+
+	* term/fig.trm: Fix text centering for nonzero text angle.
 
 2003-01-13  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
@@ -1730,7 +1740,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2003/01/22 10:30:00 $).
+	last modification date (from the tag $Date: 2003/01/22 15:08:36 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
