@@ -1,5 +1,5 @@
 /*
- * $Id: svg.trm,v 1.32 2004/03/22 00:21:24 sfeam Exp $
+ * $Id: svg.trm,v 1.33 2004/03/23 05:55:00 sfeam Exp $
  *
  */
 
@@ -376,8 +376,7 @@ SVG_options ()
 
     SVG_local_reset();
 
-    /* FIXME - Make this a loop over options (order-independent) */
-    if (!END_OF_COMMAND) {	/* get terminal size*/
+    while (!END_OF_COMMAND) {
 	if (almost_equals (c_token, "s$ize")) {
 	    double value;
 
@@ -396,27 +395,33 @@ SVG_options ()
 	    if (SVG_ySize < 2 || SVG_ySize > 8192)
 		int_error(c_token,"y size out of range");
 	    SVG_ySize = (unsigned int) value;
-
-	    if (almost_equals(c_token, "d$ynamic")) {
-		c_token++;
-		SVG_fixed_size = FALSE;
-	    } else if (almost_equals(c_token, "fi$xed")){
-		c_token++;
-		SVG_fixed_size = TRUE;
-	    }
-
+	    continue;
 	}
-    }
 
-    if (almost_equals(c_token, "enh$anced")) {
-	c_token++;
-	term->put_text = ENHsvg_put_text;
-    } else if (almost_equals(c_token, "noenh$anced")) {
-	c_token++;
-	term->put_text = SVG_put_text;
-    }
+	if (almost_equals(c_token, "d$ynamic")) {
+	    c_token++;
+	    SVG_fixed_size = FALSE;
+	    continue;
+	}
+
+	if (almost_equals(c_token, "fi$xed")){
+	    c_token++;
+	    SVG_fixed_size = TRUE;
+	    continue;
+	}
+
+	if (almost_equals(c_token, "enh$anced")) {
+	    c_token++;
+	    term->put_text = ENHsvg_put_text;
+	    continue;
+	} 
+
+	if (almost_equals(c_token, "noenh$anced")) {
+	    c_token++;
+	    term->put_text = SVG_put_text;
+	    continue;
+	}
 	    
-    if (!END_OF_COMMAND) {	/* get default font family name*/
 	if (almost_equals (c_token, "fn$ame"))  {
 	    c_token++;
 
@@ -425,21 +430,20 @@ SVG_options ()
 		c_token++;
 	    } else
 		int_error(c_token,"fname: expecting font name");
+	    continue;
 	}
-    }
 
-    if (!END_OF_COMMAND) {	/* get default font size*/
 	if (almost_equals (c_token, "fs$ize")) {
 	    c_token++;
 
 	    if (END_OF_COMMAND)
 		int_error(c_token,"fsize: expecting font size");
 	    SVG_fontSizeCur = real (const_express (&a));
+	    continue;
 	}
-    }
 
-    if (!END_OF_COMMAND)
-	 int_error(c_token, "unexpected text at end of command");
+	int_error(c_token, "unrecognized terminal option");
+    }
 
     /* Save options back into options string in normalized format */
     sprintf(term_options, "size %d %d%s %s fname '%s'  fsize %g",
@@ -1030,30 +1034,39 @@ ENHsvg_OPEN(fontname, fontsize, base, widthflag, showflag, overprint)
     double fontsize, base;
     int overprint;
 {
-    /* There are two special cases:
+    /* overprint = 1 means print the base text (leave position in center)
+     * overprint = 2 means print the overlying text
      * overprint = 3 means save current position
      * overprint = 4 means restore saved position
      * EAM FIXME - Unfortunately I can find no way in the svg spec to do this.
      * The best I can come up with is to count characters from here and then
      * try to back up over them.
      */
-    if (overprint == 3) {
+    switch (overprint) {
+    case 2:
+	fprintf(gpoutfile,"<tspan dx=\"-%.1fem\"/>",0.4*ENHsvg_charcount);
+	ENHsvg_charcount = 0;
+	break;
+    case 3:
 	ENHsvg_charcount = 0;
 	return;
-    } else if (overprint == 4) {
-	fprintf(gpoutfile,"<tspan dx=\"-%dem\"/>",ENHsvg_charcount);
+    case 4:
+	fprintf(gpoutfile,"<tspan dx=\"-%.1fem\"/>",0.8*ENHsvg_charcount);
 	ENHsvg_charcount = 0;
 	return;
+    default:
+	break;
     }
    
     if (!ENHsvg_opened_string) {
 	ENHsvg_opened_string = TRUE;
 	enhanced_cur_text = &enhanced_text[0];
+
 	/* Start a new textspan fragment */
 	fprintf(gpoutfile,"<tspan");
 	if (strcmp(SVG_fontNameCur,fontname)) {
 	    strncpy(SVG_fontNameCur,fontname,sizeof(SVG_fontNameCur));
-	    fprintf(gpoutfile," font-family=\"%s\"",SVG_fontNameCur);
+	    fprintf(gpoutfile," style=\"font-family:%s\" ",SVG_fontNameCur);
 	}
 	if (SVG_fontSizeCur != fontsize) {
 	    SVG_fontSizeCur = fontsize;
@@ -1084,10 +1097,15 @@ ENHsvg_FLUSH()
 TERM_PUBLIC void
 ENHsvg_put_text(unsigned int x, unsigned int y, const char *str)
 {
+    /* We need local copies of the starting font properties */
+    char fontname[MAX_ID_LEN + 1];
+    double fontsize = SVG_fontSizeCur;
+    strncpy(fontname,SVG_fontNameCur,sizeof(fontname));
+
     /* We need the full set of tags for text, just as normal. But in */
     /* the case of enhanced text ENHsvg_string_state == 1 tells the  */
     /* SVG_put_text() to return without actually putting the text.   */
-    if (ignore_enhanced_text || !strpbrk(str, "{}^_@&~<")) {
+    if (ignore_enhanced_text) {
 	ENHsvg_string_state = 0;
 	SVG_put_text(x, y, str);
 	return;
@@ -1097,29 +1115,21 @@ ENHsvg_put_text(unsigned int x, unsigned int y, const char *str)
     }
 
     /* Set up global variables needed by enhanced_recursion() */
+    ENHsvg_charcount = 0;
     enhanced_fontscale = 1.0;
-    strncpy(enhanced_escape_format,"&#%d;",sizeof(enhanced_escape_format));
+    strncpy(enhanced_escape_format,"&#x%2.2x;",sizeof(enhanced_escape_format));
 
-    /* Set the recursion going. We say to keep going until a
-     * closing brace, but we don't really expect to find one.
-     * If the return value is not the nul-terminator of the
-     * string, that can only mean that we did find an unmatched
-     * closing brace in the string. We increment past it (else
-     * we get stuck in an infinite loop) and try again.
-     */
     while (*(str = enhanced_recursion((char *)str, TRUE, 
-    			SVG_fontNameCur, SVG_fontSizeCur, 
-			0.0, TRUE, TRUE, 0))) {
+    			fontname, fontsize, 0.0, TRUE, TRUE, 0))) {
 	(term->enhanced_flush)();
-
-	/* I think we can only get here if *str == '}' */
-	    enh_err_check(str);
-
+	enh_err_check(str);
 	if (!*++str)
 	    break; /* end of string */
-
-	/* else carry on and process the rest of the string */
     }
+
+    /* Make sure we leave with the same font properties as on entry */
+    strncpy(SVG_fontNameCur,fontname,sizeof(fontname));
+    SVG_fontSizeCur = fontsize;
 
     /* Close the text section */
     fprintf (gpoutfile, "</text>\n\t</g>\n");
@@ -1129,8 +1139,17 @@ ENHsvg_put_text(unsigned int x, unsigned int y, const char *str)
 TERM_PUBLIC void 
 ENHsvg_writec (char c)
 {
+    int symb = (unsigned char)c;
+
     /* Kludge for phantom box accounting */
     ENHsvg_charcount++;
+
+    /* My SVG viewers really dislike non-ascii characters */
+    if (symb < ' ' || symb > '~') {
+	sprintf(enhanced_cur_text,"&#x%2.2x;",symb);
+	enhanced_cur_text += 6;
+	return;
+    }
 
     /* Escape SVG reserved characters. Are there any besides '<'? */
     switch (c) {
@@ -1189,6 +1208,7 @@ START_HELP(svg)
 "",
 " Syntax:",
 "       set terminal svg {size <x> <y> {|fixed|dynamic}}",
+"                        {{no}enhanced}",
 "                        {fname \"<font>\"} {fsize <fontsize>}",
 "",
 " where <x> and <y> are the size of the SVG plot to generate,",
@@ -1196,6 +1216,14 @@ START_HELP(svg)
 " setting, `fixed`, will request an absolute size.",
 "",
 " <font> is the name of the default font to use (default Arial) and",
-" <fontsize> is the font size (in points, default 12)"
+" <fontsize> is the font size (in points, default 12). Gnuplot does not",
+" currently provide a mechanism for embedding fonts in the output file,",
+" so svg viewing programs may substitute other fonts when the file is",
+" displayed.",
+"",
+" The svg terminal supports an enhanced text mode, which allows font",
+" and other formatting commands to be embedded in labels and other text",
+" strings. The enhanced text mode syntax is shared with other gnuplot",
+" terminal types. See `enhanced` for more details."
 END_HELP(svg)
 #endif

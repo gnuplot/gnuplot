@@ -1,3 +1,8 @@
+2004-03-27  Ethan Merritt  <merritt@u.washington.edu>
+
+	* term/svg.trm: Further fixes to enhanced text mode. Revise option
+	parsing so that it is not sensitive to the command line order.
+
 2004-03-26  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* config/config.nt: Remove HAVE_STDBOOL_H and HAVE__BOOL again ---
