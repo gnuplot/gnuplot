@@ -23,6 +23,9 @@
 
 /* PM3D support by Johannes Zellner <johannes@zellner.org>, May-15-2002 */
 
+/* 'filledboxes' with patterns are really lousy,
+   but I don't know why. 04 Jun 2002 (joze) */
+
 #include "driver.h"
 
 #ifdef TERM_REGISTER
@@ -100,6 +103,13 @@ static short PDF_Pen_RealID __PROTO ((int));
 static void PDF_PathOpen __PROTO ((void));
 static void PDF_PathClose __PROTO ((void));
 static void PDF_SetFont __PROTO ((void));
+#if USE_ULIG_FILLEDBOXES
+static int PDF_DefinePattern1 __PROTO((int x1, int y1, int x2, int y2));
+static int PDF_DefinePattern2 __PROTO((int x1, int y1, int x2, int y2, int x3, int y3, int x4, int y4));
+static void PDF_DefinePatterns __PROTO((void));
+enum { PDF_patterns = 6 };
+static int PDF_patternHandles[PDF_patterns];
+#endif
 
 /*------------------------ helper functions -------------------*/
 
@@ -157,6 +167,47 @@ PDF_SetFont ()
 					  font_handle, PDF_fontSizeCur)
 	 / 20.0);
 }
+
+#if USE_ULIG_FILLEDBOXES
+static int
+PDF_DefinePattern1(int x1, int y1, int x2, int y2)
+{
+    int handle = PDF_begin_pattern(myPDF, 8, 8, 8, 8, 2 /* painttype */);
+    PDF_setlinewidth(myPDF, 0.2);
+    PDF_setlinecap(myPDF, 0); /* rounded ends */
+    PDF_moveto(myPDF, x1, y1);
+    PDF_lineto(myPDF, x2, y2);
+    PDF_stroke(myPDF);
+    PDF_end_pattern(myPDF);
+    return handle;
+}
+
+static int
+PDF_DefinePattern2(int x1, int y1, int x2, int y2, int x3, int y3, int x4, int y4)
+{
+    int handle = PDF_begin_pattern(myPDF, 8, 8, 8, 8, 2 /* painttype */);
+    PDF_setlinewidth(myPDF, 0.2);
+    PDF_setlinecap(myPDF, 0); /* rounded ends */
+    PDF_moveto(myPDF, x1, y1);
+    PDF_lineto(myPDF, x2, y2);
+    PDF_moveto(myPDF, x3, y3);
+    PDF_lineto(myPDF, x4, y4);
+    PDF_stroke(myPDF);
+    PDF_end_pattern(myPDF);
+    return handle;
+}
+
+static void
+PDF_DefinePatterns()
+{
+    PDF_patternHandles[0] = PDF_DefinePattern1(0, 7, 7, 0);
+    PDF_patternHandles[1] = PDF_DefinePattern1(0, 0, 7, 7);
+    PDF_patternHandles[2] = PDF_DefinePattern2(0, 7, 3, 0, 4, 7, 7, 0);
+    PDF_patternHandles[3] = PDF_DefinePattern2(0, 0, 3, 7, 4, 0, 7, 7);
+    PDF_patternHandles[4] = PDF_DefinePattern2(0, 3, 7, 0, 0, 7, 7, 4);
+    PDF_patternHandles[5] = PDF_DefinePattern2(0, 0, 7, 3, 0, 4, 7, 7);
+}
+#endif
 
 /*------------------- the terminal entry functions --------------------*/
 
@@ -229,6 +280,10 @@ PDF_init ()
     /* set current font to default */
     strcpy(PDF_fontNameCur, PDF_fontNameDef);
     PDF_fontSizeCur = PDF_fontSizeDef;
+
+#if USE_ULIG_FILLEDBOXES
+    PDF_DefinePatterns();
+#endif
 
     /* Have to start the first page now, in order to know the actual
      * size of the selected font */
@@ -954,18 +1009,23 @@ PDF_boxfill(int style, unsigned int x1, unsigned int y1,
 	    }
 	    break;
 	case 2: /* pattern fill */
-	    /* TODO */
-	    fprintf(stderr, "(PDF_boxfill) pattern fill not implemented\n");
+	    fillpar = fillpar % (PDF_patterns + 1) /* 0 == white */;
+	    switch (fillpar) {
+		case 0:
+		    /* fill with white */
+		    PDF_setcolor(myPDF, "fill", "rgb", 1, 1, 1, 0 /* unused */);
+		    break;
+		default:
+		    /* fill with white */
+		    PDF_setcolor(myPDF, "fill", "pattern", PDF_patternHandles[fillpar - 1], 0, 0, 0);
+	    }
 	    break;
 	default:
 	    break;
     }
 #endif
 
-    PDF_moveto(myPDF, x1, y1);
-    PDF_lineto(myPDF, x1+width, y1);
-    PDF_lineto(myPDF, x1+width, y1+height);
-    PDF_lineto(myPDF, x1, y1+height);
+    PDF_rect(myPDF, x1, y1, width, height);
     PDF_fill(myPDF);
     PDF_restore(myPDF);
 }
