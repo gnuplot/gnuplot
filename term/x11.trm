@@ -1,5 +1,5 @@
 /*
- * $Id: x11.trm,v 1.55 2002/03/04 16:23:40 lhecking Exp $
+ * $Id: x11.trm,v 1.56 2002/03/25 14:15:02 mikulik Exp $
  *
  */
 
@@ -156,7 +156,7 @@ static FILE *X11_ipc = (FILE *) 0;
 static char **xargv = (char **) NULL;
 /* reserve a minimum 10 driver opts */
 static char *optvec[2 * X11_nopts + 1 + 10];
-# ifdef OS2
+# if defined(OS2) || defined(_Windows)
 static char X11_default_command[] = "gnuplot_x11.exe";
 # else
 # ifndef GNUPLOT_X11

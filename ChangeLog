@@ -1,3 +1,18 @@
+2002-03-26  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* src/command.h src/command.c: Routine do_string() always available
+	(only #ifdef USE_MOUSE up to now).
+
+	* src/set.c: Reimplemented "set term push" to issue the complete
+	"set term <pushed_name> <pushed_opts>" command.
+	Added a hint to set_termoptions().
+
+	* src/show.c: Leading three spaces instead of \t for 'show term' in 
+	order to better format terminals with multiline options.
+
+	* term/x11.trm: Let X11_default_command be "gnuplot_x11.exe" for both
+	OS/2 and Windows.
+
 2002-03-25  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* term/x11.trm: Show the expected gnuplot_x11 path if it cannot be
@@ -167,7 +182,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/03/24 16:34:01 $).
+	last modification date (from the tag $Date: 2002/03/25 14:15:02 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
