@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: scanner.c,v 1.9 1999/06/22 11:58:58 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: scanner.c,v 1.10 1999/06/30 12:04:45 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - scanner.c */
@@ -37,7 +37,7 @@ static char *RCSid() { return RCSid("$Id: scanner.c,v 1.9 1999/06/22 11:58:58 lh
 #include "plot.h"
 
 static int get_num __PROTO((char str[]));
-static void substitute __PROTO((char **strp, int *str_lenp, int current));
+static void substitute __PROTO((char **strp, size_t *str_lenp, int current));
 
 #ifdef AMIGA_AC_5
 #define O_RDONLY	0
@@ -101,7 +101,7 @@ static int t_num;		/* number of token I'm working on */
 int
 scanner(expressionp, expressionlenp)
 char **expressionp;
-int *expressionlenp;
+size_t *expressionlenp;
 {
     register int current;	/* index of current char in expression[] */
     char *expression = *expressionp;
@@ -294,7 +294,7 @@ char str[];
 static void
 substitute(strp, str_lenp, current)
 char **strp;
-int *str_lenp;
+size_t *str_lenp;
 int current;
 {
     register char *last;
