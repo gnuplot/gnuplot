@@ -5546,7 +5546,7 @@ C ... and restart the table:
  the plot.  `set title` is a special case of `set label`.
 
  Syntax:
-       set title {"<title-text>"} {<xoff>}{,<yoff>} {"<font>,{<size>}"}
+       set title {"<title-text>"} {<xoff>}{,<yoff>} {"<font>{,<size>}"}
        show title
 
  Specifying constants <xoff> or <yoff> as optional offsets for the title will
