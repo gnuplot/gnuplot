@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.159 2004/12/04 06:11:18 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.160 2004/12/05 08:04:43 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -1025,6 +1025,7 @@ set_cntrparam()
     } else if (almost_equals(c_token, "le$vels")) {
 	c_token++;
 
+	free_dynarray(&dyn_contour_levels_list);
 	init_dynarray(&dyn_contour_levels_list, sizeof(double), 5, 10);
 
 	/*  RKC: I have modified the next two:
@@ -3728,9 +3729,11 @@ set_xyzlabel(label_struct *label)
 	STRING_RESULT_ONLY = TRUE;
 	(void) const_express(&a);
 	STRING_RESULT_ONLY = FALSE;
-	if (a.type != STRING)
+	if (a.type == STRING) {
+	    strncpy(label->text, a.v.string_val, MAX_LINE_LEN);
+	    free(a.v.string_val);
+	} else
 	    int_warn(NO_CARET,"String parsing error");
-	strncpy(label->text, a.v.string_val, MAX_LINE_LEN);
     }
 #else
     if (isstring(c_token)) {

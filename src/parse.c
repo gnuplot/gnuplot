@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: parse.c,v 1.28 2004/10/27 21:54:50 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: parse.c,v 1.29 2004/12/05 08:04:42 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - parse.c */
@@ -116,17 +116,28 @@ const_express(struct value *valptr)
 struct at_type *
 temp_at()
 {
-    /* build a static action table and return its
-     * pointer */
+    /* build a static action table and return its pointer */
 
     if (at != NULL) {
+	/* EAM - Dec 2004
+	 * Garbage collection of dynamically allocated strings that may
+	 * have been created during evaluation of the previous action table.
+	 * WARNING: This is an empirical fix to a memory leak found by valgrind;
+	 * I do not truly understand why these are guaranteed to be orphan
+	 * strings, but testing has so far not produced double-free errors.
+	 */
+	int i;
+	for (i=0; i<at->a_count; i++)
+	    if (at->actions[i].arg.v_arg.type == STRING)
+		free(at->actions[i].arg.v_arg.v.string_val);
 	free(at);
-	at = NULL;
     }
+    
     at = (struct at_type *) gp_alloc(sizeof(struct at_type), "action table");
 
-    at->a_count = 0;		/* reset action table !!! */
+    memset(at, 0, sizeof(*at));		/* reset action table !!! */
     at_size = MAX_AT_LEN;
+
     parse_expression();
     return (at);
 }

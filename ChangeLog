@@ -1,3 +1,21 @@
+2004-12-05  Ethan Merritt  <merritt@u.washington.edu>
+
+	Run valgrind to find memory leaks.
+
+	* term/x11.trm (X11_make_palette): Free palette gradient after sending
+	it to gnuplot_x11.  Do other drivers have similar leaks?
+	
+	* src/set.c (set_cntrparam): Free old dynamic contour level array before
+	getting a new one.
+	
+	* src/set.c (set_xyzlabel): Free dynamic label string after copying it
+	to a static label structure.
+
+	* src/parse.c (temp_at): Add a garbage-collection step to the 
+	deallocation of temporary storage for expression evaluation. I wish I
+	understood this well enough to guarantee the correctness of scavenging,
+	but empirical tests indicate that no double-free errors are triggered.
+
 2004-12-04  Ethan Merritt  <merritt@u.washington.edu>
 
 	Run valgrind to find codepaths that trip over uninitialized variables.
