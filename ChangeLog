@@ -1,3 +1,7 @@
+2000-06-09  Johannes Zellner <johannes@zellner.org>
+
+	* save.c: don't close the fp's if it's stdout
+
 2000-05-31  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* Ignore `replot` command called from mouse/hotkey-event-enhanced
