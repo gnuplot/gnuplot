@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util3d.c,v 1.12 2000/11/01 18:57:34 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: util3d.c,v 1.13 2000/11/02 17:52:16 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - util3d.c */
@@ -1088,6 +1088,12 @@ void draw3d_point(v, lp)
     
     TERMCOORD(v, x, y);
     term_apply_lp_properties(lp);
+#ifdef PM3D
+    /* HBB 20010822: implemented "linetype palette" for points, too */
+    if (lp->use_palette) {
+	set_color(z2gray(v->real_z));
+    }
+#endif
     if (!clip_point(x, y))
 	(term->point) (x, y, lp->p_type);
 }    
