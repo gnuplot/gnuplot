@@ -1,6 +1,6 @@
 /* Hey Emacs this is -*- C -*-
  * 
- * $Id: pstricks.trm,v 1.20 2002/07/26 16:42:29 mikulik Exp $
+ * $Id: pstricks.trm,v 1.21 2003/01/22 10:30:00 mikulik Exp $
  */
 
 /* GNUPLOT - pstricks.trm */
@@ -647,7 +647,7 @@ PSTRICKS_set_color (double gray)
 TERM_PUBLIC void
 PSTRICKS_filled_polygon (int points, gpiPoint *corners)
 {
-    int i, j;
+    int i;
 
     if (PSTRICKS_palette_set == FALSE) {
 	 fprintf(stderr, "pstricks: Palette used before set!\n");
