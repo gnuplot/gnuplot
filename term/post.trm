@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.111 2004/07/02 23:56:52 sfeam Exp $
+ * $Id: post.trm,v 1.112 2004/07/13 14:11:25 broeker Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -496,10 +496,10 @@ static const char GPFAR * GPFAR PS_header[] = {
 /* filled box in current color,
    but color lightened up as defined by filldensity (ULIG),
    usage:   density x1 y1 x2 y2 BoxColFill */
-"/BoxColFill { gsave Rec PolyFill grestore } def\n",
+"/BoxColFill { gsave Rec PolyFill } def\n",
 
 /* Generalization of BoxColFill to polygons
- * usage: x1 y1 N x2 y2 V ... xi yi V density PolyFill
+ * usage: gsave x1 y1 N x2 y2 V ... xi yi V density PolyFill
  */
 "/PolyFill {\n",
 "  gsave\n",
@@ -510,7 +510,7 @@ static const char GPFAR * GPFAR PS_header[] = {
 "  /ColG ColG Fillden mul Fillden sub 1 add def\n",
 "  /ColB ColB Fillden mul Fillden sub 1 add def\n",
 "  ColR ColG ColB setrgbcolor\n",
-"  fill grestore } def\n",
+"  fill grestore grestore } def\n",
 
 "%\n",
 "% PostScript Level 1 Pattern Fill routine\n",
@@ -2788,11 +2788,11 @@ TERM_PUBLIC void PS_filled_polygon (int points, gpiPoint *corners)
     /* produce lines like:
 	 * 9055 29350 N 695 0 V 0 564 V density PolyFill
      */
+    fprintf(gpoutfile, "gsave ");
     fprintf(gpoutfile, "%i %i N", corners[0].x, corners[0].y);
 	for (i = 1; i < points; i++)
 	    fprintf(gpoutfile, " %i %i V",
 		corners[i].x-corners[i-1].x, corners[i].y-corners[i-1].y);
-	fprintf(gpoutfile,"\n");
 
 	switch(style & 0xf) {
 	
@@ -2800,9 +2800,10 @@ TERM_PUBLIC void PS_filled_polygon (int points, gpiPoint *corners)
 	    filldens = (style >> 4) / 100.0;
 	    if(filldens < 0.0)
 		filldens = 0.0;
-	    if(filldens > 1.0)
-		filldens = 1.0;
-	    fprintf(gpoutfile, "%.1f PolyFill\n", filldens);
+	    if(filldens >= 1.0)
+		fprintf(gpoutfile, " 1 PolyFill\n");
+	    else
+		fprintf(gpoutfile, " %.2f PolyFill\n", filldens);
 	    break;
 	    
 	case FS_PATTERN:
@@ -2810,21 +2811,20 @@ TERM_PUBLIC void PS_filled_polygon (int points, gpiPoint *corners)
 	    pattern = (style >> 4) % 8;
 	    if (pattern == 0)  {
 		filldens = 0.5;
-		fprintf(gpoutfile, "%.1f PolyFill\n", filldens);
+		fprintf(gpoutfile, " %.1f PolyFill\n", filldens);
 	    } else {
-		fprintf(gpoutfile,"gsave 1 setgray fill grestore Pattern%d fill\n", pattern);
+		fprintf(gpoutfile," gsave 1 setgray fill grestore Pattern%d fill grestore\n", pattern);
 	}
 	break;
 #else
 	filldens = (style >> 4) % 8;
 	filldens = 0.125 * (filldens + 1);
-	fprintf(gpoutfile, "%.1f PolyFill\n", filldens);
+	fprintf(gpoutfile, " %.2f PolyFill\n", filldens);
 	break;
 #endif
 
     default:
-	filldens = 1.0;
-	fprintf(gpoutfile, "%.1f PolyFill\n", filldens);
+	fprintf(gpoutfile, " 1 PolyFill\n");
         break;
 
     }

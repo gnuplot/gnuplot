@@ -1,3 +1,10 @@
+2004-07-16  Ethan Merritt  <merritt@u.washington.edu>
+
+	* term/post.trm (PS_filled_polygon): The polygon fill code was
+	mis-nesting gsave/grestore pairs, leading to several rather odd
+	results. Fixes bug #992565 and also the loss of color information
+	in pattern-filled fillcurves.
+
 2004-07-15  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* term/fig.trm (FIG_arrow): Use actual linetype variables rather
