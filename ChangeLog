@@ -1,3 +1,7 @@
+2000-11-04  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* term/post.trm: fixed /h definition for pm3d gray palette 
+
 2000-11-03  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* lisp/Makefile.dst, lisp/Makefile.in, lisp/gnuplot.el,

@@ -1,5 +1,5 @@
 /*
- * $Id: post.trm,v 1.42 2000/11/01 18:57:34 broeker Exp $
+ * $Id: post.trm,v 1.43 2000/11/02 19:14:15 lhecking Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -1874,7 +1874,7 @@ fprintf(gpoutfile, "%%  /H {h setrgbcolor pop} bind def\n");
 fprintf(gpoutfile, "  /F {rlineto fill setrgbcolor pop} bind def\n");
 fprintf(gpoutfile, "}{\n");
 fprintf(gpoutfile, "  /g {stroke setgray} bind def\n");
-fprintf(gpoutfile, "  /h {rlineto rlineto rlineto fill setgray} bind def\n");
+fprintf(gpoutfile, "  /h {rlineto rlineto rlineto fill} bind def\n");
 /*
 fprintf(gpoutfile, "%%  /g {currentgray exch stroke setgray} bind def\n");
 fprintf(gpoutfile, "%%  /G {currentgray exch stroke g} bind def\n");
