@@ -1,5 +1,5 @@
 /*
- * $Id: post.trm,v 1.94 2003/08/22 12:36:17 lhecking Exp $
+ * $Id: post.trm,v 1.95 2003/11/14 16:56:47 sfeam Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -78,12 +78,10 @@ TERM_PUBLIC void PS_linetype __PROTO((int linetype));
 TERM_PUBLIC void PS_move __PROTO((unsigned int x, unsigned int y));
 TERM_PUBLIC void PS_vector __PROTO((unsigned int x, unsigned int y));
 TERM_PUBLIC void PS_put_text __PROTO((unsigned int x, unsigned int y, const char *str));
-TERM_PUBLIC void ENHPS_put_text __PROTO((unsigned int x, unsigned int y, const char *str));
 TERM_PUBLIC int PS_text_angle __PROTO((int ang));
 TERM_PUBLIC int PS_justify_text __PROTO((enum JUSTIFY mode));
 TERM_PUBLIC void PS_point __PROTO((unsigned int x, unsigned int y, int number));
 TERM_PUBLIC int PS_set_font __PROTO((const char * font));
-TERM_PUBLIC int ENHPS_set_font __PROTO((const char * font));
 TERM_PUBLIC void PS_fillbox __PROTO((int style, unsigned int x1, unsigned int y1, unsigned int width, unsigned int height));
 TERM_PUBLIC void PS_linewidth __PROTO((double linewidth)); /* JFi [linewidth] */
 TERM_PUBLIC void PS_pointsize __PROTO((double ptsize)); /* JFi [pointsize] */
@@ -93,6 +91,16 @@ TERM_PUBLIC void PS_previous_palette (void);
 TERM_PUBLIC void PS_set_color (double);
 TERM_PUBLIC void PS_filled_polygon (int, gpiPoint *);
 #endif /* PM3D */
+
+/* To support "set term post enhanced" */
+TERM_PUBLIC void ENHPS_put_text __PROTO((unsigned int x, unsigned int y, const char *str));
+TERM_PUBLIC int  ENHPS_set_font __PROTO((const char * font));
+TERM_PUBLIC void ENHPS_OPEN __PROTO((char * fontname, double fontsize,
+	    		double base, TBOOLEAN widthflag, TBOOLEAN showflag,
+			int overprint));
+TERM_PUBLIC void ENHPS_FLUSH __PROTO((void));
+TERM_PUBLIC void ENHPS_WRITEC __PROTO((char c));
+TERM_PUBLIC char *PS_RememberFont __PROTO((char *fname, int reencode));
 
 #endif /* TERM_PROTO */
 
@@ -114,9 +122,7 @@ TERM_PUBLIC void PS_filled_polygon (int, gpiPoint *);
     }						\
 } while (0)
 
-static char *PS_RememberFont __PROTO((char *fname, int reencode));
 static void ENHPS_put_text __PROTO((unsigned int x, unsigned int y, const char *str));
-static char *ENHPS_recurse __PROTO((char *p, TBOOLEAN brace, char *fontname, double fontsize, double base, TBOOLEAN widthflag, TBOOLEAN showflag, int overprint));
 static char ps_font[MAX_ID_LEN+1] = "Helvetica" ; /* name of font */
 static int ps_fontsize = 14;					 /* size of font in pts */
 
@@ -2038,307 +2044,48 @@ PS_fillbox(style, x1,y1,width,height)
 
 /* ENHPOST */
 
-
-#ifdef DEBUG_ENHPS
-#define ENHPS_DEBUG(x) printf x;
-#else
-#define ENHPS_DEBUG(x)
-#endif
-
-
 static TBOOLEAN ENHps_opened_string;  /* try to cut out empty ()'s */
 
-/* used in determining height of processed text */
-
-static float ENHps_max_height, ENHps_min_height;
-
-
-/* process a bit of string, and return the last character used.
- * p is start of string
- * brace is TRUE to keep processing to }, FALSE for do one character
- * fontname & fontsize are obvious
- * base is the current baseline
- * widthflag is TRUE if the width of this should count,
- *              FALSE for zero width boxes
- * showflag is TRUE if this should be shown,
- *             FALSE if it should not be shown (like TeX \phantom)
- * overprint is 0 for normal operation,
- *              1 for the underprinted text (included in width calculation),
- *              2 for the overprinted text (not included in width calc)
- *              (overprinted text is centered horizontally on underprinted text
+/*
+ * close a postscript string if it has been opened
  */
+TERM_PUBLIC void 
+ENHPS_FLUSH()
+{
+    if (ENHps_opened_string) {
+	fputs(")]\n", gpoutfile);
+	ENHps_opened_string = FALSE;
+    }
+}
 
-static char *
-ENHPS_recurse(p, brace, fontname, fontsize, base, widthflag, showflag, overprint)
-    char *p, *fontname;
-    TBOOLEAN brace, widthflag, showflag;
+/*
+ * open a postscript string
+ */
+TERM_PUBLIC void 
+ENHPS_OPEN(fontname, fontsize, base, widthflag, showflag, overprint)
+    char *fontname;
+    TBOOLEAN widthflag, showflag;
     double fontsize, base;
     int overprint;
 {
-
-/* close a postscript string if it has been opened */
-#define ENHPS_FLUSH				\
-	if (ENHps_opened_string) {		\
-	    fputs(")]\n", gpoutfile);		\
-	    ENHps_opened_string = FALSE;	\
+	if (!ENHps_opened_string) {
+	    fprintf(gpoutfile, "[(%s) %.1f %.1f %s %s %d (",
+		    fontname, fontsize, base,
+		    widthflag ? "true" : "false",
+		    showflag ? "true" : "false",
+		    overprint);
+	    ENHps_opened_string = TRUE;
 	}
-
-#define ENHPS_OPEN  						\
-	if (!ENHps_opened_string) {				\
-	    fprintf(gpoutfile, "[(%s) %.1f %.1f %s %s %d (",	\
-		    fontname, fontsize, base,			\
-		    widthflag ? "true" : "false",		\
-		    showflag ? "true" : "false",		\
-		    overprint);					\
-	    ENHps_opened_string = TRUE;				\
-	}
-
-    ENHPS_DEBUG(("RECURSE WITH [%p] \"%s\", %d %s %.1f %.1f %d %d %d\n", p, p, brace, fontname, fontsize, base, widthflag, showflag, overprint));
-
-/* Start each recursion with a clean string */
-    ENHPS_FLUSH;
-
-    if (base + fontsize > ENHps_max_height) {
-	ENHps_max_height = base + fontsize;
-	ENHPS_DEBUG(("Setting max height to %.1f\n", ENHps_max_height));
-    }
-
-    if (base < ENHps_min_height) {
-	ENHps_min_height = base;
-	ENHPS_DEBUG(("Setting min height to %.1f\n", ENHps_min_height));
-    }
-
-    while (*p) {
-	float shift;
-
-	switch (*p) {
-	case '}'  :
-	    /*{{{  deal with it*/
-	    if (brace)
-		return (p);
-
-	    fputs("enhpost printer driver - spurious }\n", stderr);
-	    break;
-	    /*}}}*/
-
-	case '_'  :
-	case '^'  :
-	    /*{{{  deal with super/sub script*/
-	    shift = (*p == '^') ? 0.5 : -0.3;
-	    ENHPS_FLUSH;
-	    p = ENHPS_recurse(p + 1, FALSE, fontname, fontsize * 0.8,
-			      base + shift * fontsize, widthflag,
-			      showflag, overprint);
-	    break;
-	    /*}}}*/
-	case '{'  :
-	    {
-		char *savepos = NULL, save = 0;
-		char *localfontname = fontname, ch;
-		int recode = 1;
-		float f = fontsize, ovp;
-
-		/*{{{  recurse (possibly with a new font) */
-
-		ENHPS_DEBUG(("Dealing with {\n"));
-	    
-		/* get vertical offset (if present) for overprinted text */
-		while (*++p == ' ');
-		if (overprint == 2) {
-		    ovp = (float)strtod(p,&p);
-		    if (ovp != 0) {
-			base += ovp*f;
-		    }
-		}
-		--p;		/* HBB 20001021: bug fix: 10^{2} broken */
-
-		if (*++p == '/') {
-		    /* then parse a fontname, optional fontsize */
-		    while (*++p == ' ')
-			;	/* do nothing */
-		    if (*p=='-') {
-			recode = 0;
-			while (*++p == ' ')
-			    ;	/* do nothing */
-		    }
-		    localfontname = p;
-		    while ((ch = *p) > ' ' && ch != '=' && ch != '*')
-			++p;
-		    save = *(savepos=p);
-		    if (ch == '=') {
-			*p++ = '\0';				
-			/*{{{  get optional font size*/
-			ENHPS_DEBUG(("Calling strtod(\"%s\") ...", p));
-			f = (float)strtod(p, &p);
-			ENHPS_DEBUG(("Returned %.1f and \"%s\"\n", f, p));
-
-			if (f)
-			    f *= PS_SC;  /* remember the scaling */
-			else
-			    f = fontsize;
-
-			ENHPS_DEBUG(("Font size %.1f\n", f));
-			/*}}}*/
-		    } else if (ch == '*') {
-			*p++ = '\0';				
-			/*{{{  get optional font size scale factor*/
-			ENHPS_DEBUG(("Calling strtod(\"%s\") ...", p));
-			f = (float)strtod(p, &p);
-			ENHPS_DEBUG(("Returned %.1f and \"%s\"\n", f, p));
-
-			if (f)
-			    f *= fontsize;  /* apply the scale factor */
-			else
-			    f = fontsize;
-
-			ENHPS_DEBUG(("Font size %.1f\n", f));
-			/*}}}*/
-		    } else {
-			*p++ = '\0';
-			f = fontsize;
-		    }				
-
-		    while (*p == ' ')
-			++p;
-		    if (*localfontname) {
-			/* only allow RememberFont to re-encode it if no string
-			 * active */
-			char *recodestring = PS_RememberFont(localfontname,
-							     recode && !ENHps_opened_string);
-			if (recode && recodestring) {
-			    ENHPS_FLUSH;
-			    fprintf(gpoutfile, "/%s %s",
-				    localfontname, recodestring);
-			}
-		    } else
-			localfontname = fontname;
-		}
-		/*}}}*/
-
-		ENHPS_DEBUG(("Before recursing, we are at [%p] \"%s\"\n", p, p));
-
-		p = ENHPS_recurse(p, TRUE, localfontname, f, base,
-				  widthflag, showflag, overprint);
-
-		ENHPS_DEBUG(("BACK WITH \"%s\"\n", p));
-
-		ENHPS_FLUSH;
-
-		if (savepos)
-		    /* restore overwritten character */
-		    *savepos = save;
-		break;
-	    } /* case '{' */
-	case '@' :
-	    /*{{{  phantom box - prints next 'char', then restores currentpoint */
-
-	    ENHPS_FLUSH;
-	    p = ENHPS_recurse(++p, FALSE, fontname, fontsize, base,
-			      FALSE, showflag, overprint);
-	    break;
-	    /*}}}*/
-
-	case '&' :
-	    /*{{{  character skip - skips space equal to length of character(s) */
-	    ENHPS_FLUSH;
-
-	    p = ENHPS_recurse(++p, FALSE, fontname, fontsize, base,
-			      widthflag, FALSE, overprint);
-	    break;
-	    /*}}}*/
-
-	case '~' :
-	    /*{{{ overprinted text */
-	    /* the second string is overwritten on the first, centered
-	     * horizontally on the first and (optionally) vertically
-	     * shifted by an amount specified (as a fraction of the
-	     * current fontsize) at the beginning of the second string
-	      
-	     * Note that in this implementation neither the under- nor
-	     * overprinted string can contain syntax that would result
-	     * in additional recursions -- no subscripts,
-	     * superscripts, or anything else, with the exception of a
-	     * font definition at the beginning of the text */
-	    
-	    ENHPS_FLUSH;
-	    p = ENHPS_recurse(++p, FALSE, fontname, fontsize, base,
-			      widthflag, showflag, 1);
-	    ENHPS_FLUSH;
-	    p = ENHPS_recurse(++p, FALSE, fontname, fontsize, base,
-			      FALSE, showflag, 2);
-		
-	    overprint = 0;   /* may not be necessary, but just in case . . . */
-	    break;
-	    /*}}}*/
-
-	case '('  :
-	case ')'  :
-	    /*{{{  an escape and print it */
-	    /* special cases */
-	    ENHPS_OPEN;
-	    fputc('\\', gpoutfile);
-	    fputc(*p, gpoutfile);
-	    break;
-	    /*}}}*/
-
-	case '\\'  :
-	    /*{{{  is it an escape */
-	    /* special cases */
-
-	    if (p[1]=='\\' || p[1]=='(' || p[1]==')') {
-		ENHPS_OPEN;
-		fputc('\\', gpoutfile);
-	    } else if (p[1] >= '0' && p[1] <= '7') {
-		/* up to 3 octal digits */
-		ENHPS_OPEN;
-		fputc('\\', gpoutfile);
-		fputc(p[1], gpoutfile);
-		++p;
-		if (p[1] >= '0' && p[1] <= '7') {
-		    fputc(p[1], gpoutfile);
-		    ++p;
-		    if (p[1] >= '0' && p[1] <= '7') {
-			fputc(p[1], gpoutfile);
-			++p;
-		    }
-		}
-		break;
-	    }
-	    ++p;
-
-	    /* HBB 20030122: Avoid broken PS output if there's a \
-	     * exactly at the end of the line */
-	    if (*p == '\0') {
-		fputs("enhpost printer driver -- spurious backslash\n", stderr);
-		break;
-	    }
-
-	    /* just go and print it (fall into the 'default' case) */
-	    /*}}}*/
-	default:
-	    /*{{{  print it */
-	    ENHPS_OPEN;
-	    fputc(*p, gpoutfile);
-	    /*}}}*/
-	} /* switch (*p) */
-
-	/* like TeX, we only do one character in a recursion, unless it's
-	 * in braces
-	 */
-
-	if (!brace) {
-	    ENHPS_FLUSH;
-	    return(p);  /* the ++p in the outer copy will increment us */
-	}
-
-	if (*p) /* only not true if { not terminated, I think */
-	    ++p;	
-    } /* while (*p) */
-
-    ENHPS_FLUSH;
-    return p;
 }
 
+/*
+ * write one or more characters from inside enhanced text processing
+ */
+TERM_PUBLIC void 
+ENHPS_WRITEC(char c)
+{
+    fputc(c, gpoutfile);
+}
 
 /* a set-font routine for enhanced post : simply copies
  * the font into a global, or restores the globals
@@ -2349,8 +2096,6 @@ TERM_PUBLIC int
 ENHPS_set_font(font)  /* Entry font added by DJL */
 const char *font;
 {
-    ENHPS_DEBUG(("ENHPS_set_font(\"%s\")\n", font));
-
     if (ignore_enhanced_text)
 	return PS_set_font(font);
 
@@ -2411,13 +2156,15 @@ ENHPS_put_text(x, y, str)
 	fprintf(gpoutfile,"currentpoint gsave translate %d rotate 0 0 moveto\n",
 		ps_ang);
 
-    fputs("[ ",gpoutfile);
+    fputs("[ ", gpoutfile);
 
-    /* set up the globals */
+    /* set up the global variables needed by enhanced_recursion() */
+    enhanced_max_height = -1000;
+    enhanced_min_height = 1000;
+    enhanced_fontscale = PS_SC;
+    strncpy(enhanced_escape_format,"\\%o",sizeof(enhanced_escape_format));
 
     ENHps_opened_string = FALSE;
-    ENHps_max_height = -1000;
-    ENHps_min_height = 1000;
 
     /* Set the recursion going. We say to keep going until a
      * closing brace, but we don't really expect to find one.
@@ -2431,16 +2178,12 @@ ENHPS_put_text(x, y, str)
      * "font,size". That is to say, ps_font is used only
      * at startup and by ENHPS_set_font
      */
-    while (*(str = ENHPS_recurse((char *)str, TRUE, ps_enh_font,
-				 (double)(ps_enh_fontsize*PS_SC),
-				 0.0, TRUE, TRUE, 0))) {
-	ENHPS_FLUSH;
+    while (*(str = enhanced_recursion((char *)str, TRUE, ps_enh_font,
+		 (double)(ps_enh_fontsize*PS_SC), 0.0, TRUE, TRUE, 0))) {
+	ENHPS_FLUSH();
 
 	/* I think we can only get here if *str == '}' */
-	if (*str == '}')
-	    fputs("enhpost printer driver - ignoring spurious }\n", stderr);
-	else
-	    fprintf(stderr, "internal error in enhpost driver - *str=0x%x\n", *str);
+	enh_err_check(str);
 
 	if (!*++str)
 	    break; /* end of string */
@@ -2448,9 +2191,9 @@ ENHPS_put_text(x, y, str)
 	/* else carry on and process the rest of the string */
     }
 
-    ENHps_max_height += ENHps_min_height;
+    enhanced_max_height += enhanced_min_height;
 
-    fprintf(gpoutfile, "] %.1f ", -ENHps_max_height/3);
+    fprintf(gpoutfile, "] %.1f ", -enhanced_max_height/3);
 
     switch(ps_justify) {
     case LEFT :
@@ -2817,16 +2560,18 @@ TERM_TABLE_START(post_driver)
    PS_text, null_scale, PS_graphics, PS_move, PS_vector, 
    PS_linetype, PS_put_text, PS_text_angle, 
    PS_justify_text, PS_point, do_arrow, PS_set_font, PS_pointsize,
-   TERM_BINARY /*flags*/, 0 /*suspend*/, 0 /*resume*/, PS_fillbox, PS_linewidth
-#ifdef PM3D
+   TERM_BINARY|TERM_IS_POSTSCRIPT /*flags*/, 
+   0 /*suspend*/, 0 /*resume*/, PS_fillbox, PS_linewidth
 #ifdef USE_MOUSE
    , 0, 0, 0, 0, 0 /* no mouse support for postscript */
 #endif
+#ifdef PM3D
    , PS_make_palette,
    PS_previous_palette, /* write grestore */
    PS_set_color,
    PS_filled_polygon
 #endif /* PM3D */
+   , ENHPS_OPEN, ENHPS_FLUSH, ENHPS_WRITEC
 TERM_TABLE_END(post_driver)
 
 #undef LAST_TERM
@@ -2860,8 +2605,8 @@ START_HELP(post)
 "                               {\"<fontname>\"} {<fontsize>}",
 "",
 " where <mode> is `landscape`, `portrait`, `eps` or `default`;",
-" `enhanced` activates the \"enhanced PostScript\" features (subscripts,",
-" superscripts and mixed fonts);",
+" `enhanced` enables enhanced text mode features (subscripts,",
+" superscripts and mixed fonts). See `enhanced` for more information;",
 " `color` enables color;",
 " `blacktext` forces all text to be written in black even in color mode;",
 " `solid` draws all plots with solid lines, overriding any dashed patterns;",
@@ -2947,6 +2692,10 @@ START_HELP(post)
 "?enhanced_postscript",
 "?enhanced postscript",
 "?Enhanced postscript",
+"?enhanced",
+" Several terminal types support an enhanced text mode in which ",
+" additional formatting information is embedded in the text string.",
+"",
 "@start table - first is interactive cleartext form",
 "  Control      Examples        Explanation",
 "   ^           a^x             superscript",

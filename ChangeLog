@@ -1,3 +1,16 @@
+2003-11-30  Ethan Merritt  <merritt@u.washington.edu>
+
+	* term/post.trm src/term_api.h src/term.c:
+	Move enhanced text mode parsing and processing from post.trm to the
+	gnuplot core. This requires 3 new entries in TERM_TABLE for any
+	terminal driver that wants to share the enhanced text code. The
+	behaviour of the postscript terminal is unaffected by this change.
+	
+	* src/gplt_x11.c term/dumb.trm term/gd.trm term/pdf.trm term/x11.trm
+	NEWS: Add enhanced text mode support to four additional drivers. The
+	implementation in dumb.trm is intended as sample code for extending
+	enhanced text mode support to other drivers.
+
 2003-11-30  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* docs/gnuplot.doc: Get documentation for 'palette gray' and 'palette

@@ -1,5 +1,5 @@
 /*
- * $Id: term_api.h,v 1.20 2003/02/18 16:38:11 broeker Exp $
+ * $Id: term_api.h,v 1.21 2003/06/25 18:01:24 sfeam Exp $
  */
 
 /* GNUPLOT - term_api.h */
@@ -127,6 +127,7 @@ typedef enum t_fillstyle { FS_EMPTY }
 #define TERM_CANNOT_MULTIPLOT 2  /* tested if stdout is redirected  */
 #define TERM_BINARY           4  /* open output file with "b"       */
 #define TERM_INIT_ON_REPLOT   8  /* call term->init() on replot     */
+#define TERM_IS_POSTSCRIPT   16  /* post, next, pslatex, etc        */
 
 /* The terminal interface structure --- heart of the terminal layer.
  *
@@ -202,6 +203,14 @@ typedef struct TERMENTRY {
      */
     void (*filled_polygon) __PROTO((int points, gpiPoint *corners));
 #endif
+
+/* Enhanced text mode driver call-backs */
+    void (*enhanced_open) __PROTO((char * fontname, double fontsize,
+		double base, TBOOLEAN widthflag, TBOOLEAN showflag,
+		int overprint));
+    void (*enhanced_flush) __PROTO((void));
+    void (*enhanced_writec) __PROTO((char c));
+
 } TERMENTRY;
 
 #ifdef WIN16
@@ -300,10 +309,6 @@ extern int mouseGnupmdrv;
 extern FILE *PM_pipe;
 #endif 
 
-/* flag: don't use enhanced output methods --- for output of
- * filenames, which usually looks bad using subscripts */
-extern TBOOLEAN ignore_enhanced_text;
-
 
 /* Prototypes of functions exported by term.c */
 
@@ -325,6 +330,10 @@ struct termentry *set_term __PROTO((int));
 struct termentry *change_term __PROTO((const char *name, int length));
 void init_terminal __PROTO((void));
 void test_term __PROTO((void));
+
+/* flag: don't use enhanced output methods --- for output of
+ * filenames, which usually looks bad using subscripts */
+extern TBOOLEAN ignore_enhanced_text;
 
 #ifdef LINUXVGA
 void LINUX_setup __PROTO((void));

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.60 2003/09/11 15:08:57 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.61 2003/11/24 15:15:14 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -202,6 +202,18 @@ static void LINETYPE_null __PROTO((int));
 static void PUTTEXT_null __PROTO((unsigned int, unsigned int, const char *));
 static int set_font_null __PROTO((const char *s));
 
+/* Support for enhanced text mode. These can be static because all  */
+/* the terminal drivers are included into term.c at compile time.   */
+static char  enhanced_text[MAX_LINE_LEN];
+static char *enhanced_cur_text;
+static double enhanced_fontscale;
+static char enhanced_escape_format[16];
+static double enhanced_max_height, enhanced_min_height;
+char * enhanced_recursion __PROTO((char *p, TBOOLEAN brace,
+	     char *fontname, double fontsize, double base, 
+	     TBOOLEAN widthflag, TBOOLEAN showflag, int overprint));
+static void enh_err_check __PROTO((const char *str));
+static void do_enh_writec __PROTO((char c));
 
 #ifdef __ZTC__
 char *ztc_init();
@@ -2008,3 +2020,331 @@ fflush_binary()
     }
 }
 #endif /* VMS */
+
+/*
+ * This is an abstraction of the enhanced text mode originally written
+ * for the postscript terminal driver by David Denholm and Matt Heffron.
+ * I have split out a terminal-independent recursive syntax-parser 
+ * routine that can be shared by all drivers that want to add support
+ * for enhanced text mode.
+ *
+ * A driver that wants to make use of this common framework must provide
+ * three new entries in TERM_TABLE:
+ *	void *enhanced_open   (char *fontname, double fontsize, double base,
+ *	                       TBOOLEAN widthflag, TBOOLEAN showflag, 
+ *	                       int overprint)
+ *	void *enhanced_writec (char c)
+ *	void *enhanced_flush  ()
+ *
+ * Each driver also has a separate ENHXX_put_text() routine that replaces
+ * the normal (term->put_text) routine while in enhanced mode.
+ * This routine must initialize the following globals used by the shared code:
+ *	enhanced_fontscale	converts font size to device resolution units
+ *	enhanced_escape_format	used to process octal escape characters \xyz
+ *
+ * I bent over backwards to make the output of the revised code identical
+ * to the output of the original postscript version.  That means there is
+ * some cruft left in here (enhanced_max_height for one thing, and all
+ * the code relating to RememberFont) that is probably irrelevant to any 
+ * new drivers using the code.
+ *
+ * Ethan A Merritt - November 2003
+ */
+
+#ifdef DEBUG_ENH
+#define ENH_DEBUG(x) printf x;
+#else
+#define ENH_DEBUG(x)
+#endif
+
+static void
+do_enh_writec(c)
+    char c;
+{
+    *enhanced_cur_text++ = c;
+}
+
+/*
+ * Process a bit of string, and return the last character used.
+ * p is start of string
+ * brace is TRUE to keep processing to }, FALSE to do one character only
+ * fontname & fontsize are obvious
+ * base is the current baseline
+ * widthflag is TRUE if the width of this should count,
+ *              FALSE for zero width boxes
+ * showflag is TRUE if this should be shown,
+ *             FALSE if it should not be shown (like TeX \phantom)
+ * overprint is 0 for normal operation,
+ *              1 for the underprinted text (included in width calculation),
+ *              2 for the overprinted text (not included in width calc)
+ *              (overprinted text is centered horizontally on underprinted text
+ */
+
+char *
+enhanced_recursion(p, brace, fontname, fontsize, base, widthflag, showflag, overprint)
+    char *p, *fontname;
+    TBOOLEAN brace, widthflag, showflag;
+    double fontsize, base;
+    int overprint;
+{
+
+    ENH_DEBUG(("RECURSE WITH [%p] \"%s\", %d %s %.1f %.1f %d %d %d\n", p, p, brace, fontname, fontsize, base, widthflag, showflag, overprint));
+
+/* Start each recursion with a clean string */
+    (term->enhanced_flush)();
+
+    if (base + fontsize > enhanced_max_height) {
+	enhanced_max_height = base + fontsize;
+	ENH_DEBUG(("Setting max height to %.1f\n", enhanced_max_height));
+    }
+
+    if (base < enhanced_min_height) {
+	enhanced_min_height = base;
+	ENH_DEBUG(("Setting min height to %.1f\n", enhanced_min_height));
+    }
+
+    while (*p) {
+	float shift;
+
+	switch (*p) {
+	case '}'  :
+	    /*{{{  deal with it*/
+	    if (brace)
+		return (p);
+
+	    fputs("enhanced text parser - spurious }\n", stderr);
+	    break;
+	    /*}}}*/
+
+	case '_'  :
+	case '^'  :
+	    /*{{{  deal with super/sub script*/
+	    shift = (*p == '^') ? 0.5 : -0.3;
+	    (term->enhanced_flush)();
+	    p = enhanced_recursion(p + 1, FALSE, fontname, fontsize * 0.8,
+			      base + shift * fontsize, widthflag,
+			      showflag, overprint);
+	    break;
+	    /*}}}*/
+	case '{'  :
+	    {
+		char *savepos = NULL, save = 0;
+		char *localfontname = fontname, ch;
+		int recode = 1;
+		float f = fontsize, ovp;
+
+		/*{{{  recurse (possibly with a new font) */
+
+		ENH_DEBUG(("Dealing with {\n"));
+	    
+		/* get vertical offset (if present) for overprinted text */
+		while (*++p == ' ');
+		if (overprint == 2) {
+		    ovp = (float)strtod(p,&p);
+		    if (ovp != 0) {
+			base = ovp*f;
+		    }
+		}
+		--p;		/* HBB 20001021: bug fix: 10^{2} broken */
+
+		if (*++p == '/') {
+		    /* then parse a fontname, optional fontsize */
+		    while (*++p == ' ')
+			;	/* do nothing */
+		    if (*p=='-') {
+			recode = 0;
+			while (*++p == ' ')
+			    ;	/* do nothing */
+		    }
+		    localfontname = p;
+		    while ((ch = *p) > ' ' && ch != '=' && ch != '*')
+			++p;
+		    save = *(savepos=p);
+		    if (ch == '=') {
+			*p++ = '\0';				
+			/*{{{  get optional font size*/
+			ENH_DEBUG(("Calling strtod(\"%s\") ...", p));
+			f = (float)strtod(p, &p);
+			ENH_DEBUG(("Returned %.1f and \"%s\"\n", f, p));
+
+			if (f == 0)
+			    f = fontsize;
+			else
+			    f *= enhanced_fontscale;  /* remember the scaling */
+
+			ENH_DEBUG(("Font size %.1f\n", f));
+			/*}}}*/
+		    } else if (ch == '*') {
+			*p++ = '\0';				
+			/*{{{  get optional font size scale factor*/
+			ENH_DEBUG(("Calling strtod(\"%s\") ...", p));
+			f = (float)strtod(p, &p);
+			ENH_DEBUG(("Returned %.1f and \"%s\"\n", f, p));
+
+			if (f)
+			    f *= fontsize;  /* apply the scale factor */
+			else
+			    f = fontsize;
+
+			ENH_DEBUG(("Font size %.1f\n", f));
+			/*}}}*/
+		    } else {
+			*p++ = '\0';
+			f = fontsize;
+		    }				
+
+		    while (*p == ' ')
+			++p;
+		    if (! *localfontname) {
+			localfontname = fontname;
+		    } else if (!strncmp("postscript",term->name,9)) {
+			/* FIXME - This cruft is left over from when the code */
+			/* was part of post.trm.  No one else needs it!       */
+			char *recodestring = (PS_RememberFont)(localfontname,
+						 recode && !ENHps_opened_string);
+			if (recode && recodestring) {
+			    (term->enhanced_flush)();
+			    fprintf(gpoutfile, "/%s %s",
+				    localfontname, recodestring);
+			}
+		    }
+		}
+		/*}}}*/
+
+		ENH_DEBUG(("Before recursing, we are at [%p] \"%s\"\n", p, p));
+
+		p = enhanced_recursion(p, TRUE, localfontname, f, base,
+				  widthflag, showflag, overprint);
+
+		ENH_DEBUG(("BACK WITH \"%s\"\n", p));
+
+		(term->enhanced_flush)();
+
+		if (savepos)
+		    /* restore overwritten character */
+		    *savepos = save;
+		break;
+	    } /* case '{' */
+	case '@' :
+	    /*{{{  phantom box - prints next 'char', then restores currentpoint */
+
+	    (term->enhanced_flush)();
+	    p = enhanced_recursion(++p, FALSE, fontname, fontsize, base,
+			      FALSE, showflag, overprint);
+	    break;
+	    /*}}}*/
+
+	case '&' :
+	    /*{{{  character skip - skips space equal to length of character(s) */
+	    (term->enhanced_flush)();
+
+	    p = enhanced_recursion(++p, FALSE, fontname, fontsize, base,
+			      widthflag, FALSE, overprint);
+	    break;
+	    /*}}}*/
+
+	case '~' :
+	    /*{{{ overprinted text */
+	    /* the second string is overwritten on the first, centered
+	     * horizontally on the first and (optionally) vertically
+	     * shifted by an amount specified (as a fraction of the
+	     * current fontsize) at the beginning of the second string
+	      
+	     * Note that in this implementation neither the under- nor
+	     * overprinted string can contain syntax that would result
+	     * in additional recursions -- no subscripts,
+	     * superscripts, or anything else, with the exception of a
+	     * font definition at the beginning of the text */
+	    
+	    (term->enhanced_flush)();
+	    p = enhanced_recursion(++p, FALSE, fontname, fontsize, base,
+			      widthflag, showflag, 1);
+	    (term->enhanced_flush)();
+	    p = enhanced_recursion(++p, FALSE, fontname, fontsize, base,
+			      FALSE, showflag, 2);
+		
+	    overprint = 0;   /* may not be necessary, but just in case . . . */
+	    break;
+	    /*}}}*/
+
+	case '('  :
+	case ')'  :
+	    /*{{{  an escape and print it */
+	    /* special cases */
+	    (term->enhanced_open)(fontname, fontsize, base, widthflag, showflag, overprint);
+	    if (term->flags & TERM_IS_POSTSCRIPT)
+		(term->enhanced_writec)('\\');
+	    (term->enhanced_writec)(*p);
+	    break;
+	    /*}}}*/
+
+	case '\\'  :
+	    if (p[1]=='\\' || p[1]=='(' || p[1]==')') {
+		(term->enhanced_open)(fontname, fontsize, base, widthflag, showflag, overprint);
+		(term->enhanced_writec)('\\');
+
+	    /*{{{  The enhanced mode always uses \xyz as an octal character representation
+	    	   but each terminal type must give us the actual output format wanted.
+		   pdf.trm wants the raw character code, which is why we use strtol();
+		   most other terminal types want some variant of "\\%o". */
+	    } else if (p[1] >= '0' && p[1] <= '7') {
+		char *e, escape[16], octal[4] = {'\0','\0','\0','\0'};
+		
+		(term->enhanced_open)(fontname, fontsize, base, widthflag, showflag, overprint);
+		octal[0] = *(++p);
+		if (p[1] >= '0' && p[1] <= '7') {
+		    octal[1] = *(++p);
+		    if (p[1] >= '0' && p[1] <= '7')
+			octal[2] = *(++p);
+		}
+		sprintf(escape, enhanced_escape_format, strtol(octal,NULL,8));
+		for (e=escape; *e; e++) {
+		    (term->enhanced_writec)(*e);
+		}
+		break;
+	    }
+	    ++p;
+
+	    /* HBB 20030122: Avoid broken output if there's a \
+	     * exactly at the end of the line */
+	    if (*p == '\0') {
+		fputs("enhanced text parser -- spurious backslash\n", stderr);
+		break;
+	    }
+
+	    /* just go and print it (fall into the 'default' case) */
+	    /*}}}*/
+	default:
+	    /*{{{  print it */
+	    (term->enhanced_open)(fontname, fontsize, base, widthflag, showflag, overprint);
+	    (term->enhanced_writec)(*p);
+	    /*}}}*/
+	} /* switch (*p) */
+
+	/* like TeX, we only do one character in a recursion, unless it's
+	 * in braces
+	 */
+
+	if (!brace) {
+	    (term->enhanced_flush)();
+	    return(p);  /* the ++p in the outer copy will increment us */
+	}
+
+	if (*p) /* only not true if { not terminated, I think */
+	    ++p;	
+    } /* while (*p) */
+
+    (term->enhanced_flush)();
+    return p;
+}
+
+/* Called after the end of recursion to check for errors */
+static void
+enh_err_check( str )
+    const char *str;
+{
+    if (*str == '}')
+	fputs("enhanced text mode parser - ignoring spurious }\n", stderr);
+    else
+	fprintf(stderr, "enhanced text mode parsing error - *str=0x%x\n", *str);
+}

@@ -5,6 +5,7 @@ Changes in release 4.0:
 * CHANGE X-window plot and font size is used to adjust plot layout
 * CHANGE 'set key {on|off|default}' is preferred method for controlling key
 * CHANGE mouse position is tracked in all X windows (not just current one)
+* NEW enhanced text mode for additional terminal types
 * NEW built-in function 'defined(<variablename>)'
 * NEW mouse input information is exported to user-accessible variables
 * NEW 'set term png' and 'set term jpeg' using modern GD library
@@ -53,6 +54,7 @@ and the example script demo/mousevariables.dem.
 * NEW 'test palette'
 * NEW 'set palette palette <n>' options {float|int} and output to that of
   'set print'
+* NEW enhanced text mode for x11 gd pdf and dumb terminals
 
 [3.8j]
 * NEW 'show palette fit2rgbformulae'
