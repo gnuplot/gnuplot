@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: help.c,v 1.29 1998/04/14 00:15:36 drd Exp $";
+static char *RCSid = "$Id: help.c,v 1.8 1998/12/09 15:23:49 lhecking Exp $";
 #endif
 
 /* GNUPLOT - help.c */
@@ -570,8 +570,8 @@ TBOOLEAN *subtopics;		/* (out) are there any subtopics */
 		}
 		/* adapted by DvdSchaaf */
 		{
-#define FIRSTCOL	6
-#define COLLENGTH	15
+#define FIRSTCOL	4
+#define COLLENGTH	18
 
 		    if (pos == 0)
 			spacelen = FIRSTCOL;
