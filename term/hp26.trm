@@ -1,5 +1,5 @@
 /*
- * $Id: hp26.trm,v 1.8 1999/06/22 11:54:18 lhecking Exp $
+ * $Id: hp26.trm,v 1.9 1999/10/01 15:09:11 lhecking Exp $
  */
 
 /* GNUPLOT - HP26.trm */
@@ -107,7 +107,7 @@ typedef struct _HP26_Buffer_Node {
 } HP26_Buffer_Node;
 
 /* constructor method */
-HP26_Buffer_Node *
+static HP26_Buffer_Node *
 BN_create(index, size, linetype)
 int index, size, linetype;
 {
@@ -129,7 +129,7 @@ int index, size, linetype;
 }
 
 /* destructor method */
-void
+static void
 BN_delete(the_node)
 HP26_Buffer_Node *the_node;
 {
@@ -213,7 +213,7 @@ static char HP26_bin_table[32] =
 	if can't use binary short incremental, use binary 
 	absolute(4 bytes/point)
 -- finally, resets the HP26_next pointer to zero    */
-int
+static int
 HP26_flush(the_buff)
 HP26_Buffer_Node *the_buff;
 {
@@ -334,7 +334,7 @@ HP26_Buffer_Node *the_buff;
     return (TRUE);
 }
 
-void
+static void
 HP26_handle_overflow()
 {
     HP26_Buffer_Node *bigger, *old;
@@ -609,7 +609,7 @@ int number;
 /* provides 9 point types so they stay in sync with the linetypes 
 puts simpler point types first on the assumption they are more
 frequently used */
-void
+static void
 HP26_do_point(x, y, number)
 unsigned int x, y;
 int number;

@@ -1,5 +1,5 @@
 /*
- * $Id: eepic.trm,v 1.11 1999/06/22 11:54:16 lhecking Exp $
+ * $Id: eepic.trm,v 1.12 1999/10/01 15:09:10 lhecking Exp $
  *
  */
 
@@ -261,7 +261,7 @@ unsigned int ux, uy;
     EEPIC_posy = uy;
 }
 
-void
+static void
 EEPIC_endline()
 {
     if (EEPIC_inline) {

@@ -1,5 +1,5 @@
 /*
- * $Id: hpljii.trm,v 1.14 1999/08/07 17:19:12 lhecking Exp $
+ * $Id: hpljii.trm,v 1.15 1999/10/01 15:09:11 lhecking Exp $
  *
  */
 
@@ -285,10 +285,10 @@ const char *str;
 }
 
 #ifdef PROTOTYPES
-void
+static void
 HPLJIIputc(unsigned int x, unsigned int y, char c, int ang)
 #else
-void
+static void
 HPLJIIputc(x, y, c, ang)
 unsigned int x, y;
 int ang;

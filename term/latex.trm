@@ -1,5 +1,5 @@
 /*
- * $Id: latex.trm,v 1.19 1999/08/24 11:24:54 lhecking Exp $
+ * $Id: latex.trm,v 1.20 1999/10/01 15:09:12 lhecking Exp $
  *
  */
 
@@ -645,7 +645,7 @@ TBOOLEAN head;
     LATEX_posy = ey;
 }
 
-void
+static void
 best_latex_arrow(sx, sy, ex, ey, who, head)
 int sx, sy, ex, ey;		/* start and end points */
 int who;			/* 1=LATEX, 2=EEPIC */
