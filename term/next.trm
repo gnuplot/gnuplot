@@ -1,5 +1,5 @@
 /*
- * $Id: next.trm,v 1.22 1998/06/18 14:59:21 ddenholm Exp $
+ * $Id: next.trm,v 1.10 1998/12/14 18:40:41 lhecking Exp $
  *
  */
 
@@ -1216,7 +1216,7 @@ PStext termTitle:(in char *) title;
 @end
 
 
-@ implementation GnuTermDriver
+@implementation GnuTermDriver
 
 - init
 {
