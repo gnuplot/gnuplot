@@ -1,3 +1,8 @@
+2001-06-11  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* term/tgif.trm: Changed type of TGIF_colurs to array of plain
+ 	char, from unsigned char.
+
 2001-06-01  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* config/makefile.nt (WINOBJS): Add gpexecute.obj to the list.

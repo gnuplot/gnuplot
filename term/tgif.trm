@@ -1,4 +1,4 @@
-/* $Id: tgif.trm,v 1.16 2000/11/06 20:24:27 lhecking Exp $ */
+/* $Id: tgif.trm,v 1.17 2000/11/20 20:31:37 joze Exp $ */
 
 /* GNUPLOT - tgif.trm */
 
@@ -123,7 +123,7 @@ static int TGIF_palette_size = 128;	/* Number of colours in palette */
 #if 0
 static int TGIF_palette_offst = 32;	/* Offset from zero for user colours */
 #endif
-static unsigned char TGIF_colours[128][8];	/* Colours */
+static char TGIF_colours[128][8];	/* Colours */
 #endif /* PM3D */
 
 
@@ -390,7 +390,7 @@ TGIF_init()
     fprintf(gpoutfile, "\
 %%TGIF 2.15-p7\n\
 state(%d,30,%u,0,0,%u,16,1,9,1,1,0,0,0,0,1,0,'%s',0,%u,0,0,1,10,0,0,1,1,0,16,0,0,1,1,1).\n\
-%%\n%% @(#)$Header: /cvsroot/gnuplot/gnuplot/term/tgif.trm,v 1.16 2000/11/06 20:24:27 lhecking Exp $\n%% %%W%%\n%%\n\
+%%\n%% @(#)$Header: /cvsroot/gnuplot/gnuplot/term/tgif.trm,v 1.17 2000/11/20 20:31:37 joze Exp $\n%% %%W%%\n%%\n\
 page(1,\"\").\n",
 	    TgifPortrait ? 0 : 1, uActResolution, uActZoom, sActFont, uActFontSize);
     eTgifState = NEWPOLY;
