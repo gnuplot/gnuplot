@@ -127,7 +127,10 @@ static int  ps_enh_fontsize;
 
 static TBOOLEAN ps_portrait = FALSE;				 /* vertical page */
 static TBOOLEAN ps_color = FALSE;
+static TBOOLEAN ps_blacktext = FALSE;           /*  text always black  */
 static TBOOLEAN ps_solid = FALSE;   		/*  use solid lines */
+static float ps_dash_length = 1.0;   /*  scale factor for dash-dot patterns  */
+static float ps_linewidth_factor = 1.0;   /*  scale factor for linewidth  */
 static TBOOLEAN ps_eps = FALSE;	/* Is this for an eps file? */
 			/* Added by Robert Davis <davis@ecn.purdue.edu> */
 static int ps_page=0;			/* page count */
@@ -552,7 +555,10 @@ TERM_PUBLIC void PS_options()
 			ps_portrait=FALSE;
  			ps_eps=FALSE;
 			ps_color=FALSE;
+			ps_blacktext=FALSE;
 			ps_solid=FALSE;
+			ps_dash_length = 1.0;
+			ps_linewidth_factor = 1.0;
 			ps_duplex_option=FALSE;
 			strcpy(ps_font,"Helvetica");
 			ps_fontsize = 14;
@@ -586,12 +592,46 @@ TERM_PUBLIC void PS_options()
 	}
 
 	if (!END_OF_COMMAND) {
+		if (almost_equals(c_token,"b$lacktext")) {
+			ps_blacktext=TRUE;
+			c_token++;
+		}
+		else if (almost_equals(c_token,"color$text") ||
+		         almost_equals(c_token,"colour$text")) {
+			ps_blacktext=FALSE;
+			c_token++;
+		}
+	}
+
+	if (!END_OF_COMMAND) {
 		if (almost_equals(c_token,"so$lid")) {
 			ps_solid=TRUE;
 			c_token++;
 		}
 		else if (almost_equals(c_token,"da$shed")) {
 			ps_solid=FALSE;
+			c_token++;
+		}
+	}
+
+	if (!END_OF_COMMAND) {
+		if (almost_equals(c_token,"dashl$ength") ||
+		    almost_equals(c_token,"dl")) {
+			struct value a;
+			c_token++;
+                        ps_dash_length = real(const_express(&a));
+                        if (ps_dash_length <= 0.0) ps_dash_length = 1.0;
+			c_token++;
+		}
+	}
+
+	if (!END_OF_COMMAND) {
+		if (almost_equals(c_token,"linew$idth") ||
+		    almost_equals(c_token,"lw")) {
+			struct value a;
+			c_token++;
+                        ps_linewidth_factor = real(const_express(&a));
+                        if (ps_linewidth_factor <= 0.0) ps_linewidth_factor = 1.0;
 			c_token++;
 		}
 	}
@@ -626,14 +666,19 @@ TERM_PUBLIC void PS_options()
 		term->h_char = (unsigned int)(ps_fontsize*PS_SC*6/10);
 	}
 
+        if (!ps_color) ps_blacktext=TRUE;
+
 	sprintf(default_font,"%s,%d",ps_font,ps_fontsize);
 	/* default_font holds the font and size set at 'set term' */
 	/* Entry font added by DJL */
-	sprintf(term_options,"%s %senhanced %s %s %s \"%s\" %d",
+	sprintf(term_options,"%s %senhanced %s text %s\n     %s (length * %.1f) linewidth %.1f %s \"%s\" %d",
 		ps_eps ? "eps" : (ps_portrait ? "portrait" : "landscape"),
-      term->put_text == ENHPS_put_text ? "" : "no",
+      		term->put_text == ENHPS_put_text ? "" : "no",
 		ps_color ? "color" : "monochrome",
+                ps_blacktext ? "always black" : "can be colored",
 		ps_solid ? "solid" : "dashed",
+		ps_dash_length,
+		ps_linewidth_factor,
 		ps_duplex_option ? (ps_duplex_state ? "duplex" : "simplex")
                                     : "defaultplex",
 		ps_font,ps_fontsize);
@@ -666,7 +711,7 @@ static char GPFAR psi2[] = "%%%%EndComments\n\
 /gnulinewidth %.3f def\n\
 /userlinewidth gnulinewidth def\n\
 /vshift %d def\n\
-/dl {%d mul} def\n\
+/dl {%.1f mul} def\n\
 /hpt_ %.1f def\n\
 /vpt_ %.1f def\n\
 /hpt hpt_ def\n\
@@ -842,9 +887,9 @@ NULL };
 	fprintf(gpoutfile, psi2,
 		ps_color ? "true" : "false",
 		ps_solid ? "true" : "false",
-		PS_LW,			/* line width */
+		PS_LW*ps_linewidth_factor,	/* line width */
 	 	(int)(t->v_char)/(-3),	/* shift for vertical centring */
-		PS_SC,			/* dash length */
+		PS_SC*ps_dash_length,	/* dash length */
 		PS_HTIC/2.0,		/* half point width */
 		PS_VTIC/2.0);		/* half point height */
 
@@ -1125,6 +1170,8 @@ char *str;
 char ch;
 	if (!strlen(str)) return;
 	PS_move(x,y);
+	if (ps_blacktext)
+		fprintf(gpoutfile,"gsave 0 setgray\n");
 	if (ps_ang != 0)
 		fprintf(gpoutfile,"currentpoint gsave translate %d rotate 0 0 M\n"
 			,ps_ang*90);
@@ -1144,7 +1191,9 @@ char ch;
 		case RIGHT : fprintf(gpoutfile,") Rshow\n");
 			break;
 	}
-	if (ps_ang != 0)
+	if (ps_ang != 0 || ps_blacktext)
+		fprintf(gpoutfile,"grestore\n");
+	if (ps_ang != 0 && ps_blacktext)
 		fprintf(gpoutfile,"grestore\n");
 	ps_path_count = 0;
 	PS_relative_ok = FALSE;
@@ -1571,6 +1620,8 @@ char *str;
 		
 	PS_move(x,y);
 
+	if (ps_blacktext)
+		fprintf(gpoutfile,"gsave 0 setgray\n");
 	if (ps_ang != 0)
 		fprintf(gpoutfile,"currentpoint gsave translate %d rotate 0 0 moveto\n",
 			ps_ang*90);
@@ -1627,7 +1678,9 @@ char *str;
 			break;
 	}
 
-	if (ps_ang != 0)
+	if (ps_ang != 0 || ps_blacktext)
+		fputs("grestore\n", gpoutfile);
+	if (ps_ang != 0 && ps_blacktext)
 		fputs("grestore\n", gpoutfile);
 	ps_path_count = 0;
 	PS_relative_ok=FALSE;
@@ -1674,23 +1727,31 @@ START_HELP(post)
 "",
 " Syntax:",
 "       set terminal postscript {<mode>} {enhanced | noenhanced}",
-"                               {color | monochrome} {solid | dashed}",
+"                               {color | colour | monochrome}",
+"                               {blacktext | colortext | colourtext}",
+"                               {solid | dashed} {dashlength | dl <DL>}",
+"                               {linewidth | lw <LW>}",
 "                               {<duplexing>}",
 "                               {\"<fontname>\"} {<fontsize>}",
 "",
 " where <mode> is `landscape`, `portrait`, `eps` or `default`;",
+" `enhanced` activates the \"enhanced PostScript\" features (subscripts,",
+" superscripts and mixed fonts);",
+" `color` enables color;",
+" `blacktext` forces all text to be written in black even in color mode;",
 " `solid` draws all plots with solid lines, overriding any dashed patterns;",
+" `dashlength` or `dl` scales the length of the dashed-line segments by <DL>",
+" (which is a floating-point number greater than zero);",
+" `linewidth` or `lw` scales all linewidths by <LW>;",
 " <duplexing> is `defaultplex`, `simplex` or `duplex` (\"duplexing\" in",
 " PostScript is the ability of the printer to print on both sides of the same",
 " page---don't set this if your printer can't do it);",
-" `enhanced` activates the \"enhanced PostScript\" features (subscripts,",
-" superscripts and mixed fonts);",
 " `\"<fontname>\"` is the name of a valid PostScript font; and `<fontsize>` is",
 " the size of the font in PostScript points.",
 "",
 " `default` mode sets all options to their defaults: `landscape`, `monochrome`,",
-" `dashed`, `defaultplex`, `noenhanced`, \"Helvetica\" and 14pt.",
-"  Default size of a PostScript plot is 10 inches wide and 7 inches high.",
+" `dashed`, `dl 1.0`, 'lw 1.0`, `defaultplex`, `noenhanced`, \"Helvetica\" and",
+" 14pt.  Default size of a PostScript plot is 10 inches wide and 7 inches high.",
 "",
 " `eps` mode generates EPS (Encapsulated PostScript) output, which is just",
 " regular PostScript with some additional lines that allow the file to be",
