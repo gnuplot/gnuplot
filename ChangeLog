@@ -1,3 +1,10 @@
+2005-03-27  Ethan Merritt  <merritt@u.washington.edu>
+
+	NEWS configure.in term/gd.trm: Allow storage of a sequence of plots
+	into a single animated gif file.
+	    set term gif animate {delay <time>} {nooptimize}
+	Requires libgd version 2.0.29 or better (2.0.33 is recommended).
+
 2005-03-26  Ethan Merritt  <merritt@u.washington.edu>
 
 	SourceForge patch #1090199 "Extend hotkeys to all open plot windows"
