@@ -18,6 +18,7 @@ top_srcdir = @top_srcdir@
 @SET_MAKE@
 EMACS = @EMACS@
 MAKEINFO = @MAKEINFO@
+mkinstalldirs = $(SHELL) $(top_srcdir)/../mkinstalldirs
 LATEX = @LATEX@
 DVIPS = dvips
 INSTALL = @INSTALL@
@@ -102,7 +103,7 @@ gpelcard.dvi: gpelcard.tex
 all: gnuplot.elc info-look.elc gnuplot-gui.elc
 
 install:
-	mkinstalldirs $(lispdir)
+	$(mkinstalldirs) $(lispdir)
 	@for p in *.elc; do \
 	  echo " $(INSTALL_DATA) $$p $(lispdir)/$$p"; \
 	  $(INSTALL_DATA) $$p $(lispdir)/$$p; \
