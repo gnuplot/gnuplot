@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: wtext.c,v 1.1 1999/03/26 22:11:24 lhecking Exp $";
+static char *RCSid = "$Id: wtext.c,v 1.2 1999/07/27 19:42:16 lhecking Exp $";
 #endif
 
 /* GNUPLOT - win/wtext.c */
@@ -244,8 +244,9 @@ TextInit(LPTW lptw)
 	}
 
 	lptw->hPopMenu = CreatePopupMenu();
-	AppendMenu(lptw->hPopMenu, MF_STRING, M_COPY_CLIP, "&Copy to Clipboard");
-	AppendMenu(lptw->hPopMenu, MF_STRING, M_PASTE, "&Paste");
+	AppendMenu(lptw->hPopMenu, MF_STRING, M_COPY_CLIP, "&Copy to Clipboard\tCtrl-Ins");
+	AppendMenu(lptw->hPopMenu, MF_STRING, M_PASTE, "&Paste\tShift-Ins");
+	AppendMenu(lptw->hPopMenu, MF_SEPARATOR, 0, NULL);
 #if WINVER >= 0x030a
 	AppendMenu(lptw->hPopMenu, MF_STRING, M_CHOOSE_FONT, "Choose &Font...");
 #endif
@@ -1250,6 +1251,28 @@ WndTextProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 							lptw->KeyBufIn = lptw->KeyBuf;	/* wrap around */
 					}
 				}
+			  }
+			}
+			break;
+		case WM_KEYUP:
+			if (GetKeyState(VK_SHIFT) < 0) {
+			  switch(wParam) {
+				case VK_INSERT:
+					/* Shift-Insert: paste clipboard */
+					SendMessage(lptw->hWndText, WM_COMMAND, M_PASTE, (LPARAM)0);
+					break;
+			  }
+			}
+			if (GetKeyState(VK_CONTROL) < 0) {
+			  switch(wParam) {
+				case VK_INSERT:
+					/* Ctrl-Insert: copy to clipboard */
+					SendMessage(lptw->hWndText, WM_COMMAND, M_COPY_CLIP, (LPARAM)0);
+					break;
+				case 'V':
+					/* Ctrl-V: paste clipboard */
+					SendMessage(lptw->hWndText, WM_COMMAND, M_PASTE, (LPARAM)0);
+					break;
 			  }
 			}
 			break;
