@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.22 2000/11/01 18:57:32 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.23 2000/11/03 01:15:05 joze Exp $"); }
 #endif
 
 /* GNUPLOT - hidden3d.c */
@@ -279,15 +279,18 @@ static int compare_polys_by_zmax __PROTO((const void *p1, const void *p2));
 static void sort_edges_by_z __PROTO((void));
 static void sort_polys_by_z __PROTO((void));
 static TBOOLEAN get_plane __PROTO((p_polygon p, t_plane plane));
-static long split_line_at_ratio __PROTO((p_edge e, double w));
+static long split_line_at_ratio __PROTO((p_vertex v1, p_vertex v2, double w));
 static GP_INLINE double area2D __PROTO((p_vertex v1, p_vertex v2,
 					p_vertex v3));
 static void draw_vertex __PROTO((p_vertex v));
-static void draw_edge __PROTO((p_edge e));
-static GP_INLINE void handle_edge_fragment __PROTO((p_edge e, long int vnum1,
+static GP_INLINE void draw_edge __PROTO((p_edge e, p_vertex v1, p_vertex v2));
+static GP_INLINE void handle_edge_fragment __PROTO((long int edgenum,
+						    long int vnum1,
 						    long int vnum2,
 						    long int firstpoly));
-static int in_front __PROTO((long int edgenum, long int *firstpoly));
+static int in_front __PROTO((long int edgenum,
+			     long int vnum1, long int vnum2,
+			     long int *firstpoly));
 
 
 /* Set the options for hidden3d. To be called from set.c, when the
@@ -1332,9 +1335,8 @@ sort_polys_by_z()
 	/* traverse plist in the order given by sortarray, and set the
 	 * 'next' pointers */
 #if TEST_QUADTREE
-	/* 19991205: CODEME!!! */
-	/* HBB 20000716: beginning to code... loops backwards, to ease
-	 * construction of linked lists from the head: */
+	/* HBB 20000716: Loop backwards, to ease construction of
+	 * linked lists from the head: */
 	{
 	    unsigned int grid_x, grid_y;
 	    unsigned int grid_x_low, grid_x_high, grid_y_low, grid_y_high;
@@ -1408,13 +1410,13 @@ draw_vertex(v)
 
 /* The function that actually does the drawing of the visible portions
  * of lines */
+/* HBB 20001108: changed to take the pointers to the end vertices as
+ * additional arguments. */
 static void
-draw_edge(e)
+draw_edge(e, v1, v2)
     p_edge e;
+    p_vertex v1, v2;
 {
-    p_vertex v1 = vlist + e->v1;
-    p_vertex v2 = vlist + e->v2;
-
     assert (e >= elist && e < elist + edges.end);
 
     draw3d_line_unconditional(v1, v2, e->lp, e->style);
@@ -1435,23 +1437,22 @@ draw_edge(e)
 /* Split a given line segment into two at an inner point. The inner
  * point is specified as a fraction of the line-length (0 is V1, 1 is
  * V2) */
+/* HBB 20001108: changed to now take two vertex pointers as its
+ * arguments, rather than an edge pointer. */
 static long
-split_line_at_ratio(e, w)
-    p_edge e;			/* pointer to line to be split */
+split_line_at_ratio(v1, v2, w)
+    p_vertex v1, v2;		/* pointers to ends of line to split */
     double w;			/* where to split it */
 {
-    p_vertex v, v1, v2;
+    p_vertex v;
 
     if (EQ(w, 0.0))
-	return e->v1;
+	return v1 - vlist;
     if (EQ(w, 1.0))
-	return e->v2;
+	return v2 - vlist;
 	
     /* Create a new vertex */
     v = nextfrom_dynarray(&vertices);
-
-    v1 = vlist + e->v1;
-    v2 = vlist + e->v2;
 
     v->x = (v2->x - v1->x) * w + v1->x;
     v->y = (v2->y - v1->y) * w + v1->y;
@@ -1462,11 +1463,11 @@ split_line_at_ratio(e, w)
     /* additional checks to prevent adding unnecessary vertices */
     if (V_EQUAL(v, v1)) {
 	droplast_dynarray(&vertices);
-	return e->v1;
+	return v1 - vlist;
     }
     if (V_EQUAL(v, v2)) {
 	droplast_dynarray(&vertices);
-	return e->v2;
+	return v2 - vlist;
     }
 
     return (v - vlist);
@@ -1493,17 +1494,22 @@ area2D (v1, v2, v3)
  * of the old one. The fragment inherits the line style and stuff of the
  * given edge; only the two new vertices are different. The new edge
  * is then passed to in_front, for recursive handling */
+/* HBB 20001108: Changed from edge pointer to edge index. Don't
+ * allocate a fresh anymore, as this is no longer needed after the
+ * change to in_front().  What remains of this function may no longer
+ * be worth having. I.e. it can be replaced by a direct recursion call
+ * of in_front(), sometime soon. */
 static GP_INLINE void
-handle_edge_fragment(e, vnum1, vnum2, firstpoly)
-    p_edge e;
+handle_edge_fragment(edgenum, vnum1, vnum2, firstpoly)
+    long int edgenum;
     long int vnum1, vnum2;
     long int firstpoly;
 {
-    long int thisedge = make_edge(vnum1, vnum2, e->lp, e->style, -1);
-    in_front(thisedge, &firstpoly);
-	
-    /* this fragment is handled, release it again */
-    droplast_dynarray(&edges);
+#if !TEST_QUADTREE
+    /* Avoid checking against the same polygon again. */
+    firstpoly = plist[firstpoly].next;
+#endif
+    in_front(edgenum, vnum1, vnum2, &firstpoly);
 }
 
 /*********************************************************************/
@@ -1516,16 +1522,21 @@ handle_edge_fragment(e, vnum1, vnum2, firstpoly)
  * The visible fragments are then drawn by a call to 'draw_edge' from
  * inside this routine. */
 /*********************************************************************/
+/* HBB 20001108: changed to now take the vertex numbers as additional
+ * arguments. The idea is to not overwrite the endpoint stored with
+ * the edge, so Test 2 will catch on even after the subject edge has
+ * been split up before one of its two polygons is tested against
+ * it. FIXME: allocates new vertices when splitting, but never frees
+ * them, currently. */
 
 static int 
-in_front(edgenum, firstpoly)
-		 long int edgenum;
-		 long int *firstpoly;
+in_front(edgenum, vnum1, vnum2, firstpoly)
+    long int edgenum;		/* number of the edge in elist */
+    long int vnum1, vnum2;	/* numbers of its endpoints */
+    long int *firstpoly;	/* first plist index to consider */
 {
     p_polygon p;		/* pointer to current testing polygon */
     long int polynum;		/* ... and its index in the plist */
-    long int vnum1, vnum2;	/* indices of edge's vertices in vlist */
-    p_edge e = elist + edgenum;	/* pointer to input edge */
     p_vertex v1, v2;		/* pointers to vertices of input edge */
 
     coordval xmin, xmax;	/* all of these are for the edge */
@@ -1559,40 +1570,42 @@ in_front(edgenum, firstpoly)
      * current edge is modified, recompute all function-wide status
      * variables. Note that it guarantees that v1 is always closer to
      * the viewer than v2 (in z direction) */
-#define setup_edge(vert1, vert2)			\
-	do {						\
-	    if (vlist[vert1].z > vlist[vert2].z) {	\
-		vnum1 = vert1; v1 = vlist + (vert1);	\
-		vnum2 = vert2; v2 = vlist + (vert2);	\
-	    } else {					\
-		vnum1 = vert2; v1 = vlist + (vert2);	\
-		vnum2 = vert1; v2 = vlist + (vert1);	\
-	    }						\
-	    zmax = v1->z;	zmin = v2->z;		\
-							\
-	    if (v1->x > v2->x) {			\
-		xmin = v2->x;	xmax = v1->x;		\
-	    } else {					\
-		xmin = v1->x;	xmax = v2->x;		\
-	    }						\
-	    SET_XEXTENT;				\
-							\
-	    if (v1->y > v2->y) {			\
-		ymin = v2->y;	ymax = v1->y;		\
-	    } else {					\
-		ymin = v1->y;	ymax = v2->y;		\
-	    }						\
-	    SET_YEXTENT;				\
-	} while (0) /* end macro setup_edge */
+    /* HBB 20001108: slightly changed so it can be called with vnum1
+     * and vnum2 as its arguments, too */
+#define setup_edge(vert1, vert2)		\
+    do {					\
+	if (vlist[vert1].z > vlist[vert2].z) {	\
+	    v1 = vlist + (vert1);		\
+	    v2 = vlist + (vert2);		\
+	} else {				\
+	    v1 = vlist + (vert2);		\
+	    v2 = vlist + (vert1);		\
+	}					\
+	vnum1 = v1 - vlist;			\
+	vnum2 = v2 - vlist;			\
+	zmax = v1->z;	zmin = v2->z;		\
+						\
+	if (v1->x > v2->x) {			\
+	    xmin = v2->x;	xmax = v1->x;	\
+	} else {				\
+	    xmin = v1->x;	xmax = v2->x;	\
+	}					\
+	SET_XEXTENT;				\
+						\
+	if (v1->y > v2->y) {			\
+	    ymin = v2->y;	ymax = v1->y;	\
+	} else {				\
+	    ymin = v1->y;	ymax = v2->y;	\
+	}					\
+	SET_YEXTENT;				\
+    } while (0) /* end macro setup_edge */
 	
     /* use the macro for initial setup, too: */
-    setup_edge(e->v1, e->v2);
+    setup_edge(vnum1, vnum2);
 	
     first_zmin = zmin;
 
 #if TEST_QUADTREE
-    /* HBB 19991205 CODEME!!! */
-    /* HBB 20000716: starting to code... */
     grid_x_low = COORD_TO_TREECELL(xmin);
     grid_x_high = COORD_TO_TREECELL(xmax);
     grid_y_low = COORD_TO_TREECELL(ymin);
@@ -1678,16 +1691,18 @@ in_front(edgenum, firstpoly)
 	    }
 
 	    /* Test 2 (0D): does edge belong to this very polygon? */
+	    /* 20001108: to make this rejector more effective, do keep
+	     * the original edge vertices unchanged */
 	    if (1
 		&& (0
-		    || (p->vertex[0] == e->v1)
-		    || (p->vertex[1] == e->v1)
-		    || (p->vertex[2] == e->v1)
+		    || (p->vertex[0] == elist[edgenum].v1)
+		    || (p->vertex[1] == elist[edgenum].v1)
+		    || (p->vertex[2] == elist[edgenum].v1)
 		    )
 		&& (0
-		    || (p->vertex[0] == e->v2)
-		    || (p->vertex[1] == e->v2)
-		    || (p->vertex[2] == e->v2)
+		    || (p->vertex[0] == elist[edgenum].v2)
+		    || (p->vertex[1] == elist[edgenum].v2)
+		    || (p->vertex[2] == elist[edgenum].v2)
 		    )
 		)
 		continue;
@@ -1782,16 +1797,26 @@ in_front(edgenum, firstpoly)
 		p_side[1] = area2D(v1, v2, w2);
 		p_side[2] = area2D(v1, v2, w3);
 		
+		/* HBB 20001104: made this more restrictive: only
+		 * reject p if areas are greater than 0, i.e. don't
+		 * allow EQ(..,0). Otherwise, edges coincident with a
+		 * polygon edge in 2D will not be hidden by it. */
+		/* FIXME HBB 20001108: some more code will be needed
+		 * here or further down below. It will currently fail
+		 * if two edges fall exactly on top of each other
+		 * (like the crossover line in the Klein-bottle demo):
+		 * both edges will be hidden by the other's polygon,
+		 * essentially */
 		if (0
-		    || (GE(p_side[0], 0)
-			&& GE(p_side[1], 0)
-			&& GE(p_side[2], 0)
+		    || (GR(p_side[0], 0)
+			&& GR(p_side[1], 0)
+			&& GR(p_side[2], 0)
 			)
-		    || (GE(0, p_side[0])
-			&& GE(0, p_side[1])
-			&& GE(0, p_side[2])
+		    || (GR(0 , p_side[0])
+			&& GR(0 , p_side[1])
+			&& GR(0 , p_side[2])
 			)
-		    )
+		    ) 
 		    continue;
 	    }
 
@@ -2125,7 +2150,7 @@ in_front(edgenum, firstpoly)
 /*--------- The simplest cases first: only one intersection point -----*/
 		    /* Code is the same for all six cases, or nearly so: */
 #define handle_singleplane_hit(vert, hitpar)				\
-		    newvert[0] = split_line_at_ratio(e, hitpar);	\
+		    newvert[0] = split_line_at_ratio(v1, v2, hitpar);	\
 		    setup_edge(vert, newvert[0]);			\
 		    break;
 
@@ -2148,17 +2173,15 @@ in_front(edgenum, firstpoly)
 		    /* Both behind the front, v1 out one side, v2 out
 		     * the other.  These two cases can be handled by
 		     * common code: */
-		    newvert[0] = split_line_at_ratio(e, hit1);
-		    newvert[1] = split_line_at_ratio(e, hit2);
+		    newvert[0] = split_line_at_ratio(v1, v2, hit1);
+		    newvert[1] = split_line_at_ratio(v1, v2, hit2);
 		    if (hit1 < hit2) {
 			/* the fragments are v1--hit1 and hit2--v2 */
-			handle_edge_fragment(e, newvert[1], vnum2, polynum);
-			e = elist + edgenum; /* elist might have moved  */
+			handle_edge_fragment(edgenum, newvert[1], vnum2, polynum);
 			setup_edge(vnum1, newvert[0]);
 		    } else {
 			/* the fragments are v2--hit1 and hit2--v1 */
-			handle_edge_fragment(e, vnum1, newvert[1], polynum);
-			e = elist + edgenum; /* elist might have moved  */
+			handle_edge_fragment(edgenum, vnum1, newvert[1], polynum);
 			setup_edge(newvert[0], vnum2);
 		    }
 		    break;
@@ -2167,48 +2190,46 @@ in_front(edgenum, firstpoly)
 
 		    /* Mainly identical code block to be used 4 times
                      * --> macro */
-#define handle_outside_behind_vs_infront(vert1, vert2, hitvar)		     \
-		    /* vert1 out plane of 'hitvar' and in back, vert2	     \
-                     * in front */					     \
-		    if ((hitvar) < front_hit) {				     \
-			newvert[0] = split_line_at_ratio(e, hitvar);	     \
-			newvert[1] = split_line_at_ratio(e, front_hit);	     \
-			handle_edge_fragment(e, newvert[1], vert2, polynum); \
-			e = elist + edgenum; /* elist might have moved  */   \
-			setup_edge(vert1, newvert[0]);			     \
-		    }							     \
-		    /* otherwise, the edge missed the shadow volume	     \
-		     * --> nothing to do */				     \
+		    /* HBB 20001108: up until today, this part of the
+		     * was severely buggy. But I do think I've got it
+		     * fixed up, this time */
+#define handle_outside_behind_vs_infront(hitvar1, hitvar2)			   \
+		    /* vnum1 out plane of 'hitvar1' and in back, vnum2		   \
+                     * in front */						   \
+		    if ((hitvar1) < (hitvar2)) {				   \
+			newvert[0] = split_line_at_ratio(v1, v2, (hitvar1));	   \
+			newvert[1] = split_line_at_ratio(v1, v2, (hitvar2));	   \
+			handle_edge_fragment(edgenum, newvert[1], vnum2, polynum); \
+			setup_edge(vnum1, newvert[0]);				   \
+		    }								   \
+		    /* otherwise, the edge missed the shadow volume		   \
+		     * --> nothing to do */					   \
 		    break;
 
 		case makeclass(0,1,2): /* v1 out side1 and in back, v2 in front */
-		    handle_outside_behind_vs_infront(vnum1, vnum2, hit1);
+		    handle_outside_behind_vs_infront(hit1, front_hit);
 
 		case makeclass(0,2,1): /* v2 out side1 and in back, v1 in front */
-		    handle_outside_behind_vs_infront(vnum2, vnum1, hit1);
+		    handle_outside_behind_vs_infront(front_hit, hit1);
 
 		case makeclass(1,0,2): /* v1 out side2 and in back, v2 in front */
-		    handle_outside_behind_vs_infront(vnum1, vnum2, hit2);
+		    handle_outside_behind_vs_infront(hit2, front_hit);
 
 		case makeclass(2,0,1): /* v2 out side2 and in back, v1 in front */
-		    handle_outside_behind_vs_infront(vnum2, vnum1, hit2);
+		    handle_outside_behind_vs_infront(front_hit, hit2);
 
 #undef handle_outside_behind_vs_infront
 
 		} /* end of switch through the cases */
 
-		e->v1 = vnum1;
-		e->v2 = vnum2;
 	    } /* end of part 'T9' */
 	} /* for (polygons in list) */
 
     /* Came here, so there's something left of this polygon, which
      * needs to be drawn.  But the vertices are different, now, so
      * copy our new vertices back into 'e' */
-    e->v1 = vnum1;
-    e->v2 = vnum2;
 
-    draw_edge(e);
+    draw_edge(elist + edgenum, vlist + vnum1, vlist + vnum2);
 
     return 1;
 }
@@ -2255,7 +2276,7 @@ draw_line_hidden(v1, v2, lp)
 
     /* remove hidden portins of the line, and draw what remains */
     temp_pfirst = pfirst;
-    in_front(edgenum, &temp_pfirst);
+    in_front(edgenum, elist[edgenum].v1, elist[edgenum].v2, &temp_pfirst);
     
     /* release allocated storage slots: */
     droplast_dynarray(&edges);
@@ -2287,7 +2308,7 @@ plot3d_hidden(plots, pcount)
 	int i;
 
 	for (i=0; i<edges.end; i++) {
-	    draw_edge(elist + i);
+	    draw_edge(elist + i, vlist + elist[i].v1, vlist + elist[i].v2);
 	}
     } else {
 	long int temporary_pfirst;
@@ -2301,7 +2322,8 @@ plot3d_hidden(plots, pcount)
 
 	while (efirst >=0) {
 	    if (elist[efirst].style >= -2) /* skip invisible edges */
-		in_front(efirst, &temporary_pfirst);
+		in_front(efirst, elist[efirst].v1, elist[efirst].v2,
+			 &temporary_pfirst);
 	    efirst = elist[efirst].next;
 	}
     }
