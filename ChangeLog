@@ -1,5 +1,8 @@
 2004-04-22  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
+	* src/axis.c (set_cbminmax): Don't bail out if cbrange is empty.
+	Let the caller handle it by auto-extending the range, as usual.
+
 	* src/command.c (read_line): Fix bug where growing the line buffer
 	interfered with handling of backslash-newline continuations.
 

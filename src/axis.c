@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.42 2004/03/30 16:29:07 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.43 2004/04/13 17:23:51 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -182,10 +182,10 @@ static void get_position_type __PROTO((enum position_type * type, int *axes));
  * a given range if necessary. If checkrange is TRUE, will int_error() if
  * range is invalid */
 void
-axis_unlog_interval(axis, min, max, checkrange)
-    AXIS_INDEX axis;
-    double *min, *max;
-    TBOOLEAN checkrange;
+axis_unlog_interval( /* axis, min, max, checkrange) */
+    AXIS_INDEX axis,
+    double *min, double *max,
+    TBOOLEAN checkrange)
 {
     if (axis_array[axis].log) {
 	if (checkrange && (*min<= 0.0 || *max <= 0.0))
@@ -741,11 +741,19 @@ quantize_time_tics(axis, tic, xr, guide)
  * that rounds an axis endpoint outward. If the axis is a time/date
  * one, take care to round towards the next whole time unit, not just
  * a multiple of the (averaged) tic size */
+#if 0
 static double
 round_outward(axis, upwards, input)
     AXIS_INDEX axis;		/* Axis to work on */
     TBOOLEAN upwards;		/* extend upwards or downwards? */
     double input;		/* the current endpoint */
+#else /* HBB 20040415: ANSI-style definition fixes the problem */
+static double
+round_outward(
+    AXIS_INDEX axis,		/* Axis to work on */
+    TBOOLEAN upwards,		/* extend upwards or downwards? */
+    double input)		/* the current endpoint */
+#endif
 {
     double tic = ticstep[axis];
     double result = tic * (upwards
@@ -1534,10 +1542,12 @@ set_cbminmax()
     }
     CB_AXIS.max = axis_log_value_checked(COLOR_AXIS, CB_AXIS.max, "color axis");
 
+#if 0
     if (CB_AXIS.min == CB_AXIS.max) {
 	int_error(NO_CARET, "cannot display empty color axis range");
 	return 0;
     }
+#endif
     if (CB_AXIS.min > CB_AXIS.max) {
 	/* exchange min and max values */
 	double tmp = CB_AXIS.max;
