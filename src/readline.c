@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: readline.c,v 1.11 1999/09/21 18:24:39 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: readline.c,v 1.12 1999/09/24 15:39:28 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - readline.c */
@@ -1134,7 +1134,7 @@ reset_termio()
  *    filename == NUL ... write to stdout; otherwise to the filename
 */
 void
-write_history_n(n, filename)
+write_history_n (n, filename)
 int n;
 char *filename;
 {
@@ -1216,7 +1216,7 @@ char *cmd;
  * Returns 1 on success, 0 if no such entry exists
  */
 int
-history_find_all(cmd)
+history_find_all (cmd)
 char *cmd;
 {
     struct hist *entry = history;
