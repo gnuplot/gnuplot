@@ -1,4 +1,4 @@
-/* $Id: tgif.trm,v 1.18 2001/06/11 12:20:13 broeker Exp $ */
+/* $Id: tgif.trm,v 1.19 2001/10/26 12:58:38 mikulik Exp $ */
 
 /* GNUPLOT - tgif.trm */
 
@@ -58,7 +58,11 @@
 /*                                                                         */
 /* Modified  07 July 2000 by Ian MacPhedran                                */
 /*          - added PM3D support                                           */
-
+/*                                                                         */
+/* Modified  04 February 2002 by Levente Novák                             */
+/*          - break long "polygon()" directives into lines, as it made     */
+/*            Tgif fail polygons had >8 sides                              */
+/*            (e.g. when using "filledcurves")                             */  
 /***************************************************************************/
 
 /*}}}  */
@@ -390,7 +394,7 @@ TGIF_init()
     fprintf(gpoutfile, "\
 %%TGIF 2.15-p7\n\
 state(%d,30,%u,0,0,%u,16,1,9,1,1,0,0,0,0,1,0,'%s',0,%u,0,0,1,10,0,0,1,1,0,16,0,0,1,1,1).\n\
-%%\n%% @(#)$Header: /cvsroot/gnuplot/gnuplot/term/tgif.trm,v 1.18 2001/06/11 12:20:13 broeker Exp $\n%% %%W%%\n%%\n\
+%%\n%% @(#)$Header: /cvsroot/gnuplot/gnuplot/term/tgif.trm,v 1.19 2001/10/26 12:58:38 mikulik Exp $\n%% %%W%%\n%%\n\
 page(1,\"\").\n",
 	    TgifPortrait ? 0 : 1, uActResolution, uActZoom, sActFont, uActFontSize);
     eTgifState = NEWPOLY;
@@ -1499,7 +1503,8 @@ const char *font;
 }
 
 #ifdef PM3D
-TERM_PUBLIC int TGIF_make_palette(t_sm_palette *palette)
+TERM_PUBLIC int TGIF_make_palette(palette)
+    t_sm_palette *palette;
 {
     int i;
 
@@ -1525,15 +1530,18 @@ TERM_PUBLIC int TGIF_make_palette(t_sm_palette *palette)
     return(0);
 }
 
-TERM_PUBLIC void TGIF_set_color(double gray)
+TERM_PUBLIC void TGIF_set_color(gray)
+    double gray;
 {
     if (TGIF_palette_set == FALSE) {
-	fprintf(stderr,"Palette used before set\n"); /* Error condition */
+	fprintf(stderr, "Palette used before set\n"); /* Error condition */
     }
-    sprintf(sActColor,"%s",TGIF_colours[(int)(gray*TGIF_palette_size)]);
+    sprintf(sActColor, "%s", TGIF_colours[(int)(gray * TGIF_palette_size)]);
 }
 
-TERM_PUBLIC void TGIF_filled_polygon(int points, gpiPoint *corners)
+TERM_PUBLIC void TGIF_filled_polygon(points, corners)
+    int points;
+    gpiPoint *corners;
 {
     int i;
 
@@ -1544,14 +1552,18 @@ TERM_PUBLIC void TGIF_filled_polygon(int points, gpiPoint *corners)
     if (eTgifState == INPOLY)
 	TGIF_flush_poly(); /* Clean up current data */
 
-    fprintf(gpoutfile, "polygon('%s',%d,[\n",sActColor,points+1);
-/* loop through points, do the first one last as well as first */
-    fprintf(gpoutfile,"%u,%u",(corners[0].x+uXshift),(uYshift-corners[0].y));
-    for (i=1;i<points;i++) {
-	fprintf(gpoutfile, ",%u,%u",(corners[i].x+uXshift),(uYshift-corners[i].y));
+    fprintf(gpoutfile, "polygon('%s',%d,[\n\t",sActColor,points+1);
+    /* loop through points, do the first one last as well as first */
+    fprintf(gpoutfile,"%u,%u,", corners[0].x+uXshift, uYshift-corners[0].y);
+    for (i = 1; i < points; i++) {
+	fprintf(gpoutfile, "%u,%u,",
+		corners[i].x+uXshift, uYshift-corners[i].y);
+	/* LN: Break long lines as Tgif is rather picky about them */
+        if ((i + 1) % 8 == 0)
+	    fputs("\n\t", gpoutfile);
     }
-    fprintf(gpoutfile,",%u,%u",(corners[0].x+uXshift),(uYshift-corners[0].y));
-    fprintf(gpoutfile, "],1,1,1,0,%u,0,0,0,0,0,[\n]).\n",uActNr);
+    fprintf(gpoutfile, "%u,%u", corners[0].x+uXshift, uYshift-corners[0].y);
+    fprintf(gpoutfile, "],1,1,1,0,%u,0,0,0,0,0,[\n]).\n", uActNr);
     uActNr++;
 }
 #endif /* PM3D */

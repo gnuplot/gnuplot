@@ -1,3 +1,16 @@
+2002-02-04  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	Patch from Levente Novák <lnovak@dragon.klte.hu>, edited by me:
+
+	* term/tgif.trm (TGIF_filled_polygon): Break long TGIF command
+ 	into several lines to not overflow limits imposed by programs
+ 	reading this format.  
+	
+	* term/tgif.trm (TGIF_make_palette, TGIF_set_color,
+ 	TGIF_filled_polygon): Codesyle fixes.  Function definitions are
+ 	supposed to be in K&R, not ANSI C style.  Plus some whitespace and
+ 	indentation fixes.
+
 2002-02-04  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* src/plot.c, src/stdfn.h, term/x11.trm: Clean up atextit() handling.
@@ -24,7 +37,7 @@
 
 	* docs/gnuplot.doc: Minor fixes.
 
-2002-02-01 Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+2002-02-01  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/hidden3d.c (draw_line_hidden): Changed local variables
  	vstore1 and vstore2 from pointers to indices, to avoid yet another
@@ -1321,44 +1334,44 @@
 2001-07-20  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/interpol.c (cp_implode): Typo fixed. Would set 'x' when it
-	was trying to un-log a 'y' value.
+ 	was trying to un-log a 'y' value.
 	(cp_approx_spline, gen_interp, cp_tridiag, solve_five_diag):
-	Removed casts when assigning pointers coming from gp_alloc.
-	Re-grouped for() loops a bit.
+ 	Removed casts when assigning pointers coming from gp_alloc.
+  	Re-grouped for() loops a bit.
 
 2001-07-20  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/graphics.c (xtick2d_callback, ytick2d_callback): Cast arg
-	"axis" to void, once, to avoid warning about unused parameter.
+ 	"axis" to void, once, to avoid warning about unused parameter.
 	(widest2d_callback): Use same trick for arguments axis, place and
-	grid, which are irrelevant to this function.
+ 	grid, which are irrelevant to this function.
 
 	* src/color.c (cbtick_callback): Mark parameter "axis" as
-	intentionally unused, by cast to void.
+ 	intentionally unused, by cast to void.
 
 	* src/syscfg.h (SORTFUNC_ARGS): If not #define'd, define it to be
-	"const generic *".
+ 	"const generic *".
 	(sortfunc): Removed, as it's no longer used.
 
 	* src/interpol.c (compare_points): Changed arguments to type
-	SORTFUNC_ARGS. Made non-static to avoid bug in HP-UX gcc when
-	passing pointers to static functions.
+ 	SORTFUNC_ARGS. Made non-static to avoid bug in HP-UX gcc when
+ 	passing pointers to static functions.
 	(sort_points): Removed unneeded, potentially dangerous casts from
-	qsort() call.
+ 	qsort() call.
 
 	* src/hidden3d.c (compare_polys_by_zmax, compare_edges_by_zmin):
-	Changed arguments to type SORTFUNC_ARGS. Made non-static, too.
+ 	Changed arguments to type SORTFUNC_ARGS. Made non-static, too.
 
 	* src/help.c (keycomp): Changed arguments to type SORTFUNC_ARGS.
-	Made non-static, too.
+  	Made non-static, too.
 	(sortkeys): Removed unneeded, potentially dangerous casts from
-	qsort() call.
+ 	qsort() call.
 
 	* src/graphics.c (histeps_compare): Changed arguments to
-	SORTFUNC_ARGS type.
+ 	SORTFUNC_ARGS type.
 
 	* src/plot2d.c (eval_plots): Simplified parsing/handling of smooth
-	options.
+ 	options.
 
 2001-07-11  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
