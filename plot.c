@@ -600,7 +600,7 @@ int ExecuteMacro(char *argv, int namelength)
     short sRc;
     int rc;
 
-    safe_strncpy(pszName, argv, sizeof(pszname));
+    safe_strncpy(pszName, argv, sizeof(pszName));
     MAKERXSTRING(rxRc, pszRc, 256);
     MAKERXSTRING(rxArg, argv, strlen(argv));
     rc = RexxStart(1,
