@@ -168,16 +168,6 @@ DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 TAR = tar
 GZIP_ENV = --best
 DIST_SUBDIRS =  beos
-DEP_FILES =  .deps/alloc.P .deps/bf_test.P .deps/binary.P .deps/bitmap.P \
-.deps/command.P .deps/contour.P .deps/datafile.P .deps/dynarray.P \
-.deps/eval.P .deps/fit.P .deps/gplt_x11.P .deps/graph3d.P \
-.deps/graphics.P .deps/help.P .deps/hidden3d.P .deps/history.P \
-.deps/internal.P .deps/interpol.P .deps/matrix.P .deps/misc.P \
-.deps/mouse.P .deps/parse.P .deps/plot.P .deps/plot2d.P .deps/plot3d.P \
-.deps/readline.P .deps/save.P .deps/scanner.P .deps/set.P .deps/show.P \
-.deps/specfun.P .deps/standard.P .deps/stdfn.P .deps/tables.P \
-.deps/term.P .deps/time.P .deps/unset.P .deps/util.P .deps/util3d.P \
-.deps/variable.P .deps/version.P
 SOURCES = $(gnuplot_x11_SOURCES) $(gnuplot_SOURCES) $(bf_test_SOURCES)
 OBJECTS = $(gnuplot_x11_OBJECTS) $(gnuplot_OBJECTS) $(bf_test_OBJECTS)
 
@@ -185,9 +175,9 @@ all: all-redirect
 .SUFFIXES:
 .SUFFIXES: .S .c .o .s
 $(srcdir)/Makefile.in: Makefile.am $(top_srcdir)/configure.in $(ACLOCAL_M4) $(srcdir)/makefile.all
-	cd $(top_srcdir) && $(AUTOMAKE) --foreign src/Makefile
+	cd $(top_srcdir) && $(AUTOMAKE) --foreign --include-deps src/Makefile
 
-Makefile: $(srcdir)/Makefile.in  $(top_builddir)/config.status $(BUILT_SOURCES)
+Makefile: $(srcdir)/Makefile.in  $(top_builddir)/config.status
 	cd $(top_builddir) \
 	  && CONFIG_FILES=$(subdir)/$@ CONFIG_HEADERS= $(SHELL) ./config.status
 
@@ -225,6 +215,9 @@ clean-noinstPROGRAMS:
 distclean-noinstPROGRAMS:
 
 maintainer-clean-noinstPROGRAMS:
+
+.c.o:
+	$(COMPILE) -c $<
 
 .s.o:
 	$(COMPILE) -c $<
@@ -459,11 +452,6 @@ distdir = $(top_builddir)/$(PACKAGE)-$(VERSION)/$(subdir)
 subdir = src
 
 distdir: $(DISTFILES)
-	here=`cd $(top_builddir) && pwd`; \
-	top_distdir=`cd $(top_distdir) && pwd`; \
-	distdir=`cd $(distdir) && pwd`; \
-	cd $(top_srcdir) \
-	  && $(AUTOMAKE) --include-deps --build-dir=$$here --srcdir-name=$(top_srcdir) --output-dir=$$top_distdir --foreign src/Makefile
 	@for file in $(DISTFILES); do \
 	  d=$(srcdir); \
 	  if test -d $$d/$$file; then \
@@ -484,38 +472,6 @@ distdir: $(DISTFILES)
 	      || exit 1; \
 	  fi; \
 	done
-
-DEPS_MAGIC := $(shell mkdir .deps > /dev/null 2>&1 || :)
-
--include $(DEP_FILES)
-
-mostlyclean-depend:
-
-clean-depend:
-
-distclean-depend:
-	-rm -rf .deps
-
-maintainer-clean-depend:
-
-%.o: %.c
-	@echo '$(COMPILE) -c $<'; \
-	$(COMPILE) -Wp,-MD,.deps/$(*F).pp -c $<
-	@-cp .deps/$(*F).pp .deps/$(*F).P; \
-	tr ' ' '\012' < .deps/$(*F).pp \
-	  | sed -e 's/^\\$$//' -e '/^$$/ d' -e '/:$$/ d' -e 's/$$/ :/' \
-	    >> .deps/$(*F).P; \
-	rm .deps/$(*F).pp
-
-%.lo: %.c
-	@echo '$(LTCOMPILE) -c $<'; \
-	$(LTCOMPILE) -Wp,-MD,.deps/$(*F).pp -c $<
-	@-sed -e 's/^\([^:]*\)\.o[ 	]*:/\1.lo \1.o :/' \
-	  < .deps/$(*F).pp > .deps/$(*F).P; \
-	tr ' ' '\012' < .deps/$(*F).pp \
-	  | sed -e 's/^\\$$//' -e '/^$$/ d' -e '/:$$/ d' -e 's/$$/ :/' \
-	    >> .deps/$(*F).P; \
-	rm -f .deps/$(*F).pp
 info-am:
 info: info-recursive
 dvi-am:
@@ -555,20 +511,19 @@ distclean-generic:
 maintainer-clean-generic:
 mostlyclean-am:  mostlyclean-binPROGRAMS mostlyclean-noinstPROGRAMS \
 		mostlyclean-compile mostlyclean-krextra mostlyclean-kr \
-		mostlyclean-tags mostlyclean-depend mostlyclean-generic
+		mostlyclean-tags mostlyclean-generic
 
 mostlyclean: mostlyclean-recursive
 
 clean-am:  clean-binPROGRAMS clean-noinstPROGRAMS clean-compile \
-		clean-krextra clean-kr clean-tags clean-depend \
-		clean-generic mostlyclean-am
+		clean-krextra clean-kr clean-tags clean-generic \
+		mostlyclean-am
 
 clean: clean-recursive
 
 distclean-am:  distclean-binPROGRAMS distclean-noinstPROGRAMS \
 		distclean-compile distclean-krextra distclean-kr \
-		distclean-tags distclean-depend distclean-generic \
-		clean-am
+		distclean-tags distclean-generic clean-am
 
 distclean: distclean-recursive
 
@@ -576,8 +531,7 @@ maintainer-clean-am:  maintainer-clean-binPROGRAMS \
 		maintainer-clean-noinstPROGRAMS \
 		maintainer-clean-compile maintainer-clean-krextra \
 		maintainer-clean-kr maintainer-clean-tags \
-		maintainer-clean-depend maintainer-clean-generic \
-		distclean-am
+		maintainer-clean-generic distclean-am
 	@echo "This command is intended for maintainers to use;"
 	@echo "it deletes files that may require special tools to rebuild."
 
@@ -596,14 +550,12 @@ uninstall-exec-recursive installdirs-recursive uninstalldirs-recursive \
 all-recursive check-recursive installcheck-recursive info-recursive \
 dvi-recursive mostlyclean-recursive distclean-recursive clean-recursive \
 maintainer-clean-recursive tags tags-recursive mostlyclean-tags \
-distclean-tags clean-tags maintainer-clean-tags distdir \
-mostlyclean-depend distclean-depend clean-depend \
-maintainer-clean-depend info-am info dvi-am dvi check check-am \
-installcheck-am installcheck install-exec-am install-exec \
-install-data-am install-data install-am install uninstall-am uninstall \
-all-redirect all-am all installdirs-am installdirs mostlyclean-generic \
-distclean-generic clean-generic maintainer-clean-generic clean \
-mostlyclean distclean maintainer-clean
+distclean-tags clean-tags maintainer-clean-tags distdir info-am info \
+dvi-am dvi check check-am installcheck-am installcheck install-exec-am \
+install-exec install-data-am install-data install-am install \
+uninstall-am uninstall all-redirect all-am all installdirs-am \
+installdirs mostlyclean-generic distclean-generic clean-generic \
+maintainer-clean-generic clean mostlyclean distclean maintainer-clean
 
 
 @ALT_X11_DRIVER_TRUE@$(GNUPLOT_X11): gnuplot_x11

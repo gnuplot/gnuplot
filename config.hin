@@ -249,6 +249,9 @@
 /*  Define if <errno.h> declares errno.  */
 #undef EXTERN_ERRNO
 
+/*  Define if we have sigsetjmp().  */
+#undef HAVE_SIGSETJMP
+
 /*  Define if you do have the popen and pclose functions.  */
 #undef PIPES
 
