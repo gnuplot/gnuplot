@@ -1,0 +1,476 @@
+/* GNUPLOT - term/win.trm */
+/*
+ * Copyright (C) 1992   Maurice Castro, Russell Lang
+ *
+ * Permission to use, copy, and distribute this software and its
+ * documentation for any purpose with or without fee is hereby granted, 
+ * provided that the above copyright notice appear in all copies and 
+ * that both that copyright notice and this permission notice appear 
+ * in supporting documentation.
+ *
+ * Permission to modify the software is granted, but not the right to
+ * distribute the modified code.  Modifications are to be distributed 
+ * as patches to released version.
+ *  
+ * This software is provided "as is" without express or implied warranty.
+ * 
+ *
+ * AUTHORS
+ * 
+ *   Gnuplot for Windows:
+ *       Maurice Castro, Russell Lang
+ * 
+ * There is a mailing list for gnuplot users. Note, however, that the
+ * newsgroup 
+ *	comp.graphics.apps.gnuplot 
+ * is identical to the mailing list (they
+ * both carry the same set of messages). We prefer that you read the
+ * messages through that newsgroup, to subscribing to the mailing list.
+ * (If you can read that newsgroup, and are already on the mailing list,
+ * please send a message to majordomo@dartmouth.edu, asking to be
+ * removed from the mailing list.)
+ *
+ * The address for mailing to list members is
+ *	   info-gnuplot@dartmouth.edu
+ * and for mailing administrative requests is 
+ *	   majordomo@dartmouth.edu
+ * The mailing list for bug reports is 
+ *	   bug-gnuplot@dartmouth.edu
+ * The list of those interested in beta-test versions is
+ *	   info-gnuplot-beta@dartmouth.edu
+ */
+
+
+/* This file implements the terminal and printer display for gnuplot  */
+/* under Microsoft Windows. The code currently compiles only with the */
+/* Borland C++ 3.1 compiler.                                          */
+/*                                                                    */
+/* The modifications to allow Gnuplot to run under Windows were made  */
+/* by Maurice Castro (maurice@bruce.cs.monash.edu.au)                 */
+/* and Russell Lang (rjl@monu1.cc.monash.edu.au)         19 Nov 1992  */
+/*                                                                    */
+
+/* Edit this file with tabstop=4 (vi :se ts=4)                        */
+
+/*
+ * adapted to the new terminal layout by Stefan Bodewig (Dec. 1995)
+ */
+
+#ifndef GOT_DRIVER_H
+#include "driver.h"
+#endif
+
+#ifdef TERM_REGISTER
+register_term(windows)
+#endif
+
+#ifdef TERM_PROTO
+TERM_PUBLIC void WIN_options __PROTO((void));
+TERM_PUBLIC int WIN_scale __PROTO((void));
+TERM_PUBLIC void WIN_init __PROTO((void));
+TERM_PUBLIC void WIN_reset __PROTO((void));
+TERM_PUBLIC void WIN_text __PROTO((void));
+TERM_PUBLIC void WIN_graphics __PROTO((void));
+TERM_PUBLIC void WIN_move __PROTO((unsigned int x, unsigned int y));
+TERM_PUBLIC void WIN_vector __PROTO((unsigned int x, unsigned int y));
+TERM_PUBLIC void WIN_linetype __PROTO((int lt));
+TERM_PUBLIC void WIN_put_text __PROTO((unsigned int x, unsigned int y, char *str));
+TERM_PUBLIC int WIN_justify_text __PROTO((enum JUSTIFY mode));
+TERM_PUBLIC int WIN_text_angle __PROTO((int ang));
+TERM_PUBLIC void WIN_point __PROTO((unsigned int x, unsigned int y, int number));
+TERM_PUBLIC void WIN_resume __PROTO((void));
+TERM_PUBLIC void WIN_set_pointsize __PROTO((double));
+
+
+/* Initialization values - Guess Now Scale later */
+#define WIN_XMAX (24000)
+#define WIN_YMAX (18000)
+#define WIN_HCHAR (WIN_XMAX/75) 
+#define WIN_VCHAR (WIN_YMAX/25)
+#define WIN_HTIC (WIN_XMAX/160)
+#define WIN_VTIC WIN_HTIC
+#endif /* TERM_PROTO */
+
+#ifndef TERM_PROTO_ONLY
+#ifdef TERM_BODY
+
+#include <windows.h>
+#include "../win/wgnuplib.h"
+
+#ifdef __MSC__
+#include <io.h>		/* for mktemp() */
+#endif
+
+extern GW graphwin;
+
+#define WIN_POINT_TYPES 12
+
+/* Interface routines - create list of actions for Windows */
+
+TERM_PUBLIC void WIN_options()
+{
+	if (!END_OF_COMMAND) {
+		if (almost_equals(c_token,"d$efault")) {
+			graphwin.color=TRUE;
+			strcpy(graphwin.fontname,WINFONT);
+			graphwin.fontsize = WINFONTSIZE;
+			c_token++;
+		}
+	}
+
+	if (!END_OF_COMMAND) {
+		if (almost_equals(c_token,"m$onochrome")) {
+			graphwin.color=FALSE;
+			c_token++;
+		}
+		else if (almost_equals(c_token,"c$olor")) {
+			graphwin.color=TRUE;
+			c_token++;
+		}
+	}
+
+	if (!END_OF_COMMAND && isstring(c_token)) {
+		quote_str(graphwin.fontname,c_token, MAX_ID_LEN);
+		c_token++;
+	}
+
+	if (!END_OF_COMMAND) {
+		/* We have font size specified */
+		struct value a;
+		graphwin.fontsize = (int)real(const_express(&a));
+	}
+
+	if (graphwin.fontname[0] == '\0')
+	  sprintf(term_options,"%s", graphwin.color ? "color" :  "monochrome");
+	else
+	  sprintf(term_options,"%s \"%s\" %d", graphwin.color ? "color" :  "monochrome" ,
+		graphwin.fontname, graphwin.fontsize);
+	if (IsWindow(graphwin.hWndGraph) && IsIconic(graphwin.hWndGraph)) {
+		ShowWindow(graphwin.hWndGraph, SW_SHOWNORMAL);
+	}
+	GraphRedraw(&graphwin);
+}
+
+/* We don't actually do scaling, but we need to fix up the text size
+ * if the user has resized the window */
+int WIN_scale()
+{
+	term->h_char = graphwin.hchar;
+	term->v_char = graphwin.vchar;
+        term->h_tic =  graphwin.htic;
+        term->v_tic =  graphwin.vtic;
+	sprintf(term_options,"%s \"%s\" %d", graphwin.color ? "color" :  "monochrome" ,
+		graphwin.fontname, graphwin.fontsize);
+	return FALSE ;	/* can't be done */
+}
+
+TERM_PUBLIC void WIN_init()
+{
+	if (!graphwin.hWndGraph) {
+		graphwin.xmax = WIN_XMAX;
+		graphwin.ymax = WIN_YMAX;
+		graphwin.htic = WIN_HTIC;
+		graphwin.vtic = WIN_VTIC;
+		GraphInit(&graphwin);
+#ifdef WIN32
+		SetClassLong(graphwin.hWndGraph, GCL_HICON, (LONG)LoadIcon(graphwin.hInstance, "GRPICON"));
+#else
+		SetClassWord(graphwin.hWndGraph, GCW_HICON, LoadIcon(graphwin.hInstance, "GRPICON"));
+#endif
+		graphwin.resized = FALSE;
+	}
+}
+
+
+TERM_PUBLIC void WIN_reset()
+{
+}
+
+TERM_PUBLIC void WIN_text()
+{
+	GraphEnd(&graphwin);
+}
+
+TERM_PUBLIC void WIN_graphics()
+{
+	GraphStart(&graphwin, pointsize);
+}
+
+TERM_PUBLIC void WIN_move(x, y)
+unsigned int x, y;
+{
+	GraphOp(&graphwin, W_move, x, y, NULL);
+}
+
+TERM_PUBLIC void WIN_vector(x,y)
+unsigned int x, y;
+{
+	GraphOp(&graphwin, W_vect, x, y, NULL);
+}
+
+TERM_PUBLIC void WIN_linetype(lt)
+int lt;
+{
+	GraphOp(&graphwin, W_line_type, lt, 0, NULL);
+}
+
+TERM_PUBLIC void WIN_put_text(x,y,str)
+unsigned int x, y;
+char *str;
+{
+	GraphOp(&graphwin, W_put_text, x, y, str);
+}
+
+TERM_PUBLIC int WIN_justify_text(mode)
+enum JUSTIFY mode;
+{
+	GraphOp(&graphwin, W_justify, mode, 0, NULL);
+    return(TRUE);
+}
+
+TERM_PUBLIC int WIN_text_angle(ang)
+int ang;
+{
+	if (graphwin.rotate)
+		GraphOp(&graphwin, W_text_angle, ang, 0, NULL);
+	return graphwin.rotate;
+}
+
+TERM_PUBLIC void WIN_point(x,y,number)
+unsigned int x,y;
+int number;
+{
+	/* draw point shapes later to save memory */
+	graphwin.htic = pointsize*term->h_tic / 2;      /* size of point symbols */
+	graphwin.vtic = pointsize*term->v_tic / 2;
+	if (number>=0)
+		number %= WIN_POINT_TYPES;
+	number += 1;
+	GraphOp(&graphwin, W_dot + number, x, y, NULL);
+}
+
+TERM_PUBLIC void WIN_resume(void)
+{
+        GraphResume(&graphwin);
+}
+
+TERM_PUBLIC void WIN_set_pointsize(s)
+double s;
+{
+        /* Save new pointsize as string */
+        char scale[30];
+        sprintf(scale, "%.15g", s);
+        GraphOp(&graphwin, W_pointsize, 0, 0, scale);
+}
+
+#endif /* TERM_BODY */
+
+#ifdef TERM_TABLE
+
+TERM_TABLE_START(win_driver)
+    "windows", "Microsoft Windows",
+	   WIN_XMAX, WIN_YMAX, WIN_VCHAR, WIN_HCHAR, 
+	   WIN_VTIC, WIN_HTIC, WIN_options, WIN_init, WIN_reset, 
+	   WIN_text, null_scale, WIN_graphics, WIN_move, WIN_vector,
+	   WIN_linetype, WIN_put_text, WIN_text_angle, 
+	   WIN_justify_text, WIN_point, do_arrow, set_font_null,
+	   WIN_set_pointsize, TERM_CAN_MULTIPLOT,
+	   WIN_text /* suspend */, WIN_resume, 0 /*boxfill*/
+TERM_TABLE_END(win_driver)
+
+#undef LAST_TERM
+#define LAST_TERM win_driver
+
+#endif /* TERM_TABLE */
+#endif /* TERM_PROTO_ONLY */
+
+#ifdef TERM_HELP
+START_HELP(windows)
+"1 windows",
+"?set terminal windows",
+"?set term windows",
+"?terminal windows",
+"?term windows",
+"?windows",
+" Three options may be set in the `windows` terminal driver.",
+"",
+" Syntax:",
+"       set terminal windows {<color>} {\"<fontname>\"} {<fontsize>}",
+"",
+" where `<color>` is either `color` or `monochrome`, `\"<fontname>\"` is the",
+" name of a valid Windows font, and `<fontsize>` is the size of the font in",
+" points.",
+"2 graph-menu",
+"?set terminal windows graph-menu",
+"?set term windows graph-menu",
+"?windows graph-menu",
+"?graph-menu",
+" The `gnuplot graph` window has the following options on a pop-up menu",
+" accessed by pressing the right mouse button or selecting `Options` from the",
+" system menu:",
+"",
+  " `Bring to Top` when checked brings the graph window to the top after every",
+" plot.",
+"",
+" `Color` when checked enables color linestyles.  When unchecked it forces",
+" monochrome linestyles.",
+"",
+  " `Copy to Clipboard` copies a bitmap and a Metafile picture.",
+"",
+" `Background...` sets the window background color.",
+"",
+" `Choose Font...` selects the font used in the graphics window.",
+"",
+" `Line Styles...` allows customization of the line colors and styles.",
+"",
+" `Print...` prints the graphics windows using a Windows printer driver and",
+" allows selection of the printer and scaling of the output.  The output",
+" produced by `Print` is not as good as that from `gnuplot`'s own printer",
+  " drivers.",
+"",
+" `Update wgnuplot.ini` saves the current window locations, window sizes, text",
+" window font, text window font size, graph window font, graph window font",
+" size, background color and linestyles to the initialization file",
+" `WGNUPLOT.INI`.",
+"2 printing",
+"?set terminal windows printing",
+"?set term windows printing",
+"?windows printing",
+"?printing",
+" In order of preference, graphs may be be printed in the following ways.",
+"",
+" `1.` Use the `gnuplot` command `set terminal` to select a printer and `set",
+" output` to redirect output to a file.",
+"",
+" `2.` Select the `Print...` command from the `gnuplot graph` window.  An extra",
+" command `screendump` does this from the text window.",
+"",
+" `3.` If `set output \"PRN\"` is used, output will go to a temporary file.  When",
+" you exit from `gnuplot` or when you change the output with another `set",
+" output` command, a dialog box will appear for you to select a printer port.",
+" If you choose OK, the output will be printed on the selected port, passing",
+" unmodified through the print manager.  It is possible to accidentally (or",
+" deliberately) send printer output meant for one printer to an incompatible",
+" printer.",
+"2 text-menu",
+"?set terminal windows text-menu",
+"?set term windows text-menu",
+"?windows text-menu",
+"?text-menu",
+" The `gnuplot text` window has the following options on a pop-up menu accessed",
+" by pressing the right mouse button or selecting `Options` from the system",
+" menu:",
+"",
+" `Copy to Clipboard` copies marked text to the clipboard.",
+"",
+" `Paste` copies text from the clipboard as if typed by the user.",
+"",
+" `Choose Font...` selects the font used in the text window.",
+"",
+" `System Colors` when selected makes the text window honor the System Colors",
+" set using the Control Panel.  When unselected, text is black or blue on a",
+" white background.",
+"",
+" `Update wgnuplot.ini` saves the current text window location, text window",
+" size, text window font and text window font size to the initialisation file",
+" `WGNUPLOT.INI`.",
+"",
+" `MENU BAR`",
+"",
+" If the menu file `WGNUPLOT.MNU` is found in the same directory as",
+" WGNUPLOT.EXE, then the menu specified in `WGNUPLOT.MNU` will be loaded.",
+" Menu commands:",
+"",
+" [Menu] starts a new menu with the name on the following line.",
+"",
+" [EndMenu] ends the current menu.",
+"",
+" [--] inserts a horizontal menu separator.",
+"",
+" [|] inserts a vertical menu separator.",
+"",
+" [Button] puts the next macro on a push button instead of a menu.",
+"",
+" Macros take two lines with the macro name (menu entry) on the first line and",
+" the macro on the second line.  Leading spaces are ignored.  Macro commands:",
+"",
+" [INPUT] --- Input string with prompt terminated by [EOS] or {ENTER}",
+"",
+" [EOS] --- End Of String terminator.  Generates no output.",
+"",
+" [OPEN] --- Get name of file to open from list box, with title of list box",
+" terminated by [EOS], followed by default filename terminated by [EOS] or",
+" {ENTER}.  This uses COMMDLG.DLL from Windows 3.1.",
+"",
+" [SAVE] --- Get name of file to save.  Similar to [OPEN]",
+"",
+" Macro character substitutions:",
+"",
+" {ENTER} --- Carriage Return '\\r'",
+"",
+" {TAB} --- Tab '\\011'",
+"",
+" {ESC} --- Escape '\\033'",
+"",
+" {^A} --- '\\001'",
+"",
+" ...",
+"",
+" {^_} --- '\\031'",
+"",
+" Macros are limited to 256 characters after expansion.",
+"2 wgnuplot.ini",
+"?set terminal windows wgnuplot.ini",
+"?set term windows wgnuplot.ini",
+"?windows wgnuplot.ini",
+"?wgnuplot.ini",
+" Windows `gnuplot` will read some of its options from the `[WGNUPLOT]` section",
+" of `WGNUPLOT.INI` in the Windows directory.  A sample `WGNUPLOT.INI` file:",
+"",
+"       [WGNUPLOT]",
+"       TextOrigin=0 0",
+"       TextSize=640 150",
+"       TextFont=Terminal,9",
+"       GraphOrigin=0 150",
+"       GraphSize=640 330",
+"       GraphFont=Arial,10",
+"       GraphColor=1",
+"       GraphToTop=1",
+"       GraphBackground=255 255 255",
+"       Border=0 0 0 0 0",
+"       Axis=192 192 192 2 2",
+"       Line1=0 0 255 0 0",
+"       Line2=0 255 0 0 1",
+"       Line3=255 0 0 0 2",
+"       Line4=255 0 255 0 3",
+"       Line5=0 0 128 0 4",
+"",
+" The `GraphFont` entry specifies the font name and size in points.  The five",
+" numbers given in the `Border`, `Axis` and `Line` entries are the `Red`",
+" intensity (0--255), `Green` intensity, `Blue` intensity, `Color Linestyle`",
+" and `Mono Linestyle`.  `Linestyles` are 0=SOLID, 1=DASH, 2=DOT, 3=DASHDOT,",
+" 4=DASHDOTDOT.  In the sample `WGNUPLOT.INI` file above, Line 2 is a green",
+" solid line in color mode, or a dashed line in monochrome mode.  The default",
+" line width is 1 pixel.  If `Linestyle` is negative, it specifies the width of",
+" a SOLID line in pixels.  Line1 and any linestyle used with the `points` style",
+" must be SOLID with unit width.",
+"2 windows3.0",
+"?set terminal windows windows3.0",
+"?set term windows windows3.0",
+"?windows windows3.0",
+"?windows3.0",
+" Windows 3.1 is preferred, but WGNUPLOT will run under Windows 3.0 with the",
+" following restrictions:",
+" `1.` COMMDLG.DLL and SHELL.DLL (available with Windows 3.1 or Borland C++",
+" 3.1) must be in the windows directory.",
+"",
+" `2.` WGNUPLOT.HLP produced by Borland C++ 3.1 is in Windows 3.1 format.",
+" You need to use the WINHELP.EXE supplied with Borland C++ 3.1.",
+"",
+" `3.` It will not run in real mode due to lack of memory.",
+"",
+" `4.` TrueType fonts are not available in the graph window.",
+"",
+" `5.` Drag-drop does not work."
+END_HELP(windows)
+#endif

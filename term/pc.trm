@@ -1,0 +1,341 @@
+/*
+ * $Id: pc.trm,v 1.16 1997/04/10 02:34:27 drd Exp $
+ *
+ */
+
+/* GNUPLOT - pc.trm */
+/*
+ * Copyright (C) 1990 - 1993, 1997
+ *
+ * Permission to use, copy, and distribute this software and its
+ * documentation for any purpose with or without fee is hereby granted,
+ * provided that the above copyright notice appear in all copies and
+ * that both that copyright notice and this permission notice appear
+ * in supporting documentation.
+ *
+ * Permission to modify the software is granted, but not the right to
+ * distribute the modified code.  Modifications are to be distributed
+ * as patches to released version.
+ *
+ * This software  is provided "as is" without express or implied warranty.
+ *
+ * This file is included by ../term.c.
+ *
+ * This terminal driver supports:
+ *  Under Microsoft C
+ *      cga, egabios, egalib, vgabios, hercules, corona325, att
+ *  Under Turboc C
+ *      cga, ega/vga, vgamono, svga, mcga, hercules, att
+ *
+ * AUTHORS
+ *  Colin Kelley, Thomas Williams, William Wilson, Russell Lang
+ *  modified by David J. Liu (liu@csb.yale.edu) for version 3.6
+ *
+ * send your comments or suggestions to (info-gnuplot@dartmouth.edu).
+ *
+ * Because only one compiler is used to generate gnuplot.exe
+ * and the type of the single graphics board is auto-detected,
+ * we can combine all these parts into one terminal type: PC
+ * and let the computer take care of the rest.  -- DJL
+ *
+ * Since I don't have MicroSoft C, I assume it would define MSC.
+ * Please correct it if you are using MS C.  Thank you.  -- DJL
+ *
+ */
+
+/*
+ * adapted to the new terminal layout by Stefan Bodewig (Dec. 1995)
+ */
+
+#ifndef GOT_DRIVER_H
+#include "driver.h"
+#endif
+
+#ifdef TERM_REGISTER
+register_term(pc)
+#endif
+
+#ifdef TERM_PROTO
+TERM_PUBLIC void PC_text __PROTO((void));
+TERM_PUBLIC void PC_reset __PROTO((void));
+TERM_PUBLIC void PC_init __PROTO((void));
+TERM_PUBLIC void PC_graphics __PROTO((void));
+TERM_PUBLIC void PC_linetype __PROTO((int linetype));
+TERM_PUBLIC void PC_move __PROTO((int x, int y));
+TERM_PUBLIC void PC_vector __PROTO((int x, int y));
+TERM_PUBLIC void PC_put_text __PROTO((int x, int y, char *str));
+TERM_PUBLIC int PC_text_angle __PROTO((int ang));
+
+#define PC_HCHAR FNT5X9_HCHAR
+#define PC_VCHAR FNT5X9_VCHAR
+#define PC_HTIC 5
+#define PC_VTIC 4
+#define PC_XMAX 100 /* These two entries are just place holders. */
+#define PC_YMAX 100 /* The actual values will be found in init.  */
+#endif /* TERM_PROTO */
+
+#ifndef TERM_PROTO_ONLY
+#ifdef TERM_BODY
+
+#ifdef __TURBOC__
+static int huge detect_svga __PROTO((void));
+#endif /* __TURBOC__ */
+
+#include <string.h>
+#include <stdlib.h>
+#ifdef __TURBOC__
+#include <graphics.h>
+#include <conio.h>
+#include <dos.h>
+#endif /* __TURBOC__ */
+#ifdef MSC
+#include "mcega.h"
+#endif /* MSC */
+
+static int pattern[] = {0xffff, 0x0f0f, 0xffff, 0xaaaa, 0x3333, 0x3f3f, 0x0f0f};
+static int vga_color[] = {7,8,2,3,4,5,9,14,12,15,13,10,11,1,6};
+
+static int pc_driver, pc_mode;
+static int graphics_on = FALSE, pc_graphics = FALSE;
+static int startx, starty, pc_lastx, pc_lasty, pc_colors;
+static int pc_angle, pc_text_size, pc_text_dir, pc_corscreen = -1;
+
+
+#ifdef __TURBOC__
+extern int far _Cdecl SVGA_driver_far[] ;
+#endif /* __TURBOC__ */
+
+static int huge detect_svga(void)
+{
+  return 0; /* the default mode, just a place holder */
+}
+
+void PC_setup() /* called from the beginning of main() */
+{
+  int i,t,x,y;
+  char pc_modename[9];
+
+/* First link all BRI dribers, then detect the display card. */
+/* If environment PCTRM is set, try initiate the card/mode.  */
+
+  strncpy(pc_modename,getenv("PCTRM"),8); /* special instruction on mode */
+
+#ifdef __TURBOC__
+/* Some of this code including BGI drivers are copyright Borland Intl. */
+  registerfarbgidriver(EGAVGA_driver_far);
+  registerfarbgidriver(CGA_driver_far);
+  registerfarbgidriver(Herc_driver_far);
+  registerfarbgidriver(ATT_driver_far);
+  registerfarbgidriver(PC3270_driver_far);
+  pc_driver=DETECT; detectgraph(&pc_driver,&pc_mode);
+  if (graphresult())
+    { fprintf(stderr,"Unable to initialize graphics.\n"); return; }
+#ifdef BGI_NAME
+#define LAST_BGI 10 /* the highest standard pc_driver value, see graphics.h */
+#define LAST_SVGA_MODE 6 /* the last mode of the SVGA.BGI */
+  if ((pc_driver==VGA)&&(pc_modename[0]=='S')) /* test SVGA if we have VGA */
+    {
+      installuserdriver(BGI_NAME,&detect_svga) ;
+      registerfarbgidriver(SVGA_driver_far) ;
+      pc_driver=DETECT ; initgraph(&pc_driver,&pc_mode,"") ;
+/* The following code, which is independent of the actual SVGA.BGI used, */
+/* tries to find a mode of width defined in the environment variable PCTRM */
+      if (pc_driver>LAST_BGI) /* success */
+        {
+          sscanf(pc_modename,"S%d",&t);
+          switch(t) {
+            case 800  : break; /* S800  */
+            case 1024 : break; /* S1024 */
+            case 1280 : break; /* S1280 */
+            default: t = 640;  /* 640x480 */
+          }
+          for (i=0;i<=LAST_SVGA_MODE;i++)
+            {
+              setgraphmode(i);
+              if ((getmaxx()+1==t)&&(getmaxcolor()>14)) pc_mode=i;
+            }
+          setgraphmode(pc_mode) ;
+          if (graphresult()) /* error, go back to VGA */
+            { pc_driver = VGA; pc_mode = 4; }
+        }
+    } /* SVGA tested */
+  if (pc_driver<=LAST_BGI)
+#endif /* BGI_NAME */
+    initgraph(&pc_driver,&pc_mode,"");
+  pc_colors = getmaxcolor()+1;
+  pc_lastx = getmaxx(); pc_lasty = getmaxy();
+  restorecrtmode();
+  clrscr();
+#endif /* __TURBOC__ */
+  x = pc_lastx+1 ; y = pc_lasty+1 ;
+  fprintf(stderr,"\tScreen of %d x %d pixels and %d colors.\n",x,y,pc_colors);
+  pc_graphics = TRUE;
+}
+
+TERM_PUBLIC void PC_init()
+{
+  char *pathp;
+
+  if(!pc_graphics) {
+    fprintf(stderr,"Unable to initialize graphics.\n");
+    term=0; return;
+  }
+  pc_text_size = (pc_lasty>590)?2:1; /* Double the tic/font sizes. */
+  term_tbl[term].h_char = PC_HCHAR;
+  term_tbl[term].v_char = PC_VCHAR;
+  term_tbl[term].h_tic  = PC_HTIC*pc_text_size;
+  term_tbl[term].v_tic  = PC_VTIC*pc_text_size;
+  term_tbl[term].xmax = pc_lastx+1;
+  term_tbl[term].ymax = pc_lasty+1;
+#ifdef __TURBOC__
+  setgraphmode(pc_mode);
+  settextstyle(DEFAULT_FONT,HORIZ_DIR,pc_text_size);
+  term_tbl[term].h_char = textheight("X"); /* overriding the default */
+  term_tbl[term].v_char = textwidth("X");  /* overriding the default */
+#endif /* __TURBOC__ */
+#ifdef MSC
+#endif /* MSC */
+}
+
+TERM_PUBLIC void PC_graphics()
+{
+  graphics_on = TRUE;
+#ifdef __TURBOC__
+  setgraphmode(pc_mode);
+#endif /* __TURBOC__ */
+#ifdef MSC
+  if (pc_corscreen==-1) Vmode(18); /* VGA */
+  else { grinit(corscreen); grandtx(); } /* corolla */
+#endif /* MSC */
+}
+
+TERM_PUBLIC void PC_linetype(linetype)
+{
+  if (pc_colors>14) /* 16 or more colors */
+    {
+      if (linetype >= 13) linetype %= 13;
+#ifdef __TURBOC__
+      setcolor(vga_color[linetype+2]);
+#endif /* __TURBOC__ */
+#ifdef MSC
+#endif /* MSC */
+    }
+  else /* MONO */
+    {
+      if (linetype >= 5)  linetype %= 5;
+#ifdef __TURBOC__
+      setlinestyle(4,pattern[linetype+2],1);
+#endif /* __TURBOC__ */
+#ifdef MSC
+  if (pc_corscreen!=-1) Cor_mask(pattern[linetype+2]);
+#endif /* MSC */
+    }
+}
+
+TERM_PUBLIC void PC_move(x,y)
+  int x,y;
+{
+#ifdef __TURBOC__
+  moveto(x,pc_lasty-y);
+#endif /* __TURBOC__ */
+#ifdef MSC
+#endif /* MSC */
+  startx = x;
+  starty = y;
+}
+
+TERM_PUBLIC void PC_vector(x,y)
+  int x,y;
+{
+#ifdef __TURBOC__
+  lineto(x,pc_lasty-y);
+#endif /* __TURBOC__ */
+#ifdef MSC
+  if (pc_corscreen!=-1) Cor_line(startx,COR_YLAST-starty,x,COR_YLAST-y);
+#endif /* MSC */
+  startx = x;
+  starty = y;
+}
+
+TERM_PUBLIC void PC_reset()
+{
+  graphics_on = FALSE;
+#ifdef __TURBOC__
+  restorecrtmode();
+  clrscr();
+#endif /* __TURBOC__ */
+#ifdef MSC
+  Vmode(3);
+#endif /* MSC */
+}
+
+TERM_PUBLIC void PC_text()
+{
+  if (graphics_on) {
+    graphics_on = FALSE;
+    (void)getch();
+#ifdef __TURBOC__
+  restorecrtmode();
+  clrscr();
+#endif /* __TURBOC__ */
+#ifdef MSC
+  if (pc_corscreen!=-1) { grreset(); txonly(); }
+  Vmode(3);
+#endif /* MSC */
+  }
+}
+
+TERM_PUBLIC int PC_text_angle(ang)
+int ang;
+{
+  switch(ang) {
+    case 0 : pc_text_dir = HORIZ_DIR; break;
+    case 1 : pc_text_dir =  VERT_DIR; break;
+  }
+  return TRUE;
+}
+
+TERM_PUBLIC void PC_put_text(x,y,str)
+  int x, y;
+  char *str;
+{
+#ifdef __TURBOC__
+  settextstyle(DEFAULT_FONT,pc_text_dir,pc_text_size);
+  outtextxy(x,pc_lasty-y-(pc_text_dir?textwidth(str):(textheight(str)/2)),str);
+#endif /* __TURBOC__ */
+#ifdef MSC
+#endif /* MSC */
+}
+
+#endif /* TERM_BODY */
+
+#ifdef TERM_TABLE
+
+TERM_TABLE_START(pc_driver)
+    "pc", "IBM PC/Clone running DOS",
+	   PC_XMAX, PC_YMAX, PC_VCHAR, PC_HCHAR,
+	   PC_VTIC, PC_HTIC, options_null, PC_init, PC_reset,
+	   PC_text, null_scale, PC_graphics, PC_move, PC_vector,
+	   PC_linetype, PC_put_text, PC_text_angle,
+	   null_justify_text, line_and_point, do_arrow, set_font_null
+TERM_TABLE_END(pc_driver)
+
+#undef LAST_TERM
+#define LAST_TERM pc_driver
+
+#endif /* TERM_TABLE */
+#endif /* TERM_PROTO_ONLY */
+
+#ifdef TERM_HELP
+START_HELP(pc)
+"1 pc",
+"?set terminal pc",
+"?set term pc",
+"?terminal pc",
+"?term pc",
+"?pc",
+" The `pc` terminal driver supports PCs with arbitrary graphics boards, which",
+" will be automatically detected.  It should be used only if you are not using",
+" the gcc or Zortec C/C++ compilers."
+END_HELP(pc)
+#endif

@@ -1,0 +1,29 @@
+/*
+ * $Id: table.trm,v 1.3 1996/09/15 13:08:24 drd Exp $
+ *
+ */
+
+/*
+      The terminal 'table' is built into the source code; it is not
+      available separately.  This file is needed only for building
+      the documentation for gnuplot 3.6 (or higher) using the new
+      including mechanismn.
+*/
+
+#ifdef TERM_HELP
+START_HELP(table)
+"1 table",
+"?set terminal table",
+"?set term table",
+"?terminal table",
+"?term table",
+"?table",
+" Instead of producing a picture, the `table` terminal prints out evaluation",
+" results in a multicolumn ASCII table of X Y Z values.  For those times when",
+" you really want to see the numbers, now you can see them on the screen or",
+" save to a file.  This can be useful if you want to use the contouring engine",
+" of `gnuplot` to work out the contours of your data and then save them for",
+" further use, perhaps for plotting with `plot`.  See `set contour` for an",
+" example.  The same trick can be used to save gridded data (`set dgrid3d`)."
+END_HELP(table)
+#endif

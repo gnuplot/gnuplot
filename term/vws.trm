@@ -1,0 +1,376 @@
+/*
+ * $Id: vws.trm,v 1.12 1997/04/10 02:34:40 drd Exp $
+ *
+ */
+
+/* GNUPLOT - vws.trm */
+/*
+ * Copyright (C) 1990 - 1993, 1997
+ *
+ * Permission to use, copy, and distribute this software and its
+ * documentation for any purpose with or without fee is hereby granted,
+ * provided that the above copyright notice appear in all copies and
+ * that both that copyright notice and this permission notice appear
+ * in supporting documentation.
+ *
+ * Permission to modify the software is granted, but not the right to
+ * distribute the modified code.  Modifications are to be distributed
+ * as patches to released version.
+ *
+ * This software  is provided "as is" without express or implied warranty.
+ *
+ * This file is included by ../term.c.
+ *
+ * This terminal driver supports:
+ *   IRIS terminals
+ *
+ * AUTHORS
+ *   Walter Speth
+ *           BITNET: SPETH@DBNPIB5
+ *
+ * send your comments or suggestions to (info-gnuplot@dartmouth.edu).
+ *
+ */
+/*
+ * adapted to the new terminal layout by Stefan Bodewig (Dec. 1995)
+ */
+
+#ifndef GOT_DRIVER_H
+#include "driver.h"
+#endif
+
+#ifdef TERM_REGISTER
+register_term(vws)
+#endif
+
+#ifdef TERM_PROTO
+TERM_PUBLIC void VWS_init __PROTO((void));
+TERM_PUBLIC void VWS_reset __PROTO((void));
+TERM_PUBLIC int VWS_scale __PROTO((double xs, double ys));
+TERM_PUBLIC void VWS_graphics __PROTO((void));
+TERM_PUBLIC void VWS_text __PROTO((void));
+TERM_PUBLIC void VWS_move __PROTO((unsigned int x, unsigned int y));
+TERM_PUBLIC void VWS_vector __PROTO((unsigned int x, unsigned int y));
+TERM_PUBLIC void VWS_linetype __PROTO((int lt));
+TERM_PUBLIC void VWS_put_text __PROTO((unsigned int x, unsigned int y, char * str));
+TERM_PUBLIC int VWS_text_angle __PROTO((int ang));
+TERM_PUBLIC int VWS_justify_text __PROTO((enum JUSTIFY mode));
+TERM_PUBLIC void VWS_point __PROTO((unsigned int x, unsigned int y, int point));
+TERM_PUBLIC void VWS_arrow __PROTO((unsigned int sx, unsigned int sy, unsigned int ex, unsigned int ey, int head));
+ 
+#define VWS_XMAX 1024
+#define VWS_YMAX 780
+#define VWS_VCHAR 25
+#define VWS_HCHAR 15
+#define VWS_VTIC 10
+#define VWS_HTIC 10
+#endif /* TERM_PROTO */
+
+#ifndef TERM_PROTO_ONLY
+#ifdef TERM_BODY 
+void VWS_resize_ast __PROTO((void));
+
+#include <stdio.h>
+/*
+#include <math.h>
+#include <ssdef.h>
+*/
+#include <descrip.h>
+ 
+#include <uisentry.h>
+#include <uisusrdef.h>
+ 
+#define DEFAULT_ATTR 0
+#define OVER_ATTR 1
+#define ERAS_ATTR 2
+#define BIS_ATTR 3
+#define COLOR_ATTR 4
+#define TEXT_ATTR 5
+#define LINE_ATTR 6
+#define BACK_ATTR 7
+
+float current_x, current_y;
+ 
+int vd_id, wd_id;
+int vcm_id;
+ 
+static $DESCRIPTOR(ws_devname, "SYS$WORKSTATION");
+static $DESCRIPTOR(vd_title, "gnuplot");
+ 
+static float x0, y0, xsiz, ysiz,
+             wc_xmin_new, wc_ymin_new, wc_xmax_new, wc_ymax_new,
+             wc_xmin, wc_ymin, wc_xmax, wc_ymax,
+             vd_width, vd_height;
+ 
+void VWS_resize_ast()
+{
+  uis$resize_window(&vd_id, &wd_id, &x0, &y0, &xsiz, &ysiz,
+		    &wc_xmin, &wc_ymin, &wc_xmax, &wc_ymax);
+  replotrequest();
+}
+/****************************************************************************/
+TERM_PUBLIC void VWS_init()
+{
+  int i;
+  int cattr;
+  $DESCRIPTOR(a_font,"DTABER0003WK00PG0001UZZZZ02A000");
+  const int i0=0, i1=1, i2=2, i3=3, i4=4, i5=5, i6=6, i7=7, i8=8;
+  const float p0=0.0, p1=0.1, p2=0.2, p3=0.3, p4=0.4;
+  const float p5=0.5, p6=0.6, p7=0.7, p8=0.8, p9=0.9;
+  const int n1=0xFFFFFFFF;
+  const int uis$c_mode_over = UIS$C_MODE_OVER;
+  const int uis$c_mode_eras = UIS$C_MODE_ERAS;
+  const int uis$c_mode_bis = UIS$C_MODE_BIS;
+  const float vws_hchar = (float) VWS_HCHAR;
+  const float vws_vchar = (float) VWS_VCHAR;
+  const int default_attr = DEFAULT_ATTR;
+  const int over_attr = OVER_ATTR;
+  const int eras_attr = ERAS_ATTR;
+  const int bis_attr = BIS_ATTR;
+  const int color_attr = COLOR_ATTR;
+  const int text_attr = TEXT_ATTR;
+  const int line_attr = LINE_ATTR;
+  const int back_attr = BACK_ATTR;
+
+  vd_width  = 14;
+  vd_height = 10;		/* aspect sqrt(2) as DIN A paper */
+ 
+  wc_xmin = 0.0;
+  wc_ymin = 0.0;
+  wc_xmax = (float) VWS_XMAX;
+  wc_ymax = (float) VWS_YMAX;
+ 
+  vcm_id = uis$create_color_map(&i8);
+ 
+  vd_id = uis$create_display(&wc_xmin, &wc_ymin, &wc_xmax, &wc_ymax,
+                             &vd_width, &vd_height, &vcm_id);
+ 
+  uis$set_color(&vd_id, &i0, &p5, &p5, &p5);
+  uis$set_color(&vd_id, &i1, &p0, &p0, &p0);
+  uis$set_color(&vd_id, &i2, &p0, &p0, &p0);
+  uis$set_color(&vd_id, &i3, &p0, &p0, &p0);
+  uis$set_color(&vd_id, &i4, &p0, &p0, &p0);
+  uis$set_color(&vd_id, &i5, &p0, &p0, &p0);
+  uis$set_color(&vd_id, &i6, &p0, &p0, &p0);
+  uis$set_color(&vd_id, &i7, &p0, &p0, &p0);
+ 
+/*
+  uis$set_color(&vd_id, &i2, &p2, &p2, &p2);
+  uis$set_color(&vd_id, &i3, &p3, &p3, &p3);
+  uis$set_color(&vd_id, &i4, &p4, &p4, &p4);
+  uis$set_color(&vd_id, &i5, &p5, &p5, &p5);
+  uis$set_color(&vd_id, &i6, &p6, &p6, &p6);
+  uis$set_color(&vd_id, &i7, &p7, &p7, &p7);
+  
+  /* perhaps better for color terms (which I do not have)
+     uis$set_color(&vd_id, &i0, &0p0, &0p0, &0p0);
+     uis$set_color(&vd_id, &i1, &0p9, &0p0, &0p0);
+     uis$set_color(&vd_id, &i2, &0p0, &0p9, &0p0);
+     uis$set_color(&vd_id, &i3, &0p9, &0p9, &0p0);
+     uis$set_color(&vd_id, &i4, &0p0, &0p0, &0p9);
+     uis$set_color(&vd_id, &i5, &0p9, &0p0, &0p9);
+     uis$set_color(&vd_id, &i6, &0p0, &0p9, &0p9);
+     uis$set_color(&vd_id, &i7, &0p9, &0p9, &0p9);
+     /*
+      */
+  uis$disable_display_list(&vd_id);
+ 
+  wd_id = uis$create_window(&vd_id, &ws_devname, &vd_title,
+                            &wc_xmin, &wc_ymin, &wc_xmax, &wc_ymax,
+                            &vd_width, &vd_height);
+ 
+  uis$set_resize_ast(&vd_id, &wd_id, &VWS_resize_ast, &i0,
+                     &x0, &y0, &xsiz, &ysiz,
+                     &wc_xmin_new, &wc_ymin_new, &wc_xmax_new, &wc_ymax_new);
+ 
+  uis$set_writing_mode(&vd_id, &default_attr, &over_attr, &uis$c_mode_over);
+  uis$set_writing_mode(&vd_id, &default_attr, &eras_attr, &uis$c_mode_eras);
+  uis$set_writing_mode(&vd_id, &default_attr, &bis_attr, &uis$c_mode_bis);
+/*
+  for (i=0; i<8; i++) {
+  cattr = COLOR_ATTR+i;
+  uis$set_writing_index(&vd_id, &copy_attr, &cattr, &i);
+  }
+  */
+  uis$set_background_index(&vd_id, &default_attr, &back_attr, &i0);
+  uis$set_writing_mode(&vd_id, &default_attr, &text_attr, &uis$c_mode_over);
+  uis$set_font(&vd_id,&text_attr,&text_attr,&a_font);
+  uis$set_char_size(&vd_id,&text_attr,&text_attr,&i0,&vws_hchar,&vws_vchar);
+  uis$set_line_style(&vd_id,&line_attr,&line_attr,&n1);
+}
+ 
+/****************************************************************************/
+ 
+TERM_PUBLIC void VWS_reset()
+{
+  uis$delete_display(&vd_id);
+}
+/****************************************************************************/
+TERM_PUBLIC int VWS_scale(xs,ys)
+double xs,ys;
+{
+  return FALSE;
+}
+/****************************************************************************/
+TERM_PUBLIC void VWS_graphics()
+{
+  uis$erase(&vd_id, &wc_xmin, &wc_ymin, &wc_xmax, &wc_ymax);
+}
+/****************************************************************************/
+TERM_PUBLIC void VWS_text()
+{
+}
+/****************************************************************************/
+TERM_PUBLIC void VWS_move(x,y)
+unsigned int x,y;
+{
+  current_x= (float)(x);
+  current_y= (float)(y);
+}
+/****************************************************************************/
+TERM_PUBLIC void VWS_vector(x,y)
+unsigned int x,y;
+{
+  int col;
+  int line_attr = LINE_ATTR;
+  float fx,fy;
+  fx=(float) x;
+  fy=(float) y;
+ 
+  uis$line(&vd_id, &line_attr, &current_x, &current_y, &fx, &fy);
+  VWS_move (x,y);
+}
+/****************************************************************************/
+TERM_PUBLIC void VWS_linetype(lt)
+int lt;
+{
+  const int n1=0xFFFFFFFF;
+  const float p15=1.5, p20=2.0, p10=1.0;
+  long int lstyle[9] = { 0xffffffff,
+			 0Xff00ff00,
+			 0xffffff00,
+			 0xffff0000,
+			 0xf0f0f0f0,
+			 0Xfff0fff0,
+			 0xf000f000,
+			 0xa5a5a5af,
+			 0xf00f00f0 };
+  int line_attr = LINE_ATTR;
+ 
+  switch(lt) {
+  case -1: uis$set_line_style(&vd_id,&line_attr,&line_attr,&n1);
+    uis$set_line_width(&vd_id,&line_attr,&line_attr,&p15);
+    break;
+  case -2: uis$set_line_style(&vd_id,&line_attr,&line_attr,&n1);
+    uis$set_line_width(&vd_id,&line_attr,&line_attr,&p20);
+    break;
+/*
+  default:  uis$set_line_style(&vd_id,&line_attr,&line_attr,&lstyle[lt % 8]);
+  makes part of curve disappear on my workstation
+  */
+  default:  uis$set_line_style(&vd_id,&line_attr,&line_attr,&n1);
+    uis$set_line_width(&vd_id,&line_attr,&line_attr,&p10);
+  }
+}
+ 
+/****************************************************************************/
+static int justify_mode = CENTRE, up;
+ 
+TERM_PUBLIC void VWS_put_text(x,y,str)
+unsigned int x,y;
+char* str;
+{
+  float fx,fy, thih, twid;
+  int text_attr = TEXT_ATTR;
+ 
+/* uis$text parameter is descriptor string not character string */
+ 
+  struct dsc$descriptor_s textline = {0,DSC$K_DTYPE_T,DSC$K_CLASS_S,""};
+ 
+ 
+  textline.dsc$a_pointer = str;
+  textline.dsc$w_length = strlen(textline.dsc$a_pointer);
+  uis$measure_text(&vd_id,&text_attr,&textline,&twid,&thih);
+  fx=(float)x;
+  fy=(float)y;
+ 
+  switch (justify_mode) {
+  case LEFT : fy+=thih/2.;
+    break;
+  case RIGHT : fy+=thih/2.;
+    fx-=twid;
+    break;
+ 
+  case CENTRE : fy+=thih/2.;
+    fx-=twid/2;
+    break;
+  };
+ 
+  uis$text(&vd_id,&text_attr,&textline,&fx,&fy);
+  /* write to Example Viewport window */
+ 
+ 
+}
+/****************************************************************************/
+TERM_PUBLIC int VWS_text_angle(ang)
+int ang;
+{
+  float degrees;
+  int text_attr = TEXT_ATTR;
+  degrees=90.*(up=ang);
+  uis$set_text_slope (&vd_id, &text_attr, &text_attr, &degrees);
+  return TRUE;
+}
+/****************************************************************************/
+TERM_PUBLIC int VWS_justify_text(mode)
+enum JUSTIFY mode;
+{
+  justify_mode=mode;
+  return TRUE;
+}
+/****************************************************************************/
+TERM_PUBLIC void VWS_point(x,y,point)
+unsigned int x,y;
+int point;
+{
+  do_point(x,y,point);
+}
+/****************************************************************************/
+TERM_PUBLIC void VWS_arrow(sx,sy,ex,ey,head)
+unsigned int sx,sy,ex,ey;
+int head;
+{
+  do_arrow(sx,sy,ex,ey,head);
+}
+
+#endif /* TERM_BODY */
+
+#ifdef TERM_TABLE
+
+TERM_TABLE_START(vws_driver)
+    "VWS", "VAX Windowing System (UIS)",
+           VWS_XMAX, VWS_YMAX, VWS_VCHAR, VWS_HCHAR,
+           VWS_VTIC, VWS_HTIC, options_null, VWS_init, VWS_reset,
+           VWS_text, null_scale, VWS_graphics, VWS_move, VWS_vector,
+           VWS_linetype, VWS_put_text, VWS_text_angle,
+           VWS_justify_text, do_point, do_arrow, set_font_null
+TERM_TABLE_END(vws_driver)
+
+#undef LAST_TERM
+#define LAST_TERM vws_driver
+
+#endif /* TERM_TABLE */
+#endif /* TERM_PROTO_ONLY */
+
+#ifdef TERM_HELP
+START_HELP(vws)
+"1 vws",
+"?set terminal vws",
+"?set term vws",
+"?terminal vws",
+"?term vws",
+"?vws",
+" The `vws` terminal driver supports the VAX Windowing System.  It has no",
+" options."
+END_HELP(vws)
+#endif

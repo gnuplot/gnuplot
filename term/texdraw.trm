@@ -1,0 +1,352 @@
+/*
+ * $Id: texdraw.trm,v 1.12 1996/12/19 20:25:40 drd Exp $
+ */
+
+/* GNUPLOT - texdraw.trm */
+/*
+ * Copyright (C) 1990
+ *
+ * Permission to use, copy, and distribute this software and its
+ * documentation for any purpose with or without fee is hereby granted,
+ * provided that the above copyright notice appear in all copies and
+ * that both that copyright notice and this permission notice appear
+ * in supporting documentation.
+ *
+ * Permission to modify the software is granted, but not the right to
+ * distribute the modified code.  Modifications are to be distributed
+ * as patches to released version.
+ *
+ * This software  is provided "as is" without express or implied warranty.
+ *
+ * This file is included by ../term.c.
+ *
+ * This terminal driver supports:
+ *   The TEXDRAW macros for LaTeX.
+ *
+ * AUTHORS
+ *   Khun Yee Fung. Modified from eepic.trm.
+ *   clipper@csd.uwo.ca
+ *   January 20, 1992
+ *
+ * send your comments or suggestions to (info-gnuplot@dartmouth.edu).
+ *
+ */
+
+/*
+ *  This file contains the texdraw terminal driver, intended for use with the
+ *  texdraw macro package for LaTeX. This is an alternative to the
+ *  latex driver. You need texdraw.sty, and texdraw.tex in the texdraw package.
+ *
+ */
+#ifndef GOT_DRIVER_H
+#include "driver.h"
+#endif
+
+#ifdef TERM_REGISTER
+register_term(texdraw)
+#endif
+
+#ifdef TERM_PROTO
+TERM_PUBLIC void TEXDRAW_init __PROTO((void));
+TERM_PUBLIC void TEXDRAW_graphics __PROTO((void));
+TERM_PUBLIC void TEXDRAW_text __PROTO((void));
+TERM_PUBLIC void TEXDRAW_linetype __PROTO((int linetype));
+TERM_PUBLIC void TEXDRAW_move __PROTO((unsigned int x, unsigned int y));
+TERM_PUBLIC void TEXDRAW_point __PROTO((unsigned int x, unsigned int y, int number));
+TERM_PUBLIC void TEXDRAW_vector __PROTO((unsigned int ux, unsigned int uy));
+TERM_PUBLIC void TEXDRAW_arrow __PROTO((unsigned int sx, unsigned int sy, unsigned int ex, unsigned int ey, TBOOLEAN head));
+TERM_PUBLIC void TEXDRAW_put_text __PROTO((unsigned int x, unsigned int y, char str[]));
+TERM_PUBLIC int TEXDRAW_justify_text __PROTO((enum JUSTIFY mode));
+TERM_PUBLIC int TEXDRAW_text_angle __PROTO((int angle));
+TERM_PUBLIC void TEXDRAW_reset __PROTO((void));
+
+#define TEXDRAW_PTS_PER_INCH (72.27)
+#define DOTS_PER_INCH (300)	/* resolution of printer we expect to use */
+#define TEXDRAW_UNIT (TEXDRAW_PTS_PER_INCH/DOTS_PER_INCH) /* dot size in pt */
+
+/* 5 inches wide by 3 inches high (default) */
+#define TEXDRAW_XMAX (5*DOTS_PER_INCH)
+#define TEXDRAW_YMAX (3*DOTS_PER_INCH)
+
+#define TEXDRAW_HTIC (5*DOTS_PER_INCH/72)	/* (5./TEXDRAW_UNIT) */
+#define TEXDRAW_VTIC (5*DOTS_PER_INCH/72)	/* (5./TEXDRAW_UNIT) */
+#define TEXDRAW_HCHAR (DOTS_PER_INCH*53/10/72)	/* (5.3/TEXDRAW_UNIT) */
+#define TEXDRAW_VCHAR (DOTS_PER_INCH*11/72)	/* (11./TEXDRAW_UNIT) */
+
+#define GOT_TEXDRAW_PROTO
+#endif
+
+#ifndef TERM_PROTO_ONLY
+#ifdef TERM_BODY
+static void TEXDRAW_endline __PROTO((void));
+static unsigned int TEXDRAW_posx;
+static unsigned int TEXDRAW_posy;
+enum JUSTIFY TEXDRAW_justify = LEFT;
+enum JUSTIFY TEXDRAW_last_justify = LEFT;
+static int TEXDRAW_angle = 0;
+static float TEXDRAW_scalefactor = 0.2409;
+static double TEXDRAW_xscale = 1.0, TEXDRAW_yscale = 1.0;
+
+/* for DOTS point style */
+#define TEXDRAW_TINY_DOT "\\htext{$\\cdot$}"
+
+/* POINTS */
+#define TEXDRAW_POINT_TYPES 12	/* we supply more point types */
+static char GPFAR * GPFAR TEXDRAW_points[] =
+{
+  "\\rmove(0 4)\\htext{$\\Diamond$}",
+  "\\htext{$+$}",
+  "\\rmove(0 4)\\htext{$\\Box$}",
+  "\\htext{$\\times$}",
+  "\\htext{$\\triangle$}",
+  "\\htext{$\\star$}",
+  "\\lcir r:9",
+  "\\lcir r:12",
+  "\\lcir r:16",
+  "\\fcir f:0.9 r:9",
+  "\\fcir f:0.9 r:12",
+  "\\fcir f:0.9 r:16"
+};
+
+/* LINES */
+#define TEXDRAW_NUMLINES 5	/* number of linetypes below */
+static int TEXDRAW_lines[] =
+{
+  4,		/* -2 border */
+  3,		/* -1 axes */
+  3,		/*  0 solid thin  */
+  4,		/*  1 solid thick */
+  6,		/*  2 solid Thick */
+};
+
+static int TEXDRAW_last_type = 0; /* The line type selected most recently */
+static int TEXDRAW_type;	/* current line type */
+static TBOOLEAN TEXDRAW_inline = FALSE;	/* are we in the middle of a line */
+static void TEXDRAW_endline __PROTO((void));	/* terminate any line in progress */
+static int TEXDRAW_linecount = 0;	/* number of points in line so far */
+#define TEXDRAW_LINEMAX 5	/* max value for linecount */
+
+TERM_PUBLIC void TEXDRAW_init()
+{
+  TEXDRAW_posx = TEXDRAW_posy = 0;
+  TEXDRAW_linetype(-1);
+  fprintf(outfile, "%% GNUPLOT: LaTeX using TEXDRAW macros\n");
+}
+
+TERM_PUBLIC void TEXDRAW_graphics()
+{
+static char GPFAR tdg1[] = "\
+\\begin{texdraw}\n\
+\\normalsize\n\
+\\ifx\\pathDEFINED\\relax\\else\\let\\pathDEFINED\\relax\n\
+ \\def\\QtGfr{\\ifx (\\TGre \\let\\YhetT\\cpath\\else\\let\\YhetT\\relax\\fi\\YhetT}\n\
+ \\def\\path (#1 #2){\\move (#1 #2)\\futurelet\\TGre\\QtGfr}\n\
+ \\def\\cpath (#1 #2){\\lvec (#1 #2)\\futurelet\\TGre\\QtGfr}\n\
+\\fi\n\
+\\drawdim pt\n\
+\\setunitscale %2.2f\n\
+\\linewd %d\n\
+\\textref h:L v:C\n";
+  fprintf(outfile, tdg1, 
+	TEXDRAW_scalefactor,
+	TEXDRAW_lines[2]);
+  TEXDRAW_last_type = 0;
+  TEXDRAW_type = 0;
+}
+
+TERM_PUBLIC void TEXDRAW_text()
+{
+  TEXDRAW_endline();
+  fprintf(outfile, "\\end{texdraw}\n");
+}
+
+TERM_PUBLIC void TEXDRAW_linetype(linetype)
+int linetype;
+{
+  TEXDRAW_endline();
+
+  if (linetype >= TEXDRAW_NUMLINES - 2)
+    linetype %= (TEXDRAW_NUMLINES - 2);
+
+  TEXDRAW_type = linetype;
+}
+
+TERM_PUBLIC void TEXDRAW_move(x, y)
+unsigned int x, y;
+{
+  TEXDRAW_endline();
+
+  TEXDRAW_posx = x;
+  TEXDRAW_posy = y;
+}
+
+TERM_PUBLIC void TEXDRAW_point(x, y, number)
+unsigned int x, y;
+int number;
+{
+  TEXDRAW_move(x, y);
+
+  /* Print the character defined by 'number'; number < 0 means
+        to use a dot, otherwise one of the defined points. */
+  fprintf(outfile, "\\move (%d %d)\n",
+	  (int)((double) x * TEXDRAW_xscale),
+	  (int)((double) y * TEXDRAW_yscale));
+  if (TEXDRAW_last_justify != CENTRE) {
+    fprintf(outfile, "\\textref h:C v:C ");
+    TEXDRAW_last_justify = CENTRE;
+  }
+  fprintf(outfile, "%s\n",
+	  (number < 0 ?
+	   TEXDRAW_TINY_DOT :
+	   TEXDRAW_points[number % TEXDRAW_POINT_TYPES]));
+}
+
+TERM_PUBLIC void TEXDRAW_vector(ux, uy)
+unsigned int ux, uy;
+{
+  if (!TEXDRAW_inline) {
+    TEXDRAW_inline = TRUE;
+
+    /* Start a new line. This depends on line type */
+    if (TEXDRAW_type != TEXDRAW_last_type){
+      if (TEXDRAW_lines[TEXDRAW_type+2] != TEXDRAW_lines[TEXDRAW_last_type+2])
+	fprintf(outfile, "\\linewd %d\n", TEXDRAW_lines[TEXDRAW_type + 2]);
+      TEXDRAW_last_type = TEXDRAW_type;
+    }
+    fprintf(outfile, "\\path (%d %d)",
+	    (int)((double) TEXDRAW_posx * TEXDRAW_xscale),
+	    (int)((double) TEXDRAW_posy * TEXDRAW_yscale));
+    TEXDRAW_linecount = 1;
+  }
+  else {
+    /* Even though we are in middle of a path,
+     * we may want to start a new path command.
+     * If they are too long then latex will choke.
+     */
+    if (TEXDRAW_linecount++ >= TEXDRAW_LINEMAX) {
+      fprintf(outfile, "\n\\cpath ");
+      TEXDRAW_linecount = 1;
+    }
+  }
+  fprintf(outfile, "(%d %d)",
+	  (int)((double) ux * TEXDRAW_xscale),
+	  (int)((double) uy * TEXDRAW_yscale));
+  TEXDRAW_posx = ux;
+  TEXDRAW_posy = uy;
+}
+
+static void TEXDRAW_endline()
+{
+  if (TEXDRAW_inline) {
+    fprintf(outfile, "\n");
+    TEXDRAW_inline = FALSE;
+  }
+}
+
+TERM_PUBLIC void TEXDRAW_arrow(sx, sy, ex, ey, head)
+unsigned int sx, sy, ex, ey;
+TBOOLEAN head;
+{
+  char text;
+
+  if (head)
+    text = 'a';
+  else
+    text = 'l';
+  fprintf(outfile, "\\move (%d %d)\\%cvec (%d %d)",
+	  (int)((double) sx * TEXDRAW_xscale),
+	  (int)((double) sy * TEXDRAW_yscale),
+	  text,
+	  (int)((double) ex * TEXDRAW_xscale),
+	  (int)((double) ey * TEXDRAW_yscale));
+  TEXDRAW_posx = ex;
+  TEXDRAW_posy = ey;
+}
+
+TERM_PUBLIC void TEXDRAW_put_text(x, y, str)
+unsigned int x, y;		/* reference point of string */
+char str[];			/* the text */
+{
+  char text;
+
+  TEXDRAW_endline();
+
+  fprintf(outfile, "\\move (%d %d)",
+	  (int)((double) x * TEXDRAW_xscale),
+	  (int)((double) y * TEXDRAW_yscale));
+
+  if (!TEXDRAW_angle)
+    text = 'h';
+  else
+    text = 'v';
+
+  if (TEXDRAW_last_justify != TEXDRAW_justify) {
+    TEXDRAW_last_justify = TEXDRAW_justify;
+    if (TEXDRAW_justify == LEFT)
+      fprintf(outfile, "\\textref h:L v:C ");
+    else if (TEXDRAW_justify == CENTRE)
+      fprintf(outfile, "\\textref h:C v:C ");
+    else if (TEXDRAW_justify == RIGHT)
+      fprintf(outfile, "\\textref h:R v:C ");
+  }
+  fprintf(outfile, "\\%ctext{%s}\n", text, str);
+}
+
+
+TERM_PUBLIC int TEXDRAW_justify_text(mode)
+enum JUSTIFY mode;
+{
+  TEXDRAW_justify = mode;
+  return (TRUE);
+}
+
+TERM_PUBLIC int TEXDRAW_text_angle(angle)
+int angle;
+{
+  TEXDRAW_angle = angle;
+  return (TRUE);
+}
+
+TERM_PUBLIC void TEXDRAW_reset()
+{
+  TEXDRAW_endline();
+  TEXDRAW_posx = TEXDRAW_posy = 0;
+}   
+
+#endif /* TERM_BODY */
+
+#ifdef TERM_TABLE
+
+TERM_TABLE_START(texdraw_driver)
+
+	"texdraw",
+	"LaTeX texdraw environment",
+	TEXDRAW_XMAX, TEXDRAW_YMAX, TEXDRAW_VCHAR, TEXDRAW_HCHAR,
+	TEXDRAW_VTIC, TEXDRAW_HTIC, options_null, TEXDRAW_init, TEXDRAW_reset,
+	TEXDRAW_text, null_scale, TEXDRAW_graphics, TEXDRAW_move, TEXDRAW_vector,
+	TEXDRAW_linetype, TEXDRAW_put_text, TEXDRAW_text_angle,
+	TEXDRAW_justify_text, TEXDRAW_point, TEXDRAW_arrow, set_font_null
+
+TERM_TABLE_END(texdraw_driver)
+
+#undef LAST_TERM
+
+#define LAST_TERM texdraw_driver
+
+#endif /* TERM_TABLE */
+
+#endif /* TERM_PROTO_ONLY */
+
+#ifdef TERM_HELP
+START_HELP(texdraw)
+"1 texdraw",
+"?set terminal texdraw",
+"?set term texdraw",
+"?terminal texdraw",
+"?term texdraw",
+"?texdraw",
+" The `texdraw` terminal driver supports the LaTeX texdraw environment.  It is",
+" intended for use with \"texdraw.sty\" and \"texdraw.tex\" in the texdraw package.",
+"  It has no options."
+END_HELP(texdraw)
+#endif

@@ -1,0 +1,1176 @@
+/*
+ * $Id: hpgl.trm,v 1.22 1997/03/09 23:50:54 drd Exp $
+ */
+
+/* GNUPLOT - hpgl.trm */
+/*
+ * Copyright (C) 1990   
+ *
+ * Permission to use, copy, and distribute this software and its
+ * documentation for any purpose with or without fee is hereby granted, 
+ * provided that the above copyright notice appear in all copies and 
+ * that both that copyright notice and this permission notice appear 
+ * in supporting documentation.
+ *
+ * Permission to modify the software is granted, but not the right to
+ * distribute the modified code.  Modifications are to be distributed 
+ * as patches to released version.
+ *  
+ * This software  is provided "as is" without express or implied warranty.
+ * 
+ * This file is included by ../term.c.
+ *
+ * This terminal driver supports:
+ *  hpgl, hp7550, hp7580b, HP Laserjet III
+ *  hp7550 has been replaced by  "hpgl 8 eject"
+ *  hp7580b has been replaced by "hpgl 4"
+ *
+ * AUTHORS
+ *  Colin Kelley, Thomas Williams, Russell Lang
+ * 
+ * send your comments or suggestions to (info-gnuplot@dartmouth.edu).
+ * 
+ */
+
+/*
+ *
+ * MODIFIED for expanded HPGL/2 and PCL utilites
+ *  Tom Swiler (tom@silica.mse.ufl.edu)
+ * Modified June 1995 Ian MacPhedran to support newterm format
+ * Modified October 1995 Ian MacPhedran to simplify HPGL terminals
+ * Modified January 96 by David Denholm and Emmanuel Bigler for cp850
+ *                               and iso international character sets
+ */
+#define HPGL
+#define PCL
+
+#ifndef GOT_DRIVER_H
+#include "driver.h"
+#endif /* GOT_DRIVER_H */
+
+#ifdef TERM_REGISTER
+register_term(hpgl)
+register_term(pcl5)
+#endif /* TERM_REGISTER */
+
+#ifdef TERM_PROTO
+TERM_PUBLIC void HPGL_options __PROTO((void));
+TERM_PUBLIC void HPGL2_options __PROTO((void));
+TERM_PUBLIC void PCL_options __PROTO((void));
+TERM_PUBLIC void HPGL_init __PROTO((void));
+/* TERM_PUBLIC void HPGL2_init __PROTO((void)); */
+TERM_PUBLIC void PCL_init __PROTO((void));
+TERM_PUBLIC void HPGL_graphics __PROTO((void));
+TERM_PUBLIC void HPGL2_graphics __PROTO((void));
+TERM_PUBLIC void PCL_graphics __PROTO((void));
+TERM_PUBLIC void HPGL_text __PROTO((void));
+/* TERM_PUBLIC void HPGL2_text __PROTO((void)); */
+TERM_PUBLIC void PCL_text __PROTO((void));
+TERM_PUBLIC void HPGL_linetype __PROTO((int linetype));
+TERM_PUBLIC void HPGL2_linetype __PROTO((int linetype));
+TERM_PUBLIC void HPGL_put_text __PROTO((unsigned int x, unsigned int y, char *str));
+TERM_PUBLIC void HPGL2_put_text __PROTO((unsigned int x, unsigned int y, char *str));
+TERM_PUBLIC void HPGL_move __PROTO((unsigned int x, unsigned int y));
+TERM_PUBLIC void HPGL_vector __PROTO((unsigned int x, unsigned int y));
+TERM_PUBLIC void HPGL2_move __PROTO((unsigned int x, unsigned int y));
+TERM_PUBLIC void HPGL2_vector __PROTO((unsigned int x, unsigned int y));
+TERM_PUBLIC void HPGL2_encode __PROTO((int d));
+TERM_PUBLIC int HPGL_text_angle __PROTO((int ang));
+TERM_PUBLIC int HPGL2_text_angle __PROTO((int ang));
+TERM_PUBLIC void HPGL_reset __PROTO((void));
+/* TERM_PUBLIC void HPGL2_reset __PROTO((void)); */
+TERM_PUBLIC void PCL_reset __PROTO((void));
+TERM_PUBLIC int HPGL2_justify_text __PROTO((enum JUSTIFY just));
+#define GOT_HPGL_PROTO
+#endif /* TERM_PROTO */
+
+#ifndef TERM_PROTO_ONLY
+#ifdef TERM_BODY
+/*
+ * The maximum plot size, in plotter units:
+ */
+
+#define HPGL_PUPI	1016	/* Plotter units per inch */
+  
+#define HPGL_XMAX_A	10000
+#define HPGL_YMAX_A	7500
+  
+#define HPGL_XMAX_B	15200
+#define HPGL_YMAX_B	10000
+
+#define HPGL_XMAX	HPGL_XMAX_A
+#define HPGL_YMAX	HPGL_YMAX_A
+  
+#define PCL_XMAX	HPGL_XMAX_A
+#define PCL_YMAX	(HPGL_YMAX_A-60)
+
+/*
+ * Tic sizes
+ */
+
+#define HPGL_VTIC	(HPGL_YMAX/70)
+#define HPGL_HTIC	(HPGL_YMAX/70)
+
+#define PCL_VTIC	(PCL_YMAX/70)
+#define PCL_HTIC	(PCL_YMAX/70)
+
+/*
+ * Font size for HPGL
+ */
+
+#define HPGL_VCHAR	(HPGL_YMAX/100*32/10) /* 3.2% */
+#define HPGL_HCHAR	(HPGL_XMAX/100*12/10) /* 1.2% */
+
+/*
+ * Font size for HPGL/2
+ */
+
+#define HPGL2_DEF_POINT	14	/* Height of font */
+
+#define HPGL2_DEF_PITCH	(3 * 72 / (HPGL2_DEF_POINT * 2))
+#define HPGL2_VCHAR	((int) HPGL_PUPI * HPGL2_DEF_POINT / 72)
+#define HPGL2_HCHAR	(HPGL2_VCHAR * 2 / 3)
+
+/*
+ * Control constants
+ */
+
+#define DOWN		0	/* Pen is down */
+#define UP 		1	/* Pen is up */
+#define UNKNOWN		-10	/* Unknown status for lots of things */
+
+/*
+ * For Polyline Encoded, either use base 64 or base 32.
+ * Save space with base 64, but get 8-bit characters.
+ */
+
+#ifdef NEXT
+/* unluckily TRUE is defined as ((boolean_t)1) in mach/boolean.h */
+#define HPGL2_BASE64 1
+#else
+#define HPGL2_BASE64 TRUE
+#endif
+
+#if HPGL2_BASE64
+#define HPGL2_BITS 6
+#define HPGL2_LOW_OFFS 63
+#define HPGL2_HIGH_OFFS 191
+#define HPGL2_MASK 63
+#else
+#define HPGL2_BITS 5
+#define HPGL2_LOW_OFFS 63
+#define HPGL2_HIGH_OFFS 95
+#define HPGL2_MASK 31
+#endif
+
+/*
+ * Data structures for options
+ */
+
+struct HPGL2_font_str {
+    char           *compare,
+                   *name;
+    int             symbol_set,
+                    spacing;
+    double          pitch,
+                    height;
+    int             posture,
+                    stroke_weight,
+                    typeface;
+};
+
+struct PCL_mode_str {
+    char           *compare,
+                   *name,
+                   *command;
+    int             xmax,
+                    ymax;
+};
+
+/*
+ * The default font goes first.  Although it is the ugliest,  the
+ * stick font is probably supported by the most devices, so it
+ * becomes the default.
+ */
+
+static struct HPGL2_font_str GPFAR HPGL2_font_table[] = {
+	    {"u$nivers", "univers", 277, 1, 0.0, HPGL2_DEF_POINT, 0, 0, 4148},
+		 {"s$tick", "stick", 277, 0, HPGL2_DEF_PITCH, 0.0, 0, 0, 48},
+	   {"c$g_times", "cg_times", 277, 1, 0.0, HPGL2_DEF_POINT, 0, 0, 4101}
+};
+
+#define HPGL2_FONTS (sizeof(HPGL2_font_table) / sizeof (struct HPGL2_font_str))
+static struct HPGL2_font_str *HPGL2_font = &HPGL2_font_table[0];
+
+/*
+ * The default mode goes first.  Landscape style plots are probably the
+ * most compatable with other HPGL devices.
+ */
+
+static struct PCL_mode_str GPFAR PCL_mode_table[] = {
+	      {"l$andscape", "landscape", "\033&l1O", PCL_XMAX, PCL_YMAX},
+		 {"p$ortrait", "portrait", "\033&l0O", PCL_YMAX, PCL_XMAX}
+};
+
+#define PCL_MODES (sizeof(PCL_mode_table) / sizeof (struct PCL_mode_str))
+static struct PCL_mode_str *PCL_mode = &PCL_mode_table[0];
+
+/*
+ * Various line types and widths to distinguish data sets
+ */
+
+static char    *HPGL2_lt[] = {"", "4,2", "5,2", "6,2", "7,2", "8,2"},
+               *HPGL2_pw[] = {".15", ".12", ".08"};
+
+#define HPGL2_LINETYPES (sizeof(HPGL2_lt) / sizeof(char *))
+#define HPGL2_PENWIDTHS (sizeof(HPGL2_pw) / sizeof(char *))
+
+/* encoding vector for cp850 , characters 128 (0200) -> 255 (0377) */
+
+static char hpgl_cp_850[128][4] = {
+
+/* 0200 */ "\0164\017",
+/* 0201 */ "\016O\017",
+/* 0202 */ "\016E\017",
+/* 0203 */ "\016@\017",
+/* 0204 */ "\016L\017",
+/* 0205 */ "\016H\017",
+/* 0206 */ "\016T\017",
+/* 0207 */ "\0165\017",
+
+/* 0210 */ "\016A\017",
+/* 0211 */ "\016M\017",
+/* 0212 */ "\016I\017",
+/* 0213 */ "\016]\017",
+/* 0214 */ "\016Q\017",
+/* 0215 */ "\016Y\017",
+/* 0216 */ "\016X\017",
+/* 0217 */ "\016P\017",
+
+/* 0220 */ "\016\134\017",
+/* 0221 */ "\016W\017",
+/* 0222 */ "\016S\017",
+/* 0223 */ "\016B\017",
+/* 0224 */ "\016N\017",
+/* 0225 */ "\016J\017",
+/* 0226 */ "\016C\017",
+/* 0227 */ "\016K\017",
+
+/* 0230 */ "\016o\017",
+/* 0231 */ "\016Z\017",
+/* 0232 */ "\016[\017",
+/* 0233 */ "\016V\017",
+/* 0234 */ "\016;\017",
+/* 0235 */ "\016R\017",
+/* 0236 */ "",
+/* 0237 */ "\016>\017",
+
+/* 0240 */ "\016D\017",
+/* 0241 */ "\016U\017",
+/* 0242 */ "\016F\017",
+/* 0243 */ "\016G\017",
+/* 0244 */ "\0167\017",
+/* 0245 */ "\0166\017",
+/* 0246 */ "\016y\017",
+/* 0247 */ "\016z\017",
+
+/* 0250 */ "\0169\017",
+
+/* 0251 */ "",
+/* 0252 */ "",
+
+/* 0253 */ "\016x\017",
+/* 0254 */ "\016w\017",
+/* 0255 */ "\0168\017",
+/* 0256 */ "\016{\017",
+/* 0257 */ "\016}\017",
+
+/* 0260 */ "",
+/* 0261 */ "",
+/* 0262 */ "",
+/* 0263 */ "",
+/* 0264 */ "",
+
+/* 0265 */ "\016`\017",
+/* 0266 */ "\016\042\017",
+/* 0267 */ "\016!\017",
+
+/* 0270 */ "",
+/* 0271 */ "",
+/* 0272 */ "",
+/* 0273 */ "",
+/* 0274 */ "",
+
+/* 0275 */ "\016?\017",
+/* 0276 */ "\016<\017",
+
+/* 0277 */ "",
+
+/* 0300 */ "",
+/* 0301 */ "",
+/* 0302 */ "",
+/* 0303 */ "",
+/* 0304 */ "",
+/* 0305 */ "",
+
+/* 0306 */ "\016b\017",
+/* 0307 */ "\016a\017",
+
+/* 0310 */ "",
+/* 0311 */ "",
+/* 0312 */ "",
+/* 0313 */ "",
+/* 0314 */ "",
+/* 0315 */ "",
+/* 0316 */ "",
+
+/* 0317 */ "\016:\017",
+
+/* 0320 */ "\016d\017",
+/* 0321 */ "\016c\017",
+/* 0322 */ "\016$\017",
+/* 0323 */ "\016%\017",
+/* 0324 */ "\016#\017",
+
+/* 0325 */ "",
+
+/* 0326 */ "\016e\017",
+/* 0327 */ "\016&\017",
+
+/* 0330 */ "\016'\017",
+
+/* 0331 */ "",
+/* 0332 */ "",
+/* 0333 */ "",
+/* 0334 */ "",
+/* 0335 */ "",
+
+/* 0336 */ "\016f\017",
+/* 0337 */ "",
+
+/* 0340 */ "\016g\017",
+/* 0341 */ "\016^\017",
+/* 0342 */ "\016_\017",
+/* 0343 */ "\016h\017",
+/* 0344 */ "\016j\017",
+/* 0345 */ "\016i\017",
+/* 0346 */ "",
+/* 0347 */ "\016q\017",
+
+/* 0350 */ "\016p\017",
+/* 0351 */ "\016m\017",
+/* 0352 */ "\016.\017",
+/* 0353 */ "\016-\017",
+/* 0354 */ "",
+/* 0355 */ "",
+/* 0356 */ "\0160\017",
+/* 0357 */ "\016(\017",
+
+/* 0360 */ "\016v\017",
+/* 0361 */ "\016~\017",
+/* 0362 */ "",
+/* 0363 */ "",
+/* 0364 */ "",
+/* 0365 */ "\016=\017",
+/* 0366 */ "",
+/* 0367 */ "",
+
+/* 0370 */ "\016z\017",
+/* 0371 */ "\016+\017",
+/* 0372 */ "",
+/* 0373 */ "",
+/* 0374 */ "",
+/* 0375 */ "",
+/* 0376 */ "",
+/* 0377 */ ""
+};
+
+
+/* encoding vector for iso-8859-1 , characters 128 (0200) -> 255 (0377) */
+
+static char hpgl_iso_8859_1[128][4] = {
+
+/* 0200 */ "",
+/* 0201 */ "",
+/* 0202 */ "",
+/* 0203 */ "",
+/* 0204 */ "",
+/* 0205 */ "",
+/* 0206 */ "",
+/* 0207 */ "",
+
+/* 0210 */ "",
+/* 0211 */ "",
+/* 0212 */ "",
+/* 0213 */ "",
+/* 0214 */ "",
+/* 0215 */ "",
+/* 0216 */ "",
+/* 0217 */ "",
+
+/* 0220 */ "",
+/* 0221 */ "\016\017",
+/* 0222 */ "\016\017",
+/* 0223 */ "",
+/* 0224 */ "",
+/* 0225 */ "",
+/* 0226 */ "",
+/* 0227 */ "",
+
+/* 0230 */ "",
+/* 0231 */ "",
+/* 0232 */ "",
+/* 0233 */ "",
+/* 0234 */ "",
+/* 0235 */ "",
+/* 0236 */ "",
+/* 0237 */ "",
+
+/* 0240 */ "",
+/* 0241 */ "\0168\017",
+/* 0242 */ "\0165\017",
+/* 0243 */ "\016;\017",
+/* 0244 */ "\016:\017",
+/* 0245 */ "\016<\017",
+/* 0246 */ "\017|\017",
+/* 0247 */ "\016=\017",
+
+/* 0250 */ "\016+\017",
+/* 0251 */ "",
+/* 0252 */ "\016y\017",
+/* 0253 */ "\016{\017",
+/* 0254 */ "",
+/* 0255 */ "",
+/* 0256 */ "",
+/* 0257 */ "\0160\017",
+
+/* 0260 */ "\016z\017",
+/* 0261 */ "\016~\017",
+/* 0262 */ "",
+/* 0263 */ "",
+/* 0264 */ "",
+/* 0265 */ "",
+/* 0266 */ "",
+/* 0267 */ "",
+
+/* 0270 */ "",
+/* 0271 */ "",
+/* 0272 */ "\016z\017",
+/* 0273 */ "\016}\017",
+/* 0274 */ "\016w\017",
+/* 0275 */ "\016x\017",
+/* 0276 */ "",
+/* 0277 */ "\0169\017",
+
+/* 0300 */ "\016!\017",
+/* 0301 */ "\016`\017",
+/* 0302 */ "\016\042\017",
+/* 0303 */ "\016a\017",
+/* 0304 */ "\016X\017",
+/* 0305 */ "\016P\017",
+/* 0306 */ "\016S\017",
+/* 0307 */ "\0164\017",
+
+/* 0310 */ "\016#\017",
+/* 0311 */ "\016\134\017",
+/* 0312 */ "\016$\017",
+/* 0313 */ "\016%\017",
+/* 0314 */ "\016f\017",
+/* 0315 */ "\016e\017",
+/* 0316 */ "\016\046\017",
+/* 0317 */ "\016'\017",
+
+/* 0320 */ "\016c\017",
+/* 0321 */ "\0166\017",
+/* 0322 */ "\016h\017",
+/* 0323 */ "\016g\017",
+/* 0324 */ "\016_\017",
+/* 0325 */ "\016i\017",
+/* 0326 */ "\016Z\017",
+/* 0327 */ "",
+
+/* 0330 */ "\016R\017",
+/* 0331 */ "\016-\017",
+/* 0332 */ "\016m\017",
+/* 0333 */ "\016.\017",
+/* 0334 */ "\016[\017",
+/* 0335 */ "",
+/* 0336 */ "\016p\017",
+/* 0337 */ "\016^\017",
+
+/* 0340 */ "\016H\017",
+/* 0341 */ "\016D\017",
+/* 0342 */ "\016@\017",
+/* 0343 */ "\016b\017",
+/* 0344 */ "\016L\017",
+/* 0345 */ "\016T\017",
+/* 0346 */ "\016W\017",
+/* 0347 */ "\0165\017",
+
+/* 0350 */ "\016I\017",
+/* 0351 */ "\016E\017",
+/* 0352 */ "\016A\017",
+/* 0353 */ "\016M\017",
+/* 0354 */ "\016Y\017",
+/* 0355 */ "\016U\017",
+/* 0356 */ "\016Q\017",
+/* 0357 */ "\016]\017",
+
+/* 0360 */ "\016d\017",
+/* 0361 */ "\0167\017",
+/* 0362 */ "\016J\017",
+/* 0363 */ "\016F\017",
+/* 0364 */ "\016B\017",
+/* 0365 */ "\016j\017",
+/* 0366 */ "\016N\017",
+/* 0367 */ "",
+
+/* 0370 */ "\016V\017",
+/* 0371 */ "\016K\017",
+/* 0372 */ "\016G\017",
+/* 0373 */ "\016C\017",
+/* 0374 */ "\016O\017",
+/* 0375 */ "",
+/* 0376 */ "\016q\017",
+/* 0377 */ "\016o\017"
+};
+
+
+/*
+ * Static variables to keep track of where we are, etc.
+ */
+
+static int      HPGL_ang = 0,
+                HPGL_x = UNKNOWN,
+                HPGL_y = UNKNOWN,
+                HPGL_penstate = UNKNOWN,
+                HPGL_pentype = UNKNOWN,
+                HPGL2_in_pe,
+                HPGL2_lost;
+
+/*
+ * The subroutines, grouped by function for different versions.
+ */
+
+static int HPGL_numpen,HPGL_eject;
+
+TERM_PUBLIC void HPGL_options ()
+{
+  HPGL_numpen = 6; /* default to six pens */
+  HPGL_eject = 0; /* default to no eject */
+
+  while (!END_OF_COMMAND) {
+	if (almost_equals(c_token,"eje$ct")) HPGL_eject = 1;
+	else if (isanumber(c_token)) {
+	    HPGL_numpen = (int) real(&token[c_token].l_val);
+	    if (HPGL_numpen <= 0) {
+		HPGL_numpen = 6;
+		int_error ("Number of pens must be positive", c_token);
+	    }
+	}
+	else int_error ("expecting \"eject\" or number of pens", c_token);
+
+	c_token++;
+  }
+
+
+  sprintf(term_options,"%d pens %s",HPGL_numpen,
+  HPGL_eject ? "eject" : "noeject");
+}
+
+TERM_PUBLIC void HPGL2_options ()
+{
+    struct termentry *t = term;
+    int             i;
+    double          point_size;
+    char	   tmp_options[MAX_ID_LEN];
+    if (!END_OF_COMMAND) {
+	for (i = 0; i < HPGL2_FONTS &&
+	     !almost_equals (c_token, HPGL2_font_table[i].compare); i++);
+	if (i < HPGL2_FONTS) {
+	    HPGL2_font = &HPGL2_font_table[i];
+	} else
+	    int_error ("expecting font: stick, cg_times, or univers", c_token);
+	c_token++;
+	if (!END_OF_COMMAND) {
+	    if ((point_size = real(&token[c_token].l_val)) > 0.0) {
+		t->v_char = (int) HPGL_PUPI *point_size / 72;
+		t->h_char = t->v_char * 2 / 3;
+		if (HPGL2_font->spacing)
+		    HPGL2_font->height = point_size;
+		else
+		    HPGL2_font->pitch = 72 * 3 / (point_size * 2);
+	    } else
+		int_error ("expecting font point size: real number",c_token);
+	    c_token++;
+	}
+    }
+    sprintf (tmp_options, " %s", HPGL2_font->name);
+    strcat(term_options,tmp_options);
+    if (HPGL2_font->spacing){
+	sprintf (tmp_options, " %f",
+		  HPGL2_font->height);
+	strcat(term_options,tmp_options);
+    }else{
+	sprintf (tmp_options, " %f",
+		  HPGL2_font->pitch);
+        strcat(term_options,tmp_options);
+    }
+}
+
+TERM_PUBLIC void PCL_options ()
+{
+    int             i;
+    if (!END_OF_COMMAND) {
+	for (i = 0; i < PCL_MODES &&
+	     !almost_equals (c_token, PCL_mode_table[i].compare); i++);
+	if (i < PCL_MODES)
+	    PCL_mode = &PCL_mode_table[i];
+	else
+	    int_error ("expecting mode: portrait or landscape", c_token);
+	c_token++;
+    }
+    sprintf (term_options, " %s", PCL_mode->name);
+    HPGL2_options ();
+}
+
+TERM_PUBLIC void HPGL_init ()
+{
+}
+
+/* void HPGL2_init ()
+{
+} */
+
+TERM_PUBLIC void PCL_init ()
+{
+    struct termentry *t = term;
+/*
+ * Reset printer, set to one copy, orientation of user's choice.
+ * Make the change to the new orientation all at once.
+ */
+    fprintf (outfile, "\033E\033&l1X%s\n", PCL_mode->command);
+    t->xmax = PCL_mode->xmax;
+    t->ymax = PCL_mode->ymax;
+}
+
+TERM_PUBLIC void HPGL_graphics()
+{
+	fputs("\033.Y\n\033.I81;;17:\033.N;19:\033.M500:\n",outfile);
+/*	       1
+	1. enable eavesdropping
+*/
+	fprintf(outfile,
+	"IN;%s\nSC0,%d,0,%d;\nSR%f,%f;\n",
+	((encoding == ENCODING_CP_850)||(encoding == ENCODING_ISO_8859_1)) ? 
+                "CA7;" : "",
+		HPGL_XMAX,HPGL_YMAX,
+		((double)(HPGL_HCHAR)*200/3/HPGL_XMAX),
+		((double)(HPGL_VCHAR)*100/2/HPGL_YMAX) );
+/*	 1    2             3 
+	1. reset to power-up defaults
+	2. set SCaling
+	3. set character size
+*/
+	HPGL_ang = 0;
+}
+
+TERM_PUBLIC void HPGL2_graphics ()
+{
+/*
+ * IN - Initialize
+ * SP - Select pen
+ * SD - Set default font
+ */
+    fprintf (outfile, "INSP1SD1,%d,2,%d,",
+	     HPGL2_font->symbol_set, HPGL2_font->spacing);
+    if (HPGL2_font->spacing)
+	fprintf (outfile, "4,%f,", HPGL2_font->height);
+    else
+	fprintf (outfile, "3,%f,", HPGL2_font->pitch);
+    fprintf (outfile, "5,%d,6,%d,7,%d\n", HPGL2_font->posture,
+	     HPGL2_font->stroke_weight, HPGL2_font->typeface);
+/*
+ * Control variables
+ */
+    HPGL_ang = 0;		/* Horizontal */
+    HPGL2_in_pe = FALSE;	/* Not in PE command */
+    HPGL2_lost = TRUE;		/* Pen position is unknown */
+    HPGL_penstate = UP;		/* Pen is up */
+}
+
+TERM_PUBLIC void PCL_graphics ()
+{
+/*
+ * Enter HPGL/2 graphics mode
+ */
+    fputs ("\033%0B", outfile);
+    HPGL2_graphics ();
+}
+
+TERM_PUBLIC void HPGL_text ()
+{
+    if (HPGL_eject == 0) {
+	 fputs ("PUSP0;\033.Z\n\0", outfile);
+/*		 1 2   3
+	1. pen up
+	2. park pen
+	3. disable eavesdropping
+*/
+    }
+    else
+    {
+         fputs ("PUSP0;PG;\033.Z\n\0", outfile);
+/*		 1 2   3  4
+	1. pen up
+	2. park pen
+	3. page eject
+	4. disable eavesdropping
+*/
+    }
+    HPGL_penstate = UP;
+}
+
+#if 0 /* not used */
+void HPGL2_text ()
+{
+/*
+ * If in Polyline Encoded command, leave Polyline Encoded command
+ */
+    if (HPGL2_in_pe) {
+	fputs (";\n", outfile);
+	HPGL2_in_pe = 0;
+    }
+/*
+ * Pen up, park pen
+ */
+    fputs ("PUSP0;", outfile);
+}
+#endif
+
+TERM_PUBLIC void PCL_text ()
+{
+    if (HPGL2_in_pe) {
+	fputs (";\n", outfile);
+	HPGL2_in_pe = 0;
+    }
+/*
+ * Go into PCL mode and eject the page
+ */
+    fputs ("\033%1A\033&l0H\n\0", outfile);
+}
+
+TERM_PUBLIC void HPGL_linetype (linetype)
+    int             linetype;
+{
+/* allow for set number of pens */
+    linetype = (linetype + 2) % HPGL_numpen + 1;
+/* only select pen if necessary */
+    if (HPGL_pentype != linetype) {
+	fprintf (outfile, "PU;\nSP%d;\n", linetype);
+	HPGL_pentype = linetype;
+	HPGL_penstate = UP;
+    }
+}
+
+TERM_PUBLIC void HPGL2_linetype (linetype)
+    int             linetype;
+{
+/*
+ * If in Polyline Encoded command, leave Polyline Encoded command
+ */
+    if (HPGL2_in_pe) {
+	fputs (";\n", outfile);
+	HPGL2_in_pe = 0;
+    }
+/*
+ * Allow for lots of linetypes
+ */
+    if (linetype >= 0)
+	linetype = linetype % (HPGL2_LINETYPES * HPGL2_PENWIDTHS);
+    if (linetype != HPGL_pentype) {
+	if (linetype >= 0) {
+	    fprintf (outfile, "PW%sLT%s",
+		     HPGL2_pw[linetype / HPGL2_LINETYPES],
+		     HPGL2_lt[linetype % HPGL2_LINETYPES]);
+	} else if (linetype == -2)
+/*
+ * Borders and tics
+ */
+	    fprintf (outfile, "PW.2LT");
+	else if (linetype == -1)
+/*
+ * Axes and grids
+ */
+	    fprintf (outfile, "PW.1LT1,.25");
+	HPGL_pentype = linetype;
+    }
+}
+
+TERM_PUBLIC void HPGL_put_text (x, y, str)
+    unsigned int    x,
+                    y;
+    char           *str;
+{
+    if (HPGL_ang == 1)
+	HPGL_move (x + HPGL_VCHAR / 4, y);
+    else
+	HPGL_move (x, y - HPGL_VCHAR / 4);
+	if (encoding == ENCODING_CP_850)
+	{
+		unsigned char *s;
+		fputs("LB", outfile);
+		for (s=(unsigned char *)str; *s; ++s)
+			if (*s >= 128 && hpgl_cp_850[*s - 128][0])
+				fputs(hpgl_cp_850[*s - 128], outfile);
+			else
+				putc(*s, outfile);
+		fputs("\003\n", outfile);
+	}
+	else if (encoding == ENCODING_ISO_8859_1)
+	{
+		unsigned char *s;
+		fputs("LB", outfile);
+		for (s=(unsigned char *)str; *s; ++s)
+			if (*s >= 128 && hpgl_iso_8859_1[*s - 128][0])
+				fputs(hpgl_iso_8859_1[*s - 128], outfile);
+			else
+				putc(*s, outfile);
+		fputs("\003\n", outfile);
+	}
+	else
+    fprintf (outfile, "LB%s\003\n", str);
+}
+
+TERM_PUBLIC void HPGL2_put_text (x, y, str)
+    unsigned int    x,
+                    y;
+    char           *str;
+{
+    struct termentry *t = term;
+/*
+ * Position the pen
+ */
+    if (HPGL_ang == 1)
+	HPGL2_move (x + t->v_char / 4, y);
+    else
+	HPGL2_move (x, y - t->v_char / 4);
+/*
+ * If in Polyline Encoded command, leave Polyline Encoded command
+ */
+    if (HPGL2_in_pe) {
+	fputs (";\n", outfile);
+	HPGL2_in_pe = 0;
+    }
+/*
+ * Print the text string
+ */
+    fprintf (outfile, "LB%s\003\n", str);
+    HPGL2_lost = 1;
+}
+/*
+ * Some early HPGL plotters (e.g. HP7220C) require the
+ * Pen Up/Down and Pen (move) Absolute commands to be separate.
+ */
+
+TERM_PUBLIC void HPGL_move (x, y)
+    unsigned int    x,
+                    y;
+{
+    if (HPGL_x != x || HPGL_y != y) {		/* only move if necessary */
+	fprintf (outfile, "PU;PA%d,%d;\n", x, y);
+	HPGL_penstate = UP;
+	HPGL_x = x;
+	HPGL_y = y;
+    }
+}
+
+TERM_PUBLIC void HPGL_vector (x, y)
+    unsigned int    x,
+                    y;
+{
+    if (HPGL_penstate != DOWN) {
+	fprintf (outfile, "PD;PA%d,%d;\n", x, y);
+	HPGL_penstate = DOWN;
+    } else
+	fprintf (outfile, "PA%d,%d;\n", x, y);
+    HPGL_x = x;
+    HPGL_y = y;
+}
+
+TERM_PUBLIC void HPGL2_move (x, y)
+    unsigned int    x,
+                    y;
+{
+    register int    dx,
+                    dy;
+    if (HPGL2_in_pe) {
+	dx = x - HPGL_x;
+	dy = y - HPGL_y;
+	fputs ("<", outfile);
+    } else {
+#if HPGL2_BASE64
+	fputs ("PE<", outfile);
+#else
+	fputs ("PE7<", outfile);
+#endif
+	if (HPGL2_lost) {
+	    dx = x;
+	    dy = y;
+	    HPGL2_lost = 0;
+	    fputs ("=", outfile);
+	} else {
+	    dx = x - HPGL_x;
+	    dy = y - HPGL_y;
+	}
+	HPGL2_in_pe = 1;
+    }
+#if HPGL2_EXPLICIT_PD
+    if (HPGL_penstate == DOWN)
+	HPGL_penstate = UP;
+#endif
+    HPGL2_encode (dx);
+    HPGL2_encode (dy);
+    fputs("\n",outfile);
+    HPGL_x = x;
+    HPGL_y = y;
+}
+
+TERM_PUBLIC void HPGL2_vector (x, y)
+    unsigned int    x,
+                    y;
+{
+    register int    dx,
+                    dy;
+    if (HPGL2_in_pe) {
+	dx = x - HPGL_x;
+	dy = y - HPGL_y;
+    } else {
+#if HPGL2_BASE64
+	fputs ("PE", outfile);
+#else
+	fputs ("PE7", outfile);
+#endif
+	if (HPGL2_lost) {
+	    dx = x;
+	    dy = y;
+	    HPGL2_lost = 0;
+	    fputs ("=", outfile);
+	} else {
+	    dx = x - HPGL_x;
+	    dy = y - HPGL_y;
+	}
+	HPGL2_in_pe = 1;
+    }
+#if HPGL2_EXPLICIT_PD
+/*
+ * Put the pen down in the current position,
+ * relative vector of 0,0.
+ */
+    if (HPGL_penstate == UP) {
+	fputc ((char) HPGL2_HIGH_OFFS, outfile);
+	fputc ((char) HPGL2_HIGH_OFFS, outfile);
+	HPGL_penstate = DOWN;
+    }
+#endif
+    HPGL2_encode (dx);
+    HPGL2_encode (dy);
+    fputs("\n",outfile);
+    HPGL_x = x;
+    HPGL_y = y;
+}
+
+/*
+ * Routine to encode position in base 32 or base 64 characters
+ */
+
+TERM_PUBLIC void HPGL2_encode (d)
+    register int    d;
+{
+    register int    c;
+    if ((d <<= 1) < 0)
+	d = 1 - d;
+    do {
+	c = d & HPGL2_MASK;
+	d >>= HPGL2_BITS;
+	if (d > 0)
+	    fputc ((char) (c + HPGL2_LOW_OFFS), outfile);
+	else
+	    fputc ((char) (c + HPGL2_HIGH_OFFS), outfile);
+    } while (d > 0);
+}
+
+TERM_PUBLIC int HPGL_text_angle (ang)
+    int             ang;
+{
+    HPGL_ang = ang;
+    if (ang == 1)
+/*
+ *  Vertical
+ */
+	fprintf (outfile, "DI0,1;\n");
+    else
+/*
+ * Horizontal
+ */
+	fprintf (outfile, "DI1,0;\n");
+    return TRUE;
+}
+
+TERM_PUBLIC int HPGL2_text_angle (ang)
+    int             ang;
+{
+/*
+ * If in Polyline Encoded command, leave Polyline Encoded command
+ */
+    if (HPGL2_in_pe) {
+	fputs (";", outfile);
+	HPGL2_in_pe = 0;
+    }
+    if (ang == 1)
+/*
+ *  Vertical
+ */
+	fprintf (outfile, "DI0,1");
+    else
+/*
+ * Horizontal
+ */
+	fprintf (outfile, "DI1,0");
+    HPGL_ang = ang;
+    return TRUE;
+}
+
+TERM_PUBLIC void HPGL_reset ()
+{
+/*
+ * do nothing
+ */
+}
+
+#if 0
+void HPGL2_reset ()
+{
+/*
+ * Park the pen
+ * Advance a page
+ * End with ";"
+ */
+    fputs ("SP0PG;\n", outfile);
+}
+#endif
+
+TERM_PUBLIC void PCL_reset ()
+{
+/*
+ * Return to PCL mode
+ * Printer reset (conditional eject)
+ */
+    fputs ("\033%0A\033E\n", outfile);
+}
+
+TERM_PUBLIC int HPGL2_justify_text (just)
+    enum JUSTIFY just;
+{
+/*
+ * If in Polyline Encoded command, leave Polyline Encoded command
+ */
+    if (HPGL2_in_pe) {
+	fputs (";\n", outfile);
+	HPGL2_in_pe = 0;
+    }
+    switch (just) {
+    case LEFT:
+	fputs ("LO1", outfile);
+	break;
+    case CENTRE:
+	fputs ("LO4", outfile);
+	break;
+    case RIGHT:
+	fputs ("LO7", outfile);
+	break;
+    default:
+	return 0;
+    }
+    return 1;
+}
+
+#endif /* TERM_BODY */
+
+#ifdef TERM_TABLE
+TERM_TABLE_START(hpgl_driver)
+   "hpgl", "HP7475 and (hopefully) lots of others [number of pens] [eject]",
+           HPGL_XMAX, HPGL_YMAX, HPGL_VCHAR, HPGL_HCHAR,
+           HPGL_VTIC, HPGL_HTIC, HPGL_options, HPGL_init, HPGL_reset,
+           HPGL_text, null_scale, HPGL_graphics, HPGL_move, HPGL_vector,
+           HPGL_linetype, HPGL_put_text, HPGL_text_angle, 
+           null_justify_text, do_point, do_arrow, set_font_null
+TERM_TABLE_END(hpgl_driver)
+#undef LAST_TERM
+#define LAST_TERM hpgl_driver
+TERM_TABLE_START(pcl5_driver)
+    "pcl5", "HP LaserJet III [mode] [font] [point]",
+	PCL_XMAX, PCL_YMAX, HPGL2_VCHAR, HPGL2_HCHAR,
+	PCL_VTIC, PCL_HTIC, PCL_options, PCL_init, PCL_reset,
+	PCL_text, null_scale, PCL_graphics, HPGL2_move, HPGL2_vector,
+	HPGL2_linetype, HPGL2_put_text, HPGL2_text_angle,
+	HPGL2_justify_text, do_point, do_arrow, set_font_null
+TERM_TABLE_END(pcl5_driver)
+#undef LAST_TERM
+#define LAST_TERM pcl5_driver
+#endif /* TERM_TABLE */
+
+#endif /* TERM_PROTO_ONLY */
+
+#ifdef TERM_HELP
+START_HELP(hpgl)
+"1 hpgl",
+"?set terminal hpgl",
+"?set term hpgl",
+"?terminal hpgl",
+"?term hpgl",
+"?hpgl",
+"?set terminal pcl5",
+"?set term pcl5",
+"?terminal pcl5",
+"?term pcl5",
+"?pcl5",
+" The `hpgl` driver produces HPGL output for devices like the HP7475A plotter.",
+" There are two options which can be set---the number of pens and \"eject\", which",
+" tells the plotter to eject a page when done.  The default is to use 6 pens",
+" and not to eject the page when done.",
+"",
+" The international character sets ISO-8859-1 and CP850 are recognized via",
+" `set encoding iso_8859_1` or `set encoding cp850` (see `set encoding` for",
+" details).",
+"",
+" Syntax:",
+"       set terminal hpgl {<number_of_pens>} {eject}",
+"",
+" The selection",
+"",
+"       set terminal hpgl 8 eject",
+"",
+" is equivalent to the previous `hp7550` terminal, and the selection",
+"",
+"       set terminal hpgl 4",
+"",
+" is equivalent to the previous `hp7580b` terminal.",
+"",
+" The `pcl5` driver supports the Hewlett-Packard Laserjet III.  It actually uses",
+" HPGL-2, but there is a name conflict among the terminal devices.  It has",
+" several options",
+"",
+" Syntax:",
+"       set terminal pcl5 {<mode>} {<font>} {<fontsize>}",
+"",
+" where <mode> is `landscape`, or `portrait`, <font> is `stick`, `univers`, or",
+" `cg_times`, and <fontsize> is the size in points.",
+"",
+" With `pcl5` international characters are handled by the printer; you just put",
+" the appropriate 8-bit character codes into the text strings.  You don't need",
+" to bother with `set encoding`.",
+"",
+" HPGL graphics can be imported by many software packages."
+END_HELP(hpgl)
+#endif

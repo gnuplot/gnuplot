@@ -1,0 +1,186 @@
+/*
+ * $Id: dxy.trm,v 1.11 1997/04/10 02:34:11 drd Exp $
+ *
+ */
+
+/* GNUPLOT - dxy.trm */
+/*
+ * Copyright (C) 1990 - 1993, 1997
+ *
+ * Permission to use, copy, and distribute this software and its
+ * documentation for any purpose with or without fee is hereby granted, 
+ * provided that the above copyright notice appear in all copies and 
+ * that both that copyright notice and this permission notice appear 
+ * in supporting documentation.
+ *
+ * Permission to modify the software is granted, but not the right to
+ * distribute the modified code.  Modifications are to be distributed 
+ * as patches to released version.
+ *  
+ * This software  is provided "as is" without express or implied warranty.
+ * 
+ * This file is included by ../term.c.
+ *
+ * This terminal driver supports:
+ *  Roland DXY800A plotter 
+ *
+ * AUTHORS
+ *  Martin Yii, eln557h@monu3.OZ
+ *  Further modified Jan 1990 by Russell Lang, rjl@monu1.cc.monash.oz
+ * 
+ * send your comments or suggestions to (info-gnuplot@dartmouth.edu).
+ * 
+ */
+
+/*
+ * adapted to the new terminal layout by Stefan Bodewig (Dec. 1995)
+ */
+
+#ifndef GOT_DRIVER_H
+#include "driver.h"
+#endif
+
+#ifdef TERM_REGISTER
+register_term(dxy800a)
+#endif
+
+#ifdef TERM_PROTO
+TERM_PUBLIC void DXY_init __PROTO((void));
+TERM_PUBLIC void DXY_graphics __PROTO((void));
+TERM_PUBLIC void DXY_text __PROTO((void));
+TERM_PUBLIC void DXY_linetype __PROTO((int linetype));
+TERM_PUBLIC void DXY_move __PROTO((unsigned int x, unsigned int y));
+TERM_PUBLIC void DXY_vector __PROTO((unsigned int x, unsigned int y));
+TERM_PUBLIC void DXY_put_text __PROTO((unsigned int x, unsigned int y, char *str));
+TERM_PUBLIC int DXY_text_angle __PROTO((int ang));
+TERM_PUBLIC void DXY_reset __PROTO((void));
+
+#define DXY_XMAX 2470
+#define DXY_YMAX 1700
+
+#define DXY_XLAST (DXY_XMAX - 1)
+#define DXY_YLAST (DXY_XMAX - 1)
+
+#define DXY_VCHAR	(56)	/* double actual height of characters */
+#define DXY_HCHAR	(28)	/* actual width including spacing */
+#define DXY_VTIC	(28)		
+#define DXY_HTIC	(28)		
+#endif /* TERM_PROTO */
+
+#ifndef TERM_PROTO_ONLY
+#ifdef TERM_BODY
+
+int dxy_angle = 0;
+
+TERM_PUBLIC void DXY_init()
+{
+/*
+	No initialisation sequences for DXY 800A
+*/
+}
+
+
+TERM_PUBLIC void DXY_graphics()
+{
+	/* HOME, Character size 3 */
+	fprintf(outfile,"H\nS3\n");
+}
+
+
+TERM_PUBLIC void DXY_text()
+{
+/*
+	No sequences needed
+*/
+}
+
+
+TERM_PUBLIC void DXY_linetype(linetype)
+int linetype;
+{
+    /* select pen */
+	fprintf(outfile,"J%d\n",(linetype+2)%8+1);
+	switch(linetype) {
+	   case -1 :  /* use dotted line for axis */
+	   	    fprintf(outfile,"L1\nB50\n");
+			break;
+	   default :  /* use solid line for all others */
+			fprintf(outfile,"L0\n");
+	    		break;
+   	}
+}
+
+
+TERM_PUBLIC void DXY_move(x,y)
+unsigned int x,y;
+{
+	fprintf(outfile,"M%d,%d\n",x,y);
+}
+
+
+TERM_PUBLIC void DXY_vector(x,y)
+unsigned int x,y;
+{
+	fprintf(outfile,"D%d,%d\n",x,y);
+}
+
+
+TERM_PUBLIC void DXY_put_text(x,y,str)
+unsigned int x, y;
+char *str;
+{
+	if (dxy_angle == 1 ) 
+		/* vertical */
+		DXY_move(x + DXY_VCHAR/4,y);
+	else
+		/* horiz */
+		DXY_move(x,y - DXY_VCHAR/4);
+	fprintf(outfile,"P%s\n",str);
+}
+
+
+TERM_PUBLIC int DXY_text_angle(ang)
+int ang;
+{
+	dxy_angle = ang;
+	fprintf(outfile,"Q%d\n",ang);
+	return TRUE;
+}
+
+
+TERM_PUBLIC void DXY_reset()
+{
+	/* Home pen */
+	fprintf(outfile,"H\n");
+}
+
+#endif /* TERM_BODY */
+
+#ifdef TERM_TABLE
+
+TERM_TABLE_START(dxy_driver)
+    "dxy800a", "Roland DXY800A plotter",
+	   DXY_XMAX, DXY_YMAX, DXY_VCHAR, DXY_HCHAR,
+	   DXY_VTIC, DXY_HTIC, options_null, DXY_init, DXY_reset,
+	   DXY_text, null_scale, DXY_graphics, DXY_move, DXY_vector,
+	   DXY_linetype, DXY_put_text, DXY_text_angle, 
+	   null_justify_text, do_point, do_arrow, set_font_null
+TERM_TABLE_END(dxy_driver)
+
+#undef LAST_TERM
+#define LAST_TERM dxy_driver
+
+#endif /* TERM_TABLE */
+#endif /* TERM_PROTO_ONLY */
+
+#ifdef TERM_HELP
+START_HELP(dxy800a)
+"1 dxy800a",
+"?set terminal dxy800a",
+"?set term dxy800a",
+"?terminal dxy800a",
+"?term dxy800a",
+"?dxy800a",
+" This terminal driver supports the Roland DXY800A plotter.  It has no options."
+END_HELP(dxy800a)
+#endif

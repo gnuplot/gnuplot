@@ -1,0 +1,1710 @@
+/*
+ * $Id: post.trm,v 1.43 1997/07/22 23:24:44 drd Exp $
+ */
+
+/* GNUPLOT - post.trm */
+/*
+ * Copyright (C) 1990 - 1993, 1997   
+ *
+ * Permission to use, copy, and distribute this software and its
+ * documentation for any purpose with or without fee is hereby granted, 
+ * provided that the above copyright notice appear in all copies and 
+ * that both that copyright notice and this permission notice appear 
+ * in supporting documentation.
+ *
+ * Permission to modify the software is granted, but not the right to
+ * distribute the modified code.  Modifications are to be distributed 
+ * as patches to released version.
+ *  
+ * This software  is provided "as is" without express or implied warranty.
+ * 
+ * This terminal driver supports:
+ *     postscript
+ *
+ * AUTHORS
+ *  Russell Lang
+ *
+ * modified 10/5/95 by drd - put in support for other postscript drivers
+ * (enhpost, pslatex, ...) so they dont have to work quite so hard
+ * 
+ * send your comments or suggestions to (info-gnuplot@dartmouth.edu).
+ *
+ * The 'postscript' driver produces landscape output 10" wide and 7" high.  
+ * To change font to Times-Roman and font size to 20pts use 
+ * 'set term postscript "Times-Roman" 20'.
+ * To get a smaller (5" x 3.5") eps output use 'set term post eps'
+ * and make only one plot per file.  Font size for eps will be half
+ * the specified size.
+ *
+ * Erik Luijten 30/5/97: added %%CreationDate, made %%DocumentFonts conform
+ *                       to DSC, added version no. and patchl. to %%Creator
+ */
+
+#ifndef GOT_DRIVER_H
+#include "driver.h"
+#endif
+
+#ifdef TERM_REGISTER
+register_term(post)
+#endif
+
+#ifdef TERM_PROTO
+TERM_PUBLIC void PS_options __PROTO((void));
+TERM_PUBLIC void PS_common_init __PROTO((int encap, int portrait, int uses_fonts, unsigned int xoff, unsigned int yoff, unsigned int bb_xmin, unsigned int bb_ymin, unsigned int bb_xmax, unsigned int bb_ymax, char **dict));
+TERM_PUBLIC void PS_init __PROTO((void));
+TERM_PUBLIC void PS_graphics __PROTO((void));
+TERM_PUBLIC void PS_text __PROTO((void));
+TERM_PUBLIC void PS_reset __PROTO((void));
+TERM_PUBLIC void PS_linetype __PROTO((int linetype));
+TERM_PUBLIC void PS_move __PROTO((unsigned int x, unsigned int y));
+TERM_PUBLIC void PS_vector __PROTO((unsigned int x, unsigned int y));
+TERM_PUBLIC void PS_put_text __PROTO((unsigned int x, unsigned int y, char *str));
+TERM_PUBLIC void ENHPS_put_text __PROTO((unsigned int x, unsigned int y, char *str));
+TERM_PUBLIC int PS_text_angle __PROTO((int ang));
+TERM_PUBLIC int PS_justify_text __PROTO((enum JUSTIFY mode));
+TERM_PUBLIC void PS_point __PROTO((unsigned int x, unsigned int y, int number));
+TERM_PUBLIC int PS_set_font __PROTO((char * font));
+TERM_PUBLIC int ENHPS_set_font __PROTO((char * font));
+TERM_PUBLIC void PS_fillbox __PROTO((int style, unsigned int x1, unsigned int y1, unsigned int width, unsigned int height));
+TERM_PUBLIC void PS_linewidth __PROTO((double linewidth)); /* JFi [linewidth] */
+TERM_PUBLIC void PS_pointsize __PROTO((double pointsize)); /* JFi [pointsize] */
+
+#define PS_POINT_TYPES 8
+#define PS_XOFF	50	/* page offset in pts */
+#define PS_YOFF	50
+#define PS_XMAX 7200 /* assumes landscape */
+#define PS_YMAX 5040
+#define PS_XLAST (PS_XMAX - 1)
+#define PS_YLAST (PS_YMAX - 1)
+#define PS_VTIC (PS_YMAX/80)
+#define PS_HTIC (PS_YMAX/80)
+#define PS_SC (10)				/* scale is 1pt = 10 units */
+#define	PS_LW (0.5*PS_SC)		/* linewidth = 0.5 pts */
+#define PS_VCHAR (14*PS_SC)		/* default is 14 point characters */
+#define PS_HCHAR (14*PS_SC*6/10)
+
+#define GOT_POST_PROTO
+#endif
+
+
+#ifndef TERM_PROTO_ONLY
+
+#ifdef TERM_BODY
+/* PostScript driver by Russell Lang, rjl@monu1.cc.monash.edu.au */
+
+#define PS_FLUSH_PATH if (ps_path_count) { fprintf(outfile, "stroke "); ps_path_count = 0; }
+
+static char *PS_RememberFont __PROTO((char *fname, int reencode));
+static void ENHPS_put_text __PROTO((unsigned int x, unsigned int y, char *str));
+static char *ENHPS_recurse __PROTO((char *p, TBOOLEAN brace, char *fontname, double fontsize, double base, TBOOLEAN widthflag, TBOOLEAN showflag));
+static char ps_font[MAX_ID_LEN+1] = "Helvetica" ; /* name of font */
+static int ps_fontsize = 14;					 /* size of font in pts */
+
+/* for enhanced mode, we keep a separate font name and size, which
+ * is restored to the default value on font of ""
+ */
+static char ps_enh_font[MAX_ID_LEN+1];
+static int  ps_enh_fontsize;
+
+static TBOOLEAN ps_portrait = FALSE;				 /* vertical page */
+static TBOOLEAN ps_color = FALSE;
+static TBOOLEAN ps_solid = FALSE;   		/*  use solid lines */
+static TBOOLEAN ps_eps = FALSE;	/* Is this for an eps file? */
+			/* Added by Robert Davis <davis@ecn.purdue.edu> */
+static int ps_page=0;			/* page count */
+static int ps_path_count=0; 	/* count of lines in path */
+static int ps_ang=0;			/* text angle */
+static enum JUSTIFY ps_justify=LEFT;	/* text is flush left */
+
+/* added by Matt Heffron <heffron@falstaff.css.beckman.com> */
+static TBOOLEAN ps_duplex_state = FALSE;
+static TBOOLEAN ps_duplex_option = FALSE;
+
+static char GPFAR * GPFAR PS_header[] = {
+"/M {moveto} bind def\n",
+"/L {lineto} bind def\n",
+"/R {rmoveto} bind def\n",
+"/V {rlineto} bind def\n",
+"/vpt2 vpt 2 mul def\n",
+"/hpt2 hpt 2 mul def\n",
+/* flush left show */
+"/Lshow { currentpoint stroke M\n",
+"  0 vshift R show } def\n", 
+/* flush right show */
+"/Rshow { currentpoint stroke M\n",
+"  dup stringwidth pop neg vshift R show } def\n", 
+/* centred show */
+"/Cshow { currentpoint stroke M\n",
+"  dup stringwidth pop -2 div vshift R show } def\n", 
+/* set pointsize */
+"/UP { dup vpt_ mul /vpt exch def hpt_ mul /hpt exch def\n",
+"  /hpt2 hpt 2 mul def /vpt2 vpt 2 mul def } def\n",
+/* Dash or Color Line */
+"/DL { Color {setrgbcolor Solid {pop []} if 0 setdash }\n",
+" {pop pop pop Solid {pop []} if 0 setdash} ifelse } def\n",
+/* Border Lines */
+"/BL { stroke gnulinewidth 2 mul setlinewidth } def\n",
+/* Axes Lines */
+"/AL { stroke gnulinewidth 2 div setlinewidth } def\n",
+/* set user defined linewidth */
+"/UL { gnulinewidth mul /userlinewidth exch def } def\n",
+/* Plot Lines */
+"/PL { stroke userlinewidth setlinewidth } def\n",
+/* Line Types */
+"/LTb { BL [] 0 0 0 DL } def\n", /* border */
+"/LTa { AL [1 dl 2 dl] 0 setdash 0 0 0 setrgbcolor } def\n", /* axes */
+"/LT0 { PL [] 0 1 0 DL } def\n",
+"/LT1 { PL [4 dl 2 dl] 0 0 1 DL } def\n",
+"/LT2 { PL [2 dl 3 dl] 1 0 0 DL } def\n",
+"/LT3 { PL [1 dl 1.5 dl] 1 0 1 DL } def\n",
+"/LT4 { PL [5 dl 2 dl 1 dl 2 dl] 0 1 1 DL } def\n",
+"/LT5 { PL [4 dl 3 dl 1 dl 3 dl] 1 1 0 DL } def\n",
+"/LT6 { PL [2 dl 2 dl 2 dl 4 dl] 0 0 0 DL } def\n",
+"/LT7 { PL [2 dl 2 dl 2 dl 2 dl 2 dl 4 dl] 1 0.3 0 DL } def\n",
+"/LT8 { PL [2 dl 2 dl 2 dl 2 dl 2 dl 2 dl 2 dl 4 dl] 0.5 0.5 0.5 DL } def\n",
+/* Point (Round) */	/* Matt Heffron make it round */
+"/Pnt { stroke [] 0 setdash\n",
+"   gsave 1 setlinecap M 0 0 V stroke grestore } def\n",
+
+/* Diamond */
+"/Dia { stroke [] 0 setdash 2 copy vpt add M\n",
+"  hpt neg vpt neg V hpt vpt neg V\n",
+"  hpt vpt V hpt neg vpt V closepath stroke\n",
+"  Pnt } def\n",
+
+/* Plus */
+"/Pls { stroke [] 0 setdash vpt sub M 0 vpt2 V\n",
+"  currentpoint stroke M\n",
+"  hpt neg vpt neg R hpt2 0 V stroke\n",
+"  } def\n",
+
+/* Box */
+"/Box { stroke [] 0 setdash 2 copy exch hpt sub exch vpt add M\n",
+"  0 vpt2 neg V hpt2 0 V 0 vpt2 V\n",
+"  hpt2 neg 0 V closepath stroke\n",
+"  Pnt } def\n",
+
+/* Cross (X) */
+"/Crs { stroke [] 0 setdash exch hpt sub exch vpt add M\n",
+"  hpt2 vpt2 neg V currentpoint stroke M\n",
+"  hpt2 neg 0 R hpt2 vpt2 V stroke } def\n",
+
+/* Triangle Up*/
+"/TriU { stroke [] 0 setdash 2 copy vpt 1.12 mul add M\n",
+"  hpt neg vpt -1.62 mul V\n",
+"  hpt 2 mul 0 V\n",
+"  hpt neg vpt 1.62 mul V closepath stroke\n",
+"  Pnt  } def\n",
+
+/* Star */
+"/Star { 2 copy Pls Crs } def\n",
+
+/* div added filed box */
+/* Filled Box */
+"/BoxF { stroke [] 0 setdash exch hpt sub exch vpt add M\n",
+"  0 vpt2 neg V  hpt2 0 V  0 vpt2 V\n",
+"  hpt2 neg 0 V  closepath fill } def\n",
+
+/* div added filled triangle */
+/* Triangle Up, Filled */
+"/TriUF { stroke [] 0 setdash vpt 1.12 mul add M\n",
+"  hpt neg vpt -1.62 mul V\n",
+"  hpt 2 mul 0 V\n",
+"  hpt neg vpt 1.62 mul V closepath fill } def\n",
+
+/* Matt Heffron: added a few more types */
+/* Triangle Down */
+"/TriD { stroke [] 0 setdash 2 copy vpt 1.12 mul sub M\n", 
+"  hpt neg vpt 1.62 mul V\n",
+"  hpt 2 mul 0 V\n",
+"  hpt neg vpt -1.62 mul V closepath stroke\n",
+"  Pnt  } def\n",
+
+/* Triangle Down, Filled*/
+"/TriDF { stroke [] 0 setdash vpt 1.12 mul sub M\n",
+"  hpt neg vpt 1.62 mul V\n",
+"  hpt 2 mul 0 V\n",
+"  hpt neg vpt -1.62 mul V closepath fill} def\n",
+
+/* Diamond, Filled */
+"/DiaF { stroke [] 0 setdash vpt add M\n",
+"  hpt neg vpt neg V hpt vpt neg V\n",
+"  hpt vpt V hpt neg vpt V closepath fill } def\n",
+
+/* Pentagon */
+"/Pent { stroke [] 0 setdash 2 copy gsave\n",
+"  translate 0 hpt M 4 {72 rotate 0 hpt L} repeat\n",
+"  closepath stroke grestore Pnt } def\n",
+
+/* Pentagon, Filled */
+"/PentF { stroke [] 0 setdash gsave\n",
+"  translate 0 hpt M 4 {72 rotate 0 hpt L} repeat\n",
+"  closepath fill grestore } def\n",
+
+/* Circle */
+"/Circle { stroke [] 0 setdash 2 copy\n",
+"  hpt 0 360 arc stroke Pnt } def\n",
+
+/* Circle,Filled */
+"/CircleF { stroke [] 0 setdash hpt 0 360 arc fill } def\n",
+/* 16 differently filled circles */
+"/C0 { BL [] 0 setdash 2 copy moveto vpt 90 450  arc } bind def\n",
+"/C1 { BL [] 0 setdash 2 copy        moveto\n",
+"       2 copy  vpt 0 90 arc closepath fill\n",
+"               vpt 0 360 arc closepath } bind def\n",
+"/C2 { BL [] 0 setdash 2 copy moveto\n",
+"       2 copy  vpt 90 180 arc closepath fill\n",
+"               vpt 0 360 arc closepath } bind def\n",
+"/C3 { BL [] 0 setdash 2 copy moveto\n",
+"       2 copy  vpt 0 180 arc closepath fill\n",
+"               vpt 0 360 arc closepath } bind def\n",
+"/C4 { BL [] 0 setdash 2 copy moveto\n",
+"       2 copy  vpt 180 270 arc closepath fill\n",
+"               vpt 0 360 arc closepath } bind def\n",
+"/C5 { BL [] 0 setdash 2 copy moveto\n",
+"       2 copy  vpt 0 90 arc\n",
+"       2 copy moveto\n",
+"       2 copy  vpt 180 270 arc closepath fill\n",
+"               vpt 0 360 arc } bind def\n",
+"/C6 { BL [] 0 setdash 2 copy moveto\n",
+"      2 copy  vpt 90 270 arc closepath fill\n",
+"              vpt 0 360 arc closepath } bind def\n",
+"/C7 { BL [] 0 setdash 2 copy moveto\n",
+"      2 copy  vpt 0 270 arc closepath fill\n",
+"              vpt 0 360 arc closepath } bind def\n",
+"/C8 { BL [] 0 setdash 2 copy moveto\n",
+"      2 copy vpt 270 360 arc closepath fill\n",
+"              vpt 0 360 arc closepath } bind def\n",
+"/C9 { BL [] 0 setdash 2 copy moveto\n",
+"      2 copy  vpt 270 450 arc closepath fill\n",
+"              vpt 0 360 arc closepath } bind def\n",
+"/C10 { BL [] 0 setdash 2 copy 2 copy moveto vpt 270 360 arc closepath fill\n",
+"       2 copy moveto\n",
+"       2 copy vpt 90 180 arc closepath fill\n",
+"               vpt 0 360 arc closepath } bind def\n",
+"/C11 { BL [] 0 setdash 2 copy moveto\n",
+"       2 copy  vpt 0 180 arc closepath fill\n",
+"       2 copy moveto\n",
+"       2 copy  vpt 270 360 arc closepath fill\n",
+"               vpt 0 360 arc closepath } bind def\n",
+"/C12 { BL [] 0 setdash 2 copy moveto\n",
+"       2 copy  vpt 180 360 arc closepath fill\n",
+"               vpt 0 360 arc closepath } bind def\n",
+"/C13 { BL [] 0 setdash  2 copy moveto\n",
+"       2 copy  vpt 0 90 arc closepath fill\n",
+"       2 copy moveto\n",
+"       2 copy  vpt 180 360 arc closepath fill\n",
+"               vpt 0 360 arc closepath } bind def\n",
+"/C14 { BL [] 0 setdash 2 copy moveto\n",
+"       2 copy  vpt 90 360 arc closepath fill\n",
+"               vpt 0 360 arc } bind def\n",
+"/C15 { BL [] 0 setdash 2 copy vpt 0 360 arc closepath fill\n",
+"               vpt 0 360 arc closepath } bind def\n",
+
+/* Auxiliary definitions for rectangles */
+
+"/Rec   { newpath 4 2 roll moveto 1 index 0 rlineto 0 exch rlineto\n",
+"       neg 0 rlineto closepath } bind def\n",
+"/Square { dup Rec } bind def\n",
+"/Bsquare { vpt sub exch vpt sub exch vpt2 Square } bind def\n",
+
+/* 16 differently filled squares */
+
+"/S0 { BL [] 0 setdash 2 copy moveto 0 vpt rlineto BL Bsquare } bind def\n",
+"/S1 { BL [] 0 setdash 2 copy vpt Square fill Bsquare } bind def\n",
+"/S2 { BL [] 0 setdash 2 copy exch vpt sub exch vpt Square fill Bsquare } bind def\n",
+"/S3 { BL [] 0 setdash 2 copy exch vpt sub exch vpt2 vpt Rec fill Bsquare } bind def\n",
+"/S4 { BL [] 0 setdash 2 copy exch vpt sub exch vpt sub vpt Square fill Bsquare } bind def\n",
+"/S5 { BL [] 0 setdash 2 copy 2 copy vpt Square fill\n",
+"       exch vpt sub exch vpt sub vpt Square fill Bsquare } bind def\n",
+"/S6 { BL [] 0 setdash 2 copy exch vpt sub exch vpt sub vpt vpt2 Rec fill Bsquare } bind def\n",
+"/S7 { BL [] 0 setdash 2 copy exch vpt sub exch vpt sub vpt vpt2 Rec fill\n",
+"       2 copy vpt Square fill\n",
+"       Bsquare } bind def\n",
+"/S8 { BL [] 0 setdash 2 copy vpt sub vpt Square fill Bsquare } bind def\n",
+"/S9 { BL [] 0 setdash 2 copy vpt sub vpt vpt2 Rec fill Bsquare } bind def\n",
+"/S10 { BL [] 0 setdash 2 copy vpt sub vpt Square fill 2 copy exch vpt sub exch vpt Square fill\n",
+"       Bsquare } bind def\n",
+"/S11 { BL [] 0 setdash 2 copy vpt sub vpt Square fill 2 copy exch vpt sub exch vpt2 vpt Rec fill\n",
+"       Bsquare } bind def\n",
+"/S12 { BL [] 0 setdash 2 copy exch vpt sub exch vpt sub vpt2 vpt Rec fill Bsquare } bind def\n",
+"/S13 { BL [] 0 setdash 2 copy exch vpt sub exch vpt sub vpt2 vpt Rec fill\n",
+"       2 copy vpt Square fill Bsquare } bind def\n",
+"/S14 { BL [] 0 setdash 2 copy exch vpt sub exch vpt sub vpt2 vpt Rec fill\n",
+"       2 copy exch vpt sub exch vpt Square fill Bsquare } bind def\n",
+"/S15 { BL [] 0 setdash 2 copy Bsquare fill Bsquare } bind def\n",
+
+/* 16 different diamonds (actually just rotated squares) */
+
+"/D0 { gsave translate 45 rotate 0 0 S0 stroke grestore } bind def\n",
+"/D1 { gsave translate 45 rotate 0 0 S1 stroke grestore } bind def\n",
+"/D2 { gsave translate 45 rotate 0 0 S2 stroke grestore } bind def\n",
+"/D3 { gsave translate 45 rotate 0 0 S3 stroke grestore } bind def\n",
+"/D4 { gsave translate 45 rotate 0 0 S4 stroke grestore } bind def\n",
+"/D5 { gsave translate 45 rotate 0 0 S5 stroke grestore } bind def\n",
+"/D6 { gsave translate 45 rotate 0 0 S6 stroke grestore } bind def\n",
+"/D7 { gsave translate 45 rotate 0 0 S7 stroke grestore } bind def\n",
+"/D8 { gsave translate 45 rotate 0 0 S8 stroke grestore } bind def\n",
+"/D9 { gsave translate 45 rotate 0 0 S9 stroke grestore } bind def\n",
+"/D10 { gsave translate 45 rotate 0 0 S10 stroke grestore } bind def\n",
+"/D11 { gsave translate 45 rotate 0 0 S11 stroke grestore } bind def\n",
+"/D12 { gsave translate 45 rotate 0 0 S12 stroke grestore } bind def\n",
+"/D13 { gsave translate 45 rotate 0 0 S13 stroke grestore } bind def\n",
+"/D14 { gsave translate 45 rotate 0 0 S14 stroke grestore } bind def\n",
+"/D15 { gsave translate 45 rotate 0 0 S15 stroke grestore } bind def\n",
+
+/* closed figures w/o the point in the middle (added by Dick Crafword) */
+
+/* Diamond */
+"/DiaE { stroke [] 0 setdash vpt add M\n",
+"  hpt neg vpt neg V hpt vpt neg V\n",
+"  hpt vpt V hpt neg vpt V closepath stroke } def\n",
+
+/* Box */
+"/BoxE { stroke [] 0 setdash exch hpt sub exch vpt add M\n",
+"  0 vpt2 neg V hpt2 0 V 0 vpt2 V\n",
+"  hpt2 neg 0 V closepath stroke } def\n",
+
+/* Triangle Up*/
+"/TriUE { stroke [] 0 setdash vpt 1.12 mul add M\n",
+"  hpt neg vpt -1.62 mul V\n",
+"  hpt 2 mul 0 V\n",
+"  hpt neg vpt 1.62 mul V closepath stroke } def\n",
+
+/* Triangle Down */
+"/TriDE { stroke [] 0 setdash vpt 1.12 mul sub M\n", 
+"  hpt neg vpt 1.62 mul V\n",
+"  hpt 2 mul 0 V\n",
+"  hpt neg vpt -1.62 mul V closepath stroke } def\n",
+
+/* Pentagon */
+"/PentE { stroke [] 0 setdash gsave\n",
+"  translate 0 hpt M 4 {72 rotate 0 hpt L} repeat\n",
+"  closepath stroke grestore } def\n",
+
+/* Circle */
+"/CircE { stroke [] 0 setdash \n",
+"  hpt 0 360 arc stroke } def\n",
+
+/* filled box : usage   x1 y1 x2 y2 BoxFill */
+"/BoxFill { gsave Rec 1 setgray fill grestore } def\n",
+
+NULL
+};
+
+static char GPFAR * GPFAR ENHPS_header[] = {
+/* For MFshow and MFwidth the tos is an array with the string and font info:  */
+/*	[<fontname (a string)> <fontsize> <vertical offset> <width significant?> <printed?> <text string>]  */
+
+"/MFshow {{dup dup 0 get findfont exch 1 get scalefont setfont\n",
+"     [ currentpoint ] exch dup 2 get 0 exch rmoveto dup dup 5 get exch 4 get\n",
+"     {show} {stringwidth pop 0 rmoveto}ifelse dup 3 get\n",
+"     {2 get neg 0 exch rmoveto pop} {pop aload pop moveto}ifelse} forall} bind def\n",
+"/MFwidth {0 exch {dup 3 get{dup dup 0 get findfont exch 1 get scalefont setfont\n",
+"      5 get stringwidth pop add}\n",
+"    {pop} ifelse} forall} bind def\n",
+
+/* flush left show */
+"/MLshow { currentpoint stroke M\n",
+"  0 exch R MFshow } bind def\n", 
+
+/* flush right show */
+"/MRshow { currentpoint stroke M\n",
+"  exch dup MFwidth neg 3 -1 roll R MFshow } def\n", 
+
+/* centred show */
+"/MCshow { currentpoint stroke M\n",
+"  exch dup MFwidth -2 div 3 -1 roll R MFshow } def\n", 
+NULL
+};
+
+/* added to enhpost by Matt Heffron <heffron@falstaff.css.beckman.com> */
+/* moved to post.trm by drd */
+
+static struct PS_FontName {
+	char *name;
+	struct PS_FontName *next;
+} *PS_DocFonts = NULL;
+
+/* given a font, look in store to see if it is there already
+ * if so, return NULL. If not, reencode it if allowed to, otherwise
+ * return an appropriate re-encode string
+ */
+ 
+TERM_PUBLIC char *PS_RememberFont(fname, can_reencode)
+char *fname;
+int can_reencode;
+{
+	struct PS_FontName *fnp;
+	char *recode = NULL;
+
+   for (fnp=PS_DocFonts; fnp ; fnp = fnp->next)
+		if (strcmp(fnp->name, fname)==0)
+			return NULL;
+
+	/* we did not find the name */
+   
+   fnp = (struct PS_FontName *)gp_alloc(sizeof(struct PS_FontName), "PostScript Font record");
+   fnp->name = gp_alloc(1+strlen(fname), "PostScript Font name");
+   strcpy(fnp->name, fname);
+   fnp->next = PS_DocFonts;
+   PS_DocFonts = fnp;
+
+	switch(encoding)
+	{
+		case ENCODING_ISO_8859_1:
+			recode = "reencodeISO def\n";
+			break;
+		case ENCODING_CP_437:
+			recode = "reencodeCP437 def\n";
+			break;
+		case ENCODING_CP_850 : 
+			recode = "reencodeCP850 def\n";
+			break;
+	}
+
+	if (can_reencode && recode)
+	{	fprintf(outfile,"/%s %s",fname, recode);
+		return NULL;
+	}
+	else
+		return recode;
+}
+
+static int PS_pen_x, PS_pen_y;
+static int PS_taken;
+static int PS_linetype_last;
+static TBOOLEAN PS_relative_ok;
+
+TERM_PUBLIC void PS_options()
+{
+	if (!END_OF_COMMAND) {
+		if (almost_equals(c_token,"p$ortrait")) {
+			ps_portrait=TRUE;
+ 			ps_eps=FALSE;
+			c_token++;
+		}
+		else if (almost_equals(c_token,"l$andscape")) {
+			ps_portrait=FALSE;
+ 			ps_eps=FALSE;
+			c_token++;
+		}
+ 		else if (almost_equals(c_token,"ep$sf")) {
+ 			ps_portrait=TRUE;
+ 			ps_eps = TRUE;
+ 			c_token++;
+ 		}
+		else if (almost_equals(c_token,"d$efault")) {
+			ps_portrait=FALSE;
+ 			ps_eps=FALSE;
+			ps_color=FALSE;
+			ps_solid=FALSE;
+			ps_duplex_option=FALSE;
+			strcpy(ps_font,"Helvetica");
+			ps_fontsize = 14;
+			term->v_char = (unsigned int)(ps_fontsize*PS_SC);
+			term->h_char = (unsigned int)(ps_fontsize*PS_SC*6/10);
+			term->put_text = PS_put_text;
+			c_token++;
+		}
+	}
+
+	if (almost_equals(c_token, "enh$anced")) {
+		term->put_text = ENHPS_put_text;
+		term->set_font = ENHPS_set_font;
+		++c_token;
+	} else if (almost_equals(c_token, "noenh$anced")) {
+		term->put_text = PS_put_text;
+		term->set_font = PS_set_font;
+		++c_token;
+	}
+
+	if (!END_OF_COMMAND) {
+		if (almost_equals(c_token,"m$onochrome")) {
+			ps_color=FALSE;
+			c_token++;
+		}
+		else if (almost_equals(c_token,"c$olor")) {
+			ps_color=TRUE;
+			c_token++;
+		}
+	}
+
+	if (!END_OF_COMMAND) {
+		if (almost_equals(c_token,"so$lid")) {
+			ps_solid=TRUE;
+			c_token++;
+		}
+		else if (almost_equals(c_token,"da$shed")) {
+			ps_solid=FALSE;
+			c_token++;
+		}
+	}
+
+	if (!END_OF_COMMAND) {
+		if (almost_equals(c_token,"si$mplex")) {
+			ps_duplex_state  = FALSE;
+			ps_duplex_option = TRUE;
+			c_token++;
+		}
+		else if (almost_equals(c_token,"du$plex")) {
+			ps_duplex_state  = TRUE;
+			ps_duplex_option = TRUE;
+			c_token++;
+		}
+		else if (almost_equals(c_token,"defaultp$lex")) {
+			ps_duplex_option = FALSE;
+			c_token++;
+		}
+	}
+
+	if (!END_OF_COMMAND && isstring(c_token)) {
+		quote_str(ps_font,c_token, MAX_ID_LEN);
+		c_token++;
+	}
+
+	if (!END_OF_COMMAND) {
+		/* We have font size specified */
+		struct value a;
+		ps_fontsize = (int)real(const_express(&a));
+		term->v_char = (unsigned int)(ps_fontsize*PS_SC);
+		term->h_char = (unsigned int)(ps_fontsize*PS_SC*6/10);
+	}
+
+	sprintf(default_font,"%s,%d",ps_font,ps_fontsize);
+	/* default_font holds the font and size set at 'set term' */
+	/* Entry font added by DJL */
+	sprintf(term_options,"%s %senhanced %s %s %s \"%s\" %d",
+		ps_eps ? "eps" : (ps_portrait ? "portrait" : "landscape"),
+      term->put_text == ENHPS_put_text ? "" : "no",
+		ps_color ? "color" : "monochrome",
+		ps_solid ? "solid" : "dashed",
+		ps_duplex_option ? (ps_duplex_state ? "duplex" : "simplex")
+                                    : "defaultplex",
+		ps_font,ps_fontsize);
+}
+
+/* store settings passed to common_init() for use in PS_graphics()
+ * ps_eps, ps_portrait, etc are reserved for storing the term options
+ */
+static int ps_common_encap;
+static int ps_common_portrait;
+static int ps_common_uses_fonts;
+static unsigned int ps_common_xoff, ps_common_yoff;
+
+
+TERM_PUBLIC void PS_common_init(encap, portrait, uses_fonts, xoff, yoff, bb_xmin, bb_ymin, bb_xmax, bb_ymax, dict)
+int encap; /* encapsulated or not - 1 for pslatex */
+int portrait; /* 1 for pslatex */
+int uses_fonts; /* 0 for ps(la)tex */
+unsigned int xoff, yoff; /* how much to translate by */
+unsigned int bb_xmin, bb_ymin, bb_xmax, bb_ymax; /* bounding box */
+char **dict; /* extra entries for the dictionary */
+{
+static char GPFAR psi1[] = "%%%%Creator: gnuplot %s patchlevel %s\n\
+%%%%CreationDate: %s\
+%%%%DocumentFonts: %s\n";
+static char GPFAR psi2[] = "%%%%EndComments\n\
+/gnudict 120 dict def\ngnudict begin\n\
+/Color %s def\n\
+/Solid %s def\n\
+/gnulinewidth %.3f def\n\
+/userlinewidth gnulinewidth def\n\
+/vshift %d def\n\
+/dl {%d mul} def\n\
+/hpt_ %.1f def\n\
+/vpt_ %.1f def\n\
+/hpt hpt_ def\n\
+/vpt vpt_ def\n";
+static char GPFAR *PS_iso_8859_1_encoding[] = {
+"/reencodeISO {\n",
+"dup dup findfont dup length dict begin\n",
+"{ 1 index /FID ne { def }{ pop pop } ifelse } forall\n",
+"currentdict /CharStrings known {\n",
+"\tCharStrings /Idieresis known {\n",
+"\t\t/Encoding ISOLatin1Encoding def } if\n} if\n",
+"currentdict end definefont\n",
+"} def\n",
+"/ISOLatin1Encoding [\n",
+"/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef\n",
+"/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef\n",
+"/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef\n",
+"/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef\n",
+"/space/exclam/quotedbl/numbersign/dollar/percent/ampersand/quoteright\n",
+"/parenleft/parenright/asterisk/plus/comma/minus/period/slash\n",
+"/zero/one/two/three/four/five/six/seven/eight/nine/colon/semicolon\n",
+"/less/equal/greater/question/at/A/B/C/D/E/F/G/H/I/J/K/L/M/N\n",
+"/O/P/Q/R/S/T/U/V/W/X/Y/Z/bracketleft/backslash/bracketright\n",
+"/asciicircum/underscore/quoteleft/a/b/c/d/e/f/g/h/i/j/k/l/m\n",
+"/n/o/p/q/r/s/t/u/v/w/x/y/z/braceleft/bar/braceright/asciitilde\n",
+"/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef\n",
+"/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef\n",
+"/.notdef/dotlessi/grave/acute/circumflex/tilde/macron/breve\n",
+"/dotaccent/dieresis/.notdef/ring/cedilla/.notdef/hungarumlaut\n",
+"/ogonek/caron/space/exclamdown/cent/sterling/currency/yen/brokenbar\n",
+"/section/dieresis/copyright/ordfeminine/guillemotleft/logicalnot\n",
+"/hyphen/registered/macron/degree/plusminus/twosuperior/threesuperior\n",
+"/acute/mu/paragraph/periodcentered/cedilla/onesuperior/ordmasculine\n",
+"/guillemotright/onequarter/onehalf/threequarters/questiondown\n",
+"/Agrave/Aacute/Acircumflex/Atilde/Adieresis/Aring/AE/Ccedilla\n",
+"/Egrave/Eacute/Ecircumflex/Edieresis/Igrave/Iacute/Icircumflex\n",
+"/Idieresis/Eth/Ntilde/Ograve/Oacute/Ocircumflex/Otilde/Odieresis\n",
+"/multiply/Oslash/Ugrave/Uacute/Ucircumflex/Udieresis/Yacute\n",
+"/Thorn/germandbls/agrave/aacute/acircumflex/atilde/adieresis\n",
+"/aring/ae/ccedilla/egrave/eacute/ecircumflex/edieresis/igrave\n",
+"/iacute/icircumflex/idieresis/eth/ntilde/ograve/oacute/ocircumflex\n",
+"/otilde/odieresis/divide/oslash/ugrave/uacute/ucircumflex/udieresis\n",
+"/yacute/thorn/ydieresis\n",
+"] def\n",
+NULL };
+
+/*   encoding for code page 437                                            */
+/*                                                                         */
+/*   version 1.0:  - Mainly letters are mapped. The following positions    */
+/*   (JFi)           are left blank (undefined):                           */
+/*                   -- first 32 positions,                                */
+/*                   -- frame characters,                                  */
+/*                   -- greek characters,                                  */
+/*                   -- some more special characters.                      */
+/*                                                                         */
+/*   version 1.1:  - added some more special characters                    */
+/*                                                                         */
+static char GPFAR *PS_cp_437_encoding[] = {
+"/reencodeCP437 {\n",
+"dup dup findfont dup length dict begin\n",
+"{ 1 index /FID ne { def }{ pop pop } ifelse } forall\n",
+"currentdict /CharStrings known {\n",
+"\tCharStrings /Idieresis known {\n",
+"\t\t/Encoding CP437Encoding def } if\n} if\n",
+"currentdict end definefont\n",
+"} def\n",
+"/CP437Encoding [\n",
+"/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef\n",
+"/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef\n",
+"/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef\n",
+"/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef\n",
+"/space/exclam/quotedbl/numbersign/dollar/percent/ampersand/quoteright\n",
+"/parenleft/parenright/asterisk/plus/comma/minus/period/slash\n",
+"/zero/one/two/three/four/five/six/seven/eight/nine/colon/semicolon\n",
+"/less/equal/greater/question/at/A/B/C/D/E/F/G/H/I/J/K/L/M/N\n",
+"/O/P/Q/R/S/T/U/V/W/X/Y/Z/bracketleft/backslash/bracketright\n",
+"/asciicircum/underscore/quoteleft/a/b/c/d/e/f/g/h/i/j/k/l/m\n",
+"/n/o/p/q/r/s/t/u/v/w/x/y/z/braceleft/bar/braceright/asciitilde/.notdef\n",
+"/Ccedilla/udieresis/eacute/acircumflex/adieresis/agrave/aring/ccedilla\n",
+"/ecircumflex/edieresis/egrave/idieresis/icircumflex/igrave/Adieresis/Aring\n",
+"/Eacute/ae/AE/ocircumflex/odieresis/ograve/ucircumflex/ugrave\n",
+"/ydieresis/Odieresis/Udieresis/cent/sterling/yen/.notdef/florin\n",
+"/aacute/iacute/oacute/uacute/ntilde/Ntilde/ordfeminine/ordmasculine\n",
+"/questiondown/.notdef/logicalnot/onehalf/onequarter/exclamdown/guillemotleft/guillemotright\n",
+"/space/space/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef\n",
+"/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef\n",
+"/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef\n",
+"/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef\n",
+"/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef\n",
+"/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef\n",
+"/.notdef/germandbls/.notdef/.notdef/.notdef/.notdef/mu/.notdef\n",
+"/.notdef/.notdef/.notdef/.notdef/infinity/.notdef/.notdef/.notdef\n",
+"/.notdef/plusminus/greaterequal/lessequal/.notdef/.notdef/divide/.notdef\n",
+"/degree/bullet/periodcentered/.notdef/nsuperior/twosuperior/.notdef\n",
+"] def\n",
+NULL };
+
+/*   encoding for code page 850                                            */
+/*                                                                         */
+/*   version 1.0:  - Mainly letters are mapped. The following positions    */
+/*   (JFi)           are left blank (undefined):                           */
+/*                   -- first 32 positions,                                */
+/*                   -- frame characters,                                  */
+/*                   -- a few special characters.                          */
+/*                                                                         */
+static char GPFAR *PS_cp_850_encoding[] = {
+"/reencodeCP850 {\n",
+"dup dup findfont dup length dict begin\n",
+"{ 1 index /FID ne { def }{ pop pop } ifelse } forall\n",
+"currentdict /CharStrings known {\n",
+"\tCharStrings /Idieresis known {\n",
+"\t\t/Encoding CP850Encoding def } if\n} if\n",
+"currentdict end definefont\n",
+"} def\n",
+"/CP850Encoding [\n",
+"/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef\n",
+"/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef\n",
+"/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef\n",
+"/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef\n",
+"/space/exclam/quotedbl/numbersign/dollar/percent/ampersand/quoteright\n",
+"/parenleft/parenright/asterisk/plus/comma/minus/period/slash\n",
+"/zero/one/two/three/four/five/six/seven/eight/nine/colon/semicolon\n",
+"/less/equal/greater/question/at/A/B/C/D/E/F/G/H/I/J/K/L/M/N\n",
+"/O/P/Q/R/S/T/U/V/W/X/Y/Z/bracketleft/backslash/bracketright\n",
+"/asciicircum/underscore/quoteleft/a/b/c/d/e/f/g/h/i/j/k/l/m\n",
+"/n/o/p/q/r/s/t/u/v/w/x/y/z/braceleft/bar/braceright/asciitilde/.notdef\n",
+"/Ccedilla/udieresis/eacute/acircumflex/adieresis/agrave/aring/ccedilla\n",
+"/ecircumflex/edieresis/egrave/idieresis/icircumflex/igrave/Adieresis/Aring\n",
+"/Eacute/ae/AE/ocircumflex/odieresis/ograve/ucircumflex/ugrave\n",
+"/ydieresis/Odieresis/Udieresis/oslash/sterling/Oslash/multiply/florin\n",
+"/aacute/iacute/oacute/uacute/ntilde/Ntilde/ordfeminine/ordmasculine\n",
+"/questiondown/registered/logicalnot/onehalf/onequarter/exclamdown/guillemotleft/guillemotright\n",
+"/space/space/.notdef/.notdef/.notdef/Aacute/Acircumflex/Agrave\n",
+"/.notdef/.notdef/.notdef/.notdef/.notdef/cent/yen/.notdef\n",
+"/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/atilde/Atilde\n",
+"/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/currency\n",
+"/eth/Eth/Ecircumflex/Edieresis/Egrave/dotlessi/Iacute/Icircumflex\n",
+"/Idieresis/.notdef/.notdef/.notdef/.notdef/brokenbar/Igrave/.notdef\n",
+"/Oacute/germandbls/Ocircumflex/Ograve/otilde/Otilde/mu/thorn\n",
+"/Thorn/Uacute/Ucircumflex/Ugrave/yacute/Yacute/macron/acute\n",
+"/hyphen/plusminus/equal/threequarters/paragraph/section/divide/.notdef\n",
+"/degree/.notdef/periodcentered/onesuperior/threesuperior/twosuperior/.notdef\n",
+"] def\n",
+NULL };
+
+	struct termentry *t = term;
+	int i;
+        time_t now;
+	extern char version[];
+	extern char patchlevel[];
+
+	ps_common_encap = encap; /* store for later */
+	ps_common_portrait = portrait; /* store for later */
+	ps_common_uses_fonts = uses_fonts;
+	ps_common_xoff = xoff;
+	ps_common_yoff = yoff;
+
+	ps_page = 0;
+
+	if (!encap)
+		fprintf(outfile,"%%!PS-Adobe-2.0\n");
+	else
+		fprintf(outfile,"%%!PS-Adobe-2.0 EPSF-2.0\n");
+
+	if (outstr) fprintf(outfile, "%%%%Title: %s\n", outstr );             /*  JFi  */
+	time(&now);
+	fprintf(outfile, psi1, version, patchlevel, asctime(localtime(&now)), uses_fonts ? "(atend)" : "");
+
+	fprintf(outfile,"%%%%BoundingBox: %d %d %d %d\n", xoff + bb_xmin, yoff + bb_ymin, xoff + bb_xmax, yoff + bb_ymax);
+
+	fprintf(outfile,"%%%%Orientation: %s\n", ps_portrait ? "Portrait" : "Landscape");
+
+	if (!encap)
+		fprintf(outfile,"%%%%Pages: (atend)\n");
+	fprintf(outfile, psi2,
+		ps_color ? "true" : "false",
+		ps_solid ? "true" : "false",
+		PS_LW,			/* line width */
+	 	(int)(t->v_char)/(-3),	/* shift for vertical centring */
+		PS_SC,			/* dash length */
+		PS_HTIC/2.0,		/* half point width */
+		PS_VTIC/2.0);		/* half point height */
+
+	if (uses_fonts && (encoding == ENCODING_ISO_8859_1)) {
+		for (i=0; PS_iso_8859_1_encoding[i] != NULL; i++) {
+			fprintf(outfile,"%s",PS_iso_8859_1_encoding[i]);
+		}
+	}
+	if (uses_fonts && (encoding == ENCODING_CP_437)) {       /* JFi */
+		for (i=0; PS_cp_437_encoding[i] != NULL; i++) {
+			fprintf(outfile,"%s",PS_cp_437_encoding[i]);
+		}
+	}
+	if (uses_fonts && (encoding == ENCODING_CP_850)) {       /* JFi */
+		for (i=0; PS_cp_850_encoding[i] != NULL; i++) {
+			fprintf(outfile,"%s",PS_cp_850_encoding[i]);
+		}
+	}
+/*        Duplicate code! 
+          As long as only two code pages are implemented, that's not a big 
+          problem. Otherwise a small procedure might be beneficial.
+*/
+
+	for ( i=0; PS_header[i] != NULL; i++)
+		fprintf(outfile,"%s",PS_header[i]);
+	if (ps_duplex_option)
+		fprintf(outfile, "statusdict begin %s setduplexmode end\n",
+				ps_duplex_state ? "true" : "false");
+	PS_RememberFont(ps_font, 1);
+
+	if (dict)
+		while (*dict)
+			fputs(*(dict++), outfile);	
+
+	fprintf(outfile,"end\n%%%%EndProlog\n");
+}
+
+/* the init fn for the postscript driver */
+TERM_PUBLIC void PS_init()
+{
+	unsigned int xmin, ymin, xmax, ymax;
+
+	if (ps_eps)
+	{
+		term->xmax = PS_XMAX;
+		term->ymax = PS_YMAX;
+		xmin = PS_XMAX * xoffset / (2*PS_SC);
+		xmax = PS_XMAX * (xsize + xoffset) / (2*PS_SC);
+		ymin = PS_YMAX * yoffset / (2*PS_SC);
+		ymax = PS_YMAX * (yoffset + ysize) / (2*PS_SC);
+	}
+	else if (ps_portrait)
+	{
+		term->xmax = PS_YMAX;
+		term->ymax = PS_XMAX;
+		xmin = PS_YMAX * xoffset / PS_SC;
+		xmax = PS_YMAX * (xsize + xoffset) / PS_SC;
+		ymin = PS_XMAX * yoffset / PS_SC;
+		ymax = PS_XMAX * (ysize + yoffset) / PS_SC;
+	}
+	else
+	{
+		term->xmax = PS_XMAX;
+		term->ymax = PS_YMAX;
+		ymin = PS_XMAX * xoffset / PS_SC;
+		ymax = PS_XMAX * (xsize+xoffset) / PS_SC;
+		xmin = PS_YMAX * (1-ysize-yoffset) / PS_SC;
+		xmax = PS_YMAX * (1-yoffset) / PS_SC;
+	}
+
+	/* for enhanced postscript, copy ps_font to ps_enh_font
+	 * does no harm for non-enhanced
+	 */
+	strcpy(ps_enh_font, ps_font);
+	ps_enh_fontsize = ps_fontsize;
+	
+	PS_common_init(ps_eps, ps_portrait, 1, PS_XOFF, PS_YOFF,
+	   xmin, ymin, xmax, ymax,
+	   (term->put_text == ENHPS_put_text) ? ENHPS_header : NULL);
+}
+
+
+TERM_PUBLIC void PS_graphics()
+{
+static char GPFAR psg1[] = "0 setgray\nnewpath\n";
+struct termentry *t = term;
+	ps_page++;
+	if (!ps_common_encap)
+		fprintf(outfile,"%%%%Page: %d %d\n",ps_page,ps_page);
+	fprintf(outfile,"gnudict begin\ngsave\n");
+	fprintf(outfile,"%d %d translate\n",ps_common_xoff, ps_common_yoff);
+	fprintf(outfile,"%.3f %.3f scale\n", (ps_eps ? 0.5 : 1.0)/PS_SC,
+	                                     (ps_eps ? 0.5 : 1.0)/PS_SC);
+	if (!ps_common_portrait) {
+	    fprintf(outfile,"90 rotate\n0 %d translate\n", (int)(-PS_YMAX));
+	}
+	fprintf(outfile, psg1);
+	if (ps_common_uses_fonts)
+		fprintf(outfile, "(%s) findfont %d scalefont setfont\n", ps_font, (t->v_char) );
+	ps_path_count = 0;
+	PS_relative_ok = FALSE;
+	PS_pen_x = PS_pen_y = -4000;
+	PS_taken = 0;
+	PS_linetype_last = -1;
+}
+
+
+TERM_PUBLIC void PS_text()
+{
+	ps_path_count = 0;
+	fprintf(outfile,"stroke\ngrestore\nend\nshowpage\n");
+	/* fprintf(stderr,"taken %d times\n",PS_taken); */
+	/* informational:  tells how many times it was "cheaper"
+	   to do a relative moveto or lineto rather than an
+	   absolute one */
+}
+
+
+TERM_PUBLIC void PS_reset()
+{
+	fprintf(outfile,"%%%%Trailer\n");
+
+/*      I think the following commands should be executed 
+        `if (ps_common_uses_fonts)`. So I changed the next line. 
+        Please see "PS_RememberFont", too.                       */  /* JFi */
+
+/*	if (!ps_common_uses_fonts) {  */                             /* JFi */
+	if (ps_common_uses_fonts) {
+		fprintf(outfile,"%%%%DocumentFonts: ");
+		while (PS_DocFonts) {
+		    struct PS_FontName *fnp;
+			fnp = PS_DocFonts->next;
+			fprintf(outfile, "%s%s", PS_DocFonts->name, fnp ? " " : "\n");
+			free(PS_DocFonts->name);
+			free(PS_DocFonts);
+			PS_DocFonts=fnp;
+		}
+	}
+	if (!ps_common_encap)
+		fprintf(outfile,"%%%%Pages: %d\n",ps_page);
+}
+
+
+TERM_PUBLIC void PS_linetype(linetype)
+int linetype;
+{
+	linetype = (linetype % 9) + 2;
+	if (linetype < 0) linetype = 0;
+	PS_relative_ok = FALSE;
+#if 0
+	/*  In order to make 'PS_linewidth' work properly, I need to comment
+	 *  this line out.  Especially in combination with the line width
+	 *  extension of the `set arrow` command this is necessary.
+	 *  Can we live with that drawback?  (JFi)
+	 */
+	if (PS_linetype_last == linetype) return;
+#endif
+	PS_linetype_last = linetype;
+	fprintf(outfile,"LT%c\n", "ba012345678"[linetype]);
+	ps_path_count = 0;
+}
+
+
+TERM_PUBLIC void PS_linewidth (linewidth)
+double linewidth;
+{
+        fprintf(outfile,"%.3f UL\n",linewidth);
+
+/*  
+  Documentation of the 'change linewidth' strategy of the postscript terminal:
+
+  1. define a new postscript variable with a default value:
+     /userlinewidth gnulinewidth def
+
+  2. define a new postscript command to change the contents of that variable:
+     /UL { gnulinewidth mul /userlinewidth exch def } def
+     usage:  multiplication_factor UL
+
+  3. modify the already known postscript command /PL for the plot lines:
+     /PL { stroke userlinewidth setlinewidth } def
+
+  4. issue the new command before every change of the plot linestyle:
+     example:
+         4.0 UL
+         LT0
+     result:
+         Linetype 0 is drawn four times as thick as defined by the contents
+         of the postscript variable 'gnulinewidth'.
+*/
+}
+
+
+TERM_PUBLIC void PS_pointsize (pointsize)
+double pointsize;
+{
+        fprintf(outfile,"%.3f UP\n",pointsize);
+
+/*  
+  Documentation of the 'change pointsize' strategy of the postscript terminal:
+
+  1. define two new postscript variables to hold the overall pointsize:
+     /hpt_  and  /vpt_
+
+  2. define a new postscript command to use the contents of these variables: 
+     /UP { cf. definition above } def
+     usage:  multiplication_factor UP
+
+ [3.] [doesn't exist, skip to next number]
+
+  4. issue the new command whereever you change the symbols (and linetype):
+     example:
+         2.5 UP
+         4.0 UL  % optionally change linewidth, too
+         LT0
+     result:
+         Next symbols will be drawn 2.5 times as big as defined by the 
+         GNUPLOT `set pointsize` command (= overall pointsize).
+*/
+}
+
+
+TERM_PUBLIC void PS_move(x,y)
+unsigned int x,y;
+{
+	int dx, dy;
+	char abso[20],rel[20];
+	dx = x - PS_pen_x;
+	dy = y - PS_pen_y;
+	/* can't cancel all null moves--need a move after stroke'ing */
+	if (dx==0 && dy==0 && PS_relative_ok)
+		return;
+	sprintf(abso, "%d %d M\n", x, y);
+	sprintf(rel, "%d %d R\n", dx, dy);
+	if (strlen(rel) < strlen(abso) && PS_relative_ok){
+		fputs(rel, outfile);
+		PS_taken++;
+	}else
+		fputs(abso, outfile);
+	PS_relative_ok = TRUE;
+	ps_path_count += 1;
+
+	PS_pen_x = x;
+	PS_pen_y = y;
+}
+
+TERM_PUBLIC void PS_vector(x,y)
+unsigned int x,y;
+{
+	int dx, dy;
+	char abso[20],rel[20];
+	dx = x - PS_pen_x;
+	dy = y - PS_pen_y;
+	if (dx==0 && dy==0) return;
+	sprintf(abso, "%d %d L\n", x, y);
+	sprintf(rel, "%d %d V\n", dx, dy);
+	if (strlen(rel) < strlen(abso) && PS_relative_ok){
+		fputs(rel, outfile);
+		PS_taken++;
+	}else
+		fputs(abso, outfile);
+	PS_relative_ok = TRUE;
+	ps_path_count += 1;
+	PS_pen_x = x;
+	PS_pen_y = y;
+	if (ps_path_count >= 400) {
+		fprintf(outfile,"currentpoint stroke M\n");
+		ps_path_count = 0;
+	}
+}
+
+
+TERM_PUBLIC void PS_put_text(x,y,str)
+unsigned int x, y;
+char *str;
+{
+char ch;
+	if (!strlen(str)) return;
+	PS_move(x,y);
+	if (ps_ang != 0)
+		fprintf(outfile,"currentpoint gsave translate %d rotate 0 0 M\n"
+			,ps_ang*90);
+	putc('(',outfile);
+	ch = *str++;
+	while(ch!='\0') {
+		if ( (ch=='(') || (ch==')') || (ch=='\\') )
+			putc('\\',outfile);
+		putc(ch,outfile);
+		ch = *str++;
+	}
+	switch(ps_justify) {
+		case LEFT : fprintf(outfile,") Lshow\n");
+			break;
+		case CENTRE : fprintf(outfile,") Cshow\n");
+			break;
+		case RIGHT : fprintf(outfile,") Rshow\n");
+			break;
+	}
+	if (ps_ang != 0)
+		fprintf(outfile,"grestore\n");
+	ps_path_count = 0;
+	PS_relative_ok = FALSE;
+}
+
+
+TERM_PUBLIC int PS_text_angle(ang)
+int ang;
+{
+	ps_ang=ang;
+	return TRUE;
+}
+
+
+TERM_PUBLIC int PS_justify_text(mode)
+enum JUSTIFY mode;
+{
+	ps_justify=mode;
+	return TRUE;
+}
+
+
+TERM_PUBLIC int PS_set_font(font)  /* Entry font added by DJL */
+char *font;
+{
+char name[32];
+int  size,sep;
+
+        sep=strcspn(font,",");
+        strncpy(name,font,sep); name[sep]='\0';
+        size=ps_fontsize; sscanf (&(font[sep+1]),"%d",&size);
+        fprintf(outfile,"/%s findfont %d scalefont setfont\n",name,size*PS_SC);
+        PS_RememberFont(name,1 );
+        return TRUE;
+}
+
+
+/* postscript point routines */
+
+
+TERM_PUBLIC void PS_point(x,y,number)
+unsigned int x,y;
+int number;
+{
+static char *pointFNS[] = {"Pnt",  "Pls",   "Crs",    "Star",
+                           "Box",  "BoxF",  "Circle", "CircleF",
+                           "TriU", "TriUF", "TriD",   "TriDF",
+                           "Dia",  "DiaF",  "Pent",   "PentF",
+        		   "C0",   "C1",    "C2",     "C3",
+			   "C4",   "C5",    "C6",     "C7",
+          		   "C8",   "C9",    "C10",    "C11",
+			   "C12",  "C13",   "C14",    "C15",
+                           "S0",   "S1",    "S2",     "S3",
+			   "S4",   "S5",    "S6",     "S7",
+                           "S8",   "S9",    "S10",    "S11",
+			   "S12",  "S13",   "S14",    "S15",
+          		   "D0",   "D1",    "D2",     "D3",
+			   "D4",   "D5",    "D6",     "D7",
+			   "D8",   "D9",    "D10",    "D11",
+			   "D12",  "D13",   "D14",    "D15",
+                           "BoxE", "CircE", "TriUE",  "TriDE",
+                           "DiaE", "PentE"
+};
+	if (number < 0)
+		number = -1;		/* negative types are all 'dot' */
+	else
+		number %= sizeof(pointFNS)/sizeof(pointFNS[0]) -1;
+	fprintf(outfile,"%d %d %s\n", x, y, pointFNS[number+1]);
+
+	PS_relative_ok = 0;
+	ps_path_count = 0;
+	PS_linetype_last = -1; /* force next linetype change */
+}
+
+TERM_PUBLIC void PS_fillbox(style, x1,y1,x2,y2)
+int style;
+unsigned int x1,y1,x2,y2;
+{
+	PS_FLUSH_PATH
+
+	fprintf(outfile, "%d %d %d %d BoxFill\n", x1,y1, x2,y2);
+
+	PS_relative_ok = 0;
+	PS_linetype_last = -1;
+}
+
+
+/* ENHPOST */
+
+
+#ifdef DEBUG_ENHPS
+#define ENHPS_DEBUG(x) printf x;
+#else
+#define ENHPS_DEBUG(x)
+#endif
+
+
+static TBOOLEAN ENHps_opened_string;  /* try to cut out empty ()'s */
+
+/* used in determining height of processed text */
+
+static float ENHps_max_height, ENHps_min_height;
+
+
+/* process a bit of string, and return the last character used.
+ * p is start of string
+ * brace is TRUE to keep processing to }, FALSE for do one character
+ * fontname & fontsize are obvious
+ * base is the current baseline
+ * widthflag is TRUE if the width of this should count,
+ *              FALSE for zero width boxes
+ * showflag is TRUE if this should be shown,
+ *             FALSE if it should not be shown (like TeX \phantom)
+ */
+
+static char *ENHPS_recurse(p, brace, fontname, fontsize, base, widthflag, showflag)
+char *p, *fontname;
+TBOOLEAN brace, widthflag, showflag;
+double fontsize, base;
+{
+
+/* close a postscript string if it has been opened */
+#define ENHPS_FLUSH      \
+{	if (ENHps_opened_string)  \
+	{	fputs(")]\n", outfile);   \
+		ENHps_opened_string = FALSE; \
+	}                         \
+}
+
+#define ENHPS_OPEN	\
+{	if (!ENHps_opened_string) \
+	{ fprintf(outfile, "[(%s) %.1f %.1f %s %s (",  \
+		  fontname, fontsize, base, \
+ 		  widthflag ? "true" : "false",  \
+ 		  showflag ? "true" : "false");  \
+ 	  ENHps_opened_string = TRUE; \
+ 	}	\
+}
+
+	ENHPS_DEBUG(("RECURSE WITH [%p] \"%s\", %d %s %.1f %.1f %d %d\n", p, p, brace, fontname, fontsize, base, widthflag, showflag))
+
+	/* Start each recursion with a clean string */
+	ENHPS_FLUSH
+
+	if (base + fontsize > ENHps_max_height)
+	{	ENHps_max_height = base + fontsize;
+		ENHPS_DEBUG(("Setting max height to %.1f\n", ENHps_max_height));
+	}
+
+	if (base < ENHps_min_height)
+	{	ENHps_min_height = base;
+		ENHPS_DEBUG(("Setting min height to %.1f\n", ENHps_min_height));
+	}
+
+	while (*p)
+	{	float shift;
+
+		switch (*p)
+		{
+			case '}'  :
+				/*{{{  deal with it*/
+				if (brace)
+					return (p);
+				
+				fprintf(stderr, "enhpost printer driver - spurious }\n");
+				break;
+				/*}}}*/
+		
+			case '_'  :
+			case '^'  :
+				/*{{{  deal with super/sub script*/
+				
+				shift = (*p == '^') ? 0.5 : -0.3;
+				
+				ENHPS_FLUSH
+				
+				p = ENHPS_recurse(p+1, FALSE, fontname, fontsize*0.8, base+shift*fontsize, widthflag, showflag);
+				
+				break;
+				/*}}}*/
+		
+			case '{'  :
+			{
+				char *savepos=NULL, save=0;
+				char *localfontname=fontname, ch;
+				int recode=1;
+				float f=fontsize;
+
+				/*{{{  recurse (possibly with a new font) */
+				
+				ENHPS_DEBUG(("Dealing with {\n"))
+				
+				if (*++p == '/')
+				{	/* then parse a fontname, optional fontsize */
+					while (*++p == ' ');
+					if (*p=='-')
+					{
+						recode=0;
+						while (*++p == ' ');
+					}
+					localfontname = p;
+					while ((ch = *p) > ' ' && ch != '=')
+						++p;
+					save = *(savepos=p);
+					if (ch == '=')
+					{
+						*p++ = '\0';				
+						/*{{{  get optional font size*/
+						ENHPS_DEBUG(("Calling strtod(\"%s\") ...", p))
+						f = (float)strtod(p, &p);
+						ENHPS_DEBUG(("Returned %.1f and \"%s\"\n", f, p))
+						
+						if (f)
+							f *= PS_SC;  /* remember the scaling */
+						else
+							f = fontsize;
+						
+						ENHPS_DEBUG(("Font size %.1f\n", f))
+						/*}}}*/
+					}
+					else
+					{
+						*p++ = '\0';
+						f = fontsize;
+					}				
+				
+					while (*p == ' ')
+						++p;
+					if (*localfontname)
+					{
+						/* only allow RememberFont to re-encode it if no string active */
+						char *recodestring = PS_RememberFont(localfontname, recode && !ENHps_opened_string);
+						if (recode && recodestring)
+						{
+							ENHPS_FLUSH
+							fprintf(outfile, "/%s %s", localfontname, recodestring);
+						}
+					}
+					else
+						localfontname = fontname;
+				}
+				/*}}}*/
+				
+				ENHPS_DEBUG(("Before recursing, we are at [%p] \"%s\"\n", p, p))
+				
+				p = ENHPS_recurse(p, TRUE, localfontname, f, base, widthflag, showflag);
+				
+				ENHPS_DEBUG(("BACK WITH \"%s\"\n", p));
+				
+				ENHPS_FLUSH
+
+				if (savepos)
+					/* restore overwritten character */
+					*savepos = save;
+		
+				break;
+			}
+				
+			case '@' :
+				/*{{{  phantom box - prints next 'char', then restores currentpoint */
+    
+				ENHPS_FLUSH
+    
+				p = ENHPS_recurse(++p, FALSE, fontname, fontsize, base, FALSE, showflag);
+					
+				break;
+				/*}}}*/
+		
+			case '&' :
+				/*{{{  character skip - skips space equal to length of character(s) */
+    
+				ENHPS_FLUSH
+    
+				p = ENHPS_recurse(++p, FALSE, fontname, fontsize, base, widthflag, FALSE);
+					
+				break;
+				/*}}}*/
+		
+			case '('  :
+			case ')'  :
+				/*{{{  an escape and print it */
+				/* special cases */
+				ENHPS_OPEN
+				fputc('\\', outfile);
+				fputc(*p, outfile);
+				break;
+				/*}}}*/
+		
+			case '\\'  :
+				/*{{{  is it an escape */
+				/* special cases */
+				
+				if (p[1]=='\\' || p[1]=='(' || p[1]==')')
+				{
+					ENHPS_OPEN
+					fputc('\\', outfile);
+				}
+				else if (p[1] >= '0' && p[1] <= '7')
+				{
+					/* up to 3 octal digits */
+					ENHPS_OPEN
+					fputc('\\', outfile);
+					fputc(p[1], outfile);
+					++p;
+					if (p[1] >= '0' && p[1] <= '7')
+					{
+						fputc(p[1], outfile);
+						++p;
+						if (p[1] >= '0' && p[1] <= '7')
+						{
+							fputc(p[1], outfile);
+							++p;
+						}
+					}
+					break;
+				}
+    
+				++p;
+				/* just go and print it (fall into the 'default' case) */
+    
+				/*}}}*/
+			default:
+				/*{{{  print it */
+				ENHPS_OPEN
+    
+				fputc(*p, outfile);
+    
+			/*}}}*/
+
+		}
+
+		/* like TeX, we only do one character in a recursion, unless it's
+		 * in braces
+		 */
+
+		if (!brace)
+		{
+			ENHPS_FLUSH
+			return(p);  /* the ++p in the outer copy will increment us */
+		}
+
+		if (*p) /* only not true if { not terminated, I think */
+			++p;	
+	}
+	ENHPS_FLUSH
+	return p;
+} 
+
+
+/* a set-font routine for enhanced post : simply copies
+ * the font into a global, or restores the globals
+ * to the ps_font default
+ */
+
+TERM_PUBLIC int ENHPS_set_font(font)  /* Entry font added by DJL */
+char *font;
+{
+	ENHPS_DEBUG(("ENHPS_set_font(\"%s\")\n", font));
+
+	if (*font)
+	{
+		int sep=strcspn(font,",");
+		strncpy(ps_enh_font,font,sep); ps_enh_font[sep]='\0';
+		ps_enh_fontsize=ps_fontsize; sscanf (font+sep+1,"%d",&ps_enh_fontsize);
+		PS_RememberFont(ps_enh_font, 1);
+	}
+	else
+	{
+		/* return to defaults */
+		strcpy(ps_enh_font, ps_font);
+		ps_enh_fontsize = ps_fontsize;
+	}
+
+	return TRUE;
+}
+
+TERM_PUBLIC void ENHPS_put_text(x, y, str)
+unsigned int x, y;
+char *str;
+{
+	/* flush any pending graphics (all the XShow routines do this...) */
+
+	if (!strlen(str))
+		return;
+
+	if (ps_path_count)
+	{
+		fputs(" stroke\n",outfile);
+		ps_path_count=0;
+		PS_relative_ok=FALSE;
+	}
+
+	/* if there are no magic characters, we should just be able
+	 * punt the string to PS_put_text(), which will give shorter
+	 * ps output [eg tics and stuff rarely need extra processing],
+	 * but we need to make sure that the current font is the
+	 * default one before we can do that. {ie I tried it and it
+	 * used the wrong font !}
+	 * if (!strpbrk(str, "{}^_@&"))
+	 * {
+	 *   - do something to ensure default font is selected
+	 *   PS_put_text(x,y,str);
+	 *   return;
+	 * }
+	 */
+
+		
+	PS_move(x,y);
+
+	if (ps_ang != 0)
+		fprintf(outfile,"currentpoint gsave translate %d rotate 0 0 moveto\n",
+			ps_ang*90);
+
+	fputs("[ ",outfile);
+
+	/* set up the globals */
+	
+	ENHps_opened_string = FALSE;
+	ENHps_max_height = -1000;
+	ENHps_min_height = 1000;
+
+	/* Set the recursion going. We say to keep going until a
+	 * closing brace, but we don't really expect to find one.
+	 * If the return value is not the nul-terminator of the
+	 * string, that can only mean that we did find an unmatched
+	 * closing brace in the string. We increment past it (else
+	 * we get stuck in an infinite loop) and try again.
+	 *
+	 * ps_enh_font and ps_enh_fontsize are either set to the
+	 * the defaults set on option line, or have been set to
+	 * "font,size". That is to say, ps_font is used only
+	 * at startup and by ENHPS_set_font
+	 */
+	while (*(str = ENHPS_recurse(str, TRUE, ps_enh_font,
+				     (double)(ps_enh_fontsize*PS_SC),
+				     0.0, TRUE, TRUE)))
+	{
+		ENHPS_FLUSH
+
+		/* I think we can only get here if *str == '}' */
+		if (*str == '}')
+			fprintf(stderr, "enhpost printer driver - ignoring spurious }\n");
+		else
+			fprintf(stderr, "internal error in enhpost driver - *str=0x%x\n", *str);
+
+		if (!*++str)
+			break; /* end of string */
+
+		/* else carry on and process the rest of the string */
+	}
+
+	ENHps_max_height += ENHps_min_height;
+		
+	fprintf(outfile, "] %.1f ", -ENHps_max_height/3);
+
+	switch(ps_justify)
+	{
+		case LEFT : fprintf(outfile, "MLshow\n");
+			break;
+		case CENTRE : fprintf(outfile, "MCshow\n");
+			break;
+		case RIGHT : fprintf(outfile, "MRshow\n");
+			break;
+	}
+
+	if (ps_ang != 0)
+		fputs("grestore\n", outfile);
+	ps_path_count = 0;
+	PS_relative_ok=FALSE;
+}
+
+
+
+
+
+#endif /* TERM_BODY */
+
+#ifdef TERM_TABLE
+
+TERM_TABLE_START(post_driver)
+
+      "postscript",
+      "PostScript graphics language [mode \042fontname\042 font_size]",
+	   PS_XMAX, PS_YMAX, PS_VCHAR, PS_HCHAR, 
+	   PS_VTIC, PS_HTIC, PS_options, PS_init, PS_reset, 
+	   PS_text, null_scale, PS_graphics, PS_move, PS_vector, 
+	   PS_linetype, PS_put_text, PS_text_angle, 
+	   PS_justify_text, PS_point, do_arrow, PS_set_font, PS_pointsize,
+	   0 /*flags*/, 0 /*suspend*/, 0 /*resume*/, PS_fillbox, PS_linewidth
+
+TERM_TABLE_END(post_driver)
+
+#undef LAST_TERM
+#define LAST_TERM post_driver
+
+#endif /* TERM_TABLE */
+
+#endif /* TERM_PROTO_ONLY */
+
+#ifdef TERM_HELP
+START_HELP(post)
+"1 postscript",
+"?set terminal postscript",
+"?set term postscript",
+"?terminal postscript",
+"?term postscript",
+"?postscript",
+" Several options may be set in the `postscript` driver.",
+"",
+" Syntax:",
+"       set terminal postscript {<mode>} {color | monochrome}",
+"                               {solid | dashed} {<duplexing>}",
+"                               {enhanced | noenhanced}",
+"                               {\"<fontname>\"} {<fontsize>}",
+"",
+" where <mode> is `landscape`, `portrait`, `eps` or `default`",
+" `solid` draws all plots with solid lines, overriding any dashed patterns;",
+" <duplexing> is `defaultplex`, `simplex` or `duplex` (\"duplexing\" in",
+" PostScript is the ability of the printer to print on both sides of the same",
+" page---don't set this if your printer can't do it);",
+" `enhanced` activates the \"Enhanced PostScript\" features (subscripts,",
+" superscripts and mixed fonts);",
+" `\"<fontname>\"` is the name of a valid PostScript font; and `<fontsize>` is",
+" the size of the font in PostScript points.",
+"",
+" `default` mode sets all options to their defaults: `landscape`, `monochrome`,",
+" `dashed`, `defaultplex`, `noenhanced`, \"Helvetica\" and 14pt.",
+"  Default size of a PostScript plot is 10 inches wide and 7 inches high.",
+"",
+" `eps` mode generates EPS (Encapsulated PostScript) output, which is just",
+" regular PostScript with some additional lines that allow the file to be",
+" imported into a variety of other applications.  (The added lines are",
+" PostScript comment lines, so the file may still be printed by itself.)  To",
+" get EPS output, use the `eps` mode and make only one plot per file.  In `eps`",
+" mode the whole plot, including the fonts, is reduced to half of the default",
+" size.",
+"",
+" Examples:",
+"       set terminal postscript default       # old postscript",
+"       set terminal postscript enhanced      # old enhpost",
+"       set terminal postscript landscape 22  # old psbig",
+"       set terminal postscript eps 14        # old epsf1",
+"       set terminal postscript eps 22        # old epsf2",
+"       set size 0.7,1.4; set term post portrait color \"Times-Roman\" 14",
+"2 enhanced postscript",
+"?set terminal postscript enhanced",
+"?set term postscript enhanced",
+"?terminal postscript enhanced",
+"?term postscript enhanced",
+"?enhanced postscript",
+"@start table - first is interactive cleartext form",
+"  Control      Examples        Explanation",
+"   ^           a^x             superscript",
+"   _           a_x             subscript",
+"   @           @x or a@^b_c    phantom box (occupies no width)",
+"   &           &{space}        inserts space of specified length",
+"#\\multicolumn{3}{|c|}{Enhanced Text Control Codes} \\\\",
+"#Control & Examples & Explanation \\\\ \\hline",
+"#\\verb~^~ & \\verb~a^x~ & superscript\\\\",
+"#\\verb~_~ & \\verb~a_x~ & subscript\\\\",
+"#\\verb~@~ & \\verb~@x or a@^b_c~ & phantom box (occupies no width)\\\\",
+"#\\verb~&~ & \\verb~&{space}~ & inserts space of specified length\\\\",
+"%.TE", /* ugly - doc2ms uses @ for column separator, but here we */
+"%.TS", /* need @ in table, so end and restart the table ! */
+"%center box tab ($) ;",
+"%c c l .",
+"%Control$Examples$Explanation",
+"%_",
+"%^$a^x$superscript",
+"%\\&_$a\\&_x$subscript",
+"% @ $ @x or a\\&@^b\\&_c$phantom box (occupies no width)",
+"% & $ &{space}$inserts space of specified length",
+"@end table",
+"",
+" {text} can be used to allow multiple-character text, where only a single",
+" character is expected (e.g., 2^{10}).  To change the font and/or size, use",
+" the full form:  {/[fontname][=fontsize] text}   (For example, {/Symbol=20 G}",
+" is a 20 point GAMMA).  (The '/' character MUST be the first character after",
+" the '{'.)",
+"",
+" If the encoding vector has been changed by `set encoding`, the default",
+" encoding vector can be used instead by following the slash with a dash.  This",
+" is unnecessary if you use the Symbol font, however---since /Symbol uses its",
+" own encoding vector, `gnuplot` will not apply any other encoding vector to",
+" it.",
+"",
+" The phantom box is useful for a@^b_c to align superscripts and subscripts,",
+" and for overwriting an accent on a letter.  (The latter is tricky; it is much",
+" easier to use `set encoding iso_8859_1` to change to the ISO Latin-1 encoding",
+" vector, which contains a large variety of letters with accents or other",
+" diacritical marks.)  It is common sense to put the shorter of the two in the",
+" phantom box.",
+"",
+" Space equal in length to a string can be inserted using the '&' character.",
+" Thus",
+"         'abc&{def}ghi'",
+" would produce",
+"         'abc   ghi'.",
+"",
+" You can access special symbols numerically by specifying \\character-code (in",
+" octal), e.g., {/Symbol \\245} is the symbol for infinity.",
+"",
+" You can escape control characters using \\, e.g.,  \\\\, \\{, and so on.",
+"",
+" But be aware that strings in double-quotes are parsed differently than those",
+" enclosed in single-quotes.  The major difference is that backslashes may need",
+" to be doubled when in double-quoted strings.",
+"",
+" Examples (these are hard to describe in words---try them!):",
+"       set xlabel 'Time (10^6 {/Symbol m}s)'",
+"       set title '{/Symbol=18 \\362@_{/=9.6 0}^{/=12 x}} \\",
+"                  {/Helvetica e^{-{/Symbol m}^2/2} d}{/Symbol m}'",
+"",
+" The file \"ps_guide.ps\" in the /docs subdirectory of the `gnuplot` source",
+" distribution contains more examples of the enhanced syntax."
+END_HELP(post)
+#endif
+

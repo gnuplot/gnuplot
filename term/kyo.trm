@@ -1,0 +1,188 @@
+/*
+ * $Id: kyo.trm,v 1.10 1996/12/08 13:11:27 drd Exp $
+ *
+ */
+
+/* Prescribe (KYOCERA) driver - Michael Waldor */
+/* Modified for gnuplot 2.0 sk@sun4 24-Apr-1990 13:23 */
+
+/*
+ * adapted to the new terminal layout by Stefan Bodewig (Dec. 1995)
+ */
+
+#ifndef GOT_DRIVER_H
+#include "driver.h"
+#endif
+
+#ifdef TERM_REGISTER
+register_term(prescribe)
+register_term(kyo)
+#endif
+
+#ifdef TERM_PROTO
+TERM_PUBLIC void PRE_init __PROTO((void));
+TERM_PUBLIC void KYO_init __PROTO((void));
+TERM_PUBLIC void PRE_graphics __PROTO((void));
+TERM_PUBLIC void PRE_text __PROTO((void));
+TERM_PUBLIC void PRE_linetype __PROTO((int linetype));
+TERM_PUBLIC void PRE_move __PROTO((unsigned int x, unsigned int y));
+TERM_PUBLIC void PRE_vector __PROTO((unsigned int x, unsigned int y));
+TERM_PUBLIC void PRE_put_text __PROTO((unsigned int x, unsigned int y, char *str));
+TERM_PUBLIC int PRE_justify_text __PROTO((enum JUSTIFY mode));
+TERM_PUBLIC void PRE_reset __PROTO((void));
+
+#define PRE_XMAX 2567
+#define PRE_YMAX 1815	/* X:Y = sqrt(2) */
+
+#define PRE_VCHAR (PRE_YMAX/30)
+#define PRE_HCHAR 33	/* about 9 chars per inch */
+#define PRE_HTIC (PRE_XMAX/80)
+#define PRE_VTIC PRE_HTIC
+
+/* for Courier font: */
+#define KYO_VCHAR (14*(300/72))	/* 12 pt + 2 pt baselineskip */
+#define KYO_HCHAR (300/10)	/*  10 chars per inch */
+#endif /* TERM_PROTO */
+
+#ifndef TERM_PROTO_ONLY
+#ifdef TERM_BODY
+
+#define PRE_XLAST (PRE_XMAX - 1)
+#define PRE_YLAST (PRE_YMAX - 1)
+
+enum JUSTIFY pre_justify=LEFT;	/* text is flush left */
+
+TERM_PUBLIC void PRE_init()
+{
+  (void) fprintf(outfile,"!R! RES;\n") ;
+  /* UNIT: units are dots, 300 dots = 1 in = 72 pt */
+  /* SPO: landscape format */
+  /* STM, SLM set top, left margin*/
+  /* Font: bold Helvetica (proportional font) */
+  (void) fprintf(outfile,"PAGE; UNIT D; SPO L; STM 280; SLM 440;\n") ;
+  (void) fprintf(outfile,"FTMD 15; FONT 29; SCPI 9;\n") ;
+}
+
+TERM_PUBLIC void KYO_init()
+{
+  (void) fprintf(outfile,"!R! RES;\n") ;
+  /* UNIT: units are dots, 300 dots = 1 in = 72 pt */
+  /* SPO: landscape format */
+  /* STM, SLM set top, left margin */
+  /* Font: Courier (fixed width font) */
+  (void) fprintf(outfile,"PAGE; UNIT D; SPO L; STM 280; SLM 440;\n") ;
+  (void) fprintf(outfile,"FTMD 15; FONT 17; SCPI 10;\n") ;
+}
+
+TERM_PUBLIC void PRE_graphics()
+{
+}
+
+TERM_PUBLIC void PRE_text()			/* eject page after each plot */
+{
+  (void) fprintf(outfile,"PAGE;\n") ; 
+}
+
+TERM_PUBLIC void PRE_linetype(linetype)
+int linetype ;
+{
+  /* actually choose pendiameter */
+  if (linetype < 0) linetype = -linetype;
+  else linetype = 3;
+  (void) fprintf(outfile,"SPD %d;\n", linetype) ;
+}
+ 
+TERM_PUBLIC void PRE_move(x,y)
+unsigned int x,y ;
+{
+  (void) fprintf(outfile,"MAP %1d,%1d;\n",x,PRE_YMAX-y) ;
+}
+ 
+TERM_PUBLIC void PRE_vector(x,y)
+unsigned int x,y ;
+{
+  (void) fprintf(outfile,"DAP %1d, %1d;\n",x,PRE_YMAX-y) ;
+}
+ 
+TERM_PUBLIC void PRE_put_text(x, y, str)
+unsigned int x,y ;
+char *str;
+{
+  PRE_move(x,y);
+  switch(pre_justify){
+  case RIGHT:
+    (void) fprintf(outfile,"RTXT \"%s\", B;\n",str) ;
+    break;
+  default:
+    (void) fprintf(outfile,"TEXT \"%s\", B;\n",str) ;
+  }
+}
+ 
+TERM_PUBLIC int PRE_justify_text(mode)
+enum JUSTIFY mode;
+{
+  pre_justify=mode;
+  switch(pre_justify){
+  case LEFT:
+  case RIGHT:
+    return(TRUE);
+  default:
+    return(FALSE);
+  }
+  
+}
+
+TERM_PUBLIC void PRE_reset()
+{
+  (void) fprintf(outfile,"PAGE; RES; EXIT;\n");
+}
+
+#endif /* TERM_BODY */
+
+#ifdef TERM_TABLE
+
+TERM_TABLE_START(prescribe_driver)
+    "prescribe", "Prescribe - for the Kyocera Laser Printer",
+	PRE_XMAX, PRE_YMAX, PRE_VCHAR, PRE_HCHAR, 
+	PRE_VTIC, PRE_HTIC, options_null, PRE_init, PRE_reset, 
+	PRE_text, null_scale, PRE_graphics, PRE_move, PRE_vector, 
+	PRE_linetype, PRE_put_text, null_text_angle, 
+	PRE_justify_text, line_and_point, do_arrow, set_font_null
+TERM_TABLE_END(prescribe_driver)
+
+#undef LAST_TERM
+#define LAST_TERM prescribe_driver
+
+TERM_TABLE_START(kyo_driver)
+    "kyo", "Kyocera Laser Printer with Courier font",
+	PRE_XMAX, PRE_YMAX, KYO_VCHAR, KYO_HCHAR, 
+	PRE_VTIC, PRE_HTIC, options_null, KYO_init, PRE_reset, 
+	PRE_text, null_scale, PRE_graphics, PRE_move, PRE_vector, 
+	PRE_linetype, PRE_put_text, null_text_angle, 
+	PRE_justify_text, line_and_point, do_arrow, set_font_null
+TERM_TABLE_END(kyo_driver)
+
+#undef LAST_TERM
+#define LAST_TERM kyo_driver
+
+#endif /* TERM_TABLE */
+#endif /* TERM_PROTO_ONLY */
+
+#ifdef TERM_HELP
+START_HELP(kyo)
+"1 kyo",
+"?set terminal kyo",
+"?set term kyo",
+"?terminal kyo",
+"?term kyo",
+"?kyo",
+"?set terminal prescribe",
+"?set term prescribe",
+"?terminal prescribe",
+"?term prescribe",
+"?prescribe",
+" The `kyo` and `prescribe` terminal drivers support the Kyocera laser printer.",
+" The only difference between the two is that `kyo` uses \"Helvetica\" whereas",
+" `prescribe` uses \"Courier\".  There are no options."
+END_HELP(kyo)
+#endif
