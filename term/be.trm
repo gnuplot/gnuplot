@@ -1,5 +1,5 @@
 /*
- * $Id: be.trm,v 1.8 2001/09/22 15:58:43 amai Exp $
+ * $Id: be.trm,v 1.9 2001/12/19 09:14:55 mikulik Exp $
  *
  */
 
@@ -444,7 +444,7 @@ START_HELP(be)
 "",
 " A number of other `gnuplot` options are available for the `be` terminal.",
 " These may be specified either as command-line options when `gnuplot` is",
-" invoked or as resources in the configuration file \"/.Xdefaults\".  They are",
+" invoked or as resources in the configuration file \".Xdefaults\".  They are",
 " set upon initialization and cannot be altered during a `gnuplot` session.",
 "2 command-line_options",
 "?commands set terminal be command-line-options",

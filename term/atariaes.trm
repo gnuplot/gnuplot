@@ -1,5 +1,5 @@
 /*
- * $Id: atariaes.trm,v 1.12 1999/06/22 11:54:14 lhecking Exp $
+ * $Id: atariaes.trm,v 1.13 2001/02/01 17:56:05 broeker Exp $
  *
  */
 
@@ -765,7 +765,7 @@ START_HELP(atari)
 " colors.",
 "",
 " Syntax:",
-"       set terminal atari {<fontsize>} {<col0> <col1> ... <col15.}",
+"       set terminal atari {<fontsize>} {<col0> <col1> ... <col15>}",
 "",
 " The character size must appear if any colors are to be specified.  Each of",
 " the (up to 16) colors is given as a three-digit hex number, where the digits",

@@ -1,5 +1,5 @@
 /*
- * $Id: atarivdi.trm,v 1.12 1999/06/19 20:30:45 lhecking Exp $
+ * $Id: atarivdi.trm,v 1.13 1999/06/22 11:54:14 lhecking Exp $
  *
  */
 
@@ -466,7 +466,7 @@ START_HELP(vdi)
 " colors.",
 "",
 " Syntax:",
-"       set terminal vdi {<fontsize>} {<col0> <col1> ... <col15.}",
+"       set terminal vdi {<fontsize>} {<col0> <col1> ... <col15>}",
 "",
 " The character size must appear if any colors are to be specified.  Each of",
 " the (up to 16) colors is given as a three-digit hex number, where the digits",
