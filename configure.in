@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.in,v 1.109 2002/02/14 17:50:26 lhecking Exp $
+dnl $Id: configure.in,v 1.110 2002/03/02 18:09:05 lhecking Exp $
 dnl
 AC_INIT(src/graphics.c)
 AM_CONFIG_HEADER(config.h:config.hin)
@@ -94,13 +94,13 @@ AC_CHECK_HEADERS(errno.h float.h limits.h locale.h math.h stdlib.h string.h \
 )
 
 if test "$ac_cv_header_math_h" = yes ; then
-AC_MSG_CHECKING([for struct exception in math.h])
-AC_TRY_LINK([#include <math.h>],
-  [struct exception *x; x->type; x->name;],
-  AC_MSG_RESULT(yes)
-  AC_DEFINE(EXCEPTION_IN_MATH, 1,
-            [ Define if math.h declares struct exception for matherr(). ]),
-  AC_MSG_RESULT(no))
+  AC_MSG_CHECKING([for struct exception in math.h])
+  AC_TRY_LINK([#include <math.h>],
+    [struct exception *x; x->type; x->name;],
+    AC_MSG_RESULT(yes)
+    AC_DEFINE(HAVE_STRUCT_EXCEPTION_IN_MATH_H, 1,
+              [ Define if math.h declares struct exception for matherr(). ]),
+    AC_MSG_RESULT(no))
 fi
 
 test "$ac_cv_header_sys_stat_h" = yes && AC_HEADER_STAT
@@ -434,11 +434,6 @@ please add path to pdflib.h to CPPFLAGS in Makefile]))
 please add path to zlib.h to CPPFLAGS in Makefile]))],
     AC_MSG_RESULT([  PDF library not found.
   See term/pdf.trm for download details]))
-
-  if test "$ac_cv_header_pdflib_h" = yes; then
-    AC_DEFINE(HAVE_LIBPDF, 1,
-              [ Define if you have the pdf library. ])
-  fi
 fi
 dnl end pdf
 
