@@ -1043,7 +1043,16 @@ void init_terminal()
 #endif
 
 #ifdef OS2
-           if (_osmode==OS2_MODE) term_name = "pm" ; else term_name = "emxvga";
+/*           if (_osmode==OS2_MODE) term_name = "pm" ; else term_name = "emxvga"; */
+# ifdef X11
+/* This catch is hopefully ok ... */
+       term = getenv("WINDOWID");
+       display = getenv("DISPLAY");
+	   if ( (term != (char *)NULL) &&  (display != (char *)NULL) )
+          term_name = "x11";
+       else
+# endif
+         term_name = "pm";
 #endif /*OS2 */           
 
 /* set linux terminal only if LINUX_setup was successfull, if we are on X11
@@ -1064,7 +1073,7 @@ void init_terminal()
 }
 
 
-#if defined(__ZTC__)
+#ifdef __ZTC__
 char *
 ztc_init()
 {
@@ -1107,7 +1116,7 @@ void UP_redirect(caller) int caller;
 	caller = caller;	/* to stop Turbo C complaining 
 						 * about caller not being used */
 }
-#else
+#else /* UNIXPLOT */
 void UP_redirect (caller)
 int caller;
 /*
@@ -1152,7 +1161,7 @@ int caller;
 	break;
 	}
 }
-#endif
+#endif /* UNIXPLOT */
 
 
 /* test terminal by drawing border and text */
@@ -1280,7 +1289,7 @@ void test_term()
 }
 
 #if 0
-#if defined(MSDOS)||defined(g)||defined(MTOS)||defined(OS2)||defined(_Windows)||defined(DOS386)
+# if defined(MSDOS)||defined(g)||defined(MTOS)||defined(OS2)||defined(_Windows)||defined(DOS386)
 /* output for some terminal types must be binary to stop non Unix computers
    changing \n to \r\n. 
    If the output is not STDOUT, the following code reopens outfile 
@@ -1290,10 +1299,12 @@ reopen_binary()
 {
 	if (outstr) {
 		(void) fclose(outfile);
-#ifdef _Windows
-		if ( !stricmp(outstr,"PRN") )
-			(void) strcpy(filename,win_prntmp);	/* use temp file for windows */
-#endif
+#  ifdef _Windows
+		if ( !stricmp(outstr,"PRN") ) {
+		        /* use temp file for windows */
+			(void) strcpy(filename,win_prntmp);
+		}
+#  endif
 		if ( (outfile = fopen(filename,"wb")) == (FILE *)NULL ) {
 			if ( (outfile = fopen(filename,"w")) == (FILE *)NULL ) {
 				os_error("cannot reopen file with binary type; output unknown",
@@ -1304,8 +1315,8 @@ reopen_binary()
 					NO_CARET);
 			}
 		}
-#if defined(__TURBOC__) && defined(MSDOS)
-#ifndef _Windows
+#  if defined(__TURBOC__) && defined(MSDOS)
+#   ifndef _Windows
 		if ( !stricmp(outstr,"PRN") )
 		{
 		/* Put the printer into binary mode. */
@@ -1320,11 +1331,11 @@ reopen_binary()
 			regs.h.al = 1;		/* set device info */
 			intdos(&regs, &regs);
 		}
-#endif
-#endif
+#   endif /* !_Windows */
+#  endif /* TURBOC && MSDOS */
 	}
 }
-#endif
+# endif /* MSDOS || g || MTOS || ... */
 #endif /* 0 */
 
 #ifdef VMS
