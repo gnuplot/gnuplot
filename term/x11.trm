@@ -1,5 +1,5 @@
 /*
- * $Id: x11.trm,v 1.110 2004/05/08 22:21:58 sfeam Exp $
+ * $Id: x11.trm,v 1.111 2004/05/10 19:35:15 sfeam Exp $
  *
  */
 
@@ -1394,7 +1394,7 @@ X11_filled_polygon(int points, gpiPoint *corners)
 static TBOOLEAN ENHx11_opened_string;
 static TBOOLEAN ENHx11_sizeonly = FALSE;
 static TBOOLEAN ENHx11_show = TRUE;
-static TBOOLEAN ENHx11_overprint = FALSE;
+static int ENHx11_overprint = 0;
 static TBOOLEAN ENHx11_widthflag = TRUE;
 static double ENHx11_base;
 static double ENHx11_fontsize;
@@ -1448,7 +1448,7 @@ ENHX11_FLUSH()
 	    PRINT3("Ts%04d%04d%s\n", 0, (int)ENHx11_base, enhanced_text);
 	else if (ENHx11_overprint == 1)
 	    PRINT3("Tc%04d%04d%s\n", 0, (int)ENHx11_base, enhanced_text);
-	else if (!ENHx11_widthflag && !ENHx11_overprint)
+	else if (!ENHx11_widthflag && ENHx11_overprint != 0)
 	    PRINT3("To%04d%04d%s\n", 0, (int)ENHx11_base, enhanced_text);
 	else
 	    PRINT3("Tu%04d%04d%s\n", 0, (int)ENHx11_base, enhanced_text);

@@ -1,5 +1,5 @@
 /*
- * $Id: gd.trm,v 1.38 2004/03/24 19:28:33 sfeam Exp $
+ * $Id: gd.trm,v 1.39 2004/04/13 16:50:50 broeker Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -1377,7 +1377,7 @@ static char   *ENHgd_font;
 
 static TBOOLEAN ENHgd_show = TRUE;
 static TBOOLEAN ENHgd_sizeonly = FALSE;
-static TBOOLEAN ENHgd_overprint = FALSE;
+static int ENHgd_overprint = 0;
 static TBOOLEAN ENHgd_widthflag = TRUE;
 static unsigned int ENHgd_xsave, ENHgd_ysave;
 
@@ -1480,8 +1480,8 @@ ENHGD_put_text(x, y, str)
     strncpy(enhanced_escape_format,"&#%o;",sizeof(enhanced_escape_format));
 
     ENHgd_opened_string = FALSE;
-    ENHgd_overprint = FALSE;
-    ENHgd_show      = TRUE;
+    ENHgd_show = TRUE;
+    ENHgd_overprint = 0;
 
     /* EAM - post.trm wasn't doing this, but how else do they get initialized? */
 	ENHgd_font = png_state.ttffont;

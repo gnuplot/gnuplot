@@ -1,5 +1,5 @@
 /*
- * $Id: dumb.trm,v 1.15 2004/03/29 10:43:36 broeker Exp $
+ * $Id: dumb.trm,v 1.16 2004/04/13 17:24:16 broeker Exp $
  *
  */
 
@@ -415,7 +415,7 @@ DUMB_arrow(sx, sy, ex, ey, head)
 
 static TBOOLEAN ENHdumb_opened_string;
 static TBOOLEAN ENHdumb_show = TRUE;
-static TBOOLEAN ENHdumb_overprint = 0;
+static int ENHdumb_overprint = 0;
 static TBOOLEAN ENHdumb_widthflag = TRUE;
 static unsigned int ENHdumb_xsave, ENHdumb_ysave;
 #define ENHdumb_fontsize 1

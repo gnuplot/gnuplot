@@ -1,5 +1,5 @@
 /*
- * $Id: pdf.trm,v 1.27 2004/02/02 06:19:56 sfeam Exp $
+ * $Id: pdf.trm,v 1.28 2004/03/23 05:40:48 sfeam Exp $
  */
 
 /*------------------------------
@@ -1191,7 +1191,7 @@ static char   *ENHpdf_font;
 static TBOOLEAN ENHpdf_sizeonly = FALSE;
 
 static TBOOLEAN ENHpdf_show = TRUE;
-static TBOOLEAN ENHpdf_overprint = FALSE;
+static int ENHpdf_overprint = 0;
 static TBOOLEAN ENHpdf_widthflag = FALSE;
 static unsigned int ENHpdf_xsave, ENHpdf_ysave;
 
