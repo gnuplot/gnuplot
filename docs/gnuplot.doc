@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.275 2005/02/18 09:47:39 mikulik Exp $
+C RCS $Id: gnuplot.doc,v 1.276 2005/02/22 01:14:45 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -7937,6 +7937,10 @@ C ... and restart the table:
  boxwidth parameter has not been set then the width of the candlestick
  rectangle is controlled by `set bars <width>`.
 
+ By default the vertical line segments have no crossbars at the top and
+ bottom. If you want crossbars, which are typically used for box-and-whisker
+ plots, then add the keyword `whiskerbars` to the plot command.
+
  By default the rectangle is empty if (open > close), and filled with three
  vertical bars if (close > open). If filled-boxes support is present, then
  the rectangle is colored according to `set style fill <fillstyle>`.
@@ -7954,6 +7958,9 @@ C ... and restart the table:
    set style fill empty
    plot 'stat.dat' using 1:3:2:6:5 with candlesticks title 'Quartiles', \
         ''         using 1:4:4:4:4 with candlesticks lt -1 notitle
+
+   # Plot with crossbars on the whiskers
+   plot 'stat.dat' using 1:3:2:6:5 with candlesticks whiskerbars
 
   See `set boxwidth`, `set bars` and `set style fill`.
 5 dots

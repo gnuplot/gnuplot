@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.90 2004/12/01 21:10:35 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.91 2004/12/05 08:04:42 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -1539,10 +1539,17 @@ eval_plots()
 		}
 #endif
 
-		/* pick up line/point specs
+		/* pick up line/point specs and other style-specific keywords
 		 * - point spec allowed if style uses points, ie style&2 != 0
 		 * - keywords for lt and pt are optional
 		 */
+		if (this_plot->plot_style == CANDLESTICKS) {
+		    if (almost_equals(c_token,"whisker$bars")) {
+			this_plot->arrow_properties.head = BOTH_HEADS;
+			c_token++;
+		    }
+		}
+
 		if (this_plot->plot_style == VECTOR) {
 		    int stored_token = c_token;
 		    struct arrow_style_type arrow;

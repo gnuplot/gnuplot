@@ -1,3 +1,11 @@
+2005-02-24  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/graphics.c(plot_c_bars) src/plot2d.c(eval_plots) docs/gnuplot.doc:
+	New keyword  '... with candlesticks {whiskerbars}' that draws horizontal
+	crossbars at the top and bottom of the whiskers. This is typical for
+	box-and-whisker plots.  The new keyword is preferable to addingt a 
+	separate "boxplots" plot style (patch #624000).
+
 2005-02-22  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/x11.trm: Fix botched optimization in previous patch.

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.149 2005/02/18 22:11:06 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.150 2005/02/18 22:56:04 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -3408,6 +3408,14 @@ plot_c_bars(struct curve_points *plot)
 	    (*t->vector) (xlowM, map_y(yopen));
 	    (*t->move)   (xM, map_y(yclose));
 	    (*t->vector) (xM, yhighM);
+
+	/* Some users prefer bars at the end of the whiskers */
+	if (plot->arrow_properties.head == BOTH_HEADS) {
+	    (*t->move)   (xlowM, yhighM);
+	    (*t->vector) (xhighM, yhighM);
+	    (*t->move)   (xlowM, ylowM);
+	    (*t->vector) (xhighM, ylowM);
+	}
 
 	/* draw two extra vertical bars to indicate open > close */
 	if (yopen > yclose) {
