@@ -61,8 +61,8 @@ static char *RCSid = "$Id: time.c,v 1.11 1998/04/14 00:16:27 drd Exp $";
 extern int ftime(struct timeb *);
 # endif /* !HAVE_SYS_TIMEB_H */
 
-# define int_error(x,y) fprintf(stderr, "Error: " x "\n")
-# define int_warn(x,y) fprintf(stderr, "Warn: " x "\n")
+# define int_error(x,y) fprintf(stderr, "Error: " y "\n")
+# define int_warn(x,y) fprintf(stderr, "Warn: " y "\n")
 
 /* need (only) these from plot.h */
 # define ZERO_YEAR	2000
@@ -189,7 +189,7 @@ struct tm *tm;
 			goto found_abbrev_mon;
 		    }
 		/* get here => not found */
-		int_warn("Bad abbreviated month name", NO_CARET);
+		int_warn(NO_CARET, "Bad abbreviated month name");
 		m = 0;
 	      found_abbrev_mon:
 		tm->tm_mon = m;
@@ -205,7 +205,7 @@ struct tm *tm;
 			goto found_full_mon;
 		    }
 		/* get here => not found */
-		int_warn("Bad full month name", NO_CARET);
+		int_warn(NO_CARET, "Bad full month name");
 		m = 0;
 	      found_full_mon:
 		tm->tm_mon = m;
@@ -256,7 +256,7 @@ struct tm *tm;
 	    break;
 
 	default:
-	    int_warn("Bad time format in string", NO_CARET);
+	    int_warn(NO_CARET, "Bad time format in string");
 	}
 	fmt++;
     }
@@ -296,7 +296,7 @@ struct tm *tm;
 	if (yday) {
 
 	    if (tm->tm_yday < 0)
-		int_error("Illegal day of year", NO_CARET);
+		int_error(NO_CARET, "Illegal day of year");
 
 	    /* we just set month to jan, day to yday, and let the
 	     * normalising code do the work.
@@ -307,11 +307,11 @@ struct tm *tm;
 	    tm->tm_mday = tm->tm_yday + 1;
 	}
 	if (tm->tm_mon < 0) {
-	    int_error("illegal month", NO_CARET);
+	    int_error(NO_CARET, "illegal month");
 	    return (NULL);
 	}
 	if (tm->tm_mday < 1) {
-	    int_error("illegal day of month", NO_CARET);
+	    int_error(NO_CARET, "illegal day of month");
 	    return (NULL);
 	}
 	if (tm->tm_mon > 11) {
@@ -760,7 +760,7 @@ struct tm *tm;
 	    LETTER('S', 2, tm_sec, NOTHING);
 
 	default:
-	    int_error("incorrect time format character", NO_CARET);
+	    int_error(NO_CARET, "incorrect time format character");
 	}
     }
 
@@ -769,7 +769,7 @@ struct tm *tm;
 
     if (mktime(tm) == -1) {
 	FPRINTF((stderr, "mktime() was not happy\n"));
-	int_error("Invalid date/time [mktime() did not like it]", NO_CARET);
+	int_error(NO_CARET, "Invalid date/time [mktime() did not like it]");
     }
     FPRINTF((stderr, "After mktime : %d/%d/%d:%d:%d:%d\n", tm->tm_mday, tm->tm_mon, tm->tm_year, tm->tm_hour, tm->tm_min, tm->tm_sec));
 
