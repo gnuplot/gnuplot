@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.64 2003/07/07 20:49:00 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.65 2003/07/22 17:36:32 sfeam Exp $"); }
 #endif
 
 #define X11_POLYLINE 1
@@ -1390,8 +1390,8 @@ record()
 		    DrawBox(plot);
 		    plot->zoombox_on = FALSE;
 		}
-		return 1;
 	    }
+	    return 1;
 
 	case 't':
 #ifdef PIPE_IPC
@@ -1440,8 +1440,8 @@ record()
 			DrawBox(plot);
 		    break;
 		}
-		return 1;
 	    }
+	    return 1;
 
 	case 'r':
 #ifdef PIPE_IPC
@@ -1459,13 +1459,11 @@ record()
 		    plot->ruler_y = y;
 		}
 		DrawRuler(plot);	/* draw new one */
-		return 1;
 	    }
+	    return 1;
 
 	case 'z':
-#ifdef EXPORT_SELECTION
-	    export_graph(plot);
-#endif
+	    if (!pipe_died)
 	    {
 		int len = strlen(buf + 1) - 1;	/* discard newline '\n' */
 		memcpy(selection, buf + 1, len < SEL_LEN ? len : SEL_LEN);
@@ -1473,6 +1471,9 @@ record()
 		selection[len + 1 < SEL_LEN ? len + 1 : SEL_LEN - 1] = '\0';
 		XStoreBytes(dpy, buf + 1, len);
 		XFlush(dpy);
+#ifdef EXPORT_SELECTION
+		export_graph(plot);
+#endif
 	    }
 	    return 1;
 #endif

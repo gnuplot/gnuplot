@@ -1,5 +1,10 @@
 2003-07-27  Ethan Merritt <merritt@u.washington.edu>
 
+	* src/gplt_x11.c:  Fix incorrect bracketing of switch statement entries
+	introduced way back in Dec 2000. This fixes the "x11 clipboard" bug.
+
+2003-07-27  Ethan Merritt <merritt@u.washington.edu>
+
 	* docs/gnuplot.doc docs/titlepag.tex: This is a first pass at updating
 	the "What is New" section to reflect changes since version 3.7. I also
 	slightly re-arranged the sections on mousing, and added my name to the
