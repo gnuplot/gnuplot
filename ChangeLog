@@ -1,3 +1,7 @@
+2005-01-07  Daniel Sebald  <daniel.sebald@ieee.org>
+
+	* src/gplt_x11.c (record):  Incorrect nesting of parentheses.
+
 2006-01-02  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/gd.trm (PNG_options): Change default animation mode to 

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.150 2005/11/23 23:19:43 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.151 2005/12/03 05:23:10 sfeam Exp $"); }
 #endif
 
 #define X11_POLYLINE 1
@@ -1373,8 +1373,8 @@ record()
 		    if (plot->window) {
 			char *msg;
 			char *added_text = " drawing ...";
-			int orig_len = (plot->titlestring ? strlen(plot->titlestring : 0);
-			if (msg = (char *) malloc(orig_len + strlen(added_text) + 1) {
+			int orig_len = (plot->titlestring ? strlen(plot->titlestring) : 0);
+			if (msg = (char *) malloc(orig_len + strlen(added_text) + 1)) {
 			    strcpy(msg, plot->titlestring);
 			    strcat(msg, added_text);
 			    XStoreName(dpy, plot->window, msg);
