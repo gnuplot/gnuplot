@@ -27,6 +27,12 @@ install the gd library : see term/gif.trm for details.
 png and z libraries : see term/png.trm for details.  Note that the
 png library will probably not compile without an ANSI/ISO C compiler.
 
+   There's a special section in term.h to be used by 16bit DOS or Windows
+builds of gnuplot.  This preselection is necessary because it's quite
+hard to squeeze a sufficient set of drivers through the many 64K 
+barriers imposed by 16bit environments.  For any driver you add
+in this selection, you'll quite probably have to remove some other one.
+
    A complete overview of configure options is below in the Basic
 Installation section. On platforms which do not support GNU
 autoconf/configure, ie. most non-Unix platforms, look for a makefile
@@ -256,39 +262,59 @@ Using TurboC
 MS-Windows
 ----------
 
-Using Microsoft C 7.0 and compiling for MS-Windows
+Common for all Windows builds: The program doesn't need to be installed
+specially.  Just copy all the relevant files mentioned a single directory,
+and you're done.  You'll probably want to generate a desktop icon 
+(program manager group/icon, desktop shortcut, or Start->Programs menu
+entry) for wgnuplot.exe or wgnupl32.exe, and optionally register
+wgnuplot/wgnupl32 as the program to open plot script file with.
+Suggested filename extensions would be *.plt or *.gpl. 
+
+Using Microsoft C 7.0 and compiling for 16bit MS-Windows (3.x, WfW)
       copy makefile.msw makefile
       nmake
   Put wgnuplot.exe, wgnuplot.dll, wgnuplot.hlp and wgnuplot.mnu
-  in the windows directory.
+  in some directory.
 
-Using Borland C++ 3.1 and compiling for MS-Windows
+Using Borland C++ 3.1 and compiling for 16bit MS-Windows (3.x, WfW)
       copy makefile.win makefile
-  Edit makefile to change TC.
+  Edit makefile to change TC, and check other possible options to set.
+  You may want to edit the 16bit-only section of term.h to select a
+  different set of terminal drivers.
       make
   Put wgnuplot.exe, wgnuplot.dll, wgnuplot.hlp and wgnuplot.mnu
-  in the windows directory.
+  in some directory.
 
-Using Visual C++ and compiling for Windows NT/95/98
+Using Borland C++ 4.52, C++ Builder 1.0 or the "free" command line
+version 5.5, compiling for 32bit MS-Windows (XP/2K/NT/95/98/ME)
+      copy makefile.win makefile
+  Edit makefile to change TC, LINK32, RUNTIME_LIB and other 
+  configuration options as documented in the makefile itself. 
+      make -DWIN32=1
+  Copy wgnupl32.exe, wgnuplot.hlp and wgnuplot.mnu to some directory.
+
+Using Visual C++ and compiling for 32bit Windows (XP/2K/NT/95/98/ME)
       nmake -f makefile.nt
  or
       copy makefile.nt makefile
       nmake
 
-Using the MinGW32 port of egcs: you need the Micrsoft SDK for the
-moment.
+Using the MinGW32 port of GCC, plus the Microsoft Help Compiler (part
+of the "Platform SDK", but also available individually): 
       copy makefile.mgw makefile
   Look through the Makefile to see if you need to make any changes.
       make 
+  Optionally check the target directory in the makefile and
       make install
 
-Using the Cygwin port of gcc, which includes MinGW32: you need the
-Micrsoft SDK for the moment.
+Using the Cygwin port of GCC, which includes MinGW32. Again, you need the
+MS Help Compiler in addition to a reasonably complete Cygwin install.
       copy makefile.cyg makefile
   Look through the Makefile to see if you need to make any changes.
       make
-  Put wgnuplot.exe, wgnuplot.dll, wgnuplot.hlp and wgnuplot.mnu
-  in the windows directory.
+  Put wgnuplot.exe, wgnuplot.hlp and wgnuplot.mnu
+  in some directory.
+
 
 MSDOS
 -----
@@ -299,17 +325,23 @@ Using DJGPP
   just run djconfig.sh, and then make.
   For novices, it is recommended to use makefile.dj2 instead:
       copy makefile.dj2 makefile
+  Optionally check and adapt the makefile to turn on additional features.
       make
+  or even simpler
+      make -fmakefile.dj2
 
 Using Microsoft C 7.0.
       copy makefile.msc makefile
       nmake 
 
-Using Borland C++ 3.0
+Using Borland C++ 3.0 or 3.1
       copy makefile.tc makefile
   Edit makefile to change TC, BIN, BGI, BGIOBJ. You may also want to turn
   off overlays (See manual for more on overlays).
+  Optionally edit the 16-bit special selection of terminal drivers in
+  term.h if you need any driver that isn't part of the default collection.
       make
+
 
 The file gnuplot.gih is needed for help on the PC.
 If the file gnuplot.gih is not in the default directory, then use:
