@@ -1,3 +1,8 @@
+2004-07-17  Ethan Merritt  <merritt@u.washington.edu>
+
+	* term/post.trm (PS_filled_polygon): Remove extraneous gsave
+	introduced by previous patch, which fixes the observed slowdown.
+
 2004-07-16  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/post.trm (PS_filled_polygon): The polygon fill code was
