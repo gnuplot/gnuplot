@@ -1,20 +1,16 @@
 #
-# $Id: makefile.nt,v 1.11 2003/02/19 13:54:51 broeker Exp $
+# $Id: makefile.nt,v 1.12 2003/04/04 14:30:38 broeker Exp $
 #
 # GNUPLOT Makefile Microsoft Visual C++ and nmake on WinNT and Win95/98/..
 
-#
-# To compile gnuplot, run the following command in directory gnuplot\src:
-#	nmake -f ..\config\makefile.nt
-#
+# John Bollinger bbands@yahoo.com, 4 March 2002:
+#   Added png support with zlib and libpng as subs of .\src
+#     libpng and zlib can be downloaded from ftp://ftp.uu.net/graphics/png
+#   Added pdf support with pdflib as a sub of .\src
+#     pdflib can be downloaded from http://www.pdflib.com
+#   Added MSC multi-thread support for compatibility with pdflib
 
-# John Bollinger bbands@yahoo.com
-# 4 March 2002 bbands@yahoo.com
-# Added png support with zlib and libpng as subs of .\src
-# libpng and zlib can be downloaded from ftp://ftp.uu.net/graphics/png
-# Added pdf support with pdflib as a sub of .\src
-# pdflib can be downloaded from http://www.pdflib.com
-# Added MSC multi-thread support for compatibility with pdflib
+#
 # To compile with Visual C: 
 #	Download zlib to ..\src\zlib and compile it 
 #	Copy zlib.dll to \winnt\system32 or anywhere else in the path
@@ -112,6 +108,12 @@ linkopt1.msw: makefile.nt
 	echo libpng.lib >> linkopt1.msw
 	echo zlib.lib >> linkopt1.msw
 	echo wgnuplot.res >> linkopt1.msw
+
+makefile.nt: ..\config\makefile.nt
+	copy ..\config\makefile.nt makefile.nt
+
+config.h: ..\config\config.nt
+	copy ..\config\config.nt config.h
 
 wgnuplot.exe: $(OBJS) $(WINOBJS) win\wgnuplot.def wgnuplot.res linkopt1.msw texticon.ico grpicon.ico
 	$(LD) $(LDFLAGS) /out:wgnuplot.exe @linkopt1.msw

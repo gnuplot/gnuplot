@@ -1,5 +1,8 @@
 2004-02-13  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
+	* config/makefile.nt (makefile.nt, config.h): Copy makefile.nt and
+	config.nt over into the src directory, if necessary.
+
 	* src/time.c [!USE_SYSTEM_TIME] (gstrptime): Replace
 	implementation of %s format.  Now reads in a double-precision
 	number and uses gnuplot's own ggmtime() routine instead of library
