@@ -9676,6 +9676,7 @@ to you, depending on its output format.
 * aifm::                        
 * amiga::                       
 * apollo::                      
+* aqua::                        
 * atari_ST_(via_AES)::          
 * atari_ST_(via_VDI)::          
 * be::                          
@@ -9714,7 +9715,6 @@ to you, depending on its output format.
 * kyo::                         
 * latex::                       
 * linux::                       
-* linux_::                      
 * macintosh::                   
 * mf::                          
 * mp::                          
@@ -9735,6 +9735,7 @@ to you, depending on its output format.
 * regis_::                      
 * rgip::                        
 * sun::                         
+* sun_::                        
 * svg::                         
 * tek410x::                     
 * tek410x_::                    
@@ -9849,7 +9850,7 @@ The default font is 8-point "topaz".
 The screen option uses a virtual screen, so it is possible that the graph
 will be larger than the screen."
 
-@node apollo, atari_ST_(via_AES), amiga, terminal
+@node apollo, aqua, amiga, terminal
 @subsubsection apollo
 
 @c ?commands set terminal apollo
@@ -9866,7 +9867,35 @@ with rescaling after window resizing.  It has no options.
 
 If a fixed-size window is desired, the `gpr` terminal may be used instead."
 
-@node atari_ST_(via_AES), atari_ST_(via_VDI), apollo, terminal
+@node aqua, atari_ST_(via_AES), apollo, terminal
+@subsubsection aqua
+
+@c ?commands set terminal aqua
+@c ?set terminal aqua
+@c ?set term aqua
+@c ?terminal aqua
+@c ?term aqua
+@cindex aqua
+
+@cindex Aqua
+
+This terminal relies on AquaTerm.app for display on Mac OS X.
+
+Syntax:
+@example
+      set terminal aqua @{<n>@} @{title "<wintitle>"@} @{size <x> <y>@}
+                        @{fname "<fontface>"@} @{fsize <fontsize>@}
+
+@end example
+
+where <n> is the number of the window to draw in (default is 0),
+<wintitle> is the name shown in the title bar (default "Figure <n>"),
+<x> <y> is the size of the plot (default is 846x594 pt = 11.75x8.25 in).
+
+Use <fontface> to specify the font to use (default is "Times-Roman"),
+<fontzise> sets the font size (default is 14.0 pt)."
+
+@node atari_ST_(via_AES), atari_ST_(via_VDI), aqua, terminal
 @subsubsection atari ST (via AES)
 
 @c ?commands set terminal atari
@@ -12027,7 +12056,7 @@ The other label -- account for long ticlabels:
 
 @end example
 
-@node linux, linux_, latex, terminal
+@node linux, macintosh, latex, terminal
 @subsubsection linux
 
 @c ?commands set terminal linux
@@ -12044,24 +12073,7 @@ environment variable GSVGAMODE for the default mode; if not set, it uses
 1024x768x256 as default mode or, if that is not possible, 640x480x16
 (standard VGA)."
 
-@node linux_, macintosh, linux, terminal
-@subsubsection linux
-
-@c ?commands set terminal linux
-@c ?set terminal linux
-@c ?set term linux
-@c ?terminal linux
-@c ?term linux
-@cindex linux
-@tmindex linux
-
-
-The `linux` driver has no additional options to specify.  It looks at the
-environment variable GSVGAMODE for the default mode; if not set, it uses
-1024x768x256 as default mode or, if that is not possible, 640x480x16
-(standard VGA)."
-
-@node macintosh, mf, linux_, terminal
+@node macintosh, mf, linux, terminal
 @subsubsection macintosh
 
 @c ?set terminal macintosh
@@ -13330,7 +13342,7 @@ Example:
 
 puts six graphs on a page in three rows of two in portrait orientation."
 
-@node sun, svg, rgip, terminal
+@node sun, sun_, rgip, terminal
 @subsubsection sun
 
 @c ?commands set terminal sun
@@ -13345,7 +13357,22 @@ puts six graphs on a page in three rows of two in portrait orientation."
 The `sun` terminal driver supports the SunView window system.  It has no
 options."
 
-@node svg, tek410x, sun, terminal
+@node sun_, svg, sun, terminal
+@subsubsection sun
+
+@c ?commands set terminal sun
+@c ?set terminal sun
+@c ?set term sun
+@c ?terminal sun
+@c ?term sun
+@cindex sun
+@tmindex sun
+
+
+The `sun` terminal driver supports the SunView window system.  It has no
+options."
+
+@node svg, tek410x, sun_, terminal
 @subsubsection svg
 
 @c ?commands set terminal svg
@@ -13362,6 +13389,7 @@ This terminal produces files in the W3C Scalable Vector Graphics format.
 Syntax:
 @example
       set terminal svg @{size <x> <y> @{|fixed|dynamic@}@}
+                       @{@{no@}enhanced@}
                        @{fname "<font>"@} @{fsize <fontsize>@}
 
 @end example
@@ -13371,7 +13399,15 @@ where <x> and <y> are the size of the SVG plot to generate,
 setting, `fixed`, will request an absolute size.
 
 <font> is the name of the default font to use (default Arial) and
-<fontsize> is the font size (in points, default 12)"
+<fontsize> is the font size (in points, default 12). Gnuplot does not
+currently provide a mechanism for embedding fonts in the output file,
+so svg viewing programs may substitute other fonts when the file is
+displayed.
+
+The svg terminal supports an enhanced text mode, which allows font
+and other formatting commands to be embedded in labels and other text
+strings. The enhanced text mode syntax is shared with other gnuplot
+terminal types. See `enhanced` for more details."
 
 @node tek410x, tek410x_, svg, terminal
 @subsubsection tek410x
