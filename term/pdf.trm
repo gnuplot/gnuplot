@@ -1128,17 +1128,11 @@ PDF_set_color(double gray)
 TERM_PUBLIC void
 PDF_filled_polygon(int points, gpiPoint* corners)
 {
+    int i;
     PDF_PathClose();
-    if (4 != points) {
-	fprintf(stderr,
-	       	"** ERROR PDF_filled_polygon supports only 4 points (file %s, line %d)",
-	       	__FILE__, __LINE__);
-	return;
-    }
     PDF_moveto(myPDF, corners[0].x, corners[0].y);
-    PDF_lineto(myPDF, corners[1].x, corners[1].y);
-    PDF_lineto(myPDF, corners[2].x, corners[2].y);
-    PDF_lineto(myPDF, corners[3].x, corners[3].y);
+    for (i=1; i<points; i++)
+	PDF_lineto(myPDF, corners[i].x, corners[i].y);
     PDF_lineto(myPDF, corners[0].x, corners[0].y);
     PDF_fill(myPDF);
 }

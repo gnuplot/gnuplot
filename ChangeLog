@@ -1,3 +1,7 @@
+2003-05-01  Ethan Merritt <merritt@u.washington.edu>
+
+	* term/pdf.trm: Remove limit of 4 vertices in fill_polygon().
+
 2003-04-30  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* docs/gnuplot.doc: Say that the either of `set datafile commentschars`
