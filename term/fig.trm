@@ -1,5 +1,5 @@
 /*
- * $Id: fig.trm,v 1.10.2.1 1999/08/22 18:52:28 lhecking Exp $
+ * $Id: fig.trm,v 1.10.2.2 2000/05/07 16:40:45 lhecking Exp $
  */
 
 /* GNUPLOT - fig.trm */
@@ -93,31 +93,48 @@ TERM_PUBLIC void FIG_lpoint __PROTO((unsigned int x, unsigned int y, int number)
 #define FIG_DEFAULT DEFAULT
 #define FIG_ROMAN_FONT (0)	/* actually, the default font */
 
-#ifndef FIG_RES
-/* This is now 1200 per inch */
-#define FIG_RES         (1200)
+#if METRIC
+  #define INCH FALSE
+#else
+  #define INCH TRUE
 #endif
+
+/* These should not be defined elsewhere - ACZ */
+/* This is now 1200 per inch */
+#define FIG_IRES        (1200)
+/* This is now 450 per cm */
+#define FIG_MRES        (450)
 
 #define FIG_COORD_SYS   2
 #define FIG_ORIENT (FIG_portrait?"Portrait":"Landscape")
 /* Could be "Portrait" */
-#define FIG_JUST "Center"
+#define FIG_JUST        "Center"
 /* Could be "Flush Left" */
 #define FIG_UNIT (FIG_inches?"Inches":"Metric")
 /* Could be "Inches" */
+#define FIG_PAPER       (FIG_inches ? "Letter" : "A4")
+#define FIG_MAGNIFICATION  100.0
+#define FIG_MULTIPAGE   "Single"
+/* Could be "Multiple" */
+#define FIG_TRANSCOLOR  -2
+/* none: -2; background: -1; 0..31: foreground colors */
+/* This could probably be dropped with the support of GIFs. */
+#define FIG_TRUERES (FIG_inches ? FIG_IRES : FIG_MRES) /* ACZ */
 
-#define FIG_MAGIC       "#FIG 3.1"
-#define FIG_HTIC        (5*FIG_RES/80)
-#define FIG_VTIC        (5*FIG_RES/80)
+#define FIG_MAGIC       "#FIG 3.2" /* new file format - ACZ */
+#define FIG_HTIC(inch)  ((inch) ? (5*FIG_IRES)/80 : (15*FIG_MRES)/100)
+#define FIG_VTIC(inch)  ((inch) ? (5*FIG_IRES)/80 : (15*FIG_MRES)/100)
 #define FIG_FONT_S      (10)	/* size in points */
 #define FIG_MAX_POINTS  99999L	/* almost infinite ;-) */
 
-#define FIG_to_pixel_v(s) ((s)*FIG_RES/72*3/4)	/* height of font in pixels */
+/* height of font in pixels: */
+#define FIG_to_pixel_v(inch,s) (((inch) ? (s)*FIG_IRES : (s)*FIG_MRES*2.54) / 72 * 3/4)
 /* This is fudged to enlarge the drawing area, but gives fairly good results */
-#define FIG_to_pixel_h(s) (FIG_to_pixel_v(s)*6/10)	/* this is a guess at the width */
+/* this is a guess at the width: */
+#define FIG_to_pixel_h(inch,s) (FIG_to_pixel_v(inch,s)*6/10)
 
-#define FIG_VCHAR       FIG_to_pixel_v(FIG_FONT_S)	/* just for default, */
-#define FIG_HCHAR       FIG_to_pixel_h(FIG_FONT_S)	/* not really used   */
+#define FIG_VCHAR       FIG_to_pixel_v(INCH,FIG_FONT_S)	/* just for default, */
+#define FIG_HCHAR       FIG_to_pixel_h(INCH,FIG_FONT_S)	/* not really used   */
 
 enum FIG_poly_stat {
     FIG_poly_new, FIG_poly_part
@@ -140,29 +157,29 @@ static int FIG_poly_vec_max = 999;	/* JFS */
 static enum FIG_poly_stat FIG_polyvec_stat;
 
 /* 5 inches wide by 3 inches high */
-#define FIG_XMAX (5 * FIG_RES)
-#define FIG_YMAX (3 * FIG_RES)
+#define FIG_XMAX(inch) ((inch) ? 5*FIG_IRES : 12*FIG_MRES)
+#define FIG_YMAX(inch) ((inch) ? 3*FIG_IRES :  8*FIG_MRES)
 
-#define FIG_XOFF (FIG_RES/4)
-#define FIG_YOFF (FIG_RES/4)
+#define FIG_XOFF(inch) ((inch) ? FIG_IRES : 2*FIG_MRES)
+#define FIG_YOFF(inch) ((inch) ? FIG_IRES : 2*FIG_MRES)
 
 
-#define BFIG_HTIC       (7*FIG_RES/80)
-#define BFIG_VTIC       (7*FIG_RES/80)
+#define BFIG_HTIC(inch) ((inch) ? (7*FIG_IRES)/80 : (20*FIG_MRES)/100)
+#define BFIG_VTIC(inch) ((inch) ? (7*FIG_IRES)/80 : (20*FIG_MRES)/100)
 #define BFIG_FONT_S     (16)	/* size in points */
-#define BFIG_VCHAR      FIG_to_pixel_v(BFIG_FONT_S)	/* height in pixels of font */
-#define BFIG_HCHAR      FIG_to_pixel_h(BFIG_FONT_S)	/* this is a guess at the width */
+#define BFIG_VCHAR      FIG_to_pixel_v(INCH,BFIG_FONT_S)  /* height in pixels of font */
+#define BFIG_HCHAR      FIG_to_pixel_h(INCH,BFIG_FONT_S)  /* this is a guess at the width */
 
 static F_point *FIG_points = NULL;	/* Array for the collection of points for 
 					   POLYLINE, allocated on demand. */
 static F_line FIG_line;
 
 /* 8 inches wide by 5 inches high */
-#define BFIG_XMAX (8 * FIG_RES)
-#define BFIG_YMAX (5 * FIG_RES)
+#define BFIG_XMAX(inch) ((inch) ? 8*FIG_IRES : 20*FIG_MRES)
+#define BFIG_YMAX(inch) ((inch) ? 5*FIG_IRES : 15*FIG_MRES)
 
-#define BFIG_XOFF (FIG_RES/2)
-#define BFIG_YOFF (FIG_RES/2)
+#define BFIG_XOFF(inch) ((inch) ? FIG_IRES : 2*FIG_MRES)
+#define BFIG_YOFF(inch) ((inch) ? FIG_IRES : 2*FIG_MRES)
 
 
 static int FIG_type;		/* negative types use real lines */
@@ -172,11 +189,11 @@ static float FIG_angle;		/* Fig text angle 0=horiz, Pi/2=vert */
 static int FIG_use_color = FALSE;	/* do we use color or not? */
 static int FIG_is_big = FALSE;	/* big plot ? */
 static int FIG_color = DEFAULT;	/* which color to use */
-static int FIG_xoff = FIG_XOFF;
-static int FIG_yoff = FIG_YOFF;
+static int FIG_xoff = FIG_XOFF(INCH);
+static int FIG_yoff = FIG_YOFF(INCH);
 static int FIG_font_s = FIG_FONT_S;
 static int FIG_portrait = FALSE;
-static int FIG_inches = FALSE;
+static int FIG_inches = INCH;
 
 static void FIG_poly_clean __PROTO((enum FIG_poly_stat fig_stat));
 
@@ -235,11 +252,7 @@ TERM_PUBLIC void FIG_options()
     FIG_font_s = 0;
     FIG_default_thickness = 1;
     xsize_t = ysize_t = 0.;
-#if METRIC
-    FIG_inches = FALSE;
-#else
-    FIG_inches = TRUE;
-#endif
+    FIG_inches = INCH;
     while (!END_OF_COMMAND) {
 	if (almost_equals(c_token, "mo$nochrome")) {
 	    FIG_use_color = FALSE;
@@ -366,21 +379,21 @@ TERM_PUBLIC void FIG_options()
     if (!FIG_is_big) {
 	if (FIG_font_s == 0)	/* KB */
 	    FIG_font_s = FIG_FONT_S;
-	term->xmax = FIG_XMAX;
-	term->ymax = FIG_YMAX;
-	term->v_tic = FIG_VTIC;
-	term->h_tic = FIG_HTIC;
-	FIG_xoff = FIG_XOFF;
-	FIG_yoff = FIG_YOFF;
+	term->xmax = FIG_XMAX(FIG_inches);
+	term->ymax = FIG_YMAX(FIG_inches);
+	term->v_tic = FIG_VTIC(FIG_inches);
+	term->h_tic = FIG_HTIC(FIG_inches);
+	FIG_xoff = FIG_XOFF(FIG_inches);
+	FIG_yoff = FIG_YOFF(FIG_inches);
     } else {
 	if (FIG_font_s == 0)	/* KB */
 	    FIG_font_s = BFIG_FONT_S;
-	term->xmax = BFIG_XMAX;
-	term->ymax = BFIG_YMAX;
-	term->v_tic = BFIG_VTIC;
-	term->h_tic = BFIG_HTIC;
-	FIG_xoff = BFIG_XOFF;
-	FIG_yoff = BFIG_YOFF;
+	term->xmax = BFIG_XMAX(FIG_inches);
+	term->ymax = BFIG_YMAX(FIG_inches);
+	term->v_tic = BFIG_VTIC(FIG_inches);
+	term->h_tic = BFIG_HTIC(FIG_inches);
+	FIG_xoff = BFIG_XOFF(FIG_inches);
+	FIG_yoff = BFIG_YOFF(FIG_inches);
     }
     if (FIG_portrait) {		/* KB */
 	tmax_t = term->xmax;
@@ -388,16 +401,11 @@ TERM_PUBLIC void FIG_options()
 	term->ymax = tmax_t;
     }
     if (xsize_t > 0. && ysize_t > 0.) {
-	if (FIG_inches) {
-	    term->xmax = (unsigned int) (xsize_t * FIG_RES);
-	    term->ymax = (unsigned int) (ysize_t * FIG_RES);
-	} else {
-	    term->xmax = (unsigned int) (xsize_t / 2.54 * FIG_RES);
-	    term->ymax = (unsigned int) (ysize_t / 2.54 * FIG_RES);
-	}
+	term->xmax = (unsigned int) (xsize_t * FIG_TRUERES);
+	term->ymax = (unsigned int) (ysize_t * FIG_TRUERES);
     }
-    term->v_char = FIG_to_pixel_v(FIG_font_s);
-    term->h_char = FIG_to_pixel_h(FIG_font_s);
+    term->v_char = FIG_to_pixel_v(FIG_inches, FIG_font_s);
+    term->h_char = FIG_to_pixel_h(FIG_inches, FIG_font_s);
     FIG_thickness = FIG_default_thickness;
     if (parse_error) {		/* JFS, KB */
 	int_error(options_list, c_token);
@@ -431,10 +439,15 @@ TERM_PUBLIC void FIG_init()
 
     fprintf(gpoutfile, "\
 %s\n\
-%s\n%s\n%s\n%d %d\n",
+%s\n%s\n\
+%s\n%s\n\
+%.2f\n%s\n%d\n\
+%d %d\n",
 	    FIG_MAGIC,
 	    FIG_ORIENT, FIG_JUST,
-	    FIG_UNIT, FIG_RES, FIG_COORD_SYS);
+	    FIG_UNIT, FIG_PAPER,
+	    FIG_MAGNIFICATION, FIG_MULTIPAGE, FIG_TRANSCOLOR,
+	    FIG_IRES, FIG_COORD_SYS);
 }
 
 
@@ -773,8 +786,8 @@ TERM_PUBLIC void FIG_reset()
 
 TERM_TABLE_START(fig_driver)
     "fig", "FIG 3.1 graphics language: X graphics editor",
-    FIG_XMAX, FIG_YMAX, FIG_VCHAR, FIG_HCHAR,
-    FIG_VTIC, FIG_HTIC, FIG_options, FIG_init, FIG_reset,
+    FIG_XMAX(INCH), FIG_YMAX(INCH), FIG_VCHAR, FIG_HCHAR,
+    FIG_VTIC(INCH), FIG_HTIC(INCH), FIG_options, FIG_init, FIG_reset,
     FIG_text, null_scale, FIG_graphics, FIG_move, FIG_vector,
     FIG_linetype, FIG_put_text, FIG_text_angle, FIG_justify_text,
     FIG_lpoint, FIG_arrow, set_font_null, FIG_pointsize,
