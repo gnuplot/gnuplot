@@ -352,6 +352,15 @@ You lose.
 fi
 dnl end png and z
 
+dnl create list of terminals
+AC_MSG_CHECKING([for terminal drivers])
+( cd $srcdir/term && for i in *.trm ; do echo '${srcdir}'/../term/$i ; done )\
+ |fmt |(tr '\012' @; echo) |sed 's/@$/%/;s/@/ \\@/g'\
+ |tr @% '\012\012' >termlist
+TERM_LIST=termlist
+AC_SUBST_FILE(TERM_LIST)
+AC_MSG_RESULT([list created])
+
 dnl How do we detect the Ultrix X libraries?
 dnl Or is it really a server (run-time) problem?
 dnl FIXME AC_DEFINE(ULTRIX_KLUDGE)
@@ -437,21 +446,6 @@ AC_SUBST(TERMLIBS)
 AC_SUBST(TERMXLIBS)
 
 
-dnl rename makefiles in subdirectories, so that they don't take precedence
-dnl over our created Makefiles
-
-if test ! -f docs/makefile.dst && test -f docs/makefile && \
-   test -z "$no_create"; then
-  echo moving docs/makefile out of the way
-  mv docs/makefile docs/makefile.dst
-fi
-
-if test ! -f docs/latextut/makefile.dst && \
-   test -f docs/latextut/makefile && test -z "$no_create"; then
-  echo moving docs/latextut/makefile out of the way
-  mv docs/latextut/makefile docs/latextut/makefile.dst
-fi
-
 dnl Report configuration
 eval gp_datadir=$datadir
 test $gp_datadir = NONE/share && gp_datadir=/usr/local/share
@@ -522,6 +516,6 @@ dnl end config report
 
 dnl Write Makefiles and configuration header
 AC_OUTPUT([Makefile docs/Makefile docs/latextut/Makefile], \
-[test -z "$CONFIG_HEADERS" || echo timestamp >stamp-h])
+[test -z "$CONFIG_HEADERS" || echo timestamp >stamp-h ; rm -f termlist])
 
 dnl end configure.in
