@@ -13,6 +13,8 @@
 	There are many more explicit references to dartmouth.edu in the source
 	files and in the hard-wired Makefiles that I did not change.
 
+	* demo/bivariat.dem: Fix key placement in final plot.
+
 2003-12-05  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/x11.trm: Leave current window unchanged when closing old window
