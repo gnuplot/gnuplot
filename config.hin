@@ -147,6 +147,9 @@
 /* Define if you have the pclose function.  */
 #undef HAVE_PCLOSE
 
+/* Define if you have the poll function.  */
+#undef HAVE_POLL
+
 /* Define if you have the popen function.  */
 #undef HAVE_POPEN
 
@@ -209,6 +212,9 @@
 
 /* Define if you have the <math.h> header file.  */
 #undef HAVE_MATH_H
+
+/* Define if you have the <poll.h> header file.  */
+#undef HAVE_POLL_H
 
 /* Define if you have the <sgtty.h> header file.  */
 #undef HAVE_SGTTY_H
