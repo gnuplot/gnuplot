@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.46 2002/12/18 00:56:59 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.47 2003/01/24 08:26:52 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -62,7 +62,7 @@ static void lf_push __PROTO((FILE *));
 /* A copy of the declaration from set.c */
 /* There should only be one declaration in a header file. But I do not know
  * where to put it */
-//void get_position __PROTO((struct position * pos));
+/* void get_position __PROTO((struct position * pos)); */
 
 /* State information for load_file(), to recover from errors
  * and properly handle recursive load_file calls

@@ -1,5 +1,5 @@
 /*
- * $Id: png.trm,v 1.37 2002/12/17 13:32:41 lhecking Exp $
+ * $Id: png.trm,v 1.38 2002/12/18 17:38:53 lhecking Exp $
  *
  */
 
@@ -350,7 +350,7 @@ PNG_graphics()
 	break;
     }
 
-    /* PNGsetfont(); *//* HBB 980226: do this in init() ! */
+    /* PNGsetfont(); */ /* HBB 980226: do this in init() ! */
 
     /* rotate plot -90 degrees by reversing XMAX and YMAX and by
        setting b_rastermode to TRUE */

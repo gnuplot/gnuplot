@@ -1,5 +1,5 @@
 /* -*- objc -*-
- * $Id: openstep.trm,v 1.10 2002/08/30 20:18:26 sfeam Exp $
+ * $Id: openstep.trm,v 1.11 2003/02/11 06:08:01 sfeam Exp $
  *
  */
 
@@ -145,7 +145,7 @@ TERM_PUBLIC void NEXT_set_pointsize __PROTO((double size));
 
 #define DEFAULTNEXTSIZE 10000
 
-static NSAutoreleasePool *arpool;  // our autorelease pool
+static NSAutoreleasePool *arpool;  /* our autorelease pool */
 static id gnuTermAccess;	/* local object manages the D.O. connection */
 
 static char *NEXTBuffer, *NEXTBufAt, *NEXTBufEnd;
@@ -207,7 +207,7 @@ static char GPFAR *GPFAR NEXT_header[] =
     "/LT6 { PL [2 dl 2 dl 2 dl 4 dl] 0 0 0 DL } def\n",
     "/LT7 { PL [2 dl 2 dl 2 dl 2 dl 2 dl 4 dl] 1 0.3 0 DL } def\n",
     "/LT8 { PL [2 dl 2 dl 2 dl 2 dl 2 dl 2 dl 2 dl 4 dl] 0.5 0.5 0.5 DL } def\n",
-/* Point (Round) *//* Matt Heffron make it round */
+/* Point (Round) */ /* Matt Heffron make it round */
     "/Pnt { stroke [] 0 setdash\n",
     "   gsave 1 setlinecap M 0 0 V stroke grestore } def\n",
 
@@ -695,7 +695,7 @@ char **dict;			/* extra entries for the dictionary */
 TERM_PUBLIC void
 NEXT_init()
 {
-    // is this called more than once?
+    /* is this called more than once? */
     arpool = [[NSAutoreleasePool alloc] init];
 
     /* Initialize output string */
@@ -712,7 +712,7 @@ NEXT_init()
     term->ymax = NEXT_YMAX;
 
     gnuTermAccess = [[GnuTermDriver alloc] init];
-    // [gnuTermAccess retain];	// since we hold it privately.
+    /* [gnuTermAccess retain];	-- since we hold it privately. */
 }
 
 

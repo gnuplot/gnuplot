@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: history.c,v 1.7 2001/04/18 16:33:27 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: history.c,v 1.8 2002/01/22 18:51:37 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - history.c */
@@ -390,7 +390,7 @@ history_find(char *cmd)
     /* printf ("searching for '%s'\n", cmd); */
 
     do {
-	/* idx = history_search_prefix (cmd, 1); *//* Anchored forward search */
+	/* idx = history_search_prefix (cmd, 1); */ /* Anchored forward search */
 	found = history_search_prefix(cmd, -1);	/* Anchored backward search */
 	if (found == 0) {
 	    int idx = where_history() + history_base;
@@ -431,7 +431,7 @@ history_find_all(char *cmd)
     /* printf ("searching for '%s'\n", cmd); */
 
     do {
-	/* idx = history_search_prefix (cmd, 1); *//* Anchored forward search */
+	/* idx = history_search_prefix (cmd, 1); */ /* Anchored forward search */
 	found = history_search_prefix(cmd, -1);	/* Anchored backward search */
 	/* fprintf (stdout, "Was gefunden %d\n", found); */
 	if (found == 0) {

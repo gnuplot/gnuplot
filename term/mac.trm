@@ -1,5 +1,5 @@
 /*
- * $Id: mac.trm,v 1.3 1999/06/14 19:14:38 lhecking Exp $
+ * $Id: mac.trm,v 1.4 1999/06/22 11:54:19 lhecking Exp $
  *
  */
 
@@ -62,7 +62,7 @@ register_term(mac)
 *     void (*vector) __PROTO((unsigned int, unsigned int));                   *
 *     void (*linetype) __PROTO((int));                                        *
 *     void (*put_text) __PROTO((unsigned int, unsigned int,const char*));     *
-*     // the following are optional. set term ensures they are not NULL       *
+*     -- the following are optional. set term ensures they are not NULL       *
 *     int (*text_angle) __PROTO((int));                                       *
 *     int (*justify_text) __PROTO((enum JUSTIFY));                            *
 *     void (*point) __PROTO((unsigned int, unsigned int,int));                *
@@ -70,9 +70,9 @@ register_term(mac)
 *     int (*set_font) __PROTO((const char *font));                            *
 *     void (*pointsize) __PROTO((double));                                    *
 *     int flags;                                                              *
-*     void (*suspend) __PROTO((void)); // called after one plot of multiplot  *
-*     void (*resume) __PROTO((void));  // called before plots of multiplot    *
-*     void (*fillbox) __PROTO((int style, unsigned int x1, unsigned int y1, unsigned)) // clear in multiplot mode *
+*     void (*suspend) __PROTO((void)); -- called after one plot of multiplot  *
+*     void (*resume) __PROTO((void));  -- called before plots of multiplot    *
+*     void (*fillbox) __PROTO((int style, unsigned int x1, unsigned int y1, unsigned)) -- clear in multiplot mode *
 *     void (*linewidth) __PROTO((double linewidth));                          *
 * };                                                                          *
 *                                                                             *
@@ -87,8 +87,8 @@ register_term(mac)
 /* 
  * #define MAC_XOFFSET (497-MAC_XMAX)
  * 
- * //#define MAC_XLAST (MAC_XMAX - 1)
- * //#define MAC_YLAST (MAC_YMAX - 1)
+ * #define MAC_XLAST (MAC_XMAX - 1)
+ * #define MAC_YLAST (MAC_YMAX - 1)
  */
 
 #define MAC_VCHAR 12	 /* monaco 9 point plain style */

@@ -1,5 +1,5 @@
 /*
- * $Id: term_api.h,v 1.18 2002/09/27 00:12:26 sfeam Exp $
+ * $Id: term_api.h,v 1.19 2002/10/21 10:24:19 mikulik Exp $
  */
 
 /* GNUPLOT - term_api.h */
@@ -83,7 +83,7 @@ typedef struct arrow_style_type {    /* contains all Arrow properties */
     struct lp_style_type lp_properties;
     /* head options */
     int head;		/* arrow head: 0=no, 1=at end, 2=at start and end */
-    //    struct position headsize;	/* x = length, y = angle [deg] */
+    /* struct position headsize; */	/* x = length, y = angle [deg] */
     double head_length;              /* length of head, 0 = default */
     int head_lengthunit;             /* unit (x1, x2, screen, graph) */
     double head_angle;               /* front angle / deg */

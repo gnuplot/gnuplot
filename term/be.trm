@@ -1,5 +1,5 @@
 /*
- * $Id: be.trm,v 1.10 2002/10/18 10:03:00 lhecking Exp $
+ * $Id: be.trm,v 1.11 2002/11/27 20:45:35 lhecking Exp $
  *
  */
 
@@ -104,7 +104,7 @@ static struct beopt {
    { "-foreground", hasArg }, { "-fn", hasArg }, { "-font", hasArg },
    { "-name", hasArg },
    { "-title", hasArg },
-//   { "-xnllanguage", hasArg }, { "-xrm", hasArg },
+   /* { "-xnllanguage", hasArg }, { "-xrm", hasArg }, */
    { "-raise", hasNoArg }, { "-noraise", hasNoArg },
    { "-persist", hasNoArg }
 };

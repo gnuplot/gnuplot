@@ -1,5 +1,5 @@
 /*
- * $Id: pm.trm,v 1.31 2002/07/26 16:42:29 mikulik Exp $
+ * $Id: pm.trm,v 1.32 2002/09/26 19:19:28 mikulik Exp $
  */
 
 /* GNUPLOT - pm.trm */
@@ -139,7 +139,7 @@ TERM_PUBLIC void PM_filled_polygon (int, gpiPoint *);
 #define GR_TEXT         'T'
 #define GR_PAUSE        'P'
 #define GR_HELP         'H'
-#define GR_MOUSECAPABLE 'm' //PM: say gnupmdrv we are mouseable
+#define GR_MOUSECAPABLE 'm' /* PM: say gnupmdrv we are mouseable */
 #define PUT_TMPTEXT	't'
 #define SET_RULER	'u'
 #define SET_CURSOR	'c'
@@ -166,7 +166,7 @@ static int PM_optargs = 0;
 static int PM_plot_number = 0;
 static char PM_term_title[128] = "";
 
-int mouseGnupmdrv = 0; //PM set to 1 if we are connected to a mouseable gnupmdrv
+int mouseGnupmdrv = 0; /* PM set to 1 if we are connected to a mouseable gnupmdrv */
 
 /*  FILE *fopen(); --- HBB 20000725: this decl. cannot possibly make sense */
 FILE *PM_pipe = NULL;
@@ -278,7 +278,7 @@ PM_init()
 	    PM_reset_opts();
     }
 #ifdef USE_MOUSE
-    //PM: notify gnupmdrv that this is mouse-enhanced terminal
+    /* PM: notify gnupmdrv that this is mouse-enhanced terminal */
     putc( GR_MOUSECAPABLE, PM_pipe ) ;
     fflush( PM_pipe ) ;
     /* we catch mouseable gnupmdrv's answer in PM_query by 0xABCD */
@@ -389,8 +389,8 @@ PM_query()
     fflush(PM_pipe);
     rc = DosRead(fileno(PM_pipe), &term->h_char, sizeof(int), &cbR);
     if (term->h_char == 0xABCD) {
-      //PM we have got greetings from mouseable gnupmdrv
-      mouseGnupmdrv = 1; // thus set mouseGnupmdrv on and reread h_char
+      /* PM we have got greetings from mouseable gnupmdrv */
+      mouseGnupmdrv = 1; /*  thus set mouseGnupmdrv on and reread h_char */
       rc = DosRead( fileno(PM_pipe), &term->h_char, sizeof(int), &cbR ) ;
       }
     rc = DosRead(fileno(PM_pipe), &term->v_char, sizeof(int), &cbR);
@@ -450,7 +450,7 @@ PM_graphics()
     putc(SET_GRAPHICS, PM_pipe);
     fflush(PM_pipe);
 #ifdef USE_MOUSE
-    if (mouseGnupmdrv) { // we are connected to mouseable gnupmdrv
+    if (mouseGnupmdrv) { /*  we are connected to mouseable gnupmdrv */
 	extern void send_gpPMmenu(FILE *);
 	send_gpPMmenu(PM_pipe);
     }
@@ -461,11 +461,11 @@ PM_graphics()
 	    case S_ENC_ISO8859_2: cp = 912; break;
 	    case S_ENC_CP437: cp = 437; break;
 	    case S_ENC_CP850: cp = 850; break;
-	    default: // S_ENC_DEFAULT, S_ENC_ISO8859_1
+	    default: /*  S_ENC_DEFAULT, S_ENC_ISO8859_1 */
 		     cp = 0; break;
 	};
 	putc(SET_SPECIAL, PM_pipe);
-	putc('c', PM_pipe); // set codepage
+	putc('c', PM_pipe); /*  set codepage */
 	fwrite(&cp, sizeof(int), 1, PM_pipe);
 	fflush(PM_pipe);
 	last_encoding = encoding;
@@ -682,14 +682,14 @@ TERM_PUBLIC int PM_make_palette (t_sm_palette *palette)
 	putc(0, PM_pipe);
 	fflush(PM_pipe);
 	rc = DosRead(fileno(PM_pipe), &PM_nColors, sizeof(int), &cbR);
-	return PM_nColors; // usually = 256-18;
+	return PM_nColors; /*  usually = 256-18; */
     }
     putc(1, PM_pipe);
     for (i = 0; i < sm_palette.colors; i++) {
 	r = (int)( palette->color[i].r * 255 + 0.5 );
 	g = (int)( palette->color[i].g * 255 + 0.5 );
 	b = (int)( palette->color[i].b * 255 + 0.5 );
-	rgbTable[i] = (r<<16) + (g<<8) + b; // PM API likes this form
+	rgbTable[i] = (r<<16) + (g<<8) + b; /*  PM API likes this form */
     }
     fwrite(&sm_palette.colors, sizeof(int), 1, PM_pipe);
     fwrite(&rgbTable, sizeof(rgbTable[0])*sm_palette.colors, 1, PM_pipe);
@@ -719,7 +719,7 @@ TERM_PUBLIC void PM_set_color (double gray)
     if (c >= sm_palette.colors)
 	c = sm_palette.colors - 1;
     /* map [0;1] to interval [0;smooth_colors-1] */
-#if 0 // color caching
+#if 0 /*  color caching */
     if (c == pm_color) return;
     pm_color = c;
 #endif
@@ -732,7 +732,7 @@ TERM_PUBLIC void PM_filled_polygon ( int points, gpiPoint *corners )
 {
     int i;
     putc(GR_FILLED_POLYGON, PM_pipe);
-    fwrite(&points, sizeof(int), 1, PM_pipe); // tell him number of corners
+    fwrite(&points, sizeof(int), 1, PM_pipe); /*  tell him number of corners */
     for (i = 0; i < points; i++) {
 	fwrite(&corners[i].x, sizeof(int), 1, PM_pipe);
 	fwrite(&corners[i].y, sizeof(int), 1, PM_pipe);

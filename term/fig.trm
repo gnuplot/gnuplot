@@ -1,5 +1,5 @@
 /*
- * $Id: fig.trm,v 1.36 2002/12/13 14:58:41 lhecking Exp $
+ * $Id: fig.trm,v 1.37 2003/01/22 15:07:28 lhecking Exp $
  */
 
 /* GNUPLOT - fig.trm */
@@ -686,7 +686,7 @@ FIG_linetype(linetype)
 	    break;
 	}
     default:{
-	    /* now linetype >= 1 *//* shouldn't be negative anyway */
+	    /* now linetype >= 1 --- shouldn't be negative anyway */
 	    FIG_linedepth = FIG_depth + linetype / 1000;
 	    linetype %= 1000;
 	    /* Thickness of lines is either included in the linetype */

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.82 2003/02/16 00:07:37 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.83 2003/02/16 23:51:30 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -896,11 +896,11 @@ boundary(plots, count)
 	    unsigned int x, y;
 	    map_position(&key->user_pos, &x, &y, "key");
 #if 0
-// FIXME!!!
-// pm 22.1.2002: if key->user_pos.scalex or scaley == first_axes or second_axes,
-// then the graph scaling is not yet known and the box is positioned incorrectly;
-// you must do "replot" to avoid the wrong plot ... bad luck if output does not
-// go to screen
+/* FIXME!!!
+** pm 22.1.2002: if key->user_pos.scalex or scaley == first_axes or second_axes,
+** then the graph scaling is not yet known and the box is positioned incorrectly;
+** you must do "replot" to avoid the wrong plot ... bad luck if output does not
+** go to screen */
 #define OK fprintf(stderr,"Line %i of %s is OK\n",__LINE__,__FILE__);
 OK
 fprintf(stderr,"\tHELE: user pos: x=%i y=%i\n",key->user_pos.x,key->user_pos.y);

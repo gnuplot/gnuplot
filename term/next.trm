@@ -1,5 +1,5 @@
 /*
- * $Id: next.trm,v 1.20 2002/08/30 20:18:25 sfeam Exp $
+ * $Id: next.trm,v 1.21 2003/02/11 06:08:01 sfeam Exp $
  *
  */
 
@@ -228,7 +228,7 @@ static char GPFAR *GPFAR NEXT_header[] =
     "/LT6 { PL [2 dl 2 dl 2 dl 4 dl] 0 0 0 DL } def\n",
     "/LT7 { PL [2 dl 2 dl 2 dl 2 dl 2 dl 4 dl] 1 0.3 0 DL } def\n",
     "/LT8 { PL [2 dl 2 dl 2 dl 2 dl 2 dl 2 dl 2 dl 4 dl] 0.5 0.5 0.5 DL } def\n",
-/* Point (Round) *//* Matt Heffron make it round */
+/* Point (Round) */ /* Matt Heffron make it round */
     "/Pnt { stroke [] 0 setdash\n",
     "   gsave 1 setlinecap M 0 0 V stroke grestore } def\n",
 

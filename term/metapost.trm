@@ -1,5 +1,5 @@
 /*
- * $Id: metapost.trm,v 1.20 2002/08/30 18:45:46 mikulik Exp $
+ * $Id: metapost.trm,v 1.21 2002/08/30 20:18:25 sfeam Exp $
  */
 
 /* GNUPLOT - metapost.trm */
@@ -301,7 +301,7 @@ MP_options()
 	    c_token++;
 	    if (!END_OF_COMMAND)	/* global text scaling */
 		MP_textmag = (double) real(const_express(&a));
-/* c_token++; *//* Needed ??? */
+	    /* c_token++; */ /* Needed ??? */
 	    break;
 	case MP_OPT_OTHER:
 	default:
