@@ -1,3 +1,11 @@
+1999-08-20  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* docs/Makefile.in: Fix INCLUDES line. Add metapost.trm and
+	openstep.trm to CORETERM.
+
+	* term/be.trm, term/metapost.trm, term/openstep.trm: New drivers,
+	imported from current dev tree.
+
 1999-08-19  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* command.c, makefile.os2, makefile.unx, plot.c, protos.h, readline.c,
