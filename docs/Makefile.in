@@ -14,7 +14,7 @@
 #
 
 # default is what is needed for interactive gnuplot
-default: gnuplot.hlp gnuplot.gih
+all: gnuplot.hlp gnuplot.gih
 
 # this tells GNU make not to export variables into the environment
 # But other makes dont understand its significance, so it must
@@ -28,8 +28,7 @@ prefix = @prefix@
 exec_prefix = @exec_prefix@
 bindir = @bindir@
 datadir = @datadir@
-mandir = @mandir@
-srcdir = @srcdir@
+infodir = @infodir@
 top_builddir = .
 top_srcdir = @top_srcdir@
 VPATH = @srcdir@
@@ -48,6 +47,9 @@ LIBS = @LIBS@
 COMPILE = $(CC) $(DEFS) $(INCLUDES) $(CFLAGS)
 LINK = $(CC) $(CFLAGS) $(LDFLAGS) -o $@
 
+.c.o:
+	$(COMPILE) -c $<
+
 # The makeinfo command from GNU texinfo
 MAKEINFO = makeinfo
 
@@ -55,10 +57,10 @@ MAKEINFO = makeinfo
 EMACS = emacs
 
 # substitute your troff command (and any flags) for this one
-TROFF=troff
+TROFF = troff
 
 # substitute your DVI to PostScript conversion program here
-DVIPS=dvips
+DVIPS = dvips
 
 T = ${srcdir}/../term
 CORETERM = $(T)/aed.trm $(T)/ai.trm $(T)/amiga.trm $(T)/apollo.trm \
@@ -75,6 +77,18 @@ $(T)/pstricks.trm $(T)/qms.trm $(T)/regis.trm $(T)/rgip.trm $(T)/sun.trm \
 $(T)/t410x.trm $(T)/table.trm $(T)/tek.trm $(T)/texdraw.trm $(T)/tgif.trm \
 $(T)/tkcanvas.trm $(T)/tpic.trm $(T)/unixpc.trm $(T)/unixplot.trm \
 $(T)/v384.trm $(T)/vws.trm $(T)/win.trm $(T)/x11.trm $(T)/xlib.trm
+
+DIST_COMMON = README Makefile.in
+
+SOURCES = checkdoc.c doc2gih.c doc2hlp.c doc2html.c doc2info.c \
+doc2ipf.c doc2ms.c doc2rnh.c doc2rtf.c doc2tex.c termdoc.c xref.c
+
+HEADERS = doc2x.h xref.h
+
+EXTRA_DIST = doc2hlp.com doc2texi.pl fixinfo.el gnuplot.doc gpcard.tex \
+makefile.ami makefile.dst titlepag.ms titlepag.tex toc_entr.sty old psdoc
+
+DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(EXTRA_DIST)
 
 allterm.h : $(CORETERM)
 	@echo Building allterm.h
@@ -234,7 +248,12 @@ tutorial: latextut/tutorial.tex
 
 # this is how to check the gnuplot.doc file
 check: checkdoc $(srcdir)/gnuplot.doc
-	./checkdoc < $(srcdir)/gnuplot.doc
+	@./checkdoc < $(srcdir)/gnuplot.doc; \
+	if test $$? -eq 0; then \
+	  echo "PASS: gnuplot.doc"; \
+	else \
+	  :; \
+	fi
 
 checkdoc: checkdoc.o termdoc.o
 	$(LINK) checkdoc.o termdoc.o $(LIBS)
@@ -244,6 +263,7 @@ checkdoc.o: checkdoc.c allterm.h
 
 # For Unix and MSDOS only
 install: gnuplot.gih
+	$(top_srcdir)/mkinstalldirs $(datadir)
 	$(INSTALL_DATA) gnuplot.gih $(datadir)/gnuplot.gih
 
 uninstall:
@@ -252,6 +272,23 @@ uninstall:
 # for VMS only
 install-vms: gnuplot.hlp
 	$(INSTALL_DATA) gnuplot.hlp $(datadir)/gnuplot.hlp
+
+distdir = $(top_builddir)/$(PACKAGE)-$(VERSION)/$(subdir)
+
+subdir = docs
+
+distdir: $(DISTFILES)
+	distdir=`cd $(distdir) && pwd`
+	@for file in $(DISTFILES); do \
+	  d=$(srcdir); \
+	  if test -d $$d/$$file; then \
+	    cp -pr $$d/$$file $(distdir)/$$file; \
+	  else \
+	    test -f $(distdir)/$$file \
+	    || ln $$d/$$file $(distdir)/$$file 2> /dev/null \
+	    || cp -p $$d/$$file $(distdir)/$$file || :; \
+	  fi; \
+	done
 
 clean:
 	-rm -f doc2tex gnuplot.tex gnuplot.dvi \
@@ -276,9 +313,6 @@ distclean: clean
 
 realclean: distclean
 	-rm -f TAGS
-
-.c.o:
-	$(COMPILE) -c $<
 
 ### Dependencies - do not edit!
 
