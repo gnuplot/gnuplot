@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: bitmap.c,v 1.11 1999/11/08 19:24:27 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: bitmap.c,v 1.12 1999/11/24 13:00:01 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - bitmap.c */
@@ -850,8 +850,6 @@ unsigned int x, y, value;
 }
 
 
-/* Currently unused */
-#if 1 /* HBB 991008: used by PNG, now */
 /*
  * get pixel (x,y) value
  */
@@ -859,45 +857,41 @@ unsigned int
 b_getpixel(x, y)
 unsigned int x, y;
 {
-  register unsigned int row;
-  register unsigned char mask;
-  register unsigned short value=0; /* HBB 991123: initialize! */
-  int i;
+    register unsigned int row;
+    register unsigned char mask;
+    register unsigned short value=0; /* HBB 991123: initialize! */
+    int i;
 
-  if (b_rastermode) {
+    if (b_rastermode) {
 	row = x;
 	x = y;
 	y = b_ysize-1-row;
-  }
-  if (IN(x, b_xsize) && IN(y, b_ysize))
-  {
-    row = y/8 + (b_planes-1)*b_psize;
-    mask = 1<<(y%8);
+    }
+    if (IN(x, b_xsize) && IN(y, b_ysize)) {
+	row = y/8 + (b_planes-1)*b_psize;
+	mask = 1<<(y%8);
 
 	for (i=0; i<b_planes; i++) {
-		if ( *((*b_p)[row]+x) & mask )
-			value |= 1;
-		row -= b_psize;
-		value <<= 1;
+	    if ( *((*b_p)[row]+x) & mask )
+		value |= 1;
+	    row -= b_psize;
+	    value <<= 1;
 	}
    
-/* HBB 991123: the missing '>>1' was the 'every second color' problem
- * with PNG in 3.8a...*/
-    return(value>>1);		
-  }
-  else
-  {
+	/* HBB 991123: the missing '>>1' was the 'every second color' problem
+	 * with PNG in 3.8a...*/
+	return(value>>1);		
+    } else {
 #ifdef BITMAPDEBUG
-    if (b_rastermode)
-      fprintf(stderr, "Warning: getpixel(%d,%d) out of bounds\n",
-		b_ysize-1-y, x);
-    else
-      fprintf(stderr, "Warning: getpixel(%d,%d) out of bounds\n", x, y);
+	if (b_rastermode)
+	    fprintf(stderr, "Warning: getpixel(%d,%d) out of bounds\n",
+		    b_ysize-1-y, x);
+	else
+	    fprintf(stderr, "Warning: getpixel(%d,%d) out of bounds\n", x, y);
 #endif
-    return(0);
-  }
+	return(0);
+    }
 }
-#endif /* 0 */
 
 
 /*
