@@ -307,18 +307,6 @@
 #endif
 
 
-/* VMS */
-#ifdef VMS
-extern sys$crembx();
-extern sys$assign();
-extern sys$dassgn();
-extern sys$qio();
-extern sys$qiow();
-extern void lib$signal();
-extern unsigned int lib$spawn();
-#endif
-
-
 /* Autoconf related stuff
  * Transform autoconf defines to gnuplot coding standards
  * This is only relevant for standard ANSI headers and functions
@@ -371,6 +359,10 @@ extern unsigned int lib$spawn();
 
 # ifndef HAVE_MEMCPY
 #  define NO_MEMCPY
+# endif
+
+# ifndef HAVE_MEMMOVE
+#  define NO_MEMMOVE
 # endif
 
 # ifndef HAVE_MEMSET
