@@ -181,7 +181,7 @@ static TBOOLEAN pipe_open = FALSE;
 
 static void term_close_output()
 {
-	FPRINTF(("term_close_output\n"));
+	FPRINTF((stderr,"term_close_output\n"));
 	
 	opened_binary = FALSE;
 	
@@ -215,7 +215,7 @@ char *dest;
 {
 	FILE *f;
 
-	FPRINTF(("term_set_output\n"));
+	FPRINTF((stderr,"term_set_output\n"));
 	assert(dest == NULL || dest != outstr);
 
 	 if (multiplot) {
@@ -280,7 +280,7 @@ char *dest;
 
 void term_init()
 {
-	FPRINTF(("term_init()\n"));
+	FPRINTF((stderr,"term_init()\n"));
 	
 	if (!term)
 		int_error("No terminal defined", NO_CARET);
@@ -301,7 +301,7 @@ void term_init()
 			 */
 			char *temp = gp_alloc(strlen(outstr)+1, "temp file string");
 			if (temp) {
-				FPRINTF(("term_init : reopening \"%s\" as %s\n",
+				FPRINTF((stderr,"term_init : reopening \"%s\" as %s\n",
 				   outstr, term->flags & TERM_BINARY ? "binary" : "text"));
 				strcpy(temp, outstr);
 				term_set_output(temp); /* will free outstr */
@@ -321,7 +321,7 @@ void term_init()
 
 	if (!term_initialised || term_force_init )
 	{
-		FPRINTF(("- calling term->init()\n"));
+		FPRINTF((stderr,"- calling term->init()\n"));
 		(*term->init)();
 		term_initialised = TRUE;
 	}
@@ -330,18 +330,18 @@ void term_init()
 
 void term_start_plot()
 {
-	FPRINTF(("term_start_plot()\n"));
+	FPRINTF((stderr,"term_start_plot()\n"));
 
 	if (!term_initialised)
 		term_init();
 	
 	if (!term_graphics) {
-		FPRINTF(("- calling term->graphics()\n"));
+		FPRINTF((stderr,"- calling term->graphics()\n"));
 		(*term->graphics)();
 		term_graphics = TRUE;
 	} else if (multiplot && term_suspended) {
 		if (term->resume) {
-			FPRINTF(("- calling term->resume()\n"));
+			FPRINTF((stderr,"- calling term->resume()\n"));
 			(*term->resume)();
 		}
 		term_suspended = FALSE;
@@ -350,13 +350,13 @@ void term_start_plot()
 
 void term_end_plot()
 {
-	FPRINTF(("term_end_plot()\n"));
+	FPRINTF((stderr,"term_end_plot()\n"));
 
 	if (!term_initialised)
 		return;
 		
 	if (!multiplot) {
-		FPRINTF(("- calling term->text()\n"));
+		FPRINTF((stderr,"- calling term->text()\n"));
 		(*term->text)();
 		term_graphics = FALSE;
 	}
@@ -372,7 +372,7 @@ void term_end_plot()
 
 void term_start_multiplot()
 {
-	FPRINTF(("term_start_multiplot()\n"));
+	FPRINTF((stderr,"term_start_multiplot()\n"));
 	if (multiplot)
 		term_end_multiplot();
 
@@ -382,7 +382,7 @@ void term_start_multiplot()
 
 void term_end_multiplot()
 {
-	FPRINTF(("term_end_multiplot()\n"));
+	FPRINTF((stderr,"term_end_multiplot()\n"));
 	if (!multiplot)
 		return;
 
@@ -402,10 +402,10 @@ void term_end_multiplot()
 
 static void term_suspend()
 {
-	FPRINTF(("term_suspend()\n"));
+	FPRINTF((stderr,"term_suspend()\n"));
 	if (term_initialised && !term_suspended && term->suspend)
 	{
-		FPRINTF(("- calling term->suspend()\n"));
+		FPRINTF((stderr,"- calling term->suspend()\n"));
 		(*term->suspend)();
 		term_suspended = TRUE;
 	}
@@ -413,7 +413,7 @@ static void term_suspend()
 
 void term_reset()
 {
-	FPRINTF(("term_reset()\n"));
+	FPRINTF((stderr,"term_reset()\n"));
 
 	if (!term_initialised)
 		return;
@@ -422,7 +422,7 @@ void term_reset()
 	{
 		if (term->resume)
 		{
-			FPRINTF(("- calling term->resume()\n"));
+			FPRINTF((stderr,"- calling term->resume()\n"));
 			(*term->resume)();
 		}
 		term_suspended = FALSE;
@@ -475,7 +475,7 @@ struct lp_style_type *lp;
 void term_check_multiplot_okay(interactive)
 TBOOLEAN interactive;
 {
-	FPRINTF(("term_multiplot_okay(%d)\n", interactive));
+	FPRINTF((stderr,"term_multiplot_okay(%d)\n", interactive));
 
 	if (!term_initialised)
 		return; /* they've not started yet */

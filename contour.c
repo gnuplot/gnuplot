@@ -864,7 +864,7 @@ int contr_kind;
     struct cntr_struct  *pc_tail=NULL;
     int current_contr_kind;
 
-    FPRINTF(("check_contour_kind: current contr_kind value is %d\n",contr_kind));
+    FPRINTF((stderr,"check_contour_kind: current contr_kind value is %d\n",contr_kind));
 
     current_contr_kind = contr_kind;
 
@@ -875,7 +875,7 @@ int contr_kind;
         /* test if first and last point are equal */
         if ( fuzzy_equal(pc_tail, p_cntr) ) {
             current_contr_kind = CLOSED_CONTOUR;
-            FPRINTF(("check_contour_kind: contr_kind changed to %d\n",current_contr_kind));
+            FPRINTF((stderr,"check_contour_kind: contr_kind changed to %d\n",current_contr_kind));
         }
     }
     return (current_contr_kind);
