@@ -4,7 +4,15 @@
 
 	* 0README: Update distribution sites.
 
+	* configure: Regenerated.
+
+	* configure.in: Don't use fmt to create the driver list (not available
+	under HP-UX).
+
 	* version.c: Version 3.7, patchlevel 0, date string updated.
+
+	* term/post.trm, term/pslatex.trm, term/pstricks.trm, term/tpic.trm:
+	Fix typos introduced by the fprintf-fputs changeover.
 
 1999-01-08  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
