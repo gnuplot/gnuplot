@@ -648,7 +648,7 @@ int count;
 
     /* xlabel */
     if (xlablin) {
-	/* offset is subtracted because if . 0, the margin is smaller */
+	/* offset is subtracted because if > 0, the margin is smaller */
 	xlabel_textheight = (int) ((xlablin - xlabel.yoffset) * (t->v_char));
 	if (!xtics)
 	    xlabel_textheight += 0.5 * t->v_char;
@@ -998,14 +998,14 @@ int count;
 
     y2label_y = ytop + x2tic_height + x2tic_textheight + y2label_textheight;
 
-    xlabel_y = ybot - xtic_height - xtic_textheight - xlabel_textheight + t->v_char;
+    xlabel_y = ybot - xtic_height - xtic_textheight - xlabel_textheight + xlablin * t->v_char;
     ylabel_x = xleft - ytic_width - ytic_textwidth;
     if (*ylabel.text && can_rotate)
 	ylabel_x -= ylabel_textwidth;
 
     y2label_x = xright + y2tic_width + y2tic_textwidth;
     if (*y2label.text && can_rotate)
-	y2label_x += y2label_textwidth - t->v_char;
+	y2label_x += y2label_textwidth - y2lablin * t->v_char;
 
     if (vertical_timelabel) {
 	if (timelabel_bottom)
