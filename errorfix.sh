@@ -8,15 +8,9 @@
 #
 # this needs to be run once in gnuplot directory
 
-if [ $# = 0 ]
-then
-  dir=.
-else
-  dir=$1
-fi
+dir=$1 && test $dir || dir=.
 
-if [ $dir = . ]
-then
+if [ $dir = . ] ; then
   mkdirs=false
   backup=true
 else
@@ -24,27 +18,31 @@ else
   backup=false
 fi
 
-for i in `cd $dir;find . \( -name "*.c" -o -name "*.h" -o -name "*.trm" \) -print`
-do
+for i in `cd $dir;find . \( -name "*.c" -o -name "*.h" -o -name "*.trm" \) -print` ; do
   sed -e 's/^#\([ 	]*error\)/\1/' \
       -e 's@^\(#[ 	]*warning.*\)$@/* \1 */@' $dir/$i >.tmp
-  if cmp -s $dir/$i .tmp
-  then
+  if cmp -s $dir/$i .tmp ; then
     rm .tmp
   else
-    if $mkdirs
-    then
-      mkdirs `echo $i|sed 's@/[^/]*$@@'`
+    if $mkdirs ; then
+      dirnew=`echo $i | sed 's@^\./@@'`
+      if echo $dirnew |grep '/' >/dev/null 2>&1 ; then
+        mkdir `echo $dirnew |grep '/' |sed 's@/[^/]*$@@'`
+      fi
     fi
-    if $backup && [ ! -r $dir/$i.dist ]
-    then
+    if $backup && [ ! -r $dir/$i.dist ] ; then
       mv $dir/$i $dir/$i.dist
     fi
-    if cmp -s .tmp $i
-    then
+    if cmp -s .tmp $i ; then 
       rm .tmp
     else
+      suffix=`echo $i | awk -F\. '{print $NF}'`
+      if [ $suffix = h ]; then
+        mv $dir/$i $dir/$i.dist
+        mv .tmp $dir/$i
+      else
       mv .tmp $i
+      fi
       echo fixed $i
     fi
   fi
