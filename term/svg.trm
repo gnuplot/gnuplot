@@ -348,8 +348,9 @@ SVG_init ()
 	     "<?xml version=\"1.0\" standalone=\"no\"?>\n"
 	     "<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 20001102//EN\" \"svg-20001102.dtd\">\n"
 	     "<svg width=\"%u\" height=\"%u\" viewBox=\"0 0 %u %u\">\n\n"
-	     "<desc>Produced by GNUPLOT (svg.trm written by Amedeo Farello - afarello@libero.it)</desc>\n\n",
-	     term->xmax, term->ymax, term->xmax, term->ymax);
+	     "<desc>Produced by GNUPLOT %s patchlevel %s </desc>\n\n",
+	     term->xmax, term->ymax, term->xmax, term->ymax,
+	     gnuplot_version, gnuplot_patchlevel);
 
     /* definitions of point symbols */
     /* FIXME: SVG scales linewidth along with the marker itself, and
