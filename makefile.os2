@@ -2,52 +2,89 @@
 # $Id: makefile.os2,v 1.27 1998/04/14 00:15:54 drd Exp $
 #
 # Makefile for use with emx (0.9 and above) and GNUMake
-#   on OS/2 3.0 and above (could also work for OS/2 2.x)
-#   (yes, we do want to switch to configure ...)
+#   on OS/2 3.0 and above (might also work for OS/2 2.x)
 #
-# Authors:
-#   Roger Fearick, Rolf Niepraschk and Alexander Mai
-#
-# release: 19980824
+# last modification: 19981001
 #
 
-# SHELL=cmd
+# We depend on using cmd.exe (or a compatible one)
+SHELL=cmd
 
+#
+# ***************** Begin of Configuration section ***************************
+#
+
+# Comment out the definition lines to disable the according features:
+
+# X11 driver
+# requires installed XFree86
+X11=1
+
+# GD (GIF) device driver
+# requires GD library (not part of gnuplot)
+GD=1
+
+# PNG device driver
+# requires PNG and Z libraries (not part of gnuplot)
+PNG=1
+
+# VESAkit support
+# requires SVGA- and VESA Kit (not part of gnuplot)
+VESA=1
+
+# DEBUGging support
+# creates binaries suitable for debugging. Some bugs may come and go
+# as opposed to a production build since we lower the optimization level
+DEBUG=1
+
+# GNU_ReadLine support
+# requires GNU readline library (static or DLL; not part of gnuplot)
+GNU_RL=1
+
+# MOUSE support for PM terminal
+# (not yet supported in official release)
+# MOUSE=1
+
+#
+# ****************** End of Configuration section ****************************
+#
+
+#
+# Miscellaneous setup
+#
+
+.PHONY: all runtime alldocs demo binaries infomin clean veryclean
+.SUFFIXES: .c .trm .o .obj .exe
+
+
+# Default target is just a help screen
 default:
-	   @echo " Usage: $(MAKE) -f makefile.os2 target {defines}"
+	   @echo " Usage: $(MAKE) -f makefile.os2 target"
 	   @echo "   target is one of:"
-	   @echo "    all runtime docs alldocs demo binaries infomin clean veryclean"
-	   @echo " possible defines are:   GD=''  PNG=''  VESA=''  X11=''  GNU_RL=''  DEBUG=''"
-	   @echo "    GD       enables  GD  terminal driver  (gif support)"
-	   @echo "    PNG      enables  PNG terminal driver'"
-	   @echo "    VESA     enables  SVGA/VESAkit terminal driver"
-	   @echo "    X11      enables  X11 terminal driver"
-	   @echo "    GNU_RL   enables  the GNU Readline library"
-	   @echo "    DEBUG    generates binaries for debugging"
+	   @echo "   all runtime alldocs demo binaries infomin clean veryclean"
 
 #
 # Definitions of flags and symbols used by makefile.all and makefile.os2
 #
+
 # these definitions are used by makefile.all
-
-.PHONY: all runtime docs alldocs demo binaries infomin clean veryclean
-.SUFFIXES: .c .trm .o .obj .exe
-
 T=term/
 D=docs/
 L=$(D)latextut/
 M=demo/
+
 #
 # Definitions valid for all targets on OS/2
 #
-# directory where OS/2-driver is
+
 OS2DIR = os2
+DOCDIR=docs
+DEMODIR=demo
+TERMDIR=term
 ifdef X11
-	binaries = gnuplot.exe gnupmdrv.exe gnuplot_x11.exe
-	OS2TERMS= $(T)\pm.trm $(T)\emxvga.trm $(T)\x11.trm
+	OS2TERMS= $(TERMDIR)\pm.trm $(TERMDIR)\emxvga.trm $(TERMDIR)\x11.trm
 else
-	binaries = gnuplot.exe gnupmdrv.exe
-	OS2TERMS= $(T)\pm.trm $(T)\emxvga.trm
+	OS2TERMS= $(TERMDIR)\pm.trm $(TERMDIR)\emxvga.trm
 endif
 
 # where to place gnuplot.gih helpfile
@@ -56,7 +93,7 @@ HELPFILE = gnuplot.gih
 #
 # 3 sets of variables are defined and used to create
 #  (1): gnuplot.exe
-#   2 : gnupmdrv.exe (the PM-driver executable) 
+#   2 : gnupmdrv.exe (the PM-driver executable)
 #   3 : utilities like doc2*.exe, bf_test, ...
 #
 CC  = gcc
@@ -64,39 +101,47 @@ CC2 = gcc
 CC3 = gcc
 O  = o
 O2 = obj
-O3 = o 
+O3 = o
 
-# generic flags for compiler and linker under OS/2
+# Flags for compiler and linker under OS/2
 OS2FLAGS = -DOS2 -DHELPFILE=\"$(HELPFILE)\"
 # flags for compiling with EMX/GCC
 EMXSPECIFIC = -DREADLINE -DHAVE_STRNICMP -DPIPES -DHAVE_STRERROR -DHAVE_SYS_SELECT_H -DHAVE_SYS_STAT_H
+LIBS = 
 ifdef GNU_RL
   EMXSPECIFIC += -DGNU_READLINE
-  LIBS = -lreadline -ltermcap
-else
-  LIBS =
+  LIBS += -lreadline -ltermcap
 endif
+
+#
+# Choose flags suitable for debugging or for a production build
+#
 ifdef DEBUG
-CFLAGS  = $(OS2FLAGS) -g -Wall  -Wno-comment -O0
-LFLAGS  = -Zcrtdll
+CFLAGS  = $(OS2FLAGS) -g -Wall -Wno-comment -O0
+LFLAGS  = -Zcrtdll -g
 CFLAGS2 = $(OS2FLAGS) -Zomf -Zsys -Zmt -g -Wall -O0
 LFLAGS2 = -Zomf -Zmt -Zcrtdll -Zlinker /debug
-CFLAGS3 = $(OS2FLAGS) $(EMXSPECIFIC) -g -Wall -O0
-LFLAGS3 = 
+CFLAGS3 = $(OS2FLAGS) $(EMXSPECIFIC) -g -Wall -Wno-comment -O0
+LFLAGS3 = -g
 else
 CFLAGS  = $(OS2FLAGS) -O2 -Wall -Wno-unused -Wno-comment
-LFLAGS  = -s -Zcrtdll 
+LFLAGS  = -s -Zcrtdll
 CFLAGS2 = $(OS2FLAGS) -Zomf -Zcrtdll -Zmt -O2 -Wall -Wno-unused
 LFLAGS2 = -Zomf -Zmt -Zsys -s
-CFLAGS3 = $(OS2FLAGS) $(EMXSPECIFIC) -O2 -Wall -Wno-unused
+CFLAGS3 = $(OS2FLAGS) $(EMXSPECIFIC) -O2 -Wall -Wno-unused -Wno-comment
 LFLAGS3 = -s
 endif
+
 #
 # Settings for the terminals to be included
 #
 TERMFLAGS = -I. -I$(T)
-# (some terminals still have to be en/disabled in term.h)
-#  all terminals available via #defines should be listed below
+
+# All terminals available via #defines should be listed below
+# Some terminals can be en/disablked in the configuration at the
+# beginning of this Makefile.os2 but others still require changes
+# in term.h
+
 #
 # GIF-support
 ifdef GD
@@ -117,6 +162,10 @@ endif
 ifdef X11
 TERMFLAGS += -DX11
 endif
+# MOUSE support for PM terminal
+ifdef MOUSE
+TERMFLAGS += -DUSE_MOUSE
+endif
 #
 # Default Rules
 #
@@ -132,23 +181,27 @@ include makefile.all
 #
 # Pre-defined sets of targets:
 #
-all:         runtime demo docs
-docs:        gnuplot.gih gnuplot.inf gnuplot.html gnuplot.info
+all:         runtime demo
 alldocs:     gnuplot.gih gnuplot.inf gnuplot.html gnuplot.info \
              gnuplot.dvi gnuplot.ps
-runtime:     $(binaries) infomin gnuplot.inf
+runtime:     binaries infomin gnuplot.inf
 infomin:     gnupmdrv.hlp gnuplot.gih
 demo:        $(M)binary1 $(M)binary2 $(M)binary3
+ifdef X11
+binaries: gnuplot.exe gnupmdrv.exe gnuplot_x11.exe
+else
+binaries: gnuplot.exe gnupmdrv.exe
+endif
 
 #
 # special rule to build graphics.o ( -O2 does not work properly here ?!)
 graphics.o: graphics.c
 ifdef DEBUG
-	$(CC) $(OS2FLAGS) $(EMXSPECIFIC) -g -o $@ -c graphics.c
+	$(CC) $(OS2FLAGS) $(EMXSPECIFIC) -g -O0 -o $@ -c graphics.c
 else
-	$(CC) $(OS2FLAGS) $(EMXSPECIFIC) -O1 -o $@ -c graphics.c
-#	$(CC) $(OS2FLAGS) $(EMXSPECIFIC) -O2 -ffloat-store -o $@ -c graphics.c
+	$(CC) $(OS2FLAGS) $(EMXSPECIFIC) -O2 -ffloat-store -o $@ -c graphics.c
 endif
+
 OBJS = $(COREOBJS) version.$(O)
 gnuplot.exe: $(OBJS)
 	$(CC) -o $@ $(OBJS) $(TERMLIBS) $(LIBS) $(LFLAGS)
@@ -165,7 +218,7 @@ $(OS2DIR)\gnupmdrv.res :  $(OS2DIR)\gnupmdrv.rc $(OS2DIR)\gnuplot.ico $(OS2DIR)\
 	cd $(OS2DIR) & rc -r gnupmdrv.rc & cd ..
 OS2OBJ = $(OS2DIR)\gnupmdrv.$(O2) $(OS2DIR)\gclient.$(O2) $(OS2DIR)\print.$(O2) \
          $(OS2DIR)\dialogs.$(O2)
-gnupmdrv.exe: $(OS2OBJ) $(OS2DIR)\gnupmdrv.res $(OS2DIR)\gnupmdrv.def 
+gnupmdrv.exe: $(OS2OBJ) $(OS2DIR)\gnupmdrv.res $(OS2DIR)\gnupmdrv.def
 	$(CC2) $(LFLAGS2) -o $@ $(OS2OBJ) $(OS2DIR)\gnupmdrv.res $(OS2DIR)\gnupmdrv.def
 gnupmdrv.hlp: $(OS2DIR)\gnupmdrv.ipf
 	ipfc $(OS2DIR)\gnupmdrv.ipf
@@ -173,114 +226,107 @@ gnupmdrv.hlp: $(OS2DIR)\gnupmdrv.ipf
 #
 # Build the X11 outboard driver
 #
-#
-# X11 definitions for outboard driver
-#
+
 # List your X11 libraries
 X11LIBS = -lX11 -lsocket -Zcrtdll
 # List where the X11 include directory is found
 X11INCLUDES = -I$(X11ROOT)/xfree86/include
 X11FLAGS= -D__ST_MT_ERRNO -Zmtd -Zsysv-signals
 
-gnuplot_x11.exe: gplt_x11.c
-	$(CC) $(CFLAGS) $(X11FLAGS) $(EMXSPECIFIC) $(X11INCLUDES) -o gnuplot_x11.exe \
-        gplt_x11.c $(X11LIBS) -s
+gnuplot_x11.exe: gplt_x11.o
+	$(CC) $(LFLAGS) $(X11FLAGS) $(EMXSPECIFIC) -o $@ $< $(X11LIBS)
+
+gplt_x11.o: gplt_x11.c
+	$(CC) $(CFLAGS) $(X11FLAGS) $(EMXSPECIFIC) $(X11INCLUDES) -c -o $@ $<
+
 #
 # Create documentation in various formats
 #
-# change the call to LaTeX if the "latex2e" is not appropiate for you
+# Change the call to LaTeX if the "latex2e" is not appropiate for you
 # (and don't care about the strange way it's implemented ...)
 gnuplot.dvi: gnuplot.tex
-	copy gnuplot.tex $(D)gnuplot_2.tex
-	cd docs
-	latex2e gnuplot_2.tex
-	mv gnuplot_2.dvi ..\gnuplot.dvi
-	rm gnuplot_2*
-	cd ..
-gnuplot.tex:  $(D)gnuplot.doc doc2tex.exe
-	doc2tex $(D)gnuplot.doc gnuplot.tex
+	copy gnuplot.tex $(DOCDIR)\gnuplot_2.tex
+	cd $(DOCDIR) & latex2e gnuplot_2.tex
+	mv $(DOCDIR)\gnuplot_2.dvi gnuplot.dvi
+	rm $(DOCDIR)\gnuplot_2*
+gnuplot.tex:  $(DOCDIR)\gnuplot.doc doc2tex.exe
+	doc2tex $(DOCDIR)\gnuplot.doc gnuplot.tex
 gnuplot.ps: gnuplot.dvi
 	dvips -o gnuplot.ps gnuplot.dvi
-gnuplot.inf:  $(D)gnuplot.ipf
-	ipfc /inf $(D)gnuplot.ipf gnuplot.inf
-gnuplot.gih:  $(D)gnuplot.doc doc2gih.exe 
-	doc2gih $(D)gnuplot.doc gnuplot.gih
-gnuplot.html: $(D)gnuplot.doc doc2html.exe
-	doc2html $(D)gnuplot.doc gnuplot.html
-gnuplot.info: $(D)gnuplot.doc doc2info.exe
-	doc2info <$(D)gnuplot.doc >gnuplot.info
-gnuplot.texi: $(D)gnuplot.doc $(D)doc2texi.pl
-	perl $(D)doc2texi.pl $(D)gnuplot.doc >$(D)gnuplot.texi
-gnuplot.rtf:  $(D)gnuplot.doc doc2rtf.exe
-	doc2rtf $(D)gnuplot.doc gnuplot.rtf
-gnuplot.ms:   $(D)gnuplot.doc doc2ms.exe
-	doc2ms $(D)gnuplot.doc gnuplot.ms
-$(D)gnuplot.ipf:  $(D)gnuplot.doc doc2ipf.exe
-	doc2ipf $(D)gnuplot.doc $(D)gnuplot.ipf
+gnuplot.inf:  $(DOCDIR)\gnuplot.ipf
+	ipfc -i $(DOCDIR)\gnuplot.ipf gnuplot.inf
+gnuplot.gih:  $(DOCDIR)\gnuplot.doc doc2gih.exe
+	doc2gih $(DOCDIR)\gnuplot.doc gnuplot.gih
+gnuplot.html: $(DOCDIR)\gnuplot.doc doc2html.exe
+	doc2html $(DOCDIR)\gnuplot.doc gnuplot.html
+gnuplot.info: $(DOCDIR)\gnuplot.doc doc2info.exe
+	doc2info <$(DOCDIR)\gnuplot.doc >gnuplot.info
+gnuplot.texi: $(DOCDIR)\gnuplot.doc $(DOCDIR)\doc2texi.pl
+	perl $(DOCDIR)\doc2texi.pl $(DOCDIR)\gnuplot.doc >$(DOCDIR)\gnuplot.texi
+gnuplot.rtf:  $(DOCDIR)\gnuplot.doc doc2rtf.exe
+	doc2rtf $(DOCDIR)\gnuplot.doc gnuplot.rtf
+gnuplot.ms:   $(DOCDIR)\gnuplot.doc doc2ms.exe
+	doc2ms $(DOCDIR)\gnuplot.doc gnuplot.ms
+$(DOCDIR)\gnuplot.ipf:  $(DOCDIR)\gnuplot.doc doc2ipf.exe
+	doc2ipf $(DOCDIR)\gnuplot.doc $(DOCDIR)\gnuplot.ipf
 #
 # Tools for converting the documentation from docs\gnuplot.doc
 # in various formats
 #
 doc2gih.exe doc2ipf.exe doc2html.exe doc2info.exe doc2tex.exe doc2rtf.exe: \
-            $(D)xref.c term.h
+            $(DOCDIR)\xref.c term.h
 #
 # To include all terminal documentations in the documentation
-# uncomment the 2 lines below
+# uncomment the following 2 lines
 # doc2gih.exe doc2ipf.exe doc2html.exe doc2info.exe doc2tex.exe doc2rtf.exe: \
-#             $(D)xref.c $(D)allterm.h
+#             $(DOCDIR)\xref.c $(DOCDIR)\allterm.h
 
-$(D)allterm.h: $(CORETERM)
+$(DOCDIR)\allterm.h: $(CORETERM)
 #   echo > $@
-	type $(T)*.trm >> $@
-doc2gih.exe:  $(D)doc2gih.c  $(OS2TERMS)
-	$(CC3) $(CFLAGS3) $(TERMFLAGS) -o $@ $(D)doc2gih.c
-doc2ipf.exe:  $(D)doc2ipf.c  $(OS2TERMS)
-	$(CC3) $(CFLAGS3) $(TERMFLAGS) -o $@ $(D)doc2ipf.c
-doc2tex.exe:  $(D)doc2tex.c  $(OS2TERMS) $(D)allterm.h
-	$(CC3) $(CFLAGS3) $(TERMFLAGS) -o $@ $(D)doc2tex.c
-doc2html.exe: $(D)doc2html.c $(OS2TERMS)
-	$(CC3) $(CFLAGS3) $(TERMFLAGS) -o $@ $(D)doc2html.c
-doc2info.exe: $(D)doc2info.c $(OS2TERMS)
-	$(CC3) $(CFLAGS3) $(TERMFLAGS) -o $@ $(D)doc2info.c
-doc2rtf.exe:  $(D)doc2rtf.c  $(OS2TERMS)
-	$(CC3) $(CFLAGS3) $(TERMFLAGS) -o $@ $(D)doc2rtf.c
-doc2ms.exe:   $(D)doc2ms.c   $(OS2TERMS)
-	$(CC3) $(CFLAGS3) $(TERMFLAGS) -o $@ $(D)doc2ms.c
+	cd $(TERMDIR) & type *.trm > ..\$@
+doc2gih.exe:  $(DOCDIR)\doc2gih.c  $(OS2TERMS)
+	$(CC3) $(CFLAGS3) $(TERMFLAGS) -o $@ $(DOCDIR)\doc2gih.c
+doc2ipf.exe:  $(DOCDIR)\doc2ipf.c  $(OS2TERMS)
+	$(CC3) $(CFLAGS3) $(TERMFLAGS) -o $@ $(DOCDIR)\doc2ipf.c
+doc2tex.exe:  $(DOCDIR)\doc2tex.c  $(OS2TERMS) $(DOCDIR)\allterm.h
+	$(CC3) $(CFLAGS3) $(TERMFLAGS) -o $@ $(DOCDIR)\doc2tex.c
+doc2html.exe: $(DOCDIR)\doc2html.c $(OS2TERMS)
+	$(CC3) $(CFLAGS3) $(TERMFLAGS) -o $@ $(DOCDIR)\doc2html.c
+doc2info.exe: $(DOCDIR)\doc2info.c $(OS2TERMS)
+	$(CC3) $(CFLAGS3) $(TERMFLAGS) -o $@ $(DOCDIR)\doc2info.c
+doc2rtf.exe:  $(DOCDIR)\doc2rtf.c  $(OS2TERMS)
+	$(CC3) $(CFLAGS3) $(TERMFLAGS) -o $@ $(DOCDIR)\doc2rtf.c
+doc2ms.exe:   $(DOCDIR)\doc2ms.c   $(OS2TERMS)
+	$(CC3) $(CFLAGS3) $(TERMFLAGS) -o $@ $(DOCDIR)\doc2ms.c
 #
 # Create binary demo files
 #
 $(M)binary1: $(M)bf_test.exe
-	cd demo & bf_test.exe & cd ..
+	cd $(DEMODIR) & bf_test.exe & cd ..
 $(M)binary2: $(M)bf_test.exe
-	cd demo & bf_test.exe & cd ..
+	cd $(DEMODIR) & bf_test.exe & cd ..
 $(M)binary3: $(M)bf_test.exe
-	cd demo & bf_test.exe & cd ..
+	cd $(DEMODIR) & bf_test.exe & cd ..
 $(M)bf_test.exe : bf_test.c binary.$(O) alloc.$(O)
 	$(CC3) $(CFLAGS3) -o $@ bf_test.c binary.$(O) alloc.$(O)
 #
-# Clean up temporary files
+# Clean up
 #
+# Clean up all files temporary used
 clean:
 	IF EXIST *.$(O)                  DEL *.$(O)
 	IF EXIST *.$(O2)                 DEL *.$(O2)
-	IF EXIST $(OS2DIR)\*.$(O2)       DEL $(OS2DIR)\*.$(O2)
+	cd $(OS2DIR) & IF EXIST *.$(O2)  DEL *.$(O2)
 	IF EXIST $(OS2DIR)\gnupmdrv.res  DEL $(OS2DIR)\gnupmdrv.res
-	IF EXIST $(M)bf_test.exe         DEL $(M)bf_test.exe
-	IF EXIST doc2gih.exe             DEL doc2gih.exe
-	IF EXIST doc2ipf.exe             DEL doc2ipf.exe
-	IF EXIST doc2tex.exe             DEL doc2tex.exe
-	IF EXIST doc2html.exe            DEL doc2html.exe
-	IF EXIST doc2info.exe            DEL doc2info.exe
-	IF EXIST doc2rtf.exe             DEL doc2rtf.exe
+	IF EXIST demo\bf_test.exe        DEL demo\bf_test.exe
+	IF EXIST doc2*.exe               DEL doc2*.exe
 	IF EXIST gnuplot.ipf             DEL gnuplot.ipf
 	IF EXIST core                    DEL core
-	IF EXIST $(D)allterm.h           DEL $(D)allterm.h
+	IF EXIST $(DOCDIR)\allterm.h     DEL $(DOCDIR)\allterm.h
 
 # Clean up ALL files that were not part of the source distribution
 veryclean: clean
-	IF EXIST gnuplot.exe             DEL gnuplot.exe
-	IF EXIST gnupmdrv.exe            DEL gnupmdrv.exe
-	IF EXIST gnuplot_x11.exe         DEL gnuplot_x11.exe
+	IF EXIST *.exe.exe               DEL gnuplot.exe
 	IF EXIST gnupmdrv.hlp            DEL gnupmdrv.hlp
 	IF EXIST gnuplot.gih             DEL gnuplot.gih
 	IF EXIST gnuplot.inf             DEL gnuplot.inf
@@ -292,6 +338,4 @@ veryclean: clean
 	IF EXIST gnuplot.ms              DEL gnuplot.ms
 	IF EXIST gnuplot.rtf             DEL gnuplot.rtf
 	IF EXIST gnuplot.ps              DEL gnuplot.ps
-	IF EXIST $(M)binary1             DEL $(M)binary1
-	IF EXIST $(M)binary2             DEL $(M)binary2
-	IF EXIST $(M)binary3             DEL $(M)binary3 
+	cd demo & IF EXIST binary?       DEL binary?
