@@ -226,7 +226,7 @@ int scanner __PROTO((char expression[]));
 
 /* Prototypes from "stdfn.c" */
 
-char *safe_strncpy __PROTO((char *, char *, size_t));
+char *safe_strncpy __PROTO((char *, const char *, size_t));
 #ifndef HAVE_SLEEP
 unsigned int sleep __PROTO((unsigned int));
 #endif

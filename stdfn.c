@@ -374,7 +374,8 @@ int n;
  */
 
 char *safe_strncpy(d, s, n)
-char *d, *s;
+char *d;
+const char *s;
 size_t n;
 {
     char *ret;
