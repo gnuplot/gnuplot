@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.27 1999/09/24 15:38:59 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.28 1999/10/29 18:52:30 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -153,7 +153,7 @@ do{if (datatype[axis]==TIME) { \
   }\
   putc('"', stderr);\
  } else {\
-  fprintf(stderr,"%g",x);\
+  fprintf(stderr,"%#g",x);\
 }} while(0)
 
 #define SHOW_ALL_NL {if (!var_show_all) (void) putc('\n',stderr);}
@@ -185,7 +185,8 @@ show_command()
 
 
     struct value a;
-    int tag = 0, x_and_y_zeroax = 0;
+    double tag =0.;
+    int x_and_y_zeroax = 0;
 
     c_token++;
 
@@ -250,22 +251,22 @@ show_command()
     case S_LABEL:
 	c_token++;
 	if (!END_OF_COMMAND) {
-	    tag = (int)real(const_express(&a));
-	    if (tag <= 0)
+	    tag = real(const_express(&a));
+	    if ((int)tag <= 0)
 		int_error(c_token, "tag must be > zero");
 	}
 	(void) putc('\n',stderr);
-	show_label(tag);
+	show_label((int)tag);
 	break;
     case S_ARROW:
 	c_token++;
 	if (!END_OF_COMMAND) {
-	    tag = (int)real(const_express(&a));
-	    if (tag <= 0)
+	    tag = real(const_express(&a));
+	    if ((int)tag <= 0)
 		int_error(c_token, "tag must be > zero");
 	}
 	(void) putc('\n',stderr);
-	show_arrow(tag);
+	show_arrow((int)tag);
 	break;
 /*
     case S_LINESTYLE:
@@ -1127,7 +1128,7 @@ static void
 show_style()
 {
     struct value a;
-    int tag = 0;
+    double tag = 0;
 
     c_token++;
 
@@ -1145,18 +1146,18 @@ show_style()
     case SHOW_STYLE_LINE:
 	c_token++;
 	if (!END_OF_COMMAND) {
-	    tag = (int)real(const_express(&a));
-	    if (tag <= 0)
+	    tag = real(const_express(&a));
+	    if ((int)tag <= 0)
 		int_error(c_token, "tag must be > zero");
 	}
 	(void) putc('\n',stderr);
-	show_linestyle(tag);
+	show_linestyle((int)tag);
 	break;
     default:
 	/* show all styles */
 	show_styles("data",data_style);
 	show_styles("functions", func_style);
-	show_linestyle(tag);
+	show_linestyle((int)tag);
 	break;
     }
 }
