@@ -1,5 +1,5 @@
 /*
- * $Id: pbm.trm,v 1.11 1999/05/31 18:33:51 lhecking Exp $
+ * $Id: pbm.trm,v 1.12 1999/06/19 20:30:54 lhecking Exp $
  *
  */
 
@@ -80,8 +80,6 @@ TERM_PUBLIC void PBMlinetype __PROTO((int linetype));
 TERM_PUBLIC void PBMpoint __PROTO((unsigned int x, unsigned int y, int point));
 #endif /* TERM_PROTO */
 
-#ifdef TERM_BODY
-
 /* make XMAX and YMAX a multiple of 8 */
 #define PBM_XMAX (640)
 #define PBM_YMAX (480)
@@ -89,6 +87,8 @@ TERM_PUBLIC void PBMpoint __PROTO((unsigned int x, unsigned int y, int point));
 #define PBM_HCHAR (FNT5X9_VCHAR)
 #define PBM_VTIC FNT5X9_HBITS
 #define PBM_HTIC FNT5X9_HBITS
+
+#ifdef TERM_BODY
 
 static int pbm_font = 1;	/* small font */
 static int pbm_mode = 0;	/* 0:monochrome 1:gray 2:color */

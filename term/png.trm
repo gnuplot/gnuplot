@@ -1,5 +1,5 @@
 /*
- * $Id: png.trm,v 1.16 1999/06/19 20:30:54 lhecking Exp $
+ * $Id: png.trm,v 1.17 1999/06/22 11:54:22 lhecking Exp $
  *
  */
 
@@ -79,6 +79,14 @@ TERM_PUBLIC void PNG_linetype __PROTO((int linetype));
 TERM_PUBLIC void PNG_point __PROTO((unsigned int x, unsigned int y, int point));
 #endif /* TERM_PROTO */
 
+/* make XMAX and YMAX a multiple of 8 */
+#define PNG_XMAX (640)
+#define PNG_YMAX (480)
+#define PNG_VCHAR (FNT5X9_VCHAR)
+#define PNG_HCHAR (FNT5X9_VCHAR)
+#define PNG_VTIC FNT5X9_HBITS
+#define PNG_HTIC FNT5X9_HBITS
+
 #ifdef TERM_BODY
 
 #include "png.h"
@@ -93,14 +101,6 @@ TERM_PUBLIC void PNG_point __PROTO((unsigned int x, unsigned int y, int point));
 /* From version.c */
 extern char gnuplot_version[];
 extern char gnuplot_patchlevel[];
-
-/* make XMAX and YMAX a multiple of 8 */
-#define PNG_XMAX (640)
-#define PNG_YMAX (480)
-#define PNG_VCHAR (FNT5X9_VCHAR)
-#define PNG_HCHAR (FNT5X9_VCHAR)
-#define PNG_VTIC FNT5X9_HBITS
-#define PNG_HTIC FNT5X9_HBITS
 
 static int png_font = 1;	/* small font */
 static int png_mode = 0;	/* 0:monochrome 1:gray 2:color */
