@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.18 1999/07/30 19:36:18 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.19 1999/08/07 17:21:32 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -586,7 +586,20 @@ reset_command()
 void
 set_command()
 {
-    static char GPFAR setmess[] = SETSHOWMSG;
+    static char GPFAR setmess[] = 
+    "valid set options:  [] = choose one, {} means optional\n\n\
+\t'angles',  '{no}arrow',  '{no}autoscale',  'bar',  '{no}border',\n\
+\t'boxwidth', '{no}clabel', '{no}clip', 'cntrparam', '{no}contour',\n\
+\t'data style',  '{no}dgrid3d',  'dummy',  'encoding',  'format',\n\
+\t'function style',   '{no}grid',   '{no}hidden3d',   'isosamples',\n\
+\t'{no}key', '{no}label', '{no}linestyle', '{no}loadpath',\n\
+\t'locale', '{no}logscale', '[blrt]margin', 'mapping', '{no}missing',\n\
+\t'{no}multiplot', '{no}offsets', 'origin', 'output', '{no}parametric',\n\
+\t'pointsize', '{no}polar', '[rtuv]range',  'samples',  'size',\n\
+\t'{no}surface', 'terminal', 'tics',  'ticscale',  'ticslevel',\n\
+\t'{no}timestamp', 'timefmt', 'title', 'view', '[xyz]{2}data',\n\
+\t'[xyz]{2}label', '[xyz]{2}range', '{no}{m}[xyz]{2}tics',\n\
+\t'{no}[xyz]{2}[md]tics', '{no}{[xyz]{2}}zeroaxis', 'zero'";
 
     c_token++;
 
