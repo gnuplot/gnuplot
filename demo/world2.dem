@@ -7,10 +7,9 @@ set dummy u,v
 set angles degrees
 set parametric
 set view 60, 136, 1.22, 1.26
-set samples 32, 32
-set isosamples 9, 9
+set samples 64,64
+set isosamples 13,13
 set mapping spherical
-set yzeroaxis lt 0 lw 1.000
 unset xtics
 unset ytics
 unset ztics
