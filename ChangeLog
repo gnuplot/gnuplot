@@ -1,7 +1,12 @@
+2005-03-15  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* src/pm3d.c (set_plot_with_palette): Fix displaying colorbox also for
+	'splot ... with image'.
+
 2005-03-14  Petr Mikulik  <mikulik@physics.muni.cz>
 
-	* src/pm3d.c (set_plot_with_palette): Fix displaying colorbox for 'with
-	image'.
+	* src/pm3d.c (set_plot_with_palette): Fix displaying colorbox for 'plot
+	... with image'.
 
 2005-03-12  Ethan Merritt  <merritt@u.washington.edu>
 
