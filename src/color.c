@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: color.c,v 1.33 2002/08/20 16:50:14 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: color.c,v 1.34 2002/08/22 07:25:56 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - color.c */
@@ -578,12 +578,26 @@ draw_color_smooth_box()
 	unsigned int x, y;
 	apply_textcolor(&(CB_AXIS.label.textcolor),term);
 	if (color_box.rotation == 'h') {
+	    int len = ticscale * (tic_in ? 1 : -1) * (term->v_tic);
 	    x = (cb_x_from + cb_x_to) / 2 + CB_AXIS.label.xoffset * term->h_char;
-	    y = cb_y_from + (CB_AXIS.label.yoffset - 2.5) * term->v_char;
-	    write_multiline(x, y, CB_AXIS.label.text, CENTRE, CENTRE, 0,
+#define DEFAULT_Y_DISTANCE 1.0
+	    y = cb_y_from + (CB_AXIS.label.yoffset - DEFAULT_Y_DISTANCE - 1.7) * term->v_char;
+#undef DEFAULT_Y_DISTANCE
+	    if (len < 0) y += len;
+	    write_multiline(x, y, CB_AXIS.label.text, CENTRE, JUST_CENTRE, 0,
 			    CB_AXIS.label.font);
 	} else {
-	    x = cb_x_to + (CB_AXIS.label.xoffset + 6) * term->h_char;
+	    int len = ticscale * (tic_in ? -1 : 1) * (term->h_tic);
+	    /* calculate max length of cb-tics labels */
+	    widest_tic_strlen = 0;
+	    if (CB_AXIS.ticmode & TICS_ON_BORDER) {
+	      	widest_tic_strlen = 0; /* reset the global variable */
+		gen_tics(COLOR_AXIS, /* 0, */ widest_tic_callback);
+	    }
+#define DEFAULT_X_DISTANCE 1.0
+	    x = cb_x_to + (CB_AXIS.label.xoffset + widest_tic_strlen + DEFAULT_X_DISTANCE + 1.5) * term->h_char;
+#undef DEFAULT_X_DISTANCE
+	    if (len > 0) x += len;
 	    y = (cb_y_from + cb_y_to) / 2 + CB_AXIS.label.yoffset * term->v_char;
 	    if ((*term->text_angle)(TEXT_VERTICAL)) {
 		write_multiline(x, y, CB_AXIS.label.text, CENTRE, JUST_TOP, 
