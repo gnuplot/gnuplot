@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.18 2000/05/02 20:56:26 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.19 2000/05/31 13:03:11 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -262,6 +262,10 @@ static char *
 df_gets()
 {
     int len = 0;
+
+    /* HBB 20000526: prompt user for inline data, if in interactive mode */
+    if (mixed_data_fp && interactive)
+	fputs("input data ('e' ends) > ", stderr);
 
     if (!fgets(line, max_line_len, data_fp))
 	return NULL;

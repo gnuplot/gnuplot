@@ -1,3 +1,11 @@
+2000-06-13  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/datafile.c(df_gets): prompt visibly for inline data, if
+	in interactive mode.
+
+	* src/set.c(reset_command): set grid linewidth to 1.0, like the
+	startup value (was 0.5, incorrectly).
+
 2000-06-10  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* GNUmakefile, Makefile.am: Move pre-dist target from Makefile.am.
