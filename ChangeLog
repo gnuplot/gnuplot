@@ -8,6 +8,8 @@
 	* src/plot2d.c (eval_plots) src/plot3d.c (eval_3dplots)
 	src/set.c (set_tic_prop): Continue replacement of isstring +
 	m_quote_capture with try_to_get_string().
+
+	* term/post.trm: Fix '%' characters in output format.
 	
 2004-08-08  Ethan Merritt  <merritt@u.washington.edu>
 

@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.118 2004/08/01 03:53:02 sfeam Exp $
+ * $Id: post.trm,v 1.119 2004/08/02 03:57:27 sfeam Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -1377,9 +1377,9 @@ PS_common_init(
     static const char GPFAR psi2[] = "\
 %%%%EndComments\n\
 /gnudict 256 dict def\ngnudict begin\n\
-%\n\
-%The following 5 true/false flags may be edited by hand if required\n\
-%\n\
+%%\n\
+%%The following 5 true/false flags may be edited by hand if required\n\
+%%\n\
 /Color %s def\n\
 /Blacktext %s def\n\
 /Solid %s def\n\
