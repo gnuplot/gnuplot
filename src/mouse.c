@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.24 2001/10/05 16:37:32 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.25 2001/10/06 10:33:52 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -1676,8 +1676,8 @@ event_reset(struct gp_event_t *ge)
 void
 do_event(struct gp_event_t *ge)
 {
-    if (multiplot) {
-	/* no event processing for multiplot */
+    if (multiplot || !term) {
+	/* no event processing for multiplot or undefined terminal */
 	return;
     }
 

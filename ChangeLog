@@ -1,4 +1,10 @@
-Fri Dec 14 14:41:43 2001  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+2001-12-14  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* src/mouse.c: Routine do_event(): Disable event processing for 
+	undefined terminals (fixes crash when mouse is on and non-existing
+	terminal is set).
+
+2001-12-14  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/plot2d.c (eval_plots): Yet another fix for linestyle
  	handling.  Plots with no "lt" or "lw" option at all would not get
