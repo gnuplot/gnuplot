@@ -1,3 +1,9 @@
+2005-01-05  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* term/svg.trm (SVG_init): Updated DOCTYPE name and reference to
+	current standard: SVG 1.1. Added an XMLNS namespace declaration to
+	satisfy requirements for XML documents.
+
 2005-01-05  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/os2/gclient.c: Some more cleanup: Removed some unused variables
