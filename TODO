@@ -21,6 +21,8 @@ longer term
 
 - group related 'set' variables into structures, particularly xaxis
   stuff,etc. This will allow a move to table-driven parsing.
+  [PARTIALLY DONE] as of 3.8c
+  [DONE for the axis ones] in 'axis' branch on SourceForge [HBB]
 
 Lars' list
 
@@ -36,7 +38,8 @@ Lars' list
 - maybe use PD hash code for table-lookup (SNIPPETS code). Tables for
   builtin and user functions, variables, commands. What else? aliases
 - [Robert S. Maier] rewrite term.c to provide an interface to GNU plotutils
-- [HBB] rewrite hidden3d code (in the works)
+- [HBB] rewrite hidden3d code 
+  [MAINLY DONE] needs fine-tuning to remove single-pixel errors
 - for post-3.7 release: integrate new feature patches (M. Koga's
   polygon patch, various postscript driver patches by Dick, T. Walter's
   gnuplot command line history save file, etc)? 
@@ -82,17 +85,18 @@ Lars' list
   gp_fopen() - to be implemented
 - fix bug which prints "DI,1DI,0" in the upper left corner of the plot when
   in pcl5 mode and printing to an HP Laserjet 4+ (J. Breeding, bug-gnuplot)
+  [HBB: reason known, but proper workaround path unclear]
 DONE - integrate gpltconv into gnuplot (convert command?), configure option
 DONE - make history size configurable (set historysize)
 DONE - port writeback fix to 3.8
 
 HBB:
 WIN16 compile (BC++3.1):
--- no vfprintf simulation for the WText module, yet --> int_error problematic
+DONE - no vfprintf simulation for the WText module, yet --> int_error problematic
 -- graphics.c: too much global data?
 
 WIN32 compile (BC++4.52):
--- problems with the 16bit helper programs doc2help, bf_test (local installation problem suspected)
+DONE - problems with the 16bit helper programs doc2help, bf_test (local installation problem suspected)
 -- test run fails: script execution stops as soon as first plot is done.
 
 Petr Mikulik (info-gnuplot-beta Thu, 02 Mar 2000)

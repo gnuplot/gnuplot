@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.38.2.3 2000/06/04 12:53:20 joze Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.42 2000/10/31 19:59:30 joze Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -63,16 +63,18 @@ static char *RCSid() { return RCSid("$Id: command.c,v 1.38.2.3 2000/06/04 12:53:
  *
  */
 
-#include "plot.h"
-#include "alloc.h"
 #include "command.h"
+
+#include "alloc.h"
 #include "eval.h"
 #include "fit.h"
 #include "binary.h"
+#include "datafile.h"
 #include "gp_hist.h"
 #include "gp_time.h"
 #include "misc.h"
 #include "parse.h"
+#include "plot.h"
 #include "plot2d.h"
 #include "plot3d.h"
 #include "readline.h"
@@ -87,23 +89,11 @@ static char *RCSid() { return RCSid("$Id: command.c,v 1.38.2.3 2000/06/04 12:53:
 # include "mouse.h"
 #endif
 
-/* GNU readline
- * Only required by two files directly,
- * so I don't put this into a header file. -lh
- */
-#ifdef HAVE_LIBREADLINE
-# include <readline/readline.h>
-# include <readline/history.h>
-#endif
-
 #if (defined(MSDOS) || defined(DOS386)) && defined(__TURBOC__) && !defined(_Windows)
 unsigned _stklen = 16394;        /* increase stack size */
 #endif /* MSDOS && TURBOC */
 
 #ifdef OS2
-extern int PM_pause(char *);            /* term/pm.trm */
-extern int ExecuteMacro(char *, int);   /* plot.c */
-extern TBOOLEAN CallFromRexx;           /* plot.c */
 # ifdef USE_MOUSE
 #  define INCL_DOSMEMMGR
 #  define INCL_DOSPROCESS
@@ -134,17 +124,14 @@ static int winsystem __PROTO((char *));
 #  include <alloc.h>
 #  include <dir.h>		/* setdisk() */
 # endif				/* !MSC */
-# include "win/wgnuplib.h"
-extern TW textwin;
-extern LPSTR winhelpname;
-extern void screen_dump(void);	/* in term/win.trm */
-extern int Pause(LPSTR mess);	/* in winmain.c */
+# include "win/winmain.h"
 #endif /* _Windows */
 
 #ifdef VMS
 int vms_vkid;			/* Virtual keyboard id */
 int vms_ktid;			/* key table id, for translating keystrokes */
 #endif /* VMS */
+
 
 /* static prototypes */
 static void command __PROTO((void));
@@ -168,12 +155,13 @@ int inline_num;			/* input line number */
 
 struct udft_entry *dummy_func;
 
-/* current dummy vars */
-char c_dummy_var[MAX_NUM_VAR][MAX_ID_LEN+1];
-
 /* support for replot command */
 char *replot_line;
 int plot_token;			/* start of 'plot' command */
+
+/* flag to disable `replot` when some data are sent through stdin;
+ * used by mouse/hotkey capable terminals */
+TBOOLEAN replot_disabled = FALSE;
 
 /* If last plot was a 3d one. */
 TBOOLEAN is_3d_plot = FALSE;
@@ -216,6 +204,8 @@ extend_input_line()
     }
 }
 
+/* constant by which token table grows */
+#define MAX_TOKENS 400
 
 void
 extend_token_table()
@@ -976,7 +966,7 @@ void
 plot_command()
 {
     plot_token = c_token++;
-    plotted_data_from_stdin = 0;
+    plotted_data_from_stdin = FALSE;
     SET_CURSOR_WAIT;
 #ifdef USE_MOUSE
     plot_mode(MODE_PLOT);
@@ -1046,7 +1036,7 @@ replot_command()
        i.e. when  plotted_data_from_stdin==1  after plot "-".
     */
     if (replot_disabled) {
-	replot_disabled = 0;
+	replot_disabled = FALSE;
 #if 1
 	bail_to_command_line(); /* be silent --- don't mess the screen */
 #else
@@ -1157,7 +1147,7 @@ void
 splot_command()
 {
     plot_token = c_token++;
-    plotted_data_from_stdin = 0;
+    plotted_data_from_stdin = FALSE;
     SET_CURSOR_WAIT;
 #ifdef USE_MOUSE
     plot_mode(MODE_SPLOT);

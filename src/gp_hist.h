@@ -1,5 +1,5 @@
 /*
- * $Id: gp_hist.h,v 1.1.2.1 2000/05/03 21:26:11 joze Exp $
+ * $Id: gp_hist.h,v 1.3 2000/10/31 19:59:31 joze Exp $
  */
 
 /* GNUPLOT - gp_hist.h */
@@ -37,7 +37,7 @@
 #ifndef GNUPLOT_HISTORY_H
 # define GNUPLOT_HISTORY_H
 
-#include "plot.h"
+#include "syscfg.h"
 
 /* Type and struct definitions */
 
@@ -53,6 +53,14 @@ extern struct hist *cur_entry;
 /* Variables of history.c needed by other modules: */
 
 /* Prototypes of functions exported by history.c */
+
+/* GNU readline
+ * Only required by two files directly,
+ * so I don't put this into a header file. -lh
+ */
+#ifdef HAVE_LIBREADLINE
+# include <readline/history.h>
+#endif
 
 #if defined(READLINE) && !defined(HAVE_LIBREADLINE)
 void add_history __PROTO((char *line));

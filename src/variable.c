@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: variable.c,v 1.11 1999/10/29 18:47:22 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: variable.c,v 1.12.4.2 2000/07/26 20:35:56 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - variable.c */
@@ -80,6 +80,8 @@ char *path;
 	FPRINTF((stderr, "Clear loadpath\n"));
 	free(loadpath);
 	loadpath = p = last = NULL;
+	/* HBB 20000726: 'limit' has to be initialized to NULL, too! */
+	limit = NULL;
     case ACTION_INIT:
 	/* Init loadpath from environment */
 	FPRINTF((stderr, "Init loadpath from environment\n"));
@@ -214,7 +216,7 @@ char *newlocale;
     switch(action) {
     case ACTION_CLEAR:
     case ACTION_INIT:
-	free(current_locale);
+	if (current_locale) free(current_locale);
 	current_locale = gp_strdup(INITIAL_LOCALE);
 	break;
     case ACTION_SET:

@@ -1,5 +1,5 @@
 /*
- * $Id: matrix.h,v 1.4.2.1 2000/05/03 21:26:11 joze Exp $
+ * $Id: matrix.h,v 1.6 2000/10/31 19:59:31 joze Exp $
  */
 
 /* GNUPLOT - matrix.h */
@@ -36,7 +36,7 @@
 #ifndef MATRIX_H
 #define MATRIX_H
 
-#include "plot.h"
+#include "syscfg.h"
 
 #ifdef EXT
 #undef EXT

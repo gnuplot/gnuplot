@@ -1,5 +1,5 @@
 #
-# $Id: world.dem,v 1.4 1999/08/17 15:31:57 lhecking Exp $
+# $Id: world.dem,v 1.5.4.1 2000/07/20 13:12:05 broeker Exp $
 #
 #
 set title "Gnuplot Correspondences"
@@ -23,7 +23,7 @@ pause -1 "Hit return to continue"
 set angles degrees
 set title "3D version using spherical coordinate system"
 set ticslevel 0
-set view 70,40,0.8,1.2	# HBB: ,,2.0
+set view 70,40,0.8,1.2
 set mapping spherical
 set parametric
 set samples 32
@@ -33,11 +33,27 @@ set vrange [0:360]
 splot cos(u)*cos(v),cos(u)*sin(v),sin(u) with lines 5 6,\
 'world.dat' with lines 3 4, 'world.cor' with points 1 2
 pause -1 "Hit return to continue"
+
+# HBB 20000715: new demo:
+# same plot, but with hidden3d active, plus axes through the
+# poles:
+set title "3D solid version through hiddenlining"
+set hidden3d
+set arrow from 0,0,-1.2 to 0,0,1.2 lt 5 lw 2
+set arrow from -1.2, 0, 0 to 1.2, 0, 0 nohead lt 5 lw 1 
+set arrow from 0, -1.2, 0 to 0, 1.2, 0 nohead lt 5 lw 1
+splot cos(u)*cos(v),-cos(u)*sin(v),sin(u) with lines 5 6,\
+'world.dat' u 1:2:(1.001) with lines 3 4, 'world.cor' with points 1 2
+pause -1 "Hit return to continue"
+
+set noarrow
+set nohidden
+
 #
 # plot a '3D version using cylindrical coordinate system' of the world.
 set title "3D version using cylindrical coordinate system"
 set ticslevel 0.0
-set view 70,40,0.8,1.2	#HBB: ,,2.0
+set view 70,40,0.8,1.2
 set mapping cylindrical
 set parametric
 set samples 32

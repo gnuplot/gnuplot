@@ -1,5 +1,5 @@
 /*
- * $Id: eval.h,v 1.2.2.1 2000/05/03 21:26:11 joze Exp $
+ * $Id: eval.h,v 1.4 2000/10/31 19:59:30 joze Exp $
  */
 
 /* GNUPLOT - eval.h */
@@ -39,9 +39,52 @@
 
 /* #if... / #include / #define collection: */
 
-#include "plot.h"
+#include "syscfg.h"
+#include "gp_types.h"
+
+/*  #include "parse.h" */
 
 /* Type definitions */
+
+/* user-defined function table entry */
+typedef struct udft_entry {
+    struct udft_entry *next_udf; /* pointer to next udf in linked list */
+    char *udf_name;		/* name of this function entry */
+    struct at_type *at;		/* pointer to action table to execute */
+    char *definition;		/* definition of function as typed */
+    t_value dummy_values[MAX_NUM_VAR]; /* current value of dummy variables */
+} udft_entry;
+
+
+/* user-defined variable table entry */
+typedef struct udvt_entry {
+    struct udvt_entry *next_udv; /* pointer to next value in linked list */
+    char *udv_name;		/* name of this value entry */
+    TBOOLEAN udv_undef;		/* true if not defined yet */
+    t_value udv_value;		/* value it has */
+} udvt_entry;
+
+/* p-code argument */
+typedef union argument {
+	int j_arg;		/* offset for jump */
+	struct value v_arg;	/* constant value */
+	struct udvt_entry *udv_arg; /* pointer to dummy variable */
+	struct udft_entry *udf_arg; /* pointer to udf to execute */
+} argument;
+
+
+/* This type definition has to come after union argument has been declared. */
+#ifdef __ZTC__
+typedef int (*FUNC_PTR)(...);
+#else
+typedef int (*FUNC_PTR) __PROTO((union argument *arg));
+#endif
+
+/* standard/internal function table entry */
+typedef struct ft_entry {
+    const char *f_name;		/* pointer to name of this function */
+    FUNC_PTR func;		/* address of function to call */
+} ft_entry;
 
 /* Variables of eval.c needed by other modules: */
 

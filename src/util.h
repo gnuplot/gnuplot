@@ -1,5 +1,5 @@
 /*
- * $Id: util.h,v 1.4.2.1 2000/05/03 21:26:12 joze Exp $
+ * $Id: util.h,v 1.8 2000/10/31 19:59:31 joze Exp $
  */
 
 /* GNUPLOT - util.h */
@@ -37,7 +37,13 @@
 #ifndef GNUPLOT_UTIL_H
 # define GNUPLOT_UTIL_H
 
-#include "plot.h"
+#include "gp_types.h"
+#include "stdfn.h"		/* for size_t */
+
+/* special token number meaning 'do not draw the "caret"', for
+ * int_error and friends: */
+#define NO_CARET (-1)
+
 
 /* TRUE if command just typed; becomes FALSE whenever we
  * send some other output to screen.  If FALSE, the command line
@@ -71,10 +77,12 @@ extern struct value * Ginteger __PROTO((struct value *, int));
 extern void os_error __PROTO((int, const char *, ...));
 extern void int_error __PROTO((int, const char *, ...));
 extern void int_warn __PROTO((int, const char *, ...));
+extern void graph_error __PROTO((const char *, ...));
 #else
 extern void os_error __PROTO(());
 extern void int_error __PROTO(());
 extern void int_warn __PROTO(());
+extern void graph_error __PROTO(());
 #endif
 extern void lower_case __PROTO((char *));
 extern void squash_spaces __PROTO((char *));

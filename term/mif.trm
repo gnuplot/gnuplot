@@ -1,5 +1,5 @@
 /*
- * $Id: mif.trm,v 1.16 1999/08/24 11:24:55 lhecking Exp $
+ * $Id: mif.trm,v 1.17 1999/10/01 15:09:12 lhecking Exp $
  */
 
 /* GNUPLOT -- mif.trm */
@@ -80,7 +80,7 @@
  *      Send comments and/or suggestions to olof@fysik4.kth.se
  * 
  * CHANGES:
- *		Changed to new terminal format 9/29/95			schooley@ee.gatech.edu
+ *	Changed to new terminal format 9/29/95		schooley@ee.gatech.edu
  *      Changed order of routine declarations.          olof@fysik4.kth.se
  *      Changed mechanism for pen pattern selection.    kssingvo@immd4.informatik.uni-erlangen.de
  *      Support for vertical text.                      kssingvo@immd4.informatik.uni-erlangen.de
@@ -134,9 +134,6 @@ static void mif_put_point __PROTO((unsigned int x, unsigned int y, int np));
 #ifndef cfree
 # define cfree free
 #endif
-
-/* Declared in ../setshow.c */
-extern char term_options[];
 
 static struct mif_line {	/* Line point structure specification */
     float fpos_x;		/* Line point X coordinate */

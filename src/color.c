@@ -33,8 +33,10 @@
 
 #ifdef PM3D
 
-#include "plot.h"
-#include "setshow.h"
+#include "color.h"
+
+#include "axis.h"
+/* #include "setshow.h" */
 #include "graphics.h"
 #include "graph3d.h"
 #include "pm3d.h"
@@ -425,14 +427,14 @@ void draw_color_smooth_box ()
     y_to += y_from;
   }
   else { /* color_box.where == SMCOLOR_BOX_DEFAULT */
-    double dx = ( max_array[FIRST_X_AXIS] - min_array[FIRST_X_AXIS] );
+    double dx = ( X_AXIS.max - X_AXIS.min );
     double dz = ( used_pm3d_zmax - used_pm3d_zmin );
-    map3d_xy(max_array[FIRST_X_AXIS]+dx*0.05,max_array[FIRST_Y_AXIS],base_z+dz*0.35, &x_from,&y_from);
-    map3d_xy(max_array[FIRST_X_AXIS]+dx*0.20,max_array[FIRST_Y_AXIS],ceiling_z-dz*0.0, &x_to,&y_to);
+    map3d_xy(X_AXIS.max+dx*0.05,Y_AXIS.max,base_z+dz*0.35, &x_from,&y_from);
+    map3d_xy(X_AXIS.max+dx*0.20,Y_AXIS.max,ceiling_z-dz*0.0, &x_to,&y_to);
     if (y_from == y_to || x_from == x_to) { /* map, i.e. plot with "set view 0,0 or 180,0" */
-      dz = max_array[FIRST_Y_AXIS] - min_array[FIRST_Y_AXIS];
-      map3d_xy(max_array[FIRST_X_AXIS]+dx*0.04,min_array[FIRST_Y_AXIS]+dz*0.25,base_z, &x_from,&y_from);
-      map3d_xy(max_array[FIRST_X_AXIS]+dx*0.18,max_array[FIRST_Y_AXIS]-dz*0.25,ceiling_z, &x_to,&y_to);
+      dz = Y_AXIS.max - Y_AXIS.min;
+      map3d_xy(X_AXIS.max+dx*0.04,Y_AXIS.min+dz*0.25,base_z, &x_from,&y_from);
+      map3d_xy(X_AXIS.max+dx*0.18,Y_AXIS.max-dz*0.25,ceiling_z, &x_to,&y_to);
     }
   }
   
@@ -487,11 +489,11 @@ void draw_color_smooth_box ()
      colour box, respectively
   */
 
-  tmp = is_log_z ? exp( used_pm3d_zmin * log_base_array[FIRST_Z_AXIS] ) : used_pm3d_zmin;
+  tmp = AXIS_DE_LOG_VALUE(FIRST_Z_AXIS, used_pm3d_zmin);
 #if 0
   sprintf(s,"%g",tmp);
 #else /* format the label using `set format z` */
-  gprintf(s, sizeof(s), zformat, log_base_array[FIRST_Z_AXIS], tmp);
+  gprintf(s, sizeof(s), axis_array[FIRST_Z_AXIS].formatstring, axis_array[FIRST_Z_AXIS].log_base, tmp);
 #endif
   if (color_box.rotation == 'v') {
     if (term->justify_text) term->justify_text(LEFT);
@@ -510,11 +512,12 @@ void draw_color_smooth_box ()
     }
   }
 
-  tmp = is_log_z ? exp( used_pm3d_zmax * log_base_array[FIRST_Z_AXIS] ) : used_pm3d_zmax;
+  tmp = AXIS_DE_LOG_VALUE(FIRST_Z_AXIS, used_pm3d_zmax);
 #if 0
   sprintf(s,"%g",tmp);
 #else
-  gprintf(s, sizeof(s), zformat, log_base_array[FIRST_Z_AXIS], tmp);
+  gprintf(s, sizeof(s), axis_array[FIRST_Z_AXIS].formatstring,
+	  axis_array[FIRST_Z_AXIS].log_base, tmp);
 #endif
   if (color_box.rotation == 'v') {
     /* text was eventually already left-justified above */

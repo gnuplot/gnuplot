@@ -1,5 +1,5 @@
 /*
- * $Id: tables.h,v 1.13.2.2 2000/05/03 21:26:12 joze Exp $
+ * $Id: tables.h,v 1.15 2000/10/31 19:59:31 joze Exp $
  */
 
 /* GNUPLOT - tables.h */
@@ -37,7 +37,7 @@
 #ifndef GNUPLOT_TABLES_H
 #define GNUPLOT_TABLES_H
 
-#include "plot.h"
+#include "syscfg.h"
 
 
 typedef void (*parsefuncp_t) __PROTO((void));
@@ -111,11 +111,6 @@ enum set_id {
     S_ZERO, S_ZEROAXIS, S_XZEROAXIS, S_X2ZEROAXIS, S_YZEROAXIS, S_Y2ZEROAXIS
 };
 
-enum set_encoding_id {
-   S_ENC_DEFAULT, S_ENC_ISO8859_1, S_ENC_CP437, S_ENC_CP850,
-   S_ENC_INVALID
-};
-
 enum set_hidden3d_id {
     S_HI_INVALID,
     S_HI_DEFAULTS, S_HI_OFFSET, S_HI_NOOFFSET, S_HI_TRIANGLEPATTERN,
@@ -143,7 +138,6 @@ extern struct gen_table plot_smooth_tbl[];
 extern struct gen_table save_tbl[];
 extern struct gen_table set_tbl[];
 extern struct gen_table set_key_tbl[];
-extern struct gen_table set_encoding_tbl[];
 extern struct gen_table set_hidden3d_tbl[];
 extern struct gen_table show_style_tbl[];
 extern struct gen_table plotstyle_tbl[];

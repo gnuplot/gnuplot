@@ -1,5 +1,5 @@
 #
-# $Id: contours.dem,v 1.5 1999/08/17 15:31:54 lhecking Exp $
+# $Id: contours.dem,v 1.6.4.1 2000/05/09 19:04:05 broeker Exp $
 #
 set samples 20
 set isosamples 21
@@ -150,20 +150,4 @@ pause -1 "Hit Return to Continue (24)"
 #
 # Clean up:
 #
-set nolog
-set surface
-set nocontour
-set cntrparam levels 5
-set cntrparam linear
-set samples 100
-set isosamples 10
-set nohidden3d
-set view 60,30,1,1
-set xrange [-10:10]
-set yrange [-10:10]
-set zrange [-10:10]
-set auto
-set title "" 0,0
-set xlabel "" 0,0
-set ylabel "" 0,0
-set zlabel "" 0,0
+reset

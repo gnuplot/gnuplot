@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: vms.c,v 1.5 1998/06/18 14:55:22 ddenholm Exp $"); }
+static char *RCSid() { return RCSid("$Id: vms.c,v 1.2.4.1 2000/06/22 12:57:39 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - vms.c */
@@ -38,7 +38,7 @@ static char *RCSid() { return RCSid("$Id: vms.c,v 1.5 1998/06/18 14:55:22 ddenho
  * (originally written by drd for port of perl to vms)
  */
 
-#include "plot.h"     /* for the prototypes */
+#include "syscfg.h"     /* for the prototypes */
 #include "stdfn.h"
 
 static int something_in_this_file;

@@ -1,5 +1,5 @@
 /*
- * $Id: ipc.h,v 1.2.2.1 2000/05/03 21:26:11 joze Exp $
+ * $Id: ipc.h,v 1.6 2000/10/31 19:59:31 joze Exp $
  */
 
 /* GNUPLOT - ipc.h */
@@ -42,6 +42,8 @@
 
 #ifndef _IPC_H
 # define _IPC_H
+
+#include "syscfg.h"
 
 char* readline_ipc __PROTO((const char*));
 /*

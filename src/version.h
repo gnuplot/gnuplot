@@ -1,11 +1,11 @@
 /*
- * $Id: plot3d.h,v 1.4 2000/10/31 19:59:31 joze Exp $
+ * $Id: version.h,v 1.1.2.1 2000/06/22 12:57:39 broeker Exp $
  */
 
-/* GNUPLOT - plot3d.h */
+/* GNUPLOT - version.h */
 
 /*[
- * Copyright 1999   Thomas Williams, Colin Kelley
+ * Copyright 2000   Thomas Williams, Colin Kelley
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted,
@@ -34,34 +34,22 @@
  * to the extent permitted by applicable law.
 ]*/
 
-#ifndef GNUPLOT_PLOT3D_H
-# define GNUPLOT_PLOT3D_H
+#ifndef GNUPLOT_VERSION_H
+#define GNUPLOT_VERSION_H
 
 #include "syscfg.h"
 
-/* typedefs of plot3d.c */
+extern const char gnuplot_version[];
+extern const char gnuplot_patchlevel[];
+extern const char gnuplot_date[];
+extern const char gnuplot_copyright[];
+extern const char faq_location[];
+extern const char bug_email[];
+extern const char help_email[];
 
-typedef enum en_data_mapping {
-    MAP3D_CARTESIAN,
-    MAP3D_SPHERICAL,
-    MAP3D_CYLINDRICAL,
-} t_data_mapping;
+extern char os_name[];
+extern char os_rel[];
 
-/* Variables of plot3d.c needed by other modules: */
 
-extern struct surface_points *first_3dplot;
-extern int plot3d_num;
 
-extern t_data_mapping mapping3d;
-
-extern int dgrid3d_row_fineness;
-extern int dgrid3d_col_fineness;
-extern int dgrid3d_norm_value;
-extern TBOOLEAN	dgrid3d;
-
-/* prototypes from plot3d.c */
-
-void plot3drequest __PROTO((void));
-void sp_free __PROTO((struct surface_points *sp));
-
-#endif /* GNUPLOT_PLOT3D_H */
+#endif /* GNUPLOT_VERSION_H */

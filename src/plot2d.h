@@ -1,5 +1,5 @@
 /*
- * $Id: plot2d.h,v 1.2.2.1 2000/05/03 21:26:12 joze Exp $
+ * $Id: plot2d.h,v 1.6 2000/10/31 19:59:31 joze Exp $
  */
 
 /* GNUPLOT - plot2d.h */
@@ -37,15 +37,19 @@
 #ifndef GNUPLOT_PLOT2D_H
 # define GNUPLOT_PLOT2D_H
 
-#include "plot.h"
+#include "syscfg.h"
 
 /* Variables of plot2d.c needed by other modules: */
 
-extern int reverse_range[];
 extern struct curve_points *first_plot;
+
+extern double boxwidth;
+
 
 /* prototypes from plot2d.c */
 
 void plotrequest __PROTO((void));
+void cp_free __PROTO((struct curve_points *cp));
+void cp_extend __PROTO((struct curve_points *cp, int num));
 
 #endif /* GNUPLOT_PLOT2D_H */

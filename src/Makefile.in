@@ -96,7 +96,7 @@ noinst_PROGRAMS = bf_test
 XLIBS = @LIBRARIES_FOR_X@
 AM_CPPFLAGS = -I../term -I$(top_srcdir)/term -DBINDIR=\"$(bindir)\" -DCONTACT=\"$(EMAIL)\" -DHELPFILE=\"$(HELPFILE)\"
 
-gnuplot_SOURCES = alloc.c alloc.h ansichek.h binary.c binary.h bitmap.c bitmap.h color.c color.h command.c command.h contour.c contour.h datafile.c datafile.h dynarray.c dynarray.h eval.c eval.h fit.c fit.h getcolor.c gp_hist.h gp_time.h graph3d.c graph3d.h graphics.c graphics.h help.c help.h hidden3d.c hidden3d.h history.c internal.c internal.h interpol.c interpol.h ipc.h matrix.c matrix.h misc.c misc.h mouse.c mouse.h mousecmn.h national.h parse.c parse.h plot.c plot.h plot2d.c plot2d.h plot3d.c plot3d.h pm3d.c pm3d.h protos.h readline.c readline.h save.c save.h scanner.c scanner.h set.c setshow.h show.c specfun.c specfun.h standard.c standard.h stdfn.c stdfn.h syscfg.h tables.c tables.h template.h term_api.h term.c term.h time.c unset.c util.c util.h util3d.c util3d.h variable.c variable.h version.c
+gnuplot_SOURCES = alloc.c alloc.h ansichek.h axis.c axis.h binary.c binary.h bitmap.c bitmap.h color.c color.h command.c command.h contour.c contour.h datafile.c datafile.h dynarray.c dynarray.h eval.c eval.h fit.c fit.h gadgets.c gadgets.h getcolor.c gp_hist.h gp_time.h gp_types.h graph3d.c graph3d.h graphics.c graphics.h help.c help.h hidden3d.c hidden3d.h history.c internal.c internal.h interpol.c interpol.h ipc.h matrix.c matrix.h misc.c misc.h mouse.c mouse.h mousecmn.h national.h parse.c parse.h plot.c plot.h plot2d.c plot2d.h plot3d.c plot3d.h pm3d.c pm3d.h protos.h readline.c readline.h save.c save.h scanner.c scanner.h set.c setshow.h show.c specfun.c specfun.h standard.c standard.h stdfn.c stdfn.h syscfg.h tables.c tables.h template.h term_api.h term.c term.h time.c unset.c util.c util.h util3d.c util3d.h variable.c variable.h version.c version.h
 
 
 gnuplot_LDADD = $(TERMLIBS) $(TERMXLIBS)
@@ -143,13 +143,14 @@ ANSI2KNR = @ANSI2KNR@
 gnuplot_x11_OBJECTS =  gplt_x11$U.o getcolor$U.o
 gnuplot_x11_DEPENDENCIES = 
 gnuplot_x11_LDFLAGS = 
-gnuplot_OBJECTS =  alloc$U.o binary$U.o bitmap$U.o color$U.o command$U.o \
-contour$U.o datafile$U.o dynarray$U.o eval$U.o fit$U.o getcolor$U.o \
-graph3d$U.o graphics$U.o help$U.o hidden3d$U.o history$U.o internal$U.o \
-interpol$U.o matrix$U.o misc$U.o mouse$U.o parse$U.o plot$U.o \
-plot2d$U.o plot3d$U.o pm3d$U.o readline$U.o save$U.o scanner$U.o \
-set$U.o show$U.o specfun$U.o standard$U.o stdfn$U.o tables$U.o term$U.o \
-time$U.o unset$U.o util$U.o util3d$U.o variable$U.o version$U.o
+gnuplot_OBJECTS =  alloc$U.o axis$U.o binary$U.o bitmap$U.o color$U.o \
+command$U.o contour$U.o datafile$U.o dynarray$U.o eval$U.o fit$U.o \
+gadgets$U.o getcolor$U.o graph3d$U.o graphics$U.o help$U.o hidden3d$U.o \
+history$U.o internal$U.o interpol$U.o matrix$U.o misc$U.o mouse$U.o \
+parse$U.o plot$U.o plot2d$U.o plot3d$U.o pm3d$U.o readline$U.o save$U.o \
+scanner$U.o set$U.o show$U.o specfun$U.o standard$U.o stdfn$U.o \
+tables$U.o term$U.o time$U.o unset$U.o util$U.o util3d$U.o variable$U.o \
+version$U.o
 gnuplot_DEPENDENCIES = 
 gnuplot_LDFLAGS = 
 bf_test_OBJECTS =  bf_test$U.o binary$U.o alloc$U.o
@@ -165,7 +166,7 @@ DIST_COMMON =  Makefile.am Makefile.in ansi2knr.1 ansi2knr.c
 
 DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 
-TAR = tar
+TAR = gtar
 GZIP_ENV = --best
 DIST_SUBDIRS =  beos
 SOURCES = $(gnuplot_x11_SOURCES) $(gnuplot_SOURCES) $(bf_test_SOURCES)
@@ -270,6 +271,8 @@ bf_test: $(bf_test_OBJECTS) $(bf_test_DEPENDENCIES)
 	$(LINK) $(bf_test_LDFLAGS) $(bf_test_OBJECTS) $(bf_test_LDADD) $(LIBS)
 alloc_.c: alloc.c $(ANSI2KNR)
 	$(CPP) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/alloc.c; then echo $(srcdir)/alloc.c; else echo alloc.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > alloc_.c
+axis_.c: axis.c $(ANSI2KNR)
+	$(CPP) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/axis.c; then echo $(srcdir)/axis.c; else echo axis.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > axis_.c
 bf_test_.c: bf_test.c $(ANSI2KNR)
 	$(CPP) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/bf_test.c; then echo $(srcdir)/bf_test.c; else echo bf_test.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > bf_test_.c
 binary_.c: binary.c $(ANSI2KNR)
@@ -290,6 +293,8 @@ eval_.c: eval.c $(ANSI2KNR)
 	$(CPP) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/eval.c; then echo $(srcdir)/eval.c; else echo eval.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > eval_.c
 fit_.c: fit.c $(ANSI2KNR)
 	$(CPP) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/fit.c; then echo $(srcdir)/fit.c; else echo fit.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > fit_.c
+gadgets_.c: gadgets.c $(ANSI2KNR)
+	$(CPP) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/gadgets.c; then echo $(srcdir)/gadgets.c; else echo gadgets.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > gadgets_.c
 getcolor_.c: getcolor.c $(ANSI2KNR)
 	$(CPP) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/getcolor.c; then echo $(srcdir)/getcolor.c; else echo getcolor.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > getcolor_.c
 gplt_x11_.c: gplt_x11.c $(ANSI2KNR)
@@ -356,13 +361,13 @@ variable_.c: variable.c $(ANSI2KNR)
 	$(CPP) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/variable.c; then echo $(srcdir)/variable.c; else echo variable.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > variable_.c
 version_.c: version.c $(ANSI2KNR)
 	$(CPP) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/version.c; then echo $(srcdir)/version.c; else echo version.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > version_.c
-alloc_.o bf_test_.o binary_.o bitmap_.o color_.o command_.o contour_.o \
-datafile_.o dynarray_.o eval_.o fit_.o getcolor_.o gplt_x11_.o \
-graph3d_.o graphics_.o help_.o hidden3d_.o history_.o internal_.o \
-interpol_.o matrix_.o misc_.o mouse_.o parse_.o plot_.o plot2d_.o \
-plot3d_.o pm3d_.o readline_.o save_.o scanner_.o set_.o show_.o \
-specfun_.o standard_.o stdfn_.o tables_.o term_.o time_.o unset_.o \
-util_.o util3d_.o variable_.o version_.o : $(ANSI2KNR)
+alloc_.o axis_.o bf_test_.o binary_.o bitmap_.o color_.o command_.o \
+contour_.o datafile_.o dynarray_.o eval_.o fit_.o gadgets_.o \
+getcolor_.o gplt_x11_.o graph3d_.o graphics_.o help_.o hidden3d_.o \
+history_.o internal_.o interpol_.o matrix_.o misc_.o mouse_.o parse_.o \
+plot_.o plot2d_.o plot3d_.o pm3d_.o readline_.o save_.o scanner_.o \
+set_.o show_.o specfun_.o standard_.o stdfn_.o tables_.o term_.o \
+time_.o unset_.o util_.o util3d_.o variable_.o version_.o : $(ANSI2KNR)
 
 # This directory's subdirectories are mostly independent; you can cd
 # into them and run `make' without going through this Makefile.
@@ -461,7 +466,7 @@ distdir: $(DISTFILES)
 	@for file in $(DISTFILES); do \
 	  d=$(srcdir); \
 	  if test -d $$d/$$file; then \
-	    cp -pr $$d/$$file $(distdir)/$$file; \
+	    cp -pr $$/$$file $(distdir)/$$file; \
 	  else \
 	    test -f $(distdir)/$$file \
 	    || ln $$d/$$file $(distdir)/$$file 2> /dev/null \

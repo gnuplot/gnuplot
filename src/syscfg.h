@@ -1,5 +1,5 @@
 /*
- * $Id: syscfg.h,v 1.8.2.1 2000/05/03 21:26:12 joze Exp $
+ * $Id: syscfg.h,v 1.12 2000/10/31 19:59:31 joze Exp $
  */
 
 /* GNUPLOT - syscfg.h */
@@ -409,5 +409,178 @@
 
 #endif /* HAVE_CONFIG_H */
 /* End autoconf related stuff */
+
+/* HBB 20000416: stuff moved from plot.h to here. It's system-dependent,
+ * so it belongs here, IMHO */
+
+/* To access curves larger than 64k, MSDOS needs to use huge pointers */
+#if (defined(__TURBOC__) && defined(MSDOS)) || defined(WIN16)
+# define GPHUGE huge
+# define GPFAR far
+#else /* not TurboC || WIN16 */
+# define GPHUGE /* nothing */
+# define GPFAR /* nothing */
+#endif /* not TurboC || WIN16 */
+
+#if defined(DOS16) || defined(WIN16)
+typedef float coordval;		/* memory is tight on PCs! */
+# define COORDVAL_FLOAT 1
+#else
+typedef double coordval;
+#endif
+
+/* Set max. number of arguments in a user-defined function */
+#ifdef DOS16
+# define MAX_NUM_VAR	3
+#else
+# define MAX_NUM_VAR	5
+#endif
+
+/* There is a bug in the NEXT OS. This is a workaround. Lookout for
+ * an OS correction to cancel the following dinosaur
+ *
+ * Hm, at least with my setup (compiler version 3.1, system 3.3p1),
+ * DBL_MAX is defined correctly and HUGE and HUGE_VAL are both defined
+ * as 1e999. I have no idea to which OS version the bugfix below
+ * applies, at least wrt. HUGE, it is inconsistent with the current
+ * version. Since we are using DBL_MAX anyway, most of this isn't
+ * really needed anymore.
+ */
+
+#if defined ( NEXT ) && NX_CURRENT_COMPILER_RELEASE<310
+# if defined ( DBL_MAX)
+#  undef DBL_MAX
+# endif
+# define DBL_MAX 1.7976931348623157e+308
+# undef HUGE
+# define HUGE    DBL_MAX
+# undef HUGE_VAL
+# define HUGE_VAL DBL_MAX
+#endif /* NEXT && NX_CURRENT_COMPILER_RELEASE<310 */
+
+/*
+ * Note about VERYLARGE:  This is the upper bound double (or float, if PC)
+ * numbers. This flag indicates very large numbers. It doesn't have to 
+ * be the absolutely biggest number on the machine.  
+ * If your machine doesn't have HUGE, or float.h,
+ * define VERYLARGE here. 
+ *
+ * example:
+#define VERYLARGE 1e37
+ *
+ * To get an appropriate value for VERYLARGE, we can use DBL_MAX (or
+ * FLT_MAX on PCs), HUGE or HUGE_VAL. DBL_MAX is usually defined in
+ * float.h and is the largest possible double value. HUGE and HUGE_VAL
+ * are either DBL_MAX or +Inf (IEEE special number), depending on the
+ * compiler. +Inf may cause problems with some buggy fp
+ * implementations, so we better avoid that. The following should work
+ * better than the previous setup (which used HUGE in preference to
+ * DBL_MAX).
+ */
+/* Now define VERYLARGE. This is usually DBL_MAX/2 - 1. On MS-DOS however
+ * we use floats for memory considerations and thus use FLT_MAX.
+ */
+
+#ifndef COORDVAL_FLOAT
+# ifdef DBL_MAX
+#  define VERYLARGE (DBL_MAX/2-1)
+# endif
+#else /* COORDVAL_FLOAT */
+# ifdef FLT_MAX
+#  define VERYLARGE (FLT_MAX/2-1)
+# endif
+#endif /* COORDVAL_FLOAT */
+
+#ifndef VERYLARGE
+# ifdef HUGE
+#  define VERYLARGE (HUGE/2-1)
+# elif defined(HUGE_VAL)
+#  define VERYLARGE (HUGE_VAL/2-1)
+# else
+/* as a last resort */
+#  define VERYLARGE (1e37)
+/* #  warning "using last resort 1e37 as VERYLARGE define, please check your headers" */
+/* Maybe add a note somewhere in the install docs instead */
+# endif /* HUGE */
+#endif /* VERYLARGE */
+
+#ifdef VMS
+# define is_comment(c) ((c) == '#' || (c) == '!')
+# define is_system(c) ((c) == '$')
+/* maybe configure could check this? */
+# define BACKUP_FILESYSTEM 1
+#else /* not VMS */
+# define is_comment(c) ((c) == '#')
+# define is_system(c) ((c) == '!')
+#endif /* not VMS */
+
+#ifndef RETSIGTYPE
+/* assume ANSI definition by default */
+# define RETSIGTYPE void
+#endif
+
+#ifndef SIGFUNC_NO_INT_ARG
+typedef RETSIGTYPE (*sigfunc)__PROTO((int));
+#else
+typedef RETSIGTYPE (*sigfunc)__PROTO((void));
+#endif
+
+#ifndef SORTFUNC_ARGS
+typedef int (*sortfunc) __PROTO((const generic *, const generic *));
+#else
+typedef int (*sortfunc) __PROTO((SORTFUNC_ARGS, SORTFUNC_ARGS));
+#endif
+
+/* Macros for string concatenation */
+#ifdef HAVE_STRINGIZE
+/* ANSI version */
+# define CONCAT(x,y) x##y
+# define CONCAT3(x,y,z) x##y##z
+#else
+/* K&R version */
+# define CONCAT(x,y) x/**/y
+# define CONCAT3(x,y,z) x/**/y/**/z
+#endif
+
+/* Windows needs to redefine stdin/stdout functions */
+#if defined(_Windows) && !defined(WINDOWS_NO_GUI)
+# include "win/wtext.h"
+#endif
+
+/* if GP_INLINE has not yet been defined, set to __inline__ for gcc,
+ * nothing. I'd prefer that any other compilers have the defn in
+ * the makefile, rather than having a huge list of compilers here.
+ * But gcc is sufficiently ubiquitous that I'll allow it here !!!
+ */
+#ifndef GP_INLINE
+# ifdef __GNUC__
+#  define GP_INLINE __inline__
+# else
+#  define GP_INLINE /*nothing*/
+# endif
+#endif
+
+/* avoid precompiled header conflict with redefinition */
+#ifdef NEXT
+# include <mach/boolean.h>
+#else
+/* Sheer, raging paranoia */
+# ifdef TRUE
+#  undef TRUE
+# endif
+# ifdef FALSE
+#  undef FALSE
+# endif
+# define TRUE 1
+# define FALSE 0
+#endif
+
+#ifndef __cplusplus
+#undef bool
+typedef unsigned int bool;
+#endif
+
+/* TRUE or FALSE */
+#define TBOOLEAN bool
 
 #endif /* !SYSCFG_H */

@@ -1,5 +1,5 @@
 /*
- * $Id: post.trm,v 1.39.2.5 2000/10/24 10:02:37 mikulik Exp $
+ * $Id: post.trm,v 1.41 2000/10/31 19:59:32 joze Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -56,6 +56,9 @@
  * Erik Luijten 30/5/97: added %%CreationDate, made %%DocumentFonts conform
  *                       to DSC, added version no. and patchl. to %%Creator
  * Petr Mikulik, Jan 1999: terminal entries for PM3D functionality
+ *
+ * Dick Crawford 24/5/00: added 'a{}{}' syntax to allow for overprinting
+ *
  */
 
 #include "driver.h"
@@ -106,7 +109,7 @@ TERM_PUBLIC void PS_filled_polygon (int, gpiPoint *);
 
 static char *PS_RememberFont __PROTO((char *fname, int reencode));
 static void ENHPS_put_text __PROTO((unsigned int x, unsigned int y, const char *str));
-static char *ENHPS_recurse __PROTO((char *p, TBOOLEAN brace, char *fontname, double fontsize, double base, TBOOLEAN widthflag, TBOOLEAN showflag));
+static char *ENHPS_recurse __PROTO((char *p, TBOOLEAN brace, char *fontname, double fontsize, double base, TBOOLEAN widthflag, TBOOLEAN showflag, int overprint));
 static char ps_font[MAX_ID_LEN+1] = "Helvetica" ; /* name of font */
 static int ps_fontsize = 14;					 /* size of font in pts */
 
@@ -448,15 +451,18 @@ NULL
 
 static const char GPFAR * GPFAR ENHPS_header[] = {
 /* For MFshow and MFwidth the tos is an array with the string and font info:  */
-/*	[<fontname (a string)> <fontsize> <vertical offset> <width significant?> <printed?> <text string>]  */
+/*	[<fontname (a string)> <fontsize> <vertical offset> <width significant?> <printed?> <overprint> <text string>]  */
 
 "/MFshow {{dup dup 0 get findfont exch 1 get scalefont setfont\n",
-"     [ currentpoint ] exch dup 2 get 0 exch rmoveto dup dup 5 get exch 4 get\n",
-"     {show} {stringwidth pop 0 rmoveto}ifelse dup 3 get\n",
-"     {2 get neg 0 exch rmoveto pop} {pop aload pop moveto}ifelse} forall} bind def\n",
-"/MFwidth {0 exch {dup 3 get{dup dup 0 get findfont exch 1 get scalefont setfont\n",
-"      5 get stringwidth pop add}\n",
-"    {pop} ifelse} forall} bind def\n",
+"     [ currentpoint ] exch dup 2 get 0 exch R dup 5 get 2 ne {dup dup 6\n",
+"     get exch 4 get {show} {stringwidth pop 0 R} ifelse }if dup 5 get 0 eq\n",
+"     {dup 3 get {2 get neg 0 exch R pop} {pop aload pop M} ifelse} {dup 5\n",
+"     get 1 eq {dup 2 get exch dup 3 get exch 6 get stringwidth pop -2 div\n",
+"     dup 0 R} {dup 6 get stringwidth pop -2 div 0 R 6 get\n",
+"     show 2 index {aload pop M neg 3 -1 roll neg R pop pop} {pop pop pop\n",
+"     pop aload pop M} ifelse }ifelse }ifelse } forall} bind def\n",
+"/MFwidth {0 exch {dup 3 get{dup dup 0 get findfont exch 1 get scalefont\n",
+"     setfont 6 get stringwidth pop add} {pop} ifelse} forall} bind def\n",
 
 /* flush left show */
 "/MLshow { currentpoint stroke M\n",
@@ -518,6 +524,9 @@ int can_reencode;
 	break;
     case S_ENC_CP850 : 
 	recode = "reencodeCP850 def\n";
+	break;
+    default:
+	/* do nothing */
 	break;
     }
 
@@ -1358,13 +1367,18 @@ static float ENHps_max_height, ENHps_min_height;
  *              FALSE for zero width boxes
  * showflag is TRUE if this should be shown,
  *             FALSE if it should not be shown (like TeX \phantom)
+ * overprint is 0 for normal operation,
+ *              1 for the underprinted text (included in width calculation),
+ *              2 for the overprinted text (not included in width calc)
+ *              (overprinted text is centered horizontally on underprinted text
  */
 
 static char *
-ENHPS_recurse(p, brace, fontname, fontsize, base, widthflag, showflag)
+ENHPS_recurse(p, brace, fontname, fontsize, base, widthflag, showflag, overprint)
 char *p, *fontname;
 TBOOLEAN brace, widthflag, showflag;
 double fontsize, base;
+int overprint;
 {
 
 /* close a postscript string if it has been opened */
@@ -1377,15 +1391,16 @@ double fontsize, base;
 
 #define ENHPS_OPEN	\
 {	if (!ENHps_opened_string) \
-	{ fprintf(gpoutfile, "[(%s) %.1f %.1f %s %s (",  \
+	{ fprintf(gpoutfile, "[(%s) %.1f %.1f %s %s %d (",  \
 		  fontname, fontsize, base, \
  		  widthflag ? "true" : "false",  \
- 		  showflag ? "true" : "false");  \
+ 		  showflag ? "true" : "false",  \
+		  overprint); \
  	  ENHps_opened_string = TRUE; \
  	}	\
 }
 
-    ENHPS_DEBUG(("RECURSE WITH [%p] \"%s\", %d %s %.1f %.1f %d %d\n", p, p, brace, fontname, fontsize, base, widthflag, showflag));
+    ENHPS_DEBUG(("RECURSE WITH [%p] \"%s\", %d %s %.1f %.1f %d %d %d\n", p, p, brace, fontname, fontsize, base, widthflag, showflag, overprint))
 
 /* Start each recursion with a clean string */
     ENHPS_FLUSH;
@@ -1422,7 +1437,7 @@ double fontsize, base;
 
 	    ENHPS_FLUSH;
 
-	    p = ENHPS_recurse(p+1, FALSE, fontname, fontsize*0.8, base+shift*fontsize, widthflag, showflag);
+	    p = ENHPS_recurse(p+1, FALSE, fontname, fontsize*0.8, base+shift*fontsize, widthflag, showflag, overprint);
 
 	    break;
 	    /*}}}*/
@@ -1431,11 +1446,20 @@ double fontsize, base;
 	    char *savepos = NULL, save = 0;
 	    char *localfontname = fontname, ch;
 	    int recode = 1;
-	    float f = fontsize;
+	    float f = fontsize, ovp, overprint_voffset = 0.0;
 
 	    /*{{{  recurse (possibly with a new font) */
 
 	    ENHPS_DEBUG(("Dealing with {\n"));
+	    
+	    /* get vertical offset (if present) for overprinted text */
+	    while (*++p == ' ');
+	    if (overprint == 2)	{
+		ovp = (float)strtod(p,&p);
+		if (ovp)
+		    overprint_voffset = ovp*f;
+	    }
+	    --p;		/* HBB 20001021: bug fix: 10^{2} broken */
 
 	    if (*++p == '/') {
 		/* then parse a fontname, optional fontsize */
@@ -1502,7 +1526,7 @@ double fontsize, base;
 	    ENHPS_DEBUG(("Before recursing, we are at [%p] \"%s\"\n", p, p));
 
 	    p = ENHPS_recurse(p, TRUE, localfontname, f, base,
-			      widthflag, showflag);
+			      widthflag, showflag, overprint);
 
 	    ENHPS_DEBUG(("BACK WITH \"%s\"\n", p));
 
@@ -1518,7 +1542,7 @@ double fontsize, base;
 
 	    ENHPS_FLUSH;
 	    p = ENHPS_recurse(++p, FALSE, fontname, fontsize, base,
-			      FALSE, showflag);
+			      FALSE, showflag, overprint);
 
 	    break;
 	    /*}}}*/
@@ -1528,8 +1552,34 @@ double fontsize, base;
 	    ENHPS_FLUSH;
 
 	    p = ENHPS_recurse(++p, FALSE, fontname, fontsize, base,
-			      widthflag, FALSE);
+			      widthflag, FALSE, overprint);
 
+	    break;
+	    /*}}}*/
+
+
+	case '~' :
+	    /*{{{  overprinted text - the second string is overwritten on the
+	      first, centered horizontally on the first and (optionally)
+	      vertically shifted by an amount specified (as a fraction of
+	      the current fontsize) at the beginning of the second string
+	      
+	      Note that in this implementation neither the under- nor
+	      overprinted string can contain syntax that would result in
+	      additional recursions -- no subscripts, superscripts, or
+	      anything else, with the exception of a font definition at
+	      the beginning of the text */
+	    
+	    ENHPS_FLUSH
+		
+	    p = ENHPS_recurse(++p, FALSE, fontname, fontsize, base, widthflag, showflag, 1);
+	    
+	    ENHPS_FLUSH
+		
+	    p = ENHPS_recurse(++p, FALSE, fontname, fontsize, base, FALSE, showflag, 2);
+	    
+	    overprint = 0;   /* may not be necessary, but just in case . . . */
+	    
 	    break;
 	    /*}}}*/
 
@@ -1655,7 +1705,7 @@ const char *str;
      * but we need to make sure that the current font is the
      * default one before we can do that. {ie I tried it and it
      * used the wrong font !}
-     * if (!strpbrk(str, "{}^_@&"))
+     * if (!strpbrk(str, "{}^_@&~"))
      * {
      *   - do something to ensure default font is selected
      *   PS_put_text(x,y,str);
@@ -1693,7 +1743,7 @@ const char *str;
      */
     while (*(str = ENHPS_recurse((char *)str, TRUE, ps_enh_font,
 				 (double)(ps_enh_fontsize*PS_SC),
-				 0.0, TRUE, TRUE))) {
+				 0.0, TRUE, TRUE, 0))) {
 	ENHPS_FLUSH;
 
 	/* I think we can only get here if *str == '}' */
@@ -2021,6 +2071,8 @@ START_HELP(post)
 "   _           a_x             subscript",
 "   @           @x or a@^b_c    phantom box (occupies no width)",
 "   &           &{space}        inserts space of specified length",
+"   ~           ~a{.8-}         overprints '-' on 'a', raised by .8",
+"                               times the current fontsize",
 "#\\begin{tabular}{|ccl|} \\hline",
 "#\\multicolumn{3}{|c|}{Enhanced Text Control Codes} \\\\ \\hline",
 "#Control & Examples & Explanation \\\\ \\hline",
@@ -2028,6 +2080,8 @@ START_HELP(post)
 "#\\verb~_~ & \\verb~a_x~ & subscript\\\\",
 "#\\verb~@~ & \\verb~@x or a@^b_c~ & phantom box (occupies no width)\\\\",
 "#\\verb~&~ & \\verb~&{space}~ & inserts space of specified length\\\\",
+"#\\verb*~* & \\verb*~a{.8-}* & overprints '-' on 'a', raised by .8",
+"#\\verb~ ~ & \\verb~ ~ & times the current fontsize",
 "%c c l .",
 "%.TE", /* ugly - doc2ms uses @ for column separator, but here we */
 "%.TS", /* need @ in table, so end and restart the table ! */
@@ -2039,6 +2093,8 @@ START_HELP(post)
 "%\\&_$a\\&_x$subscript",
 "% @ $ @x or a\\&@^b\\&_c$phantom box (occupies no width)",
 "% & $ &{space}$inserts space of specified length",
+"% ~ $ ~a{.8-}$overprints '-' on 'a', raised by .8",
+"%   $   $times the current fontsize",
 "@end table",
 "",
 " Braces can be used to place multiple-character text where a single character",
@@ -2067,6 +2123,22 @@ START_HELP(post)
 "         'abc&{def}ghi'",
 " would produce",
 "         'abc   ghi'.",
+"",
+" The '~' character causes the next character or bracketed text to be",
+" overprinted by the following character or bracketed text.  The second text",
+" will be horizontally centered on the first.  Thus '~a/' will result in an 'a'",
+" with a slash through it.  You can also shift the second text vertically by",
+" preceding the second text with a number, which will define the fraction of the",
+" current fontsize by which the text will be raised or lowered.  In this case",
+" the number and text must be enclosed in brackets because more than one",
+" character is necessary.  If the overprinted text begins with a number, put a",
+" space between the vertical offset and the text ('~{abc}{.5 000}'); otherwise",
+" no space is needed ('~{abc}{.5---}').  You can change the font for one or",
+" both strings ('~a{.5 /*.2 o}'---an 'a' with a one-fifth-size 'o' on top---and",
+" the space between the number and the slash is necessary), but you can't",
+" change it after the beginning of the string.  Neither can you use any other",
+" special syntax within either string.  You can, of course, use control",
+" characters by escaping them (see below), such as '~a{\\^}'",
 "",
 " You can access special symbols numerically by specifying \\character-code (in",
 " octal), e.g., {/Symbol \\245} is the symbol for infinity.",

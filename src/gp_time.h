@@ -1,5 +1,5 @@
 /*
- * $Id: gp_time.h,v 1.2.2.1 2000/05/03 21:26:11 joze Exp $
+ * $Id: gp_time.h,v 1.4 2000/10/31 19:59:31 joze Exp $
  */
 
 /* GNUPLOT - gp_time.h */
@@ -39,7 +39,17 @@
 
 /* #if... / #include / #define collection: */
 
-#include "plot.h"
+#include "syscfg.h"
+#include "stdfn.h"
+
+/* defines used for timeseries, seconds */
+#define ZERO_YEAR	2000
+#define JAN_FIRST_WDAY 6  /* 1st jan, 2000 is a Saturday (cal 1 2000 on unix) */
+#define SEC_OFFS_SYS	946684800.0		/*  zero gnuplot (2000) - zero system (1970) */
+#define YEAR_SEC	31557600.0	/* avg, incl. leap year */
+#define MON_SEC		2629800.0	/* YEAR_SEC / 12 */
+#define WEEK_SEC	604800.0
+#define DAY_SEC		86400.0
 
 /* Type definitions */
 

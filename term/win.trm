@@ -1,5 +1,5 @@
 /*
- * $Id: win.trm,v 1.13.2.1 2000/10/20 15:35:05 broeker Exp $
+ * $Id: win.trm,v 1.15 2000/10/31 19:59:32 joze Exp $
  */
 
 /* GNUPLOT - win.trm */
@@ -121,13 +121,11 @@ TERM_PUBLIC void WIN_filled_polygon __PROTO((int points, gpiPoint *corners));
 #ifdef TERM_BODY
 
 #include <windows.h>
-#include "../src/win/wgnuplib.h"
+#include "win/winmain.h"
 
 #ifdef __MSC__
 #include <io.h>			/* for mktemp() */
 #endif
-
-extern GW graphwin;
 
 #define WIN_POINT_TYPES 12
 
@@ -265,7 +263,7 @@ WIN_linetype(lt)
 int lt;
 {
     if (lt != WIN_last_linetype) {
-    GraphOp(&graphwin, W_line_type, lt, 0, NULL);
+    	GraphOp(&graphwin, W_line_type, lt, 0, NULL);
 	WIN_last_linetype = lt;
     }
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: fit.h,v 1.5.2.1 2000/05/03 21:26:11 joze Exp $
+ * $Id: fit.h,v 1.7 2000/10/31 19:59:30 joze Exp $
  */
 
 /* GNUPLOT - fit.h */
@@ -38,7 +38,8 @@
 
 /* #if... / #include / #define collection: */
 
-#include "plot.h"
+#include "syscfg.h"
+#include "stdfn.h"
 
 /* compatible with gnuplot philosophy */
 #define STANDARD stderr

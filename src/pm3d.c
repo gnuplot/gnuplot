@@ -17,7 +17,7 @@
 
 #ifdef PM3D
 
-#include "plot.h"
+#include "axis.h"
 #include "graph3d.h"
 #include "pm3d.h"
 #include "setshow.h" /* for surface_rot_z */
@@ -59,40 +59,26 @@ int pm3d_map_rotate_ylabel = 0;
 extern struct surface_points *first_3dplot;
 
 
-extern double min_array[], max_array[];
-
-
 /*
    Check and set the z-range for use by pm3d
    Return 0 on wrong range, otherwise 1
  */
 int set_pm3d_zminmax ()
 {
-    extern double log_base_array[];
-    extern TBOOLEAN is_log_z;
     if (!pm3d.pm3d_zmin)
-	used_pm3d_zmin = min_array[FIRST_Z_AXIS];
+	used_pm3d_zmin = axis_array[FIRST_Z_AXIS].min;
     else {
-	used_pm3d_zmin = pm3d.zmin;
-	if (is_log_z) {
-	    if (used_pm3d_zmin<0) {
-		fprintf(stderr,"pm3d: log of negative z-min?\n");
-		return 0;
-	    }
-	    used_pm3d_zmin = log(used_pm3d_zmin)/log_base_array[FIRST_Z_AXIS];
-	}
+	/* FIXME 20001031 from merge: this will call graph_error() on
+	 * negative z, instead of just returning 0! */
+	used_pm3d_zmin = axis_log_value_checked(FIRST_Z_AXIS, pm3d.zmin,
+						"pm3d z-min");
     }
     if (!pm3d.pm3d_zmax)
-	used_pm3d_zmax = max_array[FIRST_Z_AXIS];
+	used_pm3d_zmax = axis_array[FIRST_Z_AXIS].max;
     else {
-	used_pm3d_zmax = pm3d.zmax;
-	if (is_log_z) {
-	    if (used_pm3d_zmax<0) {
-		fprintf(stderr,"p3md: log of negative z-max?\n");
-		return 0;
-	    }
-	    used_pm3d_zmax = log(used_pm3d_zmax)/log_base_array[FIRST_Z_AXIS];
-	}
+	/* FIXME 20001031: see above */
+	used_pm3d_zmax = axis_log_value_checked(FIRST_Z_AXIS, pm3d.zmax,
+						"pm3d z-max");
     }
     if (used_pm3d_zmin == used_pm3d_zmax) {
 	fprintf(stderr,"pm3d: colouring requires not equal zmin and zmax\n");

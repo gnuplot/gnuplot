@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: tables.c,v 1.13.2.2 2000/05/03 21:26:12 joze Exp $"); }
+static char *RCSid() { return RCSid("$Id: tables.c,v 1.15 2000/10/31 19:59:31 joze Exp $"); }
 #endif
 
 /* GNUPLOT - tables.c */
@@ -289,16 +289,6 @@ struct gen_table set_tbl[] =
 
     { "z$ero", S_ZERO },
     { NULL, S_INVALID }
-};
-
-/* 'set encoding' options */
-struct gen_table set_encoding_tbl[] =
-{
-    { "def$ault", S_ENC_DEFAULT },
-    { "iso$_8859_1", S_ENC_ISO8859_1 },
-    { "cp4$37", S_ENC_CP437 },
-    { "cp8$50", S_ENC_CP850 },
-    { NULL, S_ENC_INVALID }
 };
 
 /* 'set hidden3d' options */

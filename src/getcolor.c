@@ -6,14 +6,13 @@
  * Copyright: open source as much as possible
  *
 ]*/
-#ifdef HAVE_CONFIG_H
-#   include "config.h"
-#endif
+#include "syscfg.h"
 
 #ifdef PM3D
 
 #include <math.h>
-#include "plot.h"
+#include <stdio.h>
+#include "color.h"
 
 extern t_sm_palette sm_palette;
 

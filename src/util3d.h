@@ -1,5 +1,5 @@
 /*
- * $Id: util3d.h,v 1.3.2.1 2000/05/03 21:26:12 joze Exp $
+ * $Id: util3d.h,v 1.5 2000/10/31 19:59:31 joze Exp $
  */
 
 /* GNUPLOT - util3d.h */
@@ -44,18 +44,46 @@
 
 #include "graph3d.h"
 
+/* All the necessary information about one vertex. FIXME: Might need
+ * an lp_style_type pointer element? */
+/* HBB 20000617: moved this definition here, from hidden3d.c */
+typedef struct vertex {
+    coordval x, y, z;		/* vertex coordinates */
+    int style;			/* point symbol type (if any) */
+#ifdef PM3D
+    coordval real_z;
+#endif
+} vertex;
+typedef vertex GPHUGE * p_vertex;
+
+
+/* Utility macros for vertices: */
+#define FLAG_VERTEX_AS_UNDEFINED(v) \
+  do { (v).z = -2.0; } while (0)
+#define VERTEX_IS_UNDEFINED(v) ((v).z == -2.0)
+#define V_EQUAL(a,b) ( GE(0.0, fabs((a)->x - (b)->x) + \
+   fabs((a)->y - (b)->y) + fabs((a)->z - (b)->z)) )
+
+
+/* Maps from normalized space to terminal coordinates */
+#define TERMCOORD(v,xvar,yvar)			\
+{						\
+    xvar = ((int)((v)->x * xscaler)) + xmiddle;	\
+    yvar = ((int)((v)->y * yscaler)) + ymiddle;	\
+}
+
 /* Prototypes of functions exported by "util3d.c" */
 
-void draw_clip_line __PROTO((int, int, int, int));
-int clip_line __PROTO((int *, int *, int *, int *));
 void edge3d_intersect __PROTO((struct coordinate GPHUGE *, int, double *, double *, double *));
 TBOOLEAN two_edge3d_intersect __PROTO((struct coordinate GPHUGE *, int, double *, double *, double *));
 void mat_scale __PROTO((double sx, double sy, double sz, double mat[4][4]));
 void mat_rot_x __PROTO((double teta, double mat[4][4]));
 void mat_rot_z __PROTO((double teta, double mat[4][4]));
 void mat_mult __PROTO((double mat_res[4][4], double mat1[4][4], double mat2[4][4]));
-int clip_point __PROTO((unsigned int, unsigned int));
-void clip_put_text __PROTO((unsigned int, unsigned int, char *));
-void clip_put_text_just __PROTO((unsigned int, unsigned int, char *, enum JUSTIFY));
+void map3d_xyz __PROTO((double x, double y, double z, p_vertex out));
+void map3d_xy __PROTO((double x, double y, double z, unsigned int *xt, unsigned int *yt));
+void draw3d_line __PROTO((p_vertex, p_vertex, struct lp_style_type *));
+void draw3d_line_unconditional __PROTO((p_vertex, p_vertex, struct lp_style_type *, int));
+void draw3d_point __PROTO((p_vertex v, struct lp_style_type *lp));
 
 #endif /* GNUPLOT_UTIL3D_H */

@@ -15,6 +15,7 @@ CGM terminal mods:
 Changes in release 4.0:
 * NEW experimental driver for Enhanced Metafile Format,
   configure with --enable-emf
+* NEW set label can print numbers into the label text
 * FIXED bug in 3d plot introduced by mouse code (using variables
   before initialisation)
 * FIXED 3d key clipping

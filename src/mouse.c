@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.2.2.2 2000/06/04 12:53:20 joze Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.7 2000/10/31 19:59:31 joze Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -43,34 +43,29 @@ static char *RCSid() { return RCSid("$Id: mouse.c,v 1.2.2.2 2000/06/04 12:53:20 
  *     Johannes Zellner <johannes@zellner.org>
  */
 
-#ifdef HAVE_CONFIG_H
-# include "config.h"
-#endif
+#include "syscfg.h"
+#include "stdfn.h"
+#include "gp_types.h"
 
 #define _MOUSE_C
+#ifdef USE_MOUSE /* comment out whole file, otherwise... */
 
-#ifdef USE_MOUSE
-# include <stdio.h>
-# include <math.h>
-# include <ctype.h>		/* for toupper */
-# include <string.h>
+#include "mouse.h"
 
-# ifdef HAVE_LIBREADLINE
-#  include <readline/readline.h>	/* for ding() */
-# endif
 
-# include "plot.h"
-# include "graphics.h"
-# include "graph3d.h"
-# include "setshow.h"
-# include "alloc.h"
-# include "gp_time.h"
-# include "command.h"
-# include "plot3d.h"
-# include "mouse.h"
-# include "mousecmn.h"
+#include "alloc.h"
+#include "axis.h"
+#include "command.h"
+#include "datafile.h"
+#include "gadgets.h"
+#include "gp_time.h"
+#include "graphics.h"
+#include "graph3d.h"
+#include "plot3d.h"
+#include "readline.h"
+#include "term_api.h"
 
-/********************** variables *********************************************/
+/********************** variables ***********************************************************/
 
 
 /* Structure for the ruler: on/off, position,...
@@ -86,45 +81,51 @@ static struct {
 
 /* the coordinates of the mouse cursor in gnuplot's internal coordinate system
  */
-int mouse_x, mouse_y;
+static int mouse_x, mouse_y;
 
 
 /* the "real" coordinates of the mouse cursor, i.e., in the user's coordinate
  * system(s)
  */
-double real_x, real_y, real_x2, real_y2;
+static double real_x, real_y, real_x2, real_y2;
 
 
-/* mouse_polar_distance is set to TRUE if user wants to see the distance between
- * the ruler and mouse pointer in polar coordinates too (otherwise, distance 
- * in cartesian coordinates only is shown)
- */
+/* mouse_polar_distance is set to TRUE if user wants to see the
+ * distance between the ruler and mouse pointer in polar coordinates
+ * too (otherwise, distance in cartesian coordinates only is shown) */
 /* int mouse_polar_distance = FALSE; */
 /* moved to the struct mouse_setting_t (joze) */
 
 
 /* status of buttons; button i corresponds to bit (1<<i) of this variable
  */
-int button = 0;
+static int button = 0;
 
 
 /* variables for setting the zoom region:
  */
 /* flag, TRUE while user is outlining the zoom region */
-TBOOLEAN setting_zoom_region = FALSE;
+static TBOOLEAN setting_zoom_region = FALSE;
 /* coordinates of the first corner of the zoom region, in the internal
  * coordinate system */
-int setting_zoom_x, setting_zoom_y;
+static int setting_zoom_x, setting_zoom_y;
 
 
 /* variables for changing the 3D view:
 */
-TBOOLEAN allowmotion = TRUE;	/* do we allow motion to result in a replot right now? */
-TBOOLEAN needreplot = FALSE;	/* did we already postpone a replot because allowmotion was FALSE ? */
-int start_x, start_y;		/* mouse position when dragging started */
-int motion = 0;			/* ButtonPress sets this to 0, ButtonMotion to 1 */
-float zero_rot_x, zero_rot_z;	/* values for rot_x and rot_z corresponding to zero position of mouse */
+/* do we allow motion to result in a replot right now? */
+TBOOLEAN allowmotion = TRUE;	/* used by pm.trm, too */
+/* did we already postpone a replot because allowmotion was FALSE ? */
+static TBOOLEAN needreplot = FALSE; 
+/* mouse position when dragging started */
+static int start_x, start_y;
+/* ButtonPress sets this to 0, ButtonMotion to 1 */
+static int motion = 0;
+/* values for rot_x and rot_z corresponding to zero position of mouse */
+static float zero_rot_x, zero_rot_z; 
 
+typedef void (map_func_type) __PROTO((struct position * pos, unsigned int *x,
+				      unsigned int *y, const char *what));
 
 /* bind related stuff */
 
@@ -137,7 +138,7 @@ typedef struct bind_t {
     struct bind_t *next;
 } bind_t;
 
-bind_t *bindings = (bind_t *) 0;
+static bind_t* bindings = (bind_t*) 0;
 static const int NO_KEY = -1;
 static TBOOLEAN trap_release = FALSE;
 
@@ -169,6 +170,7 @@ static void event_buttonpress __PROTO((struct gp_event_t * ge));
 static void event_buttonrelease __PROTO((struct gp_event_t * ge));
 static void event_motion __PROTO((struct gp_event_t * ge));
 static void event_modifier __PROTO((struct gp_event_t * ge));
+static void event_plotdone __PROTO((void));
 static void event_print __PROTO((FILE * fp, char *s));
 static void do_save_3dplot __PROTO((struct surface_points *, int, int));
 
@@ -214,6 +216,8 @@ static void bind_append __PROTO((char *lhs, char *rhs, char *(*builtin) (struct 
 /* void bind_remove_all __PROTO((void)); */
 static void recalc_ruler_pos __PROTO((void));
 static void turn_ruler_off __PROTO((void));
+static int nearest_label_tag __PROTO((int x, int y, struct termentry* t,
+				      map_func_type *));
 static void remove_label __PROTO((int x, int y));
 static void put_label __PROTO((char *label, double x, double y));
 # ifdef OS2
@@ -278,26 +282,18 @@ MousePosToGraphPosReal(int xx, int yy, double *x, double *y, double *x2, double 
 	if (xright == xleft)
 	    *x = *x2 = 1e38;	/* protection */
 	else {
-	    *x =
-		min_array[FIRST_X_AXIS] + ((double) xx - xleft) / (xright - xleft) * (max_array[FIRST_X_AXIS] -
-										      min_array[FIRST_X_AXIS]);
-	    *x2 =
-		min_array[SECOND_X_AXIS] + ((double) xx - xleft) / (xright - xleft) * (max_array[SECOND_X_AXIS] -
-										       min_array[SECOND_X_AXIS]);
+	    *x = AXIS_MAPBACK(FIRST_X_AXIS, xx);
+	    *x2 = AXIS_MAPBACK(SECOND_X_AXIS, xx);
 	}
 	if (ytop == ybot)
 	    *y = *y2 = 1e38;	/* protection */
 	else {
-	    *y =
-		min_array[FIRST_Y_AXIS] + ((double) yy - ybot) / (ytop - ybot) * (max_array[FIRST_Y_AXIS] -
-										  min_array[FIRST_Y_AXIS]);
-	    *y2 =
-		min_array[SECOND_Y_AXIS] + ((double) yy - ybot) / (ytop - ybot) * (max_array[SECOND_Y_AXIS] -
-										   min_array[SECOND_Y_AXIS]);
+	    *y = AXIS_MAPBACK(FIRST_Y_AXIS, yy);
+	    *y2 = AXIS_MAPBACK(SECOND_Y_AXIS, yy);
 	}
-# if 0
-	printf("POS: xx=%i, yy=%i  =>  x=%g  y=%g\n", xx, yy, *x, *y);
-# endif
+#if 0
+	printf("POS: xx=%i, yy=%i  =>  x=%g  y=%g\n",xx, yy, *x, *y);
+#endif
     } else {
 	/* for 3D plots, we treat the mouse position as if it is
 	 * in the bottom plane, i.e., the plane of the x and y axis */
@@ -306,14 +302,14 @@ MousePosToGraphPosReal(int xx, int yy, double *x, double *y, double *x2, double 
 	xx -= axis3d_o_x;
 	yy -= axis3d_o_y;
 	if (abs(axis3d_x_dx) > abs(axis3d_x_dy)) {
-	    *x = min_array[FIRST_X_AXIS] + ((double) xx) / axis3d_x_dx * (max_array[FIRST_X_AXIS] - min_array[FIRST_X_AXIS]);
+	    *x = axis_array[FIRST_X_AXIS].min + ((double) xx) / axis3d_x_dx * (axis_array[FIRST_X_AXIS].max - axis_array[FIRST_X_AXIS].min);
 	} else {
-	    *x = min_array[FIRST_X_AXIS] + ((double) yy) / axis3d_x_dy * (max_array[FIRST_X_AXIS] - min_array[FIRST_X_AXIS]);
+	    *x = axis_array[FIRST_X_AXIS].min + ((double) yy) / axis3d_x_dy * (axis_array[FIRST_X_AXIS].max - axis_array[FIRST_X_AXIS].min);
 	}
 	if (abs(axis3d_y_dx) > abs(axis3d_y_dy)) {
-	    *y = min_array[FIRST_Y_AXIS] + ((double) xx) / axis3d_y_dx * (max_array[FIRST_Y_AXIS] - min_array[FIRST_Y_AXIS]);
+	    *y = axis_array[FIRST_Y_AXIS].min + ((double) xx) / axis3d_y_dx * (axis_array[FIRST_Y_AXIS].max - axis_array[FIRST_Y_AXIS].min);
 	} else {
-	    *y = min_array[FIRST_Y_AXIS] + ((double) yy) / axis3d_y_dy * (max_array[FIRST_Y_AXIS] - min_array[FIRST_Y_AXIS]);
+	    *y = axis_array[FIRST_Y_AXIS].min + ((double) yy) / axis3d_y_dy * (axis_array[FIRST_Y_AXIS].max - axis_array[FIRST_Y_AXIS].min);
 	}
 	*x2 = *y2 = 1e38;	/* protection */
     }
@@ -326,14 +322,10 @@ MousePosToGraphPosReal(int xx, int yy, double *x, double *y, double *x2, double 
      */
 
     /* Now take into account possible log scales of x and y axes */
-    if (is_log_x)
-	*x = exp(*x * log_base_log_x);
-    if (is_log_y)
-	*y = exp(*y * log_base_log_y);
-    if (is_log_x2)
-	*x2 = exp(*x2 * log_base_log_x2);
-    if (is_log_y2)
-	*y2 = exp(*y2 * log_base_log_y2);
+    *x = AXIS_DE_LOG_VALUE(FIRST_X_AXIS, *x);
+    *x2 = AXIS_DE_LOG_VALUE(SECOND_X_AXIS, *x2);
+    *y = AXIS_DE_LOG_VALUE(FIRST_X_AXIS, *y);
+    *y2 = AXIS_DE_LOG_VALUE(SECOND_Y_AXIS, *y2);
 }
 
 static char *
@@ -381,14 +373,14 @@ GetAnnotateString(char *s, double x, double y, int mode, char *fmt)
 	strcat(format, "]");
 	s += sprintf(s, format, xDateTimeFormat(x, buf, mode), y);
     } else if (mode == MOUSE_COORDINATES_FRACTIONAL) {
-	double xrange = max_array[FIRST_X_AXIS] - min_array[FIRST_X_AXIS];
-	double yrange = max_array[FIRST_Y_AXIS] - min_array[FIRST_Y_AXIS];
+	double xrange = axis_array[FIRST_X_AXIS].max - axis_array[FIRST_X_AXIS].min;
+	double yrange = axis_array[FIRST_Y_AXIS].max - axis_array[FIRST_Y_AXIS].min;
 	/* calculate fractional coordinates.
 	 * prevent division by zero */
 	if (xrange) {
 	    char format[0xff] = "/";
 	    strcat(format, mouse_setting.fmt);
-	    s += sprintf(s, format, (x - min_array[FIRST_X_AXIS]) / xrange);
+	    s += sprintf(s, format, (x - axis_array[FIRST_X_AXIS].min) / xrange);
 	} else {
 	    s += sprintf(s, "/(undefined)");
 	}
@@ -396,7 +388,7 @@ GetAnnotateString(char *s, double x, double y, int mode, char *fmt)
 	    char format[0xff] = ", ";
 	    strcat(format, mouse_setting.fmt);
 	    strcat(format, "/");
-	    s += sprintf(s, format, (y - min_array[FIRST_Y_AXIS]) / yrange);
+	    s += sprintf(s, format, (y - axis_array[FIRST_Y_AXIS].min) / yrange);
 	} else {
 	    s += sprintf(s, ", (undefined)/");
 	}
@@ -447,7 +439,9 @@ xDateTimeFormat(double x, char *b, int mode)
 		pxtime_position->tm_hour, pxtime_position->tm_min);
 	break;
     case MOUSE_COORDINATES_TIMEFMT:
-	gstrftime(b, 0xff, timefmt, x);
+	/* FIXME HBB 20000507: timefmt is for *reading* timedata, not
+	 * for writing them! */
+	gstrftime(b, 0xff, axis_array[FIRST_X_AXIS].timefmt, x);
 	break;
     default:
 	sprintf(b, mouse_setting.fmt, x);
@@ -457,12 +451,18 @@ xDateTimeFormat(double x, char *b, int mode)
 
 
 
-
-#define MKSTR(sp,x,idx,_format)  \
-    if (datatype[idx]==TIME) {  \
-	if (format_is_numeric[idx]) sp+=gstrftime(sp,40,timefmt,x);  \
-	else sp+=gstrftime(sp,40,_format,x);  \
-    } else sp+=sprintf(sp, mouse_setting.fmt ,x);
+/* HBB 20000507: fixed a construction error. Was using the 'timefmt'
+ * string (which is for reading, not writing time data) to output the
+ * value. Code is now closer to what setup_tics does. */
+#define MKSTR(sp,x,axis)						      \
+do {									      \
+    if (axis_array[axis].is_timedata) {					      \
+	if (axis_array[axis].format_is_numeric)				      \
+	    timetic_format(axis, axis_array[axis].min, axis_array[axis].max); \
+	sp+=gstrftime(sp,40,axis_array[axis].formatstring,x);		      \
+    } else								      \
+	sp+=sprintf(sp, mouse_setting.fmt ,x);				      \
+} while (0)
 
 
 /* formats the information for an annotation (middle mouse button clicked)
@@ -475,10 +475,10 @@ GetCoordinateString(char *s, double x, double y)
     char *sp;
     s[0] = '[';
     sp = s + 1;
-    MKSTR(sp, x, FIRST_X_AXIS, xformat);
+    MKSTR(sp, x, FIRST_X_AXIS);
     *sp++ = ',';
     *sp++ = ' ';
-    MKSTR(sp, y, FIRST_Y_AXIS, yformat);
+    MKSTR(sp, y, FIRST_Y_AXIS);
     *sp++ = ']';
     *sp = 0;
     return sp;
@@ -486,9 +486,10 @@ GetCoordinateString(char *s, double x, double y)
 # endif
 
 
-# define DIST(x,rx,is_log)  \
-    (is_log)  /* ratio for log, distance for linear */  \
-    ? ( (rx==0) ? 99999 : x / rx )  \
+/* ratio for log, distance for linear */	
+# define DIST(x,rx,axis)			\
+   (axis_array[axis].log)			\
+    ? ( (rx==0) ? 99999 : x / rx )		\
     : (x - rx)
 
 
@@ -511,11 +512,11 @@ GetRulerString(char *p, double x, double y)
     strcat(format, ", ");
     strcat(format, mouse_setting.fmt);
 
-    dx = DIST(x, ruler.x, is_log_x);
-    dy = DIST(y, ruler.y, is_log_y);
-    sprintf(p, format, ruler.x, ruler.y, dx, dy);
+    dx = DIST(x, ruler.x, FIRST_X_AXIS);
+    dy = DIST(y, ruler.y, FIRST_Y_AXIS);
+    sprintf(p, format, ruler.x,ruler.y, dx, dy);
 
-    if (mouse_setting.polardistance && !is_log_x && !is_log_y) {
+    if (mouse_setting.polardistance && !axis_array[FIRST_X_AXIS].log && !axis_array[FIRST_Y_AXIS].log) {
 	/* polar coords of distance (axes cannot be logarithmic) */
 	double rho = sqrt((x - ruler.x) * (x - ruler.x) + (y - ruler.y) * (y - ruler.y));
 	double phi = (180 / M_PI) * atan2(y - ruler.y, x - ruler.x);
@@ -535,7 +536,8 @@ GetRulerString(char *p, double x, double y)
 }
 
 
-struct t_zoom *zoom_head = NULL, *zoom_now = NULL;
+static struct t_zoom *zoom_head = NULL,
+	      *zoom_now = NULL;
 
 /* Applies the zoom rectangle of  z  by sending the appropriate command
    to gnuplot
@@ -545,15 +547,15 @@ apply_zoom(struct t_zoom *z)
 {
     char s[255];
 
-    if (zoom_now != NULL) {	/* remember the current zoom */
-	zoom_now->xmin = (!is_log_x) ? min_array[FIRST_X_AXIS] : exp(min_array[FIRST_X_AXIS] * log_base_log_x);
-	zoom_now->ymin = (!is_log_y) ? min_array[FIRST_Y_AXIS] : exp(min_array[FIRST_Y_AXIS] * log_base_log_y);
-	zoom_now->x2min = (!is_log_x2) ? min_array[SECOND_X_AXIS] : exp(min_array[SECOND_X_AXIS] * log_base_log_x2);
-	zoom_now->y2min = (!is_log_y2) ? min_array[SECOND_Y_AXIS] : exp(min_array[SECOND_Y_AXIS] * log_base_log_y2);
-	zoom_now->xmax = (!is_log_x) ? max_array[FIRST_X_AXIS] : exp(max_array[FIRST_X_AXIS] * log_base_log_x);
-	zoom_now->ymax = (!is_log_y) ? max_array[FIRST_Y_AXIS] : exp(max_array[FIRST_Y_AXIS] * log_base_log_y);
-	zoom_now->x2max = (!is_log_x2) ? max_array[SECOND_X_AXIS] : exp(max_array[SECOND_X_AXIS] * log_base_log_x2);
-	zoom_now->y2max = (!is_log_y2) ? max_array[SECOND_Y_AXIS] : exp(max_array[SECOND_Y_AXIS] * log_base_log_y2);
+    if (zoom_now != NULL) { /* remember the current zoom */
+	zoom_now->xmin = AXIS_DE_LOG_VALUE(FIRST_X_AXIS, axis_array[FIRST_X_AXIS].min);
+	zoom_now->ymin = AXIS_DE_LOG_VALUE(FIRST_Y_AXIS, axis_array[FIRST_Y_AXIS].min);
+	zoom_now->x2min = AXIS_DE_LOG_VALUE(SECOND_X_AXIS, axis_array[SECOND_X_AXIS].min);
+	zoom_now->y2min = AXIS_DE_LOG_VALUE(SECOND_Y_AXIS, axis_array[SECOND_Y_AXIS].min);
+	zoom_now->xmax = AXIS_DE_LOG_VALUE(FIRST_X_AXIS, axis_array[FIRST_X_AXIS].max);
+	zoom_now->ymax = AXIS_DE_LOG_VALUE(FIRST_Y_AXIS, axis_array[FIRST_Y_AXIS].max);
+	zoom_now->x2max = AXIS_DE_LOG_VALUE(SECOND_X_AXIS, axis_array[SECOND_X_AXIS].max);
+	zoom_now->y2max = AXIS_DE_LOG_VALUE(SECOND_Y_AXIS, axis_array[SECOND_Y_AXIS].max);
     }
     zoom_now = z;
     if (zoom_now == NULL) {
@@ -695,7 +697,6 @@ static void
 UpdateStatuslineWithMouseSetting(mouse_setting_t * ms)
 {
     char s0[256], *sp;
-    extern TBOOLEAN term_initialised;	/* term.c */
     if (!term_initialised)
 	return;
     if (!ms->on) {
@@ -712,7 +713,7 @@ UpdateStatuslineWithMouseSetting(mouse_setting_t * ms)
 	strcat(format, ", ");
 	strcat(format, ms->fmt);
 	sprintf(s0, format, surface_rot_x, surface_rot_z, surface_scale, surface_zscale);
-    } else if (!TICS_ON(x2tics) && !TICS_ON(y2tics)) {
+    } else if (!TICS_ON(axis_array[SECOND_X_AXIS].ticmode) && !TICS_ON(axis_array[SECOND_Y_AXIS].ticmode)) {
 	/* only first X and Y axis are in use */
 # ifdef OLD_STATUS_LINE
 	sp = GetCoordinateString(s0, real_x, real_y);
@@ -728,24 +729,24 @@ UpdateStatuslineWithMouseSetting(mouse_setting_t * ms)
     } else {
 	/* X2 and/or Y2 are in use: use more verbose format */
 	sp = s0;
-	if (TICS_ON(xtics)) {
+	if (TICS_ON(axis_array[FIRST_X_AXIS].ticmode)) {
 	    sp = stpcpy(sp, "x=");
-	    MKSTR(sp, real_x, FIRST_X_AXIS, xformat);
+	    MKSTR(sp, real_x, FIRST_X_AXIS);
 	    *sp++ = ' ';
 	}
-	if (TICS_ON(ytics)) {
+	if (TICS_ON(axis_array[FIRST_Y_AXIS].ticmode)) {
 	    sp = stpcpy(sp, "y=");
-	    MKSTR(sp, real_y, FIRST_Y_AXIS, yformat);
+	    MKSTR(sp, real_y, FIRST_Y_AXIS);
 	    *sp++ = ' ';
 	}
-	if (TICS_ON(x2tics)) {
+	if (TICS_ON(axis_array[SECOND_X_AXIS].ticmode)) {
 	    sp = stpcpy(sp, "x2=");
-	    MKSTR(sp, real_x2, SECOND_X_AXIS, x2format);
+	    MKSTR(sp, real_x2, SECOND_X_AXIS);
 	    *sp++ = ' ';
 	}
-	if (TICS_ON(y2tics)) {
+	if (TICS_ON(axis_array[SECOND_Y_AXIS].ticmode)) {
 	    sp = stpcpy(sp, "y2=");
-	    MKSTR(sp, real_y2, SECOND_Y_AXIS, y2format);
+	    MKSTR(sp, real_y2, SECOND_Y_AXIS);
 	    *sp++ = ' ';
 	}
 	if (ruler.on) {
@@ -753,14 +754,14 @@ UpdateStatuslineWithMouseSetting(mouse_setting_t * ms)
 # if 0
 	    MousePosToGraphPosReal(ruler.px, ruler.py, &ruler.x, &ruler.y, &ruler.x2, &ruler.y2);
 # endif
-	    if (TICS_ON(xtics))
-		sp += sprintf(sp, xy1_format("dx="), DIST(real_x, ruler.x, is_log_x));
-	    if (TICS_ON(ytics))
-		sp += sprintf(sp, xy1_format("dy="), DIST(real_y, ruler.y, is_log_y));
-	    if (TICS_ON(x2tics))
-		sp += sprintf(sp, xy1_format("dx2="), DIST(real_x2, ruler.x2, is_log_x2));
-	    if (TICS_ON(y2tics))
-		sp += sprintf(sp, xy1_format("dy2="), DIST(real_y2, ruler.y2, is_log_y2));
+	    if (TICS_ON(axis_array[FIRST_X_AXIS].ticmode))
+		sp += sprintf(sp, xy1_format("dx="), DIST(real_x, ruler.x, FIRST_X_AXIS));
+	    if (TICS_ON(axis_array[FIRST_Y_AXIS].ticmode))
+		sp += sprintf(sp, xy1_format("dy="), DIST(real_y, ruler.y, FIRST_Y_AXIS));
+	    if (TICS_ON(axis_array[SECOND_X_AXIS].ticmode))
+		sp += sprintf(sp, xy1_format("dx2="), DIST(real_x2, ruler.x2, SECOND_X_AXIS));
+	    if (TICS_ON(axis_array[SECOND_Y_AXIS].ticmode))
+		sp += sprintf(sp, xy1_format("dy2="), DIST(real_y2, ruler.y2, SECOND_Y_AXIS));
 	}
 	*--sp = 0;		/* delete trailing space */
     }
@@ -825,7 +826,7 @@ builtin_toggle_grid(struct gp_event_t *ge)
     if (!ge) {
 	return "`builtin-toggle-grid`";
     }
-    if (work_grid.l_type == GRID_OFF)
+    if (grid_selection == GRID_OFF)
 	do_string_replot("set grid");
     else
 	do_string_replot("unset grid");
@@ -851,12 +852,12 @@ builtin_toggle_log(struct gp_event_t *ge)
 	return "`builtin-toggle-log` y logscale for plots, z logscale for splots";
     }
     if (is_3d_plot) {
-	if (is_log_z)
+	if (axis_array[FIRST_Z_AXIS].log)
 	    do_string_replot("unset log z");
 	else
 	    do_string_replot("set log z");
     } else {
-	if (is_log_y)
+	if (axis_array[FIRST_Y_AXIS].log)
 	    do_string_replot("unset log y");
 	else
 	    do_string_replot("set log y");
@@ -872,7 +873,7 @@ builtin_nearest_log(struct gp_event_t *ge)
     }
     if (is_3d_plot) {
 	/* 3D-plot: toggle lin/log z axis */
-	if (is_log_z)
+	if (axis_array[FIRST_Z_AXIS].log)
 	    do_string_replot("unset log z");
 	else
 	    do_string_replot("set log z");
@@ -884,19 +885,19 @@ builtin_nearest_log(struct gp_event_t *ge)
 	 * would be better to derive that from the ..tics settings */
 	TBOOLEAN change = FALSE;
 	if (mouse_y < ybot + (ytop - ybot) / 4 && mouse_x > xleft && mouse_x < xright) {
-	    do_string(is_log_x ? "unset log x" : "set log x");
+	    do_string( axis_array[FIRST_X_AXIS].log ? "unset log x" : "set log x");
 	    change = TRUE;
 	}
 	if (mouse_y > ytop - (ytop - ybot) / 4 && mouse_x > xleft && mouse_x < xright) {
-	    do_string(is_log_x2 ? "unset log x2" : "set log x2");
+	    do_string( axis_array[SECOND_X_AXIS].log ? "unset log x2" : "set log x2");
 	    change = TRUE;
 	}
 	if (mouse_x < xleft + (xright - xleft) / 4 && mouse_y > ybot && mouse_y < ytop) {
-	    do_string(is_log_y ? "unset log y" : "set log y");
+	    do_string( axis_array[FIRST_Y_AXIS].log ? "unset log y" : "set log y");
 	    change = TRUE;
 	}
 	if (mouse_x > xright - (xright - xleft) / 4 && mouse_y > ybot && mouse_y < ytop) {
-	    do_string(is_log_y2 ? "unset log y2" : "set log y2");
+	    do_string( axis_array[SECOND_Y_AXIS].log ? "unset log y2" : "set log y2");
 	    change = TRUE;
 	}
 	if (change)
@@ -1383,7 +1384,8 @@ event_buttonrelease(struct gp_event_t *ge)
 	return;
     }
 
-    MousePosToGraphPosReal(mouse_x, mouse_y, &real_x, &real_y, &real_x2, &real_y2);
+    MousePosToGraphPosReal(mouse_x, mouse_y,
+	&real_x, &real_y, &real_x2, &real_y2);
 
     FPRINTF(("MOUSE.C: doublclick=%i, set=%i, motion=%i, ALMOST2D=%i\n", (int) doubleclick, (int) mouse_setting.doubleclick, (int) motion, (int) ALMOST2D));
 
@@ -1654,7 +1656,7 @@ do_event(struct gp_event_t *ge)
 	break;
     }
 
-    replot_disabled = 0; /* enable replot again */
+    replot_disabled = FALSE; /* enable replot again */
 }
 
 static void
@@ -1979,21 +1981,17 @@ static void
 recalc_ruler_pos(void)
 {
     double P, dummy;
-    if (is_log_x && ruler.x < 0)
+    if (axis_array[FIRST_X_AXIS].log && ruler.x < 0)
 	ruler.px = -1;
     else {
-	P = is_log_x ? log(ruler.x) / log_base_log_x : ruler.x;
-	P = (P - min_array[FIRST_X_AXIS]) / (max_array[FIRST_X_AXIS] - min_array[FIRST_X_AXIS]);
-	P *= xright - xleft;
-	ruler.px = (long) (xleft + P);
+	P = AXIS_LOG_VALUE(FIRST_X_AXIS, ruler.x);
+	ruler.px = AXIS_MAP(FIRST_X_AXIS,P);
     }
-    if (is_log_y && ruler.y < 0)
+    if (axis_array[FIRST_Y_AXIS].log && ruler.y < 0)
 	ruler.py = -1;
     else {
-	P = is_log_y ? log(ruler.y) / log_base_log_y : ruler.y;
-	P = (P - min_array[FIRST_Y_AXIS]) / (max_array[FIRST_Y_AXIS] - min_array[FIRST_Y_AXIS]);
-	P *= ytop - ybot;
-	ruler.py = (long) (ybot + P);
+	P = AXIS_LOG_VALUE(FIRST_Y_AXIS, ruler.y);
+	ruler.py = AXIS_MAP(FIRST_Y_AXIS,P);
     }
     MousePosToGraphPosReal(ruler.px, ruler.py, &dummy, &dummy, &ruler.x2, &ruler.y2);
 }
@@ -2036,6 +2034,40 @@ turn_ruler_off(void)
     }
 }
 
+static int
+nearest_label_tag(int xref, int yref, struct termentry *t,
+		  map_func_type *map_func)
+{
+    double min = -1;
+    int min_tag = -1;
+    double diff_squared;
+    unsigned int x, y;
+    struct text_label *this_label;
+    int xd;
+    int yd;
+
+    for (this_label = first_label; this_label != NULL; this_label = this_label->next) {
+	map_func(&this_label->place, &x, &y, "label");
+	xd = (int) x - (int) xref;
+	yd = (int) y - (int) yref;
+	diff_squared = xd * xd + yd * yd;
+	if (-1 == min || min > diff_squared) {
+	    /* now we check if we're within a certain
+	     * threshold around the label */
+	    double tic_diff_squared;
+	    int htic, vtic;
+	    get_offsets(this_label, t, &htic, &vtic);
+	    tic_diff_squared = htic * htic + vtic * vtic;
+	    if (diff_squared < tic_diff_squared) {
+		min = diff_squared;
+		min_tag = this_label->tag;
+	    }
+	}
+    }
+
+    return min_tag;
+}
+
 static void
 remove_label(int x, int y)
 {
@@ -2064,7 +2096,6 @@ void
 send_gpPMmenu(FILE * PM_pipe)
 {
     struct t_gpPMmenu gpPMmenu;
-    extern int mouseGnupmdrv;
     /* not connected to mouseable gnupmdrv */
     if (!PM_pipe || !mouseGnupmdrv)
 	return;
@@ -2087,7 +2118,6 @@ send_gpPMmenu(FILE * PM_pipe)
 void
 update_menu_items_PM_terminal(void)
 {
-    extern FILE *PM_pipe;
     send_gpPMmenu(PM_pipe);
 }
 # endif

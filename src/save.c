@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.11.2.6 2000/10/31 14:48:19 joze Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.18 2000/10/31 19:59:31 joze Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -36,42 +36,29 @@ static char *RCSid() { return RCSid("$Id: save.c,v 1.11.2.6 2000/10/31 14:48:19 
 
 #include "save.h"
 
+#include "axis.h"
 #include "command.h"
+#include "contour.h"
+#include "datafile.h"
 #include "eval.h"
 #include "fit.h"
 #include "gp_time.h"
+#include "graphics.h"
 #include "hidden3d.h"
+#include "plot2d.h"
+#include "plot3d.h"
 #include "setshow.h"
+#include "term_api.h"
 #include "util.h"
-
-/* HBB 990825 FIXME: how come these strings are only used for
- * _displaying_ encodings (-->no use in set.c) ? */
-const char *encoding_names[] = {
-    "default", "iso_8859_1", "cp437", "cp850", NULL };
+#include "variable.h"
 
 static void save_functions__sub __PROTO((FILE *));
 static void save_variables__sub __PROTO((FILE *));
-static void save_tics __PROTO((FILE *, int, int, struct ticdef *, TBOOLEAN, const char *));
+static void save_tics __PROTO((FILE *, AXIS_INDEX));
 static void save_position __PROTO((FILE *, struct position *));
-static void save_range __PROTO((FILE *, int, double, double, TBOOLEAN, const char *));
+static void save_range __PROTO((FILE *, AXIS_INDEX));
+static void save_zeroaxis __PROTO((FILE *,AXIS_INDEX));
 static void save_set_all __PROTO((FILE *));
-
-#define SAVE_NUM_OR_TIME(fp, x, axis) \
-do{if (datatype[axis]==TIME) { \
-  char s[80]; char *p; \
-  putc('"', fp);   \
-  gstrftime(s,80,timefmt,(double)(x)); \
-  for(p=s; *p; ++p) {\
-   if ( *p == '\t' ) fputs("\\t",fp);\
-   else if (*p == '\n') fputs("\\n",fp); \
-   else if ( *p > 126 || *p < 32 ) fprintf(fp,"\\%03o",*p);\
-   else putc(*p, fp);\
-  }\
-  putc('"', fp);\
- } else {\
-  fprintf(fp,"%#g",x);\
-}} while(0)
-
 
 /*
  *  functions corresponding to the arguments of the GNUPLOT `save` command
@@ -257,11 +244,11 @@ set ydata%s\n\
 set zdata%s\n\
 set x2data%s\n\
 set y2data%s\n",
-	    datatype[FIRST_X_AXIS] == TIME ? " time" : "",
-	    datatype[FIRST_Y_AXIS] == TIME ? " time" : "",
-	    datatype[FIRST_Z_AXIS] == TIME ? " time" : "",
-	    datatype[SECOND_X_AXIS] == TIME ? " time" : "",
-	    datatype[SECOND_Y_AXIS] == TIME ? " time" : "");
+	    axis_array[FIRST_X_AXIS].is_timedata ? " time" : "",
+	    axis_array[FIRST_Y_AXIS].is_timedata ? " time" : "",
+	    axis_array[FIRST_Z_AXIS].is_timedata ? " time" : "",
+	    axis_array[SECOND_X_AXIS].is_timedata ? " time" : "",
+	    axis_array[SECOND_Y_AXIS].is_timedata ? " time" : "");
 
     if (boxwidth < 0.0)
 	fputs("set boxwidth\n", fp);
@@ -273,41 +260,47 @@ set y2data%s\n",
 		dgrid3d_col_fineness,
 		dgrid3d_norm_value);
 
-    fprintf(fp, "set dummy %s,%s\n", dummy_var[0], dummy_var[1]);
-    fprintf(fp, "set format x \"%s\"\n", conv_text(xformat));
-    fprintf(fp, "set format y \"%s\"\n", conv_text(yformat));
-    fprintf(fp, "set format x2 \"%s\"\n", conv_text(x2format));
-    fprintf(fp, "set format y2 \"%s\"\n", conv_text(y2format));
-    fprintf(fp, "set format z \"%s\"\n", conv_text(zformat));
-    fprintf(fp, "set angles %s\n",
-	    (angles_format == ANGLES_RADIANS) ? "radians" : "degrees");
+    fprintf(fp, "set dummy %s,%s\n", set_dummy_var[0], set_dummy_var[1]);
 
-    if (work_grid.l_type == 0)
+#define SAVE_FORMAT(axis)						\
+    fprintf(fp, "set format %s \"%s\"\n", axis_defaults[axis].name,	\
+	    conv_text(axis_array[axis].formatstring));
+    SAVE_FORMAT(FIRST_X_AXIS );
+    SAVE_FORMAT(FIRST_Y_AXIS );
+    SAVE_FORMAT(SECOND_X_AXIS);
+    SAVE_FORMAT(SECOND_Y_AXIS);
+    SAVE_FORMAT(FIRST_Z_AXIS );
+#undef SAVE_FORMAT
+
+    fprintf(fp, "set angles %s\n",
+	    (ang2rad == 1.0) ? "radians" : "degrees");
+
+    if (grid_selection == 0)
 	fputs("unset grid\n", fp);
     else {
 	/* FIXME */
 	if (polar_grid_angle)	/* set angle already output */
 	    fprintf(fp, "set grid polar %f\n", polar_grid_angle / ang2rad);
 	else
-	    fputs("unset grid polar\n", fp);
+	    fputs("set grid nopolar\n", fp);
 	fprintf(fp,
 		"set grid %sxtics %sytics %sztics %sx2tics %sy2tics %smxtics %smytics %smztics %smx2tics %smy2tics lt %d lw %.3f, lt %d lw %.3f\n",
-		work_grid.l_type & GRID_X ? "" : "no",
-		work_grid.l_type & GRID_Y ? "" : "no",
-		work_grid.l_type & GRID_Z ? "" : "no",
-		work_grid.l_type & GRID_X2 ? "" : "no",
-		work_grid.l_type & GRID_Y2 ? "" : "no",
-		work_grid.l_type & GRID_MX ? "" : "no",
-		work_grid.l_type & GRID_MY ? "" : "no",
-		work_grid.l_type & GRID_MZ ? "" : "no",
-		work_grid.l_type & GRID_MX2 ? "" : "no",
-		work_grid.l_type & GRID_MY2 ? "" : "no",
+		grid_selection & GRID_X ? "" : "no",
+		grid_selection & GRID_Y ? "" : "no",
+		grid_selection & GRID_Z ? "" : "no",
+		grid_selection & GRID_X2 ? "" : "no",
+		grid_selection & GRID_Y2 ? "" : "no",
+		grid_selection & GRID_MX ? "" : "no",
+		grid_selection & GRID_MY ? "" : "no",
+		grid_selection & GRID_MZ ? "" : "no",
+		grid_selection & GRID_MX2 ? "" : "no",
+		grid_selection & GRID_MY2 ? "" : "no",
 		grid_lp.l_type + 1, grid_lp.l_width,
 		mgrid_lp.l_type + 1, mgrid_lp.l_width);
     }
     fprintf(fp, "set key title \"%s\"\n", conv_text(key_title));
     switch (key) {
-    case -1:{
+    case KEY_AUTO_PLACEMENT:
 	    fputs("set key", fp);
 	    switch (key_hpos) {
 	    case TRIGHT:
@@ -332,20 +325,20 @@ set y2data%s\n",
 		break;
 	    }
 	    break;
-	}
-    case 0:
+    case KEY_NONE:
 	fputs("unset key\n", fp);
 	break;
-    case 1:
+    case KEY_USER_PLACEMENT:
 	fputs("set key ", fp);
 	save_position(fp, &key_user_pos);
 	break;
     }
-    if (key) {
+    if (key != KEY_NONE) {
 	fprintf(fp, " %s %sreverse box linetype %d linewidth %.3f samplen %g spacing %g width %g\n",
 		key_just == JLEFT ? "Left" : "Right",
 		key_reverse ? "" : "no",
-		key_box.l_type + 1, key_box.l_width, key_swidth, key_vert_factor, key_width_fix);
+		key_box.l_type + 1, key_box.l_width,
+		key_swidth, key_vert_factor, key_width_fix);
     }
     fputs("unset label\n", fp);
     for (this_label = first_label; this_label != NULL;
@@ -406,16 +399,16 @@ set y2data%s\n",
 		this_linestyle->lp_properties.p_size);
     }
     fputs("unset logscale\n", fp);
-    if (is_log_x)
-	fprintf(fp, "set logscale x %g\n", base_log_x);
-    if (is_log_y)
-	fprintf(fp, "set logscale y %g\n", base_log_y);
-    if (is_log_z)
-	fprintf(fp, "set logscale z %g\n", base_log_z);
-    if (is_log_x2)
-	fprintf(fp, "set logscale x2 %g\n", base_log_x2);
-    if (is_log_y2)
-	fprintf(fp, "set logscale y2 %g\n", base_log_y2);
+#define SAVE_LOG(axis)							\
+    if (axis_array[axis].log)						\
+	fprintf(fp, "set logscale %s %g\n", axis_defaults[axis].name,	\
+		axis_array[axis].base);
+    SAVE_LOG(FIRST_X_AXIS );
+    SAVE_LOG(FIRST_Y_AXIS );
+    SAVE_LOG(SECOND_X_AXIS);
+    SAVE_LOG(SECOND_Y_AXIS);
+    SAVE_LOG(FIRST_Z_AXIS );
+#undef SAVE_LOG
 
     /* FIXME */
     fprintf(fp, "\
@@ -492,21 +485,21 @@ set isosamples %d, %d\n\
 	break;
     }
     fputs("set cntrparam levels ", fp);
-    switch (levels_kind) {
+    switch (contour_levels_kind) {
     case LEVELS_AUTO:
 	fprintf(fp, "auto %d\n", contour_levels);
 	break;
     case LEVELS_INCREMENTAL:
 	fprintf(fp, "incremental %g,%g,%g\n",
-		levels_list[0], levels_list[1],
-		levels_list[0] + levels_list[1] * contour_levels);
+		contour_levels_list[0], contour_levels_list[1],
+		contour_levels_list[0] + contour_levels_list[1] * contour_levels);
 	break;
     case LEVELS_DISCRETE:
 	{
 	    int i;
-	    fprintf(fp, "discrete %g", levels_list[0]);
+	    fprintf(fp, "discrete %g", contour_levels_list[0]);
 	    for (i = 1; i < contour_levels; i++)
-		fprintf(fp, ",%g ", levels_list[i]);
+		fprintf(fp, ",%g ", contour_levels_list[i]);
 	    fputc('\n', fp);
 	}
     }
@@ -649,46 +642,57 @@ set style data ",
 	break;
     }
 
+    save_zeroaxis(fp, FIRST_X_AXIS);
+    save_zeroaxis(fp, FIRST_Y_AXIS);
+    save_zeroaxis(fp, SECOND_X_AXIS);
+    save_zeroaxis(fp, SECOND_Y_AXIS);
+    
     fprintf(fp, "\
-set xzeroaxis lt %d lw %.3f\n\
-set x2zeroaxis lt %d lw %.3f\n\
-set yzeroaxis lt %d lw %.3f\n\
-set y2zeroaxis lt %d lw %.3f\n\
 set tics %s\n\
 set ticslevel %g\n\
 set ticscale %g %g\n",
-	    xzeroaxis.l_type + 1, xzeroaxis.l_width,
-	    x2zeroaxis.l_type + 1, x2zeroaxis.l_width,
-	    yzeroaxis.l_type + 1, yzeroaxis.l_width,
-	    y2zeroaxis.l_type + 1, y2zeroaxis.l_width,
 	    (tic_in) ? "in" : "out",
 	    ticslevel,
 	    ticscale, miniticscale);
 
-#define SAVE_XYZLABEL(name,lab) { \
-  fprintf(fp, "set %s \"%s\" %f,%f ", \
-    name, conv_text(lab.text),lab.xoffset,lab.yoffset); \
+#define SAVE_MINI(axis)							  \
+    switch(axis_array[axis].minitics & TICS_MASK) {				  \
+    case 0:								  \
+	fprintf(fp, "set nom%stics\n", axis_defaults[axis].name);		  \
+	break;								  \
+    case MINI_AUTO:							  \
+	fprintf(fp, "set m%stics\n", axis_defaults[axis].name);		  \
+	break;								  \
+    case MINI_DEFAULT:							  \
+	fprintf(fp, "set m%stics default\n", axis_defaults[axis].name);	  \
+	break;								  \
+    case MINI_USER: fprintf(fp, "set m%stics %f\n", axis_defaults[axis].name, \
+			    axis_array[axis].mtic_freq);			  \
+	break;								  \
+    }
+
+    SAVE_MINI(FIRST_X_AXIS);
+    SAVE_MINI(FIRST_Y_AXIS);
+    SAVE_MINI(FIRST_Z_AXIS);	/* HBB 20000506: noticed mztics were not saved! */
+    SAVE_MINI(SECOND_X_AXIS);
+    SAVE_MINI(SECOND_Y_AXIS);
+#undef SAVE_MINI
+
+    save_tics(fp, FIRST_X_AXIS);
+    save_tics(fp, FIRST_Y_AXIS);
+    save_tics(fp, FIRST_Z_AXIS);
+    save_tics(fp, SECOND_X_AXIS);
+    save_tics(fp, SECOND_Y_AXIS);
+
+#define SAVE_AXISLABEL_OR_TITLE(name,suffix,lab)	\
+    {							\
+	fprintf(fp, "set %s%s \"%s\" %f,%f ",		\
+		name, suffix, conv_text(lab.text),	\
+		lab.xoffset, lab.yoffset);		\
   fprintf(fp, " \"%s\"\n", conv_text(lab.font)); \
 }
 
-#define SAVE_MINI(name,m,freq) switch(m&TICS_MASK) { \
- case 0: fprintf(fp, "set no%s\n", name); break; \
- case MINI_AUTO: fprintf(fp, "set %s\n",name); break; \
- case MINI_DEFAULT: fprintf(fp, "set %s default\n",name); break; \
- case MINI_USER: fprintf(fp, "set %s %f\n", name, freq); break; \
-}
-    SAVE_MINI("mxtics", mxtics, mxtfreq)
-    SAVE_MINI("mytics", mytics, mytfreq)
-    SAVE_MINI("mx2tics", mx2tics, mx2tfreq)
-    SAVE_MINI("my2tics", my2tics, my2tfreq)
-
-    save_tics(fp, xtics, FIRST_X_AXIS, &xticdef, rotate_xtics, "x");
-    save_tics(fp, ytics, FIRST_Y_AXIS, &yticdef, rotate_ytics, "y");
-    save_tics(fp, ztics, FIRST_Z_AXIS, &zticdef, rotate_ztics, "z");
-    save_tics(fp, x2tics, SECOND_X_AXIS, &x2ticdef, rotate_x2tics, "x2");
-    save_tics(fp, y2tics, SECOND_Y_AXIS, &y2ticdef, rotate_y2tics, "y2");
-
-    SAVE_XYZLABEL("title", title);
+    SAVE_AXISLABEL_OR_TITLE("", "title", title);
 
     /* FIXME */
     fprintf(fp, "set %s \"%s\" %s %srotate %f,%f ",
@@ -698,31 +702,45 @@ set ticscale %g %g\n",
 	    timelabel.xoffset, timelabel.yoffset);
     fprintf(fp, " \"%s\"\n", conv_text(timelabel.font));
 
-    save_range(fp, R_AXIS, rmin, rmax, autoscale_r, "r");
-    save_range(fp, T_AXIS, tmin, tmax, autoscale_t, "t");
-    save_range(fp, U_AXIS, umin, umax, autoscale_u, "u");
-    save_range(fp, V_AXIS, vmin, vmax, autoscale_v, "v");
+    save_range(fp, R_AXIS);
+    save_range(fp, T_AXIS);
+    save_range(fp, U_AXIS);
+    save_range(fp, V_AXIS);
 
-    SAVE_XYZLABEL("xlabel", xlabel);
-    SAVE_XYZLABEL("x2label", x2label);
+#define SAVE_TIMEFMT(axis)						\
+    if (strlen(axis_array[axis].timefmt)) 						\
+	fprintf(fp, "set timefmt %s \"%s\"\n", axis_defaults[axis].name,	\
+		conv_text(axis_array[axis].timefmt));
+    SAVE_TIMEFMT(FIRST_X_AXIS);
+    SAVE_TIMEFMT(FIRST_Y_AXIS);
+    SAVE_TIMEFMT(FIRST_Z_AXIS);
+    SAVE_TIMEFMT(SECOND_X_AXIS);
+    SAVE_TIMEFMT(SECOND_Y_AXIS);
+#undef SAVE_TIMEFMT
+    
+#define SAVE_AXISLABEL(axis)					\
+    SAVE_AXISLABEL_OR_TITLE(axis_defaults[axis].name,"label",	\
+			    axis_array[axis].label)
+	
+    SAVE_AXISLABEL(FIRST_X_AXIS);
+    SAVE_AXISLABEL(SECOND_X_AXIS);
+    save_range(fp, FIRST_X_AXIS);
+    save_range(fp, SECOND_X_AXIS);
 
-    if (strlen(timefmt)) {
-	fprintf(fp, "set timefmt \"%s\"\n", conv_text(timefmt));
-    }
-    save_range(fp, FIRST_X_AXIS, xmin, xmax, autoscale_x, "x");
-    save_range(fp, SECOND_X_AXIS, x2min, x2max, autoscale_x2, "x2");
+    SAVE_AXISLABEL(FIRST_Y_AXIS);
+    SAVE_AXISLABEL(SECOND_Y_AXIS);
+    save_range(fp, FIRST_Y_AXIS);
+    save_range(fp, SECOND_Y_AXIS);
 
-    SAVE_XYZLABEL("ylabel", ylabel);
-    SAVE_XYZLABEL("y2label", y2label);
+    SAVE_AXISLABEL(FIRST_Z_AXIS);
+    save_range(fp, FIRST_Z_AXIS);
 
-    save_range(fp, FIRST_Y_AXIS, ymin, ymax, autoscale_y, "y");
-    save_range(fp, SECOND_Y_AXIS, y2min, y2max, autoscale_y2, "y2");
-
-    SAVE_XYZLABEL("zlabel", zlabel);
-    save_range(fp, FIRST_Z_AXIS, zmin, zmax, autoscale_z, "z");
+#undef SAVE_AXISLABEL
+#undef SAVE_AXISLABEL_OR_TITLE
 
     fprintf(fp, "set zero %g\n", zero);
-    fprintf(fp, "set lmargin %d\nset bmargin %d\nset rmargin %d\nset tmargin %d\n",
+    fprintf(fp, "set lmargin %d\nset bmargin %d\n"
+	    "set rmargin %d\nset tmargin %d\n",
 	    lmargin, bmargin, rmargin, tmargin);
 
     fprintf(fp, "set locale \"%s\"\n", get_locale());
@@ -737,75 +755,52 @@ set ticscale %g %g\n",
 }
 
 static void
-save_tics(fp, where, axis, tdef, rotate, text)
+save_tics(fp, axis)
 FILE *fp;
-int where;
-int axis;
-struct ticdef *tdef;
-TBOOLEAN rotate;
-const char *text;
+AXIS_INDEX axis;
 {
-
-    if (where == NO_TICS) {
-	fprintf(fp, "set no%stics\n", text);
+    if (axis_array[axis].ticmode == NO_TICS) {
+	fprintf(fp, "set no%stics\n", axis_defaults[axis].name);
 	return;
     }
-    fprintf(fp, "set %stics %s %smirror %srotate ", text,
-	    (where & TICS_MASK) == TICS_ON_AXIS ? "axis" : "border",
-	    (where & TICS_MIRROR) ? "" : "no", rotate ? "" : "no");
-    switch (tdef->type) {
+    fprintf(fp, "set %stics %s %smirror %srotate ", axis_defaults[axis].name,
+	    ((axis_array[axis].ticmode & TICS_MASK) == TICS_ON_AXIS)
+	    ? "axis" : "border",
+	    (axis_array[axis].ticmode & TICS_MIRROR) ? "" : "no",
+	    axis_array[axis].tic_rotate ? "" : "no");
+    switch (axis_array[axis].ticdef.type) {
     case TIC_COMPUTED:{
 	    fputs("autofreq ", fp);
 	    break;
 	}
     case TIC_MONTH:{
-	    fprintf(fp, "\nset %smtics", text);
+	    fprintf(fp, "\nset %smtics", axis_defaults[axis].name);
 	    break;
 	}
     case TIC_DAY:{
-	    fprintf(fp, "\nset %cdtics", axis);
+	    fprintf(fp, "\nset %sdtics", axis_defaults[axis].name);
 	    break;
 	}
     case TIC_SERIES:
-	if (datatype[axis] == TIME) {
-	    if (tdef->def.series.start != -VERYLARGE) {
-		char fd[26];
-		gstrftime(fd, 24, timefmt, (double) tdef->def.series.start);
-		fprintf(fp, "\"%s\",", conv_text(fd));
-	    }
-	    fprintf(fp, "%g", tdef->def.series.incr);
-
-	    if (tdef->def.series.end != VERYLARGE) {
-		char td[26];
-		gstrftime(td, 24, timefmt, (double) tdef->def.series.end);
-		fprintf(fp, ",\"%s\"", conv_text(td));
-	    }
-	} else {		/* !TIME */
-
-	    if (tdef->def.series.start != -VERYLARGE)
-		fprintf(fp, "%g,", tdef->def.series.start);
-	    fprintf(fp, "%g", tdef->def.series.incr);
-	    if (tdef->def.series.end != VERYLARGE)
-		fprintf(fp, ",%g", tdef->def.series.end);
-	}
-
+	if (axis_array[axis].ticdef.def.series.start != -VERYLARGE) 
+	    SAVE_NUM_OR_TIME(fp,
+			     (double) axis_array[axis].ticdef.def.series.start,
+			     axis);
+	fprintf(fp, "%g", axis_array[axis].ticdef.def.series.incr);
+	if (axis_array[axis].ticdef.def.series.end != VERYLARGE) 
+	    SAVE_NUM_OR_TIME(fp,
+			     (double) axis_array[axis].ticdef.def.series.end,
+			     axis);
 	break;
 
     case TIC_USER:{
 	    register struct ticmark *t;
-	    int flag_time;
-	    flag_time = (datatype[axis] == TIME);
 	    fputs(" (", fp);
-	    for (t = tdef->def.user; t != NULL; t = t->next) {
+	    for (t = axis_array[axis].ticdef.def.user;
+		 t != NULL; t = t->next) {
 		if (t->label)
 		    fprintf(fp, "\"%s\" ", conv_text(t->label));
-		if (flag_time) {
-		    char td[26];
-		    gstrftime(td, 24, timefmt, (double) t->position);
-		    fprintf(fp, "\"%s\"", conv_text(td));
-		} else {
-		    fprintf(fp, "%g", t->position);
-		}
+		SAVE_NUM_OR_TIME(fp, (double) t->position, axis);
 		if (t->next) {
 		    fputs(", ", fp);
 		}
@@ -834,45 +829,52 @@ struct position *pos;
 
 
 static void
-save_range(fp, axis, min, max, autosc, text)
+save_range(fp, axis)
 FILE *fp;
-int axis;
-double min, max;
-TBOOLEAN autosc;
-const char *text;
+AXIS_INDEX axis;
 {
     int i;
 
     i = axis;
-    fprintf(fp, "set %srange [ ", text);
-    if (autosc & 1) {
+    fprintf(fp, "set %srange [ ", axis_defaults[axis].name);
+    if (axis_array[axis].set_autoscale & 1) {
 	putc('*', fp);
     } else {
-	SAVE_NUM_OR_TIME(fp, min, axis);
+	SAVE_NUM_OR_TIME(fp, axis_array[axis].set_min, axis);
     }
     fputs(" : ", fp);
-    if (autosc & 2) {
+    if (axis_array[axis].set_autoscale & 2) {
 	putc('*', fp);
     } else {
-	SAVE_NUM_OR_TIME(fp, max, axis);
+	SAVE_NUM_OR_TIME(fp, axis_array[axis].set_max, axis);
     }
 
     fprintf(fp, " ] %sreverse %swriteback",
-	    range_flags[axis] & RANGE_REVERSE ? "" : "no",
-	    range_flags[axis] & RANGE_WRITEBACK ? "" : "no");
+	    axis_array[axis].range_flags & RANGE_REVERSE ? "" : "no",
+	    axis_array[axis].range_flags & RANGE_WRITEBACK ? "" : "no");
 
-    if (autosc) {
+    if (axis_array[axis].set_autoscale) {
 	/* add current (hidden) range as comments */
 	fputs("  # (currently [", fp);
-	if (autosc & 1) {
-	    SAVE_NUM_OR_TIME(fp, min, axis);
+	if (axis_array[axis].set_autoscale & 1) {
+	    SAVE_NUM_OR_TIME(fp, axis_array[axis].set_min, axis);
 	}
 	putc(':', fp);
-	if (autosc & 2) {
-	    SAVE_NUM_OR_TIME(fp, max, axis);
+	if (axis_array[axis].set_autoscale & 2) {
+	    SAVE_NUM_OR_TIME(fp, axis_array[axis].set_max, axis);
 	}
 	fputs("] )", fp);
     }
     putc('\n', fp);
 }
 
+static void
+save_zeroaxis(fp, axis)
+    FILE *fp;
+    AXIS_INDEX axis;
+{
+    fprintf(fp, "set %szeroaxis lt %d lw %.3f\n", axis_defaults[axis].name,
+	    axis_array[axis].zeroaxis.l_type + 1,
+	    axis_array[axis].zeroaxis.l_width);
+
+}

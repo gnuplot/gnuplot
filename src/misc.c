@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.23.2.1 2000/05/03 21:26:11 joze Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.25 2000/10/31 19:59:31 joze Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -38,15 +38,18 @@ static char *RCSid() { return RCSid("$Id: misc.c,v 1.23.2.1 2000/05/03 21:26:11 
 
 #include "alloc.h"
 #include "command.h"
-#include "setshow.h"
+#include "graphics.h"
+#include "parse.h"
+#include "plot.h"
+#include "tables.h"
 #include "util.h"
+#include "variable.h"
 
 /* name of command file; NULL if terminal */
 char *infile_name = NULL;
 
 static TBOOLEAN lf_pop __PROTO((void));
 static void lf_push __PROTO((FILE * fp));
-static int find_maxl_cntr __PROTO((struct gnuplot_contours * contours, int *count));
 
 /* State information for load_file(), to recover from errors
  * and properly handle recursive load_file calls
@@ -65,87 +68,6 @@ static LFS *lf_head = NULL;		/* NULL if not in load_file */
 /* these two could be in load_file, except for error recovery */
 static TBOOLEAN do_load_arg_substitution = FALSE;
 static char *call_args[10] = { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL };
-
-/*
- * cp_alloc() allocates a curve_points structure that can hold 'num'
- * points.
- */
-struct curve_points *
-cp_alloc(num)
-int num;
-{
-    struct curve_points *cp;
-
-    cp = (struct curve_points *) gp_alloc(sizeof(struct curve_points), "curve");
-    cp->p_max = (num >= 0 ? num : 0);
-
-    if (num > 0) {
-	cp->points = (struct coordinate GPHUGE *)
-	    gp_alloc(num * sizeof(struct coordinate), "curve points");
-    } else
-	cp->points = (struct coordinate GPHUGE *) NULL;
-    cp->next = NULL;
-    cp->title = NULL;
-    return (cp);
-}
-
-
-/*
- * cp_extend() reallocates a curve_points structure to hold "num"
- * points. This will either expand or shrink the storage.
- */
-void
-cp_extend(cp, num)
-struct curve_points *cp;
-int num;
-{
-
-#if defined(DOS16) || defined(WIN16)
-    /* Make sure we do not allocate more than 64k points in msdos since 
-     * indexing is done with 16-bit int
-     * Leave some bytes for malloc maintainance.
-     */
-    if (num > 32700)
-	int_error(NO_CARET, "Array index must be less than 32k in msdos");
-#endif /* MSDOS */
-
-    if (num == cp->p_max)
-	return;
-
-    if (num > 0) {
-	if (cp->points == NULL) {
-	    cp->points = (struct coordinate GPHUGE *)
-		gp_alloc(num * sizeof(struct coordinate), "curve points");
-	} else {
-	    cp->points = (struct coordinate GPHUGE *)
-		gp_realloc(cp->points, num * sizeof(struct coordinate), "expanding curve points");
-	}
-	cp->p_max = num;
-    } else {
-	if (cp->points != (struct coordinate GPHUGE *) NULL)
-	    free(cp->points);
-	cp->points = (struct coordinate GPHUGE *) NULL;
-	cp->p_max = 0;
-    }
-}
-
-/*
- * cp_free() releases any memory which was previously malloc()'d to hold
- *   curve points (and recursively down the linked list).
- */
-void
-cp_free(cp)
-struct curve_points *cp;
-{
-    if (cp) {
-	cp_free(cp->next);
-	if (cp->title)
-	    free((char *) cp->title);
-	if (cp->points)
-	    free((char *) cp->points);
-	free((char *) cp);
-    }
-}
 
 /*
  * iso_alloc() allocates a iso_curve structure that can hold 'num'
@@ -217,117 +139,6 @@ struct iso_curve *ip;
 	if (ip->points)
 	    free((char *) ip->points);
 	free((char *) ip);
-    }
-}
-
-/*
- * sp_alloc() allocates a surface_points structure that can hold 'num_iso_1'
- * iso-curves with 'num_samp_2' samples and 'num_iso_2' iso-curves with
- * 'num_samp_1' samples.
- * If, however num_iso_2 or num_samp_1 is zero no iso curves are allocated.
- */
-struct surface_points *
-sp_alloc(num_samp_1, num_iso_1, num_samp_2, num_iso_2)
-int num_samp_1, num_iso_1, num_samp_2, num_iso_2;
-{
-    struct surface_points *sp;
-
-    sp = (struct surface_points *) gp_alloc(sizeof(struct surface_points),
-					    "surface");
-    sp->next_sp = NULL;
-    sp->title = NULL;
-    sp->contours = NULL;
-    sp->iso_crvs = NULL;
-    sp->num_iso_read = 0;
-
-    if (num_iso_2 > 0 && num_samp_1 > 0) {
-	int i;
-	struct iso_curve *icrv;
-
-	for (i = 0; i < num_iso_1; i++) {
-	    icrv = iso_alloc(num_samp_2);
-	    icrv->next = sp->iso_crvs;
-	    sp->iso_crvs = icrv;
-	}
-	for (i = 0; i < num_iso_2; i++) {
-	    icrv = iso_alloc(num_samp_1);
-	    icrv->next = sp->iso_crvs;
-	    sp->iso_crvs = icrv;
-	}
-    } else
-	sp->iso_crvs = (struct iso_curve *) NULL;
-
-    return (sp);
-}
-
-/*
- * sp_replace() updates a surface_points structure so it can hold 'num_iso_1'
- * iso-curves with 'num_samp_2' samples and 'num_iso_2' iso-curves with
- * 'num_samp_1' samples.
- * If, however num_iso_2 or num_samp_1 is zero no iso curves are allocated.
- */
-void
-sp_replace(sp, num_samp_1, num_iso_1, num_samp_2, num_iso_2)
-struct surface_points *sp;
-int num_samp_1, num_iso_1, num_samp_2, num_iso_2;
-{
-    int i;
-    struct iso_curve *icrv, *icrvs = sp->iso_crvs;
-
-    while (icrvs) {
-	icrv = icrvs;
-	icrvs = icrvs->next;
-	iso_free(icrv);
-    }
-    sp->iso_crvs = NULL;
-
-    if (num_iso_2 > 0 && num_samp_1 > 0) {
-	for (i = 0; i < num_iso_1; i++) {
-	    icrv = iso_alloc(num_samp_2);
-	    icrv->next = sp->iso_crvs;
-	    sp->iso_crvs = icrv;
-	}
-	for (i = 0; i < num_iso_2; i++) {
-	    icrv = iso_alloc(num_samp_1);
-	    icrv->next = sp->iso_crvs;
-	    sp->iso_crvs = icrv;
-	}
-    } else
-	sp->iso_crvs = (struct iso_curve *) NULL;
-}
-
-/*
- * sp_free() releases any memory which was previously malloc()'d to hold
- *   surface points.
- */
-void
-sp_free(sp)
-struct surface_points *sp;
-{
-    if (sp) {
-	sp_free(sp->next_sp);
-	if (sp->title)
-	    free((char *) sp->title);
-	if (sp->contours) {
-	    struct gnuplot_contours *cntr, *cntrs = sp->contours;
-
-	    while (cntrs) {
-		cntr = cntrs;
-		cntrs = cntrs->next;
-		free(cntr->coords);
-		free(cntr);
-	    }
-	}
-	if (sp->iso_crvs) {
-	    struct iso_curve *icrv, *icrvs = sp->iso_crvs;
-
-	    while (icrvs) {
-		icrv = icrvs;
-		icrvs = icrvs->next;
-		iso_free(icrv);
-	    }
-	}
-	free((char *) sp);
     }
 }
 
@@ -547,92 +358,9 @@ load_file_error()
 
 /* find max len of keys and count keys with len > 0 */
 
-int
-find_maxl_keys(plots, count, kcnt)
-struct curve_points *plots;
-int count, *kcnt;
-{
-    int mlen, len, curve, cnt;
-    register struct curve_points *this_plot;
-
-    mlen = cnt = 0;
-    this_plot = plots;
-    for (curve = 0; curve < count; this_plot = this_plot->next, curve++)
-	if (this_plot->title
-	    && ((len = /*assign */ strlen(this_plot->title)) != 0)	/* HBB 980308: quiet BCC warning */
-	    ) {
-	    cnt++;
-	    if (len > mlen)
-		mlen = strlen(this_plot->title);
-	}
-    if (kcnt != NULL)
-	*kcnt = cnt;
-    return (mlen);
-}
-
-
-/* calculate the number and max-width of the keys for an splot.
- * Note that a blank line is issued after each set of contours
- */
-int
-find_maxl_keys3d(plots, count, kcnt)
-struct surface_points *plots;
-int count, *kcnt;
-{
-    int mlen, len, surf, cnt;
-    struct surface_points *this_plot;
-
-    mlen = cnt = 0;
-    this_plot = plots;
-    for (surf = 0; surf < count; this_plot = this_plot->next_sp, surf++) {
-
-	/* we draw a main entry if there is one, and we are
-	 * drawing either surface, or unlabelled contours
-	 */
-	if (this_plot->title && *this_plot->title &&
-	    (draw_surface || (draw_contour && !label_contours))) {
-	    ++cnt;
-	    len = strlen(this_plot->title);
-	    if (len > mlen)
-		mlen = len;
-	}
-	if (draw_contour && label_contours && this_plot->contours != NULL) {
-	    len = find_maxl_cntr(this_plot->contours, &cnt);
-	    if (len > mlen)
-		mlen = len;
-	}
-    }
-
-    if (kcnt != NULL)
-	*kcnt = cnt;
-    return (mlen);
-}
-
-static int
-find_maxl_cntr(contours, count)
-struct gnuplot_contours *contours;
-int *count;
-{
-    register int cnt;
-    register int mlen, len;
-    register struct gnuplot_contours *cntrs = contours;
-
-    mlen = cnt = 0;
-    while (cntrs) {
-	if (label_contours && cntrs->isNewLevel) {
-	    len = strlen(cntrs->label);
-	    if (len)
-		cnt++;
-	    if (len > mlen)
-		mlen = len;
-	}
-	cntrs = cntrs->next;
-    }
-    *count += cnt;
-    return (mlen);
-}
-
-
+/* FIXME HBB 2000508: by design, this one belongs into 'graphics', and the
+ * next to into 'graph3d'. Actually, the existence of a module like this 
+ * 'misc' is almost always a sign of bad design, IMHO */
 /* may return NULL */
 FILE *
 loadpath_fopen(filename, mode)
@@ -673,3 +401,127 @@ const char *filename, *mode;
 
     return fp;
 }
+
+/* Parse a plot style. Used by 'set style {data|function}' and by
+ * (s)plot.  */
+enum PLOT_STYLE
+get_style()
+{
+    /* defined in plot.h */
+    register enum PLOT_STYLE ps;
+
+    c_token++;
+
+    ps = lookup_table(&plotstyle_tbl[0],c_token);
+
+    c_token++;
+
+    if (ps == -1) {
+	int_error(c_token,"\
+expecting 'lines', 'points', 'linespoints', 'dots', 'impulses',\n\
+\t'yerrorbars', 'xerrorbars', 'xyerrorbars', 'steps', 'fsteps',\n\
+\t'histeps', 'boxes', 'boxerrorbars', 'boxxyerrorbars', 'vector',\n\
+\t'financebars', 'candlesticks', 'errorlines', 'xerrorlines',\n\
+\t'yerrorlines', 'xyerrorlines'");
+	ps = LINES;
+    }
+
+    return ps;
+}
+
+/* line/point parsing...
+ *
+ * allow_ls controls whether we are allowed to accept linestyle in
+ * the current context [ie not when doing a  set linestyle command]
+ * allow_point is whether we accept a point command
+ * We assume compiler will optimise away if(0) or if(1)
+ */
+
+void
+lp_use_properties(lp, tag, pointflag)
+struct lp_style_type *lp;
+int tag, pointflag;
+{
+    /*  This function looks for a linestyle defined by 'tag' and copies
+     *  its data into the structure 'lp'.
+     *
+     *  If 'pointflag' equals ZERO, the properties belong to a linestyle
+     *  used with arrows.  In this case no point properties will be
+     *  passed to the terminal (cf. function 'term_apply_lp_properties' below).
+     */
+
+    struct linestyle_def *this;
+
+    this = first_linestyle;
+    while (this != NULL) {
+	if (this->tag == tag) {
+	    *lp = this->lp_properties;
+	    lp->pointflag = pointflag;
+	    return;
+	} else {
+	    this = this->next;
+	}
+    }
+
+    /* tag not found: */
+    int_error(NO_CARET,"linestyle not found", NO_CARET);
+}
+
+
+#if defined(__FILE__) && defined(__LINE__) && defined(DEBUG_LP)
+# define LP_DUMP(lp) \
+ fprintf(stderr, \
+  "lp_properties at %s:%d : lt: %d, lw: %.3f, pt: %d, ps: %.3f\n", \
+  __FILE__, __LINE__, lp->l_type, lp->l_width, lp->p_type, lp->p_size)
+#else
+# define LP_DUMP(lp)
+#endif
+
+/* was a macro in plot.h */
+void
+lp_parse(lp, allow_ls, allow_point, def_line, def_point)
+struct lp_style_type *lp;
+int allow_ls, allow_point, def_line, def_point;
+{
+    struct value t;
+
+    if (allow_ls && (almost_equals(c_token, "lines$tyle") ||
+		     equals(c_token, "ls" ))) {
+	c_token++;
+	lp_use_properties(lp, (int) real(const_express(&t)), allow_point);
+    } else {
+	if (almost_equals(c_token, "linet$ype") || equals(c_token, "lt" )) {
+	    c_token++;
+#ifdef PM3D
+	    if (almost_equals(c_token, "pal$ette")) {
+		lp->use_palette = 1;
+		lp->l_type = def_line;
+		++c_token;
+	    } else {
+		lp->use_palette = 0;
+#endif
+		lp->l_type = (int) real(const_express(&t))-1;
+#ifdef PM3D
+	    }
+#endif
+	} else lp->l_type = def_line;
+	if (almost_equals(c_token, "linew$idth") || equals(c_token, "lw" )) {
+	    c_token++;
+	    lp->l_width = real(const_express(&t));
+	} else lp->l_width = 1.0;
+	if ( (lp->pointflag = allow_point) != 0) {
+	    if (almost_equals(c_token, "pointt$ype") ||
+		equals(c_token, "pt" )) {
+		c_token++;
+		lp->p_type = (int) real(const_express(&t))-1;
+	    } else lp->p_type = def_point;
+	    if (almost_equals(c_token, "points$ize") ||
+		equals(c_token, "ps" )) {
+		c_token++;
+		lp->p_size = real(const_express(&t));
+	    } else lp->p_size = pointsize; /* as in "set pointsize" */
+	} else lp->p_size = pointsize; /* give it a value */
+	LP_DUMP(lp);
+    }
+}
+

@@ -12,6 +12,14 @@
 
 	* src/save.c: set linestyle --> set style line
 
+2000-10-30  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/axis.c (gen_tics): pass NULL to callback for minitics, not "".
+	Fixes bug observed by J.R. van Zandt today.
+
+	* src/graphics.c (widest2d_callback): do nothing if 'text' argument
+	was NULL. 
+
 2000-10-27  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* term/pstricks.trm (PSTRICKS_xscale): removed, as it was
@@ -163,6 +171,37 @@
 	  - multiplot support
 	  - autoconf support
 	  - mode selection support
+
+2000-10-21  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* term/post.trm: bug fixed in Dick's overprinting patch: '10^{2}'
+	would come out as '10' without the exponent.
+
+	* src/set.c (fill_numbers_into_string): new function. Implements
+	long-outstanding feature of 'set label' with variable values in it
+	--- e.g. from 'fit' results, or parameters used in the plot.
+	(set_label): use the above, and remove unneeded checks from the
+	option parsing.
+
+	* src/axis.c (gprintf): remove 'static' qualifier, to make it
+	usable from set.c. FIXME: maybe it should move out of axis.c, into
+	util.c or so.
+
+
+2000-10-21  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/axis.h (X_AXIS): new macro to reduce code clutter.
+	'axis_array[FIRST_X_AXIS]' was getting a bit tedious to type.
+	(Y_AXIS): dito.
+	(Z_AXIS): dito.
+	(x_axis, y_axis, z_axis): new global variables to serve as
+	parameters for those macros. Replace function-local versions
+	in several places.
+
+	* all over the place: use the new macros to reduce code clutter.
+
+	* src/fit.c (fit_command): don't pass 'islog_override' to the
+	AXIS_INIT3D calls. Would cause 'fit' to unset log, involuntarily.
 
 2000-10-20  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
@@ -330,6 +369,16 @@
 	Note: not implemented for TeX-like terminals, which draw arrows
 	by their own method.
 
+2000-07-26 Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/axis.h (STORE_WITH_LOG_AND_UPDATE_RANGE): don't store
+	if AXIS argument is -1, which means 'invalid'.
+	
+2000-07-26  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/variable.c (loadpath_handler): in ACTION_CLEAR, make
+	sure 'limit' is properly initialized, too.
+	
 2000-07-25  Petr Mikulik <mikulik@physics.muni.cz>
 
 	* src/graphics.c src/plot.c src/plot2d.c src/plot3d.c src/plot.h
@@ -371,14 +420,46 @@
 	option for rotating x,y,z axes labels; once it possesses it, the above 
 	mentioned variable would be replaced by the new one.
 
+2000-07-25  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* all over the place: restructured axis module global 
+	variables. Instead of sevaral separate arrays, it's now
+	a single array of structs, to bring it even closer to the
+	idea of an OO-style axis class. 
+	* removed some more occurances of 'extern' from .trm and
+	.c files. 'extern' should only ever be needed in headers.
+
+2000-07-18  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/hidden3d.c: implemented TEST_QUADTREE code, finally.
+	Use a spatially oriented explicit datastructure (an xy
+	grid of cells, with a polygon list in each), instead of
+	the previous single large list plus a quick-out test.
+
+2000-07-15  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/graph3d.c, src/hidden3d.c: allow non-grid datasets
+	to exist even in hidden3d plot. The new hidden3d routine
+	can cope with that case, too (after some fiddling).
+	
 2000-06-23  Johannes Zellner <johannes@zellner.org>
 
 	* src/gplt_x11.c: repaired `selection' (by left mouse).
 	I really don't know when and how this got broken!
 
+2000-06-22  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/graph3d.c, src/util3d.c, src/hidden3d.c: implemented
+	hiddenlining for contour lines on surface and baseplane.
+
 2000-06-20  Juha Takala  <juha.takala@vtt.fi>
 
 	* gplt_x11.c: Add missing forward slash to path for .Xdefaults.
+
+2000-06-18  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/graph3d.c, src/util3d.c, src/hidden3d.c: implemented
+	hiddenlining for tic labels, axes and grid lines, again.
 
 2000-06-15  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
@@ -421,6 +502,68 @@
 2000-06-09  Johannes Zellner <johannes@zellner.org>
 
 	* src/save.c: don't close the fp's if it's stdout
+
+2000-06-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* term/post.trm: Dick Crawford's enhanced postscript overprinting
+	feature patch.
+	(ENHPS_recurse): additional argument 'overprint'.
+
+	* src/set.c (set_allzeroaxis): fix typo FIRST_X_AXIS vs.
+	FIRST_Y_AXIS.
+
+	* src/util3d.h: move prototypes for functions clip_point(),
+	draw_clip_line(), clip_put_text(), clip_put_text_just(),
+	clip_line() to gadgets.h; add prototype for newly global
+	map3d_xyz().
+
+
+	* src/util3d.c (clip_point): move from here to gadgets.c
+	(draw_clip_line): dito.
+	(clip_put_text): dito.
+	(clip_put_text_just): dito.
+	(clip_line): dito.
+	(map3d_xyz): move here from hidden3d.c, and make global.
+
+	* src/hidden3d.h: remove prototype for draw_line_hidden.
+
+	* src/hidden3d.c: move static function map3d_xyz out here, into
+	util3d.c.
+	(draw_line_hidden): function commented out, as it is now unused.
+
+	* src/graphics.c: #include "gadgets.h", instead of "graph3d.h" and
+	"util3d.h";
+	(do_plot): replace DRAW_ZEROAXIS macro by function
+	axis_draw_2d_zeroaxis() implemented in axis.[ch].
+	
+	* src/graph3d.h: move declaration of global suppressMove, and
+	prototypes of clip_move(), clip_vector() to gadgets.h
+
+	* src/graph3d.c: #include "gadgets.h" instead of "graphics.h";
+	move global suppressMove out of here; move clip_move() and
+	clip_vector() out of here
+	(draw_bottom_grid): calculate back_y together with zaxis_{x,y},
+	instead of doing it separately in another if block.
+	(): deactivated the whole code for drawing the base plane: it will
+	have to be redone from scratch.
+
+	* src/gadgets.h: #include "syscfg.h" added; move declararation of
+	global suppressMove here; move prototypes for draw_clip_line(),
+	clip_line(), clip_point(), clip_put_text(), clip_put_text_just(),
+	clip_move(), clip_vector() here
+
+	* src/gadgets.c: moved global variable 'suppressMove' to this
+	source file.
+	(clip_point, draw_clip_line, clip_put_text, clip_put_text_just,
+	clip_line, clip_move, clip_vector): moved to this source file
+
+	* src/datafile.c: (df_gets): added a prompt for interactive input
+	of inline data.
+
+	* src/axis.c (axis_draw_2d_zeroaxis): new function, centralizes 
+	code previously found in graphics.c
+
+	* src/axis.h: prototype for axis_draw_2d_zeroaxis added.
 
 2000-06-09  Johannes Zellner <johannes@zellner.org>
 

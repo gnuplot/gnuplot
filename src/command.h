@@ -1,5 +1,5 @@
 /*
- * $Id: command.h,v 1.15.2.2 2000/06/04 12:53:20 joze Exp $
+ * $Id: command.h,v 1.18 2000/10/31 19:59:30 joze Exp $
  */
 
 /* GNUPLOT - command.h */
@@ -37,20 +37,37 @@
 #ifndef GNUPLOT_COMMAND_H
 # define GNUPLOT_COMMAND_H
 
-#include "plot.h"
+#include "gp_types.h"
+#include "stdfn.h"
 
-/* Collect all global vars in one file.
- * The comments may go at a later date,
- * but are needed for reference now
- *
- * Maybe this should be split into separate files
- * for 2d/3d/parser/other?
- *
- * The ultimate target is of course to eliminate global vars.
- */
+#define PROMPT "gnuplot> "
+
+extern char *input_line;
+
+extern int inline_num;
+
+typedef struct lexical_unit {	/* produced by scanner */
+    TBOOLEAN is_token;		/* true if token, false if a value */ 
+    struct value l_val;
+    int start_index;		/* index of first char in token */
+    int length;			/* length of token in chars */
+} lexical_unit;
+
+extern struct lexical_unit *token;
+extern int token_table_size;
+extern int plot_token;
+#define END_OF_COMMAND (c_token >= num_tokens || equals(c_token,";"))
+
+extern char *replot_line;
+
+/* flag to disable `replot` when some data are sent through stdin;
+ * used by mouse/hotkey capable terminals */
+extern TBOOLEAN replot_disabled;
+
+
+extern TBOOLEAN is_3d_plot;
 
 extern struct udft_entry *dummy_func;
-extern char c_dummy_var[MAX_NUM_VAR][MAX_ID_LEN+1];
 
 #ifndef STDOUT
 # define STDOUT 1

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: history.c,v 1.2.2.1 2000/05/03 21:26:11 joze Exp $"); }
+static char *RCSid() { return RCSid("$Id: history.c,v 1.4 2000/10/31 19:59:31 joze Exp $"); }
 #endif
 
 /* GNUPLOT - history.c */
@@ -250,7 +250,8 @@ char *cmd;
 
 #elif defined(HAVE_LIBREADLINE)
 
-#include <readline/history.h>
+/* #include <readline/history.h> --- HBB 20000508: no #inc'ed directly from 
+ * this module's header */
 
 /*
  * Interface between 'gnuplot' and GNU 'readline-4.0'.

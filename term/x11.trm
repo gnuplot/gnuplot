@@ -1,5 +1,5 @@
 /*
- * $Id: x11.trm,v 1.26.2.2 2000/05/16 11:27:10 joze Exp $
+ * $Id: x11.trm,v 1.30 2000/10/31 19:59:32 joze Exp $
  *
  */
 
@@ -117,7 +117,9 @@ static int X11_Display = 0;
  * the pipe. Unfortunately, the handlers take different parameters.
  */
 
-#ifdef NO_ATEXIT
+/* FIXME HBB 20000416: this has to be moved out of here. The
+ * opengl term uses this block, too... */
+#if !defined (HANDLER_PROTO) && defined(NO_ATEXIT)
 # define HANDLER_PROTO  __PROTO((int x, void *y))
 # define HANDLER_DECL (x,y) int x; void *y;
 # define HANDLER_PARAMS (0,NULL)

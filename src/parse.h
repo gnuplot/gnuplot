@@ -1,5 +1,5 @@
 /*
- * $Id: parse.h,v 1.3.2.1 2000/05/03 21:26:11 joze Exp $
+ * $Id: parse.h,v 1.5 2000/10/31 19:59:31 joze Exp $
  */
 
 /* GNUPLOT - parse.h */
@@ -37,7 +37,14 @@
 #ifndef PARSE_H
 # define PARSE_H
 
-#include "plot.h"
+# include "syscfg.h"
+# include "gp_types.h"
+
+#include "eval.h"
+
+#define MAX_AT_LEN 150		/* max number of entries in action table */
+
+/* externally usable types defined by parse.h */
 
 enum operators {
     /* keep this in line with table in eval.c */
@@ -45,9 +52,11 @@ enum operators {
     LOR, LAND, BOR, XOR, BAND, EQ, NE, GT, LT, GE, LE, PLUS, MINUS, MULT,
     DIV, MOD, POWER, FACTORIAL, BOOLE,
     DOLLARS, /* for using extension - div */
-    /* only jump operators go between jump and sf_start */
+    /* only jump operators go between jump and sf_start, for is_jump() */
     JUMP, JUMPZ, JUMPNZ, JTERN, SF_START
 };
+#define is_jump(operator) \
+    ((operator) >=(int)JUMP && (operator) <(int)SF_START)
 
 /* action table entry */
 struct at_entry {
@@ -62,6 +71,19 @@ struct at_type {
     struct at_entry actions[MAX_AT_LEN];
 };
 
+
+/* exported variables of parse.c */
+
+/* The choice of dummy variables, as set by 'set dummy', 'set polar'
+ * and 'set parametric' */
+extern char set_dummy_var[MAX_NUM_VAR][MAX_ID_LEN+1];
+/* the currently used 'dummy' variables. Usually a copy of
+ * set_dummy_var, but may be changed by the '(s)plot' command
+ * containing an explicit range (--> 'plot [phi=0..pi]') */
+extern char c_dummy_var[MAX_NUM_VAR][MAX_ID_LEN+1];
+
+
+/* Prototypes of exported functions in parse.c */
 
 /* void fpe __PROTO((void)); */
 void evaluate_at __PROTO((struct at_type *at_ptr, struct value *val_ptr));

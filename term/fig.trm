@@ -1,5 +1,5 @@
 /*
- * $Id: fig.trm,v 1.19.2.5 2000/10/31 14:48:19 joze Exp $
+ * $Id: fig.trm,v 1.23 2000/10/31 19:59:32 joze Exp $
  */
 
 /* GNUPLOT - fig.trm */
@@ -101,9 +101,9 @@ TERM_PUBLIC void FIG_filled_polygon (int, gpiPoint *);
 #define FIG_ROMAN_FONT (0)	/* actually, the default font */
 
 #if METRIC
-  #define INCH FALSE
+# define INCH FALSE
 #else
-  #define INCH TRUE
+# define INCH TRUE
 #endif
 
 /* These should not be defined elsewhere - ACZ */

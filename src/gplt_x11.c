@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.16 2000/10/31 19:59:31 joze Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.17 2000/10/31 22:14:19 joze Exp $"); }
 #endif
 
 /* GNUPLOT - gplt_x11.c */
@@ -102,9 +102,10 @@ static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.16 2000/10/31 19:59:31 
  * (November 1999 - January 2000, Oct. 2000)
  */
 
-#ifdef HAVE_CONFIG_H
-#   include "config.h"
-#endif
+#include "syscfg.h"
+#include "stdfn.h"
+#include "gp_types.h"
+#include "term_api.h"
 
 #ifdef USE_MOUSE
 #define USE_NONBLOCKING_STDOUT
@@ -171,8 +172,6 @@ Error. Incompatible options.
 # define FD_ISSET(n, p)  ((p)->fds_bits[0] & (1 << ((n) % 32)))
 # define FD_ZERO(p)      memset((char *)(p),'\0',sizeof(*(p)))
 #endif /* not FD_SET */
-
-#include "plot.h"
 
 #if defined(HAVE_SYS_SYSTEMINFO_H) && defined(HAVE_SYSINFO)
 # include <sys/systeminfo.h>
@@ -963,6 +962,8 @@ plot_struct *plot;
 }
 
 #ifndef VMS
+
+int read_input __PROTO((void));
 
 /* Handle input.  Use read instead of fgets because stdio buffering
 * causes trouble when combined with calls to select.
@@ -2384,6 +2385,9 @@ Window window;
 }
 
 #ifdef USE_MOUSE
+
+static void update_modifiers __PROTO((unsigned int));
+
 void
 update_modifiers(state)
 unsigned int state;
@@ -2832,7 +2836,7 @@ XEvent *event;
 
 static XrmDatabase dbCmd, dbApp, dbDef, dbEnv, db = (XrmDatabase) 0;
 
-char *getenv(), *type[20];
+char *type[20];
 XrmValue value;
 
 static XrmOptionDescRec options[] = {

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.16.2.3 2000/06/14 00:38:37 joze Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.21 2000/10/31 19:59:30 joze Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -142,6 +142,7 @@ static char *RCSid() { return RCSid("$Id: datafile.c,v 1.16.2.3 2000/06/14 00:38
 #include "datafile.h"
 
 #include "alloc.h"
+#include "axis.h"
 #include "command.h"
 #include "binary.h"
 #include "gp_time.h"
@@ -149,11 +150,16 @@ static char *RCSid() { return RCSid("$Id: datafile.c,v 1.16.2.3 2000/06/14 00:38
 #include "internal.h"
 #include "misc.h"
 #include "parse.h"
-#include "setshow.h"
+#include "plot.h"
+/*  #include "setshow.h" */
 #include "util.h"
 
 /* if you change this, change the scanf in readline */
 #define NCOL   7		/* max using specs     */
+
+/* test to see if the end of an inline datafile is reached */
+#define is_EOF(c) ((c) == 'e' || (c) == 'E')
+
 
 /*{{{  static fns */
 #if 0				/* not used */
@@ -185,13 +191,18 @@ int df_line_number;
 int df_datum;			/* suggested x value if none given */
 TBOOLEAN df_matrix = FALSE;	/* is this a matrix splot */
 int df_eof = 0;
-int df_timecol[NCOL];
+AXIS_INDEX df_axis[NCOL];
 TBOOLEAN df_binary = FALSE;	/* this is a binary file */
 
 /* jev -- the 'thru' function --- NULL means no dummy vars active */
 /* HBB 990829: moved this here, from command.c */
 struct udft_entry ydata_func;
 
+/* string representing missing values in ascii datafiles */
+char *missing_val = NULL;
+
+/* If any 'inline data' are in use for the current plot, flag this */
+TBOOLEAN plotted_data_from_stdin = FALSE;
 
 /* private variables */
 
@@ -203,7 +214,7 @@ static size_t max_line_len = 0;
 #define DATA_LINE_BUFSIZ 160
 
 static FILE *data_fp = NULL;
-static TBOOLEAN pipe_open = FALSE;
+static TBOOLEAN df_pipe_open = FALSE;
 static TBOOLEAN mixed_data_fp = FALSE;
 
 #ifndef MAXINT			/* should there be one already defined ? */
@@ -523,8 +534,9 @@ int max_using;
     df_no_use_specs = 0;
 
     for (i = 0; i < NCOL; ++i) {
-	use_spec[i].column = i + 1;	/* default column */
+	use_spec[i].column = i + 1; /* default column */
 	use_spec[i].at = NULL;	/* no expression */
+	df_axis[i] = -1;	/* no timefmt for this output column */
     }
 
     if (max_using > NCOL)
@@ -546,8 +558,6 @@ int max_using;
     lastpoint = lastline = MAXINT;
 
     df_eof = 0;
-
-    memset(df_timecol, 0, sizeof(df_timecol));
 
     df_binary = 1;
     /*}}} */
@@ -630,12 +640,12 @@ int max_using;
 	if ((data_fp = popen(filename + 1, "r")) == (FILE *) NULL)
 	    os_error(name_token, "cannot create pipe for data");
 	else
-	    pipe_open = TRUE;
+	    df_pipe_open = TRUE;
     } else
 #endif /* PIPES */
 	/* I don't want to call strcmp(). Does it make a difference? */
     if (*filename == '-' && strlen(filename) == 1) {
-	plotted_data_from_stdin = 1;
+	plotted_data_from_stdin = TRUE;
 	data_fp = lf_top();
 	if (!data_fp)
 	    data_fp = stdin;
@@ -685,9 +695,9 @@ df_close()
 
     if (!mixed_data_fp) {
 #if defined(PIPES)
-	if (pipe_open) {
+	if (df_pipe_open) {
 	    (void) pclose(data_fp);
-	    pipe_open = FALSE;
+	    df_pipe_open = FALSE;
 	} else
 #endif /* PIPES */
 	    (void) fclose(data_fp);
@@ -777,7 +787,7 @@ static void
 plot_option_thru()
 {
     c_token++;
-    strcpy(c_dummy_var[0], dummy_var[0]);
+    strcpy(c_dummy_var[0], set_dummy_var[0]);
     /* allow y also as a dummy variable.
      * during plot, c_dummy_var[0] and [1] are 'sacred'
      * ie may be set by  splot [u=1:2] [v=1:2], and these
@@ -1029,12 +1039,14 @@ int max;
 		    v[output] = df_datum;	/* using 0 */
 		} else if (column <= 0)	/* really < -2, but */
 		    int_error(NO_CARET, "internal error: column <= 0 in datafile.c");
-		else if (df_timecol[output]) {
+		else if ((df_axis[output] != -1) 
+		         && (axis_array[df_axis[output]].is_timedata)) {
 		    struct tm tm;
 		    if (column > df_no_cols ||
 			df_column[column - 1].good == DF_MISSING ||
 			!df_column[column - 1].position ||
-			!gstrptime(df_column[column - 1].position, timefmt, &tm)
+			!gstrptime(df_column[column - 1].position,
+				   axis_array[df_axis[output]].timefmt, &tm)
 			) {
 			/* line bad only if user explicitly asked for this column */
 			if (df_no_use_specs)
@@ -1138,16 +1150,11 @@ struct curve_points *this_plot;
  * y1<y2, y2<y3... .
  * Actually, I think the assumption is less strong than that--it looks like
  * the direction just has to be the same.
- * This routine expects the following to be properly initialized:
- * is_log_x, is_log_y, and is_log_z 
- * base_log_x, base_log_y, and base_log_z 
- * log_base_log_x, log_base_log_y, and log_base_log_z 
- * xmin,ymin, and zmin
- * xmax,ymax, and zmax
- * autoscale_lx, autoscale_ly, and autoscale_lz
  *
- * does the autoscaling into the array versions (min_array[], max_array[])
- */
+ * This routine expects all the 'axis array' variables (now gathered
+ * in axis.h) to be properly initialized
+ *
+ * does the autoscaling into the array versions (min_array[], max_array[]) */
 
 int
 df_3dmatrix(this_plot)
@@ -1243,103 +1250,9 @@ struct surface_points *this_plot;
 
 	    point->type = INRANGE;	/* so far */
 
-	    /*{{{  autoscaling/clipping */
-	    /*{{{  autoscale/range-check x */
-	    if (used[0] > 0 || !is_log_x) {
-		if (used[0] < min_array[FIRST_X_AXIS]) {
-		    if (autoscale_lx & 1)
-			min_array[FIRST_X_AXIS] = used[0];
-		    else
-			point->type = OUTRANGE;
-		}
-		if (used[0] > max_array[FIRST_X_AXIS]) {
-		    if (autoscale_lx & 2)
-			max_array[FIRST_X_AXIS] = used[0];
-		    else
-			point->type = OUTRANGE;
-		}
-	    }
-	    /*}}} */
-
-	    /*{{{  autoscale/range-check y */
-	    if (used[1] > 0 || !is_log_y) {
-		if (used[1] < min_array[FIRST_Y_AXIS]) {
-		    if (autoscale_ly & 1)
-			min_array[FIRST_Y_AXIS] = used[1];
-		    else
-			point->type = OUTRANGE;
-		}
-		if (used[1] > max_array[FIRST_Y_AXIS]) {
-		    if (autoscale_ly & 2)
-			max_array[FIRST_Y_AXIS] = used[1];
-		    else
-			point->type = OUTRANGE;
-		}
-	    }
-	    /*}}} */
-
-	    /*{{{  autoscale/range-check z */
-	    if (used[2] > 0 || !is_log_z) {
-		if (used[2] < min_array[FIRST_Z_AXIS]) {
-		    if (autoscale_lz & 1)
-			min_array[FIRST_Z_AXIS] = used[2];
-		    else
-			point->type = OUTRANGE;
-		}
-		if (used[2] > max_array[FIRST_Z_AXIS]) {
-		    if (autoscale_lz & 2)
-			max_array[FIRST_Z_AXIS] = used[2];
-		    else
-			point->type = OUTRANGE;
-		}
-	    }
-	    /*}}} */
-	    /*}}} */
-
-	    /*{{{  log x */
-	    if (is_log_x) {
-		if (used[0] < 0.0) {
-		    point->type = UNDEFINED;
-		    goto skip;
-		} else if (used[0] == 0.0) {
-		    point->type = OUTRANGE;
-		    used[0] = -VERYLARGE;
-		} else
-		    used[0] = log(used[0]) / log_base_log_x;
-	    }
-	    /*}}} */
-
-	    /*{{{  log y */
-	    if (is_log_y) {
-		if (used[1] < 0.0) {
-		    point->type = UNDEFINED;
-		    goto skip;
-		} else if (used[1] == 0.0) {
-		    point->type = OUTRANGE;
-		    used[1] = -VERYLARGE;
-		} else
-		    used[1] = log(used[1]) / log_base_log_y;
-	    }
-	    /*}}} */
-
-	    /*{{{  log z */
-	    if (is_log_z) {
-		if (used[2] < 0.0) {
-		    point->type = UNDEFINED;
-		    goto skip;
-		} else if (used[2] == 0.0) {
-		    point->type = OUTRANGE;
-		    used[2] = -VERYLARGE;
-		} else
-		    used[2] = log(used[2]) / log_base_log_z;
-	    }
-	    /*}}} */
-
-	    point->x = used[0];
-	    point->y = used[1];
-	    point->z = used[2];
-
-
+	    STORE_WITH_LOG_AND_UPDATE_RANGE(point->x, used[0], point->type, FIRST_X_AXIS, NOOP, goto skip);
+	    STORE_WITH_LOG_AND_UPDATE_RANGE(point->y, used[1], point->type, FIRST_Y_AXIS, NOOP, goto skip);
+	    STORE_WITH_LOG_AND_UPDATE_RANGE(point->z, used[2], point->type, FIRST_Z_AXIS, NOOP, goto skip);
 	    /* some of you wont like this, but I say goto is for this */
 
 	  skip:
@@ -1426,13 +1339,27 @@ void
 f_timecolumn()
 {
     struct value a;
-    int column;
+    int column, output;
     struct tm tm;
+    int limit = (df_no_use_specs ? df_no_use_specs : NCOL);
+
     (void) pop(&a);
     column = (int) magnitude(&a) - 1;
+
+    /* try to match datafile column with output field number */
+    for (output=0; output<limit; output++)
+	if(use_spec[output].column == column)
+	    break;
+
     if (column < 0 || column >= df_no_cols ||
 	!df_column[column].position ||
-	!gstrptime(df_column[column].position, timefmt, &tm)) {
+	/* FIXME HBB 20000507: what's the correct _output_ column
+	 * number?  This is where my design error of associating time
+	 * parsing formats with the axes (output quantities!), instead
+	 * of the input fields, raises its ugly head. */
+	output == limit ||
+	!gstrptime(df_column[column].position,
+		   axis_array[df_axis[output]].timefmt, &tm)) {
 	undefined = TRUE;
 	push(&a);		/* any objection to this ? */
     } else

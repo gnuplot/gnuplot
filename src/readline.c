@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: readline.c,v 1.18 2000/02/11 19:17:20 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: readline.c,v 1.19.4.2 2000/07/26 18:52:58 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - readline.c */
@@ -52,15 +52,16 @@ static char *RCSid() { return RCSid("$Id: readline.c,v 1.18 2000/02/11 19:17:20 
 
 #include "alloc.h"
 #include "gp_hist.h"
+#include "plot.h"
 #include "util.h"
+#include "term_api.h"
 
 #if defined(HAVE_LIBREADLINE)
-#include <readline/readline.h>
-#include <readline/history.h>
+/* #include <readline/readline.h> --- HBB 20000508: now included by readline.h*/
+/* #include <readline/history.h> --- HBB 20000508: now included by gp_hist */
 
 
 #if defined(USE_MOUSE) && !defined(OS2)
-#include "setshow.h" /* for the variable multiplot */
 static char* line_buffer;
 static int line_complete;
 
@@ -244,8 +245,7 @@ static int ansi_getc __PROTO((void));
 # ifdef _Windows
 #  include <windows.h>
 #  include "win/wtext.h"
-#  include "win/wgnuplib.h"
-extern TW textwin;
+#  include "win/winmain.h"
 #  define TEXTUSER 0xf1
 #  define TEXTGNUPLOT 0xf0
 #  define special_getc() msdos_getch()

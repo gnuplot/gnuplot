@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot.c,v 1.31.2.4 2000/08/04 14:01:27 joze Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot.c,v 1.36 2000/10/31 19:59:31 joze Exp $"); }
 #endif
 
 /* GNUPLOT - plot.c */
@@ -55,10 +55,15 @@ static char *RCSid() { return RCSid("$Id: plot.c,v 1.31.2.4 2000/08/04 14:01:27 
 #include "command.h"
 #include "eval.h"
 #include "fit.h"
+#include "gp_hist.h"
 #include "misc.h"
+#include "readline.h"
 #include "setshow.h"
 #include "term_api.h"
 #include "util.h"
+#include "variable.h"
+#include "version.h"
+
 #ifdef USE_MOUSE
 #   ifndef OS2
 #       include "ipc.h"   /* for isatty_state */
@@ -103,8 +108,6 @@ extern smg$create_key_table();
  * so I don't put this into a header file. -lh
  */
 #ifdef HAVE_LIBREADLINE
-# include <readline/readline.h>
-# include <readline/history.h>
 extern int rl_complete_with_tilde_expansion;
 
 /* enable gnuplot history with readline */
@@ -145,11 +148,6 @@ const char *user_shell = NULL;
 const char *user_gnuplotpath = NULL;
 #endif
 
-/* flags to disable `replot` when some data are sent through stdin; used by
-   mouse/hotkey capable terminals */
-int plotted_data_from_stdin = 0;
-int replot_disabled = 0;
-
 #ifdef X11
 extern int X11_args __PROTO((int, char **));
 #endif
@@ -182,8 +180,7 @@ static int exit_status = EXIT_SUCCESS;
 # endif
 # include <os2.h>
 # include <process.h>
-ULONG RexxInterface(PRXSTRING, PUSHORT, PRXSTRING);
-int ExecuteMacro(char *, int);
+static ULONG RexxInterface(PRXSTRING, PUSHORT, PRXSTRING);
 TBOOLEAN CallFromRexx = FALSE;
 void PM_intc_cleanup();
 void PM_setup();
@@ -479,8 +476,14 @@ char **argv;
 	get_user_env();
 	init_loadpath();
 	init_locale();
+	/* HBB: make sure all variables start in the same mode 'reset'
+	 * would set them to. Since the axis variables aren't in
+	 * initialized arrays any more, this is now necessary... */
+	reset_command();
 	load_rcfile();
 	init_fit();		/* Initialization of fitting module */
+
+
 
 	if (interactive && term != 0) {		/* not unknown */
 #if defined(HAVE_LIBREADLINE) && defined(GNUPLOT_HISTORY)
@@ -935,5 +938,3 @@ wrapper_for_write_history()
 #endif
 }
 #endif /* HAVE_LIBREADLINE && GNUPLOT_HISTORY */
-
-int ignore_enhanced_text = 0;

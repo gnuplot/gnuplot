@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: time.c,v 1.10.2.1 2000/05/03 21:26:12 joze Exp $"); }
+static char *RCSid() { return RCSid("$Id: time.c,v 1.12 2000/10/31 19:59:31 joze Exp $"); }
 #endif
 
 /* GNUPLOT - time.c */
@@ -51,6 +51,7 @@ static char *RCSid() { return RCSid("$Id: time.c,v 1.10.2.1 2000/05/03 21:26:12 
 #include "gp_time.h"
 
 #include "util.h"
+#include "variable.h"
 
 /* build as a standalone test */
 
@@ -106,7 +107,7 @@ char *full_day_names[] =
 
 #else /* TEST_TIME */
 
-# include "setshow.h"		/* for month names etc */
+/*  # include "setshow.h" */		/* for month names etc */
 
 #endif /* TEST_TIME */
 

@@ -1,5 +1,5 @@
 /*
- * $Id: readline.h,v 1.4.2.1 2000/05/03 21:26:12 joze Exp $
+ * $Id: readline.h,v 1.6 2000/10/31 19:59:31 joze Exp $
  */
 
 /* GNUPLOT - readline.h */
@@ -39,13 +39,17 @@
 
 /* #if... / #include / #define collection: */
 
-#include "plot.h"
-
+#include "syscfg.h"
 /* Type definitions */
 
 /* Variables of readline.c needed by other modules: */
 
 /* Prototypes of functions exported by readline.c */
+
+#ifdef HAVE_LIBREADLINE
+# include "stdfn.h"	/* <readline/readline.h> needs stdio.h... */
+# include <readline/readline.h>
+#endif
 
 #if defined(READLINE) && !defined(HAVE_LIBREADLINE)
 char *readline __PROTO((const char *));

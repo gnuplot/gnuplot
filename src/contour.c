@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: contour.c,v 1.11.2.2 2000/10/23 04:35:27 joze Exp $"); }
+static char *RCSid() { return RCSid("$Id: contour.c,v 1.14 2000/10/31 19:59:30 joze Exp $"); }
 #endif
 
 /* GNUPLOT - contour.c */
@@ -49,29 +49,29 @@ static char *RCSid() { return RCSid("$Id: contour.c,v 1.11.2.2 2000/10/23 04:35:
 #include "contour.h"
 
 #include "alloc.h"
-#include "graphics.h"
-#include "setshow.h"
+#include "axis.h"
+/*  #include "setshow.h" */
 
-#define DEFAULT_NUM_APPROX_PTS 5
-#define DEFAULT_BSPLINE_ORDER  3
-#define MAX_NUM_APPROX_PTS     100
-#define MAX_BSPLINE_ORDER      10	/* ?? Not used ?? */
+/* exported variables (to be handled by the 'set' and friends): */
 
-/* for some reason these symbols are also defined in plot.h under different */
-/* names */
-#define INTERP_NOTHING  CONTOUR_KIND_LINEAR	/* Kind of interpolations on contours. */
-#define INTERP_CUBIC    CONTOUR_KIND_CUBIC_SPL	/* Cubic spline interp. */
-#define APPROX_BSPLINE  CONTOUR_KIND_BSPLINE	/* Bspline interpolation. */
+char contour_format[32] = "%8.3g";	/* format for contour key entries */
+t_contour_kind contour_kind = CONTOUR_KIND_LINEAR;
+t_contour_levels_kind contour_levels_kind = LEVELS_AUTO;
+int contour_levels = DEFAULT_CONTOUR_LEVELS;
+int contour_order = DEFAULT_CONTOUR_ORDER;
+int contour_pts = DEFAULT_NUM_APPROX_PTS;
 
-#define ACTIVE     1		/* Status of edges at certain Z level. */
-#define INACTIVE   2
-#define INNER_MESH 1		/* position of edge in mesh */
-#define BOUNDARY   2
-#define DIAGONAL   3
+dynarray dyn_contour_levels_list;/* storage for z levels to draw contours at */
 
-#define OPEN_CONTOUR     1	/* Contour kinds. */
-#define CLOSED_CONTOUR   2
+/* position of edge in mesh */
+typedef enum en_edge_position {
+    INNER_MESH=1,
+    BOUNDARY,
+    DIAGONAL,
+} t_edge_position;
 
+
+/* FIXME HBB 2000052: yet another local copy of 'epsilon'. Why? */
 #define EPSILON  1e-5		/* Used to decide if two float are equal. */
 
 #ifndef TRUE
@@ -94,11 +94,11 @@ static char *RCSid() { return RCSid("$Id: contour.c,v 1.11.2.2 2000/10/23 04:35:
  */
 
 struct edge_struct {
-    struct poly_struct *poly[2];	/* Each edge belongs to up to 2 polygons */
-    struct coordinate GPHUGE *vertex[2];	/* The two extreme points of this edge. */
+    struct poly_struct *poly[2]; /* Each edge belongs to up to 2 polygons */
+    struct coordinate GPHUGE *vertex[2]; /* The two extreme points of this edge. */
     struct edge_struct *next;	/* To chain lists */
-    int status,			/* Status flag to mark edges in scanning at certain Z level. */
-     position;			/* position in mesh: INNER_MESH, BOUNDARY or DIAGONNAL. */
+    TBOOLEAN is_active;		/* is edge is 'active' at certain Z level? */
+    t_edge_position position;	/* position of edge in mesh */
 };
 
 struct poly_struct {
@@ -115,9 +115,10 @@ static struct gnuplot_contours *contour_list = NULL;
 static double crnt_cntr[MAX_POINTS_PER_CNTR * 2];
 static int crnt_cntr_pt_index = 0;
 static double contour_level = 0.0;
-static int num_approx_pts = DEFAULT_NUM_APPROX_PTS;	/* # pts per approx/inter. */
-static int bspline_order = DEFAULT_BSPLINE_ORDER;	/* Bspline order to use. */
-static int interp_kind = INTERP_NOTHING;	/* Linear, Cubic interp., Bspline. */
+
+/* Linear, Cubic interp., Bspline: */
+static t_contour_kind interp_kind = CONTOUR_KIND_LINEAR;
+
 static double x_min, y_min, z_min;	/* Minimum values of x, y, and z */
 static double x_max, y_max, z_max;	/* Maximum values of x, y, and z */
 
@@ -129,12 +130,12 @@ static int update_all_edges __PROTO((struct edge_struct * p_edges,
 				     double z_level));
 static struct cntr_struct *gen_one_contour __PROTO((
 						       struct edge_struct * p_edges, double
-						       z_level, int *contr_kind,
+						       z_level, TBOOLEAN *contr_isclosed,
 						       int *num_active));
 static struct cntr_struct *trace_contour __PROTO((
 						     struct edge_struct * pe_start, double
 						     z_level, int *num_active,
-						     int contr_kind));
+						     TBOOLEAN contr_isclosed));
 static struct cntr_struct *update_cntr_pt __PROTO((struct edge_struct * p_edge,
 						   double z_level));
 static int fuzzy_equal __PROTO((struct cntr_struct * p_cntr1,
@@ -159,44 +160,42 @@ static struct poly_struct *add_poly __PROTO((struct edge_struct * edge0,
 
 static void put_contour __PROTO((struct cntr_struct * p_cntr, double z_level,
 				 double xx_min, double xx_max, double yy_min, double yy_max,
-				 int contr_kind));
+				 TBOOLEAN contr_isclosed));
 static void put_contour_nothing __PROTO((struct cntr_struct * p_cntr));
 static int chk_contour_kind __PROTO((struct cntr_struct * p_cntr,
-				     int contr_kind));
+				     TBOOLEAN contr_isclosed));
 static void put_contour_cubic __PROTO((struct cntr_struct * p_cntr,
 				       double z_level, double xx_min, double xx_max, double
 				       yy_min, double yy_max,
-				       int contr_kind));
+				       TBOOLEAN contr_isclosed));
 static void put_contour_bspline __PROTO((struct cntr_struct * p_cntr,
 					 double z_level, double xx_min, double xx_max, double
 					 yy_min, double yy_max,
-					 int contr_kind));
+					 TBOOLEAN contr_isclosed));
 static void free_contour __PROTO((struct cntr_struct * p_cntr));
 static int count_contour __PROTO((struct cntr_struct * p_cntr));
 static int gen_cubic_spline __PROTO((int num_pts, struct cntr_struct * p_cntr,
-				     double d2x[], double d2y[], double delta_t[], int contr_kind,
+				     double d2x[], double d2y[], double delta_t[], TBOOLEAN contr_isclosed,
 				     double unit_x, double unit_y));
 static void intp_cubic_spline __PROTO((int n, struct cntr_struct * p_cntr,
 				       double d2x[], double d2y[], double delta_t[], int n_intpol));
 static int solve_cubic_1 __PROTO((tri_diag m[], int n));
 static void solve_cubic_2 __PROTO((tri_diag m[], double x[], int n));
 static void gen_bspline_approx __PROTO((struct cntr_struct * p_cntr,
-					int num_of_points, int order, int contr_kind));
+					int num_of_points, int order, TBOOLEAN contr_isclosed));
 static void eval_bspline __PROTO((double t, struct cntr_struct * p_cntr,
-				  int num_of_points, int order, int j, int contr_kind, double *x,
+				  int num_of_points, int order, int j, TBOOLEAN contr_isclosed, double *x,
 				  double *y));
-static double fetch_knot __PROTO((int contr_kind, int num_of_points,
+static double fetch_knot __PROTO((TBOOLEAN contr_isclosed, int num_of_points,
 				  int order, int i));
 
 /*
  * Entry routine to this whole set of contouring module.
  */
 struct gnuplot_contours *
-contour(num_isolines, iso_lines, ZLevels, approx_pts, int_kind, order1, contour_levels_kind, cont_levels_list)
+contour(num_isolines, iso_lines)
 int num_isolines;
 struct iso_curve *iso_lines;
-int ZLevels, approx_pts, int_kind, order1, contour_levels_kind;
-double *cont_levels_list;
 {
     int i;
     int num_of_z_levels;	/* # Z contour levels. */
@@ -205,10 +204,8 @@ double *cont_levels_list;
     double z = 0, dz = 0;
     struct gnuplot_contours *save_contour_list;
 
-    num_of_z_levels = ZLevels;
-    num_approx_pts = approx_pts;
-    bspline_order = order1 - 1;
-    interp_kind = int_kind;
+    num_of_z_levels = contour_levels;
+    interp_kind = contour_kind;
 
     contour_list = NULL;
 
@@ -229,7 +226,7 @@ double *cont_levels_list;
 	if (dz == 0)
 	    return NULL;	/* empty z range ? */
 	/* what is the deeper sense of this ? (joze) */
-	dz = set_tic(log10(dz), ((int) ZLevels + 1) * 2);
+	dz = set_tic(log10(dz), ((int) contour_levels + 1) * 2);
 	z = floor(z_min / dz) * dz;
 	num_of_z_levels = (int) floor((z_max - z) / dz);
     }
@@ -239,10 +236,10 @@ double *cont_levels_list;
 	    z += dz;
 	    break;
 	case LEVELS_INCREMENTAL:
-	    z = cont_levels_list[0] + i * cont_levels_list[1];
+	    z = contour_levels_list[0] + i * contour_levels_list[1];
 	    break;
 	case LEVELS_DISCRETE:
-	    z = is_log_z ? log(cont_levels_list[i]) / log_base_log_z : cont_levels_list[i];
+	    z = AXIS_LOG_VALUE(FIRST_Z_AXIS, contour_levels_list[i]);
 	    break;
 	}
 	contour_level = z;
@@ -250,9 +247,9 @@ double *cont_levels_list;
 	gen_contours(p_edges, z, x_min, x_max, y_min, y_max);
 	if (contour_list != save_contour_list) {
 	    contour_list->isNewLevel = 1;
-	    sprintf(contour_list->label, contour_format, is_log_z ? pow(base_log_z, z) : z);
+	    sprintf(contour_list->label, contour_format, AXIS_DE_LOG_VALUE(FIRST_Z_AXIS,z));
 #ifdef PM3D
-	    contour_list->z = is_log_z ? pow(base_log_z, z) : z;
+	    contour_list->z = AXIS_DE_LOG_VALUE(FIRST_Z_AXIS, z);
 #endif
 	}
     }
@@ -328,25 +325,24 @@ gen_contours(p_edges, z_level, xx_min, xx_max, yy_min, yy_max)
 struct edge_struct *p_edges;
 double z_level, xx_min, xx_max, yy_min, yy_max;
 {
-    int num_active,		/* Number of edges marked ACTIVE. */
-     contr_kind;		/* One of OPEN_CONTOUR, CLOSED_CONTOUR. */
+    int num_active;		/* Number of edges marked ACTIVE. */
+    TBOOLEAN contr_isclosed;	/* Is this contour a closed line? */
     struct cntr_struct *p_cntr;
 
     num_active = update_all_edges(p_edges, z_level);	/* Do pass 1. */
 
-    contr_kind = OPEN_CONTOUR;	/* Start to look for contour on boundaries. */
+    contr_isclosed = FALSE;	/* Start to look for contour on boundaries. */
 
     while (num_active > 0) {	/* Do Pass 2. */
 	/* Generate One contour (and update MumActive as needed): */
-	p_cntr = gen_one_contour(p_edges, z_level, &contr_kind, &num_active);
+	p_cntr = gen_one_contour(p_edges, z_level, &contr_isclosed, &num_active);
 	/* Emit it in requested format: */
-	put_contour(p_cntr, z_level, xx_min, xx_max, yy_min, yy_max, contr_kind);
+	put_contour(p_cntr, z_level, xx_min, xx_max, yy_min, yy_max, contr_isclosed);
     }
 }
 
 /*
  * Does pass 1, or marks the edges which are active (crosses this z_level)
- * as ACTIVE, and the others as INACTIVE:
  * Returns number of active edges (marked ACTIVE).
  */
 static int
@@ -360,10 +356,10 @@ double z_level;
 	/* use the same test at both vertices to avoid roundoff errors */
 	if ((p_edges->vertex[0]->z >= z_level) !=
 	    (p_edges->vertex[1]->z >= z_level)) {
-	    p_edges->status = ACTIVE;
+	    p_edges->is_active = TRUE;
 	    count++;
 	} else
-	    p_edges->status = INACTIVE;
+	    p_edges->is_active = FALSE;
 	p_edges = p_edges->next;
     }
 
@@ -373,37 +369,39 @@ double z_level;
 /*
  * Does pass 2, or find one complete contour out of the triangulation
  * data base:
- * Returns a pointer to the contour (as linked list), contr_kind is set to
- * one of OPEN_CONTOUR, CLOSED_CONTOUR, and num_active is updated.
+ *
+ * Returns a pointer to the contour (as linked list), contr_isclosed
+ * tells if the contour is a closed line or not, and num_active is
+ * updated.  
  */
 static struct cntr_struct *
-gen_one_contour(p_edges, z_level, contr_kind, num_active)
+gen_one_contour(p_edges, z_level, contr_isclosed, num_active)
 struct edge_struct *p_edges;	/* list of edges input */
 double z_level;			/* Z level of contour input */
-int *contr_kind;		/* OPEN_ or CLOESED_CONTOUR  in/out */
+TBOOLEAN *contr_isclosed;	/* open or closed contour, in/out */
 int *num_active;		/* number of active edges     in/out */
 {
     struct edge_struct *pe_temp;
 
-    if (*contr_kind == OPEN_CONTOUR) {
+    if (! *contr_isclosed) {
 	/* Look for something to start with on boundary: */
 	pe_temp = p_edges;
 	while (pe_temp) {
-	    if ((pe_temp->status == ACTIVE) && (pe_temp->position == BOUNDARY))
+	    if (pe_temp->is_active && (pe_temp->position == BOUNDARY))
 		break;
 	    pe_temp = pe_temp->next;
 	}
 	if (!pe_temp)
-	    *contr_kind = CLOSED_CONTOUR;	/* No more contours on boundary. */
+	    *contr_isclosed = TRUE;	/* No more contours on boundary. */
 	else {
-	    return trace_contour(pe_temp, z_level, num_active, *contr_kind);
+	    return trace_contour(pe_temp, z_level, num_active, *contr_isclosed);
 	}
     }
-    if (*contr_kind == CLOSED_CONTOUR) {
+    if (*contr_isclosed) {
 	/* Look for something to start with inside: */
 	pe_temp = p_edges;
 	while (pe_temp) {
-	    if ((pe_temp->status == ACTIVE) && (!(pe_temp->position == BOUNDARY)))
+	    if (pe_temp->is_active && (pe_temp->position != BOUNDARY))
 		break;
 	    pe_temp = pe_temp->next;
 	}
@@ -412,8 +410,8 @@ int *num_active;		/* number of active edges     in/out */
 	    fprintf(stderr, "gen_one_contour: no contour found\n");
 	    return NULL;
 	} else {
-	    *contr_kind = CLOSED_CONTOUR;
-	    return trace_contour(pe_temp, z_level, num_active, *contr_kind);
+	    *contr_isclosed = TRUE;
+	    return trace_contour(pe_temp, z_level, num_active, *contr_isclosed);
 	}
     }
     return NULL;		/* We should never be here, but lint... */
@@ -426,11 +424,11 @@ int *num_active;		/* number of active edges     in/out */
  * Also decreases num_active by the number of points on contour.
  */
 static struct cntr_struct *
-trace_contour(pe_start, z_level, num_active, contr_kind)
-struct edge_struct *pe_start;	/* edge to start contour input */
-double z_level;			/* Z level of contour input */
-int *num_active;		/* number of active edges in/out */
-int contr_kind;			/* OPEN_ or CLOESED_CONTOUR    input */
+trace_contour(pe_start, z_level, num_active, contr_isclosed)
+    struct edge_struct *pe_start; /* edge to start contour input */
+    double z_level;		/* Z level of contour input */
+    int *num_active;		/* number of active edges in/out */
+    TBOOLEAN contr_isclosed;	/* open or closed contour line (input) */
 {
     struct cntr_struct *p_cntr, *pc_tail;
     struct edge_struct *p_edge, *p_next_edge;
@@ -440,8 +438,8 @@ int contr_kind;			/* OPEN_ or CLOESED_CONTOUR    input */
     p_edge = pe_start;		/* first edge to start contour */
 
     /* Generate the header of the contour - the point on pe_start. */
-    if (contr_kind == OPEN_CONTOUR) {
-	pe_start->status = INACTIVE;
+    if (! contr_isclosed) {
+	pe_start->is_active = FALSE;
 	(*num_active)--;
     }
     if (p_edge->poly[0] || p_edge->poly[1]) {	/* more than one point */
@@ -457,7 +455,7 @@ int contr_kind;			/* OPEN_ or CLOESED_CONTOUR    input */
 	    p_next_edge = NULL;	/* In case of error, remains NULL. */
 	    for (i = 0; i < 3; i++)	/* Test the 3 edges of the polygon: */
 		if (p_poly->edge[i] != p_edge)
-		    if (p_poly->edge[i]->status == ACTIVE)
+		    if (p_poly->edge[i]->is_active)
 			p_next_edge = p_poly->edge[i];
 	    if (!p_next_edge) {	/* Error exit */
 		pc_tail->next = NULL;
@@ -467,7 +465,7 @@ int contr_kind;			/* OPEN_ or CLOESED_CONTOUR    input */
 	    }
 	    p_edge = p_next_edge;
 	    PLastpoly = p_poly;
-	    p_edge->status = INACTIVE;
+	    p_edge->is_active = FALSE;
 	    (*num_active)--;
 
 	    /* Do not allocate contour points on diagonal edges */
@@ -486,7 +484,7 @@ int contr_kind;			/* OPEN_ or CLOESED_CONTOUR    input */
 
 	pc_tail->next = NULL;
 
-	/* For CLOSED_CONTOUR the first and last point should be equal */
+	/* For closed contour the first and last point should be equal */
 	if (pe_start == p_edge) {
 	    (p_cntr->X) = (pc_tail->X);
 	    (p_cntr->Y) = (pc_tail->Y);
@@ -693,9 +691,9 @@ struct edge_struct **p_edges;	/* list of edges output */
  */
 static void
 calc_min_max(num_isolines, iso_lines, xx_min, yy_min, zz_min, xx_max, yy_max, zz_max)
-int num_isolines;		/* number of iso-lines input */
-struct iso_curve *iso_lines;	/* iso-lines input */
-double *xx_min, *yy_min, *zz_min, *xx_max, *yy_max, *zz_max;	/* min/max values in/out */
+    int num_isolines;		/* number of iso-lines input */
+    struct iso_curve *iso_lines; /* iso-lines input */
+    double *xx_min, *yy_min, *zz_min, *xx_max, *yy_max, *zz_max; /* min/max values in/out */
 {
     int i, j, grid_x_max;
     struct coordinate GPHUGE *vertex;
@@ -727,6 +725,12 @@ double *xx_min, *yy_min, *zz_min, *xx_max, *yy_max, *zz_max;	/* min/max values i
 	}
 	iso_lines = iso_lines->next;
     }
+    /* HBB 20000426: this code didn't take into account that axes might
+     * be logscaled... */
+    axis_unlog_interval(FIRST_X_AXIS, xx_min, xx_max, 0);
+    axis_unlog_interval(FIRST_Y_AXIS, yy_min, yy_max, 0);
+    axis_unlog_interval(FIRST_Z_AXIS, zz_min, zz_max, 0);
+
     /* 
      * fprintf(stderr," x: %g, %g\n", (*xx_min), (*xx_max));
      * fprintf(stderr," y: %g, %g\n", (*yy_min), (*yy_max));
@@ -783,8 +787,8 @@ struct edge_struct **p_edge, **pe_tail;		/* pointers to edge list in/out */
  */
 static struct poly_struct *
 add_poly(edge0, edge1, edge2, p_poly, pp_tail)
-struct edge_struct *edge0, *edge1, *edge2;	/* 3 edges input */
-struct poly_struct **p_poly, **pp_tail;		/* pointers to polygon list in/out */
+    struct edge_struct *edge0, *edge1, *edge2;	/* 3 edges input */
+    struct poly_struct **p_poly, **pp_tail;		/* pointers to polygon list in/out */
 {
     struct poly_struct *pp_temp = NULL;
 
@@ -830,28 +834,28 @@ struct poly_struct **p_poly, **pp_tail;		/* pointers to polygon list in/out */
  * Calls the (hopefully) desired interpolation/approximation routine.
  */
 static void
-put_contour(p_cntr, z_level, xx_min, xx_max, yy_min, yy_max, contr_kind)
-struct cntr_struct *p_cntr;	/* contour structure input */
-double z_level,			/* Z level of contour input */
- xx_min, xx_max, yy_min, yy_max;	/* minimum/maximum values input */
-int contr_kind;			/* OPEN_ or CLOESED_CONTOUR input */
+put_contour(p_cntr, z_level, xx_min, xx_max, yy_min, yy_max, contr_isclosed)
+    struct cntr_struct *p_cntr;	/* contour structure input */
+    double z_level;		/* Z level of contour input */
+    double xx_min, xx_max, yy_min, yy_max; /* minimum/maximum values input */
+    TBOOLEAN contr_isclosed;		/* contour line closed? (input) */
 {
 
     if (!p_cntr)
 	return;			/* Nothing to do if it is empty contour. */
 
     switch (interp_kind) {
-    case INTERP_NOTHING:	/* No interpolation/approximation. */
+    case CONTOUR_KIND_LINEAR:	/* No interpolation/approximation. */
 	put_contour_nothing(p_cntr);
 	break;
-    case INTERP_CUBIC:		/* Cubic spline interpolation. */
+    case CONTOUR_KIND_CUBIC_SPL: /* Cubic spline interpolation. */
 	put_contour_cubic(p_cntr, z_level, xx_min, xx_max, yy_min, yy_max,
-			  chk_contour_kind(p_cntr, contr_kind));
+			  chk_contour_kind(p_cntr, contr_isclosed));
 
 	break;
-    case APPROX_BSPLINE:	/* Bspline approximation. */
+    case CONTOUR_KIND_BSPLINE:	/* Bspline approximation. */
 	put_contour_bspline(p_cntr, z_level, xx_min, xx_max, yy_min, yy_max,
-			    chk_contour_kind(p_cntr, contr_kind));
+			    chk_contour_kind(p_cntr, contr_isclosed));
 	break;
     }
     free_contour(p_cntr);
@@ -873,35 +877,35 @@ struct cntr_struct *p_cntr;
 }
 
 /*
- * for some reason contours are never flagged as CLOSED_CONTOUR
+ * for some reason contours are never flagged as 'isclosed'
  * if first point == last point, set flag accordingly
  *
  */
 
 static int
-chk_contour_kind(p_cntr, contr_kind)
-struct cntr_struct *p_cntr;
-int contr_kind;
+chk_contour_kind(p_cntr, contr_isclosed)
+    struct cntr_struct *p_cntr;
+    TBOOLEAN contr_isclosed;
 {
     struct cntr_struct *pc_tail = NULL;
-    int current_contr_kind;
+    TBOOLEAN current_contr_isclosed;
 
     FPRINTF((stderr, "check_contour_kind: current contr_kind value is %d\n", contr_kind));
 
-    current_contr_kind = contr_kind;
+    current_contr_isclosed = contr_isclosed;
 
-    if (contr_kind != CLOSED_CONTOUR) {
+    if (! contr_isclosed) {
 	pc_tail = p_cntr;
 	while (pc_tail->next)
 	    pc_tail = pc_tail->next;	/* Find last point. */
 
 	/* test if first and last point are equal */
 	if (fuzzy_equal(pc_tail, p_cntr)) {
-	    current_contr_kind = CLOSED_CONTOUR;
-	    FPRINTF((stderr, "check_contour_kind: contr_kind changed to %d\n", current_contr_kind));
+	    current_contr_isclosed = TRUE;
+	    FPRINTF((stderr, "check_contour_kind: contr_isclosed changed to %d\n", current_contr_isclosed));
 	}
     }
-    return (current_contr_kind);
+    return (current_contr_isclosed);
 }
 
 /*
@@ -911,10 +915,10 @@ int contr_kind;
  * parameter t is the length of the linear stroke.
  */
 static void
-put_contour_cubic(p_cntr, z_level, xx_min, xx_max, yy_min, yy_max, contr_kind)
+put_contour_cubic(p_cntr, z_level, xx_min, xx_max, yy_min, yy_max, contr_isclosed)
 struct cntr_struct *p_cntr;
 double z_level, xx_min, xx_max, yy_min, yy_max;
-int contr_kind;
+TBOOLEAN contr_isclosed;
 {
     int num_pts, num_intpol;
     double unit_x, unit_y;	/* To define norm (x,y)-plane */
@@ -928,7 +932,7 @@ int contr_kind;
     while (pc_tail->next)
 	pc_tail = pc_tail->next;
 
-    if (contr_kind == CLOSED_CONTOUR) {
+    if (contr_isclosed) {
 	/* Test if first and last point are equal (should be) */
 	if (!fuzzy_equal(pc_tail, p_cntr)) {
 	    pc_tail->next = p_cntr;	/* Close contour list - make it circular. */
@@ -950,11 +954,11 @@ int contr_kind;
 	 * Calculate second derivatives d2x[], d2y[] and interval lengths delta_t[]:
 	 */
 	if (!gen_cubic_spline(num_pts, p_cntr, d2x, d2y, delta_t,
-			      contr_kind, unit_x, unit_y)) {
+			      contr_isclosed, unit_x, unit_y)) {
 	    free((char *) delta_t);
 	    free((char *) d2x);
 	    free((char *) d2y);
-	    if (contr_kind == CLOSED_CONTOUR)
+	    if (contr_isclosed)
 		pc_tail->next = NULL;	/* Un-circular list */
 	    return;
 	}
@@ -971,20 +975,20 @@ int contr_kind;
 	free((char *) delta_t);
 	free((char *) d2x);
 	free((char *) d2y);
-	if (contr_kind == CLOSED_CONTOUR)
+	if (contr_isclosed)
 	    pc_tail->next = NULL;	/* Un-circular list */
 	return;
     }
 
     /* Calculate "num_intpol" interpolated values */
-    num_intpol = 1 + (num_pts - 1) * num_approx_pts;	/* global: num_approx_pts */
+    num_intpol = 1 + (num_pts - 1) * contour_pts;	/* global: contour_pts */
     intp_cubic_spline(num_pts, p_cntr, d2x, d2y, delta_t, num_intpol);
 
     free((char *) delta_t);
     free((char *) d2x);
     free((char *) d2y);
 
-    if (contr_kind == CLOSED_CONTOUR)
+    if (contr_isclosed)
 	pc_tail->next = NULL;	/* Un-circular list */
 
     end_crnt_cntr();
@@ -993,17 +997,18 @@ int contr_kind;
 
 /*
  * Find Bspline approximation for this data set.
- * Uses global variable num_approx_pts to determine number of samples per
+ * Uses global variable contour_pts to determine number of samples per
  * interval, where the knot vector intervals are assumed to be uniform, and
- * Global variable bspline_order for the order of Bspline to use.
+ * global variable contour_order for the order of Bspline to use.
  */
 static void
-put_contour_bspline(p_cntr, z_level, xx_min, xx_max, yy_min, yy_max, contr_kind)
+put_contour_bspline(p_cntr, z_level, xx_min, xx_max, yy_min, yy_max, contr_isclosed)
 struct cntr_struct *p_cntr;
 double z_level, xx_min, xx_max, yy_min, yy_max;
-int contr_kind;
+TBOOLEAN contr_isclosed;
 {
-    int num_pts, order = bspline_order;
+    int num_pts;
+    int order = contour_order - 1;
 
     num_pts = count_contour(p_cntr);	/* Number of points in contour. */
     if (num_pts < 2)
@@ -1012,7 +1017,7 @@ int contr_kind;
     if (order > num_pts - 1)
 	order = num_pts - 1;
 
-    gen_bspline_approx(p_cntr, num_pts, order, contr_kind);
+    gen_bspline_approx(p_cntr, num_pts, order, contr_isclosed);
     end_crnt_cntr();
 }
 
@@ -1052,15 +1057,15 @@ struct cntr_struct *p_cntr;
  * Find second derivatives (x''(t_i),y''(t_i)) of cubic spline interpolation
  * through list of points (x_i,y_i). The parameter t is calculated as the
  * length of the linear stroke. The number of points must be at least 3.
- * Note: For CLOSED_CONTOURs the first and last point must be equal.
+ * Note: For closed contours the first and last point must be equal.
  */
 static int
-gen_cubic_spline(num_pts, p_cntr, d2x, d2y, delta_t, contr_kind, unit_x, unit_y)
+gen_cubic_spline(num_pts, p_cntr, d2x, d2y, delta_t, contr_isclosed, unit_x, unit_y)
 int num_pts;			/* Number of points (num_pts>=3), input */
 struct cntr_struct *p_cntr;	/* List of points (x(t_i),y(t_i)), input */
 double d2x[], d2y[],		/* Second derivatives (x''(t_i),y''(t_i)), output */
  delta_t[];			/* List of interval lengths t_{i+1}-t_{i}, output */
-int contr_kind;			/* CLOSED_CONTOUR or OPEN_CONTOUR, input  */
+TBOOLEAN contr_isclosed;	/* Closed or open contour?, input  */
 double unit_x, unit_y;		/* Unit length in x and y (norm=1), input */
 {
     int n, i;
@@ -1079,7 +1084,7 @@ double unit_x, unit_y;		/* Unit length in x and y (norm=1), input */
 	d2x[i] = pc_temp->next->X - pc_temp->X;
 	d2y[i] = pc_temp->next->Y - pc_temp->Y;
 	/*
-	 * The Norm of a linear stroke is calculated in "normal coordinates"
+	 * The norm of a linear stroke is calculated in "normal coordinates"
 	 * and used as interval length:
 	 */
 	delta_t[i] = sqrt(SQR(d2x[i] / unit_x) + SQR(d2y[i] / unit_y));
@@ -1091,11 +1096,11 @@ double unit_x, unit_y;		/* Unit length in x and y (norm=1), input */
     }
 
     /*
-     * Setup linear System:  M * x = b
+     * Setup linear system:  m * x = b
      */
     n = num_pts - 2;		/* Without first and last point */
-    if (contr_kind == CLOSED_CONTOUR) {
-	/* First and last points must be equal for CLOSED_CONTOURs */
+    if (contr_isclosed) {
+	/* First and last points must be equal for closed contours */
 	delta_t[num_pts - 1] = delta_t[0];
 	d2x[num_pts - 1] = d2x[0];
 	d2y[num_pts - 1] = d2y[0];
@@ -1124,7 +1129,7 @@ double unit_x, unit_y;		/* Unit length in x and y (norm=1), input */
 	}
     }
 
-    if (contr_kind != CLOSED_CONTOUR) {
+    if (!contr_isclosed) {
 	/* Third derivative is set to zero at both ends */
 	m[0][1] += m[0][0];	/* M_{0,0}     */
 	m[0][0] = 0.;		/* M_{0,n-1}   */
@@ -1148,7 +1153,7 @@ double unit_x, unit_y;		/* Unit length in x and y (norm=1), input */
 	d2x[i] = d2x[i - 1];
 	d2y[i] = d2y[i - 1];
     }
-    if (contr_kind == CLOSED_CONTOUR) {
+    if (contr_isclosed) {
 	d2x[0] = d2x[n];
 	d2y[0] = d2y[n];
     } else {
@@ -1349,15 +1354,16 @@ int n;
 /*
  * Generate a Bspline curve defined by all the points given in linked list p:
  * Algorithm: using deBoor algorithm
- * Note: if Curvekind is OPEN_CONTOUR than Open end knot vector is assumed,
- *       else (CLOSED_CONTOUR) Float end knot vector is assumed.
+ * Note: if Curvekind is open contour than Open end knot vector is assumed,
+ *       else (closed contour) Float end knot vector is assumed.
  * It is assumed that num_of_points is at least 2, and order of Bspline is less
  * than num_of_points!
  */
 static void
-gen_bspline_approx(p_cntr, num_of_points, order, contr_kind)
+gen_bspline_approx(p_cntr, num_of_points, order, contr_isclosed)
 struct cntr_struct *p_cntr;
-int num_of_points, order, contr_kind;
+int num_of_points, order;
+TBOOLEAN contr_isclosed;
 {
     int knot_index = 0, pts_count = 1;
     double dt, t, next_t, t_min, t_max, x, y;
@@ -1368,7 +1374,7 @@ int num_of_points, order, contr_kind;
      * 2. Update num_of_points - increase it by "order-1" so contour will be
      *    closed. This will evaluate order more sections to close it!
      */
-    if (contr_kind == CLOSED_CONTOUR) {
+    if (contr_isclosed) {
 	pc_tail = p_cntr;
 	while (pc_tail->next)
 	    pc_tail = pc_tail->next;	/* Find last point. */
@@ -1384,11 +1390,11 @@ int num_of_points, order, contr_kind;
 	}
     }
     /* Find first (t_min) and last (t_max) t value to eval: */
-    t = t_min = fetch_knot(contr_kind, num_of_points, order, order);
-    t_max = fetch_knot(contr_kind, num_of_points, order, num_of_points);
+    t = t_min = fetch_knot(contr_isclosed, num_of_points, order, order);
+    t_max = fetch_knot(contr_isclosed, num_of_points, order, num_of_points);
     next_t = t_min + 1.0;
     knot_index = order;
-    dt = 1.0 / num_approx_pts;	/* Number of points per one section. */
+    dt = 1.0 / contour_pts;	/* Number of points per one section. */
 
 
     while (t < t_max) {
@@ -1398,22 +1404,22 @@ int num_of_points, order, contr_kind;
 	    next_t += 1.0;
 	}
 	eval_bspline(t, pc_temp, num_of_points, order, knot_index,
-		     contr_kind, &x, &y);	/* Next pt. */
+		     contr_isclosed, &x, &y);	/* Next pt. */
 	add_cntr_point(x, y);
 	pts_count++;
 	/* As we might have some real number round off problems we do      */
 	/* the last point outside the loop                                 */
-	if (pts_count == num_approx_pts * (num_of_points - order) + 1)
+	if (pts_count == contour_pts * (num_of_points - order) + 1)
 	    break;
 	t += dt;
     }
 
     /* Now do the last point */
     eval_bspline(t_max - EPSILON, pc_temp, num_of_points, order, knot_index,
-		 contr_kind, &x, &y);
+		 contr_isclosed, &x, &y);
     add_cntr_point(x, y);	/* Complete the contour. */
 
-    if (contr_kind == CLOSED_CONTOUR)	/* Update list - un-circular it. */
+    if (contr_isclosed)	/* Update list - un-circular it. */
 	pc_tail->next = NULL;
 }
 
@@ -1424,10 +1430,11 @@ int num_of_points, order, contr_kind;
  * first control point to blend with. The B-spline is of order order.
  */
 static void
-eval_bspline(t, p_cntr, num_of_points, order, j, contr_kind, x, y)
+eval_bspline(t, p_cntr, num_of_points, order, j, contr_isclosed, x, y)
 double t;
 struct cntr_struct *p_cntr;
-int num_of_points, order, j, contr_kind;
+int num_of_points, order, j;
+TBOOLEAN contr_isclosed;
 double *x, *y;
 {
     int i, p;
@@ -1445,8 +1452,8 @@ double *x, *y;
 
     for (p = 1; p <= order; p++) {	/* Iteration (b-spline level) counter. */
 	for (i = j; i >= j - order + p; i--) {	/* Control points indexing. */
-	    ti = fetch_knot(contr_kind, num_of_points, order, i);
-	    tikp = fetch_knot(contr_kind, num_of_points, order, i + order + 1 - p);
+	    ti = fetch_knot(contr_isclosed, num_of_points, order, i);
+	    tikp = fetch_knot(contr_isclosed, num_of_points, order, i + order + 1 - p);
 	    if (ti == tikp) {	/* Should not be a problems but how knows... */
 	    } else {
 		dx[i] = dx[i] * (t - ti) / (tikp - ti) +	/* Calculate x. */
@@ -1465,29 +1472,24 @@ double *x, *y;
 /*
  * Routine to get the i knot from uniform knot vector. The knot vector
  * might be float (Knot(i) = i) or open (where the first and last "order"
- * knots are equal). contr_kind determines knot kind - OPEN_CONTOUR means
- * open knot vector, and CLOSED_CONTOUR selects float knot vector.
+ * knots are equal). contr_isclosed determines knot kind - open contour means
+ * open knot vector, and closed contour selects float knot vector.
  * Note the knot vector is not exist and this routine simulates it existance
  * Also note the indexes for the knot vector starts from 0.
  */
 static double
-fetch_knot(contr_kind, num_of_points, order, i)
-int contr_kind, num_of_points, order, i;
+fetch_knot(contr_isclosed, num_of_points, order, i)
+    TBOOLEAN contr_isclosed;
+    int num_of_points, order, i;
 {
-    switch (contr_kind) {
-    case OPEN_CONTOUR:
+    if(! contr_isclosed) {
 	if (i <= order)
 	    return 0.0;
 	else if (i <= num_of_points)
 	    return (double) (i - order);
 	else
 	    return (double) (num_of_points - order);
-    case CLOSED_CONTOUR:
+    } else {
 	return (double) i;
-    default:			/* Should never happen */
-	return 1.0;
     }
-#ifdef sequent
-    return 1.0;			/* ???? */
-#endif
 }

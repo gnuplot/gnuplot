@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.23.2.2 2000/08/04 14:01:28 joze Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.27 2000/10/31 19:59:31 joze Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -77,15 +77,19 @@ static char *RCSid() { return RCSid("$Id: term.c,v 1.23.2.2 2000/08/04 14:01:28 
 #include "term_api.h"
 
 #include "alloc.h"
+#include "axis.h"
 #include "bitmap.h"
 #include "command.h"
 #include "driver.h"
 #include "graphics.h"
 #include "help.h"
 #include "parse.h"
-#include "setshow.h"
+#include "plot.h"
+/*  #include "setshow.h" */
 #include "tables.h"
+#include "term.h"
 #include "util.h"
+#include "version.h"
 
 #ifdef USE_MOUSE
 #include "mouse.h"
@@ -102,14 +106,47 @@ void close_printer __PROTO((FILE * outfile));
 # endif				/* MSC */
 #endif /* _Windows */
 
-enum { UNSET = -1, no = 0, yes = 1 };
+enum { UNSET = -1, no = 0, yes = 1 }; /* FIXME HBB 20001031: should this be here? */
 
-/* the 'output' file handle */
+
+/* Externally visible variables */
+/* the central instance: the current terminal's interface structure */
+struct termentry *term = NULL;	/* unknown */
+
+/* ... and its options string */
+char term_options[MAX_LINE_LEN+1] = "";
+
+/* the 'output' file name and handle */
+char *outstr = NULL;		/* means "STDOUT" */
 FILE *gpoutfile;
 
 /* true if terminal has been initialized */
 TBOOLEAN term_initialised;
 
+/* true if in multiplot mode */
+TBOOLEAN multiplot = FALSE;
+
+/* flag variable to disable enhanced output of filenames, mainly */
+TBOOLEAN ignore_enhanced_text = FALSE;
+
+/* text output encoding, for terminals that support it */
+enum set_encoding_id encoding;
+/* table of encoding names, for output of the setting */
+const char *encoding_names[] = {
+    "default", "iso_8859_1", "cp437", "cp850", NULL };
+/* 'set encoding' options */
+struct gen_table set_encoding_tbl[] =
+{
+    { "def$ault", S_ENC_DEFAULT },
+    { "iso$_8859_1", S_ENC_ISO8859_1 },
+    { "cp4$37", S_ENC_CP437 },
+    { "cp8$50", S_ENC_CP850 },
+    { NULL, S_ENC_INVALID }
+};
+
+
+
+/* Internal variables */
 /* true if terminal is in graphics mode */
 static TBOOLEAN term_graphics = FALSE;
 
@@ -123,7 +160,7 @@ static TBOOLEAN opened_binary = FALSE;
 static TBOOLEAN term_force_init = FALSE;
 
 /* internal pointsize for do_point */
-static double term_pointsize;
+static double term_pointsize=1;
 
 static void term_suspend __PROTO((void));
 static void term_close_output __PROTO((void));
@@ -211,7 +248,7 @@ int aesid = -1;
  */
 
 #if defined(PIPES)
-static TBOOLEAN pipe_open = FALSE;
+static TBOOLEAN output_pipe_open = FALSE;
 #endif /* PIPES */
 
 static void
@@ -225,9 +262,9 @@ term_close_output()
 	return;
 
 #if defined(PIPES)
-    if (pipe_open) {
+    if (output_pipe_open) {
 	(void) pclose(gpoutfile);
-	pipe_open = FALSE;
+	output_pipe_open = FALSE;
     } else
 #endif /* PIPES */
 #ifdef _Windows
@@ -278,7 +315,7 @@ char *dest;
 	    if ((f = popen(dest + 1, POPEN_MODE)) == (FILE *) NULL)
 		os_error(c_token, "cannot create pipe; output not changed");
 	    else
-		pipe_open = TRUE;
+		output_pipe_open = TRUE;
 	} else
 #endif /* PIPES */
 
@@ -567,6 +604,73 @@ TBOOLEAN f_interactive;
     else
 	int_error(NO_CARET, "Must set output to a file or put all multiplot commands on one input line");
 }
+
+
+void
+write_multiline(x, y, text, hor, vert, angle, font)
+    unsigned int x, y;
+    char *text;
+    JUSTIFY hor;		/* horizontal ... */
+    VERT_JUSTIFY vert;		/* ... and vertical just - text in hor direction despite angle */
+    int angle;			/* assume term has already been set for this */
+    const char *font;		/* NULL or "" means use default */
+{
+    register struct termentry *t = term;
+    char *p = text;
+
+    if (!p)
+	return;
+
+    if (vert != JUST_TOP) {
+	/* count lines and adjust y */
+	int lines = 0;		/* number of linefeeds - one fewer than lines */
+	while (*p++) {
+	    if (*p == '\n')
+		++lines;
+	}
+	if (angle)
+	    x -= (vert * lines * t->v_char) / 2;
+	else
+	    y += (vert * lines * t->v_char) / 2;
+    }
+    if (font && *font)
+	(*t->set_font) (font);
+
+
+    for (;;) {			/* we will explicitly break out */
+
+	if ((text != NULL) && (p = strchr(text, '\n')) != NULL)
+	    *p = 0;		/* terminate the string */
+
+	if ((*t->justify_text) (hor)) {
+	    (*t->put_text) (x, y, text);
+	} else {
+	    int fix = hor * (t->h_char) * strlen(text) / 2;
+	    if (angle)
+		(*t->put_text) (x, y - fix, text);
+	    else
+		(*t->put_text) (x - fix, y, text);
+	}
+	if (angle)
+	    x += t->v_char;
+	else
+	    y -= t->v_char;
+
+	if (!p)
+	    break;
+	else {
+	    /* put it back */
+	    *p = '\n';
+	}
+
+	text = p + 1;
+    }				/* unconditional branch back to the for(;;) - just a goto ! */
+
+    if (font && *font)
+	(*t->set_font) (default_font);
+
+}
+
 
 static void
 do_point(x, y, number)
@@ -1674,20 +1778,26 @@ fflush_binary()
 void
 fill_gp4mouse (void)
 {
-#ifdef USE_MOUSE
+    /* FIXME HBB 20000725: gadgets, axis and command module
+     * dependencies would be introduced by activating this code. This
+     * clearly would be a design bug */
     extern int xleft, xright, ybot, ytop;
-    extern double min_array[], max_array[];
+    extern AXIS axis_array[];
     extern int /*TBOOLEAN*/ is_3d_plot;
-#endif
 
     int rev_xy = 0;
 
 #if 0
     /* For development purposes: */
     printf("trm: [xleft,ybot] [xright,ytop] = [%i,%i]..[%i,%i]\n",xleft,ybot,xright,ytop);
-    printf("trm: [xmin,ymin] [xmax,ymax] = [%g,%g]..[%g,%g]\n",xmin,ymin,xmax,ymax);
-    printf("trm: autoscale_x=%i,  _y=%i\n",autoscale_x,autoscale_y);
-    printf("trm: true min,max = [%g,%g]..[%g,%g]\n",min_array[FIRST_X_AXIS],min_array[FIRST_Y_AXIS],max_array[FIRST_X_AXIS],max_array[FIRST_Y_AXIS]);
+    printf("trm: [xmin,ymin] [xmax,ymax] = [%g,%g]..[%g,%g]\n",
+	   xmin,ymin,xmax,ymax);
+    printf("trm: autoscale_x=%i,  _y=%i\n",
+	   axis_array[FIRST_X_AXIS].autoscale,
+	   axis_array[FIRST_Y_AXIS].autoscale);
+    printf("trm: true min,max = [%g,%g]..[%g,%g]\n",
+	   axis_array[FIRST_X_AXIS].min,axis_array[FIRST_Y_AXIS].min,
+	   axis_array[FIRST_X_AXIS].max,axis_array[FIRST_Y_AXIS].max);
     printf("trm: multiplot=%i\n",multiplot);
     printf("trm: draw_surface=%i\n",draw_surface);
     printf("trm: draw_contour=%i\n",draw_contour);
@@ -1712,32 +1822,32 @@ fill_gp4mouse (void)
       }
     /* printf("trm: gp4mouse.graph=%i\n",0+gp4mouse.graph); */
     if (!rev_xy) {
-	gp4mouse.xmin = min_array[FIRST_X_AXIS];
-	gp4mouse.ymin = min_array[FIRST_Y_AXIS];
-	gp4mouse.xmax = max_array[FIRST_X_AXIS];
-	gp4mouse.ymax = max_array[FIRST_Y_AXIS];
+	gp4mouse.xmin = axis_array[FIRST_X_AXIS].min;
+	gp4mouse.ymin = axis_array[FIRST_Y_AXIS].min;
+	gp4mouse.xmax = axis_array[FIRST_X_AXIS].max;
+	gp4mouse.ymax = axis_array[FIRST_Y_AXIS].max;
 	}
       else {
-	gp4mouse.xmin = min_array[FIRST_Y_AXIS];
-	gp4mouse.ymin = min_array[FIRST_X_AXIS];
-	gp4mouse.xmax = max_array[FIRST_Y_AXIS];
-	gp4mouse.ymax = max_array[FIRST_X_AXIS];
+	gp4mouse.xmin = axis_array[FIRST_Y_AXIS].min;
+	gp4mouse.ymin = axis_array[FIRST_X_AXIS].min;
+	gp4mouse.xmax = axis_array[FIRST_Y_AXIS].max;
+	gp4mouse.ymax = axis_array[FIRST_X_AXIS].max;
 	}
     gp4mouse.xleft = xleft;
     gp4mouse.ybot = ybot;
     gp4mouse.xright = xright;
     gp4mouse.ytop = ytop;
-    gp4mouse.is_log_x = is_log_x;
-    gp4mouse.is_log_y = is_log_y;
-    gp4mouse.is_log_z = is_log_z;
-    gp4mouse.base_log_x = base_log_x;
-    gp4mouse.base_log_y = base_log_y;
-    gp4mouse.base_log_z = base_log_z;
-    gp4mouse.log_base_log_x = log_base_log_x;
-    gp4mouse.log_base_log_y = log_base_log_y;
-    gp4mouse.log_base_log_z = log_base_log_z;
-    gp4mouse.has_grid = work_grid.l_type ? 1 : 0;
+    gp4mouse.log_array[FIRST_X_AXIS] = axis_array[FIRST_X_AXIS].log;
+    gp4mouse.log_array[FIRST_Y_AXIS] = axis_array[FIRST_Y_AXIS].log;
+    gp4mouse.log_array[FIRST_Z_AXIS] = axis_array[FIRST_Z_AXIS].log;
+    gp4mouse.base_array[FIRST_X_AXIS] = axis_array[FIRST_X_AXIS].base;
+    gp4mouse.base_array[FIRST_Y_AXIS] = axis_array[FIRST_Y_AXIS].base;
+    gp4mouse.base_array[FIRST_Z_AXIS] = axis_array[FIRST_Z_AXIS].base;
+    gp4mouse.log_base_array[FIRST_X_AXIS] = axis_array[FIRST_X_AXIS].log_base;
+    gp4mouse.log_base_array[FIRST_Y_AXIS] = axis_array[FIRST_Y_AXIS].log_base;
+    gp4mouse.log_base_array[FIRST_Z_AXIS] = axis_array[FIRST_Z_AXIS].log_base;
+    gp4mouse.has_grid = grid_selection ? 1 : 0;
 }
-#endif
+#endif /* 0 -- disabled code! */
 
 #endif /* USE_MOUSE */

@@ -1,5 +1,5 @@
 /*
- * $Id: graph3d.h,v 1.3.2.2 2000/10/23 18:57:54 joze Exp $
+ * $Id: graph3d.h,v 1.7 2000/10/31 19:59:31 joze Exp $
  */
 
 /* GNUPLOT - graph3d.h */
@@ -39,32 +39,90 @@
 
 /* #if... / #include / #define collection: */
 
-#include "plot.h"
+#include "syscfg.h"
+#include "gp_types.h"
 
-/* for convenience while converting to use these arrays */
-#define min3d_z min_array[FIRST_Z_AXIS]
-#define max3d_z max_array[FIRST_Z_AXIS]
-#define x_min3d min_array[FIRST_X_AXIS]
-#define x_max3d max_array[FIRST_X_AXIS]
-#define y_min3d min_array[FIRST_Y_AXIS]
-#define y_max3d max_array[FIRST_Y_AXIS]
-#define z_min3d min_array[FIRST_Z_AXIS]
-#define z_max3d max_array[FIRST_Z_AXIS]
+#include "gadgets.h"
+#include "term_api.h"
 
+/* Function macros to map from user 3D space into normalized -1..1 */
+#define map_x3d(x) ((x-X_AXIS.min)*xscale3d-1.0)
+#define map_y3d(y) ((y-Y_AXIS.min)*yscale3d-1.0)
+#define map_z3d(z) ((z-floor_z)*zscale3d-1.0)
 
 /* Type definitions */
 
+typedef enum en_contour_placement {
+    /* Where to place contour maps if at all. */
+    CONTOUR_NONE,
+    CONTOUR_BASE,
+    CONTOUR_SRF,
+    CONTOUR_BOTH,
+} t_contour_placement;
+
 typedef double transform_matrix[4][4]; /* HBB 990826: added */
+
+typedef struct gnuplot_contours {
+    struct gnuplot_contours *next;
+    struct coordinate GPHUGE *coords;
+    char isNewLevel;
+    char label[32];
+    int num_pts;
+#ifdef PM3D
+    double z;
+#endif
+} gnuplot_contours;
+
+typedef struct iso_curve {
+    struct iso_curve *next;
+    int p_max;			/* how many points are allocated */
+    int p_count;			/* count of points in points */
+    struct coordinate GPHUGE *points;
+} iso_curve;
+
+typedef struct surface_points {
+    struct surface_points *next_sp; /* linked list */
+    int token;			/* last token nr, for second pass */
+    enum PLOT_TYPE plot_type;
+    enum PLOT_STYLE plot_style;
+    char *title;
+    int title_no_enhanced;	/* don't typeset title in enhanced mode */
+    struct lp_style_type lp_properties;
+    int has_grid_topology;
+    
+    /* Data files only - num of isolines read from file. For
+     * functions, num_iso_read is the number of 'primary' isolines (in
+     * x direction) */
+    int num_iso_read;		
+    struct gnuplot_contours *contours; /* NULL if not doing contours. */
+    struct iso_curve *iso_crvs;	/* the actual data */
+} surface_points;
 
 /* Variables of graph3d.c needed by other modules: */
 
-extern int hidden_active;
-extern int suppressMove;
 extern int xmiddle, ymiddle, xscaler, yscaler;
 extern double floor_z;
-extern int hidden_no_update;
 extern transform_matrix trans_mat;
-extern unsigned int move_pos_x, move_pos_y;
+extern double xscale3d, yscale3d, zscale3d;
+
+extern t_contour_placement draw_contour;
+extern TBOOLEAN	label_contours;
+
+extern TBOOLEAN	draw_surface;
+
+/* is hidden3d display wanted? */
+extern TBOOLEAN	hidden3d;
+
+extern float surface_rot_z;
+extern float surface_rot_x;
+extern float surface_scale;
+extern float surface_zscale;
+
+extern float ticslevel;
+
+#define ISO_SAMPLES 10		/* default number of isolines per splot */
+extern int iso_samples_1;
+extern int iso_samples_2;
 
 #ifdef USE_MOUSE
 extern int axis3d_o_x, axis3d_o_y, axis3d_x_dx, axis3d_x_dy, axis3d_y_dx, axis3d_y_dy;
@@ -73,12 +131,6 @@ extern int axis3d_o_x, axis3d_o_y, axis3d_x_dx, axis3d_x_dy, axis3d_y_dx, axis3d
 /* Prototypes from file "graph3d.c" */
 
 void do_3dplot __PROTO((struct surface_points *plots, int pcount, int quick));
-
-void clip_move __PROTO((unsigned int x, unsigned int y));
-void clip_vector __PROTO((unsigned int x, unsigned int y));
-#ifdef PM3D /* HBB 20000813: export this prototype non-static, for PM3D */
-void map3d_xy __PROTO((double x, double y, double z, unsigned int *xt, unsigned int *yt));
-#endif
 void map3d_position __PROTO((struct position * pos, unsigned int *x,
 				  unsigned int *y, const char *what));
 

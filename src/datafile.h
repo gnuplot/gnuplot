@@ -1,5 +1,5 @@
 /*
- * $Id: datafile.h,v 1.2 1999/10/01 14:54:30 lhecking Exp $
+ * $Id: datafile.h,v 1.3.4.2 2000/06/22 12:57:38 broeker Exp $
  */
 
 /* GNUPLOT - datafile.h */
@@ -39,7 +39,16 @@
 
 /* #if... / #include / #define collection: */
 
-#include "plot.h"
+#include "axis.h"
+#include "graph3d.h"
+#include "graphics.h"
+
+/* returns from DF_READLINE in datafile.c */
+/* +ve is number of columns read */
+#define DF_EOF          (-1)
+#define DF_UNDEFINED    (-2)
+#define DF_FIRST_BLANK  (-3)
+#define DF_SECOND_BLANK (-4)
 
 #ifndef MAXINT			/* should there be one already defined ? */
 # ifdef INT_MAX			/* in limits.h ? */
@@ -57,15 +66,23 @@ extern int df_no_use_specs;
 /* suggested x value if none given */
 extern int df_datum;
 
-/* is this a matrix splot */
+/* is this a matrix splot? */
 extern TBOOLEAN df_matrix;
 
-/* this is a binary file */
+/* is this a binary file? */
 extern TBOOLEAN df_binary;
+
 extern int df_eof;
 extern int df_line_number;
-extern int df_timecol[];
+extern AXIS_INDEX df_axis[];
 extern struct udft_entry ydata_func; /* HBB 990829: moved from command.h */
+
+/* string representing missing values, ascii datafiles */
+extern char *missing_val;
+
+/* flag if any 'inline' data are in use, for the current plot */
+extern TBOOLEAN plotted_data_from_stdin;
+
 
 /* Prototypes of functions exported by datafile.c */
 

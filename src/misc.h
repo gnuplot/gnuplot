@@ -1,5 +1,5 @@
 /*
- * $Id: misc.h,v 1.2.2.1 2000/05/03 21:26:11 joze Exp $
+ * $Id: misc.h,v 1.6 2000/10/31 19:59:31 joze Exp $
  */
 
 /* GNUPLOT - misc.h */
@@ -37,7 +37,12 @@
 #ifndef GNUPLOT_MISC_H
 # define GNUPLOT_MISC_H
 
-#include "plot.h"
+#include "syscfg.h"
+#include "gp_types.h"
+#include "stdfn.h"
+
+#include "graphics.h"
+#include "graph3d.h"
 
 /* Variables of misc.c needed by other modules: */
 
@@ -45,21 +50,17 @@ extern char *infile_name;
 
 /* Prototypes from file "misc.c" */
 
-struct curve_points * cp_alloc __PROTO((int num));
-void cp_extend __PROTO((struct curve_points *cp, int num));
-void cp_free __PROTO((struct curve_points *cp));
 struct iso_curve * iso_alloc __PROTO((int num));
 void iso_extend __PROTO((struct iso_curve *ip, int num));
 void iso_free __PROTO((struct iso_curve *ip));
-struct surface_points * sp_alloc __PROTO((int num_samp_1, int num_iso_1, int num_samp_2, int num_iso_2));
-void sp_replace __PROTO((struct surface_points *sp, int num_samp_1, int num_iso_1, int num_samp_2, int num_iso_2));
-void sp_free __PROTO((struct surface_points *sp));
 void load_file __PROTO((FILE *fp, char *name, TBOOLEAN subst_args));
 FILE *lf_top __PROTO((void));
 void load_file_error __PROTO((void));
-size_t gp_strcspn __PROTO((const char *, const char *));
-int find_maxl_keys __PROTO((struct curve_points *plots, int count, int *kcnt));
-int find_maxl_keys3d __PROTO((struct surface_points *plots, int count, int *kcnt));
 FILE *loadpath_fopen __PROTO((const char *, const char *));
+
+/* moved here, from setshow */
+enum PLOT_STYLE get_style __PROTO((void));
+void lp_parse __PROTO((struct lp_style_type *, int, int, int, int));
+void lp_use_properties __PROTO((struct lp_style_type *lp, int tag, int pointflag));
 
 #endif /* GNUPLOT_MISC_H */

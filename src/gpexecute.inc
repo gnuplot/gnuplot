@@ -282,7 +282,7 @@ gp_exec_event_text ( char type, int mx, int my, int par1, int par2, char *text )
 #endif
 
 #if defined(USE_NONBLOCKING_STDOUT) && !defined(OS2)
-static void
+static RETSIGTYPE
 pipe_died_handler(int signum)
 {
     /* fprintf(stderr, "\n*******(pipe_died_handler)*******\n"); */

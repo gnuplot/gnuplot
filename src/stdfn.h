@@ -1,5 +1,5 @@
 /*
- * $Id: stdfn.h,v 1.9.2.1 2000/05/03 21:26:12 joze Exp $
+ * $Id: stdfn.h,v 1.13 2000/10/31 19:59:31 joze Exp $
  */
 
 /* GNUPLOT - stdfn.h */
@@ -79,6 +79,7 @@
 # endif
 #endif
 #ifndef HAVE_STRCSPN
+size_t gp_strcspn __PROTO((const char *, const char *));
 # define strcspn gp_strcspn
 #endif
 
@@ -254,6 +255,11 @@ int pclose __PROTO((FILE *));
 # include <float.h>
 #endif
 
+/* Some older platforms, namely SunOS 4.x, don't define this. */
+#ifndef DBL_EPSILON
+# define DBL_EPSILON     2.2204460492503131E-16
+#endif
+
 #ifndef NO_LOCALE_H
 # include <locale.h>
 #endif
@@ -261,6 +267,15 @@ int pclose __PROTO((FILE *));
 #ifndef NO_MATH_H
 # include <math.h>
 #endif
+
+/* Normally in <math.h> */
+#ifndef M_PI
+# define M_PI 3.14159265358979323846
+#endif
+#ifndef M_PI_2
+# define M_PI_2 1.57079632679489661923
+#endif
+
 
 #ifndef HAVE_STRCASECMP
 # ifdef HAVE_STRICMP
@@ -324,7 +339,53 @@ int pclose __PROTO((FILE *));
 # define FPRINTF(a)      /* nought */
 #endif /* DEBUG */
 
-#include "plot.h"
+#include "syscfg.h"
+
+#define INT_STR_LEN (3*sizeof(int))
+
+
+/* The XOPEN ln(10) macro */
+#ifndef M_LN10
+#  define M_LN10    2.3025850929940456840e0 
+#endif
+
+/* _POSIX_PATH_MAX is too small for practical purposes */
+#ifndef PATH_MAX
+# ifdef HAVE_SYS_PARAM_H
+#  include <sys/param.h>
+# endif
+# ifndef MAXPATHLEN
+#  define PATH_MAX 1024
+# else
+#  define PATH_MAX MAXPATHLEN
+# endif
+#endif
+
+/* Concatenate a path name and a file name. The file name
+ * may or may not end with a "directory separation" character.
+ * Path must not be NULL, but can be empty
+ */
+#define PATH_CONCAT(path,file) \
+ { char *p = path; \
+   p += strlen(path); \
+   if (p!=path) p--; \
+   if (*p && (*p != DIRSEP1) && (*p != DIRSEP2)) { \
+     if (*p) p++; *p++ = DIRSEP1; *p = NUL; \
+   } \
+   strcat (path, file); \
+ }
+
+#ifndef inrange
+# define inrange(z,min,max) \
+   (((min)<(max)) ? (((z)>=(min)) && ((z)<=(max))) : \
+	            (((z)>=(max)) && ((z)<=(min))))
+#endif
+
+/* both min/max and MIN/MAX are defined by some compilers.
+ * we are now on GPMIN / GPMAX
+ */
+#define GPMAX(a,b) ( (a) > (b) ? (a) : (b) )
+#define GPMIN(a,b) ( (a) < (b) ? (a) : (b) )
 
 /* Prototypes from "stdfn.c" */
 

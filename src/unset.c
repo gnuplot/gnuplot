@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.9.2.4 2000/06/24 21:57:33 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.12 2000/10/31 19:59:31 joze Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -36,14 +36,19 @@ static char *RCSid() { return RCSid("$Id: unset.c,v 1.9.2.4 2000/06/24 21:57:33 
 
 #include "setshow.h"
 
+#include "axis.h"
 #include "command.h"
+#include "contour.h"
+#include "datafile.h"
 #include "misc.h"
 #include "parse.h"
+#include "plot.h"
 #include "plot2d.h"
 #include "plot3d.h"
 #include "tables.h"
 #include "term_api.h"
 #include "util.h"
+#include "variable.h"
 #ifdef USE_MOUSE
 #   include "mouse.h"
 #endif
@@ -80,6 +85,7 @@ static void unset_label __PROTO((void));
 static void delete_label __PROTO((struct text_label * prev, struct text_label * this));
 static void unset_loadpath __PROTO((void));
 static void unset_locale __PROTO((void));
+static void reset_logscale __PROTO((AXIS_INDEX));
 static void unset_logscale __PROTO((void));
 static void unset_mapping __PROTO((void));
 static void unset_bmargin __PROTO((void));
@@ -94,17 +100,8 @@ static void unset_mouse __PROTO((void));
 static void unset_multiplot __PROTO((void));
 #endif
 
-static void unset_mxtics __PROTO((void));
-static void unset_mx2tics __PROTO((void));
-static void unset_mytics __PROTO((void));
-static void unset_my2tics __PROTO((void));
-static void unset_mztics __PROTO((void));
-
-static void unset_xtics __PROTO((void));
-static void unset_x2tics __PROTO((void));
-static void unset_ytics __PROTO((void));
-static void unset_y2tics __PROTO((void));
-static void unset_ztics __PROTO((void));
+static void unset_mtics __PROTO((AXIS_INDEX));
+static void unset_tics_in __PROTO((void));
 
 static void unset_offsets __PROTO((void));
 static void unset_origin __PROTO((void));
@@ -121,34 +118,20 @@ static void unset_size __PROTO((void));
 static void unset_style __PROTO((void));
 static void unset_surface __PROTO((void));
 static void unset_terminal __PROTO((void));
-static void unset_tics __PROTO((void));
+static void unset_tics __PROTO((AXIS_INDEX));
 static void unset_ticscale __PROTO((void));
 static void unset_ticslevel __PROTO((void));
 static void unset_timefmt __PROTO((void));
 static void unset_timestamp __PROTO((void));
 static void unset_view __PROTO((void));
 static void unset_zero __PROTO((void));
-static void unset_xdata __PROTO((void));
-static void unset_ydata __PROTO((void));
-static void unset_zdata __PROTO((void));
-static void unset_x2data __PROTO((void));
-static void unset_y2data __PROTO((void));
-static void unset_xrange __PROTO((void));
-static void unset_x2range __PROTO((void));
-static void unset_yrange __PROTO((void));
-static void unset_y2range __PROTO((void));
-static void unset_zrange __PROTO((void));
-static void unset_rrange __PROTO((void));
-static void unset_trange __PROTO((void));
-static void unset_urange __PROTO((void));
-static void unset_vrange __PROTO((void));
-static void unset_xzeroaxis __PROTO((void));
-static void unset_yzeroaxis __PROTO((void));
-static void unset_x2zeroaxis __PROTO((void));
-static void unset_y2zeroaxis __PROTO((void));
-static void unset_zeroaxis __PROTO((void));
+static void unset_timedata __PROTO((AXIS_INDEX));
+static void unset_range __PROTO((AXIS_INDEX));
+static void unset_zeroaxis __PROTO((AXIS_INDEX));
+static void unset_all_zeroaxes __PROTO((void));
 
-static void unset_xyzlabel __PROTO((label_struct *));
+static void unset_axislabel_or_title __PROTO((label_struct *));
+static void unset_axislabel __PROTO((AXIS_INDEX));
 
 /******** The 'unset' command ********/
 void
@@ -167,9 +150,17 @@ unset_command()
 \t'view', '[xyz]{2}data', '[xyz]{2}label', '[xyz]{2}range',\n\
 \t'{m}[xyz]{2}tics', '[xyz]{2}[md]tics', '{[xyz]{2}}zeroaxis', 'zero'";
 
+    int found_token;
+
     c_token++;
 
-    switch(lookup_table(&set_tbl[0],c_token)) {
+    found_token = lookup_table(&set_tbl[0],c_token);
+
+    /* HBB 20000506: rationalize occurences of c_token++ ... */
+    if (found_token != S_INVALID)
+	c_token++;
+
+    switch(found_token) {
     case S_ANGLES:
 	unset_angles();
 	break;
@@ -313,7 +304,7 @@ unset_command()
 	unset_terminal();
 	break;
     case S_TICS:
-	unset_tics();
+	unset_tics_in();
 	break;
     case S_TICSCALE:
 	unset_ticscale();
@@ -328,7 +319,7 @@ unset_command()
 	unset_timestamp();
 	break;
     case S_TITLE:
-	unset_xyzlabel(&title);
+	unset_axislabel_or_title(&title);
 	break;
     case S_VIEW:
 	unset_view();
@@ -338,123 +329,130 @@ unset_command()
 	break;
 /* FIXME - are the tics correct? */
     case S_MXTICS:
-	unset_mxtics();
+	unset_mtics(FIRST_X_AXIS);
 	break;
     case S_XTICS:
-	unset_xtics();
+	unset_tics(FIRST_X_AXIS);
 	break;
     case S_XDTICS:
     case S_XMTICS: 
-	c_token++;
 	break;
     case S_MYTICS:
-	unset_mytics();
+	unset_mtics(FIRST_Y_AXIS);
 	break;
     case S_YTICS:
-	unset_ytics();
+	unset_tics(FIRST_Y_AXIS);
 	break;
     case S_YDTICS:
     case S_YMTICS: 
 	break;
     case S_MX2TICS:
-	unset_mx2tics();
+	unset_mtics(SECOND_X_AXIS);
 	break;
     case S_X2TICS:
-	unset_x2tics();
+	unset_tics(SECOND_X_AXIS);
 	break;
     case S_X2DTICS:
     case S_X2MTICS: 
 	break;
     case S_MY2TICS:
-	unset_my2tics();
+	unset_mtics(SECOND_Y_AXIS);
 	break;
     case S_Y2TICS:
-	unset_y2tics();
+	unset_tics(SECOND_Y_AXIS);
 	break;
     case S_Y2DTICS:
     case S_Y2MTICS: 
 	break;
     case S_MZTICS:
-	unset_mztics();
+	unset_mtics(FIRST_Z_AXIS);
 	break;
     case S_ZTICS:
-	unset_ztics();
+	unset_tics(FIRST_Z_AXIS);
 	break;
     case S_ZDTICS:
     case S_ZMTICS: 
 	break;
     case S_XDATA:
-	unset_xdata();
+	unset_timedata(FIRST_X_AXIS);
+	/* FIXME HBB 20000506: does unsetting these axes make *any*
+	 * sense?  After all, their content is never displayed, so
+	 * what would they need a corrected format for? */
+	unset_timedata(T_AXIS);
+	unset_timedata(U_AXIS);
 	break;
     case S_YDATA:
-	unset_ydata();
+	unset_timedata(FIRST_Y_AXIS);
+	/* FIXME: see above */
+	unset_timedata(V_AXIS);
 	break;
     case S_ZDATA:
-	unset_zdata();
+	unset_timedata(FIRST_Z_AXIS);
 	break;
     case S_X2DATA:
-	unset_x2data();
+	unset_timedata(SECOND_X_AXIS);
 	break;
     case S_Y2DATA:
-	unset_y2data();
+	unset_timedata(SECOND_Y_AXIS);
 	break;
     case S_XLABEL:
-	unset_xyzlabel(&xlabel);
+	unset_axislabel(FIRST_X_AXIS);
 	break;
     case S_YLABEL:
-	unset_xyzlabel(&ylabel);
+	unset_axislabel(FIRST_Y_AXIS);
 	break;
     case S_ZLABEL:
-	unset_xyzlabel(&zlabel);
+	unset_axislabel(FIRST_Z_AXIS);
 	break;
     case S_X2LABEL:
-	unset_xyzlabel(&x2label);
+	unset_axislabel(SECOND_X_AXIS);
 	break;
     case S_Y2LABEL:
-	unset_xyzlabel(&y2label);
+	unset_axislabel(SECOND_Y_AXIS);
 	break;
     case S_XRANGE:
-	unset_xrange();
+	unset_range(FIRST_X_AXIS);
 	break;
     case S_X2RANGE:
-	unset_x2range();
+	unset_range(SECOND_X_AXIS);
 	break;
     case S_YRANGE:
-	unset_yrange();
+	unset_range(FIRST_Y_AXIS);
 	break;
     case S_Y2RANGE:
-	unset_y2range();
+	unset_range(SECOND_Y_AXIS);
 	break;
     case S_ZRANGE:
-	unset_zrange();
+	unset_range(FIRST_Z_AXIS);
 	break;
     case S_RRANGE:
-	unset_rrange();
+	unset_range(R_AXIS);
 	break;
     case S_TRANGE:
-	unset_trange();
+	unset_range(T_AXIS);
 	break;
     case S_URANGE:
-	unset_urange();
+	unset_range(U_AXIS);
 	break;
     case S_VRANGE:
-	unset_vrange();
+	unset_range(V_AXIS);
 	break;
     case S_XZEROAXIS:
-	unset_xzeroaxis();
+	unset_zeroaxis(FIRST_X_AXIS);
 	break;
     case S_YZEROAXIS:
-	unset_yzeroaxis();
+	unset_zeroaxis(FIRST_Y_AXIS);
 	break;
     case S_X2ZEROAXIS:
-	unset_x2zeroaxis();
+	unset_zeroaxis(SECOND_X_AXIS);
 	break;
     case S_Y2ZEROAXIS:
-	unset_y2zeroaxis();
+	unset_zeroaxis(SECOND_Y_AXIS);
 	break;
     case S_ZEROAXIS:
-	unset_zeroaxis();
+	unset_all_zeroaxes();
 	break;
+    case S_INVALID:
     default:
 	int_error(c_token, unsetmess);
 	break;
@@ -466,8 +464,6 @@ unset_command()
 static void
 unset_angles()
 {
-    c_token++;
-    angles_format = ANGLES_RADIANS;
     ang2rad = 1.0;
 }
 
@@ -480,8 +476,6 @@ unset_arrow()
     struct arrow_def *this_arrow;
     struct arrow_def *prev_arrow;
     int tag;
-
-    c_token++;
 
     if (END_OF_COMMAND) {
 	/* delete all arrows */
@@ -520,7 +514,7 @@ struct arrow_def *prev, *this;
 	    prev->next = this->next;
 	else			/* this = first_arrow so change first_arrow */
 	    first_arrow = this->next;
-	free((char *) this);
+	free(this);
     }
 }
 
@@ -529,40 +523,21 @@ struct arrow_def *prev, *this;
 static void
 unset_autoscale()
 {
-    c_token++;
     if (END_OF_COMMAND) {
-	autoscale_r = autoscale_t = autoscale_x = autoscale_y = autoscale_z = FALSE;
+	INIT_AXIS_ARRAY(set_autoscale, FALSE);
     } else if (equals(c_token, "xy") || equals(c_token, "tyx")) {
-	autoscale_x = autoscale_y = FALSE;
+	axis_array[FIRST_X_AXIS].set_autoscale
+	    = axis_array[FIRST_Y_AXIS].set_autoscale = FALSE;
 	c_token++;
-    } else if (equals(c_token, "r")) {
-	autoscale_r = FALSE;
-	c_token++;
-    } else if (equals(c_token, "t")) {
-	autoscale_t = FALSE;
-	c_token++;
-    } else if (equals(c_token, "u")) {
-	autoscale_u = FALSE;
-	c_token++;
-    } else if (equals(c_token, "v")) {
-	autoscale_v = FALSE;
-	c_token++;
-    } else if (equals(c_token, "x")) {
-	autoscale_x = FALSE;
-	c_token++;
-    } else if (equals(c_token, "y")) {
-	autoscale_y = FALSE;
-	c_token++;
-    } else if (equals(c_token, "x2")) {
-	autoscale_x2 = FALSE;
-	c_token++;
-    } else if (equals(c_token, "y2")) {
-	autoscale_y2 = FALSE;
-	c_token++;
-    } else if (equals(c_token, "z")) {
-	autoscale_z = FALSE;
+    } else {
+	/* HBB 20000506: parse axis name, and unset the right element
+	 * of the array: */
+	int axis = lookup_table(axisname_tbl, c_token);
+	if (axis >= 0) {
+	    axis_array[axis].set_autoscale = FALSE;
 	c_token++;
     }
+}
 }
 
 
@@ -570,7 +545,6 @@ unset_autoscale()
 static void
 unset_bars()
 {
-    c_token++;
     bar_size = 0.0;
 }
 
@@ -579,8 +553,8 @@ unset_bars()
 static void
 unset_border()
 {
-    c_token++;
-    /* FIXME? reset_command() uses 31 */
+    /* this is not the effect as with reset, as the border is enabled,
+     * by default */
     draw_border = 0;
 }
 
@@ -589,7 +563,6 @@ unset_border()
 static void
 unset_boxwidth()
 {
-    c_token++;
     boxwidth = -1.0;
 }
 
@@ -598,7 +571,6 @@ unset_boxwidth()
 static void
 unset_clabel()
 {
-    c_token++;
     /* FIXME? reset_command() uses TRUE */
     label_contours = FALSE;
 }
@@ -608,7 +580,6 @@ unset_clabel()
 static void
 unset_clip()
 {
-    c_token++;
     if (END_OF_COMMAND) {
 	/* same as all three */
 	clip_points = FALSE;
@@ -630,13 +601,11 @@ unset_clip()
 static void
 unset_cntrparam()
 {
-    c_token++;
-
-    contour_pts = 5;
+    contour_pts = DEFAULT_NUM_APPROX_PTS;
     contour_kind = CONTOUR_KIND_LINEAR;
-    contour_order = 4;
-    contour_levels = 5;
-    levels_kind = LEVELS_AUTO;
+    contour_order = DEFAULT_CONTOUR_ORDER;
+    contour_levels = DEFAULT_CONTOUR_LEVELS;
+    contour_levels_kind = LEVELS_AUTO;
 }
 
 
@@ -644,7 +613,6 @@ unset_cntrparam()
 static void
 unset_contour()
 {
-    c_token++;
     draw_contour = CONTOUR_NONE;
 }
 
@@ -653,7 +621,6 @@ unset_contour()
 static void
 unset_dgrid3d()
 {
-    c_token++;
     dgrid3d_row_fineness = 10;
     dgrid3d_col_fineness = 10;
     dgrid3d_norm_value = 1;
@@ -665,9 +632,8 @@ unset_dgrid3d()
 static void
 unset_dummy()
 {
-    c_token++;
-    strcpy(dummy_var[0], "x");
-    strcpy(dummy_var[1], "y");
+    strcpy(set_dummy_var[0], "x");
+    strcpy(set_dummy_var[1], "y");
 }
 
 
@@ -675,8 +641,6 @@ unset_dummy()
 static void
 unset_encoding()
 {
-    c_token++;
-
     encoding = S_ENC_DEFAULT;
 }
 
@@ -686,54 +650,28 @@ unset_encoding()
 static void
 unset_format()
 {
-    TBOOLEAN setx = FALSE, sety = FALSE, setz = FALSE;
-    TBOOLEAN setx2 = FALSE, sety2 = FALSE;
+    TBOOLEAN set_for_axis[AXIS_ARRAY_SIZE] = AXIS_ARRAY_INITIALIZER(FALSE);
+    int axis;
 
-    c_token++;
-    if (equals(c_token,"x")) {
-        setx = TRUE;
-        c_token++;
-    } else if (equals(c_token,"y")) {
-        sety = TRUE;
-        c_token++;
-    } else if (equals(c_token,"x2")) {
-        setx2 = TRUE;
-        c_token++;
-    } else if (equals(c_token,"y2")) {
-        sety2 = TRUE;
-        c_token++;
-    } else if (equals(c_token,"z")) {
-        setz = TRUE;
-        c_token++;
+    if ((axis = lookup_table(axisname_tbl, c_token)) >= 0) {
+	set_for_axis[axis] = TRUE;
     } else if (equals(c_token,"xy") || equals(c_token,"yx")) {
-        setx = sety = TRUE;
+        set_for_axis[FIRST_X_AXIS]
+	    = set_for_axis[FIRST_Y_AXIS]
+	    = TRUE;
         c_token++;
     } else if (isstring(c_token) || END_OF_COMMAND) {
         /* Assume he wants all */
-        setx = sety = setz = setx2 = sety2 = TRUE;
+	for (axis = 0; axis < AXIS_ARRAY_SIZE; axis++)
+	    set_for_axis[axis] = TRUE;
     }
 
     if (END_OF_COMMAND) {
-        if (setx) {
-            (void) strcpy(xformat,DEF_FORMAT);
-            format_is_numeric[FIRST_X_AXIS] = 1;
-        }
-        if (sety) {
-            (void) strcpy(yformat,DEF_FORMAT);
-            format_is_numeric[FIRST_Y_AXIS] = 1;
-        }
-        if (setz) {
-            (void) strcpy(zformat,DEF_FORMAT);
-            format_is_numeric[FIRST_Z_AXIS] = 1;
-        }
-        if (setx2) {
-            (void) strcpy(x2format,DEF_FORMAT);
-            format_is_numeric[SECOND_X_AXIS] = 1;
-        }
-        if (sety2) {
-            (void) strcpy(y2format,DEF_FORMAT);
-            format_is_numeric[SECOND_Y_AXIS] = 1;
-        }
+	SET_DEFFORMAT(FIRST_X_AXIS , set_for_axis);
+	SET_DEFFORMAT(FIRST_Y_AXIS , set_for_axis);
+	SET_DEFFORMAT(FIRST_Z_AXIS , set_for_axis);
+	SET_DEFFORMAT(SECOND_X_AXIS, set_for_axis);
+	SET_DEFFORMAT(SECOND_Y_AXIS, set_for_axis);
     }
 }
 
@@ -742,8 +680,10 @@ unset_format()
 static void
 unset_grid()
 {
-    c_token++;
-    work_grid.l_type = GRID_OFF;
+    /* FIXME HBB 20000506: there is no command to explicitly reset the
+     * linetypes for major and minor gridlines. This function should
+     * do that, maybe... */
+    grid_selection = GRID_OFF;
 }
 
 
@@ -751,7 +691,6 @@ unset_grid()
 static void
 unset_hidden3d()
 {
-    c_token++;
 #ifdef LITE
     printf(" Hidden Line Removal Not Supported in LITE version\n");
 #else
@@ -765,7 +704,6 @@ unset_hidden3d()
 static void
 unset_historysize()
 {
-    c_token++;
     gnuplot_history_size = -1; /* don't ever truncate the history. */
 }
 #endif
@@ -775,27 +713,36 @@ unset_historysize()
 static void
 unset_isosamples()
 {
-    register struct curve_points *f_p = first_plot;
-    register struct surface_points *f_3dp = first_3dplot;
+    /* HBB 20000506: was freeing 2D data structures although
+     * isosamples are only used by 3D plots. */
 
-    c_token++;
-
-    first_plot = NULL;
+    sp_free(first_3dplot);
     first_3dplot = NULL;
-    cp_free(f_p);
-    sp_free(f_3dp);
 
     iso_samples_1 = ISO_SAMPLES;
     iso_samples_2 = ISO_SAMPLES;
 }
 
 
+void
+reset_key(void)
+{
+    key = KEY_AUTO_PLACEMENT;
+    key_hpos = TRIGHT;
+    key_vpos = TTOP;
+    key_just = JRIGHT;
+    key_reverse = FALSE;
+    key_box = default_keybox_lp;
+    key_swidth = 4;
+    key_vert_factor = 1;
+    key_width_fix = 0;
+}
+
 /* process 'unset key' command */
 static void
 unset_key()
 {
-    c_token++;
-    key = 0;
+    key = KEY_NONE;
 }
 
 
@@ -803,8 +750,7 @@ unset_key()
 static void
 unset_keytitle()
 {
-    c_token++;
-    *key_title = 0;
+    key_title[0] = '\0';	/* empty string */
 }
 
 
@@ -816,8 +762,6 @@ unset_label()
     struct text_label *this_label;
     struct text_label *prev_label;
     int tag;
-
-    c_token++;
 
     if (END_OF_COMMAND) {
 	/* delete all labels */
@@ -856,8 +800,8 @@ struct text_label *prev, *this;
 	    prev->next = this->next;
 	else			/* this = first_label so change first_label */
 	    first_label = this->next;
-	free (this->text);
-	free (this->font);
+	if (this->text) free (this->text);
+	if (this->font) free (this->font);
 	free (this);
     }
 }
@@ -867,7 +811,6 @@ struct text_label *prev, *this;
 static void
 unset_loadpath()
 {
-    c_token++;
     clear_loadpath();
 }
 
@@ -876,39 +819,39 @@ unset_loadpath()
 static void
 unset_locale()
 {
-    c_token++;
     init_locale();
 }
 
+static void
+reset_logscale(axis)
+    AXIS_INDEX axis;
+{
+    axis_array[axis].log = FALSE;
+    axis_array[axis].base = 0.0;
+}
 
 /* process 'unset logscale' command */
 static void
 unset_logscale()
 {
-    c_token++;
+    int axis;
+
     if (END_OF_COMMAND) {
-	is_log_x = is_log_y = is_log_z = is_log_x2 = is_log_y2 = FALSE;
-    } else if (equals(c_token, "x2")) {
-	is_log_x2 = FALSE; ++c_token;
-    } else if (equals(c_token, "y2")) {
-	is_log_y2 = FALSE; ++c_token;
+	/* clean all the islog flags. This will hit some currently
+	 * unused ones, too, but that's actually a good thing, IMHO */
+	for(axis = 0; axis < AXIS_ARRAY_SIZE; axis++)
+	    reset_logscale(axis);
+    } else if ((axis = lookup_table(axisname_tbl, c_token)) >= 0) {
+	reset_logscale(axis);
+	++c_token;
     } else {
-	if (chr_in_str(c_token, 'x')) {
-	    is_log_x = FALSE;
-	    base_log_x = 0.0;
-	    log_base_log_x = 0.0;
-	}
-	if (chr_in_str(c_token, 'y')) {
-	    is_log_y = FALSE;
-	    base_log_y = 0.0;
-	    log_base_log_y = 0.0;
-	}
-	if (chr_in_str(c_token, 'z')) {
-	    is_log_z = FALSE;
-	    base_log_z = 0.0;
-	    log_base_log_z = 0.0;
-	}
-	c_token++;
+	if (chr_in_str(c_token, 'x')) 
+	    reset_logscale(FIRST_X_AXIS);
+	if (chr_in_str(c_token, 'y'))
+	    reset_logscale(FIRST_Y_AXIS);
+	if (chr_in_str(c_token, 'z')) 
+	    reset_logscale(FIRST_Z_AXIS);
+	++c_token;
     }
 }
 
@@ -917,7 +860,6 @@ unset_logscale()
 static void
 unset_mapping()
 {
-    c_token++;
     /* assuming same as points */
     mapping3d = MAP3D_CARTESIAN;
 }
@@ -959,7 +901,6 @@ unset_tmargin()
 static void
 unset_missing()
 {
-    c_token++;
     free(missing_val);
     missing_val = NULL;
 }
@@ -969,7 +910,6 @@ unset_missing()
 static void
 unset_mouse()
 {
-    c_token++;
     mouse_setting.on = 0;
 #if defined(USE_MOUSE) && defined(OS2)
     update_menu_items_PM_terminal();
@@ -980,96 +920,22 @@ unset_mouse()
 
 /* process 'unset mxtics' command */
 static void
-unset_mxtics()
+unset_mtics(axis)
+    AXIS_INDEX axis;
 {
-    c_token++;
-    mxtics = MINI_DEFAULT;
-    mxtfreq = 10.0;
+    axis_array[axis].minitics = MINI_DEFAULT;
+    axis_array[axis].mtic_freq = 10.0;
 }
 
 
-/* process 'unset mx2tics' command */
+/*process 'unset {x|y|x2|y2|z}tics' command */
 static void
-unset_mx2tics()
+unset_tics(axis)
+    AXIS_INDEX axis;
 {
-    c_token++;
-    mx2tics = MINI_DEFAULT;
-    mx2tfreq = 10.0;
-}
-
-
-/* process 'unset mytics' command */
-static void
-unset_mytics()
-{
-    c_token++;
-    mytics = MINI_DEFAULT;
-    mytfreq = 10.0;
-}
-
-
-/* process 'unset my2tics' command */
-static void
-unset_my2tics()
-{
-    c_token++;
-    my2tics = MINI_DEFAULT;
-    my2tfreq = 10.0;
-}
-
-
-/* process 'unset mztics' command */
-static void
-unset_mztics()
-{
-    c_token++;
-    mztics = MINI_DEFAULT;
-    mztfreq = 10.0;
-}
-
-
-/*process 'unset xtics' command */
-static void
-unset_xtics()
-{
-    c_token++;
-    xtics = NO_TICS;
-}
-
-
-/*process 'unset ytics' command */
-static void
-unset_ytics()
-{
-    c_token++;
-    ytics = NO_TICS;
-}
-
-
-/*process 'unset x2tics' command */
-static void
-unset_x2tics()
-{
-    c_token++;
-    x2tics = NO_TICS;
-}
-
-
-/*process 'unset y2tics' command */
-static void
-unset_y2tics()
-{
-    c_token++;
-    y2tics = NO_TICS;
-}
-
-
-/*process 'unset ztics' command */
-static void
-unset_ztics()
-{
-    c_token++;
-    ztics = NO_TICS;
+    /* FIXME HBB 20000506: shouldn't we remove tic series settings,
+     * too? */
+    axis_array[axis].ticmode = NO_TICS;
 }
 
 
@@ -1077,7 +943,6 @@ unset_ztics()
 static void
 unset_offsets()
 {
-    c_token++;
     loff = roff = toff = boff = 0.0;
 }
 
@@ -1086,8 +951,6 @@ unset_offsets()
 static void
 unset_origin()
 {
-    c_token++;
-
     xoffset = 0.0;
     yoffset = 0.0;
 }
@@ -1097,7 +960,6 @@ unset_origin()
 static void
 unset_output()
 {
-    c_token++;
     if (multiplot)
 	int_error(c_token, "you can't change the output in multiplot mode");
 
@@ -1111,13 +973,10 @@ unset_output()
 static void
 unset_parametric()
 {
-    c_token++;
-
     if (parametric) {
 	parametric = FALSE;
 	if (!polar) { /* keep t for polar */
-	    strcpy (dummy_var[0], "x");
-	    strcpy (dummy_var[1], "y");
+	    unset_dummy();
 	    if (interactive)
 		(void) fprintf(stderr,"\n\tdummy variable is x for curves, x/y for surfaces\n");
 	}
@@ -1140,7 +999,7 @@ unset_pm3d()
 {
     c_token++;
     if (pm3d.where[0]=='b' && !pm3d.where[1]) /* unset reversed y axis from 'set pm3d map' */
-	range_flags[FIRST_Y_AXIS] &= ~RANGE_REVERSE;
+	axis_array[FIRST_Y_AXIS].range_flags &= ~RANGE_REVERSE;
     pm3d.where[0] = 0;
     pm3d_map_rotate_ylabel = 0;  /* trick for rotating ylabel */
 #ifdef X11
@@ -1156,7 +1015,6 @@ unset_pm3d()
 static void
 unset_pointsize()
 {
-    c_token++;
     pointsize = 1.0;
 }
 
@@ -1165,17 +1023,15 @@ unset_pointsize()
 static void
 unset_polar()
 {
-    c_token++;
-
     if (polar) {
 	polar = FALSE;
-	if (parametric && autoscale_t) {
+	if (parametric && axis_array[T_AXIS].set_autoscale) {
 	    /* only if user has not set an explicit range */
-	    tmin = -5.0;
-	    tmax = 5.0;
+	    axis_array[T_AXIS].set_min = axis_defaults[T_AXIS].min;
+	    axis_array[T_AXIS].set_max = axis_defaults[T_AXIS].min;
 	}
 	if (!parametric) {
-	    strcpy (dummy_var[0], "x");
+	    strcpy (set_dummy_var[0], "x");
 	    if (interactive)
 		(void) fprintf(stderr,"\n\tdummy variable is x for curves\n");
 	}
@@ -1187,14 +1043,14 @@ unset_polar()
 static void
 unset_samples()
 {
-    register struct surface_points *f_3dp = first_3dplot;
+    /* HBB 20000506: unlike unset_isosamples(), this one *has* to
+     * clear 2D data structues! */
+    cp_free(first_plot);
+    first_plot = NULL;
 
-    c_token++;
-
+    sp_free(first_3dplot);
     first_3dplot = NULL;
-    sp_free(f_3dp);
 
-    samples = SAMPLES;
     samples_1 = SAMPLES;
     samples_2 = SAMPLES;
 }
@@ -1204,8 +1060,6 @@ unset_samples()
 static void
 unset_size()
 {
-    c_token++;
-
     xsize = 1.0;
     ysize = 1.0;
     zsize = 1.0;
@@ -1216,8 +1070,6 @@ unset_size()
 static void
 unset_style()
 {
-    c_token++;
-
     if (END_OF_COMMAND) {
         data_style = POINTSTYLE;
         func_style = LINES;
@@ -1242,7 +1094,6 @@ unset_style()
 static void
 unset_surface()
 {
-    c_token++;
     draw_surface = FALSE;
 }
 
@@ -1252,7 +1103,6 @@ static void
 unset_terminal()
 {
     /* This is a problematic case */
-    c_token++;
 /* FIXME */
     if (multiplot)
 	int_error(c_token, "You can't change the terminal in multiplot mode");
@@ -1264,9 +1114,8 @@ unset_terminal()
 
 /* process 'unset tics' command */
 static void
-unset_tics()
+unset_tics_in()
 {
-    c_token++;
     tic_in = TRUE;
 }
 
@@ -1275,8 +1124,6 @@ unset_tics()
 static void
 unset_ticscale()
 {
-    c_token++;
-
     ticscale = 1.0;
     miniticscale = 0.5;
 }
@@ -1286,7 +1133,6 @@ unset_ticscale()
 static void
 unset_ticslevel()
 {
-    c_token++;
     ticslevel = 0.5;
 }
 
@@ -1295,8 +1141,18 @@ unset_ticslevel()
 static void
 unset_timefmt()
 {
+    int axis;
+
+    if (END_OF_COMMAND)
+	for (axis=0; axis < AXIS_ARRAY_SIZE; axis++)
+	    strcpy(axis_array[axis].timefmt,TIMEFMT);
+    else if ((axis=lookup_table(axisname_tbl, c_token)) >= 0) {
+	strcpy(axis_array[axis].timefmt, TIMEFMT);
     c_token++;
-    strcpy(timefmt,TIMEFMT);
+    }
+    else
+	int_error(c_token, "expected optional axis name");
+	
 }
 
 
@@ -1304,12 +1160,7 @@ unset_timefmt()
 static void
 unset_timestamp()
 {
-    c_token++;
-
-    *timelabel.text = 0;
-    timelabel.xoffset = 0;
-    timelabel.yoffset = 0;
-    *timelabel.font = 0;
+    unset_axislabel_or_title(&timelabel);
     timelabel_rotate = FALSE;
     timelabel_bottom = TRUE;
 }
@@ -1319,7 +1170,6 @@ unset_timestamp()
 static void
 unset_view()
 {
-    c_token++;
     surface_rot_z = 30.0;
     surface_rot_x = 60.0;
     surface_scale = 1.0;
@@ -1331,194 +1181,193 @@ unset_view()
 static void
 unset_zero()
 {
-    c_token++;
     zero = ZERO;
 }
 
-/* FIXME - merge unset_*data() functions into one */
-
-/* process 'unset xdata' command */
+/* process 'unset {x|y|z|x2|y2}data' command */
 static void
-unset_xdata()
+unset_timedata(axis)
+    AXIS_INDEX axis;
 {
-    c_token++;
-    datatype[FIRST_X_AXIS] = FALSE;
-    /* eh ? - t and u have nothing to do with x */
-    datatype[T_AXIS] = FALSE;
-    datatype[U_AXIS] = FALSE;
+    axis_array[axis].is_timedata = FALSE;
 }
 
 
-/* process 'unset ydata' command */
+/* process 'unset {x|y|z|x2|y2|t|u|v|r}range' command */
 static void
-unset_ydata()
+unset_range(axis)
+    AXIS_INDEX axis;
 {
-    c_token++;
-    datatype[FIRST_Y_AXIS] = FALSE;
-    datatype[V_AXIS] = FALSE;
+    /* FIXME HBB 20000506: do we want to reset the axis autoscale and
+     * min/max, too?  */
+    axis_array[axis].range_flags = 0;
 }
 
-#define PROCESS_AXIS_DATA(AXIS) \
-    c_token++; \
-    datatype[AXIS] = FALSE;
-
-/* process 'unset zdata' command */
+/* process 'unset {x|y|z|x2|y2}zeroaxis' command */
 static void
-unset_zdata()
+unset_zeroaxis(axis)
+    AXIS_INDEX axis;
 {
-    PROCESS_AXIS_DATA(FIRST_Z_AXIS);
-}
-
-
-/* process 'unset x2data' command */
-static void
-unset_x2data()
-{
-    PROCESS_AXIS_DATA(SECOND_X_AXIS);
-}
-
-
-/* process 'unset y2data' command */
-static void
-unset_y2data()
-{
-    PROCESS_AXIS_DATA(SECOND_Y_AXIS);
-}
-
-
-/* FIXME - merge set_*range() functions into one */
-
-/* process 'unset xrange' command */
-static void
-unset_xrange()
-{
-    range_flags[FIRST_X_AXIS] = 0;
-}
-
-
-/* process 'unset x2range' command */
-static void
-unset_x2range()
-{
-    range_flags[SECOND_X_AXIS] = 0;
-}
-
-
-/* process 'unset yrange' command */
-static void
-unset_yrange()
-{
-    range_flags[FIRST_Y_AXIS] = 0;
-}
-
-
-/* process 'unset y2range' command */
-static void
-unset_y2range()
-{
-    range_flags[SECOND_Y_AXIS] = 0;
-}
-
-
-/* process 'unset zrange' command */
-static void
-unset_zrange()
-{
-    range_flags[FIRST_Z_AXIS] = 0;
-}
-
-
-/* process 'unset rrange' command */
-static void
-unset_rrange()
-{
-    range_flags[R_AXIS] = 0;
-}
-
-
-/* process 'unset trange' command */
-static void
-unset_trange()
-{
-    range_flags[T_AXIS] = 0;
-}
-
-
-/* process 'unset urange' command */
-static void
-unset_urange()
-{
-    range_flags[U_AXIS] = 0;
-}
-
-
-/* process 'unset vrange' command */
-static void
-unset_vrange()
-{
-    range_flags[V_AXIS] = 0;
-}
-
-
-/* FIXME - merge *zeroaxis() functions into one */
-
-/* process 'unset xzeroaxis' command */
-static void
-unset_xzeroaxis()
-{
-    c_token++;
-    xzeroaxis.l_type = -3;
-}
-
-
-/* process 'unset yzeroaxis' command */
-static void
-unset_yzeroaxis()
-{
-    c_token++;
-    yzeroaxis.l_type = -3;
-}
-
-
-/* process 'unset x2zeroaxis' command */
-static void
-unset_x2zeroaxis()
-{
-    c_token++;
-    x2zeroaxis.l_type = -3;
-}
-
-
-/* process 'unset y2zeroaxis' command */
-static void
-unset_y2zeroaxis()
-{
-    c_token++;
-    y2zeroaxis.l_type = -3;
+    axis_array[axis].zeroaxis = default_axis_zeroaxis;
 }
 
 
 /* process 'unset zeroaxis' command */
 static void
-unset_zeroaxis()
+unset_all_zeroaxes()
 {
-    c_token++;
-    xzeroaxis.l_type  = -3;
-    yzeroaxis.l_type  = -3;
-    x2zeroaxis.l_type = -3;
-    y2zeroaxis.l_type = -3;
+    AXIS_INDEX axis;
+
+    for(axis = 0; axis < AXIS_ARRAY_SIZE; axis++)
+	unset_zeroaxis(axis);
 }
 
 
 /* process 'unset [xyz]{2}label command */
 static void
-unset_xyzlabel(label)
-label_struct *label;
+unset_axislabel_or_title(label)
+    label_struct *label;
 {
-    c_token++;
-
     strcpy(label->text, "");
     strcpy(label->font, "");
     label->xoffset = 0;
     label->yoffset = 0;
 }
+
+static void
+unset_axislabel(axis)
+    AXIS_INDEX axis;
+{
+    axis_array[axis].label = default_axis_label;
+}
+
+/******** The 'reset' command ********/
+/* HBB 20000506: I moved this here, from set.c, because 'reset' really
+ * is more like a big lot of 'unset' commands, rather than a bunch of
+ * 'set's. The benefit is that it can make use of many of the
+ * unset_something() contained in this module, i.e. you now have one
+ * place less to keep in sync if the semantics or defaults of any
+ * option is changed. This is only true for options for which 'unset'
+ * state is the default, however, e.g. not for 'surface', 'bars' and
+ * some others. */
+void
+reset_command()
+{
+    AXIS_INDEX axis;
+    TBOOLEAN save_interactive = interactive;
+    static const TBOOLEAN set_for_axis[AXIS_ARRAY_SIZE]
+	= AXIS_ARRAY_INITIALIZER(TRUE);
+
+    c_token++;
+
+    /* Kludge alert, HBB 20000506: set to noninteractive mode, to
+     * suppress some of the commentary output by the individual
+     * unset_...() routines. */
+    interactive = FALSE;
+
+    unset_samples();
+    unset_isosamples();
+
+    /* delete arrows */
+    while (first_arrow != NULL)
+	delete_arrow((struct arrow_def *) NULL, first_arrow);
+    /* delete labels */
+    while (first_label != NULL)
+	delete_label((struct text_label *) NULL, first_label);
+    /* delete linestyles */
+    while (first_linestyle != NULL)
+	delete_linestyle((struct linestyle_def *) NULL, first_linestyle);
+
+    /* 'polar', 'parametric' and 'dummy' are interdependent, so be
+     * sure to keep the order intact */
+    unset_polar();
+    unset_parametric();
+    unset_dummy();
+
+    unset_axislabel_or_title(&title);
+
+    reset_key();
+    unset_keytitle();
+
+    unset_timefmt();
+
+    for (axis=0; axis<AXIS_ARRAY_SIZE; axis++) {
+	SET_DEFFORMAT(axis, set_for_axis);
+	unset_timedata(axis);
+	unset_zeroaxis(axis);
+	unset_range(axis);
+	unset_axislabel(axis);
+
+	axis_array[axis].set_autoscale = DTRUE;
+	axis_array[axis].writeback_min = axis_array[axis].set_min
+	    = axis_defaults[axis].min;
+	axis_array[axis].writeback_max = axis_array[axis].set_max
+	    = axis_defaults[axis].max;
+
+	/* 'tics' default is on for some, off for the other axes: */
+	axis_array[axis].ticmode = axis_defaults[axis].ticmode;
+	unset_mtics(axis);
+	axis_array[axis].ticdef = default_axis_ticdef;
+
+	reset_logscale(axis);
+}
+
+    unset_boxwidth();
+
+    clip_points = FALSE;
+    clip_lines1 = TRUE;
+    clip_lines2 = FALSE;
+
+    set_lp_properties(&border_lp, 0, -2, 0, 1.0, 1.0);
+    draw_border = 31;
+
+    draw_surface = 1.0;
+
+    data_style = POINTSTYLE;
+    func_style = LINES;
+
+    bar_size = 1.0;
+
+    unset_grid();
+    grid_lp = default_grid_lp;
+    mgrid_lp = default_grid_lp;
+    polar_grid_angle = 0;
+
+    hidden3d = FALSE;
+
+    label_contours = TRUE;
+    strcpy(contour_format, "%8.3g");
+
+    unset_angles();
+    unset_mapping();
+
+    unset_size();
+    aspect_ratio = 0.0;		/* dont force it */
+
+    unset_origin();
+    unset_view();
+    unset_timestamp();
+    unset_offsets();
+    unset_contour();
+    unset_cntrparam();
+    unset_zero();
+    unset_dgrid3d();
+    unset_ticscale();
+    unset_ticslevel();
+    unset_tics_in();
+    unset_lmargin();
+    unset_bmargin();
+    unset_rmargin();
+    unset_tmargin();
+    unset_pointsize();
+    unset_encoding();
+#ifdef PM3D
+    pm3d_reset();
+#endif
+    unset_locale();
+    unset_loadpath();
+
+    /* HBB 20000506: set 'interactive' back to its real value: */
+    interactive = save_interactive;
+}
+

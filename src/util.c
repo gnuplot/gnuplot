@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util.c,v 1.20.2.1 2000/05/03 21:26:12 joze Exp $"); }
+static char *RCSid() { return RCSid("$Id: util.c,v 1.23 2000/10/31 19:59:31 joze Exp $"); }
 #endif
 
 /* GNUPLOT - util.c */
@@ -37,8 +37,13 @@ static char *RCSid() { return RCSid("$Id: util.c,v 1.20.2.1 2000/05/03 21:26:12 
 #include "util.h"
 
 #include "alloc.h"
+#include "command.h"
 #include "misc.h"
-#include "setshow.h"		/* for month names etc */
+#include "plot.h"
+/*  #include "setshow.h" */		/* for month names etc */
+#include "term_api.h"		/* for term_end_plot() used by graph_error() */
+
+/* internal stuff */
 
 static char *num_to_str __PROTO((double r));
 static void parse_esc __PROTO((char *instr));
@@ -667,6 +672,39 @@ va_dcl
     putc('\n', stderr);
 }				/* int_warn */
 
+/*{{{  graph_error() */
+/* handle errors during graph-plot in a consistent way */
+/* HBB 20000430: move here, from graphics.c */
+#if defined(VA_START) && defined(ANSI_C)
+void
+graph_error(const char *fmt, ...)
+#else
+void
+graph_error(fmt, va_alist)
+const char *fmt;
+va_dcl
+#endif
+{
+#ifdef VA_START
+    va_list args;
+#endif
+
+    multiplot = FALSE;
+    term_end_plot();
+
+#ifdef VA_START
+    VA_START(args, fmt);
+    int_error(NO_CARET, fmt, args);
+    va_end(args);
+#else
+    int_error(fmt, a1, a2, a3, a4, a5, a6, a7, a8);
+#endif
+
+}
+
+/*}}} */
+
+
 /* Lower-case the given string (DFK) */
 /* Done in place. */
 void
@@ -676,8 +714,8 @@ char *s;
     register char *p = s;
 
     while (*p++) {
-	if (isupper(*p))
-	    *p = tolower(*p);
+	if (isupper((unsigned char)*p))
+	    *p = tolower((unsigned char)*p);
     }
 }
 

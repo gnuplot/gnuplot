@@ -1,5 +1,5 @@
 /*
- * $Id: dynarray.h,v 1.2.2.1 2000/05/03 21:26:11 joze Exp $
+ * $Id: dynarray.h,v 1.4 2000/10/31 19:59:30 joze Exp $
  */
 
 /* GNUPLOT - dynarray.h */
@@ -37,8 +37,8 @@
 #ifndef DYNARRAY__H
 # define DYNARRAY__H
 
-# include <stdlib.h>
-# include "plot.h"
+# include "syscfg.h"
+# include "stdfn.h"
 
 typedef struct dynarray {
     long size;			/* alloced size of the array */

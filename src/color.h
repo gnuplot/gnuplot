@@ -31,6 +31,7 @@ of palettes between terminals and making palette routines.
 
 #ifdef PM3D
 
+#include "gp_types.h"
 
 /* Contains a colour in RGB scheme.
    Values of  r, g and b  are all in range [0;1] */

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: strftime.c,v 1.2 1999/06/09 12:13:32 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: strftime.c,v 1.3.4.1 2000/06/22 12:57:39 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - strftime.c */
@@ -49,8 +49,8 @@ static char *RCSid() { return RCSid("$Id: strftime.c,v 1.2 1999/06/09 12:13:32 l
 
 #define NOTIMEZONE
 
-#include "plot.h"		/* for MAX_LINE_LEN */
-#include "setshow.h"		/* for days/months */
+#include "syscfg.h"		/* for MAX_LINE_LEN */
+/*  #include "setshow.h" */		/* for days/months */
 
 #ifdef TEST_STRFTIME		/* test case; link with stdfn */
 #define strftime _strftime
