@@ -217,7 +217,7 @@ doc2rnh: doc2rnh.o termdoc.o
 # end doc2xxx section
 
 tutorial: latextut/tutorial.tex
-	( cd latextut; $(MAKE) )
+	cd latextut && $(MAKE) $(MFLAGS)
 
 # this is how to check the gnuplot.doc file
 check: checkdoc $(srcdir)/gnuplot.doc
@@ -253,11 +253,12 @@ clean:
 	  doc2rnh gnuplot.rnh \
 	  doc2rtf gnuplot.rtf \
 	  gnuplot.nroff checkdoc *.o core a.out allterm.h
-	( cd latextut; $(MAKE) clean )
+	cd latextut && $(MAKE) $(MFLAGS) clean
 
 mostlyclean: clean
 
 distclean: clean
+	cd latextut && $(MAKE) $(MFLAGS) distclean
 	rm -f Makefile
 
 realclean: distclean
