@@ -308,6 +308,11 @@ typedef double coordval;
 # define DBL_EPSILON     2.2204460492503131E-16
 #endif
 
+/* The XOPEN ln(10) macro */
+#ifndef M_LN10
+#  define M_LN10    2.3025850929940456840e0 
+#endif
+
 /* argument: char *fn */
 #define VALID_FILENAME(fn) ((fn) != NULL && (*fn) != '\0')
 
