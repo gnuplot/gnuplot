@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: wgraph.c,v 1.19 2001/03/09 16:14:21 mikulik Exp $";
+static char *RCSid = "$Id: wgraph.c,v 1.20 2001/04/12 15:02:30 broeker Exp $";
 #endif
 
 /* GNUPLOT - win/wgraph.c */
@@ -138,6 +138,56 @@ int wginitstyle[WGDEFSTYLE] = {PS_SOLID, PS_DASH, PS_DOT, PS_DASHDOT, PS_DASHDOT
 /* HBB 20010218: moved here from wgnuplib.h: other parts of the program don't
  * need to know about it */
 #define GWOPMAX 4096
+
+
+#if USE_ULIG_FILLEDBOXES
+/* bitmaps for filled boxes (ULIG) */
+/* zeros represent the foreground color and ones represent the background color */
+/* FIXME HBB 20010916: *never* extern in a C source! */
+/*  extern int filldensity; */
+/*  extern int fillpattern; */
+
+static unsigned char halftone_bitmaps[][16] ={
+  { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,  
+    0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF },   /* no fill */
+  { 0xEE, 0xEE, 0xBB, 0xBB, 0xEE, 0xEE, 0xBB, 0xBB,
+    0xEE, 0xEE, 0xBB, 0xBB, 0xEE, 0xEE, 0xBB, 0xBB },   /* 25% pattern */
+  { 0xAA, 0xAA, 0x55, 0x55, 0xAA, 0xAA, 0x55, 0x55,
+    0xAA, 0xAA, 0x55, 0x55, 0xAA, 0xAA, 0x55, 0x55 },   /* 50% pattern */
+  { 0x88, 0x88, 0x22, 0x22, 0x88, 0x88, 0x22, 0x22,
+    0x88, 0x88, 0x22, 0x22, 0x88, 0x88, 0x22, 0x22 },   /* 75% pattern */
+  { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }    /* solid pattern */
+};
+#define halftone_num (sizeof(halftone_bitmaps) / sizeof (*halftone_bitmaps))
+static HBRUSH halftone_brush[halftone_num];
+static BITMAP halftone_bitdata[halftone_num];
+static HBITMAP halftone_bitmap[halftone_num];
+
+static unsigned char pattern_bitmaps[][16] = {
+  {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+   0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF}, /* no fill */
+  {0xFE, 0xFE, 0xFD, 0xFD, 0xFB, 0xFB, 0xF7, 0xF7,
+   0xEF, 0xEF, 0xDF, 0xDF, 0xBF, 0xBF, 0x7F, 0x7F}, /* diagonals (1) */
+  {0x7F, 0x7F, 0xBF, 0xBF, 0xDF, 0xDF, 0xEF, 0xEF,
+   0xF7, 0xF7, 0xFB, 0xFB, 0xFD, 0xFD, 0xFE, 0xFE}, /* diagonals (2) */
+  {0xEE, 0xEE, 0xEE, 0xEE, 0xDD, 0xDD, 0xDD, 0xDD,
+   0xBB, 0xBB, 0xBB, 0xBB, 0x77, 0x77, 0x77, 0x77}, /* diagonals (3) */
+  {0x77, 0x77, 0x77, 0x77, 0xBB, 0xBB, 0xBB, 0xBB,
+   0xDD, 0xDD, 0xDD, 0xDD, 0xEE, 0xEE, 0xEE, 0xEE}, /* diagonals (4) */
+  {0xFC, 0xFC, 0xF3, 0xF3, 0xCF, 0xCF, 0x3F, 0x3F,
+   0xFC, 0xFC, 0xF3, 0xF3, 0xCF, 0xCF, 0x3F, 0x3F}, /* diagonals (5) */
+  {0x3F, 0x3F, 0xCF, 0xCF, 0xF3, 0xF3, 0xFC, 0xFC,
+   0x3F, 0x3F, 0xCF, 0xCF, 0xF3, 0xF3, 0xFC, 0xFC} /* and this one? */
+};
+#define pattern_num (sizeof(pattern_bitmaps)/(sizeof(*pattern_bitmaps)))
+static HBRUSH pattern_brush[pattern_num];
+static BITMAP pattern_bitdata[pattern_num];
+static HBITMAP pattern_bitmap[pattern_num];
+
+static TBOOLEAN brushes_initialized = FALSE;
+#endif /* USE_ULIG_FILLEDBOXES */
+
 
 /* ================================== */
 
@@ -453,6 +503,39 @@ MakePens(LPGW lpgw, HDC hdc)
 		for (i=0; i<WGNUMPENS+2; i++)
 			lpgw->colorbrush[i] = CreateSolidBrush(lpgw->colorpen[i].lopnColor);
 	}
+
+#if USE_ULIG_FILLEDBOXES
+	/* build pattern brushes for filled boxes (ULIG) */
+	if( ! brushes_initialized ) {
+		int i;
+
+		for(i=0; i < halftone_num; i++) {
+			halftone_bitdata[i].bmType       = 0;
+			halftone_bitdata[i].bmWidth      = 16;
+			halftone_bitdata[i].bmHeight     = 8;
+			halftone_bitdata[i].bmWidthBytes = 2;
+			halftone_bitdata[i].bmPlanes     = 1;
+			halftone_bitdata[i].bmBitsPixel  = 1;
+			halftone_bitdata[i].bmBits       = halftone_bitmaps[i];
+			halftone_bitmap[i] = CreateBitmapIndirect(&halftone_bitdata[i]);
+			halftone_brush[i] = CreatePatternBrush(halftone_bitmap[i]);
+		}
+
+		for(i=0; i < pattern_num; i++) {
+			pattern_bitdata[i].bmType       = 0;
+			pattern_bitdata[i].bmWidth      = 16;
+			pattern_bitdata[i].bmHeight     = 8;
+			pattern_bitdata[i].bmWidthBytes = 2;
+			pattern_bitdata[i].bmPlanes     = 1;
+			pattern_bitdata[i].bmBitsPixel  = 1;
+			pattern_bitdata[i].bmBits       = pattern_bitmaps[i];
+			pattern_bitmap[i] = CreateBitmapIndirect(&pattern_bitdata[i]);
+			pattern_brush[i] = CreatePatternBrush(pattern_bitmap[i]);
+		}
+
+		brushes_initialized = TRUE;
+	}
+#endif /* USE_ULIG_FILLEDBOXES */
 }
 
 /* Undo effect of MakePens(). To be called just before the window is closed. */
@@ -465,6 +548,23 @@ DestroyPens(LPGW lpgw)
 	DeleteObject(lpgw->hapen);
 	for (i=0; i<WGNUMPENS+2; i++)
 		DeleteObject(lpgw->colorbrush[i]);
+
+#if USE_ULIG_FILLEDBOXES
+	/* delete brushes used for boxfilling (ULIG) */
+	if( brushes_initialized ) {
+		int i;
+
+		for( i=0; i<halftone_num; i++ ) {
+			DeleteObject(halftone_bitmap[i]);
+			DeleteObject(halftone_brush[i]);
+		}
+		for( i=0; i<pattern_num; i++ ) {
+			DeleteObject(pattern_bitmap[i]);
+			DeleteObject(pattern_brush[i]);
+		}
+		brushes_initialized = FALSE;
+	}
+#endif /* USE_ULIG_FILLEDBOXES */
 }
 
 /* ================================== */
@@ -678,6 +778,10 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
     unsigned int ngwop=0;
     BOOL isColor;
     double line_width = 1.0;
+#if USE_ULIG_FILLEDBOXES
+    unsigned int fillstyle = 0.0;
+    int idx;
+#endif /*  USE_ULIG_FILLEDBOXES */
 
     if (lpgw->locked) 
 	return;
@@ -756,22 +860,6 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 		polyi = 1;
 	    }
 	    break;
-	case W_filledbox:
-	    {
-		RECT rect;
-
-		assert (polyi == 1);
-                                 
-		rect.left = ppt[0].x;
-		rect.bottom = ppt[0].y;
-		rect.right = ppt[0].x + xdash;
-		rect.top = ppt[0].y - ydash;
-
-		SetBkColor(hdc,lpgw->background);
-		FillRect(hdc, &rect, lpgw->hbrush);
-		polyi = 0;
-	    }
-
 	case W_line_type:
 	    {
 		short cur_pen = ((curptr->x < (WORD)(-2))
@@ -790,6 +878,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 	pen = curptr->x;
 	SelectObject(hdc, lpgw->colorbrush[pen%WGNUMPENS + 2]);
 	break;
+	    
 	case W_put_text:
 	    {
 		char *str;
@@ -807,6 +896,72 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 		LocalUnlock(curptr->htext);
 	    }
 	break;
+
+#if USE_ULIG_FILLEDBOXES
+	case W_fillstyle:
+	    /* HBB 20010916: new entry, needed to squeeze the many
+	     * parameters of a filled box call through the bottlneck
+	     * of the fixed number of parameters in GraphOp() and
+	     * struct GWOP, respectively. */
+	    fillstyle = curptr->x;
+	    break;
+#endif /* USE_ULIG_FILLEDBOXES */
+
+	case W_boxfill:   /* ULIG */
+
+	    assert (polyi == 1);
+		
+#if USE_ULIG_FILLEDBOXES
+	    /* NOTE: the x and y passed with this call are the width and
+	     * height of the box, actually. The left corner was stored into
+	     * ppt[0] by a preceding W_move, and the style was memorized
+	     * by a W_fillstyle call. */
+	    switch(fillstyle & 0x0f) {
+		case 1: 
+		    /* style == 1 --> use halftone fill pattern
+		     * according to filldensity. Density is from
+		     * 0..100 percent: */
+		    idx = ((fillstyle >> 4) * (halftone_num - 1) / 100 );
+		    if (idx < 0)
+			idx = 0;
+		    if (idx > halftone_num - 1)
+			idx = halftone_num - 1;
+		    SelectObject(hdc, halftone_brush[idx]);
+		    break;
+		case 2: 
+		    /* style == 2 --> use fill pattern according to
+                     * fillpattern. Pattern number is enumerated */
+		    idx = fillstyle >> 4;  
+		    if (idx < 0) 
+			idx = 0;
+		    if (idx > pattern_num - 1)
+			idx = 0;
+		    SelectObject(hdc, pattern_brush[idx]);
+		    break;
+		default:
+		    /* style == 0 or unknown --> fill with background color */
+		    SelectObject(hdc, halftone_brush[0]);
+	    }
+	    /* needs to be fixed for monochrome devices */
+	    SetTextColor(hdc, lpgw->colorpen[pen+2].lopnColor);
+	    xdash -= rl;
+	    ydash -= rb - 1;
+	    PatBlt(hdc, ppt[0].x, ppt[0].y, xdash, ydash, PATCOPY);
+#else /* ! USE_ULIG_FILLEDBOXES */
+	    {
+		RECT rect;
+
+		rect.left = ppt[0].x;
+		rect.bottom = ppt[0].y;
+		rect.right = ppt[0].x + xdash;
+		rect.top = ppt[0].y - ydash;
+
+		SetBkColor(hdc,lpgw->background);
+		FillRect(hdc, &rect, lpgw->hbrush);
+	    }
+#endif /* USE_ULIG_FILLEDBOXES */
+	    polyi = 0;
+	    break;
 	case W_text_angle:
 	    lpgw->angle = curptr->x;
 	    SetFont(lpgw,hdc);
@@ -826,10 +981,6 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 		}
 	    break;
 	case W_pointsize:
-	    /* HBB 980309: term->pointsize() passes the number as
-	     * a scaled-up integer now, so we can avoid calling
-	     * sscanf() here (in a Win16 DLL sharing stack with
-	     * the stack-starved wgnuplot.exe !).  */
 	    if (curptr->x != 0) {
 		double pointsize = curptr->x / 100.0;
 		htic = pointsize*MulDiv(lpgw->htic, rr-rl, lpgw->xmax) + 1;

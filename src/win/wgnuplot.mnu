@@ -112,6 +112,8 @@
 			with errorbars
 		Boxes
 			with boxes
+		FilledBoxes
+			with filledboxes
 		Box Error Bars
 			with boxerrorbars
 	[EndMenu]

@@ -1,5 +1,5 @@
 /*
- * $Id: wgnuplib.h,v 1.11 2001/03/09 16:14:21 mikulik Exp $
+ * $Id: wgnuplib.h,v 1.12 2001/04/12 15:02:30 broeker Exp $
  */
 
 /* GNUPLOT - win/wgnuplib.h */
@@ -71,7 +71,8 @@
 /* HBB: bumped version for massive changes due to mouse-ing and removal of
  *      variables no longer needed, in struct GW */
 /* HBB: bumped version because of changes in PM3D interface and pointtypes */
-#define WGNUPLOTVERSION  "1.5   2001-04-11"
+/* HBB: bumped version for filledboxes support */
+#define WGNUPLOTVERSION  "1.6   2001-09-18"
 BOOL WDPROC CheckWGNUPLOTVersion(LPSTR str);
 
 /* ================================== */
@@ -255,7 +256,8 @@ void WDPROC AboutBox(HWND hwnd, LPSTR str);
  * by the 'Line styles...' dialog, and save to/from wgnuplot.ini). */
 #define WGNUMPENS 15
 
-/* GWOP is 8 bytes long. Array of GWOP kept in global block */
+/* Information about one graphical operation to be stored by the
+ * driver for the sake of redraws. Array of GWOP kept in global block */
 struct GWOP {
 	WORD op;
 	WORD x, y;
@@ -299,7 +301,8 @@ struct GWOPBLK {			/* kept in local memory */
 #define W_pm3d_setcolor 38
 #define W_pm3d_filled_polygon_pt   39
 #define W_pm3d_filled_polygon_draw 40
-#define W_filledbox 41
+#define W_boxfill 41
+#define W_fillstyle 42		/* NOTE HBB 20010916: used #if _FILLEDBOXES */
 
 typedef struct tagGW {
 	LPPRINT	lpr;		/* must be first */

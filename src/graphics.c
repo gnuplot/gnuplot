@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.52 2001/08/27 15:02:14 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.53 2001/09/08 00:50:01 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -2639,40 +2639,58 @@ plot_boxes(plot, xaxis_y)
 		yt = map_y(dyt);
 
 #if USE_ULIG_FILLEDBOXES
-                if( fill && t->fillbox ) { /* ULIG */
-                    /* filled boxes */
+                if( fill && t->fillbox ) { /* ULIG: implement filled boxes */
                     int x, y, w, h;
                     int fillpar, style;
+		    
                     x = xl;
                     y = xaxis_y;
                     w = xr - xl + 1;
                     h = yt - xaxis_y + 1;
                     /* avoid negative width/height */
-                    if( w <= 0 ) { x = xr; w = xl - xr + 1; }
-                    if( h <= 0 ) { y = yt; h = xaxis_y - yt + 1; }
-                    /* squeeze all fill information into the old style parameter */
-                    /* The terminal driver knows how to extract the information. */
-                    /* We assume that the style (int) has only 16 bit, therefore we take */
-                    /* 4 bits for the style and allow 12 bits for the corresponding fill parameter. */
-                    /* This limits the number of styles to 16 and the fill parameter's values */
-                    /* to the range 0...4095, which seems acceptable. */
+                    if( w <= 0 ) { 
+			x = xr; 
+			w = xl - xr + 1;
+		    }
+                    if( h <= 0 ) {
+			y = yt;
+			h = xaxis_y - yt + 1;
+		    }
+
+                    /* squeeze all fill information into the old style
+                     * parameter.  The terminal driver knows how to
+                     * extract the information.  We assume that the
+                     * style (int) has only 16 bit, therefore we take
+                     * 4 bits for the style and allow 12 bits for the
+                     * corresponding fill parameter.  This limits the
+                     * number of styles to 16 and the fill parameter's
+                     * values to the range 0...4095, which seems
+                     * acceptable. */
                     switch( fillstyle ) {
-                    case 1:  /* style == 1 --> solid fill with 'filldensity' */
+                    case 1:
+			/* style == 1 --> solid fill with 'filldensity' */
                         fillpar = filldensity;
                         break;
-                    case 2:  /* style == 2 --> pattern fill with 'fillpattern' */
+                    case 2:  
+			/* style == 2 --> pattern fill with 'fillpattern' */
                         fillpar = fillpattern;
                         break;
-                    default: /* style == 0 or unknown --> solid fill with background color */
+                    default:
+			/* style == 0 or unknown --> solid fill with
+                         * background color */
                         fillpar = 0;
                     }
+
                     style = ((fillpar & 0xfff) << 4) + (fillstyle & 0xf);
                     (*t->fillbox) (style, x, y, w, h);
-                    /* break here, if we don't need the box frame around, */
-                    /* i.e. fillstyle is "solid" and filldensity is 100%, */
-                    /* or if we are using the fig driver (frame and fill are one object) */
-                    if( fillstyle == 1 && filldensity == 100 ) break;
-                    if( strcmp(t->name, "fig") == 0 ) break;
+
+                    /* break here, if we don't need the box frame
+                     * around, i.e. fillstyle is "solid" and
+                     * filldensity is 100%, or if we are using the fig
+                     * driver (frame and fill are one object) */
+                    if((fillstyle == 1 && filldensity == 100)
+		        || (strcmp(t->name, "fig") == 0))
+			break;
                 }
 #endif /* USE_ULIG_FILLEDBOXES */
 
