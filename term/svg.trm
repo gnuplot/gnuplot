@@ -1,5 +1,5 @@
 /*
- * $Id: svg.trm,v 1.34 2004/03/27 23:10:51 sfeam Exp $
+ * $Id: svg.trm,v 1.35 2004/04/05 04:16:20 sfeam Exp $
  *
  */
 
@@ -1005,17 +1005,7 @@ SVG_set_color(double gray)
 {
     rgb255_color rgb255;
 
-    if (sm_palette.use_maxcolors != 0) {
-        /* finite nb of colors explicitly requested */
-        if( gray >= ( (double)(sm_palette.use_maxcolors-1) )
-	              / sm_palette.use_maxcolors )
-	    gray = 1.0;
-	else
-	    gray = floor( gray * sm_palette.use_maxcolors ) 
-	           / sm_palette.use_maxcolors;
-    }
-
-    rgb255_from_gray( gray, &rgb255 );
+    rgb255maxcolors_from_gray( gray, &rgb255 );
     SVG_use_pm3d_color = 1;
 
     if (rgb255.r != SVG_red || rgb255.g != SVG_green || rgb255.b != SVG_blue) {

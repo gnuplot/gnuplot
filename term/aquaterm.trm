@@ -1,5 +1,5 @@
 /* -*- objc -*-
- * $Id: aquaterm.trm,v 1.2 2003/08/22 12:36:42 lhecking Exp $
+ * $Id: aquaterm.trm,v 1.3 2004/03/29 10:30:18 persquare Exp $
  *
  */
 
@@ -505,18 +505,7 @@ AQUA_set_color(double gray)
 {
   rgb_color color;
   
-  if( sm_palette.use_maxcolors != 0 ) {
-    /* finite nb of colors explicitly requested */
-    if( gray >= ( (double)(sm_palette.use_maxcolors-1) )
-	/ sm_palette.use_maxcolors ) {
-      gray = 1.0;
-    } else {
-      gray = floor( gray * sm_palette.use_maxcolors ) 
-	/ sm_palette.use_maxcolors;
-    }
-  }
-  
-  rgb1_from_gray( gray, &color );
+  rgb1maxcolors_from_gray( gray, &color );
   [adapter setColorRed:color.r green:color.g blue:color.b];
   AQUA_LineType = LT_UNDEFINED; 
 }

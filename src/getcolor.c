@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: getcolor.c,v 1.13 2003/09/08 12:56:00 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: getcolor.c,v 1.14 2003/11/13 08:18:15 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - getcolor.c */
@@ -207,7 +207,8 @@ static int interpolate_color_from_gray( double gray, rgb_color *color )
  *  Returns 0 or does an int_error() when function evaluatin failed.
  *  The result is not in RGB color space jet.
  */
-int calculate_color_from_formulae( double gray, rgb_color *color )
+int
+calculate_color_from_formulae( double gray, rgb_color *color )
 {
   struct value v;
   double a, b, c;
@@ -247,7 +248,8 @@ int calculate_color_from_formulae( double gray, rgb_color *color )
 
 
 /* Map gray in [0,1] to color components according to colorMode */
-void color_components_from_gray( double gray, rgb_color *color )
+void
+color_components_from_gray( double gray, rgb_color *color )
 {
     switch( sm_palette.colorMode ) {
       case SMPAL_COLOR_MODE_GRAY:
@@ -280,7 +282,8 @@ void color_components_from_gray( double gray, rgb_color *color )
  *  to rgb1_from_gray() in order to more clearly distinguish structures
  *  rgb_color and rgb255_color.
  */
-void rgb1_from_gray( double gray, rgb_color *color )
+void
+rgb1_from_gray( double gray, rgb_color *color )
 {
     /* get the color */
     color_components_from_gray( gray, color );
@@ -303,7 +306,8 @@ void rgb1_from_gray( double gray, rgb_color *color )
 /*  
  *  Convenience function to map R, G and B float values [0,1] to uchars [0,255].
  */
-void rgb255_from_rgb1( rgb_color rgb1, rgb255_color *rgb255 )
+void
+rgb255_from_rgb1( rgb_color rgb1, rgb255_color *rgb255 )
 {
     rgb255->r = (unsigned char)(255 * rgb1.r + 0.5);
     rgb255->g = (unsigned char)(255 * rgb1.g + 0.5);
@@ -314,10 +318,37 @@ void rgb255_from_rgb1( rgb_color rgb1, rgb255_color *rgb255 )
 /*  
  *  Convenience function to map gray values to R, G and B values in [0,255].
  */
-void rgb255_from_gray( double gray, rgb255_color *rgb255 )
+void
+rgb255_from_gray( double gray, rgb255_color *rgb255 )
 {
     rgb_color rgb1;
     rgb1_from_gray(gray, &rgb1);
+    rgb255_from_rgb1(rgb1, rgb255);
+}
+
+
+/*
+ *  Convenience function to map gray values to R, G and B values in [0,1],
+ *  taking care of palette maxcolors (i.e., discrete nb of colors).
+ */
+void
+rgb1maxcolors_from_gray( double gray, rgb_color *color )
+{
+    if (sm_palette.use_maxcolors != 0)
+	gray = floor(gray * sm_palette.use_maxcolors) / (sm_palette.use_maxcolors-1);
+    rgb1_from_gray( gray, color );
+}
+
+
+/*
+ *  Convenience function to map gray values to R, G and B values in [0,255],
+ *  taking care of palette maxcolors (i.e., discrete nb of colors).
+ */
+void
+rgb255maxcolors_from_gray( double gray, rgb255_color *rgb255 )
+{
+    rgb_color rgb1;
+    rgb1maxcolors_from_gray(gray, &rgb1);
     rgb255_from_rgb1(rgb1, rgb255);
 }
 

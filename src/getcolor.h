@@ -1,5 +1,5 @@
 /*
- * $Id: getcolor.h,v 1.4 2002/08/30 18:45:45 mikulik Exp $
+ * $Id: getcolor.h,v 1.5 2003/11/13 08:18:15 mikulik Exp $
  */
 
 /* GNUPLOT - getcolor.h */
@@ -42,6 +42,9 @@ void color_components_from_gray __PROTO(( double gray, rgb_color *color ));
 void rgb1_from_gray __PROTO(( double gray, rgb_color *color ));
 void rgb255_from_rgb1 __PROTO(( rgb_color rgb1, rgb255_color *rgb255 ));
 void rgb255_from_gray __PROTO(( double gray, rgb255_color *rgb255 ));
+/* main gray --> rgb color mapping as above, with take care of palette maxcolors */
+void rgb1maxcolors_from_gray __PROTO(( double gray, rgb_color *color ));
+void rgb255maxcolors_from_gray __PROTO(( double gray, rgb255_color *rgb255 ));
 
 /* used by x11.trm to avoid 'set palette funct R(g),G(g),B(g)' problems */
 int calculate_color_from_formulae __PROTO(( double, rgb_color * ));

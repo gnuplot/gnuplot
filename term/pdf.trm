@@ -1,5 +1,5 @@
 /*
- * $Id: pdf.trm,v 1.28 2004/03/23 05:40:48 sfeam Exp $
+ * $Id: pdf.trm,v 1.29 2004/05/25 04:14:53 sfeam Exp $
  */
 
 /*------------------------------
@@ -1125,18 +1125,7 @@ PDF_set_color(double gray)
 {
     rgb_color color;
 
-    if( sm_palette.use_maxcolors != 0 ) {
-        /* finite nb of colors explicitly requested */
-        if( gray >= ( (double)(sm_palette.use_maxcolors-1) )
-	              / sm_palette.use_maxcolors )
-	    gray = 1.0;
-	else
-	    gray = floor( gray * sm_palette.use_maxcolors ) 
-	           / sm_palette.use_maxcolors;
-    }
-
-
-    rgb1_from_gray( gray, &color );
+    rgb1maxcolors_from_gray( gray, &color );
 
     /* make sure that the path is stroked with the current color
      * before changing the color */
