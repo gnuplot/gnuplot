@@ -1,3 +1,16 @@
+2002-01-22  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* INSTALL: Remove references to the GP_PATH_* macros.
+
+	* configure.in: General cleanup and bugfixing. Replace all references
+	to GP_PATH_* macros with code that uses generic autoconf macros.
+
+	* src/graphics.c: Make finish_filled_curve() static.
+
+	* src/version.c: Increment version to 3.8i, update date and copyright.
+
+	* m4/path-hdr.m4, m4/path-lib.m4: Remove.
+
 2002-01-22  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* NEWS docs/gnuplot.doc src/gadgets.h src/gadgets.c src/graph3d.c
@@ -5,7 +18,8 @@
 	src/tables.c src/unset.c: New option 'set key height <height>'.
 
 2002-01-18  Clark Gaylord  <cgaylord@vt.edu>
-	* Change all references in documenation from gnuplot.org to
+
+	* Change all references in documentation from gnuplot.org to
 	gnuplot.info.
 
 2002-01-17  Johannes Zellner  <johannes@zellner.org>
