@@ -31,9 +31,16 @@ $!-----------------------------------------------------------------
 $!-----------------------------------------------------------------
 $! customize CFLAGS for version of VMS, CRTL, and C compiler.
 $!-----------------------------------------------------------------
+$ IF F$GETSYI("ARCH_TYPE") .EQ. 1
+$ THEN
+$!  these defines work for OpenVMS VAX v6.2 and DEC C v5.7
+$ CFLAGS = "/define=(ANSI_C,HAVE_UNISTD_H,HAVE_GETCWD,"-
+ +"HAVE_SLEEP,''x11'NO_GIH,PIPES,DECCRTL)''pfix'"
+$ ELSE
 $!  these defines work for OpenVMS Alpha v6.2 and DEC C v5.3
 $ CFLAGS = "/define=(ANSI_C,HAVE_LGAMMA,HAVE_ERF,HAVE_UNISTD_H,HAVE_GETCWD,"-
  +"HAVE_SLEEP,''x11'NO_GIH,PIPES,DECCRTL)''pfix'"
+$ ENDIF
 $!
 $!-----------------------------------------------------------------
 $!
