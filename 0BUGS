@@ -186,6 +186,10 @@ e
   it cannot handle the new RTF spec. There is no workaround, but
   VC++ 5.0/6.0 users should have no problems.
  
+13. The 16bit Windows version, compiled by Borland C++ 3.1, crashes with
+  a protection violation in 'all.dem', on the first plot that tries
+  to read a datafile. Heap corruption suspected.
+
 (Moved from old WhatsNew file, needs cleaning up)
 
 BUGS outstanding
