@@ -1,5 +1,5 @@
 /*
- * $Id: pdf.trm,v 1.19 2003/03/17 19:35:12 sfeam Exp $
+ * $Id: pdf.trm,v 1.20 2003/03/31 19:29:07 sfeam Exp $
  */
 
 /*------------------------------
@@ -109,10 +109,8 @@ static void PDF_PathOpen __PROTO ((void));
 static void PDF_PathClose __PROTO ((void));
 static void PDF_SetFont __PROTO ((void));
 #if USE_ULIG_FILLEDBOXES
-static int PDF_DefinePattern1 __PROTO((int x1, int y1, int x2, int y2));
-static int PDF_DefinePattern2 __PROTO((int x1, int y1, int x2, int y2, int x3, int y3, int x4, int y4));
 static void PDF_DefinePatterns __PROTO((void));
-enum { PDF_patterns = 6 };
+enum { PDF_patterns = 7 };
 static int PDF_patternHandles[PDF_patterns];
 #endif
 
@@ -181,43 +179,51 @@ PDF_SetFont ()
 }
 
 #if USE_ULIG_FILLEDBOXES
-static int
-PDF_DefinePattern1(int x1, int y1, int x2, int y2)
-{
-    int handle = PDF_begin_pattern(myPDF, 8, 8, 8, 8, 2 /* painttype */);
-    PDF_setlinewidth(myPDF, 0.2);
-    PDF_setlinecap(myPDF, 2); /* square ends */
-    PDF_moveto(myPDF, x1, y1);
-    PDF_lineto(myPDF, x2, y2);
-    PDF_stroke(myPDF);
-    PDF_end_pattern(myPDF);
-    return handle;
-}
-
-static int
-PDF_DefinePattern2(int x1, int y1, int x2, int y2, int x3, int y3, int x4, int y4)
-{
-    int handle = PDF_begin_pattern(myPDF, 8, 8, 8, 8, 2 /* painttype */);
-    PDF_setlinewidth(myPDF, 0.2);
-    PDF_setlinecap(myPDF, 2); /* square ends */
-    PDF_moveto(myPDF, x1, y1);
-    PDF_lineto(myPDF, x2, y2);
-    PDF_moveto(myPDF, x3, y3);
-    PDF_lineto(myPDF, x4, y4);
-    PDF_stroke(myPDF);
-    PDF_end_pattern(myPDF);
-    return handle;
-}
-
 static void
 PDF_DefinePatterns()
 {
-    PDF_patternHandles[0] = PDF_DefinePattern1(0, 8, 8, 0);
-    PDF_patternHandles[1] = PDF_DefinePattern1(0, 0, 8, 8);
-    PDF_patternHandles[2] = PDF_DefinePattern2(0, 8, 4, 0, 4, 8, 8, 0);
-    PDF_patternHandles[3] = PDF_DefinePattern2(0, 0, 4, 8, 4, 0, 8, 8);
-    PDF_patternHandles[4] = PDF_DefinePattern2(0, 4, 8, 0, 0, 8, 8, 4);
-    PDF_patternHandles[5] = PDF_DefinePattern2(0, 0, 8, 4, 0, 4, 8, 8);
+    int i;
+
+    for (i=0; i<PDF_patterns; i++) {
+	PDF_patternHandles[i] = PDF_begin_pattern(myPDF, 8, 8, 8, 8, 2);
+	PDF_setlinewidth(myPDF, 0.2);
+	PDF_setlinecap(myPDF, 2); /* square ends */
+	switch (i) {
+	case 0:	PDF_moveto(myPDF, 0, 8);
+		PDF_lineto(myPDF, 8, 0);
+		break;
+	case 1:	PDF_moveto(myPDF, 0, 0);
+		PDF_lineto(myPDF, 8, 8);
+		break;
+	case 2:	PDF_moveto(myPDF, 0, 8);
+		PDF_lineto(myPDF, 4, 0);
+		PDF_moveto(myPDF, 4, 8);
+		PDF_lineto(myPDF, 8, 0);
+		break;
+	case 3:	PDF_moveto(myPDF, 0, 0);
+		PDF_lineto(myPDF, 4, 8);
+		PDF_moveto(myPDF, 4, 0);
+		PDF_lineto(myPDF, 8, 8);
+		break;
+	case 4:	PDF_moveto(myPDF, 0, 4);
+		PDF_lineto(myPDF, 8, 0);
+		PDF_moveto(myPDF, 0, 8);
+		PDF_lineto(myPDF, 8, 4);
+		break;
+	case 5:	PDF_moveto(myPDF, 0, 0);
+		PDF_lineto(myPDF, 8, 4);
+		PDF_moveto(myPDF, 0, 4);
+		PDF_lineto(myPDF, 8, 8);
+		break;
+	case 6:	PDF_moveto(myPDF, 0, 8);
+		PDF_lineto(myPDF, 8, 0);
+		PDF_moveto(myPDF, 0, 0);
+		PDF_lineto(myPDF, 8, 8);
+		break;
+	}
+	PDF_stroke(myPDF);
+	PDF_end_pattern(myPDF);
+    }
 }
 #endif
 

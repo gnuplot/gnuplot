@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.53 2002/12/06 23:55:18 joze Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.54 2002/12/18 00:57:02 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - gplt_x11.c */
@@ -503,6 +503,7 @@ static XSegment Plus[2], Cross[2], Star[4];
 
 #if USE_ULIG_FILLEDBOXES
 /* pixmaps used for filled boxes (ULIG) */
+/* FIXME EAM - These data structures are a duplicate of the ones in bitmap.c */
 
 /* halftone stipples for solid fillstyle */
 #define stipple_halftone_width 8
@@ -519,7 +520,7 @@ static const unsigned char stipple_halftone_bits[stipple_halftone_num][8] = {
 /* pattern stipples for pattern fillstyle */
 #define stipple_pattern_width 8
 #define stipple_pattern_height 8
-#define stipple_pattern_num 7
+#define stipple_pattern_num 8
 static const unsigned char stipple_pattern_bits[stipple_pattern_num][8] = {
     { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 },	/* no fill */
     { 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80 },	/* diagonal stripes (1) */
@@ -527,7 +528,8 @@ static const unsigned char stipple_pattern_bits[stipple_pattern_num][8] = {
     { 0x11, 0x11, 0x22, 0x22, 0x44, 0x44, 0x88, 0x88 },	/* diagonal stripes (3) */
     { 0x88, 0x88, 0x44, 0x44, 0x22, 0x22, 0x11, 0x11 },	/* diagonal stripes (4) */
     { 0x03, 0x0C, 0x30, 0xC0, 0x03, 0x0C, 0x30, 0xC0 },	/* diagonal stripes (5) */
-    { 0xC0, 0x30, 0x0C, 0x03, 0xC0, 0x30, 0x0C, 0x03 }	/* diagonal stripes (6) */
+    { 0xC0, 0x30, 0x0C, 0x03, 0xC0, 0x30, 0x0C, 0x03 },	/* diagonal stripes (6) */
+    { 0x81, 0x42, 0x24, 0x18, 0x18, 0x24, 0x42, 0x41 } 	/* cross-hatch      (7) */
 };
 
 static Pixmap stipple_halftone[stipple_halftone_num];

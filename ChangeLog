@@ -1,5 +1,11 @@
 2003-03-31  Ethan Merritt <merritt@u.washington.edu>
 
+	* src/bitmap.c src/gplt_x11.c term/gd.trm term/pdf.trm:
+	Add a cross-hatch fill pattern. The change to bitmap.c affects the
+	epson, hpxx, and pbm terminal types.
+
+2003-03-31  Ethan Merritt <merritt@u.washington.edu>
+
 	* src/bitmap.c term/pdf.trm: Revise the order of colors slightly
 	to maximize contrast between successive plots (affects gd.trm also).
 

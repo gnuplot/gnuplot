@@ -1,5 +1,5 @@
 /*
- * $Id: gd.trm,v 1.24 2003/03/19 06:39:11 sfeam Exp $
+ * $Id: gd.trm,v 1.25 2003/03/21 17:18:21 mikulik Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -293,7 +293,7 @@ static int
 PNG_FillPattern(int fillpar)
 {
     int rgb = png_state.rgb_table[png_state.linetype + 3];
-    fillpar %= 7;
+    fillpar %= 8;
 
     if (!PNG_fill_tile.im || rgb != PNG_fill_tile.last_rgb || PNG_fill_tile.fillpar != fillpar) {
 
@@ -345,6 +345,10 @@ PNG_FillPattern(int fillpar)
 	    case 6:
 		gdImageLine(PNG_fill_tile.im, 0, 3, 7, 0, foreground);
 		gdImageLine(PNG_fill_tile.im, 0, 7, 7, 4, foreground);
+		break;
+	    case 7:
+		gdImageLine(PNG_fill_tile.im, 0, 0, 7, 7, foreground);
+		gdImageLine(PNG_fill_tile.im, 0, 7, 7, 0, foreground);
 		break;
 	}
     }
