@@ -1,4 +1,4 @@
-2000-11-01 Johannes Zellner <johannes@zellner.org>
+2000-11-01  Johannes Zellner  <johannes@zellner.org>
 
 	a few changes after merging the axis branch
 	* src/mouse.[ch]: made event_plotdone() non-static
@@ -7,17 +7,37 @@
 	struct surface_points is declared
 	* term/pslatex.trm: remove an unused variable
 
-2000-10-31 Johannes Zellner <johannes@zellner.org>
+2000-11-01  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* Makefile.am: Add new pm3d subdir to EXTRA_DIST.
+
+	* PATCHLEVEL: Make it zero (0) instead of e as e is already in VERSION.
+
+	* configure.in: Update version/patchlevel info.
+
+	* missing: Update from current automake (again).
+
+	* docs/gnuplot.texi: Regenerated.
+
+	* src/Makefile.am: Remove obsolete file protos.h from gnuplot_SOURCES.
+
+	* src/ansi2knr.c: Update from current automake.
+
+2000-11-01  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* merged the axis branch into MAIN
+
+2000-10-31  Johannes Zellner  <johannes@zellner.org>
 
 	* src/gplt_x11.c: moved current_gc outside the #ifdef PM3D
 	block, so it is also defined, if compiling w/o PM3d support.
 
-2000-10-31 Johannes Zellner <johannes@zellner.org>
+2000-10-31  Johannes Zellner  <johannes@zellner.org>
 
 	* merged the pm3d branch to MAIN
 	* docs/gnuplot.doc: added GGI/win to the list of pm3d capable terminals
 
-2000-10-31 Johannes Zellner <johannes@zellner.org>
+2000-10-31  Johannes Zellner  <johannes@zellner.org>
 
 	* src/save.c: set linestyle --> set style line
 
@@ -44,18 +64,18 @@
  	the bounding box of the graph. This overrides the patch of
  	2000-10-24 filed in by Lars.
 
-2000-10-25  Petr Mikulik <mikulik@physics.muni.cz>
+2000-10-25  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* docs/gnuplot.doc: added documentation for the "history" and 
 	  "system" commands.
 
-2000-10-25  Johannes Zellner <johannes@zellner.org>
+2000-10-25  Johannes Zellner  <johannes@zellner.org>
 
 	* src/pm3d.c, src/color.[ch]:
 	repaired supplying of extended color specs in pm3d
 	(make it working in vgagl.trm)
 
-2000-10-24  Petr Mikulik <mikulik@physics.muni.cz>
+2000-10-24  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* trm/post.trm: "g" makes stroke + set(gray/rgb), "G" and "H" removed;
 	  finally supporting 'with l lt pal' too
@@ -86,7 +106,7 @@
 
 	* term/emf.trm: Update to latest version.
 
-2000-10-24  Johannes Zellner <johannes@zellner.org>
+2000-10-24  Johannes Zellner  <johannes@zellner.org>
 
 	* term/ggi.trm: increased the speed of ggi command line
 	input by redrawing ruler / statusline coordinates / zoombox
@@ -128,15 +148,15 @@
 	centimeter position in metric mode. Output sizes for metrix are now
 	12x8cm and 12x15cm.
 
-2000-10-23  Johannes Zellner <johannes@zellner.org>
+2000-10-23  Johannes Zellner  <johannes@zellner.org>
 
 	* repaired `pm3d hidden'
 
-2000-10-23  Petr Mikulik <mikulik@physics.muni.cz>
+2000-10-23  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/os2/gclient.c: support for 'with l lt pal'
 
-2000-10-23  Johannes Zellner <johannes@zellner.org>
+2000-10-23  Johannes Zellner  <johannes@zellner.org>
 
 	* `linetype palette' linetype, e.g.:
 	  - set style line 1 lt pal
@@ -151,7 +171,7 @@
 	following terminals are supported:
 	  - X11, gif, fig, vgagl, ggi
 
-2000-10-22  Johannes Zellner <johannes@zellner.org>
+2000-10-22  Johannes Zellner  <johannes@zellner.org>
 
 	* repaired `gnuplot -rv' (src/gplt_x11.c) so that it takes
 	white as foreground for border / text ...
@@ -173,7 +193,7 @@
 	    vgagl
 	    ggi
 
-2000-10-22  Johannes Zellner <johannes@zellner.org>
+2000-10-22  Johannes Zellner  <johannes@zellner.org>
 
 	* ggi driver:
 	  - event / mouse support
@@ -339,7 +359,7 @@
 	about the Microsoft Office CGM input filter.  Rewrap some
 	paragraphs to stay within the specified 73 columns.
 
-2000-10-06  Johannes Zellner <johannes@zellner.org>
+2000-10-06  Johannes Zellner  <johannes@zellner.org>
 
 	* implemented finally configurable offsets for
 	set label "xy" at x, y pointsize 1 offset 2.0, 3.0
@@ -347,11 +367,11 @@
 	points. This was one of the points left from implementing
 	the mouse stuff.
 
-2000-09-21  Petr Mikulik <mikulik@physics.muni.cz>
+2000-09-21  Petr Mikulik  <mikulik@physics.muni.cz>
 	* src/graphics.c src/graph3d.c: bugfix "if ((*t->pointsize))"
 	changed to "if (t->pointsize)
 
-2000-09-20  Johannes Zellner <johannes@zellner.org>
+2000-09-20  Johannes Zellner  <johannes@zellner.org>
 
 	* relative arrows:
 	  set arrow from start_x, start_y rto delta_x, delta_y
@@ -370,7 +390,7 @@
 	m$agnification. Changed %g to %f in output format (MPt doesn't know
 	exponential notation). Changed MP_DPI from 300 to 2400.
 
-2000-08-02  Petr Mikulik <mikulik@physics.muni.cz>
+2000-08-02  Petr Mikulik  <mikulik@physics.muni.cz>
 	* src/graph3d.c src/graphics.c src/set.c src/show.c src/term.c
 	  src/plot.h docs/gnuplot.doc term/fig.trm:
 	allow setting arrow head(s) sizes --- new keywords `heads` and
@@ -388,7 +408,7 @@
 	* src/variable.c (loadpath_handler): in ACTION_CLEAR, make
 	sure 'limit' is properly initialized, too.
 	
-2000-07-25  Petr Mikulik <mikulik@physics.muni.cz>
+2000-07-25  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/graphics.c src/plot.c src/plot2d.c src/plot3d.c src/plot.h
 	  src/graph3d.c src/os2/gclient.c term/pm.trm term/post.trm:
@@ -451,7 +471,7 @@
 	to exist even in hidden3d plot. The new hidden3d routine
 	can cope with that case, too (after some fiddling).
 	
-2000-06-23  Johannes Zellner <johannes@zellner.org>
+2000-06-23  Johannes Zellner  <johannes@zellner.org>
 
 	* src/gplt_x11.c: repaired `selection' (by left mouse).
 	I really don't know when and how this got broken!
@@ -475,11 +495,11 @@
 	* term/cgm.trm(CGM_option): reject linewidth zero to avoid
 	infinite looping in CGM_dashed_vector(), later
 
-2000-06-14  Johannes Zellner <johannes@zellner.org>
+2000-06-14  Johannes Zellner  <johannes@zellner.org>
 
 	* epslatex.trm also for pm3d
 
-2000-06-14  Johannes Zellner <johannes@zellner.org>
+2000-06-14  Johannes Zellner  <johannes@zellner.org>
 
 	* src/color.c: modified the postscript color box drawing for user borders
 	* term/post.trm: repaired the broken pslatex if using `encoding'
@@ -508,7 +528,7 @@
 	* term/epslatex.trm: New terminal driver by Gregor Thalhammer
 	<Gregor.Thalhammer@uibk.ac.at>, updated version from 7th June.
 
-2000-06-09  Johannes Zellner <johannes@zellner.org>
+2000-06-09  Johannes Zellner  <johannes@zellner.org>
 
 	* src/save.c: don't close the fp's if it's stdout
 
@@ -574,13 +594,13 @@
 
 	* src/axis.h: prototype for axis_draw_2d_zeroaxis added.
 
-2000-06-09  Johannes Zellner <johannes@zellner.org>
+2000-06-09  Johannes Zellner  <johannes@zellner.org>
 
 	* implemented the palette `origin', `size', `border',
 	`noborder', `bdefault' subcommands and did a few changes
 	for the placement of the labels at horizontal color boxes.
 
-2000-06-04  Johannes Zellner <johannes@zellner.org>
+2000-06-04  Johannes Zellner  <johannes@zellner.org>
 
 	* included the supported terminals for pm3d to gnuplot.doc
 
@@ -592,10 +612,10 @@
 	`plot '-'`" discussion in the gnuplot-beta newsgroup.
 	New variables: plotted_data_from_stdin, replot_disabled.
 
-2000-05-25  Petr Mikulik <mikulik@physics.muni.cz>
+2000-05-25  Petr Mikulik  <mikulik@physics.muni.cz>
 	* pm3d: support for pm3d functionality in 'pslatex / pstex' terminals
 
-2000-05-25  Petr Mikulik <mikulik@physics.muni.cz>
+2000-05-25  Petr Mikulik  <mikulik@physics.muni.cz>
 	* pm3d: unset.c: #ifdef X11 .. #endif missing in unset_pm3d()
 
 2000-05-24  Lars Hecking  <lhecking@nmrc.ie>
@@ -603,27 +623,27 @@
 	* configure.in: configure should always exit with an exit code
 	of zero.
 
-2000-05-16  Petr Mikulik <mikulik@physics.muni.cz>
+2000-05-16  Petr Mikulik  <mikulik@physics.muni.cz>
 	* pm3d/contrib: updated pm3dConvertToImage.awk to support colour images
 
-2000-05-11  Petr Mikulik <mikulik@physics.muni.cz>
+2000-05-11  Petr Mikulik  <mikulik@physics.muni.cz>
 	* pm3d/contrib: added pm3dConvertToImage.awk
 
-2000-05-09  Petr Mikulik <mikulik@physics.muni.cz>
+2000-05-09  Petr Mikulik  <mikulik@physics.muni.cz>
 	* pm3d: three new color mapping formulae 34--36: 2x,2x-0.5,2x-1
 
-2000-05-04  Johannes Zellner <johannes@zellner.org>
+2000-05-04  Johannes Zellner  <johannes@zellner.org>
 
 	* reimplemented the Linux vgagl terminal driver with
 	mouse and pm3d support (uses the lib3dkit library)
 
-2000-05-04  Johannes Zellner <johannes@zellner.org>
+2000-05-04  Johannes Zellner  <johannes@zellner.org>
 
 	* configure.in, src/plot.c, src/parse.c: replace setjmp by
 	sigsetjmp and longjmp by siglongjmp if these functions
 	(or macros) are available.
 
-2000-05-04  Johannes Zellner <johannes@zellner.org>
+2000-05-04  Johannes Zellner  <johannes@zellner.org>
 
 	* src/command.c: always include ipc.h
 
@@ -632,7 +652,7 @@
 	* term/x11.trm: added a few ifdef USE_MOUSE's to exclude mouse
 	code, if compiling w/o mouse support.
 
-2000-05-03  Johannes Zellner <johannes@zellner.org>
+2000-05-03  Johannes Zellner  <johannes@zellner.org>
 
 	* merged pre-pm3d - pre-pm3d-01 from the MAIN trunk.
 
@@ -676,16 +696,16 @@
 	* term/gif.trm(GIF_put_text): Fix compiler warnings, patch from
 	Alexander Mai.
 
-2000-05-01  Johannes Zellner <johannes@zellner.org>
+2000-05-01  Johannes Zellner  <johannes@zellner.org>
 
 	* branched off pm3d
 
-2000-05-01  Johannes Zellner <johannes@zellner.org>
+2000-05-01  Johannes Zellner  <johannes@zellner.org>
 
 	* term/x11.trm: Remove superfluous ifndef(OS2).	Add SELECT_FD_SET_CAST
 	to sselect() call.
 
-2000-04-30  Johannes Zellner <johannes@zellner.org>
+2000-04-30  Johannes Zellner  <johannes@zellner.org>
 
 	* small patch such that zooming of map views works again.
 	This patch apparently got lost during setup of the CVS repository.
@@ -806,7 +826,7 @@
 	src/plot.c, src/readline.c, src/readline.h, src/set.c, src/show.c,
 	src/os2/glcient.c, term/pm.trm, term/x11.trm: Merged Johannes' changes.
 
-2000-03-28  Petr Mikulik <mikulik@physics.muni.cz>
+2000-03-28  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* term/post.trm: Epsf option sets landscape mode instead of epsf.
 
@@ -835,13 +855,13 @@
 	* src/graphics.c(gen_tics): Bugfixes for tics and mtics handling
 	in logscale.
 
-2000-03-18  Johannes Zellner <johannes@zellner.org>
+2000-03-18  Johannes Zellner  <johannes@zellner.org>
 
 	* src/graph3d.c(do_3dplot): Fix bug which occured after having changed
 	some variables from unsigned int to int because	map3d_xy takes
 	unsigned.
 
-2000-03-17  Johannes Zellner <johannes@zellner.org>
+2000-03-17  Johannes Zellner  <johannes@zellner.org>
 
 	* made quite a few of the mouse.c functions static and
 	removed prototypes for these from mouse.h.
@@ -852,7 +872,7 @@
 	  f(x) = a*sin(x) + b*x+c; fit f(x) 'a' via a,b,c,d
 	udv_ptr->udv_name in setvar() is reallocated, but not initialised.
 
-2000-03-16  Johannes Zellner <johannes@zellner.org>
+2000-03-16  Johannes Zellner  <johannes@zellner.org>
 
 	* merged minor changes from the pm3d branch.
 
@@ -872,30 +892,30 @@
 	without {}.
 	* let 'show bind' print bindings for Space and q (mouse.c)
 
-2000-03-08  Johannes Zellner <johannes@zellner.org>
+2000-03-08  Johannes Zellner  <johannes@zellner.org>
 
 	* term/fig.trm(FIG_put_text): Fix bug which caused a SEGFAULT.
 
-2000-03-08  Johannes Zellner <johannes@zellner.org>
+2000-03-08  Johannes Zellner  <johannes@zellner.org>
 
 	* src/misc.c: Introduce pipe for load command gnuplot> load "< ...".
 
-2000-03-04  Johannes Zellner <johannes@zellner.org>
+2000-03-04  Johannes Zellner  <johannes@zellner.org>
 
 	* changed the order of two lines in extend_token_table() so
 	that is does not segfault any more when reallocating the `token'.
 	(reported by Wolfgang Schadow <schadow@lin07.triumf.ca>).
 
-2000-03-03  Johannes Zellner <johannes@zellner.org>
+2000-03-03  Johannes Zellner  <johannes@zellner.org>
 
 	* added a check for term in mouse.c:event_reset() to avoid
 	a segfault.
 
-2000-03-03  Johannes Zellner <johannes@zellner.org>
+2000-03-03  Johannes Zellner  <johannes@zellner.org>
 
 	* added a check for stpcpy in configure.in
 
-2000-03-02  Johannes Zellner <johannes@zellner.org>
+2000-03-02  Johannes Zellner  <johannes@zellner.org>
 
 	* removed the contents of `src/unused'
 
@@ -906,23 +926,23 @@
 
         * added updating of x2 and y2 coordinates of ruler position.
 
-2000-03-02  Johannes Zellner <johannes@zellner.org>
+2000-03-02  Johannes Zellner  <johannes@zellner.org>
 
         * added a few if (PM_pipe) to term/pm.trm to prevent segfaults
 	if the connection to the pm driver was not established yet.
 
-2000-03-02  Johannes Zellner <johannes@zellner.org>
+2000-03-02  Johannes Zellner  <johannes@zellner.org>
 
 	* a really small fix in term/x11.trm: change the position of
 	a comma so that is included between #ifdef USE_MOUSE ...
 
-2000-03-01  Johannes Zellner <johannes@zellner.org>
+2000-03-01  Johannes Zellner  <johannes@zellner.org>
 
 	* removed the message 'Using mouse-enhanced terminal ...'
 	from term/x11.trm, as it can be annoying when using gnuplot
 	in a pipe.
 
-2000-02-29  Johannes Zellner <johannes@zellner.org>
+2000-02-29  Johannes Zellner  <johannes@zellner.org>
 
         * added a few if (X11_ipc) to term/x11.trm to prevent segfaults
 	if the connection to the outboard driver was not established yet.
@@ -932,11 +952,11 @@
         * put #ifdef USE_MOUSE around use of EventHandler() in src/gplt_x11.c,
         to make it compile without mouse again.
 
-2000-02-21  Johannes Zellner <johannes@zellner.org>
+2000-02-21  Johannes Zellner  <johannes@zellner.org>
 
         * changed ISATTY to isatty_state as requested by Lars.
 
-2000-02-19  Johannes Zellner <johannes@zellner.org>
+2000-02-19  Johannes Zellner  <johannes@zellner.org>
 
         * removed two unused functions in gplt_x11.c
 
@@ -964,7 +984,7 @@
 
 	* src/unset.c: Repair defunct 'unset [xyz]tics' commands.
 
-2000-02-12  Johannes Zellner <johannes@zellner.org>
+2000-02-12  Johannes Zellner  <johannes@zellner.org>
 
         * changed the policy for allowing bidirectional ipc in X11:
 	if stdin comes from a terminal (tty) the mouse is on by default,
