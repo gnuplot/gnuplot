@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.52 2004/06/04 06:29:32 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.53 2004/06/07 05:33:00 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -1379,8 +1379,10 @@ event_buttonpress(struct gp_event_t *ge)
 		/* not bound in 2d graphs */
 	    } else if (2 == b) {
 		/* not bound in 2d graphs */
-	    } else if (3 == b && !replot_disabled) {
-		/* start zoom; ignore it when 'replot is disabled, e.g. with inline data */
+	    } else if (3 == b && !replot_disabled && !paused_for_mouse) {
+		/* start zoom; but ignore it when
+		 *   - replot is disabled, e.g. with inline data, or
+		 *   - during 'pause mouse' */
 		setting_zoom_x = mouse_x;
 		setting_zoom_y = mouse_y;
 		setting_zoom_region = TRUE;

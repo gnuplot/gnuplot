@@ -1,3 +1,7 @@
+2004-06-14  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* src/mouse.c: Do not start zooming during 'pause mouse'.
+
 2004-06-12  Ethan Merritt  <merritt@u.washington.edu>
 
 	* show.c (show_datafile): Provide missing show commands for suboptions
