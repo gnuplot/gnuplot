@@ -1,5 +1,5 @@
 /*
- * $Id: metapost.trm,v 1.5 1999/06/25 17:07:55 lhecking Exp $
+ * $Id: metapost.trm,v 1.6 1999/08/24 11:24:55 lhecking Exp $
  */
 
 /* GNUPLOT - metapost.trm */
@@ -688,7 +688,7 @@ START_HELP(mp)
 "",
 " Syntax:",
 "    set term mp {color} {solid} {notex} {mag <magsize>} {\"<name>\"} {<size>}",
-????"",
+"",
 " The option `color` causes lines to be drawn in color (on a printer or display",
 " that supports it), `monochrome` (or nothing) selects black lines.  The option",
 " `solid` draws solid lines, while `dashed` (or nothing) selects lines with",
