@@ -1,3 +1,9 @@
+Mon Nov 11 14:40:11 2002  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* term/svg.trm (SVG_init): Backports from 3.8 branch: adds the
+ 	viewBox attribute to the <svg> tag, and replaces the original SVG
+ 	terminal author's name by the gnuplot version in the <desc>.
+
 2002-11-09  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* makefile.dj2, makefile.tc: Update CFLAGS.
