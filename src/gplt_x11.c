@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.52 2002/10/20 20:28:59 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.53 2002/12/06 23:55:18 joze Exp $"); }
 #endif
 
 /* GNUPLOT - gplt_x11.c */
@@ -1506,7 +1506,7 @@ DrawRotated(Display *dpy, Drawable d, GC gc, int xdest, int ydest,
 
     unsigned long gcFunctionMask = GCFunction;
     XGCValues gcValues;
-    int gcCurrentFunction;
+    int gcCurrentFunction = 0;
     Status s = XGetGCValues(dpy, gc, gcFunctionMask, &gcValues);
 
     /* bitmapGC is static, so that is has to be initialized only once */
