@@ -1,5 +1,5 @@
 /* -*- objc -*-
- * $Id: openstep.trm,v 1.11 2003/02/11 06:08:01 sfeam Exp $
+ * $Id: openstep.trm,v 1.12 2003/02/18 16:38:13 broeker Exp $
  *
  */
 
@@ -36,10 +36,16 @@
 ]*/
 
 /*
+ * Name changed from "next" to "openstep" to distinguish the two different
+ * drivers. Also avoids duplications in the complete gnuplot documentation.
+ * (March 2003)
+ */
+
+/*
  * This file is included by ../term.c via ../term.h.
  *
  * This terminal driver supports:
- *     next
+ *     openstep
  *
  * AUTHORS
  *  Robert Lutwak from Russell Lang's post.trm
@@ -64,25 +70,25 @@
  * 
  *
  * Defaults are
- * 'set term next new dashed auto "Helvetica" 14'
+ * 'set term openstep new dashed auto "Helvetica" 14'
  *
  * To change font to Times-Roman and font size to 20pts use 
- * 'set term next "Times-Roman" 20'.
+ * 'set term openstep "Times-Roman" 20'.
  *
  * to choose window by title
- * 'set term next title "Window title"
+ * 'set term openstep title "Window title"
  *
  * Monitor Options:
  * monochrome, color
  *
  * To invoke Nick Strobel's old terminal
- * 'set term next old'
+ * 'set term openstep old'
  */
 
 #include "driver.h"
 
 #ifdef TERM_REGISTER
-register_term(next)
+register_term(openstep)
 #endif
 
 #ifdef TERM_PROTO
@@ -522,7 +528,7 @@ NEXT_options()
 	case NEXT_TITLE:
 	    c_token++;
 	    if (!isstring(c_token)) {
-		fprintf(stderr, "usage:  set term next title \"newtitle\"\n");
+		fprintf(stderr, "usage:  set term openstep title \"newtitle\"\n");
 	    }
 	    quote_str(NEXT_title, c_token, MAX_LINE_LEN + 1);
 	    break;
@@ -701,7 +707,7 @@ NEXT_init()
     /* Initialize output string */
     NEXTsize = DEFAULTNEXTSIZE;
     if ((NEXTBuffer = malloc(NEXTsize)) == NULL) {
-	printf("Malloc error in next filter init\n");
+	printf("Malloc error in openstep filter init\n");
 	exit(1);
     }
     NEXTBufEnd = NEXTBuffer + NEXTsize;
@@ -1002,7 +1008,7 @@ double fontsize, base;
 	    if (brace)
 		return (p);
 
-	    fprintf(stderr, "next driver - spurious }\n");
+	    fprintf(stderr, "openstep driver - spurious }\n");
 	    break;
 
 	case '_':
@@ -1356,19 +1362,19 @@ NEXTPrintf(char *fmt,...)
 #ifdef TERM_TABLE
 
 
-TERM_TABLE_START(next_driver)
-    "next",
-    "Interface to GnuTerm.app under NeXTstep",
+TERM_TABLE_START(openstep_driver)
+    "openstep",
+    "Interface to GnuTerm.app under OpenStep",
     NEXT_XMAX, NEXT_YMAX, NEXT_VCHAR, NEXT_HCHAR,
     NEXT_VTIC, NEXT_HTIC, NEXT_options, NEXT_init, NEXT_reset,
     NEXT_text, null_scale, NEXT_graphics, NEXT_move, NEXT_vector,
     NEXT_linetype, NEXT_put_text, NEXT_text_angle,
     NEXT_justify_text, NEXT_point, do_arrow, NEXT_set_font,
     NEXT_set_pointsize
-TERM_TABLE_END(next_driver)
+TERM_TABLE_END(openstep_driver)
 
 #undef LAST_TERM
-#define LAST_TERM next_driver
+#define LAST_TERM openstep_driver
 
 #endif /* TERM_TABLE */
 #endif /* TERM_PROTO_ONLY */
@@ -1378,19 +1384,24 @@ TERM_TABLE_END(next_driver)
 #ifdef TERM_HELP
 START_HELP(openstep)
 "1 Openstep (next)",
-#ifndef TERM_HELP_NEXT
-"?commands set terminal next",
-"?set terminal next",
-"?set term next",
-"?terminal next",
-"?term next",
+#ifndef TERM_HELP_OPENSTEP
+"?commands set terminal openstep",
+"?set terminal openstep",
+"?set term openstep",
+"?terminal openstep",
+"?term openstep",
+"?openstep",
+"?OpenStep",
+"?Openstep",
+/*
 "?next",
 "?NeXT",
+*/
 #endif
 " Several options may be set in the openstep (next) driver.",
 "",
 " Syntax:",
-"       set terminal next {<mode>} {<type> } {<color>} {<dashed>}",
+"       set terminal openstep {<mode>} {<type> } {<color>} {<dashed>}",
 "                  {\"<fontname>\"} {<fontsize>} title {\"<newtitle>\"}",
 "",
 " where <mode> is  `default`, which sets all options to their defaults;",
@@ -1403,11 +1414,11 @@ START_HELP(openstep)
 " Defaults are  `new`, `monochrome`, `dashed`, \"Helvetica\", 14pt.",
 "",
 " Examples:",
-"       set term next default",
-"       set term next 22",
-"       set term next color \"Times-Roman\" 14",
-"       set term next color \"Helvetica\" 12 title \"MyPlot\"",
-"       set term next old",
+"       set term openstep default",
+"       set term openstep 22",
+"       set term openstep color \"Times-Roman\" 14",
+"       set term openstep color \"Helvetica\" 12 title \"MyPlot\"",
+"       set term openstep old",
 "",
 " Pointsizes may be changed with `set linestyle`."
 END_HELP(openstep)

@@ -41,6 +41,8 @@ off with the hotkey 'm'. See 'help mouse' and 'help bind' for more details.
 
 
 [3.8j]
+* CHANGE terminal provided by openstep is called "openstep", not "next"
+* CHANGE terminal provided by gnugraph is called "gnugraph", not "unixplot"
 * NEW pm3d option corners2color
 * NEW PM3D support for pstricks terminal
 
