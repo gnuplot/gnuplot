@@ -89,9 +89,6 @@
 /* Define if you do not have the strstr function.  */
 #undef NO_STRSTR
 
-/* Define if you do not have the <sys/stat.h> header file.  */
-#undef NO_SYS_STAT_H
-
 /* Define if you do not have the <sys/time.h> header file.  */
 #undef NO_SYS_TIME_H
 
@@ -124,6 +121,9 @@
 
 /* Define to the version of the distribution.  */
 #undef VERSION
+
+/* Define if you are using the X11 window system.  */
+#undef X11
 
 /* Define to `long' if <sys/types.h> doesn't define.  */
 #undef time_t
