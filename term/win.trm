@@ -1,5 +1,5 @@
 /*
- * $Id: win.trm,v 1.15 2000/10/31 19:59:32 joze Exp $
+ * $Id: win.trm,v 1.16 2000/11/01 18:57:34 broeker Exp $
  */
 
 /* GNUPLOT - win.trm */
@@ -390,8 +390,10 @@ TERM_TABLE_START(win_driver)
     WIN_set_pointsize, TERM_CAN_MULTIPLOT,
     WIN_text /* suspend */ , WIN_resume, 
     0 /*boxfill */, WIN_linewidth,
-    /* 0, 0, 0, 0, 0, */ /* mouse functions */
 #ifdef PM3D
+#ifdef USE_MOUSE
+    /* 0, 0, 0, 0, 0, */ /* mouse functions */
+#endif
     WIN_make_palette, 0 /* previous_palette */,
     WIN_set_color, WIN_filled_polygon
 #endif            

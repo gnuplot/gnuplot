@@ -1,5 +1,5 @@
 /*
- * $Id: wtext.h,v 1.1.2.2 2000/10/22 13:50:51 joze Exp $
+ * $Id: wtext.h,v 1.3 2000/10/31 19:59:32 joze Exp $
  */
 
 /* GNUPLOT - win/wtext.h */
@@ -33,6 +33,8 @@
  * This software is provided "as is" without express or implied warranty
  * to the extent permitted by applicable law.
 ]*/
+
+#include <stdio.h>
 
 /* redefine functions that can talk to tty devices, to use 
  * implementation in winmain.c/wgnuplot.dll */

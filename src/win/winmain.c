@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: winmain.c,v 1.5 2000/10/31 19:59:32 joze Exp $";
+static char *RCSid = "$Id: winmain.c,v 1.6 2000/11/01 18:57:34 broeker Exp $";
 #endif
 
 /* GNUPLOT - win/winmain.c */
@@ -75,6 +75,7 @@ static char *RCSid = "$Id: winmain.c,v 1.5 2000/10/31 19:59:32 joze Exp $";
 #include <io.h>
 #include "plot.h"
 #include "setshow.h"
+#include "version.h"
 #include "wgnuplib.h"
 #include "wtext.h"
 

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.10 2000/11/02 15:13:38 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.11 2000/11/02 17:52:16 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -245,13 +245,15 @@ alert(void)
  * declared if the system supports stpcpy(). E.g. on Linux I would
  * have to define __USE_GNU before including string.h to get the
  * prototype (joze) */
-char *stpcpy __PROTO((char *s, char *p));
+/* HBB 20001109: *BUT* if a prototype is there, this one may easily
+ * conflict with it... */
+char *stpcpy __PROTO((char *s, const char *p));
 
 # ifndef HAVE_STPCPY
 /* handy function for composing strings; note: some platforms may
  * already provide it, how should we handle that? autoconf? -- ptdb */
 char *
-stpcpy(char *s, char *p)
+stpcpy(char *s, const char *p)
 {
     strcpy(s, p);
     return s + strlen(p);
@@ -1467,12 +1469,20 @@ event_motion(struct gp_event_t *ge)
 	if (button & (1 << 1)) {
 
 	    /* dragging with button 1 -> rotate */
+#if 0 /* HBB 20001109: what's rint()? */
 	    surface_rot_x = rint(zero_rot_x + 180.0 * mouse_y / term->ymax);
+#else
+            surface_rot_x = floor(0.5 + zero_rot_x + 180.0 * mouse_y / term->ymax);
+#endif
 	    if (surface_rot_x < 0)
 		surface_rot_x = 0;
 	    if (surface_rot_x > 180)
 		surface_rot_x = 180;
+#if 0 /* HBB 20001109: what's rint()? */
 	    surface_rot_z = rint(fmod(zero_rot_z - 360.0 * mouse_x / term->xmax, 360));
+#else
+            surface_rot_z = floor(0.5 + fmod(zero_rot_z - 360.0 * mouse_x / term->xmax, 360));
+#endif
 	    if (surface_rot_z < 0)
 		surface_rot_z += 360;
 	    redraw = TRUE;

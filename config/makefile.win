@@ -1,5 +1,5 @@
 #
-# $Id: makefile.win,v 1.7 1999/11/08 19:21:00 lhecking Exp $
+# $Id: makefile.win,v 1.8 1999/12/01 22:07:58 lhecking Exp $
 #
 # GNUPLOT Makefile for Borland C++ 3.1 Windows version
 # and Win32 using Borland C++ 4 (or 5? --- 4.52 is known to work)
@@ -34,17 +34,17 @@ M=..\\demo\\
 HELPFILE = wgnuplot.hlp
 
 # location of Borland C compiler
-TC = d:\bc31
+TC = e:\borl\cbuilder
 
 # location of TLINK.EXE and BCC.EXE
 BIN = $(TC)\bin\\
 
 #The full path name of the help compiler. For BC++:
-HC = $(BIN)\hc
+#HC = $(BIN)\hc
 # this comes with C++ Builder 1.0 (but doesn't seem to work):
 #HC = $(TC)\help\tools\hcw /c /e
 # or you can use the 'help workshop' available directly from MS:
-#HC = h:\mssdk\bin\hcw /c/e
+HC = h:\mssdk\bin\hcw /c/e
 
 # WIN32=1 for Win32s or Win32 (--> '95 or NT)
 # new: allow '-DWIN32=1' on make command line to take effect:
@@ -54,11 +54,11 @@ WIN32=0
 
 # Uncomment _this_ for BC++ 4.52 (or others that give linker errors for
 # the 'errno' variable)... :
-RUNTIME_LIBRARY=cw32.lib
+#RUNTIME_LIBRARY=cw32.lib
 
 # ... or this for more modern ones (like C++Builder 1.0) -- it's the
 # properly multithreading one:
-#RUNTIME_LIBRARY=cw32mt.lib
+RUNTIME_LIBRARY=cw32mt.lib
 
 !if $(WIN32)
 
@@ -94,17 +94,17 @@ DEFINE_HELPFILE = -DHELPFILE="$(HELPFILE)"
 #    capability add -DREADLINE to CFLAGS then add 'readline' to the /o
 #    section of the linker call.
 !if $(WIN32)
-CFLAGS = -c -W -M -G -y -v -w-rvl -w-use -w-par -w-aus -w-pro $(PROCESSOR_OPT) -I$(TC)\include -Iwin -DREADLINE=1 -DHAVE_STRNICMP -DWIN32 -DHAVE_STRERROR -DNO_GIH -DNOGAMMA -DWIN32_LEAN_AND_MEAN -DANSI_C -DHAVE_GETCWD
-CAUXFLAGS = -tWC -w-par -w-use -w-aus -f -N -M -y -v -d -I$(TC)\include -DWIN32 -DWINDOWS_NO_GUI -DHAVE_STRNICMP -DANSI_C
+CFLAGS = -c -W -M -G -y -v -w-rvl -w-use -w-par -w-aus -w-pro $(PROCESSOR_OPT) -I$(TC)\include -Iwin -DREADLINE=1 -DHAVE_STRNICMP -DWIN32 -DHAVE_STRERROR -DNO_GIH -DNOGAMMA -DWIN32_LEAN_AND_MEAN -DANSI_C -DHAVE_GETCWD -DHAVE_STPCPY -DPM3D=1
+CAUXFLAGS = -tWC -w-par -w-use -w-aus -f -N -M -y -v -d -I$(TC)\include -DWIN32 -DWINDOWS_NO_GUI -DHAVE_STRNICMP -DANSI_C -DPM3D=1
 !else
 CFLAGS = -c -W -ml -w-par -w-use -w-aus -f -h -N -M -y -v -d -Ff=32 -I$(TC)\include -Iwin -DREADLINE=1 -zEGPFAR_DATA -DHAVE_STRNICMP -DMSDOS=1 -DNO_GIH -DANSI_C -DHAVE_GETCWD -DNDEBUG
 CAUXFLAGS = -ml -w-par -w-use -w-aus -f -N -M -y -v -d -I$(TC)\include -DMSDOS=1 -DHAVE_STRNICMP -DANSI_C
 !endif
 
-OBJS = 	alloc.obj binary.obj bitmap.obj command.obj contour.obj datafile.obj \
-	dynarray.obj eval.obj fit.obj graphics.obj graph3d.obj help.obj \
-	hidden3d.obj internal.obj interpol.obj matrix.obj misc.obj parse.obj \
-	plot.obj plot2d.obj plot3d.obj readline.obj save.obj scanner.obj \
+OBJS =  alloc.obj axis.obj binary.obj bitmap.obj color.obj command.obj contour.obj datafile.obj \
+	dynarray.obj eval.obj fit.obj gadgets.obj getcolor.obj graphics.obj graph3d.obj help.obj \
+	hidden3d.obj history.obj internal.obj interpol.obj matrix.obj misc.obj mouse.obj parse.obj \
+	plot.obj plot2d.obj plot3d.obj pm3d.obj readline.obj save.obj scanner.obj \
 	set.obj show.obj specfun.obj standard.obj stdfn.obj tables.obj \
 	term.obj time.obj unset.obj util.obj util3d.obj variable.obj \
 	history.obj version.obj winmain.obj
@@ -141,9 +141,10 @@ $(TC)\lib\C0Wl +
 bitmap command eval graphics graph3d help internal misc parse +
 plot plot2d plot3d scanner set show specfun standard stdfn term util version contour +
 binary interpol variable +
+axis gadgets color getcolor pm3d mouse +
 winmain +
-readline +
-fit matrix datafile alloc util3d hidden3d time +
+readline history +
+fit matrix datafile alloc util3d hidden3d dynarray time +
 ,wgnuplot,wgnuplot, +
 wgnuplot.lib +
 $(TC)\lib\import +
@@ -164,9 +165,10 @@ bitmap command eval graphics graph3d help internal misc parse +
 plot plot2d plot3d scanner set show specfun standard stdfn term util version contour +
 wgnuplib wtext wmenu wpause wgraph wprinter +
 binary interpol +
+axis gadgets color getcolor pm3d mouse +
 winmain +
-readline +
-fit matrix datafile alloc util3d hidden3d time +
+readline history +
+fit matrix datafile alloc util3d hidden3d dynarray time +
 save unset variable tables +
 ,wgnupl32,wgnupl32, +
 $(TC)\lib\import32 +
@@ -268,7 +270,7 @@ wgnuplot.mnu: win\wgnuplot.mnu
 
 # different compiler options for DLL's */
 !if $(WIN32)
-DLLCC = $(BIN)$(CC) -DWIN32 -c -M -y -v -WE -I$(TC)\include -Iwin
+DLLCC = $(BIN)$(CC) -DWIN32 -c -M -y -v -WE -I$(TC)\include -Iwin -DPM3D=1 -DANSI_C
 !else
 DLLCC = $(BIN)$(CC) -c -WD -ms! -w-par -f -M -y -v -w -N -I$(TC)\include -Iwin
 !endif
@@ -308,6 +310,7 @@ wgraph.obj: win/wgraph.c win/wgnuplib.h win/wcommon.h win/wresourc.h
 # convert gnuplot.doc to gnuplot.rtf
 $(HELPFILE): win\gnuplot.rtf
 	$(HC) win\wgnuplot.hpj 
+        -copy win\wgnuplot.hlp $(HELPFILE)
 
 win\gnuplot.rtf: doc2rtf.exe $(D)gnuplot.doc win\wgnuplot.hpj
 	doc2rtf $(D)gnuplot.doc win\gnuplot.rtf
