@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.46 2001/08/27 15:02:14 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.47 2001/10/11 15:46:56 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -409,9 +409,8 @@ boundary3d(plots, count)
 
 	/*{{{  set aspect ratio if valid and sensible */
 	if (current_aspect_ratio >= 0.01 && current_aspect_ratio <= 100.0) {
-
-	    double current = yscaler / xscaler;
-	    double required = (current_aspect_ratio * t->v_tic) / t->h_tic;
+	    double current = (double)yscaler / xscaler ;
+	    double required = current_aspect_ratio * t->v_tic / t->h_tic;
 	
 	    if (current > required)
 		/* too tall */
@@ -425,11 +424,11 @@ boundary3d(plots, count)
 
 static void
 get_arrow3d(arrow, sx, sy, ex, ey)
-struct arrow_def* arrow;
-unsigned int* sx;
-unsigned int* sy;
-unsigned int* ex;
-unsigned int* ey;
+    struct arrow_def* arrow;
+    unsigned int* sx;
+    unsigned int* sy;
+    unsigned int* ex;
+    unsigned int* ey;
 {
     map3d_position(&(arrow->start), sx, sy, "arrow");
     if (arrow->relative) {

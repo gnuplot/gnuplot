@@ -1,3 +1,8 @@
+2001-10-31  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/graph3d.c (boundary3d): Fix computation of current aspect
+ 	ratio by casting input variable to double.
+
 2001-10-26  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/color.c term/tgif.trm term/pm.trm term/gif.trm term/fig.trm
