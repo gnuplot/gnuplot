@@ -1,15 +1,22 @@
+2002-02-21  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* src/README: Added documentation on mouse, hotkeys, terminal 
+	communication and pm3d internals.
+
+	* pm3d/old-docs: Removed.
+
 2002-02-21  Johannes Zellner  <johannes@zellner.org>
 
-	* src/pm3d.c: improved 'scans automatic' for the case where all
-	points of some scans are undefined.
+	* src/pm3d.c: Improved 'scans automatic' for the case where all points
+	of some scans are undefined.
 
 2002-02-20  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
-	* config/makefile.dj2 (CFLAGS): Added -DHAVE_ATEXIT.  Changed
- 	default compile flags to -O2 -g.
+	* config/makefile.dj2 (CFLAGS): Added -DHAVE_ATEXIT.  Changed default
+	compile flags to -O2 -g.
 	(EXENAME): Changed to gp38.
 
-	* config/makefile.nt (CFLAGS): added -DHAVE_ATEXIT
+	* config/makefile.nt (CFLAGS): Added -DHAVE_ATEXIT.
 
 2002-02-20  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
