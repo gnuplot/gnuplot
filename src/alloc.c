@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: alloc.c,v 1.4 1999/06/09 12:13:27 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: alloc.c,v 1.5 1999/06/11 11:18:52 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - alloc.c */
@@ -155,11 +155,11 @@ check_pointer_in_block(void *block, void *p, int size, char *file, int line)
 
 char *
 gp_alloc(size, usage)
-unsigned long size;
-char *usage;
+size_t size;
+const char *usage;
 {
     struct frame_struct *p;
-    unsigned long total_size = size + RESERVED_SIZE + 1;
+    size_t total_size = size + RESERVED_SIZE + 1;
 
     TRACE_ALLOC(("gp_alloc %d for %s\n", (int) size, usage ? usage : "<unknown>"));
 
@@ -177,8 +177,8 @@ char *usage;
 generic *
 gp_realloc(old, size, usage)
 generic *old;
-unsigned long size;
-char *usage;
+size_t size;
+const char *usage;
 {
     if (!old)
 	return gp_alloc(size, usage);
@@ -189,7 +189,7 @@ char *usage;
 
     {
 	struct frame_struct *p = (struct frame_struct *) old - 1;
-	unsigned long total = size + RESERVED_SIZE + 1;
+	size_t total = size + RESERVED_SIZE + 1;
 
 	p = realloc(p, total);
 
@@ -268,8 +268,8 @@ end_leak_check(char *file, int line)
 
 char *
 gp_alloc(size, message)
-unsigned long size;		/* # of bytes */
-char *message;			/* description of what is being allocated */
+size_t size;			/* # of bytes */
+const char *message;		/* description of what is being allocated */
 {
     char *p;			/* the new allocation */
 
@@ -294,16 +294,16 @@ char *message;			/* description of what is being allocated */
 }
 
 /*
- * note gp_realloc assumes that failed realloc calls leave the original mem block
- * allocated. If this is not the case with any C compiler, a substitue
+ * note gp_realloc assumes that failed realloc calls leave the original mem
+ * block allocated. If this is not the case with any C compiler, a substitue
  * realloc function has to be used.
  */
 
 generic *
 gp_realloc(p, size, message)
 generic *p;			/* old mem block */
-unsigned long size;		/* # of bytes */
-char *message;			/* description of what is being allocated */
+size_t size;			/* # of bytes */
+const char *message;		/* description of what is being allocated */
 {
     char *res;			/* the new allocation */
 

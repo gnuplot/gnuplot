@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.8 1999/06/11 18:53:14 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.9 1999/06/14 19:19:45 lhecking Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -142,14 +142,14 @@ static int maxiter = 0;		/* HBB 970304: maxiter patch */
 
 static char fit_script[128];
 static char logfile[128] = "fit.log";
-static char *FIXED = "# FIXED";
-static char *GNUFITLOG = "FIT_LOG";
-static char *FITLIMIT = "FIT_LIMIT";
-static char *FITSTARTLAMBDA = "FIT_START_LAMBDA";
-static char *FITLAMBDAFACTOR = "FIT_LAMBDA_FACTOR";
-static char *FITMAXITER = "FIT_MAXITER";	/* HBB 970304: maxiter patch */
-static char *FITSCRIPT = "FIT_SCRIPT";
-static char *DEFAULT_CMD = "replot";	/* if no fitscript spec. */
+static const char *FIXED = "# FIXED";
+static const char *GNUFITLOG = "FIT_LOG";
+static const char *FITLIMIT = "FIT_LIMIT";
+static const char *FITSTARTLAMBDA = "FIT_START_LAMBDA";
+static const char *FITLAMBDAFACTOR = "FIT_LAMBDA_FACTOR";
+static const char *FITMAXITER = "FIT_MAXITER";	/* HBB 970304: maxiter patch */
+static const char *FITSCRIPT = "FIT_SCRIPT";
+static const char *DEFAULT_CMD = "replot";	/* if no fitscript spec. */
 static char last_fit_command[LASTFITCMDLENGTH+1] = "";
 
 
@@ -189,7 +189,7 @@ static void show_fit __PROTO((int i, double chisq, double last_chisq, double *a,
 			      double lambda, FILE * device));
 static TBOOLEAN is_empty __PROTO((char *s));
 static TBOOLEAN is_variable __PROTO((char *s));
-static double getdvar __PROTO((char *varname));
+static double getdvar __PROTO((const char *varname));
 static double createdvar __PROTO((char *varname, double value));
 static void splitpath __PROTO((char *s, char *p, char *f));
 static void backup_file __PROTO((char *, const char *));
@@ -603,7 +603,7 @@ fit_interrupt()
 	case 'E':{
 		int i;
 		struct value v;
-		char *tmp;
+		const char *tmp;
 
 		tmp = (fit_script != 0 && *fit_script) ? fit_script : DEFAULT_CMD;
 		fprintf(STANDARD, "executing: %s", tmp);
@@ -959,7 +959,7 @@ struct value data;
 *****************************************************************/
 int
 getivar(varname)
-char *varname;
+const char *varname;
 {
     register struct udvt_entry *udv_ptr = first_udv;
 
@@ -980,7 +980,7 @@ char *varname;
 *****************************************************************/
 static double
 getdvar(varname)
-char *varname;
+const char *varname;
 {
     register struct udvt_entry *udv_ptr = first_udv;
 
