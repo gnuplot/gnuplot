@@ -1,3 +1,10 @@
+2002-02-14  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* man/Makefile.am: Fix lasergnu installation to honour DESTDIR.
+
+	* src/Makefile.am: Install gnuplot_x11 into $(pkglibdir)/$(PKG_MAJOR)
+	instead of $(bindir).
+
 2002-02-14  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/mouse.c: Don't change splot view if there is a log axis with a
