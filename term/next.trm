@@ -1,5 +1,5 @@
 /*
- * $Id: next.trm,v 1.15 1999/08/07 17:19:12 lhecking Exp $
+ * $Id: next.trm,v 1.16 1999/08/24 11:24:55 lhecking Exp $
  *
  */
 
@@ -583,7 +583,7 @@ char *fname;
     if (fnp)
 	return fnp->name;	/* we must have found it in the list */
 
-    if (encoding == ENCODING_ISO_8859_1) {
+    if (encoding == S_ENC_ISO8859_1) {
 	NEXTPrintf("/%s reencodeISO def\n", fname);
     }
     fnp = (struct NEXT_FontName *) gp_alloc(sizeof(struct NEXT_FontName), "PostScript Font record");
@@ -691,7 +691,7 @@ char **dict;			/* extra entries for the dictionary */
 	       NEXT_HTIC / 2.0,	/* half point width */
 	       NEXT_VTIC / 2.0);	/* half point height */
 
-    if (uses_fonts && (encoding == ENCODING_ISO_8859_1)) {
+    if (uses_fonts && (encoding == S_ENC_ISO8859_1)) {
 	for (i = 0; NEXT_iso_8859_1_encoding[i] != NULL; i++) {
 	    NEXTPrintf("%s", NEXT_iso_8859_1_encoding[i]);
 	}

@@ -1,5 +1,5 @@
 /*
- * $Id: post.trm,v 1.35 1999/09/14 15:24:04 lhecking Exp $
+ * $Id: post.trm,v 1.36 1999/10/01 15:09:12 lhecking Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -494,13 +494,13 @@ int can_reencode;
     PS_DocFonts = fnp;
 
     switch(encoding) {
-    case ENCODING_ISO_8859_1:
+    case S_ENC_ISO8859_1:
 	recode = "reencodeISO def\n";
 	break;
-    case ENCODING_CP_437:
+    case S_ENC_CP437:
 	recode = "reencodeCP437 def\n";
 	break;
-    case ENCODING_CP_850 : 
+    case S_ENC_CP850 : 
 	recode = "reencodeCP850 def\n";
 	break;
     }
@@ -906,17 +906,17 @@ NULL };
 	    PS_HTIC/2.0,		/* half point width */
 	    PS_VTIC/2.0);		/* half point height */
 
-    if (uses_fonts && (encoding == ENCODING_ISO_8859_1)) {
+    if (uses_fonts && (encoding == S_ENC_ISO8859_1)) {
 	for (i = 0; PS_iso_8859_1_encoding[i] != NULL; i++) {
 	    fprintf(gpoutfile,"%s",PS_iso_8859_1_encoding[i]);
 	}
     }
-    if (uses_fonts && (encoding == ENCODING_CP_437)) {       /* JFi */
+    if (uses_fonts && (encoding == S_ENC_CP437)) {       /* JFi */
 	for (i = 0; PS_cp_437_encoding[i] != NULL; i++) {
 	    fprintf(gpoutfile,"%s",PS_cp_437_encoding[i]);
 	}
     }
-    if (uses_fonts && (encoding == ENCODING_CP_850)) {       /* JFi */
+    if (uses_fonts && (encoding == S_ENC_CP850)) {       /* JFi */
 	for (i = 0; PS_cp_850_encoding[i] != NULL; i++) {
 	    fprintf(gpoutfile,"%s",PS_cp_850_encoding[i]);
 	}
@@ -1705,24 +1705,19 @@ const char *str;
 }
 
 
-
-
-
 #endif /* TERM_BODY */
 
 #ifdef TERM_TABLE
 
 TERM_TABLE_START(post_driver)
-
-      "postscript",
-      "PostScript graphics language [mode \042fontname\042 font_size]",
-	   PS_XMAX, PS_YMAX, PS_VCHAR, PS_HCHAR, 
-	   PS_VTIC, PS_HTIC, PS_options, PS_init, PS_reset, 
-	   PS_text, null_scale, PS_graphics, PS_move, PS_vector, 
-	   PS_linetype, PS_put_text, PS_text_angle, 
-	   PS_justify_text, PS_point, do_arrow, PS_set_font, PS_pointsize,
-	   0 /*flags*/, 0 /*suspend*/, 0 /*resume*/, PS_fillbox, PS_linewidth
-
+"postscript",
+"PostScript graphics language [mode \042fontname\042 font_size]",
+   PS_XMAX, PS_YMAX, PS_VCHAR, PS_HCHAR, 
+   PS_VTIC, PS_HTIC, PS_options, PS_init, PS_reset, 
+   PS_text, null_scale, PS_graphics, PS_move, PS_vector, 
+   PS_linetype, PS_put_text, PS_text_angle, 
+   PS_justify_text, PS_point, do_arrow, PS_set_font, PS_pointsize,
+   0 /*flags*/, 0 /*suspend*/, 0 /*resume*/, PS_fillbox, PS_linewidth
 TERM_TABLE_END(post_driver)
 
 #undef LAST_TERM
@@ -1903,7 +1898,8 @@ START_HELP(post)
 " may require deeper knowledge of the PostScript language.",
 "",
 " The organization of a PostScript file written by `gnuplot` is discussed in",
-" the text file \"ps_file.doc\" in the /docs/ps subdirectory."
+" the text file \"ps_file.doc\" in the docs/ps subdirectory of the gnuplot",
+" source distribution."
 END_HELP(post)
 #endif
 

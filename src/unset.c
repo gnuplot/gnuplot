@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.4 1999/11/03 16:04:55 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.5 1999/11/08 19:24:35 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -637,11 +637,12 @@ unset_encoding()
 {
     c_token++;
 
-    encoding = ENCODING_DEFAULT;
+    encoding = S_ENC_DEFAULT;
 }
 
 
 /* process 'unset format' command */
+/* FIXME: compare and merge with set.c::set_format */
 static void
 unset_format()
 {
