@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.132 2002/08/30 20:18:40 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.133 2002/09/02 21:03:15 mikulik Exp $
 C 18 September 2001
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001   Thomas Williams, Colin Kelley et al.
 C
@@ -111,7 +111,7 @@ C
  with a backslash (\).  The backslash must be the _last_ character on each
  line.  The effect is as if the backslash and newline were not there.  That
  is, no white space is implied, nor is a comment terminated.  Therefore,
- commenting out a continued line comments out the entire command 
+ commenting out a continued line comments out the entire command
  (see `comments`).  But note that if an error occurs somewhere on a multi-line
  command, the parser may not be able to locate precisely where the error is
  and in that case will not necessarily point to the correct line.
@@ -187,7 +187,7 @@ C
  2. Greatly expanded `using` command.  See `plot using`.
 
  3. `set timefmt` allows for the use of dates as input and output for time
- series plots.  See `Time/Date data` and  
+ series plots.  See `Time/Date data` and
 ^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/timefmt/timefmt.html">
  timedat.dem demo.
 ^ </a>
@@ -259,8 +259,8 @@ C
  commands which will be executed when a certain key or key sequence is pressed
  while the driver's window has the input focus. Note that `bind` is only
  available if gnuplot was compiled with `mouse` support and it is used by all
- mouse-capable terminals. Bindings overwrite the builtin bindings (like in 
- every real editor), except <space> and 'q' which cannot be rebound. Mouse 
+ mouse-capable terminals. Bindings overwrite the builtin bindings (like in
+ every real editor), except <space> and 'q' which cannot be rebound. Mouse
  buttons cannot be rebound.
 
  Note that multikey-bindings with modifiers have to be quoted.
@@ -512,7 +512,7 @@ C
 
  If GNUTERM is defined, it is used as the name of the terminal type to be
  used.  This overrides any terminal type sensed by `gnuplot` on start-up, but
- is itself overridden by the .gnuplot (or equivalent) start-up file 
+ is itself overridden by the .gnuplot (or equivalent) start-up file
  (see `start-up`) and, of course, by later explicit changes.
 
  On Unix, AmigaOS, AtariTOS, MS-DOS and OS/2, GNUHELP may be defined to be the
@@ -555,7 +555,7 @@ C
  For these drivers the font search path is controlled by the environmental
  variable GDFONTPATH.
  The postscript terminal uses its own font search path. It is controlled by
- the environmental variable GNUPLOT_FONTPATH. The format is the same as for 
+ the environmental variable GNUPLOT_FONTPATH. The format is the same as for
  GNUPLOT_LIB. The contents of GNUPLOT_FONTPATH are appended to the `fontpath`
  variable, but not saved with the `save` and `save set` commands.
 2 Expressions
@@ -847,7 +847,7 @@ C
 #lambertw(x) & real & Lambert W function \\
 %lambertw(x)@real@Lambert W function
  The lambertw function returns the value of the principal branch of
- Lambert's W function, which is defined by the equation (W(z)*exp(W(z))=z. 
+ Lambert's W function, which is defined by the equation (W(z)*exp(W(z))=z.
  z must be a real number with z >= -exp(-1).
 4 lgamma
 ?expressions functions lgamma
@@ -1033,7 +1033,7 @@ C
  `valid(x)` may be used only in expressions as part of `using` manipulations
  to fits or datafile plots.  See `plot datafile using`.
 @end table
- See also 
+ See also
 ^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/airfoil/airfoil.html">
  airfoil.dem: use of functions and complex variables for airfoils demo.
 ^ </a>
@@ -1333,7 +1333,7 @@ C ... and restart the table:
  `splot` can plot surfaces and contours in addition to points and/or lines.
  In addition to `splot`, see `set isosamples` for information about defining
  the grid for a 3-d function;  `splot datafile` for information about the
- requisite file structure for 3-d data values; and `set contour` and 
+ requisite file structure for 3-d data values; and `set contour` and
  `set cntrparam` for information about contours.
 
  In `splot`, control over the scales and labels of the axes are the same as
@@ -1724,7 +1724,7 @@ C ... and restart the table:
  the function values, evaluated at the same places.  This quantity is often
  called 'chisquare' (i.e., the Greek letter chi, to the power of 2).  The
  algorithm attempts to minimize SSR, or more precisely, WSSR, as the residuals
- are 'weighted' by the input data errors (or 1.0) before being squared; 
+ are 'weighted' by the input data errors (or 1.0) before being squared;
  see `fit error_estimates` for details.
 
  That's why it is called 'least-squares fitting'.  Let's look at an example
@@ -2189,11 +2189,11 @@ C ... and restart the table:
  Syntax:
        pause <time> {"<string>"}
 
- <time> may be any constant or expression.  Choosing -1 will wait until a 
+ <time> may be any constant or expression.  Choosing -1 will wait until a
  carriage return is hit, zero (0) won't pause at all, and a positive number
  will wait the specified number of seconds.  The time is rounded to an integer
  number of seconds if subsecond time resolution is not supported by the given
- platform.  `pause 0` is synonymous with `print`. 
+ platform.  `pause 0` is synonymous with `print`.
 
  Note: Since `pause` communicates with the operating system rather than the
  graphics, it may behave differently with different device drivers (depending
@@ -2274,11 +2274,11 @@ C ... and restart the table:
  Each data point represents an (x,y) pair. For `plot`s with error bars or
  error bars with lines (see `set style errorbars` or `set style errorlines`),
  each data point is (x,y,ydelta), (x,y,ylow,yhigh),
- (x,y,xdelta), (x,y,xlow,xhigh), or (x,y,xlow,xhigh,ylow,yhigh). 
- 
+ (x,y,xdelta), (x,y,xlow,xhigh), or (x,y,xlow,xhigh,ylow,yhigh).
+
  In all cases, the numbers of each record of a data file must be separated
- by white space (one or more blanks or tabs) unless a format specifier is 
- provided by the `using` option. This white space divides each record into 
+ by white space (one or more blanks or tabs) unless a format specifier is
+ provided by the `using` option. This white space divides each record into
  columns. However, whitespace inside a pair of double quotes is ignored when
  counting columns, so the following datafile line has three columns:
        1.0 "second column" 3.0
@@ -2315,7 +2315,7 @@ C ... and restart the table:
        19 19
        e
 
- To avoid this, you can use the `fixmin`/`fixmax` feature of the 
+ To avoid this, you can use the `fixmin`/`fixmax` feature of the
  `set autoscale` command, which turns off the automatic extension of the
  axis range upto the next tic mark.
 4 every
@@ -2440,8 +2440,8 @@ C ... and restart the table:
 
  If `autoscale` is not in effect, and the smooth option is either `acspline`
  or `cspline`, the sampling of the generated curve is
- done across the intersection of the x range covered by the input data and 
- the fixed abscissa range as defined by `set xrange`. 
+ done across the intersection of the x range covered by the input data and
+ the fixed abscissa range as defined by `set xrange`.
 
  If too few points are available to allow the selected option to be applied,
  an error message is produced.  The minimum number is one for `unique`, and
@@ -2795,11 +2795,11 @@ C ... and restart the table:
  option on one to avoid two entries in the key). Alternately, use the
  errorlines command (see `errorlines`).
 
- The error bars have crossbars at each end unless `set bars` is used 
+ The error bars have crossbars at each end unless `set bars` is used
  (see `set bars` for details).
 
  If autoscaling is on, the ranges will be adjusted to include the error bars.
- See also 
+ See also
 ^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/errorbar/errorbar.html">
  errorbar demos.
 ^ </a>
@@ -3021,9 +3021,9 @@ C ... and restart the table:
  `dots`, `steps`, `fsteps`, `histeps`, `errorbars`, `xerrorbars`,
  `yerrorbars`, `xyerrorbars`, `errorlines`, `xerrorlines`, `yerrorlines`,
  `xyerrorlines`, `boxes`, `filledboxes`, `filledcurves`, `boxerrorbars`,
- `boxxyerrorbars`, `financebars`, `candlesticks`, `vectors` or `pm3d`. Some 
+ `boxxyerrorbars`, `financebars`, `candlesticks`, `vectors` or `pm3d`. Some
  of these styles require additional information. See `set style <style>` for
- details of each style.  Note that `filledcurves` and `pm3d` can take an 
+ details of each style.  Note that `filledcurves` and `pm3d` can take an
  additional option not listed above (the latter only when used in the `splot`
  command)---see their help or examples below for more details.
 
@@ -3045,10 +3045,10 @@ C ... and restart the table:
 
  You may also scale the line width and point size for a plot by using
  <line_width> and <point_size>, which are specified relative to the default
- values for each terminal.  The pointsize may also be altered 
+ values for each terminal.  The pointsize may also be altered
  globally---see `set pointsize` for details.  But note that both <point_size>
- as set here and  as set by `set pointsize` multiply the default point 
- size---their effects are  not cumulative.  That is, 
+ as set here and  as set by `set pointsize` multiply the default point
+ size---their effects are  not cumulative.  That is,
  `set pointsize 2; plot x w p ps 3` will use points three times default size,
  not six.
 
@@ -3089,7 +3089,7 @@ C ... and restart the table:
  (errorbars require three or four columns):
        plot 'exper.dat' w lines, 'exper.dat' notitle w errorbars
 
- Another way to plot "exper.dat" with errorlines (errorbars require three 
+ Another way to plot "exper.dat" with errorlines (errorbars require three
  or four columns):
        plot 'exper.dat' w errorlines
 
@@ -3327,7 +3327,7 @@ C ... and restart the table:
        print y         #prints {1.16933, 0.154051}
        print asinh(y)  #prints {57.29578, 5.729578}
  See also
-^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/poldat/poldat.html"> 
+^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/poldat/poldat.html">
  poldat.dem: polar plot using `set angles` demo.
 ^ </a>
 3 arrow
@@ -3374,21 +3374,21 @@ C ... and restart the table:
  default, arrows have heads. Specifying `heads` draws arrow heads on both
  ends of the line.
 
- Head size can be controlled by `size <length>,<angle>`, where <length> 
- defines length of each branch of the arrow head and <angle> the angle (in 
+ Head size can be controlled by `size <length>,<angle>`, where <length>
+ defines length of each branch of the arrow head and <angle> the angle (in
  degrees) they make with the arrow. <Length> is in x-axis units; this can be
- changed by `first`, `second`, `graph` or `screen` before the <length>; 
+ changed by `first`, `second`, `graph` or `screen` before the <length>;
  see `coordinates` for details.
 
- Specifying `filled` produces filled arrow heads (if heads are used). 
+ Specifying `filled` produces filled arrow heads (if heads are used).
  Filling is supported on filled-polygon capable terminals, see `help pm3d`
  for their list, otherwise the arrow heads are closed but not filled.
  Further, filling is obviously not supported on terminals drawing arrows by
  their own specific routines, like `fig`, `metafont`, `metapost`, `latex` or
  `tgif`.
 
- The line style may be selected from a user-defined list of line styles 
- (see `set style line`) or may be defined here by providing values for 
+ The line style may be selected from a user-defined list of line styles
+ (see `set style line`) or may be defined here by providing values for
  <line_type> (an index from the default list of styles) and/or <line_width>
  (which is a  multiplier for the default width).
 
@@ -3453,7 +3453,7 @@ C ... and restart the table:
  where <axes> is either `x`, `y`, `z`, `cb`, `x2`, `y2` or `xy`.  A keyword with
  `min` or `max` appended (this cannot be done with `xy`) tells `gnuplot` to
  autoscale just the minimum or maximum of that axis.  If no keyword is given,
- all axes are autoscaled. 
+ all axes are autoscaled.
 
  A keyword with `fixmin`, `fixmax` or `fix` appended tells gnuplot to disable
  extension of the axis range to the next tic mark position, for autoscaled
@@ -3476,7 +3476,7 @@ C ... and restart the table:
 
  Please see `set xrange` for additional information about ranges.
 
- The behavior of autoscaling remains consistent in parametric mode, (see 
+ The behavior of autoscaling remains consistent in parametric mode, (see
  `set parametric`).  However, there are more dependent variables and hence more
  control over x, y, and z axis scales.  In parametric mode, the independent or
  dummy variable is t for `plot`s and u,v for `splot`s.  `autoscale` in
@@ -3569,7 +3569,7 @@ C ... and restart the table:
 ?show bars
 ?bars
  The `set bars` command controls the tics at the ends of error bars,
- and also the width of the boxes in plot styles candlestick and 
+ and also the width of the boxes in plot styles candlestick and
  financebars.
 
  Syntax:
@@ -3583,7 +3583,7 @@ C ... and restart the table:
 ?commands set bmargin
 ?set bmargin
 ?bmargin
- The command `set bmargin` sets the size of the bottom margin.  
+ The command `set bmargin` sets the size of the bottom margin.
  Please see `set margin` for details.
 3 border
 ?commands set border
@@ -3727,7 +3727,7 @@ C ... and restart the table:
  the automatically calculated boxwidth, otherwise the boxwidth is taken as an
  `absolute` value (which is the default). In a four-column data set, the fourth
  column will be interpreted as the box width unless the width is set to -2.0,
- in which case the width will be calculated automatically.  See 
+ in which case the width will be calculated automatically.  See
  `set style boxerrorbars` for more details.
 
  To set the box width to automatic use the command
@@ -3756,15 +3756,15 @@ C ... and restart the table:
  The `set style filling` command is used to set the fillstyle of boxes in the
  `filledboxes` style.
 
- Syntax: 
+ Syntax:
        set style filling {empty | {b}solid {<density>} | {b}pattern {<number>}}
 
  The default fillstyle is `solid 1.0`.
 
- The `solid` option causes filling with a solid color, if the terminal 
+ The `solid` option causes filling with a solid color, if the terminal
  supports that. The <density> parameter specifies the intensity
- of the filled colors. At a <density> of 0.0, the box is empty, at 
- <density> of 1.0, the inner area is of the same color as the border of 
+ of the filled colors. At a <density> of 0.0, the box is empty, at
+ <density> of 1.0, the inner area is of the same color as the border of
  the box. Solid filling may be implemented either by modifying the
  color of the box border continuously, or by dithering, depending on
  the terminal driver. If no <density> parameter is given, a default of
@@ -3774,8 +3774,8 @@ C ... and restart the table:
  drawn in black.
 
  The `pattern` option causes filling to be done with a fill pattern supplied
- by the terminal driver. <pattern> is the pattern number, starting at 0. 
- The kind and number of available fill patterns depend on the terminal driver. 
+ by the terminal driver. <pattern> is the pattern number, starting at 0.
+ The kind and number of available fill patterns depend on the terminal driver.
  If no <pattern> number is given, a default of 0 is assumed.
 
  The `bpattern` option is identical to `pattern` except that the box border is
@@ -3862,7 +3862,7 @@ C ... and restart the table:
  three types of clipping.
 
  This setting does not apply for clipping of the color filled quadrangles which
- draw `pm3d` maps and surfaces. There, you can choose between the options 
+ draw `pm3d` maps and surfaces. There, you can choose between the options
  `clip1in` and `clip4in`.
 3 cntrparam
 ?commands set cntrparam
@@ -3875,11 +3875,11 @@ C ... and restart the table:
  well as `contour`.
 
  Syntax:
-       set cntrparam { { linear 
-                       | cubicspline 
+       set cntrparam { { linear
+                       | cubicspline
                        | bspline
-                       | points <n> 
-                       | order <n> 
+                       | points <n>
+                       | order <n>
                        | levels { auto {<n>} | <n>
                                   | discrete <z1> {,<z2>{,<z3>...}}
                                   | incremental <start>, <incr> {,<end>}
@@ -3956,7 +3956,7 @@ C ... and restart the table:
  To set the start and increment while retaining the number of levels:
        set cntrparam levels incremental 100,50
 
- See also `set contour` for control of where the contours are drawn, and 
+ See also `set contour` for control of where the contours are drawn, and
  `set clabel` for control of the format of the contour labels and linetypes.
 
  See also
@@ -4012,7 +4012,7 @@ C ... and restart the table:
  such a file all the points for a single y-isoline are listed, then all the
  points for the next y-isoline, and so on.  A single blank line (a line
  containing no characters other than blank spaces and a carriage return and/or
- a line feed) separates one y-isoline from the next.  
+ a line feed) separates one y-isoline from the next.
  See also `splot datafile`.
 
 
@@ -4050,7 +4050,7 @@ C ... and restart the table:
 ?unset decimalsign
 ?decimalsign
  The `set decimalsign` command selects a decimal sign for numbers printed
- into tic labels or `set label` strings.  
+ into tic labels or `set label` strings.
 
  Syntax:
        set decimalsign {<value>}
@@ -4128,8 +4128,8 @@ C ... and restart the table:
  The first specifies that a grid of size 10 by 10 is to be constructed using
  a norm value of 1 in the weight computation.  The second only modifies the
  norm, changing it to 4.
- See also 
-^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/scatter/scatter.html"> 
+ See also
+^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/scatter/scatter.html">
  scatter.dem: dgrid3d demo.
 ^ </a>
 
@@ -4193,8 +4193,8 @@ C ... and restart the table:
 ?show fontpath
 ?fontpath
  The `fontpath` setting defines additional locations for font files
- files searched when including font files. Yet, only the postscript terminal 
- supports `fontpath`. If a file cannot be found in the current directory, 
+ files searched when including font files. Yet, only the postscript terminal
+ supports `fontpath`. If a file cannot be found in the current directory,
  the directories in `fontpath` are tried. Further documentation concerning
  the supported file formats is included in the `terminal postscript` section
  of the documentation.
@@ -4218,10 +4218,10 @@ C ... and restart the table:
  `show fontpath`, `save fontpath`, `plot`, or `splot` with embedded font
  files takes a little more time. If you want to save this time you may
  set the environmental variable GNUPLOT_FONTPATH since probing is switched
- off, then. You can find out which is the default fontpath by using 
+ off, then. You can find out which is the default fontpath by using
  `show fontpath`.
 
- However, `show fontpath` prints the contents of user defined fontpath and 
+ However, `show fontpath` prints the contents of user defined fontpath and
  system fontpath separately.  Also, the `save` and `save set` commands save
  only the user specified parts of `fontpath`, for portability reasons.
 
@@ -4263,7 +4263,7 @@ C ... and restart the table:
  spaces and labels in your format string, such as "%g m", which will put " m"
  after each number.  If you want "%" itself, double it: "%g %%".
 
- See also `set xtics` for more information about tic labels, and 
+ See also `set xtics` for more information about tic labels, and
  `set decimalsign` for how to use non-default decimal separators in numbers
  printed this way.
  See also
@@ -4494,8 +4494,8 @@ C ... and restart the table:
 
  For information about the definition and usage of functions in `gnuplot`,
  please see `expressions`.
- See also 
-^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/spline/spline.html"> 
+ See also
+^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/spline/spline.html">
  splines as user defined functions (spline.dem)
 ^ </a>
  and
@@ -4547,7 +4547,7 @@ C ... and restart the table:
  major gridlines is used.  The default polar angle is 30 degrees.
 
  If `front` is given, the grid is drawn on top of the graphed data. If
- `back` is given, the grid is drawn underneath the graphed data. Using 
+ `back` is given, the grid is drawn underneath the graphed data. Using
  `front` will prevent the grid from being obscured by dense data. The default
  setup, `layerdefault`, is 'back' for 2d plots and 'front' for 3d plots.
 
@@ -4594,7 +4594,7 @@ C ... and restart the table:
  linearly between function points or data points when determining the visible
  line segments.  This means that the appearance of a function may be different
  when plotted with `hidden3d` than when plotted with `nohidden3d` because in
- the latter case functions are evaluated at each sample.  Please see 
+ the latter case functions are evaluated at each sample.  Please see
  `set samples` and `set isosamples` for discussion of the difference.
 
  The algorithm used to remove the hidden parts of the surfaces has some
@@ -4662,7 +4662,7 @@ C ... and restart the table:
  See also
 ^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/hidden/hidden.html">
  hidden line removal demo (hidden.dem)
-^ </a> 
+^ </a>
  and
 ^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/singulr/singulr.html">
  complex hidden line demo (singulr.dem).
@@ -4763,8 +4763,8 @@ C ... and restart the table:
  The length of the sample line can be controlled by `samplen`.  The sample
  length is computed as the sum of the tic length and <sample_length> times the
  character width.  `samplen` also affects the positions of point samples in
- the key since these are drawn at the midpoint of the sample line, even if 
- the sample line itself is not drawn.  
+ the key since these are drawn at the midpoint of the sample line, even if
+ the sample line itself is not drawn.
 
  The vertical spacing between lines is controlled by `spacing`.  The spacing
  is set equal to the product of the pointsize, the vertical tic size, and
@@ -4782,9 +4782,9 @@ C ... and restart the table:
  putting a box around the key, otherwise it can be used to adjust the vertical
  shift of automatically chosen key position by <height_increment>/2.
 
- All plotted curves of `plot`s and `splot`s are titled according to the 
- default option `autotitles`. The automatic generation of titles can be 
- suppressed by `noautotitles`; then only those titles explicitly defined 
+ All plotted curves of `plot`s and `splot`s are titled according to the
+ default option `autotitles`. The automatic generation of titles can be
+ suppressed by `noautotitles`; then only those titles explicitly defined
  by `(s)plot ... title ...` will be drawn.
 
  A title can be put on the key (`title "<text>"`)---see also `syntax` for the
@@ -4834,7 +4834,7 @@ C ... and restart the table:
 
  If `splot` is being used to draw contours, the contour labels will be listed
  in the key.  If the alignment of these labels is poor or a different number
- of decimal places is desired, the label format can be specified.  See 
+ of decimal places is desired, the label format can be specified.  See
  `set clabel` for details.
 
  Examples:
@@ -4868,11 +4868,11 @@ C ... and restart the table:
  Arbitrary labels can be placed on the plot using the `set label` command.
 
  Syntax:
-       set label {<tag>} 
+       set label {<tag>}
                  { {"<label text>"{,<value>}} {, ...}} }
                  {at <position>}
                  {left | center | right}
-                 {norotate | rotate {by <degrees>}} 
+                 {norotate | rotate {by <degrees>}}
                  {font "<name>{,<size>}"}
                  {front | back}
                  {textcolor <colorspec>}
@@ -4915,7 +4915,7 @@ C ... and restart the table:
  treat this as vertical text.
 
  Font and its size can be chosen explicitly by `font "<name>{,<size>}"` if the
- terminal supports font settings.  Otherwise the default font of the terminal 
+ terminal supports font settings.  Otherwise the default font of the terminal
  will be used.
 
  If `front` is given, the label is written on top of the graphed data. If
@@ -4933,7 +4933,7 @@ C ... and restart the table:
     `tc palette fraction <val>`, with 0<=val<=1, selects a color corresponding to
         the mapping [0:1] to grays/colors of the `palette`.
 
- If a <pointstyle> is given, using keywords `lw`, `pt` and `ps`, see `style`, 
+ If a <pointstyle> is given, using keywords `lw`, `pt` and `ps`, see `style`,
  a point with the given style and color of the given line type is plotted at
  the label position and the text of the label is displaced slightly.
  The displacement defaults to 1, 1 in `pointsize` units and can be
@@ -4946,7 +4946,7 @@ C ... and restart the table:
  the label (this is the default).
 
  If one (or more) axis is timeseries, the appropriate coordinate should be
- given as a quoted time string according to the `timefmt` format string.  
+ given as a quoted time string according to the `timefmt` format string.
  See `set xdata` and `set timefmt`.
 
  The EEPIC, Imagen, LaTeX, and TPIC drivers allow \\ in a string to specify
@@ -4989,9 +4989,9 @@ C ... and restart the table:
  To set a label displaced a little bit from a small point:
        set label 'origin' at 0,0 point lt 1 pt 2 ps 3 offset 1,-1
 
- To set a label whose color matches the z value (in this case 5.5) of some 
+ To set a label whose color matches the z value (in this case 5.5) of some
  point on a 3D splot colored using pm3d:
-       set label 'text' at 0,0,5.5 tc palette z 
+       set label 'text' at 0,0,5.5 tc palette z
 
 3 linestyle
 ?commands set style line
@@ -5076,7 +5076,7 @@ C ... and restart the table:
 ?commands set lmargin
 ?set lmargin
 ?lmargin
- The command `set lmargin` sets the size of the left margin.  
+ The command `set lmargin` sets the size of the left margin.
  Please see `set margin` for details.
 3 loadpath
 ?commands set loadpath
@@ -5198,7 +5198,7 @@ C ... and restart the table:
  necessary if the data in the file are not in the required order.
 
  `mapping` has no effect on `plot`.
-^ See also 
+^ See also
 ^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/world/world.html">
  world.dem: mapping demos.
 ^ </a>
@@ -5359,11 +5359,11 @@ C ... and restart the table:
  Choose the option `labels` to get real gnuplot labels on Button 2. (The
  default is `nolabels` which makes Button 2 drawing only temporary annotations
  at the mouse positions). The labels are drawn with the current setting of
- `mouseformat`. `labeloptions` controls which options are passed to the 
+ `mouseformat`. `labeloptions` controls which options are passed to the
  `set label` command. The default is "pointstyle 1" which will plot a small
- plus at the label position.  Note that the pointsize is taken from the 
+ plus at the label position.  Note that the pointsize is taken from the
  `set pointsize` command.
-   Labels can be removed by holding the Ctrl-Key down while clicking with 
+   Labels can be removed by holding the Ctrl-Key down while clicking with
  Button 2 on the label's point. The threshold for how close you must be to the
  label is also determined by the `pointsize`.
 
@@ -5436,12 +5436,12 @@ C ... and restart the table:
 
  `set size` and `set origin` refer to the entire plotting area used for each
  plot.  If you want to have the axes themselves line up, you can guarantee
- that the margins are the same size with the `set margin` commands.  
+ that the margins are the same size with the `set margin` commands.
  See `set margin` for their use.  Note that the margin settings are absolute,
  in character units, so the appearance of the graph in the remaining space
  will depend on the screen size of the display device, e.g., perhaps quite
  different on a video display and a printer.
- See also 
+ See also
 ^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/multiplot/multiplt.html">
  multiplot demo (multiplt.dem).
 ^ </a>
@@ -5704,8 +5704,8 @@ C ... and restart the table:
 
  You are welcome to implement the support for other terminals.
 
- The pm3d algorithm fills the region between two neighbouring points in one 
- scan with another two points in the next scan by a gray (or color) according 
+ The pm3d algorithm fills the region between two neighbouring points in one
+ scan with another two points in the next scan by a gray (or color) according
  to the average of the z data (or an additional 'color' column, see `splot`)
  in these four points.  From this follows, that the neighbouring scans should
  not cross and the number of points in the neighbouring scans should not
@@ -5719,7 +5719,7 @@ C ... and restart the table:
      corners of the quadrangle into the range [min_color_z,max_color_z]
      providing range of grays [0:1].  This value can be used directly as the
      gray for gray maps.  The normalized gray value can be further mapped into
-     a color.  See `set palette` for the complete description. 
+     a color.  See `set palette` for the complete description.
  2. data splot with two ore four data columns:
      The gray is obtained by using the LAST coordinate instead of the z value.
 
@@ -5727,11 +5727,11 @@ C ... and restart the table:
  palettes of smooth colors.  See above for the list of currently available
  terminals.
 
- Notes: 
+ Notes:
     1. The term 'scan' referenced above is used more among physicists then the
        the term 'iso_curve' in gnuplot documentation and sources.  You measure
        maps recording one scan after another scan, that's why.
-    2. Map is obtained by `set view 180,0,1.25; set yrange [*:*] reverse`, 
+    2. Map is obtained by `set view 180,0,1.25; set yrange [*:*] reverse`,
        plus something more.  This can be easily switched on by using
        `set pm3d map`.  Use `unset pm3d` before switching to 2d plots.
 
@@ -5783,13 +5783,13 @@ C ... and restart the table:
  points of the quadrangle must be in the x and y ranges.
 
  The above clipping works fine for plotting maps.  For surfaces, clipping with
- respect to the z coordinate could find some use too (something like "clipz1in" 
+ respect to the z coordinate could find some use too (something like "clipz1in"
  and "clipz4in").  But nobody has needed this feature until now, so it's not
  available.
 
- Notice that the ranges of z-values and color values for surfaces are 
- adjustable independently by `set zrange`, `set cbrange`, and `set log` 
- for z or cb.  Maps can be adjusted by the cb axis only; see also 
+ Notice that the ranges of z-values and color values for surfaces are
+ adjustable independently by `set zrange`, `set cbrange`, and `set log`
+ for z or cb.  Maps can be adjusted by the cb axis only; see also
  `set colorbox`.
 
  The option `hidden3d` takes as the argument a linestyle which must be created
@@ -5848,7 +5848,7 @@ C ... and restart the table:
  which can overwrite and therefore hide part of earlier plots.
 
  If `with pm3d` is specified in the `splot` command line, then it accepts the
- 'at' option.  The following plots draw three color surfaces at different 
+ 'at' option.  The following plots draw three color surfaces at different
  altitudes:
        set border 4095
        set pm3d at s
@@ -5870,20 +5870,20 @@ C ... and restart the table:
 
  Color palettes require terminal entries for filled color polygons and
  palettes of smooth colors, are currently available for terminals listed in
- `help pm3d`. The range of color values are adjustable independently by 
- `set cbrange` and `set log cb`. The whole color palette is 
+ `help pm3d`. The range of color values are adjustable independently by
+ `set cbrange` and `set log cb`. The whole color palette is
  visualized in the `colorbox`.
 
  Syntax:
        set palette
        set palette {
                   { gray | color }
-                  {   rgbformulae <r>,<g>,<b>  
+                  {   rgbformulae <r>,<g>,<b>
                     | defined { ( <gray1> <color1> {, <grayN> <colorN>}... ) }
                     | file '<filename>' {datafile-modifiers}
                     | functions <R>,<G>,<B>
                   }
-                  { model { RGB | HSV | CMY | YIQ | XYZ } 
+                  { model { RGB | HSV | CMY | YIQ | XYZ }
                   { positive | negative }
                   { nops_allcF | ps_allcF }
                   { maxcolors <maxcolors> }
@@ -5910,7 +5910,7 @@ C ... and restart the table:
  the quadrangle into the range [min_z,max_z] providing range of grays [0:1].
  This value can be used directly as the gray for gray maps.  The color map
  requires a transformation gray --> (R,G,B), i.e. a mapping
- [0:1] --> ([0:1],[0:1],[0:1]).  
+ [0:1] --> ([0:1],[0:1],[0:1]).
 
  Basically two different types of mappings can be used:  Analytic formulae
  to convert gray to color, or discrete mapping tables which are interpolated.
@@ -5919,14 +5919,14 @@ C ... and restart the table:
  output to a minimum.
 
  `set palette gray` switches to a gray only palette.  `rgbformulae`, `defined`,
- `file` and `functions` switch to a color mapping.  `set palette color` is an 
+ `file` and `functions` switch to a color mapping.  `set palette color` is an
  easy way to switch back from the gray palette to the last color mapping.
- 
- Most terminals support only discrete number of colors (e.g. 256 colors in 
+
+ Most terminals support only discrete number of colors (e.g. 256 colors in
  gif).  All entries of the palette remaining after the default gnuplot linetype
  colors declaration are allocated for pm3d by default.  Then `multiplot` could
  fail if there are no more color positions in the terminal available.  Then you
- should use `set palette maxcolors <maxcolors>` with a reasonably small value. 
+ should use `set palette maxcolors <maxcolors>` with a reasonably small value.
  This option can also be used to separate levels of z=constant in discrete
  steps, thus to emulate filled contours. Default value of 0 stays for
  allocating all remaining entries in the terminal palette or for to use exact
@@ -5935,17 +5935,17 @@ C ... and restart the table:
  Automatic gamma correction via `set palette gamma <gamma>` can be done for
  gray maps only (`set palette gray`).  Gamma is ignored for color mappings.
 
- RGB color space might not be the most useful color space to work in.  For 
- that reason you may change the color space with `model` to one of `RGB`, 
+ RGB color space might not be the most useful color space to work in.  For
+ that reason you may change the color space with `model` to one of `RGB`,
  `HSV`, `CMY`, `YIQ` and `XYZ`.  Using color names for `defined` tables and a
  color space other than RGB will result in funny colors.  All explanation have
- been written for RGB color space, so please note, that `R` can be `H`, `C`, 
- `Y`, or `X`, depending on the actual color space (`G` and `B` accordingly). 
+ been written for RGB color space, so please note, that `R` can be `H`, `C`,
+ `Y`, or `X`, depending on the actual color space (`G` and `B` accordingly).
 
  All values for all color spaces are limited to [0,1]!
 
  RGB stands for Red, Green and Blue;  CMY stands for Cyan, Magenta and Yellow;
- HSV stands for Hue, Saturation, and Value;  YIQ is the color model used by 
+ HSV stands for Hue, Saturation, and Value;  YIQ is the color model used by
  the U.S. Commercial Color Television Broadcasting, it is basically an RGB
  recoding with downward compatibility for black and white television;
  XYZ are the three primary colors of the color model defined by the 'Commission
@@ -5964,9 +5964,9 @@ C ... and restart the table:
 ?set palette rgbformulae
 ?palette rgbformulae
 ?rgbformulae
- For `rgbformulae` three suitable mapping functions have 
- to be chosen.  This is done via `rgbformulae <r>,<g>,<b>`.  The available 
- mapping functions are listed by `show palette rgbformulae`.  Default is 
+ For `rgbformulae` three suitable mapping functions have
+ to be chosen.  This is done via `rgbformulae <r>,<g>,<b>`.  The available
+ mapping functions are listed by `show palette rgbformulae`.  Default is
  `7,5,15`, some other examples are `3,11,6`, `21,23,3` or `3,23,21`.  Negative
  numbers, like `3,-11,-6`, mean inverted color (i.e.  1-gray passed into the
  formula, see also `positive` and `negative` options below).
@@ -5998,23 +5998,23 @@ C ... and restart the table:
  Gray-to-rgb mapping can be manualy set by use of `defined`:  A color gradient
  is defined and used to give the rgb values.  Such a  gradient is a piecewise
  linear mapping from gray values in [0,1] to the RGB space [0,1]x[0,1]x[0,1].
- You have to specify the gray values and the corresponding RGB values in 
+ You have to specify the gray values and the corresponding RGB values in
  between a linear interpolation shall take place:
- 
+
  Syntax:
        set palette  defined { ( <gray1> <color1> {, <grayN> <colorN>}... ) }
 
- <grayX> are gray values which are mapped to [0,1] and <colorX> are the 
- corresponding rgb colors.  The color can be specified in three different 
- ways:  
- 
+ <grayX> are gray values which are mapped to [0,1] and <colorX> are the
+ corresponding rgb colors.  The color can be specified in three different
+ ways:
+
       <color> :=  { <r> <g> <b> | '<color-name>' | '#rrggbb' }
 
  Either by three numbers (each in [0,1]) for red, green and blue, separated by
  whitespace, or the name of the color in quotes or X style color specifiers
  also in quotes.  You may freely mix the three types in a gradient definition,
  but the named color "red" will be something strange if RGB is not selected
- as color space.  Use `show palette colornames` for a list of known color 
+ as color space.  Use `show palette colornames` for a list of known color
  names.
 
  Please note, that even if written as <r>, this might actually be the
@@ -6024,21 +6024,21 @@ C ... and restart the table:
  The <gray> values have to form an ascending sequence of real numbers; the
  sequence will be automatically rescaled to [0,1].
 
- `set palette defined` (without a gradient definition in braces) switches to 
+ `set palette defined` (without a gradient definition in braces) switches to
  RGB color space and uses a preset full-spectrum color gradient.
  Use `show palette gradient` to display the gradient.
 
  Examples:
 
  To produce a gray palette (useless but instructive) use:
-      set palette model RGB 
+      set palette model RGB
       set pallette defined ( 0 "black", 1 "white" )
 
  To produce a blue yellow red palette use (all equivalent):
        set palette defined ( 0 "blue", 1 "yellow", 2 "red" )
        set palette defined ( 0 0 0 1, 1 1 1 0, 2 1 0 0 )
        set palette defined ( 0 "#0000ff", 1 "#ffff00", 2 "ff0000" )
- 
+
  To produce some rainbow-like palette use:
        set palette defined ( 0 "blue", 3 "green", 6 "yellow", 10 "red" )
 
@@ -6049,12 +6049,12 @@ C ... and restart the table:
 
  To produce a palette with few colors only use:
        set palette model RGB maxcolors 4
-       set palette defined ( 0 "blue", 1 "green", 2 "yellow", 3 "red" ) 
+       set palette defined ( 0 "blue", 1 "green", 2 "yellow", 3 "red" )
 
  'Traffic light' palette (non-smooth color jumps at gray = 1/3 and 2/3).
        set palette model RGB
        set palette defined (0 "dark-green", 1 "green", 1 "yellow", \
-                            2 "dark-yellow", 2 "red", 3 "dark-red" ) 
+                            2 "dark-yellow", 2 "red", 3 "dark-red" )
 
 4 functions
 ?commands set palette functions
@@ -6063,7 +6063,7 @@ C ... and restart the table:
 ?functions
  Use `set palette functions <Rexpr>, <Gexpr>, <Bexpr>` to define three formulae
  for the R(gray), G(gray) and B(gray) mapping.  The three formulae may depend
- on the variable `gray` which will take values in [0,1] and should also 
+ on the variable `gray` which will take values in [0,1] and should also
  produce values in [0,1].
  Please note that <Rexpr> might be a formula for the H-value if HSV color
  space has been choosen (same for all other formulae and color spaces).
@@ -6071,7 +6071,7 @@ C ... and restart the table:
  Examples:
 
  To produce a full color palette use:
-       set palette model HSV functions gray, 1, 1 
+       set palette model HSV functions gray, 1, 1
 
  A nice black to gold palette:
        set palette model XYZ functions gray**0.35, gray**0.5, gray**0.8
@@ -6079,7 +6079,7 @@ C ... and restart the table:
  A gamma-corrected black and white palette
        gamma = 2.2
        color(gray) = gray**(1./gamma)
-       set palette model RGB functions color(gray), color(gray), color(gray) 
+       set palette model RGB functions color(gray), color(gray), color(gray)
 
 4 file
 ?commands set palette file
@@ -6090,13 +6090,13 @@ C ... and restart the table:
  <gradient> is read from a datafile.  Either 4 columns (gray,R,G,B) or
  just three columns (R,G,B) have to be selected via the `using` data file
  modifier.  In the three column case, the line number will be used as gray.
- The gray range is automatically rescaled to [0,1].  The file is read as a 
+ The gray range is automatically rescaled to [0,1].  The file is read as a
  normal data file, so all datafile modifiers can be used.
- Please note, that `R` might actually be e.g. `H` if HSV color space is 
+ Please note, that `R` might actually be e.g. `H` if HSV color space is
  selected.
 
  As usual <filename> may be `'-'` which means that the data follow the command
- inline and are terminated by a single `e` on a line of its own. 
+ inline and are terminated by a single `e` on a line of its own.
 
  Use `show palette gradient` to display the gradient.
 
@@ -6106,7 +6106,7 @@ C ... and restart the table:
        set palette file 'some-palette' using ($1/255):($2/255):($3/255)
 
  Equidistant rainbow (blue-green-yellow-red) palette:
-       set palette model RGB file "-" 
+       set palette model RGB file "-"
        0 0 1
        0 1 0
        1 1 0
@@ -6119,18 +6119,18 @@ C ... and restart the table:
 ?palette gamma-correction
 ?gamma-correction
  For gray mappings gamma correction can be turned on by `set palette gamma
- <gamma>`.  <gamma> defaults to 1.5 which is quite suitable for most 
+ <gamma>`.  <gamma> defaults to 1.5 which is quite suitable for most
  terminals.
 
- For color mappings no automatic gamma correction is done by gnuplot.  But 
+ For color mappings no automatic gamma correction is done by gnuplot.  But
  you may easily implement gamma correction, here an example for a gray scale
  image by use of explicit functions for the red, green and blue component
  with slightly different values of gamma
- 
+
  Example:
        set palette model RGB
        set palette functions gray**0.64, gray**0.67, gray**0.70
-  
+
  To use gamma correction with interpolated gradients specify intermediate
  gray values with apropriate colors.  Instead of
 
@@ -6139,18 +6139,18 @@ C ... and restart the table:
  use e.g.
 
       set palette defined ( 0 0 0 0, 0.5 .73 .73 .73, 1 1 1 1 )
- 
+
  or even more intermediate points until the linear interpolation fits the
  "gamma corrected" interpolation well enough.
 
 4 postscript
 ?palette postscript
  In order to reduce the size of postscript files, the gray value and not all
- three calculated r,g,b values are written to the file.  Therefore the 
+ three calculated r,g,b values are written to the file.  Therefore the
  analytical formulae are coded directly in the postscript language as a header
  just before the pm3d drawing, see /g and /cF definitions.  Usually, it makes
  sense to write therein definitions of only the 3 formulae used.  But for
- multiplot or any other reason you may want to manually edit the 
+ multiplot or any other reason you may want to manually edit the
  transformations directly in the postscript file.  This is the default option
  `nops_allcF`.  Using the option `ps_allcF` writes postscript definitions of
  all formulae.  This you may find interesting if you want to edit the
@@ -6158,9 +6158,9 @@ C ... and restart the table:
  in one graph.  Well, you can achieve this functionality by `multiplot` with
  fixed `origin` and `size`.
 
- If pm3d map has been plotted from gridded or almost regular data with an 
+ If pm3d map has been plotted from gridded or almost regular data with an
  output to a postscript file, then it is possible to reduce the size of this
- postscript file up to at about 50% by the enclosed awk script 
+ postscript file up to at about 50% by the enclosed awk script
  `pm3dCompress.awk`.  This you may find  interesting if you intend to keep the
  file for including it into your publication or before downloading a very large
  file into a slow printer. Usage:
@@ -6228,7 +6228,7 @@ C ... and restart the table:
  `unset colorbox` resets the default parameters for the colorbox and switches
  the colorbox off.
 
- See also `help pm3d`, `help palette`, `help x11 pm3d`, `help vgagl`, 
+ See also `help pm3d`, `help palette`, `help x11 pm3d`, `help vgagl`,
  `help set style line`.
 
 3 pointsize
@@ -6246,7 +6246,7 @@ C ... and restart the table:
  The default is a multiplier of 1.0.  Larger pointsizes may be useful to
  make points more visible in bitmapped graphics.
 
- The pointsize of a single plot may be changed on the `plot` command.  
+ The pointsize of a single plot may be changed on the `plot` command.
  See `plot with` for details.
 
  Please note that the pointsize setting is not supported by all terminal
@@ -6332,13 +6332,13 @@ C ... and restart the table:
 
  Without "<filename>", the output file is restored to <STDERR>.  The <filename>
  "-" means <STDOUT>. The `append` flag causes the file to be opened in append
- mode.  A <filename> starting with "|" is opened as a pipe to the 
+ mode.  A <filename> starting with "|" is opened as a pipe to the
  <shell_command> on platforms that support piping.
 3 rmargin
 ?commands set rmargin
 ?set rmargin
 ?rmargin
- The command `set rmargin` sets the size of the right margin.  
+ The command `set rmargin` sets the size of the right margin.
  Please see `set margin` for details.
 3 rrange
 ?commands set rrange
@@ -6432,7 +6432,7 @@ C ... and restart the table:
  To make the graph twice as high as wide use:
        set size ratio 2
 
- See also 
+ See also
 ^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/airfoil/airfoil.html">
   airfoil demo.
 ^ </a>
@@ -6474,8 +6474,8 @@ C ... and restart the table:
  will be changed to `yerrorbars`. The `boxerrorbars` style will
  calculate the boxwidth automatically.
 
- For four columns, only `xerrorbars`, `yerrorbars` (or `errorbars`), 
- `xyerrorbars`, `xerrorlines`, `yerrorlines` (or `errorlines`), `xyerrorlines`, 
+ For four columns, only `xerrorbars`, `yerrorbars` (or `errorbars`),
+ `xyerrorbars`, `xerrorlines`, `yerrorlines` (or `errorlines`), `xyerrorlines`,
  `boxxyerrorbars`, and `boxerrorbars` are allowed.  An illegal
  style will be changed to `yerrorbars`.
 
@@ -6488,7 +6488,7 @@ C ... and restart the table:
  `xyerrorlines`, and `boxxyerrorbars` styles. Illegal styles will be
  changed to `xyerrorbars` before plotting.
 
- For more information about error bars with and without lines, 
+ For more information about error bars with and without lines,
  please see `plot errorlines` and `plot errorbars`.
 4 boxerrorbars
 ?commands set style boxerrorbars
@@ -6509,7 +6509,7 @@ C ... and restart the table:
  the `yerrorbars` style---either from y-ydelta to y+ydelta or from ylow to
  yhigh, depending on how many data columns are provided.
  See also
-^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/errorbar/errorbar.html"> 
+^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/errorbar/errorbar.html">
  errorbar demo.
 ^ </a>
 4 boxes
@@ -6550,7 +6550,7 @@ C ... and restart the table:
  (e.g. postscript) use true RGB colors.
 
  For fillstyle `pattern` the box is filled in the current drawing color with
- a pattern as selected by `set style filling pattern <number>`. 
+ a pattern as selected by `set style filling pattern <number>`.
  `fillpattern` is a number starting at 0. The kind and number of the available
  fillpatterns depend on the terminal driver.
 
@@ -6606,7 +6606,7 @@ C ... and restart the table:
  Zoom of a filled curve drawn from a datafile may produce empty or incorrect
  area because gnuplot is clipping points and lines, and not areas.
 
- If the values of <a>, <x>, <y> are out of the drawing boundary, then they 
+ If the values of <a>, <x>, <y> are out of the drawing boundary, then they
  are moved to the graph boundary. Then the actually filled area in the case
  of option xy=<x>,<y> will depend on xrange and yrange.
 4 boxxyerrorbars
@@ -6627,13 +6627,13 @@ C ... and restart the table:
 ?style candlesticks
 ?candlesticks
  The `candlesticks` style can be used for 2-d data plotting of financial
- data or for generating box-and-whisker plots of statistical data.  
+ data or for generating box-and-whisker plots of statistical data.
  Five columns of data are required; in order, these should be the x
  coordinate (most likely a date) and the opening, low, high, and closing
  prices.  The symbol is a rectangular box, centered horizontally at the x
  coordinate and limited vertically by the opening and closing prices.  A
  vertical line segment at the x coordinate extends up from the top of the
- rectangle to the high price and another down to the low.  The vertical line 
+ rectangle to the high price and another down to the low.  The vertical line
  will be unchanged if the low and high prices are interchanged.
  The width of the rectangle is controlled by `set bars <width>`.
  By default the rectangle is empty if (open > close), and filled with three
@@ -6673,7 +6673,7 @@ C ... and restart the table:
  coordinate and limited vertically by the high and low prices.  A horizontal
  tic on the left marks the opening price and one on the right marks the
  closing price.  The length of these tics may be changed by `set bars`.  The
- symbol will be unchanged if the high and low prices are interchanged.  
+ symbol will be unchanged if the high and low prices are interchanged.
  See `set bars` and `candlesticks`, and also the
 ^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/finance/finance.html">
  finance demo.
@@ -6686,7 +6686,7 @@ C ... and restart the table:
  The `fsteps` style is only relevant to 2-d plotting.  It connects consecutive
  points with two line segments: the first from (x1,y1) to (x1,y2) and the
  second from (x1,y2) to (x2,y2).
- See also 
+ See also
 ^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/steps/steps.html">
  steps demo.
 ^ </a>
@@ -6780,7 +6780,7 @@ C ... and restart the table:
  like `dots`, except that a horizontal error bar is also drawn.  At each point
  (x,y), a line is drawn from (xlow,y) to (xhigh,y) or from (x-xdelta,y) to
  (x+xdelta,y), depending on how many data columns are provided.  A tic mark
- is placed at the ends of the error bar (unless `set bars` is used---see 
+ is placed at the ends of the error bar (unless `set bars` is used---see
  `set bars` for details).
 4 xyerrorbars
 ?commands set style xyerrorbars
@@ -6814,7 +6814,7 @@ C ... and restart the table:
  from (x,ylow) to (x,yhigh), depending on how many data columns are provided.
  A tic mark is placed at the ends of the error bar (unless `set bars` is
  used---see `set bars` for details).
- See also 
+ See also
 ^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/errorbar/errorbar.html">
  errorbar demo.
 ^ </a>
@@ -6946,7 +6946,7 @@ C ... and restart the table:
 
  where <direction> may be `in` (the default) or `out`.
 
- See also `set xtics` for more control of major (labelled) tic marks and 
+ See also `set xtics` for more control of major (labelled) tic marks and
  `set mxtics` for control of minor tic marks.
 3 ticslevel
 ?commands set ticslevel
@@ -7096,7 +7096,7 @@ C ... and restart the table:
 
  Since `gnuplot` cannot read non-numerical text, if the date format includes
  the day or month in words, the format string must exclude this text.  But
- it can still be printed with the "%a", "%A", "%b", or "%B" specifier: 
+ it can still be printed with the "%a", "%A", "%b", or "%B" specifier:
  see `set format` for more details about these and other options for printing
  timedata.  (`gnuplot` will determine the proper month and weekday from the
  numerical values.)
@@ -7144,7 +7144,7 @@ C ... and restart the table:
 ?commands set tmargin
 ?set tmargin
 ?tmargin
- The command `set tmargin` sets the size of the top margin.  
+ The command `set tmargin` sets the size of the top margin.
  Please see `set margin` for details.
 3 trange
 ?commands set trange
@@ -7162,7 +7162,7 @@ C ... and restart the table:
 ?show urange
 ?urange
  The `set urange` and `set vrange` commands set the parametric ranges used
- to compute x, y, and z values when in `splot` parametric mode.  
+ to compute x, y, and z values when in `splot` parametric mode.
  Please see `set xrange` for details.
 3 variables
 ?commands show variables
@@ -7228,7 +7228,7 @@ C ... and restart the table:
 ?show vrange
 ?vrange
  The `set urange` and `set vrange` commands set the parametric ranges used
- to compute x, y, and z values when in `splot` parametric mode.  
+ to compute x, y, and z values when in `splot` parametric mode.
  Please see `set xrange` for details.
 3 x2data
 ?commands set x2data
@@ -7255,7 +7255,7 @@ C ... and restart the table:
 ?set x2label
 ?show x2label
 ?x2label
- The `set x2label` command sets the label for the x2 (top) axis.  
+ The `set x2label` command sets the label for the x2 (top) axis.
  Please see `set xlabel`.
 3 x2mtics
 ?commands set x2mtics
@@ -7406,7 +7406,7 @@ C ... and restart the table:
  zlabel: The z-axis label is centered along the z axis and placed in the space
  above the grid level.
 
- cblabel: The color box axis label is centered along the box and placed below 
+ cblabel: The color box axis label is centered along the box and placed below
  or right according to horizontal or vertical color box gradient.
 
  y2label: The y2-axis label is placed to the right of the y2 axis.  The
@@ -7655,7 +7655,7 @@ C ... and restart the table:
 ?show xzeroaxis
 ?xzeroaxis
 ?noxzeroaxis
- The `set xzeroaxis` command draws a line at y = 0.  For details, 
+ The `set xzeroaxis` command draws a line at y = 0.  For details,
  please see `set zeroaxis`.
 3 y2data
 ?commands set y2data
@@ -7788,7 +7788,7 @@ C ... and restart the table:
 ?show yzeroaxis
 ?yzeroaxis
 ?noyzeroaxis
- The `set yzeroaxis` command draws a line at x = 0.  For details, 
+ The `set yzeroaxis` command draws a line at x = 0.  For details,
  please see `set zeroaxis`.
 3 zdata
 ?commands set zdata
@@ -7909,7 +7909,7 @@ C ... and restart the table:
 ?show zrange
 ?zrange
  The `set zrange` command sets the range that will be displayed on the z axis.
- The zrange is used only by `splot` and is ignored by `plot`.  Please see 
+ The zrange is used only by `splot` and is ignored by `plot`.  Please see
  `set xrange` for details.
 3 ztics
 ?commands set ztics
@@ -7946,7 +7946,7 @@ C ... and restart the table:
 ?set cbrange
 ?show cbrange
 ?cbrange
- The `set cbrange` command sets the range of z-values which are colored by 
+ The `set cbrange` command sets the range of z-values which are colored by
  `pm3d` mode of `splot`. If the cb-axis is autoscaled, then the `pm3d` /
  `palette` range is taken from `zrange`.
 
@@ -7969,7 +7969,7 @@ C ... and restart the table:
  type `logout` if using VMS, `exit` or the END-OF-FILE character if using
  Unix, `endcli` if using AmigaOS, or `exit` if using MS-DOS or OS/2.
 
- There are two ways of spawning a shell command: using `system` command 
+ There are two ways of spawning a shell command: using `system` command
  or via `!` ($ if using VMS). The former command takes a string as a
  parameter and thus it can be used anywhere among other gnuplot commands,
  while the latter syntax requires to bethe only command on the line. Control
@@ -8125,7 +8125,7 @@ C ... and restart the table:
  The `index` keyword is not supported, since the file format allows only one
  surface per file.  The `every` and `using` filters are supported.  `using`
  operates as if the data were read in the above triplet form.
- See also 
+ See also
 ^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/binary/binary.html">
  Binary File Splot Demo.
 ^ </a>
@@ -8226,7 +8226,7 @@ C ... and restart the table:
 ?splot_overview
  `splot` can display a surface as a collection of points, or by connecting
  those points.  As with `plot`, the points may be read from a data file or
- result from evaluation of a function at specified intervals, see 
+ result from evaluation of a function at specified intervals, see
  `set isosamples`.  The surface may be approximated by connecting the points
  with straight line segments, see `set surface`, in which case the surface
  can be made opaque with `set hidden3d.`  The orientation from which the 3d
@@ -8295,7 +8295,7 @@ C ... and restart the table:
  One of them is called xgfe. It uses the Qt library and can be found on
 ^ <a href="http://www.flash.net/~dmishee/xgfe/xgfe.html">
           http://www.flash.net/~dmishee/xgfe/xgfe.html
-^ </a> 
+^ </a>
 
  In addition three Tcl/Tk located at the usual Tcl/Tk repositories exist.
 
