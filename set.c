@@ -2014,7 +2014,7 @@ char *tic_side;
 	/* if tics are off, reset to default (border) */
 	if (*TICS == NO_TICS) {
 	    *TICS = TICS_ON_BORDER;
-	    if (!strcmp(tic_side, "x") || !strcmp(tic_side, "y")) {
+	    if (STREQ(tic_side, "x") || STREQ(tic_side, "y")) {
 		*TICS |= TICS_MIRROR;
 	    }
 	}
@@ -2825,9 +2825,10 @@ enum PLOT_STYLE /* not static; used by command.c */ get_style()
     else if (almost_equals(c_token, "can$dlesticks"))
 	ps = CANDLESTICKS;
     else {
-	int_error("expecting 'lines', 'points', 'linespoints', 'dots', 'impulses',\n\
-        'yerrorbars', 'xerrorbars', 'xyerrorbars', 'steps', 'fsteps', 'histeps',\n\
-        'boxes', 'boxerrorbars', 'boxxyerrorbars', 'vector', 'financebars', 'candlesticks'", c_token);
+	int_error("expecting 'lines', 'points', 'linespoints', 'dots', \
+'impulses',\n'yerrorbars', 'xerrorbars', 'xyerrorbars', 'steps', 'fsteps', \
+'histeps',\n'boxes', 'boxerrorbars', 'boxxyerrorbars', 'vector', \
+'financebars', 'candlesticks'", c_token);
 	return LINES;		/* keep gcc -Wuninitialised happy */
     }
     c_token++;

@@ -380,10 +380,10 @@ static int command()
 		if (sleep_time >= 0)
 #else
 # ifdef OS2
-		if (strcmp(term->name, "pm") != 0 || sleep_time >= 0)
+		if (!STREQ(term->name, "pm") || sleep_time >= 0)
 # else
 #  ifdef MTOS
-	        if (strcmp(term->name, "mtos") != 0 || sleep_time >= 0)
+	        if (!STREQ(term->name, "mtos") || sleep_time >= 0)
 #  endif /* MTOS */
 # endif /* OS2 */
 #endif /* _Windows */
@@ -580,7 +580,8 @@ static int command()
 	     * passes it on to load_file() so that it gets
 	     * pushed on the stack and recusion will work, etc
 	     */
-	    fp = strcmp(sv_file, "-") ? fopen(sv_file, "r") : stdin; 
+/*	    fp = strcmp(sv_file, "-") ? fopen(sv_file, "r") : stdin; */
+	    fp = STREQ(sv_file, "-") ? stdin : fopen(sv_file, "r");
 	    load_file(fp, sv_file, FALSE);
 	    /* input_line[] and token[] now destroyed! */
 	    c_token = num_tokens = 0;
@@ -1427,7 +1428,7 @@ static int winsystem(char *s)
     p = GetDOSEnvironment();
     comspec = "\\command.com";
     while (*p) {
-	if (!strncmp(p, "COMSPEC=", 8)) {
+	if (STREQN(p, "COMSPEC=", 8)) {
 	    comspec = p + 8;
 	    break;
 	}
