@@ -1,5 +1,5 @@
 /*
- * $Id: syscfg.h,v 1.20 2002/01/18 15:07:11 cgaylord Exp $
+ * $Id: syscfg.h,v 1.21 2002/02/21 12:27:37 lhecking Exp $
  */
 
 /* GNUPLOT - syscfg.h */
@@ -44,8 +44,6 @@
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
-
-#include "ansichek.h"
 
 /*
  * Define operating system dependent constants [default value]:
@@ -245,6 +243,13 @@
 #endif
 /* End fall-through defaults */
 
+/* Need this before any headers are incldued */
+#ifdef PROTOTYPES
+# define __PROTO(proto) proto
+#else
+# define __PROTO(proto) ()
+#endif
+
 /* Atari stuff. Moved here from command.c, plot2d.c, readline.c */
 #if defined(ATARI) || defined(MTOS)
 # ifdef __PUREC__
@@ -387,6 +392,11 @@ typedef RETSIGTYPE (*sigfunc)__PROTO((void));
 # define JMP_BUF jmp_buf
 #endif
 
+/* generic pointer type. For old compilers this has to be changed to char *,
+ * but I don't know if there are any CC's that support void and not void *
+ */
+#define generic void
+
 /* HBB 20010720: removed 'sortfunc' --- it's no longer used */
 /* FIXME HBB 20010720: Where is SORTFUNC_ARGS supposed to be defined?  */
 #ifndef SORTFUNC_ARGS
@@ -407,6 +417,14 @@ typedef RETSIGTYPE (*sigfunc)__PROTO((void));
 /* Windows needs to redefine stdin/stdout functions */
 #if defined(_Windows) && !defined(WINDOWS_NO_GUI)
 # include "win/wtext.h"
+#endif
+
+#ifndef GP_EXCEPTION_NAME
+# define GP_EXCEPTION_NAME exception
+#endif
+
+#ifndef GP_MATHERR
+# define GP_MATHERR matherr
 #endif
 
 /* if GP_INLINE has not yet been defined, set to __inline__ for gcc,
