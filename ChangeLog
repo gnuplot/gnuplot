@@ -1,3 +1,10 @@
+2002-02-01 Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/hidden3d.c (draw_line_hidden): Changed local variables
+ 	vstore1 and vstore2 from pointers to indices, to avoid yet another
+ 	dangling pointer problem caused by realloc() happening at a time I
+ 	hadn't expected.
+
 2002-02-01  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* term/README: Corrected type of last argument of term->arrow()

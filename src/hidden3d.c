@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.31 2001/11/22 12:25:36 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.32 2002/01/26 17:55:08 joze Exp $"); }
 #endif
 
 /* GNUPLOT - hidden3d.c */
@@ -2309,7 +2309,7 @@ draw_line_hidden(v1, v2, lp)
     p_vertex v1, v2;		/* pointers to the end vertices */
     struct lp_style_type *lp;	/* line and point style to draw in */
 {
-    p_vertex vstore1, vstore2;
+    long int vstore1, vstore2;
     long int edgenum;
     long int temp_pfirst;
 
@@ -2322,23 +2322,24 @@ draw_line_hidden(v1, v2, lp)
     }
 	
     /* Copy two vertices into hidden3d arrays: */
-    vstore1 = nextfrom_dynarray(&vertices);
-    *vstore1 = *v1;
+    nextfrom_dynarray(&vertices);
+    vstore1 = vertices.end - 1;
+    vlist[vstore1] = *v1;
     if (v2) {
-	vstore1->style = -1;
-	vstore2 = nextfrom_dynarray(&vertices);
-	*vstore2 = *v2;
-	vstore2->style = -1;
+	vlist[vstore1].style = -1;
+	nextfrom_dynarray(&vertices);
+	vstore2 = vertices.end - 1;
+	vlist[vstore2] = *v2;
+	vlist[vstore2].style = -1;
     } else {
 	/* v2 == NULL --> this is a point symbol to be drawn. Make two
 	 * vertex pointers the same, and set up the 'style' field */
 	vstore2 = vstore1;
-	vstore2->style = lp->p_type;
+	vlist[vstore2].style = lp->p_type;
     }
     
     /* store the edge into the hidden3d datastructures */
-    edgenum = make_edge(vstore1 - vlist, vstore2 - vlist,
-			lp, lp->l_type, -1);
+    edgenum = make_edge(vstore1, vstore2, lp, lp->l_type, -1);
 
     /* remove hidden portions of the line, and draw what remains */
     temp_pfirst = pfirst;
