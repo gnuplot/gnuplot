@@ -1,5 +1,5 @@
 # Hello, emacs: this is a -*- Makefile -*-
-# $Id: $
+# $Id: makefile.dj2,v 1.3 1999/05/31 18:38:59 lhecking Exp $
 #
 # GNUPLOT Makefile for DJGPP version 2 on DOS
 #
@@ -50,8 +50,8 @@ INCLUDE = -I.
 
 # for svga term driver
 # HBB: -finline-functions bombs out on term.c, so disable it unconditionally
-TERMFLAGS = -DDJSVGA -DHAVE_LIBGD
-LDFLAGS = -lgd
+TERMFLAGS = -Id:/gpp/contrib/grx23/include -DDJSVGA # -DHAVE_LIBGD
+LDFLAGS = -Ld:/gpp/contrib/grx23/lib/dj2 # -lgd
 
 # HBB : added $(OPTS) so user can
 #   change CFLAGS easily, without having to change makefile
@@ -72,6 +72,7 @@ LINKOPT = $(LDFLAGS) -lm -lpc -lgrx20
 T=../term/
 D=../docs/
 M=../demo/
+O=o
 
 CSOURCE5 = $(T)ai.trm $(T)amiga.trm $(T)aed.trm \
 	$(T)cgi.trm $(T)djsvga.trm $(T)dumb.trm \
@@ -86,13 +87,17 @@ CSOURCE6 = $(T)impcodes.h $(T)imagen.trm $(T)next.trm $(T)object.h \
 CSOURCE7 = $(T)post.trm $(T)qms.trm $(T)regis.trm $(T)sun.trm \
 	$(T)t410x.trm $(T)tek.trm $(T)texdraw.trm $(T)unixpc.trm \
 	$(T)unixplot.trm $(T)v384.trm $(T)vws.trm $(T)x11.trm $(T)xlib.trm
-OBJ1 =  bitmap.o command.o contour.o eval.o graphics.o graph3d.o hidden3d.o util3d.o
-OBJ2 =  help.o internal.o misc.o parse.o plot.o plot2d.o plot3d.o readline.o
-OBJ3 =  scanner.o set.o show.o specfun.o standard.o stdfn.o term.o time.o util.o
-OBJ4 =  version.o binary.o interpol.o fit.o matrix.o datafile.o alloc.o variable.o
+#OBJ1 =  bitmap.o command.o contour.o eval.o graphics.o graph3d.o hidden3d.o util3d.o
+#OBJ2 =  help.o internal.o misc.o parse.o plot.o plot2d.o plot3d.o readline.o
+#OBJ3 =  scanner.o set.o show.o specfun.o standard.o stdfn.o term.o time.o util.o
+#OBJ4 =  version.o binary.o interpol.o fit.o matrix.o datafile.o alloc.o variable.o
 
 CSOURCES = $(CSOURCE5) $(CSOURCE6) $(CSOURCE7)
-OBJS =  $(OBJ1) $(OBJ2) $(OBJ3) $(OBJ4)
+#OBJS =  $(OBJ1) $(OBJ2) $(OBJ3) $(OBJ4)
+# use makefile.all, instead:
+include makefile.all
+
+OBJS=$(COREOBJS) version.$(O)
 
 .c.o:  
 	$(CC) -c $(CFLAGS) $(INCLUDE) $<

@@ -1,5 +1,5 @@
 #
-# $Id: makefile.win,v 1.3 1999/05/31 18:38:57 lhecking Exp $
+# $Id: makefile.win,v 1.4 1999/09/21 18:05:41 lhecking Exp $
 #
 # GNUPLOT Makefile for Borland C++ 3.1 Windows version
 #  and Win32 using Borland C++ 4 (4.52 is known to work)
@@ -81,12 +81,12 @@ CFLAGS = -c -W -ml -w-par -w-use -w-aus -f -h -N -M -y -v -d -Ff=32 -I$(TC)\incl
 CAUXFLAGS = -ml -w-par -w-use -w-aus -f -N -M -y -v -d -I$(TC)\include -DMSDOS=1 -DHAVE_STRNICMP -DANSI_C
 !endif
 
-OBJS = 	alloc.obj binary.obj bitmap.obj command.obj contour.obj datafile.obj \
-eval.obj fit.obj graphics.obj graph3d.obj help.obj hidden3d.obj internal.obj \
-interpol.obj matrix.obj misc.obj parse.obj plot.obj plot2d.obj plot3d.obj \
-readline.obj save.obj scanner.obj set.obj show.obj specfun.obj standard.obj \
-stdfn.obj tables.obj term.obj time.obj unset.obj util.obj util3d.obj \
-variable.obj version.obj winmain.obj
+OBJS = 	bitmap.obj command.obj contour.obj eval.obj graphics.obj graph3d.obj \
+	internal.obj misc.obj parse.obj plot.obj plot2d.obj plot3d.obj \
+	readline.obj scanner.obj set.obj show.obj specfun.obj standard.obj \
+	stdfn.obj term.obj util.obj version.obj binary.obj winmain.obj \
+	interpol.obj fit.obj matrix.obj datafile.obj alloc.obj util3d.obj \
+	hidden3d.obj time.obj help.obj variable.obj save.obj unset.obj tables.obj
 
 DLLOBJS = wgnuplib.obj wtext.obj wmenu.obj wpause.obj wgraph.obj wprinter.obj 
 
@@ -146,6 +146,7 @@ binary interpol +
 winmain +
 readline +
 fit matrix datafile alloc util3d hidden3d time +
+save unset variable tables +
 ,wgnupl32,wgnupl32, +
 $(TC)\lib\import32 +
 $(TC)\lib\cw32, +
@@ -205,8 +206,6 @@ plot2d.obj: plot2d.c plot.h setshow.h
 
 readline.obj: readline.c plot.h
 
-save.obj: save.c plot.h setshow.h
-
 scanner.obj: scanner.c plot.h
 
 set.obj: set.c plot.h setshow.h
@@ -224,14 +223,10 @@ stdfn.obj: stdfn.c stdfn.h
 
 interpol.obj: interpol.c plot.h setshow.h
 
-tables.obj: tables.c plot.h tables.h
-
 term.obj: term.c term.h plot.h set.c show.c bitmap.h $(CSOURCE5) $(CSOURCE6) $(CSOURCE7) win\wgnuplib.h
 	$(BIN)$(CC) @&&!
 $(CFLAGS)
 ! $(TERMFLAGS) -I$(T) -I. term.c
-
-unset.obj: unset.c plot.h setshow.h tables.h
 
 util.obj: util.c plot.h
 
@@ -307,8 +302,8 @@ $(CAUXFLAGS)
 # make binary demo files
 $(M)bf_test.exe: bf_test.c dbinary.obj dalloc.obj
 	$(BIN)$(CCAUX) -e$(M)bf_test.exe @&&!
-$(CAUXFLAGS)
 -L$(TC)\lib
+$(CAUXFLAGS)
 ! bf_test.c dbinary.obj dalloc.obj
 	cd ..\demo
 	bf_test
