@@ -1,5 +1,5 @@
 /*
- * $Id: gd.trm,v 1.27 2003/04/01 17:19:55 sfeam Exp $
+ * $Id: gd.trm,v 1.28 2003/04/13 20:22:45 sfeam Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -323,31 +323,42 @@ PNG_FillPattern(int fillpar)
 	    case 0: /* no fill */
 	    default:
 		break;
-	    case 1:
+	    case 1: /* cross-hatch */
+		gdImageLine(PNG_fill_tile.im, 0, 0, 7, 7, foreground);
+		gdImageLine(PNG_fill_tile.im, 0, 6, 6, 0, foreground);
+		break;
+	    case 2: /* double cross-hatch */
+		gdImageLine(PNG_fill_tile.im, 0, 0, 7, 7, foreground);
+		gdImageLine(PNG_fill_tile.im, 0, 6, 6, 0, foreground);
+		gdImageLine(PNG_fill_tile.im, 0, 2, 2, 0, foreground);
+		gdImageLine(PNG_fill_tile.im, 7, 3, 3, 7, foreground);
+		gdImageLine(PNG_fill_tile.im, 4, 0, 7, 3, foreground);
+		gdImageLine(PNG_fill_tile.im, 0, 4, 3, 7, foreground);
+		break;
+	    case 3: /* solid */
+		gdImageFilledRectangle(PNG_fill_tile.im, 0, 0, 7, 7, foreground);
+		break;
+	    case 4:
 		gdImageLine(PNG_fill_tile.im, 0, 0, 7, 7, foreground);
 		break;
-	    case 2:
+	    case 5:
 		gdImageLine(PNG_fill_tile.im, 0, 7, 7, 0, foreground);
 		break;
-	    case 3:
+	    case 6:
 		gdImageLine(PNG_fill_tile.im, 0, 0, 3, 7, foreground);
 		gdImageLine(PNG_fill_tile.im, 4, 0, 7, 7, foreground);
 		break;
-	    case 4:
+	    case 7:
 		gdImageLine(PNG_fill_tile.im, 0, 7, 3, 0, foreground);
 		gdImageLine(PNG_fill_tile.im, 4, 7, 7, 0, foreground);
 		break;
-	    case 5:
+	    case 8:
 		gdImageLine(PNG_fill_tile.im, 0, 0, 7, 3, foreground);
 		gdImageLine(PNG_fill_tile.im, 0, 4, 7, 7, foreground);
 		break;
-	    case 6:
+	    case 9:
 		gdImageLine(PNG_fill_tile.im, 0, 3, 7, 0, foreground);
 		gdImageLine(PNG_fill_tile.im, 0, 7, 7, 4, foreground);
-		break;
-	    case 7:
-		gdImageLine(PNG_fill_tile.im, 0, 0, 7, 7, foreground);
-		gdImageLine(PNG_fill_tile.im, 0, 7, 7, 0, foreground);
 		break;
 	}
     }

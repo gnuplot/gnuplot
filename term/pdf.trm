@@ -1,5 +1,5 @@
 /*
- * $Id: pdf.trm,v 1.20 2003/03/31 19:29:07 sfeam Exp $
+ * $Id: pdf.trm,v 1.21 2003/03/31 22:17:00 sfeam Exp $
  */
 
 /*------------------------------
@@ -27,9 +27,8 @@
 /* PM3D support by Johannes Zellner <johannes@zellner.org>, May-15-2002 */
 /* set_color fixes by Petr Mikulik <mikulik@physics.muni.cz>, June-10-2002 */
 
-/* 'filledboxes' with patterns are really lousy,
-   but I don't know why. 04 Jun 2002 (joze) */
 /* Text rotation 24-Jul-2002 Ethan A Merritt <merritt@u.washington.edu> */
+/* Revised fill patterns 02-Apr-2003 Ethan A Merritt */
 
 #include "driver.h"
 
@@ -184,44 +183,86 @@ PDF_DefinePatterns()
 {
     int i;
 
+    /* EAM April 2003 - Rearrange patterns to maximize contrast in mono.
+     * Because of the finite linewidth, each pattern must include line
+     * fragments at the "empty" corners.
+     */
     for (i=0; i<PDF_patterns; i++) {
 	PDF_patternHandles[i] = PDF_begin_pattern(myPDF, 8, 8, 8, 8, 2);
-	PDF_setlinewidth(myPDF, 0.2);
+	PDF_setlinewidth(myPDF, 0.25);
 	PDF_setlinecap(myPDF, 2); /* square ends */
 	switch (i) {
 	case 0:	PDF_moveto(myPDF, 0, 8);
 		PDF_lineto(myPDF, 8, 0);
-		break;
-	case 1:	PDF_moveto(myPDF, 0, 0);
+		PDF_moveto(myPDF, 0, 0);
 		PDF_lineto(myPDF, 8, 8);
+		PDF_stroke(myPDF);
 		break;
-	case 2:	PDF_moveto(myPDF, 0, 8);
-		PDF_lineto(myPDF, 4, 0);
-		PDF_moveto(myPDF, 4, 8);
-		PDF_lineto(myPDF, 8, 0);
-		break;
-	case 3:	PDF_moveto(myPDF, 0, 0);
-		PDF_lineto(myPDF, 4, 8);
-		PDF_moveto(myPDF, 4, 0);
-		PDF_lineto(myPDF, 8, 8);
-		break;
-	case 4:	PDF_moveto(myPDF, 0, 4);
-		PDF_lineto(myPDF, 8, 0);
-		PDF_moveto(myPDF, 0, 8);
-		PDF_lineto(myPDF, 8, 4);
-		break;
-	case 5:	PDF_moveto(myPDF, 0, 0);
-		PDF_lineto(myPDF, 8, 4);
-		PDF_moveto(myPDF, 0, 4);
-		PDF_lineto(myPDF, 8, 8);
-		break;
-	case 6:	PDF_moveto(myPDF, 0, 8);
+	case 1:	PDF_moveto(myPDF, 0, 8);
 		PDF_lineto(myPDF, 8, 0);
 		PDF_moveto(myPDF, 0, 0);
 		PDF_lineto(myPDF, 8, 8);
+		PDF_moveto(myPDF, 4, 0);
+		PDF_lineto(myPDF, 8, 4);
+		PDF_lineto(myPDF, 4, 8);
+		PDF_lineto(myPDF, 0, 4);
+		PDF_lineto(myPDF, 4, 0);
+		PDF_stroke(myPDF);
+		break;
+	case 2:	PDF_moveto(myPDF, 0, 0);
+		PDF_lineto(myPDF, 0, 8);
+		PDF_lineto(myPDF, 8, 8);
+		PDF_lineto(myPDF, 8, 0);
+		PDF_lineto(myPDF, 0, 0);
+		PDF_fill(myPDF);
+		break;
+	case 3:	PDF_moveto(myPDF, 0, 4);
+		PDF_lineto(myPDF, 4, 0);
+		PDF_moveto(myPDF, 4, 8);
+		PDF_lineto(myPDF, 8, 4);
+		PDF_stroke(myPDF);
+		break;
+	case 4:	PDF_moveto(myPDF, 0, 4);
+		PDF_lineto(myPDF, 4, 8);
+		PDF_moveto(myPDF, 4, 0);
+		PDF_lineto(myPDF, 8, 4);
+		PDF_stroke(myPDF);
+		break;
+	case 5:	PDF_moveto(myPDF, 0, 4);
+		PDF_lineto(myPDF, 2, 0);
+		PDF_moveto(myPDF, 2, 8);
+		PDF_lineto(myPDF, 6, 0);
+		PDF_moveto(myPDF, 6, 8);
+		PDF_lineto(myPDF, 8, 4);
+		PDF_stroke(myPDF);
+		break;
+	case 6:	PDF_moveto(myPDF, 0, 4);
+		PDF_lineto(myPDF, 2, 8);
+		PDF_moveto(myPDF, 2, 0);
+		PDF_lineto(myPDF, 6, 8);
+		PDF_moveto(myPDF, 6, 0);
+		PDF_lineto(myPDF, 8, 4);
+		PDF_stroke(myPDF);
+		break;
+	case 7:	/* not used */
+		PDF_moveto(myPDF, 4, 0);
+		PDF_lineto(myPDF, 0, 2);
+		PDF_moveto(myPDF, 8, 2);
+		PDF_lineto(myPDF, 0, 6);
+		PDF_moveto(myPDF, 8, 6);
+		PDF_lineto(myPDF, 4, 8);
+		PDF_stroke(myPDF);
+		break;
+	case 8:	/* not used */
+		PDF_moveto(myPDF, 4, 0);
+		PDF_lineto(myPDF, 8, 2);
+		PDF_moveto(myPDF, 0, 2);
+		PDF_lineto(myPDF, 8, 6);
+		PDF_moveto(myPDF, 0, 6);
+		PDF_lineto(myPDF, 4, 8);
+		PDF_stroke(myPDF);
 		break;
 	}
-	PDF_stroke(myPDF);
 	PDF_end_pattern(myPDF);
     }
 }

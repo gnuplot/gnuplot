@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: emf.trm,v 1.15 2003/01/27 20:34:34 broeker Exp $
+ * $Id: emf.trm,v 1.16 2003/02/04 19:31:21 sfeam Exp $
  */
 
 /* GNUPLOT - emf.trm */
@@ -960,9 +960,9 @@ EMF_linetype, EMF_put_text, EMF_text_angle,
 EMF_justify_text, EMF_point, do_arrow, EMF_set_font,
 EMF_set_pointsize,
 TERM_BINARY,			/* various flags */
-NULL,				/* after one plot of multiplot */
-NULL,				/* before subsequent plot of multiplot */
-NULL,				/* clear part of multiplot */
+NULL,				/* suspend */
+NULL,				/* resume  */
+NULL,				/* boxfill */
 EMF_linewidth
 TERM_TABLE_END(emf_driver)
 #undef LAST_TERM
