@@ -133,6 +133,7 @@ Johannes Zellner
 * Environment::                 
 * Expressions::                 
 * Glossary::                    
+* linetype::                    
 * mouse_input::                 
 * Plotting::                    
 * Start-up::                    
@@ -1963,8 +1964,7 @@ with a letter, but subsequent characters may be letters, digits, "$", or "_".
 
 See `show functions`, `functions`, @ref{variables}.
 
-
-@node Glossary, mouse_input, Expressions, gnuplot
+@node Glossary, linetype, Expressions, gnuplot
 @section Glossary
 
 @cindex glossary
@@ -2013,7 +2013,124 @@ a single record.  A "datablock" is a set of points from consecutive records,
 delimited by blank records.  A line, when referred to in the context of a
 data file, is a subset of a datablock.
 
-@node mouse_input, Plotting, Glossary, gnuplot
+@node linetype, mouse_input, Glossary, gnuplot
+@section linetype, colors, and styles
+
+@cindex linetype
+
+@cindex colors
+
+Gnuplot commands use the term "linetype" to refer to the color of a line or
+other plot element.  Each terminal type provides a certain number of 
+pre-defined line types (colors).  These can be previewed by issuing
+the @ref{test} command after setting the terminal type.  The pre-defined colors
+are not guaranteed to be consistent for all terminal types, but all terminals
+use the special index -1 to mean the primary foreground color (normally black).
+By default, successive functions or datafiles plotted by a single command will
+be assigned successive linetypes.  You can override this default by specifying
+a particular linetype for any function, datafile, or plot element.
+
+Examples:
+
+@example
+     plot "foo", "bar"                 # plot two files using linetypes 1, 2
+     plot sin(x) linetype 4            # terminal-specific linetype color 4
+     plot sin(x) lt -1                 # black
+
+@end example
+
+For many terminal types it is also possible to assign user-defined colors
+using explicit rgb (red, green, blue) values, named colors, or color values
+that refer to the current PM3D palette.
+
+Examples:
+
+@example
+     plot sin(x) lt rgb "violet"       # one of gnuplot's named colors
+     plot sin(x) lt rgb "#FF00FF"      # explicit RGB triple in hexadecimal
+     plot sin(x) lt palette cb -45     # whatever color corresponds to -45
+                                       # in the current cbrange of the palette
+     plot sin(x) lt palette frac 0.3   # fractional value along the palette
+
+@end example
+
+See @ref{colornames}, @ref{palette}, @ref{cbrange}.
+
+Lines can have additional properties such as linewidth.  You can associate
+these various properties, as well as equivalent properties for point symbols,
+into user-defined "line styles" using the command `set style line`.  Once
+you have defined a linestyle, you can use it in a plot command to control
+the appearance of one or more plot elements.
+
+Examples:
+
+@example
+     # define a new line style with terminal-independent color cyan,
+     # linewidth 3, and associated point type 6 (a circle with a dot in it).
+     set style line 5 lt rgb "cyan" lw 3 pt 6
+     plot sin(x) with linespoints ls 5          # user-defined line style 5
+
+@end example
+
+See `linestyle`, `set style line`.
+
+@menu
+* colorspec::                   
+@end menu
+
+@node colorspec,  , linetype, linetype
+@subsection colorspec
+
+@cindex colorspec
+
+@cindex rgbcolor
+
+Many commands allow you to specify a linetype with an explicit color.
+This option is only available if your gnuplot has been built with pm3d support,
+and only for terminals that support RGB color and/or pm3d palettes.
+
+Syntax:
+
+@example
+      ... @{linetype | lt@} <colorspec>
+
+@end example
+
+where <colorspec> has one of the following forms:
+
+@example
+      rgbcolor "colorname"
+      rgbcolor "#RRGGBB"
+      palette frac <val>      # <val> runs from 0 to 1
+      palette cb <value>      # <val> lies within cbrange
+      palette z
+
+@end example
+
+"colorname" refers to one of the color names built in to gnuplot. For a list
+of the available names, see @ref{colornames}.
+
+"#RRGGBB" is a hexadecimal constant preceded by the "#" symbol. The RRGGBB
+represents the red, green, and blue components of the color, each on a scale
+from 0 - 255.  For example, magenta = full-scale red + full-scale blue would
+be represented by #FF00FF, which is the hexadecimal representation of
+(255 << 16) + (0 << 8) + (255).
+
+The color palette is a linear gradient of colors that smoothly maps a
+single numerical value onto a particular color.  Two such mappings are always
+in effect. The first maps a fractional value between 0 and 1 onto the full
+range of the color palette.  The second maps a separate color axis onto
+the same palette using an arbitrary scale and range.  This mapping is set
+by the command @ref{cbrange}.  See also `set colorbox`.  You can use either
+of these mappings to assign a constant color from the current palette.
+
+The final option, "palette z", is available only in 3d plots, and treats the
+z value of each plot segment or plot element as an index into the cbrange
+mapping of the palette. This allows smoothly-varying color along a 3d line
+or surface.
+      
+
+@node mouse_input, Plotting, linetype, gnuplot
 @section mouse input
 
 @c ?mouse input
@@ -2025,7 +2142,6 @@ input with `batch` command scripts, by invoking the command `pause mouse`
 and then using the mouse variables returned by mouse clicking as parameters
 for subsequent scripted actions. See @ref{bind} and @ref{variables}.  
 See also the command `set mouse`.
-
 
 @menu
 * bind::                        
@@ -2165,7 +2281,6 @@ keypress, then MOUSE_KEY will contain the button number, otherwise it will
 contain the ascii character value of the key that was pressed. If the
 pause command is terminated abnormally (e.g. by ctrl-C or by externally
 closing the plot window) then MOUSE_KEY will equal -1.
-
 
 @node Plotting, Start-up, mouse_input, gnuplot
 @section Plotting
@@ -2351,7 +2466,7 @@ These will generate labels with the current time and userid:
 
 
 Substitution of command line macros is disabled by default, but may be
-enabled using the @ref{macros} command.  If macro substitution is enables,
+enabled using the @ref{macros} command.  If macro substitution is enabled,
 the character @@ is used to trigger substitution of the current value of a
 string variable into the command line. The text in the string variable may
 contain any number of lexical elements.  This allows string variables to be
@@ -2428,7 +2543,6 @@ format nests all three types of quotes.
       mycomputer = @@machine_id
 
 @end example
-
 
 @node Syntax, Time/Date_data, Substitution_and_Command_line_macros, gnuplot
 @section Syntax
@@ -3646,7 +3760,7 @@ Examples:
 See also `show plot`.
 
 @menu
-* data-file::                   
+* data::                        
 * errorbars::                   
 * errorlines::                  
 * parametric::                  
@@ -3655,8 +3769,8 @@ See also `show plot`.
 * with::                        
 @end menu
 
-@node data-file, errorbars, plot, plot
-@subsection data-file
+@node data, errorbars, plot, plot
+@subsection data
 
 @c ?commands plot datafile
 @c ?plot datafile
@@ -3805,7 +3919,7 @@ See `datafile binary` for more details.
 * using::                       
 @end menu
 
-@node binary, binary_general, data-file, data-file
+@node binary, binary_general, data, data
 @subsubsection binary
 
 @c ?commands plot datafile binary
@@ -3825,7 +3939,7 @@ for which details about the file must be given at the command line.
 
 See `binary matrix` or `binary general` for more details.
 
-@node binary_general, every, binary, data-file
+@node binary_general, every, binary, data
 @subsubsection binary general
 
 @c ?commands plot datafile binary general
@@ -4161,7 +4275,7 @@ Examples:
 
 See also `binary matrix`.
 
-@node every, example_datafile, binary_general, data-file
+@node every, example_datafile, binary_general, data
 @subsubsection every
 
 @c ?commands plot datafile every
@@ -4221,7 +4335,7 @@ See
 }
 .
 
-@node example_datafile, index, every, data-file
+@node example_datafile, index, every, data
 @subsubsection example datafile
 
 @c ?commands plot datafile example
@@ -4254,7 +4368,7 @@ The file "population.dat" might contain:
 
 @c ^ <img align=bottom src="http://www.gnuplot.info/doc/population.gif" alt="[population.gif]" width=640 height=480>
 
-@node index, smooth, example_datafile, data-file
+@node index, smooth, example_datafile, data
 @subsubsection index
 
 @c ?commands plot datafile index
@@ -4289,7 +4403,7 @@ Example:
 @c ^ See also web page
 @uref{http://www.gnuplot.info/demo/multimsh.html,splot with indices demo. }
 
-@node smooth, special-filenames, index, data-file
+@node smooth, special-filenames, index, data
 @subsubsection smooth
 
 @c ?commands plot datafile smooth
@@ -4453,7 +4567,7 @@ The `frequency` option makes the data monotonic in x; points with the same
 x-value are replaced by a single point having the summed y-values.  The
 resulting points are then connected by straight line segments.
 
-@node special-filenames, thru, smooth, data-file
+@node special-filenames, thru, smooth, data
 @subsubsection special-filenames
 
 @c ?commands plot datafile special-filenames
@@ -4561,7 +4675,7 @@ the comma):
 While this approach is most flexible, it is possible to achieve simple
 filtering with the @ref{using} or @ref{thru} keywords.
 
-@node thru, using, special-filenames, data-file
+@node thru, using, special-filenames, data
 @subsubsection thru
 
 @c ?commands plot datafile thru
@@ -4598,7 +4712,7 @@ also works (i.e. you can use y as the dummy variable).
 
 @ref{thru} is parsed for `splot` and `fit` but has no effect.
 
-@node using,  , thru, data-file
+@node using,  , thru, data
 @subsubsection using
 
 @c ?commands plot datafile using
@@ -4804,7 +4918,7 @@ See `plot using xticlabels`.
 @c ?plot using zticlabels
 See `plot using xticlabels`.
 
-@node errorbars, errorlines, data-file, plot
+@node errorbars, errorlines, data, plot
 @subsection errorbars
 
 @c ?commands plot errorbars
@@ -5198,7 +5312,10 @@ allowed for smooth color change of lines, points and dots in `splots`. The
 color is chosen from a smooth palette which was set previously with the
 command @ref{palette}. The color value corresponds to the z-value of the
 point coordinates or to the color coordinate if specified by the 4th parameter
-in @ref{using}. The 2d `plot` command ignores this option.
+in @ref{using}. Both 2d and 3d plots (`plot` and `splot` commands) can use palette
+colors as specified by either their fractional value or the corresponding value
+mapped to the colorbox range. 2d plots can not use palette colors mapped by
+Z value. See `colors`, @ref{palette}, `linetype`.
 
 The keywords may be abbreviated as indicated.
 
@@ -8400,8 +8517,8 @@ several plots are placed on the same page, window, or screen.
 
 Syntax:
 @example
-      set multiplot @{ layout <cols>,<rows>
-                      @{rowmajor|columnmajor@} @{downwards|upwards@}
+      set multiplot @{ layout <rows>,<cols>
+                      @{rowsfirst|columnsfirst@} @{downwards|upwards@}
                       @{scale <xscale>@{,<yscale>@}@} @{offset <xoff>@{,<yoff>@}@} 
                     @}
       unset multiplot
@@ -8458,11 +8575,11 @@ different on a video display and a printer.
 With the `layout` option you can generate simple multiplots without having
 to give the @ref{size} and @ref{origin} commands before each plot:  Those
 are generated automatically, but can be overridden at any time.  With
-`layout` the display will be divided by a grid with <cols> columns and 
-<rows> rows.  This grid is filled rows first or columns first depending on
-whether `rowmajor` or `columnmajor` is given by the subsequent option of the 
-multiplot command.  The stack of plots can grow `downwards` or `upwards`.
-Default is `columnmajor` and `downwards`.
+`layout` the display will be divided by a grid with <rows> rows and 
+<cols> columns.  This grid is filled rows first or columns first depending on
+whether the corresponding option is given in the multiplot command.  The stack
+of plots can grow `downwards` or `upwards`.
+Default is `rowsfirst` and `downwards`.
 
 Each plot can be scaled by `scale` and shifted with `offset`; if the y-values
 for scale or offset are omitted, the x-value will be used.  @ref{multiplot}
@@ -8473,20 +8590,19 @@ Example:
 @example
       set size 1,1
       set origin 0,0
-      set multiplot layout 3,2 columnmajor scale 1.1,0.9
+      set multiplot layout 3,2 columnsfirst scale 1.1,0.9
       [ up to 6 plot commands here ]
       unset multiplot
 
 @end example
 
-The above example will produce 6 plots in 3 columns filled top to bottom,
+The above example will produce 6 plots in 2 columns filled top to bottom,
 left to right.  Each plot will have a horizontal size of 1.1/2 and a vertical
 size of 0.9/3. 
 
 See also
-@uref{http://gnuplot.sourceforge.net/demo/multiplt.html,multiplot demo (multiplt.dem)}
-.
-
+@uref{http://gnuplot.sourceforge.net/demo/multiplt.html,multiplot demo (multiplt.dem)
+}
 
 @node mx2tics, mxtics, multiplot, set-show
 @subsection mx2tics
@@ -8892,7 +9008,7 @@ Syntax:
                  @{ flush @{ begin | center | end @} @}
                  @{ ftriangles | noftriangles @}
                  @{ clip1in | clip4in @}
-                 @{ corners2color @{ mean|geomean|median|c1|c2|c3|c4 @} @}
+                 @{ corners2color @{ mean|geomean|median|min|max|c1|c2|c3|c4 @} @}
                  @{ hidden3d <linestyle> | nohidden3d @}
                  @{ implicit | explicit @}
                  @{ map @}
@@ -8940,7 +9056,8 @@ There is a single gray/color value associated to each drawn pm3d quadrangle
 (no smooth color change among vertices).  The value is calculated from
 z-coordinates from the surrounding corners according to `corners2color
 <option>`.  The options 'mean' (default), 'geomean' and 'median' produce
-various kinds of surface color smoothing.  This may not be desired for pixel
+various kinds of surface color smoothing, while options 'min' and 'max' choose
+minimal or maximal value, respectively. This may not be desired for pixel
 images or for maps with sharp and intense peaks, in which case the options
 'c1', 'c2', 'c3' or 'c4' can be used instead to assign the quadrangle color
 based on the z-coordinate of only one corner.  Some experimentation may be
@@ -9086,7 +9203,7 @@ Otherwise, the options can be given in any order.
 
 `show palette gradient` displays the gradient defining the palette (if
 appropriate).  @ref{rgbformulae} prints the available fixed gray -->
-color transformation formulae.  `show palette colornames` prints the
+color transformation formulae.  @ref{colornames} prints the
 implemented color names.
 
 `show palette palette <n>` prints to screen or to the file given by
@@ -9172,6 +9289,7 @@ and
 * file::                        
 * gamma-correction::            
 * postscript::                  
+* colornames::                  
 @end menu
 
 @node rgbformulae, defined_, palette, palette
@@ -9252,7 +9370,7 @@ Either by three numbers (each in [0,1]) for red, green and blue, separated by
 whitespace, or the name of the color in quotes or X style color specifiers
 also in quotes.  You may freely mix the three types in a gradient definition,
 but the named color "red" will be something strange if RGB is not selected
-as color space.  Use `show palette colornames` for a list of known color
+as color space.  Use @ref{colornames} for a list of known color
 names.
 
 Please note, that even if written as <r>, this might actually be the
@@ -9432,7 +9550,7 @@ or even more intermediate points until the linear interpolation fits the
 "gamma corrected" interpolation well enough.
 
 
-@node postscript,  , gamma-correction, palette
+@node postscript, colornames, gamma-correction, palette
 @subsubsection postscript
 
 @c ?commands set palette postscript
@@ -9472,6 +9590,18 @@ by the enclosed awk script `pm3dConvertToImage.awk`.  Usage:
 You may manually change the postscript output from gray to color and vice
 versa and change the definition of <maxcolors>.
 
+@node colornames,  , postscript, palette
+@subsubsection colornames
+
+@cindex colornames
+
+@c ?show palette colornames
+@c ?show colornames
+Gnuplot knows a limited number of color names. You can use these to define
+the color range spanned by a pm3d palette, or to assign a terminal-independent
+colot to a particular linetype or linestyle. To see the list of know color
+names, use the command @ref{colornames}.  
+See @ref{palette}, `linestyle`.
 
 @node pointsize, polar, palette, set-show
 @subsection pointsize
@@ -9968,7 +10098,6 @@ style.
 @c ?show style line
 @cindex linestyle
 
-@c ^ <a name="linetype"></a>
 @c ^ <a name="linewidth"></a>
 Each terminal has a default set of line and point types, which can be seen
 by using the command @ref{test}.  `set style line` defines a set of line types
@@ -9977,10 +10106,10 @@ an index instead of repeating all the information at each invocation.
 
 Syntax:
 @example
-      set style line <index> @{linetype  | lt <line_type>@}
-                             @{linewidth | lw <line_width>@}
-                             @{pointtype | pt <point_type>@}
-                             @{pointsize | ps <point_size>@}
+      set style line <index> @{@{linetype  | lt@} <line_type> | <colorspec>@}
+                             @{@{linewidth | lw@} <line_width>@}
+                             @{@{pointtype | pt@} <point_type>@}
+                             @{@{pointsize | ps@} <point_size>@}
                              @{palette@}
       unset style line
       show style line
@@ -10006,11 +10135,15 @@ this mechanism may be used with `plot`, `splot`, @ref{replot}, and @ref{arrow},
 but not by other commands that allow the default index to be used, such as
 `set grid`.
 
-If gnuplot was built with pm3d support, the special keyword @ref{palette} is
-allowed as `linetype` for splots (the 2d `plot` command ignores @ref{palette}).
-In this case the line color is chosen from a smooth palette which was
-set previously with the command @ref{palette}.  The color value corresponds
-to the z-value (elevation) of the splot.
+If gnuplot was built with pm3d support, terminal-independent colors may be
+assigned using the <colorspec>.  This requires giving a RGB color triple,
+a known palette color name, a fractional index into the current palette, or
+a constant value from the current mapping of the palette onto cbrange.
+See `colors`, @ref{colorspec}, @ref{palette}, @ref{colornames}, @ref{cbrange}.
+
+In 3d mode (`splot` command), the special keyword @ref{palette} is allowed as a
+shorthand for "linetype palette z".  The color value corresponds to the
+z-value (elevation) of the splot, and varies smoothly along a line or surface.
 
 Example:
 Suppose that the default lines for indices 1, 2, and 3 are red, green, and
@@ -11242,7 +11375,7 @@ the plot.  `set title` is a special case of @ref{label}.
 Syntax:
 @example
       set title @{"<title-text>"@} @{offset <offset>@} @{"<font>@{,<size>@}"@}
-                @{@{textcolor | tc@} @{lt <line_type> | default@}@}
+                @{@{textcolor | tc@} @{lt <line_type> | default@}@} @{@{no@}enhanced@}
       show title
 
 @end example
@@ -11259,6 +11392,9 @@ roughly the height of one character.
 the units of the font <size> depend upon which terminal is used.
 
 `textcolor lt <n>` sets the text color to that of line type <n>.
+
+`noenhanced` requests that the title not be processed by the enhanced text
+mode parser, even if enhanced text mode is currently active.
 
 `set title` with no parameters clears the title.
 
@@ -11613,7 +11749,7 @@ on the other axes.
 Syntax:
 @example
       set xlabel @{"<label>"@} @{offset <offset>@} @{font "<font>@{,<size>@}"@}
-                 @{@{textcolor | tc@} @{lt <line_type> | default@}@}
+                 @{@{textcolor | tc@} @{lt <line_type> | default@}@} @{@{no@}enhanced@}
       show xlabel
 
 @end example
@@ -11634,6 +11770,9 @@ font and the terminal.
 of the font <size> depend upon which terminal is used.
 
 `textcolor lt <n>` sets the text color to that of line type <n>.
+
+`noenhanced` requests that the label text not be processed by the enhanced text
+mode parser, even if enhanced text mode is currently active.
 
 To clear a label, put no options on the command line, e.g., "@ref{y2label}".
 
@@ -12605,12 +12744,12 @@ The `datafile` options have more differences.
 See also `show plot`.
 
 @menu
-* data-file_::                  
+* data-file::                   
 * grid_data::                   
 * splot_overview::              
 @end menu
 
-@node data-file_, grid_data, splot, splot
+@node data-file, grid_data, splot, splot
 @subsection data-file
 
 @c ?commands splot datafile
@@ -12671,7 +12810,7 @@ It is no longer necessary to specify `parametric` mode for three-column
 * matrix::                      
 @end menu
 
-@node binary_matrix, example_datafile_, data-file_, data-file_
+@node binary_matrix, example_datafile_, data-file, data-file
 @subsubsection binary matrix
 
 @c ?commands plot datafile binary matrix
@@ -12743,7 +12882,7 @@ See also `binary general` and
 @uref{http://www.gnuplot.info/demo/binary.html,Binary File Splot Demo.
 }
 
-@node example_datafile_, matrix_ascii, binary_matrix, data-file_
+@node example_datafile_, matrix_ascii, binary_matrix, data-file
 @subsubsection example datafile
 
 @c ?commands splot datafile example
@@ -12803,7 +12942,7 @@ derived, connects sequentially corresponding points, the effect of an
 irregular grid on a surface plot is unpredictable and should be examined
 on a case-by-case basis.
 
-@node matrix_ascii, matrix, example_datafile_, data-file_
+@node matrix_ascii, matrix, example_datafile_, data-file
 @subsubsection matrix_ascii
 
 @c ?commands plot datafile matrix ascii
@@ -12829,7 +12968,7 @@ A blank line or comment line ends the matrix, and starts a new
 surface mesh. You can select among the meshes inside a file by the
 @ref{index} option to the `splot` command, as usual.
 
-@node matrix,  , matrix_ascii, data-file_
+@node matrix,  , matrix_ascii, data-file
 @subsubsection matrix
 
 @c ?commands plot datafile matrix
@@ -12846,7 +12985,7 @@ The `matrix` flag indicates that the file data (ASCII or binary) are stored
 in matrix format.  The formats are slightly different amongst these two.  For
 details, see `matrix ascii` or `matrix binary`.
 
-@node grid_data, splot_overview, data-file_, splot
+@node grid_data, splot_overview, data-file, splot
 @subsection grid_data
 
 @c ?commands splot grid_data
@@ -12905,7 +13044,7 @@ having a common amplitude (see @ref{contour}) and can then connect those
 new points to display contour lines, either directly with straight-line
 segments or smoothed lines (see @ref{cntrparam}).  Functions are already
 evaluated in a grid format, determined by @ref{isosamples} and @ref{samples},
-while file data must either be in a grid format, as described in `data-file`,
+while file data must either be in a grid format, as described in @ref{data-file},
 or be used to generate a grid (see @ref{dgrid3d}).
 
 Contour lines may be displayed either on the surface or projected onto the
@@ -16851,16 +16990,20 @@ axes are not changed.
 
 Syntax:
 @example
-      set terminal tgif @{portrait | landscape@} @{<[x,y]>@}
+      set terminal tgif @{portrait | landscape | default@} @{<[x,y]>@}
+                        @{monochrome | color@}
+                        @{@{linewidth | lw@} <LW>@}
                         @{solid | dashed@}
                         @{"<fontname>"@} @{<fontsize>@}
 
 @end example
 
 where <[x,y]> specifies the number of graphs in the x and y directions on the
-page, "<fontname>" is the name of a valid PostScript font, and <fontsize>
-specifies the size of the PostScript font.  Defaults are `portrait`, `[1,1]`,
-`dashed`, `"Helvetica"`, and `18`.
+page, `color` enables color, `linewidth` scales all linewidths by <LW>,
+"<fontname>" is the name of a valid PostScript font, and <fontsize>
+specifies the size of the PostScript font.
+`defaults` sets all options to their defaults: `portrait`, `[1,1]`, `color`,
+`linwidth 1.0`, `dashed`, `"Helvetica"`, and `18`.
 
 The `solid` option is usually prefered if lines are colored, as they often
 are in the editor.  Hardcopy will be black-and-white, so `dashed` should be
@@ -16935,16 +17078,20 @@ axes are not changed.
 
 Syntax:
 @example
-      set terminal tgif @{portrait | landscape@} @{<[x,y]>@}
+      set terminal tgif @{portrait | landscape | default@} @{<[x,y]>@}
+                        @{monochrome | color@}
+                        @{@{linewidth | lw@} <LW>@}
                         @{solid | dashed@}
                         @{"<fontname>"@} @{<fontsize>@}
 
 @end example
 
 where <[x,y]> specifies the number of graphs in the x and y directions on the
-page, "<fontname>" is the name of a valid PostScript font, and <fontsize>
-specifies the size of the PostScript font.  Defaults are `portrait`, `[1,1]`,
-`dashed`, `"Helvetica"`, and `18`.
+page, `color` enables color, `linewidth` scales all linewidths by <LW>,
+"<fontname>" is the name of a valid PostScript font, and <fontsize>
+specifies the size of the PostScript font.
+`defaults` sets all options to their defaults: `portrait`, `[1,1]`, `color`,
+`linwidth 1.0`, `dashed`, `"Helvetica"`, and `18`.
 
 The `solid` option is usually prefered if lines are colored, as they often
 are in the editor.  Hardcopy will be black-and-white, so `dashed` should be
