@@ -1,3 +1,28 @@
+1999-07-13  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* src/Makefile.am: Add new file parse.h.
+
+	* src/command.c: Restructure command parser in command.c. New
+	function lookup_command().
+
+	* src/command.h: Add new enum type for gnuplot commands.
+
+	* src/graph3d.c: Comment out unused variables.
+
+	* src/parse.h: New file.
+
+	* src/plot.c: Function init_memory() moved over from command.c.
+
+	* src/plot.h: Move enum operators, struct at_entry and struct at_type
+	to parse.h. Include parse.h.
+
+	* src/protos.h: Remove init_memory() prototype.
+
+1999-07-13  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/graphics.c: Swap usage of axis_zero[SECOND_X_AXIS] and
+	axis_zero[SECOND_X_AXIS].
+
 1999-07-09  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* config/makefile.os9: Fix support for current directory structure.
