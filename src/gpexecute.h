@@ -45,6 +45,10 @@
 
 #ifdef OS2_IPC
 
+#define INCL_DOSPROCESS
+#define INCL_DOSSEMAPHORES
+#include <os2.h>
+
 void gp_execute(char *command);
 extern char mouseShareMemName[];
 

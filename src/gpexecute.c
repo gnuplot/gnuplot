@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gpexecute.c,v 1.10 2001/08/22 14:15:34 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: gpexecute.c,v 1.11 2002/02/27 21:19:05 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - gpexecute.c */
@@ -41,15 +41,13 @@ static char *RCSid() { return RCSid("$Id: gpexecute.c,v 1.10 2001/08/22 14:15:34
  *     Johannes Zellner <johannes@zellner.org>
  */
 
+#include "gpexecute.h"
+
+#include "stdfn.h"
 
 #ifdef OS2_IPC
-# define INCL_DOSPROCESS
-# define INCL_DOSSEMAPHORES
-# include <os2.h>
 # include <stdio.h>
 #endif
-
-#include "gpexecute.h"
 
 #ifdef PIPE_IPC
 # include <unistd.h>	/* open(), write() */
