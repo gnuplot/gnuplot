@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: color.c,v 1.29 2002/06/10 18:49:00 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: color.c,v 1.30 2002/07/21 12:32:52 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - color.c */
@@ -592,8 +592,8 @@ draw_color_smooth_box()
 	    } else {
 		write_multiline(x, y, CB_AXIS.label.text, LEFT, JUST_TOP, 0, CB_AXIS.label.font);
 	    }
-	reset_textcolor(&(CB_AXIS.label.textcolor),term);
 	}
+	reset_textcolor(&(CB_AXIS.label.textcolor),term);
     }
 
 }

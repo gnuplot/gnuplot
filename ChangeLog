@@ -1,5 +1,7 @@
 2002-07-22  Petr Mikulik  <mikulik@physics.muni.cz>
 
+	* src/color.c: Fix misplaced call to reset_textcolor().
+
 	* src/plot3d.h src/plot3d.c src/graph3d.c: Do not call
 	term->previous_palette() if !plot_has_palette.
 
@@ -776,7 +778,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/07/22 09:11:48 $).
+	last modification date (from the tag $Date: 2002/07/22 09:22:18 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
