@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.65 2003/03/26 19:42:21 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.66 2003/04/29 07:04:29 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -341,8 +341,11 @@ set y2data%s\n",
     }	
 
     fprintf(fp, "set key title \"%s\"\n", conv_text(key->title));
-    switch (key->flag) {
-    case KEY_AUTO_PLACEMENT:
+    if (!(key->visible))
+	fputs("unset key\n", fp);
+    else {
+	switch (key->flag) {
+	case KEY_AUTO_PLACEMENT:
 	    fputs("set key", fp);
 	    switch (key->hpos) {
 	    case TRIGHT:
@@ -367,15 +370,11 @@ set y2data%s\n",
 		break;
 	    }
 	    break;
-    case KEY_NONE:
-	fputs("unset key\n", fp);
-	break;
-    case KEY_USER_PLACEMENT:
-	fputs("set key ", fp);
-	save_position(fp, &key->user_pos);
-	break;
-    }
-    if (key->flag != KEY_NONE) {
+	case KEY_USER_PLACEMENT:
+	    fputs("set key ", fp);
+	    save_position(fp, &key->user_pos);
+	    break;
+	}
 	fprintf(fp, " %s %sreverse %senhanced box linetype %d linewidth %.3f samplen %g spacing %g width %g height %g %sautotitles\n",
 		key->just == JLEFT ? "Left" : "Right",
 		key->reverse ? "" : "no",
@@ -384,6 +383,7 @@ set y2data%s\n",
 		key->swidth, key->vert_factor, key->width_fix, key->height_fix,
 		key->auto_titles ? "" : "no" );
     }
+
     fputs("unset label\n", fp);
     for (this_label = first_label; this_label != NULL;
 	 this_label = this_label->next) {

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.54 2003/04/18 10:41:36 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.55 2003/04/29 07:04:33 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -849,7 +849,7 @@ static void
 unset_key()
 {
     legend_key *key = &keyT;
-    key->flag = KEY_NONE;
+    key->visible = FALSE;
 }
 
 

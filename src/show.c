@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.104 2003/03/26 19:42:21 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.105 2003/04/29 07:04:30 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -1717,6 +1717,11 @@ show_key()
 
     SHOW_ALL_NL;
 
+    if (!(key->visible)) {
+	fputs("\tkey is OFF\n", stderr);
+	return;
+    } 
+
     switch (key->flag) {
     case KEY_AUTO_PLACEMENT:
 	if (key->vpos == TUNDER) {
@@ -1739,16 +1744,13 @@ show_key()
 	fprintf(stderr, "\tkey is ON, position: %s\n", str);
 	free(str);
 	break;
-    case KEY_NONE:
-	fputs("\tkey is OFF\n", stderr);
-	break;
     case KEY_USER_PLACEMENT:
 	fputs("\tkey is at ", stderr);
 	show_position(&key->user_pos);
 	putc('\n', stderr);
 	break;
     }
-    if (key->flag != KEY_NONE) {
+
 	fprintf(stderr, "\tkey is %s justified, %sreversed, %senhanced and ",
 		key->just == JLEFT ? "left" : "right",
 		key->reverse ? "" : "not ",
@@ -1770,7 +1772,7 @@ show_key()
 		    key->height_fix,
                     key->auto_titles ? "" : " not",
 		    key->title);
-    }
+
 }
 
 

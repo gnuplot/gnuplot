@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.80 2003/02/16 00:07:37 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.81 2003/03/21 17:38:22 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -816,7 +816,7 @@ do_3dplot(plots, pcount, quick)
     if (key->flag == KEY_USER_PLACEMENT) {
 	map3d_position(&key->user_pos, &xl, &yl, "key");
     }
-    if (key->flag != KEY_NONE && key->box.l_type > L_TYPE_NODRAW) {
+    if (key->visible && key->box.l_type > L_TYPE_NODRAW) {
 	int yt = yl;
 	int yb = yl - key_entry_height * (key_rows - ktitle_lines) - ktitle_lines * t->v_char;
 	int key_xr = xl + key_col_wth * (key_cols - 1) + key_size_right;
@@ -844,7 +844,7 @@ do_3dplot(plots, pcount, quick)
 #endif /* not LITE */
 
     /* KEY TITLE */
-    if (key->flag != KEY_NONE && strlen(key->title)) {
+    if (key->visible && strlen(key->title)) {
 	char *ss = gp_alloc(strlen(key->title) + 2, "tmp string ss");
 	strcpy(ss, key->title);
 	strcat(ss, "\n");
@@ -894,7 +894,7 @@ do_3dplot(plots, pcount, quick)
 #endif
 
 	    if (draw_surface) {
-		TBOOLEAN lkey = (key->flag != KEY_NONE && this_plot->title && this_plot->title[0]);
+		TBOOLEAN lkey = (key->visible && this_plot->title && this_plot->title[0]);
 		term_apply_lp_properties(&(this_plot->lp_properties));
 
 
@@ -1061,7 +1061,7 @@ do_3dplot(plots, pcount, quick)
 
 		term_apply_lp_properties(&(thiscontour_lp_properties));
 
-		if (key->flag != KEY_NONE && this_plot->title && this_plot->title[0]
+		if (key->visible && this_plot->title && this_plot->title[0]
 		    && !draw_surface && !label_contours) {
 		    /* unlabelled contours but no surface : put key entry in now */
 		    /* EAM - force key text to black, then restore */
@@ -1125,7 +1125,7 @@ do_3dplot(plots, pcount, quick)
 		}
 		while (cntrs) {
 		    if (label_contours && cntrs->isNewLevel) {
-		    	if (key->flag != KEY_NONE) {
+		    	if (key->visible) {
 			    (*t->linetype)(LT_BLACK);
 			    key_text(xl, yl, cntrs->label);
 			}
@@ -1136,7 +1136,7 @@ do_3dplot(plots, pcount, quick)
 #endif
 			    (*t->linetype) (++thiscontour_lp_properties.l_type);
 
-			if (key->flag != KEY_NONE) {
+			if (key->visible) {
 
 			    switch (this_plot->plot_style) {
 			    case IMPULSES:

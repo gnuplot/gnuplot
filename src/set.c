@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.114 2003/03/13 14:47:54 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.115 2003/04/29 07:04:30 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -1462,12 +1462,29 @@ set_key()
     legend_key *key = &keyT;
 
     c_token++;
+    key->visible = TRUE;
+
+#ifdef BACKWARDS_COMPATIBLE
     if (END_OF_COMMAND) {
-	reset_key(); 		/* reset to defaults */
-	key->title[0] = 0;
-    } else {
+    	reset_key();
+	key->title[0] = '\0';
+	if (interactive)
+	    int_warn(c_token, "deprecated syntax, use \"set key default\"");
+    }
+#endif
+
 	while (!END_OF_COMMAND) {
 	    switch(lookup_table(&set_key_tbl[0],c_token)) {
+	    case S_KEY_ON:
+		key->visible = TRUE;
+		break;
+	    case S_KEY_OFF:
+		key->visible = FALSE;
+		break;
+	    case S_KEY_DEFAULT:
+		reset_key();
+		key->title[0] = '\0';
+		break;
 	    case S_KEY_TOP:
 		key->vpos = TTOP;
 		key->flag = KEY_AUTO_PLACEMENT;
@@ -1578,7 +1595,6 @@ set_key()
 	    }
 	    c_token++;
 	}
-    }
 }
 
 

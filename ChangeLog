@@ -1,9 +1,16 @@
+2003-05-16  Ethan Merritt <merritt@u.washington.edu>
+
+	* src/gadgets.h src/graph3d.c src/graphics.c src/save.c src/set.c
+	src/show.c src/tables.c src/tables.h src/unset.c docs/gnuplot.doc:
+	Add new command options 'set key {on|off|default}'.
+	Using 'set key' to restore default values is deprecated.
+
 2003-05-16  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* config/makefile.mgw config/makefile.cyg: New configuration define
 	GNUSORT.
 
-2003-05-10  Ethan Merritt <merritt@u.washington.edu>
+2003-05-13  Ethan Merritt <merritt@u.washington.edu>
 
 	* src/plot2d.c docs/gnuplot.doc: Apply current fill style to boxes 
 	drawn for 'plot with boxxyerror'.

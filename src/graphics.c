@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.89 2003/03/18 12:36:48 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.90 2003/04/14 18:11:55 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -200,7 +200,7 @@ f_min(double a, double b)
  * goes wrong, we can switch it off temporarily
  */
 
-static t_key_flag lkey;
+static TBOOLEAN lkey;
 
 /*}}} */
 
@@ -295,7 +295,7 @@ boundary(plots, count)
     int vertical_ytics  = can_rotate ? axis_array[FIRST_Y_AXIS].tic_rotate : 0;
     int vertical_y2tics = can_rotate ? axis_array[SECOND_Y_AXIS].tic_rotate : 0;
 
-    lkey = key->flag;		/* but we may have to disable it later */
+    lkey = key->visible;		/* but we may have to disable it later */
 
     xticlin = ylablin = y2lablin = xlablin = x2lablin = titlelin = 0;
 
@@ -492,7 +492,7 @@ boundary(plots, count)
     /*  end of preliminary ybot calculation }}} */
 
 
-#define KEY_PANIC(x) if (x) { lkey = KEY_NONE; goto key_escape; }
+#define KEY_PANIC(x) if (x) { lkey = FALSE; goto key_escape; }
 
     if (lkey) {
 	/*{{{  essential key features */
@@ -542,10 +542,10 @@ boundary(plots, count)
 	key_cols = 1;
 
 	/* calculate rows and cols for key - if something goes wrong,
-	 * the tidiest way out is to  set lkey = 0, and a goto
+	 * the tidiest way out is to  set lkey = FALSE, and a goto
 	 */
 
-	if (lkey == KEY_AUTO_PLACEMENT) {
+	if (key->flag == KEY_AUTO_PLACEMENT) {
 	    if (key->vpos == TUNDER) {
 		/* maximise no cols, limited by label-length */
 		key_cols = (int) (xright - xleft) / key_col_wth;
@@ -674,7 +674,7 @@ boundary(plots, count)
     /*  end of xleft calculation }}} */
 
     /* EAM Feb 2003 - Revisit key placement */
-    if (lkey == KEY_AUTO_PLACEMENT && key->vpos == TUNDER)
+    if (key->flag == KEY_AUTO_PLACEMENT && key->vpos == TUNDER)
 	keybox.xl += xleft - old_xleft;
 
     /*{{{  recompute xright based on widest y2tic. y2labels, key TOUT
@@ -727,7 +727,7 @@ boundary(plots, count)
 	    xright -= y2label_textwidth;
 
 	/* adjust for outside key */
-	if (lkey == KEY_AUTO_PLACEMENT && key->hpos == TOUT) {
+	if (key->flag == KEY_AUTO_PLACEMENT && key->hpos == TOUT) {
 	    xright -= key_col_wth * key_cols;
 	    keybox.xl = xright + (int) (t->h_tic);
 	}
@@ -871,13 +871,13 @@ boundary(plots, count)
     axis_set_graphical_range(SECOND_Y_AXIS, ybot, ytop);
 
     /*{{{  calculate the window in the grid for the key */
-    if (lkey == KEY_USER_PLACEMENT || (lkey == KEY_AUTO_PLACEMENT && key->vpos != TUNDER)) {
+    if (key->flag == KEY_USER_PLACEMENT || (key->flag == KEY_AUTO_PLACEMENT && key->vpos != TUNDER)) {
 	/* calculate space for keys to prevent grid overwrite the keys */
 	/* do it even if there is no grid, as do_plot will use these to position key */
 	key_w = key_col_wth * key_cols;
 	key_h = (ktitl_lines) * t->v_char + key_rows * key_entry_height;
 	key_h += (int)(key->height_fix * (t->v_char));
-	if (lkey == KEY_AUTO_PLACEMENT) {
+	if (key->flag == KEY_AUTO_PLACEMENT) {
 	    if (key->vpos == TTOP) {
 		keybox.yt = (int) ytop - (t->v_tic);
 		keybox.yb = keybox.yt - key_h;
@@ -1356,7 +1356,7 @@ do_plot(plots, pcount)
     /* DRAW CURVES */
     this_plot = plots;
     for (curve = 0; curve < pcount; this_plot = this_plot->next, curve++) {
-	int localkey = lkey;	/* a local copy */
+	TBOOLEAN localkey = lkey;	/* a local copy */
 
 	/* set scaling for this plot's axes */
 	x_axis = this_plot->x_axis;
@@ -1365,11 +1365,11 @@ do_plot(plots, pcount)
 	term_apply_lp_properties(&(this_plot->lp_properties));
 
 	if (this_plot->title && !*this_plot->title) {
-	    localkey = 0;
+	    localkey = FALSE;
 	} else {
 	    ignore_enhanced_text = this_plot->title_no_enhanced == 1;
 		/* don't write filename or function enhanced */
-	    if (localkey != 0 && this_plot->title) {
+	    if (localkey && this_plot->title) {
 		key_count++;
 
 		/* EAM - force key text to black, then restore */ 
@@ -1489,7 +1489,7 @@ do_plot(plots, pcount)
 	    /*}}} */
 	    /*{{{  DOTS */
 	case DOTS:
-	    if (localkey != 0 && this_plot->title) {
+	    if (localkey && this_plot->title) {
 		(*t->point) (xl + key_point_offset, yl, -1);
 	    }
 	    plot_dots(this_plot);

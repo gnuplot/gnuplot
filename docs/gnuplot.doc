@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.171 2003/04/30 07:15:43 mikulik Exp $
+C RCS $Id: gnuplot.doc,v 1.172 2003/05/14 19:03:24 sfeam Exp $
 C 18 September 2001
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001   Thomas Williams, Colin Kelley et al.
 C
@@ -4907,8 +4907,8 @@ C ... and restart the table:
  Please see `plot title` and `plot with` for more information.
 
  Syntax:
-       set key {  left | right | top | bottom | outside | below
-                | <position>}
+       set key {on|off} {default}
+               {left | right | top | bottom | outside | below | <position>}
                {Left | Right} {{no}reverse}
                {samplen <sample_length>} {spacing <vertical_spacing>}
                {width <width_increment>}
@@ -4925,6 +4925,9 @@ C ... and restart the table:
  keywords `left`, `right`, `top`, `bottom`, `outside` and `below` may be used
  to place the key in the other corners inside the graph or to the right
  (outside) or below the graph.  They may be given alone or combined.
+
+ Plots may be drawn with no visible key by requesting 'set key off' or
+ 'unset key'.
 
  Justification of the labels within the key is controlled by `Left` or `Right`
  (default is `Right`).  The text and sample can be reversed (`reverse`) and a
@@ -4967,9 +4970,9 @@ C ... and restart the table:
  terminals supporting this, see `enhanced postscript` for more details.
  This default behavior can be switched off by the `noenhanced` option.
 
- The defaults for `set key` are `right`, `top`, `Right`, `noreverse`, `samplen
- 4`, `spacing 1.25`, `title ""`, and `nobox`.  The default <linetype> is the
- same as that used for the plot borders.  Entering `set key` with no options
+ The defaults for `set key` are `on`, `right`, `top`, `Right`, `noreverse`,
+ `samplen 4`, `spacing 1.25`, `title ""`, and `nobox`.  The default <linetype>
+ is the same as that used for the plot borders.  Entering `set key default` 
  returns the key to its default configuration.
 
  The <position> can be a simple x,y,z as in previous versions, but these can
@@ -5012,7 +5015,7 @@ C ... and restart the table:
  Examples:
 
  This places the key at the default location:
-       set key
+       set key default
 
  This disables the key:
        unset key

@@ -154,7 +154,6 @@ typedef enum en_key_sample_positioning {
 } t_key_sample_positioning;
 
 typedef enum key_type {
-    KEY_NONE,
     KEY_USER_PLACEMENT,
     KEY_AUTO_PLACEMENT
 } t_key_flag;
@@ -190,7 +189,8 @@ typedef struct {
 
 
 typedef struct { 
-    t_key_flag flag;		/* Key wanted at all? and if so: where? */
+    TBOOLEAN visible;		/* Do we show this key at all? */
+    t_key_flag flag;		/* if so: where? */
     struct position user_pos;	/* if user specified position, this is it */
     t_key_vertical_position vpos; /* otherwise these guide auto-positioning */
     t_key_horizontal_position hpos;
@@ -218,7 +218,8 @@ extern legend_key keyT;
 #define DEFAULT_KEY_POSITION { graph, graph, graph, 0.9, 0.9, 0. }
 
 #define DEFAULT_KEY_PROPS \
-		{ KEY_AUTO_PLACEMENT, \
+		{ TRUE, \
+		KEY_AUTO_PLACEMENT, \
 		DEFAULT_KEY_POSITION, \
 		TTOP, TRIGHT, JRIGHT,  \
 		4.0, 1.0, 0.0, 0.0, \
