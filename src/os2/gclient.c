@@ -1,5 +1,5 @@
-gplt_x11.c#ifdef INCRCSDATA
-static char RCSid[]="$Id: gclient.c,v 1.10 2000/01/25 16:58:47 mikulik Exp $" ;
+#ifdef INCRCSDATA
+static char RCSid[]="$Id: gclient.c,v 1.7 2000/02/11 19:12:49 lhecking Exp $" ;
 #endif
 
 /****************************************************************************
@@ -1734,9 +1734,13 @@ HPS InitScreenPS()
     int     nColour = 0 ;        
 
     GpiResetPS( hpsScreen, GRES_ATTRS ) ;
+#if 0 // Use default background color (the original version)
     GpiErase(hpsScreen);
- 
     WinQueryWindowRect( hApp, (PRECTL)&rectClient ) ;
+#else //PM 14.3.2000: Use always white background
+    WinQueryWindowRect( hApp, (PRECTL)&rectClient ) ;
+    WinFillRect(hpsScreen,&rectClient,CLR_WHITE);
+#endif
     if (bKeepRatio) //PM
     {
     double ratio = 1.560 ;

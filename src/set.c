@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.30 1999/12/10 16:54:51 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.31 2000/02/11 19:14:33 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -54,7 +54,7 @@ static char *RCSid() { return RCSid("$Id: set.c,v 1.30 1999/12/10 16:54:51 lheck
 #include "term_api.h"
 #include "util.h"
 #ifdef USE_MOUSE
-# include "mouse.h"
+#   include "mouse.h"
 #endif
 
 #define BACKWARDS_COMPATIBLE
@@ -2442,11 +2442,7 @@ set_mouse()
 	} else if (equals(c_token, "labels")) {
 	    mouse_setting.label = 1;
 	    ++c_token;
-	} else if (almost_equals(c_token, "nola$bels")) {
-	    mouse_setting.label = 0;
-	    ++c_token;
-	} else if (almost_equals(c_token, "labelop$tions")) {
-	    ++c_token;
+	    /* check if the optional argument "<label options>" is present. */
 	    if (isstring(c_token)) {
 		if (token_len(c_token) >= sizeof(mouse_setting.labelopts)) {
 		    int_error(c_token, "option string too long");
@@ -2454,9 +2450,10 @@ set_mouse()
 		    quote_str(mouse_setting.labelopts,
 			c_token, token_len(c_token));
 		}
-	    } else {
-		int_error(c_token, "expecting string format");
+		++c_token;
 	    }
+	} else if (almost_equals(c_token, "nola$bels")) {
+	    mouse_setting.label = 0;
 	    ++c_token;
 	} else if (almost_equals(c_token, "ve$rbose")) {
 	    mouse_setting.verbose = 1;
@@ -2787,6 +2784,9 @@ set_terminal()
 	list_terms();
 	screen_ok = FALSE;
     } else {
+#ifdef USE_MOUSE
+        event_reset((void *)1);   /* cancel zoombox etc. */
+#endif
 	term_reset();
 	term = 0; /* in case set_term() fails */
 	term = set_term(c_token);

@@ -1,19 +1,28 @@
 /* -*- C -*-
- * FILE: "/home/joze/pub/gnuplot-3.8a-Nov-27-99/src/ipc.h"
- * LAST MODIFICATION: "Sun Nov 28 02:38:31 1999 (joze)"
+ * FILE: "/home/joze/pub/gnuplot/src/ipc.h"
+ * LAST MODIFICATION: "Wed, 22 Mar 2000 21:31:36 +0100 (joze)"
  * 1999 by Johannes Zellner, <johannes@zellner.org>
- * $Id: ipc.h,v 1.2 2000/01/20 13:49:25 mikulik Exp $
- */
-
-#ifndef OS2
-/*
- * gnuplot's terminals communicate with gnuplot by shared memory + event
- * semaphores, thus this code is not used (see also gpexecute.inc)
+ * $Id: ipc.h,v 1.1 2000/02/11 18:41:55 lhecking Exp $
  */
 
 
 #ifndef _IPC_H
 #define _IPC_H
+
+char* readline_ipc __PROTO((const char*));
+/*
+ * special readline_ipc routine for IPC communication, usual readline 
+ * otherwise (OS/2)
+ */
+
+#ifndef OS2
+/*
+ * gnuplot's terminals communicate with gnuplot by shared memory + event
+ * semaphores, thus the code below is not used (see also gpexecute.inc)
+ */
+
+
+enum { IPC_BACK_UNUSABLE = -2, IPC_BACK_CLOSED = -1 };
 
 /*
  * currently only used for X11 && USE_MOUSE, but in principle
@@ -22,13 +31,13 @@
  * should set it to a negative value when closing. (joze)
  */
 #ifdef _TERM_C
-    int ipc_back_fd = -1;
+    int ipc_back_fd = IPC_BACK_CLOSED;
+    int isatty_state = 1;
 #else
     extern int ipc_back_fd;
+    extern int isatty_state;
 #endif
 
-char* readline_ipc __PROTO((const char*));
+#endif /* OS/2 */
 
 #endif /* _IPC_H */
-
-#endif /* OS/2 */

@@ -134,7 +134,7 @@ void gp_execute(char *s)
     if (((char*)input_from_PM_Terminal)[0]==0)
 	return;
     if (pausing) { /* no communication during pause */
-	DosBeep(440,111);
+	/* DosBeep(440,111); */
 	((char*)input_from_PM_Terminal)[0] = 0;
 	return;
     }
@@ -220,9 +220,9 @@ gp_exec_event ( char type, int mx, int my, int par1, int par2 )
     ge.par1 = par1;
     ge.par2 = par2;
 #ifndef OS2
-#ifndef USE_NONBLOCKING_STDOUT
     if (pipe_died)
 	return;
+#ifndef USE_NONBLOCKING_STDOUT
     write(1, &ge, sizeof(ge));
 #else
     if (!base) {
@@ -261,7 +261,7 @@ gp_exec_event ( char type, int mx, int my, int par1, int par2 )
     ((char*)input_from_PM_Terminal)[0] = '%'; /* flag that passing gp_event_t */
     memcpy(((char*)input_from_PM_Terminal)+1, &ge, sizeof(ge)); /* copy the command to shared memory */
     if (pausing) { /* no communication during pause */
-	DosBeep(440,111);
+	/* DosBeep(440,111); */
 	((char*)input_from_PM_Terminal)[0] = 0;
 	return;
     }
@@ -285,7 +285,7 @@ gp_exec_event_text ( char type, int mx, int my, int par1, int par2, char *text )
 static void
 pipe_died_handler(int signum)
 {
-    /* fprintf(stderr, "(pipe_died_handler)\n"); */
+    /* fprintf(stderr, "\n*******(pipe_died_handler)*******\n"); */
     close(1);
     pipe_died = 1;
 }

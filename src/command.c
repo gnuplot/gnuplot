@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.19 2000/02/04 12:48:12 joze Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.37 2000/02/11 19:17:18 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -149,6 +149,9 @@ int vms_ktid;			/* key table id, for translating keystrokes */
 /* static prototypes */
 static void command __PROTO((void));
 static int changedir __PROTO((char *path));
+#ifdef USE_MOUSE
+static char* fgets_ipc __PROTO((char* dest, int len));
+#endif
 static int read_line __PROTO((const char *prompt));
 static void do_system __PROTO((const char *));
 #ifdef AMIGA_AC_5
@@ -225,8 +228,8 @@ extend_token_table()
 	memset(token, 0, MAX_TOKENS * sizeof(*token));
     } else {
 	token = gp_realloc(token, (token_table_size + MAX_TOKENS) * sizeof(struct lexical_unit), "extend token table");
-	token_table_size += MAX_TOKENS;
 	memset(token+token_table_size, 0, MAX_TOKENS * sizeof(*token));
+	token_table_size += MAX_TOKENS;
 	FPRINTF((stderr, "extending token table to %d elements\n", token_table_size));
     }
 }
@@ -589,7 +592,8 @@ call_command()
 	/* Argument list follows filename */
 	load_file(loadpath_fopen(save_file, "r"), save_file, TRUE);
 	/* input_line[] and token[] now destroyed! */
-	c_token = num_tokens = 0;
+	c_token = 0;
+	num_tokens = 0;
 	free(save_file);
     }
 }
@@ -928,7 +932,7 @@ pause_command()
 	    (void) fgets(buf, strlen(buf), stdin);
 #else /* !(_Windows || OS2 || _Macintosh || MTOS || ATARI) */
 #ifdef USE_MOUSE
-	if (term->waitforinput) {
+	if (term && term->waitforinput) {
 	    /* term->waitforinput() will return,
 	     * if CR was hit */
 	    term->waitforinput();
@@ -1558,7 +1562,7 @@ help_command()
     int len;			/* length of current help string */
     TBOOLEAN more_help;
     TBOOLEAN only;		/* TRUE if only printing subtopics */
-    int subtopics;		/* 0 if no subtopics for this topic */
+    TBOOLEAN subtopics;		/* 0 if no subtopics for this topic */
     int start;			/* starting token of help string */
     char *help_ptr;		/* name of help file */
 # if defined(SHELFIND)
@@ -1804,7 +1808,11 @@ const char *prompt;
 	    /* so that ^C or int_error during readline() does
 	     * not result in line being free-ed twice */
 	}
+#ifdef OS2
+	line = readline((interactive) ? prompt : "");
+#else
 	line = readline_ipc((interactive) ? prompt : "");
+#endif
 	leftover = 0;
 	/* If it's not an EOF */
 	if (line && *line) {
@@ -2003,6 +2011,35 @@ int len;
 #  endif			/* !plain DOS */
 # endif				/* !READLINE && !HAVE_LIBREADLINE) */
 
+#ifdef USE_MOUSE
+/* this function is called for non-interactive operation. It's usage
+ * is like fgets(), but additionally it checks for ipc events from
+ * the terminals waitforinput() (if present). This function will
+ * be used when reading from a pipe. */
+static char*
+fgets_ipc(char* dest, int len)
+{
+    if (term && term->waitforinput) {
+	char* ptr = dest;
+	char* end = dest + len;
+	*dest = '\0';
+	do {
+	    *ptr = term->waitforinput();
+	    if ('\n' == *ptr) {
+		*ptr = '\0';
+		return dest;
+	    } else if (EOF == *ptr) {
+		return (char*) 0;
+	    }
+	    ptr++;
+	} while (ptr < end);
+	return dest;
+    } else {
+	return fgets(dest, len, stdin);
+    }
+}
+#endif
+
 /* Non-VMS version */
 static int
 read_line(prompt)
@@ -2021,13 +2058,18 @@ const char *prompt;
 # if defined(READLINE) || defined(HAVE_LIBREADLINE)
 	if (((interactive)
 	    ? rlgets(&(input_line[start]), input_line_len - start,
-		     ((more) ? "> " : prompt))
-	    : fgets(&(input_line[start]), input_line_len - start, stdin))
-	    == (char *) NULL) {
+		     ((more) ? "> " : prompt)) :
+#ifdef USE_MOUSE
+	    fgets_ipc(&(input_line[start]), input_line_len - start)
+#else
+	    fgets(&(input_line[start]), input_line_len - start, stdin)
+#endif
+	    ) == (char *) NULL)
 # else /* !(READLINE || HAVE_LIBREADLINE) */
 	if (GET_STRING(&(input_line[start]), input_line_len - start)
-	    == (char *) NULL) {
+	    == (char *) NULL)
 # endif /* !(READLINE || HAVE_LIBREADLINE) */
+	{
 	    /* end-of-file */
 	    if (interactive)
 		(void) putc('\n', stderr);

@@ -1,5 +1,5 @@
 /*
- * $Id: pm.trm,v 1.19 1999/06/22 11:54:21 lhecking Exp $
+ * $Id: pm.trm,v 1.20 2000/02/11 19:21:11 lhecking Exp $
  */
 
 /* GNUPLOT - pm.trm */
@@ -82,8 +82,19 @@ TERM_PUBLIC void PM_set_clipboard __PROTO((const char[]));
 /* approximations for typical font/screen sizes */
 #define PM_VCHAR (550)
 #define PM_HCHAR (220)
-#define PM_VTIC (200)
-#define PM_HTIC (200)
+/* Note: VCHAR AND HCHAR sizes in gnuplot 3.5 were 415 and 242, 
+   in X11 are 500 and 195, respectively.
+*/
+#if 0 /* Sizes of gnuplot 3.6 and 3.7: */
+#  define PM_VTIC (200)
+#  define PM_HTIC (200)
+#else /* Sizes as X11: */
+#  define PM_VTIC (125)
+#  define PM_HTIC (130)
+/* Note: sizes for VTIC and HTIC in gnuplot 3.5 were 122 and 128, respectively.
+*/
+#endif
+
 #endif
 
 #ifdef TERM_BODY
@@ -636,41 +647,49 @@ PM_linewidth(double linewidth)
 TERM_PUBLIC void
 PM_put_tmptext(int i, const char str[])
 {
-    putc(PUT_TMPTEXT, PM_pipe);
-    fwrite(&i, sizeof(int), 1, PM_pipe);
-    i = strlen(str) + 1;
-    fwrite(&i, sizeof(int), 1, PM_pipe);
-    fwrite(&str[0], i, 1, PM_pipe);
-    fflush(PM_pipe);
+    if (PM_pipe) {
+	putc(PUT_TMPTEXT, PM_pipe);
+	fwrite(&i, sizeof(int), 1, PM_pipe);
+	i = strlen(str) + 1;
+	fwrite(&i, sizeof(int), 1, PM_pipe);
+	fwrite(&str[0], i, 1, PM_pipe);
+	fflush(PM_pipe);
+    }
 }
 
 TERM_PUBLIC void
 PM_set_ruler(int x, int y)
 {
-    putc(SET_RULER, PM_pipe);
-    fwrite(&x, sizeof(int), 1, PM_pipe);
-    fwrite(&y, sizeof(int), 1, PM_pipe);
-    fflush(PM_pipe);
+    if (PM_pipe) {
+	putc(SET_RULER, PM_pipe);
+	fwrite(&x, sizeof(int), 1, PM_pipe);
+	fwrite(&y, sizeof(int), 1, PM_pipe);
+	fflush(PM_pipe);
+    }
 }
 
 TERM_PUBLIC void
 PM_set_cursor(int c, int x, int y)
 {
-    putc(SET_CURSOR, PM_pipe);
-    fwrite(&c, sizeof(int), 1, PM_pipe);
-    fwrite(&x, sizeof(int), 1, PM_pipe);
-    fwrite(&y, sizeof(int), 1, PM_pipe);
-    fflush(PM_pipe);
+    if (PM_pipe) {
+	putc(SET_CURSOR, PM_pipe);
+	fwrite(&c, sizeof(int), 1, PM_pipe);
+	fwrite(&x, sizeof(int), 1, PM_pipe);
+	fwrite(&y, sizeof(int), 1, PM_pipe);
+	fflush(PM_pipe);
+    }
 }
 
 TERM_PUBLIC void
 PM_set_clipboard(const char s[])
 {
-    int i = strlen(s);
-    putc(SET_CLIPBOARD, PM_pipe);
-    fwrite(&i, sizeof(int), 1, PM_pipe);
-    fwrite(s, i+1, 1, PM_pipe);
-    fflush(PM_pipe);
+    if (PM_pipe) {
+	int i = strlen(s);
+	putc(SET_CLIPBOARD, PM_pipe);
+	fwrite(&i, sizeof(int), 1, PM_pipe);
+	fwrite(s, i+1, 1, PM_pipe);
+	fflush(PM_pipe);
+    }
 }
 
 #endif

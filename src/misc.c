@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.21 1999/11/08 19:24:31 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.22 1999/11/15 22:22:46 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -644,6 +644,12 @@ const char *filename, *mode;
 {
     FILE *fp;
 
+#if defined(PIPES)
+    if (*filename == '<') {
+	if ((fp = popen(filename + 1, "r")) == (FILE *) NULL)
+	    return (FILE*) 0;
+    } else
+#endif /* PIPES */
     if ((fp = fopen(filename, mode)) == (FILE *) NULL) {
 	/* try 'loadpath' variable */
 	char *fullname = NULL, *path;

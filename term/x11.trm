@@ -1,5 +1,5 @@
 /*
- * $Id: x11.trm,v 1.19 2000/01/21 02:17:45 joze Exp $
+ * $Id: x11.trm,v 1.23 2000/02/11 19:21:12 lhecking Exp $
  *
  */
 
@@ -140,11 +140,14 @@ static struct x11opt {
    { "-xnllanguage", hasArg }, { "-xrm", hasArg },
    { "-raise", hasNoArg }, { "-noraise", hasNoArg },
    { "-persist", hasNoArg }
+#ifdef USE_MOUSE
+   , { "-noevents", hasNoArg }
+#endif
 };
 
 #define X11_nopts (sizeof(X11_cmdopts) / sizeof(X11_cmdopts[0]))
 
-static FILE *X11_ipc;
+static FILE *X11_ipc = (FILE*) 0;
 #if defined(USE_MOUSE) && !defined(OS2)
 #define X11_ipc_back_fd ipc_back_fd /* defined in ipc.h */
 #endif
@@ -389,14 +392,14 @@ X11_waitforinput()
      *       mouse events are not processed. This is necessary
      *       as on some systems /dev/null is not selectable.
      * TODO: should we close the X11_ipc_back_fd in this case ? */
-    if (X11_ipc_back_fd >= 0 && 0 == fd && isatty(fd)) do {
+    if (X11_ipc_back_fd >= 0) do {
 	FD_ZERO(&fds);
 	FD_SET(fd, &fds);
 	FD_SET(X11_ipc_back_fd, &fds);
 	select(X11_ipc_back_fd+1, &fds, (fd_set*)NULL,
 	    (fd_set*)NULL, (struct timeval*)NULL);
 	if (FD_ISSET(X11_ipc_back_fd, &fds)) {
-	    n=read(X11_ipc_back_fd, l+(void*)&ge, sizeof(ge)-l);
+	    n=read(X11_ipc_back_fd, (void*)(l+(char*)&ge), sizeof(ge)-l);
 #ifndef OS2
 	    if (n == 0) {
 		close(X11_ipc_back_fd);
@@ -435,19 +438,36 @@ X11_init()
 	X11_ipc = popen(X11_command, "w");
 #else /* !(OSK || OS/2) */
 	int fdes[2];
-#ifdef USE_MOUSE
+# ifdef USE_MOUSE
 	int fdes_back[2];
 
-	if (pipe(fdes_back)) perror("pipe() failed:");
-#endif
-	if (pipe(fdes)) perror("pipe() failed:");
+#define X11_ALLOW_EVENTS (mouse_setting.on || isatty_state)
+	if (X11_ALLOW_EVENTS) {
+	    if (pipe(fdes_back))
+		perror("pipe() failed:");
+	}
+# endif
+	if (pipe(fdes))
+	    perror("pipe() failed:");
 
 	if (fork() == 0) {
 	    /* child */
-#ifdef USE_MOUSE
-	    dup2(fdes_back[1], 1);	/* stdout to pipe */
-	    close(fdes_back[0]);
-#endif
+# ifdef USE_MOUSE
+	    char noevents[] = "-noevents";
+	    if (X11_ALLOW_EVENTS) {
+		dup2(fdes_back[1], 1);	/* stdout to pipe */
+		close(fdes_back[0]);
+	    } else {
+		char** ptr;
+		for (ptr = optvec; ptr && *ptr; ptr++)
+		    /* EMPTY (skip over set arguments) */;
+		/* tell the driver not to supply any events by
+		 * appending "-noevents" to the optvec list. */
+		*ptr = noevents;
+		*++ptr = (char*) 0; /* terminate */
+	    }
+# endif
+	    /* close the write side of the child's forward fd */
 	    close(fdes[1]);
 
 	    dup2(fdes[0], 0);	/* stdin from pipe */
@@ -457,18 +477,31 @@ X11_init()
 	    exit(EXIT_FAILURE);
 	}
 	/* parent */
-#ifdef USE_MOUSE
+# ifdef USE_MOUSE
 	/* X11_ipc_out = fdopen(fdes[0], "r"); */
 	if (X11_ipc_back_fd > 0) {
 	    fprintf (stderr, "(X11_init) warning: unclosed X11_ipc_back_fd.\n");
 	    fprintf (stderr, "           this is probably a program error.\n");
 	    close(X11_ipc_back_fd);
 	}
-	X11_ipc_back_fd = fdes_back[0];
-	close(fdes_back[1]); /* the parent doesn't need this */
-#else
+	if (X11_ALLOW_EVENTS) {
+	    X11_ipc_back_fd = fdes_back[0];
+	    close(fdes_back[1]); /* the parent doesn't need this */
+	} else {
+	    /* we do not open a bidirectional communication
+	     * for non-tty's by default. If this is desired,
+	     * the mouse must be turned on explicitely *before*
+	     * starting the x11 driver.
+	     * So: if we're here, we close the ipc-back-channel
+	     * which will cause a SIGPIPE in the driver. This
+	     * is *ugly* but it works. (joze) */
+	    // close(fdes_back[0]);
+	    /* mark X11_ipc_back_fd as unusable */
+	    X11_ipc_back_fd = IPC_BACK_UNUSABLE;
+	}
+# endif
+	/* close the read side of the parent's forward fd */
 	close(fdes[0]);
-#endif
 	X11_ipc = fdopen(fdes[1], "w");
 #endif /* !(OSK || OS/2) */
     }
@@ -477,7 +510,11 @@ X11_init()
 	atexit(X11_atexit);
 	been_here++;
 #ifdef USE_MOUSE
+	/* removed this message as it can be annoying when
+	 * using gnuplot in a pipe (joze) */
+#if 0
 	fprintf(stderr,"Using mouse-enhanced x11 terminal: press 'h' for help\n");
+#endif
 #endif
     }
 #ifdef USE_MOUSE
@@ -741,7 +778,7 @@ X11_graphics()
 #else
 #ifndef OS2
     /* if we know the outboard driver has stopped, restart it */
-    if (X11_ipc_back_fd == -1) {
+    if (X11_ipc_back_fd == IPC_BACK_CLOSED) {
 	fclose(X11_ipc);
 	X11_ipc = NULL;
 	X11_init();
@@ -849,7 +886,9 @@ X11_fillbox(style, x, y, w, h)
 int style;
 unsigned int x, y, w, h;
 {
-    PRINT5("F%04d%04u%04u%04u%04u\n", style, x, y, w, h);
+    if (X11_ipc) {
+	PRINT5("F%04d%04u%04u%04u%04u\n", style, x, y, w, h);
+    }
 }
 
 TERM_PUBLIC void
@@ -857,32 +896,40 @@ X11_put_tmptext(i,str)
 int i;
 const char str[];
 {
-    PRINT2("t%04d%s\n", i, str);
-    FFLUSH();
+    if (X11_ipc) {
+	PRINT2("t%04d%s\n", i, str);
+	FFLUSH();
+    }
 }
 
 TERM_PUBLIC void
 X11_set_ruler(x, y)
 int x, y;
 {
-    PRINT2("r%04d%04d\n", x, y);
-    FFLUSH();
+    if (X11_ipc) {
+	PRINT2("r%04d%04d\n", x, y);
+	FFLUSH();
+    }
 }
 
 TERM_PUBLIC void
 X11_set_cursor(c, x, y)
 int c, x, y;
 {
-    PRINT3("u%04d%04d%04d\n", c, x, y);
-    FFLUSH();
+    if (X11_ipc) {
+	PRINT3("u%04d%04d%04d\n", c, x, y);
+	FFLUSH();
+    }
 }
 
 TERM_PUBLIC void
 X11_set_clipboard(s)
 const char s[];
 {
-    PRINT1("z%s\n", s);
-    FFLUSH();
+    if (X11_ipc) {
+	PRINT1("z%s\n", s);
+	FFLUSH();
+    }
 }
 
 
@@ -918,9 +965,9 @@ TERM_TABLE_START(X11_driver)
     X11_justify_text, X11_point, do_arrow, set_font_null,
     X11_pointsize, TERM_CAN_MULTIPLOT,
     X11_text /* suspend can use same routine */ , 0 /* resume */ ,
-    X11_fillbox, X11_linewidth,
+    X11_fillbox, X11_linewidth
 #ifdef USE_MOUSE
-    X11_waitforinput, X11_put_tmptext, X11_set_ruler, X11_set_cursor, X11_set_clipboard
+    , X11_waitforinput, X11_put_tmptext, X11_set_ruler, X11_set_cursor, X11_set_clipboard
 #endif
 TERM_TABLE_END(X11_driver)
 

@@ -141,95 +141,92 @@ static const int NO_KEY = -1;
 static TBOOLEAN trap_release = FALSE;
 
 /* forward declarations */
-void alert __PROTO((void));
-void MousePosToGraphPosReal __PROTO((int xx, int yy,
+static void alert __PROTO((void));
+static void MousePosToGraphPosReal __PROTO((int xx, int yy,
 	double *x, double *y, double *x2, double *y2));
-char *xy_format __PROTO((void));
-char *zoombox_format __PROTO((void));
-char *xy1_format __PROTO((char *leader));
-char *GetAnnotateString __PROTO((char *s, double x,
+static char *xy_format __PROTO((void));
+static char *zoombox_format __PROTO((void));
+static char *xy1_format __PROTO((char *leader));
+static char *GetAnnotateString __PROTO((char *s, double x,
 	double y, int mode, char *fmt));
-char *xDateTimeFormat __PROTO((double x, char *b, int mode));
-char *GetCoordinateString __PROTO((char *s, double x, double y));
-void GetRulerString __PROTO((char *p, double x, double y));
-void apply_zoom __PROTO((struct t_zoom *z));
-void do_zoom __PROTO((double xmin, double ymin, double x2min,
+static char *xDateTimeFormat __PROTO((double x, char *b, int mode));
+#ifdef OLD_STATUS_LINE
+static char *GetCoordinateString __PROTO((char *s, double x, double y));
+#endif
+static void GetRulerString __PROTO((char *p, double x, double y));
+static void apply_zoom __PROTO((struct t_zoom *z));
+static void do_zoom __PROTO((double xmin, double ymin, double x2min,
 	double y2min, double xmax, double ymax, double x2max, double y2max));
-void ZoomNext __PROTO((void));
-void ZoomPrevious __PROTO((void));
-void ZoomUnzoom __PROTO((void));
-void incr_mousemode __PROTO((const int amount));
-void incr_clipboardmode __PROTO((const int amount));
-void UpdateStatusline __PROTO((void));
-void UpdateStatuslineWithMouseSetting __PROTO((mouse_setting_t *ms));
-void recalc_statusline __PROTO((void));
+static void ZoomNext __PROTO((void));
+static void ZoomPrevious __PROTO((void));
+static void ZoomUnzoom __PROTO((void));
+static void incr_mousemode __PROTO((const int amount));
+static void incr_clipboardmode __PROTO((const int amount));
+static void UpdateStatuslineWithMouseSetting __PROTO((mouse_setting_t *ms));
 
-void event_keypress __PROTO((struct gp_event_t *ge));
-void ChangeView __PROTO((int x, int z));
-void event_buttonpress __PROTO((struct gp_event_t *ge));
-void event_buttonrelease __PROTO((struct gp_event_t *ge));
-void event_motion __PROTO((struct gp_event_t *ge));
-void event_modifier __PROTO((struct gp_event_t *ge));
-void event_plotdone __PROTO((void));
-void event_print __PROTO((FILE *fp, char *s));
-void event_reset __PROTO((struct gp_event_t *ge));
-void do_event __PROTO((struct gp_event_t *ge));
-void do_save_3dplot __PROTO((struct surface_points*, int, int));
+static void event_keypress __PROTO((struct gp_event_t *ge));
+static void ChangeView __PROTO((int x, int z));
+static void event_buttonpress __PROTO((struct gp_event_t *ge));
+static void event_buttonrelease __PROTO((struct gp_event_t *ge));
+static void event_motion __PROTO((struct gp_event_t *ge));
+static void event_modifier __PROTO((struct gp_event_t *ge));
+static void event_print __PROTO((FILE *fp, char *s));
+static void do_save_3dplot __PROTO((struct surface_points*, int, int));
 
 /* builtins */
-char* builtin_autoscale __PROTO((struct gp_event_t* ge));
-char* builtin_toggle_border __PROTO((struct gp_event_t* ge));
-char* builtin_replot __PROTO((struct gp_event_t* ge));
-char* builtin_toggle_grid __PROTO((struct gp_event_t* ge));
-char* builtin_help __PROTO((struct gp_event_t* ge));
-char* builtin_toggle_log __PROTO((struct gp_event_t* ge));
-char* builtin_nearest_log __PROTO((struct gp_event_t* ge));
-char* builtin_toggle_mouse __PROTO((struct gp_event_t* ge));
-char* builtin_toggle_ruler __PROTO((struct gp_event_t* ge));
-char* builtin_decrement_mousemode __PROTO((struct gp_event_t* ge));
-char* builtin_increment_mousemode __PROTO((struct gp_event_t* ge));
-char* builtin_decrement_clipboardmode __PROTO((struct gp_event_t* ge));
-char* builtin_increment_clipboardmode __PROTO((struct gp_event_t* ge));
-char* builtin_toggle_polardistance __PROTO((struct gp_event_t* ge));
-char* builtin_toggle_verbose __PROTO((struct gp_event_t* ge));
-char* builtin_toggle_ratio __PROTO((struct gp_event_t* ge));
-char* builtin_zoom_next __PROTO((struct gp_event_t* ge));
-char* builtin_zoom_previous __PROTO((struct gp_event_t* ge));
-char* builtin_unzoom __PROTO((struct gp_event_t* ge));
-char* builtin_rotate_right __PROTO((struct gp_event_t* ge));
-char* builtin_rotate_up __PROTO((struct gp_event_t* ge));
-char* builtin_rotate_left __PROTO((struct gp_event_t* ge));
-char* builtin_rotate_down __PROTO((struct gp_event_t* ge));
-char* builtin_cancel_zoom __PROTO((struct gp_event_t* ge));
+static char* builtin_autoscale __PROTO((struct gp_event_t* ge));
+static char* builtin_toggle_border __PROTO((struct gp_event_t* ge));
+static char* builtin_replot __PROTO((struct gp_event_t* ge));
+static char* builtin_toggle_grid __PROTO((struct gp_event_t* ge));
+static char* builtin_help __PROTO((struct gp_event_t* ge));
+static char* builtin_toggle_log __PROTO((struct gp_event_t* ge));
+static char* builtin_nearest_log __PROTO((struct gp_event_t* ge));
+static char* builtin_toggle_mouse __PROTO((struct gp_event_t* ge));
+static char* builtin_toggle_ruler __PROTO((struct gp_event_t* ge));
+static char* builtin_decrement_mousemode __PROTO((struct gp_event_t* ge));
+static char* builtin_increment_mousemode __PROTO((struct gp_event_t* ge));
+static char* builtin_decrement_clipboardmode __PROTO((struct gp_event_t* ge));
+static char* builtin_increment_clipboardmode __PROTO((struct gp_event_t* ge));
+static char* builtin_toggle_polardistance __PROTO((struct gp_event_t* ge));
+static char* builtin_toggle_verbose __PROTO((struct gp_event_t* ge));
+static char* builtin_toggle_ratio __PROTO((struct gp_event_t* ge));
+static char* builtin_zoom_next __PROTO((struct gp_event_t* ge));
+static char* builtin_zoom_previous __PROTO((struct gp_event_t* ge));
+static char* builtin_unzoom __PROTO((struct gp_event_t* ge));
+static char* builtin_rotate_right __PROTO((struct gp_event_t* ge));
+static char* builtin_rotate_up __PROTO((struct gp_event_t* ge));
+static char* builtin_rotate_left __PROTO((struct gp_event_t* ge));
+static char* builtin_rotate_down __PROTO((struct gp_event_t* ge));
+static char* builtin_cancel_zoom __PROTO((struct gp_event_t* ge));
 
 /* prototypes for bind stuff
  * which are used only here. */
-void bind_install_default_bindings __PROTO((void));
-void bind_clear __PROTO((bind_t* b));
-int lookup_key __PROTO((char* ptr, int* len));
-int bind_scan_lhs __PROTO((bind_t* out, const char* in));
-char* bind_fmt_lhs __PROTO((const bind_t* in));
-int bind_matches __PROTO((const bind_t* a, const bind_t* b));
-void bind_display_one __PROTO((bind_t* ptr));
-void bind_display __PROTO((char* lhs));
-void bind_remove __PROTO((bind_t* b));
-void bind_append __PROTO((char* lhs, char* rhs,
+static void bind_install_default_bindings __PROTO((void));
+static void bind_clear __PROTO((bind_t* b));
+static int lookup_key __PROTO((char* ptr, int* len));
+static int bind_scan_lhs __PROTO((bind_t* out, const char* in));
+static char* bind_fmt_lhs __PROTO((const bind_t* in));
+static int bind_matches __PROTO((const bind_t* a, const bind_t* b));
+static void bind_display_one __PROTO((bind_t* ptr));
+static void bind_display __PROTO((char* lhs));
+static void bind_remove __PROTO((bind_t* b));
+static void bind_append __PROTO((char* lhs, char* rhs,
 	char* (*builtin)(struct gp_event_t* ge)));
 /* void bind_process __PROTO((char *lhs, char *rhs)); */
 /* void bind_remove_all __PROTO((void)); */
-void recalc_ruler_pos __PROTO((void));
-void update_ruler __PROTO((void));
-int plot_mode __PROTO((int set));
-void turn_ruler_off __PROTO((void));
-void remove_label __PROTO((int x, int y));
-void put_label __PROTO((char *label, double x, double y));
+static void recalc_ruler_pos __PROTO((void));
+static void turn_ruler_off __PROTO((void));
+static void remove_label __PROTO((int x, int y));
+static void put_label __PROTO((char *label, double x, double y));
+#ifdef OS2
 void send_gpPMmenu __PROTO((FILE *PM_pipe));
-void update_menu_items_PM_terminal __PROTO((void));
+#endif
 
 /********* functions ********************************************/
 
 /* produce a beep */
-void alert(void)
+static void
+alert(void)
 {
 #ifdef GNUPMDRV
     DosBeep(444,111);
@@ -243,6 +240,13 @@ void alert(void)
 #endif
 }
 
+/* always include the prototype. The prototype might even not be
+ * declared if the system supports stpcpy(). E.g. on Linux I would
+ * have to define __USE_GNU before including string.h to get the
+ * prototype (joze) */
+char *stpcpy __PROTO((char *s,char *p));
+
+#ifndef HAVE_STPCPY
 /* handy function for composing strings; note: some platforms may
  * already provide it, how should we handle that? autoconf? -- ptdb */
 char *stpcpy(char *s,char *p)
@@ -250,6 +254,7 @@ char *stpcpy(char *s,char *p)
     strcpy(s,p);
     return s+strlen(p);
 }
+#endif
 
 
 /* a macro to check whether 2D functionality is allowed: 
@@ -263,7 +268,7 @@ char *stpcpy(char *s,char *p)
 
 /* main job of transformation, which is not device dependent
 */
-void 
+static void 
 MousePosToGraphPosReal( int xx, int yy, double *x, double *y, double *x2, double *y2 )
 {
     if (!is_3d_plot) {
@@ -317,7 +322,7 @@ MousePosToGraphPosReal( int xx, int yy, double *x, double *y, double *x2, double
     if  (is_log_y2) *y2 = exp( *y2 * log_base_log_y2 );
 }
 
-char*
+static char*
 xy_format(void)
 {
     static char format[0xff];
@@ -328,7 +333,7 @@ xy_format(void)
     return format;
 }
 
-char*
+static char*
 zoombox_format(void)
 {
     static char format[0xff];
@@ -339,7 +344,7 @@ zoombox_format(void)
     return format;
 }
 
-char*
+static char*
 xy1_format(char* leader)
 {
     static char format[0xff];
@@ -351,7 +356,7 @@ xy1_format(char* leader)
 
 /* formats the information for an annotation (middle mouse button clicked)
  */
-char*
+static char*
 GetAnnotateString(char *s, double x, double y, int mode, char* fmt)
 {
     if (mode==MOUSE_COORDINATES_XDATE ||
@@ -397,7 +402,7 @@ GetAnnotateString(char *s, double x, double y, int mode, char* fmt)
 /* Format x according to the date/time mouse mode. Uses and returns b as
    a buffer
  */
-char*
+static char*
 xDateTimeFormat(double x, char* b, int mode)
 {
 #ifndef SEC_OFFS_SYS
@@ -460,7 +465,9 @@ xDateTimeFormat(double x, char* b, int mode)
 /* formats the information for an annotation (middle mouse button clicked)
  * returns pointer to the end of the string, for easy concatenation
 */
-char *GetCoordinateString ( char *s, double x, double y )
+#ifdef OLD_STATUS_LINE
+static char*
+GetCoordinateString ( char *s, double x, double y )
 {
     char *sp;
     s[0] = '[';
@@ -473,6 +480,7 @@ char *GetCoordinateString ( char *s, double x, double y )
     *sp = 0;
     return sp;
 }
+#endif
 
 
 #define DIST(x,rx,is_log)  \
@@ -486,7 +494,8 @@ char *GetCoordinateString ( char *s, double x, double y )
    x, y is the current mouse position in real coords (for the calculation 
 	of distance)
 */
-void GetRulerString ( char *p, double x, double y )
+static void
+GetRulerString ( char *p, double x, double y )
 {
     double dx, dy;
 
@@ -529,7 +538,8 @@ struct t_zoom *zoom_head = NULL,
 /* Applies the zoom rectangle of  z  by sending the appropriate command
    to gnuplot
 */
-void apply_zoom ( struct t_zoom *z )
+static void
+apply_zoom ( struct t_zoom *z )
 {
     char s[255];
 
@@ -562,7 +572,8 @@ void apply_zoom ( struct t_zoom *z )
 /* makes a zoom: update zoom history, call gnuplot to set ranges + replot
 */
 
-void do_zoom ( double xmin, double ymin, double x2min, double y2min, double xmax, double ymax, double x2max, double y2max )
+static void
+do_zoom ( double xmin, double ymin, double x2min, double y2min, double xmax, double ymax, double x2max, double y2max )
 {
     struct t_zoom *z;
     if (zoom_head == NULL) { /* queue not yet created, thus make its head */
@@ -587,7 +598,7 @@ void do_zoom ( double xmin, double ymin, double x2min, double y2min, double xmax
 }
 
 
-void
+static void
 ZoomNext(void)
 {
     if (zoom_now == NULL || zoom_now->next == NULL)
@@ -599,7 +610,7 @@ ZoomNext(void)
     }
 }
 
-void
+static void
 ZoomPrevious(void)
 {
     if (zoom_now == NULL || zoom_now->prev == NULL)
@@ -611,7 +622,7 @@ ZoomPrevious(void)
     }
 }
 
-void
+static void
 ZoomUnzoom(void)
 {
     if (zoom_head == NULL || zoom_now == zoom_head)
@@ -623,7 +634,7 @@ ZoomUnzoom(void)
     }
 }
 
-void
+static void
 incr_mousemode(const int amount)
 {
     long int old = mouse_mode;
@@ -646,7 +657,7 @@ incr_mousemode(const int amount)
     }
 }
 
-void
+static void
 incr_clipboardmode(const int amount)
 {
     long int old = clipboard_mode;
@@ -676,7 +687,7 @@ UpdateStatusline(void)
     UpdateStatuslineWithMouseSetting(&mouse_setting);
 }
 
-void
+static void
 UpdateStatuslineWithMouseSetting(mouse_setting_t* ms)
 {
     char s0[256],*sp;
@@ -758,7 +769,8 @@ UpdateStatuslineWithMouseSetting(mouse_setting_t* ms)
 }
 
 
-void recalc_statusline(void)
+void
+recalc_statusline(void)
 {
     MousePosToGraphPosReal(mouse_x, mouse_y,
 	&real_x, &real_y, &real_x2, &real_y2);
@@ -767,7 +779,7 @@ void recalc_statusline(void)
 
 /****************** handlers for user's actions ******************/
 
-char*
+static char*
 builtin_autoscale(struct gp_event_t *ge)
 {
     if (!ge) {
@@ -777,7 +789,7 @@ builtin_autoscale(struct gp_event_t *ge)
     return (char*) 0;
 }
 
-char*
+static char*
 builtin_toggle_border(struct gp_event_t *ge)
 {
     if (!ge) {
@@ -793,7 +805,7 @@ builtin_toggle_border(struct gp_event_t *ge)
     return (char*) 0;
 }
 
-char*
+static char*
 builtin_replot(struct gp_event_t *ge)
 {
     if (!ge) {
@@ -803,7 +815,7 @@ builtin_replot(struct gp_event_t *ge)
     return (char*) 0;
 }
 
-char*
+static char*
 builtin_toggle_grid(struct gp_event_t *ge)
 {
     if (!ge) {
@@ -816,7 +828,7 @@ builtin_toggle_grid(struct gp_event_t *ge)
     return (char*) 0;
 }
 
-char*
+static char*
 builtin_help(struct gp_event_t *ge)
 {
     if (!ge) {
@@ -828,7 +840,7 @@ builtin_help(struct gp_event_t *ge)
     return (char*) 0;
 }
 
-char*
+static char*
 builtin_toggle_log(struct gp_event_t *ge)
 {
     if (!ge) {
@@ -848,7 +860,7 @@ builtin_toggle_log(struct gp_event_t *ge)
     return (char*) 0;
 }
 
-char*
+static char*
 builtin_nearest_log(struct gp_event_t *ge)
 {
     if (!ge) {
@@ -886,7 +898,7 @@ builtin_nearest_log(struct gp_event_t *ge)
     return (char*) 0;
 }
 
-char*
+static char*
 builtin_toggle_mouse(struct gp_event_t *ge)
 {
     if (!ge) {
@@ -916,7 +928,7 @@ builtin_toggle_mouse(struct gp_event_t *ge)
     return (char*) 0;
 }
 
-char*
+static char*
 builtin_toggle_ruler(struct gp_event_t *ge)
 {
     if (!ge) {
@@ -945,7 +957,7 @@ builtin_toggle_ruler(struct gp_event_t *ge)
     return (char*) 0;
 }
 
-char*
+static char*
 builtin_decrement_mousemode(struct gp_event_t *ge)
 {
     if (!ge) {
@@ -955,7 +967,7 @@ builtin_decrement_mousemode(struct gp_event_t *ge)
     return (char*) 0;
 }
 
-char*
+static char*
 builtin_increment_mousemode(struct gp_event_t *ge)
 {
     if (!ge) {
@@ -965,7 +977,7 @@ builtin_increment_mousemode(struct gp_event_t *ge)
     return (char*) 0;
 }
 
-char*
+static char*
 builtin_decrement_clipboardmode(struct gp_event_t *ge)
 {
     if (!ge) {
@@ -975,7 +987,7 @@ builtin_decrement_clipboardmode(struct gp_event_t *ge)
     return (char*) 0;
 }
 
-char*
+static char*
 builtin_increment_clipboardmode(struct gp_event_t *ge)
 {
     if (!ge) {
@@ -985,7 +997,7 @@ builtin_increment_clipboardmode(struct gp_event_t *ge)
     return (char*) 0;
 }
 
-char*
+static char*
 builtin_toggle_polardistance(struct gp_event_t *ge)
 {
     if (!ge) {
@@ -1004,7 +1016,7 @@ builtin_toggle_polardistance(struct gp_event_t *ge)
     return (char*) 0;
 }
 
-char*
+static char*
 builtin_toggle_verbose(struct gp_event_t *ge)
 {
     if (!ge) {
@@ -1022,7 +1034,7 @@ builtin_toggle_verbose(struct gp_event_t *ge)
     return (char*) 0;
 }
 
-char*
+static char*
 builtin_toggle_ratio(struct gp_event_t *ge)
 {
     if (!ge) {
@@ -1037,7 +1049,7 @@ builtin_toggle_ratio(struct gp_event_t *ge)
     return (char*) 0;
 }
 
-char*
+static char*
 builtin_zoom_next(struct gp_event_t *ge)
 {
     if (!ge) {
@@ -1047,7 +1059,7 @@ builtin_zoom_next(struct gp_event_t *ge)
     return (char*) 0;
 }
 
-char*
+static char*
 builtin_zoom_previous(struct gp_event_t *ge)
 {
     if (!ge) {
@@ -1057,7 +1069,7 @@ builtin_zoom_previous(struct gp_event_t *ge)
     return (char*) 0;
 }
 
-char*
+static char*
 builtin_unzoom(struct gp_event_t *ge)
 {
     if (!ge) {
@@ -1067,7 +1079,7 @@ builtin_unzoom(struct gp_event_t *ge)
     return (char*) 0;
 }
 
-char*
+static char*
 builtin_rotate_right(struct gp_event_t *ge)
 {
     if (!ge) {
@@ -1078,7 +1090,7 @@ builtin_rotate_right(struct gp_event_t *ge)
     return (char*) 0;
 }
 
-char*
+static char*
 builtin_rotate_left(struct gp_event_t *ge)
 {
     if (!ge) {
@@ -1089,7 +1101,7 @@ builtin_rotate_left(struct gp_event_t *ge)
     return (char*) 0;
 }
 
-char*
+static char*
 builtin_rotate_up(struct gp_event_t *ge)
 {
     if (!ge) {
@@ -1100,7 +1112,7 @@ builtin_rotate_up(struct gp_event_t *ge)
     return (char*) 0;
 }
 
-char*
+static char*
 builtin_rotate_down(struct gp_event_t *ge)
 {
     if (!ge) {
@@ -1111,7 +1123,7 @@ builtin_rotate_down(struct gp_event_t *ge)
     return (char*) 0;
 }
 
-char*
+static char*
 builtin_cancel_zoom(struct gp_event_t *ge)
 {
     if (!ge) {
@@ -1128,7 +1140,7 @@ builtin_cancel_zoom(struct gp_event_t *ge)
     return (char*) 0;
 }
 
-void
+static void
 event_keypress(struct gp_event_t *ge)
 {
     int x,y;
@@ -1169,7 +1181,7 @@ event_keypress(struct gp_event_t *ge)
 }
 
 
-void
+static void
 ChangeView(int x, int z)
 {
     if (modifier_mask & Mod_Shift) {
@@ -1207,7 +1219,8 @@ ChangeView(int x, int z)
 }
 
 
-void event_buttonpress(struct gp_event_t *ge)
+static void
+event_buttonpress(struct gp_event_t *ge)
 {
     int b;
 
@@ -1321,13 +1334,13 @@ void event_buttonpress(struct gp_event_t *ge)
 		if (y2min > y2max) {
 		    swap(y2min, y2max);
 		}
-#undef swap(x, y)
+#undef swap
 		do_zoom(xmin, ymin, x2min, y2min, xmax, ymax, x2max, y2max);
 		if (display_ipc_commands()) {
 		    fprintf(stderr, "zoom region finished.\n");
 		}
 	    } else {
-		/* silently ingore a tiny zoom box. This might
+		/* silently ignore a tiny zoom box. This might
 		 * happen, if the user starts and finishes the
 		 * zoom box at the same position. */
 	    }
@@ -1347,7 +1360,8 @@ void event_buttonpress(struct gp_event_t *ge)
 }
 
 
-void event_buttonrelease(struct gp_event_t *ge)
+static void
+event_buttonrelease(struct gp_event_t *ge)
 {
     int b, doubleclick;
 
@@ -1437,7 +1451,7 @@ printf("MOUSE.C: doublclick=%i, set=%i, motion=%i, ALMOST2D=%i\n",(int)doublecli
     UpdateStatusline();
 }
 
-void
+static void
 event_motion(struct gp_event_t *ge)
 {
     motion = 1;
@@ -1533,7 +1547,7 @@ event_motion(struct gp_event_t *ge)
 }
 
 
-void
+static void
 event_modifier(struct gp_event_t *ge)
 {
     modifier_mask = ge->par1;
@@ -1546,7 +1560,8 @@ event_modifier(struct gp_event_t *ge)
 }
 
 
-void event_plotdone()
+void
+event_plotdone()
 {
     if (needreplot) {
 	needreplot = FALSE;
@@ -1557,7 +1572,7 @@ void event_plotdone()
 }
 
 
-void
+static void
 event_print(FILE* fp, char* s)
 {
     fputs(s, fp);
@@ -1570,7 +1585,7 @@ event_reset(struct gp_event_t* ge)
     modifier_mask = 0;
     button = 0;
     builtin_cancel_zoom(ge);
-    if (term->set_cursor) {
+    if (term && term->set_cursor) {
 	term->set_cursor(0,0,0);
 	if (mouse_setting.annotate_zoom_box && term->put_tmptext) {
 	    term->put_tmptext(1, "");
@@ -1634,7 +1649,7 @@ do_event(struct gp_event_t *ge)
     }
 }
 
-void
+static void
 do_save_3dplot(struct surface_points* plots, int pcount, int quick)
 {
     if (!plots) {
@@ -1652,7 +1667,7 @@ do_save_3dplot(struct surface_points* plots, int pcount, int quick)
  * bind related functions
  */
 
-void
+static void
 bind_install_default_bindings(void)
 {
     bind_remove_all();
@@ -1682,7 +1697,7 @@ bind_install_default_bindings(void)
     bind_append("Escape", (char*) 0, builtin_cancel_zoom);
 }
 
-void
+static void
 bind_clear(bind_t* b)
 {
     b->key = NO_KEY;
@@ -1696,7 +1711,7 @@ bind_clear(bind_t* b)
 /* returns the enum which corresponds to the
  * string (ptr) or NO_KEY if ptr matches not
  * any of special_keys. */
-int
+static int
 lookup_key(char* ptr, int* len)
 {
     char** keyptr;
@@ -1709,7 +1724,7 @@ lookup_key(char* ptr, int* len)
 }
 
 /* returns 1 on success, else 0. */
-int
+static int
 bind_scan_lhs(bind_t* out, const char* in)
 {
     static const char DELIM = '-';
@@ -1745,7 +1760,7 @@ bind_scan_lhs(bind_t* out, const char* in)
  * to the static char* `out' which is
  * modified on subsequent calls.
  */
-char*
+static char*
 bind_fmt_lhs(const bind_t* in)
 {
     static char out[0x40];
@@ -1766,7 +1781,7 @@ bind_fmt_lhs(const bind_t* in)
     return out;
 }
 
-int
+static int
 bind_matches(const bind_t* a, const bind_t* b)
 {
     /* discard Shift modifier */
@@ -1779,7 +1794,7 @@ bind_matches(const bind_t* a, const bind_t* b)
 	return 0;
 }
 
-void
+static void
 bind_display_one(bind_t* ptr)
 {
     fprintf(stderr, " %-12s  ", bind_fmt_lhs(ptr));
@@ -1792,7 +1807,7 @@ bind_display_one(bind_t* ptr)
     }
 }
 
-void
+static void
 bind_display(char* lhs)
 {
     bind_t* ptr;
@@ -1815,6 +1830,9 @@ bind_display(char* lhs)
 	fprintf(stderr, fmt, "<B2-Motion>", "change view (scaling). Use <ctrl> to scale the axes only.");
 	fprintf(stderr, fmt, "<Shift-B2-Motion>", "vertical motion -- change ticslevel");
 	fprintf(stderr, "\n");
+	fprintf(stderr, " %-12s  %s\n", "Space", "raise gnuplot console window");
+	fprintf(stderr, " %-12s  %s\n", "q", "quit X11 terminal");
+	fprintf(stderr, "\n");
 	for (ptr = bindings; ptr; ptr = ptr->next) {
 	    bind_display_one(ptr);
 	}
@@ -1833,7 +1851,7 @@ bind_display(char* lhs)
     }
 }
 
-void
+static void
 bind_remove(bind_t* b)
 {
     if (!b) {
@@ -1865,7 +1883,7 @@ bind_remove(bind_t* b)
     free(b);
 }
 
-void
+static void
 bind_append(char* lhs, char* rhs, char* (*builtin)(struct gp_event_t* ge))
 {
     bind_t* new = (bind_t*) gp_alloc(sizeof(bind_t), "bind_append->new");
@@ -1948,14 +1966,15 @@ bind_remove_all(void)
 /* Ruler is on, thus recalc its (px,py) from (x,y) for the current zoom and 
    log axes.
 */
-void recalc_ruler_pos (void)
+static void
+recalc_ruler_pos (void)
 {
-    double P;
+    double P, dummy;
     if (is_log_x && ruler.x<0)
 	ruler.px = -1;
     else {
 	P = is_log_x ? log(ruler.x) / log_base_log_x : ruler.x;
-	P = (P-xmin) / (xmax-xmin);
+	P = (P-min_array[FIRST_X_AXIS]) / (max_array[FIRST_X_AXIS]-min_array[FIRST_X_AXIS]);
 	P *= xright - xleft;
 	ruler.px = (long)( xleft + P );
     }
@@ -1963,10 +1982,11 @@ void recalc_ruler_pos (void)
 	ruler.py = -1;
     else {
 	P = is_log_y ? log(ruler.y) / log_base_log_y : ruler.y;
-	P = (P-ymin) / (ymax-ymin);
+	P = (P-min_array[FIRST_Y_AXIS]) / (max_array[FIRST_Y_AXIS]-min_array[FIRST_Y_AXIS]);
 	P *= ytop - ybot;
 	ruler.py = (long)( ybot + P );
     }
+    MousePosToGraphPosReal(ruler.px, ruler.py, &dummy, &dummy, &ruler.x2, &ruler.y2);
 }
 
 
@@ -1995,7 +2015,7 @@ plot_mode(int set)
     return mode;
 }
 
-void
+static void
 turn_ruler_off(void)
 {
     if (ruler.on) {
@@ -2006,7 +2026,7 @@ turn_ruler_off(void)
     }
 }
 
-void
+static void
 remove_label(int x, int y)
 {
     int tag = nearest_label_tag(x, y, term,
@@ -2018,7 +2038,7 @@ remove_label(int x, int y)
     }
 }
 
-void
+static void
 put_label(char* label, double x, double y)
 {
     char cmd[0xff];
@@ -2031,7 +2051,8 @@ put_label(char* label, double x, double y)
 /* routine required by pm.trm: fill & send information neede for (un)checking
    menu items in the Presentation Manager terminal
 */
-void send_gpPMmenu(FILE * PM_pipe)
+void
+send_gpPMmenu(FILE * PM_pipe)
 {
     struct t_gpPMmenu gpPMmenu;
     extern int mouseGnupmdrv;
@@ -2050,10 +2071,11 @@ void send_gpPMmenu(FILE * PM_pipe)
 }
 
 /* update menu items in PM terminal */
-void update_menu_items_PM_terminal( void )
+void
+update_menu_items_PM_terminal( void )
 {
-	extern FILE *PM_pipe;
-	send_gpPMmenu(PM_pipe);
+    extern FILE *PM_pipe;
+    send_gpPMmenu(PM_pipe);
 }
 #endif
 

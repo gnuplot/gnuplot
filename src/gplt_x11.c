@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.42 2000/02/05 19:56:41 joze Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.10 2000/02/11 19:17:18 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - gplt_x11.c */
@@ -232,10 +232,6 @@ typedef struct plot_struct {
 #ifdef USE_MOUSE
     Window msgwin;
     int  button;    /* buttons which are currently pressed      */
-#if 0
-    int  pointer_x; /* current pointer position                 */
-    int  pointer_y;
-#endif
     char str[0xff]; /* last displayed string                    */
     Time time;      /* time of last button press event          */
 #endif
@@ -282,12 +278,13 @@ static char selection[0xff] = "";
 #endif /* USE_MOUSE */
 
 #ifdef USE_MOUSE
- #define GRAPH_HEIGHT(plot)  ((plot)->gheight)
- #define PIXMAP_HEIGHT(plot)  ((plot)->gheight + vchar)
- /* note: PIXMAP_HEIGHT is the height of the plot including the status line, even if the latter is not enabled right now */
+# define GRAPH_HEIGHT(plot)  ((plot)->gheight)
+# define PIXMAP_HEIGHT(plot)  ((plot)->gheight + vchar)
+  /* note: PIXMAP_HEIGHT is the height of the plot including the status line, 
+     even if the latter is not enabled right now */
 #else
- #define GRAPH_HEIGHT(plot)  ((plot)->height)
- #define PIXMAP_HEIGHT(plot)  ((plot)->height)
+# define GRAPH_HEIGHT(plot)  ((plot)->height)
+# define PIXMAP_HEIGHT(plot)  ((plot)->height)
 #endif
 
 void store_command __PROTO((char *line, plot_struct * plot));
@@ -302,17 +299,11 @@ void mainloop __PROTO((void));
 void display __PROTO((plot_struct * plot));
 void UpdateWindow __PROTO((plot_struct* plot));
 #ifdef USE_MOUSE
+static int ErrorHandler __PROTO((Display* display, XErrorEvent* error_event));
 void DrawRuler __PROTO((plot_struct* plot));
 void EventuallyDrawMouseAddOns __PROTO((plot_struct* plot));
 void DrawBox __PROTO((plot_struct* plot));
 void AnnotatePoint __PROTO((plot_struct* plot, int x, int y, const char[], const char[]));
-void DrawLine __PROTO((plot_struct* plot, int x1, int y1, int x2, int y2));
-#if 0
-void DrawEllipse __PROTO((plot_struct* plot, int x, int y, unsigned int a, unsigned int b));
-void DrawCircle __PROTO((plot_struct* plot, int x, int y, unsigned int r));
-#endif
-void DrawStringAt __PROTO((plot_struct* plot, int x, int y, char* str));
-void SetPointer __PROTO((plot_struct* plot, int x, int y));
 long int SetTime __PROTO((plot_struct* plot, Time t));
 void GetGCXor __PROTO((GC* gc, Window window));
 void GetGCXorDashed __PROTO((GC* gc, Window window));
@@ -449,6 +440,7 @@ char *argv[];
 
     FPRINTF((stderr, "gnuplot_X11 starting up\n"));
 
+
     preset(argc, argv);
 
 /* set up the alternative cursor */
@@ -461,13 +453,18 @@ char *argv[];
     /* arrow, top_left_arrow, left_ptr, sb_left_arrow, sb_right_arrow,
      * plus, pencil, draft_large, right_ptr, draft_small */
     cursor_zooming = XCreateFontCursor(dpy, XC_draft_small);
-#endif
 
-#if defined(USE_NONBLOCKING_STDOUT) && !defined(OS2)
-    /* set up nonblocking stdout */
-    getfl = fcntl(1, F_GETFL); /* get current flags */
-    fcntl(1, F_SETFL, getfl | O_NONBLOCK);
-    signal(SIGPIPE, pipe_died_handler);
+# if !defined(OS2)
+
+#  if defined(USE_NONBLOCKING_STDOUT)
+    if (!pipe_died) {
+	/* set up nonblocking stdout */
+	getfl = fcntl(1, F_GETFL); /* get current flags */
+	fcntl(1, F_SETFL, getfl | O_NONBLOCK);
+	signal(SIGPIPE, pipe_died_handler);
+    }
+#  endif
+# endif
 #endif
 
     mainloop();
@@ -588,9 +585,6 @@ mainloop()
 	    XNoOp(dpy);
 
 	if (XPending(dpy)) {
-#if 0
-	       if (FD_ISSET(cn, &tset)) { }
-#endif
 	    /* used to use CheckMaskEvent() but that cannot receive
 	     * maskable events such as ClientMessage. So now we do
 	     * one event, then return to the select.
@@ -844,10 +838,6 @@ int term_number;
 	 */
 	plot->msgwin = (Window) 0;
 	plot->button = 0;
-#if 0
-	plot->pointer_x = NOT_AVAILABLE;
-	plot->pointer_y = NOT_AVAILABLE;
-#endif
 	plot->x = NOT_AVAILABLE;
 	plot->y = NOT_AVAILABLE;
 	if (plot->str[0]!='\0') {
@@ -1045,10 +1035,6 @@ record()
 		sscanf(buf, "u%4d%4d%4d", &c, &x, &y);
 		switch (c) {
 		    case -2:  /* warp pointer */
-#if 0
-			fprintf(stderr, "(record) warp pointer\n");
-			fprintf(stderr, "    %d %d %d\n", c, x, y);
-#endif
 			XWarpPointer(dpy, None /* src_w */,
 			    plot->window /* dest_w */, 0, 0, 0, 0, X(x), Y(y));
 		    case -1:  /* zoombox */
@@ -1056,10 +1042,6 @@ record()
 			plot->zoombox_y1 = plot->zoombox_y2 = Y(y);
 			plot->zoombox_on = TRUE;
 			DrawBox(plot);
-#if 0
-			cursor = cursor_default;
-			XDefineCursor(dpy, plot->window, cursor);
-#endif
 		        break;
 		    case 0:  /* standard cross-hair cursor */
 			cursor = cursor_default;
@@ -1544,13 +1526,6 @@ static int
 ErrorHandler(Display* display, XErrorEvent* error_event)
 {
     plot_struct* plot = find_plot((Window) error_event->resourceid);
-#if 0
-    if (plot) {
-	fprintf(stderr, "(ErrorHandler) found plot window\n");
-    } else {
-	fprintf(stderr, "(ErrorHandler) found plot window\n");
-    }
-#endif
     gp_exec_event(GE_reset, 0, 0, 0, 0);
     if (plot) {
 	delete_plot(plot);
@@ -1651,13 +1626,6 @@ AnnotatePoint(plot_struct* plot, int x, int y, const char xstr[], const char yst
     ywidth = XTextWidth(font, ystr, ylen);
 
     /* horizontal centering disabled (joze) */
-#if 0
-    {
-	int width;
-	width = xwidth > ywidth ? xwidth : ywidth;
-	x -= width / 2;
-    }
-#endif
 
     if (!gc_xor) {
 	GetGCXor(&gc_xor, plot->window);
@@ -1665,53 +1633,6 @@ AnnotatePoint(plot_struct* plot, int x, int y, const char xstr[], const char yst
     XDrawString(dpy, plot->window, gc_xor, x, y - 3, xstr, xlen);
     XDrawString(dpy, plot->window, gc_xor, x, y + vchar, ystr, ylen);
 }
-
-void
-DrawEllipse(plot_struct* plot, int x, int y,
-    unsigned int a, unsigned int b)
-{
-    if (!gc_xor) {
-	GetGCXor(&gc_xor, plot->window);
-    }
-    XDrawArc(dpy, plot->window, gc_xor,
-	x - a, y - b, 2 * a, 2 * b, 0, 23040 /* 360 deg */);
-}
-
-#if 0
-void
-DrawCircle(plot_struct* plot, int x, int y, unsigned int r)
-{
-    DrawEllipse(plot, x, y, r, r);
-}
-
-void
-DrawLine(plot_struct* plot, int x1, int y1, int x2, int y2)
-{
-    if (!gc_xor) {
-	GetGCXor(&gc_xor, plot->window);
-    }
-    XDrawLine(dpy, plot->window, gc_xor, x1, y1, x2, y2);
-}
-#endif
-
-void
-DrawStringAt(plot_struct* plot, int x, int y, char* str)
-{
-    if (!gc_xor) {
-	GetGCXor(&gc_xor, plot->window);
-    }
-    XDrawString(dpy, plot->window, gc_xor, x, y, str, strlen(str));
-}
-
-
-#if 0
-void
-SetPointer(plot_struct* plot, int x, int y)
-{
-    plot->pointer_x = x;
-    plot->pointer_y = y;
-}
-#endif
 
 /* returns the time difference to the last click in milliseconds */
 long int
@@ -1722,10 +1643,6 @@ SetTime(plot_struct* plot, Time t)
     plot->time = t;
     return diff > 0 ? diff : 0;
 }
-
-
-
-
 
 void
 GetGCXor(GC* gc, Window window)
@@ -2441,6 +2358,18 @@ XEvent *event;
 	    UpdateWindow(plot);
 	}
 	break;
+    case EnterNotify:
+	plot = find_plot(event->xcrossing.window);
+	if (plot == current_plot) {
+	   gp_exec_event(GE_motion, (int)RevX(event->xcrossing.x), (int)RevY(event->xcrossing.y), 0, 0);
+	}
+	if (plot->zoombox_on) {
+	   DrawBox(plot);
+	   plot->zoombox_x2 = event->xcrossing.x;
+	   plot->zoombox_y2 = event->xcrossing.y;
+	   DrawBox(plot);
+	}
+	break;
     case MotionNotify:
 	update_modifiers(event->xmotion.state);
 	plot = find_plot(event->xmotion.window);
@@ -2471,11 +2400,6 @@ XEvent *event;
 		    (int)RevX(event->xbutton.x), (int)RevY(event->xbutton.y),
 		    event->xbutton.button, 0);
 	    }
-
-	    /* must be done *after* dispatching the button events */
-#if 0
-	    SetPointer(plot, event->xbutton.x, event->xbutton.y);
-#endif
 	}
 	break;
     case ButtonRelease:
@@ -2489,9 +2413,6 @@ XEvent *event;
 		(int)RevX(event->xbutton.x), (int)RevY(event->xbutton.y),
 		event->xbutton.button, (int) doubleclick );
 	}
-#if 0
-	SetPointer(plot, event->xbutton.x, event->xbutton.y);
-#endif
 	break;
 #endif /* USE_MOUSE */
 #ifdef EXPORT_SELECTION
@@ -2608,17 +2529,27 @@ char *argv[];
     XrmInitialize();
     XrmParseCommand(&dbCmd, options, Nopt, Name, &Argc, Argv);
     if (Argc > 1) {
+#if defined(USE_MOUSE) && !defined(OS2)
+	if (!strcmp(Argv[1], "-noevents")) {
+	    pipe_died = 1;
+	} else {
+#endif
 	fprintf(stderr, "\n\
 gnuplot: bad option: %s\n\
 gnuplot: X11 aborted.\n", Argv[1]);
 	EXIT(1);
+#if defined(USE_MOUSE) && !defined(OS2)
+	}
+#endif
     }
     if (pr_GetR(dbCmd, ".display"))
 	ldisplay = (char *) value.addr;
 
 /*---open display---------------------------------------------------------*/
 
+#ifdef USE_MOUSE
     XSetErrorHandler(ErrorHandler);
+#endif
     dpy = XOpenDisplay(ldisplay);
     if (!dpy) {
 	fprintf(stderr, "\n\
@@ -2989,7 +2920,7 @@ ProcessEvents(Window win)
 {
     XSelectInput(dpy, win, KeyPressMask | KeyReleaseMask
 	| StructureNotifyMask | PointerMotionMask | PointerMotionHintMask
-	| ButtonPressMask | ButtonReleaseMask | ExposureMask);
+	| ButtonPressMask | ButtonReleaseMask | ExposureMask | EnterWindowMask);
     XSync(dpy, 0);
 }
 

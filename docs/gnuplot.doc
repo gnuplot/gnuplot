@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.19 2000/01/26 10:22:53 joze Exp $
+C RCS $Id: gnuplot.doc,v 1.39 2000/02/11 19:18:37 lhecking Exp $
 C 3 December 1998
 C Copyright (C) 1986 - 1993, 1998   Thomas Williams, Colin Kelley
 C
@@ -2127,9 +2127,13 @@ C ... and restart the table:
  This allows a `gnuplot` command file to accept some commands from standard
  input.  Please see "help batch/interactive" for more details.
 
+ On some systems which support a popen function (Unix), the load file can be
+ read from a pipe by starting the file name with a '<'.
+
  Examples:
        load 'work.gnu'
        load "func.dat"
+       load "< loadfile_generator.sh"
 
  The `load` command is performed implicitly on any file names given as
  arguments to `gnuplot`.  These are loaded in the order specified, and
@@ -4853,9 +4857,20 @@ C ... and restart the table:
  <ctrl> is hold down, the coordinate system only is rotated which is
  useful for large data sets. A vertical motion of Button 2 with the
  shift key hold down changes the ticslevel.
+
  Mousing is not available in multiplot mode.  If multiplot is disabled
  using `unset multiplot` though,  the mouse will be turned on again and
  acts on the last plot (like replot do).
+
+ X11 specific implementation details:
+ Mouse support is turned on by default if standard input comes from
+ a terminal (tty). Mouse support is turned off, if standard input
+ does not come from a tty e.g. a pipe.  If you want to use mouse support
+ while writing to gnuplot from a pipe, the mouse must be turned on *before*
+ starting the x11 driver, e.g. immediately after startup with the explicit
+ command `set mouse`.  Beware: on some UNIX flavours, special input devices
+ as /dev/null might not be `select-able`; turning on the mouse when using
+ such devices will hang gnuplot.
 
  Syntax:
        set mouse [doubleclick <ms>] [nodoubleclick] \

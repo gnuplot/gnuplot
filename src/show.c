@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.32 1999/11/24 13:24:33 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.33 2000/02/11 19:14:34 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -1705,7 +1705,7 @@ show_historysize()
 {
     c_token++;
     if (gnuplot_history_size >= 0) {
-	fprintf(stderr, "\thistory size: %d\n", gnuplot_history_size);
+	fprintf(stderr, "\thistory size: %ld\n", gnuplot_history_size);
     } else {
 	fprintf(stderr, "\thistory will not be truncated.\n");
     }

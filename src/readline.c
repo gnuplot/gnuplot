@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: readline.c,v 1.8 2000/01/21 02:17:45 joze Exp $"); }
+static char *RCSid() { return RCSid("$Id: readline.c,v 1.18 2000/02/11 19:17:20 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - readline.c */
@@ -104,7 +104,7 @@ readline_ipc(const char* prompt)
     }
     return line_buffer;
 #else
-    return readline((char*) prompt);
+    return readline((const char*) prompt);
 #endif
 }
 
@@ -405,7 +405,7 @@ extend_cur_line()
 
 char *
 readline(prompt)
-char *prompt;
+const char *prompt;
 {
 
     int cur_char;
@@ -763,7 +763,7 @@ ansi_getc()
     int c;
 
 #ifdef USE_MOUSE
-    if (term->waitforinput && interactive)
+    if (term && term->waitforinput && interactive)
 	c = term->waitforinput();
     else
 #endif

@@ -192,40 +192,13 @@ enum {
 #endif
 
 
-char *stpcpy __PROTO((char *s,char *p));
-void alert __PROTO((void));
-void MousePosToGraphPosReal __PROTO(( int xx, int yy, double *x, double *y, double *x2, double *y2 ));
-char *GetCoordinateString __PROTO(( char *s, double x, double y ));
-char* xy_format __PROTO((void));
-char* zoombox_format __PROTO((void));
-char* xy1_format __PROTO((char* leader));
-char* GetAnnotateString __PROTO((char *s, double x, double y, int mode, char* fmt));
-char* xDateTimeFormat __PROTO((double x, char* b, int mode));
-void GetRulerString __PROTO(( char *p, double x, double y ));
-void update_ruler __PROTO((void));
-void apply_zoom __PROTO(( struct t_zoom *z ));
-void do_zoom __PROTO(( double xmin, double ymin, double x2min, double y2min, double xmax, double ymax, double x2max, double y2max ));
-void ZoomNext __PROTO((void));
-void ZoomPrevious __PROTO((void));
-void ZoomUnzoom __PROTO((void));
-void UpdateStatusline __PROTO((void));
-void UpdateStatuslineWithMouseSetting __PROTO((mouse_setting_t* ms));
 void recalc_statusline __PROTO((void));
-void incr_mousemode __PROTO((const int));
-void incr_clipboardmode __PROTO((const int));
-void event_keypress __PROTO((struct gp_event_t *ge));
-void ChangeView __PROTO((int x, int z));
-void event_buttonpress __PROTO((struct gp_event_t *ge));
-void event_buttonrelease __PROTO((struct gp_event_t *ge));
-void event_motion __PROTO((struct gp_event_t *ge));
-void event_modifier __PROTO((struct gp_event_t *ge));
-void event_plotdone __PROTO(());
-void event_print __PROTO((FILE* fp, char* s));
+void update_ruler __PROTO((void));
+void UpdateStatusline __PROTO((void));
 void do_event __PROTO((struct gp_event_t *ge));
 int plot_mode __PROTO((int mode));
-void turn_ruler_off __PROTO((void));
-void remove_label __PROTO((int x, int y));
-void put_label __PROTO((char* label, double x, double y));
+void event_reset __PROTO((struct gp_event_t *ge));
+void event_plotdone __PROTO((void));
 #ifdef OS2
 void update_menu_items_PM_terminal __PROTO((void));
 #endif

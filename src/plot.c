@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot.c,v 1.29 2000/01/22 16:53:44 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot.c,v 1.30 2000/02/11 19:18:11 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - plot.c */
@@ -47,6 +47,12 @@ static char *RCSid() { return RCSid("$Id: plot.c,v 1.29 2000/01/22 16:53:44 lhec
 #include "setshow.h"
 #include "term_api.h"
 #include "util.h"
+#ifdef USE_MOUSE
+#   ifndef OS2
+#       include "ipc.h"   /* for isatty_state */
+#   endif
+#   include "mouse.h" /* for mouse_setting */
+#endif
 
 /* Used nowhere else */
 #ifdef HAVE_SYS_UTSNAME_H
@@ -391,6 +397,16 @@ char **argv;
     interactive = TRUE;
 # else
     interactive = isatty(fileno(stdin));
+#if defined(USE_MOUSE) && !defined(OS2)
+    /* isatty_state is set here and nowhere else! (used in term/x11.trm) */
+    isatty_state = interactive;
+    if (!isatty_state) {
+	/* stdin is not from a tty --> Turn mouse off.
+	 * can be turned on again, e.g. if the user
+	 * wants to write on a pipe to gnuplot */
+	mouse_setting.on = 0;
+    }
+#endif
 # endif
 #endif /* !AMIGA_SC_6_1 */
 
@@ -754,12 +770,13 @@ ExecuteMacro(char *argv, int namelength)
     char pszName[CCHMAXPATH];
     char *rxArgStr;
     short sRc;
-    int rc;
+    long rc;
 
     if (namelength >= sizeof(pszName))
 	return 1;
     safe_strncpy(pszName, argv, namelength + 1);
     rxArgStr = &argv[namelength];
+    RXSTRPTR(rxRc) = NULL;
 
 #if 0
     /*
@@ -807,14 +824,33 @@ ExecuteMacro(char *argv, int namelength)
 		      &sRc,
 		      &rxRc);
     CallFromRexx = FALSE;
-    if (rc == -4)
-	rc = 0;			/* run was cancelled-don't give error message */
+
+   /* am: a word WRT errors codes:
+      the negative ones don't seem to have symbolic names, you can get
+      them from the OREXX reference, they're not in REXX Programming Guide -
+      no idea where to retrieve them from a Warp 3 reference ??
+      The positive ones are somehow referenced in REXXPG
+   */
+    if (rc < 0) {
+        /* REXX error */
+    } else if (rc > 0) {
+        /* Interpreter couldn't be started */
+        if (rc == -4)
+           /* run was cancelled, but don't give error message */
+            rc = 0;  
+    } else if (rc==0) {
+        /* all was fine */
+    }
 
 /* We don't we try to use rxRc ?
    BTW, don't use free() instead since it's allocated inside RexxStart()
    and not in our executable using the EMX libraries */
-    DosFreeMem(rxRc.strptr);
-    return rc;
+   if (RXSTRPTR(rxRc))
+       /* I guess it's NULL if something major went wrong,
+          NULL strings are usually not part of the REXX language ... */
+       DosFreeMem(rxRc.strptr);
+
+   return rc;
 }
 
 ULONG
