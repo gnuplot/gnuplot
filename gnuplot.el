@@ -13,11 +13,11 @@
 ; between the editted file and the plotting program:
 ; 1. send-line-to-gnu-plot - sends a single line to the plotting program for
 ;    execution. The line sent is the line the cursor is on,
-;    Bounded to Meta-E be default.
+;    Bounded to Meta-E by default.
 ; 2. send-region-to-gnu-plot - sends the region from the current mark
 ;    (mark-marker) to current position (point-marker) to the plotting program.
 ;    This function is convenient for sending a large block of commands.
-;    Bounded to Meta-R be default.
+;    Bounded to Meta-R by default.
 ; Both functions checks for existance of a buffer named gnu-plot-program
 ; and a process named "gnu-plot" hooked to it, and will restart a new process
 ; or buffer if none exists. The program to execute as process "gnu-plot" is
@@ -57,7 +57,7 @@ see send-line-to-gnu-plot and send-region-to-gnu-plot for more."
 (defun send-line-to-gnu-plot ()
   "Sends one line of code from current buffer to the GNU-PLOT program.
 
-Use to execute a line in the GNU-PLOT plotting program. The line send is
+Use to execute a line in the GNU-PLOT plotting program. The line sent is
 the line the cursor (point) is on.
 
 The GNU-PLOT plotting program buffer name is gnu-plot-program and the 
@@ -124,7 +124,7 @@ gnu-plot-program variable and may be changed."
 ;;; execute the program defined by gnu-plot-program.
 ;;;
 (defun make-gnu-plot-buffer ()
-  "Switch to iris-program buffer or create one if none exists"
+  "Switch to gnu-plot-program buffer or create one if none exists"
   (interactive)
   (if (get-buffer "gnu-plot-program")
     (if (not (get-process "gnu-plot"))

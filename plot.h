@@ -133,6 +133,9 @@
 #else
 #if defined( vms ) || defined( _CRAY ) || defined( NEXT )
 #include <float.h>
+#if defined ( NEXT )  /* bug in NeXT OS 2.0 */
+#define DBL_MAX 1.7976931348623157e+308 
+#endif
 #define VERYLARGE DBL_MAX
 #else
 #if defined(AMIGA_AC_5) || defined(AMIGA_LC_5_1)

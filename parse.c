@@ -66,17 +66,16 @@ static jmp_buf fpe_env;
 #ifdef __TURBOC__
 void fpe()
 #else
-#ifdef __ZTC__
+#if defined( __ZTC__ ) || defined( _CRAY )
 void fpe(an_int)
 int an_int;
 #else
-#ifdef _CRAY
-void fpe(an_int)
-int an_int;
+#ifdef NEXT
+void fpe(int an_int)
 #else
 fpe()
 #endif
-#endif
+#endif /* __ZTC__ || _CRAY */
 #endif
 {
 #ifdef PC	/* thanks to lotto@wjh12.UUCP for telling us about this  */

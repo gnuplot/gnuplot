@@ -35,8 +35,8 @@
  */
 
 char version[] = "3.0 ";
-char patchlevel[] = "0, Sep 29 91";
-char date[] = "Sun Sep 29 16:56:36 1991";
+char patchlevel[] = "1, Dec 1 91";
+char date[] = "Sun Dec 1 16:56:36 1991";
 
 /* override in Makefile */
 #ifndef CONTACT

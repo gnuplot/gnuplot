@@ -1,0 +1,344 @@
+/* GNUPLOT - ai.trm */
+/*
+ * Copyright (C) 1991   
+ *
+ * Permission to use, copy, and distribute this software and its
+ * documentation for any purpose with or without fee is hereby granted, 
+ * provided that the above copyright notice appear in all copies and 
+ * that both that copyright notice and this permission notice appear 
+ * in supporting documentation.
+ *
+ * Permission to modify the software is granted, but not the right to
+ * distribute the modified code.  Modifications are to be distributed 
+ * as patches to released version.
+ *  
+ * This software  is provided "as is" without express or implied warranty.
+ * 
+ * This file is included by ../term.c.
+ *
+ * This terminal driver supports:
+ *     aifm
+ *
+ * AUTHORS
+ *  Ray Ghanbari
+ * 
+ * send your comments or suggestions to (pixar!info-gnuplot@sun.com).
+ *
+ * The 'aifm' driver produces files editable by Adobe Illustrator 3.0
+ * To change font to Courier and font size to 20pts use 
+ * 'set term aifm "Courier" 20'.
+ * To switch to color output use
+ * 'set term aifm color'.
+ */
+
+
+/* AIFM driver by Ray Ghanbari, ray@mtl.mit.edu, 
+ *	based on PostScript driver by Russell Lang, rjl@monu1.cc.monash.edu.au */
+
+char ai_font[MAX_ID_LEN+1] = "Times-Roman" ; /* name of font */
+int ai_fontsize = 14;					 /* size of font in pts */
+BOOLEAN ai_color = FALSE;
+BOOLEAN ai_stroke = FALSE;
+int ai_page=0;			/* page count */
+int ai_path_count=0; 	/* count of lines in path */
+int ai_ang=0;			/* text angle */
+enum JUSTIFY ai_justify=LEFT;	/* text is flush left */
+
+
+#define AI_XOFF	50	/* page offset in pts */
+#define AI_YOFF	50
+
+#define AI_XMAX 5000
+#define AI_YMAX 3500
+
+#define AI_XLAST (AI_XMAX - 1)
+#define AI_YLAST (AI_YMAX - 1)
+
+#define AI_VTIC (AI_YMAX/80)
+#define AI_HTIC (AI_YMAX/80)
+
+#define AI_SC (10.0)				/* scale is 1pt = 10 units */
+#define AI_LW (0.5*AI_SC)		/* linewidth = 0.5 pts */
+
+#define AI_VCHAR (14*AI_SC)		/* default is 14 point characters */
+#define AI_HCHAR (14*AI_SC*6/10)
+
+
+AI_options()
+{
+	extern struct value *const_express();
+	extern double real();
+
+	if (!END_OF_COMMAND) {
+		if (almost_equals(c_token,"d$efault")) {
+			ai_color=FALSE;
+			strcpy(ai_font,"Times-Roman");
+			ai_fontsize = 14;
+			c_token++;
+		}
+	}
+
+	if (!END_OF_COMMAND) {
+		if (almost_equals(c_token,"m$onochrome")) {
+			ai_color=FALSE;
+			c_token++;
+		}
+		else if (almost_equals(c_token,"c$olor")) {
+			ai_color=TRUE;
+			c_token++;
+		}
+	}
+
+	if (!END_OF_COMMAND && isstring(c_token)) {
+		quote_str(ai_font,c_token);
+		c_token++;
+	}
+
+	if (!END_OF_COMMAND) {
+		/* We have font size specified */
+		struct value a;
+		ai_fontsize = (int)real(const_express(&a));
+		c_token++;
+		term_tbl[term].v_char = (unsigned int)(ai_fontsize*AI_SC);
+		term_tbl[term].h_char = (unsigned int)(ai_fontsize*AI_SC*6/10);
+	}
+
+	sprintf(term_options,"%s \"%s\" %d",
+		ai_color ? "color" : "monochrome",ai_font,ai_fontsize);
+}
+
+
+AI_init()
+{
+struct termentry *t = &term_tbl[term];
+int i;
+	ai_page = 0;
+	fprintf(outfile,"%%!PS-Adobe-2.0 EPSF-1.2\n");
+	fprintf(outfile,"%%%%BoundingBox: %d %d %d %d\n", AI_XOFF,AI_YOFF,
+		(int)((AI_XMAX)/AI_SC+0.5+AI_XOFF), 
+		(int)((AI_YMAX)/AI_SC+0.5+AI_YOFF) );
+	fprintf(outfile,"%%%%Template:\n");
+	fprintf(outfile,"%%%%EndComments\n");
+	fprintf(outfile,"%%%%EndProlog\n");
+}
+
+
+AI_graphics()
+{
+struct termentry *t = &term_tbl[term];
+	ai_page++;
+/*	fprintf(outfile,"%%%%Page: %d %d\n",ai_page,ai_page);*/
+	fprintf(outfile,"0 G\n");
+	fprintf(outfile,"1 j\n");
+	fprintf(outfile,"1 J\n");
+	fprintf(outfile,"u\n");
+	ai_path_count = 0;
+	ai_stroke = FALSE;
+}
+
+
+AI_text()
+{
+	if (ai_stroke) {
+		fprintf(outfile,"S\n");
+		ai_stroke = FALSE;
+	}
+	fprintf(outfile,"U\n");
+	ai_path_count = 0;
+}
+
+
+AI_reset()
+{
+	fprintf(outfile,"%%%%Trailer\n");
+/*	fprintf(outfile,"%%%%Pages: %d\n",ai_page);*/
+}
+
+
+AI_linetype(linetype)
+int linetype;
+{
+	if (ai_stroke) {
+		fprintf(outfile,"S\n");
+		ai_stroke = FALSE;
+	}
+	switch(linetype) {
+		case -2 : fprintf(outfile,"%.2f w\n",AI_LW/AI_SC*2.0);
+				if (ai_color) {
+					fprintf(outfile,"0 0 0 1 K\n");
+				}
+				else {				
+					fprintf(outfile,"[] 0 d\n");
+				}
+				break;
+				
+		case -1 : fprintf(outfile,"%.2f w\n",AI_LW/AI_SC/2.0);
+				if (ai_color) {
+					fprintf(outfile,"0 0 0 1 K\n");
+				}
+				else {				
+					fprintf(outfile,"[1 2] 0 d\n");
+				}
+				break;
+				
+		case 0 :  fprintf(outfile,"%.2f w\n",AI_LW/AI_SC);
+				if (ai_color) {
+					fprintf(outfile,"1 0 1 0 K\n");
+				}
+				else {				
+					fprintf(outfile,"[] 0 d\n");
+				}
+				break;
+				
+		case 1 :  fprintf(outfile,"%.2f w\n",AI_LW/AI_SC);
+				if (ai_color) {
+					fprintf(outfile,"1 1 0 0 K\n");
+				}
+				else {				
+					fprintf(outfile,"[4 2] 0 d\n");
+				}
+				break;
+				
+		case 2 :  fprintf(outfile,"%.2f w\n",AI_LW/AI_SC);
+				if (ai_color) {
+					fprintf(outfile,"0 1 1 0 K\n");
+				}
+				else {				
+					fprintf(outfile,"[2 3] 0 d\n");
+				}
+				break;
+				
+		case 3 :  fprintf(outfile,"%.2f w\n",AI_LW/AI_SC);
+				if (ai_color) {
+					fprintf(outfile,"0 1 0 0 K\n");
+				}
+				else {				
+					fprintf(outfile,"[1 1.5] 0 d\n");
+				}
+				break;
+				
+		case 4 :  fprintf(outfile,"%f w\n",AI_LW/AI_SC);
+				if (ai_color) {
+					fprintf(outfile,"1 0 0 0 K\n");
+				}
+				else {				
+					fprintf(outfile,"[5 2 1 2] 0 d\n");
+				}
+				break;
+				
+		case 5 : fprintf(outfile,"%.2f w\n",AI_LW/AI_SC);
+				if (ai_color) {
+					fprintf(outfile,"0 0 1 0 K\n");
+				}
+				else {				
+					fprintf(outfile,"[4 3 1 3] 0 d\n");
+				}
+				break;
+				
+		case 6 : fprintf(outfile,"%.2f w\n",AI_LW/AI_SC);
+				if (ai_color) {
+					fprintf(outfile,"0 0 0 1 K\n");
+				}
+				else {				
+					fprintf(outfile,"[2 2 2 4] 0 d\n");
+				}
+				break;
+				
+		case 7 : fprintf(outfile,"%.2f w\n",AI_LW/AI_SC);
+				if (ai_color) {
+					fprintf(outfile,"0 0.7 1 0 K\n");
+				}
+				else {				
+					fprintf(outfile,"[2 2 2 2 2 4] 0 d\n");
+				}
+				break;
+				
+		case 8 : fprintf(outfile,"%.2f w\n",AI_LW/AI_SC);
+				if (ai_color) {
+					fprintf(outfile,"0.5 0.5 0.5 0 K\n");
+				}
+				else {				
+					fprintf(outfile,"[2 2 2 2 2 2 2 4] 0 d\n");
+				}
+				break;
+		}
+				
+	ai_path_count = 0;
+}
+
+
+AI_move(x,y)
+unsigned int x,y;
+{
+	if (ai_stroke) fprintf(outfile,"S\n");
+	fprintf(outfile,"%.2f %.2f m\n", x/AI_SC, y/AI_SC);
+	ai_path_count += 1;
+	ai_stroke = TRUE;
+}
+
+
+AI_vector(x,y)
+unsigned int x,y;
+{
+	fprintf(outfile,"%.2f %.2f l\n", x/AI_SC, y/AI_SC);
+	ai_path_count += 1;
+	ai_stroke = TRUE;
+	if (ai_path_count >= 400) {
+		fprintf(outfile,"S\n%.2f %.2f m\n",x/AI_SC,y/AI_SC);
+		ai_path_count = 0;
+	}
+}
+
+
+AI_put_text(x,y,str)
+unsigned int x, y;
+char *str;
+{
+char ch;
+	if (ai_stroke) {
+		fprintf(outfile,"S\n");
+		ai_stroke = FALSE;
+	}
+	switch(ai_justify) {
+		case LEFT :   fprintf(outfile,"/_%s %d 0 0 0 z\n",ai_font,ai_fontsize);
+			break;
+		case CENTRE : fprintf(outfile,"/_%s %d 0 0 1 z\n",ai_font,ai_fontsize);
+			break;
+		case RIGHT :  fprintf(outfile,"/_%s %d 0 0 2 z\n",ai_font,ai_fontsize);
+			break;
+	}
+	if (ai_ang==0) {
+		fprintf(outfile,"[ 1 0 0 1 %.2f %.2f] e\n",
+			x/AI_SC,y/AI_SC - ai_fontsize/3.0);
+	}
+	else {
+		fprintf(outfile,"[ 0 1 -1 0 %.2f %.2f] e\n",
+			x/AI_SC - ai_fontsize/3.0,y/AI_SC);
+	}
+		
+	putc('(',outfile);
+	ch = *str++;
+	while(ch!='\0') {
+		if ( (ch=='(') || (ch==')') || (ch=='\\') )
+			putc('\\',outfile);
+		putc(ch,outfile);
+		ch = *str++;
+	}
+	fprintf(outfile,") t\nT\n");
+	ai_path_count = 0;
+}
+
+int AI_text_angle(ang)
+int ang;
+{
+	ai_ang=ang;
+	return TRUE;
+}
+
+int AI_justify_text(mode)
+enum JUSTIFY mode;
+{
+	ai_justify=mode;
+	return TRUE;
+}
+

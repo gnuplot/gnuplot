@@ -653,7 +653,7 @@ OutLine(line)
     /* built-in dumb pager */
     /* leave room for prompt line */
     if (pagelines >= SCREENSIZE - 2) {
-	   printf("Press return for more: ");
+	   fprintf(stderr,"Press return for more: ");
 	   do 
 		c = getchar();
 	   while (c != EOF && c != '\n');

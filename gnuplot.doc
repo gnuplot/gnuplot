@@ -145,7 +145,9 @@
 %Up Arrow@@same as ^P.
 %Down Arrow@@same as ^N.
 %_
-@end table 
+@end table
+ (The readline function in gnuplot is not the same as the readline used
+ in GNU BASH and GNU EMACS.  It is somewhat compatible however.) 
 2 comment
 ?comments
  Comments are supported as follows: a # may appear in most places in a line
@@ -699,8 +701,36 @@
 
  A simple example of plotting a 3-d data file is
  
+         set parametric
          splot 'glass.dat'
-
+ 
+ or
+ 
+         set noparametric
+         splot 'datafile.dat'
+ 
+ where the file datafile.dat might contain:
+ 
+         # The valley of the Gnu.
+         10
+         10
+         10
+ 
+         10
+         5
+         10
+ 
+         10
+         1
+         10
+ 
+         10
+         0
+         10
+ 
+ Note datafile.dat defines a 4 by 3 grid ( 4 rows of 3 points each ).
+ Rows are seperated by blank lines.
+ 
  For more information about 3-d plotting, see `splot`.
 4 using
 ?plot datafile using
@@ -1929,8 +1959,8 @@
          set terminal postscript {<mode>} {<color>}
                                  {"<fontname>"} {<fontsize>}
 
- where <mode> is `landscape`, `portrait` or `default`. Selecting default
- sets all options to their defaults.
+ where <mode> is `landscape`, `portrait`, `eps` or `default`. 
+ Selecting default sets all options to their defaults.
  <color> is either `color` or `monochrome`.
  "<fontname>" is the name of a valid PostScript font.
  <fontsize> is the size of the font in PostScript points, before 
@@ -1939,15 +1969,46 @@
  Default size of PostScript plot is landscape mode 10 inches wide 
  and 7 inches high.
 
+ To get EPS output, use the `eps` mode and make only one plot per file.
+ In `eps` mode the whole plot is halved in size; the fonts are half the 
+ given size, and the plot is 5 inches wide and 3.5 inches high.
+
  Examples:
  
-         set size 1,1
          set term postscript default       # old postscript
          set term postscript landscape 22  # old psbig
-         set size 0.5,0.5
-         set term postscript portrait 14   # old epsf1
-         set term postscript portrait 22   # old epsf2
-         set size 1,1; set term post landscape color "Times-Roman" 14 
+         set term postscript eps 14   # old epsf1
+         set term postscript eps 22   # old epsf2
+         set size 0.7,1.4
+         set term post portrait color "Times-Roman" 14 
+ 
+4 aifm
+?set terminal aifm
+?aifm
+ Several options may be set in the Adobe Illustrator 3.0 driver.
+
+ Syntax:
+         set terminal aifm {<color>}
+                                 {"<fontname>"} {<fontsize>}
+
+ Selecting default sets all options to their defaults.
+ <color> is either `color` or `monochrome`.
+ "<fontname>" is the name of a valid PostScript font.
+ <fontsize> is the size of the font in PostScript points, before 
+ scaling by the `set size` command.
+ Defaults are `monochrome`, "Courier", and 14pt.
+
+ Also, since AI does not really support multiple pages, multiple 
+ graphs will be output directly on one another.  However, each graph 
+ will be grouped individually, making it easy to separate them inside 
+ AI (just pick them up and move them).
+
+ Examples:
+ 
+         set term aifm 
+         set term aifm 22  
+         set size 0.7,1.4
+         set term aifm color "Times-Roman" 14 
  
 3 tics
 ?set tics
@@ -2457,8 +2518,6 @@
  See `show functions` and `show variables`.
 2 bugs
 ?bugs
- The atan() function does not work correctly for complex arguments.
- 
  The bessel functions do not work for complex arguments.
  
  The gamma function does not work for complex arguments.

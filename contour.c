@@ -63,6 +63,9 @@
 #define abs(x)  ((x) > 0 ? (x) : (-(x)))
 #define sqr(x)  ((x) * (x))
 
+#ifndef AMIGA_AC_5
+extern double sqrt();
+#endif /* not AMIGA_AC_5 */
 typedef double tri_diag[3];         /* Used to allocate the tri-diag matrix. */
 typedef double table_entry[4];	       /* Cubic spline interpolation 4 coef. */
 

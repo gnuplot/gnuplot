@@ -162,7 +162,8 @@ isletter(t_num)
 int t_num;
 {
 	return(token[t_num].is_token &&
-			(isalpha(input_line[token[t_num].start_index])));
+			((isalpha(input_line[token[t_num].start_index]))||
+			 (input_line[token[t_num].start_index] == '_')));
 }
 
 

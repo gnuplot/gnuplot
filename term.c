@@ -298,7 +298,7 @@ do_arrow(sx, sy, ex, ey, head)
 #include "term/hpljii.trm"
 #endif
 
-#ifdef HPLJII /* HP LaserJet III in HPGL mode */
+#ifdef HPLJIII /* HP LaserJet III in HPGL mode */
 #  ifndef HPGL
 #    define HPGL
 #  endif
@@ -353,6 +353,10 @@ do_arrow(sx, sy, ex, ey, head)
 #ifdef AED
 #include "term/aed.trm"
 #endif /* AED */
+
+#ifdef AIFM
+#include "term/ai.trm"
+#endif /* AIFM */
 
 #ifdef CGI
 #include "term/cgi.trm"
@@ -632,6 +636,15 @@ struct termentry term_tbl[] = {
 	   null_justify_text, do_point, do_arrow}
 #endif
 
+#ifdef AIFM
+    ,{"aifm", "Adobe Illustrator 3.0 Format",
+	   AI_XMAX, AI_YMAX, AI_VCHAR, AI_HCHAR, 
+	   AI_VTIC, AI_HTIC, AI_options, AI_init, AI_reset, 
+	   AI_text, null_scale, AI_graphics, AI_move, AI_vector, 
+	   AI_linetype, AI_put_text, AI_text_angle, 
+	   AI_justify_text, do_point, do_arrow}
+#endif
+
 #ifdef APOLLO
    	,{"apollo", "Apollo Graphics Primitive Resource, rescaling of subsequent plots after window resizing",
 	   0, 0, 0, 0, /* APOLLO_XMAX, APOLLO_YMAX, APOLLO_VCHAR, APOLLO_HCHAR, are filled in at run-time */
@@ -799,13 +812,13 @@ struct termentry term_tbl[] = {
 #endif
 
 #ifdef HPLJIII
-    ,{"hpljiii_port", "HP laserjet iii (using HPGL plot vectors), portrait mode",
+    ,{"pcl5_port", "HP laserjet iii (using HPGL plot vectors), portrait mode",
 	HPGL_XMAX, HPGL_YMAX, HPGL_VCHAR, HPGL_HCHAR,
 	HPGL_VTIC, HPGL_HTIC, options_null, HPLJIII_PORT_init, HPLJIII_reset,
 	HPGL_text, null_scale, HPGL_graphics, HPGL_move, HPGL_vector,
 	HPGL_linetype, HPGL_put_text, HPGL_text_angle,
 	null_justify_text, do_point, do_arrow}
-     ,{"hpljiii_land", "HP laserjet iii (using HPGL plot vectors), landscape mode",
+     ,{"pcl5_land", "HP laserjet iii (using HPGL plot vectors), landscape mode",
 	HPGL_XMAX, HPGL_YMAX, HPGL_VCHAR, HPGL_HCHAR,
 	HPGL_VTIC, HPGL_HTIC, options_null, HPLJIII_LAND_init, HPLJIII_reset,
 	HPGL_text, null_scale, HPGL_graphics, HPGL_move, HPGL_vector,
@@ -889,7 +902,7 @@ struct termentry term_tbl[] = {
     ,{"postscript", "PostScript graphics language [mode \042fontname\042 font_size]",
 	   PS_XMAX, PS_YMAX, PS_VCHAR, PS_HCHAR, 
 	   PS_VTIC, PS_HTIC, PS_options, PS_init, PS_reset, 
-	   PS_text, do_scale, PS_graphics, PS_move, PS_vector, 
+	   PS_text, null_scale, PS_graphics, PS_move, PS_vector, 
 	   PS_linetype, PS_put_text, PS_text_angle, 
 	   PS_justify_text, PS_point, do_arrow}
 #endif

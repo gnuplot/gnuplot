@@ -633,9 +633,9 @@ char *start_search;
 		if (!END_OF_COMMAND && !isstring(c_token)) {
 			struct value a;
 			ycol = (int)magnitude(const_express(&a));
+			xcol = ycol;
 			if (equals(c_token,":")) {
 				c_token++;      /* skip ":" */
-				xcol = ycol;
 				ycol = (int)magnitude(const_express(&a));
 				if (equals(c_token,":")) {
 					c_token++;      /* skip ":" */
@@ -869,16 +869,16 @@ adjust_yrange(curve)
     for (i = 0; i < npoints; i++) {
 	   cp = &(curve->points[i]);
 	   if (cp->type == INRANGE) {
-		  y = cp->y;
+		  y = log_y ? pow(10.0,cp->y) : cp->y;
 		  if ((autoscale_ly ||
-		       inrange(log_y ? pow(10.0, y) : y, ymin, ymax) ||
+		       inrange(y, ymin, ymax) ||
 		       polar)) {
 			 if (autoscale_ly) {
 				if (y < ymin) ymin = y;
 				if (y > ymax) ymax = y;
 				if (ebars) {
-				    ylow = cp->ylow;
-				    yhigh = cp->yhigh;
+				    ylow =  log_y ? pow(10.0,cp->ylow)  : cp->ylow;
+				    yhigh = log_y ? pow(10.0,cp->yhigh) : cp->yhigh;
 				    if (ylow < ymin) ymin = ylow;
 				    if (ylow > ymax) ymax = ylow;
 				    if (yhigh < ymin) ymin = yhigh;
@@ -950,6 +950,10 @@ char *start_search;
 			quotel_str(format, c_token);
 			c_token++;	/* skip format */
 		}
+	}
+	else {
+	    if ( only_z = !parametric )
+		zcol = 1;
 	}
 
 	switch (mapping3d) {

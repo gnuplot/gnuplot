@@ -1,7 +1,7 @@
 ############################################################
 #
 # GNUPLOT 3.0 Makefile (Unix X11 Motif/Athena support) for
-#  Apollo/Sun/Dec5000/IBMrs6000/HP9000/SGI/3B1/386IX
+#  Apollo/Sun/Dec5000/IBMrs6000/HP9000/SGI/3B1/386IX/Cray
 #
 # Original version by:
 #   oliveria@caen.engin.umich.edu (ROQUE DONIZETE DE OLIVEIRA)
@@ -203,7 +203,7 @@ DEC_M_FLAGS = \
 APOLLO_FLAGS = \
     	   CFLAGS="$(COPTS) $(OPTIONS)  -DGAMMA=lgamma" \
     	   LIBS="$(LIBS)" X11FLAGS="$(X11FLAGS)" \
-    	   X11INCLUDES="-I/usr/include/X11" \
+    	   X11INCLUDES="$(X11INCLUDES)" \
     	   X11LIBS="-L/usr/lib/X11 -lXaw -lXmu -lXt -lX11" \
     	   PLOTXFLAG="$(PLOTXFLAG)" GNUPLOT_X11=$(GNUPLOT_X11) \
     	   X11INSTALL="$(X11INSTALL)" \
@@ -224,6 +224,15 @@ HP_FLAGS = \
     	   PLOTXFLAG="$(PLOTXFLAG)" GNUPLOT_X11=$(GNUPLOT_X11) \
     	   X11INSTALL="$(X11INSTALL)" \
     	   TERMFLAGS="-Iterm -DX11"
+
+HP_M_FLAGS = \
+    	   CFLAGS="$(COPTS) $(OPTIONS) -DMEMSET -DMEMCPY -DGETCWD" \
+    	   LIBS="-lm" X11FLAGS="-DMOTIF -D_NO_PROTO" \
+    	   X11INCLUDES="-I/usr/include/Motif1.1 -I/usr/include/Motif1.1/Xm -I/usr/include/X11R4" \
+    	   X11LIBS="-L/usr/lib/Motif1.1 -L/usr/lib/X11R4 -lXm -lXt -lX11" \
+    	   PLOTXFLAG="$(PLOTXFLAG)" GNUPLOT_X11=$(GNUPLOT_X11) \
+    	   X11INSTALL="$(X11INSTALL)" \
+    	   TERMFLAGS=" -Iterm -DX11"
 
 SUN_FLAGS = \
     	   CFLAGS="$(COPTS) $(OPTIONS)" \
@@ -251,12 +260,12 @@ SGI_FLAGS = \
 
 SGIX11_FLAGS = \
     	   CFLAGS="$(COPTS) $(OPTIONS)" \
-    	   LIBS="-lm" X11FLAGS="$(X11FLAGS)" \
+    	   LIBS="-lgl_s -lm -lc_s" X11FLAGS="$(X11FLAGS)" \
     	   X11INCLUDES="-I/usr/include/X11 -I/usr/include/X11/Xaw" \
     	   X11LIBS="-L/usr/lib/X11 -lXaw -lXmu -lXt -lXext -lX11" \
      	   PLOTXFLAG="$(PLOTXFLAG)" GNUPLOT_X11=$(GNUPLOT_X11) \
      	   X11INSTALL="$(X11INSTALL)" \
-    	   TERMFLAGS="-Iterm -DX11"
+    	   TERMFLAGS="-Iterm -DX11 -DIRIS4D"
 
 CGI_FLAGS = \
     	   CFLAGS="$(COPTS) $(OPTIONS) -Dunix" \
@@ -303,12 +312,37 @@ AIX_M_FLAGS = \
     	   TERMFLAGS="$(TERMFLAGS)"
 
 NEXT_FLAGS = \
-    	   CFLAGS="$(COPTS) -DNOCWDRC -DGAMMA=lgamma -DNEXT" \
+    	   CFLAGS="$(COPTS) -DGAMMA=lgamma -DNEXT" \
     	   LIBS="-lm" X11FLAGS="$(X11FLAGS)" \
     	   X11INCLUDES=" " X11LIBS=" " PLOTXFLAG=" " \
     	   GNUPLOT_X11=" " X11INSTALL=x11_noinstall \
     	   TERMFLAGS="-Iterm"
 
+NEXT_X11_FLAGS = \
+    	   CFLAGS="$(COPTS) -DGAMMA=lgamma -DNEXT" \
+    	   LIBS="-lm" \
+           X11LIBS="-L/usr/lib/X11 -lXaw -lXmu -lXt -lX11" \
+    	   X11INCLUDES="$(X11INCLUDES)" X11FLAGS="$(X11FLAGS)" \
+    	   PLOTXFLAG="$(PLOTXFLAG)" GNUPLOT_X11=$(GNUPLOT_X11) \
+    	   X11INSTALL="$(X11INSTALL)" \
+    	   TERMFLAGS="-Iterm -DX11"
+
+CRAY_FLAGS = \
+	   CFLAGS="$(COPTS) $(OPTIONS) -DGETCWD -DNOVFORK" \
+	   LIBS="-lm" X11FLAGS=" " \
+	   X11INCLUDES=" " \
+	   X11LIBS=" " \
+	   PLOTXFLAG=" " GNUPLOT_X11=" " \
+	   X11INSTALL=x11_noinstall \
+	   TERMFLAGS="-Iterm"
+CRAY_X11_FLAGS = \
+	   CFLAGS="$(COPTS) $(OPTIONS) -DGETCWD -DNOVFORK" \
+	   LIBS="-lm" X11FLAGS="$(X11FLAGS)" \
+	   X11INCLUDES="$(X11INCLUDES)" \
+	   X11LIBS="$(X11LIBS)" \
+	   PLOTXFLAG="$(PLOTXFLAG)" GNUPLOT_X11="$(GNUPLOT_X11)" \
+	   X11INSTALL=$(X11INSTALL) \
+	   TERMFLAGS="-Iterm -DX11"
 ####################################################################
 # List of object files except version.o
 OBJS = bitmap.o command.o contour.o eval.o graphics.o graph3d.o help.o \
@@ -373,7 +407,7 @@ info:
 	@echo 
 	@echo "apollo, apollo_motif       for Apollo running SR10.3 with Apollo's X11R3"
 	@echo "dec, dec_motif             for Dec3100/5000 running Ultrix 3.1d with MIT's X11R4"
-	@echo "hp                         for HP/9000 700 series running HP/UX 8.0 with MIT's X11R4"
+	@echo "hp, hp_motif               for HP/9000 700 series running HP/UX 8.0 with MIT's X11R4"
 	@echo "sun                        for Sun sparcstation running SunOS 4.1 with suntools (no X11R4) "
 	@echo "sun_x11                    for Sun sparcstation running SunOS 4.1 with suntools and X11R4 "
 	@echo "sgi                        for Silicon Graphics IRIS4D machines (no X11R4) "
@@ -384,6 +418,8 @@ info:
 	@echo "386ix_x11                  for 386 machines running 386/ix with T.Roell X386"
 	@echo "ibmrs6000, ibmrs6000_motif for IBM RS/6000 running Aix 3.1 with IBM's X11R3"
 	@echo "x11r4, x11r4_motif         for a generic machine (like a sun or dec) with MIT's X11R4"
+	@echo "cray            for Cray Y-MP or Cray-2 running Unicos 6.0 or 6.1 (no X11R4)"
+	@echo "cray_x11        for Cray Y-MP or Cray-2 running Unicos 6.0 or 6.1 with X11R4"
 	@echo 
 	@echo "Examples:"
 	@echo
@@ -401,7 +437,9 @@ info:
 	@echo "         make sgi"
 	@echo "         make 3b1"
 	@echo "         make 386ix"
-	@echo "         make ibmrs6000    MANDEST='/usr/usr/misc/man/man1' COPTS='-O' "
+	@echo "         make ibmrs6000    MANDEST='/usr/um/misc/man/man1' COPTS='-O' "
+	@echo "         make cray"
+	@echo "         make cray_x11"
 	@echo 
 	@echo "If you just type 'make All' , it will build gnuplot for Unix X11R4/Athena"
 	@echo "and the following variables will be used as default:"
@@ -450,8 +488,14 @@ apollo_motif:
 hp:
 	$(MAKE) $(MFLAGS) $(MY_FLAGS) $(HP_FLAGS)       $(TARGET)
 
+hp_motif:
+	$(MAKE) $(MFLAGS) $(MY_FLAGS) $(HP_M_FLAGS)       $(TARGET)
+
 next:
 	$(MAKE) $(MFLAGS) $(MY_FLAGS) $(NEXT_FLAGS)     $(TARGET)
+
+next_x11:
+	$(MAKE) $(MFLAGS) $(MY_FLAGS) $(NEXT_X11_FLAGS)     $(TARGET)
 
 sun:
 	$(MAKE) $(MFLAGS) $(MY_FLAGS) $(SUN_FLAGS)      $(TARGET)
@@ -482,6 +526,10 @@ ibmrs6000:
 
 ibmrs6000_motif:
 	$(MAKE) $(MFLAGS) $(MY_FLAGS) $(AIX_M_FLAGS)    $(TARGET)
+cray:
+	$(MAKE) $(MFLAGS) $(MY_FLAGS) $(CRAY_FLAGS)     $(TARGET)
+cray_x11:
+	$(MAKE) $(MFLAGS) $(MY_FLAGS) $(CRAY_X11_FLAGS) $(TARGET)
 
 #############################################################
 # Targets that really do something
@@ -496,7 +544,7 @@ gnuplot: $(OBJS) version.o
 	$(LD) $(OBJS) version.o $(LIBS) -o gnuplot
 
 doc:
-	( cd docs; make $(MFLAGS) gnuplot.gih )
+	( cd docs; $(MAKE) $(MFLAGS) gnuplot.gih )
 
 gnuplot_x11: gnuplot_x11.c
 	$(CC) $(CFLAGS) $(X11FLAGS) $(X11INCLUDES) -o gnuplot_x11 gnuplot_x11.c $(X11LIBS)
@@ -527,7 +575,7 @@ install:
 Install: All man_install $(X11INSTALL) $(LASERGNU)
 	cp gnuplot     $(DEST)
 	strip $(DEST)/gnuplot
-	(cd docs; make $(MFLAGS) install-unix HELPDEST=$(HELPDEST))
+	( cd docs; $(MAKE) $(MFLAGS) install-unix HELPDEST=$(HELPDEST) )
 
 x11_install: gnuplot_x11
 	cp gnuplot_x11 $(DEST)
@@ -591,13 +639,13 @@ lint:
 
 clean:
 	rm -f *.o *~ *.bak term/*~ term/*.bak
-	(cd docs; make $(MFLAGS) clean)
-	(cd docs/latextut; make $(MFLAGS) clean)
+	( cd docs; $(MAKE) $(MFLAGS) clean )
+	( cd docs/latextut; $(MAKE) $(MFLAGS) clean )
 
 spotless:
 	rm -f *.o *~ *.bak term/*~ term/*.bak TAGS gnuplot gnuplot_x11
-	(cd docs; make $(MFLAGS) clean)
-	(cd docs/latextut; make $(MFLAGS) spotless)
+	( cd docs; $(MAKE) $(MFLAGS) clean )
+	( cd docs/latextut; $(MAKE) $(MFLAGS) spotless )
 
 ################################################################
 # Making shar files for mailing gnuplot

@@ -84,22 +84,22 @@ char *strcat(), *strcpy(), *strncpy();
  *
  *	 Scanning is performed by following rules:
  *
- *		Current char	token should contain
+ *	Current char	token should contain
  *     -------------    -----------------------
- *		1.  alpha		all following alpha-numerics
- *		2.  digit		0 or more following digits, 0 or 1 decimal point,
- *						  0 or more digits, 0 or 1 'e' or 'E',
- *						  0 or more digits.
- *		3.  ^,+,-,/		only current char
- *		    %,~,(,)
- *		    [,],;,:,
- *		    ?,comma
- *		4.  &,|,=,*		current char; also next if next is same
- *		5.  !,<,>		current char; also next if next is =
- *		6.  ", '		all chars up until matching quote
- *        7.  #          this token cuts off scanning of the line (DFK).
+ *	1.  alpha,_	all following alpha-numerics
+ *	2.  digit	0 or more following digits, 0 or 1 decimal point,
+ *				0 or more digits, 0 or 1 'e' or 'E',
+ *				0 or more digits.
+ *	3.  ^,+,-,/	only current char
+ *	    %,~,(,)
+ *	    [,],;,:,
+ *	    ?,comma
+ *	4.  &,|,=,*	current char; also next if next is same
+ *	5.  !,<,>	current char; also next if next is =
+ *	6.  ", '	all chars up until matching quote
+ *	7.  #		this token cuts off scanning of the line (DFK).
  *
- *		white space between tokens is ignored
+ *			white space between tokens is ignored
  */
 scanner(expression)
 char expression[];
@@ -122,7 +122,8 @@ again:
 			substitute(&expression[current],MAX_LINE_LEN - current);
 			goto again;
 		}
-		if (isalpha(expression[current])) {
+		/* allow _ to be the first character of an identifier */
+		if (isalpha(expression[current]) || expression[current] == '_') {
 			SCAN_IDENTIFIER;
 		} else if (isdigit(expression[current]) || expression[current] == '.'){
 			token[t_num].is_token = FALSE;

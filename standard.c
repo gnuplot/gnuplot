@@ -368,7 +368,7 @@ register double alpha, beta, x, y;
 f_atan()
 {
 struct value a;
-register double x, y;
+register double x, y, u, v, w, z;
 	(void) pop(&a);
 	x = real(&a); y = imag(&a);
 	if (y == 0.0)
@@ -376,9 +376,25 @@ register double x, y;
 	else if (x == 0.0 && fabs(y) == 1.0) {
 		undefined = TRUE;
 		push(complex(&a,0.0, 0.0));
-	} else
-		push( complex(&a,atan(2*x/(1-x*x-y*y)),
-	    		log((x*x+(y+1)*(y+1))/(x*x+(y-1)*(y-1)))/4) );
+	} else {
+	        if (x >= 0) {
+		        u = x;
+			v = y;
+		} else {
+		        u = -x;
+			v = -y;
+		}
+		
+	        z = atan(2*u/(1-u*u-v*v));
+		w = log((u*u+(v+1)*(v+1))/(u*u+(v-1)*(v-1)))/4;
+		if (z < 0)
+		        z = z + 2*PI_ON_TWO;
+		if (x < 0) {
+		        z = -z;
+			w = -w;
+		}
+		push( complex(&a,0.5*z, w) );
+	}
 }
 
 f_sinh()

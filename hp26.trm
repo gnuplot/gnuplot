@@ -107,7 +107,7 @@ HP26_put_text(x,y,str)
 int x, y;
 char *str;
 {
-	HP26_move(x,y - HP26_VCHAR/2);
+	HP26_move(x,y + HP26_VCHAR/2);
 	fputs("\033*dS",outfile);
 	fprintf(outfile,"\033*m3Q\033*l%s\n",str);
 	fputs("\033*dT",outfile);

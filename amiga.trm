@@ -47,22 +47,6 @@
 #include <intuition/screens.h>
 #include <graphics/text.h>
 #include <graphics/gfxbase.h>
-
-#define OSCAN_TEXT     (1)                   /*                            */
-#define SA_Dummy       (TAG_USER + 32)       /* This stuff is temporary    */
-#define SA_Overscan    (SA_Dummy + 0x0014)   /* until Aztec C implements   */
-#define STDSCREENWIDTH -1                    /* KS/WB 2.0 support.         */
-#define TAG_DONE       (0L)                  /*                            */
-#define TAG_USER       (1L<<31)              /*                            */
-                                             /*                            */
-typedef ULONG Tag;                           /*                            */
-                                             /*                            */
-struct TagItem                               /*                            */
-   {                                         /*                            */
-   Tag   ti_Tag;                             /*                            */
-   ULONG ti_Data;                            /*                            */
-   };                                        /*                            */
-
 #else
 /* You will have to use the Kickstart 2.0 header files for this to compile */
 #include <exec/types.h>
@@ -159,7 +143,7 @@ AMIGA_init()
   }
   if (IntuitionBase->LibNode.lib_Version <= 34) {
     /* We compute the vertical resolution for those poor NTSC-souls   :-)   */
-    if (GfxBase->DisplayFlags && PAL) AMIGA_ymax = 512;
+    if (GfxBase->DisplayFlags & PAL) AMIGA_ymax = 512;
     else AMIGA_ymax = 400;
     AMIGA_xmax = 640;
     AMIGA_NewScreen.Width = AMIGA_xmax;
@@ -174,14 +158,6 @@ AMIGA_init()
     /* Kickstart 2.0 support */
     AMIGA_NewScreen.Width = STDSCREENWIDTH;
     AMIGA_NewScreen.Height = STDSCREENHEIGHT;
-    /* I had to set TopEdge equal to 1 with my (probably outdated) software */
-    /* version of Kickstart 2.0 in order for the last line to be displayed */
-    /* correctly. Remove the next two lines and check if it still works */
-    /* with newer ROM-versions of Kickstart 2.0 */
-#ifdef AMIGA_LC_5_1
-    AMIGA_NewScreen.TopEdge = 1;
-    AMIGA_NewScreen.LeftEdge = 0;
-#endif
     AMIGA_Screen = OpenScreenTagList(&AMIGA_NewScreen,AMIGA_ScrTagList);
     if (AMIGA_Screen == NULL) {
       fprintf(stderr,"No Screen\n");

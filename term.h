@@ -102,6 +102,7 @@
 #define EPS60		/* Epson-style 60-dot per inch printers */
 #define EPSONP		/* Epson LX-800, Star NL-10, NX-1000 and lots of others */
 #define HPLJII		/* HP LaserJet II */
+#define HPLJIII		/* HP LaserJet III */
 #define LATEX		/* LATEX picture environment */
 
 /* These are for MSDOS only */

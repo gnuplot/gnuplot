@@ -195,3 +195,7 @@ plot.c) is used.
 
 The VMS version looks for the logical name GNUPLOT$HELP to locate 
 the help library.
+
+The CGI drivers need the CGIPATH environment variable to set the path
+to the CGI agents, and the CGIDISP and/or CGIPRNT environment
+variables to set the output devices.

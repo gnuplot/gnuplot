@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 1986, 1987, 1990   Thomas Williams, Colin Kelley
+ * Copyright (C) 1986, 1987, 1990, 1991   Thomas Williams, Colin Kelley
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted, 
@@ -11,7 +11,7 @@
  * distribute the modified code.  Modifications are to be distributed 
  * as patches to released version.
  *  
- * This software  is provided "as is" without express or implied warranty.
+ * This software is provided "as is" without express or implied warranty.
  * 
  *
  * AUTHORS
@@ -21,7 +21,15 @@
  * 
  *   Gnuplot 2.0 additions:
  *       Russell Lang, Dave Kotz, John Campbell.
+ *
+ *   Gnuplot 3.0 additions:
+ *       Gershon Elber and many others.
  * 
- * send your comments or suggestions to (pixar!info-gnuplot@sun.com).
- * 
+ * Send your comments or suggestions to 
+ *  pixar!info-gnuplot@sun.com.
+ * This is a mailing list; to join it send a note to 
+ *  pixar!info-gnuplot-request@sun.com.  
+ * Send bug reports to
+ *  pixar!bug-gnuplot@sun.com.
  */
+

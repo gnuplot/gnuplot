@@ -168,7 +168,11 @@ void tc_interrupt()
 void inter(an_int)
 int an_int;
 #else
+#ifdef NEXT
+void inter(int an_int)
+#else
 inter()
+#endif
 #endif
 #endif
 {

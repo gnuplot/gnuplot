@@ -54,6 +54,7 @@ int s_p = -1;   /* stack pointer */
  * System V and MSC 4.0 call this when they wants to print an error message.
  * Don't!
  */
+#ifndef _CRAY
 #ifdef MSDOS
 #ifdef __TURBOC__
 int matherr()	/* Turbo C */
@@ -76,6 +77,7 @@ int matherr()
 {
 	return (undefined = TRUE);		/* don't print error message */
 }
+#endif /* not _CRAY */
 
 
 reset_stack()

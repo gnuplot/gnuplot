@@ -59,6 +59,21 @@ HPLJIII_LAND_init()
 }
 
 
+HPLJIII_graphics()
+{
+	fprintf(outfile,
+	"\033%0B\nIN;\nSC0,%d,0,%d;\nSR%f,%f;\n",
+		HPGL_XMAX,HPGL_YMAX,
+		((double)(HPGL_HCHAR)*200/3/HPGL_XMAX),
+		((double)(HPGL_VCHAR)*100/2/HPGL_YMAX) );
+/*	 1    2             3 
+	1. reset to power-up defaults
+	2. set SCaling
+	3. set character size
+*/
+	HPGL_ang = 0;
+}
+
 HPGL_graphics()
 {
 	fprintf(outfile,
@@ -74,6 +89,17 @@ HPGL_graphics()
 	HPGL_ang = 0;
 }
 
+
+HPLJIII_text()
+{
+	fputs("PU;\nSP0;\n\033.Z\0",outfile);
+/*	       1    2     3
+	1. pen up
+	2. park pen
+	3. disable eavesdropping
+*/
+	fputs("\033%0A\033E\n",outfile);
+}
 
 HPGL_text()
 {
@@ -151,5 +177,5 @@ HPGL_reset()
 
 HPLJIII_reset()
 {
-	fputs("\033E\n",outfile);
+	fputs("\033%0A\033E\n",outfile);
 }

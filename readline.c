@@ -34,7 +34,8 @@
 #ifdef READLINE
 
 /* a small portable version of GNU's readline */
-
+/* this is not the BASH or GNU EMACS version of READLINE due to Copyleft 
+	restrictions */
 /* do not need any terminal capabilities except backspace,
 /* and space overwrites a character */
 
