@@ -2,7 +2,7 @@
 AUTOMAKE_OPTIONS = foreign 1.2h
 
 EXTRA_DIST = README Makefile.am.in compact.c driver.h impcodes.h \
-object.h $(CORETERM)
+object.h post.h $(CORETERM)
 
 # List of terminal drivers; must be created
 # prior to running automake
