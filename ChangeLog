@@ -1,9 +1,8 @@
 2004-03-07  Ethan Merritt  <merritt@u.washington.edu>
 	
-	* src/gplt_x11.c: Selecting linetype -2 happened to work, but
-	only because there was incorrect bounds checking. Now treat
-	LT_BACKGROUND, LT_NODRAW, and other negative linetypes as a
-	request for the background color.
+	* src/gplt_x11.c: Selecting linetype -2 worked only because bounds
+	checking was incorrect.  Now treat LT_BACKGROUND, LT_NODRAW, and other
+	negative linetypes as a request for the background color.
 
 	* src/term.c: Allow explicit vertical offset of 0 in enhanced text mode
 	overprint statement.  Patch by Harald Harders (bug report #911068).
