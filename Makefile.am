@@ -5,10 +5,10 @@ if BUILD_LISP_SUBDIR
 d_lisp = lisp
 endif
 
-SUBDIRS = config demo m4 term src docs man tutorial $(d_lisp)
+SUBDIRS = config m4 term src docs man demo tutorial $(d_lisp)
 
-EXTRA_DIST = BUGS FAQ GNUmakefile INSTALL PORTING README CodeStyle Copyright \
-INSTALL.gnu Makefile.maint PGPKEYS README.1ST djconfig.sh
+EXTRA_DIST = BUGS CodeStyle Copyright FAQ GNUmakefile INSTALL INSTALL.gnu \
+Makefile.maint PATCHLEVEL PGPKEYS PORTING README README.1ST README.exp VERSION
 
 ACLOCAL_AMFLAGS = -I m4
 
