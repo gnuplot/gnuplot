@@ -1,3 +1,12 @@
+2003-10-23  Ethan Merritt <merritt@u.washington.edu>
+
+	* term/x11.trm: Add a soft lock on the mousing pipe so that input
+	from stdin is delayed until completion of a query/response operation
+	over the mousing pipe.  This fixes the problem of input characters
+	being lost when stdin is fast (e.g. a script) and the X11 response
+	is slow. It does *not* fix the problem with unbuffered input being
+	lost, e.g. from awk scripts.
+	
 2003-10-22  Petr Mikulik  <mikulik@physics.muni.cz> 
 
 	* src/set.c reset_palette(): Added missing reset of variable

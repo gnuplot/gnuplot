@@ -1,5 +1,5 @@
 /*
- * $Id: x11.trm,v 1.80 2003/08/22 12:36:18 lhecking Exp $
+ * $Id: x11.trm,v 1.81 2003/09/12 14:36:06 broeker Exp $
  *
  */
 
@@ -195,6 +195,7 @@ static int do_raise = UNSET;
  * once per plot by the gnuplot_x11<->x11.trm font information query.
  */
 static TBOOLEAN default_font_size_known = FALSE;
+static TBOOLEAN IPC_LOCK = FALSE;
 #endif
 
 static int parse_driver __PROTO((const char *));
@@ -466,7 +467,9 @@ X11_waitforinput()
     static int l = 0;
     int n;
     int fd = fileno(stdin);
+    int repeat_count = 0;
 
+AGAIN:
     /* XXX:  if the input device it not a tty (e.g. /dev/null)
      *       mouse events are not processed. This is necessary
      *       as on some systems /dev/null is not selectable.
@@ -493,12 +496,29 @@ X11_waitforinput()
 		    l = 0;
 		    do_event(&ge);
 		    if (ge.type == GE_fontprops) {
-		    	FPRINTF((stderr,"X11_waitforinput: break on GE_fontprops\n"));
+		    	if (repeat_count > 0)
+		    	    FPRINTF((stderr,
+			        "X11_waitforinput: caught GE_fontprops after %d tries\n",
+				repeat_count));
 			return(GE_fontprops);
 		    }
 		}
 	    }
 	} while (!FD_ISSET(fd, &fds));
+
+    /* IPC_LOCK indicates that we are specifically waiting for a reply on */
+    /* the mousing channel.  If stdin unblocks first, defer reading it,   */
+    /* wait a few microseconds, and try again.                            */
+    /* FIXME EAM - Give up after 1.0 second.  This will drop input chars, */
+    /* but at least it won't hang forever if the X11 connection is bad.   */
+    if (IPC_LOCK) {
+#ifdef HAVE_USLEEP
+	usleep(10);
+#endif
+        if (repeat_count++ < 100000)
+	    goto AGAIN;
+    }
+
 #endif /* PIPE_IPC */
 
 # if 0
@@ -920,11 +940,13 @@ X11_graphics()
     /* to gnuplot_x11, then wait for it to return the resulting    */
     /* font size information (v_char and h_char).                  */
     if (!default_font_size_known) {
+	IPC_LOCK = TRUE;
 	X11_set_default_font(); 
 	FFLUSH();
 	if (ipc_back_fd >= 0)
 	    X11_waitforinput();
 	default_font_size_known = TRUE;
+	IPC_LOCK = FALSE;
     }
 #else
     X11_set_default_font(); 
