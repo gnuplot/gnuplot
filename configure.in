@@ -149,16 +149,15 @@ fi
 dnl Operating systems.
 dnl FIXME AC_DEFINE(ISC22)
 dnl FIXME AC_DEFINE(KSR)
-dnl Check for MSDOS and djgpp, NeXT, BeOS
+dnl Check for MSDOS and djgpp, NeXT, Apple MacOsX (NeXT like), BeOS
 gp_MSDOS
 gp_NEXT
+gp_APPLE
 gp_BEOS
 AC_SUBST(GNUPLOT_BE)
 
 dnl this has to be after -lsys_s on NeXT
-dnl FIXME test for a math function that is actually needed
-LIBS="$LIBS -lm"
-
+AC_CHECK_LIB(m,sin)
 
 dnl Header files. ANSI first
 dnl We prefer that the absense of a macro is the norm, so in syscfg.h
