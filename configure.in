@@ -1,12 +1,12 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot 3.7 on Unix.
 dnl
-dnl $Id: configure.in,v 1.84 2000/05/02 18:06:27 lhecking Exp $
+dnl $Id: configure.in,v 1.85 2000/05/04 21:50:41 joze Exp $
 dnl
 AC_INIT(src/graphics.c)
 AM_CONFIG_HEADER(config.h:config.hin)
 AC_PREREQ(2.13)
-AC_REVISION($Revision: 1.84 $)
+AC_REVISION($Revision: 1.85 $)
 
 VERSION="`cat $srcdir/VERSION`"
 AM_INIT_AUTOMAKE(gnuplot, $VERSION)
@@ -127,6 +127,12 @@ dnl new Enhanced Metafile Format driver
 AC_ARG_ENABLE(emf,dnl
 [  --enable-emf            enable Enhanced Metafile Format driver (EXPERIMENTAL)],,
 test -z "$enable_emf" && enable_emf=no
+)dnl
+
+dnl new epslatex driver
+AC_ARG_ENABLE(epslatex,dnl
+[  --enable-epslatex       enable epslatex driver (EXPERIMENTAL)],,
+test -z "$enable_epslatex" && enable_epslatex=no
 )dnl
 
 dnl use a different x11 driver name ?
@@ -259,15 +265,11 @@ dnl a trivial AC_CHECK_FUNCS(sigsetjmp) won't do
 dnl because sigsetjmp() might be a macro declared
 dnl in <setjmp.h>. (joze)
 AC_MSG_CHECKING(for sigsetjmp)
-AC_TRY_LINK([
-#include <setjmp.h>
-],[
-    jmp_buf env;
-    sigsetjmp(env, 1);
-],
-    AC_MSG_RESULT(yes);
-    AC_DEFINE(HAVE_SIGSETJMP, 1, [ Define if we have sigsetjmp(). ]),
-    AC_MSG_RESULT(no)
+AC_TRY_LINK([#include <setjmp.h>], [jmp_buf env; sigsetjmp(env, 1);],
+  [AC_MSG_RESULT(yes)
+   AC_DEFINE(HAVE_SIGSETJMP, 1,
+             [ Define if we have sigsetjmp(). ])],
+  AC_MSG_RESULT(no)
 )
 
 if test "$ac_cv_func_pclose" = yes && test "$ac_cv_func_popen" = yes ; then
@@ -408,19 +410,19 @@ if test "$with_png" != no; then
      AC_MSG_WARN([found z library but not zlib.h])
      AC_MSG_WARN([please add path to zlib.h to CPPFLAGS in Makefile])
     )
-    if test "$ac_cv_header_png_h" != no; then
+    if test "$ac_cv_header_png_h" = yes; then
       AC_EGREP_CPP([You lose], [#include "png.h"
 #if PNG_LIBPNG_VER < 89
 You lose.
 #endif
 ],
        AC_MSG_WARN([- libpng too old - not including png driver])
-       with_png=no)
+       ac_cv_header_png_h=no)
     else
       AC_MSG_WARN([- cannot check png version - compilation may fail])
     fi
 
-  if test "$with_png" != no; then
+  if test "$ac_cv_header_png_h" = yes; then
     AC_DEFINE(HAVE_LIBPNG, 1,
               [ Define if you have the png library. ])
   fi
@@ -508,6 +510,11 @@ if test "$enable_emf" = yes; then
             [ Define if you want to use the experimental Enhanced Metafile Format driver. ])
 fi
 
+if test "$enable_epslatex" = yes; then
+  AC_DEFINE(USE_EPSLATEX_DRIVER, 1,
+            [ Define if you want to use the experimental epslatex driver. ])
+fi
+
 dnl Substitute variables
 AC_SUBST(PACKAGE)
 AC_SUBST(VERSION)
@@ -572,7 +579,7 @@ AC_MSG_RESULT([
 test "$ac_cv_header_gd_h" = yes && \
   AC_MSG_RESULT([  Enable generation of GIF files])
 
-test "$ac_cv_header_zlib_h" = yes && \
+test "$ac_cv_header_png_h" = yes && \
   AC_MSG_RESULT([  Enable generation of PNG files])
 
 test "$with_cwdrc" = yes && \
@@ -613,8 +620,11 @@ else
   AC_MSG_RESULT([  Sort help/subtopic tables by column])
 fi
 
-test "$enable_emf" = yes &&\
+test "$enable_emf" = yes && \
   AC_MSG_RESULT([  Enable Enhanced Metafile Format terminal (EXPERIMENTAL)])
+
+test "$enable_epslatex" = yes && \
+  AC_MSG_RESULT([  Enable epslatex terminal (EXPERIMENTAL)])
 
 test "$enable_iris" = yes && \
   AC_MSG_RESULT([  Enable IRIS terminal])
