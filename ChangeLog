@@ -1,3 +1,28 @@
+1998-12-09  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* Makefile.in, makefile.all: Remove references to upd_make.sh. Move
+	references to makefile.r.
+
+	* makefile.r: Move to docs/old.
+
+	* misc.c: Save set []tics autofreq from Don Taber plus cleanup.
+
+	* upd_make.sh: Obsolete, removed.
+
+1998-12-09  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* plot3d.c(grid_nongrid_date): Fix broken dist == 0 handling.
+
+1998-12-09  Stefan Schroepfer  <scr@iis.fhg.de>
+
+	* makefile.nt: Move generated .hlp file to different directory.
+
+1998-12-09  Juergen v. Hagen  <vonHagen@engr.psu.edu>
+
+	* makefile.mgw: Updated.
+
+	* win/wgnuplib.h: Remove TMPF_VECTOR and TMPF_TRUETYPE defines.
+
 1998-12-08  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* 0BUGS: Add m[]tics entry, provided by Lucas Hart. Add entry about
@@ -57,6 +82,8 @@
 	* 0BUGS, 0INSTALL, 0README, NEWS, makefile.mgw, makefile.unx: Updated.
 
 1998-12-07  Lucas Hart  <hartl@ucs.orst.edu>
+
+	* fit.c: Add some messages.
 
 	* internal.c: More verbose error messages.
 
