@@ -1,3 +1,8 @@
+2004-11-02  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/set.c: Use 0 rather than NULL in initializing a union, to quiet
+	gcc warnings.
+
 2004-11-01  Daniel Sebald  <daniel.sebald@ieee.org>
 
 	* src/datafile.c (df_readbinary): Do not try to access Z coordinate
