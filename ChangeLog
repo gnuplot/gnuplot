@@ -1,3 +1,11 @@
+2004-11-24  Ethan Merritt  <merritt@u.washington.edu>
+
+	src/gplt_x11.c: Set background color for pattern-fill explicitly each
+	time.
+
+	term/svg.trm (SVG_GroupOpen SVG_DefineFillPattern): Allow palette colors
+	to be used in pattern fill.
+
 2004-11-23  Ethan Merritt  <merritt@u.washington.edu>
 
 	src/gplt_x11.c: Initialize mouse_format to null string. Fixes bug that

@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: svg.trm,v 1.43 2004/09/30 05:44:00 sfeam Exp $
+ * $Id: svg.trm,v 1.44 2004/11/13 04:39:07 sfeam Exp $
  */
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -177,9 +177,18 @@ SVG_GroupOpen ()
 {
     SVG_GroupFilledClose();
     if (!SVG_groupIsOpen)     {
-	fprintf (gpoutfile,
-		 "<g style=\"fill:none; color:%s; stroke:currentColor; stroke-width:%.2f\">\n",
-		 SVG_pens[SVG_Pen_RealID (SVG_LineType)].color,
+
+	fprintf (gpoutfile, "<g style=\"fill:none; color:%s; stroke:",
+		 SVG_pens[SVG_Pen_RealID (SVG_LineType)].color);
+
+#ifdef PM3D
+	if (SVG_use_pm3d_color)
+		fprintf(gpoutfile, "rgb(%3d, %3d, %3d)", SVG_red, SVG_green, SVG_blue);
+	else
+#endif
+		fprintf(gpoutfile, "currentColor");
+
+	fprintf (gpoutfile, "; stroke-width:%.2f\">\n",
 		 SVG_pens[SVG_Pen_RealID (SVG_LineType)].width * SVG_linewidth_factor);
 
 	SVG_groupIsOpen = TRUE;
@@ -319,6 +328,7 @@ SVG_DefineFillPattern(int fillpat)
 	SVG_fillPattern = fillpat;
 	SVG_PathClose();
 	SVG_fillPatternIndex++;
+
 	fprintf(gpoutfile,
 	    "\t<defs>\n"
 	    "\t\t<pattern id='gpPat%d' patternUnits='userSpaceOnUse' x='0' y='0' width='8' height='8'>\n",
@@ -351,8 +361,15 @@ SVG_DefineFillPattern(int fillpat)
 		    path="M-2,0 L4,12 M0,-4 L8,12 M4,-4 L10,8";
 		    break;
 	}
-	if (*path)
-	    fprintf(gpoutfile, "\t\t\t<path style = '%s:currentColor' d='%s'/>\n", style, path);
+	if (*path) {
+#ifdef PM3D
+	    if (SVG_use_pm3d_color)
+		fprintf(gpoutfile,"\t\t\t<path style=\"fill:none; %s:rgb(%d,%d,%d)\" d='%s'/>\n",
+		    style, SVG_red, SVG_green, SVG_blue, path);
+	    else
+#endif
+		fprintf(gpoutfile, "\t\t\t<path style = '%s:currentColor' d='%s'/>\n", style, path);
+	}
 	fputs("\t\t</pattern>\n" "\t</defs>\n", gpoutfile);
     }
 }
@@ -1016,7 +1033,7 @@ SVG_filled_polygon(int points, gpiPoint* corners)
     if (style == FS_PATTERN) {
 	/* make sure the pattern is defined (with the current stroke color)
 	 * must be defined AFTER the current group is opened with the color
-	 * attribue set, as the patterns use 'currentColor' */
+	 * attribute set, as the patterns use 'currentColor' */
 	SVG_DefineFillPattern(fillpar);
     }
 #endif

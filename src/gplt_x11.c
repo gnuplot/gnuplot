@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.121 2004/10/30 17:53:10 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.122 2004/11/24 04:45:18 sfeam Exp $"); }
 #endif
 
 #define X11_POLYLINE 1
@@ -2529,6 +2529,7 @@ exec_cmd(plot_struct *plot, char *command)
 			idx = stipple_halftone_num - 1;
 		    XSetStipple(dpy, *current_gc, stipple_halftone[idx]);
 		    XSetFillStyle(dpy, *current_gc, FillOpaqueStippled);
+		    XSetBackground(dpy, *current_gc, plot->cmap->colors[0]);
 		    break;
 		case FS_PATTERN:
 		    /* use fill pattern according to fillpattern */
@@ -2538,6 +2539,7 @@ exec_cmd(plot_struct *plot, char *command)
 		    idx = idx % stipple_pattern_num;
 		    XSetStipple(dpy, *current_gc, stipple_pattern[idx]);
 		    XSetFillStyle(dpy, *current_gc, FillOpaqueStippled);
+		    XSetBackground(dpy, *current_gc, plot->cmap->colors[0]);
 		    break;
 		case FS_EMPTY:
 		    /* fill with background color */
