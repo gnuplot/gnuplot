@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: pdf.trm,v 1.32 2004/07/02 23:58:40 sfeam Exp $
+ * $Id: pdf.trm,v 1.33 2004/07/04 23:58:47 sfeam Exp $
  */
 
 /*------------------------------
@@ -345,7 +345,9 @@ PDF_init ()
 	myPDF = PDF_new();
 
     /*open new PDF file */
-    if (PDF_open_fp(myPDF, gpoutfile) == -1)
+    /* HBB FIXME 20040708: PDF_open_file is deprecated, will have to
+     * be re-done again soon. */
+    if (PDF_open_file(myPDF, outstr) == -1)
 	int_error(NO_CARET, "Error:cannot open PDF file .\n");
 
 #ifdef PDF_DONT_COMPRESS
