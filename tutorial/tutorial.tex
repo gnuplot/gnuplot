@@ -1,7 +1,11 @@
 %
-% Tutorial for GNUPLOT plotting program, for LaTeX users
+% $Id: $
+%
+% Tutorial for gnuplot plotting program, for LaTeX users
 % David Kotz
 % Duke University Computer Science Department
+%
+% Slightly updated by the gnuplot team in 2004, for gnuplot 4.0.
 %
 % NOTE: If LaTeX runs out of memory processing plots,
 % add ``with lines 4'' to each curve in eg*.plt and rerun make.
@@ -10,24 +14,47 @@
 % some header info
 \input{header}
 
+
 \begin{document}
 
-\title{\LaTeX\ and the GNUPLOT Plotting
-Program\thanks{This document describes GNUPLOT version 3.0. All plots
-in this document were made with that version of GNUPLOT.} }
-\author{David Kotz}
-\date{July 3, 1991}
 
-\maketitle
+\begin{titlepage}
+
+\begin{center}
+{\Large \bf \LaTeX\ and the Gnuplot Plotting Program}
+
+\vskip2cm
+
+{\bf David Kotz} \\[0.4cm]
+Principal author of this tutorial for gnuplot 3.0, July 3, 1991 \\[1.0cm]
+
+{\bf current gnuplot team} \\[0.4cm]
+Updates of this tutorial for gnuplot 4.0, March 2004
+
+\vskip2cm
+
+Consequently, this document describes gnuplot version 3.0 and later.
+
+% All plots in this document were made with the version of gnuplot.
+
+\end{center}
+
+\vfil
+\vfil
+\tableofcontents
+\vfil
+
+\end{titlepage}
+
 
 \pagestyle{myheadings}
-\markright{GNUPLOT \LaTeX\ Tutorial Version 3.0}
+\markright{Gnuplot \LaTeX\ Tutorial Version 3.0}
 
 \currentspace % defined in header.tex
 
 \section{Introduction and History}
 
-GNUPLOT was originally developed by Colin Kelley and Thomas Williams
+Gnuplot was originally developed by Colin Kelley and Thomas Williams
 in 1986 to plot functions and data files on a variety of terminals.
 In 1988 and 1989 I created an alternate version, known as Gnu\TeX,
 that supported a new ``terminal type'' called {\tt latex}, so gnuplot
@@ -36,16 +63,16 @@ would output \LaTeX\ code. The plot could then be included in a
 by the {\tt latex} terminal, allowing the user to produce
 publication-quality plots.
 
-In late 1989 and early 1990 Gnu\TeX\ and a number of other GNUPLOT
-variants were merged together into a new release of GNUPLOT, 2.0. This
+In late 1989 and early 1990 Gnu\TeX\ and a number of other gnuplot
+variants were merged together into a new release of gnuplot, 2.0. This
 includes, among many other improvements, a \LaTeX\ driver derived from
 the one in Gnu\TeX. Former Gnu\TeX\ users are referred to
-Section~\ref{oldusers} for information about adapting to GNUPLOT.
-Anyone interested in using GNUPLOT with \LaTeX\ should read the next
-section, a tutorial, and the primary GNUPLOT manual.
+Section~\ref{oldusers} for information about adapting to gnuplot.
+Anyone interested in using gnuplot with \LaTeX\ should read the next
+section, a tutorial, and the primary gnuplot manual.
 
 The reader should note that the \LaTeX\ picture environments output by
-GNUPLOT can be quite large and complicated, and can easily exceed the
+gnuplot can be quite large and complicated, and can easily exceed the
 memory capacity of \TeX. If an enlarged version of \TeX\ is available,
 it is wise to use it. Otherwise, keep your plots simple and add
 \verb+\clearpage+ to your document where necessary.
@@ -56,46 +83,47 @@ efficient line-drawing, runs through \LaTeX\ faster, and uses less
 memory.  See Section~\ref{s:eepic} for more information.
 
 There is a small package of auxiliary files (makefiles and scripts)
-that I find useful for making \LaTeX\ plots with GNUPLOT. This is
+that I find useful for making \LaTeX\ plots with gnuplot. This is
 available for \verb+ftp+ as \verb+pub/gnuplot-latex.shar+ from
 \verb+cs.duke.edu+. I can mail copies (see the end of this paper for
 information).
 
-\section{Using GNUPLOT for \LaTeX: a Tutorial}
+\section{Using gnuplot for \LaTeX: a Tutorial}
 
-GNUPLOT is by nature an interactive program. Users making plots for
-\LaTeX\ will generally not use GNUPLOT interactively.  Whenever hard
-copy is desired from GNUPLOT, the program need not be run on a
+Gnuplot is by nature an interactive program. Users making plots for
+\LaTeX\ will generally not use gnuplot interactively.  Whenever hard
+copy is desired from gnuplot, the program need not be run on a
 graphics terminal. In this case the output is directed to a file or
 pipe, then sent to the appropriate output device. For example, output
 from the terminal type {\tt unixplot} may be sent to a program
 interpreting the Unix plotting standard. The terminal types {\tt
 imagen} and {\tt postscript} may be used for output to printers
 understanding those languages. (A shell script ({\tt lasergnu}) is
-supplied with the distribution that will accept a GNUPLOT command or
+supplied with the distribution that will accept a gnuplot command or
 input file and send the output to an Imagen or Postscript laser
 printer. This script may have been adapted to your site.) The terminal
 type {\tt fig} outputs FIG code that can be read by the Fig graphics
 program and translated into forms usable in both \TeX\ and
 \LaTeX\ documents.
 
-We now ignore the interactive nature of GNUPLOT and provide the input
-to GNUPLOT from a file, \ie,
+We now ignore the interactive nature of gnuplot and provide the input
+to gnuplot from a file, \ie,
 \begin{verbatim}
-      gnuplot gnu.input
+      gnuplot plotcommands.gp
 \end{verbatim}
-In this example, all of the commands to GNUPLOT are contained in the
-file {\tt gnu.input}. Multiple filenames may be supplied to GNUPLOT
+In this example, all of the commands to gnuplot are contained in the
+file {\tt plotcommands.gp}. Multiple filenames may be supplied to gnuplot
 this way, read in the order they are given.  The output (one or more
 plots) may be piped to another program or redirected to a file.
 Usually, however, we direct the output explicitly with an instruction
-to GNUPLOT (the {\tt set output} command). GNUPLOT continues to print
-error messages to the terminal (stderr).
+to gnuplot (the {\tt set output "outfile.tex"} command). Gnuplot continues to
+print error messages to the terminal (stderr). After printing, the output file
+has to be closed by {\tt set output}, \ie{} without the file name specification.
 
 \paragraph{Example 1:} Here is a first example, producing a plot for
-this document. The GNUPLOT input file is given below, and the output
+this document. The gnuplot input file is given below, and the output
 appears as Figure~\ref{eg1}. The input file defines the output to be
-in \LaTeX, gives a file name for the output, and plots $y=sin(x)$ for
+in \LaTeX, gives a file name for the output, and plots $y=\sin(x)$ for
 $x$ on $[-\pi,\pi]$. To produce the figure, I simply
 \verb+\input{eg1}+ in a {\tt center} environment in a {\tt figure}
 environment. In following examples, I will enclose the figure in a box
@@ -113,14 +141,16 @@ to make it look a little better.
   \begin{center}
     \input{eg1}
   \end{center}
-  \caption{A first example: $y=sin(x)$}
+  \caption{A first example: $y=\sin(x)$.}
   \label{eg1}
 \end{figure}
 
-Note that GNUPLOT has drawn in the axes, labeled the tic marks for us,
+Note that gnuplot has drawn in the axes, labeled the tic marks for us,
 scaled the $y$ axis automatically, and added a key in the
 upper-right-hand corner (this may be moved with the {\tt set key}
-command, and removed with {\tt set nokey}).
+command, and removed with {\tt unset key}%
+\footnote{In gnuplot version 4.0, the syntax {\tt set noXXX} changed to
+{\tt unset XXX}.}).
 
 This is the default line style for the \LaTeX\ driver.  Because of the
 limited picture capabilities of \LaTeX, many dots are required to
@@ -138,7 +168,7 @@ some labels.  This input file produces Figure~\ref{eg2}.
     set output "eg2.tex"
     set size 5/5., 4/3.
     set format xy "$%g$"
-    set title "This is a plot of $y=sin(x)$"
+    set title "This is a plot of $y=\\sin(x)$"
     set xlabel "This is the $x$ axis"
     set ylabel "This is\\the\\$y$ axis"
     plot [0:6.28] [0:1] sin(x)
@@ -172,7 +202,7 @@ A title for the plot and labels for the axes were set up in the next
 three commands.  Note that they are processed by \LaTeX\ and so may
 have math mode and other symbols in them. The ylabel may have multiple
 lines, delineated with \verb+\\+.  The ylabel can be moved around with
-optional offset parameters (see {\tt set ylabel} in the GNUPLOT
+optional offset parameters (see {\tt set ylabel} in the gnuplot
 manual). Typically, the ylabel needs to be moved to the left to avoid
 interfering with the left-hand side of the plot.  Once these labels
 are set up, they will be used for all subsequent plot commands until
@@ -182,7 +212,7 @@ not be interpreted. We have also defined the range of both $x$ (now
 $[0,2\pi]$) and $y$ (here $[0,1]$).
 
 So far we have plotted one curve, $y=\sin(x)$, on one plot. In
-GNUPLOT, each {\tt plot} command generates a new plot. If the output
+gnuplot, each {\tt plot} command generates a new plot. If the output
 is to a screen, the screen is cleared. If to a printer, a new page is
 produced. In the {\tt latex} case, a new picture is started. It is not
 likely that \LaTeX\ users will want this to happen, so generally each
@@ -237,7 +267,7 @@ linespoints} styles use a different line style for each curve on the
 plot (in this example the dots have different spacing). The
 style {\tt impulses} draws a perpendicular from each point to the
 $x$-axis. Finally, the {\tt errorbars} style can draw error bars at
-each data point (see the GNUPLOT manual).
+each data point (see the gnuplot manual).
 
 \paragraph{Example 4:} In the above plots of $\sin(x)$, it would make
 more sense to label the axis in units of $\pi$. The position and
@@ -254,7 +284,7 @@ the following example, shown in Figure~\ref{eg4}.
     set title "This is $\sin(x)$"
     set xlabel "This is the $x$ axis"
     set ylabel "$\sin(x)$"
-    set nokey
+    unset key
     set xtics -pi, pi/4
     plot [-pi:pi] [-1:1] sin(x)
 \end{verbatim}
@@ -268,7 +298,7 @@ the following example, shown in Figure~\ref{eg4}.
   \label{eg4}
 }
 
-Since {\tt pi} is a predefined variable in GNUPLOT, we can use it
+Since {\tt pi} is a predefined variable in gnuplot, we can use it
 anywhere we may use an expression. The {\tt set xtics} command here
 specifies that the tics on the $x$ axis start at $-\pi$ and increment
 by $\pi/4$. Since no end point is given, the tics continue to the
@@ -303,8 +333,8 @@ command for readability.
 \paragraph{Going further:} You should now be able to make a variety of
 plots for your \LaTeX\ document. We will present a final example
 without explanation that showcases some of the capabilities of
-GNUPLOT. You may find documentation for the various commands in the
-GNUPLOT manual, though hopefully this example is somewhat
+gnuplot. You may find documentation for the various commands in the
+gnuplot manual, though hopefully this example is somewhat
 self-explanatory. This is shown in Figure~\ref{eg6}.
 
 \singlespace
@@ -346,12 +376,12 @@ line and point types available in Figure~\ref{linepoint}.
 }
 
 \subsection{Summary --- Use with \LaTeX}
-In summary, to use the \LaTeX\ facilities of GNUPLOT, the first
-command to GNUPLOT should be
+In summary, to use the \LaTeX\ facilities of gnuplot, the first
+command to gnuplot should be
 \begin{syntax}
     set terminal latex
 \end{syntax}
-and the output of GNUPLOT should be directed to a file, for example,
+and the output of gnuplot should be directed to a file, for example,
 \begin{verbatim}
     set output "plot.tex"
 \end{verbatim}
@@ -361,12 +391,19 @@ command
 \begin{verbatim}
     set size 1,2
 \end{verbatim}
-tells GNUPLOT to use a 5 inch wide by 6 inch high box for the plot.
+tells gnuplot to use a 5 inch wide by 6 inch high box for the plot.
 The numbers given are {\em scale factors}, not the actual size.  The
 default is 5 inches by 3 inches.  This is the size of the complete
 plot, including all labels.
 
-When finished, the file will contain all of the plots you have
+Then you do the (s)plot, and finally issue commands to close the file and
+switch the terminal back to the default by
+\begin{verbatim}
+    set output
+    set terminal pop
+\end{verbatim}
+
+Finally, the file will contain all of the plots you have
 specified (you probably only want one plot per file). This file can
 then be used in a \LaTeX\ document, \eg,
 
@@ -384,7 +421,7 @@ This puts the plot into a figure.
 You will also want to read about the following commands: {\tt set
 title, set xlabel, set ylabel, set key, set label, set xtics, set
 ytics}, and {\tt set clip}.  These are all described in the regular
-GNUPLOT manual.
+gnuplot manual.
 
 \section{Use with EEPIC}
 \label{s:eepic}
@@ -397,8 +434,8 @@ dvi} file will be smaller. The quality of the output is about the
 same. If you change the source, you can generate some more interesting
 line styles.
 
-To use EEPIC, set GNUPLOT's terminal type to {\tt eepic} instead of
-{\tt latex}, and use GNUPLOT as before. The line styles will change.
+To use EEPIC, set gnuplot's terminal type to {\tt eepic} instead of
+{\tt latex}, and use gnuplot as before. The line styles will change.
 Include the file {\tt plot.tex} in your document as before, along with
 the document style options {\tt [epic,eepic]}.
 
@@ -407,18 +444,49 @@ the document style options {\tt [epic,eepic]}.
 
 Former Gnu\TeX\ users may be pleased with many of the new features
 (many inspired by your suggestions!), but will also find many changes.
-GNUPLOT will {\em not\/} run all Gnu\TeX\ input files unchanged.
-Several Gnu\TeX\ features were not included in GNUPLOT because they
+gnuplot will \emph{not} run all Gnu\TeX\ input files unchanged.
+Several Gnu\TeX\ features were not included in gnuplot because they
 were specific to the \LaTeX\ driver. I encourage you to use the newer
-GNUPLOT.  A translator is available that attempts to translate your
-old Gnu\TeX\ 1.6 input files into GNUPLOT 3.0 files. You can ftp it
+gnuplot.  A translator is available that attempts to translate your
+old Gnu\TeX\ 1.6 input files into gnuplot 3.0 files. You can ftp it
 from \verb+cs.duke.edu+ as \verb+dist/sources/gnuplot/gnut2p.tar.Z+.
 This file also contains directions and a list of changes from Gnu\TeX\
-to GNUPLOT.
+to gnuplot.
 
-\section{Contact}
-For general GNUPLOT questions, send mail to the GNUPLOT mailing list
-(\verb+info-gnuplot@dartmouth.edu+) or post to the GNUPLOT newsgroup
-(\verb+comp.graphics.apps.gnuplot+).
+
+\section{What is new for \TeX{} and \LaTeX{} terminals in gnuplot 4.0}
+
+In addition to the \texttt{latex} terminal, the following \LaTeX-friendly
+terminals are available:
+
+\begin{itemize}
+\item \texttt{emtex}: Like the \texttt{latex} terminal, but supports emtex
+specials: any line slopes contrary to a very limited set of \LaTeX{} slopes.
+
+\item \texttt{epslatex}: Combined \LaTeX{} and postscript parts for text and
+lines, respectively, with the postscript part included by
+\verb+\includegraphics{...}+ command.
+
+\item \texttt{pstex} and \texttt{pslatex}: Combined \TeX{} / \LaTeX{} and 
+postscript parts for text and lines, respectively, included by
+\verb+\special{psfile=...}+ command.
+
+\item \texttt{mf} and \texttt{mp}: Produces metafont and metapost outputs.
+
+\end{itemize}
+
+See helps of these terminals for more details about their usage.
+
+In addition, the \texttt{postscript eps enhanced} is the most useful for \TeX{}
+and \LaTeX{} if you don't insist of using \TeX{} fonts for the graph labels, and
+\texttt{pdf enhanced} and \texttt{png enhanced} for pdf\LaTeX{}.
+
+
+\section{Contact for help}
+
+For general gnuplot questions, the gnuplot mailing list
+\url{info-gnuplot@lists.sourceforge.net} is where you can send your e-mail, or
+you can use gnuplot newsgroup \url{comp.graphics.apps.gnuplot}. Addional sources
+of information are available on gnuplot homepage \url{www.gnuplot.info}.
 
 \end{document}

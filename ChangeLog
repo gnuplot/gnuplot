@@ -1,5 +1,8 @@
 2004-03-11  Petr Mikulik  <mikulik@physics.muni.cz>
 
+	*  tutorial/tutorial.tex tutorial/header.tex: Updates about TeX-friendly
+	terminals in gnuplot 4.0.
+
 	* term/gd.trm term/gif.trm: Don't print debugging message.
 
 2004-03-10  Ethan Merritt  <merritt@u.washington.edu>
