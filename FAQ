@@ -105,10 +105,10 @@ Contents
 
 This document is posted about once every two weeks to the newsgroups  ~
 comp.graphics.apps.gnuplot. Its newest (plaintext) version is available via
-anonymous ftp from ftp.gnuplot.info in /pub/gnuplot/faq/gnuplot-faq.txt.
+anonymous ftp from ftp.gnuplot.info in /pub/gnuplot/faq/faq.txt.
 
 If you have access to the WWW, you can get the newest version of this document
-from http://www.ucc.ie/gnuplot/gnuplot-faq.html.
+from http://www.ucc.ie/gnuplot/faq.html.
 
 Today's version is version $Revision: 1.1.1.1 $, dated $Date: 2002/12/07 18:33:
 30 $
@@ -129,8 +129,8 @@ scientists for graphic data representation. gnuplot is copyrighted, but freely
 distributable; you don't have to pay for it.
 
 This document deals with gnuplot Version 3.7 which is the latest official
-release as of December 10, 2002. References to bug-fix versions or (recent)
-beta versions are explicitly marked.
+release as of January 13, 2003. References to bug-fix versions or (recent) beta
+versions are explicitly marked.
 
 1.2 How did it come about and why is it called gnuplot?
 
@@ -496,7 +496,7 @@ There is new version including lots of patches from the net that is not
 maintained by the author called netpbm, with the newest version called
 netpbm-1mar1994.tar.gz.
 
-Check archie (see Q[*] ) for an archive site near you.
+Check archie (see Q2.2) for an archive site near you.
 
 For Microso$t Windows and MacOS you can use the clip board to copy your graph
 and paste it into your favourite Windows or MacOS word processor.
@@ -1097,7 +1097,7 @@ The command line arguments were:
 latex2html -split 0 -show_section_numbers -html_version 4.0 -nonavigation
 faq.tex
 
-The translation was initiated by Lars Hecking on 2002-12-10
+The translation was initiated by Lars Hecking on 2003-01-13
 -------------------------------------------------------------------------------
 
-Lars Hecking 2002-12-10
+Lars Hecking 2003-01-13
