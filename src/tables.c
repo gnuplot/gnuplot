@@ -1,4 +1,4 @@
-/* $Id: tables.c,v 1.10 1999/10/29 18:52:53 lhecking Exp $ */
+/* $Id: tables.c,v 1.11 1999/11/08 19:24:34 lhecking Exp $ */
 
 /* GNUPLOT - tables.c */
 
@@ -275,43 +275,53 @@ struct gen_table set_tbl[] =
     { NULL, S_INVALID }
 };
 
+/* 'set encoding' options */
+struct gen_table set_encoding_tbl[] =
+{
+    { "def$ault", S_ENC_DEFAULT },
+    { "iso$_8859_1", S_ENC_ISO8859_1 },
+    { "cp4$37", S_ENC_CP437 },
+    { "cp8$50", S_ENC_CP850 },
+    { NULL, S_ENC_INVALID }
+};
+
 /* 'set hidden3d' options */
 struct gen_table set_hidden3d_tbl[] =
 {
-    { "def$aults", H_DEFAULTS },
-    { "off$set", H_OFFSET },
-    { "nooff$set", H_NOOFFSET },
-    { "tri$anglepattern", H_TRIANGLEPATTERN },
-    { "undef$ined", H_UNDEFINED },
-    { "nound$efined", H_NOUNDEFINED },
-    { "alt$diagonal", H_ALTDIAGONAL },
-    { "noalt$diagonal", H_NOALTDIAGONAL },
-    { "bent$over", H_BENTOVER },
-    { "nobent$over", H_NOBENTOVER },
-    { NULL, H_INVALID }
+    { "def$aults", S_HI_DEFAULTS },
+    { "off$set", S_HI_OFFSET },
+    { "nooff$set", S_HI_NOOFFSET },
+    { "tri$anglepattern", S_HI_TRIANGLEPATTERN },
+    { "undef$ined", S_HI_UNDEFINED },
+    { "nound$efined", S_HI_NOUNDEFINED },
+    { "alt$diagonal", S_HI_ALTDIAGONAL },
+    { "noalt$diagonal", S_HI_NOALTDIAGONAL },
+    { "bent$over", S_HI_BENTOVER },
+    { "nobent$over", S_HI_NOBENTOVER },
+    { NULL, S_HI_INVALID }
 };
 
 /* 'set key' options */
 struct gen_table set_key_tbl[] =
 {
-    { "t$op", KEY_TOP },
-    { "b$ottom", KEY_BOTTOM },
-    { "l$eft", KEY_LEFT },
-    { "r$ight", KEY_RIGHT },
-    { "u$nder", KEY_UNDER },
-    { "be$low", KEY_UNDER },
-    { "o$utside", KEY_OUTSIDE },
-    { "L$eft", KEY_LLEFT },
-    { "R$ight", KEY_RRIGHT },
-    { "rev$erse", KEY_REVERSE },
-    { "norev$erse", KEY_NOREVERSE },
-    { "b$ox", KEY_BOX },
-    { "nob$ox", KEY_NOBOX },
-    { "sa$mplen", KEY_SAMPLEN },
-    { "sp$acing", KEY_SPACING },
-    { "w$idth", KEY_WIDTH },
-    { "ti$tle", KEY_TITLE },
-    { NULL, KEY_INVALID }
+    { "t$op", S_KEY_TOP },
+    { "b$ottom", S_KEY_BOTTOM },
+    { "l$eft", S_KEY_LEFT },
+    { "r$ight", S_KEY_RIGHT },
+    { "u$nder", S_KEY_UNDER },
+    { "be$low", S_KEY_UNDER },
+    { "o$utside", S_KEY_OUTSIDE },
+    { "L$eft", S_KEY_LLEFT },
+    { "R$ight", S_KEY_RRIGHT },
+    { "rev$erse", S_KEY_REVERSE },
+    { "norev$erse", S_KEY_NOREVERSE },
+    { "b$ox", S_KEY_BOX },
+    { "nob$ox", S_KEY_NOBOX },
+    { "sa$mplen", S_KEY_SAMPLEN },
+    { "sp$acing", S_KEY_SPACING },
+    { "w$idth", S_KEY_WIDTH },
+    { "ti$tle", S_KEY_TITLE },
+    { NULL, S_KEY_INVALID }
 };
 
 struct gen_table show_style_tbl[] =

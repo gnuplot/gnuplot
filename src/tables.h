@@ -1,4 +1,4 @@
-/* $Id: tables.h,v 1.10 1999/10/29 18:52:53 lhecking Exp $ */
+/* $Id: tables.h,v 1.11 1999/11/08 19:24:18 lhecking Exp $ */
 
 /* GNUPLOT - tables.h */
 
@@ -103,18 +103,24 @@ enum set_id {
     S_ZERO, S_ZEROAXIS, S_XZEROAXIS, S_X2ZEROAXIS, S_YZEROAXIS, S_Y2ZEROAXIS
 };
 
+enum set_encoding_id {
+   S_ENC_DEFAULT, S_ENC_ISO8859_1, S_ENC_CP437, S_ENC_CP850,
+   S_ENC_INVALID
+};
+
 enum set_hidden3d_id {
-    H_INVALID,
-    H_DEFAULTS, H_OFFSET, H_NOOFFSET, H_TRIANGLEPATTERN,
-    H_UNDEFINED, H_NOUNDEFINED, H_ALTDIAGONAL, H_NOALTDIAGONAL,
-    H_BENTOVER, H_NOBENTOVER
+    S_HI_INVALID,
+    S_HI_DEFAULTS, S_HI_OFFSET, S_HI_NOOFFSET, S_HI_TRIANGLEPATTERN,
+    S_HI_UNDEFINED, S_HI_NOUNDEFINED, S_HI_ALTDIAGONAL, S_HI_NOALTDIAGONAL,
+    S_HI_BENTOVER, S_HI_NOBENTOVER
 };
 
 enum set_key_id {
-    KEY_INVALID,
-    KEY_TOP, KEY_BOTTOM, KEY_LEFT, KEY_RIGHT, KEY_UNDER, KEY_OUTSIDE,
-    KEY_LLEFT, KEY_RRIGHT, KEY_REVERSE, KEY_NOREVERSE, KEY_BOX, KEY_NOBOX,
-    KEY_SAMPLEN, KEY_SPACING, KEY_WIDTH, KEY_TITLE
+    S_KEY_INVALID,
+    S_KEY_TOP, S_KEY_BOTTOM, S_KEY_LEFT, S_KEY_RIGHT, S_KEY_UNDER,
+    S_KEY_OUTSIDE, S_KEY_LLEFT, S_KEY_RRIGHT, S_KEY_REVERSE, S_KEY_NOREVERSE,
+    S_KEY_BOX, S_KEY_NOBOX, S_KEY_SAMPLEN, S_KEY_SPACING, S_KEY_WIDTH,
+    S_KEY_TITLE
 };
 
 enum show_style_id {
@@ -129,6 +135,7 @@ extern struct gen_table plot_smooth_tbl[];
 extern struct gen_table save_tbl[];
 extern struct gen_table set_tbl[];
 extern struct gen_table set_key_tbl[];
+extern struct gen_table set_encoding_tbl[];
 extern struct gen_table set_hidden3d_tbl[];
 extern struct gen_table show_style_tbl[];
 extern struct gen_table plotstyle_tbl[];
