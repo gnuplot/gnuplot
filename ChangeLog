@@ -1,3 +1,31 @@
+1998-11-18  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* 0BUGS: Updated with latest awk script for contour line clipping
+	bug workaround by Paul Halsema <phalsema@harris.com>.
+
+	* 0INSTALL: Updated. gnuplot now compiles again with SunOS' cc.
+
+	* 0README: Updated.
+
+	* bf_test.c(FreeHelp), contour.c(end_crnt_cntr), matrix.c(fsign),
+	term.c(term_count): Translate prototype to K&R.
+
+	* fit.c: Translate prototypes for printmatrix() and
+	print_matrix_and_vectors() to K&R. Add missing prototypes for
+	static functions.
+
+	* gplt_x11.c: Re-add inclusion of config.h at top.
+
+	* parse.c, term/corel.trm, term/epson.trm, term/fig.trm, term/mif.trm,
+	term/next.trm, term/pbm.trm, term/png.trm, term/win.trm: Indentation.
+
+	* set.c: Fix typos.
+
+	* term/ai.trm, term/cgm.trm, term/corel.trm, term/epson.trm,
+	term/fig.trm, term/mif.trm, term/next.trm, term/pbm.trm, term/png.trm,
+	term/post.trm, term/pslatex.trm, term/win.trm: Spelling: Accept
+	"colour" and "color" option.
+	
 1998-11-17  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* 0BUGS: Added description of m[]tics initialisation bug, from
@@ -6,11 +34,8 @@
 	entry, from Stefan Deutscher <stefand@ibm.net>. Revised entry for
 	contour clipping by Don Taber <dtaber@blackrat.risc.rockwell.com>.
 
-	* Makefile.in: Remove -I./term from term.o target because there are
-	no built sources in term/.
-
-	* ansichek.h: Use #ifndef HAVE_CONFIG_H for code depending on
-	ANSI_C.
+	* ansichek.h: Use #ifndef HAVE_CONFIG_H for systems which don't
+	run configure.
 
 	* acconfig.h: Remove ANSI_C.
 
@@ -58,8 +83,8 @@
 
 	* version.c: Changes history moved to docs/old/ChangeLog.old.
 
-	* win/wcgraph.c(wginitcolor): Swap entries for red and blue for
-	color consistency as suggested by Stephen Eglen <stephen@cns.ed.ac.uk>.
+	* win/wcgraph.c(wginitcolor): Swap entries for red and blue for	colour
+	consistency as suggested by Stephen Eglen <stephen@cns.ed.ac.uk>.
 
 1998-11-15  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
@@ -80,8 +105,7 @@
 
 	* makefile.os2: Patches by Alexander Mai.
 
-	* set.c(set_two): Skip leading whitespace in argument to
-	'set output' command.
+	* set.c(set_two): Skip leading whitespace in argument to 'set output'.
 
 	* specfun.c: Fix #ifdef directive. Reported by Alexander Mai.
 
