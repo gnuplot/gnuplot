@@ -1,3 +1,7 @@
+2003-04-01  Ethan Merritt <merritt@u.washington.edu>
+
+	* term/gd.trm: Fix bugs in parsing terminal size and setting tic size.
+
 2003-03-31  Ethan Merritt <merritt@u.washington.edu>
 
 	* src/bitmap.c src/gplt_x11.c term/gd.trm term/pdf.trm:

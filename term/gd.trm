@@ -1,5 +1,5 @@
 /*
- * $Id: gd.trm,v 1.25 2003/03/21 17:18:21 mikulik Exp $
+ * $Id: gd.trm,v 1.26 2003/03/31 22:16:59 sfeam Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -164,8 +164,7 @@ static int PNG_ps = 3;
 # define PNG_VCHAR 13
 # define PNG_HCHAR 7
 
-#define PNG_VTIC (GREG_YMAX/100)
-#define PNG_HTIC (GREG_XMAX/150)
+#define PNG_TICSIZE (GREG_YMAX/100)
 
 #define PNG_MAX_COLORS 256
 #define GOT_NEXT_PROTO
@@ -546,19 +545,18 @@ PNG_options()
 	    if (END_OF_COMMAND) {
 		PNG_XMAX = GREG_XMAX;
 		PNG_YMAX = GREG_YMAX;
-		term->v_tic = PNG_YMAX / 80;
-		term->h_tic = PNG_XMAX / 80;
 	    } else {
 		PNG_XMAX = real(const_express(&s));
 		if (equals(c_token, ",")) {
-	    c_token++;
+		    c_token++;
 		    PNG_YMAX = real(const_express(&s));
-		    term->v_tic = PNG_YMAX / 80;
-		    term->h_tic = PNG_XMAX / 80;
-		    term->ymax = PNG_YMAX;
-		    term->xmax = PNG_XMAX;
 		}
 	    }
+	    term->ymax = PNG_YMAX;
+	    term->xmax = PNG_XMAX;
+	    /* EAM Apr 2003 - same tic size on both x and y axes */
+	    term->v_tic = (PNG_XMAX < PNG_YMAX) ? PNG_XMAX/100 : PNG_YMAX/100;
+	    term->h_tic = term->v_tic;
 	    break;
 	case PNG_OTHER:
 	default:
@@ -1289,7 +1287,7 @@ PNG_pointsize(ptsize)
 TERM_TABLE_START(png_driver)
     "png", "PNG images using libgd and TrueType fonts",
     GREG_XMAX, GREG_YMAX, PNG_VCHAR, PNG_HCHAR,
-    PNG_VTIC, PNG_HTIC, PNG_options, PNG_init, PNG_reset,
+    PNG_TICSIZE, PNG_TICSIZE, PNG_options, PNG_init, PNG_reset,
     PNG_text, null_scale, PNG_graphics, PNG_move, PNG_vector,
     PNG_linetype, PNG_put_text, PNG_text_angle,
 #ifdef HAVE_GD_TTF
@@ -1436,7 +1434,7 @@ int quality = 90;
 TERM_TABLE_START(jpeg_driver)
     "jpeg", "JPEG images using libgd and TrueType fonts",
     GREG_XMAX, GREG_YMAX, PNG_VCHAR, PNG_HCHAR,
-    PNG_VTIC, PNG_HTIC, PNG_options, PNG_init, PNG_reset,
+    PNG_TICSIZE, PNG_TICSIZE, PNG_options, PNG_init, PNG_reset,
     JPEG_text, null_scale, PNG_graphics, PNG_move, PNG_vector,
     PNG_linetype, PNG_put_text, PNG_text_angle,
     PNG_justify_text, PNG_point, do_arrow, PNG_set_font,
