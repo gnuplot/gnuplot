@@ -27,10 +27,15 @@ S=1
 plot "silver.dat" t "experimental" w errorb,\
                "" u 1:2:(S*$2/$3) smooth acsplines t "acspline Y/Z"
 pause -1 "Make it smoother by changing the smoothing weights <CR>"
-S=0.001
 plot "silver.dat" t "rate" w errorb,\
-               "" u 1:2:(S*$2/$3) smooth acsplines t "acspline 0.001*Y/Z"
-pause -1 "Now approximate the data with a bezier curve<CR>"
+               "" u 1:2:($2/($3*1.e1)) sm acs t "acspline Y/(Z*1.e1)",\
+               "" u 1:2:($2/($3*1.e3)) sm acs t "         Y/(Z*1.e3)",\
+               "" u 1:2:($2/($3*1.e5)) sm acs t "         Y/(Z*1.e5)"
+pause -1 "Accentuate the relative changes with a log-scale <CR>"
+set logscale y
+replot
+pause -1 "Now approximate the data with a bezier curve between the endpoints<CR>"
+set nologscale y
 plot "silver.dat" t "experimental" w errorb,\
                "" smooth sbezier t "bezier"
 pause -1 "You would rather use log-scales ? <CR>"
