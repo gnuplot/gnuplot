@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.96 2005/01/08 16:08:59 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.97 2005/01/09 00:04:45 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -366,6 +366,10 @@ term_close_output()
     gpoutfile = stdout;		/* Don't dup... */
     free(outstr);
     outstr = NULL;
+
+    if (gppsfile)
+	fclose(gppsfile);
+    gppsfile = NULL;
 }
 
 #ifdef OS2
@@ -393,7 +397,7 @@ term_set_output(char *dest)
 	(*term->reset) ();
 	term_initialised = FALSE;
 	/* switch off output to special postscript file (if used) */
-	gppsfile = 0;
+	gppsfile = NULL;
     }
     if (dest == NULL) {		/* stdout */
 	UP_redirect(4);
@@ -485,6 +489,11 @@ term_init()
 		     outstr, term->flags & TERM_BINARY ? "binary" : "text"));
 	    strcpy(temp, outstr);
 	    term_set_output(temp);	/* will free outstr */
+	    if (temp != outstr) {
+		if (temp)
+		    free(temp);
+		temp = outstr;
+	    }
 	} else
 	    fputs("Cannot reopen output file in binary", stderr);
 	/* and carry on, hoping for the best ! */
@@ -766,7 +775,7 @@ term_reset()
 	(*term->reset) ();
 	term_initialised = FALSE;
 	/* switch off output to special postscript file (if used) */
-	gppsfile = 0;
+	gppsfile = NULL;
     }
 }
 

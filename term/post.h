@@ -1,5 +1,5 @@
 /*
- * $Id: post.h,v 1.3 1999/11/04 12:30:01 lhecking Exp $
+ * $Id: post.h,v 1.4 2004/04/13 17:24:36 broeker Exp $
  */
 
 /* GNUPLOT - post.h */
@@ -41,35 +41,27 @@
  * (post.trm and pslatex.trm)
  */
 
-/* HBB 990829: made these 'static' again. This is correct as long as
- * the terminal stuff is still compiled as a single large module, i.e.
- * the terminals aren't compiled one by one. */
-static TBOOLEAN ps_color;
-static TBOOLEAN ps_solid;
-
-#define PS_POINT_TYPES 8
-
-/* page offset in pts */
-#define PS_XOFF 50
-#define PS_YOFF 50
-
 /* assumes landscape */
-#define PS_XMAX 7200
-#define PS_YMAX 5040
+#define PS_XMAX (10*720)
+#define PS_YMAX (7*720)
 
+/* These seem to be unnecessary, thus commented out */
+/*
 #define PS_XLAST (PS_XMAX - 1)
 #define PS_YLAST (PS_YMAX - 1)
+*/
 
 #define PS_VTIC (PS_YMAX/80)
 #define PS_HTIC (PS_YMAX/80)
 
 /* scale is 1pt = 10 units */
-#define PS_SC (10)
+#define PS_SC 10
 
 /* linewidth = 0.5 pts */
 #define PS_LW (0.5*PS_SC)
 
-/* default is 14 point characters */
+/* character size defaults: */
+/* 14 pt for postscript */
 #define PS_VCHAR (14*PS_SC)
 #define PS_HCHAR (14*PS_SC*6/10)
 

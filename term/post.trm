@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.139 2005/01/08 15:37:23 mikulik Exp $
+ * $Id: post.trm,v 1.140 2005/01/08 16:09:01 mikulik Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -61,6 +61,8 @@
  *
  * Dan Sebald, 7 March 2003: terminal entry for image functionality
  *
+ *  Harald Harders (h.harders@tu-bs.de), 2004-12-02:
+ *  Moved all terminal settings into a single structure.
  */
 
 #include "driver.h"
@@ -71,7 +73,7 @@ register_term(post)
 
 #ifdef TERM_PROTO
 TERM_PUBLIC void PS_options __PROTO((void));
-TERM_PUBLIC void PS_common_init __PROTO((int encap, int portrait, int uses_fonts, unsigned int xoff, unsigned int yoff, unsigned int bb_xmin, unsigned int bb_ymin, unsigned int bb_xmax, unsigned int bb_ymax, const char **dict));
+TERM_PUBLIC void PS_common_init __PROTO((TBOOLEAN uses_fonts, unsigned int xoff, unsigned int yoff, unsigned int bb_xmin, unsigned int bb_ymin, unsigned int bb_xmax, unsigned int bb_ymax, const char **dict));
 TERM_PUBLIC void PS_init __PROTO((void));
 TERM_PUBLIC void PS_graphics __PROTO((void));
 TERM_PUBLIC void PS_text __PROTO((void));
@@ -129,13 +131,54 @@ TERM_PUBLIC char *PS_RememberFont __PROTO((char *fname, int reencode));
     }						\
 } while (0)
 
+/* Datastructure implementing inclusion of font files */
+struct ps_fontfile_def {
+    struct ps_fontfile_def *next;/* pointer to next fontfile in linked list */
+    char *fontfile_name;
+    char *fontfile_fullname;
+};
+
+enum PS_PSFORMAT {
+    PSTERM_EPS, PSTERM_PORTRAIT, PSTERM_LANDSCAPE
+};
+
+/* One struct that takes all terminal parameters
+ * by Harald Harders <h.harders@tu-bs.de> */
+typedef struct ps_params_t {
+    int xoff;
+    int yoff;
+    enum PS_PSFORMAT psformat;
+    TBOOLEAN level1;
+    TBOOLEAN color;
+    TBOOLEAN blacktext;
+    TBOOLEAN solid;
+    float dash_length;
+    float linewidth_factor;
+    TBOOLEAN duplex_option;           /* one of duplex or simplex specified? */
+    TBOOLEAN duplex_state;
+    TBOOLEAN rounded;                 /* rounded linecaps and linejoins */
+    struct ps_fontfile_def *first_fontfile;
+    char font[MAX_ID_LEN+1];          /* name of font */
+    int fontsize;                     /* size of font in pts */
+    int palfunc_samples;              /* setable via "palf$uncparam" */
+    double palfunc_deviation;         /* terminal option */
+    TBOOLEAN size5x3;
+} ps_params_t;
+
+#define POST_PARAMS_DEFAULT { \
+    50, 50, \
+    PSTERM_LANDSCAPE, FALSE, FALSE, FALSE, FALSE, 1.0, 1.0, FALSE, \
+    FALSE, FALSE, NULL, "Helvetica", 14, 2000, 0.003, FALSE \
+}
+
+static ps_params_t post_params = POST_PARAMS_DEFAULT;
+static const ps_params_t post_params_default = POST_PARAMS_DEFAULT;
+
+static ps_params_t *ps_params = NULL;
+
 static void ENHPS_put_text __PROTO((unsigned int x, unsigned int y, const char *str));
-static char ps_font[MAX_ID_LEN+1] = "Helvetica" ; /* name of font */
-static int ps_fontsize = 14;					 /* size of font in pts */
 
 #ifdef PM3D
-static int ps_palfunc_samples = 2000;        /* setable via "palf$uncparam" */
-static double ps_palfunc_deviation = 0.003;  /* terminal option */
 static void make_interpolation_code __PROTO((void));
 static void make_color_model_code __PROTO((void));
 static char * save_space __PROTO((double gray));
@@ -146,6 +189,8 @@ static void make_palette_formulae __PROTO((void));
 static void PS_make_header __PROTO((t_sm_palette *palette));
 #endif /* PM3D */
 
+static int ps_fontsize;
+
 /* for enhanced mode, we keep a separate font name and size, which
  * is restored to the default value on font of ""
  */
@@ -153,41 +198,17 @@ static char ps_enh_font[MAX_ID_LEN+1];
 static int  ps_enh_fontsize;
 static int  ENHPS_initialized;
 
-static TBOOLEAN ps_portrait = FALSE;				 /* vertical page */
-static TBOOLEAN ps_color = FALSE;
-static TBOOLEAN ps_level1 = FALSE;		/*  Limit output to PostScript level 1 */
-static TBOOLEAN ps_blacktext = FALSE;           /*  text always black  */
-static TBOOLEAN ps_solid = FALSE;   		/*  use solid lines */
-static float ps_dash_length = 1.0;   /*  scale factor for dash-dot patterns  */
-static float ps_linewidth_factor = 1.0;   /*  scale factor for linewidth  */
-static TBOOLEAN ps_eps = FALSE;	/* Is this for an eps file? */
-			/* Added by Robert Davis <davis@ecn.purdue.edu> */
 static int ps_page = 0;		/* page count */
 static int ps_path_count = 0; 	/* count of lines in path */
 static int ps_ang = 0;			/* text angle */
 static enum JUSTIFY ps_justify = LEFT;	/* text is flush left */
-
-/* added by Matt Heffron <heffron@falstaff.css.beckman.com> */
-static TBOOLEAN ps_duplex_state = FALSE;
-static TBOOLEAN ps_duplex_option = FALSE;
-
-/* added by Harald Harders <h.harders@tu-bs.de> */
-static TBOOLEAN ps_rounded = FALSE;	/* rounded linecaps and linejoins */
-
-/* Datastructure implementing inclusion of font files */
-struct ps_fontfile_def {
-    struct ps_fontfile_def *next;/* pointer to next fontfile in linked list */
-    char *fontfile_name;
-    char *fontfile_fullname;
-};
-static struct ps_fontfile_def *first_ps_fontfile = NULL;
 
 static void delete_ps_fontfile __PROTO((struct ps_fontfile_def *, struct ps_fontfile_def *));
 
 TERM_PUBLIC void PS_load_fontfile __PROTO((struct ps_fontfile_def *,TBOOLEAN));
 TERM_PUBLIC void PS_load_fontfiles __PROTO((TBOOLEAN));
 
-
+#define DOTS_PER_INCH (300)    /* resolution of printer we expect to use */
 
 static const char GPFAR * GPFAR PS_header[] = {
 "/M {moveto} bind def\n",
@@ -807,6 +828,7 @@ enum PS_id {
 
 static struct gen_table PS_opts[] =
 {
+    { "d$efault", PS_DEFAULT },
     { "p$ortrait", PS_PORTRAIT },
     { "l$andscape", PS_LANDSCAPE },
     { "ep$sf", PS_EPSF },
@@ -816,8 +838,8 @@ static struct gen_table PS_opts[] =
     { "c$olor", PS_COLOR },
     { "c$olour", PS_COLOR },
     { "b$lacktext", PS_BLACKTEXT },
-    { "color$text", PS_COLORTEXT },
-    { "colour$text", PS_COLORTEXT },
+    { "colort$ext", PS_COLORTEXT },
+    { "colourt$ext", PS_COLORTEXT },
     { "so$lid", PS_SOLIDE },
     { "da$shed", PS_DASHED },
     { "dashl$ength", PS_DASHLENGTH },
@@ -846,55 +868,37 @@ PS_options()
     struct value a;
     char *s;
     char *ps_fontfile_char = NULL;
-    ps_level1 = FALSE;
+    char tmp_term_options[MAX_LINE_LEN+1] = "";
+
+    ps_params = &post_params;
+    term->set_font = PS_set_font;
 
     while (!END_OF_COMMAND) {
 	switch(lookup_table(&PS_opts[0],c_token)) {
 	case PS_PORTRAIT:
-	    ps_portrait = TRUE;
-	    ps_eps = FALSE;
+	    ps_params->psformat = PSTERM_PORTRAIT;
 	    c_token++;
 	    break;
 	case PS_LANDSCAPE:
-	    ps_portrait = FALSE;
-	    ps_eps = FALSE;
-	    c_token++;
-	    break;
-	case PS_LEVEL1:
-	    ps_level1 = TRUE;
+	    ps_params->psformat = PSTERM_LANDSCAPE;
 	    c_token++;
 	    break;
 	case PS_EPSF:
-	    ps_portrait = TRUE;
-	    ps_eps = TRUE;
+	    ps_params->psformat = PSTERM_EPS;
+	    c_token++;
+	    break;
+	case PS_LEVEL1:
+	    ps_params->level1 = TRUE;
 	    c_token++;
 	    break;
 	case PS_DEFAULT:
-	    ps_portrait = FALSE;
-	    ps_level1 = FALSE;
-	    ps_eps = FALSE;
-	    ps_color = FALSE;
-	    ps_blacktext = FALSE;
-	    ps_solid = FALSE;
-	    ps_dash_length = 1.0;
-	    ps_linewidth_factor = 1.0;
-	    ps_duplex_option = FALSE;
-	    ps_rounded = FALSE;
-	    while (first_ps_fontfile != NULL) {
+	    while (ps_params->first_fontfile != NULL) {
 		delete_ps_fontfile((struct ps_fontfile_def *) NULL,
-				   first_ps_fontfile);
-		first_ps_fontfile = NULL;
+				   ps_params->first_fontfile);
+		ps_params->first_fontfile = NULL;
 	    }
-	    strcpy(ps_font,"Helvetica");
-	    ps_fontsize = 14;
-	    term->v_char = (unsigned int)(ps_fontsize*PS_SC);
-	    term->h_char = (unsigned int)(ps_fontsize*PS_SC*6/10);
-	    term->put_text = PS_put_text;
+	    *ps_params = post_params_default;
 	    term->flags &= ~TERM_ENHANCED_TEXT;
-#ifdef PM3D
-	    ps_palfunc_samples = 2000;
-	    ps_palfunc_deviation = 0.003;
-#endif /* PM3D */
 	    c_token++;
 	    break;
 	case PS_ENHANCED:
@@ -910,61 +914,61 @@ PS_options()
 	    ++c_token;
 	    break;
 	case PS_MONOCHROME:
-	    ps_color = FALSE;
+	    ps_params->color = FALSE;
 	    c_token++;
 	    break;
 	case PS_COLOR:
-	    ps_color = TRUE;
+	    ps_params->color = TRUE;
 	    c_token++;
 	    break;
 	case PS_BLACKTEXT:
-	    ps_blacktext = TRUE;
+	    ps_params->blacktext = TRUE;
 	    c_token++;
 	    break;
 	case PS_COLORTEXT:
-	    ps_blacktext = FALSE;
+	    ps_params->blacktext = FALSE;
 	    c_token++;
 	    break;
         case PS_SOLIDE:
-	    ps_solid = TRUE;
+	    ps_params->solid = TRUE;
 	    c_token++;
 	    break;
 	case PS_DASHED:
-	    ps_solid = FALSE;
+	    ps_params->solid = FALSE;
 	    c_token++;
 	    break;
 	case PS_DASHLENGTH:
 	    c_token++;
-	    ps_dash_length = real(const_express(&a));
-	    if (ps_dash_length <= 0.0)
-		ps_dash_length = 1.0;
+	    ps_params->dash_length = real(const_express(&a));
+	    if (ps_params->dash_length <= 0.0)
+		ps_params->dash_length = 1.0;
 	    break;
 	case PS_LINEWIDTH:
 	    c_token++;
-	    ps_linewidth_factor = real(const_express(&a));
-	    if (ps_linewidth_factor <= 0.0)
-		ps_linewidth_factor = 1.0;
+	    ps_params->linewidth_factor = real(const_express(&a));
+	    if (ps_params->linewidth_factor <= 0.0)
+		ps_params->linewidth_factor = 1.0;
 	    break;
 	case PS_SIMPLEX:
-	    ps_duplex_state  = FALSE;
-	    ps_duplex_option = TRUE;
+	    ps_params->duplex_state  = FALSE;
+	    ps_params->duplex_option = TRUE;
 	    c_token++;
 	    break;
 	case PS_DUPLEX:
-	    ps_duplex_state  = TRUE;
-	    ps_duplex_option = TRUE;
+	    ps_params->duplex_state  = TRUE;
+	    ps_params->duplex_option = TRUE;
 	    c_token++;
 	    break;
 	case PS_DEFAULTPLEX:
-	    ps_duplex_option = FALSE;
+	    ps_params->duplex_option = FALSE;
 	    c_token++;
 	    break;
 	case PS_ROUNDED:
-	    ps_rounded = TRUE;
+	    ps_params->rounded = TRUE;
 	    c_token++;
 	    break;
 	case PS_NOROUNDED:
-	    ps_rounded = FALSE;
+	    ps_params->rounded = FALSE;
 	    c_token++;
 	    break;
         case PS_FONTFILE: {
@@ -982,7 +986,8 @@ PS_options()
             }
             if (isstring(c_token)) {
                 TBOOLEAN filename_doubled = FALSE;
-                struct ps_fontfile_def *curr_ps_fontfile = first_ps_fontfile;
+                struct ps_fontfile_def *curr_ps_fontfile = 
+		    ps_params->first_fontfile;
                 struct ps_fontfile_def *prev_ps_fontfile = NULL;
                 struct ps_fontfile_def *new_ps_fontfile =
                      gp_alloc(sizeof(struct ps_fontfile_def),
@@ -1022,7 +1027,7 @@ PS_options()
 			PS_load_fontfile(new_ps_fontfile,FALSE);
 		}
 
-                if (first_ps_fontfile) {
+                if (ps_params->first_fontfile) {
                     while (curr_ps_fontfile) {
                         if (strcmp(curr_ps_fontfile->fontfile_name,
                                    new_ps_fontfile->fontfile_name) == 0) {
@@ -1046,7 +1051,7 @@ PS_options()
                     }
                 } else {
                     if (!deleteentry)
-                        first_ps_fontfile = new_ps_fontfile;
+                        ps_params->first_fontfile = new_ps_fontfile;
                     else
                         int_warn(c_token, "Can't delete Font filename '%s'",
                                  new_ps_fontfile->fontfile_name);
@@ -1057,22 +1062,23 @@ PS_options()
             break;
         }
         case PS_NOFONTFILES:
-	    while (first_ps_fontfile != NULL) {
+	    while (ps_params->first_fontfile != NULL) {
 		delete_ps_fontfile((struct ps_fontfile_def *) NULL,
-				   first_ps_fontfile);
-		first_ps_fontfile = NULL;
+				   ps_params->first_fontfile);
+		ps_params->first_fontfile = NULL;
 	    }
 	    ++c_token;
 	    break;
 #ifdef PM3D
 	case PS_PALFUNCPARAM:
 	    ++c_token;
-	    ps_palfunc_samples = (int)real(const_express(&a));
-	    if (ps_palfunc_samples < 2) ps_palfunc_samples = 2;
+	    ps_params->palfunc_samples = (int)real(const_express(&a));
+	    if (ps_params->palfunc_samples < 2)
+		ps_params->palfunc_samples = 2;
 	    if (!END_OF_COMMAND && equals(c_token, ",")) {
 	        ++c_token;
-		ps_palfunc_deviation = fabs(real(const_express(&a)));
-		if (ps_palfunc_deviation >= 1)
+		ps_params->palfunc_deviation = fabs(real(const_express(&a)));
+		if (ps_params->palfunc_deviation >= 1)
 		    int_error(c_token-1,"allowed deviation must be < 1");
 	    }
 	    ++c_token;
@@ -1083,32 +1089,32 @@ PS_options()
 	    c_token++;
 	    if (!(s = try_to_get_string()))
 		int_error(c_token,"expecting font name");
-	    strncpy(ps_font,s,sizeof(ps_font));
+	    strncpy(ps_params->font,s,sizeof(ps_params->font));
 	    free(s);
 	    break;
 
 	case PS_OTHER:
 	default:
 	    if (isstring(c_token)) {
-		quote_str(ps_font,c_token, MAX_ID_LEN);
+		quote_str(ps_params->font,c_token, MAX_ID_LEN);
 		c_token++;
 	    } else {
 		/* We have font size specified */
-		ps_fontsize = (int)real(const_express(&a));
-		term->v_char = (unsigned int)(ps_fontsize*PS_SC);
-		term->h_char = (unsigned int)(ps_fontsize*PS_SC*6/10);
+		ps_params->fontsize = (int)real(const_express(&a));
 	    }
 	    break;
 	}
     }
 
-    if (!ps_color)
-	ps_blacktext = TRUE;
+    ps_fontsize = ps_params->fontsize;
+    term->v_char = (unsigned int)(ps_fontsize*PS_SC);
+    term->h_char = (unsigned int)(ps_fontsize*PS_SC*6/10);
 
-    sprintf(PS_default_font,"%s,%d",ps_font,ps_fontsize);
+    sprintf(PS_default_font,"%s,%d",ps_params->font,ps_fontsize);
 
-    if (first_ps_fontfile) {
-	struct ps_fontfile_def *curr_ps_fontfile = first_ps_fontfile;
+    if (ps_params->first_fontfile) {
+	struct ps_fontfile_def *curr_ps_fontfile =
+	    ps_params->first_fontfile;
 	unsigned int totlength = 0;
 	char *running;
 
@@ -1117,7 +1123,7 @@ PS_options()
 		strlen(" fontfile \"\"");
 	    curr_ps_fontfile = curr_ps_fontfile->next;
 	}
-	curr_ps_fontfile = first_ps_fontfile;
+	curr_ps_fontfile = ps_params->first_fontfile;
 	ps_fontfile_char = gp_alloc (totlength+1,"ps_fontfile_char");
 	running = ps_fontfile_char;
 	while (curr_ps_fontfile) {
@@ -1130,37 +1136,42 @@ PS_options()
 
     /* HBB 19990823: fixed the options string. It violated the 'save
      * loadable output' rule */
-    sprintf(term_options,"%s %s %senhanced %s %s \\\n"
-	                 "   %s dashlength %.1f linewidth %.1f %s \\\n"
+    sprintf(term_options,"%s %s %s \\\n",
+	    ps_params->psformat==PSTERM_EPS ? "eps" :
+	    (ps_params->psformat==PSTERM_PORTRAIT ?
+	     "portrait" : "landscape"),
+	    term->put_text == ENHPS_put_text ? "enhanced" : "noenhanced",
+	    ps_params->duplex_option ? (ps_params->duplex_state ?
+					"duplex" : "simplex")
+	    : "defaultplex");
+
+    sprintf(tmp_term_options,"   %s %s %s \\\n\
+   %s dashlength %.1f linewidth %.1f %s \\\n",
+	    ps_params->level1 ? "level1" : "",
+	    ps_params->color ? "color" : "monochrome",
+	    ps_params->blacktext ? "blacktext" : "colortext",
+	    ps_params->solid ? "solid" : "dashed",
+	    ps_params->dash_length,
+	    ps_params->linewidth_factor,
+	    ps_params->rounded ? "rounded" : "butt");
+    strcat(term_options,tmp_term_options);
+
 #ifdef PM3D
-	                 "   palfuncparam %d,%g \\\n"
+    sprintf(tmp_term_options,"   palfuncparam %d,%g \\\n   ",
+	    ps_params->palfunc_samples, ps_params->palfunc_deviation);
+    strcat(term_options,tmp_term_options);
 #endif /* PM3D */
-	                 "   %s \"%s\" %d%s ",
-	    ps_eps ? "eps" : (ps_portrait ? "portrait" : "landscape"),
-	    ps_level1 ? "level1" : "",
-	    term->put_text == ENHPS_put_text ? "" : "no",
-	    ps_color ? "color" : "monochrome",
-	    ps_blacktext ? "blacktext" : "colortext",
-	    ps_solid ? "solid" : "dashed",
-	    ps_dash_length,
-	    ps_linewidth_factor,
-	    ps_duplex_option ? (ps_duplex_state ? "duplex" : "simplex")
-	    : "defaultplex",
-#ifdef PM3D
-	    ps_palfunc_samples, ps_palfunc_deviation,
-#endif /* PM3D */
-	    ps_rounded ? "rounded" : "butt",
-	    ps_font,ps_fontsize,
-	    ps_fontfile_char ? ps_fontfile_char : ""
-	    );
+
+    sprintf(tmp_term_options,"\"%s\" %d%s ",
+	    ps_params->font,ps_params->fontsize,
+	    ps_fontfile_char ? ps_fontfile_char : "");
+    strcat(term_options,tmp_term_options);
 }
 
 /* store settings passed to common_init() for use in PS_graphics()
- * ps_eps, ps_portrait, etc are reserved for storing the term options
+ * ps_params->psformat, etc are reserved for storing the term options
  */
-static int ps_common_encap;
-static int ps_common_portrait;
-static int ps_common_uses_fonts;
+static TBOOLEAN ps_common_uses_fonts;
 static unsigned int ps_common_xoff, ps_common_yoff;
 
 
@@ -1372,7 +1383,7 @@ PS_load_fontfile(struct ps_fontfile_def *current_ps_fontfile, TBOOLEAN doload)
 TERM_PUBLIC void
 PS_load_fontfiles(TBOOLEAN doload)
 {
-    struct ps_fontfile_def *current_ps_fontfile=first_ps_fontfile;
+    struct ps_fontfile_def *current_ps_fontfile=ps_params->first_fontfile;
 
     while (current_ps_fontfile) {
 	PS_load_fontfile(current_ps_fontfile,doload);
@@ -1383,9 +1394,7 @@ PS_load_fontfiles(TBOOLEAN doload)
 
 TERM_PUBLIC void
 PS_common_init(
-    int encap,			/* encapsulated or not - 1 for pslatex */
-    int portrait,		/* 1 for pslatex */
-    int uses_fonts,		/* 0 for ps(la)tex */
+    TBOOLEAN uses_fonts,		/* 0 for ps(la)tex */
     unsigned int xoff, unsigned int yoff, /* how much to translate by */
     unsigned int bb_xmin, unsigned int bb_ymin,
     unsigned int bb_xmax, unsigned int bb_ymax, /* bounding box */
@@ -1838,18 +1847,16 @@ NULL };
     int i;
     time_t now;
 
-    ps_common_encap = encap; /* store for later */
-    ps_common_portrait = portrait; /* store for later */
     ps_common_uses_fonts = uses_fonts;
     ps_common_xoff = xoff;
     ps_common_yoff = yoff;
 
     ps_page = 0;
 
-    if (!encap)
-	fputs("%!PS-Adobe-2.0\n", gppsfile);
-    else
+    if (ps_params->psformat == PSTERM_EPS)
 	fputs("%!PS-Adobe-2.0 EPSF-2.0\n", gppsfile);
+    else
+	fputs("%!PS-Adobe-2.0\n", gppsfile);
 
     if (outstr)
 	fprintf(gppsfile, "%%%%Title: %s\n", outstr);   /*  JFi  */
@@ -1861,20 +1868,21 @@ NULL };
 	    xoff + bb_xmin, yoff + bb_ymin, xoff + bb_xmax, yoff + bb_ymax);
 
     fprintf(gppsfile,"%%%%Orientation: %s\n",
-	    ps_portrait ? "Portrait" : "Landscape");
+	    ps_params->psformat == PSTERM_LANDSCAPE ?
+	    "Landscape" : "Portrait");
 
-    if (!encap)
+    if (ps_params->psformat != PSTERM_EPS)
 	fputs("%%Pages: (atend)\n", gppsfile);
     fprintf(gppsfile, psi2,
-	    ps_color ? "true" : "false",
-	    ps_blacktext ? "true" : "false",
-	    ps_solid ? "true" : "false",
-	    ps_portrait ? "false" : "true",
-	    ps_level1 ? "true" : "false",
-	    ps_rounded ? "true" : "false",
-	    PS_LW*ps_linewidth_factor,	/* line width */
+	    ps_params->color ? "true" : "false",
+	    ps_params->blacktext ? "true" : "false",
+	    ps_params->solid ? "true" : "false",
+	    ps_params->psformat == PSTERM_LANDSCAPE ? "true" : "false",
+	    ps_params->level1 ? "true" : "false",
+	    ps_params->rounded ? "true" : "false",
+	    PS_LW*ps_params->linewidth_factor,	/* line width */
 	    (int)(t->v_char)/(-3),	/* shift for vertical centring */
-	    PS_SC*ps_dash_length,	/* dash length */
+	    PS_SC*ps_params->dash_length,	/* dash length */
 	    PS_HTIC/2.0,		/* half point width */
 	    PS_VTIC/2.0);		/* half point height */
 
@@ -1903,9 +1911,9 @@ NULL };
 
     for (i = 0; PS_header[i] != NULL; i++)
 	fprintf(gppsfile,"%s",PS_header[i]);
-    if (ps_duplex_option)
+    if (ps_params->duplex_option)
 	fprintf(gppsfile, "statusdict begin %s setduplexmode end\n",
-		ps_duplex_state ? "true" : "false");
+		ps_params->duplex_state ? "true" : "false");
 
     if (dict)
 	while (*dict)
@@ -1914,7 +1922,7 @@ NULL };
     PS_load_fontfiles(TRUE);
 
     if (uses_fonts)
-	PS_RememberFont(ps_font, 1);
+	PS_RememberFont(ps_params->font, 1);
 
     fputs("end\n%%EndProlog\n", gppsfile);
 }
@@ -1925,45 +1933,49 @@ PS_init()
 {
     unsigned int xmin_t, ymin_t, xmax_t, ymax_t;
 
-    if (ps_eps) {
+    switch (ps_params->psformat) {
+    case PSTERM_EPS:
 	term->xmax = PS_XMAX;
 	term->ymax = PS_YMAX;
-	xmin_t = PS_XMAX * xoffset / (2*PS_SC);
-	xmax_t = PS_XMAX * (xsize + xoffset) / (2*PS_SC);
-	ymin_t = PS_YMAX * yoffset / (2*PS_SC);
-	ymax_t = PS_YMAX * (yoffset + ysize) / (2*PS_SC);
-    } else if (ps_portrait) {
+	xmin_t = term->xmax * xoffset / (2*PS_SC);
+	xmax_t = term->xmax * (xsize + xoffset) / (2*PS_SC);
+	ymin_t = term->ymax * yoffset / (2*PS_SC);
+	ymax_t = term->ymax * (ysize + yoffset) / (2*PS_SC);
+	break;
+    case PSTERM_PORTRAIT:
 	term->xmax = PS_YMAX;
 	term->ymax = PS_XMAX;
-	xmin_t = PS_YMAX * xoffset / PS_SC;
-	xmax_t = PS_YMAX * (xsize + xoffset) / PS_SC;
-	ymin_t = PS_XMAX * yoffset / PS_SC;
-	ymax_t = PS_XMAX * (ysize + yoffset) / PS_SC;
-    } else {
+	xmin_t = term->xmax * xoffset / PS_SC;
+	xmax_t = term->xmax * (xsize + xoffset) / PS_SC;
+	ymin_t = term->ymax * yoffset / PS_SC;
+	ymax_t = term->ymax * (ysize + yoffset) / PS_SC;
+	break;
+    case PSTERM_LANDSCAPE:
 	term->xmax = PS_XMAX;
 	term->ymax = PS_YMAX;
-	ymin_t = PS_XMAX * xoffset / PS_SC;
-	ymax_t = PS_XMAX * (xsize+xoffset) / PS_SC;
-	xmin_t = PS_YMAX * (1-ysize-yoffset) / PS_SC;
-	xmax_t = PS_YMAX * (1-yoffset) / PS_SC;
+	ymin_t = term->xmax * xoffset / PS_SC;
+	ymax_t = term->xmax * (xsize+xoffset) / PS_SC;
+	xmin_t = term->ymax * (1-ysize-yoffset) / PS_SC;
+	xmax_t = term->ymax * (1-yoffset) / PS_SC;
+	break;
     }
 
-    /* for enhanced postscript, copy ps_font to ps_enh_font
+    /* for enhanced postscript, copy ps_params->font to ps_enh_font
      * does no harm for non-enhanced
      */
-    strcpy(ps_enh_font, ps_font);
+    strcpy(ps_enh_font, ps_params->font);
     ps_enh_fontsize = ps_fontsize;
 
     /* to optimize output for postscript terminals family */
     gppsfile = gpoutfile;
 
-    PS_common_init(ps_eps, ps_portrait, 1, PS_XOFF, PS_YOFF,
+    PS_common_init(TRUE,
+		   ps_params->xoff, ps_params->yoff,
 		   xmin_t, ymin_t, xmax_t, ymax_t,
 		   (term->put_text == ENHPS_put_text) ? ENHPS_header : NULL);
     
     /* Keep track of whether we have written the enhanced text dictionary yet */
     ENHPS_initialized = (term->put_text == ENHPS_put_text) ? 2 : 1;
-    
 }
 
 
@@ -1973,7 +1985,7 @@ PS_graphics()
     static char GPFAR psg1[] = "0 setgray\nnewpath\n";
     struct termentry *t = term;
     ps_page++;
-    if (!ps_common_encap)
+    if (ps_params->psformat != PSTERM_EPS)
 	fprintf(gppsfile,"%%%%Page: %d %d\n",ps_page,ps_page);
 
     /* If we are about to use enhanced text mode for the first time in a plot that */
@@ -1991,15 +2003,14 @@ gnudict begin\ngsave\n\
 %d %d translate\n\
 %.3f %.3f scale\n",
 	    ps_common_xoff, ps_common_yoff,
-	    (ps_eps ? 0.5 : 1.0)/PS_SC,
-	    (ps_eps ? 0.5 : 1.0)/PS_SC);
-    if (!ps_common_portrait) {
+	    (ps_params->psformat == PSTERM_EPS ? 0.5 : 1.0)/PS_SC,
+	    (ps_params->psformat == PSTERM_EPS ? 0.5 : 1.0)/PS_SC);
+    if (ps_params->psformat == PSTERM_LANDSCAPE)
 	fprintf(gppsfile,"90 rotate\n0 %d translate\n", (int)(-PS_YMAX));
-    }
     fprintf(gppsfile, psg1);
     if (ps_common_uses_fonts)
 	fprintf(gppsfile, "(%s) findfont %d scalefont setfont\n",
-		ps_font, (t->v_char));
+		ps_params->font, (t->v_char));
     ps_path_count = 0;
     PS_relative_ok = FALSE;
     PS_pen_x = PS_pen_y = -4000;
@@ -2041,10 +2052,9 @@ PS_reset()
 	    PS_DocFonts = fnp;
 	}
     }
-    if (!ps_common_encap)
-	fprintf(gppsfile, "%%%%Pages: %d\n", ps_page);
+    if (ps_params->psformat != PSTERM_EPS)
+	fprintf(gppsfile,"%%%%Pages: %d\n",ps_page);
 }
-
 
 TERM_PUBLIC void
 PS_linetype(int linetype)
@@ -2483,7 +2493,7 @@ ENHPS_WRITEC(int c)
 
 /* a set-font routine for enhanced post : simply copies
  * the font into a global, or restores the globals
- * to the ps_font default
+ * to the ps_params->font default
  */
 
 TERM_PUBLIC int
@@ -2503,7 +2513,7 @@ ENHPS_set_font(const char *font)
 	sscanf (font+sep+1,"%d",&ps_enh_fontsize);
     } else {
 	/* return to defaults */
-	strcpy(ps_enh_font, ps_font);
+	strcpy(ps_enh_font, ps_params->font);
 	ps_enh_fontsize = ps_fontsize;
     }
     term->v_char = (unsigned int)(ps_enh_fontsize*PS_SC);
@@ -2567,7 +2577,7 @@ ENHPS_put_text(unsigned int x, unsigned int y, const char *str)
      *
      * ps_enh_font and ps_enh_fontsize are either set to the
      * the defaults set on option line, or have been set to
-     * "font,size". That is to say, ps_font is used only
+     * "font,size". That is to say, ps_params->font is used only
      * at startup and by ENHPS_set_font
      */
     while (*(str = enhanced_recursion((char *)str, TRUE, ps_enh_font,
@@ -2831,8 +2841,8 @@ PS_make_header(t_sm_palette *palette)
 
 	fputs("/InterpolatedColor true def\n", gppsfile);
 	make_interpolation_code();
-	gradient = approximate_palette(palette, ps_palfunc_samples,
-				       ps_palfunc_deviation, &cnt);
+	gradient = approximate_palette(palette, ps_params->palfunc_samples,
+				       ps_params->palfunc_deviation, &cnt);
 	write_gradient_definition(gradient, cnt);
 	free(gradient);
 	break;
@@ -3019,7 +3029,7 @@ TERM_PUBLIC void PS_arrow (
     int head)
 {
     do_arrow( sx, sy, ex, ey, head );
-    if (!ps_solid && head != 0) {
+    if (!ps_params->solid && head != 0) {
 	fputs("/SaveState Solid def /Solid true def\n", gppsfile);
 	PS_linetype(PS_linetype_last-3);
 	do_arrow( sx, sy, ex, ey, -head );
@@ -3034,8 +3044,9 @@ delete_ps_fontfile(struct ps_fontfile_def *prev, struct ps_fontfile_def *this)
     if (this != NULL) {		/* there really is something to delete */
 	if (prev != NULL)	/* there is a previous ps_fontfile */
 	    prev->next = this->next;
-	else			/* this = first_ps_fontfile so change first_ps_fontfile */
-	    first_ps_fontfile = this->next;
+	else			/* this = ps_params->first_fontfile */
+	                        /* so change ps_params->first_fontfile */
+	    ps_params->first_fontfile = this->next;
 	free(this->fontfile_name);
 	free(this->fontfile_fullname);
 	free(this);

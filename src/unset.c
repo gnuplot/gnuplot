@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.70 2004/11/06 21:18:46 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.71 2005/01/10 21:02:46 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -1104,12 +1104,16 @@ unset_origin()
 static void
 unset_output()
 {
-    if (multiplot)
+    if (multiplot) {
 	int_error(c_token, "you can't change the output in multiplot mode");
+	return;
+    }
 
     term_set_output(NULL);
-    free(outstr);
-    outstr = NULL; /* means STDOUT */
+    if (outstr) {
+	free(outstr);
+	outstr = NULL; /* means STDOUT */
+    }
 }
 
 

@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: pslatex.trm,v 1.47 2005/01/08 15:37:23 mikulik Exp $
+ * $Id: pslatex.trm,v 1.48 2005/01/08 16:09:01 mikulik Exp $
  */
 
 /* GNUPLOT - pslatex.trm */
@@ -156,26 +156,26 @@ PSLATEX_options()
     while (!END_OF_COMMAND) {
 	switch(lookup_table(&PSLATEX_opts[0],c_token)) {
 	case PSLATEX_DEFAULT:
-	    ps_color = FALSE;
-	    ps_solid = FALSE;
+	    ps_params->color = FALSE;
+	    ps_params->solid = FALSE;
 	    PSLATEX_rotate = TRUE;
 	    PSLATEX_useAuxFile = FALSE;
 	    c_token++;
 	    break;
 	case PSLATEX_COLOR:
-	    ps_color = TRUE;
+	    ps_params->color = TRUE;
 	    c_token++;
 	    break;
 	case PSLATEX_MONOCHROME:
-	    ps_color = FALSE;
+	    ps_params->color = FALSE;
 	    c_token++;
 	    break;
 	case PSLATEX_SOLID:
-	    ps_solid = TRUE;
+	    ps_params->solid = TRUE;
 	    c_token++;
 	    break;
 	case PSLATEX_DASHED:
-	    ps_solid = FALSE;
+	    ps_params->solid = FALSE;
 	    c_token++;
 	    break;
 	case PSLATEX_ROTATE:
@@ -204,8 +204,8 @@ PSLATEX_options()
     /* be sure to generate an options string that PSLATEX_init understands */
 
     sprintf(term_options, "%s %s %s%s",
-	    ps_color ? "color" : "monochrome",
-	    ps_solid ? "solid" : "dashed",
+	    ps_params->color ? "color" : "monochrome",
+	    ps_params->solid ? "solid" : "dashed",
 	    PSLATEX_rotate ? "rotate" : "norotate",
 	    PSLATEX_useAuxFile ? " auxfile" : "");
     if (PSLATEX_fontsize) {
@@ -356,12 +356,12 @@ PSLATEX_graphics()
 		psfile_basename, urx, ury, 10 * urx);
 	tmp = gpoutfile;
 	gpoutfile = PSLATEX_auxfile;
-	PS_common_init(1, 1, 0, 0, 0, xmin_t, ymin_t, xmax_t, ymax_t, NULL);
+	PS_common_init(FALSE, 0, 0, xmin_t, ymin_t, xmax_t, ymax_t, NULL);
 	PS_graphics();
 	gpoutfile = tmp;
     } else {
 	fputs("{\\GNUPLOTspecial{\"\n", gpoutfile);
-	PS_common_init(1, 1, 0, 0, 0, xmin_t, ymin_t, xmax_t, ymax_t, NULL);
+	PS_common_init(FALSE, 0, 0, xmin_t, ymin_t, xmax_t, ymax_t, NULL);
 	PS_graphics();
     }
 

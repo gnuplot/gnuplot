@@ -1,3 +1,12 @@
+2005-01-11  Harald Harders  <h.harders@tu-bs.de>
+
+	* src/src/set.c src/term.c src/unset.c term/post.h term/post.trm
+	term/pslatex.trm: SF patch # 1098256 "Introduce struct that takes all
+	postscript terminal options". This patch introduces the struct
+	ps_params_t that takes all postscript terminal options, e.g., color,
+	blacktext, pslevel, rounded, fontsize, ... This is useful when
+	different terminals share the same portion of code.
+
 2005-01-10  Daniel Sebald  <daniel.sebald@ieee.org>
 
 	* src/gadgets.c src/gadgets.h src/set.c (set_margin) src/show.c

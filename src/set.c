@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.163 2005/01/04 20:12:48 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.164 2005/01/10 21:02:44 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -2201,6 +2201,11 @@ set_output()
     } else if ((testfile = try_to_get_string())) {
 	gp_expand_tilde(&testfile);
 	term_set_output(testfile);
+	if (testfile != outstr) {
+	    if (testfile)
+		free(testfile);
+	    testfile = outstr;
+	}
 	/* if we get here then it worked, and outstr now = testfile */
     } else
 	int_error(c_token, "expecting filename");
