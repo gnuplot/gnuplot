@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.40 2004/03/31 15:42:52 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.41 2004/04/13 17:23:56 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - hidden3d.c */
@@ -94,7 +94,7 @@ static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.40 2004/03/31 15:42:52 
  * 'top' and 'bottom' sides of the surface, like I do, then just compile
  * with -DBACKSIDE_LINETYPE_OFFSET = 0. */
 #ifndef BACKSIDE_LINETYPE_OFFSET
-#define BACKSIDE_LINETYPE_OFFSET 1
+# define BACKSIDE_LINETYPE_OFFSET 1
 #endif
 
 /* This #define lets you choose if the diagonals that
@@ -102,7 +102,7 @@ static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.40 2004/03/31 15:42:52 
  * visible or not: do draw them, define it to be 7L, otherwise let be
  * 3L */
 #ifndef TRIANGLE_LINESDRAWN_PATTERN
-#define TRIANGLE_LINESDRAWN_PATTERN 3L
+# define TRIANGLE_LINESDRAWN_PATTERN 3L
 #endif
 
 /* Handle out-of-range or undefined points. Compares the maximum
@@ -112,7 +112,7 @@ static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.40 2004/03/31 15:42:52 
  * anything above 1, gnuplot may crash with a floating point exception
  * in hidden3d. You get what you asked for ... */
 #ifndef HANDLE_UNDEFINED_POINTS
-#define HANDLE_UNDEFINED_POINTS 1
+# define HANDLE_UNDEFINED_POINTS 1
 #endif
 /* Symbolic value for 'do not handle Undefined Points specially' */
 #define UNHANDLED (UNDEFINED+1)
@@ -124,7 +124,7 @@ static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.40 2004/03/31 15:42:52 
  * surface will be less rough than with the previous method, as the
  * border follows the undefined region as close as it can. */
 #ifndef SHOW_ALTERNATIVE_DIAGONAL
-#define SHOW_ALTERNATIVE_DIAGONAL 1
+# define SHOW_ALTERNATIVE_DIAGONAL 1
 #endif
 
 /* If the two triangles in a quad are both drawn, and they show
@@ -133,7 +133,7 @@ static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.40 2004/03/31 15:42:52 
  * parts of the scene being obscured by a line the user can't
  * see. This avoids unnecessary user surprises. */
 #ifndef HANDLE_BENTOVER_QUADRANGLES
-#define HANDLE_BENTOVER_QUADRANGLES 1
+# define HANDLE_BENTOVER_QUADRANGLES 1
 #endif
 
 /* The actual configuration is stored in these variables, modifiable
@@ -201,9 +201,9 @@ typedef polygon GPHUGE *p_polygon;
 #if HIDDEN3D_GRIDBOX
 # define UINT_BITS (CHAR_BIT * sizeof(unsigned int))
 # define COORD_TO_BITMASK(x,shift)					\
-    (~0U << (unsigned int) (((x) + 1.0) / 2.0 * UINT_BITS + (shift)))
-# define CALC_BITRANGE(range_min, range_max)				   \
-    ((~COORD_TO_BITMASK((range_max), 1)) & COORD_TO_BITMASK(range_min, 0))
+  (~0U << (unsigned int) (((x) + 1.0) / 2.0 * UINT_BITS + (shift)))
+# define CALC_BITRANGE(range_min, range_max)				 \
+  ((~COORD_TO_BITMASK((range_max), 1)) & COORD_TO_BITMASK(range_min, 0))
 #endif
 
 /* Enumeration of possible types of line, for use with the
@@ -218,14 +218,16 @@ typedef polygon GPHUGE *p_polygon;
  * right (west to east), and the isolines themselves are counted from
  * top to bottom, described as north and south. */
 typedef enum edge_direction {
-	edir_west, edir_north, edir_NW, edir_NE, edir_impulse, edir_point
+    edir_west, edir_north,
+    edir_NW, edir_NE,
+    edir_impulse, edir_point
 } edge_direction;
 
 /* direction into which the polygon is facing (the corner with the
  * right angle, inside the mesh, that is). The reference identifiying
  * the whole cell is always the lower right, i.e. southeast one. */
 typedef enum polygon_direction {
-	pdir_NE, pdir_SE, pdir_SW, pdir_NW
+    pdir_NE, pdir_SE, pdir_SW, pdir_NW
 } polygon_direction;
 
 /* Three dynamical arrays that describe what we have to plot: */
@@ -251,9 +253,9 @@ typedef struct qtreelist {
 typedef qtreelist GPHUGE *p_qtreelist;
 
 /* the number of cells in x and y direction: */
-#ifndef QUADTREE_GRANULARITY
-#define QUADTREE_GRANULARITY 10
-#endif
+# ifndef QUADTREE_GRANULARITY
+#  define QUADTREE_GRANULARITY 10
+# endif
 /* indices of the heads of all the cells' chains: */
 static long quadtree[QUADTREE_GRANULARITY][QUADTREE_GRANULARITY];
 /* and a macro to calculate the cells' position in that array: */
@@ -1078,9 +1080,9 @@ build_networks(plots, pcount)
 						      color_from_column);
 			    points[i].z = remember_z;
 			}
-		    if (basevertex > 0)
-			store_edge(thisvertex, edir_impulse, 0, lp, above);
-		    break;
+			if (basevertex > 0)
+			    store_edge(thisvertex, edir_impulse, 0, lp, above);
+			break;
 			
 		    case POINTSTYLE:
 		    default:	/* treat all the others like 'points' */
@@ -1386,12 +1388,10 @@ sort_polys_by_z()
 	for (i=polygons.end - 1; i >= 0; i--) {
 	    this = plist + sortarray[i];
 		
-		
 	    grid_x_low = COORD_TO_TREECELL(this->xmin);
 	    grid_x_high = COORD_TO_TREECELL(this->xmax);
 	    grid_y_low = COORD_TO_TREECELL(this->ymin);
 	    grid_y_high = COORD_TO_TREECELL(this->ymax);
-
 
 	    for (grid_x = grid_x_low; grid_x <= grid_x_high; grid_x++) {
 		for (grid_y = grid_y_low; grid_y <= grid_y_high; grid_y++) {
@@ -1849,6 +1849,7 @@ in_front(edgenum, vnum1, vnum2, firstpoly)
 		 * (like the crossover line in the Klein-bottle demo):
 		 * both edges will be hidden by the other's polygon,
 		 * essentially */
+#if 0
 		if (0
 		    || (GR(p_side[0], 0)
 			&& GR(p_side[1], 0)
@@ -1860,6 +1861,20 @@ in_front(edgenum, vnum1, vnum2, firstpoly)
 			)
 		    ) 
 		    continue;
+#else
+		/* HBB 20020406: try to repair this */
+		if (0
+		    || (GE(p_side[0], 0)
+			&& GE(p_side[1], 0)
+			&& GE(p_side[2], 0)
+			)
+		    || (GE(0 , p_side[0])
+			&& GE(0 , p_side[1])
+			&& GE(0 , p_side[2])
+			)
+		    )
+		    continue;
+#endif
 	    }
 
 	    /* Test 6 (3D): does the whole edge lie on the viewer's
@@ -1990,7 +2005,7 @@ in_front(edgenum, vnum1, vnum2, firstpoly)
 #define hit_in_edge(hit) ((hit >= 0) && (hit <= 1))
 
 		/* find the intersection point through the front
-                 * plane, if any: */
+		 * plane, if any: */
 		front_hit = 1e10;
 		if (classification[3]) {
 		    if (SIGN(v1_rel_pplane - v2_rel_pplane)) {
@@ -2100,7 +2115,7 @@ in_front(edgenum, vnum1, vnum2, firstpoly)
 
 		case makeclass(1,1,1):
 		    /* v1 out both sides, and in front of p (--> v2 is
-                     * hidden) */
+		     * hidden) */
 		    if (front_hit < hit1) {
 			classification[3] = 0;
 			if (hit1 < hit2)
@@ -2153,7 +2168,7 @@ in_front(edgenum, vnum1, vnum2, firstpoly)
 				
 		case makeclass(2,2,2):
 		    /* v2 out both sides, and in front of p (--> v1 is
-                     * hidden) */
+		     * hidden) */
 		    if (front_hit > hit1) {
 			classification[3] = 0;
 			if (hit1 > hit2)
@@ -2233,7 +2248,7 @@ in_front(edgenum, vnum1, vnum2, firstpoly)
 /*----------- cases with either 2 or no intersections: --------------*/
 
 		    /* Mainly identical code block to be used 4 times
-                     * --> macro */
+		     * --> macro */
 		    /* HBB 20001108: up until today, this part of the
 		     * was severely buggy. But I do think I've got it
 		     * fixed up, this time */
