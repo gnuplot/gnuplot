@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.51 2003/02/18 16:38:11 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.53 2003/03/31 22:33:54 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -1636,7 +1636,7 @@ test_term()
     (void) (*t->text_angle) (0);
 
     /* test tic size */
-    (*t->move) ((unsigned int) (xmax_t / 2 + t->h_tic * (1 + ticscale)), (unsigned) ymax_t);
+    (*t->move) ((unsigned int) (xmax_t / 2 + t->h_tic * (1 + ticscale)), (unsigned int) ymax_t - 1);
     (*t->vector) ((unsigned int) (xmax_t / 2 + t->h_tic * (1 + ticscale)),
 		  (unsigned int) (ymax_t - ticscale * t->v_tic));
     (*t->move) ((unsigned int) (xmax_t / 2), (unsigned int) (ymax_t - t->v_tic * (1 + ticscale)));
@@ -1716,7 +1716,8 @@ test_term()
     (*t->put_text)(x+xl*7, yl+t->v_char*1.5, "pattern fill");
     for (i=0; i<10; i++) {
 	int style = ((i<<4) + FS_PATTERN);
-	(*t->fillbox) ( style, x, y, xl, yl );
+	if (*t->fillbox)
+	    (*t->fillbox) ( style, x, y, xl, yl );
 	(*t->move)  (x,y);
 	(*t->vector)(x,y+yl);
 	(*t->vector)(x+xl,y+yl);
