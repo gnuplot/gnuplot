@@ -1,3 +1,7 @@
+2004-09-03  Daniel Sebald  <daniel.sebald@ieee.org>
+
+	* src/breaders.c src/datafile.c: Get rid of compiler warnings.
+
 2004-09-03  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/datafile.c: Changed default value of datafile endianess after

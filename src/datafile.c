@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.56 2004/09/01 15:53:46 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.57 2004/09/03 15:48:36 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -2644,7 +2644,7 @@ byte_read_order (df_endianess_type file_endian)
      * programmer doesn't incorrectly access array and cause segmentation
      * fault unknowingly.
      */
-    return df_byte_read_order_map[THIS_COMPILER_ENDIAN][GPMIN(GPMAX(0,file_endian), DF_ENDIAN_TYPE_LENGTH)];
+    return df_byte_read_order_map[THIS_COMPILER_ENDIAN][GPMIN(file_endian, DF_ENDIAN_TYPE_LENGTH-1)];
 }
 
 
@@ -3694,7 +3694,7 @@ plot_option_comma_separated(df_comma_separated_type type, int arg)
 {
 
     TBOOLEAN first_number = TRUE;  /* Set true to make sure a number (or tuple) appears first. */
-    TBOOLEAN comma_previous;
+    TBOOLEAN comma_previous = FALSE;
     int bin_record_count = 0;
     int test_val;
 
@@ -4277,7 +4277,7 @@ df_readbinary(double v[], int max)
     /* For matrix data structure (i.e., gnuplot binary). */
     static double first_matrix_column;
     static float *scanned_matrix_row = 0;
-    int first_matrix_row_col_count;
+    static int first_matrix_row_col_count;
     TBOOLEAN discarded_first_matrix_value = FALSE;
     TBOOLEAN saved_first_matrix_column = FALSE;
 
@@ -4486,7 +4486,7 @@ df_readbinary(double v[], int max)
 	 */
 	for (i=0; ; i++) {
 
-	    int register skip_bytes = df_column_bininfo[i].skip_bytes;
+	    int skip_bytes = df_column_bininfo[i].skip_bytes;
 
 	    if (skip_bytes) {
 		if (memory_data) {

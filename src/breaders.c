@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: breaders.c,v 1.55 2004/07/13 14:11:22 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: breaders.c,v 1.1 2004/09/01 15:56:59 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - breaders.c */
@@ -99,7 +99,7 @@ static const struct gen_table4 edf_datatype_table[] =
     { "DoubleValue",	DF_DOUBLE,  2, 8 },
     { "Float",		DF_FLOAT,   2, 4 }, /* Float and FloatValue are synonyms */
     { "Double",		DF_DOUBLE,  2, 8 }, /* Double and DoubleValue are synonyms */
-    { NULL, -1 }
+    { NULL, -1, -1, -1 }
 };
 
 static const struct gen_table edf_byteorder_table[] =
