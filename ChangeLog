@@ -1,3 +1,9 @@
+2003-03-14  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* demo/pm3d.dem: Improved demo for corners2color.
+
+	* docs/gnuplot.doc: Proofreading pm3d section.
+
 2003-03-13  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* NEWS src/pm3d.h src/pm3d.c src/tables.h src/tables.c src/save.c
