@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.14 1999/10/29 18:47:17 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.15 1999/11/08 19:24:28 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -295,6 +295,7 @@ df_gets()
     /* NOTREACHED */
     return NULL;
 }
+
 /*}}} */
 
 /*{{{  static int df_tokenise(s) */
@@ -343,29 +344,26 @@ char *s;
  * optimizations by Corey Satten, corey@cac.washington.edu
  */
 	    if ((fast_columns == 0)
-			|| (df_no_use_specs == 0)
-					|| ((df_no_use_specs > 0)
-			&& (use_spec[0].column == dfncp1
-									|| (df_no_use_specs > 1
-				&& (use_spec[1].column == dfncp1
-													|| (df_no_use_specs > 2
-					&& (use_spec[2].column == dfncp1
-																	|| (df_no_use_specs > 3
-						&& (use_spec[3].column == dfncp1
-																					|| (df_no_use_specs > 4
-							&& (use_spec[4].column == dfncp1
-								|| df_no_use_specs > 5
-								)
-							)
+		|| (df_no_use_specs == 0)
+		|| ((df_no_use_specs > 0)
+		    && (use_spec[0].column == dfncp1
+			|| (df_no_use_specs > 1
+			    && (use_spec[1].column == dfncp1
+				|| (df_no_use_specs > 2
+				    && (use_spec[2].column == dfncp1
+					|| (df_no_use_specs > 3
+					    && (use_spec[3].column == dfncp1
+						|| (df_no_use_specs > 4 && (use_spec[4].column == dfncp1 || df_no_use_specs > 5)
 						)
+					    )
 					)
+				    )
 				)
-															)
-													)
-											)
-									)
-							)
-			) {
+			    )
+			)
+		    )
+		)
+		) {
 
 #ifndef NO_FORTRAN_NUMS
 		count = sscanf(s, "%lf%n", &df_column[df_no_cols].datum, &used);
@@ -419,6 +417,7 @@ char *s;
 
     return df_no_cols;
 }
+
 /*}}} */
 
 /*{{{  static float **df_read_matrix() */
@@ -653,6 +652,7 @@ int max_using;
 
     return df_no_use_specs;
 }
+
 /*}}} */
 
 /*{{{  void df_close() */
@@ -950,15 +950,13 @@ int max;
 	/* accept only lines with (line_count%everyline) == 0 */
 
 	if (line_count < firstline || line_count > lastline ||
-	    (line_count - firstline) % everyline != 0
-	    )
+	    (line_count - firstline) % everyline != 0)
 	    continue;
 
 	/* update point_count. ignore point if point_count%everypoint != 0 */
 
 	if (++point_count < firstpoint || point_count > lastpoint ||
-	    (point_count - firstpoint) % everypoint != 0
-	    )
+	    (point_count - firstpoint) % everypoint != 0)
 	    continue;
 	/*}}} */
 	/*}}} */
@@ -972,10 +970,11 @@ int max;
 	    assert(NCOL == 7);
 
 	    /* check we have room for at least 7 columns */
-	    if (df_max_cols < 7)
+	    if (df_max_cols < 7) {
+		df_max_cols = 7;
 		df_column = (df_column_struct *) gp_realloc(df_column,
-							    (df_max_cols = 7) * sizeof(df_column_struct),
-							    "datafile columns");
+							    df_max_cols * sizeof(df_column_struct), "datafile columns");
+	    }
 
 	    df_no_cols = sscanf(line, df_format,
 				&df_column[0].datum,
@@ -1023,7 +1022,7 @@ int max;
 		    v[output] = line_count;
 		} else if (column == 0) {
 		    v[output] = df_datum;	/* using 0 */
-		} else if (column <= 0)		/* really < -2, but */
+		} else if (column <= 0)	/* really < -2, but */
 		    int_error(NO_CARET, "internal error: column <= 0 in datafile.c");
 		else if (df_timecol[output]) {
 		    struct tm tm;
@@ -1075,6 +1074,7 @@ int max;
     df_eof = 1;
     return DF_EOF;
 }
+
 /*}}} */
 
 /*{{{  int df_2dbinary(this_plot) */
@@ -1085,6 +1085,7 @@ struct curve_points *this_plot;
     int_error(NO_CARET, "Binary file format for 2d data not yet defined");
     return 0;			/* keep compiler happy */
 }
+
 /*}}} */
 
 /*{{{  int df_3dmatrix(this_plot, ret_this_iso) */
@@ -1183,11 +1184,11 @@ struct surface_points *this_plot;
     if (df_no_use_specs != 0 && df_no_use_specs != 3)
 	int_error(NO_CARET, "Current implementation requires full using spec");
 
-    if (df_max_cols < 3 &&
-	!(df_column = (df_column_struct *) gp_realloc(df_column,
-						      (df_max_cols = 3) * sizeof(df_column_struct),
-						      "datafile columns")))
-	int_error(c_token, "Out of store in binary read");
+    if (df_max_cols < 3) {
+	df_max_cols = 3;
+	df_column = (df_column_struct *) gp_realloc(df_column,
+						    df_max_cols * sizeof(df_column_struct), "datafile columns");
+    }
 
     df_no_cols = 3;
     df_column[0].good = df_column[1].good = df_column[2].good = DF_GOOD;
@@ -1353,6 +1354,7 @@ struct surface_points *this_plot;
 	free_vector(ct, 0, nc - 1);
     return (nc);
 }
+
 /*}}} */
 
 /* stuff for implementing the call-backs for picking up data values
@@ -1376,6 +1378,7 @@ union argument *x;
     } else
 	push(Gcomplex(&a, df_column[column].datum, 0.0));
 }
+
 /*}}} */
 
 /*{{{  void f_column() */
@@ -1396,6 +1399,7 @@ f_column()
     } else
 	push(Gcomplex(&a, df_column[column].datum, 0.0));
 }
+
 /*}}} */
 
 /*{{{  void f_valid() */
@@ -1423,13 +1427,13 @@ f_timecolumn()
     column = (int) magnitude(&a) - 1;
     if (column < 0 || column >= df_no_cols ||
 	!df_column[column].position ||
-	!gstrptime(df_column[column].position, timefmt, &tm)
-	) {
+	!gstrptime(df_column[column].position, timefmt, &tm)) {
 	undefined = TRUE;
 	push(&a);		/* any objection to this ? */
     } else
 	push(Gcomplex(&a, gtimegm(&tm), 0.0));
 }
+
 /*}}} */
 
 #if 0				/* not used */
@@ -1455,6 +1459,7 @@ char *fmt;			/* format string */
     }
     return (cnt);
 }
+
 /*}}} */
 
 /* modify default use_spec, applies for no user spec and time datacolumns */
@@ -1470,6 +1475,7 @@ int jump;			/* no of columns in timefmt (time data) */
 	use_spec[i].column += jump;	/* add no of columns in time to the rest */
     df_no_use_specs = 0;
 }
+
 /*}}} */
 #endif /* not used */
 
@@ -1481,12 +1487,12 @@ char *s;
     if (missing_val != NULL) {
 	size_t len = strlen(missing_val);
 	if (strncmp(s, missing_val, len) == 0 &&
-	    (isspace((int) s[len]) || !s[len])) {
-	    return (1);;	/* store undefined point in plot */
-	}
+	    (isspace((int) s[len]) || !s[len]))
+	    return 1;	/* store undefined point in plot */
     }
     return (0);
 }
+
 /*}}} */
 
 
