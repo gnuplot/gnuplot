@@ -157,7 +157,7 @@ void evaluate_at(at_ptr, val_ptr)
 			undefined = TRUE;
 		}
 	}
-#if NeXT || ultrix || __osf__
+#if NeXT || ultrix
     /*
      * linux was able to fit curves which NeXT gave up on -- traced it to
      * silently returning NaN for the undefined cases and plowing ahead
@@ -168,7 +168,7 @@ void evaluate_at(at_ptr, val_ptr)
 		errno = 0;
 		Gcomplex(val_ptr, 0.0/0.0, 0.0/0.0);
 	}
-#endif /* NeXT || ultrix || __osf__ */
+#endif /* NeXT || ultrix */
 }
 
 
