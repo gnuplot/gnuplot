@@ -1,3 +1,8 @@
+2004-07-21  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* term/post.trm (PS_make_header): Moved prototype into PM3D-only
+	section.
+
 2004-07-21  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* demo/Makefile.am.in: Add labelplot.pdb to Makefile.am target.

@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.115 2004/07/17 18:28:28 sfeam Exp $
+ * $Id: post.trm,v 1.116 2004/07/19 00:38:02 sfeam Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -136,6 +136,7 @@ static void write_component_array __PROTO((const char *text, gradient_struct *gr
 static void write_gradient_definition __PROTO((gradient_struct *gradient, int cnt));
 static void write_color_space __PROTO((t_sm_palette *palette));
 static void make_palette_formulae __PROTO((void));
+static void PS_make_header __PROTO((t_sm_palette *palette));
 #endif /* PM3D */
 
 /* for enhanced mode, we keep a separate font name and size, which
@@ -173,7 +174,6 @@ struct ps_fontfile_def {
 static struct ps_fontfile_def *first_ps_fontfile = NULL;
 
 static void delete_ps_fontfile __PROTO((struct ps_fontfile_def *, struct ps_fontfile_def *));
-static void PS_make_header __PROTO((t_sm_palette *palette));
 
 TERM_PUBLIC void PS_load_fontfile __PROTO((struct ps_fontfile_def *,TBOOLEAN));
 TERM_PUBLIC void PS_load_fontfiles __PROTO((TBOOLEAN));
