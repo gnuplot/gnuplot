@@ -1,3 +1,90 @@
+1998-10-09  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* Makefile.in, makefile.all: Add xref.h to DOCS1. Small changes.
+
+	* bf_test.c(int_error): Use only one fprintf().
+
+	* command.c: Move #ifdef MSDOS block from top of file to plot.h.
+	Suggested by HBB.
+
+	* datafile.c: Fix indentation.
+
+	* internal.c(pop): Remove superfluous space.
+
+	* makefile.286, makefile.amg, makefile.dj2, makefile.djg, makefile.emx,
+	makefile.g, makefile.msc, makefile.msw,makefile.mto, makefile,nt,
+	makefile,os2, makefile.os9, makefile.st, makefile.tc, makefile.vms,
+	makefile.wc, makefile.win, makefile.ztc: Update to reflect changes
+	in docs/Makefile.in.
+
+	* plot.c: Fix indentation.
+
+	* plot.h: Update, add MSDOS #ifdef block from command.c, add HELPFILE
+	definitions to OS section.
+
+	* plot2d.c: Remove MSDOS #ifdef block (outdated version of the defines
+	in command.c, now in plot.h). Indentation.
+
+	* plot3d.c, scanner.c, set.c: Minor changes.
+
+	* docs/Makefile.in, docs/makefile, docs/makefile.ami: Add termdoc.o
+	and xref.o where required. No more inclusion of .c files.
+
+	* docs/checkdoc.c, docs/doc2gih.c, docs/doc2hlp.c, docs/doc2html.c,
+	docs/doc2info.c, docs/doc2ipf.c, docs/doc2ms.c, docs/doc2rnh.c,
+	docs/doc2rtf.c, docs/doc2tex.c, docs/termdoc.c, docs/xref.c: No more
+	inclusion of .c files. Indentation, small changes.
+
+	* docs/xref.h: New file for definitions from docs/xref.c.
+
+	* version.c: Patchlevel pl5.
+
+1998-10-08  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* show.c(show_version_long): Add \n in fprintf().
+
+	* util.c(m_quote_capture): Use parse_esc() to interpret escape
+	sequences.
+
+	* docs/Makefile.in: Fix configuration variables.
+
+	* term/eepic.trm, term/latex.trm, term/pslatex.trm, term/tpic.trm:
+	Patch from Jochen Schuetze <jos@GBF.DE> to document free positioning
+	of labels feature.
+
+1998-10-07  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* acinclude.m4: Use LIBS instead of LDFLAGS in gp_MSDOS. Patch by
+	Andris Pavenis <pavenis@lanet.lv>.
+
+	* aclocal.m4, configure: Regenerated.
+
+	* configure.in: Rewrite tests for termcap and readline. Remove
+	obsolete AC_SUBST(TERMFLAFGS). Add `-mieee' to CFLAGS for gcc
+	under OSF/1 Digital Unix to prevent core dump in demo files.
+
+	* command.c: Define some macros for Windows. Remove spurious else
+	in #ifdef'd code for Atari in command(). Additional #ifdef's for
+	GNU_READLINE. Indentation.
+
+	* Makefile.in: Rename distdir.
+
+1998-10-06  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* configure.in: Fix readline logic.
+
+	* makefile.os2: Patch from Alexander Mai
+	<st002279@hrzpub.tu-darmstadt.de>
+
+	* plot2d.c: Cleaning up, indentation.
+
+	* docs/gnuplot.doc: Corrections from Lucas Hart <hartl@ucs.orst.edu>.
+	Rename what's-new to new-features.
+
+	* term/eepic.trm, term/latex.trm, pslatex.trm, tpic.trm: Patch from
+	Jochen Schuetze <jos@GBF.DE> to support free positioning of labels
+	with LaTeX related terminals.
+
 1998-10-05  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* 0INSTALL: Document new configure options. Additions.
@@ -67,7 +154,7 @@
 
 	* docs/gnuplot.doc: Fix URL.
 
-	* docs/termdoc.c: Patches from Lucas Hart.
+	* docs/termdoc.c: Patches from Lucas Hart <hartl@ucs.orst.edu>.
 
 1998-10-01  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
@@ -103,9 +190,6 @@
 	term/*.trm: Rename outfile gpoutfile to	resolve clash with GNU
 	plotutils library.
 
-	* plot.h: Define _PLOT_H_ to avoid accidental includsion of <plot.h>
-	from GNU plotutils. Add FAQ_LOCATION.
-
 	* plot2d.c, plot3d.c: Add declaration of gpoutfile.
 
 	* setshow.h: Remove outfile declaration.
@@ -114,7 +198,7 @@
 	only once. Rewrite show_version_long() to output to stderr instead
 	of stdout. Add UNIXPLOT and GNUGRAPH.
 
-	* term.h: Use GNUGRAPH independenlty of UNIXPLOT.
+	* term.h: Use GNUGRAPH independently of UNIXPLOT.
 
 	* version.c: Add faq_location.
 
@@ -189,7 +273,7 @@
 	
 	* stdfn.h: Add missing stat macros for WIN32 and AMIGA_SC_6_1.
 
-	* term/x11.trm: VMS diffs by Lucas Hart.
+	* term/x11.trm: VMS diffs by Lucas Hart <hartl@ucs.orst.edu>.
 
 	* win/wgnuplib.def, win/wgnuplot.def: Re-add ^M's at end of line.
 
