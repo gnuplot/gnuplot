@@ -1,5 +1,10 @@
 2003-11-30  Petr Mikulik  <mikulik@physics.muni.cz>
 
+	* docs/gnuplot.doc: Get documentation for 'palette gray' and 'palette
+	gamma' close together.
+
+2003-11-30  Petr Mikulik  <mikulik@physics.muni.cz>
+
 	* src/command.c (test_palette_subcommand): Don't forget the replot
 	command after 'test palette'.
 

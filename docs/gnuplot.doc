@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.190 2003/11/24 15:15:13 mikulik Exp $
+C RCS $Id: gnuplot.doc,v 1.191 2003/11/24 16:22:30 mikulik Exp $
 C 18 September 2001
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001   Thomas Williams, Colin Kelley et al.
 C
@@ -6062,6 +6062,7 @@ C ... and restart the table:
        set palette
        set palette {
                   { gray | color }
+                  { gamma <gamma> }
                   {   rgbformulae <r>,<g>,<b>
                     | defined { ( <gray1> <color1> {, <grayN> <colorN>}... ) }
                     | file '<filename>' {datafile-modifiers}
@@ -6071,7 +6072,6 @@ C ... and restart the table:
                   { positive | negative }
                   { nops_allcF | ps_allcF }
                   { maxcolors <maxcolors> }
-                  { gamma <gamma> }
                 }
        show palette
        show palette palette <n> {{float | int}}
@@ -6123,6 +6123,10 @@ C ... and restart the table:
  `file` and `functions` switch to a color mapping.  `set palette color` is an
  easy way to switch back from the gray palette to the last color mapping.
 
+ Automatic gamma correction via `set palette gamma <gamma>` can be done for
+ gray maps only (`set palette gray`).  Linear mapping to gray is for gamma
+ equals 1, see `test palette`.  Gamma is ignored for color mappings.
+
  Most terminals support only discrete number of colors (e.g. 256 colors in
  gif).  All entries of the palette remaining after the default gnuplot linetype
  colors declaration are allocated for pm3d by default.  Then `multiplot` could
@@ -6132,9 +6136,6 @@ C ... and restart the table:
  steps, thus to emulate filled contours. Default value of 0 stays for
  allocating all remaining entries in the terminal palette or for to use exact
  mapping to RGB.
-
- Automatic gamma correction via `set palette gamma <gamma>` can be done for
- gray maps only (`set palette gray`).  Gamma is ignored for color mappings.
 
  RGB color space might not be the most useful color space to work in.  For
  that reason you may change the color space with `model` to one of `RGB`,
