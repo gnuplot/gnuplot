@@ -150,6 +150,23 @@ enum JUSTIFY up_justify=LEFT;
 # define ROTATE(angle) rotate(0,0,90*angle)
 #endif
 
+#ifdef GNU_PLOTUTILS
+/* We don't include plot.h from plotutils because of
+ * the name clash with ../plot.h.
+ */
+extern int openpl __PROTO((void));
+extern int space __PROTO((int, int, int, int));
+extern int fontname __PROTO((const char *));
+extern int fontsize __PROTO((int));
+extern int erase __PROTO((void));
+extern int linemod __PROTO((const char *));
+extern int move __PROTO((int, int));
+extern int cont __PROTO((int, int));
+extern int alabel __PROTO((int, int, const char *));
+extern int textangle __PROTO((int));
+extern int closepl __PROTO((void));
+#endif
+
 TERM_PUBLIC void UP_options()
 {
 	if(!END_OF_COMMAND) {
