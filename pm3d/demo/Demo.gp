@@ -115,7 +115,6 @@ set yrange [*:*] noreverse
 
 
 reset
-set term pop
 
 set title "surface at view 130,10 (viewed from below)"
 set pm3d
@@ -247,7 +246,6 @@ pause -1 "Press Enter."
 
 
 reset
-set term pop
 
 set title "only for enhanced terminals: 'set format cb ...'"
 set xlabel "X"
@@ -294,7 +292,6 @@ splot sin(y)/(y) w lp lt pal
 pause -1
 
 reset
-set term pop
 
 set title "Demo for clipping of 2 rectangles will come. Now xrange is [0:2]"
 set pm3d; set palette
@@ -315,5 +312,8 @@ set title "...now xrange is [0:1.5] and 'set pm3d clip4in'"
 set pm3d clip4in
 replot
 pause -1 "Press Enter."
+
+set out
+set term pop
 
 print "End of pm3d demo."

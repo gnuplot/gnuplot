@@ -1,3 +1,8 @@
+2002-01-10  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* pm3d/demo/Demo.gp: Remove 'set term pop' after 'reset' (the latter
+	does not change terminal).
+
 2002-01-07  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* plot.c: Fix load_rcfile() to properly	report the startup filename
