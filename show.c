@@ -1505,7 +1505,7 @@ int len;
 
 	fprintf(stderr,"\n\tVariables:\n");
 	while (udv) {
-	     len = instring(udv->udv_name, ' ');
+		len = instring(udv->udv_name, ' ');
 		fprintf(stderr,"\t%-*s ",len,udv->udv_name);
 		if (udv->udv_undef)
 			fputs("is undefined\n",stderr);
@@ -1536,6 +1536,7 @@ show_version()
 void
 show_version_long ()
 {
+	char *helpfile = NULL;
 #ifdef HAVE_SYS_UTSNAME_H
 	struct utsname uts;
 
@@ -1565,58 +1566,71 @@ show_version_long ()
 	puts ("\nCompile options:");
 
 	{
-	  const char *readline, *gnu_readline, *libgd, *libpng, *linuxvga,
-		     *nocwdrc, *x11;
+		/* The following code could be a lot simper if
+		 * it wasn't for Borland's broken compiler ...
+		 */
+		const char *readline, *gnu_readline, *libgd, *libpng,
+			*linuxvga, *nocwdrc, *x11;
 
-	  readline =
+		readline =
 #ifdef READLINE
-	      "+READLINE  "
+		"+READLINE  "
 #else
-	      "-READLINE  "
+		"-READLINE  "
 #endif
-             , gnu_readline =
+		, gnu_readline =
 #ifdef GNU_READLINE
-	      "+GNU_READLINE  "
+		"+GNU_READLINE  "
 #else
-	      "-GNU_READLINE  "
+		"-GNU_READLINE  "
 #endif
-             , libgd =
+		, libgd =
 #ifdef HAVE_LIBGD
-	      "+LIBGD  "
+		"+LIBGD  "
 #else
-	      "-LIBGD  "
+		"-LIBGD  "
 #endif
-             , libpng =
+		, libpng =
 #ifdef HAVE_LIBPNG
-	      "+LIBPNG  "
+		"+LIBPNG  "
 #else
-	      "-LIBPNG  "
+		"-LIBPNG  "
 #endif
-             , linuxvga =
+		, linuxvga =
 #ifdef LINUXVGA
-	      "+LINUXVGA  "
+		"+LINUXVGA  "
 #else
-              ""
+		""
 #endif
-             , nocwdrc =
+		, nocwdrc =
 #ifdef NOCWDRC
-	      "+NOCWDRC  "
+		"+NOCWDRC  "
 #else
-	      "-NOCWDRC  "
+		"-NOCWDRC  "
 #endif
-             , x11 =
+		, x11 =
 
 #ifdef X11
-	      "+X11  "
+		"+X11  "
 #else
-              ""
+		""
 #endif
-          ;
-          printf("%s%s%s%s%s%s%s\n", readline, gnu_readline, libgd, libpng,
-               linuxvga, nocwdrc, x11);
+		;
+		printf("%s%s%s%s%s%s%s\n", readline, gnu_readline,
+			libgd, libpng, linuxvga, nocwdrc, x11);
         }
 
-	printf ("HELPFILE=\"%s\"\n", HELPFILE);
+	if ((helpfile = getenv ("GNUHELP")) == NULL) {
+#if defined(ATARI) || defined(MTOS)
+		if ((helpfile = getenv ("GNUPLOTPATH")) == NULL) {
+			helpfile = HELPFILE;
+		}
+#else
+		helpfile = HELPFILE;
+#endif
+	}
+
+	printf ("HELPFILE=\"%s\"\n", helpfile);
 	printf ("CONTACT=<%s>\n", bug_email);
 	printf ("HELPMAIL=<%s>\n", help_email);
 }
