@@ -1,3 +1,10 @@
+2001-07-09  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* term/tpic.trm (tpic_abspath): Fix by  Shigeharu TAKENO
+	<shige@iee.niit.ac.jp>. Write simple \special command directly,
+	instead of using the \put{} method to move the coordinate
+	system.
+
 2001-07-03  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/axis.h (t_autoscale): Two new enum names to flag a
