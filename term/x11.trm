@@ -98,27 +98,35 @@ int X11_Display = 0;		/* non-zero if '-display' found on command line */
 
 static void X11_atexit HANDLER_PROTO;
 
-static char X11_opts[][20] =
+/* Merged the old char X11_opts[] and int X11_optarg[]
+ * into one array of structs.
+ * Loosely based on XrmOptionDescRec, the use of which
+ * would probably be overkill here. */
+typedef enum { hasNoValue, hasValue } OptionType;
+
+static struct x11opt {
+    char *option;	/* Name of option */
+    OptionType type;	/* Type of option */
+}  X11_opts[] =
 {
-    "-mono", "-gray", "-clear", "-tvtwm", "-pointsize",
-    "-iconic", "-rv", "-reverse", "+rv", "-synchronous",
-    "-display", "-geometry", "-bg", "-background", "-bd", "-bordercolor", "-bw",
-    "-borderwidth", "-fg", "-foreground", "-fn", "-font", "-name",
-    "-selectionTimeout", "-title", "-xnllanguage", "-xrm",
-    "-raise", "-noraise", "-persist"
+   { "-mono", hasNoValue }, { "-gray", hasNoValue }, { "-clear", hasNoValue },
+   { "-tvtwm", hasNoValue }, { "-pointsize", hasValue },
+   { "-iconic", hasNoValue }, { "-rv", hasNoValue },
+   { "-reverse", hasNoValue }, { "+rv", hasNoValue },
+   { "-synchronous", hasNoValue },
+   { "-display", hasValue }, { "-geometry", hasValue }, { "-bg", hasValue },
+   { "-background", hasValue }, { "-bd", hasValue },
+   { "-bordercolor", hasValue }, { "-bw", hasValue },
+   { "-borderwidth", hasValue }, { "-fg", hasValue },
+   { "-foreground", hasValue }, { "-fn", hasValue }, { "-font", hasValue },
+   { "-name", hasValue },
+   { "-selectionTimeout", hasValue }, { "-title", hasValue },
+   { "-xnllanguage", hasValue }, { "-xrm", hasValue },
+   { "-raise", hasNoValue }, { "-noraise", hasNoValue },
+   { "-persist", hasNoValue }
 };
 
 #define X11_nopts (sizeof(X11_opts) / sizeof(X11_opts[0]))
-
-static int X11_optarg[X11_nopts] =
-{
-    0, 0, 0, 0, 1,
-    0, 0, 0, 0, 0,
-    1, 1, 1, 1, 1, 1, 1,
-    1, 1, 1, 1, 1, 1,
-    1, 1, 1, 1,
-    0, 0, 0
-};
 
 static FILE *X11_ipc;
 #ifdef OS2
@@ -139,12 +147,12 @@ char *argv[];
 
     while (++argv, --argc > 0) {
 	for (n = 0; n < X11_nopts; n++) {
-	    if (!strcmp(*argv, X11_opts[n])) {
+	    if (!strcmp(*argv, X11_opts[n].option)) {
 		strcat(X11_command, " ");
 		strcat(X11_command, *argv);
 		if (strcmp(*argv, "-display") == 0)
 		    X11_Display++;
-		if (X11_optarg[n]) {
+		if (X11_opts[n].type == hasValue) {
 		    if (--argc <= 0)
 			return (nx11);
 		    strcat(X11_command, " \"");
@@ -212,13 +220,17 @@ Error.Incompatible options.
  *   DEFAULT_X11 popen() pipe IPC
  *---------------------------------------------------------------------------*/
 
-	static void X11_atexit HANDLER_DECL { if (X11_ipc) {
+static void X11_atexit HANDLER_DECL
+{
+    if (X11_ipc) {
 	fputs("R\n", X11_ipc);
 	fclose(X11_ipc);
 	/* dont wait(), since they might be -persist */
 	X11_ipc = NULL;
     }
-} TERM_PUBLIC void X11_init()
+}
+
+TERM_PUBLIC void X11_init()
 {
     if (!X11_ipc) {
 	/* first time through or after a reset */
@@ -247,7 +259,7 @@ Error.Incompatible options.
 	static int been_here = 0;
 	if (!been_here) {
 	    atexit(X11_atexit);
-	    been_here = 1;
+	    been_here++;
 	}
     }
 
@@ -450,13 +462,17 @@ TERM_PUBLIC void X11_init()
 #define BEFORE_GRAPHICS		/* nowt */
 #define AFTER_TEXT		/* nowt */
 
-    static void X11_atexit HANDLER_DECL { if (X11_channel) {
+static void X11_atexit HANDLER_DECL
+{
+    if (X11_channel) {
 	PRINT0("R\n");
 	sleep(2);		/* Wait for subprocess to finish */
 	sys$dassgn(X11_channel);
 	X11_channel = 0;
     }
-} TERM_PUBLIC void X11_reset()
+}
+
+TERM_PUBLIC void X11_reset()
 {
     /* do nothing until exit */
 }
