@@ -1,3 +1,8 @@
+1999-09-27  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* term/tkcanvas.trm: Backport from -current, integrated perltk and
+	extended interactive Tk/Tcl capabilities.
+
 1999-09-24  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* plot2d.c(get_data): Check for minimum number of required data
