@@ -1,3 +1,10 @@
+2004-04-04  Ethan Merritt  <merritt@u.washington.edu>
+
+	* term/svg.trm: 'Set term svg {fontfile <filename>}' option to embed a
+	font, or a hyperlink to it, in the output svg document. This allows the
+	use of symbol fonts in conjunction with enhanced text mode. The file
+	search path is controlled by environmental variable GNUPLOT_FONTPATH. 
+
 2004-04-01  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/plot.c: Fix OS/2 release version string if wrong in using
