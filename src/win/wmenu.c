@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wmenu.c,v 1.1 1999/03/26 22:11:18 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: wmenu.c,v 1.2 2002/03/10 18:54:52 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - win/wmenu.c */
@@ -189,7 +189,7 @@ char *szFilter;
 				}
 				break;
 #else
-				/* Use InputBox if you don't have COMMDLG.DLL.
+				/* Use InputBox if you don't have COMMDLG.DLL */
 				s++;	/* skip list box title */
 				for(i=0; (*s >= 32 && *s <= 126); i++)
 					s++;
