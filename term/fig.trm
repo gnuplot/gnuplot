@@ -1,5 +1,5 @@
 /*
- * $Id: fig.trm,v 1.35 2002/10/25 16:37:54 sfeam Exp $
+ * $Id: fig.trm,v 1.36 2002/12/13 14:58:41 lhecking Exp $
  */
 
 /* GNUPLOT - fig.trm */
@@ -848,7 +848,12 @@ FIG_put_text(x, y, str)
 	*(s2++) = *s1;
     } while ( *(s1++) );
     FIG_poly_clean(FIG_polyvec_stat);
-    y -= term->v_char / 2;	/* assuming vertical center justified */
+    if (FIG_angle == 0.)
+	y -= term->v_char / 2;	/* assuming vertical center justified */
+    else {
+	x += (int)(term->v_char*sin(FIG_angle)/2.);
+	y -= (int)(term->v_char*cos(FIG_angle)/2.);
+    }
     
     /* (old: we assume that a string contains LaTeX commands if it contains */
     /* a backslash) --> obsoleted by 'textspecial' option (ULIG) */
