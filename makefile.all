@@ -1,7 +1,7 @@
 #<<<makefile.all>>>
 ########################################################
 #
-# $Id: makefile.all,v 1.28 1999/01/14 19:34:16 lhecking Exp $
+# $Id: makefile.all,v 1.28.2.1 1999/08/20 12:38:53 lhecking Exp $
 #
 ########################################################
 #
@@ -119,7 +119,7 @@ DEMOS = $(M)1.dat $(M)2.dat $(M)3.dat $(M)airfoil.dem $(M)all.dem \
 ETC =   0BUGS 0FAQ 0INSTALL 0PORTING 0README ChangeLog CodeStyle Copyright \
 	INSTALL.gnu Makefile.in NEWS PGPKEYS TODO acconfig.h $(ACLOCAL_M4) \
 	amiga.c buildvms.com commitvers $(CONFIG_HEADER_IN) configure \
-	configure.in corgraph.asm corplot.c ctrl87.c ctrl87.h descrip.mms \
+	configure.in corgraph.asm corplot.c ctrl87.c ctrl87.h \
 	djconfig.sh errorfix.sh genopt.com gnuplot.def gnuplot.el gnuplot.opt \
 	gnuplot.prj header.mac hrcgraph.asm install-sh intergra.x11 lasergnu \
 	lineproc.mac linkopt.vms linkopt.ztc make_vms.com makefile.286 \
@@ -128,7 +128,7 @@ ETC =   0BUGS 0FAQ 0INSTALL 0PORTING 0README ChangeLog CodeStyle Copyright \
 	makefile.msw makefile.mto makefile.nt makefile.os2 makefile.os9 \
 	makefile.st makefile.tc makefile.unx makefile.vms makefile.wc \
 	makefile.win makefile.ztc missing mkinstalldirs os9.c pcgraph.asm \
-	rgipgnu stamp-h.in strftime.c vms.c m4/msdos.m4 m4/next.m4 \
+	rgipgnu stamp-h.in strftime.c vms.c x11.opt m4/msdos.m4 m4/next.m4 \
 	m4/path-hdr.m4 m4/path-lib.m4 $(T)README
 
 # Documentation and help files

@@ -1,5 +1,23 @@
 1999-08-25  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
+	* Makefile.in, makefile.all: Updated.
+
+1999-08-25  John Hasstedt  <manager@nuclear.physics.sunysb.edu>
+
+	* 0INSTALL: VMS section updated.
+
+	* descrip.mms: Removed.
+
+	* buildvms.com, gnuplot.opt, makefile.vms: Updated.
+
+	* gplt_x11.c: Use strnicmp() instead of strncasecmp().
+
+	* x11.opt: New file.
+
+	* term/x11.trm: Fix order of arguments in os_error() in VMS part.
+
+1999-08-25  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
 	* term.h: Updated from current development version.
 
 	* term/metapost.trm: There is no gp_strdup() in this version.
