@@ -3,6 +3,11 @@
 	* fit.c, fit.h, matrix.c, matrix.h: Re-re-import new improved
 	versions from beta344. Suggested by HBB.
 
+	* Makefile.in, makefile.all: Fixes, update file lists.
+
+	* docs/makefile, docs/latextut/makefile: Restore files which
+	got deleted accidentally.
+
 1998-06-18  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* graph3d.c, util3d.c: Remove spurious ^M.
