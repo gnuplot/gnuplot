@@ -1,3 +1,7 @@
+2002-08-24  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* term/fig.trm: Don't reset terminal options. Improved documentation.
+
 2002-08-23  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* term/gd.trm: New option 'set term png ... {no}crop'.
@@ -69,7 +73,7 @@
 2002-08-01  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/next.trm (NEXT_put_text): Fix incorrect multiplication of
- 	text rotation angle by 90 degrees
+ 	text rotation angle by 90 degrees.
 
 	* term/openstep.trm (NEXT_put_text): Dito.
 
@@ -939,7 +943,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/08/23 10:08:33 $).
+	last modification date (from the tag $Date: 2002/08/23 20:56:55 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 

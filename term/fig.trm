@@ -1,5 +1,5 @@
 /*
- * $Id: fig.trm,v 1.30 2002/06/11 07:59:09 mikulik Exp $
+ * $Id: fig.trm,v 1.31 2002/07/26 16:42:29 mikulik Exp $
  */
 
 /* GNUPLOT - fig.trm */
@@ -60,6 +60,7 @@
  * plus symbols and depth/thickness by bernlohr@eu1.mpi-hd.mpg.de (KB) Aug 15 1996
  * Added PM3D functionality Ian MacPhedran, April 15 1999
  * Take into account 'set palette maxcolors' Petr Mikulik, June 11 2002
+ * Don't reset options when 'set term fig <new options>', Petr Mikulik, Aug 24 2002
  */
 
 #include "driver.h"
@@ -203,7 +204,7 @@ static F_line FIG_line;
 static int FIG_type;		/* negative types use real lines */
 static float FIG_spacing;	/* length of dash or dot spacing */
 static int FIG_justify;		/* Fig justification T_*_JUSTIFIED */
-static float FIG_angle;		/* Fig text angle 0=horiz, Pi/2=vert */
+static float FIG_angle;		/* Fig text angle (in radians) */
 static int FIG_use_color = FALSE;	/* do we use color or not? */
 static int FIG_is_big = FALSE;	/* big plot ? */
 static int FIG_color = DEFAULT;	/* which color to use */
@@ -281,9 +282,11 @@ FIG_options()
     long temp_max;
     struct value a;
     unsigned int tmax_t;
-    double xsize_t, ysize_t;
+    double xsize_t = 0, ysize_t = 0;
     char text_flags[256]; /* for description only */
- 
+
+#if 0
+    /* Terminals should not reset options to defaults. */
     FIG_use_color = FALSE;	/* default */
     FIG_is_big = FALSE;		/* default */
     FIG_portrait = FALSE;
@@ -294,7 +297,8 @@ FIG_options()
     FIG_text_flags = FIG_TEXT_NORMAL;
     FIG_solid = FALSE;
     strcpy( FIG_version, FIG_DEFAULTVERSION );
-    
+#endif
+
     while (!END_OF_COMMAND) {
 	switch(lookup_table(&FIG_opts[0],c_token)) {
 	case FIG_MONOCHROME:
@@ -1162,38 +1166,46 @@ START_HELP(fig)
 "?terminal fig",
 "?term fig",
 "?fig",
+"?xfig",
 " The `fig` terminal device generates output in the Fig graphics language.",
 "",
 " Syntax:",
-"       set terminal fig {monochrome | color} {small | big}",
-"                        {pointsmax <max_points>}",
+"       set terminal fig {monochrome | color}",
 "                        {landscape | portrait}",
+"                        {small | big | size <xsize> <ysize>}",
 "                        {metric | inches}",
+"                        {pointsmax <max_points>}",
 "                        {solid | dashed}",
 "                        {fontsize <fsize>}",
-"                        {textnormal | {textspecial texthidden textrigid} }",
-"                        {size <xsize> <ysize>}",
+"                        {textnormal | {textspecial texthidden textrigid}}",
 "                        {thickness <units>}",
 "                        {depth <layer>}",
 "                        {version <number>}",
 "",
 " `monochrome` and `color` determine whether the picture is black-and-white or",
 " `color`.  `small` and `big` produce a 5x3 or 8x5 inch graph in the default",
-" `landscape` mode and 3x5 or 5x8 inches in `portrait` mode.  <max_points>",
-" sets the maximum number of points per polyline.  Default units for editing",
-" with \"xfig\" may be `metric` or `inches`. 'solid' inhibts automatic usage",
-" of dashed lines when solid linestyles are used up, which otherwise occurs.",
+" `landscape` mode and 3x5 or 5x8 inches in `portrait` mode.",
+" `size` sets (overrides) the size of the drawing",
+" area to <xsize>*<ysize> in units of inches or centimeters depending on the",
+" `metric` or `inches` setting in effect.",
+" The latter settings is also used as default units for editing with \"xfig\".",
+"",
+" `pointsmax <max_points>` sets the maximum number of points per polyline.",
+"",
+" `solid` inhibts automatic usage of `dash`ed lines when solid linestyles are",
+" used up, which otherwise occurs.",
 "",
 " `fontsize` sets the size of the text font to <fsize> points.  `textnormal`",
 " resets the text flags and selects postscript fonts, `textspecial` sets the",
 " text flags for LaTeX specials, `texthidden` sets the hidden flag and",
-" `textrigid` the rigid flag.  `size` sets (overrides) the size of the drawing",
-" area to <xsize>*<ysize> in units of inches or centimeters depending on the",
-" `inches` or `metric` setting in effect.  `depth` sets the default depth",
-" layer for all lines and text.  The default depth is 10 to leave room for",
-" adding material with \"xfig\" on top of the plot.  'version' sets the format",
-" version of the generated fig output. Currently only versions 3.1 and 3.2 are",
-" supported.",
+" `textrigid` the rigid flag. ",
+"",
+" `depth` sets the default depth layer for all lines and text.  The default",
+" depth is 10 to leave room for adding material with \"xfig\" on top of the",
+" plot.",
+"",
+" `version` sets the format version of the generated fig output. Currently",
+" only versions 3.1 and 3.2 are supported.",
 "",
 " `thickness` sets the default line thickness, which is 1 if not specified.",
 " Overriding the thickness can be achieved by adding a multiple of 100 to the",
