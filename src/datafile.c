@@ -477,9 +477,6 @@ int max_using;
 
     fast_columns = 1;		/* corey@cac */
 
-    if (!filename)
-	filename = (char *) gp_alloc (MAX_LINE_LEN+1, "data file name");
-
     /*{{{  close file if necessary */
     if (data_fp)
 	df_close();
@@ -522,17 +519,17 @@ int max_using;
 
     assert(max_using <= NCOL);
 
-    /* empty name means re-use last one */
+    if (!filename)
+	filename = (char *) gp_alloc (token_len(c_token)+1, "data file name");
 
-    {
-	char name[MAX_LINE_LEN+1];
-	quote_str(name, c_token, MAX_LINE_LEN);
-	if (name[0])
-	    safe_strncpy (filename, name, MAX_LINE_LEN+1);
-	else
-	    if (!filename[0])
-		int_error("No previous filename", c_token);
-    }
+    if (is_notempty(c_token)) {
+	if (token_len(c_token) != strlen(filename))
+	    filename = gp_realloc (filename, token_len(c_token)+1, "data file name");
+	quote_str(filename, c_token, token_len(c_token));
+    } else
+	if (!filename[0]) /* empty name means re-use last one */
+	    int_error("No previous filename", c_token);
+
     name_token = c_token++;
 
     /* defer opening until we have parsed the modifiers... */
