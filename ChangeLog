@@ -1,5 +1,10 @@
 2004-04-05  Petr Mikulik  <mikulik@physics.muni.cz>
 
+	* BUGS: Removed point "8. contour line clipping of 3D data plots": it
+	should go to FAQ or to gnuplot's web page => "Useful scripts". Removed
+	point "11. bug in OS/2 emx/gcc 2.7.x optimizer" (cite this in
+	makefile.os2). Added link to gnuplot's sourceforge bug tracker.
+
 	* config/README: Small update.
 
 	* config/makefile.os2: Mention compiler optimization problem from BUGS.
