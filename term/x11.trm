@@ -1,5 +1,5 @@
 /*
- * $Id: x11.trm,v 1.47 2002/01/24 10:55:31 joze Exp $
+ * $Id: x11.trm,v 1.48 2002/01/31 17:14:26 lhecking Exp $
  *
  */
 
@@ -112,30 +112,7 @@ TERM_PUBLIC void X11_filled_polygon __PROTO((int, gpiPoint *));
 /* non-zero if '-display' found on command line */
 static int X11_Display = 0;
 
-
-/* sunos 4 uses on_exit() in place of atexit(). If both are missing,
- * we can probably survive since gnuplot_x11 should detect EOF on
- * the pipe. Unfortunately, the handlers take different parameters.
- */
-
-/* FIXME HBB 20000416: this has to be moved out of here. The
- * opengl term uses this block, too... */
-#if !defined (HANDLER_PROTO) && defined(NO_ATEXIT)
-# define HANDLER_PROTO  __PROTO((int x, void *y))
-# define HANDLER_DECL (x,y) int x; void *y;
-# define HANDLER_PARAMS (0,NULL)
-# ifdef HAVE_ON_EXIT
-#  define atexit(x) on_exit(x, NULL)
-# else
-#  define atexit(x)		/* nowt */
-# endif
-#else /* !NO_ATEXIT */
-# define HANDLER_PROTO __PROTO((void))
-# define HANDLER_DECL   ()
-# define HANDLER_PARAMS ()
-#endif
-
-static void X11_atexit HANDLER_PROTO;
+static void X11_atexit __PROTO((void));
 
 /* Merged the old char X11_opts[] and int X11_optarg[]
  * into one array of structs.
@@ -312,7 +289,7 @@ X11_options()
     while (!END_OF_COMMAND) {
 	switch (lookup_table(&X11_opts[0], c_token)) {
 	case X11_RESET:
-	    X11_atexit HANDLER_PARAMS;	/* tell gnuplot_x11 to shut down */
+	    X11_atexit();	/* tell gnuplot_x11 to shut down */
 	    ++c_token;
 	    break;
 	case X11_DRIVER:
@@ -325,7 +302,7 @@ X11_options()
 		if (strcmp(path, X11_command)) {
 		    /* tell gnuplot_x11 to shut down
 		     * if the driver name has changed. */
-		    X11_atexit HANDLER_PARAMS;
+		    X11_atexit();
 		}
 		if (X11_command && X11_command != X11_default_command)
 		    free(X11_command);
@@ -419,7 +396,8 @@ Error.Incompatible options.
  *   DEFAULT_X11 popen() pipe IPC
  *---------------------------------------------------------------------------*/
 static void
-X11_atexit HANDLER_DECL {
+X11_atexit()
+{
     if (X11_ipc) {
 	fputs("R\n", X11_ipc);
 	fclose(X11_ipc);
@@ -580,7 +558,7 @@ X11_init()
     }
 
     if (!been_here) {
-	atexit(X11_atexit);
+	GP_ATEXIT(X11_atexit);
 	been_here++;
     }
 #ifdef USE_MOUSE
@@ -650,7 +628,9 @@ X11_reset()
 #define FFLUSH()             fflush(X11_ipc)
 
 static void
-X11_atexit HANDLER_DECL {	/* WHAT SHOULD I DO ? */
+X11_atexit()
+{
+    /* WHAT SHOULD I DO ? */
 }
 #elif defined(VMS)
 /*-----------------------------------------------------------------------------
@@ -761,7 +741,7 @@ X11_init()
     {
 	static int been_here = 0;
 	if (!been_here) {
-	    atexit(X11_atexit);
+	    GP_ATEXIT(X11_atexit);
 	    been_here = 1;
 	}
     }
@@ -799,7 +779,7 @@ X11_init()
 #define AFTER_TEXT		/* nowt */
 
 static void
-X11_atexit HANDLER_DECL
+X11_atexit()
 {
     if (X11_channel) {
 	PRINT0("R\n");

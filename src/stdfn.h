@@ -1,5 +1,5 @@
 /*
- * $Id: stdfn.h,v 1.15 2001/02/23 18:09:26 broeker Exp $
+ * $Id: stdfn.h,v 1.16 2001/08/22 11:53:19 broeker Exp $
  */
 
 /* GNUPLOT - stdfn.h */
@@ -322,6 +322,14 @@ int gp_strnicmp __PROTO((const char *, const char *, size_t));
 # else
 #  define GP_SLEEP(delay) sleep ((unsigned int) (delay))
 # endif
+#endif
+
+#ifdef HAVE_ATEXIT
+# define GP_ATEXIT(x) atexit((x))
+#elif defined(HAVE_ON_EXIT)
+# define GP_ATEXIT(x) on_exit((x),0)
+#else
+you lose
 #endif
 
 /* Misc. defines */

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot.c,v 1.48 2002/01/07 09:03:13 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot.c,v 1.49 2002/01/31 16:59:06 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - plot.c */
@@ -506,12 +506,7 @@ char **argv;
 	     * In case you don't have one of these functions, or you don't
 	     * want to use them, 'write_history()' is called directly.
 	     */
-#if defined (HAVE_ATEXIT)
-	    atexit(wrapper_for_write_history);
-#elif defined (HAVE_ON_EXIT)
-	    on_exit(wrapper_for_write_history, 0);
-#endif /* !HAVE_ATEXIT */
-
+	    GP_ATEXIT(wrapper_for_write_history);
 #endif /* HAVE_LIBREADLINE && GNUPLOT_HISTORY */
 
 	    fprintf(stderr, "\nTerminal type set to '%s'\n", term->name);
