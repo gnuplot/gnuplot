@@ -1,7 +1,7 @@
 # pm3dConvertToImage.awk
 # Written by Petr Mikulik, mikulik@physics.muni.cz
 # Code of pm3dImage contributed by Dick Crawford
-# Version: 4. 7. 2002
+# Version: 8. 7. 2002
 #
 # This awk script tries to compress maps in a postscript file created by pm3d
 # or gnuplot with pm3d splotting mode. If the input data formed a rectangular
@@ -22,6 +22,7 @@
 #      an awk implementation
 #
 # History of changes:
+#    - 8.  7. 2002 Petr Mikulik: Don't fail on empty map.
 #    - 4.  7. 2002 Petr Mikulik: Fix for compressing several images in one file.
 #    - 3. 10. 2001 Petr Mikulik: Replaced "stroke" by "Stroke" in the "/g"
 #      definition - fixes conversion of colour images.
@@ -119,6 +120,11 @@ next
 
 $1 == "%pm3d_map_end" {
 inside_pm3d_map = 0
+
+if (pm3dline==0) { # empty map
+    pm3d_images--;
+    next;
+}
 
 if (scans_in_x) { grid_y = scan_pts; grid_x = scans; }
   else  { grid_x = scan_pts; grid_y = scans; }
