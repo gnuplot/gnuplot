@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: contour.c,v 1.7 1999/10/29 18:47:17 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: contour.c,v 1.8 1999/11/08 19:24:28 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - contour.c */
@@ -180,10 +180,6 @@ static void intp_cubic_spline __PROTO((int n, struct cntr_struct * p_cntr,
 				       double d2x[], double d2y[], double delta_t[], int n_intpol));
 static int solve_cubic_1 __PROTO((tri_diag m[], int n));
 static void solve_cubic_2 __PROTO((tri_diag m[], double x[], int n));
-/* 
- * static int solve_tri_diag __PROTO((tri_diag m[], double r[], double x[], 
- * int n));  see "protos.h"
- */
 static void gen_bspline_approx __PROTO((struct cntr_struct * p_cntr,
 					int num_of_points, int order, int contr_kind));
 static void eval_bspline __PROTO((double t, struct cntr_struct * p_cntr,
