@@ -153,51 +153,76 @@ unsigned int x, y;
 TERM_PUBLIC void TK_vector(x, y)
 unsigned int x, y;
 {
-/* {ts} 26-mar-99 */
-	extern double min_array[], max_array[];
+/* {ts} 6-apr-99 */
+	extern double min_array[], max_array[], base_array[], log_base_array[];
+	extern TBOOLEAN log_array[];
 	extern int xleft, xright, ybot, ytop;
 	extern TBOOLEAN is_3d_plot;
-	double xlocal[2][2], ylocal[2][2];
-
-#define TK_REAL_VALUE(value,axis) \
-min_array[axis]+value*(max_array[axis]-min_array[axis])
-#define TK_X_VALUE(value) \
-(double)(value-xleft)/(double)(xright-xleft)
-#define TK_Y_VALUE(value) \
-(double)(value-ybot)/(double)(ytop-ybot)
 
 	if (tk_interactive && !is_3d_plot) {
-		/* start point */
-		xlocal[0][0] = TK_REAL_VALUE(TK_X_VALUE(tk_lastx),FIRST_X_AXIS);
-		xlocal[0][1] = TK_REAL_VALUE(TK_X_VALUE(tk_lastx),SECOND_X_AXIS);
-		ylocal[0][0] = TK_REAL_VALUE(TK_Y_VALUE(1000-tk_lasty),FIRST_Y_AXIS);
-		ylocal[0][1] = TK_REAL_VALUE(TK_Y_VALUE(1000-tk_lasty),SECOND_Y_AXIS);
+		fprintf(gpoutfile, "set temp [\n");
+	}
+/* {ts} */
+    y = 1000 - y;
+    fprintf(gpoutfile,
+	    "$can create line [expr $cmx * %d /1000] [expr $cmy * %d /1000] [expr $cmx * %d /1000] [expr $cmy * %d /1000] -fill %s\n",
+	    tk_lastx, tk_lasty, x, y, tk_colors[tk_color]);
+/* {ts} 6-apr-99 */
+#define \
+TK_REAL_VALUE(value,axis) \
+(log_array[axis])\
+?pow(base_array[axis],min_array[axis]+value*(max_array[axis]-min_array[axis]))\
+:min_array[axis]+value*(max_array[axis]-min_array[axis])
+#define \
+TK_X_VALUE(value) \
+(double)(value-xleft)/(double)(xright-xleft)
+#define \
+TK_Y_VALUE(value) \
+(double)((TK_YMAX-value)-ybot)/(double)(ytop-ybot)
 
-		/* end point */
-		xlocal[1][0] = TK_REAL_VALUE(TK_X_VALUE(x),FIRST_X_AXIS);
-		xlocal[1][1] = TK_REAL_VALUE(TK_X_VALUE(x),SECOND_X_AXIS);
-		ylocal[1][0] = TK_REAL_VALUE(TK_Y_VALUE(y),FIRST_Y_AXIS);
-		ylocal[1][1] = TK_REAL_VALUE(TK_Y_VALUE(y),SECOND_Y_AXIS);
-
-		fprintf(gpoutfile, "$can bind [\n");
+	if (tk_interactive && !is_3d_plot) {
+		fprintf (gpoutfile, "]\n");
+		fprintf (gpoutfile,
+			"$can bind $temp <Button> \"gnuplot_xy $can $temp %f %f %f %f %f %f %f %f",
+			TK_REAL_VALUE(TK_X_VALUE(tk_lastx),FIRST_X_AXIS),
+			TK_REAL_VALUE(TK_Y_VALUE(tk_lasty),FIRST_Y_AXIS),
+			TK_REAL_VALUE(TK_X_VALUE(tk_lastx),SECOND_X_AXIS),
+			TK_REAL_VALUE(TK_Y_VALUE(tk_lasty),SECOND_Y_AXIS),
+			TK_REAL_VALUE(TK_X_VALUE(x),FIRST_X_AXIS),
+			TK_REAL_VALUE(TK_Y_VALUE(y),FIRST_Y_AXIS),
+			TK_REAL_VALUE(TK_X_VALUE(x),SECOND_X_AXIS),
+			TK_REAL_VALUE(TK_Y_VALUE(y),SECOND_Y_AXIS));
+		if (log_array[FIRST_X_AXIS]) {
+			fprintf (gpoutfile, " %f",
+				TK_REAL_VALUE(TK_X_VALUE(0.5*(x+tk_lastx)),FIRST_X_AXIS));
+		} else {
+			fprintf (gpoutfile, " {}");
+		}
+		if (log_array[FIRST_Y_AXIS]) {
+			fprintf (gpoutfile, " %f",
+				TK_REAL_VALUE(TK_Y_VALUE(0.5*(y+tk_lasty)),FIRST_Y_AXIS));
+		} else {
+			fprintf (gpoutfile, " {}");
+		}
+		if (log_array[SECOND_X_AXIS]) {
+			fprintf (gpoutfile, " %f",
+				TK_REAL_VALUE(TK_X_VALUE(0.5*(x+tk_lastx)),SECOND_X_AXIS));
+		} else {
+			fprintf (gpoutfile, " {}");
+		}
+		if (log_array[SECOND_Y_AXIS]) {
+			fprintf (gpoutfile, " %f",
+				TK_REAL_VALUE(TK_Y_VALUE(0.5*(y+tk_lasty)),SECOND_Y_AXIS));
+		} else {
+			fprintf (gpoutfile, " {}");
+		}
+		fprintf (gpoutfile, "\"\n");
 	}
 
 #undef TK_REAL_VALUE
 #undef TK_X_VALUE
 #undef TK_Y_VALUE
 
-/* {ts} */
-    y = 1000 - y;
-    fprintf(gpoutfile,
-	    "$can create line [expr $cmx * %d /1000] [expr $cmy * %d /1000] [expr $cmx * %d /1000] [expr $cmy * %d /1000] -fill %s\n",
-	    tk_lastx, tk_lasty, x, y, tk_colors[tk_color]);
-/* {ts} 26-mar-99 */
-	if (tk_interactive && !is_3d_plot) {
-		fprintf(gpoutfile,
-			"] <Button> {gnuplot_xy %f %f %f %f %f %f %f %f}\n",
-			xlocal[0][0], ylocal[0][0], xlocal[0][1], ylocal[0][1],
-			xlocal[1][0], ylocal[1][0], xlocal[1][1], ylocal[1][1]);
-	}
 /* {ts} */
     tk_lastx = x;
     tk_lasty = y;
@@ -216,40 +241,40 @@ char *str;
 
 TERM_PUBLIC void TK_text()
 {
-/* {ts} 26-mar-99 */
+/* {ts} 6-apr-99 */
 	extern double min_array[], max_array[];
 	extern int xleft, xright, ybot, ytop;
 	extern TBOOLEAN is_3d_plot;
 	if (!is_3d_plot) {
 		fputs("}\n", gpoutfile);
-		fputs("proc gnuplot_init {} {\n", gpoutfile);
-		fputs("global", gpoutfile);
-		fputs(" x1min x1max y1min y1max", gpoutfile);
-		fputs(" x2min x2max y2min y2max", gpoutfile);
-		fputs(" xleft xright ybot ytop\n", gpoutfile);
+		fputs("proc gnuplot_plotarea {} {\n", gpoutfile);
 		fprintf(gpoutfile,
-			"set x1min %f\nset x1max %f\nset y1min %f\nset y1max %f\n",
+			"return {%d %d %d %d}\n",
+			xleft, xright, 1000-ytop, 1000-ybot);
+		fputs("}\n", gpoutfile);
+		fputs("proc gnuplot_axisranges {} {\n", gpoutfile);
+		fprintf(gpoutfile,
+			"return {%f %f %f %f %f %f %f %f}\n",
 			min_array[FIRST_X_AXIS], max_array[FIRST_X_AXIS],
-			min_array[FIRST_Y_AXIS], max_array[FIRST_Y_AXIS]);
-		fprintf(gpoutfile,
-			"set x2min %f\nset x2max %f\nset y2min %f\nset y2max %f\n",
+			min_array[FIRST_Y_AXIS], max_array[FIRST_Y_AXIS],
 			min_array[SECOND_X_AXIS], max_array[SECOND_X_AXIS],
 			min_array[SECOND_Y_AXIS], max_array[SECOND_Y_AXIS]);
-		fprintf(gpoutfile,
-			"set xleft %d\nset xright %d\nset ybot %d\nset ytop %d\n",
-			xleft, xright, ybot, ytop);
 		if (tk_interactive) {
 			fputs("}\n", gpoutfile);
-			fputs("proc gnuplot_xy {x1s y1s x2s y2s x1e y1e x2e y2e} {\n",
+			fputs("proc gnuplot_xy {win id x1s y1s x2s y2s x1e y1e x2e y2e x1m y1m x2m y2m} {\n",
 				gpoutfile);
 			fputs("if {([llength [info commands user_gnuplot_coordinates]])} {\n",
 				gpoutfile);
-			fputs("user_gnuplot_coordinates $x1s $y1s $x2s $y2s $x1e $y1e $x2e $y2e\n",
+			fputs("user_gnuplot_coordinates $win $id $x1s $y1s $x2s $y2s $x1e $y1e $x2e $y2e $x1m $y1m $x2m $y2m\n",
 				gpoutfile);
 			fputs("} else {\n", gpoutfile);
-			fputs("puts \"[expr 0.5*($x1s+$x1e)] [expr 0.5*($y1s+$y1e)] ",
+			fputs("if {[string length $x1m]>0} {puts -nonewline \" $x1m\"} else {puts -nonewline \" [expr 0.5*($x1s+$x1e)]\"}\n",
 				gpoutfile);
-			fputs("[expr 0.5*($x2s+$x2e)] [expr 0.5*($y2s+$y2e)]\"\n",
+			fputs("if {[string length $y1m]>0} {puts -nonewline \" $y1m\"} else {puts -nonewline \" [expr 0.5*($y1s+$y1e)]\"}\n",
+				gpoutfile);
+			fputs("if {[string length $x2m]>0} {puts -nonewline \" $x2m\"} else {puts -nonewline \" [expr 0.5*($x2s+$x2e)]\"}\n",
+				gpoutfile);
+			fputs("if {[string length $y2m]>0} {puts \" $y2m\"} else {puts \" [expr 0.5*($y2s+$y2e)]\"}\n",
 				gpoutfile);
 			fputs("}\n", gpoutfile);
 		}
@@ -265,7 +290,7 @@ TERM_PUBLIC void TK_text()
 #ifdef TERM_TABLE
 /* replaced options_null with TK_options  {ts} 26-mar-99 */
 TERM_TABLE_START(tkcanvas)
-    "tkcanvas", "Tk/Tcl canvas widget",
+    "tkcanvas", "Tk/Tcl canvas widget [interactive]",
     TK_XMAX, TK_YMAX, TK_VCHAR, TK_HCHAR,
     TK_VTIC, TK_HTIC, TK_options, TK_init, TK_reset,
     TK_text, null_scale, TK_graphics, TK_move, TK_vector,
@@ -303,21 +328,23 @@ START_HELP(tkcanvas)
 "  % gnuplot .c",
 "",
 " The code generated by `gnuplot` creates a tcl procedure called \"gnuplot\"",
-" that takes the name of a canvas as its argument.  When the procedure is,",
+" that takes the name of a canvas as its argument.  When the procedure is",
 " called, it clears the canvas, finds the size of the canvas and draws the plot",
 " in it, scaled to fit.",
 "",
-" For 2-dimensional plotting (\"plot\") an additional tcl procedures called",
-" \"gnuplot_init\" is created. It can be used to set variables containing the",
-" plotting area: \"xleft, xright, ybot, ytop\" in screen coordinates, \"x1min,",
-" x1max, y1min, y1max, x2min, x2max, y2min, y2max\" in plot coordinates. These",
-" may be used for programming in Tcl/Tk.",
+" For 2-dimensional plotting (`plot`) two additional tcl procedures are defined:",
+" \"gnuplot_plotarea\" will return a list containing the borders of the plotting",
+" area \"xleft, xright, ytop, ybot\" in canvas screen coordinates, while the ranges",
+" of the two axes \"x1min, x1max, y1min, y1max, x2min, x2max, y2min, y2max\" in plot",
+" coordinates can be obtained calling \"gnuplot_axisranges\".",
 " If the \"interactive\" option is specified, mouse clicking on a line segment",
-" will print the coordinates of its midpoint to stdout.",
-" More advanced user actions can happen instead if the user supplies a procedure",
-" named \"user_gnuplot_coordinates\" which takes the following arguments:",
-" \"x1s y1s x2s y2s x1e y1e x2e y2e\", the coordinates of the start and the end",
-" point in the two possible axis ranges.",
+" will print the coordinates of its midpoint to stdout. Advanced actions",
+" can happen instead if the user supplies a procedure named",
+" \"user_gnuplot_coordinates\", which takes the following arguments:",
+" \"win id x1s y1s x2s y2s x1e y1e x2e y2e x1m y1m x2m y2m\",",
+" the name of the canvas and the id of the line segment followed by the",
+" coordinates of its start and end point in the two possible axis ranges; the",
+" coordinates of the midpoint are only filled for logarithmic axes.",
 "",
 " The current version of `tkcanvas` supports neither `multiplot` nor `replot`."
 END_HELP(tkcanvas)
