@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.53 2003/04/13 20:22:46 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.54 2003/04/18 10:41:36 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -267,6 +267,8 @@ unset_command()
     case S_DATAFILE:
 	unset_missing();
 	df_separator = '\0';
+	free(df_commentschars);
+	df_commentschars = strdup(DEFAULT_COMMENTS_CHARS);
 	break;
 #ifdef USE_MOUSE
     case S_MOUSE:
@@ -1530,6 +1532,8 @@ reset_command()
 
     unset_missing();
     df_separator = '\0';
+    free(df_commentschars);
+    df_commentschars = strdup(DEFAULT_COMMENTS_CHARS);
 
     unset_locale();
 #if 0

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.44 2002/10/05 02:59:33 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.45 2003/02/05 00:01:00 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -159,6 +159,8 @@ static char *RCSid() { return RCSid("$Id: datafile.c,v 1.44 2002/10/05 02:59:33 
 /* test to see if the end of an inline datafile is reached */
 #define is_EOF(c) ((c) == 'e' || (c) == 'E')
 
+/* is it a comment line? */
+#define is_comment(c) (strchr(df_commentschars, (c)))
 
 /*{{{  static fns */
 #if 0				/* not used */
@@ -202,6 +204,9 @@ char *missing_val = NULL;
 
 /* input field separator, NUL if whitespace is the separator */
 char df_separator = '\0';
+
+/* comments chars */
+char *df_commentschars = 0;
 
 /* If any 'inline data' are in use for the current plot, flag this */
 TBOOLEAN plotted_data_from_stdin = FALSE;

@@ -1,5 +1,5 @@
 /*
- * $Id: syscfg.h,v 1.24 2002/03/09 17:48:39 lhecking Exp $
+ * $Id: syscfg.h,v 1.25 2003/01/22 15:09:58 lhecking Exp $
  */
 
 /* GNUPLOT - syscfg.h */
@@ -359,12 +359,12 @@ typedef double coordval;
  * not here. */
 
 #ifdef VMS
-# define is_comment(c) ((c) == '#' || (c) == '!')
+# define DEFAULT_COMMENTS_CHARS "#!"
 # define is_system(c) ((c) == '$')
 /* maybe configure could check this? */
 # define BACKUP_FILESYSTEM 1
 #else /* not VMS */
-# define is_comment(c) ((c) == '#')
+# define DEFAULT_COMMENTS_CHARS "#"
 # define is_system(c) ((c) == '!')
 #endif /* not VMS */
 

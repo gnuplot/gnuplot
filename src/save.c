@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.64 2003/03/13 14:47:54 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.65 2003/03/26 19:42:21 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -568,6 +568,8 @@ set isosamples %d, %d\n\
 	fprintf(fp, "set datafile separator \"%c\"\n",df_separator);
     else
 	fprintf(fp, "set datafile separator whitespace\n");
+    if (strcmp(df_commentschars, DEFAULT_COMMENTS_CHARS))
+	fprintf(fp, "set datafile commentschars '%s'\n", df_commentschars);
 
     save_hidden3doptions(fp);
     fprintf(fp, "set cntrparam order %d\n", contour_order);

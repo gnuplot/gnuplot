@@ -1,5 +1,4 @@
 Changes in release 4.0:
-* NEW 'set datafile separator {whitespace | "<char>"}
 * CHANGE sample calculated "smooth csplines" only in actual xrange
 * CHANGE 'set term gif' compile-time option to write PNG format instead
 * NEW 'set term png' and 'set term jpeg' using modern GD library
@@ -41,6 +40,8 @@ off with the hotkey 'm'. See 'help mouse' and 'help bind' for more details.
 
 
 [3.8j]
+* NEW 'set datafile commentschars {"<chars>"}'
+* NEW 'set datafile separator {whitespace | "<char>"}'
 * CHANGE terminal provided by openstep is called "openstep", not "next"
 * CHANGE terminal provided by gnugraph is called "gnugraph", not "unixplot"
 * NEW pm3d option corners2color

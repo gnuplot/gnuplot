@@ -1,3 +1,9 @@
+2003-04-29  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* NEWS gnuplot.doc src/datafile.c src/datafile.h src/save.c src/set.c
+	src/show.c src/syscfg.h src/unset.c: New option 'set datafile
+	commentschars'.
+
 2003-04-24  Ethan Merritt <merritt@u.washington.edu>
 
 	* term/post.trm: The postscript terminal driver now implements

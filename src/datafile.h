@@ -1,5 +1,5 @@
 /*
- * $Id: datafile.h,v 1.8 2002/07/02 17:35:27 mikulik Exp $
+ * $Id: datafile.h,v 1.9 2003/02/05 00:01:01 sfeam Exp $
  */
 
 /* GNUPLOT - datafile.h */
@@ -82,6 +82,9 @@ extern char *missing_val;
 
 /* input field separator, NUL if whitespace is the separator */
 extern char df_separator;
+
+/* comments chars */
+extern char *df_commentschars;
 
 /* flag if any 'inline' data are in use, for the current plot */
 extern TBOOLEAN plotted_data_from_stdin;

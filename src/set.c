@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.113 2003/03/13 06:17:14 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.114 2003/03/13 14:47:54 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -107,6 +107,7 @@ static void set_mapping __PROTO((void));
 static void set_margin __PROTO((int *));
 static void set_missing __PROTO((void));
 static void set_separator __PROTO((void));
+static void set_datafile_commentschars __PROTO((void)); 
 #ifdef USE_MOUSE
 static void set_mouse __PROTO((void));
 #endif
@@ -345,6 +346,8 @@ set_command()
 		set_missing();
 	    else if (almost_equals(c_token,"sep$arator"))
 		set_separator();
+	    else if (almost_equals(c_token,"com$mentschars"))
+		set_datafile_commentschars();
 	    else
 		int_error(c_token,"expecting datafile modifier");
 	    break;
@@ -1890,6 +1893,22 @@ set_separator()
 	int_error(c_token, "extra chars after <separation_char>");
     else
 	df_separator = input_line[token[c_token].start_index+1];
+    c_token++;
+}
+
+static void
+set_datafile_commentschars()
+{
+    c_token++;
+    free(df_commentschars);
+    if (END_OF_COMMAND) {
+	df_commentschars = strdup(DEFAULT_COMMENTS_CHARS);
+	return;
+    }
+    if (!isstring(c_token))
+	int_error(c_token, "expected string with comments chars");
+    df_commentschars = gp_alloc(token_len(c_token)+1, "df_commentschars");
+    quote_str(df_commentschars, c_token, token_len(c_token)+1);
     c_token++;
 }
 

@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.168 2003/04/12 13:55:31 vanzandt Exp $
+C RCS $Id: gnuplot.doc,v 1.169 2003/04/18 10:41:36 mikulik Exp $
 C 18 September 2001
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001   Thomas Williams, Colin Kelley et al.
 C
@@ -482,6 +482,9 @@ C
  and `gnuplot` will ignore the rest of the line.  It will not have this effect
  inside quotes, inside numbers (including complex numbers), inside command
  substitutions, etc.  In short, it works anywhere it makes sense to work.
+
+ See also `set datafile commentschars` for specifying comment characters in
+ data files.
 2 Coordinates
 ?coordinates
  The commands `set arrow`, `set key`, and `set label` allow you to draw
@@ -4078,7 +4081,7 @@ C ... and restart the table:
 3 datafile 
 ?set datafile
  The `set datafile` command options control interpretation of fields read from
- input data files by the `plot`, `splot`, and `fit` commands.  Two such
+ input data files by the `plot`, `splot`, and `fit` commands.  Three such
  options are currently implemented.
 4 set datafile missing
 ?set datafile missing
@@ -4156,6 +4159,23 @@ C ... and restart the table:
 
        # Input file contains comma-separated values fields
        set datafile separator ","
+4 set datafile commentschars
+?set datafile commentschars
+?set commentschars
+?commentschars
+ The `set datafile commentschars` command allows you to tell `gnuplot` what
+ characters are used in a data file to denote comments.  Gnuplot will ignore
+ rest of the line behind the specified characters.
+
+ Syntax:
+       set datafile commentschars {"<string>"}
+       show datafile commentschars
+       unset commentschars
+
+ Default value of the string is "#!" on VMS and "#" otherwise.
+
+ Example:
+       set datafile commentschars "#!%"
 3 decimalsign
 ?commands set decimalsign
 ?commands show decimalsign
