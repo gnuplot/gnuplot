@@ -1,3 +1,8 @@
+1999-10-11  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* help.c: Change help index formatting to start in column 4
+ 	(instead 6) and use column length of 18 (instead 15).
+
 1999-10-11  "Eric S. Raymond"  <esr@thyrsus.com>
 
 	* demo/airfoil.dem, demo/animate.dem, demo/binary.dem,
@@ -9,6 +14,8 @@
 	and use reset instead of ad-hoc set statements.
 
 1999-10-11  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* bitmap.c, term/png.trm: Fix some shortcomings of ESR's png patches.
 
 	* plot2d.c: Bugfix for logscale plots with unused y2 axis.
 
