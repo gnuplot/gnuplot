@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.62 2005/02/06 05:05:49 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.63 2005/02/10 19:30:24 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -884,7 +884,7 @@ parse_fillstyle(struct fill_style_type *fs, int def_style, int def_density, int 
 #else
     if (END_OF_COMMAND)
 	return;
-    if (!equals(c_token, "fs") && !equals(c_token, "fill"))
+    if (!equals(c_token, "fs") && !almost_equals(c_token, "fill$style"))
 	return;
     c_token++;
 
