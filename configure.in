@@ -1,14 +1,14 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot 3.7 on Unix.
 dnl
-dnl $Id: configure.in,v 1.76 1999/09/24 15:41:31 lhecking Exp $
+dnl $Id: configure.in,v 1.77 1999/10/21 21:12:18 lhecking Exp $
 dnl
 AC_INIT(src/graphics.c)
 AM_CONFIG_HEADER(config.h:config.hin)
 AC_PREREQ(2.13)
-AC_REVISION($Revision: 1.76 $)
+AC_REVISION($Revision: 1.77 $)
 
-VERSION="`cat $srcdir/VERSION`.`cat $srcdir/PATCHLEVEL`"
+VERSION="`cat $srcdir/VERSION`"
 AM_INIT_AUTOMAKE(gnuplot, $VERSION)
 
 dnl Additional command line options
