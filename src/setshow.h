@@ -1,5 +1,5 @@
 /*
- * $Id: setshow.h,v 1.21 1999/11/15 21:59:44 lhecking Exp $
+ * $Id: setshow.h,v 1.22 1999/11/24 13:23:23 lhecking Exp $
  *
  */
 
@@ -181,11 +181,6 @@ extern int			dgrid3d_row_fineness;
 extern int			dgrid3d_col_fineness;
 extern int			dgrid3d_norm_value;
 extern TBOOLEAN			dgrid3d;
-
-#define ENCODING_DEFAULT	0
-#define ENCODING_ISO_8859_1	1
-#define ENCODING_CP_437		2
-#define ENCODING_CP_850		3   /* JFi */
 
 extern int			encoding;
 extern const char		*encoding_names[];
