@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.261 2004/11/07 10:29:25 mikulik Exp $
+C RCS $Id: gnuplot.doc,v 1.262 2004/11/09 00:26:27 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -1778,7 +1778,7 @@ C ... and restart the table:
 
  results in the string returned by the system command `uname -n` being stored
  in the string variable mycomputer.
- 
+
  However, macro substitution is not performed inside double quotes, so you
  cannot define a system command as a macro and then use both macro and backquote
  substitution at the same time.
@@ -3089,7 +3089,7 @@ C ... and restart the table:
                  used to place the data in three-space.  (E.g., usually
                  setting the z-dimension value to zero and placing 2D
                  data in the x-y plane.)
- 
+
  Examples:
 
        # Selects two float values (second one implicit) with a float value
