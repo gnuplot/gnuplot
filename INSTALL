@@ -201,7 +201,10 @@ your system.
   To compile using MMS on VAX:
      MMS/DESCRIPTION=MAKEFILE.VMS
   To compile using MMS on Alpha:
-     MMS/DESCRIPTION=MAKEFILE.VMS/MACRO=__ALPHA__
+     MMS/DESCRIPTION=MAKEFILE.VMS/MACRO=__ALPHA__=1
+
+  It may sometimes be useful to add  `/IGNORE=WARNING' to the `MMS' call.
+
   To compile using GNUC or VAXC:
      add /MACRO=GNUC or /MACRO=VAXC to the above command
   To compile with another make utility:
