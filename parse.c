@@ -157,7 +157,7 @@ void evaluate_at(at_ptr, val_ptr)
 			undefined = TRUE;
 		}
 	}
-#if defined(NeXT) || defined(ultrix) || defined(__osf__)
+#if NeXT || ultrix || __osf__
     /*
      * linux was able to fit curves which NeXT gave up on -- traced it to
      * silently returning NaN for the undefined cases and plowing ahead
