@@ -1,3 +1,8 @@
+2003-07-01  Ethan Merritt <merritt@u.washington.edu>
+
+	* src/graphics.c: Make sample arrow in plot key match the arrow 
+	style used by 'plot with vectors'.
+
 2003-06-30  Ethan Merritt <merritt@u.washington.edu>
 
 	* src/misc.h src/misc.c src/plot2d.c src/set.c docs/gnuplot.doc: 

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.92 2003/06/16 04:34:16 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.93 2003/06/20 04:54:36 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -1425,6 +1425,13 @@ do_plot(plots, pcount)
 			(*t->linetype)(this_plot->lp_properties.l_type);
 		} else
 #endif
+		if (this_plot->plot_style == VECTOR && t->arrow) {
+		    apply_head_properties(&(this_plot->arrow_properties));
+		    curr_arrow_headlength = -1;
+		    (*t->arrow)(xl + key_sample_left, yl, xl + key_sample_right, yl,
+				this_plot->arrow_properties.head);
+		} else
+
 		if ((this_plot->plot_style & PLOT_STYLE_HAS_LINE)
 		    || ((this_plot->plot_style & PLOT_STYLE_HAS_ERRORBAR)
 			&& this_plot->plot_type == DATA)) {
