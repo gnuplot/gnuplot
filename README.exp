@@ -20,19 +20,6 @@
             -OR-
             add  -DTHIN_PLATE_SPLINES_GRID=1  to CFLAGS in the platform makefile
 
- Mouse support for the pm terminal
- =================================
-
- SYSTEMS:   OS/2
-
- PURPOSE:   Show mouse position, zoom/unzoom, ruler.
-
- AUTHOR:    Petr Mikulik <mikulik@physics.muni.cz>
-
- REFERENCE: http://www.sci.muni.cz/~mikulik/gnuplot.html#mouseOS2
-
- USAGE:     Uncomment  USE_MOUSE=1  in the configuration section of
-            makefile.os2
 
  Sort help and subtopic tables by column
  =======================================

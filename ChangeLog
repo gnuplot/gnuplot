@@ -1,3 +1,11 @@
+2000-12-15  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* README.exp: remove section about 'mouse is experimental'.
+
+	* src/term.c: removed obsolete routine 'fill_gp4mouse'.
+
+	* src/command.c: removed an OS/2 switch for readline vs. readline_ipc.
+
 2000-12-12  Johannes Zellner  <johannes@zellner.org>
 
 	* src/tables.c, src/show.c: corrected a bug so that

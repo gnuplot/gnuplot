@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.30 2000/11/29 10:20:31 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.31 2000/12/04 12:02:20 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -1784,83 +1784,3 @@ fflush_binary()
 }
 #endif /* VMS */
 
-
-#ifdef USE_MOUSE
-
-#if 0
-void
-fill_gp4mouse (void)
-{
-    /* FIXME HBB 20000725: gadgets, axis and command module
-     * dependencies would be introduced by activating this code. This
-     * clearly would be a design bug */
-    extern int xleft, xright, ybot, ytop;
-    extern AXIS axis_array[];
-    extern int /*TBOOLEAN*/ is_3d_plot;
-
-    int rev_xy = 0;
-
-#if 0
-    /* For development purposes: */
-    printf("trm: [xleft,ybot] [xright,ytop] = [%i,%i]..[%i,%i]\n",xleft,ybot,xright,ytop);
-    printf("trm: [xmin,ymin] [xmax,ymax] = [%g,%g]..[%g,%g]\n",
-	   xmin,ymin,xmax,ymax);
-    printf("trm: autoscale_x=%i,  _y=%i\n",
-	   axis_array[FIRST_X_AXIS].autoscale,
-	   axis_array[FIRST_Y_AXIS].autoscale);
-    printf("trm: true min,max = [%g,%g]..[%g,%g]\n",
-	   axis_array[FIRST_X_AXIS].min,axis_array[FIRST_Y_AXIS].min,
-	   axis_array[FIRST_X_AXIS].max,axis_array[FIRST_Y_AXIS].max);
-    printf("trm: multiplot=%i\n",multiplot);
-    printf("trm: draw_surface=%i\n",draw_surface);
-    printf("trm: draw_contour=%i\n",draw_contour);
-#endif
-
-    gp4mouse.graph = 0;
-    gp4mouse.is_3d = 0;
-    if (!multiplot) {
-      if (is_3d_plot==TRUE) { /* map is for surface_rot_z == 0,90,180,270,360
-			         and for any surface_rot_x */
-	  gp4mouse.graph = 3; /* default (joze) Sun Oct 31 03:05:44 1999 */
-	  gp4mouse.is_3d = 1;
-	  rev_xy = (int)(surface_rot_z+0.5);
-	  if (rev_xy == 0 || rev_xy == 180 || rev_xy == 360)
-		{ gp4mouse.graph = 2; rev_xy = 0; } /* x axis is down, y is aside */
-	  else
-	  if (rev_xy == 90 || rev_xy == 270) /* y axis is down, x is aside */
-		{ gp4mouse.graph = 2; rev_xy = 1; }
-	  }
-	else /* 2d plot or map */
-	  gp4mouse.graph = (polar) ? 1 : 2;
-      }
-    /* printf("trm: gp4mouse.graph=%i\n",0+gp4mouse.graph); */
-    if (!rev_xy) {
-	gp4mouse.xmin = axis_array[FIRST_X_AXIS].min;
-	gp4mouse.ymin = axis_array[FIRST_Y_AXIS].min;
-	gp4mouse.xmax = axis_array[FIRST_X_AXIS].max;
-	gp4mouse.ymax = axis_array[FIRST_Y_AXIS].max;
-	}
-      else {
-	gp4mouse.xmin = axis_array[FIRST_Y_AXIS].min;
-	gp4mouse.ymin = axis_array[FIRST_X_AXIS].min;
-	gp4mouse.xmax = axis_array[FIRST_Y_AXIS].max;
-	gp4mouse.ymax = axis_array[FIRST_X_AXIS].max;
-	}
-    gp4mouse.xleft = xleft;
-    gp4mouse.ybot = ybot;
-    gp4mouse.xright = xright;
-    gp4mouse.ytop = ytop;
-    gp4mouse.log_array[FIRST_X_AXIS] = axis_array[FIRST_X_AXIS].log;
-    gp4mouse.log_array[FIRST_Y_AXIS] = axis_array[FIRST_Y_AXIS].log;
-    gp4mouse.log_array[FIRST_Z_AXIS] = axis_array[FIRST_Z_AXIS].log;
-    gp4mouse.base_array[FIRST_X_AXIS] = axis_array[FIRST_X_AXIS].base;
-    gp4mouse.base_array[FIRST_Y_AXIS] = axis_array[FIRST_Y_AXIS].base;
-    gp4mouse.base_array[FIRST_Z_AXIS] = axis_array[FIRST_Z_AXIS].base;
-    gp4mouse.log_base_array[FIRST_X_AXIS] = axis_array[FIRST_X_AXIS].log_base;
-    gp4mouse.log_base_array[FIRST_Y_AXIS] = axis_array[FIRST_Y_AXIS].log_base;
-    gp4mouse.log_base_array[FIRST_Z_AXIS] = axis_array[FIRST_Z_AXIS].log_base;
-    gp4mouse.has_grid = grid_selection ? 1 : 0;
-}
-#endif /* 0 -- disabled code! */
-
-#endif /* USE_MOUSE */
