@@ -221,7 +221,7 @@ char tos_getch();
 
 /* Prototypes from file "scanner.c" */
 
-int scanner __PROTO((char expression[]));
+int scanner __PROTO((char **expression, int *line_lengthp));
 
 
 /* Prototypes from "stdfn.c" */
