@@ -1,3 +1,11 @@
+2001-10-10  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/color.c (draw_color_smooth_box) [PM3D]: Change order of
+ 	operations to ensure setup_tics() sees the COLOR_AXIS as
+ 	log-scaled, if it is.  Use new AUTOSCALE_FIXMIN and
+ 	AUTOSCALE_FIXMAX flags instead of a blunt AUTOSCALE_NONE override
+ 	to avoid extending the color box beyond the useful z range.
+
 2001-10-06  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/set.c docs/gnuplot.doc: New autoscale option:

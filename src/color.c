@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: color.c,v 1.20 2001/08/22 14:15:33 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: color.c,v 1.21 2001/08/27 15:02:14 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - color.c */
@@ -619,7 +619,8 @@ draw_color_smooth_box()
 #if 0
     sprintf(s, "%g", tmp);
 #else
-    gprintf(s, sizeof(s), axis_array[FIRST_Z_AXIS].formatstring, axis_array[FIRST_Z_AXIS].log_base, tmp);
+    gprintf(s, sizeof(s), axis_array[FIRST_Z_AXIS].formatstring,
+	    axis_array[FIRST_Z_AXIS].log_base, tmp);
 #endif
     if (color_box.rotation == 'v') {
 	/* text was eventually already left-justified above */
@@ -642,17 +643,18 @@ draw_color_smooth_box()
 
     /* draw tics */
     if (axis_array[COLOR_AXIS].ticmode) {
-	/* setup tics, but avoid changing CB_AXIS.min, max */
-	int saved_autoscale = CB_AXIS.autoscale;
-	CB_AXIS.autoscale = AUTOSCALE_NONE;
-	setup_tics(COLOR_AXIS, 20);
-	CB_AXIS.autoscale = saved_autoscale;
 	term_apply_lp_properties(&border_lp); /* border linetype */
 	CB_AXIS.log = axis_array[FIRST_Z_AXIS].log; /* use log scaling from z-axis */
 	CB_AXIS.base = axis_array[FIRST_Z_AXIS].base;
 	CB_AXIS.log_base = axis_array[FIRST_Z_AXIS].log_base;
-	gen_tics( COLOR_AXIS, /* grid_selection & (GRID_CB | GRID_MCB), */
-		  cbtick_callback );
+
+	/* setup tics, but avoid changing CB_AXIS.min, max */
+	CB_AXIS.autoscale = axis_array[FIRST_Z_AXIS].autoscale
+	    | AUTOSCALE_FIXMIN | AUTOSCALE_FIXMAX;
+	setup_tics(COLOR_AXIS, 20);
+	gen_tics(COLOR_AXIS, cbtick_callback );
+
+	/* FIXME HBB 20011010: does this really make sense? : */
 	CB_AXIS.log = FALSE; /* disable cb-axis log, if set by the above */
     }
 
