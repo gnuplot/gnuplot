@@ -1,5 +1,5 @@
 /*
- * $Id: debug.trm,v 1.10 2001/10/02 17:21:16 broeker Exp $
+ * $Id: debug.trm,v 1.11 2004/04/13 17:24:16 broeker Exp $
  *
  */
 
@@ -72,7 +72,7 @@ TERM_PUBLIC void DEBUG_reset __PROTO((void));
 TERM_PUBLIC int DEBUG_justify_text __PROTO((enum JUSTIFY mode));
 TERM_PUBLIC int DEBUG_text_angle __PROTO((int ang));
 TERM_PUBLIC void DEBUG_point __PROTO((unsigned int x, unsigned int y, int pointstyle));
-TERM_PUBLIC void DEBUG_arrow __PROTO((unsigned int sx, unsigned int sy, unsigned int ex, unsigned int ey, TBOOLEAN head));
+TERM_PUBLIC void DEBUG_arrow __PROTO((unsigned int sx, unsigned int sy, unsigned int ex, unsigned int ey, int head));
 TERM_PUBLIC int DEBUG_set_font __PROTO((const char *font));
 TERM_PUBLIC void DEBUG_pointsize __PROTO((double pointsize));
 TERM_PUBLIC void DEBUG_suspend __PROTO((void));
@@ -125,7 +125,7 @@ DEBUG_text()
 
 TERM_PUBLIC void
 DEBUG_linetype(linetype)
-int linetype;
+    int linetype;
 {
     /*
        if (linetype != DEBUG_linetype_last){
@@ -139,7 +139,7 @@ int linetype;
 
 TERM_PUBLIC void
 DEBUG_move(x, y)
-unsigned int x, y;
+    unsigned int x, y;
 {
     /*
        if (x != DEBUG_xlast || y != DEBUG_ylast){
@@ -156,7 +156,7 @@ unsigned int x, y;
 
 TERM_PUBLIC void
 DEBUG_vector(x, y)
-unsigned int x, y;
+    unsigned int x, y;
 {
     /*
        if (x != DEBUG_xlast || y != DEBUG_ylast){
@@ -173,8 +173,8 @@ unsigned int x, y;
 
 TERM_PUBLIC void
 DEBUG_put_text(x, y, str)
-unsigned int x, y;
-const char *str;
+    unsigned int x, y;
+    const char *str;
 {
     /*
        DEBUG_move(x,y);
@@ -195,7 +195,7 @@ DEBUG_reset()
 
 TERM_PUBLIC int
 DEBUG_justify_text(mode)
-enum JUSTIFY mode;
+    enum JUSTIFY mode;
 {
     fputs("justify ", gpoutfile);
     switch (mode) {
@@ -216,7 +216,7 @@ enum JUSTIFY mode;
 
 TERM_PUBLIC int
 DEBUG_text_angle(ang)
-int ang;
+    int ang;
 {
     fprintf(gpoutfile, "text_angle %d:", ang);
     switch (ang) {
@@ -235,8 +235,8 @@ int ang;
 
 TERM_PUBLIC void
 DEBUG_point(x, y, pointstyle)
-unsigned int x, y;
-int pointstyle;
+    unsigned int x, y;
+    int pointstyle;
 {
     fprintf(gpoutfile, "point at (%ud,%ud), pointstyle %d\n", x, y, pointstyle);
 }
@@ -244,7 +244,7 @@ int pointstyle;
 TERM_PUBLIC void
 DEBUG_arrow(sx, sy, ex, ey, head)
     unsigned int sx, sy, ex, ey;
-    TBOOLEAN head;
+    int head;
 {
     fprintf(gpoutfile, "arrow from (%ud,%ud) to (%ud,%ud), %s head\n",
 	    sx, sy, ex, ey, head ? "with" : "without");
@@ -252,7 +252,7 @@ DEBUG_arrow(sx, sy, ex, ey, head)
 
 TERM_PUBLIC int
 DEBUG_set_font(font)
-const char *font;
+    const char *font;
 {
     fprintf(gpoutfile, "set font to \"%s\"\n",
 	    font ? (*font ? font : "\aempty string!") : "\aNULL string!");
@@ -261,7 +261,7 @@ const char *font;
 
 TERM_PUBLIC void
 DEBUG_pointsize(pointsize)
-double pointsize;
+    double pointsize;
 {
     fprintf(gpoutfile, "set pointsize to %lf\n", pointsize);
 }
@@ -280,8 +280,8 @@ DEBUG_resume(void)
 
 TERM_PUBLIC void
 DEBUG_fillbox(style, x1, y1, width, height)
-int style;
-unsigned int x1, y1, width, height;
+    int style;
+    unsigned int x1, y1, width, height;
 {
     fprintf(gpoutfile, "fillbox/clear at (%ud,%ud), area (%ud,%ud), style %d)\n",
 	    x1, y1, width, height, style);
