@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.193 2003/12/01 08:33:42 mikulik Exp $
+C RCS $Id: gnuplot.doc,v 1.195 2003/12/13 00:56:28 sfeam Exp $
 C 18 September 2001
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001   Thomas Williams, Colin Kelley et al.
 C
@@ -4433,7 +4433,8 @@ C ... and restart the table:
  `default`, which tells a terminal to use its default; `iso_8859_1` (known in
  the PostScript world as `ISO-Latin1`), which is used on many Unix workstations
  and with MS-Windows; `iso_8859_2`, used in Central and Eastern Europe; `cp850`
- and `cp852` for OS/2; and `cp437`, for MS-DOS.
+ and `cp852` for OS/2; `cp437`, for MS-DOS; and `koi8r`, popular Unix cyrillic
+ encoding.
 
  Syntax:
        set encoding {<value>}

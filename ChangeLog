@@ -1,3 +1,9 @@
+2003-12-15  Andrey V. Panov  <panov@iacp.dvo.ru>
+
+	* NEWS docs/gnuplot.doc src/term_api.h src/term.c src/gplt_x11.c
+	src/set.c term/post.trm: New encoding koi8-r (Russian locale on Unices).
+	SourceForge patch #853823.
+
 2003-12-15  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/color.c (draw_color_smooth_box): Fixed position of color box
