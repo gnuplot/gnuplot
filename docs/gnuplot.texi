@@ -4481,6 +4481,8 @@ by the commands `set term push` and `set term pop`, see `set term`.
 The filename must be enclosed in quotes.
 
 The special filename "-" may be used to @ref{save} commands to standard output.
+On systems which support a popen function (Unix), the output of save can be
+piped through an external program by starting the file name with a '|'.
 This provides a consistent interface to `gnuplot`'s internal settings to
 programs which communicate with `gnuplot` through a pipe.  Please see
 "help batch/interactive" for more details.
@@ -4492,6 +4494,8 @@ Examples:
       save var 'var.dat'
       save set 'options.dat'
       save term 'myterm.gnu'
+      save '-'
+      save '|grep title >t.gp'
 
 @end example
 
@@ -7921,7 +7925,7 @@ Syntax:
                  @{ gamma <gamma> @}
                @}
       show palette
-      show palette palette <n>
+      show palette palette <n> @{@{float | int@}@}
       show palette gradient
       show palette fit2rgbformulae
       show palette rgbformulae
@@ -7930,11 +7934,20 @@ Syntax:
 @end example
 
 @ref{palette} (i.e. without options) sets up the default values.
-Otherwise, the options can be given in any order. @ref{palette} shows the
-current palette properties. `show palette palette <n>` shows RGB triplets for
-the current settings and a palette having <n> discrete colors.  `show palette
-gradient` displays the gradient defining the palette (if appropriate).  @ref{rgbformulae} prints the available fixed gray --> color transformation
-formulas.  `show palette colornames` prints the implemented color names.
+Otherwise, the options can be given in any order.
+@ref{palette} shows the current palette properties.
+
+`show palette gradient` displays the gradient defining the palette (if
+appropriate).  @ref{rgbformulae} prints the available fixed gray -->
+color transformation formulae.  `show palette colornames` prints the
+implemented color names.
+
+`show palette palette <n>` prints to screen or to the file given by
+@ref{output} table of RGB triplets calculated for the current palette settings
+and a palette having <n> discrete colors.  The default wide table can be
+limited to 3 columns of r,g,b float values [0..1] or integer values [0..255]
+by options float or int, respectively.  This way, the current gnuplot color
+palette can be loaded into other imaging applications, for example Octave.
 
 The following options determine the coloring properties.
 
@@ -13673,12 +13686,14 @@ no options."
 @node unixplot, vx384, unixpc, terminal
 @subsubsection unixplot
 
-@c ?comands set terminal unixplot
+@c ?commands set terminal unixplot
 @c ?set terminal unixplot
 @c ?set term unixplot
 @c ?terminal unixplot
 @c ?term unixplot
 @cindex unixplot
+@tmindex unixplot
+
 
 The `unixplot` terminal driver generates output in the Unix "plot" graphics
 language.  It has no options.
@@ -14777,8 +14792,10 @@ by specifying `gnuplot*maxcolors: 240` and `gnuplot*mincolors: 240`.
 
 
 The `xlib` terminal driver supports the X11 Windows System.  It generates
-gnuplot_x11 commands. `set term x11` behaves similarly to `set terminal xlib;
-set output "|gnuplot_x11"`.  `xlib` has no options, but see `x11`."
+gnuplot_x11 commands, but sends them to the output file specified by
+`set output '<filename>'. `set term x11` is equivalent to
+`set terminal xlib; set output "|gnuplot_x11 -noevents"`.
+`xlib` takes the same set of options as `x11`."
 
 @node xlib_,  , xlib, terminal
 @subsubsection xlib
@@ -14793,8 +14810,10 @@ set output "|gnuplot_x11"`.  `xlib` has no options, but see `x11`."
 
 
 The `xlib` terminal driver supports the X11 Windows System.  It generates
-gnuplot_x11 commands. `set term x11` behaves similarly to `set terminal xlib;
-set output "|gnuplot_x11"`.  `xlib` has no options, but see `x11`."
+gnuplot_x11 commands, but sends them to the output file specified by
+`set output '<filename>'. `set term x11` is equivalent to
+`set terminal xlib; set output "|gnuplot_x11 -noevents"`.
+`xlib` takes the same set of options as `x11`."
 
 @node tics, ticslevel, terminal, set-show
 @subsection tics
@@ -16272,9 +16291,9 @@ Unix, `endcli` if using AmigaOS, or @ref{exit} if using MS-DOS or OS/2.
 There are two ways of spawning a shell command: using @ref{system} command
 or via `!` ($ if using VMS). The former command takes a string as a
 parameter and thus it can be used anywhere among other gnuplot commands,
-while the latter syntax requires to bethe only command on the line. Control
+while the latter syntax requires to be the only command on the line. Control
 will return immediately to `gnuplot` after this command is executed.  For
-example, in Unix, AmigaOS, MS-DOS or OS/2,
+example, in AmigaOS, MS-DOS or OS/2,
 
 @example
       ! dir
@@ -16562,7 +16581,7 @@ and so forth.  The row and column indices are used for the x- and y-values.
 
 A blank line or comment line ends the matrix, and starts a new
 surface mesh. You can select among the meshes inside a file by the
-@ref{index} option to the `plot` command, as usual.
+@ref{index} option to the `splot` command, as usual.
 
 @node grid_data, splot_overview, data-file_, splot
 @subsection grid_data
