@@ -159,10 +159,7 @@
 #include "xlib.trm"
 #endif /* !MSDOS && !OS2 && !_Windows && !_ATARI && !_MTOS && !AMIGA */
 
-#ifndef X_DISPLAY_MISSING
-# ifndef X11
-#  define X11
-# endif
+#if defined(X11) || !defined(X_DISPLAY_MISSING)
 # include "x11.trm"     /* X Window System */
 #endif
 
