@@ -2,6 +2,10 @@
 
 	* term/gd.trm: New terminal option {rounded|butt} controls line caps.
 
+	* src/color.c (draw_color_smooth_box): In splot in view map mode, have
+	the colorbox extend the full height of the y axis by default. Placement
+	in 3D plots is not affected. This was the old (pre-4.0) behaviour.
+
 2005-01-07  Daniel Sebald  <daniel.sebald@ieee.org>
 
 	* term/gd.trm: Addtional processing of animated gifs to bring

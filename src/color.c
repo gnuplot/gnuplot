@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: color.c,v 1.59 2005/09/12 23:51:36 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: color.c,v 1.60 2005/09/16 03:20:30 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - color.c */
@@ -520,13 +520,25 @@ draw_color_smooth_box(int plot_mode)
 	    map3d_xy(X_AXIS.max + dx * 0.075, Y_AXIS.max, ceiling_z, &cb_x_to, &cb_y_to);
 	}
 #else
-	/* HBB 20031215: new code.  Constants fixed to what the result
-	 * of the old code in default view (set view 60,30,1,1)
-	 * happened to be. Somebody fix them if they're not right!*/
-	cb_x_from = xmiddle + 0.709 * xscaler;
-	cb_x_to   = xmiddle + 0.778 * xscaler;
-	cb_y_from = ymiddle - 0.147 * yscaler;
-	cb_y_to   = ymiddle + 0.497 * yscaler;
+	/* MWS 09-Dec-05, make color full size for splot maps.*/
+	if (plot_mode == MODE_SPLOT && splot_map) {
+	    /* set sets the default colorbox to extend for the full y-axis when
+	     * a splot is done in map mode. */
+	    double dx = (X_AXIS.max - X_AXIS.min);
+
+	    /* note: [0.04 0.25; 0.18 0.25] were the values before cbaxis */
+	    map3d_xy(X_AXIS.max + dx * 0.025, Y_AXIS.min, base_z, & cb_x_from, &cb_y_from);
+	    map3d_xy(X_AXIS.max + dx * 0.075, Y_AXIS.max, ceiling_z, &cb_x_to, &cb_y_to);
+
+	  } else {
+	    /* HBB 20031215: new code.  Constants fixed to what the result
+	     * of the old code in default view (set view 60,30,1,1)
+	     * happened to be. Somebody fix them if they're not right!*/
+	    cb_x_from = xmiddle + 0.709 * xscaler;
+	    cb_x_to   = xmiddle + 0.778 * xscaler;
+	    cb_y_from = ymiddle - 0.147 * yscaler;
+	    cb_y_to   = ymiddle + 0.497 * yscaler;
+	  }
 #endif
 	/* EAM FIXME 15-Jan-2004: This code may want reworking similar to HBB's fix just above */
 	if (plot_mode != MODE_SPLOT) {
