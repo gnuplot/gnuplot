@@ -1,12 +1,19 @@
+2001-10-01  Slaven Rezic  <slaven.rezic@berlin.de>
+
+	* term/tkcanvas.trm: No more warnings if running with perl -w. Take
+	-highlightthickness into account for height/width computation. Use
+	a subroutine reference rather than a subroutine name in the perl
+	version (as in my original patch). Doc fix for perl sample.
+
 2001-09-28  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/graphics.c (plot_c_bars): Changed candlesticks behaviour to
- 	ignore order of high and low prices, as was long since claimed by
- 	the docs, but not actually done in the code.
+	ignore order of high and low prices, as was long since claimed by
+	the docs, but not actually done in the code.
 
 	* docs/gnuplot.doc: Corrected documentation about candlesticks
- 	behaviour if open and close prices are exchanged.  Some spurious
- 	whitespace removed to please 'make check'
+	behaviour if open and close prices are exchanged.  Some spurious
+	whitespace removed to please 'make check'.
 
 2001-09-27  Petr Mikulik  <mikulik@physics.muni.cz>
 
@@ -18,24 +25,24 @@
 2001-09-19  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/gplt_x11.c (GR_MAKE_PALETTE, GR_RELEASE_PALETTE,
- 	GR_SET_COLOR, GR_FILLED_POLYGON): Renamed so they all have an X11_
- 	prefix now, like their copies in x11.trm.
+	GR_SET_COLOR, GR_FILLED_POLYGON): Renamed so they all have an X11_
+	prefix now, like their copies in x11.trm.
 	(exec_cmd): Extend parsing of GR_FILLED_POLYGON case to allow for
- 	large polygons being broken into several lines. Uses new static
- 	variables `saved_npoints' and `saved_i' to keep state from one
- 	partial line to the next.
+	large polygons being broken into several lines. Uses new static
+	variables `saved_npoints' and `saved_i' to keep state from one
+	partial line to the next.
 
 	* term/x11.trm (X11_filled_polygon): Protocol for filled_polygon
- 	call changed. Now uses continuation lines to break up large
- 	polygons like those you get from Petr's filledcurves feature.
-  	Incomplete lines have an "xxxx" at their end; continuations are
- 	flagged by a -1 in the number-of-points field.
-	
+	call changed. Now uses continuation lines to break up large
+	polygons like those you get from Petr's filledcurves feature.
+	Incomplete lines have an "xxxx" at their end; continuations are
+	flagged by a -1 in the number-of-points field.
+
 2001-09-19  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/win/wcommon.h src/win/wgnuplib.c: New routine
 	LocalReAllocPtr().
-	
+
 	* src/win/wgraph.c: Dynamically allocate enough memory for a
 	polygon with many corners (fixes 'plot with filledcurves').
 
@@ -64,61 +71,61 @@
 2001-09-18  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	The remainder of Uli Gruenebaum's filled boxes implementation,
- 	reviewed and massively changed by me.
+	reviewed and massively changed by me.
 
 	* term/win.trm (WIN_boxfill): Renamed from WIN_filledbox.
-  	Parameter `linetype' renamed to `style'.
+	Parameter `linetype' renamed to `style'.
 	(WIN_boxfill) [USE_ULIG_FILLEDBOXES]: Send a W_fillstyle opcode to
- 	tell the new code how the interior of the rectangle is to be
- 	filled.
+	tell the new code how the interior of the rectangle is to be
+	filled.
 
 	* src/win/wgraph.c [USE_ULIG_FILLEDBOXES] (halftone_bitmaps,
- 	halftone_num, halftone_brush, halftone_bitdata, halftone_bitmap,
- 	pattern_bitmaps, pattern_num, pattern_brush, pattern_bitdata,
- 	pattern_bitmap, brushes_initialized): New file-scope variables to
- 	implement fillbox extension.
+	halftone_num, halftone_brush, halftone_bitdata, halftone_bitmap,
+	pattern_bitmaps, pattern_num, pattern_brush, pattern_bitdata,
+	pattern_bitmap, brushes_initialized): New file-scope variables to
+	implement fillbox extension.
 	(MakePens) [USE_ULIG_FILLEDBOXES]: Create GDI brushes for filling.
 	(DestroyPens) [USE_ULIG_FILLEDBOXES]: Delete brushes here.
 	(drawgraph) [USE_ULIG_FILLEDBOXES]: Implement drawing of filled
- 	boxes. W_fillstyle gives the style, a W_move specifies the top
- 	left corner, and the (x,y) pair sent with the W_boxfill specifies
- 	the width and height of the box.
+	boxes. W_fillstyle gives the style, a W_move specifies the top
+	left corner, and the (x,y) pair sent with the W_boxfill specifies
+	the width and height of the box.
 
 	* src/win/wgnuplot.mnu: Added menu entry for filledboxes style.
 
 	* src/win/wgnuplib.h (WGNUPLOTVERSION): Increased to reflect API
- 	extension.
+	extension.
 	(W_boxfill): Renamed from W_filledbox.
 	(W_fillstyle): New operation token; used to transmit fill type and
- 	parameter before a W_boxfill.
+	parameter before a W_boxfill.
 
 	* src/graphics.c [USE_ULIG_FILLEDBOXES] (plot_boxes): Reindented.
 
 2001-09-18  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/util.c: Add #include "datafile.h" to pull in prototype of
- 	J. Van Zandt's new df_showdata() function.
+	J. Van Zandt's new df_showdata() function.
 
 2001-09-18  Alexander Mai <st002279@hrzpub.tu-darmstadt.de>
 
 	* configure.in docs/Makefile.in: Check for PlainTeX, dvips as
- 	well.
+	well.
 
-2001-09-18  Lars Hecking  <lhecking@nmrc.ucc.ie
+2001-09-18  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* demo/prob.dem, demo.prob2.dem, demo/random.dem, demo/stat.inc:
- 	Remove "non-commercial" clause by permission of the original
- 	author, Jos van der Woude.
+	Remove "non-commercial" clause by permission of the original
+	author, Jos van der Woude.
 
 2001-09-18  Alexander Mai <st002279@hrzpub.tu-darmstadt.de>
 
 	* lisp/Makefile.in lisp/configure.in lisp/configure: Some more
- 	checks; get additional targets to work.
+	checks; get additional targets to work.
 
 2001-09-18  Alexander Mai <st002279@hrzpub.tu-darmstadt.de>
 
 	* doc/.cvsignore docs/psdoc/.cvsignorelisp/.cvsignore: Add missing
- 	entries.
+	entries.
 
 2001-09-17  Alexander Mai <st002279@hrzpub.tu-darmstadt.de>
 
@@ -127,16 +134,16 @@
 2001-09-17  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/save.c (save_set_all): Fixed saving of 'set grid'. Was
- 	completely broken since my change to store gridding status in the
- 	axis structs.
+	completely broken since my change to store gridding status in the
+	axis structs.
 
 	* src/unset.c (unset_style): Removed incorrect c_token increase.
 
 2001-09-16  James R. Van Zandt  <jrv@vanzandt.mv.com>
 
 	* src/datafile.c: New function df_showdata() displays the current
- 	data file line (up to 77 characters, including leading spaces) for
- 	an error message.
+	data file line (up to 77 characters, including leading spaces) for
+	an error message.
 
 	* src/datafile.h: export df_showdata(), but not df_filename or
 	df_string.
@@ -216,111 +223,111 @@
 2001-08-31  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/axis.c (typedef enum t_timelevel): New type to give names to
- 	values of timelevel[] array.
+	values of timelevel[] array.
 	(timelevel): Type changed to array of t_timelevel.
 	(make_auto_time_minitics): Renamed former function make_ltic() to
- 	this.  Parameter type changed to t_timelevel, and enum labels used
- 	instead of magic numbers inside the functions.
+	this.  Parameter type changed to t_timelevel, and enum labels used
+	instead of magic numbers inside the functions.
 	(copy_or_invent_formatstring): Use new enum labels.
 	(quantize_normal_tics): Renamed former function set_tic() to more
- 	descriptive name.
+	descriptive name.
 	(make_tics): Remove local variable l10, and. Extracted the timetic
- 	quantization part into a separate function.
+	quantization part into a separate function.
 	(quantize_time_tics): New function, extracted out of make_tics().
-  	Unused code and variables commented #if'ed out. Use new
- 	t_timelevel names.
+	Unused code and variables commented #if'ed out. Use new
+	t_timelevel names.
 	(setup_tics): Fix bug with fixed-increment series ticks on
- 	time/data axes. timelevel[axis] wasn't defined at all, in that
- 	case, using whatever value was left in there from the previous
- 	plot. BAD thing.
+	time/data axes. timelevel[axis] wasn't defined at all, in that
+	case, using whatever value was left in there from the previous
+	plot. BAD thing.
 	(gen_tics): Call of make_ltic() renamed.
 	(time_tic_just): Type of "level" argument changed to t_timelevel.
 	Use t_timelevel names.
-	
+
 	* src/contour.c (contour): Changed call of renamed function
- 	set_tic.
+	set_tic.
 
 	* src/axis.h (quantize_normal_tics): Changed prototype to reflect
- 	renamed function set_tic().
+	renamed function set_tic().
 
 2001-08-27  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	A monster patch by Ulrich Gruenebaum. Implements plotting of
- 	filled boxes for some terminals, by exploiting the unused 'style'
- 	parameter of the existing termentry function term->fillbox().
-  	Also adds unrelated enhancements to the FIG terminal driver.
-  	Heavily edited by me before checkin.
-	
+	filled boxes for some terminals, by exploiting the unused 'style'
+	parameter of the existing termentry function term->fillbox().
+	Also adds unrelated enhancements to the FIG terminal driver.
+	Heavily edited by me before checkin.
+
 	* term/post.trm (PS_header) [USE_ULIG_FILLEDBOXES]: Add PostScript
- 	macro for solid-filled boxes.
+	macro for solid-filled boxes.
 	(PS_fillbox) [USE_ULIG_FILLEDBOXES]: Implement solid-filled boxes
- 	by calling that macro.
+	by calling that macro.
 
 	* term/fig.trm: Added a set of new options: "solid", "dashed",
- 	"textnormal", "textspecial", "texthidden", "textrigid" and
- 	"version".
+	"textnormal", "textspecial", "texthidden", "textrigid" and
+	"version".
 	(FIG_DEFAULTVERSION): New macro.
 	(enum FIG_TEXT_STYLEBITS): New enum to give names to bits
- 	controlling the text output style of the new fig driver:
- 	FIG_TEXT_RIGID, FIG_TEXT_SPECIAL, FIG_TEXT_POSTSCRIPT and
- 	FIG_TEXT_HIDDEN.
+	controlling the text output style of the new fig driver:
+	FIG_TEXT_RIGID, FIG_TEXT_SPECIAL, FIG_TEXT_POSTSCRIPT and
+	FIG_TEXT_HIDDEN.
 	(FIG_TEXT_NORMAL): New macro. Equals FIG_TEXT_POSTSCRIPT.
 	(FIG_text_flags, FIG_version, FIG_solid): New status variables
- 	storing added FIG terminal options.
+	storing added FIG terminal options.
 	(FIG_opts): Added lookup table entries for new options.
 	(enum FIG_id): Added tokens for new options.
 	(FIG_options): Mention new options in error message. Parse and
- 	handle them.
+	handle them.
 	(FIG_init): Output different file header, depending on the
- 	"version" option active.
+	"version" option active.
 	(FIG_linetype): Handle option "solid".
 	(FIG_put_text): Removed autodetection of suspected LaTeX input in
- 	output string.  Replaced by FIG_text_flags, which is controlled by
- 	the user.
+	output string.  Replaced by FIG_text_flags, which is controlled by
+	the user.
 	(FIG_boxfill): New function. Optionally implements filled boxes if
- 	USE_ULIG_FILLEDBOXES is set.
+	USE_ULIG_FILLEDBOXES is set.
 	(fig_driver): Add boxfill entry. Document all the new options.
 
 	* term/epson.trm (EPSON_linetype, EPSON_move, EPSON_vector,
- 	EPSON_put_text, EPSON_text_angle, NEC_move, NEC_vector,
- 	NEC_put_text, NEC_text_angle, STARC_move, STARC_vector,
- 	STARC_put_text, STARC_text_angle): Pointless macro renames of
- 	bitmap module's functions removed. Use the original functions in
- 	the termentry struct registrations instead.
+	EPSON_put_text, EPSON_text_angle, NEC_move, NEC_vector,
+	NEC_put_text, NEC_text_angle, STARC_move, STARC_vector,
+	STARC_put_text, STARC_text_angle): Pointless macro renames of
+	bitmap module's functions removed. Use the original functions in
+	the termentry struct registrations instead.
 	(epson180_driver, epson60_driver, epsonlx_driver, nec_driver,
- 	okidata_driver, starc_driver, tandy60_driver): Add termentry field
- 	to call b_boxfill().
-	
+	okidata_driver, starc_driver, tandy60_driver): Add termentry field
+	to call b_boxfill().
+
 	* term/png.trm (png_driver): Termentry field to call b_boxfill
- 	added.
+	added.
 
 	* term/pbm.trm (PBM_move, PBM_vector, PBM_text_angle,
- 	PBM_put_text): Pointless macro renames of bitmap module's
- 	functions removed. Use the original functions in the termentry
- 	struct registrations instead.
+	PBM_put_text): Pointless macro renames of bitmap module's
+	functions removed. Use the original functions in the termentry
+	struct registrations instead.
 	(pbm_driver): Termentry field to call b_boxfill added.
 
 	* term/hppj.trm (HPPJ_move, HPPJ_vector, HPPJ_text_angle,
- 	HPPJ_put_text): Pointless macro renames of bitmap module's
- 	functions removed. Use the original functions in the termentry
- 	struct registrations instead.
+	HPPJ_put_text): Pointless macro renames of bitmap module's
+	functions removed. Use the original functions in the termentry
+	struct registrations instead.
 	(hppj_driver): Termentry field to call b_boxfill added.
 
 	* term/hpljii.trm (HPLJII_move, HPLJII_vector, HPLJII_text_angle,
- 	HPDJ_text_angle, HPDJ_put_text): Pointless macro renames of bitmap
- 	module's functions removed. Use the original functions in the
- 	termentry struct registrations instead.
+	HPDJ_text_angle, HPDJ_put_text): Pointless macro renames of bitmap
+	module's functions removed. Use the original functions in the
+	termentry struct registrations instead.
 	(hplj22_driver, hpdj_driver): Termentry field to call b_boxfill
- 	added.
+	added.
 
 	* term/hp500c.trm (HP500C_move, HP500C_vector, HP500C_text_angle,
- 	HP500C_put_text): Pointless macro renames of bitmap module's
- 	functions removed. Use the original functions in the termentry
- 	struct registrations instead.
+	HP500C_put_text): Pointless macro renames of bitmap module's
+	functions removed. Use the original functions in the termentry
+	struct registrations instead.
 	(hp500c_driver): Termentry field to call b_boxfill added.
 
 	* src/beos/GPBitmap.cpp (display): Add comment about style
- 	parameter no longer being unused.
+	parameter no longer being unused.
 
 	* term/epslatex.trm: Dito.
 
@@ -329,181 +336,181 @@
 	* term/ggi.trm: Dito.
 
 	* src/unset.c (unset_boxwidth) [USE_ULIG_RELATIVE_BOXWIDTH]: Reset
- 	boxwidth_is_absolute, too.
+	boxwidth_is_absolute, too.
 	(unset_fillstyle) [USE_ULIG_FILLEDBOXES]: New Function. Resets
- 	fillstyle to default status: enabled, solid fill, 100 percent
- 	density.
+	fillstyle to default status: enabled, solid fill, 100 percent
+	density.
 	(unset_style) [USE_ULIG_FILLEDBOXES]: Call unset_fillstyle for
- 	commands "unset style" and "unset style filling". Change error
- 	message text to mention "filling" option.
+	commands "unset style" and "unset style filling". Change error
+	message text to mention "filling" option.
 	(unset_style): Use lookup table instead of individual calls to
- 	almost_equals().
+	almost_equals().
 
 	* src/tables.c (show_style_tbl) [USE_ULIG_FILLEDBOXES]: Add parse
- 	entry for "{set|show|unset} style filling".
+	entry for "{set|show|unset} style filling".
 	(plotstyle_tbl) [USE_ULIG_FILLEDBOXES]: Add parse entry for
- 	plotstyle "filledboxes".
+	plotstyle "filledboxes".
 
 	* src/tables.h (enum show_style_id) [USE_ULIG_FILLEDBOXES]: Add
- 	token for SHOW_STYLE_FILLING.
+	token for SHOW_STYLE_FILLING.
 
 	* src/show.c (show_command, show_style): Capitalized first word of
- 	message for "show data style" & friends.
+	message for "show data style" & friends.
 	(show_boxwidth) [USE_ULIG_RELATIVE_BOXWIDTH]: Handle
- 	relative/absolute option, too.
+	relative/absolute option, too.
 	(show_fillstyle) [USE_ULIG_FILLEDBOXES]: New function.  Displays
- 	state of "set style filling".
+	state of "set style filling".
 	(show_style) [USE_ULIG_FILLEDBOXES]: Handle "show style filling",
- 	too.  Show filling style if "show style" was given without
- 	options.
+	too.  Show filling style if "show style" was given without
+	options.
 	(show_styles): Fix typo in name displayed for "candlesticks"
- 	style.
+	style.
 	(show_styles) [USE_ULIG_FILLEDBOXES]: Allow data/function style to
- 	be "filledboxes", too.
+	be "filledboxes", too.
 
 	* src/set.c (set_command): Fix position and mention of 'style' in
- 	list of allowed "set" parameters displayed upon inputting of a
- 	nonexistant one.
+	list of allowed "set" parameters displayed upon inputting of a
+	nonexistant one.
 	(set_boxwidth) [USE_ULIG_RELATIVE_BOXWIDTH]: Handle
- 	relative/absolute option, too.
+	relative/absolute option, too.
 	(set_fillstyle) [USE_ULIG_FILLEDBOXES]: New function.  Parses and
- 	implements "set style filling" command options.
+	implements "set style filling" command options.
 	(set_style): Use lookup table instead of individual
- 	almost_equals() calls.
+	almost_equals() calls.
 	(set_style) [USE_ULIG_FILLEDBOXES]: Handle "filling" style, too.
-  	Adapt error message if nonexistant style name given.
+	Adapt error message if nonexistant style name given.
 
 	* src/save.c (save_set_all) [USE_ULIG_RELATIVE_BOXWIDTH]: Save
- 	status of relative/absolut flag, too.
+	status of relative/absolut flag, too.
 	(save_set_all) [USE_ULIG_FILLEDBOXES]: Save "set style filling"
- 	status. Allow "filledboxes" in "set style {data|function}".
+	status. Allow "filledboxes" in "set style {data|function}".
 
 	* src/plot2d.h (boxwidth_is_absolute)
- 	[USE_ULIG_RELATIVE_BOXWIDTH]: Add external declaration.
+	[USE_ULIG_RELATIVE_BOXWIDTH]: Add external declaration.
 
 	* src/plot2d.c (boxwidth_is_absolute)
- 	[USE_ULIG_RELATIVE_BOXWIDTH]: New global status variable storing
- 	relative/absolute bit.
+	[USE_ULIG_RELATIVE_BOXWIDTH]: New global status variable storing
+	relative/absolute bit.
 	(get_data, print_table) [USE_ULIG_FILLEDBOXES]: Treat FILLEDBOXES
- 	just like BOXES.
+	just like BOXES.
 	(get_data) [USE_ULIG_RELATIVE_BOXWIDTH]: Don't calculate boxwidth
- 	yet, if boxwidths are set to relative.
+	yet, if boxwidths are set to relative.
 	(eval_plots, parametric_fixup) [USE_ULIG_RELATIVE_BOXWIDTH]: Set
- 	up xlow and xhigh if boxwidth set to absolute.
+	up xlow and xhigh if boxwidth set to absolute.
 
 	* src/misc.c (get_style) [USE_ULIG_FILLEDBOXES]: Add "filledboxes"
- 	to message listing allowed plot style names.
+	to message listing allowed plot style names.
 
 	* src/hidden3d.c (build_networks) [USE_ULIG_FILLEDBOXES]: Ignore
- 	FILLEDBOXES just like BOXES and other non-3D styles.
+	FILLEDBOXES just like BOXES and other non-3D styles.
 
 	* src/graphics.c: Add #include of plot2d.h (but see the FIXME
- 	comment accompanying it!).
+	comment accompanying it!).
 	(do_plot) [USE_ULIG_FILLEDBOXES]: Add boolean "filling" arguments
- 	to calls of plot_boxes(). Add code to handle "filledboxes".
+	to calls of plot_boxes(). Add code to handle "filledboxes".
 	(plot_boxes) [USE_ULIG_FILLEDBOXES]: New argument tells if boxes
- 	are meant to be filled or not. Implement filling by calling
- 	term->boxfill().
+	are meant to be filled or not. Implement filling by calling
+	term->boxfill().
 	(plot_boxes) [USE_ULIG_RELATIVE_BOXWIDTH]: Optionally modify
- 	boxwidth gnuplot would usually have chosen by the factor specifyed
- 	by "set boxwidth <factor> relative".
+	boxwidth gnuplot would usually have chosen by the factor specifyed
+	by "set boxwidth <factor> relative".
 
 	* src/graph3d.c (do_3dplot) [USE_ULIG_FILLEDBOXES]: Add entries
- 	for handling "filledboxes" the same as "boxes", i.e. map them over
- 	to "impulses".
+	for handling "filledboxes" the same as "boxes", i.e. map them over
+	to "impulses".
 	(xtick_callback, ytick_callback, ztick_callback): Added vertical
- 	adjustment argument to call of clip_put_text_just.
+	adjustment argument to call of clip_put_text_just.
 
 	* src/gplt_x11.c [USE_ULIG_FILLEDBOXES] (stipple_halftone_width,
- 	stipple_halftone_height, stipple_halftone_num,
- 	stipple_halftone_bits, stipple_pattern_width,
- 	stipple_pattern_height, stipple_pattern_num, stipple_pattern_bits,
- 	stipple_halftone, stipple_pattern, stipple_initialized): New
- 	file-scope macros and variables.
+	stipple_halftone_height, stipple_halftone_num,
+	stipple_halftone_bits, stipple_pattern_width,
+	stipple_pattern_height, stipple_pattern_num, stipple_pattern_bits,
+	stipple_halftone, stipple_pattern, stipple_initialized): New
+	file-scope macros and variables.
 	(delete_plot): Delete pattern filling pixmaps.
 	(exec_cmd): Extend implementation of 'F'illbox command in gnuplot
- 	command stream.
+	command stream.
 	(display): Initialize pattern filling pixmaps.
 	(process_event): Release pixmaps on ConfigureNotify X11 event.
 
 	* src/gp_types.h [USE_ULIG_FILLEDBOXES] (enum PLOT_STYLE): Added
- 	label for new plotstyle.
+	label for new plotstyle.
 
 	* src/gadgets.c (fillstyle, filldensity, fillpattern)
- 	[USE_ULIG_FILLEDBOXES]: New global status variables controlling
- 	how boxes are to be filled.
+	[USE_ULIG_FILLEDBOXES]: New global status variables controlling
+	how boxes are to be filled.
 	(clip_put_text_just): Added argument to specify vertical
- 	adjustment. Use it to call write_multiline().
+	adjustment. Use it to call write_multiline().
 
 	* src/gadgets.h (clip_put_text_just): Prototype adjusted.
 	(fillstyle, filldensity, fillpattern) [USE_ULIG_FILLEDBOXES]:
- 	External declarations added.
+	External declarations added.
 
 	* src/color.c (cbtick_callback): Add argument JUST_TOP or
- 	JUST_CENTRE to calls of clip_put_text_just.
+	JUST_CENTRE to calls of clip_put_text_just.
 
 	* src/bitmap.c (b_setpixel, b_setmaskpixel)
- 	[USE_ULIG_FILLEDBOXES]: Flagged these GP_INLINE for better
- 	optimization prospects.
+	[USE_ULIG_FILLEDBOXES]: Flagged these GP_INLINE for better
+	optimization prospects.
 	(fill_bitmap_width, fill_bitmap_height, fill_halftone_num,
- 	fill_halftone_bitmaps, fill_pattern_num, fill_pattern_bitmaps):
- 	New file-global macros and variables to hold filling patterns.
+	fill_halftone_bitmaps, fill_pattern_num, fill_pattern_bitmaps):
+	New file-global macros and variables to hold filling patterns.
 	(b_boxfill) [USE_ULIG_FILLEDBOXES]: New function. Was missing from
- 	bitmap module, before.  Does all the actual work for filled boxes.
-	
+	bitmap module, before.  Does all the actual work for filled boxes.
+
 	* src/bitmap.h (b_boxfill): Prototype added.
 
 	* docs/gnuplot.doc: Document new options: "plot ... with
- 	filledboxes", "set style filling", "set boxwidth <width>
- 	{{relative|absolute}}"
+	filledboxes", "set style filling", "set boxwidth <width>
+	{{relative|absolute}}"
 
 	* configure.in: Added --enable handlers for the new optional
- 	extensions.
+	extensions.
 
 2001-08-24  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* term/png.trm (PNG_text): Corrected size parameters of two
- 	memset() calls. Simplified from png_write_rows() for 1 row to the
- 	simpler png_write_row() call. Removed old code that had long since
- 	been #if'ed out in favour of calling b_getpixel().
+	memset() calls. Simplified from png_write_rows() for 1 row to the
+	simpler png_write_row() call. Removed old code that had long since
+	been #if'ed out in favour of calling b_getpixel().
 
 2001-08-22  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/util3d.c (draw3d_point) [PM3D] : Implement "linetype palette"
- 	option for pointsymbols by calling set_color() if the use_palette
- 	flag is set.
+	option for pointsymbols by calling set_color() if the use_palette
+	flag is set.
 
 	* src/graph3d.c (cntr3d_impulses, cntr3d_lines,
- 	cntr3d_linespoints, cntr3d_points) [PM3D]: Ensure that points on
- 	base contours have the actual contour z value for the real_z
- 	element of struct vertex.  This is needed to make contour lines
- 	have the right colours in "linetype palette" mode.
+	cntr3d_linespoints, cntr3d_points) [PM3D]: Ensure that points on
+	base contours have the actual contour z value for the real_z
+	element of struct vertex.  This is needed to make contour lines
+	have the right colours in "linetype palette" mode.
 
 2001-08-22  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/stdfn.c: Move gp_stricmp and gp_strnicmp prototypes from
- 	here to src/stdfn.h where they belong.
+	here to src/stdfn.h where they belong.
 	(gp_strnicmp): Made third argument type size_t, to more closely
- 	mimic the XPG4 Unix standard function strncasecmp() it will
- 	replace.
+	mimic the XPG4 Unix standard function strncasecmp() it will
+	replace.
 
 2001-08-20  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/term.c (list_terms): Sort terminals by name before
- 	displaying. Code by Ulrich Gruenebaum, modified and cleaned up by
- 	me
+	displaying. Code by Ulrich Gruenebaum, modified and cleaned up by
+	me
 	(termcomp): New function. Comparison function for qsort() to be
- 	used by list_terms.
+	used by list_terms.
 
 2001-08-17  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	Some bits extracted from a patchset by Ulrich Gruenebaum
  	<grueneba@zkom.de>:
-	
+
 	* src/stdfn.c (gp_stricmp): Corrected sign of return value, to
- 	match that of predefined library function stricmp() which it tries
- 	to mimic. I changed arguments to 'const', and internal variabales
- 	to unsigned char to avoid char signedness and constness problems.
+	match that of predefined library function stricmp() which it tries
+	to mimic. I changed arguments to 'const', and internal variabales
+	to unsigned char to avoid char signedness and constness problems.
 	(gp_strnicmp): Dito.
 
 	* docs/gnuplot.doc: Fixed minor typo in "help set" text.
@@ -511,98 +518,98 @@
 2001-08-13  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/set.c (set_label): Don't reduce pointstyle number modulo
- 	POINT_TYPES --- the terminal drivers know how to deal with that,
- 	already, and POINT_TYPES is incorrect for many terminals.  Removed
- 	long-commented-out checks, while at it, and fixed indentation.
+	POINT_TYPES --- the terminal drivers know how to deal with that,
+	already, and POINT_TYPES is incorrect for many terminals.  Removed
+	long-commented-out checks, while at it, and fixed indentation.
 
 	* doc/gnuplot.doc: Lots of typos fixed.  Reported by Shigeharu
- 	TAKENO <shige@iee.niit.ac.jp>.
-	
+	TAKENO <shige@iee.niit.ac.jp>.
+
 2001-08-09  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	A new 'smooth' method, implemented by Todd Lewis
- 	<utoddl@email.unc.edu>. This is a modified version of Patch
- 	#438326 from SourceForge.
-	
+	<utoddl@email.unc.edu>. This is a modified version of Patch
+	#438326 from SourceForge.
+
 	* src/gp_types.h (enum PLOT_SMOOTH): New label SMOOTH_FREQUENCY.
 
 	* src/tables.c (plot_smooth_tbl): Added parse table entry for
- 	smooth option 'f$requency'.
+	smooth option 'f$requency'.
 
 	* src/plot2d.c (plot_smooth_names): Added entry for "Frequency".
 	(eval_plots): Added handling for case SMOOTH_FREQUENCY.
 
 	* src/interpol.c (do_freq): New function to implement 'smooth
- 	frequency'. Takes care of extending the axis ranges, if
- 	autoscalilng.
+	frequency'. Takes care of extending the axis ranges, if
+	autoscalilng.
 	(gen_interp_frequency): New function, replaces gen_interp() for
- 	this particular smoothing method.
+	this particular smoothing method.
 	(cp_implode): Avoid division by number of imploded input
- 	datapoints, so we get counts or sums instead of averages.
+	datapoints, so we get counts or sums instead of averages.
 
 	* docs/gnuplot.doc: Document new 'smooth frequency' option.
 
 	* demo/steps.dem: Added demonstration plot to show typical use of
- 	'smooth frequency' to collect a histogram from unsorted data.
+	'smooth frequency' to collect a histogram from unsorted data.
 
 2001-08-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/set.c (set_arrow): Avoid overwriting linetype or
- 	{nohead|head|heads} status of an existing arrow if it's redefined
- 	without repeating this part of the spec.
+	{nohead|head|heads} status of an existing arrow if it's redefined
+	without repeating this part of the spec.
 
 	* src/axis.c (grid_selection): Global variable removed.
 	(axis_output_tics): Removed grid bit pattern argument; don't pass
- 	it on to gen_tics().
+	it on to gen_tics().
 	(gen_tics): Removed grid bit pattern argument. Use new axis struct
- 	fields to set up grid drawing information for callback functions.
+	fields to set up grid drawing information for callback functions.
 	(some_grid_selected): New function. Needed to replace cases where
- 	all grid bits were tested simultaneously by comparing
- 	'grid_selection == GRID_OFF'.
+	all grid bits were tested simultaneously by comparing
+	'grid_selection == GRID_OFF'.
 
 	* src/axis.h (struct axis): Two new fields 'gridmajor' and
- 	'gridminor' to replace `grid_selection'.
-	
+	'gridminor' to replace `grid_selection'.
+
 	* src/color.c (draw_color_smooth_box): Removed grid bits from
- 	argument list of gen_tics() call.
+	argument list of gen_tics() call.
 
 	* src/graph3d.c (do_3dplot): Check axis fields instead of global
- 	variable.
+	variable.
 	(draw_3d_graphbox): Remove grid bit patterns from calls to
- 	gen_tics().
+	gen_tics().
 
 	* src/graphics.c (boundary): Removed dummy zero argument in calls
- 	to gen_tics().
+	to gen_tics().
 	(do_plot): Removed GRID_* arguments from calls to
- 	axis_output_tics().
+	axis_output_tics().
 
 	* src/mouse.c (builtin_toggle_grid): Call some_grid_selected() to
- 	decide about toggling off or on.
-	
+	decide about toggling off or on.
+
 	* src/save.c (save_set_all): Reimplemented saving of 'set grid'
- 	specifications to use new axis fields.
+	specifications to use new axis fields.
 
 	* src/set.c (set_grid): Dito, for 'set grid'.
 
 	* src/show.c (show_grid): Dito, for 'show grid'. And fixed display
- 	of polar grid angular distance.
+	of polar grid angular distance.
 
 	* src/unset.c (unset_grid): Dito, for 'unset grid'
 
 2001-08-06  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
-	
+
 	* src/tables.c (command_ftbl, plot_tbl, plot_axes_tbl,
- 	plot_smooth_tbl, save_tbl, set_tbl, set_hidden3d_tbl, set_key_tbl,
- 	show_style_tbl, plotstyle_tbl, ): All turned 'const'ant.
+	plot_smooth_tbl, save_tbl, set_tbl, set_hidden3d_tbl, set_key_tbl,
+	show_style_tbl, plotstyle_tbl, ): All turned 'const'ant.
 	(lookup_table): Argument tbl flagged 'const'ant.
 	(lookup_ftable): Argument ftbl flagged 'const'ant.
 
 	* src/axis.c (axis_defaults, axisname_tbl): Turned 'const'ant.
 
 	* src/bitmap.c (fnt5x9, fnt9x17, fnt13x25): Turned 'const'ant.
-	
+
 	* src/bitmap.h (typedef char_box): Added 'const' qualifier to
- 	match fnt* arrays.
+	match fnt* arrays.
 
 	* src/eval.c (ft): Turned 'const'ant.
 
@@ -611,58 +618,58 @@
 2001-08-03  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/axis.c (copy_or_invent_formatstring): Renamed from
- 	timetic_format(), two arguments removed. Does more than before,
- 	now.  Returns pointer to the string it creates, so mouse.c doesn't
- 	need access to axis.c internal variable ticfmt[].
+	timetic_format(), two arguments removed. Does more than before,
+	now.  Returns pointer to the string it creates, so mouse.c doesn't
+	need access to axis.c internal variable ticfmt[].
 
 2001-08-01  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* docs/gnuplot.doc: Document the change to the cubic spline
- 	sampling range.
+	sampling range.
 
 	* src/interpol.c (do_cubic): Sample the generated cubic spline
- 	only across the current xrange, instead of the whole range of
- 	input datapoints.
+	only across the current xrange, instead of the whole range of
+	input datapoints.
 	(cp_approx_spline, cp_tridiag): Changed calls to int_error() to
- 	report the position by the token saved in struct curve_points.
+	report the position by the token saved in struct curve_points.
 
 	* term/emf.trm (EMF_STOCK_OBJECT_FLAG): To avoid possible
- 	signed-ness issue if a K&R C compiler is used, construct 32-bit
- 	numbers with bit 31 set by shifting, not as a manifest constant.
+	signed-ness issue if a K&R C compiler is used, construct 32-bit
+	numbers with bit 31 set by shifting, not as a manifest constant.
 
 	* term/tek.trm (CT_draw_vpoint, CT_lines): dito.
 
 	* src/term.c (null_linewidth, set_font_null, PUTTEXT_null,
- 	LINETYPE_null, MOVE_null, null_scale): Added void-casts to avoid
- 	warnings about unused parameters.
+	LINETYPE_null, MOVE_null, null_scale): Added void-casts to avoid
+	warnings about unused parameters.
 
 	* src/plot.c (inter): Dito.
 
 	* src/graph3d.c (xtick_callback, ytick_callback, ztick_callback):
- 	Dito.
-	
+	Dito.
+
 	* src/gpexecute.c (pipe_died_handler): Dito.
 
 	* src/fit.c (ctrlc_handle): Dito.
 
 	* src/datafile.c (df_2dbinary): Dito.
-	
+
 	* src/binary.c (free_vector): Removed unused argument nh.
 	(extend_vector, retract_vector): Removed unused argument old_nh.
 	(free_matrix): Removed unused argument nch.
 	(free_convert_matrix): Removed unused arguments nrh, ncl and nch.
 	(all over the place): Fixed up calls to these functions.
-	
+
 	* src/contour.c (put_contour_cubic): Use arguments xx_min and
- 	yy_min, not file-scope variables x_min and y_min.
+	yy_min, not file-scope variables x_min and y_min.
 	(put_contour_bspline): Removed unused arguments z_level, xx_min,
- 	xx_max, yy_min and yy_max.
+	xx_max, yy_min and yy_max.
 	(put_contour): Removed arguments in calls to put_contour_cubic and
- 	put_contour_bspline. Removed now unused argument z_level.
+	put_contour_bspline. Removed now unused argument z_level.
 	(gen_contours): Removed argument z_level from call to put_contour.
 
 	* src/binary.h, src/contour.h: Updated prototypes of modified
- 	functions.
+	functions.
 
 2001-07-28  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
@@ -682,24 +689,24 @@
 2001-07-23  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/eval.c, src/internal.c, src/standard.c, src/specfun.c,
- 	src/parse.c: Large-scale renovation of the whole eval/parse stuff.
-  	Avoid (unsafe!) casting function pointers. Moved lots of code from
- 	one module to another to improve coherency of modules.
+	src/parse.c: Large-scale renovation of the whole eval/parse stuff.
+	Avoid (unsafe!) casting function pointers. Moved lots of code from
+	one module to another to improve coherency of modules.
 
 	* src/README: Describe the details of the above change, which
- 	really are too long for a ChangeLog entry.
+	really are too long for a ChangeLog entry.
 
 	* src/*.[ch]: Don't #include "interpol.h", but rather "eval.h",
- 	which is now the central interface header of all the eval/parse
- 	stuff.
-	
+	which is now the central interface header of all the eval/parse
+	stuff.
+
 	* src/gp_types.h: Removed #ifdef'ed-out type definitions that had
- 	long since been moved to eval.h and command.h
+	long since been moved to eval.h and command.h
 
 	* src/parse.c (convert): Function moved here, from util.c, and
- 	turned 'static'.
+	turned 'static'.
 	(factor): Make HP-UX bug workaround code the only version --- it
- 	already was functionally identical to the generic one, anyway.
+	already was functionally identical to the generic one, anyway.
 
 	* src/util.c (convert): Deleted.
 	* src/util.h (convert): Prototype removed.
@@ -713,55 +720,55 @@
 2001-07-20  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/interpol.c (cp_implode): Typo fixed. Would set 'x' when it
- 	was trying to un-log a 'y' value.
+	was trying to un-log a 'y' value.
 	(cp_approx_spline, gen_interp, cp_tridiag, solve_five_diag):
- 	Removed casts when assigning pointers coming from gp_alloc.
-  	Re-grouped for() loops a bit.
+	Removed casts when assigning pointers coming from gp_alloc.
+	Re-grouped for() loops a bit.
 
 2001-07-20  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/graphics.c (xtick2d_callback, ytick2d_callback): Cast arg
- 	"axis" to void, once, to avoid warning about unused parameter.
+	"axis" to void, once, to avoid warning about unused parameter.
 	(widest2d_callback): Use same trick for arguments axis, place and
- 	grid, which are irrelevant to this function.
+	grid, which are irrelevant to this function.
 
 	* src/color.c (cbtick_callback): Mark parameter "axis" as
- 	intentionally unused, by cast to void.
-	
+	intentionally unused, by cast to void.
+
 	* src/syscfg.h (SORTFUNC_ARGS): If not #define'd, define it to be
- 	"const generic *".
+	"const generic *".
 	(sortfunc): Removed, as it's no longer used.
 
 	* src/interpol.c (compare_points): Changed arguments to type
- 	SORTFUNC_ARGS. Made non-static to avoid bug in HP-UX gcc when
- 	passing pointers to static functions.
+	SORTFUNC_ARGS. Made non-static to avoid bug in HP-UX gcc when
+	passing pointers to static functions.
 	(sort_points): Removed unneeded, potentially dangerous casts from
- 	qsort() call.
+	qsort() call.
 
 	* src/hidden3d.c (compare_polys_by_zmax, compare_edges_by_zmin):
- 	Changed arguments to type SORTFUNC_ARGS. Made non-static, too.
+	Changed arguments to type SORTFUNC_ARGS. Made non-static, too.
 
 	* src/help.c (keycomp): Changed arguments to type SORTFUNC_ARGS.
-  	Made non-static, too.
+	Made non-static, too.
 	(sortkeys): Removed unneeded, potentially dangerous casts from
- 	qsort() call.
+	qsort() call.
 
 	* src/graphics.c (histeps_compare): Changed arguments to
- 	SORTFUNC_ARGS type.
+	SORTFUNC_ARGS type.
 
 	* src/plot2d.c (eval_plots): Simplified parsing/handling of smooth
- 	options.
+	options.
 
 2001-07-11  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* docs/gnuplot.doc (xyerrorbars): Replaced commas by colons, in
- 	the example.
+	the example.
 
 2001-07-09  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/plot.c (get_user_env): Warn only if in interactive mode.
-  	Some uses of batch mode may not have a $HOME defined.  Windows
- 	shows this as a spurious warning, too.  Thanks to Ethan Merritt
+	Some uses of batch mode may not have a $HOME defined.  Windows
+	shows this as a spurious warning, too.  Thanks to Ethan Merritt
 	for this patch.
 
 2001-07-09  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
@@ -779,20 +786,20 @@
 2001-07-03  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/axis.h (t_autoscale): Two new enum names to flag a
- 	range that's not to be auto-extended. Old definitions slightly
- 	changed.
+	range that's not to be auto-extended. Old definitions slightly
+	changed.
 
 	* src/axis.c (setup_tics): Check new flags to optionally avoid
- 	auto-extending axes to endpoints at integer ticstep multiples.
+	auto-extending axes to endpoints at integer ticstep multiples.
 	
 	* src/set.c (PROCESS_AUTO_LETTER): Added new options
- 	"{axis}fixmin" and "{axis}fixmax" to "set autoscale".
+	"{axis}fixmin" and "{axis}fixmax" to "set autoscale".
 
 	* src/show.c (SHOW_AUTOSCALE): Show new autoscale options.
 	(show_range): Report status in "show {axis}range" command, too.
 
 	* src/save.c (save_range): Save status to file as a "set autoscale
- 	{axis}fix{min|max}" command following the "set {axis}range ...".
+	{axis}fix{min|max}" command following the "set {axis}range ...".
 
 	* docs/gnuplot.doc: Document these changes.
 
@@ -820,10 +827,10 @@
 2001-06-29  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/graph3d.c (xtick_callback, ytick_callback, ztick_callback)
- 	[PM3D]: Fill in field `real_z' of all ticmark endpoints.
+	[PM3D]: Fill in field `real_z' of all ticmark endpoints.
 
 	* src/hidden3d.c (split_line_at_ratio) [PM3D]: Fill in field
- 	`real_z', too.
+	`real_z', too.
 
 2001-06-28  Alexander Mai <st002279@hrzpub.tu-darmstadt.de>
 
@@ -833,15 +840,15 @@
 2001-06-25  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/graphics.c (histeps_current_plot, histeps_compare): New
- 	file-scope variable and comparison function, used in applying
- 	qsort() to sorting the datapoints in "histeps" mode.
+	file-scope variable and comparison function, used in applying
+	qsort() to sorting the datapoints in "histeps" mode.
 	(plot_histeps): Use qsort() instead of homegrown bubblesort
- 	implementation to sort datapoints by x. Removed now-unused locals
- 	'bigi' and 'hold'.
+	implementation to sort datapoints by x. Removed now-unused locals
+	'bigi' and 'hold'.
 	(plot_histeps): Don't blindly assume 0.0 is the baseline y
- 	position for the histogram.  For logarithmic y axis, it isn't.
+	position for the histogram.  For logarithmic y axis, it isn't.
 	Set up new local 'y_null' to hold the correct position.
-	
+
 2001-06-25  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/win/wtext.c: Hotkeys Ctrl-Insert and Shift-Insert for
@@ -850,16 +857,16 @@
 2001-06-21  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/misc.c (lp_parse): Changed two arguments' type from int to
- 	the more proper TBOOLEAN. Restructured handling of point symbol
- 	modifiers to give more helpful error message than just 'undefined
- 	variable: pointtype'.
+	the more proper TBOOLEAN. Restructured handling of point symbol
+	modifiers to give more helpful error message than just 'undefined
+	variable: pointtype'.
 
 	* src/misc.h (lp_parse): Updated prototype.
 
 	* src/plot2d.c (eval_plots): Bugfix from removing magic
- 	numbers. Was testing whether the plot contained lines, not points,
- 	as it called lp_parse().
-	
+	numbers. Was testing whether the plot contained lines, not points,
+	as it called lp_parse().
+
 2001-06-22  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* config/makefile.mgw: Remove backslahes from "\/".
@@ -867,36 +874,36 @@
 2001-06-21  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/axis.c (gprintf): Added code to make use of new features of
- 	mant_exp() introduced Jan 21st this year, for %l and %L formats.
-  	Helps to avoid problems where people use %L even though the
- 	logbase is 10.
+	mant_exp() introduced Jan 21st this year, for %l and %L formats.
+	Helps to avoid problems where people use %L even though the
+	logbase is 10.
 	(setup_tics): Corrected determination of 'fixmin' and 'fixmax'.
 	(axis_checked_extend_empty_range): Removed a few more magic
- 	numbers.
+	numbers.
 	(load_range): Dito. Also changed return type and argument from
- 	TBOOLEAN to new type t_autoscale.
+	TBOOLEAN to new type t_autoscale.
 
 	* src/axis.h (load_range): Updated prototype.
-	
+
 2001-06-20  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* term/x11.trm (X11_waitforinput): Call getc() instead of read(),
- 	to avoid problems with buffering of stdio streams.
+	to avoid problems with buffering of stdio streams.
 
 	* src/command.c (fgets_ipc): Fix EOF checking error. Replaced
- 	pointer arithmetics by array indexing. Made this function active
- 	regardless of USE_MOUSE status, moving the #ifdef inside it.
+	pointer arithmetics by array indexing. Made this function active
+	regardless of USE_MOUSE status, moving the #ifdef inside it.
 	(read_line): Simplification: just call fgets_ipc, no matter what
- 	USE_MOUSE is. Let that function decide whether mouse support stuff
- 	is needed.
+	USE_MOUSE is. Let that function decide whether mouse support stuff
+	is needed.
 
 	* src/gadgets.c (clip_point): Cast coordinates to int in
- 	comparison to the boundaries, since those are signed too, and they
- 	might actually be negative, sometimes. Fixes wrong clipping for
- 	negative 'set offset' parameters.
+	comparison to the boundaries, since those are signed too, and they
+	might actually be negative, sometimes. Fixes wrong clipping for
+	negative 'set offset' parameters.
 
 	* src/gp_types.h: Parenthesize bitmasks in plot style enum values,
- 	to quench a compiler warning.
+	to quench a compiler warning.
 
 2001-06-19  Petr Mikulik  <mikulik@physics.muni.cz>
 
@@ -910,29 +917,29 @@
 2001-06-11  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	I went on a little crusade against magic numbers in the source
- 	code:
+	code:
 	
 	* src/axis.h (t_autoscale): Define and use new enum type for the
- 	two-bit fields autoscale and set_autoscale in struct axis. This
- 	affects tons of other places using these variables, too, so I
- 	won't list them individually, here.
+	two-bit fields autoscale and set_autoscale in struct axis. This
+	affects tons of other places using these variables, too, so I
+	won't list them individually, here.
 
 	* src/gp_types.h (PLOT_STYLE_FLAGS): New enum to name flags stored
- 	as part of the plot style numbers in enum PLOT_STYLE. Use these
- 	names instead of magic numbers.
+	as part of the plot style numbers in enum PLOT_STYLE. Use these
+	names instead of magic numbers.
 
 	* src/plot2d.c (t_uses_asis): New enum to define names for the two
 	bits stored per axis uses_axis[]. 
 	(eval_plots): Use the new mnemonics instead of magic numbers.
 
 	* src/interpol.c (STORE_AND_FIXUP_RANGE): Macro arguments renamed
- 	to lowercase, properly guarded by parentheses inside the
- 	body. Body reindented for readability.
+	to lowercase, properly guarded by parentheses inside the
+	body. Body reindented for readability.
 
 2001-06-11  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* term/tgif.trm: Changed type of TGIF_colurs to array of plain
- 	char, from unsigned char.
+	char, from unsigned char.
 
 2001-06-01  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
@@ -941,9 +948,9 @@
 2001-05-31  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* term/pslatex.trm (PSLATEX_graphics): Use PSLATEX_{X|Y}MAX
- 	instead of PS_{X|Y}MAX to calculate the bounding box parameters of
- 	the dvips \special command. Was wrong by a factor of two, before.
-	
+	instead of PS_{X|Y}MAX to calculate the bounding box parameters of
+	the dvips \special command. Was wrong by a factor of two, before.
+
 2001-05-25  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/show.c (SHOW_FORMAT): Argument renamed to `_axis', to avoid
