@@ -1,3 +1,9 @@
+2005-01-27  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* config/config.mgw: Mingw 2.x does not HAVE_SYS_PARAM_H.
+
+	* src/win/wgnuplib.h: Mingw 2.x needs to #define _fstr* functions.
+
 2005-01-26  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* demo/pm3d.dem: Remove deprecated references to "set pm3d solid" and
