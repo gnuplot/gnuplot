@@ -155,17 +155,6 @@ WEB:
 -- gnuplot needs a "professional" web page
 
 
-INSTALLATION --- BUGS:
-======================
-
--- automake or autoconf generates broken src/makefile.in: it fails on platforms
-with .exe extension of executables. It needs to run "sed" or something like
-that to replace
-	noinst_PROGRAMS = bf_test$(EXEEXT) @GNUPLOT_X11@
-by
-	noinst_PROGRAMS = bf_test$(EXEEXT) @GNUPLOT_X11@$(EXEEXT)
-
-
 INSTALLATION --- LINUX:
 =======================
 
