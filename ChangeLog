@@ -1,3 +1,7 @@
+2002-04-21  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/save.c (save_set_all): Fix quoting of 'set missing' save text.
+
 2002-04-16  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	Patch from Dietmar Warning <dwarning@danalyse.de>: 
@@ -320,7 +324,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/04/10 11:02:08 $).
+	last modification date (from the tag $Date: 2002/04/16 11:02:11 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
