@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: set.c,v 1.21.2.3 1999/12/09 18:43:40 lhecking Exp $";
+static char *RCSid = "$Id: set.c,v 1.21.2.4 2000/05/07 16:46:56 lhecking Exp $";
 #endif
 
 /* GNUPLOT - set.c */
@@ -2441,9 +2441,8 @@ static void set_arrow()
     struct arrow_def *prev_arrow = NULL;
     struct position spos, epos;
     struct lp_style_type loc_lp;
-    int axes = FIRST_AXES;
     int tag;
-    TBOOLEAN set_start, set_end, head = 1, set_axes = 0, set_line = 0;
+    TBOOLEAN set_start, set_end, head = 1, set_line = 0;
 
     /* Init struct lp_style_type loc_lp */
     reset_lp_properties (&loc_lp);
@@ -2452,8 +2451,7 @@ static void set_arrow()
     if (!END_OF_COMMAND
 	&& !equals(c_token, "from")
 	&& !equals(c_token, "to")
-	&& !equals(c_token, "first")
-	&& !equals(c_token, "second")) {
+	) {
 	/* must be a tag expression! */
 	tag = (int) real(const_express(&a));
 	if (tag <= 0)
@@ -2461,15 +2459,10 @@ static void set_arrow()
     } else
 	tag = assign_arrow_tag();	/* default next tag */
 
-    if (!END_OF_COMMAND && equals(c_token, "first")) {
-	++c_token;
-	axes = FIRST_AXES;
-	set_axes = 1;
-    } else if (!END_OF_COMMAND && equals(c_token, "second")) {
-	++c_token;
-	axes = SECOND_AXES;
-	set_axes = 1;
-    }
+    /* HBB 20001018: removed code here that accepted 'first' or
+     * 'second' keywords. The resulting variables 'axes' and
+     * 'set_axes' effected nothing, anyway --> deleted them, too. */
+
     /* get start position */
     if (!END_OF_COMMAND && equals(c_token, "from")) {
 	c_token++;
@@ -2509,6 +2502,7 @@ static void set_arrow()
 	get_position(&spos);
 	set_start = TRUE;
     }
+
     if (!END_OF_COMMAND && equals(c_token, "nohead")) {
 	c_token++;
 	head = 0;
@@ -2595,7 +2589,8 @@ static void set_noarrow()
 
 /* assign a new arrow tag */
 /* arrows are kept sorted by tag number, so this is easy */
-static int /* the lowest unassigned tag number */ assign_arrow_tag()
+static int /* the lowest unassigned tag number */ 
+assign_arrow_tag()
 {
     struct arrow_def *this_arrow;
     int last = 0;		/* previous tag value */
@@ -2716,7 +2711,8 @@ static void set_nolinestyle()
 
 /* assign a new linestyle tag */
 /* linestyles are kept sorted by tag number, so this is easy */
-static int /* the lowest unassigned tag number */ assign_linestyle_tag()
+static int /* the lowest unassigned tag number */ 
+assign_linestyle_tag()
 {
     struct linestyle_def *this;
     int last = 0;		/* previous tag value */
@@ -2783,7 +2779,8 @@ int tag, pointflag;
 
 /* ======================================================== */
 
-enum PLOT_STYLE /* not static; used by command.c */ get_style()
+enum PLOT_STYLE /* not static; used by command.c */ 
+get_style()
 {
     register enum PLOT_STYLE ps = LINES;	/* HBB: initial value, for 'gcc -W} */
 

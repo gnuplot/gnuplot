@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: misc.c,v 1.15.2.1 1999/08/19 14:38:30 lhecking Exp $";
+static char *RCSid = "$Id: misc.c,v 1.15.2.2 1999/09/29 17:17:27 lhecking Exp $";
 #endif
 
 /* GNUPLOT - misc.c */
@@ -1007,7 +1007,7 @@ FILE *fp;
 struct position *pos;
 {
     static char *msg[] =
-    {"first_axes ", "second axes ", "graph ", "screen "};
+    {"first ", "second ", "graph ", "screen "};
 
     assert(first_axes == 0 && second_axes == 1 && graph == 2 && screen == 3);
 

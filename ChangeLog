@@ -1,3 +1,11 @@
+2000-10-18  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* misc.c (save_position): keywords saved for 'first' and 'second'
+	axes were incorrect.
+
+	* set.c (set_arrow): don't accept 'first' and 'second' as keywords
+ 	before 'from' or 'to'.
+	
 2000-09-14  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* graphics.c (map_position), graph3d.c (map_position): Fix
