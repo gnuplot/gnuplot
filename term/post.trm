@@ -1,5 +1,5 @@
 /*
- * $Id: post.trm,v 1.36 1999/10/01 15:09:12 lhecking Exp $
+ * $Id: post.trm,v 1.37 1999/12/10 17:01:44 lhecking Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -430,6 +430,12 @@ static const char GPFAR * GPFAR PS_header[] = {
 /* filled box : usage   x1 y1 x2 y2 BoxFill */
 "/BoxFill { gsave Rec 1 setgray fill grestore } def\n",
 
+/* oblique symbol font, e.g. set xlabel 'b' "Symbol-Oblique"
+   gives an oblique (slanted) beta character */
+"/Symbol-Oblique /Symbol findfont [1 0 .167 1 0 0] makefont\n",
+"dup length dict begin {1 index /FID eq {pop pop} {def} ifelse} forall\n",
+"currentdict end definefont\n",
+
 NULL
 };
 
@@ -479,17 +485,20 @@ int can_reencode;
 {
     struct PS_FontName *fnp;
     char *recode = NULL;
+    char *myfname = "Symbol";
+
+    if (strcmp(fname, "Symbol-Oblique") != 0)
+	myfname = fname;
 
     for (fnp = PS_DocFonts; fnp ; fnp = fnp->next)
-	if (strcmp(fnp->name, fname) == 0)
+	if (strcmp(fnp->name, myfname) == 0)
 	    return NULL;
 
     /* we did not find the name */
    
     fnp = (struct PS_FontName *)gp_alloc(sizeof(struct PS_FontName),
 					 "PostScript Font record");
-    fnp->name = gp_alloc(1+strlen(fname), "PostScript Font name");
-    strcpy(fnp->name, fname);
+    fnp->name = gp_strdup(myfname);
     fnp->next = PS_DocFonts;
     PS_DocFonts = fnp;
 
@@ -506,7 +515,7 @@ int can_reencode;
     }
 
     if (can_reencode && recode) {
-	fprintf(gpoutfile,"/%s %s",fname, recode);
+	fprintf(gpoutfile,"/%s %s", myfname, recode);
 	return NULL;
     } else
 	return recode;
