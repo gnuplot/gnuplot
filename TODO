@@ -38,4 +38,6 @@ Lars' ideas
   comp.lang.c FAQ (What's a good way to check for "close enough"
   floating-point equality?) and symbolic vars from standard header files.
 - autogenerate term.h from config file in text format and/or configure
+- add load path for files/GNUPLOT_LIBRARY env var
+- provide library of replacement functions instead of stdfn.c
 
