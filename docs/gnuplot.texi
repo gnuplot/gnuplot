@@ -5678,7 +5678,6 @@ The second example sets the second variable to s.
 @node encoding, fitlogfile, dummy, set-show
 @subsection encoding
 
-^ <a name="set encoding"></a>
 @c ?commands set encoding
 @c ?commands show encoding
 @c ?set encoding
@@ -8561,7 +8560,6 @@ See also @ref{palette}, @ref{pm3d}.
 @subsubsection plotting styles
 
 @c ?plotting styles
-^ <a name="plotting styles"></a>
 
 The commands `set style data` and `set style function` change the 
 default plotting style for subsequent `plot` and `splot` commands.
