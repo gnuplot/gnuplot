@@ -134,7 +134,7 @@ extern int errno;
 #include <sys/types.h>
 #endif
 
-#ifndef NO_SYS_STAT_H
+#ifdef HAVE_SYS_STAT_H
 #include <sys/stat.h>
 
 /* This is all taken from GNU fileutils lib/filemode.h */
@@ -176,6 +176,16 @@ extern int errno;
 # undef S_ISSOCK
 #endif /* STAT_MACROS_BROKEN.  */
 
+#ifdef WIN32
+/* Broken compiler headers ... */
+# define S_IFIFO  _S_IFIFO
+#endif
+
+#ifdef AMIGA_SC_6_1
+/* Fake S_IFIFO for SAS/C */
+# define S_IFIFO S_IREAD
+#endif
+
 #if !defined(S_ISBLK) && defined(S_IFBLK)
 # define S_ISBLK(m) (((m) & S_IFMT) == S_IFBLK)
 #endif
@@ -205,7 +215,7 @@ extern int errno;
 # define S_ISNWK(m) (((m) & S_IFMT) == S_IFNWK)
 #endif
 
-#endif /* ! NO_SYS_STAT_H */
+#endif /* HAVE_SYS_STAT_H */
 
 #ifndef NO_LIMITS_H
 #include <limits.h>
