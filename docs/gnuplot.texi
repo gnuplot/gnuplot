@@ -2158,8 +2158,8 @@ analogous to `plot`; see @ref{ranges}.
 previously user-defined function of the form f(x) or f(x,y).
 
 <datafile> is treated as in the `plot` command.  All the `plot datafile`
-modifiers (@ref{using}, @ref{every},...) except @ref{smooth} are applicable to `fit`.
-See `plot datafile`.
+modifiers (@ref{using}, @ref{every},...) except @ref{smooth} and the deprecated @ref{thru}
+are applicable to `fit`. See `plot datafile`.
 
 The default data formats for fitting functions with a single independent
 variable, y=f(x), are @{x:@}y or x:y:s; those formats can be changed with
@@ -2199,8 +2199,12 @@ of the fit is written to the display.  The same information about the
 initial and final states is written to a log file, "fit.log".  This file
 is always appended to, so as to not lose any previous fit history;  it
 should be deleted or renamed as desired. By using the command 
-@ref{fitlogfile}, the name of the log file can be changed.
+`set fit logfile`, the name of the log file can be changed.
 
+If gnuplot was built with this option, and you activated it using `set fit
+errorvariables`, the error for each fitted parameter will be stored in
+a variable named like the parameter, but with "_err" appended.  Thus the
+errors can be used as input for further computations.
 
 The fit may be interrupted by pressing Ctrl-C (any key but Ctrl-C under
 MSDOS and Atari Multitasking Systems).  After the current iteration
@@ -2570,7 +2574,7 @@ to do so depends on your operating system.
 
 changes the name (and/or path) of the file to which the fit log will be
 written from the default of "fit.log" in the working directory. The default
-value can be overwritten using the command @ref{fitlogfile}.
+value can be overwritten using the command `set fitlogfile`.
 
 @example
       FIT_SCRIPT
@@ -3497,6 +3501,7 @@ also works (i.e. you can use y as the dummy variable).
 @c ?datafile using
 @cindex using
 
+@c ?help using
 The most common datafile modifier is @ref{using}.
 
 Syntax:
@@ -4367,7 +4372,7 @@ when the variable was initially defined.
 * dgrid3d::                     
 * dummy::                       
 * encoding::                    
-* fitlogfile::                  
+* fit_::                        
 * fontpath::                    
 * format::                      
 * function_style::              
@@ -5004,7 +5009,7 @@ See also
 
 
 The @ref{boxwidth} command is used to set the default width of boxes in the
-`boxes` and `boxerrorbars` styles.
+`boxes`, `boxerrorbars` and `candlesticks` styles.
 
 Syntax:
 @example
@@ -5465,7 +5470,7 @@ options are currently implemented.
 
 The `set datafile missing` command allows you to tell `gnuplot` what character
 string is used in a data file to denote missing data.  Exactly how this missing
-value will be treated depends on the @ref{using} specifier of the @{`s`@}`plot` 
+value will be treated depends on the @ref{using} specifier of the `plot` or `splot`
 command.
 
 Syntax:
@@ -5473,6 +5478,13 @@ Syntax:
       set datafile missing @{"<string>"@}
       show datafile missing
       unset datafile
+
+@end example
+
+Example:
+@example
+      # Ignore entries containing IEEE NaN ("Not a Number") code
+      set datafile missing "NaN"
 
 @end example
 
@@ -5714,7 +5726,7 @@ Examples:
 
 The second example sets the second variable to s.
 
-@node encoding, fitlogfile, dummy, set-show
+@node encoding, fit_, dummy, set-show
 @subsection encoding
 
 @c ?commands set encoding
@@ -5744,31 +5756,29 @@ the device must be able to produce the desired non-standard characters.
 The PostScript and X11 terminals support all encodings. OS/2 Presentation
 Manager switches automatically to codepage 912 for `iso_8859_2`.
 
-@node fitlogfile, fontpath, encoding, set-show
-@subsection fitlogfile
+@node fit_, fontpath, encoding, set-show
+@subsection fit
 
-@c ?commands set fitlogfile
-@c ?commands show fitlogfile
-@c ?set fitlogfile
-@c ?show fitlogfile
-@cindex fitlogfile
-@opindex fitlogfile
-
-
-The @ref{fitlogfile} setting defines where the `fit` command writes its output.
+@c ?commands set fit
+@c ?commands show fit
+@c ?set fit
+@c ?show fit
+The `fit` setting defines where the `fit` command writes its output.
+If this option was built into your version of gnuplot, it also controls
+whether parameter errors from the fit will be written into variables.
 
 Syntax:
 @example
-      set fitlogfile @{"<filename>"@}
-      unset fitlogfile
-      show fitlogfile
+      set fit @{logfile @{"<filename>"@}@} @{@{no@}errorvariables@}
+      unset fit
+      show fit
 
 @end example
 
-The filename must be enclosed in quotes.
+The <filename> argument must be enclosed in single or double quotes.
 
-If no filename ist given or @ref{fitlogfile} is used the log file is 
-resetted to its default value "fit.log" or the value of the environmental
+If no filename ist given or `unset fit` is used the log file is 
+reset to its default value "fit.log" or the value of the environmental
 variable `FIT_LOG`.
 
 Users of DOS-like platforms should note that the \ character has
@@ -5781,7 +5791,22 @@ If the given logfile name ends with a / or \, it is interpreted to be
 a directory name, and the actual filename will be "fit.log" in that
 directory.
 
-@node fontpath, format, fitlogfile, set-show
+If the `errorvariables` option is turned on, the error of each fitted
+parameter computed by `fit` will be copied to a user-defined variable
+whose name is formed by appending "_err" to the name of the parameter
+itself.  This is useful mainly to put the parameter and its error onto
+a plot of the data and the fitted function, for reference, as in:
+
+@example
+       set fit errorvariables
+       fit f(x) 'datafile' using 1:2 via a, b
+       print "error of a is:", a_err
+       set label 'a=%6.2f', a, '+/- %6.2f', a_err
+       plot 'datafile' using 1:2, f(x)
+
+@end example
+
+@node fontpath, format, fit_, set-show
 @subsection fontpath
 
 @c ?commands set fontpath
@@ -7400,12 +7425,14 @@ more curves to the current plot and you want to edit the whole command now.
 @c ?help pm3d
 @c ?set pm3d clip1in
 @c ?set pm3d clip4in
-pm3d is a [new] type of `splot` mode for drawing color/gray maps and
-surfaces.  It can be used for plotting gridded as well as non-gridded data.
-The main power of the pm3d algorithm (see also my program pm3d) is that it
-can draw maps or surfaces from large data sets without preprocessing even
-when the data are non-gridded and the scans do not have same number of
-points, thus it produces no artefacts.  Currently supported terminals are:
+pm3d is an `splot` style for drawing palette-mapped 3d and 4d data as
+color/gray maps and surfaces.  It uses a pm3d algorithm which allows to plot
+gridded as well as non-gridded data without preprocessing, even when the data
+scans do not have the same number of points.
+
+Drawing of color surfaces is available on terminals supporting filled colored
+polygons with color mapping specified by @ref{palette}. Currently supported
+terminals include
 
 @example
   Screen terminals:
@@ -7418,7 +7445,7 @@ points, thus it produces no artefacts.  Currently supported terminals are:
     PostScript
     pslatex, pstex, epslatex
     gif, png, jpeg
-    Xfig
+    (x)fig
     tgif
     cgm
     pdf
@@ -7426,45 +7453,43 @@ points, thus it produces no artefacts.  Currently supported terminals are:
 
 @end example
 
-You are welcome to implement the support for other terminals.
+Let us first describe how a map/surface is drawn.  The input data come from an
+evaluated function or from an @ref{file}.  Each surface consists of a
+sequence of separate scans (isolines).  The pm3d algorithm fills the region
+between two neighbouring points in one scan with another two points in the
+next scan by a gray (or color) according to z-values (or according to an
+additional 'color' column, see @ref{using}) of these 4 corners; default is
+averaging but this can be changed by option `corners2color`.  In order to get
+a reasonable surface, the neighbouring scans should not cross and the number
+of points in the neighbouring scans should not differ too much; of course, the
+best plot is with scans having same number of points.  No other requirements
+(e.g. the data must be gridded) are needed.  Another advantage is that the
+pm3d algorithm does not draw anything outside of the input (measured or
+calculated) region.
 
-The pm3d algorithm fills the region between two neighbouring points in one
-scan with another two points in the next scan by a gray (or color) according
-to the average of the z data (or an additional 'color' column, see `splot`)
-in these four points.  From this follows, that the neighbouring scans should
-not cross and the number of points in the neighbouring scans should not
-differ too much (you see --- scans can have different number of points).
-No other requirements (e.g.  the data must be gridded) are needed.  Another
-advantage is that the algorithm does not draw anything outside of the input
-(measured or calculated) region.
+Surface coloring works with the following input data:
 
-1. function splot or data splot with one ore three data columns:
-@example
-    The gray is obtained by mapping the averaged z coordinate of the four
-    corners of the quadrangle into the range [min_color_z,max_color_z]
-    providing range of grays [0:1].  This value can be used directly as the
-    gray for gray maps.  The normalized gray value can be further mapped into
-    a color.  See @ref{palette} for the complete description.
-@end example
+1. splot of function or of data file with one or three data columns: The gray
+is obtained by mapping the averaged (or `corners2color`) z-coordinate of the
+four corners of the above-specified quadrangle into the range
+[min_color_z,max_color_z] of @ref{zrange} or @ref{cbrange} providing range of grays
+[0:1].  This value can be used directly as the gray for gray maps.  The
+normalized gray value can be further mapped into a color---see @ref{palette}
+for the complete description.
 
-2. data splot with two ore four data columns:
-@example
-    The gray is obtained by using the LAST coordinate instead of the z value.
+2. splot of data file with two or four data columns: The gray/color is
+obtained by @ref{using} the last-column coordinate instead of the z-value, thus
+allowing the color and the z-coordinate be mutually independent.  This can be
+used for 4d data drawing.
 
-@end example
+Two other notes:
 
-The pm3d mode requires a terminal supporting filled colored polygons and
-palettes of smooth colors.  See above for the list of currently available
-terminals.
+1. The term 'scan' referenced above is used more among physicists than the
+term 'iso_curve' referenced in gnuplot documentation and sources.  You measure
+maps recorded one scan after another scan, that's why.
 
-Notes:
-@example
-   1. The term 'scan' referenced above is used more among physicists then the
-      the term 'iso_curve' in gnuplot documentation and sources.  You measure
-      maps recording one scan after another scan, that's why.
-   2. Two-dimensional color (or gray) map is obtained by `set view map`.
-
-@end example
+2. Two-dimensional color (or gray) map (i.e., not surface) is obtained by `set
+view map` or `set pm3d map`.
 
 Syntax:
 @example
@@ -7475,34 +7500,38 @@ Syntax:
                  @{ flush @{ begin | center | end @} @}
                  @{ ftriangles | noftriangles @}
                  @{ clip1in | clip4in @}
+                 @{ corners2color @{ mean|geomean|median|c1|c2|c3|c4 @} @}
                  @{ hidden3d <linestyle> | nohidden3d @}
                  @{ transparent | solid @}
-                 @{ map @}
                  @{ implicit | explicit @}
+                 @{ map @}
                @}
       show pm3d
       unset pm3d
 
 @end example
 
-@ref{pm3d} (i.e. without options) sets up the default values.
+Setting @ref{pm3d} (i.e. without options) sets up the default values.
 Otherwise, the options can be given in any order.
 
-pm3d can be drawn at the base or top (color or gray map) or as surface
-(color or gray surface).  This is defined by the `at` option with a string
-of up to 6 combinations of `b`, `t` and `s`.  For instance, `at b` plots at
-bottom only, `at st` plots firstly surface, then top, `at bstbst`...
+Color surface can be drawn at the base or top (then it is a gray/color planar
+map) or at z-coordinates of surface points (gray/color surface).  This is
+defined by the `at` option with a string of up to 6 combinations of `b`, `t`
+and `s`. For instance, `at b` plots at bottom only, `at st` plots firstly
+surface and then top map, while `at bstbst` will never by seriously used.
 
 Colored quadrangles are plotted one after another.  When plotting surfaces
-(`at s`), the later overlaps the previous ones.  You may try to switch
-between `scansforward` and `scansbackward` to change whether the first scan
-of the data is plotted first or last. The default is `scansautomatic` where
-gnuplot makes a guess about the scan direction.
+(`at s`), the later quadrangles overlap (overdraw) the previous ones.
+(Gnuplot is not virtual reality tool to calculate intersections of filled
+polygon meshes.)  You may try to switch between `scansforward` and
+`scansbackward` to force the first scan of the data to be plotted first or
+last.  The default is `scansautomatic` where gnuplot makes a guess about scans
+order.
 
-If two subsequent scans do not have the same number of points, then it has to
-be decided whether to start taking points for quadrangles from the beginning
-of both scans (`flush begin`), from their ends (`flush end`) or to center
-them (`flush center`). Note, that `flush (center|end)` are incompatible with
+If two subsequent scans do not have same number of points, then it has to be
+decided whether to start taking points for quadrangles from the beginning of
+both scans (`flush begin`), from their ends (`flush end`) or to center them
+(`flush center`).  Note, that `flush (center|end)` are incompatible with
 `scansautomatic`: if you specify `flush center` or `flush end` and
 `scansautomatic` is set, it is silently switched to `scansforward`.
 
@@ -7511,19 +7540,29 @@ If two subsequent scans do not have the same number of points, the option
 where there are not enough points in either of the scan. This can be used to
 draw a smooth map boundary.
 
-Clipping with respect to the x,y coordinates can be done in two ways.
-`clip1in`:  all 4 points of the quadrangle must be defined and at least 1
-point of the quadrangle must be in the x and y ranges. `clip4in`: all 4
-points of the quadrangle must be in the x and y ranges.
+Clipping with respect to x, y coordinates of quadrangles can be done in two
+ways.  `clip1in`: all 4 points of each quadrangle must be defined and at least
+1 point of the quadrangle must lie in x and y ranges.  `clip4in`: all 4
+points of each quadrangle must lie in x and y ranges.
 
-The above clipping works fine for plotting maps.  For surfaces, clipping with
-respect to the z coordinate could find some use too (something like "clipz1in"
-and "clipz4in").  But nobody has needed this feature until now, so it's not
-available.
+There is a single gray/color value associated to each drawn pm3d quadrangle
+(no smooth color change among vertices).  The value is calculated from
+z-coordinates from the surrounding corners according to `corners2color
+<option>`. The options 'mean' (default), 'geomean' and 'median' produce
+various kinds of surface color smoothing, which may not be desired for pixel
+images or for maps with sharp and intense peaks.  Then options 'c1', 'c2', 'c3'
+or 'c4' can get handy to associate quadrangle color with the z-coordinate of
+either of the 4 corners, depending on the drawing direction.  There is no
+smoothing in the latter case, but no color rows are drawn for corners of the
+two surface-surrounding boundaries opposing to the selected 'c<j>' corner.
+This reflects the pm3d algorithm not to draw anything outside the measured
+surface nodes.  Another drawing algorithm, which would draw qudrangles around a
+given node by taking corners from averaged (x,y)-coordinates of its
+surrounding 4 nodes, could be implemented in the future.
 
-Notice that the ranges of z-values and color values for surfaces are
-adjustable independently by @ref{zrange}, @ref{cbrange}, and `set log`
-for z or cb.  Maps can be adjusted by the cb axis only; see also
+Notice that ranges of z-values and color-values for surfaces are adjustable
+independently by @ref{zrange}, @ref{cbrange}, as well as `set log` for z or
+cb.  Maps can be adjusted by the cb-axis only; see also `set view map` and
 `set colorbox`.
 
 The option @ref{hidden3d} takes as the argument a linestyle which must be created
@@ -7553,12 +7592,14 @@ The `set pm3d map` is an abbreviation for `set pm3d at b`; `set view map`;
 @ref{pm3d}; @ref{pm3d};.
 It is used for backwards compatibility, when `set view map` was not available.
 Take care that you properly use @ref{zrange} and @ref{cbrange} for input data point
-filtering and color range scaling, respectively.
+filtering and color range scaling, respectively; and also `set (no)surface`
+seems to have a (side?) effect.
 
 The coloring setup as well as the color box drawing are determined by
 @ref{palette}.  There can be only one palette for the current plot.  Drawing
 of several surfaces with different palettes can be achieved by @ref{multiplot}
-with fixed @ref{origin} and @ref{size}.
+with fixed @ref{origin} and @ref{size}; don't forget to use `set palette maxcolors`
+when your terminal is running out of available colors.
 
 If the option `implicit` is on (which is the default), all surface plots
 will be plotted additionally to the default type, e.g.
@@ -7582,7 +7623,7 @@ If `explicit` is on, you can also switch to the default style @ref{pm3d}, e.g.:
 @end example
 
 Note that when plotting several plots, they are plotted in the order given
-on the command line. This can be of interest especially for pm3d surfaces
+on the command line. This can be of interest especially for filled surfaces
 which can overwrite and therefore hide part of earlier plots.
 
 If @ref{pm3d} is specified in the `splot` command line, then it accepts the
@@ -7595,7 +7636,7 @@ altitudes:
 
 @end example
 
-See also @ref{palette}, `set colorbox`, @ref{pm3d}.
+See also @ref{palette}, @ref{cbrange}, `set colorbox`, @ref{pm3d}.
 
 
 @node palette, pointsize, pm3d, set-show
@@ -7655,11 +7696,11 @@ formulaes.  `show palette colornames` prints the implemented color names.
 The following options determine the coloring properties.
 
 Figure using this palette can be `gray` or `color`.  For instance, in @ref{pm3d}
-the gray is obtained by mapping the averaged z coordinate of the 4 corners of
-the quadrangle into the range [min_z,max_z] providing range of grays [0:1].
-This value can be used directly as the gray for gray maps.  The color map
-requires a transformation gray --> (R,G,B), i.e. a mapping
-[0:1] --> ([0:1],[0:1],[0:1]).
+color surfaces the gray of each small spot is obtained by mapping the averaged
+z-coordinate of the 4 corners of surface quadrangles into the range
+[min_z,max_z] providing range of grays [0:1]. This value can be used directly
+as the gray for gray maps. The color map requires a transformation gray -->
+(R,G,B), i.e. a mapping [0:1] --> ([0:1],[0:1],[0:1]).
 
 Basically two different types of mappings can be used:  Analytic formulae
 to convert gray to color, or discrete mapping tables which are interpolated.
@@ -8633,8 +8674,7 @@ For four columns, only `xerrorbars`, `yerrorbars` (or @ref{errorbars}),
 style will be changed to `yerrorbars`.
 
 Five-column data allow only the `boxerrorbars`, `financebars`, and
-`candlesticks` styles.  (The last two of these are primarily used for plots
-of financial prices.)  An illegal style will be changed to `boxerrorbars`
+`candlesticks` styles.  An illegal style will be changed to `boxerrorbars`
 before plotting.
 
 Six- and seven-column data only allow the `xyerrorbars`,
@@ -8828,7 +8868,12 @@ coordinate and limited vertically by the opening and closing prices.  A
 vertical line segment at the x coordinate extends up from the top of the
 rectangle to the high price and another down to the low.  The vertical line
 will be unchanged if the low and high prices are interchanged.
-The width of the rectangle is controlled by `set bars <width>`.
+
+The width of the rectangle can be controlled by the @ref{boxwidth} command.
+For backwards compatibility with earlier gnuplot versions, when the 
+boxwidth parameter has not been set then the width of the candlestick
+rectangle is controlled by `set bars <width>`.
+
 By default the rectangle is empty if (open > close), and filled with three
 vertical bars if (close > open). If filled-boxes support is present, then
 the rectangle is colored according to `set style fill <fillstyle>`.
@@ -8849,7 +8894,7 @@ box-and-whisker plot requires additional plot commands as in this example:
 @end example
 
 @example
- See @ref{bars} and `set style fill`.
+ See @ref{boxwidth}, @ref{bars} and `set style fill`.
 
 @end example
 
@@ -12887,12 +12932,15 @@ This terminal produces files in the W3C Scalable Vector Graphics format.
 
 Syntax:
 @example
-      set terminal svg @{size <x> <y>@}
+      set terminal svg @{size <x> <y> @{|fixed|dynamic@}@}
                        @{fname "<font>"@} @{fsize <fontsize>@}
 
 @end example
 
 where <x> and <y> are the size of the SVG plot to generate,
+`dynamic` allows a svg-Viewer to resize plot, whereas the default
+setting, `fixed`, will request an absolute size.
+
 <font> is the name of the default font to use (default Arial) and
 <fontsize> is the font size (in points, default 12)"
 
