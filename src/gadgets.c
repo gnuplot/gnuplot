@@ -390,7 +390,7 @@ apply_textcolor(const struct t_colorspec *tc, const struct termentry *t)
        return;
     }
 #ifdef PM3D
-    if (!is_plot_with_palette() || !(*t->set_color)) {
+    if (!is_plot_with_palette() || !(t->set_color)) {
 	(*t->linetype)(LT_BLACK);
 	return;
     }
