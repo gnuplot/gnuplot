@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: cgm.trm,v 1.41 2002/04/30 14:08:53 broeker Exp $
+ * $Id: cgm.trm,v 1.42 2002/06/10 18:53:00 mikulik Exp $
  */
 
 /* GNUPLOT - cgm.trm */
@@ -1262,6 +1262,10 @@ const char str[];
 					  string */
     const char *s = str;
 
+    /* sanity check - labels are not clipped */
+    if ((x > 32767) || (y > 32767))
+      return;
+
     while (*s)
 	if (!isspace((unsigned char) *s++))
 	    goto showit;
@@ -1320,8 +1324,8 @@ const char str[];
       static int orient[4];
       cgm_current.angle = cgm_next.angle;
 
-      orient[0] = (int)cgm_next.char_height*cos(cgm_next.angle+3.1416/2);
-      orient[1] = (int)cgm_next.char_height*sin(cgm_next.angle+3.1416/2);
+      orient[0] = (int)cgm_next.char_height*cos(cgm_next.angle+M_PI_2);
+      orient[1] = (int)cgm_next.char_height*sin(cgm_next.angle+M_PI_2);
       orient[2] = (int)cgm_next.char_height*cos(cgm_next.angle);
       orient[3] = (int)cgm_next.char_height*sin(cgm_next.angle);
       CGM_write_int_record(5, 16, 8, orient);

@@ -1,3 +1,10 @@
+2002-06-16  James R. Van Zandt  <jrv@debian.org>
+
+	* term/cgm.trm: silently drop any labels outside the CGM plot
+	window.  (This should eliminate the errors like "gnuplot:
+	../term/cgm.trm:1150: CGM_write_int: Assertion `value <= 32767'
+	failed.  Aborted (core dumped)".	
+
 2002-06-11  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* term/fig.trm: Support for 'set palette maxcolors <n>'. Treat properly
@@ -652,7 +659,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/06/10 21:33:31 $).
+	last modification date (from the tag $Date: 2002/06/11 07:59:09 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
