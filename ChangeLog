@@ -3,19 +3,127 @@
 	* INSTALL: In "Platform notes" section, add hint for using
 	'gcc -ansi'.
 
+	* Makefile.am: Add maintainer-only pre-dist target.
+
+	* docs/Makefile.in: Don't hardcode pdflatex command.
+
+	* docs/doc2texi.el: Add missing drivers.
+
+	* docs/gnuplot.doc: Remove docs for comma line continuation.
+
+	* src/*.h: Uniform RCS id header.
+
+	* src/command.c, src/mics.c: Clean up, add comments, remove ESR's
+	comma line continuation patch (doesn't work).
+
+	* src/dynarray.c, src/tables.c: Add RCSid.
+
+	* src/dynarray.h, src/ipc.h, src/mousecnm.h: Add gnuplot copyright
+	statement, RCS id.
+
+	* src/gp_hist.h, src/gp_time.h, src/history.c, src/time.c: Fix
+	function prototypes.
+
+	* src/graphics.c(graph_error), src/graphics.h: Revert to non-variadic
+	version, as graph_error() tries to pass a variable number of arguments
+	into another variadic function. Noted by Pieter-Tjerk de Boer.
+
+	* src/mouse.c: Formatting, indentation, RCS id.
+
+	* src/plot3d.h: Add external variable declaration.
+
+	* src/version.c: Set bug_email and help_email to info-gnuplot-beta
+	for development versions of gnuplot.
+
+	* term/gif.trm(GIF_put_text): Fix compiler warnings, patch from
+	Alexander Mai.
+
 2000-05-01  Johannes Zellner <johannes@zellner.org>
 
-	* removed a superfluous ifndef(OS2) in term/x11.trm
-	* added a SELECT_FD_SET_CAST in term/x11.trm
-
-2000-05-01  Johannes Zellner <johannes@zellner.org>
-
-	* corrected the number of format specifiers in a fprintf (src/show.c)
+	* term/x11.trm: Remove superfluous ifndef(OS2).	Add SELECT_FD_SET_CAST
+	to sselect() call.
 
 2000-04-30  Johannes Zellner <johannes@zellner.org>
 
 	* small patch such that zooming of map views works again.
 	This patch apparently got lost during setup of the CVS repository.
+
+2000-04-28  Jeff Spirko  <spirko@lehigh.edu>
+
+	* src/plot.c(main): Allow configuration of GNU readline to use
+	different settings for different terminals. Noted by Peter Maunz
+	<Peter.Maunz@mpq.mpg.de>.
+
+2000-04-14  Nigel Nunn <nNunn@ausport.gov.au>
+
+	* src/command.c(pause_command): Fix `pause' command on Win32.
+
+2000-04-12  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/graph3d.c(do_3dplot): Key sample was clipped to graph box
+	(2D rectangle around the 3D plotting area), even if the key had
+	explicitly been requested to be outside that area by `set key below'
+	or `set key outside'.
+
+2000-04-10  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* term/fig.trm(FIG_put_text): Don't create xfig SPECIAL_TEXT for
+	non-LaTeX strings. See Debian bug#61972.
+
+	* term/png.trm(PNG_options): Fix parser bug. Noted by
+	Benoit des Ligneris <benoit.des.ligneris@physique.usherb.ca>.
+
+2000-04-07  Pieter-Tjerk de Boer  <ptdeboer@cs.utwente.nl>
+
+	* src/show.c(show_mtics): Fix buggy `show m[xyz][2]tics'command.
+
+2000-04-06  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* configure.in: Add new --enable-emf option for experimental
+	Enhanced Metafile Format driver. Check for pdflatex.
+
+	* src/term.h: Include experimental emf driver.
+
+	* term/emf.trm: New file. Enhanced Metafile Format driver by
+	Stephane Barbaray <stephane.barbaray@compodata.com>. Small
+	changes for 3.8.
+
+2000-04-06  Ulrich_Gruenebaum  <grueneba@luzi.e-technik.uni-dortmund.de>
+
+	* docs/gnuplot.doc, src/plot2d.c, src/plot3d.c, src/set.c,
+	src/setshow.h: Bug fix for broken autoscale writeback, see BUGS
+	entry 3.
+
+2000-04-05  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/interpol.c(cp_implode): 'smooth unique' does not correctly
+	check inrange/outrange conditions.
+
+2000-04-04  Pieter-Tjerk de Boer <ptdeboer@cs.utwente.nl>
+
+	* src/graph3d.c(do_3dplot): Fix division by zero error caused
+	by using variables before initialisation.
+
+2000-03-31  John Hasstedt  <manager@nuclear.physics.sunysb.edu>
+
+	* configure.vms, src/command.c: Fixes for building on VMS.
+
+	* src/show.c(show_version): Add missing "%s" in format string.
+
+	* term/hp26.trm(HP26_flush): Add cast in compact_slope() call.
+
+2000-03-31  Alexander Mai <st002279@hrzpub.tu-darmstadt.de>
+
+	* src/gplt_x11.c(handle_selection_event): Fix compiler warning, use
+	FPRINTF macro.
+
+	* term/gif.trm(GIF_put_text): Fix compiler warnings.
+
+2000-03-31  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* src/os2/dialogs.h: Remove unnecessary blank lines.
+
+	* src/os2/scaling.ptr, src/os2/rotating.ptr: Add missing files.
 
 2000-03-30  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
@@ -34,6 +142,10 @@
 	* src/show.c(show_version): Add mouse support in version information.
 
 	* term/x11.trm: Remove C++ comment.
+
+2000-03-30  Shusuke Nisiyama  <shu@athena.qe.eng.hokudai.ac.jp>
+
+	* src/graphics.c: Fix bugs in vector clipping patch.
 
 2000-03-29  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
@@ -54,7 +166,7 @@
 
 2000-03-28  Petr Mikulik <mikulik@physics.muni.cz>
 
-	* term/post.trm: Epsf option sets landscape mode instead of landscape.
+	* term/post.trm: Epsf option sets landscape mode instead of epsf.
 
 2000-03-28  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
@@ -65,6 +177,16 @@
 
 	* src/graph3d.c(boundary3d): Change plot size if no key is set after
 	set key outside (part two).
+
+2000-03-26  Jeff Spirko  <spirko@lehigh.edu>
+
+	* src/show.c(show_key): The `show key' command doesn't display all
+	information if the key is boxed.
+
+2000-03-26  Walter Harms  <WHarms@bfs.de>
+
+	* src/time.c(gstrptime): Add reading of time in "%s" format (seconds
+	since epoch).
 
 2000-03-20  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
@@ -709,9 +831,6 @@
 	demo/steps.dem, demo/surface1.dem, demo/surface2.dem, demo/timedat.dem,
 	demo/using.dem: Demo directory cleanup patch. Box a bunch of legends
 	and use reset instead of ad-hoc set statements.
-
-	* docs/gnuplot.doc, src/command.c, src/misc.c: Lines ending with ","
-	are treated as continuation lines.
 
 	* src/graphics.c, src/graphics.h: Introduce exclusion box for keys.
 
