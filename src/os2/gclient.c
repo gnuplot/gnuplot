@@ -1,5 +1,5 @@
 #ifdef INCRCSDATA
-static char RCSid[]="$Id: gclient.c,v 1.8.2.5 2000/10/23 08:03:28 mikulik Exp $" ;
+static char RCSid[]="$Id: gclient.c,v 1.10 2000/10/31 19:59:32 joze Exp $" ;
 #endif
 
 /****************************************************************************
@@ -169,7 +169,7 @@ static LONG alColourTable[ nColors+2  ] ;
 
 #define   DEFLW     50
 
-       ULONG    ppidGnu = 0L ;  /* gnuplot pid */
+//       ULONG    ppidGnu = 0L ;  /* gnuplot pid  */ -- now in gpexecute.c
 static HPS      hpsScreen ;     /* screen pres. space */
 static int      iSeg = 1 ;
 
@@ -360,7 +360,7 @@ static int drop_cookie = 0;
 // Finally, include the common mousing declarations and routines:
 #define GNUPMDRV
   /* let mousing.c know whether called from gclient.c or gplt_x11.c */
-#include "../gpexecute.inc"
+#include "../gpexecute.h"
 
 /* //PM: end of new functions related to the mouse processing */
 
@@ -2204,7 +2204,7 @@ server:
                 case 'V' :   /* draw vector */
 #ifdef PM3D
 		    {
-		    LONG curr_color;
+		    LONG curr_color = -1;
 		    if (pm3d_color>=0) {
 			curr_color = GpiQueryColor(hps);
 			GpiSetColor( hps, pm3d_color);
