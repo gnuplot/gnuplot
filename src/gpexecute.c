@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gpexecute.c,v 1.7 2001/02/05 11:36:37 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: gpexecute.c,v 1.8 2001/02/09 15:06:11 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - gpexecute.c */
@@ -64,7 +64,7 @@ int pipe_died = 0;
 # include <assert.h>
 #endif
 
-#if defined(PIPE_IPC) || defined(WIN_IPC)
+#if defined(PIPE_IPC) /* || defined(WIN_IPC) */
 static gpe_fifo_t *gpe_init __PROTO((void));
 static void gpe_push __PROTO((gpe_fifo_t ** base, struct gp_event_t * ge));
 static struct gp_event_t *gpe_front __PROTO((gpe_fifo_t ** base));
@@ -146,7 +146,7 @@ gp_execute(char *s)
 
 #endif /* OS2_IPC */
 
-#if defined(PIPE_IPC) || defined(WIN_IPC)
+#if defined(PIPE_IPC) /* || defined(WIN_IPC) */
 
 int buffered_output_pending = 0;
 
@@ -219,7 +219,7 @@ void
 gp_exec_event(char type, int mx, int my, int par1, int par2)
 {
     struct gp_event_t ge;
-#if defined(PIPE_IPC) || defined(WIN_IPC)
+#if defined(PIPE_IPC) /* || defined(WIN_IPC) */
     static struct gpe_fifo_t *base = (gpe_fifo_t *) 0;
 #endif
 
@@ -238,7 +238,9 @@ gp_exec_event(char type, int mx, int my, int par1, int par2)
     if (pipe_died)
 	return;
 #endif
-#if defined(PIPE_IPC) || defined(WIN_IPC)
+    /* HBB 20010218: commented this out for WIN_IPC. We don't actually use the stack,
+     * there */
+#if defined(PIPE_IPC) /* || defined(WIN_IPC) */
     if (!base) {
 	base = gpe_init();
     }
@@ -249,6 +251,11 @@ gp_exec_event(char type, int mx, int my, int par1, int par2)
     }
 #endif
 #ifdef WIN_IPC
+    /* FIXME HBB 20010216: this breaks the wgnuplot.exe+wgnuplot.dll type of
+     * compilation (for Win16). do_event is in the main program(mouse.c), but 
+     * gpexecute is in the DLL --> can't reach it, from here. A 'called without
+     * a prototype' warning is the only telltale sign of the problem of this, at 
+     * compile time */
     do_event(&ge);
     return;
 #endif

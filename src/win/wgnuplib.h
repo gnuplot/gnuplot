@@ -1,5 +1,5 @@
 /*
- * $Id: wgnuplib.h,v 1.8 2001/02/08 16:44:36 broeker Exp $
+ * $Id: wgnuplib.h,v 1.9 2001/02/09 15:06:11 broeker Exp $
  */
 
 /* GNUPLOT - win/wgnuplib.h */
@@ -63,10 +63,14 @@
 #define WINEXPORT
 #endif
 
+/* Functions flagged WDPROC are to be export by the DLL, so they can be called
+ * directly from win.trm or the gnuplot core */
 #define WDPROC WINAPI WINEXPORT
 
 /* HBB: bumped version for pointsize, linewidth and PM3D implementation */
-#define WGNUPLOTVERSION  "1.3   2000-08-13" 
+/* HBB: bumped version for massive changes due to mouse-ing and removal of
+ *      variables no longer needed, in struct GW */
+#define WGNUPLOTVERSION  "1.4   2001-02-18"
 BOOL WDPROC CheckWGNUPLOTVersion(LPSTR str);
 
 /* ================================== */
@@ -87,18 +91,10 @@ BOOL WDPROC CheckWGNUPLOTVersion(LPSTR str);
 #  define farfree(s) free(s)
 # endif /* __TURBOC__ */
 #endif
- 
-#ifdef __MINGW32__
-/* HBB 980809: MinGW32 doesn't define some of the more traditional
- * things gnuplot expects in every Windows C compiler, it seems: */
-/* HBB 20000813: This has change, in the meantime. I'm taking some of these
- * out again: */
-/* typedef LOGPEN *LPLOGPEN; */
-/* typedef HGLOBAL GLOBALHANDLE; */
-/* #define WINVER 0x0400 */
-/* #define HFILE_ERROR ((HFILE)-1)*/
 
-/* the far mem/string function family: */
+#ifdef __MINGW32__
+/* MinGW32 doesn't define some of the more traditional
+ * things gnuplot expects in every Windows C compiler, it seems: */
 #define _fstrstr(s1,s2) (strstr(s1,s2))
 #define _fstrchr(s,c) (strchr(s,c))
 #define _fstrrchr(s,c) (strrchr(s,c))
@@ -106,10 +102,9 @@ BOOL WDPROC CheckWGNUPLOTVersion(LPSTR str);
 #define _fstrcpy(d,s) (strcpy(d,s))
 #define _fstrncpy(d,s,n) (strncpy(d,s,n))
 #define _fstrcat(s1,s2) (strcat(s1,s2))
-/* #define _fmemset(s,c,n) (memset(s,c,n)) */
-/* #define _fmemmove(d,s,n) (memmove(d,s,n)) */
 
 #endif /* __MINGW32__ */
+
 /* ================================== */
 /* wprinter.c - windows printer routines */
 void WDPROC DumpPrinter(HWND hwnd, LPSTR szAppName, LPSTR szFileName);
@@ -254,13 +249,15 @@ void WDPROC AboutBox(HWND hwnd, LPSTR str);
 /* wgraph.c - graphics window */
 
 /* windows data */
+
+/* number of different 'basic' pens supported (the ones you can modify
+ * by the 'Line styles...' dialog, and save to/from wgnuplot.ini). */
 #define WGNUMPENS 15
 
-#define GWOPMAX 4096
 /* GWOP is 8 bytes long. Array of GWOP kept in global block */
 struct GWOP {
 	WORD op;
-	WORD x, y; 
+	WORD x, y;
 	HLOCAL htext;
 };
 
@@ -300,12 +297,12 @@ struct GWOPBLK {			/* kept in local memory */
 #define W_filledbox 40
 
 typedef struct tagGW {
-	LPPRINT	lpr;			/* must be first */
-	HINSTANCE	hInstance;		/* required */
-	HINSTANCE	hPrevInstance;	/* required */
-	LPSTR	Title;			/* required */
-	int		xmax;			/* required */
-	int		ymax;			/* required */
+	LPPRINT	lpr;		/* must be first */
+	HINSTANCE hInstance;	/* required */
+	HINSTANCE hPrevInstance;	/* required */
+	LPSTR	Title;		/* required */
+	int	xmax;		/* required */
+	int	ymax;		/* required */
 	LPTW	lptw;		/* optional */  /* associated text window */
 	POINT	Origin;		/* optional */	/* origin of graph window */
 	POINT	Size;		/* optional */	/* size of graph window */
@@ -313,37 +310,31 @@ typedef struct tagGW {
 	LPSTR	IniSection;	/* optional */
 	HWND	hWndGraph;	/* window handle */
 	HMENU	hPopMenu;	/* popup menu */
-	int		numsolid;	/* number of solid pen styles */
-	int		pen;		/* current pen number */
-	int		htic;		/* horizontal size of point symbol (xmax units) */
+	int	pen;		/* current pen number */
+	int	htic;		/* horizontal size of point symbol (xmax units) */
 	int 	vtic;		/* vertical size of point symbol (ymax units)*/
-	int		hchar;		/* horizontal size of character (xmax units) */
-	int		vchar;		/* vertical size of character (ymax units)*/
-	int		angle;		/* text angle */
+	int	hchar;		/* horizontal size of character (xmax units) */
+	int	vchar;		/* vertical size of character (ymax units)*/
+	int	angle;		/* text angle */
 	BOOL	rotate;		/* can text be rotated 90 degrees ? */
 	char	fontname[MAXFONTNAME];	/* font name */
-	int		fontsize;	/* font size in pts */
+	int	fontsize;	/* font size in pts */
 	HFONT	hfonth;		/* horizonal font */
 	HFONT	hfontv;		/* vertical font */
 	BOOL	resized;	/* has graph window been resized? */
 	BOOL	graphtotop;	/* bring graph window to top after every plot? */
-	BOOL	color;					/* color pens? */
-	HPEN	hbpen;					/* border pen */
-	HPEN	hapen;					/* axis pen */
-	HPEN	hpen[WGNUMPENS];		/* pens */
-#if 1 /* HBB 980118: new try ... */
-        HPEN    hsolidpen[WGNUMPENS];           /* solid pens (for point symbols) */
-#endif
-	LOGPEN	colorpen[WGNUMPENS+2];	/* logical color pens */
-	LOGPEN	monopen[WGNUMPENS+2];	/* logical mono pens */
-	COLORREF background;			/* background color */
-	HBRUSH   hbrush;				/* background brush */
-	HBRUSH   colorbrush[WGNUMPENS+2];   /* brushes to fill points */
+	BOOL	color;		/* color pens? */
+	HPEN	hapen;		/* stored current pen */
+	LOGPEN	colorpen[WGNUMPENS+2];	/* color pen definitions */
+	LOGPEN	monopen[WGNUMPENS+2];	/* mono pen definitions */
+	COLORREF background;		/* background color */
+	HBRUSH	hbrush;		/* background brush */
+	HBRUSH	colorbrush[WGNUMPENS+2];   /* brushes to fill points */
 	struct GWOPBLK *gwopblk_head;
 	struct GWOPBLK *gwopblk_tail;
 	unsigned int nGWOP;
-	BOOL	locked;				/* locked if being written */
-	double  org_pointsize;		/* Original Pointsize */
+	BOOL	locked;		/* locked if being written */
+	double  org_pointsize;	/* Original Pointsize */
 } GW;
 typedef GW FAR*  LPGW;
 
@@ -362,15 +353,15 @@ void WDPROC GraphClose(LPGW lpgw);
 void WDPROC GraphStart(LPGW lpgw, double pointsize);
 void WDPROC GraphEnd(LPGW lpgw);
 void WDPROC GraphResume(LPGW lpgw);
-void WDPROC GraphOp(LPGW lpgw, WORD op, WORD x, WORD y, const LPSTR str);
+void WDPROC GraphOp(LPGW lpgw, WORD op, WORD x, WORD y, LPCSTR str);
 void WDPROC GraphPrint(LPGW lpgw);
 void WDPROC GraphRedraw(LPGW lpgw);
 
 #ifdef USE_MOUSE
 void WDPROC Graph_set_cursor (LPGW lpgw, int c, int x, int y );
 void WDPROC Graph_set_ruler (LPGW lpgw, int x, int y );
-void WDPROC Graph_put_tmptext(LPGW lpgw, int i, const char str[] );
-void WDPROC Graph_set_clipboard (LPGW lpgw, const char s[] );
+void WDPROC Graph_put_tmptext(LPGW lpgw, int i, LPCSTR str);
+void WDPROC Graph_set_clipboard (LPGW lpgw, LPCSTR s);
 #endif
 
 /* ================================== */
