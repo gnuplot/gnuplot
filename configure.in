@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.in,v 1.116 2002/09/16 18:24:57 lhecking Exp $
+dnl $Id: configure.in,v 1.117 2002/10/08 17:53:01 lhecking Exp $
 dnl
 AC_INIT(src/graphics.c)
 AM_CONFIG_HEADER(config.h:config.hin)
@@ -627,7 +627,7 @@ fi
 
 dnl use mouse for x11 interface
 AC_ARG_ENABLE(mouse,dnl
-[  --enable-mouse          enable mouse for the x11 terminal],,
+[  --disable-mouse         disable mouse for the x11 terminal],,
   test -z "$enable_mouse" && enable_mouse=yes)
 
 if test "$enable_mouse" = yes; then
@@ -639,7 +639,7 @@ fi
 
 dnl pm3d
 AC_ARG_ENABLE(pm3d,dnl
-[  --enable-pm3d           enable pm3d],,
+[  --disable-pm3d          disable pm3d],,
   test -z "$enable_pm3d" && enable_pm3d=yes)
 
 if test "$enable_pm3d" = yes; then
@@ -699,26 +699,30 @@ TERMLIBS="$VGAGLLIB $TERMLIBS"
 
 dnl filledboxes
 AC_ARG_ENABLE(filledboxes,dnl
-[  --enable-filledboxes    enable filledboxes style (EXPERIMENTAL)],
-  [if test "$enableval" = yes; then
-     AC_DEFINE(USE_ULIG_FILLEDBOXES, 1,
-               [ Define if you want to have Uli Gruenebaum's filledboxes style. ])
-   fi])
+[  --disable-filledboxes   disable filledboxes style],,
+  test -z "$enable_filledboxes" && enable_filledboxes=yes)
+
+if test "$enable_filledboxes" = yes; then
+  AC_DEFINE(USE_ULIG_FILLEDBOXES, 1,
+            [ Define if you want to have Uli Gruenebaum's filledboxes style. ])
+fi
 
 dnl relative boxwidth
 AC_ARG_ENABLE(relative-boxwidth,dnl
-[  --enable-relative-boxwidth    enable relative_boxwidths (EXPERIMENTAL)],
-  [if test "$enableval" = yes; then
-     AC_DEFINE(USE_ULIG_RELATIVE_BOXWIDTH, 1,
-               [ Define if you want to have Uli Gruenebaum's relative boxwidth. ])
-   fi])
+[  --disable-relative-boxwidth   disable relative_boxwidths],,
+  test -z "$enable_relative_boxwidth" && enable_relative_boxwidth=yes)
+
+if test "$enable_relative_boxwidth" = yes; then
+  AC_DEFINE(USE_ULIG_RELATIVE_BOXWIDTH, 1,
+            [ Define if you want to have Uli Gruenebaum's relative boxwidth. ])
+fi
 
 dnl thin plate splines patch
 AC_ARG_ENABLE(thin-splines,dnl
-[  --enable-thin-splines   enable thin plate splines (EXPERIMENTAL)],
+[  --enable-thin-splines   enable thin plate splines],
   [if test "$enableval" = yes; then
      AC_DEFINE(THIN_PLATE_SPLINES_GRID, 1,
-               [ Define to use thin plate spines. EXPERIMENTAL ])
+               [ Define to use thin plate spines. ])
    fi])
 
 dnl IRIS terminal on IRIS4D series computer
@@ -864,13 +868,13 @@ test "$enable_pm3d" = yes && \
   AC_MSG_RESULT([  Enable pm3d])
 
 test "$enable_filledboxes" = yes && \
-  AC_MSG_RESULT([  Enable filledboxes (EXPERIMENTAL)])
+  AC_MSG_RESULT([  Enable filledboxes])
 
 test "$enable_relative_boxwidth" = yes && \
-  AC_MSG_RESULT([  Enable relative boxwidths (EXPERIMENTAL)])
+  AC_MSG_RESULT([  Enable relative boxwidths])
 
 test "$enable_thin_splines" = yes && \
-  AC_MSG_RESULT([  Enable thin plate splines (EXPERIMENTAL)])
+  AC_MSG_RESULT([  Enable thin plate splines])
 
 test "$enable_iris" = yes && \
   AC_MSG_RESULT([  Enable IRIS terminal])
