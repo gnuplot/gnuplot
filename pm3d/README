@@ -1,4 +1,4 @@
-Subj: pm3d: new splot mode for gray/colour maps and surfaces
+pm3d: new splot mode for gray/colour maps and surfaces, and much more.
 
 Here a new type of splot mode:  pm3d.  This adds the possibility to draw 
 colour/gray maps and surfaces (even without preprocessing!) in addition to 
@@ -13,6 +13,9 @@ the gnuplot CVS tree, branch pm3d, at SourceForge:
   cvs login
   cvs -z3 checkout -P -r pm3d gnuplot
 
+You may download precompiled OS/2 binaries from
+        http://www.sci.muni.cz/~mikulik/gnuplot/
+
 pm3d mode works on terminals capable of filled colour polygons. Currently 
 supported terminals are:
 	OS/2 Presentation Manager
@@ -26,29 +29,13 @@ supported terminals are:
 	Fig
 	tgif
 
-You are welcome to run pm3d demo. Please use "help set pm3d" and "help set 
-palette" for further information.
+You are welcome to run pm3d demo.
+Please use "help set pm3d" and "help set palette" for further information.
+
 
 Subdirectories:
-	demo: demo for pm3d
-	contrib: contributions using pm3d (colour points, compress pm3d 
-		 postscript file,...)
-	old-docs: technical docs from the first public release of pm3d 
-		 in January 1999
-
-
-Compilation:
-
-        - OS/2: uncomment line with  PM3D=1  in Makefile/os2
-        - Unix: ./configure --enable-pm3d --enable-mouse
-          (if you want several gnuplot_x11 drivers to coexist on your
-           system you can additionally choose something like
-           --with-X11-driver=gnuplot_x11_pm3d)
-        then make
-
-You may download precompiled OS/2 binaries from
-
-        http://www.sci.muni.cz/~mikulik/gnuplot/
+	contrib: scripts - contributions using pm3d (colour points, 
+		 compress pm3d postscript file, ...)
 
 
 Petr Mikulik <mikulik@physics.muni.cz>

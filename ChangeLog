@@ -1,3 +1,16 @@
+2002-02-17  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* pm3d/README: Updated.
+
+	* pm3d/old-docs/README: Completely new contents. This file contains 
+	technical documentation on gnuplot internals which I was coding (pm3d,
+	mouse, hotkeys and communication). It should be renamed (name to be
+	decided) and moved to the src directory.
+
+	* pm3d/old-docs/*: Files removed except for README, see above.
+	
+	* ANNOUNCE-MOUSE: Removed.
+
 2002-02-16  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/plot3d.h src/plot3d.c src/datafile.c src/pm3d.c: New fix of

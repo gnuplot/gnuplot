@@ -1,62 +1,319 @@
-Here you find a release of patches for gnuplot's new pm3d splot 
-mode.
+This file documents shortly some parts of the gnuplot internals.
+
+TABLE OF CONTENTS:
+
+  * TECHNICAL DETAILS FOR MOUSE COMMUNICATION
+  * TECHNICAL DETAILS FOR FAST MOUSE ROTATION OF 3D SURFACES
+  * TECHNICAL DETAILS ABOUT PM3D
 
 
-Files:
-------
-
-README		this file
-README-pm3d	some doc for pm3d (e-mailed to info-gnuplot mail list)
-README-termentry some doc for new terminal entries (e-mailed to info-gnuplot mail list)
-
-gp3708b-pm3d.diff pm3d patch for gnuplot 3.7 pl 0.8, pm3d version (b)
-color.h		new file for pm3d things
-color.c		"
-pm3d.h		"
-pm3d.c		"
-
-pm3dCompress.awk script to shorten postscript files with pm3d splot and regular
-		(grided) data
-
-ApplyPM3D.cmd	my OS/2 script to apply all patches
-ApplyPM3D.sh	my shell script "
-
-demo-pm3d/*	demo for pm3d, see README therein
+*******************************************************************************
+*******************************************************************************
 
 
-Compiling:
-----------
+TECHNICAL DETAILS FOR HOTKEYS/MOUSE COMMUNICATION
+=================================================
 
-The patch must be applied after the mouse patches for PM terminal. If not, 
-then you can find some patches to be rejected; however, the rejects effect 
-only the OS/2 code, so don't care on other platforms. 
+The communication between a mouseable terminal and the main gnuplot core goes
+via structures defined in mousecmn.h. Further, the following terminal entries
+are used (see USE_MOUSE #defined code in .trm files):
+	void XX_set_ruler (int, int);
+	void XX_set_cursor (int, int, int);
+	void XX_put_tmptext (int, const char str[]);
+	void XX_set_clipboard (const char[]);
 
-Files color.h, color.c, pm3d.h, pm3d.c have to be copied to src/
+On OS/2, the communication of these structures between the stand-alone
+terminals gnupmdrv.exe or gnuplot_x11.exe and the main gnuplot.exe executable
+is implemented by shared memory and an event semaphore.
 
-Compiling gnuplot+pm3d on OS/2, you may use my script ApplyPM3D.cmd
-On Unix, see ApplyPM3D.sh.
+On Unix, a bidirectional pipe is implemented for the ipc (inter-process)
+communication between gnuplot_x11 and gnuplot. The readline interfaces were
+modified to listen to both stdin and the ipc file descriptor.  (Well, that's
+just the usual way). Note that if compiling with gnu readline, you must have a
+gnu readline version > 2.2 (3.0).  This will not be a major drawback, as 2.2 is
+out for years now and the current gnu readline version is 4.0.
 
+On VGAGL, the communication is done by...?
 
-Snapshots:
-----------
-Please look first look at http://www.sci.muni.cz/~mikulik/gnuplot.html
-or something like that for the snapshot of this new splot functionality.
-
-Notes:
-------
-README-pm3d and README-termentry enclosed here close are those from 
-14. 3. 1999, thus NOT updated for new things developed, like `fig` terminal
-support. But both are surely useful anyway.
-
-
-History of public releases:
----------------------------
- 15. 6. 1999 update: splitting `set pm3d` and `set palette`
-  1. 5. 1999 update: some improvements, `set pm3d map`, demo
- 22. 4. 1999 update: fig terminal; formulae 30,31,32; ps: /Color; pm3dCompress
- 15. 4. 1999 update: (help) set/show pm3d + several new options
-  6. 4. 1999 (gp 3.7 pl 0.5);
- 14. 3. 1999 (version for gp 3.7)
+On Windows, the windows terminal is a part of the gnuplot executable
+wgnuplot.exe. Thus it is possible to call the executing routine do_event(&ge);
+directly, without any communication at all.
 
 
-Petr Mikulik, mikulik@physics.muni.cz
+History of mouseable terminals:
+(*) March 1998: Implementation of mousing in OS/2 Presentation Manager terminal
+(Petr Mikulik). 
+(*) April 1999: Proper implementation of the gnupmdrv-gnuplot communication by
+shared memory and event semaphores (Franz Bakan, Petr Mikulik).
+(*) October 1999: Mouseable X11 terminal on Unix and OS/2 (Johannes Zellner,
+Petr Mikulik).
+
+The stand-alone terminals gnupmdrv.exe and gnuplot_x11(.exe) had full control
+over mousing over its displayed graph (all relevant gnuplot structures were
+passed into the terminal). 
+
+(*) January 2000: Mousing re-implemented by means of new terminal (.trm)
+entries, i.e. with a call-back of events passed from the stand-alone terminal
+to the main gnuplot (Pieter-Tjerk de Boer, Johannes Zellner, Petr Mikulik).
+
+(*) January 2000: Implemented mousing in vgagl terminal, the fast linux console
+terminal (Johannes Zellner).
+
+(*) February 2002: Implemented mousing in windows terminal (Petr Mikulik,
+Hans-Bernhard Broeker).
+
+
+*******************************************************************************
+*******************************************************************************
+
+
+TECHNICAL DETAILS FOR FAST MOUSE ROTATION OF 3D SURFACES
+========================================================
+
+For splots (3d) the data of all surfaces of the current graph are cached and
+can therefore be redrawn very quickly, without rereading and reparsing the
+input files. This enables smooth rotating and zooming of splots. Note that
+gnuplot frees the allocated data of the current graph when it starts to plot a
+new graph.
+
+
+*******************************************************************************
+*******************************************************************************
+
+
+TECHNICAL DETAILS ABOUT PM3D
+============================
+
+The pm3d splot mode for gray and colour maps and surface (and much later for
+much more: splots with color lines, plots with filled curves) has been
+implemented by Petr Mikulik in December 1998 and January 1999. It was released
+for public on 14. 3. 1999 as a patch for gnuplot 3.7. Below you can find the
+original notes about the implementation, slightly modified in February 2002.
+
+
+The pm3d algorithm: History and description
+-------------------------------------------
+
+The gnuplot pm3d splot mode is a successor to my pm3d algorithm coded
+previously in my Turbo Vision Pascal plotting program "pmgraf" for DOS (April
+1994) and the C++ command line "pm3d" program which is converting the input
+data into postscript maps (March 1995). Both programs are available on my
+homepage.
+
+The pm3d algorithm (in pmgraf, pm3d and now in gnuplot) draws a gray or colour
+map (or surface, in gnuplot only) of a 3D data, which are supposed to be a
+sequence of scans. Scan is the same what is called 'iso_curve' in gnuplot.
+
+For the given surface, the algorithm takes one scan after the other scan until
+the last but one. For a scan number K it looks at the subsequent scan K+1. For
+each (but the last one) point on scan K, it makes a quadrangle with 4 corners:
+two subsequent points at scan K and two points at scan K+1. (The quadrangle is
+a rectangle if the data are matrix-like.) The quadrangle is filled by the
+colour corresponding to the averaged Z coordinate of its 4 corners.
+
+Therefore it can plot matricial as well as non-rectangular non-gridded data
+without any preprocessing, and on single pass through the data. It does not
+require that the scans have the same number of points (see the details on
+flushing below or 'set pm3d flush').
+
+
+pm3d implementation in gnuplot
+------------------------------
+
+Below, you find the basic description of gnuplot implementation of pm3d, colour
+palette and filled colour polygons.
+
+The pm3d implementation in gnuplot is is based on the following terminal
+entries (see below for more details):
+	term->make_palette
+	term->previous_palette
+	term->set_color
+	term->filled_polygon
+
+The topmost implementation of colour filled areas in plot3d.c:
+
+(*) pm3d mode is set on if (pm3d.where[0]). Its setting, or using 'with ...
+palette', requests the palette of continous (smooth) colours for the given
+terminal according to 'set palette' setup. The palette is created by a call to
+make_palette(). The routine make_palette() is coded in pm3d.c. It will be
+commented below.
+
+(*) pm3d plot for a given surface is called from graph3d.c, just before the
+stuff for hidden line removal, i.e. before plotting surfaces and contours. For
+each surface, it calls
+               pm3d_plot( this_plot, pm3d.where[i] );
+
+(*) The colour box showing the sequence of continuous colours is drawn in routine 
+draw_color_smooth_box(). Postscript output uses the box implementation directly
+in the postscript language, see below.
+
+(*) Routine term->previous_palette() is called after the plot. Currently, it is
+needed only for printing the string "grestore" into a postscript file. 
+
+
+----- Implementation of pm3d_plot( this_plot, at_which_z ) in pm3d.c -----
+
+(*) This plots the map (for at_which_z=PM3D_AT_BASE or PM3D_AT_TOP) or surface
+(for at_which_z=PM3D_AT_SURFACE) for the given surface (variable this_plot).
+
+(*) The implementation of the pm3d algorithm is schematically:
+
+for scan J=1 to scans-1 { /* for each scan in the surface */
+  for pt=1 to min( points(J), points(J+1) ) { /* go over min nb of points */
+    pt' = ...; pt'' = ... /* see below */
+    ptJa = point(J,pt')
+    ptJb = point(J,pt'+1)
+    ptJ+1a = point(J+1,pt'')
+    ptJ+1b = point(J+1,pt'')
+    averagedZ = ( z(ptJa) + z(ptJb) + z(ptJ+1a) + z(ptJ+1b) ) / 4
+    set_color( averagedZ normalized to [0;1] )
+    fill_polygon( 4 corners, 
+                  those 4 points transformed into coordinates of
+                  the map or surface on the terminal )
+    }
+  }
+
+If the two subsequent scans have the same number of points, then pt''=pt'=pt.
+Otherwise, pt''=pt'=pt if 'scans flushed begin', pt'=points(J)-pt and
+pt''=points(J+1)-pt if 'scans flushed end', and similarly for 'scans center'.
+And nothing is drawn if there is only one point in the scan.
+
+
+----- Implementation of make_palette() in pm3d.c -----
+
+(*) Look into color.h, structure t_sm_palette: declaration of smooth palette,
+i.e. palette for smooth colours. It documents how gray [0,1] is mapped into
+(R,G,B) = ([0,1], [0,1], [0,1]).
+
+(*) Ask for the number of colours that are (still) available on the current
+terminal:
+	i = term->make_palette(NULL);
+
+Postscript terminal returns 0 since it supports all RGB values (no limit on
+discrete number of colours). It has its own mapping: transformation of gray
+[0,1] is coded as postscript functions, and also in order to make the output
+size of the postscript file as small as possible, i.e. the same as the output
+from the pm3d program. Further, not 3 values of the RGB triplet but only 1 gray
+value is written into the postscript file. This is achieved by the analytical
+functions: pm3dGetColorValue() are coded as postscript functions, see post.trm:
+PostScriptColorFormulae[] used in PS_make_palette entry. PS->make_palette()
+looks itself into sm_palette and writes a header with the appropriate
+postscript codes for formulaR, formulaG, formulaB transformations. See also
+post.trm: PostScriptColorFormulae[] used in PS_make_palette. Return from
+make_palette().
+
+All other terminals have discrete number of colours. Currently an RGB palette
+is allocated for the number of available colours returned by make_palette(); if
+pm3d is used in gnuplot's multiplot mode, then the result would be incorrect if
+the previous palette is not reused or if the number of colours is not limited
+by 'set palette maxcolors'.
+
+Creating the RGB palette: make the array of (RGB) triplets according to items in 
+sm_palette (not for postscript) 
+	sm_palette.color = malloc( sm_palette.colors * sizeof(rgb_color) );
+
+And then
+for (i = 0; i < sm_palette.colors; i++) {
+  gray = (double)i / (sm_palette.colors - 1); /* rescale to [0;1] */
+  if (sm_palette.ColorMode == colorModeGRAY) /* gray scale only */
+     sm_palette.color[i].r = sm_palette.color[i].g = sm_palette.color[i].b
+     			   = gray;
+  else { /* i.e. sm_palette.ColorMode == colorModeRGB */
+    sm_palette.color[i].r = pm3dGetColorValue(sm_palette.formulaR, gray);
+    sm_palette.color[i].g = pm3dGetColorValue(sm_palette.formulaG, gray);
+    sm_palette.color[i].b = pm3dGetColorValue(sm_palette.formulaB, gray);
+    }
+  }
+
+Finally, tell the terminal to allocate the palette for the (RGB) triplets 
+(again, not for postscript)
+	term->make_palette(&sm_palette);
+
+
+----- Transformation of the z-coordinate to gray and RGB in pm3c.c -----
+
+How a colour is transformed from the gray?  AveragedZ is mapped into the 
+interval [min_z:max_z] which is transformed into [0:1], see routine
+	double z2gray ( double z ) 
+which rescales z into the interval [0,1]. This works fine also for the 
+logarithmic z axis. Later, this is used by
+	gray = z2gray ( avgZ );
+This value can be used directly as a gray for gray maps. For colour maps
+it further needs to transform 
+	gray -> (R,G,B): [0:1] -> ([0:1], [0:1], [0:1])
+thus some nice three functions have to be choosen --- see pm3d.c, function
+pm3dGetColorValue(), for the available mapping functions.
+
+Note that after the complete separation of the z and cb axes (cb-axis is the
+axis of colors) in February 2002, there is a new function z2cb(), and z2gray()
+was replaced by cb2gray().
+
+
+----- Implementation of pm3d terminal entries in *.trm -----
+
+In this section you will find a brief discussion on the following pm3d-related
+terminal entries:
+	term->make_palette
+	term->previous_palette
+	term->set_color
+	term->filled_polygon
+which are required to make pm3d to work. Files considered by these functions
+are color.h, color.c, plot.h, and all .trm which are pm3d-capable. If you are
+coding pm3d support for a new terminal, then you can have a look at the code
+in these files:
+	gif.trm (bitmap GIF terminal implementation),
+	post.trm (PostScript terminal implementation),
+	pm.trm + gclient.c (OS/2 PM terminal implementation),
+	x11.trm + gplt_x11.c (X11 terminal implementation).
+
+The pm3d-specific code is surrounded by #ifdef PM3D ... #endif, so it is
+possible to compile gnuplot with or without pm3d support just bey (un)defining
+the PM3D constant.
+
+In plot.h, the following new terminal entries are added into struct TERMENTRY:
+
+int (*make_palette) __PROTO((t_sm_palette *palette));
+    1. If palette==NULL, then return nice/suitable maximal number of colours
+    supported by this terminal. Returns 0 if it can make colours without
+    palette (like postscript).
+    2. If palette!=NULL, then allocate its own palette return value is
+    undefined.
+    3. Available: some negative values of max_colors for whatever it can be 
+    useful.
+
+    Some particular notes:
+    (*) Terminals with palette (GIF, PM): there are already some basic colours
+    allocated (see gnuplot command 'test'), thus an offset for the `part with
+    smooth colours' is needed. 
+    (*) GIF: can allocate up to 256 colours, i.e. discrete number of colours.  
+    (*) PM: discrete number of colours.  Passes the rgbTable through the pipe
+    into standalone gnupmdrv driver.  X11 should be implemented in the same
+    way.
+    (*) PostScript: continuous colours, as "setrgbcolor" PS command takes the
+    triplet of intervals [0,1].
+
+void (*previous_palette) __PROTO((void));	
+    Release the palette that the above routine allocated and get back the
+    palette that was active before. Some terminals, like displays, may draw
+    parts of the figure using their own palette. The terminals possessing only
+    one palette for the whole plot don't need this routine.
+
+    Actually, this routine is currently used only for postscript terminal,
+    where it writes "grestore" as make_palette() starts its postscript
+    definitions by "gsave"... that's because there are the analytical mapping
+    functions gray->RGB defined in the local header.
+
+void (*set_color) __PROTO((double gray));
+    The value of gray is [0;1]. The terminal uses its color palette or any
+    other way to transform in into true gray or to r,g,b. This terminal entry
+    remembers (or not) this colour so that it can reuse it for a subsequent
+    drawing (for each terminal separately).
+
+void (*filled_polygon) __PROTO((int points, gpiPoint *corners));
+    The declaration has been made the same as in GIF's gd.h. It fills the given
+    polygon according to color set by the previous call to set_color().
+
+
+*******************************************************************************
+*******************************************************************************
+
