@@ -131,7 +131,8 @@ geticon.exe: win\geticon.c
 # convert gnuplot.doc to gnuplot.rtf
 $(HELPFILE): doc2rtf.exe docs\gnuplot.doc win\wgnuplot.hpj
 	doc2rtf docs\gnuplot.doc win\gnuplot.rtf
-	hcw /c /e win\wgnuplot.hpj 
+	hcw /c /e win\wgnuplot.hpj
+	if exist win\wgnuplot.hlp copy win\wgnuplot.hlp .
 
 doc2rtf.exe: docs\doc2rtf.c docs\termdoc.c docs\xref.c
 	cl $(CFLAGS) /F 5000 /W1 /I. /Idocs /Iterm -Fedoc2rtf.exe docs\doc2rtf.c docs\termdoc.c docs\xref.c
