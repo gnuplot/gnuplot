@@ -1,7 +1,0 @@
-FROM LIB:c.o
-     binary.o bitmap.o command.o contour.o eval.o gnubin.o graph3d.o
-     graphics.o help.o internal.o misc.o parse.o plot.o scanner.o
-     setshow.o specfun.o standard.o term.o util.o version.o
-TO gnuplot
-LIB LIB:scmieee.lib LIB:scnb.lib
-STRIPDEBUG
