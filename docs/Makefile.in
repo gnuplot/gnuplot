@@ -89,8 +89,9 @@ doc2ipf.c doc2ms.c doc2rnh.c doc2rtf.c doc2tex.c termdoc.c xref.c
 
 HEADERS = doc2x.h xref.h
 
-EXTRA_DIST = doc2hlp.com doc2texi.pl fixinfo.el gnuplot.doc gpcard.tex \
-makefile.ami makefile.dst titlepag.ms titlepag.tex toc_entr.sty old psdoc
+EXTRA_DIST = doc2hlp.vms doc2texi.el doc2texi.pl fixinfo.el gnuplot.doc \
+gnuplot.texi gpcard.tex makefile.ami makefile.dst titlepag.ms titlepag.tex \
+toc_entr.sty old psdoc
 
 DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(EXTRA_DIST)
 
@@ -213,7 +214,7 @@ info: gnuplot.info
 
 gnuplot.info: doc2info $(srcdir)/gnuplot.doc
 	./doc2info $(srcdir)/gnuplot.doc gnuplot.info
-	if test "$(EMACS)" != no; then \
+	@if test "$(EMACS)" != no; then \
 	  $(EMACS) --batch -l $(srcdir)/fixinfo.el; \
 	else \
 	  @echo No emacs found - cannot fix info file; \
@@ -221,6 +222,17 @@ gnuplot.info: doc2info $(srcdir)/gnuplot.doc
 
 doc2info: doc2info.o termdoc.o xref.o
 	$(LINK) doc2info.o termdoc.o xref.o $(LIBS)
+
+## An alternative to doc2info.c, Thanks to Bruce Ravel
+#gnuplot.info: $(srcdir)/gnuplot.texi $(srcdir)/gnuplot.doc
+#	$(MAKEINFO) -I$(srcdir) $(srcdir)/gnuplot.texi --no-split --output=$@
+#
+#gnuplot.texi: $(srcdir)/doc2info.el $(srcdir)/gnuplot.doc
+#	@if test "$(EMACS)" != no; then \
+#	  $(EMACS) -batch -l $(srcdir)/doc2texi.el -f d2t-doc-to-texi; \
+#	else \
+#	  @echo No emacs found - cannot create texinfo file; \
+#	fi
 
 # this is how to make OS/2 ipfc documentation
 ipf: gnuplot.ipf
