@@ -1,3 +1,11 @@
+1999-06-25  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* configure.in, m4/*.m4: All gp_* macros renamed to GP_*.
+
+	* term/cgm.trm, term/fig.trm, term/gif.trm, term/metafont.trm,
+	term/metapost.trm, term/mif.trm, term/post.trm, term/pstricks.trm:
+	Add more const qualifiers to reduce compiler warnings.
+
 1999-06-21  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* src/bitmap.c, src/bitmap.h: Add const qualifier to char * arg in
@@ -400,7 +408,7 @@
 
 	* config.hin, configure: Regenerated.
 
-1999-05-30  "Mark K. Gardner"  <mkgardne@rtsl3.cs.uiuc.edu>
+1999-05-30  "Mark K. Gardner"  <mkgardne@cs.uiuc.edu>
 
 	* README.exp, configure.in, src/help.c: Format help and subtopic
 	tables by row or column.
