@@ -1,3 +1,8 @@
+2001-11-26  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* src/graph3d.c: Fix  splot 'a.dat' with ... palette  crash if
+	'a.dat' contains a single scan only.
+
 2001-11-25  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/set.c: Allow any order of options in 'set arrow'.
