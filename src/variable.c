@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: variable.c,v 1.5 1999/06/10 19:59:19 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: variable.c,v 1.6 1999/06/14 19:22:42 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - variable.c */
@@ -82,13 +82,12 @@ char *path;
 	/* Init loadpath from environment */
 	FPRINTF((stderr, "Init loadpath from environment\n"));
 	assert(loadpath == NULL);
-	if (!loadpath);
+	if (!loadpath)
 	{
 	    char *envlib = getenv("GNUPLOT_LIB");
 	    if (envlib) {
 		int len = strlen(envlib);
-		loadpath = gp_alloc(len + 1, "init loadpath");
-		safe_strncpy(loadpath, envlib, len + 1);
+		loadpath = gp_strdup(envlib);
 		/* point to end of loadpath */
 		last = loadpath + len;
 		/* convert all PATHSEPs to \0 */
@@ -201,8 +200,7 @@ char *newlocale;
     case ACTION_CLEAR:
     case ACTION_INIT:
 	free(current_locale);
-	current_locale = gp_alloc(strlen(INITIAL_LOCALE) + 1, "initial locale");
-	strcpy(current_locale, INITIAL_LOCALE);
+	current_locale = gp_strdup(INITIAL_LOCALE);
 	break;
     case ACTION_SET:
 #ifndef NO_LOCALE_H
