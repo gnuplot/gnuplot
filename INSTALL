@@ -128,43 +128,39 @@ $ ./configure --help
   --libdir=DIR            object code libraries in DIR [EPREFIX/lib]
   --includedir=DIR        C header files in DIR [PREFIX/include]
   --mandir=DIR            Man documentation in DIR [PREFIX/man]
-  --with-readline (*)     use the builtin minimal readline function
-  --without-readline      do not use the builtin readline function
-  --with-readline=gnu     use the GNU readline library
-  --with-readline=PATH            Specify the location of GNU readline
-  --with-plot             use the Unix plot library
-  --with-plot=PATH                Specify the location of GNU libplot
-  --with-gd (*)           enable gif terminal with Tom Boutell's gd library
-                          (requires GD library)
-  --with-gd=PATH                  Specify the location of libgd
-  --with-png (*)          enable png terminal
-                          (requires libpng and libz)
-  --with-png=PATH                 Specify the location of libpng
-  --with-pdf (*)          enable pdf terminal 
-                          (requires PDFLib, libz and maybe libtiff)
-  --with-pdf=PATH                 Specify the location of libpdf
-  --with-cwdrc            check current directory for .gnuplot file,
-                          normally disabled for security reasons
+  --with-x11-driver       specify an alternative X11 driver name (gnuplot_x11)
+  --with-x          (*)   use the X Window System
   --with-lasergnu         install lasergnu printer script
   --with-linux-vga        use the Linux SVGA console driver
                           (requires /usr/lib/libvga)
+  --with-ggi[=PATH]       enable the ggi driver (EXPERIMENTAL)
+  --with-xmi[=PATH]       ggi's xmi support for pm3d (EXPERIMENTAL)
+  --with-readline   (*)   use the builtin minimal readline function (default)
+  --without-readline      do not use the builtin readline function
+  --with-readline=gnu     use the GNU readline library
+  --with-readline=PATH    Specify the location of GNU readline
+  --enable-history-file   use history file (requires GNU readline)
+  --with-gd[=PATH]        enable gif terminal with Tom Boutell's gd library
+                          (requires GD library)
+  --with-plot=[PATH]      use the Unix plot library
+  --with-png[=PATH] (*)   enable png terminal
+                          (requires libpng and libz)
+  --with-pdf=[PATH] (*)   enable pdf terminal 
+                          (requires PDFLib)
+  --with-cwdrc            check current directory for .gnuplot file,
+                          normally disabled for security reasons
   --without-lisp-files    do not build emacs lisp files
-  --without-tutorial      do not build LaTeX tutorial
-  --enable-history        enable history (requires GNU readline)
-  --enable-thin-splines   enable thin plate splines (EXPERIMENTAL)
-  --with-row-help (*)     format help and subtopic tables by row (default)
+  --with-row-help   (*)   format help and subtopic tables by row (default)
   --without-row-help      format help and subtopic tables by column
+  --without-tutorial      do not build LaTeX tutorial
+  --enable-mouse    (*)   enable mouse for the x11 terminal
+  --enable-pm3d     (*)   enable pm3d
+  --enable-filledboxes    enable filledboxes style (EXPERIMENTAL)
+  --enable-relative-boxwidth    enable relative_boxwidths (EXPERIMENTAL)
+  --enable-thin-splines   enable thin plate splines (EXPERIMENTAL)
   --enable-iris           enable IRIS terminal (IRIS4D only)
   --enable-mgr            enable MGR terminal
   --enable-rgip           enable Redwood Graphics Interface Protocol
-  --enable-mouse (*)      enable mouse for the x11 terminal
-  --enable-pm3d  (*)      enable pm3d
-  --with-ggi              enable the ggi driver (EXPERIMENTAL)
-  --with-ggi=PATH                 Specify the location of libggi
-  --with-xmi              ggi's xmi support for pm3d (EXPERIMENTAL)
-  --with-xmi=PATH                 Specify the location of libxmi
-  --with-x11-driver       specify an alternative X11 driver name (gnuplot_x11)
-  --with-x (*)            Use the X Window System
 
  Options marked with (*) are enabled by default, ie. these features or
 packages are used if configure detects them even if the corresponding
@@ -398,9 +394,6 @@ LD_LIBRARY_PATH environment variable should be set.
 About --with-PACKAGE[=PATH]
 ***************************
 
- The described method of finding library and header files using the
---with-package configure option applies to gnuplot only.
-
  Every `--with-PACKAGE' option sets a `with_package' variable in
 configure.  Depending on how `--with-PACKAGE' was invoked, there are
 only three different possible values for the `with_package' variable:
@@ -414,93 +407,49 @@ only three different possible values for the `with_package' variable:
 --with-package=PATH       PATH
 --without-package         no
 
- This means that configure will always (by default) try to locate PACKAGE
-unless `--with-package=no' or `--without-package' was specified. Examples
-for with-PACKAGE options used by gnuplot's configure are `--with-gd',
-`--with-png'. The corresponding package variables are `with_gd',
-and `with_png'.
+ In gnuplot, the following --with-PACKAGE options are available.
+The --with-PACKAGE=PATH form is always required if a package is installed
+in a non-default location that is not searched by the preprocessor
+or linker.
 
- For gnuplot, configure uses the macros `GP_PATH_LIB' and `GP_PATH_HEADER'
-to search for libraries and includes, resp.  These macros are different
-from the standard GNU autoconf macros for this purpose, `AC_CHECK_LIB' and
-`AC_CHECK_HEADER/S' (see autoconf manual). The GP_XXX macros are closely
-tied to gnuplot, and cannot be used for other packages without modification.
-[May change in the future]
+  --with-readline
 
- The difference between these package specific macros and standard
-autoconf macros is that they do search more than the default directories
-known to the compiler to determine the location of the specified file.
+   Use gnuplot's builtin readline function. This is enabled by default.
 
- Libraries will be searched in at least three, and up to five different
-directories, depending on the PATH specified with `--with-PACKAGE=PATH'.
-These directories are determined by the second argument to GP_PATH_LIB,
-which should normally be identical with the argument to the corresponding
-`--with-PACKAGE=PATH' configure option: GP_PATH_lib(lib, [$with_package]).
-Here's the list:
+  --without-readline
 
- o the default linker path (this is really more than one directory)
- o /usr/local/lib, which is a fairly common place for 3rd party libs
- o the PATH directory, trailing `/lib/libPACKAGE.a' stripped off
- o the PATH directory, trailing `/lib/libPACKAGE.a' stripped off and
-   `/lib' added
- o the PATH directory, trailing `/libPACKAGE.a' stripped off.
+   (same as --with-readline=no) Do not use gnuplot's builtin readline function.
 
- Using the default linker path as the first search directory has one
-big, but not so obvious advantage: if all libraries are in the same
-directory, the path to the first library specified with --with-PACKAGE
-is added to the linker path with a `-L' option.  The library searched
-for with the next --with-PACKAGE option will now be found faster, because
-only one additional directory is checked.  This is also true for header files.
+  --with-readline=gnu
 
- Example: the user has unpacked the gd library distribution into
-/home/user/source/gd:
+   Use the GNU readline library instead of gnuplot's builtin readline.
 
-$ configure --with-gd=/home/user/source/gd
+  --with-readline=[PATH]
 
-will search the following directories for libgd.a:
+   Use the GNU readline library instead of gnuplot's builtin readline.
+   This form is required if GNU readline is not installed in a default
+   location.
 
- o the default linker path
- o /usr/local/lib
- o /home/user/source/gd
- o /home/user/source/gd/lib
- o /home/user/source/gd
+  --with-gd[=PATH]
 
- Include files will be searched in the default location, /usr/local/include,
-and three additional directories. These directories are determined by the
-second argument to GP_PATH_HEADER, which should normally be identical with
-the argument to the corresponding `--with-PACKAGE=PATH' configure option:
-GP_PATH_HEADER(header.h, [$with_package]). Here's the list:
+   Dto. for Thomas Boutell's gd library. This option is off by default,
+   as the developers want to encourage users to use the png format instead
+   of gif.
 
- o the default include path (can be more than one directory)
- o /usr/local/include, a fairly common place for 3rd party headers
- o the PATH directory, trailing `/libPACKAGE.a' stripped off
- o the PATH directory, trailing `/lib/libPACKAGE.a' stripped off
- o the PATH directory, trailing `/lib/libPACKAGE.a' stripped off and
-   `/include' added
+  --with-png[=PATH]
 
- Here are some more examples:
+    Dto. for the png library. This option is on by default.
 
- o the gd and png libraries are in /usr/local/gnu/lib, which is
-   automatically searched by gcc.  The corresponding header files are
-   in /usr/local/gnu/include, which is not in gcc's include search path.
-   Solution:
+  --with-pdf[=PATH]
 
-   $ ./configure --with-gd=/usr/local/gnu
+    Dto. for the pdf library. This option is on by default.
 
- o the gd and png libraries are in /opt/gnu/lib, the header files are
-   in /opt/gnu/include.  Solution:
- 
-   $ ./configure --with-gd=/opt/gnu
+  --with-plot[=PATH]
 
- o the gd and png libraries and headers are all in different directories,
-   none of which is in the compilers search path:
-
-   $ ./configure --with-gd=/tmp/gd --with-png=/tmp/libpng
-
- o the gd and png libraries are in /usr/local/gnu, the GNU plotutils
-   stuff is in /opt/plotutils
-
-   $ ./configure --with-gd=/usr/local/gnu --with-plot=/opt/plotutils
+    If used without the PATH argument, this option selects the standard
+    UNIX plot library, if available. If used with the PATH argument,
+    configure looks for the plot library from GNU plotutils version 2.2
+    or better. The option is off by default.
 
 Platform problems and testing
 *****************************
@@ -591,12 +540,12 @@ should work, though).
 
   (Bourne shell syntax)
 
-  $ cd gnuplot-3.7
+  $ cd gnuplot-4.0
   $ CC='cc -B/full/path/to/unproto/dir/ -tp' ./configure <options>
 
   or (C shell syntax)
 
-  $ cd gnuplot-3.7
+  $ cd gnuplot-4.0
   $ env CC='cc -B/full/path/to/unproto/dir/ -tp' ./configure <options>
 
   The required compiler options shown here are for System V.2.  For other
@@ -609,12 +558,9 @@ How to test gnuplot
 ===================
 
    No comprehensive test suite for gnuplot's features has been written
-to date. It is probaly impossible to write such a test suite, because
-it would need to cover all possible variations allwed by gnuplot's
-command language, or a significant subset thereof.
-However, the supplied demo files provide a good method of testing commonly
-used features. All command line examples below assume Unix Bourne shell
-syntax.
+to date. However, the supplied demo files provide a good method of
+testing commonly used features. All command line examples below assume
+Unix Bourne shell syntax.
 
    The demo files can be run interactively by eg.
 
@@ -647,9 +593,9 @@ the 'test' command:
 $ gnuplot
 
         G N U P L O T
-        Unix version 3.7
+        Unix version 4.0
         patchlevel 0
-        last modified Tue Jan 12 13:48:06 BST 1999
+        last modified Mon Jan 21 21:21:20 GMT 2002
 
         Copyright(C) 1986 - 1993, 1998
         Thomas Williams, Colin Kelley and many others
@@ -662,3 +608,19 @@ gnuplot> test
 
    `test` creates a display of line and point styles and other useful things
 appropriate for the terminal you are using.
+
+Front Ends for gnuplot
+======================
+
+ o Xgfe by David Ishee <dmishee@jasper.he.net>, available from
+   http://von-mises.home.ml.org/xgfe/xgfe.html
+   To compile from source, you need Qt library from
+   http://www.troll.no/.
+
+ o Bruce Ravel <ravel@phys.washington.edu> has written a new version of
+   gnuplot-mode for GNU emacs and XEmacs. This version is based on
+   the gnuplot.el file by Gershon Elber which is included with this
+   distribution. The package is available from
+   http://feff.phys.washington.edu/~ravel/gnuplot/.
+   From gnuplot 4.0 on, this package is included in the distribution.
+
