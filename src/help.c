@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: help.c,v 1.29 1998/04/14 00:15:36 drd Exp $"); }
+static char *RCSid() { return RCSid("$Id: help.c,v 1.3 1999/06/09 12:13:29 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - help.c */
@@ -641,11 +641,6 @@ void StartOutput()
     pagelines = 0;
 }
 
-#if defined(ATARI) || defined(MTOS)
-# ifndef READLINE
-#  error cannot compile atari versions without -DREADLINE
-# endif
-#endif
 
 /* write a line of help output  */
 /* line should contain only one \n, at the end */

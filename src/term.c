@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.104 1998/06/18 14:55:19 ddenholm Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.5 1999/06/09 12:13:32 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -149,7 +149,7 @@ void fflush_binary();
 #  ifdef _O_BINARY
 #   define O_BINARY _O_BINARY
 #  else
-#   error O_BINARY still undefined!
+#   define O_BINARY O_BINARY_is_not_defined
 #  endif
 # endif
 #endif

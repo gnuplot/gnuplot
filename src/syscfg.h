@@ -1,5 +1,5 @@
 /*
- * $Id: $
+ * $Id: syscfg.h,v 1.3 1999/05/20 18:42:04 lhecking Exp $
  *
  */
 
@@ -113,8 +113,10 @@
 # define OS "Linux "
 #endif /* Linux */
 
-#if defined(__NeXT__) && !defined(NEXT)
-# define NEXT
+#if defined(__NeXT__) || defined(NEXT)
+# ifndef NEXT
+#  define NEXT
+# endif
 #endif /* NeXT */
 
 #ifdef OS2
@@ -144,7 +146,8 @@
 #  define HELPFILE "GNUPLOT$HELP"
 # endif
 # if !defined(VAXCRTL) && !defined(DECCRTL)
-#  error Please /define either VAXCRTL or DECCRTL
+#  define VAXCRTL VAXCRTL_AND_DECCRTL_UNDEFINED
+#  define DECCRTL VAXCRTL_AND_DECCRTL_UNDEFINED
 # endif
 /* avoid some IMPLICITFUNC warnings */
 # ifdef __DECC

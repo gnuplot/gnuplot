@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.68 1998/06/22 12:24:54 ddenholm Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.11 1999/06/09 12:10:22 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -95,7 +95,8 @@ char y2format[MAX_ID_LEN+1] = DEF_FORMAT;
  * - never saved or shown ...
  */
 #if AXIS_ARRAY_SIZE != 10
-# error error in initialiser for format_is_numeric
+/* # error error in initialiser for format_is_numeric */
+# define AXIS_ARRAY_SIZE  AXIS_ARRAY_SIZE_not_defined
 #endif
 
 int format_is_numeric[AXIS_ARRAY_SIZE] = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
