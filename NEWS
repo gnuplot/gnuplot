@@ -1,3 +1,26 @@
+Changes in release 3.7.1:
+* Updated makefiles and autoconf files
+* Updated documentation and FAQ
+* Added Windows stdin wrapper
+* Improved configure options for GNU readline
+* Security: the Linux SVGAlib driver is now disabled by default
+* Support for GNU plotutils 2.2
+* Bug fix for negative aspect ratio
+* Bug fixes in the cgm, eepic, png, and pslatex drivers
+* Bug fix in the data fitting code (store value of last parameter)
+* Bug fixes for HP-UX, NEXT, and Windows
+* Bug fixes for save and set lmargin commands
+* Bug fix for 'set view <z_scale>' (compressed z-axis) problem
+* Bug fix for surface plots and bnegative ticslevel
+* Bug fix for multiline labels
+* Bug fix for multiplot and eps output
+* Better makefile for Amiga SAS/c
+* Bug fixed with exit/quit in batch mode
+* Buffering bug in X11 driver fixed
+* Embedding document font is now default font in latex output
+* Y2K: "%y" date format interpretation is now in line with
+  Open Group recommendations
+
 What's new in 3.7 ?
 
 from 315 to 348
