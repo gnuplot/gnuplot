@@ -1,5 +1,5 @@
 /*
- * $Id: plot.h,v 1.24 1999/10/29 18:52:01 lhecking Exp $
+ * $Id: plot.h,v 1.25 1999/11/08 19:24:16 lhecking Exp $
  *
  */
 
@@ -74,8 +74,14 @@
 # define TRUE 1
 # define FALSE 0
 #endif
+
+#ifndef __cplusplus
+#undef bool
+typedef unsigned int bool;
+#endif
+
 /* TRUE or FALSE */
-typedef int TBOOLEAN;
+#define TBOOLEAN bool
 
 /* double true, used in autoscale: 1=autoscale ?min, 2=autoscale ?max */
 #define DTRUE 3
@@ -544,7 +550,7 @@ struct lp_style_type {          /* contains all Line and Point properties */
 
 
 struct curve_points {
-	struct curve_points *next_cp;	/* pointer to next plot in linked list */
+	struct curve_points *next;	/* pointer to next plot in linked list */
 	int token;    /* last token in re/plot line, for second pass */
 	enum PLOT_TYPE plot_type;
 	enum PLOT_STYLE plot_style;
@@ -628,7 +634,7 @@ struct TERMENTRY {
 	int (*text_angle) __PROTO((int));
 	int (*justify_text) __PROTO((enum JUSTIFY));
 	void (*point) __PROTO((unsigned int, unsigned int,int));
-	void (*arrow) __PROTO((unsigned int, unsigned int, unsigned int, unsigned int, int));
+	void (*arrow) __PROTO((unsigned int, unsigned int, unsigned int, unsigned int, TBOOLEAN));
 	int (*set_font) __PROTO((const char *font));
 	void (*pointsize) __PROTO((double)); /* change pointsize */
 	int flags;
