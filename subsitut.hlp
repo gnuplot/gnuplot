@@ -1,0 +1,22 @@
+Command-line substitution is specified by a system command enclosed in
+backquotes (`).  This command is spawned and the output it produces
+replaces the name of the command (and backquotes) on the command line.
+
+Newlines in the output produced by the spawned command are replaced with
+blanks.
+
+Command-line substitution can be used anywhere on the GNUPLOT command
+line. 
+
+
+Example:
+
+This will run the program 'leastsq' and substitute `leastsq` on the
+command line with its output:
+
+ f(x) = `leastsq`
+
+or, in VMS
+
+ f(x) = `run leastsq`
+

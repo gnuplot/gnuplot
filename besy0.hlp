@@ -1,0 +1,3 @@
+This function returns the y0th Bessel function of its argument.
+'besy0' expects its argument to be in radians.
+

@@ -1,0 +1,11 @@
+The sampling rate of functions may be changed by the 'set samples'
+command.  By default, sampling is set to 160 points.  A higher
+sampling rate will produce more accurate plots, but will take
+longer.  In generating plots, GNUPLOT will use either the sampling
+rate set or the resolution of the current output device, whichever
+is lower. 
+
+Syntax:
+        set samples <expression>
+        show samples
+

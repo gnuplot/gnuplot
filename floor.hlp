@@ -1,0 +1,4 @@
+This function returns the smallest integer not greater than its
+argument.  For complex numbers, 'floor' returns the smallest
+integer not greater than the real part of its argument. 
+

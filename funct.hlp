@@ -1,0 +1,5 @@
+The functions in GNUPLOT are the same as the corresponding functions
+in the UNIX math library, except that all functions accept integer,
+real, and complex arguments, unless otherwise noted.  The sgn()
+function is also supported, as in BASIC. 
+

@@ -1,0 +1,4 @@
+This function returns the largest integer not less than its
+argument.  For complex numbers, 'ceil' returns the largest integer
+not less than the real part of its argument. 
+

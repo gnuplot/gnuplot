@@ -1,0 +1,8 @@
+GNUPLOT will not plot a point if its imaginary part is greater in
+magnitude than the 'zero' threshold.  The default 'zero' value is
+1e-8. 
+
+Syntax:
+        set zero <expression>
+        show zero
+

@@ -1,0 +1,3 @@
+This function returns the hyperbolic sine of its argument.  'sinh'
+expects its argument to be in radians. 
+

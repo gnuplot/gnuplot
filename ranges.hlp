@@ -1,0 +1,39 @@
+This option specifies the region of the plot which will be displayed. 
+
+Ranges may be provided on the 'plot' command line as synonyms for
+the 'set xrange' and 'set yrange' commands.
+
+Syntax:
+        [{dummy-var =} {xmin : xmax}] { [{ymin : ymax}] }
+
+Where dummy-var is the independent variable (the default is 'x',
+but this may be changed with the 'set dummy' command) and the min
+and max terms can be expressions or constants. 
+
+Both the min and max terms are optional.  The ':' is also optional
+if neither a min nor a max term is specified.  This allows '[]' to
+be used as a null range specification. 
+
+Specifying a Y range turns autoscaling OFF.
+
+
+Examples:
+
+This uses current ranges:
+        plot cos(x)
+
+This sets the xrange only:
+        plot [-10:30] sin(pi*x)/(pi*x)
+
+This is the same, but uses t as the dummy-variable:
+        plot [t = -10 :30]  sin(pi*t)/(pi*t)
+
+This sets both the x and yranges:
+        plot [-pi:pi] [-3:3]  tan(x), 1/x
+
+This sets only the yrange:
+        plot [] [-2:sin(5)*-8] sin(x)**besj0(x)
+
+This sets xmax and ymin only:
+        plot [:200] [-pi:]  exp(sin(x))
+

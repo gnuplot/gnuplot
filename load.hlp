@@ -1,0 +1,19 @@
+This command executes each line of the specified input file as if it
+had been typed in interactively.  Files created by the 'save' command
+can later be 'load'ed.  Any text file containing valid commands can be
+created and then executed by the 'load' command.  Files being 'load'ed
+may themselves contain 'load' commands.  Lines beginning with # (or !
+if using VMS) will be treated as comments and ignored.
+
+The 'load' command must be the last command on the line. 
+        
+Syntax:
+        load <input-file>
+
+The name of the input file must be enclosed in quotes.
+
+Examples:
+
+        load 'work.gnu'
+        load "func.dat"
+

@@ -1,0 +1,30 @@
+The following is a list of all the binary operators and their
+usages:
+
+ Symbol 	Example 	 Explanation
+  **     	 a**b    	  exponentiation
+  *      	 a*b     	  multiplication
+  /      	 a/b     	  division
+  %      	 a%b     	* modulo
+  +      	 a+b     	  addition
+  -      	 a-b     	  subtraction
+  ==     	 a==b    	  equality
+  !=     	 a!=b    	  inequality
+  &      	 a&b     	* bitwise and
+  ^      	 a^b     	* bitwise exclusive or
+  |      	 a|b     	* bitwise inclusive or
+  &&     	 a&&b    	* logical and
+  ||     	 a||b    	* logical or
+  ?:     	 a?b:c   	* ternary operation
+
+(*) Starred explanations indicate that the operator requires
+integer arguments.
+
+Logical AND (&&) and OR (||) short-circuit the way they do in C.
+That is, the second && operand is not evaluated if the first is
+false; the second || operand is not evaluated if the first is true.
+
+The ternary operator evaluates its first argument (a).  If it is
+true (non-zero) the second argument (b) is evaluated and returned,
+otherwise the third argument (c) is evaluated and returned. 
+

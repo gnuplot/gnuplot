@@ -1,0 +1,3 @@
+This function returns the tangent of its argument.  'tan' expects
+its argument to be in radians. 
+

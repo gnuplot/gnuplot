@@ -1,0 +1,4 @@
+This command erases the current screen or output device as specified
+by 'set output'.  This usually generates a formfeed on hardcopy
+devices.  Use 'set terminal' to set the device type. 
+

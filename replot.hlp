@@ -1,0 +1,4 @@
+'replot' repeats the last 'plot' command.  This can be useful for
+viewing a plot with different 'set' options, or when generating the
+same plot for several devices.
+

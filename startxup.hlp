@@ -1,0 +1,12 @@
+When GNUPLOT is run, it looks for an initialization file to load. 
+This file is called '.gnuplot' on Unix systems, and 'GNUPLOT.INI' on
+other systems.  If this file is not found in the current directory,
+the program will look for it in your home directory (under MS-DOS, the
+environment variable GNUPLOT should contain the name of this
+directory). 
+
+If this file is found, GNUPLOT executes the commands in this file.
+This is most useful for setting your terminal type and defining any
+functions or variables which you use often.  The variable 'pi' is
+already defined for you. 
+

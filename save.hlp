@@ -1,0 +1,20 @@
+This command saves either user-defined functions, variables, or both
+to the specified file. 
+
+Syntax:
+        save  {option} <filename>
+
+Where <option> is either 'functions' or 'variables'.  If no option is
+used GNUPLOT saves both functions and variables. 
+
+'save'd files are written in text format and may be read by the 'load'
+command.
+
+The filename must be enclosed in quotes.
+
+Examples:
+
+        save "work.gnu"
+        save functions 'func.dat'
+        save var 'var.dat'
+

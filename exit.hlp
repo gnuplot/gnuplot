@@ -1,0 +1,4 @@
+'exit', 'quit' and your computer's END-OF-FILE character will exit
+GNUPLOT.  All these commands will clear the output device (as the
+'clear' command does) before exiting. 
+

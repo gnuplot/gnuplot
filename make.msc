@@ -1,0 +1,55 @@
+OBJS = 	command.obj eval.obj graphics.obj internal.obj misc.obj parse.obj plot.obj scanner.obj standard.obj term.obj util.obj version.obj pcgraph.asm corgraph.asm hrcgraph.asm
+
+# /AC means use compact model (small code, large data)
+CFLAGS = /AC /DPC #/Zi #/Od
+
+TERMFLAGS = /DHERCULES /DATT6300 /DCORONA /DPOSTSCRIPT /DHP75 /DTEK /DV384 /DEGALIB
+
+LINKFLAGS = #/codeview
+
+# default rules
+.c.obj:
+	msc $(CFLAGS) $*;
+
+.asm.obj:
+	masm $*;
+
+pcgraph.obj: pcgraph.asm header.mac lineproc.mac
+
+corgraph.obj: corgraph.asm header.mac lineproc.mac
+
+hrcgraph.obj: hrcgraph.asm header.mac lineproc.mac
+
+command.obj: command.c plot.h
+
+eval.obj: eval.c plot.h
+
+graphics.obj: graphics.c plot.h
+
+internal.obj: internal.c plot.h
+
+misc.obj: misc.c plot.h
+
+parse.obj: parse.c plot.h
+
+plot.obj: plot.c plot.h
+
+scanner.obj: scanner.c plot.h
+
+standard.obj: standard.c plot.h
+
+term.obj: term.c plot.h
+	msc $(CFLAGS) $(TERMFLAGS) term;
+
+util.obj: util.c plot.h
+
+version.obj: version.c
+
+
+# use link.opt to avoid command-line overflow
+
+gnuplot.exe: $(OBJS)
+ link$(LINKFLAGS) @link.opt
+ exepack gnuplot.exe gnupack.exe
+ del gnuplot.exe
+ ren gnupack.exe gnuplot.exe

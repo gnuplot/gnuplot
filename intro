@@ -1,0 +1,13 @@
+.B
+.ce
+INTRODUCTION
+.R
+GNUPLOT is a command-driven interactive function plotting program.
+It is case sensitive (commands and function names written in lowercase
+are not the same as those written in CAPS).  All command names may be
+abbreviated, as long as the abbreviation is not ambiguous.  Any number
+of commands may appear on line, separated by semicolons (;).
+.sp
+The following sections provide brief descriptions of each of the program
+commands.
+.sp 2 
