@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.49 2002/02/02 12:03:31 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.50 2002/04/05 17:15:51 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -810,8 +810,8 @@ print_table(current_plot, plot_num)
 
 	    /* FIXME HBB 20020405: had better use the real x/x2 axes
                of this plot */
-	    OUTPUT_NUMBER(x, FIRST_X_AXIS);
-	    OUTPUT_NUMBER(y, FIRST_Y_AXIS);
+	    OUTPUT_NUMBER(x, current_plot->x_axis);
+	    OUTPUT_NUMBER(y, current_plot->y_axis);
 
 	    switch (current_plot->plot_style) {
 	    case BOXES:
@@ -819,26 +819,26 @@ print_table(current_plot, plot_num)
 	    case FILLEDBOXES:
 #endif /* USE_ULIG_FILLEDBOXES */
 	    case XERRORBARS:
-		OUTPUT_NUMBER(xlow, FIRST_X_AXIS);
-		OUTPUT_NUMBER(xhigh, FIRST_X_AXIS);
+		OUTPUT_NUMBER(xlow, current_plot->x_axis);
+		OUTPUT_NUMBER(xhigh, current_plot->x_axis);
 		/* Hmmm... shouldn't this write out width field of box
 		 * plots, too, if stored? */
 		break;
 	    case BOXXYERROR:
 	    case XYERRORBARS:
-		OUTPUT_NUMBER(xlow, FIRST_X_AXIS);
-		OUTPUT_NUMBER(xhigh, FIRST_X_AXIS);
+		OUTPUT_NUMBER(xlow, current_plot->x_axis);
+		OUTPUT_NUMBER(xhigh, current_plot->x_axis);
 		/* FALLTHROUGH */
 	    case BOXERROR:
 	    case YERRORBARS:
-		OUTPUT_NUMBER(ylow, FIRST_Y_AXIS);
-		OUTPUT_NUMBER(yhigh, FIRST_Y_AXIS);
+		OUTPUT_NUMBER(ylow, current_plot->y_axis);
+		OUTPUT_NUMBER(yhigh, current_plot->y_axis);
 		break;
 	    case FINANCEBARS:
 	    case CANDLESTICKS:
-		OUTPUT_NUMBER(ylow, FIRST_Y_AXIS);
-		OUTPUT_NUMBER(yhigh, FIRST_Y_AXIS);
-		OUTPUT_NUMBER(z, FIRST_Y_AXIS);
+		OUTPUT_NUMBER(ylow, current_plot->y_axis);
+		OUTPUT_NUMBER(yhigh, current_plot->y_axis);
+		OUTPUT_NUMBER(z, current_plot->y_axis);
 	    default:
 		/* ? */
 		break;
