@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: term.c,v 1.19.2.1 1999/08/19 14:35:57 lhecking Exp $";
+static char *RCSid = "$Id: term.c,v 1.19.2.2 1999/09/14 19:20:05 lhecking Exp $";
 #endif
 
 /* GNUPLOT - term.c */
@@ -818,6 +818,13 @@ struct termentry term_tbl[] =
 };
 
 #define TERMCOUNT (sizeof(term_tbl)/sizeof(struct termentry))
+
+/* mainly useful for external code */
+GP_INLINE int
+term_count()
+{
+    return TERMCOUNT;
+}
 
 void list_terms()
 {
