@@ -46,4 +46,4 @@ set title ""
 set xlabel ""
 set nohidden3d
 set auto
-set nopara
+set noparametric

@@ -1,5 +1,5 @@
 #
-# $Id: surface2.dem,v 1.2.2.1 1999/08/19 14:34:41 lhecking Exp $
+# $Id: surface2.dem,v 1.2.2.2 1999/10/11 13:23:53 lhecking Exp $
 #
 set parametric
 set isosamples 50,10
@@ -77,8 +77,4 @@ set isosamples 50,20
 splot cos(u)+.5*cos(u)*cos(v),sin(u)+.5*sin(u)*cos(v),.5*sin(v) with lines, \
       1+cos(u)+.5*cos(u)*cos(v),.5*sin(v),sin(u)+.5*sin(u)*cos(v) with lines
 pause -1 "Hit return to continue (9)"
-
-#
-# Clean up:
-#
 reset

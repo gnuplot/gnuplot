@@ -1,5 +1,5 @@
 #
-# $Id: world.dem,v 1.1.1.1.2.1 1999/08/19 14:33:56 lhecking Exp $
+# $Id: world.dem,v 1.1.1.1.2.2 1999/08/19 14:34:27 lhecking Exp $
 #
 #
 set title "Gnuplot Correspondences"
@@ -23,7 +23,7 @@ pause -1 "Hit return to continue"
 set angles degrees
 set title "3D version using spherical coordinate system"
 set ticslevel 0
-set view 70,40,0.8,1.2	# HBB: ,,2.0
+set view 70,40,0.8,1.2
 set mapping spherical
 set parametric
 set samples 32
@@ -33,11 +33,12 @@ set vrange [0:360]
 splot cos(u)*cos(v),cos(u)*sin(v),sin(u) with lines 5 6,\
 'world.dat' with lines 3 4, 'world.cor' with points 1 2
 pause -1 "Hit return to continue"
+
 #
 # plot a '3D version using cylindrical coordinate system' of the world.
 set title "3D version using cylindrical coordinate system"
 set ticslevel 0.0
-set view 70,40,0.8,1.2	#HBB: ,,2.0
+set view 70,40,0.8,1.2
 set mapping cylindrical
 set parametric
 set samples 32
@@ -47,9 +48,4 @@ set vrange [-90:90]
 splot cos(u),sin(u),v with lines 5 6,\
 'world.dat' with lines 3 4, 'world.cor' with points 1 2
 pause -1 "Hit return to continue"
-
-
-#
-# Clean up:
-#
 reset

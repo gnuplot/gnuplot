@@ -1,5 +1,5 @@
 #
-# $Id: prob2.dem,v 1.1.1.1.2.1 1999/10/11 13:24:36 lhecking Exp $
+# $Id: prob2.dem,v 1.1.1.1.2.2 2001/09/18 11:48:47 lhecking Exp $
 #
 # Demo Statistical Approximations version 1.1
 #
@@ -14,6 +14,7 @@ pause  0 ""
 pause  0 "                        Statistical Approximations, version 1.1"
 pause  0 ""
 pause  0 "        Copyright (c) 1991, 1992, Jos van de Woude, jvdwoude@hut.nl"
+pause  0 ""
 pause  0 ""
 pause  0 ""
 pause  0 ""
@@ -350,4 +351,3 @@ set label "mu" at mu + 1, ymax / 10
 set label "sigma" at mu + 1 + sigma, normal(mu + sigma)
 plot poisson(x), normal(x - 0.5)
 reset
-

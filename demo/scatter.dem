@@ -1,8 +1,8 @@
 #
-# Simple demo to scatter data conversion to grid data.
+# Simple demo of scatter data conversion to grid data.
 #
 
-set title "Simple demo to scatter data conversion to grid data"
+set title "Simple demo of scatter data conversion to grid data"
 set nohidden3d
 set ticslevel 0.5
 set view 60,30
@@ -56,4 +56,3 @@ set data style lines
 splot "scatter2.dat"
 pause -1 "Hit return to continue (8)"
 reset
-

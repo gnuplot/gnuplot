@@ -1,5 +1,5 @@
 #
-# $Id: using.dem,v 1.2 1998/12/02 18:36:13 lhecking Exp $
+# $Id: using.dem,v 1.2.2.1 1999/10/11 13:23:35 lhecking Exp $
 #
 # Requires data file "using.dat" from this directory,
 # so change current working directory to this directory before running.
@@ -23,4 +23,3 @@ plot 'using.dat' using 3:4 title "Logged in" with impulses,\
 set nolabel
 pause -1 "Hit return to continue"
 reset
-

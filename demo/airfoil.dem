@@ -1,5 +1,5 @@
 #
-# $Id: airfoil.dem,v 1.1.1.1 1998/04/15 19:16:40 lhecking Exp $
+# $Id: airfoil.dem,v 1.1.1.1.2.1 1999/10/11 13:17:35 lhecking Exp $
 #
 # This demo shows how to use bezier splines to define NACA four
 # series airfoils and complex variables to define Joukowski
@@ -121,7 +121,7 @@ airfoil_y2(t, thick) = mean_y(z_x(t)) - z_y(t, thick)
 airfoil_y(t) = mean_y(z_x(t))
 airfoil_x(t) = mean_x(z_x(t))
 set nogrid
-set nozero
+set nozeroaxis
 set parametric
 set xrange [-0.1:1.1]
 set yrange [-0.1:.7]

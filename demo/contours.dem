@@ -1,5 +1,5 @@
 #
-# $Id: contours.dem,v 1.2.2.2 2000/07/24 13:31:30 broeker Exp $
+# $Id: contours.dem,v 1.2.2.3 2001/03/03 17:31:30 lhecking Exp $
 #
 set samples 20
 set isosamples 21
@@ -44,7 +44,7 @@ splot x*y / (x**2 + y**2 + 0.1)
 pause -1 "Hit return to continue (9)"
 splot [x=-3:3] [y=-3:3] sin(x) * cos(y)
 pause -1 "Hit return to continue (10)"
-set zrange [-0.5:0.5]
+set zrange [-1.0:1.0]
 replot
 pause -1 "Hit return to continue (11)"
 set samples 6
@@ -82,7 +82,7 @@ set cntrparam levels 10
 set xrange [0:15]
 set yrange [0:15]
 set auto
-set zrange [-0.6:0.6]
+set zrange [-1.0:1.0]
 set data style lines
 set title "3D gnuplot demo - contour of data grid plotting"
 set parametric
