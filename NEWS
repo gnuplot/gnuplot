@@ -10,6 +10,7 @@ Changes in release 3.7.1:
 * Support for GNU plotutils 2.2
 * Improved tkcanvas driver (extend interactive capabilities, integrated
   perltk driver)
+* Fixed compiling on IRIX 6.5, LynxOS 3.0.1
 * Bug fix for negative aspect ratio
 * Bug fixes in the cgm, eepic, png, and pslatex drivers
 * Bug fix in the data fitting code (store value of last parameter)
