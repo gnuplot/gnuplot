@@ -1,5 +1,5 @@
 #
-# $Id: makefile.nt,v 1.6 2002/02/27 17:05:53 broeker Exp $
+# $Id: makefile.nt,v 1.7 2002/03/02 14:10:24 mikulik Exp $
 #
 # GNUPLOT Makefile Microsoft Visual C++ and nmake on WinNT and Win95/98/..
 
@@ -173,6 +173,7 @@ dbinary.obj: binary.c
 
 # clean up temporary files
 clean:
+	del config.h
 	del *.obj
 	del *.ico
 	del wgnuplot.res

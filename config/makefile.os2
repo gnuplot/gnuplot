@@ -1,5 +1,5 @@
 #
-# $Id: makefile.os2,v 1.26 2002/02/19 12:36:58 amai Exp $
+# $Id: makefile.os2,v 1.27 2002/03/02 14:10:24 mikulik Exp $
 #
 # GNUPLOT Makefile for use on OS/2 2.x and above using emx 0.9 (and above)
 # and GNU Make
@@ -378,6 +378,7 @@ $(M)bf_test.exe : bf_test.c binary.$(O3) alloc.$(O3)
 
 # Clean up all files temporary used
 clean:
+	IF EXIST config.h                  DEL config.h
 	IF EXIST *.$(O)                    DEL *.$(O)
 	IF EXIST *.$(O2)                   DEL *.$(O2)
 	IF EXIST *.$(O3)                   DEL *.$(O3)
