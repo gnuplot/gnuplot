@@ -1,3 +1,25 @@
+1999-08-24  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* src/gpltconv.c: Rewrite to allow more general approach for string
+	replacement.
+
+	* src/plot.c: Fix off-by-one error in tilde expansion code.
+
+	* src/plot.h, src/show.c, src/version.c: Add new variable const
+	char *more_info[].
+
+	* src/set.c, src/setshow.h: Static prototype for set_lp_properties()
+	now in set.c.
+
+	* src/term.c: Include tables.h.
+
+	* term/ai.trm, term/amiga.trm, term/be.trm, term/cgm.trm,
+	term/corel.trm, term/djsvga.trm, term/dumb.trm, term/epson.trm,
+	term/fig.trm, term/fig.trm, term/gnugraph.trm, term/imagen.trm,
+	term/latex.trm, term/metapost.trm, term/mif.trm, term/next.trm,
+	term/openstep.trm, term/openstep.trm term/png.trm, term/post.trm,
+	term/pslatex.trm, term/tkcanvas.trm, term/win.trm, term/x11.trm.
+
 1999-08-20  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* configure.in: Change check for plotcompat.h in configuration report.
@@ -1219,7 +1241,7 @@
 
 	* src/term.c: Patched to set stdout to binary on DOS/Windows
 	platforms. I had to resolve a conflict between term/object.h and
-	POSIX header <fcntl.h>: both #define O_TEXT, for different purposes.
+	header <fcntl.h>: both #define O_TEXT, for different purposes.
 
 	* win/pgnuplot.c: Fixed for binary file output to stdout.
 
