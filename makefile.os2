@@ -1,10 +1,10 @@
 #
 # $Id: makefile.os2,v 1.27 1998/04/14 00:15:54 drd Exp $
 #
-# Makefile for use with emx 0.9 (and above) and GNUMake
+# Makefile for use with emx (and above) and GNUMake
 #   on OS/2 3.0 and above (might also work for OS/2 2.x)
 #
-# last modification date: 19981107
+# last modification date: 19981205
 #
 
 # We depend on using cmd.exe (or a compatible one)
@@ -30,7 +30,7 @@ PNG=1
 
 # VESAkit support
 # requires SVGA- and VESA Kit (not part of gnuplot)
-# VESA=1
+VESA=1
 
 # GNU_ReadLine support
 # requires GNU readline library (static or DLL; not part of gnuplot)
@@ -100,7 +100,7 @@ HELPFILE = gnuplot.gih
 # 3 sets of variables are defined and used to create
 #  (1): gnuplot.exe
 #   2 : gnupmdrv.exe (the PM-driver executable)
-#   3 : utilities like doc2*.exe, bf_test, ...
+#   3 : utilities like doc2*.exe, bf_test.exe, ...
 #
 CC  = gcc
 CC2 = gcc
@@ -278,7 +278,7 @@ $(DOCDIR)\gnuplot.ipf:  $(DOCDIR)\gnuplot.doc doc2ipf.exe
 # in various formats
 #
 doc2gih.exe doc2ipf.exe doc2html.exe doc2info.exe doc2tex.exe doc2rtf.exe: \
-            $(DOCDIR)\termdoc.c $(DOCDIR)\xref.c term.h
+            $(DOCDIR)\termdoc.c $(DOCDIR)\xref.c $(DOCDIR)\allterm.h
 #
 # To include all terminal documentations in the documentation
 # uncomment the following 2 lines
