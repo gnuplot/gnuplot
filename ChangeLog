@@ -1,5 +1,13 @@
 2003-11-13  Petr Mikulik  <mikulik@physics.muni.cz>
 
+	* NEWS src/show.c docs/gnuplot.doc: Options {float | int} for 'show
+	palette palette <n>', and let the output go to that of 'set print'.
+
+	* src/command.h src/command.c: Let variables print_out and
+	print_out_name be global instead of static.
+
+2003-11-13  Petr Mikulik  <mikulik@physics.muni.cz>
+
 	* src/axis.h src/axis.c src/plot3d.c: Renamed set_pm3d_zminmax() to
 	set_cbminmax().
 

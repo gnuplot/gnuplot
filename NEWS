@@ -48,6 +48,9 @@ and the example script demo/mousevariables.dem.
 
 =============================================================================
 
+[3.8k]
+* NEW 'set palette palette <n>' options {float|int} and output to that of
+  'set print'
 
 [3.8j]
 * NEW 'show palette fit2rgbformulae'

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.113 2003/08/20 17:48:45 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.114 2003/11/13 08:18:16 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -2001,16 +2001,29 @@ show_palette_palette()
     double gray, r, g, b;
     rgb_color rgb1;
     rgb255_color rgb255;
+    int how = 0; /* How to print table: 0: default large; 1: rgb 0..1; 2: integers 0..255 */
+    FILE *f;
 
     c_token++;
     if (END_OF_COMMAND)
 	int_error(c_token,"palette size required");
     colors = (int) real(const_express(&a));
-    if (colors<2) colors = 100;
-    if (sm_palette.colorMode == SMPAL_COLOR_MODE_GRAY)
-	fprintf(stderr, "Gray palette with %i discrete colors\n", colors);
+    if (colors<2) colors = 128;
+    if (!END_OF_COMMAND) {
+	if (almost_equals(c_token, "f$loat")) /* option: print r,g,b floats 0..1 values */
+	    how = 1;
+	else if (almost_equals(c_token, "i$nt")) /* option: print only integer 0..255 values */
+	    how = 2;
     else
-	fprintf(stderr, "Color palette with %i discrete colors\n", colors );
+	    int_error(c_token, "expecting no option or int or float");
+	c_token++;
+    }
+
+    f = (print_out) ? print_out : stderr;
+    fprintf(stderr, "%s palette with %i discrete colors", 
+	    (sm_palette.colorMode == SMPAL_COLOR_MODE_GRAY) ? "Gray" : "Color", colors);
+    if (print_out) fprintf(stderr," saved to \"%s\".", print_out_name);
+	else fprintf(stderr, ".\n");
 
     for (i = 0; i < colors; i++) {
 	/* colours equidistantly from [0,1]  */
@@ -2021,12 +2034,22 @@ show_palette_palette()
 	rgb1_from_gray(gray, &rgb1);
 	rgb255_from_rgb1(rgb1, &rgb255);
 
-	fprintf( stderr, 
+	switch (how) {
+	    case 1:
+		fprintf(f, "%0.4f\t%0.4f\t%0.4f\n", rgb1.r, rgb1.g, rgb1.b);
+		break;
+	    case 2:
+		fprintf(f, "%i\t%i\t%i\n", 
+			(int)rgb255.r, (int)rgb255.g, (int)rgb255.b);
+		break;
+	    default:
+		fprintf(f,
 		"%3i. gray=%0.4f, (r,g,b)=(%0.4f,%0.4f,%0.4f), #%02x%02x%02x = %3i %3i %3i\n",
 		i, gray, rgb1.r, rgb1.g, rgb1.b,
 		(int)rgb255.r, (int)rgb255.g, (int)rgb255.b,
 		(int)rgb255.r, (int)rgb255.g, (int)rgb255.b );
     }
+}
 }
 
 

@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.186 2003/08/22 12:36:17 lhecking Exp $
+C RCS $Id: gnuplot.doc,v 1.187 2003/10/21 10:07:39 mikulik Exp $
 C 18 September 2001
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001   Thomas Williams, Colin Kelley et al.
 C
@@ -6069,19 +6069,27 @@ C ... and restart the table:
                   { gamma <gamma> }
                 }
        show palette
-       show palette palette <n>
+       show palette palette <n> {{float | int}}
        show palette gradient
        show palette fit2rgbformulae
        show palette rgbformulae
        show palette colornames
 
  `set palette` (i.e. without options) sets up the default values.
- Otherwise, the options can be given in any order. `show palette` shows the
- current palette properties. `show palette palette <n>` shows RGB triplets for
- the current settings and a palette having <n> discrete colors.  `show palette
- gradient` displays the gradient defining the palette (if appropriate).  `show
- palette rgbformulae` prints the available fixed gray --> color transformation
- formulas.  `show palette colornames` prints the implemented color names.
+ Otherwise, the options can be given in any order.
+ `show palette` shows the current palette properties.
+
+ `show palette gradient` displays the gradient defining the palette (if
+ appropriate).  `show palette rgbformulae` prints the available fixed gray -->
+ color transformation formulae.  `show palette colornames` prints the
+ implemented color names.
+
+ `show palette palette <n>` prints to screen or to the file given by
+ `set output` table of RGB triplets calculated for the current palette settings
+ and a palette having <n> discrete colors.  The default wide table can be
+ limited to 3 columns of r,g,b float values [0..1] or integer values [0..255]
+ by options float or int, respectively.  This way, the current gnuplot color
+ palette can be loaded into other imaging applications, for example Octave.
 
  The following options determine the coloring properties.
 

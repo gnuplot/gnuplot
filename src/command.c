@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.76 2003/07/27 22:28:36 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.77 2003/10/21 10:07:39 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -163,6 +163,10 @@ TBOOLEAN paused_for_mouse = FALSE;
 
 /* If last plot was a 3d one. */
 TBOOLEAN is_3d_plot = FALSE;
+
+/* output file for the print command */
+FILE *print_out = NULL;
+char *print_out_name = NULL;
 
 /* input data, parsing variables */
 #ifdef AMIGA_SC_6_1
@@ -1005,8 +1009,6 @@ plot_command()
     SET_CURSOR_ARROW;
 }
 
-static FILE *print_out = NULL;
-static char *print_out_name = NULL;
 
 void 
 print_set_output(name, append_p)
