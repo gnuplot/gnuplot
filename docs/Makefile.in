@@ -258,29 +258,29 @@ realclean: distclean
 
 TERM_H = $(srcdir)/../term.h
 
-checkdoc.o: checkdoc.c $(srcdir)/../config.h $(srcdir)/../ansichek.h \
+checkdoc.o: checkdoc.c ../config.h $(srcdir)/../ansichek.h \
 		$(srcdir)/../stdfn.h doc2x.h allterm.h
-doc2gih.o: doc2gih.c $(srcdir)/../config.h $(srcdir)/../ansichek.h \
+doc2gih.o: doc2gih.c ../config.h $(srcdir)/../ansichek.h \
 		$(srcdir)/../stdfn.h doc2x.h $(TERM_H)
-doc2hlp.o: doc2hlp.c $(srcdir)/../config.h $(srcdir)/../ansichek.h \
+doc2hlp.o: doc2hlp.c ../config.h $(srcdir)/../ansichek.h \
 		$(srcdir)/../stdfn.h doc2x.h $(TERM_H)
-doc2html.o: doc2html.c $(srcdir)/../config.h $(srcdir)/../ansichek.h \
+doc2html.o: doc2html.c ../config.h $(srcdir)/../ansichek.h \
 		$(srcdir)/../stdfn.h doc2x.h allterm.h
-doc2info.o: doc2info.c $(srcdir)/../config.h $(srcdir)/../ansichek.h \
+doc2info.o: doc2info.c ../config.h $(srcdir)/../ansichek.h \
 		$(srcdir)/../stdfn.h doc2x.h $(TERM_H)
-doc2ipf.o: doc2ipf.c $(srcdir)/../config.h $(srcdir)/../ansichek.h \
+doc2ipf.o: doc2ipf.c ../config.h $(srcdir)/../ansichek.h \
 		$(srcdir)/../stdfn.h doc2x.h $(TERM_H)
-doc2ms.o: doc2ms.c $(srcdir)/../config.h $(srcdir)/../ansichek.h \
+doc2ms.o: doc2ms.c ../config.h $(srcdir)/../ansichek.h \
 		$(srcdir)/../stdfn.h doc2x.h allterm.h
-doc2rnh.o: doc2rnh.c $(srcdir)/../config.h $(srcdir)/../ansichek.h \
+doc2rnh.o: doc2rnh.c ../config.h $(srcdir)/../ansichek.h \
 		$(srcdir)/../stdfn.h doc2x.h $(TERM_H)
-doc2rtf.o: doc2rtf.c $(srcdir)/../config.h $(srcdir)/../ansichek.h \
+doc2rtf.o: doc2rtf.c ../config.h $(srcdir)/../ansichek.h \
 		$(srcdir)/../stdfn.h doc2x.h $(TERM_H)
-doc2tex.o: doc2tex.c $(srcdir)/../config.h $(srcdir)/../ansichek.h \
+doc2tex.o: doc2tex.c ../config.h $(srcdir)/../ansichek.h \
 		$(srcdir)/../stdfn.h doc2x.h allterm.h
-termdoc.o: termdoc.c $(srcdir)/../config.h $(srcdir)/../ansichek.h \
+termdoc.o: termdoc.c ../config.h $(srcdir)/../ansichek.h \
 		$(srcdir)/../stdfn.h doc2x.h
-xref.o: xref.c $(srcdir)/../config.h $(srcdir)/../ansichek.h \
+xref.o: xref.c ../config.h $(srcdir)/../ansichek.h \
 		$(srcdir)/../stdfn.h doc2x.h xref.h
 
 #the end
