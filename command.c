@@ -307,6 +307,7 @@ void define()
     if (equals(c_token + 1, "(")) {
 	/* function ! */
 	int             dummy_num = 0;
+        struct at_type *at_tmp;
 	char save_dummy[MAX_NUM_VAR][MAX_ID_LEN+1];
 	memcpy(save_dummy, c_dummy_var, sizeof(save_dummy));
 	start_token = c_token;
@@ -320,10 +321,11 @@ void define()
 	if (END_OF_COMMAND)
 	    int_error("function definition expected", c_token);
 	udf = dummy_func = add_udf(start_token);
-	if (udf->at)		/* already a dynamic a.t. there */
-	    free((char *) udf->at);	/* so free it first */
-	if ((udf->at = perm_at()) == (struct at_type *) NULL)
+        if ((at_tmp = perm_at()) == (struct at_type *) NULL)
 	    int_error("not enough memory for function", start_token);
+        if (udf->at)            /* already a dynamic a.t. there */
+            free((char *) udf->at);     /* so free it first */
+        udf->at = at_tmp;               /* before re-assigning it. */
 	memcpy(c_dummy_var, save_dummy, sizeof(save_dummy));
 	m_capture(&(udf->definition), start_token, c_token - 1);
 	dummy_func=NULL; /* dont let anyone else use our workspace */
