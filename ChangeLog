@@ -1,3 +1,8 @@
+2004-05-26  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* src/mouse.c (event_buttonpress): Don't start zooming box if replot is
+	disabled.
+
 2004-05-24  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/gplt_x11.c (exec_cmd): Flush polyline to X-server when it reaches

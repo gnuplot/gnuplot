@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.48 2004/05/17 10:18:18 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.49 2004/05/19 14:43:45 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -1345,8 +1345,7 @@ event_buttonpress(struct gp_event_t *ge)
 
     button |= (1 << b);
 
-    FPRINTF((stderr, "(event_buttonpress) mouse_x = %d\n", mouse_x));
-    FPRINTF((stderr, "(event_buttonpress) mouse_y = %d\n", mouse_y));
+    FPRINTF((stderr, "(event_buttonpress) mouse_x = %d\tmouse_y = %d\n", mouse_x, mouse_y));
 
     MousePosToGraphPosReal(mouse_x, mouse_y, &real_x, &real_y, &real_x2, &real_y2);
 
@@ -1356,8 +1355,8 @@ event_buttonpress(struct gp_event_t *ge)
 		/* not bound in 2d graphs */
 	    } else if (2 == b) {
 		/* not bound in 2d graphs */
-	    } else if (3 == b) {
-		/* start zoom */
+	    } else if (3 == b && !replot_disabled) {
+		/* start zoom; ignore it when 'replot is disabled, e.g. with inline data */
 		setting_zoom_x = mouse_x;
 		setting_zoom_y = mouse_y;
 		setting_zoom_region = TRUE;
