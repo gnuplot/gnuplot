@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: specfun.c,v 1.8.2.1 2001/12/09 19:01:24 lhecking Exp $";
+static char *RCSid = "$Id: specfun.c,v 1.8.2.2 2002/01/23 11:19:44 lhecking Exp $";
 #endif
 
 /* GNUPLOT - specfun.c */
@@ -116,13 +116,12 @@ static double inverse_error_func __PROTO((double p));
 #ifndef GAMMA
 /* Provide GAMMA function for those who do not already have one */
 static double lngamma __PROTO((double z));
-static double lgamneg __PROTO((double z));
-static double lgampos __PROTO((double z));
 
 static double lngamma(z)
 double z;
 {
-  printf("Sorry, your libc does not contain lgammma()...\n");
+    fprintf(stderr, "Sorry, your libc does not contain lgammma()...\n");
+    return 0;
 }
 
 # define GAMMA(x) lngamma ((x))
@@ -611,16 +610,13 @@ void f_inverse_erf()
 static double inverse_normal_func(p)
 double p;
 {
-  printf("Sorry, function removed due to license issues :(\n");
-
-  return 0;
+    fprintf(stderr, "Sorry, function removed due to license issues :(\n");
+    return 0;
 }
-
 
 static double inverse_error_func(p)
 double p;
 {
-  printf("Sorry, function removed due to license issues :(\n");
-
-  return 0;
+    fprintf(stderr, "Sorry, function removed due to license issues :(\n");
+    return 0;
 }
