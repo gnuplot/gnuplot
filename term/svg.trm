@@ -1,5 +1,5 @@
 /*
- * $Id: svg.trm,v 1.17 2002/07/21 13:07:06 mikulik Exp $
+ * $Id: svg.trm,v 1.18 2002/07/26 16:42:29 mikulik Exp $
  *
  */
 
@@ -769,7 +769,7 @@ TERM_PUBLIC int
 SVG_text_angle (int ang)
 {
     /* Can only do pure horizontal or vertical */
-    SVG_TextAngle = (ang ? 1 : 0);
+    SVG_TextAngle = ang;
     return (TRUE);
 }
 
@@ -801,21 +801,20 @@ SVG_put_text (unsigned int x, unsigned int y, const char *str)
 
 /* vertical justification*/
 
-    switch (SVG_TextAngle) {
-    case 1:
+    if (SVG_TextAngle % 180) {
+	/* vertical text */
 	h += (SVG_fontAscent - SVG_fontDescent) / 2;
-	break;		/* vertical text*/
-    default:
+    } else {
+	/* horizontal text */
 	v -= (SVG_fontAscent - SVG_fontDescent) / 2;
-	break;		/* orizontal text*/
     }
 
-/* define text position and attributes*/
+/* define text position and attributes */
 
-    fprintf (gpoutfile, "\t<g transform=\"translate(%d,%d)%s\" \
-style=\"stroke:none; fill:", 
-	     h, term->ymax - v,
-	     SVG_TextAngle ? " rotate(-90)" : "");
+    fprintf (gpoutfile, "\t<g transform=\"translate(%d,%d)", h, term->ymax - v);
+    if (SVG_TextAngle)
+	fprintf (gpoutfile, " rotate(%i)", -SVG_TextAngle);
+    fprintf (gpoutfile, "\" style=\"stroke:none; fill:");
 
 #ifdef PM3D
     if (!SVG_use_pm3d_color)
