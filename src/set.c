@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.25 1999/10/01 14:54:35 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.26 1999/10/29 18:47:20 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -40,7 +40,8 @@ static char *RCSid() { return RCSid("$Id: set.c,v 1.25 1999/10/01 14:54:35 lheck
  * Added user-specified bases for log scaling.
  */
 
-#include "plot.h"
+#include "setshow.h"
+
 #include "alloc.h"
 #include "command.h"
 #include "gp_time.h"
@@ -49,10 +50,11 @@ static char *RCSid() { return RCSid("$Id: set.c,v 1.25 1999/10/01 14:54:35 lheck
 #include "parse.h"
 #include "plot2d.h"
 #include "plot3d.h"
-#include "setshow.h"
 #include "tables.h"
 #include "term_api.h"
 #include "util.h"
+
+#define BACKWARDS_COMPATIBLE
 
 #define SIGNIF (0.01)		/* less than one hundredth of a tic mark */
 
@@ -263,11 +265,11 @@ double miniticscale = 0.5;	/* and for minitics */
 
 float ticslevel = 0.5;
 
-struct ticdef xticdef = { TIC_COMPUTED };
-struct ticdef yticdef = { TIC_COMPUTED };
-struct ticdef zticdef = { TIC_COMPUTED };
-struct ticdef x2ticdef = { TIC_COMPUTED };
-struct ticdef y2ticdef = { TIC_COMPUTED };
+struct ticdef xticdef = { TIC_COMPUTED, { NULL } };
+struct ticdef yticdef = { TIC_COMPUTED, { NULL } };
+struct ticdef zticdef = { TIC_COMPUTED, { NULL } };
+struct ticdef x2ticdef = { TIC_COMPUTED, { NULL } };
+struct ticdef y2ticdef = { TIC_COMPUTED, { NULL } };
 
 TBOOLEAN tic_in = TRUE;
 
@@ -396,10 +398,13 @@ static int assign_linestyle_tag __PROTO((void));
 static int looks_like_numeric __PROTO((char *));
 static void set_lp_properties __PROTO((struct lp_style_type *, int, int, int, double, double));
 static void reset_lp_properties __PROTO((struct lp_style_type *arg));
+static void lp_use_properties __PROTO((struct lp_style_type *lp, int tag, int pointflag));
 
 static int set_tic_prop __PROTO((int *TICS, int *MTICS, double *FREQ,
      struct ticdef * tdef, int AXIS, TBOOLEAN * ROTATE, const char *tic_side));
 
+/* Backwards compatibility ... */
+static void set_nolinestyle __PROTO((void));
 
 /* following code segment appears over and over again */
 #define GET_NUM_OR_TIME(store,axis) \
@@ -647,292 +652,335 @@ set_command()
 
     c_token++;
 
-    if (max_levels == 0)
-	levels_list = (double *)gp_alloc((max_levels = 5)*sizeof(double), 
-					 "contour levels");
+#ifdef BACKWARDS_COMPATIBLE
 
-    switch(lookup_table(&set_tbl[0],c_token)) {
-    case S_ANGLES:
-	set_angles();
-	break;
-    case S_ARROW:
-	set_arrow();
-	break;
-    case S_AUTOSCALE:
-	set_autoscale();
-	break;
-    case S_BARS:
-	set_bars();
-	break;
-    case S_BORDER:
-	set_border();
-	break;
-    case S_BOXWIDTH:
-	set_boxwidth();
-	break;
-    case S_CLABEL:
-	set_clabel();
-	break;
-    case S_CLIP:
-	set_clip();
-	break;
-    case S_CNTRPARAM:
-	set_cntrparam();
-	break;
-    case S_CONTOUR:
-	set_contour();
-	break;
-    case S_DGRID3D:
-	set_dgrid3d();
-	break;
-    case S_DUMMY:
-	set_dummy();
-	break;
-    case S_ENCODING:
-	set_encoding();
-	break;
-    case S_FORMAT:
-	set_format();
-	break;
-    case S_GRID:
-	set_grid();
-	break;
-    case S_HIDDEN3D:
-	set_hidden3d();
-	break;
-    case S_ISOSAMPLES:
-	set_isosamples();
-	break;
-    case S_KEY:
-	set_key();
-	break;
-    case S_KEYTITLE:
-	set_keytitle();
-	break;
-    case S_LABEL:
-	set_label();
-	break;
-    case S_LOADPATH:
-	set_loadpath();
-	break;
-    case S_LOCALE:
-	set_locale();
-	break;
-    case S_LOGSCALE:
-	set_logscale();
-	break;
-    case S_MAPPING:
-	set_mapping();
-	break;
-    case S_BMARGIN:
-	set_bmargin();
-	break;
-    case S_LMARGIN:
-	set_lmargin();
-	break;
-    case S_RMARGIN:
-	set_rmargin();
-	break;
-    case S_TMARGIN:
-	set_tmargin();
-	break;
-    case S_MISSING:
-	set_missing();
-	break;
-    case S_MULTIPLOT:
-	term_start_multiplot();
-	break;
-    case S_OFFSETS:
-	set_offsets();
-	break;
-    case S_ORIGIN:
-	set_origin();
-	break;
-    case S_OUTPUT:
-	set_output();
-	break;
-    case S_PARAMETRIC:
-	set_parametric();
-	break;
-    case S_POINTSIZE:
-	set_pointsize();
-	break;
-    case S_POLAR:
-	set_polar();
-	break;
-    case S_SAMPLES:
-	set_samples();
-	break;
-    case S_SIZE:
-	set_size();
-	break;
-    case S_STYLE:
-	set_style();
-	break;
-    case S_SURFACE:
-	set_surface();
-	break;
-    case S_TERMINAL:
-	set_terminal();
-	break;
-    case S_TERMOPTIONS:
-	set_termoptions();
-	break;
-    case S_TICS:
-	set_tics();
-	break;
-    case S_TICSCALE:
-	set_ticscale();
-	break;
-    case S_TICSLEVEL:
-	set_ticslevel();
-	break;
-    case S_TIMEFMT:
-	set_timefmt();
-	break;
-    case S_TIMESTAMP:
-	set_timestamp();
-	break;
-    case S_TITLE:
-	set_xyzlabel(&title);
-	break;
-    case S_VIEW:
-	set_view();
-	break;
-    case S_ZERO:
-	set_zero();
-	break;
-    case S_MXTICS:
-    case S_NOMXTICS:
-    case S_XTICS:
-    case S_NOXTICS:
-    case S_XDTICS:
-    case S_NOXDTICS:
-    case S_XMTICS: 
-    case S_NOXMTICS:
-	set_tic_prop(&xtics, &mxtics, &mxtfreq, &xticdef, FIRST_X_AXIS,
-		     &rotate_xtics, "x");
-	break;
-    case S_MYTICS:
-    case S_NOMYTICS:
-    case S_YTICS:
-    case S_NOYTICS:
-    case S_YDTICS:
-    case S_NOYDTICS:
-    case S_YMTICS: 
-    case S_NOYMTICS:
-	set_tic_prop(&ytics, &mytics, &mytfreq, &yticdef, FIRST_Y_AXIS,
-		     &rotate_ytics, "y");
-	break;
-    case S_MX2TICS:
-    case S_NOMX2TICS:
-    case S_X2TICS:
-    case S_NOX2TICS:
-    case S_X2DTICS:
-    case S_NOX2DTICS:
-    case S_X2MTICS: 
-    case S_NOX2MTICS:
-	set_tic_prop(&x2tics, &mx2tics, &mx2tfreq, &x2ticdef, SECOND_X_AXIS,
-		     &rotate_x2tics, "x2");
-	break;
-    case S_MY2TICS:
-    case S_NOMY2TICS:
-    case S_Y2TICS:
-    case S_NOY2TICS:
-    case S_Y2DTICS:
-    case S_NOY2DTICS:
-    case S_Y2MTICS: 
-    case S_NOY2MTICS:
-	set_tic_prop(&y2tics, &my2tics, &my2tfreq, &y2ticdef, SECOND_Y_AXIS,
-		     &rotate_y2tics, "y2");
-	break;
-    case S_MZTICS:
-    case S_NOMZTICS:
-    case S_ZTICS:
-    case S_NOZTICS:
-    case S_ZDTICS:
-    case S_NOZDTICS:
-    case S_ZMTICS: 
-    case S_NOZMTICS:
-	set_tic_prop(&ztics, &mztics, &mztfreq, &zticdef, FIRST_Z_AXIS,
-		     &rotate_ztics, "z");
-	break;
-    case S_XDATA:
-	set_xdata();
-	break;
-    case S_YDATA:
-	set_ydata();
-	break;
-    case S_ZDATA:
-	set_zdata();
-	break;
-    case S_X2DATA:
-	set_x2data();
-	break;
-    case S_Y2DATA:
-	set_y2data();
-	break;
-    case S_XLABEL:
-	set_xyzlabel(&xlabel);
-	break;
-    case S_YLABEL:
-	set_xyzlabel(&ylabel);
-	break;
-    case S_ZLABEL:
-	set_xyzlabel(&zlabel);
-	break;
-    case S_X2LABEL:
-	set_xyzlabel(&x2label);
-	break;
-    case S_Y2LABEL:
-	set_xyzlabel(&y2label);
-	break;
-    case S_XRANGE:
-	set_xrange();
-	break;
-    case S_X2RANGE:
-	set_x2range();
-	break;
-    case S_YRANGE:
-	set_yrange();
-	break;
-    case S_Y2RANGE:
-	set_y2range();
-	break;
-    case S_ZRANGE:
-	set_zrange();
-	break;
-    case S_RRANGE:
-	set_rrange();
-	break;
-    case S_TRANGE:
-	set_trange();
-	break;
-    case S_URANGE:
-	set_urange();
-	break;
-    case S_VRANGE:
-	set_vrange();
-	break;
-    case S_XZEROAXIS:
-	set_xzeroaxis();
-	break;
-    case S_YZEROAXIS:
-	set_yzeroaxis();
-	break;
-    case S_X2ZEROAXIS:
-	set_x2zeroaxis();
-	break;
-    case S_Y2ZEROAXIS:
-	set_y2zeroaxis();
-	break;
-    case S_ZEROAXIS:
-	set_zeroaxis();
-	break;
-    default:
-	int_error(c_token, setmess);
-	break;
+    /* retain backwards compatibility to the old syntax for now
+     * Oh, such ugliness ...
+     */
+
+    if (almost_equals(c_token,"da$ta")) {
+	if (interactive)
+	    int_warn(c_token, "deprecated syntax, use \"set style data\"");
+	if (!almost_equals(++c_token,"s$tyle"))
+            int_error(c_token,"expecting keyword 'style'");
+	else
+	    data_style = get_style();
+    } else if (almost_equals(c_token,"fu$nction")) {
+	if (interactive)
+	    int_warn(c_token, "deprecated syntax, use \"set style function\"");
+        if (!almost_equals(++c_token,"s$tyle"))
+            int_error(c_token,"expecting keyword 'style'");
+	else
+	    func_style = get_style();
+    } else if (almost_equals(c_token,"li$nestyle") || equals(c_token, "ls" )) {
+	if (interactive)
+	    int_warn(c_token, "deprecated syntax, use \"set style line\"");
+        c_token++;
+        set_linestyle();
+    } else if (almost_equals(c_token,"noli$nestyle") || equals(c_token, "nols" )) {
+        c_token++;
+        set_nolinestyle();
+    } else if (input_line[token[c_token].start_index] == 'n' &&
+	       input_line[token[c_token].start_index+1] == 'o') {
+	if (interactive)
+	    int_warn(c_token, "deprecated syntax, use \"unset\"");
+	token[c_token].start_index += 2;
+	token[c_token].length -= 2;
+	c_token--;
+	unset_command();
+    } else {
+
+#endif /* BACKWARDS_COMPATIBLE */
+
+	if (max_levels == 0)
+	    levels_list = (double *)gp_alloc((max_levels = 5)*sizeof(double), 
+					     "contour levels");
+
+	switch(lookup_table(&set_tbl[0],c_token)) {
+	case S_ANGLES:
+	    set_angles();
+	    break;
+	case S_ARROW:
+	    set_arrow();
+	    break;
+	case S_AUTOSCALE:
+	    set_autoscale();
+	    break;
+	case S_BARS:
+	    set_bars();
+	    break;
+	case S_BORDER:
+	    set_border();
+	    break;
+	case S_BOXWIDTH:
+	    set_boxwidth();
+	    break;
+	case S_CLABEL:
+	    set_clabel();
+	    break;
+	case S_CLIP:
+	    set_clip();
+	    break;
+	case S_CNTRPARAM:
+	    set_cntrparam();
+	    break;
+	case S_CONTOUR:
+	    set_contour();
+	    break;
+	case S_DGRID3D:
+	    set_dgrid3d();
+	    break;
+	case S_DUMMY:
+	    set_dummy();
+	    break;
+	case S_ENCODING:
+	    set_encoding();
+	    break;
+	case S_FORMAT:
+	    set_format();
+	    break;
+	case S_GRID:
+	    set_grid();
+	    break;
+	case S_HIDDEN3D:
+	    set_hidden3d();
+	    break;
+	case S_ISOSAMPLES:
+	    set_isosamples();
+	    break;
+	case S_KEY:
+	    set_key();
+	    break;
+	case S_KEYTITLE:
+	    set_keytitle();
+	    break;
+	case S_LABEL:
+	    set_label();
+	    break;
+	case S_LOADPATH:
+	    set_loadpath();
+	    break;
+	case S_LOCALE:
+	    set_locale();
+	    break;
+	case S_LOGSCALE:
+	    set_logscale();
+	    break;
+	case S_MAPPING:
+	    set_mapping();
+	    break;
+	case S_BMARGIN:
+	    set_bmargin();
+	    break;
+	case S_LMARGIN:
+	    set_lmargin();
+	    break;
+	case S_RMARGIN:
+	    set_rmargin();
+	    break;
+	case S_TMARGIN:
+	    set_tmargin();
+	    break;
+	case S_MISSING:
+	    set_missing();
+	    break;
+	case S_MULTIPLOT:
+	    term_start_multiplot();
+	    break;
+	case S_OFFSETS:
+	    set_offsets();
+	    break;
+	case S_ORIGIN:
+	    set_origin();
+	    break;
+	case S_OUTPUT:
+	    set_output();
+	    break;
+	case S_PARAMETRIC:
+	    set_parametric();
+	    break;
+	case S_POINTSIZE:
+	    set_pointsize();
+	    break;
+	case S_POLAR:
+	    set_polar();
+	    break;
+	case S_SAMPLES:
+	    set_samples();
+	    break;
+	case S_SIZE:
+	    set_size();
+	    break;
+	case S_STYLE:
+	    set_style();
+	    break;
+	case S_SURFACE:
+	    set_surface();
+	    break;
+	case S_TERMINAL:
+	    set_terminal();
+	    break;
+	case S_TERMOPTIONS:
+	    set_termoptions();
+	    break;
+	case S_TICS:
+	    set_tics();
+	    break;
+	case S_TICSCALE:
+	    set_ticscale();
+	    break;
+	case S_TICSLEVEL:
+	    set_ticslevel();
+	    break;
+	case S_TIMEFMT:
+	    set_timefmt();
+	    break;
+	case S_TIMESTAMP:
+	    set_timestamp();
+	    break;
+	case S_TITLE:
+	    set_xyzlabel(&title);
+	    break;
+	case S_VIEW:
+	    set_view();
+	    break;
+	case S_ZERO:
+	    set_zero();
+	    break;
+	case S_MXTICS:
+	case S_NOMXTICS:
+	case S_XTICS:
+	case S_NOXTICS:
+	case S_XDTICS:
+	case S_NOXDTICS:
+	case S_XMTICS: 
+	case S_NOXMTICS:
+	    set_tic_prop(&xtics, &mxtics, &mxtfreq, &xticdef, FIRST_X_AXIS,
+			 &rotate_xtics, "x");
+	    break;
+	case S_MYTICS:
+	case S_NOMYTICS:
+	case S_YTICS:
+	case S_NOYTICS:
+	case S_YDTICS:
+	case S_NOYDTICS:
+	case S_YMTICS: 
+	case S_NOYMTICS:
+	    set_tic_prop(&ytics, &mytics, &mytfreq, &yticdef, FIRST_Y_AXIS,
+			 &rotate_ytics, "y");
+	    break;
+	case S_MX2TICS:
+	case S_NOMX2TICS:
+	case S_X2TICS:
+	case S_NOX2TICS:
+	case S_X2DTICS:
+	case S_NOX2DTICS:
+	case S_X2MTICS: 
+	case S_NOX2MTICS:
+	    set_tic_prop(&x2tics, &mx2tics, &mx2tfreq, &x2ticdef, SECOND_X_AXIS,
+			 &rotate_x2tics, "x2");
+	    break;
+	case S_MY2TICS:
+	case S_NOMY2TICS:
+	case S_Y2TICS:
+	case S_NOY2TICS:
+	case S_Y2DTICS:
+	case S_NOY2DTICS:
+	case S_Y2MTICS: 
+	case S_NOY2MTICS:
+	    set_tic_prop(&y2tics, &my2tics, &my2tfreq, &y2ticdef, SECOND_Y_AXIS,
+			 &rotate_y2tics, "y2");
+	    break;
+	case S_MZTICS:
+	case S_NOMZTICS:
+	case S_ZTICS:
+	case S_NOZTICS:
+	case S_ZDTICS:
+	case S_NOZDTICS:
+	case S_ZMTICS: 
+	case S_NOZMTICS:
+	    set_tic_prop(&ztics, &mztics, &mztfreq, &zticdef, FIRST_Z_AXIS,
+			 &rotate_ztics, "z");
+	    break;
+	case S_XDATA:
+	    set_xdata();
+	    break;
+	case S_YDATA:
+	    set_ydata();
+	    break;
+	case S_ZDATA:
+	    set_zdata();
+	    break;
+	case S_X2DATA:
+	    set_x2data();
+	    break;
+	case S_Y2DATA:
+	    set_y2data();
+	    break;
+	case S_XLABEL:
+	    set_xyzlabel(&xlabel);
+	    break;
+	case S_YLABEL:
+	    set_xyzlabel(&ylabel);
+	    break;
+	case S_ZLABEL:
+	    set_xyzlabel(&zlabel);
+	    break;
+	case S_X2LABEL:
+	    set_xyzlabel(&x2label);
+	    break;
+	case S_Y2LABEL:
+	    set_xyzlabel(&y2label);
+	    break;
+	case S_XRANGE:
+	    set_xrange();
+	    break;
+	case S_X2RANGE:
+	    set_x2range();
+	    break;
+	case S_YRANGE:
+	    set_yrange();
+	    break;
+	case S_Y2RANGE:
+	    set_y2range();
+	    break;
+	case S_ZRANGE:
+	    set_zrange();
+	    break;
+	case S_RRANGE:
+	    set_rrange();
+	    break;
+	case S_TRANGE:
+	    set_trange();
+	    break;
+	case S_URANGE:
+	    set_urange();
+	    break;
+	case S_VRANGE:
+	    set_vrange();
+	    break;
+	case S_XZEROAXIS:
+	    set_xzeroaxis();
+	    break;
+	case S_YZEROAXIS:
+	    set_yzeroaxis();
+	    break;
+	case S_X2ZEROAXIS:
+	    set_x2zeroaxis();
+	    break;
+	case S_Y2ZEROAXIS:
+	    set_y2zeroaxis();
+	    break;
+	case S_ZEROAXIS:
+	    set_zeroaxis();
+	    break;
+	default:
+	    int_error(c_token, setmess);
+	    break;
+	}
+#ifdef BACKWARDS_COMPATIBLE
     }
+#endif
 }
 
 
@@ -3697,5 +3745,35 @@ int allow_ls, allow_point, def_line, def_point;
 	    } else lp->p_size = pointsize; /* as in "set pointsize" */
 	} else lp->p_size = pointsize; /* give it a value */
 	LP_DUMP(lp);
+    }
+}
+
+/*
+ * Backwards compatibility ...
+ */
+static void set_nolinestyle()
+{
+    struct value a;
+    struct linestyle_def *this, *prev;
+    int tag;
+
+    if (END_OF_COMMAND) {
+        /* delete all linestyles */
+        while (first_linestyle != NULL)
+            delete_linestyle((struct linestyle_def *) NULL, first_linestyle);
+    } else {
+        /* get tag */
+        tag = (int) real(const_express(&a));
+        if (!END_OF_COMMAND)
+            int_error(c_token, "extraneous arguments to set nolinestyle");
+        for (this = first_linestyle, prev = NULL;
+             this != NULL;
+             prev = this, this = this->next) {
+            if (this->tag == tag) {
+                delete_linestyle(prev, this);
+                return;         /* exit, our job is done */
+            }
+        }
+        int_error(c_token, "linestyle not found");
     }
 }
