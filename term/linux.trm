@@ -1,5 +1,5 @@
 /*
- * $Id: linux.trm,v 1.22 2002/05/16 21:29:18 joze Exp $
+ * $Id: linux.trm,v 1.23 2002/07/26 16:42:29 mikulik Exp $
  *
  */
 
@@ -111,7 +111,7 @@ static void LINUX_putc __PROTO((unsigned int x, unsigned int y, int c, int ang,
 
 /* this function is called at the very beginning of main() to initialize
  *  the vgalib and to revoke suid privileges.
- * /dev/console and /dev/tty\d are considered graphic terminals, all other
+ * /dev/console and /dev/tty\d and /dev/vc/\d are considered graphic terminals, all other
  * don't support the linux terminal */
 
 void
@@ -130,9 +130,13 @@ LINUX_setup(void)
 	fgets(line, 256, pipe);
 	pclose(pipe);
 	line[strlen(line) - 1] = '\0';
-	if (strcmp(line, "/dev/console") == 0 ||
-	    (strncmp(line, "/dev/tty", 8) == 0
-	     && isdigit((unsigned char) line[8]))) {
+	if (
+	    strcmp(line, "/dev/console") == 0 ||
+	    
+	    ( ( strncmp(line, "/dev/tty", 8) == 0 || strncmp(line, "/dev/vc/", 8) == 0 )
+	     && isdigit((unsigned char) line[8]))
+	     
+	     ) {
 	    LINUX_graphics_allowed = TRUE;
 	} else {
 	    /* check for socket name as set for example by `screen' */
