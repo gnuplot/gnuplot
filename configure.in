@@ -120,6 +120,7 @@ else
   CPPFLAGS="$CPPFLAGS $X_CFLAGS"
   X_LIBRARIES="$X_PRE_LIBS $X_LIBRARIES $X_LIBS $X_EXTRA_LIBS"
   GNUPLOT_X11=gnuplot_x11
+  AC_DEFINE(X11)
 fi
 
 
@@ -159,9 +160,9 @@ AC_CHECK_HEADER(time.h, ,AC_DEFINE(NO_TIME_H) AC_CHECK_TYPE(time_t, long))
 dnl
 AC_CHECK_HEADER(sys/time.h, , AC_DEFINE(NO_SYS_TIME_H))
 AC_CHECK_HEADER(sys/types.h, , AC_DEFINE(NO_SYS_TYPES_H))
-AC_CHECK_HEADER(sys/stat.h, AC_HEADER_STAT, AC_DEFINE(NO_SYS_STAT_H))
-AC_CHECK_HEADERS(sys/bsdtypes.h sys/select.h sys/socket.h sys/systeminfo.h \
-  sys/utsname.h libc.h malloc.h sgtty.h termios.h)
+AC_CHECK_HEADERS(sys/bsdtypes.h sys/select.h sys/socket.h sys/stat.h \
+  sys/systeminfo.h sys/utsname.h libc.h malloc.h sgtty.h termios.h)
+test "$ac_cv_header_sys_stat_h" = yes && AC_HEADER_STAT
 
 dnl check if unistd actually declares anything. On NeXT 3.2 unistd is
 dnl conditionalized for _POSIX_SOURCE
