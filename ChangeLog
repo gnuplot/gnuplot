@@ -1,3 +1,8 @@
+2002-02-03  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* src/graph3d.c: For 'splot ... with ... palette', draw key as a line
+	or point/dot sequence with a color gradient.
+
 2002-02-02  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* NEWS docs/gnuplot.doc src/gadgets.h src/gadgets.c src/plot2d.c

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.55 2002/01/26 17:55:07 joze Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.56 2002/01/28 16:38:03 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -140,6 +140,10 @@ static void boundary3d __PROTO((struct surface_points * plots, int count));
 /* put entries in the key */
 static void key_sample_line __PROTO((int xl, int yl));
 static void key_sample_point __PROTO((int xl, int yl, int pointtype));
+#ifdef PM3D
+static void key_sample_line_pm3d __PROTO((int xl, int yl));
+static void key_sample_point_pm3d __PROTO((int xl, int yl, int pointtype));
+#endif
 static void key_text __PROTO((int xl, int yl, char *text));
 
 static void get_arrow3d(struct arrow_def* arrow, unsigned int* sx, unsigned int* sy, unsigned int* ex, unsigned int* ey);
@@ -894,6 +898,11 @@ do_3dplot(plots, pcount, quick)
 	    case LINES:
 		{
 		    if (lkey) {
+#ifdef PM3D
+			if (this_plot->lp_properties.use_palette) 
+			    key_sample_line_pm3d(xl, yl);
+			else
+#endif
 			key_sample_line(xl, yl);
 		    }
 		    if (!(hidden3d && draw_surface)) {
@@ -919,6 +928,11 @@ do_3dplot(plots, pcount, quick)
 	    case VECTOR:
 	    case POINTSTYLE:
 		if (lkey) {
+#ifdef PM3D
+		    if (this_plot->lp_properties.use_palette)
+			key_sample_point_pm3d(xl, yl, this_plot->lp_properties.p_type);
+		    else
+#endif
 		    key_sample_point(xl, yl, this_plot->lp_properties.p_type);
 		}
 		if (!(hidden3d && draw_surface)) {
@@ -933,8 +947,14 @@ do_3dplot(plots, pcount, quick)
 
 	    case LINESPOINTS:
 		/* put lines */
-		if (lkey)
+		if (lkey) {
+#ifdef PM3D
+			if (this_plot->lp_properties.use_palette)
+			    key_sample_line_pm3d(xl, yl);
+			else
+#endif
 		    key_sample_line(xl, yl);
+		}
 
 		if (!(hidden3d && draw_surface)) {
 #ifdef PM3D
@@ -946,8 +966,14 @@ do_3dplot(plots, pcount, quick)
 		}
 
 		/* put points */
-		if (lkey)
+		if (lkey) {
+#ifdef PM3D
+		    if (this_plot->lp_properties.use_palette)
+			key_sample_point_pm3d(xl, yl, this_plot->lp_properties.p_type);
+		    else
+#endif
 		    key_sample_point(xl, yl, this_plot->lp_properties.p_type);
+		}
 
 		if (!(hidden3d && draw_surface)) {
 #ifdef PM3D
@@ -962,14 +988,14 @@ do_3dplot(plots, pcount, quick)
 
 	    case DOTS:
 		if (lkey) {
-		    if (key == KEY_USER_PLACEMENT) {
-			if (!clip_point(xl + key_point_offset, yl))
-			    (*t->point) (xl + key_point_offset, yl, -1);
-		    } else {
-			(*t->point) (xl + key_point_offset, yl, -1);
-			/* (*t->point)(xl+2*(t->h_char),yl, -1); */
-		    }
+#ifdef PM3D
+		    if (this_plot->lp_properties.use_palette)
+			key_sample_point_pm3d(xl, yl, -1);
+		    else
+#endif
+			key_sample_point(xl, yl, -1);
 		}
+
 		if (!(hidden3d && draw_surface)) {
 #ifdef PM3D
 		    if (use_palette)
@@ -1038,12 +1064,27 @@ do_3dplot(plots, pcount, quick)
 		    case FINANCEBARS:
 		    case VECTOR:
 		    case POINTSTYLE:
+#ifdef PM3D
+			if (this_plot->lp_properties.use_palette)
+			    key_sample_point_pm3d(xl, yl, this_plot->lp_properties.p_type);
+			else
+#endif
 			key_sample_point(xl, yl, this_plot->lp_properties.p_type);
 			break;
 		    case LINESPOINTS:
+#ifdef PM3D
+			if (this_plot->lp_properties.use_palette)
+			    key_sample_line_pm3d(xl, yl);
+			else
+#endif
 			key_sample_line(xl, yl);
 			break;
 		    case DOTS:
+#ifdef PM3D
+			if (this_plot->lp_properties.use_palette)
+			    key_sample_point_pm3d(xl, yl, this_plot->lp_properties.p_type);
+			else
+#endif
 			key_sample_point(xl, yl, -1);
 			break;
 #ifdef PM3D
@@ -1094,9 +1135,19 @@ do_3dplot(plots, pcount, quick)
 			    case FINANCEBARS:
 			    case VECTOR:
 			    case POINTSTYLE:
+#ifdef PM3D
+				if (this_plot->lp_properties.use_palette)
+				    key_sample_point_pm3d(xl, yl, this_plot->lp_properties.p_type);
+				else
+#endif
 				key_sample_point(xl, yl, this_plot->lp_properties.p_type);
 				break;
 			    case DOTS:
+#ifdef PM3D
+				if (this_plot->lp_properties.use_palette)
+				    key_sample_point_pm3d(xl, yl, this_plot->lp_properties.p_type);
+				else
+#endif
 				key_sample_point(xl, yl, -1);
 				break;
 #ifdef PM3D
@@ -2683,3 +2734,60 @@ int pointtype;
 	(*term->point) (xl + key_point_offset, yl, pointtype);
     }
 }
+
+#ifdef PM3D
+/* let us make a gradient color line */
+static void
+key_sample_line_pm3d(xl, yl)
+int xl, yl;
+{
+    const int steps = 32;
+    /* int x_from = xl + key_sample_left; */
+    int x_to = xl + key_sample_right;
+    double step = ((double)(key_sample_right - key_sample_left)) / steps;
+    int i = 1, x1 = xl + key_sample_left, x2;
+    if (key == KEY_AUTO_PLACEMENT)
+	(*term->move) (x1, yl);
+    else 
+	clip_move(x1, yl);
+    set_color(0);
+    x2 = x1;
+    while (i <= steps) {
+	if (i>1) set_color( i==steps ? 1 : (i-0.5)/steps );
+	(*term->move) (x2, yl);
+	x2 = (i==steps) ? x_to : x1 + (int)(i*step+0.5);
+	if (key == KEY_AUTO_PLACEMENT)
+	    (*term->vector) (x2, yl);
+	else
+	    clip_vector(x2, yl);
+	i++;
+    }
+}
+
+/* let us make a sequence of points with gradient color */
+static void
+key_sample_point_pm3d(xl, yl, pointtype)
+int xl, yl;
+int pointtype;
+{
+    /* int x_from = xl + key_sample_left; */
+    int x_to = xl + key_sample_right;
+    int i = 0, x1 = xl + key_sample_left, x2;
+    /* rule for number of steps: 3*char_width*pointsize or char_width for dots, 
+     * but at least 3 points */
+    double step = term->h_char * (pointtype == -1 ? 1 : 3*pointsize);
+    int steps = (int)(((double)(key_sample_right - key_sample_left)) / step + 0.5);
+    if (steps < 2) steps = 2;
+    step = ((double)(key_sample_right - key_sample_left)) / steps;
+    set_color(0);
+    while (i <= steps) {
+	if (i>0) set_color( i==steps ? 1 : (i-0.5)/steps );
+	x2 = i==0 ? x1 : (i==steps ? x_to : x1 + (int)(i*step+0.5));
+	/* x2 += key_point_offset; ... that's if there is only 1 point */
+	if (key == KEY_AUTO_PLACEMENT || !clip_point(x2, yl))
+	    (*term->point) (x2, yl, pointtype);
+	i++;
+    }
+}
+
+#endif
