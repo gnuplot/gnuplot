@@ -198,7 +198,7 @@ fi
 AC_DEFUN(gp_CHECK_LIB_QUIET,
 [ac_lib_var=`echo $1['_']$2 | sed 'y%./+-%__p_%'`
 ac_save_LIBS="$LIBS"
-LIBS="$TERMLIBS -l$1 $5 $LIBS"
+LIBS="$TERMLIBS $TERMXLIBS -l$1 $5 $LIBS"
 AC_TRY_LINK(dnl
 ifelse([$2], [main], , dnl Avoid conflicting decl of main.
 [/* Override any gcc2 internal prototype to avoid an error.  */
@@ -306,10 +306,13 @@ fi
 
 AC_DEFUN(gp_FIND_SELECT_ARGTYPES,
 [AC_MSG_CHECKING([types of arguments accepted by select])
- for arg_fdset_p in 'fd_set *' 'int *' 'void *'; do
-  for arg_size_t in 'int' 'size_t' 'unsigned long' 'unsigned'; do
-   for arg_timeval_p in 'struct timeval *' 'const struct timeval *'; do
-    AC_TRY_COMPILE(dnl
+ AC_CACHE_VAL(ac_cv_type_select_arg234,dnl
+ [AC_CACHE_VAL(ac_cv_type_select_arg1,dnl
+  [AC_CACHE_VAL(ac_cv_type_select_arg5,dnl
+   [for ac_cv_type_select_arg234 in 'fd_set *' 'int *' 'void *'; do
+     for ac_cv_type_select_arg1 in 'int' 'size_t' 'unsigned long' 'unsigned'; do
+      for ac_cv_type_select_arg5 in 'struct timeval *' 'const struct timeval *'; do
+       AC_TRY_COMPILE(dnl
 [#ifndef NO_SYS_TYPES_H
 #include <sys/types.h>
 #endif
@@ -322,18 +325,21 @@ AC_DEFUN(gp_FIND_SELECT_ARGTYPES,
 #ifdef HAVE_SYS_SOCKET_H
 #include <sys/socket.h>
 #endif
-extern select ($arg_size_t,$arg_fdset_p,$arg_fdset_p,$arg_fdset_p,$arg_timeval_p);],,dnl
-    [ac_not_found=no ; break 3],ac_not_found=yes)
-   done
-  done
- done
+extern select ($ac_cv_type_select_arg1,$ac_cv_type_select_arg234,$ac_cv_type_select_arg234,$ac_cv_type_select_arg234,$ac_cv_type_select_arg5);],,dnl
+        [ac_not_found=no ; break 3],ac_not_found=yes)
+      done
+     done
+    done
+   ])dnl AC_CACHE_VAL
+  ])dnl AC_CACHE_VAL
+ ])dnl AC_CACHE_VAL
  if test "$ac_not_found" = yes; then
-  arg_size_t=int 
-  arg_fdset_p='int *' 
-  arg_timeval_p='struct timeval *'
+  ac_cv_type_select_arg1=int 
+  ac_cv_type_select_arg234='int *' 
+  ac_cv_type_select_arg5='struct timeval *'
  fi
- AC_MSG_RESULT([$arg_size_t,$arg_fdset_p,$arg_timeval_p])
- AC_DEFINE_UNQUOTED(SELECT_ARGTYPE_1,$arg_size_t)
- AC_DEFINE_UNQUOTED(SELECT_ARGTYPE_234,($arg_fdset_p))
- AC_DEFINE_UNQUOTED(SELECT_ARGTYPE_5,($arg_timeval_p))
+ AC_MSG_RESULT([$ac_cv_type_select_arg1,$ac_cv_type_select_arg234,$ac_cv_type_select_arg5])
+ AC_DEFINE_UNQUOTED(SELECT_ARGTYPE_1,$ac_cv_type_select_arg1)
+ AC_DEFINE_UNQUOTED(SELECT_ARGTYPE_234,($ac_cv_type_select_arg234))
+ AC_DEFINE_UNQUOTED(SELECT_ARGTYPE_5,($ac_cv_type_select_arg5))
 ])
