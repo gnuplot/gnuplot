@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: tables.c,v 1.16 2000/11/01 18:57:33 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: tables.c,v 1.17 2000/11/22 10:04:25 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - tables.c */
@@ -283,9 +283,9 @@ struct gen_table set_tbl[] =
     { "vr$ange", S_VRANGE },
 
     { "xzeroa$xis", S_XZEROAXIS },
-    { "x2zeroa$xis", S_XZEROAXIS },
+    { "x2zeroa$xis", S_X2ZEROAXIS },
     { "yzeroa$xis", S_YZEROAXIS },
-    { "y2zeroa$xis", S_YZEROAXIS },
+    { "y2zeroa$xis", S_Y2ZEROAXIS },
     { "zeroa$xis", S_ZEROAXIS },
 
     { "z$ero", S_ZERO },
