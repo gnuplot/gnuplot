@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot.c,v 1.15 1999/06/19 20:54:20 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot.c,v 1.16 1999/07/09 21:04:28 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - plot.c */
@@ -142,6 +142,7 @@ static jmp_buf command_line_env;
 static void load_rcfile __PROTO((void));
 static void get_user_env __PROTO((void));
 RETSIGTYPE inter __PROTO((int anint));
+static void init_memory __PROTO((void));
 
 /* built-in function table */
 struct ft_entry GPFAR ft[] =
@@ -783,6 +784,17 @@ char **pathp;
 	    int_warn(NO_CARET, "HOME not set - cannot expand tilde");
     }
 }
+
+
+static void
+init_memory()
+{
+    extend_input_line();
+    extend_token_table();
+    replot_line = gp_alloc(1, "string");
+    *replot_line = NUL;
+}
+
 
 #ifdef OS2
 
