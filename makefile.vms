@@ -72,9 +72,9 @@ gnuplot.hlp : doc2hlp.$X [.docs]gnuplot.doc [.docs]doc2hlp.com
 gnuplot.hlb : gnuplot.hlp
 	library/create/help gnuplot.hlb gnuplot.hlp
 
-doc2hlp.$X: [.docs]doc2hlp.c
-	$(CC) /include=([.docs],[],[.term]) [.docs]doc2hlp.c
-	link doc2hlp $(CTRL_SHARE)
+doc2hlp.$X: [.docs]doc2hlp.c [.docs]termdoc.c
+	$(CC) /include=([.docs],[],[.term]) [.docs]doc2hlp.c [.docs]termdoc.c
+	link /exe=doc2hlp.$X doc2hlp termdoc $(CTRL_SHARE)
 
 term.$O: term.h term.c $(CSOURCE5) $(CSOURCE6) $(CSOURCE7)
 	$(CC) $(CFLAGS) $(TERMFLAGS) term.c /object=term.$O

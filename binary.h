@@ -32,12 +32,6 @@
  * to the extent permitted by applicable law.
 ]*/
 
-
-/* Copied from command.c -- this should be put in a shared macro file */
-#ifndef inrange
-#define inrange(z,min,max) ((min<max) ? ((z>=min)&&(z<=max)) : ((z>=max)&&(z<=min)) )
-#endif
-
 /* Routines for interfacing with command.c */
 float GPFAR *vector __PROTO(( int nl, int nh));
 float GPFAR *extend_vector __PROTO((float GPFAR *vec, int old_nl, int old_nh, int new_nh));

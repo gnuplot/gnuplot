@@ -34,19 +34,6 @@
  * to the extent permitted by applicable law.
 ]*/
 
-/*
- * AUTHORS
- * 
- *   Russell Lang
- * 
- * Send your comments or suggestions to 
- *  info-gnuplot@dartmouth.edu.
- * This is a mailing list; to join it send a note to 
- *  majordomo@dartmouth.edu.  
- * Send bug reports to
- *  bug-gnuplot@dartmouth.edu.
- */
-
 /* redefine functions that can talk to tty devices, to use 
  * implementation in winmain.c/wgnuplot.dll */
 

@@ -36,6 +36,10 @@
 ]*/
 
 
+/* for show_version_long() */
+#ifdef HAVE_SYS_UTSNAME_H
+#include <sys/utsname.h>
+#endif
 
 #ifndef DEFAULT_TIMESTAMP_FORMAT
 #define DEFAULT_TIMESTAMP_FORMAT "%a %b %d %H:%M:%S %Y" /* asctime() format */
@@ -117,7 +121,6 @@ extern double			base_log_x2, base_log_y2;
 				/* base, for computing pow(base,x) */
 extern double			log_base_log_x2, log_base_log_y2;
 				/* log of base, for computing logbase(base,x) */
-extern FILE*			outfile;
 extern char			*outstr;
 extern TBOOLEAN			parametric;
 extern double			pointsize;
@@ -241,7 +244,8 @@ void show_command __PROTO((void));
 /* and some accessible support functions */
 enum PLOT_STYLE get_style __PROTO((void));
 TBOOLEAN load_range __PROTO((int axis, double *a, double *b, int autosc));
-void show_version __PROTO((void));
+void show_version __PROTO((FILE *fp));
+void show_version_long __PROTO((void));
 char * conv_text __PROTO((char *s, char *t));
 void lp_use_properties __PROTO((struct lp_style_type *lp, int tag, int pointflag ));
 

@@ -51,27 +51,25 @@ extern struct value stack[STACK_DEPTH];
 extern int s_p;
 extern double zero;
 
-#define ITMAX   100
+#define ITMAX   200
+
 #ifdef FLT_EPSILON
-#define MACHEPS FLT_EPSILON /* 1.0E-08 */
+# define MACHEPS FLT_EPSILON	/* 1.0E-08 */
 #else
-#define MACHEPS 1.0E-08
+# define MACHEPS 1.0E-08
 #endif
-#ifdef FLT_MIN_EXP
-#define MINEXP  FLT_MIN_EXP /* -88.0 */
-#else
+
+/* AS239 value, e^-88 = 2^-127 */
 #define MINEXP  -88.0
-#endif
+
 #ifdef FLT_MAX
-#define OFLOW   FLT_MAX /* 1.0E+37 */
+# define OFLOW   FLT_MAX		/* 1.0E+37 */
 #else
-#define OFLOW   1.0E+37
+# define OFLOW   1.0E+37
 #endif
-#ifdef FLT_MAX_10_EXP
-#define XBIG    FLT_MAX_10_EXP /* 2.55E+305 */
-#else
-#define XBIG    2.55E+305
-#endif
+
+/* AS239 value for igamma(a,x>=XBIG) = 1.0 */
+#define XBIG    1.0E+08
 
 /*
  * Mathematical constants
@@ -79,36 +77,34 @@ extern double zero;
 #define LNPI 1.14472988584940016
 #define LNSQRT2PI 0.9189385332046727
 #ifdef PI
-#undef PI
+# undef PI
 #endif
 #define PI 3.14159265358979323846
 #define PNT68 0.6796875
-#define SQRT_TWO 1.41421356237309504880168872420969809   /* JG */
+#define SQRT_TWO 1.41421356237309504880168872420969809	/* JG */
 
 /* Prefer lgamma */
 #ifndef GAMMA
 # ifdef HAVE_LGAMMA
 #  define GAMMA(x) lgamma (x)
+# elif defined(HAVE_GAMMA)
+#  define GAMMA(x) gamma (x)
 # else
-#  ifdef HAVE_GAMMA
-#   define GAMMA(x) gamma (x)
-#  else
-#   undef GAMMA
-#  endif
+#  undef GAMMA
 # endif
 #endif
 
 #ifndef GAMMA
 int signgam = 0;
 #else
-extern int signgam; /* this is not always declared in math.h */
+extern int signgam;		/* this is not always declared in math.h */
 #endif
 
 /* Global variables, not visible outside this file */
-static long     Xm1 = 2147483563L;
-static long     Xm2 = 2147483399L;
-static long     Xa1 = 40014L;
-static long     Xa2 = 40692L;
+static long Xm1 = 2147483563L;
+static long Xm2 = 2147483399L;
+static long Xa1 = 40014L;
+static long Xa2 = 40692L;
 
 /* Local function declarations, not visible outside this file */
 static double confrac __PROTO((double a, double b, double x));
@@ -159,36 +155,37 @@ static double lgampos __PROTO((double z));
  */
 
 /* Local data, not visible outside this file 
-static double   a[] =
-{
-    0.9999999999995183E+00,
-    0.6765203681218835E+03,
-    -.1259139216722289E+04,
-    0.7713234287757674E+03,
-    -.1766150291498386E+03,
-    0.1250734324009056E+02,
-    -.1385710331296526E+00,
-    0.9934937113930748E-05,
-    0.1659470187408462E-06,
-};   */
+   static double   a[] =
+   {
+   0.9999999999995183E+00,
+   0.6765203681218835E+03,
+   -.1259139216722289E+04,
+   0.7713234287757674E+03,
+   -.1766150291498386E+03,
+   0.1250734324009056E+02,
+   -.1385710331296526E+00,
+   0.9934937113930748E-05,
+   0.1659470187408462E-06,
+   };   */
 
 /* from Ray Toy */
-static double GPFAR a[] = {
-        .99999999999980993227684700473478296744476168282198,
-     676.52036812188509856700919044401903816411251975244084,
-   -1259.13921672240287047156078755282840836424300664868028,
-     771.32342877765307884865282588943070775227268469602500,
+static double GPFAR a[] =
+{
+    .99999999999980993227684700473478296744476168282198,
+    676.52036812188509856700919044401903816411251975244084,
+    -1259.13921672240287047156078755282840836424300664868028,
+    771.32342877765307884865282588943070775227268469602500,
     -176.61502916214059906584551353999392943274507608117860,
-      12.50734327868690481445893685327104972970563021816420,
-       -.13857109526572011689554706984971501358032683492780,
-        .00000998436957801957085956266828104544089848531228,
-        .00000015056327351493115583383579667028994545044040,
+    12.50734327868690481445893685327104972970563021816420,
+    -.13857109526572011689554706984971501358032683492780,
+    .00000998436957801957085956266828104544089848531228,
+    .00000015056327351493115583383579667028994545044040,
 };
 
-static double   lgamneg(z)
+static double lgamneg(z)
 double z;
 {
-    double          tmp;
+    double tmp;
 
     /* Use reflection formula, then call lgampos() */
     tmp = sin(z * PI);
@@ -197,22 +194,22 @@ double z;
 	tmp = 0.0;
     } else if (tmp < 0.0) {
 	tmp = -tmp;
-        signgam = -1;
+	signgam = -1;
     }
     return LNPI - lgampos(1.0 - z) - log(tmp);
 
 }
 
-static double   lgampos(z)
+static double lgampos(z)
 double z;
 {
-    double          sum;
-    double          tmp;
-    int             i;
+    double sum;
+    double tmp;
+    int i;
 
     sum = a[0];
     for (i = 1, tmp = z; i < 9; i++) {
-        sum += a[i] / tmp;
+	sum += a[i] / tmp;
 	tmp++;
     }
 
@@ -230,120 +227,141 @@ double z;
 	return lgampos(z);
 }
 
-#define GAMMA(x) lngamma ((x))
-#endif /* GAMMA */
+# define GAMMA(x) lngamma ((x))
+#endif /* !GAMMA */
 
 void f_erf()
 {
-struct value a;
-double x;
+    struct value a;
+    double x;
 
-        x = real(pop(&a));
-#ifndef HAVE_ERF
-        x = x < 0.0 ? -igamma(0.5, x * x) : igamma(0.5, x * x);
+    x = real(pop(&a));
+
+#ifdef HAVE_ERF
+    x = erf(x);
 #else
-        x = erf(x);
+    {
+	int fsign;
+	fsign = x >= 0 ? 1 : 0;
+	x = igamma(0.5, (x)*(x));
+	if (x == -1.0) {
+	    undefined = TRUE;
+	    x = 0.0;
+	} else {
+	    if (fsign == 0)
+		x = -x;
+	}
+    }
 #endif
-        push( Gcomplex(&a,x,0.0) );
+    push(Gcomplex(&a, x, 0.0));
 }
 
 void f_erfc()
 {
-struct value a;
-double x;
+    struct value a;
+    double x;
 
-        x = real(pop(&a));
-#ifndef HAVE_ERF
-        x = x < 0.0 ? 1.0 + igamma(0.5, x * x) : 1.0 - igamma(0.5, x * x);
+    x = real(pop(&a));
+#ifdef HAVE_ERFC
+    x = erfc(x);
 #else
-        x = erfc(x);
+    {
+	int fsign;
+	fsign = x >= 0 ? 1 : 0;
+	x = igamma(0.5, (x)*(x));
+	if (x == 1.0) {
+	    undefined = TRUE;
+	    x = 0.0;
+	} else { 
+	    x = fsign > 0 ? 1.0 - x : 1.0 + x ;
+	}
+    }
 #endif
-        push( Gcomplex(&a,x,0.0) );
+    push(Gcomplex(&a, x, 0.0));
 }
 
 void f_ibeta()
 {
-struct value a;
-double x;
-double arg1;
-double arg2;
+    struct value a;
+    double x;
+    double arg1;
+    double arg2;
 
     x = real(pop(&a));
     arg2 = real(pop(&a));
     arg1 = real(pop(&a));
 
     x = ibeta(arg1, arg2, x);
-    if(x == -1.0) {
-        undefined = TRUE;
-        push( Ginteger(&a,0) );
+    if (x == -1.0) {
+	undefined = TRUE;
+	push(Ginteger(&a, 0));
     } else
-        push( Gcomplex(&a,x,0.0) );
+	push(Gcomplex(&a, x, 0.0));
 }
 
 void f_igamma()
 {
-struct value a;
-double x;
-double arg1;
+    struct value a;
+    double x;
+    double arg1;
 
     x = real(pop(&a));
     arg1 = real(pop(&a));
 
-    x = igamma(arg1,x);
-    if(x == -1.0) {
-        undefined = TRUE;
-        push( Ginteger(&a,0) );
+    x = igamma(arg1, x);
+    if (x == -1.0) {
+	undefined = TRUE;
+	push(Ginteger(&a, 0));
     } else
-        push( Gcomplex(&a,x,0.0) );
+	push(Gcomplex(&a, x, 0.0));
 }
 
 void f_gamma()
 {
-register double y;
-struct value a;
+    register double y;
+    struct value a;
 
-        y = GAMMA(real(pop(&a)));
-	if (y > 88.0) {
-		undefined = TRUE;
-		push( Ginteger(&a,0) );
-	}
-	else
-		push( Gcomplex(&a,signgam * gp_exp(y),0.0) );
+    y = GAMMA(real(pop(&a)));
+    if (y > 88.0) {
+	undefined = TRUE;
+	push(Ginteger(&a, 0));
+    } else
+	push(Gcomplex(&a, signgam * gp_exp(y), 0.0));
 }
 
 void f_lgamma()
 {
-struct value a;
+    struct value a;
 
-        push( Gcomplex(&a, GAMMA(real(pop(&a))),0.0) );
+    push(Gcomplex(&a, GAMMA(real(pop(&a))), 0.0));
 }
 
 #ifndef BADRAND
 
 void f_rand()
 {
-struct value a;
+    struct value a;
 
-        push( Gcomplex(&a, ranf(real(pop(&a))),0.0) );
+    push(Gcomplex(&a, ranf(real(pop(&a))), 0.0));
 }
 
-#else
+#else /* BADRAND */
 
 /* Use only to observe the effect of a "bad" random number generator. */
 void f_rand()
 {
-struct value a;
+    struct value a;
 
-static unsigned int y =0;
-unsigned int maxran = 1000;
+    static unsigned int y = 0;
+    unsigned int maxran = 1000;
 
-	(void)real(pop(&a));
-	y = (781*y + 387) %maxran;
+    (void) real(pop(&a));
+    y = (781 * y + 387) % maxran;
 
-	push( Gcomplex(&a, (double) y /maxran,0.0) );
+    push(Gcomplex(&a, (double) y / maxran, 0.0));
 }
 
-#endif
+#endif /* BADRAND */
 
 /** ibeta.c
  *
@@ -378,7 +396,7 @@ unsigned int maxran = 1000;
  * Copyright (c) 1992 Jos van der Woude, jvdwoude@hut.nl
  */
 
-static double          ibeta(a, b, x)
+static double ibeta(a, b, x)
 double a, b, x;
 {
     /* Test for admissibility of arguments */
@@ -395,27 +413,27 @@ double a, b, x;
     return a < x * (a + b) ? 1.0 - confrac(b, a, 1.0 - x) : confrac(a, b, x);
 }
 
-static double   confrac(a, b, x)
+static double confrac(a, b, x)
 double a, b, x;
 {
-    double          Alo = 0.0;
-    double          Ahi;
-    double          Aev;
-    double          Aod;
-    double          Blo = 1.0;
-    double          Bhi = 1.0;
-    double          Bod = 1.0;
-    double          Bev = 1.0;
-    double          f;
-    double          fold;
-    double          Apb = a + b;
-    double          d;
-    int             i;
-    int             j;
+    double Alo = 0.0;
+    double Ahi;
+    double Aev;
+    double Aod;
+    double Blo = 1.0;
+    double Bhi = 1.0;
+    double Bod = 1.0;
+    double Bev = 1.0;
+    double f;
+    double fold;
+    double Apb = a + b;
+    double d;
+    int i;
+    int j;
 
     /* Set up continued fraction expansion evaluation. */
     Ahi = gp_exp(GAMMA(Apb) + a * log(x) + b * log(1.0 - x) -
-              GAMMA(a + 1.0) - GAMMA(b));
+		 GAMMA(a + 1.0) - GAMMA(b));
 
     /*
      * Continued fraction loop begins here. Evaluation continues until
@@ -473,16 +491,16 @@ double a, b, x;
  */
 
 /* Global variables, not visible outside this file */
-static double   pn1, pn2, pn3, pn4, pn5, pn6;
+static double pn1, pn2, pn3, pn4, pn5, pn6;
 
-static double          igamma(a, x)
+static double igamma(a, x)
 double a, x;
 {
-    double          arg;
-    double          aa;
-    double          an;
-    double          b;
-    int             i;
+    double arg;
+    double aa;
+    double an;
+    double b;
+    int i;
 
     /* Check that we have valid values for a and x */
     if (x < 0.0 || a <= 0.0)
@@ -505,8 +523,8 @@ double a, x;
     if ((x > 1.0) && (x >= a + 2.0)) {
 	/* Use a continued fraction expansion */
 
-	double          rn;
-	double          rnold;
+	double rn;
+	double rnold;
 
 	aa = 1.0 - a;
 	b = aa + x + 1.0;
@@ -583,13 +601,13 @@ double a, x;
      with Splitting Facilities." ACM Transactions on Mathematical
      Software, 17:98-111 (1991)
 ***********************************************************************/
-static double          ranf(init)
+static double ranf(init)
 double init;
 {
 
-    long            k, z;
-    static int      firsttime = 1;
-    static long     s1, s2;
+    long k, z;
+    static int firsttime = 1;
+    static long s1, s2;
 
     /* (Re)-Initialize seeds if necessary */
     if (init < 0.0 || firsttime == 1) {
@@ -622,222 +640,231 @@ double init;
    on 28 OCT 1992.
    ---------------------------------------------------------------- */
 
-void f_normal()	/* Normal or Gaussian Probability Function */
-{
-struct value a;
-double x;
+void f_normal()
+{				/* Normal or Gaussian Probability Function */
+    struct value a;
+    double x;
 
-	/* ref. Abramowitz and Stegun 1964, "Handbook of Mathematical 
-	   Functions", Applied Mathematics Series, vol 55,
-	   Chapter 26, page 934, Eqn. 26.2.29 and Jos van der Woude 
-           code found above */
+    /* ref. Abramowitz and Stegun 1964, "Handbook of Mathematical 
+       Functions", Applied Mathematics Series, vol 55,
+       Chapter 26, page 934, Eqn. 26.2.29 and Jos van der Woude 
+       code found above */
 
-	x = real(pop(&a));
+    x = real(pop(&a));
 
-#ifndef HAVE_ERF
-        x = 0.5 * SQRT_TWO * x;
-        x = 0.5 * (1.0 + (x < 0.0 ? -igamma(0.5, x * x) : igamma(0.5, x * x)));
+    x = 0.5 * SQRT_TWO * x;
+#ifdef HAVE_ERF
+    x = 0.5 * (1.0 + erf(x));
 #else
-	x = 0.5 * (1.0 + erf(0.5 * SQRT_TWO * x));
+    {
+	int fsign;
+	fsign = x >= 0 ? 1 : 0;
+	x = igamma(0.5, (x)*(x));
+	if (x == 1.0) {
+	    undefined = TRUE;
+	    x = 0.0;
+	} else { 
+	    if (fsign == 0)
+		x = -(x);
+	    x = 0.5 * (1.0 + x);
+	}
+    }
 #endif
-        push( Gcomplex(&a,x,0.0) );
+    push(Gcomplex(&a, x, 0.0));
 }
 
-void f_inverse_normal()  /* Inverse normal distribution function */
-{
-struct value a;
-double x;
+void f_inverse_normal()
+{				/* Inverse normal distribution function */
+    struct value a;
+    double x;
 
-	x = real(pop(&a));
+    x = real(pop(&a));
 
-	if (x <= 0.0 || x >= 1.0) {
-		undefined = TRUE;
-		push(Gcomplex(&a,0.0, 0.0));
-	} else {
-		push( Gcomplex(&a,inverse_normal_func(x), 0.0) );
-	}
+    if (x <= 0.0 || x >= 1.0) {
+	undefined = TRUE;
+	push(Gcomplex(&a, 0.0, 0.0));
+    } else {
+	push(Gcomplex(&a, inverse_normal_func(x), 0.0));
+    }
 }
 
 
-void f_inverse_erf()  /* Inverse error function */
-{
-struct value a;
-double x;
+void f_inverse_erf()
+{				/* Inverse error function */
+    struct value a;
+    double x;
 
-	x = real(pop(&a));
+    x = real(pop(&a));
 
-	if (fabs(x) >= 1.0) {
-		undefined = TRUE;
-		push(Gcomplex(&a,0.0, 0.0));
-	} else {
-		push( Gcomplex(&a,inverse_error_func(x), 0.0) );
-	}
+    if (fabs(x) >= 1.0) {
+	undefined = TRUE;
+	push(Gcomplex(&a, 0.0, 0.0));
+    } else {
+	push(Gcomplex(&a, inverse_error_func(x), 0.0));
+    }
 }
 
-static double 
-inverse_normal_func(p)
+static double inverse_normal_func(p)
 double p;
 {
-	/* 
-           Source: This routine was derived (using f2c) from the 
-                   FORTRAN subroutine MDNRIS found in 
-                   ACM Algorithm 602 obtained from netlib.
+    /* 
+       Source: This routine was derived (using f2c) from the 
+       FORTRAN subroutine MDNRIS found in 
+       ACM Algorithm 602 obtained from netlib.
 
-                   MDNRIS code contains the 1978 Copyright 
-                   by IMSL, INC. .  Since MDNRIS has been 
-                   submitted to netlib it may be used with 
-                   the restriction that it may only be 
-                   used for noncommercial purposes and that
-                   IMSL be acknowledged as the copyright-holder
-                   of the code.
-        */
+       MDNRIS code contains the 1978 Copyright 
+       by IMSL, INC. .  Since MDNRIS has been 
+       submitted to netlib it may be used with 
+       the restriction that it may only be 
+       used for noncommercial purposes and that
+       IMSL be acknowledged as the copyright-holder
+       of the code.
+     */
 
-	/* Initialized data */
-	static double eps = 1e-10;
-	static double g0 = 1.851159e-4;
-	static double g1 = -.002028152;
-	static double g2 = -.1498384;
-	static double g3 = .01078639;
-	static double h0 = .09952975;
-	static double h1 = .5211733;
-	static double h2 = -.06888301;
-	static double sqrt2 = 1.414213562373095;
+    /* Initialized data */
+    static double eps = 1e-10;
+    static double g0 = 1.851159e-4;
+    static double g1 = -.002028152;
+    static double g2 = -.1498384;
+    static double g3 = .01078639;
+    static double h0 = .09952975;
+    static double h1 = .5211733;
+    static double h2 = -.06888301;
+    static double sqrt2 = 1.414213562373095;
 
-	/* Local variables */
-	static double a, w, x;
-	static double sd, wi, sn, y;
+    /* Local variables */
+    static double a, w, x;
+    static double sd, wi, sn, y;
 
-	/* Note: 0.0 < p < 1.0 */
+    /* Note: 0.0 < p < 1.0 */
 
-	/* p too small, compute y directly */
-	if (p <= eps) {
-		a = p + p;
-		w = sqrt(-(double)log(a + (a - a * a)));
+    /* p too small, compute y directly */
+    if (p <= eps) {
+	a = p + p;
+	w = sqrt(-(double) log(a + (a - a * a)));
 
-		/* use a rational function in 1.0 / w */
-		wi = 1.0 / w;
-		sn = ((g3 * wi + g2) * wi + g1) * wi;
-		sd = ((wi + h2) * wi + h1) * wi + h0;
-		y = w + w * (g0 + sn / sd);
-		y = -y * sqrt2;
-	} else {
-		x = 1.0 - (p + p);
-		y = inverse_error_func(x);
-		y = -sqrt2 * y;
-	}
-	return(y);
-} 
+	/* use a rational function in 1.0 / w */
+	wi = 1.0 / w;
+	sn = ((g3 * wi + g2) * wi + g1) * wi;
+	sd = ((wi + h2) * wi + h1) * wi + h0;
+	y = w + w * (g0 + sn / sd);
+	y = -y * sqrt2;
+    } else {
+	x = 1.0 - (p + p);
+	y = inverse_error_func(x);
+	y = -sqrt2 * y;
+    }
+    return (y);
+}
 
 
-static double 
-inverse_error_func(p) 
+static double inverse_error_func(p)
 double p;
 {
-	/* 
-           Source: This routine was derived (using f2c) from the 
-                   FORTRAN subroutine MERFI found in 
-                   ACM Algorithm 602 obtained from netlib.
+    /* 
+       Source: This routine was derived (using f2c) from the 
+       FORTRAN subroutine MERFI found in 
+       ACM Algorithm 602 obtained from netlib.
 
-                   MDNRIS code contains the 1978 Copyright 
-                   by IMSL, INC. .  Since MERFI has been 
-                   submitted to netlib, it may be used with 
-                   the restriction that it may only be 
-                   used for noncommercial purposes and that
-                   IMSL be acknowledged as the copyright-holder
-                   of the code.
-        */
+       MDNRIS code contains the 1978 Copyright 
+       by IMSL, INC. .  Since MERFI has been 
+       submitted to netlib, it may be used with 
+       the restriction that it may only be 
+       used for noncommercial purposes and that
+       IMSL be acknowledged as the copyright-holder
+       of the code.
+     */
 
 
 
-	/* Initialized data */
-	static double a1 = -.5751703;
-	static double a2 = -1.896513;
-	static double a3 = -.05496261;
-	static double b0 = -.113773;
-	static double b1 = -3.293474;
-	static double b2 = -2.374996;
-	static double b3 = -1.187515;
-	static double c0 = -.1146666;
-	static double c1 = -.1314774;
-	static double c2 = -.2368201;
-	static double c3 = .05073975;
-	static double d0 = -44.27977;
-	static double d1 = 21.98546;
-	static double d2 = -7.586103;
-	static double e0 = -.05668422;
-	static double e1 = .3937021;
-	static double e2 = -.3166501;
-	static double e3 = .06208963;
-	static double f0 = -6.266786;
-	static double f1 = 4.666263;
-	static double f2 = -2.962883;
-	static double g0 = 1.851159e-4;
-	static double g1 = -.002028152;
-	static double g2 = -.1498384;
-	static double g3 = .01078639;
-	static double h0 = .09952975;
-	static double h1 = .5211733;
-	static double h2 = -.06888301;
+    /* Initialized data */
+    static double a1 = -.5751703;
+    static double a2 = -1.896513;
+    static double a3 = -.05496261;
+    static double b0 = -.113773;
+    static double b1 = -3.293474;
+    static double b2 = -2.374996;
+    static double b3 = -1.187515;
+    static double c0 = -.1146666;
+    static double c1 = -.1314774;
+    static double c2 = -.2368201;
+    static double c3 = .05073975;
+    static double d0 = -44.27977;
+    static double d1 = 21.98546;
+    static double d2 = -7.586103;
+    static double e0 = -.05668422;
+    static double e1 = .3937021;
+    static double e2 = -.3166501;
+    static double e3 = .06208963;
+    static double f0 = -6.266786;
+    static double f1 = 4.666263;
+    static double f2 = -2.962883;
+    static double g0 = 1.851159e-4;
+    static double g1 = -.002028152;
+    static double g2 = -.1498384;
+    static double g3 = .01078639;
+    static double h0 = .09952975;
+    static double h1 = .5211733;
+    static double h2 = -.06888301;
 
-	/* Local variables */
-	static double a, b, f, w, x, y, z, sigma, z2, sd, wi, sn;
+    /* Local variables */
+    static double a, b, f, w, x, y, z, sigma, z2, sd, wi, sn;
 
-	x = p;
+    x = p;
 
-	/* determine sign of x */
-	if (x > 0)
-		sigma = 1.0;
-	else
-		sigma = -1.0;
+    /* determine sign of x */
+    if (x > 0)
+	sigma = 1.0;
+    else
+	sigma = -1.0;
 
-	/* Note: -1.0 < x < 1.0 */
+    /* Note: -1.0 < x < 1.0 */
 
-	z = fabs(x);
+    z = fabs(x);
 
-	/* z between 0.0 and 0.85, approx. f by a 
-	   rational function in z  */
+    /* z between 0.0 and 0.85, approx. f by a 
+       rational function in z  */
 
-	if (z <= 0.85) {
-		z2 = z * z;
-		f = z + z * (b0 + a1 * z2 / (b1 + z2 + a2 
-		    / (b2 + z2 + a3 / (b3 + z2))));
+    if (z <= 0.85) {
+	z2 = z * z;
+	f = z + z * (b0 + a1 * z2 / (b1 + z2 + a2
+				     / (b2 + z2 + a3 / (b3 + z2))));
 
 	/* z greater than 0.85 */
-	} else {
-		a = 1.0 - z;
-		b = z;
+    } else {
+	a = 1.0 - z;
+	b = z;
 
-		/* reduced argument is in (0.85,1.0), 
-		   obtain the transformed variable */
+	/* reduced argument is in (0.85,1.0), 
+	   obtain the transformed variable */
 
-		w = sqrt(-(double)log(a + a * b));
+	w = sqrt(-(double) log(a + a * b));
 
-		/* w greater than 4.0, approx. f by a 
-		   rational function in 1.0 / w */
+	/* w greater than 4.0, approx. f by a 
+	   rational function in 1.0 / w */
 
-		if (w >= 4.0) {
-			wi = 1.0 / w;
-			sn = ((g3 * wi + g2) * wi + g1) * wi;
-			sd = ((wi + h2) * wi + h1) * wi + h0;
-			f = w + w * (g0 + sn / sd);
+	if (w >= 4.0) {
+	    wi = 1.0 / w;
+	    sn = ((g3 * wi + g2) * wi + g1) * wi;
+	    sd = ((wi + h2) * wi + h1) * wi + h0;
+	    f = w + w * (g0 + sn / sd);
 
-		/* w between 2.5 and 4.0, approx. 
-		   f by a rational function in w */
+	    /* w between 2.5 and 4.0, approx. 
+	       f by a rational function in w */
 
-		} else if (w < 4.0 && w > 2.5) {
-			sn = ((e3 * w + e2) * w + e1) * w;
-			sd = ((w + f2) * w + f1) * w + f0;
-			f = w + w * (e0 + sn / sd);
+	} else if (w < 4.0 && w > 2.5) {
+	    sn = ((e3 * w + e2) * w + e1) * w;
+	    sd = ((w + f2) * w + f1) * w + f0;
+	    f = w + w * (e0 + sn / sd);
 
-		/* w between 1.13222 and 2.5, approx. f by 
-		   a rational function in w */
-		} else if (w <= 2.5 && w > 1.13222) {
-			sn = ((c3 * w + c2) * w + c1) * w;
-			sd = ((w + d2) * w + d1) * w + d0;
-			f = w + w * (c0 + sn / sd);
-		}
+	    /* w between 1.13222 and 2.5, approx. f by 
+	       a rational function in w */
+	} else if (w <= 2.5 && w > 1.13222) {
+	    sn = ((c3 * w + c2) * w + c1) * w;
+	    sd = ((w + d2) * w + d1) * w + d0;
+	    f = w + w * (c0 + sn / sd);
 	}
-	y = sigma * f;
-	return(y);
+    }
+    y = sigma * f;
+    return (y);
 }
-

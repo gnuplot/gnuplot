@@ -131,8 +131,8 @@ version.obj: version.c
 $(HELPFILE): doc2gih.exe docs\gnuplot.doc
 	doc2gih docs\gnuplot.doc $(HELPFILE)
 
-doc2gih.exe: docs\doc2gih.c
-    $(BIN)$(CC) -w- -ml -I$(TC)\include -L$(TC)\lib docs\doc2gih.c
+doc2gih.exe: docs\doc2gih.c docs\termdoc.c
+    $(BIN)$(CC) -edoc2gih.exe -w- -ml -I$(TC)\include -L$(TC)\lib docs\doc2gih.c docs\termdoc.c
 
 demo\bf_test.exe: bf_test.c binary.obj alloc.obj
     $(BIN)$(CC) -edemo\bf_test.exe -w- -ml -I$(TC)\include -L$(TC)\lib bf_test.c binary.obj alloc.obj

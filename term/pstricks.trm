@@ -95,7 +95,7 @@ TERM_PUBLIC void PSTRICKS_vector __PROTO((unsigned int ux, unsigned int uy));
 TERM_PUBLIC void PSTRICKS_arrow __PROTO((unsigned int sx, unsigned int sy, unsigned int ex, unsigned int ey, TBOOLEAN head));
 TERM_PUBLIC void PSTRICKS_put_text __PROTO((unsigned int x, unsigned int y, char str[]));
 TERM_PUBLIC int PSTRICKS_justify_text __PROTO((enum JUSTIFY mode));
-TERM_PUBLIC int PSTRICKS_text_angle __PROTO((int angle));
+TERM_PUBLIC int PSTRICKS_text_angle __PROTO((int ang));
 TERM_PUBLIC void PSTRICKS_reset __PROTO((void));
 
 #define PSTRICKS_XMAX 10000.0
@@ -110,20 +110,20 @@ TERM_PUBLIC void PSTRICKS_reset __PROTO((void));
 #ifndef TERM_PROTO_ONLY
 #ifdef TERM_BODY
 static void PSTRICKS_endline __PROTO((void));
-static char * PSTRICKS_hack_text __PROTO((char s[]));
+static char *PSTRICKS_hack_text __PROTO((char s[]));
 
-static float	PSTRICKS_xscale = 1.0;
-static float	PSTRICKS_yscale = 1.0;
-static float	PSTRICKS_posx;
-static float	PSTRICKS_posy;
-enum JUSTIFY    PSTRICKS_justify = LEFT;
-static int      PSTRICKS_angle = 0;
+static float PSTRICKS_xscale = 1.0;
+static float PSTRICKS_yscale = 1.0;
+static float PSTRICKS_posx;
+static float PSTRICKS_posy;
+enum JUSTIFY PSTRICKS_justify = LEFT;
+static int PSTRICKS_angle = 0;
 
-#define	PSTRICKS_TINY_DOT	0.00025	/* A tiny dot */
+#define	PSTRICKS_TINY_DOT	0.00025		/* A tiny dot */
 
 /* POINTS */
-#define PSTRICKS_POINT_TYPES 12		/* we supply more point types */
-static char    *PSTRICKS_points[] =
+#define PSTRICKS_POINT_TYPES 12	/* we supply more point types */
+static char *PSTRICKS_points[] =
 {
     "\\PST@Diamond",
     "\\PST@Plus",
@@ -140,8 +140,8 @@ static char    *PSTRICKS_points[] =
 };
 
 /* LINES */
-#define PSTRICKS_NUMLINES 6		/* number of linetypes below */
-static char    *PSTRICKS_lines[] =
+#define PSTRICKS_NUMLINES 6	/* number of linetypes below */
+static char *PSTRICKS_lines[] =
 {
     "\\PST@Border",
     "\\PST@Axes",
@@ -151,22 +151,29 @@ static char    *PSTRICKS_lines[] =
     "\\PST@LongDash"
 };
 
-static int      PSTRICKS_type;		/* current line type */
-static TBOOLEAN  PSTRICKS_inline = FALSE;/* are we in the middle of a line */
-static void     PSTRICKS_endline __PROTO((void));	/* terminate any line in progress */
-static int      PSTRICKS_linecount = 0;	/* number of points in line so far */
+/* current line type */
+static int PSTRICKS_type;
 
-#define PSTRICKS_LINEMAX 100		/* max value for linecount */
+/* are we in the middle of a line */
+static TBOOLEAN PSTRICKS_inline = FALSE;
+
+/* terminate any line in progress */
+static void PSTRICKS_endline __PROTO((void));
+
+/* number of points in line so far */
+static int PSTRICKS_linecount = 0;
+
+/* max value for linecount */
+#define PSTRICKS_LINEMAX 100
 
 /*
  * Handle options
  */
 
-static int PST_hack_text = TRUE;			/* Hack text on */
-static int PST_unit_plot = FALSE;			/* Unit-sized plot off */
+static int PST_hack_text = TRUE;	/* Hack text on */
+static int PST_unit_plot = FALSE;	/* Unit-sized plot off */
 
-TERM_PUBLIC void
-PSTRICKS_options()
+TERM_PUBLIC void PSTRICKS_options()
 {
     if (!END_OF_COMMAND) {
 	if (almost_equals(c_token, "no$hacktext")) {
@@ -179,92 +186,91 @@ PSTRICKS_options()
     }
 }
 
-TERM_PUBLIC void
-PSTRICKS_init()
+TERM_PUBLIC void PSTRICKS_init()
 {
     PSTRICKS_posx = PSTRICKS_posy = 0;
     PSTRICKS_linetype(-1);
-    fprintf(outfile, "%% GNUPLOT: LaTeX picture using PSTRICKS macros\n");
+    fputs("% GNUPLOT: LaTeX picture using PSTRICKS macros\n", gpoutfile);
 }
 
 
-TERM_PUBLIC void
-PSTRICKS_graphics()
+TERM_PUBLIC void PSTRICKS_graphics()
 {
-    fprintf(outfile, "%% Define new PST objects, if not already defined\n");
-
-    fprintf(outfile, "\\ifx\\PSTloaded\\undefined\n");
-    fprintf(outfile, "\\def\\PSTloaded{t}\n");
-
-    fprintf(outfile, "\\psset{arrowsize=.01 3.2 1.4 .3}\n");
-    fprintf(outfile, "\\psset{dotsize=.01}\n");
-
-    fprintf(outfile, "\\catcode`@=11\n\n");
+    fputs("\
+% Define new PST objects, if not already defined\n\
+\\ifx\\PSTloaded\\undefined\n\
+\\def\\PSTloaded{t}\n\
+\\psset{arrowsize=.01 3.2 1.4 .3}\n\
+\\psset{dotsize=.01}\n\
+\\catcode`@=11\n\n", gpoutfile);
 
     /* Define line type objects */
-    fprintf(outfile, "\\newpsobject{PST@Border}{psline}{linewidth=.0015,linestyle=solid}\n");
-    fprintf(outfile, "\\newpsobject{PST@Axes}{psline}{linewidth=.0015,linestyle=dotted,dotsep=.004}\n");
-    fprintf(outfile, "\\newpsobject{PST@Solid}{psline}{linewidth=.0015,linestyle=solid}\n");
-    fprintf(outfile, "\\newpsobject{PST@Dashed}{psline}{linewidth=.0015,linestyle=dashed,dash=.01 .01}\n");
-    fprintf(outfile, "\\newpsobject{PST@Dotted}{psline}{linewidth=.0025,linestyle=dotted,dotsep=.008}\n");
-    fprintf(outfile, "\\newpsobject{PST@LongDash}{psline}{linewidth=.0015,linestyle=dashed,dash=.02 .01}\n");
+    fputs("\
+\\newpsobject{PST@Border}{psline}{linewidth=.0015,linestyle=solid}\n\
+\\newpsobject{PST@Axes}{psline}{linewidth=.0015,linestyle=dotted,dotsep=.004}\n\
+\\newpsobject{PST@Solid}{psline}{linewidth=.0015,linestyle=solid}\n\
+\\newpsobject{PST@Dashed}{psline}{linewidth=.0015,linestyle=dashed,dash=.01 .01}\n\
+\\newpsobject{PST@Dotted}{psline}{linewidth=.0025,linestyle=dotted,dotsep=.008}\n\
+\\newpsobject{PST@LongDash}{psline}{linewidth=.0015,linestyle=dashed,dash=.02 .01}\n", gpoutfile);
 
     /* Define point objects */
-    
+
 #ifdef	OLD_PST
     /* PSTricks version 0.91 had x and diamond dot types */
-    fprintf(outfile, "\\newpsobject(PST@Diamond}{psdots}{linewidth=.001,linestyle=solid,dotstyle=diamond}\n");
-    fprintf(outfile, "\\newpsobject(PST@Filldiamond}{psdots}{linewidth=.001,linestyle=solid,dotstyle=diamond*}\n");
-    fprintf(outfile, "\\newpsobject{PST@Cross}{psdots}{linewidth=.001,linestyle=solid,dotstyle=x}\n");
+    fputs("\
+\\newpsobject(PST@Diamond}{psdots}{linewidth=.001,linestyle=solid,dotstyle=diamond}\n\
+\\newpsobject(PST@Filldiamond}{psdots}{linewidth=.001,linestyle=solid,dotstyle=diamond*}\n\
+\\newpsobject{PST@Cross}{psdots}{linewidth=.001,linestyle=solid,dotstyle=x}\n", gpoutfile);
 #else
     /* Newer versions use rotated plus and square to get the x and diamond dots */
-    fprintf(outfile, "\\newpsobject{PST@Diamond}{psdots}{linewidth=.001,linestyle=solid,dotstyle=square,dotangle=45}\n");
-    fprintf(outfile, "\\newpsobject{PST@Filldiamond}{psdots}{linewidth=.001,linestyle=solid,dotstyle=square*,dotangle=45}\n");
-    fprintf(outfile, "\\newpsobject{PST@Cross}{psdots}{linewidth=.001,linestyle=solid,dotstyle=+,dotangle=45}\n");
+    fputs("\
+\\newpsobject{PST@Diamond}{psdots}{linewidth=.001,linestyle=solid,dotstyle=square,dotangle=45}\n\
+\\newpsobject{PST@Filldiamond}{psdots}{linewidth=.001,linestyle=solid,dotstyle=square*,dotangle=45}\n\
+\\newpsobject{PST@Cross}{psdots}{linewidth=.001,linestyle=solid,dotstyle=+,dotangle=45}\n", gpoutfile);
 #endif
 
-    fprintf(outfile, "\\newpsobject{PST@Plus}{psdots}{linewidth=.001,linestyle=solid,dotstyle=+}\n");
-    fprintf(outfile, "\\newpsobject{PST@Square}{psdots}{linewidth=.001,linestyle=solid,dotstyle=square}\n");
-    fprintf(outfile, "\\newpsobject{PST@Circle}{psdots}{linewidth=.001,linestyle=solid,dotstyle=o}\n");
-    fprintf(outfile, "\\newpsobject{PST@Triangle}{psdots}{linewidth=.001,linestyle=solid,dotstyle=triangle}\n");
-    fprintf(outfile, "\\newpsobject{PST@Pentagon}{psdots}{linewidth=.001,linestyle=solid,dotstyle=pentagon}\n");
-    fprintf(outfile, "\\newpsobject{PST@Fillsquare}{psdots}{linewidth=.001,linestyle=solid,dotstyle=square*}\n");
-    fprintf(outfile, "\\newpsobject{PST@Fillcircle}{psdots}{linewidth=.001,linestyle=solid,dotstyle=*}\n");
-    fprintf(outfile, "\\newpsobject{PST@Filltriangle}{psdots}{linewidth=.001,linestyle=solid,dotstyle=triangle*}\n");
-    fprintf(outfile, "\\newpsobject{PST@Fillpentagon}{psdots}{linewidth=.001,linestyle=solid,dotstyle=pentagon*}\n");
+    fputs("\
+\\newpsobject{PST@Plus}{psdots}{linewidth=.001,linestyle=solid,dotstyle=+}\n\
+\\newpsobject{PST@Square}{psdots}{linewidth=.001,linestyle=solid,dotstyle=square}\n\
+\\newpsobject{PST@Circle}{psdots}{linewidth=.001,linestyle=solid,dotstyle=o}\n\
+\\newpsobject{PST@Triangle}{psdots}{linewidth=.001,linestyle=solid,dotstyle=triangle}\n\
+\\newpsobject{PST@Pentagon}{psdots}{linewidth=.001,linestyle=solid,dotstyle=pentagon}\n\
+\\newpsobject{PST@Fillsquare}{psdots}{linewidth=.001,linestyle=solid,dotstyle=square*}\n\
+\\newpsobject{PST@Fillcircle}{psdots}{linewidth=.001,linestyle=solid,dotstyle=*}\n\
+\\newpsobject{PST@Filltriangle}{psdots}{linewidth=.001,linestyle=solid,dotstyle=triangle*}\n\
+\\newpsobject{PST@Fillpentagon}{psdots}{linewidth=.001,linestyle=solid,dotstyle=pentagon*}\n", gpoutfile);
 
     /* Define arrow object */
-    fprintf(outfile, "\\newpsobject{PST@Arrow}{psline}{linewidth=.001,linestyle=solid}\n");
-
-    fprintf(outfile, "\\catcode`@=12\n\n");
-    fprintf(outfile, "\\fi\n");
+    fputs("\
+\\newpsobject{PST@Arrow}{psline}{linewidth=.001,linestyle=solid}\n\
+\\catcode`@=12\n\n\
+\\fi\n", gpoutfile);
 
     /* Set the scaled plot size, if it's not a unit plot */
     if (!PST_unit_plot) {
-	fprintf(outfile, "\\psset{unit=%fin,xunit=%fin,yunit=%fin}\n",
+	fprintf(gpoutfile, "\\psset{unit=%fin,xunit=%fin,yunit=%fin}\n",
 		5.0 * PSTRICKS_xscale,
 		5.0 * PSTRICKS_xscale,
 		3.0 * PSTRICKS_yscale);
     }
-    
-    fprintf(outfile, "\\pspicture(0,0)(1,1)\n");
-    fprintf(outfile, "\\ifx\\nofigs\\undefined\n");
-    fprintf(outfile, "\\catcode`@=11\n\n");
+    fputs("\
+\\pspicture(0,0)(1,1)\n\
+\\ifx\\nofigs\\undefined\n\
+\\catcode`@=11\n\n", gpoutfile);
 }
 
 
-TERM_PUBLIC void
-PSTRICKS_text()
+TERM_PUBLIC void PSTRICKS_text()
 {
     PSTRICKS_endline();
-    fprintf(outfile, "\\catcode`@=12\n");
-    fprintf(outfile, "\\fi\n");
-    fprintf(outfile, "\\endpspicture\n");
+    fputs("\
+\\catcode`@=12\n\
+\\fi\n\
+\\endpspicture\n", gpoutfile);
 }
 
 
-TERM_PUBLIC void
-PSTRICKS_linetype(linetype)
+TERM_PUBLIC void PSTRICKS_linetype(linetype)
 int linetype;
 {
     PSTRICKS_endline();
@@ -277,8 +283,7 @@ int linetype;
 
 
 
-TERM_PUBLIC void
-PSTRICKS_move(x, y)
+TERM_PUBLIC void PSTRICKS_move(x, y)
 unsigned int x;
 unsigned int y;
 {
@@ -289,8 +294,7 @@ unsigned int y;
 }
 
 
-TERM_PUBLIC void
-PSTRICKS_point(x, y, number)		/* version of line_and_point */
+TERM_PUBLIC void PSTRICKS_point(x, y, number) /* version of line_and_point */
 unsigned x;
 unsigned y;
 int number;
@@ -298,15 +302,15 @@ int number;
     PSTRICKS_move(x, y);
 
     /* Print the character defined by 'number'; number < 0 means
-	  to use a dot, otherwise one of the defined points. */
+       to use a dot, otherwise one of the defined points. */
 
     if (number < 0) {
-	fprintf(outfile, "\\qdisk(%.4f,%.4f){%.4f}\n",
+	fprintf(gpoutfile, "\\qdisk(%.4f,%.4f){%.4f}\n",
 		x / PSTRICKS_XMAX,
 		y / PSTRICKS_YMAX,
 		PSTRICKS_TINY_DOT);
     } else {
-	fprintf(outfile, "%s(%.4f,%.4f)\n",
+	fprintf(gpoutfile, "%s(%.4f,%.4f)\n",
 		PSTRICKS_points[number % PSTRICKS_POINT_TYPES],
 		x / PSTRICKS_XMAX,
 		y / PSTRICKS_YMAX);
@@ -314,8 +318,7 @@ int number;
 }
 
 
-TERM_PUBLIC void
-PSTRICKS_vector(ux, uy)
+TERM_PUBLIC void PSTRICKS_vector(ux, uy)
 unsigned ux;
 unsigned uy;
 {
@@ -323,7 +326,7 @@ unsigned uy;
 	PSTRICKS_inline = TRUE;
 
 	/* Start a new line. This depends on line type */
-	fprintf(outfile, "%s(%.4f,%.4f)\n", PSTRICKS_lines[PSTRICKS_type + 2],
+	fprintf(gpoutfile, "%s(%.4f,%.4f)\n", PSTRICKS_lines[PSTRICKS_type + 2],
 		PSTRICKS_posx, PSTRICKS_posy);
 	PSTRICKS_linecount = 1;
     } else {
@@ -333,36 +336,34 @@ unsigned uy;
 	 * If they are too long then latex will choke.
 	 */
 	if (PSTRICKS_linecount++ >= PSTRICKS_LINEMAX) {
-/*	    fprintf(outfile, "\n"); */
-	    fprintf(outfile, "%s(%.4f,%.4f)\n", PSTRICKS_lines[PSTRICKS_type + 2],
+/*	    fprintf(gpoutfile, "\n"); */
+	    fprintf(gpoutfile, "%s(%.4f,%.4f)\n", PSTRICKS_lines[PSTRICKS_type + 2],
 		    PSTRICKS_posx, PSTRICKS_posy);
 	    PSTRICKS_linecount = 1;
 	}
     }
     PSTRICKS_posx = ux / PSTRICKS_XMAX;
     PSTRICKS_posy = uy / PSTRICKS_YMAX;
-    fprintf(outfile, "(%.4f,%.4f)\n", PSTRICKS_posx, PSTRICKS_posy);
+    fprintf(gpoutfile, "(%.4f,%.4f)\n", PSTRICKS_posx, PSTRICKS_posy);
 }
 
-static void
-PSTRICKS_endline()
+static void PSTRICKS_endline()
 {
     if (PSTRICKS_inline) {
-	fprintf(outfile, "\n");
+	putc('\n', gpoutfile);
 	PSTRICKS_inline = FALSE;
     }
 }
 
 
-TERM_PUBLIC void
-PSTRICKS_arrow(sx, sy, ex, ey, head)
+TERM_PUBLIC void PSTRICKS_arrow(sx, sy, ex, ey, head)
 unsigned int sx;
 unsigned int sy;
 unsigned int ex;
 unsigned int ey;
 TBOOLEAN head;
 {
-    fprintf(outfile, "\\PST@Arrow%s(%.4f,%.4f)(%.4f,%.4f)\n",
+    fprintf(gpoutfile, "\\PST@Arrow%s(%.4f,%.4f)(%.4f,%.4f)\n",
 	    head ? "{->}" : "",
 	    sx / PSTRICKS_XMAX,
 	    sy / PSTRICKS_YMAX,
@@ -389,13 +390,12 @@ TBOOLEAN head;
  */
 
 
-static char *
-PSTRICKS_hack_text(s)
+static char *PSTRICKS_hack_text(s)
 char s[];
 {
-    double	value;
-    char	*ends;
-    static char	hack[BUFSIZ];
+    double value;
+    char *ends;
+    static char hack[BUFSIZ];
 
     /*
      * Does the string start with a number?
@@ -407,24 +407,23 @@ char s[];
 	/*
 	 * This doesn't start a number, so just copy the string over
 	 */
-	
+
 	strcpy(hack, s);
     } else {
 	char *ptr;
-	
+
 	/*
 	 * We have a number!  Check to see if the number
 	 * is in scientific notation
 	 */
 
-	strncpy(hack, s, ends - s);
-	hack[ends - s] = '\0';
-	
+	safe_strncpy(hack, s, ends - s);
+	/* hack[ends - s] = '\0'; */
+
 	ptr = strchr(hack, 'e');
 	if (ptr == NULL) {
 	    ptr = strchr(hack, 'E');
 	}
-
 	if (ptr != NULL) {
 	    /*
 	     * Exponential notation!  Let's get the mantissa and exponent separately
@@ -433,7 +432,7 @@ char s[];
 	    double man_val;
 	    int expo_val;
 
-	    *ptr = '\0';
+	    *ptr = NUL;
 
 	    man_val = atof(hack);
 	    expo_val = atoi(ptr + 1);
@@ -456,19 +455,17 @@ char s[];
 		}
 	    }
 	}
-
 	/*
 	 * Copy anything that's left of the string
 	 */
-	
+
 	strcat(hack, ends);
     }
 
     return hack;
 }
 
-TERM_PUBLIC void
-PSTRICKS_put_text(x, y, str)
+TERM_PUBLIC void PSTRICKS_put_text(x, y, str)
 unsigned int x;
 unsigned int y;
 char str[];
@@ -478,18 +475,18 @@ char str[];
     /* Skip this if the string is empty */
 
     if (strlen(str) > 0) {
-	fprintf(outfile, "\\rput");
+	fputs("\\rput", gpoutfile);
 
 	/* Set justification */
 
 	switch (PSTRICKS_justify) {
 	case LEFT:
-	    fprintf(outfile, "[l]");
+	    fputs("[l]", gpoutfile);
 	    break;
 	case CENTRE:
 	    break;
 	case RIGHT:
-	    fprintf(outfile, "[r]");
+	    fputs("[r]", gpoutfile);
 	    break;
 	}
 
@@ -499,48 +496,45 @@ char str[];
 	case 0:
 	    break;
 	case 1:
-	    fprintf(outfile, "{L}");
+	    fputs("{L}", gpoutfile);
 	    break;
 	}
 
 	/* Set reference position and text */
 
-	fprintf(outfile, "(%.4f,%.4f)",
-		    x / PSTRICKS_XMAX,
-		    y / PSTRICKS_YMAX);
+	fprintf(gpoutfile, "(%.4f,%.4f)",
+		x / PSTRICKS_XMAX,
+		y / PSTRICKS_YMAX);
 	if (PST_hack_text) {
 	    char *hack;
 
 	    /* Hack leading numbers to something nice for TeX */
-	    
+
 	    hack = PSTRICKS_hack_text(str);
-	    fprintf(outfile, "{%s}\n", hack);
+	    fprintf(gpoutfile, "{%s}\n", hack);
 	} else {
-	    fprintf(outfile, "{%s}\n", str);
+	    fprintf(gpoutfile, "{%s}\n", str);
 	}
     }
 }
 
 
 
-TERM_PUBLIC int 
-PSTRICKS_justify_text(mode)
+TERM_PUBLIC int PSTRICKS_justify_text(mode)
 enum JUSTIFY mode;
 {
     PSTRICKS_justify = mode;
     return (TRUE);
 }
 
-TERM_PUBLIC int 
-PSTRICKS_text_angle(angle)
-int angle;
+TERM_PUBLIC int PSTRICKS_text_angle(ang)
+int ang;
 {
-    PSTRICKS_angle = angle;
+    PSTRICKS_angle = ang;
     return (TRUE);
 }
 
-TERM_PUBLIC void
-PSTRICKS_reset()
+TERM_PUBLIC void PSTRICKS_reset()
 {
     PSTRICKS_endline();
     PSTRICKS_posx = PSTRICKS_posy = 0;
@@ -552,11 +546,11 @@ PSTRICKS_reset()
 
 TERM_TABLE_START(pstricks_driver)
     "pstricks", "LaTeX picture environment with PSTricks macros",
-	   PSTRICKS_XMAX, PSTRICKS_YMAX, PSTRICKS_VCHAR, PSTRICKS_HCHAR, 
-	   PSTRICKS_VTIC, PSTRICKS_HTIC, PSTRICKS_options, PSTRICKS_init, PSTRICKS_reset, 
-	   PSTRICKS_text, null_scale, PSTRICKS_graphics, PSTRICKS_move, PSTRICKS_vector, 
-	   PSTRICKS_linetype, PSTRICKS_put_text, PSTRICKS_text_angle, 
-	   PSTRICKS_justify_text, PSTRICKS_point, PSTRICKS_arrow, set_font_null
+    PSTRICKS_XMAX, PSTRICKS_YMAX, PSTRICKS_VCHAR, PSTRICKS_HCHAR,
+    PSTRICKS_VTIC, PSTRICKS_HTIC, PSTRICKS_options, PSTRICKS_init, PSTRICKS_reset,
+    PSTRICKS_text, null_scale, PSTRICKS_graphics, PSTRICKS_move, PSTRICKS_vector,
+    PSTRICKS_linetype, PSTRICKS_put_text, PSTRICKS_text_angle,
+    PSTRICKS_justify_text, PSTRICKS_point, PSTRICKS_arrow, set_font_null
 TERM_TABLE_END(pstricks_driver)
 
 #undef LAST_TERM
@@ -568,6 +562,7 @@ TERM_TABLE_END(pstricks_driver)
 #ifdef TERM_HELP
 START_HELP(pstricks)
 "1 pstricks",
+"?commands set terminal pstricks",
 "?set terminal pstricks",
 "?set term pstricks",
 "?terminal pstricks",
@@ -588,4 +583,4 @@ START_HELP(pstricks)
 " The first option invokes an ugly hack that gives nicer numbers; the second",
 " has to do with plot scaling.  The defaults are `hacktext` and `nounit`."
 END_HELP(pstricks)
-#endif
+#endif /* TERM_HELP */

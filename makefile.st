@@ -122,6 +122,7 @@ plot3d.o:    plot3d.c plot.h setshow.h binary.h help.h
 readline.o:  readline.c
 scanner.o:   scanner.c plot.h
 show.o:      set.c plot.h setshow.h
+		$(CC) -o $@ $(CFLAGS) -DHELPFILE=\"$(HELPFILE)\" $<
 set.o:       show.c plot.h setshow.h
 specfun.o:   plot.h specfun.c
 standard.o:  standard.c plot.h
@@ -135,8 +136,8 @@ version.o:   version.c
 $(HELPFILE): doc2gih docs$(SL)gnuplot.doc
 	doc2gih docs$(SL)gnuplot.doc $(HELPFILE)
 
-doc2gih: docs$(SL)doc2gih.c
-	$(HOSTCC) -I. -I.. -o doc2gih docs$(SL)doc2gih.c
+doc2gih: docs$(SL)doc2gih.c docs$(SL)termdoc.c
+	$(HOSTCC) -I. -I.. -o doc2gih docs$(SL)doc2gih.c docs$(SL)termdoc.c 
 
 demo$(SL)bf_test.tos: bf_test.o binary.o alloc.o
 	$(CC) -s -o $@ bf_test.o binary.o alloc.o -lpml

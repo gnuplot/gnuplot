@@ -77,6 +77,7 @@ static char RCSid[]="$Id: gclient.c,v 1.15 1998/03/22 22:34:21 drd Exp $" ;
 #include <stdio.h>
 #include <io.h>
 #include <fcntl.h>
+#include <math.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <process.h>
@@ -176,7 +177,7 @@ static int lSubOffset = 0 ;
 static int lBaseSupOffset = 0 ;
 static int lBaseSubOffset = 0 ;
 static int lCharWidth = 217 ;
-static int lCharHeight = 558 ; 
+static int lCharHeight = 465 ; 
 
 
 /*==== f u n c t i o n s =====================================================*/
@@ -206,6 +207,9 @@ static char    *ParseText(HPS, char *, BOOL, char *,
                        int, int, BOOL, BOOL ) ;
 static void     CharStringAt(HPS, int, int, int, char *) ;
 static int      QueryTextBox( HPS, int, char * ) ; 
+static void      LMove( HPS hps, POINTL *p ) ;
+static void      LLine( HPS hps, POINTL *p ) ;
+static void      LType( int iType ) ;
 
 /*==== c o d e ===============================================================*/
 
@@ -318,19 +322,18 @@ MRESULT EXPENTRY DisplayClientWndProc(HWND hWnd, ULONG message, MPARAM mp1, MPAR
             {
             ULONG ulCount ;
             PID pid; TID tid;
-            if(bFirst) { /* ignore first paint message */
-                bFirst = FALSE ;
-                return (WinDefWindowProc(hWnd, message, mp1, mp2));
-                }
-                /* suppress paint messages while building plot */
+            HPS hps_tmp;
+            RECTL rectl_tmp;
               DosQueryMutexSem( semHpsAccess, &pid, &tid, &ulCount ) ;
-              if( ulCount > 0 ) {
-//            if( DosWaitEventSem( semDrawDone, 0 ) != 0 ) {
-                        /* include in update region */
-                WinInvalidateRect( hWnd, &rectlPaint, TRUE ) ;
-                        /* mark as done, but save region for later update */ 
-                WinBeginPaint( hWnd, hpsScreen, &rectlPaint ) ;
-                WinEndPaint(hpsScreen) ; 
+            if (( ulCount > 0 ) && (tid != tidDraw)) {
+                /* simple repaint while building plot or metafile */
+                /* use temporary PS                   */
+              hps_tmp = WinBeginPaint(hWnd,0,&rectl_tmp );
+              WinFillRect(hps_tmp,&rectl_tmp,CLR_BACKGROUND);
+              WinEndPaint(hps_tmp);
+                /* add dirty rectangle to saved rectangle     */
+                /* to be repainted when PS is available again */
+              WinUnionRect(hab,&rectlPaint,&rectl_tmp,&rectlPaint);
                 iPaintCount ++ ;
                 break ;
                 } 
@@ -775,7 +778,7 @@ BOOL QueryIni( HAB hab )
         }
     else {
         lCharWidth = 217 ;
-        lCharHeight = 558 ;
+        lCharHeight = 465 ;
         }
     PrfCloseProfile( hini ) ;
 
@@ -869,8 +872,7 @@ static void DoPaint( HWND hWnd, HPS hps  )
             /* winbeginpaint here, so paint message is
                not resent when we return, then spawn a 
                thread to do the drawing */
-//    WinBeginPaint( hWnd, hps, &rectl ) ;
-    WinBeginPaint( hWnd, hps, NULL ) ;
+    WinBeginPaint( hWnd, hps, &rectl ) ;                 //rl
     tidDraw = _beginthread( ThreadDraw, NULL, 32768, NULL ) ;
     }
 
@@ -1445,6 +1447,7 @@ server:
 	            lt = (lt%8);
 	            col = (col+2)%16 ;
                     GpiLabel( hps, lLineTypes[lt] ) ;
+lOldLine=lt ;
                     LType( (bLineTypes||bBW)?lt:0 ) ;
 //                    GpiSetLineType( hps, (bLineTypes||bBW)?lLineTypes[lt]:lLineTypes[0] ) ;
                     if( !bBW ) { /* maintain some flexibility here in case we don't want
@@ -1475,8 +1478,10 @@ server:
                     BufRead(hRead,&lt, sizeof(int), &cbR) ;
     	              /* 1: enter point mode, 0: exit */
                     if( bLineTypes || bBW ) {
-                        if( lt == 1 ) lOldLine = GpiSetLineType( hps, lLineTypes[0] ) ;
-                        else GpiSetLineType( hps, lOldLine ) ;
+                        if( lt==1) LType(0) ;
+                        else LType( lOldLine ) ;
+//                        if( lt == 1 ) lOldLine = GpiSetLineType( hps, lLineTypes[0] ) ;
+//                        else GpiSetLineType( hps, lOldLine ) ;
                         }
 //                    if( lt == 1 ) GpiSetLineWidthGeom( hps, 20 ) ;
 //                    else GpiSetLineWidthGeom( hps, 50 ) ;
@@ -2025,7 +2030,6 @@ void FontExpand( char *name )
     }
 
 /*=======================================*/
-#include <math.h>
 static POINTL pCur ;
 static int iLinebegin = 1 ;
 static int iLtype = 0 ;
@@ -2033,17 +2037,17 @@ static int iState = 0 ;
 static double togo = 0.0 ;
 static int iPatt[8][9]
   = {
-    0,   0,   0,   0,   0,   0,   0,   0  , 0,
-    300, 200, -1 , 0  , 0  , 0  , 0  , 0  , 0  ,
-    150, 150, -1 , 0  , 0  , 0  , 0  , 0  , 0  ,
-    300, 200, 150, 200, -1 , 0  , 0  , 0  , 0  ,
-    500, 200, -1 , 0  , 0  , 0  , 0  , 0  , 0  ,
-    300, 200, 150, 200, 150, 200, -1 , 0  , 0  ,
-    300, 200, 150, 200, 150, 200, 150, 200, -1 ,
-    500,  200, 150, 200, -1 , 0  , 0  , 0  , 0  
+    {   0,   0,   0,   0,   0,   0,   0,   0,  0 },
+    { 300, 200,  -1,   0,   0,   0,   0,   0,  0 },
+    { 150, 150,  -1,   0,   0,   0,   0,   0,  0 },
+    { 300, 200, 150, 200,  -1,   0,   0,   0,  0 },
+    { 500, 200,  -1,   0,   0,   0,   0,   0,  0 },
+    { 300, 200, 150, 200, 150, 200,  -1,   0,  0 },
+    { 300, 200, 150, 200, 150, 200, 150, 200, -1 },
+    { 500, 200, 150, 200,  -1,   0,   0,   0,  0 }
     } ;
 
-int LMove( HPS hps, POINTL *p )
+void LMove( HPS hps, POINTL *p )
     {
     double ds, dx, dy ;
     if( iLinebegin ) {
@@ -2081,7 +2085,7 @@ int LMove( HPS hps, POINTL *p )
         }
     } 
 
-int LLine( HPS hps, POINTL *p )
+void LLine( HPS hps, POINTL *p )
     {
     double ds, dx, dy ;
     if( iLinebegin ) iLinebegin = 0 ;
@@ -2119,7 +2123,7 @@ int LLine( HPS hps, POINTL *p )
         }
     } 
 
-int LType( int iType )
+void LType( int iType )
     {
     iLinebegin = 1 ;
     if( iType > 7 ) iType = 0 ;

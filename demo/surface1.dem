@@ -6,7 +6,7 @@ set isosample 11
 set xlabel "X axis" -3,-2
 set ylabel "Y axis" 3,-2
 set zlabel "Z axis" -5
-set title "3D gnu plot demo"
+set title "3D gnuplot demo"
 set label 1 "This is the surface boundary" at -10,-5,150 center
 set arrow 1 from -10,-5,120 to -10,0,0 nohead
 set arrow 2 from -10,-5,120 to 10,0,0 nohead
@@ -26,18 +26,18 @@ pause -1 "Hit return to continue (3)"
 rep (x**3+y**3)/10
 pause -1 "Hit return to continue (4)"
 set ticslevel 0.0
-set title "3D gnu plot demo ( ticslevel = 0.0 )"
+set title "3D gnuplot demo ( ticslevel = 0.0 )"
 rep
 pause -1 "Hit return to continue (5)"
 set ticslevel 2.0
-set title "3D gnu plot demo ( ticslevel = 2.0 )"
+set title "3D gnuplot demo ( ticslevel = 2.0 )"
 rep
 pause -1 "Hit return to continue (6)"
 set ticslevel 0.5
-set title "3D gnu plot demo ( ticslevel = 0.5 )"
+set title "3D gnuplot demo ( ticslevel = 0.5 )"
 rep
 pause -1 "Hit return to continue (7)"
-set title "3D gnu plot demo"
+set title "3D gnuplot demo"
 set nogrid
 splot x*y with points
 pause -1 "Hit return to continue (8)"
@@ -57,14 +57,14 @@ set title "Surfaces with z log scale"
 splot x**2*y**2 + 2, x**2*y**4 + 2, x**4*y**2 + 2
 pause -1 "Hit return to continue (10)"
 set nolog z
-set xtics
-set ytics
+set xtics autofreq
+set ytics autofreq
 set xrange [-1:1]
 set yrange [-1:1]
 set samples 51
 set isosample 21
 set dummy u,v
-set title "3D gnu plot demo"
+set title "3D gnuplot demo"
 splot u*v / (u**2 + v**2 + 0.1)
 pause -1 "Hit return to continue (11)"
 splot [x=-3:3] [y=-3:3] sin(x) * cos(y)
@@ -87,7 +87,7 @@ set arrow 1 from -5,-2.1,1.4 to 0,0,1
 splot [-12:12.01] [-12:12.01] sinc(u,v)
 pause -1 "Hit return to continue (15)"
 set noarrow
-set ztics
+set ztics autofreq
 set nolabel
 set log
 set auto

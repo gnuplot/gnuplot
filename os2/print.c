@@ -99,6 +99,7 @@ static char         szPrintFile[CCHMAXPATHCOMP] = {0} ;
 static DEVOPENSTRUC devop ;
 
 ULONG GetPrinters( PPRQINFO3 *, ULONG *  ) ;
+int FindPrinter( char *, PPRQINFO3  ) ;
 HMF     CopyToMetaFile( HPS ) ; 
 static void    ThreadPrintPage( ) ;
 
@@ -115,7 +116,7 @@ MPARAM PrintCmdProc( HWND hWnd, ULONG msg, MPARAM mp1, MPARAM mp2 )
     static HEV semPrint = 0L ;
     static HWND hwndCancel = NULLHANDLE ;
     char szTemp[32] ;
-    long lErr ;
+    unsigned short lErr ;
     PBYTE pStack = abStack;
     TID tid ;
     char *pszMess, *szPrinter ;
@@ -487,7 +488,7 @@ int FindPrinter( char *szName, PPRQINFO3 piPrinter )
     {
     PPRQINFO3 pprq = NULL ;
     PDRIVDATA pdriv = NULL ;
-    ULONG np ;
+    LONG np ;
     
     if( *szName && (strcmp( szName, piPrinter->pszName ) == 0) ) return 0 ;
     if( GetPrinters( &pprq , &np ) == 0 ) return 1 ;

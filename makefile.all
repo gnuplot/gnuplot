@@ -26,105 +26,145 @@
 # T as the prefix for terminals (eg term/ or [.term])
 # D as the prefix for docs (eg docs/)
 # L as the prefix for latex tutorial (eg docs/latextut/ or [.docs.latextut])
+# Q as the prefix for old doc files (eg docs/old)
+# S as the prefix for postscript docs (eg docs/ps)
 # M as the prefix for demos (eg demo/)
-
+# N as the prefix for NeXT (eg NeXT/)
+# P as the prefix for OS/2 (eg os2/)
+# W as the prefix for Windows (eg win/)
 
 ####################################################################
 # List of object files except version.$(O)
-#
-# If you add files here, please also add them to gnuplot.opt,
-# which is used on various platforms (VMS, NT, ..?)
-
-COREOBJS = alloc.$(O) binary.$(O) bitmap.$(O) command.$(O) contour.$(O) datafile.$(O) eval.$(O) fit.$(O)\
-       graphics.$(O) graph3d.$(O) help.$(O) hidden3d.$(O) internal.$(O) interpol.$(O)\
-       matrix.$(O) misc.$(O) parse.$(O) plot.$(O) plot2d.$(O) plot3d.$(O) readline.$(O)\
-       scanner.$(O) set.$(O) show.$(O) specfun.$(O) standard.$(O) stdfn.$(O) term.$(O) time.$(O) util.$(O) \
-       util3d.$(O)
+COREOBJS = alloc.$(O) binary.$(O) bitmap.$(O) command.$(O) contour.$(O)\
+	datafile.$(O) eval.$(O) fit.$(O) graphics.$(O) graph3d.$(O) help.$(O)\
+	hidden3d.$(O) internal.$(O) interpol.$(O) matrix.$(O) misc.$(O)\
+	parse.$(O) plot.$(O) plot2d.$(O) plot3d.$(O) readline.$(O)\
+	scanner.$(O) set.$(O) show.$(O) specfun.$(O) standard.$(O) stdfn.$(O)\
+	term.$(O) time.$(O) util.$(O) util3d.$(O)
 
 ####################################################################
 # List of source files
 # Used for making shar files, lint, and some dependencies.
-DIRS = term demo docs $(D)latextut
 
-CSOURCE1 = alloc.c binary.c bitmap.c command.c contour.c datafile.c eval.c fit.c
-CSOURCE2 = graphics.c graph3d.c help.c hidden3d.c internal.c interpol.c
-CSOURCE3 = matrix.c misc.c parse.c plot.c plot2d.c plot3d.c readline.c
-CSOURCE4 = scanner.c set.c show.c specfun.c standard.c stdfn.c term.c time.c util.c util3d.c version.c
+CSOURCE = alloc.c binary.c bitmap.c command.c contour.c datafile.c eval.c \
+	  fit.c graphics.c graph3d.c help.c hidden3d.c internal.c interpol.c \
+	  matrix.c misc.c parse.c plot.c plot2d.c plot3d.c readline.c \
+	  scanner.c set.c show.c specfun.c standard.c stdfn.c term.c time.c \
+	  util.c util3d.c version.c
 
+HEADERS = alloc.h ansichek.h binary.h bitmap.h fit.h fnproto.h help.h \
+	  matrix.h national.h plot.h protos.h setshow.h stdfn.h syscfg.h term.h
 
-CSOURCE5 = $(T)ai.trm $(T)amiga.trm $(T)aed.trm \
-	$(T)cgi.trm $(T)corel.trm $(T)cgm.trm \
-	$(T)djsvga.trm $(T)dumb.trm \
-	$(T)dxf.trm $(T)dxy.trm $(T)debug.trm \
-	$(T)emxvga.trm $(T)eepic.trm $(T)epson.trm $(T)excl.trm \
-	$(T)fig.trm $(T)gif.trm $(T)grass.trm $(T)hp26.trm $(T)hp2648.trm $(T)hpgl.trm \
-	$(T)hp500c.trm $(T)hpljii.trm $(T)metafont.trm \
-	$(T)apollo.trm $(T)gpr.trm $(T)hppj.trm $(T)compact.c
-CSOURCE6 = $(T)impcodes.h $(T)imagen.trm $(T)next.trm $(T)object.h \
-	$(T)iris4d.trm $(T)kyo.trm $(T)latex.trm $(T)mif.trm \
-	$(T)pbm.trm $(T)pslatex.trm $(T)gpic.trm $(T)png.trm
-CSOURCE7 = $(T)post.trm $(T)pstricks.trm $(T)qms.trm $(T)regis.trm \
-	$(T)rgip.trm $(T)sun.trm \
-	$(T)t410x.trm $(T)tek.trm $(T)texdraw.trm \
-	$(T)tgif.trm $(T)tpic.trm \
-	$(T)unixpc.trm $(T)unixplot.trm \
-	$(T)v384.trm $(T)vws.trm $(T)x11.trm $(T)xlib.trm
+CORETERM = $(T)aed.trm $(T)ai.trm $(T)amiga.trm $(T)apollo.trm \
+	   $(T)atariaes.trm $(T)atarivdi.trm $(T)cgi.trm $(T)cgm.trm \
+	   $(T)compact.c $(T)corel.trm $(T)debug.trm $(T)djsvga.trm \
+	   $(T)driver.h $(T)dumb.trm $(T)dxf.trm $(T)dxy.trm $(T)eepic.trm \
+	   $(T)emxvga.trm $(T)epson.trm $(T)excl.trm $(T)fg.trm $(T)fig.trm \
+	   $(T)gif.trm $(T)gnugraph.trm $(T)gpic.trm $(T)gpr.trm \
+	   $(T)grass.trm $(T)hp26.trm $(T)hp2648.trm $(T)hp500c.trm \
+	   $(T)hpgl.trm $(T)hpljii.trm $(T)hppj.trm $(T)imagen.trm \
+	   $(T)impcodes.h $(T)iris4d.trm $(T)kyo.trm $(T)latex.trm \
+	   $(T)linux.trm $(T)mac.trm $(T)metafont.trm $(T)mgr.trm \
+	   $(T)mif.trm $(T)multitos.trm $(T)next.trm $(T)object.h \
+	   $(T)pbm.trm $(T)pc.trm $(T)pm.trm $(T)png.trm $(T)post.trm \
+	   $(T)pslatex.trm $(T)pstricks.trm $(T)qms.trm $(T)regis.trm \
+	   $(T)rgip.trm $(T)sun.trm $(T)t410x.trm $(T)table.trm \
+	   $(T)tek.trm $(T)texdraw.trm $(T)tgif.trm $(T)tkcanvas.trm \
+	   $(T)tpic.trm $(T)unixpc.trm $(T)unixplot.trm $(T)v384.trm \
+	   $(T)vws.trm $(T)win.trm $(T)x11.trm $(T)xlib.trm
+
 CSOURCE8 = bf_test.c gplt_x11.c
 
-CORETERM = $(CSOURCE5) $(CSOURCE6) $(CSOURCE7)
+NEXTSRC  = $(N)Controller.h $(N)Controller.m $(N)GnuTerm.iconheader \
+	   $(N)GnuTerm.tiff $(N)GnuTerm_main.m $(N)GnuView.h \
+	   $(N)GnuView.m $(N)Makefile $(N)Makefile.postamble \
+	   $(N)Makefile.preamble $(N)PB.gdbinit $(N)PB.project \
+	   $(N)README.rtf $(N)bigger.tiff $(N)gnuviewController.h \
+	   $(N)gnuviewController.m $(N)smaller.tiff \
+	   $(N)English.lproj/GnuTerm.nib/data.classes \
+	   $(N)English.lproj/GnuTerm.nib/data.nib \
+	   $(N)English.lproj/gnuview.nib/bigger.tiff \
+	   $(N)English.lproj/gnuview.nib/data.classes \
+	   $(N)English.lproj/gnuview.nib/data.nib \
+	   $(N)English.lproj/gnuview.nib/smaller.tiff
 
-NEXTSRC  = epsviewe.m epsviewe.h
+OS2SRC = $(P)dialogs.c $(P)dialogs.h $(P)gclient.c $(P)gnuplot.ico \
+	 $(P)gnupmdrv.c $(P)gnupmdrv.def $(P)gnupmdrv.h $(P)gnupmdrv.ipf \
+	 $(P)gnupmdrv.rc $(P)print.c
+
+WINDOWS = $(W)geticon.c $(W)wcommon.h $(W)wgnupl32.def $(W)wgnuplib.c \
+	  $(W)wgnuplib.def $(W)wgnuplib.h $(W)wgnuplib.rc $(W)wgnuplot.def \
+	  $(W)wgnuplot.hpj $(W)wgnuplot.mnu $(W)wgnuplot.rc $(W)wgraph.c \
+	  $(W)winmain.c $(W)wmenu.c $(W)wpause.c $(W)wprinter.c \
+	  $(W)wresourc.h $(W)wtext.c $(W)wtext.h
+
 # not C code, but still needed
 
-DEMOS = $(M)1.dat $(M)2.dat $(M)3.dat $(M)contours.dem \
-	$(M)controls.dem $(M)electron.dem $(M)glass.dat $(M)param.dem \
-	$(M)polar.dem $(M)simple.dem $(M)surface1.dem \
-	$(M)surface2.dem $(M)using.dat $(M)using.dem $(M)world.cor \
-	$(M)world.dat $(M)world.dem \
-	$(M)err.dat $(M)poldat.dem $(M)errorbar.dem \
-	$(M)all.dem $(M)animate.dem $(M)bivariat.dem \
-	$(M)prob.dem $(M)stat.inc $(M)prob2.dem $(M)random.dem \
-	$(M)discrete.dem $(M)hidden.dem $(M)airfoil.dem $(M)gnuplot.rot\
-	$(M)binary.dem $(M)spline.dem $(M)steps.dem $(M)steps.dat \
-	$(M)multimsh.dem $(M)whale.dat $(M)hemisphr.dat \
-	$(M)scatter.dem $(M)scatter2.dat $(M)singulr.dem $(M)klein.dat
+DEMOS = $(M)1.dat $(M)2.dat $(M)3.dat $(M)airfoil.dem $(M)all.dem \
+	$(M)animate.dem $(M)battery.dat $(M)big_peak.dat $(M)binary.dem \
+	$(M)bivariat.dem $(M)borders.dem $(M)contours.dem $(M)controls.dem \
+	$(M)density.fnc $(M)discrete.dem $(M)electron.dem $(M)fit.dem \
+	$(M)glass.dat $(M)gnuplot.rot $(M)hemisphr.dat $(M)hexa.fnc \
+	$(M)hidden.dem $(M)klein.dat $(M)lcdemo.dat $(M)line.fnc \
+	$(M)mgr.dem $(M)moli3.dat $(M)multimsh.dem $(M)multiplt.dem \
+	$(M)param.dem $(M)polar.dem $(M)poldat.dem $(M)prob.dem \
+	$(M)prob2.dem $(M)random.dem $(M)reflect.fnc $(M)reread.bor \
+	$(M)scatter.dem $(M)scatter2.dat $(M)silver.dat $(M)simple.dem \
+	$(M)singulr.dem $(M)sound.par $(M)sound2.par $(M)soundvel.dat \
+	$(M)spline.dem $(M)start.par $(M)stat.inc $(M)steps.dat \
+	$(M)steps.dem $(M)surface1.dem $(M)surface2.dem $(M)timedat.dat \
+	$(M)timedat.dem $(M)using.dat $(M)using.dem $(M)vector.dem \
+	$(M)whale.dat $(M)world.cor $(M)world.dat $(M)world.dem
 
-ETC = Copyright 0README README.gnu README.ami makefile.unx makefile.vms \
-	linkopt.amg makefile.amg makefile.ami linkopt.vms buildvms.com \
-	lasergnu makefile.r makefile.nt makefile.g 0FAQ 0BUGS\
-	$(T)README History gnuplot.el intergra.x11 0INSTALL\
-	README.3p2 README.3p3 README.3p4 README.pro README.nex README.x11 \
-	README.3d README.mf README.win configure configure.in Makefile.in
-
+ETC =   0BUGS 0FAQ 0INSTALL 0PORTING 0README ChangeLog CodeStyle Copyright \
+	INSTALL.gnu Makefile.in NEWS PGPKEYS TODO acconfig.h $(ACLOCAL_M4) \
+	amiga.c buildvms.com commitvers $(CONFIG_HEADER_IN) configure \
+	configure.in corgraph.asm corplot.c ctrl87.c ctrl87.h descrip.mms \
+	djconfig.sh errorfix.sh genopt.com gnuplot.def gnuplot.el gnuplot.opt \
+	gnuplot.prj header.mac hrcgraph.asm install-sh intergra.x11 lasergnu \
+	lineproc.mac linkopt.vms linkopt.ztc make_vms.com makefile.286 \
+	makefile.all makefile.amg makefile.ami makefile.cyg makefile.dj2 \
+	makefile.djg makefile.emx makefile.g makefile.mgw makefile.msc \
+	makefile.msw makefile.mto makefile.nt makefile.os2 makefile.os9 \
+	makefile.st makefile.tc makefile.unx makefile.vms makefile.wc \
+	makefile.win makefile.ztc missing mkinstalldirs os9.c pcgraph.asm \
+	rgipgnu stamp-h.in strftime.c vms.c m4/msdos.m4 m4/next.m4 \
+	m4/search-hdr.m4 m4/search-lib.m4 $(T)README
 
 # Documentation and help files
-DOCS1 = $(D)makefile.org $(D)README $(D)checkdoc.c $(D)doc2gih.c \
-	$(D)doc2hlp.c $(D)doc2hlp.com $(D)doc2ms.c $(D)doc2tex.c \
-	$(D)gnuplot.1 $(D)lasergnu.1 $(D)toc_entr.sty $(D)doc2info.pl \
-	$(D)titlepag.ms $(D)titlepag.tex $(D)makefile.ami \
-	$(D)doc2rtf.c $(D)Makefile.in
+DOCS1 = $(D)Makefile.in $(D)README $(D)checkdoc.c $(D)doc2gih.c \
+	$(D)doc2hlp.c $(D)doc2hlp.com $(D)doc2html.c $(D)doc2info.c \
+	$(D)doc2ipf.c $(D)doc2ms.c $(D)doc2rnh.c $(D)doc2rtf.c $(D)doc2tex.c \
+	$(D)doc2texi.pl $(D)doc2x.h $(D)gnuplot.1 $(D)lasergnu.1 \
+	$(D)makefile.dst $(D)makefile.ami $(D)termdoc.c $(D)titlepag.ms \
+	$(D)titlepag.tex $(D)toc_entr.sty $(D)xref.c $(D)xref.h
 DOCS2 = $(D)gnuplot.doc $(D)gpcard.tex
-DOCS3 = $(L)makefile.org $(L)eg1.plt \
+DOCS3 = $(L)Makefile.in $(L)eg1.plt \
 	$(L)eg2.plt $(L)eg3.dat $(L)eg3.plt \
 	$(L)eg4.plt $(L)eg5.plt $(L)eg6.plt \
-	$(L)header.tex $(L)tutorial.tex \
-	$(L)linepoin.plt $(L)Makefile.in
+	$(L)header.tex $(L)linepoin.plt $(L)makefile.dst $(L)tutorial.tex
+DOCS4 = $(S)Makefile $(S)README $(S)ps_file.doc $(S)ps_guide.ps \
+	$(S)ps_symbols.gpi
+DOCS5 = $(Q)ChangeLog.old $(Q)History.old $(Q)README.3d $(Q)README.3p1 \
+	$(Q)README.3p2 $(Q)README.3p3 $(Q)README.3p4 $(Q)README.3p5 \
+	$(Q)README.ami $(Q)README.emx $(Q)README.fit $(Q)README.gnu \
+	$(Q)README.iso $(Q)README.mf $(Q)README.nex $(Q)README.os2 \
+	$(Q)README.pic $(Q)README.pro $(Q)README.win $(Q)README.x11 \
+	$(Q)README.xli $(Q)makefile.r
 
-DOCS  = $(DOCS1) $(DOCS2) $(DOCS3)
+DOCS  = $(DOCS1) $(DOCS2) $(DOCS3) $(DOCS4) $(DOCS5)
 
 #########################################################################
-
 # Simple Dependencies
 # - note that VMS requires space before and after the :
 
-
 $(COREOBJS) : plot.h protos.h stdfn.h
 
-command.$(O) : command.c fit.h
+help.$(O) misc.$(O) : help.h
 
-command.$(O) help.$(O) misc.$(O) : help.h
+protos.h : alloc.h
 
-command.$(O) graphics.$(O) graph3d.$(O) misc.$(O) plot.$(O) set.$(O) show.$(O) term.$(O) : setshow.h
+graphics.$(O) graph3d.$(O) misc.$(O) plot.$(O) set.$(O) show.$(O) term.$(O) : setshow.h
 
 fit.$(O) : fit.c fit.h matrix.h plot.h
 
@@ -133,13 +173,5 @@ matrix.$(O) : matrix.c matrix.h fit.h
 bitmap.$(O) term.$(O) : bitmap.h
 
 term.$(O) : term.h $(CORETERM)
-
-# Complex Dependencies
-
-
-
-#   ... should be defined in the system specific makefiles, eg
-#term.$(O) : ...
-
 
 #>>>makefile.all<<<

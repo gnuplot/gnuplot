@@ -1,4 +1,4 @@
-# make file for gnuplot 3.6 / DOS / DJGPP version 2
+# make file for gnuplot 3.7 / DOS / DJGPP version 2
 #
 # compile it by   make -f makefile.dj2 in the main gnuplot directory
 #
@@ -84,7 +84,7 @@ CSOURCE7 = term/post.trm term/qms.trm term/regis.trm term/sun.trm \
 	term/unixplot.trm term/v384.trm term/vws.trm term/x11.trm term/xlib.trm
 OBJ1 =  bitmap.o command.o contour.o eval.o graphics.o graph3d.o hidden3d.o util3d.o
 OBJ2 =  help.o internal.o misc.o parse.o plot.o plot2d.o plot3d.o readline.o
-OBJ3 =  scanner.o set.o show.o specfun.o standard.o term.o time.o util.o
+OBJ3 =  scanner.o set.o show.o specfun.o standard.o stdfn.o term.o time.o util.o
 OBJ4 =  version.o binary.o interpol.o fit.o matrix.o datafile.o alloc.o
 
 CSOURCES = $(CSOURCE5) $(CSOURCE6) $(CSOURCE7)
@@ -126,6 +126,9 @@ $(EXENAME).exe : $(OBJS)
 command.o: command.c plot.h setshow.h help.h
 	$(CC) -c $(CFLAGS) $(INCLUDE) -DHELPFILE=\"$(HELPFILE)\" command.c
 
+show.o: show.c plot.h setshow.h
+	$(CC) -c $(CFLAGS) $(INCLUDE) -DHELPFILE=\"$(HELPFILE)\" $<
+
 term.o: term.c term.h plot.h set.c show.c bitmap.h $(CSOURCES)
 	$(CC) -c $(CFLAGS) $(INCLUDE) $(TERMFLAGS) -Iterm term.c
 
@@ -153,16 +156,15 @@ version.o: version.c
 $(HELPDEST)\$(HELPFILE): .\docs\doc2gih.exe .\docs\gnuplot.doc
 	.\docs\doc2gih  docs/gnuplot.doc > $(HELPDEST)\$(HELPFILE)
 
-.\docs\doc2gih.exe: .\docs\doc2gih.c $(CSOURCES)
-	$(CC) $(CFLAGS) $(INCLUDE) $(TERMFLAGS) -Iterm -o ./docs/doc2gih ./docs/doc2gih.c
+.\docs\doc2gih.exe: .\docs\doc2gih.c .\docs\termdoc.c $(CSOURCES)
+	$(CC) $(CFLAGS) $(INCLUDE) $(TERMFLAGS) -Iterm -o ./docs/doc2gih ./docs/doc2gih.c ./docs/termdoc.c
 	coff2exe ./docs/doc2gih
 
 # now for the demo bin
 demo\binary?.: bf_test.exe
 	bf_test
-	move binary1 demo
-	move binary2 demo
-	move binary3 demo
+	copy binary? demo\binary?
+	del binary?
 
 bf_test.o:
 	$(CC) $(CFLAGS) -c bf_test.c
@@ -193,19 +195,20 @@ install: all
 clean:
 	del *.o
 	del $(EXENAME)
-	del .\docs\doc2gih.exe
-
-# realclean target - remove all files created by the makefile
-realclean: clean
-	del $(EXENAME).exe
 	del .\docs\doc2gih
 	del .\docs\doc2gih.exe
 	del bf_test
 	del bf_test.exe
+
+# realclean target - remove all files created by the makefile
+realclean: clean
+	del $(EXENAME).exe
 	del $(HELPDEST)\$(HELPFILE)
 	del .\demo\binary1
 	del .\demo\binary2
 	del .\demo\binary3
+	del .\demo\fit.log
+	del .\demo\soundfit.par
 #####
-##     END OF GNUPLOT 3.6 MAKEFILE FOR DJGPP V2
+##     END OF GNUPLOT 3.7 MAKEFILE FOR DJGPP V2
 #####

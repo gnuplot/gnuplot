@@ -36,12 +36,11 @@
 #ifndef TERM_DRIVER_H
 #define TERM_DRIVER_H
 
-#include "plot.h"
-#include "bitmap.h"
-#include "setshow.h"
-
+#if 0
+/* Dangerous; putc may already be defined as fputc */
 /* corey@cac added the next line for efficiency */
 #define fputc putc
+#endif
 
 /* functions provided by in term.c */
 
@@ -57,7 +56,7 @@ void UNKNOWN_null __PROTO((void));
 int set_font_null __PROTO((char *s));
 void null_set_pointsize __PROTO((double size));
 
-extern FILE *outfile;
+extern FILE *gpoutfile;
 extern struct termentry *term;
 extern float xsize, ysize;
 
@@ -68,17 +67,17 @@ extern float xsize, ysize;
 /* it seems that sign as macro causes some conflict with precompiled headers */
 static int sign(int x)
 {
-  return x >=0 ? 1 : -1;
+    return x >= 0 ? 1 : -1;
 }
 #endif /* NEXT */
 
 /* abs as macro is now uppercase, there are conflicts with a few C compilers
    that have abs as macro, even though ANSI defines abs as function
-   (int abs(int)). Most calls to ABS in term/* could be changed to abs if
+   (int abs(int)). Most calls to ABS in term/ could be changed to abs if
    they use only int arguments and others to fabs, but for the time being,
    all calls are done via the macro */
 #ifndef ABS
-#define ABS(x) ((x) >= 0 ? (x) : -(x))
+# define ABS(x) ((x) >= 0 ? (x) : -(x))
 #endif /* ABS */
 
 /*  GPMIN/GPMAX are already defined in "plot.h"  */

@@ -85,6 +85,52 @@
 #define FDAY6 "Saturday"
 
 
+#elif defined(HUNGARIAN)
+
+#define AMON01 "jan"
+#define AMON02 "febr"
+#define AMON03 "m&aacute;rc"
+#define AMON04 "&aacute;pr"
+#define AMON05 "m&aacute;j"
+#define AMON06 "j&uacute;n"
+#define AMON07 "j&uacute;l"
+#define AMON08 "aug"
+#define AMON09 "szept"
+#define AMON10 "okt"
+#define AMON11 "nov"
+#define AMON12 "dec"
+
+#define FMON01 "janu&aacute;r"
+#define FMON02 "febru&aacute;r"
+#define FMON03 "m&aacute;rcius"
+#define FMON04 "&aacute;prilis"
+#define FMON05 "m&aacute;jus"
+#define FMON06 "j&uacute;nius"
+#define FMON07 "j&uacute;lius"
+#define FMON08 "augusztus"
+#define FMON09 "szeptember"
+#define FMON10 "okt&oacute;ber"
+#define FMON11 "november"
+#define FMON12 "december"
+
+
+/* DAY names */
+#define ADAY0 "vas"
+#define ADAY1 "h&eacute;t"
+#define ADAY2 "kedd"
+#define ADAY3 "sze"
+#define ADAY4 "cs&uuml;t"
+#define ADAY5 "p&eacute;n"
+#define ADAY6 "szo"
+
+#define FDAY0 "vas&aacute;rnap"
+#define FDAY1 "h&eacute;tf&otilde;"
+#define FDAY2 "kedd"
+#define FDAY3 "szerda"
+#define FDAY4 "cs&uacute;t&ouml;rt&ouml;k"
+#define FDAY5 "p&eacute;ntek"
+#define FDAY6 "szombat"
+
 #else
 
 /* MONTH-names */

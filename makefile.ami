@@ -14,7 +14,7 @@
 #
 
 # where to install help file gnuplot.gih
-HELPDEST=GNUPLOT:docs/gnuplot.gih
+HELPFILE=S:gnuplot.gih
 # Where to send email about bugs and comments (locally)
 EMAIL="bug-gnuplot@dartmouth.edu"
 
@@ -108,7 +108,10 @@ $(OBJS): plot.h
 	$(CC) $(CFLAGS) $*.c
 
 command.o:
-	$(CC) $(CFLAGS) -c command.c -DHELPFILE="$(HELPDEST)"
+	$(CC) $(CFLAGS) -c command.c -DHELPFILE=\"$(HELPFILE)\"
+
+show.o:
+	$(CC) $(CFLAGS) -c show.c -DHELPFILE=\"$(HELPFILE)\"
 
 command.o help.o misc.o: help.h
 

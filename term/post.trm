@@ -82,7 +82,7 @@ TERM_PUBLIC int PS_set_font __PROTO((char * font));
 TERM_PUBLIC int ENHPS_set_font __PROTO((char * font));
 TERM_PUBLIC void PS_fillbox __PROTO((int style, unsigned int x1, unsigned int y1, unsigned int width, unsigned int height));
 TERM_PUBLIC void PS_linewidth __PROTO((double linewidth)); /* JFi [linewidth] */
-TERM_PUBLIC void PS_pointsize __PROTO((double pointsize)); /* JFi [pointsize] */
+TERM_PUBLIC void PS_pointsize __PROTO((double ptsize)); /* JFi [pointsize] */
 
 #define PS_POINT_TYPES 8
 #define PS_XOFF	50	/* page offset in pts */
@@ -98,7 +98,6 @@ TERM_PUBLIC void PS_pointsize __PROTO((double pointsize)); /* JFi [pointsize] */
 #define PS_VCHAR (14*PS_SC)		/* default is 14 point characters */
 #define PS_HCHAR (14*PS_SC*6/10)
 
-#define GOT_POST_PROTO
 #endif
 
 
@@ -107,7 +106,12 @@ TERM_PUBLIC void PS_pointsize __PROTO((double pointsize)); /* JFi [pointsize] */
 #ifdef TERM_BODY
 /* PostScript driver by Russell Lang, rjl@monu1.cc.monash.edu.au */
 
-#define PS_FLUSH_PATH if (ps_path_count) { fprintf(outfile, "stroke "); ps_path_count = 0; }
+/* From version.c */
+extern char version[];
+extern char patchlevel[];
+
+#define PS_FLUSH_PATH \
+    if (ps_path_count) { fprintf(gpoutfile, "stroke "); ps_path_count = 0; }
 
 static char *PS_RememberFont __PROTO((char *fname, int reencode));
 static void ENHPS_put_text __PROTO((unsigned int x, unsigned int y, char *str));
@@ -403,7 +407,7 @@ static char GPFAR * GPFAR PS_header[] = {
 
 /* opaque closed figures w/o the point in the middle (added by Dick Crawford) */
 
-"/Opaque { gsave closepath 1 setgray fill grestore 0 setgray closepath } def\n"
+"/Opaque { gsave closepath 1 setgray fill grestore 0 setgray closepath } def\n",
 
 /* Diamond */
 "/DiaW { stroke [] 0 setdash vpt add M\n",
@@ -514,7 +518,7 @@ int can_reencode;
 	}
 
 	if (can_reencode && recode)
-	{	fprintf(outfile,"/%s %s",fname, recode);
+	{	fprintf(gpoutfile,"/%s %s",fname, recode);
 		return NULL;
 	}
 	else
@@ -574,7 +578,8 @@ TERM_PUBLIC void PS_options()
 			ps_color=FALSE;
 			c_token++;
 		}
-		else if (almost_equals(c_token,"c$olor")) {
+		else if (almost_equals(c_token,"c$olor")
+			 || almost_equals(c_token,"c$olour")) {
 			ps_color=TRUE;
 			c_token++;
 		}
@@ -655,7 +660,7 @@ static char GPFAR psi1[] = "%%%%Creator: gnuplot %s patchlevel %s\n\
 %%%%CreationDate: %s\
 %%%%DocumentFonts: %s\n";
 static char GPFAR psi2[] = "%%%%EndComments\n\
-/gnudict 120 dict def\ngnudict begin\n\
+/gnudict 256 dict def\ngnudict begin\n\
 /Color %s def\n\
 /Solid %s def\n\
 /gnulinewidth %.3f def\n\
@@ -666,7 +671,7 @@ static char GPFAR psi2[] = "%%%%EndComments\n\
 /vpt_ %.1f def\n\
 /hpt hpt_ def\n\
 /vpt vpt_ def\n";
-static char GPFAR *PS_iso_8859_1_encoding[] = {
+static char GPFAR * GPFAR PS_iso_8859_1_encoding[] = {
 "/reencodeISO {\n",
 "dup dup findfont dup length dict begin\n",
 "{ 1 index /FID ne { def }{ pop pop } ifelse } forall\n",
@@ -719,7 +724,7 @@ NULL };
 /*                                                                         */
 /*   version 1.1:  - added some more special characters                    */
 /*                                                                         */
-static char GPFAR * PS_cp_437_encoding[] = {
+static char GPFAR * GPFAR PS_cp_437_encoding[] = {
 "/reencodeCP437 {\n",
 "dup dup findfont dup length dict begin\n",
 "{ 1 index /FID ne { def }{ pop pop } ifelse } forall\n",
@@ -767,7 +772,7 @@ NULL };
 /*                   -- frame characters,                                  */
 /*                   -- a few special characters.                          */
 /*                                                                         */
-static char GPFAR *PS_cp_850_encoding[] = {
+static char GPFAR * GPFAR PS_cp_850_encoding[] = {
 "/reencodeCP850 {\n",
 "dup dup findfont dup length dict begin\n",
 "{ 1 index /FID ne { def }{ pop pop } ifelse } forall\n",
@@ -810,8 +815,6 @@ NULL };
 	struct termentry *t = term;
 	int i;
         time_t now;
-	extern char version[];
-	extern char patchlevel[];
 
 	ps_common_encap = encap; /* store for later */
 	ps_common_portrait = portrait; /* store for later */
@@ -822,21 +825,21 @@ NULL };
 	ps_page = 0;
 
 	if (!encap)
-		fprintf(outfile,"%%!PS-Adobe-2.0\n");
+		fprintf(gpoutfile,"%%!PS-Adobe-2.0\n");
 	else
-		fprintf(outfile,"%%!PS-Adobe-2.0 EPSF-2.0\n");
+		fprintf(gpoutfile,"%%!PS-Adobe-2.0 EPSF-2.0\n");
 
-	if (outstr) fprintf(outfile, "%%%%Title: %s\n", outstr );             /*  JFi  */
+	if (outstr) fprintf(gpoutfile, "%%%%Title: %s\n", outstr );             /*  JFi  */
 	time(&now);
-	fprintf(outfile, psi1, version, patchlevel, asctime(localtime(&now)), uses_fonts ? "(atend)" : "");
+	fprintf(gpoutfile, psi1, version, patchlevel, asctime(localtime(&now)), uses_fonts ? "(atend)" : "");
 
-	fprintf(outfile,"%%%%BoundingBox: %d %d %d %d\n", xoff + bb_xmin, yoff + bb_ymin, xoff + bb_xmax, yoff + bb_ymax);
+	fprintf(gpoutfile,"%%%%BoundingBox: %d %d %d %d\n", xoff + bb_xmin, yoff + bb_ymin, xoff + bb_xmax, yoff + bb_ymax);
 
-	fprintf(outfile,"%%%%Orientation: %s\n", ps_portrait ? "Portrait" : "Landscape");
+	fprintf(gpoutfile,"%%%%Orientation: %s\n", ps_portrait ? "Portrait" : "Landscape");
 
 	if (!encap)
-		fprintf(outfile,"%%%%Pages: (atend)\n");
-	fprintf(outfile, psi2,
+		fprintf(gpoutfile,"%%%%Pages: (atend)\n");
+	fprintf(gpoutfile, psi2,
 		ps_color ? "true" : "false",
 		ps_solid ? "true" : "false",
 		PS_LW,			/* line width */
@@ -847,17 +850,17 @@ NULL };
 
 	if (uses_fonts && (encoding == ENCODING_ISO_8859_1)) {
 		for (i=0; PS_iso_8859_1_encoding[i] != NULL; i++) {
-			fprintf(outfile,"%s",PS_iso_8859_1_encoding[i]);
+			fprintf(gpoutfile,"%s",PS_iso_8859_1_encoding[i]);
 		}
 	}
 	if (uses_fonts && (encoding == ENCODING_CP_437)) {       /* JFi */
 		for (i=0; PS_cp_437_encoding[i] != NULL; i++) {
-			fprintf(outfile,"%s",PS_cp_437_encoding[i]);
+			fprintf(gpoutfile,"%s",PS_cp_437_encoding[i]);
 		}
 	}
 	if (uses_fonts && (encoding == ENCODING_CP_850)) {       /* JFi */
 		for (i=0; PS_cp_850_encoding[i] != NULL; i++) {
-			fprintf(outfile,"%s",PS_cp_850_encoding[i]);
+			fprintf(gpoutfile,"%s",PS_cp_850_encoding[i]);
 		}
 	}
 /*        Duplicate code! 
@@ -866,50 +869,50 @@ NULL };
 */
 
 	for ( i=0; PS_header[i] != NULL; i++)
-		fprintf(outfile,"%s",PS_header[i]);
+		fprintf(gpoutfile,"%s",PS_header[i]);
 	if (ps_duplex_option)
-		fprintf(outfile, "statusdict begin %s setduplexmode end\n",
+		fprintf(gpoutfile, "statusdict begin %s setduplexmode end\n",
 				ps_duplex_state ? "true" : "false");
 	PS_RememberFont(ps_font, 1);
 
 	if (dict)
 		while (*dict)
-			fputs(*(dict++), outfile);	
+			fputs(*(dict++), gpoutfile);	
 
-	fprintf(outfile,"end\n%%%%EndProlog\n");
+	fprintf(gpoutfile,"end\n%%%%EndProlog\n");
 }
 
 /* the init fn for the postscript driver */
 TERM_PUBLIC void PS_init()
 {
-	unsigned int xmin, ymin, xmax, ymax;
+	unsigned int xmin_t, ymin_t, xmax_t, ymax_t;
 
 	if (ps_eps)
 	{
 		term->xmax = PS_XMAX;
 		term->ymax = PS_YMAX;
-		xmin = PS_XMAX * xoffset / (2*PS_SC);
-		xmax = PS_XMAX * (xsize + xoffset) / (2*PS_SC);
-		ymin = PS_YMAX * yoffset / (2*PS_SC);
-		ymax = PS_YMAX * (yoffset + ysize) / (2*PS_SC);
+		xmin_t = PS_XMAX * xoffset / (2*PS_SC);
+		xmax_t = PS_XMAX * (xsize + xoffset) / (2*PS_SC);
+		ymin_t = PS_YMAX * yoffset / (2*PS_SC);
+		ymax_t = PS_YMAX * (yoffset + ysize) / (2*PS_SC);
 	}
 	else if (ps_portrait)
 	{
 		term->xmax = PS_YMAX;
 		term->ymax = PS_XMAX;
-		xmin = PS_YMAX * xoffset / PS_SC;
-		xmax = PS_YMAX * (xsize + xoffset) / PS_SC;
-		ymin = PS_XMAX * yoffset / PS_SC;
-		ymax = PS_XMAX * (ysize + yoffset) / PS_SC;
+		xmin_t = PS_YMAX * xoffset / PS_SC;
+		xmax_t = PS_YMAX * (xsize + xoffset) / PS_SC;
+		ymin_t = PS_XMAX * yoffset / PS_SC;
+		ymax_t = PS_XMAX * (ysize + yoffset) / PS_SC;
 	}
 	else
 	{
 		term->xmax = PS_XMAX;
 		term->ymax = PS_YMAX;
-		ymin = PS_XMAX * xoffset / PS_SC;
-		ymax = PS_XMAX * (xsize+xoffset) / PS_SC;
-		xmin = PS_YMAX * (1-ysize-yoffset) / PS_SC;
-		xmax = PS_YMAX * (1-yoffset) / PS_SC;
+		ymin_t = PS_XMAX * xoffset / PS_SC;
+		ymax_t = PS_XMAX * (xsize+xoffset) / PS_SC;
+		xmin_t = PS_YMAX * (1-ysize-yoffset) / PS_SC;
+		xmax_t = PS_YMAX * (1-yoffset) / PS_SC;
 	}
 
 	/* for enhanced postscript, copy ps_font to ps_enh_font
@@ -919,7 +922,7 @@ TERM_PUBLIC void PS_init()
 	ps_enh_fontsize = ps_fontsize;
 	
 	PS_common_init(ps_eps, ps_portrait, 1, PS_XOFF, PS_YOFF,
-	   xmin, ymin, xmax, ymax,
+	   xmin_t, ymin_t, xmax_t, ymax_t,
 	   (term->put_text == ENHPS_put_text) ? ENHPS_header : NULL);
 }
 
@@ -930,17 +933,17 @@ static char GPFAR psg1[] = "0 setgray\nnewpath\n";
 struct termentry *t = term;
 	ps_page++;
 	if (!ps_common_encap)
-		fprintf(outfile,"%%%%Page: %d %d\n",ps_page,ps_page);
-	fprintf(outfile,"gnudict begin\ngsave\n");
-	fprintf(outfile,"%d %d translate\n",ps_common_xoff, ps_common_yoff);
-	fprintf(outfile,"%.3f %.3f scale\n", (ps_eps ? 0.5 : 1.0)/PS_SC,
+		fprintf(gpoutfile,"%%%%Page: %d %d\n",ps_page,ps_page);
+	fprintf(gpoutfile,"gnudict begin\ngsave\n");
+	fprintf(gpoutfile,"%d %d translate\n",ps_common_xoff, ps_common_yoff);
+	fprintf(gpoutfile,"%.3f %.3f scale\n", (ps_eps ? 0.5 : 1.0)/PS_SC,
 	                                     (ps_eps ? 0.5 : 1.0)/PS_SC);
 	if (!ps_common_portrait) {
-	    fprintf(outfile,"90 rotate\n0 %d translate\n", (int)(-PS_YMAX));
+	    fprintf(gpoutfile,"90 rotate\n0 %d translate\n", (int)(-PS_YMAX));
 	}
-	fprintf(outfile, psg1);
+	fprintf(gpoutfile, psg1);
 	if (ps_common_uses_fonts)
-		fprintf(outfile, "(%s) findfont %d scalefont setfont\n", ps_font, (t->v_char) );
+		fprintf(gpoutfile, "(%s) findfont %d scalefont setfont\n", ps_font, (t->v_char) );
 	ps_path_count = 0;
 	PS_relative_ok = FALSE;
 	PS_pen_x = PS_pen_y = -4000;
@@ -952,7 +955,7 @@ struct termentry *t = term;
 TERM_PUBLIC void PS_text()
 {
 	ps_path_count = 0;
-	fprintf(outfile,"stroke\ngrestore\nend\nshowpage\n");
+	fprintf(gpoutfile,"stroke\ngrestore\nend\nshowpage\n");
 	/* fprintf(stderr,"taken %d times\n",PS_taken); */
 	/* informational:  tells how many times it was "cheaper"
 	   to do a relative moveto or lineto rather than an
@@ -962,7 +965,7 @@ TERM_PUBLIC void PS_text()
 
 TERM_PUBLIC void PS_reset()
 {
-	fprintf(outfile,"%%%%Trailer\n");
+	fprintf(gpoutfile,"%%%%Trailer\n");
 
 /*      I think the following commands should be executed 
         `if (ps_common_uses_fonts)`. So I changed the next line. 
@@ -970,18 +973,18 @@ TERM_PUBLIC void PS_reset()
 
 /*	if (!ps_common_uses_fonts) {  */                             /* JFi */
 	if (ps_common_uses_fonts) {
-		fprintf(outfile,"%%%%DocumentFonts: ");
+		fprintf(gpoutfile,"%%%%DocumentFonts: ");
 		while (PS_DocFonts) {
 		    struct PS_FontName *fnp;
 			fnp = PS_DocFonts->next;
-			fprintf(outfile, "%s%s", PS_DocFonts->name, fnp ? " " : "\n");
+			fprintf(gpoutfile, "%s%s", PS_DocFonts->name, fnp ? " " : "\n");
 			free(PS_DocFonts->name);
 			free(PS_DocFonts);
 			PS_DocFonts=fnp;
 		}
 	}
 	if (!ps_common_encap)
-		fprintf(outfile,"%%%%Pages: %d\n",ps_page);
+		fprintf(gpoutfile,"%%%%Pages: %d\n",ps_page);
 }
 
 
@@ -1000,7 +1003,7 @@ int linetype;
 	if (PS_linetype_last == linetype) return;
 #endif
 	PS_linetype_last = linetype;
-	fprintf(outfile,"LT%c\n", "ba012345678"[linetype]);
+	fprintf(gpoutfile,"LT%c\n", "ba012345678"[linetype]);
 	ps_path_count = 0;
 }
 
@@ -1008,7 +1011,7 @@ int linetype;
 TERM_PUBLIC void PS_linewidth (linewidth)
 double linewidth;
 {
-        fprintf(outfile,"%.3f UL\n",linewidth);
+        fprintf(gpoutfile,"%.3f UL\n",linewidth);
 
 /*  
   Documentation of the 'change linewidth' strategy of the postscript terminal:
@@ -1034,10 +1037,10 @@ double linewidth;
 }
 
 
-TERM_PUBLIC void PS_pointsize (pointsize)
-double pointsize;
+TERM_PUBLIC void PS_pointsize (ptsize)
+double ptsize;
 {
-        fprintf(outfile,"%.3f UP\n",pointsize);
+        fprintf(gpoutfile,"%.3f UP\n",ptsize);
 
 /*  
   Documentation of the 'change pointsize' strategy of the postscript terminal:
@@ -1067,7 +1070,8 @@ TERM_PUBLIC void PS_move(x,y)
 unsigned int x,y;
 {
 	int dx, dy;
-	char abso[20],rel[20];
+	/* Make this semi-dynamic and independent of architecture */
+	char abso[5+2*INT_STR_LEN], rel[5+2*INT_STR_LEN];
 	dx = x - PS_pen_x;
 	dy = y - PS_pen_y;
 	/* can't cancel all null moves--need a move after stroke'ing */
@@ -1076,10 +1080,10 @@ unsigned int x,y;
 	sprintf(abso, "%d %d M\n", x, y);
 	sprintf(rel, "%d %d R\n", dx, dy);
 	if (strlen(rel) < strlen(abso) && PS_relative_ok){
-		fputs(rel, outfile);
+		fputs(rel, gpoutfile);
 		PS_taken++;
 	}else
-		fputs(abso, outfile);
+		fputs(abso, gpoutfile);
 	PS_relative_ok = TRUE;
 	ps_path_count += 1;
 
@@ -1091,23 +1095,23 @@ TERM_PUBLIC void PS_vector(x,y)
 unsigned int x,y;
 {
 	int dx, dy;
-	char abso[20],rel[20];
+	char abso[5+2*INT_STR_LEN], rel[5+2*INT_STR_LEN];
 	dx = x - PS_pen_x;
 	dy = y - PS_pen_y;
 	if (dx==0 && dy==0) return;
 	sprintf(abso, "%d %d L\n", x, y);
 	sprintf(rel, "%d %d V\n", dx, dy);
 	if (strlen(rel) < strlen(abso) && PS_relative_ok){
-		fputs(rel, outfile);
+		fputs(rel, gpoutfile);
 		PS_taken++;
 	}else
-		fputs(abso, outfile);
+		fputs(abso, gpoutfile);
 	PS_relative_ok = TRUE;
 	ps_path_count += 1;
 	PS_pen_x = x;
 	PS_pen_y = y;
 	if (ps_path_count >= 400) {
-		fprintf(outfile,"currentpoint stroke M\n");
+		fprintf(gpoutfile,"currentpoint stroke M\n");
 		ps_path_count = 0;
 	}
 }
@@ -1121,26 +1125,26 @@ char ch;
 	if (!strlen(str)) return;
 	PS_move(x,y);
 	if (ps_ang != 0)
-		fprintf(outfile,"currentpoint gsave translate %d rotate 0 0 M\n"
+		fprintf(gpoutfile,"currentpoint gsave translate %d rotate 0 0 M\n"
 			,ps_ang*90);
-	putc('(',outfile);
+	putc('(',gpoutfile);
 	ch = *str++;
 	while(ch!='\0') {
 		if ( (ch=='(') || (ch==')') || (ch=='\\') )
-			putc('\\',outfile);
-		putc(ch,outfile);
+			putc('\\',gpoutfile);
+		putc(ch,gpoutfile);
 		ch = *str++;
 	}
 	switch(ps_justify) {
-		case LEFT : fprintf(outfile,") Lshow\n");
+		case LEFT : fprintf(gpoutfile,") Lshow\n");
 			break;
-		case CENTRE : fprintf(outfile,") Cshow\n");
+		case CENTRE : fprintf(gpoutfile,") Cshow\n");
 			break;
-		case RIGHT : fprintf(outfile,") Rshow\n");
+		case RIGHT : fprintf(gpoutfile,") Rshow\n");
 			break;
 	}
 	if (ps_ang != 0)
-		fprintf(outfile,"grestore\n");
+		fprintf(gpoutfile,"grestore\n");
 	ps_path_count = 0;
 	PS_relative_ok = FALSE;
 }
@@ -1169,9 +1173,9 @@ char name[32];
 int  size,sep;
 
         sep=strcspn(font,",");
-        strncpy(name,font,sep); name[sep]='\0';
+        strncpy(name,font,sep); name[sep]=NUL;
         size=ps_fontsize; sscanf (&(font[sep+1]),"%d",&size);
-        fprintf(outfile,"/%s findfont %d scalefont setfont\n",name,size*PS_SC);
+        fprintf(gpoutfile,"/%s findfont %d scalefont setfont\n",name,size*PS_SC);
         PS_RememberFont(name,1 );
         return TRUE;
 }
@@ -1184,7 +1188,7 @@ TERM_PUBLIC void PS_point(x,y,number)
 unsigned int x,y;
 int number;
 {
-static char GPFAR *pointFNS[] = {"Pnt",  "Pls",   "Crs",    "Star",
+static char GPFAR * GPFAR pointFNS[] = {"Pnt",  "Pls",   "Crs",    "Star",
                            "Box",  "BoxF",  "Circle", "CircleF",
                            "TriU", "TriUF", "TriD",   "TriDF",
                            "Dia",  "DiaF",  "Pent",   "PentF",
@@ -1208,7 +1212,7 @@ static char GPFAR *pointFNS[] = {"Pnt",  "Pls",   "Crs",    "Star",
 		number = -1;		/* negative types are all 'dot' */
 	else
 		number %= sizeof(pointFNS)/sizeof(pointFNS[0]) -1;
-	fprintf(outfile,"%d %d %s\n", x, y, pointFNS[number+1]);
+	fprintf(gpoutfile,"%d %d %s\n", x, y, pointFNS[number+1]);
 
 	PS_relative_ok = 0;
 	ps_path_count = 0;
@@ -1221,7 +1225,7 @@ unsigned int x1,y1,x2,y2;
 {
 	PS_FLUSH_PATH
 
-	fprintf(outfile, "%d %d %d %d BoxFill\n", x1,y1, x2,y2);
+	fprintf(gpoutfile, "%d %d %d %d BoxFill\n", x1,y1, x2,y2);
 
 	PS_relative_ok = 0;
 	PS_linetype_last = -1;
@@ -1265,14 +1269,14 @@ double fontsize, base;
 /* close a postscript string if it has been opened */
 #define ENHPS_FLUSH      \
 {	if (ENHps_opened_string)  \
-	{	fputs(")]\n", outfile);   \
+	{	fputs(")]\n", gpoutfile);   \
 		ENHps_opened_string = FALSE; \
 	}                         \
 }
 
 #define ENHPS_OPEN	\
 {	if (!ENHps_opened_string) \
-	{ fprintf(outfile, "[(%s) %.1f %.1f %s %s (",  \
+	{ fprintf(gpoutfile, "[(%s) %.1f %.1f %s %s (",  \
 		  fontname, fontsize, base, \
  		  widthflag ? "true" : "false",  \
  		  showflag ? "true" : "false");  \
@@ -1342,7 +1346,7 @@ double fontsize, base;
 						while (*++p == ' ');
 					}
 					localfontname = p;
-					while ((ch = *p) > ' ' && ch != '=')
+					while ((ch = *p) > ' ' && ch != '=' && ch != '*')
 						++p;
 					save = *(savepos=p);
 					if (ch == '=')
@@ -1355,6 +1359,22 @@ double fontsize, base;
 						
 						if (f)
 							f *= PS_SC;  /* remember the scaling */
+						else
+							f = fontsize;
+						
+						ENHPS_DEBUG(("Font size %.1f\n", f))
+						/*}}}*/
+					}
+					else if (ch == '*')
+					{
+						*p++ = '\0';				
+						/*{{{  get optional font size scale factor*/
+						ENHPS_DEBUG(("Calling strtod(\"%s\") ...", p))
+						f = (float)strtod(p, &p);
+						ENHPS_DEBUG(("Returned %.1f and \"%s\"\n", f, p))
+						
+						if (f)
+							f *= fontsize;  /* apply the scale factor */
 						else
 							f = fontsize;
 						
@@ -1376,7 +1396,7 @@ double fontsize, base;
 						if (recode && recodestring)
 						{
 							ENHPS_FLUSH
-							fprintf(outfile, "/%s %s", localfontname, recodestring);
+							fprintf(gpoutfile, "/%s %s", localfontname, recodestring);
 						}
 					}
 					else
@@ -1424,8 +1444,8 @@ double fontsize, base;
 				/*{{{  an escape and print it */
 				/* special cases */
 				ENHPS_OPEN
-				fputc('\\', outfile);
-				fputc(*p, outfile);
+				fputc('\\', gpoutfile);
+				fputc(*p, gpoutfile);
 				break;
 				/*}}}*/
 		
@@ -1436,22 +1456,22 @@ double fontsize, base;
 				if (p[1]=='\\' || p[1]=='(' || p[1]==')')
 				{
 					ENHPS_OPEN
-					fputc('\\', outfile);
+					fputc('\\', gpoutfile);
 				}
 				else if (p[1] >= '0' && p[1] <= '7')
 				{
 					/* up to 3 octal digits */
 					ENHPS_OPEN
-					fputc('\\', outfile);
-					fputc(p[1], outfile);
+					fputc('\\', gpoutfile);
+					fputc(p[1], gpoutfile);
 					++p;
 					if (p[1] >= '0' && p[1] <= '7')
 					{
-						fputc(p[1], outfile);
+						fputc(p[1], gpoutfile);
 						++p;
 						if (p[1] >= '0' && p[1] <= '7')
 						{
-							fputc(p[1], outfile);
+							fputc(p[1], gpoutfile);
 							++p;
 						}
 					}
@@ -1466,7 +1486,7 @@ double fontsize, base;
 				/*{{{  print it */
 				ENHPS_OPEN
     
-				fputc(*p, outfile);
+				fputc(*p, gpoutfile);
     
 			/*}}}*/
 
@@ -1503,7 +1523,7 @@ char *font;
 	if (*font)
 	{
 		int sep=strcspn(font,",");
-		strncpy(ps_enh_font,font,sep); ps_enh_font[sep]='\0';
+		strncpy(ps_enh_font,font,sep); ps_enh_font[sep]=NUL;
 		ps_enh_fontsize=ps_fontsize; sscanf (font+sep+1,"%d",&ps_enh_fontsize);
 		PS_RememberFont(ps_enh_font, 1);
 	}
@@ -1528,7 +1548,7 @@ char *str;
 
 	if (ps_path_count)
 	{
-		fputs(" stroke\n",outfile);
+		fputs(" stroke\n",gpoutfile);
 		ps_path_count=0;
 		PS_relative_ok=FALSE;
 	}
@@ -1551,10 +1571,10 @@ char *str;
 	PS_move(x,y);
 
 	if (ps_ang != 0)
-		fprintf(outfile,"currentpoint gsave translate %d rotate 0 0 moveto\n",
+		fprintf(gpoutfile,"currentpoint gsave translate %d rotate 0 0 moveto\n",
 			ps_ang*90);
 
-	fputs("[ ",outfile);
+	fputs("[ ",gpoutfile);
 
 	/* set up the globals */
 	
@@ -1594,20 +1614,20 @@ char *str;
 
 	ENHps_max_height += ENHps_min_height;
 		
-	fprintf(outfile, "] %.1f ", -ENHps_max_height/3);
+	fprintf(gpoutfile, "] %.1f ", -ENHps_max_height/3);
 
 	switch(ps_justify)
 	{
-		case LEFT : fprintf(outfile, "MLshow\n");
+		case LEFT : fprintf(gpoutfile, "MLshow\n");
 			break;
-		case CENTRE : fprintf(outfile, "MCshow\n");
+		case CENTRE : fprintf(gpoutfile, "MCshow\n");
 			break;
-		case RIGHT : fprintf(outfile, "MRshow\n");
+		case RIGHT : fprintf(gpoutfile, "MRshow\n");
 			break;
 	}
 
 	if (ps_ang != 0)
-		fputs("grestore\n", outfile);
+		fputs("grestore\n", gpoutfile);
 	ps_path_count = 0;
 	PS_relative_ok=FALSE;
 }
@@ -1643,6 +1663,7 @@ TERM_TABLE_END(post_driver)
 #ifdef TERM_HELP
 START_HELP(post)
 "1 postscript",
+"?commands set terminal postscript",
 "?set terminal postscript",
 "?set term postscript",
 "?terminal postscript",
@@ -1691,19 +1712,21 @@ START_HELP(post)
 " The `postscript` driver supports about 70 distinct pointtypes, selectable",
 " through the `pointtype` option on `plot` and `set linestyle`.",
 "",
-" Several possibly useful files about `gnuplot`'s PostScript are included in",
-" the /docs subdirectory of the `gnuplot` distribution and at the distribution",
-" sites.  These are \"ps_symbols.gpi\" (a `gnuplot` command file that, when",
-" executed, creates the file \"ps_symbols.ps\"), \"ps_symbols.ps\" (which shows",
-" all the symbols available through the `postscript` terminal), \"ps_guide.ps\"",
-" (which contains a summary of the enhanced syntax and pages showing what the",
-" octal codes produce with text and symbol fonts) and \"ps_file.doc\" (a text",
-" file discussing the organization of a PostScript file written by `gnuplot`).",
+" Several possibly useful files about `gnuplot`'s PostScript are included",
+" in the /docs/ps subdirectory of the `gnuplot` distribution and at the",
+" distribution sites.  These are \"ps_symbols.gpi\" (a `gnuplot` command file",
+" that, when executed, creates the file \"ps_symbols.ps\" which shows all the",
+" symbols available through the `postscript` terminal), \"ps_guide.ps\" (a",
+" PostScript file that contains a summary of the enhanced syntax and a page",
+" showing what the octal codes produce with text and symbol fonts) and",
+" \"ps_file.doc\" (a text file that contains a discussion of the organization",
+" of a PostScript file written by `gnuplot`).",
 "", 
 " A PostScript file is editable, so once `gnuplot` has created one, you are",
 " free to modify it to your heart's desire.  See the \"editing postscript\"",
 " section for some hints.",
 "2 enhanced postscript",
+"?commands set terminal postscript enhanced",
 "?set terminal postscript enhanced",
 "?set term postscript enhanced",
 "?terminal postscript enhanced",
@@ -1737,9 +1760,10 @@ START_HELP(post)
 "",
 " Braces can be used to place multiple-character text where a single character",
 " is expected (e.g., 2^{10}).  To change the font and/or size, use the full",
-" form:  {/[fontname][=fontsize] text}   (For example, {/Symbol=20 G} is a ",
-" 20 point GAMMA).  (The '/' character MUST be the first character after the",
-" '{'.)",
+" form:  {/[fontname][=fontsize | *fontscale] text}.  Thus {/Symbol=20 G} is a",
+" 20-point GAMMA) and {/*0.75 K} is a K at three-quarters of whatever fontsize",
+" is currently in effect.  (The '/' character MUST be the first character after",
+" the '{'.)",
 "",
 " If the encoding vector has been changed by `set encoding`, the default",
 " encoding vector can be used instead by following the slash with a dash.  This",
@@ -1775,9 +1799,10 @@ START_HELP(post)
 "       set title '{/Symbol=18 \\362@_{/=9.6 0}^{/=12 x}} \\",
 "                  {/Helvetica e^{-{/Symbol m}^2/2} d}{/Symbol m}'",
 "",
-" The file \"ps_guide.ps\" in the /docs subdirectory of the `gnuplot` source",
+" The file \"ps_guide.ps\" in the /docs/ps subdirectory of the `gnuplot` source",
 " distribution contains more examples of the enhanced syntax.",
 "2 editing postscript",
+"?commands set terminal postscript editing",
 "?set terminal postscript editing",
 "?set term postscript editing",
 "?terminal postscript editing",
@@ -1798,7 +1823,7 @@ START_HELP(post)
 " may require deeper knowledge of the PostScript language.",
 "",
 " The organization of a PostScript file written by `gnuplot` is discussed in",
-" the text file \"ps_file.doc\" in the /docs subdirectory."
+" the text file \"ps_file.doc\" in the /docs/ps subdirectory."
 END_HELP(post)
 #endif
 

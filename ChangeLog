@@ -1,0 +1,2056 @@
+1999-01-14  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* Makefile.in, makefile.all: Add PGPKEYS to ETC.
+
+	* PGPKEYS: New file.
+
+	* term/apollo.trm: Add note about copyright status.
+
+1999-01-13  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* 0INSTALL: Add compile instructions for Cygwin.
+
+	* 0README: Add Windows 95/98 to platform list.
+
+	* Makefile.in, makefile.all: Add makefile.cyg to ETC.
+
+	* term/ai.trm: Removed 3.6ism, noted by Andy Dougherty
+	<doughera@lafayette.edu>.
+
+	* term/grass.trm: Switched to new gnuplot copyright. Permission
+	granted by original author.
+
+1999-01-13  William D Kirby  <wdkirby@ix.netcom.com>
+
+	* makefile.cyg: New makefile for Cygwin environment.
+	
+1999-01-12  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* 0INSTALL: Update to 3.7.
+
+	* 0README: Update distribution sites.
+
+	* configure: Regenerated.
+
+	* configure.in: Don't use fmt to create the driver list (not available
+	under HP-UX).
+
+	* version.c: Version 3.7, patchlevel 0, date string updated.
+
+	* term/post.trm, term/pslatex.trm, term/pstricks.trm, term/tpic.trm:
+	Fix typos introduced by the fprintf-fputs changeover.
+
+1999-01-08  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* term/mif.trm: Bugfix.
+
+1999-01-08  William D Kirby  <wdkirby@ix.netcom.com>
+
+	* win/wcommon.h: Don't include <shellapi.h> when compiling with
+	gcc based compilers.
+
+1999-01-07  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* Makefile.in, makefile.all: Remove m4/select-types.m4 and
+	m4/stringize.m4	from ETC and $(ACLOCAL_M4).
+
+	* acconfig.h: Remove HAVE_STRINGIZE and SELECT_TYPE_ARG* symbols.
+
+	* aclocal.m4, config.hin, configure: Regenerated.
+
+	* configure.in: Require autoconf-2.13.
+
+	* m4/select-types.m4, m4/stringize.m4: Removed, provided by
+	new autoconf version.
+
+1999-01-06  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* graphics.c(ticfmt): Fix buffer overrun.
+
+1999-01-05  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* 0INSTALL: Add section about front ends.
+
+	* TODO: Fix some typos.
+
+1999-01-05  Jens Emmerich  <Jens.Emmerich@itp.uni-leipzig.de>
+
+	* term/pslatex.trm: Remove doubled '%' chars.
+
+1998-12-24  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* fit.c, protos.h: Change wri_to_fil_last_fit_cmd() return value
+	to size_t.
+
+1998-12-23  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* 0INSTALL: Add note about MSDOS/DJGPP and djconfig.sh.
+
+	* Makefile.in, makefile.all: Add djconfig.sh to ETC variable.
+
+	* configure: Regenerated.
+
+	* configure.in: Use sh comments instead of m4 comments in some places.
+
+1998-12-23  Andris Pavenis  <pavenis@lanet.lv>
+
+	* djconfig.sh: New file to make configuration under MSDOS/DJGPP
+	easier.
+
+1998-12-22  Alexander Mai  <st002279@HRzpUB.tu-darmstadt.DE>
+
+	* term/pm.trm: Small patch.
+
+1998-12-22  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* 0README: Updated.
+
+	* TODO: Updated.
+
+	* configure: Regenerated.
+
+	* configure.in: Add ${with_gnu_readline}/lib to locations searched
+	for GNU libreadline.
+
+	* plot.h, term/post.trm: Implement and use architecture-independent
+	INT_STR_LEN constant as suggested by Andris Pavenis <pavenis@lanet.lv>.
+
+1998-12-22  Dick Crawford  <u600256@gamma.lanl.gov>, Lucas Hart  <hartl@ucs.orst.edu 
+
+	* docs/gnuplot.doc: Update fit documentation.
+
+1998-12-21  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* 0BUGS: Amend entry about label and arrow clipping.
+
+	* configure: Regenerated.
+
+	* configure.in: Change readline test so that full path to libreadline
+	is allowed, but not required. Edit some warning messages.
+
+1998-12-21  Lucas Hart  <hartl@ucs.orst.edu>
+
+	* descrip.mms: Updated. Fix sleep() problem.
+
+	* docs/README: VMS section updated.
+
+1998-12-18  Andris Pavenis  <pavenis@lanet.lv>
+
+	* term/djsvga.trm: Fix bug in W. Kirby's patch (rows and columns
+	swapped).
+
+1998-12-17  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* term/amiga.trm, term/post.trm: Indentation.
+
+	* term/x11.trm: Fix VMS include statement.
+
+1998-12-17  Andris Pavenis  <pavenis@lanet.lv>
+
+	* syscfg.h: Undef HELPFILE for MSDOS before #define'ing it.
+
+1998-12-17  William D Kirby  <wdkirby@ix.netcom.com>
+
+	* term/djsvga.trm: Resolve conflict between user defined screen text
+	mode, and the default text mode.
+
+1998-12-17  Roger Fearick  <FEARICK@physci.uct.ac.za>
+
+	* os2/gclient.c, os2/print.c: Patches from Robert Lalla that fix 
+	paint problems if full window drag is enabled, and crash if printing
+	to non-existing printer queue.
+
+1998-12-16  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* configure: Regenerated.
+
+	* configure.in: More meaningful warning messages.
+
+	* protos.h: GNU libreadline prototypes.
+
+	* show.c(show_command,show_one): Add cntrparam to showmess,
+	show cntrparam can now be abbreviated with show cn.
+
+	* term/tgif.trm: Fix undefined behaviour.
+
+1998-12-16  Lucas Hart  <hartl@ucs.orst.edu>
+
+	* term/gif.trm: Fix 'set terminal' info for gif driver.
+
+1998-12-16  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* 0BUGS: Add entry for 16bit Windows and Borland C++ 3.1.
+
+	* makefile.mgw: Call compiled programs via ./ because under
+	CygWin-BASH, the current directory is not in PATH.
+
+1998-12-15  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* gplt_x11.c, term/hpljii.trm, term/latex.trm, term/metafont.trm,
+	term/mif.trm, term/pbm.trm, pstricks.trm: Fix typos.
+
+	* show.c(show_one): Map show cntrparam to show contour.
+
+	* version.c: Remove comment. Beta 349.
+
+1998-12-14  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* term/*.trm: Indentation, use fputs for static strings.
+
+1998-12-14  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* makefile.win: Patch.
+
+1998-12-10  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* fit.c: Fix range bug in 3d fits.
+
+1998-12-09  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* Makefile.in, makefile.all: Remove references to upd_make.sh. Move
+	references to makefile.r.
+
+	* makefile.r: Move to docs/old.
+
+	* misc.c: Save set []tics autofreq from Don Taber plus cleanup.
+
+	* upd_make.sh: Obsolete, removed.
+
+1998-12-09  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* plot3d.c(grid_nongrid_date): Fix broken dist == 0 handling.
+
+1998-12-09  Stefan Schroepfer  <scr@iis.fhg.de>
+
+	* makefile.nt: Move generated .hlp file to different directory.
+
+1998-12-09  Juergen v. Hagen  <vonHagen@engr.psu.edu>
+
+	* makefile.mgw: Updated.
+
+	* win/wgnuplib.h: Remove TMPF_VECTOR and TMPF_TRUETYPE defines.
+
+1998-12-08  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* 0BUGS: Add m[]tics entry, provided by Lucas Hart. Add entry about
+	Windows help file.
+
+	* TODO: Add entry for snprintf(3).
+
+	* command.c, fit.c, gplt_x11.c, help.c, hidden3d.c, misc.c, plot.c,
+	plot2d.c, plot2d.c, show.c, term.c, time.c, util.c: Replace
+	fprintf'ing of static strings with fputs.
+
+	* configure: Regenerated.
+
+	* configure.in: Cleanup, fix typo.
+
+	* protos.h: Put ifdef around readline functions.
+
+1998-12-08  Andy Dougherty  <doughera@lafayette.edu>
+
+	* 0INSTALL: Mention PATH=.:$PATH trick for testing of uninstalled
+	binaries.
+
+	* 0PORTING: Clarification of build instructions.
+
+	* term.c: Enhance comment about pedantic preprocessors.
+
+	* demo/contours.dem, demo/surface1.dem: Change "gnu plot" to
+	"gnuplot".
+
+1998-12-08  Dick Crawford  <u600256@gamma.lanl.gov>
+
+	* docs/gnuplot.doc, docs/titlepag.ms, docs/titlepag.tex: 3.7ise.
+
+1998-12-07  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* 0BUGS: Remove entry about truncation of script files on VMS.
+
+	* 0README: Update monash ftp site details.
+
+	* Makefile.in, makefile.all: Add INSTALL.gnu to ETC.
+
+	* configure: Regenerated.
+
+	* configure.in: Fix configuring under HP-UX.
+
+	* graphics.c: Run through indent.
+
+	* plot.h: Add XOPEN M_LN10 constant.
+
+	* set.c(set_one): Use M_LN10.
+
+	* specfun.c: Revise Lucas' changes and bugfix.
+
+1998-12-07  Juergen v. Hagen  <vonHagen@engr.psu.edu>
+
+	* 0BUGS, 0INSTALL, 0README, NEWS, makefile.mgw, makefile.unx: Updated.
+
+1998-12-07  Lucas Hart  <hartl@ucs.orst.edu>
+
+	* fit.c: Add some messages.
+
+	* internal.c: More verbose error messages.
+
+	* standard.c(f_log10): Use M_LN10 constant.
+
+	* specfun.c: Expand GP_ERF/ERFC macros inline and add error checking.
+
+	* strftime.c: TEST_STRFTIME code was incomplete.
+
+	* syscfg.h: Add HELPFILE for VMS.
+
+	* demo/mgr.dem: Modify the acspline demo to better illustrate the
+	capabilities of the option.
+
+1998-12-06  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* 0FAQ, 0README, NEWS, configure.in, makefile.dj2, makefile.os9,
+	term/README: 3.7ise.
+
+	* Makefile.in, makefile.all: Add mac.trm to CORETERM.
+
+1998-12-06  David Schooley  <dcschooley@mediaone.net>
+
+	* term/mac.trm: Added terminal driver for Macintosh.
+
+1998-12-05  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* 0BUGS: Update OS/2 gcc optimiser bug entry.
+
+	* 0README: Update distribution sites.
+
+	* TODO: Add png driver entry.
+
+1998-12-05  Alexander Mai  <st002279@HRzpUB.tu-darmstadt.DE>
+
+	* makefile.os2: Fix OS/2 build (allterm.h related).
+
+1998-12-05  Ian MacPhedran  <Ian_MacPhedran@mackenzie.usask.ca>
+
+	* descrip.mms: VMS build fixes.
+
+1998-12-05  Roger Fearick  <FEARICK@physci.uct.ac.za>
+
+	* protos.h: Fix typo.
+
+	* os2/gclient.c, term/pm.trm: Fix old bug about default help file
+	path, and adjust font metrics in pm driver.
+
+1998-12-04  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* 0BUGS: Remove pslatex driver bug entry.
+
+	* TODO: Remove entry "allow load '-' or  gnuplot -  to mean
+	interactive".
+
+	* docs/Makefile.in: Fix for building outside source dir in all
+	targets using ALL_TERM_DOC.
+
+	* docs/doc2info.c: Remove static keyword in function declarations
+	to fix building with SunOS cc.
+
+1998-12-04  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* makefile.mgw, makefile.win, win/wgnuplib.h, win/wgraph.c,
+	win/winmain.c, win/wmenu.c, win/wpause.c: Fix bug with line width
+	scaling under Windows. Some cleanups.
+
+1998-12-03  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* aclocal.m4, config.hin, configure: Regenerated.
+
+	* configure.in: Require autoconf 2.12.2. Add AC_PROG_CPP.
+
+	* contour.c(gen_bspline_approx): Remove unused variable i.
+
+	* graph3d.c(setlinestyle,ztick_callback): Remove unused variable t.
+
+	* help.c: Make StartOutput(), OutLine(), EndOutput() non-static.
+	Remove list_terms().
+
+	* hidden3d.c(draw): Remove unused vars cross1, cross2.
+
+	* protos.h: Add prototypes for help.c functions. Remove prototype
+	for term_count().
+
+	* show.c(show_version_long): Rename readline rdline, and gnu_readline
+	gnu_rdline to avoid compiler warnings.
+
+	* stdfn.h: Remove bcopy() prototype, may conflict with system headers.
+
+	* term.c: Remove term_count(), update list_terms() to Don Taber's
+	version.
+
+	* version.c: Patchlevel beta348.
+
+1998-12-03  Dick Crawford  <u600256@gamma.lanl.gov>
+
+	* docs/gnuplot.doc, docs/titlepag.ms, docs/titlepag.tex: Updated list
+	of contributors, documentation of Don's "-" patch.
+
+1998-12-03  Don Taber  <dtaber@blackrat.risc.rockwell.com>
+
+	* command.c, misc.c, plot.c: Patch to use "-" for stdin or load file.
+
+	* graphics.c: Patch to make all four [xy][12]labels symmetric about
+	plots and well spaced from axes regardless of tics or absence of tics,
+	move the title up a character height, and put half a character extra
+	space on left and right to help out some of the terminals which have
+	trouble with this.
+
+1998-12-02  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* Makefile.in: Clean out dist target.
+
+	* bf_test.c: Add prototype for FreeHelp().
+
+	* fit.c(error_ex): Use strncpy() instead of safe_strncpy().
+
+	* gnuplot.opt: Add help (for DT's new version of list_terms()).
+
+	* makefile.amg: Remove obsolete file type.h from dependencies.
+
+	* protos.h: Remove null_linewidth() prototype. Add sleep() prototype.
+
+	* term.c: Add null_linewidth() prototype.
+
+	* docs/Makefile.in: Better integration of alldoc2gih target.
+
+1998-12-02  Lucas Hart  <hartl@ucs.orst.edu>
+	
+	* demo/hidden.dem, demo/prob.dem, demo/surface1.dem, demo/surface2.dem,
+	demo/using.dem: Reset axis labels with `set [xyz]tics autofreq'.
+
+1998-12-01  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* Makefile.in, makefile.all: Add makefile.mgw to ETC.
+
+	* TODO: New entry.
+
+1998-12-01  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* command.c: On Win32 platforms, allow 'cd "d:\path"' to also change
+	the drive.
+
+	* graphics.c: Fix bug in the new polar errorbar support (non-polar
+	yerrorbars had become diagonals).
+
+	* makefile.dj2, makefile.tc: Update realclean target.
+
+	* makefile.mgw: New makefile for MinGW32.
+
+	* makefile.win: Add 'help' to the list of objects to be compiled
+	into gnuplot (for Don Taber's new version of list_terms() sitting
+	in help.c)
+
+	* syscfg.h: Add HAVE_SLEEP for Win32.
+
+	* term/win.trm: Add more stuff in terminal help.
+
+	* win/geticon.c, win/wgnuplib.h, win/wgraph.c, win/winmain.c,
+	win/wmenu.c, win/wpause.c, win/wtext.c: Changes to allow building
+	under MinGW32.
+
+1998-12-01  Hartmut Niemann  <niemann@cip.e-technik.uni-erlangen.de>
+
+	* term/pslatex.trm: Patch to avoid problems with active characters
+	in \special commands, and line-end characters.
+
+1998-12-01  Alexander Mai  <st002279@hrzpub.tu-darmstadt.de>
+
+	* 0INSTALL: Upgrade OS/2 related docs.
+
+1998-11-30  Alexander Mai  <st002279@hrzpub.tu-darmstadt.de>
+
+	* makefile.os2: Update various compiler flags.
+
+	* plot.c(ExecuteMacro): Cosmetic changes.
+
+1998-11-30  Dick Crawford  <u600256@gamma.lanl.gov>
+
+	* docs/gnuplot.doc: Add documentation for `show version' and fixes.
+
+1998-11-30  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* 0INSTALL: Remove generic GNU install instructions.
+
+	* TODO: Add more suggestions.
+
+	* bf_test.c: Don't include plot.h, but all other necessary include
+	files.
+
+	* term.h: Fix typo (gpr.h <-> gpr.trm).
+
+	* term/cgm.trm: Remove temporary string.
+
+	* term/excl.trm: Update copyright to the current version by
+	permission of the author, Przemek Klosowski <przemek@nist.gov>.
+
+1998-11-26  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* Makefile.in: Remove allterm.h target and dependency.
+
+	* configure: Regenerated.
+
+	* configure.in: Add code to generate terminal driver dependencies in
+	docs/Makefile.in. Remove code to rename old makefiles.
+
+	* protos.h: Move non-static prototypes from term.c.
+
+	* term.c: Indentation. Move non-static prototypes to protos.h. Avoid
+	compiler warnings about variable shadowing:
+	In term_check_multiplot_okay(), rename interactive f_interactive.
+	In do_arrow(), change test for exact inequality in doubles.
+	In set_term(), rename c_token argument c_token_arg.
+	In init_terminal, rename term env_term.
+	In test_term, rename xmax xmax_t, and ymax ymax_t.
+
+	* docs/Makefile.in: Add TERM_LIST variable for allterm.h dependencies.
+	Use explicit file names instead of makefile variables. Modify allgih
+	target so that it builds independently from gih target, and vice versa.
+
+	* docs/makefile, docs/latextut/makefile: Rename makefile.dst, resp.
+
+	* term/*.trm(*_text_angle): Rename argument to text_angle function
+	ang consistently across terminal drivers to avoid compiler warnings.
+
+	* term/fig.trm(FIG_poly_clean): Rename stat fig_stat. In
+	FIG_options, rename tmax tmax_t, xsize xsize_t, ysize ysize_t.
+	In FIG_pointsize, rename pointsize arg_pointsize.
+
+	* term/post.trm: Rename pointsize ptsize. In PS_init, rename
+	xmax xmax_t, ymax ymax_t, xmin xmin_t, ymin ymin_t.
+
+	* term/pslatex.trm(PSLATEX_init): In PS_init, rename xmax xmax_t,
+	ymax ymax_t, xmin xmin_t, ymin ymin_t.
+
+	* term/tpic.trm(TPIC_options): Rename pointsize ptsize.
+
+1998-11-25  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* TODO: Add entry about float/double comparisons.
+
+	* command.c, plot2d.c, plot3d.c: Remove obsolete definition of MAXSTR.
+
+	* plot.c: Other small changes.
+
+	* term/table.trm, term/driver.h, term/xlib.trm, term/unixplot.trm,
+	term/hp2648.trm, term/dxy.trm, term/v384.trm, term/aed.trm,
+	term/tkcanvas.trm, term/mgr.trm, term/kyo.trm, term/qms.trm,
+	term/regis.trm, term/cgi.trm, term/debug.trm, term/excl.trm,
+	term/t410x.trm, term/linux.trm, term/hppj.trm: Indentation,
+	minor cleanups.
+
+1998-11-25  Don Taber  <dtaber@blackrat.risc.rockwell.com>
+
+	* term/cgm.trm: Solid line option for cgm terminal.
+
+1998-11-25  Alexander Mai  <st002279@hrzpub.tu-darmstadt.de>
+
+	* plot.c: Patch for OS/2.
+
+1998-11-24  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* TODO: Remove "clean up includes at top of files" entry. Add
+	some new entries.
+
+	* docs/gnuplot.1: Update X11 command line options.
+
+	* term/compact.c: Indentation, add RCS id.
+
+	* term/grass.trm: Remove duplicate header file inclusions.
+
+1998-11-23  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* graphics.c(gen_tics) Modified patch from Jochen Schuetze <jos@GBF.DE>
+	to avoid infinite loop during tic generation.
+
+	* term/aed.trm, term/ai.trm, term/apollo.trm, term/atariaes.trm,
+	term/atarivdi.trm: Indentation. Replace fprintf'ing of plain strings
+	with fputs.
+
+1998-11-23  David Schooley <dcschooley@mediaone.net>
+
+	* term/table.trm: Add missing register_term statement.
+
+1998-11-21  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* command.c(do_system): No not check system() return value.
+
+	* configure.in: Edit comment.
+
+	* version.c: Patchlevel pl7.
+
+1998-11-20  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* CodeStyle: Updated.
+
+	* command.c: Cleaning up. Make local functions static. Remove unused
+	variables and functions.
+
+	* fit.c: Make kbhit() static.
+
+	* graph3d.c: Indentation.
+
+	* plot.c: Cleaning up. Add OS/2 set_input_line() from command.c.
+
+	* plot2d.c: Delete `extern' keyword from variables removed from
+	command.c.
+
+1998-11-20  Don Taber  <dtaber@blackrat.risc.rockwell.com>
+
+	* graphics.c: Revise margin calculation.
+
+1998-11-20  Lucas Hart  <hartl@ucs.orst.edu>
+
+	* show.c: Adjust 'show tics' after set_tic_prop patch from 1998-10-31.
+
+1998-11-19  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* 0BUGS: Remove entry for manual key placement in hidden3d splot.
+	Add open file handles inheritance entry as suggested by Alexander Mai.
+
+	* ChangeLog: Reorganised.
+
+	* command.c(do_line): Skip leading spaces in input.
+
+	* config.hin, configure: Regenerated.
+
+	* configure.in: Add test for memmove().
+
+	* errorfix.sh: Simplified. Now only creates temporary copies
+	of files to be fixed, not of all files.
+
+	* plot.c(main): Fix compiler warnings.
+
+	* stdfn.c: Move memcpy definition to stdfn.h.
+
+	* stdfn.h, syscfg.h: Add definitions for memcpy and memmove.
+
+	* term/ai.trm, term/regis.trm: Add missing TERM_TABLE_END.
+
+1998-11-19  Lucas Hart  <hartl@ucs.orst.edu> 
+
+	* ansichek.h: Undefine HAVE_STRINGIZE for VAXC.
+
+	* command.c: Fixes for VMS and !NO_GIH, do_system() line truncation
+	when called from load_file(), comments.
+
+	* syscfg.h: Remove declarations that cause duplicate warnings.
+
+	* term.c: Avoid duplicate warnings from VMS headers.
+
+	* vms.c: Remove some duplicate header file inclusions.
+
+	* docs/doc2rnh.c: Add single_top_level, convert '/' in topic to
+	'|' because VMS HELP uses '/' as a list separator.
+
+1998-11-19  Dick Crawford  <u600256@gamma.lanl.gov>
+
+	* docs/gnuplot.doc: Extensive patches to fix minor misspellings,
+	makes all references "time/date" (instead of some being "date/time"),
+	removes some blanks from the ends of lines, add commands synonyms.
+
+	* term/*.trm: Add command synonyms to all terminals.
+
+1998-11-19  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* fit.c: Merge in patch from Lucas Hart <hartl@ucs.orst.edu>
+	to make fit.log and screen output match the documentation.
+	Cleaning up.
+
+	* graph3d.c(key_sample_line): Fix core dump if key is manually placed.
+
+	* graphics.c, plot2d.c: Merge in polar errorbars patch from
+	Igor Bray <I.Bray@flinders.edu.au>.
+
+1998-11-18  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* 0BUGS: Updated with latest awk script for contour line clipping
+	bug workaround by Paul Halsema <phalsema@harris.com>.
+
+	* 0INSTALL: Updated. gnuplot now compiles again with SunOS' cc.
+
+	* 0README: Updated.
+
+	* bf_test.c(FreeHelp), contour.c(end_crnt_cntr), matrix.c(fsign),
+	term.c(term_count): Translate prototype to K&R.
+
+	* fit.c: Translate prototypes for printmatrix() and
+	print_matrix_and_vectors() to K&R. Add missing prototypes for
+	static functions.
+
+	* gplt_x11.c: Re-add inclusion of config.h at top.
+
+	* parse.c: Indentation.
+
+	* set.c: Fix typos.
+
+	* term/ai.trm, term/cgm.trm, term/corel.trm, term/epson.trm,
+	term/fig.trm, term/mif.trm, term/next.trm, term/pbm.trm, term/png.trm,
+	term/post.trm, term/pslatex.trm, term/win.trm: Accept alternative
+	spelling "colour" for "color".
+	
+1998-11-17  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* 0BUGS: Added description of m[]tics initialisation bug, from
+	Lucas Hart <hartl@ucs.orst.edu>. Changed hidden3d entry and line
+	clipping entry as suggested by HBB. Add error bars in polar plots
+	entry, from Stefan Deutscher <stefand@ibm.net>.
+
+	* ansichek.h: Use #ifndef HAVE_CONFIG_H for systems which don't
+	run configure.
+
+	* acconfig.h: Remove ANSI_C.
+
+	* configure.in: Add comment at top. Don't define ANSI_C.
+
+	* misc.c: Patch by Alexander Mai <st002279@hrzpub.tu-darmstadt.de>
+	to read DOS files under Unix.
+
+	* plot.h: Comment out LP_DEFAULT. Don't use ANSI_C.
+
+	* protos.h: Updated prototypes for help.c and term.c
+
+	* set.c: New function reset_lp_properties. Replaces LP_DEFAULT
+	initialisation, get's rid of ANSI_C.
+
+1998-11-17  Don Taber  <dtaber@blackrat.risc.rockwell.com>
+
+	* 0BUGS: Revised entry for contour lines clipping bug.
+
+	* graph3d.c(do_3dplot): If "set contour; set nosurface; set noclabel"
+	is used, the items in the key will overwrite one another if more than
+	one function or file is plotted.
+	
+	* help.c, term.c: Patch to pipe 'set terminal' output through pager.
+
+	* plot3d.c(printd_3dtable): Add space between "label:" and label in
+	output.
+
+1998-11-16  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* 0BUGS: Added description and workaround for contour line clipping
+	bug. Provided by Don Taber <dtaber@blackrat.risc.rockwell.com>.
+ 	
+	* docs/old: New directory.
+
+	* History, README.3d, README.3p1, README.3p2, README.3p3, README.3p4,
+	README.3p5, README.ami, README.emx, README.fit, README.gnu,
+	README.iso, README.mf, README.nex, README.os2, README.pic, README.pro,
+	README.win, README.x11, README.xli: Moved to new dir docs/old.
+
+	* Makefile.in, makefile.all: Updated to reflect changes in directory
+	structure (ETC, DOCS5, DOCS).
+
+	* Projects: Renamed TODO.
+
+	* WhatsNew: Renamed NEWS.
+
+	* version.c: Changes history moved to docs/old/ChangeLog.old.
+
+	* win/wcgraph.c(wginitcolor): Swap entries for red and blue for	colour
+	consistency as suggested by Stephen Eglen <stephen@cns.ed.ac.uk>.
+
+1998-11-15  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* 0BUGS: Add description and workaround for pslatex driver bug.
+
+1998-11-15  Konrad Bernloehr  <bernlohr@ik3.fzk.de>
+
+	* interpol.c: Bugfix for 'smooth acsplines' option with logarithmic
+	x axis.
+
+1998-11-15  Lucas Hart  <hartl@ucs.orst.edu>
+
+	* stdfn.c(safe_strncpy): Bugfix.
+
+1998-11-09  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* 0INSTALL: Document new `--enable-system-time' configure option
+	and fixes.
+
+	* set.c(set_two): Skip leading whitespace in argument to 'set output'.
+
+	* specfun.c: Fix #ifdef directive.
+
+	* docs/gnuplot.doc: Change 'set output' documentation accordingly.
+
+1998-11-09  Alexander Mai  <st002279@hrzpub.tu-darmstadt.de>
+
+	* gplt_x11.c: Close open files on first initialisation on OS/2.
+
+	* makefile.os2: Updated.
+
+1998-11-06  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* 0INSTALL: Updated pointer to unproto.
+
+	* 0PORTING: Updated.
+
+	* acconfig.h: New symbol USE_SYSTEM_TIME (see time.c).
+
+	* config.hin, configure: Regenerated.
+
+	* configure.in: Improved time_t test by Andris Pavenis
+	<pavenis@lanet.lv>. New option '--enable-system-time' (see time.c).
+	Add check for <sys/timeb.h>.
+
+	* fit.c: Remove obsolete function subst().
+	
+	* Makefile.in, makefile.all: Remove mkdist from ETC variable.
+
+	* mkdist: Obsolete, removed. Use 'make dist'.
+
+	* protos.h: Change prototpe for util.c(chr_in_str).
+
+	* time.c: Fix indentation. Rename SYSTEM_TIME to USE_SYSTEM_TIME.
+	Fix compiler warnings about variable shadowing (rename clock l_clock).
+	Replace return statements with exit().
+
+	* util.c(chr_in_str): Make second arg int instead of char.
+
+	* docs/Makefile.in: New target allgih for .gih file with docs for
+	all terminals.
+
+1998-11-05  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* makefile.dj2: stdfn.o missing in OBJ3. Reported by William D Kirby
+	<wdkirby@ix.netcom.com>. demo\binary? target fixed as per suggestion
+	by Juergen Breitlow <Juergen.Breitlow@blns.siemens.de> and W. Kirby.
+
+	* plot.c(ExecuteMacro): Fix typo in variable name. Reported by
+	Lucas Hart <hartl@ucs.orst.edu>.
+
+	* syscfg.h: #ifdef directives simplified.
+
+	* term.c: Fixes to allow 'set output' in gnugraph terminal. Problem
+	reported by Berthold Hoellmann <se6y095@public.uni-hamburg.de>.
+
+	* term/djsvga.trm(DJSVGA_set_font): Add missing parenthesis. Reported
+	by William D Kirby <wdkirby@ix.netcom.com>.
+
+1998-11-04  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* hidden3d.c, scanner.c, show.c: Fix indentation.
+
+	* syscfg.h: Add comment.
+
+	* version.c: Patchlevel pl6.
+	
+1998-11-04  Lucas Hart <hartl@ucs.orst.edu>
+
+	* graphics.c, hidden3d.c, specfun.c, stdfn.h: VMS fixes.
+
+1998-11-03  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* bf_test.c, binary.c, bitmap.c: Fix indentation.
+
+	* config.hin, configure: Regenerated.
+
+	* configure.in: Add erfc() function check, change png version
+	test indentation to satisfy DU 4.0 cc.
+
+	* graphics.c(gen_tics): Hopefully fixed xmtics to start from 1
+	instead of 0.
+
+	* graphics.c(fixup_range), set.c(set_tic_prop): Avoid automatic
+	aggregate initialisation.
+
+	* show.c(show_two): Map show command for [xyz]{2}[md]tics to
+	[xyz]{2}tics.
+
+	* specfun.c: Fix typo in comment.
+
+	* docs/Makefile.in: Fix dependencies for config.h.
+
+1998-10-31  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* datafile.c, term/cgm.trm: Cast argument of is*() functions to int.
+
+	* eval.c, internal.c, interpol.c, plot3d.c, specfun.c: Fix indentation.
+
+	* graphics.c, set.c: Indentation.
+
+	* help.c: Some cleanups. Use TBOOLEAN instead of boolean type and
+	remove tboolean. Fix indentation. Move tos_getch() prototype to
+	protos.h.
+
+	* misc.c: Some cleanups.
+
+	* plot.h: Add TRUE and FALSE defines.
+
+	* protos.h: New prototype for misc.c(instring) and
+	readline.c(tos_getch).
+
+	* readline.c: Move tos_getch() prototype to protos.h.
+
+	* set.c: Fix indentation.
+
+	* term/gif.trm(GIF_options): Fix compiler warning (sscanf call).
+
+	* term/gnugraph.trm: Add prototypes for GNU plotutils functions.
+
+	* term/mif.trm: Fix compiler warning (nested extern decl).
+
+1998-10-31  Lucas Hart  <hartl@ucs.orst.edu>
+
+	* graphics.c, set.c, docs/gnuplot.doc: set_tic_prop patch version b.
+
+1998-10-30  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* acconfig.h, configure.in, stdfn.h, m4/select-types.m4: Replace
+	gp_FIND_SELECT_ARGTYPES with AC_FUNC_SELECT_ARGTYPES from upcoming
+	autoconf release, and related changes.
+
+	* aclocal.m4, config.hin, configure: Regenerated.
+
+	* fit.c, graphics.c, scanner.c, util.c: Cast argument of is*()
+	functions to int.
+
+	* syscfg.h: VMS prototypes, moved from term.c.
+
+	* term.c: Include header files moved from driver.h, indentation.
+
+	* docs/doc2x.h: Prototype for safe_strncpy().
+
+	* docs/termdoc.c: New function safe_strncpy() to avoid linking with
+	stdfn.c
+
+	* term/driver.h: Don't include header files.
+
+1998-10-28  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* Makefile.in: Reverse order of CPPFLAGS and INCLUDES in COMPILE.
+
+	* Makefile.in, buildvms.com, descrip.mms, makefile.os2, makefile.os9,
+	makefile.unx: gnuplot_x11 is now linked with stdfn.o.
+
+	* command.c, fit.c, gplt_x11.c, help.c, plot.c, scanner.c, strftime.c,
+	docs/doc2html.c, docs/doc2info.c, docs/termdoc.c, term/pc.trm,
+	term/pslatex.trm, term/pstricks.trm: Replace calls to strncpy() and
+	similar code with safe_strncpy().
+
+	* command.c, plot2d.c, plot3d.c, readline.c: Move Atari file
+	inclusion to syscfg.h.
+
+	* corplot.c, scanner.c, standard.c: Simplify #ifdef line.
+
+	* fit.c: Don't use copy_max(). Move to stdfn.c as safe_strncpy().
+	Move Atari file inclusion to syscfg.h. Move Dblf* macros to fit.h.
+	Fix indentation.
+
+	* fit.h: Moved macros from fit.c. Move function prototypes to protos.h.
+
+	* protos.h: safe_strncpy() prototype from stdfn.c. Prototypes from
+	fit.h.
+
+	* stdfn.c: New function safe_strncpy(), moved from fit.c(copy_max).
+
+	* syscfg.h: Include files for Atari.
+
+	* parse.c, stdfn.h, syscfg.h, term.h: Fix ifdefs.
+
+	* term/amiga.trm, term/cgm.trm, term/djsvga.trm, term/grass.trm,
+	term/next.trm, term/post.trm, term/tgif.trm: Replace '\0' with NUL.
+
+1998-10-28  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* makefile.tc, makefile.win, plot3d.c, term/hpgl.trm: DOS and dgrid3d
+	patches.
+
+1998-10-28  Jochen Schuetze  <jos@GBF.DE>
+
+	* fit.c, fit.h, misc.c: Save last fit command as comment.
+
+1998-10-20  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* 0INSTALL, 0PORTING: Updated.
+
+	* Makefile.in, makefile.all: Add new file syscfg.h to HEADERS variable.
+
+	* acconfig.h: Remove obsolete defines.
+
+	* bf_test.c, gplt_x11.c, readline.c, stdfn.c: Include plot.h instead
+	of config.h, ansichek.h and stdfn.h. Make enum JUSTIFY local in
+	gplt_x11.c(display).
+
+	* configure, config.hin: Regenerated.
+
+	* configure.in: Move some tests, rewrite some header and library tests.
+
+	* fit.c: Don't include config.h.
+
+	* plot.h, stdfn.h: Move OS dependent defines to new file syscfg.h.
+
+	* plot2d.c: Fix typo in #define.
+
+	* syscfg.h: New file for OS dependencies.
+
+1998-10-20  Andris Pavenis  <pavenis@lanet.lv>
+
+	* fit.c: Fix bug in vector resizing of bigger than default data sets.
+
+1998-10-19  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* acconfig.h, ansichek.h, hidden3d, plot2d.c, plot3d.c, docs/doc2x.h:
+	Rename HAVE_CPP_STRINGIFY to HAVE_STRINGIZE.
+
+	* acinclude.m4: Deprecated, removed.
+
+	* aclocal.m4, config.hin, configure: Regenerated.
+
+	* configure.in: Replace gp_PROG_CPP_STRINGIFY with AC_C_STRINGIZE
+	from current autoconf CVS repository. Rename gp_CHECK_LIB_PATH to
+	gp_SEARCH_LIBDIRS and gp_CHECK_HEADER to gp_SEARCH_HEADERDIRS.
+
+	* contour.c: Change function prototypes to K&R for compatibility.
+
+	* m4/msdos.m4, m4/next.m4, m4/search-hdr.m4, m4/search-lib.m4,
+	m4/select-types.m4, m4/stringize.m4: New files to store macros
+	from deprecated acinclude.m4 file.
+
+	* Makefile.in: Add INSTALL_SCRIPT and ACLOCAL_AMFLAGS variables,
+	remove ACCONFIG variable. Add new m4 macros to ETC variable. Add
+	m4 to SUBDIRS. Clean up.
+
+	* makefile.all: Remove stray backslash from NEXTSRC variable. Add
+	m4 files to ETC and fix typos.
+
+	* docs/*.c: More cleaning up. Add exit() statements in main()
+	function, remove unused vars, fix potential buffer overflows.
+
+	* term/rgip.trm: Splice unterminated strings.
+
+1998-10-16  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* acinclude.m4: In gp_CHECK_LIB_QUIET, add TERMXLIBS to LIBS during
+	test. In gp_FIND_SELECT_ARGTYPES, rename loop variables and add
+	caching.
+
+	* aclocal.m4, configure: Regenerated.
+
+	* command.c: Fix preprocessor directive syntax for BC++ 4.5.
+
+	* fit.c, fit.h, matrix.c: Don't include type.h, remove comment.
+
+	* Makefile.in, makefile.all: Remove type.h from HEADERS. Add doc2x.h
+	to DOCS1.
+
+	* misc.c: Fix typos.
+
+	* type.h: Obsolete file removed.
+
+	* docs/Makefile.in: Fix alldoc, clean, html targets and dependencies.
+	Compile doc2html with -DALL_TERM_DOC. Print gpcard.ps to file
+	instead of printer.
+
+	* docs/docs2x.h: New file.
+
+	* docs/*.[ch]: Move definitions to new file doc2x.h and include
+	doc2x.h.
+
+	* term/apollo.trm: Change in help part.
+
+1998-10-15  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* contour.c: Indentation, nested comments removed.
+
+	* misc.c(save_set_all): Add 3D mapping, missing to saved variables.
+
+	* show.c: Add 'bar' to showmess[].
+
+	* docs/*.c: Fix embarrassing typo in comment.
+
+1998-10-13  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* Makefile.in, makefile.all: Add ChangeLog to ETC variable.
+
+	* acconfig.h: Add MGR and RGIP.
+
+	* acinclude.m4: Minor changes.
+
+	* aclocal.m4, config.hin, configure: Regenerated.
+
+	* configure.in: Add options for MGR and RGIP. Define APOLLO if MGR
+ 	is defined. Add IRIS to configuration report.
+
+	* docs/gnuplot.doc: Small patch from Dick Crawford.
+
+	* graphics.c(boundary): Another margin calculation bug fix by HBB.
+
+	* parse.c: Change #ifdef statement, remove __osf__.
+
+	* term.h: Cleaning up, better readability.
+
+	* term/driver.h: Remove nested comment.
+
+	* version.c: Patchlevel pl5.
+
+1998-10-12  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* contour.c, term.c: Fix FPRINTF calls.
+
+	* graphics.c: Fix comments.
+
+	* misc.c(save_tics): Rename time variable to flag_time to prevent
+	global variable shadowing.
+
+	* set.c: Make references to first_plot and first_3dplot global.
+
+	* show.c(show_version_long): Reformat output.
+
+	* stdfn.h: Add VMS exit codes. Reformatting, define HAVE_SLEEP
+	unconditionally under VMS.
+
+	* docs/Makefile.in: Add new alldoc target for debugging purposes.
+	Add ipf target.
+
+	* docs/README: Cleanup and fixes.
+
+	* makefile.os2, docs/checkdoc.c, docs/doc2gih.c, docs/doc2hlp.c,
+	docs/doc2info.c, docs/doc2ipf.c, docs/doc2ms.c: Final fixes to
+	remove .c file inclusion.
+
+	* term/mif.trm, term/png.trm, term/post.trm: Make references to
+	version and patchlevel global to eliminate "nested extern declaration"
+	compiler warnings.
+
+	* term/x11.trm(VMS X11_init): Make declarations static.
+
+1998-10-09  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* Makefile.in, makefile.all: Add xref.h to DOCS1. Small changes.
+
+	* bf_test.c(int_error): Use only one fprintf().
+
+	* command.c: Move #ifdef MSDOS block from top of file to plot.h.
+	Suggested by HBB.
+
+	* datafile.c: Fix indentation.
+
+	* internal.c(pop): Remove superfluous space.
+
+	* makefile.286, makefile.amg, makefile.dj2, makefile.djg, makefile.emx,
+	makefile.g, makefile.msc, makefile.msw,makefile.mto, makefile,nt,
+	makefile,os2, makefile.os9, makefile.st, makefile.tc, makefile.vms,
+	makefile.wc, makefile.win, makefile.ztc: Add termdoc.o and xref.o
+	where required. No more inclusion of .c files.
+
+	* plot.c: Fix indentation.
+
+	* plot.h: Update, add MSDOS #ifdef block from command.c, add HELPFILE
+	definitions to OS section.
+
+	* plot2d.c: Remove MSDOS #ifdef block (outdated version of the defines
+	in command.c, now in plot.h). Indentation.
+
+	* plot3d.c, scanner.c, set.c: Minor changes.
+
+	* docs/Makefile.in, docs/makefile, docs/makefile.ami: Add termdoc.o
+	and xref.o where required. No more inclusion of .c files.
+
+	* docs/checkdoc.c, docs/doc2gih.c, docs/doc2hlp.c, docs/doc2html.c,
+	docs/doc2info.c, docs/doc2ipf.c, docs/doc2ms.c, docs/doc2rnh.c,
+	docs/doc2rtf.c, docs/doc2tex.c, docs/termdoc.c, docs/xref.c: No more
+	inclusion of .c files. Indentation, small changes.
+
+	* docs/xref.h: New file for definitions from docs/xref.c.
+
+1998-10-08  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* show.c(show_version_long): Add \n in fprintf().
+
+	* util.c(m_quote_capture): Use parse_esc() to interpret escape
+	sequences.
+
+	* docs/Makefile.in: Fix configuration variables.
+
+1998-10-08  Jochen Schuetze  <jos@GBF.DE>
+
+	* term/eepic.trm, term/latex.trm, term/pslatex.trm, term/tpic.trm:
+	Documentation for free positioning of labels feature.
+
+1998-10-07  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* aclocal.m4, configure: Regenerated.
+
+	* configure.in: Rewrite tests for termcap and readline. Remove
+	obsolete AC_SUBST(TERMFLAGS).
+
+	* command.c: Define some macros for Windows. Remove spurious else
+	in #ifdef'd code for Atari in command(). Additional #ifdef's for
+	GNU_READLINE. Indentation.
+
+	* Makefile.in: Rename distdir.
+
+1998-10-07  Andris Pavenis  <pavenis@lanet.lv>
+
+	* acinclude.m4: Use LIBS instead of LDFLAGS in gp_MSDOS.
+
+1998-10-06  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* configure.in: Fix readline logic.
+
+	* plot2d.c: Cleaning up, indentation.
+
+	* docs/gnuplot.doc: Corrections from Lucas Hart <hartl@ucs.orst.edu>.
+	Rename what's-new to new-features.
+
+1998-10-06  Alexander Mai  <st002279@hrzpub.tu-darmstadt.de>
+
+	* makefile.os2: Updated.
+
+1998-10-06  Jochen Schuetze  <jos@GBF.DE>
+
+	* term/eepic.trm, term/latex.trm, pslatex.trm, tpic.trm: Support
+	free positioning of labels with LaTeX related terminals.
+
+1998-10-05  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* 0INSTALL: Document new configure options. Additions.
+
+	* 0PORTING: Fix typo.
+
+	* Makefile.in: Add -DGNUPLOT_BINDIR to show.o target.
+
+	* acinclude.m4: Add /usr/local/lib to gp_CHECK_LIB_PATH and
+	/usr/local/include to gp_CHECK_HEADER.
+
+	* aclocal.m4, configure: Regenerated.
+
+	* configure.in: Merge --with-gnugraph and --enable-unixplot into
+	--with-plot.
+
+	* graphics.c: Indentation.
+
+	* show.c: Final fixes for merger (see entry from 1998-10-03).
+
+	* version.c: Patchlevel pl4.
+
+	* term/gnugrph.trm: Code for GNU plotutils lib.
+
+1998-10-04  Jonathan Thornburg  <jthorn@galileo.thp.univie.ac.at>
+	* graphics.c, plot2d.c, plot3d.c, graph3d.c, protos.h,
+	docs/gnuplot.doc: Fix infinite loops when data range is empty,
+	also wrong plots when data range is smaller than 'zero' setting.
+
+1998-10-03  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* 0PORTING, buildvms.com, term.h: Rename NO_ALL_TERM to SHORT_TERMLIST.
+
+	* Makefile.in: Eliminate TERMFLAGS, add TERMXLIBS (for GNU libplot.a
+	from GNU plotutils). Remove misc.o target. Remove CPPFLAGS and TERMLIBS
+	from Makefile and config.status targets.
+
+	* acconfig.h: Add APOLLO, CGI, DJSVGA, GNU_PLOTUTILS, GNUGRAPH,
+	GPR, GRX21, IRIS, SUN, UNIXPC, UNIXPLOT.
+
+	* acinclude.m4: Clean up gp_MSDOS, gp_NEXT, gp_CHECK_LIB_PATH. Add
+	cases to gp_FIND_SELECT_ARGTYPES.
+
+	* aclocal.m4, config.hin, configure: Regenerated.
+
+	* configure.in: Add --enable options and checks for Unix and GNU plot
+	library, Apollo, SCO/cgi library, Iris, SunView, AT&T Unix PC. Add
+	to configuration report.
+
+	* misc.c: Remove extern declarations. Remove save_version() and
+	replace with show_version(fp). Indentation.
+
+	* plot.c, plot2d.c, plot3d.c, set.c, term.c, term/driver.h term/*.trm:
+	Rename outfile variable to gpoutfile (name clash with GNU plotutils
+	library). Call show_version(stderr) instead of show_version().
+
+	* plot.h: Add FAQ_LOCATION.
+
+	* setshow.h: Remove outfile declaration. Fix show_version() prototpe.
+
+	* show.c: Fix show_version() calls. Merge misc.c(save_version) into
+	show_version().	In show_version_long(), use one single call to
+	fprintf().
+
+	* version.c: Add faq_location.
+
+	* docs/gnuplot.doc: Fix URL.
+
+	* docs/termdoc.c: Patches from Lucas Hart <hartl@ucs.orst.edu>.
+
+1998-10-01  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* 0INSTALL: Update with-PACKAGE section.
+
+	* 0PORTING, Makefile.in, makefile.unx: The preprocessor symbol
+	is IRIS, not IRIS4D.
+
+	* acconfig.h: Add GNUGRAPH and UNIXPLOT symbols.
+
+	* acinclude.m4: Remove caching from gp_CHECK_HEADER_QUIET and
+	gp_CHECK_LIB_QUIET, cleanup. Add new macro gp_SCO.
+
+	* aclocal.m4, config.hin, configure: Regenerated.
+
+	* configure.in: Cleanup, remove caching of CPPFLAGS and TERMLIBS.
+	New options --enable-unixplot and --with-gnugraph.
+
+	* gplt_x11.c: Move inclusion of ansichk.h and stdfn.h below
+	select stuff. Replace call to index() with strchr().
+
+	* graphics.c(boundary): Remove unnecessary \ at end of line.
+
+	* help.c(ShowSubtopics): Move spacelen out of for loop and init
+	spacelen and ispacelen to zero. Suggested by HBB.
+
+	* plot.c, plot2d.c, plot3d.c, set.c, term.c, term/driver.h,
+	term/*.trm: Rename outfile gpoutfile to	resolve clash with GNU
+	plotutils library.
+
+	* plot2d.c, plot3d.c: Add declaration of gpoutfile.
+
+	* setshow.h: Remove outfile declaration.
+
+	* show.c: Add faq_location. Rewrite show_version() to use fprintf()
+	only once. Rewrite show_version_long() to output to stderr instead
+	of stdout. Add UNIXPLOT and GNUGRAPH.
+
+	* term.h: Use GNUGRAPH independently of UNIXPLOT.
+
+	* version.c: Add faq_location.
+
+	* term/gif.trm: Update help text.
+
+1998-10-01  Dick Crawford  <u600256@gamma.lanl.gov>.
+
+	* docs/gnuplot.doc: Updates.
+
+1998-10-01  Alexander Mai  <st002279@hrzpub.tu-darmstadt.de>
+
+	* os2/gnupmdrv.c: Close all open files on first initialisation.
+
+	* command.c, makefile.os2: OS/2 related changes.
+
+1998-09-30  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* Makefile.in: Add $(INCLUDES) to version.o target.
+
+1998-09-28  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* 0PORTING, buildvms.com, term.h: Lucas Hart's NO_ALLTERM patch.
+
+	* configure.in: Re-add AC_HEADER_STDC. Otherwise STDC_HEADERS is
+	not defined.
+
+	* help.c(ShowSubtopics): spacelen and ispacelen must not be
+	initialised with zero. Bug report from Stefan Schroepfer
+	<scr@iis.fhg.de>. Indentation.
+
+	* plot.c(load_rcfile): Bugfix: ~/.gnuplot not read. Reported by
+	Stefan Schroepfer <scr@iis.fhg.de>.
+
+	* stdfn.h: OS/2 fixes.
+
+	* util.c: Indentation, add braces.
+
+1998-09-28  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* docs/ps/ps_guide.ps: Add page numbers to enable browsing with ps
+	viewers.
+
+1998-09-26  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* term/sun.trm(local_notice_destroy): Comment out assignment to
+	non-existent variable term_init.
+
+1998-09-26  Alexander Mai  <st002279@hrzpub.tu-darmstadt.de>
+
+	* 0INSTALL, makefile.os2, plot.c, term/emxvga.trm, term/pm.trm:
+	More OS/2 related changes.
+
+1998-09-25  Alexander Mai  <st002279@hrzpub.tu-darmstadt.de>
+
+	* 0INSTALL, makefile.os2: OS/2 related changes.
+
+1998-09-25  Andris Pavenis  <pavenis@lanet.lv>
+	
+	* command.c, plot.c: Patches to compile with DJGPP.
+
+1998-09-24  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* 0PORTING: Mention HAVE_SYS_STAT_H. Add info about plot.h.
+
+	* acconfig.h: Remove NO_SYS_STAT_H, re-add X11.
+
+	* acinclude.m4: Cleanup.
+
+	* aclocal.m4, config.hin, configure: Regenerated.
+
+	* configure.in: Change test for <sys/stat.h>, re-add X11.
+
+	* datefile.c, stdfn.h: Invert #ifdef logic for <sys/stat.h>.
+
+	* gplt_x11.c(mainloop): Fix typo.
+
+	* makefile.amg: Add comment about compiler warning.
+
+	* makefile.ami, makefile.nt, makefile.os9, makefile.tc, makefile.wc,
+	makefile.win: Escape quotes in CFLAGS line.
+
+	* makefile.amg, makefile.nt: Define HAVE_SYS_STAT_H in DEFS/CFLAGS.
+	
+	* stdfn.h: Add missing stat macros for WIN32 and AMIGA_SC_6_1.
+
+	* win/wgnuplib.def, win/wgnuplot.def: Re-add ^M's at end of line.
+
+	* plot.h: Remove X_DISPLAY_MISSING and re-add X11. Move definition of
+	PLOTRC into OS specific section.
+
+	* term.h: Remove X_DISPLAY_MISSING.
+
+1998-09-24  Lucas Hart  <hartl@ucs.orst.edu>
+
+	* term/x11.trm: VMS patch.
+
+1998-09-23  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* 0INSTALL: Rewrite part about unproto.
+
+	* Makefile.in: Remove spurious \ in NEXTSRC.
+
+	* acconfig.h: Add NO_SYS_TIME_H and SELECT_ARGTYPE_mmm.
+
+	* acinclude.m4: New macro gp_FIND_SELECT_ARGTYPES.
+
+	* aclocal.m4, config.hin, configure: Regenerated.
+
+	* configure.in: Remove AC_HEADER_STDC (checked by AM_C_PROTOTYPES).
+	Add check for <sys/time.h> and <sys/socket.h>, required by
+	gp_FIND_SELECT_ARGTYPES. Add  gp_FIND_SELECT_ARGTYPES.
+
+	* gplt_x11.c(mainloop): Use new types for args to select().
+	
+	* graph3d.c, graphics.c, hidden3d.c, plot2d.c: Fix typos which crept
+	in when applying Lucas Hart's patches.
+
+	* plot.h, term.h: Fix #ifdef logic with X_DISPLAY_MISSING.
+
+	* stdfn.h: Add code for select() argument types.
+
+	* term/post.trm: Fix typo.
+
+	* term/tek.trm: Rest of Lucas Hart's patches
+
+	* version.c: Bump version to 347pl3.
+
+1998-09-22  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* acconfig.h: Remove HAVE_LGAMMA and HAVE_STRNCASECMP.
+
+	* config.hin, configure: Regenerated.
+
+	* configure.in: Streamline header and functions tests to reduce
+	configure script size. Use AC_MSG_RESULT for configuration report.
+	Cosmetic changes.
+
+	* os2/gclient.h: Move #include <math.h> to top.
+
+	* readline.c: Indentation and comments cleanup.
+
+	* term/excl.trm, term/fg.trm, term/gif.trm, term/gnugraph.trm,
+	term/metafont.trm, term/mgr.trm, term/mif.trm, term/multitos.trm,
+	term/pm.trm, term/table.trm, term/win.trm, term/xlib.trm: Add
+	comments and RCS id.
+
+1998-09-22  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* readline.c: Don't store duplicated history entries.
+
+1998-09-22  Dick Crawford  <rccrawford@lanl.gov>
+
+	* term/post.trm: Enhpost psfonts scale patch.
+
+1998-09-21  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* binary.h, command.c, graph3d.c, graphics.c, interpol.c, plot2d.c,
+ 	plot3d.c, util3d.c: Move inrange macro to plot.h. 
+
+	* gplt_x11.c: Fix indentation. Add definition of fd_set_t. Use
+	fd_set_t to clean up select() call. Remove unused variable all
+	in DEFAULT_X11 mainloop(). Fix some compiler warnings.
+
+	* plot.c: Move defintion of HOME, PLOTRC to plot.h. Clean up
+	load_rcfile(). Use new symbols DIRSEP1, DIRSEP2, NUL.
+
+	* plot.h: Define HOME, DIRSEP1, DIRSEP2 in OS section. Define
+	PLOTRC.
+
+	* stdfn.h: Define NUL.
+	
+1998-09-20  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* CodeStyle: Amended.
+
+	* contour.c: Change some function signatures to avoid compiler
+	warnings.
+
+	* datafile.c: Rename some vars to avoid compiler warnings.
+
+	* help.c(LoadHelp,ShowSubtopics): Initialize pos.
+
+	* contour.c, datafile.c, fit.c, graph3d.c, graphics.c, hidden3d.c,
+	internal.c, interpol.c, matrix.c, plot2d.c, plot3d.c, set.c, stdfn.c,
+	strftime.c, util3d.c: Cleanups.
+
+1998-09-20  Lucas Hart  <hartl@ucs.orst.edu>
+
+	* contour.c: Add chk_contour_kind() function.
+
+	* docs/doc2rnh.c: Add new putrnh_() function.
+
+	* contour.c, datafile.c, fit.c, graph3d.c, graphics.c, hidden3d.c,
+	internal.c, interpol.c, matrix.c, plot2d.c, plot3d.c, set.c, stdfn.c,
+	strftime.c, util3d.c: VMS patches
+	
+1998-09-19  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* version.c: Trim log entries for beta346.
+
+1998-09-19  Alexander Mai  <st002279@hrzpub.tu-darmstadt.de>
+
+	* command.c, plot.c, stdfn.h, os2/gclient.c: Patches to make 347pl2
+	compile under OS/2.
+
+1998-09-18  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* command.c: Move HELPFILE definition to plot.h.
+
+	* plot.h: Add CONTACT, HELPFILE, and HELPMAIL definitions.
+
+	* show.c(show_version_long): Use GNUHELP environment variable to
+	find HELPFILE, cleanup.
+
+	* version.c: Move CONTACT and HELPMAIL definition to plot.h,
+	include plot.h. Bump version to 347pl2.
+
+1998-09-17  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* set.c(get_style): Fix typo.
+
+1998-09-16  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* 0INSTALL: Updated.
+
+	* acconfig.h: Add NO_SYS_STAT_H, remove X11.
+
+	* config.hin, configure: Regenerated.
+
+	* configure.in: Don't define X11. Add check for <sys/stat.h> and
+	AC_HEADER_STAT.
+
+	* datafile.c: Modified version of Alexander Mai's stat(2) patch
+	(check if regular file or pipe before opening data file).
+
+	* makefile.amg: Remove stdfn.h from datafile.c deps.
+
+	* plot.h: Define X11 in terms of X_DISPLAY_MISSING.
+
+	* show.c(show_version_long): Fix typo. Changes to make it compile
+	with pre-ANSI cc.
+
+	* stdfn.h: Add stat(2) related macros.
+
+	* term.h: Use X_DISPLAY_MISSING instead of X11.
+
+1998-09-16  REIBENSCHUH Alfred  <alfred.reibenschuh@cait.co.at>
+
+	* term/gif.trm: More colours for gif terminal (web216 standard).
+
+1998-09-15  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* term/cgm.trm(CGM_graphics): Fix core dump with strlen(NULL).
+
+1998-09-15  REIBENSCHUH Alfred  <alfred.reibenschuh@cait.co.at>
+
+	* term/gif.term: Draw grids with the gdStyled functions.
+
+1998-09-02  REIBENSCHUH Alfred  <alfred.reibenschuh@cait.co.at>
+
+	* term/gif.term: Prevent rotated labels from extending into graph area.
+
+1998-09-01  Dick Crawford  <u600256@gamma.lanl.gov>
+
+	* graphics.c: Fix timestamp positioning.
+	
+	* term/post.trm: Update help section to	new directory structure
+	for postscript docs.
+
+1998-08-28  Rolf Niepraschk  <niepraschk@ChbRB.berlin.ptb.de>
+
+	* descrip.mms: Updated version.
+
+1998-08-28  Joji Maeda  <jiji@ee.noda.sut.ac.jp>
+
+	* term/post.trm: Increase the number of dictionaries to 256.
+
+1998-08-24  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* Makefile.in, misc.c: Modified set angle patch from Juergen von Hagen
+	<vonHagen@engr.psu.edu>.
+
+	* Makefile.in: Add PACKAGE and VERSION variables. Remove version
+	variable.
+
+	* acconfig.h: Add PACKAGE and VERSION variables.
+
+	* acinclude.m4: Remove AM_MISSING_PROG macro.
+
+	* aclocal.m4: Regenerated with aclocal.
+
+	* config.hin: Regenerated with autoheader.
+
+	* configure.in: Add VERSION variable, AM_INIT_AUTOMAKE. Remove
+	AM_MISSING_PROG, AC_PROG_MAKE_SET, AC_PROG_INSTALL. Add configuration
+	summary report.
+
+	* configure: Regenerated with autoconf.
+
+	* docs/checkdoc.c, docs/doc2gih.c, docs/doc2hlp.c, docs/doc2html.c,
+	docs/doc2info.c, docs/doc2ipf.c, docs/doc2ms.c, docs/doc2rnh.c,
+	docs/doc2rtf.c, docs/doc2tex.c: #undef TRUE and FALSE before
+	redefining it.
+
+1998-08-24  Alexander Mai  <st002279@hrzpub.tu-darmstadt.de>
+
+	* gplt_x11.c, makefile.os2, os2/gclient.c, os2/print.c, term/pm.trm:
+	OS/2 fixes.
+
+1998-08-20  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de> 
+
+	* datafile.c (df_tokenise): Fix bug in datafile reading speedup	patch.
+
+1998-08-19  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* readline.c: Fix termios/sgtty logic.
+
+1998-08-18  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* configure.in: Unconditional test for <sgtty.h>.
+
+	* plot.h, readline.c: Indentation, comments for readability.
+
+	* Makefile.in, makefile.all: Forgot Makefile in DOCS4.
+	
+1998-08-17  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* Makefile.in: Forgot to add docs/ps to SUBDIRS. Remove duplicate
+	DOCS variable.
+
+	* Makefile.in, makefile.all: Remove $(S)ps_symbols.ps from DOCS4.
+
+1998-08-17  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* hidden3d.c, makefile.dj2, makefile.tc, makefile.win, plot.h,
+	show.c, term/pc.trm, term/post.trm, win/wgnuplot.def, win/wtext.c:
+	hbbmisc.diffs.980813 patch set.
+
+1998-08-17  Andris Pavenis  <pavenis@lanet.lv>
+
+	* term/hpljii.trm: Output file is opened in ASCII mode under DJGPP,
+	Windows.
+
+1998-08-11  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* docs/gnuplot.doc: Fix hierarchical structure of 'format',
+	'format_specifiers' and 'data/time_specifiers'. By HBB.
+
+	* Makefile.in, makefile.all: remove docs/ps_guide.ps from DOCS1.
+
+	* install-sh, missing, mkinstalldirs: Update from automake-1.3b.
+	
+1998-07-23  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* docs/ps_guide.ps: Removed. Newer version now in docs/ps.
+
+	* fit.h: Add parentheses around macro args.
+
+	* version.c: Fix some typos.
+
+1998-07-21  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* term/amiga.trm: Fix indentation.
+
+	* docs/ps/: New subdir for PostScript docs.
+
+	* docs/ps/Makefile, docs/ps/README, docs/ps/ps_file.doc,
+	docs/ps/ps_guide.ps, docs/ps/ps_symbols.gpi: New files, from
+	Dick Crawford's gp-ps.tar.
+	
+	* Makefile.in, makefile.all: Add PostScript docs to DOCS variable.
+
+1998-07-15  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* 0INSTALL, 0README, configure.in: Fix typos, small changes.
+
+	* docs/Makefile.in, docs/latextut/Makefile.in: Fixes for building
+	outside source directory, cleanup. Add target for tutorial.ps.
+
+	* Makefile.in: In Makefile target, change INCLUDES= to CPPFLAGS=.
+
+	* docs/*.c, docs/gnuplot.doc: Update copyright statement.
+
+	* Makefile.in, makefile.all: Add doc2rnh.c to DOCS1 variable.
+
+1998-07-15  Lucas Hart  <hartl@ucs.orst.edu>
+
+	* scanner.c: Add include files for VMS. Old patch.
+
+	* docs/doc2rnh.c: New file, help file format for VMS. Old patch.
+ 	Target was already in Makefile.in.
+
+	* vms.c: Include plot.h, make mbxbname static. Old patch.
+
+1998-07-14  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* 0INSTALL: Add missing --without-PACKAGE description in section
+	about --with-PACKAGE.
+
+	* Makefile.in: (Bug fix) No directory prefix for CONFIG_HEADER_IN.
+	If build dir != src dir, configure/make picks up the correct prefix.
+	automatically. Add makefile.wc to ETC variable. Final fix for dist
+	target.
+
+	* configure.in: Set CPPFLAGS and X_LIBRARIES in test for X Window
+	System files. Remove test for -lnsl/-lsocket. Add code to cache
+	and use CPPFLAGS and TERMLIBS. Bug fix in libreadline test error msg,
+	reported by Thomas Walter <walter@pctc.chemie.uni-erlangen.de>.
+
+	* configure: Regenerated.
+
+	* graphics.c (gprintf): Add klugde to use snprintf() where available.
+	Add new 2nd arg (size_t count) to function signature.
+
+	* makefile.all: Add makefile.wc to ETC variable.
+
+1998-07-14  Stefan Schroepfer  <scr@iis.fhg.de>
+
+	* makefile.nt: Portability patch.
+
+1998-07-08  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* configure.in: Change AC_PATH_X to AC_PATH_XTRA, add check
+	for snprintf().
+
+	* config.hin, configure: Regenerated.
+
+	* 0INSTALL, 0README: Additions, inspired by Lucas Hart 
+	<hartl@ucs.orst.edu>.
+
+1998-07-08  Aurel Gabris  <gabrisa@valerie.inf.elte.hu>
+
+	* 0PORTING, doc/gnuplot.doc, makefile.wc, national.h, stdfn.h,
+	term/pc.trm, term.c: DOS Watcom C port.
+
+1998-07-08  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* graphics.c, util3d.c: Grid clipping patch.
+
+	* datafile.c: Fortran numbers patch.
+
+1998-07-02  Markus Dickebohm  <m.dickebohm@uni-koeln.de>
+
+	* gplt_x11.c: Change 0xffffffff to (unsigned long)(-1L).
+
+1998-07-01  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* Makefile.in: New target for show.o, for 'show version long'.
+
+	* acconfig.h, config.hin, configure.in: The correct file name
+	is .gnuplot, not .gnuplotrc!
+
+	* config.hin: Add HAVE_SYS_UTSNAME_H, for 'show version long'.
+
+	* configure.in: Add check for <sys/utsname.h>.
+
+	* configure: Regenerated.
+
+	* setshow.h: Add <sys/utsname.h> and show_version_long() prototype.
+
+	* show.c: Add show_version_long(), and add 'version long' option
+	to parser.
+
+1998-07-01  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* hidden3d.c: Fix core dump, allocated storage not free()'d in
+	case of errors.
+
+1998-06-30  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* fit.c, fit.h, matrix.c, matrix.h: Updated to hbbmisc	patch
+	from 29-06-1998.
+
+	* makefile.tc, makefile.win, misc.c, set.c, show.c, docs/gnuplot.doc,
+	win/wtext.h: Updated to hbbmisc patch from 29-06-1998.
+
+	* graphics.c: hbbmisc patch minus write_multiline() hunk.
+
+	* graphics.c: hbbdiffs-980630, hopefully complete fix for margin
+	calculation bug.
+
+	* term/pc.trm: hbbdiffs-980630. Let BGI graphics library take
+ 	care of vertical centering of letters.
+
+	* win/wgraph.c: hbbdiffs-980630. Make rotated letters also have the
+	correct justification to the *center* of the text height.
+
+1998-06-29  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* docs/termdoc.c: Use HAVE_CPP_STRINGIFY for ANSI_C.
+
+1998-06-29  Roger Fearick  <FEARICK@physci.uct.ac.za>
+
+	* makefile.os2, plot.c, os2/gclient.c, term/pm.trm: OS/2 patches.
+
+1998-06-23  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* Imported beta 347.
+
+1998-06-23  Berthold Hoellmann  <hoel@Hamburg.GermanLloyd.de>
+
+	* Makefile.in: In term.o target, reverse order of $(INCLUDES) and
+	$(CPPFLAGS) to avoid problems with GNU plotutils.
+
+1998-06-23  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* Imported beta 346.
+
+1998-06-19  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* fit.c, fit.h, matrix.c, matrix.h: Re-re-import new improved
+	versions from beta344. Suggested by HBB.
+
+	* Makefile.in, makefile.all: Fixes, update file lists.
+
+	* docs/makefile, docs/latextut/makefile: Restore files which
+	got deleted accidentally.
+
+1998-06-18  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* graph3d.c, util3d.c: Remove spurious ^M.
+
+	* 0PORTING: Fix typos.
+
+	* set.c: Complete axis width fix.
+
+1998-06-17  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* Imported beta 345.
+
+	* docs/gnuplot.doc, term/post.trm: Fix typos.
+
+1998-06-16  Dick Crawford  <rccrawford@lanl.gov>
+
+	* docs/README, docs/doc2ms.c, docs/doc2tex.c, docs/gnuplot.doc,
+	docs/ps_guide.ps, term/cgm.trm, term/post.trm,term/x11.trm:
+ 	Cleaning up.
+
+1998-05-12  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* set.c: Fix axis width in lp_style_type. HBB and Lars Hecking.
+
+1998-05-08  Dick Crawford  <rccrawford@lanl.gov>
+
+	* plot3d.c: Fix "title" option for "splot" under parametric mode.
+
+	* graphics.c, set.c, show.c: Margin calculation correction patch.
+
+1998-04-29  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* Makefile.in: Minor fixes.
+
+	* fit.c, fit.h, matrix.c, matrix.h: Re-import versions from beta 343.
+	Suggested by HBB.
+
+1998-04-24  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* configure, configure.in: Don't use sudo.
+
+1998-04-24  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* graph3d.c: Fix range bug in splot.
+
+1998-04-22  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* Imported beta 344.
+
+1998-04-16  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* set.c: Don't include math.h, but stdfn.h.
+
+	* term/driver.h: Remove GOT_DRIVER_H, use TERM_DRIVER_H instead.
+	Add some comments.
+
+	* term/*.trm, TERM/README: Remove #ifndef GOT_DRIVER_H/#endif
+	around #include "driver.h".
+
+	* term/cgm.trm: Amend help section.
+
+	* term/emxvga.trm: Add some comments, don't include math.h.
+
+	* term/latex.trm (LATEX_rule): Replace valid with isvalid
+	(valid is a macro in <locale.h> under SunOS 4.1.x).
+
+	* term/png.trm: Test for png version moved to configure.
+
+	* term/epson.trm, term/hp500c.trm, term/hpljii.trm, term/hppj.trm,
+	term/pbm.trm, term/png.trm: Replace #ifdef vms with #ifdef VMS.
+
+	* makefile.*: Remove unneeded symbols AUTOCONF, HAVE_STRERROR, NOGAMMA.
+	Add stdfn.c and appropriate rules.
+
+1998-04-15  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* parse.c (factor): Final, working workaround for HP 300 compiler
+	limitation.
+
+1998-04-13  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* post.trm: Fix typos in Dick's term-340 patch.
+
+1998-04-13  Dick Crawford  <u600256@gamma.lanl.gov>
+
+	* atariaes.trm, atarivdi.trm, cgi.trm, cgm.trm, corel.trm, epson.trm,
+	fig.trm, linux.trm, next.trm, pbm.trm, pc.trm, pm.trm, png.trm,
+	post.trm, pslatex.trm, pstricks.trm, table.trm, tek.trm, texdraw.trm,
+	unixplot.trm, vws.trm, win.trm, x11.trm: term-340.patch.
+
+1998-04-13  "Glenn A. Horton-Smith"  <gas@SLAC.Stanford.EDU>
+
+	* scanner.c, util.c: Escape quotes patch.
+
+1998-04-13  Stephen Eglen  <stephen@cns.ed.ac.uk>
+
+	* post.trm, pbm.trm: X11 vs. ps (and pbm) colour inconsistency patch.
+
+1998-04-13  "James R. Van Zandt"  <jrv@vanzandt.mv.com>
+
+	* cgm.trm: Updated version, fixes "plot size change" bug, and "ugly
+	dashed lines" bug.
+
+	* term/README: Documentation fix.
+
+1998-04-13  Konrad Bernloehr  <bernlohr@ik3.fzk.de>
+
+	* command.c (define): Fix segfault where allocated structure
+	(action table) is freed twice.
+
+	* fig.trm: Fix pointsize in fig terminal, together with
+	Hans-Martin Keller <hkeller@gwdg.de>.
+
+1998-04-13  Kai Poitschke  <kai.poitschke@henkel.de> 
+
+	* term.c (term_init): Memory allocation error fix.
+
+1998-04-13  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* fit.c, matrix.c, matrix.h: fit-unlimited.diff.980105.
+
+	* fit.c: Fix segfault in fit.c (fit_chisq_undef.diff.980304).
+
+	* hp500c.trm, hppj.trm, pbm.trm, png.trm: Fix changing plot size bug.
+
+1998-04-11  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* acconfig.h: Remove AUTOCONF, NOCOPY, OLD_SELECT.
+	Add HAVE_CPP_STRINGIFY,	HAVE_LGAMMA, HAVE_STRNCASECMP, NO_MATH_H,
+	NO_SETVBUF, NO_STRERROR, NO_STRRCHR, NO_STRSTR.
+
+	* ansichek.h: Remove test for AUTOCONF, define ANSI_C if __STDC__ == 1.
+	Define HAVE_CPP_STRINGIFY and PROTOTYPES if ANSI_C == 1.
+
+	* config.hin: Regenerated from acconfig.h with autoheader.
+
+	* configure.in: Add support for 'missing'. Add test for ANSI
+	stringification. Rearrange test order (ANSI first). Rewrite tests
+	for libgd and libpng, check png version.
+
+	* configure: Regenerated from configure.in with autoconf.
+
+	* stdfn.c: New file, adds strchr(), strstr(). Moved memcpy() from
+	parse.c, memset() from plot.h, strerror() from util.c, purec_sscanf()
+	from datafile.c, sleep() from command.c, strnicmp() from fit.c.
+
+	* stdfn.h: Cleanups, adjustments for stdfn.c. Include math.h.
+	New, general debug macro FPRINTF.
+
+	* parse.c: Don't include math.h. Move memcpy() to stdfn.c. Workaround
+	for buggy HP-UX compiler.
+
+	* plot.h: Regroup OS specific defines at beginning of file. Define
+	VMS for VMS platform. Move memcpy() to stdfn.c. Move most #include
+	statements to stdfn.h. Define AMIGA for AmigaOS compilers. Define
+	BACKUP_FILESYSTEM for VMS.
+
+	* fit.c: Move strnicmp() to stdfn.c. Use BACKUP_FILESYSTEM in update().
+
+	* gplt_x11.c, readline.c, term.c, time.c, util.c: Use FPRINTF instead
+	of DEBUG, DEBUG_STR, and TRACE.
+
+	* gplt_x11.c, plot.c: Remove superfluous prototype for main.
+
+	* gplt_x11.c: Use HAVE_SYS_SELECT_H instead of OLD_SELECT. Use
+	memset() instead of bzero(). In mainloop(), use ANSI_C instead
+	of __STDC__.
+
+	* bf_test.c, binary.c, command.c, contour.c, datafile.c, fit.c,
+	gplt_x11.c, graph3d.c, graphics.c, hidden3d.c, internal.c, interpol.c,
+	matrix.c, misc.c, plot.c, plot2d.c, plot3d.c, readline.c, scanner.c,
+	show.c, specfun.c, standard.c, strftime.c, term.c, time.c, util.c,
+	util3d.c: Don't include headers already included by stdfn.h.
+
+	* command.c: Move sleep() related declarations to stdfn.c and stdfn.h.
+
+	* datafile.c: Move purec_sscanf() to stdfn.c.
+
+	* hidden3d.c, plot2d.c, plot3d.c: Use HAVE_CPP_STRINGIFY in place
+	of ANSI_C.
+
+	* command.c, plot.c, scanner.c, term.c, util.c: Use VMS in place
+	of vms.
+
+	* plot.c, term.c: Use AMIGA for AmigaOS compilers.
+
+	* strftime.c: Replace TEST with TEST_STRFTIME.
+
+	* util.c: Move strerror() to stdfn.c.
+
+	* errorfix.sh: Can now be run if compiledir != sourcedir. More
+	robust.
+
+	* term.h: Use AMIGA for Amiga compilers. Move X11 term inclusion.
+
+	* vms.c: Include stdfn.h.
+
+	* makefile.g: Remove -DAUTOCONF=1.
+
+1998-04-09  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* ChangeLog: New file.
+
+	* gplt_x11.c (prepare_plot): Remove unused definition term_icon[10].
+
+	* set.c (set_arrow, set_linestyle): Replace aggregate initialisation
+	for non-ANSI compilers.
+
+	* Makefile.in: General cleanup. Add full support for GNU auto* tools.
+
+	* missing: New file required for full GNU auto* tools support. Taken
+	from automake 1.3 distribution.
+
+	* acinclude.m4: New macros gp_PROG_CPP_STRINGIFY, taken from egcs,
+	and AM_MISSING_PROG, from automake 1.3 distribution. Fixes in
+	gp_CHECK_LIB_PATH and gp_CHECK_HEADER.
+
+	* aclocal.m4: Regenerated from acinclude.m4 with aclocal.
+
+	* configure: Regenerated from configure.in with autoconf.

@@ -69,7 +69,7 @@ static double ry1 __PROTO((double x));
  * These bessel functions are accurate to about 1e-13
  */
 
-#if (defined (ATARI) && defined(__PUREC__)) || (defined (MTOS) && defined(__PUREC__))
+#if (defined (ATARI) || defined (MTOS)) && defined(__PUREC__)
 /* Sorry. But PUREC bugs here.
  * These bessel functions are NOT accurate to about 1e-13
  */
@@ -480,7 +480,7 @@ static double GPFAR qyone[] = {
 	0.1e+1
 };
 
-#endif /* ATARI && __PUREC__  ||  MTOS && __PUREC__*/
+#endif /* (ATARI || MTOS) && __PUREC__ */
 
 void f_real()
 {
@@ -794,10 +794,8 @@ register double mag, ang;
 void f_log10()
 {
 struct value a;
-register double l10;;
 	(void) pop(&a);
-	l10 = log(10.0);	/***** replace with a constant! ******/
-	push( Gcomplex(&a,log(magnitude(&a))/l10, angle(&a)/l10) );
+	push( Gcomplex(&a,log(magnitude(&a))/M_LN10, angle(&a)/M_LN10) );
 }
 
 

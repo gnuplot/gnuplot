@@ -95,10 +95,9 @@ TERM_PUBLIC void AMIGA_graphics __PROTO((void));
 TERM_PUBLIC void AMIGA_move __PROTO((unsigned int x, unsigned int y));
 TERM_PUBLIC void AMIGA_vector __PROTO((unsigned int x, unsigned int y));
 TERM_PUBLIC void AMIGA_linetype __PROTO((int linetype));
-TERM_PUBLIC void AMIGA_put_text __PROTO((unsigned int x, unsigned int y,
-                                     char *str));
+TERM_PUBLIC void AMIGA_put_text __PROTO((unsigned int x, unsigned int y, char *str));
 TERM_PUBLIC int AMIGA_justify_text __PROTO((enum JUSTIFY mode));
-TERM_PUBLIC int AMIGA_set_font __PROTO((char * font));
+TERM_PUBLIC int AMIGA_set_font __PROTO((char *font));
 TERM_PUBLIC void AMIGA_suspend __PROTO((void));
 TERM_PUBLIC void AMIGA_resume __PROTO((void));
 
@@ -110,7 +109,6 @@ TERM_PUBLIC void AMIGA_resume __PROTO((void));
 #ifndef TERM_PROTO_ONLY
 
 #ifdef TERM_BODY
-
 
 #ifdef AMIGA_AC_5
 #include <intuition/intuitionbase.h>
@@ -136,8 +134,8 @@ void AMIGA_exit(void);
 /* #  define ATEXIT(x) (onexit(x) == 0) */
 #  define RAWCON(x) rawcon(x)
 # else
-#  define RAWCON(x) /* nought */
-# endif /* SAS */
+#  define RAWCON(x)		/* nought */
+# endif				/* SAS */
 #else
 # define ATEXIT(x) 0
 #endif /* NO_ATEXIT */
@@ -171,21 +169,25 @@ static int AMIGA_FontSize;
 
 
 /* Font stuff */
-static struct TextAttr AMIGA_Font = {
-  "topaz.font",TOPAZ_EIGHTY,FS_NORMAL,FPF_ROMFONT
+static struct TextAttr AMIGA_Font =
+{
+    "topaz.font", TOPAZ_EIGHTY, FS_NORMAL, FPF_ROMFONT
 };
 static struct TextFont *AMIGA_TextFont;
 
 
 /* Screen stuff */
-static struct NewScreen AMIGA_NewScreen = {
-  0,0,AMIGA_XMAX,AMIGA_YMAX,4,15,0,HIRES|LACE,
-  CUSTOMSCREEN|SCREENBEHIND|SCREENQUIET,NULL,NULL,NULL,NULL
+static struct NewScreen AMIGA_NewScreen =
+{
+    0, 0, AMIGA_XMAX, AMIGA_YMAX, 4, 15, 0, HIRES | LACE,
+    CUSTOMSCREEN | SCREENBEHIND | SCREENQUIET, NULL, NULL, NULL, NULL
 };
 static struct Screen *AMIGA_Screen;
-static struct TagItem AMIGA_ScrTagList[] = {
-  { SA_Overscan, OSCAN_TEXT }, { TAG_DONE, 0 }
- };
+static struct TagItem AMIGA_ScrTagList[] =
+{
+    { SA_Overscan, OSCAN_TEXT },
+    { TAG_DONE, 0 }
+};
 
 
 /* Window stuff */
@@ -196,31 +198,37 @@ static TBOOLEAN AMIGA_window_mode = FALSE;
 #define AMIGA_WIN_YMAX 320
 
 static struct Window *AMIGA_Window;
-static struct TagItem AMIGA_WinTagList[] = {
-  { WA_InnerWidth, AMIGA_WIN_XMAX }, { WA_InnerHeight, AMIGA_WIN_YMAX },
-  { WA_Title, (ULONG)"gnuplot" },    { WA_DragBar, TRUE },
-  { WA_DepthGadget, TRUE },	     { WA_WBenchWindow, TRUE },
-  { WA_SmartRefresh, TRUE} ,	     { WA_GimmeZeroZero, TRUE },
-  { WA_AutoAdjust, TRUE },	     { TAG_DONE, 0 }
- };
+static struct TagItem AMIGA_WinTagList[] =
+{
+    { WA_InnerWidth, AMIGA_WIN_XMAX },
+    { WA_InnerHeight, AMIGA_WIN_YMAX },
+    { WA_Title, (ULONG) "gnuplot" },
+    { WA_DragBar, TRUE },
+    { WA_DepthGadget, TRUE },
+    { WA_WBenchWindow, TRUE },
+    { WA_SmartRefresh, TRUE },
+    { WA_GimmeZeroZero, TRUE },
+    { WA_AutoAdjust, TRUE },
+    { TAG_DONE, 0 }
+};
 
 /*
  * This  is the palette.  Values are stored as 0xrrggbb, where rr, gg, and, bb
  * are big-endian 8-bit intensities for red, green, and blue, respectively.
  */
 static unsigned int palette[] =
-      {
-       0xffffff,       /* white */
-       0x000000,       /* black */
-       0xff0000,       /* red */
-       0x00ff00,       /* green */
-       0x0000ff,       /* blue */
-       0x00ffff,       /* cyan */
-       0xff00ff,       /* magenta */
-       0xffff00,       /* yellow */
-       0x7f007f,       /* purple */
-       0xff7f00,       /* orange */
-      };
+{
+    0xffffff,			/* white */
+    0x000000,			/* black */
+    0xff0000,			/* red */
+    0x00ff00,			/* green */
+    0x0000ff,			/* blue */
+    0x00ffff,			/* cyan */
+    0xff00ff,			/* magenta */
+    0xffff00,			/* yellow */
+    0x7f007f,			/* purple */
+    0xff7f00,			/* orange */
+};
 
 #define PALETTE_SIZE (sizeof (palette) / sizeof (unsigned int))
 
@@ -228,21 +236,22 @@ static unsigned int palette[] =
  * the above palette. The values stored in this table are pen numbers;
  * e.g clut[2] is the pen which represents the color "red".
  */
-static unsigned int clut[10];
+static unsigned int clut[PALETTE_SIZE];
 
 
 /* Colors */
-static UWORD AMIGA_Colors [] = {
-  0x000,0xfff,0xbbb,0x0f0,0xf00,0x00f,0x3ca,0xf0f,
-  0x94d,0x0ff,0x82f,0xff0,0x0af,0xc5e,0xfa2,0xf44
+static UWORD AMIGA_Colors[] =
+{
+    0x000, 0xfff, 0xbbb, 0x0f0, 0xf00, 0x00f, 0x3ca, 0xf0f,
+    0x94d, 0x0ff, 0x82f, 0xff0, 0x0af, 0xc5e, 0xfa2, 0xf44
 };
 
 
 /* Misc */
 static int AMIGA_slinetype;
 static enum JUSTIFY AMIGA_justify = LEFT;
-static unsigned int AMIGA_ymax,AMIGA_xmax; 
-static WORD AMIGA_cwd,AMIGA_cht,AMIGA_bsl,AMIGA_vadj;
+static unsigned int AMIGA_ymax, AMIGA_xmax;
+static WORD AMIGA_cwd, AMIGA_cht, AMIGA_bsl, AMIGA_vadj;
 /* Common RastPort */
 static struct RastPort *AMIGA_RastPort;
 
@@ -251,49 +260,46 @@ static struct RastPort *AMIGA_RastPort;
  */
 TERM_PUBLIC void AMIGA_reset()
 {
-  if (AMIGA_window_mode == TRUE)
-    {
-      int i = 0;
+    if (AMIGA_window_mode == TRUE) {
+	int i = 0;
 
-      /* Free the pens */
-      while (i < PALETTE_SIZE)
-	{
-	  if (clut[i] != -1)
-	    ReleasePen (AMIGA_Window->WScreen->ViewPort.ColorMap, clut[i]);
+	/* Free the pens */
+	while (i < PALETTE_SIZE) {
+	    if (clut[i] != -1)
+		ReleasePen(AMIGA_Window->WScreen->ViewPort.ColorMap, clut[i]);
 
-	  i++;
+	    i++;
 	}
 
-      /* Close the window */
-      if (AMIGA_Window != NULL)
-	CloseWindow (AMIGA_Window);
+	/* Close the window */
+	if (AMIGA_Window != NULL)
+	    CloseWindow(AMIGA_Window);
 
-      AMIGA_Window = NULL;
-      AMIGA_window_mode = FALSE;
+	AMIGA_Window = NULL;
+	AMIGA_window_mode = FALSE;
     }
+    if (AMIGA_TextFont != NULL)
+	CloseFont(AMIGA_TextFont);
 
-  if (AMIGA_TextFont != NULL)
-    CloseFont (AMIGA_TextFont);
+    if (DiskfontBase != NULL)
+	CloseLibrary(DiskfontBase);
 
-  if (DiskfontBase != NULL)
-    CloseLibrary (DiskfontBase);
+    if (AMIGA_Screen != NULL)
+	CloseScreen(AMIGA_Screen);
 
-  if (AMIGA_Screen != NULL)
-    CloseScreen (AMIGA_Screen);
+    if (IntuitionBase != NULL)
+	CloseLibrary((struct Library *) IntuitionBase);
 
-  if (IntuitionBase != NULL)
-    CloseLibrary ((struct Library *)IntuitionBase);
+    if (GfxBase != NULL)
+	CloseLibrary((struct Library *) GfxBase);
 
-  if (GfxBase != NULL)
-    CloseLibrary ((struct Library *)GfxBase);
+    AMIGA_TextFont = NULL;
+    DiskfontBase = NULL;
+    AMIGA_Screen = NULL;
+    IntuitionBase = NULL;
+    GfxBase = NULL;
 
-  AMIGA_TextFont = NULL;
-  DiskfontBase = NULL;
-  AMIGA_Screen = NULL;
-  IntuitionBase = NULL;
-  GfxBase = NULL;
-
-  AMIGA_RastPort = NULL; /**/
+    AMIGA_RastPort = NULL;
 }
 
 
@@ -302,123 +308,107 @@ TERM_PUBLIC void AMIGA_reset()
  */
 TERM_PUBLIC void AMIGA_init()
 {
-  char name[MAX_ID_LEN+1];
+    char name[MAX_ID_LEN + 1];
 
-  /* Install exit trap in case of abnormal termination (see below). */
-  if (ATEXIT(AMIGA_exit))
-    AMIGA_ERROR("Couldn't set exit trap", RETURN_FAIL)
+    /* Install exit trap in case of abnormal termination (see below). */
+    if (ATEXIT(AMIGA_exit))
+	AMIGA_ERROR("Couldn't set exit trap", RETURN_FAIL);
 
-  /* Open needed libraries */
-  GfxBase = (struct GfxBase *) OpenLibrary("graphics.library",0);
-  if (GfxBase == NULL)
-    AMIGA_ERROR("No Graphics-Library", RETURN_FAIL)
+    /* Open needed libraries */
+    GfxBase = (struct GfxBase *) OpenLibrary("graphics.library", 0);
+    if (GfxBase == NULL)
+	AMIGA_ERROR("No Graphics-Library", RETURN_FAIL);
 
-  IntuitionBase = (struct IntuitionBase *) OpenLibrary("intuition.library",0);
-  if (IntuitionBase == NULL)
-    AMIGA_ERROR("No Intuition-Library", RETURN_FAIL)
+    IntuitionBase = (struct IntuitionBase *) OpenLibrary("intuition.library", 0);
+    if (IntuitionBase == NULL)
+	AMIGA_ERROR("No Intuition-Library", RETURN_FAIL);
 
-  if (AMIGA_window_mode == TRUE)
-    {
-      int i = 0;
+    if (AMIGA_window_mode == TRUE) {
+	int i = 0;
 
-      /* Initialize the clut */
-      while (i < PALETTE_SIZE)
-	clut[i++] = -1;
-  }
-
-  if (LIB_VERSION(IntuitionBase) <= 34)
-    {
-    /* We compute the vertical resolution for those poor NTSC-souls   :-)   */
-      if (GfxBase->DisplayFlags & PAL)
-	AMIGA_ymax = 512;
-      else
-	AMIGA_ymax = 400;
-
-    AMIGA_xmax = 640;
-    AMIGA_NewScreen.Width = AMIGA_xmax;
-    AMIGA_NewScreen.Height = AMIGA_ymax;
-
-    AMIGA_Screen = OpenScreen(&AMIGA_NewScreen);
-
-      if (AMIGA_Screen == NULL)
-	AMIGA_ERROR("No Screen", RETURN_FAIL)
-
-      AMIGA_RastPort = &AMIGA_Screen->RastPort;
-
+	/* Initialize the clut */
+	while (i < PALETTE_SIZE)
+	    clut[i++] = -1;
     }
-  else /* Intuition version > 34 */
-    {
-    /* Kickstart 2.0 support */
-    AMIGA_NewScreen.Width = STDSCREENWIDTH;
-    AMIGA_NewScreen.Height = STDSCREENHEIGHT;
+    if (LIB_VERSION(IntuitionBase) <= 34) {
+	/* We compute the vertical resolution for those poor NTSC-souls   :-)   */
+	if (GfxBase->DisplayFlags & PAL)
+	    AMIGA_ymax = 512;
+	else
+	    AMIGA_ymax = 400;
 
-      if (AMIGA_window_mode != TRUE)
-	{
+	AMIGA_xmax = 640;
+	AMIGA_NewScreen.Width = AMIGA_xmax;
+	AMIGA_NewScreen.Height = AMIGA_ymax;
 
-    AMIGA_Screen = OpenScreenTagList(&AMIGA_NewScreen,AMIGA_ScrTagList);
+	AMIGA_Screen = OpenScreen(&AMIGA_NewScreen);
 
-	  if (AMIGA_Screen == NULL)
-	    AMIGA_ERROR("No Screen", RETURN_FAIL)
+	if (AMIGA_Screen == NULL)
+	    AMIGA_ERROR("No Screen", RETURN_FAIL);
 
-	  AMIGA_RastPort = &AMIGA_Screen->RastPort;
+	AMIGA_RastPort = &AMIGA_Screen->RastPort;
 
-    AMIGA_xmax = AMIGA_Screen->Width;
-    AMIGA_ymax = AMIGA_Screen->Height;
-  }
-      else /* AMIGA_window_mode == TRUE */
-	if (LIB_VERSION(GfxBase) >= 39)
-	  {
+    } else {			/* Intuition version > 34 */
+	/* Kickstart 2.0 support */
+	AMIGA_NewScreen.Width = STDSCREENWIDTH;
+	AMIGA_NewScreen.Height = STDSCREENHEIGHT;
+
+	if (AMIGA_window_mode != TRUE) {
+
+	    AMIGA_Screen = OpenScreenTagList(&AMIGA_NewScreen, AMIGA_ScrTagList);
+
+	    if (AMIGA_Screen == NULL)
+		AMIGA_ERROR("No Screen", RETURN_FAIL);
+
+	    AMIGA_RastPort = &AMIGA_Screen->RastPort;
+
+	    AMIGA_xmax = AMIGA_Screen->Width;
+	    AMIGA_ymax = AMIGA_Screen->Height;
+	} else if (LIB_VERSION(GfxBase) >= 39) { /* AMIGA_window_mode == TRUE */
 	    /* Open the plot window */
-	    /* AMIGA_ERROR("plot window not implemented", RETURN_FAIL) */
 
-	    AMIGA_Window = (struct Window *)
-			    OpenWindowTagList (NULL,AMIGA_WinTagList);
+	    AMIGA_Window = (struct Window *)OpenWindowTagList(NULL, AMIGA_WinTagList);
 
 	    /* Don't do this: fall back to screen */
 	    if (AMIGA_Window == NULL)
-	      AMIGA_ERROR("Could not open plot window", RETURN_FAIL);
+		AMIGA_ERROR("Could not open plot window", RETURN_FAIL);
 
 	    AMIGA_RastPort = AMIGA_Window->RPort;
 
 	    AMIGA_xmax = AMIGA_WIN_XMAX;
 	    AMIGA_ymax = AMIGA_WIN_YMAX;
 
-	  } /* Gfx version >= 39 */
+	}			/* Gfx version >= 39 */
+    }				/* Intuition version <= 34 */
 
-    } /* Intuition version <= 34 */
+    term->xmax = AMIGA_xmax;
+    term->ymax = AMIGA_ymax;
 
-  term->xmax = AMIGA_xmax;
-  term->ymax = AMIGA_ymax;
+    if (AMIGA_window_mode != TRUE) {
+	sprintf(name, "%s,%d", AMIGA_FontName, AMIGA_FontSize);
+	AMIGA_set_font(name);
 
-  if (AMIGA_window_mode != TRUE)
-    {
-  sprintf(name,"%s,%d",AMIGA_FontName,AMIGA_FontSize);
-  AMIGA_set_font(name);
+	LoadRGB4(&AMIGA_Screen->ViewPort, AMIGA_Colors, 16);
+	RemakeDisplay();
+	AMIGA_slinetype = 1;
+	SetAPen(&AMIGA_Screen->RastPort, AMIGA_slinetype);
+    } else {
+	int i, r, g, b;
 
-  LoadRGB4(&AMIGA_Screen->ViewPort,AMIGA_Colors,16);
-  RemakeDisplay();
-  AMIGA_slinetype = 1;
-  SetAPen(&AMIGA_Screen->RastPort,AMIGA_slinetype);
-    }
-  else
-    {
-      int i, r, g, b;
+	AMIGA_bsl = AMIGA_Window->RPort->TxBaseline;	/* Reference line */
+	AMIGA_cht = AMIGA_Window->RPort->TxHeight;	/* Height of characters */
 
-      AMIGA_bsl = AMIGA_Window->RPort->TxBaseline; /* Reference line */
-      AMIGA_cht = AMIGA_Window->RPort->TxHeight; /* Height of characters */
-
-      /* Allocate pens */
-      for (i = 0; i < PALETTE_SIZE; i++)
-       {
-	 r = (palette[i] << 8 ) & 0xFF000000;
-	 g = (palette[i] << 16) & 0xFF000000;
-	 b = (palette[i] << 24) & 0xFF000000;
-	 clut[i] = ObtainBestPenA (AMIGA_Window->WScreen->ViewPort.ColorMap,r,g,b,NULL);
-}
+	/* Allocate pens */
+	for (i = 0; i < PALETTE_SIZE; i++) {
+	    r = (palette[i] << 8) & 0xFF000000;
+	    g = (palette[i] << 16) & 0xFF000000;
+	    b = (palette[i] << 24) & 0xFF000000;
+	    clut[i] = ObtainBestPenA(AMIGA_Window->WScreen->ViewPort.ColorMap, r, g, b, NULL);
+	}
 
     }
 
-  SetDrMd (AMIGA_RastPort,JAM1);
+    SetDrMd(AMIGA_RastPort, JAM1);
 
 }
 
@@ -429,52 +419,40 @@ TERM_PUBLIC void AMIGA_init()
 TERM_PUBLIC void AMIGA_options()
 {
 
-  /* Screen/Window mode */
-  if (!END_OF_COMMAND)
-    {
-      if (almost_equals(c_token,"scr$een"))
-	{
-	  AMIGA_window_mode = FALSE;
-	  c_token++;
-	}
-      else
-	if (almost_equals(c_token,"win$dow"))
-	  {
+    /* Screen/Window mode */
+    if (!END_OF_COMMAND) {
+	if (almost_equals(c_token, "scr$een")) {
+	    AMIGA_window_mode = FALSE;
+	    c_token++;
+	} else if (almost_equals(c_token, "win$dow")) {
 	    AMIGA_window_mode = TRUE;
 	    c_token++;
-	  }
+	}
     }
+    /* Font name */
+    if (!END_OF_COMMAND && isstring(c_token)) {
+	quote_str(AMIGA_FontName, c_token, MAX_ID_LEN);
+	c_token++;
+    }
+    /* Font size */
+    if (!END_OF_COMMAND) {
+	/* We have font size specified */
+	struct value a;
+	AMIGA_FontSize = (int) real(const_express(&a));
+    }
+    if (strcmp(AMIGA_FontName, "") == 0 && AMIGA_FontSize != 0)
+	strcpy(AMIGA_FontName, "topaz");
 
-  /* Font name */
-  if (!END_OF_COMMAND && isstring(c_token))
-    {
-    quote_str(AMIGA_FontName,c_token, MAX_ID_LEN);
-    c_token++;
-  }
+    if (strcmp(AMIGA_FontName, "") != 0 && AMIGA_FontSize == 0)
+	AMIGA_FontSize = 8;
 
-  /* Font size */
-  if (!END_OF_COMMAND)
-    {
-    /* We have font size specified */
-    struct value a;
-    AMIGA_FontSize = (int)real(const_express(&a));
-  }
-  
-  if (strcmp(AMIGA_FontName,"") == 0 && AMIGA_FontSize != 0)
-    strcpy(AMIGA_FontName,"topaz");
-
-  if (strcmp(AMIGA_FontName,"") != 0 && AMIGA_FontSize == 0)
-    AMIGA_FontSize = 8;
-
-  if (strcmp(AMIGA_FontName,"") != 0 && AMIGA_FontSize != 0)
-    {
-    sprintf(default_font,"%s,%d",AMIGA_FontName,AMIGA_FontSize);
-      sprintf (term_options,"%s \"%s\" %d",\
-	       (AMIGA_window_mode != TRUE ? "screen" : "window"),\
-	       AMIGA_FontName, AMIGA_FontSize);
-  }
-  else
-    sprintf (term_options,"%s",(AMIGA_window_mode != TRUE ? "screen" : "window"));
+    if (strcmp(AMIGA_FontName, "") != 0 && AMIGA_FontSize != 0) {
+	sprintf(default_font, "%s,%d", AMIGA_FontName, AMIGA_FontSize);
+	sprintf(term_options, "%s \"%s\" %d", \
+		(AMIGA_window_mode != TRUE ? "screen" : "window"), \
+		AMIGA_FontName, AMIGA_FontSize);
+    } else
+	sprintf(term_options, "%s", (AMIGA_window_mode != TRUE ? "screen" : "window"));
 }
 
 
@@ -483,21 +461,18 @@ TERM_PUBLIC void AMIGA_options()
  */
 TERM_PUBLIC void AMIGA_text()
 {
-  if (AMIGA_window_mode != TRUE)
-    {
-      if (interactive == TRUE)
-	{
-  FILE *fp;
+    if (AMIGA_window_mode != TRUE) {
+	if (interactive == TRUE) {
+	    FILE *fp;
 
-	  if ((fp = fopen("*","r")) != NULL)
-	    {
-	      int c = getc(fp);
+	    if ((fp = fopen("*", "r")) != NULL) {
+		int c = getc(fp);
 
-    ungetc(c,stdin);
-  fclose(fp);
+		ungetc(c, stdin);
+		fclose(fp);
 	    }
-  ScreenToBack(AMIGA_Screen);
-}
+	    ScreenToBack(AMIGA_Screen);
+	}
     }
 }
 
@@ -508,44 +483,42 @@ TERM_PUBLIC void AMIGA_text()
 TERM_PUBLIC void AMIGA_graphics()
 {
 
-  SetRast (AMIGA_RastPort,0);
+    SetRast(AMIGA_RastPort, 0);
 
-  if (AMIGA_window_mode == TRUE)
-    {
-      /* clear the window */
-      SetAPen (AMIGA_Window->RPort,clut[0]);
-      RectFill (AMIGA_Window->RPort,0,0,640,400);
-      AMIGA_slinetype = clut[1];
+    if (AMIGA_window_mode == TRUE) {
+	/* clear the window */
+	SetAPen(AMIGA_Window->RPort, clut[0]);
+	RectFill(AMIGA_Window->RPort, 0, 0, 640, 400);
+	AMIGA_slinetype = clut[1];
     }
-
-  SetAPen (AMIGA_RastPort,AMIGA_slinetype);
-  AMIGA_resume ();
+    SetAPen(AMIGA_RastPort, AMIGA_slinetype);
+    AMIGA_resume();
 }
 
 
 /*
  *
  */
-TERM_PUBLIC void AMIGA_move(x,y)
-unsigned int x,y;
+TERM_PUBLIC void AMIGA_move(x, y)
+unsigned int x, y;
 {
-  if ((x>=AMIGA_xmax) || (y>=AMIGA_ymax))
-    return;
+    if ((x >= AMIGA_xmax) || (y >= AMIGA_ymax))
+	return;
 
-  Move (AMIGA_RastPort,x,AMIGA_VTF(y));
+    Move(AMIGA_RastPort, x, AMIGA_VTF(y));
 }
 
 
 /*
  *
  */
-TERM_PUBLIC void AMIGA_vector(x,y)
-unsigned int x,y;
+TERM_PUBLIC void AMIGA_vector(x, y)
+unsigned int x, y;
 {
-  if ((x>=AMIGA_xmax) || (y>=AMIGA_ymax))
-    return;
+    if ((x >= AMIGA_xmax) || (y >= AMIGA_ymax))
+	return;
 
-  Draw (AMIGA_RastPort,x,AMIGA_VTF(y));
+    Draw(AMIGA_RastPort, x, AMIGA_VTF(y));
 }
 
 
@@ -555,71 +528,67 @@ unsigned int x,y;
 TERM_PUBLIC void AMIGA_linetype(linetype)
 int linetype;
 {
-  if (AMIGA_window_mode != TRUE)
-    {
-      if (linetype >= 13)
-	linetype %= 13;
+    if (AMIGA_window_mode != TRUE) {
+	if (linetype >= 13)
+	    linetype %= 13;
 
-      if (linetype < -2)
-	linetype = -2;
+	if (linetype < -2)
+	    linetype = -2;
 
-  AMIGA_slinetype = linetype+3;
+	AMIGA_slinetype = linetype + 3;
+    } else {
+	if (linetype >= 0)
+	    linetype = (linetype % 9) + 1;
+
+	if (linetype < 0)
+	    linetype = 1;
+
+	AMIGA_slinetype = clut[linetype];
     }
-  else
-    {
-      if (linetype >= 0)
-	linetype = (linetype % 9) + 1;
-
-      if (linetype < 0)
-	linetype = 1;
-
-      AMIGA_slinetype = clut[linetype];
-    }
-  SetAPen (AMIGA_RastPort,AMIGA_slinetype);
+    SetAPen(AMIGA_RastPort, AMIGA_slinetype);
 }
 
 
 /*
  *
  */
-TERM_PUBLIC void AMIGA_put_text(x,y,str)
-unsigned int x,y;
+TERM_PUBLIC void AMIGA_put_text(x, y, str)
+unsigned int x, y;
 char *str;
 {
-  LONG len,tx_len;
-  WORD x_min,x_max,y_min,y_max;
+    LONG len, tx_len;
+    WORD x_min, x_max, y_min, y_max;
 
-  len = strlen(str);
+    len = strlen(str);
 
-  tx_len = TextLength (AMIGA_RastPort,str,len);
+    tx_len = TextLength(AMIGA_RastPort, str, len);
 
-  switch (AMIGA_justify)
-    {
+    switch (AMIGA_justify) {
     case LEFT:
 	x_min = x;
 	x_max = x + tx_len;
-      break;
+	break;
     case CENTRE:
 	x_min = x - tx_len / 2;
-	x_max = x + tx_len - tx_len / 2;    /* avoid roundoff errors ! */
-      break;
-      default:				    /* does this make sense ?? */
+	x_max = x + tx_len - tx_len / 2;	/* avoid roundoff errors ! */
+	break;
+    default:			/* does this make sense ?? */
     case RIGHT:
 	x_min = x - tx_len;
 	x_max = x;
-      break;
-  }
+	break;
+    }
 
-  y_min = AMIGA_VTF(y) - AMIGA_vadj;
-  y_max = y_min + AMIGA_cht;
+    y_min = AMIGA_VTF(y) - AMIGA_vadj;
+    y_max = y_min + AMIGA_cht;
 
-  /* Check if character-string lies completely within the screen: */
-  /* What about clipping? */
-  if ((x_max >= AMIGA_xmax) || (y_min < 0) || (y_max >= AMIGA_ymax))
-    return;
+    /* Check if character-string lies completely within the screen: */
+    /* What about clipping? */
+    if ((x_max >= AMIGA_xmax) || (y_min < 0) || (y_max >= AMIGA_ymax))
+	return;
 
-  Move (AMIGA_RastPort,x_min,y_min+AMIGA_bsl);
-  Text (AMIGA_RastPort,str,len);
+    Move(AMIGA_RastPort, x_min, y_min + AMIGA_bsl);
+    Text(AMIGA_RastPort, str, len);
 }
 
 
@@ -629,8 +598,8 @@ char *str;
 TERM_PUBLIC int AMIGA_justify_text(mode)
 enum JUSTIFY mode;
 {
-  AMIGA_justify = mode;
-  return TRUE;
+    AMIGA_justify = mode;
+    return TRUE;
 }
 
 
@@ -640,74 +609,67 @@ enum JUSTIFY mode;
 TERM_PUBLIC int AMIGA_set_font(font)
 char *font;
 {
-  static char test_str[] =
+    static char test_str[] =
     " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~";
-  static WORD test_len,test_pxl;
-  char name[MAX_ID_LEN+1];
-  int  size,sep;
-  
-  /* Disable for window */
-if (AMIGA_window_mode != TRUE)
-  {
-  sep = strcspn(font,",");
-  strncpy(name,font,sep);
-  name[sep] = '\0';
-  size = AMIGA_FontSize;
-  sscanf(&(font[sep+1]),"%d",&size);
+    static WORD test_len, test_pxl;
+    char name[MAX_ID_LEN+1];
+    int size, sep;
 
-  if (strcmp(name,"") != 0)
-    {
-    strncat(name,".font",MAX_ID_LEN+1);
+    /* Disable for window mode */
+    if (AMIGA_window_mode != TRUE) {
+	sep = strcspn(font, ",");
+	strncpy(name, font, sep);
+	name[sep] = NUL;
+	size = AMIGA_FontSize;
+	sscanf(&(font[sep + 1]), "%d", &size);
 
-    /* Avoid opening "diskfont.library" if a built-in font is desired */
-    if ((strcmp("topaz.font",name) == 0) &&
-	  ((size == TOPAZ_EIGHTY) || (size == TOPAZ_SIXTY)))
-	{
-      AMIGA_Font.ta_Name = name;
-      AMIGA_Font.ta_YSize = size;
-      AMIGA_Font.ta_Style = FS_NORMAL;
-      AMIGA_Font.ta_Flags = FPF_ROMFONT;
-      AMIGA_TextFont = OpenFont(&AMIGA_Font);
+	if (strcmp(name, "") != 0) {
+	    strncat(name, ".font", MAX_ID_LEN+1);
 
-      if (AMIGA_TextFont != NULL) 
-        SetFont(&AMIGA_Screen->RastPort,AMIGA_TextFont);
+	    /* Avoid opening "diskfont.library" if a built-in font is desired */
+	    if ((strcmp("topaz.font", name) == 0) &&
+		((size == TOPAZ_EIGHTY) || (size == TOPAZ_SIXTY))) {
+		AMIGA_Font.ta_Name = name;
+		AMIGA_Font.ta_YSize = size;
+		AMIGA_Font.ta_Style = FS_NORMAL;
+		AMIGA_Font.ta_Flags = FPF_ROMFONT;
+		AMIGA_TextFont = OpenFont(&AMIGA_Font);
 
+		if (AMIGA_TextFont != NULL)
+		    SetFont(&AMIGA_Screen->RastPort, AMIGA_TextFont);
+
+	    } else {
+		DiskfontBase = OpenLibrary("diskfont.library", 0);
+
+		if (DiskfontBase != NULL) {
+		    AMIGA_Font.ta_Name = name;
+		    AMIGA_Font.ta_YSize = size;
+		    AMIGA_Font.ta_Style = FS_NORMAL;
+		    AMIGA_Font.ta_Flags = FPF_ROMFONT | FPF_DISKFONT;
+		    AMIGA_TextFont = OpenDiskFont(&AMIGA_Font);
+
+		    if (AMIGA_TextFont != NULL)
+			SetFont(&AMIGA_Screen->RastPort, AMIGA_TextFont);
+		}
+	    }
 	}
-      else
-	{
-      DiskfontBase = OpenLibrary("diskfont.library",0);
+	/* Width of characters: This works better for proportional fonts than */
+	/* AMIGA_Screen->RastPort.TxWidth + AMIGA_Screen->RastPort.TxSpacing */
+	test_len = strlen(test_str);
+	test_pxl = TextLength(&AMIGA_Screen->RastPort, test_str, test_len);
 
-	  if (DiskfontBase != NULL)
-	    {
-        AMIGA_Font.ta_Name = name;
-        AMIGA_Font.ta_YSize = size;
-        AMIGA_Font.ta_Style = FS_NORMAL;
-        AMIGA_Font.ta_Flags = FPF_ROMFONT|FPF_DISKFONT;
-        AMIGA_TextFont = OpenDiskFont(&AMIGA_Font);
+	AMIGA_cwd = test_pxl / test_len;
+	AMIGA_cht = AMIGA_Screen->RastPort.TxHeight;	/* Height of characters */
+	AMIGA_bsl = AMIGA_Screen->RastPort.TxBaseline;	/* Reference line */
 
-        if (AMIGA_TextFont != NULL)
-          SetFont(&AMIGA_Screen->RastPort,AMIGA_TextFont);
-      }
-    }
-  }
+	/* Amount by which characters have to be shifted upwards to be */
+	/* vertically justified: */
+	AMIGA_vadj = AMIGA_bsl / 2;
+	term->v_char = AMIGA_cht + 4;	/* So lines won't be too close */
+	term->h_char = AMIGA_cwd;
 
-  /* Width of characters: This works better for proportional fonts than */
-  /* AMIGA_Screen->RastPort.TxWidth + AMIGA_Screen->RastPort.TxSpacing */
-  test_len = strlen(test_str);
-  test_pxl = TextLength(&AMIGA_Screen->RastPort,test_str,test_len);
-
-  AMIGA_cwd = test_pxl / test_len;
-  AMIGA_cht = AMIGA_Screen->RastPort.TxHeight; /* Height of characters */
-  AMIGA_bsl = AMIGA_Screen->RastPort.TxBaseline; /* Reference line */
-
-  /* Amount by which characters have to be shifted upwards to be */
-  /* vertically justified: */
-  AMIGA_vadj = AMIGA_bsl / 2;
-  term->v_char = AMIGA_cht + 4; /* So lines won't be too close */
-  term->h_char = AMIGA_cwd;
-
-  } /* !window_mode */
-  return TRUE;
+    }				/* !window_mode */
+    return TRUE;
 }
 
 
@@ -716,21 +678,18 @@ if (AMIGA_window_mode != TRUE)
  */
 TERM_PUBLIC void AMIGA_suspend()
 {
-  if (AMIGA_window_mode != TRUE)
-    {
-      if (interactive == TRUE)
-	{
-  FILE *fp;
+    if (AMIGA_window_mode != TRUE) {
+	if (interactive == TRUE) {
+	    FILE *fp;
 
-	  if ((fp = fopen("*","r")) != NULL)
-	    {
-	      int c = getc(fp);
+	    if ((fp = fopen("*", "r")) != NULL) {
+		int c = getc(fp);
 
-    ungetc(c,stdin);
-  fclose(fp);
+		ungetc(c, stdin);
+		fclose(fp);
 	    }
-  ScreenToBack(AMIGA_Screen);
-}
+	    ScreenToBack(AMIGA_Screen);
+	}
     }
 }
 
@@ -740,10 +699,10 @@ TERM_PUBLIC void AMIGA_suspend()
  */
 TERM_PUBLIC void AMIGA_resume()
 {
-  if (AMIGA_window_mode != TRUE)
-  ScreenToFront(AMIGA_Screen);
-  else
-    WindowToFront (AMIGA_Window);
+    if (AMIGA_window_mode != TRUE)
+	ScreenToFront(AMIGA_Screen);
+    else
+	WindowToFront(AMIGA_Window);
 }
 
 
@@ -755,9 +714,10 @@ TERM_PUBLIC void AMIGA_resume()
  */
 void AMIGA_exit(void)
 {
-  AMIGA_reset();
-  RAWCON(0);
+    AMIGA_reset();
+    RAWCON(0);
 }
+
 #endif /* NO_ATEXIT */
 
 
@@ -766,14 +726,14 @@ void AMIGA_exit(void)
 #ifdef TERM_TABLE
 
 TERM_TABLE_START(amiga_driver)
-  "amiga", "Amiga Custom Screen/Window [screen window]",
-  AMIGA_XMAX, AMIGA_YMAX, AMIGA_VCHAR, AMIGA_HCHAR, 
-  AMIGA_VTIC, AMIGA_HTIC, AMIGA_options, AMIGA_init, AMIGA_reset, 
-  AMIGA_text, null_scale, AMIGA_graphics, AMIGA_move, AMIGA_vector,
-  AMIGA_linetype, AMIGA_put_text, null_text_angle, 
-  AMIGA_justify_text, do_point, do_arrow, AMIGA_set_font,
-  0, /* pointsize */
-  TERM_CAN_MULTIPLOT, AMIGA_suspend, AMIGA_resume
+    "amiga", "Amiga Custom Screen/Window [screen window]",
+    AMIGA_XMAX, AMIGA_YMAX, AMIGA_VCHAR, AMIGA_HCHAR,
+    AMIGA_VTIC, AMIGA_HTIC, AMIGA_options, AMIGA_init, AMIGA_reset,
+    AMIGA_text, null_scale, AMIGA_graphics, AMIGA_move, AMIGA_vector,
+    AMIGA_linetype, AMIGA_put_text, null_text_angle,
+    AMIGA_justify_text, do_point, do_arrow, AMIGA_set_font,
+    0,				/* pointsize */
+    TERM_CAN_MULTIPLOT, AMIGA_suspend, AMIGA_resume
 TERM_TABLE_END(amiga_driver)
 
 #undef LAST_TERM
@@ -786,6 +746,7 @@ TERM_TABLE_END(amiga_driver)
 #ifdef TERM_HELP
 START_HELP(amiga)
 "1 amiga",
+"?commands set terminal amiga",
 "?set terminal amiga",
 "?set term amiga",
 "?terminal amiga",

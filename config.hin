@@ -3,6 +3,9 @@
 /* Define to empty if the keyword does not work.  */
 #undef const
 
+/* Define if you have the ANSI # stringizing operator in cpp. */
+#undef HAVE_STRINGIZE
+
 /* Define if you have <unistd.h>.  */
 #undef HAVE_UNISTD_H
 
@@ -12,14 +15,35 @@
 /* Define as the return type of signal handlers (int or void).  */
 #undef RETSIGTYPE
 
+/* Define to the type of arg1 for select(). */
+#undef SELECT_TYPE_ARG1
+
+/* Define to the type of args 2, 3 and 4 for select(). */
+#undef SELECT_TYPE_ARG234
+
+/* Define to the type of arg5 for select(). */
+#undef SELECT_TYPE_ARG5
+
 /* Define to `unsigned' if <sys/types.h> doesn't define.  */
 #undef size_t
+
+/* Define if the `S_IS*' macros in <sys/stat.h> do not work properly.  */
+#undef STAT_MACROS_BROKEN
 
 /* Define if you have the ANSI C header files.  */
 #undef STDC_HEADERS
 
-/* Define if compiler can handle ANSI prototypes.  */
-#undef ANSI_C
+/* Define if the X Window System is missing or not being used.  */
+#undef X_DISPLAY_MISSING
+
+/* Define if you want to use the Apollo Graphics Primitive Resource.  */
+#undef APOLLO
+
+/* Define if you want to use the CGI terminal under SCO.  */
+#undef CGI
+
+/* Define if you want to use libgrx20 with MSDOS/djgpp.  */
+#undef DJSVGA
 
 /* Define if this system uses a 32-bit DOS extender (djgpp/emx).  */
 #undef DOS32
@@ -30,11 +54,17 @@
 /* Define if you are using the GNU readline library.  */
 #undef GNU_READLINE
 
-/* Define if the C preprocessor understands ANSI stringification.  */
-#undef HAVE_CPP_STRINGIFY
+/* Define if your libplot.a is from GNU plotutils.  */
+#undef GNU_PLOTUTILS
 
-/* Define if you have the lgamma function.  */
-#undef HAVE_LGAMMA
+/* Define if you want to use the GNU version of the Unix plot library.  */
+#undef GNUGRAPH
+
+/* Define if you want to use the Apollo Graphics Primitive Resource (fixed-size window.  */
+#undef GPR
+
+/* Define if you want to use a newer version of libgrx under MSDOS/djgpp.  */
+#undef GRX21
 
 /* Define if you have Thomas Boutell's gd library.  */
 #undef HAVE_LIBGD
@@ -42,83 +72,50 @@
 /* Define if you have the png library.  */
 #undef HAVE_LIBPNG
 
-/* Define if you do not have the strncasecmp function.  */
-#undef HAVE_STRNCASECMP
+/* Define if you want to use the IRIS terminal on IRIS4D series computers.  */
+#undef IRIS
 
 /* Define if this is a Linux system with SuperVGA library.  */
 #undef LINUXVGA
 
+/* Define if you want to use the MGR Window system.  */
+#undef MGR
+
 /* Define if this is an MSDOS system with djgpp.  */
 #undef MSDOS
 
-/* Define if you do not want to read .gnuplotrc in the current directory.  */
+/* Define if you do not want to read .gnuplot in the current directory.  */
 #undef NOCWDRC
-
-/* Define if you do not have the atexit function.  */
-#undef NO_ATEXIT
-
-/* Define if you do not have the <errno.h> header file.  */
-#undef NO_ERRNO_H
-
-/* Define if you do not have the <float.h> header file.  */
-#undef NO_FLOAT_H
-
-/* Define if you do not have the <limits.h> header file.  */
-#undef NO_LIMITS_H
-
-/* Define if you do not have the <locale.h> header file.  */
-#undef NO_LOCALE_H
-
-/* Define if you do not have the <math.h> header file.  */
-#undef NO_MATH_H
-
-/* Define if you do not have the memcpy function.  */
-#undef NO_MEMCPY
-
-/* Define if you do not have the memset function.  */
-#undef NO_MEMSET
-
-/* Define if you do not have the setvbuf function.  */
-#undef NO_SETVBUF
-
-/* Define if you do not have the <stdlib.h> header file.  */
-#undef NO_STDLIB_H
-
-/* Define if you do not have the strchr function.  */
-#undef NO_STRCHR
-
-/* Define if you do not have the strerror function.  */
-#undef NO_STRERROR
-
-/* Define if you do not have the <string.h> header file.  */
-#undef NO_STRING_H
-
-/* Define if you do not have the strrchr function.  */
-#undef NO_STRRCHR
-
-/* Define if you do not have the strstr function.  */
-#undef NO_STRSTR
-
-/* Define if you do not have the <sys/types.h> header file.  */
-#undef NO_SYS_TYPES_H
-
-/* Define if you do not have the <time.h> header file.  */
-#undef NO_TIME_H
 
 /* Define if you do have the popen and pclose functions.  */
 #undef PIPES
 
-/* Define if you have the function prototypes.  */
-#undef PROTOTYPES
-
 /* Define if you want to use the included readline function.  */
 #undef READLINE
+
+/* Define if you want to use the Redwood Graphics Interface Protocol.  */
+#undef RGIP
+
+/* Define if you want to use the sunview terminal (sun).  */
+#undef SUN
+
+/* Define if you want to use the unixpc terminal (ATT 3b1 or ATT 7300.  */
+#undef UNIXPC
+
+/* Define if you want to use the standard Unix plot library.  */
+#undef UNIXPLOT
+
+/* Define if you want to use the system time routines.  */
+#undef USE_SYSTEM_TIME
 
 /* Define if you are using the X11 window system.  */
 #undef X11
 
 /* Define to `long' if <sys/types.h> doesn't define.  */
 #undef time_t
+
+/* Define if you have the atexit function.  */
+#undef HAVE_ATEXIT
 
 /* Define if you have the bcopy function.  */
 #undef HAVE_BCOPY
@@ -129,6 +126,9 @@
 /* Define if you have the erf function.  */
 #undef HAVE_ERF
 
+/* Define if you have the erfc function.  */
+#undef HAVE_ERFC
+
 /* Define if you have the gamma function.  */
 #undef HAVE_GAMMA
 
@@ -138,17 +138,56 @@
 /* Define if you have the index function.  */
 #undef HAVE_INDEX
 
+/* Define if you have the lgamma function.  */
+#undef HAVE_LGAMMA
+
+/* Define if you have the memcpy function.  */
+#undef HAVE_MEMCPY
+
+/* Define if you have the memmove function.  */
+#undef HAVE_MEMMOVE
+
+/* Define if you have the memset function.  */
+#undef HAVE_MEMSET
+
 /* Define if you have the on_exit function.  */
 #undef HAVE_ON_EXIT
+
+/* Define if you have the pclose function.  */
+#undef HAVE_PCLOSE
+
+/* Define if you have the popen function.  */
+#undef HAVE_POPEN
 
 /* Define if you have the rindex function.  */
 #undef HAVE_RINDEX
 
+/* Define if you have the setvbuf function.  */
+#undef HAVE_SETVBUF
+
 /* Define if you have the sleep function.  */
 #undef HAVE_SLEEP
 
+/* Define if you have the snprintf function.  */
+#undef HAVE_SNPRINTF
+
+/* Define if you have the strchr function.  */
+#undef HAVE_STRCHR
+
+/* Define if you have the strerror function.  */
+#undef HAVE_STRERROR
+
+/* Define if you have the strncasecmp function.  */
+#undef HAVE_STRNCASECMP
+
 /* Define if you have the strnicmp function.  */
 #undef HAVE_STRNICMP
+
+/* Define if you have the strrchr function.  */
+#undef HAVE_STRRCHR
+
+/* Define if you have the strstr function.  */
+#undef HAVE_STRSTR
 
 /* Define if you have the sysinfo function.  */
 #undef HAVE_SYSINFO
@@ -156,11 +195,32 @@
 /* Define if you have the tcgetattr function.  */
 #undef HAVE_TCGETATTR
 
+/* Define if you have the <errno.h> header file.  */
+#undef HAVE_ERRNO_H
+
+/* Define if you have the <float.h> header file.  */
+#undef HAVE_FLOAT_H
+
 /* Define if you have the <libc.h> header file.  */
 #undef HAVE_LIBC_H
 
+/* Define if you have the <limits.h> header file.  */
+#undef HAVE_LIMITS_H
+
+/* Define if you have the <locale.h> header file.  */
+#undef HAVE_LOCALE_H
+
 /* Define if you have the <malloc.h> header file.  */
 #undef HAVE_MALLOC_H
+
+/* Define if you have the <math.h> header file.  */
+#undef HAVE_MATH_H
+
+/* Define if you have the <sgtty.h> header file.  */
+#undef HAVE_SGTTY_H
+
+/* Define if you have the <stdlib.h> header file.  */
+#undef HAVE_STDLIB_H
 
 /* Define if you have the <string.h> header file.  */
 #undef HAVE_STRING_H
@@ -171,11 +231,42 @@
 /* Define if you have the <sys/select.h> header file.  */
 #undef HAVE_SYS_SELECT_H
 
+/* Define if you have the <sys/socket.h> header file.  */
+#undef HAVE_SYS_SOCKET_H
+
+/* Define if you have the <sys/stat.h> header file.  */
+#undef HAVE_SYS_STAT_H
+
 /* Define if you have the <sys/systeminfo.h> header file.  */
 #undef HAVE_SYS_SYSTEMINFO_H
+
+/* Define if you have the <sys/time.h> header file.  */
+#undef HAVE_SYS_TIME_H
+
+/* Define if you have the <sys/timeb.h> header file.  */
+#undef HAVE_SYS_TIMEB_H
+
+/* Define if you have the <sys/types.h> header file.  */
+#undef HAVE_SYS_TYPES_H
+
+/* Define if you have the <sys/utsname.h> header file.  */
+#undef HAVE_SYS_UTSNAME_H
 
 /* Define if you have the <termios.h> header file.  */
 #undef HAVE_TERMIOS_H
 
+/* Define if you have the <time.h> header file.  */
+#undef HAVE_TIME_H
+
 /* Define if you have the <values.h> header file.  */
 #undef HAVE_VALUES_H
+
+/* Name of package */
+#undef PACKAGE
+
+/* Version number of package */
+#undef VERSION
+
+/* Define if compiler has function prototypes */
+#undef PROTOTYPES
+

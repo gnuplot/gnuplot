@@ -7,9 +7,11 @@ An Interactive Plotting Program
 .AU
 Thomas Williams & Colin Kelley
 .br
-   Version 3.6 organized by: David Denholm
+   Version 3.7 organized by: David Denholm
 .br
    Major contributors (alphabetic order):
+.br
+  Hans-Bernhard Broeker
 .br
   John Campbell
 .br
@@ -23,6 +25,10 @@ Thomas Williams & Colin Kelley
 .br
   Carsten Grammes
 .br
+  Lucas Hart
+.br
+  Lars Hecking
+.br
   Thomas Koenig
 .br
   David Kotz
@@ -33,15 +39,19 @@ Thomas Williams & Colin Kelley
 .br
   Alexander Lehmann
 .br
+  Alexander Mai
+.br
   Carsten Steger
 .br
   Tom Tkacik
 .br
-  Jos Van der Woude 
+  Jos Van der Woude
+.br
+  James R. Van Zandt
 .br
   Alex Woo
 .br
-  Copyright (C) 1986 - 1995   Thomas Williams, Colin Kelley
+  Copyright (C) 1986 - 1993, 1998   Thomas Williams, Colin Kelley
 .AI
    Mailing list for comments: info-gnuplot@dartmouth.edu
 .br
@@ -55,12 +65,13 @@ Thomas Williams & Colin Kelley
 
 
 This manual was prepared by Dick Crawford.
+3 December 1998
 .AB no
 .AE
 .LP
 .nr HM 1.2i
 .ds CH
-.ds LH GNUPLOT 3.6
+.ds LH GNUPLOT 3.7
 .ds RH %
 .\".nr PS 12
 .\".nr VS 13

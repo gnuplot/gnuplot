@@ -124,6 +124,7 @@ scanner.obj: scanner.c plot.h
 set.obj: set.c plot.h setshow.h
 
 show.obj: show.c plot.h setshow.h
+	cl $(CFLAGS)  /DHELPFILE=\"$(HELPFILE)\" show.c
 
 standard.obj: standard.c plot.h
 
@@ -191,13 +192,13 @@ wprinter.obj: win/wprinter.c win/wgnuplib.h win/wcommon.h win/wresourc.h
 wgraph.obj: win/wgraph.c win/wgnuplib.h win/wcommon.h win/wresourc.h
 	$(DLLCC) win/wgraph.c
 	
-# convert gnuplot.doc to gnuplot.gih
+# convert gnuplot.doc to gnuplot.rtf
 $(HELPFILE): doc2rtf.exe docs\gnuplot.doc win\wgnuplot.hpj
 	doc2rtf docs\gnuplot.doc win\gnuplot.rtf
 	hc31 win\wgnuplot.hpj 
 
-doc2rtf.exe: docs\doc2rtf.c
-	cl /AS /F 5000 /W1 docs\doc2rtf.c
+doc2rtf.exe: docs\doc2rtf.c docs\termdoc.c docs\xref.c
+	cl /AS /F 5000 /W1 /Fedoc2rtf.exe docs\doc2rtf.c docs\termdoc.c docs\xref.c
 
 #make binary demo files
 demo\bf_test.exe: bf_test.c dbinary.obj alloc.obj

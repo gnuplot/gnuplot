@@ -106,7 +106,6 @@ TERM_PUBLIC void CTEK_linetype __PROTO((int linetype));
 TERM_PUBLIC void CTEK_move __PROTO((unsigned int x, unsigned int y));
 TERM_PUBLIC void CTEK_vector __PROTO((unsigned int x, unsigned int y));
 
-#define GOT_TEK40_PROTO
 #endif /* TERM_PROTO */
 
 #ifndef TERM_PROTO_ONLY
@@ -123,9 +122,9 @@ TERM_PUBLIC void CTEK_vector __PROTO((unsigned int x, unsigned int y));
 #define TEK40VCHAR		25
 #define TEK40HCHAR		14
 #define TEK40VTIC		11
-#define TEK40HTIC		11	
+#define TEK40HTIC		11
 
-#define HX 0x20		/* bit pattern to OR over 5-bit data */
+#define HX 0x20			/* bit pattern to OR over 5-bit data */
 #define HY 0x20
 #define LX 0x40
 #define LY 0x60
@@ -142,27 +141,30 @@ TERM_PUBLIC void TEK40init()
 TERM_PUBLIC void TEK40graphics()
 {
 #ifdef VMS
-	term_pasthru();
+    term_pasthru();
 #endif /* VMS */
-	fprintf(outfile,"\033\014");
+    fputs("\033\014", gpoutfile);
 /*                   1
 	1. clear screen
 */
-	(void) fflush(outfile);
-	sleep(1);  
-	/* sleep 1 second to allow screen time to clear on real 
-	   tektronix terminals */
+    (void) fflush(gpoutfile);
+    sleep(1);
+    /* sleep 1 second to allow screen time to clear on real 
+       tektronix terminals */
 }
 
 TERM_PUBLIC void TEK40text()
 {
-	TEK40move(0,12);
-	fprintf(outfile,"\037");
+#ifdef VMS
+    (void) fflush(gpoutfile);	/* finish the graphics */
+#endif
+    TEK40move(0, 12);
+    fputs("\037", gpoutfile);
 /*                   1
 	1. into alphanumerics
 */
 #ifdef VMS
-	term_nopasthru();
+    term_nopasthru();
 #endif /* VMS */
 }
 
@@ -172,30 +174,30 @@ int linetype;
 {
 }
 
-TERM_PUBLIC void TEK40move(x,y)
-unsigned int x,y;
+TERM_PUBLIC void TEK40move(x, y)
+unsigned int x, y;
 {
-	(void) putc('\035', outfile);	/* into graphics */
-	TEK40vector(x,y);
+    (void) putc('\035', gpoutfile);	/* into graphics */
+    TEK40vector(x, y);
 }
 
 
-TERM_PUBLIC void TEK40vector(x,y)
-unsigned int x,y;
+TERM_PUBLIC void TEK40vector(x, y)
+unsigned int x, y;
 {
-	(void) putc((HY | (y & UPPER5)>>5), outfile);
-	(void) putc((LY | (y & LOWER5)), outfile);
-	(void) putc((HX | (x & UPPER5)>>5), outfile);
-	(void) putc((LX | (x & LOWER5)), outfile);
+    (void) putc((HY | (y & UPPER5) >> 5), gpoutfile);
+    (void) putc((LY | (y & LOWER5)), gpoutfile);
+    (void) putc((HX | (x & UPPER5) >> 5), gpoutfile);
+    (void) putc((LX | (x & LOWER5)), gpoutfile);
 }
 
 
-TERM_PUBLIC void TEK40put_text(x,y,str)
-unsigned int x,y;
+TERM_PUBLIC void TEK40put_text(x, y, str)
+unsigned int x, y;
 char str[];
 {
-	TEK40move(x,y-11);
-	fprintf(outfile,"\037%s\n",str);
+    TEK40move(x, y - 11);
+    fprintf(gpoutfile, "\037%s\n", str);
 }
 
 
@@ -211,9 +213,9 @@ TERM_PUBLIC void TEK40reset()
 
 #ifdef BITGRAPH
 
-#define BG_XMAX			 	768 /* width of plot area */
-#define BG_YMAX			 	768 /* height of plot area */
-#define BG_SCREEN_HEIGHT	1024 /* full screen height */
+#define BG_XMAX			 	768	/* width of plot area */
+#define BG_YMAX			 	768	/* height of plot area */
+#define BG_SCREEN_HEIGHT	1024	/* full screen height */
 
 #define BG_XLAST	 (BG_XMAX - 1)
 #define BG_YLAST	 (BG_YMAX - 1)
@@ -221,7 +223,7 @@ TERM_PUBLIC void TEK40reset()
 #define BG_VCHAR	16
 #define BG_HCHAR	 9
 #define BG_VTIC		 8
-#define BG_HTIC		 8	
+#define BG_HTIC		 8
 
 
 #define BG_init TEK40init
@@ -238,20 +240,23 @@ TERM_PUBLIC void TEK40reset()
 
 TERM_PUBLIC void BG_text()
 {
-	BG_move(0, BG_SCREEN_HEIGHT - 2 * BG_VCHAR);
-	fprintf(outfile,"\037");
+#ifdef VMS
+    (void) fflush(gpoutfile);	/* finish the graphics */
+#endif
+    BG_move(0, BG_SCREEN_HEIGHT - 2 * BG_VCHAR);
+    fputs("\037", gpoutfile);
 /*                   1
 	1. into alphanumerics
 */
 }
 
 
-TERM_PUBLIC void BG_put_text(x,y,str)
-unsigned int x,y;
+TERM_PUBLIC void BG_put_text(x, y, str)
+unsigned int x, y;
 char str[];
 {
-	BG_move(x,y-11);
-	fprintf(outfile,"\037%s\n",str);
+    BG_move(x, y - 11);
+    fprintf(gpoutfile, "\037%s\n", str);
 }
 
 
@@ -270,22 +275,22 @@ char str[];
 TERM_PUBLIC void KTEK40graphics()
 {
 #ifdef VMS
-        term_mode_tek();
-	term_pasthru();
+    term_mode_tek();
+    term_pasthru();
 #endif /* VMS */
-	fprintf(outfile,"\033\014");
+    fputs("\033\014", gpoutfile);
 /*                   1
 	1. clear screen
 */
-	/* kermit tektronix emulation doesn't need to wait */
+    /* kermit tektronix emulation doesn't need to wait */
 }
 
 TERM_PUBLIC void KTEK40Ctext()
 {
-	TEK40text();
-	KTEK40Clinetype(0);  /* change to green */
+    TEK40text();
+    KTEK40Clinetype(0);		/* change to green */
 #ifdef VMS
-	term_nopasthru();
+    term_nopasthru();
 #endif /* VMS */
 }
 
@@ -293,39 +298,40 @@ TERM_PUBLIC void KTEK40Ctext()
 /*	0 = normal, 1 = bright 
 	foreground color (30-37) = 30 + colors
 		where colors are   1=red, 2=green, 4=blue */
-static char *kermit_color[15]= {"\033[0;37m","\033[1;30m",
-		"\033[0;32m","\033[0;36m","\033[0;31m","\033[0;35m",
-		"\033[1;34m","\033[1;33m","\033[1;31m","\033[1;37m",
-		"\033[1;35m","\033[1;32m","\033[1;36m","\033[0;34m",
-		"\033[0;33m"};
+static char *kermit_color[15] =
+{"\033[0;37m", "\033[1;30m",
+ "\033[0;32m", "\033[0;36m", "\033[0;31m", "\033[0;35m",
+ "\033[1;34m", "\033[1;33m", "\033[1;31m", "\033[1;37m",
+ "\033[1;35m", "\033[1;32m", "\033[1;36m", "\033[0;34m",
+ "\033[0;33m"};
 
 TERM_PUBLIC void KTEK40Clinetype(linetype)
 int linetype;
 {
-	if (linetype >= 13)
-		linetype %= 13;
-	fprintf(outfile,"%s",kermit_color[linetype+2]);
+    if (linetype >= 13)
+	linetype %= 13;
+    fprintf(gpoutfile, "%s", kermit_color[linetype + 2]);
 }
 
 
 /* linetypes for MS-DOS Kermit v2.30 tektronix emulator */
 /* `=solid, a=fine dots, b=short dashes, c=dash dot, 
    d=long dash dot, e=dash dot dot */
-static char *kerm_linetype = "`a`abcde" ;
+static char *kerm_linetype = "`a`abcde";
 
 TERM_PUBLIC void KTEK40Mlinetype(linetype)
 int linetype;
 {
-	if (linetype >= 6)
-		linetype %= 6;
-	fprintf(outfile,"\033%c",kerm_linetype[linetype+2]);
+    if (linetype >= 6)
+	linetype %= 6;
+    fprintf(gpoutfile, "\033%c", kerm_linetype[linetype + 2]);
 }
 
 TERM_PUBLIC void KTEK40reset()
 {
-	fprintf(outfile,"\030\n");  /* turn off Tek emulation */
+    fputs("\030\n", gpoutfile);	/* turn off Tek emulation */
 #ifdef VMS
-	term_mode_native();
+    term_mode_native();
 #endif /* VMS */
 }
 
@@ -339,7 +345,7 @@ TERM_PUBLIC void KTEK40reset()
 
 TERM_PUBLIC void SEL_init()
 {
-	fprintf(outfile,"\033\062");
+    fputs("\033\062", gpoutfile);
 /*					1
 	1. set to ansi mode
 */
@@ -348,27 +354,36 @@ TERM_PUBLIC void SEL_init()
 
 TERM_PUBLIC void SEL_graphics()
 {
-	fprintf(outfile,"\033[H\033[J\033\061\033\014");
+    fputs("\033[H\033[J\033\061\033\014", gpoutfile);
 /*                   1           2       3
 	1. clear ANSI screen
 	2. set to TEK mode
 	3. clear screen
 */
+#ifdef VMS
+    term_pasthru();
+#endif /* VMS */
 }
 
 
 TERM_PUBLIC void SEL_text()
 {
-	TEK40move(0,12);
-	fprintf(outfile,"\033\062");
+#ifdef VMS
+    (void) fflush(gpoutfile);	/* finish the graphics */
+#endif
+    TEK40move(0, 12);
+    fputs("\033\062", gpoutfile);
 /*                   1
 	1. into ANSI mode
 */
+#ifdef VMS
+    term_nopasthru();
+#endif /* VMS */
 }
 
 TERM_PUBLIC void SEL_reset()
 {
-	fprintf(outfile,"\033\061\033\012\033\062\033[H\033[J");
+    fputs("\033\061\033\012\033\062\033[H\033[J", gpoutfile);
 /*                   1        2       3      4
 1       set tek mode
 2       clear screen
@@ -376,29 +391,30 @@ TERM_PUBLIC void SEL_reset()
 4       clear screen
 */
 }
+
 #endif /* SELANAR */
 
 #ifdef VTTEK
 
 TERM_PUBLIC void VTTEK40init()
 {
-        fprintf(outfile,"\033[?38h");
-        fflush(outfile);
-        sleep(1);
-        /* sleep 1 second to allow screen time to clear on some terminals */
+    fputs("\033[?38h", gpoutfile);
+    fflush(gpoutfile);
+    sleep(1);
+    /* sleep 1 second to allow screen time to clear on some terminals */
 #ifdef VMS
-        term_mode_tek();
+    term_mode_tek();
 #endif /* VMS */
 }
 
 TERM_PUBLIC void VTTEK40reset()
 {
-        fprintf(outfile,"\033[?38l");
-        fflush(outfile);
-        sleep(1);
-        /* sleep 1 second to allow screen time to clear on some terminals */
+    fputs("\033[?38l", gpoutfile);
+    fflush(gpoutfile);
+    sleep(1);
+    /* sleep 1 second to allow screen time to clear on some terminals */
 #ifdef VMS
-        term_mode_native();
+    term_mode_native();
 #endif /* VMS */
 }
 
@@ -406,26 +422,26 @@ TERM_PUBLIC void VTTEK40reset()
 /* `=solid, a=fine dots, b=short dashes, c=dash dot,
    d=long dash dot, h=bold solid, i=bold fine dots, j=bold short dashes,
    k=bold dash dot, l=bold long dash dot */
-static char *vt_linetype = "`a`abcdhijkl" ;
+static char *vt_linetype = "`a`abcdhijkl";
 static int last_vt_linetype = 0;
 TERM_PUBLIC void VTTEK40linetype(linetype)
 int linetype;
 {
-        if (linetype >= 10)
-                linetype %= 10;
-        fprintf(outfile,"\033%c",vt_linetype[linetype+2]);
-        last_vt_linetype = linetype;
+    if (linetype >= 10)
+	linetype %= 10;
+    fprintf(gpoutfile, "\033%c", vt_linetype[linetype + 2]);
+    last_vt_linetype = linetype;
 }
 
-TERM_PUBLIC void VTTEK40put_text(x,y,str)
-unsigned int x,y;
+TERM_PUBLIC void VTTEK40put_text(x, y, str)
+unsigned int x, y;
 char str[];
 {
-        int linetype;
-        linetype = last_vt_linetype;
-        VTTEK40linetype(0);
-        TEK40put_text(x,y,str);
-        VTTEK40linetype(linetype);
+    int linetype;
+    linetype = last_vt_linetype;
+    VTTEK40linetype(0);
+    TEK40put_text(x, y, str);
+    VTTEK40linetype(linetype);
 }
 
 #endif /* VTTEK */
@@ -434,13 +450,14 @@ char str[];
 
 TERM_PUBLIC void LN03Pinit()
 {
-	fprintf(outfile,"\033[?38h");
+    fputs("\033[?38h", gpoutfile);
 }
 
 TERM_PUBLIC void LN03Preset()
 {
-	fprintf(outfile,"\033[?38l");
+    fputs("\033[?38l", gpoutfile);
 }
+
 #endif /* LN03P */
 
 
@@ -456,47 +473,48 @@ static void CT_draw_vpoint __PROTO((int x, int y, int last));
 static void CT_pattern_vector __PROTO((int x1, int y1));
 
 /* CT_lines are line types defined as bit pattern */
-static unsigned long CT_lines[]=
-{  0xffffffff,  /* solid line */
-   0x000fffff,  /* long dash */
-   0x00ff00ff,  /* short dash */
-   0x00f00fff,  /* dash-dot */
-   0x00f07fff,  /* long dash - dot */
-   0x07070707,
-   0x07ff07ff,
-   0x070707ff};
+static unsigned long CT_lines[] =
+{0xffffffff,			/* solid line */
+ 0x000fffff,			/* long dash */
+ 0x00ff00ff,			/* short dash */
+ 0x00f00fff,			/* dash-dot */
+ 0x00f07fff,			/* long dash - dot */
+ 0x07070707,
+ 0x07ff07ff,
+ 0x070707ff};
 
 /* current line pattern */
 static unsigned long *CT_pattern = &CT_lines[0];
 
 /* we need to keep track of tek cursor location */
-static int CT_last_linetype=0, CT_last_x,CT_last_y;
+static int CT_last_linetype = 0, CT_last_x, CT_last_y;
 
 TERM_PUBLIC void CTEK_linetype(linetype)
 int linetype;
 {
-  if(linetype<0) linetype=0;
-  linetype %= (sizeof(CT_lines)/sizeof(unsigned long));
-  CT_pattern= &CT_lines[linetype];
-  CT_last_linetype=linetype;
+    if (linetype < 0)
+	linetype = 0;
+    linetype %= (sizeof(CT_lines) / sizeof(unsigned long));
+    CT_pattern = &CT_lines[linetype];
+    CT_last_linetype = linetype;
 }
 
 TERM_PUBLIC void CTEK_move(x, y)
 unsigned int x;
 unsigned int y;
 {
-  TEK40move(x,y);
-  CT_last_x=x;
-  CT_last_y=y;
+    TEK40move(x, y);
+    CT_last_x = x;
+    CT_last_y = y;
 }
 
 static void CT_solid_vector(x, y)
 int x;
 int y;
 {
-  TEK40vector(x,y);
-  CT_last_x=x;
-  CT_last_y=y;
+    TEK40vector(x, y);
+    CT_last_x = x;
+    CT_last_y = y;
 }
 
 /*
@@ -504,41 +522,39 @@ int y;
    delays actual line drawing until maximum line segment is determined
    (or first/last point is defined)
 */
-static int CT_penon=0; /* is Pen on? */
+static int CT_penon = 0;	/* is Pen on? */
 
-static void CT_draw_vpoint(x, y,last)
+static void CT_draw_vpoint(x, y, last)
 int x;
 int y;
 int last;
 {
-  static int xx0, yy0,xx1,yy1;
+    static int xx0, yy0, xx1, yy1;
 
-  if((*CT_pattern) & 1) {
-    if(CT_penon) { /* This point is a continuation of current line */
-      xx1=x;
-      yy1=y;
+    if ((*CT_pattern) & 1) {
+	if (CT_penon) {		/* This point is a continuation of current line */
+	    xx1 = x;
+	    yy1 = y;
+	} else {		/* beginning of new line */
+	    xx0 = xx1 = x;
+	    yy0 = yy1 = y;
+	    CT_penon = 1;
+	}
+	*CT_pattern = ((*CT_pattern) >> 1) | 0x80000000;	/* rotate the pattern */
+	if (last) {		/* draw the line anyway if this is the last point */
+	    TEK40move(xx0, yy0);
+	    TEK40vector(xx1, yy1);
+	    CT_penon = 0;
+	}
+    } else {			/* do not draw this pixel */
+	if (CT_penon) {		/* last line segment ended at the previous pixel. */
+	    /* draw the line */
+	    TEK40move(xx0, yy0);
+	    TEK40vector(xx1, yy1);
+	    CT_penon = 0;
+	}
+	*CT_pattern = (*CT_pattern) >> 1;	/* rotate the current pattern */
     }
-    else { /* beginning of new line */
-      xx0=xx1=x;
-      yy0=yy1=y;
-      CT_penon=1;
-    }
-    *CT_pattern = ((*CT_pattern)>>1) | 0x80000000; /* rotate the pattern */
-    if(last) { /* draw the line anyway if this is the last point */
-      TEK40move(xx0,yy0);
-      TEK40vector(xx1,yy1);
-      CT_penon=0;
-    }
-  }
-  else { /* do not draw this pixel */
-    if(CT_penon) { /* last line segment ended at the previous pixel. */
-                   /* draw the line */
-      TEK40move(xx0,yy0);
-      TEK40vector(xx1,yy1);
-      CT_penon=0;
-    }
-    *CT_pattern = (*CT_pattern)>>1; /* rotate the current pattern */
-  }
 }
 
 /*
@@ -549,47 +565,46 @@ static void CT_pattern_vector(x1, y1)
 int x1;
 int y1;
 {
-  int op; /* order parameter */
-  int x0 = CT_last_x;
-  int y0 = CT_last_y;
-  int dx = x1-x0;
-  int dy = y1-y0;
-  int ax = ABS(dx) << 1;
-  int ay = ABS(dy) << 1;
-  int sx = SIGN(dx);
-  int sy = SIGN(dy);
+    int op;			/* order parameter */
+    int x0 = CT_last_x;
+    int y0 = CT_last_y;
+    int dx = x1 - x0;
+    int dy = y1 - y0;
+    int ax = ABS(dx) << 1;
+    int ay = ABS(dy) << 1;
+    int sx = SIGN(dx);
+    int sy = SIGN(dy);
 
-  if(ax >= ay) {
-    for(op = ay - (ax >> 1); x0 != x1; x0 += sx, op += ay) {
-      CT_draw_vpoint(x0,y0,0);
-      if(op >0 || (op==0 && sx==1)) {
-	op -= ax;
-	y0 += sy;
-      }
+    if (ax >= ay) {
+	for (op = ay - (ax >> 1); x0 != x1; x0 += sx, op += ay) {
+	    CT_draw_vpoint(x0, y0, 0);
+	    if (op > 0 || (op == 0 && sx == 1)) {
+		op -= ax;
+		y0 += sy;
+	    }
+	}
+    } else {			/* ax < ay */
+	for (op = ax - (ay >> 1); y0 != y1; y0 += sy, op += ax) {
+	    CT_draw_vpoint(x0, y0, 0);
+	    if (op > 0 || (op == 0 && sy == 1)) {
+		op -= ay;
+		x0 += sx;
+	    }
+	}
     }
-  }
-  else {  /* ax < ay */
-    for(op = ax - (ay >> 1); y0 != y1 ; y0 += sy, op += ax) {
-      CT_draw_vpoint(x0,y0,0);
-      if(op >0 || (op==0 && sy==1)) {
-	op -= ay;
-	x0 += sx;
-      }
-    }
-  }
-  CT_draw_vpoint(x0,y0,1); /* last point */
-  CT_last_x=x1;
-  CT_last_y=y1;
+    CT_draw_vpoint(x0, y0, 1);	/* last point */
+    CT_last_x = x1;
+    CT_last_y = y1;
 }
 
 TERM_PUBLIC void CTEK_vector(x, y)
 unsigned int x;
 unsigned int y;
 {
-  if(CT_last_linetype<=0)
-    CT_solid_vector(x,y);
-  else
-    CT_pattern_vector(x,y);
+    if (CT_last_linetype <= 0)
+	CT_solid_vector(x, y);
+    else
+	CT_pattern_vector(x, y);
 }
 
 #endif /* CTEK */
@@ -599,84 +614,96 @@ unsigned int y;
 
 TERM_TABLE_START(tek40_driver)
 #ifndef CTEK
-   "tek40xx", "Tektronix 4010 and others; most TEK emulators",
-           TEK40XMAX, TEK40YMAX, TEK40VCHAR, TEK40HCHAR, 
-           TEK40VTIC, TEK40HTIC, options_null, TEK40init, TEK40reset, 
-           TEK40text, null_scale, TEK40graphics, TEK40move, TEK40vector, 
-           TEK40linetype, TEK40put_text, null_text_angle, 
-           null_justify_text, line_and_point, do_arrow, set_font_null
+    "tek40xx", "Tektronix 4010 and others; most TEK emulators",
+    TEK40XMAX, TEK40YMAX, TEK40VCHAR, TEK40HCHAR,
+    TEK40VTIC, TEK40HTIC, options_null, TEK40init, TEK40reset,
+    TEK40text, null_scale, TEK40graphics, TEK40move, TEK40vector,
+    TEK40linetype, TEK40put_text, null_text_angle,
+    null_justify_text, line_and_point, do_arrow, set_font_null
 #else
-   "tek40xx","Tektronix 4010 and others; most TEK emulators",
-        TEK40XMAX, TEK40YMAX, TEK40VCHAR, TEK40HCHAR,
-        TEK40VTIC, TEK40HTIC, options_null, TEK40init, TEK40reset,
-        TEK40text, null_scale, TEK40graphics, CTEK_move, CTEK_vector, 
-        CTEK_linetype, TEK40put_text, null_text_angle, 
-        null_justify_text, line_and_point, do_arrow, set_font_null
-#endif
+    "tek40xx", "Tektronix 4010 and others; most TEK emulators",
+    TEK40XMAX, TEK40YMAX, TEK40VCHAR, TEK40HCHAR,
+    TEK40VTIC, TEK40HTIC, options_null, TEK40init, TEK40reset,
+    TEK40text, null_scale, TEK40graphics, CTEK_move, CTEK_vector,
+    CTEK_linetype, TEK40put_text, null_text_angle,
+    null_justify_text, line_and_point, do_arrow, set_font_null
+#endif /* CTEK */
 TERM_TABLE_END(tek40_driver)
+
 #undef LAST_TERM
 #define LAST_TERM tek40_driver
 
 #ifdef VTTEK
 TERM_TABLE_START(vttek_driver)
-   "vttek", "VT-like tek40xx terminal emulator",
-       TEK40XMAX,TEK40YMAX,TEK40VCHAR, TEK40HCHAR,
-       TEK40VTIC, TEK40HTIC, options_null, VTTEK40init, VTTEK40reset,
-       TEK40text, null_scale, TEK40graphics, TEK40move, TEK40vector,
-       VTTEK40linetype, VTTEK40put_text, null_text_angle,
-       null_justify_text, line_and_point, do_arrow, set_font_null
+    "vttek", "VT-like tek40xx terminal emulator",
+    TEK40XMAX, TEK40YMAX, TEK40VCHAR, TEK40HCHAR,
+    TEK40VTIC, TEK40HTIC, options_null, VTTEK40init, VTTEK40reset,
+    TEK40text, null_scale, TEK40graphics, TEK40move, TEK40vector,
+    VTTEK40linetype, VTTEK40put_text, null_text_angle,
+    null_justify_text, line_and_point, do_arrow, set_font_null
 TERM_TABLE_END(vttek_driver)
+
 #undef LAST_TERM
 #define LAST_TERM vttek_driver
-#endif
+
+#endif /* VTTEK */
 
 #ifdef KERMIT
 TERM_TABLE_START(kc_tek40_driver)
    "kc_tek40xx", "MS-DOS Kermit Tek4010 terminal emulator - color",
-           TEK40XMAX,TEK40YMAX,TEK40VCHAR, KTEK40HCHAR, 
-           TEK40VTIC, TEK40HTIC, options_null, TEK40init, KTEK40reset, 
-           KTEK40Ctext, null_scale, KTEK40graphics, TEK40move, TEK40vector, 
-           KTEK40Clinetype, TEK40put_text, null_text_angle, 
-           null_justify_text, do_point, do_arrow, set_font_null
+    TEK40XMAX, TEK40YMAX, TEK40VCHAR, KTEK40HCHAR,
+    TEK40VTIC, TEK40HTIC, options_null, TEK40init, KTEK40reset,
+    KTEK40Ctext, null_scale, KTEK40graphics, TEK40move, TEK40vector,
+    KTEK40Clinetype, TEK40put_text, null_text_angle,
+    null_justify_text, do_point, do_arrow, set_font_null
 TERM_TABLE_END(kc_tek40_driver)
 
+#undef LAST_TERM
+#define LAST_TERM kc_tek40_driver
+
 TERM_TABLE_START(km_tek40_driver)
-   "km_tek40xx", "MS-DOS Kermit Tek4010 terminal emulator - monochrome",
-           TEK40XMAX,TEK40YMAX,TEK40VCHAR, KTEK40HCHAR, 
-           TEK40VTIC, TEK40HTIC, options_null, TEK40init, KTEK40reset, 
-           TEK40text, null_scale, KTEK40graphics, TEK40move, TEK40vector, 
-           KTEK40Mlinetype, TEK40put_text, null_text_angle, 
-           null_justify_text, line_and_point, do_arrow, set_font_null
+    "km_tek40xx", "MS-DOS Kermit Tek4010 terminal emulator - monochrome",
+    TEK40XMAX, TEK40YMAX, TEK40VCHAR, KTEK40HCHAR,
+    TEK40VTIC, TEK40HTIC, options_null, TEK40init, KTEK40reset,
+    TEK40text, null_scale, KTEK40graphics, TEK40move, TEK40vector,
+    KTEK40Mlinetype, TEK40put_text, null_text_angle,
+    null_justify_text, line_and_point, do_arrow, set_font_null
 TERM_TABLE_END(km_tek40_driver)
+
 #undef LAST_TERM
 #define LAST_TERM km_tek40_driver
-#endif
+
+#endif /* KERMIT */
 
 #ifdef SELANAR
 TERM_TABLE_START(selanar_driver)
-   "selanar", "Selanar",
-           TEK40XMAX, TEK40YMAX, TEK40VCHAR, TEK40HCHAR, 
-           TEK40VTIC, TEK40HTIC, options_null, SEL_init, SEL_reset, 
-           SEL_text, null_scale, SEL_graphics, TEK40move, TEK40vector, 
-           TEK40linetype, TEK40put_text, null_text_angle, 
-           null_justify_text, line_and_point, do_arrow, set_font_null
+    "selanar", "Selanar",
+    TEK40XMAX, TEK40YMAX, TEK40VCHAR, TEK40HCHAR,
+    TEK40VTIC, TEK40HTIC, options_null, SEL_init, SEL_reset,
+    SEL_text, null_scale, SEL_graphics, TEK40move, TEK40vector,
+    TEK40linetype, TEK40put_text, null_text_angle,
+    null_justify_text, line_and_point, do_arrow, set_font_null
 TERM_TABLE_END(selanar_driver)
+
 #undef LAST_TERM
 #define LAST_TERM selanar_driver
-#endif
+
+#endif /* SELANAR */
 
 #ifdef BITGRAPH
 TERM_TABLE_START(bitgraph_driver)
-   "bitgraph", "BBN Bitgraph Terminal",
-           BG_XMAX,BG_YMAX,BG_VCHAR, BG_HCHAR, 
-           BG_VTIC, BG_HTIC, options_null, BG_init, BG_reset, 
-           BG_text, null_scale, BG_graphics, BG_move, BG_vector,
-           BG_linetype, BG_put_text, null_text_angle, 
-           null_justify_text, line_and_point, do_arrow, set_font_null
+    "bitgraph", "BBN Bitgraph Terminal",
+    BG_XMAX, BG_YMAX, BG_VCHAR, BG_HCHAR,
+    BG_VTIC, BG_HTIC, options_null, BG_init, BG_reset,
+    BG_text, null_scale, BG_graphics, BG_move, BG_vector,
+    BG_linetype, BG_put_text, null_text_angle,
+    null_justify_text, line_and_point, do_arrow, set_font_null
 TERM_TABLE_END(bitgraph_driver)
+
 #undef LAST_TERM
-#define LAST_TERM bitgraph_drive
-#endif
+#define LAST_TERM bitgraph_driver
+
+#endif /* BITGRAPH */
 
 #endif /* TERM_TABLE */
 
@@ -685,31 +712,37 @@ TERM_TABLE_END(bitgraph_driver)
 #ifdef TERM_HELP
 START_HELP(tek40)
 "1 tek40",
+"?commands set terminal tek40xx",
 "?set terminal tek40xx",
 "?set term tek40xx",
 "?terminal tek40xx",
 "?terminal tek40xx",
 "?tek40",
+"?commands set terminal vttek",
 "?set terminal vttek",
 "?set term vttek",
 "?terminal vttek",
 "?term vttek",
 "?vttek",
+"?commands set terminal kc-tek40xx",
 "?set terminal kc-tek40xx",
 "?set term kc-tek40xx",
 "?terminal kc-tek40xx",
 "?term kc-tek40xx",
 "?kc-tek40xx",
+"?commands set terminal km-tek40xx",
 "?set terminal km-tek40xx",
 "?set term km-tek40xx",
 "?terminal km-tek40xx",
 "?term km-tek40xx",
 "?km-tek40xx",
+"?commands set terminal selanar",
 "?set terminal selanar",
 "?set term selanar",
 "?terminal selanar",
 "?term selanar",
 "?selanar",
+"?commands set terminal bitgraph",
 "?set terminal bitgraph",
 "?set term bitgraph",
 "?terminal bitgraph",
@@ -722,4 +755,4 @@ START_HELP(tek40)
 " in monochrome; `selanar` supports Selanar graphics; and `bitgraph` supports",
 " BBN Bitgraph terminals.  None have any options."
 END_HELP(tek40)
-#endif
+#endif /* TERM_HELP */

@@ -1,5 +1,5 @@
 #ifndef lint
-static char    *RCSid = "$Id: datafile.c,v 1.42 1998/04/14 00:15:17 drd Exp $";
+static char *RCSid = "$Id: datafile.c,v 1.42 1998/04/14 00:15:17 drd Exp $";
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -40,8 +40,8 @@ static char    *RCSid = "$Id: datafile.c,v 1.42 1998/04/14 00:15:17 drd Exp $";
  * this file provides the functions to handle data-file reading..
  * takes care of all the pipe / stdin / index / using worries
  */
- 
-/*{{{  notes*/
+
+/*{{{  notes */
 /* couldn't decide how to implement 'thru' only for 2d and 'index'
  * for only 3d, so I did them for both - I can see a use for
  * index in 2d, especially for fit.
@@ -137,18 +137,18 @@ static char    *RCSid = "$Id: datafile.c,v 1.42 1998/04/14 00:15:17 drd Exp $";
  *           way the parser works
  *
  */
-/*}}}*/
+/*}}} */
 
 #include "plot.h"
-#include "fnproto.h"  /* check prototypes against our defns */
+#include "fnproto.h"		/* check prototypes against our defns */
 #include "binary.h"
 #include "setshow.h"
 
 /* if you change this, change the scanf in readline */
-#define NCOL   7            /* max using specs     */
+#define NCOL   7		/* max using specs     */
 
-/*{{{  static fns*/
-#if 0 /* not used */
+/*{{{  static fns */
+#if 0				/* not used */
 static int get_time_cols __PROTO((char *fmt));
 static void mod_def_usespec __PROTO((int specno, int jump));
 #endif
@@ -156,905 +156,872 @@ static int check_missing __PROTO((char *s));
 static char *df_gets __PROTO((void));
 static int df_tokenise __PROTO((char *s));
 static float **df_read_matrix __PROTO((int *rows, int *columns));
-/*}}}*/
+/*}}} */
 
-/*{{{  variables*/
-struct use_spec_s { int column; struct at_type *at; };
+/*{{{  variables */
+struct use_spec_s {
+    int column;
+    struct at_type *at;
+};
 
 /* public variables client might access */
 
-int df_no_use_specs;  /* how many using columns were specified */
+int df_no_use_specs;		/* how many using columns were specified */
 int df_line_number;
-int df_datum;  /* suggested x value if none given */
-TBOOLEAN df_matrix = FALSE; /* is this a matrix splot */
-int df_eof=0;
+int df_datum;			/* suggested x value if none given */
+TBOOLEAN df_matrix = FALSE;	/* is this a matrix splot */
+int df_eof = 0;
 int df_timecol[NCOL];
-TBOOLEAN df_binary = FALSE; /* this is a binary file */
+TBOOLEAN df_binary = FALSE;	/* this is a binary file */
 
 /* private variables */
 
 /* in order to allow arbitrary data line length, we need to use the heap
  * might consider free-ing it in df_close, especially for small systems
  */
-static char *line=NULL;
-static int max_line_len=0;
+static char *line = NULL;
+static int max_line_len = 0;
 
-static FILE *data_fp=NULL;
+static FILE *data_fp = NULL;
 static TBOOLEAN pipe_open = FALSE;
 static TBOOLEAN mixed_data_fp = FALSE;
 
-#ifndef MAXINT  /* should there be one already defined ? */
-#ifdef INT_MAX  /* in limits.h ? */
-#define MAXINT INT_MAX
-#else
-#define MAXINT ((~0)>>1)
-#endif
+#ifndef MAXINT			/* should there be one already defined ? */
+# ifdef INT_MAX			/* in limits.h ? */
+#  define MAXINT INT_MAX
+# else
+#  define MAXINT ((~0)>>1)
+# endif
 #endif
 
 /* stuff for implementing index */
-static int blank_count=0;      /* how many blank lines recently */
-static int df_lower_index=0;  /* first mesh required */
-static int df_upper_index=MAXINT;
-static int df_index_step=1;  /* 'every' for indices */
-static int df_current_index;   /* current mesh */
+static int blank_count = 0;	/* how many blank lines recently */
+static int df_lower_index = 0;	/* first mesh required */
+static int df_upper_index = MAXINT;
+static int df_index_step = 1;	/* 'every' for indices */
+static int df_current_index;	/* current mesh */
 
 /* stuff for every point:line */
-static int everypoint=1;
-static int firstpoint=0;
-static int lastpoint=MAXINT;
-static int everyline=1;
-static int firstline=0;
-static int lastline=MAXINT;
-static int point_count=-1;  /* point counter - preincrement and test 0 */
-static int line_count=0;  /* line counter */
+static int everypoint = 1;
+static int firstpoint = 0;
+static int lastpoint = MAXINT;
+static int everyline = 1;
+static int firstline = 0;
+static int lastline = MAXINT;
+static int point_count = -1;	/* point counter - preincrement and test 0 */
+static int line_count = 0;	/* line counter */
 
 /* parsing stuff */
 static struct use_spec_s use_spec[NCOL];
-static char df_format[MAX_LINE_LEN+1];
+static char df_format[MAX_LINE_LEN + 1];
 
 /* rather than three arrays which all grow dynamically, make one
  * dynamic array of this structure
  */
 
 typedef struct df_column_struct {
-	double datum;
-	enum { DF_MISSING,DF_BAD,DF_GOOD } good;
-	char *position;
+    double datum;
+    enum {
+	DF_MISSING, DF_BAD, DF_GOOD
+    } good;
+    char *position;
 } df_column_struct;
 
-static df_column_struct *df_column=NULL; /* we'll allocate space as needed */
-static int df_max_cols=0; /* space allocated */
-static int df_no_cols;    /* cols read */
+static df_column_struct *df_column = NULL;	/* we'll allocate space as needed */
+static int df_max_cols = 0;	/* space allocated */
+static int df_no_cols;		/* cols read */
 static int fast_columns;	/* corey@cac optimization */
 
 /* external variables we need */
 
 extern int c_token, num_tokens;
-extern char timefmt[]; /* I would rather not need this, but ... */
+extern char timefmt[];		/* I would rather not need this, but ... */
 /* columns needing timefmt are passed in df_timecol[] after df_open */
 
 /* jev -- for passing data thru user-defined function */
 extern struct udft_entry ydata_func;
 extern struct udft_entry *dummy_func;
-extern char dummy_var[MAX_NUM_VAR][MAX_ID_LEN+1];
-extern char c_dummy_var[MAX_NUM_VAR][MAX_ID_LEN+1];
+extern char dummy_var[MAX_NUM_VAR][MAX_ID_LEN + 1];
+extern char c_dummy_var[MAX_NUM_VAR][MAX_ID_LEN + 1];
 
 extern double min_array[], max_array[];
-/*}}}*/
+/*}}} */
 
 
-/*{{{  static char *df_gets()*/
+/*{{{  static char *df_gets() */
 static char *df_gets()
 {
-	int len=0;
-	
-	if (!fgets(line, max_line_len, data_fp))
-		return NULL;
+    int len = 0;
 
-	if (mixed_data_fp)
-		++inline_num;
-
-	for(;;)
-	{
-		len += strlen(line+len);
-		
-		if (len > 0 && line[len-1]=='\n')
-		{
-			/* we have read an entire text-file line.
-			 * Strip the trailing linefeed and return
-			 */
-			line[len-1]=0;
-			return line;
-		}
-
-		/* buffer we provided may not be full - dont grab extra
-		 * memory un-necessarily. This may trap a problem with last
-		 * line in file not being properly terminated - each time
-		 * through a replot loop, it was doubling buffer size
-		 */
-
-		if ( (max_line_len-len) < 32)
-			line = gp_realloc(line, max_line_len*=2, "datafile line buffer");
-
-		if (!fgets(line+len, max_line_len - len, data_fp))
-			return line; /* unexpected end of file, but we have something to do */
-	}
-
-	/* NOTREACHED */
+    if (!fgets(line, max_line_len, data_fp))
 	return NULL;
-}
-/*}}}*/
 
-/*{{{  static int df_tokenise(s)*/
+    if (mixed_data_fp)
+	++inline_num;
+
+    for (;;) {
+	len += strlen(line + len);
+
+	if (len > 0 && line[len - 1] == '\n') {
+	    /* we have read an entire text-file line.
+	     * Strip the trailing linefeed and return
+	     */
+	    line[len - 1] = 0;
+	    return line;
+	}
+	/* buffer we provided may not be full - dont grab extra
+	 * memory un-necessarily. This may trap a problem with last
+	 * line in file not being properly terminated - each time
+	 * through a replot loop, it was doubling buffer size
+	 */
+
+	if ((max_line_len - len) < 32)
+	    line = gp_realloc(line, max_line_len *= 2, "datafile line buffer");
+
+	if (!fgets(line + len, max_line_len - len, data_fp))
+	    return line;	/* unexpected end of file, but we have something to do */
+    }
+
+    /* NOTREACHED */
+    return NULL;
+}
+/*}}} */
+
+/*{{{  static int df_tokenise(s) */
 static int df_tokenise(s)
 char *s;
 {
-	/* implement our own sscanf that takes 'missing' into account,
-	 * and can understand fortran quad format
-	 */
+    /* implement our own sscanf that takes 'missing' into account,
+     * and can understand fortran quad format
+     */
 
-	df_no_cols = 0;
+    df_no_cols = 0;
 
-	while (*s)
-	{
+    while (*s) {
 
-		/* check store - double max cols or add 20, whichever is greater */
-		if (df_max_cols <= df_no_cols)
-			df_column=(df_column_struct *)gp_realloc(df_column, (df_max_cols += (df_max_cols < 20 ? 20 : df_max_cols))*sizeof(df_column_struct), "datafile column");
+	/* check store - double max cols or add 20, whichever is greater */
+	if (df_max_cols <= df_no_cols)
+	    df_column = (df_column_struct *) gp_realloc(df_column, (df_max_cols += (df_max_cols < 20 ? 20 : df_max_cols)) * sizeof(df_column_struct), "datafile column");
 
-		/* have always skipped spaces at this point */
-		df_column[df_no_cols].position = s;
+	/* have always skipped spaces at this point */
+	df_column[df_no_cols].position = s;
 
-		if (check_missing(s))
-			df_column[df_no_cols].good = DF_MISSING;
-		else {
+	if (check_missing(s))
+	    df_column[df_no_cols].good = DF_MISSING;
+	else {
 #ifdef OSK
-			/* apparently %n does not work. This implementation
-			 * is just as good as the non-OSK one, but close
-			 * to a release (at last) we make it os-9 specific
-			 */
-			 int count;
-			 char *p = strpbrk(s, "dqDQ");
-			 if (p != NULL)
-			 	*p = 'e';
-			 	
-			count = sscanf(s, "%lf", &df_column[df_no_cols].datum);
+	    /* apparently %n does not work. This implementation
+	     * is just as good as the non-OSK one, but close
+	     * to a release (at last) we make it os-9 specific
+	     */
+	    int count;
+	    char *p = strpbrk(s, "dqDQ");
+	    if (p != NULL)
+		*p = 'e';
+
+	    count = sscanf(s, "%lf", &df_column[df_no_cols].datum);
 #else
-			/* cannot trust strtod - eg strtod("-",&p) */
-			int used;
-			int count;
-			int dfncp1 = df_no_cols+1;
+	    /* cannot trust strtod - eg strtod("-",&p) */
+	    int used;
+	    int count;
+	    int dfncp1 = df_no_cols + 1;
 
 /*
  * optimizations by Corey Satten, corey@cac.washington.edu
  */
-			if (fast_columns == 0 ||
-			    df_no_use_specs > 0 && (use_spec[0].column == dfncp1 ||
-			    df_no_use_specs > 1 && (use_spec[1].column == dfncp1 ||
-			    df_no_use_specs > 2 && (use_spec[2].column == dfncp1 ||
-			    df_no_use_specs > 3 && (use_spec[3].column == dfncp1 ||
-			    df_no_use_specs > 5 && (use_spec[5].column == dfncp1 ||
-			    df_no_use_specs > 5))))) ||
-			    df_no_use_specs == 0) {
-			
-#ifdef FORTRAN_NUMS
-				count = sscanf(s, "%lf%n", &df_column[df_no_cols].datum, &used);
+	    if (fast_columns == 0 ||
+		df_no_use_specs > 0 && (use_spec[0].column == dfncp1 ||
+		  df_no_use_specs > 1 && (use_spec[1].column == dfncp1 ||
+		  df_no_use_specs > 2 && (use_spec[2].column == dfncp1 ||
+		  df_no_use_specs > 3 && (use_spec[3].column == dfncp1 ||
+		  df_no_use_specs > 4 && (use_spec[4].column == dfncp1 ||
+					  df_no_use_specs > 5))))) ||
+		df_no_use_specs == 0) {
+
+#ifndef NO_FORTRAN_NUMS
+		count = sscanf(s, "%lf%n", &df_column[df_no_cols].datum, &used);
 #else
-				while (isspace(*s)) ++s;
-				count = *s ? 1 : 0;
-				df_column[df_no_cols].datum = atof(s);
-#endif /* FORTRAN_NUMS */
-				}
-			else {
-				/* skip any space at start of column */
-				while (isspace(*s)) ++s;
-				count = *s ? 1 : 0;
-				/* skip chars to end of column */
-				for (used=0; !isspace(*s) && (*s != '\0'); ++used, ++s) ;
-			    }
-
-			/* it might be a fortran double or quad precision. 'used'
-			 * is only safe if count is 1
-			 */
-			 
-#ifdef FORTRAN_NUMS
-			if (count==1 &&
-			    (s[used]=='d' || s[used]=='D' || s[used]=='q' || s[used]=='Q')
-			   ) {
-			   /* might be fortran double */
-				s[used]='e';
-				/* and try again */
-				count = sscanf(s, "%lf", &df_column[df_no_cols].datum);
-			}
-#endif /* FORTRAN_NUMS */
-#endif
-			df_column[df_no_cols].good = count==1 ? DF_GOOD : DF_BAD;
-		}
-
-		++df_no_cols;
-		/*{{{  skip chars to end of column*/
-		while ((!isspace(*s)) && (*s != '\0'))
-			++s;
-		/*}}}*/
-		/*{{{  skip spaces to start of next column*/
 		while (isspace(*s))
-			++s;
-		/*}}}*/
+		    ++s;
+		count = *s ? 1 : 0;
+		df_column[df_no_cols].datum = atof(s);
+#endif /* NO_FORTRAN_NUMS */
+	    } else {
+		/* skip any space at start of column */
+		while (isspace((int)*s))
+		    ++s;
+		count = *s ? 1 : 0;
+		/* skip chars to end of column */
+		for (used = 0; !isspace((int)*s) && (*s != NUL); ++used, ++s)
+		    ;
+	    }
+
+	    /* it might be a fortran double or quad precision.
+	     * 'used' is only safe if count is 1
+	     */
+
+#ifndef NO_FORTRAN_NUMS
+	    if (count == 1 &&
+		(s[used] == 'd' || s[used] == 'D' ||
+		 s[used] == 'q' || s[used] == 'Q')) {
+		/* might be fortran double */
+		s[used] = 'e';
+		/* and try again */
+		count = sscanf(s, "%lf", &df_column[df_no_cols].datum);
+	    }
+#endif /* NO_FORTRAN_NUMS */
+#endif /* OSK */
+	    df_column[df_no_cols].good = count == 1 ? DF_GOOD : DF_BAD;
 	}
 
-	return df_no_cols;
-}
-/*}}}*/
+	++df_no_cols;
+	/*{{{  skip chars to end of column */
+	while ((!isspace((int)*s)) && (*s != '\0'))
+	    ++s;
+	/*}}} */
+	/*{{{  skip spaces to start of next column */
+	while (isspace((int)*s))
+	    ++s;
+	/*}}} */
+    }
 
-/*{{{  static float **df_read_matrix()*/
+    return df_no_cols;
+}
+/*}}} */
+
+/*{{{  static float **df_read_matrix() */
 /* reads a matrix from a text file
  * stores in same storage format as fread_matrix
  */
- 
+
 static float **df_read_matrix(rows, cols)
 int *rows, *cols;
 {
-	int max_rows = 0;
-	int c;
-	float **matrix = NULL;
+    int max_rows = 0;
+    int c;
+    float **rmatrix = NULL;
 
-	char *s;
+    char *s;
 
-	*rows = 0;
-	*cols = 0;
+    *rows = 0;
+    *cols = 0;
 
-	for (;;)
-	{
-		if (!(s=df_gets()))
-		{
-			df_eof = 1;
-			return matrix; /* NULL if we have not read anything yet */
-		}
-		
-		while (isspace(*s))
-			++s;
-
-		if (!*s || is_comment(*s))
-		{
-			if (matrix)
-				return matrix;
-			else
-				continue;
-		}
-			
-		if (mixed_data_fp && is_EOF(*s))
-		{
-			df_eof=1;
-			return matrix;
-		}
-
-		c = df_tokenise(s);
-
-		if (!c)
-			return matrix;
-
-		if (*cols && c != *cols)
-		{
-			/* its not regular */
-			int_error("Matrix does not represent a grid", NO_CARET);
-		}
-
-		*cols = c;
-
-		if (*rows >= max_rows)
-		{
-			matrix = gp_realloc(matrix, (max_rows += 10)*sizeof(float *), "df_matrix");
-		}
-
-		/* allocate a row and store data */
-		{
-			int i;
-			float *row = matrix[*rows] = (float *)gp_alloc(c*sizeof(float), "df_matrix row");
-
-			for (i=0; i<c; ++i)
-			{
-				if (df_column[i].good != DF_GOOD)
-					int_error("Bad number in matrix", NO_CARET);
-
-				row[i] = (float) df_column[i].datum;
-			}
-
-			++*rows;
-		}
+    for (;;) {
+	if (!(s = df_gets())) {
+	    df_eof = 1;
+	    return rmatrix;	/* NULL if we have not read anything yet */
 	}
-}
-/*}}}*/
-	
+	while (isspace((int)*s))
+	    ++s;
 
-/*{{{  int df_open(max_using)*/
+	if (!*s || is_comment(*s)) {
+	    if (rmatrix)
+		return rmatrix;
+	    else
+		continue;
+	}
+	if (mixed_data_fp && is_EOF(*s)) {
+	    df_eof = 1;
+	    return rmatrix;
+	}
+	c = df_tokenise(s);
+
+	if (!c)
+	    return rmatrix;
+
+	if (*cols && c != *cols) {
+	    /* its not regular */
+	    int_error("Matrix does not represent a grid", NO_CARET);
+	}
+	*cols = c;
+
+	if (*rows >= max_rows) {
+	    rmatrix = gp_realloc(rmatrix, (max_rows += 10) * sizeof(float *), "df_matrix");
+	}
+	/* allocate a row and store data */
+	{
+	    int i;
+	    float *row = rmatrix[*rows] = (float *) gp_alloc(c * sizeof(float), "df_matrix row");
+
+	    for (i = 0; i < c; ++i) {
+		if (df_column[i].good != DF_GOOD)
+		    int_error("Bad number in matrix", NO_CARET);
+
+		row[i] = (float) df_column[i].datum;
+	    }
+
+	    ++*rows;
+	}
+    }
+}
+
+/*}}} */
+
+
+/*{{{  int df_open(max_using) */
 int df_open(max_using)
 int max_using;
 
 /* open file, parsing using/thru/index stuff
  * return number of using specs  [well, we have to return something !]
  */
- 
+
 {
-	static char filename[MAX_LINE_LEN+1]="";
-	int i;
-	int name_token;
-	
-	fast_columns = 1;		/* corey@cac */
-	
-	/*{{{  close file if necessary*/
-	if (data_fp)
-		df_close();
-	/*}}}*/
-	
-	/*{{{  initialise static variables*/
-	df_format[0] = '\0';  /* no format string */
-	
-	df_no_use_specs = 0;
-	
-	for (i=0; i<NCOL; ++i)
-	{	use_spec[i].column=i+1; /* default column */
-		use_spec[i].at = NULL;  /* no expression */
-	}
-	
-	if (max_using > NCOL)
-		max_using = NCOL;
-	
-	df_datum = -1; /* it will be preincremented before use */
-	df_line_number=0; /* ditto */
-	
-	df_lower_index = 0;
-	df_index_step = 1;
-	df_upper_index = MAXINT;
-	
-	df_current_index=0;
-	blank_count = 2;
-	/* by initialising blank_count, leading blanks will be ignored */
-	
-	everypoint = everyline=1;  /* unless there is an every spec */
-	firstpoint=firstline=0;
-	lastpoint=lastline=MAXINT;
-	
-	df_eof=0;
-	
-	memset(df_timecol, 0, sizeof(df_timecol));
-	
-	df_binary=1;
-	/*}}}*/
+    static char filename[MAX_LINE_LEN + 1] = "";
+    int i;
+    int name_token;
 
-	assert(max_using <= NCOL);
+    fast_columns = 1;		/* corey@cac */
 
-	/* empty name means re-use last one */
+    /*{{{  close file if necessary */
+    if (data_fp)
+	df_close();
+    /*}}} */
 
-	{	char name[MAX_LINE_LEN+1];
-		quote_str(name, c_token, MAX_LINE_LEN);
-		if (name[0])
-			strcpy(filename, name);
-		else if (!filename[0])
-			int_error("No previous filename", c_token);
-	}
-	name_token = c_token++;
+    /*{{{  initialise static variables */
+    df_format[0] = NUL;	/* no format string */
 
-	/* defer opening until we have parsed the modifiers... */
+    df_no_use_specs = 0;
 
-	/*{{{  look for binary / matrix*/
-	df_binary = df_matrix = FALSE;
-	
-	if (almost_equals(c_token, "bin$ary"))
-	{
+    for (i = 0; i < NCOL; ++i) {
+	use_spec[i].column = i + 1;	/* default column */
+	use_spec[i].at = NULL;	/* no expression */
+    }
+
+    if (max_using > NCOL)
+	max_using = NCOL;
+
+    df_datum = -1;		/* it will be preincremented before use */
+    df_line_number = 0;		/* ditto */
+
+    df_lower_index = 0;
+    df_index_step = 1;
+    df_upper_index = MAXINT;
+
+    df_current_index = 0;
+    blank_count = 2;
+    /* by initialising blank_count, leading blanks will be ignored */
+
+    everypoint = everyline = 1;	/* unless there is an every spec */
+    firstpoint = firstline = 0;
+    lastpoint = lastline = MAXINT;
+
+    df_eof = 0;
+
+    memset(df_timecol, 0, sizeof(df_timecol));
+
+    df_binary = 1;
+    /*}}} */
+
+    assert(max_using <= NCOL);
+
+    /* empty name means re-use last one */
+
+    {
+	char name[MAX_LINE_LEN + 1];
+	quote_str(name, c_token, MAX_LINE_LEN);
+	if (name[0])
+	    strcpy(filename, name);
+	else if (!filename[0])
+	    int_error("No previous filename", c_token);
+    }
+    name_token = c_token++;
+
+    /* defer opening until we have parsed the modifiers... */
+
+    /*{{{  look for binary / matrix */
+    df_binary = df_matrix = FALSE;
+
+    if (almost_equals(c_token, "bin$ary")) {
+	++c_token;
+	df_binary = TRUE;
+	df_matrix = TRUE;
+    } else if (almost_equals(c_token, "mat$rix")) {
+	++c_token;
+	df_matrix = TRUE;
+    }
+    /*}}} */
+
+    /*{{{  deal with index */
+    if (almost_equals(c_token, "i$ndex")) {
+	struct value a;
+
+	if (df_binary)
+	    int_error("Binary file format does not allow more than one surface per file", c_token);
+
+	++c_token;
+	df_lower_index = (int) real(const_express(&a));
+	if (equals(c_token, ":")) {
+	    ++c_token;
+	    df_upper_index = (int) magnitude(const_express(&a));
+	    if (df_upper_index < df_lower_index)
+		int_error("Upper index should be bigger than lower index", c_token);
+
+	    if (equals(c_token, ":")) {
 		++c_token;
-		df_binary=TRUE;
-		df_matrix=TRUE;
-	}
-	else if (almost_equals(c_token, "mat$rix"))
-	{
-		++c_token;
-		df_matrix = TRUE;
-	}
-	/*}}}*/
+		df_index_step = (int) magnitude(const_express(&a));
+		if (df_index_step < 1)
+		    int_error("Index step must be positive", c_token);
+	    }
+	} else
+	    df_upper_index = df_lower_index;
+    }
+    /*}}} */
 
-	/*{{{  deal with index*/
-	if (almost_equals(c_token, "i$ndex")) {
-		struct value a;
-	
-		if (df_binary)
-			int_error("Binary file format does not allow more than one surface per file",c_token);
-			
-		++c_token;
-		df_lower_index = (int)real(const_express(&a));
+    /*{{{  deal with every */
+    if (almost_equals(c_token, "ev$ery")) {
+	struct value a;
+
+	fast_columns = 0;	/* corey@cac */
+	/* allow empty fields - every a:b:c::e
+	 * we have already established the defaults
+	 */
+
+	if (!equals(++c_token, ":")) {
+	    everypoint = (int) real(const_express(&a));
+	    if (everypoint < 1)
+		int_error("Expected positive integer", c_token);
+	}
+	/* if it fails on first test, no more tests will succeed. If it
+	 * fails on second test, next test will succeed with correct c_token
+	 */
+	if (equals(c_token, ":") && !equals(++c_token, ":")) {
+	    everyline = (int) real(const_express(&a));
+	    if (everyline < 1)
+		int_error("Expected positive integer", c_token);
+	}
+	if (equals(c_token, ":") && !equals(++c_token, ":")) {
+	    firstpoint = (int) real(const_express(&a));
+	    if (firstpoint < 0)
+		int_error("Expected non-negative integer", c_token);
+	}
+	if (equals(c_token, ":") && !equals(++c_token, ":")) {
+	    firstline = (int) real(const_express(&a));
+	    if (firstline < 0)
+		int_error("Expected non-negative integer", c_token);
+	}
+	if (equals(c_token, ":") && !equals(++c_token, ":")) {
+	    lastpoint = (int) real(const_express(&a));
+	    if (lastpoint < firstpoint)
+		int_error("Last point must not be before first point", c_token);
+	}
+	if (equals(c_token, ":")) {
+	    ++c_token;
+	    lastline = (int) real(const_express(&a));
+	    if (lastline < firstline)
+		int_error("Last line must not be before first line", c_token);
+	}
+    }
+    /*}}} */
+
+    /*{{{  deal with thru */
+    /* jev -- support for passing data from file thru user function */
+
+    if (almost_equals(c_token, "thru$")) {
+	c_token++;
+	if (ydata_func.at)
+	    free(ydata_func.at);
+	strcpy(c_dummy_var[0], dummy_var[0]);
+	/* allow y also as a dummy variable.
+	 * during plot, c_dummy_var[0] and [1] are 'sacred'
+	 * ie may be set by  splot [u=1:2] [v=1:2], and these
+	 * names are stored only in c_dummy_var[]
+	 * so choose dummy var 2 - can anything vital be here ?
+	 */
+	dummy_func = &ydata_func;
+	strcpy(c_dummy_var[2], "y");
+	ydata_func.at = perm_at();
+	dummy_func = NULL;
+    } else {
+	if (ydata_func.at)
+	    free(ydata_func.at);
+	ydata_func.at = NULL;
+    }
+    /*}}} */
+
+    /*{{{  deal with using */
+    if (almost_equals(c_token, "u$sing")) {
+	if (!END_OF_COMMAND && !isstring(++c_token)) {
+	    struct value a;
+
+	    do {		/* must be at least one */
+		if (df_no_use_specs >= max_using)
+		    int_error("Too many columns in using specification", c_token);
+
 		if (equals(c_token, ":")) {
-			++c_token;
-			df_upper_index = (int)magnitude(const_express(&a));
-			if (df_upper_index < df_lower_index)
-				int_error("Upper index should be bigger than lower index", c_token);
-	
-			if (equals(c_token, ":")) {
-				++c_token;
-				df_index_step = (int)magnitude(const_express(&a));
-				if (df_index_step < 1)
-					int_error("Index step must be positive", c_token);
-			}
+		    /* empty specification - use default */
+		    use_spec[df_no_use_specs].column = df_no_use_specs;
+		    ++df_no_use_specs;
+		    /* do not increment c+token ; let while() find the : */
+		} else if (equals(c_token, "(")) {
+		    fast_columns = 0;	/* corey@cac */
+		    dummy_func = NULL;	/* no dummy variables active */
+		    use_spec[df_no_use_specs++].at = perm_at();		/* it will match ()'s */
+		} else {
+		    int col = (int) real(const_express(&a));
+		    if (col < -2)
+			int_error("Column must be >= -2", c_token);
+		    use_spec[df_no_use_specs++].column = col;
 		}
-		else
-			df_upper_index = df_lower_index;
+	    } while (equals(c_token, ":") && ++c_token);
 	}
-	/*}}}*/
+	if (!END_OF_COMMAND && isstring(c_token)) {
+	    if (df_binary)
+		int_error("Format string meaningless with binary data", NO_CARET);
 
-	/*{{{  deal with every*/
-	if (almost_equals(c_token, "ev$ery")) {
-		struct value a;
-	
-		fast_columns = 0; 	/* corey@cac */
-		/* allow empty fields - every a:b:c::e
-		 * we have already established the defaults
-		 */
-	
-		if (!equals(++c_token, ":")) {
-			everypoint = (int)real(const_express(&a));
-			if (everypoint<1)
-				int_error("Expected positive integer", c_token);
-		}
-	
-		/* if it fails on first test, no more tests will succeed. If it
-		 * fails on second test, next test will succeed with correct c_token
-		 */
-		if (equals(c_token, ":") && !equals(++c_token, ":")) {
-			everyline = (int)real(const_express(&a));
-			if (everyline<1)
-				int_error("Expected positive integer", c_token);
-		}
-	
-		if (equals(c_token, ":") && !equals(++c_token, ":")) {
-			firstpoint = (int)real(const_express(&a));
-			if (firstpoint<0)
-				int_error("Expected non-negative integer", c_token);
-		}
-	
-		if (equals(c_token, ":") && !equals(++c_token, ":")) {
-			firstline = (int)real(const_express(&a));
-			if (firstline<0)
-				int_error("Expected non-negative integer", c_token);
-		}
-	
-		if (equals(c_token, ":") && !equals(++c_token, ":")) {
-			lastpoint = (int)real(const_express(&a));
-			if (lastpoint<firstpoint)
-				int_error("Last point must not be before first point", c_token);
-		}
-	
-		if (equals(c_token, ":")) {
-			++c_token;
-			lastline = (int)real(const_express(&a));
-			if (lastline<firstline)
-				int_error("Last line must not be before first line", c_token);
-		}
+	    quote_str(df_format, c_token, MAX_LINE_LEN);
+	    if (!valid_format(df_format))
+		int_error("Please use a double conversion %lf", c_token);
+
+	    c_token++;		/* skip format */
 	}
-	/*}}}*/
-	
-	/*{{{  deal with thru*/
-	/* jev -- support for passing data from file thru user function */
-	
-	if (almost_equals(c_token, "thru$")) {
-		c_token++;
-		if (ydata_func.at)
-			free(ydata_func.at);
-		strcpy(c_dummy_var[0], dummy_var[0]);
-		/* allow y also as a dummy variable.
-		 * during plot, c_dummy_var[0] and [1] are 'sacred'
-		 * ie may be set by  splot [u=1:2] [v=1:2], and these
-		 * names are stored only in c_dummy_var[]
-		 * so choose dummy var 2 - can anything vital be here ?
-		 */
-		dummy_func = &ydata_func;
-		strcpy(c_dummy_var[2], "y");
-		ydata_func.at = perm_at();
-		dummy_func = NULL;
-	} else {
-		if (ydata_func.at)
-			free(ydata_func.at);
-		ydata_func.at = NULL;
-	}
-	/*}}}*/
+    }
+    /*}}} */
 
-	/*{{{  deal with using*/
-	if (almost_equals(c_token,"u$sing"))
-	{
-		if (!END_OF_COMMAND && !isstring(++c_token))
-		{
-			struct value a;
-	
-			do  /* must be at least one */
-			{
-				if (df_no_use_specs >= max_using)
-					int_error("Too many columns in using specification", c_token);
-	
-				if (equals(c_token, ":"))
-				{
-					/* empty specification - use default */
-					use_spec[df_no_use_specs].column = df_no_use_specs;
-					++df_no_use_specs;
-					/* do not increment c+token ; let while() find the : */
-				}
-				else if (equals(c_token, "("))
-				{
-					fast_columns = 0;	/* corey@cac */
-					dummy_func=NULL;  /* no dummy variables active */
-					use_spec[df_no_use_specs++].at = perm_at();  /* it will match ()'s */
-				}
-				else
-				{
-					int col = (int)real(const_express(&a));
-					if (col < -2)
-						int_error("Column must be >= -2", c_token);
-					use_spec[df_no_use_specs++].column = col;
-				}
-			} while (equals(c_token,":") && ++c_token);
-		}
-	
-		if (!END_OF_COMMAND && isstring(c_token)) {
-			if (df_binary)
-				int_error("Format string meaningless with binary data",NO_CARET);
-				
-			quote_str(df_format, c_token, MAX_LINE_LEN);
-			if (!valid_format( df_format))
-				int_error( "Please use a double conversion %lf", c_token);
-					    		      
-			c_token++;	/* skip format */
-		}
-	}
-	/*}}}*/
+    /*{{{  more variable inits */
+    point_count = -1;		/* we preincrement */
+    line_count = 0;
 
-	/*{{{  more variable inits*/
-	point_count = -1;  /* we preincrement */
-	line_count = 0;
-	
-	/* here so it's not done for every line in df_readline */
-	if (max_line_len < 160)
-		line = (char *)gp_alloc(max_line_len=160, "datafile line buffer");
-	
-	
-	/*}}}*/
+    /* here so it's not done for every line in df_readline */
+    if (max_line_len < 160)
+	line = (char *) gp_alloc(max_line_len = 160, "datafile line buffer");
 
 
-/*{{{  open file*/
+    /*}}} */
+
+
+/*{{{  open file */
 #if defined(PIPES)
-	if (*filename == '<') {
-		if ((data_fp = popen(filename + 1, "r")) == (FILE *) NULL)
-			os_error("cannot create pipe for data", name_token);
-		else
-			pipe_open = TRUE;
-	} else
+    if (*filename == '<') {
+	if ((data_fp = popen(filename + 1, "r")) == (FILE *) NULL)
+	    os_error("cannot create pipe for data", name_token);
+	else
+	    pipe_open = TRUE;
+    } else
 #endif /* PIPES */
-	if (*filename == '-'){
-		data_fp=lf_top();
-		if(!data_fp) data_fp=stdin;
-		mixed_data_fp=TRUE; /* don't close command file */
-	} else
-		if ((data_fp = fopen(filename, df_binary ? "rb" : "r")) == (FILE *) NULL)
-		{
-			/* one day we will have proper printf-style error reporting fns */
-			char msg[160];
-			sprintf(msg, "can't read data file \"%s\"", filename);
-			os_error(msg, name_token);
-		}
-/*}}}*/
+    if (*filename == '-') {
+	data_fp = lf_top();
+	if (!data_fp)
+	    data_fp = stdin;
+	mixed_data_fp = TRUE;	/* don't close command file */
+    } else {
+	char msg[MAX_LINE_LEN+1];
+#ifdef HAVE_SYS_STAT_H
+	struct stat statbuf;
 
-	return df_no_use_specs;
+	if ((stat(filename, &statbuf) > -1) &&
+	    !S_ISREG(statbuf.st_mode) && !S_ISFIFO(statbuf.st_mode)) {
+	    sprintf(msg, "\"%s\" is not a regular file or pipe", filename);
+	    os_error(msg, name_token);
+	}
+#endif /* HAVE_SYS_STAT_H */
+	if ((data_fp = fopen(filename, df_binary ? "rb" : "r")) == (FILE *) NULL) {
+	    /* one day we will have proper printf-style error reporting fns */
+	    sprintf(msg, "can't read data file \"%s\"", filename);
+	    os_error(msg, name_token);
+	}
+    }
+/*}}} */
+
+    return df_no_use_specs;
 }
-/*}}}*/
+/*}}} */
 
-/*{{{  void df_close()*/
+/*{{{  void df_close() */
 void df_close()
 {
-	int i;
+    int i;
+    /* paranoid - mark $n and column(n) as invalid */
+    df_no_cols = 0;
 
-	df_no_cols = 0;  /* paranoid - mark $n and column(n) as invalid */
+    if (!data_fp)
+	return;
 
-	if (!data_fp)
-		return;
-
-	if (ydata_func.at) {
-		free(ydata_func.at);
-		ydata_func.at = NULL;
+    if (ydata_func.at) {
+	free(ydata_func.at);
+	ydata_func.at = NULL;
+    }
+    /*{{{  free any use expression storage */
+    for (i = 0; i < df_no_use_specs; ++i)
+	if (use_spec[i].at) {
+	    free(use_spec[i].at);
+	    use_spec[i].at = NULL;
 	}
-	
-	/*{{{  free any use expression storage*/
-	for (i=0; i<df_no_use_specs; ++i)
-		if (use_spec[i].at)
-		{
-			free(use_spec[i].at);
-			use_spec[i].at = NULL;
-		}
-	/*}}}*/
+    /*}}} */
 
-	if(!mixed_data_fp) {
+    if (!mixed_data_fp) {
 #if defined(PIPES)
-		if (pipe_open) {
-						(void) pclose(data_fp);
-									pipe_open = FALSE;
-		} else
+	if (pipe_open) {
+	    (void) pclose(data_fp);
+	    pipe_open = FALSE;
+	} else
 #endif /* PIPES */
-		(void) fclose(data_fp);
-	}
-		mixed_data_fp=FALSE;
-			data_fp=NULL;
-}	
-/*}}}*/
+	    (void) fclose(data_fp);
+    }
+    mixed_data_fp = FALSE;
+    data_fp = NULL;
+}
 
-/*{{{  int df_readline(v, max)*/
+/*}}} */
+
+/*{{{  int df_readline(v, max) */
 /* do the hard work... read lines from file,
  * - use blanks to get index number
  * - ignore lines outside range of indices required
  * - fill v[] based on using spec if given
  */
- 
+
 int df_readline(v, max)
 double v[];
 int max;
 {
-	char *s;
-	
-	assert(data_fp != NULL);
-	assert(!df_binary);
-	assert(max_line_len); /* alloc-ed in df_open() */
-	assert(max <= NCOL);
+    char *s;
 
-	/* catch attempt to read past EOF on mixed-input */
-	if (df_eof)
-		return DF_EOF;
+    assert(data_fp != NULL);
+    assert(!df_binary);
+    assert(max_line_len);	/* alloc-ed in df_open() */
+    assert(max <= NCOL);
 
-	while ( (s=df_gets()) != NULL)	
-		/*{{{  process line*/
-		{
-			int line_okay = 1;
-			int output=0;  /* how many numbers written to v[] */
-			
-			++df_line_number;
-			df_no_cols = 0;
-			
-			/*{{{  check for blank lines, and reject by index/every*/
-			/*{{{  skip leading spaces*/
-			while (isspace(*s))
-				++s;  /* will skip the \n too, to point at \0  */
-			/*}}}*/
-				
-			/*{{{  skip comments*/
-			if (is_comment(*s))
-			   	continue;		/* ignore comments */
-			/*}}}*/
-			
-			/*{{{  check EOF on mixed data*/
-			if (mixed_data_fp && is_EOF(*s))
-			{
-				df_eof=1;  /* trap attempts to read past EOF */
-				return DF_EOF;
-			}
-			/*}}}*/
-			
-			if (*s==0)
-				/*{{{  its a blank line - update counters and continue or return*/
-				{
-					/* argh - this is complicated !  we need to
-					 *   ignore it if we haven't reached first index
-					 *   report EOF if passed last index
-					 *   report blank line unless we've already done 2 blank lines
-					 *
-					 * - I have probably missed some obvious way of doing all this,
-					 * but its getting late
-					 */
-				
-					point_count=-1;  /* restart counter within line */
-				
-					if (++blank_count==1) {
-						/* first blank line */
-						++line_count;
-					}
-					
-					if (blank_count == 2)
-					{	/* just reached end of a group/surface */
-						++df_current_index;
-						line_count = 0;
-						df_datum = -1;
-						/* ignore line if current_index has just become
-						 * first required one - client doesn't want this
-						 * blank line. While we're here, check for <=
-						 * - we need to do it outside this conditional, but
-						 * probably no extra cost at assembler level
-						 */
-						if (df_current_index <= df_lower_index)
-							continue;  /* dont tell client */
-				
-						/* df_upper_index is MAXINT-1 if we are not doing index */
-						if (df_current_index > df_upper_index)
-						{
-							/* oops - need to gobble rest of input if mixed */
-							if (mixed_data_fp)
-								continue;
-							else
-							{
-								df_eof=1;
-								return DF_EOF; /* no point continuing */
-							}
-						}
-					}
-				
-					/* dont tell client if we haven't reached first index */
-					if (df_current_index < df_lower_index)
-						continue;
-				
-					/* ignore blank lines after blank_index */
-					if (blank_count > 2)
-						continue;
-				
-					return DF_FIRST_BLANK - (blank_count-1);
-				}
-				/*}}}*/
-			
-			/* get here => was not blank */
-				
-			blank_count = 0;
-			
-			/*{{{  ignore points outside range of index*/
-			/* we try to return end-of-file as soon as we pass upper index,
-			 * but for mixed input stream, we must skip garbage
-			 */
-			 
-			if (df_current_index < df_lower_index ||
-			    df_current_index > df_upper_index ||
-			     ((df_current_index - df_lower_index)%df_index_step) != 0)
-				continue;
-			/*}}}*/
-			
-			/*{{{  reject points by every*/
-			/* accept only lines with (line_count%everyline)==0 */
-			
-			if (line_count<firstline || line_count > lastline ||
-			    (line_count-firstline)%everyline != 0
-			   )
-				continue;
-			
-			/* update point_count. ignore point if point_count%everypoint != 0 */
-			
-			if (++point_count < firstpoint || point_count > lastpoint ||
-			    (point_count-firstpoint)%everypoint != 0
-			   )
-				continue;
-			/*}}}*/
-			/*}}}*/
-		
-			++df_datum;
-			
-			if (*df_format)
-				/*{{{  do a sscanf*/
-				{
-					int i;
-				
-					assert(NCOL==7);
-					
-					/* check we have room for at least 7 columns */
-					if (df_max_cols < 7)
-						df_column = (df_column_struct *)gp_realloc(df_column, (df_max_cols=7)*sizeof(df_column_struct), "datafile columns");
-				
-					df_no_cols = sscanf(line, df_format,
-					   &df_column[0].datum,
-					   &df_column[1].datum,
-					   &df_column[2].datum,
-					   &df_column[3].datum,
-					   &df_column[4].datum,
-					   &df_column[5].datum,
-					   &df_column[6].datum);
-				
-					if (df_no_cols == EOF)
-					{
-						df_eof=1;
-						return DF_EOF;  /* tell client */
-					}
-					for (i=0; i < df_no_cols; ++i ) /* may be zero */
-					{	df_column[i].good=DF_GOOD;
-						df_column[i].position=NULL;  /* cant get a time */
-					}
-				}
-				/*}}}*/
-			else
-				df_tokenise(s);
-		
-			/*{{{  copy column[] to v[] via use[]*/
-			{
-				int limit=(df_no_use_specs ? df_no_use_specs : NCOL);
-				if (limit>max)
-					limit=max;
-				
-				for (output=0; output<limit; ++output)
-				{
-					/* if there was no using spec, column is output+1 and at=NULL */
-					int column=use_spec[output].column;
-			
-					if (use_spec[output].at)
-					{	struct  value a;
-						/* no dummy values to set up prior to... */
-						evaluate_at(use_spec[output].at, &a);
-						if (undefined)
-							return DF_UNDEFINED;  /* store undefined point in plot */
-							
-						v[output]=real(&a);
-					}
-					else if (column == -2)
-					{
-						v[output] = df_current_index;
-					}
-					else if (column == -1)
-					{
-						v[output] = line_count;
-					}
-					else if (column == 0)
-					{
-						v[output] = df_datum;	/* using 0 */
-					}
-					else if (column <= 0) /* really < -2, but */
-						int_error("internal error: column <= 0 in datafile.c", NO_CARET);
-					else if (df_timecol[output])
-					{	struct tm tm;
-						if (column > df_no_cols ||
-						    df_column[column-1].good == DF_MISSING ||
-						    !df_column[column-1].position ||
-						    !gstrptime(df_column[column-1].position,timefmt,&tm)
-						   )
-						{
-							/* line bad only if user explicitly asked for this column */
-							if (df_no_use_specs)
-								line_okay=0;
-			
-							/* return or ignore line depending on line_okay */
-							break;
-						}
-						v[output] = (double) gtimegm(&tm);
-					}
-					else  /* column > 0 */
-					{
-						if ( (column <= df_no_cols) && df_column[column-1].good==DF_GOOD)
-							v[output] = df_column[column-1].datum;
-						else
-						{
-							/* line bad only if user explicitly asked for this column */
-							if (df_no_use_specs)
-								line_okay=0;
-							break;  /* return or ignore depending on line_okay */ 
-						}
-					}
-				}
-			}
-			/*}}}*/
-		
-			if (!line_okay)
-				continue;
-		
-			/* output == df_no_use_specs if using was specified
-			 * - actually, smaller of df_no_use_specs and max
-			 */
-			assert (df_no_use_specs==0 || output==df_no_use_specs || output==max);
-			
-			return output;
-		
-		}
-		/*}}}*/
-
-	/* get here => fgets failed */
-
-	df_no_cols = 0;  /* no longer needed - mark column(x) as invalid */
-	df_eof=1;
+    /* catch attempt to read past EOF on mixed-input */
+    if (df_eof)
 	return DF_EOF;
-}
-/*}}}*/
 
-/*{{{  int df_2dbinary(this_plot)*/
+    while ((s = df_gets()) != NULL)
+	/*{{{  process line */
+    {
+	int line_okay = 1;
+	int output = 0;		/* how many numbers written to v[] */
+
+	++df_line_number;
+	df_no_cols = 0;
+
+	/*{{{  check for blank lines, and reject by index/every */
+	/*{{{  skip leading spaces */
+	while (isspace((int)*s))
+	    ++s;		/* will skip the \n too, to point at \0  */
+	/*}}} */
+
+	/*{{{  skip comments */
+	if (is_comment(*s))
+	    continue;		/* ignore comments */
+	/*}}} */
+
+	/*{{{  check EOF on mixed data */
+	if (mixed_data_fp && is_EOF(*s)) {
+	    df_eof = 1;		/* trap attempts to read past EOF */
+	    return DF_EOF;
+	}
+	/*}}} */
+
+	/*{{{  its a blank line - update counters and continue or return */
+	if (*s == 0) {
+	    /* argh - this is complicated !  we need to
+	     *   ignore it if we haven't reached first index
+	     *   report EOF if passed last index
+	     *   report blank line unless we've already done 2 blank lines
+	     *
+	     * - I have probably missed some obvious way of doing all this,
+	     * but its getting late
+	     */
+
+	    point_count = -1;	/* restart counter within line */
+
+	    if (++blank_count == 1) {
+		/* first blank line */
+		++line_count;
+	    }
+
+	    /* just reached end of a group/surface */
+	    if (blank_count == 2) {
+		++df_current_index;
+		line_count = 0;
+		df_datum = -1;
+		/* ignore line if current_index has just become
+		 * first required one - client doesn't want this
+		 * blank line. While we're here, check for <=
+		 * - we need to do it outside this conditional, but
+		 * probably no extra cost at assembler level
+		 */
+		if (df_current_index <= df_lower_index)
+		    continue;	/* dont tell client */
+
+		/* df_upper_index is MAXINT-1 if we are not doing index */
+		if (df_current_index > df_upper_index) {
+		    /* oops - need to gobble rest of input if mixed */
+		    if (mixed_data_fp)
+			continue;
+		    else {
+			df_eof = 1;
+			return DF_EOF;	/* no point continuing */
+		    }
+		}
+	    }
+	    /* dont tell client if we haven't reached first index */
+	    if (df_current_index < df_lower_index)
+		continue;
+
+	    /* ignore blank lines after blank_index */
+	    if (blank_count > 2)
+		continue;
+
+	    return DF_FIRST_BLANK - (blank_count - 1);
+	}
+	/*}}} */
+
+	/* get here => was not blank */
+
+	blank_count = 0;
+
+	/*{{{  ignore points outside range of index */
+	/* we try to return end-of-file as soon as we pass upper index,
+	 * but for mixed input stream, we must skip garbage
+	 */
+
+	if (df_current_index < df_lower_index ||
+	    df_current_index > df_upper_index ||
+	    ((df_current_index - df_lower_index) % df_index_step) != 0)
+	    continue;
+	/*}}} */
+
+	/*{{{  reject points by every */
+	/* accept only lines with (line_count%everyline) == 0 */
+
+	if (line_count < firstline || line_count > lastline ||
+	    (line_count - firstline) % everyline != 0
+	    )
+	    continue;
+
+	/* update point_count. ignore point if point_count%everypoint != 0 */
+
+	if (++point_count < firstpoint || point_count > lastpoint ||
+	    (point_count - firstpoint) % everypoint != 0
+	    )
+	    continue;
+	/*}}} */
+	/*}}} */
+
+	++df_datum;
+
+	/*{{{  do a sscanf */
+	if (*df_format)	{
+	    int i;
+
+	    assert(NCOL == 7);
+
+	    /* check we have room for at least 7 columns */
+	    if (df_max_cols < 7)
+		df_column = (df_column_struct *) gp_realloc(df_column, (df_max_cols = 7) * sizeof(df_column_struct), "datafile columns");
+
+	    df_no_cols = sscanf(line, df_format,
+				&df_column[0].datum,
+				&df_column[1].datum,
+				&df_column[2].datum,
+				&df_column[3].datum,
+				&df_column[4].datum,
+				&df_column[5].datum,
+				&df_column[6].datum);
+
+	    if (df_no_cols == EOF) {
+		df_eof = 1;
+		return DF_EOF;	/* tell client */
+	    }
+	    for (i = 0; i < df_no_cols; ++i) {	/* may be zero */
+		df_column[i].good = DF_GOOD;
+		df_column[i].position = NULL;	/* cant get a time */
+	    }
+	}
+	/*}}} */
+	else
+	    df_tokenise(s);
+
+	/*{{{  copy column[] to v[] via use[] */
+	{
+	    int limit = (df_no_use_specs ? df_no_use_specs : NCOL);
+	    if (limit > max)
+		limit = max;
+
+	    for (output = 0; output < limit; ++output) {
+		/* if there was no using spec, column is output+1 and at=NULL */
+		int column = use_spec[output].column;
+
+		if (use_spec[output].at) {
+		    struct value a;
+		    /* no dummy values to set up prior to... */
+		    evaluate_at(use_spec[output].at, &a);
+		    if (undefined)
+			return DF_UNDEFINED;	/* store undefined point in plot */
+
+		    v[output] = real(&a);
+		} else if (column == -2) {
+		    v[output] = df_current_index;
+		} else if (column == -1) {
+		    v[output] = line_count;
+		} else if (column == 0) {
+		    v[output] = df_datum;	/* using 0 */
+		} else if (column <= 0)		/* really < -2, but */
+		    int_error("internal error: column <= 0 in datafile.c", NO_CARET);
+		else if (df_timecol[output]) {
+		    struct tm tm;
+		    if (column > df_no_cols ||
+			df_column[column - 1].good == DF_MISSING ||
+			!df_column[column - 1].position ||
+			!gstrptime(df_column[column - 1].position, timefmt, &tm)
+			) {
+			/* line bad only if user explicitly asked for this column */
+			if (df_no_use_specs)
+			    line_okay = 0;
+
+			/* return or ignore line depending on line_okay */
+			break;
+		    }
+		    v[output] = (double) gtimegm(&tm);
+		} else {	/* column > 0 */
+		    if ((column <= df_no_cols) && df_column[column - 1].good == DF_GOOD)
+			v[output] = df_column[column - 1].datum;
+		    else {
+			/* line bad only if user explicitly asked for this column */
+			if (df_no_use_specs)
+			    line_okay = 0;
+			break;	/* return or ignore depending on line_okay */
+		    }
+		}
+	    }
+	}
+	/*}}} */
+
+	if (!line_okay)
+	    continue;
+
+	/* output == df_no_use_specs if using was specified
+	 * - actually, smaller of df_no_use_specs and max
+	 */
+	assert(df_no_use_specs == 0 || output == df_no_use_specs || output == max);
+
+	return output;
+
+    }
+    /*}}} */
+
+    /* get here => fgets failed */
+
+    /* no longer needed - mark column(x) as invalid */
+    df_no_cols = 0;
+
+    df_eof = 1;
+    return DF_EOF;
+}
+/*}}} */
+
+/*{{{  int df_2dbinary(this_plot) */
 int df_2dbinary(this_plot)
 struct curve_points *this_plot;
 {
-	int_error("Binary file format for 2d data not yet defined", NO_CARET);
-	return 0;  /* keep compiler happy */
+    int_error("Binary file format for 2d data not yet defined", NO_CARET);
+    return 0;			/* keep compiler happy */
 }
-/*}}}*/
+/*}}} */
 
-/*{{{  int df_3dmatrix(this_plot, ret_this_iso)*/
+/*{{{  int df_3dmatrix(this_plot, ret_this_iso) */
 /*
  * formerly in gnubin.c
  *
@@ -1072,11 +1039,11 @@ struct curve_points *this_plot;
  * Trouble figuring out file format ! Is it
 
  width  x1  x2  x3  x4  x5 ...
-   y1   z11 z12 z13 z14 z15 ...
-   y2   x21 z22 z23 .....
-   .    .
-   .        .
-   .             .
+ y1   z11 z12 z13 z14 z15 ...
+ y2   x21 z22 z23 .....
+ .    .
+ .        .
+ .             .
 
  * with perhaps x and y swapped...
  *
@@ -1093,390 +1060,356 @@ struct curve_points *this_plot;
  */
 
 /*
-  Here we keep putting new plots onto the end of the linked list
+   Here we keep putting new plots onto the end of the linked list
 
-  We assume the data's x,y values have x1<x2, x2<x3... and 
-                                       y1<y2, y2<y3... .
-  Actually, I think the assumption is less strong than that--it looks like
-  the direction just has to be the same.
-  This routine expects the following to be properly initialized:
-      is_log_x, is_log_y, and is_log_z 
-      base_log_x, base_log_y, and base_log_z 
-      log_base_log_x, log_base_log_y, and log_base_log_z 
-      xmin,ymin, and zmin
-      xmax,ymax, and zmax
-      autoscale_lx, autoscale_ly, and autoscale_lz
+   We assume the data's x,y values have x1<x2, x2<x3... and 
+   y1<y2, y2<y3... .
+   Actually, I think the assumption is less strong than that--it looks like
+   the direction just has to be the same.
+   This routine expects the following to be properly initialized:
+   is_log_x, is_log_y, and is_log_z 
+   base_log_x, base_log_y, and base_log_z 
+   log_base_log_x, log_base_log_y, and log_base_log_z 
+   xmin,ymin, and zmin
+   xmax,ymax, and zmax
+   autoscale_lx, autoscale_ly, and autoscale_lz
 
-      does the autoscaling into the array versions (min_array[], max_array[])
-*/
+   does the autoscaling into the array versions (min_array[], max_array[])
+ */
 
-int
-  df_3dmatrix(this_plot)
+int df_3dmatrix(this_plot)
 struct surface_points *this_plot;
 {
-	float GPFAR * GPFAR *matrix, GPFAR *rt, GPFAR *ct;
-	int nr,nc;
-	int width,height;
-	int row,col;
-	struct iso_curve *this_iso;
-	double used[3]; /* output from using manip */
-	struct coordinate GPHUGE *point; /* HBB 980308: added 'GPHUGE' flag */
-	
-	assert(df_matrix);
-	
-	if (df_eof)
-		return 0; /* hope caller understands this */
+    float GPFAR *GPFAR * dmatrix, GPFAR * rt, GPFAR * ct;
+    int nr, nc;
+    int width, height;
+    int row, col;
+    struct iso_curve *this_iso;
+    double used[3];		/* output from using manip */
+    struct coordinate GPHUGE *point;	/* HBB 980308: added 'GPHUGE' flag */
 
-	if (df_binary)
-	{
-		if(!fread_matrix(data_fp,&matrix,&nr,&nc,&rt,&ct))
-			int_error("Binary file read error: format unknown!",NO_CARET);
-		/* fread_matrix() drains the file */
-		df_eof=1;
+    assert(df_matrix);
+
+    if (df_eof)
+	return 0;		/* hope caller understands this */
+
+    if (df_binary) {
+	if (!fread_matrix(data_fp, &dmatrix, &nr, &nc, &rt, &ct))
+	    int_error("Binary file read error: format unknown!", NO_CARET);
+	/* fread_matrix() drains the file */
+	df_eof = 1;
+    } else {
+	if (!(dmatrix = df_read_matrix(&nr, &nc))) {
+	    df_eof = 1;
+	    return 0;
 	}
-	else
-	{
-		if (!(matrix = df_read_matrix(&nr, &nc)))
-		{
-			df_eof=1;
-			return 0;
+	rt = NULL;
+	ct = NULL;
+    }
+
+    if (nc == 0 || nr == 0)
+	int_error("Read grid of zero height or zero width", NO_CARET);
+
+    this_plot->plot_type = DATA3D;
+    this_plot->has_grid_topology = TRUE;
+
+    if (df_no_use_specs != 0 && df_no_use_specs != 3)
+	int_error("Current implementation requires full using spec", NO_CARET);
+
+    if (df_max_cols < 3 &&
+	!(df_column = (df_column_struct *) gp_realloc(df_column, (df_max_cols = 3) * sizeof(df_column_struct), "datafile columns"))
+	)
+	int_error("Out of store in binary read", c_token);
+
+    df_no_cols = 3;
+    df_column[0].good = df_column[1].good = df_column[2].good = DF_GOOD;
+
+    assert(everyline > 0);
+    assert(everypoint > 0);
+    width = (nc - firstpoint + everypoint - 1) / everypoint;	/* ? ? ? ? ? */
+    height = (nr - firstline + everyline - 1) / everyline;	/* ? ? ? ? ? */
+
+    for (row = firstline; row < nr; row += everyline) {
+	df_column[1].datum = rt ? rt[row] : row;
+
+	/*Allocate the correct number of entries */
+	this_iso = iso_alloc(width);
+
+	point = this_iso->points;
+
+	/* Cycle through data */
+	for (col = firstpoint; col < nc; col += everypoint, ++point) {
+	    /*{{{  process one point */
+	    int i;
+
+	    df_column[0].datum = ct ? ct[col] : col;
+	    df_column[2].datum = dmatrix[row][col];
+
+	    /*{{{  pass through using spec */
+	    for (i = 0; i < 3; ++i) {
+		int column = use_spec[i].column;
+
+		if (df_no_use_specs == 0)
+		    used[i] = df_column[i].datum;
+		else if (use_spec[i].at) {
+		    struct value a;
+		    evaluate_at(use_spec[i].at, &a);
+		    if (undefined) {
+			point->type = UNDEFINED;
+			goto skip;	/* continue _outer_ loop */
+		    }
+		    used[i] = real(&a);
+		} else if (column < 1 || column > df_no_cols) {
+		    point->type = UNDEFINED;
+		    goto skip;
+		} else
+		    used[i] = df_column[column - 1].datum;
+	    }
+	    /*}}} */
+
+	    point->type = INRANGE;	/* so far */
+
+	    /*{{{  autoscaling/clipping */
+	    /*{{{  autoscale/range-check x */
+	    if (used[0] > 0 || !is_log_x) {
+		if (used[0] < min_array[FIRST_X_AXIS]) {
+		    if (autoscale_lx & 1)
+			min_array[FIRST_X_AXIS] = used[0];
+		    else
+			point->type = OUTRANGE;
 		}
-		rt=NULL;
-		ct=NULL;
-	}
-
-	if (nc==0 || nr==0)
-		int_error("Read grid of zero height or zero width", NO_CARET);
-	
-	this_plot->plot_type = DATA3D;
-	this_plot->has_grid_topology = TRUE;
-	
-	if (df_no_use_specs != 0 && df_no_use_specs != 3)
-			int_error("Current implementation requires full using spec",NO_CARET);
-
-	if (df_max_cols < 3 &&
-	    !(df_column = (df_column_struct *)gp_realloc(df_column, (df_max_cols=3)*sizeof(df_column_struct), "datafile columns"))
-	   )
-	   int_error("Out of store in binary read", c_token);
-
-	df_no_cols=3;
-	df_column[0].good=df_column[1].good=df_column[2].good=DF_GOOD;
-	
-	assert(everyline > 0);
-	assert(everypoint > 0);
-	width=(nc-firstpoint+everypoint-1)/everypoint; /* ? ? ? ? ? */
-	height=(nr-firstline+everyline-1)/everyline; /* ? ? ? ? ? */
-	
-	for(row=firstline; row < nr; row+=everyline){
-		df_column[1].datum=rt ? rt[row] : row;
-
-		this_iso = iso_alloc(width);/*Allocate the correct number of entries*/
-		point=this_iso->points;
-
-		for(col = firstpoint; col< nc; col+=everypoint, ++point){/* Cycle through data */
-			/*{{{  process one point*/
-			int i;
-			
-			df_column[0].datum=ct ? ct[col] : col;
-			df_column[2].datum=matrix[row][col];
-			
-			/*{{{  pass through using spec*/
-			for (i=0; i<3; ++i)
-			{
-				int column=use_spec[i].column;
-			
-				if (df_no_use_specs==0)
-					used[i]=df_column[i].datum;
-				else if (use_spec[i].at)
-				{
-					struct value a;
-					evaluate_at(use_spec[i].at, &a);
-					if (undefined)
-					{
-						point->type=UNDEFINED;
-						goto skip;  /* continue _outer_ loop */
-					}
-					used[i]=real(&a);
-				}
-				else if (column < 1 || column > df_no_cols)
-				{
-					point->type=UNDEFINED;
-					goto skip;
-				}
-				else
-					used[i]=df_column[column-1].datum;
-			}
-			/*}}}*/
-			
-			point->type=INRANGE; /* so far */
-			
-			/*{{{  autoscaling/clipping*/
-			/*{{{  autoscale/range-check x*/
-			if (used[0]>0 || !is_log_x)
-			{
-				if (used[0] < min_array[FIRST_X_AXIS])
-				{	if (autoscale_lx & 1)
-						min_array[FIRST_X_AXIS] = used[0];
-					else
-						point->type=OUTRANGE;
-				}
-			
-				if (used[0] > max_array[FIRST_X_AXIS])
-				{	if (autoscale_lx & 2)
-						max_array[FIRST_X_AXIS] = used[0];
-					else
-						point->type=OUTRANGE;
-				}
-			}
-			/*}}}*/
-			
-			/*{{{  autoscale/range-check y*/
-			if (used[1]>0 || !is_log_y)
-			{
-				if (used[1] < min_array[FIRST_Y_AXIS])
-				{	if (autoscale_ly & 1)
-						min_array[FIRST_Y_AXIS] = used[1];
-					else
-						point->type=OUTRANGE;
-				}
-			
-				if (used[1] > max_array[FIRST_Y_AXIS])
-				{	if (autoscale_ly & 2)
-						max_array[FIRST_Y_AXIS] = used[1];
-					else
-						point->type=OUTRANGE;
-				}
-			}
-			/*}}}*/
-			
-			/*{{{  autoscale/range-check z*/
-			if (used[2]>0 || !is_log_z)
-			{
-				if (used[2] < min_array[FIRST_Z_AXIS])
-				{	if (autoscale_lz & 1)
-						min_array[FIRST_Z_AXIS] = used[2];
-					else
-						point->type=OUTRANGE;
-				}
-			
-				if (used[2] > max_array[FIRST_Z_AXIS])
-				{	if (autoscale_lz & 2)
-						max_array[FIRST_Z_AXIS] = used[2];
-					else
-						point->type=OUTRANGE;
-				}
-			}
-			/*}}}*/
-			/*}}}*/
-			
-			/*{{{  log x*/
-			if (is_log_x)
-			{
-				if (used[0] < 0.0)
-				{
-					point->type = UNDEFINED;
-					goto skip;
-				}
-				else if (used[0] == 0.0)
-				{
-					point->type = OUTRANGE;
-					used[0]=-VERYLARGE;
-				}
-				else
-					used[0] = log(used[0])/log_base_log_x;
-			}
-			/*}}}*/
-			
-			/*{{{  log y*/
-			if (is_log_y)
-			{
-				if (used[1] < 0.0)
-				{
-					point->type = UNDEFINED;
-					goto skip;
-				}
-				else if (used[1] == 0.0)
-				{
-					point->type=OUTRANGE;
-					used[1]=-VERYLARGE;
-				}
-				else
-					used[1] = log(used[1])/log_base_log_y;
-			}
-			/*}}}*/
-			
-			/*{{{  log z*/
-			if (is_log_z)
-			{
-				if (used[2] < 0.0)
-				{
-					point->type = UNDEFINED;
-					goto skip;
-				}
-				else if (used[2]==0.0)
-				{
-					point->type = OUTRANGE;
-					used[2]=-VERYLARGE;
-				}
-				else
-					used[2] = log(used[2])/log_base_log_z;
-			}
-			/*}}}*/
-			
-			point->x = used[0];
-			point->y = used[1];
-			point->z = used[2];
-					
-				
-			/* some of you wont like this, but I say goto is for this */
-			
-			skip:
-				; /* ansi requires this */
-			/*}}}*/
+		if (used[0] > max_array[FIRST_X_AXIS]) {
+		    if (autoscale_lx & 2)
+			max_array[FIRST_X_AXIS] = used[0];
+		    else
+			point->type = OUTRANGE;
 		}
-		this_iso->p_count = width;
-		this_iso->next = this_plot->iso_crvs;
-		this_plot->iso_crvs = this_iso;
-		this_plot->num_iso_read++;
+	    }
+	    /*}}} */
+
+	    /*{{{  autoscale/range-check y */
+	    if (used[1] > 0 || !is_log_y) {
+		if (used[1] < min_array[FIRST_Y_AXIS]) {
+		    if (autoscale_ly & 1)
+			min_array[FIRST_Y_AXIS] = used[1];
+		    else
+			point->type = OUTRANGE;
+		}
+		if (used[1] > max_array[FIRST_Y_AXIS]) {
+		    if (autoscale_ly & 2)
+			max_array[FIRST_Y_AXIS] = used[1];
+		    else
+			point->type = OUTRANGE;
+		}
+	    }
+	    /*}}} */
+
+	    /*{{{  autoscale/range-check z */
+	    if (used[2] > 0 || !is_log_z) {
+		if (used[2] < min_array[FIRST_Z_AXIS]) {
+		    if (autoscale_lz & 1)
+			min_array[FIRST_Z_AXIS] = used[2];
+		    else
+			point->type = OUTRANGE;
+		}
+		if (used[2] > max_array[FIRST_Z_AXIS]) {
+		    if (autoscale_lz & 2)
+			max_array[FIRST_Z_AXIS] = used[2];
+		    else
+			point->type = OUTRANGE;
+		}
+	    }
+	    /*}}} */
+	    /*}}} */
+
+	    /*{{{  log x */
+	    if (is_log_x) {
+		if (used[0] < 0.0) {
+		    point->type = UNDEFINED;
+		    goto skip;
+		} else if (used[0] == 0.0) {
+		    point->type = OUTRANGE;
+		    used[0] = -VERYLARGE;
+		} else
+		    used[0] = log(used[0]) / log_base_log_x;
+	    }
+	    /*}}} */
+
+	    /*{{{  log y */
+	    if (is_log_y) {
+		if (used[1] < 0.0) {
+		    point->type = UNDEFINED;
+		    goto skip;
+		} else if (used[1] == 0.0) {
+		    point->type = OUTRANGE;
+		    used[1] = -VERYLARGE;
+		} else
+		    used[1] = log(used[1]) / log_base_log_y;
+	    }
+	    /*}}} */
+
+	    /*{{{  log z */
+	    if (is_log_z) {
+		if (used[2] < 0.0) {
+		    point->type = UNDEFINED;
+		    goto skip;
+		} else if (used[2] == 0.0) {
+		    point->type = OUTRANGE;
+		    used[2] = -VERYLARGE;
+		} else
+		    used[2] = log(used[2]) / log_base_log_z;
+	    }
+	    /*}}} */
+
+	    point->x = used[0];
+	    point->y = used[1];
+	    point->z = used[2];
+
+
+	    /* some of you wont like this, but I say goto is for this */
+
+	  skip:
+	    ;			/* ansi requires this */
+	    /*}}} */
 	}
-	
-	free_matrix(matrix,0,nr-1,0,nc-1);
-	if (rt) free_vector(rt,0,nr-1);
-	if (ct) free_vector(ct,0,nc-1);
-	return(nc);
+	this_iso->p_count = width;
+	this_iso->next = this_plot->iso_crvs;
+	this_plot->iso_crvs = this_iso;
+	this_plot->num_iso_read++;
+    }
+
+    free_matrix(dmatrix, 0, nr - 1, 0, nc - 1);
+    if (rt)
+	free_vector(rt, 0, nr - 1);
+    if (ct)
+	free_vector(ct, 0, nc - 1);
+    return (nc);
 }
-/*}}}*/
+/*}}} */
 
 /* stuff for implementing the call-backs for picking up data values
  * do it here so we can make the variables private to this file
  */
 
-/*{{{  void f_dollars(x)*/
+/*{{{  void f_dollars(x) */
 void f_dollars(x)
 union argument *x;
 {
-	int column = x->v_arg.v.int_val - 1;
-		/* we checked it was an integer >= 0 at compile time */
-	struct value a;
+    int column = x->v_arg.v.int_val - 1;
+    /* we checked it was an integer >= 0 at compile time */
+    struct value a;
 
-	if (column==-1)
-	{
-		push ( Gcomplex(&a, (double)df_datum, 0.0));  /* $0 */
-	}
-	else if (column >= df_no_cols || df_column[column].good != DF_GOOD)
-	{	undefined = TRUE;
-		push (&(x->v_arg));  /* this okay ? */
-	}
-	else
-		push( Gcomplex(&a, df_column[column].datum, 0.0) );
+    if (column == -1) {
+	push(Gcomplex(&a, (double) df_datum, 0.0));	/* $0 */
+    } else if (column >= df_no_cols || df_column[column].good != DF_GOOD) {
+	undefined = TRUE;
+	push(&(x->v_arg));	/* this okay ? */
+    } else
+	push(Gcomplex(&a, df_column[column].datum, 0.0));
 }
-/*}}}*/
+/*}}} */
 
-/*{{{  void f_column()*/
+/*{{{  void f_column() */
 void f_column()
 {
-	struct value a;
-	int column;
-	(void) pop(&a);
-	column = (int) real(&a) - 1;
-	if (column == -2)
-		push( Ginteger(&a, line_count) );
-	else if (column == -1) /* $0 = df_datum */
-		push( Gcomplex(&a, (double) df_datum, 0.0) );
-	else if (column < 0 || column >= df_no_cols || df_column[column].good!=DF_GOOD)
-	{	undefined = TRUE;
-		push (&a);  /* any objection to this ? */
-	}
-	else
-		push( Gcomplex(&a, df_column[column].datum, 0.0) );
+    struct value a;
+    int column;
+    (void) pop(&a);
+    column = (int) real(&a) - 1;
+    if (column == -2)
+	push(Ginteger(&a, line_count));
+    else if (column == -1)	/* $0 = df_datum */
+	push(Gcomplex(&a, (double) df_datum, 0.0));
+    else if (column < 0 || column >= df_no_cols || df_column[column].good != DF_GOOD) {
+	undefined = TRUE;
+	push(&a);		/* any objection to this ? */
+    } else
+	push(Gcomplex(&a, df_column[column].datum, 0.0));
 }
-/*}}}*/
+/*}}} */
 
-/*{{{  void f_valid()*/
+/*{{{  void f_valid() */
 void f_valid()
 {
-	struct value a;
-	int column,good;
-	(void) pop(&a);
-	column = (int) magnitude(&a) - 1;
-	good = column >= 0 && column < df_no_cols && df_column[column].good==DF_GOOD;
-	push (Ginteger(&a, good));
+    struct value a;
+    int column, good;
+    (void) pop(&a);
+    column = (int) magnitude(&a) - 1;
+    good = column >= 0 && column < df_no_cols && df_column[column].good == DF_GOOD;
+    push(Ginteger(&a, good));
 }
-/*}}}*/
 
-/*{{{  void f_timecolumn()*/
+/*}}} */
+
+/*{{{  void f_timecolumn() */
 void f_timecolumn()
 {
-	struct value a;
-	int column;
-	struct tm tm;
-	(void) pop(&a);
-	column = (int) magnitude(&a) - 1;
-	if (column < 0 || column >= df_no_cols ||
-	    !df_column[column].position ||
-	    !gstrptime(df_column[column].position,timefmt,&tm)
-      )
-	{	undefined = TRUE;
-		push (&a);  /* any objection to this ? */
-	}
-	else
-		push( Gcomplex(&a, gtimegm(&tm), 0.0) );
+    struct value a;
+    int column;
+    struct tm tm;
+    (void) pop(&a);
+    column = (int) magnitude(&a) - 1;
+    if (column < 0 || column >= df_no_cols ||
+	!df_column[column].position ||
+	!gstrptime(df_column[column].position, timefmt, &tm)
+	) {
+	undefined = TRUE;
+	push(&a);		/* any objection to this ? */
+    } else
+	push(Gcomplex(&a, gtimegm(&tm), 0.0));
 }
-/*}}}*/
+/*}}} */
 
-#if 0 /* not used */
+#if 0				/* not used */
 /* count columns in timefmt */
-/*{{{  static int get_time_cols(fmt)*/
+/*{{{  static int get_time_cols(fmt) */
 static int get_time_cols(fmt)
-char *fmt; /* format string */
+char *fmt;			/* format string */
 {
-	int cnt,i;
-	char *p;
+    int cnt, i;
+    char *p;
 
-	p = fmt;
-	cnt = 0;
-	while ( isspace(*p) )
-		p++;
-	if ( ! strlen(p)) 
-		int_error("Empty time-data format",NO_CARET);
-	cnt ++;
-	for(i=0;i<strlen(p)-1;i++) {
-		if ( isspace(p[i]) && !isspace(p[i+1]) )
-			cnt++;
-	}
-	return(cnt);
+    p = fmt;
+    cnt = 0;
+    while (isspace(*p))
+	p++;
+    if (!strlen(p))
+	int_error("Empty time-data format", NO_CARET);
+    cnt++;
+    for (i = 0; i < strlen(p) - 1; i++) {
+	if (isspace(p[i]) && !isspace(p[i + 1]))
+	    cnt++;
+    }
+    return (cnt);
 }
-/*}}}*/
+/*}}} */
 
 /* modify default use_spec, applies for no user spec and time datacolumns */
-/*{{{  static void mod_def_usespec(specno,jump)*/
-static void mod_def_usespec(specno,jump)
-int specno; /* which spec in ?:?:? */
-int jump; /* no of columns in timefmt (time data) */
+/*{{{  static void mod_def_usespec(specno,jump) */
+static void mod_def_usespec(specno, jump)
+int specno;			/* which spec in ?:?:? */
+int jump;			/* no of columns in timefmt (time data) */
 {
-	int i;
+    int i;
 
-	for (i=specno+1; i<NCOL; ++i) 
-		use_spec[i].column += jump; /* add no of columns in time to the rest */
-	df_no_use_specs = 0;
+    for (i = specno + 1; i < NCOL; ++i)
+	use_spec[i].column += jump;	/* add no of columns in time to the rest */
+    df_no_use_specs = 0;
 }
-/*}}}*/
-#endif
+/*}}} */
+#endif /* not used */
 
-/*{{{  static int check_missing(s)*/
+/*{{{  static int check_missing(s) */
 static int check_missing(s)
 char *s;
 {
-	if ( missing_val != NULL)
-	{
-		int len = strlen(missing_val);
-		if (strncmp(s,missing_val,len) == 0 &&
-	     (isspace(s[len]) || !s[len]))
-		{
-			return (1);;  /* store undefined point in plot */
-		}
+    if (missing_val != NULL) {
+	int len = strlen(missing_val);
+	if (strncmp(s, missing_val, len) == 0 &&
+	    (isspace((int)s[len]) || !s[len])) {
+	    return (1);;	/* store undefined point in plot */
 	}
-	return(0);
+    }
+    return (0);
 }
-/*}}}*/
-
+/*}}} */

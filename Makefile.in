@@ -12,13 +12,15 @@ all: @ERRORFIX@ gnuplot @GNUPLOT_X11@ doc demo/binary1
 
 
 # this tells GNU make not to export variables into the environment
-# But other makes dont understand its significance, so it must
+# But other makes don't understand its significance, so it must
 # not be the first target in the file. So it is here, before
 # any variables are created, but after the default target
 .NOEXPORT:
 
-
 SHELL = /bin/sh
+
+PACKAGE=@PACKAGE@
+VERSION=@VERSION@
 
 prefix = @prefix@
 exec_prefix = @exec_prefix@
@@ -38,40 +40,46 @@ HELPFILE=$(datadir)/gnuplot.gih
 INSTALL = @INSTALL@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_DATA = @INSTALL_DATA@
+INSTALL_SCRIPT = @INSTALL_SCRIPT@
 
-CC     = @CC@
+CC = @CC@
 CPPFLAGS = @CPPFLAGS@
-DEFS  = @DEFS@ @X_INCLUDES@
+DEFS  = @DEFS@
 INCLUDES = -I. -I$(top_srcdir)
 CFLAGS = @CFLAGS@
 LDFLAGS = @LDFLAGS@
 
+COMPILE = $(CC) $(DEFS) $(INCLUDES) $(CPPFLAGS) $(CFLAGS)
+LINK = $(CC) $(CFLAGS) $(LDFLAGS) -o $@
+
+# This stuff is obsolete now. Use the appropriate configure options!
+#
 # Additional devices you can add.
 # -DAPOLLO      Apollo Graphics Primitive Resource (window resize after replot)
 # -DGPR         Apollo Graphics Primitive Resource (fixed-size window)
 # -DCGI         SCO CGI
-# -DIRIS4D      IRIS4D series computer
+# -DIRIS        IRIS4D series computer
 # -DSUN         Sun Microsystems Workstation
 # -DLINUXVGA	Linux PC with SuperVGA library
 # -DUNIXPC      unixpc (ATT 3b1 or ATT 7300)
 # -DUNIXPLOT    unixplot
 # -DGNUGRAPH    use GNU graphics version of UNIX plot library
 #               This can only be used in combination with -DUNIXPLOT
-TERMFLAGS = @TERMFLAGS@
+# TERMFLAGS = @TERMFLAGS@
 
 #  -lplot if you have -DUNIXPLOT in TERMFLAGS
 #  -lsuntool -lsunwindow -lpixrect  if you have -DSUN in TERMFLAGS
-#  -lgl_s if -DIRIS4D in TERMFLAGS
+#  -lgl_s if -DIRIS in TERMFLAGS
 #  -lccgi if -DCGI in TERMFLAGS
 #  -lvga if -DLINUXVGA in TERMFLAGS
-#  -L/usr/somewhere/gd -lgd  if gif driver used
 TERMLIBS = @TERMLIBS@
+TERMXLIBS = @TERMXLIBS@
 
 LIBS = @LIBS@
 XLIBS = @X_LIBRARIES@
 
 # Where to send email about bugs and comments (locally)
-EMAIL=bug-gnuplot@dartmouth.edu
+EMAIL = bug-gnuplot@dartmouth.edu
 
 # Lasergnu is a handy shell script for creating a plot from the
 # command line and sending it directly to the printer. It currently
@@ -126,11 +134,12 @@ ACLOCAL = @ACLOCAL@
 AUTOCONF = @AUTOCONF@
 AUTOMAKE = @AUTOMAKE@
 AUTOHEADER = @AUTOHEADER@
-ACCONFIG = acconfig.h
+ACLOCAL_AMFLAGS = -I m4
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-CONFIG_HEADER_IN = $(top_srcdir)/config.hin
+CONFIG_HEADER_IN = config.hin
 CONFIG_HEADER = config.h
-
+GZIP = --best
+TAR = tar
 ####################################################################
 #
 
@@ -141,7 +150,12 @@ O=o
 T=$(srcdir)/term/
 D=$(srcdir)/docs/
 L=$(srcdir)/docs/latextut/
-M=$(srcdir)/demos
+Q=$(srcdir)/docs/old/
+S=$(srcdir)/docs/ps/
+M=$(srcdir)/demo/
+N=$(srcdir)/NeXT/
+P=$(srcdir)/os2/
+W=$(srcdir)/win/
 
 #standard unix make does not support included makefiles.
 #we inline the contents of makefile.all here
@@ -176,8 +190,12 @@ M=$(srcdir)/demos
 # T as the prefix for terminals (eg term/ or [.term])
 # D as the prefix for docs (eg docs/)
 # L as the prefix for latex tutorial (eg docs/latextut/ or [.docs.latextut])
+# Q as the prefix for old doc files (eg docs/old)
+# S as the prefix for postscript docs (eg docs/ps)
 # M as the prefix for demos (eg demo/)
-
+# N as the prefix for NeXT (eg NeXT/)
+# P as the prefix for OS/2 (eg os2/)
+# W as the prefix for Windows (eg win/)
 
 ####################################################################
 # List of object files except version.$(O)
@@ -191,86 +209,124 @@ COREOBJS = alloc.$(O) binary.$(O) bitmap.$(O) command.$(O) contour.$(O)\
 ####################################################################
 # List of source files
 # Used for making shar files, lint, and some dependencies.
-DIRS = term demo docs $(D)latextut
 
-CSOURCE1 = alloc.c binary.c bitmap.c command.c contour.c datafile.c eval.c fit.c
-CSOURCE2 = graphics.c graph3d.c help.c hidden3d.c internal.c interpol.c
-CSOURCE3 = matrix.c misc.c parse.c plot.c plot2d.c plot3d.c readline.c
-CSOURCE4 = scanner.c set.c show.c specfun.c standard.c stdfn.c term.c time.c util.c util3d.c version.c
+CSOURCE = alloc.c binary.c bitmap.c command.c contour.c datafile.c eval.c \
+	  fit.c graphics.c graph3d.c help.c hidden3d.c internal.c interpol.c \
+	  matrix.c misc.c parse.c plot.c plot2d.c plot3d.c readline.c \
+	  scanner.c set.c show.c specfun.c standard.c stdfn.c term.c time.c \
+	  util.c util3d.c version.c
 
+HEADERS = alloc.h ansichek.h binary.h bitmap.h fit.h fnproto.h help.h \
+	  matrix.h national.h plot.h protos.h setshow.h stdfn.h syscfg.h term.h
 
-CSOURCE5 = $(T)ai.trm $(T)amiga.trm $(T)aed.trm \
-	$(T)cgi.trm $(T)corel.trm $(T)cgm.trm \
-	$(T)djsvga.trm $(T)dumb.trm \
-	$(T)dxf.trm $(T)dxy.trm $(T)debug.trm \
-	$(T)emxvga.trm $(T)eepic.trm $(T)epson.trm $(T)excl.trm \
-	$(T)fig.trm $(T)gif.trm $(T)grass.trm $(T)hp26.trm $(T)hp2648.trm $(T)hpgl.trm \
-	$(T)hp500c.trm $(T)hpljii.trm $(T)metafont.trm \
-	$(T)apollo.trm $(T)gpr.trm $(T)hppj.trm $(T)compact.c
-CSOURCE6 = $(T)impcodes.h $(T)imagen.trm $(T)next.trm $(T)object.h \
-	$(T)iris4d.trm $(T)kyo.trm $(T)latex.trm $(T)mif.trm \
-	$(T)pbm.trm $(T)pslatex.trm $(T)gpic.trm $(T)png.trm
-CSOURCE7 = $(T)post.trm $(T)pstricks.trm $(T)qms.trm $(T)regis.trm \
-	$(T)rgip.trm $(T)sun.trm \
-	$(T)t410x.trm $(T)tek.trm $(T)texdraw.trm \
-	$(T)tgif.trm $(T)tpic.trm \
-	$(T)unixpc.trm $(T)unixplot.trm \
-	$(T)v384.trm $(T)vws.trm $(T)x11.trm $(T)xlib.trm
+CORETERM = $(T)aed.trm $(T)ai.trm $(T)amiga.trm $(T)apollo.trm \
+	   $(T)atariaes.trm $(T)atarivdi.trm $(T)cgi.trm $(T)cgm.trm \
+	   $(T)compact.c $(T)corel.trm $(T)debug.trm $(T)djsvga.trm \
+	   $(T)driver.h $(T)dumb.trm $(T)dxf.trm $(T)dxy.trm $(T)eepic.trm \
+	   $(T)emxvga.trm $(T)epson.trm $(T)excl.trm $(T)fg.trm $(T)fig.trm \
+	   $(T)gif.trm $(T)gnugraph.trm $(T)gpic.trm $(T)gpr.trm \
+	   $(T)grass.trm $(T)hp26.trm $(T)hp2648.trm $(T)hp500c.trm \
+	   $(T)hpgl.trm $(T)hpljii.trm $(T)hppj.trm $(T)imagen.trm \
+	   $(T)impcodes.h $(T)iris4d.trm $(T)kyo.trm $(T)latex.trm \
+	   $(T)linux.trm $(T)mac.trm $(T)metafont.trm $(T)mgr.trm \
+	   $(T)mif.trm $(T)multitos.trm $(T)next.trm $(T)object.h \
+	   $(T)pbm.trm $(T)pc.trm $(T)pm.trm $(T)png.trm $(T)post.trm \
+	   $(T)pslatex.trm $(T)pstricks.trm $(T)qms.trm $(T)regis.trm \
+	   $(T)rgip.trm $(T)sun.trm $(T)t410x.trm $(T)table.trm \
+	   $(T)tek.trm $(T)texdraw.trm $(T)tgif.trm $(T)tkcanvas.trm \
+	   $(T)tpic.trm $(T)unixpc.trm $(T)unixplot.trm $(T)v384.trm \
+	   $(T)vws.trm $(T)win.trm $(T)x11.trm $(T)xlib.trm
+
 CSOURCE8 = bf_test.c gplt_x11.c
 
-CORETERM = $(CSOURCE5) $(CSOURCE6) $(CSOURCE7)
+NEXTSRC  = $(N)Controller.h $(N)Controller.m $(N)GnuTerm.iconheader \
+	   $(N)GnuTerm.tiff $(N)GnuTerm_main.m $(N)GnuView.h \
+	   $(N)GnuView.m $(N)Makefile $(N)Makefile.postamble \
+	   $(N)Makefile.preamble $(N)PB.gdbinit $(N)PB.project \
+	   $(N)README.rtf $(N)bigger.tiff $(N)gnuviewController.h \
+	   $(N)gnuviewController.m $(N)smaller.tiff \
+	   $(N)English.lproj/GnuTerm.nib/data.classes \
+	   $(N)English.lproj/GnuTerm.nib/data.nib \
+	   $(N)English.lproj/gnuview.nib/bigger.tiff \
+	   $(N)English.lproj/gnuview.nib/data.classes \
+	   $(N)English.lproj/gnuview.nib/data.nib \
+	   $(N)English.lproj/gnuview.nib/smaller.tiff
 
-NEXTSRC  = epsviewe.m epsviewe.h
+OS2SRC = $(P)dialogs.c $(P)dialogs.h $(P)gclient.c $(P)gnuplot.ico \
+	 $(P)gnupmdrv.c $(P)gnupmdrv.def $(P)gnupmdrv.h $(P)gnupmdrv.ipf \
+	 $(P)gnupmdrv.rc $(P)print.c
+
+WINDOWS = $(W)geticon.c $(W)wcommon.h $(W)wgnupl32.def $(W)wgnuplib.c \
+	  $(W)wgnuplib.def $(W)wgnuplib.h $(W)wgnuplib.rc $(W)wgnuplot.def \
+	  $(W)wgnuplot.hpj $(W)wgnuplot.mnu $(W)wgnuplot.rc $(W)wgraph.c \
+	  $(W)winmain.c $(W)wmenu.c $(W)wpause.c $(W)wprinter.c \
+	  $(W)wresourc.h $(W)wtext.c $(W)wtext.h
+
 # not C code, but still needed
 
-DEMOS = $(M)1.dat $(M)2.dat $(M)3.dat $(M)contours.dem \
-	$(M)controls.dem $(M)electron.dem $(M)glass.dat $(M)param.dem \
-	$(M)polar.dem $(M)simple.dem $(M)surface1.dem \
-	$(M)surface2.dem $(M)using.dat $(M)using.dem $(M)world.cor \
-	$(M)world.dat $(M)world.dem \
-	$(M)err.dat $(M)poldat.dem $(M)errorbar.dem \
-	$(M)all.dem $(M)animate.dem $(M)bivariat.dem \
-	$(M)prob.dem $(M)stat.inc $(M)prob2.dem $(M)random.dem \
-	$(M)discrete.dem $(M)hidden.dem $(M)airfoil.dem $(M)gnuplot.rot\
-	$(M)binary.dem $(M)spline.dem $(M)steps.dem $(M)steps.dat \
-	$(M)multimsh.dem $(M)whale.dat $(M)hemisphr.dat \
-	$(M)scatter.dem $(M)scatter2.dat $(M)singulr.dem $(M)klein.dat
+DEMOS = $(M)1.dat $(M)2.dat $(M)3.dat $(M)airfoil.dem $(M)all.dem \
+	$(M)animate.dem $(M)battery.dat $(M)big_peak.dat $(M)binary.dem \
+	$(M)bivariat.dem $(M)borders.dem $(M)contours.dem $(M)controls.dem \
+	$(M)density.fnc $(M)discrete.dem $(M)electron.dem $(M)fit.dem \
+	$(M)glass.dat $(M)gnuplot.rot $(M)hemisphr.dat $(M)hexa.fnc \
+	$(M)hidden.dem $(M)klein.dat $(M)lcdemo.dat $(M)line.fnc \
+	$(M)mgr.dem $(M)moli3.dat $(M)multimsh.dem $(M)multiplt.dem \
+	$(M)param.dem $(M)polar.dem $(M)poldat.dem $(M)prob.dem \
+	$(M)prob2.dem $(M)random.dem $(M)reflect.fnc $(M)reread.bor \
+	$(M)scatter.dem $(M)scatter2.dat $(M)silver.dat $(M)simple.dem \
+	$(M)singulr.dem $(M)sound.par $(M)sound2.par $(M)soundvel.dat \
+	$(M)spline.dem $(M)start.par $(M)stat.inc $(M)steps.dat \
+	$(M)steps.dem $(M)surface1.dem $(M)surface2.dem $(M)timedat.dat \
+	$(M)timedat.dem $(M)using.dat $(M)using.dem $(M)vector.dem \
+	$(M)whale.dat $(M)world.cor $(M)world.dat $(M)world.dem
 
-ETC = Copyright 0README README.gnu README.ami makefile.unx makefile.vms \
-	linkopt.amg makefile.amg makefile.ami linkopt.vms buildvms.com \
-	lasergnu makefile.r makefile.nt makefile.g 0FAQ 0BUGS\
-	$(T)README History gnuplot.el intergra.x11 0INSTALL\
-	README.3p2 README.3p3 README.3p4 README.pro README.nex README.x11 \
-	README.3d README.mf README.win configure configure.in Makefile.in \
-	$(ACCONFIG) $(ACLOCAL_M4) $(CONFIG_HEADER_IN) missing stamp-h.in
-
+ETC =   0BUGS 0FAQ 0INSTALL 0PORTING 0README ChangeLog CodeStyle Copyright \
+	INSTALL.gnu Makefile.in NEWS PGPKEYS TODO acconfig.h $(ACLOCAL_M4) \
+	amiga.c buildvms.com commitvers $(CONFIG_HEADER_IN) configure \
+	configure.in corgraph.asm corplot.c ctrl87.c ctrl87.h descrip.mms \
+	djconfig.sh errorfix.sh genopt.com gnuplot.def gnuplot.el gnuplot.opt \
+	gnuplot.prj header.mac hrcgraph.asm install-sh intergra.x11 lasergnu \
+	lineproc.mac linkopt.vms linkopt.ztc make_vms.com makefile.286 \
+	makefile.all makefile.amg makefile.ami makefile.cyg makefile.dj2 \
+	makefile.djg makefile.emx makefile.g makefile.mgw makefile.msc \
+	makefile.msw makefile.mto makefile.nt makefile.os2 makefile.os9 \
+	makefile.st makefile.tc makefile.unx makefile.vms makefile.wc \
+	makefile.win makefile.ztc missing mkinstalldirs os9.c pcgraph.asm \
+	rgipgnu stamp-h.in strftime.c vms.c m4/msdos.m4 m4/next.m4 \
+	m4/search-hdr.m4 m4/search-lib.m4 $(T)README 
 
 # Documentation and help files
-DOCS1 = $(D)makefile.org $(D)README $(D)checkdoc.c $(D)doc2gih.c \
-	$(D)doc2hlp.c $(D)doc2hlp.com $(D)doc2ms.c $(D)doc2tex.c \
-	$(D)gnuplot.1 $(D)lasergnu.1 $(D)toc_entr.sty $(D)doc2info.pl \
-	$(D)titlepag.ms $(D)titlepag.tex $(D)makefile.ami \
-	$(D)doc2rtf.c $(D)Makefile.in
+DOCS1 = $(D)Makefile.in $(D)README $(D)checkdoc.c $(D)doc2gih.c \
+	$(D)doc2hlp.c $(D)doc2hlp.com $(D)doc2html.c $(D)doc2info.c \
+	$(D)doc2ipf.c $(D)doc2ms.c $(D)doc2rnh.c $(D)doc2rtf.c $(D)doc2tex.c \
+	$(D)doc2texi.pl $(D)doc2x.h $(D)gnuplot.1 $(D)lasergnu.1 \
+	$(D)makefile.dst $(D)makefile.ami $(D)termdoc.c $(D)titlepag.ms \
+	$(D)titlepag.tex $(D)toc_entr.sty $(D)xref.c $(D)xref.h
 DOCS2 = $(D)gnuplot.doc $(D)gpcard.tex
-DOCS3 = $(L)makefile.org $(L)eg1.plt \
+DOCS3 = $(L)Makefile.in $(L)eg1.plt \
 	$(L)eg2.plt $(L)eg3.dat $(L)eg3.plt \
 	$(L)eg4.plt $(L)eg5.plt $(L)eg6.plt \
-	$(L)header.tex $(L)tutorial.tex \
-	$(L)linepoin.plt $(L)Makefile.in
+	$(L)header.tex $(L)linepoin.plt $(L)makefile.dst $(L)tutorial.tex
+DOCS4 = $(S)Makefile $(S)README $(S)ps_file.doc $(S)ps_guide.ps \
+	$(S)ps_symbols.gpi
+DOCS5 = $(Q)ChangeLog.old $(Q)History.old $(Q)README.3d $(Q)README.3p1 \
+	$(Q)README.3p2 $(Q)README.3p3 $(Q)README.3p4 $(Q)README.3p5 \
+	$(Q)README.ami $(Q)README.emx $(Q)README.fit $(Q)README.gnu \
+	$(Q)README.iso $(Q)README.mf $(Q)README.nex $(Q)README.os2 \
+	$(Q)README.pic $(Q)README.pro $(Q)README.win $(Q)README.x11 \
+	$(Q)README.xli $(Q)makefile.r
 
-DOCS  = $(DOCS1) $(DOCS2) $(DOCS3)
+DOCS  = $(DOCS1) $(DOCS2) $(DOCS3) $(DOCS4) $(DOCS5)
 
 #########################################################################
-
 # Simple Dependencies
 # - note that VMS requires space before and after the :
-
 
 $(COREOBJS) : plot.h protos.h stdfn.h
 
 help.$(O) misc.$(O) : help.h
 
-protos.h: alloc.h
+protos.h : alloc.h
 
 graphics.$(O) graph3d.$(O) misc.$(O) plot.$(O) set.$(O) show.$(O) term.$(O) : setshow.h
 
@@ -285,37 +341,11 @@ term.$(O) : term.h $(CORETERM)
 #>>>makefile.all<<<
 
 ####################################################
-
 # (that's the end of makefile.all, by the way...)
 
 # List of object files except version.o
 
 OBJS = $(COREOBJS) @NEXTOBJS@
-
-
-#########################################################################
-
-gnuplot: $(OBJS) version.o
-	$(CC) -o $@ $(OBJS) version.o $(LDFLAGS) $(TERMLIBS) $(LIBS)
-
-gnuplot_x11: gplt_x11.o
-	$(CC) -o $@ gplt_x11.o $(LDFLAGS) $(XLIBS) $(LIBS)
-
-docs/allterm.h: $(CORETERM)
-	cat $(T)*.trm > docs/allterm.h
-
-doc: docs/allterm.h
-	( cd docs; $(MAKE) $(MFLAGS) gnuplot.gih )
-
-demo/binary1 demo/binary2 demo/binary3: bf_test
-	( wd=`pwd`; cd $(srcdir)/demo; $$wd/bf_test )
-
-bf_test: bf_test.o binary.o alloc.o
-	$(CC) -o $@ bf_test.o binary.o alloc.o $(LDFLAGS) $(LIBS)
-
-errorfix: $(srcdir)/errorfix.sh
-	$(srcdir)/errorfix.sh $(srcdir)
-	touch errorfix
 
 ################################################################
 
@@ -326,11 +356,11 @@ install: all $(LASERGNU)
 	$(INSTALL_PROGRAM) gnuplot $(bindir)/gnuplot
 	test ! -f gnuplot_x11 || $(INSTALL_PROGRAM) gnuplot_x11 $(bindir)/gnuplot_x11
 	-$(INSTALL_DATA) $(srcdir)/docs/gnuplot.1 $(mandir)/man1/gnuplot.1
-	( cd docs; $(MAKE) $(MFLAGS) install datadir=$(datadir) )
+	-cd docs && $(MAKE) $(MFLAGS) install
 	@LINUXSUID@
 
 lasergnu_install: lasergnu docs/lasergnu.1
-	$(INSTALL_PROGRAM) $(srcdir)/lasergnu $(bindir)/lasergnu
+	$(INSTALL_SCRIPT) $(srcdir)/lasergnu $(bindir)/lasergnu
 	$(INSTALL_DATA) $(srcdir)/docs/lasergnu.1 $(mandir)/man1/lasergnu.1
 
 lasergnu_noinstall:
@@ -338,94 +368,134 @@ lasergnu_noinstall:
 uninstall:
 	rm -f $(bindir)/gnuplot $(bindir)/gnuplot_x11
 	rm -f $(mandir)/man1/gnuplot.1 $(mandir)/man1/lasergnu.1
-	( cd docs; $(MAKE) $(MFLAGS) uninstall datadir=$(datadir) )
+	cd docs && $(MAKE) $(MFLAGS)
 
 ################################################################
 # Dependencies
 
 .c.o:
-	$(CC) -c $(CPPFLAGS) $(DEFS) $(INCLUDES) $(CFLAGS) $<
+	$(COMPILE) -c $<
+
+gnuplot: $(OBJS) version.o
+	$(LINK) $(OBJS) version.o $(TERMLIBS) $(TERMXLIBS) $(LIBS)
+
+gnuplot_x11: gplt_x11.o stdfn.o
+	$(LINK) gplt_x11.o stdfn.o $(XLIBS) $(LIBS)
+
+doc:
+	cd docs && $(MAKE) $(MFLAGS) gnuplot.gih
+
+demo/binary1 demo/binary2 demo/binary3: bf_test
+	wd=`pwd` && cd $(srcdir)/demo && $$wd/bf_test
+
+bf_test: bf_test.o binary.o alloc.o
+	$(LINK) bf_test.o binary.o alloc.o $(LIBS)
+
+errorfix: $(srcdir)/errorfix.sh
+	$(srcdir)/errorfix.sh $(srcdir)
+	touch errorfix
 
 command.o: command.c fit.h help.h setshow.h
-	$(CC) -c $(CPPFLAGS) $(DEFS) $(INCLUDES) $(CFLAGS) -DHELPFILE=\"$(HELPFILE)\" $<
+	$(COMPILE) -DHELPFILE=\"$(HELPFILE)\" -c $<
+
+show.o: show.c plot.h setshow.h
+	$(COMPILE) -DHELPFILE=\"$(HELPFILE)\" -DGNUPLOT_BINDIR=\"$(bindir)\" -c $<
 
 term.o: term.c term.h $(CORETERM)
-	$(CC) -c $(TERMFLAGS) $(CPPFLAGS) $(INCLUDES) -I./term -I$(top_srcdir)/term $(DEFS) $(CFLAGS) $<
+	$(COMPILE) -I./term -I$(top_srcdir)/term -c $<
 
 version.o: version.c
-	$(CC) -c -DCONTACT=\"$(EMAIL)\" $(CPPFLAGS) $(DEFS) $(CFLAGS) $<
+	$(COMPILE) -DCONTACT=\"$(EMAIL)\" -c $<
 
 $(COREOBJS) version.o bf_test.o : $(CONFIG_HEADER)
 
 ################################################################
 # Autoconfig rules
 #
-# I have enabled these rules, because missing autocconf and
+# I have enabled these rules, because missing autoconf and
 # automake tools are now detected by configure and dealt with.
 
+# This rule is disabled because we have no Makefile.am
 #$(srcdir)/Makefile.in: Makefile.am $(top_srcdir)/configure.in $(ACLOCAL_M4) 
 #	cd $(top_srcdir) && $(AUTOMAKE) --foreign Makefile
 
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	cd $(top_builddir) \
-	  && CONFIG_FILES=$@ CONFIG_HEADERS= \
-	  INCLUDES="@CPPFLAGS@" TERMLIBS="@TERMLIBS@" \
-	  $(SHELL) ./config.status
+	  && CONFIG_FILES=$@ CONFIG_HEADERS= $(SHELL) ./config.status
 
-$(ACLOCAL_M4): configure.in
-	cd $(srcdir) && $(ACLOCAL)
+$(ACLOCAL_M4): configure.in m4/msdos.m4 m4/next.m4 m4/search-hdr.m4 \
+		m4/search-lib.m4
+	cd $(srcdir) && $(ACLOCAL) $(ACLOCAL_AMFLAGS)
 
-config.status: $(srcdir)/configure
-	CPPFLAGS="@CPPFLAGS@" TERMLIBS="@TERMLIBS@" \
+config.status: $(srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
 	$(SHELL) ./config.status --recheck
 
 $(srcdir)/configure: $(srcdir)/configure.in $(ACLOCAL_M4) $(CONFIGURE_DEPENDENCIES)
 	cd $(srcdir) && $(AUTOCONF)
 
 $(CONFIG_HEADER): stamp-h
-stamp-h: $(CONFIG_HEADER_IN) $(top_builddir)/config.status
+	@:
+stamp-h: $(srcdir)/$(CONFIG_HEADER_IN) $(top_builddir)/config.status
 	cd $(top_builddir) \
-	&& CONFIG_FILES= CONFIG_HEADERS=$(CONFIG_HEADER):$(CONFIG_HEADER_IN) \
+	&& CONFIG_FILES= CONFIG_HEADERS=$(CONFIG_HEADER)
 	   $(SHELL) ./config.status
 	@echo timestamp > stamp-h
 
 $(srcdir)/$(CONFIG_HEADER_IN): stamp-h.in
-$(srcdir)/stamp-h.in: $(top_srcdir)/configure.in $(ACLOCAL_M4) $(ACCONFIG)
+$(srcdir)/stamp-h.in: $(top_srcdir)/configure.in $(ACLOCAL_M4) acconfig.h
 	cd $(top_srcdir) && $(AUTOHEADER)
 	@echo timestamp > $(srcdir)/stamp-h.in
 
 ################################################################
 # Miscellaneous targets
 
-SOURCES=plot.h help.h setshow.h bitmap.h term.h $(CSOURCE1) $(CSOURCE2) \
-	$(CSOURCE3) $(CSOURCE4) $(CSOURCE5) $(CSOURCE6) $(CSOURCE7)\
-	$(CSOURCE8) $(NEXTSRC) $(WINDOWS) $(OS2)
+SOURCES = $(HEADERS) $(CSOURCE) $(CSOURCE8) $(CORETERM) $(NEXTSRC) \
+	  $(OS2SRC) $(WINDOWS)
 
-DOCS  = $(DOCS1) $(DOCS2) $(DOCS3)
+DISTFILES = $(ETC) $(SOURCES) $(DEMOS) $(DOCS)
+
+SUBDIRS = NeXT NeXT/English.lproj NeXT/English.lproj/GnuTerm.nib \
+	  NeXT/English.lproj/gnuview.nib demo docs docs/latextut docs/old \
+	  docs/ps m4 os2 term win
 
 clean:
-# HBB: also delete *~ backup files
-# HBB: ... and <program>.exe files (might happen since autoconf
-#      now runs even on MSDOS with DJGPP...)
-# HBB: don't delete stamp-h. In a nutshell: make clean shouldn't
-#      delete files that weren't generated by 'make' originally
 	rm -f gnuplot gnuplot_x11 bf_test *.o core *~
 	rm -f gnuplot.exe gnuplot_x11.exe bf_test.exe
 	rm -f demo/binary? demo/temp.set demo/defaults.ini demo/fit.log \
-		demo/soundfit.par
-	( cd docs; $(MAKE) $(MFLAGS) clean )
+	  demo/soundfit.par
+	cd docs && $(MAKE) $(MFLAGS) clean
 
 mostlyclean: clean
 
 distclean: clean
 	rm -f Makefile config.status config.cache $(CONFIG_HEADER) \
-	config.log stamp-h
-	rm -f docs/Makefile docs/latextut/Makefile
+	  config.log stamp-h docs/Makefile docs/latextut/Makefile
 	test "$(srcdir)" = "$(top_builddir)" || rm -rf docs term
 
 realclean: distclean
 	rm -f TAGS docs/TAGS
 
-dist: $(ETC) $(SOURCES) $(PC) $(DEMOS) $(BETA) $(DOCS)
-	$(TAR) cvf /tmp/gnuplot.tar $(ETC) $(SOURCES) $(PC)\
-	     $(DEMOS) $(BETA) $(DOCS)
+distdir = $(PACKAGE)-$(VERSION)
+top_distdir = $(distdir)
+
+dist: distdir
+	-chmod -R a+r $(distdir)
+	$(TAR) chf - $(distdir) | gzip $(GZIP) > $(distdir).tar.gz
+	-rm -rf $(distdir)
+
+distdir: $(DISTFILES)
+	-rm -rf $(distdir)
+	mkdir $(distdir)
+	-chmod u+rwx,go+rx $(distdir)
+	for subdir in $(SUBDIRS); do \
+	  test -d $(distdir)/$$subdir \
+	  || mkdir $(distdir)/$$subdir \
+	  || exit 1; \
+	  chmod u+rwx,go+rx $(distdir)/$$subdir; \
+	done
+	@for file in $(DISTFILES); do \
+	  d=$(srcdir); \
+	  test -f $(distdir)/$$file \
+	  || ln $$d/$$file $(distdir)/$$file 2> /dev/null \
+	  || cp -p $$d/$$file $(distdir)/$$file; \
+	done

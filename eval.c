@@ -39,102 +39,102 @@ static char *RCSid = "$Id: eval.c,v 1.15 1998/03/22 22:31:30 drd Exp $";
 
 
 struct udvt_entry *
-add_udv(t_num)  /* find or add value and return pointer */
+ add_udv(t_num)			/* find or add value and return pointer */
 int t_num;
 {
-register struct udvt_entry **udv_ptr = &first_udv;
+    register struct udvt_entry **udv_ptr = &first_udv;
 
-	/* check if it's already in the table... */
+    /* check if it's already in the table... */
 
-	while (*udv_ptr) {
-		if (equals(t_num,(*udv_ptr)->udv_name))
-			return(*udv_ptr);
-		udv_ptr = &((*udv_ptr)->next_udv);
-	}
+    while (*udv_ptr) {
+	if (equals(t_num, (*udv_ptr)->udv_name))
+	    return (*udv_ptr);
+	udv_ptr = &((*udv_ptr)->next_udv);
+    }
 
-	*udv_ptr = (struct udvt_entry *)
-	  gp_alloc((unsigned long)sizeof(struct udvt_entry), "value");
-	(*udv_ptr)->next_udv = NULL;
-	copy_str((*udv_ptr)->udv_name,t_num, MAX_ID_LEN);
-	(*udv_ptr)->udv_value.type = INTGR;	/* not necessary, but safe! */
-	(*udv_ptr)->udv_undef = TRUE;
-	return(*udv_ptr);
+    *udv_ptr = (struct udvt_entry *)
+	gp_alloc((unsigned long) sizeof(struct udvt_entry), "value");
+    (*udv_ptr)->next_udv = NULL;
+    copy_str((*udv_ptr)->udv_name, t_num, MAX_ID_LEN);
+    (*udv_ptr)->udv_value.type = INTGR;		/* not necessary, but safe! */
+    (*udv_ptr)->udv_undef = TRUE;
+    return (*udv_ptr);
 }
 
 
 struct udft_entry *
-add_udf(t_num)  /* find or add function and return pointer */
-int t_num; /* index to token[] */
+ add_udf(t_num)			/* find or add function and return pointer */
+int t_num;			/* index to token[] */
 {
-register struct udft_entry **udf_ptr = &first_udf;
+    register struct udft_entry **udf_ptr = &first_udf;
 
-	int i;
-	while (*udf_ptr) {
-		if (equals(t_num,(*udf_ptr)->udf_name))
-			return(*udf_ptr);
-		udf_ptr = &((*udf_ptr)->next_udf);
-	}
+    int i;
+    while (*udf_ptr) {
+	if (equals(t_num, (*udf_ptr)->udf_name))
+	    return (*udf_ptr);
+	udf_ptr = &((*udf_ptr)->next_udf);
+    }
 
-     /* get here => not found. udf_ptr points at first_udf or
-      * next_udf field of last udf
-      */
+    /* get here => not found. udf_ptr points at first_udf or
+     * next_udf field of last udf
+     */
 
-     if (standard(t_num))
-       int_warn("Warning : udf shadowed by built-in function of the same name", t_num);
+    if (standard(t_num))
+	int_warn("Warning : udf shadowed by built-in function of the same name", t_num);
 
-     /* create and return a new udf slot */
+    /* create and return a new udf slot */
 
-     *udf_ptr = (struct udft_entry *)
-	  gp_alloc((unsigned long)sizeof(struct udft_entry), "function");
-	(*udf_ptr)->next_udf = (struct udft_entry *) NULL;
-	(*udf_ptr)->definition = NULL;
-	(*udf_ptr)->at = NULL;
-	copy_str((*udf_ptr)->udf_name,t_num, MAX_ID_LEN);
-	for(i=0; i<MAX_NUM_VAR; i++)
-		(void) Ginteger(&((*udf_ptr)->dummy_values[i]), 0);
-	return(*udf_ptr);
+    *udf_ptr = (struct udft_entry *)
+	gp_alloc((unsigned long) sizeof(struct udft_entry), "function");
+    (*udf_ptr)->next_udf = (struct udft_entry *) NULL;
+    (*udf_ptr)->definition = NULL;
+    (*udf_ptr)->at = NULL;
+    copy_str((*udf_ptr)->udf_name, t_num, MAX_ID_LEN);
+    for (i = 0; i < MAX_NUM_VAR; i++)
+	(void) Ginteger(&((*udf_ptr)->dummy_values[i]), 0);
+    return (*udf_ptr);
 }
 
 
-int standard(t_num)  /* return standard function index or 0 */
+int standard(t_num)		/* return standard function index or 0 */
 int t_num;
 {
-register int i;
-	for (i = (int)SF_START; ft[i].f_name != NULL; i++) {
-		if (equals(t_num,ft[i].f_name))
-			return(i);
-	}
-	return(0);
+    register int i;
+    for (i = (int) SF_START; ft[i].f_name != NULL; i++) {
+	if (equals(t_num, ft[i].f_name))
+	    return (i);
+    }
+    return (0);
 }
 
- 
+
 
 void execute_at(at_ptr)
 struct at_type *at_ptr;
 {
-register int i,index,count,offset;
+    register int i, index, count, offset;
 
-	count = at_ptr->a_count;
-	for (i = 0; i < count;) {
-		index = (int)at_ptr->actions[i].index;
-		offset = (*ft[index].func)(&(at_ptr->actions[i].arg));
-		if (is_jump(index))
-			i += offset;
-		else
-			i++;
-	}
+    count = at_ptr->a_count;
+    for (i = 0; i < count;) {
+	index = (int) at_ptr->actions[i].index;
+	offset = (*ft[index].func) (&(at_ptr->actions[i].arg));
+	if (is_jump(index))
+	    i += offset;
+	else
+	    i++;
+    }
 }
 
 /*
 
- 'ft' is a table containing C functions within this program. 
+   'ft' is a table containing C functions within this program. 
 
- An 'action_table' contains pointers to these functions and arguments to be
- passed to them. 
+   An 'action_table' contains pointers to these functions and arguments to be
+   passed to them. 
 
- at_ptr is a pointer to the action table which must be executed (evaluated)
+   at_ptr is a pointer to the action table which must be executed (evaluated)
 
- so the iterated line exectues the function indexed by the at_ptr and 
- passes the address of the argument which is pointed to by the arg_ptr 
+   so the iterated line exectues the function indexed by the at_ptr and 
+   passes the address of the argument which is pointed to by the arg_ptr 
 
-*/
+ */

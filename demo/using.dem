@@ -24,4 +24,4 @@ pause -1 "Hit return to continue"
 # undo what we have done above
 set title
 set autoscale x
-set xtics
+#set xtics autofreq

@@ -62,10 +62,14 @@ TERM_PUBLIC void DUMB_text __PROTO((void));
 TERM_PUBLIC void DUMB_reset __PROTO((void));
 TERM_PUBLIC void DUMB_linetype __PROTO((int linetype));
 TERM_PUBLIC void DUMB_move __PROTO((unsigned int x, unsigned int y));
-TERM_PUBLIC void DUMB_point __PROTO((unsigned int x, unsigned int y, int point));
+TERM_PUBLIC void DUMB_point __PROTO((unsigned int x, unsigned int y,
+				     int point));
 TERM_PUBLIC void DUMB_vector __PROTO((unsigned int x, unsigned int y));
-TERM_PUBLIC void DUMB_put_text __PROTO((unsigned int x, unsigned int y, char *str));
-TERM_PUBLIC void DUMB_arrow __PROTO((unsigned int sx, unsigned int sy, unsigned int ex, unsigned int ey, int head));
+TERM_PUBLIC void DUMB_put_text __PROTO((unsigned int x, unsigned int y,
+					char *str));
+TERM_PUBLIC void DUMB_arrow __PROTO((unsigned int sx, unsigned int sy,
+				     unsigned int ex, unsigned int ey,
+				     int head));
 
 #define DUMB_XMAX 79
 #define DUMB_YMAX 24
@@ -77,11 +81,16 @@ TERM_PUBLIC void DUMB_arrow __PROTO((unsigned int sx, unsigned int sy, unsigned 
 #define DUMB_AXIS_CONST '\1'
 #define DUMB_BORDER_CONST '\2'
 
-static char *dumb_matrix = NULL;      /* matrix of characters */
-static char *dumb_priority = NULL;    /* matrix of priority at each position */
-static char dumb_pen;                 /* current character used to draw */
-static int dumb_x;                    /* current X position */
-static int dumb_y;                    /* current Y position */
+/* matrix of characters */
+static char *dumb_matrix = NULL;
+/* matrix of priority at each position */
+static char *dumb_priority = NULL;
+/* current character used to draw */
+static char dumb_pen;
+/* current X position */
+static int dumb_x;
+/* current Y position */
+static int dumb_y;
 static int dumb_xmax = DUMB_XMAX;
 static int dumb_ymax = DUMB_YMAX;
 static int dumb_feed = 1;
@@ -91,102 +100,99 @@ static int dumb_feed = 1;
 static void dumb_set_pixel __PROTO((int x, int y, int v, int p));
 
 
-static void dumb_set_pixel(x,y,v,p)
-int x,y,v,p;
+static void dumb_set_pixel(x, y, v, p)
+int x, y, v, p;
 {
-  if ( (unsigned) x <= dumb_xmax &&  /* ie x>=0 && x<=dumb_xmax */
-       (unsigned) y <= dumb_ymax &&
-       p > dumb_priority[dumb_xmax*y+x])
-    {
-      dumb_matrix[dumb_xmax*y+x] = v;
-      dumb_priority[dumb_xmax*y+x] = p;
+    if ((unsigned) x <= dumb_xmax &&	/* ie x>=0 && x<=dumb_xmax */
+	(unsigned) y <= dumb_ymax &&
+	p > dumb_priority[dumb_xmax * y + x]) {
+	dumb_matrix[dumb_xmax * y + x] = v;
+	dumb_priority[dumb_xmax * y + x] = p;
     }
 }
 
 
 TERM_PUBLIC void DUMB_options()
 {
-  int x,y;
-  struct value a;
+    int x, y;
+    struct value a;
 
-  if (almost_equals(c_token, "f$eed"))
+    if (almost_equals(c_token, "f$eed"))
 	++c_token, dumb_feed = 1;
-  else if (almost_equals(c_token, "nof$eed"))
-   ++c_token, dumb_feed = 0;
-	
-  if (!END_OF_COMMAND) {
-    x = (int) real(const_express(&a));
-    if (!END_OF_COMMAND) {
-      y = (int) real(const_express(&a));
-      dumb_xmax = term->xmax = x;
-      dumb_ymax = term->ymax = y;
-    }
-  }
+    else if (almost_equals(c_token, "nof$eed"))
+	++c_token, dumb_feed = 0;
 
-  sprintf(term_options, "%sfeed %d %d", dumb_feed ? "" : "no",dumb_xmax,dumb_ymax);
+    if (!END_OF_COMMAND) {
+	x = (int) real(const_express(&a));
+	if (!END_OF_COMMAND) {
+	    y = (int) real(const_express(&a));
+	    dumb_xmax = term->xmax = x;
+	    dumb_ymax = term->ymax = y;
+	}
+    }
+    sprintf(term_options, "%sfeed %d %d",
+	    dumb_feed ? "" : "no", dumb_xmax, dumb_ymax);
 }
 
 
 TERM_PUBLIC void DUMB_init()
 {
-  if (dumb_matrix)
-    free(dumb_matrix);
+    if (dumb_matrix)
+	free(dumb_matrix);
 
-  dumb_matrix = gp_alloc ((unsigned long)dumb_xmax * dumb_ymax * 2, "dumb terminal");
+    dumb_matrix = gp_alloc((unsigned long) dumb_xmax * dumb_ymax * 2, "dumb terminal");
 
-  dumb_priority = dumb_matrix + dumb_xmax * dumb_ymax;
+    dumb_priority = dumb_matrix + dumb_xmax * dumb_ymax;
 }
 
 
-TERM_PUBLIC void DUMB_graphics ()
+TERM_PUBLIC void DUMB_graphics()
 {
-  int i;
-  char *pm = dumb_matrix, *pp = dumb_priority;
+    int i;
+    char *pm = dumb_matrix, *pp = dumb_priority;
 
-  for ( i = dumb_xmax * dumb_ymax; i > 0; i-- ) {
-    *pm++ = ' ';
-    *pp++ = 0;
-  }
-}
-
-
-TERM_PUBLIC void DUMB_text ()
-{
-  int x, y, l;
-
-  putc ('\f', outfile);
-  for (y = dumb_ymax - 1; y >= 0; y--)
-    {
-      for (l = dumb_xmax; l > 0 && DUMB_PIXEL (l - 1, y) == ' '; l--)
-       ;
-      for (x = 0; x < l; x++)
-       putc (DUMB_PIXEL (x, y), outfile);
-      if (dumb_feed || y>0) putc('\n', outfile);
+    for (i = dumb_xmax * dumb_ymax; i > 0; i--) {
+	*pm++ = ' ';
+	*pp++ = 0;
     }
-  fflush (outfile);
+}
+
+
+TERM_PUBLIC void DUMB_text()
+{
+    int x, y, l;
+
+    putc('\f', gpoutfile);
+    for (y = dumb_ymax - 1; y >= 0; y--) {
+	for (l = dumb_xmax; l > 0 && DUMB_PIXEL(l - 1, y) == ' '; l--);
+	for (x = 0; x < l; x++)
+	    putc(DUMB_PIXEL(x, y), gpoutfile);
+	if (dumb_feed || y > 0)
+	    putc('\n', gpoutfile);
+    }
+    fflush(gpoutfile);
 }
 
 
 TERM_PUBLIC void DUMB_reset()
 {
-  free (dumb_matrix);
-  dumb_matrix = NULL;
+    free(dumb_matrix);
+    dumb_matrix = NULL;
 }
 
 
 TERM_PUBLIC void DUMB_linetype(linetype)
 int linetype;
 {
-  static char pen_type[7] = {'*', '#', '$', '%', '@', '&', '='};
+    static char pen_type[7] = { '*', '#', '$', '%', '@', '&', '=' };
 
-  if (linetype == -2)
-    dumb_pen = DUMB_BORDER_CONST;
-  else if (linetype == -1)
-    dumb_pen = DUMB_AXIS_CONST;
-  else
-    {
-      linetype = linetype % 7;
-      dumb_pen = pen_type[linetype];
+    if (linetype == -2)
+	dumb_pen = DUMB_BORDER_CONST;
+    else if (linetype == -1)
+	dumb_pen = DUMB_AXIS_CONST;
+    else {
+	linetype = linetype % 7;
+	dumb_pen = pen_type[linetype];
     }
 }
 
@@ -194,167 +200,160 @@ int linetype;
 TERM_PUBLIC void DUMB_move(x, y)
 unsigned int x, y;
 {
-  dumb_x = x;
-  dumb_y = y;
+    dumb_x = x;
+    dumb_y = y;
 }
 
 
-TERM_PUBLIC void DUMB_point(x,y,point)
-unsigned int x,y;
+TERM_PUBLIC void DUMB_point(x, y, point)
+unsigned int x, y;
 int point;
 {
-  dumb_set_pixel (x, y, point == -1 ? '.' : point % 26 + 'A', 4);
+    dumb_set_pixel(x, y, point == -1 ? '.' : point % 26 + 'A', 4);
 }
 
 
-TERM_PUBLIC void DUMB_vector(_x,_y)
-unsigned int _x,_y;
+TERM_PUBLIC void DUMB_vector(_x, _y)
+unsigned int _x, _y;
 {
-  int x=_x;	/* we need signed int, since unsigned-signed=unsigned and */
-  int y=_y;	/* abs and cast to double wouldn't work */
-  char pen, pen1;
-  int priority;
-  int delta;
+    int x = _x;			/* we need signed int, since
+				 * unsigned-signed=unsigned and */
+    int y = _y;			/* abs and cast to double wouldn't work */
+    char pen, pen1;
+    int priority;
+    int delta;
 
-  if (ABS (y - dumb_y) > ABS (x - dumb_x))
-    {
-      switch (dumb_pen)
-       {
-       case DUMB_AXIS_CONST:
-         pen = ':';
-         pen1 = '+';
-         priority = 1;
-         break;
+    if (ABS(y - dumb_y) > ABS(x - dumb_x)) {
+	switch (dumb_pen) {
+	case DUMB_AXIS_CONST:
+	    pen = ':';
+	    pen1 = '+';
+	    priority = 1;
+	    break;
 
-       case DUMB_BORDER_CONST:
-         pen = '|';
-         pen1 = '+';
-         priority = 2;
-         break;
+	case DUMB_BORDER_CONST:
+	    pen = '|';
+	    pen1 = '+';
+	    priority = 2;
+	    break;
 
-       default:
-         pen = dumb_pen;
-         pen1 = dumb_pen;
-         priority = 3;
-         break;
-       }
-      dumb_set_pixel (dumb_x, dumb_y, pen1, priority);
-      for (delta = 1; delta < ABS (y - dumb_y); delta++)
-       dumb_set_pixel (dumb_x
-                       + (int) ((double) (x - dumb_x) * delta / ABS(y - dumb_y)
-                                + 0.5),
-                       dumb_y + delta * sign (y - dumb_y),
-                       pen, priority);
-      dumb_set_pixel (x, y, pen1, priority);
+	default:
+	    pen = dumb_pen;
+	    pen1 = dumb_pen;
+	    priority = 3;
+	    break;
+	}
+	dumb_set_pixel(dumb_x, dumb_y, pen1, priority);
+	for (delta = 1; delta < ABS(y - dumb_y); delta++) {
+	    dumb_set_pixel(dumb_x  + (int) ((double) (x - dumb_x) *
+					    delta / ABS(y - dumb_y) + 0.5),
+			   dumb_y + delta * sign(y - dumb_y), pen, priority);
+	}
+	dumb_set_pixel(x, y, pen1, priority);
+    } else if (ABS(x - dumb_x) > ABS(y - dumb_y)) {
+	switch (dumb_pen) {
+	case DUMB_AXIS_CONST:
+	    pen = '.';
+	    pen1 = '+';
+	    priority = 1;
+	    break;
+
+	case DUMB_BORDER_CONST:
+	    pen = '-';
+	    pen1 = '+';
+	    priority = 2;
+	    break;
+
+	default:
+	    pen = dumb_pen;
+	    pen1 = dumb_pen;
+	    priority = 3;
+	    break;
+	}
+	dumb_set_pixel(dumb_x, dumb_y, pen1, priority);
+	for (delta = 1; delta < ABS(x - dumb_x); delta++)
+	    dumb_set_pixel(dumb_x + delta * sign(x - dumb_x),
+			   dumb_y +
+			   (int) ((double) (y - dumb_y) * delta / ABS(x - dumb_x)
+				  + 0.5),
+			   pen, priority);
+	dumb_set_pixel(x, y, pen1, priority);
+    } else {
+	switch (dumb_pen) {
+	case DUMB_AXIS_CONST:	/* zero length axis */
+	    pen = '+';
+	    priority = 1;
+	    break;
+
+	case DUMB_BORDER_CONST:	/* zero length border */
+	    pen = '+';
+	    priority = 2;
+	    break;
+
+	default:
+	    pen = dumb_pen;
+	    priority = 3;
+	    break;
+	}
+	for (delta = 0; delta <= ABS(x - dumb_x); delta++)
+	    dumb_set_pixel(dumb_x + delta * sign(x - dumb_x),
+			   dumb_y + delta * sign(y - dumb_y),
+			   pen, priority);
     }
-  else if (ABS (x - dumb_x) > ABS (y - dumb_y))
-    {
-      switch (dumb_pen)
-       {
-       case DUMB_AXIS_CONST:
-         pen = '.';
-         pen1 = '+';
-         priority = 1;
-         break;
-
-       case DUMB_BORDER_CONST:
-         pen = '-';
-         pen1 = '+';
-         priority = 2;
-         break;
-
-       default:
-         pen = dumb_pen;
-         pen1 = dumb_pen;
-         priority = 3;
-         break;
-       }
-      dumb_set_pixel (dumb_x, dumb_y, pen1, priority);
-      for (delta = 1; delta < ABS (x - dumb_x); delta++)
-       dumb_set_pixel (dumb_x + delta * sign (x - dumb_x),
-                       dumb_y +
-                       (int) ((double) (y - dumb_y) * delta / ABS(x - dumb_x)
-                              + 0.5),
-                       pen, priority);
-      dumb_set_pixel (x, y, pen1, priority);
-    }
-  else
-    {
-      switch (dumb_pen)
-       {
-       case DUMB_AXIS_CONST:	/* zero length axis */
-         pen = '+';
-         priority = 1;
-         break;
-
-       case DUMB_BORDER_CONST:	/* zero length border */
-         pen = '+';
-         priority = 2;
-         break;
-
-       default:
-         pen = dumb_pen;
-         priority = 3;
-         break;
-       }
-      for (delta = 0; delta <= ABS (x - dumb_x); delta++)
-	dumb_set_pixel (dumb_x + delta * sign (x - dumb_x),
-			dumb_y + delta * sign (y - dumb_y),
-			pen, priority);
-    }
-  dumb_x = x;
-  dumb_y = y;
+    dumb_x = x;
+    dumb_y = y;
 }
 
 
-TERM_PUBLIC void DUMB_put_text(x,y,str)
+TERM_PUBLIC void DUMB_put_text(x, y, str)
 unsigned int x, y;
 char *str;
 {
-  int length;
+    int length;
 
-  length = strlen(str);
-  if (x + length > dumb_xmax)
-    x = GPMAX(0, dumb_xmax - length);
+    length = strlen(str);
+    if (x + length > dumb_xmax)
+	x = GPMAX(0, dumb_xmax - length);
 
-  for (; x < dumb_xmax && *str; x++, str++)
-    dumb_set_pixel (x, y, *str, 5);
+    for (; x < dumb_xmax && *str; x++, str++)
+	dumb_set_pixel(x, y, *str, 5);
 }
 
 
-TERM_PUBLIC void DUMB_arrow (sx,sy,ex,ey,head)
-unsigned int sx,sy,ex,ey;
-int head; /* ignored */
+TERM_PUBLIC void DUMB_arrow(sx, sy, ex, ey, head)
+unsigned int sx, sy, ex, ey;
+int head;			/* ignored */
 {
-  char saved_pen;
-  char saved_x;
-  char saved_y;
+    char saved_pen;
+    char saved_x;
+    char saved_y;
 
-  saved_pen = dumb_pen;
-  saved_x = dumb_x;
-  saved_y = dumb_y;
+    saved_pen = dumb_pen;
+    saved_x = dumb_x;
+    saved_y = dumb_y;
 
-  dumb_pen = '>';
-  dumb_x = sx;
-  dumb_y = sy;
-  DUMB_vector (ex,ey);
+    dumb_pen = '>';
+    dumb_x = sx;
+    dumb_y = sy;
+    DUMB_vector(ex, ey);
 
-  dumb_pen = saved_pen;
-  dumb_x = saved_x;
-  dumb_y = saved_y;
+    dumb_pen = saved_pen;
+    dumb_x = saved_x;
+    dumb_y = saved_y;
 }
+
 #endif /* TERM_BODY */
 
 #ifdef TERM_TABLE
 TERM_TABLE_START(dumb_driver)
-         "dumb", "printer or glass dumb terminal",
-         DUMB_XMAX, DUMB_YMAX, 1, 1,
-         1, 1, DUMB_options, DUMB_init, DUMB_reset,
-         DUMB_text, null_scale, DUMB_graphics, DUMB_move, DUMB_vector,
-         DUMB_linetype, DUMB_put_text, null_text_angle,
-         null_justify_text, DUMB_point, DUMB_arrow, set_font_null,
-			0, /* pointsize */
-			TERM_CAN_MULTIPLOT
+    "dumb", "printer or glass dumb terminal",
+    DUMB_XMAX, DUMB_YMAX, 1, 1,
+    1, 1, DUMB_options, DUMB_init, DUMB_reset,
+    DUMB_text, null_scale, DUMB_graphics, DUMB_move, DUMB_vector,
+    DUMB_linetype, DUMB_put_text, null_text_angle,
+    null_justify_text, DUMB_point, DUMB_arrow, set_font_null,
+    0,				/* pointsize */
+    TERM_CAN_MULTIPLOT
 TERM_TABLE_END(dumb_driver)
 
 #undef LAST_TERM
@@ -365,6 +364,7 @@ TERM_TABLE_END(dumb_driver)
 #ifdef TERM_HELP
 START_HELP(dumb)
 "1 dumb",
+"?commands set terminal dumb",
 "?set terminal dumb",
 "?set term dumb",
 "?terminal dumb",
@@ -383,4 +383,4 @@ START_HELP(dumb)
 "       set term dumb nofeed",
 "       set term dumb 79 49 # VGA screen---why would anyone do that?"
 END_HELP(dumb)
-#endif
+#endif /* TERM_HELP */

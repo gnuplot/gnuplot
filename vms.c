@@ -38,6 +38,7 @@ static char    *RCSid = "$Id: vms.c,v 1.5 1998/06/18 14:55:22 ddenholm Exp $";
  * (originally written by drd for port of perl to vms)
  */
 
+#include "plot.h"     /* for the prototypes */
 #include "stdfn.h"
 
 static int something_in_this_file;
@@ -50,10 +51,6 @@ static int something_in_this_file;
 #define FATAL(msg) { fprintf(stderr, "%s\nFile %s line %d\n", msg, __FILE__, __LINE__); exit(EXIT_FAILURE); }
 
  
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
 #include <dvidef.h>
 #include <syidef.h>
 #include <jpidef.h>
@@ -120,7 +117,7 @@ popen_completion_ast(unsigned long int unused)
 FILE *
 popen(char *cmd, char *mode)
 {
-    char mbxname[64];
+    static char mbxname[64];
     unsigned short int chan;
     unsigned long int flags=1;  /* nowait - gnu c doesn't allow &1 */
     struct pipe_details *info;

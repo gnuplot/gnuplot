@@ -42,53 +42,51 @@
  */
 
 #ifndef ANSI_CHECK_H
-#define ANSI_CHECK_H
+# define ANSI_CHECK_H
 
-#if defined(__STDC__) && __STDC__
-# ifndef ANSI_C
-#define ANSI_C
-# endif /* ANSI_C */
-#endif /* __STDC__ */
+# ifndef HAVE_CONFIG_H
+/* Only relevant for systems which don't run configure */
+
+#  if defined(__STDC__) && __STDC__
+#   ifndef ANSI_C
+#    define ANSI_C
+#   endif
+#  endif /* __STDC__ */
 
 /* are all these compiler tests necessary ? - can the makefiles not
  * just set ANSI_C ?
  */
-/* must encapsulate HAVE_CPP_STRINGIFY to avoid having it defined
- * on autoconfiscated platforms where it's unavailable
- */ 
 
-#if defined(ANSI_C) || defined(__TURBOC__) || defined (__PUREC__) || defined (__ZTC__) || defined (_MSC_VER) || (defined(OSK) && defined(_ANSI_EXT))
-# ifndef PROTOTYPES
-#  define PROTOTYPES
-# endif /* PROTOTYPES */
-# ifndef HAVE_CPP_STRINGIFY
-#  define HAVE_CPP_STRINGIFY
-# endif
-#endif /* ANSI_C ... */
+#  if defined(ANSI_C) || defined(__TURBOC__) || defined (__PUREC__) || defined (__ZTC__) || defined (_MSC_VER) || (defined(OSK) && defined(_ANSI_EXT))
+#   ifndef PROTOTYPES
+#    define PROTOTYPES
+#   endif
+#   ifndef HAVE_STRINGIZE
+#    ifndef VAXC	   /* not quite ANSI_C */
+#     define HAVE_STRINGIZE
+#    endif
+#   endif
+#  endif /* ANSI_C ... */
+
+#  ifndef ANSI_C
+#   define const
+#  endif
+
+# endif /* !HAVE_CONFIG_H */
 
 /* used to be __P but it was just too difficult to guess whether
  * standard headers define it. It's not as if the defn is
  * particularly difficult to do ourselves...
  */
-
-#ifdef PROTOTYPES
-# define __PROTO(proto) proto
-#else
-# define __PROTO(proto) ()
-#endif
-
+# ifdef PROTOTYPES
+#  define __PROTO(proto) proto
+# else
+#  define __PROTO(proto) ()
+# endif
 
 /* generic pointer type. For old compilers this has to be changed to char *,
-   but I don't know if there are any CC's that support void and not void * */
-
-#define generic void
-
-/* undef const for old compilers
- * I think autoconf tests const : why don't we use its test ?
+ * but I don't know if there are any CC's that support void and not void *
  */
-
-#ifndef ANSI_C
-# define const
-#endif
+#  define generic void
 
 #endif /* ANSI_CHECK_H */

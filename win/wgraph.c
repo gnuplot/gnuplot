@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: wgraph.c,v 1.14 1998/03/22 23:32:00 drd Exp $";
+static char *RCSid = "$Id: wgraph.c,v 1.5 1998/12/04 15:17:04 lhecking Exp $";
 #endif
 
 /* GNUPLOT - win/wgraph.c */
@@ -72,9 +72,9 @@ void ReadGraphIni(LPGW lpgw);
 
 #define WGDEFCOLOR 15
 COLORREF wginitcolor[WGDEFCOLOR] =  {
-	RGB(0,0,255),	/* blue */
-	RGB(0,255,0),	/* green */
 	RGB(255,0,0),	/* red */
+	RGB(0,255,0),	/* green */
+	RGB(0,0,255),	/* blue */
 	RGB(255,0,255), /* magenta */
 	RGB(0,0,128),	/* dark blue */
 	RGB(128,0,0),	/* dark red */
@@ -214,7 +214,7 @@ GraphInit(LPGW lpgw)
 		wndclass.hInstance = lpgw->hInstance;
 		wndclass.hIcon = LoadIcon(NULL, IDI_APPLICATION);
 		wndclass.hCursor = LoadCursor(NULL, IDC_ARROW);
-		wndclass.hbrBackground = GetStockBrush(WHITE_BRUSH);
+		wndclass.hbrBackground = (HBRUSH)GetStockObject(WHITE_BRUSH);
 		wndclass.lpszMenuName = NULL;
 		wndclass.lpszClassName = szGraphClass;
 		RegisterClass(&wndclass);
@@ -384,6 +384,9 @@ MakePens(LPGW lpgw, HDC hdc)
 		for (i=0; i<WGNUMPENS; i++)
 		{
 			lpgw->hpen[i] = CreatePenIndirect((LOGPEN FAR *)&lpgw->colorpen[i+2]);
+#if 1 /* HBB 980118 fix 'numsolid' problem */
+			lpgw->hsolidpen[i] = CreatePen(PS_SOLID, 1, lpgw->colorpen[i+2].lopnColor);
+#endif
 			}
 		/* find number of solid, unit width line styles */
 		for (i=0; i<WGNUMPENS && lpgw->colorpen[i+2].lopnStyle==PS_SOLID
@@ -400,13 +403,17 @@ DestroyPens(LPGW lpgw)
 {
 	int i;
 
-	DeleteBrush(lpgw->hbrush);
-	DeletePen(lpgw->hbpen);
-	DeletePen(lpgw->hapen);
+	DeleteObject(lpgw->hbrush);
+	DeleteObject(lpgw->hbpen);
+	DeleteObject(lpgw->hapen);
 	for (i=0; i<WGNUMPENS; i++)
-		DeletePen(lpgw->hpen[i]);
+		DeleteObject(lpgw->hpen[i]);
+#if 1 /* HBB 980118: fix 'numsolid' gotcha */
+	for (i=0; i<WGNUMPENS; i++)
+		DeleteObject(lpgw->hsolidpen[i]);
+#endif
 	for (i=0; i<WGNUMPENS+2; i++)
-		DeleteBrush(lpgw->colorbrush[i]);
+		DeleteObject(lpgw->colorbrush[i]);
 }
 
 /* ================================== */
@@ -446,7 +453,7 @@ MakeFonts(LPGW lpgw, LPRECT lprect, HDC hdc)
 	}
 
 	/* save text size */
-	hfontold = SelectFont(hdc, lpgw->hfonth);
+	hfontold = SelectObject(hdc, lpgw->hfonth);
 #ifdef WIN32
 	{
 	SIZE size;
@@ -469,7 +476,7 @@ MakeFonts(LPGW lpgw, LPRECT lprect, HDC hdc)
         cy = MulDiv(cx/20, GetDeviceCaps(hdc,LOGPIXELSY), GetDeviceCaps(hdc,LOGPIXELSX));
         lpgw->vtic = MulDiv(cy,lpgw->ymax,lprect->bottom - lprect->top);
 	/* find out if we can rotate text 90deg */
-	SelectFont(hdc, lpgw->hfontv);
+	SelectObject(hdc, lpgw->hfontv);
 	result = GetDeviceCaps(hdc, TEXTCAPS);
 	if ((result & TC_CR_90) || (result & TC_CR_ANY))
 		lpgw->rotate = 1;
@@ -480,7 +487,7 @@ MakeFonts(LPGW lpgw, LPRECT lprect, HDC hdc)
 	if (tm.tmPitchAndFamily & TMPF_TRUETYPE)
 		lpgw->rotate = 1;	/* truetype fonts can all be rotated */
 #endif
-	SelectFont(hdc, hfontold);
+	SelectObject(hdc, hfontold);
 	return;
 }
 
@@ -488,11 +495,11 @@ void
 DestroyFonts(LPGW lpgw)
 {
 	if (lpgw->hfonth) {
-		DeleteFont(lpgw->hfonth);
+		DeleteObject(lpgw->hfonth);
 		lpgw->hfonth = 0;
 	}
 	if (lpgw->hfontv) {
-		DeleteFont(lpgw->hfontv);
+		DeleteObject(lpgw->hfontv);
 		lpgw->hfontv = 0;
 	}
 	return;
@@ -503,11 +510,11 @@ SetFont(LPGW lpgw, HDC hdc)
 {
 	if (lpgw->rotate && lpgw->angle) {
 		if (lpgw->hfontv)
-			SelectFont(hdc, lpgw->hfontv);
+			SelectObject(hdc, lpgw->hfontv);
 	}
 	else {
 		if (lpgw->hfonth)
-			SelectFont(hdc, lpgw->hfonth);
+			SelectObject(hdc, lpgw->hfonth);
 	}
 	return;
 }
@@ -572,7 +579,8 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 	int rr, rl, rt, rb;
 	struct GWOP FAR *curptr;
 	struct GWOPBLK *blkptr;
-	int htic, vtic, vshift;
+	int htic, vtic;
+	int hshift, vshift;
 	unsigned int lastop=-1;		/* used for plotting last point on a line */
 	int pen, numsolid;
 	int polymax = 200;
@@ -604,10 +612,13 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 	SetFont(lpgw, hdc);
 	SetTextAlign(hdc, TA_LEFT|TA_BOTTOM);
 	vshift = MulDiv(lpgw->vchar, rb-rt, lpgw->ymax)/2;
+	/* HBB 980630: new variable for moving rotated text to the correct
+	 * position: */
+	hshift = MulDiv(lpgw->vchar, rr-rl, lpgw->xmax)/2;
 
 	pen = 0;
-	SelectPen(hdc, lpgw->hpen[pen]);
-	SelectBrush(hdc, lpgw->colorbrush[pen+2]);
+	SelectObject(hdc, lpgw->hpen[pen]);
+	SelectObject(hdc, lpgw->colorbrush[pen+2]);
 	numsolid = lpgw->numsolid;
 
 	/* do the drawing */
@@ -653,27 +664,31 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 				switch (curptr->x)
 				{
 				    case (WORD) -2:		/* black 2 pixel wide */
-					    SelectPen(hdc, lpgw->hbpen);
+					    SelectObject(hdc, lpgw->hbpen);
 					    if (lpgw->color && isColor)
 					        SetTextColor(hdc, lpgw->colorpen[0].lopnColor);
 					    break;
 				    case (WORD) -1:		/* black 1 pixel wide doted */
-					    SelectPen(hdc, lpgw->hapen);
+					    SelectObject(hdc, lpgw->hapen);
 					    if (lpgw->color && isColor)
 					        SetTextColor(hdc, lpgw->colorpen[1].lopnColor);
 					    break;
 				    default:
-					    SelectPen(hdc, lpgw->hpen[(curptr->x)%WGNUMPENS]);
+					    SelectObject(hdc, lpgw->hpen[(curptr->x)%WGNUMPENS]);
 					    if (lpgw->color && isColor)
 					        SetTextColor(hdc, lpgw->colorpen[(curptr->x)%WGNUMPENS + 2].lopnColor);
 				}
 				pen = curptr->x;
-				SelectBrush(hdc, lpgw->colorbrush[pen%WGNUMPENS + 2]);
+				SelectObject(hdc, lpgw->colorbrush[pen%WGNUMPENS + 2]);
 				break;
 			case W_put_text:
 				{char *str;
 				str = LocalLock(curptr->htext);
 				if (str) {
+					/* HBB 980630: shift differently for rotated text: */
+					if (lpgw->angle)
+						xdash += hshift;
+					else
 					ydash += vshift;
 					SetBkMode(hdc,TRANSPARENT);
 					TextOut(hdc,xdash,ydash,str,lstrlen(str));
@@ -701,7 +716,6 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 					}
 				break;
 			case W_pointsize:
-#if 1
 				/* HBB 980309: term->pointsize() passes the number as a scaled-up
 				 * integer now, so we can avoid calling sscanf() here (in a Win16
 				 * DLL sharing stack with the stack-starved wgnuplot.exe !).
@@ -712,9 +726,8 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 					 * pointsize at all! That obviously can't be correct. So use it! */
 					htic = pointsize*MulDiv(lpgw->htic, rr-rl, lpgw->xmax) + 1;
 					vtic = pointsize*MulDiv(lpgw->vtic, rb-rt, lpgw->ymax) + 1;
-				} else
-#endif
-				{	char *str;
+                               } else {
+					char *str;
 					str = LocalLock(curptr->htext);
 					if (str) {
 						double pointsize;
@@ -726,11 +739,15 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 				}
 				break;
 			default:	/* A plot mark */
+#if 0 /* HBB 980118: fix 'sumsolid' gotcha: */
 				if (pen >= numsolid) {
 					pen %= numsolid;	/* select solid pen */
-					SelectPen(hdc, lpgw->hpen[pen]);
-					SelectBrush(hdc, lpgw->colorbrush[pen+2]);
+					SelectObject(hdc, lpgw->hpen[pen]);
+					SelectObject(hdc, lpgw->colorbrush[pen+2]);
 				}
+#else
+                                SelectObject(hdc, lpgw->hsolidpen[pen%WGNUMPENS]);
+#endif
                                 switch (curptr->op) {
 					case W_dot:
 						dot(hdc, xdash, ydash);
@@ -857,7 +874,7 @@ CopyClip(LPGW lpgw)
 			rect.bottom - rect.top);
 	if (bitmap) {
 		/* there is enough memory and the bitmaps OK */
-		SelectBitmap(mem, bitmap);
+		SelectObject(mem, bitmap);
 		BitBlt(mem,0,0,rect.right - rect.left, 
 			rect.bottom - rect.top, hdc, rect.left,
 			rect.top, SRCCOPY);
@@ -871,17 +888,34 @@ CopyClip(LPGW lpgw)
 	{
 	GW gwclip = *lpgw;
 	int windowfontsize = MulDiv(lpgw->fontsize, GetDeviceCaps(hdc, LOGPIXELSY), 72);
+	int i;
 	gwclip.fontsize = MulDiv(windowfontsize, lpgw->ymax, rect.bottom);
 	gwclip.hfonth = gwclip.hfontv = 0;
+
+	/* HBB 981203: scale up pens as well... */
+	for (i=0; i<WGNUMPENS+2; i++) {
+		if(gwclip.monopen[i].lopnWidth.x > 1)
+			gwclip.monopen[i].lopnWidth.x =
+				MulDiv(gwclip.monopen[i].lopnWidth.x,
+					gwclip.xmax, rect.right-rect.left);
+		if(gwclip.colorpen[i].lopnWidth.x > 1)
+			gwclip.colorpen[i].lopnWidth.x =
+				MulDiv(gwclip.colorpen[i].lopnWidth.x,
+					gwclip.xmax, rect.right-rect.left);
+	}
+
 	rect.right = lpgw->xmax;
 	rect.bottom = lpgw->ymax;
 	
+	MakePens(&gwclip, hdc);
 	MakeFonts(&gwclip, &rect, hdc);
 
 	ReleaseDC(hwnd, hdc);
 
 	hdc = CreateMetaFile((LPSTR)NULL);
-	SetMapMode(hdc, MM_ANISOTROPIC);
+
+/* HBB 981203: According to Petzold, Metafiles shouldn't contain SetMapMode() calls: */
+	/*SetMapMode(hdc, MM_ANISOTROPIC);*/
 #ifdef WIN32
 	SetWindowExtEx(hdc, rect.right, rect.bottom, (LPSIZE)NULL);
 #else
@@ -890,6 +924,7 @@ CopyClip(LPGW lpgw)
 	drawgraph(&gwclip, hdc, (void *) &rect);
 	hmf = CloseMetaFile(hdc);
 	DestroyFonts(&gwclip);
+	DestroyPens(&gwclip);
 	}
 
 	hGMem = GlobalAlloc(GMEM_MOVEABLE, (DWORD)sizeof(METAFILEPICT));
@@ -899,7 +934,8 @@ CopyClip(LPGW lpgw)
 	/* in MM_ANISOTROPIC, xExt & yExt give suggested size in 0.01mm units */
 	lpMFP->mm = MM_ANISOTROPIC;
 	lpMFP->xExt = MulDiv(rect.right-rect.left, 2540, GetDeviceCaps(hdc, LOGPIXELSX));
-	lpMFP->yExt = MulDiv(rect.bottom-rect.top, 2540, GetDeviceCaps(hdc, LOGPIXELSX));
+	/* HBB 981203: Seems it should be LOGPIXELS_Y_, here, not _X_*/
+	lpMFP->yExt = MulDiv(rect.bottom-rect.top, 2540, GetDeviceCaps(hdc, LOGPIXELSY));
 	lpMFP->hMF = hmf;
 	ReleaseDC(hwnd, hdc);
 	GlobalUnlock(hGMem);
@@ -1402,8 +1438,8 @@ LineStyleDlgProc(HWND hdlg, UINT wmsg, WPARAM wparam, LPARAM lparam)
 			plpc = &lpls->colorpen[pen];
 			hBrush = CreateSolidBrush(plpc->lopnColor);
 			FillRect(lpdis->hDC, &lpdis->rcItem, hBrush);
-			FrameRect(lpdis->hDC, &lpdis->rcItem, GetStockBrush(BLACK_BRUSH));
-			DeleteBrush(hBrush);
+			FrameRect(lpdis->hDC, &lpdis->rcItem, (HBRUSH)GetStockObject(BLACK_BRUSH));
+			DeleteObject(hBrush);
 			}
 			return FALSE;
 	}

@@ -1,8 +1,8 @@
-/*
+/*[
  * GNUPLOT - grass.trm
  * $Id: grass.trm,v
  *-
- * Copyright (C) 1992-1995. James Darrell McCauley
+ * Copyright (C) 1992-1995, 1999. James Darrell McCauley
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted,
@@ -11,8 +11,24 @@
  * in supporting documentation.
  *
  * Permission to modify the software is granted, but not the right to
- * distribute the modified code.  Modifications are to be distributed
- * as patches to released version.
+ * distribute the complete modified source code.  Modifications are to
+ * be distributed as patches to the released version.  Permission to
+ * distribute binaries produced by compiling modified sources is granted,
+ * provided you
+ *   1. distribute the corresponding source modifications from the
+ *    released version in the form of a patch file along with the binaries,
+ *   2. add special version identification to distinguish your version
+ *    in addition to the base release version number,
+ *   3. provide your name and address as the primary contact for the
+ *    support of your modified version, and
+ *   4. retain our contact information in regard to use of the base
+ *    software.
+ * Permission to distribute the released version of the source code along
+ * with corresponding source modifications in the form of a patch file is
+ * granted with same provisions 2 through 4 for binary distributions.
+ *
+ * This software is provided "as is" without express or implied warranty
+ * to the extent permitted by applicable law.
  *
  * This software  is provided "as is" without express or implied warranty.
  *
@@ -30,9 +46,12 @@
  *               compiles clean with 'gcc -Wall'
  * 14 Apr 1995 - adapted for new layout, added font selection
  *
+ * 13 Jan 1999 - Copyright statement changed to new gnuplot copyright
+ *               Permission given by orig author in private email (lh)
+ *
  * send your comments or suggestions to (grassp-list@moon.cecer.army.mil).
  *
- */
+]*/
 
 #include "driver.h"
 
@@ -57,15 +76,10 @@ TERM_PUBLIC void GRASS_point __PROTO((unsigned int x, unsigned int y, int point)
 TERM_PUBLIC int GRASS_set_font __PROTO((char *font));
 /* TERM_PUBLIC void GRASS_set_pointsize __PROTO((double size)); */
 TERM_PUBLIC void GRASS_arrow __PROTO((unsigned int sx, unsigned int sy, unsigned int ex, unsigned int ey, int head));
-#define GOT_GRASS_PROTO
 #endif /* TERM_PROTO */
 
 #ifndef TERM_PROTO_ONLY
 #ifdef TERM_BODY
-
-#include <stdio.h>
-#include <string.h>
-/* #include "gis.h" */ /* this causes conflicts with things in term.c */
 
 #include <stdio.h>
 #include <string.h>
@@ -545,7 +559,7 @@ char *font;
   /* G_warning(font); */
 
   sep=strcspn(font,",");
-  strncpy(name,font,sep); name[sep]='\0';
+  strncpy(name,font,sep); name[sep]=NUL;
   sscanf (&(font[sep+1]),"%d",&size);
 
   if (size==0)
@@ -603,6 +617,7 @@ TERM_TABLE_END(grass_driver)
 #ifdef TERM_HELP
 START_HELP(grass)
 "1 grass",
+"?commands set terminal grass",
 "?set terminal grass",
 "?set term grass",
 "?terminal grass",

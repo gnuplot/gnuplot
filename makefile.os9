@@ -2,7 +2,7 @@
 #
 # $Id: makefile.os9,v 1.4 1998/04/14 00:15:55 drd Exp $
 #
-# GNUPLOT 3.6 makefile (X11 support) for OS-9 and Ultra C
+# GNUPLOT 3.7 makefile (X11 support) for OS-9 and Ultra C
 #   by Martijn Schipper 18-6-1996
 #   schipper@iri.tudelft.nl
 #
@@ -89,20 +89,23 @@ $(HELPFILE): doc2gih $(D)gnuplot.doc
 	$(ODIR)/doc2gih <$(D)gnuplot.doc >-$(HELPFILE)
 	attr -pr $(HELPFILE)
 
-doc2gih: $(RDIR)/doc2gih.$(O)
-	$(LC) $(LFLAGS) $(RDIR)/doc2gih.$(O) -f=$(ODIR)/$@
+doc2gih: $(RDIR)/doc2gih.$(O) $(RDIR)/termdoc.$(O) 
+	$(LC) $(LFLAGS) $(RDIR)/doc2gih.$(O) $(RDIR)/termdoc.$(O) -f=$(ODIR)/$@
 
 $(RDIR)/doc2gih.$(O): $(D)doc2gih.c
 	$(CC) $(CFLAGS) $(CCFLAGS) -v=$(SDIR) -v=TERM $(D)doc2gih.c
+
+$(RDIR)/termdoc.$(O): $(D)termdoc.c
+	$(CC) $(CFLAGS) $(CCFLAGS) -v=$(SDIR) -v=TERM $(D)termdoc.c
 
 #
 # For X11 support generate gnuplot_X11
 # I have only old X11 R4 libraries, that is the reason for using compatability
 # mode for compiling and linking gnuplot_x11
 #
-gnuplot_X11: $(RDIR)/gplt_x11.$(O)
+gnuplot_X11: $(RDIR)/gplt_x11.$(O) $(RDIR)/stdfn.$(O)
 	$(LC) -mode=compat $(DEBUG) -q -m=64 $(X11LIBS) $(RDIR)/gplt_x11.$(O) \
-	-n=$@ -f=$(ODIR)/$@
+	$(RDIR)/stdfn.$(O) -n=$@ -f=$(ODIR)/$@
 	attr -pepr $(ODIR)/$@
 
 $(RDIR)/gplt_x11.$(O): gplt_x11.c
@@ -140,7 +143,10 @@ gnuplot: $(OBJS)
 include makefile.all
 
 command.$(O): command.c
-	$(CC) $(CFLAGS) -DHELPFILE="$(HELPFILE)" $(CCFLAGS) command.c
+	$(CC) $(CFLAGS) -DHELPFILE=\"$(HELPFILE)\" $(CCFLAGS) command.c
+
+show.$(O): show.c
+	$(CC) $(CFLAGS) -DHELPFILE=\"($HELPFILE)\" $(CCFLAGS) show.c
 
 term.$(O): term.c $(CORETERM)
 	$(CC) $(CFLAGS) $(TERMFLAGS) -v=TERM -v=$(SDIR) $(CCFLAGS) term.c

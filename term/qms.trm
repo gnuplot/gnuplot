@@ -47,6 +47,7 @@
  * send your comments or suggestions to (info-gnuplot@dartmouth.edu).
  * 
  */
+
 /*
  * adapted to the new terminal layout by Stefan Bodewig (Dec. 1995)
  */
@@ -85,20 +86,23 @@ static int qms_line = 0;	/* to remember current line type */
 
 TERM_PUBLIC void QMS_init()
 {
-/* This was just ^IOL, but at Rutgers at least we need some more stuff */
-  fprintf(outfile,"^PY^-\n^IOL\n^ISYNTAX00000^F^IB11000^IJ00000^IT00000\n");
-/*                 ^ QUIC on    ^set defaults  ^ set botttom,top,left margins
-                          ^landscape         ^free format   */
+    /* This was just ^IOL, but at Rutgers at least we need some more stuff */
+    fputs("^PY^-\n^IOL\n^ISYNTAX00000^F^IB11000^IJ00000^IT00000\n", gpoutfile);
+    /*     ^ QUIC on    ^set defaults  ^ set botttom,top,left margins
+     *            ^landscape         ^free format
+     */
+
 /* set defaults are: implicit decimal point, units in inches, 
-   numbers left justified, units in 1/1000 inch, do not ignore spaces */
-/* margins are in 1/1000 inch units */
+ * numbers left justified, units in 1/1000 inch, do not ignore spaces
+ * margins are in 1/1000 inch units
+ */
 }
 
 
 TERM_PUBLIC void QMS_graphics()
 {
-	fprintf(outfile,"^IGV\n");
-/*	                 ^enter graphics vector mode */
+    fputs("^IGV\n", gpoutfile);
+    /*     ^enter graphics vector mode */
 }
 
 
@@ -107,18 +111,19 @@ TERM_PUBLIC void QMS_text()
 {
 /* added ^-, because ^, after an ^I command doesn't actually print a page */
 /* Did anybody try this code out?  [uhh...-cdk] */
-	fprintf(outfile,"^IGE\n^-^,");
-/*	                 ^exit graphics vector mode
-	                       ^pass terminator
-	                         ^print page  */
+    fputs("^IGE\n^-^,", gpoutfile);
+    /*     ^exit graphics vector mode
+     *           ^pass terminator
+     *             ^print page
+     */
 }
 
 
 TERM_PUBLIC void QMS_linetype(linetype)
 int linetype;
 {
-static int width[2+9] = {7, 3, 3, 3, 3, 5, 5, 5, 7, 7, 7};
-static int type[2+9] =  {0, 1, 0, 2, 3, 0, 2, 3, 0, 2, 3};
+    static int width[2 + 9] = { 7, 3, 3, 3, 3, 5, 5, 5, 7, 7, 7 };
+    static int type[2 + 9] = { 0, 1, 0, 2, 3, 0, 2, 3, 0, 2, 3 };
 /*
  * I don't know about Villanova, but on our printer, using ^V without
  * previously setting up a pattern crashes the microcode.
@@ -128,83 +133,85 @@ static int type[2+9] =  {0, 1, 0, 2, 3, 0, 2, 3, 0, 2, 3};
 /* Code to define patterns added by rjl
  * According to the manual it should work - but it doesn't
  */
-	qms_line = linetype;
-	if (linetype >= 9)
-		linetype %= 9;
-	fprintf(outfile,"^PW%02d\n",width[linetype+2]); 
+    qms_line = linetype;
+    if (linetype >= 9)
+	linetype %= 9;
+
+    fprintf(gpoutfile, "^PW%02d\n", width[linetype + 2]);
 /*	                 ^width in dots */
-	switch (type[linetype+2]) {
-		case 1 :	/* short dash */
-			fprintf(outfile,"^PV102025^G\n^V1\n");
-/* ^PV = define pattern vector, 1 = pattern number,
-   02 = number of pen downs and ups, 025 = .025" length of ups/downs */
-			break;
-		case 2 :	/* medium dash */
-			fprintf(outfile,"^PV202050^G\n^V2\n");
-			break;
-		case 3 :	/* long dash */
-			fprintf(outfile,"^PV302100^G\n^V3\n");
-			break;
-		default:
-		case 0 :
-			fprintf(outfile,"^V0\n");
-			break;
-	}
+
+    switch (type[linetype + 2]) {
+    case 1:			/* short dash */
+	fputs("^PV102025^G\n^V1\n", gpoutfile);
+	/* ^PV = define pattern vector, 1 = pattern number,
+	 * 02 = number of pen downs and ups, 025 = .025" length of ups/downs
+	 */
+	break;
+    case 2:			/* medium dash */
+	fputs("^PV202050^G\n^V2\n", gpoutfile);
+	break;
+    case 3:			/* long dash */
+	fputs("^PV302100^G\n^V3\n", gpoutfile);
+	break;
+    default:
+    case 0:
+	fputs("^V0\n", gpoutfile);
+	break;
+    }
 }
 
 
-TERM_PUBLIC void QMS_move(x,y)
-unsigned int x,y;
+TERM_PUBLIC void QMS_move(x, y)
+unsigned int x, y;
 {
-	fprintf(outfile,"^U%05d:%05d\n", 1000 + x, QMS_YLAST + 1000 - y);
-/*	                 ^pen up vector*/
+    fprintf(gpoutfile, "^U%05d:%05d\n", 1000 + x, QMS_YLAST + 1000 - y);
+    /*                   ^pen up vector*/
 }
 
 
-TERM_PUBLIC void QMS_vector(x2,y2)
-unsigned int x2,y2;
+TERM_PUBLIC void QMS_vector(x2, y2)
+unsigned int x2, y2;
 {
-	fprintf(outfile,"^D%05d:%05d\n", 1000 + x2, QMS_YLAST + 1000 - y2);
-/*	                 ^pen down vector*/
+    fprintf(gpoutfile, "^D%05d:%05d\n", 1000 + x2, QMS_YLAST + 1000 - y2);
+    /*                  ^pen down vector*/
 }
 
 
-TERM_PUBLIC void QMS_put_text(x,y,str)
-unsigned int x,y;
+TERM_PUBLIC void QMS_put_text(x, y, str)
+unsigned int x, y;
 char str[];
 {
-char ch;
-	QMS_move(x,y + QMS_VCHAR/3);
-	fputs("^IGE\n",outfile);
+    char ch;
+    QMS_move(x, y + QMS_VCHAR / 3);
+    fputs("^IGE\n", gpoutfile);
+    ch = *str++;
+    while (ch != NUL) {
+	if (ch == '^')
+	    putc('^', gpoutfile);
+	putc(ch, gpoutfile);
 	ch = *str++;
-	while(ch!='\0') {
-		if (ch=='^')
-			putc('^',outfile);
-		putc(ch,outfile);
-		ch = *str++;
-	}
-	fputs("\n^IGV\n",outfile);
-	QMS_linetype(qms_line); /* restore line type */
+    }
+    fputs("\n^IGV\n", gpoutfile);
+    QMS_linetype(qms_line);	/* restore line type */
 }
 
 
 TERM_PUBLIC void QMS_reset()
 {
-	fprintf(outfile,"^PN^-\n");
-/*	                 ^QUIC off*/
+    fputs("^PN^-\n", gpoutfile);
+    /*     ^QUIC off */
 }
 
 #endif /* TERM_BODY */
 
 #ifdef TERM_TABLE
-
 TERM_TABLE_START(qms_driver)
     "qms", "QMS/QUIC Laser printer (also Talaris 1200 and others)",
-	   QMS_XMAX,QMS_YMAX, QMS_VCHAR, QMS_HCHAR, 
-	   QMS_VTIC, QMS_HTIC, options_null, QMS_init,QMS_reset, 
-	   QMS_text, null_scale, QMS_graphics, QMS_move, QMS_vector,
-	   QMS_linetype,QMS_put_text, null_text_angle, 
-	   null_justify_text, line_and_point, do_arrow, set_font_null
+    QMS_XMAX, QMS_YMAX, QMS_VCHAR, QMS_HCHAR,
+    QMS_VTIC, QMS_HTIC, options_null, QMS_init, QMS_reset,
+    QMS_text, null_scale, QMS_graphics, QMS_move, QMS_vector,
+    QMS_linetype, QMS_put_text, null_text_angle,
+    null_justify_text, line_and_point, do_arrow, set_font_null
 TERM_TABLE_END(qms_driver)
 
 #undef LAST_TERM
@@ -216,6 +223,7 @@ TERM_TABLE_END(qms_driver)
 #ifdef TERM_HELP
 START_HELP(qms)
 "1 qms",
+"?commands set terminal qms",
 "?set terminal qms",
 "?set term qms",
 "?terminal qms",

@@ -18,8 +18,9 @@ gnuplot.doc -> gnuplot.gih
             -> gnuplot.hlp
             -> gnuplot.html
             -> gnuplot.info
-            -> gnuplot.itl
+            -> gnuplot.ipf
             -> gnuplot.ms
+            -> gnuplot.rnh
             -> gnuplot.rtf
             -> gnuplot.tex
     	   	  	 	    		
@@ -27,11 +28,13 @@ On Unix, AmigaOS, and MSDOS the interactive help is built into the
 program, and uses the file "gnuplot.gih" ('make gih').
 
 On VMS, the interactive help is supplied by the system help facility,
-using the file "gnuplot.hlp".  This is made with 'make hlp' and must
-be put into a library, either a specific "gnuplot.hlb" or any of the
-system-wide help libraries, using lib/help ('help lib').  If VMS users
-prefer the gnuplot interactive help facility to the system facility,
-this can be easily changed in "command.c".
+using the file "gnuplot.hlp".  This is built by default, either by 
+doc2hlp, or doc2rnh and RUNOFF which format gnuplot.doc for the VMS
+HELP indenting conventions.  The help file is placed in a help library, 
+"gnuplot.hlb" but it may be also be placed in one of the system-wide 
+help libraries, using lib/help ('help lib').  If VMS users prefer the 
+gnuplot interactive help facility to the system facility, this can be 
+easily changed by not defining NO_GIH.
 
 On the World Wide Web, the gnuplot manual can include demonstration
 plots; the links for these are included in the file "gnuplot.html"
@@ -39,7 +42,8 @@ plots; the links for these are included in the file "gnuplot.html"
 
 Under EMACS, interactive help uses the file "gnuplot.info" ('make info').
 
-On OS/2, the interactive help uses the file "gnuplot.itl".
+On OS/2, the Information Presentation Facility Compiler converts the
+file "gnuplot.ipf" to a "gnuplot.inf" file.
 
 The printed document is available in troff/nroff (ms) format, using
 the file "gnuplot.ms".  For nroff, use 'make nroff'. For troff, type
@@ -69,11 +73,11 @@ The printed manual generators and the html generator contain information
 about all terminals.  This is accomplished by concatenating all of the
 ".trm" files into a single one, "allterm.h".
 
-The routine "termdoc.c" is #included by each of the eight processing
-programs ("doc2gih.c", etc.); it in turn #includes either "term.h" or
-"allterm.h", as is appropriate.  If you wish to override the default
-decision about which terminals are to appear in the documentation, edit
-the appropriate "doc2" program to either #define or #undefine ALL_TERM.
+The file "termdoc.c" is used by each of the eight processing programs
+("doc2gih.c", etc.); it #includes either "term.h" or "allterm.h", as is
+appropriate.  If you wish to override the default decision about which
+terminals are to appear in the documentation, edit the appropriate target
+in the Makefile and add/remove -DALL_TERM_DOC to/from the compiler flags.
 
 
 Description of the gnuplot.doc format:
@@ -145,7 +149,7 @@ Backquote pairs are converted by the doc2tex program into boldface;
 Control characters in first column:
 ?    used by .gih format, for builtin interactive help - keyword
 0-9  used by VMS help and by doc2{tex,ms} formatters to define level,keyword
-@    used by doc2{tex,ms} to define table start/end
+@    used by doc2{tex,ms,rnh} to define table start/end
 #    used by doc2tex: table entry
 %    used by doc2ms: table entry
 ^    used by doc2html : hypertext link

@@ -1,4 +1,8 @@
-/* GNUPLOT - mtos.trm */
+/*
+ * $Id: $
+ */
+
+/* GNUPLOT - multitos.trm */
 
 /*[
  * Copyright 1994, 1998
@@ -42,12 +46,12 @@
  * send your comments or suggestions to (info-gnuplot@dartmouth.edu).
  * 
  */
- 
+
 #include "driver.h"
 
 #ifdef TERM_REGISTER
 register_term(mtos)
-#endif           
+#endif
 
 #ifdef TERM_PROTO
 
@@ -60,9 +64,9 @@ TERM_PUBLIC void MTOS_text(void);
 TERM_PUBLIC void MTOS_move(unsigned int x, unsigned int y);
 TERM_PUBLIC void MTOS_vector(unsigned int x, unsigned int y);
 TERM_PUBLIC void MTOS_linetype(int lt);
-TERM_PUBLIC int MTOS_text_angle(int ta);
+TERM_PUBLIC int MTOS_text_angle(int ang);
 TERM_PUBLIC void MTOS_put_text(unsigned int x, unsigned int y, char *str);
-TERM_PUBLIC int  MTOS_justify_text(enum JUSTIFY mode);
+TERM_PUBLIC int MTOS_justify_text(enum JUSTIFY mode);
 TERM_PUBLIC void MTOS_point(unsigned int x, unsigned int y, int number);
 
 /* default to ST high resolution */
@@ -92,7 +96,7 @@ TERM_PUBLIC void MTOS_point(unsigned int x, unsigned int y, int number);
 #include <osbind.h>
 #include <mintbind.h>
 
-int  MTOS_pause(char *str);
+int MTOS_pause(char *str);
 static void MTOS_quit(void);
 void MTOS_open_pipe(void);
 static void write_pid(void);
@@ -125,7 +129,7 @@ static void init_exit(void);
 #define GPCLIENT2       "gpclient"
 
 /* environment */
-#define MYENV          "GNUPLOTPATH" 
+#define MYENV          "GNUPLOTPATH"
 #define PATH           "PATH"
 
 /* some global variables */
@@ -135,229 +139,228 @@ static int pid = -1;
 
 TERM_PUBLIC void MTOS_options()
 {
-	term_options[0] = '\0';
+    term_options[0] = NUL;
 }
 
-TERM_PUBLIC void MTOS_init() 
-{ 
-	char pipe[NAMESIZE];
-	char *file, cmd[MAXPATHLEN];
-	char const *const ext[] = {"prg", "app", NULL};
+TERM_PUBLIC void MTOS_init()
+{
+    char pipe[NAMESIZE];
+    char *file, cmd[MAXPATHLEN+1];
+    char const *const ext[] = { "prg", "app", NULL };
 
-	if (handle < 0) {
-		if (aesid < 0) {
-			if ((aesid = appl_init()) < 0)
-				int_error("APPL_INIT failed !", NO_CARET);			
-		}
-
-		file = findfile(GPCLIENT2,getenv(MYENV),ext);
-		if (!file)
-			strcpy(cmd,GPCLIENT1);
-		else if (file && !strchr(file,'\\') && !strchr(file,'/'))
-			strcpy(cmd,file);
-		else
-			unx2dos(file,cmd);
-		if (!shel_find(cmd))
-			int_error("Cannot find GPCLIENT !", NO_CARET);
-
-		sprintf(&pipe[1],PIPE1,aesid);
-
-		if ((handle = open(&pipe[1], O_RDWR | O_CREAT)) < 0) {
-			if ((handle = (int)Fcreate(&pipe[1],0)) < 0)
-				int_error("Cannot open PIPE to GPCLIENT !", NO_CARET);
-		}
-		
-		pipe[0] = (char)(strlen(&pipe[1])+1);
-
-		if (!shel_write(1,1,100,cmd,pipe)) {
-			close(handle);
-			handle = -1;
-			int_error("Cannot spawn GPCLIENT !", NO_CARET);
-		}
-       	init_exit();
+    if (handle < 0) {
+	if (aesid < 0) {
+	    if ((aesid = appl_init()) < 0)
+		int_error("APPL_INIT failed !", NO_CARET);
 	}
-	if (aesid > -1) menu_register(aesid, "  Terminal: mtos");
+	file = findfile(GPCLIENT2, getenv(MYENV), ext);
+	if (!file)
+	    safe_strncpy(cmd, GPCLIENT1, sizeof(cmd));
+	else if (file && !strchr(file, '\\') && !strchr(file, '/'))
+	    safe_strncpy(cmd, file, sizeof(cmd));
+	else
+	    unx2dos(file, cmd);
+	if (!shel_find(cmd))
+	    int_error("Cannot find GPCLIENT !", NO_CARET);
+
+	sprintf(&pipe[1], PIPE1, aesid);
+
+	if ((handle = open(&pipe[1], O_RDWR | O_CREAT)) < 0) {
+	    if ((handle = (int) Fcreate(&pipe[1], 0)) < 0)
+		int_error("Cannot open PIPE to GPCLIENT !", NO_CARET);
+	}
+	pipe[0] = (char) (strlen(&pipe[1]) + 1);
+
+	if (!shel_write(1, 1, 100, cmd, pipe)) {
+	    close(handle);
+	    handle = -1;
+	    int_error("Cannot spawn GPCLIENT !", NO_CARET);
+	}
+	init_exit();
+    }
+    if (aesid > -1)
+	menu_register(aesid, "  Terminal: mtos");
 }
 
-TERM_PUBLIC void MTOS_reset() 
+TERM_PUBLIC void MTOS_reset()
 {
-	short buff;
+    short buff;
 
-	buff = (short)GR_RESET;
-	write(handle, &buff, SIZE); 
+    buff = (short) GR_RESET;
+    write(handle, &buff, SIZE);
 }
 
-TERM_PUBLIC void MTOS_text() 
+TERM_PUBLIC void MTOS_text()
 {
-	short buff;
+    short buff;
 
-	buff = (short)SET_TEXT;
-	if (MTOS_mode != SET_TEXT) 
-   		write(handle, &buff, SIZE);
-	MTOS_mode = SET_TEXT;
+    buff = (short) SET_TEXT;
+    if (MTOS_mode != SET_TEXT)
+	write(handle, &buff, SIZE);
+    MTOS_mode = SET_TEXT;
 }
 
 TERM_PUBLIC void MTOS_graphics()
-{ 
-	short buff;
+{
+    short buff;
 
-	buff = (short)SET_GRAPHICS;
-	write(handle, &buff, SIZE);
-	MTOS_mode = SET_GRAPHICS ;
+    buff = (short) SET_GRAPHICS;
+    write(handle, &buff, SIZE);
+    MTOS_mode = SET_GRAPHICS;
 }
 
 TERM_PUBLIC void MTOS_move(unsigned int x, unsigned int y)
-{ 
-	short x_1, y_1, buff;
+{
+    short x_1, y_1, buff;
 
-	x_1 = (short)x;
-	y_1 = (short)y;	 
-	buff = (short)GR_MOVE;	
-	write(handle, &buff, SIZE);
-	write(handle, &x_1, SIZE);
-	write(handle, &y_1, SIZE);
+    x_1 = (short) x;
+    y_1 = (short) y;
+    buff = (short) GR_MOVE;
+    write(handle, &buff, SIZE);
+    write(handle, &x_1, SIZE);
+    write(handle, &y_1, SIZE);
 }
 
 TERM_PUBLIC void MTOS_vector(unsigned int x, unsigned int y)
-{ 
-	short x_1, y_1, buff;
+{
+    short x_1, y_1, buff;
 
-	x_1 = (short)x;
-	y_1 = (short)y;	
-	buff = (short)GR_DRAW;
-	write(handle, &buff, SIZE);
-	write(handle, &x_1, SIZE);
-	write(handle, &y_1, SIZE);
+    x_1 = (short) x;
+    y_1 = (short) y;
+    buff = (short) GR_DRAW;
+    write(handle, &buff, SIZE);
+    write(handle, &x_1, SIZE);
+    write(handle, &y_1, SIZE);
 }
 
 TERM_PUBLIC void MTOS_linetype(int lt)
-{ 
-	short lt_1, buff;
-
-	lt_1 = (short)lt;
-	buff = (short)SET_LINE;
-	write(handle, &buff, SIZE);
-	write(handle, &lt_1, SIZE);
-}
-
-TERM_PUBLIC int MTOS_text_angle(int ta)
-{ 
-	short ta_1, buff;
-
-	ta_1 = (short)ta;
-	buff = (short)SET_ANGLE;
-	write(handle, &buff, SIZE);
-	write(handle, &ta_1, SIZE);
-	return(TRUE);
-}
-
-TERM_PUBLIC void MTOS_put_text(unsigned int x, unsigned int y, char *str) 
 {
-	short x_1, y_1, len, buff;
+    short lt_1, buff;
 
-	x_1 = (short)x;
-	y_1 = (short)y;
-	len = (short)strlen(str) + 1;
-	buff = (short)GR_TEXT;	
-	write(handle, &buff, SIZE);
-	write(handle, &x_1, SIZE);
-	write(handle, &y_1, SIZE);
-	write(handle, &len, SIZE);
-	write(handle, str, (unsigned)len);
+    lt_1 = (short) lt;
+    buff = (short) SET_LINE;
+    write(handle, &buff, SIZE);
+    write(handle, &lt_1, SIZE);
+}
+
+TERM_PUBLIC int MTOS_text_angle(int ang)
+{
+    short ta_1, buff;
+
+    ta_1 = (short) ang;
+    buff = (short) SET_ANGLE;
+    write(handle, &buff, SIZE);
+    write(handle, &ta_1, SIZE);
+    return (TRUE);
+}
+
+TERM_PUBLIC void MTOS_put_text(unsigned int x, unsigned int y, char *str)
+{
+    short x_1, y_1, len, buff;
+
+    x_1 = (short) x;
+    y_1 = (short) y;
+    len = (short) strlen(str) + 1;
+    buff = (short) GR_TEXT;
+    write(handle, &buff, SIZE);
+    write(handle, &x_1, SIZE);
+    write(handle, &y_1, SIZE);
+    write(handle, &len, SIZE);
+    write(handle, str, (unsigned) len);
 }
 
 TERM_PUBLIC int MTOS_justify_text(enum JUSTIFY mode)
 {
-	short j_mode, buff;
+    short j_mode, buff;
 
-	j_mode = (short)mode;
-	buff = (short)SET_JUSTIFY;	
-	write(handle, &buff, SIZE);
-	write(handle, &j_mode, SIZE);
-	return(TRUE);
+    j_mode = (short) mode;
+    buff = (short) SET_JUSTIFY;
+    write(handle, &buff, SIZE);
+    write(handle, &j_mode, SIZE);
+    return (TRUE);
 }
 
 TERM_PUBLIC void MTOS_point(unsigned int x, unsigned int y, int number)
 {
-	short mode, buff;
+    short mode, buff;
 
-	buff = (short)SET_POINTMODE;	
-	mode = 1;
-	write(handle, &buff, SIZE);
-	write(handle, &mode, SIZE);    
-	do_point(x, y, number); 
-	mode = 0;
-	write(handle, &buff, SIZE);
-	write(handle, &mode, SIZE);
+    buff = (short) SET_POINTMODE;
+    mode = 1;
+    write(handle, &buff, SIZE);
+    write(handle, &mode, SIZE);
+    do_point(x, y, number);
+    mode = 0;
+    write(handle, &buff, SIZE);
+    write(handle, &mode, SIZE);
 }
 
 int MTOS_pause(char *str)
 {
-	short len, buff;
+    short len, buff;
 
-	len = (short)strlen(str) + 1;
-	buff = (short)PAUSE;	
-	write(handle, &buff, SIZE);
-	write(handle, &len, SIZE);
-	write(handle, str, (unsigned)len);
-	read (handle, &len, SIZE);
-	return((int)len);
+    len = (short) strlen(str) + 1;
+    buff = (short) PAUSE;
+    write(handle, &buff, SIZE);
+    write(handle, &len, SIZE);
+    write(handle, str, (unsigned) len);
+    read(handle, &len, SIZE);
+    return ((int) len);
 }
 
 static void MTOS_quit()
 {
-	short buff;
-	
-	if (pid > -1)
-		kill(pid,SIGTERM);
-	if (handle > -1) {
-		buff = (short)QUIT;
-		write(handle, &buff, SIZE);
-		close(handle);
-	}
+    short buff;
+
+    if (pid > -1)
+	kill(pid, SIGTERM);
+    if (handle > -1) {
+	buff = (short) QUIT;
+	write(handle, &buff, SIZE);
+	close(handle);
+    }
 }
 
 void MTOS_open_pipe()
 {
-	char pipe[NAMESIZE];
-	short len;
-	
-	if (handle < 0) {
-		if ((handle = open(PIPE2, O_RDWR)) < 0)
-            	return;
-		read(handle, &len, SIZE);
-		if (len > 0) {
-        		read(handle, pipe, (unsigned)len);
-        		close(handle);
-        		if ((handle = open(pipe, O_RDWR)) < 0) {
-					fprintf(stderr,"\n\n\33p Can't open Pipe: (%s) Error: (%s) !\33q\n\n",pipe,sys_errlist[errno]);
-					fflush(stderr);
-            		return;
-				}
-		}
-		init_exit();
+    char pipe[NAMESIZE];
+    short len;
+
+    if (handle < 0) {
+	if ((handle = open(PIPE2, O_RDWR)) < 0)
+	    return;
+	read(handle, &len, SIZE);
+	if (len > 0) {
+	    read(handle, pipe, (unsigned) len);
+	    close(handle);
+	    if ((handle = open(pipe, O_RDWR)) < 0) {
+		fprintf(stderr, "\n\n\33p Can't open Pipe: (%s) Error: (%s) !\33q\n\n", pipe,sys_errlist[errno]);
+		fflush(stderr);
+		return;
+	    }
 	}
+	init_exit();
+    }
 }
 
 static void write_pid()
 {
-	short buff, mypid, gpclpid;
-	
-	mypid = (short)getpid();
-	buff = (short)PID;
-	while (write(handle, &buff, SIZE) <= 0)
-		Fselect(100,0L,0L,0L);
-	while (read(handle, &gpclpid, SIZE) <= 0)
-		Fselect(100,0L,0L,0L);
-	write(handle, &mypid, SIZE);
-	pid = (int)gpclpid;
+    short buff, mypid, gpclpid;
+
+    mypid = (short) getpid();
+    buff = (short) PID;
+    while (write(handle, &buff, SIZE) <= 0)
+	Fselect(100, 0L, 0L, 0L);
+    while (read(handle, &gpclpid, SIZE) <= 0)
+	Fselect(100, 0L, 0L, 0L);
+    write(handle, &mypid, SIZE);
+    pid = (int) gpclpid;
 }
 
 static void init_exit()
 {
-	Cconout(7);
-	write_pid();
-	atexit(MTOS_quit);
+    Cconout(7);
+    write_pid();
+    atexit(MTOS_quit);
 }
 
 #endif /* TERM_BODY */
@@ -365,13 +368,13 @@ static void init_exit()
 #ifdef TERM_TABLE
 
 TERM_TABLE_START(mtos_driver)
-	"mtos", "Atari MiNT/MULTITOS/Magic Terminal",
-	MTOS_XMAX, MTOS_YMAX, MTOS_VCHAR, MTOS_HCHAR, 
-	MTOS_VTIC, MTOS_HTIC, MTOS_options, MTOS_init, MTOS_reset, 
-	MTOS_text, null_scale, MTOS_graphics, MTOS_move, MTOS_vector, 
-	MTOS_linetype, MTOS_put_text, MTOS_text_angle, 
-	MTOS_justify_text, MTOS_point, do_arrow, set_font_null,
-	0, TERM_CAN_MULTIPLOT, 0, 0
+    "mtos", "Atari MiNT/MULTITOS/Magic Terminal",
+    MTOS_XMAX, MTOS_YMAX, MTOS_VCHAR, MTOS_HCHAR,
+    MTOS_VTIC, MTOS_HTIC, MTOS_options, MTOS_init, MTOS_reset,
+    MTOS_text, null_scale, MTOS_graphics, MTOS_move, MTOS_vector,
+    MTOS_linetype, MTOS_put_text, MTOS_text_angle,
+    MTOS_justify_text, MTOS_point, do_arrow, set_font_null,
+    0, TERM_CAN_MULTIPLOT, 0, 0
 TERM_TABLE_END(mtos_driver)
 
 #undef LAST_TERM
@@ -384,6 +387,7 @@ TERM_TABLE_END(mtos_driver)
 #ifdef TERM_HELP
 START_HELP(mtos)
 "1 mtos",
+"?commands set terminal mtos",
 "?set terminal mtos",
 "?set term mtos",
 "?terminal mtos",

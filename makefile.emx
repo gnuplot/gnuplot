@@ -135,7 +135,7 @@ set.o: set.c plot.h setshow.h
 	$(CCC)
 
 show.o: show.c plot.h setshow.h
-	$(CCC)
+	$(CCC) -DHELPFILE=\"$(HELPFILE)\"
 
 specfun.o: specfun.c plot.h
 	$(CCC)
@@ -162,8 +162,8 @@ version.o: version.c
 	$(CCC)
 
 # convert gnuplot.doc to gnuplot.gih
-doc2gih.exe: docs\doc2gih.c
-	gcc -o doc2gih -I. docs/doc2gih.c
+doc2gih.exe: docs\doc2gih.c docs\termdoc.c
+	gcc -o doc2gih -I. docs/doc2gih.c docs/termdoc.c
 	emxbind $(EMXPATH)/bin/emx.exe doc2gih doc2gih.exe
 
 $(HELPFILE): doc2gih.exe docs\gnuplot.doc

@@ -91,9 +91,8 @@ TERM_PUBLIC void AED_reset __PROTO((void));
 
 TERM_PUBLIC void AED_init()
 {
-	fprintf(outfile,
-	"\033SEN3DDDN.SEC.7.SCT.0.1.80.80.90.SBC.0.AAV2.MOV.0.9.CHR.0.FFD");
-/*   2            3     4                5     7    6       1
+    fputs("\033SEN3DDDN.SEC.7.SCT.0.1.80.80.90.SBC.0.AAV2.MOV.0.9.CHR.0.FFD", gpoutfile);
+/*         2            3     4                5     7    6       1
 	1. Clear Screen
 	2. Set Encoding
 	3. Set Default Color
@@ -107,13 +106,13 @@ TERM_PUBLIC void AED_init()
 
 TERM_PUBLIC void AED_graphics()
 {
-	fprintf(outfile,"\033FFD\033");
+    fputs("\033FFD\033", gpoutfile);
 }
 
 
 TERM_PUBLIC void AED_text()
 {
-	fprintf(outfile,"\033MOV.0.9.SEC.7.XXX");
+    fputs("\033MOV.0.9.SEC.7.XXX", gpoutfile);
 }
 
 
@@ -121,37 +120,41 @@ TERM_PUBLIC void AED_text()
 TERM_PUBLIC void AED_linetype(linetype)
 int linetype;
 {
-static int color[2+9] = { 7, 1, 6, 2, 3, 5, 1, 6, 2, 3, 5 };
-static int type[2+9] = { 85, 85, 255, 255, 255, 255, 255, 85, 85, 85, 85 };
+    static int color[2 + 9] = { 7, 1, 6, 2, 3, 5, 1, 6, 2, 3, 5 };
+    static int type[2 + 9] = { 85, 85, 255, 255, 255, 255, 255, 85, 85, 85, 85 };
 
-	if (linetype >= 10)
-		linetype %= 10;
-	fprintf(outfile,"\033SLS%d.255.",type[linetype+2]);
-	fprintf(outfile,"\033SEC%d.",color[linetype+2]);
+    if (linetype >= 10)
+	linetype %= 10;
+
+    fprintf(gpoutfile, "\
+\033SLS%d.255.\
+\033SEC%d.",
+	    type[linetype + 2],
+	    color[linetype + 2]);
 }
 
 
 
-TERM_PUBLIC void AED_move(x,y)
-unsigned int x,y;
+TERM_PUBLIC void AED_move(x, y)
+unsigned int x, y;
 {
-	fprintf(outfile,"\033MOV%d.%d.",x,y);
+    fprintf(gpoutfile, "\033MOV%d.%d.", x, y);
 }
 
 
-TERM_PUBLIC void AED_vector(x,y)
-unsigned int x,y;
+TERM_PUBLIC void AED_vector(x, y)
+unsigned int x, y;
 {
-	fprintf(outfile,"\033DVA%d.%d.",x,y);
+    fprintf(gpoutfile, "\033DVA%d.%d.", x, y);
 }
 
 
-TERM_PUBLIC void AED_put_text(x,y,str)
-unsigned int x,y;
+TERM_PUBLIC void AED_put_text(x, y, str)
+unsigned int x, y;
 char str[];
 {
-	AED_move(x,y - AED_VCHAR/2 + 2);
-	fprintf(outfile,"\033XXX%s\033",str);
+    AED_move(x, y - AED_VCHAR / 2 + 2);
+    fprintf(gpoutfile, "\033XXX%s\033", str);
 }
 
 
@@ -160,7 +163,7 @@ char str[];
 
 TERM_PUBLIC void AED_reset()
 {
-	fprintf(outfile,"\033SCT0.1.0.0.0.SBC.0.FFD");
+    fputs("\033SCT0.1.0.0.0.SBC.0.FFD", gpoutfile);
 }
 
 #endif /* TERM_BODY */
@@ -168,23 +171,25 @@ TERM_PUBLIC void AED_reset()
 #ifdef TERM_TABLE
 TERM_TABLE_START(aed512_driver)
     "aed512", "AED 512 Terminal",
-	   AED5_XMAX, AED_YMAX, AED_VCHAR, AED_HCHAR,
-	   AED_VTIC, AED_HTIC, options_null, AED_init, AED_reset, 
-	   AED_text, null_scale, AED_graphics, AED_move, AED_vector, 
-	   AED_linetype, AED_put_text, null_text_angle, 
-	   null_justify_text, do_point, do_arrow, set_font_null
+    AED5_XMAX, AED_YMAX, AED_VCHAR, AED_HCHAR,
+    AED_VTIC, AED_HTIC, options_null, AED_init, AED_reset,
+    AED_text, null_scale, AED_graphics, AED_move, AED_vector,
+    AED_linetype, AED_put_text, null_text_angle,
+    null_justify_text, do_point, do_arrow, set_font_null
 TERM_TABLE_END(aed512_driver)
+
 #undef LAST_TERM
 #define LAST_TERM aed512_driver
 
 TERM_TABLE_START(aed767_driver)
     "aed767", "AED 767 Terminal",
-	   AED_XMAX, AED_YMAX, AED_VCHAR, AED_HCHAR,
-	   AED_VTIC, AED_HTIC, options_null, AED_init, AED_reset, 
-	   AED_text, null_scale, AED_graphics, AED_move, AED_vector, 
-	   AED_linetype, AED_put_text, null_text_angle, 
-	   null_justify_text, do_point, do_arrow, set_font_null
+    AED_XMAX, AED_YMAX, AED_VCHAR, AED_HCHAR,
+    AED_VTIC, AED_HTIC, options_null, AED_init, AED_reset,
+    AED_text, null_scale, AED_graphics, AED_move, AED_vector,
+    AED_linetype, AED_put_text, null_text_angle,
+    null_justify_text, do_point, do_arrow, set_font_null
 TERM_TABLE_END(aed767_driver)
+
 #undef LAST_TERM
 #define LAST_TERM aed767_driver
 
@@ -194,11 +199,13 @@ TERM_TABLE_END(aed767_driver)
 #ifdef TERM_HELP
 START_HELP(aed767)
 "1 aed767",
+"?commands set terminal aed767",
 "?set terminal aed767",
 "?set term aed767",
 "?terminal aed767",
 "?term aed767",
 "?aed767",
+"?commands set terminal aed512",
 "?set terminal aed512",
 "?set term aed512",
 "?terminal aed512",

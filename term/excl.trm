@@ -3,27 +3,44 @@
  *
  */
 
-/* Copyright (c) 1992 by P. Klosowski at NIST.  All Rights Reserved 
+/* GNUPLOT - excl.trm */
+
+/* Copyright (c) 1992, 1998 by P. Klosowski at NIST.  All Rights Reserved 
  *
  * Permission to use, copy, and distribute this software and its
- * documentation for any purpose with or without fee is hereby granted, 
- * provided that the above copyright notice appear in all copies and 
- * that both that copyright notice and this permission notice appear 
+ * documentation for any purpose with or without fee is hereby granted,
+ * provided that the above copyright notice appear in all copies and
+ * that both that copyright notice and this permission notice appear
  * in supporting documentation.
  *
  * Permission to modify the software is granted, but not the right to
- * distribute the modified code.  Modifications are to be distributed 
- * as patches to released version.
- *  
- * This software  is provided "as is" without express or implied warranty.
- * 
+ * distribute the complete modified source code.  Modifications are to
+ * be distributed as patches to the released version.  Permission to
+ * distribute binaries produced by compiling modified sources is granted,
+ * provided you
+ *   1. distribute the corresponding source modifications from the
+ *    released version in the form of a patch file along with the binaries,
+ *   2. add special version identification to distinguish your version
+ *    in addition to the base release version number,
+ *   3. provide your name and address as the primary contact for the
+ *    support of your modified version, and
+ *   4. retain our contact information in regard to use of the base
+ *    software.
+ * Permission to distribute the released version of the source code along
+ * with corresponding source modifications in the form of a patch file is
+ * granted with same provisions 2 through 4 for binary distributions.
+ *
+ * This software is provided "as is" without express or implied warranty
+ * to the extent permitted by applicable law.
+ *
  * This file is included by ../term.c.
  *
  * 
  * send your comments or suggestions to (info-gnuplot@dartmouth.edu).
  *
- ***     $Id: excl.trm,v 1.9 1998/04/14 00:17:41 drd Exp $
-     
+ */
+
+/***
   NAME
      quic
    PURPOSE
@@ -32,6 +49,8 @@
      
    HISTORY
      przemek - Aug 16, 1992: Created.
+     lars - Nov 30, 1998: Updated to new gnuplot copyright by
+                          permission from Przemek
 ***/
 /*
 c               *****************************************
@@ -143,13 +162,13 @@ c     TALGMV: graphical move to hor,vert ** abs  coords       (p. 213)
 
 TERM_PUBLIC void EXCL_init()
 {
-  fprintf(outfile,"%s%s%s%s%s%s",
-  	          TALPSH,TALAMS,TALMOD,TALCCNT,TALFCTL,TALASF);
+    fprintf(gpoutfile, "%s%s%s%s%s%s",
+	    TALPSH, TALAMS, TALMOD, TALCCNT, TALFCTL, TALASF);
 /*                ^save state   ^setEXCL       ^PaperSize8.5x11       */
 /*                       ^setANSI      ^copyCount1     ^absorbCtlChar */
-  fprintf(outfile, "%s%s%s%s%s%s",
-		  PUM,TALPRM,TALPGO,TALPCW,TALORG,TALGLP_init);
-  fprintf(outfile,                                            TALGLT,"");
+    fprintf(gpoutfile, "%s%s%s%s%s%s",
+	    PUM, TALPRM, TALPGO, TALPCW, TALORG, TALGLP_init);
+    fprintf(gpoutfile, TALGLT, "");
 /*                ^setUnits  ^landscape    ^OriginZero        ^SolidLine   */
 /*                    ^Units1/1000" ^pageClip     ^SetLine            */
 }
@@ -160,8 +179,8 @@ TERM_PUBLIC void EXCL_graphics()
 
 TERM_PUBLIC void EXCL_text()
 {
-	fprintf(outfile,TALFPO );
-	/*              ^pageout  */
+    fputs(TALFPO, gpoutfile);
+    /*    ^pageout  */
 }
 
 
@@ -173,55 +192,58 @@ int linetype;
    exclpen=MOD(NPEN,8)*7
    CSI  exclpen; exclpen; TALGLPE
 */
-  static char *type[2+9]={ 
-    "", "40;40", "",  "42;42",  "14;21",
+    static char *type[2 + 9] =
+    {
+	"", "40;40", "", "42;42", "14;21",
     /*   ....   ----  -- -- --   . . .   */
-     "",  "49;30",  "14;21",         "",  "49;30",  "14;21"
+	"", "49;30", "14;21", "", "49;30", "14;21"
     /*  same pattern, but thicker..  and thicker       */
     };
-  static int width[2+9] = {14, 7,    7, 7, 7, 10, 10, 10, 17, 17, 17};
-  if (linetype >= 9)
-    linetype %= 9;
-  fprintf(outfile,TALGLP,width[linetype+2],width[linetype+2]); 
-  /*	          ^width in dots */
-  fprintf(outfile,TALGLT,type[linetype+2]);
-  /*              ^line type     */
+    static int width[2+9] = { 14, 7, 7, 7, 7, 10, 10, 10, 17, 17, 17 };
+
+    if (linetype >= 9)
+	linetype %= 9;
+
+    fprintf(gpoutfile, TALGLP, width[linetype + 2], width[linetype + 2]);
+    /*                 ^width in dots */
+    fprintf(gpoutfile, TALGLT, type[linetype + 2]);
+    /*                 ^line type     */
 }
 
 
-TERM_PUBLIC void EXCL_move(x,y)
-unsigned int x,y;
+TERM_PUBLIC void EXCL_move(x, y)
+unsigned int x, y;
 {
-	fprintf(outfile,TALGMV, 1000 + x, EXCL_YLAST + 1000 - y);
-/*	                 ^pen up vector*/
+    fprintf(gpoutfile, TALGMV, 1000 + x, EXCL_YLAST + 1000 - y);
+    /*                 ^pen up vector */
 }
 
 
-TERM_PUBLIC void EXCL_vector(x2,y2)
-unsigned int x2,y2;
+TERM_PUBLIC void EXCL_vector(x2, y2)
+unsigned int x2, y2;
 {
-	fprintf(outfile,TALGDW, 1000 + x2, EXCL_YLAST + 1000 - y2);
-/*	                 ^pen down vector*/
+    fprintf(gpoutfile, TALGDW, 1000 + x2, EXCL_YLAST + 1000 - y2);
+    /*                 ^pen down vector */
 }
 
 
-TERM_PUBLIC void EXCL_put_text(x,y,str)
-unsigned int x,y;
+TERM_PUBLIC void EXCL_put_text(x, y, str)
+unsigned int x, y;
 char str[];
 {
-char ch;
-	EXCL_move(x,y - EXCL_VCHAR/3);
+    char ch;
+    EXCL_move(x, y - EXCL_VCHAR / 3);
+    ch = *str++;
+    while (ch != NUL) {
+	putc(ch, gpoutfile);
 	ch = *str++;
-	while(ch!='\0') {
-		putc(ch,outfile);
-		ch = *str++;
-	}
+    }
 }
 
 TERM_PUBLIC void EXCL_reset()
 {
-	fprintf(outfile,"%s%s", TALFPO, TALPOP);
-	/*                      ^pageout ^pop  */
+    fprintf(gpoutfile, "%s%s", TALFPO, TALPOP);
+    /*                         ^pageout ^pop  */
 }
 
 
@@ -231,13 +253,12 @@ TERM_PUBLIC void EXCL_reset()
 
 TERM_TABLE_START(excl_driver)
     "excl", "Talaris EXCL Laser printer (also Talaris 1590 and others)",
-	   EXCL_XMAX,EXCL_YMAX, EXCL_VCHAR, EXCL_HCHAR, 
-	   EXCL_VTIC, EXCL_HTIC, options_null, EXCL_init,EXCL_reset, 
-	   EXCL_text, null_scale, EXCL_graphics, EXCL_move, EXCL_vector,
-	   EXCL_linetype,EXCL_put_text, null_text_angle, 
-	   null_justify_text, line_and_point, do_arrow, set_font_null
+    EXCL_XMAX, EXCL_YMAX, EXCL_VCHAR, EXCL_HCHAR,
+    EXCL_VTIC, EXCL_HTIC, options_null, EXCL_init, EXCL_reset,
+    EXCL_text, null_scale, EXCL_graphics, EXCL_move, EXCL_vector,
+    EXCL_linetype, EXCL_put_text, null_text_angle,
+    null_justify_text, line_and_point, do_arrow, set_font_null
 TERM_TABLE_END(excl_driver)
-
 #undef LAST_TERM
 #define LAST_TERM excl_driver
 
@@ -247,6 +268,7 @@ TERM_TABLE_END(excl_driver)
 #ifdef TERM_HELP
 START_HELP(excl)
 "1 excl",
+"?commands set terminal excl",
 "?set terminal excl",
 "?set term excl",
 "?terminal excl",

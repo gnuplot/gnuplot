@@ -48,38 +48,36 @@
 #include <ctype.h>
 #include <stdio.h>
 
-#ifdef __PUREC__
-# define sscanf purec_sscanf
-#endif
-
-#if defined(apollo) || defined(alliant)
-#define NO_LIMITS_H
-#endif
-
-#ifdef sequent
-#define NO_LIMITS_H
-#define NO_STRCHR
-#endif
+#include "syscfg.h"
 
 #ifndef NO_STRING_H
-#include <string.h>
+# include <string.h>
 #else
-#include <strings.h>
+# include <strings.h>
 #endif
 
+#ifdef HAVE_BCOPY
+# ifdef NO_MEMCPY
+#  define memcpy(d,s,n) bcopy((s),(d),(n))
+# endif
+# ifdef NO_MEMMOVE
+#  define memmove(d,s,n) bcopy((s),(d),(n))
+# endif
+#endif /* HAVE_BCOPY */
+
 #ifdef NO_STRCHR
-#ifdef strchr
-#undef strchr
-#endif
+# ifdef strchr
+#  undef strchr
+# endif
 #ifdef HAVE_INDEX
-#define strchr index
+# define strchr index
 #endif
-#ifdef strrchr
-#undef strrchr
-#endif
-#ifdef HAVE_RINDEX
-#define strrchr rindex
-#endif
+# ifdef strrchr
+#  undef strrchr
+# endif
+# ifdef HAVE_RINDEX
+#  define strrchr rindex
+# endif
 #endif
 
 #ifdef NO_STDLIB_H
@@ -96,7 +94,8 @@ double atof();
 int atoi();
 long atol();
 double strtod();
-/* need to find out about VMS */
+#else /* !NO_STDLIB_H */
+# include <stdlib.h>
 # ifndef VMS
 #  ifndef EXIT_FAILURE
 #   define EXIT_FAILURE (1)
@@ -104,50 +103,130 @@ double strtod();
 #  ifndef EXIT_SUCCESS
 #   define EXIT_SUCCESS (0)
 #  endif
+# else /* VMS */
+#  ifdef VAXC            /* replacement values suppress some messages */
+#   ifdef  EXIT_FAILURE
+#    undef EXIT_FAILURE
+#   endif
+#   ifdef  EXIT_SUCCESS
+#    undef EXIT_SUCCESS
+#   endif
+#  endif /* VAXC */
+#  ifndef  EXIT_FAILURE
+#   define EXIT_FAILURE  0x10000002
+#  endif
+#  ifndef  EXIT_SUCCESS
+#   define EXIT_SUCCESS  1
+#  endif
 # endif /* VMS */
-#else
-#include <stdlib.h>
-#endif /* NO_STDLIB_H */
+#endif /* !NO_STDLIB_H */
 
 #ifdef HAVE_UNISTD_H
-#include <unistd.h>
+# include <unistd.h>
 #else
-#ifdef HAVE_LIBC_H /* NeXT uses libc instead of unistd */
-#include <libc.h>
-#endif
-#ifdef VMS
-#include <signal.h>
-#ifndef HAVE_SLEEP
-#define HAVE_SLEEP
-#endif /* HAVE_SLEEP */
-#endif /* VMS */
+# ifdef HAVE_LIBC_H /* NeXT uses libc instead of unistd */
+#  include <libc.h>
+# endif
 #endif /* HAVE_UNISTD_H */
 
 #ifndef NO_ERRNO_H
-#include <errno.h>
+# include <errno.h>
 #endif
-#ifdef EXTERN_ERRNO
+# ifdef EXTERN_ERRNO
 extern int errno;
 #endif
 
 #ifndef NO_SYS_TYPES_H
-#include <sys/types.h>
+# include <sys/types.h>
 #endif
+
+#ifdef HAVE_SYS_STAT_H
+# include <sys/stat.h>
+
+/* This is all taken from GNU fileutils lib/filemode.h */
+
+#if !S_IRUSR
+# if S_IREAD
+#  define S_IRUSR S_IREAD
+# else
+#  define S_IRUSR 00400
+# endif
+#endif
+
+#if !S_IWUSR
+# if S_IWRITE
+#  define S_IWUSR S_IWRITE
+# else
+#  define S_IWUSR 00200
+# endif
+#endif
+
+#if !S_IXUSR
+# if S_IEXEC
+#  define S_IXUSR S_IEXEC
+# else
+#  define S_IXUSR 00100
+# endif
+#endif
+
+#ifdef STAT_MACROS_BROKEN
+# undef S_ISBLK
+# undef S_ISCHR
+# undef S_ISDIR
+# undef S_ISFIFO
+# undef S_ISLNK
+# undef S_ISMPB
+# undef S_ISMPC
+# undef S_ISNWK
+# undef S_ISREG
+# undef S_ISSOCK
+#endif /* STAT_MACROS_BROKEN.  */
+
+#if !defined(S_ISBLK) && defined(S_IFBLK)
+# define S_ISBLK(m) (((m) & S_IFMT) == S_IFBLK)
+#endif
+#if !defined(S_ISCHR) && defined(S_IFCHR)
+# define S_ISCHR(m) (((m) & S_IFMT) == S_IFCHR)
+#endif
+#if !defined(S_ISDIR) && defined(S_IFDIR)
+# define S_ISDIR(m) (((m) & S_IFMT) == S_IFDIR)
+#endif
+#if !defined(S_ISREG) && defined(S_IFREG)
+# define S_ISREG(m) (((m) & S_IFMT) == S_IFREG)
+#endif
+#if !defined(S_ISFIFO) && defined(S_IFIFO)
+# define S_ISFIFO(m) (((m) & S_IFMT) == S_IFIFO)
+#endif
+#if !defined(S_ISLNK) && defined(S_IFLNK)
+# define S_ISLNK(m) (((m) & S_IFMT) == S_IFLNK)
+#endif
+#if !defined(S_ISSOCK) && defined(S_IFSOCK)
+# define S_ISSOCK(m) (((m) & S_IFMT) == S_IFSOCK)
+#endif
+#if !defined(S_ISMPB) && defined(S_IFMPB) /* V7 */
+# define S_ISMPB(m) (((m) & S_IFMT) == S_IFMPB)
+# define S_ISMPC(m) (((m) & S_IFMT) == S_IFMPC)
+#endif
+#if !defined(S_ISNWK) && defined(S_IFNWK) /* HP/UX */
+# define S_ISNWK(m) (((m) & S_IFMT) == S_IFNWK)
+#endif
+
+#endif /* HAVE_SYS_STAT_H */
 
 #ifndef NO_LIMITS_H
-#include <limits.h>
+# include <limits.h>
 #else
-#ifdef HAVE_VALUES_H
-#include <values.h>
-#endif
-#endif
+# ifdef HAVE_VALUES_H
+#  include <values.h>
+# endif /* HAVE_VALUES_H */
+#endif /* !NO_LIMITS_H */
 
 #ifdef NO_TIME_H
-#ifndef time_t /* should be #defined by config.h, then... */
-#define time_t long
-#endif
+# ifndef time_t /* should be #defined by config.h, then... */
+#  define time_t long
+# endif
 #else
-#include <time.h> /* ctime etc, should also define time_t and struct tm */
+# include <time.h> /* ctime etc, should also define time_t and struct tm */
 #endif
 
 #if defined(PIPES) && (defined(VMS) || (defined(OSK) && defined(_ANSI_EXT))) || defined(PIPES) && defined(AMIGA_SC_6_1)
@@ -156,39 +235,52 @@ int pclose __PROTO((FILE *));
 #endif
 
 #ifndef NO_FLOAT_H
-#include <float.h>
+# include <float.h>
 #endif
 
 #ifndef NO_LOCALE_H
-#include <locale.h>
+# include <locale.h>
 #endif
 
 #ifndef NO_MATH_H
-#include <math.h>
+# include <math.h>
 #endif
 
 #ifndef HAVE_STRNICMP
-#  ifdef HAVE_STRNCASECMP
-#    define strnicmp strncasecmp
-#  else
-int strnicmp __PROTO((char *, char *, int));
-#  endif
-#endif
-
-#ifndef GP_GETCWD
-# ifdef OS2
-#  define GP_GETCWD(path,len) _getcwd2 (path, len)
+# ifdef HAVE_STRNCASECMP
+#  define strnicmp strncasecmp
 # else
-#  if defined(HAVE_GETCWD)
-#   define GP_GETCWD(path,len) getcwd (path, len)
-#  else
-#   define GP_GETCWD(path,len) getwd (path)
-#  endif
+int strnicmp __PROTO((char *, char *, int));
 # endif
 #endif
 
-#ifdef __TURBOC__ /* HBB 980324: for sleep() prototype */
-# include <dos.h>
+/* Argument types for select() */
+#ifdef SELECT_TYPE_ARG1
+# define gp_nfds_t SELECT_TYPE_ARG1
+#else
+# define gp_nfds_t int
+#endif /* 1 */
+#ifdef SELECT_TYPE_ARG234
+# define gp_fd_set_p SELECT_TYPE_ARG234
+#else
+# ifndef __EMX__
+#  define gp_fd_set_p (int *)
+# else
+#  define gp_fd_set_p (fd_set *)
+# endif
+#endif /* 234 */
+#ifdef SELECT_TYPE_ARG5
+# define gp_timeval_p SELECT_TYPE_ARG5
+#else
+# define gp_timeval_p (struct timeval *)
+#endif /* 5 */
+
+#ifndef GP_GETCWD
+# if defined(HAVE_GETCWD)
+#  define GP_GETCWD(path,len) getcwd (path, len)
+# else
+#  define GP_GETCWD(path,len) getwd (path)
+# endif
 #endif
 
 #ifndef GP_SLEEP
@@ -199,20 +291,21 @@ int strnicmp __PROTO((char *, char *, int));
 # endif
 #endif
 
+/* Misc. defines */
+
+/* Null character */
+#define NUL ('\0')
+
 /* Definitions for debugging */
 /* #define NDEBUG */
 #include <assert.h>
 
 #ifdef DEBUG
-
-#define DEBUG_WHERE do { fprintf(stderr,"%s:%d ",__FILE__,__LINE__); } while (0)
-#define FPRINTF(a) do { DEBUG_WHERE; fprintf a; } while (0)
-
+# define DEBUG_WHERE do { fprintf(stderr,"%s:%d ",__FILE__,__LINE__); } while (0)
+# define FPRINTF(a) do { DEBUG_WHERE; fprintf a; } while (0)
 #else
-
-#define DEBUG_WHERE     /* nought */
-#define FPRINTF(a)      /* nought */
-
+# define DEBUG_WHERE     /* nought */
+# define FPRINTF(a)      /* nought */
 #endif /* DEBUG */
 
 #endif /* STDFN_H */

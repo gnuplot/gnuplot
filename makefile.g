@@ -35,10 +35,10 @@
 #
 # the following is what I use for Solaris 2.3
 REGULAR_FLAGS=-DREADLINE=1 -DNOCWDRC=1 -DPROTOTYPES=1 -DX11=1 \
-	-DHAVE_UNISTD_H=1 -DHAVE_TERMIOS_H=1 -DSTDC_HEADERS=1 -DRETSIGTYPE=void \
-	-DGAMMA=lgamma -DHAVE_GETCWD=1 -DHAVE_STRNCASECMP=1 -DXPG3_LOCALE=1 \
-	-DHAVE_SYS_SYSTEMINFO_H=1 -DHAVE_SYSINFO=1 -DHAVE_TCGETATTR=1 \
-	-I/opt/x11r5/include -g -O
+	-DHAVE_UNISTD_H=1 -DHAVE_TERMIOS_H=1 -DSTDC_HEADERS=1 \
+	-DRETSIGTYPE=void -DGAMMA=lgamma -DHAVE_GETCWD=1 -DHAVE_STRNCASECMP=1 \
+	-DXPG3_LOCALE=1 -DHAVE_SYS_SYSTEMINFO_H=1 -DHAVE_SYSINFO=1 \
+	-DHAVE_TCGETATTR=1 -I/opt/x11r5/include -g -O
 ################### Don't touch anything below this line ###################
 
 HELPDEST=$(GISBASE)/man/help/g.gnuplot
@@ -57,9 +57,9 @@ EXTRA_CFLAGS=$(GTERMFLAGS) $(REGULAR_FLAGS) -DCONTACT=\"$(EMAIL)\" \
 
 # List of object files (including version.o)
 OBJS = bitmap.o command.o contour.o eval.o graphics.o graph3d.o help.o \
-       internal.o misc.o parse.o plot.o plot2d.o plot3d.o readline.o scanner.o \
-       set.o show.o specfun.o standard.o term.o util.o binary.o \
-       interpol.o fit.o matrix.o datafile.o alloc.o version.o
+	internal.o misc.o parse.o plot.o plot2d.o plot3d.o readline.o \
+	scanner.o set.o show.o specfun.o standard.o term.o util.o binary.o \
+	interpol.o fit.o matrix.o datafile.o alloc.o version.o
 
 all: $(BIN_MAIN_CMD)/g.gnuplot $(GISBASE)/man/help/g.gnuplot
 

@@ -1,3 +1,7 @@
+/*
+ * $Id: $
+ */
+
 /* GNUPLOT -- gnugraph.trm */
 
 /*[
@@ -58,7 +62,7 @@
 /*
 Unixplot library writes to stdout.  A fix was put in place by
 ..!arizona!naucse!jdc to let set term and set output redirect
-stdout.  All other terminals write to outfile.
+stdout.  All other terminals write to gpoutfile.
 */
 
 /* This is a device independent format, so the output should look
@@ -95,9 +99,9 @@ TERM_PUBLIC void UP_reset __PROTO((void));
 */
 
 #define UP_VFONTSC  53.5
-#define UP_VCHAR    535   /* 10 * VFONTSC */
+#define UP_VCHAR    535		/* 10 * VFONTSC */
 #define UP_HFONTSC  27.6
-#define UP_HCHAR    276   /* 10 * HFONTSC */
+#define UP_HCHAR    276		/* 10 * HFONTSC */
 
 #define UP_VTIC (UP_YMAX/80)
 #define UP_HTIC (UP_XMAX/80)
@@ -107,7 +111,7 @@ TERM_PUBLIC void UP_reset __PROTO((void));
 #ifdef TERM_BODY
 
 
-char up_font[MAX_ID_LEN+1] = "Courier" ; /* name of font */
+char up_font[MAX_ID_LEN+1] = "Courier";	/* name of font */
 int up_fontsize = 10;
 
 /* plot2ps produces a 8.25" x 8.25" square. */
@@ -138,133 +142,161 @@ int up_fontsize = 10;
 #define UP_XOFF 3972
 #define UP_YOFF 3972
 
-enum JUSTIFY up_justify=LEFT;
+enum JUSTIFY up_justify = LEFT;
+
+#ifdef GNU_PLOTUTILS
+# define ROTATE(angle) textangle(90*angle)
+#else
+# define ROTATE(angle) rotate(0,0,90*angle)
+#endif
+
+#ifdef GNU_PLOTUTILS
+/* We don't include plot.h from plotutils because of
+ * the name clash with ../plot.h.
+ */
+extern int openpl __PROTO((void));
+extern int space __PROTO((int, int, int, int));
+extern int fontname __PROTO((const char *));
+extern int fontsize __PROTO((int));
+extern int erase __PROTO((void));
+extern int linemod __PROTO((const char *));
+extern int move __PROTO((int, int));
+extern int cont __PROTO((int, int));
+extern int alabel __PROTO((int, int, const char *));
+extern int textangle __PROTO((int));
+extern int closepl __PROTO((void));
+#endif
 
 TERM_PUBLIC void UP_options()
 {
-	if(!END_OF_COMMAND) {
-	  if(almost_equals(c_token,"d$efault")) {
-		strcpy(up_font,"Courier");
-		up_fontsize = 10;
-		term->v_char = (unsigned int)(up_fontsize*UP_VFONTSC);
-		term->h_char = (unsigned int)(up_fontsize*UP_HFONTSC);
-		c_token++;
-	  }
+    if (!END_OF_COMMAND) {
+	if (almost_equals(c_token, "d$efault")) {
+	    strcpy(up_font, "Courier");
+	    up_fontsize = 10;
+	    term->v_char = (unsigned int) (up_fontsize * UP_VFONTSC);
+	    term->h_char = (unsigned int) (up_fontsize * UP_HFONTSC);
+	    c_token++;
 	}
-
-        if (!END_OF_COMMAND && isstring(c_token)) {
-                quote_str(up_font,c_token, MAX_ID_LEN);
-                c_token++;
-        }
-
-        if (!END_OF_COMMAND) {
-                /* We have font size specified */
-                struct value a;
-                up_fontsize = (int)real(const_express(&a));
-                term->v_char = (unsigned int)(up_fontsize*UP_VFONTSC);
-                term->h_char = (unsigned int)(up_fontsize*UP_HFONTSC);
-        }
-
-	sprintf(term_options,"\"%s\" %d",up_font,up_fontsize);
+    }
+    if (!END_OF_COMMAND && isstring(c_token)) {
+	quote_str(up_font, c_token, MAX_ID_LEN);
+	c_token++;
+    }
+    if (!END_OF_COMMAND) {
+	/* We have font size specified */
+	struct value a;
+	up_fontsize = (int) real(const_express(&a));
+	term->v_char = (unsigned int) (up_fontsize * UP_VFONTSC);
+	term->h_char = (unsigned int) (up_fontsize * UP_HFONTSC);
+    }
+    sprintf(term_options, "\"%s\" %d", up_font, up_fontsize);
 }
 
 TERM_PUBLIC void UP_init()
 {
-	openpl();
-	space(0,0,UP_SCREENX-1,UP_SCREENY-1);
-	fontname(up_font);
-	fontsize(up_fontsize);
+    openpl();
+    space(0, 0, UP_SCREENX - 1, UP_SCREENY - 1);
+    fontname(up_font);
+/*
+#ifdef GNU_PLOTUTILS
+	fontsize((int)((up_fontsize / 72.0 * 8.0) * (UP_SCREENY-1)));
+#else
+*/
+    fontsize(up_fontsize);
+/*
+#endif
+*/
 }
 
 
 TERM_PUBLIC void UP_graphics()
 {
-	erase();
+    erase();
 }
 
 
 TERM_PUBLIC void UP_text()
 {
-	/* Flush here so that output will be complete. */
-	fflush(stdout);
+    /* Flush here so that output will be complete. */
+    fflush(stdout);
 }
 
 
 TERM_PUBLIC void UP_linetype(linetype)
 int linetype;
 {
-static char *lt[2+5] = {"solid", "longdashed", "solid", "dotted","shortdashed",
-	"dotdashed", "longdashed"};
+    static char *lt[2+5] = { "solid", "longdashed", "solid", "dotted",
+			     "shortdashed", "dotdashed", "longdashed"};
 
-	if (linetype >= 5)
-		linetype %= 5;
-	linemod(lt[linetype+2]);
+    if (linetype >= 5)
+	linetype %= 5;
+    linemod(lt[linetype + 2]);
 }
 
 
-TERM_PUBLIC void UP_move(x,y)
-unsigned int x,y;
+TERM_PUBLIC void UP_move(x, y)
+unsigned int x, y;
 {
-	move(x+UP_XOFF,y+UP_YOFF);
+    move(x + UP_XOFF, y + UP_YOFF);
 }
 
 
-TERM_PUBLIC void UP_vector(x,y)
-unsigned int x,y;
+TERM_PUBLIC void UP_vector(x, y)
+unsigned int x, y;
 {
-	cont(x+UP_XOFF,y+UP_YOFF);
+    cont(x + UP_XOFF, y + UP_YOFF);
 }
 
 
-TERM_PUBLIC void UP_put_text(x,y,str)
-unsigned int x,y;
+TERM_PUBLIC void UP_put_text(x, y, str)
+unsigned int x, y;
 char str[];
 {
-	UP_move(x,y); /* Don't adjust x and y! It's done in UP_move. */
-	switch(up_justify) {
-	 case LEFT:
-	  alabel('l','c',str);
-	  break;
-	 case CENTRE:
-	  alabel('c','c',str);
-	  break;
-	 case RIGHT:
-	  alabel('r','c',str);
-	  break;
-	}
+    UP_move(x, y);		/* Don't adjust x and y! It's done in UP_move. */
+    switch (up_justify) {
+    case LEFT:
+	alabel('l', 'c', str);
+	break;
+    case CENTRE:
+	alabel('c', 'c', str);
+	break;
+    case RIGHT:
+	alabel('r', 'c', str);
+	break;
+    }
 
 }
 
 TERM_PUBLIC int UP_text_angle(ang)
 int ang;
 {
-	rotate(0,0,90*ang);
-	return TRUE;
+    ROTATE(ang);
+    return TRUE;
 }
 
 TERM_PUBLIC int UP_justify_text(mode)
 enum JUSTIFY mode;
 {
-	up_justify=mode;
-	return TRUE;
+    up_justify = mode;
+    return TRUE;
 }
 
 TERM_PUBLIC void UP_reset()
 {
-	closepl();
+    closepl();
 }
 
 #endif /* TERM_BODY */
 
-#ifdef TERM_TABLE 
+#ifdef TERM_TABLE
 
 TERM_TABLE_START(unixplot_driver)
     "unixplot", "GNU plot(1) format [\042fontname\042 font_size]",
-	   UP_XMAX, UP_YMAX, UP_VCHAR, UP_HCHAR,
-	   UP_VTIC, UP_HTIC, UP_options, UP_init, UP_reset,
-	   UP_text, null_scale, UP_graphics, UP_move, UP_vector,
-	   UP_linetype, UP_put_text, UP_text_angle,
-	   UP_justify_text, line_and_point, do_arrow, set_font_null
+    UP_XMAX, UP_YMAX, UP_VCHAR, UP_HCHAR,
+    UP_VTIC, UP_HTIC, UP_options, UP_init, UP_reset,
+    UP_text, null_scale, UP_graphics, UP_move, UP_vector,
+    UP_linetype, UP_put_text, UP_text_angle,
+    UP_justify_text, line_and_point, do_arrow, set_font_null
 TERM_TABLE_END(unixplot_driver)
 
 #undef LAST_TERM
@@ -276,6 +308,7 @@ TERM_TABLE_END(unixplot_driver)
 #ifdef TERM_HELP
 START_HELP(unixplot)
 "1 unixplot",
+"?commands set terminal unixplot",
 "?set terminal unixplot",
 "?set term unixplot",
 "?terminal unixplot",

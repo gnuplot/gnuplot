@@ -1,5 +1,5 @@
 !         
-! GNUPLOT Makefile for VMS, Vers. 2.0, 1996/07/09
+! GNUPLOT Makefile for VMS, Vers. 2.1, 1998/08/25
 !
 ! "$ MMS" or "$ MMK" makes GNUPLOT.(E,A)XE, gnuplot_X11.(E,A)XE, GNUPLOT.HLB
 ! "$ MMS ALL" makes in addition GNUPLOT.HTML, GNUPLOT.TEX
@@ -31,22 +31,28 @@ ALL : DEFAULT gnuplot.html $(D)gnuplot.tex
 
 .IFDEF GNUC
 CC = GCC
-CFLAGS = /NOOP/define=(ANSI_C,NO_GIH,NO_LOCALE_H,X11,PIPES,VAXCRTL)
+CFLAGS = /NOOP/define=(ANSI_C,HAVE_SLEEP,NO_GIH,NO_LOCALE_H,X11,PIPES,VAXCRTL)
 CRTL_SHARE = ,GNU_CC:[000000]GCCLIB.OLB/lib,$(CWD)linkopt.vms/opt
 .ENDIF
 
 .IFDEF VAXC
-CFLAGS = /STAND=VAXC/NOOP/define=(NO_GIH,NO_LOCALE_H,X11,PIPES,VAXCRTL)
+CFLAGS = /STAND=VAXC/NOOP/define=(HAVE_SLEEP,NO_GIH,NO_LOCALE_H,X11,PIPES,VAXCRTL)
 CRTL_SHARE = ,linkopt.vms/opt
 .ENDIF
 
 .IFDEF DECC
-! A more conservative set of definitions is
-!CFLAGS = /NOOP/define=(ANSI_C,NO_GIH,NO_LOCALE_H,X11,PIPES,DECCRTL)-
-!/prefix=all
+
+! If this doesn't work use the next definitions.
+!
 ! but the following definitions work with OpenVMS Alpha V6.2 and DEC C V5.3
-CFLAGS = /define=(ANSI_C,HAVE_LGAMMA,HAVE_ERF,HAVE_UNISTD_H,HAVE_GETCWD,-
-NO_GIH,X11,PIPES,DECCRTL) /prefix=all/warnings=disable=ADDRCONSTEXT
+CFLAGS = /define=(ANSI_C,HAVE_LGAMMA,HAVE_ERFC,HAVE_ERF,HAVE_UNISTD_H,-
+HAVE_GETCWD,HAVE_SLEEP,NO_GIH,X11,PIPES,DECCRTL) /prefix=all
+
+! A more conservative set of definitions is
+!
+!CFLAGS = /NOOP/define=(ANSI_C,NO_GIH,NO_LOCALE_H,X11,PIPES,DECCRTL,-
+!HAVE_SLEEP,HAVE_GETCWD) /prefix=all
+
 CRTL_SHARE =
 .ENDIF	
 	
@@ -96,8 +102,8 @@ gnuplot.$(X) : $(OBJS) $(OPT_FILE)
 	@ $(SAY) "Your gnuplot executable is $@"
 	@ $(SAY) ""
 
-gnuplot_X11.$(X) : gplt_x11.$(O) $(X11OPT_FILE) 
-	LINK /EXE=$@ GPLT_X11.$(O), $(X11OPT_FILE)/opt $(CRTL_SHARE)
+gnuplot_X11.$(X) : gplt_x11.$(O) stdfn.$(O) $(X11OPT_FILE) 
+	LINK /EXE=$@ GPLT_X11.$(O), STDFN.$(O), $(X11OPT_FILE)/opt $(CRTL_SHARE)
 	@ $(SAY) ""
 	@ $(SAY) "Your gnuplot_x11 executable is $@"
 	@ $(SAY) ""
@@ -114,16 +120,16 @@ gnuplot.hlb : gnuplot.hlp
 	@ IF "''F$SEARCH("$@")'" .EQS. "" THEN LIBRARY/CREATE/HELP $@
 	LIBRARY $@ $<    
 	
-!gnuplot.hlp : doc2hlp.$(X) $(D)gnuplot.doc 
-!        CREATE_DOC := $ $(CWD)$<
-!        CREATE_DOC $(D)gnuplot.doc $@
-
-$(D)gnuplot.rnh : doc2rnh.$(X) $(D)gnuplot.doc
+gnuplot.hlp : doc2hlp.$(X) $(D)gnuplot.doc 
         CREATE_DOC := $ $(CWD)$<
         CREATE_DOC $(D)gnuplot.doc $@
 
-gnuplot.hlp : $(D)gnuplot.rnh 
-        RUNOFF $(D)gnuplot.rnh 
+!$(D)gnuplot.rnh : doc2rnh.$(X) $(D)gnuplot.doc
+!        CREATE_DOC := $ $(CWD)$<
+!        CREATE_DOC $(D)gnuplot.doc $@
+
+!gnuplot.hlp : $(D)gnuplot.rnh 
+!        RUNOFF $(D)gnuplot.rnh 
 
 gnuplot.html : doc2html.$(X) $(D)gnuplot.doc 
         CREATE_DOC := $ $(CWD)$<
@@ -141,12 +147,13 @@ gnuplot.dvi : $(D)gnuplot.tex $(D)titlepag.tex $(D)toc_entr.sty
 	$(CD) 'MAKEDIR'
         
 doc2rnh.$(X) : doc2rnh.$(O)    	
-doc2hlp.$(X) : doc2hlp.$(O)    	
+doc2hlp.$(X) : doc2hlp.$(O) termdoc.$(O)
+	LINK /EXE=$@ doc2hlp.$(O),termdoc.$(O)
 doc2html.$(X) : doc2html.$(O)          
 doc2tex.$(X) : doc2tex.$(O)  
 
-!doc2hlp.$(O) doc2html.$(O) doc2tex.$(O) : $(D)termdoc.c $(D)allterm.h
-!	$(CC) /OBJ=$@ $(CFLAGS) $(TERMFLAGS) $(D)$*.c
+doc2hlp.$(O) doc2html.$(O) doc2tex.$(O) termdoc.$(O) : $(D)termdoc.c $(D)allterm.h
+	$(CC) /OBJ=$@ $(CFLAGS) $(TERMFLAGS) $(D)$*.c
 doc2rnh.$(O) doc2hlp.$(O) doc2html.$(O) doc2tex.$(O) : $(D)termdoc.c $(D)allterm.h
 	$(CC) /OBJ=$@ $(CFLAGS) $(TERMFLAGS) $(D)$*.c
 		  		

@@ -1,5 +1,5 @@
 /*
- * $Id: wgnuplib.h,v 1.10 1998/03/22 22:35:27 drd Exp $
+ * $Id: wgnuplib.h,v 1.4 1998/12/10 18:30:13 lhecking Exp $
  */
 
 /* GNUPLOT - win/wgnuplib.h */
@@ -76,11 +76,33 @@ BOOL WDPROC CheckWGNUPLOTVersion(LPSTR str);
 #define OFFSETOF(x)  (x)
 #define SELECTOROF(x)  (x)
 #define MoveTo(hdc,x,y) MoveToEx(hdc,x,y,(LPPOINT)NULL);
+# ifndef __TURBOC__ /* Borland C has these defines, already... */
 #define farmalloc(x) malloc(x)
 #define farrealloc(s,n) realloc(s,n)
 #define farfree(s) free(s)
+# endif /* __TURBOC__ */
 #endif
  
+#ifdef __MINGW32__
+/* HBB 980809: MinGW32 doesn't define some of the more traditional
+ * things gnuplot expects in every Windows C compiler, it seems: */
+typedef LOGPEN *LPLOGPEN;
+typedef HGLOBAL GLOBALHANDLE;
+#define WINVER 0x0400
+#define HFILE_ERROR ((HFILE)-1)
+
+/* the far mem/string function family: */
+#define _fstrstr(s1,s2) (strstr(s1,s2))
+#define _fstrchr(s,c) (strchr(s,c))
+#define _fstrrchr(s,c) (strrchr(s,c))
+#define _fstrlen(s) (strlen(s))
+#define _fstrcpy(d,s) (strcpy(d,s))
+#define _fstrncpy(d,s,n) (strncpy(d,s,n))
+#define _fstrcat(s1,s2) (strcat(s1,s2))
+#define _fmemset(s,c,n) (memset(s,c,n))
+#define _fmemmove(d,s,n) (memmove(d,s,n))
+
+#endif /* __MINGW32__ */
 /* ================================== */
 /* wprinter.c - windows printer routines */
 void WDPROC DumpPrinter(HWND hwnd, LPSTR szAppName, LPSTR szFileName);
@@ -298,6 +320,9 @@ typedef struct tagGW {
 	HPEN	hbpen;					/* border pen */
 	HPEN	hapen;					/* axis pen */
 	HPEN	hpen[WGNUMPENS];		/* pens */
+#if 1 /* HBB 980118: new try ... */
+        HPEN    hsolidpen[WGNUMPENS];           /* solid pens (for point symbols) */
+#endif
 	LOGPEN	colorpen[WGNUMPENS+2];	/* logical color pens */
 	LOGPEN	monopen[WGNUMPENS+2];	/* logical mono pens */
 	COLORREF background;			/* background color */

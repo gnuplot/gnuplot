@@ -68,7 +68,9 @@ static char *RCSid = "$Id: winmain.c,v 1.15 1998/03/22 23:32:01 drd Exp $";
 #ifdef __MSC__
 #include <malloc.h>
 #else
+# ifdef __TURBOC__ /* HBB 981201: MinGW32 doesn't have this */
 #include <alloc.h>
+#endif
 #endif
 #include <io.h>
 #include "plot.h"
@@ -89,7 +91,9 @@ LPSTR szModuleName;
 LPSTR winhelpname;
 LPSTR szMenuName;
 #define MENUNAME "wgnuplot.mnu"
+#ifndef HELPFILE /* HBB 981203: makefile.win predefines this... */
 #define HELPFILE "wgnuplot.hlp"
+#endif
 
 extern char version[];
 extern char patchlevel[];
@@ -126,7 +130,9 @@ WinExit(void)
 {
 	term_reset();
 
+#ifndef __MINGW32__ /* HBB 980809: FIXME: doesn't exist for MinGW32. So...? */
 	fcloseall();
+#endif
 	if (graphwin.hWndGraph && IsWindow(graphwin.hWndGraph))
 		GraphClose(&graphwin);
 	TextMessage();	/* process messages */
@@ -161,8 +167,6 @@ int PASCAL WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 		_argv[++_argc] = _fstrtok( NULL, " ");
 #endif /* __MSC__ */
 
-  	szModuleName = (LPSTR)farmalloc(MAXSTR+1);
-  	CheckMemory(szModuleName);
 	szModuleName = (LPSTR)farmalloc(MAXSTR+1);
 	CheckMemory(szModuleName);
 

@@ -61,10 +61,10 @@ TERM_PUBLIC int PRE_justify_text __PROTO((enum JUSTIFY mode));
 TERM_PUBLIC void PRE_reset __PROTO((void));
 
 #define PRE_XMAX 2567
-#define PRE_YMAX 1815	/* X:Y = sqrt(2) */
+#define PRE_YMAX 1815		/* X:Y = sqrt(2) */
 
 #define PRE_VCHAR (PRE_YMAX/30)
-#define PRE_HCHAR 33	/* about 9 chars per inch */
+#define PRE_HCHAR 33		/* about 9 chars per inch */
 #define PRE_HTIC (PRE_XMAX/80)
 #define PRE_VTIC PRE_HTIC
 
@@ -79,104 +79,105 @@ TERM_PUBLIC void PRE_reset __PROTO((void));
 #define PRE_XLAST (PRE_XMAX - 1)
 #define PRE_YLAST (PRE_YMAX - 1)
 
-enum JUSTIFY pre_justify=LEFT;	/* text is flush left */
+enum JUSTIFY pre_justify = LEFT;	/* text is flush left */
 
 TERM_PUBLIC void PRE_init()
 {
-  (void) fprintf(outfile,"!R! RES;\n") ;
-  /* UNIT: units are dots, 300 dots = 1 in = 72 pt */
-  /* SPO: landscape format */
-  /* STM, SLM set top, left margin*/
-  /* Font: bold Helvetica (proportional font) */
-  (void) fprintf(outfile,"PAGE; UNIT D; SPO L; STM 280; SLM 440;\n") ;
-  (void) fprintf(outfile,"FTMD 15; FONT 29; SCPI 9;\n") ;
+    fputs("!R! RES;\n", gpoutfile);
+    /* UNIT: units are dots, 300 dots = 1 in = 72 pt */
+    /* SPO: landscape format */
+    /* STM, SLM set top, left margin */
+    /* Font: bold Helvetica (proportional font) */
+    fputs("PAGE; UNIT D; SPO L; STM 280; SLM 440;\n", gpoutfile);
+    fputs("FTMD 15; FONT 29; SCPI 9;\n", gpoutfile);
 }
 
 TERM_PUBLIC void KYO_init()
 {
-  (void) fprintf(outfile,"!R! RES;\n") ;
-  /* UNIT: units are dots, 300 dots = 1 in = 72 pt */
-  /* SPO: landscape format */
-  /* STM, SLM set top, left margin */
-  /* Font: Courier (fixed width font) */
-  (void) fprintf(outfile,"PAGE; UNIT D; SPO L; STM 280; SLM 440;\n") ;
-  (void) fprintf(outfile,"FTMD 15; FONT 17; SCPI 10;\n") ;
+    fputs("!R! RES;\n", gpoutfile);
+    /* UNIT: units are dots, 300 dots = 1 in = 72 pt */
+    /* SPO: landscape format */
+    /* STM, SLM set top, left margin */
+    /* Font: Courier (fixed width font) */
+    fputs("PAGE; UNIT D; SPO L; STM 280; SLM 440;\n", gpoutfile);
+    fputs("FTMD 15; FONT 17; SCPI 10;\n", gpoutfile);
 }
 
 TERM_PUBLIC void PRE_graphics()
 {
 }
 
-TERM_PUBLIC void PRE_text()			/* eject page after each plot */
-{
-  (void) fprintf(outfile,"PAGE;\n") ; 
+TERM_PUBLIC void PRE_text()
+{				/* eject page after each plot */
+    fputs("PAGE;\n", gpoutfile);
 }
 
 TERM_PUBLIC void PRE_linetype(linetype)
-int linetype ;
+int linetype;
 {
-  /* actually choose pendiameter */
-  if (linetype < 0) linetype = -linetype;
-  else linetype = 3;
-  (void) fprintf(outfile,"SPD %d;\n", linetype) ;
+    /* actually choose pendiameter */
+    if (linetype < 0)
+	linetype = -linetype;
+    else
+	linetype = 3;
+    (void) fprintf(gpoutfile, "SPD %d;\n", linetype);
 }
- 
-TERM_PUBLIC void PRE_move(x,y)
-unsigned int x,y ;
+
+TERM_PUBLIC void PRE_move(x, y)
+unsigned int x, y;
 {
-  (void) fprintf(outfile,"MAP %1d,%1d;\n",x,PRE_YMAX-y) ;
+    (void) fprintf(gpoutfile, "MAP %1d,%1d;\n", x, PRE_YMAX - y);
 }
- 
-TERM_PUBLIC void PRE_vector(x,y)
-unsigned int x,y ;
+
+TERM_PUBLIC void PRE_vector(x, y)
+unsigned int x, y;
 {
-  (void) fprintf(outfile,"DAP %1d, %1d;\n",x,PRE_YMAX-y) ;
+    (void) fprintf(gpoutfile, "DAP %1d, %1d;\n", x, PRE_YMAX - y);
 }
- 
+
 TERM_PUBLIC void PRE_put_text(x, y, str)
-unsigned int x,y ;
+unsigned int x, y;
 char *str;
 {
-  PRE_move(x,y);
-  switch(pre_justify){
-  case RIGHT:
-    (void) fprintf(outfile,"RTXT \"%s\", B;\n",str) ;
-    break;
-  default:
-    (void) fprintf(outfile,"TEXT \"%s\", B;\n",str) ;
-  }
+    PRE_move(x, y);
+    switch (pre_justify) {
+    case RIGHT:
+	(void) fprintf(gpoutfile, "RTXT \"%s\", B;\n", str);
+	break;
+    default:
+	(void) fprintf(gpoutfile, "TEXT \"%s\", B;\n", str);
+    }
 }
- 
+
 TERM_PUBLIC int PRE_justify_text(mode)
 enum JUSTIFY mode;
 {
-  pre_justify=mode;
-  switch(pre_justify){
-  case LEFT:
-  case RIGHT:
-    return(TRUE);
-  default:
-    return(FALSE);
-  }
-  
+    pre_justify = mode;
+    switch (pre_justify) {
+    case LEFT:
+    case RIGHT:
+	return (TRUE);
+    default:
+	return (FALSE);
+    }
+
 }
 
 TERM_PUBLIC void PRE_reset()
 {
-  (void) fprintf(outfile,"PAGE; RES; EXIT;\n");
+    fputs("PAGE; RES; EXIT;\n", gpoutfile);
 }
 
 #endif /* TERM_BODY */
 
 #ifdef TERM_TABLE
-
 TERM_TABLE_START(prescribe_driver)
     "prescribe", "Prescribe - for the Kyocera Laser Printer",
-	PRE_XMAX, PRE_YMAX, PRE_VCHAR, PRE_HCHAR, 
-	PRE_VTIC, PRE_HTIC, options_null, PRE_init, PRE_reset, 
-	PRE_text, null_scale, PRE_graphics, PRE_move, PRE_vector, 
-	PRE_linetype, PRE_put_text, null_text_angle, 
-	PRE_justify_text, line_and_point, do_arrow, set_font_null
+    PRE_XMAX, PRE_YMAX, PRE_VCHAR, PRE_HCHAR,
+    PRE_VTIC, PRE_HTIC, options_null, PRE_init, PRE_reset,
+    PRE_text, null_scale, PRE_graphics, PRE_move, PRE_vector,
+    PRE_linetype, PRE_put_text, null_text_angle,
+    PRE_justify_text, line_and_point, do_arrow, set_font_null
 TERM_TABLE_END(prescribe_driver)
 
 #undef LAST_TERM
@@ -184,11 +185,11 @@ TERM_TABLE_END(prescribe_driver)
 
 TERM_TABLE_START(kyo_driver)
     "kyo", "Kyocera Laser Printer with Courier font",
-	PRE_XMAX, PRE_YMAX, KYO_VCHAR, KYO_HCHAR, 
-	PRE_VTIC, PRE_HTIC, options_null, KYO_init, PRE_reset, 
-	PRE_text, null_scale, PRE_graphics, PRE_move, PRE_vector, 
-	PRE_linetype, PRE_put_text, null_text_angle, 
-	PRE_justify_text, line_and_point, do_arrow, set_font_null
+    PRE_XMAX, PRE_YMAX, KYO_VCHAR, KYO_HCHAR,
+    PRE_VTIC, PRE_HTIC, options_null, KYO_init, PRE_reset,
+    PRE_text, null_scale, PRE_graphics, PRE_move, PRE_vector,
+    PRE_linetype, PRE_put_text, null_text_angle,
+    PRE_justify_text, line_and_point, do_arrow, set_font_null
 TERM_TABLE_END(kyo_driver)
 
 #undef LAST_TERM
@@ -200,11 +201,13 @@ TERM_TABLE_END(kyo_driver)
 #ifdef TERM_HELP
 START_HELP(kyo)
 "1 kyo",
+"?commands set terminal kyo",
 "?set terminal kyo",
 "?set term kyo",
 "?terminal kyo",
 "?term kyo",
 "?kyo",
+"?commands set terminal prescribe",
 "?set terminal prescribe",
 "?set term prescribe",
 "?terminal prescribe",

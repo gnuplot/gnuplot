@@ -2,7 +2,7 @@
 # To make the manual from scratch, we run latex two times
 
 # default target
-all: tutorial.dvi done
+all: tutorial.dvi
 
 # this tells GNU make not to export variables into the environment
 # But other makes dont understand its significance, so it must
@@ -11,6 +11,7 @@ all: tutorial.dvi done
 .NOEXPORT:
 
 SHELL = /bin/sh
+DVIPS = dvips
 
 srcdir = @srcdir@
 VPATH = @srcdir@
@@ -20,31 +21,32 @@ exec_prefix = $(prefix)
 bindir = $(exec_prefix)/bin
 datadir = $(prefix)/lib
 mandir = $(prefix)/man
+top_builddir = .
+top_srcdir = @top_srcdir@
 
-
-done:
-	latex tutorial
-	echo > done
 
 # To touch it up after changes:
 remake: tutorial.dvi
 
-# Always runs latex, e.g., to get labels right
-force:
-	latex tutorial
+tutorial.ps: tutorial.dvi
 
 tutorial.dvi: eg1.tex eg2.tex eg3.tex eg4.tex eg5.tex eg6.tex linepoin.tex \
 	tutorial.tex header.tex
-	latex tutorial
-	rm -f done
+	TEXINPUTS=.:$(srcdir): latex tutorial
+	TEXINPUTS=.:$(srcdir): latex tutorial
 
-.SUFFIXES: .tex .plt
+.SUFFIXES: .dvi .tex .plt .ps
+
+.dvi.ps:
+	$(DVIPS) -o $@ $<
 
 .plt.tex:
+	@test "$(srcdir)" = "$(top_builddir)" || cp $(srcdir)/*.dat .
 	gnuplot $<
 
 clean:
-	rm -f *.log eg?.tex linepoin.tex
+	rm -f *.aux *.dvi *.log *.ps eg?.tex linepoin.tex
+	@test "$(srcdir)" = "$(top_builddir)" || rm -f eg?.dat
 
 mostlyclean: clean
 

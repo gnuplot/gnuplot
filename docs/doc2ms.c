@@ -3,22 +3,37 @@ static char *RCSid = "$Id: doc2ms.c,v 1.19 1998/06/18 14:59:11 ddenholm Exp $";
 #endif
 
 /* GNUPLOT - doc2ms.c */
-/*
- * Copyright (C) 1986 - 1993, 1997   Thomas Williams, Colin Kelley
+
+/*[
+ * Copyright 1986 - 1993, 1998   Thomas Williams, Colin Kelley
  *
  * Permission to use, copy, and distribute this software and its
- * documentation for any purpose with or without fee is hereby granted, 
- * provided that the above copyright notice appear in all copies and 
- * that both that copyright notice and this permission notice appear 
+ * documentation for any purpose with or without fee is hereby granted,
+ * provided that the above copyright notice appear in all copies and
+ * that both that copyright notice and this permission notice appear
  * in supporting documentation.
  *
  * Permission to modify the software is granted, but not the right to
- * distribute the modified code.  Modifications are to be distributed 
- * as patches to released version.
- *  
- * This software is provided "as is" without express or implied warranty.
- */
- 
+ * distribute the complete modified source code.  Modifications are to
+ * be distributed as patches to the released version.  Permission to
+ * distribute binaries produced by compiling modified sources is granted,
+ * provided you
+ *   1. distribute the corresponding source modifications from the
+ *    released version in the form of a patch file along with the binaries,
+ *   2. add special version identification to distinguish your version
+ *    in addition to the base release version number,
+ *   3. provide your name and address as the primary contact for the
+ *    support of your modified version, and
+ *   4. retain our contact information in regard to use of the base
+ *    software.
+ * Permission to distribute the released version of the source code along
+ * with corresponding source modifications in the form of a patch file is
+ * granted with same provisions 2 through 4 for binary distributions.
+ *
+ * This software is provided "as is" without express or implied warranty
+ * to the extent permitted by applicable law.
+]*/
+
 /*
  * doc2ms.c  -- program to convert Gnuplot .DOC format to *roff -ms document
  * From hlp2ms by Thomas Williams 
@@ -44,66 +59,55 @@ static char *RCSid = "$Id: doc2ms.c,v 1.19 1998/06/18 14:59:11 ddenholm Exp $";
  */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+# include "config.h"
 #endif
 
 #include "ansichek.h"
 #include "stdfn.h"
+#include "doc2x.h"
 
-#define MAX_NAME_LEN	256
-#define MAX_LINE_LEN	256
 #define LINE_SKIP		3
 
-#define TRUE 1
-#define FALSE 0
-
-void init __PROTO(( FILE *b ));
-void convert __PROTO(( FILE *a, FILE *b ));
-void process_line __PROTO(( char *line, FILE *b ));
-void section __PROTO(( char *line, FILE *b ));
-void putms __PROTO(( char *s, FILE *file ));
-void putms_verb __PROTO(( char *s, FILE *file ));
-void finish __PROTO(( FILE *b ));
-
-typedef int boolean;
+void init __PROTO((FILE *));
+void convert __PROTO((FILE *, FILE *));
+void process_line __PROTO((char *, FILE *));
+void section __PROTO((char *, FILE *));
+void putms __PROTO((char *, FILE *));
+void putms_verb __PROTO((char *, FILE *));
+void finish __PROTO((FILE *));
 
 static boolean intable = FALSE;
 
-#ifndef ALL_TERM_DOC
-#define ALL_TERM_DOC
-#endif
-
-#define TERM_DRIVER_H
-#include "termdoc.c"
-
-int main(argc,argv)
+int main(argc, argv)
 int argc;
 char **argv;
 {
-FILE * infile;
-FILE * outfile;
-	infile = stdin;
-	outfile = stdout;
-	if (argc > 3) {
-		fprintf(stderr,"Usage: %s [infile [outfile]]\n", argv[0]);
-		exit(1);
+    FILE *infile;
+    FILE *outfile;
+    infile = stdin;
+    outfile = stdout;
+    if (argc > 3) {
+	fprintf(stderr, "Usage: %s [infile [outfile]]\n", argv[0]);
+	exit(EXIT_FAILURE);
+    }
+    if (argc >= 2) {
+	if ((infile = fopen(argv[1], "r")) == (FILE *) NULL) {
+	    fprintf(stderr, "%s: Can't open %s for reading\n",
+		    argv[0], argv[1]);
+	    exit(EXIT_FAILURE);
 	}
-	if (argc >= 2) 
-		if ( (infile = fopen(argv[1],"r")) == (FILE *)NULL) {
-			fprintf(stderr,"%s: Can't open %s for reading\n",
-				argv[0], argv[1]);
-			exit(1);
-		}
-	if (argc == 3)
-		if ( (outfile = fopen(argv[2],"w")) == (FILE *)NULL) {
-			fprintf(stderr,"%s: Can't open %s for writing\n",
-				argv[0], argv[2]);
-		}
-	
-	init(outfile);
-	convert(infile,outfile);
-	finish(outfile);
-	return(0);
+    }
+    if (argc == 3) {
+	if ((outfile = fopen(argv[2], "w")) == (FILE *) NULL) {
+	    fprintf(stderr, "%s: Can't open %s for writing\n",
+		    argv[0], argv[2]);
+	    exit(EXIT_FAILURE);
+	}
+    }
+    init(outfile);
+    convert(infile, outfile);
+    finish(outfile);
+    exit(EXIT_SUCCESS);
 }
 
 
@@ -111,108 +115,109 @@ void init(b)
 FILE *b;
 {
     /* in nroff, increase line length by 8 and don't adjust lines */
-    (void) fputs(".if n \\{.nr LL +8m\n.na \\}\n",b);
-    (void) fputs(".nr PO +0.3i\n",b);
-    (void) fputs(".so titlepag.ms\n",b);
-    (void) fputs(".pn 1\n",b);
-    (void) fputs(".bp\n",b);
-    (void) fputs(".ta 1.5i 3.0i 4.5i 6.0i 7.5i\n",b);
-    (void) fputs("\\&\n.sp 3\n.PP\n",b);
+    (void) fputs(".if n \\{.nr LL +8m\n.na \\}\n\
+.nr PO +0.3i\n\
+.so titlepag.ms\n\
+.pn 1\n\
+.bp\n\
+.ta 1.5i 3.0i 4.5i 6.0i 7.5i\n\
+\\&\n.sp 3\n.PP\n", b);
+
     /* following line commented out by rjl
-    (void) fputs(".so intro\n",b);
-    */
+       (void) fputs(".so intro\n",b);
+     */
 }
 
 
-void convert(a,b)
-	FILE *a,*b;
+void convert(a, b)
+FILE *a, *b;
 {
-    static char line[MAX_LINE_LEN];
+    static char line[MAX_LINE_LEN+1];
 
-    while (fgets(line,MAX_LINE_LEN,a)) {
-	   process_line(line, b);
+    while (get_line(line, sizeof(line), a)) {
+	process_line(line, b);
     }
 }
 
 void process_line(line, b)
-	char *line;
-	FILE *b;
+char *line;
+FILE *b;
 {
-    switch(line[0]) {		/* control character */
-	   case '?': {			/* interactive help entry */
-		  break;			/* ignore */
-	   }
-	   case '@': {			/* start/end table */
-		  if (intable) {
-			 (void) fputs(".TE\n.KE\n", b);
-			 (void) fputs(".EQ\ndelim off\n.EN\n\n",b);
-			 intable = FALSE;
-		  } else {
-			 (void) fputs("\n.EQ\ndelim $$\n.EN\n",b);
-			 (void) fputs(".KS\n.TS\ncenter box tab (@) ;\n", b);
-			 /* moved to gnuplot.doc by RCC
-                         (void) fputs("c c l .\n", b);
-                         */
-			 intable = TRUE;
-		  }
-		  /* ignore rest of line */
-		  break;
-	   }
-	   case '^': {			/* html table entry */
-		  break;			/* ignore */
-	   }
-	   case '#': {			/* latex table entry */
-		  break;			/* ignore */
-	   }
-	   case '%': {			/* troff table entry */
-		  if (intable)
-		    (void) fputs(line+1, b); /* copy directly */
-		  else
-		    fprintf(stderr, "error: %% line found outside of table\n");
-		  break;
-	   }
-	   case '\n':			/* empty text line */
-	   case ' ': {			/* normal text line */
-		  if (intable)
-		    break;		/* ignore while in table */
-		  switch(line[1]) {
-			 case ' ': {
-				/* verbatim mode */
-				fputs(".br\n",b); 
-				putms_verb(line+1,b); 
-				fputs(".br\n",b);
-				break;
-			 }
-			 case '\'': {
-				fputs("\\&",b);
-				putms(line+1,b); 
-				break;
-			 }
-			 case '.': { /* hide leading . from ms */
-			   fputs("\\&",b);
-			   putms(line+1,b);
-			   break;
-			 }
-			 default: {
-				if (line[0] == '\n')
-				  putms(line,b); /* handle totally blank line */
-				else
-				  putms(line+1,b);
-				break;
-			 }
-			 break;
-		  }
-		  break;
-	   }
-	   default: {
-		  if (isdigit(line[0])) { /* start of section */
-			 if (!intable)	/* ignore while in table */
-			   section(line, b);
-		  } else
-		    fprintf(stderr, "unknown control code '%c' in column 1\n", 
-				  line[0]);
-		  break;
-	   }
+    switch (line[0]) {		/* control character */
+    case '?':{			/* interactive help entry */
+	    break;		/* ignore */
+	}
+    case '@':{			/* start/end table */
+	    if (intable) {
+		(void) fputs(".TE\n.KE\n", b);
+		(void) fputs(".EQ\ndelim off\n.EN\n\n", b);
+		intable = FALSE;
+	    } else {
+		(void) fputs("\n.EQ\ndelim $$\n.EN\n", b);
+		(void) fputs(".KS\n.TS\ncenter box tab (@) ;\n", b);
+		/* moved to gnuplot.doc by RCC
+		   (void) fputs("c c l .\n", b);
+		 */
+		intable = TRUE;
+	    }
+	    /* ignore rest of line */
+	    break;
+	}
+    case '^':{			/* html table entry */
+	    break;		/* ignore */
+	}
+    case '#':{			/* latex table entry */
+	    break;		/* ignore */
+	}
+    case '%':{			/* troff table entry */
+	    if (intable)
+		(void) fputs(line + 1, b);	/* copy directly */
+	    else
+		fprintf(stderr, "error: %% line found outside of table\n");
+	    break;
+	}
+    case '\n':			/* empty text line */
+    case ' ':{			/* normal text line */
+	    if (intable)
+		break;		/* ignore while in table */
+	    switch (line[1]) {
+	    case ' ':{
+		    /* verbatim mode */
+		    fputs(".br\n", b);
+		    putms_verb(line + 1, b);
+		    fputs(".br\n", b);
+		    break;
+		}
+	    case '\'':{
+		    fputs("\\&", b);
+		    putms(line + 1, b);
+		    break;
+		}
+	    case '.':{		/* hide leading . from ms */
+		    fputs("\\&", b);
+		    putms(line + 1, b);
+		    break;
+		}
+	    default:{
+		    if (line[0] == '\n')
+			putms(line, b);		/* handle totally blank line */
+		    else
+			putms(line + 1, b);
+		    break;
+		}
+		break;
+	    }
+	    break;
+	}
+    default:{
+	    if (isdigit((int)line[0])) {	/* start of section */
+		if (!intable)	/* ignore while in table */
+		    section(line, b);
+	    } else
+		fprintf(stderr, "unknown control code '%c' in column 1\n",
+			line[0]);
+	    break;
+	}
     }
 }
 
@@ -221,79 +226,77 @@ void process_line(line, b)
 /* starts a new [sub]section */
 
 void section(line, b)
-	char *line;
-	FILE *b;
+char *line;
+FILE *b;
 {
-    static char string[MAX_LINE_LEN];
+    static char string[MAX_LINE_LEN+1];
     int sh_i;
     static int old = 1;
 
-  
-    (void) sscanf(line,"%d %[^\n]s",&sh_i,string);
-    
-    (void) fprintf(b,".sp %d\n",(sh_i == 1) ? LINE_SKIP : LINE_SKIP-1);
-    
+
+    (void) sscanf(line, "%d %[^\n]s", &sh_i, string);
+
+    (void) fprintf(b, ".sp %d\n", (sh_i == 1) ? LINE_SKIP : LINE_SKIP - 1);
+
     if (sh_i > old) {
-	   do
-		if (old!=1)	/* this line added by rjl */
-		  (void) fputs(".RS\n.IP\n",b);
-	   while (++old < sh_i);
+	do
+	    if (old != 1)	/* this line added by rjl */
+		(void) fputs(".RS\n.IP\n", b);
+	while (++old < sh_i);
+    } else if (sh_i < old) {
+	do
+	    if (sh_i != 1)	/* this line added by rjl */
+		(void) fputs(".RE\n.br\n", b);
+	while (--old > sh_i);
     }
-    else if (sh_i < old) {
-	   do
-			   if (sh_i!=1) /* this line added by rjl */
-				(void) fputs(".RE\n.br\n",b);
-	   while (--old > sh_i);
-    }
-    
     /* added by dfk to capitalize section headers */
-    if (islower(string[0]))
-	 string[0] = toupper(string[0]);
-    
+    if (islower((int)string[0]))
+	string[0] = toupper(string[0]);
+
     /* next 3 lines added by rjl */
-    if (sh_i!=1) 
-	 (void) fprintf(b,".NH %d\n%s\n.sp 1\n.LP\n",sh_i-1,string);
-    else 
-	 (void) fprintf(b,".NH %d\n%s\n.sp 1\n.LP\n",sh_i,string);
+    if (sh_i != 1)
+	(void) fprintf(b, ".NH %d\n%s\n.sp 1\n.LP\n", sh_i - 1, string);
+    else
+	(void) fprintf(b, ".NH %d\n%s\n.sp 1\n.LP\n", sh_i, string);
     old = sh_i;
-    
-    (void) fputs(".XS\n",b);
-    (void) fputs(string,b);
-    (void) fputs("\n.XE\n",b);
+
+    (void) fputs(".XS\n", b);
+    (void) fputs(string, b);
+    (void) fputs("\n.XE\n", b);
 }
 
 void putms(s, file)
-	char *s;
-	FILE *file;
+char *s;
+FILE *file;
 {
     static boolean inquote = FALSE;
 
-    while (*s != '\0') {
-	   switch (*s) {
-		  case '`': {		/* backquote -> boldface */
-			 if (inquote) {
-				fputs("\\fR", file);
-				inquote = FALSE;
-			 } else {
-				fputs("\\fB", file);
-				inquote = TRUE;
-			 }
-			 break;
-		  }
-		  case '\\': {		/* backslash */
-			 fputs("\\\\", file);
-			 break;
-		  }
-		  case '\'' : {  /* single quote */
-			fputs("\\&'", file);
-			break;
-		  }
-		  default: {
-			 fputc(*s, file);
-			 break;
-		  }
-	   }
-	   s++;
+    while (*s != NUL) {
+	switch (*s) {
+	case '`':{		/* backquote -> boldface */
+		if (inquote) {
+		    fputs("\\fR", file);
+		    inquote = FALSE;
+		} else {
+		    fputs("\\fB", file);
+		    inquote = TRUE;
+		}
+		break;
+	    }
+	case '\\':{		/* backslash */
+		fputs("\\\\", file);
+		break;
+	    }
+	case '\'':{		/* single quote */
+		fputs("\\&'", file);
+		break;
+	    }
+	default:{
+		fputc(*s, file);
+		break;
+	    }
+	}
+	s++;
     }
 }
 
@@ -303,23 +306,23 @@ void putms(s, file)
  */
 
 void putms_verb(s, file)
-	char *s;
-	FILE *file;
+char *s;
+FILE *file;
 {
     while (*s != '\0') {
-	   if (*s == '\\') {
-		 fputc('\\', file);
-	   }
-	   fputc(*s, file);
-	   s++;
+	if (*s == '\\') {
+	    fputc('\\', file);
+	}
+	fputc(*s, file);
+	s++;
     }
 }
 
-void finish(b)		/* spit out table of contents */
+void finish(b)			/* spit out table of contents */
 FILE *b;
 {
-	(void) fputs(".pn 1\n",b);
-	(void) fputs(".ds RH %\n",b);
-	(void) fputs(".af % i\n",b);
-	(void) fputs(".bp\n.PX\n",b);
+    (void) fputs(".pn 1\n", b);
+    (void) fputs(".ds RH %\n", b);
+    (void) fputs(".af % i\n", b);
+    (void) fputs(".bp\n.PX\n", b);
 }

@@ -39,10 +39,11 @@ Copyright and Porting
 
  See the Copyright file for copyright conditions.
 
- See the History file for changes to GNUPLOT.
+ See the ChangeLog and docs/old/History.old file for changes to GNUPLOT.
 
  Compilation instructions are in the 0INSTALL file. Porting instructions
-are in the 0PORTING file.
+are in the 0PORTING file. Compile and testing problems are also in
+0INSTALL.
 
  The code for GNUPLOT was written with portability in mind; however, the
 new features incorporated in v3.6 were developed with ANSI-C compliant
@@ -53,16 +54,17 @@ has been tested on the following systems (incomplete), but be aware that
 this list is not necessarily up to date with regard to the current version
 of GNUPLOT:
 
- o Sun3, sun4c, sun4m, sun4u (SunOS 4.03, SunOS 4.1.x, Solaris 2.5.1)
+ o Sun3, sun4c, sun4m, sun4u (SunOS 4.03, SunOS 4.1.x, Solaris 2.5.1/2.6)
  o uVAX 3100 (VMS 5.4, 5.5, 6.0, 6.1)
  o VAX 6410 (VMS 5.2)
  o DECStation 5000/200PXG (ULTRIX V4.1)
  o DEC AXP 3400 (VMS/OpenVMS 1.5, 6.2)
  o DEC AXP 600, A1000A, 3000 (DEC Unix 3.2 4.0, Windows NT 4.0 MSVC++ 4.0)
  o IBM PC and compatibles (MS-DOS 3.3/5.0 BC++3.1/TC++ 1.0 MSC 7.0 DJGPP,
-   OS/2 2.x, Linux 2.x SVGA X11/XFree86, Windows NT 4.0)
+   OS/2 2.x, Linux 2.x SVGA X11/XFree86, Windows95/98, Windows NT 4.0)
+ o IBM AIX 3.x and 4.x
  o CBM Amiga (AmigaOS 1.3, 2.x and 3.x, SAS/C 6.2 and better, Aztec C
-   beta 5.2a, gcc)
+   beta 5.2a, gcc; Linux 2.x, NetBSD-1.3.x)
  o IRIS 4D/70G and 4D/25G with MIPS C
  o NeXT with gnu C 1.34
  o AT&T 3B1 (version 3.51m with cc and gcc 1.39)
@@ -182,14 +184,16 @@ Also, comp.sources.misc is usually a month or so behind us.
 Date: Fri Aug 27 05:21:33 GMT 1993
 
 
-Version: 3.5
+Version: 3.7
 
-In general, GNUPLOT 3.5 is available as the file gnuplot3.5.tar.Z.
-There will patches to bring 3.4 to 3.5 as well called gp34to35.shar.Z.
-(Version 3.3 was skipped because of possible confusion
-with the numerous BETA releases.)  It will be made available to simtel20 
-and its mirrors in ZIP format, along with a DOS, MS-Windows 3.1 and
-OS/2 2.0 executables.
+In general, GNUPLOT 3.7 is available as the file gnuplot-3.7.tar.gz.
+Because of the numerous changes since version 3.5, no patch files
+will be available to bring 3.5 to 3.7.
+(Version 3.6 was skipped because of possible confusion
+with the numerous BETA releases.)  It will be made available at web
+and ftp sites listed below, along with DOS, MS-Windows 3.1,
+Windows 95/98/NT and OS/2 2.0 executables. Amiga binaries will be
+made available on Aminet.
 
 Also, some sites will have gpdoc_ps.zip which contains
 PostScript versions of the manuals and tutorials.
@@ -197,17 +201,24 @@ PostScript versions of the manuals and tutorials.
 Please obtain gnuplot from the site
 nearest you.
 
-USENET users:
-
-    GNUPLOT 3.5 will posted to comp.sources.misc.
-
 
 NORTH AMERICA:
 
-     Anonymous ftp to ftp.dartmouth.edu (129.170.16.4)
-     Fetch
-        pub/gnuplot/gnuplot3.5.tar.Z
-     in binary mode.
+     Anonymous ftp to ftp.gnuplot.vt.edu:
+     ftp://ftp.gnuplot.vt.edu/pub/gnuplot/gnuplot-3.7.tar.gz
+
+     Alternatively, you can use your web browser to get gnuplot
+     from the gnuplot web pages at
+
+     http://members.theglobe.com/gnuplot/gp37tar.gz
+     http://www.geocities.com/SiliconValley/Foothills/6647/gp37tar.gz
+
+     Anonymous ftp to ftp.dartmouth.edu. Please try the
+     other sites first!
+     ftp://ftp.dartmouth.edu/pub/gnuplot/gnuplot-3.7.tar.gz
+
+[ At time of release, we are not sure whether this service
+  is still available. -lh
 
      Users without ftp capability can obtain it through a mail ftp
      server. Email a message to ftpmail@ftp.dartmouth.edu
@@ -216,7 +227,7 @@ NORTH AMERICA:
         open
         cd pub/gnuplot
         mode binary
-        get gnuplot3.5.tar.Z
+        get gnuplot-3.7.tar.Z
         quit
 
      If you have some problem, you might need to stick 
@@ -224,25 +235,22 @@ NORTH AMERICA:
      before all the above.
 
      You will receive gnuplot as uuencoded compressed tar file.
-
+]
 
 AUSTRALIA:
 
-     Anonymous ftp to monu1.cc.monash.edu.au (130.194.1.101).
-     Fetch pub/gnuplot3.5.tar.Z in binary mode.
+     Anonymous ftp to ftp.cc.monash.edu.au:
+     ftp://ftp.cc.monash.edu.au/pub/gnuplot/gnuplot-3.7.tar.gz
 
 
 EUROPE:
 
-     Anonymous ftp to irisa.irisa.fr (131.254.2.3).
-     Fetch pub/gnuplot3.5.tar.Z in binary mode.
-
-----
-
-     DISCLAIMER - This product is not related in any way to
-     Pixar or any other commercial venture.
+     Anonymous ftp to ftp.irisa.fr:
+     ftp://ftp.irisa.fr/pub/gnuplot/gnuplot-3.7.tar.gz
 
 ----
 
                                         -Thomas Williams-
                                         -Alex Woo-
+                                        -David Denholm-
+                                        -Lars Hecking-

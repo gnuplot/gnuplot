@@ -73,7 +73,9 @@ static char *RCSid = "$Id: wtext.c,v 1.11 1998/03/22 22:35:31 drd Exp $";
 #define TEXTFONTSIZE 9
 #define TEXTFONTNAME "Terminal"
 
+#ifndef EOF /* HBB 980809: for MinGW32 */
 #define EOF -1		/* instead of using <stdio.h> */
+#endif
 /* limits */
 #define MAXSTR 256
 POINT ScreenMinSize = {16,4};
@@ -156,7 +158,7 @@ hdllInstance = lptw->hInstance;	/* not using a DLL */
 	else
 		wndclass.hIcon = LoadIcon(NULL, IDI_APPLICATION);
 	wndclass.hCursor = LoadCursor(NULL, IDC_ARROW);
-	wndclass.hbrBackground = GetStockBrush(WHITE_BRUSH);
+	wndclass.hbrBackground = (HBRUSH) GetStockObject(WHITE_BRUSH);
 	wndclass.lpszMenuName = NULL;
 	wndclass.lpszClassName = szParentClass;
 	RegisterClass(&wndclass);
@@ -458,7 +460,7 @@ int xpos, ypos;
 	    SetTextColor(hdc, TextFore(lptw->Attr));
 	    SetBkColor(hdc, TextBack(lptw->Attr));
 	}
-	SelectFont(hdc, lptw->hfont);
+	SelectObject(hdc, lptw->hfont);
 	TextOut(hdc,xpos,ypos,
 		(LPSTR)(lptw->ScreenBuffer + lptw->CursorPos.y*lptw->ScreenSize.x + 
 		lptw->CursorPos.x), count);
@@ -657,7 +659,7 @@ int count;
 int offset;
 	offset = lptw->ScreenSize.x * pt.y + pt.x;
 	hdc = GetDC(lptw->hWndText);
-	SelectFont(hdc, lptw->hfont);
+	SelectObject(hdc, lptw->hfont);
 	if (lptw->bSysColors) {
 	    SetTextColor(hdc, GetSysColor(COLOR_HIGHLIGHTTEXT));
 	    SetBkColor(hdc, GetSysColor(COLOR_HIGHLIGHT));
@@ -827,7 +829,7 @@ TextCopyClip(LPTW lptw)
 	hGMem = GlobalReAlloc(hGMem, (DWORD)size, GMEM_MOVEABLE);
 	/* find out what type to put into clipboard */
 	hdc = GetDC(lptw->hWndText);
-	SelectFont(hdc, lptw->hfont);
+	SelectObject(hdc, lptw->hfont);
 	GetTextMetrics(hdc,(TEXTMETRIC FAR *)&tm);
 	if (tm.tmCharSet == OEM_CHARSET)
 		type = CF_OEMTEXT;
@@ -864,10 +866,10 @@ TextMakeFont(LPTW lptw)
 		lf.lfWeight = FW_BOLD;
 	}
 	if (lptw->hfont != 0)
-		DeleteFont(lptw->hfont);
+		DeleteObject(lptw->hfont);
 	lptw->hfont = CreateFontIndirect((LOGFONT FAR *)&lf);
 	/* get text size */
-	SelectFont(hdc, lptw->hfont);
+	SelectObject(hdc, lptw->hfont);
 	GetTextMetrics(hdc,(TEXTMETRIC FAR *)&tm);
 	lptw->CharSize.y = tm.tmHeight;
 	lptw->CharSize.x = tm.tmAveCharWidth;
@@ -964,10 +966,10 @@ WndParentProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			break;
 		case WM_GETMINMAXINFO:
 			{
-			POINT far * MMinfo = (POINT far *)lParam;
+                        POINT FAR * MMinfo = (POINT FAR *)lParam;
 			TEXTMETRIC tm;
 			hdc = GetDC(hwnd);
-			SelectFont(hdc, GetStockFont(OEM_FIXED_FONT));
+			SelectObject(hdc, GetStockObject(OEM_FIXED_FONT));
 			GetTextMetrics(hdc,(LPTEXTMETRIC)&tm);
 			ReleaseDC(hwnd,hdc);
 			/* minimum size */
@@ -997,8 +999,8 @@ WndParentProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 				hbrush = CreateSolidBrush(GetSysColor(COLOR_BTNSHADOW));
 				rect.bottom = lptw->ButtonHeight-1;
 				FillRect(hdc, &rect, hbrush);
-				DeleteBrush(hbrush);
-				SelectPen(hdc, GetStockPen(BLACK_PEN));
+				DeleteObject(hbrush);
+				SelectObject(hdc, GetStockObject(BLACK_PEN));
 				MoveTo(hdc, rect.left, lptw->ButtonHeight-1);
 				LineTo(hdc, rect.right, lptw->ButtonHeight-1);
 			}
@@ -1024,7 +1026,7 @@ WndParentProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			/* get character size */
 			TextMakeFont(lptw);
 			hdc = GetDC(hwnd);
-			SelectFont(hdc, lptw->hfont);
+			SelectObject(hdc, lptw->hfont);
 			GetTextMetrics(hdc,(LPTEXTMETRIC)&tm);
 			lptw->CharSize.y = tm.tmHeight;
 			lptw->CharSize.x = tm.tmAveCharWidth;
@@ -1065,7 +1067,7 @@ WndParentProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 				DragAcceptFiles(hwnd, FALSE);
 			}
 #endif
-			DeleteFont(lptw->hfont);
+			DeleteObject(lptw->hfont);
 			lptw->hfont = 0;
 			break;
 		case WM_CLOSE:
@@ -1375,7 +1377,7 @@ WndTextProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 					UINT type;
 					/* find out what type to get from clipboard */
 					hdc = GetDC(hwnd);
-					SelectFont(hdc, lptw->hfont);
+					SelectObject(hdc, lptw->hfont);
 					GetTextMetrics(hdc,(TEXTMETRIC FAR *)&tm);
 					if (tm.tmCharSet == OEM_CHARSET)
 						type = CF_OEMTEXT;
@@ -1419,7 +1421,7 @@ WndTextProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			}
 			return(0);
 		case WM_SYSCOLORCHANGE:
-			DeleteBrush(lptw->hbrBackground);
+			DeleteObject(lptw->hbrBackground);
 			lptw->hbrBackground = CreateSolidBrush(lptw->bSysColors ? 
 				GetSysColor(COLOR_WINDOW) : RGB(0,0,0));
 			return(0);
@@ -1432,7 +1434,7 @@ WndTextProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			hdc = BeginPaint(hwnd, &ps);
 			if (ps.fErase)
 				FillRect(hdc, &ps.rcPaint, lptw->hbrBackground);
-			SelectFont(hdc, lptw->hfont);
+			SelectObject(hdc, lptw->hfont);
 			SetMapMode(hdc, MM_TEXT);
 			SetBkMode(hdc,OPAQUE);
 			GetClientRect(hwnd, &rect);
@@ -1523,7 +1525,7 @@ WndTextProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			lptw->hWndText = hwnd;
 			break;
 		case WM_DESTROY:
-			DeleteBrush(lptw->hbrBackground);
+			DeleteObject(lptw->hbrBackground);
 			break;
 	}
 	return DefWindowProc(hwnd, message, wParam, lParam);
@@ -1668,7 +1670,7 @@ POINT pt;
 	    SetTextColor(hdc, TextFore(lptw->Attr));
 	    SetBkColor(hdc, TextBack(lptw->Attr));
 	}
-	SelectFont(hdc, (lptw->hfont));
+	SelectObject(hdc, (lptw->hfont));
 	TextOut(hdc,xpos,ypos,
 		(LPSTR)(lptw->ScreenBuffer + lptw->CursorPos.y*lptw->ScreenSize.x + 
 		lptw->CursorPos.x), lptw->ScreenSize.x-lptw->CursorPos.x);

@@ -35,158 +35,66 @@
  * to the extent permitted by applicable law.
 ]*/
 
-#ifndef PLOT_H		/* avoid multiple includes */
+/* avoid multiple includes */
+#ifndef PLOT_H
 #define PLOT_H
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+# include "config.h"
 #endif
 
 #include "ansichek.h"
+/* syscfg.h is included by stdfn.h */
 #include "stdfn.h"
 
 #define PROGRAM "G N U P L O T"
 #define PROMPT "gnuplot> "
 
-/* Define operating system name, shell, and OS specific defines */
+/* The part for OS dependent defines
+ * has been moved to a new file.
+ */
 
-#if defined(AMIGA_SC_6_1) || defined(AMIGA_AC_5) || defined(__amigaos__)
-# define OS "Amiga "
-# ifndef __amigaos__
-#define SHELL "NewShell"
-# endif
-# ifndef AMIGA
-#  define AMIGA
-# endif
-#endif /* Amiga */
-
-#ifdef ATARI
-# define OS "TOS "
-#define SHELL "gulam.prg"
-#endif /* Atari */
-
-#ifdef DOS386
-# define OS "DOS 386 "
-#endif /* DOS386 */
-
-#ifdef linux
-# define OS "Linux "
-#endif /* Linux */
-
-#if defined(__NeXT__) && !defined(NEXT)
-# define NEXT
-#endif
-
-#ifdef OS2
-# define OS "OS/2 "
-#define SHELL "c:\\cmd.exe"
-#endif /* OS/2 */
-
-#ifdef OSK
-# define OS "OS-9 "
-#define SHELL "/dd/cmds/shell"
-#endif /* OS-9 */
-
-#if defined(vms) || defined(VMS)
-# ifndef VMS
-#  define VMS
-#endif
-# define OS "VMS "
-# if !defined(VAXCRTL) && !defined(DECCRTL)
-#  error Please /define either VAXCRTL or DECCRTL
-# endif
-/* avoid some IMPLICITFUNC warnings */
-# ifdef __DECC
-#  include <starlet.h>
-# endif  /* __DECC */
-#endif /* VMS */
-
-#if defined(_WINDOWS) || defined(_Windows)
-# ifndef _Windows
-#  define _Windows
-#endif
-# ifdef WIN32
-#  define OS "MS-Windows 32 bit "
-# else
-#  ifndef WIN16
-#   define WIN16
-#  endif
-#  define OS "MS-Windows "
-# endif /* WIN32 */
-#endif /* _WINDOWS */
-
-#if defined(MSDOS) && !defined(_Windows)
-# if !defined(DOS32) && !defined(DOS16)
-#  define DOS16
-# endif
-# ifdef MTOS
-#  define OS "TOS & MiNT & MULTITOS & Magic - "
-# endif /* MTOS */
-# define OS "MS-DOS "
-#endif /* MSDOS */
-
-#if defined(__unix__) || defined(unix)
-# ifndef unix
-#  define unix
-# endif
-# ifndef OS
-#  define OS "Unix "
-# endif
-#endif /* Unix */
-
-/* Note: may not catch all IBM AIX compilers */
-#ifdef _AIX
-# ifndef unix
-#  define unix
-# endif
-# define OS "Unix "
-#endif
-
-/* Attempted fix for SCO */
-#ifdef SCO
-# ifndef unix
-#  define unix
-# endif
-# define OS "Unix "
-#endif
-
-#ifndef OS
-# define OS ""
-#endif
-
-#ifndef SHELL
-#define SHELL "/bin/sh"    /* used if SHELL env variable not set */
-#endif
-
-/* End OS section */
-  
-  
 #define SAMPLES 100		/* default number of samples for a plot */
 #define ISO_SAMPLES 10		/* default number of isolines per splot */
 #define ZERO	1e-8		/* default for 'zero' set option */
 
 #ifndef TERM
 /* default terminal is "unknown"; but see init_terminal */
-#define TERM "unknown"
+# define TERM "unknown"
 #endif
 
 /* avoid precompiled header conflict with redefinition */
 #ifdef NEXT
-#include <mach/boolean.h>
+# include <mach/boolean.h>
 #else
-#define TRUE 1
-#define FALSE 0
+/* Sheer, raging paranoia */
+# ifdef TRUE
+#  undef TRUE
+# endif
+# ifdef FALSE
+#  undef FALSE
+# endif
+# define TRUE 1
+# define FALSE 0
 #endif
+/* TRUE or FALSE */
+typedef int TBOOLEAN;
 
-#define DTRUE 3 /* double true, used in autoscale: 1=autoscale ?min, 2=autoscale ?max */
+/* double true, used in autoscale: 1=autoscale ?min, 2=autoscale ?max */
+#define DTRUE 3
 
 #define Pi 3.141592653589793
 #define DEG2RAD (Pi / 180.0)
 
 
-#define MIN_CRV_POINTS 100		/* minimum size of points[] in curve_points */
-#define MIN_SRF_POINTS 1000		/* minimum size of points[] in surface_points */
+/* minimum size of points[] in curve_points */
+#define MIN_CRV_POINTS 100
+/* minimum size of points[] in surface_points */
+#define MIN_SRF_POINTS 1000
 
+
+/* Minimum number of chars to represent an integer */
+#define INT_STR_LEN (3*sizeof(int))
 
 /* note that MAX_LINE_LEN, MAX_TOKENS and MAX_AT_LEN do no longer limit the
    size of the input. The values describe the steps in which the sizes are
@@ -202,10 +110,10 @@
 #define NO_CARET (-1)
 
 #ifdef DOS16
-#define MAX_NUM_VAR	3	/* Ploting projection of func. of max. five vars. */
-#else
-#define MAX_NUM_VAR	5	/* Ploting projection of func. of max. five vars. */
-#endif
+# define MAX_NUM_VAR	3	/* Plotting projection of func. of max. five vars. */
+#else /* not DOS16 */
+# define MAX_NUM_VAR	5	/* Plotting projection of func. of max. five vars. */
+#endif /* not DOS16 */
 
 #define MAP3D_CARTESIAN		0	/* 3D Data mapping. */
 #define MAP3D_SPHERICAL		1
@@ -300,23 +208,18 @@
 
 /* To access curves larger than 64k, MSDOS needs to use huge pointers */
 #if (defined(__TURBOC__) && defined(MSDOS)) || defined(WIN16)
-#define GPHUGE huge
-#define GPFAR far
-#else
-#define GPHUGE
-#define GPFAR
-#endif
+# define GPHUGE huge
+# define GPFAR far
+#else /* not TurboC || WIN16 */
+# define GPHUGE /* nothing */
+# define GPFAR /* nothing */
+#endif /* not TurboC || WIN16 */
 
 #if defined(DOS16) || defined(WIN16)
 typedef float coordval;		/* memory is tight on PCs! */
-#define COORDVAL_FLOAT 1
+# define COORDVAL_FLOAT 1
 #else
 typedef double coordval;
-#endif
-
-/* introduced by Pedro Mendes, prm@aber.ac.uk */
-#ifdef WIN32
-#define far 
 #endif
 
 /*
@@ -346,6 +249,15 @@ typedef double coordval;
 #define GPMAX(a,b) ( (a) > (b) ? (a) : (b) )
 #define GPMIN(a,b) ( (a) < (b) ? (a) : (b) )
 
+/* Moved from binary.h, command.c, graph3d.c, graphics.c, interpol.c,
+ * plot2d.c, plot3d.c, util3d.c ...
+ */
+#ifndef inrange
+# define inrange(z,min,max) \
+   (((min)<(max)) ? (((z)>=(min)) && ((z)<=(max))) : \
+                    (((z)>=(max)) && ((z)<=(min))))
+#endif
+
 /* There is a bug in the NEXT OS. This is a workaround. Lookout for
  * an OS correction to cancel the following dinosaur
  *
@@ -366,7 +278,7 @@ typedef double coordval;
 # define HUGE    DBL_MAX
 # undef HUGE_VAL
 # define HUGE_VAL DBL_MAX
-#endif
+#endif /* NEXT && NX_CURRENT_COMPILER_RELEASE<310 */
 
 /* Now define VERYLARGE. This is usually DBL_MAX/2 - 1. On MS-DOS however
  * we use floats for memory considerations and thus use FLT_MAX.
@@ -391,7 +303,17 @@ typedef double coordval;
 /* as a last resort */
 #  define VERYLARGE (1e37)
 #  warning "using last resort 1e37 as VERYLARGE define, please check your headers"
-# endif
+# endif /* HUGE */
+#endif /* VERYLARGE */
+
+/* Some older platforms, namely SunOS 4.x, don't define this. */
+#ifndef DBL_EPSILON
+# define DBL_EPSILON     2.2204460492503131E-16
+#endif
+
+/* The XOPEN ln(10) macro */
+#ifndef M_LN10
+#  define M_LN10    2.3025850929940456840e0 
 #endif
 
 /* argument: char *fn */
@@ -405,16 +327,16 @@ typedef double coordval;
 # define is_system(c) ((c) == '$')
 /* maybe configure could check this? */
 # define BACKUP_FILESYSTEM 1
-#else /* VMS */
+#else /* not VMS */
 # define is_comment(c) ((c) == '#')
 # define is_system(c) ((c) == '!')
-#endif /* VMS */
+#endif /* not VMS */
 
 #define top_of_stack stack[s_p]
 
 #ifndef RETSIGTYPE
 /* assume ANSI definition by default */
-#define RETSIGTYPE void
+# define RETSIGTYPE void
 #endif
 
 #ifndef SIGFUNC_NO_INT_ARG
@@ -428,8 +350,6 @@ typedef int (*sortfunc) __PROTO((const generic *, const generic *));
 #else
 typedef int (*sortfunc) __PROTO((SORTFUNC_ARGS, SORTFUNC_ARGS));
 #endif
-
-typedef int TBOOLEAN;
 
 enum operators {
 	/* keep this in line with table in plot.c */
@@ -601,8 +521,9 @@ struct lp_style_type {          /* contains all Line and Point properties */
                                 /* more to come ? */
 };
 
+/* Now unused; replaced with set.c(reset_lp_properties) */
 /* default values for the structure 'lp_style_type' */
-#define LP_DEFAULT {0,0,0,1.0,1.0}
+/* #define LP_DEFAULT {0,0,0,1.0,1.0} */
 
 
 struct curve_points {
@@ -701,9 +622,9 @@ struct TERMENTRY {
 };
 
 #ifdef WIN16
-#define termentry TERMENTRY far
+# define termentry TERMENTRY far
 #else
-#define termentry TERMENTRY
+# define termentry TERMENTRY
 #endif
 
 
@@ -868,7 +789,7 @@ extern char dummy_var[MAX_NUM_VAR][MAX_ID_LEN+1];	/* from setshow.c */
  * allow_point is whether we accept a point command
  * We assume compiler will optimise away if(0) or if(1)
  */
-#if defined(ANSI_C) && defined(DEBUG_LP)
+#if defined(__FILE__) && defined(__LINE__) && defined(DEBUG_LP)
 # define LP_DUMP(lp) \
  fprintf(stderr, \
   "lp_properties at %s:%d : lt: %d, lw: %.3f, pt: %d, ps: %.3f\n", \
@@ -905,4 +826,4 @@ if (allow_ls && (almost_equals(c_token, "lines$tyle") || equals(c_token, "ls" ))
    
 
  
-#endif	    /* PLOT_H */
+#endif /* not PLOT_H */

@@ -42,12 +42,7 @@ static char *RCSid = "$Id: stdfn.c,v 1.1 1998/05/19 18:05:02 ddenholm Exp $";
  * - Lars Hecking
  */
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
-
-#include "ansichek.h"
-#include "stdfn.h"
+#include "plot.h"
 
 /*
  * ANSI C functions
@@ -56,9 +51,7 @@ static char *RCSid = "$Id: stdfn.c,v 1.1 1998/05/19 18:05:02 ddenholm Exp $";
 /* memcpy() */
 
 #ifdef NO_MEMCPY
-# ifdef HAVE_BCOPY
-#  define memcpy(dest,src,len) bcopy((src),(dest),(len))
-# else
+# ifndef HAVE_BCOPY
 /*
  * cheap and slow version of memcpy() in case you don't have one 
  */
@@ -72,9 +65,8 @@ memcpy (dest, src, len)
   while (len--)
     *dest++ = *src++;
 }
-# endif /* HAVE_BCOPY */
+# endif /* !HAVE_BCOPY */
 #endif /* NO_MEMCPY */
-
 
 /* strchr()
  * Simple and portable version, conforming to Plauger.
@@ -156,13 +148,13 @@ const char *cs, *ct;
     return NULL;
 
   if (!*ct)
-    return cs;
+    return (char *)cs;
   
   len = strlen(ct);
   while (*cs)
     {
       if (strncmp(cs, ct, len)==0)
-	return cs;
+	return (char *)cs;
       cs++;
     }
 
@@ -374,4 +366,23 @@ int n;
 }
 # endif /* !HAVE_STRNCASECMP */
 #endif /* !HAVE_STRNICMP */
+
+
+/* Safe, '\0'-terminated version of strncpy()
+ * safe_strncpy(dest, src, n), where n = sizeof(dest)
+ * This is basically the old fit.c(copy_max) function
+ */
+
+char *safe_strncpy(d, s, n)
+char *d, *s;
+size_t n;
+{
+    char *ret;
+
+    ret = strncpy(d, s, n);
+    if (strlen(s) >= n)
+	d[ n > 0 ? n-1 : 0] = NUL;
+
+    return ret;
+}
 

@@ -121,6 +121,14 @@ int main ( int argc, char **argv )
     HWND         hwndHelp ;        
     BOOL         bPos ;
 
+    /* (am, 19981001)
+     * A subtile problem is fixed here:
+     * upon the first initialization of this driver (i.e. we're here in main())
+     * it may inherit handles of files opened (temporarily) by gnuplot itself!
+     * We close them here.
+     */
+    fcloseall();
+
     if( argc <= 1 ) strcpy( szIPCName, IPCDEFAULT ) ;
     else {
         int i ;

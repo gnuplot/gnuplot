@@ -1,18 +1,29 @@
 # make file for Borland C++ 3.1 Windows version
-# and Win32 using Borland C++ 4.0
+# and Win32 using Borland C++ 4 (4.52 is known to work)
+# CAVEAT: may not work correctly with BC 5 due to changes in flags
 # The compile and link includes debug flags.  Take them out if you
 # do not want them included  (-y -v -M, /m /s /v /l)
 
 # where to place wgnuplot.hlp helpfile
 HELPFILE = wgnuplot.hlp
 # location of Borland C compiler
-TC = c:\bc
-# WIN32=1 for Win32s
+TC = d:\bc45
+# WIN32=1 for Win32s or Win32 (--> '95 or NT)
+# new: allow '-DWIN32=1' on make command line to take effect:
+!if "$(WIN32)"==""
 WIN32=0
+!endif
 
 !if $(WIN32)
 # name of C compiler
+# bcc32a is the pentium-scheduling compiler in BC 4.52
+!if $(PENTIUM)
+CC = bcc32a
+PROCESSOR_OPT = -5
+!else
 CC = bcc32
+PROCESSOR_OPT =
+!endif
 CCAUX = bcc
 !else
 CC = bcc
@@ -34,10 +45,11 @@ BIN = $(TC)\bin\\
 #    capability add -DREADLINE to CFLAGS then add 'readline' to the /o
 #    section of the linker call.
 !if $(WIN32)
-CFLAGS = -c -W -M -y -v -w-rvl -w-pro -I$(TC)\include -Iwin -DREADLINE -DHAVE_STRNICMP -DWIN32 -DNO_GIH -DWIN32_LEAN_AND_MEAN -DANSI_C -DHAVE_GETCWD
+CFLAGS = -c -W -M -G -y -v -w-rvl -w-use -w-par -w-aus -w-pro $(PROCESSOR_OPT) -I$(TC)\include -Iwin -DREADLINE=1 -DHAVE_STRNICMP -DWIN32 -DHAVE_STRERROR -DNO_GIH -DNOGAMMA -DWIN32_LEAN_AND_MEAN -DANSI_C -DHAVE_GETCWD
+CAUXFLAGS = -ml -w-par -w-use -w-aus -f -N -M -y -v -d -I$(TC)\include -DHAVE_STRNICMP -DANSI_C
 !else
-CFLAGS = -c -W -ml -w-par -w-use -w-aus -f -h -N -M -y -v -d -Ff=32 -I$(TC)\include -Iwin -DREADLINE -zEGPFAR_DATA -DHAVE_STRNICMP -DMSDOS -DNO_GIH -DANSI_C -DHAVE_GETCWD -DNDEBUG
-CAUXFLAGS = -ml -w-par -w-use -w-aus -f -N -M -y -v -d -I$(TC)\include -DMSDOS -DHAVE_STRNICMP -DANSI_C
+CFLAGS = -c -W -ml -w-par -w-use -w-aus -f -h -N -M -y -v -d -Ff=32 -I$(TC)\include -Iwin -DREADLINE=1 -zEGPFAR_DATA -DHAVE_STRNICMP -DMSDOS=1 -DNO_GIH -DANSI_C -DHAVE_GETCWD -DNDEBUG
+CAUXFLAGS = -ml -w-par -w-use -w-aus -f -N -M -y -v -d -I$(TC)\include -DMSDOS=1 -DHAVE_STRNICMP -DANSI_C
 !endif
 
 OBJS = 	bitmap.obj command.obj contour.obj eval.obj graphics.obj graph3d.obj \
@@ -45,7 +57,8 @@ OBJS = 	bitmap.obj command.obj contour.obj eval.obj graphics.obj graph3d.obj \
 	readline.obj scanner.obj set.obj show.obj specfun.obj standard.obj \
 	stdfn.obj term.obj util.obj version.obj binary.obj winmain.obj \
 	interpol.obj fit.obj matrix.obj datafile.obj alloc.obj util3d.obj \
-	hidden3d.obj time.obj
+	hidden3d.obj time.obj help.obj
+
 DLLOBJS = wgnuplib.obj wtext.obj wmenu.obj wpause.obj wgraph.obj wprinter.obj 
 
 CSOURCE5 = term\aed.trm term\cgi.trm term\cgm.trm term\debug.trm \
@@ -75,7 +88,7 @@ wgnuplot.exe: $(OBJS) win\wgnuplot.def win\wgnuplot.rc winmain.obj wgnuplot.lib
 #	$(BIN)tlink /Twe /c @&&!
 	$(BIN)tlink /Twe /c /s /v /l @&&!
 $(TC)\lib\C0Wl +
-bitmap command eval graphics graph3d internal misc parse +
+bitmap command eval graphics graph3d help internal misc parse +
 plot plot2d plot3d scanner set show specfun standard stdfn term util version contour +
 binary interpol +
 winmain +
@@ -97,7 +110,7 @@ wgnupl32.exe: $(OBJS) $(DLLOBJS) win\wgnupl32.def wgnupl32.res winmain.obj
 #	$(BIN)tlink32 /Tpe /c @&&!
 	$(BIN)tlink32 /Tpe /c /m /s /v @&&!
 $(TC)\lib\C0W32 +
-bitmap command eval graphics graph3d internal misc parse +
+bitmap command eval graphics graph3d help internal misc parse +
 plot plot2d plot3d scanner set show specfun standard stdfn term util version contour +
 wgnuplib wtext wmenu wpause wgraph wprinter +
 binary interpol +
@@ -105,7 +118,6 @@ winmain +
 readline +
 fit matrix datafile alloc util3d hidden3d time +
 ,wgnupl32,wgnupl32, +
-+d:\c\gd1.2\libgd +
 $(TC)\lib\import32 +
 $(TC)\lib\cw32, +
 win\wgnupl32.def, wgnupl32.res
@@ -126,8 +138,8 @@ $(CFLAGS)
 bitmap.obj: bitmap.c bitmap.h plot.h
 
 command.obj: command.c plot.h setshow.h fit.h
-	$(BIN)$(CC) @&&!
-$(CFLAGS) -DHELPFILE="$(HELPFILE)"
+	$(BIN)$(CC) -DHELPFILE=\"$(HELPFILE)\" @&&!
+$(CFLAGS)
 ! command.c
 
 contour.obj: contour.c plot.h
@@ -169,6 +181,9 @@ scanner.obj: scanner.c plot.h
 set.obj: set.c plot.h setshow.h
 
 show.obj: show.c plot.h setshow.h
+	$(BIN)$(CC) -DHELPFILE=\"$(HELPFILE)\" @&&!
+$(CFLAGS)
+! show.c
 
 specfun.obj: specfun.c
 
@@ -190,8 +205,8 @@ util3d.obj: util3d.c plot.h setshow.h
 version.obj: version.c
 
 winmain.obj: win\winmain.c win\wgnuplib.h win\wtext.h plot.h
-	$(BIN)$(CC) @&&!
-$(CFLAGS) -DHELPFILE="$(HELPFILE)"
+	$(BIN)$(CC) -DHELPFILE=\"$(HELPFILE)\" @&&!
+$(CFLAGS)
 ! win\winmain.c
 
 wgnuplot.mnu: win\wgnuplot.mnu
@@ -200,9 +215,9 @@ wgnuplot.mnu: win\wgnuplot.mnu
 
 # different compiler options for DLL's */
 !if $(WIN32)
-DLLCC = $(BIN)bcc32 -DWIN32 -c -M -y -v -WE -I$(TC)\include -Iwin
+DLLCC = $(BIN)$(CC) -DWIN32 -c -M -y -v -WE -I$(TC)\include -Iwin
 !else
-DLLCC = $(BIN)bcc -c -WD -ms! -w-par -f -M -y -v -w -N -I$(TC)\include -Iwin
+DLLCC = $(BIN)$(CC) -c -WD -ms! -w-par -f -M -y -v -w -N -I$(TC)\include -Iwin
 !endif
 
 wgnuplot.lib: wgnuplot.dll
@@ -237,20 +252,20 @@ wprinter.obj: win/wprinter.c win/wgnuplib.h win/wcommon.h win/wresourc.h
 wgraph.obj: win/wgraph.c win/wgnuplib.h win/wcommon.h win/wresourc.h
 	$(DLLCC) win/wgraph.c
 	
-# convert gnuplot.doc to gnuplot.gih
+# convert gnuplot.doc to gnuplot.rtf
 $(HELPFILE): win\gnuplot.rtf
 	$(BIN)hc win\wgnuplot.hpj 
 
 win\gnuplot.rtf: doc2rtf.exe docs\gnuplot.doc win\wgnuplot.hpj
 	doc2rtf docs\gnuplot.doc win\gnuplot.rtf
 
-doc2rtf.exe: docs\doc2rtf.c
-	$(BIN)$(CCAUX) @&&!
+doc2rtf.exe: docs\doc2rtf.c docs\termdoc.c docs\xref.c $(CSOURCE5) $(CSOURCE6) $(CSOURCE7)
+	$(BIN)$(CCAUX) -edoc2rtf.exe @&&!
 -D_Windows
 -w-pro
 $(CAUXFLAGS)
 -I. -Iterm -Idocs
-! docs\doc2rtf.c
+! docs\doc2rtf.c docs\termdoc.c docs\xref.c
 
 # make binary demo files
 demo\bf_test.exe: bf_test.c dbinary.obj dalloc.obj
@@ -287,6 +302,8 @@ clean:
 	del wgnuplot.lib
 	del demo\bf_test.exe
 	
+realclean: veryclean
+
 veryclean: clean
 	del wgnuplot.exe
 	del wgnuplot.hlp

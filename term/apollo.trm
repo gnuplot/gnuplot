@@ -5,7 +5,7 @@
 
 /* GNUPLOT - apollo.trm */
 /*
-    Apollo terminal driver for GNUplot.
+    Apollo terminal driver for gnuplot.
 
     Open a pad for the graphics, and use GPR routines.  For additional
     speed, we do the graphics to a separate bitmap, and the blt the
@@ -16,9 +16,13 @@
     trick, it looks funny.
 
     Ray Lischner (uunet!mntgfx!lisch)
-    4 October 1989	file created for GNUplot 1.1
-    26 March 1990	updated for GNUplot 2.0
+    4 October 1989	file created for gnuplot 1.1
+    26 March 1990	updated for gnuplot 2.0
     30 October 1991	fixed minor problem in apollo_tic_sizes
+
+    As of 13 January 1999, this file has been placed in the
+    public domain by Ray Lischner.
+
 */
 
 /*
@@ -44,7 +48,7 @@ TERM_PUBLIC void APOLLO_put_text __PROTO((unsigned int x, unsigned int y, char s
 TERM_PUBLIC void APOLLO_reset __PROTO((void));
 /* default tick sizes for small windows */
 #define APOLLO_VTIC	 6
-#define APOLLO_HTIC	 6	
+#define APOLLO_HTIC	 6
 #endif
 
 #ifndef TERM_PROTO_ONLY
@@ -56,12 +60,12 @@ TERM_PUBLIC void APOLLO_reset __PROTO((void));
 #include <apollo/gpr.h>
 
 int apollo_isa_pad __PROTO((void));
-static void apollo_font_info __PROTO((struct termentry * tbl, char * fname));
+static void apollo_font_info __PROTO((struct termentry * tbl, char *fname));
 static void apollo_gpr_init __PROTO((struct termentry * tbl, pad_$window_desc_t * window));
 static void apollo_tic_sizes __PROTO((struct termentry * tbl));
 static void apollo_gpr_terminate __PROTO((void));
 static void apollo_redo_window __PROTO((pad_$window_desc_t * window));
-static void apollo_xy_error __PROTO((char * s, int x, int y, status_$t status));
+static void apollo_xy_error __PROTO((char *s, int x, int y, status_$t status));
 
 /* issue an error message, using additional text "s" */
 #define apollo_error(s)	error_$print_name(status, (s), strlen(s))
@@ -69,14 +73,14 @@ static void apollo_xy_error __PROTO((char * s, int x, int y, status_$t status));
 /* if "status" indicates an error, then issue an error message */
 #define apollo_check(s)	if (status.all != status_$ok) apollo_error(s)
 
-static ios_$id_t stream = -1;           /* the stream for the pad */
-static gpr_$bitmap_desc_t screen_desc;  /* the screen's bitmap */
-static gpr_$bitmap_desc_t bitmap_desc;  /* the graphics bitmap */
-static gpr_$attribute_desc_t attr;      /* attribute block for saved bitmap */
-static int APOLLO_XMAX, APOLLO_YMAX;    /* window size */
-static short draw_width;                /* default GPR draw width */
-static name_$long_pname_t font_name;    /* font path name */
-static boolean use_bitmap;              /* use a separate bitmap? */
+static ios_$id_t stream = -1;	/* the stream for the pad */
+static gpr_$bitmap_desc_t screen_desc;	/* the screen's bitmap */
+static gpr_$bitmap_desc_t bitmap_desc;	/* the graphics bitmap */
+static gpr_$attribute_desc_t attr;	/* attribute block for saved bitmap */
+static int APOLLO_XMAX, APOLLO_YMAX;	/* window size */
+static short draw_width;	/* default GPR draw width */
+static name_$long_pname_t font_name;	/* font path name */
+static boolean use_bitmap;	/* use a separate bitmap? */
 
 /* return whether stdout is a DM pad */
 apollo_isa_pad()
@@ -93,7 +97,7 @@ apollo_isa_pad()
     Note that we must save the font file name because we need
     to reload the font file everytime the window changes size.
 */
-static void apollo_font_info(struct termentry* tbl, char* fname)
+static void apollo_font_info(struct termentry *tbl, char *fname)
 {
     short fwidth, fheight, flen;
     status_$t status;
@@ -102,7 +106,7 @@ static void apollo_font_info(struct termentry* tbl, char* fname)
     pad_$inq_font(stream, &fwidth, &fheight, fname, name_$long_pnamlen_max,
 		  &flen, &status);
     apollo_check("inq_font");
-    fname[flen] = '\0';
+    fname[flen] = NUL;
 
     tbl->v_char = fheight;
     tbl->h_char = fwidth;
@@ -131,7 +135,7 @@ static void apollo_font_info(struct termentry* tbl, char* fname)
     anything about the current output device characteristics;
     we can just draw the default width, or twice the default width, etc.
 */
-static void apollo_gpr_init(struct termentry* tbl, pad_$window_desc_t* window)
+static void apollo_gpr_init(struct termentry *tbl, pad_$window_desc_t * window)
 {
     gpr_$offset_t size;
     short fontid;
@@ -144,8 +148,7 @@ static void apollo_gpr_init(struct termentry* tbl, pad_$window_desc_t* window)
     gpr_$init(gpr_$frame, stream, size, 1, &screen_desc, &status);
     apollo_check("gpr_$init");
 
-    if (use_bitmap)
-    {
+    if (use_bitmap) {
 	/* allocate the bitmap and its attribute block */
 	gpr_$allocate_attribute_block(&attr, &status);
 	apollo_check("allocate_attribute_block");
@@ -156,7 +159,6 @@ static void apollo_gpr_init(struct termentry* tbl, pad_$window_desc_t* window)
 	gpr_$set_bitmap(bitmap_desc, &status);
 	apollo_check("set_bitmap");
     }
-
     /* set the font file */
     gpr_$load_font_file(font_name, strlen(font_name), &fontid, &status);
     apollo_check(font_name);
@@ -180,7 +182,7 @@ static void apollo_gpr_init(struct termentry* tbl, pad_$window_desc_t* window)
     This routine must be called after apollo_gpr_init(), because we
     need to know the window size, as stored in the termentry table.
 */
-static void apollo_tic_sizes(struct termentry* tbl)
+static void apollo_tic_sizes(struct termentry *tbl)
 {
     /* base the tick size on the window size */
     tbl->v_tic = tbl->ymax / 50;
@@ -246,7 +248,7 @@ static void apollo_gpr_terminate()
 
     An alternative strategy would be to interpret multiple "set term
     apollo"s to mean create multiple windows.  The user could only
-    access the most recent window because GNUplot has no concept of
+    access the most recent window because gnuplot has no concept of
     multiple terminals.  The user would, in fact, have no way of
     removing old windows because they are still active.  We could try
     catching keyboard events to see if the user presses EXIT, but I do
@@ -257,25 +259,21 @@ static void apollo_gpr_terminate()
 TERM_PUBLIC void APOLLO_init()
 {
     /* only initialize once */
-    if (stream == -1)
-    {
-	struct termentry* tbl;
+    if (stream == -1) {
+	struct termentry *tbl;
 	pad_$window_desc_t window;
 	name_$long_name_t wname;
-	short wnum;			/* junk needed by pad_$inq_windows() */
+	short wnum;		/* junk needed by pad_$inq_windows() */
 	boolean unlink_wname;
 	status_$t status;
 
 	tbl = term;
 
 	/* make the window name unique, with "gnuplot" in the label */
-	if (outstr==NULL) == 0)
-	{
+	if (outstr == NULL) {
 	    sprintf(wname, "gnuplot-%d", getpid());
 	    unlink_wname = true;
-	}
-	else
-	{
+	} else {
 	    strcpy(wname, outstr);
 	    unlink_wname = false;
 	}
@@ -323,9 +321,9 @@ TERM_PUBLIC void APOLLO_init()
     the new size.  We also need to update the termentry table.
     If the window stays the same size, then just clear it.
 */
-static void apollo_redo_window(pad_$window_desc_t* window)
+static void apollo_redo_window(pad_$window_desc_t * window)
 {
-    struct termentry* tbl = term;
+    struct termentry *tbl = term;
     status_$t status;
 
     /* the order of the following calls is important */
@@ -345,8 +343,7 @@ TERM_PUBLIC void APOLLO_graphics()
 
     if (window.width != APOLLO_XMAX || window.height != APOLLO_YMAX)
 	apollo_redo_window(&window);
-    else
-    {
+    else {
 	gpr_$clear(0, &status);
 	apollo_check("clear");
     }
@@ -379,7 +376,7 @@ TERM_PUBLIC void APOLLO_graphics()
     really does not buy us anything.
 
     I used patterns that do not start with all bits on because
-    GNUplot seems to use lots of short line segments to draw
+    gnuplot seems to use lots of short line segments to draw
     a curve, and this might make a very curvey plot seem like
     a solid line, regardless of pattern.  I don't want to start
     with too many zeros, however, or else the curve might not
@@ -400,15 +397,16 @@ typedef struct {
     short pattern;
 } APOLLO_LINE;
 
-static APOLLO_LINE apollo_lines[] = {
-    { 2, ~0 },		/* heavy, solid */
-    { 2, 0x6666 },	/* heavy, dotted */
-    { 1, ~0 },		/* normal */
-    { 1, 0xAAAA },	/* dotted */
-    { 1, 0xC3C3 },	/* short dash */
-    { 1, 0xE01F },	/* long dash */
-    { 1, 0x87F8 },	/* dash dot */
-    { 1, 0x6666 },	/* big dots */
+static APOLLO_LINE apollo_lines[] =
+{
+    {2, ~0},			/* heavy, solid */
+    {2, 0x6666},		/* heavy, dotted */
+    {1, ~0},			/* normal */
+    {1, 0xAAAA},		/* dotted */
+    {1, 0xC3C3},		/* short dash */
+    {1, 0xE01F},		/* long dash */
+    {1, 0x87F8},		/* dash dot */
+    {1, 0x6666},		/* big dots */
 };
 
 #define BITS_PER_LINETYPE	16
@@ -440,7 +438,7 @@ int ltype;
 }
 
 /* issue an error message that includes an (x, y) coordinate */
-static void apollo_xy_error(char* s, int x, int y, status_$t status)
+static void apollo_xy_error(char *s, int x, int y, status_$t status)
 {
     char buffer[128];
 
@@ -452,7 +450,7 @@ static void apollo_xy_error(char* s, int x, int y, status_$t status)
     if (status.all != status_$ok) apollo_xy_error((s), x, y, status)
 
 /*
-    Note that GNUplot and GPR have reversed ideas of where the Y origin is.
+    Note that gnuplot and GPR have reversed ideas of where the Y origin is.
     This means subtracting the Y coordinate from Y max.
 */
 #define plot_to_gpr(y)		(APOLLO_YMAX - (y))
@@ -482,9 +480,8 @@ TERM_PUBLIC void APOLLO_vector(unsigned int x, unsigned int y)
 */
 TERM_PUBLIC void APOLLO_text()
 {
-    if (use_bitmap)
-    {
-	static gpr_$position_t pos;		/* always zero */
+    if (use_bitmap) {
+	static gpr_$position_t pos;	/* always zero */
 	gpr_$window_t window;
 	status_$t status;
 
@@ -540,8 +537,7 @@ char str[];
     apollo_check("inq_text_extent");
 
     y -= size.y_size / 2;	/* center around "y" */
-    switch (apollo_text_mode)
-    {
+    switch (apollo_text_mode) {
     case LEFT:
 	break;
     case CENTRE:
@@ -560,8 +556,7 @@ char str[];
 /* reset the graphics state and terminate */
 TERM_PUBLIC void APOLLO_reset()
 {
-    if (stream != -1)
-    {
+    if (stream != -1) {
 	apollo_gpr_terminate();
 	stream = -1;
     }
@@ -571,12 +566,13 @@ TERM_PUBLIC void APOLLO_reset()
 
 #ifdef TERM_TABLE
 TERM_TABLE_START(apollo_driver)
-   	"apollo", "Apollo Graphics Primitive Resource, rescaling of subsequent plots after window resizing",
-	   0, 0, 0, 0, /* APOLLO_XMAX, APOLLO_YMAX, APOLLO_VCHAR, APOLLO_HCHAR, are filled in at run-time */
-	   APOLLO_VTIC, APOLLO_HTIC, options_null, APOLLO_init, APOLLO_reset,
-	   APOLLO_text, null_scale, APOLLO_graphics, APOLLO_move, APOLLO_vector,
-	   APOLLO_linetype, APOLLO_put_text, APOLLO_text_angle,
-	   APOLLO_justify_text, line_and_point, do_arrow, set_font_null
+    "apollo",
+    "Apollo Graphics Primitive Resource, rescaling of subsequent plots after window resizing",
+    0, 0, 0, 0,	/* APOLLO_XMAX, APOLLO_YMAX, APOLLO_VCHAR, APOLLO_HCHAR, are filled in at run-time */
+    APOLLO_VTIC, APOLLO_HTIC, options_null, APOLLO_init, APOLLO_reset,
+    APOLLO_text, null_scale, APOLLO_graphics, APOLLO_move, APOLLO_vector,
+    APOLLO_linetype, APOLLO_put_text, APOLLO_text_angle,
+    APOLLO_justify_text, line_and_point, do_arrow, set_font_null
 TERM_TABLE_END(apollo_driver)
 
 #undef LAST_TERM
@@ -588,6 +584,7 @@ TERM_TABLE_END(apollo_driver)
 #ifdef TERM_HELP
 START_HELP(apollo)
 "1 apollo",
+"?commands set terminal apollo",
 "?set terminal apollo",
 "?set term apollo",
 "?terminal apollo",
@@ -596,6 +593,6 @@ START_HELP(apollo)
 " The `apollo` terminal driver supports the Apollo Graphics Primitive Resource",
 " with rescaling after window resizing.  It has no options.",
 "",
-" If a fixed-size window is used, the `gpr` terminal may be used instead."
+" If a fixed-size window is desired, the `gpr` terminal may be used instead."
 END_HELP(apollo)
-#endif
+#endif /* TERM_HELP */

@@ -1,6 +1,12 @@
 
  The following information is mainly geared towards people who want
-to port gnuplot to new platforms. Please do also read the file CodeStyle.
+to port gnuplot to new platforms not covered by the installation
+instructions in 0INSTALL and INSTALL.gnu. Please do also read the
+file CodeStyle.
+
+ Some operating system dependent preprocessor symbols are defined near
+the top of plot.h. If you add a new platform, some definitions must
+probably be added to plot.h as well.
 
 Preprocessor Defines
 ********************
@@ -56,15 +62,20 @@ HAVE_LIBC_H    (unistd.h alternative on NEXT)
 HAVE_SGTTY_H             needed if there is no termios.h
 HAVE_SYS_BSDTYPES_H
 HAVE_SYS_SELECT_H        (needed for FD_* macros)
+HAVE_SYS_STAT_H
 HAVE_SYS_SYSTEMINFO_H
 HAVE_TERMIOS_H
 HAVE_VALUES_H            needed if there is no limits.h
+
+ Note that configure use the HAVE_XXXX_H form, though. The transformation
+into NO_XXXX_H is done in syscfg.h. The same applies to function defines
+(see below).
 
 Function Availability
 =====================
 
  It is generally assumed that standard ANSI/ISO functions are available.
-The code is protected against missing standard funktions with NO_XXX defines:
+The code is protected against missing standard functions with NO_XXX defines:
 
 NO_ATEXIT   - atexit() not available
 NO_MEMCPY   - memcpy() not available
@@ -94,28 +105,30 @@ HAVE_LGAMMA       lgamma()       specfun.c       prefered over gamma()
 HAVE_ON_EXIT      on_exit()      term/x11.trm    atexit() substitute on SunOS
 HAVE_RINDEX       rindex()       stdfn.h         pre-ANSI version of strrchr()
 HAVE_SLEEP        sleep()        command.c
-HAVE_SYSINFO      sysinfo()      gplt_x11.c      SysV version of gethostname()
+HAVE_SYSINFO      sysinfo()      gplt_x11.c      SysV function to get and set
+                                                 system information. Used
+                                                 instead of gethostname().
 HAVE_STRNCASECMP  strncasecmp()  stdfn.c
 HAVE_STRNICMP     strnicmp()     stdfn.c
 HAVE_TCGETATTR    tcgetattr()    readline.c
-
 
 Terminal Selection Options
 ==========================
 
    These defines are used to include the drivers for various plotting 
 terminals, printers, and protocols that a given version of gnuplot can 
-access and the description of such for the help file.  {T
+access and the description of such for the help file.
 
 
-define      file            note
-------      ----            --------
-TERMFLAGS   Makefile        the set of terminals you want, from below
-            or term.h
-NO_ALL_TERM_H  term.h          edit term.h to specify desired devices at
-                               the beginning (instead of to comment out, 
+define      file               note
+------      ----               --------
+TERMFLAGS   Various makefiles  (obsolete under Unix; use configure instead)
+                               the set of terminals you want, from below or
+                               term.h
+SHORT_TERMLIST  term.h         edit term.h to specify desired devices at
+                               the beginning (instead of commenting out, 
                                throughout the file, devices not desired.) 
-                                       
+
 ALL_TERM_DOC   docs/termdoc.c  on-line help documentation for all devices
                                rather than only for the drivers selected
                                in term.h.
@@ -160,7 +173,7 @@ of devices that may be selected/deselected by editing term.h.
    HPLJII      HP Laserjet II
    HPPJ        HP PaintJet
    IMAGEN      Imagen laser printers (300dpi) (requires -Iterm also)
-   IRIS4D      IRIS4D series computer
+   IRIS        IRIS4D series computer
    KERMIT      MS-DOS Kermit Tektronix 4010 emulator
    LATEX       LaTeX picture environment
    LINUXVGA    Linux PC with (s)vgalib
@@ -203,7 +216,7 @@ Platform Related Defines
 ========================
 
  These #defines are defined automatically by various compilers or
-makefile, some gnuplot routines check these defines to implement
+makefiles, some gnuplot routines check these defines to implement
 features found in the various environments. This list is certainly
 incomplete.
 
@@ -222,6 +235,7 @@ unix          defined by most unix C compilers.
 vms           (and VMS) defined by VMS C compilers.
 __ZTC__       Zortech C compiler under MSDOS.
 _Windows      defined by Borland C++ 3.0 compiling for MS-Windows.
+__WATCOMC__   defined automatically by  Watcom C
 __EMX__       defined by EMX gcc (available on DOS & OS/2).
 OS2           defined by compilers under OS/2.
 
@@ -237,7 +251,7 @@ GP_GETCWD         getwd()/getcwd() alikes    stdfn.h
 GP_FARMALLOC      faralloc()/malloc()        alloc.c     Windows environment
 GP_FARREALLOC     farrealloc()/realloc()     alloc.c     Windows environment
 GP_SLEEP          sleep()                    command.c
-GP_SYSTEMINFO     sysinfo()/gethostname()    gplt_X11.c
+GP_SYSTEMINFO     sysinfo()/gethostname()    gplt_x11.c
 GPFAR             `far' compiler directive   plot.h      MSDOS and Win16
 GPHUGE            `huge' compiler directive  plot.h      MSDOS and Win16
 GP_INLINE         `__inline' directive       plot.h

@@ -1,4 +1,8 @@
-/* GNUPLOT -- gdgif.trm */
+/*
+ * $Id: $
+ */
+
+/* GNUPLOT -- gif.trm */
 
 /*[
  * Copyright 1998
@@ -34,7 +38,7 @@
  * This file is included by ../term.c.
  *
  * This terminal driver supports:
- *  GD GIF library 1.2
+ *  GD GIF library 1.2 & 1.3
  *
  * To Use:
  *
@@ -61,10 +65,14 @@
  * This driver is modeled after the PBM driver pbm.trm.
  *
  * AUTHORS
- *  Sam Shen sls@mh1.lbl.gov
- *  Alex Woo woo@playfair.stanford.edu
+ *  Sam Shen <sls@mh1.lbl.gov>
+ *  Alex Woo <woo@playfair.stanford.edu>
  *
- * send your comments or suggestions to (info-gnuplot@cs.dartmouth.edu).
+ * CONTRIBUTORS
+ *  Alfred Reibenschuh <alfred.reibenschuh@cait.co.at> or <fredo@blackbox.at>
+ *
+ * send your comments or suggestions to:
+ *  info-gnuplot@cs.dartmouth.edu
  * 
  * This version outputs either color or monochrome GIFs.  The default
  * is 640x480 pixels.  
@@ -74,6 +82,10 @@
  * gd is not distributed with gnuplot, because of the UNISYS license thing.
  *
  * find out about gd from http://www.boutell.com/gd/
+ *
+ * [Update: as of version 1.3, gd does not use any more UNISYS licensed
+ *  code. The gnuplot team may decide to include this version some day.]
+ *
  */
 
 #include "driver.h"
@@ -95,17 +107,17 @@ TERM_PUBLIC int GIF_text_angle __PROTO((int ang));
 TERM_PUBLIC void GIF_reset __PROTO((void));
 
 #include "gd.h"
-extern gdFontPtr gdFontSmall;  /* 6x12 */
-extern gdFontPtr gdFontLarge;  /* 8x16 */
-extern gdFontPtr gdFontMediumBold;  /* 7x13 */
+extern gdFontPtr gdFontSmall;	/* 6x12 */
+extern gdFontPtr gdFontLarge;	/* 8x16 */
+extern gdFontPtr gdFontMediumBold;	/* 7x13 */
 
 
 #define GREG_XMAX 640
 #define GREG_YMAX 480
 
 
-int GIF_XMAX= GREG_XMAX;
-int GIF_YMAX= GREG_YMAX;
+int GIF_XMAX = GREG_XMAX;
+int GIF_YMAX = GREG_YMAX;
 
 
 #define GIF_FONT_SMALL 1
@@ -143,23 +155,114 @@ static struct {
     int rgb_table[GIF_MAX_COLORS];
     int angle;
     int flags;
+    int linetype;
 } gif_state;
 
 #define GIF_USE_TRANSPARENT 1
 #define GIF_USE_INTERLACE   2
 
-static unsigned int gif_color_rgbs[] = {
-    0xffffff, /* white - background */
-    0x000000, /* black - borders */
-    0x404040, /* gray - X & y axes */
-    0xff0000, /* red */
-    0xffa500, /* orange */
-    0x66cdaa, /* mediumacquamarine */
-    0xcdb5cd, /* thistle3 */
-    0xadd8e6, /* lightblue */
-    0x0000ff, /* blue */
-    0xdda0dd, /* plum */
-    0x9500d3  /* dark violet */
+static unsigned int gif_color_rgbs[] =
+{
+    0xffffff,			/* background: white         */
+    0x000000,			/*    borders: black         */
+    0x404040,			/* x & y axes: grey          */
+    0xff0000,			/*   color 01: red           */
+    0x00c000,			/*   color 02: dark green    */
+    0x0080ff,			/*   color 03: dark blue     */
+    0xc000ff,			/*   color 04: dark magenta  */
+    0xc0ff40,			/*   color 05: yellow        */
+    0xc04000,			/*   color 06: orange        */
+    0x40ff80,			/*   color 07: sea green     */
+    0x2020c0,			/*   color 08: royal blue    */
+    0x8000c0,			/*   color 09: dark violet   */
+    /* please note: these colors are optimized for web216 compatibility */
+    0x006080,			/* DeepSkyBlue4 */
+    0x008000,			/* green4 */
+    0x008040,			/* SpringGreen4 */
+    0x008080,			/* dark cyan, turquoise4 */
+    0x00c060,			/* SpringGreen3 */
+    0x00c0c0,			/* cyan3, turquoise3 */
+    0x00ff00,			/* green */
+    0x208020,			/* forest green */
+    0x306080,			/* SteelBlue4 */
+    0x404040,			/* grey25-31 */
+    0x408000,			/* chartreuse4 */
+    0x000080,			/* dark blue, navy blue */
+    0x806000,			/* DarkGoldenrod4 */
+    0x806010,			/* goldenrod4 */
+    0x806060,			/* pink4 */
+    0x806080,			/* plum4 */
+    0x0000c0,			/* medium blue */
+    0x0000ff,			/* blue */
+    0x006000,			/* dark green */
+    0x40c080,			/* SeaGreen3 */
+    0x60a0c0,			/* SkyBlue3 */
+    0x60c000,			/* chartreuse3 */
+    0x60c0a0,			/* medium aquamarine */
+    0x800000,			/* dark red */
+    0x800080,			/* dark magenta */
+    0x602080,			/* DarkOrchid4 */
+    0x606060,			/* dim grey */
+    0x00ffff,			/* cyan1, turquoise1 */
+    0x202020,			/* grey13-18 */
+    0x204040,			/* dark slate grey */
+    0x204080,			/* RoyalBlue4 */
+    0x608020,			/* olive drab */
+    0x608060,			/* DarkSeaGreen4 */
+    0x608080,			/* LightBlue4, PaleTurquoise4 */
+    0x808040,			/* LightGoldenrod4, khaki4 */
+    0x808080,			/* grey51-56 */
+    0xa0a0a0,			/* dark grey, grey63-68 */
+    0xa0d0e0,			/* light blue */
+    0xc02020,			/* firebrick3 */
+    0xc06000,			/* DarkOrange3 */
+    0x80c0e0,			/* sky blue */
+    0xc060c0,			/* orchid3 */
+    0xc08000,			/* orange3 */
+    0xc08060,			/* LightSalmon3 */
+    0xff4000,			/* orange red */
+    0xff4040,			/* brown1, tomato */
+    0x80c0ff,			/* light sky blue */
+    0xff8060,			/* salmon */
+    0xff8080,			/* light coral */
+    0xc0a000,			/* gold3 */
+    0xc0c0c0,			/* grey76-81, honeydew3, ivory3, snow3 */
+    0xc0ffc0,			/* DarkSeaGreen1 */
+    0xff0000,			/* red */
+    0xff00ff,			/* magenta */
+    0xff80a0,			/* PaleVioletRed1 */
+    0xff80ff,			/* orchid1 */
+    0xc0c0a0,			/* LemonChiffon3 */
+    0xff6060,			/* IndianRed1 */
+    0xff8000,			/* dark orange */
+    0xffa000,			/* orange */
+    0x80e0e0,			/* CadetBlue2, DarkSlateGray2 */
+    0xa0e0e0,			/* pale turquoise */
+    0xa0ff20,			/* green yellow */
+    0xc00000,			/* red3 */
+    0xc000c0,			/* magenta3 */
+    0xa02020,			/* brown */
+    0xa020ff,			/* purple */
+    0x802000,			/* OrangeRed4 */
+    0x802020,			/* brown4 */
+    0x804000,			/* DarkOrange4 */
+    0x804020,			/* sienna4 */
+    0x804080,			/* orchid4 */
+    0x8060c0,			/* MediumPurple3 */
+    0x8060ff,			/* SlateBlue1 */
+    0x808000,			/* yellow4 */
+    0xa080ff,			/* MediumPurple1 */
+    0xc06080,			/* PaleVioletRed3 */
+    0xc0c000,			/* yellow3 */
+    0xff8040,			/* sienna1 */
+    0xffa040,			/* tan1 */
+    0xffa060,			/* sandy brown */
+    0xffa070,			/* light salmon */
+    0xffc020,			/* goldenrod1 */
+    0xffc0c0,			/* RosyBrown1, pink */
+    0xffff00,			/* yellow */
+    0xffff80,			/* khaki1 */
+    0xffffc0			/* lemon chiffon */
 };
 #define GIF_N_DEFAULT_COLORS (sizeof(gif_color_rgbs)/sizeof(gif_color_rgbs[0]))
 
@@ -172,93 +275,98 @@ static unsigned int gif_color_rgbs[] = {
  */
 TERM_PUBLIC void GIF_options()
 {
-    int gif_font,i;
-    term_options[0] = '\0';
+    int gif_font, i;
+    term_options[0] = NUL;
     gif_state.n_colors = 0;
     gif_state.flags = 0;
     gif_font = 1;
     GIF_font = gdfont;
 
     while (!END_OF_COMMAND) {
-      if (almost_equals(c_token, "t$ransparent")) {
-	gif_state.flags |= GIF_USE_TRANSPARENT;
-	++c_token;
-      } else if (almost_equals(c_token, "i$nterlace")) {
-	gif_state.flags |= GIF_USE_INTERLACE;
-	++c_token;
-      } else if (almost_equals(c_token,"s$mall")) {
-	GIF_font=gdFontSmall;
-	gif_font = 1;
-	term->v_char = (unsigned int)(12);
-	term->h_char = (unsigned int)(6);
-	++c_token;
-      } else if (almost_equals(c_token,"m$edium")) {
-	GIF_font=gdFontMediumBold;
-	gif_font = 2;
-	term->v_char = (unsigned int)(13);
-	term->h_char = (unsigned int)(7);
-	++c_token;
-      } else if(almost_equals(c_token,"l$arge")) {
-	GIF_font=gdFontLarge;
-	gif_font = 3;
-	term->v_char = (unsigned int)(16);
-	term->h_char = (unsigned int)(8);
-	++c_token;
-      } else if(almost_equals(c_token,"si$ze")){
-	struct value s;
-	c_token++;
-	if(END_OF_COMMAND){
-	  GIF_XMAX = GREG_XMAX;
-	  GIF_YMAX = GREG_YMAX;
-	  term->v_tic = GIF_YMAX/80;
-	  term->h_tic = GIF_XMAX/80;
-	} else {
-	  GIF_XMAX = real(const_express(&s));
-	  if( equals(c_token,",")){
+	if (almost_equals(c_token, "t$ransparent")) {
+	    gif_state.flags |= GIF_USE_TRANSPARENT;
+	    ++c_token;
+	} else if (almost_equals(c_token, "i$nterlace")) {
+	    gif_state.flags |= GIF_USE_INTERLACE;
+	    ++c_token;
+	} else if (almost_equals(c_token, "s$mall")) {
+	    GIF_font = gdFontSmall;
+	    gif_font = 1;
+	    term->v_char = (unsigned int) (12);
+	    term->h_char = (unsigned int) (6);
+	    ++c_token;
+	} else if (almost_equals(c_token, "m$edium")) {
+	    GIF_font = gdFontMediumBold;
+	    gif_font = 2;
+	    term->v_char = (unsigned int) (13);
+	    term->h_char = (unsigned int) (7);
+	    ++c_token;
+	} else if (almost_equals(c_token, "l$arge")) {
+	    GIF_font = gdFontLarge;
+	    gif_font = 3;
+	    term->v_char = (unsigned int) (16);
+	    term->h_char = (unsigned int) (8);
+	    ++c_token;
+	} else if (almost_equals(c_token, "si$ze")) {
+	    struct value s;
 	    c_token++;
-	    GIF_YMAX = real(const_express(&s));
-	    term->v_tic = GIF_YMAX/80;
-	    term->h_tic = GIF_XMAX/80;
-	    term->ymax  = GIF_YMAX;
-	    term->xmax  = GIF_XMAX;
-	  }
+	    if (END_OF_COMMAND) {
+		GIF_XMAX = GREG_XMAX;
+		GIF_YMAX = GREG_YMAX;
+		term->v_tic = GIF_YMAX / 80;
+		term->h_tic = GIF_XMAX / 80;
+	    } else {
+		GIF_XMAX = real(const_express(&s));
+		if (equals(c_token, ",")) {
+		    c_token++;
+		    GIF_YMAX = real(const_express(&s));
+		    term->v_tic = GIF_YMAX / 80;
+		    term->h_tic = GIF_XMAX / 80;
+		    term->ymax = GIF_YMAX;
+		    term->xmax = GIF_XMAX;
+		}
+	    }
+	} else {		/* not "size" */
+	    char *string = input_line + token[c_token].start_index;
+	    unsigned long color;
+	    if (sscanf(string, "x%lx", &color) != 1) {
+		int_error("invalid color spec, must be xRRGGBB", c_token);
+	    } else if (gif_state.n_colors == GIF_MAX_COLORS) {
+		int_warn("too many colors, ingoring", c_token);
+		++c_token;
+	    } else {
+		gif_state.rgb_table[gif_state.n_colors++] = color;
+		++c_token;
+	    }
 	}
-      } else { /* not "size" */
-	char *string = input_line + token[c_token].start_index;
-	unsigned long color;
-	if (sscanf(string, "x%x", &color) != 1) {
-	  int_error("invalid color spec, must be xRRGGBB", c_token);
-	} else if (gif_state.n_colors == GIF_MAX_COLORS) {
-	  int_warn("too many colors, ingoring", c_token);
-	  ++c_token;
-	} else {
-	  gif_state.rgb_table[gif_state.n_colors++] = color;
-	  ++c_token;
-	}
-      }
     }
 
 
     /* now generate options string */
 
     if (gif_state.flags & GIF_USE_TRANSPARENT) {
-      strcat(term_options, "transparent ");
+	strcat(term_options, "transparent ");
     }
     if (gif_state.flags & GIF_USE_INTERLACE) {
-      strcat(term_options, "interlace ");
+	strcat(term_options, "interlace ");
     }
-    
-    switch(gif_font) {
-    	case 1: strcat(term_options,"small "); break;
-    	case 2: strcat(term_options,"medium "); break;
-    	case 3: strcat(term_options,"large "); break;
+    switch (gif_font) {
+    case 1:
+	strcat(term_options, "small ");
+	break;
+    case 2:
+	strcat(term_options, "medium ");
+	break;
+    case 3:
+	strcat(term_options, "large ");
+	break;
     }
-    sprintf(term_options+strlen(term_options),
-      "size %d,%d ", GIF_XMAX, GIF_YMAX);
+    sprintf(term_options + strlen(term_options),
+	    "size %d,%d ", GIF_XMAX, GIF_YMAX);
 
-    for( i=0; i < gif_state.n_colors; i++) {
-      sprintf(term_options+strlen(term_options),
-        "x%06x ", gif_state.rgb_table[i] );
+    for (i = 0; i < gif_state.n_colors; i++) {
+	sprintf(term_options + strlen(term_options),
+		"x%06x ", gif_state.rgb_table[i]);
     }
 }
 
@@ -270,6 +378,7 @@ TERM_PUBLIC void GIF_options()
  */
 TERM_PUBLIC void GIF_init()
 {
+    gif_state.linetype = 0;
 }
 
 /*
@@ -280,7 +389,7 @@ TERM_PUBLIC void GIF_init()
 TERM_PUBLIC void GIF_reset()
 {
 }
- 
+
 /*
  * _graphics()  Called just before a plot is going to be displayed.  This
  * procedure should set the device into graphics mode.  Devices which can't
@@ -296,13 +405,13 @@ TERM_PUBLIC void GIF_graphics()
     gif_state.image = gdImageCreate((int) (xsize * GIF_XMAX),
 				    (int) (ysize * GIF_YMAX));
     gif_state.height = (int) (ysize * GIF_YMAX);
-    gif_state.charw = term->h_char; /* gif_state.font->w; */
-    gif_state.charh = term->v_char; /* gif_state.font->h; */
+    gif_state.charw = term->h_char;	/* gif_state.font->w; */
+    gif_state.charh = term->v_char;	/* gif_state.font->h; */
     for (i = gif_state.n_colors; i < GIF_N_DEFAULT_COLORS; i++)
 	gif_state.rgb_table[i] = gif_color_rgbs[i];
     if (gif_state.n_colors < GIF_N_DEFAULT_COLORS)
 	gif_state.n_colors = GIF_N_DEFAULT_COLORS;
-    for (i = 0 ; i < gif_state.n_colors; i++) {
+    for (i = 0; i < gif_state.n_colors; i++) {
 	rgb = gif_state.rgb_table[i];
 	gif_state.color_table[i] =
 	    gdImageColorAllocate(gif_state.image, (rgb >> 16) & 0xff,
@@ -325,10 +434,10 @@ TERM_PUBLIC void GIF_text()
 {
     if (gif_state.flags & GIF_USE_INTERLACE)
 	gdImageInterlace(gif_state.image, 1);
-    gdImageGif(gif_state.image, outfile);
+    gdImageGif(gif_state.image, gpoutfile);
     gdImageDestroy(gif_state.image);
 }
- 
+
 /* _move(x,y)  Called at the start of a line.  The cursor should move to the
  * (x,y) position without drawing.
  */
@@ -344,12 +453,26 @@ TERM_PUBLIC void GIF_move(unsigned int x, unsigned int y)
  */
 TERM_PUBLIC void GIF_vector(unsigned int x, unsigned int y)
 {
-    gdImageLine(gif_state.image, gif_state.x, gif_state.height - gif_state.y,
-		x, gif_state.height - y, gif_state.color);
+    int gif_linetype_dotted[5];
+
+    if (gif_state.linetype == -1) {
+	gif_linetype_dotted[0] = gif_state.color_table[2];
+	gif_linetype_dotted[1] = gif_state.color_table[2];
+	gif_linetype_dotted[2] = gif_state.color_table[0];
+	gif_linetype_dotted[3] = gif_state.color_table[0];
+	gif_linetype_dotted[4] = gif_state.color_table[0];
+
+	gdImageSetStyle(gif_state.image, gif_linetype_dotted, 5);
+	gdImageLine(gif_state.image, gif_state.x, gif_state.height - gif_state.y,
+		    x, gif_state.height - y, gdStyled);
+    } else {
+	gdImageLine(gif_state.image, gif_state.x, gif_state.height - gif_state.y,
+		    x, gif_state.height - y, gif_state.color);
+    }
     gif_state.x = x;
     gif_state.y = y;
 }
- 
+
 /* _linetype(lt)  Called to set the line type before text is displayed or
  * line(s) plotted.  This procedure should select a pen color or line
  * style if the device has these capabilities.  
@@ -365,19 +488,21 @@ TERM_PUBLIC void GIF_linetype(int type)
 {
     if (type >= (gif_state.n_colors - 3))
 	type %= (gif_state.n_colors - 3);
+
     gif_state.color = gif_state.color_table[type + 3];
+    gif_state.linetype = type;
 }
- 
+
 /* _put_text(x,y,str)  Called to display text at the (x,y) position, 
  * while in graphics mode.   The text should be vertically (with respect 
  * to the text) justified about (x,y).  The text is rotated according 
  * to _text_angle and then horizontally (with respect to the text)
  * justified according to _justify_text.
  */
-TERM_PUBLIC void GIF_put_text(unsigned int x, unsigned int y, char* string)
+TERM_PUBLIC void GIF_put_text(unsigned int x, unsigned int y, char *string)
 {
     if (gif_state.angle == 1) {
-	x += gif_state.charw / 2;
+	x -= gif_state.charh / 2;
 	gdImageStringUp(gif_state.image, gif_state.font,
 			x, gif_state.height - y,
 			string, gif_state.color);
@@ -388,14 +513,14 @@ TERM_PUBLIC void GIF_put_text(unsigned int x, unsigned int y, char* string)
 		      string, gif_state.color);
     }
 }
- 
+
 /* _text_angle(ang)  Called to rotate the text angle when placing the y label.
  * If ang = 0 then text is horizontal.  If ang = 1 then text is vertically
  * upwards.  Returns TRUE if text can be rotated, FALSE otherwise.
  */
-TERM_PUBLIC int GIF_text_angle(int angle)
+TERM_PUBLIC int GIF_text_angle(int ang)
 {
-    gif_state.angle = angle;
+    gif_state.angle = ang;
     return TRUE;
 }
 
@@ -409,16 +534,15 @@ TERM_PUBLIC int GIF_text_angle(int angle)
 #ifdef TERM_TABLE
 
 TERM_TABLE_START(gif_driver)
-        "gif", "GIF format format [\042fontname]",
-       GREG_XMAX, GREG_YMAX, GIF_VCHAR, GIF_HCHAR,
-       GIF_VTIC, GIF_HTIC, GIF_options, GIF_init, GIF_reset,
-       GIF_text, null_scale, GIF_graphics, GIF_move, GIF_vector,
-       GIF_linetype, GIF_put_text, GIF_text_angle,
-       null_justify_text,do_point, do_arrow, set_font_null,
-                        0, /* pointsize */
-                        TERM_CAN_MULTIPLOT | TERM_BINARY
+    "gif", "GIF format [mode] [fontsize] [size] [colors]",
+    GREG_XMAX, GREG_YMAX, GIF_VCHAR, GIF_HCHAR,
+    GIF_VTIC, GIF_HTIC, GIF_options, GIF_init, GIF_reset,
+    GIF_text, null_scale, GIF_graphics, GIF_move, GIF_vector,
+    GIF_linetype, GIF_put_text, GIF_text_angle,
+    null_justify_text, do_point, do_arrow, set_font_null,
+    0,				/* pointsize */
+    TERM_CAN_MULTIPLOT | TERM_BINARY
 TERM_TABLE_END(gif_driver)
-
 
 #undef LAST_TERM
 #define LAST_TERM gif_driver
@@ -429,15 +553,14 @@ TERM_TABLE_END(gif_driver)
 #ifdef TERM_HELP
 START_HELP(gif)
 "1 gif",
+"?commands set terminal gif",
 "?set terminal gif",
 "?set term gif",
 "?terminal gif",
 "?term gif",
 "?gif",
-" The `gif` terminal driver generates output in GIF format.  It must be linked",
-" with the \"gd\" library (link with \"-Lterm/gd -lgd\" if your directory structure",
-" is \"gnuplot/term/gd\").  \"gd\" cannot be distributed with `gnuplot` because of",
-" license problems.  Find out about \"gd\" from http://www.boutell.com/",
+" The `gif` terminal driver generates output in GIF format.  It uses Thomas",
+" Boutell's gd library, which is available from http://www.boutell.com/gd/",
 "",
 " Syntax:",
 "       set terminal gif {transparent} {interlace}",
@@ -483,5 +606,4 @@ START_HELP(gif)
 "",
 " The current version of the `gif` driver does not support animated GIFs."
 END_HELP(gif)
-
-#endif
+#endif /* TERM_HELP */

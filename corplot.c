@@ -38,7 +38,7 @@ static char *RCSid = "$Id: corplot.c,v 1.8 1998/03/22 22:31:27 drd Exp $";
 #include <stdio.h>
 #include <process.h>
 #include <dos.h>
-#if (defined(ATARI) && defined(__PUREC__)) || (defined(MTOS) && defined(__PUREC__))
+#if (defined(ATARI) || defined(MTOS)) && defined(__PUREC__)
 #include <plot.h>
 #endif
 

@@ -1,43 +1,26 @@
-What's new in 3.6 ?
+What's new in 3.7 ?
 
-see version.c for a detailed list of recent changes
+from 315 to 348
+  makefile.mgw contributed by HBB for compilation under MinGW32
+  "-" means interactive on command line and load file
+  gnuplot no longer faults on Alpha in prob.dem
+  margin and label-positioning works with set ?label offset
+  set ?tics auto resets the tic-marks
+  line widths get copied in M$ Windows terminal when using the
+     copy->clipboard option
+  PSLATEX-terminal: resolves problems with german.sty when " is
+     active character
+  the terminal list gets paged through your preferred pager
+  
+  and many more.
 
-BUGS outstanding
-  illegal trailing tab on fig output
-  minor tics missing on HPUX ?
-  problem with time on os/2 - optimiser bug ?
-  terminal settings get propagated when terminal is changed (now fixed ?)
-  set ?range [] writeback is broken ? certainly for logscales.
-  source file copyrights are out of date - what should go on new files ?
-  to be documented - ms-windows cannot do wide, dashed lines (well, win32 can, but...)
-  does not build on win16 or sun/cc (getting closer)
-
-OTHER ISSUES
-  set mapping spherical is not 'real' spherical polars
-  terminals are no longer allowed to do their own scaling
-  break up some of the drivers (eg epson and family) into their
-    own files. *maybe* we can provide libraries of generic routines
-    (particularly tex) which can be used by all interested drivers,
-    and because they are a library, they are linked only if
-    any relevant drivers are installed. bitmap.c could also be
-    linked in this way.
-  Now that all drivers are new format, do we need to explore separate
-    compilation of the drivers into their own .obj files for DOS ?
-  hidden line is SLOW, and throws up some logic errors
-  have I got all os/2 and (in particular) mac changes ?
-  filled boxes ?
-  substution using backquotes should not have a length limit
-  the source indentation stinks - may I pass it through gnu indent,
-     or will that mess up use of patches which did not make it into
-     the release.
-     
-
+See docs/old/ChangeLog.old and ChangeLog for a list of changes
 
   As always, there are outstanding contributed patches
  that I haven't yet installed (sorry), and half-promises for features
  that I've not had a chance to fulfill.
 
-in this release
+in this release (somwhere between 315 and 347)
   try to improve (and not break too badly) portability
   multiple X11 windows have number in window title, and active window
    has crosshair cursor
@@ -295,3 +278,28 @@ Here goes:
 
 
 that's all I can think of for the moment...
+
+
+ o timeseries plots
+ o enhanced X11 driver
+ o Win32/NT support
+ o OS9 support
+ o updated copyright
+ o new driver: NeXT
+ o window option for Amiga driver
+ o greatly improved hidden3d algorithm
+ o updated postscript docs (Dick)
+ o multiplot feature
+ o new driver: texdraw
+ o new driver: gif (requires external lib)
+ o new driver: emx
+ o pipe support for Amiga
+ o using patch (dd)
+ o enhanced postscript driver (Matt Heffron)
+ o integration of Carsten Grammes's gnufit extension
+ o greatly improved configuration on Unix platforms
+ o fig driver updated to xfig 3.x
+ o new driver: Linux svga
+ o improved pslatex driver
+ o new hpgl driver hp7550
+ o new errorbar styles

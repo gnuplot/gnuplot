@@ -116,11 +116,12 @@ char s;
 #endif
 
 but since there's no benefit from using a character as parameter, may
-as well use the int  (?)  ie
+as well use the int ie.
   char *foo(s)
   int s;
 
-gcc -Wtraditional  might help with this
+gcc -Wtraditional  might help with this.
+[char parameters should be avoided. int can safely be used in this case.]
 
 
 
@@ -201,7 +202,9 @@ putting   set ts=4  into your ~/.exrc file.
 
   Unfortunately, gnu indent does not seem to recognise this
 as a layout style. If it did, I'd have run all sources
-through it long ago.
+through it long ago. [GNU indent -kr -cp0 -l100 -lps comes
+pretty close, though. I need very little manual editing after
+running this, mostly for long (> 80 cols) lines. -Lars]
 
 
 
@@ -228,6 +231,14 @@ and /*}}}*/  are markers left by my folding editor when I am forced
 to fold up particularly long functions when trying to understand the
 logic. I tend to leave these markers in when I finally figure it out,
 though perhaps I should not.
+
+
+Source code is intended to be read and maintained by humans. As such,
+readability is prefered over elegance. Please separate all operators
+from operands with a space, ie. instead of x+=3, use x += 3. The former
+is not only less readable, it may also break older compilers! This rule
+should also be followed for simple assignments, ie. in for (;;) loops.
+Unary operators should be writen as usual, ie i++.
 
 
 [more to come]

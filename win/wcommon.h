@@ -49,7 +49,9 @@
  */
 
 #if WINVER >= 0x030a
+#ifndef CYGWIN
 #include <shellapi.h>
+#endif
 #endif
 /* this file contains items that are internal to wgnuplot.dll */
 

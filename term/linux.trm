@@ -46,7 +46,7 @@
  *  Scott Heavner (sdh@po.cwru.edu)
  *  based on original linux.trm by Tommy Frandsen (frandsen@diku.dk)
  *  patched by David J. Liu (liu@molecule.phri.nyu.edu)
- *  to increase perfromance and safety based on the features of SVGALib/GL.
+ *  to increase perfomance and safety based on the features of SVGALib/GL.
  *  send your comments or suggestions to (pixar!info-gnuplot@sun.com).
  */
 
@@ -68,8 +68,8 @@ register_term(linux)
 #define LINUX_HCHAR FNT5X9_HCHAR
 #define LINUX_VTIC 5
 #define LINUX_HTIC 5
-#define LINUX_XMAX 0 /* These two entries are just place holders. */
-#define LINUX_YMAX 0 /* The actual values will be filled in init. */
+#define LINUX_XMAX 0		/* These two entries are just place holders. */
+#define LINUX_YMAX 0		/* The actual values will be filled in init. */
 
 TERM_PUBLIC void LINUX_options __PROTO((void));
 TERM_PUBLIC void LINUX_init __PROTO((void));
@@ -77,10 +77,10 @@ TERM_PUBLIC void LINUX_reset __PROTO((void));
 TERM_PUBLIC void LINUX_text __PROTO((void));
 TERM_PUBLIC void LINUX_graphics __PROTO((void));
 TERM_PUBLIC void LINUX_linetype __PROTO((int linetype));
-TERM_PUBLIC void LINUX_move __PROTO((unsigned int x,unsigned int y));
-TERM_PUBLIC void LINUX_vector __PROTO((unsigned int x,unsigned int y));
+TERM_PUBLIC void LINUX_move __PROTO((unsigned int x, unsigned int y));
+TERM_PUBLIC void LINUX_vector __PROTO((unsigned int x, unsigned int y));
 TERM_PUBLIC int LINUX_text_angle __PROTO((int ang));
-TERM_PUBLIC void LINUX_put_text __PROTO((unsigned int x,unsigned int y,char *str));
+TERM_PUBLIC void LINUX_put_text __PROTO((unsigned int x, unsigned int y, char *str));
 TERM_PUBLIC void LINUX_suspend __PROTO((void));
 TERM_PUBLIC void LINUX_resume __PROTO((void));
 
@@ -91,8 +91,8 @@ TERM_PUBLIC void LINUX_resume __PROTO((void));
 #define _STRING_H_
 #include <vga.h>
 
-static int linux_vmode = G1024x768x256; /* default mode */
-static int vgacolor[] = {7,8,2,3,4,5,9,14,12,15,13,10,11,1,6};
+static int linux_vmode = G1024x768x256;		/* default mode */
+static int vgacolor[] = { 7, 8, 2, 3, 4, 5, 9, 14, 12, 15, 13, 10, 11, 1, 6 };
 static int graphics_on = FALSE;
 vga_modeinfo *modeinfo;
 static int linux_startx, linux_starty, linux_lasty;
@@ -101,195 +101,202 @@ int LINUX_graphics_allowed;
 
 typedef (*linux_line_func_ptr) __PROTO((int x1, int y1, int x2, int y2));
 
-static void LINUX_putc __PROTO((unsigned int x,unsigned int y,int c,int ang,linux_line_func_ptr line_func));
+static void LINUX_putc __PROTO((unsigned int x, unsigned int y, int c, int ang,
+				linux_line_func_ptr line_func));
 
 /* this function is called at the very beginning of main() to initialize
-   the vgalib and to revoke suid privileges.
-   /dev/console and /dev/tty\d are considered graphic terminals, all other
-   don't support the linux terminal */
+ *  the vgalib and to revoke suid privileges.
+ * /dev/console and /dev/tty\d are considered graphic terminals, all other
+ * don't support the linux terminal */
 
 void LINUX_setup(void)
 {
-  char line[256];
-  FILE *pipe;
+    char line[256];
+    FILE *pipe;
 
-  LINUX_graphics_allowed=FALSE;
+    LINUX_graphics_allowed = FALSE;
 
-  if(geteuid()!=0) return; /* if we aren't root, we cannot init graphics */
+    if (geteuid() != 0)
+	return;			/* if we aren't root, we cannot init graphics */
 
-  if((pipe=popen("/usr/bin/tty","r"))!=NULL) {
-    line[0]=0;
-    fgets(line,256, pipe);
-    pclose(pipe);
-    line[strlen(line)-1]='\0';
-    if(strcmp(line,"/dev/console")==0 || (strncmp(line, "/dev/tty", 8)==0 &&
-       isdigit(line[8])))
-      LINUX_graphics_allowed=TRUE;
-  }
-
-  if(LINUX_graphics_allowed) {
-    vga_init();
-  } else {
-    /* err - shouldn't we give up root uid whatever happens ?
-     * or perhaps vga_init() does it ?
-     */
-    setuid(getuid());
-  }
+    if ((pipe = popen("/usr/bin/tty", "r")) != NULL) {
+	line[0] = 0;
+	fgets(line, 256, pipe);
+	pclose(pipe);
+	line[strlen(line) - 1] = '\0';
+	if (strcmp(line, "/dev/console") == 0 ||
+	    (strncmp(line, "/dev/tty", 8) == 0 && isdigit(line[8])))
+	    LINUX_graphics_allowed = TRUE;
+    }
+    if (LINUX_graphics_allowed) {
+	vga_init();
+    } else {
+	/* err - shouldn't we give up root uid whatever happens ?
+	 * or perhaps vga_init() does it ?
+	 */
+	setuid(getuid());
+    }
 }
 
 TERM_PUBLIC void LINUX_options()
 {
-	if(!LINUX_graphics_allowed) {
-		int_error("Linux terminal driver not available", NO_CARET);
-	}
-
-	fprintf (stderr, "%s\n",vga_getmodename(linux_vmode)) ;
+    if (!LINUX_graphics_allowed) {
+	int_error("Linux terminal driver not available", NO_CARET);
+    }
+    fprintf(stderr, "%s\n", vga_getmodename(linux_vmode));
 }
 
 TERM_PUBLIC void LINUX_init()
 {
-/* vga_init () has been moved to immediately after main () for security */
-	if (vga_getdefaultmode()!= -1) linux_vmode=vga_getdefaultmode();
-	/* get the default mode from GSVGAMODE, if available */
-	if (!vga_hasmode(linux_vmode)) linux_vmode = G640x480x16;
-	/* test default mode first */
-	if (!vga_hasmode(linux_vmode)) {
-		fprintf (stderr,"Error, unable to initiate graphics.\n") ;
-		return;
-	} /* this mode is the bottom line */
-	modeinfo = vga_getmodeinfo(linux_vmode);
-	term->xmax = modeinfo->width;
-	term->ymax = modeinfo->height;
-	linux_lasty = modeinfo->height-1;
+    /* vga_init () has been moved to immediately after main () for security */
+    if (vga_getdefaultmode() != -1)
+	linux_vmode = vga_getdefaultmode();
+    /* get the default mode from GSVGAMODE, if available */
+    if (!vga_hasmode(linux_vmode))
+	linux_vmode = G640x480x16;
+    /* test default mode first */
+    if (!vga_hasmode(linux_vmode)) {
+	fputs("Error, unable to initiate graphics.\n", stderr);
+	return;
+    }				/* this mode is the bottom line */
+    modeinfo = vga_getmodeinfo(linux_vmode);
+    term->xmax = modeinfo->width;
+    term->ymax = modeinfo->height;
+    linux_lasty = modeinfo->height - 1;
 }
 
 TERM_PUBLIC void LINUX_reset()
 {
-	if (graphics_on) {
-		vga_setmode(TEXT);
-		graphics_on = FALSE;
-	}
+    if (graphics_on) {
+	vga_setmode(TEXT);
+	graphics_on = FALSE;
+    }
 }
 
 TERM_PUBLIC void LINUX_text()
 {
-	if (graphics_on) {
-		vga_getch();
-		vga_setmode(TEXT);
-		graphics_on = FALSE;
-	}
+    if (graphics_on) {
+	vga_getch();
+	vga_setmode(TEXT);
+	graphics_on = FALSE;
+    }
 }
 
 TERM_PUBLIC void LINUX_graphics()
 {
-	if (!graphics_on) {
-		vga_setmode(linux_vmode);
-		graphics_on = TRUE;
-	}
+    if (!graphics_on) {
+	vga_setmode(linux_vmode);
+	graphics_on = TRUE;
+    }
 }
 
 TERM_PUBLIC void LINUX_suspend()
 {
-	vga_flip();
+    vga_flip();
 }
 
 TERM_PUBLIC void LINUX_resume()
 {
-	vga_flip();
+    vga_flip();
 }
 
 TERM_PUBLIC void LINUX_linetype(linetype)
 int linetype;
 {
-	if (linetype >= 13)
-		linetype %= 13;
-	vga_setcolor(vgacolor[linetype+2]);
+    if (linetype >= 13)
+	linetype %= 13;
+    vga_setcolor(vgacolor[linetype + 2]);
 }
 
-TERM_PUBLIC void LINUX_move(x,y)
+TERM_PUBLIC void LINUX_move(x, y)
 unsigned int x;
 unsigned int y;
 {
-	linux_startx = x;
-	linux_starty = y;
+    linux_startx = x;
+    linux_starty = y;
 }
 
-TERM_PUBLIC void LINUX_vector(x,y)
+TERM_PUBLIC void LINUX_vector(x, y)
 unsigned int x;
 unsigned int y;
 {
-	vga_drawline(linux_startx,linux_lasty-linux_starty,x,linux_lasty-y); 
-	linux_startx = x;
-	linux_starty = y;
+    vga_drawline(linux_startx, linux_lasty - linux_starty, x, linux_lasty - y);
+    linux_startx = x;
+    linux_starty = y;
 }
 
 TERM_PUBLIC int LINUX_text_angle(ang)
 int ang;
 {
-	linux_angle=ang;
-	return TRUE;
+    linux_angle = ang;
+    return TRUE;
 }
 
-static void LINUX_putc(x,y,c,ang,line_func)
-unsigned int x,y;
+static void LINUX_putc(x, y, c, ang, line_func)
+unsigned int x, y;
 int c;
 int ang;
 linux_line_func_ptr line_func;
 {
-int i, j, k;
-unsigned int pixelon;
-	i = (int)(c) - 32;
-	for (j=0; j<FNT5X9_VBITS; j++) {
-		for (k=0; k<FNT5X9_HBITS; k++) {
-			pixelon = (((unsigned int)(fnt5x9[i][j])) >> k & 1);
-			if (pixelon) {
-				switch(ang) {
-					case 0 : (*line_func)(x+k+1,y-j,x+k+1,y-j);
-							break;
-					case 1 : (*line_func)(x-j,y-k-1,x-j,y-k-1);
-							break;
-				}
-			}
+    int i, j, k;
+    unsigned int pixelon;
+    i = (int) (c) - 32;
+    for (j = 0; j < FNT5X9_VBITS; j++) {
+	for (k = 0; k < FNT5X9_HBITS; k++) {
+	    pixelon = (((unsigned int) (fnt5x9[i][j])) >> k & 1);
+	    if (pixelon) {
+		switch (ang) {
+		case 0:
+		    (*line_func) (x + k + 1, y - j, x + k + 1, y - j);
+		    break;
+		case 1:
+		    (*line_func) (x - j, y - k - 1, x - j, y - k - 1);
+		    break;
 		}
+	    }
 	}
+    }
 }
 
-TERM_PUBLIC void LINUX_put_text(x,y,str)
+TERM_PUBLIC void LINUX_put_text(x, y, str)
 unsigned int x, y;
 char *str;
 {
-int i;
-	switch(linux_angle) {
-		case 0 : y -= LINUX_VCHAR/2;
-				break;
-		case 1 : x += LINUX_VCHAR/2;
-				break;
+    int i;
+    switch (linux_angle) {
+    case 0:
+	y -= LINUX_VCHAR / 2;
+	break;
+    case 1:
+	x += LINUX_VCHAR / 2;
+	break;
+    }
+    for (i = 0; str[i]; i++) {
+	LINUX_putc(x, linux_lasty - y, str[i], linux_angle, vga_drawline);
+	switch (linux_angle) {
+	case 0:
+	    x += LINUX_HCHAR;
+	    break;
+	case 1:
+	    y += LINUX_HCHAR;
+	    break;
 	}
-	for (i=0;str[i];i++) {
-		LINUX_putc(x,linux_lasty-y,str[i],linux_angle,vga_drawline); 
-		switch(linux_angle) {
-			case 0 : x+=LINUX_HCHAR ;
-					break;
-			case 1 : y+=LINUX_HCHAR ;
-					break;
-		}
-	}
+    }
 }
 
 #endif
 
 #ifdef TERM_TABLE
 TERM_TABLE_START(linux_driver)
-    "linux", "Linux PC with (s)vgalib", 
-           LINUX_XMAX, LINUX_YMAX, LINUX_VCHAR, LINUX_HCHAR,
-           LINUX_VTIC, LINUX_HTIC, LINUX_options, LINUX_init, LINUX_reset,
-           LINUX_text, null_scale, LINUX_graphics, LINUX_move, LINUX_vector,
-           LINUX_linetype, LINUX_put_text, LINUX_text_angle,
-           null_justify_text, do_point, do_arrow, set_font_null,
-           0, /* pointsize */
-           TERM_CAN_MULTIPLOT, LINUX_suspend, LINUX_resume
+    "linux", "Linux PC with (s)vgalib",
+    LINUX_XMAX, LINUX_YMAX, LINUX_VCHAR, LINUX_HCHAR,
+    LINUX_VTIC, LINUX_HTIC, LINUX_options, LINUX_init, LINUX_reset,
+    LINUX_text, null_scale, LINUX_graphics, LINUX_move, LINUX_vector,
+    LINUX_linetype, LINUX_put_text, LINUX_text_angle,
+    null_justify_text, do_point, do_arrow, set_font_null,
+    0,				/* pointsize */
+    TERM_CAN_MULTIPLOT, LINUX_suspend, LINUX_resume
 TERM_TABLE_END(linux_driver)
-
 #undef LAST_TERM
 #define LAST_TERM linux_driver
 #endif
@@ -297,6 +304,7 @@ TERM_TABLE_END(linux_driver)
 #ifdef TERM_HELP
 START_HELP(linux)
 "1 linux",
+"?commands set terminal linux",
 "?set terminal linux",
 "?set term linux",
 "?terminal linux",
