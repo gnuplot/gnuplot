@@ -1,6 +1,6 @@
 ############################################################
 #
-# $Id: Makefile.in,v 1.42.2.16 2002/02/25 19:39:05 lhecking Exp $
+# $Id: Makefile.in,v 1.42.2.17 2002/10/15 19:30:07 lhecking Exp $
 #
 # GNUPLOT Makefile.in for autoconf (Unix X11 support)
 # Adapted from makefile.unx by djm@gnu.ai.mit.edu
@@ -166,7 +166,7 @@ W=$(srcdir)/win/
 #<<<makefile.all>>>
 ########################################################
 #
-# $Id: Makefile.in,v 1.42.2.16 2002/02/25 19:39:05 lhecking Exp $
+# $Id: Makefile.in,v 1.42.2.17 2002/10/15 19:30:07 lhecking Exp $
 #
 ########################################################
 #
@@ -477,7 +477,7 @@ mostlyclean: clean
 
 distclean: clean
 	rm -f Makefile config.status config.cache $(CONFIG_HEADER) \
-	  config.log stamp-h docs/Makefile docs/latextut/Makefile
+	  config.log stamp-h stamp-h[0-9]* docs/Makefile docs/latextut/Makefile
 	test "$(srcdir)" = "$(top_builddir)" || rm -rf docs term
 
 realclean: distclean
