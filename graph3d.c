@@ -443,7 +443,7 @@ int count;
     /* HBB 980308: sigh... another 16bit glitch: on term's with more than
      * 8000 pixels in either direction, these calculations produce garbage
      * results if done in (16bit) ints */
-    xscaler = (xright - xleft) * 4 / 7;		/* HBB: Magic number alert! */
+    xscaler = ((xright - xleft) * 4L) / 7L;              /* HBB: Magic number alert! */
     yscaler = ((ytop - ybot) * 4L) / 7L;
 
 }
