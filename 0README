@@ -63,7 +63,7 @@ of GNUPLOT:
  o IBM PC and compatibles (MS-DOS 3.3/5.0 BC++3.1/TC++ 1.0 MSC 7.0 DJGPP,
    OS/2 2.x, Linux 2.x SVGA X11/XFree86, Windows NT 4.0)
  o CBM Amiga (AmigaOS 1.3, 2.x and 3.x, SAS/C 6.2 and better, Aztec C
-   beta 5.2a, gcc, Linux 2.x)
+   beta 5.2a, gcc; Linux 2.x, NetBSD-1.3.x)
  o IRIS 4D/70G and 4D/25G with MIPS C
  o NeXT with gnu C 1.34
  o AT&T 3B1 (version 3.51m with cc and gcc 1.39)
