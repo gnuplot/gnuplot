@@ -91,6 +91,10 @@ static char *RCSid = "$Id: gplt_x11.c,v 1.71 1998/04/14 00:15:22 drd Exp $";
    defining NOEXPORT over-rides the default
  */
 
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
+
 #ifdef EXPORT_SELECTION
 # undef EXPORT_SELECTION
 #endif /* EXPORT SELECTION */
