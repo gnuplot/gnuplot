@@ -1,5 +1,5 @@
 /*
- * $Id: datafile.h,v 1.10 2003/04/29 07:04:29 mikulik Exp $
+ * $Id: datafile.h,v 1.11 2004/04/13 17:23:53 broeker Exp $
  */
 
 /* GNUPLOT - datafile.h */
@@ -49,6 +49,7 @@
 #define DF_UNDEFINED    (-2)
 #define DF_FIRST_BLANK  (-3)
 #define DF_SECOND_BLANK (-4)
+#define DF_MISSING      (-5)
 
 #ifndef MAXINT			/* should there be one already defined ? */
 # ifdef INT_MAX			/* in limits.h ? */

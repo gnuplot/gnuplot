@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.49 2004/04/13 17:23:52 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.50 2004/06/01 16:20:03 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -263,7 +263,7 @@ static char df_format[MAX_LINE_LEN + 1];
 typedef struct df_column_struct {
     double datum;
     enum {
-	DF_MISSING, DF_BAD, DF_GOOD
+	DF_BAD, DF_GOOD
     } good;
     char *position;
 } df_column_struct;
@@ -1165,7 +1165,7 @@ int max;
 		     * noted also, but that would change existing default behavior.
 		     */
 		    else if ((column <= df_no_cols) && (df_column[column - 1].good == DF_MISSING))
-			return DF_UNDEFINED;
+			return DF_MISSING;
 		    else {
 			/* line bad only if user explicitly asked for this column */
 			if (df_no_use_specs)

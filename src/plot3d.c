@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.65 2004/02/23 13:29:34 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.66 2004/04/13 17:23:59 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -707,7 +707,7 @@ get_3ddata(this_plot)
 	    }
 	    cp = local_this_iso->points + xdatum;
 
-	    if (j == DF_UNDEFINED) {
+	    if (j == DF_UNDEFINED || j == DF_MISSING) {
 		cp->type = UNDEFINED;
 		continue;
 	    }

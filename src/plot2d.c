@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.65 2004/05/20 14:43:47 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.66 2004/05/20 16:56:43 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -341,6 +341,10 @@ get_data(current_plot)
 		df_close();
 		int_error(c_token, "internal error : df_readline returned %d : datafile line %d", j, df_line_number);
 	    }
+
+	case DF_MISSING:
+	    /* Plot type specific handling of missing points could go here. */
+	    /* For now missing data is treated the same as undefined */
 	case DF_UNDEFINED:
 	    /* bad result from extended using expression */
 	    current_plot->points[i].type = UNDEFINED;

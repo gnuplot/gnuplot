@@ -1,3 +1,19 @@
+2004-06-12  Ethan Merritt  <merritt@u.washington.edu>
+
+	* datafile.h: define DF_MISSING as a return code from df_readline().
+	* datatile.c (df_readline): If a data field contains the missing data
+	string, return DF_MISSING rather than DF_UNDEFINED.
+	* fit.c (fit_command): Explicitly ignore DF_MISSING data.
+	* plot2d.c (get_data): Explicitly test for data marked DF_MISSING 
+	but treat it the same as DF_UNDEFINED.
+	* plot3d.c (get_3ddata): Explicitly test for data marked DF_MISSING 
+	but treat it the same as DF_UNDEFINED.
+	
+	These are trivial changes that do not affect the existing behavior of
+	gnuplot. However, the core routines in plot2d and plot3d now have the
+	information needed to treat missing data differently depending on the
+	plot style if desired.
+
 2004-06-06  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/command.c src/command.h src/mouse.c src/gplt_x11.c

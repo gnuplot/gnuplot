@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.38 2004/04/10 14:28:02 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.39 2004/04/13 17:23:53 broeker Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -1416,6 +1416,7 @@ fit_command()
 	} /* if (need to extend storage space) */
 
 	switch (i) {
+	case DF_MISSING:
 	case DF_UNDEFINED:
 	case DF_FIRST_BLANK:
 	case DF_SECOND_BLANK:
