@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.43 2002/07/21 12:32:52 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.44 2002/07/26 16:42:27 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - gplt_x11.c */
@@ -390,7 +390,6 @@ t_sm_palette sm_palette = {
     0,				/* use_maxcolors */
     -1,				/* colors */
     (rgb_color *) 0,
-    0,				/* offset */
     0,				/* ps_allcF */
 };
 static GC gc_pm3d = (GC) 0;
