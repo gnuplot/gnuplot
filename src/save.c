@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.70 2004/01/13 20:51:58 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.71 2004/01/18 01:30:38 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -407,7 +407,7 @@ set y2data%s\n",
 	fputs(this_arrow->relative ? " rto " : " to ", fp);
 	save_position(fp, &this_arrow->end);
 	fprintf(fp, " %s %s %s linetype %d linewidth %.3f",
-		this_arrow->arrow_properties.head ? "" : " nohead",
+		arrow_head_names[this_arrow->arrow_properties.head],
 		(this_arrow->arrow_properties.layer==0) ? "back" : "front",
 		( (this_arrow->arrow_properties.head_filled==2) ? "filled" :
 		  ( (this_arrow->arrow_properties.head_filled==1) ? "empty" :
@@ -444,7 +444,7 @@ set y2data%s\n",
 	 this_arrowstyle = this_arrowstyle->next) {
 	fprintf(fp, "set style arrow %d", this_arrowstyle->tag);
 	fprintf(fp, " %s %s %s linetype %d linewidth %.3f",
-		this_arrowstyle->arrow_properties.head ? "" : " nohead",
+		arrow_head_names[this_arrowstyle->arrow_properties.head],
 		(this_arrowstyle->arrow_properties.layer==0)?"back":"front",
 		( (this_arrowstyle->arrow_properties.head_filled==2)?"filled":
 		  ( (this_arrowstyle->arrow_properties.head_filled==1)?"empty":

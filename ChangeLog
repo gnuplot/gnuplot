@@ -1,7 +1,23 @@
+2004-02-27  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	Fix SF bug [ 905691 ] "save" does not save correct arrow heads.
+
+	* src/term_api.h (t_arrow_head): New enum type to provide manifest
+	constants for arrow head choices.
+	(arrow_head_names): Added declaration of new global in term.c.
+	(arrow_style_type): Change type of member "head" from int to new
+	enum.
+
+	* src/term.c: Define constant strings for arrow head placement
+	options.
+
+	* src/save.c (save_set_all): Use new string constant to correctly
+	output head placement options.
+
 2004-02-27  Petr Mikulik  <mikulik@physics.muni.cz>
 
-	* docs/gnuplot.doc term/x11.trm: Added missing labels for hypertext
-	references.
+	* docs/gnuplot.doc term/x11.trm: Added missing labels for
+	hypertext references.
 
 2004-02-24  Petr Mikulik  <mikulik@physics.muni.cz>
 

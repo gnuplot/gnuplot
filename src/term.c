@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.66 2004/01/11 20:06:57 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.67 2004/02/12 17:27:38 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -155,6 +155,8 @@ const struct gen_table set_encoding_tbl[] =
     { "koi8$r", S_ENC_KOI8_R },
     { NULL, S_ENC_INVALID }
 };
+
+const char *arrow_head_names[3] = {"nohead", "head", "heads"};
 
 /* HBB 20020225: moved here, from ipc.h, where it never should have
  * been. */
