@@ -1,3 +1,7 @@
+2005-01-11  Shigeharu Takeno  <shige@iee.niit.ac.jp>
+
+	* term/tgif.trm: Fix two bugs related to font handling.
+
 2005-01-11  Ethan Merritt  <merritt@u.washington.edu>
 
 	* demo/mousevariables.dem demo/keystroke.dem: Fix incorrect termination
