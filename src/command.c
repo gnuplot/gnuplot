@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.39 2000/05/02 17:44:48 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.40 2000/05/04 20:55:19 joze Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -412,6 +412,24 @@ char *s;
     strcpy(buf,s);
     do_line();
     input_line=orig_input_line;
+}
+
+void
+do_string_replot(s)
+char *s;
+{
+    char *orig_input_line;
+    static char buf[256];
+
+    orig_input_line = input_line;
+    input_line = buf;
+    strcpy(buf,s);
+    if (!replot_disabled)
+	strcat(buf,"; replot");
+    if (display_ipc_commands())
+	fprintf(stderr, "%s\n", buf);
+    do_line();
+    input_line = orig_input_line;
 }
 
 void
@@ -958,6 +976,7 @@ void
 plot_command()
 {
     plot_token = c_token++;
+    plotted_data_from_stdin = 0;
     SET_CURSOR_WAIT;
 #ifdef USE_MOUSE
     plot_mode(MODE_PLOT);
@@ -1022,6 +1041,18 @@ replot_command()
 {
     if (!*replot_line)
 	int_error(c_token, "no previous plot");
+    /* Disable replot for some reason; currently used by the mouse/hotkey 
+       capable terminals to avoid replotting when some data come from stdin, 
+       i.e. when  plotted_data_from_stdin==1  after plot "-".
+    */
+    if (replot_disabled) {
+	replot_disabled = 0;
+#if 1
+	bail_to_command_line(); /* be silent --- don't mess the screen */
+#else
+	int_error(c_token, "cannot replot data coming from stdin");
+#endif
+    }
     c_token++;
     SET_CURSOR_WAIT;
     replotrequest();
@@ -1126,6 +1157,7 @@ void
 splot_command()
 {
     plot_token = c_token++;
+    plotted_data_from_stdin = 0;
     SET_CURSOR_WAIT;
 #ifdef USE_MOUSE
     plot_mode(MODE_SPLOT);

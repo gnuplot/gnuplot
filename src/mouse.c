@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.3 2000/05/02 18:52:20 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.5 2000/05/02 20:56:27 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -564,9 +564,9 @@ apply_zoom(struct t_zoom *z)
     sprintf(s, "set xr[% #g:% #g]; set yr[% #g:% #g]", zoom_now->xmin, zoom_now->xmax, zoom_now->ymin, zoom_now->ymax);
     do_string(s);
 
-    sprintf(s, "set x2r[% #g:% #g]; set y2r[% #g:% #g]; replot",
+    sprintf(s, "set x2r[% #g:% #g]; set y2r[% #g:% #g]",
 	    zoom_now->x2min, zoom_now->x2max, zoom_now->y2min, zoom_now->y2max);
-    do_string(s);
+    do_string_replot(s);
 }
 
 
@@ -785,7 +785,7 @@ builtin_autoscale(struct gp_event_t *ge)
     if (!ge) {
 	return "`builtin-autoscale` (set autoscale; replot)";
     }
-    do_string("set autoscale; replot");
+    do_string_replot("set autoscale");
     return (char *) 0;
 }
 
@@ -797,14 +797,14 @@ builtin_toggle_border(struct gp_event_t *ge)
     }
     if (is_3d_plot) {
 	if (draw_border == 4095)
-	    do_string("set border; replot");
+	    do_string_replot("set border");
 	else
-	    do_string("set border 4095 lw 0.5; replot");
+	    do_string_replot("set border 4095 lw 0.5");
     } else {
 	if (draw_border == 15)
-	    do_string("set border; replot");
+	    do_string_replot("set border");
 	else
-	    do_string("set border 15 lw 0.5; replot");
+	    do_string_replot("set border 15 lw 0.5");
     }
     return (char *) 0;
 }
@@ -815,7 +815,7 @@ builtin_replot(struct gp_event_t *ge)
     if (!ge) {
 	return "`builtin-replot`";
     }
-    do_string("replot");
+    do_string_replot("");
     return (char *) 0;
 }
 
@@ -826,9 +826,9 @@ builtin_toggle_grid(struct gp_event_t *ge)
 	return "`builtin-toggle-grid`";
     }
     if (work_grid.l_type == GRID_OFF)
-	do_string("set grid; replot");
+	do_string_replot("set grid");
     else
-	do_string("unset grid; replot");
+	do_string_replot("unset grid");
     return (char *) 0;
 }
 
@@ -852,14 +852,14 @@ builtin_toggle_log(struct gp_event_t *ge)
     }
     if (is_3d_plot) {
 	if (is_log_z)
-	    do_string("unset log z; replot");
+	    do_string_replot("unset log z");
 	else
-	    do_string("set log z; replot");
+	    do_string_replot("set log z");
     } else {
 	if (is_log_y)
-	    do_string("unset log y; replot");
+	    do_string_replot("unset log y");
 	else
-	    do_string("set log y; replot");
+	    do_string_replot("set log y");
     }
     return (char *) 0;
 }
@@ -873,9 +873,9 @@ builtin_nearest_log(struct gp_event_t *ge)
     if (is_3d_plot) {
 	/* 3D-plot: toggle lin/log z axis */
 	if (is_log_z)
-	    do_string("unset log z; replot");
+	    do_string_replot("unset log z");
 	else
-	    do_string("set log z; replot");
+	    do_string_replot("set log z");
     } else {
 	/* 2D-plot: figure out which axis/axes is/are
 	 * close to the mouse cursor, and toggle those lin/log */
@@ -900,7 +900,7 @@ builtin_nearest_log(struct gp_event_t *ge)
 	    change = TRUE;
 	}
 	if (change)
-	    do_string("replot");
+	    do_string_replot("");
     }
     return (char *) 0;
 }
@@ -1046,11 +1046,11 @@ builtin_toggle_ratio(struct gp_event_t *ge)
 	return "`builtin-toggle-ratio`";
     }
     if (aspect_ratio == 0)
-	do_string("set size ratio -1; replot");
+	do_string_replot("set size ratio -1");
     else if (aspect_ratio == 1)
-	do_string("set size nosquare; replot");
+	do_string_replot("set size nosquare");
     else
-	do_string("set size square; replot");
+	do_string_replot("set size square");
     return (char *) 0;
 }
 
@@ -1602,6 +1602,9 @@ do_event(struct gp_event_t *ge)
 	return;
     }
 
+    /* disable `replot` when some data were sent through stdin */
+    replot_disabled = plotted_data_from_stdin;
+
     if (ge->type) {
 	FPRINTF((stderr, "(do_event) type       = %d\n", ge->type));
 	FPRINTF((stderr, "           mx, my     = %d, %d\n", ge->mx, ge->my));
@@ -1650,6 +1653,8 @@ do_event(struct gp_event_t *ge)
 	fprintf(stderr, "%s:%d protocol error\n", __FILE__, __LINE__);
 	break;
     }
+
+    replot_disabled = 0; /* enable replot again */
 }
 
 static void
@@ -2038,8 +2043,8 @@ remove_label(int x, int y)
 				is_3d_plot ? map3d_position : map_position);
     if (-1 != tag) {
 	char cmd[0x40];
-	sprintf(cmd, "unset label %d; replot", tag);
-	do_string(cmd);
+	sprintf(cmd, "unset label %d", tag);
+	do_string_replot(cmd);
     }
 }
 
@@ -2047,12 +2052,12 @@ static void
 put_label(char *label, double x, double y)
 {
     char cmd[0xff];
-    sprintf(cmd, "set label \"%s\" at %f,%f %s; replot\n", label, x, y, mouse_setting.labelopts);
-    do_string(cmd);
+    sprintf(cmd, "set label \"%s\" at %f,%f %s", label, x, y, mouse_setting.labelopts);
+    do_string_replot(cmd);
 }
 
 # ifdef OS2
-/* routine required by pm.trm: fill & send information neede for (un)checking
+/* routine required by pm.trm: fill & send information needed for (un)checking
    menu items in the Presentation Manager terminal
 */
 void

@@ -1,5 +1,5 @@
 /*
- * $Id: command.h,v 1.15 2000/02/11 19:17:18 lhecking Exp $
+ * $Id: command.h,v 1.16 2000/05/02 18:01:03 lhecking Exp $
  */
 
 /* GNUPLOT - command.h */
@@ -133,6 +133,7 @@ int do_line __PROTO((void));
 void toggle_display_of_ipc_commands __PROTO((void));
 int display_ipc_commands __PROTO((void));
 void do_string __PROTO((char* s));
+void do_string_replot __PROTO((char* s));
 #endif
 #ifdef VMS                     /* HBB 990829: used only on VMS */
 void done __PROTO((int status));

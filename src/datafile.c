@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.16 1999/11/24 13:02:38 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.18 2000/05/02 20:56:26 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -631,6 +631,7 @@ int max_using;
 #endif /* PIPES */
 	/* I don't want to call strcmp(). Does it make a difference? */
     if (*filename == '-' && strlen(filename) == 1) {
+	plotted_data_from_stdin = 1;
 	data_fp = lf_top();
 	if (!data_fp)
 	    data_fp = stdin;

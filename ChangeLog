@@ -1,3 +1,10 @@
+2000-05-31  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* Ignore `replot` command called from mouse/hotkey-event-enhanced
+	terminal when some plot data were piped in gnuplot via stdin ---
+	i.e., no mouse replot after `plot '-'`). See also "no replot after
+	`plot '-'`" discussion in the gnuplot-beta newsgroup.
+	New variables: plotted_data_from_stdin, replot_disabled.
 
 2000-05-04  Johannes Zellner <johannes@zellner.org>
 
