@@ -1,3 +1,7 @@
+2004-07-01  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/fit.c: #include gp_time.h is now necessary.
+
 2004-07-01  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* PATCHLEVEL: Raised to 2 to mark post ANSI-fication status.
