@@ -15,7 +15,7 @@ bin_PROGRAMS = gnuplot $(GNUPLOT_X11)
 noinst_PROGRAMS = bf_test
 
 XLIBS = @LIBRARIES_FOR_X@
-AM_CPPFLAGS = -I../term -I$(top_srcdir)/term -DBINDIR=\"$(bindir)\" -DCONTACT=\"$(EMAIL)\" -DHELPFILE=\"$(HELPFILE)\"
+AM_CPPFLAGS = -I../term -I$(top_srcdir)/term -DBINDIR=\"$(bindir)\" -DX11_DRIVER_DIR=\"$(pkglibdir)/$(PKG_MAJOR)\" -DCONTACT=\"$(EMAIL)\" -DHELPFILE=\"$(HELPFILE)\"
 
 gnuplot_SOURCES = alloc.c alloc.h ansichek.h axis.c axis.h binary.c \
 binary.h bitmap.c bitmap.h color.c color.h command.c command.h \
@@ -36,11 +36,6 @@ gnuplot_LDADD = $(TERMLIBS) $(TERMXLIBS)
 gnuplot_x11_SOURCES = gplt_x11.c getcolor.c gpexecute.c gpexecute.h mousecmn.h
 
 gnuplot_x11_LDADD = $(XLIBS)
-
-if ALT_X11_DRIVER
-$(GNUPLOT_X11): gnuplot_x11
-	cp gnuplot_x11 $(GNUPLOT_X11)
-endif
 
 bf_test_SOURCES = bf_test.c binary.c alloc.c
 

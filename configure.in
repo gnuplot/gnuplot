@@ -1,24 +1,18 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.in,v 1.106 2002/01/26 00:16:23 broeker Exp $
+dnl $Id: configure.in,v 1.107 2002/01/29 20:49:43 lhecking Exp $
 dnl
 AC_INIT(src/graphics.c)
 AM_CONFIG_HEADER(config.h:config.hin)
 AC_PREREQ(2.13)
 
-VERSION="`cat $srcdir/VERSION`"
+dnl this is actually major.minor ...
+PKG_MAJOR="`cat $srcdir/VERSION`"
 PATCHLEVEL="`cat $srcdir/PATCHLEVEL`"
-AM_INIT_AUTOMAKE(gnuplot, $VERSION.$PATCHLEVEL)
+AM_INIT_AUTOMAKE(gnuplot, $PKG_MAJOR.$PATCHLEVEL)
 
 dnl Additional command line options
-
-dnl use a different x11 driver name ?
-AC_ARG_WITH(x11-driver,
-[  --with-x11-driver       specify an alternative X11 driver name (gnuplot_x11)],
-GNUPLOT_X11="$withval",
-GNUPLOT_X11=gnuplot_x11
-)dnl
 
 dnl configure.in body
 
@@ -55,12 +49,10 @@ fi
 if test "$no_x" != yes; then
   CPPFLAGS="$CPPFLAGS $X_CFLAGS"
   LIBRARIES_FOR_X="$X_LIBS -lX11 $X_EXTRA_LIBS"
+  GNUPLOT_X11=gnuplot_x11
   AC_DEFINE(X11, 1,
             [ Define if you are using the X11 window system. ])
 
-  AC_DEFINE_UNQUOTED(GNUPLOT_X11, "$GNUPLOT_X11",
-            [ Define the default x11 driver name. ])
-  AM_CONDITIONAL(ALT_X11_DRIVER, test x$GNUPLOT_X11 != xgnuplot_x11)
 else
   GNUPLOT_X11=
 fi
@@ -645,6 +637,7 @@ AC_ARG_ENABLE(rgip,dnl
 
 dnl Substitute variables
 AC_SUBST(PACKAGE)
+AC_SUBST(PKG_MAJOR)
 AC_SUBST(VERSION)
 AC_SUBST(LASERGNU)
 AC_SUBST(LINUXSUID)

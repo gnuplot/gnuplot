@@ -1,3 +1,8 @@
+2002-02-13  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* configure.in, src/Makefile.am: Remove --with-x11-driver configure
+	option and related changes.
+
 2002-02-13  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* term/x11.trm (X11_options): Kill some more erroneous commas in
