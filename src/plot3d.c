@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.36 2002/01/26 21:44:51 joze Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.37 2002/01/27 18:44:23 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -1223,7 +1223,8 @@ eval_3dplots()
 			duplication=TRUE;
 			break;
 		    }
-		    this_plot->title_no_enhanced = 0; /* can be enhanced */
+		    this_plot->title_no_enhanced = !key_enhanced;
+			/* title can be enhanced if not explicitly disabled */
 		    if (parametric) {
 			if (crnt_param != 0)
 			    int_error(c_token, "\"title\" allowed only after parametric function fully specified");

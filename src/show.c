@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.69 2002/01/24 13:55:27 amai Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.70 2002/01/25 18:02:08 joze Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -1654,9 +1654,10 @@ show_key()
 	break;
     }
     if (key != KEY_NONE) {
-	fprintf(stderr, "\tkey is %s justified, %s reversed and ",
+	fprintf(stderr, "\tkey is %s justified, %sreversed, %senhanced and ",
 		key_just == JLEFT ? "left" : "right",
-		key_reverse ? "" : "not");
+		key_reverse ? "" : "not ",
+		key_enhanced ? "" : "not ");
 	if (key_box.l_type > L_TYPE_NODRAW)
 	    fprintf(stderr, "boxed\n\twith linetype %d, linewidth %.3f\n",
 		    key_box.l_type + 1, key_box.l_width);

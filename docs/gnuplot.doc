@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.96 2002/01/26 17:55:07 joze Exp $
+C RCS $Id: gnuplot.doc,v 1.97 2002/02/01 19:11:17 mikulik Exp $
 C 18 September 2001
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001   Thomas Williams, Colin Kelley et al.
 C
@@ -180,7 +180,7 @@ C
  Gnuplot version 3.7 contains many new features.  This section gives a partial
  list and links to the new items in no particular order.
 
- 1. `fit f(x) 'file' via` uses the Marquardt-Levenberg method to fit data.
+ 1. `fit f(x) 'file' via` uses the Marquardt-Levenberg method to `fit` data.
  (This is only slightly different from the `gnufit` patch available for 3.5.)
 
  2. Greatly expanded `using` command.  See `plot using`.
@@ -198,7 +198,7 @@ C
 
  7. Multiplots on a single logical page with `set multiplot`.
 
- 8. Enhanced `postscript` driver with super/subscripts and font changes.
+ 8. `Enhanced postscript` driver with super/subscripts and font changes.
  (This was a separate driver (`enhpost`) that was available as a patch for
  3.5.)
 
@@ -1427,8 +1427,8 @@ C ... and restart the table:
  manual the command examples generally single-quote filenames and double-quote
  other string tokens for clarity.
 
- At present you should not embed \n inside {} when using the enhanced option
- of the postscript terminal.
+ At present you should not embed \n inside {} when using the `enhanced postscript`
+ terminal.
 
  The EEPIC, Imagen, Uniplex, LaTeX, and TPIC drivers allow a newline to be
  specified by \\ in a single-quoted string or \\\\ in a double-quoted string.
@@ -4050,6 +4050,7 @@ C ... and restart the table:
 ?commands set encoding
 ?commands show encoding
 ?set encoding
+?set encoding iso_8859_1
 ?show encoding
 ?encoding
  The `set encoding` command selects a character encoding.  Valid values are
@@ -4562,7 +4563,7 @@ C ... and restart the table:
                {samplen <sample_length>} {spacing <vertical_spacing>}
                {width <width_increment>}
                {height <height_increment>}
-               {title "<text>"}
+               {title "<text>"} {{no}enhanced}
                {{no}box { {linestyle | ls <line_style>}
                           | {linetype | lt <line_type>}
                             {linewidth | lw <line_width>}}}
@@ -4605,6 +4606,10 @@ C ... and restart the table:
  A title can be put on the key (`title "<text>"`)---see also `syntax` for the
  distinction between text in single- or double-quotes.  The key title uses the
  same justification as do the plot titles.
+
+ An explicitly given title is typeset using enhanced text properties on
+ terminals supporting this, see `enhanced postscript` for more details.
+ This default behavior can be switched off by the `noenhanced` option.
 
  The defaults for `set key` are `right`, `top`, `Right`, `noreverse`, `samplen
  4`, `spacing 1.25`, `title ""`, and `nobox`.  The default <linetype> is the
@@ -4730,7 +4735,7 @@ C ... and restart the table:
  displace the labels 2 * pointsize horizontally and -3 * pointsize vertically
  from the actual coordinate point as given by `position`.  The size of the
  point depends also on the setting of `pointsize`.
- This option is used by default for placing labels in mouse enhanced
+ This option is used by default for placing labels in `mouse` enhanced
  terminals.  Use `nopoint` to turn off the drawing of a point near
  the label (this is the default).
 

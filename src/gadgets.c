@@ -53,8 +53,8 @@ t_key_horizontal_position key_hpos = TRIGHT;
 t_key_vertical_position key_vpos = TTOP;
 /* alignment of key labels: left/right */
 t_key_sample_positioning key_just = JRIGHT;
-
 TBOOLEAN key_reverse = FALSE;	/* reverse text & sample ? */
+TBOOLEAN key_enhanced = TRUE; /* enable/disable enhanced text of key titles */ 
 /* FIXME HBB 20000521: these initial values should be accessible
  * separately, as defaults for unset.c */
 double key_swidth = 4.0;

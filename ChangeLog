@@ -1,3 +1,11 @@
+2002-02-02  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* NEWS docs/gnuplot.doc src/gadgets.h src/gadgets.c src/plot2d.c
+	src/plot3d.c src/save.c src/set.c src/show.c src/tables.h src/tables.c
+	src/unset.c: New option 'set key {no}enhanced'.
+
+	* term/post.trm: Add label "?enhanced postscript".
+
 2002-02-01  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* demo/pm3d.dem: Remove warning that pm3d works on some terminals

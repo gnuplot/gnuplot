@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.36 2002/01/25 14:19:54 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.37 2002/01/25 18:02:08 joze Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -365,9 +365,10 @@ set y2data%s\n",
 	break;
     }
     if (key != KEY_NONE) {
-	fprintf(fp, " %s %sreverse box linetype %d linewidth %.3f samplen %g spacing %g width %g height %g\n",
+	fprintf(fp, " %s %sreverse %senhanced box linetype %d linewidth %.3f samplen %g spacing %g width %g height %g\n",
 		key_just == JLEFT ? "Left" : "Right",
 		key_reverse ? "" : "no",
+		key_enhanced ? "" : "no",
 		key_box.l_type + 1, key_box.l_width,
 		key_swidth, key_vert_factor, key_width_fix, key_height_fix);
     }

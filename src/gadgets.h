@@ -171,6 +171,8 @@ extern double key_width_fix;
 extern double key_height_fix;
 /* key back to front */ 
 extern TBOOLEAN	key_reverse;
+/* enable/disable enhanced text of key titles */ 
+extern TBOOLEAN	key_enhanced;
 /* title line for the key as a whole */
 extern char key_title[];
 /* linetype of box around key: default and current state */

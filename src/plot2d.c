@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.47 2001/12/14 14:22:45 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.48 2002/01/06 16:31:12 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -1057,7 +1057,8 @@ eval_plots()
 			duplication=TRUE;
 			break;
 		    }
-		    this_plot->title_no_enhanced = 0; /* can be enhanced */
+		    this_plot->title_no_enhanced = !key_enhanced;
+			/* title can be enhanced if not explicitly disabled */
 		    if (parametric) {
 			if (xparam)
 			    int_error(c_token, "\"title\" allowed only after parametric function fully specified");

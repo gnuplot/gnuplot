@@ -1,5 +1,5 @@
 /*
- * $Id: tables.h,v 1.22 2002/01/06 16:31:12 mikulik Exp $
+ * $Id: tables.h,v 1.23 2002/01/22 15:52:25 mikulik Exp $
  */
 
 /* GNUPLOT - tables.h */
@@ -124,6 +124,7 @@ enum set_key_id {
     S_KEY_INVALID,
     S_KEY_TOP, S_KEY_BOTTOM, S_KEY_LEFT, S_KEY_RIGHT, S_KEY_UNDER,
     S_KEY_OUTSIDE, S_KEY_LLEFT, S_KEY_RRIGHT, S_KEY_REVERSE, S_KEY_NOREVERSE,
+    S_KEY_ENHANCED, S_KEY_NOENHANCED,
     S_KEY_BOX, S_KEY_NOBOX, S_KEY_SAMPLEN, S_KEY_SPACING, S_KEY_WIDTH,
     S_KEY_HEIGHT, S_KEY_TITLE
 };
