@@ -399,12 +399,12 @@ set title "set pm3d corners2color c1"
 set pm3d corners2color c1
 splot f(x,y)
 
-set origin 0*dx,2*dy
+set origin 2*dx,0*dy
 set title "set pm3d corners2color c2"
 set pm3d corners2color c2
 replot
 
-set origin 2*dx,0*dy
+set origin 0*dx,2*dy
 set title "set pm3d corners2color c3"
 set pm3d corners2color c3
 replot
@@ -441,6 +441,6 @@ splot f(x,y) with linesp ps 3 pt 5 palette
 
 unset multiplot
 pause -1 "Hit return to continue"
+reset
 
 print "End of pm3d demo."
-
