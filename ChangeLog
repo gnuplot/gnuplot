@@ -1,3 +1,8 @@
+2000-06-23  Johannes Zellner <johannes@zellner.org>
+
+	* src/gplt_x11.c: repaired `selection' (by left mouse).
+	I really don't know when and how this got broken!
+
 2000-06-15  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* term/cgm.trm(CGM_option): reject linewidth zero to avoid
