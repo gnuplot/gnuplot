@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.66 2001/05/11 16:54:14 broeker Exp $
+C RCS $Id: gnuplot.doc,v 1.67 2001/06/30 20:50:22 vanzandt Exp $
 C 3 December 1998
 C Copyright (C) 1986 - 1993, 1998   Thomas Williams, Colin Kelley
 C
@@ -5126,7 +5126,8 @@ C ... and restart the table:
  The same syntax applies to `mytics`, `mztics`, `mx2tics` and `my2tics`.
 
  <freq> is the number of sub-intervals (NOT the number of minor tics) between
- major tics (ten is the default for a linear axis, so there are nine minor
+ major tics (the default for a linear axis is either two or five
+ depending on the major tics, so there are one or four minor
  tics between major tics). Selecting `default` will return the number of minor
  ticks to its default value.
 

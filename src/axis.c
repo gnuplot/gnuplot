@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.16 2001/06/21 15:00:58 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.17 2001/06/21 17:24:10 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -1203,7 +1203,9 @@ gen_tics(axis, grid, callback)
 		ministart = ministep = make_ltic(timelevel[axis], step);
 		miniend = step * 0.9;
 	    } else if (minitics == MINI_AUTO) {
-		ministart = ministep = 0.1 * step;
+		int k = fabs(step)/pow(10.,floor(log10(fabs(step))));
+		/* so that step == k times some power of 10 */
+		ministart = ministep = (k==2 ? 0.5 : 0.2) * step;
 		miniend = step;
 	    } else
 		minitics = 0;

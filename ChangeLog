@@ -1,3 +1,10 @@
+2001-07-01  James R. Van Zandt  <jrv@vanzandt.mv.com>
+
+	* src/axis.c (gen_tics): Default to either one or four minitics
+	(i.e. two or five intervals) per large tic.
+
+	* docs/gnuplot.doc: Document the above
+
 2001-06-30  James R. Van Zandt  <jrv@vanzandt.mv.com>
 
 	* docs/gnuplot.doc: Introduced "latitude" and "longitude"
