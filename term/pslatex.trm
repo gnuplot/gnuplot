@@ -193,7 +193,7 @@ TERM_PUBLIC void PSLATEX_init()
 	PSLATEX_psfile = gp_alloc(dotIndex - outstr + 3, "pslatex aux filename");
 	if (PSLATEX_psfile) {
 	/* including . */
-	    safe_strncpy(PSLATEX_psfile, outstr, dotIndex - outstr + 1);
+	    safe_strncpy(PSLATEX_psfile, outstr, dotIndex - outstr + 2);
 	    strcpy(PSLATEX_psfile + (dotIndex - outstr) + 1, "ps");
 	    if ((PSLATEX_auxFile = fopen(PSLATEX_psfile, "w")) == (FILE *) NULL) {
 		fprintf(stderr, "Cannot open aux file %s for output\n",
