@@ -1,3 +1,10 @@
+1999-08-25  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* term.h: Updated from current development version.
+
+	* term/metapost.trm: There is no gp_strdup() in this version.
+	Replaced with gp_alloc() and strcpy().
+
 1999-08-24  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* makefile.cyg: Updated version from W. Kirby.
