@@ -35,6 +35,10 @@
  * to the extent permitted by applicable law.
 ]*/
 
+
+#ifndef GNUPLOT_PROTOS_H
+# define GNUPLOT_PROTOS_H
+
 #include "ansichek.h"
 
 /* note that this before this file, some headers that define stuff like FILE,
@@ -339,3 +343,4 @@ void clip_put_text_just __PROTO((unsigned int x, unsigned int y, char *str, enum
 
 #include "alloc.h"
 
+#endif /* GNUPLOT_PROTOS_H */

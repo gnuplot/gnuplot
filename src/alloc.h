@@ -32,6 +32,9 @@
  * to the extent permitted by applicable law.
 ]*/
 
+#ifndef GNUPLOT_ALLOC_H
+# define GNUPLOT_ALLOC_H
+
 /* prototypes from "alloc.c". This file figures out if the free hack is needed
  * and redefines free if necessary.
  */
@@ -68,3 +71,5 @@ void end_leak_check(char *file,int line);
 void gpfree __PROTO((generic *p));
 #define free gpfree
 #endif
+
+#endif /* GNUPLOT_ALLOC_H */

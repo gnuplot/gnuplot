@@ -32,6 +32,9 @@
  * to the extent permitted by applicable law.
 ]*/
 
+#ifndef GNUPLOT_BINARY_H
+# define GNUPLOT_BINARY_H
+
 /* Routines for interfacing with command.c */
 float GPFAR *vector __PROTO(( int nl, int nh));
 float GPFAR *extend_vector __PROTO((float GPFAR *vec, int old_nl, int old_nh, int new_nh));
@@ -46,3 +49,5 @@ int fread_matrix __PROTO((FILE *fin, float GPFAR * GPFAR * GPFAR *ret_matrix, in
 int fwrite_matrix __PROTO(( FILE *fout, float GPFAR * GPFAR *m, int nrl, int nrh, int ncl, int nch, float GPFAR *row_title, float GPFAR *column_title));
 float GPFAR * GPFAR *convert_matrix __PROTO((float GPFAR *a, int nrl, int nrh, int ncl, int nch));
 void free_convert_matrix __PROTO((float GPFAR* GPFAR *b, int nrl, int nrh, int ncl, int nch));
+
+#endif /* GNUPLOT_BINARY_H */

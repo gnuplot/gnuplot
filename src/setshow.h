@@ -36,6 +36,9 @@
 ]*/
 
 
+#ifndef GNUPLOT_SETSHOW_H
+# define GNUPLOT_SETSHOW_H
+
 /* for show_version_long() */
 #ifdef HAVE_SYS_UTSNAME_H
 #include <sys/utsname.h>
@@ -269,3 +272,4 @@ extern char *missing_val;
 \t'{m}[xyz]{2}tics', '[xyz]{2}[md]tics', '[xyz]{2}zeroaxis',\n\
 \t'[xyz]data',   'zero', 'zeroaxis'"
 
+#endif /* GNUPLOT_SETSHOW_H */

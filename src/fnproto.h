@@ -33,9 +33,12 @@
 ]*/
 
 
-/* prototypes for gnuplot function primitives. These functions are not called
-   directly, only via a function table.
-*/
+#ifndef GNUPLOT_FNPROTO_H
+# define GNUPLOT_FNPROTO_H
+
+/* prototypes for gnuplot function primitives. These functions are not
+ * called directly, only via a function table.
+ */
 
 /* Prototypes from file "internal.c" */
 
@@ -135,3 +138,5 @@ void f_dollars __PROTO((union argument *x));
 void f_column  __PROTO((void));
 void f_valid   __PROTO((void));
 void f_timecolumn   __PROTO((void));
+
+#endif /* GNUPLOT_FNPROTO_H */

@@ -36,6 +36,9 @@
 ]*/
 
 
+#ifndef GNUPLOT_HELP_H
+# define GNUPLOT_HELP_H
+
 #include "ansichek.h"
 
 /* Exit status returned by help() */
@@ -45,3 +48,5 @@
 
 int help __PROTO((char *keyword, char *path, int *subtopics));
 void FreeHelp __PROTO((void));	/* use this if you need memory */
+
+#endif /* GNUPLOT_HELP_H */

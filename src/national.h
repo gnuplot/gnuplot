@@ -33,6 +33,9 @@
 ]*/
 
 
+#ifndef GNUPLOT_NATIONAL_H
+# define GNUPLOT_NATIONAL_H
+
 /* if setlocale is available, these strings will be overridden
  * by strftime, or they may not be used at all if the run-time
  * system provides global variables with these strings
@@ -178,3 +181,5 @@
 #define FDAY5 "Friday"
 #define FDAY6 "Saturday"
 #endif /* language */
+
+#endif /* GNUPLOT_NATIONAL_H */
