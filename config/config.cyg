@@ -67,4 +67,6 @@
 #define HAVE_STRNICMP		1
 #define HAVE_STRRCHR		1
 #define HAVE_STRSTR		1
+#define HAVE_TIME_T_IN_TIME_H	1
 #define HAVE_VFPRINTF		1
+
