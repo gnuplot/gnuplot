@@ -1,5 +1,12 @@
 2001-07-09  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
+	* src/plot.c (get_user_env): Warn only if in interactive mode.
+  	Some uses of batch mode may not have a $HOME defined.  Windows
+ 	shows this as a spurious warning, too.  Thanks to Ethan Merritt
+	for this patch.
+
+2001-07-09  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
 	* term/tpic.trm (tpic_abspath): Fix by  Shigeharu TAKENO
 	<shige@iee.niit.ac.jp>. Write simple \special command directly,
 	instead of using the \put{} method to move the coordinate
