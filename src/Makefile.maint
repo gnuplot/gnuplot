@@ -29,14 +29,6 @@ makefile.all: Makefile.maint
 	 | tr @% '\012\012' >>$@t
 	@if cmp -s $@ $@t; then rm -f $@t; else mv $@t $@; fi
 
-Makefile.in: makefile.all
-	@echo Making $@
-	@rm -f $@t
-	@sed -n '1,/^##makefile-all-begin/p' $@ > $@t
-	@cat $< >> $@t
-	@sed -n '/^##makefile-all-end/,$$p' $@ >> $@t
-	@if cmp -s $@ $@t; then rm -f $@t; else mv $@t $@; fi
-
 version.c: ../VERSION ../PATCHLEVEL Makefile.maint
 	@echo Making $@
 	@vn=`sed -n 's/.*version.*"\(.*\)".*/\1/p' ./version.c|tr -d ' '`; \
