@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.57 2004/09/03 15:48:36 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.58 2004/09/03 15:56:28 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -2761,47 +2761,52 @@ df_insert_scanned_use_spec(int uspec)
 }
 
 
-/* I realize this isn't the most elegant way of defining the default columns
- * because there is some room for bugs to creep in if the order of the
- * PLOT_STYLE enumeration is changed.  However, I just can't stand the idea
- * of a bunch of conditional statements when table lookup will do.  (If
- * someone has the energy to do that, or has a better scheme, feel free to
- * change it.  A sanity check test in the code should alert developers to
- * to this table when something new is added to PLOT_STYLE.)
+/* Not the most elegant way of defining the default columns, but I prefer
+ * this to switch and conditional statements when there are so many styles.
  */
 #define LAST_PLOT_STYLE 26
 typedef struct df_bin_default_columns {
+    PLOT_STYLE plot_style;
     short excluding_gen_coords; /* Number of columns of information excluding generated coordinates. */
     short dimen_in_2d;          /* Number of additional columns required (in 2D plot) if coordinates not generated. */
 } df_bin_default_columns;
 df_bin_default_columns default_style_cols[LAST_PLOT_STYLE + 1] = {
-    {1, 1}, /* LINES */
-    {1, 1}, /* POINTSTYLE */
-    {1, 1}, /* IMPULSES */
-    {1, 1}, /* LINESPOINTS */
-    {1, 1}, /* DOTS */
-    {2, 1}, /* XERRORBARS */
-    {2, 1}, /* YERRORBARS */
-    {3, 1}, /* XYERRORBARS */
-    {3, 1}, /* BOXXYERROR */
-    {1, 1}, /* BOXES */
-    {3, 1}, /* BOXERROR */
-    {1, 1}, /* STEPS */
-    {1, 1}, /* FSTEPS */
-    {1, 1}, /* HISTEPS */
-    {2, 2}, /* VECTOR */
-    {4, 1}, /* CANDLESTICKS */
-    {4, 1}, /* FINANCEBARS */
-    {2, 1}, /* XERRORLINES */
-    {2, 1}, /* YERRORLINES */
-    {3, 1}, /* XYERRORLINES */
-    {0, 0}, /* not used */
-    {1, 1}, /* FILLEDCURVES */
-    {1, 2}, /* PM3DSURFACE */
-    {2, 1}, /* LABELPOINTS */
-    {1, 0}, /* HISTOGRAMS */
-    {1, 2}, /* IMAGE */
-    {3, 2}  /* RGBIMAGE 26 */
+    {LINES, 1, 1},
+    {POINTSTYLE, 1, 1},
+    {IMPULSES, 1, 1},
+    {LINESPOINTS, 1, 1},
+    {DOTS, 1, 1},
+    {XERRORBARS, 2, 1},
+    {YERRORBARS, 2, 1},
+    {XYERRORBARS, 3, 1},
+    {BOXXYERROR, 3, 1},
+    {BOXES, 1, 1},
+    {BOXERROR, 3, 1},
+    {STEPS, 1, 1},
+    {FSTEPS, 1, 1},
+    {HISTEPS, 1, 1},
+    {VECTOR, 2, 2},
+    {CANDLESTICKS, 4, 1},
+    {FINANCEBARS, 4, 1},
+    {XERRORLINES, 2, 1},
+    {YERRORLINES, 2, 1},
+    {XYERRORLINES, 3, 1},
+    {FILLEDCURVES, 1, 1},
+#ifdef PM3D
+    {PM3DSURFACE, 1, 2},
+#endif
+#ifdef EAM_DATASTRINGS
+    {LABELPOINTS, 2, 1},
+#endif
+#ifdef USE_ULIG_FILLEDBOXES
+#ifdef EAM_HISTOGRAMS
+    {HISTOGRAMS, 1, 0},
+#endif
+#endif
+#ifdef WITH_IMAGE
+    {IMAGE, 1, 2},
+    {RGBIMAGE, 3, 2}
+#endif
 };
 
 
@@ -2811,7 +2816,7 @@ adjust_binary_use_spec()
 
     char *nothing_known = "No default columns known for that plot style";
     enum PLOT_STYLE plot_style;
-    unsigned plot_style_index;
+    unsigned ps_index;
     int c_token_copy;
 
     /* This may appear strange, but ASCII matrix is not the same
@@ -2832,10 +2837,12 @@ adjust_binary_use_spec()
 	plot_style = LINES;
     c_token = c_token_copy;
 
-    plot_style_index = plot_style >> 4;
-
-    /* Range check the index. */
-    if (plot_style_index > LAST_PLOT_STYLE)
+    /* Determine index. */
+    for (ps_index=0; ps_index < sizeof(default_style_cols)/sizeof(default_style_cols[0]); ps_index++) {
+	if (default_style_cols[ps_index].plot_style == plot_style)
+	    break;
+    }
+    if (ps_index == sizeof(default_style_cols)/sizeof(default_style_cols[0]))
 	int_error(c_token_copy, nothing_known);
 
     /* Matrix format is interpretted as always having three columns. */
@@ -2850,11 +2857,9 @@ adjust_binary_use_spec()
      */
     if (!df_no_use_specs) {
 
-	int i;
-
 	if (!df_matrix_file) {
 
-	    int no_cols = default_style_cols[plot_style_index].excluding_gen_coords;
+	    int no_cols = default_style_cols[ps_index].excluding_gen_coords;
 	    if (!no_cols)
 		int_error(c_token_copy, nothing_known);
 
@@ -2863,13 +2868,13 @@ adjust_binary_use_spec()
 	     * extra column if using `splot`.
 	     */
 	    if (df_num_bin_records && df_bin_record[0].scan_generate_coord) {
-		if (default_style_cols[plot_style_index].dimen_in_2d == 0)
+		if (default_style_cols[ps_index].dimen_in_2d == 0)
 		    int_error(c_token_copy, "Cannot generate coords for that plot style");
 	    } else {
 		/* If there aren't generated coordinates, then add the
 		 * amount of columns that would be generated.
 		 */
-		no_cols += default_style_cols[plot_style_index].dimen_in_2d;
+		no_cols += default_style_cols[ps_index].dimen_in_2d;
 		if (df_plot_mode == MODE_SPLOT)
 		    no_cols++;
 	    }
@@ -2892,12 +2897,12 @@ adjust_binary_use_spec()
 	     * should go.
 	     */
 
-	    if ((default_style_cols[plot_style_index].dimen_in_2d == 2)
-		&& (default_style_cols[plot_style_index].excluding_gen_coords == 1)) {
+	    if ((default_style_cols[ps_index].dimen_in_2d == 2)
+		&& (default_style_cols[ps_index].excluding_gen_coords == 1)) {
 		df_no_use_specs = 3;
-	    } else if ( (default_style_cols[plot_style_index].dimen_in_2d == 1)
+	    } else if ( (default_style_cols[ps_index].dimen_in_2d == 1)
 			&& (df_plot_mode == MODE_SPLOT)
-			&& (default_style_cols[plot_style_index].excluding_gen_coords == 1) ) {
+			&& (default_style_cols[ps_index].excluding_gen_coords == 1) ) {
 		df_no_use_specs = 3;
 	    } else
 		int_error(NO_CARET, "Plot style does not conform to three column data in this graph mode");
@@ -2956,11 +2961,11 @@ adjust_binary_use_spec()
 	    int k;
 	    for (k=0; k < df_num_bin_records; k++) {
 		if ((df_bin_record[k].cart_dim[2] == 0) && (df_bin_record[k].scan_dim[2] == 0)) {
-		    if (default_style_cols[plot_style_index].dimen_in_2d > 2)
+		    if (default_style_cols[ps_index].dimen_in_2d > 2)
 			int_error(NO_CARET, "Plot style requires higher than two-dimensional sampling array");
 		    else {
 			if ((df_bin_record[k].cart_dim[1] == 0) && (df_bin_record[k].scan_dim[1] == 0)) {
-			    if (default_style_cols[plot_style_index].dimen_in_2d > 1)
+			    if (default_style_cols[ps_index].dimen_in_2d > 1)
 				int_error(NO_CARET, "Plot style requires higher than one-dimensional sampling array");
 			    else {
 				/* Place a special marker in the using list to derive the y value
@@ -4278,7 +4283,6 @@ df_readbinary(double v[], int max)
     static double first_matrix_column;
     static float *scanned_matrix_row = 0;
     static int first_matrix_row_col_count;
-    TBOOLEAN discarded_first_matrix_value = FALSE;
     TBOOLEAN saved_first_matrix_column = FALSE;
 
     assert(data_fp != NULL);

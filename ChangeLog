@@ -1,3 +1,9 @@
+2004-09-13  Daniel Sebald  <daniel.sebald@ieee.org>
+
+	* src/datafile.c: Rework the layout of the df_bin_default_columns
+	array, so that the binary input code is not sensitive to the order of
+	defining plot styles in gp_types.h.
+
 2004-09-13  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/gplt_x11.c: Trivial cleanup to remove compiler warnings.
