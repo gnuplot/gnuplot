@@ -1,57 +1,39 @@
 #ifndef lint
-static char *RCSid = "$Id: version.c,v 1.340 1997/11/25 23:03:09 drd Exp $";
+static char *RCSid = "$Id: version.c,v 1.347 1998/06/22 12:24:56 ddenholm Exp $";
 #endif
 
 /* GNUPLOT - version.c */
-/*
- * Copyright (C) 1986 - 1993, 1997   Thomas Williams, Colin Kelley
+
+/*[
+ * Copyright 1986 - 1993, 1998   Thomas Williams, Colin Kelley
  *
  * Permission to use, copy, and distribute this software and its
- * documentation for any purpose with or without fee is hereby granted, 
- * provided that the above copyright notice appear in all copies and 
- * that both that copyright notice and this permission notice appear 
+ * documentation for any purpose with or without fee is hereby granted,
+ * provided that the above copyright notice appear in all copies and
+ * that both that copyright notice and this permission notice appear
  * in supporting documentation.
  *
  * Permission to modify the software is granted, but not the right to
- * distribute the modified code.  Modifications are to be distributed 
- * as patches to released version.
- *  
- * This software is provided "as is" without express or implied warranty.
- * 
+ * distribute the complete modified source code.  Modifications are to
+ * be distributed as patches to the released version.  Permission to
+ * distribute binaries produced by compiling modified sources is granted,
+ * provided you
+ *   1. distribute the corresponding source modifications from the
+ *    released version in the form of a patch file along with the binaries,
+ *   2. add special version identification to distinguish your version
+ *    in addition to the base release version number,
+ *   3. provide your name and address as the primary contact for the
+ *    support of your modified version, and
+ *   4. retain our contact information in regard to use of the base
+ *    software.
+ * Permission to distribute the released version of the source code along
+ * with corresponding source modifications in the form of a patch file is
+ * granted with same provisions 2 through 4 for binary distributions.
  *
- * AUTHORS
- * 
- *   Original Software:
- *     Thomas Williams,  Colin Kelley.
- * 
- *   Gnuplot 2.0 additions:
- *       Russell Lang, Dave Kotz, John Campbell.
- *
- *   Gnuplot 3.0 additions:
- *       Gershon Elber and many others.
- * 
- *   Gnuplot 3.4 additions:
- *       Alex Woo and many others.
- * 
- * There is a mailing list for gnuplot users. Note, however, that the
- * newsgroup 
- *	comp.graphics.apps.gnuplot 
- * is identical to the mailing list (they
- * both carry the same set of messages). We prefer that you read the
- * messages through that newsgroup, to subscribing to the mailing list.
- * (If you can read that newsgroup, and are already on the mailing list,
- * please send a message to majordomo@dartmouth.edu, asking to be
- * removed from the mailing list.)
- *
- * The address for mailing to list members is
- *	   info-gnuplot@dartmouth.edu
- * and for mailing administrative requests is 
- *	   majordomo@dartmouth.edu
- * The mailing list for bug reports is 
- *	   bug-gnuplot@dartmouth.edu
- * The list of those interested in beta-test versions is
- *	   info-gnuplot-beta@dartmouth.edu
- */
+ * This software is provided "as is" without express or implied warranty
+ * to the extent permitted by applicable law.
+]*/
+
 
 /*
  * The rcs log will be removed for `real' releases
@@ -64,6 +46,244 @@ static char *RCSid = "$Id: version.c,v 1.340 1997/11/25 23:03:09 drd Exp $";
  * do not agree with the one in the log. I hope to fix this some time soon.
  *
  * $Log: version.c,v $
+ * Revision 1.347  1998/06/22 12:24:56  ddenholm
+ * dd : retrieve fit.*, matrix.*, docs/latextut/makefile from earlier vsns
+ *      add  set noxdtics etc. (behave same as  set xtics)
+ *
+ * Revision 1.346  1998/06/18 14:55:21  ddenholm
+ * Lars : compilation of many patches posted to the net.
+ * 1998-06-17  Lars Hecking  <lhecking@nmrc.ucc.ie>
+ *
+ * 	* Imported beta 345.
+ *
+ * 	* docs/README, docs/doc2ms.c, docs/doc2tex.c, docs/gnuplot.doc,
+ * 	docs/ps_guide.ps, term/cgm.trm, term/post.trm,term/x11.trm:
+ *  	Cleanup patches by Dick Crawford <rccrawford@lanl.gov>.
+ *
+ * 	* docs/gnuplot.doc, term/post.trm: FIx typos.
+ *
+ * 1998-05-12  Lars Hecking  <lhecking@nmrc.ucc.ie>
+ *
+ * 	* set.c: Fix axis width in lp_style_type. HBB and Lars Hecking.
+ *
+ * 1998-05-08  Lars Hecking  <lhecking@nmrc.ucc.ie>
+ *
+ * 	* plot3d.c: Fix "title" option for "splot" under parametric mode.
+ * 	By Dick Crawford <rccrawford@lanl.gov>.
+ *
+ * 	* graphics.c, set.c, show.c: Margin calculation correction patch.
+ * 	By Dick Crawford <rccrawford@lanl.gov>.
+ *
+ * 1998-04-29  Lars Hecking  <lhecking@nmrc.ucc.ie>
+ *
+ * 	* Makefile.in: Minor fixes.
+ *
+ * 	* fit.c, fit.h, matrix.c, matrix.h: Re-import versions from beta 343.
+ * 	Suggested by HBB.
+ *
+ * 1998-04-24  Lars Hecking  <lhecking@nmrc.ucc.ie>
+ *
+ * 	* configure, configure.in: Don't use sudo.
+ *
+ * 	* graph3d.c: Fix range bug in splot. By HBB.
+ *
+ * 1998-04-22  Lars Hecking  <lhecking@nmrc.ucc.ie>
+ *
+ * 	* Imported beta 344.
+ *
+ * 1998-04-16  Lars Hecking  <lhecking@nmrc.ucc.ie>
+ *
+ * 	* set.c: Don't include math.h, but stdfn.h.
+ *
+ * 	* term/driver.h: Remove GOT_DRIVER_H, use TERM_DRIVER_H instead.
+ * 	Add some comments.
+ *
+ * 	* term/*.trm, TERM/README: Remove #ifndef GOT_DRIVER_H/#endif
+ * 	around #include "driver.h".
+ *
+ * 	* term/cgm.trm: Amend help section.
+ *
+ * 	* term/emxvga.trm: Add some comments, don't include math.h.
+ *
+ * 	* term/latex.trm (LATEX_rule): Replace valid with isvalid
+ * 	(valid is a macro in <locale.h> under SunOS 4.1.x).
+ *
+ * 	* term/png.trm: Test for png version moved to configure.
+ *
+ * 	* term/epson.trm, term/hp500c.trm, term/hpljii.trm, term/hppj.trm,
+ * 	term/pbm.trm, term/png.trm: Replace #ifdef vms with #ifdef VMS.
+ *
+ * 	* makefile.*: Remove unneeded symbols AUTOCONF, HAVE_STRERROR, NOGAMMA.
+ * 	Add stdfn.c and appropriate rules.
+ *
+ * 1998-04-15  Lars Hecking  <lhecking@nmrc.ucc.ie>
+ *
+ * 	* parse.c (factor): Final, working workaround for HP 300 compiler
+ * 	limitation.
+ *
+ * 1998-04-13  Lars Hecking  <lhecking@nmrc.ucc.ie>
+ *
+ * 	* atariaes.trm, atarivdi.trm, cgi.trm, cgm.trm, corel.trm, epson.trm,
+ * 	fig.trm, linux.trm, next.trm, pbm.trm, pc.trm, pm.trm, png.trm,
+ * 	post.trm, pslatex.trm, pstricks.trm, table.trm, tek.trm, texdraw.trm,
+ * 	unixplot.trm, vws.trm, win.trm, x11.trm:
+ * 	term-340.patch from Richard Crawford <u600256@gamma.lanl.gov>.
+ *
+ * 	* post.trm: Fix typos in Dick's term-340 patch.
+ *
+ * 	* scanner.c, util.c: Escape quotes patch
+ * 	from Glenn A. Horton-Smith <gas@SLAC.Stanford.EDU>.
+ *
+ * 	* post.trm, pbm.trm: X11 vs. ps (and pbm) colour inconsistency patch
+ * 	from Stephen Eglen <stephen@cns.ed.ac.uk>.
+ *
+ * 	* fit.c, matrix.c, matrix.h: fit-unlimited.diff.980105 from
+ * 	Hans-Bernhard Broeker <broeker@physik.rwth-aachen.de>.
+ *
+ * 	* cgm.trm: Updated version, fixes "plot size change"Mon Jun 22 13:22:33 BST 1998"ugly
+ * 	dashed lines" bug. From "James R. Van Zandt" <jrv@vanzandt.mv.com>.
+ *
+ * 	* term/README: Documentation fix from
+ * 	"James R. Van Zandt" <jrv@vanzandt.mv.com>.
+ *
+ * 	* fig.trm: Fix pointsize in fig terminal, from
+ * 	Hans-Martin Keller <hkeller@gwdg.de>, and
+ * 	Konrad Bernloehr <bernlohr@ik3.fzk.de>.
+ *
+ * 	* hp500c.trm, hppj.trm, pbm.trm, png.trm: Fix changing plot size bug.
+ * 	From Hans-Bernhard Broeker <broeker@physik.rwth-aachen.de>.
+ *
+ * 	* fit.c: Fix segfault in fit.c (fit_chisq_undef.diff.980304).
+ * 	From Hans-Bernhard Broeker <broeker@physik.rwth-aachen.de>.
+ *
+ * 	* command.c (define): Fix segfault where allocated structure
+ * 	(action table) is freed twice.
+ * 	From Konrad Bernloehr <bernlohr@ik3.fzk.de>
+ *
+ * 	* term.c (term_init): Memory allocation error fix.
+ * 	From Kai Poitschke <kai.poitschke@henkel.de>.
+ *
+ * 1998-04-11  Lars Hecking  <lhecking@nmrc.ucc.ie>
+ *
+ * 	* acconfig.h: Remove AUTOCONF, NOCOPY, OLD_SELECT.
+ * 	Add HAVE_CPP_STRINGIFY,	HAVE_LGAMMA, HAVE_STRNCASECMP, NO_MATH_H,
+ * 	NO_SETVBUF, NO_STRERROR, NO_STRRCHR, NO_STRSTR.
+ *
+ * 	* ansichek.h: Remove test for AUTOCONF, define ANSI_C if __STDC__ == 1.
+ * 	Define HAVE_CPP_STRINGIFY and PROTOTYPES if ANSI_C == 1.
+ *
+ * 	* config.hin: Regenerated from acconfig.h with autoheader.
+ *
+ * 	* configure.in: Add support for 'missing'. Add test for ANSI
+ * 	stringification. Rearrange test order (ANSI first). Rewrite tests
+ * 	for libgd and libpng, check png version.
+ *
+ * 	* configure: Regenerated from configure.in with autoconf.
+ *
+ * 	* stdfn.c: New file, adds strchr(), strstr(). Moved memcpy() from
+ * 	parse.c, memset() from plot.h, strerror() from util.c, purec_sscanf()
+ * 	from datafile.c, sleep() from command.c, strnicmp() from fit.c.
+ *
+ * 	* stdfn.h: Cleanups, adjustments for stdfn.c. Include math.h.
+ * 	New, general debug macro FPRINTF.
+ *
+ * 	* parse.c: Don't include math.h. Move memcpy() to stdfn.c. Workaround
+ * 	for buggy HP-UX compiler.
+ *
+ * 	* plot.h: Regroup OS specific defines at beginning of file. Define
+ * 	VMS for VMS platform. Move memcpy() to stdfn.c. Move most #include
+ * 	statements to stdfn.h. Define AMIGA for AmigaOS compilers. Define
+ * 	BACKUP_FILESYSTEM for VMS.
+ *
+ * 	* fit.c: Move strnicmp() to stdfn.c. Use BACKUP_FILESYSTEM in update().
+ *
+ * 	* gplt_x11.c, readline.c, term.c, time.c, util.c: Use FPRINTF instead
+ * 	of DEBUG, DEBUG_STR, and TRACE.
+ *
+ * 	* gplt_x11.c, plot.c: Remove superfluous prototype for main.
+ *
+ * 	* gplt_x11.c: Use HAVE_SYS_SELECT_H instead of OLD_SELECT. Use
+ * 	memset() instead of bzero(). In mainloop(), use ANSI_C instead
+ * 	of __STDC__
+ *
+ * 	* bf_test.c, binary.c, command.c, contour.c, datafile.c, fit.c,
+ * 	gplt_x11.c, graph3d.c, graphics.c, hidden3d.c, internal.c, interpol.c,
+ * 	matrix.c, misc.c, plot.c, plot2d.c, plot3d.c, readline.c, scanner.c,
+ * 	show.c, specfun.c, standard.c, strftime.c, term.c, time.c, util.c,
+ * 	util3d.c: Don't include headers already included by stdfn.h.
+ *
+ * 	* command.c: Move sleep() related declarations to stdfn.c and stdfn.h.
+ *
+ * 	* datafile.c: Move purec_sscanf() to stdfn.c.
+ *
+ * 	* hidden3d.c, plot2d.c, plot3d.c: Use HAVE_CPP_STRINGIFY in place
+ * 	of ANSI_C.
+ *
+ * 	* command.c, plot.c, scanner.c, term.c, util.c: Use VMS in place
+ * 	of vms.
+ *
+ * 	* plot.c, term.c: Use AMIGA for AmigaOS compilers.
+ *
+ * 	* strftime.c: Replace TEST with TEST_STRFTIME.
+ *
+ * 	* util.c: Move strerror() to stdfn.c.
+ *
+ * 	* errorfix.sh: Can now be run if compiledir != sourcedir. More
+ * 	robust.
+ *
+ * 	* term.h: Use AMIGA for Amiga compilers. Move X11 term inclusion.
+ *
+ * 	* vms.c: Include stdfn.h.
+ *
+ * 	* makefile.g: Remove -DAUTOCONF=1.
+ *
+ * 1998-04-09  Lars Hecking  <lhecking@nmrc.ucc.ie>
+ *
+ * 	* ChangeLog: New file.
+ *
+ * 	* gplt_x11.c (prepare_plot): Remove unused definition term_icon[10].
+ *
+ * 	* set.c (set_arrow, set_linestyle): Replace aggregate initialisation
+ * 	for non-ANSI compilers.
+ *
+ * 	* Makefile.in: General cleanup. Add full support for GNU auto* tools.
+ *
+ * 	* missing: New file required for full GNU auto* tools support. Taken
+ * 	from automake 1.3 distribution.
+ *
+ * 	* acinclude.m4: New macros gp_PROG_CPP_STRINGIFY, taken from egcs,
+ * 	and AM_MISSING_PROG, from automake 1.3 distribution. Fixes in
+ * 	gp_CHECK_LIB_PATH and gp_CHECK_HEADER.
+ *
+ * 	* aclocal.m4: Regenerated from acinclude.m4 with aclocal.
+ *
+ * 	* configure: Regenerated from configure.in with autoconf.
+ *
+ * Revision 1.345  1998/05/19 18:05:03  ddenholm
+ * drd: add missing stdfn.c file
+ *
+ * Revision 1.344  1998/04/14 00:38:57  drd
+ * drd: oops - forgot to bump version number with last checkin.
+ *
+ * Revision 1.343  1998/03/22  23:31:31  drd
+ * hbb: compile on win16 ; latest and greatest hidden3d stuff
+ *
+ * Revision 1.342  1998/03/22  22:32:24  drd
+ * drd: update copyright statements on most files. There are still a
+ *      few files (obscure terminal drivers) copyright others. Maybe
+ *      we have to drop these, or at least list the files which
+ *      cannot be redistributed with a modified gnuplot.
+ *      (Or maybe it is okay to include these files unchanged in an
+ *       otherwise modified gnuplot ?)
+ *
+ * Revision 1.341  1997/12/16  23:01:05  drd
+ * Lars Hecking: 0PORTING, 0README, 0INSTALL
+ * HBB: latest hidden3d stuff
+ *      off-by-one error in long-line datafiles
+ * gas@SLAC.stanford.edu : fix for \" inside "strings"
+ * Hans-Martin Keller : fix for fault in contour stuff
+ * Niels Provos : VMS stuff
+ *
  * Revision 1.340  1997/11/25  23:03:09  drd
  * Alexander Mai: fix show output for non-auto x range
  * Konrad Bernloehr: fixes for logscale tics
@@ -449,7 +669,7 @@ static char *RCSid = "$Id: version.c,v 1.340 1997/11/25 23:03:09 drd Exp $";
  * Scott Lurndal: variable scope in help.c [reported against 3.5]
  * Alex Woo: Makefile for docs
  * William Kirby: colours in win32 [again !]
- * Carsten Stegar: amiga fixes
+ * Carsten Steger: amiga fixes
  * Dick Crawford: yet more postscript symbols
  * Joerg Fischer: makefile.all fixes
  * Neil Mathews: gplt_x11 tweaks
@@ -915,7 +1135,7 @@ static char *RCSid = "$Id: version.c,v 1.340 1997/11/25 23:03:09 drd Exp $";
  * drd: multiplot for splot; suspend only when prompt is issued
  *
  * Revision 1.191  1995/05/25  14:24:08  drd
- * drd: chenge term_tbl[term] to term-> in preparation for change to
+ * drd: change term_tbl[term] to term-> in preparation for change to
  *      linked lists of terminals
  *
  * Revision 1.190  1995/05/25  13:38:17  drd
@@ -1599,9 +1819,9 @@ static char *RCSid = "$Id: version.c,v 1.340 1997/11/25 23:03:09 drd Exp $";
  */
 
 char version[] = "3.5 (pre 3.6)";
-char patchlevel[] = "beta 340";
-char date[] = "Tue Nov 25 22:57:44 GMT 1997"; 
-char gnuplot_copyright[] = "Copyright(C) 1986 - 1993, 1997";
+char patchlevel[] = "beta 347";
+char date[] = "Mon Jun 22 13:22:33 BST 1998"; 
+char gnuplot_copyright[] = "Copyright(C) 1986 - 1993, 1998";
 
 
 /* override in Makefile */
