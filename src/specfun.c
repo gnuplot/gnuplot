@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: specfun.c,v 1.17 2002/02/27 21:19:22 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: specfun.c,v 1.18 2002/05/16 13:48:28 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - specfun.c */
@@ -158,10 +158,17 @@ Direct inquiries to 30 Frost Street, Cambridge, MA 02140
 
 int             merror = 0;
 
-/* Notice: the order of appearance of the following
- * messages is bound to the error codes defined
- * in mconf.h.
+/* Notice: the order of appearance of the following messages cannot be bound
+ * to error codes defined in mconf.h or math.h or similar, as these files are
+ * not available on every platform. Thus, enumerate them explicitly.
  */
+#define MTHERR_DOMAIN	 1
+#define MTHERR_SING	 2
+#define MTHERR_OVERFLOW  3
+#define MTHERR_UNDERFLOW 4
+#define MTHERR_TLPREC	 5
+#define MTHERR_PLPREC	 6
+
 static char    *ermsg[7] = {
     "unknown",                  /* error code 0 */
     "domain",                   /* error code 1 */
@@ -469,7 +476,7 @@ double          lngamma(double x)
         if (p == q) {
     lgsing:
 #ifdef INFINITIES
-            mtherr("lngamma", SING);
+            mtherr("lngamma", MTHERR_SING);
             return (DBL_MAX * DBL_MAX);
 #else
             goto loverf;
@@ -525,7 +532,7 @@ double          lngamma(double x)
         return (sgngam * (DBL_MAX * DBL_MAX));
 #else
 loverf:
-        mtherr("lngamma", OVERFLOW);
+        mtherr("lngamma", MTHERR_OVERFLOW);
         return (sgngam * MAXNUM);
 #endif
     }
@@ -1406,11 +1413,11 @@ inverse_normal_func(double y0)
     int             code;
 
     if (y0 <= 0.0) {
-        mtherr("inverse_normal_func", DOMAIN);
+        mtherr("inverse_normal_func", MTHERR_DOMAIN);
         return (-DBL_MAX);
     }
     if (y0 >= 1.0) {
-        mtherr("inverse_normal_func", DOMAIN);
+        mtherr("inverse_normal_func", MTHERR_DOMAIN);
         return (DBL_MAX);
     }
     code = 1;
@@ -1861,7 +1868,7 @@ double          erfc(double a)
 
     if (z < DBL_MIN_10_EXP) {
 under:
-        mtherr("erfc", UNDERFLOW);
+        mtherr("erfc", MTHERR_UNDERFLOW);
         if (a < 0)
             return (2.0);
         else

@@ -1,5 +1,10 @@
 2002-10-04  Petr Mikulik  <mikulik@physics.muni.cz>
 
+	* src/specfun.c: Error codes DOMAIN, SING etc. are not available on
+	every platform, thus define MTHERR_* constants explicitly.
+
+2002-10-04  Petr Mikulik  <mikulik@physics.muni.cz>
+
 	* config/makefile.os2: Use temporary getcolor_x11.c when compiling
 	gnuplot_x11.exe.
 
@@ -1216,7 +1221,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/10/05 02:59:33 $).
+	last modification date (from the tag $Date: 2002/10/05 15:08:42 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
