@@ -12,6 +12,7 @@
 #define READLINE
 #define GP_INLINE __inline
 #define ANSI_C
+#define PROTOTYPES		1
 
 #ifndef __WIN32__
 # define __WIN32__
@@ -30,6 +31,7 @@
 #define HAVE_TIME_H		1
 
 #define HAVE_ATEXIT		1
+#define HAVE_GETCWD		1
 #define HAVE_MEMCPY		1
 #define HAVE_MEMSET		1
 #define HAVE_MEMMOVE		1
