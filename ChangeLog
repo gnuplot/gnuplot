@@ -1,3 +1,9 @@
+2004-07-21  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/graphics.c (plot_bars plot_betweencurves): If the current
+	terminal does not support filled_polygons, then fall back to
+	yerrorbars plot style as per the documentation.
+
 2004-07-21  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* term/post.trm (PS_make_header): Moved prototype into PM3D-only

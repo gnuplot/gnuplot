@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.116 2004/07/13 14:11:23 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.117 2004/07/20 05:23:02 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -1974,6 +1974,12 @@ plot_betweencurves(struct curve_points *plot)
     double xmid, ymid;
     int i;
 
+    /* If terminal doesn't support filled polygons, approximate with bars */
+    if (!term->filled_polygon) {
+	plot_bars(plot);
+	return;
+    }
+
     /*
      * Fill the region one quadrilateral at a time.
      * Check each interval to see if the curves cross.
@@ -2480,7 +2486,9 @@ plot_bars(struct curve_points *plot)
 	|| (plot->plot_style == XYERRORBARS)
 	|| (plot->plot_style == BOXERROR)
 	|| (plot->plot_style == YERRORLINES)
-	|| (plot->plot_style == XYERRORLINES)) {
+	|| (plot->plot_style == XYERRORLINES)
+	|| (plot->plot_style == FILLEDCURVES) /* Only if term has no filled_polygon! */
+	) {
 	/* Draw the vertical part of the bar */
 	for (i = 0; i < plot->p_count; i++) {
 	    /* undefined points don't count */
