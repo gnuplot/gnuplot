@@ -1096,6 +1096,7 @@ unsigned int x,y;
 {
 	int dx, dy;
 	char abso[5+2*INT_STR_LEN], rel[5+2*INT_STR_LEN];
+
 	dx = x - PS_pen_x;
 	dy = y - PS_pen_y;
 	if (dx==0 && dy==0) return;
