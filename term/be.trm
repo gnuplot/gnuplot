@@ -1,5 +1,5 @@
 /*
- * $Id: be.trm,v 1.6 1999/06/22 11:54:14 lhecking Exp $
+ * $Id: be.trm,v 1.7 1999/08/24 11:24:52 lhecking Exp $
  *
  */
 
@@ -504,7 +504,7 @@ START_HELP(be)
 " than 0 and less than or equal to ten) used as a scaling factor for point",
 " sizes.  For example, `-pointsize 2` uses points twice the default size, and",
 " `-pointsize 0.5` uses points half the normal size.",
-"2 monochome_options",
+"2 monochrome_options",
 "?commands set terminal be monochrome_options",
 "?set terminal be monochrome_options",
 "?set term be monochrome_options",

@@ -1,5 +1,5 @@
 /*
- * $Id: x11.trm,v 1.39 2001/09/08 02:25:27 mikulik Exp $
+ * $Id: x11.trm,v 1.40 2001/09/19 15:50:10 broeker Exp $
  *
  */
 
@@ -1219,7 +1219,7 @@ START_HELP(x11)
 " The `-noevents` switch disables all mouse and key event processing (execpt",
 " for `q` and `<space>` for closing the window). This is useful for programs",
 " which use the x11 driver independent of the gnuplot main program.",
-"2 monochome_options",
+"2 monochrome_options",
 "?commands set terminal x11 monochrome_options",
 "?set terminal x11 monochrome_options",
 "?set term x11 monochrome_options",
