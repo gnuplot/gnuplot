@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util3d.c,v 1.6 1999/10/29 18:47:22 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: util3d.c,v 1.7 1999/11/08 19:24:35 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - util3d.c */
@@ -204,7 +204,7 @@ unsigned int x, y;
  */
 void
 draw_clip_line(x1, y1, x2, y2)
-unsigned int x1, y1, x2, y2;
+int x1, y1, x2, y2;
 {
     int x, y, dx, dy, x_intr[4], y_intr[4], count, pos1, pos2;
     register struct termentry *t = term;

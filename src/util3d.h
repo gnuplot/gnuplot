@@ -1,5 +1,5 @@
 /*
- * $Id: util3d.h,v 1.1 1999/06/14 19:21:31 lhecking Exp $
+ * $Id: util3d.h,v 1.2 1999/10/01 14:54:37 lhecking Exp $
  *
  */
 
@@ -47,7 +47,7 @@
 
 /* Prototypes of functions exported by "util3d.c" */
 
-void draw_clip_line __PROTO((unsigned int, unsigned int, unsigned int, unsigned int));
+void draw_clip_line __PROTO((int, int, int, int));
 int clip_line __PROTO((int *, int *, int *, int *));
 void edge3d_intersect __PROTO((struct coordinate GPHUGE *, int, double *, double *, double *));
 TBOOLEAN two_edge3d_intersect __PROTO((struct coordinate GPHUGE *, int, double *, double *, double *));
