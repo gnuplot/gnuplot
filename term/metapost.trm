@@ -1,5 +1,5 @@
 /*
- * $Id: metapost.trm,v 1.5.2.4 1999/09/16 16:05:21 lhecking Exp $
+ * $Id: metapost.trm,v 1.5.2.5 2000/10/19 20:41:12 lhecking Exp $
  */
 
 /* GNUPLOT - metapost.trm */
@@ -541,8 +541,7 @@ char str[];
 	return;
 
     /* F***. why do drivers need to modify string args? */
-    text = gp_alloc(strlen(str)+1, "temp string");
-    strcpy(text,str);
+    text = gp_strdup(str);
 
     if (MP_inline)
 	MP_endline();

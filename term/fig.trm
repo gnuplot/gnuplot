@@ -1,5 +1,5 @@
 /*
- * $Id: fig.trm,v 1.10.2.2 2000/05/07 16:40:45 lhecking Exp $
+ * $Id: fig.trm,v 1.10.2.3 2000/10/20 19:04:34 lhecking Exp $
  */
 
 /* GNUPLOT - fig.trm */
@@ -94,9 +94,9 @@ TERM_PUBLIC void FIG_lpoint __PROTO((unsigned int x, unsigned int y, int number)
 #define FIG_ROMAN_FONT (0)	/* actually, the default font */
 
 #if METRIC
-  #define INCH FALSE
+# define INCH FALSE
 #else
-  #define INCH TRUE
+# define INCH TRUE
 #endif
 
 /* These should not be defined elsewhere - ACZ */
