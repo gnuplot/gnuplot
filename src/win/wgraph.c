@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.36 2004/02/21 19:06:18 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.37 2004/04/13 17:24:06 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - win/wgraph.c */
@@ -1028,17 +1028,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 		HBRUSH this_brush;
 		COLORREF c;
 
-		if (sm_palette.use_maxcolors > 0 && sm_palette.use_maxcolors < 256) {
-		    /* number of palette colours is reduced */
-		    if (curptr->x >=255)
-			level = 1;
-		    else {
-			level = (int)(level * sm_palette.colors);
-			level = (level >= sm_palette.colors-1) ? 1 : level / sm_palette.colors;
-		    }
-		}
-
-		rgb255_from_gray( level, &rgb255 );
+		rgb255maxcolors_from_gray( level, &rgb255 );
 		c = RGB(rgb255.r, rgb255.g, rgb255.b);
 		this_brush = CreateSolidBrush(c);
 		SelectObject(hdc, this_brush);
