@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: graph3d.c,v 1.106 1998/06/18 14:55:07 ddenholm Exp $";
+static char *RCSid = "$Id: graph3d.c,v 1.13 1998/12/03 22:24:45 lhecking Exp $";
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -397,6 +397,7 @@ int count;
     key_rows = ptitl_cnt;
     key_cols = 1;
     if (key == -1 && key_vpos == TUNDER) {
+      if (ptitl_cnt > 0) {
 	/* calculate max no cols, limited by label-length */
 	key_cols = (int) (xright - xleft) / ((max_ptitl_len + 4) * (t->h_char) + key_sample_width);
 	key_rows = (int) (ptitl_cnt / key_cols) + ((ptitl_cnt % key_cols) > 0);
@@ -404,6 +405,9 @@ int count;
 	key_cols = (int) (ptitl_cnt / key_rows) + ((ptitl_cnt % key_rows) > 0);
 	key_col_wth = (int) (xright - xleft) / key_cols;
 	/* key_rows += ktitle_lines; - messes up key - div */
+      } else {
+	key_rows = key_cols = key_col_wth = 0;
+      }
     }
     /* this should also consider the view and number of lines in
      * xformat || yformat || xlabel || ylabel */
@@ -443,7 +447,7 @@ int count;
     /* HBB 980308: sigh... another 16bit glitch: on term's with more than
      * 8000 pixels in either direction, these calculations produce garbage
      * results if done in (16bit) ints */
-    xscaler = (xright - xleft) * 4 / 7;		/* HBB: Magic number alert! */
+    xscaler = ((xright - xleft) * 4L) / 7L;              /* HBB: Magic number alert! */
     yscaler = ((ytop - ybot) * 4L) / 7L;
 
 }
@@ -502,12 +506,13 @@ int pcount;			/* count of plots in linked list */
     mat_scale(surface_scale / 2.0, surface_scale / 2.0, surface_scale / 2.0, mat);
     mat_mult(trans_mat, trans_mat, mat);
 
+#if 0 /* HBB 19990609: this is *not* the way to implement 'set view' <z_scale> */
     /* modify min_z/max_z so it will zscale properly. */
     ztemp = (z_max3d - z_min3d) / (2.0 * surface_zscale);
     temp = (z_max3d + z_min3d) / 2.0;
     z_min3d = temp - ztemp;
     z_max3d = temp + ztemp;
-
+#endif
 
     /* The extrema need to be set even when a surface is not being
      * drawn.   Without this, gnuplot used to assume that the X and
@@ -573,7 +578,7 @@ int pcount;			/* count of plots in linked list */
     boundary3d(scaling, plots, pcount);
 
     /* SCALE FACTORS */
-    zscale3d = 2.0 / (ceiling_z - floor_z);
+    zscale3d = 2.0 / (ceiling_z - floor_z) * surface_zscale;
     yscale3d = 2.0 / (y_max3d - y_min3d);
     xscale3d = 2.0 / (x_max3d - x_min3d);
 
@@ -675,6 +680,9 @@ int pcount;			/* count of plots in linked list */
 	    xl /= 1000;
 	    xl += xleft;
 #else
+	    /* HBB 19990608: why calculate these again? boundary3d has already 
+	     * done it... */
+	    if (ptitl_cnt > 0) {
 	    /* maximise no cols, limited by label-length */
 	    key_cols = (int) (xright - xleft) / key_col_wth;
 	    key_rows = (int) (ptitl_cnt + key_cols - 1) / key_cols;
@@ -689,6 +697,7 @@ int pcount;			/* count of plots in linked list */
 	     */
 	    xl = xleft + ((xright - xleft) * key_size_left) / (key_cols * (key_size_left + key_size_right));
 	    yl = yoffset * t->ymax + (key_rows) * key_entry_height + (ktitle_lines + 2) * t->v_char;
+	    }
 #endif
 	} else {
 	    if (key_vpos == TTOP) {

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: datafile.c,v 1.42 1998/04/14 00:15:17 drd Exp $";
+static char *RCSid = "$Id: datafile.c,v 1.11 1998/11/03 12:46:21 lhecking Exp $";
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -348,12 +348,15 @@ char *s;
 #endif /* NO_FORTRAN_NUMS */
 	    } else {
 		/* skip any space at start of column */
-		while (isspace((int)*s))
+		/* HBB tells me that the cast must be to
+		 * unsigned char instead of int. */
+		while (isspace((unsigned char) *s))
 		    ++s;
 		count = *s ? 1 : 0;
 		/* skip chars to end of column */
-		for (used = 0; !isspace((int)*s) && (*s != NUL); ++used, ++s)
-		    ;
+		used = 0;
+		while (!isspace((unsigned char) *s) && (*s != NUL))
+		    ++s;
 	    }
 
 	    /* it might be a fortran double or quad precision.
@@ -467,7 +470,8 @@ int max_using;
  */
 
 {
-    static char filename[MAX_LINE_LEN + 1] = "";
+    /* now allocated dynamically */
+    static char *filename = NULL;
     int i;
     int name_token;
 
@@ -516,14 +520,12 @@ int max_using;
     assert(max_using <= NCOL);
 
     /* empty name means re-use last one */
-
-    {
-	char name[MAX_LINE_LEN + 1];
-	quote_str(name, c_token, MAX_LINE_LEN);
-	if (name[0])
-	    strcpy(filename, name);
-	else if (!filename[0])
-	    int_error("No previous filename", c_token);
+    if (isstring(c_token) && token_len(c_token) == 2) {
+	if (!filename || !*filename)
+	    int_error("No previous filename",c_token);
+    } else {
+	filename = gp_realloc(filename, token_len(c_token), "datafile name");
+	quote_str(filename, c_token, token_len(c_token));
     }
     name_token = c_token++;
 

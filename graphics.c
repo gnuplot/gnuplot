@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: graphics.c,v 1.138 1998/06/18 14:55:08 ddenholm Exp $";
+static char *RCSid = "$Id: graphics.c,v 1.24 1999/01/12 14:02:37 lhecking Exp $";
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -593,12 +593,14 @@ int count;
 	    top_margin = y2label_textheight;
 
 	top_margin += x2tic_height + x2tic_textheight;
-/* FIXME: what is this additional space reservation for??? */
+	/* x2tic_height and x2tic_textheight are computed as only the
+	 *     relevant heights, but they nonetheless need a blank
+	 *     space above them  */
 	if (top_margin > x2tic_height)
 	    top_margin += (int) (t->v_char);
 
 	ytop -= top_margin;
-	if (ytop == (int) ((ysize + yoffset) * (t->ymax))) {
+	if (ytop == (int) (0.5 + (ysize + yoffset) * (t->ymax))) {
 	    /* make room for the end of rotated ytics or y2tics */
 	    ytop -= (int) ((t->h_char) * 2);
 	}
@@ -646,7 +648,7 @@ int count;
 
     /* xlabel */
     if (xlablin) {
-	/* offset is subtracted because if . 0, the margin is smaller */
+	/* offset is subtracted because if > 0, the margin is smaller */
 	xlabel_textheight = (int) ((xlablin - xlabel.yoffset) * (t->v_char));
 	if (!xtics)
 	    xlabel_textheight += 0.5 * t->v_char;
@@ -659,9 +661,8 @@ int count;
 	 * DBT 11-18-98 resize plot for vertical timelabels too !
 	 */
 	/* offset is subtracted because if . 0, the margin is smaller */
-	timebot_textheight = (int) ((timelin - timelabel.yoffset + 1.5) * (t->v_char));
-    }
-    else
+	timebot_textheight = (int) ((timelin - timelabel.yoffset) * (t->v_char));
+    } else
 	timebot_textheight = 0;
 
     /* compute ybot from the various components
@@ -671,9 +672,13 @@ int count;
 
     if (bmargin < 0) {
 	ybot += xtic_height + xtic_textheight;
-	if (timebot_textheight > 0 || xlabel_textheight > 0)
-	    ybot += (timebot_textheight > xlabel_textheight) ? timebot_textheight : xlabel_textheight;
-	if (ybot == (t->ymax) * yoffset) {
+	if (xlabel_textheight > 0)
+	    ybot += xlabel_textheight;
+	if (timebot_textheight > 0)
+	    ybot += timebot_textheight;
+	/* HBB 19990616: round to nearest integer, required to escape
+	 * floating point inaccuracies */
+	if (ybot == (int)(0.5 + (t->ymax) * yoffset)) {
 	    /* make room for the end of rotated ytics or y2tics */
 	    ybot += (int) ((t->h_char) * 2);
 	}
@@ -845,7 +850,12 @@ int count;
 	xleft += (timelabel_textwidth > ylabel_textwidth ? timelabel_textwidth : ylabel_textwidth)
 	    + ytic_width + ytic_textwidth;
 
-	if (xleft == (t->xmax) * xoffset) {
+	/* make sure xleft is wide enough for a negatively
+	 * x-offset horizontal timestamp
+	 */
+	if (!vertical_timelabel && xleft - ytic_width - ytic_textwidth < -(int) (timelabel.xoffset * (t->h_char)))
+	xleft = ytic_width + ytic_textwidth - (int) (timelabel.xoffset * (t->h_char));
+	if (xleft == (int)(0.5 + (t->xmax) * xoffset)) {
 	    /* make room for end of xtic or x2tic label */
 	    xleft += (int) ((t->h_char) * 2);
 	}
@@ -854,11 +864,6 @@ int count;
     } else
 	xleft += (int) (lmargin * (t->h_char));
 
-    /* make sure xleft is wide enough for a negatively
-     * x-offset horizontal timestamp
-     */
-    if (!vertical_timelabel && xleft - ytic_width - ytic_textwidth < -(int) (timelabel.xoffset * (t->h_char)))
-	xleft = ytic_width + ytic_textwidth - (int) (timelabel.xoffset * (t->h_char));
     /*  end of xleft calculation }}} */
 
 
@@ -913,7 +918,7 @@ int count;
 	    xright -= key_col_wth * key_cols;
 	    key_xl = xright + (int) (t->h_tic);
 	}
-	if (xright == (t->xmax) * (xsize + xoffset)) {
+	if (xright == (int)(0.5 + (t->xmax) * (xsize + xoffset))) {
 	    /* make room for end of xtic or x2tic label */
 	    xright -= (int) ((t->h_char) * 2);
 	}
@@ -929,7 +934,7 @@ int count;
 	double current_aspect_ratio;
 
 	if (aspect_ratio < 0 && (max_array[x_axis] - min_array[x_axis]) != 0.0) {
-	    current_aspect_ratio = -aspect_ratio * (max_array[y_axis] - min_array[y_axis]) / (max_array[x_axis] - min_array[x_axis]);
+	    current_aspect_ratio = -aspect_ratio * fabs((max_array[y_axis] - min_array[y_axis]) / (max_array[x_axis] - min_array[x_axis]));
 	} else
 	    current_aspect_ratio = aspect_ratio;
 
@@ -942,8 +947,6 @@ int count;
 		/* too tall */
 		ytop = ybot + required * (xright - xleft);
 	    } else {
-		/* HBB: y2label_x wasn't defined yet, and would be
-		 * overwritten later */
 		xright = xleft + (ytop - ybot) / required;
 	    }
 	}
@@ -973,18 +976,14 @@ int count;
     if (tmargin < 0 && x2tics & TICS_ON_BORDER && vertical_x2tics) {
 	widest_tic = 0;		/* reset the global variable ... */
 	gen_tics(SECOND_X_AXIS, &x2ticdef, 0, 0, 0.0, widest2d_callback);
-/* HBB: redid this: remove rough guess value first. Among other reasons,
- * I suspected the '-4 lines' of the original code to be in error, as the
- * original calc. of x2tic_textheight uses *5* lines */
 	ytop += x2tic_textheight;
-/* Now compute a new one and use that instead: */
+	/* Now compute a new one and use that instead: */
 	x2tic_textheight = (int) ((t->h_char) * (widest_tic));
 	ytop -= x2tic_textheight;
     }
     if (bmargin < 0 && xtics & TICS_ON_BORDER && vertical_xtics) {
 	widest_tic = 0;		/* reset the global variable ... */
 	gen_tics(FIRST_X_AXIS, &xticdef, 0, 0, 0.0, widest2d_callback);
-/* HBB: same changes as for tmargin/ytop above */
 	ybot -= xtic_textheight;
 	xtic_textheight = (int) ((t->h_char) * widest_tic);
 	ybot += xtic_textheight;
@@ -1002,14 +1001,14 @@ int count;
 
     y2label_y = ytop + x2tic_height + x2tic_textheight + y2label_textheight;
 
-    xlabel_y = ybot - xtic_height - xtic_textheight - xlabel_textheight + t->v_char;
+    xlabel_y = ybot - xtic_height - xtic_textheight - xlabel_textheight + xlablin*(t->v_char);
     ylabel_x = xleft - ytic_width - ytic_textwidth;
     if (*ylabel.text && can_rotate)
 	ylabel_x -= ylabel_textwidth;
 
     y2label_x = xright + y2tic_width + y2tic_textwidth;
     if (*y2label.text && can_rotate)
-	y2label_x += y2label_textwidth - t->v_char;
+	y2label_x += y2label_textwidth - y2lablin * t->v_char;
 
     if (vertical_timelabel) {
 	if (timelabel_bottom)
@@ -1019,7 +1018,7 @@ int count;
 	}
     } else {
 	if (timelabel_bottom)
-	    time_y = xlabel_y - timebot_textheight + xlabel_textheight;
+	    time_y = ybot - xtic_height - xtic_textheight - xlabel_textheight - timebot_textheight + t->v_char;
 	else if (ylabel_textheight > 0)
 	    time_y = ylabel_y + timetop_textheight;
 	else
@@ -1561,44 +1560,45 @@ int pcount;			/* count of plots in linked list */
 
     x_axis = FIRST_X_AXIS;
     y_axis = FIRST_Y_AXIS;	/* chose scaling */
-    axis_zero[FIRST_X_AXIS] = map_y(0.0);
-    axis_zero[FIRST_Y_AXIS] = map_x(0.0);
+    axis_zero[FIRST_Y_AXIS] = map_y(0.0);
+    axis_zero[FIRST_X_AXIS] = map_x(0.0);
 
-    if (axis_zero[FIRST_X_AXIS] < ybot || is_log_y)
-	axis_zero[FIRST_X_AXIS] = ybot;		/* save for impulse plotting */
-    else if (axis_zero[FIRST_X_AXIS] >= ytop)
-	axis_zero[FIRST_X_AXIS] = ytop;
+    if (axis_zero[FIRST_Y_AXIS] < ybot || is_log_y)
+	axis_zero[FIRST_Y_AXIS] = ybot;		/* save for impulse plotting */
+    else if (axis_zero[FIRST_Y_AXIS] >= ytop)
+	axis_zero[FIRST_Y_AXIS] = ytop;
     else if (xzeroaxis.l_type > -3) {
 	term_apply_lp_properties(&xzeroaxis);
-	(*t->move) (xleft, axis_zero[FIRST_X_AXIS]);
-	(*t->vector) (xright, axis_zero[FIRST_X_AXIS]);
+	(*t->move) (xleft, axis_zero[FIRST_Y_AXIS]);
+	(*t->vector) (xright, axis_zero[FIRST_Y_AXIS]);
     }
     if ((yzeroaxis.l_type > -3) && !is_log_x
-				&& axis_zero[FIRST_Y_AXIS] >= xleft
-				&& axis_zero[FIRST_Y_AXIS] < xright) {
+	&& axis_zero[FIRST_X_AXIS] >= xleft
+	&& axis_zero[FIRST_X_AXIS] < xright) {
 	term_apply_lp_properties(&yzeroaxis);
-	(*t->move) (axis_zero[FIRST_Y_AXIS], ybot);
-	(*t->vector) (axis_zero[FIRST_Y_AXIS], ytop);
+	(*t->move) (axis_zero[FIRST_X_AXIS], ybot);
+	(*t->vector) (axis_zero[FIRST_X_AXIS], ytop);
     }
     x_axis = SECOND_X_AXIS;
     y_axis = SECOND_Y_AXIS;	/* chose scaling */
-    axis_zero[SECOND_X_AXIS] = map_y(0.0);
-    axis_zero[SECOND_Y_AXIS] = map_x(0.0);
+    axis_zero[SECOND_Y_AXIS] = map_y(0.0);
+    axis_zero[SECOND_X_AXIS] = map_x(0.0);
 
-    if (axis_zero[SECOND_X_AXIS] < ybot || is_log_y2)
-	axis_zero[SECOND_X_AXIS] = ybot;	/* save for impulse plotting */
-    else if (axis_zero[SECOND_X_AXIS] >= ytop)
-	axis_zero[SECOND_X_AXIS] = ytop;
+    if (axis_zero[SECOND_Y_AXIS] < ybot || is_log_y2)
+	axis_zero[SECOND_Y_AXIS] = ybot;  /* save for impulse plotting */
+    else if (axis_zero[SECOND_Y_AXIS] >= ytop)
+	axis_zero[SECOND_Y_AXIS] = ytop;
     else if (x2zeroaxis.l_type > -3) {
 	term_apply_lp_properties(&x2zeroaxis);
-	(*t->move) (xleft, axis_zero[SECOND_X_AXIS]);
-	(*t->vector) (xright, axis_zero[SECOND_X_AXIS]);
+	(*t->move) (xleft, axis_zero[SECOND_Y_AXIS]);
+	(*t->vector) (xright, axis_zero[SECOND_Y_AXIS]);
     }
-    if ((y2zeroaxis.l_type > -3) && !is_log_x2 && axis_zero[SECOND_Y_AXIS] >= xleft &&
-	axis_zero[SECOND_Y_AXIS] < xright) {
+    if ((y2zeroaxis.l_type > -3) && !is_log_x2 &&
+	axis_zero[SECOND_X_AXIS] >= xleft &&
+	axis_zero[SECOND_X_AXIS] < xright) {
 	term_apply_lp_properties(&y2zeroaxis);
-	(*t->move) (axis_zero[SECOND_Y_AXIS], ybot);
-	(*t->vector) (axis_zero[SECOND_Y_AXIS], ytop);
+	(*t->move) (axis_zero[SECOND_X_AXIS], ybot);
+	(*t->vector) (axis_zero[SECOND_X_AXIS], ytop);
     }
     /* DRAW PLOT BORDER */
     if (draw_border) {
@@ -1841,7 +1841,7 @@ int pcount;			/* count of plots in linked list */
 	switch (this_plot->plot_style) {
 	    /*{{{  IMPULSE */
 	case IMPULSES:
-	    plot_impulses(this_plot, axis_zero[y_axis], axis_zero[x_axis]);
+	    plot_impulses(this_plot, axis_zero[x_axis], axis_zero[y_axis]);
 	    break;
 	    /*}}} */
 	    /*{{{  LINES */
@@ -1905,7 +1905,7 @@ int pcount;			/* count of plots in linked list */
 	    /*}}} */
 	    /*{{{  BOXXYERROR */
 	case BOXXYERROR:
-	    plot_boxes(this_plot, axis_zero[x_axis]);
+	    plot_boxes(this_plot, axis_zero[y_axis]);
 	    break;
 	    /*}}} */
 	    /*{{{  BOXERROR (falls through to) */
@@ -1916,7 +1916,7 @@ int pcount;			/* count of plots in linked list */
 	    /*}}} */
 	    /*{{{  BOXES */
 	case BOXES:
-	    plot_boxes(this_plot, axis_zero[x_axis]);
+	    plot_boxes(this_plot, axis_zero[y_axis]);
 	    break;
 	    /*}}} */
 	    /*{{{  VECTOR */
@@ -4413,7 +4413,9 @@ tic_callback callback;		/* fn to call to actually do the work */
 			    gstrftime(label, 24, ticfmt[axis], (double) user);
 			} else if (polar) {
 			    /* if rmin is set, we stored internally with r-rmin */
-#if 0				/* Igor's polar-grid patch */
+/* Igor's polar-grid patch */
+#if 1
+			    /* HBB 990327: reverted to 'pre-Igor' version... */
 			    double r = fabs(user) + (autoscale_r & 1 ? 0 : rmin);
 #else
 			    /* Igor removed fabs to allow -ve labels */
