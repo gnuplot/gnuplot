@@ -1,8 +1,16 @@
+2001-09-17  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/save.c (save_set_all): Fixed saving of 'set grid'. Was
+ 	completely broken since my change to store gridding status in the
+ 	axis structs.
+
+	* src/unset.c (unset_style): Removed incorrect c_token increase.
+
 2001-09-16  James R. Van Zandt  <jrv@vanzandt.mv.com>
 
 	* src/datafile.c: New function df_showdata() displays the current
-	data file line (up to 77 characters, including leading spaces) for
-	an error message.
+ 	data file line (up to 77 characters, including leading spaces) for
+ 	an error message.
 
 	* src/datafile.h: export df_showdata(), but not df_filename or
 	df_string.
