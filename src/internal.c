@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: internal.c,v 1.14 2002/03/07 17:58:11 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: internal.c,v 1.15 2002/03/09 17:48:39 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - internal.c */
@@ -94,7 +94,7 @@ math exception : %s\n\
 #endif
 }
 
-#define BAD_DEFAULT default: int_error(NO_CARET, "interal error : type neither INT or CMPLX"); return;
+#define BAD_DEFAULT default: int_error(NO_CARET, "internal error : type neither INT or CMPLX"); return;
 
 void
 f_push(x)
