@@ -1619,5 +1619,6 @@ char patchlevel[] = "beta 347pl3";
 char date[] = "Mon Jun 22 13:22:33 BST 1998"; 
 char gnuplot_copyright[] = "Copyright(C) 1986 - 1993, 1998";
 
+char faq_location[] = FAQ_LOCATION;
 char bug_email[] = CONTACT;
 char help_email[] = HELPMAIL;
