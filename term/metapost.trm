@@ -1,5 +1,5 @@
 /*
- * $Id: metapost.trm,v 1.8 1999/09/21 18:31:49 lhecking Exp $
+ * $Id: metapost.trm,v 1.9 1999/10/01 15:09:12 lhecking Exp $
  */
 
 /* GNUPLOT - metapost.trm */
@@ -88,8 +88,10 @@ TERM_PUBLIC void MP_boxfill __PROTO((int style,
 #define MP_YSIZE 3.0
 
 /* gnuplot units will be one pixel if printing device has this
-   resolution */
-#define MP_DPI (300)
+   resolution. Too small resolutions (like 300) can give rough
+   appearence to curves when user tries to smooth a curve by choosing
+   high sampling rate. */
+#define MP_DPI (2400)
 
 #define MP_XMAX (MP_XSIZE*MP_DPI)
 #define MP_YMAX (MP_YSIZE*MP_DPI)
@@ -161,7 +163,7 @@ enum MP_id {
 
 static struct gen_table MP_opts[] = 
 {
-    { "m$onochrome", MP_MONOCHROME },
+    { "mo$nochrome", MP_MONOCHROME },
     { "c$olor", MP_COLOR },
     { "c$olour", MP_COLOR },
     { "s$olid", MP_SOLID },
@@ -169,7 +171,7 @@ static struct gen_table MP_opts[] =
     { "n$otex", MP_NOTEX },
     { "t$ex", MP_TEX },
     { "de$fault", MP_DEFAULT },
-    { "m$agnification", MP_MAGNIFICATION },
+    { "ma$gnification", MP_MAGNIFICATION },
     { NULL, MP_OTHER }
 };
 
@@ -263,6 +265,7 @@ MP_init()
     MP_posx = MP_posy = 0;
     fprintf(gpoutfile, "%%GNUPLOT Metapost output: %s\n", asctime(localtime(&now)));
     fputs("\n\
+warningcheck:=0;\n\
 defaultmpt:=mpt:=4;\n\
 th:=.6;\n\
 \n\
@@ -280,8 +283,8 @@ vardef makepic(expr str) =\n\
   fi\n\
 enddef;\n\
 \n\
-def	infontsize(expr str, size) =\n\
-  infont str scaled (size /	fontsize str)\n\
+def infontsize(expr str, size) =\n\
+  infont str scaled (size / fontsize str)\n\
 enddef;\n",
 	  gpoutfile);
 
@@ -400,10 +403,15 @@ MP_graphics()
     MP_oldline = -2;
     MP_oldpen = 1.0;
     MP_oldptsize = pointsize;
-    fprintf(gpoutfile, "\nbeginfig(%d);\nw:=%gin;h:=%gin;\n",
+    fprintf(gpoutfile, "\nbeginfig(%d);\nw:=%.3fin;h:=%.3fin;\n",
 	    MP_char_code, MP_xsize, MP_ysize);
-    fprintf(gpoutfile, "a:=w/%d;b:=h/%d;\n", term->xmax, term->ymax);
-    fprintf(gpoutfile, "scalepen 1; ptsize %g;linetype -2;\n", pointsize);
+    /* MetaPost can only handle numbers up to 4096. When MP_DPI
+       is larger than 819, this is exceeded by (term->xmax). So we
+       scale it and all coordinates down by factor of 10.0. And
+       compensate by scaling a and b up.
+    */
+    fprintf(gpoutfile, "a:=w/%.1f;b:=h/%.1f;\n", (term->xmax)/10.0, (term->ymax)/10.0);
+    fprintf(gpoutfile, "scalepen 1; ptsize %.3f;linetype -2;\n", pointsize);
     MP_char_code++;
 }
 
@@ -458,7 +466,8 @@ int pt;
 
     if (pointtype >= MP_POINT_TYPES)
 	pointtype %= MP_POINT_TYPES;
-    fprintf(gpoutfile, "gpdraw(%d,%da,%db);\n", pointtype, x, y);
+/* Change %d to %f, divide x,y by 10 */
+    fprintf(gpoutfile, "gpdraw(%d,%.1fa,%.1fb);\n", pointtype, x/10.0, y/10.0);
 }
 
 TERM_PUBLIC void
@@ -468,7 +477,7 @@ double ps;
     if (MP_oldptsize != ps) {
 	if (MP_inline)
 	    MP_endline();
-	fprintf(gpoutfile, "ptsize %g;\n", ps);
+	fprintf(gpoutfile, "ptsize %.3f;\n", ps);
 	MP_oldptsize = ps;
     }
 }
@@ -481,7 +490,7 @@ double lw;
     if (MP_oldpen != lw) {
 	if (MP_inline)
 	    MP_endline();
-	fprintf(gpoutfile, "scalepen %g;\n", lw);
+	fprintf(gpoutfile, "scalepen %.3f;\n", lw);
 	MP_oldpen = lw;
     }
 }
@@ -502,12 +511,12 @@ unsigned int uy;
 	}
     } else {
 	MP_inline = TRUE;
-	fprintf(gpoutfile, "draw (%da,%db)", MP_posx, MP_posy);
+	fprintf(gpoutfile, "draw (%.1fa,%.1fb)", MP_posx/10.0, MP_posy/10.0);
 	MP_linecount = 2;
     }
     MP_posx = ux;
     MP_posy = uy;
-    fprintf(gpoutfile, "--(%da,%db)", MP_posx, MP_posy);
+    fprintf(gpoutfile, "--(%.1fa,%.1fb)", MP_posx/10.0, MP_posy/10.0);
 }
 
 static void
@@ -527,11 +536,11 @@ TBOOLEAN head;
 {
     MP_move(sx, sy);
     if (head) {
-	fprintf(gpoutfile, "drawarrow (%da,%db)--(%da,%db);\n",
-		sx, sy, ex, ey);
+	fprintf(gpoutfile, "drawarrow (%.1fa,%.1fb)--(%.1fa,%.1fb);\n",
+		sx/10.0, sy/10.0, ex/10.0, ey/10.0);
     } else if ((sx != ex) || (sy != ey)) {
-	fprintf(gpoutfile, "draw (%da,%db)--(%da,%db);\n",
-		sx, sy, ex, ey);
+	fprintf(gpoutfile, "draw (%.1fa,%.1fb)--(%.1fa,%.1fb);\n",
+		sx/10.0, sy/10.0, ex/10.0, ey/10.0);
     }				/* else: arrow with no length and no head = sound of one hand clapping? */
     MP_posx = ex;
     MP_posy = ey;
@@ -574,19 +583,19 @@ const char str[];
 		text[i] = '\'';	/* Replace " with ' */
 	if (MP_fontchanged) {
 	    fprintf(gpoutfile, "\
-put_text(\"%s\" infontsize(\"%s\",%5.2f), %da, %db, %d, %d);\n",
-		    text, MP_fontname, MP_fontsize, x, y, MP_ang, j);
+put_text(\"%s\" infontsize(\"%s\",%5.2f), %.1fa, %.1fb, %d, %d);\n",
+		    text, MP_fontname, MP_fontsize, x/10.0, y/10.0, MP_ang, j);
 	} else {
-	    fprintf(gpoutfile, "put_text(\"%s\", %da, %db, %d, %d);\n",
-		    text, x, y, MP_ang, j);
+	    fprintf(gpoutfile, "put_text(\"%s\", %.1fa, %.1fb, %d, %d);\n",
+		    text, x/10.0, y/10.0, MP_ang, j);
 	}
     } else if (MP_fontchanged) {
 	fprintf(gpoutfile, "\
-put_text( btex \\setfont{%s}{%5.2f} %s etex, %da, %db, %d, %d);\n",
-		MP_fontname, MP_fontsize, text, x, y, MP_ang, j);
+put_text( btex \\setfont{%s}{%5.2f} %s etex, %.1fa, %.1fb, %d, %d);\n",
+		MP_fontname, MP_fontsize, text, x/10.0, y/10.0, MP_ang, j);
     } else {
-	fprintf(gpoutfile, "put_text( btex %s etex, %da, %db, %d, %d);\n",
-		text, x, y, MP_ang, j);
+	fprintf(gpoutfile, "put_text( btex %s etex, %.1fa, %.1fb, %d, %d);\n",
+		text, x/10.0, y/10.0, MP_ang, j);
     }
 
     free(text);
@@ -647,8 +656,9 @@ unsigned int x1, y1, wd, ht;
 	MP_endline();
     if (sty <= 0)
 	fprintf(gpoutfile, "\
-fill (%da,%db)--(%da,%db)--(%da,%db)--(%da,%db)--cycle withcolor background;\n",
-		x1, y1, x1 + wd, y1, x1 + wd, y1 + ht, x1, y1 + ht);
+fill (%.1fa,%.1fb)--(%.1fa,%.1fb)--(%.1fa,%.1fb)--(%.1fa,%.1fb)--cycle withcolor background;\n",
+		x1/10.0, y1/10.0, (x1 + wd)/10.0, y1/10.0, (x1 + wd)/10.0, (y1 +
+  ht)/10.0, x1/10.0, (y1 + ht)/10.0);
 }
 
 #endif /* TERM_BODY */
