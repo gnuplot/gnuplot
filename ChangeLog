@@ -1,3 +1,14 @@
+2002-08-30  Ethan Merritt <merritt@u.washington.edu>
+
+        * src/term.c term/amiga.trm term/cgm.trm term/epslatex.trm 
+        term/metapost.trm term/next.trm term/openstep.trm term/post.trm
+        term/x11.trm:  Remove global default font from term.c and make all
+        drivers keep their own default font so they don't cross-contaminate.
+
+        * src/graphics.c src/save.c src/set.c src/show.c docs/gnuplot.doc
+        demo/fillbox.dem demo/candlesticks.dem demo/candlesticks.dat:
+        Add new filledbox style options 'bsolid' and 'bpattern'.
+
 2002-08-30  Volker Dobler  <v.dobler@web.de>
 
 	* NEWS demo/all.dem demo/pm3dcolors.dem demo/pm3dgamma.dem
@@ -12,7 +23,7 @@
 2002-08-28  Ethan Merritt <merritt@u.washington.edu>
 
 	* docs/gnuplot.doc term/hpgl.trm term/epslatex.trm:
-	Spell-check and fix several typos in documentation.
+	Spell-check and fix typos in documentation.
 
 2002-08-28  Ethan Merritt <merritt@u.washington.edu>
 
@@ -1023,7 +1034,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/08/29 04:10:08 $).
+	last modification date (from the tag $Date: 2002/08/30 18:45:44 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
