@@ -1,5 +1,5 @@
 /*
- * $Id: stdfn.h,v 1.17.2.1 1999/10/15 16:04:51 lhecking Exp $
+ * $Id: stdfn.h,v 1.17.2.2 2002/03/11 16:05:15 lhecking Exp $
  *
  */
 
@@ -221,12 +221,13 @@ extern int errno;
 # endif /* HAVE_VALUES_H */
 #endif /* !NO_LIMITS_H */
 
-#ifdef NO_TIME_H
-# ifndef time_t /* should be #defined by config.h, then... */
-#  define time_t long
-# endif
-#else
-# include <time.h> /* ctime etc, should also define time_t and struct tm */
+/* ctime etc, should also define time_t and struct tm */
+#ifndef NO_TIME_H
+# include <time.h>
+#endif
+
+#ifndef HAVE_TIME_T_IN_TIME_H
+# define time_t long
 #endif
 
 #if defined(PIPES) && (defined(VMS) || (defined(OSK) && defined(_ANSI_EXT))) || defined(PIPES) && defined(AMIGA_SC_6_1)
