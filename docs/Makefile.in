@@ -41,7 +41,7 @@ INSTALL_DATA = @INSTALL_DATA@
 CC     = @CC@
 DEFS   = @DEFS@
 CFLAGS = @CFLAGS@
-INCLUDES = -I.. -I$(top_srcdir)/src -I$(top_srcdir)/../term -I.
+INCLUDES = -I.. -I$(top_srcdir)/src -I$(top_srcdir)/term -I.
 LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
 
