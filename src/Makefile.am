@@ -1,19 +1,16 @@
 ## Process this file with automake to produce Makefile.in -*-Makefile-*-
 AUTOMAKE_OPTIONS = ansi2knr foreign 1.2h
 
-EXTRA_PROGRAMS = gnuplot_x11
-
-bin_PROGRAMS = gnuplot @GNUPLOT_X11@ bf_test
-
 # Where to send email about bugs and comments (locally)
 EMAIL = bug-gnuplot@dartmouth.edu
 
 # Help file location
 HELPFILE=$(datadir)/gnuplot.gih
 
+EXTRA_PROGRAMS = gnuplot_x11
+bin_PROGRAMS = gnuplot @GNUPLOT_X11@ bf_test
+
 # There is probably no need to edit anything below this line
-TERMLIBS = @TERMLIBS@
-TERMXLIBS = @TERMXLIBS@
 XLIBS = @LIBRARIES_FOR_X@
 AM_CPPFLAGS = -I../term -I$(top_srcdir)/term -DBINDIR=\"$(bindir)\" -DCONTACT=\"$(EMAIL)\" -DHELPFILE=\"$(HELPFILE)\"
 
