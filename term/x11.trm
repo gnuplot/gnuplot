@@ -1,5 +1,5 @@
 /*
- * $Id: x11.trm,v 1.79 2003/08/05 05:25:59 sfeam Exp $
+ * $Id: x11.trm,v 1.80 2003/08/22 12:36:18 lhecking Exp $
  *
  */
 
@@ -1057,7 +1057,7 @@ X11_set_font(const char *fontname)
     return( TRUE );
 }
 
-void
+static void
 X11_set_default_font()
 {
     PRINT1("QD%s\n",X11_default_font);

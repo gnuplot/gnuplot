@@ -1,6 +1,25 @@
+2003-09-12  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	Part II of portability glitches reported by Scott Marovich from HP
+ 	labs:
+	
+	* term/x11.trm (X11_set_default_font): Made static to match
+ 	declaration.
+	
+	* term/png.trm (png_default_write_data) [PNG_NO_STDIO] : New
+ 	callback function to be used if libpng was built with the
+ 	PNG_NO_STDIO option.
+	(PNG_text) [PNG_NO_STDIO]: Use it instead of png_init_io.
+
+	* configure.in (--with-png): Test for png_create_write_struct
+ 	instead of png_init_io, since the latter can be removed from
+ 	libpng at build time.
+	(--with-pdf): Remove spurious comma in test for libpdf and
+ 	pdflib.h precence.
+
 2003-09-11  Petr Mikulik  <mikulik@physics.muni.cz>
 
-	*  src/term.c (test_term): Fixed incomplete if statement.
+	* src/term.c (test_term): Fixed incomplete if statement.
 
 2003-09-08  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 

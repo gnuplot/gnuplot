@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.in,v 1.132 2003/07/23 23:58:52 sfeam Exp $
+dnl $Id: configure.in,v 1.133 2003/08/29 11:41:08 broeker Exp $
 dnl
 AC_INIT(src/graphics.c)
 AM_CONFIG_HEADER(config.h:config.hin)
@@ -383,14 +383,14 @@ if test "$with_png" != no; then
   CPPFLAGS="$CPPFLAGS $libpng_CPPFLAGS"
   LDFLAGS="$LDFLAGS $libpng_LDFLAGS"
 
-  AC_CHECK_LIB(png,png_init_io,
+  AC_CHECK_LIB(png,png_create_write_struct,
     AC_DEFINE(HAVE_LIBPNG,1,[ Define if you have the png library. ]),,[-lz -lm])
 
   AC_CHECK_HEADERS(png.h,,
     [AC_CHECK_HEADERS(libpng/png.h,
        [libpng_CPPFLAGS="$libpng_CPPFLAGS/libpng"])])
 
-  if test "$ac_cv_lib_png_png_init_io" = yes ; then
+  if test "$ac_cv_lib_png_png_create_write_struct" = yes ; then
     AC_EGREP_CPP([You lose],[#include "png.h"
 #if PNG_LIBPNG_VER < 89
 You lose.
@@ -528,7 +528,7 @@ if test "$with_pdf" != no; then
   LDFLAGS="$LDFLAGS $libpdf_LDFLAGS"
 
   AC_CHECK_LIB(pdf,PDF_get_majorversion,
-    [AC_DEFINE(HAVE_LIBPDF,1,[ Define if you have the pdf library. ]),
+    [AC_DEFINE(HAVE_LIBPDF,1,[ Define if you have the pdf library. ])
      AC_CHECK_HEADERS(pdflib.h,,
        AC_MSG_WARN([please add path to pdflib.h to CPPFLAGS in Makefile]))
     ],

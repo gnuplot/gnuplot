@@ -1,5 +1,5 @@
 /*
- * $Id: png.trm,v 1.38 2002/12/18 17:38:53 lhecking Exp $
+ * $Id: png.trm,v 1.39 2003/02/18 16:38:13 broeker Exp $
  *
  */
 
@@ -135,6 +135,22 @@ static struct gen_table PNG_opts[] =
     { "pics$ize", PNG_PICSIZE },
     { NULL, PNG_OTHER }
 };
+#ifdef PNG_NO_STDIO
+
+/* NOTE:  Some sites configure their version of the GNU PNG Library without
+ *        Standard I/O Library interfaces in order to avoid unnecessary inter-
+ * library dependencies at link time for applications that don't need Standard
+ * I/O.  If you site is one of these, the following skeletal stubs, copied from
+ * PNG Library code, should be enough for this module.  --Scott B. Marovich,
+ * Hewlett-Packard Laboratories, July 2002.
+ */
+static void
+png_default_write_data(png_structp png_ptr, png_bytep data, png_size_t length)
+{
+   if (fwrite(data, 1, length, (FILE *)png_ptr->io_ptr) != length)
+     png_error(png_ptr, "Write Error");
+}
+#endif /* PNG_NO_STDIO */
 
 TERM_PUBLIC void
 PNG_options()
@@ -403,9 +419,11 @@ PNG_text()
     png_info_init(info_ptr);
     png_write_init(png_ptr); */
 #endif /* __OLD_PNGLIB__ */
-
+#ifdef PNG_NO_STDIO
+    png_set_write_fn(png_ptr, gpoutfile, png_default_write_data, NULL);
+#else /* not PNG_NO_STDIO */
     png_init_io(png_ptr, gpoutfile);
-
+#endif /* PNG_NO_STDIO */
     info_ptr->width = b_ysize;
     info_ptr->height = b_xsize;
 
