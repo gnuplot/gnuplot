@@ -330,72 +330,107 @@ a reply to you.  There is a form for such postings on the WWW site.
 
 @cindex new-features
 
-The previous official release of gnuplot was version 3.7.  Gnuplot version 4.0
-contains many new features, which were gradually introduced into a series of  
-development snapshots 3.8a through 3.8k.  This section lists major
-additions and gives a partial list of changes and minor new features.
-Sample gnuplot scripts demonstrating many of these features are provided
-in the gnuplot distribution, and are referred to here by name.
+The previous official release of gnuplot was version 3.7, with subversions up to
+3.7.3. Gnuplot version 4.0 contains many new features, which were gradually
+introduced into a series of development snapshots 3.8a through 3.8k. This
+section lists major additions and gives a partial list of changes and minor
+new features. Sample gnuplot scripts demonstrating many of these features are
+provided in the gnuplot distribution, and are referred to here by name.
 
 
 @menu
-* Mouse_support::               
-* New_plotting_style_PM3D::     
-* New_terminal_types::          
+* Mouse_and_hotkey_support_in_interactive_terminals::  
+* New_terminal_features::       
+* New_plot_style_@ref{pm3d}::   
 * New_plot_style_`filledcurves`::  
 * Filled_boxes::                
 * New_plot_option_smooth_frequency::  
 * Improved_text_options::       
-* Data_file_format::            
+* More_text_encodings::         
 * Arrows::                      
-* PostScript_output_features::  
-* X11_output_features::         
+* Data_file_format::            
 * Other_changes_and_additions::  
+* Accompanying_documentation::  
 @end menu
 
-@node Mouse_support, New_plotting_style_PM3D, What_is_New_in_Version_4.0, What_is_New_in_Version_4.0
-@subsection Mouse support
+@node Mouse_and_hotkey_support_in_interactive_terminals, New_terminal_features, What_is_New_in_Version_4.0, What_is_New_in_Version_4.0
+@subsection Mouse and hotkey support in interactive terminals
 
 
-Interaction with the current plot via mouse and hotkey input is supported for
-the X11, OS/2, ggi and windows terminals. See `mouse input` for more 
-information on mousing. See @ref{bind} for information on hotkeys. Also see 
-the documentation for individual mousing terminals `ggi`, `pm`, `windows` and 
-`x11`.
+Interaction with the current plot via mouse and hotkeys is supported for
+the X11, OS/2 Presentation Manager, ggi and windows terminals. See
+`mouse input` for more information on mousing. See @ref{bind} for information
+on hotkeys. Also see the documentation for individual mousing terminals `ggi`,
+`pm`, `windows` and `x11`.
+
+Here are briefly some useful hotkeys.
+Hit 'h' in the interactive interval for help. Hit 'm' to switch mousing on/off.
+Hit 'g' for grid, 'l' for log and 'e' for replot.
+Hit 'r' for ruler to measure peak distances (linear scale) or peak ratios (log
+scale), and '5' for polar coordinates inside a map.
+Zoom by mouse (MB3), and move in the zoom history by 'p', 'u', 'n'; hit 'a' for
+autoscale.
+Use other mouse buttons to put current mouse coordinates to clipboard (double
+click of MB1), add temporarily or permanently labels to the plot (middle mouse
+button MB2).
+Rotate a 3D surface by mouse. 
+Hit spacebar to switch to the gnuplot command window.
 
 Sample script: mousevariables.dem
 
 
-@node New_plotting_style_PM3D, New_terminal_types, Mouse_support, What_is_New_in_Version_4.0
-@subsection New plotting style PM3D
+@node New_terminal_features, New_plot_style_@ref{pm3d}, Mouse_and_hotkey_support_in_interactive_terminals, What_is_New_in_Version_4.0
+@subsection New terminal features
 
 
-The `splot` command is now capable of plotting generates 2D and 3D surfaces 
-coloured by greyscale or color palettes. See @ref{pm3d}, @ref{palette}, 
+`aqua`: New terminal for Mac OS X.
+
+`epslatex`: New terminal. Prepares eps figures for inclusion in LaTeX documents.
+
+`gif`: Support for this terminal has been dropped in favour of the `png`
+format for legal reasons; under usual configure conditions, old scripts that
+request gif will work but will produce a `png` file instead.
+
+`ggi`: New full-screen interactive terminal for Linux. Interface to the
+General Graphics Interface Library.
+
+`pdf`: New terminal exporting Adobe Portable Document Format. Requires libpdf.
+
+`png` and `jpeg`: Support for both PNG and JPEG image output is provided by a
+new driver via libgd. The new driver supports many more features than the
+old png driver, including TrueType fonts. Requires libgd.
+
+@ref{postscript}: The PostScript driver now provides an oblique symbol font, and
+allows run-time inclusion of embedded PostScript fonts. It also supports
+additional character encodings. See `postscript fontfile` and @ref{encoding}.
+
+Sample script: fontfile.dem
+
+`svg`: New terminal exporting Scalable Vector Graphics.
+
+`x11`: The X-windows driver now allows you to specify fonts, see
+`set term x11 x11_fonts`. There is no longer a limit to the number of x11 plot
+windows opened simultaneously, and each plot window can be given its own
+title. See `set term x11`.
+
+
+@node New_plot_style_@ref{pm3d}, New_plot_style_`filledcurves`, New_terminal_features, What_is_New_in_Version_4.0
+@subsection New plot style @ref{pm3d}
+
+
+The `splot` command is now capable of plotting 2D maps and 3D surfaces 
+colored by greyscale or color palettes. See @ref{pm3d}, @ref{palette}, 
 @ref{cbrange}, `set view map`, `set colorbox` and @ref{palette}.
 
-Sample script: pm3d.dem
+Sample scripts: pm3d.dem pm3dcolors.dem pm3dgamma.dem
 
 
-@node New_terminal_types, New_plot_style_`filledcurves`, New_plotting_style_PM3D, What_is_New_in_Version_4.0
-@subsection New terminal types
-
-
-@example
- epslatex - prepares eps figures for inclusion in latex documents
- ggi      - interface to the General Graphics Interface Library
- pdf      - Adobe Portable Document Format, requires libpdf 
- png/jpeg - Support for both PNG and JPEG image output is provided by a
-            a new driver via libgd. The new driver supports many more features
-            than the old png driver, including TrueType fonts. Requires libgd.
- svg      - Scalable Vector Graphics
-
-@end example
-
-
-@node New_plot_style_`filledcurves`, Filled_boxes, New_terminal_types, What_is_New_in_Version_4.0
+@node New_plot_style_`filledcurves`, Filled_boxes, New_plot_style_@ref{pm3d}, What_is_New_in_Version_4.0
 @subsection New plot style `filledcurves`
 
+
+The style `filledcurves` allows to fill an area between the drawn curve and a
+horizontal line.
 
 Sample script: fillcrvs.dem
 
@@ -421,7 +456,7 @@ or approximation of data.  See @ref{smooth}, `frequency`, `unique`.
 Sample scripts: step.dem mgr.dem
 
 
-@node Improved_text_options, Data_file_format, New_plot_option_smooth_frequency, What_is_New_in_Version_4.0
+@node Improved_text_options, More_text_encodings, New_plot_option_smooth_frequency, What_is_New_in_Version_4.0
 @subsection Improved text options
 
 
@@ -435,19 +470,17 @@ include dumb, jpeg, pdf, pm, png, postscript, and x11. See `enhanced text`.
 Sample scripts: textcolor.dem textrotate.dem
 
 
-@node Data_file_format, Arrows, Improved_text_options, What_is_New_in_Version_4.0
-@subsection Data file format
+@node More_text_encodings, Arrows, Improved_text_options, What_is_New_in_Version_4.0
+@subsection More text encodings
 
 
-The new `set datafile` command can be used to specify information about the
-format of input data files, including the characters used to separate fields, 
-to indicate comment lines, and to specify missing data.  Gnuplot now attempts 
-to recognize text fields with embedded blanks as single entities based on the 
-datafile format settings.  This allows input from csv (comma-separated value)
-files. See `set datafile`.
+Several terminals, including @ref{postscript}, `x11` and `pm`, support additional
+text `encodings`: ISO 8859-1 (Latin 1), ISO 8859-2 (Latin 2), ISO 8859-15 
+(variant of 8859-1 with Euro sign), KOI8-R (cyrillic), and miscellaneous
+codepages. See @ref{encoding} for more details.
 
 
-@node Arrows, PostScript_output_features, Data_file_format, What_is_New_in_Version_4.0
+@node Arrows, Data_file_format, More_text_encodings, What_is_New_in_Version_4.0
 @subsection Arrows
 
 
@@ -458,29 +491,19 @@ See @ref{arrow}, `plotting styles vectors`.
 Sample script: arrowstyle.dem
 
 
-@node PostScript_output_features, X11_output_features, Arrows, What_is_New_in_Version_4.0
-@subsection PostScript output features
+@node Data_file_format, Other_changes_and_additions, Arrows, What_is_New_in_Version_4.0
+@subsection Data file format
 
 
-The PostScript driver now provides an oblique symbol font, and allows run-time
-inclusion of embedded PostScript fonts. It also supports ISO-8859-2 and 
-CP-852 character encodings. See `postscript fontfile`.
-
-Sample script: fontfile.dem
-
-
-@node X11_output_features, Other_changes_and_additions, PostScript_output_features, What_is_New_in_Version_4.0
-@subsection X11 output features
+The new `set datafile` command can be used to specify information about the
+format of input data files, including the characters used to separate fields, 
+to indicate comment lines, and to specify missing data.  Gnuplot now attempts 
+to recognize text fields with embedded blanks as single entities based on the 
+datafile format settings.  This allows input from csv (comma-separated value)
+files such as those exported by spreadsheet programs. See `set datafile`.
 
 
-The X-windows driver now allows you to specify fonts, text rotation, and text
-color.  It also allows interaction with the current plot using the mouse and 
-hotkeys. See `set term x11 x11_fonts`.  There is no longer a limit to the 
-number of x11 plot windows opened simultaneously, and each plot window can be
-given its own title.  See `set term x11`.
-
-
-@node Other_changes_and_additions,  , X11_output_features, What_is_New_in_Version_4.0
+@node Other_changes_and_additions, Accompanying_documentation, Data_file_format, What_is_New_in_Version_4.0
 @subsection Other changes and additions
 
 
@@ -506,11 +529,40 @@ specify point style and text style (font, rotation, etc). User variables
 can be included in labels via format specifiers in the label text.
 See @ref{label}.
 
-New command `set view map` to select 2D projection view of 3D surface plot.
+New command `set view map` to select top-view 2D projection of 3D surface plot.
 
-New commands `set term push` and `set term pop`.
+New commands `set term push` and `set term pop` to achieve platform
+independent restoring of the terminal after printing,
 
-The `load` command accepts piped input.
+The `load` and @ref{save} commands accept piped input and output, respectively.
+
+The `history` command (for gnuplot with its own readline, not with GNU
+readline) now includes several useful options.
+
+The MS Windows package includes an additional executable `pgnuplot.exe` to
+support piping command through standard input, which is otherwise not
+available for graphical applications on this system.
+
+
+@node Accompanying_documentation,  , Other_changes_and_additions, What_is_New_in_Version_4.0
+@subsection Accompanying documentation
+
+
+In directory docs/psdocs/ you may find new information in the gnuplot output
+postscript file guide, list of postscript symbols in different encodings.
+
+Improved FAQ. Please read it before asking your question in a public forum.
+
+There are plenty of new demos *.dem in the demo/ directory. Please run them,
+for example by
+@example
+      load "all.dem"
+@end example
+
+before asking for help.  Plots produced by the demo scripts can also be viewed
+at 
+@uref{http://gnuplot.sourceforge.net/demo/,http://gnuplot.sourceforge.net/demo/
+}
 
 
 @node Batch/Interactive_Operation, Command-line-editing, What_is_New_in_Version_4.0, gnuplot
@@ -634,7 +686,7 @@ The Atari version of readline defines some additional key aliases:
       Ctrl Home       - same as ^E.
       Esc             - same as ^U.
       Help            - @ref{help} plus return.
-      Ctrl Help       - @ref{help}.
+      Ctrl Help       - `help `.
 
 @end example
 
@@ -1713,7 +1765,7 @@ data file, is a subset of a datablock.
 @section mouse input
 
 @c ?mouse input
-The `x11`, `windows`, `ggi` and `pm` terminals allow interaction with the
+The `x11`, `pm`, `windows`, and `ggi` terminals allow interaction with the
 current plot using the mouse. They also support the definition of hotkeys
 to activate pre-defined functions by hitting a single key while the mouse
 focus is in the active plot window.  It is even possible to combine mouse
@@ -5963,18 +6015,14 @@ The second example sets the second variable to s.
 @c ?commands set encoding
 @c ?commands show encoding
 @c ?set encoding
-@c ?set encoding iso_8859_1
 @c ?show encoding
 @cindex encoding
 @opindex encoding
 
 
-The @ref{encoding} command selects a character encoding.  Valid values are
-`default`, which tells a terminal to use its default; `iso_8859_1` (known in
-the PostScript world as `ISO-Latin1`), which is used on many Unix workstations
-and with MS-Windows; `iso_8859_2`, used in Central and Eastern Europe; `cp850`
-and `cp852` for OS/2; and `cp437`, for MS-DOS.
+@cindex encodings
 
+The @ref{encoding} command selects a character encoding.
 Syntax:
 @example
       set encoding @{<value>@}
@@ -5982,6 +6030,22 @@ Syntax:
 
 @end example
 
+Valid values are
+@example
+   default     - tells a terminal to use its default encoding
+   iso_8859_1  - the most common Western European font used by many 
+                 Unix workstations and by MS-Windows. This encoding is
+                 known in the PostScript world as 'ISO-Latin1'.
+   iso_8859_2  - used in Central and Eastern Europe
+   iso_8859_15 - a variant of iso_8859_1 that includes the Euro symbol
+   cp850       - codepage for OS/2
+   cp852       - codepage for OS/2
+   cp437       - codepage for MS-DOS
+   koi8r       - popular Unix cyrillic encoding
+
+@end example
+
+Generally you must set the encoding before setting the terminal type.
 Note that encoding is not supported by all terminal drivers and that
 the device must be able to produce the desired non-standard characters.
 The PostScript and X11 terminals support all encodings. OS/2 Presentation
@@ -9622,7 +9686,6 @@ to you, depending on its output format.
 * kyo::                         
 * latex::                       
 * linux::                       
-* linux_::                      
 * macintosh::                   
 * mf::                          
 * mp::                          
@@ -9643,6 +9706,7 @@ to you, depending on its output format.
 * regis_::                      
 * rgip::                        
 * sun::                         
+* sun_::                        
 * svg::                         
 * tek410x::                     
 * tek410x_::                    
@@ -11933,7 +11997,7 @@ The other label -- account for long ticlabels:
 
 @end example
 
-@node linux, linux_, latex, terminal
+@node linux, macintosh, latex, terminal
 @subsubsection linux
 
 @c ?commands set terminal linux
@@ -11950,24 +12014,7 @@ environment variable GSVGAMODE for the default mode; if not set, it uses
 1024x768x256 as default mode or, if that is not possible, 640x480x16
 (standard VGA)."
 
-@node linux_, macintosh, linux, terminal
-@subsubsection linux
-
-@c ?commands set terminal linux
-@c ?set terminal linux
-@c ?set term linux
-@c ?terminal linux
-@c ?term linux
-@cindex linux
-@tmindex linux
-
-
-The `linux` driver has no additional options to specify.  It looks at the
-environment variable GSVGAMODE for the default mode; if not set, it uses
-1024x768x256 as default mode or, if that is not possible, 640x480x16
-(standard VGA)."
-
-@node macintosh, mf, linux_, terminal
+@node macintosh, mf, linux, terminal
 @subsubsection macintosh
 
 @c ?set terminal macintosh
@@ -12683,8 +12730,8 @@ Syntax:
 
 where <mode> is `landscape`, `portrait`, `eps` or `default`;
 `enhanced` enables enhanced text mode features (subscripts,
-superscripts and mixed fonts). See `enhanced` for more information;
-`color` enables color;
+superscripts and mixed fonts). See `enhanced` for more information.
+Option `color` enables color;
 `blacktext` forces all text to be written in black even in color mode;
 `solid` draws all plots with solid lines, overriding any dashed patterns;
 `dashlength` or `dl` scales the length of the dashed-line segments by <DL>
@@ -12813,7 +12860,7 @@ it.
 
 The phantom box is useful for a@@^b_c to align superscripts and subscripts
 but does not work well for overwriting an accent on a letter.  (To do the
-latter, it is much better to use `set encoding iso_8859_1` to change to the
+latter, it is much better to use 'set encoding iso_8859_1' to change to the
 ISO Latin-1 encoding vector, which contains a large variety of letters with
 accents or other diacritical marks.)  Since the box is non-spacing, it is
 sensible to put the shorter of the subscript or superscript in the box (that
@@ -13236,7 +13283,7 @@ Example:
 
 puts six graphs on a page in three rows of two in portrait orientation."
 
-@node sun, svg, rgip, terminal
+@node sun, sun_, rgip, terminal
 @subsubsection sun
 
 @c ?commands set terminal sun
@@ -13251,7 +13298,22 @@ puts six graphs on a page in three rows of two in portrait orientation."
 The `sun` terminal driver supports the SunView window system.  It has no
 options."
 
-@node svg, tek410x, sun, terminal
+@node sun_, svg, sun, terminal
+@subsubsection sun
+
+@c ?commands set terminal sun
+@c ?set terminal sun
+@c ?set term sun
+@c ?terminal sun
+@c ?term sun
+@cindex sun
+@tmindex sun
+
+
+The `sun` terminal driver supports the SunView window system.  It has no
+options."
+
+@node svg, tek410x, sun_, terminal
 @subsubsection svg
 
 @c ?commands set terminal svg
@@ -15731,7 +15793,7 @@ Syntax:
                 @{  autofreq
                  | <incr>
                  | <start>, <incr> @{,<end>@}
-                 | (@{"<label>"@} <pos> @{,@{"<label>"@} <pos>@}...) @}
+                 | (@{"<label>"@} <pos> @{<level>@} @{,@{"<label>"@}...) @}
                 @{ font "name@{,<size>@}" @}
                 @{ textcolor <colorspec> @}
       unset xtics
@@ -15796,25 +15858,31 @@ Make tics at 1, 100, 1e4, 1e6, 1e8.
 
 @end example
 
-The explicit ("<label>" <pos>, ...) form allows arbitrary tic positions or
-non-numeric tic labels.  A set of tics is a set of positions, each with its
-own optional label.  Note that the label is a string enclosed by quotes.  It
-may be a constant string, such as "hello", may contain formatting information
-for converting the position into its label, such as "%3f clients", or may be
-empty, "".  See `set format` for more information.  If no string is given,
-the default label (numerical) is used.  In this form, the tics do not need to
-be listed in numerical order.
+The explicit ("<label>" <pos> <level>, ...) form allows arbitrary tic
+positions or non-numeric tic labels.  In this form, the tics do not
+need to be listed in numerical order.  Each tic has a 
+position, optionally with a label.  Note that the label is
+a string enclosed by quotes.  It may be a constant string, such as
+"hello", may contain formatting information for converting the
+position into its label, such as "%3f clients", or may be empty, "".
+See `set format` for more information.  If no string is given, the
+default label (numerical) is used.
+
+An explicit tic mark has a third parameter, the "level".  The default
+is level 0, a major tic.  A level of 1 generates a minor tic.  If the
+level is specified, then the label must also be supplied.
 
 Examples:
 @example
       set xtics ("low" 0, "medium" 50, "high" 100)
       set xtics (1,2,4,8,16,32,64,128,256,512,1024)
       set ytics ("bottom" 0, "" 10, "top" 20)
+      set ytics ("bottom" 0, "" 10 1, "top" 20)
 
 @end example
 
 In the second example, all tics are labelled.  In the third, only the end
-tics are labelled.
+tics are labelled.  In the fourth, the unlabeled tic is a minor tic.
 
 However they are specified, tics will only be plotted when in range.
 
