@@ -85,6 +85,7 @@ void convert __PROTO(( FILE *a, FILE *b ));
 void process_line __PROTO(( char *line, FILE *b ));
 void section __PROTO(( char *line, FILE *b ));
 void putrnh __PROTO(( char *s, FILE *file ));
+void putrnh_ __PROTO(( char *s, FILE *file ));
 void finish __PROTO(( FILE *b ));
 
 typedef int boolean;
@@ -170,7 +171,7 @@ void process_line(line, b)
 		  } else {
 /*			 (void) fputs(".literal\n",b);	*/
 			 intable = TRUE;
-                         rnh_table = FALSE;
+	                 rnh_table = FALSE;
       			 initial_entry = TRUE;
 		  }
 		  /* ignore rest of line */
@@ -317,7 +318,7 @@ void section(line, b)
     old = sh_i;
     
     (void) fputs(".indent -1;\n",b);
-    (void) putrnh(line,b);
+    (void) putrnh_(line,b);
     (void) fputs(".br;\n",b);
 }
 
@@ -327,10 +328,43 @@ void section(line, b)
  */
 
 void putrnh(s, file)
-      	char *s;
+	char *s;
 	FILE *file;
 {
     (void) fputs(s,file);
+}
+
+/*
+ * Change blanks in section heading to underscore for legibility in 
+ * on-line HELP menus.  Modeled after doc2tex and doc2ms section 
+ * heading conversions.
+ *
+ * Header starts at [2], so just check for blanks not to be converted
+ * at end of string.
+ * 
+ */
+
+void putrnh_(s, file)
+       char *s;
+       FILE *file;
+{
+       int i, s_len, last_chr;
+
+       s_len = strlen(s);
+
+       for (i = s_len-1; i > 2; i--) {
+	   if (s[i] != ' ') {
+	       last_chr = i;
+	       break;
+	       }
+	   }
+
+       for (i = 0; i <= s_len; i++) {
+	   if ( (i > 2) && (i < last_chr) && (s[i] == ' ') )
+	       (void) fputc('_',file);
+	   else
+	       (void) fputc(s[i],file);
+	   }
 }
 
 void finish(b)		/* not used */
