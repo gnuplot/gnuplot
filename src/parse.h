@@ -1,5 +1,5 @@
 /*
- * $Id: parse.h,v 1.7 2001/08/22 14:15:34 broeker Exp $
+ * $Id: parse.h,v 1.8 2003/07/22 17:41:10 sfeam Exp $
  */
 
 /* GNUPLOT - parse.h */
@@ -63,5 +63,6 @@ struct at_type * perm_at __PROTO((void));
 struct udvt_entry * add_udv __PROTO((int t_num));
 struct udft_entry * add_udf __PROTO((int t_num));
 struct udvt_entry * get_udv __PROTO((char *key));
+void cleanup_udvlist __PROTO((void));
 
 #endif /* PARSE_H */
