@@ -1,5 +1,5 @@
 /*
- * $Id: fit.h,v 1.8 2000/11/01 18:57:28 broeker Exp $
+ * $Id: fit.h,v 1.9 2001/08/22 14:15:34 broeker Exp $
  */
 
 /* GNUPLOT - fit.h */
@@ -60,6 +60,7 @@
 /* Exported Variables of fit.c */
 
 extern char fitbuf[];
+extern char *fitlogfile;
 
 /* Prototypes of functions exported by fit.c */
 
@@ -68,5 +69,7 @@ void init_fit __PROTO((void));
 void update __PROTO((char *pfile, char *npfile));
 void fit_command __PROTO((void));
 size_t wri_to_fil_last_fit_cmd __PROTO((FILE *fp));
+/* HBB/H.Harders NEW 20020927 */
+char *getfitlogfile __PROTO((void));
 
 #endif /* GNUPLOT_FIT_H */

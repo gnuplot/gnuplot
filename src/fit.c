@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.30 2001/12/04 13:49:39 amai Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.31 2002/03/07 16:22:37 lhecking Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -134,19 +134,30 @@ typedef enum marq_res marq_res_t;
 
 #define LASTFITCMDLENGTH 511
 
+/* externally visible variables: */
+
+/* saved copy of last 'fit' command -- for output by "save" */
 char fitbuf[256];
 
-/* HBB 971023: new, allow for dynamic adjustment of these: */
+/* log-file for fit command */
+char *fitlogfile = NULL;
+
+/* private variables: */
+
 static int max_data;
 static int max_params;
 
 static double epsilon = 1e-5;	/* convergence limit */
-static int maxiter = 0;		/* HBB 970304: maxiter patch */
+static int maxiter = 0;	
 
 static char fit_script[256];
-static char logfile[256] = "fit.log";
+
+/* HBB/H.Harders 20020927: log file name now changeable from inside
+ * gnuplot */
+static const char fitlogfile_default[] = "fit.log";
+static const char GNUFITLOG[] = "FIT_LOG";
+
 static const char *FIXED = "# FIXED";
-static const char *GNUFITLOG = "FIT_LOG";
 static const char *FITLIMIT = "FIT_LIMIT";
 static const char *FITSTARTLAMBDA = "FIT_START_LAMBDA";
 static const char *FITLAMBDAFACTOR = "FIT_LAMBDA_FACTOR";
@@ -1317,29 +1328,19 @@ fit_command()
 	printf("Lambda scaling factors reset:  %g\n", lambda_up_factor);
     }
     *fit_script = NUL;
-    if ((tmp = getenv(FITSCRIPT)) != NULL) {
+    if ((tmp = getenv(FITSCRIPT)) != NULL) 
 	safe_strncpy(fit_script, tmp, sizeof(fit_script));
+
+    {
+	char *logfile = getfitlogfile();
+
+	if (!log_f && !(log_f = fopen(logfile, "a")))
+	    Eex2("could not open log-file %s", logfile);
+
+	if (logfile)
+	    free(logfile);
     }
 
-    tmp = getenv(GNUFITLOG);	/* open logfile */
-    if (tmp != NULL) {
-	char *tmp2 = &tmp[strlen(tmp) - 1];
-	char buf[sizeof(logfile)];
-	
-	if (*tmp2 == '/' || *tmp2 == '\\') {
-	    safe_strncpy(buf, tmp, sizeof(logfile));
-	    if (sizeof(logfile)-strlen(buf) <= strlen(logfile)) {
-	       Eex2("Path too long for log-file %s", tmp);
-	    }
-	    strcat(buf, logfile);
-	    strcpy(logfile, buf); 
-	}
-	else {
-	    safe_strncpy(logfile, tmp, sizeof(logfile));
-	}
-    }
-    if (!log_f && /* div */ !(log_f = fopen(logfile, "a")))
-	Eex2("could not open log-file %s", logfile);
     fputs("\n\n*******************************************************************************\n", log_f);
     (void) time(&timer);
     fprintf(log_f, "%s\n\n", ctime(&timer));
@@ -1648,5 +1649,37 @@ va_dcl
     fprintf(STANDARD, fmt, a1, a2, a3, a4, a5, a6, a7, a8);
     fprintf(log_f, fmt, a1, a2, a3, a4, a5, a6, a7, a8);
 #endif /* VA_START */
+}
 
+/* HBB/H.Harders NEW 20020927: make fit log filename exchangeable at
+ * run-time, not only by setting an environment variable. */
+char *
+getfitlogfile()
+{
+    char *logfile = NULL;
+
+    if (fitlogfile == NULL) {
+	char *tmp = getenv(GNUFITLOG);	/* open logfile */
+
+	if (tmp != NULL && *tmp != '\0') {
+	    char *tmp2 = tmp + (strlen(tmp) - 1);
+	    
+	    /* if given log file name ends in path separator, treat it
+	     * as a directory to store the default "fit.log" in */
+	    if (*tmp2 == '/' || *tmp2 == '\\') {
+		logfile = gp_alloc(strlen(tmp)
+				   + strlen(fitlogfile_default) + 1, 
+				   "logfile");
+		strcpy(logfile, tmp);
+		strcat(logfile, fitlogfile_default);
+	    } else {
+		logfile = gp_strdup(tmp);
+	    }
+	} else {
+	    logfile = gp_strdup(fitlogfile_default);
+	}
+    } else {
+	logfile = gp_strdup(fitlogfile);
+    }
+    return logfile;
 }

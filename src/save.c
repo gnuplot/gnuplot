@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.52 2002/09/25 05:33:56 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.53 2002/09/27 00:12:26 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -795,6 +795,11 @@ set ticscale %g %g\n",
 	while ((s = save_fontpath()) != NULL)
 	    fprintf(fp, "\"%s\" ", s);
 	fputc('\n', fp);
+    }
+
+    /* HBB NEW 20020927: fit logfile name option */
+    if (fitlogfile) {
+	fprintf(fp, "set fitlogfile \'%s\'", fitlogfile);
     }
 }
 

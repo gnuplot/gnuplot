@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.90 2002/09/11 20:52:30 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.91 2002/09/27 00:12:26 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -48,6 +48,7 @@ static char *RCSid() { return RCSid("$Id: show.c,v 1.90 2002/09/11 20:52:30 sfea
 #include "contour.h"
 #include "datafile.h"
 #include "eval.h"
+#include "fit.h"		/* HBB 20020927: for fitlogfile */
 #include "gp_time.h"
 #include "graphics.h"
 #include "hidden3d.h"
@@ -116,6 +117,7 @@ static void show_colorbox __PROTO((void));
 static void show_pointsize __PROTO((void));
 static void show_encoding __PROTO((void));
 static void show_decimalsign __PROTO((void));
+static void show_fitlogfile __PROTO((void));
 static void show_polar __PROTO((void));
 static void show_print __PROTO((void));
 static void show_angles __PROTO((void));
@@ -179,8 +181,8 @@ show_command()
     "valid set options:  [] = choose one, {} means optional\n\n\
 \t'all', 'angles', 'arrow', 'autoscale', 'bars', 'border', 'boxwidth',\n\
 \t'clip', 'cntrparam', 'colorbox', 'contour', 'decimalsign', 'dgrid3d',\n\
-\t'dummy', 'encoding', 'fontpath', 'format', 'functions', 'grid', 'hidden',\n\
-\t'isosamples', 'key', 'label', 'loadpath', 'locale', 'logscale',\n\
+\t'dummy', 'encoding', 'fitlogfile', 'fontpath', 'format', 'functions', 'grid',\n\
+\t'hidden', 'isosamples', 'key', 'label', 'loadpath', 'locale', 'logscale',\n\
 \t'mapping', 'margin', 'missing', 'offsets', 'origin', 'output', 'plot',\n\
 \t'palette', 'parametric', 'pm3d', 'pointsize', 'polar', 'print', '[rtuv]range',\n\
 \t'samples', 'size', 'style', 'terminal', 'tics', 'timestamp',\n\
@@ -334,6 +336,9 @@ show_command()
 	break;
     case S_ENCODING:
 	show_encoding();
+	break;
+    case S_FITLOGFILE:
+	show_fitlogfile();
 	break;
     case S_FONTPATH:
 	show_fontpath();
@@ -774,6 +779,7 @@ show_all()
     show_pointsize();
     show_encoding();
     show_decimalsign();
+    show_fitlogfile();
     show_polar();
     show_angles();
     show_samples();
@@ -2168,6 +2174,30 @@ show_decimalsign()
     else
         fprintf(stderr, "\tdecimalsign has default value (normally '.')\n");
 }
+
+
+/* process 'show fitlogfile' command */
+static void
+show_fitlogfile()
+{
+    SHOW_ALL_NL;
+    if (fitlogfile != NULL) {
+        fprintf(stderr, "\
+\tlog-file for fits is was set by the user to be \n\
+\t'%s'\n", fitlogfile);
+    } else {
+	char *logfile = getfitlogfile();
+
+	if (logfile) {
+	    fprintf(stderr, "\
+\tlog-file for fits is unchanged from the environment default of\n\
+\t'%s'\n", logfile);
+	    free(logfile);
+	}
+    }
+}
+
+
 /* process 'show polar' command */
 static void
 show_polar()

@@ -1,3 +1,48 @@
+2002-09-27  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	Integrated SF Patch #606726 by Harald Harders. This implements a
+ 	new setting "fitlogfile" to override the default filename
+ 	"fit.log" for the fit result log.
+	
+	* src/fit.c (fitlogfile): Renamed from logfile, and made
+ 	externally visible instead of file-global.
+	(fitlogfile_default): New variable to hold default log file name.
+	(fit_command): Replaced code to determine file name by call to
+ 	getfitlogfile.
+	(getfitlogfile): New function.  Extracted from fit_command, and
+ 	extended to check new user-settable variable fitlogfile before
+ 	using environment variable $FIT_LOG or the default.  Returns
+
+	* src/fit.h (fitlogfile, getfitlogfile): Declare new exports of
+ 	fit.c.
+
+	* docs/gnuplot.doc (environment): $FIT_LOG is only the default,
+ 	but no longer the fixed filename for the fit log output.
+	(fit): Reference "set fitlogfile" to override $FIT_LOG or
+ 	"fit.log", respectively.
+	(fitlogfile): Document new option.
+
+	* src/tables.h (set_id): New entry S_FITLOGFILE.
+
+	* src/tables.c (set_tbl): New entry to handle set/show/unset
+ 	fitlogfile.
+
+	* src/set.c (set_command): Added handling of fitlogfile to error
+ 	message and big switch block.
+	(set_fitlogfile): New function to implement "set fitlogfile".
+
+	* src/show.c (show_command): Added handling of fitlogfile to error
+ 	message, big switch block.
+	(show_fitlogfile): New function to implement "show fitlogfile".
+	(show_all): Show fitlogfile, too.
+
+	* src/unset.c (unset_command): Added handling of fitlogfile to
+ 	error message and big switch statement.
+	(unset_fitlogfile): New function to implement "unset fitlogfile".
+	(reset_command): Clear fitlogfile as part of a "reset".
+
+	* src/save.c (save_set_all): Save the state of fitlogfile, too.
+
 2002-09-26  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/plot2d.c: Fix boxwidth handling when relative-boxwidth disabled.
@@ -1134,7 +1179,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/09/26 19:19:27 $).
+	last modification date (from the tag $Date: 2002/09/27 00:11:13 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 

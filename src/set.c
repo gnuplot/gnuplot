@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.96 2002/09/23 21:04:47 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.97 2002/09/27 00:12:26 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -47,6 +47,7 @@ static char *RCSid() { return RCSid("$Id: set.c,v 1.96 2002/09/23 21:04:47 sfeam
 #include "command.h"
 #include "contour.h"
 #include "datafile.h"
+#include "fit.h"		/* HBB 20020927: for fitlogfile */
 #include "gadgets.h"
 #include "gp_time.h"
 #include "hidden3d.h"
@@ -86,6 +87,7 @@ static void set_dgrid3d __PROTO((void));
 static void set_decimalsign __PROTO((void));
 static void set_dummy __PROTO((void));
 static void set_encoding __PROTO((void));
+static void set_fitlogfile __PROTO((void));
 static void set_format __PROTO((void));
 static void set_grid __PROTO((void));
 static void set_hidden3d __PROTO((void));
@@ -176,7 +178,7 @@ set_command()
     "valid set options:  [] = choose one, {} means optional\n\n\
 \t'angles', 'arrow', 'autoscale', 'bars', 'border', 'boxwidth',\n\
 \t'clabel', 'clip', 'cntrparam', 'colorbox', 'contour', 'decimalsign',\n\
-\t'dgrid3d', 'dummy', 'encoding', 'format', 'grid',\n\
+\t'dgrid3d', 'dummy', 'encoding', 'fitlogfile', 'format', 'grid',\n\
 \t'hidden3d', 'historysize', 'isosamples', 'key', 'label',  'locale',\n\
 \t'logscale', '[blrt]margin', 'mapping', 'missing', 'mouse',\n\
 \t'multiplot', 'offsets', 'origin', 'output', 'palette', 'parametric',\n\
@@ -276,6 +278,9 @@ set_command()
 	    break;
 	case S_ENCODING:
 	    set_encoding();
+	    break;
+	case S_FITLOGFILE:
+	    set_fitlogfile();
 	    break;
 	case S_FONTPATH:
 	    set_fontpath();
@@ -1259,6 +1264,25 @@ set_encoding()
 	c_token++;
     }
     encoding = temp;
+}
+
+
+/* process 'set fitlogfile' command */
+static void
+set_fitlogfile()
+{
+    c_token++;
+
+    if (END_OF_COMMAND) {
+        if (fitlogfile != NULL)
+            free(fitlogfile);
+        fitlogfile=NULL;
+    } else if (!isstring(c_token)) {
+        int_error(c_token, "expecting string");
+    } else {
+        m_quote_capture(&fitlogfile, c_token, c_token); /* reallocs store */
+        c_token++;
+    }
 }
 
 

@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.134 2002/09/03 17:58:01 lhecking Exp $
+C RCS $Id: gnuplot.doc,v 1.135 2002/09/27 00:12:23 sfeam Exp $
 C 18 September 2001
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001   Thomas Williams, Colin Kelley et al.
 C
@@ -541,7 +541,7 @@ C
  If PCTRM is not set, standard VGA is used.
 
  FIT_SCRIPT may be used to specify a `gnuplot` command to be executed when a
- fit is interrupted---see `fit`.  FIT_LOG specifies the filename of the
+ fit is interrupted---see `fit`.  FIT_LOG specifies the default filename of the
  logfile maintained by fit.
 
  GNUPLOT_LIB may be used to define additional search directories for data
@@ -1670,7 +1670,9 @@ C ... and restart the table:
  of the fit is written to the display.  The same information about the
  initial and final states is written to a log file, "fit.log".  This file
  is always appended to, so as to not lose any previous fit history;  it
- should be deleted or renamed as desired.
+ should be deleted or renamed as desired. By using the command 
+ `set fitlogfile`, the name of the log file can be changed.
+
 
  The fit may be interrupted by pressing Ctrl-C (any key but Ctrl-C under
  MSDOS and Atari Multitasking Systems).  After the current iteration
@@ -1965,7 +1967,8 @@ C ... and restart the table:
 
        FIT_LOG
  changes the name (and/or path) of the file to which the fit log will be
- written from the default of "fit.log" in the working directory.
+ written from the default of "fit.log" in the working directory. The default
+ value can be overwritten using the command `set fitlogfile`.
 
        FIT_SCRIPT
  specifies a command that may be executed after an user interrupt. The default
@@ -4186,6 +4189,34 @@ C ... and restart the table:
  the device must be able to produce the desired non-standard characters.
  The PostScript and X11 terminals support all encodings. OS/2 Presentation
  Manager switches automatically to codepage 912 for `iso_8859_2`.
+3 fitlogfile
+?commands set fitlogfile
+?commands show fitlogfile
+?set fitlogfile
+?show fitlogfile
+?fitlogfile
+ The `fitlogfile` setting defines where the `fit` command writes its output.
+
+ Syntax:
+       set fitlogfile {"<filename>"}
+       unset fitlogfile
+       show fitlogfile
+
+ The filename must be enclosed in quotes.
+
+ If no filename ist given or `unset fitlogfile` is used the log file is 
+ resetted to its default value "fit.log" or the value of the environmental
+ variable `FIT_LOG`.
+
+ Users of DOS-like platforms should note that the \ character has
+ special significance in double-quoted strings, so single-quotes 
+ should be used for filenames in different directories, or you have 
+ to write \\ for each \.  Or you can just use forward slashes, 
+ even though this is DOS.
+
+ If the given logfile name ends with a / or \, it is interpreted to be
+ a directory name, and the actual filename will be "fit.log" in that
+ directory.
 3 fontpath
 ?commands set fontpath
 ?commands show fontpath
@@ -6525,7 +6556,7 @@ C ... and restart the table:
  boxwidth` command, this will be used.  If neither of these is available, the
  width of each box will be calculated automatically so that it touches the
  adjacent boxes. 
- 
+
  The interior of the boxes is drawn according to the current fillstyle.
  See `set style fill` for details.  Alternatively a new fillstyle
  may be specified in the plot command.
