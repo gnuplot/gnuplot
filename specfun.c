@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: specfun.c,v 1.8.2.2 2002/01/23 11:19:44 lhecking Exp $";
+static char *RCSid = "$Id: specfun.c,v 1.8.2.3 2002/01/26 18:56:32 lhecking Exp $";
 #endif
 
 /* GNUPLOT - specfun.c */
@@ -610,13 +610,13 @@ void f_inverse_erf()
 static double inverse_normal_func(p)
 double p;
 {
-    fprintf(stderr, "Sorry, function removed due to license issues :(\n");
+    fprintf(stderr, "inverse_normal_func() removed due to license issues\n");
     return 0;
 }
 
 static double inverse_error_func(p)
 double p;
 {
-    fprintf(stderr, "Sorry, function removed due to license issues :(\n");
+    fprintf(stderr, "inverse_error_func() removed due to license issues\n");
     return 0;
 }
