@@ -1,3 +1,16 @@
+2003-06-09  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* INSTALL, configure.in: Add note about GNU readline bug.
+	
+	* docs/Makefile.in, src/makefile.all, src/term.h, term/aquaterm.trm:
+	Add support for AquaTerm, a new MacOS X graphics terminal.
+
+	* src/Makefile.am: Fix for bug #738816 "configure --without-x not
+	effective".
+
+	* src/readline.c: Remove gnuplot SIGWINCH handler, see note about
+	GNU readline bug.
+
 2003-06-04  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/show.c (show_palette_fit2rgbformulae): Take care of color models.
