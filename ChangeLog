@@ -1,3 +1,10 @@
+2001-10-11  Dick Crawford <crawford@arete.com>
+
+	* term/post.trm (PS_header): Old PostScript linewidth patch for
+ 	dotted axis linetype finally brought into 3.8 branch. Affects
+ 	macros /BL, /AL, /UL, and /LTa. /UL macro fixed to avoid problems
+ 	with dash pattern length definition for zero linewidth.
+
 2001-10-10  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/color.c (draw_color_smooth_box) [PM3D]: Change order of
