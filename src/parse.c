@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: parse.c,v 1.30 2004/12/06 06:46:27 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: parse.c,v 1.31 2004/12/06 19:15:48 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - parse.c */
@@ -80,8 +80,10 @@ static int is_builtin_function __PROTO((int t_num));
 static struct at_type *at = NULL;
 static int at_size = 0;
 
+#ifdef GP_ISVAR
 /* isvar - When this variable is true PUSH operations become PUSHV */
 static TBOOLEAN push_vars = TRUE;
+#endif
 
 static void
 convert(struct value *val_ptr, int t_num)
@@ -333,7 +335,9 @@ parse_primary_expression()
 		(void) add_action(whichfunc);
 
 		 /* Turn normal variable pushing back on */
+#ifdef GP_ISVAR
 		push_vars=TRUE;
+#endif
 	    } else {
 		/* it's a call to a user-defined function */
 		enum operators call_type = (int) CALL;
@@ -386,9 +390,11 @@ parse_primary_expression()
 	    }
 	    /* its a variable, with no dummies active - div */
 	} else {
-            if (push_vars==FALSE)
+#ifdef GP_ISVAR
+            if (push_vars == FALSE)
 		add_action(PUSHV)->udv_arg = add_udv(c_token);
 	    else
+#endif
 		add_action(PUSH)->udv_arg = add_udv(c_token);
 
 	    c_token++;

@@ -1,3 +1,9 @@
+2004-12-15  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/parse.c (push_vars): Conditionalize definition on GP_ISVAR.
+	(parse_primary_expression): Conditionalize use of push_vars and
+	action PUSHV on GP_ISVAR.
+
 2004-12-14  Ethan Merritt  <merritt@u.washington.edu>
 
 	* demo/Makefile.am.in: Add rainbow.html and pointsize.html to the
