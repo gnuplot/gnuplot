@@ -1,5 +1,5 @@
 /*
- * $Id: pslatex.trm,v 1.15.2.1 1999/08/19 14:16:07 lhecking Exp $
+ * $Id: pslatex.trm,v 1.15.2.2 1999/10/01 18:22:37 lhecking Exp $
  */
 
 /* GNUPLOT - pslatex.trm */
@@ -186,7 +186,7 @@ TERM_PUBLIC void PSLATEX_init()
      */
 
     /* if there's no extension, append ".ps" */
-    if ((dotIndex = strrchr(outstr, '.')) == NULL)
+    if (outstr && (dotIndex = strrchr(outstr, '.')) == NULL)
 	dotIndex = strchr(outstr, NUL);
 
     /* try to open the auxiliary file for the postscript parts. */
