@@ -1,3 +1,11 @@
+
+2000-09-20  Johannes Zellner <johannes@zellner.org>
+
+	* relative arrows:
+	  set arrow from start_x, start_y rto delta_x, delta_y
+	* if front was given, the arrow head stuff wasn't applied.
+	  I repaired this. (also for 3d plots).
+
 2000-09-14  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* graphics.c (map_position), graph3d.c (map_position): Fix

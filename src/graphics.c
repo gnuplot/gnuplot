@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.33 2000/08/02 13:53:10 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.34 2000/09/14 13:23:56 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -159,6 +159,10 @@ static void mant_exp __PROTO((double log_base, double x, int scientific, double 
 static double make_ltic __PROTO((int, double));
 static double time_tic_just __PROTO((int, double));
 static void timetic_format __PROTO((int, double, double));
+
+static void get_arrow __PROTO((struct arrow_def* arrow, unsigned int* sx, unsigned int* sy, unsigned int* ex, unsigned int* ey));
+static void map_position_double __PROTO((struct position* pos, double* x, double* y, const char* what));
+static void map_position_r __PROTO((struct position* pos, double* x, double* y, const char* what));
 
 
 /* for plotting error bars
@@ -1327,6 +1331,65 @@ nearest_label_tag(int xref, int yref, struct termentry *t,
     return min_tag;
 }
 
+static void
+get_arrow(arrow, sx, sy, ex, ey)
+struct arrow_def* arrow;
+unsigned int* sx;
+unsigned int* sy;
+unsigned int* ex;
+unsigned int* ey;
+{
+    if (arrow->relative) {
+	if (arrow->start.scalex == arrow->end.scalex &&
+	    arrow->start.scaley == arrow->end.scaley) {
+	    /* coordinate systems are equal. The advantage of
+	     * handling this special case is that it works also
+	     * for logscale (which might not work otherwise, if
+	     * the relative arrows point downwards for example) */
+	    struct position delta_pos;
+	    delta_pos = arrow->start;
+	    delta_pos.x += arrow->end.x;
+	    delta_pos.y += arrow->end.y;
+	    map_position(&arrow->start, sx, sy, "arrow");
+	    map_position(&delta_pos, ex, ey, "arrow");
+	} else {
+	    /* different coordinate systems:
+	     * add the values in the drivers
+	     * coordinate system */
+	    double sx_d, sy_d, ex_d, ey_d;
+	    map_position_double(&arrow->start, &sx_d, &sy_d, "arrow");
+	    map_position_r(&arrow->end, &ex_d, &ey_d, "arrow");
+	    *sx = (unsigned int)sx_d;
+	    *sy = (unsigned int)sy_d;
+	    *ex = (unsigned int)(ex_d + sx_d);
+	    *ey = (unsigned int)(ey_d + sy_d);
+	}
+    } else {
+	map_position(&arrow->start, sx, sy, "arrow");
+	map_position(&arrow->end, ex, ey, "arrow");
+    }
+}
+
+void
+apply_head_properties(struct position* headsize)
+{
+    extern double curr_arrow_headangle;
+    extern int curr_arrow_headlength;
+    curr_arrow_headlength = 0;
+    if (headsize->x > 0) { /* set head length+angle for term->arrow */
+	int itmp, x1, x2;
+	double savex = headsize->x;
+	curr_arrow_headangle = headsize->y;
+	headsize->y = 1.0; /* any value, just avoid log y */
+	map_position(headsize, &x2, &itmp, "arrow");
+	headsize->x = 0; /* measure length from zero */
+	map_position(headsize, &x1, &itmp, "arrow");
+	curr_arrow_headlength = x2 - x1;
+	headsize->y = curr_arrow_headangle; /* restore the angle */
+	headsize->x = savex; /* restore the length */
+    }
+}
+
 void
 do_plot(plots, pcount)
 struct curve_points *plots;
@@ -1781,28 +1844,13 @@ int pcount;			/* count of plots in linked list */
 /* PLACE ARROWS */
     for (this_arrow = first_arrow; this_arrow != NULL; this_arrow = this_arrow->next) {
 	unsigned int sx, sy, ex, ey;
-	extern int curr_arrow_headlength;
-	extern double curr_arrow_headangle;
 
 	if (this_arrow->layer)
 	    continue;
-	map_position(&this_arrow->start, &sx, &sy, "arrow");
-	map_position(&this_arrow->end, &ex, &ey, "arrow");
+	get_arrow(this_arrow, &sx, &sy, &ex, &ey);
 
 	term_apply_lp_properties(&(this_arrow->lp_properties));
-	curr_arrow_headlength = 0;
-	if (this_arrow->headsize.x > 0) { /* set head length+angle for term->arrow */
-	    int itmp, x1, x2;
-	    double savex = this_arrow->headsize.x;
-	    curr_arrow_headangle = this_arrow->headsize.y;
-	    this_arrow->headsize.y = 1.0; /* any value, just avoid log y */
-	    map_position(&this_arrow->headsize, &x2, &itmp, "arrow");
-	    this_arrow->headsize.x = 0; /* measure length from zero */
-	    map_position(&this_arrow->headsize, &x1, &itmp, "arrow");
-	    curr_arrow_headlength = x2 - x1;
-	    this_arrow->headsize.y = curr_arrow_headangle; /* restore the angle */
-	    this_arrow->headsize.x = savex; /* restore the length */
-	}
+	apply_head_properties(&(this_arrow->headsize));
 	(*t->arrow) (sx, sy, ex, ey, this_arrow->head);
     }
 
@@ -2084,10 +2132,10 @@ int pcount;			/* count of plots in linked list */
 
 	if (this_arrow->layer == 0)
 	    continue;
-	map_position(&this_arrow->start, &sx, &sy, "arrow");
-	map_position(&this_arrow->end, &ex, &ey, "arrow");
+	get_arrow(this_arrow, &sx, &sy, &ex, &ey);
 
 	term_apply_lp_properties(&(this_arrow->lp_properties));
+	apply_head_properties(&(this_arrow->headsize));
 	(*t->arrow) (sx, sy, ex, ey, this_arrow->head);
     }
 
@@ -4672,11 +4720,26 @@ tic_callback callback;		/* fn to call to actually do the work */
 
 /*}}} */
 
-/*{{{  map_position */
+/*{{{  map_position, wrapper, which maps double to int */
 void
 map_position(pos, x, y, what)
 struct position *pos;
 unsigned int *x, *y;
+const char *what;
+{
+    double xx, yy;
+    map_position_double(pos, &xx, &yy, what);
+    *x = xx;
+    *y = yy;
+}
+
+/*}}} */
+
+/*{{{  map_position_double */
+static void
+map_position_double(pos, x, y, what)
+struct position *pos;
+double *x, *y;
 const char *what;
 {
     switch (pos->scalex) {
@@ -4684,19 +4747,19 @@ const char *what;
 	{
 	    double xx = LogScale(pos->x, log_array[FIRST_X_AXIS], log_base_array[FIRST_X_AXIS],
 				 what, "x");
-	    *x = xleft + (xx - min_array[FIRST_X_AXIS]) * scale[FIRST_X_AXIS] + 0.5;
+	    *x = xleft + (xx - min_array[FIRST_X_AXIS]) * scale[FIRST_X_AXIS];
 	    break;
 	}
     case second_axes:
 	{
 	    double xx = LogScale(pos->x, log_array[SECOND_X_AXIS], log_base_array[SECOND_X_AXIS],
 				 what, "x");
-	    *x = xleft + (xx - min_array[SECOND_X_AXIS]) * scale[SECOND_X_AXIS] + 0.5;
+	    *x = xleft + (xx - min_array[SECOND_X_AXIS]) * scale[SECOND_X_AXIS];
 	    break;
 	}
     case graph:
 	{
-	    *x = xleft + pos->x * (xright - xleft) + 0.5;
+	    *x = xleft + pos->x * (xright - xleft);
 	    break;
 	}
     case screen:
@@ -4704,7 +4767,7 @@ const char *what;
 	    register struct termentry *t = term;
 	    /* HBB 20000914: Off-by-one bug. Max. allowable result is
 	     * t->xmax - 1, not t->xmax ! */
-	    *x = pos->x * (t->xmax - 1) + 0.5;
+	    *x = pos->x * (t->xmax - 1);
 	    break;
 	}
     }
@@ -4713,30 +4776,96 @@ const char *what;
 	{
 	    double yy = LogScale(pos->y, log_array[FIRST_Y_AXIS], log_base_array[FIRST_Y_AXIS],
 				 what, "y");
-	    *y = ybot + (yy - min_array[FIRST_Y_AXIS]) * scale[FIRST_Y_AXIS] + 0.5;
-	    return;
+	    *y = ybot + (yy - min_array[FIRST_Y_AXIS]) * scale[FIRST_Y_AXIS];
+	    break;
 	}
     case second_axes:
 	{
 	    double yy = LogScale(pos->y, log_array[SECOND_Y_AXIS], log_base_array[SECOND_Y_AXIS],
 				 what, "y");
-	    *y = ybot + (yy - min_array[SECOND_Y_AXIS]) * scale[SECOND_Y_AXIS] + 0.5;
-	    return;
+	    *y = ybot + (yy - min_array[SECOND_Y_AXIS]) * scale[SECOND_Y_AXIS];
+	    break;
 	}
     case graph:
 	{
-	    *y = ybot + pos->y * (ytop - ybot) + 0.5;
-	    return;
+	    *y = ybot + pos->y * (ytop - ybot);
+	    break;
 	}
     case screen:
 	{
 	    register struct termentry *t = term;
 	    /* HBB 20000914: Off-by-one bug. Max. allowable result is
 	     * t->ymax - 1, not t->ymax ! */
-	    *y = pos->y * (t->ymax -1) + 0.5;
+	    *y = pos->y * (t->ymax -1);
+	    break;
+	}
+    }
+    *x += 0.5;
+    *y += 0.5;
+}
+
+/*}}} */
+
+/*{{{  map_position_r */
+static void
+map_position_r(pos, x, y, what)
+struct position *pos;
+double *x, *y;
+const char *what;
+{
+    switch (pos->scalex) {
+    case first_axes:
+	{
+	    double xx = LogScale(pos->x, log_array[FIRST_X_AXIS], log_base_array[FIRST_X_AXIS],
+				 what, "x");
+	    *x = xx * scale[FIRST_X_AXIS];
+	    break;
+	}
+    case second_axes:
+	{
+	    double xx = LogScale(pos->x, log_array[SECOND_X_AXIS], log_base_array[SECOND_X_AXIS],
+				 what, "x");
+	    *x = xx * scale[SECOND_X_AXIS];
+	    break;
+	}
+    case graph:
+	{
+	    *x = pos->x * (xright - xleft);
+	    break;
+	}
+    case screen:
+	{
+	    register struct termentry *t = term;
+	    *x = pos->x * (t->xmax - 1);
+	    break;
+	}
+    }
+    switch (pos->scaley) {
+    case first_axes:
+	{
+	    double yy = LogScale(pos->y, log_array[FIRST_Y_AXIS], log_base_array[FIRST_Y_AXIS],
+				 what, "y");
+	    *y = yy * scale[FIRST_Y_AXIS];
+	    return;
+	}
+    case second_axes:
+	{
+	    double yy = LogScale(pos->y, log_array[SECOND_Y_AXIS], log_base_array[SECOND_Y_AXIS],
+				 what, "y");
+	    *y = yy * scale[SECOND_Y_AXIS];
+	    return;
+	}
+    case graph:
+	{
+	    *y = pos->y * (ytop - ybot);
+	    return;
+	}
+    case screen:
+	{
+	    register struct termentry *t = term;
+	    *y = pos->y * (t->ymax -1);
 	    return;
 	}
     }
 }
-
 /*}}} */

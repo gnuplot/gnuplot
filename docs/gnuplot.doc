@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.41 2000/05/02 19:32:00 lhecking Exp $
+C RCS $Id: gnuplot.doc,v 1.42 2000/08/02 13:53:11 mikulik Exp $
 C 3 December 1998
 C Copyright (C) 1986 - 1993, 1998   Thomas Williams, Colin Kelley
 C
@@ -3216,7 +3216,7 @@ C ... and restart the table:
  Arbitrary arrows can be placed on a plot using the `set arrow` command.
 
  Syntax:
-       set arrow {<tag>} {from <position>} {to <position>}
+       set arrow {<tag>} {from <position>} {to|rto <position>}
                  {nohead | head | heads}
                  {size <length>,<angle>}
                  {front | back}
@@ -3239,6 +3239,8 @@ C ... and restart the table:
  `screen`.  See `coordinates` for details.  A coordinate system specifier
  does not carry over from the "from" position to the "to" position.  Arrows
  outside the screen boundaries are permitted but may cause device errors.
+ If the endpoint is specified by "rto" instead of "to" it is drawn relatively
+ to the start point.
 
  Specifying `nohead` produces an arrow drawn without a head---a line segment.
  This gives you yet another way to draw a line segment on the plot.  By
@@ -3283,6 +3285,10 @@ C ... and restart the table:
 
  To draw a vertical arrow with T-shape ends, use:
        set arrow 3 from 0,-5 to 0,5 heads size screen 0.1,90
+
+ To draw a arrow relatively to the start point, where the relative distances
+ are given in graph coordinates, use:
+       set arrow from 0,-5 rto graph 0.1,0.1
 
  To delete arrow number 2, use:
        set noarrow 2

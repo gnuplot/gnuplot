@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.13 2000/05/02 20:56:27 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.14 2000/06/09 15:36:00 joze Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -381,7 +381,7 @@ set y2data%s\n",
 	 this_arrow = this_arrow->next) {
 	fprintf(fp, "set arrow %d from ", this_arrow->tag);
 	save_position(fp, &this_arrow->start);
-	fputs(" to ", fp);
+	fputs(this_arrow->relative ? " rto " : " to ", fp);
 	save_position(fp, &this_arrow->end);
 	fprintf(fp, " %s linetype %d linewidth %.3f\n",
 		this_arrow->head ? "" : " nohead",

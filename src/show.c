@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.39 2000/05/02 20:56:27 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.40 2000/08/02 13:53:11 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -1409,7 +1409,7 @@ int tag;			/* 0 means show all */
 		    this_arrow->head ? (this_arrow->head==2 ? " both heads " : "") : " (nohead)",
 		    this_arrow->layer ? "front" : "back");
 	    show_position(&this_arrow->start);
-	    fputs(" to ", stderr);
+	    fputs(this_arrow->relative ? " rto " : " to ", stderr);
 	    show_position(&this_arrow->end);
 	    if (this_arrow->headsize.x > 0) {
 		static char *msg[] =

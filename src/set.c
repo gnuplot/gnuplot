@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.36 2000/05/23 15:28:12 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.37 2000/08/02 13:53:10 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -1075,7 +1075,9 @@ set_arrow()
     struct lp_style_type loc_lp;
     int axes = FIRST_AXES;
     int tag;
-    TBOOLEAN set_start, set_end, head = 1, set_axes = 0, set_line = 0, set_headsize = 0, set_layer = 0;
+    TBOOLEAN set_start, set_end, head = 1, set_axes = 0;
+    TBOOLEAN set_line = 0, set_headsize = 0, set_layer = 0;
+    TBOOLEAN relative = 0;
     int layer = 0;
     headsize.x = 0; /* length being zero means the default head size */
 
@@ -1088,6 +1090,7 @@ set_arrow()
     if (!END_OF_COMMAND
 	&& !equals(c_token, "from")
 	&& !equals(c_token, "to")
+	&& !equals(c_token, "rto")
 	&& !equals(c_token, "first")
 	&& !equals(c_token, "second")) {
 	/* must be a tag expression! */
@@ -1128,6 +1131,14 @@ set_arrow()
 	/* get coordinates */
 	get_position(&epos);
 	set_end = TRUE;
+    } else if (!END_OF_COMMAND && equals(c_token, "rto")) {
+	c_token++;
+	if (END_OF_COMMAND)
+	    int_error(c_token, "end coordinates expected");
+	/* get coordinates */
+	get_position(&epos);
+	set_end = TRUE;
+	relative = 1;
     } else {
 	epos.x = epos.y = epos.z = 0;
 	epos.scalex = epos.scaley = epos.scalez = first_axes;
@@ -1201,6 +1212,7 @@ set_arrow()
 	}
 	if (set_end) {
 	    this_arrow->end = epos;
+	    this_arrow->relative = relative;
 	}
 	this_arrow->head = head;
 	if (set_layer) {
@@ -1226,6 +1238,7 @@ set_arrow()
 	new_arrow->head = head;
 	new_arrow->headsize = headsize;
 	new_arrow->layer = layer;
+	new_arrow->relative = relative;
 	new_arrow->lp_properties = loc_lp;
     }
 }
