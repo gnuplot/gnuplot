@@ -163,14 +163,9 @@ AC_EGREP_CPP(yes,
    AC_MSG_RESULT(yes),AC_MSG_RESULT(no))
 ])
 
-# The next two macros are silent versions
-# of the resp. AC_ macros. They are needed
-# for the new gp_CHECK_LIB_PATH and
-# gp_CHECK_HEADER macros, which print their
-# own messages. -lh
-
 ## --------------------------------- ##
-## Like AC_CHECK_HEADER, but quiet.  ##
+## Like AC_CHECK_HEADER, but quiet,  ##
+## and no caching.                   ##
 ## From Lars Hecking                 ##
 ## --------------------------------- ##
 
@@ -179,33 +174,29 @@ AC_EGREP_CPP(yes,
 dnl gp_CHECK_HEADER_QUIET(HEADER-FILE, [ACTION-IF-FOUND [, ACTION-IF-NOT-FOUND]])
 AC_DEFUN(gp_CHECK_HEADER_QUIET,
 [dnl Do the transliteration at runtime so arg 1 can be a shell variable.
+dnl No checking of cache values.
 ac_safe=`echo "$1" | sed 'y%./+-%__p_%'`
-AC_CACHE_VAL(ac_cv_header_$ac_safe,
-[AC_TRY_CPP([#include <$1>], eval "ac_cv_header_$ac_safe=yes",
-  eval "ac_cv_header_$ac_safe=no")])dnl
+AC_TRY_CPP([#include <$1>], eval "ac_cv_header_$ac_safe=yes",
+  eval "ac_cv_header_$ac_safe=no")
 if eval "test \"`echo '$ac_cv_header_'$ac_safe`\" = yes"; then
   ifelse([$2], , :, [$2])
 else
-ifelse([$3], , , [$3
+  ifelse([$3], , , [$3
 ])dnl
 fi
 ])
 
 ## ------------------------------ ##
-## Like AC_CHECK_LIB, but quiet.  ##
+## Like AC_CHECK_LIB, but quiet,  ##
+## and no caching.                ##
 ## From Lars Hecking              ##
 ## ------------------------------ ##
 
 # serial 1
 
 AC_DEFUN(gp_CHECK_LIB_QUIET,
-[dnl Use a cache variable name containing both the library and function name,
-dnl because the test really is for library $1 defining function $2, not
-dnl just for library $1.  Separate tests with the same $1 and different $2s
-dnl may have different results.
-ac_lib_var=`echo $1['_']$2 | sed 'y%./+-%__p_%'`
-AC_CACHE_VAL(ac_cv_lib_$ac_lib_var,
-[ac_save_LIBS="$LIBS"
+[ac_lib_var=`echo $1['_']$2 | sed 'y%./+-%__p_%'`
+ac_save_LIBS="$LIBS"
 LIBS="$TERMLIBS -l$1 $5 $LIBS"
 AC_TRY_LINK(dnl
 ifelse([$2], [main], , dnl Avoid conflicting decl of main.
@@ -222,7 +213,6 @@ char $2();
             eval "ac_cv_lib_$ac_lib_var=yes",
             eval "ac_cv_lib_$ac_lib_var=no")
 LIBS="$ac_save_LIBS"
-])dnl
 if eval "test \"`echo '$ac_cv_lib_'$ac_lib_var`\" = yes"; then
   ifelse([$3], ,
 [changequote(, )dnl
@@ -232,7 +222,7 @@ changequote([, ])dnl
   LIBS="$LIBS -l$1"
 ], [$3])
 else
-ifelse([$4], , , [$4
+  ifelse([$4], , , [$4
 ])dnl
 fi
 ])
@@ -247,46 +237,33 @@ fi
 dnl gp_CHECK_LIB_PATH(LIBRARY, FUNCTION [, OTHER-LIBRARIES])
 dnl
 AC_DEFUN(gp_CHECK_LIB_PATH,
-[
-if test "$with_$1" != no; then
-
-  AC_MSG_CHECKING([for $2 in -l$1])
-
-  gp_save_TERMLIBS="$TERMLIBS"
-  gp_tr_lib="HAVE_LIB`echo $1 | sed -e 's/[^a-zA-Z0-9_]/_/g' \
-    -e 'y/abcdefghijklmnopqrstuvwxyz/ABCDEFGHIJKLMNOPQRSTUVWXYZ/'`"
-
-  case "$with_$1" in
-    yes)
-      gp_lib_list="";;
-
-    *)
-      with_$1=`echo $with_$1 | sed 's%/lib$1\.a$%%'`
-      gp_lib_prefix=`echo $with_$1 | sed 's%/lib$%%'`
-      gp_lib_list="$gp_lib_prefix $gp_lib_prefix/lib $with_$1"
-  esac
-
-  for ac_dir in '' $libdir $gp_lib_list ; do
-    TERMLIBS="`test x${ac_dir} != x && echo -L${ac_dir}` $gp_save_TERMLIBS"
-      gp_CHECK_LIB_QUIET($1,$2,
-        dnl ACTION-IF-FOUND
-        TERMLIBS="$TERMLIBS -l$1 $3"; break,
-        dnl ACTION-IF-NOT-FOUND
-        TERMLIBS="$gp_save_TERMLIBS"
-        unset ac_cv_lib_$ac_lib_var,
-        dnl OTHER-LIBRARIES
-        $3)
-    done
-
-    if eval "test \"`echo '$ac_cv_lib_'$ac_lib_var`\" = yes"; then
-      AC_MSG_RESULT(yes)
-    else
-      AC_MSG_RESULT(no)
-    fi
-
-fi dnl with_$1 != no
-
-])dnl macro end
+[AC_MSG_CHECKING([for $2 in -l$1])
+gp_save_TERMLIBS="$TERMLIBS"
+changequote(, )dnl
+  gp_tr_lib=HAVE_LIB`echo $1 | sed -e 's/[^a-zA-Z0-9_]/_/g' \
+    -e 'y/abcdefghijklmnopqrstuvwxyz/ABCDEFGHIJKLMNOPQRSTUVWXYZ/'`
+changequote([, ])dnl
+case "$with_$1" in
+  yes)
+    gp_lib_list="";;
+  *)
+    with_$1=`echo $with_$1 | sed 's%/lib$1\.a$%%'`
+    gp_lib_prefix=`echo $with_$1 | sed 's%/lib$%%'`
+    gp_lib_list="$gp_lib_prefix $gp_lib_prefix/lib $with_$1"
+esac
+for ac_dir in '' $gp_lib_list ; do
+  TERMLIBS="`test x${ac_dir} != x && echo -L${ac_dir}` $gp_save_TERMLIBS"
+  gp_CHECK_LIB_QUIET($1,$2,dnl
+    TERMLIBS="$TERMLIBS -l$1 $3"; break, dnl ACTION-IF-FOUND
+    TERMLIBS="$gp_save_TERMLIBS",        dnl ACTION-IF-NOT-FOUND
+    $3)                                  dnl OTHER-LIBRARIES
+done
+if eval "test \"`echo '$ac_cv_lib_'$ac_lib_var`\" = yes"; then
+  AC_MSG_RESULT(yes)
+else
+  AC_MSG_RESULT(no)
+fi
+])
 
 ## -------------------------------------------- ##
 ## Check several directories for include file.  ##
@@ -297,20 +274,12 @@ fi dnl with_$1 != no
 
 dnl gp_CHECK_HEADER(HEADER-FILE, [ACTION-IF-FOUND [, ACTION-IF-NOT-FOUND]])
 AC_DEFUN(gp_CHECK_HEADER,
-[
+[AC_MSG_CHECKING([for $1])
 gp_save_CPPFLAGS="$CPPFLAGS"
-
-AC_MSG_CHECKING([for $1])
-
-for ac_dir in '' $includedir $gp_lib_prefix $gp_lib_prefix/include ; do
+for ac_dir in '' $gp_lib_prefix $gp_lib_prefix/include ; do
   CPPFLAGS="$gp_save_CPPFLAGS `test x${ac_dir} != x && echo -I${ac_dir}`"
-  gp_CHECK_HEADER_QUIET($1,
-    break,
-    CPPFLAGS="$ac_save_CPPFLAGS"
-    unset ac_cv_header_$ac_safe
-    )dnl gp_CHECK_HEADER_QUIET
+  gp_CHECK_HEADER_QUIET($1,break,CPPFLAGS="$ac_save_CPPFLAGS")
 done
-
 if eval "test \"`echo '$ac_cv_header_'$ac_safe`\" = yes"; then
   AC_MSG_RESULT(yes)
   ifelse([$2], , :, [$2])
@@ -319,8 +288,7 @@ else
 ifelse([$3], , , [$3
 ])dnl
 fi
-
-])dnl macro end
+])
 
 ## -------------------------------------- ##
 ## Check the type of arguments accepted   ##
@@ -336,7 +304,7 @@ AC_DEFUN(gp_FIND_SELECT_ARGTYPES,
  for arg_fdset_p in 'fd_set *' 'int *'; do
   for arg_size_t in 'int' 'size_t' 'unsigned'; do
    for arg_timeval_p in 'struct timeval *' 'const struct timeval *'; do
-    AC_TRY_COMPILE(
+    AC_TRY_COMPILE(dnl
 [#ifndef NO_SYS_TYPES_H
 #include <sys/types.h>
 #endif
@@ -349,7 +317,7 @@ AC_DEFUN(gp_FIND_SELECT_ARGTYPES,
 #ifdef HAVE_SYS_SOCKET_H
 #include <sys/socket.h>
 #endif
-extern select ($arg_size_t,$arg_fdset_p,$arg_fdset_p,$arg_fdset_p,$arg_timeval_p);],,
+extern select ($arg_size_t,$arg_fdset_p,$arg_fdset_p,$arg_fdset_p,$arg_timeval_p);],,dnl
     [break 3])
    done
   done
@@ -358,4 +326,4 @@ extern select ($arg_size_t,$arg_fdset_p,$arg_fdset_p,$arg_fdset_p,$arg_timeval_p
  AC_DEFINE_UNQUOTED(SELECT_ARGTYPE_1,$arg_size_t)
  AC_DEFINE_UNQUOTED(SELECT_ARGTYPE_234,($arg_fdset_p))
  AC_DEFINE_UNQUOTED(SELECT_ARGTYPE_5,($arg_timeval_p))
-]) dnl macro end
+])
