@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.71 2003/07/07 11:36:56 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.72 2003/07/07 11:40:28 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -377,6 +377,7 @@ do_string(s)
 
     while (input_line_len < strlen(s) + 1)
 	extend_input_line();
+    strcpy(input_line, s);
 
 #ifdef USE_MOUSE
     if (display_ipc_commands())
