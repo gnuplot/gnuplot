@@ -1,5 +1,5 @@
 /*
- * $Id: svg.trm,v 1.21 2002/09/27 00:12:27 sfeam Exp $
+ * $Id: svg.trm,v 1.22 2002/12/17 13:32:56 lhecking Exp $
  *
  */
 
@@ -25,6 +25,8 @@
 
 /* PM3D support by Johannes Zellner <johannes@zellner.org>, May-16-2002 */
 /* set_color fixes by Petr Mikulik <mikulik@physics.muni.cz>, June-10-2002 */
+/* ISO-Latin encoding, Font selection fixes, option "fixed|dynamic" by
+ * Wilhelm Braunschober <Wilhelm.Braunschober@t-online.de>, Feb-21-2002 */
 
 #include "driver.h"
 
@@ -85,6 +87,7 @@ struct SVG_PEN
 
 static unsigned int SVG_xSize = SVG_XMAX; /* plot horizontal size */
 static unsigned int SVG_ySize = SVG_YMAX; /* plot vertical size*/
+static TBOOLEAN SVG_fixed_size = TRUE;  /* make SVG viewer size fixed */
 
 static unsigned int SVG_xLast = UINT_MAX; /* current pen horizontal position*/
 static unsigned int SVG_yLast = UINT_MAX;	/* current pen vertical position*/
@@ -124,6 +127,7 @@ static void SVG_GroupFilledOpen __PROTO ((void));
 static void SVG_GroupFilledClose __PROTO ((void));
 static void SVG_StyleColor __PROTO((const char*));
 static void SVG_StyleFillColor __PROTO((void));
+static void SVG_local_reset __PROTO(());
 #if USE_ULIG_FILLEDBOXES
 static void SVG_DefineFillPatternWithPath __PROTO((const char* path));
 static void SVG_DefineFillPattern __PROTO((int fillpat));
@@ -360,21 +364,34 @@ SVG_options ()
 {
     struct value a;
 
+    SVG_local_reset();
     if (!END_OF_COMMAND) {	/* get terminal size*/
 	if (almost_equals (c_token, "s$ize")) {
+	    double value;
+
 	    c_token++;
 
 	    if (END_OF_COMMAND)
 		int_error(c_token,"expecting x size");
-	    SVG_xSize = (unsigned int) real (const_express (&a));
+	    value = real(const_express (&a));
 	    if (SVG_xSize < 2 || SVG_xSize > 8192)
 		int_error(c_token,"x size out of range");
+	    SVG_xSize = (unsigned int) value;
 
 	    if (END_OF_COMMAND)
 		int_error(c_token,"expecting y size");
-	    SVG_ySize = (unsigned int) real (const_express (&a));
+	    value = real(const_express (&a));
 	    if (SVG_ySize < 2 || SVG_ySize > 8192)
 		int_error(c_token,"y size out of range");
+	    SVG_ySize = (unsigned int) value;
+
+	    if (almost_equals (c_token, "d$ynamic")) {
+		c_token++;
+		SVG_fixed_size = FALSE;
+	    } else if (almost_equals (c_token, "fi$xed")){
+		c_token++;
+		SVG_fixed_size = TRUE;
+	    }
 	}
     }
 
@@ -383,7 +400,7 @@ SVG_options ()
 	    c_token++;
 
 	    if (!END_OF_COMMAND && isstring (c_token)) {
-		quote_str (SVG_fontNameDef, c_token, MAX_ID_LEN);
+		quote_str (SVG_fontNameCur, c_token, MAX_ID_LEN);
 		c_token++;
 	    } else
 		int_error(c_token,"fname: expecting font name");
@@ -396,7 +413,7 @@ SVG_options ()
 
 	    if (END_OF_COMMAND)
 		int_error(c_token,"fsize: expecting font size");
-	    SVG_fontSizeDef = real (const_express (&a));
+	    SVG_fontSizeCur = real (const_express (&a));
 	}
     }
 
@@ -404,8 +421,20 @@ SVG_options ()
 	 int_error(c_token, "unexpected text at end of command");
 
     /* Save options back into options string in normalized format */
-    sprintf(term_options, "size %d %d fname '%s'  fsize %g",
-	    SVG_xSize, SVG_ySize, SVG_fontNameDef, SVG_fontSizeDef);
+    sprintf(term_options, "size %d %d%s fname '%s'  fsize %g",
+	    SVG_xSize, SVG_ySize,
+        SVG_fixed_size ? " fixed": " dynamic",
+        SVG_fontNameCur, SVG_fontSizeCur);
+}
+
+static void
+SVG_local_reset()
+{
+    SVG_xSize      = SVG_XMAX;
+    SVG_ySize      = SVG_YMAX;
+    SVG_fixed_size = TRUE;
+    strcpy(SVG_fontNameCur, SVG_fontNameDef);
+    SVG_fontSizeCur  = SVG_fontSizeDef;
 }
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -462,7 +491,7 @@ SVG_init ()
 
 /* set current font*/
 
-    SVG_SetFont (SVG_fontNameDef, SVG_fontSizeDef);
+    SVG_SetFont (SVG_fontNameCur, SVG_fontSizeCur);
 
 /* set h_char, v_char*/
 
@@ -477,23 +506,27 @@ SVG_init ()
 /* write file header*/
 
     fprintf (gpoutfile,
-	     "<?xml version=\"1.0\" standalone=\"no\"?>\n"
+	     "<?xml version=\"1.0\" %sstandalone=\"no\"?>\n"
 	     "<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 20001102//EN\" \"svg-20001102.dtd\">\n"
-	     "<svg width=\"%u\" height=\"%u\" viewBox=\"0 0 %u %u\">\n\n"
+	     "<svg ",
+	     (encoding == S_ENC_ISO8859_1) ? "encoding=\"iso-8859-1\" " : "");
+
+    if (SVG_fixed_size)
+        fprintf (gpoutfile, "width=\"%u\" height=\"%u\" ",
+		 term->xmax, term->ymax);
+
+    fprintf (gpoutfile,
+	     "viewBox=\"0 0 %u %u\">\n"
 	     "<desc>Produced by GNUPLOT %s patchlevel %s </desc>\n\n",
-	     term->xmax, term->ymax, term->xmax, term->ymax,
-	     gnuplot_version, gnuplot_patchlevel);
+	     term->xmax, term->ymax, gnuplot_version, gnuplot_patchlevel);
 
     /* definitions of point symbols */
     /* FIXME: SVG scales linewidth along with the marker itself, and
      * there seems to be no way to avoid that without copying the
      * marker definition into the file, rather than referencing a
      * defined one :-( That would make for much larger files */
-
-#if 0
-	     "\t<path id='gpPt3' style='stroke-width:%.3f' d='M-1,-1 h2 v2 h-2 z'/>\n"
-#endif
-       
+    /* "\t<path id='gpPt3' style='stroke-width:%.3f' d='M-1,-1 h2 v2 h-2 z'/>\n" */
+	
     stroke_width = 2.0 / term->h_tic;
     fprintf (gpoutfile,
 	     "<defs>\n"
@@ -1003,10 +1036,13 @@ START_HELP(svg)
 " This terminal produces files in the W3C Scalable Vector Graphics format.",
 "",
 " Syntax:",
-"       set terminal svg {size <x> <y>}",
+"       set terminal svg {size <x> <y> {|fixed|dynamic}}",
 "                        {fname \"<font>\"} {fsize <fontsize>}",
 "",
 " where <x> and <y> are the size of the SVG plot to generate,",
+" `dynamic` allows a svg-Viewer to resize plot, whereas the default",
+" setting, `fixed`, will request an absolute size.",
+"",
 " <font> is the name of the default font to use (default Arial) and",
 " <fontsize> is the font size (in points, default 12)"
 END_HELP(svg)

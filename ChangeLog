@@ -1,3 +1,12 @@
+2003-03-06  Wilhelm Braunschober  <Wilhelm.Braunschober@t-online.de>
+
+	* term/svg.trm (SVG_fixed_size): New configuration variable.
+	(SVG_local_reset): New helper function to reset all to defaults.
+	(SVG_options): Handle new option 'size {fixed|dynamic}'.  Fix font
+ 	name input to write to FontNameCur, not FontNameDef.
+	(SVG_init): Use FontNameCur instead of FontNameDef.  Implement
+ 	encoding ISO-8859-1 and dynamic size option.
+
 2003-03-04  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* pm3d/contrib/colorpts-demo.gp: Removed explicit 'set term'.
