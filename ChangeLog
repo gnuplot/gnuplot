@@ -1,4 +1,11 @@
-2004-07-04  Ethan Merritt  <merritt@u.washington.edu>
+2004-07-05  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/gplt_x11.c: Rework event-handling subroutines so that the
+	intermediate window resize and redraw events are skipped if possible.
+	This reduces the hysteresis when the window is resized by dragging.
+	Patch by Jay Painter <jpaint@u.washington.edu>.
+
+2004-07-05  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/graph3d.c (place_labels3d place_arrows3d get_arrow3d): Test for
 	wrap-around of negative coordinates when converted to unsigned screen
