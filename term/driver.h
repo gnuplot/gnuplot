@@ -1,4 +1,4 @@
-/* $Id: driver.h,v 1.11 1999/08/07 17:18:48 lhecking Exp $ */
+/* $Id: driver.h,v 1.12 1999/10/01 15:09:10 lhecking Exp $ */
 
 /* GNUPLOT - driver.h */
 
@@ -46,7 +46,6 @@
 
 static void do_point __PROTO((unsigned int x, unsigned int y, int number));
 static void line_and_point __PROTO((unsigned int x, unsigned int y, int number));
-static void do_arrow __PROTO((unsigned int sx, unsigned int sy, unsigned int ex, unsigned int ey, int head));
 static int null_text_angle __PROTO((int ang));
 static int null_justify_text __PROTO((enum JUSTIFY just));
 static int null_scale __PROTO((double x, double y));
