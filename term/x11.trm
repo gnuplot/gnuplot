@@ -1,5 +1,5 @@
 /*
- * $Id: x11.trm,v 1.88 2003/12/06 06:44:40 sfeam Exp $
+ * $Id: x11.trm,v 1.89 2003/12/13 00:01:40 sfeam Exp $
  *
  */
 
@@ -164,6 +164,7 @@ static struct x11opt {
     { "-raise", hasNoArg}, { "-noraise", hasNoArg},
     { "-persist", hasNoArg}
 #ifdef USE_MOUSE
+    , { "-nofeedback", hasNoArg}
     , { "-noevents", hasNoArg}
 #endif
 };
@@ -210,6 +211,7 @@ static int do_raise = UNSET;
  */
 static TBOOLEAN default_font_size_known = FALSE;
 static TBOOLEAN IPC_LOCK = FALSE;
+static TBOOLEAN X11_MOUSE_FEEDBACK = TRUE;
 #endif
 
 static int parse_driver __PROTO((const char *));
@@ -296,6 +298,8 @@ X11_args(int argc, char *argv[])
 	for (n = 0; n < X11_nopts; n++) {
 	    if (strcmp(*argv, X11_cmdopts[n].option) == 0) {
 		optvec[i++] = *xargv;
+		if (strcmp(*argv, "-nofeedback") == 0)
+		    X11_MOUSE_FEEDBACK = FALSE;
 		if (strcmp(*argv, "-display") == 0)
 		    X11_Display++;
 		if (X11_cmdopts[n].arg == hasArg) {
@@ -1036,29 +1040,24 @@ X11_graphics()
 	last_encoding = encoding;
     }
 
-    /* Force default font at start of plot */
-#ifdef USE_MOUSE
+#if defined(USE_MOUSE) && defined(PIPE_IPC)
     /* EAM June 2003 - Flush the set font command through the pipe */
     /* to gnuplot_x11, then wait for it to return the resulting    */
-    /* font size information (v_char and h_char).                  */
-    if (!default_font_size_known) {
-#ifdef PIPE_IPC
-	IPC_LOCK = TRUE;
-#endif
-	X11_set_default_font(); 
-	FFLUSH();
-#ifdef PIPE_IPC
-	if (ipc_back_fd >= 0)
-#endif
+    /* font size information (v_char and h_char). The feedback is  */
+    /* caught by do_event() as an event of type GE_fontprops.      */
+    if (ipc_back_fd >= 0 && X11_MOUSE_FEEDBACK) {
+	if (!default_font_size_known) {
+	    IPC_LOCK = TRUE;
+	    PRINT1("QG%s\n",X11_default_font);
+	    FFLUSH();
 	    X11_waitforinput();
-	default_font_size_known = TRUE;
-#ifdef PIPE_IPC
-	IPC_LOCK = FALSE;
-#endif
+	    default_font_size_known = TRUE;
+	    IPC_LOCK = FALSE;
+	}
     }
-#else
-    X11_set_default_font(); 
 #endif
+    /* Force default font at start of plot */
+    X11_set_default_font(); 
     X11_set_font("");
 }
 

@@ -421,6 +421,7 @@ static void pr_window __PROTO((plot_struct * plot));
 static void ProcessEvents __PROTO((Window win));
 static void pr_raise __PROTO((void));
 static void pr_persist __PROTO((void));
+static void pr_feedback __PROTO((void));
 
 #ifdef EXPORT_SELECTION
 static void export_graph __PROTO((plot_struct * plot));
@@ -504,6 +505,7 @@ static XFontStruct *font;
  * header file between this file and term/x11.trm! */
 enum { UNSET = -1, no = 0, yes = 1 };
 static int do_raise = yes, persist = no;
+static int feedback = yes;
 static Cursor cursor;
 static Cursor cursor_default;
 #ifdef USE_MOUSE
@@ -631,8 +633,6 @@ main(int argc, char *argv[])
     fcloseall();
 #endif
 
-    FPRINTF((stderr, "starting up\n"));
-
     preset(argc, argv);
 
 /* set up the alternative cursor */
@@ -670,7 +670,7 @@ main(int argc, char *argv[])
     if (persist) {
 	FPRINTF((stderr, "waiting for %d windows\n", windows_open));
 
-#ifndef DEBUG	
+#ifndef DEBUG
 	/* HBB 20030519: Some programs executing gnuplot -persist may
 	 * be waiting for all default handles to be closed before they
 	 * consider the sub-process finished.  Emacs, e.g., does.  So,
@@ -1560,7 +1560,7 @@ record()
 #ifdef USE_MOUSE
 	case 'Q':		
 	    /* Set default font immediately and return size info through pipe */
-	    if (buf[1] == 'D') {
+	    if (buf[1] == 'G') {
 		int scaled_hchar, scaled_vchar;
 		char *c = &(buf[strlen(buf)-1]);
 		while (*c <= ' ') *c-- = '\0';
@@ -1578,7 +1578,7 @@ record()
 		    gp_exec_event(GE_fontprops, plot->width, plot->height, 
 				  scaled_hchar, scaled_vchar);
 		}
-		continue;
+		return 1;
 	    }
 	    /* fall through */
 #endif
@@ -3787,6 +3787,8 @@ static XrmOptionDescRec options[] = {
     {"-xrm", NULL, XrmoptionResArg, (caddr_t) NULL},
     {"-raise", "*raise", XrmoptionNoArg, (caddr_t) "on"},
     {"-noraise", "*raise", XrmoptionNoArg, (caddr_t) "off"},
+    {"-feedback", "*feedback", XrmoptionNoArg, (caddr_t) "on"},
+    {"-nofeedback", "*feedback", XrmoptionNoArg, (caddr_t) "off"},
     {"-persist", "*persist", XrmoptionNoArg, (caddr_t) "on"}
 };
 
@@ -4057,6 +4059,7 @@ gnuplot: X11 aborted.\n", ldisplay);
     pr_pointsize();
     pr_raise();
     pr_persist();
+    pr_feedback();
 }
 
 /*-----------------------------------------------------------------------------
@@ -4592,6 +4595,14 @@ pr_persist()
 {
     if (pr_GetR(db, ".persist"))
 	persist = (On(value.addr));
+}
+
+static void
+pr_feedback()
+{
+    if (pr_GetR(db, ".feedback"))
+	feedback = !(!strncasecmp(value.addr,"off",3) || !strncasecmp(value.addr,"false",5));
+    FPRINTF((stderr,"gplt_x11: set feedback to %d (%s)\n",feedback,value.addr));
 }
 
 /************ code to handle selection export *********************/

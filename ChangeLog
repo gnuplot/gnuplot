@@ -1,3 +1,12 @@
+2003-12-16  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/gplt_x11.c term/x11.trm:  Add a new x11 command line option
+	-nofeedback, and the corresponding Xresource gnuplot*feedback.
+	It disables the feedback loop by which gnuplot_x11 reports font and
+	plot size information back to gnuplot via the mouse pipe. This
+	is a work-around for feedback synchronization problems triggered by 
+	certain scripting environments and possibly by other causes under os2.
+
 2003-12-16  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* docs/gnuplot.doc: Changes in "What is New in 4.0".
