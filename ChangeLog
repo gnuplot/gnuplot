@@ -1,3 +1,8 @@
+2004-09-1%  Ethan Merritt  <merritt@u.washington.edu>
+
+	* plot3d.c (get_3ddata) graphics.c (boundary) x11.trm:
+	Add #ifdefs so that ./configure --disable-pm3d will build successfully.
+
 2004-09-15  Konstantin Korikov  <lostclus@ua.fm>
 
 	* NEWS docs/gnuplot.doc src/gplt_x11.c src/set.c src/term_api.h

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.76 2004/09/12 01:12:11 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.77 2004/09/12 04:25:01 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -675,8 +675,8 @@ get_3ddata(struct surface_points *this_plot)
 	struct iso_curve *local_this_iso = iso_alloc(samples_1);
 	struct coordinate GPHUGE *cp;
 	double x, y, z;
-#ifdef PM3D
 	double color = VERYLARGE;
+#ifdef PM3D
 	int pm3d_color_from_column = FALSE;
 #endif
 #ifdef EAM_DATASTRINGS

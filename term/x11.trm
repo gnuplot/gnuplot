@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: x11.trm,v 1.117 2004/09/01 15:53:51 mikulik Exp $
+ * $Id: x11.trm,v 1.118 2004/09/07 19:44:35 sfeam Exp $
  *
  */
 
@@ -149,7 +149,10 @@ static enum JUSTIFY X11_last_justification = LEFT;
 
 static void X11_atexit __PROTO((void));
 static void X11_set_default_font __PROTO((void));
+
+#ifdef PM3D
 static void transmit_gradient __PROTO((gradient_struct *gradient, int cnt));
+#endif
 
 /* Merged the old char X11_opts[] and int X11_optarg[]
  * into one array of structs.
