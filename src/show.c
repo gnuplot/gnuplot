@@ -1478,8 +1478,8 @@ show_key()
 	    fprintf(stderr, "boxed\n\twith linetype %d, linewidth %.3f\n",
 		    key_box.l_type + 1, key_box.l_width);
 	else
-	    fprintf(stderr, "not boxed\n\
-\tsample length is %g characters\n\
+	    fprintf(stderr, "not boxed\n");
+	fprintf(stderr, "\tsample length is %g characters\n\
 \tvertical spacing is %g characters\n\
 \twidth adjustment is %g characters\n\
 \tkey title is \"%s\"\n",
@@ -1806,13 +1806,16 @@ int minitic;
 double minifreq;
 const char *name;
 {
+    c_token++;
+
     switch (minitic) {
     case MINI_OFF:
 	fprintf(stderr, "\tminor %stics are off\n", name);
 	break;
     case MINI_DEFAULT:
 	fprintf(stderr, "\
-\tminor %stics are computed automatically for log scales\n", name);
+\tminor %stics are off for linear scales\n\
+\tminor %stics are computed automatically for log scales\n", name, name);
 	break;
     case MINI_AUTO:
 	fprintf(stderr, "\tminor %stics are computed automatically\n", name);
