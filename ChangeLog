@@ -1,3 +1,11 @@
+2003-07-23  Ethan Merritt <merritt@u.washington.edu>
+
+	* configure.in: Rename the configuration option for Jaime Reed's
+	'defined(var)' code, and enable it by default.  The option is now
+	./configure --disable-defined-var
+
+	* show.c: Move listing of undefined variables to an FPRINTF.
+
 2003-07-22  Ethan Merritt <merritt@u.washington.edu>
 
 	* src/command.c src/command.h src/mouse.c:
