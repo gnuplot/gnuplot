@@ -225,7 +225,7 @@ int scanner __PROTO((char expression[]));
 
 char *safe_strncpy __PROTO((char *, char *, size_t));
 #ifndef HAVE_SLEEP
-unsigned int sleep __PROTO((unsigned int)):
+unsigned int sleep __PROTO((unsigned int));
 #endif
 
 
