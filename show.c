@@ -1432,18 +1432,13 @@ static void show_contour()
 
 static void show_format()
 {
-    char str[5][MAX_LINE_LEN + 1];
+    char str[MAX_LINE_LEN+1];
 
-    fprintf(stderr, "\ttic format is x-axis: \"%s\"\
-, y-axis: \"%s\"\
-, z-axis: \"%s\"\
-, x2-axis: \"%s\"\
-, y2-axis: \"%s\"\n",
-	    conv_text(str[0], xformat),
-	    conv_text(str[1], yformat),
-	    conv_text(str[2], zformat),
-	    conv_text(str[3], x2format),
-	    conv_text(str[4], y2format));
+    fprintf(stderr, "\ttic format is x-axis: \"%s\"", conv_text(str, xformat));
+    fprintf(stderr, ", y-axis: \"%s\"", conv_text(str, yformat));
+    fprintf(stderr, ", z-axis: \"%s\"", conv_text(str, zformat));
+    fprintf(stderr, ", x2-axis: \"%s\"", conv_text(str, x2format));
+    fprintf(stderr, ", y2-axis: \"%s\"\n", conv_text(str, y2format));
 }
 
 #define SHOW_LOG(FLAG, BASE, TEXT) \
@@ -1595,9 +1590,9 @@ void show_version_long()
 #ifdef HAVE_LIBREADLINE
 	    "+LIBREADLINE  "
 # ifdef GNUPLOT_HISTORY
-            "+HISTORY  "
+	    "+HISTORY  "
 #else
-            "-HISTORY  "
+	    "-HISTORY  "
 # endif
 #else
 	    "-LIBREADLINE  "

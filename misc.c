@@ -449,7 +449,7 @@ FILE *fp;
     struct text_label *this_label;
     struct arrow_def *this_arrow;
     struct linestyle_def *this_linestyle;
-    char str[MAX_LINE_LEN + 1];
+    char str[MAX_LINE_LEN+1];
 
     /* opinions are split as to whether we save term and outfile
      * as a compromise, we output them as comments !
@@ -502,20 +502,13 @@ set y2data%s\n",
 		dgrid3d_col_fineness,
 		dgrid3d_norm_value);
 
-    fprintf(fp, "\
-set dummy %s,%s\n\
-set format x \"%s\"\n\
-set format y \"%s\"\n\
-set format x2 \"%s\"\n\
-set format y2 \"%s\"\n\
-set format z \"%s\"\n\
-set angles %s\n",
-	    dummy_var[0], dummy_var[1],
-	    conv_text(str, xformat),
-	    conv_text(str, yformat),
-	    conv_text(str, x2format),
-	    conv_text(str, y2format),
-	    conv_text(str, zformat),
+    fprintf(fp, "set dummy %s,%s\n",dummy_var[0], dummy_var[1]);
+    fprintf(fp, "set format x \"%s\"\n", conv_text(str, xformat));
+    fprintf(fp, "set format y \"%s\"\n", conv_text(str, yformat));
+    fprintf(fp, "set format x2 \"%s\"\n", conv_text(str, x2format));
+    fprintf(fp, "set format y2 \"%s\"\n", conv_text(str, y2format));
+    fprintf(fp, "set format z \"%s\"\n", conv_text(str, zformat));
+    fprintf(fp, "set angles %s\n",
 	    (angles_format == ANGLES_RADIANS) ? "radians" : "degrees");
 
     if (work_grid.l_type == 0)
