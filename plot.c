@@ -489,10 +489,10 @@ static void load_rcfile()
 	    p = &home[strlen(home)-1];
 	else
  	    p = home;
-	if ( (*p != PATHSEP1) && (*p != PATHSEP2) && (*p != NUL) ) {
+	if ( (*p != DIRSEP1) && (*p != DIRSEP2) && (*p != NUL) ) {
 	    assert (p>=home && p<=(home+sizeof(home)-1-2));
 	    if (*p) p++;
-	    *p++ = PATHSEP1;
+	    *p++ = DIRSEP1;
 	    *p = NUL;
 	}
     }

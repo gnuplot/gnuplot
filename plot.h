@@ -50,13 +50,13 @@
 
 /* Define operating system dependent constants [default value]:
  *
- * OS:       [" "] Name of OS plus trailing space
- * HOME:     [HOME] Name of environment variable which points to
- *           the directory where gnuplot's config file/s are found.
- * SHELL:    ["/bin/sh"] Name, and in some cases, full path to the shell
- *           that is used to run external commands.
- * PATHSEP1: ['/'] Primary character which separates path elements.
- * PATHSEP2: ['\0'] Secondary character which separates path elements.
+ * OS:      [" "] Name of OS plus trailing space
+ * HOME:    [HOME] Name of environment variable which points to
+ *          the directory where gnuplot's config file/s are found.
+ * SHELL:   ["/bin/sh"] Name, and in some cases, full path to the shell
+ *          that is used to run external commands.
+ * DIRSEP1: ['/'] Primary character which separates path components.
+ * DIRSEP2: ['\0'] Secondary character which separates path components.
  *        
  */
 
@@ -65,7 +65,7 @@
 # ifndef __amigaos__
 #  define HOME     "GNUPLOT"
 #  define SHELL    "NewShell"
-#  define PATHSEP2 ':'
+#  define DIRSEP2 ':'
 # endif
 # ifndef AMIGA
 #  define AMIGA
@@ -76,16 +76,16 @@
 # define OS "TOS "
 # define HOME  "GNUPLOT"
 # define SHELL "gulam.prg"
-# define PATHSEP1 '\\'
+# define DIRSEP1 '\\'
 # ifdef MTOS
-#  define PATHSEP2 '/'
+#  define DIRSEP2 '/'
 # endif
 #endif /* Atari */
 
 #ifdef DOS386
 # define OS "DOS 386 "
 # define HOME  "GNUPLOT"
-# define PATHSEP1 '\\'
+# define DIRSEP1 '\\'
 #endif /* DOS386 */
 
 #ifdef linux
@@ -100,7 +100,7 @@
 # define OS "OS/2 "
 # define HOME  "GNUPLOT"
 # define SHELL "c:\\cmd.exe"
-# define PATHSEP1 '\\'
+# define DIRSEP1 '\\'
 #endif /* OS/2 */
 
 #ifdef OSK
@@ -136,7 +136,7 @@
 #  define OS "MS-Windows "
 # endif /* WIN32 */
 # define HOME  "GNUPLOT"
-# define PATHSEP1 '\\'
+# define DIRSEP1 '\\'
 #endif /* _WINDOWS */
 
 #if defined(MSDOS) && !defined(_Windows)
@@ -148,7 +148,7 @@
 #  define OS "TOS & MiNT & MULTITOS & Magic - "
 # endif /* MTOS */
 # define OS "MS-DOS "
-# define PATHSEP1 '\\'
+# define DIRSEP1 '\\'
 #endif /* MSDOS */
 
 #if defined(__unix__) || defined(unix)
@@ -190,12 +190,12 @@
 # define SHELL "/bin/sh"    /* used if SHELL env variable not set */
 #endif
 
-#ifndef PATHSEP1
-# define PATHSEP1 '/'
+#ifndef DIRSEP1
+# define DIRSEP1 '/'
 #endif
 
-#ifndef PATHSEP2
-# define PATHSEP2 NUL
+#ifndef DIRSEP2
+# define DIRSEP2 NUL
 #endif
 
 #if defined(unix) || defined(AMIGA) || defined(OSK)
