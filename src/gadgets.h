@@ -194,6 +194,8 @@ extern double key_vert_factor;
 /* user specified additional (+/-) width of key titles */
 extern double key_width_fix;
 extern double key_height_fix;
+/* auto title for curves */
+extern int key_auto_titles;
 /* key back to front */ 
 extern TBOOLEAN	key_reverse;
 /* enable/disable enhanced text of key titles */ 

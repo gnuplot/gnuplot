@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.82 2002/07/26 14:09:23 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.83 2002/07/26 16:42:28 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -1722,11 +1722,13 @@ show_key()
 \tvertical spacing is %g characters\n\
 \twidth adjustment is %g characters\n\
 \theight adjustment is %g characters\n\
+\tcurves are%s automatically titled\n\
 \tkey title is \"%s\"\n",
 		    key_swidth,
 		    key_vert_factor,
 		    key_width_fix,
 		    key_height_fix,
+                    key_auto_titles ? "" : " not",
 		    key_title);
     }
 }

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.51 2002/04/08 15:03:43 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.52 2002/08/01 12:05:14 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -1153,9 +1153,12 @@ eval_plots()
 	    /* set default values for title if this has not been specified */
 	    if (!set_title) {
 		this_plot->title_no_enhanced = 1; /* filename or function cannot be enhanced */
-		m_capture(&(this_plot->title), start_token, end_token);
-		if (xparam)
-		    xtitle = this_plot->title;
+		if (key_auto_titles) {
+  		    m_capture(&(this_plot->title), start_token, end_token);
+		    if (xparam)
+		        xtitle = this_plot->title;
+		} else if (xtitle != NULL)
+		    xtitle[0] = '\0';
 	    }
 
 	    /* No line/point style given. As lp_parse also supplies

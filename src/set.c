@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.87 2002/07/26 16:42:28 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.88 2002/08/01 12:05:14 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -1618,6 +1618,12 @@ set_key()
 		key_height_fix = real(const_express(&a));
 		c_token--; /* it is incremented after loop */
 		break;
+            case S_KEY_AUTOTITLES:
+                key_auto_titles = 1;
+                break;
+            case S_KEY_NOAUTOTITLES:
+                key_auto_titles = 0;
+                break;
 	    case S_KEY_TITLE:
 		if (isstring(c_token+1)) {
 		    /* We have string specified - grab it. */

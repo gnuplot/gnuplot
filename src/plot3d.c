@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.55 2002/07/21 12:32:53 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.56 2002/07/22 09:22:18 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -1337,16 +1337,24 @@ eval_3dplots()
 	    /* set default values for title if this has not been specified */
 	    if (!set_title) {
 		this_plot->title_no_enhanced = 1; /* filename or function cannot be enhanced */
-		if (this_plot->plot_type == DATA3D && df_binary==TRUE && end_token==start_token+1)
-		    /* let default title for  splot 'a.dat' binary  is 'a.dat'
-		     * while for  'a.dat' binary using 2:1:3  will be all 4 words */ 
-                    m_capture(&(this_plot->title), start_token, start_token);
-		else
-		    m_capture(&(this_plot->title), start_token, end_token);
-		if (crnt_param == 2)
-		    xtitle = this_plot->title;
-		else if (crnt_param == 1)
-		    ytitle = this_plot->title;
+		if (key_auto_titles) {
+		    if (this_plot->plot_type == DATA3D && df_binary==TRUE && end_token==start_token+1)
+			/* let default title for  splot 'a.dat' binary  is 'a.dat'
+			 * while for  'a.dat' binary using 2:1:3  will be all 4 words */ 
+			m_capture(&(this_plot->title), start_token, start_token);
+		    else
+			m_capture(&(this_plot->title), start_token, end_token);
+		    if (crnt_param == 2)
+			xtitle = this_plot->title;
+		    else if (crnt_param == 1)
+			ytitle = this_plot->title;
+		} else {
+		    if (xtitle != NULL)
+			xtitle[0] = '\0';
+		    if (ytitle != NULL)
+			ytitle[0] = '\0';
+		    /*   this_plot->title = NULL;   */
+		}
 	    }
 
 	    /* No line/point style given. As lp_parse also supplies

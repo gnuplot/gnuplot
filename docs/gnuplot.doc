@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.122 2002/07/26 16:42:27 mikulik Exp $
+C RCS $Id: gnuplot.doc,v 1.123 2002/08/15 17:59:15 mikulik Exp $
 C 18 September 2001
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001   Thomas Williams, Colin Kelley et al.
 C
@@ -2964,9 +2964,10 @@ C ... and restart the table:
  `notitle`.  A null title (`title ''`) is equivalent to `notitle`.  If only
  the sample is wanted, use one or more blanks (`title ' '`).
 
- By default the line title is the function or file name as it appears on the
- `plot` command.  If it is a file name, any datafile modifiers specified will
- be included in the default title.
+ If `key autotitles` is set (which is the default) and neither `title` nor
+ `notitle` are specified the line title is the function name or the file name as
+ it appears on the `plot` command.  If it is a file name, any datafile modifiers
+ specified will be included in the default title.
 
  The layout of the key itself (position, title justification, etc.) can be
  controlled by `set key`.  Please see `set key` for details.
@@ -4679,6 +4680,7 @@ C ... and restart the table:
                {samplen <sample_length>} {spacing <vertical_spacing>}
                {width <width_increment>}
                {height <height_increment>}
+               {{no}autotitles}
                {title "<text>"} {{no}enhanced}
                {{no}box { {linestyle | ls <line_style>}
                           | {linetype | lt <line_type>}
@@ -4718,6 +4720,11 @@ C ... and restart the table:
  subtracted from the height of the key box.  This is useful mainly when you are
  putting a box around the key, otherwise it can be used to adjust the vertical
  shift of automatically chosen key position by <height_increment>/2.
+
+ All plotted curves of `plot`s and `splot`s are titled according to the 
+ default option `autotitles`. The automatic generation of titles can be 
+ suppressed by `noautotitles`; then only those titles explicitly defined 
+ by `(s)plot ... title ...` will be drawn.
 
  A title can be put on the key (`title "<text>"`)---see also `syntax` for the
  distinction between text in single- or double-quotes.  The key title uses the

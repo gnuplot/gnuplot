@@ -65,6 +65,7 @@ double key_swidth = 4.0;
 double key_vert_factor = 1.0;
 double key_width_fix = 0.0;
 double key_height_fix = 0.0;
+int key_auto_titles = 1;
 char key_title[MAX_LINE_LEN + 1] = "";
 
 #ifdef PM3D

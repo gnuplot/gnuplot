@@ -1,3 +1,9 @@
+2002-08-16  Harald Harders  <h.harders@tu-bs.de>
+
+	* NEWS docs/gnuplot.doc src/gadgets.h src/gadgets.c src/plot2d.c
+	src/plot3d.c src/save.c src/set.c src/show.c src/tables.h src/tables.c
+	src/unset.c: New option 'set key {no}autotitles'.
+
 2002-08-15  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* docs/gnuplot.doc term/post.trm: Added some hyperlinks.
@@ -886,7 +892,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/08/15 17:59:15 $).
+	last modification date (from the tag $Date: 2002/08/15 20:33:56 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
