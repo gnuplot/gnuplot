@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.32 2001/08/27 15:02:14 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.33 2001/09/19 15:47:18 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - gplt_x11.c */
@@ -262,6 +262,9 @@ typedef struct plot_struct {
      * This is always the default colormap, if not in pm3d.
      */
     cmap_t *cmap;
+#ifdef PM3D
+    TBOOLEAN release_cmap;
+#endif
 } plot_struct;
 
 #ifdef USE_MOUSE
@@ -979,6 +982,12 @@ int term_number;
  * cursors for all windows and then define the cursor for the active
  * window 
  */
+    /* allow releasing of the cmap at the first drawing
+     * operation if no palette was allocated until then.
+     */
+#ifdef PM3D
+    plot->release_cmap = TRUE;
+#endif
     reset_cursor();
     XDefineCursor(dpy, plot->window, cursor);
 }
@@ -1161,12 +1170,14 @@ record()
 		}
 	    }
 	    return 1;
+#if 0
 	case X11_GR_RELEASE_PALETTE:
 	    /* turn pm3d off */
 	    FPRINTF((stderr, "X11_GR_RELEASE_PALETTE\n"));
 	    ReleaseColormap(plot);
 	    sm_palette.colorMode = SMPAL_COLOR_MODE_NONE;
 	    return 1;
+#endif
 #endif
 
 	case 'X':		/* tell the driver about do_raise /  persist */
@@ -1695,6 +1706,16 @@ display(plot)
 {
     int n;
 
+#ifdef PM3D
+    if (TRUE == plot->release_cmap) {
+	/* no pm3d palette was allocated, so
+	 * switch back to the default cmap */
+	plot->release_cmap = FALSE;
+	ReleaseColormap(plot);
+	sm_palette.colorMode = SMPAL_COLOR_MODE_NONE;
+    }
+#endif
+
     FPRINTF((stderr, "Display %d ; %d commands\n", plot - plot_array, plot->ncommands));
 
     if (plot->ncommands == 0)
@@ -1858,7 +1879,7 @@ FreeColors(plot_struct * plot)
 {
     if (plot->cmap->total && plot->cmap->pixels) {
 	if (plot->cmap->allocated) {
-	    /* fprintf(stderr, "(FreeColors) XFreeColors\n"); */
+	    /* fprintf(stderr, "freeing palette colors\n"); */
 	    XFreeColors(dpy, plot->cmap->colormap, plot->cmap->pixels, plot->cmap->allocated, 0 /* XXX ??? XXX */ );
 	}
 	free(plot->cmap->pixels);
@@ -1949,6 +1970,11 @@ PaletteMake(plot_struct * plot, t_sm_palette * tpal)
     int max_colors;
     int min_colors;
     char *save_title = (char *) 0;
+
+#ifdef PM3D
+    /* don't release this cmap at the first drawing operation */
+    plot->release_cmap = FALSE;
+#endif
 
     if (tpal && tpal->use_maxcolors > 0)
 	max_colors = tpal->use_maxcolors;

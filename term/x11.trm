@@ -1,5 +1,5 @@
 /*
- * $Id: x11.trm,v 1.40 2001/09/19 15:50:10 broeker Exp $
+ * $Id: x11.trm,v 1.41 2001/09/22 15:58:43 amai Exp $
  *
  */
 
@@ -83,7 +83,6 @@ TERM_PUBLIC void X11_set_clipboard __PROTO((const char[]));
 
 #ifdef PM3D
 TERM_PUBLIC int X11_make_palette __PROTO((t_sm_palette*));
-/* not static! */ void X11_unset_pm3d __PROTO((void)); /*not previous_palette*/
 TERM_PUBLIC void X11_set_color __PROTO((double));
 TERM_PUBLIC void X11_filled_polygon __PROTO((int, gpiPoint*));
 /* these must match the definitions in gplt_x11.c */
@@ -980,17 +979,6 @@ TERM_PUBLIC int X11_make_palette(t_sm_palette *palette)
 	}
     }
     return 0;
-}
-
-/* we use it from unset.c */
-void
-X11_unset_pm3d(void)
-{
-    if (X11_ipc) {
-	PRINT1("%c\n", X11_GR_RELEASE_PALETTE);
-	FFLUSH();
-    }
-    return;
 }
 
 TERM_PUBLIC void X11_set_color(double gray)

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.23 2001/09/27 19:52:50 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.24 2001/10/31 17:13:59 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -50,9 +50,6 @@ static char *RCSid() { return RCSid("$Id: unset.c,v 1.23 2001/09/27 19:52:50 mik
 #include "variable.h"
 #ifdef USE_MOUSE
 # include "mouse.h"
-#  ifdef X11
-extern void X11_unset_pm3d __PROTO((void)); /* defined in x11.trm */
-#  endif
 #endif
 
 #ifdef PM3D
@@ -1075,11 +1072,6 @@ unset_pm3d()
     }
     pm3d.where[0] = 0;
     pm3d.map = 0;  /* trick for rotating ylabel */
-#ifdef X11
-    if (!strcmp(term->name, "x11")) {
-	X11_unset_pm3d();
-    }
-#endif
 }
 #endif
 
