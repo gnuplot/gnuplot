@@ -202,7 +202,7 @@ doc2html.o: doc2html.c allterm.h
 ### PDF documentation
 pdf: gnuplot.pdf
 
-gnuplot.pdf gnuplot.tex
+gnuplot.pdf: gnuplot.tex
 	$(PDFLATEX) gnuplot.tex
 	$(PDFLATEX) gnuplot.tex
 

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: fit.c,v 1.23.2.1 1999/08/19 14:39:59 lhecking Exp $";
+static char *RCSid = "$Id: fit.c,v 1.23.2.2 1999/10/01 10:36:35 lhecking Exp $";
 #endif
 
 /*
@@ -89,6 +89,9 @@ extern char c_dummy_var[MAX_NUM_VAR][MAX_ID_LEN+1];
 extern int c_token;
 extern int df_datum, df_line_number;
 
+/* following 2 external arrays are needed to use time data */
+extern int datatype[];
+extern int df_timecol[];
 
 enum marq_res {
     OK, ERROR, BETTER, WORSE
@@ -1288,7 +1291,7 @@ void do_fit()
 
     columns = df_open(4);	/* up to 4 using specs allowed */
     if (columns == 1)
-	int_error(c_token, "Need 2 to 4 using specs" c_token);
+	int_error("Need 2 to 4 using specs", c_token);
 
     /* The following patch was made by Remko Scharroo, 25-Mar-1999
      * We need to check if one of the columns is time data, like
