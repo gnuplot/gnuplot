@@ -75,6 +75,8 @@ TERM_PUBLIC void PM_linewidth __PROTO((double linewidth));
 #include <process.h>
 #include <io.h>
 #define INCL_DOSPROCESS
+#define INCL_DOSSEMAPHORES
+#define INCL_DOSMISC
 #include <os2.h>
 
 
@@ -120,6 +122,7 @@ void PM_setup( void ) ;
 static void PM_reset_opts( void ) ;
 static void PM_query( void ) ;
 static void PM_make_servername( char * ) ;
+static void PM_abortplot();
 
 TERM_PUBLIC void PM_init() 
     { 
@@ -446,7 +449,7 @@ TERM_PUBLIC void PM_point( unsigned int x, unsigned int y, int number )
     fwrite( &mode, sizeof(int), 1, PM_pipe ) ;
     }
 
-int PM_abortplot()
+void PM_abortplot()
     {
     PM_must_abort = 0;
     term_reset() ;
@@ -454,7 +457,7 @@ int PM_abortplot()
     bail_to_command_line();
     }
 
-int PM_intc_cleanup()
+void PM_intc_cleanup()
     {
     if( PM_pipe == NULL || PM_mode == SET_TEXT ) PM_abortplot() ;
     PM_must_abort = 1 ;
@@ -498,7 +501,6 @@ int PM_pause( char *str )
     {
     int len, rc ;
     ULONG cbR ;
-    unsigned long ul ;
     char buf[256] ;
     char *bp ;
 

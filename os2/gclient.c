@@ -206,6 +206,9 @@ static char    *ParseText(HPS, char *, BOOL, char *,
                        int, int, BOOL, BOOL ) ;
 static void     CharStringAt(HPS, int, int, int, char *) ;
 static int      QueryTextBox( HPS, int, char * ) ; 
+static void      LMove( HPS hps, POINTL *p ) ;
+static void      LLine( HPS hps, POINTL *p ) ;
+static void      LType( int iType ) ;
 
 /*==== c o d e ===============================================================*/
 
@@ -2036,14 +2039,14 @@ static int iState = 0 ;
 static double togo = 0.0 ;
 static int iPatt[8][9]
   = {
-    0,   0,   0,   0,   0,   0,   0,   0  , 0,
-    300, 200, -1 , 0  , 0  , 0  , 0  , 0  , 0  ,
-    150, 150, -1 , 0  , 0  , 0  , 0  , 0  , 0  ,
-    300, 200, 150, 200, -1 , 0  , 0  , 0  , 0  ,
-    500, 200, -1 , 0  , 0  , 0  , 0  , 0  , 0  ,
-    300, 200, 150, 200, 150, 200, -1 , 0  , 0  ,
-    300, 200, 150, 200, 150, 200, 150, 200, -1 ,
-    500,  200, 150, 200, -1 , 0  , 0  , 0  , 0  
+    {   0,   0,   0,   0,   0,   0,   0,   0,  0 },
+    { 300, 200,  -1,   0,   0,   0,   0,   0,  0 },
+    { 150, 150,  -1,   0,   0,   0,   0,   0,  0 },
+    { 300, 200, 150, 200,  -1,   0,   0,   0,  0 },
+    { 500, 200,  -1,   0,   0,   0,   0,   0,  0 },
+    { 300, 200, 150, 200, 150, 200,  -1,   0,  0 },
+    { 300, 200, 150, 200, 150, 200, 150, 200, -1 },
+    { 500, 200, 150, 200,  -1,   0,   0,   0,  0 }
     } ;
 
 int LMove( HPS hps, POINTL *p )
@@ -2084,7 +2087,7 @@ int LMove( HPS hps, POINTL *p )
         }
     } 
 
-int LLine( HPS hps, POINTL *p )
+void LLine( HPS hps, POINTL *p )
     {
     double ds, dx, dy ;
     if( iLinebegin ) iLinebegin = 0 ;
@@ -2122,7 +2125,7 @@ int LLine( HPS hps, POINTL *p )
         }
     } 
 
-int LType( int iType )
+void LType( int iType )
     {
     iLinebegin = 1 ;
     if( iType > 7 ) iType = 0 ;
