@@ -5,7 +5,13 @@
   	Helps to avoid problems where people use %L even though the
  	logbase is 10.
 	(setup_tics): Corrected determination of 'fixmin' and 'fixmax'.
+	(axis_checked_extend_empty_range): Removed a few more magic
+ 	numbers.
+	(load_range): Dito. Also changed return type and argument from
+ 	TBOOLEAN to new type t_autoscale.
 
+	* src/axis.h (load_range): Updated prototype.
+	
 2001-06-20  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* term/x11.trm (X11_waitforinput): Call getc() instead of read(),

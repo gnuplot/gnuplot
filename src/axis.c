@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.15 2001/06/21 11:20:20 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.16 2001/06/21 15:00:58 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -312,9 +312,9 @@ axis_checked_extend_empty_range(axis,mesg)
 		    axis_defaults[axis].name, dmin, dmax);
 	    /* HBB 20010525: correctly handle single-ended
 	     * autoscaling, too: */
-	    if (axis_array[axis].autoscale & 1)
+	    if (axis_array[axis].autoscale & AUTOSCALE_MIN)
 		axis_array[axis].min -= widen;
-	    if (axis_array[axis].autoscale & 2)
+	    if (axis_array[axis].autoscale & AUTOSCALE_MAX)
 		axis_array[axis].max += widen;
 	    fprintf(stderr, "adjusting to [%g:%g]\n",
 		    axis_array[axis].min, axis_array[axis].max);
@@ -1540,23 +1540,23 @@ axis_draw_2d_zeroaxis(axis, crossaxis)
 
 /* loads a range specification from the input line into variables 'a'
  * and 'b' */
-TBOOLEAN
-load_range(axis, a, b, autosc)
+t_autoscale
+load_range(axis, a, b, autoscale)
      AXIS_INDEX axis;
      double *a, *b;
-     TBOOLEAN autosc;
+     t_autoscale autoscale;
 {
     if (equals(c_token, "]"))
-	return (autosc);
+	return (autoscale);
     if (END_OF_COMMAND) {
 	int_error(c_token, "starting range value or ':' or 'to' expected");
     } else if (!equals(c_token, "to") && !equals(c_token, ":")) {
 	if (equals(c_token, "*")) {
-	    autosc |= 1;
+	    autoscale |= AUTOSCALE_MIN;
 	    c_token++;
 	} else {
 	    GET_NUM_OR_TIME(*a, axis);
-	    autosc &= 2;
+	    autoscale &= ~AUTOSCALE_MIN;
 	}
     }
     if (!equals(c_token, "to") && !equals(c_token, ":"))
@@ -1564,14 +1564,14 @@ load_range(axis, a, b, autosc)
     c_token++;
     if (!equals(c_token, "]")) {
 	if (equals(c_token, "*")) {
-	    autosc |= 2;
+	    autoscale |= AUTOSCALE_MAX;
 	    c_token++;
 	} else {
 	    GET_NUM_OR_TIME(*b, axis);
-	    autosc &= 1;
+	    autoscale &= ~AUTOSCALE_MAX;
 	}
     }
-    return (autosc);
+    return (autoscale);
 }
 
 

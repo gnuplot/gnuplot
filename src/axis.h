@@ -1,5 +1,5 @@
 /* 
- * $Id: axis.h,v 1.6 2001/03/19 14:52:23 mikulik Exp $
+ * $Id: axis.h,v 1.7 2001/06/11 16:47:59 broeker Exp $
  *
  */
 
@@ -584,8 +584,8 @@ do {						\
 
 	
 /* ------------ functions exported by axis.c */
-TBOOLEAN load_range __PROTO((AXIS_INDEX, double *a, double *b, TBOOLEAN autosc));
-void axis_unlog_interval __PROTO((AXIS_INDEX, double *, double *, TBOOLEAN checkrange));
+t_autoscale load_range __PROTO((AXIS_INDEX, double *, double *, t_autoscale));
+void axis_unlog_interval __PROTO((AXIS_INDEX, double *, double *, TBOOLEAN));
 void axis_revert_and_unlog_range __PROTO((AXIS_INDEX));
 double axis_log_value_checked __PROTO((AXIS_INDEX, double, const char *));
 void axis_checked_extend_empty_range __PROTO((AXIS_INDEX, const char *mesg));
