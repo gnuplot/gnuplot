@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.68 2004/11/21 05:41:15 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.69 2005/03/03 04:09:46 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -262,7 +262,8 @@ static TBOOLEAN mixed_data_fp = FALSE; /* inline data */
 char *df_filename;	/* name of data file */
 
 #ifdef EAM_DATASTRINGS
-static int df_no_tic_specs;		/* except ticlabel columns are counted here */
+static int df_no_tic_specs;	/* ticlabel columns not counted in df_no_use_specs */
+#define MAX_TOKEN_LENGTH 64
 #endif
 
 #ifndef MAXINT			/* should there be one already defined ? */
@@ -315,7 +316,7 @@ static int fast_columns;	/* corey@cac optimization */
 char *df_tokens[MAXDATACOLS];		/* filled in by df_tokenise */
 #define NO_COLUMN_HEADER (-99)	/* some value that can never be a real column */
 static int column_for_key_title = NO_COLUMN_HEADER;
-static char df_key_title[64];	/* filled in from <col> in 1st row by df_tokenise */
+static char df_key_title[MAX_TOKEN_LENGTH];	/* filled in from <col> in 1st row by df_tokenise */
 #endif
 
 /* columns needing timefmt are passed in df_timecol[] after df_open */
@@ -1835,7 +1836,7 @@ df_readline(double v[], int max)
 		/* Handle cases where column holds a meta-data string */
 		/* Axis labels, plot titles, etc.                     */
 		if (use_spec[output].expected_type >= CT_XTICLABEL) {
-		    char temp_string[64];
+		    char temp_string[MAX_TOKEN_LENGTH];
 		    int axis, axcol;
 		    float xpos;
 		    switch (use_spec[output].expected_type) {
@@ -1864,7 +1865,7 @@ df_readline(double v[], int max)
 		    add_tic_user(axis,temp_string,xpos,0);
 #ifdef EAM_HISTOGRAMS
 		} else if (use_spec[output].expected_type == CT_KEYLABEL) {
-		    char temp_string[64];
+		    char temp_string[MAX_TOKEN_LENGTH];
 		    df_parse_string_field(temp_string,df_tokens[output]);
 		    add_key_entry(temp_string,df_datum);
 #endif
@@ -2551,7 +2552,7 @@ df_set_key_title(struct curve_points *plot)
 static void
 df_parse_string_field(char *string, char *field)
 {
-    char temp_string[64];
+    char temp_string[MAX_TOKEN_LENGTH];
     temp_string[sizeof(temp_string)-1] = '\0';
 
     if (!field) {
