@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: wgraph.c,v 1.11 2001/02/08 16:44:36 broeker Exp $";
+static char *RCSid = "$Id: wgraph.c,v 1.12 2001/02/09 15:06:11 broeker Exp $";
 #endif
 
 /* GNUPLOT - win/wgraph.c */
@@ -358,6 +358,10 @@ RECT rect;
 	InvalidateRect(lpgw->hWndGraph, (LPRECT) &rect, 1);
 	lpgw->locked = FALSE;
 	UpdateWindow(lpgw->hWndGraph);
+#ifdef USE_MOUSE
+	/* redraw ruler for this new plot */
+	DrawRuler(lpgw);
+#endif
 }
 
 void WDPROC
@@ -1749,18 +1753,110 @@ WM_MOUSEMOVE: set default pointer, i.e.:
 			}
 			break;
 		case WM_CHAR:
+			if (wParam == VK_SPACE) {
 				/* HBB 20001023: implement the '<space> in graph returns to
 				 * text window' --- feature already present in OS/2 and X11 */
-			if (wParam == VK_SPACE) {
 				/* Make sure the text window is visible: */
 				ShowWindow(lpgw->lptw->hWndParent, SW_SHOW);
 				/* and activate it (--> Keyboard focus goes there */
 				BringWindowToTop(lpgw->lptw->hWndParent);
-#ifdef USE_MOUSE
-			} else {
-			    Wnd_exec_event(lpgw, lParam,  GE_keypress, wParam, 0);
-#endif
+				return 0;
 			}
+#ifdef USE_MOUSE
+			/* Remap virtual keys to gnuplot's codes. */
+			switch (wParam) { 
+				case VK_BACK:
+					wParam = GP_BackSpace; break;
+				case VK_TAB:
+					wParam = GP_Tab; break;
+				case VK_RETURN:
+					wParam = GP_Return; break;
+				case VK_PAUSE:
+					wParam = GP_Pause; break;
+				case VK_SCROLL:
+					wParam = GP_Scroll_Lock; break;
+#if HOW_IS_THIS_FOR_WINDOWS //??? @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+				case VK_SYSRQ:
+					wParam = GP_Sys_Req; break;
+#endif
+				case VK_ESCAPE:
+					wParam = GP_Escape; break;
+				case VK_DELETE:
+					wParam = GP_Delete; break;
+				case VK_INSERT:
+					wParam = GP_KP_Insert; break;
+				case VK_HOME:
+					wParam = GP_Home; break;
+				case VK_LEFT:
+					wParam = GP_Left; break;
+				case VK_UP:
+					wParam = GP_Up; break;
+				case VK_RIGHT:
+					wParam = GP_Right; break;
+				case VK_DOWN:
+					wParam = GP_Down; break;
+				case VK_END:
+					wParam = GP_End; break;
+
+#if HOW_IS_THIS_FOR_WINDOWS //??? @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+				case VK_PAGEUP:
+					wParam = GP_PageUp; break;
+				case VK_PAGEDOWN:
+					wParam = GP_PageDown; break;
+#endif
+				case VK_F1:
+					wParam = GP_F1; break;
+				case VK_F2:
+					wParam = GP_F2; break;
+				case VK_F3:
+					wParam = GP_F3; break;
+				case VK_F4:
+					wParam = GP_F4; break;
+				case VK_F5:
+					wParam = GP_F5; break;
+				case VK_F6:
+					wParam = GP_F6; break;
+				case VK_F7:
+					wParam = GP_F7; break;
+				case VK_F8:
+					wParam = GP_F8; break;
+				case VK_F9:
+					wParam = GP_F9; break;
+				case VK_F10:
+					wParam = GP_F10; break;
+				case VK_F11:
+					wParam = GP_F11; break;
+				case VK_F12:
+					wParam = GP_F12; break;
+				case VK_SHIFT:
+				case VK_CONTROL:
+#if HOW_IS_THIS_FOR_WINDOWS //??? @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+				case VK_ALT:
+#endif
+					{
+					static int last_modifier_mask = -99;
+					int modifier_mask = 0;
+#if THE_CODE_BELOW_WAS_UPDATED_FOR_WINDOWS //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+// note: you can test it on "splot x*y" + zoom and rotate by mouse
+					modifier_mask = ( (usFlag & KC_SHIFT) ? Mod_Shift : 0 )
+						| ( (usFlag & KC_CTRL) ? Mod_Ctrl : 0)
+						| ( (usFlag & KC_ALT) ? Mod_Alt : 0);
+					if (modifier_mask != last_modifier_mask) {
+						gp_exec_event ( GE_modifier, mx, my, modifier_mask, 0 );
+						last_modifier_mask = modifier_mask;
+					}
+#if 0					
+					if (!(usFlag & KC_SCANCODE)) return 0L; /* only modifier mask has changed */
+#endif
+					if (usFlag & KC_KEYUP) return 0L;   /* ignore key release events? */
+#endif
+					Wnd_exec_event ( lpgw, 0, GE_modifier, modifier_mask, 0);
+					return 0L;
+					}
+			}
+			if (wParam)
+				Wnd_exec_event(lpgw, lParam, GE_keypress, wParam, 0);
+#endif
 			return 0;			
 		case WM_COMMAND:
 			switch(LOWORD(wParam))
@@ -1815,6 +1911,11 @@ WM_MOUSEMOVE: set default pointer, i.e.:
 					GetClientRect(hwnd, &rect);
 					InvalidateRect(hwnd, (LPRECT) &rect, 1);
 					UpdateWindow(hwnd);
+#ifdef USE_MOUSE
+
+					/* Redraw ruler when the window is de-minimized. */
+					DrawRuler(lpgw);
+#endif
 					return 0;
 			}
 			return 0;
@@ -2084,13 +2185,33 @@ DisplayStatusLine (LPGW lpgw, TBOOLEAN erase)
 static void
 UpdateStatusLine (LPGW lpgw, const char text[] )
 {
+#ifdef ENABLE_STATUS_LINE_RESIZE
+	static int is_resized = 0;
+	/* IS IT ALLOWED TO HAVE STATIC HERE? HOW TO DO IT OTHERWISE 
+	 * see also   gplt_x11.c:2303
+	 * @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+	 */
+#endif	
 	DisplayStatusLine(lpgw, TRUE); /* erase previous text */
 	free(sl_curr_text);
 	if (!text || !*text) {
 		sl_curr_text = 0;
+#ifdef ENABLE_STATUS_LINE_RESIZE
+		if (is_resized) {
+			SetWindowHeight( by -vchar );
+			is_resized = 0;
+		}
+#endif
+		
 	} else { /* display new text */
 		sl_curr_text = strdup(text);
 		DisplayStatusLine(lpgw, FALSE);
+#ifdef ENABLE_STATUS_LINE_RESIZE
+		if (!is_resized) {
+			SetWindowHeight( by +char_height );
+			is_resized = 1;
+		}
+#endif
 	}
 }
 

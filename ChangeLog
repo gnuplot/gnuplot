@@ -1,3 +1,10 @@
+2001-02-10  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* src/win/wgraph.c: two more calls to DrawRuler() to draw the ruler
+	after the graph window has been de-minimized or replotted by gnuplot
+	after 'replot' or 'plot ...'; added remapping of VK_ key codes to
+	gnuplot key codes GP_.
+
 2001-02-09  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/term.c (term_set_output): add code to work around an MSDOS
