@@ -511,9 +511,9 @@ int count;
 	label_width(timelabel.text, &timelin);
     /*}}} */
 
-    /*{{{  preliminary ytop  calculation
+    /*{{{  preliminary ytop  calculation */
 
-     *     first compute heights of things to be written in the margin /*
+     /*     first compute heights of things to be written in the margin */
 
      /* title */
     if (titlelin)
