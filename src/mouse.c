@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.25 2001/10/06 10:33:52 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.26 2001/12/14 14:32:39 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -920,13 +920,24 @@ static char *
 builtin_toggle_log(struct gp_event_t *ge)
 {
     if (!ge) {
+#ifdef PM3D
+	return "`builtin-toggle-log` y logscale for plots, z and cb logscale for splots";
+#else
 	return "`builtin-toggle-log` y logscale for plots, z logscale for splots";
+#endif
     }
     if (is_3d_plot) {
-	if (axis_array[FIRST_Z_AXIS].log)
+#ifdef PM3D
+	if (Z_AXIS.log || CB_AXIS.log)
+	    do_string_replot("unset log zcb");
+	else
+	    do_string_replot("set log zcb");
+#else
+	if (Z_AXIS.log)
 	    do_string_replot("unset log z");
 	else
 	    do_string_replot("set log z");
+#endif
     } else {
 	if (axis_array[FIRST_Y_AXIS].log)
 	    do_string_replot("unset log y");
@@ -944,10 +955,17 @@ builtin_nearest_log(struct gp_event_t *ge)
     }
     if (is_3d_plot) {
 	/* 3D-plot: toggle lin/log z axis */
-	if (axis_array[FIRST_Z_AXIS].log)
+#ifdef PM3D
+	if (Z_AXIS.log || CB_AXIS.log)
+	    do_string_replot("unset log zcb");
+	else
+	    do_string_replot("set log zcb");
+#else
+	if (Z_AXIS.log)
 	    do_string_replot("unset log z");
 	else
 	    do_string_replot("set log z");
+#endif
     } else {
 	/* 2D-plot: figure out which axis/axes is/are
 	 * close to the mouse cursor, and toggle those lin/log */

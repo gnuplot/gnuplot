@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.57 2002/02/03 11:18:04 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.58 2002/02/06 17:12:25 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -489,7 +489,7 @@ place_labels(int layer)
 	if (this_label->lp_properties.pointflag) {
 	    term_apply_lp_properties(&this_label->lp_properties);
 	    (*t->point) (x, y, this_label->lp_properties.p_type);
-	    /* the default label colour is that of border */
+	    /* the default label color is that of border */
 	    term_apply_lp_properties(&border_lp);
 	}
     }
@@ -641,34 +641,19 @@ do_3dplot(plots, pcount, quick)
 	draw_3d_graphbox(plots, pcount);
 
 #ifdef PM3D
-    /* DRAW PM3D ALL COLOUR SURFACES */
+    /* DRAW PM3D ALL COLOR SURFACES */
     can_pm3d = 0;
     if (!quick) {
-	int palette = 0;
-	if (!pm3d.where[0]) {
-	    for (this_plot = plots, surface = 0; surface < pcount;
-		this_plot = this_plot->next_sp, surface++) {
-		if (this_plot->lp_properties.use_palette) {
-		    palette = 1;
-		    break;
-		}
-	    }
-	} else {
-	    palette = 1;
-	}
-	if (palette)
- 	    can_pm3d = set_pm3d_zminmax() && !make_palette() && term->set_color;
+	can_pm3d = is_plot_with_palette() && !make_palette() && term->set_color;
 	if (can_pm3d) {
-	    axis_checked_extend_empty_range(COLOR_AXIS, "All points of colorbox value undefined");
-	    axis_revert_and_unlog_range(COLOR_AXIS);
-	    /* draw the colour surfaces */
+	    /* draw the color surfaces */
 	    if (pm3d.where[0]) {
 		if (pm3d.solid) {
 		    whichgrid = BACKGRID;
 		    draw_3d_graphbox(plots, pcount);
 		}
 	    }
-	    /* draw colour box */
+	    /* draw color box */
 	    draw_color_smooth_box();
 	} /* can_pm3d */
     }
@@ -1099,7 +1084,7 @@ do_3dplot(plots, pcount, quick)
 		    if (label_contours && cntrs->isNewLevel) {
 #ifdef PM3D
 			if (use_palette)
-			    set_color(z2gray(cntrs->z));
+			    set_color( z2cb( cb2gray(cntrs->z) ) );
 			else
 #endif
 			    (*t->linetype) (++thiscontour_lp_properties.l_type);
@@ -1472,10 +1457,8 @@ plot3d_lines_pm3d(plot)
     double lx[2], ly[2], lz[2];	/* two edge points */
     double z;
 
-#ifdef PM3D
     /* just a shortcut */
     int color_from_column = plot->pm3d_color_from_column;
-#endif
 
 #ifndef LITE
 /* These are handled elsewhere.  */
@@ -1518,13 +1501,11 @@ plot3d_lines_pm3d(plot)
 			map3d_xy(points[i].x, points[i].y, points[i].z, &x, &y);
 
 			if (prev == INRANGE) {
-#ifdef PM3D
 			    if (color_from_column)
-				z =  (points[i - step].ylow + points[i].ylow) * .5;
+				z =  (points[i - step].ylow + points[i].ylow) * 0.5;
 			    else
-#endif
-			    z =  (points[i - step].z + points[i].z) * .5;
-			    set_color(z2gray(z));
+				z =  (z2cb(points[i - step].z) + z2cb(points[i].z)) * 0.5;
+			    set_color( cb2gray(z) );
 			    clip_vector(x, y);
 			} else {
 			    if (prev == OUTRANGE) {
@@ -1541,13 +1522,11 @@ plot3d_lines_pm3d(plot)
 				    map3d_xy(clip_x, clip_y, clip_z, &xx0, &yy0);
 
 				    clip_move(xx0, yy0);
-#ifdef PM3D
 				    if (color_from_column)
-					z =  (points[i - step].ylow + points[i].ylow) * .5;
+					z =  (points[i - step].ylow + points[i].ylow) * 0.5;
 				    else
-#endif
-				    z =  (points[i - step].z + points[i].z) * .5;
-				    set_color(z2gray(z));
+					z =  (z2cb(points[i - step].z) + z2cb(points[i].z)) * 0.5;
+				    set_color( cb2gray(z) );
 				    clip_vector(x, y);
 				}
 			    } else {
@@ -1569,13 +1548,11 @@ plot3d_lines_pm3d(plot)
 
 				map3d_xy(clip_x, clip_y, clip_z, &xx0, &yy0);
 
-#ifdef PM3D
 				if (color_from_column)
-				    z =  (points[i - step].ylow + points[i].ylow) * .5;
+				    z =  (points[i - step].ylow + points[i].ylow) * 0.5;
 				else
-#endif
-				z =  (points[i - step].z + points[i].z) * .5;
-				set_color(z2gray(z));
+				    z =  (z2cb(points[i - step].z) + z2cb(points[i].z)) * 0.5;
+				set_color( cb2gray(z));
 				clip_vector(xx0, yy0);
 			    }
 			} else if (prev == OUTRANGE) {
@@ -1592,13 +1569,11 @@ plot3d_lines_pm3d(plot)
 				    map3d_xy(lx[1], ly[1], lz[1], &xx0, &yy0);
 
 				    clip_move(x, y);
-#ifdef PM3D
 				    if (color_from_column)
-					z =  (points[i - step].ylow + points[i].ylow) * .5;
+					z =  (points[i - step].ylow + points[i].ylow) * 0.5;
 				    else
-#endif
-				    z =  (points[i - step].z + points[i].z) * .5;
-				    set_color(z2gray(z));
+					z =  (z2cb(points[i - step].z) + z2cb(points[i].z)) * 0.5;
+				    set_color( cb2gray(z) );
 				    clip_vector(xx0, yy0);
 				}
 			    }
@@ -1706,9 +1681,9 @@ plot3d_points_pm3d(plot, p_type)
 
 		    if (!clip_point(x, y)) {
 			if (color_from_column)
-			    set_color(z2gray(points[i].ylow));
+			    set_color( cb2gray(points[i].ylow) );
 			else
-			set_color(z2gray(points[i].z));
+			    set_color( cb2gray( z2cb(points[i].z) ) );
 			(*t->point) (x, y, p_type);
 		    }
 		}
@@ -2793,8 +2768,8 @@ int xl, yl;
     if (cbmin > cbmax) return; /* splot 1/0, for example */
     cbmin = GPMAX(cbmin, CB_AXIS.min);
     cbmax = GPMIN(cbmax, CB_AXIS.max);
-    gray_from = z2gray(cbmin);
-    gray_to = z2gray(cbmax);
+    gray_from = cb2gray(cbmin);
+    gray_to = cb2gray(cbmax);
     gray_step = (gray_to > gray_from) ? (gray_to - gray_from)/steps : 0;
 
     if (key == KEY_AUTO_PLACEMENT)
@@ -2844,8 +2819,8 @@ int pointtype;
     if (cbmin > cbmax) return; /* splot 1/0, for example */
     cbmin = GPMAX(cbmin, CB_AXIS.min);
     cbmax = GPMIN(cbmax, CB_AXIS.max);
-    gray_from = z2gray(cbmin);
-    gray_to = z2gray(cbmax);
+    gray_from = cb2gray(cbmin);
+    gray_to = cb2gray(cbmax);
     gray_step = (gray_to > gray_from) ? (gray_to - gray_from)/steps : 0;
 #if 0
     fprintf(stderr,"POINT_pm3D: cbmin=%g  cbmax=%g\n",cbmin, cbmax);

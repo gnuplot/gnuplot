@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: color.c,v 1.24 2001/12/16 18:41:28 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: color.c,v 1.25 2002/01/26 17:55:07 joze Exp $"); }
 #endif
 
 /* GNUPLOT - color.c */
@@ -31,13 +31,13 @@ static char *RCSid() { return RCSid("$Id: color.c,v 1.24 2001/12/16 18:41:28 mik
 #include "axis.h"
 #include "gadgets.h"
 #include "graphics.h"
+#include "plot.h"
 #include "graph3d.h"
 #include "pm3d.h"
 #include "graphics.h"
 #include "term_api.h"
 #include "util3d.h"
 #include "alloc.h"
-/* need to access used_pm3d_zmin, used_pm3d_zmax */
 
 /* COLOUR MODES - GLOBAL VARIABLES */
 
@@ -103,7 +103,7 @@ make_palette(void)
 #endif
 
     if (!term->make_palette) {
-	fprintf(stderr, "Error: your terminal does not support continous colors!\nSee pm3d/README for more details.\n");
+	fprintf(stderr, "Error: terminal \"%s\" does not support continous colors.\n",term->name);
 	return 1;
     }
 
@@ -131,7 +131,8 @@ make_palette(void)
 	|| sm_palette.formulaG != save_pal.formulaG
 	|| sm_palette.formulaB != save_pal.formulaB
 	|| sm_palette.positive != save_pal.positive || sm_palette.colors != save_pal.colors) {
-	/* print the message only if the colors have changed */
+	/* print the message only if colors have changed */
+	if (interactive)
 	fprintf(stderr, "smooth palette in %s: available %i color positions; using %i of them\n", term->name, i, sm_palette.colors);
     }
 
@@ -569,19 +570,8 @@ draw_color_smooth_box()
     /* draw tics */
     if (axis_array[COLOR_AXIS].ticmode) {
 	term_apply_lp_properties(&border_lp); /* border linetype */
-	CB_AXIS.log = axis_array[FIRST_Z_AXIS].log; /* use log scaling from z-axis */
-	CB_AXIS.base = axis_array[FIRST_Z_AXIS].base;
-	CB_AXIS.log_base = axis_array[FIRST_Z_AXIS].log_base;
-
-	/* setup tics, but avoid changing CB_AXIS.min, max */
-	CB_AXIS.autoscale = axis_array[FIRST_Z_AXIS].autoscale
-	    | AUTOSCALE_FIXMIN | AUTOSCALE_FIXMAX;
 	setup_tics(COLOR_AXIS, 20);
 	gen_tics(COLOR_AXIS, cbtick_callback );
-
-	/* log(cb) may have been set above if log(z), but log(cb) is not allowed 
-	   elsewhere unless somebody implements independent z and cb axes */
-	CB_AXIS.log = FALSE;
     }
 
     /* write the colour box label */

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.73 2002/02/02 12:03:31 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.74 2002/02/13 17:59:36 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -2015,10 +2015,6 @@ set_logscale()
 	double newbase = 10;
 
 	if ((axis = lookup_table(axisname_tbl, c_token)) >= 0) {
-#ifdef PM3D
-	    if (axis == COLOR_AXIS) 
-		int_error(c_token,"cannot set independent log for cb-axis --- log setup of z-axis is used");
-#endif
 	    set_for_axis[axis] = TRUE;
 	} else { /* must not see x when x2, etc */
 	    if (chr_in_str(c_token, 'x'))
@@ -2027,6 +2023,9 @@ set_logscale()
  		set_for_axis[FIRST_Y_AXIS] = TRUE;
 	    if (chr_in_str(c_token, 'z'))
  		set_for_axis[FIRST_Z_AXIS] = TRUE;
+	    if (chr_in_str(c_token, 'c') && chr_in_str(c_token, 'b'))
+		/* FIXME should be strstr(token,"cb") */
+ 		set_for_axis[COLOR_AXIS] = TRUE;
 	}
 	c_token++;
 

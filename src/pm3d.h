@@ -1,5 +1,5 @@
 /*
- * $Id: pm3d.h,v 1.8 2002/01/25 18:02:08 joze Exp $
+ * $Id: pm3d.h,v 1.9 2002/01/26 17:55:08 joze Exp $
  */
 
 /* GNUPLOT - pm3d.h */
@@ -35,7 +35,7 @@
 ****/
 
 /*
-  where to plot pm3d: base or top (colour map) or surface (colour surface)
+  where to plot pm3d: base or top (color map) or surface (color surface)
     - if pm3d.where is "", then don't plot in pm3d mode
     - pm3d_at_where can be any combination of the #defines below. For instance,
 	"b" plot at botton only, "st" plots firstly surface, then top, etc.
@@ -78,7 +78,7 @@ typedef enum {
 
 /*
   structure defining all properties of pm3d plotting mode
-  (except for the properties of the smooth colour box, see color_box instead)
+  (except for the properties of the smooth color box, see color_box instead)
 */
 typedef struct {
   char where[7];	/* base, top, surface */
@@ -111,7 +111,8 @@ void pm3d_plot __PROTO((struct surface_points * plot, char at_which_z));
 void filled_color_contour_plot __PROTO((struct surface_points *plot, int contours_where));
 void pm3d_reset __PROTO((void));
 void pm3d_draw_one __PROTO((struct surface_points* plots));
-double z2gray __PROTO((double z));
+double z2cb __PROTO((double z));
+double cb2gray __PROTO((double cb));
 void
 pm3d_rearrange_scan_array __PROTO((struct surface_points* this_plot,
     struct iso_curve*** first_ptr, int* first_n, int* first_invert,

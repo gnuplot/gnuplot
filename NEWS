@@ -38,6 +38,8 @@ off with the hotkey 'm'. See 'help mouse' and 'help bind' for more details.
 
 
 [3.8i]
+* NEW set log cb - since now, z and cb axes are completely independent
+* NEW set decimalsign
 * NEW set key {no}enhanced
 * NEW pm3d splots support independent z and color coordinates according to an
   optional 4th column of using

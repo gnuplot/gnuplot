@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.37 2002/01/27 18:44:23 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.38 2002/02/02 12:03:31 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -49,6 +49,9 @@ static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.37 2002/01/27 18:44:23 br
 #include "parse.h"
 #include "term_api.h"
 #include "util.h"
+#ifdef PM3D
+#include "pm3d.h"
+#endif
 
 #ifdef THIN_PLATE_SPLINES_GRID
 #include "matrix.h"
@@ -74,6 +77,8 @@ TBOOLEAN dgrid3d = FALSE;
 #ifdef PM3D
 static double g_non_pm3d_min;
 static double g_non_pm3d_max;
+static int plot_has_palette; /* current plot needs the color palette */
+static void set_plot_with_palette __PROTO((int plot_num));
 static void calculate_set_of_isolines __PROTO((AXIS_INDEX value_axis, TBOOLEAN cross, struct iso_curve **this_iso,
 					       AXIS_INDEX iso_axis, double iso_min, double iso_step, int num_iso_to_use,
 					       AXIS_INDEX sam_axis, double sam_min, double sam_step, int num_sam_to_use,
@@ -344,6 +349,30 @@ update_pm3d_zrange(value, pal)
 	}
     }
 }
+
+static void
+set_plot_with_palette(int plot_num)
+{
+    struct surface_points *this_plot = first_3dplot;
+    int surface = 0;
+    plot_has_palette = 1;
+    if (pm3d.where[0])
+	return;
+    while (surface < plot_num) {
+	if (this_plot->lp_properties.use_palette)
+	    return;
+	this_plot = this_plot->next_sp;
+	surface++;
+    }
+    plot_has_palette = 0;
+}
+
+int
+is_plot_with_palette(void)
+{
+    return plot_has_palette;
+}
+
 #endif
 
 static void
@@ -1633,8 +1662,13 @@ eval_3dplots()
     setup_tics(FIRST_Z_AXIS, 20);
 
 #ifdef PM3D
-    /* Note: the above setup for COLOR_AXIS is made in graph3d.c:do_3dplot().
-     */
+    set_plot_with_palette(plot_num);
+    if (is_plot_with_palette()) {
+	set_pm3d_zminmax();
+	axis_checked_extend_empty_range(COLOR_AXIS, "All points of colorbox value undefined");
+	/* axis_revert_and_unlog_range(COLOR_AXIS); */
+	/* fprintf(stderr,"plot3d.c: CB_AXIS.min=%g\tCB_AXIS.max=%g\n",CB_AXIS.min,CB_AXIS.max); */
+    }
 #endif
 
     AXIS_WRITEBACK(FIRST_X_AXIS);

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.20 2002/01/26 17:55:08 joze Exp $"); }
+static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.21 2002/01/26 21:44:51 joze Exp $"); }
 #endif
 
 /* GNUPLOT - pm3d.c */
@@ -32,8 +32,6 @@ static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.20 2002/01/26 17:55:08 joze
 
 
 
-/********************************************************************/
-
 /*
   Global options for pm3d algorithm (to be accessed by set / show).
 */
@@ -51,27 +49,21 @@ pm3d_struct pm3d = {
 };
 
 
-/****************************************************************/
-/* Now the routines which are really just those for pm3d.c
+/*
+* Now the routines which are really just those for pm3d.c
 */
 
 /*
-   Check and set the z-range for use by pm3d.
+   Check and set the cb-range for use by pm3d.
    Return 0 on wrong range, otherwise 1.
  */
 int
 set_pm3d_zminmax()
 {
     if (CB_AXIS.set_autoscale & AUTOSCALE_MIN) {
-	/* CB_AXIS.min has been initialized to VERYLARGE
-	 * in plot3d.c:plot3drequest() */
 	if (PM3D_IMPLICIT == pm3d.implicit) {
-	    double x = get_non_pm3d_min();
-	    if (x < CB_AXIS.min)
-		CB_AXIS.min = x;
-	    else if (CB_AXIS.min == VERYLARGE)
-		/* fallback, should in principle never happen */
-		CB_AXIS.min = axis_array[FIRST_Z_AXIS].min;
+	    CB_AXIS.min = get_non_pm3d_min();
+	    CB_AXIS.min = axis_log_value_checked(COLOR_AXIS, CB_AXIS.min, "color axis");
 	}
     } else {
 	/* Negative z: Call graph_error(), thus stop by an error message
@@ -79,29 +71,21 @@ set_pm3d_zminmax()
 	 * axes. Note that another possibility is to return 0 to make a plot
 	 * with disabled pm3d, but this is not useful.
 	 */
-	CB_AXIS.min = 
-	    axis_log_value_checked(FIRST_Z_AXIS,
-				   CB_AXIS.set_min, 
-				   "color axis");
+	CB_AXIS.min = axis_log_value_checked(COLOR_AXIS, CB_AXIS.set_min, "color axis");
     }
+
     if (CB_AXIS.set_autoscale & AUTOSCALE_MAX) {
 	/* CB_AXIS.min has been initialized to -VERYLARGE
 	 * in plot3d.c:plot3drequest() */
 	if (PM3D_IMPLICIT == pm3d.implicit) {
-	    double x = get_non_pm3d_max();
-	    if (x > CB_AXIS.max)
-		CB_AXIS.max = x;
-	    else if (CB_AXIS.max == -VERYLARGE)
-		/* fallback, should in principle never happen */
-		CB_AXIS.max = axis_array[FIRST_Z_AXIS].max;
+	    CB_AXIS.max = get_non_pm3d_max();
+	    CB_AXIS.max = axis_log_value_checked(COLOR_AXIS, CB_AXIS.max, "color axis");
 	}
     } else {
 	/* Negative z: see above */
-	CB_AXIS.max = 
-	    axis_log_value_checked(FIRST_Z_AXIS,
-				   CB_AXIS.set_max,
-				   "color axis");
+	CB_AXIS.max = axis_log_value_checked(COLOR_AXIS, CB_AXIS.set_max, "color axis");
     }
+
     if (CB_AXIS.min == CB_AXIS.max) {
 	int_error(NO_CARET, "cannot display empty color axis range");
 	return 0;
@@ -118,22 +102,47 @@ set_pm3d_zminmax()
     return 1;
 }
 
+
 /*
- * Rescale z into the interval [0,1].
- * Note that it is OK for logarithmic z-axis too.
+ * Rescale z to cb values. Nothing to do if both z and cb are linear or log of the
+ * same base, other it has to un-log z and subsequently log it again.
  */
 double
-z2gray(double z)
+z2cb(double z)
 {
-    if (z <= CB_AXIS.min)
-	return 0;
-    if (z >= CB_AXIS.max)
-	return 1;
-    z = (z - CB_AXIS.min)
-      / (CB_AXIS.max - CB_AXIS.min);
-    return z;
+    if (!Z_AXIS.log && !CB_AXIS.log) /* both are linear */
+	return z;
+    if (Z_AXIS.log && !CB_AXIS.log) /* log z, linear cb */
+	return exp(z * Z_AXIS.log_base); /* unlog(z) */
+    if (!Z_AXIS.log && CB_AXIS.log) /* linear z, log cb */
+	return (log(z) / CB_AXIS.log_base);
+    /* both are log */
+    if (Z_AXIS.base==CB_AXIS.base) /* can we compare double numbers like that? */
+	return z;
+    return z * Z_AXIS.log_base / CB_AXIS.log_base; /* log_cb(unlog_z(z)) */
 }
 
+
+/*
+ * Rescale cb value into the interval [0,1].
+ * Note that it is OK for logarithmic cb-axis too.
+ */
+double
+cb2gray(double cb)
+{
+    if (cb <= CB_AXIS.min)
+	return 0;
+    if (cb >= CB_AXIS.max)
+	return 1;
+    cb = (cb - CB_AXIS.min)
+      / (CB_AXIS.max - CB_AXIS.min);
+    return cb;
+}
+
+
+/*
+ * Rearrange...
+ */
 static void
 pm3d_rearrange_part(struct iso_curve *src, const int len, struct iso_curve ***dest, int *invert)
 {
@@ -219,8 +228,13 @@ pm3d_rearrange_part(struct iso_curve *src, const int len, struct iso_curve ***de
     }
 }
 
-/* allocates *first_ptr (and eventually *second_ptr)
- * which must be freed by the caller */
+
+/*
+ * Rearrange scan array
+ * 
+ * Allocates *first_ptr (and eventually *second_ptr)
+ * which must be freed by the caller
+ */
 void
 pm3d_rearrange_scan_array(struct surface_points *this_plot,
 			  struct iso_curve ***first_ptr, int *first_n, int *first_invert,
@@ -250,11 +264,9 @@ pm3d_rearrange_scan_array(struct surface_points *this_plot,
 }
 
 
-
 /*
-   Now the implementation of the pm3d (s)plotting mode
+ * Now the implementation of the pm3d (s)plotting mode
  */
-
 void
 pm3d_plot(struct surface_points *this_plot, char at_which_z)
 {
@@ -263,7 +275,7 @@ pm3d_plot(struct surface_points *this_plot, char at_which_z)
     struct coordinate GPHUGE *pointsA, *pointsB;
     struct iso_curve **scan_array;
     int scan_array_n;
-    double avgZ, gray;
+    double avgC, gray;
     gpdPoint corners[4];
 #ifdef EXTENDED_COLOR_SPECS
     gpiPoint icorners[4];
@@ -289,7 +301,7 @@ pm3d_plot(struct surface_points *this_plot, char at_which_z)
     case PM3D_AT_TOP:
 	corners[0].z = corners[1].z = corners[2].z = corners[3].z = ceiling_z;
 	break;
-	/* the 3rd possibility is surface, PM3D_AT_SURFACE, and it'll come later */
+	/* the 3rd possibility is surface, PM3D_AT_SURFACE, coded below */
     }
 
     scanA = this_plot->iso_crvs;
@@ -382,15 +394,15 @@ pm3d_plot(struct surface_points *this_plot, char at_which_z)
 		   I always wonder what is faster: d*0.25 or d/4? Someone knows? -- 0.25 (joze) */
 		if (color_from_column)
 		    /* ylow is set in plot3d.c:get_3ddata() */
-		    avgZ = (pointsA[i].ylow + pointsA[i + 1].ylow + pointsB[ii].ylow + pointsB[ii + 1].ylow) * 0.25;
+		    avgC = (pointsA[i].ylow + pointsA[i + 1].ylow + pointsB[ii].ylow + pointsB[ii + 1].ylow) * 0.25;
 		else
-		    avgZ = (pointsA[i].z + pointsA[i + 1].z + pointsB[ii].z + pointsB[ii + 1].z) * 0.25;
+		    avgC = (z2cb(pointsA[i].z) + z2cb(pointsA[i + 1].z) + z2cb(pointsB[ii].z) + z2cb(pointsB[ii + 1].z)) * 0.25;
 		/* transform z value to gray, i.e. to interval [0,1] */
-		gray = z2gray(avgZ);
-		/* print the quadrangle with the given colour */
+		gray = cb2gray(avgC);
+		/* print the quadrangle with the given color */
 #if 0
-		printf("averageZ %g\tgray=%g\tM %g %g L %g %g L %g %g L %g %g\n",
-		       avgZ,
+		printf("averageColor %g\tgray=%g\tM %g %g L %g %g L %g %g L %g %g\n",
+		       avgColor,
 		       gray,
 		       pointsA[i].x, pointsA[i].y,
 		       pointsB[ii].x, pointsB[ii].y, pointsB[ii + 1].x, pointsB[ii + 1].y, pointsA[i + 1].x, pointsA[i + 1].y);
@@ -432,7 +444,8 @@ pm3d_plot(struct surface_points *this_plot, char at_which_z)
 		    icorners[3].z = pointsA[i + 1].z;
 		}
 		for (i = 0; i < 4; i++) {
-		    icorners[i].spec.gray = z2gray(icorners[i].z);
+		    icorners[i].spec.gray = 
+			cb2gray( color_from_column ? icorners[i].z : z2cb(icorners[i].z) );
 		}
 	    }
 	    filled_quadrangle(corners, icorners);
@@ -450,11 +463,9 @@ pm3d_plot(struct surface_points *this_plot, char at_which_z)
 }				/* end of pm3d splotting mode */
 
 
-
 /*
-   Now the implementation of the filled colour contour plot
+ *  Now the implementation of the filled color contour plot
 */
-
 void
 filled_color_contour_plot(this_plot, contours_where)
 struct surface_points *this_plot;
@@ -483,13 +494,13 @@ int contours_where;
 	    printf("\t...it isNewLevel\n");
 	    /* contour split across chunks */
 	    /* fprintf(gpoutfile, "\n# Contour %d, label: %s\n", number++, c->label); */
-	    /* What is the colour? */
+	    /* What is the color? */
 	    /* get the z-coordinate */
 	    /* transform contour z-coordinate value to gray, i.e. to interval [0,1] */
 	    if (color_from_column)
-		gray = z2gray(cntr->coords[0].ylow);
+		gray = cb2gray(cntr->coords[0].ylow);
 	    else
-	    gray = z2gray(cntr->coords[0].z);
+		gray = cb2gray( z2cb(cntr->coords[0].z) );
 	    set_color(gray);
 	}
 	/* draw one countour */
@@ -500,8 +511,12 @@ int contours_where;
 	/* next contour */
 	cntr = cntr->next;
     }
-}				/* end of filled colour contour plot splot mode */
+}				/* end of filled color contour plot splot mode */
 
+
+/*
+ * unset pm3d for the reset command
+ */
 void
 pm3d_reset(void)
 {
@@ -515,7 +530,10 @@ pm3d_reset(void)
     pm3d.implicit = PM3D_IMPLICIT;
 }
 
-/* DRAW /ONE/ PM3D COLOUR SURFACE */
+
+/* 
+ * Draw (one) PM3D color surface
+ */
 void
 pm3d_draw_one(struct surface_points *plot)
 {
@@ -534,9 +552,13 @@ pm3d_draw_one(struct surface_points *plot)
     }
 
     if (strchr(pm3d.where, 'C') != NULL) {
-	/* !!!!! CONTOURS, UNDOCUMENTED
-	   !!!!! LATER CHANGE TO STH LIKE (if_filled_contours_requested)
-	   !!!!! ... */
+	/* !!!!! FILLED COLOR CONTOURS, *UNDOCUMENTED*
+	   !!!!! LATER CHANGE TO STH LIKE 
+	   !!!!!   (if_filled_contours_requested)
+	   !!!!!      ...
+	   Currently filled color contours do not work because gnuplot generates
+	   open contour lines, i.e. not closed on the graph boundary.
+	 */
 	if (draw_contour & CONTOUR_SRF)
 	    filled_color_contour_plot(plot, CONTOUR_SRF);
 	if (draw_contour & CONTOUR_BASE)

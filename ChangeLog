@@ -1,3 +1,10 @@
+2002-02-13  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* NEWS src/plot3d.h src/pm3d.h src/color.c src/graph3d.c src/mouse.c
+	src/plot3d.c src/pm3d.c src/set.c src/unset.c src/util3d.c: Implemented
+	'set log cb'. From now, z and cb axes are completely independent on
+	both the value range and the lin/log base.
+
 2002-02-13  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* configure.in, src/Makefile.am: Remove --with-x11-driver configure

@@ -1,5 +1,5 @@
 /*
- * $Id: plot3d.h,v 1.6 2000/11/02 19:11:07 lhecking Exp $
+ * $Id: plot3d.h,v 1.7 2002/01/26 21:44:51 joze Exp $
  */
 
 /* GNUPLOT - plot3d.h */
@@ -67,6 +67,8 @@ void sp_free __PROTO((struct surface_points *sp));
 #ifdef PM3D
 double get_non_pm3d_min __PROTO((void));
 double get_non_pm3d_max __PROTO((void));
+int is_plot_with_palette __PROTO((void));
+  /* return 1 if the current splot needs the color palette */
 #endif
 
 #endif /* GNUPLOT_PLOT3D_H */
