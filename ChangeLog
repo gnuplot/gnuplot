@@ -1,3 +1,12 @@
+2003-06-11  Ethan Merritt <merritt@u.washington.edu>
+
+	* term/epslatex.trm term/pslatex.trm: Add text rotation.
+
+	* term/epslatex.trm: Add missing PostScript macros used by 
+	t->filled_polygon.
+
+	* src/term.c: Fix size of test polygon relative to plot.
+
 2003-06-09  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* INSTALL, configure.in: Add note about GNU readline bug.

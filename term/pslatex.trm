@@ -1,5 +1,5 @@
 /*
- * $Id: pslatex.trm,v 1.36 2002/12/13 14:59:03 lhecking Exp $
+ * $Id: pslatex.trm,v 1.37 2003/04/04 21:22:32 sfeam Exp $
  */
 
 /* GNUPLOT - pslatex.trm */
@@ -401,7 +401,7 @@ int ang;
 {
     /* rotated text is put in a short stack, and optionally uses 
      * postscript specials depending on PSLATEX_rotate */
-    PSLATEX_angle = (ang ? 1 : 0);
+    PSLATEX_angle = ang;
     return TRUE;
 }
 
@@ -467,11 +467,13 @@ PSLATEX_text()
 		    break;
 		}
 		break;
-	    case 1:		/* put text in a short stack */
+
+	    default:
+	    case TEXT_VERTICAL:		/* put text in a short stack */
 		if (PSLATEX_rotate) {
-		    fputs("\
+		    fprintf(gpoutfile, "\
 %\n\\special{ps: gsave currentpoint currentpoint translate\n\
-270 rotate neg exch neg exch translate}%\n", gpoutfile);
+%d rotate neg exch neg exch translate}%\n", 360 - tc->angle);
 		}
 		switch (tc->justify) {
 		case LEFT:

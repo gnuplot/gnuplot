@@ -1,5 +1,5 @@
 /*
- * $Id: epslatex.trm,v 1.17 2002/12/17 13:33:16 lhecking Exp $
+ * $Id: epslatex.trm,v 1.18 2003/04/04 21:22:34 sfeam Exp $
  */
 
 /* GNUPLOT - epslatex.trm */
@@ -136,6 +136,8 @@ static char GPFAR *GPFAR EPSL_header[] = {
 " /L /lineto load def  \n",
 " /R /rmoveto load def  \n",
 " /V /rlineto load def  \n",
+" /N {newpath moveto} bind def  \n",
+" /f {rlineto fill} bind def  \n",
 " /ED { exch def} bind def  \n",
 "  \n",
 " /Atan {/atan load stopped {pop pop 0} if } def  \n",
@@ -889,7 +891,7 @@ EPSL_put_text(x, y, str)
     if (EPSL_texfile) {
 	fprintf(EPSL_texfile, "\\put(%d,%d){", x, y);
 	if (EPSL_ang) {
-	    fputs("\\rotatebox{90}{", EPSL_texfile);
+	    fprintf(EPSL_texfile,"\\rotatebox{%d}{", EPSL_ang);
 	}
 	if (((str[0] == '{') || (str[0] == '['))) {
 	    fprintf(EPSL_texfile, "\\makebox(0,0)%s", str);
