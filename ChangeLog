@@ -1,3 +1,8 @@
+2003-03-17  Leo Brewin <leo.brewin@sci.monash.edu.au>
+
+	* term/pdf.trm: Tell pdflib to use its built-in font metrics for
+	Symbol and ZapfDingbats fonts, since not all hosts have these.
+
 2003-03-14  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* demo/pm3d.dem: Improved demo for corners2color.

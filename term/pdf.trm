@@ -1,5 +1,5 @@
 /*
- * $Id: pdf.trm,v 1.17 2002/12/17 13:32:56 lhecking Exp $
+ * $Id: pdf.trm,v 1.18 2003/02/11 06:08:01 sfeam Exp $
  */
 
 /*------------------------------
@@ -156,15 +156,22 @@ PDF_PathClose ()
 static void
 PDF_SetFont ()
 {
-    int font_handle = PDF_findfont(myPDF, PDF_fontNameCur, "host", 0);
+    int font_handle;
+
+    /* LCB : Symbol and ZapfDingbats should use "builtin" not "host" encoding */
+    if ( (strcmp(PDF_fontNameCur,"Symbol") == 0) ||
+	 (strcmp(PDF_fontNameCur,"ZapfDingbats") == 0) )
+	font_handle = PDF_findfont(myPDF, PDF_fontNameCur, "builtin", 0);
+    else
+	font_handle = PDF_findfont(myPDF, PDF_fontNameCur, "host", 0);
 
     PDF_setfont(myPDF, font_handle, PDF_fontSizeCur * PDF_RESOLUTION);
 
     /* Ask PDFlib for the actual numbers */
     PDF_fontAscent = (int) (PDF_RESOLUTION * PDF_fontSizeCur * PDF_get_value(myPDF, "ascender", 0));	
     PDF_fontDescent = (int) (- PDF_RESOLUTION * PDF_fontSizeCur * PDF_get_value(myPDF, "descender", 0));	
-    PDF_fontLeading = (int) (PDF_RESOLUTION * PDF_fontSizeCur * 0.25); 
-    
+    PDF_fontLeading = (int) (PDF_RESOLUTION * PDF_fontSizeCur * 0.25);
+
     /* Assume this particular string is a somewhat reasonable typical
      * output, for getting at the average character width */
     PDF_fontAvWidth = (int)
