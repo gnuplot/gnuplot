@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.20.2.6 2002/04/10 09:36:49 broeker Exp $
+C RCS $Id: gnuplot.doc,v 1.20.2.7 2002/05/17 11:42:45 lhecking Exp $
 C 3 December 1998
 C Copyright (C) 1986 - 1993, 1998   Thomas Williams, Colin Kelley
 C
@@ -303,7 +303,7 @@ C
        ^K    deletes from current position to the end of line.
        ^L,^R redraws line in case it gets trashed.
        ^U    deletes the entire line.
-       ^W    deletes the last word.
+       ^W    delete from the current word to the end of line.
 
        `History`:
 
@@ -390,7 +390,7 @@ C
        Help            - `help` plus return.
        Ctrl Help       - `help `.
 #\begin{tabular}{|cl|} \hline
-#Arrow key & Function \\ \hline
+#Key       & Function \\ \hline
 #Undo      & same as \verb~^L~. \\
 #Home      & same as \verb~^A~. \\
 #Ctrl Home & same as \verb~^E~. \\
@@ -398,7 +398,7 @@ C
 #Help      & `{\bf help}' plus return. \\
 #Ctrl Help & `{\bf help }'. \\
 %c l .
-%Arrow key@Function
+%Key@Function
 %_
 %Undo@same as ^L.
 %Home@same as ^A.
@@ -626,7 +626,7 @@ C
 ?besy0
 #besy0(x) & int or real & $y_{0}$ Bessel function of $x$, in radians \\
 %besy0(x)@int or real@$y sub 0$ Bessel function of $x$, in radians
- The `besy0` function returns the y0th Bessel function of its argument.
+ The `besy0(x)` function returns the y0th Bessel function of its argument.
  `besy0` expects its argument to be in radians.
 4 besy1
 ?expressions functions besy1
@@ -829,8 +829,8 @@ C
 ?expressions functions sinh
 ?functions sinh
 ?sinh
-#sinh(x) & any & $\sinh x$, hyperbolic sine $x$ in radians \\
-%sinh(x)@any@$sinh~x$, hyperbolic sine $x$ in radians
+#sinh(x) & any & $\sinh x$, hyperbolic sine of $x$ in radians \\
+%sinh(x)@any@$sinh~x$, hyperbolic sine of $x$ in radians
  The `sinh(x)` function returns the hyperbolic sine of its argument.  `sinh`
  expects its argument to be in radians.
 4 sqrt
@@ -2828,8 +2828,8 @@ C ... and restart the table:
  This plots sin(x) with impulses:
        plot sin(x) with impulses
 
- This plots x with points, x**2 with the default:
-       plot x*y w points, x**2 + y**2
+ This plots x*y with points, x**2 with the default:
+       plot x*y w points, x**2
 
  This plots tan(x) with the default function style, file "data.1" with lines:
        plot [ ] [-2:5] tan(x), 'data.1' with l
@@ -5250,7 +5250,7 @@ C ... and restart the table:
  `plot` command should be used to set up the appropriate form.  For example,
  if the data are of the form (x,y,xdelta,ylow,yhigh), then you can use
 
-       plot 'data' using 1:2:($1-$3),($1+$3),4,5 with xyerrorbars
+       plot 'data' using 1:2:($1-$3):($1+$3):4:5 with xyerrorbars
 4 yerrorbars
 ?commands set style yerrorbars
 ?commands set style errorbars
@@ -5287,7 +5287,7 @@ C ... and restart the table:
  appropriate style, data or function.
 
  Whenever `set nosurface` is issued, `splot` will not draw points or lines
- corresponding to the function or data file points.  Contours may be still be
+ corresponding to the function or data file points.  Contours may still be
  drawn on the surface, depending on the `set contour` option. `set nosurface;
  set contour base` is useful for displaying contours on the grid base.  See
  also `set contour`.
@@ -5399,7 +5399,7 @@ C ... and restart the table:
  year).  With `top` or `bottom` you can place the timestamp at the top or
  bottom of the left margin (default: bottom).  `rotate` lets you write the
  timestamp vertically, if your terminal supports vertical text.  The constants
- <xoff> and <off> are offsets from the default position given in character
+ <xoff> and <yoff> are offsets from the default position given in character
  screen coordinates.  <font> is used to specify the font with which the time
  is to be written.
 
@@ -5801,7 +5801,7 @@ C ... and restart the table:
  label` instead--that command gives you much more control over where text is
  placed.
 
- Please see `set syntax` for further information about backslash processing
+ Please see `syntax` for further information about backslash processing
  and the difference between single- and double-quoted strings.
 3 xmtics
 ?commands set xmtics
@@ -5812,7 +5812,7 @@ C ... and restart the table:
 ?show xmtics
 ?xmtics
 ?noxmtics
- The `set xmtics` commands converts the x-axis tic marks to months of the
+ The `set xmtics` command converts the x-axis tic marks to months of the
  year where 1=Jan and 12=Dec.  Overflows are converted modulo 12 to months.
  The tics are returned to their default labels by `set noxmtics`.  Similar
  commands perform the same duties for the other axes.
@@ -5944,7 +5944,7 @@ C ... and restart the table:
 
  The defaults are `border mirror norotate` for tics on the x and y axes, and
  `border nomirror norotate` for tics on the x2 and y2 axes.  For the z axis,
- the the `{axis | border}` option is not available and the default is
+ the `{axis | border}` option is not available and the default is
  `nomirror`.  If you do want to mirror the z-axis tics, you might want to
  create a bit more room for them with `set border`.
 
@@ -5961,7 +5961,7 @@ C ... and restart the table:
  of <incr>.  If <end> is not given, it is assumed to be infinity.  The
  increment may be negative.  If neither <start> nor <end> is given, <start> is
  assumed to be negative infinity, <end> is assumed to be positive infinity,
- and the tics will be drawn at integral multiples of <step>.  If the axis is
+ and the tics will be drawn at integral multiples of <incr>.  If the axis is
  logarithmic, the increment will be used as a multiplicative factor.
 
  Examples:
@@ -5973,7 +5973,7 @@ C ... and restart the table:
        set xtics 5
 
  Make tics at 1, 100, 1e4, 1e6, 1e8.
-       set logscale x; set xtics 1,100,10e8
+       set logscale x; set xtics 1,100,1e8
 
  The explicit ("<label>" <pos>, ...) form allows arbitrary tic positions or
  non-numeric tic labels.  A set of tics is a set of positions, each with its
@@ -5995,7 +5995,7 @@ C ... and restart the table:
  However they are specified, tics will only be plotted when in range.
 
  Format (or omission) of the tic labels is controlled by `set format`, unless
- the explicit text of a labels is included in the `set xtic (`<label>`)` form.
+ the explicit text of a labels is included in the `set xtics (`<label>`)` form.
 
  Minor (unlabelled) tics can be added by the `set mxtics` command.
 
@@ -6055,7 +6055,7 @@ C ... and restart the table:
 ?set y2label
 ?show y2label
 ?y2label
- The `set y2dtics` command sets the label for the y2 (right-hand) axis.
+ The `set y2label` command sets the label for the y2 (right-hand) axis.
  Please see `set xlabel`.
 3 y2mtics
 ?commands set y2mtics
@@ -6104,7 +6104,8 @@ C ... and restart the table:
 ?set ydata
 ?show ydata
 ?ydata
- Sets y-axis data to timeseries (dates/times).  Please see `set xdata`.
+ The `set ydata` command sets y-axis data to timeseries (dates/times).
+ Please see `set xdata`.
 3 ydtics
 ?commands set ydtics
 ?commands set noydtics
@@ -6170,7 +6171,8 @@ C ... and restart the table:
 ?set zdata
 ?show zdata
 ?zdata
- Set zaxis date to timeseries (dates/times).  Please see `set xdata`.
+ The `set zdata` command sets z-axis data to timeseries (dates/times).
+ Please see `set xdata`.
 3 zdtics
 ?commands set zdtics
 ?commands set nozdtics

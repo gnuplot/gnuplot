@@ -1,5 +1,5 @@
 /*
- * $Id: atariaes.trm,v 1.9 1998/06/18 14:59:17 ddenholm Exp $
+ * $Id: atariaes.trm,v 1.9 1998/12/14 18:38:13 lhecking Exp $
  *
  */
 
@@ -752,8 +752,8 @@ START_HELP(atari)
 "       set terminal atari 4    # use small (6x6) font",
 "       set terminal atari 6 0  # set monochrome screen to white on black",
 "       set terminal atari 13 0 fff f00 f0 f ff f0f",
-"                  # set first seven colors to black, white, green, blue,",
-"                  # cyan, purple, and yellow and use large font (8x16).",
+"                  # set first seven colors to black, white, red, green,",
+"                  # blue, cyan, and purple and use large font (8x16).",
 "",
 " Additionally, if an environment variable GNUCOLORS exists, its contents are",
 " interpreted as an options string, but an explicit terminal option takes",

@@ -1,5 +1,5 @@
 /*
- * $Id: atarivdi.trm,v 1.7 1998/06/18 14:59:18 ddenholm Exp $
+ * $Id: atarivdi.trm,v 1.10 1998/12/14 18:38:17 lhecking Exp $
  *
  */
 
@@ -465,8 +465,8 @@ START_HELP(vdi)
 "       set terminal vdi 4    # use small (6x6) font",
 "       set terminal vdi 6 0  # set monochrome screen to white on black",
 "       set terminal vdi 13 0 fff f00 f0 f ff f0f",
-"                  # set first seven colors to black, white, green, blue,",
-"                  # cyan, purple, and yellow and use large font (8x16).",
+"                  # set first seven colors to black, white, red, green,",
+"                  # blue, cyan, and purple and use large font (8x16).",
 "",
 " Additionally, if an environment variable GNUCOLORS exists, its contents are",
 " interpreted as an options string, but an explicit terminal option takes",
