@@ -2775,8 +2775,8 @@ fi
 rm -f conftest*
 
 
-echo $ac_n "checking for Apple MacOs X""... $ac_c" 1>&6
-echo "configure:2780: checking for Apple MacOs X" >&5
+echo $ac_n "checking for Apple MacOS X""... $ac_c" 1>&6
+echo "configure:2780: checking for Apple MacOS X" >&5
 cat > conftest.$ac_ext <<EOF
 #line 2782 "configure"
 #include "confdefs.h"
@@ -3270,7 +3270,7 @@ for ac_func in atexit memcpy memmove memset \
   index rindex \
   erf erfc gamma lgamma \
   getcwd poll pclose popen select sleep snprintf \
-  strncasecmp strnicmp sysinfo tcgetattr vfprintf doprnt
+  strdup strncasecmp strnicmp sysinfo tcgetattr vfprintf doprnt
 
 do
 echo $ac_n "checking for $ac_func""... $ac_c" 1>&6

@@ -308,7 +308,7 @@ AC_EGREP_CPP(yes,
 # serial 1
 
 AC_DEFUN(gp_APPLE,
-[AC_MSG_CHECKING(for Apple MacOs X)
+[AC_MSG_CHECKING(for Apple MacOS X)
 AC_EGREP_CPP(yes,
 [#if defined(__APPLE__) && defined(__MACH__)
   yes
