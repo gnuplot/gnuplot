@@ -1,5 +1,5 @@
 /*
- * $Id: fig.trm,v 1.19 2000/03/28 21:19:57 lhecking Exp $
+ * $Id: fig.trm,v 1.20 2000/05/02 14:16:57 lhecking Exp $
  */
 
 /* GNUPLOT - fig.trm */
@@ -642,6 +642,7 @@ unsigned int ex, ey;		/* end coord */
 TBOOLEAN head;
 {
     int cap_style;
+    double awidth, aheight;	/* arrow head sizes */
     FIG_poly_clean(FIG_polyvec_stat);
     cap_style = (FIG_line.style==DOTTED_LINE)? CAP_ROUND : FIG_line.cap_style;
     fprintf(gpoutfile, "%d %d %d %d %d %d %d %d %d %9.3f %d %d %d %d %d %d\n",
@@ -649,14 +650,28 @@ TBOOLEAN head;
 	    FIG_line.pen_color, FIG_line.fill_color, FIG_line.depth,
 	    FIG_line.pen_style, FIG_line.fill_style, FIG_line.style_val,
 	    FIG_line.join_style, cap_style, FIG_line.radius,
-	    head ? 1 : 0, 0, 2);
+	    head ? 1 : 0, head==2 ? 1 : 0, 2);
+
+    /* arrow head(s) */
+    if (head) {
+	/* arrow head size */
+	if (curr_arrow_headlength==0) {
+	    awidth  = (double) (term->h_tic / 2 + 1);
+	    aheight = (double) term->h_tic;
+	} else {
+	    awidth  = (double) curr_arrow_headlength * 2*sin(curr_arrow_headangle*M_PI/180);
+	    aheight = (double) curr_arrow_headlength * cos(curr_arrow_headangle*M_PI/180);
+	}
+	/* forward head */
+	fprintf(gpoutfile, "%d %d %.3f %.3f %.3f\n",
+		0, 0, 1.0, awidth, aheight);
+	/* backward head */
+	if (head==2)
+	fprintf(gpoutfile, "%d %d %.3f %.3f %.3f\n",
+		0, 0, 1.0, awidth, aheight);
+    }
 
     /* arrow line */
-    if (head)
-	fprintf(gpoutfile, "%d %d %.3f %.3f %.3f\n",
-		0, 0, 1.0,
-		(double) (term->h_tic / 2 + 1),
-		(double) term->h_tic);
     fprintf(gpoutfile, "%d %d %d %d\n",
 	    FIG_xoff + sx, FIG_yoff + term->ymax - sy,
 	    FIG_yoff + ex, FIG_yoff + term->ymax - ey);
@@ -857,7 +872,7 @@ TERM_TABLE_START(fig_driver)
     FIG_text, null_scale, FIG_graphics, FIG_move, FIG_vector,
     FIG_linetype, FIG_put_text, FIG_text_angle, FIG_justify_text,
     FIG_lpoint, FIG_arrow, set_font_null, FIG_pointsize,
-    0 /*flags */ , 0 /*suspend */ , 0 /*resume */ , 0 /*fillbox */ ,
+    TERM_BINARY /*flags */ , 0 /*suspend */ , 0 /*resume */ , 0 /*fillbox */ ,
     FIG_linewidth
 TERM_TABLE_END(fig_driver)
 

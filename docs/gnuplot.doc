@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.40 2000/03/28 21:27:40 lhecking Exp $
+C RCS $Id: gnuplot.doc,v 1.41 2000/05/02 19:32:00 lhecking Exp $
 C 3 December 1998
 C Copyright (C) 1986 - 1993, 1998   Thomas Williams, Colin Kelley
 C
@@ -3216,7 +3216,9 @@ C ... and restart the table:
  Arbitrary arrows can be placed on a plot using the `set arrow` command.
 
  Syntax:
-       set arrow {<tag>} {from <position>} {to <position>} {{no}head}
+       set arrow {<tag>} {from <position>} {to <position>}
+                 {nohead | head | heads}
+                 {size <length>,<angle>}
                  {front | back}
                  { {linestyle | ls <line_style>}
                    | {linetype | lt <line_type>}
@@ -3240,7 +3242,14 @@ C ... and restart the table:
 
  Specifying `nohead` produces an arrow drawn without a head---a line segment.
  This gives you yet another way to draw a line segment on the plot.  By
- default, arrows have heads.
+ default, arrows have heads. Specifying `heads` draws arrow heads on both
+ ends of the line.
+
+ Head size can be controlled by `size <length>,<angle>`, where <length> 
+ defines length of each branch of the arrow head and <angle> the angle (in 
+ degrees) they make with the arrow. <Length> is in x-axis units; this can be
+ changed by `first`, `second`, `graph` or `screen` before the <length>; see
+ `coordinates` for details.
 
  The line style may be selected from a user-defined list of line styles (see
  `set style line`) or may be defined here by providing values for <line_type>
@@ -3271,6 +3280,9 @@ C ... and restart the table:
 
  To draw a vertical line from the bottom to the top of the graph at x=3, use:
        set arrow from 3, graph 0 to 3, graph 1 nohead
+
+ To draw a vertical arrow with T-shape ends, use:
+       set arrow 3 from 0,-5 to 0,5 heads size screen 0.1,90
 
  To delete arrow number 2, use:
        set noarrow 2

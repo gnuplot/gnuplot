@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.37 2000/05/02 19:00:41 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.39 2000/05/02 20:56:27 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -1406,11 +1406,19 @@ int tag;			/* 0 means show all */
 		    this_arrow->tag,
 		    this_arrow->lp_properties.l_type + 1,
 		    this_arrow->lp_properties.l_width,
-		    this_arrow->head ? "" : " (nohead)",
+		    this_arrow->head ? (this_arrow->head==2 ? " both heads " : "") : " (nohead)",
 		    this_arrow->layer ? "front" : "back");
 	    show_position(&this_arrow->start);
 	    fputs(" to ", stderr);
 	    show_position(&this_arrow->end);
+	    if (this_arrow->headsize.x > 0) {
+		static char *msg[] =
+		{"(first x axis) ", "(second x axis) ", "(graph units) ", "(screen units) "};
+		fprintf(stderr,"\n\t  arrow head: length %s%g, angle %g deg", 
+		   this_arrow->headsize.scalex == first_axes ? "" : msg[this_arrow->headsize.scalex],
+		   this_arrow->headsize.x,
+		   this_arrow->headsize.y);
+	    }
 	    putc('\n', stderr);
 	}
     }

@@ -1,3 +1,11 @@
+2000-02-08  Petr Mikulik <mikulik@physics.muni.cz>
+	* src/graph3d.c src/graphics.c src/set.c src/show.c src/term.c
+	  src/plot.h docs/gnuplot.doc term/fig.trm:
+	allow setting arrow head(s) sizes --- new keywords `heads` and
+	`{size <length>,<angle>}` for `set arrow`.
+	Note: not implemented for TeX-like terminals, which draw arrows
+	by their own method.
+
 2000-07-25  Petr Mikulik <mikulik@physics.muni.cz>
 
 	* src/graphics.c src/plot.c src/plot2d.c src/plot3d.c src/plot.h

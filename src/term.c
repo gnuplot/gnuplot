@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.23 2000/02/11 19:17:20 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.25 2000/05/02 20:56:27 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -689,6 +689,9 @@ int number;
 
 #define HEAD_COEFF  (0.3)	/* default value of head/line length ratio */
 
+int curr_arrow_headlength;    /* access head length + angle without changing API */
+double curr_arrow_headangle;  /* angle in degrees */
+
 static void
 do_arrow(sx, sy, ex, ey, head)
 unsigned int sx, sy;		/* start point */
@@ -707,28 +710,47 @@ TBOOLEAN head;
     (*t->move) (sx, sy);
     (*t->vector) (ex, ey);
 
-    /* no head for arrows whih length = 0
+    /* no head for arrows with length = 0
      * or, to be more specific, length < DBL_EPSILON,
      * because len_arrow will almost always be != 0
      */
     if (head && fabs(len_arrow) >= DBL_EPSILON) {
+	int x1, y1, x2, y2;
+	if (curr_arrow_headlength <= 0) {
+	    /* arrow head with the default size */
 	/* now calc the head_coeff */
 	double coeff_shortest = len_tic * HEAD_SHORT_LIMIT / len_arrow;
 	double coeff_longest = len_tic * HEAD_LONG_LIMIT / len_arrow;
 	double head_coeff = GPMAX(coeff_shortest,
 				  GPMIN(HEAD_COEFF, coeff_longest));
-	/* now draw the arrow head. */
 	/* we put the arrowhead marks at 15 degrees to line */
-	int x, y;		/* one endpoint */
-
-	x = (int) (ex + (COS15 * dx - SIN15 * dy) * head_coeff);
-	y = (int) (ey + (SIN15 * dx + COS15 * dy) * head_coeff);
-	(*t->move) (x, y);
+	    x1 = (int) ((COS15 * dx - SIN15 * dy) * head_coeff);
+	    y1 = (int) ((SIN15 * dx + COS15 * dy) * head_coeff);
+	    x2 = (int) ((COS15 * dx + SIN15 * dy) * head_coeff);
+	    y2 = (int) ((-SIN15 * dx + COS15 * dy) * head_coeff);
+	    (*t->move) (ex + x1, ey + y1);
 	(*t->vector) (ex, ey);
-
-	x = (int) (ex + (COS15 * dx + SIN15 * dy) * head_coeff);
-	y = (int) (ey + (-SIN15 * dx + COS15 * dy) * head_coeff);
-	(*t->vector) (x, y);
+	    (*t->vector) (ex + x2, ey + y2);
+	    }
+	else {
+	    /* the arrow head with the length + angle specified explicitly */
+	    double alpha = curr_arrow_headangle * DEG2RAD;
+	    double phi = atan2(-dy,-dx); /* azimuthal angle of the vector */
+	    /* anticlock-wise head segment */
+	    x1 = -(int)(curr_arrow_headlength * cos( alpha - phi ));
+	    y1 =  (int)(curr_arrow_headlength * sin( alpha - phi ));
+	    /* clock-wise head segment */
+	    x2 = -(int)(curr_arrow_headlength * cos( phi + alpha ));
+	    y2 = -(int)(curr_arrow_headlength * sin( phi + alpha ));
+	}
+	(*t->move) ( ex + x1, ey + y1); /* forward arrow head */
+	(*t->vector) (ex, ey);
+	(*t->vector) ( ex + x2, ey + y2);
+	if (head == 2) { /* backward arrow head */
+	    (*t->move) ( sx - x2, sy - y2);
+	    (*t->vector) (sx, sy);
+	    (*t->vector) ( sx - x1, sy - y1);
+	}
     }
 }
 
