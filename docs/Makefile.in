@@ -96,7 +96,7 @@ doc2ms: doc2ms.o termdoc.o
 	$(LINK) doc2ms.o termdoc.o $(LIBS)
 
 doc2ms.o: doc2ms.c allterm.h
-	$(COMPILE) -DALL_TERM_DOC -c doc2ms.c
+	$(COMPILE) -DALL_TERM_DOC -c $(srcdir)/doc2ms.c
 
 ### html
 html : gnuplot.html
@@ -108,7 +108,7 @@ doc2html : doc2html.o termdoc.o xref.o
 	$(LINK) doc2html.o termdoc.o xref.o $(LDFLAGS) $(LIBS)
 
 doc2html.o: doc2html.c allterm.h
-	$(COMPILE) -DALL_TERM_DOC -c doc2html.c
+	$(COMPILE) -DALL_TERM_DOC -c $(srcdir)/doc2html.c
 
 ### LaTeX documentation
 tex: gnuplot.tex
@@ -120,7 +120,7 @@ doc2tex: doc2tex.o termdoc.o
 	$(LINK) doc2tex.o termdoc.o $(LIBS)
 
 doc2tex.o: doc2tex.c allterm.h
-	$(COMPILE) -DALL_TERM_DOC -c doc2tex.c
+	$(COMPILE) -DALL_TERM_DOC -c $(srcdir)/doc2tex.c
 
 # this is how to make DVI files
 dvi: gnuplot.dvi gpcard.dvi
@@ -171,7 +171,7 @@ alldoc2gih: alldoc2gih.o termdoc.o
 	$(LINK) alldoc2gih.o termdoc.o $(LIBS)
 
 alldoc2gih.o: doc2gih.c allterm.h
-	$(COMPILE) -DALL_TERM_DOC -c doc2gih.c
+	$(COMPILE) -DALL_TERM_DOC -c $(srcdir)/doc2gih.c
 	@mv doc2gih.o alldoc2gih.o
 
 # this is how to make Info documentation
@@ -223,7 +223,7 @@ checkdoc: checkdoc.o termdoc.o
 	$(LINK) checkdoc.o termdoc.o $(LIBS)
 
 checkdoc.o: checkdoc.c allterm.h
-	$(COMPILE) -DALL_TERM_DOC -c checkdoc.c
+	$(COMPILE) -DALL_TERM_DOC -c $(srcdir)/checkdoc.c
 
 # For Unix and MSDOS only
 install: gnuplot.gih
