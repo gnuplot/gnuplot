@@ -83,6 +83,7 @@ TERM_PUBLIC void PM_linewidth __PROTO((double linewidth));
 #define INCL_DOSPROCESS
 #define INCL_DOSSEMAPHORES
 #define INCL_DOSMISC
+#define INCL_DOSMODULEMGR
 #include <os2.h>
 
 
