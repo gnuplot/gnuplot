@@ -4,17 +4,34 @@
 # See README.
 #
 # To print manual:
-#    make gnuplot.dvi             (for latex)
-#    (print or view gnuplot.dvi)
-# OR
-#    make gnuplot.nroff           (for nroff)
-#    (print or view gnuplot.nroff)
-#   or
-#    make "TROFF=itroff" troff    (for troff; use your troff here)
+#
+#   For LaTeX
+#       make gnuplot.dvi
+#       (print or view gnuplot.dvi)
+#     or
+#       make ps
+#       (print or view gnuplot.ps)
+#
+#   For groff (GNU troff}
+#       make grotxt
+#       (print or view gnuplot.txt)
+#     or
+#       make grodvi
+#       (print or view gnuplot.dvi)
+#     or
+#       make grops
+#       (print or view gnuplot.ps)
+#
+#   For nroff
+#     make gnuplot.nroff
+#     (print or view gnuplot.nroff)
+#
+#   For troff
+#     make "TROFF=itroff" troff    (use your troff here)
 #
 
 # default is what is needed for interactive gnuplot
-default: gnuplot.hlp gnuplot.gih
+all: gnuplot.gih
 
 # this tells GNU make not to export variables into the environment
 # But other makes dont understand its significance, so it must
@@ -28,9 +45,9 @@ prefix = @prefix@
 exec_prefix = @exec_prefix@
 bindir = @bindir@
 datadir = @datadir@
-mandir = @mandir@
+infodir = @infodir@
 srcdir = @srcdir@
-top_builddir = .
+top_builddir = ..
 top_srcdir = @top_srcdir@
 VPATH = @srcdir@
 
@@ -39,30 +56,67 @@ INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_DATA = @INSTALL_DATA@
 
 CC     = @CC@
+CPP    = @CPP@
 DEFS   = @DEFS@
+CPPFLAGS = @CPPFLAGS@
 CFLAGS = @CFLAGS@
-INCLUDES = -I.. -I$(srcdir)/.. -I$(srcdir)/../term -I.
+INCLUDES = -I.. -I$(top_srcdir)/src -I$(top_srcdir)/term -I.
 LDFLAGS = @LDFLAGS@
-LIBS = 
+LIBS = @LIBS@
 
-COMPILE = $(CC) $(DEFS) $(INCLUDES) $(CFLAGS)
+COMPILE = $(CC) $(DEFS) $(INCLUDES) $(CPPFLAGS) $(CFLAGS)
 LINK = $(CC) $(CFLAGS) $(LDFLAGS) -o $@
+
+.c.o:
+	$(COMPILE) -c $<
 
 # The makeinfo command from GNU texinfo
 MAKEINFO = makeinfo
 
 # substitute your troff command (and any flags) for this one
-TROFF=troff
+TROFF = troff
+
+# LaTeX command, either latex or latex2e or no
+LATEX = latex
 
 # substitute your DVI to PostScript conversion program here
-DVIPS=dvips
+DVIPS = dvips
 
-# list of terminals, generated at configure time
-TERM_LIST = \@TERM_LIST@
+T = ${srcdir}/../term
+CORETERM = $(T)/aed.trm $(T)/ai.trm $(T)/amiga.trm $(T)/apollo.trm \
+$(T)/atariaes.trm $(T)/atarivdi.trm $(T)/be.trm $(T)/cgi.trm $(T)/cgm.trm \
+$(T)/corel.trm $(T)/debug.trm $(T)/djsvga.trm $(T)/dumb.trm $(T)/dxf.trm \
+$(T)/dxy.trm $(T)/eepic.trm $(T)/emxvga.trm $(T)/epson.trm $(T)/excl.trm \
+$(T)/fg.trm $(T)/fig.trm $(T)/gif.trm $(T)/gnugraph.trm $(T)/gpic.trm \
+$(T)/gpr.trm $(T)/grass.trm $(T)/hp26.trm $(T)/hp2648.trm $(T)/hp500c.trm \
+$(T)/hpgl.trm $(T)/hpljii.trm $(T)/hppj.trm $(T)/imagen.trm $(T)/iris4d.trm \
+$(T)/kyo.trm $(T)/latex.trm $(T)/linux.trm $(T)/mac.trm $(T)/metafont.trm \
+$(T)/mgr.trm $(T)/mif.trm $(T)/multitos.trm $(T)/next.trm $(T)/pbm.trm \
+$(T)/pc.trm $(T)/pm.trm $(T)/png.trm $(T)/post.trm $(T)/pslatex.trm \
+$(T)/pstricks.trm $(T)/qms.trm $(T)/regis.trm $(T)/rgip.trm $(T)/sun.trm \
+$(T)/t410x.trm $(T)/table.trm $(T)/tek.trm $(T)/texdraw.trm $(T)/tgif.trm \
+$(T)/tkcanvas.trm $(T)/tpic.trm $(T)/unixpc.trm $(T)/unixplot.trm \
+$(T)/v384.trm $(T)/vws.trm $(T)/win.trm $(T)/x11.trm $(T)/xlib.trm
 
-allterm.h : $(TERM_LIST)
+DIST_COMMON = README Makefile.in
+
+SOURCES = checkdoc.c doc2gih.c doc2hlp.c doc2html.c doc2info.c \
+doc2ipf.c doc2ms.c doc2rnh.c doc2rtf.c doc2tex.c termdoc.c xref.c
+
+HEADERS = doc2x.h xref.h
+
+EXTRA_DIST = doc2hlp.com doc2texi.el doc2texi.pl gnuplot.1 gnuplot.doc \
+gnuplot.texi gpcard.tex lasergnu.1 makefile.ami makefile.dst titlepag.ms \
+titlepag.tex toc_entr.sty latextut old psdoc
+
+DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(EXTRA_DIST)
+
+allterm.h : $(CORETERM)
 	@echo Building allterm.h
-	cat $(srcdir)/../term/*.trm > allterm.h
+	@cat $(top_srcdir)/term/*.trm > allterm.c
+	$(CPP) -I$(top_srcdir)/term -DTERM_DRIVER_H -DTERM_HELP allterm.c | \
+	  sed '/^ *$$/d;/^#/d' > allterm.h
+	@rm -f allterm.c
 
 # for debugging
 alldoc: check dvi gih hlp html info ipf ms nroff ps rnh rtf
@@ -84,6 +138,34 @@ gnuplot.nroff: gnuplot.ms titlepag.ms
 	else \
 	    < gnuplot.ms sed "s,titlepag\.ms,$(srcdir)/titlepag\.ms," |\
 	      tbl | neqn | nroff -ms | col > gnuplot.nroff ; \
+	fi
+
+### groff documentation
+
+groff: grotxt grodvi grops
+
+grotxt: gnuplot.ms titlepag.ms
+	@if [ "$(srcdir)" = "$(top_builddir)" ] ; then \
+	    groff -s -p -t -e -ms -Tlatin1 gnuplot.ms > gnuplot.txt ; \
+	else \
+	    sed "s,titlepag\.ms,$(srcdir)/titlepag\.ms," gnuplot.ms |\
+	      groff -s -p -t -e -ms -Tlatin1 gnuplot.ms > gnuplot.txt ; \
+	fi
+
+grodvi: gnuplot.ms titlepag.ms
+	@if [ "$(srcdir)" = "$(top_builddir)" ] ; then \
+	    groff -s -p -t -e -ms -Tdvi gnuplot.ms > gnuplot.dvi ; \
+	else \
+	    sed "s,titlepag\.ms,$(srcdir)/titlepag\.ms," gnuplot.ms |\
+	      groff -s -p -t -e -ms -Tdvi gnuplot.ms > gnuplot.dvi ; \
+	fi
+
+grops: gnuplot.ms titlepag.ms
+	@if [ "$(srcdir)" = "$(top_builddir)" ] ; then \
+	    groff -s -p -t -e -ms -Tps gnuplot.ms > gnuplot.ps ; \
+	else \
+	    sed "s,titlepag\.ms,$(srcdir)/titlepag\.ms," gnuplot.ms |\
+	      groff -s -p -t -e -ms -Tps gnuplot.ms > gnuplot.ps ; \
 	fi
 
 ### doc2xxx dependencies
@@ -126,13 +208,17 @@ doc2tex.o: doc2tex.c allterm.h
 dvi: gnuplot.dvi gpcard.dvi
 
 gnuplot.dvi: gnuplot.tex titlepag.tex toc_entr.sty
-	TEXINPUTS=.:$(srcdir): latex gnuplot
-	TEXINPUTS=.:$(srcdir): latex gnuplot
+	@if test $(LATEX) != no ; then \
+	  TEXINPUTS=.:$(srcdir):${TEXINPUTS}: $(LATEX) gnuplot ; \
+	  TEXINPUTS=.:$(srcdir):${TEXINPUTS}: $(LATEX) gnuplot ; \
+	else \
+	  echo latex not found - cannot build dvi file ; \
+	fi
 
 gpcard.dvi: gpcard.tex
 	TEXINPUTS=.:$(srcdir): tex gpcard
 
-# this is how to make PostScript files
+### Postscript format
 # if pslatex has been installed, add "times" to titlepage.tex
 ps: gnuplot.ps gpcard.ps
 
@@ -152,7 +238,7 @@ gnuplot.hlp: doc2hlp $(srcdir)/gnuplot.doc
 doc2hlp: doc2hlp.o termdoc.o
 	$(LINK) doc2hlp.o termdoc.o $(LIBS)
 
-# this is how to make gnuplot.gih
+### gnuplot interactive help format
 gih: gnuplot.gih
 
 gnuplot.gih: doc2gih $(srcdir)/gnuplot.doc
@@ -174,7 +260,7 @@ alldoc2gih.o: doc2gih.c allterm.h
 	$(COMPILE) -DALL_TERM_DOC -c $(srcdir)/doc2gih.c
 	@mv doc2gih.o alldoc2gih.o
 
-# this is how to make Info documentation
+### GNU info format
 info: gnuplot.info
 
 gnuplot.info: doc2info $(srcdir)/gnuplot.doc
@@ -192,7 +278,7 @@ gnuplot.ipf: doc2ipf $(srcdir)/gnuplot.doc
 doc2ipf: doc2ipf.o termdoc.o xref.o
 	$(LINK) doc2ipf.o termdoc.o xref.o $(LIBS)
 
-# this is how to make rtf documentation
+### Rich Text Format
 rtf: gnuplot.rtf
 
 gnuplot.rtf: doc2rtf $(srcdir)/gnuplot.doc
@@ -216,10 +302,15 @@ tutorial: latextut/tutorial.tex
 	( cd latextut; $(MAKE) )
 
 # this is how to check the gnuplot.doc file
-check: checkdoc $(srcdir)/gnuplot.doc
-	./checkdoc < $(srcdir)/gnuplot.doc
+check: all checkdoc
+	@./checkdoc < $(srcdir)/gnuplot.doc; \
+	if test $$? -eq 0; then \
+	  echo "PASS: gnuplot.doc"; \
+	else \
+	  :; \
+	fi
 
-checkdoc: checkdoc.o termdoc.o
+checkdoc: checkdoc.o termdoc.o $(srcdir)/gnuplot.doc
 	$(LINK) checkdoc.o termdoc.o $(LIBS)
 
 checkdoc.o: checkdoc.c allterm.h
@@ -227,6 +318,7 @@ checkdoc.o: checkdoc.c allterm.h
 
 # For Unix and MSDOS only
 install: gnuplot.gih
+	$(top_srcdir)/mkinstalldirs $(datadir)
 	$(INSTALL_DATA) gnuplot.gih $(datadir)/gnuplot.gih
 
 uninstall:
@@ -236,8 +328,26 @@ uninstall:
 install-vms: gnuplot.hlp
 	$(INSTALL_DATA) gnuplot.hlp $(datadir)/gnuplot.hlp
 
+distdir = $(top_builddir)/$(PACKAGE)-$(VERSION)/$(subdir)
+
+subdir = docs
+
+
+distdir: $(DISTFILES)
+	distdir=`cd $(distdir) && pwd`
+	@for file in $(DISTFILES); do \
+	  d=$(srcdir); \
+	  if test -d $$d/$$file; then \
+	    cp -pr $$d/$$file $(distdir)/$$file; \
+	  else \
+	    test -f $(distdir)/$$file \
+	    || ln $$d/$$file $(distdir)/$$file 2> /dev/null \
+	    || cp -p $$d/$$file $(distdir)/$$file || :; \
+	  fi; \
+	done
+
 clean:
-	rm -f doc2tex gnuplot.tex gnuplot.dvi \
+	-rm -f doc2tex gnuplot.tex gnuplot.dvi \
 	  gnuplot.aux gnuplot.log gnuplot.toc \
 	  gnuplot.ps gpcard.dvi gpcard.log gpcard.ps \
 	  alldoc2gih doc2gih gnuplot.gih \
@@ -250,17 +360,19 @@ clean:
 	  doc2rtf gnuplot.rtf \
 	  gnuplot.nroff checkdoc *.o core a.out allterm.h
 	( cd latextut; $(MAKE) clean )
+	rm -f *.exe
 
 mostlyclean: clean
 
 distclean: clean
-	rm -f Makefile
+	-rm -f Makefile
 
 realclean: distclean
-	rm -f TAGS
+	-rm -f TAGS
 
-.c.o:
-	$(COMPILE) -c $<
+Makefile: Makefile.in ../config.status
+	cd .. \
+	  && CONFIG_FILES=$(subdir)/$@ CONFIG_HEADERS= $(SHELL) ./config.status
 
 ### Dependencies - do not edit!
 
@@ -269,33 +381,33 @@ realclean: distclean
 # (but then we have to change all the other makefiles). Plus then
 # we cannot make some doc2* filters use allterm.h and others use term.h
 
-TERM_H = $(srcdir)/../term.h
+TERM_H = $(top_srcdir)/term.h
 
-checkdoc.o: checkdoc.c ../config.h $(srcdir)/../ansichek.h \
-		$(srcdir)/../stdfn.h doc2x.h allterm.h
-alldoc2gih.o: doc2gih.c ../config.h $(srcdir)/../ansichek.h \
-		$(srcdir)/../stdfn.h doc2x.h allterm.h
-doc2gih.o: doc2gih.c ../config.h $(srcdir)/../ansichek.h \
-		$(srcdir)/../stdfn.h doc2x.h $(TERM_H)
-doc2hlp.o: doc2hlp.c ../config.h $(srcdir)/../ansichek.h \
-		$(srcdir)/../stdfn.h doc2x.h $(TERM_H)
-doc2html.o: doc2html.c ../config.h $(srcdir)/../ansichek.h \
-		$(srcdir)/../stdfn.h doc2x.h allterm.h
-doc2info.o: doc2info.c ../config.h $(srcdir)/../ansichek.h \
-		$(srcdir)/../stdfn.h doc2x.h $(TERM_H)
-doc2ipf.o: doc2ipf.c ../config.h $(srcdir)/../ansichek.h \
-		$(srcdir)/../stdfn.h doc2x.h $(TERM_H)
-doc2ms.o: doc2ms.c ../config.h $(srcdir)/../ansichek.h \
-		$(srcdir)/../stdfn.h doc2x.h allterm.h
-doc2rnh.o: doc2rnh.c ../config.h $(srcdir)/../ansichek.h \
-		$(srcdir)/../stdfn.h doc2x.h $(TERM_H)
-doc2rtf.o: doc2rtf.c ../config.h $(srcdir)/../ansichek.h \
-		$(srcdir)/../stdfn.h doc2x.h $(TERM_H)
-doc2tex.o: doc2tex.c ../config.h $(srcdir)/../ansichek.h \
-		$(srcdir)/../stdfn.h doc2x.h allterm.h
-termdoc.o: termdoc.c ../config.h $(srcdir)/../ansichek.h \
-		$(srcdir)/../stdfn.h doc2x.h
-xref.o: xref.c ../config.h $(srcdir)/../ansichek.h \
-		$(srcdir)/../stdfn.h doc2x.h xref.h
+checkdoc.o: checkdoc.c ../config.h $(top_srcdir)/ansichek.h \
+		$(top_srcdir)/stdfn.h doc2x.h allterm.h
+alldoc2gih.o: doc2gih.c ../config.h $(top_srcdir)/ansichek.h \
+		$(top_srcdir)/stdfn.h doc2x.h allterm.h
+doc2gih.o: doc2gih.c ../config.h $(top_srcdir)/ansichek.h \
+		$(top_srcdir)/stdfn.h doc2x.h $(TERM_H)
+doc2hlp.o: doc2hlp.c ../config.h $(top_srcdir)/ansichek.h \
+		$(top_srcdir)/stdfn.h doc2x.h $(TERM_H)
+doc2html.o: doc2html.c ../config.h $(top_srcdir)/ansichek.h \
+		$(top_srcdir)/stdfn.h doc2x.h allterm.h
+doc2info.o: doc2info.c ../config.h $(top_srcdir)/ansichek.h \
+		$(top_srcdir)/stdfn.h doc2x.h $(TERM_H)
+doc2ipf.o: doc2ipf.c ../config.h $(top_srcdir)/ansichek.h \
+		$(top_srcdir)/stdfn.h doc2x.h $(TERM_H)
+doc2ms.o: doc2ms.c ../config.h $(top_srcdir)/ansichek.h \
+		$(top_srcdir)/stdfn.h doc2x.h allterm.h
+doc2rnh.o: doc2rnh.c ../config.h $(top_srcdir)/ansichek.h \
+		$(top_srcdir)/stdfn.h doc2x.h $(TERM_H)
+doc2rtf.o: doc2rtf.c ../config.h $(top_srcdir)/ansichek.h \
+		$(top_srcdir)/stdfn.h doc2x.h $(TERM_H)
+doc2tex.o: doc2tex.c ../config.h $(top_srcdir)/ansichek.h \
+		$(top_srcdir)/stdfn.h doc2x.h allterm.h
+termdoc.o: termdoc.c ../config.h $(top_srcdir)/ansichek.h \
+		$(top_srcdir)/stdfn.h doc2x.h
+xref.o: xref.c ../config.h $(top_srcdir)/ansichek.h \
+		$(top_srcdir)/stdfn.h doc2x.h xref.h
 
 #the end
