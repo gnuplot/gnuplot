@@ -130,6 +130,12 @@ AC_ARG_ENABLE(unixpc,dnl
 test -z "$enable_unixpc" && enable_unixpc=no
 )dnl
 
+dnl enable system time routines
+AC_ARG_ENABLE(system-time,dnl
+[  --enable-system-time    use the system time routines in time.c],,
+test -z "$enable_system_time" && enable_system_time=no
+)dnl
+
 dnl configure.in body
 
 dnl Compiler characteristics
@@ -184,7 +190,7 @@ AC_HEADER_STDC
 
 dnl ANSI headers
 AC_CHECK_HEADERS(errno.h float.h limits.h locale.h math.h stdlib.h string.h \
-  time.h sys/time.h sys/types.h)
+  time.h sys/time.h sys/timeb.h sys/types.h)
 dnl other
 AC_CHECK_HEADERS(sys/bsdtypes.h sys/select.h sys/socket.h sys/stat.h \
   sys/systeminfo.h sys/utsname.h libc.h malloc.h sgtty.h termios.h values.h)
@@ -207,7 +213,10 @@ AC_TRY_COMPILE(
 
 dnl Types.
 AC_TYPE_SIZE_T
-AC_CHECK_TYPE(time_t, long)
+AC_MSG_CHECKING(for time_t in time.h)
+AC_EGREP_HEADER(time_t,time.h,dnl
+  [ ac_cv_type_time_t=yes; AC_MSG_RESULT(yes) ],dnl
+  [ AC_MSG_RESULT(no) AC_CHECK_TYPE(time_t, long)])
 AC_TYPE_SIGNAL
  
 
@@ -416,6 +425,10 @@ if test "$enable_unixpc" = yes; then
    enable_unixpc=no)
 fi
 
+if test "$enable_system_time" = yes; then
+  AC_DEFINE(USE_SYSTEM_TIME)
+fi
+
 dnl Substitute variables
 AC_SUBST(PACKAGE)
 AC_SUBST(VERSION)
@@ -500,6 +513,9 @@ test "$enable_sun" = yes && \
 
 test "$enable_unixpc" = yes && \
   AC_MSG_RESULT([  Enable unixpc terminal (ATT 3b1 or ATT 7300).])
+
+test "$enable_system_time" = yes && \
+  AC_MSG_RESULT([  Use system time routines in timce.c.])
 
 test "$no_x" != yes && \
   AC_MSG_RESULT([  Use the X Window System.
