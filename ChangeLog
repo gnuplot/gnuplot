@@ -1,4 +1,8 @@
-2004-04-22  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+2004-04-30  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* docs/gpcard.tex: Remove duplicated X11 terminal entry.
+
+2004-04-29  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* docs/gnuplot.doc: Fix description of default format being "% g"
 	instead of "%g".
