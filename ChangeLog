@@ -1,3 +1,7 @@
+2004-11-25  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/util3d.h: map3d_xy_double is needed independent of WITH_IMAGE.
+
 2004-11-24  Ethan Merritt  <merritt@u.washington.edu>
 
 	src/gplt_x11.c: Set background color for pattern-fill explicitly each
