@@ -1,3 +1,28 @@
+1999-05-13  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* lisp/Makefile.in: Add empty check target.
+
+	* src/fit.c(do_fit), src/graphics.c(gprintf): Adjust static array
+	size.
+
+	* src/misc.c(save_set_all), src/plot.h, src/set.c, src/show.c: Now
+	fully dynamic allocation of text and font members in struct text_label.
+
+1999-05-13  "James R. Van Zandt"  <jrv@vanzandt.mv.com>
+
+	* term/cgm.trm(CGM_linewidth): Change assertion to more useful
+	value (0 instead of 1.0).
+	
+1999-05-12  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* NEWS, PATCHLEVEL: Updated.
+
+	* docs/gnuplot.doc, src/scanner.c: Just strip newlines in the output
+	produced by spawned commands. They are NOT replaced with blanks
+	anymore.
+
+	* src/command.c: Fix indentation, potential buffer overflow.
+
 1999-05-11  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* lisp/Makefile.in: Add empty uninstall target.
@@ -18,7 +43,7 @@
 	* src/misc.c(load_file): Fix for "gnuplot doesn't exit on
 	quit/exit in non-interactive mode".
 
-1999-05-09  James R. Van Zandt  <jrv@vanzandt.mv.com>
+1999-05-09  "James R. Van Zandt"  <jrv@vanzandt.mv.com>
 
 	* src/plot.h: MAX_DISCRETE_LEVELS removed.
 
@@ -27,7 +52,7 @@
 
 	* src/setshow.h: levels_list is now dynamic.
 
-1999-05-08  James R. Van Zandt  <jrv@vanzandt.mv.com>
+1999-05-08  "James R. Van Zandt"  <jrv@vanzandt.mv.com>
 
 	* docs/gnuplot.doc: Command substitution will not work within a
 	string surrounded by single quotes.  Show an example of command
