@@ -2,7 +2,7 @@
 AUTOMAKE_OPTIONS = ansi2knr foreign 1.2h
 
 # in the spirit of automake ...
-pkglibexecdir = $(libexecdir)/@PACKAGE@
+pkglibexecdir = $(libexecdir)/@PACKAGE@/@PKG_MAJOR@
 
 # Where to send email about bugs and comments (locally)
 EMAIL = gnuplot-bugs@lists.sourceforge.net
@@ -11,14 +11,15 @@ EMAIL = gnuplot-bugs@lists.sourceforge.net
 HELPFILE=@GIHDIR@/gnuplot.gih
 
 # Default X11 driver location
-X11_DRIVER_DIR=$(pkglibexecdir)/@PKG_MAJOR@
+X11_DRIVER_DIR=$(pkglibexecdir)
 
 # There is probably no need to edit anything below this line
 
 GNUPLOT_X11 = @GNUPLOT_X11@
 EXTRA_PROGRAMS = gnuplot_x11
 bin_PROGRAMS = gnuplot
-noinst_PROGRAMS = bf_test $(GNUPLOT_X11)
+pkglibexec_PROGRAMS = $(GNUPLOT_X11)
+noinst_PROGRAMS = bf_test
 
 XLIBS = @LIBRARIES_FOR_X@
 AM_CPPFLAGS = -I../term -I$(top_srcdir)/term -DBINDIR=\"$(bindir)\" -DX11_DRIVER_DIR=\"$(X11_DRIVER_DIR)\" -DCONTACT=\"$(EMAIL)\" -DHELPFILE=\"$(HELPFILE)\"
@@ -70,23 +71,3 @@ include makefile.all
 # end makefile.all
 term$U.o: $(CORETERM)
 
-install-exec-local: $(GNUPLOT_X11)
-	@$(NORMAL_INSTALL)
-	$(mkinstalldirs) $(DESTDIR)$(pkglibexecdir)/$(PKG_MAJOR)
-	@list='$(GNUPLOT_X11)'; for p in $$list; do \
-	  p1=`echo $$p|sed 's/$(EXEEXT)$$//'`; \
-	  if test -f $$p \
-	  ; then \
-	    f=`echo $$p1|sed '$(transform);s/$$/$(EXEEXT)/'`; \
-	   echo " $(INSTALL_PROGRAM_ENV) $(INSTALL_PROGRAM) $$p $(DESTDIR)$(pkglibexecdir)/$(PKG_MAJOR)/$$f"; \
-	   $(INSTALL_PROGRAM_ENV) $(INSTALL_PROGRAM) $$p $(DESTDIR)$(pkglibexecdir)/$(PKG_MAJOR)/$$f ; \
-	  else :; fi; \
-	done
-
-uninstall-local:
-	@$(NORMAL_UNINSTALL)
-	@list='$(GNUPLOT_X11)'; for p in $$list; do \
-	  f=`echo $$p|sed 's/$(EXEEXT)$$//;$(transform);s/$$/$(EXEEXT)/'`; \
-	  echo " rm -f $(DESTDIR)$(pkglibexecdir)/$(PKG_MAJOR)/$$f"; \
-	  rm -f $(DESTDIR)$(pkglibexecdir)/$(PKG_MAJOR)/$$f; \
-	done
