@@ -1,3 +1,11 @@
+2002-04-16  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	Patch from Dietmar Warning <dwarning@danalyse.de>: 
+	
+	* term/tkcanvas.trm (TK_put_text): Quote-protect characters that
+ 	would be interpreted by Tcl/Tk if not in tk_perl mode of
+ 	operation.
+
 2002-04-10  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* docs/gnuplot.doc: Added missing documentation of timefmt %s
@@ -312,7 +320,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/04/08 15:04:52 $).
+	last modification date (from the tag $Date: 2002/04/10 11:02:08 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 

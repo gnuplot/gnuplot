@@ -1,5 +1,5 @@
 /*
- * $Id: tkcanvas.trm,v 1.19 2000/11/01 18:57:34 broeker Exp $
+ * $Id: tkcanvas.trm,v 1.20 2001/10/01 13:42:51 lhecking Exp $
  *
  */
 
@@ -390,8 +390,8 @@ $can create line \
 
 TERM_PUBLIC void
 TK_put_text(x, y, str)
-unsigned int x, y;
-const char *str;
+    unsigned int x, y;
+    const char *str;
 {
     y = 1000 - y;
     if (tk_perl) {
@@ -403,14 +403,32 @@ $cmy * %d / 1000, \
 (defined $font ? (-font => $font) : ()));\n",
 		x, y, str, tk_colors[tk_color], tk_anchor);
     } else {
+        /* Have to quote-protect '[' and ']' characters */
+        int i, newsize = 0;
+        char *quoted_str;
+
+        for (i=0; str[i] != '\0'; i++) {
+            if ((str[i] == '[') || (str[i] == ']'))
+                newsize++;
+            newsize++;
+        }
+        quoted_str = gp_alloc(newsize + 1, "TK_put_text: quoted string");
+
+        for (i=0, newsize = 0; str[i] != '\0'; i++) {
+            if ((str[i] == '[') || (str[i] == ']')) 
+                quoted_str[newsize++] = '\\';
+            quoted_str[newsize++] = str[i];
+        }
+        quoted_str[newsize] = '\0';
 	fprintf(gpoutfile,"\
 eval $can create text \
 [expr $cmx * %d /1000] \
 [expr $cmy * %d /1000] \
 -text \\{%s\\} -fill %s -anchor %s\
  [expr [info exists font]?\"-font \\$font\":{}]\n",
-		x, y, str, tk_colors[tk_color], tk_anchor);
-    }
+		x, y, quoted_str, tk_colors[tk_color], tk_anchor);
+       free(quoted_str);
+    } /* else (!tk_perl) */
 }
 
 TERM_PUBLIC int
