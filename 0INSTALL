@@ -101,6 +101,8 @@ $ ./configure --help
   --with-gnu-readline=PATH        Specify the location of libreadline.
                           Use this form if your libreadline is not installed
                           where your linker can find it.
+  --with-plot             use the Unix plot library
+  --with-plot=PATH                Specify the location of GNU libplot
   --with-gd (*)           Enable gif terminal with Tom Boutell's gd library
                           (requires GD library)
   --with-gd=PATH                  Specify the location of libgd
@@ -114,6 +116,12 @@ $ ./configure --help
   --with-lasergnu         Install lasergnu printer script
   --without-linux-vga (*) Do not use the Linux console driver
                           (requires Linux SVGAlib /usr/lib/libvga)
+  --enable-apollo         Apollo Graphics Primitive Resource
+  --enable-gpr            Apollo Graphics Primitive Resource (fixed-size window)
+  --enable-cgi            enable CGI terminal (SCO only)
+  --enable-iris           enable IRIS terminal (IRIS4D only)
+  --enable-sun            enable sunview terminal (Sun only)
+  --enable-unixpc         enable unixpc terminal (ATT 3b1 or ATT 7300)
   --with-x (*)            Use the X Window System
 
  Options marked with (*) are on by default, ie. these features or packages
@@ -493,10 +501,11 @@ packages without modification.
 autoconf macros is that they do search more than one (the default)
 directory to determine the location of the specified file.
 
- Libraries will be searched in at least two, and up to four different
+ Libraries will be searched in at least three, and up to five different
 directories, depending on the PATH specified with `--with-PACKAGE=PATH':
 
  o the default linker path (this is really more than one directory)
+ o /usr/local/lib, which is a fairly common place for 3rd party libs
  o the PATH directory, trailing `/lib/libPACKAGE.a' stripped off
  o the PATH directory, trailing `/lib/libPACKAGE.a' stripped off and
    `/lib' added
@@ -505,9 +514,9 @@ directories, depending on the PATH specified with `--with-PACKAGE=PATH':
  Using the default linker path as the first search directory has one
 big, but not so obvious advantage: if all libraries are in the same
 directory, the path to the first library specified with --with-PACKAGE
-is added to the linker path.  The library searched for with the next
---with-PACKAGE option will now be found faster, because only one
-directory is checked.  This is also true for header files.
+is added to the linker path with an `-L' option.  The library searched
+for with the next --with-PACKAGE option will now be found faster, because
+only one additional directory is checked.  This is also true for header files.
 
  Example: the user has unpacked the gd library distribution into
 /home/user/source/gd:
@@ -517,6 +526,7 @@ $ configure --with-gd=/home/user/source/gd
 will search the following directories for libgd.a:
 
  o the default linker path
+ o /usr/local/lib
  o /home/user/source/gd
  o /home/user/source/gd/lib
  o /home/user/source/gd
@@ -525,15 +535,16 @@ will search the following directories for libgd.a:
 directories, depending on the PATH specified with `--with-PACKAGE=PATH':
 
  o the default include path (can be more than one diretcory)
+ o /usr/local/include, a fairly common place for 3rd party headers
  o the PATH directory, trailing `/lib/libPACKAGE.a' stripped off
  o the PATH directory, trailing `/lib/libPACKAGE.a' stripped off and
    `/include' added
 
  Caveat: the `gp_CHECK_HEADER' macro should only be used after the
-`gp_CHECK_LIB_PATH' macro to take full advantage of the search algorithm.
-This is a reasonable assumption nevertheless, because it allows for
-structuring configure.in so that the test for a header file is skipped
-if the corresponding library is not found.
+corresponding `gp_CHECK_LIB_PATH' macro to take full advantage of the
+search algorithm.  This is a reasonable assumption nevertheless, because
+it allows for structuring configure.in so that the test for a header file
+is skipped if the corresponding library is not found.
 
  Here are some more examples:
 
@@ -592,10 +603,12 @@ may work, though).
    It is recommended to use gcc, although the native compiler may
   work with warnings.
 
- - IRIX 6.x
-   It may be necessary to remove '-lnsl -lsocket' from the LIBS line
-  in Makefile if these libraries are not installed.
+ - HP-UX 10.x
+   It is recommended to use the native compiler cc, as problems
+  have been reported when using gcc. This will be looked at in the
+  near future.
 
+ - IRIX 6.x
    If you want to use the png terminal, you must install your own
   versions of libpng and zlib. The versions supplied with the OS
   are too old.
@@ -634,10 +647,10 @@ may work, though).
 How to test gnuplot
 ===================
 
-   No comprehensive test suite for all of gnuplot's features has been
-written to date. However, the supplied demo files provide a good method
-of testing commonly used features. All command line examples below
-assume Unix Bourne shell syntax.
+   No comprehensive test suite for gnuplot's features has been written
+to date. However, the supplied demo files provide a good method of
+testing commonly used features. All command line examples below assume
+Unix Bourne shell syntax.
 
    The demo files can be run by eg.
 
