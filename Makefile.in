@@ -18,6 +18,7 @@ all: @ERRORFIX@ gnuplot @GNUPLOT_X11@ doc demo/binary1
 .NOEXPORT:
 
 SHELL = /bin/sh
+
 PACKAGE=@PACKAGE@
 VERSION=@VERSION@
 
@@ -42,10 +43,13 @@ INSTALL_DATA = @INSTALL_DATA@
 
 CC     = @CC@
 CPPFLAGS = @CPPFLAGS@
-DEFS  = @DEFS@ @X_INCLUDES@
+DEFS  = @DEFS@
 INCLUDES = -I. -I$(top_srcdir)
 CFLAGS = @CFLAGS@
 LDFLAGS = @LDFLAGS@
+
+COMPILE = $(CC) $(DEFS) $(CPPFLAGS) $(INCLUDES) $(CFLAGS)
+LINK = $(CC) $(CFLAGS) $(LDFLAGS) -o $@
 
 # Additional devices you can add.
 # -DAPOLLO      Apollo Graphics Primitive Resource (window resize after replot)
@@ -335,31 +339,6 @@ term.$(O) : term.h $(CORETERM)
 
 OBJS = $(COREOBJS) @NEXTOBJS@
 
-
-#########################################################################
-
-gnuplot: $(OBJS) version.o
-	$(CC) -o $@ $(OBJS) version.o $(LDFLAGS) $(TERMLIBS) $(LIBS)
-
-gnuplot_x11: gplt_x11.o
-	$(CC) -o $@ gplt_x11.o $(LDFLAGS) $(XLIBS) $(LIBS)
-
-docs/allterm.h: $(CORETERM)
-	cat $(T)*.trm > docs/allterm.h
-
-doc: docs/allterm.h
-	( cd docs; $(MAKE) $(MFLAGS) gnuplot.gih )
-
-demo/binary1 demo/binary2 demo/binary3: bf_test
-	( wd=`pwd`; cd $(srcdir)/demo; $$wd/bf_test )
-
-bf_test: bf_test.o binary.o alloc.o
-	$(CC) -o $@ bf_test.o binary.o alloc.o $(LDFLAGS) $(LIBS)
-
-errorfix: $(srcdir)/errorfix.sh
-	$(srcdir)/errorfix.sh $(srcdir)
-	touch errorfix
-
 ################################################################
 
 install: all $(LASERGNU)
@@ -387,22 +366,44 @@ uninstall:
 # Dependencies
 
 .c.o:
-	$(CC) -c $(CPPFLAGS) $(DEFS) $(INCLUDES) $(CFLAGS) $<
+	$(COMPILE) -c $<
+
+gnuplot: $(OBJS) version.o
+	$(LINK) $(OBJS) version.o $(TERMLIBS) $(LIBS)
+
+gnuplot_x11: gplt_x11.o
+	$(LINK) gplt_x11.o $(XLIBS) $(LIBS)
+
+docs/allterm.h: $(CORETERM)
+	cat $(T)*.trm > docs/allterm.h
+
+doc: docs/allterm.h
+	( cd docs; $(MAKE) $(MFLAGS) gnuplot.gih )
+
+demo/binary1 demo/binary2 demo/binary3: bf_test
+	( wd=`pwd`; cd $(srcdir)/demo; $$wd/bf_test )
+
+bf_test: bf_test.o binary.o alloc.o
+	$(LINK) bf_test.o binary.o alloc.o $(LIBS)
+
+errorfix: $(srcdir)/errorfix.sh
+	$(srcdir)/errorfix.sh $(srcdir)
+	touch errorfix
 
 command.o: command.c fit.h help.h setshow.h
-	$(CC) -c $(CPPFLAGS) $(DEFS) $(INCLUDES) $(CFLAGS) -DHELPFILE=\"$(HELPFILE)\" $<
+	$(COMPILE) -DHELPFILE=\"$(HELPFILE)\" -c $<
 
 misc.o:misc.c plot.h setshow.h
-	$(CC) -c $(CPPFLAGS) $(DEFS) $(INCLUDES) $(CFLAGS) -DGNUPLOT_BINDIR=\"$(bindir)\" $<
+	$(COMPILE) -DGNUPLOT_BINDIR=\"$(bindir)\" -c $<
 
 show.o: show.c plot.h setshow.h
-	$(CC) -c $(CPPFLAGS) $(DEFS) $(INCLUDES) $(CFLAGS) -DHELPFILE=\"$(HELPFILE)\" $<
+	$(COMPILE) -DHELPFILE=\"$(HELPFILE)\" -c $<
 
 term.o: term.c term.h $(CORETERM)
-	$(CC) -c $(TERMFLAGS) $(INCLUDES) $(CPPFLAGS) -I./term -I$(top_srcdir)/term $(DEFS) $(CFLAGS) $<
+	$(COMPILE) $(TERMFLAGS) -I./term -I$(top_srcdir)/term -c $<
 
 version.o: version.c
-	$(CC) -c -DCONTACT=\"$(EMAIL)\" $(CPPFLAGS) $(DEFS) $(CFLAGS) $<
+	$(COMPILE) -DCONTACT=\"$(EMAIL)\" -c $<
 
 $(COREOBJS) version.o bf_test.o : $(CONFIG_HEADER)
 
@@ -433,7 +434,7 @@ $(srcdir)/configure: $(srcdir)/configure.in $(ACLOCAL_M4) $(CONFIGURE_DEPENDENCI
 	cd $(srcdir) && $(AUTOCONF)
 
 $(CONFIG_HEADER): stamp-h
-stamp-h: $(CONFIG_HEADER_IN) $(top_builddir)/config.status
+stamp-h: $(top_builddir)/$(CONFIG_HEADER_IN) $(top_builddir)/config.status
 	cd $(top_builddir) \
 	&& CONFIG_FILES= CONFIG_HEADERS=$(CONFIG_HEADER):$(CONFIG_HEADER_IN) \
 	   $(SHELL) ./config.status
