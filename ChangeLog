@@ -1,3 +1,9 @@
+2004-09-20  Ethan Merritt  <merritt@u.washington.edu>
+
+	* configure.in: --enable-with-image requires both pm3d and binary file
+	support. Enforce this in the configure script by not allowing with-image
+	to be enabled if the other two options have not also been enabled.
+
 2004-09-21  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* docs/gnuplot.doc: Fix documentation for multiplot.
