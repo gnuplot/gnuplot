@@ -1,3 +1,8 @@
+2004-07-29  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/util.c (PRINT_SPACES_UNDER_PROMPT): Protect against
+	NULL prompt.
+
 2004-07-27  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	Bugfix: caret position of error messages in multiplot modes was
