@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: pgnuplot.c,v 1.11 2004/04/13 17:24:06 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: pgnuplot.c,v 1.12 2004/07/01 17:10:10 broeker Exp $"); }
 #endif
 
 /*
@@ -169,69 +169,73 @@ PROCESS_INFORMATION piProcInfo;
 STARTUPINFO         siStartInfo;
 
 /* CRS: Callback for the EnumThreadWindows function */
-BOOL CALLBACK cbGetTextWindow(HWND  hwnd, LPARAM  lParam )
+BOOL CALLBACK
+cbGetTextWindow(HWND  hwnd, LPARAM  lParam)
 {
-	/* save the value of the parent window */
-	hwndParent = hwnd;
-	/* check to see if it has a child text window */
-	hwndText = FindWindowEx(hwnd, NULL, TEXTCLASS, NULL );
+    /* save the value of the parent window */
+    hwndParent = hwnd;
+    /* check to see if it has a child text window */
+    hwndText = FindWindowEx(hwnd, NULL, TEXTCLASS, NULL);
 
-	/* if the text window was found, stop looking */
-	return ( hwndText == NULL );
+    /* if the text window was found, stop looking */
+    return (hwndText == NULL);
 }
 
 /* sends a string to the specified window */
 /* CRS: made this into a function call */
-void PostString(HWND hwnd, char *pc)
+void
+PostString(HWND hwnd, char *pc)
 {
-	while( *pc ){
-		PostMessage( hwnd, WM_CHAR, *pc, 1L );
-		/* CRS: should add a check of return code on PostMessage. If 0, the
-		   message que was full and the message wasn't posted. */
-		pc++;
-	}
+    while(*pc) {
+	PostMessage(hwnd, WM_CHAR, (unsigned char) *pc, 1L);
+	/* CRS: should add a check of return code on PostMessage. If 0, the
+	   message que was full and the message wasn't posted. */
+	pc++;
+    }
 }
 
 /* FindUnquotedSpace(): Search a string for the first space not enclosed in quotes.
  *   Returns a pointer to the space, or the empty string if no space is found.
  *   -CRS 30061999
  */
-char* FindUnquotedSpace( char *pc )
+char*
+FindUnquotedSpace(char *pc)
 {
-	while ( (*pc) && (*pc != ' ') && (*pc != '\t') ){
-		if ( *pc == '"' ){
-			do {
-				pc++;
-			} while ( (pc[1]) && (*pc != '"') );
-		}
+    while ((*pc) && (*pc != ' ') && (*pc != '\t')) {
+	if (*pc == '"') {
+	    do {
 		pc++;
+	    } while (pc[1] && (*pc != '"'));
 	}
-	return pc;
+	pc++;
+    }
+    return pc;
 }
 
-int main (int argc, char *argv[])
+int
+main (int argc, char *argv[])
 {
-	char    psBuffer[BUFFER_SIZE];
-	char    psGnuplotCommandLine[MAX_PATH] = PROGNAME;
-	LPTSTR  psCmdLine;
-	BOOL    bSuccess;
-	int	i;
+    char    psBuffer[BUFFER_SIZE];
+    char    psGnuplotCommandLine[MAX_PATH] = PROGNAME;
+    LPTSTR  psCmdLine;
+    BOOL    bSuccess;
+    int	i;
 
 #if !defined(_O_BINARY) && defined(O_BINARY)
 # define _O_BINARY O_BINARY
 # define _setmode setmode /* this is for BC4.5 ... */
 #endif
-	_setmode(fileno(stdout), _O_BINARY);
+    _setmode(fileno(stdout), _O_BINARY);
 
     for (i = 1; i < argc; i++) {
 	if (!argv[i])
 	    continue;
 	if (!strcmp(argv[i], "-V") || !strcmp(argv[i], "--version")) {
 	    printf("gnuplot %s patchlevel %s\n",
-		    gnuplot_version, gnuplot_patchlevel);
+		   gnuplot_version, gnuplot_patchlevel);
 	    return 0;
 	} else if (!strcmp(argv[i], "-h") || !strcmp(argv[i], "--help")) {
-	    printf( "Usage: gnuplot [OPTION] [FILE] [-]\n"
+	    printf("Usage: gnuplot [OPTION] [FILE] [-]\n"
 		    "  -V, --version   show gnuplot version\n"
 		    "  -h, --help      show this help\n"
 		    "  -persist        don't close the plot after executing FILE\n"
@@ -243,99 +247,99 @@ int main (int argc, char *argv[])
 		    gnuplot_version, gnuplot_patchlevel);
 	    return 0;
 	}
+    } /* for(argc) */
+
+    /* CRS: create the new command line, passing all of the command
+     * line options to wgnuplot so that it can process them:
+     * first, get the command line,
+     * then move past the name of the program (e.g., 'pgnuplot'),
+     * finally, add what's left of the line onto the gnuplot command line. */
+    psCmdLine = GetCommandLine();
+
+#ifdef SHOWCMDLINE
+    fprintf(stderr,"CmdLine: %s\n", psCmdLine);
+    fprintf(stderr,"argv[0]: %s\n",argv[0]);
+#endif
+
+    /* CRS 30061999: Search for the first unquoted space. This should
+       separate the program name from the arguments. */
+    psCmdLine = FindUnquotedSpace(psCmdLine);
+
+    strncat(psGnuplotCommandLine, psCmdLine, MAX_PATH - strlen(psGnuplotCommandLine));
+
+#ifdef SHOWCMDLINE
+    fprintf(stderr,"Arguments: %s\n", psCmdLine);
+    fprintf(stderr,"GnuplotCommandLine: %s\n",psGnuplotCommandLine);
+#endif
+
+    /* CRS: if stdin isn't redirected then just launch wgnuplot normally
+     * and exit. */
+    if (isatty(fileno(stdin))) {
+	if (WinExec(psGnuplotCommandLine, SW_SHOWDEFAULT) > 31) {
+	    exit(EXIT_SUCCESS);
+	}
+	fprintf(stderr,"ERROR %u: Couldn't execute: \"%s\"\n",
+		GetLastError(), psGnuplotCommandLine);
+	exit(EXIT_FAILURE);
     }
 
-	/* CRS: create the new command line, passing all of the command
-	 * line options to wgnuplot so that it can process them:
-	 * first, get the command line,
-	 * then move past the name of the program (e.g., 'pgnuplot'),
-	 * finally, add what's left of the line onto the gnuplot command line. */
-	psCmdLine = GetCommandLine();
+    /* CRS: initialize the STARTUPINFO and call CreateProcess(). */
+    siStartInfo.cb = sizeof(STARTUPINFO);
+    siStartInfo.lpReserved = NULL;
+    siStartInfo.lpReserved2 = NULL;
+    siStartInfo.cbReserved2 = 0;
+    siStartInfo.lpDesktop = NULL;
+    siStartInfo.dwFlags = STARTF_USESHOWWINDOW;
+    siStartInfo.wShowWindow = SW_SHOWMINIMIZED;
 
-#ifdef SHOWCMDLINE
-	fprintf(stderr,"CmdLine: %s\n", psCmdLine);
-	fprintf(stderr,"argv[0]: %s\n",argv[0]);
-#endif
+    bSuccess = CreateProcess(
+			     NULL,                   /* pointer to name of executable module   */
+			     psGnuplotCommandLine,   /* pointer to command line string         */
+			     NULL,                   /* pointer to process security attributes */
+			     NULL,                   /* pointer to thread security attributes  */
+			     FALSE,                  /* handle inheritance flag                */
+			     0,                      /* creation flags                         */
+			     NULL,                   /* pointer to new environment block       */
+			     NULL,                   /* pointer to current directory name      */
+			     &siStartInfo,           /* pointer to STARTUPINFO                 */
+			     &piProcInfo             /* pointer to PROCESS_INFORMATION         */
+			     );
 
-	/* CRS 30061999: Search for the first unquoted space. This should
-	   separate the program name from the arguments. */
-	psCmdLine = FindUnquotedSpace( psCmdLine );
+    /* if CreateProcess() failed, print a warning and exit. */
+    if (! bSuccess) {
+	fprintf(stderr,"ERROR %u: Couldn't execute: \"%s\"\n",
+		GetLastError(), psGnuplotCommandLine);
+	exit(EXIT_FAILURE);
+    }
 
-	strncat(psGnuplotCommandLine, psCmdLine, MAX_PATH - strlen(psGnuplotCommandLine));
+    /* CRS: give gnuplot enough time to start (1 sec.) */
+    if (WaitForInputIdle(piProcInfo.hProcess, 1000)) {
+	fprintf(stderr, "Timeout: gnuplot is not ready\n");
+	exit(EXIT_FAILURE);
+    }
 
-#ifdef SHOWCMDLINE
-	fprintf(stderr,"Arguments: %s\n", psCmdLine);
-	fprintf(stderr,"GnuplotCommandLine: %s\n",psGnuplotCommandLine);
-#endif
+    /* CRS: get the HWND of the parent window and text windows */
+    EnumThreadWindows(piProcInfo.dwThreadId, cbGetTextWindow, 0);
 
-	/* CRS: if stdin isn't redirected then just launch wgnuplot normally
-	 * and exit. */
-	if ( isatty(fileno(stdin)) ) {
-		if ( WinExec(psGnuplotCommandLine, SW_SHOWDEFAULT) > 31 ){
-			exit(EXIT_SUCCESS);
-		}
-		fprintf(stderr,"ERROR %u: Couldn't execute: \"%s\"\n",
-			    GetLastError(), psGnuplotCommandLine);
-		exit(EXIT_FAILURE);
-	}
+    /* CRS: free the process and thread handles */
+    CloseHandle(piProcInfo.hProcess);
+    CloseHandle(piProcInfo.hThread);
 
-	/* CRS: initialize the STARTUPINFO and call CreateProcess(). */
-	siStartInfo.cb = sizeof(STARTUPINFO);
-	siStartInfo.lpReserved = NULL;
-	siStartInfo.lpReserved2 = NULL;
-	siStartInfo.cbReserved2 = 0;
-	siStartInfo.lpDesktop = NULL;
-	siStartInfo.dwFlags = STARTF_USESHOWWINDOW;
-	siStartInfo.wShowWindow = SW_SHOWMINIMIZED;
-
-	bSuccess = CreateProcess(
-			NULL,                   /* pointer to name of executable module   */
-			psGnuplotCommandLine,   /* pointer to command line string         */
-			NULL,                   /* pointer to process security attributes */
-			NULL,                   /* pointer to thread security attributes  */
-			FALSE,                  /* handle inheritance flag                */
-			0,                      /* creation flags                         */
-			NULL,                   /* pointer to new environment block       */
-			NULL,                   /* pointer to current directory name      */
-			&siStartInfo,           /* pointer to STARTUPINFO                 */
-			&piProcInfo             /* pointer to PROCESS_INFORMATION         */
-			);
-
-	/* if CreateProcess() failed, print a warning and exit. */
-	if ( ! bSuccess ) {
-		fprintf(stderr,"ERROR %u: Couldn't execute: \"%s\"\n",
-						GetLastError(), psGnuplotCommandLine);
-		exit(EXIT_FAILURE);
-	}
-
-	/* CRS: give gnuplot enough time to start (1 sec.) */
-	if ( WaitForInputIdle(piProcInfo.hProcess, 1000) ) {
-		fprintf(stderr, "Timeout: gnuplot is not ready\n");
-		exit(EXIT_FAILURE);
-	}
-
-	/* CRS: get the HWND of the parent window and text windows */
-	EnumThreadWindows(piProcInfo.dwThreadId, cbGetTextWindow, 0);
-
-	/* CRS: free the process and thread handles */
-	CloseHandle(piProcInfo.hProcess);
-	CloseHandle(piProcInfo.hThread);
-
-	if ( ! hwndParent || ! hwndText ) {
+    if (! hwndParent || ! hwndText) {
 	/* Still no gnuplot window? Problem! */
-		fprintf(stderr, "Can't find the gnuplot window");
-		exit(EXIT_FAILURE);
-	}
+	fprintf(stderr, "Can't find the gnuplot window");
+	exit(EXIT_FAILURE);
+    }
 
-	/* wait for commands on stdin, and pass them on to the wgnuplot text
-	 * window */
-	while ( fgets(psBuffer, BUFFER_SIZE, stdin) != NULL ) {
-		PostString(hwndText, psBuffer);
-	}
+    /* wait for commands on stdin, and pass them on to the wgnuplot text
+     * window */
+    while (fgets(psBuffer, BUFFER_SIZE, stdin) != NULL) {
+	PostString(hwndText, psBuffer);
+    }
 
-	/* exit gracefully */
-	/* CRS: Add a test to see if gnuplot is still running? */
-	PostString(hwndText, "\nexit\n");
+    /* exit gracefully */
+    /* CRS: Add a test to see if gnuplot is still running? */
+    PostString(hwndText, "\nexit\n");
 
-	return EXIT_SUCCESS;
+    return EXIT_SUCCESS;
 }
