@@ -1,407 +1,326 @@
-############################################################
-#
-# $Id: Makefile.in,v 1.50 1998/06/18 14:55:00 ddenholm Exp $
-#
-# GNUPLOT Makefile.in for autoconf (Unix X11 support)
-# Adapted from makefile.unx by djm@gnu.ai.mit.edu
-############################################################
+# Makefile.in generated automatically by automake 1.4 from Makefile.am
 
-# default target
+# Copyright (C) 1994, 1995-8, 1999 Free Software Foundation, Inc.
+# This Makefile.in is free software; the Free Software Foundation
+# gives unlimited permission to copy and/or distribute it,
+# with or without modifications, as long as this notice is preserved.
 
-all: @ERRORFIX@ gnuplot @GNUPLOT_X11@ @GNUPLOT_BE@ bf_test
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY, to the extent permitted by law; without
+# even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+# PARTICULAR PURPOSE.
 
-
-# this tells GNU make not to export variables into the environment
-# But other makes don't understand its significance, so it must
-# not be the first target in the file. So it is here, before
-# any variables are created, but after the default target
-.NOEXPORT:
 
 SHELL = @SHELL@
 
-PACKAGE=@PACKAGE@
-VERSION=@VERSION@
-
-prefix = @prefix@
-exec_prefix = @exec_prefix@
-bindir = @bindir@
-datadir = @datadir@
-includedir = @includedir@
-libdir = @libdir@
 srcdir = @srcdir@
-top_builddir = ..
 top_srcdir = @top_srcdir@
 VPATH = @srcdir@
-@SET_MAKE@
+prefix = @prefix@
+exec_prefix = @exec_prefix@
 
-HELPFILE=$(datadir)/gnuplot.gih
+bindir = @bindir@
+sbindir = @sbindir@
+libexecdir = @libexecdir@
+datadir = @datadir@
+sysconfdir = @sysconfdir@
+sharedstatedir = @sharedstatedir@
+localstatedir = @localstatedir@
+libdir = @libdir@
+infodir = @infodir@
+mandir = @mandir@
+includedir = @includedir@
+oldincludedir = /usr/include
 
-DESTDIR = 
+DESTDIR =
+
+pkgdatadir = $(datadir)/@PACKAGE@
+pkglibdir = $(libdir)/@PACKAGE@
+pkgincludedir = $(includedir)/@PACKAGE@
+
+top_builddir = ..
+
+ACLOCAL = @ACLOCAL@
+AUTOCONF = @AUTOCONF@
+AUTOMAKE = @AUTOMAKE@
+AUTOHEADER = @AUTOHEADER@
 
 INSTALL = @INSTALL@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@ $(AM_INSTALL_PROGRAM_FLAGS)
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
+transform = @program_transform_name@
 
+NORMAL_INSTALL = :
+PRE_INSTALL = :
+POST_INSTALL = :
+NORMAL_UNINSTALL = :
+PRE_UNINSTALL = :
+POST_UNINSTALL = :
 CC = @CC@
-CPPFLAGS = @CPPFLAGS@
-DEFS  = @DEFS@
-INCLUDES = -I.. -I$(srcdir)
-CFLAGS = @CFLAGS@
-LDFLAGS = @LDFLAGS@
+CPP = @CPP@
+EMACS = @EMACS@
+GNUPLOT_X11 = @GNUPLOT_X11@
+LASERGNU = @LASERGNU@
+LATEX = @LATEX@
+LIBRARIES_FOR_X = @LIBRARIES_FOR_X@
+LINUXSUID = @LINUXSUID@
+MAKEINFO = @MAKEINFO@
+NEXTOBJS = @NEXTOBJS@
+PACKAGE = @PACKAGE@
+TUTORIAL = @TUTORIAL@
+U = @U@
+VERSION = @VERSION@
 
-COMPILE = $(CC) $(DEFS) $(INCLUDES) $(CPPFLAGS) $(CFLAGS)
-LINK = $(CC) $(CFLAGS) $(LDFLAGS) -o $@
+AUTOMAKE_OPTIONS = foreign 1.2h
 
-# This stuff is obsolete now. Use the appropriate configure options!
-#
-# Additional devices you can add.
-# -DAPOLLO      Apollo Graphics Primitive Resource (window resize after replot)
-# -DGPR         Apollo Graphics Primitive Resource (fixed-size window)
-# -DCGI         SCO CGI
-# -DIRIS        IRIS4D series computer
-# -DSUN         Sun Microsystems Workstation
-# -DLINUXVGA	Linux PC with SuperVGA library
-# -DUNIXPC      unixpc (ATT 3b1 or ATT 7300)
-# -DUNIXPLOT    unixplot
-# -DGNUGRAPH    use GNU graphics version of UNIX plot library
-#               This can only be used in combination with -DUNIXPLOT
-# TERMFLAGS = @TERMFLAGS@
+EXTRA_PROGRAMS = gnuplot_x11
 
-#  -lplot if you have -DUNIXPLOT in TERMFLAGS
-#  -lsuntool -lsunwindow -lpixrect  if you have -DSUN in TERMFLAGS
-#  -lgl_s if -DIRIS in TERMFLAGS
-#  -lccgi if -DCGI in TERMFLAGS
-#  -lvga if -DLINUXVGA in TERMFLAGS
+bin_PROGRAMS = gnuplot @GNUPLOT_X11@ bf_test
+
 TERMLIBS = @TERMLIBS@
 TERMXLIBS = @TERMXLIBS@
-
-LIBS = @LIBS@
 XLIBS = @LIBRARIES_FOR_X@
-
+HELPFILE = $(datadir)/gnuplot.gih
 # Where to send email about bugs and comments (locally)
 EMAIL = bug-gnuplot@dartmouth.edu
 
-# Lasergnu is a handy shell script for creating a plot from the
-# command line and sending it directly to the printer. It currently
-# supports PostScript and imagen printers, and probably would need
-# tailoring to your site.
-# Use lasergnu_install to install lasergnu.
-# Use lasergnu_noinstall to not install lasergnu (default).
-LASERGNU = @LASERGNU@
+gnuplot_SOURCES = alloc.c alloc.h ansichek.h binary.c binary.h bitmap.c bitmap.h command.c contour.c datafile.c eval.c fit.c fit.h fnproto.h graph3d.c graphics.c help.c help.h hidden3d.c internal.c interpol.c matrix.c matrix.h misc.c national.h parse.c plot.c plot.h plot2d.c plot3d.c protos.h readline.c scanner.c set.c setshow.h show.c specfun.c standard.c stdfn.c stdfn.h syscfg.h term.c term.h time.c util.c util3d.c variable.c variable.h version.c
 
-############################################################
-# -DREADLINE:
-#   If READLINE is defined, then command-line editing is supported.
-#   Otherwise, your normal terminal editing is all you get.
-#   Some machines will not support this, and they will turn this
-#   option off (for example, apollos running SR10.2 or SR10.3 and
-#   loaded with BSD4.3 instead of SYS5). Note: problems with
-#   gnuplot prompts have been noted when this feature is selected
-#   on IBM RS/6000 AIX, and compile errors are encountered on
-#   Sequent Dynix 3 and Convex OS 9.0.
-# -DNOCWDRC:
-#   If NOCWDRC is defined, then any .gnuplot in the current directory
-#   is not read on startup. This is a security consideration
-#   especially for root users ( we recommend you define -DNOCWDRC ).
-# -ISC22 to circumvent missing plots past the first on ISC 2.2
 
-#  -DNO_MEMSET if you don't have memset()
-#  -DHAVE_BZERO if you have bzero() instead and no memset().
-#    This works only if the second argument to memset() is 0! 
-#  -DNO_MEMCPY if you don't have memcpy()
-#  -DHAVE_BCOPY if you have bcopy() instead and no memcpy()
-#  -DGAMMA=foo if your gamma function is called foo(). Apollos and
-#    Linux have lgamma(3m). The default is -DGAMMA=gamma.
-#  -DHAVE_GETCWD if your unix uses getcwd() instead of getwd()
-#    this is needed by HP-UX and Cray Unicos systems.
-#  -DULTRIX_KLUDGE if you run X windows on Ultrix and experience the
-#    "every other plot" problem.
-#  -DCRIPPLED_SELECT if "select errors" are encountered with X. This
-#    option is needed on SVR3 platforms with incomplete support for
-#    the BSD select() system call
-#  -DHAVE_LOCALE if your system uses the 'setlocale' function to
-#    support foreign charactersets (currently only ISO8859-1).
-#  -DSYSTEM_TIME to use the system-provided set of time routines -
-#    in case the gnuplot routines in time.c misbehave
-#  -Dunix is required to explicitly define "unix" for SCO and IBM
-#          RS/6000 running AIX 3.2
+EXTRA_gnuplot_SOURCES = @NEXTOBJS@
 
-#
-# You probably don't need to change anything below here.
-#
+gnuplot_LDADD = $(TERMLIBS) $(TERMXLIBS)
+
+gnuplot_x11_SOURCES = gplt_x11.c stdfn.c
+
+gnuplot_x11_LDADD = $(XLIBS)
+
+bf_test_SOURCES = bf_test.c binary.c alloc.c
+
+@BUILD_SRC_BEOS_SUBDIR_TRUE@d_beos = beos
+
+SUBDIRS = $(d_beos)
+
+OTHER_SOURCES = amiga.c corplot.c ctrl87.c ctrl87.h os9.c strftime.c vms.c
+
+EXTRA_DIST = GNUmakefile Makefile.maint NeXT corgraph.asm genopt.com gnuplot.def gnuplot.opt gnuplot.prj header.mac hrcgraph.asm intergra.x11 lasergnu lineproc.mac linkopt.vms linkopt.ztc makefile.all os2 pcgraph.asm rgipgnu win $(OTHER_SOURCES)
 
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = ../config.h
-CONFIG_CLEAN_FILES =
+CONFIG_CLEAN_FILES = 
+PROGRAMS =  $(bin_PROGRAMS)
 
-GZIP = --best
-TAR = tar
 
-####################################################################
-#
-# Definitions for macros used in makefile.all (updated automatically)
-#
-# Standard unix make does not support included makefiles.
-# We inline the contents of makefile.all here
-# it will be updated using a script whenever makefile.all is changed
-# (resp, the plan is to generate this Makefile.in from Makefile.in.in
-# via GNUMakefile)
+DEFS = @DEFS@ -I. -I$(srcdir) -I..
+CPPFLAGS = @CPPFLAGS@
+LDFLAGS = @LDFLAGS@
+LIBS = @LIBS@
+X_CFLAGS = @X_CFLAGS@
+X_LIBS = @X_LIBS@
+X_EXTRA_LIBS = @X_EXTRA_LIBS@
+X_PRE_LIBS = @X_PRE_LIBS@
+gnuplot_x11_OBJECTS =  gplt_x11.o stdfn.o
+gnuplot_x11_DEPENDENCIES = 
+gnuplot_x11_LDFLAGS = 
+gnuplot_OBJECTS =  alloc.o binary.o bitmap.o command.o contour.o \
+datafile.o eval.o fit.o graph3d.o graphics.o help.o hidden3d.o \
+internal.o interpol.o matrix.o misc.o parse.o plot.o plot2d.o plot3d.o \
+readline.o scanner.o set.o show.o specfun.o standard.o stdfn.o term.o \
+time.o util.o util3d.o variable.o version.o
+gnuplot_DEPENDENCIES = 
+gnuplot_LDFLAGS = 
+bf_test_OBJECTS =  bf_test.o binary.o alloc.o
+bf_test_LDADD = $(LDADD)
+bf_test_DEPENDENCIES = 
+bf_test_LDFLAGS = 
+CFLAGS = @CFLAGS@
+COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
+CCLD = $(CC)
+LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(LDFLAGS) -o $@
+DIST_COMMON =  Makefile.am Makefile.in
 
-# Please define
-# O as the object extension
-O=o
-# T as the prefix for terminals (eg term/ or [.term])
-T=$(top_srcdir)/term/
-# N as the prefix for NeXT (eg NeXT/)
-N=$(srcdir)/NeXT/
-# B as the prefix for BeOS (eg beos/)
-B=$(srcdir)/beos/
-# P as the prefix for OS/2 (eg os2/)
-P=$(srcdir)/os2/
-# W as the prefix for Windows (eg win/)
-W=$(srcdir)/win/
 
-####################################################################
-##makefile-all-begin
-# makefile.all generated automatically by GNU make
+DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 
-# List of core object files except version.$(O)
-COREOBJS = alloc.$(O) binary.$(O) bitmap.$(O) command.$(O) contour.$(O) \
-datafile.$(O) eval.$(O) fit.$(O) graph3d.$(O) graphics.$(O) help.$(O) \
-hidden3d.$(O) internal.$(O) interpol.$(O) matrix.$(O) misc.$(O) parse.$(O) \
-plot.$(O) plot2d.$(O) plot3d.$(O) readline.$(O) scanner.$(O) set.$(O) \
-show.$(O) specfun.$(O) standard.$(O) stdfn.$(O) term.$(O) time.$(O) \
-util.$(O) util3d.$(O) variable.$(O)
+TAR = gtar
+GZIP_ENV = --best
+DIST_SUBDIRS =  beos
+DEP_FILES =  .deps/alloc.P .deps/bf_test.P .deps/binary.P .deps/bitmap.P \
+.deps/command.P .deps/contour.P .deps/datafile.P .deps/eval.P \
+.deps/fit.P .deps/gplt_x11.P .deps/graph3d.P .deps/graphics.P \
+.deps/help.P .deps/hidden3d.P .deps/internal.P .deps/interpol.P \
+.deps/matrix.P .deps/misc.P .deps/parse.P .deps/plot.P .deps/plot2d.P \
+.deps/plot3d.P .deps/readline.P .deps/scanner.P .deps/set.P \
+.deps/show.P .deps/specfun.P .deps/standard.P .deps/stdfn.P \
+.deps/term.P .deps/time.P .deps/util.P .deps/util3d.P .deps/variable.P \
+.deps/version.P
+SOURCES = $(gnuplot_x11_SOURCES) $(gnuplot_SOURCES) $(EXTRA_gnuplot_SOURCES) $(bf_test_SOURCES)
+OBJECTS = $(gnuplot_x11_OBJECTS) $(gnuplot_OBJECTS) $(bf_test_OBJECTS)
 
-# List of terminal driver sources
-CORETERM = $(T)aed.trm $(T)ai.trm $(T)amiga.trm $(T)apollo.trm \
-$(T)atariaes.trm $(T)atarivdi.trm $(T)be.trm $(T)cgi.trm $(T)cgm.trm \
-$(T)corel.trm $(T)debug.trm $(T)djsvga.trm $(T)dumb.trm $(T)dxf.trm \
-$(T)dxy.trm $(T)eepic.trm $(T)emxvga.trm $(T)epson.trm $(T)excl.trm \
-$(T)fg.trm $(T)fig.trm $(T)gif.trm $(T)gnugraph.trm $(T)gpic.trm \
-$(T)gpr.trm $(T)grass.trm $(T)hp26.trm $(T)hp2648.trm $(T)hp500c.trm \
-$(T)hpgl.trm $(T)hpljii.trm $(T)hppj.trm $(T)imagen.trm $(T)iris4d.trm \
-$(T)kyo.trm $(T)latex.trm $(T)linux.trm $(T)mac.trm $(T)metafont.trm \
-$(T)metapost.trm $(T)mgr.trm $(T)mif.trm $(T)multitos.trm \
-$(T)next.trm $(T)openstep.trm $(T)pbm.trm $(T)pc.trm $(T)pm.trm \
-$(T)png.trm $(T)post.trm $(T)pslatex.trm $(T)pstricks.trm $(T)qms.trm \
-$(T)regis.trm $(T)rgip.trm $(T)sun.trm $(T)t410x.trm $(T)table.trm \
-$(T)tek.trm $(T)texdraw.trm $(T)tgif.trm $(T)tkcanvas.trm $(T)tpic.trm \
-$(T)unixpc.trm $(T)unixplot.trm $(T)v384.trm $(T)vws.trm $(T)win.trm \
-$(T)x11.trm $(T)xlib.trm
+all: all-redirect
+.SUFFIXES:
+.SUFFIXES: .S .c .o .s
+$(srcdir)/Makefile.in: Makefile.am $(top_srcdir)/configure.in $(ACLOCAL_M4) 
+	cd $(top_srcdir) && $(AUTOMAKE) --foreign src/Makefile
 
-##makefile-all-end
-####################################################################
-
-####################################################################
-# List of source files
-# Used for making shar files, lint, and some dependencies.
-
-CSOURCE = alloc.c binary.c bitmap.c command.c contour.c datafile.c eval.c \
-	  fit.c graphics.c graph3d.c help.c hidden3d.c internal.c interpol.c \
-	  matrix.c misc.c parse.c plot.c plot2d.c plot3d.c readline.c \
-	  scanner.c set.c show.c specfun.c standard.c stdfn.c term.c time.c \
-	  util.c util3d.c variable.c version.c
-
-CSOURCE2 = bf_test.c gplt_x11.c
-
-CSOURCE3 = amiga.c corplot.c ctrl87.c ctrl87.h os9.c strftime.c vms.c
-
-HEADERS = alloc.h ansichek.h binary.h bitmap.h fit.h fnproto.h help.h \
-	  matrix.h national.h plot.h protos.h setshow.h stdfn.h syscfg.h \
-	  term.h variable.h
-
-NEXTSRC  = $(N)Controller.h $(N)Controller.m $(N)GnuTerm.iconheader \
-	   $(N)GnuTerm.tiff $(N)GnuTerm_main.m $(N)GnuView.h \
-	   $(N)GnuView.m $(N)Makefile $(N)Makefile.postamble \
-	   $(N)Makefile.preamble $(N)PB.gdbinit $(N)PB.project \
-	   $(N)README.rtf $(N)bigger.tiff $(N)gnuviewController.h \
-	   $(N)gnuviewController.m $(N)smaller.tiff \
-	   $(N)English.lproj/GnuTerm.nib/data.classes \
-	   $(N)English.lproj/GnuTerm.nib/data.nib \
-	   $(N)English.lproj/gnuview.nib/bigger.tiff \
-	   $(N)English.lproj/gnuview.nib/data.classes \
-	   $(N)English.lproj/gnuview.nib/data.nib \
-	   $(N)English.lproj/gnuview.nib/smaller.tiff
-
-BEOSSRC = $(B)GPApp.cpp $(B)GPApp.h $(B)GPBitmap.cpp $(B)GPBitmap.h \
-	  $(B)GPView.cpp $(B)GPView.h $(B)GPWindow.cpp $(B)GPWindow.h \
-	  $(B)Makefile $(B)XStringList.cpp $(B)XStringList.h $(B)constants.h
-
-OS2SRC = $(P)dialogs.c $(P)dialogs.h $(P)gclient.c $(P)gnuplot.ico \
-	 $(P)gnupmdrv.c $(P)gnupmdrv.def $(P)gnupmdrv.h $(P)gnupmdrv.ipf \
-	 $(P)gnupmdrv.rc $(P)print.c
-
-WINDOWS = $(W)geticon.c $(W)pgnuplot.c $(W)wcommon.h $(W)wgnupl32.def \
-	  $(W)wgnuplib.c $(W)wgnuplib.def $(W)wgnuplib.h $(W)wgnuplib.rc \
-	  $(W)wgnuplot.def $(W)wgnuplot.hpj $(W)wgnuplot.mnu $(W)wgnuplot.rc \
-	  $(W)wgraph.c $(W)winmain.c $(W)wmenu.c $(W)wpause.c $(W)wprinter.c \
-	  $(W)wresourc.h $(W)wtext.c $(W)wtext.h
-
-# Other files which need to go into the distribution
-EXTRA_DIST = GNUmakefile Makefile.in Makefile.maint corgraph.asm errorfix.sh \
-genopt.com gnuplot.def gnuplot.opt gnuplot.prj header.mac hrcgraph.asm \
-intergra.x11 lasergnu lineproc.mac linkopt.vms linkopt.ztc makefile.all \
-pcgraph.asm rgipgnu
-
-#########################################################################
-# Simple Dependencies
-# (generate these automatically)
-# - note that VMS requires space before and after the :
-
-alloc.o: alloc.c plot.h ansichek.h stdfn.h syscfg.h protos.h alloc.h help.h
-bf_test.o: bf_test.c ansichek.h stdfn.h syscfg.h binary.h alloc.h
-binary.o: binary.c plot.h ansichek.h stdfn.h syscfg.h protos.h alloc.h \
-	  binary.h
-bitmap.o: bitmap.c plot.h ansichek.h stdfn.h syscfg.h protos.h alloc.h \
-	  bitmap.h
-command.o: command.c plot.h ansichek.h stdfn.h syscfg.h protos.h alloc.h \
-	   setshow.h variable.h fit.h binary.h help.h
-contour.o: contour.c plot.h ansichek.h stdfn.h syscfg.h protos.h alloc.h \
-	   setshow.h variable.h
-corplot.o: corplot.c
-ctrl87.o: ctrl87.c ctrl87.h
-datafile.o: datafile.c plot.h ansichek.h stdfn.h syscfg.h protos.h alloc.h \
-	    fnproto.h binary.h setshow.h variable.h
-eval.o: eval.c plot.h ansichek.h stdfn.h syscfg.h protos.h alloc.h
-fit.o: fit.c plot.h ansichek.h stdfn.h syscfg.h protos.h alloc.h matrix.h \
-	fit.h setshow.h variable.h
-gplt_x11.o: gplt_x11.c plot.h ansichek.h stdfn.h syscfg.h protos.h alloc.h
-graph3d.o: graph3d.c plot.h ansichek.h stdfn.h syscfg.h protos.h alloc.h \
-	   setshow.h variable.h
-graphics.o: graphics.c plot.h ansichek.h stdfn.h syscfg.h protos.h alloc.h \
-	    setshow.h variable.h
-help.o: help.c plot.h ansichek.h stdfn.h syscfg.h protos.h alloc.h help.h
-hidden3d.o: hidden3d.c plot.h ansichek.h stdfn.h syscfg.h protos.h alloc.h \
-	    setshow.h variable.h
-internal.o: internal.c plot.h ansichek.h stdfn.h syscfg.h protos.h alloc.h \
-	    fnproto.h
-interpol.o: interpol.c plot.h ansichek.h stdfn.h syscfg.h protos.h alloc.h \
-	    setshow.h variable.h
-matrix.o: matrix.c fit.h plot.h ansichek.h stdfn.h syscfg.h protos.h alloc.h \
-	  matrix.h
-misc.o: misc.c plot.h ansichek.h stdfn.h syscfg.h protos.h alloc.h setshow.h \
-	variable.h
-parse.o: parse.c plot.h ansichek.h stdfn.h syscfg.h protos.h alloc.h help.h
-plot.o: plot.c plot.h ansichek.h stdfn.h syscfg.h protos.h alloc.h fit.h \
-	setshow.h variable.h fnproto.h
-plot2d.o: plot2d.c plot.h ansichek.h stdfn.h syscfg.h protos.h alloc.h \
-	  setshow.h variable.h fit.h binary.h help.h
-plot3d.o: plot3d.c plot.h ansichek.h stdfn.h syscfg.h protos.h alloc.h \
-	  setshow.h variable.h binary.h matrix.h help.h
-readline.o: readline.c plot.h ansichek.h stdfn.h syscfg.h protos.h alloc.h
-scanner.o: scanner.c plot.h ansichek.h stdfn.h syscfg.h protos.h alloc.h
-set.o: set.c plot.h ansichek.h stdfn.h syscfg.h protos.h alloc.h setshow.h \
-	variable.h national.h
-show.o: show.c plot.h ansichek.h stdfn.h syscfg.h protos.h alloc.h setshow.h \
-	variable.h
-specfun.o: specfun.c plot.h ansichek.h stdfn.h syscfg.h protos.h alloc.h \
-	   fnproto.h
-standard.o: standard.c plot.h ansichek.h stdfn.h syscfg.h protos.h alloc.h \
-	    setshow.h variable.h fnproto.h
-stdfn.o: stdfn.c plot.h ansichek.h stdfn.h syscfg.h protos.h alloc.h
-strftime.o: strftime.c plot.h ansichek.h stdfn.h syscfg.h protos.h alloc.h \
-	    setshow.h variable.h
-term.o: term.c plot.h ansichek.h stdfn.h syscfg.h protos.h alloc.h bitmap.h \
-	setshow.h variable.h ../term/driver.h term.h $(CORETERM)
-time.o: time.c plot.h ansichek.h stdfn.h syscfg.h protos.h alloc.h setshow.h \
-	variable.h
-util.o: util.c plot.h ansichek.h stdfn.h syscfg.h protos.h alloc.h setshow.h \
-	variable.h
-util3d.o: util3d.c plot.h ansichek.h stdfn.h syscfg.h protos.h alloc.h \
-	  setshow.h variable.h
-variable.o: variable.c plot.h ansichek.h stdfn.h syscfg.h protos.h alloc.h \
-	    variable.h
-version.o: version.c plot.h ansichek.h stdfn.h syscfg.h protos.h alloc.h
-vms.o: vms.c plot.h ansichek.h stdfn.h syscfg.h protos.h alloc.h
-
-# List of object files except version.o
-
-OBJS = $(COREOBJS) @NEXTOBJS@
-
-################################################################
-
-install: all $(LASERGNU)
-	$(mkinstalldirs) $(bindir)
-	$(mkinstalldirs) $(datadir)
-	$(INSTALL_PROGRAM) gnuplot $(bindir)/gnuplot
-	@if test -f gnuplot_x11; then \
-	  $(INSTALL_PROGRAM) gnuplot_x11 $(bindir)/gnuplot_x11; \
-	fi
-	@if test -f beos/gnuplot_be; then \
-	  $(INSTALL_PROGRAM) beos/gnuplot_be $(bindir)/gnuplot_be; \
-	fi
-	@LINUXSUID@
-
-lasergnu_install: lasergnu
-	$(mkinstalldirs) $(bindir)
-	$(INSTALL_SCRIPT) $(srcdir)/lasergnu $(bindir)/lasergnu
-
-lasergnu_noinstall:
-
-uninstall:
-	-rm -f $(bindir)/gnuplot $(bindir)/gnuplot_x11 $(bindir)/gnuplot_be
-
-################################################################
-# Dependencies
-
-.c.o:
-	$(COMPILE) -c $<
-
-gnuplot: $(OBJS) version.o
-	$(LINK) $(OBJS) version.o $(TERMLIBS) $(TERMXLIBS) $(LIBS)
-
-gnuplot_x11: gplt_x11.o stdfn.o
-	$(LINK) gplt_x11.o stdfn.o $(XLIBS) $(LIBS)
-
-$(B)gnuplot_be : 
-	cd $(B) && make $(MFLAGS)
-
-gnuplot_be: $(B)gnuplot_be
-
-bf_test: bf_test.o binary.o alloc.o
-	$(LINK) bf_test.o binary.o alloc.o $(LIBS)
-
-errorfix: $(srcdir)/errorfix.sh
-	$(srcdir)/errorfix.sh $(srcdir)
-	touch errorfix
-
-command.o: command.c fit.h help.h setshow.h
-	$(COMPILE) -DHELPFILE=\"$(HELPFILE)\" -c $<
-
-show.o: show.c plot.h setshow.h
-	$(COMPILE) -DHELPFILE=\"$(HELPFILE)\" -DBINDIR=\"$(bindir)\" -c $<
-
-term.o: term.c term.h $(CORETERM)
-	$(COMPILE) -I../term -I$(top_srcdir)/term -c $<
-
-version.o: version.c
-	$(COMPILE) -DCONTACT=\"$(EMAIL)\" -c $<
-
-$(COREOBJS) version.o bf_test.o : $(CONFIG_HEADER)
-
-################################################################
-# Autoconfig rules
-
-Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
+Makefile: $(srcdir)/Makefile.in  $(top_builddir)/config.status $(BUILT_SOURCES)
 	cd $(top_builddir) \
 	  && CONFIG_FILES=$(subdir)/$@ CONFIG_HEADERS= $(SHELL) ./config.status
 
-################################################################
-# Miscellaneous targets
 
-SOURCES = $(CSOURCE) $(CSOURCE2) $(CSOURCE3) $(B) $(BEOSSRC) $(N) $(NEXTSRC) \
-$(P) $(OS2SRC) $(W) $(WINDOWS)
+mostlyclean-binPROGRAMS:
 
-DISTFILES = $(SOURCES) $(HEADERS) $(EXTRA_DIST)
+clean-binPROGRAMS:
+	-test -z "$(bin_PROGRAMS)" || rm -f $(bin_PROGRAMS)
+
+distclean-binPROGRAMS:
+
+maintainer-clean-binPROGRAMS:
+
+install-binPROGRAMS: $(bin_PROGRAMS)
+	@$(NORMAL_INSTALL)
+	$(mkinstalldirs) $(DESTDIR)$(bindir)
+	@list='$(bin_PROGRAMS)'; for p in $$list; do \
+	  if test -f $$p; then \
+	    echo "  $(INSTALL_PROGRAM) $$p $(DESTDIR)$(bindir)/`echo $$p|sed 's/$(EXEEXT)$$//'|sed '$(transform)'|sed 's/$$/$(EXEEXT)/'`"; \
+	     $(INSTALL_PROGRAM) $$p $(DESTDIR)$(bindir)/`echo $$p|sed 's/$(EXEEXT)$$//'|sed '$(transform)'|sed 's/$$/$(EXEEXT)/'`; \
+	  else :; fi; \
+	done
+
+uninstall-binPROGRAMS:
+	@$(NORMAL_UNINSTALL)
+	list='$(bin_PROGRAMS)'; for p in $$list; do \
+	  rm -f $(DESTDIR)$(bindir)/`echo $$p|sed 's/$(EXEEXT)$$//'|sed '$(transform)'|sed 's/$$/$(EXEEXT)/'`; \
+	done
+
+.s.o:
+	$(COMPILE) -c $<
+
+.S.o:
+	$(COMPILE) -c $<
+
+mostlyclean-compile:
+	-rm -f *.o core *.core
+
+clean-compile:
+
+distclean-compile:
+	-rm -f *.tab.c
+
+maintainer-clean-compile:
+
+gnuplot_x11: $(gnuplot_x11_OBJECTS) $(gnuplot_x11_DEPENDENCIES)
+	@rm -f gnuplot_x11
+	$(LINK) $(gnuplot_x11_LDFLAGS) $(gnuplot_x11_OBJECTS) $(gnuplot_x11_LDADD) $(LIBS)
+
+gnuplot: $(gnuplot_OBJECTS) $(gnuplot_DEPENDENCIES)
+	@rm -f gnuplot
+	$(LINK) $(gnuplot_LDFLAGS) $(gnuplot_OBJECTS) $(gnuplot_LDADD) $(LIBS)
+
+bf_test: $(bf_test_OBJECTS) $(bf_test_DEPENDENCIES)
+	@rm -f bf_test
+	$(LINK) $(bf_test_LDFLAGS) $(bf_test_OBJECTS) $(bf_test_LDADD) $(LIBS)
+
+# This directory's subdirectories are mostly independent; you can cd
+# into them and run `make' without going through this Makefile.
+# To change the values of `make' variables: instead of editing Makefiles,
+# (1) if the variable is set in `config.status', edit `config.status'
+#     (which will cause the Makefiles to be regenerated when you run `make');
+# (2) otherwise, pass the desired values on the `make' command line.
+
+@SET_MAKE@
+
+all-recursive install-data-recursive install-exec-recursive \
+installdirs-recursive install-recursive uninstall-recursive  \
+check-recursive installcheck-recursive info-recursive dvi-recursive:
+	@set fnord $(MAKEFLAGS); amf=$$2; \
+	dot_seen=no; \
+	target=`echo $@ | sed s/-recursive//`; \
+	list='$(SUBDIRS)'; for subdir in $$list; do \
+	  echo "Making $$target in $$subdir"; \
+	  if test "$$subdir" = "."; then \
+	    dot_seen=yes; \
+	    local_target="$$target-am"; \
+	  else \
+	    local_target="$$target"; \
+	  fi; \
+	  (cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $$local_target) \
+	   || case "$$amf" in *=*) exit 1;; *k*) fail=yes;; *) exit 1;; esac; \
+	done; \
+	if test "$$dot_seen" = "no"; then \
+	  $(MAKE) $(AM_MAKEFLAGS) "$$target-am" || exit 1; \
+	fi; test -z "$$fail"
+
+mostlyclean-recursive clean-recursive distclean-recursive \
+maintainer-clean-recursive:
+	@set fnord $(MAKEFLAGS); amf=$$2; \
+	dot_seen=no; \
+	rev=''; list='$(SUBDIRS)'; for subdir in $$list; do \
+	  rev="$$subdir $$rev"; \
+	  test "$$subdir" = "." && dot_seen=yes; \
+	done; \
+	test "$$dot_seen" = "no" && rev=". $$rev"; \
+	target=`echo $@ | sed s/-recursive//`; \
+	for subdir in $$rev; do \
+	  echo "Making $$target in $$subdir"; \
+	  if test "$$subdir" = "."; then \
+	    local_target="$$target-am"; \
+	  else \
+	    local_target="$$target"; \
+	  fi; \
+	  (cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $$local_target) \
+	   || case "$$amf" in *=*) exit 1;; *k*) fail=yes;; *) exit 1;; esac; \
+	done && test -z "$$fail"
+tags-recursive:
+	list='$(SUBDIRS)'; for subdir in $$list; do \
+	  test "$$subdir" = . || (cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) tags); \
+	done
+
+tags: TAGS
+
+ID: $(HEADERS) $(SOURCES) $(LISP)
+	list='$(SOURCES) $(HEADERS)'; \
+	unique=`for i in $$list; do echo $$i; done | \
+	  awk '    { files[$$0] = 1; } \
+	       END { for (i in files) print i; }'`; \
+	here=`pwd` && cd $(srcdir) \
+	  && mkid -f$$here/ID $$unique $(LISP)
+
+TAGS: tags-recursive $(HEADERS) $(SOURCES)  $(TAGS_DEPENDENCIES) $(LISP)
+	tags=; \
+	here=`pwd`; \
+	list='$(SUBDIRS)'; for subdir in $$list; do \
+   if test "$$subdir" = .; then :; else \
+	    test -f $$subdir/TAGS && tags="$$tags -i $$here/$$subdir/TAGS"; \
+   fi; \
+	done; \
+	list='$(SOURCES) $(HEADERS)'; \
+	unique=`for i in $$list; do echo $$i; done | \
+	  awk '    { files[$$0] = 1; } \
+	       END { for (i in files) print i; }'`; \
+	test -z "$(ETAGS_ARGS)$$unique$(LISP)$$tags" \
+	  || (cd $(srcdir) && etags $(ETAGS_ARGS) $$tags  $$unique $(LISP) -o $$here/TAGS)
+
+mostlyclean-tags:
+
+clean-tags:
+
+distclean-tags:
+	-rm -f TAGS ID
+
+maintainer-clean-tags:
 
 distdir = $(top_builddir)/$(PACKAGE)-$(VERSION)/$(subdir)
 
 subdir = src
 
 distdir: $(DISTFILES)
-	distdir=`cd $(distdir) && pwd`
+	here=`cd $(top_builddir) && pwd`; \
+	top_distdir=`cd $(top_distdir) && pwd`; \
+	distdir=`cd $(distdir) && pwd`; \
+	cd $(top_srcdir) \
+	  && $(AUTOMAKE) --include-deps --build-dir=$$here --srcdir-name=$(top_srcdir) --output-dir=$$top_distdir --foreign src/Makefile
 	@for file in $(DISTFILES); do \
 	  d=$(srcdir); \
 	  if test -d $$d/$$file; then \
@@ -412,21 +331,144 @@ distdir: $(DISTFILES)
 	    || cp -p $$d/$$file $(distdir)/$$file || :; \
 	  fi; \
 	done
+	for subdir in $(DIST_SUBDIRS); do \
+	  if test "$$subdir" = .; then :; else \
+	    test -d $(distdir)/$$subdir \
+	    || mkdir $(distdir)/$$subdir \
+	    || exit 1; \
+	    chmod 777 $(distdir)/$$subdir; \
+	    (cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) top_distdir=../$(top_distdir) distdir=../$(distdir)/$$subdir distdir) \
+	      || exit 1; \
+	  fi; \
+	done
 
-# Empty target
-check:
+DEPS_MAGIC := $(shell mkdir .deps > /dev/null 2>&1 || :)
 
-clean:
-	-rm -f gnuplot gnuplot_x11 bf_test *.o core *~
-	-rm -f gnuplot.exe gnuplot_x11.exe bf_test.exe
-	-cd beos && $(MAKE) $(MFLAGS) clean
+-include $(DEP_FILES)
 
-mostlyclean: clean
+mostlyclean-depend:
 
-distclean: clean
-	-cd beos && $(MAKE) $(MFLAGS) distclean
+clean-depend:
+
+distclean-depend:
+	-rm -rf .deps
+
+maintainer-clean-depend:
+
+%.o: %.c
+	@echo '$(COMPILE) -c $<'; \
+	$(COMPILE) -Wp,-MD,.deps/$(*F).pp -c $<
+	@-cp .deps/$(*F).pp .deps/$(*F).P; \
+	tr ' ' '\012' < .deps/$(*F).pp \
+	  | sed -e 's/^\\$$//' -e '/^$$/ d' -e '/:$$/ d' -e 's/$$/ :/' \
+	    >> .deps/$(*F).P; \
+	rm .deps/$(*F).pp
+
+%.lo: %.c
+	@echo '$(LTCOMPILE) -c $<'; \
+	$(LTCOMPILE) -Wp,-MD,.deps/$(*F).pp -c $<
+	@-sed -e 's/^\([^:]*\)\.o[ 	]*:/\1.lo \1.o :/' \
+	  < .deps/$(*F).pp > .deps/$(*F).P; \
+	tr ' ' '\012' < .deps/$(*F).pp \
+	  | sed -e 's/^\\$$//' -e '/^$$/ d' -e '/:$$/ d' -e 's/$$/ :/' \
+	    >> .deps/$(*F).P; \
+	rm -f .deps/$(*F).pp
+info-am:
+info: info-recursive
+dvi-am:
+dvi: dvi-recursive
+check-am: all-am
+check: check-recursive
+installcheck-am:
+installcheck: installcheck-recursive
+install-exec-am: install-binPROGRAMS
+install-exec: install-exec-recursive
+
+install-data-am:
+install-data: install-data-recursive
+
+install-am: all-am
+	@$(MAKE) $(AM_MAKEFLAGS) install-exec-am install-data-am
+install: install-recursive
+uninstall-am: uninstall-binPROGRAMS
+uninstall: uninstall-recursive
+all-am: Makefile $(PROGRAMS)
+all-redirect: all-recursive
+install-strip:
+	$(MAKE) $(AM_MAKEFLAGS) AM_INSTALL_PROGRAM_FLAGS=-s install
+installdirs: installdirs-recursive
+installdirs-am:
+	$(mkinstalldirs)  $(DESTDIR)$(bindir)
+
+
+mostlyclean-generic:
+
+clean-generic:
+
+distclean-generic:
 	-rm -f Makefile $(CONFIG_CLEAN_FILES)
-	@test "$(srcdir)" = "$(top_builddir)" || rm -rf docs term
+	-rm -f config.cache config.log stamp-h stamp-h[0-9]*
 
-realclean: distclean
-	-rm -f TAGS docs/TAGS
+maintainer-clean-generic:
+mostlyclean-am:  mostlyclean-binPROGRAMS mostlyclean-compile \
+		mostlyclean-tags mostlyclean-depend mostlyclean-generic
+
+mostlyclean: mostlyclean-recursive
+
+clean-am:  clean-binPROGRAMS clean-compile clean-tags clean-depend \
+		clean-generic mostlyclean-am
+
+clean: clean-recursive
+
+distclean-am:  distclean-binPROGRAMS distclean-compile distclean-tags \
+		distclean-depend distclean-generic clean-am
+
+distclean: distclean-recursive
+
+maintainer-clean-am:  maintainer-clean-binPROGRAMS \
+		maintainer-clean-compile maintainer-clean-tags \
+		maintainer-clean-depend maintainer-clean-generic \
+		distclean-am
+	@echo "This command is intended for maintainers to use;"
+	@echo "it deletes files that may require special tools to rebuild."
+
+maintainer-clean: maintainer-clean-recursive
+
+.PHONY: mostlyclean-binPROGRAMS distclean-binPROGRAMS clean-binPROGRAMS \
+maintainer-clean-binPROGRAMS uninstall-binPROGRAMS install-binPROGRAMS \
+mostlyclean-compile distclean-compile clean-compile \
+maintainer-clean-compile install-data-recursive \
+uninstall-data-recursive install-exec-recursive \
+uninstall-exec-recursive installdirs-recursive uninstalldirs-recursive \
+all-recursive check-recursive installcheck-recursive info-recursive \
+dvi-recursive mostlyclean-recursive distclean-recursive clean-recursive \
+maintainer-clean-recursive tags tags-recursive mostlyclean-tags \
+distclean-tags clean-tags maintainer-clean-tags distdir \
+mostlyclean-depend distclean-depend clean-depend \
+maintainer-clean-depend info-am info dvi-am dvi check check-am \
+installcheck-am installcheck install-exec-am install-exec \
+install-data-am install-data install-am install uninstall-am uninstall \
+all-redirect all-am all installdirs-am installdirs mostlyclean-generic \
+distclean-generic clean-generic maintainer-clean-generic clean \
+mostlyclean distclean maintainer-clean
+
+
+# explicit targets
+command.o: command.c plot.h ansichek.h stdfn.h syscfg.h protos.h alloc.h \
+	   setshow.h variable.h fit.h binary.h help.h
+	$(COMPILE) -DHELPFILE=\"$(HELPFILE)\" -c $<
+
+show.o: show.c plot.h ansichek.h stdfn.h syscfg.h protos.h alloc.h setshow.h \
+	variable.h
+	$(COMPILE) -DHELPFILE=\"$(HELPFILE)\" -DBINDIR=\"$(bindir)\" -c $<
+
+term.o: term.c plot.h ansichek.h stdfn.h syscfg.h protos.h alloc.h bitmap.h \
+	setshow.h variable.h ../term/driver.h term.h $(CORETERM)
+	$(COMPILE) -I../term -I$(top_srcdir)/term -c $<
+
+version.o: version.c plot.h ansichek.h stdfn.h syscfg.h protos.h alloc.h
+	$(COMPILE) -DCONTACT=\"$(EMAIL)\" -c $<
+
+# Tell versions [3.59,3.63) of GNU make to not export all variables.
+# Otherwise a system limit (for SysV at least) may be exceeded.
+.NOEXPORT:
