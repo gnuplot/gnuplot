@@ -1679,7 +1679,7 @@ show_version_long ()
 		""
 #endif
 		;
-		fprintf(stderr,"%s%s%s%s%s%s%s%s%s\n",readline,gnu_readline,
+		fprintf(stderr,"%s%s%s%s%s%s%s%s%s\n\n",readline,gnu_readline,
 			libgd,libpng,linuxvga,nocwdrc,x11,unixplot,gnugraph);
 	}
 

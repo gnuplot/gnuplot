@@ -1824,8 +1824,7 @@ set_three()
 			tsamp2 = (int)magnitude(const_express(&a));
 		}
 		if (tsamp1 < 2 || tsamp2 < 2)
-			int_error("sampling rate must be > 1; sampling unchanged",
-				c_token);
+			int_error("sampling rate must be > 1; sampling unchanged",c_token);
 		else {
 		        extern struct surface_points *first_3dplot;
 			register struct surface_points *f_3dp = first_3dplot;
@@ -1852,8 +1851,7 @@ set_three()
 			tsamp2 = (int)magnitude(const_express(&a));
 		}
 		if (tsamp1 < 2 || tsamp2 < 2)
-			int_error("sampling rate must be > 1; sampling unchanged",
-				c_token);
+			int_error("sampling rate must be > 1; sampling unchanged",c_token);
 		else {
 		        extern struct curve_points *first_plot;
 		        extern struct surface_points *first_3dplot;
@@ -2017,11 +2015,9 @@ set_three()
 		}
 
 		if (local_vals[0] < 0 || local_vals[0] > 180)
-			int_error("rot_x must be in [0:180] degrees range; view unchanged",
-				  c_token);
+			int_error("rot_x must be in [0:180] degrees range; view unchanged", c_token);
 		if (local_vals[1] < 0 || local_vals[1] > 360)
-			int_error("rot_z must be in [0:360] degrees range; view unchanged",
-				  c_token);
+			int_error("rot_z must be in [0:360] degrees range; view unchanged", c_token);
 		if (local_vals[2] < 1e-6)
 			int_error("scale must be > 0; view unchanged", c_token);
 		if (local_vals[3] < 1e-6)
@@ -2223,9 +2219,10 @@ set_label()
 	   }
 	   else
 		int_error("bad syntax in set label", c_token);
+
 	   c_token++;
 	   set_just = TRUE;
-    } 
+    }
 
     /* get rotation (added by RCC)*/
     if (!END_OF_COMMAND && !equals(c_token, "font")) {
@@ -2237,12 +2234,13 @@ set_label()
 	   }
 	   else
 		int_error("bad syntax in set label", c_token);
+
 	   c_token++;
 	   set_rot = TRUE;
-    } 
+    }
 
     /* get font */
-    font[0] = '\0'; set_font = FALSE;
+    font[0] = NUL; set_font = FALSE;
     if (!END_OF_COMMAND && equals(c_token, "font")) {
 	   c_token++;
 	   if (END_OF_COMMAND)
@@ -2254,6 +2252,7 @@ set_label()
            }
 	   else
 		int_error("'fontname,fontsize' expected", c_token);
+
            c_token++;
     } /* Entry font added by DJL */
 
@@ -2933,8 +2932,7 @@ load_tic_series(axis,tdef)
 		GET_NUM_OR_TIME(end, axis);
     }
     if (!END_OF_COMMAND)
-	 int_error("tic series is defined by [start,]increment[,end]", 
-			 c_token);
+	 int_error("tic series is defined by [start,]increment[,end]", c_token);
     
     if (start < end && incr <= 0)
 	 int_error("increment must be positive", incr_token);
