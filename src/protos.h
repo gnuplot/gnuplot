@@ -196,7 +196,7 @@ struct at_type * perm_at __PROTO((void));
 /* Prototypes from file "plot.c" */
 
 void interrupt_setup __PROTO((void));
-void gp_expand_tilde __PROTO((char **, size_t));
+void gp_expand_tilde __PROTO((char **));
 
 /* prototypes from plot2d.c */
 
@@ -288,7 +288,6 @@ int almost_equals __PROTO((int t_num, char *str));
 int isstring __PROTO((int t_num));
 int isanumber __PROTO((int t_num));
 int isletter __PROTO((int t_num));
-int is_notempty __PROTO((int t_num));
 int is_definition __PROTO((int t_num));
 void copy_str __PROTO((char str[], int t_num, int max));
 int token_len __PROTO((int t_num));
