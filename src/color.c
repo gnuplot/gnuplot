@@ -1,3 +1,7 @@
+#ifndef lint
+static char *RCSid() { return RCSid("$Id: $"); }
+#endif
+
 /* GNUPLOT - color.c */
 
 /*[

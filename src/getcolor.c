@@ -1,3 +1,7 @@
+#ifndef lint
+static char *RCSid() { return RCSid("$Id: $"); }
+#endif
+
 /* GNUPLOT - getcolor.c */
 
 /*[
@@ -6,6 +10,7 @@
  * Copyright: open source as much as possible
  *
 ]*/
+
 #include "syscfg.h"
 
 #ifdef PM3D
@@ -13,6 +18,7 @@
 #include <math.h>
 #include <stdio.h>
 #include "color.h"
+#include "stdfn.h"
 
 extern t_sm_palette sm_palette;
 
