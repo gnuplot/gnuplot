@@ -1,3 +1,21 @@
+1999-02-22  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* gplt_x11.c(main): Fix long-standing typo in debug FPRINTF statement.
+
+	* plot.c: Name GNUPLOT_HISTORY_FILE "~/.gnuplot.history".
+
+	* docs/Makefile: Fix LIBS variable, edit some comments.
+
+1999-02-18  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* term/x11.trm: Use execvp() instead of execl() to start x11
+	driver.
+
+1999-02-17  Dick Crawford  <u600256@gamma.lanl.gov>
+
+	* term/eepic.trm, term/latex.trm, term/texdraw.trm: Explanation
+	about LaTeX2e point symbols, add-on to JvH's patch.
+
 1999-02-16  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* command.c: Move STREQ and STREQN mcaros to plot.h.
