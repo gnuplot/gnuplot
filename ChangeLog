@@ -6,6 +6,9 @@
 
 	* term/post.trm (START_HELP): Fixed undefined references in gnuplot.tex.
 
+	* src/gplt_x11.c: #if (USE_MOUSE && MOUSE_ALL_WINDOWS) =>
+	#if defined(...) && defined(...)
+
 2003-12-15  Ethan Merritt  <merritt@u.washington.edu>
 
 	* demo/Makefile.am.in demo/webify.pl demo/airfoil.dem demo/prob2.dem:

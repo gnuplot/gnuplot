@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.75 2003/12/15 07:52:14 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.76 2003/12/15 07:58:16 mikulik Exp $"); }
 #endif
 
 #define X11_POLYLINE 1
@@ -294,7 +294,7 @@ typedef struct plot_struct {
 #ifdef PM3D
     TBOOLEAN release_cmap;
 #endif
-#if (USE_MOUSE && MOUSE_ALL_WINDOWS)
+#if defined(USE_MOUSE) && defined(MOUSE_ALL_WINDOWS)
     /* This array holds per-axis scaling information sufficient to reconstruct
      * plot coordinates of a mouse click.  It is a snapshot of the contents of
      * gnuplot's axis_array structure at the time the plot was drawn.
@@ -427,7 +427,7 @@ static void export_graph __PROTO((plot_struct * plot));
 static void handle_selection_event __PROTO((XEvent * event));
 #endif
 
-#if (USE_MOUSE && MOUSE_ALL_WINDOWS)
+#if defined(USE_MOUSE) && defined(MOUSE_ALL_WINDOWS)
 static void mouse_to_coords __PROTO((plot_struct *plot, XEvent *event,
 			double *x, double *y, double *x2, double *y2));
 static double mouse_to_axis __PROTO((int mouse_coord, axis_scale_t *axis));
@@ -2232,7 +2232,7 @@ exec_cmd(plot_struct *plot, char *command)
 	}
     }
 #endif
-#if (USE_MOUSE && MOUSE_ALL_WINDOWS)
+#if defined(USE_MOUSE) && defined(MOUSE_ALL_WINDOWS)
     /*   Axis scaling information to save for later mouse clicks */
     else if (*buffer == 'S') {
 	int axis, axis_mask;
@@ -3648,7 +3648,7 @@ process_event(XEvent *event)
 	    if (plot == current_plot) {
 		Call_display(plot);
 		gp_exec_event(GE_motion, (int) RevX(pos_x), (int) RevY(pos_y), 0, 0);
-#if (USE_MOUSE && MOUSE_ALL_WINDOWS)
+#if defined(USE_MOUSE) && defined(MOUSE_ALL_WINDOWS)
 	    } else if (plot->axis_mask) {
 		/* This is not the active plot window, but we can still update the mouse coords */
 		char mouse_format[60];
@@ -3715,7 +3715,7 @@ process_event(XEvent *event)
 	    gp_exec_event(GE_buttonrelease,
 			  (int) RevX(event->xbutton.x), (int) RevY(event->xbutton.y), event->xbutton.button, (int) doubleclick);
 	}
-#if (USE_MOUSE && MOUSE_ALL_WINDOWS)
+#if defined(USE_MOUSE) && defined(MOUSE_ALL_WINDOWS)
 	/* This causes gnuplot_x11 to pass mouse clicks back from all plot windows,
 	 * not just the current plot. But who should we notify that a click has 
 	 * happened, and how?  The fprintf to stderr is just for debugging. */
@@ -4682,7 +4682,7 @@ handle_selection_event(XEvent *event)
 
 #endif /* EXPORT_SELECTION */
 
-#if (USE_MOUSE && MOUSE_ALL_WINDOWS)
+#if defined(USE_MOUSE) && defined(MOUSE_ALL_WINDOWS)
 /* Convert X-window mouse coordinates to coordinate system of plot axes */
 static void
 mouse_to_coords(plot_struct *plot, XEvent *event,
