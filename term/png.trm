@@ -1,5 +1,5 @@
 /*
- * $Id: png.trm,v 1.23 1999/10/01 15:12:19 lhecking Exp $
+ * $Id: png.trm,v 1.24 1999/10/17 19:06:51 lhecking Exp $
  *
  */
 
@@ -133,6 +133,15 @@ static struct gen_table PNG_opts[] =
 TERM_PUBLIC void
 PNG_options()
 {
+    unsigned short rgb_color[3];
+    int n_colors = 0;
+    char *string;
+    int i;
+
+    rgb_color[0] = 0;
+    rgb_color[1] = 0;
+    rgb_color[2] = 0;
+
     png_font = 1; /* small */
     png_mode = 2; /* color */
     png_transparent = 0;       /* use opaque image background */
@@ -140,7 +149,9 @@ PNG_options()
     term_options[0] = NUL;
 
     while (!END_OF_COMMAND) {
+	
 	switch(lookup_table(&PNG_opts[0],c_token)) {
+
 	case PNG_TRANSPARENT:
 	    png_transparent = 1;
 	case PNG_NOTRANSPARENT:
@@ -171,11 +182,29 @@ PNG_options()
 	    break;
 	case PNG_OTHER:
 	default:
-	    /* reset to default, since term is already set */
-	    png_font = 1;
-	    png_mode = 0;
-	    int_error(c_token, "expecting: {small, medium, large},[no]transparent, or {monochrome, gray, color}");
-	    c_token++;
+	    /* set color */
+	    string = input_line + token[c_token].start_index;
+
+	    if (string[0] == 'x') {
+		/* HBB 991123: read in as *shorts*, not ints! */
+		if (sscanf(string, "x%2hx%2hx%2hx", &rgb_color[0], &rgb_color[1], &rgb_color[2] ) != 3) {
+		    int_error(c_token, "invalid color spec, must be xRRGGBB");
+		} 
+	    }
+	    else
+		int_error(c_token, "expecting: {small, medium, large},[no]transparent, or {monochrome, gray, color, [xRRGGBB] }");
+
+	    if (n_colors >= WEB_N_COLORS) {
+		int_warn(c_token, "too many colors, ingoring");
+		++c_token;
+	    } 
+	    else {
+		web_color_rgbs[n_colors].r = rgb_color[0];
+		web_color_rgbs[n_colors].g = rgb_color[1];
+		web_color_rgbs[n_colors].b = rgb_color[2];
+		n_colors++;
+		++c_token;
+	    }
 	    break;
 	}
     }
@@ -213,6 +242,14 @@ PNG_options()
     default:
 	strcat(term_options, " monochrome");
 	break;
+    }
+
+    for (i=0; i < n_colors ; i++ ) {
+	sprintf(term_options,"%s x%02x%02x%02x",
+		term_options,
+		web_color_rgbs[i].r,
+		web_color_rgbs[i].g,
+		web_color_rgbs[i].b);
     }
 }
 
@@ -296,15 +333,15 @@ PNG_graphics()
 TERM_PUBLIC void
 PNG_text()
 {
-    register int x, j, row;
     png_structp png_ptr;
     png_infop info_ptr;
-    register int i, value;
     png_bytep prow;
-    int mask, plane1, plane2, plane3, plane4;
     png_text pngtext, *pngtext_copy;
-    char text[100];
     png_byte pal_trans[1];
+    char text[100];
+    register int x, i, j;
+/*    register int row, value; */
+/* int mask, plane1, plane2, plane3, plane4; */
 
     png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
     if (!png_ptr) {
@@ -323,6 +360,7 @@ PNG_text()
 	b_freebitmap();
 	return;
     }
+    memset(prow,0,sizeof(prow));
     if (setjmp(png_ptr->jmpbuf)) {
 	png_destroy_write_struct(&png_ptr, &info_ptr);
 	free(prow);
@@ -353,13 +391,18 @@ PNG_text()
 	if (png_mode == 1) {
 	    info_ptr->sig_bit.gray = 3;
 	    png_set_shift(png_ptr, &(info_ptr->sig_bit));
-	} else {
-	    info_ptr->sig_bit.red = 2;
-	    info_ptr->sig_bit.green = 2;
-	    info_ptr->sig_bit.blue = 2;
+	} 
+	else {
+	    /* HBB 991123: we're now using the full 8 bits per color
+	     * component... */
+	    info_ptr->sig_bit.red = 8;
+	    info_ptr->sig_bit.green = 8;
+	    info_ptr->sig_bit.blue = 8;
 	}
     }
+
     info_ptr->interlace_type = 0;
+
     if (png_mode == 0)
 	png_set_invert_mono(png_ptr);
 
@@ -377,8 +420,8 @@ PNG_text()
 	    png_palette[i].blue = web_color_rgbs[i].b;
 	}
     }
-    sprintf(text, "gnuplot %sversion %s patchlevel %s",
-	    OS, gnuplot_version, gnuplot_patchlevel);
+    sprintf(text, "gnuplot version %s patchlevel %s on %s %s",
+	    gnuplot_version, gnuplot_patchlevel, os_name, os_rel);
 
     pngtext.compression = -1;
     pngtext.key = "Software";
@@ -386,6 +429,13 @@ PNG_text()
     pngtext.text_length = strlen(text);
 
     pngtext_copy = malloc(sizeof(*pngtext_copy));
+    if (!pngtext_copy) {
+	png_destroy_write_struct(&png_ptr, &info_ptr);
+	free(prow);
+	b_freebitmap();
+	return;
+    }
+    memset(pngtext_copy,0,sizeof(pngtext_copy));
     *pngtext_copy = pngtext;
     info_ptr->num_text = 1;
     info_ptr->text = pngtext_copy;
@@ -437,7 +487,7 @@ PNG_text()
 #else
 	for (j=b_ysize - 1; j>= 0; j--)
 	    prow[j] = (png_byte)b_getpixel(j, x);
-#endif                                                      
+#endif
 	png_write_rows(png_ptr, &prow, 1);
     }
 
@@ -463,21 +513,18 @@ PNG_linetype(linetype)
 int linetype;
 {
     switch (png_mode) {
-    /* HBB 991008: this makes the grid lines and axes (-1) look the
+    /* HBB 991008: this once made the grid lines and axes (-1) look the
      * same as the borders (-2). That's ugly, IMHO. GIF uses a
      * dashed line, for this, but libpng doesn't seem able to do
      * that. But a look into the palette turns up that color 2
      * is grey, and is currently unused... Let's see: */
     case 2:
-#if 0
-	if (linetype == -1 || linetype == -2)
-	    linetype = 1;
-#else
+
 	if (linetype == -2)
 	    linetype = 1;
 	else if (linetype == -1)
 	    linetype = 2;
-#endif
+
 	else {
 	    /* HBB 991008: moved the += 3 down, so colors 0, 1, 2 are
 	     * _not_ used by the regular plots, as it should be */
