@@ -1,9 +1,23 @@
+2002-02-27  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	Patches for MS VC++ from John Bollinger <bbands@yahoo.com>:
+	
+	* src/internal.c (matherr) [__MSC__]: Add #defines to make it work
+ 	with MS VC++.
+
+	* config/makefile.nt (CFLAGS): Repaired after removal of all the
+ 	NO_FLAGS.  Added lots of /DHAVE_SOMETHING's
+	(LDFLAGS, TERMFLAGS): Added stuff to compile in libpng and libz.
+	(linkopt1.msw): Added stuff to compile with libpng and
+ 	libz. Removed spurious mention of mouse.obj which is already in
+ 	$CORE_OBJS.
+
 2002-02-26  Petr Mikulik  <mikulik@physics.muni.cz>
 
-	* config/makefile.mgw config/makefile.cyg: Fixing broken makefiles due
-	to recent removal of NO_ symbols.  Create a temporary config.h file 
-	in order to avoid 12 lines of text for each gcc command (too many HAVE_
-	symbols).
+	* config/makefile.mgw config/makefile.cyg: Fixing broken makefiles
+ 	due to recent removal of NO_ symbols.  Create a temporary config.h
+ 	file in order to avoid 12 lines of text for each gcc command (too
+ 	many HAVE_ symbols).
 
 2002-02-25  Hans-Bernhard Broeker  <hbb@ballermann.oche.de>
 

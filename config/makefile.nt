@@ -1,5 +1,5 @@
 #
-# $Id: makefile.nt,v 1.4 2001/06/01 15:41:06 broeker Exp $
+# $Id: makefile.nt,v 1.5 2002/02/20 12:01:49 broeker Exp $
 #
 # GNUPLOT Makefile to compile gnuplot for WinNT and Win95/98
 #
@@ -7,10 +7,23 @@
 # run this on the command line with "nmake -f makefile.nt"
 #
 
+#
+# Updated 2/26/2002 by John Bollinger to reflect Lars Heckling's changes to sysconf.h
+# Added png support with zlib and libpng as subs of .\src
+# libpng and zlib can be downloaded from ftp://ftp.uu.net/graphics/png
+# To compile with Visual C: 
+#	Download zlib to ..\src\zlib and compile it 
+#	Copy zlib.dll to \winnt\system32 or anywhere else in the path
+#	Download libpng to ..\src\libpng and compile it
+#	Copy makefile.nt to ..\src
+# 	Find and run VCVARS32.BAT
+# 	Then from ..\src nmake -f makefile.nt
+#
+
 # where to place gnuplot.gih helpfile
 HELPFILE = wgnuplot.hlp
-TOP = .
 
+TOP = .
 
 # /c  means don't link
 # /I  means extra include directory
@@ -24,18 +37,23 @@ TOP = .
 
 CC = cl /c
 LD = link
-CFLAGS = /O2 /I$(TOP) /nologo /D_Windows /DPM3D /DUSE_MOUSE /DWIN_IPC /D__MSC__ /DWIN32 /DNO_GIH /DHAVE_STRNICMP /DREADLINE /DHELPFILE=\"$(HELPFILE)\" /DGP_INLINE=__inline /DANSI_C /DHAVE_GETCWD /DHAVE_SYS_STAT_H /DHAVE_ATEXIT
+
+#compiler flags
+CFLAGS = /G5 /O2 /I$(TOP) /nologo /D_Windows /DWIN_IPC /D__MSC__ /DWIN32 /DREADLINE /DHELPFILE=\"$(HELPFILE)\" /DGP_INLINE=__inline /DANSI_C /DHAVE_GETCWD /DNO_GIH /DPM3D /DUSE_MOUSE /DUSE_ULIG_FILLEDBOXES /DHAVE_STRING_H /DHAVE_STDLIB_H /DHAVE_ERRNO_H /DHAVE_LIMITS_H /DHAVE_LOCALE_H /DHAVE_TIME_H /DHAVE_FLOAT_H /DHAVE_MATH_H /DHAVE_ATEXIT /DHAVE_MEMCPY /DHAVE_MEMSET /DHAVE_MEMMOVE /DHAVE_SETVBUF /DHAVE_STRCHR /DHAVE_STRERROR /DHAVE_STRSTR /DHAVE_TEMPNAM /DHAVE_LIBPNG 
+
 !IF "$(PROCESSOR_ARCHITECTURE)" == "ALPHA"
 MACHINE = ALPHA
 !ELSEIF "$(PROCESSOR_ARCHITECTURE)" == "x86"
 MACHINE = IX86
 # definitions for other architectures to be inserted here
 !ENDIF
-LDFLAGS = /subsystem:windows /nologo /MACHINE:$(MACHINE) /MAP:GNUPLOT
 
+# paths for external libs added here... 
+LDFLAGS = /subsystem:windows /nologo /MACHINE:$(MACHINE) /MAP:GNUPLOT /libpath:..\src\zlib /libpath:..\src\libpng
+
+# ...and here.
 # see other terminal defines in term.h
-TERMFLAGS = /I..\\term
-
+TERMFLAGS = /I..\\term /I..\\src\\libpng /I..\\src\\zlib
 
 # macros for makefile.all
 O=obj
@@ -43,7 +61,6 @@ T=..\\term\\
 D=..\\docs\\
 L=..\\docs\\latex\\
 M=..\\demo\\
-
 
 default: wgnuplot.exe $(HELPFILE) wgnuplot.mnu $(M)bf_test.exe
 
@@ -61,7 +78,6 @@ WINDOWS = makefile.win makefile.nt README.win win\wcommon.h \
 	win\wresourc.h win\wtext.c win\wtext.h win\geticon.c \
 	$(D)doc2rtf.c $(T)win.trm win\grpicon.ico win\texticon.ico
 
-
 # default rules
 .c.obj:
 	$(CC) $(CFLAGS) $*.c
@@ -69,7 +85,6 @@ WINDOWS = makefile.win makefile.nt README.win win\wcommon.h \
 linkopt1.msw: makefile.nt
 	copy gnuplot.opt linkopt1.msw
 	echo winmain >> linkopt1.msw
-	echo mouse >> linkopt1.msw
 	echo gpexecute >> linkopt1.msw
 	echo readline >> linkopt1.msw
 	echo wgnuplib >> linkopt1.msw
@@ -85,6 +100,8 @@ linkopt1.msw: makefile.nt
 	echo comdlg32.lib >> linkopt1.msw
 	echo advapi32.lib >> linkopt1.msw
 	echo shell32.lib >> linkopt1.msw
+	echo libpng.lib >> linkopt1.msw
+	echo zlib.lib >> linkopt1.msw
 	echo wgnuplot.res >> linkopt1.msw
 
 wgnuplot.exe: $(OBJS) $(WINOBJS) win\wgnuplot.def wgnuplot.res linkopt1.msw texticon.ico grpicon.ico
@@ -93,11 +110,10 @@ wgnuplot.exe: $(OBJS) $(WINOBJS) win\wgnuplot.def wgnuplot.res linkopt1.msw text
 # rules
 
 wgnuplot.res :  win\wgnuplot.rc win\wgnuplib.rc win\wresourc.h texticon.ico grpicon.ico
-   rc /l 0x409 /fowgnuplot.res /i "win" /d "NDEBUG" /d WIN32 /d MSRC win\wgnuplot.rc
+	rc /l 0x409 /fowgnuplot.res /i "win" /d "NDEBUG" /d WIN32 /d MSRC win\wgnuplot.rc
 
 term.obj: term.c term.h plot.h setshow.h bitmap.h $(CORETERM)
 	$(CC) $(CFLAGS) $(TERMFLAGS) term.c
-
 
 WINDEPS = win\wgnuplib.h win\wcommon.h win\wresourc.h
 winmain.obj: win\winmain.c win\wgnuplib.h win\wtext.h plot.h
@@ -105,22 +121,22 @@ winmain.obj: win\winmain.c win\wgnuplib.h win\wtext.h plot.h
 
 wgnuplib.obj: win\wgnuplib.c $(WINDEPS)
 	$(CC) $(CFLAGS) win\wgnuplib.c
-	
+
 wmenu.obj: win\wmenu.c $(WINDEPS)
 	$(CC) $(CFLAGS) win\wmenu.c
 
 wtext.obj: win\wtext.c $(WINDEPS)
 	$(CC) $(CFLAGS) win\wtext.c
-	
+
 wpause.obj: win\wpause.c $(WINDEPS)
 	$(CC) $(CFLAGS) win\wpause.c
-	
+
 wprinter.obj: win\wprinter.c $(WINDEPS)
 	$(CC) $(CFLAGS) win\wprinter.c
-	
+
 wgraph.obj: win\wgraph.c $(WINDEPS)
 	$(CC) $(CFLAGS) win\wgraph.c
-	
+
 wgnuplot.mnu: win\wgnuplot.mnu
 	copy win\wgnuplot.mnu wgnuplot.mnu
 
@@ -156,14 +172,14 @@ dbinary.obj: binary.c
 # clean up temporary files
 clean:
 	del *.obj
-		del *.ico
+	del *.ico
 	del wgnuplot.res
 	del win\gnuplot.rtf
 	del $(D)bf_test.exe
 	del linkopt1.msw
 	del doc2rtf.exe
-		del geticon.exe
-	
+	del geticon.exe
+
 veryclean: clean
 	del wgnuplot.exe
 	del wgnuplot.hlp

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: internal.c,v 1.10 2001/08/31 21:51:18 amai Exp $"); }
+static char *RCSid() { return RCSid("$Id: internal.c,v 1.11 2001/09/06 13:09:21 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - internal.c */
@@ -40,6 +40,8 @@ static char *RCSid() { return RCSid("$Id: internal.c,v 1.10 2001/08/31 21:51:18 
 #include "stdfn.h"
 
 #include "util.h"		/* for int_error() */
+
+#include <math.h>
 /*
  * System V and MSC 4.0 call this when they wants to print an error message.
  * Don't!
@@ -49,10 +51,13 @@ static char *RCSid() { return RCSid("$Id: internal.c,v 1.10 2001/08/31 21:51:18 
 #  define matherr __matherr
 #  define exception __exception
 # endif				/* AMIGA_SC_6_1 */
-# if defined(__BORLANDC__) && __BORLANDC__ >= 0x450
+# if (defined(__BORLANDC__) && __BORLANDC__ >= 0x450) || defined(__MSC__)
 #  define matherr _matherr
-# endif				/* __BORLANDC__ >= 0x450 */
-# if (defined(MSDOS) || defined(DOS386)) && defined(__TURBOC__) || defined(VMS) || defined(__EMX__) || defined(__MINGW32__)
+# endif				/* Borland >=4.5, or MS VC */
+# ifdef __MSC__
+#  define exception _exception
+# endif
+# if (defined(MSDOS) || defined(DOS386)) && defined(__TURBOC__) || defined(VMS) || defined(__EMX__) || defined(__MINGW32__) || defined(linux)
 int
 matherr()
 #else
