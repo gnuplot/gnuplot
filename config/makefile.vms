@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vms,v 1.5 1999/07/09 20:58:44 lhecking Exp $
+# $Id: makefile.vms,v 1.6 1999/09/21 18:05:41 lhecking Exp $
 #
 # GNUPLOT Makefile for VMS
 #
@@ -95,6 +95,14 @@ gnuplot_x11.$(X) : gplt_x11.$(O) stdfn.$(O)
 gplt_x11.o : gplt_x11.c
 	$(CC) $(CFLAGS) $(X11FLAGS)
 
+[-.demo]binary1. [-.demo]binary2. [-.demo]binary3. : bf_test.$(X)
+	set default [-.demo]
+	run [-.src]bf_test.$(X)
+	set default [-]
+
+bf_test.$(X) : bf_test.$(O) binary.$(O) alloc.$(O)
+	link /exe=bf_test.exe bf_test.$(O),binary.$(O),alloc.$(O)
+
 gnuplot.hlp : doc2hlp.$(X) [-.docs]gnuplot.doc
 	define/user sys$input [-.docs]gnuplot.doc
 	define/user sys$output []gnuplot.hlp
@@ -124,4 +132,5 @@ bitmap.$(O) term.$(O) : bitmap.h
 
 clean :
 	purge/log
-	del/log *.$(O);*
+	delete/log *.$(O);*
+	delete/log [-.demo]binary1.;*,binary2.;*,binary3.;*
