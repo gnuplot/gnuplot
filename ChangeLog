@@ -1,3 +1,10 @@
+2002-10-09  Harald Harders  <h.harders@tu-bs.de>
+
+	* src/variable.c: Patch #611546 "Save wrong for loadpath and fontpath".
+	 If the local values for fontpath or loadpath is empty while system 
+	 values are defined, the save command saves the first path entry which
+	 it shouldn't. 
+
 2002-10-09  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* src/plot.c(main): Remove non-standard and undocumented -? and -help
@@ -1253,7 +1260,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/10/09 08:58:47 $).
+	last modification date (from the tag $Date: 2002/10/09 09:21:37 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
