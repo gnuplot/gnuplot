@@ -35,10 +35,10 @@ static char *RCSid = "$Id: gplt_x11.c,v 1.71 1998/04/14 00:15:22 drd Exp $";
 ]*/
 
 
-/*lph changes:
-   (a) make EXPORT_SELECTION the default and specify NOEXPORT to undefine
-   (b) append X11 terminal number to resource name
-   (c) change cursor for active terminal
+/* lph changes:
+ * (a) make EXPORT_SELECTION the default and specify NOEXPORT to undefine
+ * (b) append X11 terminal number to resource name
+ * (c) change cursor for active terminal
  */
 
 /*-----------------------------------------------------------------------------
@@ -87,8 +87,8 @@ static char *RCSid = "$Id: gplt_x11.c,v 1.71 1998/04/14 00:15:22 drd Exp $";
  */
 
 /*lph: add a "feature" to undefine EXPORT_SELECTION
-      The following makes EXPORT_SELECTION the default and 
-      defining NOEXPORT over-rides the default
+   The following makes EXPORT_SELECTION the default and 
+   defining NOEXPORT over-rides the default
  */
 
 #ifdef EXPORT_SELECTION
@@ -96,7 +96,7 @@ static char *RCSid = "$Id: gplt_x11.c,v 1.71 1998/04/14 00:15:22 drd Exp $";
 #endif /* EXPORT SELECTION */
 #ifndef NOEXPORT
 # define EXPORT_SELECTION XA_PRIMARY
-#endif  /* NOEXPORT */
+#endif /* NOEXPORT */
 
 
 #if !(defined(VMS) || defined(CRIPPLED_SELECT))
@@ -114,18 +114,18 @@ Error. Incompatible options.
 #include <X11/Xutil.h>
 #include <X11/Xatom.h>
 #include <X11/keysym.h>
- 
+
 #include <signal.h>
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+# include "config.h"
 #endif
 
 #include "ansichek.h"
 #include "stdfn.h"
 
 #ifdef HAVE_SYS_BSDTYPES_H
-#include <sys/bsdtypes.h>
+# include <sys/bsdtypes.h>
 #endif /* HAVE_SYS_BSDTYPES_H */
 
 #ifdef __EMX__
@@ -133,16 +133,22 @@ Error. Incompatible options.
 # include <netdb.h>
 #endif
 
-# if defined(HAVE_SYS_SELECT_H) && !defined(VMS)
-#  include <sys/select.h>
-# endif /* HAVE_SYS_SELECT_H && !VMS */
+#if defined(HAVE_SYS_SELECT_H) && !defined(VMS)
+# include <sys/select.h>
+#endif /* HAVE_SYS_SELECT_H && !VMS */
 
 #ifndef FD_SET
 # define FD_SET(n, p)    ((p)->fds_bits[0] |= (1 << ((n) % 32)))
 # define FD_CLR(n, p)    ((p)->fds_bits[0] &= ~(1 << ((n) % 32)))
 # define FD_ISSET(n, p)  ((p)->fds_bits[0] & (1 << ((n) % 32)))
-# define FD_ZERO(p)      memset((char *)(p),'\0',sizeof(*(p))) 
+# define FD_ZERO(p)      memset((char *)(p),'\0',sizeof(*(p)))
 #endif /* not FD_SET */
+
+#ifdef FD_SET_T_IS_INT
+# define fd_set_t int
+#else
+# define fd_set_t fd_set
+#endif
 
 #if defined(HAVE_SYS_SYSTEMINFO_H) && defined(HAVE_SYSINFO)
 # include <sys/systeminfo.h>
@@ -156,8 +162,8 @@ Error. Incompatible options.
 #ifdef VMS
 # ifdef __DECC
 #  include <starlet.h>
-# endif /* __DECC */
-# define EXIT(status) sys$delprc(0,0)	  /* VMS does not drop itself */
+# endif				/* __DECC */
+# define EXIT(status) sys$delprc(0,0)	/* VMS does not drop itself */
 #else
 # define EXIT(status) exit(status)
 #endif
@@ -169,26 +175,26 @@ Error. Incompatible options.
 /* information about one window/plot */
 
 typedef struct plot_struct {
-	Window window;
-	Pixmap pixmap;
-	unsigned int posn_flags;
-	int x,y;
-	unsigned int width, height; /* window size */
-	unsigned int px, py; /* pointsize */
-	int ncommands, max_commands;
-	char **commands;
+    Window window;
+    Pixmap pixmap;
+    unsigned int posn_flags;
+    int x, y;
+    unsigned int width, height;	/* window size */
+    unsigned int px, py;	/* pointsize */
+    int ncommands, max_commands;
+    char **commands;
 } plot_struct;
 
-void store_command __PROTO((char *line, plot_struct *plot));
-void prepare_plot __PROTO((plot_struct *plot, int term_number));
-void delete_plot __PROTO((plot_struct *plot));
+void store_command __PROTO((char *line, plot_struct * plot));
+void prepare_plot __PROTO((plot_struct * plot, int term_number));
+void delete_plot __PROTO((plot_struct * plot));
 
 int record __PROTO((void));
-void process_event __PROTO((XEvent *event)); /* from Xserver */
+void process_event __PROTO((XEvent * event));	/* from Xserver */
 
 void mainloop __PROTO((void));
 
-void display __PROTO((plot_struct *plot));
+void display __PROTO((plot_struct * plot));
 
 void reset_cursor __PROTO((void));
 
@@ -205,8 +211,8 @@ void pr_raise __PROTO((void));
 void pr_persist __PROTO((void));
 
 #ifdef EXPORT_SELECTION
-void export_graph __PROTO((plot_struct *plot));
-void handle_selection_event __PROTO((XEvent *event));
+void export_graph __PROTO((plot_struct * plot));
+void handle_selection_event __PROTO((XEvent * event));
 #endif
 
 #define FallbackFont "fixed"
@@ -232,9 +238,9 @@ Display *dpy;
 int scr;
 Window root;
 Visual *vis;
-GC gc = (GC)0;
+GC gc = (GC) 0;
 XFontStruct *font;
-int do_raise=1, persist=0;
+int do_raise = 1, persist = 0;
 KeyCode q_keycode;
 Cursor cursor;
 
@@ -245,20 +251,20 @@ unsigned int gW = 640, gH = 450;
 unsigned int gFlags = PSize;
 
 unsigned int BorderWidth = 2;
-unsigned int D; /* depth */
+unsigned int D;			/* depth */
 
 Bool Mono = 0, Gray = 0, Rv = 0, Clear = 0;
 char Name[64] = "gnuplot";
 char Class[64] = "Gnuplot";
 
-int cx=0, cy=0, vchar;
+int cx = 0, cy = 0, vchar;
 double xscale, yscale, pointsize;
 #define X(x) (int) ((x) * xscale)
 #define Y(y) (int) ((4095-(y)) * yscale)
 enum JUSTIFY { LEFT, CENTRE, RIGHT } jmode;
 
 #define Nbuf 1024
-char buf[Nbuf], **commands = (char **)0;
+char buf[Nbuf], **commands = (char **) 0;
 
 FILE *X11_ipc;
 char X11_ipcpath[32];
@@ -267,7 +273,7 @@ char X11_ipcpath[32];
  * to send us an event when user chooses 'close window'. We do this
  * by setting WM_DELETE_WINDOW atom in property WM_PROTOCOLS
  */
- 
+
 Atom WM_PROTOCOLS, WM_DELETE_WINDOW;
 
 XPoint Diamond[5], Triangle[4];
@@ -277,40 +283,40 @@ XSegment Plus[2], Cross[2], Star[4];
  *   main program 
  *---------------------------------------------------------------------------*/
 
-int main(argc, argv) int argc; char *argv[]; {
+int main(argc, argv)
+int argc;
+char *argv[];
+{
 
 
 #ifdef OSK
-   /* malloc large blocks, otherwise problems with fragmented mem */
-   _mallocmin (102400);
+    /* malloc large blocks, otherwise problems with fragmented mem */
+    _mallocmin(102400);
 #endif
 
-	FPRINTF((stderr,"gnuplot_X11 starting up\n"));
+    FPRINTF((stderr, "gnuplot_X11 starting up\n"));
 
-   preset(argc, argv);
+    preset(argc, argv);
 
 /* set up the alternative cursor */
-   cursor = XCreateFontCursor(dpy,XC_crosshair);
+    cursor = XCreateFontCursor(dpy, XC_crosshair);
 
-   mainloop();
+    mainloop();
 
-	if (persist)
-	{
-		FPRINTF((stderr,"waiting for %d windows\n, windows_open"));
-		/* read x events until all windows have been quit */
-		while (windows_open > 0)
-		{
-			XEvent event;
-			XNextEvent(dpy, &event);
-			process_event(&event);
-		}
+    if (persist) {
+	FPRINTF((stderr, "waiting for %d windows\n, windows_open"));
+	/* read x events until all windows have been quit */
+	while (windows_open > 0) {
+	    XEvent event;
+	    XNextEvent(dpy, &event);
+	    process_event(&event);
 	}
-		
-  	XCloseDisplay(dpy);
+    }
+    XCloseDisplay(dpy);
 
-	FPRINTF((stderr,"exiting\n"));
+    FPRINTF((stderr, "exiting\n"));
 
-	EXIT(0);
+    EXIT(0);
 }
 
 /*-----------------------------------------------------------------------------
@@ -336,75 +342,76 @@ int main(argc, argv) int argc; char *argv[]; {
  *    DEFAULT_X11 mainloop
  *---------------------------------------------------------------------------*/
 
-void mainloop() {
-   int nf, nfds, cn = ConnectionNumber(dpy), in;
-   struct timeval timeout, *timer = (struct timeval *)0;
-   fd_set rset, tset;
-   unsigned long all = (unsigned long)(-1L);
+void mainloop()
+{
+    int nf, nfds, cn = ConnectionNumber(dpy), in;
+    struct timeval *timer = (struct timeval *) 0;
+#ifdef ISC22
+    struct timeval timeout;
+#endif
+    fd_set rset, tset;
 
-   X11_ipc = stdin;
-   in = fileno (X11_ipc);
+    X11_ipc = stdin;
+    in = fileno(X11_ipc);
 
-   FD_ZERO(&rset);
-   FD_SET(cn, &rset);
+    FD_ZERO(&rset);
+    FD_SET(cn, &rset);
 
-   FD_SET(in, &rset);
-   nfds = (cn > in) ? cn + 1 : in + 1;
+    FD_SET(in, &rset);
+    nfds = (cn > in) ? cn + 1 : in + 1;
 
 #ifdef ISC22
 /* Added by Robert Eckardt, RobertE@beta.TP2.Ruhr-Uni-Bochum.de */
-   timeout.tv_sec  = 0;		/* select() in ISC2.2 needs timeout */
-   timeout.tv_usec = 300000;	/* otherwise input from gnuplot is */
-   timer = &timeout;		/* suspended til next X event. */
-#endif /* ISC22 	 (0.3s are short enough not to be noticed */
+    timeout.tv_sec = 0;		/* select() in ISC2.2 needs timeout */
+    timeout.tv_usec = 300000;	/* otherwise input from gnuplot is */
+    timer = &timeout;		/* suspended til next X event. */
+#endif /* ISC22   (0.3s are short enough not to be noticed */
 
-	while(1) {
+    while (1) {
 
-		/* XNextEvent does an XFlush() before waiting. But here.
-		 * we must ensure that the queue is flushed, since we
-		 * dont call XNextEvent until an event arrives. (I have
-		 * twice wasted quite some time over this issue, so now
-		 * I am making sure of it !
-		 */
+	/* XNextEvent does an XFlush() before waiting. But here.
+	 * we must ensure that the queue is flushed, since we
+	 * dont call XNextEvent until an event arrives. (I have
+	 * twice wasted quite some time over this issue, so now
+	 * I am making sure of it !
+	 */
 
-		XFlush(dpy);
-		
-		tset = rset;
-#if defined(__hpux) && defined(ANSI_C)
-		nf = select(nfds, (int *)&tset, (int *)0, (int *)0, timer);
-#else
-		nf = select(nfds, &tset, (fd_set *)0, (fd_set *)0, timer);
-#endif
-		if (nf < 0) {
-			if (errno == EINTR) continue;
-			fprintf(stderr, "gnuplot: select failed. errno:%d\n", errno);
-			EXIT(1);
-		}
-		if (nf > 0) XNoOp(dpy);
-		if (FD_ISSET(cn, &tset)) {
-			/* used to use CheckMaskEvent() but that cannot receive
-			 * maskable events such as ClientMessage. So now we do
-			 * one event, then return to the select.
-			 * And that almost works, except that under some Xservers
-			 * running without a window manager (e.g. Hummingbird Exceed under Win95)
-			 * a bogus ConfigureNotify is sent followed by a valid ConfigureNotify
-			 * when the window is maximized.  The two events are queued, apparently
-			 * in a single I/O because select() above doesn't see the second, valid
-			 * event.  This little loop fixes the problem by flushing the
-			 * event queue completely.
-			 */
-			XEvent xe;
-			do
-			{
-			XNextEvent(dpy, &xe);
-			process_event(&xe);
-			} while(XPending(dpy));
-		}
-      if (FD_ISSET(in, &tset))
-			if (!record())
-				/* end of input */
-				return;
+	XFlush(dpy);
+
+	tset = rset;
+	nf = select(nfds, (fd_set_t *) & tset, (fd_set_t *) 0, (fd_set_t *) 0, timer);
+	if (nf < 0) {
+	    if (errno == EINTR)
+		continue;
+	    fprintf(stderr, "gnuplot: select failed. errno:%d\n", errno);
+	    EXIT(1);
 	}
+	if (nf > 0)
+	    XNoOp(dpy);
+
+	if (FD_ISSET(cn, &tset)) {
+	    /* used to use CheckMaskEvent() but that cannot receive
+	     * maskable events such as ClientMessage. So now we do
+	     * one event, then return to the select.
+	     * And that almost works, except that under some Xservers
+	     * running without a window manager (e.g. Hummingbird Exceed under Win95)
+	     * a bogus ConfigureNotify is sent followed by a valid ConfigureNotify
+	     * when the window is maximized.  The two events are queued, apparently
+	     * in a single I/O because select() above doesn't see the second, valid
+	     * event.  This little loop fixes the problem by flushing the
+	     * event queue completely.
+	     */
+	    XEvent xe;
+	    do {
+		XNextEvent(dpy, &xe);
+		process_event(&xe);
+	    } while (XPending(dpy));
+	}
+	if (FD_ISSET(in, &tset)) {
+	    if (!record())      /* end of input */
+		return;
+	}
+    }
 }
 
 #endif
@@ -415,44 +422,46 @@ void mainloop() {
  *    CRIPPLED_SELECT mainloop
  *---------------------------------------------------------------------------*/
 
-void mainloop() {
-   int nf, nfds, cn = ConnectionNumber(dpy);
-   struct timeval timeout, *timer;
-   fd_set rset, tset;
-   unsigned long all = (unsigned long)(-1L);
-   XEvent xe;
+void mainloop()
+{
+    int nf, nfds, cn = ConnectionNumber(dpy);
+    struct timeval timeout, *timer;
+    fd_set rset, tset;
+    unsigned long all = (unsigned long) (-1L);
+    XEvent xe;
 
-   FD_ZERO(&rset);
-   FD_SET(cn, &rset);
+    FD_ZERO(&rset);
+    FD_SET(cn, &rset);
 
-   timeout.tv_sec = 1;
-   timeout.tv_usec = 0;
-   timer = &timeout;
-   sprintf(X11_ipcpath, "/tmp/Gnuplot_%d", getppid());
-   nfds = cn + 1;
+    timeout.tv_sec = 1;
+    timeout.tv_usec = 0;
+    timer = &timeout;
+    sprintf(X11_ipcpath, "/tmp/Gnuplot_%d", getppid());
+    nfds = cn + 1;
 
-   while(1) {
-   	XFlush(dpy); /* see above */
-      tset = rset;
-      nf = select(nfds, &tset, (fd_set *)0, (fd_set *)0, timer);
-      if (nf < 0) {
-	 if (errno == EINTR) continue;
-	 fprintf(stderr, "gnuplot: select failed. errno:%d\n", errno);
-	 EXIT(1);
-	 }
-      nf > 0 && XNoOp(dpy);
-      if (FD_ISSET(cn, &tset)) {
-	 while (XCheckMaskEvent(dpy, all, &xe)) {
-	    process_event(&xe);
+    while (1) {
+	XFlush(dpy);		/* see above */
+	tset = rset;
+	nf = select(nfds, &tset, (fd_set *) 0, (fd_set *) 0, timer);
+	if (nf < 0) {
+	    if (errno == EINTR)
+		continue;
+	    fprintf(stderr, "gnuplot: select failed. errno:%d\n", errno);
+	    EXIT(1);
+	}
+	nf > 0 && XNoOp(dpy);
+	if (FD_ISSET(cn, &tset)) {
+	    while (XCheckMaskEvent(dpy, all, &xe)) {
+		process_event(&xe);
 	    }
-	 }
-      if ((X11_ipc = fopen(X11_ipcpath, "r"))) {
-	 unlink(X11_ipcpath);
-	 record();
-	 fclose(X11_ipc);
-	 }
-      }
-   }
+	}
+	if ((X11_ipc = fopen(X11_ipcpath, "r"))) {
+	    unlink(X11_ipcpath);
+	    record();
+	    fclose(X11_ipc);
+	}
+    }
+}
 #endif /* CRIPPLED_SELECT */
 
 
@@ -473,55 +482,52 @@ void mainloop() {
  */
 
 #include <iodef.h>
-char    STDIIN[] = "SYS$INPUT:";
-short   STDIINchannel, STDIINiosb[4];
-struct  { short size, type; char  *address; } STDIINdesc;
-char    STDIINbuffer[64];
-int     status;
+char STDIIN[] = "SYS$INPUT:";
+short STDIINchannel, STDIINiosb[4];
+struct { short size, type; char *address; } STDIINdesc;
+char STDIINbuffer[64];
+int status;
 
 ast()
 {
-   int status = sys$qio(0, STDIINchannel, IO$_READVBLK, STDIINiosb, record,
-		        0, STDIINbuffer, sizeof(STDIINbuffer) -1,0, 0, 0, 0);
-   if((status & 0x1) == 0) EXIT(status);
+    int status = sys$qio(0, STDIINchannel, IO$_READVBLK, STDIINiosb, record,
+		  0, STDIINbuffer, sizeof(STDIINbuffer) - 1, 0, 0, 0, 0);
+    if ((status & 0x1) == 0)
+	EXIT(status);
 }
 
 Window message_window;
 
 void mainloop()
 {
-	/* dummy unmapped window for receiving internally-generated terminate
-	 * messages
-	 */
-	message_window = XCreateSimpleWindow(dpy,root, 0,0,1,1, 1,0,0);
+    /* dummy unmapped window for receiving internally-generated terminate
+     * messages
+     */
+    message_window = XCreateSimpleWindow(dpy, root, 0, 0, 1, 1, 1, 0, 0);
 
-	STDIINdesc.size = strlen(STDIIN); 
-	STDIINdesc.type = 0;
-	STDIINdesc.address = STDIIN;
-	status = sys$assign(&STDIINdesc, &STDIINchannel, 0, 0, 0);
-	if((status & 0x1) == 0)  EXIT(status); 
-	ast();
-	
-	for (;;)
-	{
-		XEvent xe;
-		XNextEvent(dpy, &xe);
-		if (xe.type == ClientMessage && xe.xclient.window == message_window)
-		{
-			if (xe.xclient.message_type == None &&
-			    xe.xclient.format == 8 &&
-			    strcmp(xe.xclient.data.b, "die gnuplot die") == 0)
-			{
-				FPRINTF((stderr,"quit message from ast\n"));
-				return;
-			}
-			else
-			{
-				FPRINTF((stderr,"Bogus XClientMessage event from window manager ?\n"));
-			}
-		}
-		process_event(&xe);
+    STDIINdesc.size = strlen(STDIIN);
+    STDIINdesc.type = 0;
+    STDIINdesc.address = STDIIN;
+    status = sys$assign(&STDIINdesc, &STDIINchannel, 0, 0, 0);
+    if ((status & 0x1) == 0)
+	EXIT(status);
+    ast();
+
+    for (;;) {
+	XEvent xe;
+	XNextEvent(dpy, &xe);
+	if (xe.type == ClientMessage && xe.xclient.window == message_window) {
+	    if (xe.xclient.message_type == None &&
+		xe.xclient.format == 8 &&
+		strcmp(xe.xclient.data.b, "die gnuplot die") == 0) {
+		FPRINTF((stderr, "quit message from ast\n"));
+		return;
+	    } else {
+		FPRINTF((stderr, "Bogus XClientMessage event from window manager ?\n"));
+	    }
 	}
+	process_event(&xe);
+    }
 }
 
 #endif /* VMS */
@@ -531,29 +537,25 @@ void mainloop()
 void delete_plot(plot)
 plot_struct *plot;
 {
-	int i;
+    int i;
 
-	FPRINTF((stderr,"Delete plot %d\n", plot - plot_array));
-	
-	for (i=0; i<plot->ncommands; ++i)
-		free(plot->commands[i]);
-	plot->ncommands = 0;
+    FPRINTF((stderr, "Delete plot %d\n", plot - plot_array));
 
-	if (plot->window)
-	{
-		FPRINTF((stderr,"Destroy window 0x%x\n", plot->window));
-		XDestroyWindow(dpy,plot->window);
-		plot->window = None;
-		--windows_open;
-	}
+    for (i = 0; i < plot->ncommands; ++i)
+	free(plot->commands[i]);
+    plot->ncommands = 0;
 
-	if (plot->pixmap)
-	{
-		XFreePixmap(dpy, plot->pixmap);
-		plot->pixmap = None;
-	}
-
-	/* but preserve geometry */
+    if (plot->window) {
+	FPRINTF((stderr, "Destroy window 0x%x\n", plot->window));
+	XDestroyWindow(dpy, plot->window);
+	plot->window = None;
+	--windows_open;
+    }
+    if (plot->pixmap) {
+	XFreePixmap(dpy, plot->pixmap);
+	plot->pixmap = None;
+    }
+    /* but preserve geometry */
 }
 
 
@@ -563,79 +565,75 @@ void prepare_plot(plot, term_number)
 plot_struct *plot;
 int term_number;
 {
-	int i;
-        char *term_name, tmp_nam[4];
-	for (i=0; i<plot->ncommands; ++i)
-		free(plot->commands[i]);
-	plot->ncommands = 0;
+    int i;
+    char *term_name;
 
-	if (!plot->posn_flags)
-	{
-		/* first time this window has been used - use default or -geometry
-		 * settings
-		 */
-		plot->posn_flags = gFlags;
-		plot->x = gX;
-		plot->y = gY;
-		plot->width = gW;
-		plot->height = gH;
+    for (i = 0; i < plot->ncommands; ++i)
+	free(plot->commands[i]);
+    plot->ncommands = 0;
+
+    if (!plot->posn_flags) {
+	/* first time this window has been used - use default or -geometry
+	 * settings
+	 */
+	plot->posn_flags = gFlags;
+	plot->x = gX;
+	plot->y = gY;
+	plot->width = gW;
+	plot->height = gH;
+    }
+
+    if (!plot->window) {
+	plot->window = pr_window(plot->posn_flags, plot->x, plot->y, plot->width, plot->height);
+	++windows_open;
+
+	/* append the X11 terminal number (if greater than zero) */
+
+	if (term_number) {
+	    char new_name[60];
+	    XFetchName(dpy, plot->window, &term_name);
+	    FPRINTF((stderr, "Window title is %s\n", term_name));
+
+	    sprintf(new_name, "%.55s%3d", term_name, term_number);
+	    FPRINTF((stderr, "term_number  is %d\n", term_number));
+
+	    XStoreName(dpy, plot->window, new_name);
+
+	    sprintf(new_name, "gplt%3d", term_number);
+	    XSetIconName(dpy, plot->window, new_name);
 	}
-
-	if (!plot->window)
-	{
-		plot->window = pr_window(plot->posn_flags, plot->x, plot->y, plot->width, plot->height);
-		++windows_open;
-
-      		/* append the X11 terminal number (if greater than zero) */
-
-      		if (term_number)
-      		{
-      			char new_name[60];
-      			XFetchName(dpy,plot->window,&term_name);
-      			FPRINTF((stderr,"Window title is %s\n",term_name));
-      			
-      			sprintf(new_name,"%.55s%3d",term_name, term_number);
-      			FPRINTF((stderr,"term_number  is %d\n",term_number));
-      			
-      			XStoreName(dpy,plot->window,new_name);
-
-      			sprintf(new_name, "gplt%3d", term_number);
-      			XSetIconName(dpy,plot->window,new_name);
-      		}
- 	}
-
+    }
 /* We don't know that it is the same window as before, so we reset the
  * cursors for all windows and then define the cursor for the active
  * window 
  */
-      	reset_cursor();
-      	XDefineCursor(dpy,plot->window,cursor);
+    reset_cursor();
+    XDefineCursor(dpy, plot->window, cursor);
 
-}	
+}
 
 /* store a command in a plot structure */
 
-void store_command(buf, plot)
-char *buf;
+void store_command(buffer, plot)
+char *buffer;
 plot_struct *plot;
 {
-	char *p;
+    char *p;
 
-	FPRINTF((stderr,"Store in %d : %s", plot - plot_array, buf));
-	
-	if (plot->ncommands >= plot->max_commands)
-	{
-		plot->max_commands = plot->max_commands*2 + 1;
-		plot->commands = (plot->commands)
-		    ? (char **)realloc(plot->commands, plot->max_commands * sizeof(char *))
-		    : (char **)malloc(sizeof(char *));
-	}
-	p = (char *)malloc((unsigned)strlen(buf)+1);
-	if (!plot->commands || !p) {
-		fprintf(stderr, "gnuplot: can't get memory. X11 aborted.\n");
-		EXIT(1);
-	}
-	plot->commands[plot->ncommands++] = strcpy(p, buf);
+    FPRINTF((stderr, "Store in %d : %s", plot - plot_array, buffer));
+
+    if (plot->ncommands >= plot->max_commands) {
+	plot->max_commands = plot->max_commands * 2 + 1;
+	plot->commands = (plot->commands)
+	    ? (char **) realloc(plot->commands, plot->max_commands * sizeof(char *))
+	: (char **) malloc(sizeof(char *));
+    }
+    p = (char *) malloc((unsigned) strlen(buffer) + 1);
+    if (!plot->commands || !p) {
+	fprintf(stderr, "gnuplot: can't get memory. X11 aborted.\n");
+	EXIT(1);
+    }
+    plot->commands[plot->ncommands++] = strcpy(p, buffer);
 }
 
 #ifndef VMS
@@ -645,103 +643,106 @@ plot_struct *plot;
 
 int record()
 {
-	static plot_struct *plot = plot_array;
-	while (fgets(buf, Nbuf, X11_ipc)) {
-		switch (*buf)
-		{
-			case 'G':                           /* enter graphics mode */
-			{
-				int plot_number = atoi(buf+1); /* 0 if none specified */
-				if (plot_number < 0 || plot_number >= MAX_WINDOWS)
-					plot_number = 0;
-				FPRINTF((stderr,"plot for window number %d\n", plot_number));
-				plot = plot_array + plot_number;
-				prepare_plot(plot, plot_number);
-				continue;
-			}
-			case 'E':      /* leave graphics mode / suspend */
-				display(plot);
-				return 1;
-			case 'R':      /* leave x11 mode */
-      				reset_cursor();
-				return 0;
-			default:
-				store_command(buf, plot);
-				continue;
-		}
-	}
+    static plot_struct *plot = plot_array;
 
-	/* get here if fgets fails */
-	
+    while (fgets(buf, Nbuf, X11_ipc)) {
+	switch (*buf) {
+	case 'G':		/* enter graphics mode */
+	    {
+		int plot_number = atoi(buf + 1);	/* 0 if none specified */
+
+		if (plot_number < 0 || plot_number >= MAX_WINDOWS)
+		    plot_number = 0;
+
+		FPRINTF((stderr, "plot for window number %d\n", plot_number));
+		plot = plot_array + plot_number;
+		prepare_plot(plot, plot_number);
+		continue;
+	    }
+	case 'E':		/* leave graphics mode / suspend */
+	    display(plot);
+	    return 1;
+	case 'R':		/* leave x11 mode */
+	    reset_cursor();
+	    return 0;
+	default:
+	    store_command(buf, plot);
+	    continue;
+	}
+    }
+
+    /* get here if fgets fails */
+
 #ifdef OSK
-   if (feof(X11_ipc))      /* On OS-9 sometimes while resizing the window,  */
-      _cleareof (X11_ipc); /* and plotting data, the eof or error flag of   */
-   if (ferror(X11_ipc))    /* X11_ipc stream gets set, while there is       */
-   	  clearerr (X11_ipc);  /* nothing wrong! Probably a bug in my select()? */
+    if (feof(X11_ipc))		/* On OS-9 sometimes while resizing the window,  */
+	_cleareof(X11_ipc);	/* and plotting data, the eof or error flag of   */
+    if (ferror(X11_ipc))	/* X11_ipc stream gets set, while there is       */
+	clearerr(X11_ipc);	/* nothing wrong! Probably a bug in my select()? */
 #else
-   if (feof(X11_ipc) || ferror(X11_ipc)) return 0;
+    if (feof(X11_ipc) || ferror(X11_ipc))
+	return 0;
 #endif /* not OSK */
 
-	return 1;
+    return 1;
 }
 
-#else    /* VMS */
+#else /* VMS */
 /*-----------------------------------------------------------------------------
  *   record - record new plot from gnuplot inboard X11 driver (VMS)
  *---------------------------------------------------------------------------*/
 
 record()
 {
-	static plot_struct *plot = plot_array;
+    static plot_struct *plot = plot_array;
 
-	int	status;
-	
-	if((STDIINiosb[0] & 0x1) == 0) EXIT(STDIINiosb[0]);
-	STDIINbuffer[STDIINiosb[1]] = '\0';
-	strcpy(buf, STDIINbuffer);
-	
-	switch(*buf)
+    int status;
+
+    if ((STDIINiosb[0] & 0x1) == 0)
+	EXIT(STDIINiosb[0]);
+    STDIINbuffer[STDIINiosb[1]] = '\0';
+    strcpy(buf, STDIINbuffer);
+
+    switch (*buf) {
+    case 'G':			/* enter graphics mode */
 	{
-		case 'G':   /* enter graphics mode */
-		{
-			int plot_number = atoi(buf+1); /* 0 if none specified */
-			if (plot_number < 0 || plot_number >= MAX_WINDOWS)
-				plot_number = 0;
-			FPRINTF((stderr,"plot for window number %d\n", plot_number));
-			plot = plot_array + plot_number;
-			prepare_plot(plot, plot_number);
-			break;
-		}
-		case 'E':  /* leave graphics mode */
-			display(plot);
-			break;
-		case 'R': /* exit x11 mode */
-			FPRINTF((stderr,"received R - sending ClientMessage\n"));
-      			reset_cursor();
-			sys$cancel(STDIINchannel);
-			/* this is ridiculous - cook up an event to ourselves,
-			 * in order to get the mainloop() out of the XNextEvent() call
-			 * it seems that window manager can also send clientmessages,
-			 * so put a checksum into the message
-			 */
-			{
-				XClientMessageEvent event;
-				event.type = ClientMessage;
-				event.send_event = True;
-				event.display = dpy;
-				event.window = message_window;
-				event.message_type = None;
-				event.format = 8;
-				strcpy(event.data.b, "die gnuplot die");
-				XSendEvent(dpy, message_window, False, 0, (XEvent *)&event);
-				XFlush(dpy);
-			}
-			return; /* no ast */
-		default:
-			store_command(buf, plot);
-			break;
+	    int plot_number = atoi(buf + 1);	/* 0 if none specified */
+	    if (plot_number < 0 || plot_number >= MAX_WINDOWS)
+		plot_number = 0;
+	    FPRINTF((stderr, "plot for window number %d\n", plot_number));
+	    plot = plot_array + plot_number;
+	    prepare_plot(plot, plot_number);
+	    break;
 	}
-   ast();
+    case 'E':			/* leave graphics mode */
+	display(plot);
+	break;
+    case 'R':			/* exit x11 mode */
+	FPRINTF((stderr, "received R - sending ClientMessage\n"));
+	reset_cursor();
+	sys$cancel(STDIINchannel);
+	/* this is ridiculous - cook up an event to ourselves,
+	 * in order to get the mainloop() out of the XNextEvent() call
+	 * it seems that window manager can also send clientmessages,
+	 * so put a checksum into the message
+	 */
+	{
+	    XClientMessageEvent event;
+	    event.type = ClientMessage;
+	    event.send_event = True;
+	    event.display = dpy;
+	    event.window = message_window;
+	    event.message_type = None;
+	    event.format = 8;
+	    strcpy(event.data.b, "die gnuplot die");
+	    XSendEvent(dpy, message_window, False, 0, (XEvent *) & event);
+	    XFlush(dpy);
+	}
+	return;			/* no ast */
+    default:
+	store_command(buf, plot);
+	break;
+    }
+    ast();
 }
 #endif /* VMS */
 
@@ -753,249 +754,254 @@ record()
 void display(plot)
 plot_struct *plot;
 {
-   int n, x, y, sw, sl, lt=0, width, type, point, px, py;
-   int user_width = 1; /* as specified by plot...linewidth */
-   char *buf, *str;
+    int n, x, y, sw, sl, lt = 0, width, type, point, px, py;
+    int user_width = 1;		/* as specified by plot...linewidth */
+    char *buffer, *str;
 
-   FPRINTF((stderr,"Display %d ; %d commands\n", plot - plot_array, plot->ncommands));
-   
-	if (plot->ncommands == 0) return;
+    FPRINTF((stderr, "Display %d ; %d commands\n", plot - plot_array, plot->ncommands));
 
-   /* set scaling factor between internal driver & window geometry */
-   xscale = plot->width / 4096.0;  yscale = plot->height / 4096.0;  
+    if (plot->ncommands == 0)
+	return;
 
-   /* initial point sizes, until overridden with P7xxxxyyyy */
-   px = (int) (xscale * pointsize);
-   py = (int) (yscale * pointsize);
+    /* set scaling factor between internal driver & window geometry */
+    xscale = plot->width / 4096.0;
+    yscale = plot->height / 4096.0;
 
-   /* create new pixmap & GC */
-   if (gc)
-		XFreeGC(dpy, gc);
+    /* initial point sizes, until overridden with P7xxxxyyyy */
+    px = (int) (xscale * pointsize);
+    py = (int) (yscale * pointsize);
 
-	if (!plot->pixmap)
-	{
-		FPRINTF((stderr,"Create pixmap %d : %dx%dx%d\n", plot - plot_array, plot->width, plot->height, D));
-		plot->pixmap = XCreatePixmap(dpy, root, plot->width, plot->height, D);
+    /* create new pixmap & GC */
+    if (gc)
+	XFreeGC(dpy, gc);
+
+    if (!plot->pixmap) {
+	FPRINTF((stderr, "Create pixmap %d : %dx%dx%d\n", plot - plot_array, plot->width, plot->height, D));
+	plot->pixmap = XCreatePixmap(dpy, root, plot->width, plot->height, D);
+    }
+
+    gc = XCreateGC(dpy, plot->pixmap, 0, (XGCValues *) 0);
+
+    XSetFont(dpy, gc, font->fid);
+
+    /* set pixmap background */
+    XSetForeground(dpy, gc, colors[0]);
+    XFillRectangle(dpy, plot->pixmap, gc, 0, 0, plot->width, plot->height);
+    XSetBackground(dpy, gc, colors[0]);
+
+    if (!plot->window) {
+	plot->window = pr_window(plot->posn_flags, plot->x, plot->y, plot->width, plot->height);
+	++windows_open;
+    }
+    /* top the window but don't put keyboard or mouse focus into it. */
+    if (do_raise)
+	XMapRaised(dpy, plot->window);
+
+    /* momentarily clear the window first if requested */
+    if (Clear) {
+	XClearWindow(dpy, plot->window);
+	XFlush(dpy);
+    }
+    /* loop over accumulated commands from inboard driver */
+    for (n = 0; n < plot->ncommands; n++) {
+	buffer = plot->commands[n];
+
+	/*   X11_vector(x,y) - draw vector  */
+	if (*buffer == 'V') {
+	    sscanf(buffer, "V%4d%4d", &x, &y);
+	    XDrawLine(dpy, plot->pixmap, gc, X(cx), Y(cy), X(x), Y(y));
+	    cx = x;
+	    cy = y;
 	}
-	
-   gc = XCreateGC(dpy, plot->pixmap, 0, (XGCValues *)0);
+	/*   X11_move(x,y) - move  */
+	else if (*buffer == 'M')
+	    sscanf(buffer, "M%4d%4d", &cx, &cy);
 
-   XSetFont(dpy, gc, font->fid);
+	/*   X11_put_text(x,y,str) - draw text   */
+	else if (*buffer == 'T') {
+	    sscanf(buffer, "T%4d%4d", &x, &y);
+	    str = buffer + 9;
+	    sl = strlen(str) - 1;
+	    sw = XTextWidth(font, str, sl);
 
-   /* set pixmap background */
-   XSetForeground(dpy, gc, colors[0]);
-   XFillRectangle(dpy, plot->pixmap, gc, 0, 0, plot->width, plot->height);
-   XSetBackground(dpy, gc, colors[0]);
-
-   if (!plot->window)
-   {
-   	plot->window = pr_window(plot->posn_flags, plot->x, plot->y, plot->width, plot->height);
-   	++windows_open;
-   }
-   	
-   /* top the window but don't put keyboard or mouse focus into it. */
-   if (do_raise) XMapRaised(dpy, plot->window);
-
-   /* momentarily clear the window first if requested */
-   if (Clear) {
-      XClearWindow(dpy, plot->window);
-      XFlush(dpy);
-      }
-
-   /* loop over accumulated commands from inboard driver */
-   for (n=0; n<plot->ncommands; n++) {
-      buf = plot->commands[n];
-
-      /*   X11_vector(x,y) - draw vector  */
-      if (*buf == 'V') { 
-	 sscanf(buf, "V%4d%4d", &x, &y);  
-	 XDrawLine(dpy, plot->pixmap, gc, X(cx), Y(cy), X(x), Y(y));
-	 cx = x; cy = y;
-	 }
-
-      /*   X11_move(x,y) - move  */
-      else if (*buf == 'M') 
-	 sscanf(buf, "M%4d%4d", &cx, &cy);  
-
-      /*   X11_put_text(x,y,str) - draw text   */
-      else if (*buf == 'T') { 
-	 sscanf(buf, "T%4d%4d", &x, &y);  
-	 str = buf + 9; sl = strlen(str) - 1;
-	 sw = XTextWidth(font, str, sl);
-	 switch(jmode) {
-	    case LEFT:   sw = 0;     break;
-	    case CENTRE: sw = -sw/2; break;
-	    case RIGHT:  sw = -sw;   break;
+	    switch (jmode) {
+	    case LEFT:
+		sw = 0;
+		break;
+	    case CENTRE:
+		sw = -sw / 2;
+		break;
+	    case RIGHT:
+		sw = -sw;
+		break;
 	    }
-	 XSetForeground(dpy, gc, colors[2]);
-	 XDrawString(dpy, plot->pixmap, gc, X(x)+sw, Y(y)+vchar/3, str, sl);
-	 XSetForeground(dpy, gc, colors[lt+3]);
-	 }
-	else if (*buf == 'F') { /* fill box */
-		int style,x,y,w,h;
-		if (sscanf(buf+1, "%4d%4d%4d%4d%4d", &style, &x,&y,&w,&h) == 5) {
-			/* gnuplot has origin at bottom left, but X uses top left
-			 * There may be an off-by-one (or more) error here.
-			 * style ignored here for the moment
-			 */
-			y += h; /* top left corner of rectangle to be filled */
-			w *= xscale;
-			h *= yscale;
-			XSetForeground(dpy, gc, colors[0]);
-			XFillRectangle(dpy,plot->pixmap,gc, X(x), Y(y), w, h);
-			XSetForeground(dpy, gc, colors[lt+3]);
+
+	    XSetForeground(dpy, gc, colors[2]);
+	    XDrawString(dpy, plot->pixmap, gc, X(x) + sw, Y(y) + vchar / 3, str, sl);
+	    XSetForeground(dpy, gc, colors[lt + 3]);
+	} else if (*buffer == 'F') {	/* fill box */
+	    int style, xtmp, ytmp, w, h;
+
+	    if (sscanf(buffer + 1, "%4d%4d%4d%4d%4d", &style, &xtmp, &ytmp, &w, &h) == 5) {
+		/* gnuplot has origin at bottom left, but X uses top left
+		 * There may be an off-by-one (or more) error here.
+		 * style ignored here for the moment
+		 */
+		ytmp += h;		/* top left corner of rectangle to be filled */
+		w *= xscale;
+		h *= yscale;
+		XSetForeground(dpy, gc, colors[0]);
+		XFillRectangle(dpy, plot->pixmap, gc, X(xtmp), Y(ytmp), w, h);
+		XSetForeground(dpy, gc, colors[lt + 3]);
+	    }
+	}
+	/*   X11_justify_text(mode) - set text justification mode  */
+	else if (*buffer == 'J')
+	    sscanf(buffer, "J%4d", (int *) &jmode);
+
+	/*  X11_linewidth(width) - set line width */
+	else if (*buffer == 'W')
+	    sscanf(buffer + 1, "%4d", &user_width);
+
+	/*   X11_linetype(type) - set line type  */
+	else if (*buffer == 'L') {
+	    sscanf(buffer, "L%4d", &lt);
+	    lt = (lt % 8) + 2;
+	    /* default width is 0 {which X treats as 1} */
+	    width = widths[lt] ? user_width * widths[lt] : user_width;
+	    if (dashes[lt][0]) {
+		type = LineOnOffDash;
+		XSetDashes(dpy, gc, 0, dashes[lt], strlen(dashes[lt]));
+	    } else {
+		type = LineSolid;
+	    }
+	    XSetForeground(dpy, gc, colors[lt + 3]);
+	    XSetLineAttributes(dpy, gc, width, type, CapButt, JoinBevel);
+	}
+	/*   X11_point(number) - draw a point */
+	else if (*buffer == 'P') {
+	    /* linux sscanf does not like %1d%4d%4d" with Oxxxxyyyy */
+	    /* sscanf(buffer, "P%1d%4d%4d", &point, &x, &y); */
+	    point = buffer[1] - '0';
+	    sscanf(buffer + 2, "%4d%4d", &x, &y);
+	    if (point == 7) {
+		/* set point size */
+		px = (int) (x * xscale * pointsize);
+		py = (int) (y * yscale * pointsize);
+	    } else {
+		if (type != LineSolid || width != 0) {	/* select solid line */
+		    XSetLineAttributes(dpy, gc, 0, LineSolid, CapButt, JoinBevel);
 		}
+		switch (point) {
+		case 0:	/* dot */
+		    XDrawPoint(dpy, plot->pixmap, gc, X(x), Y(y));
+		    break;
+		case 1:	/* do diamond */
+		    Diamond[0].x = (short) X(x) - px;
+		    Diamond[0].y = (short) Y(y);
+		    Diamond[1].x = (short) px;
+		    Diamond[1].y = (short) -py;
+		    Diamond[2].x = (short) px;
+		    Diamond[2].y = (short) py;
+		    Diamond[3].x = (short) -px;
+		    Diamond[3].y = (short) py;
+		    Diamond[4].x = (short) -px;
+		    Diamond[4].y = (short) -py;
+
+		    /*
+		     * Should really do a check with XMaxRequestSize()
+		     */
+		    XDrawLines(dpy, plot->pixmap, gc, Diamond, 5, CoordModePrevious);
+		    XDrawPoint(dpy, plot->pixmap, gc, X(x), Y(y));
+		    break;
+		case 2:	/* do plus */
+		    Plus[0].x1 = (short) X(x) - px;
+		    Plus[0].y1 = (short) Y(y);
+		    Plus[0].x2 = (short) X(x) + px;
+		    Plus[0].y2 = (short) Y(y);
+		    Plus[1].x1 = (short) X(x);
+		    Plus[1].y1 = (short) Y(y) - py;
+		    Plus[1].x2 = (short) X(x);
+		    Plus[1].y2 = (short) Y(y) + py;
+
+		    XDrawSegments(dpy, plot->pixmap, gc, Plus, 2);
+		    break;
+		case 3:	/* do box */
+		    XDrawRectangle(dpy, plot->pixmap, gc, X(x) - px, Y(y) - py, (px + px), (py + py));
+		    XDrawPoint(dpy, plot->pixmap, gc, X(x), Y(y));
+		    break;
+		case 4:	/* do X */
+		    Cross[0].x1 = (short) X(x) - px;
+		    Cross[0].y1 = (short) Y(y) - py;
+		    Cross[0].x2 = (short) X(x) + px;
+		    Cross[0].y2 = (short) Y(y) + py;
+		    Cross[1].x1 = (short) X(x) - px;
+		    Cross[1].y1 = (short) Y(y) + py;
+		    Cross[1].x2 = (short) X(x) + px;
+		    Cross[1].y2 = (short) Y(y) - py;
+
+		    XDrawSegments(dpy, plot->pixmap, gc, Cross, 2);
+		    break;
+		case 5:	/* do triangle */
+		    {
+			short temp_x, temp_y;
+
+			temp_x = (short) (1.33 * (double) px + 0.5);
+			temp_y = (short) (1.33 * (double) py + 0.5);
+
+			Triangle[0].x = (short) X(x);
+			Triangle[0].y = (short) Y(y) - temp_y;
+			Triangle[1].x = (short) temp_x;
+			Triangle[1].y = (short) 2 *py;
+			Triangle[2].x = (short) -(2 * temp_x);
+			Triangle[2].y = (short) 0;
+			Triangle[3].x = (short) temp_x;
+			Triangle[3].y = (short) -(2 * py);
+
+			XDrawLines(dpy, plot->pixmap, gc, Triangle, 4, CoordModePrevious);
+			XDrawPoint(dpy, plot->pixmap, gc, X(x), Y(y));
+		    }
+		    break;
+		case 6:	/* do star */
+		    Star[0].x1 = (short) X(x) - px;
+		    Star[0].y1 = (short) Y(y);
+		    Star[0].x2 = (short) X(x) + px;
+		    Star[0].y2 = (short) Y(y);
+		    Star[1].x1 = (short) X(x);
+		    Star[1].y1 = (short) Y(y) - py;
+		    Star[1].x2 = (short) X(x);
+		    Star[1].y2 = (short) Y(y) + py;
+		    Star[2].x1 = (short) X(x) - px;
+		    Star[2].y1 = (short) Y(y) - py;
+		    Star[2].x2 = (short) X(x) + px;
+		    Star[2].y2 = (short) Y(y) + py;
+		    Star[3].x1 = (short) X(x) - px;
+		    Star[3].y1 = (short) Y(y) + py;
+		    Star[3].x2 = (short) X(x) + px;
+		    Star[3].y2 = (short) Y(y) - py;
+
+		    XDrawSegments(dpy, plot->pixmap, gc, Star, 4);
+		    break;
+		}
+		if (type != LineSolid || width != 0) {	/* select solid line */
+		    XSetLineAttributes(dpy, gc, width, type, CapButt, JoinBevel);
+		}
+	    }
 	}
-      /*   X11_justify_text(mode) - set text justification mode  */
-      else if (*buf == 'J') 
-	 sscanf(buf, "J%4d", &jmode);
+    }
 
-      /*  X11_linewidth(width) - set line width */
-      else if (*buf == 'W')
-	 sscanf(buf+1, "%4d", &user_width);	
+    /* set new pixmap as window background */
+    XSetWindowBackgroundPixmap(dpy, plot->window, plot->pixmap);
 
-      /*   X11_linetype(type) - set line type  */
-      else if (*buf == 'L') { 
-	 sscanf(buf, "L%4d", &lt);
-	 lt = (lt%8)+2;
-     /* default width is 0 {which X treats as 1} */
-	 width = widths[lt] ? user_width * widths[lt] : user_width;
-	 if (dashes[lt][0]) {
-	    type = LineOnOffDash;
-	    XSetDashes(dpy, gc, 0, dashes[lt], strlen(dashes[lt]));
-	    }
-	 else {
-	    type = LineSolid;
-	    }
-	 XSetForeground(dpy, gc, colors[lt+3]);
-	 XSetLineAttributes( dpy,gc, width, type, CapButt, JoinBevel);
-  	 }
+    /* trigger exposure of background pixmap */
+    XClearWindow(dpy, plot->window);
 
-      /*   X11_point(number) - draw a point */
-      else if (*buf == 'P') {
-      	/* linux sscanf does not like %1d%4d%4d" with Oxxxxyyyy */
- 	 /* sscanf(buf, "P%1d%4d%4d", &point, &x, &y); */
-	 point = buf[1] - '0';
-	 sscanf(buf+2, "%4d%4d", &x, &y);  
- 	 if (point==7) {
- 	    /* set point size */
- 	    px = (int) (x * xscale * pointsize);
- 	    py = (int) (y * yscale * pointsize);
- 	    }
- 	 else {
-	    if (type != LineSolid || width != 0) {  /* select solid line */
-	       XSetLineAttributes(dpy, gc, 0, LineSolid, CapButt, JoinBevel);
-	       }
-	    switch(point) {
-	       case 0: /* dot */
-		   XDrawPoint(dpy,plot->pixmap,gc, X(x), Y(y));
-		   break;
-	       case 1: /* do diamond */ 
-		 Diamond[0].x = (short) X(x) - px;
-		 Diamond[0].y = (short) Y(y); 
-		 Diamond[1].x = (short) px;
-		 Diamond[1].y = (short) -py;
-		 Diamond[2].x = (short) px;
-		 Diamond[2].y = (short) py;
-		 Diamond[3].x = (short) -px;
-		 Diamond[3].y = (short) py;
-		 Diamond[4].x = (short) -px;
-		 Diamond[4].y = (short) -py;
-		 
-		 /*
-		  * Should really do a check with XMaxRequestSize()
-		  */
-		 XDrawLines(dpy,plot->pixmap,gc, Diamond, 5, CoordModePrevious);
-		 XDrawPoint(dpy,plot->pixmap,gc, X(x), Y(y));
-		 break;
-	       case 2: /* do plus */ 
-		 Plus[0].x1 = (short) X(x) - px;
-		 Plus[0].y1 = (short) Y(y);
-		 Plus[0].x2 = (short) X(x) + px;
-		 Plus[0].y2 = (short) Y(y);
-		 Plus[1].x1 = (short) X(x);
-		 Plus[1].y1 = (short) Y(y) - py;
-		 Plus[1].x2 = (short) X(x);
-		 Plus[1].y2 = (short) Y(y) + py;
-
-		 XDrawSegments(dpy,plot->pixmap,gc, Plus, 2);
-		 break;
-	       case 3: /* do box */ 
-		 XDrawRectangle(dpy,plot->pixmap,gc, X(x)-px, Y(y)-py, (px+px), (py+py));
-		 XDrawPoint(dpy,plot->pixmap,gc, X(x), Y(y));
-		 break;
-	       case 4: /* do X */ 
-		 Cross[0].x1 = (short) X(x) - px;
-		 Cross[0].y1 = (short) Y(y) - py;
-		 Cross[0].x2 = (short) X(x) + px;
-		 Cross[0].y2 = (short) Y(y) + py;
-		 Cross[1].x1 = (short) X(x) - px;
-		 Cross[1].y1 = (short) Y(y) + py;
-		 Cross[1].x2 = (short) X(x) + px;
-		 Cross[1].y2 = (short) Y(y) - py;
-
-		 XDrawSegments(dpy,plot->pixmap,gc, Cross, 2);
-		 break;
-	       case 5: /* do triangle */ 
-		 {
-		   short temp_x, temp_y;
-
-		   temp_x = (short) (1.33 * (double) px + 0.5);
-		   temp_y = (short) (1.33 * (double) py + 0.5);
-
-		   Triangle[0].x = (short) X(x);
-		   Triangle[0].y = (short) Y(y) - temp_y;
-		   Triangle[1].x = (short) temp_x; 
-		   Triangle[1].y = (short) 2 * py;
-		   Triangle[2].x = (short) -(2 * temp_x);
-		   Triangle[2].y = (short) 0;
-		   Triangle[3].x = (short) temp_x;
-		   Triangle[3].y = (short) -(2 * py);
-		   
-		   XDrawLines(dpy,plot->pixmap,gc, Triangle, 4, CoordModePrevious);
-		   XDrawPoint(dpy,plot->pixmap,gc, X(x), Y(y));
-		 }
-		 break;
-	       case 6: /* do star */ 
-		 Star[0].x1 = (short) X(x) - px;
-		 Star[0].y1 = (short) Y(y);
-		 Star[0].x2 = (short) X(x) + px;
-		 Star[0].y2 = (short) Y(y);
-		 Star[1].x1 = (short) X(x);
-		 Star[1].y1 = (short) Y(y) - py;
-		 Star[1].x2 = (short) X(x);
-		 Star[1].y2 = (short) Y(y) + py;
-		 Star[2].x1 = (short) X(x) - px;
-		 Star[2].y1 = (short) Y(y) - py;
-		 Star[2].x2 = (short) X(x) + px;
-		 Star[2].y2 = (short) Y(y) + py;
-		 Star[3].x1 = (short) X(x) - px;
-		 Star[3].y1 = (short) Y(y) + py;
-		 Star[3].x2 = (short) X(x) + px;
-		 Star[3].y2 = (short) Y(y) - py;
-
-		 XDrawSegments(dpy,plot->pixmap,gc, Star, 4);
-		 break;
-	       }
-	    if (type != LineSolid || width != 0) {  /* select solid line */
-	       XSetLineAttributes(dpy, gc, width, type, CapButt, JoinBevel);
-	       }
-	    }
-	 }
-      }
-
-   /* set new pixmap as window background */
-   XSetWindowBackgroundPixmap(dpy, plot->window, plot->pixmap);
-
-   /* trigger exposure of background pixmap */
-   XClearWindow(dpy,plot->window);
-   
 #ifdef EXPORT_SELECTION
-	export_graph(plot);
+    export_graph(plot);
 #endif
 
-   XFlush(dpy);
-   }
+    XFlush(dpy);
+}
 
 /*---------------------------------------------------------------------------
  *  reset all cursors (since we dont have a record of the previous terminal #)
@@ -1003,22 +1009,20 @@ plot_struct *plot;
 
 void reset_cursor()
 {
-      	int plot_number;
-      	plot_struct *plot = plot_array;
+    int plot_number;
+    plot_struct *plot = plot_array;
 
-      	for (plot_number=0, plot = plot_array;
-      	plot_number < MAX_WINDOWS;
-      		++plot_number, ++plot)
-      	{
-      		if (plot->window)
-      		{
-      			FPRINTF((stderr,"Window for plot %d exists\n", plot_number));
-      			XUndefineCursor(dpy,plot->window);;
-      		}
-      	}
+    for (plot_number = 0, plot = plot_array;
+	 plot_number < MAX_WINDOWS;
+	 ++plot_number, ++plot) {
+	if (plot->window) {
+	    FPRINTF((stderr, "Window for plot %d exists\n", plot_number));
+	    XUndefineCursor(dpy, plot->window);;
+	}
+    }
 
-      	FPRINTF((stderr,"Cursors reset\n"));
-      	return;
+    FPRINTF((stderr, "Cursors reset\n"));
+    return;
 }
 
 /*-----------------------------------------------------------------------------
@@ -1028,82 +1032,77 @@ void reset_cursor()
 plot_struct *find_plot(window)
 Window window;
 {
-	int plot_number;
-	plot_struct *plot = plot_array;
+    int plot_number;
+    plot_struct *plot = plot_array;
 
-	for (plot_number=0, plot = plot_array;
-	     plot_number < MAX_WINDOWS;
-	     ++plot_number, ++plot)
-	{
-		if (plot->window == window)
-		{
-			FPRINTF((stderr,"Event for plot %d\n", plot_number));
-			return plot;
-		}
+    for (plot_number = 0, plot = plot_array;
+	 plot_number < MAX_WINDOWS;
+	 ++plot_number, ++plot) {
+	if (plot->window == window) {
+	    FPRINTF((stderr, "Event for plot %d\n", plot_number));
+	    return plot;
 	}
-	
-	FPRINTF((stderr,"Bogus window 0x%x in event !\n", window));
-	return NULL;
+    }
+
+    FPRINTF((stderr, "Bogus window 0x%x in event !\n", window));
+    return NULL;
 }
 
 void process_event(event)
 XEvent *event;
 {
-	FPRINTF((stderr,"Event 0x%x\n", event->type));
+    FPRINTF((stderr, "Event 0x%x\n", event->type));
 
-	switch (event->type)
+    switch (event->type) {
+    case ConfigureNotify:
 	{
-		case ConfigureNotify:
-		{
-			plot_struct *plot = find_plot(event->xconfigure.window);
-			if (plot)
-			{
-				int w = event->xconfigure.width, h = event->xconfigure.height;
+	    plot_struct *plot = find_plot(event->xconfigure.window);
+	    if (plot) {
+		int w = event->xconfigure.width, h = event->xconfigure.height;
 
-				/* store settings in case window is closed then recreated */
-   			plot->x = event->xconfigure.x;
-   			plot->y = event->xconfigure.y;
-   			plot->posn_flags = (plot->posn_flags & ~PPosition) | USPosition;
-   			
-				if (w>1 && h>1 && (w != plot->width || h != plot->height)) {
-					plot->width = w;
-					plot->height = h;
-					plot->posn_flags = (plot->posn_flags & ~PSize) | USSize;
-					if (plot->pixmap)
-					{
-						/* it is the wrong size now */
-						FPRINTF((stderr,"Free pixmap %d\n", 0));
-						XFreePixmap(dpy, plot->pixmap);
-						plot->pixmap = None;
-					}
-					display(plot);
-				}
-			}
-			break;
+		/* store settings in case window is closed then recreated */
+		plot->x = event->xconfigure.x;
+		plot->y = event->xconfigure.y;
+		plot->posn_flags = (plot->posn_flags & ~PPosition) | USPosition;
+
+		if (w > 1 && h > 1 && (w != plot->width || h != plot->height)) {
+		    plot->width = w;
+		    plot->height = h;
+		    plot->posn_flags = (plot->posn_flags & ~PSize) | USSize;
+		    if (plot->pixmap) {
+			/* it is the wrong size now */
+			FPRINTF((stderr, "Free pixmap %d\n", 0));
+			XFreePixmap(dpy, plot->pixmap);
+			plot->pixmap = None;
+		    }
+		    display(plot);
 		}
-		case KeyPress:
-			if (event->xkey.keycode == q_keycode)
-			{
-				plot_struct *plot = find_plot(event->xkey.window);
-				if (plot) delete_plot(plot);
-			}
-			break;
-		case ClientMessage:
-			if (event->xclient.message_type == WM_PROTOCOLS &&
-			    event->xclient.format == 32 &&
-			    event->xclient.data.l[0] == WM_DELETE_WINDOW)
-			{
-				plot_struct *plot = find_plot(event->xclient.window);
-				if (plot) delete_plot(plot);
-			}
-			break;
-#ifdef EXPORT_SELECTION
-		case SelectionNotify:
-		case SelectionRequest:
-			handle_selection_event(event);
-			break;
-#endif
+	    }
+	    break;
 	}
+    case KeyPress:
+	if (event->xkey.keycode == q_keycode) {
+	    plot_struct *plot = find_plot(event->xkey.window);
+	    if (plot)
+		delete_plot(plot);
+	}
+	break;
+    case ClientMessage:
+	if (event->xclient.message_type == WM_PROTOCOLS &&
+	    event->xclient.format == 32 &&
+	    event->xclient.data.l[0] == WM_DELETE_WINDOW) {
+	    plot_struct *plot = find_plot(event->xclient.window);
+	    if (plot)
+		delete_plot(plot);
+	}
+	break;
+#ifdef EXPORT_SELECTION
+    case SelectionNotify:
+    case SelectionRequest:
+	handle_selection_event(event);
+	break;
+#endif
+    }
 }
 
 /*-----------------------------------------------------------------------------
@@ -1119,395 +1118,420 @@ XEvent *event;
 #define MAXHOSTNAMELEN 64
 #endif
 
-static XrmDatabase dbCmd, dbApp, dbDef, dbEnv, db = (XrmDatabase)0;
+static XrmDatabase dbCmd, dbApp, dbDef, dbEnv, db = (XrmDatabase) 0;
 
 char *pr_GetR(), *getenv(), *type[20];
 XrmValue value;
 
 static XrmOptionDescRec options[] = {
-   {"-mono",             ".mono",             XrmoptionNoArg,   (caddr_t) "on" },
-   {"-gray",             ".gray",             XrmoptionNoArg,   (caddr_t) "on" },
-   {"-clear",            ".clear",            XrmoptionNoArg,   (caddr_t) "on" },
-   {"-tvtwm",            ".tvtwm",            XrmoptionNoArg,   (caddr_t) "on" },
-   {"-pointsize",        ".pointsize",        XrmoptionSepArg,  (caddr_t) NULL },
-   {"-display",          ".display",          XrmoptionSepArg,  (caddr_t) NULL },
-   {"-name",             ".name",             XrmoptionSepArg,  (caddr_t) NULL },
-   {"-geometry",         "*geometry",         XrmoptionSepArg,  (caddr_t) NULL },
-   {"-background",       "*background",       XrmoptionSepArg,  (caddr_t) NULL },
-   {"-bg",               "*background",       XrmoptionSepArg,  (caddr_t) NULL },
-   {"-foreground",       "*foreground",       XrmoptionSepArg,  (caddr_t) NULL },
-   {"-fg",               "*foreground",       XrmoptionSepArg,  (caddr_t) NULL },
-   {"-bordercolor",      "*bordercolor",      XrmoptionSepArg,  (caddr_t) NULL },
-   {"-bd",               "*bordercolor",      XrmoptionSepArg,  (caddr_t) NULL },
-   {"-borderwidth",      ".borderwidth",      XrmoptionSepArg,  (caddr_t) NULL },
-   {"-bw",               ".borderwidth",      XrmoptionSepArg,  (caddr_t) NULL },
-   {"-font",             "*font",             XrmoptionSepArg,  (caddr_t) NULL },
-   {"-fn",               "*font",             XrmoptionSepArg,  (caddr_t) NULL },
-   {"-reverse",          "*reverseVideo",     XrmoptionNoArg,   (caddr_t) "on" },
-   {"-rv",               "*reverseVideo",     XrmoptionNoArg,   (caddr_t) "on" },
-   {"+rv",               "*reverseVideo",     XrmoptionNoArg,   (caddr_t) "off"},
-   {"-iconic",           "*iconic",           XrmoptionNoArg,   (caddr_t) "on" },
-   {"-synchronous",      "*synchronous",      XrmoptionNoArg,   (caddr_t) "on" },
-   {"-xnllanguage",      "*xnllanguage",      XrmoptionSepArg,  (caddr_t) NULL },
-   {"-selectionTimeout", "*selectionTimeout", XrmoptionSepArg,  (caddr_t) NULL },
-   {"-title",            ".title",            XrmoptionSepArg,  (caddr_t) NULL },
-   {"-xrm",              NULL,                XrmoptionResArg,  (caddr_t) NULL },
-   {"-raise",            "*raise",            XrmoptionNoArg,   (caddr_t) "on" },
-   {"-noraise",          "*raise",            XrmoptionNoArg,   (caddr_t) "off" },
-   {"-persist",          "*persist",          XrmoptionNoArg,   (caddr_t) "on" }
+    {"-mono", ".mono", XrmoptionNoArg, (caddr_t) "on"},
+    {"-gray", ".gray", XrmoptionNoArg, (caddr_t) "on"},
+    {"-clear", ".clear", XrmoptionNoArg, (caddr_t) "on"},
+    {"-tvtwm", ".tvtwm", XrmoptionNoArg, (caddr_t) "on"},
+    {"-pointsize", ".pointsize", XrmoptionSepArg, (caddr_t) NULL},
+    {"-display", ".display", XrmoptionSepArg, (caddr_t) NULL},
+    {"-name", ".name", XrmoptionSepArg, (caddr_t) NULL},
+    {"-geometry", "*geometry", XrmoptionSepArg, (caddr_t) NULL},
+    {"-background", "*background", XrmoptionSepArg, (caddr_t) NULL},
+    {"-bg", "*background", XrmoptionSepArg, (caddr_t) NULL},
+    {"-foreground", "*foreground", XrmoptionSepArg, (caddr_t) NULL},
+    {"-fg", "*foreground", XrmoptionSepArg, (caddr_t) NULL},
+    {"-bordercolor", "*bordercolor", XrmoptionSepArg, (caddr_t) NULL},
+    {"-bd", "*bordercolor", XrmoptionSepArg, (caddr_t) NULL},
+    {"-borderwidth", ".borderwidth", XrmoptionSepArg, (caddr_t) NULL},
+    {"-bw", ".borderwidth", XrmoptionSepArg, (caddr_t) NULL},
+    {"-font", "*font", XrmoptionSepArg, (caddr_t) NULL},
+    {"-fn", "*font", XrmoptionSepArg, (caddr_t) NULL},
+    {"-reverse", "*reverseVideo", XrmoptionNoArg, (caddr_t) "on"},
+    {"-rv", "*reverseVideo", XrmoptionNoArg, (caddr_t) "on"},
+    {"+rv", "*reverseVideo", XrmoptionNoArg, (caddr_t) "off"},
+    {"-iconic", "*iconic", XrmoptionNoArg, (caddr_t) "on"},
+    {"-synchronous", "*synchronous", XrmoptionNoArg, (caddr_t) "on"},
+    {"-xnllanguage", "*xnllanguage", XrmoptionSepArg, (caddr_t) NULL},
+    {"-selectionTimeout", "*selectionTimeout", XrmoptionSepArg, (caddr_t) NULL},
+    {"-title", ".title", XrmoptionSepArg, (caddr_t) NULL},
+    {"-xrm", NULL, XrmoptionResArg, (caddr_t) NULL},
+    {"-raise", "*raise", XrmoptionNoArg, (caddr_t) "on"},
+    {"-noraise", "*raise", XrmoptionNoArg, (caddr_t) "off"},
+    {"-persist", "*persist", XrmoptionNoArg, (caddr_t) "on"}
 };
 
 #define Nopt (sizeof(options) / sizeof(options[0]))
 
-void preset(argc, argv) int argc; char *argv[]; {
-   int Argc = argc; char **Argv = argv;
+void preset(argc, argv)
+int argc;
+char *argv[];
+{
+    int Argc = argc;
+    char **Argv = argv;
 
 #ifdef VMS
-   char *display = (char *) 0;
+    char *ldisplay = (char *) 0;
 #else
-   char *display = getenv("DISPLAY");
+    char *ldisplay = getenv("DISPLAY");
 #endif
-   char *home = getenv("HOME");
-   char *server_defaults, *env, buf[256];
+    char *home = getenv("HOME");
+    char *server_defaults, *env, buffer[256];
 
-   /* avoid bus error when env vars are not set */
-   if(display==NULL) display="";
-   if(home==NULL) home="";
+    /* avoid bus error when env vars are not set */
+    if (ldisplay == NULL)
+	ldisplay = "";
+    if (home == NULL)
+	home = "";
 
-   /*---set to ignore ^C and ^Z----------------------------------------------*/
+/*---set to ignore ^C and ^Z----------------------------------------------*/
 
-   signal(SIGINT, SIG_IGN);
+    signal(SIGINT, SIG_IGN);
 #ifdef SIGTSTP
-   signal(SIGTSTP, SIG_IGN);
+    signal(SIGTSTP, SIG_IGN);
 #endif
 
-   /*---prescan arguments for "-name"----------------------------------------*/
+/*---prescan arguments for "-name"----------------------------------------*/
 
-   while(++Argv, --Argc > 0) {
-      if (!strcmp(*Argv, "-name") && Argc > 1) {
-	 strncpy(Name, Argv[1], 64);
-	 strncpy(Class, Argv[1], 64);
-	 if (Class[0] >= 'a' && Class[0] <= 'z') Class[0] -= 0x20;
-	 }
-      }
-   Argc = argc; Argv = argv;
+    while (++Argv, --Argc > 0) {
+	if (!strcmp(*Argv, "-name") && Argc > 1) {
+	    strncpy(Name, Argv[1], 64);
+	    strncpy(Class, Argv[1], 64);
+	    if (Class[0] >= 'a' && Class[0] <= 'z')
+		Class[0] -= 0x20;
+	}
+    }
+    Argc = argc;
+    Argv = argv;
 
-   /*---parse command line---------------------------------------------------*/
+/*---parse command line---------------------------------------------------*/
 
-   XrmInitialize();
-   XrmParseCommand(&dbCmd, options, Nopt, Name, &Argc, Argv);
-   if (Argc > 1) {
-      fprintf(stderr, "\ngnuplot: bad option: %s\n", Argv[1]);
-      fprintf(stderr, "gnuplot: X11 aborted.\n");
-      EXIT(1);
-      }
-   if (pr_GetR(dbCmd, ".display")) display = (char *) value.addr;
+    XrmInitialize();
+    XrmParseCommand(&dbCmd, options, Nopt, Name, &Argc, Argv);
+    if (Argc > 1) {
+	fprintf(stderr, "\ngnuplot: bad option: %s\n", Argv[1]);
+	fprintf(stderr, "gnuplot: X11 aborted.\n");
+	EXIT(1);
+    }
+    if (pr_GetR(dbCmd, ".display"))
+	ldisplay = (char *) value.addr;
 
-   /*---open display---------------------------------------------------------*/
+/*---open display---------------------------------------------------------*/
 
-   dpy = XOpenDisplay(display); 
-   if (!dpy) {
-      fprintf(stderr, "\ngnuplot: unable to open display '%s'\n", display);
-      fprintf(stderr, "gnuplot: X11 aborted.\n");
-      EXIT(1);
-      }
-   scr = DefaultScreen(dpy);
-   vis = DefaultVisual(dpy,scr);
-   D = DefaultDepth(dpy,scr);
-   root = DefaultRootWindow(dpy);
-   server_defaults = XResourceManagerString(dpy);
+    dpy = XOpenDisplay(ldisplay);
+    if (!dpy) {
+	fprintf(stderr, "\ngnuplot: unable to open display '%s'\n", ldisplay);
+	fprintf(stderr, "gnuplot: X11 aborted.\n");
+	EXIT(1);
+    }
+    scr = DefaultScreen(dpy);
+    vis = DefaultVisual(dpy, scr);
+    D = DefaultDepth(dpy, scr);
+    root = DefaultRootWindow(dpy);
+    server_defaults = XResourceManagerString(dpy);
 
-   /*---get symcode for key q ---*/
+/*---get symcode for key q ---*/
 
-   q_keycode = XKeysymToKeycode(dpy, XK_q);
+    q_keycode = XKeysymToKeycode(dpy, XK_q);
 
-   /**** atoms we will need later ****/
-   
-	WM_PROTOCOLS = XInternAtom(dpy,"WM_PROTOCOLS", False);
-	WM_DELETE_WINDOW = XInternAtom(dpy,"WM_DELETE_WINDOW", False);
+/**** atoms we will need later ****/
+
+    WM_PROTOCOLS = XInternAtom(dpy, "WM_PROTOCOLS", False);
+    WM_DELETE_WINDOW = XInternAtom(dpy, "WM_DELETE_WINDOW", False);
 
 
-   /*---get application defaults--(subset of Xt processing)------------------*/
+/*---get application defaults--(subset of Xt processing)------------------*/
 
 #ifdef VMS
-   strcpy (buf, "DECW$USER_DEFAULTS:GNUPLOT_X11.INI");
+    strcpy(buffer, "DECW$USER_DEFAULTS:GNUPLOT_X11.INI");
 #else
-#ifdef OS2
+# ifdef OS2
 /* for Xfree86 ... */
-   {
-   char *appdefdir = "XFree86/lib/X11/app-defaults" ;
-   char *xroot = getenv( "X11ROOT" ) ; 
-   sprintf(buf, "%s/%s/%s", xroot, appdefdir, "Gnuplot");
-   }
-#else
-   sprintf(buf, "%s/%s", AppDefDir, "Gnuplot");
-#endif
-#endif
-   dbApp = XrmGetFileDatabase(buf);
-   XrmMergeDatabases(dbApp, &db);
+    {
+	char *appdefdir = "XFree86/lib/X11/app-defaults";
+	char *xroot = getenv("X11ROOT");
+	sprintf(buffer, "%s/%s/%s", xroot, appdefdir, "Gnuplot");
+    }
+# else
+    sprintf(buffer, "%s/%s", AppDefDir, "Gnuplot");
+# endif /* !OS2 */
+#endif /* !VMS */
 
-   /*---get server or ~/.Xdefaults-------------------------------------------*/
+    dbApp = XrmGetFileDatabase(buffer);
+    XrmMergeDatabases(dbApp, &db);
 
-   if (server_defaults)
-      dbDef = XrmGetStringDatabase(server_defaults);
-   else {
+/*---get server or ~/.Xdefaults-------------------------------------------*/
+
+    if (server_defaults)
+	dbDef = XrmGetStringDatabase(server_defaults);
+    else {
 #ifdef VMS
-      strcpy(buf,"DECW$USER_DEFAULTS:DECW$XDEFAULTS.DAT");
+	strcpy(buffer, "DECW$USER_DEFAULTS:DECW$XDEFAULTS.DAT");
 #else
-      sprintf(buf, "%s/.Xdefaults", home);
+	sprintf(buffer, "%s/.Xdefaults", home);
 #endif
-      dbDef = XrmGetFileDatabase(buf);
-      }
-   XrmMergeDatabases(dbDef, &db);
+	dbDef = XrmGetFileDatabase(buffer);
+    }
+    XrmMergeDatabases(dbDef, &db);
 
-   /*---get XENVIRONMENT or  ~/.Xdefaults-hostname---------------------------*/
+/*---get XENVIRONMENT or  ~/.Xdefaults-hostname---------------------------*/
 
 #ifndef VMS
-   if (env = getenv("XENVIRONMENT")) 
-      dbEnv = XrmGetFileDatabase(env);
-   else {
-      char *p, host[MAXHOSTNAMELEN];
+    if ((env = getenv("XENVIRONMENT")) != NULL)
+	dbEnv = XrmGetFileDatabase(env);
+    else {
+	char *p = NULL, host[MAXHOSTNAMELEN];
 
-      if (GP_SYSTEMINFO(host) < 0) {
-         fprintf(stderr, "gnuplot: %s failed. X11 aborted.\n", SYSINFO_METHOD);
-	 EXIT(1);
-	 }
-      if (p = index(host, '.')) *p = '\0';
-      sprintf(buf, "%s/.Xdefaults-%s", home, host);
-      dbEnv = XrmGetFileDatabase(buf);
-      }
-   XrmMergeDatabases(dbEnv, &db);
-#endif   /* not VMS */
+	if (GP_SYSTEMINFO(host) < 0) {
+	    fprintf(stderr, "gnuplot: %s failed. X11 aborted.\n", SYSINFO_METHOD);
+	    EXIT(1);
+	}
+	if ((p = index(host, '.')) != NULL)
+	    *p = '\0';
+	sprintf(buffer, "%s/.Xdefaults-%s", home, host);
+	dbEnv = XrmGetFileDatabase(buffer);
+    }
+    XrmMergeDatabases(dbEnv, &db);
+#endif /* not VMS */
 
-   /*---merge command line options-------------------------------------------*/
+/*---merge command line options-------------------------------------------*/
 
-   XrmMergeDatabases(dbCmd, &db);
+    XrmMergeDatabases(dbCmd, &db);
 
-   /*---set geometry, font, colors, line widths, dash styles, point size-----*/
+/*---set geometry, font, colors, line widths, dash styles, point size-----*/
 
-   pr_geometry();
-   pr_font();
-   pr_color();
-   pr_width();
-   pr_dashes();
-   pr_pointsize();
-	pr_raise();
-	pr_persist();
-   } 
+    pr_geometry();
+    pr_font();
+    pr_color();
+    pr_width();
+    pr_dashes();
+    pr_pointsize();
+    pr_raise();
+    pr_persist();
+}
 
 /*-----------------------------------------------------------------------------
  *   pr_GetR - get resource from database using "-name" option (if any)
  *---------------------------------------------------------------------------*/
 
 char *
-pr_GetR(db, resource) XrmDatabase db; char *resource; {
-   char name[128], class[128], *rc;
+ pr_GetR(xrdb, resource)
+XrmDatabase xrdb;
+char *resource;
+{
+    char name[128], class[128], *rc;
 
-   strcpy(name, Name); strcat(name, resource);
-   strcpy(class, Class); strcat(class, resource);
-   rc = XrmGetResource(db, name, class, type, &value)
-      ? (char *)value.addr 
-      : (char *)0;
-   return(rc);
-   }
+    strcpy(name, Name);
+    strcat(name, resource);
+    strcpy(class, Class);
+    strcat(class, resource);
+    rc = XrmGetResource(xrdb, name, class, type, &value)
+	? (char *) value.addr
+	: (char *) 0;
+    return (rc);
+}
 
 /*-----------------------------------------------------------------------------
  *   pr_color - determine color values
  *---------------------------------------------------------------------------*/
 
-char color_keys[Ncolors][30] =   { 
-   "background", "bordercolor", "text", "border", "axis", 
-   "line1", "line2", "line3",  "line4", 
-   "line5", "line6", "line7",  "line8" 
-   };
-char color_values[Ncolors][30] = { 
-   "white", "black",  "black",  "black",  "black", 
-   "red",   "green",  "blue",   "magenta", 
-   "cyan",  "sienna", "orange", "coral" 
-   };
-char gray_values[Ncolors][30] = { 
-   "black",   "white",  "white",  "gray50", "gray50",
-   "gray100", "gray60", "gray80", "gray40", 
-   "gray90",  "gray50", "gray70", "gray30" 
-   };
+char color_keys[Ncolors][30] = {
+    "background", "bordercolor", "text", "border", "axis",
+    "line1", "line2", "line3", "line4",
+    "line5", "line6", "line7", "line8"
+};
+char color_values[Ncolors][30] = {
+    "white", "black", "black", "black", "black",
+    "red", "green", "blue", "magenta",
+    "cyan", "sienna", "orange", "coral"
+};
+char gray_values[Ncolors][30] = {
+    "black", "white", "white", "gray50", "gray50",
+    "gray100", "gray60", "gray80", "gray40",
+    "gray90", "gray50", "gray70", "gray30"
+};
 
-void pr_color() {
-   unsigned long black = BlackPixel(dpy, scr), white = WhitePixel(dpy,scr);
-   char option[20], color[30], *v, *type; 
-   XColor xcolor;
-   Colormap cmap;
-   double intensity = -1;
-   int n;
+void pr_color()
+{
+    unsigned long black = BlackPixel(dpy, scr), white = WhitePixel(dpy, scr);
+    char option[20], color[30], *v, *ctype;
+    XColor xcolor;
+    Colormap cmap;
+    double intensity = -1;
+    int n;
 
-   pr_GetR(db, ".mono")         && On(value.addr) && Mono++;
-   pr_GetR(db, ".gray")         && On(value.addr) && Gray++;
-   pr_GetR(db, ".reverseVideo") && On(value.addr) && Rv++;
+    pr_GetR(db, ".mono") && On(value.addr) && Mono++;
+    pr_GetR(db, ".gray") && On(value.addr) && Gray++;
+    pr_GetR(db, ".reverseVideo") && On(value.addr) && Rv++;
 
-   if (!Gray && (vis->class == GrayScale || vis->class == StaticGray)) Mono++;
+    if (!Gray && (vis->class == GrayScale || vis->class == StaticGray))
+	Mono++;
 
-   if (!Mono) {
-      cmap = DefaultColormap(dpy, scr);
-      type = (Gray) ? "Gray" : "Color";
+    if (!Mono) {
+	cmap = DefaultColormap(dpy, scr);
+	ctype = (Gray) ? "Gray" : "Color";
 
-      for (n=0; n<Ncolors; n++) {
-	 strcpy(option, ".");
-	 strcat(option, color_keys[n]);
-	 (n > 1) && strcat(option, type);
-	 v = pr_GetR(db, option) 
-	     ? (char *) value.addr
-	     : ((Gray) ? gray_values[n] : color_values[n]);
+	for (n = 0; n < Ncolors; n++) {
+	    strcpy(option, ".");
+	    strcat(option, color_keys[n]);
+	    (n > 1) && strcat(option, ctype);
+	    v = pr_GetR(db, option)
+		? (char *) value.addr
+		: ((Gray) ? gray_values[n] : color_values[n]);
 
-	 if (sscanf(v,"%30[^,],%lf", color, &intensity) == 2) {
-	    if (intensity < 0 || intensity > 1) {
-	       fprintf(stderr, "\ngnuplot: invalid color intensity in '%s'\n",
-                       color);
-	       intensity = 1;
-	       }
+	    if (sscanf(v, "%30[^,],%lf", color, &intensity) == 2) {
+		if (intensity < 0 || intensity > 1) {
+		    fprintf(stderr, "\ngnuplot: invalid color intensity in '%s'\n",
+			    color);
+		    intensity = 1;
+		}
+	    } else {
+		strcpy(color, v);
+		intensity = 1;
 	    }
-	 else { 
-	    strcpy(color, v);
-	    intensity = 1;
-	    }
 
-	 if (!XParseColor(dpy, cmap, color, &xcolor)) {
-	    fprintf(stderr, "\ngnuplot: unable to parse '%s'. Using black.\n",
-                    color);
-	    colors[n] = black;
+	    if (!XParseColor(dpy, cmap, color, &xcolor)) {
+		fprintf(stderr, "\ngnuplot: unable to parse '%s'. Using black.\n",
+			color);
+		colors[n] = black;
+	    } else {
+		xcolor.red *= intensity;
+		xcolor.green *= intensity;
+		xcolor.blue *= intensity;
+		if (XAllocColor(dpy, cmap, &xcolor)) {
+		    colors[n] = xcolor.pixel;
+		} else {
+		    fprintf(stderr, "\ngnuplot: can't allocate '%s'. Using black.\n",
+			    v);
+		    colors[n] = black;
+		}
 	    }
-	 else {
-	    xcolor.red *= intensity;
-	    xcolor.green *= intensity;
-	    xcolor.blue *= intensity;
-	    if (XAllocColor(dpy, cmap, &xcolor)) {
-	       colors[n] = xcolor.pixel;
-	       }
-	    else {
-	       fprintf(stderr, "\ngnuplot: can't allocate '%s'. Using black.\n",
-                        v);
-	       colors[n] = black;
-	       }
-	    }
-	 }
-      }
-   else {
-      colors[0] = (Rv) ? black : white ;
-      for (n=1; n<Ncolors; n++)  colors[n] = (Rv) ? white : black;
-      }
-   }
+	}
+    } else {
+	colors[0] = (Rv) ? black : white;
+	for (n = 1; n < Ncolors; n++)
+	    colors[n] = (Rv) ? white : black;
+    }
+}
 
 /*-----------------------------------------------------------------------------
  *   pr_dashes - determine line dash styles 
  *---------------------------------------------------------------------------*/
 
-char dash_keys[Ndashes][10] =   { 
-   "border", "axis",
-   "line1", "line2", "line3",  "line4", "line5", "line6", "line7",  "line8" 
-   };
+char dash_keys[Ndashes][10] = {
+    "border", "axis",
+    "line1", "line2", "line3", "line4", "line5", "line6", "line7", "line8"
+};
 
-char dash_mono[Ndashes][10] =   { 
-   "0", "16",
-   "0", "42", "13",  "44", "15", "4441", "42",  "13" 
-   };
+char dash_mono[Ndashes][10] = {
+    "0", "16",
+    "0", "42", "13", "44", "15", "4441", "42", "13"
+};
 
-char dash_color[Ndashes][10] =   { 
-   "0", "16",
-   "0", "0", "0", "0", "0", "0", "0", "0" 
-   };
+char dash_color[Ndashes][10] = {
+    "0", "16",
+    "0", "0", "0", "0", "0", "0", "0", "0"
+};
 
-void pr_dashes() {
-   int n, j, l, ok;
-   char option[20], *v; 
-   for (n=0; n<Ndashes; n++) {
-      strcpy(option, ".");
-      strcat(option, dash_keys[n]);
-      strcat(option, "Dashes");
-      v = pr_GetR(db, option) 
-	  ? (char *) value.addr
-	  : ((Mono) ? dash_mono[n] : dash_color[n]);
-      l = strlen(v);
-      if (l == 1 && *v == '0') {
-	 dashes[n][0] = (unsigned char)0;
-	 continue;
-	 }
-      for (ok=0, j=0; j<l; j++) { v[j] >= '1' && v[j] <= '9' && ok++; }
-      if (ok != l || (ok != 2 && ok != 4)) {
-	 fprintf(stderr, "gnuplot: illegal dashes value %s:%s\n", option, v);
-	 dashes[n][0] = (unsigned char)0;
-	 continue;
-	 }
-      for(j=0; j<l; j++) {
-	 dashes[n][j] = (unsigned char) (v[j] - '0');
-	 }
-      dashes[n][l] = (unsigned char)0;
-      }
-   }
+void pr_dashes()
+{
+    int n, j, l, ok;
+    char option[20], *v;
+
+    for (n = 0; n < Ndashes; n++) {
+	strcpy(option, ".");
+	strcat(option, dash_keys[n]);
+	strcat(option, "Dashes");
+	v = pr_GetR(db, option)
+	    ? (char *) value.addr
+	    : ((Mono) ? dash_mono[n] : dash_color[n]);
+	l = strlen(v);
+	if (l == 1 && *v == '0') {
+	    dashes[n][0] = (unsigned char) 0;
+	    continue;
+	}
+	for (ok = 0, j = 0; j < l; j++) {
+	    v[j] >= '1' && v[j] <= '9' && ok++;
+	}
+	if (ok != l || (ok != 2 && ok != 4)) {
+	    fprintf(stderr, "gnuplot: illegal dashes value %s:%s\n", option, v);
+	    dashes[n][0] = (unsigned char) 0;
+	    continue;
+	}
+	for (j = 0; j < l; j++) {
+	    dashes[n][j] = (unsigned char) (v[j] - '0');
+	}
+	dashes[n][l] = (unsigned char) 0;
+    }
+}
 
 /*-----------------------------------------------------------------------------
  *   pr_font - determine font          
  *---------------------------------------------------------------------------*/
 
-void pr_font() {
-   char *fontname = pr_GetR(db, ".font");
+void pr_font()
+{
+    char *fontname = pr_GetR(db, ".font");
 
-   if (!fontname) fontname = FallbackFont;
-   font = XLoadQueryFont(dpy, fontname);
-   if (!font) {
-      fprintf(stderr, "\ngnuplot: can't load font '%s'\n", fontname);
-      fprintf(stderr, "gnuplot: using font '%s' instead.\n", FallbackFont);
-      font = XLoadQueryFont(dpy, FallbackFont);
-      if (!font) {
-	 fprintf(stderr, "gnuplot: can't load font '%s'\n", FallbackFont);
-	 fprintf(stderr, "gnuplot: no useable font - X11 aborted.\n");
-         EXIT(1);
-	 }
-      }
-   vchar = font->ascent + font->descent;
-   }
+    if (!fontname)
+	fontname = FallbackFont;
+    font = XLoadQueryFont(dpy, fontname);
+    if (!font) {
+	fprintf(stderr, "\ngnuplot: can't load font '%s'\n", fontname);
+	fprintf(stderr, "gnuplot: using font '%s' instead.\n", FallbackFont);
+	font = XLoadQueryFont(dpy, FallbackFont);
+	if (!font) {
+	    fprintf(stderr, "gnuplot: can't load font '%s'\n", FallbackFont);
+	    fprintf(stderr, "gnuplot: no useable font - X11 aborted.\n");
+	    EXIT(1);
+	}
+    }
+    vchar = font->ascent + font->descent;
+}
 
 /*-----------------------------------------------------------------------------
  *   pr_geometry - determine window geometry      
  *---------------------------------------------------------------------------*/
 
-void pr_geometry() {
-   char *geometry = pr_GetR(db, ".geometry");
-   int x, y, flags;
-   unsigned int w, h; 
+void pr_geometry()
+{
+    char *geometry = pr_GetR(db, ".geometry");
+    int x, y, flags;
+    unsigned int w, h;
 
-   if (geometry) {
-      flags = XParseGeometry(geometry, &x, &y, &w, &h);
-      if (flags & WidthValue)  gW = w;
-      if (flags & HeightValue) gH = h;
-		if (flags & (WidthValue | HeightValue))
-			gFlags = (gFlags & ~PSize) | USSize;
+    if (geometry) {
+	flags = XParseGeometry(geometry, &x, &y, &w, &h);
+	if (flags & WidthValue)
+	    gW = w;
+	if (flags & HeightValue)
+	    gH = h;
+	if (flags & (WidthValue | HeightValue))
+	    gFlags = (gFlags & ~PSize) | USSize;
 
-      if (flags & XValue)
-         gX = (flags & XNegative) ? x + DisplayWidth(dpy,scr) - gW - BorderWidth*2 : x;
+	if (flags & XValue)
+	    gX = (flags & XNegative) ? x + DisplayWidth(dpy, scr) - gW - BorderWidth * 2 : x;
 
-      if (flags & YValue)
-         gY = (flags & YNegative) ? y + DisplayHeight(dpy,scr) - gH - BorderWidth*2 : y;
+	if (flags & YValue)
+	    gY = (flags & YNegative) ? y + DisplayHeight(dpy, scr) - gH - BorderWidth * 2 : y;
 
-		if (flags & (XValue | YValue))
-         gFlags = (gFlags & ~PPosition) | USPosition;
-	}
+	if (flags & (XValue | YValue))
+	    gFlags = (gFlags & ~PPosition) | USPosition;
+    }
 }
 
 /*-----------------------------------------------------------------------------
  *   pr_pointsize - determine size of points for 'points' plotting style
  *---------------------------------------------------------------------------*/
 
-void pr_pointsize() {
+void pr_pointsize()
+{
     if (pr_GetR(db, ".pointsize")) {
-	if (sscanf( (char *) value.addr,"%lf", &pointsize) == 1) {
+	if (sscanf((char *) value.addr, "%lf", &pointsize) == 1) {
 	    if (pointsize <= 0 || pointsize > 10) {
 		fprintf(stderr, "\ngnuplot: invalid pointsize '%s'\n", value.addr);
 		pointsize = 1;
 	    }
-	} else { 
+	} else {
 	    fprintf(stderr, "\ngnuplot: invalid pointsize '%s'\n", value.addr);
 	    pointsize = 1;
 	}
     } else {
-    	pointsize=1;
+	pointsize = 1;
     }
 }
 
@@ -1515,26 +1539,28 @@ void pr_pointsize() {
  *   pr_width - determine line width values
  *---------------------------------------------------------------------------*/
 
-char width_keys[Nwidths][30] =   { 
-   "border", "axis",
-   "line1", "line2", "line3",  "line4", "line5", "line6", "line7",  "line8" 
-   };
+char width_keys[Nwidths][30] = {
+    "border", "axis",
+    "line1", "line2", "line3", "line4", "line5", "line6", "line7", "line8"
+};
 
-void pr_width() {
-   int n;
-   char option[20], *v; 
-   for (n=0; n<Nwidths; n++) {
-      strcpy(option, ".");
-      strcat(option, width_keys[n]);
-      strcat(option, "Width");
-      if (v = pr_GetR(db, option)) {
-	 if ( *v < '0' || *v > '4' || strlen(v) > 1)
-	    fprintf(stderr, "gnuplot: illegal width value %s:%s\n", option, v);
-	 else 
-	    widths[n] = (unsigned int)atoi(v);
-	 }
-      }
-   }
+void pr_width()
+{
+    int n;
+    char option[20], *v;
+
+    for (n = 0; n < Nwidths; n++) {
+	strcpy(option, ".");
+	strcat(option, width_keys[n]);
+	strcat(option, "Width");
+	if ((v = pr_GetR(db, option)) != NULL) {
+	    if (*v < '0' || *v > '4' || strlen(v) > 1)
+		fprintf(stderr, "gnuplot: illegal width value %s:%s\n", option, v);
+	    else
+		widths[n] = (unsigned int) atoi(v);
+	}
+    }
+}
 
 /*-----------------------------------------------------------------------------
  *   pr_window - create window 
@@ -1542,64 +1568,66 @@ void pr_width() {
 
 Window pr_window(flags, x, y, width, height)
 unsigned int flags;
-int x,y;
+int x, y;
 unsigned int width, height;
 {
-   char *title =  pr_GetR(db, ".title");
-   static XSizeHints hints;
-   int Tvtwm = 0;
+    char *title = pr_GetR(db, ".title");
+    static XSizeHints hints;
+    int Tvtwm = 0;
 
-   Window win = XCreateSimpleWindow(dpy, root, x, y, width, height, BorderWidth,
-                             colors[1], colors[0]);
+    Window win = XCreateSimpleWindow(dpy, root, x, y, width, height, BorderWidth,
+				     colors[1], colors[0]);
 
-   /* ask ICCCM-compliant window manager to tell us when close window
-    * has been chosen, rather than just killing us
-    */
+    /* ask ICCCM-compliant window manager to tell us when close window
+     * has been chosen, rather than just killing us
+     */
 
-   XChangeProperty(dpy, win, WM_PROTOCOLS, XA_ATOM, 32, PropModeReplace,
-	  (unsigned char *)&WM_DELETE_WINDOW, 1);
+    XChangeProperty(dpy, win, WM_PROTOCOLS, XA_ATOM, 32, PropModeReplace,
+		    (unsigned char *) &WM_DELETE_WINDOW, 1);
 
-   pr_GetR(db, ".clear") && On(value.addr) && Clear++;
-   pr_GetR(db, ".tvtwm") && On(value.addr) && Tvtwm++;
+    pr_GetR(db, ".clear") && On(value.addr) && Clear++;
+    pr_GetR(db, ".tvtwm") && On(value.addr) && Tvtwm++;
 
-   if (!Tvtwm) {
-      hints.flags = flags;
-      }
-   else {
-      hints.flags = flags & ~USPosition | PPosition; /* ? */
-      }
-   hints.x = gX; hints.y = gY;        
-   hints.width = width; hints.height = height;
+    if (!Tvtwm) {
+	hints.flags = flags;
+    } else {
+	hints.flags = (flags & ~USPosition) | PPosition;	/* ? */
+    }
+    hints.x = gX;
+    hints.y = gY;
+    hints.width = width;
+    hints.height = height;
 
-   XSetNormalHints(dpy, win, &hints);
+    XSetNormalHints(dpy, win, &hints);
 
-   if (pr_GetR(db, ".iconic") && On(value.addr)) {
-      XWMHints wmh;
+    if (pr_GetR(db, ".iconic") && On(value.addr)) {
+	XWMHints wmh;
 
-      wmh.flags = StateHint ;
-      wmh.initial_state = IconicState;
-      XSetWMHints(dpy, win, &wmh);
-      } 
+	wmh.flags = StateHint;
+	wmh.initial_state = IconicState;
+	XSetWMHints(dpy, win, &wmh);
+    }
+    XStoreName(dpy, win, ((title) ? title : Class));
 
-   XStoreName(dpy, win, ((title) ? title : Class));
+    XSelectInput(dpy, win, KeyPressMask | StructureNotifyMask);
+    XMapWindow(dpy, win);
 
-   XSelectInput(dpy, win, KeyPressMask | StructureNotifyMask);
-   XMapWindow(dpy, win);
-
-	return win;   
+    return win;
 }
 
 
 /***** pr_raise ***/
 void pr_raise()
 {
-	if ( pr_GetR(db, ".raise")) do_raise=(On(value.addr));
+    if (pr_GetR(db, ".raise"))
+	do_raise = (On(value.addr));
 }
 
 
 void pr_persist()
 {
-	if (pr_GetR(db, ".persist")) persist = (On(value.addr));
+    if (pr_GetR(db, ".persist"))
+	persist = (On(value.addr));
 }
 
 /************ code to handle selection export *********************/
@@ -1612,70 +1640,74 @@ static struct plot_struct *exported_plot;
 void export_graph(plot)
 struct plot_struct *plot;
 {
-	FPRINTF((stderr,"export_graph(0x%x)\n", plot));
-	
-	XSetSelectionOwner(dpy, EXPORT_SELECTION, plot->window, CurrentTime);
-	/* to check we have selection, we would have to do a
-	 * GetSelectionOwner(), but if it failed, it failed - no big deal
-	 */
-	exported_plot = plot;
+    FPRINTF((stderr, "export_graph(0x%x)\n", plot));
+
+    XSetSelectionOwner(dpy, EXPORT_SELECTION, plot->window, CurrentTime);
+    /* to check we have selection, we would have to do a
+     * GetSelectionOwner(), but if it failed, it failed - no big deal
+     */
+    exported_plot = plot;
 }
 
 void handle_selection_event(event)
 XEvent *event;
 {
-	switch (event->type)
+    switch (event->type) {
+    case SelectionRequest:
 	{
-		case SelectionRequest:
-		{
-			XEvent reply;
-			
-			static Atom XA_TARGETS = (Atom) 0;
-			if (XA_TARGETS==0)
-				XA_TARGETS = XInternAtom(dpy, "TARGETS", False);
-			
-			reply.type = SelectionNotify;
-			reply.xselection.send_event = True;
-			reply.xselection.display = event->xselectionrequest.display;
-			reply.xselection.requestor = event->xselectionrequest.requestor;
-			reply.xselection.selection = event->xselectionrequest.selection;
-			reply.xselection.target = event->xselectionrequest.target;
-			reply.xselection.property = event->xselectionrequest.property;
-			reply.xselection.time = event->xselectionrequest.time;
-			
-			FPRINTF((stderr,"selection request\n"));
+	    XEvent reply;
 
-			if (reply.xselection.target == XA_TARGETS) {
-				static Atom targets[] = { XA_PIXMAP, XA_COLORMAP };
-				FPRINTF((stderr,"Targets request from %d\n", reply.xselection.requestor));
-				XChangeProperty(dpy, reply.xselection.requestor,
-				  reply.xselection.property, reply.xselection.target, 32, PropModeReplace,
-				  (unsigned char *)targets, 2);
-			} else if (reply.xselection.target == XA_COLORMAP) {
-				Colormap cmap = DefaultColormap(dpy,0);
-				FPRINTF((stderr,"colormap request from %d\n", reply.xselection.requestor));
-				XChangeProperty(dpy, reply.xselection.requestor,
-				  reply.xselection.property, reply.xselection.target, 32, PropModeReplace,
-				  (unsigned char *)&cmap, 1);
-			} else if (reply.xselection.target == XA_PIXMAP) {
-				FPRINTF((stderr,"pixmap request from %d\n", reply.xselection.requestor));
-				XChangeProperty(dpy, reply.xselection.requestor,
-				  reply.xselection.property, reply.xselection.target, 32, PropModeReplace,
-				  (unsigned char *)&(exported_plot->pixmap), 1);
-			} else {
-				reply.xselection.property = None;
-			}
-			
-			XSendEvent(dpy, reply.xselection.requestor, False, 0L, &reply);
-			/* we never block on XNextEvent(), so must flush manually
-			 * (took me *ages* to find this out !)
-			 */
-			 
-			XFlush(dpy);
-		}
-		break;
+	    static Atom XA_TARGETS = (Atom) 0;
+	    if (XA_TARGETS == 0)
+		XA_TARGETS = XInternAtom(dpy, "TARGETS", False);
+
+	    reply.type = SelectionNotify;
+	    reply.xselection.send_event = True;
+	    reply.xselection.display = event->xselectionrequest.display;
+	    reply.xselection.requestor = event->xselectionrequest.requestor;
+	    reply.xselection.selection = event->xselectionrequest.selection;
+	    reply.xselection.target = event->xselectionrequest.target;
+	    reply.xselection.property = event->xselectionrequest.property;
+	    reply.xselection.time = event->xselectionrequest.time;
+
+	    FPRINTF((stderr, "selection request\n"));
+
+	    if (reply.xselection.target == XA_TARGETS) {
+		static Atom targets[] =	{XA_PIXMAP, XA_COLORMAP};
+
+		FPRINTF((stderr, "Targets request from %d\n", reply.xselection.requestor));
+
+		XChangeProperty(dpy, reply.xselection.requestor,
+				reply.xselection.property, reply.xselection.target, 32, PropModeReplace,
+				(unsigned char *) targets, 2);
+	    } else if (reply.xselection.target == XA_COLORMAP) {
+		Colormap cmap = DefaultColormap(dpy, 0);
+
+		FPRINTF((stderr, "colormap request from %d\n", reply.xselection.requestor));
+
+		XChangeProperty(dpy, reply.xselection.requestor,
+				reply.xselection.property, reply.xselection.target, 32, PropModeReplace,
+				(unsigned char *) &cmap, 1);
+	    } else if (reply.xselection.target == XA_PIXMAP) {
+
+		FPRINTF((stderr, "pixmap request from %d\n", reply.xselection.requestor));
+
+		XChangeProperty(dpy, reply.xselection.requestor,
+				reply.xselection.property, reply.xselection.target, 32, PropModeReplace,
+			  (unsigned char *) &(exported_plot->pixmap), 1);
+	    } else {
+		reply.xselection.property = None;
+	    }
+
+	    XSendEvent(dpy, reply.xselection.requestor, False, 0L, &reply);
+	    /* we never block on XNextEvent(), so must flush manually
+	     * (took me *ages* to find this out !)
+	     */
+
+	    XFlush(dpy);
 	}
+	break;
+    }
 }
-			
-#endif /* EXPORT_SELECTION */
 
+#endif /* EXPORT_SELECTION */
