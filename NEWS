@@ -7,11 +7,14 @@ Changes in release 4.0:
   to avoid mixup with new 'history' command
 * fix to find gethostbyname(3) on LynxOS
 * added new implementation of hidden3d code
-* fixed png driver now shares web-friendly palette with gif driver
+* fixed png driver now shares web-friendly palette with gif driver;
+  also new transparency option and user defined colour specs
 * fixed data format for table driver
-* fixed history command for GNU readline
+* history command now works with GNU readline
 * fixed monochrome plots with Windows driver
+* fixed bug in contour handling
 * switch gnugraph driver to plotutils 2.2+ API
+* updated FAQ
 
 [3.8a]
 * doc2texi.el, gnuplot.texi added; remove doc2info.c,

@@ -1,3 +1,27 @@
+1999-12-01  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* FAQ: Updated to latest version from Juergen.
+
+	* configure.in: Simplify test for GNU plotutils by requiring
+	version 2.2 or newer (API change).
+
+	* config/buildvms.com, config/makefile.286, config/makefile.amg,
+	config/makefile.ami, config/makefile.emx, config/makefile.g,
+	config/makefile.msc, config/makefile.msw, config/makefile.mto,
+	config/makefile.os2, config/makefile.os9, config/makefile.st,
+	config/makefile.tc, config/makefile.vms, config/makefile.wc,
+	config/makefile.win, config/makefile.ztc: Updated lists of files
+	and dependencies.
+
+	* src/bitmap.c, src/command.c: Formatting and indentation.
+
+	* term/png.trm: Indentation, fixes in term options strings, add more
+	descriptive docs.
+
+1999-12-01  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/contour.c(gen_triangle): Fix coredump in contour code.
+
 1999-11-24  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* configure.in: Rename --enable-history option to
@@ -20,7 +44,7 @@
 
 	* src/command.h: Add declaration of input_line_len.
 
-	* src/datafile.c: Fix formatting.
+	* src/datafile.c: Formatting, indentation.
 
 	* src/gp_hist.h: New file, declarations for history.c.
 
@@ -45,7 +69,7 @@
 
 	* src/setshow.h: Add SIGNIF define, change DEF_FROMAT to "% g".
 
-	* src/show.c: Change version string and handling, integrate
+	* src/show.c: Change banner string and version handling, integrate
 	show_version_long into show_version.
 
 	* src/syscfg.h: Remove trailing space from OS define, remove unix
@@ -80,9 +104,19 @@
 
 1999-11-15  Thomas Walter  <walter@pctc.chemie.uni-erlangen.de>
 
+	* src/command.c, src/plot.c: Improvements in history related code.
+	New environment variable GNUPLOT_HISTORY_SIZE.
+
 	* src/history.c: New file. Code for the 'history' command and GNU
 	readline.
-	
+
+	* src/term.c: Fixes for the interface to 'GNU plotutils-2.2'.  See
+	also 'term/gnugraph.trm'.
+
+	* term/gnugraph.trm: Fix code following the docs of 'GNU plotutils'.
+	Now it is possible to use 'gpoutfile' to write into a user defined
+	file.  See also 'src/term.c'.
+
 1999-11-15  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/win/wgraph.c: Initialise pens in monochrome mode.
