@@ -1,5 +1,5 @@
 /*
- * $Id: gd.trm,v 1.6 2002/06/09 07:42:50 joze Exp $
+ * $Id: gd.trm,v 1.7 2002/06/10 18:53:00 mikulik Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -461,22 +461,22 @@ PNG_options()
 	case PNG_SMALL:
 	    PNG_font = gdFontSmall;
 	    png_font = 1;
-	    term->v_char = (unsigned int) (12);
-	    term->h_char = (unsigned int) (6);
+	    term->v_char = (unsigned int)(12);
+	    term->h_char = (unsigned int)(6);
 	    ++c_token;
 	    break;
 	case PNG_MEDIUM:
 	    PNG_font = gdFontMediumBold;
 	    png_font = 2;
-	    term->v_char = (unsigned int) (13);
-	    term->h_char = (unsigned int) (7);
+	    term->v_char = (unsigned int)(13);
+	    term->h_char = (unsigned int)(7);
 	    ++c_token;
 	    break;
 	case PNG_LARGE:
 	    PNG_font = gdFontLarge;
 	    png_font = 3;
-	    term->v_char = (unsigned int) (16);
-	    term->h_char = (unsigned int) (8);
+	    term->v_char = (unsigned int)(16);
+	    term->h_char = (unsigned int)(8);
 	    ++c_token;
 	    break;
 	case PNG_GIANT:
@@ -492,18 +492,21 @@ PNG_options()
 	    if (END_OF_COMMAND) {
 	    	png_state.ttffont[0] = '\0';
 	    } else {
-	    	int brect[8];
+		int brect[8];
 		char *err;
-	    	string = input_line + token[c_token++].start_index;
-		sscanf(string,"%63s",png_state.ttffont);
-		strcpy(PNG_ttffont,png_state.ttffont);
+		if (isstring(c_token))
+		    quote_str(png_state.ttffont, c_token, MAX_LINE_LEN);
+	        else
+		    copy_str(png_state.ttffont, c_token, MAX_LINE_LEN);
+		c_token++;
+		strcpy(PNG_ttffont, png_state.ttffont);
 	        png_state.ttfsize = 8 + 2*png_font;
 		err = gdImageStringFT(NULL, &brect[0], 0, 
 			png_state.ttffont, (double)png_state.ttfsize,
 			0.0, 0, 0, "test");
 		if (err) {
 			fprintf(stderr,"%s when opening font %s, using default\n",
-				err,png_state.ttffont);
+				err, png_state.ttffont);
 			png_state.ttffont[0] = PNG_ttffont[0] = '\0';
 		}
 	    }
