@@ -1,3 +1,9 @@
+2004-04-24  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/gplt_x11.c: Correct the placement of rotated text to account
+	for the difference in x and y coordinate scaling. This greatly
+	improves the rendering of rotated text in enhanced text mode.
+
 2004-04-22  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/axis.c (set_cbminmax): Don't bail out if cbrange is empty.

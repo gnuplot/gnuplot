@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.92 2004/03/25 17:21:42 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.93 2004/04/13 17:23:53 broeker Exp $"); }
 #endif
 
 #define X11_POLYLINE 1
@@ -1735,6 +1735,7 @@ DrawRotated(plot_struct *plot, Display *dpy, GC gc, int xdest, int ydest,
     }
 
     src_cen_y = 0; /* EAM 29-Sep-2002 - vertical justification has already been done */
+
     switch (just) {
 	case LEFT:
 	default:
@@ -1903,6 +1904,16 @@ exec_cmd(plot_struct *plot, char *command)
 	case 'u':	/* Enhanced mode print with update */
 	case 's':	/* Enhanced mode update with no print */
 		    sscanf(buffer+2, "%4d%4d", &x_offset, &y_offset);
+		    /* EAM FIXME - This code has only been tested for x_offset == 0 */
+		    if (plot->angle != 0) {
+			int xtmp=0, ytmp=0;
+			xtmp += x_offset * cos((double)(plot->angle) * 0.01745);
+			xtmp -= y_offset * sin((double)(plot->angle) * 0.01745) * yscale/xscale;
+			ytmp += x_offset * sin((double)(plot->angle) * 0.01745) * xscale/yscale;
+			ytmp += y_offset * cos((double)(plot->angle) * 0.01745);
+			x_offset = xtmp;
+			y_offset = ytmp;
+		    }
 		    x = plot->xLast + x_offset;
 		    y = plot->yLast + y_offset;
 		    v_offset = 0;
@@ -1966,7 +1977,7 @@ exec_cmd(plot_struct *plot, char *command)
 	    plot->xLast = RevX(X(x) + sj + sw) - x_offset;
 	    plot->yLast = y - y_offset;
 	    if (plot->angle != 0) { /* This correction is not perfect */
-		plot->yLast += RevX(sw) * sin((double)(plot->angle) * 0.01745);
+		plot->yLast += RevX(sw) * sin((double)(plot->angle) * 0.01745) * xscale/yscale;
 		plot->xLast -= RevX(sw) * (1.0 - cos((double)(plot->angle) * 0.01745));
 	    }
 	}
