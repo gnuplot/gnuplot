@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.97 2003/10/10 10:33:39 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.98 2003/11/22 04:49:58 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -3766,6 +3766,10 @@ ytick2d_callback(axis, place, text, grid)
     }
 }
 
+/* STR points to a label string, possibly with several lines separated
+   by \n.  Return the number of characters in the longest line.  If
+   LINES is not NULL, set *LINES to the number of lines in the
+   label. */
 int
 label_width(str, lines)
 const char *str;
