@@ -197,7 +197,7 @@ picture r[];\n\
 %blacker:=0;\n\
 %fillin:=.2;\n\
 %o_correction:=.6;\n\
-"%fix_units;\n", gpoutfile);
+%fix_units;\n", gpoutfile);
 
     /* Next lines must be included if text support is needed (CM base used) */
     fputs("\
@@ -274,7 +274,7 @@ input romspu.mf %Uppercase specials (\\AE, \\OE, \\O)\n\
 input punct.mf %Punctuation symbols.\n\
 \nminus=ASCII\"-\"; cmchar \"Minus sign\";\n\
 beginarithchar(minus); \n\
-  pickup rule.nib;\n"
+  pickup rule.nib;\n\
   lft x1=hround 1.5u-eps;\n\
   x2=w-x1; y1=y2=math_axis;\n\
   draw z1--z2;	 % bar\n\
@@ -294,7 +294,7 @@ endchar;\n", gpoutfile);
 
     fputs("\
 \ndef endchar =\n\
-  % Next line should probably be removed if CM base is used\n"
+  % Next line should probably be removed if CM base is used\n\
   l:=0; r:=w;\n\
   %Include the next two lines if you want to\n\
   %rotate the picture 90 deg.(Portrait to Landscape)\n\

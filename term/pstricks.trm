@@ -256,7 +256,7 @@ TERM_PUBLIC void PSTRICKS_graphics()
     fputs("\
 \\pspicture(0,0)(1,1)\n\
 \\ifx\\nofigs\\undefined\n\
-"\\catcode`@=11\n\n", gpoutfile);
+\\catcode`@=11\n\n", gpoutfile);
 }
 
 

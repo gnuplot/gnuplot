@@ -362,7 +362,7 @@ TERM_PUBLIC void HPDJtext()
     b_freebitmap();
 
 #ifndef VMS			/* most vms spoolers add a formfeed character */
-    putc("\f", gpoutfile);
+    putc('\f', gpoutfile);
 #endif /* !VMS */
 }
 

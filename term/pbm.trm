@@ -250,9 +250,10 @@ static void PBMgraytext()
     register int i, value;
     int mask, plane1, plane2, plane3;
 
-    fprintf(gpoutfile, "P5\n\
+    fprintf(gpoutfile, "\
+P5\n\
 %u %u\n\
-"%u\n",
+%u\n",
 	    b_ysize, b_xsize,
 	    255);
 

@@ -532,7 +532,7 @@ TERM_PUBLIC void MIF_graphics()
 \t<Separation 0>\n\
 \t<BRect 2.000 %.3f %.3f %.3f>\n\
 \t<NSOffset  0.000>\n\
-\t<BLOffset  0.000>\n,
+\t<BLOffset  0.000>\n",
 	    mif_frameno,
 	    ((float) mif_frameno) * GNP_TO_MIF(MIF_YMAX + 100),
 	    GNP_TO_MIF(MIF_XMAX), GNP_TO_MIF(MIF_YMAX));

@@ -1215,7 +1215,7 @@ gnuplot: X11 aborted.\n", Argv[1]);
 
     dpy = XOpenDisplay(ldisplay);
     if (!dpy) {
-	fprintf(stderr, "\n
+	fprintf(stderr, "\n\
 gnuplot: unable to open display '%s'\n\
 gnuplot: X11 aborted.\n", ldisplay);
 	EXIT(1);

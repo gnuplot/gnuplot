@@ -742,7 +742,7 @@ TERM_PUBLIC void EMTEX_init()
     LATEX_posx = LATEX_posy = 0;
     fprintf(gpoutfile, "\
 %% GNUPLOT: LaTeX picture with emtex specials\n\
-\\setlength{\\unitlength}{%fpt}\n
+\\setlength{\\unitlength}{%fpt}\n\
 \\ifx\\plotpoint\\undefined\\newsavebox{\\plotpoint}\\fi\n",
 	    LATEX_UNIT);
     LATEX_linetype(-1);
