@@ -1,8 +1,19 @@
+2002-10-15  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* Makefile.in: Remove acconfig.h.
+
+	* acconfig.h: File removed.
+
+	* configure.in, stdfn.h: Change test for time_t in <time.h> to not
+	require time_t define in config.h. This removes the need for acconfig.h.
+
+	* term/metapost.trm: Add empty line in terminal documentation.
+
 2002-09-19  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* term/gpic.trm (GPIC_linetype): Fix signed conversion problems
  	between size_t GPIC_NUMLINES and int linetype.  NOTE: this will
- 	change linetypes for numbers abve 4, because the border and axis
+ 	change linetypes for numbers above 4, because the border and axis
  	linetypes will no longer be re-used.  Add offset here already,
  	instead of doing it later.
 	(GPIC_vector): Removed addition of offset from here.
