@@ -52,7 +52,7 @@ static char *RCSid = "$Id: plot2d.c,v 1.53 1998/06/18 14:55:14 ddenholm Exp $";
 void plotrequest __PROTO((void));
 void plot3drequest __PROTO((void));
 void define __PROTO((void));
-static void get_data __PROTO((struct curve_points * this_plot));
+static int get_data __PROTO((struct curve_points * this_plot));
 static void store2d_point __PROTO((struct curve_points * this_plot, int i, double x, double y, double xlow, double xhigh, double ylow, double yhigh, double width));
 static void print_table __PROTO((struct curve_points * first_plot, int plot_num));
 static void eval_plots __PROTO((void));
@@ -282,7 +282,7 @@ void plotrequest()
  */
 
 
-static void get_data(this_plot)
+static int get_data(this_plot)
 struct curve_points *this_plot;
 /* this_plot->token is after datafile spec, for error reporting
  * it will later be moved passed title/with/linetype/pointtype
@@ -520,6 +520,8 @@ struct curve_points *this_plot;
     cp_extend(this_plot, i);	/* shrink to fit */
 
     df_close();
+    
+    return i; /* i==0 indicates an 'empty' file */
 }
 
 /* called by get_data for each point */
@@ -965,7 +967,12 @@ static void eval_plots()
 	    }
 	    if (this_plot->plot_type == DATA) {
 		/* actually get the data now */
-		get_data(this_plot);
+		if ( get_data(this_plot) == 0) {
+			/* am: not a single line of data (point to be more precise)
+			   has been found. So don't issue a misleading warning like
+			   "x range is invalid" but stop here! */
+			int_error("no data point found in specified file", c_token);
+		}
 
 		/* sort */
 		switch (this_plot->plot_smooth) {	/* sort and average, if */
