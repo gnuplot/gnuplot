@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.83 2004/01/10 21:11:38 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.84 2004/02/15 20:29:56 sfeam Exp $"); }
 #endif
 
 #define X11_POLYLINE 1
@@ -403,8 +403,9 @@ static int is_shift __PROTO((KeySym));
 static char* __PROTO((getMultiTabConsoleSwitchCommand(unsigned long *)));
 #endif
 
-static void DrawRotated __PROTO((Display *, Drawable, GC, int,
-	    int, const char *, int, int, enum JUSTIFY));
+static void DrawRotated __PROTO((plot_struct *, Display *, GC, 
+				 int, int, const char *, int));
+static int DrawRotatedErrorHandler __PROTO((Display *, XErrorEvent *));
 static void exec_cmd __PROTO((plot_struct *, char *));
 
 static void reset_cursor __PROTO((void));
@@ -1656,10 +1657,20 @@ record()
 }
 #endif /* VMS */
 
-static void
-DrawRotated(Display *dpy, Drawable d, GC gc, int xdest, int ydest,
-       	const char *str, int len, int angle, enum JUSTIFY just)
+static int
+DrawRotatedErrorHandler(Display * display, XErrorEvent * error_event)
 {
+  return 0;  /* do nothing */
+}
+
+static void
+DrawRotated(plot_struct *plot, Display *dpy, GC gc, int xdest, int ydest,
+       	const char *str, int len)
+{
+    Window w = plot->window;
+    Drawable d = plot->pixmap;
+    int angle = plot->angle;
+    enum JUSTIFY just = plot->jmode;
     int x, y;
     double src_x, src_y;
     double dest_x, dest_y;
@@ -1675,30 +1686,37 @@ DrawRotated(Display *dpy, Drawable d, GC gc, int xdest, int ydest,
     double dest_cen_x = (double)dest_width * 0.5;
     double dest_cen_y = (double)dest_height * 0.5;
     char* data = (char*) malloc(dest_width * dest_height * sizeof(char));
-    Pixmap pixmap_src = XCreatePixmap(dpy, root, width, height, 1);
+    Pixmap pixmap_src = XCreatePixmap(dpy, root, (unsigned int)width, (unsigned int)height, 1);
     XImage *image_src;
     XImage *image_dest;
+    XImage *image_scr;
+    unsigned long fgpixel = 0;
+    XWindowAttributes win_attrib;
+    int xscr, yscr, xoff, yoff;
+    unsigned int scr_width, scr_height;
+    XErrorHandler prevErrorHandler;
 
     unsigned long gcFunctionMask = GCFunction;
     XGCValues gcValues;
     int gcCurrentFunction = 0;
-    Status s = XGetGCValues(dpy, gc, gcFunctionMask, &gcValues);
+    Status s = XGetGCValues(dpy, gc, gcFunctionMask|GCForeground, &gcValues);
 
     /* bitmapGC is static, so that is has to be initialized only once */
     static GC bitmapGC = (GC) 0;
 
     if (s) {
 	/* success */
+	fgpixel = gcValues.foreground;
 	gcCurrentFunction = gcValues.function; /* save current function */
-	gcValues.function = GXand; /* merge image_dest with drawable */
+	gcValues.function = GXcopy; /* merge image_scr with drawable */
 	XChangeGC(dpy, gc, gcFunctionMask, &gcValues);
     }
 
     /* eventually initialize bitmapGC */
     if ((GC)0 == bitmapGC) {
 	bitmapGC = XCreateGC(dpy, pixmap_src, 0, (XGCValues *) 0);
-	XSetForeground(dpy, bitmapGC, WhitePixel(dpy, scr));
-	XSetBackground(dpy, bitmapGC, BlackPixel(dpy, scr));
+	XSetForeground(dpy, bitmapGC, 1);
+	XSetBackground(dpy, bitmapGC, 0);
     }
 
     /* set font for the bitmap GC */
@@ -1709,25 +1727,24 @@ DrawRotated(Display *dpy, Drawable d, GC gc, int xdest, int ydest,
 
     /* create XImage's of depth 1 */
     /* source from pixmap */
-    image_src = XGetImage(dpy, pixmap_src, 0, 0, width, height,
+    image_src = XGetImage(dpy, pixmap_src, 0, 0, (unsigned int)width, (unsigned int)height,
 	    1, XYPixmap /* ZPixmap, XYBitmap */ );
 
     /* empty dest */
     assert(data);
-    memset((void*)data, 0, dest_width * dest_height);
+    memset((void*)data, 0, (size_t)dest_width * dest_height);
     image_dest = XCreateImage(dpy, vis, 1, XYBitmap,
-	    0, data, dest_width, dest_height, 8, 0);
-
+	    0, data, (unsigned int)dest_width, (unsigned int)dest_height, 8, 0);
 #define RotateX(_x, _y) (( (_x) * ca + (_y) * sa + dest_cen_x))
 #define RotateY(_x, _y) ((-(_x) * sa + (_y) * ca + dest_cen_y))
     /* copy & rotate from source --> dest */
     for (y = 0, src_y = -src_cen_y; y < height; y++, src_y++) {
 	for (x = 0, src_x = -src_cen_x; x < width; x++, src_x++) {
 	    /* TODO: move some operations outside the inner loop (joze) */
-	    dest_x = (int)rint(RotateX(src_x, src_y));
-	    dest_y = (int)rint(RotateY(src_x, src_y));
+	    dest_x = rint(RotateX(src_x, src_y));
+	    dest_y = rint(RotateY(src_x, src_y));
 	    if (dest_x >= 0 && dest_x < dest_width && dest_y >= 0 && dest_y < dest_height)
-		XPutPixel(image_dest, dest_x, dest_y, XGetPixel(image_src, x, y));
+		XPutPixel(image_dest, (int)dest_x, (int)dest_y, XGetPixel(image_src, x, y));
 	}
     }
 
@@ -1749,10 +1766,43 @@ DrawRotated(Display *dpy, Drawable d, GC gc, int xdest, int ydest,
     }
 
 #undef RotateX
+#undef RotateY
 
-    /* copy the rotated image to the drawable d */
-    XPutImage(dpy, d, gc, image_dest, 0, 0,
-	    xdest, ydest, dest_width, dest_height);
+    /* grab the current screen area where the new text will go */
+    s = XGetWindowAttributes(dpy, w, &win_attrib);
+    /* compute screen coords that are within the current window */
+    xscr = (xdest<0)? 0 : xdest; 
+    yscr = (ydest<0)? 0 : ydest;;
+    scr_width = dest_width; scr_height = dest_height;
+    if (xscr + dest_width > win_attrib.width){
+      scr_width = win_attrib.width - xscr;
+    }
+    if (yscr + dest_height > win_attrib.height){
+      scr_height = win_attrib.height - yscr;
+    }
+    xoff = xscr - xdest;
+    yoff = yscr - ydest;
+    scr_width -= xoff;
+    scr_height -= yoff;
+    prevErrorHandler = XSetErrorHandler(DrawRotatedErrorHandler);
+
+    image_scr = XGetImage(dpy, d, xscr, yscr, scr_width,
+			  scr_height, AllPlanes, XYPixmap);
+    if (image_scr != 0){
+      /* copy from 1 bit bitmap image of text to the full depth image of screen*/
+      for (y = 0; y < scr_height; y++){
+	for (x = 0; x < scr_width; x++){
+	  if (XGetPixel(image_dest, x + xoff, y + yoff)){
+	    XPutPixel(image_scr, x, y, fgpixel);
+	  }
+	}
+      }
+      /* copy the rotated image to the drawable d */
+      XPutImage(dpy, d, gc, image_scr, 0, 0, xscr, yscr, scr_width, scr_height);
+
+      XDestroyImage(image_scr);
+    }
+    XSetErrorHandler(prevErrorHandler);
 
     /* free resources */
     XFreePixmap(dpy, pixmap_src);
@@ -1907,8 +1957,7 @@ exec_cmd(plot_struct *plot, char *command)
 	    ;
 	else if (plot->angle != 0) {
 	    /* rotated text */
-	    DrawRotated(dpy, plot->pixmap, *current_gc, X(x), Y(y),
-		    str, sl, plot->angle, plot->jmode);
+	    DrawRotated(plot, dpy, *current_gc, X(x), Y(y), str, sl);
 	} else {
 	    /* horizontal text */
 	    XDrawString(dpy, plot->pixmap, *current_gc,

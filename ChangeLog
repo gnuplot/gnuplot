@@ -1,3 +1,13 @@
+2004-02-22  Ethan Merritt  <merritt@u.washington.edu>
+	
+	* src/gplt_x11.c: When drawing rotated text, only modify pixels
+	that actually contain part of the text. Fixes bug #668782.
+	Patch originally submitted by Mike Sutton 
+	<suttonm@users.sourceforge.net>, lightly modified by me.
+	NB: This code makes refreshing the plot window very slow
+	if rotated text is present.  It is particularly noticeable when 
+	the window is resized.
+
 2004-02-22  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	Fix SF bug: [ 666462 ] steps/histeps calculation/display problem.
