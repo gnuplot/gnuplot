@@ -1,3 +1,8 @@
+2000-12-12  Johannes Zellner  <johannes@zellner.org>
+
+	* src/set.c, src/show.c: corrected a bug so that
+	x2zeroaxis works again.
+
 2000-12-08  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/datafile.c (df_3dmatrix): implement missing 'index' option

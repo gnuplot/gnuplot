@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.48 2000/11/23 08:35:39 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.49 2000/11/23 14:14:37 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -237,12 +237,18 @@ show_command()
 	break;
     case S_XZEROAXIS:
 	show_zeroaxis(FIRST_X_AXIS);
-	    break;
+	break;
     case S_ZEROAXIS:
 	show_zeroaxis(FIRST_X_AXIS);
 	/* FALLTHROUGH */
     case S_YZEROAXIS:
 	show_zeroaxis(FIRST_Y_AXIS);
+	break;
+    case S_X2ZEROAXIS:
+	show_zeroaxis(SECOND_X_AXIS);
+	break;
+    case S_Y2ZEROAXIS:
+	show_zeroaxis(SECOND_Y_AXIS);
 	break;
 
 #define CHECK_TAG_GT_ZERO					\
