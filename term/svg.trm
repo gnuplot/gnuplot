@@ -1,5 +1,5 @@
 /*
- * $Id: svg.trm,v 1.29 2003/12/19 07:08:15 sfeam Exp $
+ * $Id: svg.trm,v 1.30 2004/02/02 19:22:04 sfeam Exp $
  *
  */
 
@@ -147,10 +147,11 @@ SVG_Pen_RealID (inPenCode)
 {
     if (inPenCode >= 13)
 	inPenCode %= 13;	/* normalize pen code*/
-    if (inPenCode <= L_TYPE_NODRAW)
-	inPenCode = 13;		/* LT_NODRAW or LT_BACKGROUND should use background color */
+    inPenCode += 3;
+    if (inPenCode < 0)
+	inPenCode = 0;		/* LT_NODRAW or LT_BACKGROUND should use background color */
 
-    return (inPenCode + 2);
+    return (inPenCode);
 }
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -461,40 +462,40 @@ SVG_init ()
 
     /* setup pens*/
     SVG_pens[0].width = SVG_LineWidth;
-    sprintf (SVG_pens[0].color, "black");	/* black*/
+    sprintf (SVG_pens[0].color, "white");	/* white - should really be background */
     SVG_pens[1].width = SVG_LineWidth;
-    sprintf (SVG_pens[1].color, "gray");	/* medium gray*/
+    sprintf (SVG_pens[1].color, "black");	/* black*/
     SVG_pens[2].width = SVG_LineWidth;
-    sprintf (SVG_pens[2].color, "red");
+    sprintf (SVG_pens[2].color, "gray");	/* medium gray*/
     SVG_pens[3].width = SVG_LineWidth;
-    /* sprintf (SVG_pens[3].color, "#%2.2X%2.2X%2.2X", 0, 209, 0); */	/* green*/
-    sprintf (SVG_pens[3].color, "green");
+    sprintf (SVG_pens[3].color, "red");
     SVG_pens[4].width = SVG_LineWidth;
-    /* sprintf (SVG_pens[4].color, "#%2.2X%2.2X%2.2X", 74, 77, 201); */	/* blue*/
-    sprintf (SVG_pens[4].color, "blue");	/* blue*/
+    /* sprintf (SVG_pens[4].color, "#%2.2X%2.2X%2.2X", 0, 209, 0); */	/* green*/
+    sprintf (SVG_pens[4].color, "green");
     SVG_pens[5].width = SVG_LineWidth;
-    /* sprintf (SVG_pens[5].color, "#%2.2X%2.2X%2.2X", 173, 0, 0); */	/* brick*/
-    sprintf (SVG_pens[5].color, "cyan");
+    /* sprintf (SVG_pens[5].color, "#%2.2X%2.2X%2.2X", 74, 77, 201); */	/* blue*/
+    sprintf (SVG_pens[5].color, "blue");	/* blue*/
     SVG_pens[6].width = SVG_LineWidth;
-    sprintf (SVG_pens[6].color, "#%2.2X%2.2X%2.2X", 21, 117, 69);	/* pine green*/
+    /* sprintf (SVG_pens[6].color, "#%2.2X%2.2X%2.2X", 173, 0, 0); */	/* brick*/
+    sprintf (SVG_pens[6].color, "cyan");
     SVG_pens[7].width = SVG_LineWidth;
-    sprintf (SVG_pens[7].color, "#%2.2X%2.2X%2.2X", 0, 0, 148);	/* navy*/
+    sprintf (SVG_pens[7].color, "#%2.2X%2.2X%2.2X", 21, 117, 69);	/* pine green*/
     SVG_pens[8].width = SVG_LineWidth;
-    sprintf (SVG_pens[8].color, "#%2.2X%2.2X%2.2X", 255, 153, 0);	/* orange*/
+    sprintf (SVG_pens[8].color, "#%2.2X%2.2X%2.2X", 0, 0, 148);	/* navy*/
     SVG_pens[9].width = SVG_LineWidth;
-    sprintf (SVG_pens[9].color, "#%2.2X%2.2X%2.2X", 0, 153, 161);	/* green blue*/
+    sprintf (SVG_pens[9].color, "#%2.2X%2.2X%2.2X", 255, 153, 0);	/* orange*/
     SVG_pens[10].width = SVG_LineWidth;
-    sprintf (SVG_pens[10].color, "#%2.2X%2.2X%2.2X", 214, 214, 69);	/* olive*/
+    sprintf (SVG_pens[10].color, "#%2.2X%2.2X%2.2X", 0, 153, 161);	/* green blue*/
     SVG_pens[11].width = SVG_LineWidth;
-    sprintf (SVG_pens[11].color, "#%2.2X%2.2X%2.2X", 163, 145, 255);	/* cornflower*/
+    sprintf (SVG_pens[11].color, "#%2.2X%2.2X%2.2X", 214, 214, 69);	/* olive*/
     SVG_pens[12].width = SVG_LineWidth;
-    sprintf (SVG_pens[12].color, "#%2.2X%2.2X%2.2X", 255, 204, 0);	/* gold*/
+    sprintf (SVG_pens[12].color, "#%2.2X%2.2X%2.2X", 163, 145, 255);	/* cornflower*/
     SVG_pens[13].width = SVG_LineWidth;
-    sprintf (SVG_pens[13].color, "#%2.2X%2.2X%2.2X", 214, 0, 120);	/* mulberry*/
+    sprintf (SVG_pens[13].color, "#%2.2X%2.2X%2.2X", 255, 204, 0);	/* gold*/
     SVG_pens[14].width = SVG_LineWidth;
-    sprintf (SVG_pens[14].color, "#%2.2X%2.2X%2.2X", 171, 214, 0);	/* green yellow*/
+    sprintf (SVG_pens[14].color, "#%2.2X%2.2X%2.2X", 214, 0, 120);	/* mulberry*/
     SVG_pens[15].width = SVG_LineWidth;
-    sprintf (SVG_pens[15].color, "white");	/* white - should really be background */
+    sprintf (SVG_pens[15].color, "#%2.2X%2.2X%2.2X", 171, 214, 0);	/* green yellow*/
 
     SVG_LineType = -3;
 
