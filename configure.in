@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.in,v 1.121 2002/12/18 17:39:22 lhecking Exp $
+dnl $Id: configure.in,v 1.122 2003/01/22 15:12:17 lhecking Exp $
 dnl
 AC_INIT(src/graphics.c)
 AM_CONFIG_HEADER(config.h:config.hin)
@@ -414,6 +414,8 @@ if test "$with_gd" != no; then
 
   _cppflags="$CPPFLAGS"
   _ldflags="$LDFLAGS"
+  CPPFLAGS="$CPPFLAGS $libgd_CPPFLAGS"
+  LDFLAGS="$LDFLAGS $libgd_LDFLAGS"
 
   AC_CHECK_LIB(gd,gdImageCreate,
     [dnl found gd library
@@ -424,11 +426,14 @@ if test "$with_gd" != no; then
      AC_CHECK_LIB(gd,gdImageGif,
        [AC_DEFINE(HAVE_GD_GIF, 1, [ Define if libgd supports gif. ])])
 
+     _libs="$LIBS"
+     LIBS="$LIBS -ljpeg"
      dnl jpeg support in libgd
      AC_CHECK_LIB(gd,gdImageJpeg,
        [AC_DEFINE(HAVE_GD_JPEG, 1, [ Define if libgd supports jpeg. ])
         libgd_LIBS="$libgd_LIBS -ljpeg"])
 
+     LIBS="$_libs $libgd_LIBS -lfreetype"
      dnl freetype support in libgd
      AC_CHECK_LIB(gd,gdImageStringFT,
        [have_ttf=yes],
@@ -443,11 +448,13 @@ if test "$with_gd" != no; then
        libgd_LIBS="$libgd_LIBS -lfreetype"
      fi
 
+     LIBS="$_libs $libgd_LIBS -lpng"
      dnl png support in libgd
      AC_CHECK_LIB(gd,gdImagePng,
        [AC_DEFINE(HAVE_GD_PNG, 1, [ Define if libgd supports png. ])
         libgd_LIBS="$libgd_LIBS -lpng"
         have_gd_png=yes])
+     LIBS="$_libs"
 
     ],[dnl gd library not found
        with_gd=no
