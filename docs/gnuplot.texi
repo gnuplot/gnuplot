@@ -693,7 +693,7 @@ The Atari version of readline defines some additional key aliases:
       Ctrl Home       - same as ^E.
       Esc             - same as ^U.
       Help            - @ref{help} plus return.
-      Ctrl Help       - `help `.
+      Ctrl Help       - @ref{help}.
 
 @end example
 
@@ -1973,6 +1973,20 @@ sufficient to test for any one of these variables being defined.
 
 @end example
 
+It is also possible to track keystrokes in the plot window using the mousing
+code.
+
+@example
+      plot 'something'
+      pause mouse keypress
+      print "Keystroke ", MOUSE_KEY, " at ", MOUSE_X, " ", MOUSE_Y
+
+@end example
+
+If 'pause mouse keypress' is terminated by a mouse click rather than by a
+keypress, then MOUSE_KEY will contain the button number, otherwise it will
+contain the ascii character value of the key that was pressed.
+
 
 @node Plotting, Start-up, mouse_input, gnuplot
 @section Plotting
@@ -3178,7 +3192,7 @@ waits a specified amount of time or until the carriage return is pressed.
 Syntax:
 @example
       pause <time> @{"<string>"@}
-      pause mouse @{"<string>"@}
+      pause mouse @{keypress@} @{"<string>"@}
 
 @end example
 
@@ -3190,7 +3204,12 @@ platform.  `pause 0` is synonymous with `print`.
 
 If the current terminal supports mousing, then `pause mouse` will terminate
 on either a mouse click or on ctrl-C.  For all other terminals, or if mousing
-is not active, `pause mouse` is equivalent to `pause -1`.
+is not active, `pause mouse` is equivalent to `pause -1`.  The variant command
+`pause mouse keypress` will terminate on either a mouse click or on a 
+keypress in the plot window.  In all cases the coordinates of the mouse are
+returned in variables MOUSE_X, MOUSE_Y, MOUSE_X2, MOUSE_Y2.  The button number
+or the ascii value of the key pressed is returned in MOUSE_KEY.
+See @ref{variables}.
 
 Note: Since @ref{pause} communicates with the operating system rather than the
 graphics, it may behave differently with different device drivers (depending
@@ -3854,9 +3873,12 @@ errors in x and/or y.  See @ref{style} for details about plotting styles that
 make use of error information, and `fit` for use of error information in
 curve fitting.
 
-'scanf' accepts several numerical specifications but `gnuplot` requires all
-inputs to be double-precision floating-point variables, so `lf` is the only
-permissible specifier.  'scanf' expects to see white space---a blank, tab
+'scanf' accepts several numerical specifications but `gnuplot`
+requires all inputs to be double-precision floating-point variables,
+so "%lf" is essentially the only permissible specifier.
+A format string given by the user must contain at least one such
+input specifier, and no more than seven of them.
+'scanf' expects to see white space---a blank, tab
 ("\t"), newline ("\n"), or formfeed ("\f")---between numbers; anything else
 in the input stream must be explicitly skipped.
 

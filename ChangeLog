@@ -1,14 +1,14 @@
 2004-06-06  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/command.c src/command.h src/mouse.c src/gplt_x11.c
-	term/x11.trm docs/gnuplot.doc:  `pause mouse keypress` option behaves
-	exactly as `pause mouse` except that the pause can be terminated by a
-	keystroke while the plot window has focus. On return, the variable
-	MOUSE_KEY contains the mouse button number if the pause terminated on
-	a mouse click, otherwise it contains the key code of the key that was
-	pressed.  Normal ascii characters will return their ascii code; other
-	keyboard keys are assigned codes from a table in src/mousecmn.h.
-	The command may be abbreviated to `pause mouse key`.
+	term/x11.trm docs/gnuplot.doc docs/gnuplot.texi:  
+	`pause mouse keypress` option behaves exactly as `pause mouse` except
+	that the pause can be terminated by a keystroke while the plot window
+	has focus. On return, the variable MOUSE_KEY contains the mouse button
+	number if the pause terminated on a mouse click, otherwise it contains
+	the key code of the key that was pressed. Normal ascii characters will
+	return their ascii code; other keyboard keys are assigned codes from a
+	table in mousecmn.h.  The command may be shortened to `pause mouse key`.
 
 2004-06-04  Petr Mikulik  <mikulik@physics.muni.cz>
 
