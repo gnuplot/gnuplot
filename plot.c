@@ -115,7 +115,14 @@ TBOOLEAN noinputfiles = TRUE;	/* FALSE if there are script files */
 TBOOLEAN do_load_arg_substitution = FALSE;
 char *call_args[10] = { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL };
 
-char *infile_name = NULL;	/* name of command file; NULL if terminal */
+/* name of command file; NULL if terminal */
+char *infile_name = NULL;
+
+/* user home directory */
+const char *user_homedir = NULL;
+
+/* user shell */
+const char *user_shell = NULL;
 
 #ifdef X11
 extern int X11_args __PROTO((int, char **));
@@ -139,6 +146,8 @@ static jmp_buf command_line_env;
 #endif
 
 static void load_rcfile __PROTO((void));
+static void getenv_user_homedir __PROTO((void));
+static void getenv_user_shell __PROTO((void));
 RETSIGTYPE inter __PROTO((int anint));
 
 /* built-in function table */
@@ -285,6 +294,51 @@ int anint;
 #endif
 }
 
+#ifdef LINUXVGA
+/* utility functions to ensure that setuid gnuplot
+ * assumes root privileges only for those parts
+ * of the code which require root rights.
+ *
+ * By "Dr. Werner Fink" <werner@suse.de>
+ */
+static uid_t euid, ruid;
+static gid_t egid, rgid;
+static int asked_privi = 0;
+
+void drop_privilege()
+{
+    if (!asked_privi) {
+	euid = geteuid();
+	egid = getegid();
+	ruid = getuid();
+	rgid = getgid();
+	asked_privi = 1;
+    }
+    if (setegid(rgid) == -1)
+	(void) fprintf(stderr, "setegid(%d): %s\n",
+			(int) rgid, strerror(errno));
+    if (seteuid(ruid) == -1)
+	(void) fprintf(stderr, "seteuid(%d): %s\n",
+			(int) ruid, strerror(errno));
+}
+
+void take_privilege()
+{
+    if (!asked_privi) {
+	euid = geteuid();
+	egid = getegid();
+	ruid = getuid();
+	rgid = getgid();
+	asked_privi = 1;
+    }
+    if (setegid(egid) == -1)
+	(void) fprintf(stderr, "setegid(%d): %s\n",
+			(int) egid, strerror(errno));
+    if (seteuid(euid) == -1)
+	(void) fprintf(stderr, "seteuid(%d): %s\n",
+			(int) euid, strerror(errno));
+}
+#endif /* LINUXVGA */
 
 /* a wrapper for longjmp so we can keep everything local */
 void bail_to_command_line()
@@ -301,6 +355,7 @@ int argc;
 char **argv;
 {
 #ifdef LINUXVGA
+    drop_privilege();
     LINUX_setup();
 #endif
 /* make sure that we really have revoked root access, this might happen if
@@ -440,6 +495,8 @@ char **argv;
     if (!setjmp(command_line_env)) {
 	/* first time */
 	interrupt_setup();
+	getenv_user_homedir();
+	getenv_user_shell();
 	load_rcfile();
 	init_fit();		/* Initialization of fitting module */
 
@@ -525,7 +582,7 @@ char **argv;
 
 		while (!com_line());
 
-		/* interactive = FALSE; /* should this be here? */
+		/* interactive = FALSE; */ /* should this be here? */
 
 	    } else
 		load_file(fopen(*argv, "r"), *argv, FALSE);
@@ -616,47 +673,27 @@ void interrupt_setup()
 }
 
 
-/* Look for a gnuplot init file in . or home directory */
+/* Look for a gnuplot init file in current or home directory */
 static void load_rcfile()
 {
     FILE *plotrc = NULL;
-    char home[80];
-    char rcfile[sizeof(PLOTRC) + 80];
-    char *tmp_home = NULL;
-#ifndef VMS
-    char *p;	/* points to last char in home path, or to \0, if none */
+    char *rcfile = NULL;
 
-    tmp_home = getenv(HOME);
-    if (tmp_home) {
-	safe_strncpy(home, tmp_home, sizeof(home));
-	if (strlen(home))
-	    p = &home[strlen(home) - 1];
-	else
-	    p = home;
-	if ((*p != DIRSEP1) && (*p != DIRSEP2) && (*p != NUL)) {
-	    assert(p >= home && p <= (home + sizeof(home) - 1 - 2));
-	    if (*p)
-		p++;
-	    *p++ = DIRSEP1;
-	    *p = NUL;
-	}
-    }
-#else /* VMS */
-    safe_strncpy(home, HOME, sizeof(home));
-    tmp_home = home;
-#endif /* VMS */
+    /* len of homedir + directory separator + len of file name + \0 */
+    rcfile = (char *) gp_alloc (( user_homedir ? strlen(user_homedir) : 0 )+1+strlen(PLOTRC)+1, "rcfile");
 
 #ifdef NOCWDRC
     /* inhibit check of init file in current directory for security reasons */
 #else
-    (void) strcpy(rcfile, PLOTRC);
-    plotrc = fopen(rcfile, "r");
+    plotrc = fopen (PLOTRC, "r");
 #endif /* !NOCWDRC */
 
     if (plotrc == NULL) {
-	if (tmp_home) {
-	    (void) sprintf(rcfile, "%s%s", home, PLOTRC);
+	if (user_homedir) {
+	    strcpy (rcfile, user_homedir);
+	    PATH_CONCAT(rcfile,PLOTRC);
 	    plotrc = fopen(rcfile, "r");
+
 #if defined(ATARI) || defined(MTOS)
 	    if (plotrc == NULL) {
 		char const *const ext[] = { NULL };
@@ -670,6 +707,70 @@ static void load_rcfile()
     }
     if (plotrc)
 	load_file(plotrc, rcfile, FALSE);
+
+    free(plotrc);
+}
+
+#ifdef VMS
+# define getenv(name) name
+#endif
+static void getenv_user_homedir ()
+{
+    if (user_homedir == NULL) {
+	char *env_home;
+
+	if ((env_home = getenv(HOME)) || (env_home = getenv("HOME"))) {
+	    size_t homelen = strlen(env_home) + 1;
+
+	    assert(homelen <= PATH_MAX);
+	    user_homedir = (const char *) gp_alloc(homelen, "user homedir");
+	    safe_strncpy((char *)user_homedir, env_home, homelen);
+	} else
+	    int_warn("no HOME found", NO_CARET);
+    }
+}
+
+/* Hhm ... what about VMS? */
+static void getenv_user_shell ()
+{
+    if (user_shell == NULL) {
+	char *env_shell;
+	size_t shell_len = 1;
+
+	if ((env_shell = getenv("SHELL")) == NULL)
+#if defined(MSDOS) || defined(_Windows) || defined(DOS386) || defined(OS2)
+	    if ((env_shell = getenv("COMSPEC")) == NULL)
+#endif
+	    env_shell = SHELL;
+
+	shell_len += strlen(env_shell);
+	user_shell = (const char *) gp_alloc(shell_len, "user shell");
+	safe_strncpy((char *)user_shell, env_shell, shell_len);
+    }
+}
+
+/* expand tilde in path
+ * path cannot be a static array!
+ */
+void gp_expand_tilde (path, pathsize)
+char *path;
+size_t pathsize;
+{
+    if (path[0] == '~' && path[1] == DIRSEP1) {
+
+	if (user_homedir) {
+	    size_t n = strlen(path);
+
+	    if (n + strlen(user_homedir) >= pathsize)
+		path = gp_realloc (path, n - 1 + strlen(user_homedir), "tilde expanded path");
+
+	    /* include null at end ... */
+	    memmove (path + strlen(user_homedir) - 1, path, n+1);
+	    strncpy (path, user_homedir, strlen(user_homedir));
+        }
+        else
+	    int_warn ("HOME not set - cannot expand tilde", NO_CARET);
+    }
 }
 
 #ifdef OS2
