@@ -1,5 +1,5 @@
 /*
- * $Id: epslatex.trm,v 1.4 2000/10/31 20:26:03 joze Exp $
+ * $Id: epslatex.trm,v 1.5 2000/11/07 16:35:55 lhecking Exp $
  */
 
 /* GNUPLOT - epslatex.trm */
@@ -798,7 +798,7 @@ EPSL_arrow(xstart, ystart, xend, yend, head)
 unsigned int xstart, ystart, xend, yend;
 TBOOLEAN head;
 {
-    fprintf(gpoutfile, "%d %d M\n%d %d %s\n", xstart, ystart, xend, yend, head ? "Arrow" : "Gpstroke");
+    fprintf(gpoutfile, "%d %d M\n%d %d %s\n", xstart, ystart, xend, yend, head ? "Arrow" : "L Gpstroke");
 }
 
 TERM_PUBLIC void
