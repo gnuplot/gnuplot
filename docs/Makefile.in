@@ -161,6 +161,11 @@ gnuplot.gih: doc2gih $(srcdir)/gnuplot.doc
 doc2gih: doc2gih.o termdoc.o
 	$(LINK) doc2gih.o termdoc.o $(LIBS)
 
+# To include all terminals in the .gih file
+allgih: doc2gih.c
+	$(COMPILE) -DALL_TERM_DOC -c $<
+	$(MAKE) gih
+
 # this is how to make Info documentation
 info: gnuplot.info
 
