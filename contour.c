@@ -285,7 +285,7 @@ double x, y;
 /*
  * Done with current contour - create gnuplot data structure for it.
  */
-static void end_crnt_cntr(void)
+static void end_crnt_cntr()
 {
     int i;
     struct gnuplot_contours *cntr = (struct gnuplot_contours *)
