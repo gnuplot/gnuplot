@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: getcolor.c,v 1.14 2003/11/13 08:18:15 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: getcolor.c,v 1.15 2004/05/26 11:17:42 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - getcolor.c */
@@ -251,6 +251,11 @@ calculate_color_from_formulae( double gray, rgb_color *color )
 void
 color_components_from_gray( double gray, rgb_color *color )
 {
+    if (gray < 0)
+    	gray = 0;
+    else
+	if (gray > 1.0)
+	    gray = 1.0;
     switch( sm_palette.colorMode ) {
       case SMPAL_COLOR_MODE_GRAY:
 	  color->r = color->g = color->b = pow( gray, 1.0/sm_palette.gamma );

@@ -1,3 +1,8 @@
+2004-05-28  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* src/getcolor.c (color_components_from_gray): Test gray value for being
+	in range [0;1].
+
 2004-05-27  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/gplt_x11.c (PaletteSetColor): Test for overflow of index
