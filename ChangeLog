@@ -1,4 +1,31 @@
-\2004-07-03  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+2004-07-03  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/color.c src/color.h src/gadgets.h src/gp_types.h src/graphics.c 
+	src/misc.c src/plot2d.c src/pm3d.c src/set.c src/tables.c src/tables.h
+	src/term_api.h src/term.c:
+
+	New capabilities for filledcurves plot style.
+	(1) New options "above" and "below" to limit filled area to one side of
+	the bounding line or second curve.
+	(2) New ability to fill area between two curves (triggered if 3 input
+	columns are given.  E.g. `plot "data" using 1:2:3 with filledcurves`
+	(3) Apply current fill style to filledcurves (requires terminal support
+	in term->filled_polygon).
+
+	* demo/fillbetween.dem docs/gnuplot.doc:  documentation and demo file
+
+	* term/cgm.trm term/gd.trm term/pdf.trm term/post.trm term/svg.trm
+	term/x11.trm: Modified filled_polygon() to apply fill style passed in
+	the color structure of the first vertex.
+
+	* src/gplt_x11.c: Back-end support for applying explicit fill style
+	to filled_polygon.  Beware of incompatibility with early versions.
+
+2004-07-03  Ethan Merritt  <merritt@u.washington.edu>
+
+	* term/post.trm: Minor cleanup of enhanced text "phantom box" macros.
+
+2004-07-03  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* PATCHLEVEL, VERSION: Changed to version 4.1, patchlevel 0.
 

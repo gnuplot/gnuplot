@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.109 2004/06/30 19:56:20 broeker Exp $
+ * $Id: post.trm,v 1.110 2004/07/01 17:10:33 broeker Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -492,9 +492,14 @@ static const char GPFAR * GPFAR PS_header[] = {
 #if USE_ULIG_FILLEDBOXES
 /* filled box in current color,
    but color lightened up as defined by filldensity (ULIG),
-   usage:   x1 y1 x2 y2 BoxColFill */
-"/BoxColFill {\n",
-"  gsave Rec\n",
+   usage:   density x1 y1 x2 y2 BoxColFill */
+"/BoxColFill { gsave Rec PolyFill grestore } def\n",
+
+/* Generalization of BoxColFill to polygons
+ * usage: x1 y1 N x2 y2 V ... xi yi V density PolyFill
+ */
+"/PolyFill {\n",
+"  gsave\n",
 "  /Fillden exch def\n",
 "  currentrgbcolor\n",
 "  /ColB exch def /ColG exch def /ColR exch def\n",
@@ -531,6 +536,91 @@ static const char GPFAR * GPFAR PS_header[] = {
 "%\n",
 
 #endif /* USE_ULIG_FILLEDBOXES */
+
+#define EAM_PSLEVEL2
+/*
+ * To protect this stuff at run-time rather than at compile time:
+ *
+ * /languagelevel where
+ *   {pop languagelevel} {1} ifelse
+ *   2 lt
+ *      {/PSLevel2 false def}
+ *      {/PSLevel2 true def}
+ *   ifelse
+ */
+#ifdef EAM_PSLEVEL2
+"%\n",
+"% PostScript level 2 pattern fill definitions\n",
+"% Ethan A Merritt April 2004\n",
+"%\n",
+"% Pattern fill definitions\n",
+
+"/Tile8x8 {/PaintType 2 /PatternType 1 /TilingType 1 /BBox [0 0 8 8] /XStep 8 /YStep 8}\n",
+"          bind def\n",
+"/KeepColor {currentrgbcolor [/Pattern /DeviceRGB] setcolorspace} bind def\n",
+
+"<< Tile8x8\n",
+" /PaintProc { 0.5 setlinewidth  pop 0 0 M 8 8 L 0 8 M 8 0 L stroke } \n",
+">> matrix makepattern\n",
+"/Pat1 exch def\n",
+
+"<< Tile8x8\n",
+" /PaintProc { 0.5 setlinewidth  pop 0 0 M 8 8 L 0 8 M 8 0 L stroke\n",
+"              0 4 M 4 8 L 8 4 L 4 0 L 0 4 L stroke }\n",
+">> matrix makepattern\n",
+"/Pat2 exch def\n",
+
+"<< Tile8x8\n",
+" /PaintProc { 0.5 setlinewidth  pop 0 0 M 0 8 L\n",
+"              8 8 L 8 0 L 0 0 L fill }\n",
+">> matrix makepattern\n",
+"/Pat3 exch def\n",
+
+"<< Tile8x8\n",
+" /PaintProc { 0.5 setlinewidth  pop -4 8 M 8 -4 L\n",
+"              0 12 M 12 0 L stroke }\n",
+">> matrix makepattern\n",
+"/Pat4 exch def\n",
+
+"<< Tile8x8\n",
+" /PaintProc { 0.5 setlinewidth  pop -4 0 M 8 12 L\n",
+"              0 -4 M 12 8 L stroke }\n",
+">> matrix makepattern\n",
+"/Pat5 exch def\n",
+
+"<< Tile8x8\n",
+" /PaintProc { 0.5 setlinewidth  pop -2 8 M 4 -4 L\n",
+"              0 12 M 8 -4 L 4 12 M 10 0 L stroke }\n",
+">> matrix makepattern\n",
+"/Pat6 exch def\n",
+
+"<< Tile8x8\n",
+" /PaintProc { 0.5 setlinewidth  pop -2 0 M 4 12 L\n",
+"              0 -4 M 8 12 L 4 -4 M 10 8 L stroke }\n",
+">> matrix makepattern\n",
+"/Pat7 exch def\n",
+
+"<< Tile8x8\n",
+" /PaintProc { 0.5 setlinewidth  pop 8 -2 M -4 4 L\n",
+"              12 0 M -4 8 L 12 4 M 0 10 L stroke }\n",
+">> matrix makepattern\n",
+"/Pat8 exch def\n",
+
+"<< Tile8x8\n",
+" /PaintProc { 0.5 setlinewidth  pop 0 -2 M 12 4 L\n",
+"              -4 0 M 12 8 L -4 4 M 8 10 L stroke }\n",
+">> matrix makepattern\n",
+"/Pat9 exch def\n",
+
+"/Pattern1 {KeepColor Pat1 setpattern} bind def\n",
+"/Pattern2 {KeepColor Pat2 setpattern} bind def\n",
+"/Pattern3 {KeepColor Pat3 setpattern} bind def\n",
+"/Pattern4 {KeepColor Landscape { Pat5 } { Pat4 } ifelse setpattern} bind def\n",
+"/Pattern5 {KeepColor Landscape { Pat4 } { Pat5 } ifelse setpattern} bind def\n",
+"/Pattern6 {KeepColor Landscape { Pat9 } { Pat6 } ifelse setpattern} bind def\n",
+"/Pattern7 {KeepColor Landscape { Pat8 } { Pat7 } ifelse setpattern} bind def\n",
+"%\n%End of PostScript Level 2 code\n%\n",
+#endif /* EAM_PSLEVEL2 */
 
 /* oblique symbol font, e.g. set xlabel 'b' "Symbol-Oblique"
    gives an oblique (slanted) beta character */
@@ -573,6 +663,11 @@ static const char GPFAR * GPFAR ENHPS_header[] = {
 /* centred show */
 "/MCshow { currentpoint stroke M\n",
 "  exch dup MFwidth -2 div 3 -1 roll R MFshow } def\n",
+
+/* Save and restore for @-text (phantom box) */
+"/XYsave    { [( ) 1 2 true false 3 ()] } bind def\n",
+"/XYrestore { [( ) 1 2 true false 4 ()] } bind def\n",
+
 NULL
 };
 
@@ -1244,6 +1339,7 @@ PS_common_init(
 /gnudict 256 dict def\ngnudict begin\n\
 /Color %s def\n\
 /Solid %s def\n\
+/Landscape %s def\n\
 /gnulinewidth %.3f def\n\
 /userlinewidth gnulinewidth def\n\
 /vshift %d def\n\
@@ -1652,6 +1748,7 @@ NULL };
     fprintf(gpoutfile, psi2,
 	    ps_color ? "true" : "false",
 	    ps_solid ? "true" : "false",
+		ps_portrait ? "false" : "true",
 	    PS_LW*ps_linewidth_factor,	/* line width */
 	    (int)(t->v_char)/(-3),	/* shift for vertical centring */
 	    PS_SC*ps_dash_length,	/* dash length */
@@ -2215,10 +2312,10 @@ ENHPS_OPEN(
     /* that the normal case macro wants. Somebody more familiar with PostScript*/
     /* than I am please clean it up!                                           */
     if (overprint == 3) {
-	fprintf(gpoutfile,"[( ) 1 2 true true 3 (GSAVE)]\n");
+	fprintf(gpoutfile,"XYsave\n");
 	return;
     } else if (overprint == 4) {
-	fprintf(gpoutfile,"[( ) 1 2 true true 4 (GRESTORE)]\n");
+	fprintf(gpoutfile,"XYrestore\n");
 	return;
     }
 
@@ -2649,31 +2746,61 @@ TERM_PUBLIC void PS_set_color (double gray)
 }
 
 
-TERM_PUBLIC void PS_filled_polygon ( int points, gpiPoint *corners )
+TERM_PUBLIC void PS_filled_polygon (int points, gpiPoint *corners)
 {
+    int i;
+    float filldens = 1.0;
+    int pattern = 0;
+    int style = corners->style;
+
     /* Stroke the previous graphic element if required. */
     if (PS_relative_ok)
 	PS_FLUSH_PATH;
 
     /* produce lines like:
-       9055 29350 N 695 0 V 0 564 V -695 0 h  ... for quadrangles
-       9055 29350 N 695 0 V 0 564 f           ... otherwise
+	 * 9055 29350 N 695 0 V 0 564 V density PolyFill
      */
     fprintf(gpoutfile, "%i %i N", corners[0].x, corners[0].y);
-    if (points == 4) /* shorter version for quadrangles */
-	fprintf(gpoutfile, " %i %i %i %i %i %i h\n",
-	    corners[3].x-corners[2].x, corners[3].y-corners[2].y,
-	    corners[2].x-corners[1].x, corners[2].y-corners[1].y,
-	    corners[1].x-corners[0].x, corners[1].y-corners[0].y
-	       );
-    else {
-	int i;
-	for (i = 1; i < points-1; i++)
+	for (i = 1; i < points; i++)
 	    fprintf(gpoutfile, " %i %i V",
 		corners[i].x-corners[i-1].x, corners[i].y-corners[i-1].y);
-	fprintf(gpoutfile, " %i %i f\n",
-	    corners[i].x-corners[i-1].x, corners[i].y-corners[i-1].y);
+	fprintf(gpoutfile,"\n");
+
+	switch( style & 0xf ) {
+	
+	case FS_SOLID:
+	    filldens = (style >> 4) / 100.0;
+	    if( filldens < 0.0 )
+		filldens = 0.0;
+	    if( filldens > 1.0 )
+		filldens = 1.0;
+	    fprintf(gpoutfile, "%.1f PolyFill\n", filldens);
+	    break;
+	    
+	case FS_PATTERN:
+#ifdef EAM_PSLEVEL2
+	    pattern = (style >> 4) % 8;
+	    if (pattern == 0)  {
+		filldens = 0.5;
+		fprintf(gpoutfile, "%.1f PolyFill\n", filldens);
+	    } else {
+		fprintf(gpoutfile,"gsave 1 setgray fill grestore Pattern%d fill\n", pattern);
+	}
+	break;
+#else
+	filldens = (style >> 4) % 8;
+	filldens = 0.125 * (filldens + 1);
+	fprintf(gpoutfile, "%.1f PolyFill\n", filldens);
+	break;
+#endif
+
+    default:
+	filldens = 1.0;
+	fprintf(gpoutfile, "%.1f PolyFill\n", filldens);
+        break;
+
     }
+
     PS_relative_ok = FALSE;
 }
 
