@@ -114,6 +114,7 @@ extern int Pause(LPSTR mess);	/* in winmain.c */
 # define chdir  _chdir2
 extern int PM_pause(char *);  /* term/pm.trm */
 extern int ExecuteMacro(char *, int); /* plot.c */
+extern TBOOLEAN CallFromRexx;  /* plot.c */
 #endif /* OS2 */
 
 #ifdef VMS
@@ -398,9 +399,12 @@ static int command()
 # ifdef OS2
 	    if (strcmp(term->name, "pm") == 0 && sleep_time < 0) {
 		int rc;
-		if ((rc = PM_pause(buf)) == 0)
-		    bail_to_command_line();
-		else if (rc == 2) {
+		if ((rc = PM_pause(buf)) == 0) {
+/*           if (!CallFromRexx)
+  would help to stop REXX programs w/o raising an error message
+  in RexxInterface() ... */
+              bail_to_command_line();
+        } else if (rc == 2) {
 		    fputs(buf, stderr);
 		    text = 1;
 		    (void) fgets(buf, MAX_LINE_LEN, stdin);

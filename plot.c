@@ -94,7 +94,7 @@ extern int rl_complete_with_tilde_expansion;
 #  endif
 /* 
  * The next variable is a pointer to the value returned from 'tilde_expand()'.
- * This function expands '~' to the user's home directory, or $HOME,
+ * This function expands '~' to the user's home directory, or $HOME, with
  * UN*X, AmigaOS, MSDOS.
  * Depending on your OS you have to make sure that the "$HOME" environment
  * variable exitsts.  You are responsible for valid values.
@@ -251,6 +251,7 @@ struct udft_entry *first_udf = NULL;
 # include <process.h>
 ULONG RexxInterface(PRXSTRING, PUSHORT, PRXSTRING);
 int ExecuteMacro(char *, int);
+TBOOLEAN CallFromRexx = FALSE;
 void PM_intc_cleanup();
 void PM_setup();
 #endif /* OS2 */
@@ -676,15 +677,56 @@ static void load_rcfile()
 int ExecuteMacro(char *argv, int namelength)
 {
     RXSTRING rxRc;
-    RXSTRING rxArg;
+    RXSTRING rxArg[2];
+    int rxArgCount=0;
     char pszName[CCHMAXPATH];
+    char *rxArgStr;
     short sRc;
     int rc;
 
-    safe_strncpy(pszName, argv, sizeof(pszName));
-    MAKERXSTRING(rxArg, argv, strlen(argv));
-    rc = RexxStart(1,
-		   &rxArg,
+    if (namelength >= sizeof(pszName))
+      return 1;
+    safe_strncpy(pszName, argv, namelength+1);
+    rxArgStr = &argv[namelength];
+
+#if 0
+    /*
+       C-like calling of function: program name is first
+       parameter.
+       In REXX you would have to use
+          Parse Arg param0, param1
+       to get the program name in param0 and the arguments in param1.
+
+       Some versions before gnuplot 3.7pl1 used a similar approach but
+       passed program name and arguments in a single string:
+         (==> Parse Arg param0 param1)
+    */
+
+    MAKERXSTRING(rxArg[0], pszName, strlen(pszName));
+    rxArgCount++;
+    if (*rxArgStr) {
+      MAKERXSTRING(rxArg[1], rxArgStr, strlen(rxArgStr));
+      rxArgCount++;
+    }
+#else
+    /*
+       REXX standard calling (gnuplot 3.7pl1 and above):
+       The program name is not supplied and so all actual arguments
+       are in a single string:
+           Parse Arg param
+       We even handle blanks like cmd.exe when calling REXX programs.
+    */
+
+    if (*rxArgStr) {
+      MAKERXSTRING(rxArg[0], rxArgStr, strlen(rxArgStr));
+      rxArgCount++;
+    }
+#endif
+
+    CallFromRexx = TRUE;
+    rc = RexxStart(
+           rxArgCount,
+		   rxArg,
 		   pszName,
 		   NULL,
 		   "GNUPLOT",
@@ -692,11 +734,13 @@ int ExecuteMacro(char *argv, int namelength)
 		   NULL,
 		   &sRc,
 		   &rxRc);
+    CallFromRexx = FALSE;
     if (rc == -4)
-	rc = 0;			/* run was cancelled-don't give error message */
+      rc = 0;       /* run was cancelled-don't give error message */
 
-/* We don't use this value ?
-   BTW, don't use free() instead since it's allocated inside RexxStart() */
+/* We don't we try to use rxRc ?
+   BTW, don't use free() instead since it's allocated inside RexxStart()
+   and not in our executable using the EMX libraries */
     DosFreeMem(rxRc.strptr);
     return rc;
 }
@@ -712,20 +756,25 @@ ULONG RexxInterface(PRXSTRING rxCmd, PUSHORT pusErr, PRXSTRING rxRc)
 
     memcpy(keepenv, command_line_env, sizeof(jmp_buf));
     if (!setjmp(command_line_env)) {
-	/* set variable input_line.
-	 * Watch out for line length of NOT_ZERO_TERMINATED strings ! */
-	cmdlen = rxCmd->strlength + 1;
-	safe_strncpy(input_line, rxCmd->strptr, cmdlen);
-	input_line[cmdlen] = NUL;
-
-	rc = do_line();
-	*pusErr = RXSUBCOM_OK;
-	rxRc->strptr[0] = rc + '0';
-	rxRc->strptr[1] = NUL;
-	rxRc->strlength = strlen(rxRc->strptr);
+      /* Set variable input_line.
+         Watch out for line length of NOT_ZERO_TERMINATED strings ! */
+       cmdlen = rxCmd->strlength + 1;
+       safe_strncpy(input_line, rxCmd->strptr, cmdlen);
+       input_line[cmdlen] = NUL;
+       rc = do_line();
+       *pusErr = RXSUBCOM_OK;
+       rxRc->strptr[0] = rc + '0';
+       rxRc->strptr[1] = NUL;
+       rxRc->strlength = strlen(rxRc->strptr);
     } else {
-	*pusErr = RXSUBCOM_ERROR;
-	RexxSetHalt(getpid(), 1);
+/*
+   We end up here when bail_to_command_line() is called.
+   Therefore sometimes this call should be avoided when
+   executing a REXX program (e.g. 'Cancel' from
+   PM GUI after a 'pause -1' command)
+*/
+       *pusErr = RXSUBCOM_ERROR;
+       RexxSetHalt(getpid(), 1);
     }
     memcpy(command_line_env, keepenv, sizeof(jmp_buf));
     return 0;
