@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.152 2002/12/13 21:02:47 mikulik Exp $
+C RCS $Id: gnuplot.doc,v 1.153 2002/12/16 14:17:39 lhecking Exp $
 C 18 September 2001
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001   Thomas Williams, Colin Kelley et al.
 C
@@ -8471,8 +8471,8 @@ C ... and restart the table:
  the gnuplot.el file by Gershon Elber.
  While the gnuplot CVS repository has its own copy the most recent
  version of this package is available from
-^ <a href="http://feff.phys.washington.edu/~ravel/gnuplot/">
-           http://feff.phys.washington.edu/~ravel/gnuplot
+^ <a href="http://feff.phys.washington.edu/~ravel/software/gnuplot-mode/">
+           http://feff.phys.washington.edu/~ravel/software/gnuplot-mode/
 ^ </a>
 
 1 Bugs
