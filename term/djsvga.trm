@@ -331,7 +331,7 @@ char *fontname;
 	char *cp;
 	GrFont *font;
 
-	safe_strncpy(DJSVGA_fontname, fontname, sizeof(DJSVGA_fontname);
+	safe_strncpy(DJSVGA_fontname, fontname, sizeof(DJSVGA_fontname));
 	cp = strstr(DJSVGA_fontname, ",");
 	if (cp != NULL) 
 		*cp = NUL;
