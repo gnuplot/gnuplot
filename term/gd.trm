@@ -1,5 +1,5 @@
 /*
- * $Id: gd.trm,v 1.26 2003/03/31 22:16:59 sfeam Exp $
+ * $Id: gd.trm,v 1.27 2003/04/01 17:19:55 sfeam Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -56,7 +56,7 @@
  *
  * font size (tiny,small,medium,large,giant)
  *
- * font name (TrueType font name is passed to libgd)
+ * font name (TrueType or Adobe Type 1 font name is passed to libgd)
  *
  * xrrggbb - sets the next color.  x is the literal character 'x',
  * rrggbb are the red green and blue components in hex.  For example
@@ -1337,7 +1337,8 @@ START_HELP(png)
 "              {<color0> <color1> <color2> ...}",
 "",
 " PNG images are created using libgd, with optional support for TrueType",
-" fonts via libfreetype. Version 1.8 or greater of libgd is required.",
+" and Adobe Type 1 fonts via libfreetype. Version 1.8 or greater of libgd",
+" is required.",
 "",
 " `transparent` instructs the driver to generate transparent PNGs.  The first",
 " color will be the transparent one. Default is `notransparent`.",
@@ -1350,11 +1351,14 @@ START_HELP(png)
 " `large` (8x16) or `giant` (9x15 pixels). These fonts cannot be scaled",
 " or rotated (pure horizontal or vertical text only).",
 "",
-" If gnuplot was built with support for TrueType fonts, they may be",
-" selected using the `font <face> {<pointsize>}` option. <face> is either ",
-" the full pathname to a TrueType font file, or a font face name searched",
-" for using the GDFONTPATH environmental variable. TrueType fonts are fully",
-" scalable and may be rotated through any angle.",
+" If gnuplot was built with support for TrueType (*.ttf) or Adobe Type 1 ",
+" (*.pfa) fonts, they may be selected using the 'font <face> {<pointsize>}' ",
+" option. <face> is either the full pathname to the font file, or a font ",
+" face name that is assumed to be the first part of a filename in one of the ",
+" directories listed in the GDFONTPATH environmental variable. That is, ",
+" 'set term png font \"Face\"' will look for a font file named either ",
+" <somedirectory>/Face.ttf or <somedirectory>/Face.pfa. Both TrueType and ",
+" Adobe Type 1 fonts are fully scalable and may be rotated through any angle.",
 "",
 " The size <x,y> is given in pixels---it defaults to 640x480.  The number of",
 " pixels can be also modified by scaling with the `set size` command.",
@@ -1490,11 +1494,14 @@ START_HELP(jpeg)
 " `large` (8x16) or `giant` (9x15 pixels). These fonts cannot be scaled",
 " or rotated (pure horizontal or vertical text only).",
 "",
-" If gnuplot was built with support for TrueType fonts, they may be",
-" selected using the `font <face> {<pointsize>}` option. <face> is either ",
-" the full pathname to a TrueType font file, or a font face name searched",
-" for using the GDFONTPATH environmental variable. TrueType fonts are fully",
-" scalable and may be rotated through any angle.",
+" If gnuplot was built with support for TrueType (*.ttf) or Adobe Type 1 ",
+" (*.pfa) fonts, they may be selected using the 'font <face> {<pointsize>}' ",
+" option. <face> is either the full pathname to the font file, or a font ",
+" face name that is assumed to be the first part of a filename in one of the ",
+" directories listed in the GDFONTPATH environmental variable. That is, ",
+" 'set term png font \"Face\"' will look for a font file named either ",
+" <somedirectory>/Face.ttf or <somedirectory>/Face.pfa. Both TrueType and ",
+" Adobe Type 1 fonts are fully scalable and may be rotated through any angle.",
 "",
 " The size <x,y> is given in pixels---it defaults to 640x480.  The number of",
 " pixels can be also modified by scaling with the `set size` command.",

@@ -1,3 +1,10 @@
+2003-04-13  Ethan Merritt <merritt@u.washington.edu>
+
+	* term/gd.trm: Document that libgd will handle both TrueType
+	and Adobe Type 1 fonts.
+
+	* src/unset.c: Set tic label rotation to 0 on unset or reset.
+
 2003-04-04  Ethan Merritt <merritt@u.washington.edu>
 
 	* term/pslatex.trm term/epslatex.trm: Add filled box support.
