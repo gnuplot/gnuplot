@@ -1,5 +1,5 @@
 #ifdef INCRCSDATA
-static char RCSid[]="$Id: gclient.c,v 1.28 2004/07/01 17:10:09 broeker Exp $";
+static char RCSid[]="$Id: gclient.c,v 1.29 2004/09/27 14:39:00 mikulik Exp $";
 #endif
 
 /****************************************************************************
@@ -2170,7 +2170,9 @@ ReadGnu(void* arg)
 #ifdef PM3D
     HPAL pm3d_hpal = 0;     /* palette used for make_palette() */
     HPAL pm3d_hpal_old = 0; /* default palette used before make_palette() */
-    LONG pm3d_color = 0;    /* current colour(used if it is >0) */
+    /* Either of the two is used: */
+    LONG pm3d_color = 0;     /* current colour(used if it is >0) */
+    int pm3d_rgb_color = -1; /* current rgb colour(used if it is >=0) */
 #endif
 
     hab = WinInitialize(0);
@@ -2347,6 +2349,22 @@ ReadGnu(void* arg)
 		if (pm3d_color>=0) {
 		    curr_color = GpiQueryColor(hps);
 		    GpiSetColor(hps, pm3d_color);
+		} else if (pm3d_rgb_color >= 0) {
+#if 1
+		    /* @@@ FIXME -- UNIMPLEMENTED */
+		    /* @@@ SEE "pm3d_rgb_color" ALSO BELOW -- DO A ROUTINE TO BE REUSABLE */
+		    static int here = 1;
+		    if (here) {
+			fprintf(stderr, "set_color(pm3d_rgb_color) not yet implemented -- please contribute\n");
+			here = 0;
+		    }
+#else
+		    int r, g, b;
+		    r = (pm3d_rgb_color >> 16 ) & 255;
+		    g = (pm3d_rgb_color >> 8 ) & 255;
+		    b = (pm3d_rgb_color & 255);
+		    // NOW FIND AN APPROXIMATIVE COLOR IN THE CURRENT PALETTE
+#endif
 		}
 #endif
 		if (*buff=='M') {
@@ -2374,6 +2392,8 @@ ReadGnu(void* arg)
 		if (pm3d_color >= 0)
 		    GpiSetColor(hps, curr_color);
 	    }
+		    /* @@@ FIXME -- UNIMPLEMENTED */
+		    /* @@@ SEE "pm3d_rgb_color" ALSO ABOVE -- DO A ROUTINE TO BE REUSABLE */
 #endif
 	    break;
 
@@ -2435,6 +2455,8 @@ ReadGnu(void* arg)
 #ifdef PM3D
 		    if (pm3d_color>=0)
 			GpiSetColor(hps, pm3d_color);
+		    /* @@@ FIXME -- UNIMPLEMENTED */
+		    /* @@@ SEE "pm3d_rgb_color" ALSO ABOVE -- DO A ROUTINE TO BE REUSABLE */
 		    /*
 		      else
 		      GpiSetColor(hps, CLR_BLACK);
@@ -2577,6 +2599,7 @@ ReadGnu(void* arg)
 		}
 #ifdef PM3D
 		pm3d_color = -1; /* switch off using pm3d colours */
+		pm3d_rgb_color = -1;
 #endif
 		break;
 	    }
@@ -2835,6 +2858,15 @@ ReadGnu(void* arg)
 
 		BufRead(hRead,&c, 1, &cbR);
 		pm3d_color = c + nColors;
+		pm3d_rgb_color = -1;
+		break;
+	    }
+	    case 'b': /* GR_SET_RGBCOLOR */
+	    {
+		int i;
+		BufRead(hRead, &i, sizeof(i), &cbR);
+		pm3d_rgb_color = i;
+		pm3d_color = -1;
 		break;
 	    }
 	    case 'f': /* GR_FILLED_POLYGON */
@@ -2848,6 +2880,8 @@ ReadGnu(void* arg)
 		/* GpiSetBackMix(hps,BM_OVERPAINT); */
 		if (pm3d_color>=0)
 		    GpiSetColor(hps, pm3d_color);
+		    /* @@@ FIXME -- UNIMPLEMENTED */
+		    /* @@@ SEE "pm3d_rgb_color" ALSO ABOVE -- DO A ROUTINE TO BE REUSABLE */
 		/* using colours defined in the palette */
 		GpiBeginArea(hps, BA_BOUNDARY | BA_ALTERNATE);
 		for (i = 0; i < points; i++) {

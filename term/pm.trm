@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: pm.trm,v 1.36 2004/07/01 17:10:33 broeker Exp $
+ * $Id: pm.trm,v 1.37 2004/07/13 14:11:25 broeker Exp $
  */
 
 /* GNUPLOT - pm.trm */
@@ -78,7 +78,7 @@ TERM_PUBLIC void PM_set_clipboard __PROTO((const char[]));
 #ifdef PM3D
 TERM_PUBLIC int PM_make_palette (t_sm_palette *);
 TERM_PUBLIC void PM_previous_palette (void);
-TERM_PUBLIC void PM_set_color (double);
+TERM_PUBLIC void PM_set_color (t_colorspec *);
 TERM_PUBLIC void PM_filled_polygon (int, gpiPoint *);
 #endif
 
@@ -148,6 +148,7 @@ TERM_PUBLIC void PM_filled_polygon (int, gpiPoint *);
 #define GR_MAKE_PALETTE    'p'
 #define GR_RELEASE_PALETTE 'e'
 #define GR_SET_COLOR       'C'
+#define GR_SET_RGBCOLOR	   'b'
 #define GR_FILLED_POLYGON  'f'
 #endif
 #define PM_nopts 1
@@ -706,25 +707,20 @@ TERM_PUBLIC void PM_previous_palette ()
 }
 
 
-#if 0 /* caching of color value removed; won't be so efficient for z=const
-	 surfaces/map, but will save a lot of headache (linetype changes
-	 color, for instance) */
-int pm_color = -1;
-  /* keep here the last set color
-     it is not unsigned char since -1 says that no value has been set
-   */
-#endif
-
-TERM_PUBLIC void PM_set_color (double gray)
+TERM_PUBLIC void PM_set_color (t_colorspec *colorspec)
 {
+    if (colorspec->type == TC_RGB) {
+	putc(GR_SET_RGBCOLOR, PM_pipe);
+	fwrite(&(colorspec->lt), sizeof(int), 1, PM_pipe);
+	fflush(PM_pipe);
+	return;
+    }
+    if (colorspec->type != TC_FRAC)
+	return;
     unsigned char c = (gray <= 0) ? 0 : (int)(gray * sm_palette.colors);
     if (c >= sm_palette.colors)
 	c = sm_palette.colors - 1;
     /* map [0;1] to interval [0;smooth_colors-1] */
-#if 0 /*  color caching */
-    if (c == pm_color) return;
-    pm_color = c;
-#endif
     putc(GR_SET_COLOR, PM_pipe);
     putc(c, PM_pipe);
 }

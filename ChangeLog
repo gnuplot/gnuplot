@@ -1,3 +1,8 @@
+2004-11-29  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* term/pm.trm src/os2/gclient.c: Changes for the new colorspec type
+	TC_RGB. Currently, they are dummy in gclient.c -- to be implemented.
+
 2004-11-27  Ethan Merritt  <merritt@u.washington.edu>
 
 	* docs/gnuplot.doc docs/gnuplot.texi: Re-format a large section of text
