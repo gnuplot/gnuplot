@@ -1,3 +1,13 @@
+2004-11-20  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/datafile.c (add_key_entry): Make sure all fields of newly
+	allocated structure are initialized.
+
+	* src/graph3d.c (do_3dplot) src/plot3d.h: Call utility function 
+	is_plot_with_palette rather than making plot_has_palette a global int.
+
+	* src/util3d.h: map3d_xy_double is needed independent of WITH_IMAGE.
+
 2004-11-13  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/specfun.c (f_erf f_erfc f_normal): Replace in-line rough
