@@ -1,3 +1,25 @@
+1999-05-04  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* config/makefile.os2: Run latex2e three times to update the table of
+	contents properly. Suggested by Petr Mikulik.
+
+1999-04-29  Dick Crawford  <u600256@gamma.lanl.gov>
+
+	* docs/gnuplot.doc: Updated.
+
+1999-04-29  "Daniel H. Luecking"  <luecking@comp.uark.edu>
+
+	* term/metafont.trm(MF_init): Fix typos (GPMAX->max). Better vertical
+	adjustment for text.
+
+1999-04-27  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* README.1st: Note new location of djconfig.sh.
+
+	* TODO: Add new topic.
+
+	* docs/Makefile.in, term/post.trm: Fix typos.
+
 1999-04-26  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* NEWS: Updated.
@@ -68,7 +90,7 @@
 
 	* src/Makefile.maint: Add target for version.c.
 
-	* src/util.c(m_quote_capture): Fix possible quoting bug.
+	* src/util.c(m_quote_capture): Fix potential quoting bug.
 
 1999-04-15  Martin Costabel  <costabel@wanadoo.fr>
 
