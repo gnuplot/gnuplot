@@ -49,7 +49,7 @@ clean-local:
 
 Makefile.am: Makefile.am.in
 	rm -f $@ $@t
-	sed -n '1,/^##plt-files-begin/p' $< > $@t
+	sed -n '1,/^##plt-files-begin/p' Makefile.am.in > $@t
 	echo PLT_SOURCES = *.plt | fmt | (tr '\012' @; echo ) \
 	  |sed 's/@$$/%/;s/@/ \\@/g;' | tr @% '\012 ' >> $@t
 	sed -n '/^##plt-files-end/,$$p' $< >> $@t
