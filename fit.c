@@ -73,7 +73,7 @@ static char *RCSid = "$Id: fit.c,v 1.58 1998/04/14 00:15:19 drd Exp $";
 
 #if defined(ATARI) || defined(MTOS)
 # define getchx() Crawcin()
-int kbhit(void);
+static int kbhit(void);
 #endif
 
 #define STANDARD    stderr	/* compatible with gnuplot philosophy */
@@ -1580,7 +1580,7 @@ void do_fit()
 }
 
 #if defined(ATARI) || defined(MTOS)
-int kbhit()
+static int kbhit()
 {
     fd_set rfds;
     struct timeval timeout;
