@@ -286,7 +286,7 @@ struct value a, b;
 	}
 	push(integer(&a,result));
 }
-
+ 
 
 f_gt()
 {

@@ -42,8 +42,11 @@ struct at_type at;
 static jmp_buf fpe_env;
 
 #define dummy (struct value *) 0
-
+#ifdef __TURBOC__
+void fpe(int xXx)
+#else
 fpe()
+#endif
 {
 #ifdef PC	/* thanks to lotto@wjh12.UUCP for telling us about this  */
 	_fpreset();

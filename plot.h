@@ -15,22 +15,32 @@
 
 #define PROGRAM "G N U P L O T"
 #define PROMPT "gnuplot> "
-#define SHELL "/bin/csh"		/* used if SHELL env variable not set */
+#define SHELL "/bin/sh"		/* used if SHELL env variable not set */
 
 #ifdef vms
 #define HELP  "gnuplot "
 #else /* vms */
-#define HELP  "/usr/local/bin/gnuphelp gnuplot"
+#define HELP  "/usr/local/bin/help gnuplot"
 #endif /* vms */
 
 #define SAMPLES 160			/* default number of samples for a plot */
 #define ZERO	1e-8		/* default for 'zero' set option */
 
+#ifdef __TURBOC__
+#ifndef PC
+#define PC 1
+#endif
+#endif
+
 #ifdef PC
 #define TERM "egalib"
-#else /* PC */
-#define TERM "tek"		/* put your most common term type here! */
-#endif /* PC */
+#else
+#ifdef UNIXPC
+#define TERM "unixpc"
+#else
+#define TERM "tek40xx"		/* put your most common term type here! */
+#endif 
+#endif
 
 #define TRUE 1
 #define FALSE 0
@@ -72,6 +82,13 @@
  * example:
 #define HUGE 1e38
  */
+#ifndef HUGE 
+#ifdef HUGE_VAL  /* __TURBOC__ and VMS C ver 3.0 (ansi type compilers) */
+#define HUGE HUGE_VAL
+#else
+#define HUGE 1e38
+#endif
+#endif
 
 #define END_OF_COMMAND (c_token >= num_tokens || equals(c_token,";"))
 

@@ -1,0 +1,96 @@
+/* thanks to richb@yarra.OZ (Rich Burridge) for the Postscript driver */
+#define PS_XMAX 540
+#define PS_YMAX 720
+
+#define PS_XLAST (PS_XMAX - 1)
+#define PS_YLAST (PS_YMAX - 1)
+
+#define PS_VCHAR (PS_YMAX/30)
+#define PS_HCHAR (PS_XMAX/72)
+#define PS_VTIC (PS_YMAX/80)
+#define PS_HTIC (PS_XMAX/80)
+
+
+PS_init()
+{
+  (void) fprintf(outfile,"%%!\n") ;
+  (void) fprintf(outfile,"/off {36 add} def\n") ;
+  (void) fprintf(outfile,"/mv {off exch off moveto} def\n") ;
+  (void) fprintf(outfile,"/ln {off exch off lineto} def\n") ;
+  (void) fprintf(outfile,"/Times-Roman findfont 12 scalefont setfont\n") ;
+  (void) fprintf(outfile,"0.25 setlinewidth\n") ;
+}
+
+
+PS_graphics()
+{
+  (void) fprintf(outfile,"newpath\n") ;
+}
+
+
+PS_text()
+{
+  (void) fprintf(outfile,"stroke\n") ;
+  (void) fprintf(outfile,"showpage\n") ;
+}
+
+
+PS_linetype(linetype)
+int linetype ;
+{
+  (void) fprintf(outfile,"stroke [") ;
+  switch ((linetype+2)%7)
+    {
+      case 0 :                                 /* solid. */
+      case 2 : break ;
+      case 1 :                                 /* longdashed. */
+      case 6 : (void) fprintf(outfile,"9 3") ;
+               break ;
+      case 3 : (void) fprintf(outfile,"3") ;            /* dotted. */
+               break ;
+      case 4 : (void) fprintf(outfile,"6 3") ;          /* shortdashed. */
+               break ;
+      case 5 : (void) fprintf(outfile,"3 3 6 3") ;      /* dotdashed. */
+    }
+  (void) fprintf(outfile,"] 0 setdash\n") ;
+}
+ 
+ 
+PS_move(x,y)
+unsigned int x,y ;
+{
+  (void) fprintf(outfile,"%1d %1d mv\n",y,x) ;
+}
+ 
+ 
+PS_vector(x,y)
+unsigned int x,y ;
+{
+  (void) fprintf(outfile,"%1d %1d ln\n",y,x) ;
+}
+ 
+ 
+PS_lrput_text(row,str)
+unsigned int row ;
+char str[] ;
+{
+  PS_move(PS_XMAX - PS_HTIC - PS_HCHAR*(strlen(str)+1),
+          PS_VTIC + PS_VCHAR*(row+1)) ;
+  (void) fprintf(outfile,"(%s) show\n",str) ;
+}
+
+
+PS_ulput_text(row,str)
+unsigned int row ;
+char str[] ;
+{
+  PS_move(PS_HTIC, PS_YMAX - PS_VTIC - PS_VCHAR*(row+1)) ;
+  (void) fprintf(outfile,"(%s) show\n",str) ;
+}
+
+
+PS_reset()
+{
+}
+
+

@@ -15,14 +15,19 @@
 
 #include <stdio.h>
 #include "plot.h"
+#ifdef __TURBOC__
+#include <graphics.h>
+#endif
 
 extern BOOLEAN autoscale;
+extern BOOLEAN polar;
 extern BOOLEAN log_x, log_y;
 extern FILE* outfile;
 extern char outstr[];
 extern int samples;
 extern int term;
 extern double zero;
+extern double roff, loff, toff, boff;
 
 extern BOOLEAN screen_ok;
 
@@ -164,6 +169,11 @@ show_zero()
 	fprintf(stderr,"\tzero is %g\n",zero);
 }
 
+show_offsets()
+{
+	fprintf(stderr,"\toffsets are %g, %g, %g, %g\n",roff,loff,toff,boff);
+}
+
 show_samples()
 {
 	fprintf(stderr,"\tsampling rate is %d\n",samples);
@@ -177,6 +187,14 @@ show_output()
 show_term()
 {
 	fprintf(stderr,"\tterminal type is %s\n",term_tbl[term].name);
+}
+
+show_polar()
+{
+	if (polar)
+		fprintf(stderr,"\tPolar coordinates are in effect\n");
+	else
+		fprintf(stderr,"\tRectangular coordinates are in effect\n");
 }
 
 show_autoscale()

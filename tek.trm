@@ -1,0 +1,92 @@
+#define TEK40XMAX 1024
+#define TEK40YMAX 780
+
+#define TEK40XLAST (TEK40XMAX - 1)
+#define TEK40YLAST (TEK40YMAX - 1)
+
+#define TEK40VCHAR		25
+#define TEK40HCHAR		14
+#define TEK40VTIC		11
+#define TEK40HTIC		11	
+
+#define HX 0x20		/* bit pattern to OR over 5-bit data */
+#define HY 0x20
+#define LX 0x40
+#define LY 0x60
+
+#define LOWER5 31
+#define UPPER5 (31<<5)
+
+
+TEK40init()
+{
+}
+
+
+TEK40graphics()
+{
+	fprintf(outfile,"\033\014");
+/*                   1
+	1. clear screen
+*/
+}
+
+
+TEK40text()
+{
+	TEK40move(0,12);
+	fprintf(outfile,"\037");
+/*                   1
+	1. into alphanumerics
+*/
+}
+
+
+TEK40linetype(linetype)
+int linetype;
+{
+}
+
+
+TEK40move(x,y)
+unsigned int x,y;
+{
+	(void) putc('\035', outfile);	/* into graphics */
+	TEK40vector(x,y);
+}
+
+
+TEK40vector(x,y)
+unsigned int x,y;
+{
+	(void) putc((HY | (y & UPPER5)>>5), outfile);
+	(void) putc((LY | (y & LOWER5)), outfile);
+	(void) putc((HX | (x & UPPER5)>>5), outfile);
+	(void) putc((LX | (x & LOWER5)), outfile);
+}
+
+
+TEK40lrput_text(row,str)
+unsigned int row;
+char str[];
+{
+	TEK40move(TEK40XMAX - TEK40HTIC - TEK40HCHAR*(strlen(str)+1),
+		TEK40VTIC + TEK40VCHAR*(row+1));
+	fprintf(outfile,"\037%s\n",str);
+}
+
+
+TEK40ulput_text(row,str)
+unsigned int row;
+char str[];
+{
+	TEK40move(TEK40HTIC, TEK40YMAX - TEK40VTIC - TEK40VCHAR*(row+1));
+	fprintf(outfile,"\037%s\n",str);
+}
+
+
+TEK40reset()
+{
+}
+
+

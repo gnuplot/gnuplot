@@ -1,0 +1,104 @@
+/* thanks to hplvlch!ch (Chuck Heller) for the HP2623A driver */
+#define HP26_XMAX 512
+#define HP26_YMAX 390
+
+#define HP26_XLAST (HP26_XMAX - 1)
+#define HP26_YLAST (HP26_XMAX - 1)
+
+/* Assume a character size of 1, or a 7 x 10 grid. */
+#define HP26_VCHAR	10
+#define HP26_HCHAR	7
+#define HP26_VTIC	4
+#define HP26_HTIC	4
+
+HP26_init()
+{
+	/*	The HP2623A needs no initialization. */
+}
+
+
+HP26_graphics()
+{
+	/*	Clear and enable the display */
+
+	fputs("\033*daZ\033*dcZ",outfile);
+}
+
+
+HP26_text()
+{
+	fputs("\033*dT",outfile);	/* back to text mode */
+}
+
+
+HP26_linetype(linetype)
+int linetype;
+{
+#define	SOLID	1
+#define LINE4	4
+#define LINE5	5
+#define LINE6	6
+#define LINE8	8
+#define	DOTS	7
+#define LINE9	9
+#define LINE10	10
+
+static int map[2+9] = {	SOLID,	/* border */
+						DOTS,	/* axes */
+						SOLID,	/* plot 0 */
+						LINE4,	/* plot 1 */
+						LINE5,	/* plot 2 */
+						LINE6,	/* plot 3 */
+						LINE8,	/* plot 4 */
+						LINE9,	/* plot 5 */
+						LINE10,	/* plot 6 */
+						DOTS,	/* plot 7 */
+						SOLID	/* plot 8 */ };
+
+	if (linetype >= 9)
+		linetype %= 9;
+	fprintf(outfile,"\033*m%dB",map[linetype + 2]);
+}
+
+
+HP26_move(x,y)
+int x,y;
+{
+	fprintf(outfile,"\033*pa%d,%dZ",x,y);
+}
+
+
+HP26_vector(x,y)
+int x,y;
+{
+	fprintf(outfile,"\033*pb%d,%dZ",x,y);
+}
+
+
+HP26_lrput_text(row,str)
+int row;
+char str[];
+{
+	HP26_move(HP26_XMAX-HP26_HTIC*2,HP26_VTIC*2+HP26_VCHAR*row);
+	fputs("\033*dS",outfile);
+	fprintf(outfile,"\033*m7Q\033*l%s\n",str);
+	fputs("\033*dT",outfile);
+}
+
+
+HP26_ulput_text(row,str)
+int row;
+char str[];
+{
+	HP26_move(HP26_HTIC*2,HP26_YMAX-HP26_VTIC*2-HP26_VCHAR*row);
+	fputs("\033*dS",outfile);
+	fprintf(outfile,"\033*m3Q\033*l%s\n",str);
+	fputs("\033*dT",outfile);
+}
+
+
+HP26_reset()
+{
+}
+
+

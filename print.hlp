@@ -1,7 +1,0 @@
-This command prints the value of <expression> to the screen.
-
-Syntax:
-        print <expression>
-
-See 'expressions'.
-

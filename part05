@@ -1,0 +1,1204 @@
+Newsgroups: comp.sources.misc
+From: allbery@uunet.UU.NET (Brandon S. Allbery - comp.sources.misc)
+Subject: v08i039: GnuPlot v1.10A (part 5 of 7)
+Reply-To: canoaf@ntvax.UUCP (Augustine Cano)
+
+Posting-number: Volume 8, Issue 39
+Submitted-by: canoaf@ntvax.UUCP (Augustine Cano)
+Archive-name: gnuplot1.10A/part05
+
+[OOPS!!!  I had to patch these after receiving them -- and managed to lose the
+name of the person who submitted them in the process.  Duh.  The name shown
+is a "best guess".  Submitter, please correct me.  ++bsa]
+
+#! /bin/sh
+# This is a shell archive.  Remove anything before this line, then unpack
+# it by saving it into a file and typing "sh file".  To overwrite existing
+# files, type "sh file -c".  You can also feed this as standard input via
+# unshar, or by typing "sh <file", e.g..  If this archive is complete, you
+# will see the following message at the end:
+#		"End of archive 5 (of 7)."
+# Contents:  unixpc.trm unixplot.trm util.c v384.trm version.c
+# Wrapped by allbery@uunet on Sat Sep  9 13:47:23 1989
+PATH=/bin:/usr/bin:/usr/ucb ; export PATH
+if test -f 'unixpc.trm' -a "${1}" != "-c" ; then 
+  echo shar: Will not clobber existing file \"'unixpc.trm'\"
+else
+echo shar: Extracting \"'unixpc.trm'\" \(12181 characters\)
+sed "s/^X//" >'unixpc.trm' <<'END_OF_FILE'
+X/*
+XFrom: John Campbell (...!arizona!naucse!jdc)
+X
+XI ported gnuplot to the ATT 3b1 (ATT7300) on 12/4/88.  The 3b1, as I view
+Xit, is a 720x300 bitmapped, monochrome display (often people don't use
+Xthe top 12 scan lines and thus the effective size is 720x288).  I tried to
+Xmaximize the size of the graph area, by using these top 12 lines (normally
+Xreserved) and set up a signal handler to restore them upon exit, abort, etc.
+X
+XLine styles were "fudged" (they do not know the aspect ratio).  The same
+Xline style may look different depending upon the slope of the curve.  Due to
+Xthis only 4 line styles were implemented.  While more line types are possible,
+Xthe current styles were chosen as distinguishable.
+X
+XThe 3b1 has 4 "special" rows at the bottom that I could not use in graphics
+Xmode.  I chose to use these lines for the plot scale--normally found at the
+Xbottom right corner of the plot.  I wanted to use the four bottom lines as
+Xprompt/command lines, but did not find a way to do this.  If someone ever
+Xwrites a device driver to "open" these rows as a small separate window, I
+Xcould implement my original idea.
+X*/
+X
+X#include <sys/window.h>   /* Started with tam.h--too much trouble. */
+X#include <sys/signal.h>
+X#include <errno.h>
+X
+X#define uPC_HIGH_BIT    (0x8000)
+X
+Xtypedef unsigned short Scr_type;
+Xtypedef unsigned char Scr_kluge;
+X
+X#define uPC_XMAX 720
+X#define uPC_YMAX 300
+X
+X#define uPC_XSIZE       45 /* Short ints. */
+X#define uPC_YSIZE uPC_YMAX
+X
+XScr_type uPC_display[uPC_YSIZE][uPC_XSIZE];
+Xint uPC_width = 2*uPC_XSIZE;
+Xint uPC_sx=0, uPC_sy=0;
+Xint uPC_cur_linetype=0;
+Xunsigned short uPC_raster_count=0;
+X
+X#define uPC_XLAST (uPC_XMAX - 1)
+X#define uPC_YLAST (uPC_YMAX - 1)
+X
+X#define uPC_VCHAR 12
+X#define uPC_HCHAR  9
+X#define uPC_VTIC   8
+X#define uPC_HTIC  12
+X
+Xextern errno, sys_nerr;
+Xextern char *sys_errlist[];
+X
+Xstatic struct urdata uPC_ur = {(unsigned short *)uPC_display, 2*uPC_XSIZE, 0, 0,
+X                           0, 0, 0, 0, uPC_XMAX, uPC_YMAX, SRCSRC, DSTOR, 0};
+X
+X#define IfErrOut(e1,e2,s1,s2) if (e1 e2) {\
+Xfprintf(stderr, "%s:: %s %s\n", sys_errlist[errno], s1, s2);\
+XuPC_fixwind(0);\
+Xexit(-1);}
+X
+XuPC_init()
+X{
+X/* This routine will ioctl to change 0 size */
+X   int i;
+X   struct uwdata uw;
+X   int uPC_fixwind();
+X   short gw;
+X
+X/* Check that we are on the bitmapped window. */
+X   if (iswind() != 0) {
+X      fprintf (stderr, "Sorry--must run from the bitmapped terminal\n");
+X      exit(-1);
+X   }
+X   for (i=1; i<=16; i++) {
+X      if (i != SIGINT && i != SIGFPE)  /* Two are caught in plot.c */
+X         signal (i, uPC_fixwind);
+X   }
+X
+X/* Increase the screen size */
+X   uw.uw_x = 0;
+X   uw.uw_y = 0;   /* Leave room for top status line. */
+X   uw.uw_width = uPC_XMAX;      /* 720 */
+X   uw.uw_height = uPC_YMAX;     /* 288 normal--we clobber 12 (top row)*/
+X   uw.uw_uflags = 1;         /* Creates with no border */
+X
+X   IfErrOut (ioctl(0, WIOCSETD, &uw), <0, "ioctl failed on", "WIOCSETD");
+X}
+X
+X
+XuPC_graphics()
+X{
+X/* This routine will clear the uPC_display buffer and window. */
+X   register Scr_type *j;
+X   register int i;
+X
+X   j = (Scr_type *)uPC_display;
+X   i = uPC_YSIZE*uPC_XSIZE + 1;
+X
+X   while (--i)
+X      *j++ = 0;
+X
+X   uPC_ur.ur_dstop = DSTSRC;   /* replace (clear screen). */
+X   IfErrOut (ioctl(0, WIOCRASTOP, &uPC_ur), <0,
+X      "ioctl failed", "WIOCRASTOP");
+X   uPC_ur.ur_dstop = DSTOR;   /* Or in (show text) */
+X}
+X
+X
+XuPC_text()
+X{
+X/* This routine will flush the display. */
+X
+X   IfErrOut (ioctl(0, WIOCRASTOP, &uPC_ur), <0,
+X      "ioctl failed", "WIOCRASTOP");
+X/* Now position the cursor at the second to the last row--better later? */
+X   wgoto (0, 24, 0);
+X}
+X
+X
+XuPC_linetype(linetype)
+Xint linetype;
+X{
+X/* This routine records the current linetype. */
+X   if (uPC_cur_linetype != linetype) {
+X      uPC_raster_count = 0;
+X      uPC_cur_linetype = linetype;
+X   }
+X}
+X
+X
+XuPC_move(x,y)
+Xunsigned int x,y;
+X{
+X/* This routine just records x and y in uPC_sx, uPC_sy */
+X   uPC_sx = x;
+X   uPC_sy = y;
+X}
+X
+X
+X/* Was just (*(a)|=(b)) */
+X#define uPC_PLOT(a,b)   (uPC_cur_linetype != 0 ? uPC_plot_word (a,b) :\
+X                                *(a)|=(b))
+X
+XuPC_plot_word(a,b)
+XScr_type *a, b;
+X/*
+X   Weak attempt to make line styles.  The real problem is the aspect
+X   ratio.  This routine is called only when a bit is to be turned on in
+X   a horizontal word.  A better line style routine would know something
+X   about the slope of the line around the current point (in order to
+X   change weighting).
+X
+X   This yields 3 working linetypes plus a usable axis line type.
+X*/
+X{
+X/* Various line types */
+X   switch (uPC_cur_linetype) {
+X   case -1:
+X   /* Distinguish between horizontal and vertical axis. */
+X      if (uPC_sx > uPC_XMAX/8 && uPC_sx < 7*uPC_XMAX/8) {
+X      /* Fuzzy tolerance because we don't know exactly where the y axis is */
+X         if (++uPC_raster_count % 2 == 0) *(a) |= b;
+X      }
+X      else {
+X      /* Due to aspect ratio, take every other y pixel and every third x. */
+X         *(a) |= (b & 0x9999);
+X      }
+X   break;
+X   case 1:
+X   case 5:
+X   /* Make a |    |----|    |----| type of line. */
+X      if ((1<<uPC_raster_count) & 0xF0F0) *(a) |= b;
+X      if (++uPC_raster_count > 15) uPC_raster_count = 0;
+X   break;
+X   case 2:
+X   case 6:
+X   /* Make a |----|----|----|--- |    | type of line. */
+X      if ((1<<uPC_raster_count) & 0x0EFFF) *(a) |= b;
+X      if (++uPC_raster_count > 19) uPC_raster_count = 0;
+X   break;
+X   case 3:
+X   case 7:
+X   /* Make a | -  | -  | -  | -  | type of line. */
+X      if ((1<<uPC_raster_count) & 0x4444) *(a) |= b;
+X      if (++uPC_raster_count > 15) uPC_raster_count = 0;
+X   break;
+X   case 4:
+X   case 8:
+X   default:
+X      *(a) |= b;
+X   break;
+X   }
+X}
+X
+XuPC_vector(x,y)
+Xunsigned int x,y;
+X{
+X/* This routine calls line with x,y */
+X   int x1 = uPC_sx, y1=uPC_sy, x2 = x, y2 = y;
+X   register int  c, e, dx, dy, width;
+X   register Scr_type mask, *a;
+X   static Scr_type lookup[] = {
+X      0x0001, 0x0002, 0x0004, 0x0008,
+X      0x0010, 0x0020, 0x0040, 0x0080,
+X      0x0100, 0x0200, 0x0400, 0x0800,
+X      0x1000, 0x2000, 0x4000, 0x8000,
+X   };
+X
+X/* Record new sx, sy for next call to the vector routine. */
+X   uPC_sx = x2;
+X   uPC_sy = y2;
+X
+X   a = &uPC_display[(uPC_YSIZE - 1) - y1][x1 >> 4];
+X   mask = lookup[x1 & 0x0f];
+X   width = uPC_width;
+X
+X   if ((dx = x2 - x1) > 0) {
+X      if ((dy = y2 - y1) > 0) {
+X         if (dx > dy) {         /* dx > 0, dy > 0, dx > dy */
+X            dy <<= 1;
+X            e = dy - dx;
+X            c = dx + 2;
+X            dx <<= 1;
+X
+X            while (--c) {
+X               uPC_PLOT(a, mask);
+X               if (e >= 0) {
+X                  (Scr_kluge *)a -= width;
+X                  e -= dx;
+X               }
+X               if (mask & uPC_HIGH_BIT) {
+X                  mask = 1;
+X                  a++;
+X               } else
+X                  mask <<= 1;
+X               e += dy;
+X            }
+X         } else {            /* dx > 0, dy > 0, dx <= dy */
+X            dx <<= 1;
+X            e = dx - dy;
+X            c = dy + 2;
+X            dy <<= 1;
+X
+X            while (--c) {
+X               uPC_PLOT(a, mask);
+X               if (e >= 0) {
+X                  if (mask & uPC_HIGH_BIT) {
+X                     mask = 1;
+X                     a++;
+X                  } else
+X                     mask <<= 1;
+X                  e -= dy;
+X               }
+X               (Scr_kluge *)a -= width;
+X               e += dx;
+X            }
+X         }
+X      } else {
+X         dy = -dy;
+X         if (dx > dy) {         /* dx > 0, dy <= 0, dx > dy */
+X            dy <<= 1;
+X            e = dy - dx;
+X            c = dx + 2;
+X            dx <<= 1;
+X
+X            while (--c) {
+X               uPC_PLOT(a, mask);
+X               if (e >= 0) {
+X                  (Scr_kluge *)a += width;
+X                  e -= dx;
+X               }
+X               if (mask & uPC_HIGH_BIT) {
+X                  mask = 1;
+X                  a++;
+X               } else
+X                  mask <<= 1;
+X               e += dy;
+X            }
+X         } else {            /* dx > 0, dy <= 0, dx <= dy */
+X            dx <<= 1;
+X            e = dx - dy;
+X            c = dy + 2;
+X            dy <<= 1;
+X
+X            while (--c) {
+X               uPC_PLOT(a, mask);
+X               if (e >= 0) {
+X                  if (mask & uPC_HIGH_BIT) {
+X                     mask = 1;
+X                     a++;
+X                  } else
+X                     mask <<= 1;
+X                  e -= dy;
+X               }
+X               (Scr_kluge *)a += width;
+X               e += dx;
+X            }
+X         }
+X      }
+X   } else {
+X      dx = -dx;
+X      if ((dy = y2 - y1) > 0) {
+X         if (dx > dy) {         /* dx <= 0, dy > 0, dx > dy */
+X            dy <<= 1;
+X            e = dy - dx;
+X            c = dx + 2;
+X            dx <<= 1;
+X
+X            while (--c) {
+X               uPC_PLOT(a, mask);
+X               if (e >= 0) {
+X                  (Scr_kluge *)a -= width;
+X                  e -= dx;
+X               }
+X               if (mask & 1) {
+X                  mask = uPC_HIGH_BIT;
+X                  a--;
+X               } else
+X                  mask >>= 1;
+X               e += dy;
+X            }
+X         } else {            /* dx <= 0, dy > 0, dx <= dy */
+X            dx <<= 1;
+X            e = dx - dy;
+X            c = dy + 2;
+X            dy <<= 1;
+X
+X            while (--c) {
+X               uPC_PLOT(a, mask);
+X               if (e >= 0) {
+X                  if (mask & 1) {
+X                     mask = uPC_HIGH_BIT;
+X                     a--;
+X                  } else
+X                     mask >>= 1;
+X                  e -= dy;
+X               }
+X               (Scr_kluge *)a -= width;
+X               e += dx;
+X            }
+X         }
+X      } else {
+X         dy = -dy;
+X         if (dx > dy) {         /* dx <= 0, dy <= 0, dx > dy */
+X            dy <<= 1;
+X            e = dy - dx;
+X            c = dx + 2;
+X            dx <<= 1;
+X
+X            while (--c) {
+X               uPC_PLOT(a, mask);
+X               if (e >= 0) {
+X                  (Scr_kluge *)a += width;
+X                  e -= dx;
+X               }
+X               if (mask & 1) {
+X                  mask = uPC_HIGH_BIT;
+X                  a--;
+X               } else
+X                  mask >>= 1;
+X               e += dy;
+X            }
+X         } else {            /* dx <= 0, dy <= 0, dx <= dy */
+X            dx <<= 1;
+X            e = dx - dy;
+X            c = dy + 2;
+X            dy <<= 1;
+X
+X            while (--c) {
+X               uPC_PLOT(a, mask);
+X               if (e >= 0) {
+X                  if (mask & 1) {
+X                     mask = uPC_HIGH_BIT;
+X                     a--;
+X                  } else
+X                     mask >>= 1;
+X                  e -= dy;
+X               }
+X               (Scr_kluge *)a += width;
+X               e += dx;
+X            }
+X         }
+X      }
+X   }
+X}
+X
+X
+XuPC_lrput_text(row,str)
+Xunsigned int row;
+Xchar str[];
+X{
+X   int col = 80-strlen(str), num, i;
+X   struct utdata ut;
+X   char *txt=ut.ut_text;
+X
+X/* Fill in the pad. */
+X   for (i = 0; i < col; i++)
+X      txt[i] = ' ';
+X/* Then stick in the text. */
+X   txt[i] = '\0';
+X   strcat (txt, str);
+X
+X   if (row > 2)
+X      puts (txt);
+X   else {
+X   /* This will fit on the 2 bottom "non-graphic" lines. */
+X      switch (row) {
+X      case 0: ut.ut_num =  WTXTSLK1; break;
+X      case 1: ut.ut_num =  WTXTSLK2; break;
+X      }
+X      ioctl (0, WIOCSETTEXT, &ut);
+X   }
+X   wgoto (1, 24, 0);
+X}
+X
+XuPC_ulput_text(row,str)
+Xunsigned int row;
+Xchar str[];
+X{
+X/* This routine puts the text in the upper left corner. */
+X
+X/* Just use the ANSI escape sequence CUP (iswind said that was ok!) */
+X   printf ("\033[%d;%dH%s\033[25;1H", row+2, 2, str); /* +1 +2 ? */
+X   fflush (stdout);
+X}
+X
+X
+XuPC_reset()
+X{
+X/* Reset window to normal size. */
+X   uPC_fixwind (0);
+X}
+X
+X
+X
+XuPC_fixwind(signo)
+Xint signo;
+X{
+X   static struct uwdata wreset = { 0, 12, 720, 288, 0x1};
+X   struct utdata ut;
+X
+X/* Reset the window to the right size. */
+X   ioctl(0, WIOCSETD, &wreset);   /* 0, not wncur here! */
+X
+X/* Clear the lines affected by an _lrput_text. */
+X   ut.ut_text[0] = '\0';
+X   ut.ut_num =  WTXTSLK1;
+X   ioctl(0, WIOCSETTEXT, &ut);
+X   ut.ut_num =  WTXTSLK2;
+X   ioctl(0, WIOCSETTEXT, &ut);
+X/* Scroll the screen once. (avoids typing over the same line) */
+X   fprintf (stderr, "\n");
+X
+X   if (signo) {
+X      if (signo == SIGILL || signo == SIGTRAP || signo == SIGPWR)
+X         signal (signo, SIG_DFL);
+X      kill (0,signo);  /* Redo the signal (as if we never trapped it). */
+X   }
+X}
+END_OF_FILE
+if test 12181 -ne `wc -c <'unixpc.trm'`; then
+    echo shar: \"'unixpc.trm'\" unpacked with wrong size!
+fi
+# end of 'unixpc.trm'
+fi
+if test -f 'unixplot.trm' -a "${1}" != "-c" ; then 
+  echo shar: Will not clobber existing file \"'unixplot.trm'\"
+else
+echo shar: Extracting \"'unixplot.trm'\" \(998 characters\)
+sed "s/^X//" >'unixplot.trm' <<'END_OF_FILE'
+X#define UP_XMAX 4096
+X#define UP_YMAX 4096
+X
+X#define UP_XLAST (UP_XMAX - 1)
+X#define UP_YLAST (UP_YMAX - 1)
+X
+X#define UP_VCHAR (UP_YMAX/30)
+X#define UP_HCHAR (UP_XMAX/72)	/* just a guess--no way to know this! */
+X#define UP_VTIC (UP_YMAX/80)
+X#define UP_HTIC (UP_XMAX/80)
+X
+XUP_init()
+X{
+X	openpl();
+X	space(0, 0, UP_XMAX, UP_YMAX);
+X}
+X
+X
+XUP_graphics()
+X{
+X	erase();
+X}
+X
+X
+XUP_text()
+X{
+X}
+X
+X
+XUP_linetype(linetype)
+Xint linetype;
+X{
+Xstatic char *lt[2+5] = {"solid", "longdashed", "solid", "dotted","shortdashed",
+X	"dotdashed", "longdashed"};
+X
+X	if (linetype >= 5)
+X		linetype %= 5;
+X	linemod(lt[linetype+2]);
+X}
+X
+X
+XUP_move(x,y)
+Xunsigned int x,y;
+X{
+X	move(x,y);
+X}
+X
+X
+XUP_vector(x,y)
+Xunsigned int x,y;
+X{
+X	cont(x,y);
+X}
+X
+X
+XUP_lrput_text(row,str)
+Xunsigned int row;
+Xchar str[];
+X{
+X	move(UP_XMAX - UP_HTIC - UP_HCHAR*(strlen(str)+1),
+X		UP_VTIC + UP_VCHAR*(row+1));
+X	label(str);
+X}
+X
+X
+XUP_ulput_text(row,str)
+Xunsigned int row;
+Xchar str[];
+X{
+X	UP_move(UP_HTIC, UP_YMAX - UP_VTIC - UP_VCHAR*(row+1));
+X	label(str);
+X}
+X
+XUP_reset()
+X{
+X	closepl();
+X}
+X
+X
+END_OF_FILE
+if test 998 -ne `wc -c <'unixplot.trm'`; then
+    echo shar: \"'unixplot.trm'\" unpacked with wrong size!
+fi
+# end of 'unixplot.trm'
+fi
+if test -f 'util.c' -a "${1}" != "-c" ; then 
+  echo shar: Will not clobber existing file \"'util.c'\"
+else
+echo shar: Extracting \"'util.c'\" \(8430 characters\)
+sed "s/^X//" >'util.c' <<'END_OF_FILE'
+X/*
+X *
+X *    G N U P L O T  --  util.c
+X *
+X *  Copyright (C) 1986, 1987  Thomas Williams, Colin Kelley
+X *
+X *  You may use this code as you wish if credit is given and this message
+X *  is retained.
+X *
+X *  Please e-mail any useful additions to vu-vlsi!plot so they may be
+X *  included in later releases.
+X *
+X *  This file should be edited with 4-column tabs!  (:set ts=4 sw=4 in vi)
+X */
+X
+X#include <ctype.h>
+X#include <setjmp.h>
+X#include <stdio.h>
+X#include <errno.h>
+X#include "plot.h"
+X
+Xextern BOOLEAN screen_ok;
+X	/* TRUE if command just typed; becomes FALSE whenever we
+X		send some other output to screen.  If FALSE, the command line
+X		will be echoed to the screen before the ^ error message. */
+X
+Xchar *malloc();
+X
+X#ifndef vms
+Xextern int errno, sys_nerr;
+Xextern char *sys_errlist[];
+X#endif /* vms */
+X
+Xextern char input_line[];
+Xextern struct lexical_unit token[];
+Xextern jmp_buf env;	/* from plot.c */
+X
+X
+X/*
+X * equals() compares string value of token number t_num with str[], and
+X *   returns TRUE if they are identical.
+X */
+Xequals(t_num, str)
+Xint t_num;
+Xchar *str;
+X{
+Xregister int i;
+X
+X	if (!token[t_num].is_token)
+X		return(FALSE);				/* must be a value--can't be equal */
+X	for (i = 0; i < token[t_num].length; i++) {
+X		if (input_line[token[t_num].start_index+i] != str[i])
+X			return(FALSE);
+X		}
+X	/* now return TRUE if at end of str[], FALSE if not */
+X	return(str[i] == '\0');
+X}
+X
+X
+X
+X/*
+X * almost_equals() compares string value of token number t_num with str[], and
+X *   returns TRUE if they are identical up to the first $ in str[].
+X */
+Xalmost_equals(t_num, str)
+Xint t_num;
+Xchar *str;
+X{
+Xregister int i;
+Xregister int after = 0;
+Xregister start = token[t_num].start_index;
+Xregister length = token[t_num].length;
+X
+X	if (!token[t_num].is_token)
+X		return(FALSE);				/* must be a value--can't be equal */
+X	for (i = 0; i < length + after; i++) {
+X		if (str[i] != input_line[start + i]) {
+X			if (str[i] != '$')
+X				return(FALSE);
+X			else {
+X				after = 1;
+X				start--;	/* back up token ptr */
+X				}
+X			}
+X		}
+X
+X	/* i now beyond end of token string */
+X
+X	return(after || str[i] == '$' || str[i] == '\0');
+X}
+X
+X
+X
+Xisstring(t_num)
+Xint t_num;
+X{
+X	
+X	return(token[t_num].is_token &&
+X		   (input_line[token[t_num].start_index] == '\'' ||
+X		   input_line[token[t_num].start_index] == '\"'));
+X}
+X
+X
+Xisnumber(t_num)
+Xint t_num;
+X{
+X	return(!token[t_num].is_token);
+X}
+X
+X
+Xisletter(t_num)
+Xint t_num;
+X{
+X	return(token[t_num].is_token &&
+X			(isalpha(input_line[token[t_num].start_index])));
+X}
+X
+X
+X/*
+X * is_definition() returns TRUE if the next tokens are of the form
+X *   identifier =
+X *		-or-
+X *   identifier ( identifer ) =
+X */
+Xis_definition(t_num)
+Xint t_num;
+X{
+X	return (isletter(t_num) &&
+X			(equals(t_num+1,"=") ||			/* variable */
+X			(equals(t_num+1,"(") &&		/* function */
+X			 isletter(t_num+2)   &&
+X			 equals(t_num+3,")") &&
+X			 equals(t_num+4,"=") )
+X		));
+X}
+X
+X
+X
+X/*
+X * copy_str() copies the string in token number t_num into str, appending
+X *   a null.  No more than MAX_ID_LEN chars are copied.
+X */
+Xcopy_str(str, t_num)
+Xchar str[];
+Xint t_num;
+X{
+Xregister int i = 0;
+Xregister int start = token[t_num].start_index;
+Xregister int count;
+X
+X	if ((count = token[t_num].length) > MAX_ID_LEN)
+X		count = MAX_ID_LEN;
+X	do {
+X		str[i++] = input_line[start++];
+X		} while (i != count);
+X	str[i] = '\0';
+X}
+X
+X
+X/*
+X * quote_str() does the same thing as copy_str, except it ignores the
+X *   quotes at both ends.  This seems redundant, but is done for
+X *   efficency.
+X */
+Xquote_str(str, t_num)
+Xchar str[];
+Xint t_num;
+X{
+Xregister int i = 0;
+Xregister int start = token[t_num].start_index + 1;
+Xregister int count;
+X
+X	if ((count = token[t_num].length - 2) > MAX_ID_LEN)
+X		count = MAX_ID_LEN;
+X	do {
+X		str[i++] = input_line[start++];
+X		} while (i != count);
+X	str[i] = '\0';
+X}
+X
+X
+X/*
+X *	capture() copies into str[] the part of input_line[] which lies between
+X *	the begining of token[start] and end of token[end].
+X */
+Xcapture(str,start,end)
+Xchar str[];
+Xint start,end;
+X{
+Xregister int i,e;
+X
+X	e = token[end].start_index + token[end].length;
+X	for (i = token[start].start_index; i < e && input_line[i] != '\0'; i++)
+X		*str++ = input_line[i];
+X	*str = '\0';
+X}
+X
+X
+X/*
+X *	m_capture() is similar to capture(), but it mallocs storage for the
+X *  string.
+X */
+Xm_capture(str,start,end)
+Xchar **str;
+Xint start,end;
+X{
+Xregister int i,e;
+Xregister char *s;
+X
+X	if (*str)		/* previous pointer to malloc'd memory there */
+X		free(*str);
+X	e = token[end].start_index + token[end].length;
+X	if (*str = malloc((unsigned int)(e - token[start].start_index + 1))) {
+X		s = *str;
+X		for (i = token[start].start_index; i < e && input_line[i] != '\0'; i++)
+X			*s++ = input_line[i];
+X		*s = '\0';
+X	}
+X}
+X
+X
+Xconvert(val_ptr, t_num)
+Xstruct value *val_ptr;
+Xint t_num;
+X{
+X	*val_ptr = token[t_num].l_val;
+X}
+X
+X
+X
+Xdisp_value(fp,val)
+XFILE *fp;
+Xstruct value *val;
+X{
+X		switch(val->type) {
+X			case INT:
+X				fprintf(fp,"%d",val->v.int_val);
+X				break;
+X			case CMPLX:
+X				if (val->v.cmplx_val.imag != 0.0 )
+X					fprintf(fp,"{%g, %g}",
+X						val->v.cmplx_val.real,val->v.cmplx_val.imag);
+X				else
+X					fprintf(fp,"%g", val->v.cmplx_val.real);
+X				break;
+X			default:
+X				int_error("unknown type in disp_value()",NO_CARET);
+X		}
+X}
+X
+X
+Xdouble
+Xreal(val)		/* returns the real part of val */
+Xstruct value *val;
+X{
+X	switch(val->type) {
+X		case INT:
+X			return((double) val->v.int_val);
+X			break;
+X		case CMPLX:
+X			return(val->v.cmplx_val.real);
+X	}
+X	int_error("unknown type in real()",NO_CARET);
+X	/* NOTREACHED */
+X}
+X
+X
+Xdouble
+Ximag(val)		/* returns the imag part of val */
+Xstruct value *val;
+X{
+X	switch(val->type) {
+X		case INT:
+X			return(0.0);
+X			break;
+X		case CMPLX:
+X			return(val->v.cmplx_val.imag);
+X	}
+X	int_error("unknown type in real()",NO_CARET);
+X	/* NOTREACHED */
+X}
+X
+X
+X
+Xdouble
+Xmagnitude(val)		/* returns the magnitude of val */
+Xstruct value *val;
+X{
+X	double sqrt();
+X
+X	switch(val->type) {
+X		case INT:
+X			return((double) abs(val->v.int_val));
+X			break;
+X		case CMPLX:
+X			return(sqrt(val->v.cmplx_val.real*
+X				    val->v.cmplx_val.real +
+X				    val->v.cmplx_val.imag*
+X				    val->v.cmplx_val.imag));
+X	}
+X	int_error("unknown type in magnitude()",NO_CARET);
+X	/* NOTREACHED */
+X}
+X
+X
+X
+Xdouble
+Xangle(val)		/* returns the angle of val */
+Xstruct value *val;
+X{
+X	double atan2();
+X
+X	switch(val->type) {
+X		case INT:
+X			return((val->v.int_val > 0) ? 0.0 : Pi);
+X			break;
+X		case CMPLX:
+X			if (val->v.cmplx_val.imag == 0.0) {
+X				if (val->v.cmplx_val.real >= 0.0)
+X					return(0.0);
+X				else
+X					return(Pi);
+X			}
+X			return(atan2(val->v.cmplx_val.imag,
+X				     val->v.cmplx_val.real));
+X	}
+X	int_error("unknown type in angle()",NO_CARET);
+X	/* NOTREACHED */
+X}
+X
+X
+Xstruct value *
+Xcomplex(a,realpart,imagpart)
+Xstruct value *a;
+Xdouble realpart, imagpart;
+X{
+X	a->type = CMPLX;
+X	a->v.cmplx_val.real = realpart;
+X	a->v.cmplx_val.imag = imagpart;
+X	return(a);
+X}
+X
+X
+Xstruct value *
+Xinteger(a,i)
+Xstruct value *a;
+Xint i;
+X{
+X	a->type = INT;
+X	a->v.int_val = i;
+X	return(a);
+X}
+X
+X
+X
+Xos_error(str,t_num)
+Xchar str[];
+Xint t_num;
+X{
+X#ifdef vms
+Xstatic status[2] = {1, 0};		/* 1 is count of error msgs */
+X#endif
+X
+Xregister int i;
+X
+X	/* reprint line if screen has been written to */
+X
+X	if (t_num != NO_CARET) {		/* put caret under error */
+X		if (!screen_ok)
+X			fprintf(stderr,"\n%s%s\n", PROMPT, input_line);
+X
+X		for (i = 0; i < sizeof(PROMPT) - 1; i++)
+X			(void) putc(' ',stderr);
+X		for (i = 0; i < token[t_num].start_index; i++) {
+X			(void) putc((input_line[i] == '\t') ? '\t' : ' ',stderr);
+X			}
+X		(void) putc('^',stderr);
+X		(void) putc('\n',stderr);
+X	}
+X
+X	for (i = 0; i < sizeof(PROMPT) - 1; i++)
+X		(void) putc(' ',stderr);
+X	fprintf(stderr,"%s\n",str);
+X
+X	for (i = 0; i < sizeof(PROMPT) - 1; i++)
+X		(void) putc(' ',stderr);
+X#ifdef vms
+X	status[1] = vaxc$errno;
+X	sys$putmsg(status);
+X	(void) putc('\n',stderr);
+X#else
+X	if (errno >= sys_nerr)
+X		fprintf(stderr, "unknown errno %d\n\n", errno);
+X	else
+X		fprintf(stderr,"(%s)\n\n",sys_errlist[errno]);
+X#endif
+X
+X	longjmp(env, TRUE);	/* bail out to command line */
+X}
+X
+X
+Xint_error(str,t_num)
+Xchar str[];
+Xint t_num;
+X{
+Xregister int i;
+X
+X	/* reprint line if screen has been written to */
+X
+X	if (t_num != NO_CARET) {		/* put caret under error */
+X		if (!screen_ok)
+X			fprintf(stderr,"\n%s%s\n", PROMPT, input_line);
+X
+X		for (i = 0; i < sizeof(PROMPT) - 1; i++)
+X			(void) putc(' ',stderr);
+X		for (i = 0; i < token[t_num].start_index; i++) {
+X			(void) putc((input_line[i] == '\t') ? '\t' : ' ',stderr);
+X			}
+X		(void) putc('^',stderr);
+X		(void) putc('\n',stderr);
+X	}
+X
+X	for (i = 0; i < sizeof(PROMPT) - 1; i++)
+X		(void) putc(' ',stderr);
+X	fprintf(stderr,"%s\n\n",str);
+X
+X	longjmp(env, TRUE);	/* bail out to command line */
+X}
+END_OF_FILE
+if test 8430 -ne `wc -c <'util.c'`; then
+    echo shar: \"'util.c'\" unpacked with wrong size!
+fi
+# end of 'util.c'
+fi
+if test -f 'v384.trm' -a "${1}" != "-c" ; then 
+  echo shar: Will not clobber existing file \"'v384.trm'\"
+else
+echo shar: Extracting \"'v384.trm'\" \(1966 characters\)
+sed "s/^X//" >'v384.trm' <<'END_OF_FILE'
+X/*
+X *  thanks to roland@moncskermit.OZ (Roland Yap) for this driver
+X *
+X *	Vectrix 384 driver - works with tandy color printer as well
+X *  in reverse printing 8 color mode.
+X *  This doesn't work on Vectrix 128 because it redefines the
+X *  color table. It can be hacked to work on the 128 by changing
+X *  the colours but then it will probably not print best. The color
+X *  table is purposely designed so that it will print well
+X *
+X */
+X
+X#define V384_XMAX 630
+X#define V384_YMAX 480
+X
+X#define V384_XLAST (V384_XMAX - 1)
+X#define V384_YLAST (V384_YMAX - 1)
+X
+X#define V384_VCHAR	12
+X#define V384_HCHAR	7
+X#define V384_VTIC	8
+X#define V384_HTIC	7
+X
+X
+XV384_init()
+X{
+X	fprintf(outfile,"%c%c  G0   \n",27,18);
+X	fprintf(outfile,"Q 0 8\n");
+X	fprintf(outfile,"0 0 0\n");
+X	fprintf(outfile,"255 0 0\n");
+X	fprintf(outfile,"0 255 0\n");
+X	fprintf(outfile,"0 0 255\n");
+X	fprintf(outfile,"0 255 255\n");
+X	fprintf(outfile,"255 0 255\n");
+X	fprintf(outfile,"255 255 0\n");
+X	fprintf(outfile,"255 255 255\n");
+X}
+X
+X
+XV384_graphics()
+X{
+X	fprintf(outfile,"%c%c E0 RE N 65535\n",27,18);
+X}
+X
+X
+XV384_text()
+X{
+X	fprintf(outfile,"%c%c\n",27,17);
+X}
+X
+X
+XV384_linetype(linetype)
+Xint linetype;
+X{
+Xstatic int color[]= {
+X		1 /* red */,
+X		2 /* green */,
+X		3 /* blue */,
+X		4 /* cyan */,
+X		5 /* magenta */,
+X		6 /* yellow */, /* not a good color so not in use at the moment */
+X		7 /* white */
+X	};
+X		
+X	if (linetype < 0)
+X		linetype=6;
+X	else
+X		linetype %= 5;
+X	fprintf(outfile,"C %d\n",color[linetype]);
+X}
+X
+X
+XV384_move(x,y)
+Xunsigned int x,y;
+X{
+X	fprintf(outfile,"M %d %d\n",x+20,y);
+X}
+X
+X
+XV384_vector(x,y)
+Xunsigned int x,y;
+X{
+X	fprintf(outfile,"L %d %d\n",x+20,y);
+X}
+X
+X
+XV384_lrput_text(row,str)
+Xunsigned int row;
+Xchar str[];
+X{
+X	V384_move(V384_XMAX - V384_HTIC - V384_HCHAR*(strlen(str)+1),
+X		V384_VTIC + V384_VCHAR*(row+1));
+X	fprintf(outfile,"$%s\n",str);
+X}
+X
+X
+XV384_ulput_text(row,str)
+Xunsigned int row;
+Xchar str[];
+X{
+X	V384_move(V384_HTIC, V384_YMAX - V384_VTIC - V384_VCHAR*(row+1));
+X	fprintf(outfile,"$%s\n",str);
+X}
+X
+X
+XV384_reset()
+X{
+X}
+X
+X
+END_OF_FILE
+if test 1966 -ne `wc -c <'v384.trm'`; then
+    echo shar: \"'v384.trm'\" unpacked with wrong size!
+fi
+# end of 'v384.trm'
+fi
+if test -f 'version.c' -a "${1}" != "-c" ; then 
+  echo shar: Will not clobber existing file \"'version.c'\"
+else
+echo shar: Extracting \"'version.c'\" \(1467 characters\)
+sed "s/^X//" >'version.c' <<'END_OF_FILE'
+X/*
+X *  Modified version of 1.1.0 gnuplot by Thomas Williams and Colin Kelley.
+X *  "You may use this code as you wish if credit is given and this message
+X *  is retained."
+X *
+X *  Our "use" of this code has been to add a terminal driver (att 3b1),
+X *  improve the IBM-PC drivers using TURBO-C routines, throw in a
+X *  different help system (the one we got didn't seem to work) and add
+X *  the commands SET POLAR, SET OFFSETS, and PAUSE.
+X *
+X *  Files that were changed from the original 1.1.0 version:
+X *  command.c, graphics.c, misc.c, plot.c, term.c and version.c.
+X *
+X *  The annoying problem with unixplot files not being redirected by
+X *  the set output command was fixed and an ``init()'' routine was
+X *  added to term.c to allow an implementation to detect the terminal
+X *  type.  (Currently only used by TURBO-C and VMS.)  The file term.c
+X *  was further changed by breaking it into a number of .TRM files
+X *  (Makefile was changed accordingly).
+X *
+X *  A bug in do_plot() was fixed as well as a VMS bug that caused
+X *  SET OUTPUT to fail.  A final departure from the original 1.1.0
+X *  version was the addition of Jyrki Yli-Nokari's HP laser jet
+X *  drivers to term.c.
+X *
+X *  John Campbell  CAMPBELL@NAUVAX.bitnet (3b1, polar, offsets, pause)
+X *  Bill Wilson    WILSON@NAUVAX.bitnet   (TURBO-C IBM-PC drivers)
+X *  Steve Wampler  ...!arizona!naucse!sbw (help system acquisition)
+X */
+Xchar version[] = "1.1.0A (Polar)";
+Xchar date[] = "Thu May 18 21:57:24 MST 1989";
+END_OF_FILE
+if test 1467 -ne `wc -c <'version.c'`; then
+    echo shar: \"'version.c'\" unpacked with wrong size!
+fi
+# end of 'version.c'
+fi
+echo shar: End of archive 5 \(of 7\).
+cp /dev/null ark5isdone
+MISSING=""
+for I in 1 2 3 4 5 6 7 ; do
+    if test ! -f ark${I}isdone ; then
+	MISSING="${MISSING} ${I}"
+    fi
+done
+if test "${MISSING}" = "" ; then
+    echo You have unpacked all 7 archives.
+    rm -f ark[1-9]isdone
+else
+    echo You still need to unpack the following archives:
+    echo "        " ${MISSING}
+fi
+##  End of shell archive.
+exit 0

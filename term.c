@@ -26,6 +26,10 @@ extern char input_line[];
 extern struct lexical_unit token[];
 extern struct termentry term_tbl[];
 
+/* This is needed because the unixplot library only writes to stdout. */
+FILE save_stdout;
+int unixplot=0;
+
 #define NICE_LINE		0
 #define POINT_TYPES		6
 
@@ -121,1508 +125,268 @@ int x,y,number;
 }
 
 
+#ifdef HPLJET
+#define RASTER
+#endif /* HPLJET */
+
+#ifdef RASTER
+/*
+** General raster plotting routines.
+** Raster routines written and copyrighted 1987 by
+** Jyrki Yli-Nokari (jty@intrin.UUCP)
+** Intrinsic, Ltd.
+** 
+** You may use this code for anything you like as long as
+** you are not selling it and the credit is given and
+** this message retained.
+**
+** The plotting area is defined as a huge raster.
+** The raster is stored in a dynamically allocated pixel array r_p
+**
+** The raster is allocated (and initialized to zero) with
+** r_makeraster(xsize, ysize)
+** and freed with r_freeraster()
+**
+** Valid (unsigned) coordinates range from zero to (xsize-1,ysize-1)
+**
+** Plotting is done via r_move(x, y) and r_draw(x, y, value) functions,
+** where the point (x,y) is the target to go from the current point
+** and value is the value (of type pixel) to be stored in every pixel.
+**
+** Internally all plotting goes through r_setpixel(x, y, val).
+** If you want different plotting styles (like OR, XOR...), use "value"
+** in r_draw() to mark different styles and change r_setpixel() accordingly.
+*/
+
+#define IN(i,size)	((unsigned)i < (unsigned)size)
+typedef char pixel;	/* the type of one pixel in raster */
+typedef pixel *raster[];	/* the raster */
+
+static raster *r_p;	/* global pointer to raster */
+static unsigned r_currx, r_curry;	/* the current coordinates */
+static unsigned r_xsize, r_ysize;	/* the size of the raster */
+
+char *calloc();
+void free();
+
+/*
+** set pixel (x, y, val) to value val (this can be 1/0 or a color number).
+*/
+void
+r_setpixel(x, y, val)
+unsigned x, y;
+pixel val;
+{
+	if (IN(x, r_xsize) && IN(y, r_ysize)) {
+		*(((*r_p)[y]) + x) = val;
+	}
+#ifdef RASTERDEBUG
+	else {
+		fprintf(stderr, "Warning: setpixel(%d, %d, %d) out of bounds\n", x, y, val);
+	}
+#endif
+}
+
+/*
+** get pixel (x,y) value
+*/
+pixel
+r_getpixel(x, y)
+unsigned x, y;
+{
+	if (IN(x, r_xsize) && IN(y, r_ysize)) {
+		return *(((*r_p)[y]) + x);
+	} else {
+#ifdef RASTERDEBUG
+		fprintf(stderr, "Warning: getpixel(%d,%d) out of bounds\n", x, y);
+#endif
+		return 0;
+	}
+}
+
+/*
+** allocate the raster
+*/
+void
+r_makeraster(x, y)
+unsigned x, y;
+{
+	register unsigned j;
+	
+	/* allocate row pointers */
+	if ((r_p = (raster *)calloc(y, sizeof(pixel *))) == (raster *)0) {
+		fprintf(stderr, "Raster buffer allocation failure\n");
+		exit(1);
+	}
+	for (j = 0; j < y; j++) {
+		if (((*r_p)[j] = (pixel *)calloc(x, sizeof(pixel))) == (pixel *)0) {
+			fprintf(stderr, "Raster buffer allocation failure\n");
+			exit(1);
+		}
+	}
+	r_xsize = x; r_ysize = y;
+	r_currx = r_curry = 0;
+}
+	
+/*
+** plot a line from (x0,y0) to (x1,y1) with color val.
+*/
+void
+r_plot(x0, y0, x1, y1, val)
+unsigned x0, y0, x1, y1;
+pixel val;
+{
+	unsigned hx, hy, i;
+	int e, dx, dy;
+
+	hx = abs((int)(x1 - x0));
+	hy = abs((int)(y1 - y0));
+	dx = (x1 > x0) ? 1 : -1;
+	dy = (y1 > y0) ? 1 : -1;
+	
+	if (hx > hy) {
+		/*
+		** loop over x-axis
+		*/
+		e = hy + hy - hx;
+		for (i = 0; i <= hx; i++) {
+			r_setpixel(x0, y0, val);
+			if (e > 0) {
+				y0 += dy;
+				e += hy + hy - hx - hx;
+			} else {
+				e += hy + hy;
+			}
+			x0 += dx;
+		}
+	} else {
+		/*
+		** loop over y-axis
+		*/
+		e = hx + hx - hy;
+		for (i = 0; i <= hy; i++) {
+			r_setpixel(x0, y0, val);
+			if (e > 0) {
+				x0 += dx;
+				e += hx + hx - hy - hy;
+			} else {
+				e += hx + hx;
+			}
+			y0 += dy;
+		}
+	}
+}
+
+/*
+** move to (x,y)
+*/
+void
+r_move(x, y)
+unsigned x, y;
+{
+	r_currx = x;
+	r_curry = y;
+}
+
+/*
+** draw to (x,y) with color val
+** (move pen down)
+*/
+void
+r_draw(x, y, val)
+unsigned x, y;
+pixel val;
+{
+	r_plot(r_currx, r_curry, x, y, val);
+	r_currx = x;
+	r_curry = y;
+}
+
+/*
+** free the allocated raster
+*/
+void
+r_freeraster()
+{
+	int y;
+
+	for (y = 0; y < r_ysize; y++) {
+		free((char *)(*r_p)[y]);
+	}
+	free((char *)r_p);
+}
+#endif /* RASTER */
+
+#ifdef HPLJET
+#include "hpljet.trm"
+#endif /* HPLJET */
+
 #ifdef PC
-
-static char near buf[80];	/* kludge since EGA.LIB is compiled SMALL */
-
-static int pattern[] = {0xffff, 0x0f0f, 0xffff, 0xaaaa, 0x3333, 0x3f3f, 0x0f0f};
-
-static int graphics_on = FALSE;
-int startx, starty;
-
-
-pause()								/* press any key to continue... */
-{
-	while (kbhit())
-		(void) getch();				/* flush the keyboard buffer */
-	while (!kbhit())
-		;
-}
-
-
-PC_lrput_text(row,str)
-int row;
-char str[];
-{
-	PC_curloc(24-row,78-strlen(str));
-	PC_puts(str);
-}
-
-PC_ulput_text(row,str)
-int row;
-char str[];
-{
-	PC_curloc(row+1,2);
-	PC_puts(str);
-}
-
-PC_text()
-{
-	if (graphics_on) {
-		graphics_on = FALSE;
-		pause();
-	}
-	Vmode(3);
-}
-
-PC_reset()
-{
-}
-#define CGA_XMAX 640
-#define CGA_YMAX 200
-
-#define CGA_XLAST (CGA_XMAX - 1)
-#define CGA_YLAST (CGA_YMAX - 1)
-
-#define CGA_VCHAR 8
-#define CGA_HCHAR 8
-#define CGA_VTIC 2
-#define CGA_HTIC 3
-
-CGA_init()
-{
-	PC_color(1);		/* monochrome */
-}
-
-CGA_graphics()
-{
-	graphics_on = TRUE;
-	Vmode(6);
-}
-
-#define CGA_text PC_text
-
-CGA_linetype(linetype)
-{
-	if (linetype >= 5)
-		linetype %= 5;
-	PC_mask(pattern[linetype+2]);
-}
-
-CGA_move(x,y)
-{
-	startx = x;
-	starty = y;
-}
-
-
-CGA_vector(x,y)
-{
-	PC_line(startx,CGA_YLAST-starty,x,CGA_YLAST-y);
-	startx = x;
-	starty = y;
-}
-
-#define CGA_lrput_text PC_lrput_text
-#define CGA_ulput_text PC_ulput_text
-
-
-#define CGA_reset PC_reset
-
-
-#define EGA_XMAX 640
-#define EGA_YMAX 350
-
-#define EGA_XLAST (EGA_XMAX - 1)
-#define EGA_YLAST (EGA_YMAX - 1)
-
-#define EGA_VCHAR 14
-#define EGA_HCHAR 8
-#define EGA_VTIC 5
-#define EGA_HTIC 5
-
-static int ega64color[] =  {1,1,5,4,3,5,4,3, 5, 4, 3, 5, 4, 3,5};
-static int ega256color[] = {1,8,2,3,4,5,9,14,12,15,13,10,11,7,6};
-
-static int *egacolor;
-
-
-EGA_init()
-{
-	PC_mask(0xffff);
-	egacolor = ega256color;		/* should be smarter */
-}
-
-EGA_graphics()
-{
-	graphics_on = TRUE;
-	Vmode(16);
-}
-
-#define EGA_text PC_text
-
-EGA_linetype(linetype)
-{
-	if (linetype >= 13)
-		linetype %= 13;
-	PC_color(egacolor[linetype+2]);
-}
-
-EGA_move(x,y)
-{
-	startx = x;
-	starty = y;
-}
-
-EGA_vector(x,y)
-{
-	PC_line(startx,EGA_YLAST-starty,x,EGA_YLAST-y);
-	startx = x;
-	starty = y;
-}
-
-#define EGA_lrput_text PC_lrput_text
-#define EGA_ulput_text PC_ulput_text
-
-
-#define EGA_reset PC_reset
-
-
-
-#ifdef EGALIB
-
-#define EGALIB_XMAX 640
-#define EGALIB_YMAX 350
-
-#define EGALIB_XLAST (EGA_XMAX - 1)
-#define EGALIB_YLAST (EGA_YMAX - 1)
-
-#define EGALIB_VCHAR 14
-#define EGALIB_HCHAR 8
-#define EGALIB_VTIC 4
-#define EGALIB_HTIC 5
-
-#include "mcega.h"
-
-EGALIB_init()
-{
-	GPPARMS();
-	if (GDTYPE != 5) {
-		term = 0;
-		int_error("color EGA board not found",NO_CARET);
-	}
-	egacolor = (GDMEMORY < 256) ? ega64color : ega256color;
-}
-
-EGALIB_graphics()
-{
-	graphics_on = TRUE;
-	GPINIT();
-}
-
-EGALIB_text()
-{
-	if (graphics_on) {
-		graphics_on = FALSE;
-		pause();
-	}
-	GPTERM();
-}
-
-EGALIB_linetype(linetype)
-{
-	if (linetype >= 13)
-		linetype %= 13;
-	GPCOLOR(egacolor[linetype+2]);
-}
-
-EGALIB_move(x,y)
-{
-	GPMOVE(x,GDMAXROW-y);
-}
-
-
-EGALIB_vector(x,y)
-{
-	GPLINE(x,GDMAXROW-y);
-}
-
-
-EGALIB_lrput_text(row,str)
-int row;
-char str[];
-{
-	strcpy((char far *)buf,str);
-	GotoXY(78-strlen(str),24-row);
-	gprintf(buf);
-}
-
-EGALIB_ulput_text(row,str)
-int row;
-char str[];
-{
-	strcpy((char far *)buf,str);
-	GotoXY(2,row+1);
-	gprintf(buf);
-}
-
-#define EGALIB_reset PC_reset
-
-#endif /* EGALIB */
-
-
-#ifdef HERCULES
-
-#define HERC_XMAX 720
-#define HERC_YMAX 348
-
-#define HERC_XLAST (HERC_XMAX - 1)
-#define HERC_YLAST (HERC_YMAX - 1)
-
-#define HERC_VCHAR 8
-#define HERC_HCHAR 8
-#define HERC_VTIC 4
-#define HERC_HTIC 4
-
-
-HERC_init()
-{
-}
-
-HERC_graphics()
-{
-	HVmode(1);
-	graphics_on = TRUE;
-}
-
-HERC_text()
-{
-	if (graphics_on) {
-		graphics_on = FALSE;
-		pause();
-	}
-	HVmode(0);
-}
-
-HERC_linetype(linetype)
-{
-	if (linetype >= 5)
-		linetype %= 5;
-	H_mask(pattern[linetype+2]);
-}
-
-HERC_move(x,y)
-{
-	if (x < 0)
-		startx = 0;
-	else if (x > HERC_XLAST)
-		startx = HERC_XLAST;
-	else
-		startx = x;
-
-	if (y < 0)
-		starty = 0;
-	else if (y > HERC_YLAST)
-		starty = HERC_YLAST;
-	else
-		starty = y;
-}
-
-HERC_vector(x,y)
-{
-	if (x < 0)
-		x = 0;
-	else if (x > HERC_XLAST)
-		x = HERC_XLAST;
-	if (y < 0)
-		y = 0;
-	else if (y > HERC_YLAST)
-		y = HERC_YLAST;
-
-	H_line(startx,HERC_YLAST-starty,x,HERC_YLAST-y);
-	startx = x;
-	starty = y;
-}
-
-HERC_lrput_text(row,str)
-int row;
-char str[];
-{
-	H_puts(str, 41-row, 87-strlen(str));
-}
-
-HERC_ulput_text(row,str)
-int row;
-char str[];
-{
-	H_puts(str, row+1, 2);
-}
-
-#define HERC_reset PC_reset
-
-#endif /* HERCULES */
-
-
-/* thanks to sask!macphed (Geoff Coleman and Ian Macphedran) for the
-   ATT 6300 driver */ 
-
-
-#ifdef ATT6300
-
-#define ATT_XMAX 640
-#define ATT_YMAX 400
-
-#define ATT_XLAST (ATT_XMAX - 1)
-#define ATT_YLAST (ATT_YMAX - 1)
-
-#define ATT_VCHAR 8
-#define ATT_HCHAR 8
-#define ATT_VTIC 3
-#define ATT_HTIC 3
-
-#define ATT_init CGA_init
-
-ATT_graphics()
-{
-	graphics_on = TRUE;
-	Vmode(0x40);        /* 40H is the magic number for the AT&T driver */
-}
-
-#define ATT_text CGA_text
-
-#define ATT_linetype CGA_linetype
-
-#define ATT_move CGA_move
-
-ATT_vector(x,y)
-{
-	PC_line(startx,ATT_YLAST-starty,x,ATT_YLAST-y);
-	startx = x;
-	starty = y;
-}
-
-#define ATT_lrput_text PC_lrput_text
-#define ATT_ulput_text PC_ulput_text
-
-
-#define ATT_reset CGA_reset
-
-#endif  /* ATT6300 */
-
-
-#ifdef CORONA
-
-#define COR_XMAX 640
-#define COR_YMAX 325
-
-#define COR_XLAST (COR_XMAX - 1)
-#define COR_YLAST (COR_YMAX - 1)
-
-#define COR_VCHAR 13
-#define COR_HCHAR 8
-#define COR_VTIC 4
-#define COR_HTIC 4
-
-
-static int corscreen;		/* screen number, 0 - 7 */
-
-COR_init()
-{
-register char *p;
-	if (!(p = getenv("CORSCREEN")))
-		int_error("must run CORPLOT for Corona graphics",NO_CARET);
-	corscreen = *p - '0';
-}
-
-COR_graphics()
-{
-	graphics_on = TRUE;
-	Vmode(3);				/* clear text screen */
-	grinit(corscreen);
-	grandtx();
-}
-
-COR_text()
-{
-	if (graphics_on) {
-		graphics_on = FALSE;
-		pause();
-	}
-	grreset();
-	txonly();
-	Vmode(3);
-}
-
-COR_linetype(linetype)
-{
-	if (linetype >= 5)
-		linetype %= 5;
-	Cor_mask(pattern[linetype+2]);
-}
-
-COR_move(x,y)
-{
-	if (x < 0)
-		startx = 0;
-	else if (x > COR_XLAST)
-		startx = COR_XLAST;
-	else
-		startx = x;
-
-	if (y < 0)
-		starty = 0;
-	else if (y > COR_YLAST)
-		starty = COR_YLAST;
-	else
-		starty = y;
-}
-
-COR_vector(x,y)
-{
-	if (x < 0)
-		x = 0;
-	else if (x > COR_XLAST)
-		x = COR_XLAST;
-	if (y < 0)
-		y = 0;
-	else if (y > COR_YLAST)
-		y = COR_YLAST;
-
-	Cor_line(startx,COR_YLAST-starty,x,COR_YLAST-y);
-	startx = x;
-	starty = y;
-}
-
-#define COR_lrput_text PC_lrput_text
-#define COR_ulput_text PC_ulput_text
-
-#define COR_reset PC_reset
-
-#endif /* CORONA */
-
+#include "pc.trm"
 #endif /* PC */
 
-
-
 #ifdef AED
-
-#define AED_XMAX 768
-#define AED_YMAX 575
-
-#define AED_XLAST (AED_XMAX - 1)
-#define AED_YLAST (AED_YMAX - 1)
-
-#define AED_VCHAR	13
-#define AED_HCHAR	8
-#define AED_VTIC	8
-#define AED_HTIC	7
-
-/* slightly different for AED 512 */
-#define AED5_XMAX 512
-#define AED5_XLAST (AED5_XMAX - 1)
-
-AED_init()
-{
-	fprintf(outfile,
-	"\033SEN3DDDN.SEC.7.SCT.0.1.80.80.90.SBC.0.AAV2.MOV.0.9.CHR.0.FFD");
-/*   2            3     4                5     7    6       1
-	1. Clear Screen
-	2. Set Encoding
-	3. Set Default Color
-	4. Set Backround Color Table Entry
-	5. Set Backround Color
-	6. Move to Bottom Lefthand Corner
-	7. Anti-Alias Vectors
-*/
-}
-
-
-AED_graphics()
-{
-	fprintf(outfile,"\033FFD\033");
-}
-
-
-AED_text()
-{
-	fprintf(outfile,"\033MOV.0.9.SEC.7.XXX");
-}
-
-
-
-AED_linetype(linetype)
-int linetype;
-{
-static int color[2+9] = { 7, 1, 6, 2, 3, 5, 1, 6, 2, 3, 5 };
-static int type[2+9] = { 85, 85, 255, 255, 255, 255, 255, 85, 85, 85, 85 };
-
-	if (linetype >= 10)
-		linetype %= 10;
-	fprintf(outfile,"\033SLS%d.255.",type[linetype+2]);
-	fprintf(outfile,"\033SEC%d.",color[linetype+2]);
-}
-
-
-
-AED_move(x,y)
-int x,y;
-{
-	fprintf(outfile,"\033MOV%d.%d.",x,y);
-}
-
-
-AED_vector(x,y)
-int x,y;
-{
-	fprintf(outfile,"\033DVA%d.%d.",x,y);
-}
-
-
-AED_lrput_text(row,str) /* write text to screen while still in graphics mode */
-int row;
-char str[];
-{
-	AED_move(AED_XMAX-((strlen(str)+2)*AED_HCHAR),AED_VTIC+AED_VCHAR*(row+1));
-	fprintf(outfile,"\033XXX%s\033",str);
-}
-
-
-AED5_lrput_text(row,str) /* same, but for AED 512 */
-int row;
-char str[];
-{
-	AED_move(AED5_XMAX-((strlen(str)+2)*AED_HCHAR),AED_VTIC+AED_VCHAR*(row+1));
-	fprintf(outfile,"\033XXX%s\033",str);
-}
-
-
-AED_ulput_text(row,str) /* write text to screen while still in graphics mode */
-int row;
-char str[];
-{
-	AED_move(AED_HTIC*2,AED_YMAX-AED_VTIC-AED_VCHAR*(row+1));
-	fprintf(outfile,"\033XXX%s\033",str);
-}
-
-
-#define hxt (AED_HTIC/2)
-#define hyt (AED_VTIC/2)
-
-AED_reset()
-{
-	fprintf(outfile,"\033SCT0.1.0.0.0.SBC.0.FFD");
-}
-
+#include "aed.trm"
 #endif /* AED */
 
-
-
-/* thanks to dukecdu!evs (Ed Simpson) for the BBN BitGraph driver */
-
 #ifdef BITGRAPH
-
-#define BG_XMAX			 	768 /* width of plot area */
-#define BG_YMAX			 	768 /* height of plot area */
-#define BG_SCREEN_HEIGHT	1024 /* full screen height */
-
-#define BG_XLAST	 (BG_XMAX - 1)
-#define BG_YLAST	 (BG_YMAX - 1)
-
-#define BG_VCHAR	16
-#define BG_HCHAR	 9
-#define BG_VTIC		 8
-#define BG_HTIC		 8	
-
-
-#define BG_init TEK40init
-
-#define BG_graphics TEK40graphics
-
-
-#define BG_linetype TEK40linetype
-
-#define BG_move TEK40move
-
-#define BG_vector TEK40vector
-
-
-BG_text()
-{
-	BG_move(0, BG_SCREEN_HEIGHT - 2 * BG_VCHAR);
-	fprintf(outfile,"\037");
-/*                   1
-	1. into alphanumerics
-*/
-}
-
-
-BG_lrput_text(row,str)
-unsigned int row;
-char str[];
-{
-	BG_move(BG_XMAX - BG_HTIC - BG_HCHAR*(strlen(str)+1),
-		BG_VTIC + BG_VCHAR*(row+1));
-	fprintf(outfile,"\037%s\n",str);
-}
-
-
-BG_ulput_text(row,str)
-unsigned int row;
-char str[];
-{
-	BG_move(BG_HTIC, BG_YMAX - BG_VTIC - BG_VCHAR*(row+1));
-	fprintf(outfile,"\037%s\n",str);
-}
-
-
-#define BG_reset TEK40reset
-
+#include "bitgraph.trm"
 #endif /* BITGRAPH */
 
-
-/* thanks to hplvlch!ch (Chuck Heller) for the HP2623A driver */
-
 #ifdef HP26
-
-#define HP26_XMAX 512
-#define HP26_YMAX 390
-
-#define HP26_XLAST (HP26_XMAX - 1)
-#define HP26_YLAST (HP26_XMAX - 1)
-
-/* Assume a character size of 1, or a 7 x 10 grid. */
-#define HP26_VCHAR	10
-#define HP26_HCHAR	7
-#define HP26_VTIC	(HP26_YMAX/70)		
-#define HP26_HTIC	(HP26_XMAX/75)		
-
-HP26_init()
-{
-	/*	The HP2623A needs no initialization. */
-}
-
-
-HP26_graphics()
-{
-	/*	Clear and enable the display */
-
-	fputs("\033*daZ\033*dcZ",outfile);
-}
-
-
-HP26_text()
-{
-	fputs("\033*dT",outfile);	/* back to text mode */
-}
-
-
-HP26_linetype(linetype)
-int linetype;
-{
-#define	SOLID	1
-#define LINE4	4
-#define LINE5	5
-#define LINE6	6
-#define LINE8	8
-#define	DOTS	7
-#define LINE9	9
-#define LINE10	10
-
-static int map[2+9] = {	SOLID,	/* border */
-						SOLID,	/* axes */
-						DOTS,	/* plot 0 */
-						LINE4,	/* plot 1 */
-						LINE5,	/* plot 2 */
-						LINE6,	/* plot 3 */
-						LINE8,	/* plot 4 */
-						LINE9,	/* plot 5 */
-						LINE10,	/* plot 6 */
-						SOLID,	/* plot 7 */
-						SOLID	/* plot 8 */ };
-
-	if (linetype >= 9)
-		linetype %= 9;
-	fprintf(outfile,"\033*m%dB",map[linetype + 2]);
-}
-
-
-HP26_move(x,y)
-int x,y;
-{
-	fprintf(outfile,"\033*pa%d,%dZ",x,y);
-}
-
-
-HP26_vector(x,y)
-int x,y;
-{
-	fprintf(outfile,"\033*pb%d,%dZ",x,y);
-}
-
-
-HP26_lrput_text(row,str)
-int row;
-char str[];
-{
-	HP26_move(HP26_XMAX-HP26_HTIC*2,HP26_VTIC*2+HP26_VCHAR*row);
-	HP26_move(HP26_XMAX-HP26_HTIC*2,HP26_VTIC*2+HP26_VCHAR*row);
-	fputs("\033*dS",outfile);
-	fprintf(outfile,"\033*m7Q\033*l%s\n",str);
-	fputs("\033*dT",outfile);
-}
-
-
-HP26_ulput_text(row,str)
-int row;
-char str[];
-{
-	HP26_move(HP26_HTIC*2,HP26_YMAX-HP26_VTIC*2-HP26_VCHAR*row);
-	fputs("\033*dS",outfile);
-	fprintf(outfile,"\033*m3Q\033*l%s\n",str);
-	fputs("\033*dT",outfile);
-}
-
-
-HP26_reset()
-{
-}
-
+#include "hp26.trm"
 #endif /* HP26 */
 
-
 #ifdef HP75
-
-#define HP75_XMAX 6000
-#define HP75_YMAX 6000
-
-#define HP75_XLAST (HP75_XMAX - 1)
-#define HP75_YLAST (HP75_XMAX - 1)
-
-/* HP75_VCHAR, HP75_HCHAR  are not used */
-#define HP75_VCHAR	(HP75_YMAX/20)	
-#define HP75_HCHAR	(HP75_XMAX/20)		
-#define HP75_VTIC	(HP75_YMAX/70)		
-#define HP75_HTIC	(HP75_XMAX/75)		
-
-HP75_init()
-{
-	fprintf(outfile,
-	"IN;\033.P1:SC0,%d,0,%d;\n;IP;SI0.2137,0.2812;\n",
-		HP75_XMAX,HP75_YMAX);
-/*	 1      2  3       4             5    6  7
-	1. turn on eavesdropping
-	2. reset to power-up defaults
-	3. enable XON/XOFF flow control
-	4. set SCaling to 2000 x 2000
-	5. rotate page 90 degrees
-	6. ???
-	7. set some character set stuff
-*/
-}
-
-
-HP75_graphics()
-{
-/*         1
-	fputs("\033.Y",outfile);
-	1. enable eavesdropping
-*/
-}
-
-
-HP75_text()
-{
-	fputs("NR;\033.Z",outfile);
-/*         1  2
-	1. go into 'view' mode
-	2. disable plotter eavesdropping
-*/
-}
-
-
-HP75_linetype(linetype)
-int linetype;
-{
-	fprintf(outfile,"SP%d;\n",(linetype+3)%8);
-}
-
-
-HP75_move(x,y)
-int x,y;
-{
-	fprintf(outfile,"PU%d,%d;\n",x,y);
-}
-
-
-HP75_vector(x,y)
-int x,y;
-{
-	fprintf(outfile,"PD%d,%d;\n",x,y);
-}
-
-
-HP75_lrput_text(row,str)
-int row;
-char str[];
-{
-	HP75_move(HP75_XMAX-HP75_HTIC*2,HP75_VTIC*2+HP75_VCHAR*row);
-	fprintf(outfile,"LO17;LB%s\003\n",str);
-}
-
-HP75_ulput_text(row,str)
-int row;
-char str[];
-{
-	HP75_move(HP75_HTIC*2,HP75_YMAX-HP75_VTIC*2-HP75_VCHAR*row);
-	fprintf(outfile,"LO13;LB%s\003\n",str);
-}
-
-HP75_reset()
-{
-}
-
+#include "hp75.trm"
 #endif /* HP75 */
 
-
-/* thanks to richb@yarra.OZ (Rich Burridge) for the Postscript driver */
+#ifdef IRIS4D
+#include "iris4d.trm"
+#endif /* IRIS4D */
  
 #ifdef POSTSCRIPT
-  
-#define PS_XMAX 540
-#define PS_YMAX 720
-
-#define PS_XLAST (PS_XMAX - 1)
-#define PS_YLAST (PS_YMAX - 1)
-
-#define PS_VCHAR (PS_YMAX/30)
-#define PS_HCHAR (PS_XMAX/72)
-#define PS_VTIC (PS_YMAX/80)
-#define PS_HTIC (PS_XMAX/80)
-
-
-PS_init()
-{
-  (void) fprintf(outfile,"%%!\n") ;
-  (void) fprintf(outfile,"/off {36 add} def\n") ;
-  (void) fprintf(outfile,"/mv {off exch off moveto} def\n") ;
-  (void) fprintf(outfile,"/ln {off exch off lineto} def\n") ;
-  (void) fprintf(outfile,"/Times-Roman findfont 12 scalefont setfont\n") ;
-  (void) fprintf(outfile,"0.25 setlinewidth\n") ;
-}
-
-
-PS_graphics()
-{
-  (void) fprintf(outfile,"newpath\n") ;
-}
-
-
-PS_text()
-{
-  (void) fprintf(outfile,"stroke\n") ;
-  (void) fprintf(outfile,"showpage\n") ;
-}
-
-
-PS_linetype(linetype)
-int linetype ;
-{
-  (void) fprintf(outfile,"stroke [") ;
-  switch ((linetype+2)%7)
-    {
-      case 0 :                                 /* solid. */
-      case 2 : break ;
-      case 1 :                                 /* longdashed. */
-      case 6 : (void) fprintf(outfile,"9 3") ;
-               break ;
-      case 3 : (void) fprintf(outfile,"3") ;            /* dotted. */
-               break ;
-      case 4 : (void) fprintf(outfile,"6 3") ;          /* shortdashed. */
-               break ;
-      case 5 : (void) fprintf(outfile,"3 3 6 3") ;      /* dotdashed. */
-    }
-  (void) fprintf(outfile,"] 0 setdash\n") ;
-}
- 
- 
-PS_move(x,y)
-unsigned int x,y ;
-{
-  (void) fprintf(outfile,"%1d %1d mv\n",y,x) ;
-}
- 
- 
-PS_vector(x,y)
-unsigned int x,y ;
-{
-  (void) fprintf(outfile,"%1d %1d ln\n",y,x) ;
-}
- 
- 
-PS_lrput_text(row,str)
-unsigned int row ;
-char str[] ;
-{
-  PS_move(PS_XMAX - PS_HTIC - PS_HCHAR*(strlen(str)+1),
-          PS_VTIC + PS_VCHAR*(row+1)) ;
-  (void) fprintf(outfile,"(%s) show\n",str) ;
-}
-
-
-PS_ulput_text(row,str)
-unsigned int row ;
-char str[] ;
-{
-  PS_move(PS_HTIC, PS_YMAX - PS_VTIC - PS_VCHAR*(row+1)) ;
-  (void) fprintf(outfile,"(%s) show\n",str) ;
-}
-
-
-PS_reset()
-{
-}
-
+#include "postscpt.trm"
 #endif /* POSTSCRIPT */
 
 
 #ifdef QMS
-
-#define QMS_XMAX 9000
-#define QMS_YMAX 6000
-
-#define QMS_XLAST (QMS_XMAX - 1)
-#define QMS_YLAST (QMS_YMAX - 1)
-
-#define QMS_VCHAR		120
-#define QMS_HCHAR		75
-#define QMS_VTIC		70
-#define QMS_HTIC		70
-
-
-QMS_init()
-{
-/* This was just ^IOL, but at Rutgers at least we need some more stuff */
-  fprintf(outfile,"^PY^-\n^IOL\n^ISYNTAX00000^F^IB11000^IJ00000^IT00000\n");
-}
-
-
-QMS_graphics()
-{
-	fprintf(outfile,"^IGV\n");
-}
-
-
-
-QMS_text()
-{
-/* added ^-, because ^, after an ^I command doesn't actually print a page */
-/* Did anybody try this code out?  [uhh...-cdk] */
-	fprintf(outfile,"^IGE\n^-^,");
-}
-
-
-QMS_linetype(linetype)
-int linetype;
-{
-static int width[2+9] = {7, 3, 3, 3, 3, 5, 5, 5, 7, 7, 7};
-/*
- * I don't know about Villanova, but on our printer, using ^V without
- * previously setting up a pattern crashes the microcode.
- * [nope, doesn't crash here. -cdk]
- */
-    static int type[2+9] =  {0, 0, 0, 2, 5, 0, 2, 5, 0, 2, 5};
-	if (linetype >= 9)
-		linetype %= 9;
-    fprintf(outfile,"^PW%02d\n^V%x\n",width[linetype+2], type[linetype+2]); 
-}
-
-
-QMS_move(x,y)
-int x,y;
-{
-	fprintf(outfile,"^U%05d:%05d\n", 1000 + x, QMS_YLAST + 1000 - y);
-}
-
-
-QMS_vector(x2,y2)
-int x2,y2;
-{
-	fprintf(outfile,"^D%05d:%05d\n", 1000 + x2, QMS_YLAST + 1000 - y2);
-}
-
-
-QMS_lrput_text(row,str)
-int row;
-char str[];
-{
-	QMS_move(QMS_XMAX-QMS_HTIC-QMS_HCHAR*(strlen(str)+1),
-		QMS_VTIC+QMS_VCHAR*(row+1));
-	fprintf(outfile,"^IGE\n%s\n^IGV\n",str);
-}
-
-QMS_ulput_text(row,str)
-int row;
-char str[];
-{
-	QMS_move(QMS_HTIC*2,QMS_YMAX-QMS_VTIC-QMS_VCHAR*(row+1));
-	fprintf(outfile,"^IGE\n%s\n^IGV\n",str);
-}
-
-
-QMS_reset()
-{
-/* add ^- just in case last thing was ^I command */
-	fprintf(outfile,"^-^,\n");
-}
-
+#include "qms.trm"
 #endif /* QMS */
 
 
 #ifdef REGIS
-
-#define REGISXMAX 800             
-#define REGISYMAX 440
-
-#define REGISXLAST (REGISXMAX - 1)
-#define REGISYLAST (REGISYMAX - 1)
-
-#define REGISVCHAR		20  	
-#define REGISHCHAR		8		
-#define REGISVTIC		8
-#define REGISHTIC		6
-
-REGISinit()
-{
-	fprintf(outfile,"\033[r\033[24;1H");
-/*                   1     2
-	1. reset scrolling region
-	2. locate cursor on bottom line
-*/
-}
-
-
-/* thanks to calmasd!dko (Dan O'Neill) for adding S(E) for vt125s */
-REGISgraphics()
-{
-	fprintf(outfile,"\033[2J\033P1pS(C0)S(E)");
-/*                   1      2      3	4
-	1. clear screen
-	2. enter ReGIS graphics
-	3. turn off graphics diamond cursor
-	4. clear graphics screen
-*/
-}
-
-
-REGIStext()
-{
-	fprintf(outfile,"\033\\\033[24;1H");
-/*	                   1    2
-	1. Leave ReGIS graphics mode
- 	2. locate cursor on last line of screen
-*/
-}
-
-
-REGISlinetype(linetype)
-int     linetype;
-{
-      /* This will change color in order G,R,B,G-dot,R-dot,B-dot */
-static int in_map[9 + 2] = {2, 2, 3, 2, 1, 3, 2, 1, 3, 2, 1};
-static int lt_map[9 + 2] = {1, 4, 1, 1, 1, 4, 4, 4, 6, 6, 6};
-
-	if (linetype >= 9)
-		linetype %= 9;
-	fprintf(outfile, "W(I%d)", in_map[linetype + 2]);
-	fprintf(outfile, "W(P%d)", lt_map[linetype + 2]);
-}
-
-
-REGISmove(x,y)
-int x,y;
-{
-	fprintf(outfile,"P[%d,%d]",x,REGISYLAST-y,x,REGISYLAST-y);
-}
-
-
-REGISvector(x,y)
-int x,y;
-{
-	fprintf(outfile,"v[]v[%d,%d]",x,REGISYLAST - y);
-/* the initial v[] is needed to get the first pixel plotted */
-}
-
-
-REGISlrput_text(row,str)
-int row;
-char *str;
-{
-	REGISmove(REGISXMAX-REGISHTIC-REGISHCHAR*(strlen(str)+3),
-		REGISVTIC+REGISVCHAR*(row+1));
-	(void) putc('T',outfile); (void) putc('\'',outfile);
-	while (*str) {
-		(void) putc(*str,outfile);
-		if (*str == '\'')
-			(void) putc('\'',outfile);	/* send out another one */
-		str++;
-	}
-	(void) putc('\'',outfile);
-}
-
-
-REGISulput_text(row,str)
-int row;
-char *str;
-{
-	REGISmove(REGISVTIC,REGISYMAX-REGISVTIC*2-REGISVCHAR*row);
-	(void) putc('T',outfile); (void) putc('\'',outfile);
-	while (*str) {
-		(void) putc(*str,outfile);
-		if (*str == '\'')
-			(void) putc('\'',outfile);	/* send out another one */
-		str++;
-	}
-	(void) putc('\'',outfile);
-}
-
-
-REGISreset()
-{
-	fprintf(outfile,"\033[2J\033[24;1H");
-}
-
+#include "regis.trm"
 #endif /* REGIS */
 
 
-/* thanks to sask!macphed (Geoff Coleman and Ian Macphedran) for the
-   Selanar driver */
-
 #ifdef SELANAR
-
-SEL_init()
-{
-	fprintf(outfile,"\033\062");
-/*					1
-	1. set to ansi mode
-*/
-}
-
-
-SEL_graphics()
-{
-	fprintf(outfile,"\033[H\033[J\033\061\033\014");
-/*                   1           2       3
-	1. clear ANSI screen
-	2. set to TEK mode
-	3. clear screen
-*/
-}
-
-
-SEL_text()
-{
-	TEK40move(0,12);
-	fprintf(outfile,"\033\062");
-/*                   1
-	1. into ANSI mode
-*/
-}
-
-SEL_reset()
-{
-	fprintf(outfile,"\033\061\033\012\033\062\033[H\033[J");
-/*                   1        2       3      4
-1       set tek mode
-2       clear screen
-3       set ansi mode
-4       clear screen
-*/
-}
+#include "selanar.trm"
 #endif /* SELANAR */
 
 
 #ifdef TEK
-
-#define TEK40XMAX 1024
-#define TEK40YMAX 780
-
-#define TEK40XLAST (TEK40XMAX - 1)
-#define TEK40YLAST (TEK40YMAX - 1)
-
-#define TEK40VCHAR		25
-#define TEK40HCHAR		14
-#define TEK40VTIC		11
-#define TEK40HTIC		11	
-
-#define HX 0x20		/* bit pattern to OR over 5-bit data */
-#define HY 0x20
-#define LX 0x40
-#define LY 0x60
-
-#define LOWER5 31
-#define UPPER5 (31<<5)
-
-
-TEK40init()
-{
-}
-
-
-TEK40graphics()
-{
-	fprintf(outfile,"\033\014");
-/*                   1
-	1. clear screen
-*/
-}
-
-
-TEK40text()
-{
-	TEK40move(0,12);
-	fprintf(outfile,"\037");
-/*                   1
-	1. into alphanumerics
-*/
-}
-
-
-TEK40linetype(linetype)
-int linetype;
-{
-}
-
-
-TEK40move(x,y)
-unsigned int x,y;
-{
-	(void) putc('\035', outfile);	/* into graphics */
-	TEK40vector(x,y);
-}
-
-
-TEK40vector(x,y)
-unsigned int x,y;
-{
-	(void) putc((HY | (y & UPPER5)>>5), outfile);
-	(void) putc((LY | (y & LOWER5)), outfile);
-	(void) putc((HX | (x & UPPER5)>>5), outfile);
-	(void) putc((LX | (x & LOWER5)), outfile);
-}
-
-
-TEK40lrput_text(row,str)
-unsigned int row;
-char str[];
-{
-	TEK40move(TEK40XMAX - TEK40HTIC - TEK40HCHAR*(strlen(str)+1),
-		TEK40VTIC + TEK40VCHAR*(row+1));
-	fprintf(outfile,"\037%s\n",str);
-}
-
-
-TEK40ulput_text(row,str)
-unsigned int row;
-char str[];
-{
-	TEK40move(TEK40HTIC, TEK40YMAX - TEK40VTIC - TEK40VCHAR*(row+1));
-	fprintf(outfile,"\037%s\n",str);
-}
-
-
-TEK40reset()
-{
-}
-
+#include "tek.trm"
 #endif /* TEK */
 
 
 #ifdef V384
-
-/*
- *  thanks to roland@moncskermit.OZ (Roland Yap) for this driver
- *
- *	Vectrix 384 driver - works with tandy color printer as well
- *  in reverse printing 8 color mode.
- *  This doesn't work on Vectrix 128 because it redefines the
- *  color table. It can be hacked to work on the 128 by changing
- *  the colours but then it will probably not print best. The color
- *  table is purposely designed so that it will print well
- *
- */
-
-#define V384_XMAX 630
-#define V384_YMAX 480
-
-#define V384_XLAST (V384_XMAX - 1)
-#define V384_YLAST (V384_YMAX - 1)
-
-#define V384_VCHAR	12
-#define V384_HCHAR	7
-#define V384_VTIC	8
-#define V384_HTIC	7
-
-
-V384_init()
-{
-	fprintf(outfile,"%c%c  G0   \n",27,18);
-	fprintf(outfile,"Q 0 8\n");
-	fprintf(outfile,"0 0 0\n");
-	fprintf(outfile,"255 0 0\n");
-	fprintf(outfile,"0 255 0\n");
-	fprintf(outfile,"0 0 255\n");
-	fprintf(outfile,"0 255 255\n");
-	fprintf(outfile,"255 0 255\n");
-	fprintf(outfile,"255 255 0\n");
-	fprintf(outfile,"255 255 255\n");
-}
-
-
-V384_graphics()
-{
-	fprintf(outfile,"%c%c E0 RE N 65535\n",27,18);
-}
-
-
-V384_text()
-{
-	fprintf(outfile,"%c%c\n",27,17);
-}
-
-
-V384_linetype(linetype)
-int linetype;
-{
-static int color[]= {
-		1 /* red */,
-		2 /* green */,
-		3 /* blue */,
-		4 /* cyan */,
-		5 /* magenta */,
-		6 /* yellow */, /* not a good color so not in use at the moment */
-		7 /* white */
-	};
-		
-	if (linetype < 0)
-		linetype=6;
-	else
-		linetype %= 5;
-	fprintf(outfile,"C %d\n",color[linetype]);
-}
-
-
-V384_move(x,y)
-unsigned int x,y;
-{
-	fprintf(outfile,"M %d %d\n",x+20,y);
-}
-
-
-V384_vector(x,y)
-unsigned int x,y;
-{
-	fprintf(outfile,"L %d %d\n",x+20,y);
-}
-
-
-V384_lrput_text(row,str)
-unsigned int row;
-char str[];
-{
-	V384_move(V384_XMAX - V384_HTIC - V384_HCHAR*(strlen(str)+1),
-		V384_VTIC + V384_VCHAR*(row+1));
-	fprintf(outfile,"$%s\n",str);
-}
-
-
-V384_ulput_text(row,str)
-unsigned int row;
-char str[];
-{
-	V384_move(V384_HTIC, V384_YMAX - V384_VTIC - V384_VCHAR*(row+1));
-	fprintf(outfile,"$%s\n",str);
-}
-
-
-V384_reset()
-{
-}
-
+#include "v384.trm"
 #endif /* V384 */
 
 
 #ifdef UNIXPLOT
-
-#define UP_XMAX 4096
-#define UP_YMAX 4096
-
-#define UP_XLAST (UP_XMAX - 1)
-#define UP_YLAST (UP_YMAX - 1)
-
-#define UP_VCHAR (UP_YMAX/30)
-#define UP_HCHAR (UP_XMAX/72)	/* just a guess--no way to know this! */
-#define UP_VTIC (UP_YMAX/80)
-#define UP_HTIC (UP_XMAX/80)
-
-UP_init()
-{
-	openpl();
-	space(0, 0, UP_XMAX, UP_YMAX);
-}
-
-
-UP_graphics()
-{
-	erase();
-}
-
-
-UP_text()
-{
-}
-
-
-UP_linetype(linetype)
-int linetype;
-{
-static char *lt[2+5] = {"solid", "longdashed", "solid", "dotted","shortdashed",
-	"dotdashed", "longdashed"};
-
-	if (linetype >= 5)
-		linetype %= 5;
-	linemod(lt[linetype+2]);
-}
-
-
-UP_move(x,y)
-unsigned int x,y;
-{
-	move(x,y);
-}
-
-
-UP_vector(x,y)
-unsigned int x,y;
-{
-	cont(x,y);
-}
-
-
-UP_lrput_text(row,str)
-unsigned int row;
-char str[];
-{
-	move(UP_XMAX - UP_HTIC - UP_HCHAR*(strlen(str)+1),
-		UP_VTIC + UP_VCHAR*(row+1));
-	label(str);
-}
-
-
-UP_ulput_text(row,str)
-unsigned int row;
-char str[];
-{
-	UP_move(UP_HTIC, UP_YMAX - UP_VTIC - UP_VCHAR*(row+1));
-	label(str);
-}
-
-UP_reset()
-{
-	closepl();
-}
-
+/*
+   Unixplot library writes to stdout.  A fix was put in place by
+   ..!arizona!naucse!jdc to let set term and set output redirect
+   stdout.  All other terminals write to outfile.
+*/
+#include "unixplot.trm"
 #endif /* UNIXPLOT */
 
+#ifdef UNIXPC     /* unix-PC  ATT 7300 or 3b1 machine */
+#include "unixpc.trm"
+#endif /* UNIXPC */
 
 
 UNKNOWN_null()
@@ -1638,7 +402,55 @@ struct termentry term_tbl[] = {
 	{"unknown", 100, 100, 1, 1, 1, 1, UNKNOWN_null, UNKNOWN_null, UNKNOWN_null,
 	UNKNOWN_null, UNKNOWN_null, UNKNOWN_null, UNKNOWN_null, UNKNOWN_null,
 	UNKNOWN_null, UNKNOWN_null}
+#ifdef HPLJET
+	,{"laserjet1",HPLJETXMAX,HPLJETYMAX,HPLJET1VCHAR, HPLJET1HCHAR, HPLJETVTIC,
+		HPLJETHTIC, HPLJET1init,HPLJETreset, HPLJETtext, HPLJETgraphics, 
+		HPLJETmove, HPLJETvector,HPLJETlinetype,HPLJETlrput_text,
+		HPLJETulput_text, line_and_point}
+	,{"laserjet2",HPLJETXMAX,HPLJETYMAX,HPLJET2VCHAR, HPLJET2HCHAR, HPLJETVTIC, 
+		HPLJETHTIC, HPLJET2init,HPLJETreset, HPLJETtext, HPLJETgraphics, 
+		HPLJETmove, HPLJETvector,HPLJETlinetype,HPLJETlrput_text,
+		HPLJETulput_text, line_and_point}
+	,{"laserjet3",HPLJETXMAX,HPLJETYMAX,HPLJET3VCHAR, HPLJET3HCHAR, HPLJETVTIC, 
+		HPLJETHTIC, HPLJET3init,HPLJETreset, HPLJETtext, HPLJETgraphics, 
+		HPLJETmove, HPLJETvector,HPLJETlinetype,HPLJETlrput_text,
+		HPLJETulput_text, line_and_point}
+#endif
+
 #ifdef PC
+#ifdef __TURBOC__
+
+	,{"egalib", EGALIB_XMAX, EGALIB_YMAX, EGALIB_VCHAR, EGALIB_HCHAR,
+		EGALIB_VTIC, EGALIB_HTIC, EGALIB_init, EGALIB_reset,
+		EGALIB_text, EGALIB_graphics, EGALIB_move, EGALIB_vector,
+		EGALIB_linetype, EGALIB_lrput_text, EGALIB_ulput_text, line_and_point}
+
+	,{"vgalib", VGA_XMAX, VGA_YMAX, VGA_VCHAR, VGA_HCHAR,
+		VGA_VTIC, VGA_HTIC, VGA_init, VGA_reset,
+		VGA_text, VGA_graphics, VGA_move, VGA_vector,
+		VGA_linetype, VGA_lrput_text, VGA_ulput_text, line_and_point}
+
+	,{"vgamono", VGA_XMAX, VGA_YMAX, VGA_VCHAR, VGA_HCHAR,
+		VGA_VTIC, VGA_HTIC, VGA_init, VGA_reset,
+		VGA_text, VGA_graphics, VGA_move, VGA_vector,
+		VGAMONO_linetype, VGA_lrput_text, VGA_ulput_text, line_and_point}
+
+	,{"mcga", MCGA_XMAX, MCGA_YMAX, MCGA_VCHAR, MCGA_HCHAR,
+		MCGA_VTIC, MCGA_HTIC, MCGA_init, MCGA_reset,
+		MCGA_text, MCGA_graphics, MCGA_move, MCGA_vector,
+		MCGA_linetype, MCGA_lrput_text, MCGA_ulput_text, line_and_point}
+
+	,{"cga", CGA_XMAX, CGA_YMAX, CGA_VCHAR, CGA_HCHAR,
+		CGA_VTIC, CGA_HTIC, CGA_init, CGA_reset,
+		CGA_text, CGA_graphics, CGA_move, CGA_vector,
+		CGA_linetype, CGA_lrput_text, CGA_ulput_text, line_and_point}
+
+	,{"hercules", HERC_XMAX, HERC_YMAX, HERC_VCHAR, HERC_HCHAR,
+		HERC_VTIC, HERC_HTIC, HERC_init, HERC_reset,
+		HERC_text, HERC_graphics, HERC_move, HERC_vector,
+		HERC_linetype, HERC_lrput_text, HERC_ulput_text, line_and_point}
+
+#else
 	,{"cga", CGA_XMAX, CGA_YMAX, CGA_VCHAR, CGA_HCHAR,
 		CGA_VTIC, CGA_HTIC, CGA_init, CGA_reset,
 		CGA_text, CGA_graphics, CGA_move, CGA_vector,
@@ -1676,6 +488,7 @@ struct termentry term_tbl[] = {
 		COR_text, COR_graphics, COR_move, COR_vector,
 		COR_linetype, COR_lrput_text, COR_ulput_text, line_and_point}
 #endif /* CORONA */
+#endif /* TURBOC */
 #endif /* PC */
 
 #ifdef AED
@@ -1687,6 +500,13 @@ struct termentry term_tbl[] = {
 		AED_VTIC, AED_HTIC, AED_init, AED_reset, 
 		AED_text, AED_graphics, AED_move, AED_vector, 
 		AED_linetype, AED_lrput_text, AED_ulput_text, do_point}
+#endif
+
+#ifdef UNIXPC
+	,{"unixpc",uPC_XMAX,uPC_YMAX,uPC_VCHAR, uPC_HCHAR, uPC_VTIC, 
+		uPC_HTIC, uPC_init,uPC_reset, uPC_text, uPC_graphics, 
+		uPC_move, uPC_vector,uPC_linetype,uPC_lrput_text,
+		uPC_ulput_text, line_and_point}
 #endif
 
 #ifdef BITGRAPH
@@ -1706,6 +526,15 @@ struct termentry term_tbl[] = {
 	,{"hp7580B",HP75_XMAX,HP75_YMAX, HP75_VCHAR, HP75_HCHAR,HP75_VTIC,HP75_HTIC,
 		HP75_init,HP75_reset,HP75_text, HP75_graphics, HP75_move, HP75_vector,
 		HP75_linetype, HP75_lrput_text, HP75_ulput_text, do_point}
+#endif
+
+#ifdef IRIS4D
+	,{"iris4d", IRIS4D_XMAX, IRIS4D_YMAX, IRIS4D_VCHAR,
+		IRIS4D_HCHAR, IRIS4D_VTIC, IRIS4D_HTIC,
+		IRIS4D_init, IRIS4D_reset, IRIS4D_text,
+		IRIS4D_graphics, IRIS4D_move, IRIS4D_vector,
+		IRIS4D_linetype, IRIS4D_lrput_text, IRIS4D_ulput_text,
+		do_point}
 #endif
 
 #ifdef POSTSCRIPT
@@ -1790,6 +619,157 @@ register int i,t;
 	if (t == -1)
 		int_error("unknown terminal type; type just 'set terminal' for a list",
 			c_token);
+	else if (!strncmp("unixplot",term_tbl[t].name,sizeof(unixplot))) {
+		UP_redirect (2);  /* Redirect actual stdout for unixplots */
+	}
+	else if (unixplot) {
+		UP_redirect (3);  /* Put stdout back together again. */
+	}
 	term_init = FALSE;
 	return(t);
 }
+
+
+/*
+   Routine to detect what terminal is being used (or do anything else
+   that would be nice).  One anticipated (or allowed for) side effect
+   is that the global ``term'' may be set.
+*/
+init()
+{
+char *term_name = NULL;
+int t = -1, i;
+#ifdef __TURBOC__
+  int g_driver,g_mode;
+  char far *c1,*c2;
+
+/* Some of this code including BGI drivers is copyright Borland Intl. */
+	g_driver=DETECT;
+	      get_path();
+        initgraph(&g_driver,&g_mode,path);
+        c1=getdrivername();
+        c2=getmodename(g_mode);
+          switch (g_driver){
+            case -2: fprintf(stderr,"Graphics card not detected.\n");
+                     break;
+            case -3: fprintf(stderr,"BGI driver file cannot be found.\n");
+                     break;
+            case -4: fprintf(stderr,"Invalid BGI driver file.\n");
+                     break;
+            case -5: fprintf(stderr,"Insufficient memory to load ",
+                             "graphics driver.");
+                     break;
+            }
+        closegraph();
+	fprintf(stderr,"\tTC Graphics, driver %s  mode %s\n",c1,c2);
+#endif
+#ifdef VMS
+/*
+   Determine if we have a regis terminal.  If not use TERM 
+   (tek40xx) as default.
+*/
+#include <descrip>
+#include <dvidef>
+
+extern int term;
+char *term_str="tt:";
+typedef struct
+          {
+          short cond_value;
+          short count;
+          int info;
+          }  status_block;
+typedef struct
+          {
+          short buffer_len;
+          short item_code;
+          int buffer_addr;
+          int ret_len_addr;
+          }  item_desc;
+struct {
+    item_desc dev_type;
+      int terminator;
+   }  dvi_list;
+   int status, dev_type, zero=0;
+   char buffer[255];
+   $DESCRIPTOR(term_desc, term_str);
+
+/* set up dvi item list */
+	dvi_list.dev_type.buffer_len = 4;
+	dvi_list.dev_type.item_code = DVI$_TT_REGIS;
+	dvi_list.dev_type.buffer_addr = &dev_type;
+	dvi_list.dev_type.ret_len_addr = 0;
+
+	dvi_list.terminator = 0;
+
+/* See what type of terminal we have. */
+	status = SYS$GETDVIW (0, 0, &term_desc, &dvi_list, 0, 0, 0, 0);
+	if ((status & 1) && dev_type) {
+		term_name = "regis";
+	}
+#endif
+	if (term_name != NULL) {
+	/* We have a name to set! */
+		for (i = 0; i < TERMCOUNT; i++) {
+   			if (!strncmp("regis",term_tbl[i].name,5)) {
+				t = i;
+			}
+		}
+		if (t != -1)
+			term = t;
+	}
+}
+
+
+/*
+	This is always defined so we don't have to have command.c know if it
+	is there or not.
+*/
+#ifndef UNIXPLOT
+UP_redirect(caller) int caller; {}
+#else
+UP_redirect (caller)
+int caller;
+/*
+	Unixplot can't really write to outfile--it wants to write to stdout.
+	This is normally ok, but the original design of gnuplot gives us
+	little choice.  Originally users of unixplot had to anticipate
+	their needs and redirect all I/O to a file...  Not very gnuplot-like.
+
+	caller:  1 - called from SET OUTPUT "FOO.OUT"
+			 2 - called from SET TERM UNIXPLOT
+			 3 - called from SET TERM other
+			 4 - called from SET OUTPUT
+*/
+{
+	switch (caller) {
+	case 1:
+	/* Don't save, just replace stdout w/outfile (save was already done). */
+		if (unixplot)
+			*(stdout) = *(outfile);  /* Copy FILE structure */
+	break;
+	case 2:
+		if (!unixplot) {
+			fflush(stdout);
+			save_stdout = *(stdout);
+			*(stdout) = *(outfile);  /* Copy FILE structure */
+			unixplot = 1;
+		}
+	break;
+	case 3:
+	/* New terminal in use--put stdout back to original. */
+		closepl();
+		fflush(stdout);
+		*(stdout) = save_stdout;  /* Copy FILE structure */
+		unixplot = 0;
+	break;
+	case 4:
+	/*  User really wants to go to normal output... */
+		if (unixplot) {
+			fflush(stdout);
+			*(stdout) = save_stdout;  /* Copy FILE structure */
+		}
+	break;
+	}
+}
+#endif

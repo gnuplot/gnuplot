@@ -1,0 +1,2258 @@
+Newsgroups: comp.sources.misc
+From: allbery@uunet.UU.NET (Brandon S. Allbery - comp.sources.misc)
+Subject: v08i035: GnuPlot v1.10A (part 1 of 7)
+Reply-To: canoaf@ntvax.UUCP (Augustine Cano)
+
+Posting-number: Volume 8, Issue 35
+Submitted-by: canoaf@ntvax.UUCP (Augustine Cano)
+Archive-name: gnuplot1.10A/part01
+
+[OOPS!!!  I had to patch these after receiving them -- and managed to lose the
+name of the person who submitted them in the process.  Duh.  The name shown
+is a "best guess".  Submitter, please correct me.  ++bsa]
+
+#! /bin/sh
+# This is a shell archive.  Remove anything before this line, then unpack
+# it by saving it into a file and typing "sh file".  To overwrite existing
+# files, type "sh file -c".  You can also feed this as standard input via
+# unshar, or by typing "sh <file", e.g..  If this archive is complete, you
+# will see the following message at the end:
+#		"End of archive 1 (of 7)."
+# Contents:  1.dat 2.dat 3.dat 3b1.dem README README.3B1 aed.trm
+#   bitgraph.trm command.c compile.com controls.dem corgraph.asm
+#   corplot.c docs eval.c
+# Wrapped by allbery@uunet on Sat Sep  9 13:47:18 1989
+PATH=/bin:/usr/bin:/usr/ucb ; export PATH
+if test -f '1.dat' -a "${1}" != "-c" ; then 
+  echo shar: Will not clobber existing file \"'1.dat'\"
+else
+echo shar: Extracting \"'1.dat'\" \(781 characters\)
+sed "s/^X//" >'1.dat' <<'END_OF_FILE'
+X-20.000000 -3.041676
+X-19.000000 -3.036427
+X-18.000000 -3.030596
+X-17.000000 -3.024081
+X-16.000000 -3.016755
+X-15.000000 -3.008456
+X-14.000000 -2.998978
+X-13.000000 -2.988049
+X-12.000000 -2.975310
+X-11.000000 -2.960273
+X-10.000000 -2.942255
+X-9.000000 -2.920278
+X-8.000000 -2.892883
+X-7.000000 -2.857799
+X-6.000000 -2.811295
+X-5.000000 -2.746802
+X-4.000000 -2.651635
+X-3.000000 -2.498092
+X-2.000000 -2.214297
+X-1.000000 -1.570796
+X0.000000 0.000000
+X1.000000 1.570796
+X2.000000 2.214297
+X3.000000 2.498092
+X4.000000 2.651635
+X5.000000 2.746802
+X6.000000 2.811295
+X7.000000 2.857799
+X8.000000 2.892883
+X9.000000 2.920278
+X10.000000 2.942255
+X11.000000 2.960273
+X12.000000 2.975310
+X13.000000 2.988049
+X14.000000 2.998978
+X15.000000 3.008456
+X16.000000 3.016755
+X17.000000 3.024081
+X18.000000 3.030596
+X19.000000 3.036427
+END_OF_FILE
+if test 781 -ne `wc -c <'1.dat'`; then
+    echo shar: \"'1.dat'\" unpacked with wrong size!
+fi
+# end of '1.dat'
+fi
+if test -f '2.dat' -a "${1}" != "-c" ; then 
+  echo shar: Will not clobber existing file \"'2.dat'\"
+else
+echo shar: Extracting \"'2.dat'\" \(781 characters\)
+sed "s/^X//" >'2.dat' <<'END_OF_FILE'
+X-20.000000 -6.083352
+X-19.000000 -6.072853
+X-18.000000 -6.061191
+X-17.000000 -6.048162
+X-16.000000 -6.033510
+X-15.000000 -6.016913
+X-14.000000 -5.997955
+X-13.000000 -5.976098
+X-12.000000 -5.950620
+X-11.000000 -5.920546
+X-10.000000 -5.884511
+X-9.000000 -5.840556
+X-8.000000 -5.785765
+X-7.000000 -5.715597
+X-6.000000 -5.622591
+X-5.000000 -5.493603
+X-4.000000 -5.303271
+X-3.000000 -4.996183
+X-2.000000 -4.428595
+X-1.000000 -3.141593
+X0.000000 0.000000
+X1.000000 3.141593
+X2.000000 4.428595
+X3.000000 4.996183
+X4.000000 5.303271
+X5.000000 5.493603
+X6.000000 5.622591
+X7.000000 5.715597
+X8.000000 5.785765
+X9.000000 5.840556
+X10.000000 5.884511
+X11.000000 5.920546
+X12.000000 5.950620
+X13.000000 5.976098
+X14.000000 5.997955
+X15.000000 6.016913
+X16.000000 6.033510
+X17.000000 6.048162
+X18.000000 6.061191
+X19.000000 6.072853
+END_OF_FILE
+if test 781 -ne `wc -c <'2.dat'`; then
+    echo shar: \"'2.dat'\" unpacked with wrong size!
+fi
+# end of '2.dat'
+fi
+if test -f '3.dat' -a "${1}" != "-c" ; then 
+  echo shar: Will not clobber existing file \"'3.dat'\"
+else
+echo shar: Extracting \"'3.dat'\" \(781 characters\)
+sed "s/^X//" >'3.dat' <<'END_OF_FILE'
+X-20.000000 -9.125028
+X-19.000000 -9.109280
+X-18.000000 -9.091787
+X-17.000000 -9.072243
+X-16.000000 -9.050265
+X-15.000000 -9.025369
+X-14.000000 -8.996933
+X-13.000000 -8.964147
+X-12.000000 -8.925931
+X-11.000000 -8.880819
+X-10.000000 -8.826766
+X-9.000000 -8.760835
+X-8.000000 -8.678648
+X-7.000000 -8.573396
+X-6.000000 -8.433886
+X-5.000000 -8.240405
+X-4.000000 -7.954906
+X-3.000000 -7.494275
+X-2.000000 -6.642892
+X-1.000000 -4.712389
+X0.000000 0.000000
+X1.000000 4.712389
+X2.000000 6.642892
+X3.000000 7.494275
+X4.000000 7.954906
+X5.000000 8.240405
+X6.000000 8.433886
+X7.000000 8.573396
+X8.000000 8.678648
+X9.000000 8.760835
+X10.000000 8.826766
+X11.000000 8.880819
+X12.000000 8.925931
+X13.000000 8.964147
+X14.000000 8.996933
+X15.000000 9.025369
+X16.000000 9.050265
+X17.000000 9.072243
+X18.000000 9.091787
+X19.000000 9.109280
+END_OF_FILE
+if test 781 -ne `wc -c <'3.dat'`; then
+    echo shar: \"'3.dat'\" unpacked with wrong size!
+fi
+# end of '3.dat'
+fi
+if test -f '3b1.dem' -a "${1}" != "-c" ; then 
+  echo shar: Will not clobber existing file \"'3b1.dem'\"
+else
+echo shar: Extracting \"'3b1.dem'\" \(493 characters\)
+sed "s/^X//" >'3b1.dem' <<'END_OF_FILE'
+Xset yrange [-40:40]
+Xset samples 8
+Xplot -20,-18,-16,-14,-4,-6,-8,-10
+Xset yrange [-1.4:1.4]
+Xset xrange [-3*pi:3*pi]
+Xset samples 90
+Xplot sin(x),sin(x+1),sin(x+2),sin(x+3)
+Xset yrange [-3:3]
+Xplot sin(x)**2+cos(x)**2,sin(x)**2,cos(x)**2
+Xplot cos(x), 3*exp(-x**2.0/3.0), -1/cos(x)**2
+Xnormal(x) = 1/sqrt(2*pi)*exp(-x**2/(2*pi))
+Xset autoscale
+Xplot normal(x)
+Xset samples 360
+Xset yrange [-.2:.5]
+Xset function style impulse
+Xreplot
+Xset xrange [-10:10]
+Xset autoscale
+Xset function style line
+Xset samples 160
+END_OF_FILE
+if test 493 -ne `wc -c <'3b1.dem'`; then
+    echo shar: \"'3b1.dem'\" unpacked with wrong size!
+fi
+# end of '3b1.dem'
+fi
+if test -f 'README' -a "${1}" != "-c" ; then 
+  echo shar: Will not clobber existing file \"'README'\"
+else
+echo shar: Extracting \"'README'\" \(7021 characters\)
+sed "s/^X//" >'README' <<'END_OF_FILE'
+X---------  Version 1.10A (Polar) README file ---------
+X
+XVersion 1.1.0A (Polar) of GNUPLOT includes ATT3b1 support and the commands
+XSET POLAR, SET OFFSETS, and PAUSE.  Additionally, some bugs were fixed
+Xand new improved IBM-PC drivers were written in TURBO-C.  The file version.c
+Xcontains a synopsis of differences between this GNUPLOT and version 1.1.0.
+X
+XAll that is needed to make gnuplot work is the gnuplot executable.  Every
+Xthing else can be removed.  The help command, however, won't work without a
+Xhelp executable and a gnuplot help directory tree.  Gnuplot actually executes
+Xsystem(GNUHELP) to run the help command where GNUHELP is an environment
+Xvariable that contains the string to be executed.  On unix this string might
+Xbe GNUHELP="/usr/local/bin/help gnuplot".
+X
+XNote that there is no file called "Makefile" in the main directory.  Three
+Xdifferent makefiles are used for the 3 varieties of system where GNUPLOT
+Xis known to run: makefile.unx for UNIX systems (tested on ULTRIX),
+Xmakefile.3b1 for the UNIX PC (tested on System V 3.51a) and makefile.tc
+Xfor PC compatibles running DOS and Turbo C. Copy the appropriate one for
+Xyour system to "Makefile" and "make" the system.
+X
+XIn the help system directory, 2 makefiles are provided: makefile.unx
+Xfor all UNIX systems (including the UNIX PC) and makefile.tc for Turbo C.
+XAs above, copy the correct one for your system to "Makefile".
+X
+XThe help system supplied with this distribution will look first for an
+Xenvironment variable called HELPDIR and then in /usr/local/help for the
+Xdirectory tree requested.  PC users will probably want to define HELPDIR
+Xto be the root directory that contains the gnuplot directory tree.
+X
+XOh yes, our attempts to reach vu-vlsi!plot failed.  This seems to also
+Xbe the case for David F. Kotz <dfk@cs.duke.edu> who has developed another
+Xvariant of Gnuplot: GnuTeX.  We discussed a merger of these efforts, but
+Xhis LaTeX version started from an earlier Gnuplot and has been added to
+Xextensively.
+X
+XWe turn you over now to your regularly scheduled release notes...
+X
+X---------  Version 1.10 README file ---------
+XThe GNUPLOT source code and executables may be copied and/or modified freely
+Xas long as the copyright messages are left intact.
+X
+XGNUPLOT has been tested on a Pyramid 90x (ucb 4.2 and att V), a VAX 8200
+X(VMS 4.3), IBM PC's and AT's (MS-DOS 3.1, Microsoft C 4.0).  The code is
+Xwritten with portability in mind, and it passes lint!  If you have
+Xproblems, send mail to vu-vlsi!plot.  And please send any modifications
+Xyou make so they can be #ifdef'd into later releases.
+X
+X
+X                      GNUPLOT 1.1 RELEASE NOTES
+X
+XNew terminal drivers:  AED 512, BBN BitGraph, HP2623, POSTSCRIPT, Selanar,
+XVectrix 384.  The PC version now supports Hercules and ATT 6300 monochrome
+Xgraphics.  Thanks to those who sent these drivers in.
+X
+XNew commands:  'set dummy' and 'show dummy' to select the dummy variable
+Xname; 'replot' to repeat the last 'plot' command.
+X
+XThe exclamation point (!) is now accepted as postfix factorial operator.
+XThe gamma() function is also included, if your C library has gamma().  See
+XGAMMA below.
+X
+XLogical AND (&&) and OR (||) now short-circuit the way they do in C.  That
+Xis, the second && operand is not evaluated if the first is false; the
+Xsecond || operand is not evaluated if the first is true.  The ternary operator
+X(?:) also does not evaluate the unused operand.  This change allows for the
+Xdefinition of recursive functions, e.g. a synonym for the ! factorial operator:
+X
+X        fact(x) = (x<=1) ? 1 : x*fact(x-1)
+X
+XGNUPLOT now has a much better memory allocation scheme, replacing
+Xmost fixed-size arrays with malloc()'d linked lists.  There is no longer
+Xany artificial maximum on the number of simultaneous plots, number of
+Xpoints in those plots, or the number of user-defined functions or
+Xvariables.  All these are limited only by the memory available to
+Xmalloc().  This is a big improvement for memory-starved machines like
+XPDP-11s or PCs.
+X
+XLines beginning with # (also ! in VMS) are treated as comments.  Only the
+X$ may now be used for a shell escape in VMS, since ! is a comment.
+X
+XThe PC version now has the 'help' command, thanks to code posted by
+XRobert Scott.
+X
+XSeveral old bugs have been superseded by new ones.
+X
+X
+X                       PREPROCESSOR #DEFINES
+X
+XThese #defines should be checked before compilation:
+X
+XVFORK       Makefile        define if you've got vfork() system call
+XGAMMA       Makefile        define if you've got gamma(3)
+XBCOPY       Makefile        define if your memcpy() is called bcopy()
+XNOCOPY      Makefile        define if you've don't have a memcpy() by any name
+Xbcopy()     plot.h          define if you've got a memcpy() by some OTHER name
+X                              (see example in plot.h)
+Xvms         Makefile        define if compiling under VMS;
+X                              automatically defined by DEC C
+XPC          Makefile        define if compiling on a PClone
+XMSDOS       Makefile        define if compiling under MSDOS;
+X                              automatically defined by Microsoft C 4.0
+XAED         Makefile        define these if you want this terminal driver
+X                              included
+XBITGRAPH       .            (TEK must also be defined)
+XHP26           .
+XHP75           .
+XPOSTSCRIPT     .
+XQMS            .
+XREGIS          .
+XSELANAR        .            (TEK must also be defined)
+XTEK            .
+XUNIXPLOT       .
+XV384           .
+X
+XHERCULES       .            same, but only if PC is defined
+XATT            .
+XCORONA         .
+X
+XHUGE        plot.h          define to be largest double if not defined
+X                              in <math.h>
+XGNUTERM     plot.h          default terminal type if GNUTERM environment
+X                              variable not found at run-time
+XHELP        plot.h          default command spawned by 'help' command
+X                              if GNUHELP environment variable not found
+X                              at run-time
+XSHELL       plot.h          default shell to spawn if SHELL environment
+X                              variable not found at run-time
+X
+X
+X                             TO COMPILE
+X
+Xunder UNIX:  type 'make'
+X
+Xunder VMS:  type '@compile', then '@link'.  Use the gnuplot.hlp file in the
+Xdocs directory to build the GNUPLOT.HLB file.
+X
+Xunder MSDOS:  use 'make make.msc' for Microsoft C 4.0 or make makefile.tc
+Xfor Borland Turbo C.  If you've got another compiler, you're on your own!
+XFor MSDOS help, use the gnuplot.hlp file to build the gnuplot subtree using
+Xthe HELPTREE program.  Borland Turbo-C is the most recent support package,
+Xsee README.TC for more information.
+X
+X
+X                         ENVIRONMENT VARIABLES
+X
+XIf the environment variable GNUTERM is found, it is used as the terminal
+Xtype.
+X
+XIf the environment variable GNUHELP exists, it is used as the command to
+Xspawn for help.
+X
+XThe PC version looks for the environment variable GNUPLOT to contain
+Xthe name of the directory from which to load the initialization file
+XGNUPLOT.INI.  See the help on 'start_up' for more information.
+END_OF_FILE
+if test 7021 -ne `wc -c <'README'`; then
+    echo shar: \"'README'\" unpacked with wrong size!
+fi
+# end of 'README'
+fi
+if test -f 'README.3B1' -a "${1}" != "-c" ; then 
+  echo shar: Will not clobber existing file \"'README.3B1'\"
+else
+echo shar: Extracting \"'README.3B1'\" \(6524 characters\)
+sed "s/^X//" >'README.3B1' <<'END_OF_FILE'
+X
+X				   GNUPLOT
+X			Additional notes for users of
+X			   AT&T Unix PC 7300/3b1
+X				     by
+X				Augustine Cano
+X
+X
+X	INTRODUCTION
+X
+X	The following notes address peculiarities, problems, possible
+X	improvements and instructions specific the the Unix PC version
+X	of GNUPLOT.  The port to the Unix PC was done by John Campbell
+X	(CAMPBELL@NAUVAX.bitnet), who also integrated the help system,
+X	added polar coordinates and fixed miscellaneous bugs.  I 
+X	(Augustine Cano, canoaf@dept.csci.unt.edu) made the makefiles
+X	easier to use and was a beta tester.
+X
+X	The "README" file in this directory contains important information
+X	about the different makefiles and how to rename them to "make"
+X	GNUPLOT on the various systems supported.  Reading that file
+X	and at least the following INSTALLATION section will make it
+X	much easier to configure and install GNUPLOT.
+X
+X
+X	INSTALLATION
+X
+X	The much friendlier makefile.3b1 makes it very easy to install
+X	this package.  All that is needed is to "make all" and "make
+X	install".  As usual, look over the makefile to make sure that
+X	the default destinations do not conflict with anything on your
+X	system.
+X
+X	The distribution consists essentially of three parts: gnuplot
+X	itself, the help program and the documentation (which is used to
+X	build the help tree used by the help program).  If you want to 
+X	look over the details of the sub-systems, look at the makefiles 
+X	in ./help and ./docs respectively; otherwise, the top-level 
+X	makefile will take care of compiling and installing everything.  
+X	It is important that the directory /usr/local/help exist,
+X	otherwise the creation of the help tree will fail.
+X	The default destinations are as follows:
+X
+X		gnuplot		- /usr/local/bin
+X		manual page	- /usr/man/man1
+X		help system	- /usr/local/help
+X		help tree root	- /usr/local/help/gnuplot
+X
+X	Note that this is only relevant to "make install".  If you want to
+X	test the system in your current directory, before final installation,
+X	you can "make all" and then go to ./docs and create the help tree
+X	there.  You will then have to define the following environment
+X	variables so that gnuplot knows about the non-standard locations:
+X
+X		GNUHELP='./help/help gnuplot'
+X		HELPDIR='./docs'
+X
+X	An easy way of testing GNUPLOT is to "load" the .dem files.
+X	Typing help at the "gnuplot>" prompt will enter the help system.
+X	Step by step instructions are given there.  <RETURN> goes to the
+X	previous level and <CTRL D> returns you to GNUPLOT from any level.
+X	Two consecutive <RETURN>s at the top level of the help tree will
+X	also return to the "gnuplot>" prompt.
+X
+X	Given that the help system does not have its own Unix-PC specific
+X	makefile, if you want to compile it with the shared library, you will
+X	have to uncomment the appropriate 'ld' line in help system Makefile.
+X
+X
+X	PROBLEMS, UNIX PC PECULIARITIES, IMPROVEMENTS
+X
+X	In an attempt to get the program out as soon as possible, it was
+X	decided that certain minor problems, incompatibilities with other
+X	programs and improvements would be dealt with later.  If you have
+X	suggestions, fixes or improvements, send them to John Campbell
+X	(jdc@naucse.uucp).
+X
+X	The primary area of conflict is the larger than 24 lines display
+X	of the Unix PC.  Ideally, as much of it should be used in a way
+X	that would not make this version radically different from that of
+X	other machines.
+X
+X	One problem was caused by contention between GNUPLOT and sysinfo,
+X	the program written by Lenny Tropiano (lenny@icus.islp.ny.us).  This
+X	program updates the two bottom lines of the screen (the same ones
+X	used by the UA to display the soft key labels) every 15 seconds with
+X	miscellaneous system information.  GNUPLOT uses these two lines
+X	to display range information, and it would be invariably overwritten
+X	in less than 15 seconds.  John created a patch for sysinfo available 
+X	for FTP access from dept.csci.unt.edu (IP number 129.120.1.2).  The 
+X	file is called sysinfo.patch.  It prevents sysinfo from updating the 
+X	two bottom lines if they are being used by another program  (this works
+X	with the UA too.)
+X
+X	In order to have the largest graphics window possible, GNUPLOT uses
+X	the uppermost status line, where the date, time, and various icons
+X	reside.  When switching to another window, the date, time and icons
+X	are not restored and they should be.
+X
+X	The "gnuplot>" prompt appears inside the graphics window.  Any input
+X	makes this window scroll upwards.  It would be much more elegant to
+X	to use the line immediately below the graphics screen for input.
+X	One possible solution, that would solve this and also free the two
+X	bottom lines for sysinfo and the UA, would configure the 4 bottom
+X	lines of the screen like this:
+X
+X|                     bottom of the graphics screen                           |
+X_______________________________________________________________________________
+Xgnuplot > < this area for input        > < first line of range info > |working|
+X< this area for error messages         > < second line of range info> | icon  |
+X<              this line used by sysinfo and for soft key labeling            >
+X<              this line used by sysinfo and for soft key labeling            >
+X_______________________________________________________________________________
+X
+X	One problem is that the input area is not very big.  A solution
+X	(other than overwriting the first line of the range info) would be
+X	to use the scheme that ksh uses to edit the command line (if you
+X	get to column 80, a '<' appears there and your command gets shifted
+X	to the left.) This way, you could use vi for command line editing.
+X	Neat, but it could be more trouble than it's worth, and you would
+X	not see long formulas all at once.  Alternatively, the range info
+X	could be left where it is and the input area and error messages
+X	line extended up to the "working" icon, or the "working" icon
+X	suppressed until the line is no longer needed (is this possible
+X	without hacking the kernel?)
+X
+X	Yet another option would be to have a text window pop up when input
+X	is required or help text needs to be output.  The range information
+X	would stay where it currently is.  This solution would, of course,
+X	use real tam windows and thus allow switching from one window to 
+X	another if gnuplot were in "text" mode.
+X
+X	Ideally, when gnuplot exits, it should leave the two bottom lines
+X	alone (not clearing them) if what is in them was not written by it.
+X
+X	Finally, and this is a matter of preference, some people might want
+X	gnuplot to clear the screen (the graphics window) or restore the
+X	previous contents when exiting.
+END_OF_FILE
+if test 6524 -ne `wc -c <'README.3B1'`; then
+    echo shar: \"'README.3B1'\" unpacked with wrong size!
+fi
+# end of 'README.3B1'
+fi
+if test -f 'aed.trm' -a "${1}" != "-c" ; then 
+  echo shar: Will not clobber existing file \"'aed.trm'\"
+else
+echo shar: Extracting \"'aed.trm'\" \(1946 characters\)
+sed "s/^X//" >'aed.trm' <<'END_OF_FILE'
+X#define AED_XMAX 768
+X#define AED_YMAX 575
+X
+X#define AED_XLAST (AED_XMAX - 1)
+X#define AED_YLAST (AED_YMAX - 1)
+X
+X#define AED_VCHAR	13
+X#define AED_HCHAR	8
+X#define AED_VTIC	8
+X#define AED_HTIC	7
+X
+X/* slightly different for AED 512 */
+X#define AED5_XMAX 512
+X#define AED5_XLAST (AED5_XMAX - 1)
+X
+XAED_init()
+X{
+X	fprintf(outfile,
+X	"\033SEN3DDDN.SEC.7.SCT.0.1.80.80.90.SBC.0.AAV2.MOV.0.9.CHR.0.FFD");
+X/*   2            3     4                5     7    6       1
+X	1. Clear Screen
+X	2. Set Encoding
+X	3. Set Default Color
+X	4. Set Backround Color Table Entry
+X	5. Set Backround Color
+X	6. Move to Bottom Lefthand Corner
+X	7. Anti-Alias Vectors
+X*/
+X}
+X
+X
+XAED_graphics()
+X{
+X	fprintf(outfile,"\033FFD\033");
+X}
+X
+X
+XAED_text()
+X{
+X	fprintf(outfile,"\033MOV.0.9.SEC.7.XXX");
+X}
+X
+X
+X
+XAED_linetype(linetype)
+Xint linetype;
+X{
+Xstatic int color[2+9] = { 7, 1, 6, 2, 3, 5, 1, 6, 2, 3, 5 };
+Xstatic int type[2+9] = { 85, 85, 255, 255, 255, 255, 255, 85, 85, 85, 85 };
+X
+X	if (linetype >= 10)
+X		linetype %= 10;
+X	fprintf(outfile,"\033SLS%d.255.",type[linetype+2]);
+X	fprintf(outfile,"\033SEC%d.",color[linetype+2]);
+X}
+X
+X
+X
+XAED_move(x,y)
+Xint x,y;
+X{
+X	fprintf(outfile,"\033MOV%d.%d.",x,y);
+X}
+X
+X
+XAED_vector(x,y)
+Xint x,y;
+X{
+X	fprintf(outfile,"\033DVA%d.%d.",x,y);
+X}
+X
+X
+XAED_lrput_text(row,str) /* write text to screen while still in graphics mode */
+Xint row;
+Xchar str[];
+X{
+X	AED_move(AED_XMAX-((strlen(str)+2)*AED_HCHAR),AED_VTIC+AED_VCHAR*(row+1));
+X	fprintf(outfile,"\033XXX%s\033",str);
+X}
+X
+X
+XAED5_lrput_text(row,str) /* same, but for AED 512 */
+Xint row;
+Xchar str[];
+X{
+X	AED_move(AED5_XMAX-((strlen(str)+2)*AED_HCHAR),AED_VTIC+AED_VCHAR*(row+1));
+X	fprintf(outfile,"\033XXX%s\033",str);
+X}
+X
+X
+XAED_ulput_text(row,str) /* write text to screen while still in graphics mode */
+Xint row;
+Xchar str[];
+X{
+X	AED_move(AED_HTIC*2,AED_YMAX-AED_VTIC-AED_VCHAR*(row+1));
+X	fprintf(outfile,"\033XXX%s\033",str);
+X}
+X
+X
+X#define hxt (AED_HTIC/2)
+X#define hyt (AED_VTIC/2)
+X
+XAED_reset()
+X{
+X	fprintf(outfile,"\033SCT0.1.0.0.0.SBC.0.FFD");
+X}
+X
+X
+END_OF_FILE
+if test 1946 -ne `wc -c <'aed.trm'`; then
+    echo shar: \"'aed.trm'\" unpacked with wrong size!
+fi
+# end of 'aed.trm'
+fi
+if test -f 'bitgraph.trm' -a "${1}" != "-c" ; then 
+  echo shar: Will not clobber existing file \"'bitgraph.trm'\"
+else
+echo shar: Extracting \"'bitgraph.trm'\" \(1025 characters\)
+sed "s/^X//" >'bitgraph.trm' <<'END_OF_FILE'
+X/* thanks to dukecdu!evs (Ed Simpson) for the BBN BitGraph driver */
+X#define BG_XMAX			 	768 /* width of plot area */
+X#define BG_YMAX			 	768 /* height of plot area */
+X#define BG_SCREEN_HEIGHT	1024 /* full screen height */
+X
+X#define BG_XLAST	 (BG_XMAX - 1)
+X#define BG_YLAST	 (BG_YMAX - 1)
+X
+X#define BG_VCHAR	16
+X#define BG_HCHAR	 9
+X#define BG_VTIC		 8
+X#define BG_HTIC		 8	
+X
+X
+X#define BG_init TEK40init
+X
+X#define BG_graphics TEK40graphics
+X
+X
+X#define BG_linetype TEK40linetype
+X
+X#define BG_move TEK40move
+X
+X#define BG_vector TEK40vector
+X
+X
+XBG_text()
+X{
+X	BG_move(0, BG_SCREEN_HEIGHT - 2 * BG_VCHAR);
+X	fprintf(outfile,"\037");
+X/*                   1
+X	1. into alphanumerics
+X*/
+X}
+X
+X
+XBG_lrput_text(row,str)
+Xunsigned int row;
+Xchar str[];
+X{
+X	BG_move(BG_XMAX - BG_HTIC - BG_HCHAR*(strlen(str)+1),
+X		BG_VTIC + BG_VCHAR*(row+1));
+X	fprintf(outfile,"\037%s\n",str);
+X}
+X
+X
+XBG_ulput_text(row,str)
+Xunsigned int row;
+Xchar str[];
+X{
+X	BG_move(BG_HTIC, BG_YMAX - BG_VTIC - BG_VCHAR*(row+1));
+X	fprintf(outfile,"\037%s\n",str);
+X}
+X
+X
+X#define BG_reset TEK40reset
+X
+X
+END_OF_FILE
+if test 1025 -ne `wc -c <'bitgraph.trm'`; then
+    echo shar: \"'bitgraph.trm'\" unpacked with wrong size!
+fi
+# end of 'bitgraph.trm'
+fi
+if test -f 'command.c' -a "${1}" != "-c" ; then 
+  echo shar: Will not clobber existing file \"'command.c'\"
+else
+echo shar: Extracting \"'command.c'\" \(23912 characters\)
+sed "s/^X//" >'command.c' <<'END_OF_FILE'
+X/*
+X *
+X *    G N U P L O T  --  command.c
+X *
+X *  Copyright (C) 1986, 1987  Thomas Williams, Colin Kelley
+X *
+X *  You may use this code as you wish if credit is given and this message
+X *  is retained.
+X *
+X *  Please e-mail any useful additions to vu-vlsi!plot so they may be
+X *  included in later releases.
+X *
+X *  This file should be edited with 4-column tabs!  (:set ts=4 sw=4 in vi)
+X */
+X
+X#include <stdio.h>
+X#include <math.h>
+X
+X#ifdef MSDOS
+X#include <process.h>
+X#endif
+X
+X#include "plot.h"
+X
+X#ifndef STDOUT
+X#define STDOUT 1
+X#endif
+X
+X/*
+X * global variables to hold status of 'set' options
+X *
+X */
+XBOOLEAN			polar		= FALSE; 
+XBOOLEAN			autoscale	= TRUE;
+Xchar			dummy_var[MAX_ID_LEN+1] = "x";
+Xenum PLOT_STYLE data_style	= POINTS,
+X				func_style	= LINES;
+XBOOLEAN			log_x		= FALSE,
+X				log_y		= FALSE;
+XFILE*			outfile;
+Xchar			outstr[MAX_ID_LEN+1] = "STDOUT";
+Xint				samples		= SAMPLES;
+Xint				term		= 0;				/* unknown term is 0 */
+Xdouble			xmin		= -10.0,
+X				xmax		= 10.0,
+X				ymin		= -10.0,
+X				ymax		= 10.0;
+Xdouble			loff		= 0.0,
+X				roff		= 0.0,
+X				toff		= 0.0,
+X				boff		= 0.0;
+Xdouble			zero = ZERO;			/* zero threshold, not 0! */
+X
+X
+XBOOLEAN screen_ok;
+XBOOLEAN term_init;
+XBOOLEAN undefined;
+X
+X/*
+X * instead of <strings.h>
+X */
+X
+Xchar *gets(),*getenv();
+Xchar *strcpy(),*strncpy(),*strcat();
+X
+Xchar *malloc();
+X
+Xdouble magnitude(),angle(),real(),imag();
+Xstruct value *const_express(), *pop(), *complex();
+Xstruct at_type *temp_at(), *perm_at();
+Xstruct udft_entry *add_udf();
+Xstruct udvt_entry *add_udv();
+X
+Xextern struct termentry term_tbl[];
+X
+Xstruct lexical_unit token[MAX_TOKENS];
+Xchar input_line[MAX_LINE_LEN+1] = "set term ";
+Xchar c_dummy_var[MAX_ID_LEN+1]; 		/* current dummy var */
+Xint num_tokens, c_token;
+X
+Xstruct curve_points *first_plot = NULL;
+Xstruct udft_entry plot_func, *dummy_func;
+X
+Xstatic char replot_line[MAX_LINE_LEN+1];
+Xstatic int plot_token;					/* start of 'plot' command */
+Xstatic char help[MAX_LINE_LEN] = HELP;
+X
+Xcom_line()
+X{
+X	read_line();
+X
+X	screen_ok = TRUE; /* so we can flag any new output */
+X
+X	do_line();
+X}
+X
+X
+Xdo_line()	  /* also used in load_file */
+X{
+X	if (is_comment(input_line[0]))
+X		return;
+X	if (is_system(input_line[0])) {
+X		do_system();
+X		fputs("!\n",stderr);
+X		return;
+X	}
+X	num_tokens = scanner(input_line);
+X	c_token = 0;
+X	while(c_token < num_tokens) {
+X		command();
+X		if (c_token < num_tokens)	/* something after command */
+X			if (equals(c_token,";"))
+X				c_token++;
+X			else
+X					int_error("';' expected",c_token);
+X	}
+X}
+X
+X
+X
+Xcommand()
+X{
+Xstatic char sv_file[MAX_LINE_LEN+1];
+X			/* string holding name of save or load file */
+X
+X	c_dummy_var[0] = '\0';		/* no dummy variable */
+X
+X	if (is_definition(c_token))
+X		define();
+X	else if (equals(c_token,"help") || equals(c_token,"?")) {
+X		register int len;
+X		register char *help_ptr;
+X
+X		c_token++;
+X		if ((help_ptr = getenv("GNUHELP")))	/* initial command */
+X			(void) strncpy(help,help_ptr,sizeof(help) - 1);
+X		else
+X			(void) strncpy(help,HELP,sizeof(help) - 1);
+X
+X		while (!(END_OF_COMMAND)) {
+X			len = strlen(help);
+X			help[len] = ' ';   /* put blank between help segments */
+X			copy_str(help+len+1,c_token++);
+X		}
+X		do_help();
+X		screen_ok = FALSE;
+X		c_token++;
+X	}
+X	else if (almost_equals(c_token,"pa$use")) {
+X		struct value a;
+X		int stime, text=0, len;
+X		char buf[MAX_LINE_LEN+1], *ptr;
+X
+X		c_token++;
+X		stime = (int )real(const_express(&a));
+X		if (!(END_OF_COMMAND)) {
+X			if (!isstring(c_token))
+X				int_error("expecting string",c_token);
+X			else {
+X			/*	Unfortunately, quote_str has a ID limit. */
+X				len = token[c_token].length - 2;
+X				ptr = &input_line[token[c_token].start_index+1];
+X				fprintf (stderr, "%.*s", len,ptr);
+X				text = 1;
+X			}
+X		}
+X		if (stime < 0) fgets (buf,MAX_LINE_LEN,stdin);  /* Hold until CR hit. */
+X		if (stime > 0) sleep(stime);
+X		if (text != 0 && stime >= 0) fprintf (stderr,"\n");
+X		c_token++;
+X		screen_ok = FALSE;
+X	}
+X	else if (almost_equals(c_token,"pr$int")) {
+X		struct value a;
+X
+X		c_token++;
+X		(void) const_express(&a);
+X		(void) putc('\t',stderr);
+X		disp_value(stderr,&a);
+X		(void) putc('\n',stderr);
+X		screen_ok = FALSE;
+X	}
+X	else if (almost_equals(c_token,"p$lot")) {
+X		plot_token = c_token++;
+X		plotrequest();
+X	}
+X	else if (almost_equals(c_token,"rep$lot")) {
+X		if (replot_line[0] == '\0') 
+X			int_error("no previous plot",c_token);
+X		(void) strcpy(input_line,replot_line);
+X		screen_ok = FALSE;
+X		num_tokens = scanner(input_line);
+X		c_token = 1;					/* skip the 'plot' part */
+X		plotrequest();
+X	}
+X	else if (almost_equals(c_token,"se$t"))
+X		set_stuff();
+X	else if (almost_equals(c_token,"sh$ow"))
+X		show_stuff();
+X	else if (almost_equals(c_token,"cl$ear")) {
+X		if (!term_init) {
+X			(*term_tbl[term].init)();
+X			term_init = TRUE;
+X		}
+X		(*term_tbl[term].graphics)();
+X		(*term_tbl[term].text)();
+X		(void) fflush(outfile);
+X		screen_ok = FALSE;
+X		c_token++;
+X	}
+X	else if (almost_equals(c_token,"she$ll")) {
+X		do_shell();
+X		screen_ok = FALSE;
+X		c_token++;
+X	}
+X	else if (almost_equals(c_token,"sa$ve")) {
+X		if (almost_equals(++c_token,"f$unctions")) {
+X			if (!isstring(++c_token))
+X				int_error("expecting filename",c_token);
+X			else {
+X				quote_str(sv_file,c_token);
+X				save_functions(fopen(sv_file,"w"));
+X			}
+X		}
+X		else if (almost_equals(c_token,"v$ariables")) {
+X			if (!isstring(++c_token))
+X				int_error("expecting filename",c_token);
+X			else {
+X				quote_str(sv_file,c_token);
+X				save_variables(fopen(sv_file,"w"));
+X			}
+X		}
+X		else if (isstring(c_token)) {
+X			quote_str(sv_file,c_token);
+X			save_all(fopen(sv_file,"w"));
+X		}
+X		else {
+X			int_error(
+X		"filename or keyword 'functions' or 'variables' expected",c_token);
+X		}
+X		c_token++;
+X	}
+X	else if (almost_equals(c_token,"l$oad")) {
+X		if (!isstring(++c_token))
+X			int_error("expecting filename",c_token);
+X		else {
+X			quote_str(sv_file,c_token);
+X			load_file(fopen(sv_file,"r"));	
+X		/* input_line[] and token[] now destroyed! */
+X			c_token = num_tokens = 0;
+X		}
+X	}
+X	else if (almost_equals(c_token,"ex$it") ||
+X			almost_equals(c_token,"q$uit")) {
+X		done(IO_SUCCESS);
+X	}
+X	else if (!equals(c_token,";")) {		/* null statement */
+X		int_error("invalid command",c_token);
+X	}
+X}
+X
+X
+Xenum PLOT_STYLE
+Xget_style()
+X{
+Xregister enum PLOT_STYLE ps;
+X
+X	c_token++;
+X	if (almost_equals(c_token,"l$ines"))
+X		ps = LINES;
+X	else if (almost_equals(c_token,"i$mpulses"))
+X		ps = IMPULSES;
+X	else if (almost_equals(c_token,"p$oints"))
+X		ps = POINTS;
+X	else
+X		int_error("expecting 'lines', 'points', or 'impulses'",c_token);
+X	c_token++;
+X	return(ps);
+X}
+X
+X
+Xset_stuff()
+X{
+Xstatic char testfile[MAX_LINE_LEN+1];
+X
+X	if (almost_equals(++c_token,"a$utoscale")) {
+X		autoscale = TRUE;
+X		c_token++;
+X	}
+X	else if (almost_equals(c_token,"noa$utoscale")) {
+X		autoscale = FALSE;
+X		c_token++;
+X	}
+X	else if (almost_equals(c_token,"po$lar")) {
+X		polar = TRUE;
+X		xmin = 0.0;
+X		xmax = 2*Pi;
+X		c_token++;
+X	}
+X	else if (almost_equals(c_token,"nopo$lar")) {
+X		polar = FALSE;
+X		xmin = -10.0;
+X		xmax = 10.0;
+X		c_token++;
+X	}
+X	else if (almost_equals(c_token,"d$ata")) {
+X		c_token++;
+X		if (!almost_equals(c_token,"s$tyle"))
+X			int_error("expecting keyword 'style'",c_token);
+X		data_style = get_style();
+X	}
+X	else if (almost_equals(c_token,"d$ummy")) {
+X		c_token++;
+X		copy_str(dummy_var,c_token++);
+X	}
+X	else if (almost_equals(c_token,"f$unction")) {
+X		c_token++;
+X		if (!almost_equals(c_token,"s$tyle"))
+X			int_error("expecting keyword 'style'",c_token);
+X		func_style = get_style();
+X	}
+X	else if (almost_equals(c_token,"l$ogscale")) {
+X		c_token++;
+X		if (equals(c_token,"x")) {
+X			log_y = FALSE;
+X			log_x = TRUE;
+X			c_token++;
+X		}
+X		else if (equals(c_token,"y")) {
+X			log_x = FALSE;
+X			log_y = TRUE;
+X			c_token++;
+X		}
+X		else if (equals(c_token,"xy") || equals(c_token,"yx")) {
+X			log_x = log_y = TRUE;
+X			c_token++;
+X		}
+X		else
+X			int_error("expecting 'x', 'y', or 'xy'",c_token);
+X	}
+X	else if (almost_equals(c_token,"nol$ogscale")) {
+X		log_x = log_y = FALSE;
+X		c_token++;
+X	}
+X	else if (almost_equals(c_token,"of$fsets")) {
+X		c_token++;
+X		if (END_OF_COMMAND) {
+X			loff = roff = toff = boff = 0.0;  /* Reset offsets */
+X		}
+X		else {
+X			load_offsets (&loff,&roff,&toff,&boff);
+X		}
+X	}
+X	else if (almost_equals(c_token,"o$utput")) {
+X		register FILE *f;
+X
+X		c_token++;
+X		if (END_OF_COMMAND) {	/* no file specified */
+X 			UP_redirect (4);
+X#ifdef VMS
+X			if (outfile != stdout) /* Never close stdout */
+X#endif
+X			(void) fclose(outfile);
+X#ifdef VMS
+X			outfile = stdout; /* Avoid the dup... */
+X#else
+X			outfile = fdopen(dup(STDOUT), "w");
+X#endif
+X			term_init = FALSE;
+X			(void) strcpy(outstr,"STDOUT");
+X		} else if (!isstring(c_token))
+X			int_error("expecting filename",c_token);
+X		else {
+X			quote_str(testfile,c_token);
+X			if (!(f = fopen(testfile,"w"))) {
+X			  os_error("cannot open file; output not changed",c_token);
+X			}
+X#ifdef VMS
+X			if (outfile != stdout) /* Never close stdout */
+X#endif
+X			(void) fclose(outfile);
+X			outfile = f;
+X			term_init = FALSE;
+X			outstr[0] = '\'';
+X			(void) strcat(strcpy(outstr+1,testfile),"'");
+X 			UP_redirect (1);
+X		}
+X		c_token++;
+X	}
+X	else if (almost_equals(c_token,"sa$mples")) {
+X		register int tsamp;
+X		struct value a;
+X
+X		c_token++;
+X		tsamp = (int)magnitude(const_express(&a));
+X		if (tsamp < 1)
+X			int_error("sampling rate must be > 0; sampling unchanged",
+X				c_token);
+X		else {
+X			register struct curve_points *f_p = first_plot;
+X
+X			first_plot = NULL;
+X			cp_free(f_p);
+X			samples = tsamp;
+X		}
+X	}
+X	else if (almost_equals(c_token,"t$erminal")) {
+X		c_token++;
+X		if (END_OF_COMMAND) {
+X			list_terms();
+X			screen_ok = FALSE;
+X		}
+X		else
+X			term = set_term(c_token);
+X		c_token++;
+X	}
+X	else if (almost_equals(c_token,"x$range")) {
+X		c_token++;
+X		if (!equals(c_token,"["))
+X			int_error("expecting '['",c_token);
+X		c_token++;
+X		load_range(&xmin,&xmax);
+X		if (!equals(c_token,"]"))
+X			int_error("expecting ']'",c_token);
+X		c_token++;
+X	}
+X	else if (almost_equals(c_token,"y$range")) {
+X		c_token++;
+X		if (!equals(c_token,"["))
+X			int_error("expecting '['",c_token);
+X		c_token++;
+X		load_range(&ymin,&ymax);
+X		autoscale = FALSE;
+X		if (!equals(c_token,"]"))
+X			int_error("expecting ']'",c_token);
+X		c_token++;
+X	}
+X	else if (almost_equals(c_token,"z$ero")) {
+X		struct value a;
+X		c_token++;
+X		zero = magnitude(const_express(&a));
+X	}
+X	else
+X		int_error(
+X	"valid set options:  '[no]autoscale', 'data', 'dummy', 'function',\n\
+X'[no]logscale', 'offsets', 'output', '[no]polar', 'samples',\n\
+X'terminal', 'xrange', 'yrange', 'zero'",
+X	c_token);
+X}
+X
+X
+Xshow_stuff()
+X{
+X	if (almost_equals(++c_token,"ac$tion_table") ||
+X			 equals(c_token,"at") ) {
+X		c_token++;
+X		show_at();
+X		c_token++;
+X	}
+X	else if (almost_equals(c_token,"au$toscale")) {
+X		(void) putc('\n',stderr);
+X		show_autoscale();
+X		c_token++;
+X	}
+X	else if (almost_equals(c_token,"d$ata")) {
+X		c_token++;
+X		if (!almost_equals(c_token,"s$tyle"))
+X			int_error("expecting keyword 'style'",c_token);
+X		(void) putc('\n',stderr);
+X		show_style("data",data_style);
+X		c_token++;
+X	}
+X	else if (almost_equals(c_token,"d$ummy")) {
+X		fprintf(stderr,"\n\tdummy variable is %s\n",dummy_var);
+X		c_token++;
+X	}
+X	else if (almost_equals(c_token,"f$unctions")) {
+X		c_token++;
+X		if (almost_equals(c_token,"s$tyle"))  {
+X			(void) putc('\n',stderr);
+X			show_style("functions",func_style);
+X			c_token++;
+X		}
+X		else
+X			show_functions();
+X	}
+X	else if (almost_equals(c_token,"l$ogscale")) {
+X		(void) putc('\n',stderr);
+X		show_logscale();
+X		c_token++;
+X	}
+X	else if (almost_equals(c_token,"of$fsets")) {
+X		(void) putc('\n',stderr);
+X		show_offsets();
+X		c_token++;
+X	}
+X	else if (almost_equals(c_token,"o$utput")) {
+X		(void) putc('\n',stderr);
+X		show_output();
+X		c_token++;
+X	}
+X	else if (almost_equals(c_token,"po$lar")) {
+X		(void) putc('\n',stderr);
+X		show_polar();
+X		c_token++;
+X	}
+X	else if (almost_equals(c_token,"sa$mples")) {
+X		(void) putc('\n',stderr);
+X		show_samples();
+X		c_token++;
+X	}
+X	else if (almost_equals(c_token,"t$erminal")) {
+X		(void) putc('\n',stderr);
+X		show_term();
+X		c_token++;
+X	}
+X	else if (almost_equals(c_token,"v$ariables")) {
+X		show_variables();
+X		c_token++;
+X	}
+X	else if (almost_equals(c_token,"ve$rsion")) {
+X		show_version();
+X		c_token++;
+X	}
+X	else if (almost_equals(c_token,"x$range")) {
+X		(void) putc('\n',stderr);
+X		show_range('x',xmin,xmax);
+X		c_token++;
+X	}
+X	else if (almost_equals(c_token,"y$range")) {
+X		(void) putc('\n',stderr);
+X		show_range('y',ymin,ymax);
+X		c_token++;
+X	}
+X	else if (almost_equals(c_token,"z$ero")) {
+X		(void) putc('\n',stderr);
+X		show_zero();
+X		c_token++;
+X	}
+X	else if (almost_equals(c_token,"a$ll")) {
+X		c_token++;
+X		show_version();
+X		show_polar();
+X		fprintf(stderr,"\tdummy variable is %s\n",dummy_var);
+X		show_style("data",data_style);
+X		show_style("functions",func_style);
+X		show_output();
+X		show_term();
+X		show_samples();
+X		show_logscale();
+X		show_autoscale();
+X		show_zero();
+X		show_range('x',xmin,xmax);
+X		show_range('y',ymin,ymax);
+X		show_offsets();
+X		show_variables();
+X		show_functions();
+X		c_token++;
+X	}
+X	else
+X		int_error(
+X	"valid show options:  'action_table', 'all', 'autoscale', 'data',\n\
+X'dummy', 'function', 'logscale', 'offsets', 'output', 'polar',\n\
+X'samples', 'terminal', 'variables', 'version', 'xrange', 'yrange', 'zero'",
+Xc_token);
+X	screen_ok = FALSE;
+X	(void) putc('\n',stderr);
+X}
+X
+X
+Xload_offsets (a, b, c, d)
+Xdouble *a,*b, *c, *d;
+X{
+Xstruct value t;
+X
+X	*a = real (const_express(&t));  /* loff value */
+X	c_token++;
+X	if (equals(c_token,","))
+X		c_token++;
+X	if (END_OF_COMMAND) 
+X	    return;
+X
+X	*b = real (const_express(&t));  /* roff value */
+X	c_token++;
+X	if (equals(c_token,","))
+X		c_token++;
+X	if (END_OF_COMMAND) 
+X	    return;
+X
+X	*c = real (const_express(&t));  /* toff value */
+X	c_token++;
+X	if (equals(c_token,","))
+X		c_token++;
+X	if (END_OF_COMMAND) 
+X	    return;
+X
+X	*d = real (const_express(&t));  /* boff value */
+X	c_token++;
+X}
+X
+X
+Xload_range(a,b)
+Xdouble *a,*b;
+X{
+Xstruct value t;
+X
+X	if (equals(c_token,"]"))
+X		return;
+X	if (END_OF_COMMAND) {
+X	    int_error("starting range value or ':' expected",c_token);
+X	} else if (!equals(c_token,"to") && !equals(c_token,":"))  {
+X		*a = real(const_express(&t));
+X	}	
+X	if (!equals(c_token,"to") && !equals(c_token,":"))
+X		int_error("':' expected",c_token);
+X	c_token++;
+X	if (!equals(c_token,"]"))
+X		*b = real(const_express(&t));
+X}
+X
+X
+Xplotrequest()
+X{
+X	
+X	if (!term)					/* unknown */
+X		int_error("use 'set term' to set terminal type first",c_token);
+X
+X	if (equals(c_token,"[")) {
+X		c_token++;
+X		if (isletter(c_token)) {
+X			copy_str(c_dummy_var,c_token++);
+X			if (equals(c_token,"="))
+X				c_token++;
+X			else
+X				int_error("'=' expected",c_token);
+X		}
+X		load_range(&xmin,&xmax);
+X		if (!equals(c_token,"]"))
+X			int_error("']' expected",c_token);
+X		c_token++;
+X	}
+X
+X	if (equals(c_token,"[")) { /* set optional y ranges */
+X		c_token++;
+X		load_range(&ymin,&ymax);
+X		autoscale = FALSE;
+X		if (!equals(c_token,"]"))
+X			int_error("']' expected",c_token);
+X		c_token++;
+X	}
+X
+X	eval_plots();
+X}
+X
+X
+Xdefine()
+X{
+Xregister int start_token;  /* the 1st token in the function definition */
+Xregister struct udvt_entry *udv;
+Xregister struct udft_entry *udf;
+X
+X	if (equals(c_token+1,"(")) {
+X		/* function ! */
+X		start_token = c_token;
+X		copy_str(c_dummy_var, c_token + 2);
+X		c_token += 5; /* skip (, dummy, ) and = */
+X		if (END_OF_COMMAND)
+X			int_error("function definition expected",c_token);
+X		udf = dummy_func = add_udf(start_token);
+X		if (udf->at)				/* already a dynamic a.t. there */
+X			free((char *)udf->at);	/* so free it first */
+X		if (!(udf->at = perm_at()))
+X			int_error("not enough memory for function",start_token);
+X		m_capture(&(udf->definition),start_token,c_token-1);
+X	}
+X	else {
+X		/* variable ! */
+X		start_token = c_token;
+X		c_token +=2;
+X		udv = add_udv(start_token);
+X		(void) const_express(&(udv->udv_value));
+X		udv->udv_undef = FALSE;
+X	}
+X}
+X
+X
+Xget_data(this_plot)
+Xstruct curve_points *this_plot;
+X{
+Xstatic char data_file[MAX_LINE_LEN+1], line[MAX_LINE_LEN+1];
+Xregister int i, overflow, l_num;
+Xregister FILE *fp;
+Xfloat x, y;
+X
+X	quote_str(data_file, c_token);
+X	this_plot->plot_type = DATA;
+X	if (!(fp = fopen(data_file, "r")))
+X		os_error("can't open data file", c_token);
+X
+X	l_num = 0;
+X
+X	overflow = i = 0;
+X
+X	while (fgets(line, MAX_LINE_LEN, fp)) {
+X		l_num++;
+X		if (is_comment(line[0]) || ! line[1])	/* line[0] will be '\n' */
+X			continue;		/* ignore comments  and blank lines */
+X
+X		if (i == samples+1) {
+X			overflow = i;	/* keep track for error message later */
+X			i--;			/* so we don't fall off end of points[i] */
+X		}
+X		switch (sscanf(line, "%f %f", &x, &y)) {
+X			case 1:			/* only one number on the line */
+X				y = x;		/* so use it as the y value, */
+X				x = i;		/* and use the index as the x */
+X			/* no break; !!! */
+X			case 2:
+X				this_plot->points[i].undefined = TRUE;
+X				if (x >= xmin && x <= xmax && (autoscale ||
+X					(y >= ymin && y <= ymax))) {
+X					if (log_x) {
+X						if (x <= 0.0)
+X							break;
+X						this_plot->points[i].x = log10(x);
+X					} else
+X						this_plot->points[i].x = x;
+X					if (log_y) {
+X						if (y <= 0.0)
+X							break;
+X						this_plot->points[i].y = log10(y);
+X					} else
+X						this_plot->points[i].y = y;
+X					if (autoscale) {
+X						if (y < ymin) ymin = y;
+X						if (y > ymax) ymax = y;
+X					}
+X
+X					this_plot->points[i].undefined = FALSE;
+X				}
+X				if (overflow)
+X					overflow++;
+X				else
+X					i++;
+X				break;
+X
+X			default:
+X				(void) sprintf(line, "bad data on line %d", l_num);
+X				int_error(line,c_token);
+X		}
+X	}
+X	if (overflow) {
+X		(void) sprintf(line,
+X	"%d data points found--samples must be set at least this high",overflow);
+X				/* actually, samples can be one less! */
+X		int_error(line,c_token);
+X	}
+X	this_plot->p_count = i;
+X	(void) fclose(fp);
+X}
+X
+X
+Xeval_plots()
+X{
+Xregister int i;
+Xregister struct curve_points *this_plot, **tp_ptr;
+Xregister int start_token, mysamples;
+Xregister double x_min, x_max, y_min, y_max, x;
+Xregister double xdiff, temp;
+Xregister int plot_num;
+Xstatic struct value a;
+X
+X	/* don't sample higher than output device can handle! */
+X	mysamples = (samples <= term_tbl[term].xmax) ?samples :term_tbl[term].xmax;
+X
+X	if (log_x) {
+X		if (xmin < 0.0 || xmax < 0.0)
+X			int_error("x range must be above 0 for log scale!",NO_CARET);
+X		x_min = log10(xmin);
+X		x_max = log10(xmax);
+X	} else {
+X		x_min = xmin;
+X		x_max = xmax;
+X	}
+X
+X	if (autoscale) {
+X		ymin = HUGE;
+X		ymax = -HUGE;
+X	} else if (log_y && (ymin <= 0.0 || ymax <= 0.0))
+X			int_error("y range must be above 0 for log scale!",
+X				NO_CARET);
+X
+X	xdiff = (x_max - x_min) / mysamples;
+X
+X	tp_ptr = &(first_plot);
+X	plot_num = 0;
+X
+X	while (TRUE) {
+X		if (END_OF_COMMAND)
+X			int_error("function to plot expected",c_token);
+X
+X		start_token = c_token;
+X
+X		if (is_definition(c_token)) {
+X			define();
+X		} else {
+X			plot_num++;
+X			if (*tp_ptr)
+X				this_plot = *tp_ptr;
+X			else {		/* no memory malloc()'d there yet */
+X				this_plot = (struct curve_points *)
+X					malloc((unsigned int) (sizeof(struct curve_points) -
+X					(MAX_POINTS - (samples+1))*sizeof(struct coordinate)));
+X				if (!this_plot)
+X					int_error("out of memory",c_token);
+X				this_plot->next_cp = NULL;
+X				this_plot->title = NULL;
+X				*tp_ptr = this_plot;
+X			}
+X
+X			if (isstring(c_token)) {			/* data file to plot */
+X				this_plot->plot_type = DATA;
+X				this_plot->plot_style = data_style;
+X				get_data(this_plot);
+X				c_token++;
+X			}
+X			else {							/* function to plot */
+X				this_plot->plot_type = FUNC;
+X				this_plot->plot_style = func_style;
+X
+X				(void) strcpy(c_dummy_var,dummy_var);
+X				dummy_func = &plot_func;
+X
+X				plot_func.at = temp_at();
+X
+X				for (i = 0; i <= mysamples; i++) {
+X					if (i == samples+1)
+X						int_error("number of points exceeded samples",
+X							NO_CARET);
+X					x = x_min + i*xdiff;
+X					if (log_x)
+X						x = pow(10.0,x);
+X					(void) complex(&plot_func.dummy_value, x, 0.0);
+X					
+X					evaluate_at(plot_func.at,&a);
+X
+X					if (this_plot->points[i].undefined =
+X						undefined || (fabs(imag(&a)) > zero))
+X							continue;
+X				/*	
+X					The old code used plot_type to generate x, but with
+X					polar and offset concepts we need to record the x
+X					value.
+X				*/
+X					this_plot->points[i].x = x;
+X
+X					temp = real(&a);
+X
+X					if (log_y && temp <= 0.0) {
+X							this_plot->points[i].undefined = TRUE;
+X							continue;
+X					}
+X					if (autoscale) {
+X						if (temp < ymin) ymin = temp;
+X						if (temp > ymax) ymax = temp;
+X					} else if (temp < ymin || temp > ymax) {
+X						this_plot->points[i].undefined = TRUE;
+X						continue;
+X					}
+X
+X					this_plot->points[i].y = log_y ? log10(temp) : temp;
+X				}
+X				this_plot->p_count = i; /* mysamples + 1 */
+X			}
+X			m_capture(&(this_plot->title),start_token,c_token-1);
+X			if (almost_equals(c_token,"w$ith"))
+X				this_plot->plot_style = get_style();
+X			tp_ptr = &(this_plot->next_cp);
+X		}
+X
+X		if (equals(c_token,","))
+X			c_token++;
+X		else
+X			break;
+X	}
+X
+X	if (autoscale && (ymin == ymax))
+X		ymax += 1.0;	/* kludge to avoid divide-by-zero in do_plot */
+X
+X	if (log_y) {
+X		y_min = log10(ymin);
+X		y_max = log10(ymax);
+X	} else {
+X		y_min = ymin;
+X		y_max = ymax;
+X	}
+X	capture(replot_line,plot_token,c_token);	
+X	do_plot(first_plot,plot_num,x_min,x_max,y_min,y_max);
+X}
+X
+X
+X
+Xdone(status)
+Xint status;
+X{
+X	if (term)
+X		(*term_tbl[term].reset)();
+X	exit(status);
+X}
+X
+X
+X#ifdef vms
+X
+X#include <descrip.h>
+X#include <rmsdef.h>
+X#include <errno.h>
+X
+Xextern lib$get_input(), lib$put_output();
+X
+Xint vms_len;
+X
+Xunsigned int status[2] = {1, 0};
+X
+X$DESCRIPTOR(prompt_desc,PROMPT);
+X$DESCRIPTOR(line_desc,input_line);
+X
+X$DESCRIPTOR(help_desc,help);
+X$DESCRIPTOR(helpfile_desc,"GNUPLOT$HELP");
+X
+X
+Xread_line()
+X{
+X	switch(status[1] = lib$get_input(&line_desc, &prompt_desc, &vms_len)){
+X		case RMS$_EOF:
+X			done(IO_SUCCESS);	/* ^Z isn't really an error */
+X			break;
+X		case RMS$_TNS:			/* didn't press return in time */
+X			vms_len--;		/* skip the last character */
+X			break;			/* and parse anyway */
+X		case RMS$_BES:			/* Bad Escape Sequence */
+X		case RMS$_PES:			/* Partial Escape Sequence */
+X			sys$putmsg(status);
+X			vms_len = 0;		/* ignore the line */
+X			break;
+X		case SS$_NORMAL:
+X			break;			/* everything's fine */
+X		default:
+X			done(status[1]);	/* give the error message */
+X	}
+X	input_line[vms_len] = '\0';
+X}
+X
+X
+Xdo_help()
+X{
+X	help_desc.dsc$w_length = strlen(help);
+X	if ((vaxc$errno = lbr$output_help(lib$put_output,0,&help_desc,
+X		&helpfile_desc,0,lib$get_input)) != SS$_NORMAL)
+X			os_error("can't open GNUPLOT$HELP");
+X}
+X
+X
+Xdo_shell()
+X{
+X	if ((vaxc$errno = lib$spawn()) != SS$_NORMAL) {
+X		os_error("spawn error",NO_CARET);
+X	}
+X}
+X
+X
+Xdo_system()
+X{
+X	input_line[0] = ' ';	/* an embarrassment, but... */
+X
+X	if ((vaxc$errno = lib$spawn(&line_desc)) != SS$_NORMAL)
+X		os_error("spawn error",NO_CARET);
+X
+X	(void) putc('\n',stderr);
+X}
+X
+X#else /* vms */
+X
+Xdo_help()
+X{
+X	if (system(help))
+X		os_error("can't spawn help",c_token);
+X}
+X
+X
+Xdo_system()
+X{
+X	if (system(input_line + 1))
+X		os_error("system() failed",NO_CARET);
+X}
+X
+X#ifdef MSDOS
+X
+Xread_line()
+X{
+Xregister int i;
+X
+X	input_line[0] = MAX_LINE_LEN - 1;
+X	cputs(PROMPT);
+X	cgets(input_line);			/* console input so CED will work */
+X	(void) putc('\n',stderr);
+X	if (input_line[2] == 26) {
+X		(void) putc('\n',stderr);		/* end-of-file */
+X		done(IO_SUCCESS);
+X	}
+X
+X	i = 0;
+X	while (input_line[i] = input_line[i+2])
+X		i++;		/* yuck!  move everything down two characters */
+X}
+X
+X
+Xdo_shell()
+X{
+Xregister char *comspec;
+X	if (!(comspec = getenv("COMSPEC")))
+X		comspec = "\command.com";
+X	if (spawnl(P_WAIT,comspec,NULL) == -1)
+X		os_error("unable to spawn shell",NO_CARET);
+X}
+X
+X#else /* MSDOS */
+X		/* plain old Unix */
+X
+Xread_line()
+X{
+X	fputs(PROMPT,stderr);
+X	if (!fgets(input_line, MAX_LINE_LEN, stdin)) {
+X		(void) putc('\n',stderr);		/* end-of-file */
+X		done(IO_SUCCESS);
+X	}
+X	else {
+X		input_line[strlen(input_line)-1] = '\0';  /* Remove trailing \n */
+X	}
+X}
+X
+X#ifdef VFORK
+X
+Xdo_shell()
+X{
+Xregister char *shell;
+Xregister int p;
+Xstatic int execstat;
+X	if (!(shell = getenv("SHELL")))
+X		shell = SHELL;
+X	if ((p = vfork()) == 0) {
+X		execstat = execl(shell,shell,NULL);
+X		_exit(1);
+X	} else if (p == -1)
+X		os_error("vfork failed",c_token);
+X	else
+X		while (wait(NULL) != p)
+X			;
+X	if (execstat == -1)
+X		os_error("shell exec failed",c_token);
+X	(void) putc('\n',stderr);
+X}
+X#else /* VFORK */
+X
+X#define EXEC "exec "
+Xdo_shell()
+X{
+Xstatic char exec[100] = EXEC;
+Xregister char *shell;
+X	if (!(shell = getenv("SHELL")))
+X		shell = SHELL;
+X
+X	if (system(strncpy(&exec[sizeof(EXEC)-1],shell,
+X		sizeof(exec)-sizeof(EXEC)-1)))
+X		os_error("system() failed",NO_CARET);
+X
+X	(void) putc('\n',stderr);
+X}
+X#endif /* VFORK */
+X#endif /* MSDOS */
+X#endif /* vms */
+END_OF_FILE
+if test 23912 -ne `wc -c <'command.c'`; then
+    echo shar: \"'command.c'\" unpacked with wrong size!
+fi
+# end of 'command.c'
+fi
+if test -f 'compile.com' -a "${1}" != "-c" ; then 
+  echo shar: Will not clobber existing file \"'compile.com'\"
+else
+echo shar: Extracting \"'compile.com'\" \(567 characters\)
+sed "s/^X//" >'compile.com' <<'END_OF_FILE'
+X$! make sure you SET TERM/NOWRAP before running GNUPLOT!
+X$ CFLAGS = "NOTHING"
+X$ TERMFLAGS = "AED,HP26,HP75,POSTSCRIPT,QMS,REGIS,TEK,V384,HPLJET"
+X$ set verify
+X$ cc/define=('CFLAGS') command.c
+X$ cc/define=('CFLAGS') eval.c
+X$ cc/define=('CFLAGS') graphics.c
+X$ cc/define=('CFLAGS') internal.c
+X$ cc/define=('CFLAGS') misc.c
+X$ cc/define=('CFLAGS') parse.c
+X$ cc/define=('CFLAGS') plot.c
+X$ cc/define=('CFLAGS') scanner.c
+X$ cc/define=('CFLAGS') standard.c
+X$ cc/define=('CFLAGS','TERMFLAGS') term.c
+X$ cc/define=('CFLAGS') util.c
+X$ cc/define=('CFLAGS') version.c
+X$ set noverify
+END_OF_FILE
+if test 567 -ne `wc -c <'compile.com'`; then
+    echo shar: \"'compile.com'\" unpacked with wrong size!
+fi
+# end of 'compile.com'
+fi
+if test -f 'controls.dem' -a "${1}" != "-c" ; then 
+  echo shar: Will not clobber existing file \"'controls.dem'\"
+else
+echo shar: Extracting \"'controls.dem'\" \(598 characters\)
+sed "s/^X//" >'controls.dem' <<'END_OF_FILE'
+X#
+X# warning:  this demo is SLOW on PCs without math coprocessors!
+X#
+X# From _Automatic_Control_Systems_, fourth ed., figure 6-14
+X# transient response of a second-order system to a unit step input function
+X#
+Xdamp(t) = exp(-s*wn*t)/sqrt(1.0-s*s)
+Xper(t) = sin(wn*sqrt(1.0-s**2)*t - atan(-sqrt(1.0-s**2)/s))
+Xc(t) = 1-damp(t)*per(t)
+X#
+X#	wn is natural undamped frequency
+X#	s is damping factor
+X#
+Xwn = 1.0
+Xset xrange [0:13]
+Xset samples 50
+Xset dummy t
+X#
+X# plot c(t) for several different damping factors s
+X#
+Xplot s=.1,c(t),s=.3,c(t),s=.5,c(t),s=.7,c(t),s=.9,c(t),s=1.0,c(t),s=1.5,c(t),s=2.0,c(t)
+Xset dummy x
+END_OF_FILE
+if test 598 -ne `wc -c <'controls.dem'`; then
+    echo shar: \"'controls.dem'\" unpacked with wrong size!
+fi
+# end of 'controls.dem'
+fi
+if test -f 'corgraph.asm' -a "${1}" != "-c" ; then 
+  echo shar: Will not clobber existing file \"'corgraph.asm'\"
+else
+echo shar: Extracting \"'corgraph.asm'\" \(2272 characters\)
+sed "s/^X//" >'corgraph.asm' <<'END_OF_FILE'
+XTITLE	Corona graphics module
+X;	Colin Kelley
+X;	January 1987
+X
+Xinclude header.mac
+X
+Xif1
+Xinclude lineproc.mac
+Xendif
+X
+X
+X_text	segment
+X
+Xpublic	_GrInit,_GrReset,_GrOnly,_TxOnly,_GrandTx,_Cor_line,_Cor_mask
+X
+Xcorpixel proc near
+X	ror word ptr linemask,1
+X	jc cont
+X	ret
+Xcont:	push bp
+X	mov bp,sp
+X	push ax
+X	push bx
+X	push cx
+X	mov es,ScSeg
+X	shl bx,1			; y
+X	mov bx,word ptr LookUp[bx] ; bx has y mem address
+X	mov cl,al			; x
+X	and cl,7
+X	shr ax,1
+X	shr ax,1
+X	shr ax,1			; ax /= 8
+X	add bx,ax
+X	mov al,1
+X	shl al,cl			; al contains bit mask
+X	or byte ptr es:[bx],al
+X	pop cx
+X	pop bx
+X	pop ax
+X	pop bp
+X	ret
+X
+Xlineproc _Cor_line, corpixel
+X
+Xbeginproc _GrInit
+X	push bp
+X	mov bp,sp
+X	push di
+X	mov ax, [bp+X]			; screen number (0 - 7)
+X	mov cl,11
+X	shl ax,cl			; multiply by 2048 to get segment
+X	mov ScSeg,ax			; save segment for later
+X	push ax
+X	mov es, ax
+X	xor ax,ax
+X	mov di,ax
+X	mov cx, 4000h
+X	cld
+X	rep stosw
+X	pop cx
+X	call near ptr GrAddr
+X	mov ax,es
+X	pop di
+X	pop bp
+X	ret
+X_GrInit	endp
+X
+Xbeginproc _GrReset
+X	mov cx, 0
+X	call near ptr GrAddr
+X	ret
+X_GrReset endp
+X
+XGrAddr	proc near
+X	mov dx,3b4h			; address of 6845
+X	mov al,0ch			; register 12
+X	out dx,al
+X	inc dx
+X	mov al,ch			; Graphics Segment High
+X	out dx,al
+X	dec dx
+X	mov al,0dh			; register 13
+X	out dx,al
+X	mov al,cl			; Graphics Segment Low
+X	inc dx
+X	out dx,al
+X	ret
+XGrAddr	endp
+X
+Xbeginproc _GrOnly
+X	mov dx,3b8h
+X	mov al,0a0h
+X	out dx,al
+X	ret
+X_GrOnly	endp
+X
+Xbeginproc _TxOnly
+X	mov dx,3b8h
+X	mov al,28h
+X	out dx,al
+X	ret
+X_TxOnly	endp
+X
+Xbeginproc _GrandTx
+X	mov dx,3b8h
+X	mov al,0a8h
+X	out dx,al
+X	ret
+X_GrandTx endp
+X
+Xbeginproc _Cor_mask
+X	push bp
+X	mov bp,sp
+X	mov ax,[bp+x]			; mask
+X	mov linemask,ax
+X	pop bp
+X	ret
+X_Cor_mask endp
+X
+Xcorpixel endp
+X
+X_text	ends
+X 
+X
+X_data	segment
+Xlinemask dw -1
+XScSeg	dw 0
+X_data	ends
+X
+Xconst	segment
+X
+XK	equ 1024
+X
+Xmem_mac	MACRO x
+X	dw x,2*K+x,4*K+x,6*K+x,8*K+x,10*K+x,12*K+x,14*K+x,16*K+x
+X	dw 18*K+x,20*K+x,22*K+x,24*K+x
+X	ENDM
+XLookUp	equ $
+X	mem_mac 0
+X	mem_mac 80
+X	mem_mac (80*2)
+X	mem_mac (80*3)
+X	mem_mac (80*4)
+X	mem_mac (80*5)
+X	mem_mac (80*6)
+X	mem_mac (80*7)
+X	mem_mac (80*8)
+X	mem_mac (80*9)
+X	mem_mac (80*10)
+X	mem_mac (80*11)
+X	mem_mac (80*12)
+X	mem_mac (80*13)
+X	mem_mac (80*14)
+X	mem_mac (80*15)
+X	mem_mac (80*16)
+X	mem_mac (80*17)
+X	mem_mac (80*18)
+X	mem_mac (80*19)
+X	mem_mac (80*20)
+X	mem_mac (80*21)
+X	mem_mac (80*22)
+X	mem_mac (80*23)
+X	mem_mac (80*24)
+X
+Xconst	ends
+X
+X	end
+END_OF_FILE
+if test 2272 -ne `wc -c <'corgraph.asm'`; then
+    echo shar: \"'corgraph.asm'\" unpacked with wrong size!
+fi
+# end of 'corgraph.asm'
+fi
+if test -f 'corplot.c' -a "${1}" != "-c" ; then 
+  echo shar: Will not clobber existing file \"'corplot.c'\"
+else
+echo shar: Extracting \"'corplot.c'\" \(839 characters\)
+sed "s/^X//" >'corplot.c' <<'END_OF_FILE'
+X#include <stdio.h>
+X#include <process.h>
+X#include <dos.h>
+X
+X#define BOUNDARY 32768
+X#define segment(addr) (FP_SEG(m) + ((FP_OFF(m)+15) >> 4));
+X#define round(value,boundary) (((value) + (boundary) - 1) & ~((boundary) - 1))
+X
+Xchar *malloc(),*realloc();
+X
+Xchar prog[] = "gnuplot";
+Xchar corscreen[] = "CORSCREEN=0";
+X
+Xmain()
+X{
+Xregister unsigned int segm,start;
+Xchar *m;
+X	if (!(m = malloc(BOUNDARY))) {
+X		printf("malloc() failed\n");
+X		exit(1);
+X	}
+X	segm = segment(m);
+X	start = round(segm,BOUNDARY/16);
+X
+X	if (realloc(m,BOUNDARY+(start-segm)*16) != m) {
+X		printf("can't realloc() memory\n");
+X		exit(2);
+X	}
+X
+X	if ((segm = start >> 11) >= 8) {
+X		printf("not enough room in first 256K\n");
+X		exit(3);
+X	}
+X
+X	corscreen[sizeof(corscreen)-2] = '0' + segm;
+X	if (putenv(corscreen))
+X		perror("putenv");
+X
+X	if (spawnlp(P_WAIT,prog,prog,NULL))
+X		perror("spawnlp");
+X}
+END_OF_FILE
+if test 839 -ne `wc -c <'corplot.c'`; then
+    echo shar: \"'corplot.c'\" unpacked with wrong size!
+fi
+# end of 'corplot.c'
+fi
+if test ! -d 'docs' ; then
+    echo shar: Creating directory \"'docs'\"
+    mkdir 'docs'
+fi
+if test -f 'eval.c' -a "${1}" != "-c" ; then 
+  echo shar: Will not clobber existing file \"'eval.c'\"
+else
+echo shar: Extracting \"'eval.c'\" \(3101 characters\)
+sed "s/^X//" >'eval.c' <<'END_OF_FILE'
+X/*
+X *
+X *    G N U P L O T  --  eval.c
+X *
+X *  Copyright (C) 1986, 1987  Colin Kelley, Thomas Williams
+X *
+X *  You may use this code as you wish if credit is given and this message
+X *  is retained.
+X *
+X *  Please e-mail any useful additions to vu-vlsi!plot so they may be
+X *  included in later releases.
+X *
+X *  This file should be edited with 4-column tabs!  (:set ts=4 sw=4 in vi)
+X */
+X
+X#include <stdio.h>
+X#include "plot.h"
+X
+Xchar *malloc();
+X
+Xextern int c_token;
+Xextern struct ft_entry ft[];
+Xextern struct udvt_entry *first_udv;
+Xextern struct udft_entry *first_udf;
+Xextern struct at_type at;
+Xextern struct lexical_unit token[];
+X
+Xstruct value *integer();
+X
+X
+X
+Xstruct udvt_entry *
+Xadd_udv(t_num)  /* find or add value and return pointer */
+Xint t_num;
+X{
+Xregister struct udvt_entry **udv_ptr = &first_udv;
+X
+X	/* check if it's already in the table... */
+X
+X	while (*udv_ptr) {
+X		if (equals(t_num,(*udv_ptr)->udv_name))
+X			return(*udv_ptr);
+X		udv_ptr = &((*udv_ptr)->next_udv);
+X	}
+X
+X	if (!(*udv_ptr = (struct udvt_entry *)
+X		malloc((unsigned int)sizeof(struct udvt_entry))))
+X			int_error("not enought memory for value",t_num);
+X	(*udv_ptr)->next_udv = NULL;
+X	copy_str((*udv_ptr)->udv_name,t_num);
+X	(*udv_ptr)->udv_value.type = INT;	/* not necessary, but safe! */
+X	(*udv_ptr)->udv_undef = TRUE;
+X	return(*udv_ptr);
+X}
+X
+X
+Xstruct udft_entry *
+Xadd_udf(t_num)  /* find or add function and return pointer */
+Xint t_num; /* index to token[] */
+X{
+Xregister struct udft_entry **udf_ptr = &first_udf;
+X
+X	while (*udf_ptr) {
+X		if (equals(t_num,(*udf_ptr)->udf_name))
+X			return(*udf_ptr);
+X		udf_ptr = &((*udf_ptr)->next_udf);
+X	}
+X	if (!(*udf_ptr = (struct udft_entry *)
+X		malloc((unsigned int)sizeof(struct udft_entry))))
+X			int_error("not enought memory for function",t_num);
+X	(*udf_ptr)->next_udf = (struct udft_entry *) NULL;
+X	(*udf_ptr)->definition = NULL;
+X	(*udf_ptr)->at = NULL;
+X	copy_str((*udf_ptr)->udf_name,t_num);
+X	(void) integer(&((*udf_ptr)->dummy_value), 0);
+X	return(*udf_ptr);
+X}
+X
+X
+Xunion argument *
+Xadd_action(sf_index)
+Xenum operators sf_index;		/* index of p-code function */
+X{
+X	if (at.a_count >= MAX_AT_LEN)
+X		int_error("action table overflow",NO_CARET);
+X	at.actions[at.a_count].index = sf_index;
+X	return(&(at.actions[at.a_count++].arg));
+X}
+X
+X
+Xint standard(t_num)  /* return standard function index or 0 */
+X{
+Xregister int i;
+X	for (i = (int)SF_START; ft[i].f_name != NULL; i++) {
+X		if (equals(t_num,ft[i].f_name))
+X			return(i);
+X	}
+X	return(0);
+X}
+X
+X 
+X
+Xexecute_at(at_ptr)
+Xstruct at_type *at_ptr;
+X{
+Xregister int i,index,count,offset;
+X
+X	count = at_ptr->a_count;
+X	for (i = 0; i < count;) {
+X		index = (int)at_ptr->actions[i].index;
+X		offset = (*ft[index].func)(&(at_ptr->actions[i].arg));
+X		if (is_jump(index))
+X			i += offset;
+X		else
+X			i++;
+X	}
+X}
+X
+X/*
+X
+X 'ft' is a table containing C functions within this program. 
+X
+X An 'action_table' contains pointers to these functions and arguments to be
+X passed to them. 
+X
+X at_ptr is a pointer to the action table which must be executed (evaluated)
+X
+X so the iterated line exectues the function indexed by the at_ptr and 
+X passes the address of the argument which is pointed to by the arg_ptr 
+X
+X*/
+END_OF_FILE
+if test 3101 -ne `wc -c <'eval.c'`; then
+    echo shar: \"'eval.c'\" unpacked with wrong size!
+fi
+# end of 'eval.c'
+fi
+echo shar: End of archive 1 \(of 7\).
+cp /dev/null ark1isdone
+MISSING=""
+for I in 1 2 3 4 5 6 7 ; do
+    if test ! -f ark${I}isdone ; then
+	MISSING="${MISSING} ${I}"
+    fi
+done
+if test "${MISSING}" = "" ; then
+    echo You have unpacked all 7 archives.
+    rm -f ark[1-9]isdone
+else
+    echo You still need to unpack the following archives:
+    echo "        " ${MISSING}
+fi
+##  End of shell archive.
+exit 0

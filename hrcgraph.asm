@@ -6,8 +6,8 @@ TITLE	Hercules graphics module
 ; Others came from pcgraph.asm included in GNUPLOT by Colin Kelley
 ;
 ; modified slightly by Colin Kelley - 22-Dec-86
-;	added junk below for MSC compact model, although it's probably not all
-;	  necessary...
+;	added header.mac, parameterized declarations
+; added dgroup: in HVmodem to reach HCh_Parms and HGr_Parms - 30-Jan-87
 
 include header.mac
 
@@ -148,12 +148,12 @@ beginproc _HVmode
 	mov ax, [bp+X]
 	or ah, al
 	mov al, HCh_Mode		; Assume character mode is wanted
-	mov si, offset HCh_Parms
+	mov si, offset dgroup:HCh_Parms
 	cmp ah, 0			; nonzero means switch to graphics
 	jz vmode_ok
 	call near ptr clear		; clear the graphics page
 	mov al, HGr_Mode
-	mov si, offset HGr_Parms
+	mov si, offset dgroup:HGr_Parms
 vmode_ok:
 	mov dx, HCtrl_Port
 	out dx, al			; Set Hercules board to proper mode
@@ -341,3 +341,6 @@ HGr_Parms db	35H, 2DH, 2EH, 07H, 5BH, 02H, 57H, 57H, 02H, 03H, 00H, 00H
 const	ends
 
 	end
+---------------------------end HRCGRAPH.ASM-------------------------------
+
+

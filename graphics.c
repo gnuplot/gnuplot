@@ -19,6 +19,7 @@
 
 char *strcpy(),*strncpy(),*strcat();
 
+extern BOOLEAN polar;
 extern BOOLEAN autoscale;
 extern FILE *outfile;
 extern BOOLEAN log_x, log_y;
@@ -27,6 +28,9 @@ extern int term;
 extern BOOLEAN screen_ok;
 extern BOOLEAN term_init;
 
+extern double loff,roff,toff,boff;
+extern double zero;
+
 extern struct termentry term_tbl[];
 
 
@@ -34,8 +38,9 @@ extern struct termentry term_tbl[];
 #define max(a,b) ((a > b) ? a : b)
 #endif
 
-#define map_x(x) (int)((x-xmin)*xscale) /* maps floating point x to screen */ 
-#define map_y(y) (int)((y-ymin)*yscale)	/* same for y */
+/* maps floating point x (and y) to screen */ 
+#define map_x(x) (int)((x-xmin)*xscale) 
+#define map_y(y) (int)((y-ymin)*yscale)
 
 
 double raise(x,y)
@@ -142,9 +147,24 @@ register int mms,mts;
 static char xns[20],xms[20],yns[20],yms[20],xts[20],yts[20];
 static char label[80];
 
+	if (polar)
+		polar_xform (plots, pcount, &xmin, &xmax, &ymin, &ymax);
+
 	if (ymin == HUGE || ymax == -HUGE)
 		int_error("all points undefined!", NO_CARET);
 
+/*	This used be xmax == xmin, but that caused an infinite loop once. */
+	if (fabs(xmax - xmin) < zero)
+		int_error("xmin should not equal xmax!",NO_CARET);
+	if (fabs(ymax - ymin) < zero)
+		int_error("ymin should not equal ymax!",NO_CARET);
+
+/*	Apply the desired viewport offsets. */
+	xmin -= loff;
+	xmax += roff;
+	ymin -= boff;
+	ymax += toff;
+	
 	ytic = make_tics(ymin,ymax,log_y);
 	xtic = make_tics(xmin,xmax,log_x);
 	dpcount = 0;
@@ -158,11 +178,6 @@ static char label[80];
 		ymax = ytic * floor(ymax/ytic);
 	}
 
-	if (xmin == xmax)
-		int_error("xmin should not equal xmax!",NO_CARET);
-	if (ymin == ymax)
-		int_error("ymin should not equal ymax!",NO_CARET);
-	
 	yscale = (t->ymax - 2)/(ymax - ymin);
 	xscale = (t->xmax - 2)/(xmax - xmin);
 	
@@ -266,10 +281,7 @@ static char label[80];
 			case IMPULSES:
 				for (i = 0; i < this_plot->p_count; i++) {
 					if (!this_plot->points[i].undefined) {
-						if (p_type == DATA)
-							x = map_x(this_plot->points[i].x);
-						else
-							x = (long)(t->xmax-1)*i/(this_plot->p_count-1);
+						x = map_x(this_plot->points[i].x);
 						(*t->move)(x,xaxis_y);
 						(*t->vector)(x,map_y(this_plot->points[i].y));
 					}
@@ -279,10 +291,7 @@ static char label[80];
 				prev_undef = TRUE;
 				for (i = 0; i < this_plot->p_count; i++) {
 					if (!this_plot->points[i].undefined) {
-						if (p_type == DATA)
-							x = map_x(this_plot->points[i].x);
-						else
-							x = (long)(t->xmax-1)*i/(this_plot->p_count-1);
+						x = map_x(this_plot->points[i].x);
 						if (prev_undef)
 							(*t->move)(x,
 							map_y(this_plot->points[i].y));
@@ -295,18 +304,80 @@ static char label[80];
 			case POINTS:
 				for (i = 0; i < this_plot->p_count; i++) {
 					if (!this_plot->points[i].undefined) {
-						if (p_type == DATA)
-							x = map_x(this_plot->points[i].x);
-						else
-							x = (long)(t->xmax-1)*i/(this_plot->p_count-1);
+						x = map_x(this_plot->points[i].x);
 						(*t->point)(x,map_y(this_plot->points[i].y),dpcount);
 					}
 				}
 				dpcount++;
 				break;
-
 		}
 	}
 	(*t->text)();
 	(void) fflush(outfile);
+}
+
+
+polar_xform (plots, pcount, xminp, xmaxp, yminp, ymaxp)
+struct curve_points *plots;
+int pcount;			/* count of plots in linked list */
+double *xminp, *xmaxp;
+double *yminp, *ymaxp;
+{
+register int i, p_cnt;
+register struct termentry *t = &term_tbl[term];
+register struct curve_points *this_plot;
+enum PLOT_TYPE p_type;
+struct coordinate *pnts;
+int curve, xaxis_y, yaxis_x, dpcount;
+double xmin, xmax, ymin, ymax, x, y;
+
+/*
+	Cycle through all the plots converting polar to rectangular and adjust
+	max and mins.
+*/
+	xmin = HUGE;
+	ymin = HUGE;
+	xmax = -HUGE;
+	ymax = -HUGE;
+    
+	this_plot = plots;
+	for (curve = 0; curve < pcount; this_plot = this_plot->next_cp, curve++) {
+		p_cnt = this_plot->p_count;
+        pnts = this_plot->points;
+
+	/*	Convert to cartesian all points in this curve. */
+		for (i = 0; i < p_cnt; i++) {
+			if (!pnts[i].undefined) {
+				x = pnts[i].y*cos(pnts[i].x);
+				y = pnts[i].y*sin(pnts[i].x);
+				pnts[i].x = x;
+				pnts[i].y = y;
+				if (xmin > x) xmin = x;
+				if (xmax < x) xmax = x;
+			/*  Can't worry about autoscale (assume true). */
+				if (ymin > y) ymin = y;
+				if (ymax < y) ymax = y;
+			}
+		}	
+	}
+	if (xmin < xmax) {  /* All points might be undefined... */
+		if (xmax - xmin < zero) {
+		/* This happens at least for the plot of 1/cos(x) (verticle line). */
+			xmin -= 3.14159;
+			xmax += 3.14159;
+		}
+	}
+	if (ymin < ymax) {  /* Only if there were defined points... */
+		if (ymax - ymin < zero) {
+		/* This happens at least for the plot of 1/sin(x) (horizontal line). */
+			ymin -= 1;
+			ymax += 1;
+		}
+	}
+
+/* Return the new maximums and minimums */
+	*xminp = xmin;
+	*xmaxp = xmax;
+	*yminp = ymin;
+	*ymaxp = ymax;
 }

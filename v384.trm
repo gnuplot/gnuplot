@@ -1,0 +1,110 @@
+/*
+ *  thanks to roland@moncskermit.OZ (Roland Yap) for this driver
+ *
+ *	Vectrix 384 driver - works with tandy color printer as well
+ *  in reverse printing 8 color mode.
+ *  This doesn't work on Vectrix 128 because it redefines the
+ *  color table. It can be hacked to work on the 128 by changing
+ *  the colours but then it will probably not print best. The color
+ *  table is purposely designed so that it will print well
+ *
+ */
+
+#define V384_XMAX 630
+#define V384_YMAX 480
+
+#define V384_XLAST (V384_XMAX - 1)
+#define V384_YLAST (V384_YMAX - 1)
+
+#define V384_VCHAR	12
+#define V384_HCHAR	7
+#define V384_VTIC	8
+#define V384_HTIC	7
+
+
+V384_init()
+{
+	fprintf(outfile,"%c%c  G0   \n",27,18);
+	fprintf(outfile,"Q 0 8\n");
+	fprintf(outfile,"0 0 0\n");
+	fprintf(outfile,"255 0 0\n");
+	fprintf(outfile,"0 255 0\n");
+	fprintf(outfile,"0 0 255\n");
+	fprintf(outfile,"0 255 255\n");
+	fprintf(outfile,"255 0 255\n");
+	fprintf(outfile,"255 255 0\n");
+	fprintf(outfile,"255 255 255\n");
+}
+
+
+V384_graphics()
+{
+	fprintf(outfile,"%c%c E0 RE N 65535\n",27,18);
+}
+
+
+V384_text()
+{
+	fprintf(outfile,"%c%c\n",27,17);
+}
+
+
+V384_linetype(linetype)
+int linetype;
+{
+static int color[]= {
+		1 /* red */,
+		2 /* green */,
+		3 /* blue */,
+		4 /* cyan */,
+		5 /* magenta */,
+		6 /* yellow */, /* not a good color so not in use at the moment */
+		7 /* white */
+	};
+		
+	if (linetype < 0)
+		linetype=6;
+	else
+		linetype %= 5;
+	fprintf(outfile,"C %d\n",color[linetype]);
+}
+
+
+V384_move(x,y)
+unsigned int x,y;
+{
+	fprintf(outfile,"M %d %d\n",x+20,y);
+}
+
+
+V384_vector(x,y)
+unsigned int x,y;
+{
+	fprintf(outfile,"L %d %d\n",x+20,y);
+}
+
+
+V384_lrput_text(row,str)
+unsigned int row;
+char str[];
+{
+	V384_move(V384_XMAX - V384_HTIC - V384_HCHAR*(strlen(str)+1),
+		V384_VTIC + V384_VCHAR*(row+1));
+	fprintf(outfile,"$%s\n",str);
+}
+
+
+V384_ulput_text(row,str)
+unsigned int row;
+char str[];
+{
+	V384_move(V384_HTIC, V384_YMAX - V384_VTIC - V384_VCHAR*(row+1));
+	fprintf(outfile,"$%s\n",str);
+}
+
+
+V384_reset()
+{
+}
+
+

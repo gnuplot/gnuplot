@@ -30,6 +30,7 @@
  * global variables to hold status of 'set' options
  *
  */
+BOOLEAN			polar		= FALSE; 
 BOOLEAN			autoscale	= TRUE;
 char			dummy_var[MAX_ID_LEN+1] = "x";
 enum PLOT_STYLE data_style	= POINTS,
@@ -44,6 +45,10 @@ double			xmin		= -10.0,
 				xmax		= 10.0,
 				ymin		= -10.0,
 				ymax		= 10.0;
+double			loff		= 0.0,
+				roff		= 0.0,
+				toff		= 0.0,
+				boff		= 0.0;
 double			zero = ZERO;			/* zero threshold, not 0! */
 
 
@@ -140,6 +145,30 @@ static char sv_file[MAX_LINE_LEN+1];
 		do_help();
 		screen_ok = FALSE;
 		c_token++;
+	}
+	else if (almost_equals(c_token,"pa$use")) {
+		struct value a;
+		int stime, text=0, len;
+		char buf[MAX_LINE_LEN+1], *ptr;
+
+		c_token++;
+		stime = (int )real(const_express(&a));
+		if (!(END_OF_COMMAND)) {
+			if (!isstring(c_token))
+				int_error("expecting string",c_token);
+			else {
+			/*	Unfortunately, quote_str has a ID limit. */
+				len = token[c_token].length - 2;
+				ptr = &input_line[token[c_token].start_index+1];
+				fprintf (stderr, "%.*s", len,ptr);
+				text = 1;
+			}
+		}
+		if (stime < 0) fgets (buf,MAX_LINE_LEN,stdin);  /* Hold until CR hit. */
+		if (stime > 0) sleep(stime);
+		if (text != 0 && stime >= 0) fprintf (stderr,"\n");
+		c_token++;
+		screen_ok = FALSE;
 	}
 	else if (almost_equals(c_token,"pr$int")) {
 		struct value a;
@@ -262,6 +291,18 @@ static char testfile[MAX_LINE_LEN+1];
 		autoscale = FALSE;
 		c_token++;
 	}
+	else if (almost_equals(c_token,"po$lar")) {
+		polar = TRUE;
+		xmin = 0.0;
+		xmax = 2*Pi;
+		c_token++;
+	}
+	else if (almost_equals(c_token,"nopo$lar")) {
+		polar = FALSE;
+		xmin = -10.0;
+		xmax = 10.0;
+		c_token++;
+	}
 	else if (almost_equals(c_token,"d$ata")) {
 		c_token++;
 		if (!almost_equals(c_token,"s$tyle"))
@@ -301,13 +342,30 @@ static char testfile[MAX_LINE_LEN+1];
 		log_x = log_y = FALSE;
 		c_token++;
 	}
+	else if (almost_equals(c_token,"of$fsets")) {
+		c_token++;
+		if (END_OF_COMMAND) {
+			loff = roff = toff = boff = 0.0;  /* Reset offsets */
+		}
+		else {
+			load_offsets (&loff,&roff,&toff,&boff);
+		}
+	}
 	else if (almost_equals(c_token,"o$utput")) {
 		register FILE *f;
 
 		c_token++;
 		if (END_OF_COMMAND) {	/* no file specified */
+ 			UP_redirect (4);
+#ifdef VMS
+			if (outfile != stdout) /* Never close stdout */
+#endif
 			(void) fclose(outfile);
+#ifdef VMS
+			outfile = stdout; /* Avoid the dup... */
+#else
 			outfile = fdopen(dup(STDOUT), "w");
+#endif
 			term_init = FALSE;
 			(void) strcpy(outstr,"STDOUT");
 		} else if (!isstring(c_token))
@@ -317,11 +375,15 @@ static char testfile[MAX_LINE_LEN+1];
 			if (!(f = fopen(testfile,"w"))) {
 			  os_error("cannot open file; output not changed",c_token);
 			}
+#ifdef VMS
+			if (outfile != stdout) /* Never close stdout */
+#endif
 			(void) fclose(outfile);
 			outfile = f;
 			term_init = FALSE;
 			outstr[0] = '\'';
 			(void) strcat(strcpy(outstr+1,testfile),"'");
+ 			UP_redirect (1);
 		}
 		c_token++;
 	}
@@ -381,7 +443,8 @@ static char testfile[MAX_LINE_LEN+1];
 	else
 		int_error(
 	"valid set options:  '[no]autoscale', 'data', 'dummy', 'function',\n\
-'[no]logscale', 'output', 'samples', 'terminal', 'xrange', 'yrange', 'zero'",
+'[no]logscale', 'offsets', 'output', '[no]polar', 'samples',\n\
+'terminal', 'xrange', 'yrange', 'zero'",
 	c_token);
 }
 
@@ -426,9 +489,19 @@ show_stuff()
 		show_logscale();
 		c_token++;
 	}
+	else if (almost_equals(c_token,"of$fsets")) {
+		(void) putc('\n',stderr);
+		show_offsets();
+		c_token++;
+	}
 	else if (almost_equals(c_token,"o$utput")) {
 		(void) putc('\n',stderr);
 		show_output();
+		c_token++;
+	}
+	else if (almost_equals(c_token,"po$lar")) {
+		(void) putc('\n',stderr);
+		show_polar();
 		c_token++;
 	}
 	else if (almost_equals(c_token,"sa$mples")) {
@@ -467,6 +540,7 @@ show_stuff()
 	else if (almost_equals(c_token,"a$ll")) {
 		c_token++;
 		show_version();
+		show_polar();
 		fprintf(stderr,"\tdummy variable is %s\n",dummy_var);
 		show_style("data",data_style);
 		show_style("functions",func_style);
@@ -478,6 +552,7 @@ show_stuff()
 		show_zero();
 		show_range('x',xmin,xmax);
 		show_range('y',ymin,ymax);
+		show_offsets();
 		show_variables();
 		show_functions();
 		c_token++;
@@ -485,10 +560,42 @@ show_stuff()
 	else
 		int_error(
 	"valid show options:  'action_table', 'all', 'autoscale', 'data',\n\
-'dummy', 'function', 'logscale', 'output', 'samples', 'terminal',\n\
-'variables', 'version', 'xrange', 'yrange', 'zero'", c_token);
+'dummy', 'function', 'logscale', 'offsets', 'output', 'polar',\n\
+'samples', 'terminal', 'variables', 'version', 'xrange', 'yrange', 'zero'",
+c_token);
 	screen_ok = FALSE;
 	(void) putc('\n',stderr);
+}
+
+
+load_offsets (a, b, c, d)
+double *a,*b, *c, *d;
+{
+struct value t;
+
+	*a = real (const_express(&t));  /* loff value */
+	c_token++;
+	if (equals(c_token,","))
+		c_token++;
+	if (END_OF_COMMAND) 
+	    return;
+
+	*b = real (const_express(&t));  /* roff value */
+	c_token++;
+	if (equals(c_token,","))
+		c_token++;
+	if (END_OF_COMMAND) 
+	    return;
+
+	*c = real (const_express(&t));  /* toff value */
+	c_token++;
+	if (equals(c_token,","))
+		c_token++;
+	if (END_OF_COMMAND) 
+	    return;
+
+	*d = real (const_express(&t));  /* boff value */
+	c_token++;
 }
 
 
@@ -740,6 +847,12 @@ static struct value a;
 					if (this_plot->points[i].undefined =
 						undefined || (fabs(imag(&a)) > zero))
 							continue;
+				/*	
+					The old code used plot_type to generate x, but with
+					polar and offset concepts we need to record the x
+					value.
+				*/
+					this_plot->points[i].x = x;
 
 					temp = real(&a);
 
@@ -916,9 +1029,12 @@ register char *comspec;
 read_line()
 {
 	fputs(PROMPT,stderr);
-	if (!gets(input_line)) {
+	if (!fgets(input_line, MAX_LINE_LEN, stdin)) {
 		(void) putc('\n',stderr);		/* end-of-file */
 		done(IO_SUCCESS);
+	}
+	else {
+		input_line[strlen(input_line)-1] = '\0';  /* Remove trailing \n */
 	}
 }
 

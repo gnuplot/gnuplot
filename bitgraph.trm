@@ -1,0 +1,58 @@
+/* thanks to dukecdu!evs (Ed Simpson) for the BBN BitGraph driver */
+#define BG_XMAX			 	768 /* width of plot area */
+#define BG_YMAX			 	768 /* height of plot area */
+#define BG_SCREEN_HEIGHT	1024 /* full screen height */
+
+#define BG_XLAST	 (BG_XMAX - 1)
+#define BG_YLAST	 (BG_YMAX - 1)
+
+#define BG_VCHAR	16
+#define BG_HCHAR	 9
+#define BG_VTIC		 8
+#define BG_HTIC		 8	
+
+
+#define BG_init TEK40init
+
+#define BG_graphics TEK40graphics
+
+
+#define BG_linetype TEK40linetype
+
+#define BG_move TEK40move
+
+#define BG_vector TEK40vector
+
+
+BG_text()
+{
+	BG_move(0, BG_SCREEN_HEIGHT - 2 * BG_VCHAR);
+	fprintf(outfile,"\037");
+/*                   1
+	1. into alphanumerics
+*/
+}
+
+
+BG_lrput_text(row,str)
+unsigned int row;
+char str[];
+{
+	BG_move(BG_XMAX - BG_HTIC - BG_HCHAR*(strlen(str)+1),
+		BG_VTIC + BG_VCHAR*(row+1));
+	fprintf(outfile,"\037%s\n",str);
+}
+
+
+BG_ulput_text(row,str)
+unsigned int row;
+char str[];
+{
+	BG_move(BG_HTIC, BG_YMAX - BG_VTIC - BG_VCHAR*(row+1));
+	fprintf(outfile,"\037%s\n",str);
+}
+
+
+#define BG_reset TEK40reset
+
+

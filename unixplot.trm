@@ -1,0 +1,79 @@
+#define UP_XMAX 4096
+#define UP_YMAX 4096
+
+#define UP_XLAST (UP_XMAX - 1)
+#define UP_YLAST (UP_YMAX - 1)
+
+#define UP_VCHAR (UP_YMAX/30)
+#define UP_HCHAR (UP_XMAX/72)	/* just a guess--no way to know this! */
+#define UP_VTIC (UP_YMAX/80)
+#define UP_HTIC (UP_XMAX/80)
+
+UP_init()
+{
+	openpl();
+	space(0, 0, UP_XMAX, UP_YMAX);
+}
+
+
+UP_graphics()
+{
+	erase();
+}
+
+
+UP_text()
+{
+}
+
+
+UP_linetype(linetype)
+int linetype;
+{
+static char *lt[2+5] = {"solid", "longdashed", "solid", "dotted","shortdashed",
+	"dotdashed", "longdashed"};
+
+	if (linetype >= 5)
+		linetype %= 5;
+	linemod(lt[linetype+2]);
+}
+
+
+UP_move(x,y)
+unsigned int x,y;
+{
+	move(x,y);
+}
+
+
+UP_vector(x,y)
+unsigned int x,y;
+{
+	cont(x,y);
+}
+
+
+UP_lrput_text(row,str)
+unsigned int row;
+char str[];
+{
+	move(UP_XMAX - UP_HTIC - UP_HCHAR*(strlen(str)+1),
+		UP_VTIC + UP_VCHAR*(row+1));
+	label(str);
+}
+
+
+UP_ulput_text(row,str)
+unsigned int row;
+char str[];
+{
+	UP_move(UP_HTIC, UP_YMAX - UP_VTIC - UP_VCHAR*(row+1));
+	label(str);
+}
+
+UP_reset()
+{
+	closepl();
+}
+
+

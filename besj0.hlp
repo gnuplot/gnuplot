@@ -1,3 +1,0 @@
-This function returns the j0th Bessel function of its argument.
-'besj0' expects its argument to be in radians.
-

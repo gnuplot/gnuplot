@@ -1,4 +1,0 @@
-This function returns 1 if its argument is positive, -1 if its
-argument is negative, and 0 if its argument is 0.  If the argument
-is a complex value, the imaginary component is ignored. 
-

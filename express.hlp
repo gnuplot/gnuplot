@@ -1,9 +1,0 @@
-In general, any mathematical expression accepted by C, FORTRAN,
-Pascal, or BASIC is valid.  The precedence of these operators is
-determined by the specifications of the C programming language.
-White space (spaces and tabs) is ignored inside expressions. 
-
-Complex constants may be expressed as the {real,imag}, where <real>
-and <imag> must be numerical constants.  For example {3,2}
-represents 3 + 2i; {0,1} represents 'i' itself. 
-

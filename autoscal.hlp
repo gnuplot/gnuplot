@@ -1,9 +1,0 @@
-If autoscaling is set, the Y axis is automatically scaled to fit the
-range of the function or data being plotted.  If autoscaling is not
-set, the current Y range is used.  See 'set yrange'. 
-
-Syntax:
-        set autoscale
-        set noautoscale
-        show autoscale
-

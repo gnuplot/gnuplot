@@ -1,0 +1,232 @@
+/*
+** Hewlett-Packard Laserjet
+** Driver written and copyrighted 1987 by
+** Jyrki Yli-Nokari (jty@intrin.UUCP)
+** Intrinsic, Ltd.
+** 
+** You may use this code for anything you like as long as
+** you are not selling it and the credit is given and
+** this message retained.
+*/
+
+/*
+** Here is the GNUPLOT HP Laserjet driver I promised to send to the net.
+** Following is a set of diffs to the GNUPLOT version V1.1 term.c
+** In case you don't have the patch program, you must insert the diffs
+** by hand. This should be fairly easy with a proper editor
+** since they are almost in one piece.
+**
+** Also there are some fixes to the HP26xx driver that was in the
+** V1.1 distribution.
+**
+** To get the laserjet driver, add -DHPLJET to TERMFLAGS in Makefile
+** (/DHPLJET in make.msc and HPLJET in compile.com).
+**
+** The driver consists of two parts: general raster plotting routines
+** (#ifdef RASTER) and the laserjet driver using them (#ifdef HPLJET).
+**
+** The laserjet driver contains actually three different "terminal types":
+** laserjet1, laserjet2 and laserjet3. The difference between them is the size
+** of the picture "laserjet3" being the biggest.
+*/
+
+/*
+** NOTE:
+** When sending the plot to the laserjet there must be absolutely
+** NO character translation done by the operating system.
+** Normally, in UNIX, the (operating system) terminal driver
+** translates newlines to CR/LF pairs. This is called the "cooked mode".
+** Some operating systems might add CR/LF pairs if they think there
+** is a too long line. ALL THIS IS STRICTLY PROHIBITED.
+** ALL DATA TO THE LASERJET MUST BE SENT WHEN THE LINE IS IN RAW MODE.
+**
+
+/*
+** The laserjet math is a pain since we have to deal with
+** decipoints (720/inch), dots (300/inch), pixels (100-300/inch),
+** characters (10/inch horiz., 6/inch vertic.) and the size of
+** the plottable surface in A4 (about 7.8 inches horizontally).
+** On top of this we also support different plot sizes!
+*/
+
+#define HPLJET_PIXSIZE	(hpljet_pixel)
+		/* Laserjet pixel size in laserjet minimum dots */
+#define HPLJET_PPI (300/HPLJET_PIXSIZE)
+		/* Laserjet raster scaling factor, Pixels Per Inch */
+#define HPLJET_WIDTH 5600
+		/* ~ Number of horizontal decipoints in A4 */
+#define HPLJET_IN2DP(x) (720*(x))
+		/* convert INches TO DeciPoints */
+#define HPLJET_PX2DP(x) (HPLJET_IN2DP(x)/HPLJET_PPI)
+		/* convert PiXels TO DeciPoints */
+#define HPLJET_HC2DP(x) (72*(x))
+		/* convert Horizontal Characters TO DeciPoints */
+#define HPLJET_VC2DP(x) (120*(x))
+		/* convert Vertical Characters TO DeciPoints */
+#define HPLJET_LMARG ((HPLJET_WIDTH - HPLJET_PX2DP(HPLJETXMAX))/2)
+		/* Picture left margin in decipoints */
+#define HPLJET_RMARG ((HPLJET_WIDTH + HPLJET_PX2DP(HPLJETXMAX))/2)
+		/* Picture right margin in decipoints */
+#define HPLJETXMAX 640
+		/* Number of pixels in X-axis */
+#define HPLJETYMAX 640
+		/* Number of pixels in Y-axis */
+#define HPLJETXLAST (HPLJETXMAX - 1)
+		/* Last valid X-pixel value */
+#define HPLJETYLAST (HPLJETYMAX - 1)
+		/* Last valid Y-pixel value */
+
+#define HPLJETVCHAR	(HPLJET_PPI/6)
+		/* Vertical pixel size of the character font */
+#define HPLJETHCHAR	(HPLJET_PPI/10)
+		/* Horizontal pixel size of the character font */
+#define HPLJET1VCHAR	(300/6)
+		/* Vertical pixel size of the character font */
+#define HPLJET1HCHAR	(300/10)
+		/* Horizontal pixel size of the character font */
+#define HPLJET2VCHAR	(150/6)
+		/* Vertical pixel size of the character font */
+#define HPLJET2HCHAR	(150/10)
+		/* Horizontal pixel size of the character font */
+#define HPLJET3VCHAR	(100/6)
+		/* Vertical pixel size of the character font */
+#define HPLJET3HCHAR	(100/10)
+		/* Horizontal pixel size of the character font */
+/*
+** (I guess) VTIC and HTIC are used as
+** "small units that look like equal length".
+** They determine (at least) the length of "bars" in axises and
+** the size of plotting symbols.
+*/
+#define HPLJETVTIC		6
+#define HPLJETHTIC		6
+
+/*
+** We use laserjet1, laserjet2 and laserjet3 for different
+** pixel sizes of the picture (1 is the smallest).
+** The size of the text, however, remains the same.
+** These three terminal types use mostly the same
+** functions, only the init-function determines the size of the picture.
+** Also, the h_char and v_char are different, but they are
+** not used.
+*/
+
+/*
+** Initialize (once) for graphics
+*/
+static int hpljet_pixel = 3;
+
+HPLJET1init()
+{
+	hpljet_pixel = 1;
+}
+
+HPLJET2init()
+{
+	hpljet_pixel = 2;
+}
+
+HPLJET3init()
+{
+	hpljet_pixel = 3;
+}
+
+HPLJETmove(x, y)
+{
+	r_move((unsigned)x, (unsigned)y);
+}
+
+HPLJETvector(x, y)
+{
+	r_draw((unsigned)x, (unsigned)y, (pixel)1);
+}
+
+/*
+** Enter graphics mode:
+**	- allocate raster buffer
+**	- set resolution
+*/
+HPLJETgraphics()
+{
+	r_makeraster(HPLJETXMAX, HPLJETYMAX);
+	fprintf(outfile,"\033*t%dR", HPLJET_PPI);
+/*	                             1
+**	1. Set resolution pixels/inch
+*/
+}
+
+/*
+** (re-)enter text mode,
+** output raster and deallocate it.
+*/
+HPLJETtext()
+{
+	int x, y;
+	unsigned v, i;
+
+	fprintf(outfile, "\033&a%dH\033&a%dV", HPLJET_LMARG, HPLJET_VC2DP(2));
+	fprintf(outfile, "\033*r1A");
+	for (y = r_ysize-1; y >= 0; y--) {
+		fprintf(outfile, "\033*b%dW", r_xsize/8);
+		for (x = 0; x < r_xsize; x += 8) {
+			v = 0;
+			for (i = 0; i < 8; i++) {
+				v = (v << 1) | r_getpixel((unsigned)x + i, (unsigned)y);
+			}
+			putc((char)v, outfile);
+		}
+	}
+	r_freeraster();
+	fprintf(outfile, "\033*rB\f");
+}
+
+/*
+** Select line type [-2:8]
+** line types:
+**	-2 = border line
+**	-1 = x/y axis line
+**	0-8 = function plot lines.
+**	Dummy function here.
+*/
+HPLJETlinetype(linetype)
+int linetype;
+{
+}
+
+/*
+** Put text "str" to the lower right corner of the screen.
+** "row" is the row number [0:1].
+** Actually in the laserjet, put the text above the upper right corner.
+*/
+HPLJETlrput_text(row,str)
+unsigned int row;
+char str[];
+{
+	
+	fprintf(outfile, "\033&a%dH\033&a%dV",
+	        HPLJET_RMARG - HPLJET_HC2DP(strlen(str)), HPLJET_VC2DP(row));
+	fputs(str, outfile);
+}
+
+/*
+** Put text "str" to the upper left corner of the screen.
+** "row" is the (serial) number of function to be plotted.
+** Actually in the laserjet, put the text under the lower left corner.
+*/
+HPLJETulput_text(row,str)
+unsigned int row;
+char str[];
+{
+	fprintf(outfile, "\033&a%dH\033&a%dV",
+	        HPLJET_LMARG,
+	        HPLJET_VC2DP(row+3)+HPLJET_PX2DP(HPLJETYMAX));
+	fputs(str, outfile);
+}
+
+/*
+** RETURN to normal mode (exit gnuplot)
+*/
+HPLJETreset()
+{
+}
+

@@ -1,0 +1,124 @@
+# "make all" will compile all the necessary programs, gnuplot itself, the
+# help system and helptree (to make the help tree out of the flat file.)
+#
+# "make install will install all the necessary pieces to run gnuplot
+# successfully.  This includes creating the help tree in /usr/local/help.
+
+# If you do not wish the destinations of the executable and manual page to
+# be at the default locations (see below), feel free to change them.
+# The location of the help system and help tree also have default values.
+# If you want them somewhere else or would like to test the whole system
+# before you run "make install", you have to set environment variables so
+# that gnuplot finds them.  See README.3B1 for details.
+
+# where to install executable on 'make install'
+DEST=/usr/local/bin/gnuplot
+# where to install man page on 'make man_install'
+MANDEST=/usr/man/man1/gnuplot.1
+
+# -DFORK if you have vfork()
+# -DBCOPY if your memcpy() is called bcopy() (a Berkeleyism, right?)
+# -DNOCOPY if you don't have a memcpy() by any name
+# -DGAMMA if you've got gamma(3)
+# -O if you trust your compiler's optimizer
+CFLAGS = -DVFORK -DBCOPY -DGAMMA #-gx #-O
+
+# -D<terminal> in TERMFLAGS iff you wish to support <terminal>
+# -DAED         AED 512 and AED 767
+# -DBITGRAPH    BBN BitGraph
+# -DHP26        HP2623A and maybe others
+# -DHP75        HP7580, and probably other HPs
+# -DHPLJET      HP LaserJet laserprinter
+# -DPOSTSCRIPT  Postscript
+# -DQMS         QMS/QUIC laserprinter (Talaris 1200 and others)
+# -DREGIS       ReGis graphics (vt125, vt220, vt240, Gigis...)
+# -DSELANAR     Selanar
+# -DTEK         Tektronix 4010, and probably others
+# -DUNIXPC      unixpc (ATT 3b1 or ATT 7300)
+# -DUNIXPLOT    unixplot
+# -DV384        Vectrix 384 and tandy color printer
+
+TERMFLAGS = -DAED -DBITGRAPH -DHP26 -DHP75 -DPOSTSCRIPT -DQMS -DREGIS -DSELANAR -DTEK -DUNIXPLOT -DV384
+
+
+OBJS = 	command.o eval.o graphics.o internal.o misc.o parse.o plot.o scanner.o\
+    standard.o term.o util.o
+
+# -lplot if you have -DUNIXPLOT
+LIBS = -lm -lplot
+
+# If you do not wish to compile the help system or make the help directory
+# tree, feel free to comment out the appropriate lines that do it.
+
+all:	gnuplot help_system doc_tree
+
+gnuplot: $(OBJS) version.o
+	cc $(OBJS) version.o $(LIBS) -o gnuplot
+
+help_system:
+	( cd help ; make )
+
+doc_tree:
+	( cd docs ; make helptree )
+
+# note that directory /usr/local/help must exist for the help tree
+# to be created
+install: gnuplot help_system doc_tree man_install
+	cp gnuplot $(DEST)
+	strip $(DEST)
+	docs/helptree -t /usr/local/help/gnuplot < docs/gnuplot.hlp
+	cd help; make install
+
+man_install: gnuplot.1
+	cp gnuplot.1 $(MANDEST)
+
+term.o: term.c aed.trm bitgraph.trm hp26.trm hp75.trm hpljet.trm pc.trm \
+	postscpt.trm qms.trm regis.trm selanar.trm tek.trm unixpc.trm \
+	unixplot.trm v384.trm
+	cc $(CFLAGS) $(TERMFLAGS) -c term.c
+
+
+$(OBJS): plot.h
+
+clean:
+	rm -f *.o gnuplot
+
+	( cd help ; make clean )
+	( cd docs ; make clean )
+
+spotless:
+	rm -f *.o gnuplot Makefile help/Makefile
+
+	( cd help ; make clean -f makefile.unx )
+	( cd docs ; make clean )
+
+#
+# if you have the Rich $alz shar package, you can use this make shar section.
+#
+
+shars:	spotless shar/gnuplot.shar.1 shar/gnuplot.shar.2 \
+	shar/gnuplot.shar.3 shar/gnuplot.shar.4 shar/gnuplot.shar.5 \
+	shar/gnuplot.shar.6 shar/gnuplot.shar.7
+
+shar/gnuplot.shar.1: [1-9]* [A-Z]* [a-f]*
+	shar -n1 -e7 [1-9]* [A-Z]* [a-f]* > shar/gnuplot.shar.1
+
+shar/gnuplot.shar.2: [g-l]*
+	shar -n2 -e7 [g-l]* > shar/gnuplot.shar.2
+
+shar/gnuplot.shar.3: [m-o]* p[a-i]*
+	shar -n3 -e7 [m-o]* p[a-i]* > shar/gnuplot.shar.3
+
+shar/gnuplot.shar.4: p[j-z]* [q-t]*
+	shar -n4 -e7 p[j-z]* [q-t]* > shar/gnuplot.shar.4
+
+shar/gnuplot.shar.5: [u-z]*
+	shar -n5 -e7 [u-z]* > shar/gnuplot.shar.5
+
+shar/gnuplot.shar.6: docs/[A-Z]* docs/[a-g]*
+	cd docs; make clean; cd ..
+	shar -n6 -e7 docs docs/[A-Z]* docs/[a-g]* > shar/gnuplot.shar.6
+
+shar/gnuplot.shar.7: docs/[h-z]* help/*
+	shar -n7 -e7 docs/[h-z]* help help/* > shar/gnuplot.shar.7
+

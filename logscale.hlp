@@ -1,9 +1,0 @@
-Log scaling may be set on the X and/or Y axis.
-
-Syntax:
-        set logscale <axes>
-        set nologscale
-        show logscale
-
-Where <axes> is either 'x', 'y', or 'xy'.
-

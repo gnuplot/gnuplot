@@ -1,0 +1,1816 @@
+Newsgroups: comp.sources.misc
+From: allbery@uunet.UU.NET (Brandon S. Allbery - comp.sources.misc)
+Subject: v08i041: GnuPlot v1.10A (part 7 of 7)
+Reply-To: canoaf@ntvax.UUCP (Augustine Cano)
+
+Posting-number: Volume 8, Issue 41
+Submitted-by: canoaf@ntvax.UUCP (Augustine Cano)
+Archive-name: gnuplot1.10A/part07
+
+[OOPS!!!  I had to patch these after receiving them -- and managed to lose the
+name of the person who submitted them in the process.  Duh.  The name shown
+is a "best guess".  Submitter, please correct me.  ++bsa]
+
+#! /bin/sh
+# This is a shell archive.  Remove anything before this line, then unpack
+# it by saving it into a file and typing "sh file".  To overwrite existing
+# files, type "sh file -c".  You can also feed this as standard input via
+# unshar, or by typing "sh <file", e.g..  If this archive is complete, you
+# will see the following message at the end:
+#		"End of archive 7 (of 7)."
+# Contents:  docs/helptree.c docs/hlp2ms.c docs/intro docs/termdrvr.doc
+#   docs/titlepage help help/README help/append.c help/catch.c
+#   help/format_help.c help/free_list.c help/global.h help/help.1
+#   help/help.c help/initialize.c help/input_choice.c help/insert.c
+#   help/link.otc help/main.c help/makefile.tc help/makefile.unx
+#   help/pchar.c help/present.c help/scan_topics.c
+# Wrapped by allbery@uunet on Sat Sep  9 13:47:25 1989
+PATH=/bin:/usr/bin:/usr/ucb ; export PATH
+if test -f 'docs/helptree.c' -a "${1}" != "-c" ; then 
+  echo shar: Will not clobber existing file \"'docs/helptree.c'\"
+else
+echo shar: Extracting \"'docs/helptree.c'\" \(6341 characters\)
+sed "s/^X//" >'docs/helptree.c' <<'END_OF_FILE'
+X#include <stdio.h>
+X#include <ctype.h>
+X#ifndef __TURBOC__
+X#include <sys/file.h>
+X#endif
+X#include <sys/types.h>
+X#include <sys/stat.h>
+X
+Xextern errno, sys_nerr;
+Xextern char *sys_errlist[];
+X
+X#define ErrOut(s1,s2) {\
+Xfprintf(stderr, "\n%s:: ", sys_errlist[errno]);\
+Xfprintf(stderr, s1, s2);\
+Xfprintf(stderr, "\n");\
+Xexit(1);}
+X
+Xmain(argc,argv)
+Xint argc;
+Xchar *argv[];
+X/*
+X   Routine to build a flat file out of a help tree or build a help tree
+X   out of a flat file.  This routine requires a switch (-f or -t) to
+X   determine which mode it will run in and a path name that represents
+X   the root of a help tree.  A flat help file is useful for moving a
+X   help tree from one system to another and, in addition, VMS can use
+X   it directly as a help file.
+X
+X   -f assume we are creating a flat file, path is the root of an existing
+X      help tree and the flat help file will be written to stdout.
+X
+X   -t assume we are creating a help tree, path is the root of a help tree
+X      that is to be created.
+X
+X   usage: helptree -f path       or      helptree -t path
+X
+X*/
+X{
+X
+X/* Parse options. */
+X   if (argc != 3 || argv[1][0] != '-') usage();
+X   if (argv[1][1] == 'f')
+X      build_file (argv[2], 0);
+X   else if (argv[1][1] == 't')
+X      build_tree (argv[2]);
+X
+X   exit (0);
+X/*NOTREACHED*/
+X}
+X
+X
+Xbuild_file (path,level)
+Xchar *path;
+Xint level;
+X{
+X   FILE *fp, *fopen();
+X   char buf[BUFSIZ], name[BUFSIZ];
+X   char *names, *src, *dst, *str_append(), *next_name();
+X
+X   ++level;
+X   if (chdir(path) < 0)
+X      ErrOut("Can't cd to %s", path);
+X
+X/* Copy any TEXT file out to stdout. */
+X   if ((fp = fopen ("TEXT", "r")) != NULL) {
+X      while (fgets (buf, BUFSIZ, fp) != NULL) {
+X	 putc (' ', stdout);  /* Put leading space on output lines */
+X         fputs (buf, stdout);
+X      }
+X      fclose (fp);
+X   }
+X   names = NULL;
+X
+X/* Read any DIR file and build a list of names. */
+X   if ((fp = fopen ("DIR", "r")) != NULL) {
+X      while (fgets (buf, BUFSIZ, fp) != NULL) {
+X         src = buf;
+X         dst = name;
+X         while (*src && *src != '*') *dst++ = *src++;
+X         if (*src == '*') {
+X         /* Append this name to the end of the name list. */
+X            *dst = '\0';
+X            names = str_append (names, name);
+X         }
+X      }
+X      fclose (fp);
+X   }
+X/* Cycle through the names and do each one found. */
+X   src = names;
+X   while ((src = next_name (src, name)) != NULL) {
+X      if (isdirectory(name)) {
+X         printf ("%d %s\n", level, name);
+X         build_file (name, level);  /* Recurse. */
+X         if (chdir ("..") < 0)
+X            ErrOut ("Error with cd ..", NULL);
+X      }
+X   }
+X}
+X
+X
+Xstatic int lncnt=0, done=0;  /* Set in put_text */
+Xstatic char buf[BUFSIZ];
+X
+Xbuild_tree (start_path)
+Xchar *start_path;
+X/*
+X   This routine assumes that a properly formatted .hlp file is being read
+X   in from standard input.  Properly formatted means that the only lines
+X   which begin in column 1 are numeric indices of a tree (directory) 
+X   level.
+X*/
+X{
+X   int level, curlevel=0;
+X   char cmd[256], *ptr, path[BUFSIZ];
+X   
+X   strcpy (path, start_path);
+X   while (!done) {
+X      sprintf (cmd,"mkdir %s", path);
+X      system (cmd); 
+X      if (curlevel > 0)
+X         append_DIR (path);
+X      if (chdir(path) < 0)
+X         ErrOut("Can't cd to %s", path);
+X      ++curlevel;
+X
+X      put_text ("TEXT");
+X   /* Buf now contains new level item or we reached EOF */
+X      if (done) break;
+X
+X      level = atoi (buf);
+X      ptr = buf;
+X      while (isspace(*ptr) || isdigit(*ptr)) ++ptr;
+X      ptr[strlen(ptr)-1] = '\0';  /* Remove \n */
+X      strcpy (path, ptr);
+X
+X      while (curlevel > level) {
+X         if (chdir("..") < 0)
+X            ErrOut("Can't cd to ..", path);
+X         if (--curlevel < 1) {
+X            fprintf (stderr, "Error with input near line %d\n",lncnt);
+X            exit(1);
+X         }
+X      }
+X   }
+X}
+X
+Xappend_DIR (path)
+Xchar *path;
+X/*
+X   Append ``path'' to the DIR file found at this directory level.
+X*/
+X{
+X   FILE *fdir, *fopen();
+X
+X   if ((fdir = fopen ("DIR", "a")) == NULL) {
+X      fprintf (stderr, "Couldn't build DIRS near line %d\n", lncnt);
+X      ErrOut ("Open failure for DIRS in %s", path);
+X   }
+X   fprintf (fdir, "%s*%s\n", path, path);
+X   fclose (fdir);
+X}
+X
+X
+Xput_text (file)
+Xchar *file;
+X{
+X   FILE *ftext = NULL, *fopen();
+X   char *bufptr;
+X
+X   while ((bufptr = fgets (buf, BUFSIZ, stdin)) != NULL) {
+X      ++lncnt;
+X      if (!isspace(buf[0])) {
+X         break;
+X      }
+X   /* Open the file the first time we have to write to it. */
+X      if (ftext == NULL) {
+X         if ((ftext = fopen (file, "w")) == NULL) 
+X            ErrOut ("Can't open TEXT file near line %d in input", lncnt);
+X      }
+X      fputs (buf+1, ftext);  /* Don't write first blank */
+X   }
+X   if (ftext != NULL)
+X      fclose(ftext);
+X   if (bufptr == NULL) {
+X      done = 1;
+X   }
+X}
+X
+X
+Xint isdirectory(name)
+Xchar *name;
+X{
+X   struct stat sbuf;
+X   int isdir=1;
+X   
+X   if (stat(name,&sbuf) < 0) {
+X      isdir = 0;
+X      fprintf (stderr, "Can't stat %s\n", name);
+X   }
+X
+X   if (!(sbuf.st_mode & S_IFDIR)) {
+X      isdir = 0;
+X      fprintf (stderr, "%s is not a directory!\n", name);
+X   }
+X   return isdir;
+X}
+X
+X
+Xchar *next_name (src, name)
+Xchar *src, *name;
+X/*
+X   Routine to store next name in src into and then return pointer to next
+X   name.  src is a list of names separated by a ' '.
+X*/
+X{
+X   char *dst=name;
+X
+X   if (!*src) return NULL;
+X
+X   while (*src && *src != ' ') *dst++ = *src++;
+X
+X   *dst = '\0';
+X
+X   if (dst == name) return NULL;
+X
+X   while (*src == ' ') ++src;
+X
+X   return src;
+X}
+X
+X
+Xchar *str_append (names, name)
+Xchar *names, *name;
+X/*
+X   Routine to stick name into the names list.
+X*/
+X{
+X   char *realloc(), *malloc();
+X   int l1=0, l2;
+X
+X   if (names != NULL)
+X      l1 = strlen(names);
+X   else
+X      l1 = -1;
+X
+X   l2 = strlen(name);
+X
+X   if (names == NULL)
+X      names = malloc ((unsigned )l1+l2+2);
+X   else
+X      names = realloc (names, (unsigned )l1+l2+2);
+X
+X   if (l1 > 0)
+X      names[l1] = ' ';
+X   
+X   strcpy (&names[l1+1], name);
+X
+X   return names;
+X}
+X
+X
+Xusage()
+X{
+X   fprintf (stderr, "usage: helptree -f path\tor\thelptree -t path\n\n");
+X   fprintf (stderr,
+X   "-f assume we are creating a flat file, path is the root of an existing\n");
+X   fprintf (stderr,
+X   "   help tree and the flat help file will be written to stdout.\n\n");
+X
+X   fprintf (stderr,
+X   "-t assume we are creating a help tree, path is the root of a help tree\n");
+X   fprintf (stderr,"   that is to be created.\n");
+X
+X   exit(1);
+X}
+END_OF_FILE
+if test 6341 -ne `wc -c <'docs/helptree.c'`; then
+    echo shar: \"'docs/helptree.c'\" unpacked with wrong size!
+fi
+# end of 'docs/helptree.c'
+fi
+if test -f 'docs/hlp2ms.c' -a "${1}" != "-c" ; then 
+  echo shar: Will not clobber existing file \"'docs/hlp2ms.c'\"
+else
+echo shar: Extracting \"'docs/hlp2ms.c'\" \(2140 characters\)
+sed "s/^X//" >'docs/hlp2ms.c' <<'END_OF_FILE'
+X/*
+X * hlp2ms.c  -- program to convert VMS .HLP format to *roff -ms document
+X * Thomas Williams 
+X *
+X * usage:  hlp2ms < file.hlp > file.ms
+X *
+X *   where file.hlp is a VMS .HLP file, and file.ms will be a [nt]roff
+X *     document suitable for printing with nroff -ms or troff -ms
+X *
+X * typical usage for GNUPLOT:
+X *
+X *   vmshelp.csh /usr/help/gnuplot/* | hlp2ms | troff -ms
+X */
+X
+X#include <stdio.h>
+X#include <ctype.h>
+X
+X#define MAX_NAME_LEN	256
+X#define MAX_LINE_LEN	256
+X#define LINE_SKIP		3
+X
+X
+Xmain()
+X{
+X	init(stdout);
+X	convert(stdin,stdout);
+X	finish(stdout);
+X	exit(0);
+X}
+X
+X
+Xinit(b)
+XFILE *b;
+X{
+X			/* in nroff, increase line length by 8 and don't adjust lines */
+X	(void) fputs(".if n \\{.nr LL +8m\n.na \\}\n",b);
+X    (void) fputs(".nr PO +0.3i\n",b);
+X	(void) fputs(".so titlepage\n",b);
+X	(void) fputs(".pn 1\n",b);
+X    (void) fputs(".ds CH GNUPLOT\n",b);
+X	(void) fputs(".ds RH Page %\n",b);
+X	(void) fputs(".bp\n",b);
+X    (void) fputs(".nr PS 12\n",b);
+X    (void) fputs(".nr VS 13\n",b);
+X	(void) fputs(".ta 1.5i 3.0i 4.5i 6.0i 7.5i\n",b);
+X	(void) fputs("\\&\n.sp 3\n.PP\n",b);
+X	(void) fputs(".so intro\n",b);
+X}
+X
+X
+Xconvert(a,b)
+XFILE *a,*b;
+X{
+Xstatic char string[MAX_LINE_LEN],line[MAX_LINE_LEN];
+Xint old = 1;
+Xint sh_i, i;
+X
+X	while (fgets(line,MAX_LINE_LEN,a)) {
+X
+X		if (isdigit(line[0])) {
+X			(void) sscanf(line,"%d %[^\n]s",&sh_i,string);
+X
+X			(void) fprintf(b,".sp %d\n",(sh_i == 1) ? LINE_SKIP : LINE_SKIP-1);
+X
+X			if (sh_i > old) {
+X				do
+X					(void) fputs(".RS\n.IP\n",b);
+X				while (++old < sh_i);
+X			}
+X			else if (sh_i < old) {
+X				do
+X					(void) fputs(".RE\n.br\n",b);
+X				while (--old > sh_i);
+X			}
+X
+X			(void) fprintf(b,".NH %d\n%s\n.sp 1\n.LP\n",sh_i,string);
+X			old = sh_i;
+X
+X			(void) fputs(".XS\n",b);
+X			(void) fputs(string,b);
+X			(void) fputs("\n.XE\n",b);
+X
+X		} else {
+X			switch (line[1]) {
+X				case ' ' : fputs(".br\n",b); fputs(line+1,b); fputs(".br\n",b);
+X 						   break;
+X				case '\'': fputs("\\&",b);
+X				default  : (void) fputs(line+1,b); 
+X			}
+X		}
+X
+X	}
+X}
+X
+X
+Xfinish(b)		/* spit out table of contents */
+XFILE *b;
+X{
+X	(void) fputs(".pn 1\n",b);
+X	(void) fputs(".ds RH %\n",b);
+X	(void) fputs(".af % i\n",b);
+X	(void) fputs(".bp\n.PX\n",b);
+X}
+END_OF_FILE
+if test 2140 -ne `wc -c <'docs/hlp2ms.c'`; then
+    echo shar: \"'docs/hlp2ms.c'\" unpacked with wrong size!
+fi
+# end of 'docs/hlp2ms.c'
+fi
+if test -f 'docs/intro' -a "${1}" != "-c" ; then 
+  echo shar: Will not clobber existing file \"'docs/intro'\"
+else
+echo shar: Extracting \"'docs/intro'\" \(24 characters\)
+sed "s/^X//" >'docs/intro' <<'END_OF_FILE'
+X
+X.B
+X.ce
+XINTRODUCTION
+X.R
+END_OF_FILE
+if test 24 -ne `wc -c <'docs/intro'`; then
+    echo shar: \"'docs/intro'\" unpacked with wrong size!
+fi
+# end of 'docs/intro'
+fi
+if test -f 'docs/termdrvr.doc' -a "${1}" != "-c" ; then 
+  echo shar: Will not clobber existing file \"'docs/termdrvr.doc'\"
+else
+echo shar: Extracting \"'docs/termdrvr.doc'\" \(2024 characters\)
+sed "s/^X//" >'docs/termdrvr.doc' <<'END_OF_FILE'
+XHere's a brief description of what each term.c procedure does:
+X
+X_init()  Called once, when the device is first selected.  This procedure
+Xshould set up things that only need to be set once, like handshaking and
+Xcharacter sets etc...
+X
+X_graphics()  Called just before a plot is going to be displayed.  This
+Xprocedure should set the device into graphics mode.  Devices which can't
+Xbe used as terminals (like plotters) will probably be in graphics mode always
+Xand therefore won't need this.
+X
+X_text()  Called after a plot is displayed.  This procedure should set the
+Xdevice back into text mode if it is also a terminal, so that commands can
+Xbe seen as they're typed.  Again, this will probably do nothing if the
+Xdevice can't be used as a terminal.
+X
+X_linetype(lt)  Called to set the line type before text is displayed or line(s)
+Xplotted.  This procedure should select a pen color or line style if the
+Xdevice has these capabilities.  lt is an integer from -2 to 8.  An lt of
+X-2 is used for the border of the plot.  An lt of -1 is used for the X and Y
+Xaxes.  lt 0 through 8 are used for plots 0 through 8.
+X
+X_move(x,y)  Called at the start of a line.  The cursor should move to the
+X(x,y) position without drawing.
+X
+X_vector(x,y)  Called when a line is to be drawn.  This should display a line
+Xfrom the last (x,y) position given by _move() or _vector() to this new (x,y)
+Xposition.
+X
+X_ulput_text(row,str)  Called to display text in the upper-left corner of
+Xthe screen/page.  row is an integer from 0 through 8.  The row starts
+Xat the upper-left with 0 and proceed down.  str is the string to be displayed.
+X
+X_lrput_text(row,str)  Called to display text in the lower-right corner of
+Xthe screen/page.  This is the same as ulput_text(), except that the string
+Xshould be displayed right-justified in the lower right corner of the screen.
+XThe row starts at the lower-right with 0 and proceeds up.
+X
+X_reset()  Called when Gnuplot is exited.  This procedure should reset the
+Xdevice, possibly flushing a buffer somewhere or generating a form feed.
+END_OF_FILE
+if test 2024 -ne `wc -c <'docs/termdrvr.doc'`; then
+    echo shar: \"'docs/termdrvr.doc'\" unpacked with wrong size!
+fi
+# end of 'docs/termdrvr.doc'
+fi
+if test -f 'docs/titlepage' -a "${1}" != "-c" ; then 
+  echo shar: Will not clobber existing file \"'docs/titlepage'\"
+else
+echo shar: Extracting \"'docs/titlepage'\" \(216 characters\)
+sed "s/^X//" >'docs/titlepage' <<'END_OF_FILE'
+X.nr HM 3.2i
+X.TL
+XGNUPLOT
+X.br
+XAn Interactive Plotting Program
+X.sp
+X.AU
+XThomas Williams & Colin Kelley
+X.AI
+XDepartment of Electrical Engineering 
+XVillanova University
+XVillanova, PA  19085
+X\*(DY
+X.AB no
+X.AE
+X.LP
+X.nr HM 1.2i
+END_OF_FILE
+if test 216 -ne `wc -c <'docs/titlepage'`; then
+    echo shar: \"'docs/titlepage'\" unpacked with wrong size!
+fi
+# end of 'docs/titlepage'
+fi
+if test ! -d 'help' ; then
+    echo shar: Creating directory \"'help'\"
+    mkdir 'help'
+fi
+if test -f 'help/README' -a "${1}" != "-c" ; then 
+  echo shar: Will not clobber existing file \"'help/README'\"
+else
+echo shar: Extracting \"'help/README'\" \(4091 characters\)
+sed "s/^X//" >'help/README' <<'END_OF_FILE'
+XHello,
+X
+XThis is the first distribution of any sort out of me.  This program,
+XI believe, will find genuine use on almost all machines, versions of
+XUN*X, and environments.  This system implements a VMS-like help facility
+Xfor any and all commands, procedures, etc.
+X
+XI hereby release this code into the public domain.  Please don't remove
+Xthe file headers that have my name in them, and don't make profit with
+Xthis system.  Rather, customize it to your own local uses and
+X
+X		TEACH PEOPLE UN*X WITH THIS SYSTEM!!!
+X
+XThis later goal is by FAR more important to me than some stupid copyright
+Xnotice that could be deleted by anyone anyway.  Also, I will not be libel
+Xfor any damages done to your system, period.  AS IS WHERE IS is the motto.
+X
+XThis system is NOT intended to replace "man(1)" but rather to supplement
+Xthe information in the manual pages to first time users.  For instance,
+Xhere at OSU, we use this system on the undergraduate machine to try and
+Xguide the freshman through the gore of printing, editors, etc. rather
+Xthan having a professor do it.  Also, most of the more often used
+Xcommands have their manual pages ripped up and stuffed into this format
+Xto aid the student (you must admit that "help" is a more natural thing
+Xto type when in need as a first time UN*X user than is "man").
+X
+XBecause we have 43 hosts here in the Computer and Information Sciences
+Xdepartment, all running some flavor of UN*X, a LARGE amount of time
+Xwas taken to make this as simple and portable as possible.  Therefore,
+X"curses(3)" was not used (not all systems support it in the same way
+Xor even have it in a few cases).  Also things like ISAM were not used
+X(portability problems).  This implies that this package does not have
+Xthe 'spiffyness' that some of you may be looking for.
+X
+XIn short, this is not going to impress the boss, code-wise.  Rather, the
+Xcontent of the help directorys (the actual text of the various help
+Xmessages) are what should be devoted a fair amount of time.  This is also
+Xwhere this system shines.  True flexibility is achieved by the "DIR" files
+Xwithin this system.  They allow you to setup acronyms for traversing the
+Xdirectory tree of "TEXT" files.  This allows you to have help topics like
+X"printing a file" or "using the printer in the basement" both point to
+Xthe help screen on using the "lp" command.  This file also allows SYS5
+Xsites to use any length 'help file' name and still map it into the small
+Xfile name SYS5 allows you (14 characters?).
+X
+XHidden aliases can also be used.  This allows you to also have such things
+Xas "lp" be a 'help topic' as in the previous paragraph.  This makes the
+Xsystem less painful for those who really do know UN*X, but have forgotten
+Xone simple flag on "_XXXX_".
+X
+XThese are the instructions to compile "help(L)":
+X
+X1.	Edit the file "global.h" and change the #define's
+X	for ROOTDIR, HELPFILE, and DIRFILE to be locally
+X	acceptable.
+X
+X2.	Edit the file "Makefile" and fix the definitions of BIN, HELPDIR,
+X	HELPOWN, and HELPGRP so that "make install" will work.
+X
+X3.	Type "make all".
+X
+X4.	IF the make completes, play around with it for a while
+X	and make sure it works...
+X
+X5.	Type "make install".  This will install a copy of our help
+X	files, complete with typo's & bad grammar.  Most of the
+X	files were typed in by various volunteers here within
+X	the university.  You may want to look at them as an
+X	example, you may want to delete them, who knows...
+X
+XI bet you think you are done...  HA!  HA!  HA!  That's a computer joke!
+XYou are just barely beginning.  Now comes the fun part. :-)
+X
+X6.	Type "cd <ROOTDIR>".
+X
+X7.	Start making your "./TEXT" and "./DIR" files.  The examples
+X	in this shell archive should prove adequate for examples.
+X	For a subtopic, type "mkdir <subtopic>" and then
+X	"cd <subtopic>" and goto step 7.
+X
+XIf you have any questions or further enhancements (or help subtrees :-),
+Xplease e-mail them to me.  I really would like to hear how this thing
+Xfairs in the big wide world...
+X
+XRoland Stolfa
+XComputing and Information Sciences Department
+XOklahoma State University
+X219 Math Sciences Building
+XStillwater OK 74078
+X
+Xrjs@a.cs.okstate.edu
+END_OF_FILE
+if test 4091 -ne `wc -c <'help/README'`; then
+    echo shar: \"'help/README'\" unpacked with wrong size!
+fi
+# end of 'help/README'
+fi
+if test -f 'help/append.c' -a "${1}" != "-c" ; then 
+  echo shar: Will not clobber existing file \"'help/append.c'\"
+else
+echo shar: Extracting \"'help/append.c'\" \(1008 characters\)
+sed "s/^X//" >'help/append.c' <<'END_OF_FILE'
+X/*
+X * Program	: help
+X * Module	: append.c
+X * Programmer	: R. Stolfa
+X *
+X * Purpose :	To append a basename and help topic to the
+X *		specified list
+X *
+X * Modification History:
+X *   08/27/87	Created
+X *   08/31/87	Changed exit on default to be a call to "catch()"
+X *	-	Streamlined the building of nodes
+X */
+X
+X#include	"global.h"
+X
+Xappend (cmd, basename, subject, command)
+Xint	cmd;
+Xchar	*basename,
+X	*subject,
+X	*command;
+X{
+X	struct	LIST	*new;
+X
+X	if ((strlen (basename) == 0) ||
+X	    (strlen (subject) == 0) ||
+X	    (cmd < 0) || (cmd >= 3))
+X		/*
+X		 * Bad invocation of "append()"
+X		 */
+X		return;
+X
+X	/*
+X	 * Build the basic LIST structure for the new
+X	 * entry
+X	 */
+X	new = (struct LIST *)
+X		malloc (sizeof (struct LIST));
+X  if(new==NULL){
+X     fprintf(stderr,"Can't malloc %d bytes\n",sizeof (struct LIST));
+X     exit(1);
+X  }
+X	strcpy (new->base, basename);
+X	strcpy (new->topic, subject);
+X	strcpy (new->cmd, command);
+X
+X	/*
+X	 * Append the new element onto the correct list
+X	 */
+X	new->prev = _list[cmd];
+X	_list[cmd] = new;
+X}
+END_OF_FILE
+if test 1008 -ne `wc -c <'help/append.c'`; then
+    echo shar: \"'help/append.c'\" unpacked with wrong size!
+fi
+# end of 'help/append.c'
+fi
+if test -f 'help/catch.c' -a "${1}" != "-c" ; then 
+  echo shar: Will not clobber existing file \"'help/catch.c'\"
+else
+echo shar: Extracting \"'help/catch.c'\" \(460 characters\)
+sed "s/^X//" >'help/catch.c' <<'END_OF_FILE'
+X/*
+X * Program	: help
+X * Module	: catch.c
+X * Programmer	: R. Stolfa
+X *
+X * Purpose :	To handle all user signals.
+X *
+X * Modification History:
+X *   08/31/87	Created
+X */
+X
+X#include	"global.h"
+X
+X#ifdef __TURBOC__
+X  void catch()
+X#else
+X  int	catch()
+X#endif
+X{
+X	/*
+X	 * Free the in memory lists to keep user memory from
+X	 * growing.
+X	 */
+X	free_list (PRINT);
+X	free_list (ACRON);
+X	free_list (TOPIC);
+X
+X	/*
+X	 * ...Neat up the screen and exit
+X	 */
+X	putchar ('\n');
+X	exit (0);
+X}
+END_OF_FILE
+if test 460 -ne `wc -c <'help/catch.c'`; then
+    echo shar: \"'help/catch.c'\" unpacked with wrong size!
+fi
+# end of 'help/catch.c'
+fi
+if test -f 'help/format_help.c' -a "${1}" != "-c" ; then 
+  echo shar: Will not clobber existing file \"'help/format_help.c'\"
+else
+echo shar: Extracting \"'help/format_help.c'\" \(884 characters\)
+sed "s/^X//" >'help/format_help.c' <<'END_OF_FILE'
+X/*
+X * Program	: help
+X * Module	: format_help.c
+X * Programmer	: R. Stolfa
+X *
+X * Purpose :	To format the list of available help topics in a
+X *		neat and readable format
+X *
+X * Modification History:
+X *   08/26/87	Created
+X *   09/02/87	Fixed for more than one line of text (oops!),
+X *		streamlined.
+X */
+X
+X#include	"global.h"
+X
+Xformat_help ()
+X{
+X	struct	LIST	*p;		/* temporary LIST pointer */
+X	register	int	cur_col;
+X
+X	/*
+X	 * Screen columns go from 0 to 79
+X	 */
+X	cur_col = 0;
+X
+X	pchar ('\n');
+X	for (p = prt_list; p != NULL; p = p->prev) {
+X		/*
+X		 * If the addition of the current topic to the screen
+X		 * will cause there to be wraparound, skip to the next
+X		 * line.
+X		 */
+X		cur_col = (cur_col + 8) -
+X			  ((cur_col + 8) % 8) +
+X			  strlen(p->topic);
+X		if (cur_col > 79)  {
+X			cur_col = strlen(p->topic) + 8;
+X			pchar ('\n');
+X		}
+X		printf ("\t%s", p->topic);
+X	}
+X	pchar ('\n');
+X	pchar ('\n');
+X}
+END_OF_FILE
+if test 884 -ne `wc -c <'help/format_help.c'`; then
+    echo shar: \"'help/format_help.c'\" unpacked with wrong size!
+fi
+# end of 'help/format_help.c'
+fi
+if test -f 'help/free_list.c' -a "${1}" != "-c" ; then 
+  echo shar: Will not clobber existing file \"'help/free_list.c'\"
+else
+echo shar: Extracting \"'help/free_list.c'\" \(634 characters\)
+sed "s/^X//" >'help/free_list.c' <<'END_OF_FILE'
+X/*
+X * Program	: help
+X * Module	: free_list.c
+X * Programmer	: R. Stolfa
+X *
+X * Purpose :	To return to system memory a list of LIST structures
+X *
+X * Modification History:
+X *   08/27/87	Created
+X *   08/31/87	Changed default exit to be a call to "catch()"
+X */
+X
+X#include	"global.h"
+X
+Xfree_list (type)
+Xint	type;
+X{
+X	struct	LIST	*q;
+X
+X	/*
+X	 * Check for valid type
+X	 */
+X	if ((type < 0) || (type >= 3)) {
+X		printf ("free_list:  error in type parameter %d\n", type);
+X		catch ();
+X		/* NOT REACHED */
+X	}
+X
+X	/*
+X	 * Clear the header
+X	 */
+X	q = _list[type];
+X	_list[type] = NULL;
+X
+X	/*
+X	 * Clear the list
+X	 */
+X	for ( ; q != NULL; q = q->prev)
+X		free (q);
+X}
+END_OF_FILE
+if test 634 -ne `wc -c <'help/free_list.c'`; then
+    echo shar: \"'help/free_list.c'\" unpacked with wrong size!
+fi
+# end of 'help/free_list.c'
+fi
+if test -f 'help/global.h' -a "${1}" != "-c" ; then 
+  echo shar: Will not clobber existing file \"'help/global.h'\"
+else
+echo shar: Extracting \"'help/global.h'\" \(2295 characters\)
+sed "s/^X//" >'help/global.h' <<'END_OF_FILE'
+X/*
+X * Program	: help
+X * Module	: global.h
+X * Programmer	: R. Stolfa
+X *
+X * Modification History:
+X *   08/27/87	Created
+X *   07/13/88	Cleaned up for distribution
+X */
+X
+X#include	<stdio.h>
+X#ifdef __TURBOC__
+X#include <stdlib.h>
+X#endif
+X#include	<signal.h>
+X#include	<ctype.h>
+X#undef		toupper			/* to get the non-macro version */
+X
+X#define		TRUE		1
+X#define		FALSE		0
+X#define		UP		2
+X
+X#define		BSIZE		80
+X
+X#define		PRINT		0
+X#define		ACRON		1
+X#define		TOPIC		2
+X
+X/*
+X * ROOTDIR is the anchor point for the help tree.  It should be a
+X * publically accessable directory, with all it's submembers being
+X * readable and executable by all.
+X */
+X#define		ROOTDIR		"/usr/local/help"
+X
+X/*
+X * HELPFILE is the basename of the file that will contain the
+X * text of the actual help information.  It should have
+X * permissions 444.
+X */
+X#define		HELPFILE	"/TEXT"
+X
+X/*
+X * DIRFILE is the basename of a file that contains the help
+X * index to file name mappings for the current level of the
+X * help tree.  The format of the data contained in this file
+X * is as follows....
+X *
+X * <basename><print_flag><help_index_string>
+X *
+X * where:
+X *	<basename>	relative directory name for help
+X *	<print_flag>	is a:
+X *				* for printable
+X *				: for acronym
+X *	<help_index_string>
+X *			text to present as a choice (or use as an
+X *			acronym) at any level in the help tree
+X */
+X#define		DIRFILE		"/DIR"
+X
+X/*
+X * LIST structure.
+X *
+X * This is the standard format of help file lists.
+X */
+Xstruct	LIST {
+X	char	base[BSIZE];
+X	char	topic[BSIZE];
+X	char	cmd[BSIZE];
+X	struct	LIST	*prev;
+X};
+X#define		prt_list	(_list[PRINT])
+X#define		acr_list	(_list[ACRON])
+X#define		top_list	(_list[TOPIC])
+X
+X/*------------------------------------------------------------*/
+X
+X/*
+X * MACROS
+X */
+X
+X#define	gen_path(x)	sprintf (Path, "%s%s%s", Root_Dir, cur_path, (x))
+X
+X/*------------------------------------------------------------*/
+X
+X/*
+X * Variables
+X */
+X
+X#ifdef	MAIN
+X#define	extern	/* global */
+X#endif
+X
+Xextern	struct	LIST	*_list[3];	/* list of printable topics */
+Xextern	char		Path[BSIZE],	/* true path to help file */
+X			cur_path[BSIZE];/* curent help path */
+Xextern	int		lines;		/* number of lines on the screen */
+X#ifdef __TURBOC__
+X          void catch();	/* interrupt handler */
+X#else
+X          int catch();
+X#endif
+Xextern	char		Root_Dir[BSIZE];/* location of root directory */
+END_OF_FILE
+if test 2295 -ne `wc -c <'help/global.h'`; then
+    echo shar: \"'help/global.h'\" unpacked with wrong size!
+fi
+# end of 'help/global.h'
+fi
+if test -f 'help/help.1' -a "${1}" != "-c" ; then 
+  echo shar: Will not clobber existing file \"'help/help.1'\"
+else
+echo shar: Extracting \"'help/help.1'\" \(2516 characters\)
+sed "s/^X//" >'help/help.1' <<'END_OF_FILE'
+X.TH HELP L
+X.SH NAME
+Xhelp - a VMS-like help facility for XENIX
+X.SH SYNOPSIS
+X.B help
+X.br
+X.SH DESCRIPTION
+X.I help
+Xis intended to be a more useful system than the native
+X.I man(1)
+Xsupplied with
+X.I XENIX.
+XIt is styled after the very popular and useful VMS HELP facility, in that
+Xit is tree structured and interactive.
+X.PP
+X.I help
+Xis very configurable.  In essence, you decide what help "topics" map
+Xto what files.  I.E. you can have more than one topic, or acronym, map
+Xto the same help subtopic.  An example would be having the words "lp"
+Xand "printing" both map to the 
+X.I help
+Xsubtopic "lp-command".  Also, you need not have the subtopic "lp" even
+Xshow up in the help screen.  If you wish to have acronyms, as described
+Xabove, it is site taylorable using the DIRFILE (as described below in
+XINTERNALS).
+X.PP
+XAll of the files and directories contained in the system are all plain
+Xtext files, with an easy format that can be used to your advantage.
+X.sp 1
+X.SH "INTERNALS"
+X.I help
+Xuses a tree structured file data-base to store all help.  Each node (or
+Xdirectory) has at least one file.  This file, called
+X.I ./TEXT
+Xcontains the actual text of the help message for this subtopic.  If there
+Xare any subtopics below this one, their
+X.I ./TEXT
+Xfiles are held in subdirectories of this one, and then there is a file
+X.I ./DIR
+Xthat maps the directory name to the subtopic to display.  This will allow
+X.I SYSV
+Xsystems with limited directory name lengths map much longer descriptions
+Xto shorter file names.
+X.PP
+XAlso contained in the
+X.I ./DIR
+Xfile is a similar mapping for acronyms of the subsequent subtopics.  In the
+Xexample above with lp, a sample portion of a help file would be
+X.sp 1
+X	lp-command*lp
+X.br
+X	lp-command:printing
+X.br
+X	lp-command:getting output
+X.sp 1
+XWhere the "*" in the first line implies that the "topic" name "lp" is to
+Xbe printed as a possible topic for help, and the subtopics "printing" and
+X"getting output" are acronyms for traversing the to the "lp-command"
+Xsubdirectory to get at the next
+X.I ./TEXT
+Xfile.
+X.sp 1
+X.SH "FILES"
+X"/usr/help/...."	- Root directory for help
+X.br
+X"./TEXT"			- Help text
+X.br
+X"./DIR"			- Directory files for next subtopic
+X.PP
+X.SH DIAGNOSTICS
+XThere are no real diagnostics.  However, if you reach a point in the
+Xhelp system where you know you have a "subtopic" but cannot reach it,
+Xsearch for correct premissions (0444 for
+X.I ./TEXT
+Xfiles, and (0555 for
+X.I ./DIR
+Xfiles).
+X.sp 1
+X.SH AUTHOR
+XRoland J. Stolfa
+X.br
+XDepartment of Computing and Information Sciences
+X.br
+XOklahoma State University
+X
+END_OF_FILE
+if test 2516 -ne `wc -c <'help/help.1'`; then
+    echo shar: \"'help/help.1'\" unpacked with wrong size!
+fi
+# end of 'help/help.1'
+fi
+if test -f 'help/help.c' -a "${1}" != "-c" ; then 
+  echo shar: Will not clobber existing file \"'help/help.c'\"
+else
+echo shar: Extracting \"'help/help.c'\" \(749 characters\)
+sed "s/^X//" >'help/help.c' <<'END_OF_FILE'
+X/*
+X * Program	: help
+X * Module	: help.c
+X * Programmer	: R. Stolfa
+X *
+X * Purpose :	To more the current "HELPFILE" to the screen.
+X *
+X * Modification History:
+X *   08/27/87	Created
+X *   09/02/87	Added ("Q"|"q") commands
+X */
+X
+X#include	"global.h"
+X
+Xhelp ()
+X{
+X	FILE	*fd;		/* help text file */
+X	int	c;		/* temp */
+X
+X	gen_path (HELPFILE);
+X
+X	if ((fd = fopen (Path, "r")) == NULL) {
+X		printf ("There is no help text on this subject\n");
+X		return;
+X	}
+X
+X	/*
+X	 * Note what help subject we are looking at
+X	 */
+X	if (strlen (cur_path) != 0) {
+X		present ("TOPIC: ", " ");
+X		pchar ('\n');
+X	}
+X
+X	/*
+X	 * Reset the number of lines displayed, and output
+X	 * the new help file text.
+X	 */
+X	while ((c = getc (fd)) != EOF)
+X		pchar(c);
+X
+X	fclose (fd);
+X
+X	pchar ('\n');
+X	lines ++;
+X}
+END_OF_FILE
+if test 749 -ne `wc -c <'help/help.c'`; then
+    echo shar: \"'help/help.c'\" unpacked with wrong size!
+fi
+# end of 'help/help.c'
+fi
+if test -f 'help/initialize.c' -a "${1}" != "-c" ; then 
+  echo shar: Will not clobber existing file \"'help/initialize.c'\"
+else
+echo shar: Extracting \"'help/initialize.c'\" \(433 characters\)
+sed "s/^X//" >'help/initialize.c' <<'END_OF_FILE'
+X/*
+X * Program	: help
+X * Module	: initialize.c
+X * Programmer	: R. Stolfa
+X *
+X * Purpose :	To initialize all global data structures
+X *
+X * Modification History:
+X *   08/31/87	Created
+X */
+X
+X#include	"global.h"
+X
+Xinitialize()
+X{
+X	int	i;
+X
+X	/*
+X	 * Catch all signals that might not free up memory....
+X	 */
+X	signal (SIGINT, catch);
+X	signal (SIGTERM, catch);
+X
+X	Path[0] = '\0';
+X	cur_path[0] = '\0';
+X
+X	for (i = 0; i < 3 ; i ++)
+X		_list[i] = NULL;
+X}
+END_OF_FILE
+if test 433 -ne `wc -c <'help/initialize.c'`; then
+    echo shar: \"'help/initialize.c'\" unpacked with wrong size!
+fi
+# end of 'help/initialize.c'
+fi
+if test -f 'help/input_choice.c' -a "${1}" != "-c" ; then 
+  echo shar: Will not clobber existing file \"'help/input_choice.c'\"
+else
+echo shar: Extracting \"'help/input_choice.c'\" \(2709 characters\)
+sed "s/^X//" >'help/input_choice.c' <<'END_OF_FILE'
+X/*
+X * Program	: help
+X * Module	: input_choice.c
+X * Programmer	: R. Stolfa
+X *
+X * Purpose :	To selectively change the current help subject
+X *		based on what topic the user chooses to learn
+X *		about next.
+X *
+X * Modification History:
+X *   08/26/87	Created
+X */
+X
+X#include	"global.h"
+X
+Xinput_choice ()
+X{
+X	int	done,			/* need to parse DIRFILE again */
+X		i,			/* temp */
+X		j,			/* temp */
+X		count,			/* num. of acronym topics that mached */
+X		topics;			/* num. of topics at this level */
+X	char	buff[BSIZE],		/* input buffer */
+X		tmp_path[BSIZE];	/* holding place for cur_path */
+X	struct	LIST	*p;		/* temp */
+X
+X	done = FALSE;
+X	do {
+X		present ("HELP ", " > ");
+X
+X		if (fgets (buff, BSIZE, stdin) == NULL)
+X			/*
+X			 * End help on EOF
+X			 */
+X			return (TRUE);
+X
+X		/*
+X		 * Strip junk out of line
+X		 */
+X		for (i = 0, j = 0; i < strlen(buff); i ++) {
+X			if (buff[i] == '\n')
+X				buff[i] = '\0';
+X			if (!isspace(buff[i]))
+X				buff[j++] = toupper(buff[i]);
+X		}
+X
+X		if (strlen(buff) == 0) {
+X			/*
+X			 * At this point, we have a request to recurse
+X			 * back out of the help tree by one level.
+X			 */
+X			for (i = strlen (cur_path); cur_path[i] != '/'; --i)
+X				;
+X			cur_path[i] = '\0';
+X			return (UP);
+X			/* NOT REACHED */
+X		}
+X
+X		/*
+X		 * OK.  We have the topic that the user has requested.
+X		 * Now let's try to find some reference to it
+X		 */
+X		count = 0;
+X		topics = 0;
+X		free_list (TOPIC);
+X		for (p = acr_list; p != NULL ; p = p->prev) {
+X			if (strncmp (buff, p->topic, strlen(buff)) == 0) {
+X				insert (TOPIC,
+X					p->base, p->topic, p->cmd);
+X				count ++;
+X			}
+X			topics ++;
+X		}
+X
+X		if (count == 0) {
+X			if (strcmp (buff, "?") != 0) {
+X				present ("Sorry, no documentation on ", " ");
+X				printf ("%s\n", buff);
+X			}
+X			if (topics > 0) {
+X				printf ("Additional information available:\n");
+X				lines = 2;
+X				format_help();
+X			}
+X			done = FALSE;
+X		} else if (count == 1) {
+X			if (top_list->cmd[0] == '\0') {
+X			   /*
+X			    * We have only one help subtopic, so traverse
+X			    * the tree down that link.
+X			    */
+X			   sprintf (cur_path, "%s/%s", cur_path,
+X				   top_list->base);
+X			   done = TRUE;
+X                           }
+X			else {
+X                           system(top_list->cmd);
+X                           return (UP);
+X                           }
+X		} else {
+X			/*
+X			 * We have several matches.  Therefore, page the
+X			 * HELPFILE for each to the screen and stay where
+X			 * we are.
+X			 */
+X			lines = 0;
+X			strcpy (tmp_path, cur_path);
+X			for (p = top_list; p != NULL ; p = p->prev) {
+X				if (p->cmd[0] == '\0') {
+X				   sprintf (cur_path, "%s/%s", tmp_path,
+X					   p->base);
+X				   gen_path(HELPFILE);
+X				   help();
+X				   strcpy (cur_path, tmp_path);
+X				   }
+X			}
+X		}
+X
+X	} while (done != TRUE);
+X	return (FALSE);
+X}
+END_OF_FILE
+if test 2709 -ne `wc -c <'help/input_choice.c'`; then
+    echo shar: \"'help/input_choice.c'\" unpacked with wrong size!
+fi
+# end of 'help/input_choice.c'
+fi
+if test -f 'help/insert.c' -a "${1}" != "-c" ; then 
+  echo shar: Will not clobber existing file \"'help/insert.c'\"
+else
+echo shar: Extracting \"'help/insert.c'\" \(1087 characters\)
+sed "s/^X//" >'help/insert.c' <<'END_OF_FILE'
+X/*
+X * Program	: help
+X * Module	: insert.c
+X * Programmer	: R. Stolfa
+X *
+X * Purpose :	To uniquely insert a basename and help topic to the
+X *		specified list
+X *
+X * Modification History:
+X *   07/13/88	Created
+X */
+X
+X#include	"global.h"
+X
+Xinsert (cmd, basename, subject, command)
+Xint	cmd;
+Xchar	*basename,
+X	*subject,
+X	*command;
+X{
+X	struct	LIST	*new, *p;
+X
+X	if ((strlen (basename) == 0) ||
+X	    (strlen (subject) == 0) ||
+X	    (cmd < 0) || (cmd >= 3))
+X		/*
+X		 * Bad invocation of "insert()"
+X		 */
+X		return;
+X
+X	/*
+X	 * Build the basic LIST structure for the new
+X	 * entry
+X	 */
+X	new = (struct LIST *)
+X		malloc (sizeof (struct LIST));
+X	strcpy (new->base, basename);
+X	strcpy (new->topic, subject);
+X	strcpy (new->cmd, command);
+X
+X	/*
+X	 * Prepend the new element onto the correct list
+X	 */
+X	p = _list[cmd];
+X	new->prev = _list[cmd];
+X
+X	/*
+X	 * Check for uniqueness
+X	 */
+X	for (; p != NULL; p = p->prev) {
+X		if (strcmp (new->base, p->base) == 0) {
+X			free (new);
+X			return;
+X			/* NOT REACHED */
+X		}
+X	}
+X
+X	/*
+X	 * If we get to here, we have a new item.  Fix the master
+X	 * pointer & go on.
+X	 */
+X	_list[cmd] = new;
+X}
+END_OF_FILE
+if test 1087 -ne `wc -c <'help/insert.c'`; then
+    echo shar: \"'help/insert.c'\" unpacked with wrong size!
+fi
+# end of 'help/insert.c'
+fi
+if test -f 'help/link.otc' -a "${1}" != "-c" ; then 
+  echo shar: Will not clobber existing file \"'help/link.otc'\"
+else
+echo shar: Extracting \"'help/link.otc'\" \(159 characters\)
+sed "s/^X//" >'help/link.otc' <<'END_OF_FILE'
+X\tc\lib\C0l main append catch format_h free_lis help insert initiali input_ch pchar present scan_top,help,help, \tc\lib\emu \tc\lib\mathl \tc\lib\cl 
+X        
+END_OF_FILE
+if test 159 -ne `wc -c <'help/link.otc'`; then
+    echo shar: \"'help/link.otc'\" unpacked with wrong size!
+fi
+# end of 'help/link.otc'
+fi
+if test -f 'help/main.c' -a "${1}" != "-c" ; then 
+  echo shar: Will not clobber existing file \"'help/main.c'\"
+else
+echo shar: Extracting \"'help/main.c'\" \(1359 characters\)
+sed "s/^X//" >'help/main.c' <<'END_OF_FILE'
+X/*
+X * Program	: help
+X * Module	: main.c
+X * Programmer	: R. Stolfa
+X *
+X * Purpose :	To support a VMS-like help facility
+X *
+X * Modification History:
+X *   08/26/87	Created
+X *   07/13/88	Fixed end-of-program detection to work correctly
+X */
+X
+X#define		MAIN
+X#include	"global.h"
+X
+Xmain (argc, argv)
+Xint	argc;
+Xchar	*argv[];
+X{
+X	int	done;
+X    char *helpdir, *getenv();
+X
+X        --argc; ++argv;
+X
+X        if ((helpdir = getenv ("HELPDIR")) == NULL)
+X           strcpy(Root_Dir, ROOTDIR);
+X        else
+X           strcpy (Root_Dir, helpdir);
+X
+X        if (argc >= 2 && strcmp(*argv,"-r") == 0) {	/* Absolute directory */
+X           strcpy(Root_Dir, *++argv);
+X           ++argv;
+X           argc += 2;
+X        }
+X				
+X        while (argc--) {		/* Construct relative root directory */
+X           strcat(Root_Dir,"/");
+X           strcat(Root_Dir, *argv);
+X           ++argv;
+X        }
+X
+X	initialize();
+X	done = FALSE;
+X
+X	while (done != TRUE) {
+X		/*
+X		 * Free memory to keep user memory from growing
+X		 */
+X		free_list (PRINT);
+X		free_list (ACRON);
+X		free_list (TOPIC);
+X
+X		/*
+X		 * If we are recursing out of the help tree,
+X		 * do not print the help stuff...
+X		 */
+X		lines = 0;
+X		if (done != UP)
+X			help();
+X		scan_topics ();
+X		if (done != UP)
+X			format_help ();
+X		done = input_choice ();
+X
+X		if ((done == UP) && (strcmp (Path, Root_Dir) == 0))
+X			done = TRUE;
+X	}
+X	printf ("\n");
+Xexit(0);
+X}
+END_OF_FILE
+if test 1359 -ne `wc -c <'help/main.c'`; then
+    echo shar: \"'help/main.c'\" unpacked with wrong size!
+fi
+# end of 'help/main.c'
+fi
+if test -f 'help/makefile.tc' -a "${1}" != "-c" ; then 
+  echo shar: Will not clobber existing file \"'help/makefile.tc'\"
+else
+echo shar: Extracting \"'help/makefile.tc'\" \(825 characters\)
+sed "s/^X//" >'help/makefile.tc' <<'END_OF_FILE'
+X#
+X# HELP - Ver. 1.0
+X#
+X#		by R. Stolfa
+X#
+X# Modification History
+X#  08/26/87	Created
+X#  08/31/87	Added initialize and catch functions
+X#  09/02/87	Added all .h dependencies
+X#  07/13/88	Packaged to ship out of OSU
+X#		Added insert to fix problem with uniqueness
+X#
+X
+XOFILES	=\
+X	main.obj append.obj catch.obj format_h.obj free_lis.obj help.obj insert.obj \
+X	initiali.obj input_ch.obj pchar.obj present.obj scan_top.obj
+X
+Xhelp.exe: $(OFILES)
+X  tlink /m /s /v /l @link.otc
+X
+XCFLAGS	= -c -f -ml -M -y -v -I\tc\include -DMSDOS -DPC
+XCC      = tcc
+X
+X.c.obj:
+X  tcc $(CFLAGS) $*
+X  
+Xmain.obj: main.c
+Xappend.obj: append.c
+Xcatch.obj: catch.c
+Xformat_h.obj: format_h.c
+Xfree_lis.obj: free_lis.c
+Xhelp.obj: help.c
+Xinsert.obj: insert.c
+Xinitiali.obj: initiali.c
+Xinput_ch.obj: input_ch.c
+Xpchar.obj: pchar.c
+Xpresent.obj: present.c
+Xscan_top.obj: scan_top.c
+END_OF_FILE
+if test 825 -ne `wc -c <'help/makefile.tc'`; then
+    echo shar: \"'help/makefile.tc'\" unpacked with wrong size!
+fi
+# end of 'help/makefile.tc'
+fi
+if test -f 'help/makefile.unx' -a "${1}" != "-c" ; then 
+  echo shar: Will not clobber existing file \"'help/makefile.unx'\"
+else
+echo shar: Extracting \"'help/makefile.unx'\" \(1489 characters\)
+sed "s/^X//" >'help/makefile.unx' <<'END_OF_FILE'
+X#
+X# HELP - Ver. 1.0
+X#
+X#		by R. Stolfa
+X#
+X# (For 3B1 shared libraries change the ld command below...)
+X# Modification History
+X#  08/26/87	Created
+X#  08/31/87	Added initialize and catch functions
+X#  09/02/87	Added all .h dependencies
+X#  07/13/88	Packaged to ship out of OSU
+X#		Added insert to fix problem with uniqueness
+X#
+X
+XBIN	= /usr/local/bin
+XHELPDIR	= /usr/local/help
+XCFLAGS	= -O
+XCC      = cc
+X# HELPOWN = help
+X# HELPGRP = root
+XHELPOWN = bin
+XHELPGRP = bin
+X
+XOFILES	=\
+X	main.o append.o catch.o format_help.o free_list.o help.o insert.o \
+X	initialize.o input_choice.o pchar.o present.o scan_topics.o
+X
+Xhelp:	$(OFILES)
+X	$(CC) $(CFLAGS) $(OFILES) -o help
+X#	ld /lib/crt0s.o /lib/shlib.ifile $(CFLAGS) $(OFILES) -o help
+X
+Xall:	help manual
+X
+Xinstall:
+X	cp help $(BIN)
+X	chmod 711 $(BIN)/help
+X	chown $(HELPOWN) $(BIN)/help
+X	chgrp $(HELPGRP) $(BIN)/help
+X#	mkdir $(HELPDIR)
+X#	cp files $(HELPDIR)
+X#	cd $(HELPDIR) ; shar files
+X#	@echo "Remember to fix the ownership & permissions"
+X
+Xmanual:
+X	nroff -man man.form > help.man
+X
+Xclean:
+X	rm -f *.o help a.out core help.man Help.shar
+X
+Xshar:
+X	shar README Makefile *.h *.c man.form files > Help.shar
+X
+X#
+X# Dependencies
+X#
+X
+Xmain.o append.o catch.o format_help.o free_list.o help.o \
+Xinitialize.o input_choice.o insert.o pchar.o present.o scan_topics.o \
+X	: global.h
+X
+Xmain.o catch.o format_help.o free_list.o help.o \
+Xinput_choice.o insert.o pchar.o scan_topics.c \
+X	: /usr/include/stdio.h
+X
+Xinitialize.o \
+X	: /usr/include/signal.h
+X
+Xinput_choice.o \
+X	: /usr/include/ctype.h
+END_OF_FILE
+if test 1489 -ne `wc -c <'help/makefile.unx'`; then
+    echo shar: \"'help/makefile.unx'\" unpacked with wrong size!
+fi
+# end of 'help/makefile.unx'
+fi
+if test -f 'help/pchar.c' -a "${1}" != "-c" ; then 
+  echo shar: Will not clobber existing file \"'help/pchar.c'\"
+else
+echo shar: Extracting \"'help/pchar.c'\" \(736 characters\)
+sed "s/^X//" >'help/pchar.c' <<'END_OF_FILE'
+X/*
+X * Program	: help
+X * Module	: pchar.c
+X * Programmer	: R. Stolfa
+X *
+X * Purpose :	To provide a very simple "more" like output stream for
+X *		looking at the text in "HELPFILE" and all the topics
+X *		listed in "DIRFILE".
+X *
+X * Modification History:
+X *   08/27/87	Created
+X */
+X
+X#include	"global.h"
+X
+Xpchar (c)
+Xint	c;
+X{
+X	char	in_buff[BSIZE];		/* input buffer */
+X
+X	/*
+X	 * If this is the recursive call, do not
+X	 * output anything
+X	 */
+X	if (c != '\0')
+X		putchar (c);
+X
+X	/*
+X	 * If this is the newline, then increment the
+X	 * line count
+X	 */
+X	if (c == '\n')
+X		lines ++;
+X
+X	/*
+X	 * If this is the one to pause on, then do so
+X	 */
+X	if (lines == 21) {
+X		printf ("\nPress RETURN to continue");
+X		(void) fgets (in_buff, BSIZE, stdin);
+X		lines = 0;
+X	}
+X}
+END_OF_FILE
+if test 736 -ne `wc -c <'help/pchar.c'`; then
+    echo shar: \"'help/pchar.c'\" unpacked with wrong size!
+fi
+# end of 'help/pchar.c'
+fi
+if test -f 'help/present.c' -a "${1}" != "-c" ; then 
+  echo shar: Will not clobber existing file \"'help/present.c'\"
+else
+echo shar: Extracting \"'help/present.c'\" \(521 characters\)
+sed "s/^X//" >'help/present.c' <<'END_OF_FILE'
+X/*
+X * Program	: help
+X * Module	: present.c
+X * Programmer	: R. Stolfa
+X *
+X * Purpose :	To generate a topics line without '/'s in it.
+X *
+X * Modification History:
+X *   08/31/87	Created
+X */
+X
+X#include	"global.h"
+X
+Xpresent (str1, str2)
+Xchar	*str1,
+X	*str2;
+X{
+X	int	i;		/* temp */
+X
+X	/*
+X	 * Make a line like "/vi/join/lines" more readable as
+X	 * " vi join lines"
+X	 */
+X	printf ("%s", str1);
+X	for (i = 0; i < strlen (cur_path); i ++)
+X		if (cur_path[i] == '/')
+X			putchar (' ');
+X		else
+X			putchar (cur_path[i]);
+X	printf ("%s", str2);
+X}
+END_OF_FILE
+if test 521 -ne `wc -c <'help/present.c'`; then
+    echo shar: \"'help/present.c'\" unpacked with wrong size!
+fi
+# end of 'help/present.c'
+fi
+if test -f 'help/scan_topics.c' -a "${1}" != "-c" ; then 
+  echo shar: Will not clobber existing file \"'help/scan_topics.c'\"
+else
+echo shar: Extracting \"'help/scan_topics.c'\" \(2536 characters\)
+sed "s/^X//" >'help/scan_topics.c' <<'END_OF_FILE'
+X/*
+X * Program	: help
+X * Module	: scan_topics.c
+X * Programmer	: R. Stolfa
+X *
+X * Purpose :	To scan the current directory for all "topic"
+X *		directories in the DIRFILE file.
+X *
+X * Modification History:
+X *   08/26/87	Created
+X *   08/31/87	Changed input routine to change spaces in the topic
+X *		field to be underscores.
+X */
+X
+X#include	"global.h"
+X
+Xscan_topics ()
+X{
+X	FILE	*fd;			/* DIRFILE descriptor */
+X	int	i,j,k,			/* temp */
+X		cmd,			/* directed to man page? */
+X		count;			/* is there any help? */
+X	char	buff[BSIZE],		/* for reading DIRFILE */
+X		help_topic[BSIZE],	/* used to parse DIRFILE lines */
+X		base_path[BSIZE],	/* used to parse DIRFILE lines */
+X		cmd_buf[BSIZE],		/* used to parse DIRFILE lines */
+X		prt_flag;		/* used to parse DIRFILE lines */
+X
+X	count = 0;
+X	gen_path(DIRFILE);
+X
+X	if ((fd = fopen (Path, "r")) == NULL) {
+X		printf ("There are no subtopics for this area.\n");
+X		return;
+X	}
+X
+X	/*
+X	 * Here we need to read in the lines in DIRFILE
+X	 * that are of the format
+X	 * <basename><print_flag><help_topic_string>
+X	 * and capitalize the <help_topic_string>.
+X	 *
+X	 * if <print_flag> is a "*" then the <help_topic_string> is
+X	 * for viewing.
+X	 *
+X	 * if <print_flag> is a ":" then it is an acronym for lookups.
+X	 *
+X	 * if find "!" before <print_flag> then there's a command.
+X	 */
+X
+X	while (fgets (buff, BSIZE, fd) != NULL) {
+X
+X		cmd = 0;
+X		k = j = 0;
+X		for (i = 0;
+X		     i < strlen(buff) && buff[i] != ':' && buff[i] != '*';
+X		     i ++) {
+X			if (buff[i] == '!')
+X			   ++cmd;
+X			else if (!cmd)
+X			   base_path[j++] = buff[i];
+X			else
+X			   cmd_buf[k++] = buff[i];
+X			}
+X		base_path[j] = '\0';
+X		cmd_buf[k]   = '\0';
+X
+X		if (i < strlen (buff))
+X			prt_flag = buff[i];
+X		else
+X			/* Bad input line */
+X			continue;
+X
+X		strcpy (help_topic, &buff[i+1]);
+X		for (i = 0; i < strlen (help_topic); i ++) {
+X			help_topic[i] = toupper (help_topic[i]);
+X			if (help_topic[i] == ' ')
+X				help_topic[i] = '_';
+X			if (help_topic[i] == '\n')
+X				help_topic[i] = '\0';
+X		}
+X
+X		/*
+X		 * At this point, we have a fairly legal line,
+X		 * so, let's finish it off...
+X		 */
+X
+X		if ((strlen (base_path) == 0) || (strlen (help_topic) == 0))
+X			continue;
+X		count ++;
+X
+X		if (prt_flag == '*')
+X			/*
+X			 * Append this line to the list of things to
+X			 * output as topics
+X			 */
+X			append (PRINT, base_path, help_topic, cmd_buf);
+X
+X		/*
+X		 * Append this line to the list of acronymns
+X		 * for reference later...
+X		 */
+X		append (ACRON, base_path, help_topic, cmd_buf);
+X	}
+X
+X	fclose (fd);
+X
+X	if (count == 0) {
+X		printf ("There are no subtopics for this area.\n");
+X		return;
+X	}
+X}
+END_OF_FILE
+if test 2536 -ne `wc -c <'help/scan_topics.c'`; then
+    echo shar: \"'help/scan_topics.c'\" unpacked with wrong size!
+fi
+# end of 'help/scan_topics.c'
+fi
+echo shar: End of archive 7 \(of 7\).
+cp /dev/null ark7isdone
+MISSING=""
+for I in 1 2 3 4 5 6 7 ; do
+    if test ! -f ark${I}isdone ; then
+	MISSING="${MISSING} ${I}"
+    fi
+done
+if test "${MISSING}" = "" ; then
+    echo You have unpacked all 7 archives.
+    rm -f ark[1-9]isdone
+else
+    echo You still need to unpack the following archives:
+    echo "        " ${MISSING}
+fi
+##  End of shell archive.
+exit 0

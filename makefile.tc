@@ -1,0 +1,50 @@
+# make file for Turbo C
+# Modified from MSC make by John Campbell and Bill Wilson
+# The compile and link includes debug flags.  Take them out if you
+# do not want them included
+
+OBJS = 	command.obj eval.obj graphics.obj internal.obj misc.obj parse.obj plot.obj scanner.obj standard.obj term.obj util.obj version.obj 
+
+gnuplot.exe: $(OBJS) 
+ tlink /m /s /v /l @link.otc
+
+# /AC means use compact model (small code, large data)
+CFLAGS = -c -f -ml -M -y -v -I\tc\include -DMSDOS -DPC
+TERMFLAGS = 
+# -DHERCULES -DCGA
+
+# default rules
+.c.obj:
+	tcc $(CFLAGS) $*
+
+command.obj: command.c plot.h
+
+eval.obj: eval.c plot.h
+
+graphics.obj: graphics.c plot.h
+
+internal.obj: internal.c plot.h
+
+misc.obj: misc.c plot.h
+
+parse.obj: parse.c plot.h
+
+plot.obj: plot.c plot.h
+
+scanner.obj: scanner.c plot.h
+
+standard.obj: standard.c plot.h
+
+term.obj: term.c plot.h \
+	aed.trm bitgraph.trm hp26.trm hp75.trm hpljet.trm pc.trm \
+	postscpt.trm qms.trm regis.trm selanar.trm tek.trm unixpc.trm \
+	unixplot.trm v384.trm
+	tcc $(CFLAGS) $(TERMFLAGS) term.c
+	
+util.obj: util.c plot.h
+
+version.obj: version.c
+
+
+# use link.opt to avoid command-line overflow
+

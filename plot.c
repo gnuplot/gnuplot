@@ -11,12 +11,20 @@
  *  included in later releases.
  *
  *  This file should be edited with 4-column tabs!  (:set ts=4 sw=4 in vi)
+ *
+ *  The Turbo C code was supplied by William E Wilson, 1988-1989
+ *
  */
 
 #include <stdio.h>
 #include <setjmp.h>
 #include <signal.h>
 #include "plot.h"
+
+/* on some compilers (Turbo C) interrupt is a reserved word */
+#ifdef MSDOS               
+#define interrupt intrrtn  /*something different*/
+#endif
 
 char *getenv(),*strcat(),*strcpy(),*strncpy();
 
@@ -35,52 +43,52 @@ struct value *integer(),*complex();
 
 
 extern f_push(),f_pushc(),f_pushd(),f_call(),f_lnot(),f_bnot(),f_uminus()
-	,f_lor(),f_land(),f_bor(),f_xor(),f_band(),f_eq(),f_ne(),f_gt(),f_lt(),
-	f_ge(),f_le(),f_plus(),f_minus(),f_mult(),f_div(),f_mod(),f_power(),
-	f_factorial(),f_bool(),f_jump(),f_jumpz(),f_jumpnz(),f_jtern();
+        ,f_lor(),f_land(),f_bor(),f_xor(),f_band(),f_eq(),f_ne(),f_gt(),f_lt(),
+        f_ge(),f_le(),f_plus(),f_minus(),f_mult(),f_div(),f_mod(),f_power(),
+        f_factorial(),f_bool(),f_jump(),f_jumpz(),f_jumpnz(),f_jtern();
 
 extern f_real(),f_imag(),f_arg(),f_conjg(),f_sin(),f_cos(),f_tan(),f_asin(),
-	f_acos(),f_atan(),f_sinh(),f_cosh(),f_tanh(),f_int(),f_abs(),f_sgn(),
-	f_sqrt(),f_exp(),f_log10(),f_log(),f_besj0(),f_besj1(),f_besy0(),f_besy1(),
+        f_acos(),f_atan(),f_sinh(),f_cosh(),f_tanh(),f_int(),f_abs(),f_sgn(),
+        f_sqrt(),f_exp(),f_log10(),f_log(),f_besj0(),f_besj1(),f_besy0(),f_besy1(),
 #ifdef GAMMA
-	f_gamma(),
+        f_gamma(),
 #endif
-	f_floor(),f_ceil();
+        f_floor(),f_ceil();
 
 
-struct ft_entry ft[] = {	/* built-in function table */
+struct ft_entry ft[] = {        /* built-in function table */
 
 /* internal functions: */
-	{"push", f_push},	{"pushc", f_pushc},	{"pushd", f_pushd},
-	{"call", f_call},	{"lnot", f_lnot},	{"bnot", f_bnot},
-	{"uminus", f_uminus},					{"lor", f_lor},
-	{"land", f_land},	{"bor", f_bor},		{"xor", f_xor},
-	{"band", f_band},	{"eq", f_eq},		{"ne", f_ne},
-	{"gt", f_gt},		{"lt", f_lt},		{"ge", f_ge},
-	{"le", f_le},		{"plus", f_plus},	{"minus", f_minus},
-	{"mult", f_mult},	{"div", f_div},		{"mod", f_mod},
-	{"power", f_power}, {"factorial", f_factorial},
-	{"bool", f_bool},	{"jump", f_jump},	{"jumpz", f_jumpz},
-	{"jumpnz",f_jumpnz},{"jtern", f_jtern},
+        {"push", f_push},       {"pushc", f_pushc},     {"pushd", f_pushd},
+        {"call", f_call},       {"lnot", f_lnot},       {"bnot", f_bnot},
+        {"uminus", f_uminus},                                   {"lor", f_lor},
+        {"land", f_land},       {"bor", f_bor},         {"xor", f_xor},
+        {"band", f_band},       {"eq", f_eq},           {"ne", f_ne},
+        {"gt", f_gt},           {"lt", f_lt},           {"ge", f_ge},
+        {"le", f_le},           {"plus", f_plus},       {"minus", f_minus},
+        {"mult", f_mult},       {"div", f_div},         {"mod", f_mod},
+        {"power", f_power}, {"factorial", f_factorial},
+        {"bool", f_bool},       {"jump", f_jump},       {"jumpz", f_jumpz},
+        {"jumpnz",f_jumpnz},{"jtern", f_jtern},
 
 /* standard functions: */
-	{"real", f_real},	{"imag", f_imag},	{"arg", f_arg},
-	{"conjg", f_conjg}, {"sin", f_sin},		{"cos", f_cos},
-	{"tan", f_tan},		{"asin", f_asin},	{"acos", f_acos},
-	{"atan", f_atan},	{"sinh", f_sinh},	{"cosh", f_cosh},
-	{"tanh", f_tanh},	{"int", f_int},		{"abs", f_abs},
-	{"sgn", f_sgn},		{"sqrt", f_sqrt},	{"exp", f_exp},
-	{"log10", f_log10},	{"log", f_log},		{"besj0", f_besj0},
-	{"besj1", f_besj1},	{"besy0", f_besy0},	{"besy1", f_besy1},
+        {"real", f_real},       {"imag", f_imag},       {"arg", f_arg},
+        {"conjg", f_conjg}, {"sin", f_sin},             {"cos", f_cos},
+        {"tan", f_tan},         {"asin", f_asin},       {"acos", f_acos},
+        {"atan", f_atan},       {"sinh", f_sinh},       {"cosh", f_cosh},
+        {"tanh", f_tanh},       {"int", f_int},         {"abs", f_abs},
+        {"sgn", f_sgn},         {"sqrt", f_sqrt},       {"exp", f_exp},
+        {"log10", f_log10},     {"log", f_log},         {"besj0", f_besj0},
+        {"besj1", f_besj1},     {"besy0", f_besy0},     {"besy1", f_besy1},
 #ifdef GAMMA
- 	{"gamma", f_gamma},
+        {"gamma", f_gamma},
 #endif
-	{"floor", f_floor},	{"ceil", f_ceil},
-	{NULL, NULL}
+        {"floor", f_floor},     {"ceil", f_ceil},
+        {NULL, NULL}
 };
 
 static struct udvt_entry udv_pi = {NULL, "pi",FALSE};
-									/* first in linked list */
+/* first in linked list */
 struct udvt_entry *first_udv = &udv_pi;
 struct udft_entry *first_udf = NULL;
 
@@ -108,11 +116,20 @@ struct udft_entry *first_udf = NULL;
 #define PLOTRC "gnuplot.ini"
 #endif
 
+
+#ifdef __TURBOC__
+void interrupt()
+#else
 interrupt()
+#endif
 {
 #ifdef MSDOS
+#ifdef __TURBOC__
+  (void) signal(SIGINT, interrupt);
+#else
 	void ss_interrupt();
 	(void) signal(SIGINT, ss_interrupt);
+#endif
 #else
 	(void) signal(SIGINT, interrupt);
 #endif
@@ -128,29 +145,40 @@ interrupt()
 main()
 {
 register FILE *plotrc;
-register char *gnuterm;
+register char *gnuterm=NULL;
 static char home[sizeof(PLOTRC)+80];
 
 	setbuf(stderr,(char *)NULL);
+#ifdef VMS
+	outfile = stdout; /* never close stdout--even if duped. */
+#else
 	outfile = fdopen(dup(STDOUT),"w");
+#endif
 	(void) complex(&udv_pi.udv_value, Pi, 0.0);
-
 	show_version();
+	init();  /* Can set term if it wishes. */
 
 /* thanks to osupyr!alden (Dave Alden) for the GNUTERM code */
 
-	if (!(gnuterm = getenv("GNUTERM")))
+	if (!(gnuterm = getenv("GNUTERM")) && term == 0)
 		gnuterm = TERM;
-	(void) strcat(input_line,gnuterm); /* input_line already has "set term " */
+	if (gnuterm != NULL)
+		(void) strcat(input_line,gnuterm); /* input_line has "set term " */
+	else
+		input_line[0] = '\0';   /* No SET TERM command needed. */
 
 	if (!setjmp(env))				/* come back here from printerror() */
 		do_line();
 
 	if (!setjmp(env)) {
-#ifdef MSDOS
+#ifdef MSDOS 
+#ifdef __TURBOC__
+		(void) signal(SIGINT, interrupt);	/* go there on interrupt char */
+#else
 		void ss_interrupt();
 		save_stack();				/* work-around for MSC 4.0/MSDOS 3.x bug */
 		(void) signal(SIGINT, ss_interrupt);
+#endif
 #else /* MSDOS */
 		(void) signal(SIGINT, interrupt);	/* go there on interrupt char */
 #endif /* MSDOS */

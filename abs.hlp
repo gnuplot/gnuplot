@@ -1,6 +1,0 @@
-This function returns the absolute value of its argument.  The
-returned value is of the same type as the argument. 
-
-For complex arguments, abs(x) is defined as the length of x in the
-complex plane [i.e.  sqrt(real(x)**2 + imag(x)**2) ].
-

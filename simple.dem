@@ -1,12 +1,12 @@
 #
 # gnuplot> set term <term-type>
-# gnuplot> load 'simple.demo'
+# gnuplot> load 'simple.dem'
 #
 set samples 50
 plot [-10:10] sin(x),atan(x),cos(atan(x))
-set samples 100 
+set samples 100
 plot [-pi/2:pi] cos(x),-(sin(x) > sin(x+1) ? sin(x) : sin(x+1))
-set samples 200 
+set samples 200
 plot [-3:5] asin(x),acos(x)
 plot [-30:20] besj0(x)*0.12e1 with impulses, (x**besj0(x))-2.5 with points
 set samples 400

@@ -1,0 +1,43 @@
+/* thanks to sask!macphed (Geoff Coleman and Ian Macphedran) for the
+   Selanar driver */
+
+SEL_init()
+{
+	fprintf(outfile,"\033\062");
+/*					1
+	1. set to ansi mode
+*/
+}
+
+
+SEL_graphics()
+{
+	fprintf(outfile,"\033[H\033[J\033\061\033\014");
+/*                   1           2       3
+	1. clear ANSI screen
+	2. set to TEK mode
+	3. clear screen
+*/
+}
+
+
+SEL_text()
+{
+	TEK40move(0,12);
+	fprintf(outfile,"\033\062");
+/*                   1
+	1. into ANSI mode
+*/
+}
+
+SEL_reset()
+{
+	fprintf(outfile,"\033\061\033\012\033\062\033[H\033[J");
+/*                   1        2       3      4
+1       set tek mode
+2       clear screen
+3       set ansi mode
+4       clear screen
+*/
+}
+
