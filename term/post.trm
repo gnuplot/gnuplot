@@ -1,5 +1,5 @@
 /*
- * $Id: post.trm,v 1.21.2.3 2000/02/04 15:20:42 lhecking Exp $
+ * $Id: post.trm,v 1.21.2.4 2001/10/11 12:58:28 broeker Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -500,10 +500,10 @@ int can_reencode;
 			return NULL;
 
 	/* we did not find the name */
-   
-   fnp = (struct PS_FontName *)gp_alloc(sizeof(struct PS_FontName), "PostScript Font record");
-   fnp->name = gp_alloc(1+strlen(fname), "PostScript Font name");
-   strcpy(fnp->name, fname);
+
+    fnp = (struct PS_FontName *)gp_alloc(sizeof(struct PS_FontName),
+					 "PostScript Font record");
+    fnp->name = gp_strdup(myfname);
    fnp->next = PS_DocFonts;
    PS_DocFonts = fnp;
 
