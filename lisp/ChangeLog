@@ -1,0 +1,106 @@
+
+Dec 27 1998  Bruce Ravel  <bruce.ravel@nist.gov>
+
+	* gnuplot.el: Version 0.5
+	* preliminary version of interactive graphical system for
+                        setting command arguments
+	* make changes to insertion menu and to gnuplot-insert
+                 function to accomodate GUI system
+	* made gnuplot-negate-option function and bound it to C-c C-n
+	* replace kw-compl with a simple completion function 
+	* transparent icons in toolbar
+	* move toolbar code into gnuplot.el
+
+Dec 15 1998  Bruce Ravel  <bruce.ravel@nist.gov>
+
+	* gnuplot.el: Version 0.4f
+	* defcustom all the insertion submenus
+	* added gnuplot-insertion-menu-flag
+	* Makefile now knows how to determine which version of
+	             info-look to compile
+
+Dec 13 1998  Bruce Ravel  <bruce.ravel@nist.gov>
+
+	* gnuplot.el: Version 0.4e
+	* deal with the many versions of info-look in the Makefile
+	* drop install-gnuplot
+	* break insertions menu up into several variables and put
+	          menubar initialization into a function
+
+Dec  9 1998  Bruce Ravel  <bruce.ravel@nist.gov>
+
+	* gnuplot.el: Version 0.4d
+	* added function gnuplot-setup-info-look and hook variable
+	          gnuplot-info-hook to handle situation of different
+	          versions of the info file.
+
+Nov 30 1998  Bruce Ravel  <bruce.ravel@nist.gov>
+
+	* gnuplot.el: Version 0.4c
+	* fixed frame behavior
+	* fixed comint highlighting behavior
+	* added :link to defgroup.  added "[:]" to range insertions
+	* fixed behavior of filename insertion function
+	* added more :link's to the defgroup
+	* edited Makefile and README file in the distribution, added
+	           dot.el to the distribution to suppress compile-time
+	           warnings
+
+Nov 21 1998  Bruce Ravel  <bruce.ravel@nist.gov>
+
+	* gnuplot.el: Version 0.4b
+	* Fix bug in line plotting function when line is empty
+	* Add toolbar for XEmacs and file gnuplot-toolbar.el
+	* Allow display of gnuplot process in a separate frame
+
+Nov 18 1998  Bruce Ravel  <bruce.ravel@nist.gov>
+
+	* gnuplot.el: Version 0.4a
+	* clean up useless buffers left lying around by info-look
+	* Fix font-lock rules so that quoted words and the text
+	        surrounding them are correctly highlighted
+	* Fix font-lock rules for plot and splot
+	* Added function `gnuplot-send-line-and-forward' and bound it to
+	        C-c C-v.  Mention this in gpelcard
+
+Nov 14 1998  Bruce Ravel  <bruce.ravel@nist.gov>
+
+	* gnuplot.el: Version 0.4
+	* Added info-look to distribution.  It was taken from the emacs
+		  20.2 installation and one small change was made to allow
+	          it compile under XEmacs.
+	* Use info-look for info interface.  With this the gnuplot-mode
+	     	user interface to the gnuplot info file does not change
+	     	but the interior code is much cleaner and I get to
+	        use an already invented wheel.  One nice feature is that
+	        the help function is completely independent of the version
+	        number of gnuplot as long as the index in the gnuplot.info
+	        file is called "General Index".  Also `gnuplot-keywords'
+	        (which is used for help, keyword-completion, and hilit19
+	        highlighting) is now generated automatically the first
+	        time gnuplot mode is invoked.
+	* Changed default of `gnuplot-show-help-flag' to nil.
+
+
+Earlier versions (taken from gnuplot.el file)
+
+  0.1   Jun 25 1998 Finished with initial release.
+  0.2   Sep  4 1998 Added filename insertion, indentation, and
+        colorization/completion in comint buffer. <BR>
+  0.2a  Sep 11 1998 made `indent-line-function' buffer-local (whoops!)
+        and fixed some stuff in the installation script <BR>
+  0.3   Sep 12 1998 include insertions menu <BR>
+  0.3a  Sep 14 1998 fixed bug finding info file if missing, fixed bug
+        starting font-lock, fixed bug re overwriting files in
+        installation script <BR>
+  0.3b  Sep 15 1998 Added (require 'info) to `(eval-and-compile' clause,
+        Added (kill-all-local-variables) to `gnuplot-mode', altered order
+        of:-
+            (provide 'gnuplot)
+            ;; any final chores before leaving
+            (run-hooks 'gnuplot-load-hook)
+        at the end of the file in case something in the load hook
+        requires gnuplot (oh not that old one again...), added
+        `gnuplot-comint-setup-hook', corrected `gnuplot-mark-active'
+        which caused an error to be raised by (mark) when the mark
+        was inactive <DB>  Some changes to font-lock rules <LB>&<BR>
