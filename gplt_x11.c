@@ -374,7 +374,7 @@ void mainloop()
 
 	tset = rset;
 	nf = select((gp_nfds_t)nfds, gp_fd_set_p &tset, gp_fd_set_p 0,
-		     gp_fd_set_p0, gp_timeval_p timer);
+		     gp_fd_set_p 0, gp_timeval_p timer);
 	if (nf < 0) {
 	    if (errno == EINTR)
 		continue;
