@@ -1,5 +1,5 @@
 /*
- * $Id: ggi.trm,v 1.9 2000/12/04 21:14:42 joze Exp $
+ * $Id: ggi.trm,v 1.10 2000/12/05 23:23:15 joze Exp $
  */
 
 /* GNUPLOT - ggi.trm */
@@ -71,6 +71,17 @@ register_term(ggi)
 static TBOOLEAN GGI_use_whm = 0;
 #endif
 
+#if 1
+#if defined(PM3D) && defined(HAVE_GGI_XMI_H)
+#   define ENABLE_XMI 1
+#endif
+#endif
+
+#ifdef ENABLE_XMI
+#   include <ggi/xmi.h>
+#endif
+
+static void GGI_line_colors __PROTO((void));
 TERM_PUBLIC void GGI_graphics __PROTO((void));
 TERM_PUBLIC void GGI_set_size __PROTO((void));
 TERM_PUBLIC void GGI_init __PROTO((void));
@@ -82,6 +93,7 @@ TERM_PUBLIC void GGI_suspend __PROTO((void));
 TERM_PUBLIC void GGI_resume __PROTO((void));
 TERM_PUBLIC void GGI_fillbox __PROTO((int style, unsigned int x, unsigned int y,
 	unsigned int w, unsigned int h));
+TERM_PUBLIC void GGI_close __PROTO((void));
 TERM_PUBLIC void GGI_reset __PROTO((void));
 TERM_PUBLIC void GGI_text __PROTO((void));
 TERM_PUBLIC void GGI_vector __PROTO((unsigned int,unsigned int));
@@ -135,7 +147,7 @@ TERM_PUBLIC void GGI_set_clipboard __PROTO((const char[]));
 TERM_PUBLIC int GGI_make_palette __PROTO((t_sm_palette*));
 TERM_PUBLIC void GGI_previous_palette __PROTO((void));
 TERM_PUBLIC void GGI_set_color __PROTO((double));
-#if 0
+#ifdef ENABLE_XMI
 TERM_PUBLIC void GGI_filled_polygon __PROTO((int, gpiPoint*));
 #endif
 #endif
@@ -190,7 +202,7 @@ static t_sm_palette GGI_save_pal = {
  * GGIwidth, GGIheight are the extensions in the visual.
  * GGIymax = term->ymax
  */
-static ggi_visual_t GGIvisual=NULL;
+static ggi_visual_t GGIvisual = (ggi_visual_t)0;
 static ggi_pixel GGIborderColor;
 static ggi_pixel GGIaxisColor;
 static ggi_pixel GGIblack;
@@ -213,6 +225,14 @@ static int GGI_frames =
 #endif
 ;
 
+#ifdef ENABLE_XMI
+static miGC* GGI_miGC = (miGC*)0;
+static miPaintedSet* GGI_miPaintedSet = (miPaintedSet*)0;
+static miPixel GGI_miPixels[2]; /* only GGI_miPixels[1] is used */
+static int GGI_numblendstages = 0;
+static miBlendStage GGI_blendstages[4];
+#endif
+
 static TBOOLEAN GGI_mode_changed = 1;
 static char GGI_mode_spec[0xff] = "";
 static int GGI_acceleration = 7; /* arbitrary */
@@ -230,39 +250,32 @@ static struct gen_table GGI_opts[] =
     { NULL, GGI_OTHER }
 };
 
-static void init_ggi_driver()
+static void
+GGI_line_colors()
 {
     ggi_pixel GGIwhite,GGIred,GGIgreen,GGIblue,GGIcyan,GGImagenta,GGIgray;
     ggi_pixel GGIyellow;
     ggi_color color;
-    if(GGIvisual==NULL)
-    {
-	if(ggiInit()) {}
-	if(NULL==(GGIvisual=ggiOpen(NULL)))
-	    ggiExit();
-	if(ggiSetSimpleMode(GGIvisual,GGI_AUTO,GGI_AUTO,GGI_frames,GT_AUTO))
-	    ggiExit();
-    }
-    ggiAddFlags(GGIvisual, GGIFLAG_ASYNC);
-    color.r=0xFFFF; color.g=0xFFFF; color.b=0xFFFF; GGIwhite=ggiMapColor(GGIvisual,&color);
-    color.r=0x0000; color.g=0x0000; color.b=0x0000; GGIblack=ggiMapColor(GGIvisual,&color);
-    color.r=0xFFFF; color.g=0x0000; color.b=0x0000; GGIred=ggiMapColor(GGIvisual,&color);
-    color.r=0x0000; color.g=0xFFFF; color.b=0x0000; GGIgreen=ggiMapColor(GGIvisual,&color);
-    color.r=0x0000; color.g=0x0000; color.b=0xFFFF; GGIblue=ggiMapColor(GGIvisual,&color);
-    color.r=0x0000; color.g=0xFFFF; color.b=0xFFFF; GGIcyan=ggiMapColor(GGIvisual,&color);
-    color.r=0xFFFF; color.g=0x0000; color.b=0xFFFF; GGImagenta=ggiMapColor(GGIvisual,&color);
-    color.r=0xFFFF; color.g=0xFFFF; color.b=0x0000; GGIyellow=ggiMapColor(GGIvisual,&color);
-    color.r=0x8888; color.g=0x8888; color.b=0x8888; GGIgray=ggiMapColor(GGIvisual,&color);
-    GGIborderColor=GGIwhite;
-    GGIaxisColor=GGIgray;
-    GGIcolors[0]=GGIred;
-    GGIcolors[1]=GGIgreen;
-    GGIcolors[2]=GGIblue;
-    GGIcolors[3]=GGImagenta;
-    GGIcolors[4]=GGIcyan;
-    GGIcolors[5]=GGIyellow;
-    GGIcolors[6]=GGIgray;
 
+    color.r = 0xFFFF; color.g = 0xFFFF; color.b = 0xFFFF; GGIwhite   = ggiMapColor(GGIvisual,&color);
+    color.r = 0x0000; color.g = 0x0000; color.b = 0x0000; GGIblack   = ggiMapColor(GGIvisual,&color);
+    color.r = 0xFFFF; color.g = 0x0000; color.b = 0x0000; GGIred     = ggiMapColor(GGIvisual,&color);
+    color.r = 0x0000; color.g = 0xFFFF; color.b = 0x0000; GGIgreen   = ggiMapColor(GGIvisual,&color);
+    color.r = 0x0000; color.g = 0x0000; color.b = 0xFFFF; GGIblue    = ggiMapColor(GGIvisual,&color);
+    color.r = 0x0000; color.g = 0xFFFF; color.b = 0xFFFF; GGIcyan    = ggiMapColor(GGIvisual,&color);
+    color.r = 0xFFFF; color.g = 0x0000; color.b = 0xFFFF; GGImagenta = ggiMapColor(GGIvisual,&color);
+    color.r = 0xFFFF; color.g = 0xFFFF; color.b = 0x0000; GGIyellow  = ggiMapColor(GGIvisual,&color);
+    color.r = 0x8888; color.g = 0x8888; color.b = 0x8888; GGIgray    = ggiMapColor(GGIvisual,&color);
+
+    GGIborderColor = GGIwhite;
+    GGIaxisColor   = GGIgray;
+    GGIcolors[0]   = GGIred;
+    GGIcolors[1]   = GGIgreen;
+    GGIcolors[2]   = GGIblue;
+    GGIcolors[3]   = GGImagenta;
+    GGIcolors[4]   = GGIcyan;
+    GGIcolors[5]   = GGIyellow;
+    GGIcolors[6]   = GGIgray;
 }
 
 /* Called bevore a graphic is displayed */
@@ -275,7 +288,7 @@ TERM_PUBLIC void GGI_graphics()
 #if 0
     if(!Xenv)
     {
-	init_ggi_driver();
+	GGI_line_colors();
 	return;
     }
 #endif
@@ -348,11 +361,19 @@ TERM_PUBLIC void GGI_init()
     int success = 0;
     ggi_mode mode;
 
-    if (0 != ggiInit()) {/* ignore */}
+#if 0
+    if (0 != giiInit()) {
+	ggiPanic("*** giiInit() failed *** \n");
+    }
+#endif
+
+    if (0 != ggiInit()) {
+	ggiPanic("*** ggiInit() failed *** \n");
+    }
 
     if (NULL == (GGIvisual = ggiOpen(NULL))) {
 	/* TODO: abort a bit more gracefully */
-	ggiExit();
+	ggiPanic("(GGI_init() unable to open default\n");
     }
 
     if (strlen(GGI_mode_spec)) {
@@ -368,8 +389,8 @@ TERM_PUBLIC void GGI_init()
     if (!success) {
 	/* try the default mode */
 	if(ggiSetSimpleMode(GGIvisual,GGI_AUTO,GGI_AUTO,GGI_frames,GT_AUTO)) {
-	    ggiExit();
-	    GGIvisual = NULL;
+	    ggiPanic("(GGI_init() unable to set default mode\n");
+	    GGIvisual = (ggi_visual_t)0;
 	}
     }
 
@@ -388,6 +409,7 @@ TERM_PUBLIC void GGI_init()
 #endif
 
     GGI_set_size();
+
 
 #ifdef USE_MOUSE
     ggiSetReadFrame(GGIvisual, 0);
@@ -421,9 +443,10 @@ TERM_PUBLIC void GGI_init()
 	ggiClose(GGIvisual);
 	ggiExit();
 	GGIvisual=NULL;
-    } else
+    }
 #endif
-	init_ggi_driver();
+    GGI_line_colors();
+    ggiSetFlags(GGIvisual, GGIFLAG_ASYNC);
 #ifdef USE_MOUSE
     GGI_mouse_x = 0;
     GGI_mouse_y = 0;
@@ -434,6 +457,33 @@ TERM_PUBLIC void GGI_init()
 	gettimeofday(&tv, &tz);
 	GGI_SetTime(&tv); /* initialize time */
     }
+#endif
+
+#ifdef ENABLE_XMI
+    if (0 != xmiInit()) {
+	/* TODO: abort a bit more gracefully */
+	ggiPanic("(GGI_init() unable to initialize xmi\n");
+    }
+
+    if (xmiAttach(GGIvisual) < 0) {
+	ggiPanic("(GGI_init) Unable to attach XMI extension to visual\n");
+    }
+
+    /* miPaintedSet */
+    if (GGI_miPaintedSet) {
+	miDeletePaintedSet(GGIvisual, GGI_miPaintedSet);
+	GGI_miPaintedSet = (miPaintedSet*)0;
+    }
+    GGI_miPaintedSet = miNewPaintedSet(GGIvisual);
+    miClearPaintedSet(GGIvisual, GGI_miPaintedSet);
+
+    /* miGC */
+    if (GGI_miGC) {
+	miDeleteGC(GGIvisual, GGI_miGC);
+	GGI_miGC = (miGC*)0;
+    }
+    GGI_miGC = miNewGC(GGIvisual, 2,
+	GGI_miPixels, GGI_numblendstages, GGI_blendstages);
 #endif
 }
 
@@ -492,22 +542,42 @@ GGI_options()
     }
 }
 
+TERM_PUBLIC void
+GGI_close()
+{
+    ggiFlush(GGIvisual);
+    /* DETACH EXTENSIONS */
+#if HAVE_WMH_H
+    if(GGI_use_whm) {
+	ggiWmhDetach(GGIvisual);
+    }
+#endif
+#ifdef ENABLE_XMI
+    xmiDetach(GGIvisual);
+#endif
+
+    ggiClose(GGIvisual); 
+    GGIvisual = (ggi_visual_t)0;
+
+    /* EXIT EXTENSIONS */
+#if HAVE_WMH_H
+    if(GGI_use_whm) {
+	ggiWmhExit();
+	GGI_use_whm = 0;
+    }
+#endif
+#ifdef ENABLE_XMI
+    xmiExit();	
+#endif
+}
+
 /* Called when terminal is terminated i.e.
  * when switching to another terminal. */
-TERM_PUBLIC void GGI_reset() 
+TERM_PUBLIC void
+GGI_reset() 
 {
-    if(GGIvisual!=NULL)
-    {
-#if HAVE_WMH_H
-	if(GGI_use_whm) {
-	    ggiWmhDetach(GGIvisual);
-	    ggiWmhExit();
-	    GGI_use_whm = 0;
-	}
-#endif
-	ggiClose(GGIvisual); 
-	ggiExit();
-	GGIvisual=NULL;
+    if(GGIvisual!=NULL) {
+	GGI_close();
     }
 #ifdef PM3D
     /* not needed */
@@ -566,9 +636,7 @@ GGI_text()
      * running in console mode. */
     /* TODO: return immediately, if in X */
     ggiGetc(GGIvisual);
-    ggiClose(GGIvisual);
-    ggiExit();
-    GGIvisual=NULL;
+    GGI_close();
 #endif
 }
 
@@ -1368,7 +1436,17 @@ GGI_make_palette(palette)
 TERM_PUBLIC void
 GGI_previous_palette()
 {
+#if 0
+#ifdef ENABLE_XMI
     fprintf(stderr, "(GGI_previous_palette) \n");
+    if (GGI_miPaintedSet) {
+	miPoint offset;
+	offset.x = 0; offset.y = 0;
+	miCopyPaintedSetToVisual(GGIvisual, GGI_miGC, GGI_miPaintedSet, offset);
+	miClearPaintedSet(GGIvisual, GGI_miPaintedSet);
+    }
+#endif
+#endif
 }
 
 TERM_PUBLIC void
@@ -1382,16 +1460,36 @@ GGI_set_color(gray)
 	else if (idx >= ggi_pm3d_colors)
 	    idx = ggi_pm3d_colors - 1;
 	ggiSetGCForeground(GGIvisual, GGI_smooth_colors[idx]);
+#ifdef ENABLE_XMI
+	GGI_miGC->pixels[1] = GGI_smooth_colors[idx];
+#endif
     }
 }
 
-#if 0
+#ifdef ENABLE_XMI
 TERM_PUBLIC void
 GGI_filled_polygon(points, corners)
     int points;
     gpiPoint *corners;
 {
-    /* not implemented */
+    static miPoint offset = {0, 0};
+    if (GGI_miPaintedSet) {
+#define MI_POINTS 4
+	miPoint mi_corners[MI_POINTS];
+	unsigned int i;
+	if (MI_POINTS != points) {
+	    fprintf(stderr, "(GGI_filled_polygon) internal error %s:%d\n", __FILE__, __LINE__);
+	    return;
+	}
+	for (i = 0; i < MI_POINTS; i++) {
+	    mi_corners[i].x = corners[i].x;
+	    mi_corners[i].y = GGI_y(corners[i].y);
+	}
+	miFillPolygon(GGIvisual, GGI_miPaintedSet, GGI_miGC,
+	    MI_SHAPE_GENERAL, MI_COORD_MODE_ORIGIN, MI_POINTS, mi_corners);
+	miCopyPaintedSetToVisual(GGIvisual, GGI_miGC, GGI_miPaintedSet, offset);
+	miClearPaintedSet(GGIvisual, GGI_miPaintedSet);
+    }
 }
 #endif
 
@@ -1425,7 +1523,11 @@ TERM_TABLE_START(ggi_driver)
     , GGI_make_palette,
     GGI_previous_palette,
     GGI_set_color,
+#ifdef ENABLE_XMI
+    GGI_filled_polygon
+#else
     0 /* GGI_filled_polygon */
+#endif
 #endif
 TERM_TABLE_END(ggi_driver)
 

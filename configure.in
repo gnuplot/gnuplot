@@ -1,12 +1,12 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot 3.7 on Unix.
 dnl
-dnl $Id: configure.in,v 1.94 2000/11/24 15:44:29 mikulik Exp $
+dnl $Id: configure.in,v 1.95 2000/12/05 23:23:12 joze Exp $
 dnl
 AC_INIT(src/graphics.c)
 AM_CONFIG_HEADER(config.h:config.hin)
 AC_PREREQ(2.13)
-AC_REVISION($Revision: 1.94 $)
+AC_REVISION($Revision: 1.95 $)
 
 VERSION="`cat $srcdir/VERSION`"
 PATCHLEVEL="`cat $srcdir/PATCHLEVEL`"
@@ -131,9 +131,16 @@ test -z "$enable_pm3d" && enable_pm3d=no
 )dnl
 
 dnl new ggi driver
-AC_ARG_ENABLE(ggi,dnl
-[  --enable-ggi            enable ggi driver (EXPERIMENTAL)],,
-test -z "$enable_ggi" && enable_ggi=no
+AC_ARG_WITH(ggi,dnl
+[  --with-ggi              enable the ggi driver (EXPERIMENTAL)
+  --with-ggi=PATH                 Specify the location of libggi],,
+test -z "$with_ggi" && with_ggi=no
+)dnl
+
+AC_ARG_WITH(xmi,dnl
+[  --with-xmi              ggi's xmi support for pm3d (EXPERIMENTAL)
+  --with-xmi=PATH                 Specify the location of libxmi],,
+test -z "$with_xmi" && with_xmi=yes
 )dnl
 
 dnl use a different x11 driver name ?
@@ -355,6 +362,47 @@ fi
 
 TERMLIBS="$VGAGLLIB $TERMLIBS"
 
+dnl check for ggi lib
+GGI_SUPPORT=no
+if test "$with_ggi" != no; then
+    GP_PATH_LIB(ggi,ggiInit,[$with_ggi])
+    if test "$ac_cv_lib_ggi_ggiInit" = yes; then
+	AC_DEFINE(USE_GGI_DRIVER, 1,
+	    [ Define if you want to use the experimental ggi driver. ])
+	GGI_SUPPORT=yes
+    fi
+fi
+
+dnl check if libggiwmh and ggi/wmh.h are found
+if test "$GGI_SUPPORT" = yes; then
+    AC_CHECK_LIB(ggiwmh, ggiWmhInit,
+	[dnl action if libggiwmh is found
+	    AC_CHECK_HEADER(ggi/wmh.h,
+		[dnl action if ggi/wmh.h is found
+		    TERMLIBS="$TERMLIBS -lggiwmh"
+		    AC_DEFINE(HAVE_GGI_WMH_H, 1,
+			[ Define if ggi/wmh.h is there. ]
+		    )
+		]
+	    )
+	]
+    )
+fi
+
+dnl check for xmi lib
+if test "$GGI_SUPPORT" = yes -a "$with_xmi" != no; then
+    GP_PATH_LIB(xmi,xmiInit,[$with_xmi])
+    if test "$ac_cv_lib_xmi_xmiInit" = yes; then
+	AC_CHECK_HEADER(ggi/xmi.h,
+	    [dnl action if ggi/xmi.h is found
+		AC_DEFINE(HAVE_GGI_XMI_H, 1,
+		    [ Define if ggi/xmi.h is there. ]
+		)
+	    ]
+	)
+    fi
+fi
+
 dnl GNU readline and the required terminal library
 if test "$with_readline" != no; then
   if test "$with_readline" != yes; then
@@ -574,36 +622,6 @@ if test "$enable_pm3d" = yes; then
   AC_DEFINE(PM3D, 1,
             [ Define if you want to have Petr Mikulik's fancy pm3d. ])
 fi
-
-dnl check for ggi lib
-GGI_SUPPORT=no
-if test "$enable_ggi" = yes; then
-    AC_CHECK_LIB(ggi, ggiInit,
-	[dnl action if lib is ok
-	    TERMLIBS="$TERMLIBS -lggi"
-	    AC_DEFINE(USE_GGI_DRIVER, 1,
-		[ Define if you want to use the experimental ggi driver. ])
-	    GGI_SUPPORT=yes
-	]
-    )
-fi
-
-dnl check if libggiwmh and ggi/wmh.h are found
-if test "$GGI_SUPPORT" = yes; then
-    AC_CHECK_LIB(ggiwmh, ggiWmhInit,
-	[dnl action if libggiwmh is found
-	    AC_CHECK_HEADER(ggi/wmh.h,
-		[dnl action if ggi/wmh.h is found
-		    TERMLIBS="$TERMLIBS -lggiwmh"
-		    AC_DEFINE(HAVE_GGI_WMH_H, 1,
-			[ Define if ggi/wmh.h is there. ]
-		    )
-		]
-	    )
-	]
-    )
-fi
-
 
 dnl Substitute variables
 AC_SUBST(PACKAGE)

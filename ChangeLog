@@ -1,3 +1,10 @@
+2000-12-26  Johannes Zellner  <johannes@zellner.org>
+
+	* term/ggi.trm,configure.in: pm3d for ggi using the
+	ggi xmi library. new configure switches:
+	    --with-ggi
+	    --with-xmi
+
 2000-12-21  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/datafile.c (df_tokenise): recover the original exponent
