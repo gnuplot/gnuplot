@@ -1,5 +1,5 @@
 /*
- * $Id: gif.trm,v 1.30 2000/11/22 10:04:25 mikulik Exp $
+ * $Id: gif.trm,v 1.31 2000/12/08 11:23:48 mikulik Exp $
  */
 
 /* GNUPLOT -- gif.trm */
@@ -113,6 +113,7 @@ TERM_PUBLIC void GIF_put_text __PROTO((unsigned int x, unsigned int y, const cha
 TERM_PUBLIC int GIF_text_angle __PROTO((int ang));
 TERM_PUBLIC void GIF_reset __PROTO((void));
 TERM_PUBLIC int GIF_set_font __PROTO((const char *fontname));
+TERM_PUBLIC void GIF_boxfill __PROTO((int style, unsigned int x, unsigned int y, unsigned int w, unsigned int h));
 #ifdef PM3D
 TERM_PUBLIC int GIF_make_palette (t_sm_palette *);
 /* TERM_PUBLIC void GIF_previous_palette (void); */
@@ -647,6 +648,16 @@ GIF_set_font(const char *fontname)
     return TRUE;
 }
 
+TERM_PUBLIC void
+GIF_boxfill(style, x, y, w, h)
+    int style;
+    unsigned int x, y, w, h;
+{
+    // Only solid filling style is supported, i.e. no pattern nor density.
+    gdImageFilledRectangle(gif_state.image, x, gif_state.height-(y+h), 
+	    x+w, gif_state.height-y, gif_state.color);
+}
+    
 #endif /* TERM_BODY */
 #ifdef TERM_TABLE
 
@@ -661,7 +672,7 @@ TERM_TABLE_START(gif_driver)
     TERM_CAN_MULTIPLOT | TERM_BINARY
 #ifdef PM3D
     , 0 /*suspend*/, 0 /*resume*/, 
-    0 /*fillbox*/,   0 /*linewidth*/
+    GIF_boxfill,   0 /*linewidth*/
 #ifdef USE_MOUSE
     , 0, 0, 0, 0, 0 /* no mouse support for gif terminal */
 #endif

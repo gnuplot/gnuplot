@@ -1,5 +1,5 @@
 #ifdef INCRCSDATA
-static char RCSid[]="$Id: gclient.c,v 1.12 2000/11/30 08:23:00 mikulik Exp $" ;
+static char RCSid[]="$Id: gclient.c,v 1.13 2000/12/20 11:57:09 mikulik Exp $" ;
 #endif
 
 /****************************************************************************
@@ -2393,7 +2393,12 @@ lOldLine=lt ;
 		    GpiMove( hpsScreen, &pt ) ;
 		    pt.x += w;
 		    pt.y += h;
-		    GpiSetColor( hps, CLR_BACKGROUND );
+		    if (style == 0)
+			GpiSetColor( hps, CLR_BACKGROUND );
+		    else {
+			// density and pattern styles are not implemented,
+			// always use the solid current colour
+		    }
 		    GpiBox(hps, DRO_FILL, &pt, 0,0);
 		    }
                     break ;

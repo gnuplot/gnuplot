@@ -1,3 +1,10 @@
+2001-09-03  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* src/os2/gclient.c term/gif.trm docs/gnuplot.doc: Support for
+	filled boxes, i.e. termentry fillbox(), for the Presentation
+	Manager and GIF terminals. However, only solid colours implemented,
+	i.e. no density nor pattern styles.
+
 2001-09-02  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/mouse.c: Bugfix for reversing axes during zoom.

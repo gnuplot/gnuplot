@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.75 2001/08/17 14:00:36 broeker Exp $
+C RCS $Id: gnuplot.doc,v 1.76 2001/08/27 15:02:14 broeker Exp $
 C 3 December 1998
 C Copyright (C) 1986 - 1993, 1998   Thomas Williams, Colin Kelley
 C
@@ -5959,8 +5959,8 @@ C ... and restart the table:
  graph border) to the given y coordinate.  See the `boxes` style for how the
  width of the box is obtained.  The `filledboxes` keyword may be abbreviated
  to `fill`. The drawn box is filled with a color pattern according to a style
- defined by the `set style filling` command.  The fillstyle may be one of `empty`,
- `solid` and `pattern`.
+ defined by the `set style filling` command.  The fillstyle may be one of
+ `empty`, `solid` and `pattern`.
 
  For fillstyle `empty` the box is filled with the background color.
 
@@ -5975,8 +5975,8 @@ C ... and restart the table:
 
  For fillstyle `pattern` the box is filled in the current drawing color with
  a pattern as selected by `set style filling pattern <number>`. 
- `fillpattern` is a number starting at 0. The kind and number of the available fillpatterns depend on the
- terminal driver.
+ `fillpattern` is a number starting at 0. The kind and number of the available
+ fillpatterns depend on the terminal driver.
 
  Examples:
 
@@ -5993,10 +5993,10 @@ C ... and restart the table:
        plot sin(x), cos(x)
 
  Currently only the following terminal drivers support the `filledboxes` style:
- x11, windows, postscript, fig, pbm, png, hpdj, hppj, hpljii, hp500c, nec_cp6,
- epson_180dpi, epson_60dpi, epson_lx800, okidata, starc and tandy_60dpi. The
- BeOS driver (`be`) supports `filledboxes` too, but it is unknown whether it
- works as intended.
+ x11, windows, pm, postscript, fig, pbm, png, gif, hpdj, hppj, hpljii, hp500c,
+ nec_cp6, epson_180dpi, epson_60dpi, epson_lx800, okidata, starc and
+ tandy_60dpi. The BeOS driver (`be`) supports `filledboxes` too, but it is
+ unknown whether it works as intended.
 4 boxxyerrorbars
 ?commands set style boxxyerrorbars
 ?set style boxxyerrorbars
