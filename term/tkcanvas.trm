@@ -137,22 +137,22 @@ TERM_PUBLIC void TK_init()
 TERM_PUBLIC void TK_graphics()
 {
     if (tk_perl) {
-	fputs(
-		 "sub gnuplot {\n"
-		 "my($can) = @_;\n"
-		 "$can->delete('all');\n"
-		 "my $cmx = ($can->configure(-width))[4];\n"
-		 "my $cmy = ($can->configure(-height))[4];\n"
-		 "my $font;\n"
-		 "my $temp;\n",
-		 gpoutfile);
+	fputs("\
+sub gnuplot {\n\
+my($can) = @_;\n\
+$can->delete('all');\n\
+my $cmx = ($can->configure(-width))[4];\n\
+my $cmy = ($can->configure(-height))[4];\n\
+my $font;\n\
+my $temp;\n",
+	      gpoutfile);
     } else {
-	fputs(
-		 "proc gnuplot can {\n"
-		 "$can delete all\n"
-		 "set cmx [lindex [$can configure -width] 4]\n"
-		 "set cmy [lindex [$can configure -height] 4]\n",
-		 gpoutfile);
+	fputs("\
+proc gnuplot can {\n\
+$can delete all\n\
+set cmx [lindex [$can configure -width] 4]\n\
+set cmy [lindex [$can configure -height] 4]\n",
+	      gpoutfile);
     }
     tk_lastx = tk_lasty = tk_color = 0;
 }
@@ -180,17 +180,16 @@ unsigned int x, y;
     tk_lasty = 1000 - y;
 }
 
-#define \
-TK_REAL_VALUE(value,axis) \
-(log_array[axis])\
-?pow(base_array[axis],min_array[axis]+value*(max_array[axis]-min_array[axis]))\
-:min_array[axis]+value*(max_array[axis]-min_array[axis])
-#define \
-TK_X_VALUE(value) \
-(double)(value-xleft)/(double)(xright-xleft)
-#define \
-TK_Y_VALUE(value) \
-(double)((TK_YMAX-value)-ybot)/(double)(ytop-ybot)
+#define TK_REAL_VALUE(value,axis) \
+ (log_array[axis])\
+ ?pow(base_array[axis],min_array[axis]+value*(max_array[axis]-min_array[axis]))\
+ :min_array[axis]+value*(max_array[axis]-min_array[axis])
+
+#define TK_X_VALUE(value) \
+ (double)(value-xleft)/(double)(xright-xleft)
+
+#define TK_Y_VALUE(value) \
+ (double)((TK_YMAX-value)-ybot)/(double)(ytop-ybot)
 
 TERM_PUBLIC void TK_vector(x, y)
 unsigned int x, y;
@@ -208,29 +207,29 @@ unsigned int x, y;
     }
     y = 1000 - y;
     if (tk_perl) {
-	fprintf(gpoutfile,
-		"$can->createLine("
-		"$cmx * %d / 1000, "
-		"$cmy * %d / 1000, "
-		"$cmx * %d / 1000, "
-		"$cmy * %d / 1000, -fill => q{%s}, -width => %f, -capstyle => q{round})",
+	fprintf(gpoutfile,"\
+$can->createLine(\
+$cmx * %d / 1000, \
+$cmy * %d / 1000, \
+$cmx * %d / 1000, \
+$cmy * %d / 1000, -fill => q{%s}, -width => %f, -capstyle => q{round})",
 		tk_lastx, tk_lasty, x, y, tk_colors[tk_color], tk_linewidth);
     } else {
-	fprintf(gpoutfile,
-		"$can create line "
-		"[expr $cmx * %d /1000] "
-		"[expr $cmy * %d /1000] "
-		"[expr $cmx * %d /1000] "
-		"[expr $cmy * %d /1000] -fill %s -width %f -capstyle round\n",
+	fprintf(gpoutfile,"\
+$can create line \
+[expr $cmx * %d /1000] \
+[expr $cmy * %d /1000] \
+[expr $cmx * %d /1000] \
+[expr $cmy * %d /1000] -fill %s -width %f -capstyle round\n",
 		tk_lastx, tk_lasty, x, y, tk_colors[tk_color], tk_linewidth);
     }
 
     if (tk_interactive && !is_3d_plot) {
 	if (tk_perl) {
-	    fprintf(gpoutfile,
-		    ", '<Button>' => "
 	    /* Ev('W') not needed here, supplied anyhow, WHY ??? */
-		    "[\\&gnuplot_xy, %f, %f, %f, %f, %f, %f, %f, %f,",
+	    fprintf(gpoutfile,"\
+, '<Button>' => \
+[\\&gnuplot_xy, %f, %f, %f, %f, %f, %f, %f, %f,",
 		    TK_REAL_VALUE(TK_X_VALUE(tk_lastx), FIRST_X_AXIS),
 		    TK_REAL_VALUE(TK_Y_VALUE(tk_lasty), FIRST_Y_AXIS),
 		    TK_REAL_VALUE(TK_X_VALUE(tk_lastx), SECOND_X_AXIS),
@@ -265,9 +264,9 @@ unsigned int x, y;
 	    }
 	    fprintf(gpoutfile, "]);\n");
 	} else {
-	    fprintf(gpoutfile,
-		    "] <Button> "
-		    "\"gnuplot_xy %%W %f %f %f %f %f %f %f %f",
+	    fprintf(gpoutfile,"\
+] <Button> \
+\"gnuplot_xy %%W %f %f %f %f %f %f %f %f",
 		    TK_REAL_VALUE(TK_X_VALUE(tk_lastx), FIRST_X_AXIS),
 		    TK_REAL_VALUE(TK_Y_VALUE(tk_lasty), FIRST_Y_AXIS),
 		    TK_REAL_VALUE(TK_X_VALUE(tk_lastx), SECOND_X_AXIS),
@@ -321,20 +320,20 @@ char *str;
 {
     y = 1000 - y;
     if (tk_perl) {
-	fprintf(gpoutfile,
-		"$can->createText("
-		"$cmx * %d / 1000, "
-		"$cmy * %d / 1000, "
-		"-text => q{%s}, -fill => q{%s}, -anchor => '%s', "
-		"(defined $font ? (-font => $font) : ()));\n",
+	fprintf(gpoutfile,"\
+$can->createText(\
+$cmx * %d / 1000, \
+$cmy * %d / 1000, \
+-text => q{%s}, -fill => q{%s}, -anchor => '%s', \
+(defined $font ? (-font => $font) : ()));\n",
 		x, y, str, tk_colors[tk_color], tk_anchor);
     } else {
-	fprintf(gpoutfile,
-		"eval $can create text "
-		"[expr $cmx * %d /1000] "
-		"[expr $cmy * %d /1000] "
-		"-text {%s} -fill %s -anchor %s"
-		" [expr [info exists font]?\"-font \\$font\":{}]\n",
+	fprintf(gpoutfile,"\
+eval $can create text \
+[expr $cmx * %d /1000] \
+[expr $cmy * %d /1000] \
+-text {%s} -fill %s -anchor %s\
+ [expr [info exists font]?\"-font \\$font\":{}]\n",
 		x, y, str, tk_colors[tk_color], tk_anchor);
     }
 }
@@ -384,9 +383,9 @@ char *font;
 	if (sep < strlen(font))
 	    sscanf(&(font[sep + 1]), "%d", &size);
 	if (tk_perl) {
-	    fprintf(gpoutfile,
-		    "if ($can->can('fontCreate')) {\n"
-		    "$font = $can->fontCreate(-family => q{%s}",
+	    fprintf(gpoutfile,"\
+if ($can->can('fontCreate')) {\n\
+$font = $can->fontCreate(-family => q{%s}",
 		    name);
 	    if (size)
 		fprintf(gpoutfile, ", -size => %d", size);
