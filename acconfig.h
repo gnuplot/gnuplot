@@ -87,13 +87,13 @@
 #undef RGIP
 
 /* Define as the type of the first argument to select.  */
-#undef SELECT_ARGTYPE_1
+#undef SELECT_TYPE_ARG1
 
 /* Define as the type of the second, third, and fourth argument to select.  */
-#undef SELECT_ARGTYPE_234
+#undef SELECT_TYPE_ARG234
 
 /* Define as the type of the fifth argument to select.  */
-#undef SELECT_ARGTYPE_5
+#undef SELECT_TYPE_ARG5
 
 /* Define if you want to use the sunview terminal (sun).  */
 #undef SUN

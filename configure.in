@@ -220,14 +220,14 @@ AC_CHECK_FUNCS(atexit on_exit memcpy bcopy memset bzero setvbuf strerror \
 dnl gamma is called lgamma on apollos and linux
 dnl we prefer lgamma over gamma, see specfun.c
 dnl math lib is already available, see operating systems part
-AC_CHECK_FUNCS(erf gamma lgamma getcwd pclose popen sleep snprintf \
+AC_CHECK_FUNCS(erf erfc gamma lgamma getcwd pclose popen sleep snprintf \
   strncasecmp strnicmp sysinfo tcgetattr)
 if test "$ac_cv_func_pclose" = yes && test "$ac_cv_func_popen" = yes ; then
   AC_DEFINE(PIPES)
 fi
 
 dnl arg types for select
-gp_FIND_SELECT_ARGTYPES
+AC_FUNC_SELECT_ARGTYPES
 
 dnl On SVR3.
 dnl FIXME AC_DEFINE(CRIPPLED_SELECT)
