@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: parse.c,v 1.23 2004/07/01 17:10:07 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: parse.c,v 1.24 2004/07/24 19:37:03 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - parse.c */
@@ -95,7 +95,7 @@ convert(struct value *val_ptr, int t_num)
 struct value *
 const_express(struct value *valptr)
 {
-    register int tkn = c_token;
+    int tkn = c_token;
 
     if (END_OF_COMMAND)
 	int_error(c_token, "constant expression required");
@@ -138,7 +138,7 @@ temp_at()
 struct at_type *
 perm_at()
 {
-    register struct at_type *at_ptr;
+    struct at_type *at_ptr;
     size_t len;
 
     (void) temp_at();
@@ -407,7 +407,7 @@ parse_conditional_expression()
     /* create action code for ? : expressions */
 
     if (equals(c_token, "?")) {
-	register int savepc1, savepc2;
+	int savepc1, savepc2;
 
 	c_token++;
 	savepc1 = at->a_count;
@@ -432,7 +432,7 @@ parse_logical_OR_expression()
     /* create action codes for || operator */
 
     while (equals(c_token, "||")) {
-	register int savepc;
+	int savepc;
 
 	c_token++;
 	savepc = at->a_count;
@@ -451,7 +451,7 @@ parse_logical_AND_expression()
     /* create action code for && operator */
 
     while (equals(c_token, "&&")) {
-	register int savepc;
+	int savepc;
 
 	c_token++;
 	savepc = at->a_count;
@@ -627,7 +627,7 @@ parse_unary_expression()
 struct udvt_entry *
 add_udv(int t_num)
 {
-    register struct udvt_entry **udv_ptr = &first_udv;
+    struct udvt_entry **udv_ptr = &first_udv;
 
     /* check if it's already in the table... */
 
@@ -652,7 +652,7 @@ add_udv(int t_num)
 struct udft_entry *
 add_udf(int t_num)
 {
-    register struct udft_entry **udf_ptr = &first_udf;
+    struct udft_entry **udf_ptr = &first_udf;
 
     int i;
     while (*udf_ptr) {
@@ -686,7 +686,7 @@ add_udf(int t_num)
 static int
 is_builtin_function(int t_num)
 {
-    register int i;
+    int i;
 
     for (i = (int) SF_START; ft[i].f_name != NULL; i++) {
 	if (equals(t_num, ft[i].f_name))
@@ -700,7 +700,7 @@ is_builtin_function(int t_num)
 struct udvt_entry *
 get_udv(char *key)
 {
-    register struct udvt_entry **udv_ptr = &first_udv;
+    struct udvt_entry **udv_ptr = &first_udv;
 
     /* check if it's already in the table... */
 

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.42 2004/06/30 19:55:14 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.43 2004/07/01 17:10:06 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - hidden3d.c */
@@ -1515,7 +1515,7 @@ split_line_at_ratio(
 static GP_INLINE double
 area2D(p_vertex v1, p_vertex v2, p_vertex v3)
 {
-    register double
+    double
 	dx12 = v2->x - v1->x,	/* x/y components of (v2-v1) and (v3-v1) */
 	dx13 = v3->x - v1->x,
 	dy12 = v2->y - v1->y,

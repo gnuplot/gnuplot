@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.73 2004/07/05 03:49:21 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.74 2004/07/13 14:11:24 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -847,7 +847,7 @@ store_label(
     int i,			/* point number */
     char *string)		/* start of label string */
 {
-    register struct text_label *tl = listhead;
+    struct text_label *tl = listhead;
     int textlen;
 
     /* Walk through list to get to the end. Yes I know this is inefficient */
@@ -927,7 +927,7 @@ static char *plot_smooth_names[] =
 static void
 print_points(int curve)
 {
-    register struct curve_points *this_plot;
+    struct curve_points *this_plot;
     int i;
 
     if (curve < 0) {
@@ -1104,8 +1104,8 @@ typedef enum e_uses_axis {
 static void
 eval_plots()
 {
-    register int i;
-    register struct curve_points *this_plot, **tp_ptr;
+    int i;
+    struct curve_points *this_plot, **tp_ptr;
     t_uses_axis uses_axis[AXIS_ARRAY_SIZE];
     int some_functions = 0;
     int plot_num, line_num, point_num, xparam = 0;

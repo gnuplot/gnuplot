@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.45 2004/07/01 17:10:03 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.46 2004/07/03 06:08:48 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -521,7 +521,7 @@ copy_or_invent_formatstring(AXIS_INDEX axis)
 static double
 dbl_raise(double x, int y)
 {
-    register int i = abs(y);
+    int i = abs(y);
     double val = 1.0;
 
     while (--i >= 0)
@@ -598,7 +598,7 @@ quantize_normal_tics(double arg, int guide)
 static double
 make_tics(AXIS_INDEX axis, int guide)
 {
-    register double xr, tic;
+    double xr, tic;
 
     xr = fabs(axis_array[axis].min - axis_array[axis].max);
     tic = quantize_normal_tics(xr, guide);

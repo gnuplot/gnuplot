@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: binary.c,v 1.10 2002/02/25 03:10:40 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: binary.c,v 1.11 2004/07/01 17:10:03 broeker Exp $"); }
 #endif
 
 /*
@@ -167,10 +167,10 @@ fwrite_matrix(
     float GPFAR *row_title,
     float GPFAR *column_title)
 {
-    register int j;
+    int j;
     float length;
-    register int col_length;
-    register int status;
+    int col_length;
+    int status;
     float GPFAR *title = NULL;
 
     length = (float) (col_length = nch - ncl + 1);

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: time.c,v 1.16 2004/04/13 17:24:02 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: time.c,v 1.17 2004/07/01 17:10:08 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - time.c */
@@ -652,7 +652,7 @@ xstrftime(
 double
 gtimegm(struct tm *tm)
 {
-    register int i;
+    int i;
     /* returns sec from year ZERO_YEAR, defined in plot.h */
     double dsec = 0.;
 

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.53 2004/07/08 19:26:16 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.54 2004/07/13 14:11:23 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -147,7 +147,7 @@ iso_free(struct iso_curve *ip)
 void
 load_file(FILE *fp, char *name, TBOOLEAN can_do_args)
 {
-    register int len;
+    int len;
 
     int start, left;
     int more;
@@ -230,14 +230,14 @@ load_file(FILE *fp, char *name, TBOOLEAN can_do_args)
 
 	    if (strlen(input_line) > 0) {
 		if (can_do_args) {
-		    register int il = 0;
-		    register char *rl;
+		    int il = 0;
+		    char *rl;
 		    char *raw_line = gp_strdup(input_line);
 
 		    rl = raw_line;
 		    *input_line = '\0';
 		    while (*rl) {
-			register int aix;
+			int aix;
 			if (*rl == '$'
 			    && ((aix = *(++rl)) != 0)	/* HBB 980308: quiet BCC warning */
 			    &&aix >= '0' && aix <= '9') {
@@ -593,7 +593,7 @@ enum PLOT_STYLE
 get_style()
 {
     /* defined in plot.h */
-    register enum PLOT_STYLE ps;
+    enum PLOT_STYLE ps;
 
     c_token++;
 

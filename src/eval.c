@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: eval.c,v 1.16 2004/04/13 17:23:53 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: eval.c,v 1.17 2004/07/01 17:10:04 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - eval.c */
@@ -538,7 +538,7 @@ f_jtern(union argument *x)
 void
 execute_at(struct at_type *at_ptr)
 {
-    register int instruction_index, operator, count;
+    int instruction_index, operator, count;
     int saved_jump_offset = jump_offset;
 
     count = at_ptr->a_count;

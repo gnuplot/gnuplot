@@ -188,7 +188,7 @@ clip_point(unsigned int x, unsigned int y)
 void
 draw_clip_line(int x1, int y1, int x2, int y2)
 {
-    register struct termentry *t = term;
+    struct termentry *t = term;
 
 #if defined(ATARI) || defined(MTOS)
     /* HBB 20000522: why would this test be particular to ATARIs? And
@@ -229,7 +229,7 @@ draw_clip_line(int x1, int y1, int x2, int y2)
 void
 clip_put_text(unsigned int x, unsigned y, char *str)
 {
-    register struct termentry *t = term;
+    struct termentry *t = term;
 
     if (clip_point(x, y))
 	return;
@@ -391,7 +391,7 @@ apply_textcolor(const struct t_colorspec *tc, const struct termentry *t)
        return;
     }
 #ifdef PM3D
-    if (!is_plot_with_palette() || !(t->set_color)) {
+    if (!is_plot_with_palette() || !t->set_color) {
 	(*t->linetype)(LT_BLACK);
 	return;
     }

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.137 2004/07/13 14:11:24 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.138 2004/07/20 05:22:04 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -1430,7 +1430,7 @@ set_historysize()
 static void
 set_isosamples()
 {
-    register int tsamp1, tsamp2;
+    int tsamp1, tsamp2;
     struct value a;
 
     c_token++;
@@ -1445,8 +1445,8 @@ set_isosamples()
     if (tsamp1 < 2 || tsamp2 < 2)
 	int_error(c_token, "sampling rate must be > 1; sampling unchanged");
     else {
-	register struct curve_points *f_p = first_plot;
-	register struct surface_points *f_3dp = first_3dplot;
+	struct curve_points *f_p = first_plot;
+	struct surface_points *f_3dp = first_3dplot;
 
 	first_plot = NULL;
 	first_3dplot = NULL;
@@ -2978,7 +2978,7 @@ set_polar()
 static void
 set_samples()
 {
-    register int tsamp1, tsamp2;
+    int tsamp1, tsamp2;
     struct value a;
 
     c_token++;
@@ -2993,7 +2993,7 @@ set_samples()
     if (tsamp1 < 2 || tsamp2 < 2)
 	int_error(c_token, "sampling rate must be > 1; sampling unchanged");
     else {
-	register struct surface_points *f_3dp = first_3dplot;
+	struct surface_points *f_3dp = first_3dplot;
 
 	first_3dplot = NULL;
 	sp_free(f_3dp);
@@ -3980,7 +3980,7 @@ void
 free_marklist(struct ticmark *list)
 {
     while (list != NULL) {
-	register struct ticmark *freeable = list;
+	struct ticmark *freeable = list;
 	list = list->next;
 	if (freeable->label != NULL)
 	    free(freeable->label);

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.80 2004/07/05 03:49:21 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.81 2004/07/13 14:11:24 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -119,7 +119,7 @@ save_all(FILE *fp)
 static void
 save_functions__sub(FILE *fp)
 {
-    register struct udft_entry *udf = first_udf;
+    struct udft_entry *udf = first_udf;
 
     while (udf) {
 	if (udf->definition) {
@@ -133,7 +133,7 @@ static void
 save_variables__sub(FILE *fp)
 {
     /* always skip pi */
-    register struct udvt_entry *udv = first_udv->next_udv;
+    struct udvt_entry *udv = first_udv->next_udv;
 
     while (udv) {
 	if (!udv->udv_undef) {
@@ -907,7 +907,7 @@ save_tics(FILE *fp, AXIS_INDEX axis)
 	break;
 
     case TIC_USER:{
-	    register struct ticmark *t;
+	    struct ticmark *t;
 	    fputs(" (", fp);
 	    for (t = axis_array[axis].ticdef.def.user;
 		 t != NULL; t = t->next) {

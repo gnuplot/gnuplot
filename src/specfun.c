@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: specfun.c,v 1.28 2004/07/01 17:10:07 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: specfun.c,v 1.29 2004/07/13 14:11:24 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - specfun.c */
@@ -649,7 +649,7 @@ void f_igamma(union argument *arg)
 
 void f_gamma(union argument *arg)
 {
-    register double y;
+    double y;
     struct value a;
 
     (void) arg;				/* avoid -Wunused warning */

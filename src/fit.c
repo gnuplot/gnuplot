@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.44 2004/07/13 14:11:22 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.45 2004/07/22 16:03:58 broeker Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -269,7 +269,7 @@ int getchx __PROTO((void));
 int
 getchx()
 {
-    register int c = getch();
+    int c = getch();
     if (!c || c == 0xE0) {
 	c <<= 8;
 	c |= getch();
@@ -881,7 +881,7 @@ init_fit()
 static void
 setvar(char *varname, struct value data)
 {
-    register struct udvt_entry *udv_ptr = first_udv, *last = first_udv;
+    struct udvt_entry *udv_ptr = first_udv, *last = first_udv;
 
     /* check if it's already in the table... */
 
@@ -933,7 +933,7 @@ setvarerr(char *varname, double value)
 static int
 getivar(const char *varname)
 {
-    register struct udvt_entry *udv_ptr = first_udv;
+    struct udvt_entry *udv_ptr = first_udv;
 
     while (udv_ptr) {
 	if (!strcmp(varname, udv_ptr->udv_name))
@@ -953,7 +953,7 @@ getivar(const char *varname)
 static double
 getdvar(const char *varname)
 {
-    register struct udvt_entry *udv_ptr = first_udv;
+    struct udvt_entry *udv_ptr = first_udv;
 
     for (; udv_ptr; udv_ptr = udv_ptr->next_udv)
 	if (strcmp(varname, udv_ptr->udv_name) == 0)
@@ -971,7 +971,7 @@ getdvar(const char *varname)
 static double
 createdvar(char *varname, double value)
 {
-    register struct udvt_entry *udv_ptr = first_udv;
+    struct udvt_entry *udv_ptr = first_udv;
 
     for (; udv_ptr; udv_ptr = udv_ptr->next_udv)
 	if (strcmp(varname, udv_ptr->udv_name) == 0) {
@@ -1001,7 +1001,7 @@ createdvar(char *varname, double value)
 static void
 splitpath(char *s, char *p, char *f)
 {
-    register char *tmp;
+    char *tmp;
     tmp = s + strlen(s) - 1;
     while (*tmp != '\\' && *tmp != '/' && *tmp != ':' && tmp - s >= 0)
 	tmp--;

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.78 2004/07/04 17:27:19 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.79 2004/07/13 14:11:24 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -680,7 +680,7 @@ write_multiline(
     int angle,			/* assume term has already been set for this */
     const char *font)		/* NULL or "" means use default */
 {
-    register struct termentry *t = term;
+    struct termentry *t = term;
     char *p = text;
 
     if (!p)
@@ -711,7 +711,7 @@ write_multiline(
 	if ((*t->justify_text) (hor)) {
 	    (*t->put_text) (x, y, text);
 	} else {
-	    int fix = hor * (t->h_char) * strlen(text) / 2;
+	    int fix = hor * t->h_char * strlen(text) / 2;
 	    if (angle)
 		(*t->put_text) (x, y - fix, text);
 	    else
@@ -743,8 +743,8 @@ write_multiline(
 static void
 do_point(unsigned int x, unsigned int y, int number)
 {
-    register int htic, vtic;
-    register struct termentry *t = term;
+    int htic, vtic;
+    struct termentry *t = term;
 
     if (number < 0) {		/* do dot */
 	(*t->move) (x, y);
@@ -873,7 +873,7 @@ do_arrow(
     unsigned int ex, unsigned int ey,	/* end point (point of arrowhead) */
     int head)
 {
-    register struct termentry *t = term;
+    struct termentry *t = term;
     float len_tic = ((double) (t->h_tic + t->v_tic)) / 2.0;
     /* average of tic sizes */
     /* (dx,dy) : vector from end to start */
@@ -1151,7 +1151,7 @@ term_count()
 void
 list_terms()
 {
-    register int i;
+    int i;
     char *line_buffer = gp_alloc(BUFSIZ, "list_terms");
     int sort_idxs[TERMCOUNT];
 
@@ -1191,7 +1191,7 @@ termcomp(const generic *arga, const generic *argb)
 struct termentry *
 set_term(int c_token_arg)
 {
-    register struct termentry *t = NULL;
+    struct termentry *t = NULL;
     char *input_name;
 
     if (!token[c_token_arg].is_token)
@@ -1510,7 +1510,7 @@ UP_redirect(int caller)
 void
 test_term()
 {
-    register struct termentry *t = term;
+    struct termentry *t = term;
     const char *str;
     int x, y, xl, yl, i;
     unsigned int xmax_t, ymax_t;
@@ -1523,10 +1523,10 @@ test_term()
     xmax_t = (unsigned int) (t->xmax * xsize);
     ymax_t = (unsigned int) (t->ymax * ysize);
 
-    p_width = pointsize * (t->h_tic);
-    key_entry_height = pointsize * (t->v_tic) * 1.25;
-    if (key_entry_height < (t->v_char))
-	key_entry_height = (t->v_char);
+    p_width = pointsize * t->h_tic;
+    key_entry_height = pointsize * t->v_tic * 1.25;
+    if (key_entry_height < t->v_char)
+	key_entry_height = t->v_char;
 
     /* border linetype */
     (*t->linewidth) (1.0);
@@ -1955,7 +1955,7 @@ void
 fflush_binary()
 {
     typedef short int INT16;	/* signed 16-bit integers */
-    register INT16 k;		/* loop index */
+    INT16 k;		/* loop index */
 
     if (gpoutfile != stdout) {
 	/* Stupid VMS fflush() raises error and loses last data block

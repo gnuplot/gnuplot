@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: scanner.c,v 1.16 2004/04/13 17:24:00 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: scanner.c,v 1.17 2004/07/01 17:10:07 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - scanner.c */
@@ -128,9 +128,11 @@ scanner(char **expressionp, size_t *expressionlenp)
 	    goto again;
 	}
 	/* allow _ to be the first character of an identifier */
-	if (isalpha((unsigned char) expression[current]) || expression[current] == '_') {
+	if (isalpha((unsigned char) expression[current])
+	    || expression[current] == '_') {
 	    SCAN_IDENTIFIER;
-	} else if (isdigit((unsigned char) expression[current]) || expression[current] == '.') {
+	} else if (isdigit((unsigned char) expression[current])
+		   || expression[current] == '.') {
 	    token[t_num].is_token = FALSE;
 	    token[t_num].length = get_num(&expression[current]);
 	    current += (token[t_num].length - 1);

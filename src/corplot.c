@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: corplot.c,v 1.4 2000/11/01 18:57:27 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: corplot.c,v 1.5 2004/04/13 17:23:52 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - corplot.c */
@@ -54,7 +54,7 @@ char corscreen[] = "CORSCREEN=0";
 int
 main()
 {
-    register unsigned int segm, start;
+    unsigned int segm, start;
     char *m;
     if (!(m = malloc(BOUNDARY))) {
 	printf("malloc() failed\n");

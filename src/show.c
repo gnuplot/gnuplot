@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.130 2004/07/05 03:49:22 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.131 2004/07/13 14:03:04 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -1429,7 +1429,7 @@ show_styles(const char *name, enum PLOT_STYLE style)
 static void
 show_functions()
 {
-    register struct udft_entry *udf = first_udf;
+    struct udft_entry *udf = first_udf;
 
     fputs("\n\tUser-Defined Functions:\n", stderr);
 
@@ -2748,7 +2748,7 @@ show_plot()
 static void
 show_variables()
 {
-    register struct udvt_entry *udv = first_udv;
+    struct udvt_entry *udv = first_udv;
     int len;
 
     SHOW_ALL_NL;
@@ -2853,7 +2853,7 @@ show_arrowstyle(int tag)
 static void
 show_ticdef(AXIS_INDEX axis)
 {
-    register struct ticmark *t;
+    struct ticmark *t;
 
     const char *ticfmt = conv_text(axis_array[axis].formatstring);
 

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: interpol.c,v 1.29 2004/04/13 17:23:58 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: interpol.c,v 1.30 2004/07/01 17:10:06 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - interpol.c */
@@ -276,8 +276,8 @@ num_curves(struct curve_points *plot)
 static double *
 cp_binomial(int points)
 {
-    register double *coeff;
-    register int n, k;
+    double *coeff;
+    int n, k;
     int e;
 
     e = points;			/* well we're going from k=0 to k=p_count-1 */

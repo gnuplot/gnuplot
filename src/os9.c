@@ -1,4 +1,4 @@
-/* $Id: os9.c,v 1.2 2004/04/13 17:23:58 broeker Exp $ */
+/* $Id: os9.c,v 1.3 2004/07/01 17:10:07 broeker Exp $ */
 
 /* GNUPLOT - os9.c */
 
@@ -65,7 +65,7 @@ popen(char *command, char *mode)
     int temp, fd;
     FILE *pipe;
     char *argv[4];
-    register char *cp;
+    char *cp;
     mh_com *mod;
     int linked = 0;
 
@@ -148,9 +148,9 @@ isatty(int f)
 char *
 getwd(char *p)
 {
-    register char *cp;
-    register struct dirent *dp;
-    register int l, olddot = 0, i, d, dot, dotdot;
+    char *cp;
+    struct dirent *dp;
+    int l, olddot = 0, i, d, dot, dotdot;
     struct dirent db[8];
     char buf[1024];
 

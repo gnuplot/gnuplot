@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: standard.c,v 1.16 2004/04/13 17:24:01 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: standard.c,v 1.17 2004/07/01 17:10:08 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - standard.c */
@@ -545,7 +545,7 @@ void
 f_tan(union argument *arg)
 {
     struct value a;
-    register double den;
+    double den;
 
     (void) arg;			/* avoid -Wunused warning */
     (void) pop(&a);
@@ -565,7 +565,7 @@ void
 f_asin(union argument *arg)
 {
     struct value a;
-    register double alpha, beta, x, y;
+    double alpha, beta, x, y;
 
     (void) arg;			/* avoid -Wunused warning */
     (void) pop(&a);
@@ -588,7 +588,7 @@ void
 f_acos(union argument *arg)
 {
     struct value a;
-    register double x, y;
+    double x, y;
 
     (void) arg;			/* avoid -Wunused warning */
     (void) pop(&a);
@@ -615,7 +615,7 @@ void
 f_atan(union argument *arg)
 {
     struct value a;
-    register double x, y, u, v, w, z;
+    double x, y, u, v, w, z;
 
     (void) arg;			/* avoid -Wunused warning */
     (void) pop(&a);
@@ -722,7 +722,7 @@ void
 f_asinh(union argument *arg)
 {
     struct value a;		/* asinh(z) = -I*asin(I*z) */
-    register double alpha, beta, x, y;
+    double alpha, beta, x, y;
 
     (void) arg;			/* avoid -Wunused warning */
     (void) pop(&a);
@@ -746,7 +746,7 @@ void
 f_acosh(union argument *arg)
 {
     struct value a;
-    register double alpha, beta, x, y;	/* acosh(z) = I*acos(z) */
+    double alpha, beta, x, y;	/* acosh(z) = I*acos(z) */
 
     (void) arg;			/* avoid -Wunused warning */
     (void) pop(&a);
@@ -770,7 +770,7 @@ void
 f_atanh(union argument *arg)
 {
     struct value a;
-    register double x, y, u, v, w, z;	/* atanh(z) = -I*atan(I*z) */
+    double x, y, u, v, w, z;	/* atanh(z) = -I*atan(I*z) */
 
     (void) arg;			/* avoid -Wunused warning */
     (void) pop(&a);
@@ -852,7 +852,7 @@ void
 f_sqrt(union argument *arg)
 {
     struct value a;
-    register double mag;
+    double mag;
 
     (void) arg;			/* avoid -Wunused warning */
     (void) pop(&a);
@@ -874,7 +874,7 @@ void
 f_exp(union argument *arg)
 {
     struct value a;
-    register double mag, ang;
+    double mag, ang;
 
     (void) arg;			/* avoid -Wunused warning */
     (void) pop(&a);

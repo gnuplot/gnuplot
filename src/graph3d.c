@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.93 2004/07/05 03:49:21 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.94 2004/07/06 00:00:35 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -295,9 +295,9 @@ find_maxl_keys3d(struct surface_points *plots, int count, int *kcnt)
 static int
 find_maxl_cntr(struct gnuplot_contours *contours, int *count)
 {
-    register int cnt;
-    register int mlen, len;
-    register struct gnuplot_contours *cntrs = contours;
+    int cnt;
+    int mlen, len;
+    struct gnuplot_contours *cntrs = contours;
 
     mlen = cnt = 0;
     while (cntrs) {
@@ -321,7 +321,7 @@ static void
 boundary3d(struct surface_points *plots, int count)
 {
     legend_key *key = &keyT;
-    register struct termentry *t = term;
+    struct termentry *t = term;
     int ytlen, i;
 
     titlelin = 0;
@@ -329,19 +329,19 @@ boundary3d(struct surface_points *plots, int count)
     p_height = pointsize * t->v_tic;
     p_width = pointsize * t->h_tic;
     if (key->swidth >= 0)
-	key_sample_width = key->swidth * (t->h_char) + pointsize * (t->h_tic);
+	key_sample_width = key->swidth * t->h_char + pointsize * t->h_tic;
     else
 	key_sample_width = 0;
-    key_entry_height = pointsize * (t->v_tic) * 1.25 * key->vert_factor;
-    if (key_entry_height < (t->v_char)) {
+    key_entry_height = pointsize * t->v_tic * 1.25 * key->vert_factor;
+    if (key_entry_height < t->v_char) {
 	/* is this reasonable ? */
-	key_entry_height = (t->v_char) * key->vert_factor;
+	key_entry_height = t->v_char * key->vert_factor;
     }
     /* count max_len key and number keys (plot-titles and contour labels) with len > 0 */
     max_ptitl_len = find_maxl_keys3d(plots, count, &ptitl_cnt);
     if ((ytlen = label_width(key->title, &ktitle_lines)) > max_ptitl_len)
 	max_ptitl_len = ytlen;
-    key_col_wth = (max_ptitl_len + 4) * (t->h_char) + key_sample_width;
+    key_col_wth = (max_ptitl_len + 4) * t->h_char + key_sample_width;
 
     /* luecken@udel.edu modifications
        sizes the plot to take up more of available resolution */
@@ -355,7 +355,7 @@ boundary3d(struct surface_points *plots, int count)
     if (key->flag == KEY_AUTO_PLACEMENT && key->vpos == TUNDER) {
 	if (ptitl_cnt > 0) {
 	    /* calculate max no cols, limited by label-length */
-	    key_cols = (int) (xright - xleft) / ((max_ptitl_len + 4) * (t->h_char) + key_sample_width);
+	    key_cols = (int) (xright - xleft) / ((max_ptitl_len + 4) * t->h_char + key_sample_width);
 	    /* HBB 991019: fix division by zero problem */
 	    if (key_cols == 0)
 		key_cols = 1;
@@ -372,7 +372,7 @@ boundary3d(struct surface_points *plots, int count)
      * xformat || yformat || xlabel || ylabel */
 
     /* an absolute 1, with no terminal-dependent scaling ? */
-    ybot = (t->v_char) * 2.5 + 1;
+    ybot = t->v_char * 2.5 + 1;
     if (key_rows && key->flag == KEY_AUTO_PLACEMENT && key->vpos == TUNDER)
 	ybot += key_rows * key_entry_height + ktitle_lines * t->v_char;
 
@@ -386,7 +386,7 @@ boundary3d(struct surface_points *plots, int count)
     ytop = ysize * t->ymax - t->v_char * (titlelin + 1.5) - 1;
     if (key->flag == KEY_AUTO_PLACEMENT && key->vpos != TUNDER) {
 	/* calculate max no rows, limited be ytop-ybot */
-	i = (int) (ytop - ybot) / (t->v_char) - 1 - ktitle_lines;
+	i = (int) (ytop - ybot) / t->v_char - 1 - ktitle_lines;
 	/* HBB 20030321: div by 0 fix like above */
 	if (i == 0)
 	    i = 1;
@@ -398,7 +398,7 @@ boundary3d(struct surface_points *plots, int count)
 	key_rows += ktitle_lines;
     }
     if (key->flag == KEY_AUTO_PLACEMENT && key->hpos == TOUT) {
-	xright -= key_col_wth * (key_cols - 1) + key_col_wth - 2 * (t->h_char);
+	xright -= key_col_wth * (key_cols - 1) + key_col_wth - 2 * t->h_char;
     }
     xleft += t->xmax * xoffset;
     xright += t->xmax * xoffset;
@@ -483,7 +483,7 @@ place_labels3d(struct text_label *listhead, int layer)
 {
     struct termentry *t = term;
     struct text_label *this_label;
-    if ((t->pointsize)) {
+    if (t->pointsize) {
 	(*t->pointsize)(pointsize);
     }
     for (this_label = listhead; this_label != NULL;
@@ -715,11 +715,11 @@ do_3dplot(
 	       tics is as given by character height: */
 #define DEFAULT_Y_DISTANCE 1.0
 	    x = (unsigned int) ((map_x1 + map_x2) / 2 + title.xoffset * t->h_char);
-	    y = (unsigned int) (map_y1 + tics_len + (DEFAULT_Y_DISTANCE + titlelin - 0.5 + title.yoffset) * (t->v_char));
+	    y = (unsigned int) (map_y1 + tics_len + (DEFAULT_Y_DISTANCE + titlelin - 0.5 + title.yoffset) * t->v_char);
 #undef DEFAULT_Y_DISTANCE
 	} else { /* usual 3d set view ... */
     	    x = (unsigned int) ((xleft + xright) / 2 + title.xoffset * t->h_char);
-    	    y = (unsigned int) (ytop + (titlelin + title.yoffset) * (t->h_char));
+    	    y = (unsigned int) (ytop + (titlelin + title.yoffset) * t->h_char);
     	}
 	apply_textcolor(&(title.textcolor),t);
 	/* PM: why there is JUST_TOP and not JUST_BOT? We should draw above baseline!
@@ -775,16 +775,16 @@ do_3dplot(
 	key_sample_left = -key_sample_width;
 	key_sample_right = 0;
 	key_text_left = t->h_char;
-	key_text_right = (t->h_char) * (max_ptitl_len + 1);
-	key_size_right = (t->h_char) * (max_ptitl_len + 2 + key->width_fix);
-	key_size_left = (t->h_char) + key_sample_width;
+	key_text_right = t->h_char * (max_ptitl_len + 1);
+	key_size_right = t->h_char * (max_ptitl_len + 2 + key->width_fix);
+	key_size_left = t->h_char + key_sample_width;
     } else {
 	key_sample_left = 0;
 	key_sample_right = key_sample_width;
-	key_text_left = -(int) ((t->h_char) * (max_ptitl_len + 1));
-	key_text_right = -(int) (t->h_char);
-	key_size_left = (t->h_char) * (max_ptitl_len + 2 + key->width_fix);
-	key_size_right = (t->h_char) + key_sample_width;
+	key_text_left = -(int) (t->h_char * (max_ptitl_len + 1));
+	key_text_right = -(int) t->h_char;
+	key_size_left = t->h_char * (max_ptitl_len + 2 + key->width_fix);
+	key_size_right = t->h_char + key_sample_width;
     }
     key_point_offset = (key_sample_left + key_sample_right) / 2;
 
@@ -792,7 +792,7 @@ do_3dplot(
 	if (key->vpos == TUNDER) {
 #if 0
 	    yl = yoffset * t->ymax + (key_rows) * key_entry_height + (ktitle_lines + 2) * t->v_char;
-	    xl = max_ptitl_len * 1000 / (key_sample_width / (t->h_char) + max_ptitl_len + 2);
+	    xl = max_ptitl_len * 1000 / (key_sample_width / t->h_char + max_ptitl_len + 2);
 	    xl *= (xright - xleft) / key_cols;
 	    xl /= 1000;
 	    xl += xleft;
@@ -818,20 +818,20 @@ do_3dplot(
 #endif
 	} else {
 	    if (key->vpos == TTOP) {
-		yl = ytop - (t->v_tic) - t->v_char;
+		yl = ytop - t->v_tic - t->v_char;
 	    } else {
-		yl = ybot + (t->v_tic) + key_entry_height * key_rows + ktitle_lines * t->v_char;
+		yl = ybot + t->v_tic + key_entry_height * key_rows + ktitle_lines * t->v_char;
 	    }
 	    if (key->hpos == TOUT) {
 		/* keys outside plot border (right) */
-		xl = xright + (t->h_tic) + key_size_left;
+		xl = xright + t->h_tic + key_size_left;
 	    } else if (key->hpos == TLEFT) {
-		xl = xleft + (t->h_tic) + key_size_left;
+		xl = xleft + t->h_tic + key_size_left;
 	    } else {
 		xl = xright - key_size_right - key_col_wth * (key_cols - 1);
 	    }
 	}
-	yl_ref = yl - ktitle_lines * (t->v_char);
+	yl_ref = yl - ktitle_lines * t->v_char;
     }
     if (key->flag == KEY_USER_PLACEMENT) {
 	map3d_position(&key->user_pos, &xl, &yl, "key");
@@ -840,7 +840,7 @@ do_3dplot(
 	int yt = yl;
 	int yb = yl - key_entry_height * (key_rows - ktitle_lines) - ktitle_lines * t->v_char;
 	int key_xr = xl + key_col_wth * (key_cols - 1) + key_size_right;
-	int tmp = (int)(0.5 * key->height_fix * (t->v_char));
+	int tmp = (int)(0.5 * key->height_fix * t->v_char);
 	yt += 2 * tmp;
 	yl += tmp;
 
@@ -866,7 +866,7 @@ do_3dplot(
     /* KEY TITLE */
     if (key->visible && strlen(key->title)) {
 	char *ss = gp_alloc(strlen(key->title) + 2, "tmp string ss");
-	int tmp = (int)(0.5 * key->height_fix * (t->v_char));
+	int tmp = (int)(0.5 * key->height_fix * t->v_char);
 	strcpy(ss, key->title);
 	strcat(ss, "\n");
 	s = ss;
@@ -883,7 +883,7 @@ do_3dplot(
 		    (*t->put_text) (xl + key_text_right,
 				    yl, s);
 		} else {
-		    int x = xl + key_text_right - (t->h_char) * strlen(s);
+		    int x = xl + key_text_right - t->h_char * strlen(s);
 		    if (inrange(x, xleft, xright))
 			(*t->put_text) (x, yl, s);
 		}
@@ -2291,7 +2291,7 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid)
 		vertex v1, v2;
 		map3d_xyz(mid_x, xaxis_y, base_z, &v1);
 		v2.x = v1.x;
-		v2.y = v1.y - tic_unity * (t->v_char) * 1;
+		v2.y = v1.y - tic_unity * t->v_char * 1;
 		if (!tic_in) {
 		    /* FIXME
 		     * This code and its source in xtick_callback() is wrong --- tics
@@ -2378,10 +2378,10 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid)
 		       ) {
 			map3d_xyz(0.0, yaxis_x, base_z, &v1);
 		    }
-		    v2.x = v1.x - tic_unitx * (t->h_char) * 1;
+		    v2.x = v1.x - tic_unitx * t->h_char * 1;
 		    v2.y = v1.y;
 	    	    if (!tic_in)
-			v2.x -= tic_unitx * (t->h_tic) * ticscale;
+			v2.x -= tic_unitx * t->h_tic * ticscale;
 		    TERMCOORD(&v2, x1, y1);
 		    /* calculate max length of y-tics labels */
 		    widest_tic_strlen = 0;
@@ -2408,7 +2408,7 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid)
 	 	       tics is as given by character height: */
 #define DEFAULT_X_DISTANCE 0
 		    x1 += (unsigned int) (tics_len + (-0.5 + Y_AXIS.label.xoffset) * t->h_char);
-		    y1 += (unsigned int) ((DEFAULT_X_DISTANCE + Y_AXIS.label.yoffset) * (t->v_char));
+		    y1 += (unsigned int) ((DEFAULT_X_DISTANCE + Y_AXIS.label.yoffset) * t->v_char);
 #undef DEFAULT_X_DISTANCE
 #endif
 		    h_just = CENTRE; /* vertical justification for rotated text */
@@ -2527,7 +2527,7 @@ xtick_callback(
     double scale = (text ? ticscale : miniticscale) * (tic_in ? 1 : -1);
     double other_end =
 	Y_AXIS.min + Y_AXIS.max - xaxis_y;
-    register struct termentry *t = term;
+    struct termentry *t = term;
 
     (void) axis;		/* avoid -Wunused warning */
 
@@ -2562,8 +2562,8 @@ xtick_callback(
 	    just = CENTRE;
 	else
 	    just = RIGHT;
-	v2.x = v1.x - tic_unitx * (t->h_char) * 1;
-	v2.y = v1.y - tic_unity * (t->v_char) * 1;
+	v2.x = v1.x - tic_unitx * t->h_char * 1;
+	v2.y = v1.y - tic_unity * t->v_char * 1;
 	if (!tic_in) {
 	    v2.x -= tic_unitx * t->v_tic * ticscale;
 	    v2.y -= tic_unity * t->v_tic * ticscale;
@@ -2600,7 +2600,7 @@ ytick_callback(
     double scale = (text ? ticscale : miniticscale) * (tic_in ? 1 : -1);
     double other_end =
 	X_AXIS.min + X_AXIS.max - yaxis_x;
-    register struct termentry *t = term;
+    struct termentry *t = term;
 
     (void) axis;		/* avoid -Wunused warning */
 
@@ -2634,11 +2634,11 @@ ytick_callback(
 	    just = CENTRE;
 	else
 	    just = RIGHT;
-	v2.x = v1.x - tic_unitx * (t->h_char) * 1;
-	v2.y = v1.y - tic_unity * (t->v_char) * 1;
+	v2.x = v1.x - tic_unitx * t->h_char * 1;
+	v2.y = v1.y - tic_unity * t->v_char * 1;
 	if (!tic_in) {
-	    v2.x -= tic_unitx * (t->h_tic) * ticscale;
-	    v2.y -= tic_unity * (t->v_tic) * ticscale;
+	    v2.x -= tic_unitx * t->h_tic * ticscale;
+	    v2.y -= tic_unity * t->v_tic * ticscale;
 	}
         /* User-specified different color for the tics text */
 	if (axis_array[axis].ticdef.textcolor.lt != TC_DEFAULT)
@@ -2784,7 +2784,7 @@ map3d_position(
 	graph_error("Cannot mix screen co-ordinates with other types");
     }
     {
-	register struct termentry *t = term;
+	struct termentry *t = term;
 	/* HBB 20000914: off-by-one bug. Maximum allowed output is
          * t->?max - 1, not t->?max itself! */
 	*x = pos->x * (t->xmax -1) + 0.5;
@@ -2818,7 +2818,7 @@ map3d_position_r(
     if (screens1 != 3 || screens2 != 3) {
 	graph_error("Cannot mix screen co-ordinates with other types");
     } {
-	register struct termentry *t = term;
+	struct termentry *t = term;
 	*x = pos_s->x + pos_e->x * (t->xmax -1) + 0.5;
 	*y = pos_s->y + pos_e->y * (t->ymax -1) + 0.5;
     }
