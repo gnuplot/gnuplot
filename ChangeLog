@@ -1,5 +1,16 @@
 2004-03-31  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
+	* src/graph3d.c (do_3dplot): Ignore "set grid {back|front}" in
+	hidden3d mode --- they would directly contradict the idea of
+	hidden-line removal.
+
+	* docs/gnuplot.doc (grid): Document effect of hidden3d mode on
+	options "back" and "front".
+	(border, xtics): Document that "set grid {front|back}" also
+	controls the drawing order of border and ticmarks.
+	(xtics axis): Describe actual effect of on-axis tics coming too
+	close to the graph border.
+
 	* configure.in: New options --enable-h3d-quadtree and
 	--enable-h3d-gridbox to control compile-time flags of hidden3d
 	code.
@@ -14,8 +25,8 @@
 
 	* src/hidden3d.c (HIDDEN3D_GRIDBOX, HIDDEN3D_QUADTREE): Renamed to
 	avoid namespace collisions since these are now globally visible.
-	Used to be called TEST_GRIDBOX and TEST_QUADTREE.  Changes all
-	occur all over hidden3d.c.
+	Used to be called TEST_GRIDBOX and TEST_QUADTREE.  Changes occur
+	all over hidden3d.c.
 
 2004-03-30  Ethan Merritt  <merritt@u.washington.edu>
 
