@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.50 2004/05/26 07:06:33 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.51 2004/05/26 22:50:16 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -81,6 +81,19 @@ mouse_setting_t mouse_setting = {
     1, 0, 0, 0, 0,
     "% #g",
     "point pt 1"
+};
+
+/* "usual well-known" keycodes, i.e. those not listed in special_keys in mouse.h
+*/
+const struct gen_table usual_special_keys[] =
+{
+    { "BackSpace", GP_BackSpace},
+    { "Tab", GP_Tab},
+    { "KP_Enter", GP_KP_Enter},
+    { "Return", GP_Return},
+    { "Escape", GP_Escape},
+    { "Delete", GP_Delete},
+    { NULL, 0}
 };
 
 /* the status of the shift, ctrl and alt keys
@@ -1907,6 +1920,13 @@ static int
 lookup_key(char *ptr, int *len)
 {
     char **keyptr;
+    /* first, search in the table of "usual well-known" keys */
+    int what = lookup_table_nth(usual_special_keys, ptr);
+    if (what >= 0) {
+	*len = strlen(usual_special_keys[what].key);
+	return usual_special_keys[what].value;
+    }
+    /* second, search in the table of other keys */
     for (keyptr = special_keys; *keyptr; ++keyptr) {
 	if (!strncasecmp(ptr, *keyptr, (*len = strlen(*keyptr)))) {
 	    return keyptr - special_keys + GP_FIRST_KEY;
@@ -1968,6 +1988,15 @@ bind_fmt_lhs(const bind_t * in)
     if (in->key > GP_FIRST_KEY && in->key < GP_LAST_KEY) {
 	sprintf(out, "%s%s", out, special_keys[in->key - GP_FIRST_KEY]);
     } else {
+	int k = 0;
+	for ( ; usual_special_keys[k].value > 0; k++) {
+	    if (usual_special_keys[k].value == in->key) {
+		sprintf(out, "%s%s", out, usual_special_keys[k].key);
+		k = -1;
+		break;
+	    }
+	}
+	if (k >= 0)
 	sprintf(out, "%s%c", out, in->key);
     }
     return out;

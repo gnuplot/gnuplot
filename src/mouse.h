@@ -1,5 +1,5 @@
 /*
- * $Id: mouse.h,v 1.11 2002/02/25 03:10:41 broeker Exp $
+ * $Id: mouse.h,v 1.12 2003/10/10 13:16:45 mikulik Exp $
  */
 
 /* GNUPLOT - mouse.h */
@@ -82,17 +82,12 @@ extern mouse_setting_t mouse_setting;
  * enum's of GP_ and end with a NULL pointer! */
 static char* special_keys[] = {
     "GP_FIRST_KEY", /* keep this dummy there */
-    "BackSpace",
-    "Tab",
     "Linefeed",
     "Clear",
-    "Return",
     "Pause",
     "Scroll_Lock",
     "Sys_Req",
-    "Escape",
     "Insert",
-    "Delete",
     "Home",
     "Left",
     "Up",
@@ -104,7 +99,6 @@ static char* special_keys[] = {
     "Begin",
     "KP_Space",
     "KP_Tab",
-    "KP_Enter",
     "KP_F1",
     "KP_F2",
     "KP_F3",

@@ -1,5 +1,5 @@
 /*
- * $Id: mousecmn.h,v 1.7 2003/06/20 04:54:36 sfeam Exp $
+ * $Id: mousecmn.h,v 1.8 2004/04/13 17:23:58 broeker Exp $
  */
 
 /* GNUPLOT - mousecnm.h */
@@ -79,21 +79,25 @@ enum {
 enum { Mod_Shift = (1), Mod_Ctrl = (1 << 1), Mod_Alt = (1 << 2) };
 
 
-/* this depends on the ascii character set lying in the
- * range from 0 to 255 (below 1000). */
-enum {
+/* the below depends on the ascii character set lying in the
+ * range from 0 to 255 (below 1000) */
+enum { /* special keys with "usual well-known" keycodes */
+    GP_BackSpace = 0x08,
+    GP_Tab = 0x09,
+    GP_KP_Enter = 0x0A,
+    GP_Return = 0x0D,
+    GP_Escape = 0x1B,
+    GP_Delete = 127,
+};
+
+enum { /* other special keys */
     GP_FIRST_KEY = 1000,
-    GP_BackSpace,
-    GP_Tab,
     GP_Linefeed,
     GP_Clear,
-    GP_Return,
     GP_Pause,
     GP_Scroll_Lock,
     GP_Sys_Req,
-    GP_Escape,
     GP_Insert,
-    GP_Delete,
     GP_Home,
     GP_Left,
     GP_Up,
@@ -105,7 +109,6 @@ enum {
     GP_Begin,
     GP_KP_Space,
     GP_KP_Tab,
-    GP_KP_Enter,
     GP_KP_F1,
     GP_KP_F2,
     GP_KP_F3,

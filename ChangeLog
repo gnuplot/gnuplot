@@ -1,3 +1,13 @@
+2004-06-04  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* src/mouse.h src/mousecmn.h src/mouse.c: Split array special_keys[] of
+	of key names and key codes into special_keys[] and usual_special_keys[],
+	so that "usual" keys (like BackSpace, Tab, Enter, Return, Escape, Tab,
+	Delete) can have their "usual" keycodes instead of those >=1000.
+	Changed lookup_key() and bind_fmt_lhs() in mouse.c to look into both
+	arrays. This does not change any functionality of the current version
+	of gnuplot, but will help new future features (like "pause mouse key").
+
 2004-06-03  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/emf.trm (EMF_linewidth): Force re-evaluation of line
