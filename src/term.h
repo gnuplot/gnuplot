@@ -1,5 +1,5 @@
 /*
- * $Id: term.h,v 1.44 1998/04/14 00:16:25 drd Exp $
+ * $Id: term.h,v 1.4 1999/06/09 12:11:13 lhecking Exp $
  *
  */
 
@@ -391,6 +391,5 @@
 
 /* METAPOST */
 #include "metapost.trm"
-
 
 #endif /* !SHORT_TERMLIST */
