@@ -1,5 +1,5 @@
 /*
- * $Id: x11.trm,v 1.38 2001/09/08 01:24:46 mikulik Exp $
+ * $Id: x11.trm,v 1.39 2001/09/08 02:25:27 mikulik Exp $
  *
  */
 
@@ -1004,24 +1004,22 @@ TERM_PUBLIC void X11_set_color(double gray)
 TERM_PUBLIC void X11_filled_polygon(int points, gpiPoint *corners)
 {
     int i;
-    /* FIXME - volunteer? */
-    if (points > 105) {
-	fprintf(stderr,
-	    "YOUR HOMEWORK: CANNOT PASS SO MUCH POLYGON POINTS THROUGH X11_IPC. "
-	    "YOU ARE WELCOME TO PROVIDE A PATCH. THE BEST WOULD BE A "
-	    "BINARY PROTOCOL FOR X11 TERMINAL, SIMILARLY TO THE OS/2 "
-	    "pm.trm.\n");
-	/* OTHER HINT: send the polygon data in chunks of X11_buffer_size until
-	   all data are sent; but the PM_filled_polygon() is the best solution
-	   anyway.
-	 */
-	return;
-    }
-    /* END OF FIXME - volunteer? */
+
     fputc(X11_GR_FILLED_POLYGON, X11_ipc);
+    /* FIXME HBB 20010919: this %04d format somewhat arbitrarily
+     * limits us to 10000 vertices in the polygon */
     PRINT1("%04d", points);
-    for (i = 0; i < points; i++)
+    for (i = 0; i < points; i++) {
 	PRINT2("%04d%04d", corners[i].x, corners[i].y);
+	/* HBB 20010919: fix for buffer overflow problem: start
+	 * another line every 100 points, to avoid overflowing
+	 * fixed-size buffer in gplt_x11.  Number of points == -1
+	 * signals continuation line */
+	if ((i % 100) == 99) {
+	    PRINT1("xxxx\n%c-001", X11_GR_FILLED_POLYGON);
+	    FFLUSH();
+	}
+    }
     fputc('\n', X11_ipc);
     FFLUSH();
     return;

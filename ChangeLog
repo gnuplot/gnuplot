@@ -1,3 +1,19 @@
+2001-09-19  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/gplt_x11.c (GR_MAKE_PALETTE, GR_RELEASE_PALETTE,
+ 	GR_SET_COLOR, GR_FILLED_POLYGON): Renamed so they all have an X11_
+ 	prefix now, like their copies in x11.trm.
+	(exec_cmd): Extend parsing of GR_FILLED_POLYGON case to allow for
+ 	large polygons being broken into several lines. Uses new static
+ 	variables `saved_npoints' and `saved_i' to keep state from one
+ 	partial line to the next.
+
+	* term/x11.trm (X11_filled_polygon): Protocol for filled_polygon
+ 	call changed. Now uses continuation lines to break up large
+ 	polygons like those you get from Petr's filledcurves feature.
+  	Incomplete lines have an "xxxx" at their end; continuations are
+ 	flagged by a -1 in the number-of-points field.
+	
 2001-09-19  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/win/wcommon.h src/win/wgnuplib.c: New routine

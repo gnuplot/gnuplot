@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.31 2001/01/22 18:30:21 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.32 2001/08/27 15:02:14 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - gplt_x11.c */
@@ -384,10 +384,12 @@ char dashes[Ndashes][5];
 
 #ifdef PM3D
 /* these must match the definitions in x11.trm */
-#define GR_MAKE_PALETTE     'p'
-#define GR_RELEASE_PALETTE  'e'
-#define GR_SET_COLOR        'c'
-#define GR_FILLED_POLYGON   'f'
+/* FIXME HBB 20010919: don't say so, *force* it!  Include a common
+ * header file into both x11.trm and this file. */
+#define X11_GR_MAKE_PALETTE     'p'
+#define X11_GR_RELEASE_PALETTE  'e'
+#define X11_GR_SET_COLOR        'c'
+#define X11_GR_FILLED_POLYGON   'f'
 t_sm_palette sm_palette = {
     -1,				/* colorFormulae */
     SMPAL_COLOR_MODE_NONE,	/* colorMode */
@@ -1145,10 +1147,10 @@ record()
 	    return 0;
 
 #ifdef PM3D
-	case GR_MAKE_PALETTE:
+	case X11_GR_MAKE_PALETTE:
 	    {
 		t_sm_palette tpal;
-		FPRINTF((stderr, "GR_MAKE_PALETTE\n"));
+		FPRINTF((stderr, "X11_GR_MAKE_PALETTE\n"));
 		if (6 != sscanf(buf + 1, "%c %d %d %d %c %d\n",
 				&(tpal.colorMode), &(tpal.formulaR), &(tpal.formulaG),
 				&(tpal.formulaB), &(tpal.positive), &(tpal.use_maxcolors))) {
@@ -1159,9 +1161,9 @@ record()
 		}
 	    }
 	    return 1;
-	case GR_RELEASE_PALETTE:
+	case X11_GR_RELEASE_PALETTE:
 	    /* turn pm3d off */
-	    FPRINTF((stderr, "GR_RELEASE_PALETTE\n"));
+	    FPRINTF((stderr, "X11_GR_RELEASE_PALETTE\n"));
 	    ReleaseColormap(plot);
 	    sm_palette.colorMode = SMPAL_COLOR_MODE_NONE;
 	    return 1;
@@ -1616,36 +1618,68 @@ exec_cmd(plot, command)
 	}
     }
 #if PM3D
-    else if (*buffer == GR_SET_COLOR) {	/* set color */
+    else if (*buffer == X11_GR_SET_COLOR) {	/* set color */
 	if (have_pm3d) {	/* ignore, if your X server is not supported */
 	    double gray;
 	    sscanf(buffer + 1, "%lf", &gray);
 	    PaletteSetColor(plot, gray);
 	    current_gc = &gc_pm3d;
 	}
-    } else if (*buffer == GR_FILLED_POLYGON) {	/* filled polygon */
+    } else if (*buffer == X11_GR_FILLED_POLYGON) {	/* filled polygon */
 	if (have_pm3d) {	/* ignore, if your X server is not supported */
-	    static XPoint *points = (XPoint *) 0;
+	    static XPoint *points = NULL;
 	    static int st_npoints = 0;
+	    static int saved_npoints = -1, saved_i = -1; /* HBB 20010919 */
 	    int i, npoints;
 	    char *ptr = buffer + 1;
+
 	    sscanf(ptr, "%4d", &npoints);
+
+	    /* HBB 20010919: Implement buffer overflow protection by
+	     * breaking up long lines */
+	    if (npoints == -1) {
+		/* This is a continuation line. */
+		if (saved_npoints < 100) {
+		    fprintf(stderr, "gnuplot_x11: filled_polygon() protocol error\n");
+		    EXIT(1);
+		}
+		/* Continue filling at end of previous list: */
+		i = saved_i;
+		npoints = saved_npoints;
+	    } else {
+		saved_npoints = npoints;
+		i = 0;
+	    }
+
 	    ptr += 4;
 	    if (npoints > st_npoints) {
-		points = realloc((void *) points, sizeof(XPoint) * npoints);
+		XPoint *new_points = realloc(points, sizeof(XPoint) * npoints);
 		st_npoints = npoints;
-		if (!points) {
+		if (!new_points) {
 		    perror("gnuplot_x11: exec_cmd()->points");
 		    EXIT(1);
 		}
+		points = new_points;
 	    }
-	    for (i = 0; i < npoints; i++) {
+
+	    while (*ptr != 'x' && i < npoints) { /* not end-of-line marker */
 		sscanf(ptr, "%4d%4d", &x, &y);
 		ptr += 8;
 		points[i].x = X(x);
 		points[i].y = Y(y);
+		i++;
 	    }
-	    XFillPolygon(dpy, plot->pixmap, *current_gc, points, npoints, Nonconvex, CoordModeOrigin);
+
+	    if (i >= npoints) {
+		/* only do the call if list is complete by now */
+		XFillPolygon(dpy, plot->pixmap, *current_gc, points, npoints,
+			     Nonconvex, CoordModeOrigin);
+		/* Flag this continuation line as closed */
+		saved_npoints = saved_i = -1;
+	    } else {
+		/* Store how far we got: */
+		saved_i = i;
+	    }
 	}
     }
 #endif
