@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: wgraph.c,v 1.20 2001/04/12 15:02:30 broeker Exp $";
+static char *RCSid = "$Id: wgraph.c,v 1.21 2001/09/18 17:46:33 broeker Exp $";
 #endif
 
 /* GNUPLOT - win/wgraph.c */
@@ -1034,11 +1034,11 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 	break;
 	case W_pm3d_filled_polygon_pt:
 	    {
-		/* a point of the polygon is coming.
-		   note: if a polygon with larger nb of pts is needed, then reallocated
-		   ppt for an increased number polymax
-		   */
-		assert(polyi<polymax);
+		/* a point of the polygon is coming */
+		if (polyi >= polymax) {
+		    polymax += 200;
+		    ppt = (POINT *)LocalReAllocPtr(ppt, LHND, (polymax+1) * sizeof(POINT));
+		}
 		ppt[polyi].x = xdash;
 		ppt[polyi].y = ydash;
 		polyi++;

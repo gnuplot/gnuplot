@@ -1,5 +1,5 @@
 /*
- * $Id: wcommon.h,v 1.7 1998/03/22 22:35:27 drd Exp $
+ * $Id: wcommon.h,v 1.1 1999/03/26 22:11:00 lhecking Exp $
  */
 
 /* GNUPLOT - wcommon.h */
@@ -65,6 +65,7 @@ extern LPSTR szGraphClass;
 extern LPSTR szAboutClass;
 
 void NEAR * LocalAllocPtr(UINT flags, UINT size);
+void NEAR * LocalReAllocPtr(void NEAR * ptr, UINT flags, UINT size);
 void LocalFreePtr(void NEAR *ptr);
 LPSTR GetInt(LPSTR str, LPINT pval);
 

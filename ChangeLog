@@ -1,20 +1,28 @@
+2001-09-19  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* src/win/wcommon.h src/win/wgnuplib.c: New routine
+	LocalReAllocPtr().
+	
+	* src/win/wgraph.c: Dynamically allocate enough memory for a
+	polygon with many corners (fixes 'plot with filledcurves').
+
 2001-09-19  Alexander Mai <st002279@hrzpub.tu-darmstadt.de>
 
 	* INSTALL docs/gnuplot.doc: Fix old URLs (use gnuplot.org now);
-	add hyperlinks. Move pointers to frontends for gnuplot
+	add hyperlinks. Move pointers to frontends for gnuplot.
 
 	* configure configure.in docs/Makefile.in: Let configure 
-	check for even more utils which we use. Always check for emacs
+	check for even more utils which we use. Always check for emacs.
 
 2001-09-18  Alexander Mai <st002279@hrzpub.tu-darmstadt.de>
 
 	* src/readline.c: Fix Gnuplot-readline implementation to
-	distinguish between VIO and xterm
+	distinguish between VIO and xterm on OS/2.
 
 	* term/post.trm: Fix broken PS code for Symbol Oblique font
-	definition. Thanks to Michael Vulis from MicroPress
+	definition. Thanks to Michael Vulis from MicroPress.
 
-	* src/getcolor.c: Drop duplicate #includes
+	* src/getcolor.c: Drop duplicate #includes.
 
 2001-09-18  Alexander Mai <st002279@hrzpub.tu-darmstadt.de>
 
@@ -148,7 +156,7 @@
 2001-09-05  Alexander Mai <st002279@hrzpub.tu-darmstadt.de>
 
 	* src/Makefile.am tutorial/Makefile.am: fixes to make
-	automake 1.5 happy. Should work as well with automake 1.4
+	automake 1.5 happy. Should work as well with automake 1.4.
 
 2001-09-04  James R. Van Zandt  <jrv@vanzandt.mv.com>
 
