@@ -110,7 +110,30 @@ void MAC_options __PROTO(());
 void MAC_suspend __PROTO(());
 void MAC_resume __PROTO(());
 int  MAC_setfont __PROTO((char *font));
-#endif
+#endif /* TERM_PROTO */
+
+#ifndef TERM_PROTO_ONLY
+#ifdef TERM_BODY
+#endif /* TERM_BODY */
+
+#ifdef TERM_TABLE
+
+TERM_TABLE_START(mac_driver)
+    "macintosh", "Macintosh Graphic Window",
+    MAC_XMAX, MAC_YMAX, MAC_VCHAR+1, MAC_HCHAR,
+    MAC_VTIC, MAC_HTIC, MAC_options,MAC_init, MAC_reset,
+    MAC_text, null_scale, MAC_graphics, MAC_move, MAC_vector,
+    MAC_linetype, MAC_put_text, MAC_text_angle,
+    MAC_justify_text, do_point, do_arrow,
+    MAC_setfont, NULL, TERM_CAN_MULTIPLOT+TERM_BINARY,
+    MAC_suspend, MAC_resume
+TERM_TABLE_END(mac_driver)
+
+#undef LAST_TERM
+#define LAST_TERM mac_driver
+
+#endif /* TERM_TABLE */
+#endif /* TERM_PROTO_ONLY */
 
 #ifdef TERM_HELP
 START_HELP(mac)
@@ -144,26 +167,6 @@ START_HELP(mac)
 "  window will be reused as long as singlewin is in effect. If you switch back",
 "  to multiwin, generate some graphs, and then switch to singlewin again, the",
 "  orginal 'singlewin' window will be resused if it is still open. Otherwise",
-"  a new 'singlewin' window will be created. The 'singlewin' window is not numbered.",
-#endif
-
-
-#ifndef TERM_PROTO_ONLY
-#ifdef TERM_BODY
-#endif
-#ifdef TERM_TABLE
-
-TERM_TABLE_START(mac_driver)
-    "macintosh", "Macintosh Graphic Window",
-    MAC_XMAX, MAC_YMAX, MAC_VCHAR+1, MAC_HCHAR, 
-    MAC_VTIC, MAC_HTIC, MAC_options,MAC_init, MAC_reset, 
-    MAC_text, null_scale, MAC_graphics, MAC_move, MAC_vector,
-    MAC_linetype, MAC_put_text, MAC_text_angle, 
-    MAC_justify_text, do_point, do_arrow,
-    MAC_setfont, NULL, TERM_CAN_MULTIPLOT+TERM_BINARY,
-    MAC_suspend, MAC_resume} 
-#undef LAST_TERM
-#define LAST_TERM mac_driver
-#endif
-#endif /* TERM_PROTO_ONLY */
-
+"  a new 'singlewin' window will be created. The 'singlewin' window is not numbered."
+END_HELP(mac)
+#endif /* TERM_HELP */
