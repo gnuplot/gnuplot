@@ -1,3 +1,38 @@
+1999-06-09  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* configure.in: Use TERMLIBS instead of LIBS in readline test.
+
+	* src/command.c(command): Remove a few static arrays.
+
+1999-06-09  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/graph3d.c(boundary3d, do_3dplot): Suppress calculation of
+	key_cols and key_rows if key is empty.
+
+1999-06-08  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* lisp/ChangeLog, lisp/gnuplot.el: Updated to 0.5g.
+
+	* lisp/acinclude.m4: Latest lispdir.m4 from automake-cvs.
+
+	* lisp/aclocal.m4, lisp/configure: Regenerated.
+
+	* src/alloc.h: src/binary.h, src/bitmap.h, src/fnproto.h, src/help.h,
+	src/national.h, src/protos.h, src/setshow.h: Protect against multiple
+	inclusion.
+
+	* term/mac.trm: Rearange to match terminal layout guidelines.
+
+	* tutorial/header.tex: Add comment about LaTeX warning.
+
+1999-06-08  Alexander Mai  <st002279@HRzpUB.tu-darmstadt.DE>
+
+	* src/set.c(get_style): Add new errorlines styles to error message.
+
+1999-06-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* term/gif.trm(GIF_graphics): Fix off-by-one error in y-scaling.
+
 1999-06-06  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* src/alloc.c: Indentation.
@@ -47,13 +82,6 @@
 1999-06-03  David Dyck  <dcd@tc.fluke.com>
 
 	* src/util.c: Fix VPRINTF/VFPRINTF typos.
-
-1999-06-02  Lars Hecking  <lhecking@nmrc.ucc.ie>
-
-	* src/command.c(command,do_system): Shell commands '!cmd' are now
-	treated	like ordinary gnuplot commands, get no more special treatment
-	when at the beginning of a command line, and may appear anywhere
-	on a ';' separated command line.
 
 1999-06-01  Lars Hecking  <lhecking@nmrc.ucc.ie>
 

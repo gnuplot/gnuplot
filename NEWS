@@ -24,11 +24,6 @@ Changes in release 3.7.1:
   variable number of arguments. On platforms without vfprintf
   or doprnt, the number of format-dependent arguments is
   limited to 8.
-* CHANGE shell commands !cmd may now appear anywhere on a
-  ';' separated command line, and get no more special treatment
-  when at the beginning of a command line; the VMS version of
-  command.c(do_system) may not work as expected. May interfere
-  with expression evaluation.
 
 [3.7.0.6]
 * Petr Mikulik's OS/2 mouse patch integrated
