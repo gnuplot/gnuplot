@@ -1,5 +1,9 @@
 2003-11-24  Petr Mikulik  <mikulik@physics.muni.cz>
 
+	* term/xlib.h: Fixed typo (missing ` makes some of doc2xxx fail).
+
+2003-11-24  Petr Mikulik  <mikulik@physics.muni.cz>
+
 	* docs/gnuplot.doc src/gp_hist.h src/command.c src/history.c: Allow
 	'history "file"' be a pipe. New option 'history "file" append'.
 

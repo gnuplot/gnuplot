@@ -1,5 +1,5 @@
 /*
- * $Id: xlib.trm,v 1.10 2002/12/13 14:59:07 lhecking Exp $
+ * $Id: xlib.trm,v 1.12 2003/11/18 01:20:18 sfeam Exp $
  */
 
 /* GNUPLOT - xlib.trm */
@@ -32,7 +32,7 @@ TERM_PUBLIC void
 Xlib_init()
 {
     /* x11.trm thinks it is writing to a private pipe, but here we */
-    /* set it to use the channel opened by 'set output <file>`     */
+    /* set it to use the channel opened by 'set output <file>'     */
     X11_ipc = gpoutfile;
 
 #ifdef PIPE_IPC
@@ -92,7 +92,7 @@ START_HELP(xlib)
 "?xlib",
 " The `xlib` terminal driver supports the X11 Windows System.  It generates",
 " gnuplot_x11 commands, but sends them to the output file specified by",
-" `set output '<filename>'. `set term x11` is equivalent to",
+" `set output '<filename>'`. `set term x11` is equivalent to",
 " `set terminal xlib; set output \"|gnuplot_x11 -noevents\"`.",
 " `xlib` takes the same set of options as `x11`."
 END_HELP(xlib)
