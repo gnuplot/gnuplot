@@ -1,4 +1,4 @@
-/* $Id: command.h,v 1.7 1999/07/30 19:33:48 lhecking Exp $ */
+/* $Id: command.h,v 1.8 1999/08/07 17:20:22 lhecking Exp $ */
 
 /* GNUPLOT - command.h */
 
@@ -79,5 +79,16 @@ extern __far int num_tokens, c_token;
 #else
 extern int num_tokens, c_token;
 #endif
+
+
+/* used by load_command() and save_command() */
+
+/* Capture filename from unput_line and
+ * fopen in `mode' ("r", "w" etc.)
+ */
+#define CAPTURE_FILENAME_AND_FOPEN(mode) \
+  m_quote_capture(&save_file,c_token,c_token); \
+  gp_expand_tilde(&save_file); \
+  fp = strcmp(save_file, "-") ? fopen(save_file, (mode)) : stdout;
 
 #endif /* GNUPLOT_COMMAND_H */
