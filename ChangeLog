@@ -1,5 +1,20 @@
 2000-12-05  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
+	* term/win.trm: un-comment the mouse function dummy entries in the
+	terminal entry.
+
+	* src/win/wgraph.c: include "getcolor.h". Fixes bug in Win32-pm3d
+ 	handling reported by Petr Mikulik
+
+	* src/win/wgnuplib.h (farmalloc): make this macro definition
+ 	active for Borland C++ compilers higher than a certain version.
+
+	* src/hidden3d.c (split_line_at_ratio): changed vertex arguments
+ 	from pointer to array index avoid dangling pointers after realloc
+ 	of vlist array.
+
+2000-12-05  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
 	* term/svg.trm: new driver.
 	* src/term.h: #include it.
 
