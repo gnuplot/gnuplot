@@ -9,9 +9,11 @@ CC = sc
 # Remove 'MATH=IEEE' if you don't want to use the better Commodore
 # math-routines. If you do so, you'll have to change 'scmieee.lib'
 # to 'scm.lib' in the gnuplot and bf_test target lines below.
-# I am guessing the syntax here : I want to define GP_INLINE=__inline
+# I am guessing the syntax here : I want to define GP_INLINE=__inline.
+# If you have SAS/C 6.57 or newer, you may wish to disable warning 317
+# too. Just add it in the COPTS line.
 OFLAGS = opt
-DEFS   = def=AMIGA_SC_6_1 def=ANSI_C def=HAVE_STRNICMP def=HAVE_GETCWD def=PIPES def=GP_INLINE=__inline
+DEFS   = def=AMIGA_SC_6_1 def=ANSI_C def=HAVE_SYS_STAT_H def=HAVE_STRNICMP def=HAVE_GETCWD def=PIPES def=GP_INLINE=__inline
 COPTS  = idir=term data=f math=i ign=304+306 #noerrhigh #errrexx
 DEBUG  = # Will be dbg=sf when called with smake -f makefile.amg debug
 CFLAGS = $(COPTS) $(DEFS) $(OFLAGS) $(DEBUG)
