@@ -1,4 +1,11 @@
-Thu Feb 14 14:49:28 2002  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+2002-02-14  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* src/mouse.c: Don't change splot view if there is a log axis with a
+	negative range coordinate.
+
+	* src/unset.c: Remove #ifdef USE_MOUSE inside another USE_MOUSE.
+
+2002-02-14  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* term/x11.trm: #include <ctype.h>.  Some stylistic changes here
  	and there.
