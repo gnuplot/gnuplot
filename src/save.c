@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.91 2004/10/26 04:30:52 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.92 2004/11/06 21:18:45 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -725,8 +725,15 @@ set ticscale %g %g\n",
 
     SAVE_AXISLABEL(FIRST_Y_AXIS);
     SAVE_AXISLABEL(SECOND_Y_AXIS);
-    save_range(fp, FIRST_Y_AXIS);
-    save_range(fp, SECOND_Y_AXIS);
+    if (splot_map == FALSE) {
+	save_range(fp, FIRST_Y_AXIS);
+	save_range(fp, SECOND_Y_AXIS);
+    } else { /* 'set view map' uses flipped y-axes */
+	splot_map_deactivate();
+	save_range(fp, FIRST_Y_AXIS);
+	save_range(fp, SECOND_Y_AXIS);
+	splot_map_activate();
+    }
 
     SAVE_AXISLABEL(FIRST_Z_AXIS);
     save_range(fp, FIRST_Z_AXIS);

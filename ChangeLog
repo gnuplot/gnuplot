@@ -1,3 +1,7 @@
+2004-11-10  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* src/save.c: Fix y-axes reversal when saving during 'set view map'.
+
 2004-11-08  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/term.c (do_arrow test_term): Do not attempt filled arrowheads if
