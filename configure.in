@@ -24,14 +24,15 @@ dnl Optional features.
 
 dnl Do not use the included readline function
 AC_ARG_WITH(readline,dnl
-[  --without-readline      do not use the included readline function],,
-  AC_DEFINE(READLINE)
+[  --with-readline         use the included minimal readline function (default)
+  --without-readline      do not use the included readline function],,
+test -z "$with_readline" && with_readline=yes
 )dnl
 
 dnl The GNU readline library
 AC_ARG_WITH(gnu-readline,dnl
-[  --with-gnu-readline     use the GNU readline version
-  --with-gnu-readline=PATH        Specify the location of libreadline],,
+[  --with-gnu-readline     use the GNU readline library
+  --with-gnu-readline=PATH        Specify the location of GNU readline],,
 test -z "$with_gnu_readline" && with_gnu_readline=no
 )dnl
 
@@ -162,6 +163,14 @@ dnl FIXME AC_DEFINE(KSR)
 dnl Check for MSDOS and djgpp, NeXT
 gp_MSDOS
 gp_NEXT
+dnl gcc on Digital Unix
+dnl gnuplot dumps core in prob.dem unless
+dnl compiled with -mieee
+AC_EGREP_CPP(yes,dnl
+ [#if __GNUC__ && __osf__
+   yes
+  #endif
+ ],CFLAGS="-mieee $CFLAGS")
 
 dnl this has to be after -lsys_s on NeXT
 LIBS="$LIBS -lm"
@@ -253,24 +262,39 @@ dnl
 dnl most unices need termcap with readline, but not Debian linux, which
 dnl does not even supply it, or so I am told
 
-if test "$with_gnu_readline" = yes; then
-    AC_CHECK_LIB(termcap, tputs, gp_tcap="-ltermcap", gp_tcap="")
-    AC_CHECK_LIB(readline, readline, 
-      LIBS="$LIBS -lreadline $gp_tcap",
-   AC_MSG_ERROR([Can't find -lreadline in a standard path -- specify its location using --with-gnu-readline=/path/to/libreadline.a]),
-	  $gp_tcap 
-    )dnl readline
-    AC_DEFINE(GNU_READLINE)
+if test "$with_gnu_readline" != no; then
+  dnl check for terminal library
+  dnl this is a very cool solution from octave's configure.in
+  gp_tcap=""
+  for termlib in ncurses curses termcap terminfo termlib; do
+    AC_CHECK_LIB(${termlib}, tputs, [gp_tcap="${gp_tcap} -l${termlib}"])
+    case "${gp_tcap}" in
+      *-l${termlib}*)
+        AC_MSG_RESULT([using ${gp_tcap} with readline])
+        break
+      ;;
+    esac
+  done
 
-  elif test "$with_gnu_readline" != no; then
+  if test "$with_gnu_readline" = yes; then
+    AC_CHECK_LIB(readline, readline,dnl
+     LIBS="$LIBS -lreadline $gp_tcap"
+     AC_DEFINE(GNU_READLINE)
+     with_readline=no,dnl
+     AC_MSG_ERROR([Can't find -lreadline in a standard path -- specify its location using --with-gnu-readline=/path/to/libreadline.a]),dnl
+     ${gp_tcap})dnl readline
+  else
     if test ! -f $with_gnu_readline ; then
       AC_MSG_ERROR([No such file $with_gnu_readline])
     fi
 
-    AC_CHECK_LIB(termcap, tputs, gp_tcap=" -ltermcap", gp_tcap="")
     LIBS="$LIBS $with_gnu_readline $gp_tcap"
     AC_DEFINE(GNU_READLINE)
+    with_readline=no
+  fi
 fi
+
+test "$with_readline" = yes && AC_DEFINE(READLINE)
 dnl end readline
 
 dnl libplot
@@ -408,7 +432,6 @@ AC_SUBST(VERSION)
 AC_SUBST(LASERGNU)
 AC_SUBST(LINUXSUID)
 AC_SUBST(NEXTOBJS)
-AC_SUBST(TERMFLAGS)
 AC_SUBST(TERMLIBS)
 AC_SUBST(TERMXLIBS)
 
@@ -445,7 +468,7 @@ test "$ac_cv_header_zlib_h" = yes && \
 test "$with_cwdrc" = yes && \
   AC_MSG_RESULT([  Check current directory for .gnuplot file.])
 
-if test -f "$with_gnu_readline"; then
+if test "$with_gnu_readline" != no; then
   AC_MSG_RESULT([  Use GNU readline library.])
 else
   test "$with_readline" != no && \
