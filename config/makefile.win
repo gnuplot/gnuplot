@@ -1,5 +1,5 @@
 #
-# $Id: makefile.win,v 1.11 2002/02/21 12:27:37 lhecking Exp $
+# $Id: makefile.win,v 1.12 2002/03/07 16:20:15 lhecking Exp $
 #
 # GNUPLOT Makefile for Borland C++ 3.1 Windows version
 # and Win32 using Borland C++ 4 (or 5? --- 4.52 is known to work)
@@ -94,7 +94,7 @@ DEFINE_HELPFILE = -DHELPFILE="$(HELPFILE)"
 #    capability add -DREADLINE to CFLAGS then add 'readline' to the /o
 #    section of the linker call.
 !if $(WIN32)
-CFLAGS = -c -W -M -G -y -v -w-rvl -w-use -w-par -w-aus -w-pro $(PROCESSOR_OPT) -I$(TC)\include -Iwin -DREADLINE=1 -DHAVE_STRNICMP -DWIN32 -DHAVE_STRERROR -DNO_GIH -DWIN32_LEAN_AND_MEAN -DPROTOTYPES -DHAVE_VFPRINTF -DHAVE_GETCWD -DHAVE_STPCPY -DPM3D=1 -DUSE_MOUSE=1 -DWIN_IPC -DHAVE_STRINGIZE
+CFLAGS = -c -W -M -G -y -v -w-rvl -w-use -w-par -w-aus -w-pro $(PROCESSOR_OPT) -I$(TC)\include -Iwin -DREADLINE=1 -DHAVE_STRNICMP -DWIN32 -DHAVE_STRERROR -DNO_GIH -DWIN32_LEAN_AND_MEAN -DPROTOTYPES -DHAVE_VFPRINTF -DHAVE_GETCWD -DHAVE_STPCPY -DPM3D=1 -DUSE_MOUSE=1 -DWIN_IPC -DHAVE_STRINGIZE -DGP_MATHERR=_matherr -DGP_EXCEPTION=_exception -DHAVE_STRUCT_EXCEPTION_IN_MATH_H=1
 CAUXFLAGS = -tWC -w-par -w-use -w-aus -f -N -M -y -v -d -I$(TC)\include -DWIN32 -DWINDOWS_NO_GUI -DHAVE_STRNICMP -DPROTOTYPES -DPM3D=1 -DHAVE_STRINGIZE
 !else
 CFLAGS = -c -W -ml -w-par -w-use -w-aus -f -h -N -M -y -v -d -Ff=32 -I$(TC)\include -Iwin -DREADLINE=1 -zEGPFAR_DATA -DHAVE_STRNICMP -DMSDOS=1 -DNO_GIH -DPROTOTYPES -DHAVE_GETCWD -DHAVE_VFPRINTF -DNDEBUG -DHAVE_STRINGIZE

@@ -1,5 +1,5 @@
 /*
- * $Id: syscfg.h,v 1.21 2002/02/21 12:27:37 lhecking Exp $
+ * $Id: syscfg.h,v 1.22 2002/03/07 16:26:12 lhecking Exp $
  */
 
 /* GNUPLOT - syscfg.h */
@@ -425,6 +425,12 @@ typedef RETSIGTYPE (*sigfunc)__PROTO((void));
 
 #ifndef GP_MATHERR
 # define GP_MATHERR matherr
+#endif
+
+#ifdef HAVE_STRUCT_EXCEPTION_IN_MATH_H
+# define STRUCT_EXCEPTION_P_X struct GP_EXCEPTION_NAME *x
+#else
+# define STRUCT_EXCEPTION_P_X /* nothing */
 #endif
 
 /* if GP_INLINE has not yet been defined, set to __inline__ for gcc,

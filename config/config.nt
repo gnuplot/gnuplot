@@ -13,7 +13,9 @@
 #define GP_INLINE __inline
 #define GP_EXCEPTION_NAME	_exception
 #define GP_MATHERR		_matherr
+#define HAVE_STRUCT_EXCEPTION_IN_MATH_H	1
 #define PROTOTYPES		1
+#define HAVE_STRINGIZE		1
 
 #ifndef __WIN32__
 # define __WIN32__

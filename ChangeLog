@@ -1,3 +1,20 @@
+2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* config/makefile.win (CFLAGS) [WIN32]: Added flags to define
+ 	GP_MATHERR, GP_EXCEPTION and HAVE_STRUCT_EXCEPTION_IN_MATH_H.
+
+	* config/config.nt (HAVE_STRUCT_EXCEPTION_IN_MATH_H,
+ 	HAVE_STRINGIZE): Added these definitions.
+
+	* src/syscfg.h (STRUCT_EXCEPTION_P_X): Moved definition block to
+ 	here, from internal.c.  Use GP_EXCEPTION_NAME as the name of this
+ 	structure.  Clarify behaviour by #defining this to be an empty
+ 	macro if matherr() doesn't take an argument.
+
+	* src/internal.c (GP_MATHERR): Renamed, was matherr.
+	(matherr, exception): Removed #defines, as they are no longer
+ 	useful.
+
 2002-03-07  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* PORTING, config/buildvms.com, config/config.cyg, config/config.mgw,
