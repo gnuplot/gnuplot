@@ -1184,7 +1184,8 @@ do{ assert(!polar && !parametric); \
 	    else
 		break;
 	}
-
+	/* when step debugging, set breakpoint here to get through
+	 * the 'read function' loop above quickly */
 	if (parametric) {
 	    /* Now actually fix the plot pairs to be single plots */
 	    /* also fixes up polar&&parametric fn plots */
