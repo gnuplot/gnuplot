@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.in,v 1.112 2002/04/29 13:37:01 broeker Exp $
+dnl $Id: configure.in,v 1.113 2002/04/30 19:16:52 lhecking Exp $
 dnl
 AC_INIT(src/graphics.c)
 AM_CONFIG_HEADER(config.h:config.hin)
@@ -442,6 +442,19 @@ if test "$with_newgd" = yes; then
     with_ttf="yes")
 
   if test "$with_ttf" = yes; then
+  AC_CHECK_LIB(gd,gdImageStringFT,,
+    [AC_MSG_WARN([ TTF support not found - trying again with explicit libraries ])
+     with_ttf="fail"], [ ] )
+  fi
+  if test "$with_ttf" = fail; then
+  AC_CHECK_LIB(gd,gdImageStringTTF,
+    with_ttf="yes",
+    [AC_MSG_WARN([ TTF support missing in libgd or freetype library not found ])
+     with_ttf="no"],
+    [-lpng -lz -lfreetype ])
+  fi
+  
+  if test "$with_ttf" = yes; then
     AC_DEFINE(HAVE_TTF, 1, [ Define if TrueType font support in libgd ])
   fi
 fi
@@ -604,12 +617,9 @@ AC_ARG_WITH(row-help,dnl
 dnl Wether we want to create the LaTeX tutorial
 TUTORIAL=tutorial
 AC_ARG_WITH(tutorial,dnl
-[  --without-tutorial      do not build LaTeX tutorial],,
-  [if test "$with_tutorial" = no; then
-     TUTORIAL=notutorial
-   fi])
+[  --without-tutorial      do not build LaTeX tutorial])
 dnl only if latex/2e is found
-if test "$LATEX" = no; then
+if test "$LATEX" = no -o "$with_tutorial" = no ; then
   TUTORIAL=notutorial
   with_tutorial=no
 fi

@@ -7,6 +7,14 @@
 	* term/pdf.trm, docs/gnuplot.doc, pm3d/README: pm3d support
 	for the pdf driver
 
+2002-05-13  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* configure.in: Fix for broken --without-tutorial option.
+
+2002-05-13  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* configure.in: Improved testing for libfreetype dependency in libgd.
+
 2002-05-01  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* docs/gnuplot.doc: Mention PNG supports pm3d.
@@ -423,7 +431,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/05/15 05:51:39 $).
+	last modification date (from the tag $Date: 2002/05/15 20:56:26 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
