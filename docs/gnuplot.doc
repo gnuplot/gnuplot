@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.117 2002/07/20 14:56:29 mikulik Exp $
+C RCS $Id: gnuplot.doc,v 1.118 2002/07/21 12:32:52 mikulik Exp $
 C 18 September 2001
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001   Thomas Williams, Colin Kelley et al.
 C
@@ -6321,22 +6321,34 @@ C ... and restart the table:
 ?set style candlesticks
 ?style candlesticks
 ?candlesticks
- The `candlesticks` style is only relevant for 2-d data plotting of financial
- data.  Five columns of data are required; in order, these should be the x
+ The `candlesticks` style can be used for 2-d data plotting of financial
+ data or for generating box-and-whisker plots of statistical data.  
+ Five columns of data are required; in order, these should be the x
  coordinate (most likely a date) and the opening, low, high, and closing
- prices.  The symbol is an open rectangle, centered horizontally at the x
+ prices.  The symbol is a rectangular box, centered horizontally at the x
  coordinate and limited vertically by the opening and closing prices.  A
  vertical line segment at the x coordinate extends up from the top of the
- rectangle to the high price and another down to the low.  The width of the
- rectangle may be changed by `set bars`.  The symbol will be unchanged
- if the low and high prices are interchanged.  The rectangle is pseudo-filled 
- by three vertical lines inside it, if the open value is larger than
- the close. Otherwise it's left empty. See `set bars` and `financebars`.
-
- See also
+ rectangle to the high price and another down to the low.  The vertical line 
+ will be unchanged if the low and high prices are interchanged.
+ The width of the rectangle is controlled by `set bars <width>`.
+ By default the rectangle is empty if (open > close), and filled with three
+ vertical bars if (close > open). If filled-boxes support is present, then
+ the rectangle is colored according to `set style fill <fillstyle>`.
+ See `set bars` and `financebars`.  See also
 ^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/finance/finance.html">
  finance demos.
 ^ </a>
+
+ Note: To place additional symbols, such as the median value, on a
+ box-and-whisker plot requires additional plot commands as in this example:
+
+   # Data columns: X Median 1stQuartile 2ndQuartile 3rdQuartile 4thQuartile
+   set bars 4.0
+   set style fill empty
+   plot 'stat.dat' using 1:4:3:6:5 with candlesticks title 'Quartiles', \
+        ''         using 1:2:2:2:2 with candlesticks lt -1 notitle
+ 
+  See also `set bars` and `set style filling`.
 4 dots
 ?commands set style dots
 ?set style dots

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.66 2002/02/25 03:10:41 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.67 2002/07/21 12:32:53 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -3004,6 +3004,39 @@ plot_c_bars(plot)
 	if (!high_inrange && !low_inrange && ylowM == yhighM)
 	    /* both out of range on the same side */
 	    continue;
+
+#ifdef USE_ULIG_FILLEDBOXES
+	/* EAM Sep 2001 use term->fillbox() code if present */
+	if ((fillstyle > 0) && (term->fillbox)) {
+	    int ymin, ymax, fillpar, style;
+	    /* Set style parameter (horrible bit-packing hack) */
+	    /* This code copied from filledboxes below         */
+                    switch( fillstyle ) {
+                    case 1:
+			/* style == 1 --> solid fill with 'filldensity' */
+                        fillpar = filldensity;
+                        break;
+                    case 2:  
+			/* style == 2 --> pattern fill with 'fillpattern' */
+                        fillpar = fillpattern;
+                        break;
+                    default:
+			/* style == 0 or unknown --> solid fill with background color */
+                        fillpar = 0;
+                    }
+                    style = ((fillpar & 0xfff) << 4) + (fillstyle & 0xf);
+	    if (map_y(yopen) < map_y(yclose)) {
+	    	ymin = map_y(yopen); ymax = map_y(yclose);
+	    } else {
+	    	ymax = map_y(yopen); ymin = map_y(yclose);
+	    }
+	    term->fillbox( style,
+	    	    (unsigned int)(xM - bar_size * tic),
+		    (unsigned int)(ymin),
+		    (unsigned int)(2 * bar_size * tic),
+		    (unsigned int)(ymax-ymin)  );
+	}
+#endif
 
 	/* by here everything has been mapped */
 	if (yopen <= yclose) {
