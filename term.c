@@ -205,7 +205,7 @@ static void term_close_output()
 void term_set_output(dest)
 char *dest;
 {
-    FILE *f;
+    FILE *f = NULL;
 
     FPRINTF((stderr, "term_set_output\n"));
     assert(dest == NULL || dest != outstr);
