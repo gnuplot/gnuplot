@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.41 2002/07/21 12:32:53 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.42 2002/07/23 18:53:13 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -908,12 +908,16 @@ TBOOLEAN head;
 	}
 #endif
 	/* draw outline of forward arrow head */
-	(*t->move) (ex + x1, ey + y1); /* forward arrow head */
-	(*t->vector) (ex, ey);
-	(*t->vector) (ex + x2, ey + y2);
 	if (curr_arrow_headfilled) {
-	    /* close outline */
+	    (*t->move) (ex + (x1 + x2)/2, ey + (y1 + y2)/2);
 	    (*t->vector) (ex + x1, ey + y1);
+	    (*t->vector) (ex, ey);
+	    (*t->vector) (ex + x2, ey + y2);
+	    (*t->vector) (ex + (x1 + x2)/2, ey + (y1 + y2)/2);
+	} else {
+	    (*t->move) (ex + x1, ey + y1);
+	    (*t->vector) (ex, ey);
+	    (*t->vector) (ex + x2, ey + y2);
 	}
 	if (head == 2) { /* backward arrow head */
 #ifdef PM3D
@@ -929,12 +933,16 @@ TBOOLEAN head;
 	    }
 #endif
 	    /* draw outline of backward arrow head */
+	    if (curr_arrow_headfilled) {
+		(*t->move) ( sx - (x1 + x2)/2, sy - (y1 + y2)/2);
+		(*t->vector) ( sx - x2, sy - y2);
+		(*t->vector) (sx, sy);
+		(*t->vector) (sx - x1, sy - y1);
+		(*t->vector) ( sx - (x1 + x2)/2, sy - (y1 + y2)/2);
+	    } else {
 	    (*t->move) ( sx - x2, sy - y2);
 	    (*t->vector) (sx, sy);
 	    (*t->vector) (sx - x1, sy - y1);
-	    if (curr_arrow_headfilled) {
-		/* close outline */
-		(*t->vector) (sx - x2, sy - y2);
 	    }
 	}
     }
