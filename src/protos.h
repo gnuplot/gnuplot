@@ -304,9 +304,15 @@ double magnitude __PROTO((struct value *val));
 double angle __PROTO((struct value *val));
 struct value * Gcomplex __PROTO((struct value *a, double realpart, double imagpart));
 struct value * Ginteger __PROTO((struct value *a, int i));
-void os_error __PROTO((char str[], int t_num));
-void int_error __PROTO((char str[], int t_num));
-void int_warn __PROTO((char str[], int t_num));
+#if defined(VA_START) && defined(ANSI_C)
+void os_error __PROTO((int, char *, ...));
+void int_error __PROTO((int, char *, ...));
+void int_warn __PROTO((int, char *, ...));
+#else
+void os_error ();
+void int_error ();
+void int_warn ();
+#endif
 void lower_case __PROTO((char *s));
 void squash_spaces __PROTO((char *s));
 

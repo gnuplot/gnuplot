@@ -155,6 +155,9 @@ int t_num;
 int is_notempty(t_num)
 int t_num;
 {
+    if (!isstring(t_num))
+	return FALSE;
+
     return (token[t_num].is_token && token_len(t_num) > 2);
 }
 
@@ -363,7 +366,7 @@ struct value *val;
 		    num_to_str(val->v.cmplx_val.real));
 	break;
     default:
-	int_error("unknown type in disp_value()", NO_CARET);
+	int_error(NO_CARET, "unknown type in disp_value()");
     }
 }
 
@@ -377,7 +380,7 @@ struct value *val;
     case CMPLX:
 	return (val->v.cmplx_val.real);
     }
-    int_error("unknown type in real()", NO_CARET);
+    int_error(NO_CARET, "unknown type in real()");
     /* NOTREACHED */
     return ((double) 0.0);
 }
@@ -392,7 +395,7 @@ struct value *val;
     case CMPLX:
 	return (val->v.cmplx_val.imag);
     }
-    int_error("unknown type in imag()", NO_CARET);
+    int_error(NO_CARET, "unknown type in imag()");
     /* NOTREACHED */
     return ((double) 0.0);
 }
@@ -411,7 +414,7 @@ struct value *val;
 		     val->v.cmplx_val.imag *
 		     val->v.cmplx_val.imag));
     }
-    int_error("unknown type in magnitude()", NO_CARET);
+    int_error(NO_CARET, "unknown type in magnitude()");
     /* NOTREACHED */
     return ((double) 0.0);
 }
@@ -434,7 +437,7 @@ struct value *val;
 	return (atan2(val->v.cmplx_val.imag,
 		      val->v.cmplx_val.real));
     }
-    int_error("unknown type in angle()", NO_CARET);
+    int_error(NO_CARET, "unknown type in angle()");
     /* NOTREACHED */
     return ((double) 0.0);
 }
@@ -463,16 +466,45 @@ int i;
 }
 
 
-void os_error(str, t_num)
-char str[];
-int t_num;
-{
-#ifdef VMS
-    static status[2] =
-    {1, 0};			/* 1 is count of error msgs */
-#endif /* VMS */
+/* some macros for the error and warning functions below
+ * may turn this into a utility function later
+ */
+#define PRINT_SPACES_UNDER_PROMPT \
+{ register int i; \
+  for (i = 0; i < sizeof(PROMPT) - 1; i++) \
+   (void) fputc(' ', stderr); \
+}
 
-    register int i;
+#define PRINT_SPACES_UPTO_TOKEN \
+{ register int i; \
+   for (i = 0; i < token[t_num].start_index; i++) \
+    (void) fputc((input_line[i] == '\t') ? '\t' : ' ', stderr); \
+}
+
+#define PRINT_CARET fputs("^\n",stderr);
+
+#define PRINT_FILE_AND_LINE \
+ if (!interactive) { \
+        if (infile_name != NULL) \
+            fprintf(stderr, "\"%s\", line %d: ", infile_name, inline_num); \
+        else fprintf(stderr, "line %d: ", inline_num); \
+ }
+
+#if defined(VA_START) && defined(ANSI_C)
+void os_error (int t_num, char *str, ...)
+#else
+void os_error(t_num, str, va_alist)
+int t_num;
+char *str;
+va_dcl
+#endif
+{
+#ifdef VA_START
+    va_list args;
+#endif
+#ifdef VMS
+    static status[2] = {1, 0};			/* 1 is count of error msgs */
+#endif /* VMS */
 
     /* reprint line if screen has been written to */
 
@@ -480,28 +512,28 @@ int t_num;
 	if (!screen_ok)
 	    fprintf(stderr, "\n%s%s\n", PROMPT, input_line);
 
-	for (i = 0; i < sizeof(PROMPT) - 1; i++)
-	    (void) putc(' ', stderr);
-	for (i = 0; i < token[t_num].start_index; i++) {
-	    (void) putc((input_line[i] == '\t') ? '\t' : ' ', stderr);
-	}
-	(void) putc('^', stderr);
-	(void) putc('\n', stderr);
+	PRINT_SPACES_UNDER_PROMPT;
+	PRINT_SPACES_UPTO_TOKEN;
+	PRINT_CARET;
     }
-    for (i = 0; i < sizeof(PROMPT) - 1; i++)
-	(void) putc(' ', stderr);
-    fputs(str, stderr);
+
+    PRINT_SPACES_UNDER_PROMPT;
+
+#ifdef VA_START
+    VA_START (args, str);
+# if HAVE_VPRINTF || _LIBC
+    vfprintf (stderr, str, args);
+# else
+    _doprnt (str, args, stderr);
+# endif
+    va_end (args);
+#else
+    fprintf (stderr, str, a1, a2, a3, a4, a5, a6, a7, a8);
+#endif
     putc('\n', stderr);
 
-    for (i = 0; i < sizeof(PROMPT) - 1; i++)
-	(void) putc(' ', stderr);
-    if (!interactive) {
-	if (infile_name != NULL)
-	    fprintf(stderr, "\"%s\", line %d: ", infile_name, inline_num);
-	else
-	    fprintf(stderr, "line %d: ", inline_num);
-    }
-
+    PRINT_SPACES_UNDER_PROMPT;
+    PRINT_FILE_AND_LINE;
 
 #ifdef VMS
     status[1] = vaxc$errno;
@@ -515,11 +547,18 @@ int t_num;
 }
 
 
-void int_error(str, t_num)
-char str[];
+#if defined(VA_START) && defined(ANSI_C)
+void int_error int t_num, char *str, ...)
+#else
+void int_error (t_num, str, va_alist)
 int t_num;
+char str[];
+va_dcl
+#endif
 {
-    register int i;
+#ifdef VA_START
+    va_list args;
+#endif
 
     /* reprint line if screen has been written to */
 
@@ -527,34 +566,43 @@ int t_num;
 	if (!screen_ok)
 	    fprintf(stderr, "\n%s%s\n", PROMPT, input_line);
 
-	for (i = 0; i < sizeof(PROMPT) - 1; i++)
-	    (void) putc(' ', stderr);
-	for (i = 0; i < token[t_num].start_index; i++) {
-	    (void) putc((input_line[i] == '\t') ? '\t' : ' ', stderr);
-	}
-	(void) putc('^', stderr);
-	(void) putc('\n', stderr);
+	PRINT_SPACES_UNDER_PROMPT;
+	PRINT_SPACES_UPTO_TOKEN;
+	PRINT_CARET;
     }
-    for (i = 0; i < sizeof(PROMPT) - 1; i++)
-	(void) putc(' ', stderr);
-    if (!interactive) {
-	if (infile_name != NULL)
-	    fprintf(stderr, "\"%s\", line %d: ", infile_name, inline_num);
-	else
-	    fprintf(stderr, "line %d: ", inline_num);
-    }
-    fputs(str, stderr);
+
+    PRINT_SPACES_UNDER_PROMPT;
+    PRINT_FILE_AND_LINE;
+
+#ifdef VA_START
+    VA_START (args, str);
+# if HAVE_VPRINTF || _LIBC
+    vfprintf (stderr, str, args);
+# else
+    _doprnt (str, args, stderr);
+# endif
+    va_end (args);
+#else
+    fprintf (stderr, str, a1, a2, a3, a4, a5, a6, a7, a8);
+#endif
     fputs("\n\n", stderr);
 
     bail_to_command_line();
 }
 
 /* Warn without bailing out to command line. Not a user error */
-void int_warn(str, t_num)
-char str[];
+#if defined(VA_START) && defined(ANSI_C)
+void int_warn (int t_num, char *str, ...)
+#else
+void int_warn(t_num, str, va_alist)
 int t_num;
+char str[];
+va_dcl
+#endif
 {
-    register int i;
+#ifdef VA_START
+    va_list args;
+#endif
 
     /* reprint line if screen has been written to */
 
@@ -562,24 +610,27 @@ int t_num;
 	if (!screen_ok)
 	    fprintf(stderr, "\n%s%s\n", PROMPT, input_line);
 
-	for (i = 0; i < sizeof(PROMPT) - 1; i++)
-	    (void) putc(' ', stderr);
-	for (i = 0; i < token[t_num].start_index; i++) {
-	    (void) putc((input_line[i] == '\t') ? '\t' : ' ', stderr);
-	}
-	(void) putc('^', stderr);
-	(void) putc('\n', stderr);
+	PRINT_SPACES_UNDER_PROMPT;
+	PRINT_SPACES_UPTO_TOKEN;
+	PRINT_CARET;
     }
-    for (i = 0; i < sizeof(PROMPT) - 1; i++)
-	(void) putc(' ', stderr);
-    if (!interactive) {
-	if (infile_name != NULL)
-	    fprintf(stderr, "\"%s\", line %d: ", infile_name, inline_num);
-	else
-	    fprintf(stderr, "line %d: ", inline_num);
-    }
-    fprintf(stderr, "warning: %s\n", str);
 
+    PRINT_SPACES_UNDER_PROMPT;
+    PRINT_FILE_AND_LINE;
+
+    fputs("warning: ", stderr);
+#ifdef VA_START
+    VA_START (args, str);
+# if HAVE_VPRINTF || _LIBC
+    vfprintf (stderr, str, args);
+# else
+    _doprnt (str, args, stderr);
+# endif
+    va_end (args);
+#else
+    fprintf (stderr, str, a1, a2, a3, a4, a5, a6, a7, a8);
+#endif
+    putc('\n', stderr);
 }				/* int_warn */
 
 /* Lower-case the given string (DFK) */
