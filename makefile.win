@@ -206,7 +206,7 @@ version.obj: version.c
 
 winmain.obj: win\winmain.c win\wgnuplib.h win\wtext.h plot.h
 	$(BIN)$(CC) @&&!
-$(CFLAGS) -DHELPFILE=\"$(HELPFILE)\"
+$(CFLAGS) -DHELPFILE="$(HELPFILE)"
 ! win\winmain.c
 
 wgnuplot.mnu: win\wgnuplot.mnu

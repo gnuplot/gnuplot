@@ -24,7 +24,7 @@ TOP = .
 CC = gcc
 LD = gcc
 CFLAGS = -g -O2 -I$(TOP) -D_Windows -DNO_GIH -DHAVE_STRNICMP -DREADLINE -DGP_INLINE=inline -DHAVE_SLEEP -DANSI_C -DHAVE_GETCWD -DNEAR=
-LDFLAGS = -g -v # -Wl,--verbose
+LDFLAGS = -g # -v -Wl,--verbose
 
 RM = rm -f
 CP = cp -p
