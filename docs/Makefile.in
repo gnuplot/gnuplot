@@ -156,6 +156,7 @@ doc2hlp: doc2hlp.o termdoc.o
 gih: gnuplot.gih
 
 gnuplot.gih: doc2gih $(srcdir)/gnuplot.doc
+	@rm -f alldoc2gih
 	./doc2gih $(srcdir)/gnuplot.doc gnuplot.gih
 
 doc2gih: doc2gih.o termdoc.o
@@ -166,9 +167,12 @@ allgih: alldoc2gih $(srcdir)/gnuplot.doc
 	@rm -f doc2gih
 	./alldoc2gih $(srcdir)/gnuplot.doc gnuplot.gih
 
-alldoc2gih: doc2gih.c termdoc.o allterm.h
+alldoc2gih: alldoc2gih.o termdoc.o
+	$(LINK) alldoc2gih.o termdoc.o $(LIBS)
+
+alldoc2gih.o: doc2gih.c allterm.h
 	$(COMPILE) -DALL_TERM_DOC -c doc2gih.c
-	$(LINK) doc2gih.o termdoc.o $(LIBS)
+	@mv doc2gih.o alldoc2gih.o
 
 # this is how to make Info documentation
 info: gnuplot.info
@@ -268,6 +272,8 @@ realclean: distclean
 TERM_H = $(srcdir)/../term.h
 
 checkdoc.o: checkdoc.c ../config.h $(srcdir)/../ansichek.h \
+		$(srcdir)/../stdfn.h doc2x.h allterm.h
+alldoc2gih.o: doc2gih.c ../config.h $(srcdir)/../ansichek.h \
 		$(srcdir)/../stdfn.h doc2x.h allterm.h
 doc2gih.o: doc2gih.c ../config.h $(srcdir)/../ansichek.h \
 		$(srcdir)/../stdfn.h doc2x.h $(TERM_H)
