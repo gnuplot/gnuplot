@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.50 2003/02/10 04:28:11 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.51 2003/02/18 16:38:11 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -1636,20 +1636,20 @@ test_term()
     (void) (*t->text_angle) (0);
 
     /* test tic size */
-    (*t->move) ((unsigned int) (xmax_t / 2 + t->h_tic * (1 + ticscale)), (unsigned) 0);
+    (*t->move) ((unsigned int) (xmax_t / 2 + t->h_tic * (1 + ticscale)), (unsigned) ymax_t);
     (*t->vector) ((unsigned int) (xmax_t / 2 + t->h_tic * (1 + ticscale)),
-		  (unsigned int) (ticscale * t->v_tic));
-    (*t->move) ((unsigned int) (xmax_t / 2), (unsigned int) (t->v_tic * (1 + ticscale)));
+		  (unsigned int) (ymax_t - ticscale * t->v_tic));
+    (*t->move) ((unsigned int) (xmax_t / 2), (unsigned int) (ymax_t - t->v_tic * (1 + ticscale)));
     (*t->vector) ((unsigned int) (xmax_t / 2 + ticscale * t->h_tic),
-                  (unsigned int) (t->v_tic * (1 + ticscale)));
+                  (unsigned int) (ymax_t - t->v_tic * (1 + ticscale)));
     /* HBB 19990530: changed this to use right-justification, if possible... */
     if ((*t->justify_text) (RIGHT))
 	(*t->put_text) ((unsigned int) (xmax_t / 2 - 1* t->h_char),
-			(unsigned int) (t->v_tic * 2 + t->v_char / 2),
+			(unsigned int) (ymax_t - (t->v_tic * 2 + t->v_char / 2)),
 		    "test tics");
     else
 	(*t->put_text) ((unsigned int) (xmax_t / 2 - 10 * t->h_char),
-			(unsigned int) (t->v_tic * 2 + t->v_char / 2),
+			(unsigned int) (ymax_t - (t->v_tic * 2 + t->v_char / 2)),
 			"test tics");
     (void) (*t->justify_text) (LEFT);
 
@@ -1672,11 +1672,12 @@ test_term()
 	    (*t->point) (x + t->h_char * 5 + p_width / 2, y, i);
 	y -= key_entry_height;
     }
+
     /* test some arrows */
     (*t->linewidth) (1.0);
     (*t->linetype) (0);
-    x = xmax_t / 4;
-    y = ymax_t / 4;
+    x = xmax_t / 3;
+    y = ymax_t / 3;
     xl = t->h_tic * 5;
     yl = t->v_tic * 5;
     (*t->arrow) (x, y, x + xl, y, TRUE);
@@ -1687,6 +1688,45 @@ test_term()
     (*t->arrow) (x, y, x - xl, y - yl, TRUE);
     (*t->arrow) (x, y, x, y - yl, TRUE);
     (*t->arrow) (x, y, x + xl, y - yl, TRUE);
+
+    /* test line widths */
+    (void) (*t->justify_text) (LEFT);
+    x = xmax_t * .075;
+    y = t->v_tic * 5;
+    xl = t->h_tic * 15;
+   
+    for (i=1; i<7; i++) {
+	(*t->linewidth) ((float)(i)); (*t->linetype)(LT_BLACK);
+	(*t->move) (x, y); (*t->vector) (x+xl, y);
+	sprintf(label,"  lw %1d%c",i,0);
+	(*t->put_text) (x+xl, y, label);
+	y += t->v_tic * 5;
+    }
+    (*t->put_text) (x, y, "linewidth");
+
+#ifdef USE_ULIG_FILLEDBOXES
+    /* test fill patterns */
+    x = xmax_t * 0.5;
+    y = 0;
+    xl = t->h_tic * 3;
+    yl = t->v_tic * 12;
+    (*t->linewidth) ((float)(1));
+    (*t->linetype)(LT_BLACK);
+    (*t->justify_text) (CENTRE);
+    (*t->put_text)(x+xl*7, yl+t->v_tic*5, "pattern fill");
+    for (i=0; i<10; i++) {
+	int style = ((i<<4) + FS_PATTERN);
+	(*t->fillbox) ( style, x, y, xl, yl );
+	(*t->move)  (x,y);
+	(*t->vector)(x,y+yl);
+	(*t->vector)(x+xl,y+yl);
+	(*t->vector)(x+xl,y);
+	(*t->vector)(x,y);
+	sprintf(label,"%2d",i);
+	(*t->put_text)(x+xl/2, y+yl+t->v_tic*2, label);
+	x += xl * 1.5;
+    }
+#endif
 
     term_end_plot();
 }
