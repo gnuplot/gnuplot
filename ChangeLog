@@ -5,6 +5,10 @@
 	LT_BACKGROUND, LT_NODRAW, and other negative linetypes as a
 	request for the background color.
 
+	* src/term.c: Allow explicit vertical offset of 0 in enhanced text mode
+	overprint statement.  Patch by Harald Harders (bug report #911068).
+	Overprint positioning remains inexact at best in non-PostScript drivers.
+
 2004-03-04  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/axis.h (STORE_WITH_LOG_AND_UPDATE_RANGE): Added check

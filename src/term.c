@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.67 2004/02/12 17:27:38 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.68 2004/02/27 10:13:00 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -2155,9 +2155,10 @@ enhanced_recursion(p, brace, fontname, fontsize, base, widthflag, showflag, over
 		while (*++p == ' ');
 		if (overprint == 2) {
 		    ovp = (float)strtod(p,&p);
-		    if (ovp != 0) {
+		    if (term->flags & TERM_IS_POSTSCRIPT)
 			base = ovp*f;
-		    }
+		    else
+			base += ovp*f;
 		}
 		--p;		/* HBB 20001021: bug fix: 10^{2} broken */
 
