@@ -159,8 +159,11 @@
 #include "xlib.trm"
 #endif /* !MSDOS && !OS2 && !_Windows && !_ATARI && !_MTOS && !AMIGA */
 
-#ifdef X11
-#include "x11.trm"     /* x windows */
+#ifndef X_DISPLAY_MISSING
+# ifndef X11
+#  define X11
+# endif
+# include "x11.trm"     /* x windows */
 #endif
 
 /* These terminals can be used on any system */
