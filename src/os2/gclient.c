@@ -1,5 +1,5 @@
 #ifdef INCRCSDATA
-static char RCSid[]="$Id: gclient.c,v 1.29 2004/09/27 14:39:00 mikulik Exp $";
+static char RCSid[]="$Id: gclient.c,v 1.30 2004/11/29 11:56:45 mikulik Exp $";
 #endif
 
 /****************************************************************************
@@ -105,16 +105,6 @@ static char RCSid[]="$Id: gclient.c,v 1.29 2004/09/27 14:39:00 mikulik Exp $";
 #include "mousecmn.h"
 
 
-/*==== g l o b a l    d a t a ================================================*/
-
-/* HBB FIXME 20040630: there should *never* be a need to use 'extern'
- * in a .c file! */
-extern char szIPCName[];       /* name used in IPC with gnuplot */
-extern char szIniFile[256];    /* full path of ini file */
-extern int  bServer;
-extern int  bPersist;
-extern int  bEnhanced;
-
 /*==== l o c a l    d a t a ==================================================*/
 
 static long lLineTypes[7] = {
@@ -173,8 +163,6 @@ static HSWITCH hSwitch = 0;    /* switching between windows */
 static SWCNTRL swGnu;
 
 static BOOL     bLineTypes = FALSE;    // true if use dashed linetypes
-/* HBB FIXME 20040630: global variable, should be listed elsewhere! */
-BOOL     bWideLines;
 static BOOL     bColours = TRUE;
 static BOOL     bShellPos = FALSE;
 static BOOL     bPlotPos = FALSE;

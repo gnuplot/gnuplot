@@ -1,5 +1,5 @@
 /*
-** static char RCSid[]="$Id: gnupmdrv.h,v 1.5 2004/04/13 17:24:05 broeker Exp $" ;
+** static char RCSid[]="$Id: gnupmdrv.h,v 1.6 2004/07/01 17:10:10 broeker Exp $" ;
 */
 
 /* PM driver for GNUPLOT */
@@ -97,9 +97,17 @@
 HAB         hab ;               /* application anchor block handle */
 HWND   	    hApp ;          /* application window handle */
 HWND        hwndFrame ;         /* frame window handle */
+
 #define   FONTBUF   256         /* buffer for dropped font namesize */
 #define     GNUXPAGE  19500     /* width of plot area in 0.01 cm */
 #define     GNUYPAGE  12500     /* height of plot area in 0.01 cm */
+
+extern char szIPCName[];       /* name used in IPC with gnuplot */
+extern char szIniFile[256];    /* full path of ini file */
+extern int  bServer;
+extern int  bPersist;
+extern int  bWideLines;
+extern int  bEnhanced;
 
 /*==== stuff for querying printer capability =================================*/
 
