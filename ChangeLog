@@ -1,3 +1,46 @@
+1999-06-21  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* src/bitmap.c, src/bitmap.h: Add const qualifier to char * arg in
+	b_put_text().
+
+	* src/command.c(do_help), src/fit.c(fit_interrupt),
+	src/gplt_x11.c(preset), src/graph3d.c(do_3dplot),
+	src/help.c(ShowSubtopics), src/plot2d.c(parametric_fixup): Replace
+	calls to sprintf() with strcpy() and strcat().
+
+	* src/graphics.c, src/graphics.h: Fix a couple of off-by-one
+	gp_alloc() errors recently introduced by me. Make gprintf() global.
+
+	* src/term.c(list_terms): Make static array dynamic. Use strcpy()
+ 	instead of sprintf().
+
+	* term/README, term/*.trm: Change third argument to all *_put_text()
+	functions to const char *, in line with the definition of struct
+	termentry in plot.h. Make argument to *_set_font const.
+
+	* term/amiga.trm: Replace static arrays for AMIGA_FontName and
+	temporary arrays with AllocMem()'d memory.
+
+	* term/post.trm, term/tgif.trm, term/tpic.trm: Replace fprintf() with
+	fputs() in many places.
+
+1999-06-21  Albert Chin-A-Young  <china@thewrittenword.com>
+
+	* configure.in, docs/Makefile.in, term/gnugraph.trm: Use plotcompat.h
+	header file from GNU plotutils 2.2 for backwards compatibility instead
+	of our own code.
+
+1999-06-21  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* src/os2/gclient.c: Do not transfer focus to the icon of minimized
+	gnupmdrv.
+
+1999-06-20  William D Kirby  <wdkirby@ix.netcom.com>
+
+	* config/makefile.cyg: Modified for new directory structure.
+
+	* src/scanner.c(substitute): Fix function args for non-Unix compilers.
+
 1999-06-19  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* configure.in: Add test for strcspn().
