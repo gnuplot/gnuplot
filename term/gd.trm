@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: gd.trm,v 1.53 2004/10/19 00:24:08 sfeam Exp $
+ * $Id: gd.trm,v 1.54 2004/11/27 02:38:37 sfeam Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -894,6 +894,10 @@ TERM_PUBLIC
 void PNG_set_color (t_colorspec *colorspec)
 {
     double gray = colorspec->value;
+
+    if (colorspec->type == TC_RGB)
+	png_state.color = gdImageColorResolve(png_state.image,
+	    colorspec->lt >> 16, (colorspec->lt >> 8) & 0xff, colorspec->lt & 0xff);
 
     if (colorspec->type != TC_FRAC)
 	return;

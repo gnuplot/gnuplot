@@ -1,5 +1,5 @@
 /*
- * $Id: color.h,v 1.18 2004/09/01 15:53:46 mikulik Exp $
+ * $Id: color.h,v 1.19 2004/11/22 00:43:04 sfeam Exp $
  */
 
 /* GNUPLOT - color.h */
@@ -36,14 +36,15 @@ of palettes between terminals and making palette routines.
  * Supplements basic linetype choice */
 typedef struct t_colorspec {
     int type;			/* TC_<type> definitions below */
-    int lt;			/* holds lt    if type==1 */
-    double value;		/* holds value if type>1  */
+    int lt;			/* used for TC_LT and TC_RGB */
+    double value;		/* used for TC_CB and TC_FRAC */
 } t_colorspec;
 #define	TC_DEFAULT	0
 #define	TC_LT		1
-#define	TC_CB		2
-#define	TC_FRAC		3
-#define	TC_Z		4
+#define	TC_RGB		2
+#define	TC_CB		3
+#define	TC_FRAC		4
+#define	TC_Z		5
 
 /* EAM July 2004 - Disentangle polygon support and PM3D support  */
 /* a point (with integer coordinates) for use in polygon drawing */

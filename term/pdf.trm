@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: pdf.trm,v 1.39 2004/09/30 05:44:00 sfeam Exp $
+ * $Id: pdf.trm,v 1.40 2004/11/27 02:38:37 sfeam Exp $
  */
 
 /*------------------------------
@@ -1137,7 +1137,11 @@ PDF_set_color(t_colorspec *colorspec)
 
     if (colorspec->type == TC_FRAC)
 	rgb1maxcolors_from_gray( colorspec->value, &color );
-    else
+    else if (colorspec->type == TC_RGB) {
+	color.r = (double)((colorspec->lt >> 16 ) & 255) / 255.;
+	color.g = (double)((colorspec->lt >> 8 ) & 255) / 255.;
+	color.b = (double)(colorspec->lt & 255) / 255.;
+    } else
 	return;
 
     /* make sure that the path is stroked with the current color

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.122 2004/11/24 04:45:18 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.123 2004/11/25 04:33:53 sfeam Exp $"); }
 #endif
 
 #define X11_POLYLINE 1
@@ -2305,7 +2305,22 @@ exec_cmd(plot_struct *plot, char *command)
 	}
     }
 #ifdef PM3D
-    else if (*buffer == X11_GR_SET_COLOR) {	/* set color */
+    else if (*buffer == X11_GR_SET_RGBCOLOR) {
+	    int rgb255color;
+	    XColor xcolor;
+	    sscanf(buffer + 1, "%x", &rgb255color);
+	    xcolor.red = (double)(0xffff) * (double)((rgb255color >> 16) & 0xff) /255.;
+	    xcolor.green = (double)(0xffff) * (double)((rgb255color >> 8) & 0xff) /255.;
+	    xcolor.blue = (double)(0xffff) * (double)(rgb255color & 0xff) /255.;
+	    FPRINTF((stderr,"gplt_x11: got request for color %d %d %d\n",
+		    xcolor.red, xcolor.green, xcolor.blue));
+	    if (XAllocColor(dpy, plot->cmap->colormap, &xcolor)) {
+		XSetForeground(dpy, gc_pm3d, xcolor.pixel);
+	    } else {
+		FPRINTF((stderr, "          failed to allocate color\n"));
+	    }
+	    current_gc = &gc_pm3d;
+    } else if (*buffer == X11_GR_SET_COLOR) {	/* set color */
 	if (have_pm3d) {	/* ignore, if your X server is not supported */
 #ifndef BINARY_X11_POLYGON
 	    double gray;

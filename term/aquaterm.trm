@@ -1,5 +1,5 @@
 /* -*- objc -*-
- * $Id: aquaterm.trm,v 1.8 2004/10/19 12:58:45 persquare Exp $
+ * $Id: aquaterm.trm,v 1.9 2004/11/27 02:38:37 sfeam Exp $
  *
  */
 
@@ -534,8 +534,13 @@ AQUA_set_color(t_colorspec *colorspec)
   
   if (colorspec->type == TC_FRAC)
     rgb1maxcolors_from_gray( gray, &color );
-  else
+  else if (colorspec->type == TC_RGB) {
+    color.r = (double)((colorspec->lt >> 16 ) & 255) / 255.;
+    color.g = (double)((colorspec->lt >> 8 ) & 255) / 255.;
+    color.b = (double)(colorspec->lt & 255) / 255.;
+  } else
     return;
+
   [adapter setColorRed:color.r green:color.g blue:color.b];
   AQUA_LineType = LT_UNDEFINED;
 }

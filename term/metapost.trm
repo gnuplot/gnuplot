@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: metapost.trm,v 1.29 2004/10/19 00:24:09 sfeam Exp $
+ * $Id: metapost.trm,v 1.30 2004/11/27 02:38:37 sfeam Exp $
  */
 
 /* GNUPLOT - metapost.trm */
@@ -830,9 +830,7 @@ TERM_PUBLIC void
 MP_set_color(t_colorspec *colorspec)
 {
     double gray = colorspec->value;
-
-    if (colorspec->type != TC_FRAC)
-	return;
+    rgb_color color;
 
     /* remeber that we changed the color, needed to reset color in MP_linetype()*/
     MP_color_changed = 1;
@@ -840,16 +838,22 @@ MP_set_color(t_colorspec *colorspec)
     if (MP_inline)
 	MP_endline();
 
-    if (sm_palette.colors != 0) /* finite nb of colors explicitly requested */
-	    gray = (gray >= ((double)(sm_palette.colors-1)) / sm_palette.colors) ?
-		    1 : floor(gray * sm_palette.colors) / sm_palette.colors;
-
     if (!MP_color) {		/* gray mode */
 	if (gray < 1e-3) gray = 0;
 	fprintf(gpoutfile, "currentcolor:=%.3gwhite;\n", gray);
     } else {			/* color mode */
-        rgb_color color;
-	rgb1_from_gray( gray, &color );
+	if (colorspec->type == TC_FRAC) {
+	    if (sm_palette.colors != 0) /* finite nb of colors explicitly requested */
+		gray = (gray >= ((double)(sm_palette.colors-1)) / sm_palette.colors) ?
+		    1 : floor(gray * sm_palette.colors) / sm_palette.colors;
+	    rgb1_from_gray( gray, &color );
+	} else if (colorspec->type == TC_RGB) {
+	    color.r = (double)((colorspec->lt >> 16 ) & 255) / 255.;
+	    color.g = (double)((colorspec->lt >> 8 ) & 255) / 255.;
+	    color.b = (double)(colorspec->lt & 255) / 255.;
+	} else
+	    return;
+
 	if (color.r < 1e-4) color.r = 0;
 	if (color.g < 1e-4) color.g = 0;
 	if (color.b < 1e-4) color.b = 0;

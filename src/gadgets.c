@@ -382,7 +382,7 @@ clip_vector(unsigned int x, unsigned int y)
 /* Common routines for setting text or line color from t_colorspec */
 
 void
-apply_pm3dcolor(const struct t_colorspec *tc, const struct termentry *t)
+apply_pm3dcolor(struct t_colorspec *tc, const struct termentry *t)
 {
     if (tc->type == TC_DEFAULT) {
 	(*t->linetype)(LT_BLACK);
@@ -393,6 +393,10 @@ apply_pm3dcolor(const struct t_colorspec *tc, const struct termentry *t)
        return;
     }
 #ifdef PM3D
+    if (tc->type == TC_RGB && t->set_color) {
+	t->set_color(tc);
+	return;
+    }
     if (!is_plot_with_palette() || !t->set_color) {
 	(*t->linetype)(LT_BLACK);
 	return;

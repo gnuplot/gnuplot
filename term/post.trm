@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.134 2004/09/30 05:44:00 sfeam Exp $
+ * $Id: post.trm,v 1.135 2004/11/27 02:38:38 sfeam Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -2895,6 +2895,14 @@ TERM_PUBLIC int PS_make_palette (t_sm_palette *palette)
 TERM_PUBLIC void PS_set_color (t_colorspec *colorspec)
 {
     double gray;
+
+    if (colorspec->type == TC_RGB) {
+	double r = (double)((colorspec->lt >> 16 ) & 255) / 255.;
+	double g = (double)((colorspec->lt >> 8 ) & 255) / 255.;
+	double b = (double)(colorspec->lt & 255) / 255.;
+	PS_FLUSH_PATH;
+	fprintf(gpoutfile, "%3.2f %3.2f %3.2f C ",r,g,b);
+    }
 
     if (colorspec->type != TC_FRAC)
 	return;

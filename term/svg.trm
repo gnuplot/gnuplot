@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: svg.trm,v 1.45 2004/11/25 04:33:54 sfeam Exp $
+ * $Id: svg.trm,v 1.46 2004/11/27 02:38:38 sfeam Exp $
  */
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -991,10 +991,15 @@ SVG_set_color(t_colorspec *colorspec)
 {
     rgb255_color rgb255;
 
-    if (colorspec->type != TC_FRAC)
+    if (colorspec->type == TC_FRAC)
+	rgb255maxcolors_from_gray( colorspec->value, &rgb255 );
+    else if (colorspec->type == TC_RGB) {
+	rgb255.r = colorspec->lt >> 16;
+	rgb255.g = colorspec->lt >> 8 & 0xff;
+	rgb255.b = colorspec->lt & 0xff;
+    } else
 	return;
 
-    rgb255maxcolors_from_gray( colorspec->value, &rgb255 );
     SVG_use_pm3d_color = 1;
 
     if (rgb255.r != SVG_red || rgb255.g != SVG_green || rgb255.b != SVG_blue) {

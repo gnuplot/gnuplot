@@ -45,6 +45,7 @@
 #define X11_GR_MAKE_PALETTE     'p'
 #define X11_GR_RELEASE_PALETTE  'e'
 #define X11_GR_SET_COLOR        'c'
+#define X11_GR_SET_RGBCOLOR     'g'
 #define X11_GR_FILLED_POLYGON   'f'
 #endif
 

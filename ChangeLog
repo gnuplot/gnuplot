@@ -1,3 +1,18 @@
+2004-11-27  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/color.h: Add new colorspec type TC_RGB, allowing colors to
+	be specified as an RGB triple stored as (RR<<16)+(GG<<8)+BB with
+	red, green, and blue components running from 0 - 255.
+
+	* src/gadgets.c (apply_pm3dcolor) src/gadgets.h: Pass RGB color
+	specifications to terminals via the new API for term->set_color().
+
+	* src/gplt_x11.c src/gplt_x11.h term/*.trm (set_color):
+	Implement set color to specified RGB triple in these terminals
+		aquaterm gd metapost pdf post svg x11
+	Somebody please have a look at doing the same for
+		cgm pstricks win
+
 2004-11-26  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/term_api.h term/README: Change from term->set_color(double gray)

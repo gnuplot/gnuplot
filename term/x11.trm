@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: x11.trm,v 1.122 2004/10/29 19:26:21 sfeam Exp $
+ * $Id: x11.trm,v 1.123 2004/11/27 02:38:39 sfeam Exp $
  *
  */
 
@@ -1400,18 +1400,23 @@ void dump_histogram(void) {
 TERM_PUBLIC void
 X11_set_color(t_colorspec *colorspec)
 {
-#ifndef BINARY_X11_POLYGON
-    double gray = colorspec->value;
+    if (colorspec->type == TC_RGB) {
+	fputc(X11_GR_SET_RGBCOLOR, X11_ipc);
+	PRINT1("%6.6x\n", colorspec->lt);
+	FFLUSH();
+	return;
+    }
 
+#ifndef BINARY_X11_POLYGON
     if (colorspec->type != TC_FRAC)
 	return;
 
     fputc(X11_GR_SET_COLOR, X11_ipc);
-    PRINT1("%f\n", gray);
+    PRINT1("%f\n", colorspec->value);
     FFLUSH();
     return;
-
 #else
+    {
     char *c_ptr;
     unsigned short byte_remaining;
     float fgray = colorspec->value;
@@ -1439,8 +1444,8 @@ X11_set_color(t_colorspec *colorspec)
 
     fputc('\n', X11_ipc);
     FFLUSH();
-
-#endif
+    }
+#endif /* BINARY_X11_POLYGON */
 
 }
 
