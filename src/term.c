@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.63 2003/12/15 07:52:15 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.64 2003/12/22 05:13:19 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -161,7 +161,7 @@ const struct gen_table set_encoding_tbl[] =
 #ifdef PIPE_IPC
 /* HBB 20020225: currently not used anywhere outside term.c --> make
  * it static */
-static int ipc_back_fd = IPC_BACK_CLOSED;
+static SELECT_TYPE_ARG1 ipc_back_fd = IPC_BACK_CLOSED;
 int isatty_state = 1;
 #endif
 

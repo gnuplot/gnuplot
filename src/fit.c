@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.35 2003/02/18 16:19:49 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.36 2004/01/07 14:45:22 lhecking Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -1662,7 +1662,7 @@ kbhit()
     timeout.tv_sec = 0;
     timeout.tv_usec = 0;
     rfds = (fd_set) (1L << fileno(stdin));
-    return ((select(0, (SELECT_TYPE_ARG234) &rfds, NULL, NULL, &timeout) > 0) ? 1 : 0);
+    return ((select(0, SELECT_TYPE_ARG234 &rfds, NULL, NULL, SELECT_TYPE_ARG5 &timeout) > 0) ? 1 : 0);
 }
 #endif
 

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.79 2003/12/22 05:13:18 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.80 2004/01/07 14:45:22 lhecking Exp $"); }
 #endif
 
 #define X11_POLYLINE 1
@@ -310,10 +310,10 @@ typedef struct plot_struct {
     int plot_number;
 } plot_struct;
 
-static plot_struct *Add_Plot_To_Linked_List __PROTO((int plot_number));
-static void Remove_Plot_From_Linked_List __PROTO((Window plot_window));
-static plot_struct *Find_Plot_In_Linked_List_By_Number __PROTO((int plot_number));
-static plot_struct *Find_Plot_In_Linked_List_By_Window __PROTO((Window plot_window));
+static plot_struct *Add_Plot_To_Linked_List __PROTO((int));
+static void Remove_Plot_From_Linked_List __PROTO((Window));
+static plot_struct *Find_Plot_In_Linked_List_By_Number __PROTO((int));
+static plot_struct *Find_Plot_In_Linked_List_By_Window __PROTO((Window));
 
 static struct plot_struct *current_plot = NULL;
 static struct plot_struct *list_start = NULL;
@@ -325,7 +325,7 @@ typedef struct plot_remove_struct {
     int processed;
 } plot_remove_struct;
 
-static void Add_Plot_To_Remove_FIFO_Queue __PROTO((Window plot_window));
+static void Add_Plot_To_Remove_FIFO_Queue __PROTO((Window));
 static void Process_Remove_FIFO_Queue __PROTO((void));
 
 static struct plot_remove_struct *remove_fifo_queue_start = NULL;
@@ -354,84 +354,84 @@ static char selection[SEL_LEN] = "";
 #endif
 
 #ifdef PM3D
-static void GetGCpm3d __PROTO((plot_struct * plot, GC * ret));
-static void CmapClear __PROTO((cmap_t * cmap_ptr));
-static void RecolorWindow __PROTO((plot_struct * plot));
-static void FreeColors __PROTO((plot_struct * plot));
-static void ReleaseColormap __PROTO((plot_struct * plot));
-static unsigned long *ReallocColors __PROTO((plot_struct * plot, int n));
-static void PaletteMake __PROTO((plot_struct * plot, t_sm_palette * tpal));
-static void PaletteSetColor __PROTO((plot_struct * plot, double gray));
-static int GetVisual __PROTO((int class, Visual ** best, int *depth));
-static void scan_palette_from_buf __PROTO(( plot_struct *plot ));
+static void GetGCpm3d __PROTO((plot_struct *, GC *));
+static void CmapClear __PROTO((cmap_t *));
+static void RecolorWindow __PROTO((plot_struct *));
+static void FreeColors __PROTO((plot_struct *));
+static void ReleaseColormap __PROTO((plot_struct *));
+static unsigned long *ReallocColors __PROTO((plot_struct *, int));
+static void PaletteMake __PROTO((plot_struct *, t_sm_palette *));
+static void PaletteSetColor __PROTO((plot_struct *, double));
+static int GetVisual __PROTO((int, Visual **, int *));
+static void scan_palette_from_buf __PROTO((plot_struct *));
 #endif
 
-static void store_command __PROTO((char *line, plot_struct * plot));
-static void prepare_plot __PROTO((plot_struct * plot, int term_number));
-static void delete_plot __PROTO((plot_struct * plot));
+static void store_command __PROTO((char *, plot_struct *));
+static void prepare_plot __PROTO((plot_struct *, int));
+static void delete_plot __PROTO((plot_struct *));
 
 static int record __PROTO((void));
-static void process_event __PROTO((XEvent * event));	/* from Xserver */
+static void process_event __PROTO((XEvent *));	/* from Xserver */
 
 static void mainloop __PROTO((void));
 
-static void display __PROTO((plot_struct * plot));
-static void UpdateWindow __PROTO((plot_struct * plot));
+static void display __PROTO((plot_struct *));
+static void UpdateWindow __PROTO((plot_struct *));
 #ifdef USE_MOUSE
-static int ErrorHandler __PROTO((Display * display, XErrorEvent * error_event));
-static void DrawRuler __PROTO((plot_struct * plot));
-static void EventuallyDrawMouseAddOns __PROTO((plot_struct * plot));
-static void DrawBox __PROTO((plot_struct * plot));
-static void AnnotatePoint __PROTO((plot_struct * plot, int x, int y, const char[], const char[]));
-static long int SetTime __PROTO((plot_struct * plot, Time t));
-static unsigned long AllocateXorPixel __PROTO((cmap_t * cmap_ptr));
-static void GetGCXor __PROTO((plot_struct * plot, GC * gc));
-static void GetGCXorDashed __PROTO((plot_struct * plot, GC * gc));
+static int ErrorHandler __PROTO((Display *, XErrorEvent *));
+static void DrawRuler __PROTO((plot_struct *));
+static void EventuallyDrawMouseAddOns __PROTO((plot_struct *));
+static void DrawBox __PROTO((plot_struct *));
+static void AnnotatePoint __PROTO((plot_struct *, int, int, const char[], const char[]));
+static long int SetTime __PROTO((plot_struct *, Time));
+static unsigned long AllocateXorPixel __PROTO((cmap_t *));
+static void GetGCXor __PROTO((plot_struct *, GC *));
+static void GetGCXorDashed __PROTO((plot_struct *, GC *));
 #if 0
-static void GetGCBlackAndWhite __PROTO((plot_struct * plot, GC * ret, Pixmap pixmap, int mode));
-static int SplitAt __PROTO((char **args, int maxargs, char *buf, char splitchar));
-static void xfree __PROTO((void *fred));
+static void GetGCBlackAndWhite __PROTO((plot_struct *, GC *, Pixmap, int));
+static int SplitAt __PROTO((char **, int, char *, char));
+static void xfree __PROTO((void *));
 #endif
-static void EraseCoords __PROTO((plot_struct * plot));
-static void DrawCoords __PROTO((plot_struct * plot, const char *s));
-static void DisplayCoords __PROTO((plot_struct * plot, const char *s));
+static void EraseCoords __PROTO((plot_struct *));
+static void DrawCoords __PROTO((plot_struct *, const char *));
+static void DisplayCoords __PROTO((plot_struct *, const char *));
 #if 0
-static int is_control __PROTO((KeySym mod));
-static int is_meta __PROTO((KeySym mod));
-static int is_shift __PROTO((KeySym mod));
+static int is_control __PROTO((KeySym));
+static int is_meta __PROTO((KeySym));
+static int is_shift __PROTO((KeySym));
 #endif
-static char* __PROTO((getMultiTabConsoleSwitchCommand(unsigned long *newGnuplotXID)));
+static char* __PROTO((getMultiTabConsoleSwitchCommand(unsigned long *)));
 #endif
 
-static void DrawRotated __PROTO((Display *dpy, Drawable d, GC gc, int xdest,
-	    int ydest, const char *str, int len, int angle, enum JUSTIFY just));
+static void DrawRotated __PROTO((Display *, Drawable, GC, int,
+	    int, const char *, int, int, enum JUSTIFY));
 static void exec_cmd __PROTO((plot_struct *, char *));
 
 static void reset_cursor __PROTO((void));
 
-static void preset __PROTO((int argc, char *argv[]));
-static char *pr_GetR __PROTO((XrmDatabase db, char *resource));
-static void pr_color __PROTO((cmap_t * cmap_ptr));
+static void preset __PROTO((int, char **));
+static char *pr_GetR __PROTO((XrmDatabase, char *));
+static void pr_color __PROTO((cmap_t *));
 static void pr_dashes __PROTO((void));
-static void pr_font __PROTO((char * fontname));
+static void pr_font __PROTO((char *));
 static void pr_geometry __PROTO((void));
 static void pr_pointsize __PROTO((void));
 static void pr_width __PROTO((void));
-static void pr_window __PROTO((plot_struct * plot));
-static void ProcessEvents __PROTO((Window win));
+static void pr_window __PROTO((plot_struct *));
+static void ProcessEvents __PROTO((Window));
 static void pr_raise __PROTO((void));
 static void pr_persist __PROTO((void));
 static void pr_feedback __PROTO((void));
 
 #ifdef EXPORT_SELECTION
-static void export_graph __PROTO((plot_struct * plot));
-static void handle_selection_event __PROTO((XEvent * event));
+static void export_graph __PROTO((plot_struct *));
+static void handle_selection_event __PROTO((XEvent *));
 #endif
 
 #if defined(USE_MOUSE) && defined(MOUSE_ALL_WINDOWS)
-static void mouse_to_coords __PROTO((plot_struct *plot, XEvent *event,
-			double *x, double *y, double *x2, double *y2));
-static double mouse_to_axis __PROTO((int mouse_coord, axis_scale_t *axis));
+static void mouse_to_coords __PROTO((plot_struct *, XEvent *,
+			double *, double *, double *, double *));
+static double mouse_to_axis __PROTO((int, axis_scale_t *));
 #endif
 
 #define FallbackFont "fixed"
@@ -781,7 +781,7 @@ mainloop()
 	}
 #endif
 
-	nf = select(nfds, SELECT_TYPE_ARG234 &tset, 0, 0, timer);
+	nf = select(nfds, SELECT_TYPE_ARG234 &tset, 0, 0, SELECT_TYPE_ARG5 timer);
 
 	if (nf < 0) {
 	    if (errno == EINTR)
@@ -875,7 +875,7 @@ mainloop()
 
 	nfds = (cn > in) ? cn + 1 : in + 1;
 
-	nf = select(nfds, SELECT_TYPE_ARG234 &tset, 0, 0, timer);
+	nf = select(nfds, SELECT_TYPE_ARG234 &tset, 0, 0, SELECT_TYPE_ARG5 timer);
 
 	if (nf < 0) {
 	    if (errno == EINTR)
@@ -3112,7 +3112,7 @@ is_shift(KeySym mod)
  *	- KDE's Konsole.
  * Note: if the returned command is !NULL, then it must be free()'d by the caller.
  */
-char*
+static char*
 getMultiTabConsoleSwitchCommand(unsigned long *newGnuplotXID)
 {
     char *cmd = NULL; /* result */

@@ -1,5 +1,5 @@
 /*
- * $Id: x11.trm,v 1.92 2004/01/07 14:45:22 lhecking Exp $
+ * $Id: x11.trm,v 1.93 2004/01/07 16:50:12 broeker Exp $
  *
  */
 
@@ -589,7 +589,7 @@ AGAIN:
 	    FD_ZERO(&fds);
 	    FD_SET(fd, &fds);
 	    FD_SET(ipc_back_fd, &fds);
-	    select(ipc_back_fd + 1, SELECT_TYPE_ARG234 &fds, 0, 0, (struct timeval *) NULL);
+	    select(ipc_back_fd + 1, SELECT_TYPE_ARG234 &fds, 0, 0, NULL);
 	    if (FD_ISSET(ipc_back_fd, &fds)) {
 		n = read(ipc_back_fd, (void *) (l + (char *) &ge), sizeof(ge) - l);
 		if (n == 0) {
