@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.83 2003/02/16 23:51:30 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.84 2003/02/18 16:38:09 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -2148,7 +2148,7 @@ histeps_compare(p1, p2)
     if (x1 < x2)
 	return -1;
     else
-	return (x2 > x1);
+	return (x1 > x2);
 }
 
 /* CAC  */

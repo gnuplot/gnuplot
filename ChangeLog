@@ -1,3 +1,8 @@
+2003-02-19  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* src/graphics.c(histeps_compare): There was a wrong comparison returned
+	by this qsort-called routine, which caused 'plot with histeps' buggy.
+
 2003-02-19  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* ChangeLog: Modified an old log entry that contained an actual
