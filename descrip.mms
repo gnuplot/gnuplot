@@ -31,12 +31,12 @@ ALL : DEFAULT gnuplot.html $(D)gnuplot.tex
 
 .IFDEF GNUC
 CC = GCC
-CFLAGS = /NOOP/define=(ANSI_C,NO_GIH,NO_LOCALE_H,X11,PIPES,VAXCRTL)
+CFLAGS = /NOOP/define=(ANSI_C,HAVE_SLEEP,NO_GIH,NO_LOCALE_H,X11,PIPES,VAXCRTL)
 CRTL_SHARE = ,GNU_CC:[000000]GCCLIB.OLB/lib,$(CWD)linkopt.vms/opt
 .ENDIF
 
 .IFDEF VAXC
-CFLAGS = /STAND=VAXC/NOOP/define=(NO_GIH,NO_LOCALE_H,X11,PIPES,VAXCRTL)
+CFLAGS = /STAND=VAXC/NOOP/define=(HAVE_SLEEP,NO_GIH,NO_LOCALE_H,X11,PIPES,VAXCRTL)
 CRTL_SHARE = ,linkopt.vms/opt
 .ENDIF
 
@@ -45,14 +45,13 @@ CRTL_SHARE = ,linkopt.vms/opt
 ! If this doesn't work use the next definitions.
 !
 ! but the following definitions work with OpenVMS Alpha V6.2 and DEC C V5.3
-CFLAGS = /define=(ANSI_C,HAVE_LGAMMA,HAVE_ERF,HAVE_UNISTD_H,HAVE_GETCWD,-
-NO_GIH,X11,PIPES,DECCRTL)/undef=PROTOTYPES /prefix=(all,except=sleep) -
-/warnings=disable=ADDRCONSTEXT
+CFLAGS = /define=(ANSI_C,HAVE_LGAMMA,HAVE_ERFC,HAVE_ERF,HAVE_UNISTD_H,-
+HAVE_GETCWD,HAVE_SLEEP,NO_GIH,X11,PIPES,DECCRTL) /prefix=all
 
 ! A more conservative set of definitions is
 !
-!CFLAGS = /NOOP/define=(ANSI_C,NO_GIH,NO_LOCALE_H,X11,PIPES,DECCRTL,HAVE_GETCWD)-
-!/prefix=all
+!CFLAGS = /NOOP/define=(ANSI_C,NO_GIH,NO_LOCALE_H,X11,PIPES,DECCRTL,-
+!HAVE_SLEEP,HAVE_GETCWD) /prefix=all
 
 CRTL_SHARE =
 .ENDIF	
