@@ -1,3 +1,8 @@
+2004-10-22  Ethan Merritt  <merritt@u.washington.edu>
+
+	* docs/gnuplot.doc: A very preliminary update of the "What's New"
+	section of the docs to track changes since the version 4.0 release.
+
 2004-10-21  Harald Harders  <h.harders@tu-bs.de>
 
 	This patch introduces the possibilty to move many kinds of texts by an

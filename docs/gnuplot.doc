@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.248 2004/10/20 20:14:16 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.249 2004/10/22 01:30:50 sfeam Exp $
 C 18 September 2001
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -108,10 +108,10 @@ C
  filename "-" is used to denote standard input.  See "help batch/interactive"
  for more details.
 
- Many `gnuplot` commands have multiple options.  These options must appear in
- the proper order, although unwanted ones may be omitted in most cases.  Thus
- if the entire command is "command a b c", then "command a c" will probably
- work, but "command c a" will fail.
+ Many `gnuplot` commands have multiple options. Version 4 is less sensitive
+ to the order of these options than earlier versions, but some order-dependence
+ remains. If you see error messages about unrecognized options, please try
+ again using the exact order listed in the documentation.
 
  Commands may extend over several input lines by ending each line but the last
  with a backslash (\).  The backslash must be the _last_ character on each
@@ -183,14 +183,48 @@ C
  you are subscribed to the list, so that users who use news will know to email
  a reply to you.  There is a form for such postings on the WWW site.
 
-2 What is New in Version 4.0
+2 New Features
 ?new-features
- The previous official release of gnuplot was version 3.7, with subversions up
- to 3.7.3. Gnuplot version 4.0 contains many new features, which were gradually
- introduced into a series of development snapshots 3.8a through 3.8k. This
- section lists major additions and gives a partial list of changes and minor
- new features. Sample gnuplot scripts demonstrating many of these features are
- provided in the gnuplot distribution, and are referred to here by name.
+?version 4.1 features
+ Gnuplot version 4.1 contained many features introduced since the preceding
+ official version 4.0.  This section lists major additions and gives a partial
+ list of changes and minor new features.
+
+3 New plot styles
+
+4 Histogram
+ See `histograms`.
+
+4 Label plots
+ See `labels`.
+
+4 Image data mapped onto plot
+ See `image`.
+
+4 Filled curves
+ See `filledcurves`.
+
+4 Vectors
+ See `vectors`.
+
+3 String and text data read from datafiles
+ See `datastrings`
+
+3 Auto-layout of multiple plots on a page
+ See `multiplot`.
+
+3 Input from binary data files
+ See `binary`.
+
+3 New or revised terminal drivers
+4 Consolidated gif/jpeg/png driver
+4 New Enhanced MetaFile (EMF) driver
+4 Adobe Illustrator (ai) driver deprecated
+
+2 Features introduced in version 4.0
+?version 4 features
+ Gnuplot version 4.0 contained many features introduced since the preceding
+ official version 3.7.  These are summarized here.
 
 3 Mouse and hotkey support in interactive terminals
 
@@ -200,53 +234,27 @@ C
  hotkeys. Also see the documentation for individual mousing terminals `ggi`,
  `pm`, `windows` and `x11`.
 
- Here are briefly some useful hotkeys.
- Hit 'h' in the interactive interval for help. Hit 'm' to switch mousing on/off.
- Hit 'g' for grid, 'l' for log and 'e' for replot.
- Hit 'r' for ruler to measure peak distances (linear scale) or peak ratios (log
- scale), and '5' for polar coordinates inside a map.
- Zoom by mouse (MB3), and move in the zoom history by 'p', 'u', 'n'; hit 'a' for
- autoscale.
- Use other mouse buttons to put current mouse coordinates to clipboard (double
- click of MB1), add temporarily or permanently labels to the plot (middle mouse
- button MB2).
- Rotate a 3D surface by mouse. 
- Hit spacebar to switch to the gnuplot command window.
-
  Sample script: mousevariables.dem
 
-3 New terminal features
+3 New terminals
 
  `aqua`: New terminal for Mac OS X. Requires AquaTerm 1.0 or later.
 
  `epslatex`: New terminal. Prepares eps figures for inclusion in LaTeX
  documents.
 
- `gif`: Support for this terminal has been dropped in favour of the `png`
- format for legal reasons; under usual configure conditions, old scripts that
- request gif will work but will produce a `png` file instead.
+ `gif`: Consolidated with png/jpeg terminals. Requires libgd.
 
  `ggi`: New full-screen interactive terminal for Linux. Interface to the
  General Graphics Interface Library.
 
  `pdf`: New terminal exporting Adobe Portable Document Format. Requires libpdf.
 
- `png` and `jpeg`: Support for both PNG and JPEG image output is provided by a
+ `png` and `jpeg`: Support for GIF< PNG and JPEG image output is provided by a
  new driver via libgd. The new driver supports many more features than the
  old png driver, including TrueType fonts. Requires libgd.
 
- `postscript`: The PostScript driver now provides an oblique symbol font, and
- allows run-time inclusion of embedded PostScript fonts. It also supports
- additional character encodings. See `postscript fontfile` and `set encoding`.
-
- Sample script: fontfile.dem
-
  `svg`: New terminal exporting Scalable Vector Graphics.
-
- `x11`: The X-windows driver now allows you to specify fonts, see
- `set term x11 x11_fonts`. There is no longer a limit to the number of x11 plot
- windows opened simultaneously, and each plot window can be given its own
- title. See `set term x11`.
 
 3 New plot style `pm3d`
 
@@ -255,13 +263,6 @@ C
  `set cbrange`, `set view map`, `set colorbox` and `test palette`.
 
  Sample scripts: pm3d.dem pm3dcolors.dem pm3dgamma.dem
-
-3 New plot style `filledcurves`
-
- The style `filledcurves` allows to fill an area between the drawn curve and a
- horizontal line.
-
- Sample script: fillcrvs.dem
 
 3 Filled boxes
 
@@ -302,7 +303,7 @@ C
  command line or from a data file via the `plot with vectors` style.
  See `set style arrow`, `plotting styles vectors`.
 
- Sample script: arrowstyle.dem
+ Sample scripts: arrowstyle.dem vector.dem
 
 3 Data file format
 
@@ -312,12 +313,20 @@ C
  to recognize text fields with embedded blanks as single entities based on the 
  datafile format settings.  This allows input from csv (comma-separated value)
  files such as those exported by spreadsheet programs. See `set datafile`.
+ See also the `binary` option in version 4.1.
+
+3 New commands
+
+ `set view map` selects a top-view 2D projection of 3D surface plot.
+
+ `set term push` and `set term pop` save and restore the current terminal type.
+
+ `load` and `save` commands accept piped input and output, respectively.
 
 3 Other changes and additions
 
- The preferred syntax to undo a command `set <something>` is now 
- `unset <something>` rather than `set no<something>`. The older form has been
- deprecated.  Version 4.0 continues to allow the older syntax, but such 
+ `unset <something>` is now preferred to`set no<something>`. The older form hasi
+ been deprecated.  Version 4.1 continues to allow the older syntax, but such 
  backwards compatibility may be lost in future versions.
 
  Commands of the form `set <something> <style>` also are deprectated in favor
@@ -325,30 +334,6 @@ C
  elements now have style options of their own, including arrows, filled
  areas, lines, and points. There are also style settings for input data and
  formatting. Please see `set style`, `set decimalsign`, and `set datafile`.
-
- Improved 2D and 3D clipping (hidden lines).
-
- More consistent point styles and other default formatting styles across
- all terminals. Please use the `test` command to check default styles and
- plotting capabilities for the currently selected terminal type.
-
- The `set label` command supports associated points, and allows you to 
- specify point style and text style (font, rotation, etc). User variables
- can be included in labels via format specifiers in the label text.
- See `set label`.
-
- New command `set view map` to select top-view 2D projection of 3D surface plot.
-
- New commands `set term push` and `set term pop` to achieve platform
- independent restoring of the terminal after printing,
-
- The `load` and `save` commands accept piped input and output, respectively.
-
- The `history` command (for gnuplot with its own readline, not with GNU
- readline) now includes several useful options.
-
- The built-in function `rand(x)` has been modified to allow explicit seeding
- of the pseudo-random number generator. See `random`.
 
  The MS Windows package includes an additional executable `pgnuplot.exe` to
  support piping command through standard input, which is otherwise not
@@ -1652,12 +1637,16 @@ C ... and restart the table:
 ?syntax
 ?specify
 ?punctuation
- The general rules of syntax and punctuation in `gnuplot` are that keywords
- and options are order-dependent.  Options and any accompanying parameters are
- separated by spaces whereas lists and coordinates are separated by commas.
- Ranges are separated by colons and enclosed in brackets [], text and file
- names are enclosed in quotes, and a few miscellaneous things are enclosed
- in parentheses.  Braces {} are used for a few special purposes.
+ Version 4 of gnuplot is much less sensitive than earlier versions to the 
+ order of keywords and suboptions. However, if you get error messages from
+ specifying options that you think should work, please try rearranging them
+ into the exact order listed by the documentation.
+
+ Options and any accompanying parameters are separated by spaces whereas lists
+ and coordinates are separated by commas.  Ranges are separated by colons and 
+ enclosed in brackets [], text and file names are enclosed in quotes, and a 
+ few miscellaneous things are enclosed in parentheses.  Braces {} are used for 
+ a few special purposes.
 
  Commas are used to separate coordinates on the `set` commands `arrow`,
  `key`, and `label`; the list of variables being fitted (the list after the
