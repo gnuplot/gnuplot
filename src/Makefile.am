@@ -26,7 +26,7 @@ EXTRA_gnuplot_SOURCES = @NEXTOBJS@
 
 gnuplot_LDADD = $(TERMLIBS) $(TERMXLIBS)
 
-gnuplot_x11_SOURCES = gplt_x11.c stdfn.c
+gnuplot_x11_SOURCES = gplt_x11.c
 
 gnuplot_x11_LDADD = $(XLIBS)
 
