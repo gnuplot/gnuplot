@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: gplt_x11.c,v 1.16.2.2 1999/08/25 16:16:01 lhecking Exp $";
+static char *RCSid = "$Id: gplt_x11.c,v 1.16.2.3 1999/09/23 13:26:53 lhecking Exp $";
 #endif
 
 /* GNUPLOT - gplt_x11.c */
@@ -344,7 +344,7 @@ void
 mainloop()
 {
     int nf, cn = ConnectionNumber(dpy), in;
-    int nfds;
+    fd_set_size_t nfds;
     struct timeval timeout, *timer = (struct timeval *) 0;
     fd_set tset;
 
@@ -387,8 +387,7 @@ mainloop()
 
 	nfds = (cn > in) ? cn + 1 : in + 1;
 
-	nf = select((gp_nfds_t)nfds, gp_fd_set_p &tset, gp_fd_set_p 0,
-		    gp_fd_set_p 0, gp_timeval_p timer);
+	nf = select(nfds, SELECT_FD_SET_CAST &tset, 0, 0, timer);
 
 	if (nf < 0) {
 	    if (errno == EINTR)

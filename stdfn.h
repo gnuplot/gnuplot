@@ -1,5 +1,5 @@
 /*
- * $Id: stdfn.h,v 1.23 1998/06/18 14:55:18 ddenholm Exp $
+ * $Id: stdfn.h,v 1.17 1998/12/03 22:22:14 lhecking Exp $
  *
  */
 
@@ -255,25 +255,13 @@ int strnicmp __PROTO((char *, char *, int));
 #endif
 
 /* Argument types for select() */
-#ifdef SELECT_TYPE_ARG1
-# define gp_nfds_t SELECT_TYPE_ARG1
-#else
-# define gp_nfds_t int
-#endif /* 1 */
-#ifdef SELECT_TYPE_ARG234
-# define gp_fd_set_p SELECT_TYPE_ARG234
-#else
-# ifndef __EMX__
-#  define gp_fd_set_p (int *)
-# else
-#  define gp_fd_set_p (fd_set *)
-# endif
-#endif /* 234 */
-#ifdef SELECT_TYPE_ARG5
-# define gp_timeval_p SELECT_TYPE_ARG5
-#else
-# define gp_timeval_p (struct timeval *)
-#endif /* 5 */
+/* These may need some work ... */
+#ifndef fd_set_size_t
+# define fd_set_size_t size_t
+#endif
+#ifndef SELECT_FD_SET_CAST
+# define SELECT_FD_SET_CAST
+#endif
 
 #ifndef GP_GETCWD
 # if defined(HAVE_GETCWD)
