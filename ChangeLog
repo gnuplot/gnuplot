@@ -1,3 +1,65 @@
+Wed Feb 28 17:15:51 2001  Hans-Bernhard Broeker  <broeker@acaxp6.physik.rwth-aachen.de>
+
+	* src/term_api.h (DEFAULT_LP_STYLE_TYPE): New macro, to help
+ 	initializing lp_style_type struct variables directly.
+
+	* src/gadgets.c (DEFAULT_BORDER_LP): New macro to hold the default
+ 	lp_style_type for the graph border.
+	(default_border_lp): New global constant variable. Used to
+ 	re-initialize the border linetype by struct assignment.
+	
+	* src/gadgets.h: Declaration for default_border_lp added.
+
+	* src/unset.c (reset_command): Assign border_lp from
+ 	default_border_lp instead of calling set_lp_properties().
+
+	* src/set.c (set_arrow, set_linestyle): Initialize local variable
+ 	from new macro DEFAULT_LP_STYLE_TYPE instead of calling
+ 	reset_lp_properties().
+	(set_border): Assign border_lp from default_border_lp instead of
+ 	calling set_lp_properties().
+	(reset_lp_properties, set_lp_properties): Functions no longer
+ 	used. Removed them.
+	
+	* src/setshow.h (set_lp_properties): Removed prototype.
+
+2001-02-28  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* term/emf.trm (EMF_text, EMF_reset): Reset emf_graphics flag to
+ 	FALSE to fix bug reported by J.Bollinger.
+
+	* term/emf.trm (EMF_STOCK_OBJECT_FLAG,
+ 	EMF_STOCK_OBJECT_WHITE_BRUSH, EMF_STOCK_OBJECT_BLACK_PEN,
+ 	EMF_STOCK_OBJECT_DEFAULT_FONT): New mnemonic macros to replace
+ 	magic numbers.
+	(EMF_setfont, EMF_text, EMF_dashtype): Use them.
+
+	* src/win/wgraph.c (LoadCursors): Use default cursor IDC_CROSS
+ 	instead of home-grown ptrcross.cur.
+	(CopyPrint): Codestyle: indented and commented #if/#else/#endif
+ 	lines.
+	
+	* src/win/ptrcross.cur: File removed.
+
+	* src/win/wgnuplib.rc: Reference to ptrcross.cur deleted.
+
+	* src/win/wresourc.h (IDC_SCALING): Removed #define for
+ 	IDC_CROSSHAIR
+
+	* src/win/scaling.cur, src/win/rotating.cur: Binary files replaced
+ 	by new, much nicer versions.
+	
+	* src/set.c (set_terminal): Codestyle: call gp_strdup() instead of
+ 	strdup().
+
+	* src/readline.h: The readline_ipc() prototype is now here, since
+ 	the functions is in readline.c, too.
+
+	* src/ipc.h: Moved readline_ipc() prototype away from here.
+
+	* src/command.c (com_line): Codestyle: #if's indented and
+ 	commented.
+
 2001-02-27  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* config/makefile.mgw: added a configuration section for easier setup
