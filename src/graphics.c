@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.85 2003/02/19 18:41:51 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.86 2003/03/03 07:06:40 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -2602,28 +2602,29 @@ plot_boxes(plot, xaxis_y)
 	case INRANGE:{
 		if (plot->points[i].z < 0.0) {
 		    /* need to auto-calc width */
-		    /* ASSERT(boxwidth <= 0.0); - else graphics.c
-		     * provides width */
-
-		    /* calculate width */
 		    if (prev != UNDEFINED)
-#if USE_ULIG_RELATIVE_BOXWIDTH
-                        if (! boxwidth_is_absolute) /* consider relative boxwidth (ULIG) */
-			    dxl = (plot->points[i-1].x - plot->points[i].x) * boxwidth / 2.0;
-                        else
-#endif /* USE_RELATIVE_BOXWIDTH */
+			if (boxwidth < 0)
 			    dxl = (plot->points[i-1].x - plot->points[i].x) / 2.0;
+#if USE_ULIG_RELATIVE_BOXWIDTH
+                        else if (! boxwidth_is_absolute)
+			    dxl = (plot->points[i-1].x - plot->points[i].x) * boxwidth / 2.0;
+#endif /* USE_RELATIVE_BOXWIDTH */
+                        else /* shouldn't happen, as graphics.c was supposed to */
+			     /* handle this case and then set points[i].z to 0 */
+			    dxl = boxwidth / 2.0;
 		    else
 			dxl = 0.0;
 
 		    if (i < plot->p_count - 1) {
 			if (plot->points[i + 1].type != UNDEFINED)
-#if USE_ULIG_RELATIVE_BOXWIDTH
-                            if (! boxwidth_is_absolute) /* consider relative boxwidth (ULIG) */
-			        dxr = (plot->points[i+1].x - plot->points[i].x) * boxwidth / 2.0;
-                            else
-#endif /* USE_RELATIVE_BOXWIDTH */
+                            if (boxwidth < 0)
 			        dxr = (plot->points[i+1].x - plot->points[i].x) / 2.0;
+#if USE_ULIG_RELATIVE_BOXWIDTH
+                            else if (! boxwidth_is_absolute)
+			        dxr = (plot->points[i+1].x - plot->points[i].x) * boxwidth / 2.0;
+#endif /* USE_RELATIVE_BOXWIDTH */
+                            else /* shouldn't happen */
+			        dxr = boxwidth / 2.0;
 			else
 			    dxr = -dxl;
 		    } else {
@@ -2932,11 +2933,12 @@ static void
 plot_c_bars(plot)
     struct curve_points *plot;
 {
-    int i;			/* point index */
     struct termentry *t = term;
-    double x;			/* position of the bar */
-    double ylow, yhigh, yclose, yopen;	/* the ends of the bars */
-    unsigned int xM, ylowM, yhighM;	/* the mapped version of above */
+    int i;
+    double x;						/* position of the bar */
+    double dxl, dxr, ylow, yhigh, yclose, yopen;	/* the ends of the bars */
+    unsigned int xlowM, xhighM, xM, ylowM, yhighM;	/* mapped version of above */
+    enum coord_type prev = UNDEFINED;			/* type of previous point */
     TBOOLEAN low_inrange, high_inrange;
     int tic = ERRORBARTIC / 2;
 
@@ -2990,9 +2992,45 @@ plot_c_bars(plot)
 	    /* both out of range on the same side */
 	    continue;
 
+	if (boxwidth < 0.0) {
+	    /* EAM Feb 2003 - Old code did essentially this */
+	    xlowM = xM - bar_size * tic;
+	    xhighM = xM + bar_size * tic;
+	} else { 
+
+	    dxl = -boxwidth / 2.0;
+	    if (prev != UNDEFINED) 
+#if USE_ULIG_RELATIVE_BOXWIDTH
+		if (! boxwidth_is_absolute)
+		    dxl = (plot->points[i-1].x - plot->points[i].x) * boxwidth / 2.0;
+#endif
+
+	    dxr = -dxl;
+	    if (i < plot->p_count - 1) {
+		if (plot->points[i + 1].type != UNDEFINED) { 
+#if USE_ULIG_RELATIVE_BOXWIDTH
+		    if (! boxwidth_is_absolute)
+			dxr = (plot->points[i+1].x - plot->points[i].x) * boxwidth / 2.0;
+		    else
+#endif
+			dxr = boxwidth / 2.0;
+		}
+	    }
+	
+	if (prev == UNDEFINED)
+	    dxl = -dxr;
+
+	dxl = plot->points[i].x + dxl;
+	dxr = plot->points[i].x + dxr;
+	cliptorange(dxr, X_AXIS.min, X_AXIS.max);
+	cliptorange(dxl, X_AXIS.min, X_AXIS.max);
+	xlowM = map_x(dxl);
+	xhighM = map_x(dxr);
+	}
+
 #ifdef USE_ULIG_FILLEDBOXES
 	/* EAM Sep 2001 use term->fillbox() code if present */
-	if ((plot->fill_properties.fillstyle != FS_EMPTY) && (term->fillbox)) {
+	if (term->fillbox) {
 	    int ymin, ymax, fillpar, style;
 	    /* This code duplicated in plot_boxes() */
                     switch( plot->fill_properties.fillstyle ) {
@@ -3007,56 +3045,39 @@ plot_c_bars(plot)
                         fillpar = 0;
                     }
 	    /* Set style parameter (horrible bit-packing hack) */
-                    style = ((fillpar & 0xfff) << 4) 
-			  + (plot->fill_properties.fillstyle & 0xf);
+	    style = ((fillpar & 0xfff) << 4) 
+		  + (plot->fill_properties.fillstyle & 0xf);
 	    if (map_y(yopen) < map_y(yclose)) {
 		ymin = map_y(yopen); ymax = map_y(yclose);
 	    } else {
 		ymax = map_y(yopen); ymin = map_y(yclose);
 	    }
 	    term->fillbox( style,
-		    (unsigned int)(xM - bar_size * tic),
-		    (unsigned int)(ymin),
-		    (unsigned int)(2 * bar_size * tic),
-		    (unsigned int)(ymax-ymin)  );
+		    (unsigned int)(xlowM), (unsigned int)(ymin),
+		    (unsigned int)(xhighM-xlowM), (unsigned int)(ymax-ymin) );
 	}
 #endif
 
-	/* by here everything has been mapped */
-	if (yopen <= yclose) {
-	    (*t->move) (xM, ylowM);
-	    (*t->vector) (xM, map_y(yopen));	/* draw the lower bar */
-	    /* draw the open tic */
-	    (*t->vector) ((unsigned int) (xM - bar_size * tic), map_y(yopen));
-	    /* draw the open tic */
-	    (*t->vector) ((unsigned int) (xM + bar_size * tic), map_y(yopen));
-	    (*t->vector) ((unsigned int) (xM + bar_size * tic), map_y(yclose));
-	    (*t->vector) ((unsigned int) (xM - bar_size * tic), map_y(yclose));
-	    /* draw the open tic */
-	    (*t->vector) ((unsigned int) (xM - bar_size * tic), map_y(yopen));
-	    (*t->move) (xM, map_y(yclose));	/* draw the close tic */
+	/* Draw whiskers and an open box */
+	    (*t->move)   (xM, ylowM);
+	    (*t->vector) (xM, map_y(yopen));
+	    (*t->vector) (xlowM, map_y(yopen));
+	    (*t->vector) (xhighM, map_y(yopen));
+	    (*t->vector) (xhighM, map_y(yclose));
+	    (*t->vector) (xlowM, map_y(yclose));
+	    (*t->vector) (xlowM, map_y(yopen));
+	    (*t->move)   (xM, map_y(yclose));
 	    (*t->vector) (xM, yhighM);
-	} else {
-	    (*t->move) (xM, ylowM);
-	    (*t->vector) (xM, yhighM);
-	    /* draw the open tic */
-	    (*t->move) ((unsigned int) (xM - bar_size * tic), map_y(yopen));
-	    /* draw the open tic */
-	    (*t->vector) ((unsigned int) (xM + bar_size * tic), map_y(yopen));
-	    (*t->vector) ((unsigned int) (xM + bar_size * tic), map_y(yclose));
-	    (*t->vector) ((unsigned int) (xM - bar_size * tic), map_y(yclose));
-	    /* draw the open tic */
-	    (*t->vector) ((unsigned int) (xM - bar_size * tic), map_y(yopen));
-	    /* draw the close tic */
-	    (*t->move) ((unsigned int) (xM - bar_size * tic / 2), map_y(yclose));
-	    /* draw the open tic */
-	    (*t->vector) ((unsigned int) (xM - bar_size * tic / 2), map_y(yopen));
-	    /* draw the close tic */
-	    (*t->move) ((unsigned int) (xM + bar_size * tic / 2), map_y(yclose));
-	    /* draw the open tic */
-	    (*t->vector) ((unsigned int) (xM + bar_size * tic / 2), map_y(yopen));
+
+	/* draw two extra vertical bars to indicate open > close */
+	if (yopen > yclose) {
+	    (*t->move)   ( (xM + xlowM) / 2, map_y(yclose));
+	    (*t->vector) ( (xM + xlowM) / 2, map_y(yopen));
+	    (*t->move)   ( (xM + xhighM) / 2, map_y(yclose));
+	    (*t->vector) ( (xM + xhighM) / 2, map_y(yopen));
 	}
 
+	prev = plot->points[i].type;
     }
 }
 
