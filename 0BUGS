@@ -149,13 +149,28 @@ END {
   If the filesystem doesn't allow deleting open files these file are
   locked for the time the terminal driver is running.
 
+11. OS/2 gcc optimiser bug
+  The following gnuplot commands demonstrate a bug in gcc's optimiser
+  under OS/2. The workaround is to use "-O2 -ffloat-store" instead of "-O2".
+
+reset
+set key
+set xlabel "Year"
+set xdata time
+set timefmt "%y%m%d"
+set format x "%y"
+set xrange ["900621" : "950126"]
+set ylabel "Price per $100 principal"
+plot '-' using 1:2 title 'Fitted IO' with lines 1
+900621 20
+950126 55
+e
 
 (Moved from old WhatsNew file, needs cleaning up)
 
 BUGS outstanding
   illegal trailing tab on fig output
   minor tics missing on HPUX ?
-  problem with time on os/2 - optimiser bug ?
   terminal settings get propagated when terminal is changed (now fixed ?)
   set ?range [] writeback is broken ? certainly for logscales.
   source file copyrights are out of date - what should go on new files ?
