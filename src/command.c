@@ -143,7 +143,7 @@ static int command __PROTO((void));
 static int read_line __PROTO((char *prompt));
 static void do_shell __PROTO((void));
 static void do_help __PROTO((int toplevel));
-static void do_system __PROTO((void));
+static void do_system __PROTO((char *cmd));
 static int changedir __PROTO((char *path));
 
 
@@ -277,7 +277,7 @@ int do_line()
     if (inlptr != input_line) {
 	/* If there was leading whitespace, copy the actual
 	 * command string to the front. use memmove() because
-	 * source and target overlap */
+	 * source and target may overlap */
 	memmove(input_line, inlptr, strlen(inlptr));
 	/* Terminate resulting string */
 	input_line[strlen(inlptr)] = NUL;
@@ -285,12 +285,21 @@ int do_line()
     FPRINTF((stderr, "Input line: \"%s\"\n", input_line));
 
     /* also used in load_file */
+#if 0
     if (is_system(input_line[0])) {
-	do_system();
+	/* system command may be followed by ';' separated gnuplot commands */
+	char *gpcmds = strchr(input_line,';');
+
+	do_system(input_line);
 	if (interactive)	/* 3.5 did it unconditionally */
 	    (void) fputs("!\n", stderr);	/* why do we need this ? */
-	return (0);
+
+	if (gpcmds != NULL)
+	    memmove (input_line,gpcmds,strlen(gpcmds)+1); /* including '\0' */
+	else
+	    return (0);
     }
+#endif
     num_tokens = scanner(&input_line, &input_line_len);
     c_token = 0;
     while (c_token < num_tokens) {
@@ -671,6 +680,13 @@ static int command()
 	       almost_equals(c_token, "q$uit")) {
 	/* graphics will be tidied up in main */
 	return (1);
+    } else if (equals(c_token, "!")) {  /* shell command */
+	++c_token;
+	if (!isletter(c_token)) {
+	    int_error(c_token, "expecting shell command");
+	} else
+	    do_system(input_line+token[c_token].start_index);
+	c_token++;
     } else if (!equals(c_token, ";")) {		/* null statement */
 #ifdef OS2
 	if (_osmode == OS2_MODE) {
@@ -761,11 +777,21 @@ void replotrequest()
      * after do_plot has returned, whence we know all is well
      */
     if (END_OF_COMMAND) {
-	/* it must already be long enough, but lets make sure */
-	int len = strlen(replot_line) + 1;
-	while (input_line_len < len)
+	char *rest_args = &input_line[token[c_token].start_index];
+	int replot_len = strlen(replot_line);
+	int rest_len = strlen(rest_args);
+
+	/* move rest of input line to the start
+	 * necessary because of realloc() in extend_input_line() */
+	memmove(input_line,rest_args,rest_len+1);
+	/* reallocs if necessary */
+	while (input_line_len < replot_len+rest_len+1)
 	    extend_input_line();
-	strcpy(input_line, replot_line);
+	/* move old rest args off start of input line to
+	 * make space for replot_line */
+	memmove(input_line+replot_len,input_line,rest_len+1);
+	/* copy previous plot command to start of input line */
+	strncpy(input_line, replot_line, replot_len);
     } else {
 	char *replot_args = NULL;	/* else m_capture will free it */
 	int last_token = num_tokens - 1;
@@ -900,21 +926,36 @@ static void do_shell()
     }
 }
 
-
-static void do_system()
+/* the leading '!' should already be stripped,
+ * but it's not too hard to provide a safeguard */
+static void do_system(cmd)
+char *cmd;
 {
-/*    input_line[0] = ' ';	an embarrassment, but... */
+    char *scol = strchr(cmd,';');
+    char *lcmd = NULL;
 
-/* input_line is filled by read_line or load_file, but 
- * line_desc length is set only by read_line; adjust now
- */
-    line_desc.dsc$w_length = strlen(input_line) - 1;
-    line_desc.dsc$a_pointer = &input_line[1];
+    if (scol != NULL) {
+	int cmdlen = scol - cmd;
+
+	lcmd = gp_alloc (cmdlen+1, "shell cmd");
+	strncpy(lcmd,cmd,cmdlen);
+	*(lcmd+cmdlen) = NUL;
+    } else
+	lcmd = cmd;
+
+    /* input_line is filled by read_line or load_file, but 
+     * line_desc length is set only by read_line; adjust now
+     */
+    line_desc.dsc$w_length = strlen(lcmd);
+    line_desc.dsc$a_pointer = lcmd;
 
     if ((vaxc$errno = lib$spawn(&line_desc)) != SS$_NORMAL)
 	os_error(NO_CARET, "spawn error");
 
     (void) putc('\n', stderr);
+
+    if (scol != NULL)
+	free(lcmd);
 }
 
 #endif /* VMS */
@@ -1103,37 +1144,58 @@ static char strg0[256];
 static void getparms __PROTO((char *, char **));
 # endif
 
-static void do_system()
+/* the leading '!' should already be stripped,
+ * but it's not too hard to provide a safeguard */
+static void do_system(cmd)
+char *cmd;
 {
+    char *scol = strchr(cmd,';');
+    char *lcmd = NULL;
+
+    if (scol != NULL) {
+	int cmdlen = scol - cmd;
+
+	lcmd = gp_alloc(cmdlen+1, "shell cmd");
+	strncpy(lcmd,cmd,cmdlen);
+	*(lcmd+cmdlen) = NUL;
+    } else
+	lcmd = cmd;
+
 # ifdef AMIGA_AC_5
-    getparms(input_line + 1, parms);
+    getparms(lcmd, parms);
     fexecv(parms[0], parms);
 # elif (defined(ATARI) && defined(__GNUC__))
 /* || (defined(MTOS) && defined(__GNUC__)) */
-    /* use preloaded shell, if available */
-    short (*shell_p) (char *command);
-    void *ssp;
+    {
+	/* use preloaded shell, if available */
+	short (*shell_p) (char *command);
+	void *ssp;
 
-    ssp = (void *) Super(NULL);
-    shell_p = *(short (**)(char *)) 0x4f6;
-    Super(ssp);
+	ssp = (void *) Super(NULL);
+	shell_p = *(short (**)(char *)) 0x4f6;
+	Super(ssp);
 
-    /* this is a bit strange, but we have to have a single if */
-    if (shell_p)
-	(*shell_p) (input_line + 1);
-    else
-	system(input_line + 1);
+	/* this is a bit strange, but we have to have a single if */
+	if (shell_p)
+	    (*shell_p) (lcmd);
+	else
+	    system(lcmd);
+    }
 # elif defined(_Windows)
-    winsystem(input_line + 1);
-# else				/* !(AMIGA_AC_5 || ATARI && __GNUC__ || _Windows) */
+    winsystem(lcmd);
+# else /* !(AMIGA_AC_5 || ATARI && __GNUC__ || _Windows) */
 /* (am, 19980929)
  * OS/2 related note: cmd.exe returns 255 if called w/o argument.
  * i.e. calling a shell by "!" will always end with an error message.
  * A workaround has to include checking for EMX,OS/2, two environment
  *  variables,...
  */
-    system(input_line + 1);
-# endif				/* !(AMIGA_AC_5 || ATARI&&__GNUC__ || _Windows) */
+    system(lcmd);
+# endif /* !(AMIGA_AC_5 || ATARI&&__GNUC__ || _Windows) */
+
+    if (scol != NULL)
+	free(lcmd);
+
 }
 
 
