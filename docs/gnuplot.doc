@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.218 2004/04/18 02:57:24 cgaylord Exp $
+C RCS $Id: gnuplot.doc,v 1.219 2004/04/20 08:45:23 broeker Exp $
 C 18 September 2001
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -1308,8 +1308,28 @@ C ... and restart the table:
        plot 'file' using 1:( $4<0 ? 1/0 : ($2+$3)/2 )
 
  Please see `plot datafile using` for an explanation of the `using` syntax.
-3 User-defined
+
+3 Gnuplot-defined variables
+?gnuplot-defined variables
+ The variable `pi` is defined to be pi, see
+       print pi
+
+ Additionally, gnuplot may define some variables under various operations.
+
+ Working with interactive terminals with `mouse` functionality defines
+ variables with names that begin "MOUSE_", see `mouse variables` for details.
+
+ The `fit` mechanism uses several variables with names that begin "FIT_".  It
+ is safest to avoid using such names.  "FIT_LIMIT", however, is one that you
+ may wish to redefine. Under `set fit errorvariables`, the error for each
+ fitted parameter will be stored in a variable named like the parameter, but
+ with "_err" appended. See the documentation on `fit` for details.
+
+ See `user-defined variables`, `mouse variables`, and `fit`.
+
+3 User-defined variables and functions
 ?expressions user-defined
+?user-defined variables
 ?user-defined
 ?variables
  New user-defined variables and functions of one through five variables may
@@ -1337,16 +1357,20 @@ C ... and restart the table:
 
 ^ <img align=bottom src="http://www.gnuplot.info/doc/userdefined.gif" alt="[userdefined.gif]" width=640 height=480>
  Note that the variable `pi` is already defined.  But it is in no way magic;
- you may redefine it to be whatever you like.
+ you may redefine it to be whatever you like. Some other variables may be
+ defined under various gnuplot operations like mousing in interactive terminals
+ or fitting; see `gnuplot-defined variables` for details.
+
+ You can check for existence of a given variable by the defined(v) expression,
+ for example
+       a = 10
+       if (defined(a)) print "a is defined"
+       if (!defined(b)) print "b is not defined"
 
  Valid names are the same as in most programming languages: they must begin
  with a letter, but subsequent characters may be letters, digits, "$", or "_".
- Note, however, that the `fit` mechanism uses several variables with names
- that begin "FIT_".  It is safest to avoid using such names.  "FIT_LIMIT",
- however, is one that you may wish to redefine. See the documentation
- on `fit` for details.
 
- See `show functions`, `show variables`, and `fit`.
+ See `show functions`, `functions`, `gnuplot-defined variables`.
 
 2 Glossary
 ?glossary
@@ -1466,7 +1490,7 @@ C ... and restart the table:
 
  See also help for `mouse` and `if`.
 
-3 mouse_variables
+3 Mouse variables
 ?mouse variables
  When mousing is active, clicking in the active window will set several user
  variables that can be accessed from the gnuplot command line. The coordinates
@@ -6206,21 +6230,26 @@ C ... and restart the table:
  as the gray for gray maps. The color map requires a transformation gray -->
  (R,G,B), i.e. a mapping [0:1] --> ([0:1],[0:1],[0:1]).
 
- Basically two different types of mappings can be used:  Analytic formulae
- to convert gray to color, or discrete mapping tables which are interpolated.
- `rgbformulae` and `functions` use analytic formulae whereas `defined` and
- `file` use interpolated tables.  `rgbformulae` reduces the size of postscript
- output to a minimum.
+ Basically two different types of mappings can be used:  Analytic formulae to
+ convert gray to color, or discrete mapping tables which are interpolated.
+ `palette rgbformulae` and `palette functions` use analytic formulae whereas
+ `palette defined` and `palette file` use interpolated tables.  `palette
+ rgbformulae` reduces the size of postscript output to a minimum.
 
  The command `show palette fit2rgbformulae` finds the best matching `set
  palette rgbformulae` for the current `set palette`. Naturally, it makes sense
  to use it for non-rgbformulae palettes. This command can be found useful
  mainly for external programs using the same rgbformulae definition of palettes
- as gnuplot, like zimg.
+ as gnuplot, like zimg (
+^ <a href="http://zimg.sourceforge.net">
+           http://zimg.sourceforge.net
+^ </a>
+  ).
 
- `set palette gray` switches to a gray only palette.  `rgbformulae`, `defined`,
- `file` and `functions` switch to a color mapping.  `set palette color` is an
- easy way to switch back from the gray palette to the last color mapping.
+ `set palette gray` switches to a gray only palette. `set palette rgbformulae`,
+ `set palette defined`, `set palette file` and `set palette functions` switch
+ to a color mapping. `set palette color` is an easy way to switch back from the
+ gray palette to the last color mapping.
 
  Automatic gamma correction via `set palette gamma <gamma>` can be done for
  gray maps only (`set palette gray`).  Linear mapping to gray is for gamma
@@ -6236,12 +6265,13 @@ C ... and restart the table:
  allocating all remaining entries in the terminal palette or for to use exact
  mapping to RGB.
 
- RGB color space might not be the most useful color space to work in.  For
- that reason you may change the color space with `model` to one of `RGB`,
- `HSV`, `CMY`, `YIQ` and `XYZ`.  Using color names for `defined` tables and a
- color space other than RGB will result in funny colors.  All explanation have
- been written for RGB color space, so please note, that `R` can be `H`, `C`,
- `Y`, or `X`, depending on the actual color space (`G` and `B` accordingly).
+ RGB color space might not be the most useful color space to work in.  For that
+ reason you may change the color space with `model` to one of `RGB`, `HSV`,
+ `CMY`, `YIQ` and `XYZ`.  Using color names for `set palette defined` tables
+ and a color space other than RGB will result in funny colors.  All explanation
+ have been written for RGB color space, so please note, that `R` can be `H`,
+ `C`, `Y`, or `X`, depending on the actual color space (`G` and `B`
+ accordingly).
 
  All values for all color spaces are limited to [0,1].
 
@@ -6298,8 +6328,7 @@ C ... and restart the table:
 ?commands set palette defined
 ?set palette defined
 ?palette defined
-?defined
- Gray-to-rgb mapping can be manually set by use of `defined`:  A color gradient
+ Gray-to-rgb mapping can be manually set by use of `palette defined`:  A color gradient
  is defined and used to give the rgb values.  Such a  gradient is a piecewise
  linear mapping from gray values in [0,1] to the RGB space [0,1]x[0,1]x[0,1].
  You have to specify the gray values and the corresponding RGB values in
@@ -6388,7 +6417,6 @@ C ... and restart the table:
 ?commands set palette file
 ?set palette file
 ?palette file
-?file
  `set palette file` is basically a `set palette defined (<gradient>)` where
  <gradient> is read from a datafile.  Either 4 columns (gray,R,G,B) or
  just three columns (R,G,B) have to be selected via the `using` data file
