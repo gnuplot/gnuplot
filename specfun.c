@@ -1,7 +1,6 @@
 #ifndef lint
-static char *RCSid = "$Id: specfun.c,v 1.21 1998/04/14 00:16:20 drd Exp $";
+static char *RCSid = "$Id: specfun.c,v 1.8 1998/12/10 18:30:35 lhecking Exp $";
 #endif
-
 
 /* GNUPLOT - specfun.c */
 
@@ -363,7 +362,7 @@ void f_rand()
 
 #endif /* BADRAND */
 
-/** ibeta.c
+/* ** ibeta.c
  *
  *   DESCRIB   Approximate the incomplete beta function Ix(a, b).
  *
@@ -392,8 +391,11 @@ void f_rand()
  *   REFERENCE The continued fraction expansion as given by
  *             Abramowitz and Stegun (1964) is used.
  *
- * Permission granted to distribute freely for non-commercial purposes only
  * Copyright (c) 1992 Jos van der Woude, jvdwoude@hut.nl
+ *
+ * Note: this function was translated from the Public Domain Fortran
+ *       version available from http://lib.stat.cmu.edu/apstat/xxx
+ *
  */
 
 static double ibeta(a, b, x)
@@ -462,7 +464,7 @@ double a, b, x;
     return -1.0;
 }
 
-/** igamma.c
+/* ** igamma.c
  *
  *   DESCRIB   Approximate the incomplete gamma function P(a, x).
  *
@@ -486,8 +488,11 @@ double a, b, x;
  *
  *   REFERENCE ALGORITHM AS239  APPL. STATIST. (1988) VOL. 37, NO. 3
  *
- * Permission granted to distribute freely for non-commercial purposes only
  * Copyright (c) 1992 Jos van der Woude, jvdwoude@hut.nl
+ *
+ * Note: this function was translated from the Public Domain Fortran
+ *       version available from http://lib.stat.cmu.edu/apstat/239
+ *
  */
 
 /* Global variables, not visible outside this file */

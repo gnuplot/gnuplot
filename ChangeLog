@@ -1,3 +1,8 @@
+2001-12-09  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* src/specfun.c: Remove "non-commercial" clause for ibeta() and
+	igamma() by permission of the original author, Jos van der Woude.
+
 2001-12-04  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* demo/airfoil.dem, demo/contours.dem, demo/fit.dem, demo/multimsh.dem,
