@@ -1,3 +1,15 @@
+2003-03-20  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/eval.c (gp_exp): Make this a function in all cases.  If
+ 	MINEXP wasn't set, use special version that removes ERANGE caused
+ 	by large negative arguments to exp().
+
+	* src/eval.h (gp_exp): Don't #define gp_exp() if no MINEXP set.
+
+	* src/specfun.c (inverse_error_func): Call sanitized gp_exp()
+ 	instead of plain exp().
+	(lambertw): Likewise.
+
 2003-03-18  Ethan Merritt <merritt@u.washington.edu>
 
 	* term/gd.trm: Default to medium size font (7x13) as claimed

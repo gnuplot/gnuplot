@@ -1,5 +1,5 @@
 /*
- * $Id: eval.h,v 1.5 2000/11/01 18:57:28 broeker Exp $
+ * $Id: eval.h,v 1.6 2001/08/22 14:15:33 broeker Exp $
  */
 
 /* GNUPLOT - eval.h */
@@ -126,11 +126,7 @@ extern TBOOLEAN undefined;
 
 /* Prototypes of functions exported by eval.c */
 
-#ifdef MINEXP
 double gp_exp __PROTO((double x));
-#else
-#define gp_exp(x) exp(x)
-#endif
 
 /* HBB 20010726: Moved these here, from util.h. */
 void disp_value __PROTO((FILE *, struct value *));

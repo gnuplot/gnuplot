@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: specfun.c,v 1.18 2002/05/16 13:48:28 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: specfun.c,v 1.19 2002/10/05 15:18:57 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - specfun.c */
@@ -1823,12 +1823,11 @@ static unsigned short U[] = {
 };
 #define UTHRESH 37.519379347
 #endif
-/*
-double          ndtr(double a)
-{
-    double          x,
-                    y,
-                    z;
+
+#if 0 /* unused */
+double
+ndtr(double a) {
+    double x, y, z;
 
     x = a * SQRTH;
     z = fabs(x);
@@ -1845,16 +1844,17 @@ double          ndtr(double a)
 
     return (y);
 }
-*/
+#endif /* unused */
+
+/* HBB FIXME 20030320: what's this prototype doing down here, way
+ * after erf() has been called by other functions further up already?
+ * */
 double erf(double);
 
-double          erfc(double a)
+double erfc(a)
+    double a;
 {
-    double          p,
-                    q,
-                    x,
-                    y,
-                    z;
+    double p, q, x, y, z;
 
     if (a < 0.0)
         x = -a;
@@ -1894,10 +1894,8 @@ under:
     return (y);
 }
 
-double          erf(double x)
-{
-    double          y,
-                    z;
+double erf(x) double x; {
+    double y, z;
 
     if (fabs(x) > 1.0)
         return (1.0 - erfc(x));
@@ -1907,17 +1905,19 @@ double          erf(double x)
 
 }
 
-static double inverse_error_func(double y)
+static double
+inverse_error_func(y)
+    double y;
 {
-    double          x = 0.0;    /* The output */
-    double          z = 0.0;    /* Intermadiate variable */
-    double          y0 = 0.7;   /* Central range variable */
+    double x = 0.0;    /* The output */
+    double z = 0.0;    /* Intermadiate variable */
+    double y0 = 0.7;   /* Central range variable */
 
     /* Coefficients in rational approximations. */
-    double          a[4] = {0.886226899, -1.645349621, 0.914624893, -0.140543331};
-    double          b[4] = {-2.118377725, 1.442710462, -0.329097515, 0.012229801};
-    double          c[4] = {-1.970840454, -1.624906493, 3.429567803, 1.641345311};
-    double          d[2] = {3.543889200, 1.637067800};
+    double a[4] = {0.886226899, -1.645349621, 0.914624893, -0.140543331};
+    double b[4] = {-2.118377725, 1.442710462, -0.329097515, 0.012229801};
+    double c[4] = {-1.970840454, -1.624906493, 3.429567803, 1.641345311};
+    double d[2] = {3.543889200, 1.637067800};
 
     if ((y < -1.0) || (1.0 < y)) {
         printf("inverse_error_func: The value out of the range of the function");
@@ -1937,8 +1937,8 @@ static double inverse_error_func(double y)
             x = (((c[3] * z + c[2]) * z + c[1]) * z + c[0]) / ((d[1] * z + d[0]) * z + 1.0);
         }
         /* Two steps of Newton-Raphson correction to full accuracy. */
-        x = x - (erf(x) - y) / (2.0 / sqrt(PI) * exp(-x * x));
-        x = x - (erf(x) - y) / (2.0 / sqrt(PI) * exp(-x * x));
+        x = x - (erf(x) - y) / (2.0 / sqrt(PI) * gp_exp(-x * x));
+        x = x - (erf(x) - y) / (2.0 / sqrt(PI) * gp_exp(-x * x));
     }
     return (x);
 }
@@ -1954,7 +1954,7 @@ static double inverse_error_func(double y)
 
 static double 
 lambertw(x)
-double x;
+    double x;
 {
     double p, e, t, w, eps;
     int i;
@@ -1978,7 +1978,7 @@ double x;
 	w = w - log(w);
     }
     for (i = 0; i < 20; i++) {
-	e = exp(w);
+	e = gp_exp(w);
 	t = w * e - x;
 	t = t / (e * (w + 1.0) - 0.5 * (w + 2.0) * t / (w + 1.0));
 	w = w - t;

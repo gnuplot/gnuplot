@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: eval.c,v 1.11 2001/08/22 14:15:33 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: eval.c,v 1.12 2001/12/01 13:08:59 amai Exp $"); }
 #endif
 
 /* GNUPLOT - eval.c */
@@ -399,15 +399,22 @@ Ginteger(a, i)
  * exp(x) will already have been defined as gp_exp(x) in plot.h
  */
 
-#ifdef MINEXP
 double
 gp_exp(x)
-double x;
+    double x;
 {
+#ifdef MINEXP    
     return (x < (MINEXP)) ? 0.0 : exp(x);
+#else  /* MINEXP */
+    int old_errno = errno;
+    double result = exp(x);
+    
+    /* exp(-large) quite uselessly raises ERANGE --- stop that */
+    if (result == 0.0)
+	errno = old_errno;
+    return result;
+#endif /* MINEXP */
 }
-#endif
-
 
 void
 reset_stack()
