@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.130 2004/09/15 04:49:41 sfeam Exp $
+ * $Id: post.trm,v 1.131 2004/09/15 11:13:04 mikulik Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -3003,7 +3003,6 @@ static void
 delete_ps_fontfile(struct ps_fontfile_def *prev, struct ps_fontfile_def *this)
 {
     if (this != NULL) {		/* there really is something to delete */
-	printf("hallo1\n");
 	if (prev != NULL)	/* there is a previous ps_fontfile */
 	    prev->next = this->next;
 	else			/* this = first_ps_fontfile so change first_ps_fontfile */

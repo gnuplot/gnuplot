@@ -1,3 +1,7 @@
+2004-09-16  Harald Harders  <h.harders@tu-bs.de>
+
+	* term/post.trm (delete_ps_fontfile): Remove debugging printout line.
+
 2004-09-15  Ethan Merritt  <merritt@u.washington.edu>
 
 	* plot3d.c (get_3ddata) graphics.c (boundary) x11.trm:
