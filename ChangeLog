@@ -1,3 +1,32 @@
+1999-03-11  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* 0INSTALL: Configure options updated.
+
+	* 0README: Distribution sites updated.
+
+	* NEWS: Updated.
+
+	* command.c, show.c, term/multitos.trm: Use external user_gnuplotpath
+	variable on Atari/MTOS.
+
+	* plot.c: Put user environment handling code into one function.
+	Add handling of GNUPLOTPATH on Atari/MTOS.
+
+	* stdfn.h: Add GP_GETCWD definition for OS/2 from syscfg.h.
+
+	* syscfg.h: Move GP_GETCWD for OS/2 to stdfn.h, don't include
+	stdfn.h.
+
+	* version.c: New patchlevel and date.
+
+	* os2/gclient.c/, os2/gnupmdrv.c, os2/gnupmdrv.h: Use external
+	user_homedir variable instead of GNUPLOT.
+
+1999-03-11  Jon Garibaldi  <jong@rome.cis.plym.ac.uk>
+
+	* term/cgm.trm(CGM_write_char_record): Fix bug trying to write
+	from NULL pointer.
+
 1999-03-10  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* acconfig.h: Remove symbols whose description was moved to
