@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.47 2001/04/03 16:14:46 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.48 2001/06/11 16:47:59 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -140,6 +140,7 @@ static int widest_tic;
 void widest2d_callback __PROTO((AXIS_INDEX, double place, char *text, struct lp_style_type grid));
 void ytick2d_callback __PROTO((AXIS_INDEX, double place, char *text, struct lp_style_type grid));
 void xtick2d_callback __PROTO((AXIS_INDEX, double place, char *text, struct lp_style_type grid));
+int histeps_compare __PROTO((const void *p1, const void *p2));
 
 static void get_arrow __PROTO((struct arrow_def* arrow, unsigned int* sx, unsigned int* sy, unsigned int* ex, unsigned int* ey));
 static void map_position_double __PROTO((struct position* pos, double* x, double* y, const char* what));
@@ -1819,19 +1820,39 @@ struct curve_points *plot;
     }
 }
 
+/* HBB 20010625: replaced homegrown bubblesort in plot_histeps() by
+ * call of standard routine qsort(). Need to tell the compare function
+ * about the plotted dataset via this file scope variable: */
+static struct curve_points *histeps_current_plot;
+
+/* NOTE: I'd have made the comp.function 'static', but the HP-sUX gcc
+ * bug seems to forbid that :-( */
+int
+histeps_compare(p1, p2)
+    const void *p1, *p2;
+{
+    double x1=histeps_current_plot->points[*(int *)p1].x;
+    double x2=histeps_current_plot->points[*(int *)p2].x;
+    
+    if (x1 < x2)
+	return -1;
+    else
+	return (x2 > x1);
+}
+
 /* CAC  */
 /* plot_histeps:                                
  * Plot the curves in HISTEPS style
  */
 static void
 plot_histeps(plot)
-struct curve_points *plot;
+    struct curve_points *plot;
 {
     int i;			/* point index */
-    int hold, bigi;		/* indices for sorting */
     int xl, yl;			/* cursor position in terminal coordinates */
     struct termentry *t = term;
     double x, y, xn, yn;	/* point position */
+    double y_null;		/* y coordinate of histogram baseline */
     int *gl, goodcount;		/* array to hold list of valid points */
 
     /* preliminary count of points inside array */
@@ -1842,42 +1863,40 @@ struct curve_points *plot;
     if (goodcount < 2)
 	return;			/* cannot plot less than 2 points */
 
-    gl = (int *) gp_alloc(goodcount * sizeof(int), "histeps valid point mapping");
+    gl = gp_alloc(goodcount * sizeof(int), "histeps valid point mapping");
     if (gl == NULL)
 	return;
 
-/* fill gl array with indexes of valid (non-undefined) points.  */
+    /* fill gl array with indexes of valid (non-undefined) points.  */
     goodcount = 0;
     for (i = 0; i < plot->p_count; i++)
 	if (plot->points[i].type == INRANGE || plot->points[i].type == OUTRANGE) {
 	    gl[goodcount] = i;
 	    ++goodcount;
 	}
-/* sort the data */
-    /* FIXME HBB 20010214: should replace home-grown bubblesort by
-     * call of qsort(), or at least insertion sort ... */
-    for (bigi = i = 1; i < goodcount;) {
-	if (plot->points[gl[i]].x < plot->points[gl[i - 1]].x) {
-	    hold = gl[i];
-	    gl[i] = gl[i - 1];
-	    gl[i - 1] = hold;
-	    if (i > 1) {
-		i--;
-		continue;
-	    }
-	}
-	i = ++bigi;
-    }
+    /* sort the data --- tell histeps_compare about the plot
+     * datastructure to look at, then call qsort() */
+    histeps_current_plot = plot;
+    qsort(gl, goodcount, sizeof(*gl), histeps_compare);
+    /* play it safe: invalidate the static pointer after usage */
+    histeps_current_plot = NULL;
+
+    /* HBB 20010625: log y axis must treat 0.0 as -infinity. Define
+     * the correct y position for the histogram's baseline once. It'll
+     * be used twice (once for each endpoint of the histogram). */
+    if (Y_AXIS.log) 
+	y_null = GPMIN(Y_AXIS.min, Y_AXIS.max);
+    else
+	y_null = 0.0;
 
     x = (3.0 * plot->points[gl[0]].x - plot->points[gl[1]].x) / 2.0;
-    y = 0.0;
+    y = y_null;
 
     xl = map_x(x);
     yl = map_y(y);
     (*t->move) (xl, yl);
 
     for (i = 0; i < goodcount - 1; i++) {	/* loop over all points except last  */
-
 	yn = plot->points[gl[i]].y;
 	xn = (plot->points[gl[i]].x + plot->points[gl[i + 1]].x) / 2.0;
 	histeps_vertical(&xl, &yl, x, y, yn);
@@ -1891,7 +1910,7 @@ struct curve_points *plot;
     xn = (3.0 * plot->points[gl[i]].x - plot->points[gl[i - 1]].x) / 2.0;
     histeps_vertical(&xl, &yl, x, y, yn);
     histeps_horizontal(&xl, &yl, x, xn, yn);
-    histeps_vertical(&xl, &yl, xn, yn, 0.0);
+    histeps_vertical(&xl, &yl, xn, yn, y_null);
 
     free(gl);
 }
