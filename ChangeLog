@@ -1,3 +1,12 @@
+1999-12-01  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* configure.in: Do not use gd library by default, only when
+	specifically requested.
+
+	* term/png.trm: Bugfix by HBB for error I introduced when porting
+	the driver back from -current. Add missing trailing spaces when
+	strcat'ing font options.
+
 1999-11-30  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* bitmap.c, bitmap.h: Enable b_getpixel(), required by updated
