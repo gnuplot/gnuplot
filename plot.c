@@ -86,7 +86,7 @@ extern int rl_complete_with_tilde_expansion;
 # ifdef GNUPLOT_HISTORY
 #  include <readline/tilde.h>
 #  ifndef GNUPLOT_HISTORY_FILE
-#   define GNUPLOT_HISTORY_FILE "~/gnuplot.history"
+#   define GNUPLOT_HISTORY_FILE "~/.gnuplot.history"
 #  endif
 #  ifndef HISTORY_SIZE
 /* Some more or less arbitrary value :) */
