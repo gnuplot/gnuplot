@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.89 2004/12/01 19:27:33 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.90 2004/12/01 21:10:35 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -126,6 +126,13 @@ cp_alloc(int num)
 #ifdef EAM_HISTOGRAMS
     cp->histogram = NULL; /* Will be allocated later if plot_style == HISTOGRAM */
     cp->histogram_sequence = 0;
+#endif
+
+    memset(&(cp->lp_properties),0,sizeof(lp_style_type));
+    memset(&(cp->arrow_properties),0,sizeof(arrow_style_type));
+    memset(&(cp->fill_properties),0,sizeof(fill_style_type));
+#ifdef PM3D
+    memset(&(cp->filledcurves_options),0,sizeof(filledcurves_opts));
 #endif
     return (cp);
 }

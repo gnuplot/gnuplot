@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.158 2004/12/01 21:10:36 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.159 2004/12/04 06:11:18 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -1712,11 +1712,13 @@ set_label()
 
 #ifdef GP_STRING_VARS
     if (!END_OF_COMMAND) {
-	struct value a = {STRING,{0}};
+	struct value a;
 	int save_token = c_token;
 	parse_label_options( this_label );
 	if (!END_OF_COMMAND) {
+	    STRING_RESULT_ONLY = TRUE;
 	    (void) const_express(&a);
+	    STRING_RESULT_ONLY = FALSE;
 	    if (a.type == STRING)
 		this_label->text = a.v.string_val;
 	    else
@@ -3722,8 +3724,12 @@ set_xyzlabel(label_struct *label)
 #ifdef GP_STRING_VARS
     /* Allow creation of label text using sprintf() */
     if (isstring(c_token) || equals(c_token,"sprintf") || isstringvar(c_token)) {
-	struct value a = {STRING,{0}};
+	struct value a;
+	STRING_RESULT_ONLY = TRUE;
 	(void) const_express(&a);
+	STRING_RESULT_ONLY = FALSE;
+	if (a.type != STRING)
+	    int_warn(NO_CARET,"String parsing error");
 	strncpy(label->text, a.v.string_val, MAX_LINE_LEN);
     }
 #else

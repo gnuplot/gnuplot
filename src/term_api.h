@@ -1,5 +1,5 @@
 /*
- * $Id: term_api.h,v 1.35 2004/11/27 02:38:36 sfeam Exp $
+ * $Id: term_api.h,v 1.36 2004/12/01 21:10:38 sfeam Exp $
  */
 
 /* GNUPLOT - term_api.h */
@@ -104,7 +104,7 @@ typedef struct arrow_style_type {    /* contains all Arrow properties */
 #define L_TYPE_NODRAW -3	/* use if line is not to be drawn */
 
 #ifdef PM3D
-# define DEFAULT_LP_STYLE_TYPE {0, 0, 0, 1.0, 1.0, FALSE}
+# define DEFAULT_LP_STYLE_TYPE {0, 0, 0, 1.0, 1.0, FALSE, DEFAULT_COLORSPEC}
 #else
 # define DEFAULT_LP_STYLE_TYPE {0, 0, 0, 1.0, 1.0}
 #endif

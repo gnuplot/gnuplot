@@ -1,3 +1,15 @@
+2004-12-04  Ethan Merritt  <merritt@u.washington.edu>
+
+	Run valgrind to find codepaths that trip over uninitialized variables.
+
+	* src/parse.c (const_express) src/set.c (set_xyzlabel set_label):
+	src/eval.c src/eval.h: Move set/clear of flag STRING_RESULT_ONLY up
+	one level in the call chain.
+
+	* src/temp_api.h src/color.h src/graphics.c (init_histogram)
+	src/plot2d.c (cp_alloc) src/plot3d.c (sp_alloc):
+	More complete initialization of dynamic and gp_alloc()ed structures.
+
 2004-12-03  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c (xtick2d_callback ytick2d_callback): Fix bug

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: eval.c,v 1.21 2004/10/27 21:54:49 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: eval.c,v 1.22 2004/11/10 23:30:14 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - eval.c */
@@ -65,7 +65,8 @@ struct udvt_entry udv_pi = { NULL, "pi", FALSE, {INTGR, {0} } };
 struct udvt_entry *first_udv = &udv_pi;
 struct udft_entry *first_udf = NULL;
 
-#if (GP_STRING_VARS > 1)
+#ifdef GP_STRING_VARS
+/* Used to prevent auto-conversion of strings to numbers */
 TBOOLEAN STRING_RESULT_ONLY = FALSE;
 #endif
 

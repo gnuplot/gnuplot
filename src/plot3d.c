@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.91 2004/11/22 00:43:05 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.92 2004/12/01 19:27:33 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -124,6 +124,9 @@ sp_alloc(int num_samp_1, int num_iso_1, int num_samp_2, int num_iso_2)
     sp->pm3d_color_from_column = FALSE;
     sp->pm3d_where[0] = 0;
 #endif
+
+    memset(&(sp->lp_properties),0,sizeof(lp_style_type));
+    memset(&(sp->arrow_properties),0,sizeof(arrow_style_type));
 
     if (num_iso_2 > 0 && num_samp_1 > 0) {
 	int i;
@@ -1436,7 +1439,7 @@ eval_3dplots()
 		    }
 		} else {
 		    int stored_token = c_token;
-		    struct lp_style_type lp;
+		    struct lp_style_type lp = DEFAULT_LP_STYLE_TYPE;
 
  		    lp_parse(&lp, 1,
 			     this_plot->plot_style & PLOT_STYLE_HAS_POINT,

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.137 2004/12/01 21:10:33 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.138 2004/12/03 20:25:31 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -1085,7 +1085,8 @@ apply_head_properties(struct arrow_style_type *arrow_properties)
     if (arrow_properties->head_length > 0) {
 	/* set head length+angle for term->arrow */
 	unsigned int itmp, x1, x2;
-	struct position headsize;
+	struct position headsize = {0,0,0,0.,0.,0.};
+
 	headsize.x = arrow_properties->head_length;
 	headsize.scalex = arrow_properties->head_lengthunit;
 
@@ -4438,6 +4439,7 @@ init_histogram(struct histogram_style *histogram, char *title)
     stackheight = NULL;
     if (histogram) {
 	memcpy(histogram,&histogram_opts,sizeof(histogram_opts));
+	memset(&(histogram->title), 0, sizeof(text_label)); 
 	/* Insert in linked list */
 	histogram_opts.next = histogram;
 	histogram->title.text = title;

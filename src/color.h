@@ -1,5 +1,5 @@
 /*
- * $Id: color.h,v 1.19 2004/11/22 00:43:04 sfeam Exp $
+ * $Id: color.h,v 1.20 2004/11/28 02:02:51 sfeam Exp $
  */
 
 /* GNUPLOT - color.h */
@@ -45,6 +45,8 @@ typedef struct t_colorspec {
 #define	TC_CB		3
 #define	TC_FRAC		4
 #define	TC_Z		5
+
+#define DEFAULT_COLORSPEC {TC_DEFAULT, 0, 0.0}
 
 /* EAM July 2004 - Disentangle polygon support and PM3D support  */
 /* a point (with integer coordinates) for use in polygon drawing */

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: parse.c,v 1.27 2004/10/26 04:30:51 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: parse.c,v 1.28 2004/10/27 21:54:50 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - parse.c */
@@ -101,16 +101,7 @@ const_express(struct value *valptr)
     /* div - no dummy variables in a constant expression */
     dummy_func = NULL;
 
-#if (GP_STRING_VARS > 1)
-    /* If the caller insists on a string return, honor the request */
-    if (valptr->type == STRING) {
-	STRING_RESULT_ONLY = TRUE;
-	evaluate_at(temp_at(), valptr);	/* run it and send answer back */
-	STRING_RESULT_ONLY = FALSE;
-    } else
-#endif
-    /* The usual case */
-	evaluate_at(temp_at(), valptr);	/* run it and send answer back */
+    evaluate_at(temp_at(), valptr);	/* run it and send answer back */
 
     if (undefined) {
 	int_error(tkn, "undefined value");
@@ -398,6 +389,7 @@ parse_primary_expression()
 	union argument *foo = add_action(PUSHC);
 	foo->v_arg.type = STRING;
 	foo->v_arg.v.string_val = NULL;
+	/* WARNING - This is a memory leak if the string is not later freed */
 	m_quote_capture(&(foo->v_arg.v.string_val), c_token, c_token);
 	c_token++;
     }
