@@ -1,5 +1,10 @@
 2003-11-13  Petr Mikulik  <mikulik@physics.muni.cz>
 
+	* src/axis.h src/axis.c src/plot3d.c: Renamed set_pm3d_zminmax() to
+	set_cbminmax().
+
+2003-11-13  Petr Mikulik  <mikulik@physics.muni.cz>
+
 	* src/color.h src/color.c src/getcolor.h src/getcolor.c src/gplt_x11.c
 	src/show.c src/win/wgraph.c term/metapost.trm term/pdf.trm term/svg.trm:
 	- New structure rgb255_color for uchar r,g,b.

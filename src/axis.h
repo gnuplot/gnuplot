@@ -1,5 +1,5 @@
 /* 
- * $Id: axis.h,v 1.30 2003/09/08 12:56:00 broeker Exp $
+ * $Id: axis.h,v 1.31 2003/10/06 22:26:16 sfeam Exp $
  *
  */
 
@@ -650,7 +650,7 @@ void get_position __PROTO((struct position * pos));
    (PM3DSURFACE == (plot)->plot_style \
     || PM3D_IMPLICIT == pm3d.implicit \
     || 1 == (plot)->lp_properties.use_palette)
-int set_pm3d_zminmax __PROTO((void));
+int set_cbminmax __PROTO((void));
 
 #else
 

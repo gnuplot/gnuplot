@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.60 2003/01/13 13:22:10 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.61 2003/02/16 00:07:37 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -1678,7 +1678,7 @@ eval_3dplots()
 #ifdef PM3D
     set_plot_with_palette(plot_num);
     if (is_plot_with_palette()) {
-	set_pm3d_zminmax();
+	set_cbminmax();
 	axis_checked_extend_empty_range(COLOR_AXIS, "All points of colorbox value undefined");
 	/* axis_revert_and_unlog_range(COLOR_AXIS); */
 	/* fprintf(stderr,"plot3d.c: CB_AXIS.min=%g\tCB_AXIS.max=%g\n",CB_AXIS.min,CB_AXIS.max); */

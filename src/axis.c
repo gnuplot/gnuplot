@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.35 2002/11/01 20:14:31 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.36 2003/01/27 20:39:28 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -1524,15 +1524,15 @@ some_grid_selected()
 
 #ifdef PM3D
 /*
-   Check and set the cb-range for use by pm3d.
+   Check and set the cb-range for use by pm3d or other palette using styles.
    Return 0 on wrong range, otherwise 1.
  */
 int
-set_pm3d_zminmax()
+set_cbminmax()
 {
 #if 0
-    printf("ENTER set_pm3d_zminmax:  Z_AXIS.min=%g\t Z_AXIS.max=%g\n",Z_AXIS.min,Z_AXIS.max);
-    printf("ENTER set_pm3d_zminmax: CB_AXIS.min=%g\tCB_AXIS.max=%g\n",CB_AXIS.min,CB_AXIS.max);
+    printf("ENTER set_cbminmax:  Z_AXIS.min=%g\t Z_AXIS.max=%g\n",Z_AXIS.min,Z_AXIS.max);
+    printf("ENTER set_cbminmax: CB_AXIS.min=%g\tCB_AXIS.max=%g\n",CB_AXIS.min,CB_AXIS.max);
 #endif
     if (CB_AXIS.set_autoscale & AUTOSCALE_MIN) {
 	/* -VERYLARGE according to AXIS_INI3D */
@@ -1559,8 +1559,8 @@ set_pm3d_zminmax()
 	CB_AXIS.min = tmp;
     }
 #if 0
-    printf("EXIT  set_pm3d_zminmax:  Z_AXIS.min=%g\t Z_AXIS.max=%g\n",Z_AXIS.min,Z_AXIS.max);
-    printf("EXIT  set_pm3d_zminmax: CB_AXIS.min=%g\tCB_AXIS.max=%g\n",CB_AXIS.min,CB_AXIS.max);
+    printf("EXIT  set_cbminmax:  Z_AXIS.min=%g\t Z_AXIS.max=%g\n",Z_AXIS.min,Z_AXIS.max);
+    printf("EXIT  set_cbminmax: CB_AXIS.min=%g\tCB_AXIS.max=%g\n",CB_AXIS.min,CB_AXIS.max);
 #endif
     return 1;
 }
