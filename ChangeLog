@@ -1,3 +1,7 @@
+2004-03-30  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/axis.c: Fix another case of arithmetic assignment to a boolean.
+
 2004-03-30  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/graph3d.c (plot3d_lines_pm3d, plot3d_points_pm3d,

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.40 2004/03/23 12:58:33 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.41 2004/03/23 17:15:24 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -1233,7 +1233,7 @@ axis_output_tics(axis, ticlabel_position, zeroaxis_basis, callback)
 {
     struct termentry *t = term;
     TBOOLEAN axis_is_vertical = ((axis % SECOND_AXES) == FIRST_Y_AXIS);
-    TBOOLEAN axis_is_second = (axis / SECOND_AXES);
+    TBOOLEAN axis_is_second = ((axis / SECOND_AXES) == 1);
     int axis_position;		/* 'non-running' coordinate */
     int mirror_position;	/* 'non-running' coordinate, 'other' side */
 
