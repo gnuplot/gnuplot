@@ -190,8 +190,8 @@ In general, GNUPLOT 3.7 is available as the file gnuplot-3.7.tar.gz.
 Because of the numerous changes since version 3.5, no patch files
 will be available to bring 3.5 to 3.7.
 (Version 3.6 was skipped because of possible confusion
-with the numerous BETA releases.)  It will be made available to simtel20 
-and its mirrors in ZIP format, along with a DOS, MS-Windows 3.1,
+with the numerous BETA releases.)  It will be made available at web
+and ftp sites listed below, along with DOS, MS-Windows 3.1,
 Windows 95/98/NT and OS/2 2.0 executables. Amiga binaries will be
 made available on Aminet.
 
@@ -201,20 +201,24 @@ PostScript versions of the manuals and tutorials.
 Please obtain gnuplot from the site
 nearest you.
 
-USENET users:
-
-    GNUPLOT 3.7 will posted to comp.sources.misc.
-
 
 NORTH AMERICA:
 
+     Anonymous ftp to ftp.gnuplot.vt.edu:
+     ftp://ftp.gnuplot.vt.edu/pub/gnuplot/gnuplot-3.7.tar.gz
+
+     Alternatively, you can use your web browser to get gnuplot
+     from the gnuplot web pages at
+
+     http://members.theglobe.com/gnuplot/gp37tar.gz
+     http://www.geocities.com/SiliconValley/Foothills/6647/gp37tar.gz
+
+     Anonymous ftp to ftp.dartmouth.edu. Please try the
+     other sites first!
+     ftp://ftp.dartmouth.edu/pub/gnuplot/gnuplot-3.7.tar.gz
+
 [ At time of release, we are not sure whether this service
   is still available. -lh
-
-     Anonymous ftp to ftp.dartmouth.edu (129.170.16.4)
-     Fetch
-        pub/gnuplot/gnuplot-3.7.tar.gz
-     in binary mode.
 
      Users without ftp capability can obtain it through a mail ftp
      server. Email a message to ftpmail@ftp.dartmouth.edu
@@ -235,21 +239,18 @@ NORTH AMERICA:
 
 AUSTRALIA:
 
-     Anonymous ftp to ftp.cc.monash.edu.au (130.194.11.8).
-     Fetch /pub/gnuplot/gnuplot-3.7.tar.gz in binary mode.
+     Anonymous ftp to ftp.cc.monash.edu.au:
+     ftp://ftp.cc.monash.edu.au/pub/gnuplot/gnuplot-3.7.tar.gz
 
 
 EUROPE:
 
-     Anonymous ftp to ftp.irisa.fr (131.254.254.10).
-     Fetch /pub/gnuplot/gnuplot-3.7.tar.gz in binary mode.
-
-----
-
-     DISCLAIMER - This product is not related in any way to
-     Pixar or any other commercial venture.
+     Anonymous ftp to ftp.irisa.fr:
+     ftp://ftp.irisa.fr/pub/gnuplot/gnuplot-3.7.tar.gz
 
 ----
 
                                         -Thomas Williams-
                                         -Alex Woo-
+                                        -David Denholm-
+                                        -Lars Hecking-
