@@ -1,5 +1,5 @@
 /*
- * $Id: metapost.trm,v 1.6 1999/08/24 11:24:55 lhecking Exp $
+ * $Id: metapost.trm,v 1.7 1999/09/14 15:24:31 lhecking Exp $
  */
 
 /* GNUPLOT - metapost.trm */
@@ -121,10 +121,10 @@ static int MP_char_code = 0;
 /* number of nodes in an output line so far */
 static int MP_linecount = 1;
 
-/* Number of points */
+/* Number of point types */
 #define MP_POINT_TYPES 10
 
-/* Number of lines */
+/* Number of line types */
 #define MP_LINE_TYPES 8
 
 /* are we in the middle of a MP path? */
@@ -246,7 +246,7 @@ MP_options()
     if (MP_notex) {		/* Courier is a little wider than cmtt */
 	term->h_char = (unsigned int) (MP_DPI * MP_fontsize * MP_textmag * 6.0 / 720 + 0.5);
     } else {
-	term->h_char = (unsigned int) (MP_DPI * MP_fontsize * MP_textmag * 5.25 / 720 + 0.5);
+	term->h_char = (unsigned int) (MP_DPI * MP_fontsize * MP_textmag * 5.3 / 720 + 0.5);
     }
 
     sprintf(term_options, "%s%s%s%s%6.3f \"%s\" %5.2f",
@@ -263,10 +263,10 @@ MP_init()
     MP_posx = MP_posy = 0;
     fprintf(gpoutfile, "%%GNUPLOT Metapost output: %s\n", asctime(localtime(&now)));
     fputs("\n\
-defaultmpt:=mpt:=4;\
-th:=.6;\
+defaultmpt:=mpt:=4;\n\
+th:=.6;\n\
 \n\
-def pen expr n = pickup pencircle scaled (n*th) enddef;\
+def scalepen expr n = pickup pencircle scaled (n*th) enddef;\n\
 def ptsize expr n = mpt:=n*defaultmpt enddef;\n",
 	  gpoutfile);
 
@@ -317,7 +317,7 @@ boolean colorlines,dashedlines;\n",
 	fputs("dashedlines:=true;\n", gpoutfile);
     }
     fputs("\n\
-def _wc = withpen currentpen if colorlines: withcolor currentcolor fi enddef;\n\
+def _wc = withpen currentpen withcolor currentcolor enddef;\n\
 def _ac = addto currentpicture enddef;\n\
 def _sms = scaled mpt shifted enddef;\n\
 % drawing point-types\n\
@@ -347,13 +347,13 @@ ptpath4 = ptpath8:= fullcircle;\n\
 ptpath5 = ptpath9 := (0,1/2)--(-1/2,-1/2)--(1/2,-1/2)--cycle;\n\
 \n\
 def linetype expr n =\n\
-  if n < 1 : currentcolor:=black;\n\
-    if n = -1 : drawoptions(withpen (currentpen scaled .6667));\n\
-      else : drawoptions();\n\
-    fi\n\
-  else: if colorlines: currentcolor:=col[n]; fi\n\
-    drawoptions( if dashedlines: dashed lt[n] fi\n\
-      if colorlines: withcolor col[n] fi  withpen currentpen);\n\
+  currentcolor:= if colorlines : col[n] else: black fi;\n\
+  if n = -1 :\n\
+      drawoptions(withcolor currentcolor withpen (currentpen scaled .5));\n\
+  elseif n < 1 :\n\
+    drawoptions(_wc);\n\
+  else :\n\
+    drawoptions( if dashedlines: dashed lt[n] fi _wc);\n\
   fi\n\
 enddef;\n\
 \n\
@@ -363,8 +363,8 @@ lt1=dashpattern(on 2 off 2); % dashes\n\
 lt2=dashpattern(on 2 off 2 on 0.2 off 2); %dash-dot\n\
 lt3=lt1 scaled 1.414;\n\
 lt4=lt2 scaled 1.414;\n\
-lt5=lt3 scaled 1.414;\n\
-lt6:=lt4 scaled 1.414;\n\
+lt5=lt1 scaled 2;\n\
+lt6:=lt2 scaled 2;\n\
 lt7=dashpattern(on 0.2 off 2); %dots\n\
 \n\
 color col[],cyan, magenta, yellow;\n\
@@ -374,7 +374,7 @@ col1:=red;\n\
 col2:=(.2,.2,1); %blue\n\
 col3:=(1,.66,0); %orange\n\
 col4:=.85*green;\n\
-col5:=.9magenta;\n\
+col5:=.9*magenta;\n\
 col6:=0.85*cyan;\n\
 col7:=.85*yellow;\n\
 \n\
@@ -403,7 +403,7 @@ MP_graphics()
     fprintf(gpoutfile, "\nbeginfig(%d);\nw:=%gin;h:=%gin;\n",
 	    MP_char_code, MP_xsize, MP_ysize);
     fprintf(gpoutfile, "a:=w/%d;b:=h/%d;\n", term->xmax, term->ymax);
-    fprintf(gpoutfile, "pen 1; ptsize %g;linetype -2;\n", pointsize);
+    fprintf(gpoutfile, "scalepen 1; ptsize %g;linetype -2;\n", pointsize);
     MP_char_code++;
 }
 
@@ -481,7 +481,7 @@ double lw;
     if (MP_oldpen != lw) {
 	if (MP_inline)
 	    MP_endline();
-	fprintf(gpoutfile, "pen %g;\n", lw);
+	fprintf(gpoutfile, "scalepen %g;\n", lw);
 	MP_oldpen = lw;
     }
 }

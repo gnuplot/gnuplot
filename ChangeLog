@@ -1,3 +1,50 @@
+1999-09-21  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* FAQ: Latest version from Juergen.
+
+	* INSTALL: VMS section updated according suggestion from
+	Rolf Niepraschk <niepraschk@ChbRB.berlin.ptb.de>.
+
+	* configure.in: Get rid of AC_SUBST(NEXTOBJS), which is apparently
+	not required anymore.
+
+	* config/makefile.*: New .c files and rules added.
+
+	* docs/gnuplot.doc: Docs for 'set cntrparam' fixed following
+	suggestion from HBB.
+
+	* lisp/gnuplot-gui.el, lisp/gnuplot.el, lisp/gpelcard.tex: Updated
+	to current version from Bruce.
+
+	* m4/next.m4: Remove NEXTOBJS.
+
+1999-09-21  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/graph3d.c: Fix splot zeroaxis misbehaviour (reversed
+	'set {x|y}zeroaxis').
+
+1999-09-21  Dick Crawford  <u600256@gamma.lanl.gov>
+
+	* src/term.c(test_term): Fix bug with plotting before line properties
+	are specified completely.
+
+1999-09-21  John Hasstedt  <manager@nuclear.physics.sunysb.edu>
+
+	* config/buildvms.com: Updated.
+
+	* config/descrip.mms: Removed. See INSTALL.
+
+1999-09-21  "Daniel H. Luecking"  <luecking@comp.uark.edu>
+
+	* term/metapost.trm: Updated.
+
+1999-09-21  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* src/command.c, src/plot.c, src/readline.c, src/os2/dialogs.c,
+	src/os2/dialogs.h, src/os2/gclient.c, src/os2/gnupmdrv.h,
+	src/os2/gnupmdrv.ipf, src/os2/gnupmdrv.rc: Updated and improved
+	OS/2 mouse mode.
+
 1999-09-14  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* src/Makefile.am: Do not install bf_test and gpltconv.
