@@ -1,5 +1,5 @@
 /*
- * $Id: hpljii.trm,v 1.17 1999/12/10 16:59:48 lhecking Exp $
+ * $Id: hpljii.trm,v 1.18 2001/08/27 15:04:12 broeker Exp $
  *
  */
 
@@ -281,19 +281,15 @@ const char *str;
     }
 }
 
-#ifdef PROTOTYPES
-static void
-HPLJII_putc(unsigned int x, unsigned int y, char c, int ang)
-#else
 static void
 HPLJII_putc(x, y, c, ang)
-unsigned int x, y;
-int ang;
-char c;
-#endif
+    unsigned int x, y;
+    char c;
+    int ang;
 {
     HPLJII_POP_CURSOR;
     HPLJII_PUSH_CURSOR;
+    (void) ang;			/* avoid -Wunused warnings */
     /* (0,0) is the upper left point of the paper */
     fprintf(gpoutfile, "\033*p%+dx%+dY", x * HPLJII_DPP
 	    ,(HPLJII_YMAX - y - 1) * HPLJII_DPP);

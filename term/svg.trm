@@ -56,30 +56,32 @@ struct SVG_PEN
     char color[8];
 };
 
-unsigned int SVG_xSize = SVG_XMAX;	/* plot horizontal size */
-unsigned int SVG_ySize = SVG_YMAX;	/* plot vertical size*/
+static unsigned int SVG_xSize = SVG_XMAX; /* plot horizontal size */
+static unsigned int SVG_ySize = SVG_YMAX; /* plot vertical size*/
 
-unsigned int SVG_xLast = UINT_MAX;	/* current pen horizontal position*/
-unsigned int SVG_yLast = UINT_MAX;	/* current pen vertical position*/
+static unsigned int SVG_xLast = UINT_MAX; /* current pen horizontal position*/
+static unsigned int SVG_yLast = UINT_MAX;	/* current pen vertical position*/
 
-int SVG_LineType = -3;	/* current line type*/
-double SVG_LineWidth = 1.0;	/* current line width*/
-int SVG_TextAngle = 0;	/* current text orientation*/
-enum JUSTIFY SVG_TextJust = LEFT;	/* current text justification*/
+static int SVG_LineType = -3;	/* current line type*/
+static double SVG_LineWidth = 1.0; /* current line width*/
+static int SVG_TextAngle = 0;	/* current text orientation*/
+static enum JUSTIFY SVG_TextJust = LEFT; /* current text justification*/
 
-char SVG_fontNameDef[MAX_ID_LEN + 1] = "Arial";	/* default text font family*/
-double SVG_fontSizeDef = 12;	/* default text size*/
-char SVG_fontNameCur[MAX_ID_LEN + 1] = "Arial";	/* current text font family*/
-double SVG_fontSizeCur = 12;	/* current text size*/
-TBOOLEAN SVG_groupIsOpen = FALSE; /* open group flag*/
-TBOOLEAN SVG_pathIsOpen = FALSE; /* open path flag*/
-unsigned int SVG_path_count = 0;	/* size of current path*/
-struct SVG_PEN SVG_pens[16];	/* pen descriptors*/
+/* default text font family: */
+static char SVG_fontNameDef[MAX_ID_LEN + 1] = "Arial"; 
+static double SVG_fontSizeDef = 12;	/* default text size*/
+/* current text font family: */
+static char SVG_fontNameCur[MAX_ID_LEN + 1] = "Arial";
+static double SVG_fontSizeCur = 12;	/* current text size*/
+static TBOOLEAN SVG_groupIsOpen = FALSE; /* open group flag*/
+static TBOOLEAN SVG_pathIsOpen = FALSE; /* open path flag*/
+static unsigned int SVG_path_count = 0;	/* size of current path*/
+static struct SVG_PEN SVG_pens[16];	/* pen descriptors*/
 
-int SVG_fontAscent = 0;	/* estimated current font ascent*/
-int SVG_fontDescent = 0;	/* estimated current font descent*/
-int SVG_fontLeading = 0;	/* estimated current font leading*/
-int SVG_fontAvWidth = 0;	/* estimated current font char average width*/
+static int SVG_fontAscent = 0;	/* estimated current font ascent*/
+static int SVG_fontDescent = 0;	/* estimated current font descent*/
+static int SVG_fontLeading = 0;	/* estimated current font leading*/
+static int SVG_fontAvWidth = 0;	/* estimated current font char average width*/
 
 static short SVG_Pen_RealID __PROTO ((int));
 static void SVG_PathOpen __PROTO ((void));

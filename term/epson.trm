@@ -1,5 +1,5 @@
 /*
- * $Id: epson.trm,v 1.15 1999/12/10 16:58:28 lhecking Exp $
+ * $Id: epson.trm,v 1.16 2001/08/27 15:04:12 broeker Exp $
  *
  */
 
@@ -332,7 +332,7 @@ NEC_text()
 
 TERM_PUBLIC void
 NEC_linetype(linetype)
-int linetype;
+    int linetype;
 {
     if (NECmode == 'c') {
 	if (linetype >= 6)
@@ -827,7 +827,7 @@ TERM_TABLE_END(epsonlx_driver)
     NECXMAX, NECYMAX, NECVCHAR, NECHCHAR,
     NECVTIC, NECHTIC, NEC_options, NEC_init, NEC_reset,
     NEC_text, null_scale, NEC_graphics, b_move, b_vector,
-    b_setlinetype, b_put_text, b_text_angle,
+    NEC_linetype, b_put_text, b_text_angle,
     null_justify_text, line_and_point, do_arrow, set_font_null, 0, TERM_BINARY,
     0, 0, b_boxfill
 TERM_TABLE_END(nec_driver)

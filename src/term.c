@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.38 2001/08/22 14:15:34 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.39 2002/02/15 17:15:12 amai Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -152,7 +152,14 @@ const struct gen_table set_encoding_tbl[] =
     { NULL, S_ENC_INVALID }
 };
 
-
+/* HBB 20020225: moved here, from ipc.h, where it never should have
+ * been. */
+#ifdef PIPE_IPC
+/* HBB 20020225: currently not used anywhere outside term.c --> make
+ * it static */
+static int ipc_back_fd = IPC_BACK_CLOSED;
+int isatty_state = 1;
+#endif
 
 /* Internal variables */
 
@@ -202,8 +209,6 @@ static void LINETYPE_null __PROTO((int));
 static void PUTTEXT_null __PROTO((unsigned int, unsigned int, const char *));
 static int set_font_null __PROTO((const char *s));
 
-#define _TERM_C /* must be defined before including "ipc.h" */
-#include "ipc.h"
 
 #ifdef __ZTC__
 char *ztc_init();

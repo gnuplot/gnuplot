@@ -1,5 +1,5 @@
 /*
- * $Id: x11.trm,v 1.52 2002/02/14 14:21:09 broeker Exp $
+ * $Id: x11.trm,v 1.53 2002/02/19 12:36:59 amai Exp $
  *
  */
 
@@ -437,8 +437,8 @@ X11_atexit()
 	/* dont wait(), since they might be -persist */
 	X11_ipc = NULL;
 #ifdef PIPE_IPC
-	close(X11_ipc_back_fd);
-	X11_ipc_back_fd = -1;
+	close(ipc_back_fd);
+	ipc_back_fd = -1;
 #endif
     }
 }
@@ -457,18 +457,18 @@ X11_waitforinput()
     /* XXX:  if the input device it not a tty (e.g. /dev/null)
      *       mouse events are not processed. This is necessary
      *       as on some systems /dev/null is not selectable.
-     * TODO: should we close the X11_ipc_back_fd in this case ? */
-    if (X11_ipc_back_fd >= 0)
+     * TODO: should we close the ipc_back_fd in this case ? */
+    if (ipc_back_fd >= 0)
 	do {
 	    FD_ZERO(&fds);
 	    FD_SET(fd, &fds);
-	    FD_SET(X11_ipc_back_fd, &fds);
-	    select(X11_ipc_back_fd + 1, SELECT_FD_SET_CAST & fds, 0, 0, (struct timeval *) NULL);
-	    if (FD_ISSET(X11_ipc_back_fd, &fds)) {
-		n = read(X11_ipc_back_fd, (void *) (l + (char *) &ge), sizeof(ge) - l);
+	    FD_SET(ipc_back_fd, &fds);
+	    select(ipc_back_fd + 1, SELECT_FD_SET_CAST & fds, 0, 0, (struct timeval *) NULL);
+	    if (FD_ISSET(ipc_back_fd, &fds)) {
+		n = read(ipc_back_fd, (void *) (l + (char *) &ge), sizeof(ge) - l);
 		if (n == 0) {
-		    close(X11_ipc_back_fd);
-		    X11_ipc_back_fd = -1;
+		    close(ipc_back_fd);
+		    ipc_back_fd = -1;
 		    /* don't close X11_ipc, otherwise later writes
 		     * to it will cause a segfault */
 		    break;	/* outboard driver has stopped */
@@ -571,13 +571,13 @@ X11_init()
 	/* parent */
 # ifdef PIPE_IPC
 	/* X11_ipc_out = fdopen(fdes[0], "r"); */
-	if (X11_ipc_back_fd > 0) {
-	    fprintf(stderr, "(X11_init) warning: unclosed X11_ipc_back_fd.\n");
+	if (ipc_back_fd > 0) {
+	    fprintf(stderr, "(X11_init) warning: unclosed ipc_back_fd.\n");
 	    fprintf(stderr, "           this is probably a program error.\n");
-	    close(X11_ipc_back_fd);
+	    close(ipc_back_fd);
 	}
 	if (X11_ALLOW_EVENTS) {
-	    X11_ipc_back_fd = fdes_back[0];
+	    ipc_back_fd = fdes_back[0];
 	    close(fdes_back[1]);	/* the parent doesn't need this */
 
 	    /* apparently multy-character inputs like escape sequences
@@ -595,8 +595,8 @@ X11_init()
 	     * which will cause a SIGPIPE in the driver. This
 	     * is *ugly* but it works. (joze) */
 	    /* close(fdes_back[0]); */
-	    /* mark X11_ipc_back_fd as unusable */
-	    X11_ipc_back_fd = IPC_BACK_UNUSABLE;
+	    /* mark ipc_back_fd as unusable */
+	    ipc_back_fd = IPC_BACK_UNUSABLE;
 	}
 # endif	/* PIPE_IPC */
 	/* close the read side of the parent's forward fd */
@@ -865,7 +865,7 @@ X11_graphics()
 #else
 #ifdef PIPE_IPC
     /* if we know the outboard driver has stopped, restart it */
-    if (X11_ipc_back_fd == IPC_BACK_CLOSED) {
+    if (ipc_back_fd == IPC_BACK_CLOSED) {
 	fclose(X11_ipc);
 	X11_ipc = NULL;
 	X11_init();

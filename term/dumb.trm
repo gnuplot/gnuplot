@@ -1,5 +1,5 @@
 /*
- * $Id: dumb.trm,v 1.9 1999/08/24 11:24:53 lhecking Exp $
+ * $Id: dumb.trm,v 1.10 1999/11/15 21:57:04 lhecking Exp $
  *
  */
 
@@ -350,13 +350,14 @@ const char *str;
 
 TERM_PUBLIC void
 DUMB_arrow(sx, sy, ex, ey, head)
-unsigned int sx, sy, ex, ey;
-TBOOLEAN head;			/* ignored */
+    unsigned int sx, sy, ex, ey;
+    TBOOLEAN head;		/* ignored */
 {
     char saved_pen;
     char saved_x;
     char saved_y;
 
+    (void) head;		/* dummy usage avoid compiler warnings */
     saved_pen = dumb_pen;
     saved_x = dumb_x;
     saved_y = dumb_y;

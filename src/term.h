@@ -1,5 +1,5 @@
 /*
- * $Id: term.h,v 1.13 2001/01/16 20:56:09 broeker Exp $
+ * $Id: term.h,v 1.14 2001/03/02 15:21:09 broeker Exp $
  */
 
 /* GNUPLOT - term.h */
@@ -178,12 +178,12 @@
 /* Linux VGA */
 #ifdef LINUXVGA
 # include "linux.trm"
-#endif
 
 /* Linux VGAGL */
-#if defined(VGAGL) && defined (THREEDKIT)
-# include "vgagl.trm"
-#endif
+# if defined(VGAGL) && defined (THREEDKIT)
+#  include "vgagl.trm"
+# endif
+#endif /* LINUXVGA */
 
 /* MGR Window system */
 #ifdef MGR

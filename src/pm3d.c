@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.25 2002/02/18 15:03:34 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.26 2002/02/21 07:02:06 joze Exp $"); }
 #endif
 
 /* GNUPLOT - pm3d.c */
@@ -47,6 +47,12 @@ pm3d_struct pm3d = {
     PM3D_IMPLICIT,		/* implicit */
     0 				/* use_column */
 };
+
+/* Internal prototypes for this module */
+static void pm3d_plot __PROTO((struct surface_points *, char));
+static void pm3d_option_at_error __PROTO((void));
+static void pm3d_rearrange_part __PROTO((struct iso_curve *, const int, struct iso_curve ***, int *));
+static void filled_color_contour_plot  __PROTO((struct surface_points *, int));
 
 
 /*
@@ -151,7 +157,11 @@ cb2gray(double cb)
  * Rearrange...
  */
 static void
-pm3d_rearrange_part(struct iso_curve *src, const int len, struct iso_curve ***dest, int *invert)
+pm3d_rearrange_part(src, len, dest, invert)
+    struct iso_curve *src;
+    const int len;
+    struct iso_curve ***dest;
+    int *invert;
 {
     struct iso_curve *scanA;
     struct iso_curve *scanB;
@@ -276,8 +286,10 @@ pm3d_rearrange_scan_array(struct surface_points *this_plot,
 /*
  * Now the implementation of the pm3d (s)plotting mode
  */
-void
-pm3d_plot(struct surface_points *this_plot, char at_which_z)
+static void
+pm3d_plot(this_plot, at_which_z)
+    struct surface_points *this_plot;
+    char at_which_z;
 {
     int i, j, ii, from, curve, scan, up_to, up_to_minus, invert = 0;
     struct iso_curve *scanA, *scanB;
@@ -475,10 +487,10 @@ pm3d_plot(struct surface_points *this_plot, char at_which_z)
 /*
  *  Now the implementation of the filled color contour plot
 */
-void
+static void
 filled_color_contour_plot(this_plot, contours_where)
-struct surface_points *this_plot;
-int contours_where;
+    struct surface_points *this_plot;
+    int contours_where;
 {
     double gray;
     struct gnuplot_contours *cntr;
@@ -591,7 +603,6 @@ pm3d_draw_one(struct surface_points *plot)
 
 /* Display an error message for the routine get_pm3d_at_option() below.
  */
-static void pm3d_option_at_error __PROTO((void));
 
 static void
 pm3d_option_at_error(void)

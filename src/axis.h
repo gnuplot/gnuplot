@@ -1,5 +1,5 @@
 /* 
- * $Id: axis.h,v 1.12 2001/10/31 17:13:59 mikulik Exp $
+ * $Id: axis.h,v 1.13 2002/02/13 17:59:36 broeker Exp $
  *
  */
 
@@ -613,7 +613,6 @@ void gen_tics __PROTO((AXIS_INDEX, /* int, */ tic_callback));
 void gprintf __PROTO((char *, size_t, char *, double, double));
 void axis_output_tics __PROTO((AXIS_INDEX, int *, AXIS_INDEX, tic_callback));
 void axis_set_graphical_range __PROTO((AXIS_INDEX, unsigned int lower, unsigned int upper));
-TBOOLEAN axis_position_zeroaxis __PROTO((AXIS_INDEX));
 void axis_draw_2d_zeroaxis __PROTO((AXIS_INDEX, AXIS_INDEX));
 TBOOLEAN some_grid_selected __PROTO((void));
 

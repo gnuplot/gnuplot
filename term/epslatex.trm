@@ -1,5 +1,5 @@
 /*
- * $Id: epslatex.trm,v 1.10 2001/09/08 16:16:00 amai Exp $
+ * $Id: epslatex.trm,v 1.11 2001/12/18 14:22:35 broeker Exp $
  */
 
 /* GNUPLOT - epslatex.trm */
@@ -123,7 +123,7 @@ static enum JUSTIFY EPSL_justify = LEFT;	/* text is flush left */
 char GPFAR * GPFAR EPSL_header[] = {"(prolog.ps) run\n", NULL}; 
  */
 
-char GPFAR *GPFAR EPSL_header[] = {
+static char GPFAR *GPFAR EPSL_header[] = {
 " /hpt hpt_ def  \n",
 " /vpt vpt_ def  \n",
 " /Gppointsize_ 1 def \n",
@@ -893,11 +893,12 @@ int number;
 
 TERM_PUBLIC void
 EPSL_fillbox(style, x1, y1, x2, y2)
-int style;
-unsigned int x1, y1, x2, y2;
+    int style;
+    unsigned int x1, y1, x2, y2;
 {
     /* ULIG: the style parameter is now used for the fillboxes style
     * (not implemented here), see the documentation */
+    (void) style;		/* avoid -Wunused warnings */
     EPSL_FLUSH_PATH fprintf(gpoutfile, "%d %d %d %d BoxFill\n", x1, y1, x2, y2);
 
     EPSL_relative_ok = 0;

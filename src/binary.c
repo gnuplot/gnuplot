@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: binary.c,v 1.8 1999/11/08 19:24:27 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: binary.c,v 1.9 2001/08/22 14:15:33 broeker Exp $"); }
 #endif
 
 /*
@@ -203,7 +203,7 @@ register int nrl, nrh, ncl, nch;
 
 /*===================== Support routines ==============================*/
 
-/******************************** VECTOR *******************************
+/* ******************************* VECTOR *******************************
  *       The following routines interact with vectors.
  *
  *   If there is an error we don't really return - int_error breaks us out.
@@ -267,7 +267,7 @@ retract_vector(v, old_nl, new_nh)
 }
 
 
-/***************************** MATRIX ************************
+/* **************************** MATRIX ************************
  *
  * 	  The following routines work with matricies
  *

@@ -1,5 +1,5 @@
 /*
- * $Id: term_api.h,v 1.14 2001/04/03 16:16:46 broeker Exp $
+ * $Id: term_api.h,v 1.15 2001/08/22 14:15:34 broeker Exp $
  */
 
 /* GNUPLOT - term_api.h */
@@ -181,6 +181,39 @@ enum set_encoding_id {
    S_ENC_DEFAULT, S_ENC_ISO8859_1, S_ENC_ISO8859_2, S_ENC_CP437, S_ENC_CP850,
    S_ENC_CP852, S_ENC_INVALID
 };
+
+/* HBB 20020225: this stuff used to be in a separate header, ipc.h,
+ * but I strongly disliked the way that was done */
+
+/*
+ * There are the following types of interprocess communication from
+ * (gnupmdrv, gnuplot_x11) => gnuplot:
+ *	OS2_IPC  ... the OS/2 shared memory + event semaphores approach
+ *	PIPE_IPC ... communication by using bidirectional pipe
+ */
+
+
+/*
+ * OS2_IPC: gnuplot's terminals communicate with it by shared memory + event
+ * semaphores => the code in gpexecute.c is used, and nothing more from here.
+ */
+
+#ifdef PIPE_IPC
+
+enum { IPC_BACK_UNUSABLE = -2, IPC_BACK_CLOSED = -1 };
+
+/*
+ * Currently only used for PIPE_IPC, but in principle
+ * every term could use this file descriptor to write back
+ * commands to gnuplot.  Note, that terminals using this fd
+ * should set it to a negative value when closing. (joze)
+ */
+/* HBB 20020225: currently not used anywhere outside term.c --> make
+ * it static */
+/* extern int ipc_back_fd; */
+extern int isatty_state;
+
+# endif /* PIPE_IPC */
 
 
 /* Variables of term.c needed by other modules: */

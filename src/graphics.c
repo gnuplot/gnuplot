@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.64 2002/01/25 18:02:08 joze Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.65 2002/02/15 15:40:58 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -115,10 +115,15 @@ static void plot_boxes __PROTO((struct curve_points * plot, int xaxis_y));
 #endif /* USE_ULIG_FILLEDBOXES */
 #ifdef PM3D
 static void plot_filledcurves __PROTO((struct curve_points * plot));
+static void finish_filled_curve __PROTO((int, gpiPoint *, filledcurves_opts *));
 #endif
 static void plot_vectors __PROTO((struct curve_points * plot));
 static void plot_f_bars __PROTO((struct curve_points * plot));
 static void plot_c_bars __PROTO((struct curve_points * plot));
+
+static void place_labels __PROTO((int layer));
+static void place_arrows __PROTO((int layer));
+static void place_grid __PROTO((void));
 
 static void edge_intersect __PROTO((struct coordinate GPHUGE * points, int i, double *ex, double *ey));
 static TBOOLEAN two_edge_intersect __PROTO((struct coordinate GPHUGE * points, int i, double *lx, double *ly));
@@ -998,6 +1003,8 @@ unsigned int* ey;
     }
 }
 
+/* FIXME HBB 20020225: this is shared with graph3d.c, so it shouldn't
+ * be in this module */
 void
 apply_head_properties(struct position* headsize)
 {
@@ -1077,7 +1084,8 @@ place_grid()
 }
 
 static void
-place_arrows(int layer)
+place_arrows(layer)
+    int layer;
 {
     struct arrow_def *this_arrow;
     register struct termentry *t = term;
@@ -1095,7 +1103,8 @@ place_arrows(int layer)
 }
 
 static void
-place_labels(int layer)
+place_labels(layer)
+    int layer;
 {
     struct text_label *this_label;
     register struct termentry *t = term;
@@ -1735,9 +1744,9 @@ struct curve_points *plot;
 /* finalize and draw the filled curve */
 static void
 finish_filled_curve(points, corners, filledcurves_options)
-int points;
-gpiPoint *corners;
-filledcurves_opts *filledcurves_options;
+    int points;
+    gpiPoint *corners;
+    filledcurves_opts *filledcurves_options;
 {
     if (points <= 0) return;
     /* add side (closing) points */

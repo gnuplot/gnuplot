@@ -1,5 +1,5 @@
 		    /* Hey Emacs this is -*- C -*-
- * $Id: emf.trm,v 1.9 2001/08/22 14:16:34 broeker Exp $
+ * $Id: emf.trm,v 1.10 2002/01/17 21:20:00 joze Exp $
  */
 
 /* GNUPLOT - emf.trm */
@@ -213,7 +213,6 @@ static char emf_fontname[255] = EMF_FONTNAME;
 static int emf_fontsize = EMF_FONTSIZE;
 static char emf_defaultfontname[255] = EMF_FONTNAME;
 static int emf_defaultfontsize = EMF_FONTSIZE;
-enum JUSTIFY emf_justify = LEFT;
 static int emf_vert_text = 0;	/* text orientation -- nonzero for vertical */
 static int emf_step_sizes[8];	/* array of currently used dash lengths in plot units */
 static int emf_step_index = 0;	/* index into emf_step_sizes[] */

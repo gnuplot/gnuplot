@@ -1,5 +1,5 @@
 /*
- * $Id: hpgl.trm,v 1.11 1999/10/01 15:12:51 lhecking Exp $
+ * $Id: hpgl.trm,v 1.12 1999/12/10 17:09:52 lhecking Exp $
  */
 
 /* GNUPLOT - hpgl.trm */
@@ -628,13 +628,15 @@ HPGL_options()
 }
 
 static int HPGL2_color = 1, HPGL2_numpen = 6;	/* default to 6 pen color */
-int HPGL2_dashed = 0;		/* current dashed linetype */
-int HPGL2_solid = 1;		/* default to solid lines */
-int HPGL2_font_num = 0;		/* font from options */
-int HPGL2_font_num_current = 0;	/* current font */
-int pspointset = 0;		/* default to standard point types */
-double HPGL2_point_size = HPGL2_DEF_POINT;	/* pointsize from options */
-double HPGL2_point_size_current = 0;	/* current pointsize */
+static int HPGL2_dashed = 0;	/* current dashed linetype */
+static int HPGL2_solid = 1;	/* default to solid lines */
+static int HPGL2_font_num = 0;	/* font from options */
+static int HPGL2_font_num_current = 0; /* current font */
+static int pspointset = 0;	/* default to standard point types */
+static double HPGL2_point_size = HPGL2_DEF_POINT; /* pointsize from options */
+static double HPGL2_point_size_current = 0; /* current pointsize */
+static const char *PCL_dim = "noextended"; /* default plotting dimensions */
+
 
 enum HPGL2_id {
     HPGL2_MONOCHROME, HPGL2_COLOR, HPGL2_SOLID, HPGL2_DASHED, HPGL2_FONT,
@@ -746,8 +748,6 @@ HPGL2_options()
 	    HPGL2_font->spacing ? HPGL2_font->height : HPGL2_font->pitch,
 	    pspointset ? "pspoints" : "nopspoints");
 }
-
-char *PCL_dim = "noextended";	/* default plotting dimensions */
 
 #if 0
 /* Unused for now */

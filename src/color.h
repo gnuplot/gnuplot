@@ -1,5 +1,5 @@
 /*
- * $Id: color.h,v 1.8 2001/02/19 17:10:36 broeker Exp $
+ * $Id: color.h,v 1.9 2001/08/22 14:15:33 broeker Exp $
  */
 
 /* GNUPLOT - color.h */
@@ -101,7 +101,7 @@ typedef struct {
   int formulaR, formulaG, formulaB;
   char positive;		/* positive or negative figure */
 
-  /** Now the variables that contain the discrete approximation of the
+  /* Now the variables that contain the discrete approximation of the
    * desired palette of smooth colours as created by make_palette in
    * pm3d.c.  This is then passed into terminal's make_palette, who
    * transforms this [0;1] into whatever it supports.  */

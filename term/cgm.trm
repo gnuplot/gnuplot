@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: cgm.trm,v 1.35 2001/02/01 17:56:05 broeker Exp $
+ * $Id: cgm.trm,v 1.36 2001/10/26 12:58:38 mikulik Exp $
  */
 
 /* GNUPLOT - cgm.trm */
@@ -99,9 +99,10 @@ TERM_PUBLIC int CGM_text_angle __PROTO((int ang));
 TERM_PUBLIC int CGM_justify_text __PROTO((enum JUSTIFY mode));
 TERM_PUBLIC void CGM_point __PROTO((unsigned int x, unsigned int y,
 				    int number));
-TERM_PUBLIC int CGM_find_font __PROTO((const char *name, int len,
-				       double *relwidth));
-TERM_PUBLIC int CGM_set_font __PROTO((const char *font));
+TERM_PUBLIC void CGM_filled_polygon __PROTO((int points, gpiPoint *corner));
+TERM_PUBLIC void CGM_set_color __PROTO((double gray));
+TERM_PUBLIC int CGM_make_palette __PROTO((t_sm_palette *palette));
+
 TERM_PUBLIC void CGM_set_pointsize __PROTO((double size));
 
 #define CGM_LARGE 32767
@@ -123,6 +124,9 @@ TERM_PUBLIC void CGM_set_pointsize __PROTO((double size));
 #ifndef TERM_PROTO_ONLY
 #ifdef TERM_BODY
 
+static int CGM_find_font __PROTO((const char *name, int len,
+				       double *relwidth));
+static int CGM_set_font __PROTO((const char *font));
 /*
  * on NeXTstep, id is an identifier (in ObjC) and causes a parse error
  * since some asserts below are mistaken as casts. datum is a type
@@ -213,9 +217,9 @@ struct fontdata {
                                    monospaced. Also, metrics of the
                                    same font from different foundaries
                                    are sometimes different.  */
-}  
-  cgm_basic_font_data[]={
+};  
 
+static struct fontdata cgm_basic_font_data[]={
     /* these are WebCGM recommended fonts */
     {"Helvetica",1.039},
     {"Helvetica Oblique",1.099},
@@ -269,8 +273,9 @@ struct fontdata {
     {"Times Bold Oblique",1.0},
 
     {0,0}
-  },
-    *cgm_font_data = cgm_basic_font_data;
+};
+
+static struct fontdata *cgm_font_data = cgm_basic_font_data;
 
 #define DEFAULT_CGMFONT "Helvetica Bold"
 
@@ -749,11 +754,11 @@ Gnuplot version %s patchlevel %s,\
    the first font is 1.  Set relwidth to the width of the font,
    relative to Times Bold Italic.  If the font is not in the table,
    set *relwidth to 1.0 and return 0. */
-TERM_PUBLIC int
+static int
 CGM_find_font(name, numchar, relwidth)
-const char *name;
-int numchar;
-double *relwidth;
+    const char *name;
+    int numchar;
+    double *relwidth;
 {
     int i;
     *relwidth = 1.;
@@ -771,7 +776,7 @@ double *relwidth;
 
 TERM_PUBLIC int
 CGM_set_font(font)
-const char *font;
+    const char *font;
 {
     register struct termentry *t = term;
     int size, font_index;
@@ -938,7 +943,8 @@ unsigned int x, y;
 
 #ifdef PM3D
 
-TERM_PUBLIC int CGM_make_palette(t_sm_palette *palette)
+TERM_PUBLIC int CGM_make_palette(palette)
+     t_sm_palette *palette;
 {
     if (palette) {
 	 int i, k;
@@ -969,7 +975,8 @@ TERM_PUBLIC int CGM_make_palette(t_sm_palette *palette)
     }
 }
 
-TERM_PUBLIC void CGM_set_color(double gray)
+TERM_PUBLIC void CGM_set_color(gray)
+     double gray;
 {
     /* map [0...1] to interval [0...cgm_smooth_colors-1], then add
        offset to get past the default colors */
@@ -977,7 +984,9 @@ TERM_PUBLIC void CGM_set_color(double gray)
 	 (int)( gray * cgm_smooth_colors );
 }
 
-TERM_PUBLIC void CGM_filled_polygon(int points, gpiPoint *corner)
+TERM_PUBLIC void CGM_filled_polygon(points, corner)
+     int points;
+     gpiPoint *corner;
 {
     int i;
     if (cgm_current.fill_color != cgm_next.fill_color){

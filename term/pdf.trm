@@ -57,28 +57,30 @@ TERM_PUBLIC void PDF_linewidth __PROTO ((double linewidth));
 
 #include <pdflib.h>
 
-PDF *myPDF = NULL;
+static PDF *myPDF = NULL;
 
-unsigned int PDF_xLast = UINT_MAX;	/* current pen horizontal position*/
-unsigned int PDF_yLast = UINT_MAX;	/* current pen vertical position*/
+static unsigned int PDF_xLast = UINT_MAX; /* current pen horizontal position*/
+static unsigned int PDF_yLast = UINT_MAX; /* current pen vertical position*/
 
-int PDF_LineType = -3;		/* current line type*/
-double PDF_LineWidth = 1.0;	/* current line width*/
-int PDF_TextAngle = 0;		/* current text orientation*/
-enum JUSTIFY PDF_TextJust = LEFT; /* current text justification*/
+static int PDF_LineType = -3;	/* current line type*/
+static double PDF_LineWidth = 1.0; /* current line width*/
+static int PDF_TextAngle = 0;		/* current text orientation*/
+static enum JUSTIFY PDF_TextJust = LEFT; /* current text justification*/
 
-char PDF_fontNameDef[MAX_ID_LEN + 1] = "Helvetica"; /* default text font family*/
-double PDF_fontSizeDef = 6;	/* default text size*/
-char PDF_fontNameCur[MAX_ID_LEN + 1] = "Helvetica"; /* current text font family*/
-double PDF_fontSizeCur = 6;	/* current text size*/
+/* default text font family: */
+static char PDF_fontNameDef[MAX_ID_LEN + 1] = "Helvetica"; 
+static double PDF_fontSizeDef = 6;	/* default text size*/
+/* current text font family: */
+static char PDF_fontNameCur[MAX_ID_LEN + 1] = "Helvetica"; 
+static double PDF_fontSizeCur = 6; /* current text size*/
 
-TBOOLEAN PDF_pageIsOpen = FALSE; /* already started a page ?? */
-TBOOLEAN PDF_pathIsOpen = FALSE; /* open path flag*/
+static TBOOLEAN PDF_pageIsOpen = FALSE; /* already started a page ?? */
+static TBOOLEAN PDF_pathIsOpen = FALSE; /* open path flag*/
 
-int PDF_fontAscent = 0;		/* estimated current font ascent*/
-int PDF_fontDescent = 0;	/* estimated current font descent*/
-int PDF_fontLeading = 0;	/* estimated current font leading*/
-int PDF_fontAvWidth = 0;	/* estimated current font char average width*/
+static int PDF_fontAscent = 0;	/* estimated current font ascent*/
+static int PDF_fontDescent = 0;	/* estimated current font descent*/
+static int PDF_fontLeading = 0;	/* estimated current font leading*/
+static int PDF_fontAvWidth = 0;	/* estimated current font char average width*/
 
 static short PDF_Pen_RealID __PROTO ((int));
 static void PDF_PathOpen __PROTO ((void));

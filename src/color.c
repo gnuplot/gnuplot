@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: color.c,v 1.25 2002/01/26 17:55:07 joze Exp $"); }
+static char *RCSid() { return RCSid("$Id: color.c,v 1.26 2002/02/13 22:58:17 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - color.c */
@@ -69,7 +69,7 @@ int supply_extended_color_specs = 0;
 #endif
 
 /* Corners of the colour box. */
-unsigned int cb_x_from, cb_x_to, cb_y_from, cb_y_to;
+static unsigned int cb_x_from, cb_x_to, cb_y_from, cb_y_to;
 
 /* Internal prototype declarations: */
 
@@ -77,7 +77,7 @@ static void draw_inside_color_smooth_box_postscript __PROTO((FILE * out));
 static void draw_inside_color_smooth_box_bitmap __PROTO((FILE * out));
 void cbtick_callback __PROTO((AXIS_INDEX axis, double place, char *text, struct lp_style_type grid));
 
-/********************************************************************
+/* *******************************************************************
   ROUTINES
  */
 

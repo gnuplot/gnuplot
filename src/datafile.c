@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.31 2002/02/15 17:07:18 amai Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.32 2002/02/16 14:52:54 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -188,7 +188,6 @@ struct use_spec_s {
 
 int df_no_use_specs;		/* how many using columns were specified */
 int df_line_number;
-char *df_filename;		/* name of data file */
 int df_datum;			/* suggested x value if none given */
 TBOOLEAN df_matrix = FALSE;	/* is this a matrix splot */
 int df_eof = 0;
@@ -216,7 +215,8 @@ static size_t max_line_len = 0;
 
 static FILE *data_fp = NULL;
 static TBOOLEAN df_pipe_open = FALSE;
-static TBOOLEAN mixed_data_fp = FALSE;
+static TBOOLEAN mixed_data_fp = FALSE; /* inline data */
+static char *df_filename;	/* name of data file */
 
 #ifndef MAXINT			/* should there be one already defined ? */
 # ifdef INT_MAX			/* in limits.h ? */
@@ -1321,9 +1321,12 @@ df_3dmatrix(this_plot)
 	    STORE_WITH_LOG_AND_UPDATE_RANGE(point->z, used[2], point->type, FIRST_Z_AXIS, NOOP, goto skip);
 #ifdef PM3D
 	    /* see also: plot3d.c: get_3ddata(this_plot) */
+/* FIXME HBB 20020225: "See also" is nonsense. Instead of duplicating
+ * the code here, move it to some applicable header file! */
 #define NEED_PALETTE(plot) (PM3DSURFACE == (this_plot)->plot_style || 1 == (this_plot)->lp_properties.use_palette)
 	    /* there should be `color' instead of used[2], when this is
 	     * implemented for binary files */
+/* FIXME HBB 20020225: no prototype in scope! */
 	    update_pm3d_zrange(used[2], NEED_PALETTE(this_plot));
 #endif
 	    /* some of you won't like this, but I say goto is for this */

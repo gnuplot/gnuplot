@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.37 2002/01/31 17:26:42 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.38 2002/02/19 12:36:58 amai Exp $"); }
 #endif
 
 /* GNUPLOT - gplt_x11.c */
@@ -174,14 +174,12 @@ Error. Incompatible options.
 #  include <os2.h>
 #  include "os2/dialogs.h"
 # endif
-/* define before including mouse.h */
-# define _GPLT_X11
 # include "gpexecute.h"
 # include "mouse.h"
 # include <unistd.h>
 # include <fcntl.h>
 # include <errno.h>
-unsigned long gnuplotXID = 0;	/* WINDOWID of gnuplot */
+static unsigned long gnuplotXID = 0; /* WINDOWID of gnuplot */
 
 #endif /* USE_MOUSE */
 
@@ -231,7 +229,7 @@ typedef struct cmap_t {
 } cmap_t;
 
 /* always allocate a default colormap (done in preset()) */
-cmap_t cmap;
+static cmap_t cmap;
 
 /* information about one window/plot */
 typedef struct plot_struct {
@@ -295,81 +293,80 @@ static char selection[SEL_LEN] = "";
 #endif
 
 #ifdef PM3D
-void GetGCpm3d __PROTO((plot_struct * plot, GC * ret));
-void CmapClear __PROTO((cmap_t * cmap_ptr));
-void RecolorWindow __PROTO((plot_struct * plot));
-void FreeColors __PROTO((plot_struct * plot));
-void ReleaseColormap __PROTO((plot_struct * plot));
-unsigned long *ReallocColors __PROTO((plot_struct * plot, int n));
-void PaletteMake __PROTO((plot_struct * plot, t_sm_palette * tpal));
-void PaletteSetColor __PROTO((plot_struct * plot, double gray));
-int GetVisual __PROTO((int class, Visual ** best, int *depth));
+static void GetGCpm3d __PROTO((plot_struct * plot, GC * ret));
+static void CmapClear __PROTO((cmap_t * cmap_ptr));
+static void RecolorWindow __PROTO((plot_struct * plot));
+static void FreeColors __PROTO((plot_struct * plot));
+static void ReleaseColormap __PROTO((plot_struct * plot));
+static unsigned long *ReallocColors __PROTO((plot_struct * plot, int n));
+static void PaletteMake __PROTO((plot_struct * plot, t_sm_palette * tpal));
+static void PaletteSetColor __PROTO((plot_struct * plot, double gray));
+static int GetVisual __PROTO((int class, Visual ** best, int *depth));
 #endif
 
-void store_command __PROTO((char *line, plot_struct * plot));
-void prepare_plot __PROTO((plot_struct * plot, int term_number));
-void delete_plot __PROTO((plot_struct * plot));
+static void store_command __PROTO((char *line, plot_struct * plot));
+static void prepare_plot __PROTO((plot_struct * plot, int term_number));
+static void delete_plot __PROTO((plot_struct * plot));
 
-int record __PROTO((void));
-void process_event __PROTO((XEvent * event));	/* from Xserver */
+static int record __PROTO((void));
+static void process_event __PROTO((XEvent * event));	/* from Xserver */
 
-void mainloop __PROTO((void));
+static void mainloop __PROTO((void));
 
-void display __PROTO((plot_struct * plot));
-void UpdateWindow __PROTO((plot_struct * plot));
+static void display __PROTO((plot_struct * plot));
+static void UpdateWindow __PROTO((plot_struct * plot));
 #ifdef USE_MOUSE
 static int ErrorHandler __PROTO((Display * display, XErrorEvent * error_event));
-void DrawRuler __PROTO((plot_struct * plot));
-void EventuallyDrawMouseAddOns __PROTO((plot_struct * plot));
-void DrawBox __PROTO((plot_struct * plot));
-void AnnotatePoint __PROTO((plot_struct * plot, int x, int y, const char[], const char[]));
-long int SetTime __PROTO((plot_struct * plot, Time t));
-unsigned long AllocateXorPixel __PROTO((cmap_t * cmap_ptr));
-void GetGCXor __PROTO((plot_struct * plot, GC * gc));
-void GetGCXorDashed __PROTO((plot_struct * plot, GC * gc));
-void GetGCBlackAndWhite __PROTO((plot_struct * plot, GC * ret, Pixmap pixmap, int mode));
-int SplitAt __PROTO((char **args, int maxargs, char *buf, char splitchar));
-void DisplayMessageAt __PROTO((plot_struct * plot, char *msg, int x, int y));
-void xfree(void *fred);
-void EraseCoords __PROTO((plot_struct * plot));
-void DrawCoords __PROTO((plot_struct * plot, const char *s));
-void DisplayCoords __PROTO((plot_struct * plot, const char *s));
-int is_control __PROTO((KeySym mod));
-int is_meta __PROTO((KeySym mod));
-int is_shift __PROTO((KeySym mod));
+static void DrawRuler __PROTO((plot_struct * plot));
+static void EventuallyDrawMouseAddOns __PROTO((plot_struct * plot));
+static void DrawBox __PROTO((plot_struct * plot));
+static void AnnotatePoint __PROTO((plot_struct * plot, int x, int y, const char[], const char[]));
+static long int SetTime __PROTO((plot_struct * plot, Time t));
+static unsigned long AllocateXorPixel __PROTO((cmap_t * cmap_ptr));
+static void GetGCXor __PROTO((plot_struct * plot, GC * gc));
+static void GetGCXorDashed __PROTO((plot_struct * plot, GC * gc));
+static void GetGCBlackAndWhite __PROTO((plot_struct * plot, GC * ret, Pixmap pixmap, int mode));
+static int SplitAt __PROTO((char **args, int maxargs, char *buf, char splitchar));
+static void xfree __PROTO((void *fred));
+static void EraseCoords __PROTO((plot_struct * plot));
+static void DrawCoords __PROTO((plot_struct * plot, const char *s));
+static void DisplayCoords __PROTO((plot_struct * plot, const char *s));
+static int is_control __PROTO((KeySym mod));
+static int is_meta __PROTO((KeySym mod));
+static int is_shift __PROTO((KeySym mod));
 #endif
 
-void DrawVerticalString __PROTO((Display *dpy, Drawable d, GC gc, int x, int y, const char *str, int len));
-void exec_cmd __PROTO((plot_struct *, char *));
+static void DrawVerticalString __PROTO((Display *dpy, Drawable d, GC gc, int x, int y, const char *str, int len));
+static void exec_cmd __PROTO((plot_struct *, char *));
 
 static plot_struct *find_plot __PROTO((Window window));
-void reset_cursor __PROTO((void));
+static void reset_cursor __PROTO((void));
 
-void preset __PROTO((int argc, char *argv[]));
-char *pr_GetR __PROTO((XrmDatabase db, char *resource));
-void pr_color __PROTO((cmap_t * cmap_ptr));
-void pr_dashes __PROTO((void));
-void pr_font __PROTO((void));
-void pr_geometry __PROTO((void));
-void pr_pointsize __PROTO((void));
-void pr_width __PROTO((void));
-void pr_window __PROTO((plot_struct * plot));
-void ProcessEvents __PROTO((Window win));
-void pr_raise __PROTO((void));
-void pr_persist __PROTO((void));
+static void preset __PROTO((int argc, char *argv[]));
+static char *pr_GetR __PROTO((XrmDatabase db, char *resource));
+static void pr_color __PROTO((cmap_t * cmap_ptr));
+static void pr_dashes __PROTO((void));
+static void pr_font __PROTO((void));
+static void pr_geometry __PROTO((void));
+static void pr_pointsize __PROTO((void));
+static void pr_width __PROTO((void));
+static void pr_window __PROTO((plot_struct * plot));
+static void ProcessEvents __PROTO((Window win));
+static void pr_raise __PROTO((void));
+static void pr_persist __PROTO((void));
 
 #ifdef EXPORT_SELECTION
-void export_graph __PROTO((plot_struct * plot));
-void handle_selection_event __PROTO((XEvent * event));
+static void export_graph __PROTO((plot_struct * plot));
+static void handle_selection_event __PROTO((XEvent * event));
 #endif
 
 #define FallbackFont "fixed"
 
 #define Nwidths 10
-unsigned int widths[Nwidths] = { 2, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+static unsigned int widths[Nwidths] = { 2, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
 #define Ndashes 10
-char dashes[Ndashes][5];
+static char dashes[Ndashes][5];
 
 #define MAX_WINDOWS 16
 
@@ -395,8 +392,8 @@ t_sm_palette sm_palette = {
 static GC gc_pm3d = (GC) 0;
 static int have_pm3d = 1;
 static int num_colormaps = 0;
-unsigned int maximal_possible_colors = 0x100;
-unsigned int minimal_possible_colors;
+static unsigned int maximal_possible_colors = 0x100;
+static unsigned int minimal_possible_colors;
 
 /* the following visual names must match the
  * definitions in X.h in this order ! I hope
@@ -413,15 +410,15 @@ static char *visual_name[] = {
 #endif /* PM3D */
 
 
-struct plot_struct plot_array[MAX_WINDOWS];
-struct plot_struct *current_plot = NULL;
+static struct plot_struct plot_array[MAX_WINDOWS];
+static struct plot_struct *current_plot = NULL;
 
 
-Display *dpy;
-int scr;
-Window root;
-Visual *vis = (Visual *) 0;
-GC gc = (GC) 0;
+static Display *dpy;
+static int scr;
+static Window root;
+static Visual *vis = (Visual *) 0;
+static GC gc = (GC) 0;
 /* current_gc points to either the `line' GC `gc' or
  * to the pm3d smooth palette GC `gc_pm3d'. If pm3d
  * is disabled at compile time, current_gc always
@@ -429,37 +426,39 @@ GC gc = (GC) 0;
  * current_gc is to switch between the `line' and the
  * pm3d GC's. */
 static GC *current_gc = (GC *) 0;
-GC gc_xor = (GC) 0;
-GC gc_xor_dashed = (GC) 0;
-XFontStruct *font;
+static GC gc_xor = (GC) 0;
+static GC gc_xor_dashed = (GC) 0;
+static XFontStruct *font;
 /* must match the definition in term/x11.trm: */
+/* FIXME HBB 20020225: that really should be ensured by sharing a common
+ * header file between this file and term/x11.trm! */
 enum { UNSET = -1, no = 0, yes = 1 };
-int do_raise = yes, persist = no;
-Cursor cursor;
-Cursor cursor_default;
+static int do_raise = yes, persist = no;
+static Cursor cursor;
+static Cursor cursor_default;
 #ifdef USE_MOUSE
-Cursor cursor_exchange;
-Cursor cursor_sizing;
-Cursor cursor_zooming;
+static Cursor cursor_exchange;
+static Cursor cursor_sizing;
+static Cursor cursor_zooming;
 #endif
 
-int windows_open = 0;
+static int windows_open = 0;
 
-int gX = 100, gY = 100;
-unsigned int gW = 640, gH = 450;
-unsigned int gFlags = PSize;
+static int gX = 100, gY = 100;
+static unsigned int gW = 640, gH = 450;
+static unsigned int gFlags = PSize;
 
-unsigned int BorderWidth = 2;
-unsigned int dep;		/* depth */
+static unsigned int BorderWidth = 2;
+static unsigned int dep;		/* depth */
 
-Bool Mono = 0, Gray = 0, Rv = 0, Clear = 0;
-char Name[64] = "gnuplot";
-char Class[64] = "Gnuplot";
+static Bool Mono = 0, Gray = 0, Rv = 0, Clear = 0;
+static char Name[64] = "gnuplot";
+static char Class[64] = "Gnuplot";
 
-int cx = 0, cy = 0, vchar;
+static int cx = 0, cy = 0, vchar;
 /* Speficy negative values as indicator of uninitialized state */
-double xscale = -1.;
-double yscale = -1.;
+static double xscale = -1.;
+static double yscale = -1.;
 double pointsize = -1.;
 /* Avoid a crash upon using uninitialized variables from
    above and avoid unnecessary calls to display().
@@ -472,22 +471,20 @@ double pointsize = -1.;
 /* note: the 0.5 term in RevX(x) and RevY(y) compensates for the round-off in X(x) and Y(y) */
 
 #define Nbuf 1024
-char buf[Nbuf];
-char **commands = (char **) 0;
+static char buf[Nbuf];
 static int buffered_input_available = 0;
 
-FILE *X11_ipc;
-char X11_ipcpath[32];
+static FILE *X11_ipc;
 
 /* when using an ICCCM-compliant window manager, we can ask it
  * to send us an event when user chooses 'close window'. We do this
  * by setting WM_DELETE_WINDOW atom in property WM_PROTOCOLS
  */
 
-Atom WM_PROTOCOLS, WM_DELETE_WINDOW;
+static Atom WM_PROTOCOLS, WM_DELETE_WINDOW;
 
-XPoint Diamond[5], Triangle[4];
-XSegment Plus[2], Cross[2], Star[4];
+static XPoint Diamond[5], Triangle[4];
+static XSegment Plus[2], Cross[2], Star[4];
 
 #if USE_ULIG_FILLEDBOXES
 /* pixmaps used for filled boxes (ULIG) */
@@ -518,9 +515,9 @@ static const unsigned char stipple_pattern_bits[stipple_pattern_num][8] = {
     { 0xC0, 0x30, 0x0C, 0x03, 0xC0, 0x30, 0x0C, 0x03 }	/* diagonal stripes (6) */
 };
 
-Pixmap stipple_halftone[stipple_halftone_num];
-Pixmap stipple_pattern[stipple_pattern_num];
-int stipple_initialized = 0;
+static Pixmap stipple_halftone[stipple_halftone_num];
+static Pixmap stipple_pattern[stipple_pattern_num];
+static int stipple_initialized = 0;
 #endif /* USE_ULIG_FILLEDBOXES */
 
 /*
@@ -608,7 +605,7 @@ main(int argc, char *argv[])
 /*
  * DEFAULT_X11 mainloop
  */
-void
+static void
 mainloop()
 {
     int nf, cn = ConnectionNumber(dpy), in;
@@ -717,10 +714,12 @@ mainloop()
 
 #elif defined(CRIPPLED_SELECT)
 
+char X11_ipcpath[32];
+
 /*
  * CRIPPLED_SELECT mainloop
  */
-void
+static void
 mainloop()
 {
     fd_set_size_t nf, nfds, cn = ConnectionNumber(dpy);
@@ -820,7 +819,7 @@ ast()
 
 Window message_window;
 
-void
+static void
 mainloop()
 {
     /* dummy unmapped window for receiving internally-generated terminate
@@ -851,11 +850,12 @@ mainloop()
     }
 }
 #else /* !(DEFAULT_X11 || CRIPPLED_SELECT || VMS */
-You lose. No mainloop.
+# error You lose. No mainloop.
 #endif				/* !(DEFAULT_X11 || CRIPPLED_SELECT || VMS */
 
 /* delete a window / plot */
-void delete_plot(plot_struct *plot)
+static void
+delete_plot(plot_struct *plot)
 {
     int i;
 
@@ -897,7 +897,7 @@ void delete_plot(plot_struct *plot)
 
 
 /* prepare the plot structure */
-void
+static void
 prepare_plot(plot_struct *plot, int term_number)
 {
     int i;
@@ -940,7 +940,7 @@ prepare_plot(plot_struct *plot, int term_number)
 	    XSetIconName(dpy, plot->window, new_name);
 	}
 #ifdef USE_MOUSE
-	/**
+	/*
 	 * set all mouse parameters
 	 * to a well-defined state.
 	 */
@@ -971,7 +971,7 @@ prepare_plot(plot_struct *plot, int term_number)
 }
 
 /* store a command in a plot structure */
-void
+static void
 store_command(char *buffer, plot_struct *plot)
 {
     char *p;
@@ -994,13 +994,13 @@ store_command(char *buffer, plot_struct *plot)
 
 #ifndef VMS
 
-int read_input __PROTO((void));
+static int read_input __PROTO((void));
 
 /*
  * Handle input.  Use read instead of fgets because stdio buffering
  * causes trouble when combined with calls to select.
  */
-int
+static int
 read_input()
 {
     static int rdbuf_size = 10 * Nbuf;
@@ -1056,7 +1056,7 @@ gnuplot: X11 aborted.\n", stderr);
 /*
  * record - record new plot from gnuplot inboard X11 driver (Unix)
  */
-int
+static int
 record()
 {
     static plot_struct *plot = plot_array;
@@ -1367,7 +1367,7 @@ record()
 }
 #endif /* VMS */
 
-void
+static void
 DrawVerticalString(Display *dpy, Drawable d, GC gc, int xdest, int ydest, const char *str, int len)
 {
     int x, y, x2;
@@ -1412,7 +1412,7 @@ DrawVerticalString(Display *dpy, Drawable d, GC gc, int xdest, int ydest, const 
 /*
  *   exec_cmd - execute drawing command from inboard driver
  */
-void
+static void
 exec_cmd(plot_struct *plot, char *command)
 {
     int x, y, sw, sl;
@@ -1749,7 +1749,7 @@ exec_cmd(plot_struct *plot, char *command)
 /*
  *   display - display a stored plot
  */
-void
+static void
 display(plot_struct *plot)
 {
     int n;
@@ -1840,7 +1840,7 @@ display(plot_struct *plot)
 #endif
 }
 
-void
+static void
 UpdateWindow(plot_struct * plot)
 {
 #ifdef USE_MOUSE
@@ -1882,7 +1882,7 @@ UpdateWindow(plot_struct * plot)
 
 #ifdef PM3D
 
-void
+static void
 CmapClear(cmap_t * cmap_ptr)
 {
     cmap_ptr->total = (int) 0;
@@ -1890,7 +1890,7 @@ CmapClear(cmap_t * cmap_ptr)
     cmap_ptr->pixels = (unsigned long *) 0;
 }
 
-void
+static void
 GetGCpm3d(plot_struct * plot, GC * ret)
 {
     XGCValues values;
@@ -1903,7 +1903,7 @@ GetGCpm3d(plot_struct * plot, GC * ret)
     *ret = XCreateGC(dpy, plot->window, mask, &values);
 }
 
-void
+static void
 RecolorWindow(plot_struct * plot)
 {
     if (None != plot->window) {
@@ -1926,7 +1926,7 @@ RecolorWindow(plot_struct * plot)
  * or the default colormap.  Note, that the line colors are not
  * free'd nor even touched.
  */
-void
+static void
 FreeColors(plot_struct * plot)
 {
     if (plot->cmap->total && plot->cmap->pixels) {
@@ -1946,7 +1946,7 @@ FreeColors(plot_struct * plot)
  * and the line `colors' to the line colors of the default
  * colormap.
  */
-void
+static void
 ReleaseColormap(plot_struct * plot)
 {
     FreeColors(plot);
@@ -1961,7 +1961,7 @@ ReleaseColormap(plot_struct * plot)
     }
 }
 
-unsigned long *
+static unsigned long *
 ReallocColors(plot_struct * plot, int n)
 {
     FreeColors(plot);
@@ -1985,7 +1985,7 @@ ReallocColors(plot_struct * plot, int n)
  * returns 1 if a visual which matches the request
  * could be found else 0.
  */
-int
+static int
 GetVisual(int class, Visual ** visual, int *depth)
 {
     XVisualInfo *visualsavailable;
@@ -2016,7 +2016,7 @@ GetVisual(int class, Visual ** visual, int *depth)
     return nvisuals > 0;
 }
 
-void
+static void
 PaletteMake(plot_struct * plot, t_sm_palette * tpal)
 {
     static int virgin = yes;
@@ -2094,7 +2094,7 @@ PaletteMake(plot_struct * plot, t_sm_palette * tpal)
     /* TODO */
     /* EventuallyChangeVisual(plot); */
 
-    /**
+    /*
      * start with trying to allocate max_colors. This should 
      * always succeed with TrueColor visuals >= 16bit. If it
      * fails (for example for a PseudoColor visual of depth 8),
@@ -2183,7 +2183,7 @@ PaletteMake(plot_struct * plot, t_sm_palette * tpal)
     recursion = 0;
 }
 
-void
+static void
 PaletteSetColor(plot_struct * plot, double gray)
 {
     if (plot->cmap->allocated) {
@@ -2208,7 +2208,7 @@ ErrorHandler(Display * display, XErrorEvent * error_event)
     return 0;
 }
 
-void
+static void
 DrawRuler(plot_struct * plot)
 {
     if (plot->ruler_on) {
@@ -2225,7 +2225,7 @@ DrawRuler(plot_struct * plot)
     }
 }
 
-void
+static void
 EventuallyDrawMouseAddOns(plot_struct * plot)
 {
     DrawRuler(plot);
@@ -2245,7 +2245,7 @@ EventuallyDrawMouseAddOns(plot_struct * plot)
  * corners of the box are annotated with the strings
  * stored in the plot structure.
  */
-void
+static void
 DrawBox(plot_struct * plot)
 {
     int width;
@@ -2289,7 +2289,7 @@ DrawBox(plot_struct * plot)
  * as usually, so that we can also remove the coords
  * later.
  */
-void
+static void
 AnnotatePoint(plot_struct * plot, int x, int y, const char xstr[], const char ystr[])
 {
     int ylen, xlen;
@@ -2311,7 +2311,7 @@ AnnotatePoint(plot_struct * plot, int x, int y, const char xstr[], const char ys
 }
 
 /* returns the time difference to the last click in milliseconds */
-long int
+static long int
 SetTime(plot_struct *plot, Time t)
 {
     long int diff = t - plot->time;
@@ -2322,7 +2322,7 @@ SetTime(plot_struct *plot, Time t)
     return diff > 0 ? diff : 0;
 }
 
-unsigned long
+static unsigned long
 AllocateXorPixel(cmap_t *cmap_ptr)
 {
     unsigned long pixel;
@@ -2359,7 +2359,7 @@ AllocateXorPixel(cmap_t *cmap_ptr)
     return pixel;
 }
 
-void
+static void
 GetGCXor(plot_struct * plot, GC * ret)
 {
     XGCValues values;
@@ -2374,7 +2374,7 @@ GetGCXor(plot_struct * plot, GC * ret)
     *ret = XCreateGC(dpy, plot->window, mask, &values);
 }
 
-void
+static void
 GetGCXorDashed(plot_struct * plot, GC * gc)
 {
     GetGCXor(plot, gc);
@@ -2390,7 +2390,8 @@ GetGCXorDashed(plot_struct * plot, GC * gc)
  * mode == 0 --> black on white
  * mode == 1 --> white on black
  */
-void
+/* FIXME HBB 20020225: This function is not used anywhere ??? */
+static void
 GetGCBlackAndWhite(plot_struct * plot, GC * ret, Pixmap pixmap, int mode)
 {
     XGCValues values;
@@ -2406,7 +2407,7 @@ GetGCBlackAndWhite(plot_struct * plot, GC * ret, Pixmap pixmap, int mode)
 	values.background = plot->cmap->colors[0];
 #endif
     } else {
-	/**
+	/*
 	 * swap colors
 	 */
 #if 0
@@ -2423,10 +2424,11 @@ GetGCBlackAndWhite(plot_struct * plot, GC * ret, Pixmap pixmap, int mode)
     *ret = XCreateGC(dpy, pixmap, mask, &values);
 }
 
-/**
+/*
  * split a string at `splitchar'.
  */
-int
+/* FIXME HBB 20020225: This function is not used anywhere ??? */
+static int
 SplitAt(char **args, int maxargs, char *buf, char splitchar)
 {
     int argc = 0;
@@ -2452,7 +2454,8 @@ SplitAt(char **args, int maxargs, char *buf, char splitchar)
     return argc;
 }
 
-void
+/* FIXME HBB 20020225: This function is not used anywhere ??? */
+static void
 xfree(void *fred)
 {
     if (fred)
@@ -2460,7 +2463,7 @@ xfree(void *fred)
 }
 
 /* erase the last displayed position string */
-void
+static void
 EraseCoords(plot_struct * plot)
 {
     DrawCoords(plot, plot->str);
@@ -2468,7 +2471,7 @@ EraseCoords(plot_struct * plot)
 
 
 
-void
+static void
 DrawCoords(plot_struct * plot, const char *str)
 {
     if (!gc_xor) {
@@ -2481,7 +2484,7 @@ DrawCoords(plot_struct * plot, const char *str)
 
 
 /* display text (e.g. mouse position) in the lower left corner of the window. */
-void
+static void
 DisplayCoords(plot_struct * plot, const char *s)
 {
     /* first, erase old text */
@@ -2515,20 +2518,24 @@ DisplayCoords(plot_struct * plot, const char *s)
 }
 
 
-int
+/* FIXME HBB 20020225: This function is not used anywhere ??? */
+static int
 is_control(KeySym mod)
 {
     return (XK_Control_R == mod || XK_Control_L == mod);
 }
 
-int
+/* FIXME HBB 20020225: This function is not used anywhere ??? */
+static int
 is_meta(KeySym mod)
 {
     /* we make no difference between alt and meta */
-    return (XK_Meta_R == mod || XK_Meta_L == mod || XK_Alt_R == mod || XK_Alt_L == mod);
+    return (XK_Meta_R == mod || XK_Meta_L == mod
+	    || XK_Alt_R == mod || XK_Alt_L == mod);
 }
 
-int
+/* FIXME HBB 20020225: This function is not used anywhere ??? */
+static int
 is_shift(KeySym mod)
 {
     return (XK_Shift_R == mod || XK_Shift_L == mod);
@@ -2540,7 +2547,7 @@ is_shift(KeySym mod)
  *  reset all cursors (since we dont have a record of the previous terminal #)
  *---------------------------------------------------------------------------*/
 
-void
+static void
 reset_cursor()
 {
     int plot_number;
@@ -2580,9 +2587,13 @@ find_plot(Window window)
 
 #ifdef USE_MOUSE
 
+/* the status of the shift, ctrl and alt keys
+*/
+static int modifier_mask = 0;
+
 static void update_modifiers __PROTO((unsigned int));
 
-void
+static void
 update_modifiers(unsigned int state)
 {
     int old_mod_mask;
@@ -2598,7 +2609,7 @@ update_modifiers(unsigned int state)
 #endif
 
 
-void
+static void
 process_event(XEvent *event)
 {
 #if 0
@@ -3042,8 +3053,8 @@ process_event(XEvent *event)
 
 static XrmDatabase dbCmd, dbApp, dbDef, dbEnv, db = (XrmDatabase) 0;
 
-char *type[20];
-XrmValue value;
+static char *type[20];
+static XrmValue value;
 
 static XrmOptionDescRec options[] = {
     {"-mono", ".mono", XrmoptionNoArg, (caddr_t) "on"},
@@ -3080,7 +3091,7 @@ static XrmOptionDescRec options[] = {
 
 #define Nopt (sizeof(options) / sizeof(options[0]))
 
-void
+static void
 preset(int argc, char *argv[])
 {
     int Argc = argc;
@@ -3351,10 +3362,10 @@ gnuplot: X11 aborted.\n", ldisplay);
  *   pr_GetR - get resource from database using "-name" option (if any)
  *---------------------------------------------------------------------------*/
 
-char *
+static char *
 pr_GetR(xrdb, resource)
-XrmDatabase xrdb;
-char *resource;
+    XrmDatabase xrdb;
+    char *resource;
 {
     char name[128], class[128], *rc;
 
@@ -3371,28 +3382,28 @@ char *resource;
  *   pr_color - determine color values
  *---------------------------------------------------------------------------*/
 
-char color_keys[Ncolors][30] = {
+static const char color_keys[Ncolors][30] = {
     "background", "bordercolor", "text", "border", "axis",
     "line1", "line2", "line3", "line4",
     "line5", "line6", "line7", "line8"
 };
-char color_values[Ncolors][30] = {
+static char color_values[Ncolors][30] = {
     "white", "black", "black", "black", "black",
     "red", "green", "blue", "magenta",
     "cyan", "sienna", "orange", "coral"
 };
-char color_values_rv[Ncolors][30] = {
+static char color_values_rv[Ncolors][30] = {
     "black", "white", "white", "white", "white",
     "red", "green", "blue", "magenta",
     "cyan", "sienna", "orange", "coral"
 };
-char gray_values[Ncolors][30] = {
+static char gray_values[Ncolors][30] = {
     "black", "white", "white", "gray50", "gray50",
     "gray100", "gray60", "gray80", "gray40",
     "gray90", "gray50", "gray70", "gray30"
 };
 
-void
+static void
 pr_color(cmap_t * cmap_ptr)
 {
     unsigned long black = BlackPixel(dpy, scr), white = WhitePixel(dpy, scr);
@@ -3479,22 +3490,22 @@ pr_color(cmap_t * cmap_ptr)
  *   pr_dashes - determine line dash styles 
  *---------------------------------------------------------------------------*/
 
-char dash_keys[Ndashes][10] = {
+static const char dash_keys[Ndashes][10] = {
     "border", "axis",
     "line1", "line2", "line3", "line4", "line5", "line6", "line7", "line8"
 };
 
-char dash_mono[Ndashes][10] = {
+static char dash_mono[Ndashes][10] = {
     "0", "16",
     "0", "42", "13", "44", "15", "4441", "42", "13"
 };
 
-char dash_color[Ndashes][10] = {
+static char dash_color[Ndashes][10] = {
     "0", "16",
     "0", "0", "0", "0", "0", "0", "0", "0"
 };
 
-void
+static void
 pr_dashes()
 {
     int n, j, l, ok;
@@ -3531,7 +3542,7 @@ pr_dashes()
  *   pr_font - determine font          
  *---------------------------------------------------------------------------*/
 
-void
+static void
 pr_font()
 {
     char *fontname = pr_GetR(db, ".font");
@@ -3557,7 +3568,7 @@ gnuplot: no useable font - X11 aborted.\n", FallbackFont);
  *   pr_geometry - determine window geometry      
  *---------------------------------------------------------------------------*/
 
-void
+static void
 pr_geometry()
 {
     char *geometry = pr_GetR(db, ".geometry");
@@ -3588,7 +3599,7 @@ pr_geometry()
  *   pr_pointsize - determine size of points for 'points' plotting style
  *---------------------------------------------------------------------------*/
 
-void
+static void
 pr_pointsize()
 {
     if (pr_GetR(db, ".pointsize")) {
@@ -3610,12 +3621,12 @@ pr_pointsize()
  *   pr_width - determine line width values
  *---------------------------------------------------------------------------*/
 
-char width_keys[Nwidths][30] = {
+static const char width_keys[Nwidths][30] = {
     "border", "axis",
     "line1", "line2", "line3", "line4", "line5", "line6", "line7", "line8"
 };
 
-void
+static void
 pr_width()
 {
     int n;
@@ -3637,7 +3648,7 @@ pr_width()
 /*-----------------------------------------------------------------------------
  *   pr_window - create window 
  *---------------------------------------------------------------------------*/
-void
+static void
 ProcessEvents(Window win)
 {
     XSelectInput(dpy, win, KeyPressMask | KeyReleaseMask
@@ -3646,7 +3657,7 @@ ProcessEvents(Window win)
     XSync(dpy, 0);
 }
 
-void
+static void
 pr_window(plot_struct *plot)
 {
     char *title = pr_GetR(db, ".title");
@@ -3714,7 +3725,7 @@ pr_window(plot_struct *plot)
 
 
 /***** pr_raise ***/
-void
+static void
 pr_raise()
 {
     if (pr_GetR(db, ".raise"))
@@ -3722,7 +3733,7 @@ pr_raise()
 }
 
 
-void
+static void
 pr_persist()
 {
     if (pr_GetR(db, ".persist"))
@@ -3736,7 +3747,7 @@ pr_persist()
 /* bit of a bodge, but ... */
 static struct plot_struct *exported_plot;
 
-void
+static void
 export_graph(struct plot_struct *plot)
 {
     FPRINTF((stderr, "export_graph(0x%x)\n", plot));
@@ -3748,7 +3759,7 @@ export_graph(struct plot_struct *plot)
     exported_plot = plot;
 }
 
-void
+static void
 handle_selection_event(XEvent *event)
 {
     switch (event->type) {

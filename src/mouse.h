@@ -1,5 +1,5 @@
 /*
- * $Id: mouse.h,v 1.9 2001/02/09 15:06:11 broeker Exp $
+ * $Id: mouse.h,v 1.10 2001/11/10 18:27:12 mikulik Exp $
  */
 
 /* GNUPLOT - mouse.h */
@@ -69,21 +69,7 @@ typedef struct mouse_setting_t {
     char labelopts[0xff];  /* label options                               */
 } mouse_setting_t;
 
-/* FIXME HBB 20010207: Codestyle violation: these should be in mouse.c! */
-#if defined(_MOUSE_C) || defined(_GPLT_X11)
-mouse_setting_t mouse_setting = {
-    1, 300 /* ms */, 1, 0, 0, 0, 0, "% #g", "pointtype 1"
-};
-
-/* the status of the shift, ctrl and alt keys
-*/
-static int modifier_mask = 0;
-/* definition of Mod_Shift, Mod_Ctrl and Mod_Alt has moved to mousecmn.h 
-*/
-
-#else
 extern mouse_setting_t mouse_setting;
-#endif
 
 
 /* enum of GP_ -keycodes has moved to mousecmn.h so that it can be 

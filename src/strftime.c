@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: strftime.c,v 1.3.4.1 2000/06/22 12:57:39 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: strftime.c,v 1.4 2000/11/01 18:57:33 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - strftime.c */
@@ -50,12 +50,11 @@ static char *RCSid() { return RCSid("$Id: strftime.c,v 1.3.4.1 2000/06/22 12:57:
 #define NOTIMEZONE
 
 #include "syscfg.h"		/* for MAX_LINE_LEN */
-/*  #include "setshow.h" */		/* for days/months */
+#include "stdfn.h"		/* for safe_strncpy */
 
 #ifdef TEST_STRFTIME		/* test case; link with stdfn */
 #define strftime _strftime
 
-#include "stdfn.h"		/* for safe_strncpy */
 
 #include "national.h"		/* language info for the following, */
 			/* extracted from set.c */
@@ -74,12 +73,14 @@ char abbrev_day_names[7][8] =
 
 #endif /* TEST_STRFTIME */
 
+static void fill __PROTO((char *from, char **pto, size_t *pmaxsize));
+static void number __PROTO((int num, int pad, char **pto, size_t *pmaxsize));
 
 static void
 fill(from, pto, pmaxsize)
-char *from;
-char **pto;
-size_t *pmaxsize;
+    char *from;
+    char **pto;
+    size_t *pmaxsize;
 {
     safe_strncpy(*pto, from, *pmaxsize);
     if (*pmaxsize < strlen(from)) {
@@ -93,10 +94,10 @@ size_t *pmaxsize;
 
 static void
 number(num, pad, pto, pmaxsize)
-int num;
-int pad;
-char **pto;
-size_t *pmaxsize;
+    int num;
+    int pad;
+    char **pto;
+    size_t *pmaxsize;
 {
     char str[100];
 
@@ -106,10 +107,10 @@ size_t *pmaxsize;
 
 size_t
 strftime(s, max, format, tp)
-char *s;
-size_t max;
-const char *format;
-const struct tm *tp;
+    char *s;
+    size_t max;
+    const char *format;
+    const struct tm *tp;
 {
     char *start = s;
     size_t maxsize = max;

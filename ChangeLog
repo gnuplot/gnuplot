@@ -1,3 +1,119 @@
+2002-02-25  Hans-Bernhard Broeker  <hbb@ballermann.oche.de>
+
+	* docs/titlepag.tex: Minor spelling correction of my last name.
+
+	* term/emf.trm (emf_justify): Unused --> removed.
+
+	* term/epson.trm (nec_driver): Register NEC_linetype, not
+	b_setlinetype, for this driver.
+
+	* term/epslatex.trm (EPSL_fillbox): Cast argument to void, to quell
+	"unused" warnings.
+
+	* term/hpljii.trm (HPLJII_putc): Cast argument to void, to quell
+	"unused" warnings.
+
+	* term/gpic.trm (GPIC_text_angle): Cast argument to void, to quell
+	"unused" warnings.
+
+	* term/tek.trm (TEK40linetype): Cast argument to void, to quell
+	"unused" warnings.
+
+	* term/dumb.trm (DUMB_arrow): Cast argument to void, to quell
+	"unused" warnings.
+
+	* term/cgm.trm (CGM_make_palette, CGM_set_color,
+	CGM_filled_polygon): Prototypes added. Definition K&R'ized.
+	(CGM_find_font, CGM_set_font): Changed from TERM_PUBLIC to
+	'static'. Prototype moved into TERM_BODY section.
+
+	* src/strftime.c (fill, number): Prototypes added.
+
+	* src/graphics.c (finish_filled_curve, place_arrows,
+	place_labels): Prototypes added. Definitions K&R'ized.
+	(place_grid): Prototype added.
+
+	* src/pm3d.c (filled_color_contour_plot, pm3d_plot): Turned
+	static. Prototype moved from pm3d.h to here.
+	(pm3d_rearrange_part): Prototype added, definition K&R'ized. 
+	(pm3d_plot): Definition K&R'ized.
+
+	* src/graph3d.c (place_arrows3d): Renamed, to distinguish it from
+	same-named function in graphics.c.  Prototype added.
+	(place_labels3d): Dito. And definition K&R'ized.
+	(whichgrid): Turned static.
+
+	* src/axis.c (axis_position_zeroaxis): Turned static. Prototype
+	moved from axis.h to here.
+	(quantize_duodecimal_tics): Turned static. Prototype added.
+
+	* src/mouse.h [_MOUSE_C || _GPLT_X11]: Removed hacked definitions
+	from header file, leaving only the extern declarations.
+	
+	* src/mouse.c (mouse_setting, modifier mask): Definitions now
+	here.
+
+	* src/gplt_x11.c: *TONS* of internal variables and functions
+	turned static.
+	[USE_MOUSE] (_GPLT_X11): Removed #define, no longer needed.
+
+	* src/term.h: Moved VGAGL part into #ifdef LINUXVGA part, since
+	VGAGL doesn't work if LINUXVGA isn't compiled in, too.
+
+	* term/linux.trm (LINUX_graphics_allowed): Added declaration of
+	variable to TERM_PROTO section.  Variable itself flagged
+	TERM_PUBLIC.
+
+	* term/vgagl.trm (VGAGL_options): Removed extern declaration of
+	LINUX_graphics_allowed where it shouldn't be.
+
+	* src/ipc.h: Contents of file moved into term_api.h and term.c,
+	file itself removed.
+	
+	* src/term.c, src/readline.c, src/plot.c, src/command.c: Removed
+	#include of "ipc.h".
+
+	* src/term.c [PIPE_IPC] (ipc_back_fd): Turned static.
+
+	* term/epslatex.trm (EPSL_header): Turned static.
+
+	* term/pslatex.trm (PSLATEX_auxfile): Turned static.
+
+	* term/svg.trm (SVG_xSize, SVG_ySize, SVG_xLast, SVG_yLast,
+	SVG_LineType, SVG_LineWidth, SVG_TextAngle, SVG_TextJust,
+	SVG_fontNameDef, SVG_fontSizeDef, SVG_fontNameCur,
+	SVG_fontSizeCur, SVG_groupIsOpen, SVG_pathIsOpen, SVG_path_count,
+	SVG_pens, SVG_fontAscent, SVG_fontDescent, SVG_fontLeading,
+	SVG_fontAvWidth): Turned static.
+
+	* term/pdf.trm (myPDF, PDF_xLast, PDF_yLast, PDF_LineType,
+	PDF_LineWidth, PDF_TextAngle, PDF_TextJust, PDF_fontNameDef,
+	PDF_fontNameCur, PDF_fontSizeCur, PDF_pageIsOpen, PDF_pathIsOpen,
+	PDF_fontAscent, PDF_fontDescent, PDF_fontLeading,
+	PDF_fontAvWidth): Turned static.
+
+	* term/hpgl.trm (HPGL2_dashed, HPGL2_solid, HPGL2_font_num,
+	HPGL2_font_num_current, pspointset, HPGL2_point_size,
+	HPGL2_point_size_current): Turned static.
+	(PCL_dim): Turned static.  Definition moved to other static vars.
+	
+	* term/cgm.trm (cgm_basic_font_data, cgm_font_data): Turned
+	static.  Uncluttered definitions of struct type definition and of
+	variables of that type.
+
+	* term/x11.trm (X11_ipc_back_fd): Removed this macro which just
+	hid accesses to global variable ipc_back_fd. All uses of it
+	replaced by ipc_back_fd itself.
+	
+	* src/datafile.c (df_filename): Turned static.  Declaration moved
+	to a different section of the source.
+	
+	* term/driver.h: Removed directory path from #include of syscfg.h.
+	Added #include <stdio.h> to make it self-contained.
+
+	* src/strftime.c: Move #include "stdfn.h" out of TEST_STRFTIME
+	block to provide definition of size_t.
+
 2002-02-21  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* PORTING, configure.vms, config/buildvms.com, config/makefile.ami,

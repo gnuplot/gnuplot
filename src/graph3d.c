@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.60 2002/02/15 17:06:31 amai Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.61 2002/02/18 23:39:29 amai Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -101,7 +101,7 @@ double xscale3d, yscale3d, zscale3d;
 
 #ifdef PM3D
 typedef enum { ALLGRID, FRONTGRID, BACKGRID } WHICHGRID;
-WHICHGRID whichgrid = ALLGRID;
+static WHICHGRID whichgrid = ALLGRID;
 #endif
 
 static void plot3d_impulses __PROTO((struct surface_points * plot));
@@ -148,7 +148,9 @@ static void key_sample_point_pm3d __PROTO((struct surface_points *plot, int xl, 
 #endif
 static void key_text __PROTO((int xl, int yl, char *text));
 
-static void get_arrow3d(struct arrow_def* arrow, unsigned int* sx, unsigned int* sy, unsigned int* ex, unsigned int* ey);
+static void get_arrow3d __PROTO((struct arrow_def*, unsigned int*, unsigned int*, unsigned int*, unsigned int*));
+static void place_arrows3d __PROTO((int));
+static void place_labels3d __PROTO((int));
 static int map3d_getposition __PROTO((struct position* pos, const char* what, double* xpos, double* ypos, double* zpos));
 static void map3d_position_r __PROTO((struct position* pos1, struct position* pos2, unsigned int* x, unsigned int* y, const char* what));
 
@@ -460,7 +462,8 @@ get_arrow3d(arrow, sx, sy, ex, ey)
 }
 
 static void
-place_labels(int layer)
+place_labels3d(layer)
+    int layer;
 {
     struct termentry *t = term;
     struct text_label *this_label;
@@ -497,7 +500,8 @@ place_labels(int layer)
 }
 
 static void
-place_arrows(int layer)
+place_arrows3d(layer)
+    int layer;
 {
     struct termentry *t = term;
     struct arrow_def *this_arrow;
@@ -695,10 +699,10 @@ do_3dplot(plots, pcount, quick)
     }
 
     /* PLACE LABELS */
-    place_labels(0);
+    place_labels3d(0);
 
     /* PLACE ARROWS */
-    place_arrows(0);
+    place_arrows3d(0);
 
 #ifndef LITE
     if (hidden3d && draw_surface && !quick) {
@@ -1216,10 +1220,10 @@ do_3dplot(plots, pcount, quick)
 	draw_3d_graphbox(plots, pcount);
 
     /* PLACE LABELS */
-    place_labels(1);
+    place_labels3d(1);
 
     /* PLACE ARROWS */
-    place_arrows(1);
+    place_arrows3d(1);
 
 #ifdef USE_MOUSE
     /* finally, store the 2d projection of the x and y axis, to enable zooming by mouse */

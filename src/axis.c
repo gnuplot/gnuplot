@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.25 2002/02/13 17:59:36 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.26 2002/02/20 03:19:43 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -167,6 +167,8 @@ static double quantize_time_tics __PROTO((AXIS_INDEX, double, double, int));
 static void   mant_exp __PROTO((double, double, TBOOLEAN, double *, int *, const char *));
 static double time_tic_just __PROTO((t_timelevel, double));
 static double round_outward __PROTO((AXIS_INDEX, TBOOLEAN, double));
+static TBOOLEAN axis_position_zeroaxis __PROTO((AXIS_INDEX));
+static double quantize_duodecimal_tics __PROTO((double, int));
 
 /* ---------------------- routines ----------------------- */
 
@@ -964,7 +966,7 @@ make_tics(axis, guide)
  * duodecimal reference, as used in times (60 seconds, 60 minuts, 24
  * hours, 12 months). Derived from quantize_normal_tics(). The default
  * guide is assumed to be 12, here, not 20 */
-double
+static double
 quantize_duodecimal_tics(arg, guide)
      double arg;
      int guide;
@@ -1682,7 +1684,7 @@ axis_set_graphical_range(axis, lower, upper)
     axis_array[axis].term_upper = upper;
 }
 
-TBOOLEAN 
+static TBOOLEAN 
 axis_position_zeroaxis(axis)
      AXIS_INDEX axis;
 {
