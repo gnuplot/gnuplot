@@ -1,55 +1,39 @@
 /*
- * $Id: plot.h,v 1.118 1997/11/25 23:02:59 drd Exp $
+ * $Id: plot.h,v 1.119 1998/03/22 22:31:56 drd Exp $
  *
  */
 
 /* GNUPLOT - plot.h */
-/*
- * Copyright (C) 1986 - 1993, 1997   Thomas Williams, Colin Kelley
+
+/*[
+ * Copyright 1986 - 1993, 1998   Thomas Williams, Colin Kelley
  *
  * Permission to use, copy, and distribute this software and its
- * documentation for any purpose with or without fee is hereby granted, 
- * provided that the above copyright notice appear in all copies and 
- * that both that copyright notice and this permission notice appear 
+ * documentation for any purpose with or without fee is hereby granted,
+ * provided that the above copyright notice appear in all copies and
+ * that both that copyright notice and this permission notice appear
  * in supporting documentation.
  *
  * Permission to modify the software is granted, but not the right to
- * distribute the modified code.  Modifications are to be distributed 
- * as patches to released version.
- *  
- * This software is provided "as is" without express or implied warranty.
- * 
+ * distribute the complete modified source code.  Modifications are to
+ * be distributed as patches to the released version.  Permission to
+ * distribute binaries produced by compiling modified sources is granted,
+ * provided you
+ *   1. distribute the corresponding source modifications from the
+ *    released version in the form of a patch file along with the binaries,
+ *   2. add special version identification to distinguish your version
+ *    in addition to the base release version number,
+ *   3. provide your name and address as the primary contact for the
+ *    support of your modified version, and
+ *   4. retain our contact information in regard to use of the base
+ *    software.
+ * Permission to distribute the released version of the source code along
+ * with corresponding source modifications in the form of a patch file is
+ * granted with same provisions 2 through 4 for binary distributions.
  *
- * AUTHORS
- * 
- *   Original Software:
- *     Thomas Williams,  Colin Kelley.
- * 
- *   Gnuplot 2.0 additions:
- *       Russell Lang, Dave Kotz, John Campbell.
- *
- *   Gnuplot 3.0 additions:
- *       Gershon Elber and many others.
- * 
- * There is a mailing list for gnuplot users. Note, however, that the
- * newsgroup 
- *	comp.graphics.apps.gnuplot 
- * is identical to the mailing list (they
- * both carry the same set of messages). We prefer that you read the
- * messages through that newsgroup, to subscribing to the mailing list.
- * (If you can read that newsgroup, and are already on the mailing list,
- * please send a message to majordomo@dartmouth.edu, asking to be
- * removed from the mailing list.)
- *
- * The address for mailing to list members is
- *	   info-gnuplot@dartmouth.edu
- * and for mailing administrative requests is 
- *	   majordomo@dartmouth.edu
- * The mailing list for bug reports is 
- *	   bug-gnuplot@dartmouth.edu
- * The list of those interested in beta-test versions is
- *	   info-gnuplot-beta@dartmouth.edu
- */
+ * This software is provided "as is" without express or implied warranty
+ * to the extent permitted by applicable law.
+]*/
 
 #ifndef PLOT_H		/* avoid multiple includes */
 #define PLOT_H
@@ -59,50 +43,124 @@
 #endif
 
 #include "ansichek.h"
-
-/* #define NDEBUG */
-#include <assert.h>
+#include "stdfn.h"
 
 #define PROGRAM "G N U P L O T"
 #define PROMPT "gnuplot> "
-#if defined(AMIGA_SC_6_1) || defined(AMIGA_AC_5)
-#define SHELL "NewShell"
-#else /* AMIGA */
-#ifdef ATARI
-#define SHELL "gulam.prg"
-#else /* ATARI */
-#ifdef OS2
-#define SHELL "c:\\cmd.exe"
-#else /* OS2 */
-#ifdef OSK
-#define SHELL "/dd/cmds/shell"
-#else /* OSK */
-#define SHELL "/bin/sh"		/* used if SHELL env variable not set */
-#endif /* OSK */
-#endif /* OS2 */
-#endif /* ATARI */
-#endif /* AMIGA  */
 
-#if defined(__unix__) && !defined(unix)
-#define unix
-#endif
+/* Define operating system name, shell, and OS specific defines */
+
+#if defined(AMIGA_SC_6_1) || defined(AMIGA_AC_5) || defined(__amigaos__)
+# define OS "Amiga "
+# ifndef __amigaos__
+#  define SHELL "NewShell"
+# endif
+# ifndef AMIGA
+#  define AMIGA
+# endif
+#endif /* Amiga */
+
+#ifdef ATARI
+# define OS "TOS "
+# define SHELL "gulam.prg"
+#endif /* Atari */
+
+#ifdef DOS386
+# define OS "DOS 386 "
+#endif /* DOS386 */
+
+#ifdef linux
+# define OS "Linux "
+#endif /* Linux */
 
 #if defined(__NeXT__) && !defined(NEXT)
-#define NEXT
+# define NEXT
 #endif
 
-#if defined(MSDOS) && !defined(DOS32) && !defined(DOS16)
-#define DOS16
+#ifdef OS2
+# define OS "OS/2 "
+# define SHELL "c:\\cmd.exe"
+#endif /* OS/2 */
+
+#ifdef OSK
+# define OS "OS-9 "
+# define SHELL "/dd/cmds/shell"
+#endif /* OS-9 */
+
+#if defined(vms) || defined(VMS)
+# ifndef VMS
+#  define VMS
+# endif
+# define OS "VMS "
+# if !defined(VAXCRTL) && !defined(DECCRTL)
+#  error Please /define either VAXCRTL or DECCRTL
+# endif
+/* avoid some IMPLICITFUNC warnings */
+# ifdef __DECC
+#  include <starlet.h>
+# endif  /* __DECC */
+#endif /* VMS */
+
+#if defined(_WINDOWS) || defined(_Windows)
+# ifndef _Windows
+#  define _Windows
+# endif
+# ifdef WIN32
+#  define OS "MS-Windows 32 bit "
+# else
+#  ifndef WIN16
+#   define WIN16
+#  endif
+#  define OS "MS-Windows "
+# endif /* WIN32 */
+#endif /* _WINDOWS */
+
+#ifdef MSDOS
+# if !defined(DOS32) && !defined(DOS16)
+#  define DOS16
+# endif
+# ifdef MTOS
+#  define OS "TOS & MiNT & MULTITOS & Magic - "
+# endif /* MTOS */
+# define OS "MS-DOS "
+#endif /* MSDOS */
+
+#if defined(__unix__) || defined(unix)
+# ifndef unix
+#  define unix
+# endif
+# ifndef OS
+#  define OS "Unix "
+# endif
+#endif /* Unix */
+
+/* Note: may not catch all IBM AIX compilers */
+#ifdef _AIX
+# ifndef unix
+#  define unix
+# endif
+# define OS "Unix "
 #endif
 
-#if defined(_WINDOWS) && !defined(_Windows)
-#define _Windows
+/* Attempted fix for SCO */
+#ifdef SCO
+# ifndef unix
+#  define unix
+# endif
+# define OS "Unix "
 #endif
 
-
-#if defined(_Windows) && !defined(WIN32) && !defined(WIN16)
-#define WIN16
+/* FIXME: OS might be empty for certain SCO and IBM AIX compilers. */
+#ifndef OS
+# define OS ""
 #endif
+
+#ifndef SHELL
+# define SHELL "/bin/sh"    /* used if SHELL env variable not set */
+#endif
+
+/* End OS defines section */
+
 
 #define SAMPLES 100		/* default number of samples for a plot */
 #define ISO_SAMPLES 10		/* default number of isolines per splot */
@@ -241,67 +299,6 @@
 #define GRID_MX2    256
 #define GRID_MY2    512
 
-#if defined(AMIGA_SC_6_1) || defined(AMIGA_AC_5) || defined(__amigaos__)
-#define OS "Amiga "
-#endif /* Amiga */
-
-#ifdef OS2
-#define OS "OS/2 "
-#endif  /* OS2 */
-
-#ifdef OSK
-#define OS "OS-9 "
-#endif  /* OSK */
-
-#ifdef vms
-#define OS "VMS "
-#if !defined(VAXCRTL) && !defined(DECCRTL)
-#error Please /define either VAXCRTL or DECCRTL
-#endif
-#endif /* VMS */
-
-#ifdef linux
-#define OS "Linux "
-#endif /* Linux */
-
-#ifdef DOS386
-#define OS "DOS 386 "
-#endif /* DOS386 */
-
-#ifdef _Windows
-#ifdef WIN32
-#define OS "MS-Windows 32 bit "
-#else
-#define OS "MS-Windows "
-#endif /* WIN32 */
-#else
-#ifdef MSDOS
-#ifdef MTOS
-#define OS "TOS & MiNT & MULTITOS & Magic - "
-#endif /* MTOS */
-#define OS "MS-DOS "
-#endif /* MSDOS */
-#endif /* _Windows */
-
-#ifdef ATARI
-#define OS "TOS "
-#endif /* ATARI */
-
-/* Note: may not catch all IBM AIX compilers */
-#ifdef _AIX
-#define OS "Unix "
-#endif
-
-#if defined(unix) && !defined(OS)
-#define OS "Unix "
-#endif
- 
-/* FIXME: OS might be empty for certain SCO and IBM AIX compilers. */
-#ifndef OS
-#define OS ""
-#endif
-
-
 /* To access curves larger than 64k, MSDOS needs to use huge pointers */
 #if (defined(__TURBOC__) && defined(MSDOS)) || defined(WIN16)
 #define GPHUGE huge
@@ -323,10 +320,6 @@ typedef double coordval;
 #define far 
 #endif
 
-/* get prototypes for str??? functions. this is so much better that clogging
-   up all files with loads of #ifdefs for incompatible return types */
-#include "stdfn.h"
-
 /*
  * Note about VERYLARGE:  This is the upper bound double (or float, if PC)
  * numbers. This flag indicates very large numbers. It doesn't have to 
@@ -347,40 +340,12 @@ typedef double coordval;
  * DBL_MAX).
  */
 
-#ifndef NO_FLOAT_H
-#  include <float.h>
-#endif
-
 /* both min/max and MIN/MAX are defined by some compilers.
  * we are now on GPMIN / GPMAX
  */
 
 #define GPMAX(a,b) ( (a) > (b) ? (a) : (b) )
 #define GPMIN(a,b) ( (a) < (b) ? (a) : (b) )
-
-
-/* ATARI and SAS/C 6.x need prototypes
- * As this is ANSI standard, you should try to add your compiler to the
- * list so that in the end, the conditionals might fall.
- *
- * Actually, most of these headers are now included in stdfn.h above, so
- * maybe we can get rid of them completely.
- */
-
-#if defined(ATARI) || defined(MTOS) || defined(AMIGA_SC_6_1) || defined(__amigaos__)
-# include <stdio.h>
-# include <stdlib.h>
-# include <string.h>
-# include <math.h>
-#endif
-
-/* Manx wants math.h only. Try to add it to the above list to get rid
- * of those lines
- */
-
-#ifdef AMIGA_AC_5
-# include <math.h>
-#endif
 
 /* There is a bug in the NEXT OS. This is a workaround. Lookout for
  * an OS correction to cancel the following dinosaur
@@ -394,14 +359,14 @@ typedef double coordval;
  */
 
 #if defined ( NEXT ) && NX_CURRENT_COMPILER_RELEASE<310
-#   if defined ( DBL_MAX)
-#      undef DBL_MAX
-#   endif
-#   define DBL_MAX 1.7976931348623157e+308
-#   undef HUGE
-#   define HUGE    DBL_MAX
-#   undef HUGE_VAL
-#   define HUGE_VAL DBL_MAX
+# if defined ( DBL_MAX)
+#  undef DBL_MAX
+# endif
+# define DBL_MAX 1.7976931348623157e+308
+# undef HUGE
+# define HUGE    DBL_MAX
+# undef HUGE_VAL
+# define HUGE_VAL DBL_MAX
 #endif
 
 /* Now define VERYLARGE. This is usually DBL_MAX/2 - 1. On MS-DOS however
@@ -409,25 +374,25 @@ typedef double coordval;
  */
 
 #ifndef COORDVAL_FLOAT
-#ifdef DBL_MAX
-#define VERYLARGE (DBL_MAX/2-1)
-#endif
+# ifdef DBL_MAX
+#  define VERYLARGE (DBL_MAX/2-1)
+# endif
 #else /* COORDVAL_FLOAT */
-#ifdef FLT_MAX
-#define VERYLARGE (FLT_MAX/2-1)
-#endif
+# ifdef FLT_MAX
+#  define VERYLARGE (FLT_MAX/2-1)
+# endif
 #endif /* COORDVAL_FLOAT */
 
 #ifndef VERYLARGE
-#ifdef HUGE
-#define VERYLARGE (HUGE/2-1)
-#elif defined(HUGE_VAL)
-#define VERYLARGE (HUGE_VAL/2-1)
-#else
+# ifdef HUGE
+#  define VERYLARGE (HUGE/2-1)
+# elif defined(HUGE_VAL)
+#  define VERYLARGE (HUGE_VAL/2-1)
+# else
 /* as a last resort */
-#define VERYLARGE (1e37)
-#warning "using last resort 1e37 as VERYLARGE define, please check your headers"
-#endif
+#  define VERYLARGE (1e37)
+#  warning "using last resort 1e37 as VERYLARGE define, please check your headers"
+# endif
 #endif
 
 /* argument: char *fn */
@@ -436,57 +401,15 @@ typedef double coordval;
 #define END_OF_COMMAND (c_token >= num_tokens || equals(c_token,";"))
 #define is_EOF(c) ((c) == 'e' || (c) == 'E')
 
-#ifdef vms
-
-
-#define is_comment(c) ((c) == '#' || (c) == '!')
-#define is_system(c) ((c) == '$')
-
-
-#else /* vms */
-
-#define is_comment(c) ((c) == '#')
-#define is_system(c) ((c) == '!')
-
-#endif /* vms */
-
-/* 
- * memcpy() and memset() come by many names. The default is now to assume
- * these functions as defined by ANSI.
- * Define NO_MEMCPY to use bcopy(), NO_MEMSET to use bzero()
- *  NOCOPY to use a handwritten version in parse.c
- */
-
-#if defined(NO_MEMCPY) && !defined(NOCOPY)
-#  define memcpy(dest,src,len) bcopy(src,dest,len)
-#else 
-   /* use memcpy directly, define bcopy to cause an error */
-#  ifdef bcopy
-#   undef bcopy
-#  endif
-#  define bcopy(s,d,l) bcopy->dont
-#endif /* NO_MEMCPY */
-
-/*
- * Since we want to use memset, we have to map a possibly nonzero fill byte
- * to the bzero function. The following defined might seem a bit odd, but I
- * think this is the only possible way.
- */
-
-#if defined(NO_MEMCPY)
-#include <assert.h>
-#define memset(s, b, l)	\
-do {			\
-  assert((b)==0);	\
-  bzero(s, l);		\
-} while(0)
-#else
-  /* use memset, define bzero to cause an error */
-# ifdef bzero
-#  undef bzero
-# endif
-# define bzero(s,l) bzero->dont
-#endif
+#ifdef VMS
+# define is_comment(c) ((c) == '#' || (c) == '!')
+# define is_system(c) ((c) == '$')
+/* maybe configure could check this? */
+# define BACKUP_FILESYSTEM 1
+#else /* VMS */
+# define is_comment(c) ((c) == '#')
+# define is_system(c) ((c) == '!')
+#endif /* VMS */
 
 #define top_of_stack stack[s_p]
 
@@ -774,7 +697,7 @@ struct TERMENTRY {
 	int flags;
 	void (*suspend) __PROTO((void)); /* called after one plot of multiplot */
 	void (*resume)  __PROTO((void)); /* called before plots of multiplot */
-	void (*fillbox) __PROTO((int style, unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2)); /* clear in multiplot mode */
+	void (*fillbox) __PROTO((int, unsigned int, unsigned int, unsigned int, unsigned int)); /* clear in multiplot mode */
    void (*linewidth) __PROTO((double linewidth));
 };
 
@@ -855,12 +778,12 @@ struct ticmark {
  from:	Martin Minow
 	decvax!minow
  */
-#ifdef	vms
+#ifdef VMS
 #include		<ssdef.h>
 #include		<stsdef.h>
 #define	IO_SUCCESS	(SS$_NORMAL | STS$M_INHIB_MSG)
 #define	IO_ERROR	SS$_ABORT
-#endif /* vms */
+#endif /* VMS */
 
 
 #ifndef	IO_SUCCESS	/* DECUS or VMS C will have defined these already */
