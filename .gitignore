@@ -26,3 +26,5 @@ _$*
 *.ln
 core
 # CVS default ignores end
+Makefile
+Makefile.in
