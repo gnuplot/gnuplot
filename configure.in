@@ -109,7 +109,7 @@ dnl X Window System files.
 AC_SUBST(X_INCLUDES)
 AC_SUBST(X_LIBRARIES)
 AC_SUBST(GNUPLOT_X11)
-AC_PATH_X
+AC_PATH_XTRA
 if test "$no_x" = yes; then
   X_INCLUDES= X_LIBRARIES= GNUPLOT_X11=
 else
@@ -196,7 +196,7 @@ dnl math lib is already available, see operating systems part
 AC_CHECK_FUNCS(erf)
 AC_CHECK_FUNC(lgamma,AC_DEFINE(HAVE_LGAMMA),AC_CHECK_FUNCS(gamma))
 
-AC_CHECK_FUNCS(getcwd sleep tcgetattr)
+AC_CHECK_FUNCS(getcwd snprintf sleep tcgetattr)
 AC_CHECK_FUNC(popen,AC_CHECK_FUNC(pclose,AC_DEFINE(PIPES)))
 AC_CHECK_FUNC(strncasecmp,AC_DEFINE(HAVE_STRNCASECMP),AC_CHECK_FUNCS(strnicmp))
 
@@ -208,6 +208,7 @@ dnl Libraries.
 dnl -lsocket is needed on SVR4.
 dnl
 dnl Is this true ?  Can anyone remember why ?
+dnl I believe it is needed by gnuplot_x11 for gethostname and friends? lars
 AC_CHECK_LIB(socket, main, LIBS="$LIBS -lnsl -lsocket")
 
 dnl check for installed linux vgalib
