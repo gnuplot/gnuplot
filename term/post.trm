@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.109 2004/06/30 19:56:20 broeker Exp $
+ * $Id: post.trm,v 1.110 2004/07/01 17:10:33 broeker Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -2616,7 +2616,7 @@ PS_make_header(t_sm_palette *palette)
     fputs("}{\n", gpoutfile);
     fputs("  /g {stroke pm3dround pm3dGamma exp setgray} bind def\n", gpoutfile);
     fputs("} ifelse\n", gpoutfile);
-    fputs("/h {rlineto rlineto rlineto fill} bind def\n", gpoutfile);
+    fputs("/h {rlineto rlineto rlineto gsave fill grestore} bind def\n", gpoutfile);
 #undef R
 #undef G
 #undef B

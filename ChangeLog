@@ -1,3 +1,9 @@
+2004-07-09  Ethan Merritt  <merritt@u.washington.edu>
+
+	* term/post.trm: Add a gsave/grestore pair to the fill operation
+	used by pm3d surface quadrangles. This works around a ghostscript
+	bug that introduces antialiasing artifacts when displaying in X11.
+
 2004-07-15  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* term/fig.trm (FIG_arrow): Use actual linetype variables rather
