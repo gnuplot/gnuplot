@@ -40,10 +40,10 @@ SUBDIRS = $(d_beos)
 
 OTHER_SOURCES = amiga.c corplot.c ctrl87.c ctrl87.h os9.c strftime.c vms.c
 
-EXTRA_DIST = GNUmakefile Makefile.maint NeXT corgraph.asm genopt.com \
+EXTRA_DIST = GNUmakefile Makefile.maint NeXT OpenStep corgraph.asm genopt.com \
 gnuplot.def gnuplot.opt gnuplot.prj header.mac hrcgraph.asm intergra.x11 \
 lasergnu lineproc.mac linkopt.vms linkopt.ztc makefile.all os2 pcgraph.asm \
-rgipgnu win $(OTHER_SOURCES)
+rgipgnu win x11.opt $(OTHER_SOURCES)
 
 ## we don't need COREOBJS, but CORETERM
 ## for the term.o dependencies
