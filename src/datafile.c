@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.59 2004/09/13 21:50:24 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.60 2004/09/29 11:29:12 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -2529,7 +2529,10 @@ df_parse_string_field(char *string, char *field)
     char temp_string[64];
     temp_string[sizeof(temp_string)-1] = '\0';
 
-    if (*field == '"') {
+    if (!field) {
+	*string = '\0';
+	return;
+    } else if (*field == '"') {
 	strncpy(temp_string,&(field[1]),sizeof(temp_string)-1);
 	temp_string[strcspn(temp_string,"\"")] = '\0';
     } else if (df_separator != '\0') {

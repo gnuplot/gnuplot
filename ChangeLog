@@ -2,7 +2,10 @@
 
 	* src/plot2d.c (get_data eval_plots): Defer adjustment of histogram 
 	ranges until after the input file has been checked for valid data.
-	(fixes bug #1046894).
+	(fixes bug #1046894)
+
+	* src/datafile.c (df_parse_string_field): Handle missing field in 
+	input file more gracefully. (bug #1046894)
 
 2004-10-13  Harald Harders  <h.harders@tu-bs.de>
 
