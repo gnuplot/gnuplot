@@ -276,6 +276,9 @@
 /*  Define if you want to use a newer version of libgrx under MSDOS/djgpp.  */
 #undef GRX21
 
+/*  Define if math.h declares struct exception for matherr().  */
+#undef EXCEPTION_IN_MATH
+
 /*  Define if <errno.h> declares errno.  */
 #undef EXTERN_ERRNO
 
