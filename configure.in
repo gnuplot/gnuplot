@@ -106,6 +106,18 @@ AC_ARG_ENABLE(iris,dnl
 test -z "$enable_iris" && enable_iris=no
 )dnl
 
+dnl MGR Window system
+AC_ARG_ENABLE(mgr,dnl
+[  --enable-mgr            enable MGR terminal],,
+test -z "$enable_mgr" && enable_mgr=no
+)dnl
+
+dnl Redwood Graphics Interface Protocol
+AC_ARG_ENABLE(rgip,dnl
+[  --enable-rgip           enable Redwood Graphics Interface Protocol],,
+test -z "$enable_rgip" && enable_rgip=no
+)dnl
+
 dnl SUNview driver
 AC_ARG_ENABLE(sun,dnl
 [  --enable-sun            enable sunview terminal (Sun only)],,
@@ -163,14 +175,6 @@ dnl FIXME AC_DEFINE(KSR)
 dnl Check for MSDOS and djgpp, NeXT
 gp_MSDOS
 gp_NEXT
-dnl gcc on Digital Unix
-dnl gnuplot dumps core in prob.dem unless
-dnl compiled with -mieee
-AC_EGREP_CPP(yes,dnl
- [#if __GNUC__ && __osf__
-   yes
-  #endif
- ],CFLAGS="-mieee $CFLAGS")
 
 dnl this has to be after -lsys_s on NeXT
 LIBS="$LIBS -lm"
@@ -386,7 +390,7 @@ if test "$enable_gpr" = yes; then
    [#ifdef apollo 
      yes
     #endif
-   ],AC_DEFINE(GPR),dnl
+   ],AC_DEFINE(APOLLO) AC_DEFINE(GPR),dnl
    enable_gpr=no)
 fi
 
@@ -406,6 +410,17 @@ if test "$enable_iris" = yes; then
    AC_DEFINE(IRIS)
    TERMLIBS="$TERMLIBS -lgl_s",dnl
    enable_iris=no)
+fi
+
+if test "$enable_mgr" = yes; then
+  AC_CHECK_LIB(mgr,m_getinfo,dnl
+   AC_DEFINE(MGR)dnl
+   TERMLIBS="$TERMLIBS -lmgr -lpixrect",dnl
+   enable_mgr=no,[-lpixrect])
+fi
+
+if test "$enable_rgip" = yes; then
+  AC_DEFINE(RGIP)
 fi
 
 if test "$enable_sun" = yes; then
@@ -490,11 +505,20 @@ test "$with_linux_vga" = yes && \
 test "$enable_apollo" = yes && \
   AC_MSG_RESULT([  Enable Apollo terminal (resizeable window).])
 
+test "$enable_cgi" = yes && \
+  AC_MSG_RESULT([  Enable cgi terminal (SCO).])
+
 test "$enable_gpr" = yes && \
   AC_MSG_RESULT([  Enable Apollo terminal (fixed-size window).])
 
-test "$enable_cgi" = yes && \
-  AC_MSG_RESULT([  Enable cgi terminal (SCO).])
+test "$enable_iris" = yes && \
+  AC_MSG_RESULT([  Enable IRIS terminal.])
+
+test "$enable_mgr" = yes && \
+  AC_MSG_RESULT([  Enable MGR terminal.])
+
+test "$enable_rgip" = yes && \
+  AC_MSG_RESULT([  Enable RGIP terminal.])
 
 test "$enable_sun" = yes && \
   AC_MSG_RESULT([  Enable sunview terminal.])
