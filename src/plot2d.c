@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.8 1999/06/11 11:18:56 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.9 1999/06/11 18:53:16 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -35,7 +35,6 @@ static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.8 1999/06/11 11:18:56 lhe
 ]*/
 
 #include "plot.h"
-#include "command.h"
 #include "setshow.h"
 #include "fit.h"
 #include "binary.h"
@@ -89,9 +88,6 @@ extern int df_no_use_specs;
 extern int df_eof;
 extern int df_timecol[];
 extern TBOOLEAN df_binary;
-
-#define Inc_c_token if (++c_token >= num_tokens) \
-  int_error (c_token, "Syntax error");
 
 
 /*
