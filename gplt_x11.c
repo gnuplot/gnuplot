@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: gplt_x11.c,v 1.71 1998/04/14 00:15:22 drd Exp $";
+static char *RCSid = "$Id: gplt_x11.c,v 1.16 1998/12/15 20:22:52 lhecking Exp $";
 #endif
 
 /* GNUPLOT - gplt_x11.c */
@@ -257,6 +257,7 @@ double xscale, yscale, pointsize;
 
 #define Nbuf 1024
 char buf[Nbuf], **commands = (char **) 0;
+static int buffered_input_available = 0;
 
 FILE *X11_ipc;
 char X11_ipcpath[32];
@@ -275,7 +276,8 @@ XSegment Plus[2], Cross[2], Star[4];
  *   main program 
  *---------------------------------------------------------------------------*/
 
-int main(argc, argv)
+int
+main(argc, argv)
 int argc;
 char *argv[];
 {
@@ -300,7 +302,7 @@ char *argv[];
     mainloop();
 
     if (persist) {
-	FPRINTF((stderr, "waiting for %d windows\n, windows_open"));
+	FPRINTF((stderr, "waiting for %d windows\n", windows_open));
 	/* read x events until all windows have been quit */
 	while (windows_open > 0) {
 	    XEvent event;
@@ -338,23 +340,16 @@ char *argv[];
  *    DEFAULT_X11 mainloop
  *---------------------------------------------------------------------------*/
 
-void mainloop()
+void
+mainloop()
 {
-    int nf, nfds, cn = ConnectionNumber(dpy), in;
-    struct timeval *timer = (struct timeval *) 0;
-#ifdef ISC22
-    struct timeval timeout;
-#endif
-    fd_set rset, tset;
+    int nf, cn = ConnectionNumber(dpy), in;
+    int nfds;
+    struct timeval timeout, *timer = (struct timeval *) 0;
+    fd_set tset;
 
     X11_ipc = stdin;
     in = fileno(X11_ipc);
-
-    FD_ZERO(&rset);
-    FD_SET(cn, &rset);
-
-    FD_SET(in, &rset);
-    nfds = (cn > in) ? cn + 1 : in + 1;
 
 #ifdef ISC22
 /* Added by Robert Eckardt, RobertE@beta.TP2.Ruhr-Uni-Bochum.de */
@@ -374,15 +369,34 @@ void mainloop()
 
 	XFlush(dpy);
 
-	tset = rset;
+	FD_ZERO(&tset);
+	FD_SET(cn, &tset);
+
+	/* Don't wait for events if we know that input is
+	 * already sitting in a buffer.  Also don't wait for
+	 * input to become available.
+	*/
+	if (buffered_input_available) {
+	    timeout.tv_sec  = 0;
+	    timeout.tv_usec = 0;
+	    timer = &timeout;
+	} else {
+	    timer = (struct timeval *) 0;
+	    FD_SET(in, &tset);
+	}
+
+	nfds = (cn > in) ? cn + 1 : in + 1;
+
 	nf = select((gp_nfds_t)nfds, gp_fd_set_p &tset, gp_fd_set_p 0,
-		     gp_fd_set_p 0, gp_timeval_p timer);
+		    gp_fd_set_p 0, gp_timeval_p timer);
+
 	if (nf < 0) {
 	    if (errno == EINTR)
 		continue;
 	    fprintf(stderr, "gnuplot: select failed. errno:%d\n", errno);
 	    EXIT(1);
 	}
+
 	if (nf > 0)
 	    XNoOp(dpy);
 
@@ -404,31 +418,28 @@ void mainloop()
 		process_event(&xe);
 	    } while (XPending(dpy));
 	}
-	if (FD_ISSET(in, &tset)) {
-	    if (!record())      /* end of input */
+
+	if (FD_ISSET(in, &tset) || buffered_input_available) {
+	    if (!record())	/* end of input */
 		return;
 	}
     }
 }
 
-#endif
 
-
-#ifdef CRIPPLED_SELECT
+#elif defined(CRIPPLED_SELECT)
 /*-----------------------------------------------------------------------------
  *    CRIPPLED_SELECT mainloop
  *---------------------------------------------------------------------------*/
 
-void mainloop()
+void
+mainloop()
 {
-    int nf, nfds, cn = ConnectionNumber(dpy);
+    fd_set_size_t nf, nfds, cn = ConnectionNumber(dpy);
     struct timeval timeout, *timer;
-    fd_set rset, tset;
+    fd_set tset;
     unsigned long all = (unsigned long) (-1L);
     XEvent xe;
-
-    FD_ZERO(&rset);
-    FD_SET(cn, &rset);
 
     timeout.tv_sec = 1;
     timeout.tv_usec = 0;
@@ -438,16 +449,37 @@ void mainloop()
 
     while (1) {
 	XFlush(dpy);		/* see above */
-	tset = rset;
-	nf = select((gp_nfds_t)nfds, gp_fd_set_p &tset, gp_fd_set_p 0,
-		    gp_fd_set_p 0, gp_timeval_p timer);
+
+	FD_ZERO(&tset);
+	FD_SET(cn, &tset);
+
+	/* Don't wait for events if we know that input is
+	 * already sitting in a buffer.  Also don't wait for
+	 * input to become available.
+	*/
+	if (buffered_input_available) {
+	    timeout.tv_sec  = 0;
+	    timeout.tv_usec = 0;
+	    timer = &timeout;
+	} else {
+	    timer = (struct timeval *) 0;
+	    FD_SET(in, &tset);
+	}
+
+	nfds = (cn > in) ? cn + 1 : in + 1;
+
+	nf = select(nfds, SELECT_FD_SET_CAST &tset, 0, 0, timer);
+
 	if (nf < 0) {
 	    if (errno == EINTR)
 		continue;
 	    fprintf(stderr, "gnuplot: select failed. errno:%d\n", errno);
 	    EXIT(1);
 	}
-	nf > 0 && XNoOp(dpy);
+
+	if (nf > 0)
+	    XNoOp(dpy);
+
 	if (FD_ISSET(cn, &tset)) {
 	    while (XCheckMaskEvent(dpy, all, &xe)) {
 		process_event(&xe);
@@ -460,10 +492,9 @@ void mainloop()
 	}
     }
 }
-#endif /* CRIPPLED_SELECT */
 
 
-#ifdef VMS
+#elif defined(VMS)
 /*-----------------------------------------------------------------------------
  *    VMS mainloop - Yehavi Bourvine - YEHAVI@VMS.HUJI.AC.IL
  *---------------------------------------------------------------------------*/
@@ -471,32 +502,38 @@ void mainloop()
 /*  In VMS there is no decent Select(). hence, we have to loop inside
  *  XGetNextEvent for getting the next X window event. In order to get input
  *  from the master we assign a channel to SYS$INPUT and use AST's in order to
- *  receive data. In order to exit the mainloop, we need to somehow make XNextEvent
- *  return from within the ast. We do this with a XSendEvent() to ourselves !
+ *  receive data. In order to exit the mainloop, we need to somehow make
+ *  XNextEvent return from within the ast. We do this with a XSendEvent() to
+ *  ourselves !
  *  This needs a window to send the message to, so we create an unmapped window
  *  for this purpose. Event type XClientMessage is perfect for this, but it
- *  appears that such messages come from elsewhere (motif window manager, perhaps ?)
- *  So we need to check fairly carefully that it is the ast event that has been received.
+ *  appears that such messages come from elsewhere (motif window manager,
+ *  perhaps ?) So we need to check fairly carefully that it is the ast event
+ *  that has been received.
  */
 
 #include <iodef.h>
 char STDIIN[] = "SYS$INPUT:";
 short STDIINchannel, STDIINiosb[4];
-struct { short size, type; char *address; } STDIINdesc;
+struct {
+    short size, type;
+    char *address;
+} STDIINdesc;
 char STDIINbuffer[64];
 int status;
 
 ast()
 {
     int status = sys$qio(0, STDIINchannel, IO$_READVBLK, STDIINiosb, record,
-		  0, STDIINbuffer, sizeof(STDIINbuffer) - 1, 0, 0, 0, 0);
+			 0, STDIINbuffer, sizeof(STDIINbuffer) - 1, 0, 0, 0, 0);
     if ((status & 0x1) == 0)
 	EXIT(status);
 }
 
 Window message_window;
 
-void mainloop()
+void
+mainloop()
 {
     /* dummy unmapped window for receiving internally-generated terminate
      * messages
@@ -527,12 +564,14 @@ void mainloop()
 	process_event(&xe);
     }
 }
-
-#endif /* VMS */
+#else /* !(DEFAULT_X11 || CRIPPLED_SELECT || VMS */
+You lose. No mainloop.
+#endif				/* !(DEFAULT_X11 || CRIPPLED_SELECT || VMS */
 
 /* delete a window / plot */
 
-void delete_plot(plot)
+void
+delete_plot(plot)
 plot_struct *plot;
 {
     int i;
@@ -559,7 +598,8 @@ plot_struct *plot;
 
 /* prepare the plot structure */
 
-void prepare_plot(plot, term_number)
+void
+prepare_plot(plot, term_number)
 plot_struct *plot;
 int term_number;
 {
@@ -580,7 +620,6 @@ int term_number;
 	plot->width = gW;
 	plot->height = gH;
     }
-
     if (!plot->window) {
 	plot->window = pr_window(plot->posn_flags, plot->x, plot->y, plot->width, plot->height);
 	++windows_open;
@@ -612,7 +651,8 @@ int term_number;
 
 /* store a command in a plot structure */
 
-void store_command(buffer, plot)
+void
+store_command(buffer, plot)
 char *buffer;
 plot_struct *plot;
 {
@@ -635,19 +675,79 @@ plot_struct *plot;
 }
 
 #ifndef VMS
+
+/* Handle input.  Use read instead of fgets because stdio buffering
+* causes trouble when combined with calls to select.
+*/
+int
+read_input ()
+{
+    static int rdbuf_size = 10*Nbuf;
+    static char rdbuf[10*Nbuf-1];
+    static int total_chars;
+    static int rdbuf_offset;
+    static int buf_offset;
+    static int partial_read = 0;
+    int fd = fileno (X11_ipc);
+
+    if (! partial_read)
+	buf_offset = 0;
+
+    if (! buffered_input_available) {
+	total_chars = read (fd, rdbuf, rdbuf_size);
+	buffered_input_available = 1;
+	partial_read = 0;
+	rdbuf_offset = 0;
+	if (total_chars < 0)
+	    return -1;
+    }
+
+    if (rdbuf_offset < total_chars) {
+	while (rdbuf_offset < total_chars && buf_offset < Nbuf) {
+	    char c = rdbuf[rdbuf_offset++];
+	    buf[buf_offset++] = c;
+	    if (c == '\n')
+		break;
+	}
+
+	if (buf_offset == Nbuf) {
+	    fputs("\
+\n\
+gnuplot: buffer overflow in read_input!\n\
+gnuplot: X11 aborted.\n", stderr);
+	    EXIT(1);
+	} else
+	    buf[buf_offset] = NUL;
+    }
+
+    if (rdbuf_offset == total_chars) {
+	buffered_input_available = 0;
+	if (buf[buf_offset-1] != '\n')
+	    partial_read = 1;
+    }
+
+    return partial_read;
+}
+
+
 /*-----------------------------------------------------------------------------
  *   record - record new plot from gnuplot inboard X11 driver (Unix)
  *---------------------------------------------------------------------------*/
 
-int record()
+int
+record()
 {
     static plot_struct *plot = plot_array;
 
-    while (fgets(buf, Nbuf, X11_ipc)) {
+    while (1) {
+	int status = read_input (buf, Nbuf);
+	if (status != 0)
+	    return status;
+
 	switch (*buf) {
 	case 'G':		/* enter graphics mode */
 	    {
-		int plot_number = atoi(buf + 1);	/* 0 if none specified */
+		int plot_number = atoi(buf + 1);    /* 0 if none specified */
 
 		if (plot_number < 0 || plot_number >= MAX_WINDOWS)
 		    plot_number = 0;
@@ -668,20 +768,6 @@ int record()
 	    continue;
 	}
     }
-
-    /* get here if fgets fails */
-
-#ifdef OSK
-    if (feof(X11_ipc))		/* On OS-9 sometimes while resizing the window,  */
-	_cleareof(X11_ipc);	/* and plotting data, the eof or error flag of   */
-    if (ferror(X11_ipc))	/* X11_ipc stream gets set, while there is       */
-	clearerr(X11_ipc);	/* nothing wrong! Probably a bug in my select()? */
-#else
-    if (feof(X11_ipc) || ferror(X11_ipc))
-	return 0;
-#endif /* not OSK */
-
-    return 1;
 }
 
 #else /* VMS */
@@ -749,7 +835,8 @@ record()
  *   display - display a stored plot
  *---------------------------------------------------------------------------*/
 
-void display(plot)
+void
+display(plot)
 plot_struct *plot;
 {
     int n, x, y, sw, sl, lt = 0, width, type, point, px, py;
@@ -775,10 +862,10 @@ plot_struct *plot;
 	XFreeGC(dpy, gc);
 
     if (!plot->pixmap) {
-	FPRINTF((stderr, "Create pixmap %d : %dx%dx%d\n", plot - plot_array, plot->width, plot->height, D));
+	FPRINTF((stderr, "Create pixmap %d : %dx%dx%d\n", plot - plot_array, plot->width,
+		 plot->height, D));
 	plot->pixmap = XCreatePixmap(dpy, root, plot->width, plot->height, D);
     }
-
     gc = XCreateGC(dpy, plot->pixmap, 0, (XGCValues *) 0);
 
     XSetFont(dpy, gc, font->fid);
@@ -846,7 +933,7 @@ plot_struct *plot;
 		 * There may be an off-by-one (or more) error here.
 		 * style ignored here for the moment
 		 */
-		ytmp += h;		/* top left corner of rectangle to be filled */
+		ytmp += h;	/* top left corner of rectangle to be filled */
 		w *= xscale;
 		h *= yscale;
 		XSetForeground(dpy, gc, colors[0]);
@@ -1006,7 +1093,8 @@ plot_struct *plot;
  *  reset all cursors (since we dont have a record of the previous terminal #)
  *---------------------------------------------------------------------------*/
 
-void reset_cursor()
+void
+reset_cursor()
 {
     int plot_number;
     plot_struct *plot = plot_array;
@@ -1028,7 +1116,8 @@ void reset_cursor()
  *   resize - rescale last plot if window resized
  *---------------------------------------------------------------------------*/
 
-plot_struct *find_plot(window)
+plot_struct *
+find_plot(window)
 Window window;
 {
     int plot_number;
@@ -1047,7 +1136,8 @@ Window window;
     return NULL;
 }
 
-void process_event(event)
+void
+process_event(event)
 XEvent *event;
 {
     FPRINTF((stderr, "Event 0x%x\n", event->type));
@@ -1107,10 +1197,12 @@ XEvent *event;
 /*-----------------------------------------------------------------------------
  *   preset - determine options, open display, create window
  *---------------------------------------------------------------------------*/
-
+/*
 #define On(v) ( !strcmp(v,"on") || !strcmp(v,"true") || \
                 !strcmp(v,"On") || !strcmp(v,"True") || \
                 !strcmp(v,"ON") || !strcmp(v,"TRUE") )
+*/
+#define On(v) ( !strncasecmp(v,"on",2) || !strncasecmp(v,"true",4) )
 
 #define AppDefDir "/usr/lib/X11/app-defaults"
 #ifndef MAXHOSTNAMELEN
@@ -1157,7 +1249,8 @@ static XrmOptionDescRec options[] = {
 
 #define Nopt (sizeof(options) / sizeof(options[0]))
 
-void preset(argc, argv)
+void
+preset(argc, argv)
 int argc;
 char *argv[];
 {
@@ -1189,8 +1282,11 @@ char *argv[];
 
     while (++Argv, --Argc > 0) {
 	if (!strcmp(*Argv, "-name") && Argc > 1) {
-	    safe_strncpy(Name, Argv[1], sizeof(Name));
-	    safe_strncpy(Class, Argv[1], sizeof(Class));
+	    strncpy(Name, Argv[1], sizeof(Name) - 1);
+	    strncpy(Class, Argv[1], sizeof(Class) - 1);
+	    /* just in case */
+	    Name[sizeof(Name)-1] = NUL;
+	    Class[sizeof(Class)-1] = NUL;
 	    if (Class[0] >= 'a' && Class[0] <= 'z')
 		Class[0] -= 0x20;
 	}
@@ -1240,17 +1336,17 @@ gnuplot: X11 aborted.\n", ldisplay);
 
 #ifdef VMS
     strcpy(buffer, "DECW$USER_DEFAULTS:GNUPLOT_X11.INI");
-#else
-# ifdef OS2
+#elif defined OS2
 /* for Xfree86 ... */
     {
 	char *appdefdir = "XFree86/lib/X11/app-defaults";
 	char *xroot = getenv("X11ROOT");
 	sprintf(buffer, "%s/%s/%s", xroot, appdefdir, "Gnuplot");
     }
-# else
-    sprintf(buffer, "%s/%s", AppDefDir, "Gnuplot");
-# endif /* !OS2 */
+# else /* !OS/2 */
+    strcpy(buffer, AppDefDir);
+    strcat(buffer, "/");
+    strcat(buffer, "Gnuplot");
 #endif /* !VMS */
 
     dbApp = XrmGetFileDatabase(buffer);
@@ -1264,7 +1360,8 @@ gnuplot: X11 aborted.\n", ldisplay);
 #ifdef VMS
 	strcpy(buffer, "DECW$USER_DEFAULTS:DECW$XDEFAULTS.DAT");
 #else
-	sprintf(buffer, "%s/.Xdefaults", home);
+	strcpy(buffer, home);
+	strcat(buffer, ".Xdefaults");
 #endif
 	dbDef = XrmGetFileDatabase(buffer);
     }
@@ -1284,7 +1381,9 @@ gnuplot: X11 aborted.\n", ldisplay);
 	}
 	if ((p = strchr(host, '.')) != NULL)
 	    *p = '\0';
-	sprintf(buffer, "%s/.Xdefaults-%s", home, host);
+	strcpy(buffer, home);
+	strcat(buffer, "/.Xdefaults-");
+	strcat(buffer, host);
 	dbEnv = XrmGetFileDatabase(buffer);
     }
     XrmMergeDatabases(dbEnv, &db);
@@ -1311,7 +1410,7 @@ gnuplot: X11 aborted.\n", ldisplay);
  *---------------------------------------------------------------------------*/
 
 char *
- pr_GetR(xrdb, resource)
+pr_GetR(xrdb, resource)
 XrmDatabase xrdb;
 char *resource;
 {
@@ -1322,8 +1421,8 @@ char *resource;
     strcpy(class, Class);
     strcat(class, resource);
     rc = XrmGetResource(xrdb, name, class, type, &value)
-	? (char *) value.addr
-	: (char *) 0;
+    ? (char *) value.addr
+    : (char *) 0;
     return (rc);
 }
 
@@ -1347,7 +1446,8 @@ char gray_values[Ncolors][30] = {
     "gray90", "gray50", "gray70", "gray30"
 };
 
-void pr_color()
+void
+pr_color()
 {
     unsigned long black = BlackPixel(dpy, scr), white = WhitePixel(dpy, scr);
     char option[20], color[30], *v, *ctype;
@@ -1429,7 +1529,8 @@ char dash_color[Ndashes][10] = {
     "0", "0", "0", "0", "0", "0", "0", "0"
 };
 
-void pr_dashes()
+void
+pr_dashes()
 {
     int n, j, l, ok;
     char option[20], *v;
@@ -1465,7 +1566,8 @@ void pr_dashes()
  *   pr_font - determine font          
  *---------------------------------------------------------------------------*/
 
-void pr_font()
+void
+pr_font()
 {
     char *fontname = pr_GetR(db, ".font");
 
@@ -1490,7 +1592,8 @@ gnuplot: no useable font - X11 aborted.\n", FallbackFont);
  *   pr_geometry - determine window geometry      
  *---------------------------------------------------------------------------*/
 
-void pr_geometry()
+void
+pr_geometry()
 {
     char *geometry = pr_GetR(db, ".geometry");
     int x, y, flags;
@@ -1520,7 +1623,8 @@ void pr_geometry()
  *   pr_pointsize - determine size of points for 'points' plotting style
  *---------------------------------------------------------------------------*/
 
-void pr_pointsize()
+void
+pr_pointsize()
 {
     if (pr_GetR(db, ".pointsize")) {
 	if (sscanf((char *) value.addr, "%lf", &pointsize) == 1) {
@@ -1546,7 +1650,8 @@ char width_keys[Nwidths][30] = {
     "line1", "line2", "line3", "line4", "line5", "line6", "line7", "line8"
 };
 
-void pr_width()
+void
+pr_width()
 {
     int n;
     char option[20], *v;
@@ -1568,7 +1673,8 @@ void pr_width()
  *   pr_window - create window 
  *---------------------------------------------------------------------------*/
 
-Window pr_window(flags, x, y, width, height)
+Window
+pr_window(flags, x, y, width, height)
 unsigned int flags;
 int x, y;
 unsigned int width, height;
@@ -1619,14 +1725,16 @@ unsigned int width, height;
 
 
 /***** pr_raise ***/
-void pr_raise()
+void
+pr_raise()
 {
     if (pr_GetR(db, ".raise"))
 	do_raise = (On(value.addr));
 }
 
 
-void pr_persist()
+void
+pr_persist()
 {
     if (pr_GetR(db, ".persist"))
 	persist = (On(value.addr));
@@ -1639,7 +1747,8 @@ void pr_persist()
 /* bit of a bodge, but ... */
 static struct plot_struct *exported_plot;
 
-void export_graph(plot)
+void
+export_graph(plot)
 struct plot_struct *plot;
 {
     FPRINTF((stderr, "export_graph(0x%x)\n", plot));
@@ -1651,7 +1760,8 @@ struct plot_struct *plot;
     exported_plot = plot;
 }
 
-void handle_selection_event(event)
+void
+handle_selection_event(event)
 XEvent *event;
 {
     switch (event->type) {
@@ -1675,7 +1785,7 @@ XEvent *event;
 	    FPRINTF((stderr, "selection request\n"));
 
 	    if (reply.xselection.target == XA_TARGETS) {
-		static Atom targets[] =	{XA_PIXMAP, XA_COLORMAP};
+		static Atom targets[] = { XA_PIXMAP, XA_COLORMAP };
 
 		FPRINTF((stderr, "Targets request from %d\n", reply.xselection.requestor));
 
@@ -1696,7 +1806,7 @@ XEvent *event;
 
 		XChangeProperty(dpy, reply.xselection.requestor,
 				reply.xselection.property, reply.xselection.target, 32, PropModeReplace,
-			  (unsigned char *) &(exported_plot->pixmap), 1);
+				(unsigned char *) &(exported_plot->pixmap), 1);
 	    } else {
 		reply.xselection.property = None;
 	    }
