@@ -16,18 +16,37 @@ patchlevel := $(shell cat ../PATCHLEVEL)
 date := $(shell date)
 
 makefile.all: Makefile.maint
-	@echo "# $@ generated automatically by GNU make" >$@
-	@echo >>$@
-	@echo '# List of core object files except version.$$(O)' >>$@
+	@echo Making $@
+	@echo "# $@ generated automatically by GNU make" >$@t
+	@echo >>$@t
+	@echo '# List of core object files except version.$$(O)' >>$@t
 	@echo COREOBJS = $(coresrc:.c=.'$$(O)') \
 	 | fmt | (tr '\012' @; echo) | sed 's/@$$/%/;s/@/ \\@/g' \
-	 | tr @% '\012\012' >>$@
-	@echo "# List of terminal driver sources" >>$@
+	 | tr @% '\012\012' >>$@t
+	@echo "# List of terminal driver sources" >>$@t
 	@echo CORETERM = $(patsubst %.trm,$$\(T\)%.trm,$(coreterm)) \
 	 | fmt | (tr '\012' @; echo) | sed 's/@$$/%/;s/@/ \\@/g' \
-	 | tr @% '\012\012' >>$@
+	 | tr @% '\012\012' >>$@t
+	@if cmp -s $@ $@t; then \
+	  rm -f $@t; \
+	else \
+	  mv $@t $@; \
+	fi
+
+Makefile.in: makefile.all
+	@echo Making $@
+	@rm -f $@t
+	@sed -n '1,/^##makefile-all-begin/p' $@ > $@t
+	@cat $< >> $@t
+	@sed -n '/^##makefile-all-end/,$$p' $@ >> $@t
+	@if cmp -s $@ $@t; then \
+	  rm -f $@t; \
+	else \
+	  mv $@t $@; \
+	fi
 
 version.c: ../VERSION ../PATCHLEVEL Makefile.maint
+	@echo Making $@
 	@vn=`sed -n 's/.*version.*"\(.*\)".*/\1/p' ./version.c|tr -d ' '`; \
 	pl=`sed -n 's/.*patchlevel.*"\(.*\)".*/\1/p' ./version.c|tr -d ' '`; \
 	dt=`sed -n 's/.*date.*"\(.*\)".*/\1/p' ./version.c`; \
