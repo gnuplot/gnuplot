@@ -201,7 +201,7 @@ AC_CHECK_FUNCS(atexit memcpy memmove memset \
   index rindex \
   erf erfc gamma lgamma \
   getcwd poll pclose popen select sleep snprintf \
-  strncasecmp strnicmp sysinfo tcgetattr
+  strncasecmp strnicmp sysinfo tcgetattr vfprintf doprnt
 )
 
 if test "$ac_cv_func_pclose" = yes && test "$ac_cv_func_popen" = yes ; then
