@@ -1,18 +1,15 @@
 #
-# $Id: makefile.os2,v 1.26 2002/02/19 12:36:58 amai Exp $
+# $Id: makefile.os2,v 1.29 2002/03/04 13:36:55 amai Exp $
 #
-# GNUPLOT Makefile for use on OS/2 2.x and above
+# GNUPLOT Makefile for use on OS/2 2.x (and above)
 # using emx 0.9 (and above) and GNUMake
-#
-# last modification date: (see CVS timestamp)
-#
 #
 # To compile gnuplot, run the following command in directory gnuplot\src:
 #	make -f ..\config\makefile.os2
 #
 
 # We depend on using cmd.exe (or a compatible one) and the
-# standard OS/2 tools set.
+# standard OS/2 tool set. (additionally we use 'cat')
 SHELL=cmd.exe
 
 #
@@ -45,7 +42,6 @@ SHELL=cmd.exe
 
 # GNU_ReadLine support
 # requires GNU readline library (static or DLL; not part of gnuplot)
-# May fail in an xterm under XFree/2
 # GNU_RL=1
 
 # DEBUGging support
@@ -104,16 +100,13 @@ HELPFILE = $(DOCDIR)\gnuplot.gih
 
 #
 # 3 sets of variables are defined and used to create
-#  (1): gnuplot.exe
+#  (1): gnuplot.exe, and utilities
 #   2 : gnupmdrv.exe (the PM-driver executable)
-#   3 : utilities like doc2*.exe, bf_test.exe, ...
 #
 CC  = gcc
 CC2 = gcc
-CC3 = gcc
 O  = o
 O2 = obj
-O3 = o
 
 # Flags for compiler and linker under OS/2
 OS2FLAGS = -DOS2
@@ -139,15 +132,11 @@ CFLAGS  = -g $(OS2FLAGS) $(EMXSPECIFIC) -Wall -Wno-comment -O0 -Zmt
 LDFLAGS  = -g -Zmt -Zcrtdll -Zbsd-signals
 CFLAGS2 = -g $(OS2FLAGS) $(EMXSPECIFIC) -Wall              -O0 -Zmt -Zomf
 LDFLAGS2 = -g -Zmt -Zcrtdll -Zbsd-signals -Zomf
-CFLAGS3 = -g $(OS2FLAGS) $(EMXSPECIFIC) -Wall -Wno-comment -O0 -I.
-LDFLAGS3 = -g -Zmt -Zcrtdll -Zbsd-signals
 else
 CFLAGS  = $(OS2FLAGS) $(EMXSPECIFIC) -O4 -mpentium -Wall -Wno-unused -Wno-comment -Zmt
 LDFLAGS  = -s -Zmt -Zcrtdll -Zbsd-signals
 CFLAGS2 = $(OS2FLAGS) $(EMXSPECIFIC) -O4 -mpentium -Wall -Wno-unused              -Zmt -Zomf
 LDFLAGS2 = -s -Zmt -Zcrtdll -Zbsd-signals -Zomf
-CFLAGS3 = $(OS2FLAGS) $(EMXSPECIFIC) -O4 -mpentium -Wall -Wno-unused -Wno-comment -I.
-LDFLAGS3 = -s -Zmt -Zcrtdll -Zbsd-signals
 endif
 
 #
@@ -214,7 +203,7 @@ PLAINTEX = tex
 .c.$(O):
 	$(CC)  $(CFLAGS) $(TERMFLAGS) -o $*.$(O) -c $*.c
 .c.obj:
-	$(CC2) $(CFLAGS2) -o $*.obj -c $*.c
+	$(CC2) $(CFLAGS2) $(TERMFLAGS) -o $*.obj -c $*.c
 
 #
 # Include dependencies valid for all platforms from makefile.all
@@ -240,7 +229,7 @@ endif
 
 OBJS = $(COREOBJS) version.$(O)
 
-$(OBJS): config.h
+$(OBJS): ..\config.h
 term.$(O): $(CORETERM) term.h
 
 gnuplot.exe: $(OBJS)
@@ -290,8 +279,8 @@ gplt_x11.o: gplt_x11.c mouse.h gpexecute.h
 # This file is preferable over having explicit gcc command longer than 10 lines:
 # gcc ... -DHAVE_ -DHAVE_ ... -DHAVE_ -DHAVE_ ... myfile.c
 #
-config.h: ..\config\config.os2
-	IF EXIST config.h DEL config.h
+..\config.h: ..\config\config.os2
+	IF EXIST $@ DEL $@
 	copy $< $@
 
 #
@@ -306,7 +295,7 @@ $(DOCDIR)\gnuplot.dvi: $(DOCDIR)\gnuplot.tex
 	cd $(DOCDIR) && $(LATEX) gnuplot_2.tex && $(LATEX) gnuplot_2.tex && $(LATEX) gnuplot_2.tex
 	if exist $(DOCDIR)\gnuplot.dvi del $(DOCDIR)\gnuplot.dvi
 	move $(DOCDIR)\gnuplot_2.dvi $(DOCDIR)\gnuplot.dvi
-	del $(DOCDIR)\gnuplot_2*
+	del $(DOCDIR)\gnuplot_2.*
 $(DOCDIR)\gnuplot.ps: $(DOCDIR)\gnuplot.dvi
 	$(DVIPS) -o $@ $(DOCDIR)\gnuplot.dvi
 $(DOCDIR)\gnuplot.pdf: $(DOCDIR)\gnuplot.tex
@@ -314,6 +303,7 @@ $(DOCDIR)\gnuplot.pdf: $(DOCDIR)\gnuplot.tex
 	cd $(DOCDIR) && $(PDFLATEX) gnuplot_3.tex && $(PDFLATEX) gnuplot_3.tex && $(PDFLATEX) gnuplot_3.tex
 	if exist $(DOCDIR)\gnuplot.pdf del $(DOCDIR)\gnuplot.pdf
 	move $(DOCDIR)\gnuplot_3.pdf $(DOCDIR)\gnuplot.pdf
+	del $(DOCDIR)\gnuplot_3.*
 $(DOCDIR)\gnuplot.tex:  $(DOCDIR)\gnuplot.doc $(DOCDIR)\doc2tex.exe
 	$(DOCDIR)\doc2tex.exe $(DOCDIR)\gnuplot.doc $@
 $(DOCDIR)\gnuplot.inf:  $(DOCDIR)\gnuplot.ipf
@@ -344,10 +334,10 @@ $(DOCDIR)\gpcard.dvi: $(DOCDIR)\gpcard.tex
 # in various formats
 #
 
-# Some dependency - no rule!
+# Some dependencies - no rule!
 $(DOCDIR)\doc2gih.exe $(DOCDIR)\doc2ipf.exe $(DOCDIR)\doc2info.exe \
 $(DOCDIR)\doc2tex.exe $(DOCDIR)\doc2rtf.exe: \
-      $(DOCDIR)\termdoc.c $(DOCDIR)\xref.c $(DOCDIR)\allterm.h
+      $(DOCDIR)\termdoc.c $(DOCDIR)\xref.c $(DOCDIR)\allterm.h ..\config.h
 
 
 $(DOCDIR)\allterm.h: $(CORETERM)
@@ -358,23 +348,23 @@ $(DOCDIR)\allterm.h: $(CORETERM)
       sed -e "/^ *$$/d;/^#/d" > allterm.h
 
 $(DOCDIR)\doc2gih.exe:  $(DOCDIR)\doc2gih.c $(DOCDIR)\termdoc.c $(OS2TERM)
-	$(CC3) $(CFLAGS3) $(TERMFLAGS) -DALL_TERM_DOC -o $@ $(DOCDIR)\doc2gih.c $(DOCDIR)\termdoc.c
+	$(CC) $(CFLAGS) $(TERMFLAGS) -DALL_TERM_DOC -o $@ $(DOCDIR)\doc2gih.c $(DOCDIR)\termdoc.c
 $(DOCDIR)\doc2ipf.exe:  $(DOCDIR)\doc2ipf.c $(DOCDIR)\termdoc.c $(DOCDIR)\xref.c $(OS2TERM)
-	$(CC3) $(CFLAGS3) $(TERMFLAGS) -DALL_TERM_DOC -o $@ $(DOCDIR)\doc2ipf.c $(DOCDIR)\termdoc.c $(DOCDIR)\xref.c
+	$(CC) $(CFLAGS) $(TERMFLAGS) -DALL_TERM_DOC -o $@ $(DOCDIR)\doc2ipf.c $(DOCDIR)\termdoc.c $(DOCDIR)\xref.c
 $(DOCDIR)\doc2tex.exe:  $(DOCDIR)\doc2tex.c $(DOCDIR)\termdoc.c $(OS2TERM) $(DOCDIR)\allterm.h
-	$(CC3) $(CFLAGS3) $(TERMFLAGS) -DALL_TERM_DOC -o $@ $(DOCDIR)\doc2tex.c $(DOCDIR)\termdoc.c
+	$(CC) $(CFLAGS) $(TERMFLAGS) -DALL_TERM_DOC -o $@ $(DOCDIR)\doc2tex.c $(DOCDIR)\termdoc.c
 $(DOCDIR)\doc2rtf.exe:  $(DOCDIR)\doc2rtf.c $(DOCDIR)\termdoc.c $(DOCDIR)\xref.c $(OS2TERM)
-	$(CC3) $(CFLAGS3) $(TERMFLAGS) -DALL_TERM_DOC -o $@ $(DOCDIR)\doc2rtf.c $(DOCDIR)\termdoc.c $(DOCDIR)\xref.c
+	$(CC) $(CFLAGS) $(TERMFLAGS) -DALL_TERM_DOC -o $@ $(DOCDIR)\doc2rtf.c $(DOCDIR)\termdoc.c $(DOCDIR)\xref.c
 $(DOCDIR)\doc2ms.exe:   $(DOCDIR)\doc2ms.c $(DOCDIR)\termdoc.c $(OS2TERM)
-	$(CC3) $(CFLAGS3) $(TERMFLAGS) -DALL_TERM_DOC -o $@ $(DOCDIR)\doc2ms.c $(DOCDIR)\termdoc.c
+	$(CC) $(CFLAGS) $(TERMFLAGS) -DALL_TERM_DOC -o $@ $(DOCDIR)\doc2ms.c $(DOCDIR)\termdoc.c
 #
 # Create binary demo files
 #
 $(M)binary1 $(M)binary2 $(M)binary3: $(M)bf_test.exe
 	cd $(DEMODIR) && bf_test.exe
 
-$(M)bf_test.exe : bf_test.c binary.$(O3) alloc.$(O3)
-	$(CC3) $(CFLAGS3) -o $@ bf_test.c binary.$(O3) alloc.$(O3)
+$(M)bf_test.exe : bf_test.c binary.$(O) alloc.$(O)
+	$(CC) $(CFLAGS) -o $@ bf_test.c binary.$(O) alloc.$(O)
 
 #
 # Clean up
@@ -382,10 +372,9 @@ $(M)bf_test.exe : bf_test.c binary.$(O3) alloc.$(O3)
 
 # Clean up all files temporary used
 clean:
-	IF EXIST config.h                  DEL config.h
+	IF EXIST ..\config.h               DEL ..\config.h
 	IF EXIST *.$(O)                    DEL *.$(O)
 	IF EXIST *.$(O2)                   DEL *.$(O2)
-	IF EXIST *.$(O3)                   DEL *.$(O3)
 	cd $(OS2DIR) && IF EXIST *.$(O2)   DEL *.$(O2)
 	IF EXIST $(OS2DIR)\gnupmdrv.res    DEL $(OS2DIR)\gnupmdrv.res
 	IF EXIST $(DEMODIR)\bf_test.exe    DEL $(DEMODIR)\bf_test.exe
