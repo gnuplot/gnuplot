@@ -2781,7 +2781,7 @@ register enum PLOT_STYLE ps=LINES; /* HBB: initial value, for 'gcc -W} */
 		ps = FSTEPS;
 	else if (almost_equals(c_token,"his$teps"))
 		ps = HISTEPS;
-	else if (almost_equals(c_token,"vec$tors"))   /* HBB: minor cosmetic change */
+	else if (almost_equals(c_token,"vec$tor"))   /* HBB: minor cosmetic change */
 		ps = VECTOR;
 	else if (almost_equals(c_token, "fin$ancebars"))
 		ps = FINANCEBARS;
