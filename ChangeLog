@@ -1,10 +1,64 @@
+1999-04-16  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* djconfig.sh: Moved to config/.
+
+	* Makefile.am: Add new files VERSION, PATCHLEVEL to EXTRA_DIST.
+
+	* Makefile.in, configure, config/Makefile.am, config/Makefile.in,
+	src/version.c: Regenerated.
+
+	* NEWS: Updated.
+
+	* configure.in: Simplify code to determine VERSION.
+
+	* config/Makefile.am.in: Add djconfig.sh.
+
+	* src/Makefile.maint: Add target for version.c.
+
+	* src/util.c(m_quote_capture): Fix possible quoting bug.
+
+1999-04-15  Martin Costabel  <costabel@wanadoo.fr>
+
+	* src/misc.c(save_set_all): Split long fprintf() statement up to
+	work around possible egcs bug on LinuxPPC.
+
+1999-04-12  "Carlos A M dos Santos"  <casantos@inf.ufrgs.br>
+
+	* docs/Makefile.in: Build documentation in text, dvi,and ps format
+	with groff.
+
+1999-04-08  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* Makefile.am: Reorder SUBDIRS, update EXTRA_DIST.
+
+	* Makefile.in, demo/Makefile.am, demo/Makefile.in, docs/gnuplot.texi,
+	lisp/aclocal.m4, lisp/configure: Regenerated.
+
+	* demo/Makefile.am.in: Move binary[123] targets from src/Makefile.in.
+
+	* docs/doc2texi.el: Wrap the @top node in @ifnottex instead of
+ 	@ifinfo so `makeinfo --html ...' works. Snarfed from GNU fileutils,
+	change was by Karl Berry.
+
+	* lisp/acinclude.m4: Better check for lispdir.
+
+	* src/Makefile.in: move binary[123] targets to demo/Makefile.am.in.
+
+1999-04-07  "Jürgen v.Hagen"  <vonhagen@ihefiji.etec.uni-karlsruhe.de>
+
+	* tutorial/header.tex: Change for LaTeX2e.
+
+1999-04-06  Don Taber  <dtaber@blackrat.risc.rockwell.com>
+
+	* src/plot.c: Don't drop root priviledge until VGA is initialised.
+
 1999-04-05  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* INSTALL: Change examples in test section.
 
 	* NEWS: Minor change.
 
-	* README.exp: New file to explain experimental features.
+	* README.exp: New file to document experimental features.
 
 	* demo/Makefile.am, demo/Makefile.in, lisp/aclocal.m4, lisp/configure:
 	Regenerated.
