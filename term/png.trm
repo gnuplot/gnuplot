@@ -144,26 +144,28 @@ void PNGoptions()
     /* setup options string */
 
     switch (png_font) {
-    case 1:
-	strcat(term_options, "small");
+    case 3:
+	strcat(term_options, "large");
 	break;
     case 2:
 	strcat(term_options, "medium");
 	break;
-    case 3:
-	strcat(term_options, "large");
+    case 1:
+    default:
+	strcat(term_options, "small");
 	break;
     }
 
     switch (png_mode) {
-    case 0:
-	strcat(term_options, " monochrome");
+    case 2:
+	strcat(term_options, " color");
 	break;
     case 1:
 	strcat(term_options, " gray");
 	break;
-    case 2:
-	strcat(term_options, " color");
+    case 0:
+    default:
+	strcat(term_options, " monochrome");
 	break;
     }
 }
@@ -186,12 +188,12 @@ void PNGreset()
 void PNGsetfont()
 {
     switch (png_font) {
-    case 1:
-	b_charsize(FNT5X9);
-	term->v_char = FNT5X9_VCHAR;
-	term->h_char = FNT5X9_HCHAR;
-	term->v_tic = FNT5X9_HBITS;
-	term->h_tic = FNT5X9_HBITS;
+    case 3:
+	b_charsize(FNT13X25);
+	term->v_char = FNT13X25_VCHAR;
+	term->h_char = FNT13X25_HCHAR;
+	term->v_tic = FNT13X25_HBITS;
+	term->h_tic = FNT13X25_HBITS;
 	break;
     case 2:
 	b_charsize(FNT9X17);
@@ -200,12 +202,13 @@ void PNGsetfont()
 	term->v_tic = FNT9X17_HBITS;
 	term->h_tic = FNT9X17_HBITS;
 	break;
-    case 3:
-	b_charsize(FNT13X25);
-	term->v_char = FNT13X25_VCHAR;
-	term->h_char = FNT13X25_HCHAR;
-	term->v_tic = FNT13X25_HBITS;
-	term->h_tic = FNT13X25_HBITS;
+    case 1:
+    default:
+	b_charsize(FNT5X9);
+	term->v_char = FNT5X9_VCHAR;
+	term->h_char = FNT5X9_HCHAR;
+	term->v_tic = FNT5X9_HBITS;
+	term->h_tic = FNT5X9_HBITS;
 	break;
     }
 }
@@ -213,17 +216,18 @@ void PNGsetfont()
 
 void PNGgraphics()
 {
-    int numplanes;
+    int numplanes = 1;
 
     switch (png_mode) {
-    case 0:
-	numplanes = 1;
+    case 2:
+	numplanes = 4;
 	break;
     case 1:
 	numplanes = 3;
 	break;
-    case 2:
-	numplanes = 4;
+    case 0:
+    default:
+	numplanes = 1;
 	break;
     }
 
@@ -248,7 +252,7 @@ void PNGtext()
     png_bytep prow;
     int mask, plane1, plane2, plane3, plane4;
     int red, green, blue;
-    png_text pngtext;
+    png_text pngtext, *pngtext_copy;
     char text[100];
 
     png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
@@ -326,12 +330,15 @@ void PNGtext()
     pngtext.text = text;
     pngtext.text_length = strlen(text);
 
+    pngtext_copy = malloc(sizeof(*pngtext_copy));
+    *pngtext_copy = pngtext;
     info_ptr->num_text = 1;
-    info_ptr->text = &pngtext;
+    info_ptr->text = pngtext_copy;
 
     png_write_info(png_ptr, info_ptr);
 
     info_ptr->num_text = 0;
+    if (info_ptr->text) free(info_ptr->text);
     info_ptr->text = NULL;
 
     png_set_packing(png_ptr);
@@ -384,18 +391,19 @@ void PNGlinetype(linetype)
 int linetype;
 {
     switch (png_mode) {
-    case 0:
-	b_setlinetype(linetype);
+    case 2:
+	if (linetype >= 9)
+	    linetype %= 9;
+	b_setvalue(png_color_table[linetype + 2]);
 	break;
     case 1:
 	if (linetype >= 7)
 	    linetype %= 7;
 	b_setvalue(png_gray[linetype + 2]);
 	break;
-    case 2:
-	if (linetype >= 9)
-	    linetype %= 9;
-	b_setvalue(png_color_table[linetype + 2]);
+    case 0:
+    default:
+	b_setlinetype(linetype);
 	break;
     }
 }
