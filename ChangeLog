@@ -1,7 +1,9 @@
 1999-08-20  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
-	* docs/Makefile.in: Fix INCLUDES line. Add metapost.trm and
-	openstep.trm to CORETERM.
+	* docs/Makefile.in: Fix INCLUDES line.
+
+	* Makefile.in,docs/Makefile.in: Add metapost.trm and openstep.trm to
+	CORETERM.
 
 	* term/be.trm, term/metapost.trm, term/openstep.trm: New drivers,
 	imported from current dev tree.
