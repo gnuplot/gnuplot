@@ -1,5 +1,5 @@
 /*
- * $Id: ggi.trm,v 1.2 2000/10/22 11:13:00 joze Exp $
+ * $Id: ggi.trm,v 1.3 2000/10/22 12:16:17 joze Exp $
  */
 
 /* GNUPLOT - ggi.trm */
@@ -146,6 +146,7 @@ static int GGI_font_width = 0;
 static int GGI_font_height = 0;
 static int GGI_saved_canvas = 0;
 static int GGI_saved_stl = 0;
+static int GGI_needs_update = 1;
 #endif
 
 
@@ -243,6 +244,7 @@ TERM_PUBLIC void GGI_graphics()
     /* mark the contents of the alternate frame as invalid */
     GGI_saved_canvas = 0;
     GGI_saved_stl = 0;
+    GGI_needs_update = 1;
 
     /* reset the stl vertex */
     GGI_stl_vertex.width = 0;
@@ -786,59 +788,6 @@ GGI_dispatch_event(event)
     do_event(&gp_ev);
 }
 
-TERM_PUBLIC int
-GGI_waitforinput()
-{
-    char c;
-
-    /* XXX:  if the input device it not a tty (e.g. /dev/null)
-     *       mouse events are not processed. This is necessary
-     *       as on some systems /dev/null is not selectable.
-     */
-    if (GGIvisual) {
-	fd_set fds;
-	int fd = fileno(stdin);
-	int i, j;
-	do {
-	    ggi_event_mask mask = ggiGetEventMask(GGIvisual);
-	    int n;
-	    FD_ZERO(&fds);
-	    FD_SET(fd, &fds); /* listen to stdin */
-
-	    /* draw the ruler below the other items */
-	    GGI_draw_ruler();
-
-	    /* update the zoombox */
-	    GGI_draw_zoombox();
-	    for (i = 0; i < 2; i++) {
-		for (j = 0; j < 2; j++) {
-		    GGI_save_puts(&(GGI_zoom[i][j]), GGI_saved_canvas);
-		}
-	    }
-
-	    /* update the status line */
-	    GGI_save_puts(&GGI_stl_vertex, GGI_saved_stl);
-
-	    ggiFlush(GGIvisual);
-
-	    n = ggiEventSelect(GGIvisual, &mask, fd + 1, SELECT_FD_SET_CAST &fds, 0, 0, (struct timeval*)0);
-
-	    if (mask) {
-		ggi_event event;
-		/* mask pointe motions, to they don't pile up */
-		ggiEventRead(GGIvisual, &event, mask);
-		ggiRemoveEventMask(GGIvisual, emPtrMove);
-		GGI_dispatch_event(&event);
-		ggiAddEventMask(GGIvisual, emPtrMove);
-	    }
-
-	} while (!FD_ISSET(fd, &fds));
-    }
-
-    if (read(0, &c, 1)!=1) return EOF;
-    else return c;
-}
-
 /* save currently displayed frame to alternate buffer */
 TERM_PUBLIC void
 GGI_save_frame_canvas()
@@ -946,61 +895,6 @@ GGI_set_vertex(v, x, y, str, tag)
 	*(v->str) = '\0';
     }
 
-}
-
-TERM_PUBLIC void
-GGI_put_tmptext(i, str)
-    int i;
-    const char str[];
-{
-    char* second;
-
-    switch (i) {
-	case 0: /* statusline text */
-
-	    if (!str || !(*str)) {
-		/* statusline is empty. This is the case,
-		 * if the mouse was just turned off. */
-		if (GGI_use_mouse) {
-		    /* The user just toggled of the mouse. */
-		    GGI_use_mouse = 0;
-		    GGI_set_size();
-		    GGI_replot();
-		}
-	    } else {
-		/* statusline is non-empty */
-		if (!GGI_use_mouse) {
-		    /* The mouse was off before and was just turned on. */
-		    GGI_use_mouse = 1;
-		    GGI_set_size();
-		    GGI_replot();
-		}
-		GGI_save_frame_stl();
-		GGI_set_vertex(&GGI_stl_vertex, 0, GGIcanvas_height, str, GGI_saved_stl);
-	    }
-	    break;
-
-	case 1: /* coordinate text for first  corner of zoombox */
-	case 2: /* coordinate text for second corner of zoombox */
-	    GGI_save_frame_canvas();
-	    second = (char*) strchr(str, '\r'); 
-	    --i; /* transform to [0, 1] */
-	    GGI_clear_zoombox();
-	    if (second == NULL) {
-		/* remove box and / or coordinates */
-		GGI_set_vertex(&(GGI_zoom[i][0]), 0, 0, (char*)0, GGI_saved_canvas);
-		GGI_set_vertex(&(GGI_zoom[i][1]), 0, 0, (char*)0, GGI_saved_canvas);
-		break;
-	    } else {
-		*second = '\0'; /* XXX this assumes that str is writable XXX */
-		second++;
-		GGI_set_vertex(&(GGI_zoom[i][0]), GGI_mouse_x, GGI_mouse_y - GGI_font_height - 1, str, GGI_saved_canvas);
-		GGI_set_vertex(&(GGI_zoom[i][1]), GGI_mouse_x, GGI_mouse_y + 1, second, GGI_saved_canvas);
-		GGI_zoombox[i].x = GGI_mouse_x;
-		GGI_zoombox[i].y = GGI_mouse_y;
-	    }
-	    break;
-    }
 }
 
 TERM_PUBLIC void
@@ -1141,6 +1035,133 @@ GGI_draw_zoombox()
 }
 
 TERM_PUBLIC void
+GGI_abort_zooming()
+{
+    /* empty string: finish zooming */
+    int i, j;
+    GGI_clear_zoombox();
+    for (i = 0; i < 2; i++) {
+	for (j = 0; j < 2; j++) {
+	    GGI_set_vertex(&(GGI_zoom[i][j]), 0, 0, (char*)0, GGI_saved_canvas);
+	}
+	GGI_zoombox[i].x = -1;
+    }
+}
+
+TERM_PUBLIC int
+GGI_waitforinput()
+{
+    char c;
+
+    /* XXX:  if the input device it not a tty (e.g. /dev/null)
+     *       mouse events are not processed. This is necessary
+     *       as on some systems /dev/null is not selectable.
+     */
+    if (GGIvisual) {
+	fd_set fds;
+	int fd = fileno(stdin);
+	int i, j;
+	do {
+	    ggi_event_mask mask = ggiGetEventMask(GGIvisual);
+	    int n;
+	    FD_ZERO(&fds);
+	    FD_SET(fd, &fds); /* listen to stdin */
+
+	    if (GGI_needs_update) {
+		/* draw the ruler below the other items */
+		GGI_draw_ruler();
+
+		/* update the zoombox */
+		GGI_draw_zoombox();
+		for (i = 0; i < 2; i++) {
+		    for (j = 0; j < 2; j++) {
+			GGI_save_puts(&(GGI_zoom[i][j]), GGI_saved_canvas);
+		    }
+		}
+
+		/* update the status line */
+		GGI_save_puts(&GGI_stl_vertex, GGI_saved_stl);
+
+		ggiFlush(GGIvisual);
+
+		n = ggiEventSelect(GGIvisual, &mask, fd + 1, SELECT_FD_SET_CAST &fds, 0, 0, (struct timeval*)0);
+
+		GGI_needs_update = 0;
+	    }
+
+	    if (mask) {
+		ggi_event event;
+		/* mask pointe motions, to they don't pile up */
+		ggiEventRead(GGIvisual, &event, mask);
+		ggiRemoveEventMask(GGIvisual, emPtrMove);
+		GGI_dispatch_event(&event);
+		ggiAddEventMask(GGIvisual, emPtrMove);
+	    }
+
+	} while (!FD_ISSET(fd, &fds));
+    }
+
+    if (read(0, &c, 1)!=1) return EOF;
+    else return c;
+}
+
+TERM_PUBLIC void
+GGI_put_tmptext(i, str)
+    int i;
+    const char str[];
+{
+    char* second;
+
+    switch (i) {
+	case 0: /* statusline text */
+
+	    if (!str || !(*str)) {
+		/* statusline is empty. This is the case,
+		 * if the mouse was just turned off. */
+		if (GGI_use_mouse) {
+		    /* The user just toggled of the mouse. */
+		    GGI_use_mouse = 0;
+		    GGI_set_size();
+		    GGI_replot();
+		}
+	    } else {
+		/* statusline is non-empty */
+		if (!GGI_use_mouse) {
+		    /* The mouse was off before and was just turned on. */
+		    GGI_use_mouse = 1;
+		    GGI_set_size();
+		    GGI_replot();
+		}
+		GGI_save_frame_stl();
+		GGI_set_vertex(&GGI_stl_vertex, 0, GGIcanvas_height, str, GGI_saved_stl);
+	    }
+	    break;
+
+	case 1: /* coordinate text for first  corner of zoombox */
+	case 2: /* coordinate text for second corner of zoombox */
+	    GGI_save_frame_canvas();
+	    second = (char*) strchr(str, '\r'); 
+	    --i; /* transform to [0, 1] */
+	    GGI_clear_zoombox();
+	    if (second == NULL) {
+		/* remove box and / or coordinates */
+		GGI_set_vertex(&(GGI_zoom[i][0]), 0, 0, (char*)0, GGI_saved_canvas);
+		GGI_set_vertex(&(GGI_zoom[i][1]), 0, 0, (char*)0, GGI_saved_canvas);
+		break;
+	    } else {
+		*second = '\0'; /* XXX this assumes that str is writable XXX */
+		second++;
+		GGI_set_vertex(&(GGI_zoom[i][0]), GGI_mouse_x, GGI_mouse_y - GGI_font_height - 1, str, GGI_saved_canvas);
+		GGI_set_vertex(&(GGI_zoom[i][1]), GGI_mouse_x, GGI_mouse_y + 1, second, GGI_saved_canvas);
+		GGI_zoombox[i].x = GGI_mouse_x;
+		GGI_zoombox[i].y = GGI_mouse_y;
+	    }
+	    break;
+    }
+    GGI_needs_update++;
+}
+
+TERM_PUBLIC void
 GGI_set_ruler(x, y)
     int x, y;
 {
@@ -1156,20 +1177,7 @@ GGI_set_ruler(x, y)
 	GGI_ruler.x = x;
 	GGI_ruler.y = GGI_y(y);
     }
-}
-
-TERM_PUBLIC void
-GGI_abort_zooming()
-{
-    /* empty string: finish zooming */
-    int i, j;
-    GGI_clear_zoombox();
-    for (i = 0; i < 2; i++) {
-	for (j = 0; j < 2; j++) {
-	    GGI_set_vertex(&(GGI_zoom[i][j]), 0, 0, (char*)0, GGI_saved_canvas);
-	}
-	GGI_zoombox[i].x = -1;
-    }
+    GGI_needs_update++;
 }
 
 TERM_PUBLIC void
@@ -1188,6 +1196,7 @@ GGI_set_cursor(c, x, y)
 	    /* XXX not implemented */
 	    break;
     }
+    GGI_needs_update++;
 }
 
 TERM_PUBLIC void
