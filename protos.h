@@ -80,7 +80,7 @@ void setvar __PROTO((char *varname, struct value data));
 int getivar __PROTO((char *varname));
 void update __PROTO((char *pfile, char *npfile));
 void do_fit __PROTO((void));
-int wri_to_fil_last_fit_cmd __PROTO((FILE *fp));
+size_t wri_to_fil_last_fit_cmd __PROTO((FILE *fp));
 
 
 /* Prototypes from file "graphics.c" */

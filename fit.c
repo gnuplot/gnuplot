@@ -192,13 +192,13 @@ static void backup_file __PROTO((char *, const char *));
          but only the size of the string is returned.
 *****************************************************************/
 
-int wri_to_fil_last_fit_cmd(fp)
+size_t wri_to_fil_last_fit_cmd(fp)
 FILE *fp;
 {
     if (fp == NULL)
 	return strlen(last_fit_command);
     else
-	return fputs(last_fit_command, fp);
+	return (size_t) fputs(last_fit_command, fp);
 }
 
 
