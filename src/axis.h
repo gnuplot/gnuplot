@@ -1,5 +1,5 @@
 /* 
- * $Id: axis.h,v 1.29 2003/01/27 20:39:31 broeker Exp $
+ * $Id: axis.h,v 1.30 2003/09/08 12:56:00 broeker Exp $
  *
  */
 
@@ -574,9 +574,10 @@ do {									  \
 }
 #endif
 
-/* use this instead of empty macro arguments to work around NeXT cpp bug */
-/* if this fails on any system, we might use ((void)0) */
-#define NOOP 0
+/* Empty macro arguments triggered NeXT cpp bug       */
+/* #define NOOP (0) caused many warnings from gcc 3.2 */
+/* Now trying ((void)0) */
+#define NOOP ((void)0)
 
 /* HBB 20000506: new macro, initializes one variable to the same
  * value, for all axes. */

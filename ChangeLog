@@ -1,3 +1,10 @@
+2003-10-06  Ethan A Merritt <merritt@u.washington.edu>
+
+	* axis.h: The recent (8 Sep) change to define NOOP as 0 caused
+	gcc 3.2 -Wall to emit dozens of warning messages. Change this to
+	#define NOOP ((void)0) instead.
+	* interpol.c, plot2d.c: Remove extraneous redefinition of NOOP.
+
 2003-10-06  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* configure.in (AC_PREREQ): Requirement raised to version 2.52 of
