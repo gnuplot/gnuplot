@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.55 2003/04/29 07:04:33 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.56 2003/05/17 05:59:01 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -1119,7 +1119,6 @@ reset_colorbox()
 static void
 unset_colorbox()
 {
-    c_token++;
     reset_colorbox();
     color_box.where = SMCOLOR_BOX_NO;
 }
@@ -1129,7 +1128,6 @@ unset_colorbox()
 static void
 unset_pm3d()
 {
-    c_token++;
     pm3d.where[0] = 0;
     /* reset styles, required to 'plot something' after e.g. 'set pm3d map' */
     if (data_style == PM3DSURFACE) data_style = POINTSTYLE;
