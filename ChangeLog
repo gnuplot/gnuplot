@@ -1,3 +1,22 @@
+1999-05-20  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* config/makefile.os2: Add HAVE_UNISTD_H to EMXSPECIFIC.
+
+	* src/Makefile.in, src/misc.c, src/plot.c, src/setshow.h, src/show.c,
+	src/syscfg.h, src/variable.c, src/variable.h: Implementation of
+	'loadpath' variable.
+
+1999-05-19  Thomas Sefzick  <t.sefzick@fz-juelich.de>,  Slaven Rezic <eserte@cs.tu-berlin.de>
+
+	* term/tkcanvas.trm: Integrate Slaven Rezic's perltk.trm plus some
+	minor modifications.
+
+1999-05-19  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* src/command.c, src/graph3d.c, src/readline.c, src/os2/dialogs.h,
+	src/os2/gclient.c, src/os2/gnupmdrv.ipf, src/os2/gnupmdrv.rc,
+	term/pm.trm: Latest OS/2 mouse update.
+
 1999-05-16  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* aclocal.m4, configure: Regenerated.
