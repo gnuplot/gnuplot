@@ -4,9 +4,18 @@
 \usepackage{longtable}
 \usepackage{graphicx}
 \usepackage{array}
+\usepackage{calc}
 %\usepackage[width=18cm,height=24cm]{geometry}
-\addtolength{\textwidth}{30mm}
+\addtolength{\textwidth}{40mm}
 \addtolength{\oddsidemargin}{-15mm}
+
+\let\orgcaption\caption
+\newlength\tmplength
+\newcommand{\captionabove}{%
+  \setlength{\tmplength}{\abovecaptionskip}%
+  \setlength{\abovecaptionskip}{\belowcaptionskip}%
+  \setlength{\belowcaptionskip}{\tmplength}%
+  \orgcaption}
 
 \font\cmmi=cmmi10
 \font\cmr=cmr10
@@ -21,83 +30,90 @@
 \font\lasy=lasy10
 
 \newcount\rownum
+\newcounter{dezcnt}
+
+\def\dez#1#2#3\empty{\setcounter{dezcnt}{64*#1+8*#2+#3}\thedezcnt}
 
 \newcommand*\row[1]{%
-  \gdef\zus{}%
+  \global\let\zus=\empty
   \ifnum#1=000
-    \gdef\zus{, \textbackslash 241}%
+    \gdef\zus{241}%
   \else\ifnum#1=001
-    \gdef\zus{, \textbackslash 242}%
+    \gdef\zus{242}%
   \else\ifnum#1=002
-    \gdef\zus{, \textbackslash 243}%
+    \gdef\zus{243}%
   \else\ifnum#1=003
-    \gdef\zus{, \textbackslash 244}%
+    \gdef\zus{244}%
   \else\ifnum#1=004
-    \gdef\zus{, \textbackslash 245}%
+    \gdef\zus{245}%
   \else\ifnum#1=005
-    \gdef\zus{, \textbackslash 246}%
+    \gdef\zus{246}%
   \else\ifnum#1=006
-    \gdef\zus{, \textbackslash 247}%
+    \gdef\zus{247}%
   \else\ifnum#1=007
-    \gdef\zus{, \textbackslash 250}%
+    \gdef\zus{250}%
   \else\ifnum#1=010
-    \gdef\zus{, \textbackslash 251}%
+    \gdef\zus{251}%
   \else\ifnum#1=011
-    \gdef\zus{, \textbackslash 252}%
+    \gdef\zus{252}%
   \else\ifnum#1=012
-    \gdef\zus{, \textbackslash 255}%
+    \gdef\zus{255}%
   \else\ifnum#1=013
-    \gdef\zus{, \textbackslash 256}%
+    \gdef\zus{256}%
   \else\ifnum#1=014
-    \gdef\zus{, \textbackslash 257}%
+    \gdef\zus{257}%
   \else\ifnum#1=015
-    \gdef\zus{, \textbackslash 260}%
+    \gdef\zus{260}%
   \else\ifnum#1=016
-    \gdef\zus{, \textbackslash 261}%
+    \gdef\zus{261}%
   \else\ifnum#1=017
-    \gdef\zus{, \textbackslash 262}%
+    \gdef\zus{262}%
   \else\ifnum#1=020
-    \gdef\zus{, \textbackslash 263}%
+    \gdef\zus{263}%
   \else\ifnum#1=021
-    \gdef\zus{, \textbackslash 264}%
+    \gdef\zus{264}%
   \else\ifnum#1=022
-    \gdef\zus{, \textbackslash 265}%
+    \gdef\zus{265}%
   \else\ifnum#1=023
-    \gdef\zus{, \textbackslash 266}%
+    \gdef\zus{266}%
   \else\ifnum#1=024
-    \gdef\zus{, \textbackslash 267}%
+    \gdef\zus{267}%
   \else\ifnum#1=025
-    \gdef\zus{, \textbackslash 270}%
+    \gdef\zus{270}%
   \else\ifnum#1=026
-    \gdef\zus{, \textbackslash 271}%
+    \gdef\zus{271}%
   \else\ifnum#1=027
-    \gdef\zus{, \textbackslash 272}%
+    \gdef\zus{272}%
   \else\ifnum#1=030
-    \gdef\zus{, \textbackslash 273}%
+    \gdef\zus{273}%
   \else\ifnum#1=031
-    \gdef\zus{, \textbackslash 274}%
+    \gdef\zus{274}%
   \else\ifnum#1=032
-    \gdef\zus{, \textbackslash 275}%
+    \gdef\zus{275}%
   \else\ifnum#1=033
-    \gdef\zus{, \textbackslash 276}%
+    \gdef\zus{276}%
   \else\ifnum#1=034
-    \gdef\zus{, \textbackslash 277}%
+    \gdef\zus{277}%
   \else\ifnum#1=035
-    \gdef\zus{, \textbackslash 300}%
+    \gdef\zus{300}%
   \else\ifnum#1=036
-    \gdef\zus{, \textbackslash 301}%
+    \gdef\zus{301}%
   \else\ifnum#1=037
-    \gdef\zus{, \textbackslash 302}%
+    \gdef\zus{302}%
   \else\ifnum#1=040
-    \gdef\zus{, \textbackslash 303}% and \200
+    \gdef\zus{303}% and \200
   \else\ifnum#1=177
-    \gdef\zus{, \textbackslash 304}%
+    \gdef\zus{304}%
   \fi\fi\fi\fi\fi\fi\fi
   \fi\fi\fi\fi\fi\fi\fi
   \fi\fi\fi\fi\fi\fi\fi
   \fi\fi\fi\fi\fi\fi\fi
   \fi\fi\fi\fi\fi\fi
-  \textbackslash #1\zus & 
+  \textbackslash #1%
+  \ifx\zus\empty
+  \else
+    , \textbackslash\zus
+  \fi & 
   {\cmr\char'#1} & 
   {\cmti\char'#1} & 
   {\cmtt\char'#1} & 
@@ -111,18 +127,30 @@
   \ifodd\rownum \else\qquad\fi
   \global\advance\rownum 1
   {\raisebox{1.7ex}[0mm][1ex]{\cmex\char'#1}} &
-  \textbackslash #1\zus \\
+  \textbackslash #1%
+  \ifx\zus\empty
+  \else
+    , \textbackslash\zus
+  \fi & 
+  \expandafter\dez#1\empty
+  \ifx\zus\empty
+  \else
+    , \expandafter\dez\zus\empty
+  \fi \\
 }
 
 \begin{document}
 \title{Using \TeX\ Fonts in the Gnuplot Postscript Terminal}
 \author{Harald Harders, {\ttfamily h.harders@tu-bs.de}}
-\date{2002-11-14}
+\date{2003-03-03}
 \maketitle
 
+\noindent
 The Postscript terminal can embed Postscript Type\,1 fonts (with
 extensions \verb|.pfa| and \verb|.pfb|) and TrueType fonts (extension
-\verb|.ttf|) using the command
+\verb|.ttf|)\footnote{If \texttt{.pfb} and \texttt{.ttf} fonts really
+  can be embedded depends on your gnuplot installation: It needs to be
+  able to handle pipes.} using the command
 \begin{verbatim}
 set terminal postscript fontfile '<filename>'
 \end{verbatim}
@@ -139,8 +167,8 @@ or in postscript enhanced terminal as following example:
 set xlabel '{/CMMI10 x}'
 \end{verbatim}
 
-The font embedding is useful for generating plots to be included in
-\LaTeX\ documents. 
+Among other things, the font embedding is useful for generating plots
+to be included in \LaTeX\ documents. 
 For normal text, the \emph{cm-super} Postscript Type\,1 fonts are a
 good choice. 
 They are available from CTAN servers, e.g.
@@ -149,9 +177,10 @@ ftp://ftp.dante.de/tex-archive/fonts/ps-type1/cm-super/
 \end{verbatim}
 The normal upright font with serifes is defined in
 \verb|sfrm1000.pfb|, and the font name is \verb|SFRM1000|\footnote{If you
-have an old version of the cm-super font, prior 2001-10-14, the font name is
-in lowercase letters: \texttt{sfrm1000}.} (The
-\verb|1000| means that this font is designed for 10\,pt).
+  have an old version of the cm-super font, prior 2001-10-14, the font
+  name is in lowercase letters: \texttt{sfrm1000}. You should update
+  to a new version.} (The \verb|1000| means that this font is designed
+for 10\,pt).
 Replace the \verb|rm| by \verb|it|, \verb|bx| or other combinations in
 both the file name and the font name (here, in uppercase letters) in order 
 to get other font shapes.
@@ -162,6 +191,9 @@ the cm-super font bundle.
 %
 \begin{table}
   \centering
+  \captionabove{Some fonts in the cm-super font bundle (for a
+    designsize of 10\,pt)}%
+  \label{tab:fontnames}%
   \begin{tabular}{>{\ttfamily}l>{\ttfamily}ll}
     \toprule
     \multicolumn{1}{l}{File name}&
@@ -203,9 +235,6 @@ the cm-super font bundle.
     {\ttfamily\scshape Example} \\
     \bottomrule
   \end{tabular}
-  \caption{Some fonts in the cm-super font bundle (for a designsize of
-    10\,pt)}%
-  \label{tab:fontnames}%
 \end{table}
 
 For mathematics the Type\,1 versions of the Computer Modern fonts are
@@ -216,20 +245,27 @@ available from CTAN servers, e.g.
 ftp://ftp.dante.de/tex-archive/fonts/cm/ps-type1/bluesky/pfb/
 \end{verbatim}
 Here, the font name is the base of the file name in uppercase letters,
-e.g. the file \verb|cmmi10.pfb| contains the font \verb|CMMI10|.
+e.g.\ the file \verb|cmmi10.pfb| contains the font \verb|CMMI10|.
 Since the encoding of these fonts is strange, a table containing all
 characters for some fonts follows.
 The font \verb|CMEX10| contains large symbols for mathematics. They
 overlap sometimes in the table. Since the baseline of the
 \verb|CMEX10| font is at the top of the signs, Gnuplot defines a font
 \verb|CMEX10-Baseline| with a different baseline if \verb|CMEX10| is
-embedded (normaly by using \verb|fontfile 'cmex10.pfb'|.
+embedded (normally by using \verb|fontfile 'cmex10.pfb'|.
+In contrast to the other fonts, \verb|CMEX10| is only available in the
+design size 10\,pt.
 
+You can access all characters of the fonts by typing their octal code.
+To get a $\heartsuit$ symbol, you may type:
+\begin{verbatim}
+set label '{/CMSY10 \176}' at graph 0.5,0.5
+\end{verbatim}
 Since characters with an octal number below \textbackslash 040 can't
 be displayed by some postscript interpreters, these characters are
 repeated in the Computer Modern Fonts with a larger code.
 Thus, you should use the larger number, where two octal numbers are
-given (e.g. \textbackslash 000, \textbackslash 241).
+given (e.g.\ \textbackslash 000, \textbackslash 241).
 For example, you better use
 \begin{verbatim}
 set xlabel '{/CMR10 \242}'
@@ -238,16 +274,16 @@ than
 \begin{verbatim}
 set xlabel '{/CMR10 \001}'
 \end{verbatim}
-to get an upright uppercase Delta. 
+to get an upright uppercase Delta $\Delta$. 
 
-\begin{longtable}{lllllllllllll}
+\begin{longtable}{lllllllllllllr}
   \toprule
   Oct& \rotatebox{90}{CMR10}& \rotatebox{90}{CMTI10}&
   \rotatebox{90}{CMTT10}& \rotatebox{90}{CMMI10}&
   \rotatebox{90}{CMU10}& \rotatebox{90}{CMSS10}&
   \rotatebox{90}{CMTEX10}& \rotatebox{90}{CMFF10}&
   \rotatebox{90}{CMSY10}& \rotatebox{90}{LASY10}&
-  \rotatebox{90}{CMEX10-Baseline}& Oct\\
+  \rotatebox{90}{CMEX10-Baseline}& Oct& Dec\\
   \midrule
   \endhead
   \bottomrule

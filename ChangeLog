@@ -1,3 +1,9 @@
+2003-04-18  Harald Harders  <h.harders@tu-bs.de>
+
+	* docs/psdoc/ps_fontfile_doc.tex: Patch "[ 696421 ] Improved
+	ps_fontfile_doc". Some text is modified, the symbol table now
+	includes the octal and decimal numbers of the characters.
+
 2003-04-18  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* gnuplot.doc unset.c(reset_command): Remove "unset_loadpath()" from
