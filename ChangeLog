@@ -1,3 +1,7 @@
+2000-11-29  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	*src/syscfg.h: #define FAQ_LOCATION "http://www.gnuplot.org/faq"
+
 2000-11-29  Levente Novak  <novak@jaguar.dote.hu>
 
         * docs/gnuplot.doc docs/gnuplot.texi docs/psdoc/README
