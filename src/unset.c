@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.33 2002/03/30 13:15:21 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.34 2002/05/22 11:37:24 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -1368,6 +1368,7 @@ unset_axislabel_or_title(label)
     strcpy(label->font, "");
     label->xoffset = 0;
     label->yoffset = 0;
+    label->textcolor.type = TC_DEFAULT;
 }
 
 static void
