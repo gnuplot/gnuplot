@@ -203,16 +203,18 @@ picture r[];\n\
     fputs("\
 \ndef put_text(expr ts,xstart,ystart,rot,justification) =\n\
   begingroup\n\
-    text_width:=0;text_height:=0;\n\
+    text_width:=0;text_height:=0;text_depth:=0;\n\
     for ind:=0 step 1 until length(ts)-1:\n\
       dec_num:=ASCII substring (ind,ind+1) of ts;\n\
       if unknown r[dec_num]: dec_num:=32; fi\n\
       if dec_num=32: \n\
         text_width:=text_width+wd[65];\n\
-        text_height:=GPMAX(text_height,ht[65]+dp[65]);\n\
+        text_height:=max(text_height,ht[65]);\n\
+        text_depth:=max(text_depth,dp[65]);\n\
       elseif dec_num>=0: \n\
         text_width:=text_width+wd[dec_num];\n\
-        text_height:=GPMAX(text_height,ht[dec_num]+dp[dec_num]);\n\
+        text_height:=max(text_height,ht[dec_num]);\n\
+        text_depth:=max(text_depth,dp[dec_num]);\n\
       fi\n\
     endfor\n\
     if rot=90:\n\
@@ -220,13 +222,13 @@ picture r[];\n\
       elseif justification=2: ynext:=round(ystart-text_width/2);\n\
       else: ynext:=round(ystart-text_width);\n\
       fi\n\
-      xnext:=xstart+text_height/2;\n\
+      xnext:=xstart+(text_height-text_depth)/2;\n\
     else:\n\
       if justification=1: xnext:=xstart;\n\
       elseif justification=2: xnext:=round(xstart-text_width/2);\n\
       else: xnext:=round(xstart-text_width);\n\
       fi\n\
-      ynext:=ystart-text_height/2;\n\
+      ynext:=ystart-(text_height-text_depth)/2;\n\
     fi\n\
     for ind:=0 step 1 until length(ts)-1:\n\
       dec_num:=ASCII substring (ind,ind+1) of ts;\n\
@@ -530,7 +532,7 @@ START_HELP(mf)
 "?term mf",
 "?mf",
 "?metafont",
-" The `mf` terminal driver creates a input file to the METAFONT program.  Thus a",
+" The `mf` terminal driver creates an input file to the METAFONT program.  Thus a",
 " figure may be used in the TeX document in the same way as is a character.",
 "",
 " To use a picture in a document, the METAFONT program must be run with the",
@@ -541,7 +543,7 @@ START_HELP(mf)
 "",
 " The text support is based on a METAFONT character set.  Currently the",
 " Computer Modern Roman font set is input, but the user is in principal free to",
-" chose whatever fonts he or she needs.  The METAFONT source files for the",
+" choose whatever fonts he or she needs.  The METAFONT source files for the",
 " chosen font must be available.  Each character is stored in a separate",
 " picture variable in METAFONT.  These variables may be manipulated (rotated,",
 " scaled etc.) when characters are needed.  The drawback is the interpretation",
