@@ -1,5 +1,5 @@
 /*
- * $Id: pslatex.trm,v 1.25 1999/10/17 19:08:35 lhecking Exp $
+ * $Id: pslatex.trm,v 1.26 2000/02/11 19:24:03 lhecking Exp $
  */
 
 /* GNUPLOT - pslatex.trm */
@@ -278,24 +278,6 @@ Turning off auxfile option\n", outstr);
 \\GNUPLOTunit=0.1bp\n", gpoutfile);
     }
 
-    {
-	unsigned int xmin_t = xoffset * PSLATEX_XMAX / PS_SC;
-	unsigned int xmax_t = (xoffset + xsize) * PSLATEX_XMAX / PS_SC;
-	unsigned int ymin_t = yoffset * PSLATEX_YMAX / PS_SC;
-	unsigned int ymax_t = (yoffset + ysize) * PSLATEX_YMAX / PS_SC;
-
-	if (PSLATEX_auxfile) {
-	    FILE *tmp = gpoutfile;
-	    gpoutfile = PSLATEX_auxfile;
-	    PS_common_init(1, 1, 0, 0, 0, xmin_t, ymin_t, xmax_t, ymax_t, NULL);
-	    gpoutfile = tmp;
-	} else {
-	    fputs("{\\GNUPLOTspecial{!\n", gpoutfile);
-	    PS_common_init(1, 1, 0, 0, 0, xmin_t, ymin_t, xmax_t, ymax_t, NULL);
-	    fputs("}}%\n", gpoutfile);
-	}
-    }
-
     PSLATEX_angle = 0;
     PSLATEX_justify = 0;
     PSLATEX_labels = 0;
@@ -305,6 +287,10 @@ TERM_PUBLIC void
 PSLATEX_graphics()
 {
     struct termentry *t = term;
+    unsigned int xmin_t = xoffset * PSLATEX_XMAX / PS_SC;
+    unsigned int xmax_t = (xoffset + xsize) * PSLATEX_XMAX / PS_SC;
+    unsigned int ymin_t = yoffset * PSLATEX_YMAX / PS_SC;
+    unsigned int ymax_t = (yoffset + ysize) * PSLATEX_YMAX / PS_SC;
 
     if (PSLATEX_output)
 	fprintf(gpoutfile, "\\begin{picture}(%d,%d)(0,0)%%\n",
@@ -345,10 +331,12 @@ PSLATEX_graphics()
 		psfile_basename, urx, ury, 10 * urx);
 	tmp = gpoutfile;
 	gpoutfile = PSLATEX_auxfile;
+	PS_common_init(1, 1, 0, 0, 0, xmin_t, ymin_t, xmax_t, ymax_t, NULL);
 	PS_graphics();
 	gpoutfile = tmp;
     } else {
 	fputs("{\\GNUPLOTspecial{\"\n", gpoutfile);
+	PS_common_init(1, 1, 0, 0, 0, xmin_t, ymin_t, xmax_t, ymax_t, NULL);
 	PS_graphics();
     }
 
@@ -657,9 +645,10 @@ START_HELP(pslatex)
 "       set terminal pslatex | pstex {<color>} {<dashed>} {<rotate>}",
 "                                     {auxfile} {<font_size>}",
 "",
-" <color> is either `color` or `monochrome`.  <rotate> is either `rotate` or",
-" `norotate` and determines if the y-axis label is rotated.  <font_size> is",
-" used to scale the font from its usual size.",
+" <color> is either `color` or `monochrome`.  <dashed> is either `dashed`",
+" or `solid`.  <rotate> is either `rotate` or `norotate` and determines",
+" if the y-axis label is rotated.  <font_size> is used to scale the font",
+" from its usual size.",
 "",
 " If `auxfile` is specified, it directs the driver to put the PostScript",
 " commands into an auxiliary file instead of directly into the LaTeX file.",
