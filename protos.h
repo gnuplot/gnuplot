@@ -105,11 +105,13 @@ void map3d_xy __PROTO((double x, double y, double z, unsigned int *xt, unsigned 
 int map3d_z __PROTO((double x, double y, double z));
 void do_3dplot __PROTO((struct surface_points *plots, int pcount));
 
+
 /* Prototypes from file "help.c" */
 
 int  help __PROTO((char *keyword, char *path, TBOOLEAN *subtopics));
 void FreeHelp __PROTO((void));
 void list_terms __PROTO((void));
+
 
 /* Prototypes from file "hidden3d.c" */
 
@@ -128,6 +130,7 @@ void plot3d_hidden __PROTO((struct surface_points *plots, int pcount));
 void draw_line_hidden __PROTO((unsigned int, unsigned int, unsigned int, unsigned int));
 #endif
 
+
 /* Prototypes from file "internal.c" */
 
 #ifdef MINEXP
@@ -142,11 +145,13 @@ void check_stack __PROTO((void));
 struct value *pop __PROTO((struct value *x));
 void push __PROTO((struct value *x));
 
+
 /* Prototypes from file "interpol.c" */
 
 void gen_interp __PROTO((struct curve_points *plot));
 void sort_points __PROTO((struct curve_points *plot));
 void cp_implode __PROTO((struct curve_points *cp));
+
 
 /* Prototypes from file "misc.c" */
 
@@ -175,6 +180,7 @@ int find_maxl_keys __PROTO((struct curve_points *plots, int count, int *kcnt));
 int find_maxl_keys3d __PROTO((struct surface_points *plots, int count, int *kcnt));
 TBOOLEAN valid_format __PROTO((const char *format));
 
+
 /* Prototypes from file "parse.c" */
 
 /* void fpe __PROTO((void)); */
@@ -183,13 +189,16 @@ struct value * const_express __PROTO((struct value *valptr));
 struct at_type * temp_at __PROTO((void));
 struct at_type * perm_at __PROTO((void));
 
+
 /* Prototypes from file "plot.c" */
 
 void interrupt_setup __PROTO((void));
 
+
 /* prototypes from plot2d.c */
 
 void plotrequest __PROTO((void));
+
 
 /* prototypes from plot3d.c */
 
@@ -204,13 +213,16 @@ void add_history __PROTO((char *line));
 char tos_getch();
 #endif
 
+
 /* Prototypes from file "scanner.c" */
 
 int scanner __PROTO((char expression[]));
 
+
 /* Prototypes from "stdfn.c" */
 
 char *safe_strncpy __PROTO((char *, char *, size_t));
+
 
 /* Prototypes from file "term.c" */
 
@@ -238,12 +250,27 @@ void LINUX_setup __PROTO((void));
 void vms_reset();
 #endif
 
+/* used by the drivers (?) */
+
+int null_text_angle __PROTO((int ang));
+int null_justify_text __PROTO((enum JUSTIFY just));
+int null_scale __PROTO((double x, double y));
+static void null_linewidth __PROTO((double s));
+int do_scale __PROTO((double x, double y));
+void options_null __PROTO((void));
+void UNKNOWN_null __PROTO((void));
+void MOVE_null __PROTO((unsigned int, unsigned int));
+void LINETYPE_null __PROTO((int));
+void PUTTEXT_null __PROTO((unsigned int, unsigned int, char *));
+
+
 /* prototypes for functions from time.c */
 
 char * gstrptime __PROTO((char *, char *, struct tm *)); /* string to *tm */
 int gstrftime __PROTO((char *, int, char *, double)); /* *tm to string */
 double gtimegm __PROTO((struct tm *)); /* *tm to seconds */
 int ggmtime __PROTO((struct tm *, double)); /* seconds to *tm */
+
 
 /* Prototypes from file "util.c" */
 
@@ -273,6 +300,7 @@ void int_error __PROTO((char str[], int t_num));
 void int_warn __PROTO((char str[], int t_num));
 void lower_case __PROTO((char *s));
 void squash_spaces __PROTO((char *s));
+
 
 /* Prototypes from file "util3d.c" */
 
