@@ -65,6 +65,7 @@ struct TERMENTRY {
    void (*boxfill) __PROTO((int style, unsigned int x1, unsigned int y1, unsigned int width, unsigned int height)); /* clear part of multiplot */
    void (*linewidth) __PROTO((double linewidth));
    void (*pointsize) __PROTO((double pointsize));
+   void (*waitforinput) __PROTO((void));
 };
 
 One consequence of (1) is that we would like drivers to be backwards
@@ -196,7 +197,8 @@ position.
 _linetype(lt)  Called to set the line type before text is displayed or
 line(s) plotted.  This procedure should select a pen color or line
 style if the device has these capabilities.  
-lt is an integer from -2 to 0 or greater.  
+lt is an integer from -3 to 0 or greater.  
+An lt of -3 is solid and drawn with xor (for temporary interactive annotations).
 An lt of -2 is used for the border of the plot.
 An lt of -1 is used for the X and Y axes.  
 lt 0 and upwards are used for plots 0 and upwards.

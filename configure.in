@@ -1,12 +1,12 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot 3.7 on Unix.
 dnl
-dnl $Id: configure.in,v 1.79 1999/11/24 13:39:05 lhecking Exp $
+dnl $Id: configure.in,v 1.80 1999/12/01 22:07:34 lhecking Exp $
 dnl
 AC_INIT(src/graphics.c)
 AM_CONFIG_HEADER(config.h:config.hin)
 AC_PREREQ(2.13)
-AC_REVISION($Revision: 1.79 $)
+AC_REVISION($Revision: 1.80 $)
 
 VERSION="`cat $srcdir/VERSION`"
 AM_INIT_AUTOMAKE(gnuplot, $VERSION)
@@ -117,6 +117,12 @@ AC_ARG_ENABLE(rgip,dnl
 test -z "$enable_rgip" && enable_rgip=no
 )dnl
 
+dnl use mouse for x11 interface
+AC_ARG_ENABLE(mouse,dnl
+[  --enable-mouse          enable mouse for the x11 terminal (EXPERIMENTAL)],,
+test -z "$enable_mouse" && enable_mouse=no
+)dnl
+
 dnl configure.in body
 
 dnl Compiler characteristics
@@ -131,7 +137,6 @@ AC_C_STRINGIZE
 
 dnl X Window System files.
 AC_SUBST(LIBRARIES_FOR_X)
-AC_SUBST(GNUPLOT_X11)
 AC_PATH_XTRA
 
 dnl Needed for LynxOS until AC_PATH_XTRA is fixed
@@ -147,7 +152,16 @@ if test "$no_x" != yes; then
   GNUPLOT_X11=gnuplot_x11
   AC_DEFINE(X11, 1,
             [ Define if you are using the X11 window system. ])
+
+  dnl use a different x11 driver name ?
+  AC_ARG_WITH(X11-driver,[  --with-X11-driver       specify an alternative X11 driver name (gnuplot_x11)],
+      GNUPLOT_X11=$withval, GNUPLOT_X11="gnuplot_x11"
+  )dnl
+
+  AC_DEFINE_UNQUOTED(GNUPLOT_X11, "$GNUPLOT_X11", [ Define the default x11 driver name. ])
+  AM_CONDITIONAL(ALT_X11_DRIVER, test x$GNUPLOT_X11 != xgnuplot_x11)
 fi
+AC_SUBST(GNUPLOT_X11)
 
 
 dnl Operating systems.
@@ -228,7 +242,8 @@ AC_CHECK_FUNCS(atexit memcpy memmove memset \
   index rindex \
   erf erfc gamma lgamma \
   getcwd poll pclose popen select sleep snprintf \
-  strcspn strdup strncasecmp strnicmp sysinfo tcgetattr vfprintf doprnt
+  strcspn strdup strcasecmp stricmp strncasecmp strnicmp \
+  sysinfo tcgetattr vfprintf doprnt
 )
 
 if test "$ac_cv_func_pclose" = yes && test "$ac_cv_func_popen" = yes ; then
@@ -459,6 +474,11 @@ if test "$enable_rgip" = yes; then
             [ Define if you want to use the Redwood Graphics Interface Protocol. ])
 fi
 
+if test "$enable_mouse" = yes; then
+  AC_DEFINE(USE_MOUSE, 1,
+            [ Define if you want to have mouse support for the x11 terminal. ])
+fi
+
 dnl Substitute variables
 AC_SUBST(PACKAGE)
 AC_SUBST(VERSION)
@@ -576,9 +596,14 @@ test "$EMACS" != no && \
 test "$LATEX" != no && \
   AC_MSG_RESULT([  Build LaTeX tutorial])
 
-test "$no_x" != yes && \
-  AC_MSG_RESULT([  Use the X Window System
-])
+if test "$no_x" != yes; then
+  AC_MSG_RESULT([  Use the X Window System ])
+  test "$GNUPLOT_X11" != "gnuplot_x11" && \
+    AC_MSG_RESULT([  X11 driver name: ]$GNUPLOT_X11)
+  test "$enable_mouse" = yes && \
+    AC_MSG_RESULT([  Enable MOUSE for X11 (EXPERIMENTAL)])
+fi
 dnl end config report
+
 
 dnl end configure.in

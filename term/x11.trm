@@ -1,5 +1,5 @@
 /*
- * $Id: x11.trm,v 1.21 1999/08/24 11:24:57 lhecking Exp $
+ * $Id: x11.trm,v 1.19 2000/01/21 02:17:45 joze Exp $
  *
  */
 
@@ -39,6 +39,10 @@
  *    x11.trm  --- inboard terminal driver for X11
  */
 
+/* Petr Mikulik and Johannes Zellner: added mouse support (October 1999)
+ * Implementation and functionality is based on pm.trm
+ */
+
 #include "driver.h"
 
 #ifdef TERM_REGISTER
@@ -47,6 +51,9 @@ register_term(x11)
 
 #ifdef TERM_PROTO
 int X11_args __PROTO((int argc, char *argv[]));
+#ifdef USE_MOUSE
+TERM_PUBLIC void X11_update_opts __PROTO((void));
+#endif
 TERM_PUBLIC void X11_options __PROTO((void));
 TERM_PUBLIC void X11_init __PROTO((void));
 TERM_PUBLIC void X11_graphics __PROTO((void));
@@ -61,6 +68,11 @@ TERM_PUBLIC void X11_put_text __PROTO((unsigned int x, unsigned int y, const cha
 TERM_PUBLIC int X11_justify_text __PROTO((enum JUSTIFY mode));
 TERM_PUBLIC void X11_point __PROTO((unsigned int x, unsigned int y, int number));
 TERM_PUBLIC void X11_fillbox __PROTO((int style, unsigned int x, unsigned y, unsigned int width, unsigned int height));
+TERM_PUBLIC int X11_waitforinput __PROTO((void));
+TERM_PUBLIC void X11_set_ruler __PROTO((int, int));
+TERM_PUBLIC void X11_set_cursor __PROTO((int, int, int));
+TERM_PUBLIC void X11_put_tmptext __PROTO((int, const char str[]));
+TERM_PUBLIC void X11_set_clipboard __PROTO((const char[]));
 #define X11_XMAX 4096
 #define X11_YMAX 4096
 
@@ -133,14 +145,26 @@ static struct x11opt {
 #define X11_nopts (sizeof(X11_cmdopts) / sizeof(X11_cmdopts[0]))
 
 static FILE *X11_ipc;
+#if defined(USE_MOUSE) && !defined(OS2)
+#define X11_ipc_back_fd ipc_back_fd /* defined in ipc.h */
+#endif
 
 static char **xargv = (char **)NULL;
 static char *optvec[2*X11_nopts+1];
 # ifdef OS2
-static char X11_command[] = "gnuplot_x11.exe";
+static char X11_default_command[] = "gnuplot_x11.exe";
 # else
-static char X11_command[] = "gnuplot_x11";
+# ifndef GNUPLOT_X11
+    static char X11_default_command[] = "gnuplot_x11";
+# else
+    static char X11_default_command[] = GNUPLOT_X11;
+# endif
 # endif /* !OS/2 */
+static char* X11_command = X11_default_command;
+/* must match the definition in src/gplt_x11.c: */
+enum { UNSET = -1, no = 0, yes = 1 };
+static int persist = UNSET;
+static int do_raise = UNSET;
 
 /*   X11_args - scan gnuplot command line for standard X Toolkit options
  * called from plot.c so must not be TERM_PUBLIC (which may be static)
@@ -191,11 +215,24 @@ char *argv[];
 
 static unsigned int X11_plot_number;
 
-enum X11_id { X11_RESET, X11_OTHER };
+enum X11_id {
+    X11_RESET,
+    X11_DRIVER,
+    X11_PERSIST,
+    X11_NOPERSIST,
+    X11_RAISE,
+    X11_NORAISE,
+    X11_OTHER
+};
 
 static struct gen_table X11_opts[] = 
 {
     { "res$et", X11_RESET },
+    { "dr$iver", X11_DRIVER },
+    { "per$sist", X11_PERSIST },
+    { "noper$sist", X11_NOPERSIST },
+    { "rai$se", X11_RAISE },
+    { "norai$se", X11_NORAISE },
     { NULL, X11_OTHER }
 };
 
@@ -203,6 +240,9 @@ TERM_PUBLIC void
 X11_options()
 {
     struct value a;
+#ifdef USE_MOUSE
+    unsigned int old_plot_number = X11_plot_number;
+#endif
 
     while (!END_OF_COMMAND) {
 	switch(lookup_table(&X11_opts[0],c_token)) {
@@ -210,15 +250,79 @@ X11_options()
 	    X11_atexit HANDLER_PARAMS;	/* tell gnuplot_x11 to shut down */
 	    ++c_token;
 	    break;
+	case X11_DRIVER:
+	    ++c_token;
+	    if (isstring(c_token)) {
+		char* path;
+		/* get text */
+		path = gp_alloc(token_len(c_token), "x11->driver");
+		quote_str(path, c_token, token_len(c_token));
+		if (strcmp(path, X11_command)) {
+		    /* tell gnuplot_x11 to shut down
+		     * if the driver name has changed. */
+		    X11_atexit HANDLER_PARAMS;
+		}
+		if (X11_command && X11_command != X11_default_command)
+		    free(X11_command);
+		X11_command = path;
+		optvec[0] = X11_command;
+		c_token++;
+	    }
+	    break;
+	case X11_PERSIST:
+	    persist = yes;
+	    c_token++;
+	    break;
+	case X11_NOPERSIST:
+	    persist = no;
+	    c_token++;
+	    break;
+	case X11_RAISE:
+	    do_raise = yes;
+	    c_token++;
+	    break;
+	case X11_NORAISE:
+	    do_raise = no;
+	    c_token++;
+	    break;
 	case X11_OTHER:
 	default:
 	    X11_plot_number = (int) real(const_express(&a));
 	    /* let gnuplot_x11 check range */
+#ifdef USE_MOUSE
+	    /* eventually tell the driver that the
+	     * plot number has changed. */
+	    if (X11_plot_number != old_plot_number && X11_ipc) {
+		fprintf(X11_ipc, "N%d\n", X11_plot_number);
+		fflush(X11_ipc);
+	    }
+#endif
 	    break;
 	}
     }
-    sprintf(term_options, "%d", X11_plot_number);
+    sprintf(term_options, "%d, driver \"%s\"", X11_plot_number, X11_command);
+    if (UNSET != do_raise) {
+	strcat(term_options, (yes == do_raise ? ", raise" : ", noraise"));
+    }
+    if (UNSET != persist) {
+	strcat(term_options, (yes == persist ? ", persist" : ", nopersist"));
+    }
+#ifdef USE_MOUSE
+    X11_update_opts();
+#endif
 }
+
+#ifdef USE_MOUSE
+TERM_PUBLIC void
+X11_update_opts(void)
+{
+    if (X11_ipc && (UNSET != do_raise || UNSET != persist)) {
+	fprintf(X11_ipc, "X %d %d\n", do_raise, persist);
+	fflush(X11_ipc);
+    }
+}
+#endif
+
 
 /*-----------------------------------------------------------------------------
  *   Three different versions of the remainder of the X11 terminal driver
@@ -261,8 +365,61 @@ X11_atexit HANDLER_DECL
 	fclose(X11_ipc);
 	/* dont wait(), since they might be -persist */
 	X11_ipc = NULL;
+#if defined(USE_MOUSE) && !defined(OS2)
+	close(X11_ipc_back_fd);
+	X11_ipc_back_fd = -1;
+#endif
     }
 }
+
+
+
+TERM_PUBLIC int
+X11_waitforinput()
+{
+    char c;
+#if defined(USE_MOUSE) && !defined(OS2)
+    fd_set fds;
+    static struct gp_event_t ge;
+    static int l=0;
+    int n;
+    int fd = fileno(stdin);
+
+    /* XXX:  if the input device it not a tty (e.g. /dev/null)
+     *       mouse events are not processed. This is necessary
+     *       as on some systems /dev/null is not selectable.
+     * TODO: should we close the X11_ipc_back_fd in this case ? */
+    if (X11_ipc_back_fd >= 0 && 0 == fd && isatty(fd)) do {
+	FD_ZERO(&fds);
+	FD_SET(fd, &fds);
+	FD_SET(X11_ipc_back_fd, &fds);
+	select(X11_ipc_back_fd+1, &fds, (fd_set*)NULL,
+	    (fd_set*)NULL, (struct timeval*)NULL);
+	if (FD_ISSET(X11_ipc_back_fd, &fds)) {
+	    n=read(X11_ipc_back_fd, l+(void*)&ge, sizeof(ge)-l);
+#ifndef OS2
+	    if (n == 0) {
+		close(X11_ipc_back_fd);
+		X11_ipc_back_fd = -1;
+		/* don't close X11_ipc, otherwise later writes
+		 * to it will cause a segfault */
+		break;  /* outboard driver has stopped */
+	    }
+#endif
+	    l+=n;
+	    if (l==sizeof(ge)) {
+		/* note: do_event() may not return (if an
+		 * error occurs), so need to reset l first */
+		l=0;
+		do_event(&ge);
+	    }
+	}
+    } while (!FD_ISSET(fd, &fds));
+#endif
+    if (read(0, &c, 1)!=1) return EOF;
+    else return c;
+}
+
 
 TERM_PUBLIC void
 X11_init()
@@ -278,12 +435,21 @@ X11_init()
 	X11_ipc = popen(X11_command, "w");
 #else /* !(OSK || OS/2) */
 	int fdes[2];
+#ifdef USE_MOUSE
+	int fdes_back[2];
 
+	if (pipe(fdes_back)) perror("pipe() failed:");
+#endif
 	if (pipe(fdes)) perror("pipe() failed:");
 
 	if (fork() == 0) {
 	    /* child */
+#ifdef USE_MOUSE
+	    dup2(fdes_back[1], 1);	/* stdout to pipe */
+	    close(fdes_back[0]);
+#endif
 	    close(fdes[1]);
+
 	    dup2(fdes[0], 0);	/* stdin from pipe */
 	    execvp(X11_command, optvec);
 	    /* if we get here, something went wrong */
@@ -291,7 +457,18 @@ X11_init()
 	    exit(EXIT_FAILURE);
 	}
 	/* parent */
-	close(fdes[0]);		/* read end of pipe */
+#ifdef USE_MOUSE
+	/* X11_ipc_out = fdopen(fdes[0], "r"); */
+	if (X11_ipc_back_fd > 0) {
+	    fprintf (stderr, "(X11_init) warning: unclosed X11_ipc_back_fd.\n");
+	    fprintf (stderr, "           this is probably a program error.\n");
+	    close(X11_ipc_back_fd);
+	}
+	X11_ipc_back_fd = fdes_back[0];
+	close(fdes_back[1]); /* the parent doesn't need this */
+#else
+	close(fdes[0]);
+#endif
 	X11_ipc = fdopen(fdes[1], "w");
 #endif /* !(OSK || OS/2) */
     }
@@ -299,7 +476,13 @@ X11_init()
     if (!been_here) {
 	atexit(X11_atexit);
 	been_here++;
+#ifdef USE_MOUSE
+	fprintf(stderr,"Using mouse-enhanced x11 terminal: press 'h' for help\n");
+#endif
     }
+#ifdef USE_MOUSE
+    X11_update_opts();
+#endif
 }
 
 TERM_PUBLIC void
@@ -398,6 +581,7 @@ struct iosb {
     unsigned short count;
     unsigned long info;
 };
+
 
 
 TERM_PUBLIC void
@@ -545,15 +729,40 @@ You lose.
 TERM_PUBLIC void
 X11_graphics()
 {
+#ifdef USE_MOUSE
+    static unsigned long windowid = 0;
+#endif
+
     BEFORE_GRAPHICS;		/* kludge for crippled select */
 
+#ifndef USE_MOUSE
     /* for VMS sake, keep as separate prints */
     PRINT1("G%d\n", X11_plot_number);
+#else
+#ifndef OS2
+    /* if we know the outboard driver has stopped, restart it */
+    if (X11_ipc_back_fd == -1) {
+	fclose(X11_ipc);
+	X11_ipc = NULL;
+	X11_init();
+    }
+#endif
+    /* send also XID of gnuplot window (<space> then raises it up) */
+    if (!windowid) {
+	char* window_env = (char*) getenv("WINDOWID");
+	if (window_env)
+	    sscanf(window_env, "%lu", &windowid);
+    }
+#ifndef OS2
+    PRINT2("G%d %lu\n", X11_plot_number, windowid);
+#else
+    PRINT3("G%d %lu %i\n", X11_plot_number, windowid, getpid());
+#endif
+#endif /* USE_MOUSE */
 
 #ifdef ULTRIX_KLUDGE
     fflush(X11_ipc);
 #endif
-
 }
 
 TERM_PUBLIC void
@@ -568,7 +777,6 @@ X11_text()
 
     AFTER_TEXT;			/* kludge for crippled select */
 }
-
 
 TERM_PUBLIC void
 X11_move(x, y)
@@ -644,6 +852,41 @@ unsigned int x, y, w, h;
     PRINT5("F%04d%04u%04u%04u%04u\n", style, x, y, w, h);
 }
 
+TERM_PUBLIC void
+X11_put_tmptext(i,str)
+int i;
+const char str[];
+{
+    PRINT2("t%04d%s\n", i, str);
+    FFLUSH();
+}
+
+TERM_PUBLIC void
+X11_set_ruler(x, y)
+int x, y;
+{
+    PRINT2("r%04d%04d\n", x, y);
+    FFLUSH();
+}
+
+TERM_PUBLIC void
+X11_set_cursor(c, x, y)
+int c, x, y;
+{
+    PRINT3("u%04d%04d%04d\n", c, x, y);
+    FFLUSH();
+}
+
+TERM_PUBLIC void
+X11_set_clipboard(s)
+const char s[];
+{
+    PRINT1("z%s\n", s);
+    FFLUSH();
+}
+
+
+
 #endif /* TERM_BODY */
 
 #ifdef TERM_TABLE
@@ -658,6 +901,9 @@ TERM_TABLE_START(x11_driver)
     X11_pointsize, TERM_CAN_MULTIPLOT,
     X11_text /* suspend can use same routine */ , 0 /* resume */ ,
     X11_fillbox, X11_linewidth
+#ifdef USE_MOUSE
+    , X11_waitforinput, X11_put_tmptext, X11_set_ruler, X11_set_cursor, X11_set_clipboard
+#endif
 TERM_TABLE_END(x11_driver)
 
 #undef LAST_TERM
@@ -672,7 +918,10 @@ TERM_TABLE_START(X11_driver)
     X11_justify_text, X11_point, do_arrow, set_font_null,
     X11_pointsize, TERM_CAN_MULTIPLOT,
     X11_text /* suspend can use same routine */ , 0 /* resume */ ,
-    X11_fillbox, X11_linewidth
+    X11_fillbox, X11_linewidth,
+#ifdef USE_MOUSE
+    X11_waitforinput, X11_put_tmptext, X11_set_ruler, X11_set_cursor, X11_set_clipboard
+#endif
 TERM_TABLE_END(X11_driver)
 
 #undef LAST_TERM
@@ -698,7 +947,7 @@ START_HELP(x11)
 " if the `-display` command line option is used.",
 "",
 " Syntax:",
-"       set terminal x11 {reset} {<n>}",
+"    set terminal x11 [reset] [<n>] [driver <path>] [[no]persist] [[no]raise]",
 "",
 " Multiple plot windows are supported: `set terminal x11 <n>` directs the",
 " output to plot window number n.  If n>0, the terminal number will be",
@@ -713,8 +962,21 @@ START_HELP(x11)
 " actually terminates the subprocess which maintains the windows (unless",
 " `-persist` was specified).",
 "",
+" The option `driver` can be used to specify a driver different from the",
+" default driver `gnuplot_x11`. This options is thought mainly for developers",
+" who are working on new driver features. Note that changing the driver will",
+" shut down the connection to the previous driver. Example:",
+"     gnuplot> set term x11 driver \"gnuplot_x11_38a\"",
+"",
 " Plot windows will automatically be closed at the end of the session",
 " unless the `-persist` option was given.",
+"",
+" The options `persist` and `raise` are unset by default, which means that",
+" the defaults (persist == no and raise == yes) or the command line options",
+" -persist / -raise or the Xresources are taken.  If [no]persist or",
+" [no]raise are specified, they will override command line options and",
+" Xresources.  Setting one of these options takes place immediately, so",
+" the behaviour of an already running driver can be modified.",
 "",
 " The size or aspect ratio of a plot may be changed by resizing the `gnuplot`",
 " window.",
@@ -731,6 +993,7 @@ START_HELP(x11)
 " These may be specified either as command-line options when `gnuplot` is",
 " invoked or as resources in the configuration file \"/.Xdefaults\".  They are",
 " set upon initialization and cannot be altered during a `gnuplot` session.",
+" (except `persist` and `raise`)",
 "2 command-line_options",
 "?commands set terminal x11 command-line-options",
 "?set terminal x11 command-line-options",
@@ -739,7 +1002,8 @@ START_HELP(x11)
 "?command-line-options",
 " In addition to the X Toolkit options, the following options may be specified",
 " on the command line when starting `gnuplot` or as resources in your",
-" \".Xdefaults\" file:",
+" \".Xdefaults\" file (note that `raise` and `persist` can be overridden",
+" later by `set term x11 [no]raise [no]persist)`:",
 "@start table - first is interactive cleartext form",
 "  `-clear`   requests that the window be cleared momentarily before a",
 "             new plot is displayed.",
