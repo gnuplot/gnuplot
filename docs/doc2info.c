@@ -1,5 +1,5 @@
 /*
- * $Id: doc2info.c,v 1.7 1998/04/14 00:16:59 drd Exp $
+ * $Id: doc2info.c,v 1.9 1998/12/04 15:18:04 lhecking Exp $
  *
  */
 
@@ -148,7 +148,13 @@ FILE *a, *b;
     refhead->next = refhead->prev = NULL;
 
     /* Info header */
-    fprintf(b, "This file is %s created by doc2info from %s.\n\n", ofile, ifile);
+    fprintf(b, "\
+This file is %s created by doc2info from %s.\n\
+\n\
+START-INFO-DIR-ENTRY\n\
+* Gnuplot: (gnuplot).           Gnuplot plotting program\n\
+END-INFO-DIR-ENTRY\n\n",
+	    ofile, ifile);
 
     /* and Top node */
     node_head(NULL, NULL, head->next->string, NULL, b);
