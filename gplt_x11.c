@@ -300,7 +300,7 @@ char *argv[];
     mainloop();
 
     if (persist) {
-	FPRINTF((stderr, "waiting for %d windows\n, windows_open"));
+	FPRINTF((stderr, "waiting for %d windows\n", windows_open));
 	/* read x events until all windows have been quit */
 	while (windows_open > 0) {
 	    XEvent event;
