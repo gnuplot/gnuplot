@@ -104,8 +104,8 @@ EMAIL = bug-gnuplot@dartmouth.edu
 # Default help file location
 HELPFILE = $(datadir)/gnuplot.gih
 EXTRA_PROGRAMS = gnuplot_x11
-bin_PROGRAMS = gnuplot $(GNUPLOT_X11)
-noinst_PROGRAMS = bf_test
+bin_PROGRAMS = gnuplot
+noinst_PROGRAMS = bf_test $(GNUPLOT_X11)
 
 XLIBS = @LIBRARIES_FOR_X@
 AM_CPPFLAGS = -I../term -I$(top_srcdir)/term -DBINDIR=\"$(bindir)\" -DX11_DRIVER_DIR=\"$(pkglibdir)/$(PKG_MAJOR)\" -DCONTACT=\"$(EMAIL)\" -DHELPFILE=\"$(HELPFILE)\"
@@ -181,8 +181,8 @@ mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = $(top_builddir)/config.h
 CONFIG_CLEAN_FILES =
 EXTRA_PROGRAMS = gnuplot_x11$(EXEEXT)
-bin_PROGRAMS = gnuplot$(EXEEXT) @GNUPLOT_X11@
-noinst_PROGRAMS = bf_test$(EXEEXT)
+bin_PROGRAMS = gnuplot$(EXEEXT)
+noinst_PROGRAMS = bf_test$(EXEEXT) @GNUPLOT_X11@
 PROGRAMS = $(bin_PROGRAMS) $(noinst_PROGRAMS)
 
 am_bf_test_OBJECTS = bf_test$U.$(OBJEXT) binary$U.$(OBJEXT) \
@@ -693,7 +693,7 @@ info-am:
 
 install-data-am:
 
-install-exec-am: install-binPROGRAMS
+install-exec-am: install-binPROGRAMS install-exec-local
 
 install-info: install-info-recursive
 
@@ -709,7 +709,7 @@ mostlyclean: mostlyclean-recursive
 
 mostlyclean-am: mostlyclean-compile mostlyclean-generic mostlyclean-kr
 
-uninstall-am: uninstall-binPROGRAMS uninstall-info-am
+uninstall-am: uninstall-binPROGRAMS uninstall-info-am uninstall-local
 
 uninstall-info: uninstall-info-recursive
 
@@ -721,19 +721,41 @@ uninstall-info: uninstall-info-recursive
 	dvi-recursive info info-am info-recursive install install-am \
 	install-binPROGRAMS install-data install-data-am \
 	install-data-recursive install-exec install-exec-am \
-	install-exec-recursive install-info install-info-am \
-	install-info-recursive install-man install-recursive \
-	install-strip installcheck installcheck-am installdirs \
-	installdirs-am installdirs-recursive maintainer-clean \
-	maintainer-clean-generic maintainer-clean-recursive mostlyclean \
-	mostlyclean-compile mostlyclean-generic mostlyclean-kr \
-	mostlyclean-recursive tags tags-recursive uninstall \
-	uninstall-am uninstall-binPROGRAMS uninstall-info-am \
-	uninstall-info-recursive uninstall-recursive
+	install-exec-local install-exec-recursive install-info \
+	install-info-am install-info-recursive install-man \
+	install-recursive install-strip installcheck installcheck-am \
+	installdirs installdirs-am installdirs-recursive \
+	maintainer-clean maintainer-clean-generic \
+	maintainer-clean-recursive mostlyclean mostlyclean-compile \
+	mostlyclean-generic mostlyclean-kr mostlyclean-recursive tags \
+	tags-recursive uninstall uninstall-am uninstall-binPROGRAMS \
+	uninstall-info-am uninstall-info-recursive uninstall-local \
+	uninstall-recursive
 
 # begin makefile.all
 # end makefile.all
 term$U.o: $(CORETERM)
+
+install-exec-local: $(EXTRA_PROGRAMS)
+	@$(NORMAL_INSTALL)
+	$(mkinstalldirs) $(DESTDIR)$(pkglibdir)/$(PKG_MAJOR)
+	@list='$(EXTRA_PROGRAMS)'; for p in $$list; do \
+	  p1=`echo $$p|sed 's/$(EXEEXT)$$//'`; \
+	  if test -f $$p \
+	  ; then \
+	    f=`echo $$p1|sed '$(transform);s/$$/$(EXEEXT)/'`; \
+	   echo " $(INSTALL_PROGRAM_ENV) $(INSTALL_PROGRAM) $$p $(DESTDIR)$(pkglibdir)/$(PKG_MAJOR)/$$f"; \
+	   $(INSTALL_PROGRAM_ENV) $(INSTALL_PROGRAM) $$p $(DESTDIR)$(pkglibdir)/$(PKG_MAJOR)/$$f ; \
+	  else :; fi; \
+	done
+
+uninstall-local:
+	@$(NORMAL_UNINSTALL)
+	@list='$(EXTRA_PROGRAMS)'; for p in $$list; do \
+	  f=`echo $$p|sed 's/$(EXEEXT)$$//;$(transform);s/$$/$(EXEEXT)/'`; \
+	  echo " rm -f $(DESTDIR)$(pkglibdir)/$(PKG_MAJOR)/$$f"; \
+	  rm -f $(DESTDIR)$(pkglibdir)/$(PKG_MAJOR)/$$f; \
+	done
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:
