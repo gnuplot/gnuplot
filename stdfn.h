@@ -254,10 +254,13 @@ int strnicmp __PROTO((char *, char *, int));
 # endif
 #endif
 
-#ifdef SELECT_USES_FD_SET
-typedef fd_set gp_fd_set;
-#else
-typedef int gp_fd_set;
+/* Arument types for select */
+/* These may need some work ... */
+#ifndef fd_set_size_t
+# define fd_set_size_t size_t
+#endif
+#ifndef SELECT_FD_SET_CAST
+# define SELECT_FD_SET_CAST
 #endif
 
 #ifndef GP_GETCWD

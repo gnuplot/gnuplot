@@ -207,8 +207,10 @@ if test "$ac_cv_func_pclose" = yes && test "$ac_cv_func_popen" = yes ; then
   AC_DEFINE(PIPES)
 fi
 
-dnl arg types for select
-AC_FUNC_SELECT
+dnl arg types for select - works only with ANSI compilers!
+if test "$am_cv_prog_cc_stdc" != no; then
+  AC_FUNC_SELECT
+fi
 
 dnl On SVR3.
 dnl FIXME AC_DEFINE(CRIPPLED_SELECT)

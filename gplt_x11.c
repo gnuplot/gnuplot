@@ -341,7 +341,7 @@ char *argv[];
 void mainloop()
 {
     fd_set_size_t nf, nfds, cn = ConnectionNumber(dpy), in;
-    struct_timeval_t *timer = (struct timeval *) 0;
+    struct timeval *timer = (struct timeval *) 0;
 #ifdef ISC22
     struct timeval timeout;
 #endif
@@ -375,7 +375,7 @@ void mainloop()
 	XFlush(dpy);
 
 	tset = rset;
-	nf = select(nfds, (gp_fd_set *) &tset, 0, 0, timer);
+	nf = select(nfds, SELECT_FD_SET_CAST &tset, 0, 0, timer);
 	if (nf < 0) {
 	    if (errno == EINTR)
 		continue;
@@ -421,7 +421,7 @@ void mainloop()
 void mainloop()
 {
     fd_set_size_t nf, nfds, cn = ConnectionNumber(dpy);
-    struct_timeval_t timeout, *timer;
+    struct timeval timeout, *timer;
     fd_set rset, tset;
     unsigned long all = (unsigned long) (-1L);
     XEvent xe;
@@ -438,7 +438,7 @@ void mainloop()
     while (1) {
 	XFlush(dpy);		/* see above */
 	tset = rset;
-	nf = select(nfds, (gp_fd_set *)&tset, 0, 0, timer);
+	nf = select(nfds, SELECT_FD_SET_CAST &tset, 0, 0, timer);
 	if (nf < 0) {
 	    if (errno == EINTR)
 		continue;
