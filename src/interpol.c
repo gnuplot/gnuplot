@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: interpol.c,v 1.25 2002/02/15 17:04:04 amai Exp $"); }
+static char *RCSid() { return RCSid("$Id: interpol.c,v 1.26 2002/08/01 13:52:45 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - interpol.c */
@@ -1091,6 +1091,7 @@ cp_implode(cp)
 			|| ((y > Y_AXIS.max) && !(Y_AXIS.autoscale & AUTOSCALE_MAX)))
 			cp->points[j].type = OUTRANGE;
 		is_outrange:
+		    ;
 		} /* if(! all inrange) */
 
 		j++;		/* next valid entry */
@@ -1133,6 +1134,7 @@ cp_implode(cp)
 			|| ((y > Y_AXIS.max) && !(Y_AXIS.autoscale & AUTOSCALE_MAX)))
 			cp->points[j].type = OUTRANGE;
 		is_outrange2:
+		    ;
 	    }
 	    j++;		/* next valid entry */
 	}
