@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.38 2002/02/19 12:36:58 amai Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.39 2002/02/25 03:10:41 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - gplt_x11.c */
@@ -1675,7 +1675,7 @@ exec_cmd(plot_struct *plot, char *command)
 	    }
 	}
     }
-#if PM3D
+#ifdef PM3D
     else if (*buffer == X11_GR_SET_COLOR) {	/* set color */
 	if (have_pm3d) {	/* ignore, if your X server is not supported */
 	    double gray;
@@ -3256,7 +3256,7 @@ gnuplot: X11 aborted.\n", ldisplay);
 
 /*---set geometry, font, colors, line widths, dash styles, point size-----*/
 
-#if PM3D
+#ifdef PM3D
     /* a specific visual can be forced by the X resource visual */
     db_string = pr_GetR(db, ".visual") ? (char *) value.addr : (char *) 0;
     if (db_string) {
@@ -3426,7 +3426,7 @@ pr_color(cmap_t * cmap_ptr)
 
 	ctype = (Gray) ? "Gray" : "Color";
 
-#if PM3D
+#ifdef PM3D
 	if (&cmap != cmap_ptr) {
 	    /* for private colormaps: make shure
 	     * that pixel 0 gets black (joze) */
@@ -3666,7 +3666,7 @@ pr_window(plot_struct *plot)
 
     FPRINTF((stderr, "(pr_window) \n"));
 
-#if PM3D
+#ifdef PM3D
     if (have_pm3d) {
 	XSetWindowAttributes attr;
 	unsigned long mask = CWBackPixel | CWBorderPixel | CWColormap;
