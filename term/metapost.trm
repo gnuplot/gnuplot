@@ -1,5 +1,5 @@
 /*
- * $Id: metapost.trm,v 1.12 2002/05/22 11:37:53 lhecking Exp $
+ * $Id: metapost.trm,v 1.13 2002/06/06 18:31:01 lhecking Exp $
  */
 
 /* GNUPLOT - metapost.trm */
@@ -880,7 +880,7 @@ START_HELP(mp)
 "",
 " The option `tex` sets the terminal to output its text for TeX to process.",
 "",
-" The option `latex' sets the terminal to output its text for processing by",
+" The option `latex` sets the terminal to output its text for processing by",
 " LaTeX. This allows things like \\frac for fractions which LaTeX knows about",
 " but TeX does not.  Note that you must set the environment variable TEX to the",
 " name of your LaTeX executable (normally latex) if you use this option. ",

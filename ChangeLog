@@ -1,3 +1,8 @@
+2002-06-07  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* term/metapost.trm: In the documentation section, fixed `latex' to
+	`latex` --- the reason for doc2rtf to crash.
+
 2002-06-06  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* term/metapost.trm: Add pm3d capability, patch by Arun Persaud
@@ -580,7 +585,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/06/05 21:58:50 $).
+	last modification date (from the tag $Date: 2002/06/06 18:31:01 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
