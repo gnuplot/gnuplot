@@ -61,7 +61,7 @@ all: $(EXENAME).exe $(HELPFILE)
 $(EXENAME).exe : $(OBJS)
 	$(CC) -o $(EXENAME) $(OBJS) $(LINKOPT)
 #	strip $(EXENAME)
-#HBB: keep a debuggable gp36 around
+#HBB: keep a debuggable gp37 around
 	objcopy --strip-all $(EXENAME) $(EXENAME).str
 	coff2exe $(EXENAME).str
 	del $(EXENAME).str
