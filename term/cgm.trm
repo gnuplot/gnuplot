@@ -286,7 +286,10 @@ TERM_PUBLIC void CGM_graphics()
   };
 
 	/* metafile description (class 1) */
-  CGM_write_char_record(0, 1, strlen(outstr)+1, outstr);
+  if (!outstr)
+    CGM_write_char_record(0, 1, 1, outstr);
+  else
+    CGM_write_char_record(0, 1, strlen(outstr)+1, outstr);
   CGM_write_int_record(1, 1, 2, version_data);
   CGM_write_char_record(1, 2, sizeof(description_data), description_data);
   CGM_write_int_record(1, 3, 2, vdc_type_data);
