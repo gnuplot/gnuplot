@@ -1,3 +1,26 @@
+1998-12-02  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* Makefile.in: Clean out dist target.
+
+	* bf_test.c: Add prototype for FreeHelp().
+
+	* fit.c(error_ex): Use strncpy() instead of safe_strncpy().
+
+	* gnuplot.opt: Add help (for DT's new version of list_terms()).
+
+	* makefile.amg: Remove obsolete file type.h from dependencies.
+
+	* protos.h: Remove null_linewidth() prototype. Add sleep() prototype.
+
+	* term.c: Add null_linewidth() prototype.
+
+	* docs/Makefile.in: Better integration of alldoc2gih target.
+
+1998-12-02  Lucas Hart  <hartl@ucs.orst.edu>
+	
+	* demo/hidden.dem, demo/prob.dem, demo/surface1.dem, demo/surface2.dem,
+	demo/using.dem: Reset axis labels with `set [xyz]tics autofreq'.
+
 1998-12-01  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* Makefile.in, makefile.all: Add makefile.mgw to ETC.
