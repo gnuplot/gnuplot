@@ -1,3 +1,10 @@
+2004-03-07  Ethan Merritt  <merritt@u.washington.edu>
+	
+	* src/gplt_x11.c: Selecting linetype -2 happened to work, but
+	only because there was incorrect bounds checking. Now treat
+	LT_BACKGROUND, LT_NODRAW, and other negative linetypes as a
+	request for the background color.
+
 2004-03-04  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/axis.h (STORE_WITH_LOG_AND_UPDATE_RANGE): Added check
