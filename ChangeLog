@@ -1,3 +1,8 @@
+2004-07-17  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/show.c (show_tics) src/save.c (save_tics): Show and save
+	the tic level of user-specific tics.
+
 2004-07-27  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	Bugfix: caret position of error messages in multiplot modes was
