@@ -37,6 +37,7 @@ static char *RCSid = "$Id: plot3d.c,v 1.36 1998/06/18 14:55:14 ddenholm Exp $";
 #include "plot.h"
 #include "setshow.h"
 #include "binary.h"
+#include "matrix.h"
 
 #ifndef _Windows
 # include "help.h"
@@ -236,7 +237,8 @@ void plot3drequest()
 		/* used to be: int_error("'=' expected",c_token); */
 	    }
 	}
-	changed = parametric ? load_range(U_AXIS, &umin, &umax, autoscale_lu) : load_range(FIRST_X_AXIS, &xmin, &xmax, autoscale_lx);
+	changed = parametric ? load_range(U_AXIS, &umin, &umax, autoscale_lu) :
+			load_range(FIRST_X_AXIS, &xmin, &xmax, autoscale_lx);
 	if (!equals(c_token, "]"))
 	    int_error("']' expected", c_token);
 	c_token++;
@@ -260,7 +262,8 @@ void plot3drequest()
 		/* used to be: int_error("'=' expected",c_token); */
 	    }
 	}
-	changed = parametric ? load_range(V_AXIS, &vmin, &vmax, autoscale_lv) : load_range(FIRST_Y_AXIS, &ymin, &ymax, autoscale_ly);
+	changed = parametric ? load_range(V_AXIS, &vmin, &vmax, autoscale_lv) :
+			load_range(FIRST_Y_AXIS, &ymin, &ymax, autoscale_ly);
 	if (!equals(c_token, "]"))
 	    int_error("']' expected", c_token);
 	c_token++;
@@ -315,6 +318,118 @@ void plot3drequest()
     eval_3dplots();
 }
 
+#ifdef THIN_PLATE_SPLINES_GRID
+static double splines_kernel(h)
+double h;
+{
+    /* this is normaly not usefull ... */
+    h = fabs(h);
+
+    if (h != 0.0) {
+	return h * h * log(h);
+    } else {
+	return 0;
+    }
+}
+
+#define Swap(a,b) {double tmp; tmp=a; a=b; b=tmp;}
+
+static void lu_decomp(a, n, indx, d)
+double **a;
+int n;
+int *indx;
+double *d;
+{
+    int i, imax = -1, j, k;	/* HBB: added initial value, to shut up gcc -Wall */
+
+    double large, dummy, temp, **ar, **lim, *limc, *ac, *dp, *vscal;
+
+    dp = vscal = vec(n);
+    *d = 1.0;
+    for (ar = a, lim = &(a[n]); ar < lim; ar++) {
+	large = 0.0;
+	for (ac = *ar, limc = &(ac[n]); ac < limc;)
+	    if ((temp = fabs(*ac++)) > large)
+		large = temp;
+	if (large == 0.0)
+	    int_error("Singular matrix in LU-DECOMP", NO_CARET);
+	*dp++ = 1 / large;
+    }
+    ar = a;
+    for (j = 0; j < n; j++, ar++) {
+	for (i = 0; i < j; i++) {
+	    ac = &(a[i][j]);
+	    for (k = 0; k < i; k++)
+		*ac -= a[i][k] * a[k][j];
+	}
+	large = 0.0;
+	dp = &(vscal[j]);
+	for (i = j; i < n; i++) {
+	    ac = &(a[i][j]);
+	    for (k = 0; k < j; k++)
+		*ac -= a[i][k] * a[k][j];
+	    if ((dummy = *dp++ * fabs(*ac)) >= large) {
+		large = dummy;
+		imax = i;
+	    }
+	}
+	if (j != imax) {
+	    ac = a[imax];
+	    dp = *ar;
+	    for (k = 0; k < n; k++, ac++, dp++)
+		Swap(*ac, *dp);
+	    *d = -(*d);
+	    vscal[imax] = vscal[j];
+	}
+	indx[j] = imax;
+	if (*(dp = &(*ar)[j]) == 0)
+	    *dp = 1e-30;
+
+	if (j != n - 1) {
+	    dummy = 1 / (*ar)[j];
+	    for (i = j + 1; i < n; i++)
+		a[i][j] *= dummy;
+	}
+    }
+    free(vscal);
+}
+
+static void lu_backsubst(a, n, indx, b)
+double **a;
+int n;
+int *indx;
+double *b;
+{
+    int i, memi = -1, ip, j;
+
+    double sum, *bp, *bip, **ar, *ac;
+
+    ar = a;
+
+    for (i = 0; i < n; i++, ar++) {
+	ip = indx[i];
+	sum = b[ip];
+	b[ip] = b[i];
+	if (memi >= 0) {
+	    ac = &((*ar)[memi]);
+	    bp = &(b[memi]);
+	    for (j = memi; j <= i - 1; j++)
+		sum -= *ac++ * *bp++;
+	} else if (sum)
+	    memi = i;
+	b[i] = sum;
+    }
+    ar--;
+    for (i = n - 1; i >= 0; i--) {
+	ac = &(*ar)[i + 1];
+	bp = &(b[i + 1]);
+	bip = &(b[i]);
+	for (j = i + 1; j < n; j++)
+	    *bip -= *ac++ * *bp++;
+	*bip /= (*ar--)[i];
+    }
+}
+#endif
 
 static void grid_nongrid_data(this_plot)
 struct surface_points *this_plot;
@@ -324,6 +439,10 @@ struct surface_points *this_plot;
     struct iso_curve *old_iso_crvs = this_plot->iso_crvs;
     struct iso_curve *icrv, *oicrv, *oicrvs;
 
+#ifdef THIN_PLATE_SPLINES_GRID
+    double *b, **K, *xx, *yy, *zz, d;
+    int *indx, numpoints;
+#endif
     /* Compute XY bounding box on the original data. */
     xmin = xmax = old_iso_crvs->points[0].x;
     ymin = ymax = old_iso_crvs->points[0].y;
@@ -351,6 +470,68 @@ struct surface_points *this_plot;
     this_plot->iso_crvs = NULL;
     this_plot->num_iso_read = dgrid3d_col_fineness;
     this_plot->has_grid_topology = TRUE;
+
+#ifdef THIN_PLATE_SPLINES_GRID
+    numpoints = 0;
+    for (oicrv = old_iso_crvs; oicrv != NULL; oicrv = oicrv->next) {
+	numpoints += oicrv->p_count;
+    }
+    xx = (double *) gp_alloc(sizeof(double) * (numpoints + 3) * (numpoints + 8),
+			     "thin plate splines in dgrid3d");
+    /* the memory needed is not really (n+3)*(n+8) for now,
+       but might be if I take into account errors ... */
+    K = (double **) gp_alloc(sizeof(double *) * (numpoints + 3),
+			     "matrix : thin plate splines 2d");
+    yy = xx + numpoints;
+    zz = yy + numpoints;
+    b = zz + numpoints;
+    i = 0;
+    for (oicrv = old_iso_crvs; oicrv != NULL; oicrv = oicrv->next) {
+	struct coordinate GPHUGE *opoints = oicrv->points;
+	for (k = 0; k < oicrv->p_count; k++, opoints++) {
+	    xx[i] = opoints->x;
+	    yy[i] = opoints->y;
+	    zz[i] = opoints->z;
+	    i++;
+	}
+    }
+    for (i = 0; i < numpoints + 3; i++) {
+	K[i] = b + (numpoints + 3) * (i + 1);
+    }
+
+    for (i = 0; i < numpoints; i++) {
+	for (j = i + 1; j < numpoints; j++) {
+	    double dx = xx[i] - xx[j], dy = yy[i] - yy[j];
+	    K[i][j] = K[j][i] = -splines_kernel(sqrt(dx * dx + dy * dy));
+	}
+	K[i][i] = 0.0;		/* here will come the weights for errors */
+	b[i] = zz[i];
+    }
+    for (i = 0; i < numpoints; i++) {
+	K[i][numpoints] = K[numpoints][i] = 1.0;
+	K[i][numpoints + 1] = K[numpoints + 1][i] = xx[i];
+	K[i][numpoints + 2] = K[numpoints + 2][i] = yy[i];
+    }
+    b[numpoints] = 0.0;
+    b[numpoints + 1] = 0.0;
+    b[numpoints + 2] = 0.0;
+    K[numpoints][numpoints] = 0.0;
+    K[numpoints][numpoints + 1] = 0.0;
+    K[numpoints][numpoints + 2] = 0.0;
+    K[numpoints + 1][numpoints] = 0.0;
+    K[numpoints + 1][numpoints + 1] = 0.0;
+    K[numpoints + 1][numpoints + 2] = 0.0;
+    K[numpoints + 2][numpoints] = 0.0;
+    K[numpoints + 2][numpoints + 1] = 0.0;
+    K[numpoints + 2][numpoints + 2] = 0.0;
+    indx = (int *) gp_alloc(sizeof(int) * (numpoints + 3), "indexes lu");
+    /* actually, K is *not* positive definite, but 
+       has only non zero real eigenvalues ->
+       we can use an lu_decomp safely */
+    lu_decomp(K, numpoints + 3, indx, &d);
+    lu_backsubst(K, numpoints + 3, indx, b);
+#endif /* THIN_PLATE_SPLINES_GRID */
+
     for (i = 0, x = xmin; i < dgrid3d_col_fineness; i++, x += dx) {
 	struct coordinate GPHUGE *points;
 
@@ -363,16 +544,23 @@ struct surface_points *this_plot;
 	for (j = 0, y = ymin; j < dgrid3d_row_fineness; j++, y += dy, points++) {
 	    z = w = 0.0;
 
-#ifndef BUGGY_DGRID_RANGING /* HBB 981209 */
+#ifndef BUGGY_DGRID_RANGING	/* HBB 981209 */
 	    /* as soon as ->type is changed to UNDEFINED, break out of
 	     * two inner loops! */
 	    points->type = INRANGE;
 #endif
+#ifdef THIN_PLATE_SPLINES_GRID
+	    z = b[numpoints];
+	    for (k = 0; k < numpoints; k++) {
+		double dx = xx[k] - x, dy = yy[k] - y;
+		z = z - b[k] * splines_kernel(sqrt(dx * dx + dy * dy));
+	    }
+	    z = z + b[numpoints + 1] * x + b[numpoints + 2] * y;
+#else
 	    for (oicrv = old_iso_crvs; oicrv != NULL; oicrv = oicrv->next) {
 		struct coordinate GPHUGE *opoints = oicrv->points;
 		for (k = 0; k < oicrv->p_count; k++, opoints++) {
 		    double dist, dist_x = fabs(opoints->x - x), dist_y = fabs(opoints->y - y);
-
 		    switch (dgrid3d_norm_value) {
 		    case 1:
 			dist = dist_x + dist_y;
@@ -406,15 +594,15 @@ struct surface_points *this_plot;
 		     */
 		    if (dist == 0.0) {
 #ifndef BUGGY_DGRID_RANGING
-		        /* HBB 981209: revised flagging as undefined */
+			/* HBB 981209: revised flagging as undefined */
 			/* Supporting all those infinities on various
 			 * platforms becomes tiresome, to say the least :-(
 			 * Let's just return the first z where this happens,
 			 * unchanged, and be done with this, period. */
-		        points->type = UNDEFINED;
+			points->type = UNDEFINED;
 			z = opoints->z;
 			w = 1.0;
-			break; /* out of for (k...) loop */
+			break;	/* out of for (k...) loop */
 #else
 #if !defined(AMIGA_SC_6_1) && !defined(__PUREC__)
 			dist = VERYLARGE;
@@ -440,9 +628,10 @@ struct surface_points *this_plot;
 		}
 #ifndef BUGGY_DGRID_RANGING
 		if (points->type != INRANGE)
-		  break; /* out of the second-inner loop as well ... */
+		    break;	/* out of the second-inner loop as well ... */
 #endif
 	    }
+#endif /* THIN_PLATE_SPLINES_GRID */
 
 #ifndef BUGGY_DGRID_RANGING
 	    /* Now that we've escaped the loops safely, we know that we
@@ -452,7 +641,11 @@ struct surface_points *this_plot;
 
 	    STORE_WITH_LOG_AND_FIXUP_RANGE(points->x, x, points->type, x_axis, NOOP, continue);
 	    STORE_WITH_LOG_AND_FIXUP_RANGE(points->y, y, points->type, y_axis, NOOP, continue);
+#ifndef THIN_PLATE_SPLINES_GRID
 	    STORE_WITH_LOG_AND_FIXUP_RANGE(points->z, z / w, points->type, z_axis, NOOP, continue);
+#else
+	    STORE_WITH_LOG_AND_FIXUP_RANGE(points->z, z, points->type, z_axis, NOOP, continue);
+#endif
 #else
 	    /* HBB 981026: original, short version of this code */
 	    points->x = x;
@@ -462,6 +655,12 @@ struct surface_points *this_plot;
 #endif
 	}
     }
+
+#ifdef THIN_PLATE_SPLINES_GRID
+    free(K);
+    free(xx);
+    free(indx);
+#endif
 
     /* Delete the old non grid data. */
     for (oicrvs = old_iso_crvs; oicrvs != NULL;) {
@@ -888,12 +1087,11 @@ static void eval_3dplots()
 
 		/*{{{  function */
 		++plot_num;
-		if (parametric)	{
+		if (parametric) {
 		    /* Rotate between x/y/z axes */
 		    /* +2 same as -1, but beats -ve problem */
 		    crnt_param = (crnt_param + 2) % 3;
 		}
-
 		if (*tp_3d_ptr) {
 		    this_plot = *tp_3d_ptr;
 		    if (!hidden3d)
@@ -1037,7 +1235,7 @@ static void eval_3dplots()
 		    /* dont move tp_3d_ptr until we are sure we
 		     * have read a surface
 		     */
-		    
+
 		    /* used by get_3ddata() */
 		    this_plot->token = this_token;
 
@@ -1088,7 +1286,7 @@ static void eval_3dplots()
 		this_plot->token = c_token;	/* store for second pass */
 	    }
 
-	}		/* !is_definition() : end of scope of this_plot */
+	}			/* !is_definition() : end of scope of this_plot */
 
 
 	if (equals(c_token, ","))
@@ -1130,11 +1328,11 @@ static void eval_3dplots()
 	     * if there are no fns, we'll report it later as 'nothing to plot'
 	     */
 
-	    if (min_array[FIRST_X_AXIS] == VERYLARGE || 
+	    if (min_array[FIRST_X_AXIS] == VERYLARGE ||
 		max_array[FIRST_X_AXIS] == -VERYLARGE) {
 		int_error("x range is invalid", c_token);
 	    }
-	    if (min_array[FIRST_Y_AXIS] == VERYLARGE || 
+	    if (min_array[FIRST_Y_AXIS] == VERYLARGE ||
 		max_array[FIRST_Y_AXIS] == -VERYLARGE) {
 		int_error("y range is invalid", c_token);
 	    }
@@ -1196,7 +1394,6 @@ static void eval_3dplots()
 	    int_error("samples or iso_samples < 2. Must be at least 2.",
 		      NO_CARET);
 	}
-
 	/* start over */
 	this_plot = first_3dplot;
 	c_token = begin_token;
@@ -1246,7 +1443,7 @@ static void eval_3dplots()
 			/* y = pow(log_base_log_y,y); 26-Sep-89 */
 			/* parametric => NOT a log quantity (?) */
 			(void) Gcomplex(&plot_func.dummy_values[1],
-			!parametric && is_log_y ? pow(base_log_y, y) : y,
+					!parametric && is_log_y ? pow(base_log_y, y) : y,
 					0.0);
 
 			for (i = 0; i < num_sam_to_use; i++) {
@@ -1272,7 +1469,8 @@ static void eval_3dplots()
 			    temp = real(&a);
 
 			    points[i].type = INRANGE;
-			    STORE_WITH_LOG_AND_FIXUP_RANGE(points[i].z, temp, points[i].type, crnt_param, NOOP, NOOP);
+			    STORE_WITH_LOG_AND_FIXUP_RANGE(points[i].z, temp, points[i].type,
+							   crnt_param, NOOP, NOOP);
 
 			}
 			this_iso->p_count = num_sam_to_use;
@@ -1298,7 +1496,8 @@ static void eval_3dplots()
 				/* if (is_log_y) PEM fix logscale y axis */
 				/* y = pow(base_log_y,y); 26-Sep-89 */
 				(void) Gcomplex(&plot_func.dummy_values[1],
-						(!parametric && is_log_y) ? pow(base_log_y, y) : y, 0.0);
+						(!parametric && is_log_y) ? pow(base_log_y, y) :
+						y, 0.0);
 
 				points[j].x = x;
 				points[j].y = y;
@@ -1312,7 +1511,8 @@ static void eval_3dplots()
 				temp = real(&a);
 
 				points[j].type = INRANGE;
-				STORE_WITH_LOG_AND_FIXUP_RANGE(points[j].z, temp, points[j].type, crnt_param, NOOP, NOOP);
+				STORE_WITH_LOG_AND_FIXUP_RANGE(points[j].z, temp, points[j].type,
+							       crnt_param, NOOP, NOOP);
 			    }
 			    this_iso->p_count = num_sam_to_use;
 			    this_iso = this_iso->next;
@@ -1321,8 +1521,7 @@ static void eval_3dplots()
 		    }
 		    /*}}} */
 		}		/* end of ITS A FUNCTION TO PLOT */
-
-		/* we saved it from first pass */ 
+		/* we saved it from first pass */
 		c_token = this_plot->token;
 
 		/* one data file can make several plots */
@@ -1392,7 +1591,7 @@ if(range_flags[axis]&RANGE_WRITEBACK) \
     WRITEBACK(FIRST_Z_AXIS, zmin, zmax);
 
     if (plot_num == 0 || first_3dplot == NULL) {
-        int_error("no functions or data to plot", c_token);
+	int_error("no functions or data to plot", c_token);
     }
     /* Creates contours if contours are to be plotted as well. */
 
@@ -1423,9 +1622,9 @@ if(range_flags[axis]&RANGE_WRITEBACK) \
 		this_plot->contours = contour(
 						 this_plot->num_iso_read,
 						 this_plot->iso_crvs,
-					     contour_levels, contour_pts,
-					     contour_kind, contour_order,
-					       levels_kind, levels_list);
+						 contour_levels, contour_pts,
+						 contour_kind, contour_order,
+						 levels_kind, levels_list);
 	    } else {
 		this_plot->contours = contour(iso_samples_2,
 					      this_plot->iso_crvs,
@@ -1518,8 +1717,8 @@ int *plot_num;
 	    assert(INRANGE < OUTRANGE && OUTRANGE < UNDEFINED);
 
 	    while (zicrvs) {
-		struct coordinate GPHUGE *xpoints = xicrvs->points,
-		 GPHUGE * ypoints = yicrvs->points, GPHUGE * zpoints = zicrvs->points;
+		struct coordinate GPHUGE *xpoints = xicrvs->points, GPHUGE * ypoints =
+		yicrvs->points, GPHUGE * zpoints = zicrvs->points;
 		for (i = 0; i < zicrvs->p_count; ++i) {
 		    zpoints[i].x = xpoints[i].z;
 		    zpoints[i].y = ypoints[i].z;
