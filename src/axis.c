@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.22 2001/10/02 17:20:49 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.23 2001/10/31 17:13:59 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -163,6 +163,7 @@ static double make_tics __PROTO((AXIS_INDEX, int));
 static double quantize_time_tics __PROTO((AXIS_INDEX, double, double, int));
 static void   mant_exp __PROTO((double, double, TBOOLEAN, double *, int *, const char *));
 static double time_tic_just __PROTO((t_timelevel, double));
+static double round_outward __PROTO((AXIS_INDEX, TBOOLEAN, double));
 
 /* ---------------------- routines ----------------------- */
 
@@ -352,7 +353,7 @@ make_auto_time_minitics(tlevel, incr)
 {
     double tinc = 0.0;
 
-    if (tlevel < TIMELEVEL_SECONDS)
+    if ((int)tlevel < TIMELEVEL_SECONDS)
 	tlevel = TIMELEVEL_SECONDS;
     switch (tlevel) {
     case TIMELEVEL_SECONDS:
@@ -1000,6 +1001,34 @@ quantize_time_tics(axis, tic, xr, guide)
 
 /*}}} */
 
+/* HBB 20011204: new function (repeated code ripped out of setup_tics)
+ * that rounds an axis endpoint outward. If the axis is a time/date
+ * one, take care to round towards the next whole time unit, not just
+ * a multiple of the (averaged) tic size */
+static double
+round_outward(axis, upwards, input)
+    AXIS_INDEX axis;		/* Axis to work on */
+    TBOOLEAN upwards;		/* extend upwards or downwards? */
+    double input;		/* the current endpoint */
+{
+    double tic = ticstep[axis];
+    double result = tic * (upwards
+			   ? ceil(input / tic)
+			   : floor(input / tic));
+    
+    if (axis_array[axis].is_timedata) {
+	double ontime = time_tic_just(timelevel[axis], result);
+	
+	/* FIXME: how certain is it that we don't want to *always*
+	 * return 'ontime'? */
+	if ((upwards && (ontime > result))
+	    || (!upwards && (ontime <result)))
+	    return ontime;
+    }
+    
+    return result;
+}
+
 /* setup_tics allows max number of tics to be specified but users dont
  * like it to change with size and font, so we use value of 20, which
  * is 3.5 behaviour.  Note also that if format is '', yticlin = 0, so
@@ -1038,34 +1067,35 @@ setup_tics(axis, max)
 	fixmin = fixmax = FALSE; /* user-defined, day or month */
     }
 
+    /* BUGFIX HBB 20010831: for time/date axes, if an explicit
+     * stepsize was set, timelevel[axis] wasn't defined, leading to
+     * strange misbehaviours of minor tics on time axes. This would
+     * usually be used to redefine the 'tic' interval, but as a side
+     * effect, it defines timelevel[axis]. */
+    /* HBB 20011204: moved this up --- round_outward() needs
+     * timelevel[axis], too */
+    if (axis_array[axis].is_timedata && ticdef->type == TIC_SERIES)
+	quantize_time_tics(axis, tic,
+			   axis_array[axis].max - axis_array[axis].min,
+			   20);
+
     if (fixmin) {
-	if (axis_array[axis].min < axis_array[axis].max)
-	    axis_array[axis].min = tic * floor(axis_array[axis].min / tic);
-	else
-	    axis_array[axis].min = tic * ceil(axis_array[axis].min / tic);
+	axis_array[axis].min =
+	    round_outward(axis,
+			  ! (axis_array[axis].min < axis_array[axis].max),
+			  axis_array[axis].min);
     }
     if (fixmax) {
-	if (axis_array[axis].min < axis_array[axis].max)
-	    axis_array[axis].max = tic * ceil(axis_array[axis].max / tic);
-	else
-	    axis_array[axis].max = tic * floor(axis_array[axis].max / tic);
+	axis_array[axis].max =
+	    round_outward(axis, 
+			  axis_array[axis].min < axis_array[axis].max,
+			  axis_array[axis].max);
     }
 
     /* Set up ticfmt[axis] correctly. If necessary (time axis, but not
      * time/date output format), make up a formatstring that suits the
      * range of data */
     copy_or_invent_formatstring(axis);
-
-    /* BUGFIX HBB 20010831: for time/date axes, if an explicit
-     * stepsize was set, timelevel[axis] wasn't defined, leading to
-     * strange misbehaviours of minor tics on time axes. This would
-     * usually be used to redefine the 'tic' interval, but as a side
-     * effect, it defines ticlevel[axis]. */
-    if (axis_array[axis].is_timedata && ticdef->type == TIC_SERIES)
-	    quantize_time_tics(axis, tic,
-			       axis_array[axis].max - axis_array[axis].min,
-			       20);
-    
 }
 
 /*{{{  gen_tics */

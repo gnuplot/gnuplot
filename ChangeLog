@@ -1,12 +1,23 @@
+2001-12-04  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/axis.c (setup_tics): Went over automatic ticmark extension
+ 	of axis endpints.  Moved calculation of timelevel[axis] before the
+ 	tic extension.
+	(round_outward): New function. Extracted and recombined code from
+ 	setup_tics, that handled ticmark extension. Extended to handle
+ 	time/date axes with their slightly irregular tic steps.
+	(make_auto_time_minitics): Added cast to int to quell unsigned
+ 	comparison warning.
+
 2001-12-04  Alexander Mai <st002279@hrzpub.tu-darmstadt.de>
 
-	* src/fit.c: Fix buffer overflows regarding env vars
-	used for fitting.
+	* src/fit.c: Fix buffer overflows regarding env vars used for
+ 	fitting.
 
 2001-12-03  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
-	* src/save.c (save_set_all): Put #ifdef PM3D around pm3d-only
- 	code regions.
+	* src/save.c (save_set_all): Put #ifdef PM3D around pm3d-only code
+ 	regions.
 
 	* src/show.c (show_command): Dito.
 
