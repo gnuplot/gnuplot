@@ -12,6 +12,11 @@
 ;; This file is not part of GNU Emacs.
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; This program is free software; you can redistribute it and/or modify
+;; it under the terms of the GNU General Public License as published by
+;; the Free Software Foundation; either version 2, or (at your option)
+;; any later version.
+;;
 ;; This lisp script is distributed in the hope that it will be useful,
 ;; but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
@@ -19,6 +24,11 @@
 ;; Permission is granted to distribute copies of this lisp script
 ;; provided the copyright notice and this permission are preserved in
 ;; all copies.
+;;
+;; You should have received a copy of the GNU General Public License
+;; along with this program; if not, you can either send email to this
+;; program's maintainer or write to: The Free Software Foundation,
+;; Inc.; 675 Massachusetts Avenue; Cambridge, MA 02139, USA.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; send bug reports to the authors (ravel@phys.washington.edu)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -1674,6 +1684,8 @@ is non-nil if this is a 'range widget."
   "A link to an info file for the Gnuplot GUI."
   :action '(lambda (widget &optional event)
 	     (let ((gnuplot-info-display 'frame))
+	       (if gnuplot-keywords-pending		; <HW>
+		   (gnuplot-setup-info-look))
 	       (gnuplot-info-lookup-symbol (widget-value widget)
 					   'gnuplot-mode))))
 

@@ -5,13 +5,18 @@
 ;; Author:     Bruce Ravel <ravel@phys.washington.edu> and Phil Type
 ;; Maintainer: Bruce Ravel <ravel@phys.washington.edu>
 ;; Created:    June 28 1998
-;; Updated:    May 27 1999
-;; Version:    0.5g
+;; Updated:    September 9 1999
+;; Version:    0.5j
 ;; Keywords:   gnuplot, plotting
 
 ;; This file is not part of GNU Emacs.
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; This program is free software; you can redistribute it and/or modify
+;; it under the terms of the GNU General Public License as published by
+;; the Free Software Foundation; either version 2, or (at your option)
+;; any later version.
+;;
 ;; This lisp script is distributed in the hope that it will be useful,
 ;; but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
@@ -19,6 +24,11 @@
 ;; Permission is granted to distribute copies of this lisp script
 ;; provided the copyright notice and this permission are preserved in
 ;; all copies.
+;;
+;; You should have received a copy of the GNU General Public License
+;; along with this program; if not, you can either send email to this
+;; program's maintainer or write to: The Free Software Foundation,
+;; Inc.; 675 Massachusetts Avenue; Cambridge, MA 02139, USA.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; send bug reports to the authors (ravel@phys.washington.edu)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -224,12 +234,27 @@
 ;;        accordingly.  Added `gnuplot-program-version' variable.
 ;;        Check that font-lock is actually a feature, as suggested by
 ;;        <KL>
+;;  0.5h  Aug 15 1999 <BR> Added `gnuplot-determine-gnuplot-version' so
+;;        that the gnuplot version number and `comint-process-echos'
+;;        actually get set correctly.  Actually, the first time
+;;        something is plotted, the echoing might not work, but the
+;;        second time it will.
+;;  0.5i  Sep  2 1999 <BR> Once again changed how
+;;        `comint-process-echos' gets set.  Maybe I got it right this
+;;        time?  Also fixed certain situations where the info file
+;;        did notget properly loaded (insertion with info toggle on
+;;        and info button in GUI).
+;;  0.5j  Sep  9 1999 <BR> Do a more robust check for the gnuplot
+;;        process before killing the gnuplot buffer, ass suggested by
+;;        <SE>.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Acknowledgements:
 ;;    David Batty      <DB> (numerous corrections)
 ;;    Laurent Bonnaud  <LB> (suggestions regarding font-lock rules)
 ;;    Markus Dickebohm <MD> (suggested `gnuplot-send-line-and-forward')
-;;    Stephen Eglan    <SE> (suggested the use of info-look)
+;;    Stephen Eglan    <SE> (suggested the use of info-look,
+;;                           contributed a bug fix regarding shutting
+;;                           down the gnuplot process)
 ;;    Kuang-Yu Liu     <KL> (pointed out buggy dependence on font-lock)
 ;;    Hrvoje Niksic    <HN> (help with defcustom arguments for insertions)
 ;;    Michael Sanders  <MS> (help with the info-look interface)
@@ -309,7 +334,7 @@
 (defconst gnuplot-maintainer-email "ravel@phys.washington.edu")
 (defconst gnuplot-maintainer-url
   "http://feff.phys.washington.edu/~ravel/gnuplot/")
-(defconst gnuplot-version "0.5g")
+(defconst gnuplot-version "0.5j")
 
 (defgroup gnuplot nil
   "Gnuplot-mode for Emacs."
@@ -404,7 +429,8 @@ useful for functions included in `gnuplot-after-plot-hook'.")
   "*The name of the gnuplot executable."
   :group 'gnuplot
   :type 'string)
-(defvar gnuplot-program-version nil)
+(defvar gnuplot-program-version nil
+  "This is gnuplot-mode's stab at determining gnuplot's version number.")
 (defcustom gnuplot-process-name "gnuplot"
   "Name given to the gnuplot buffer and process."
   :group 'gnuplot
@@ -580,9 +606,9 @@ you're not using that musty old thing, are you..."
 	["Swap plot/splot/fit lists in GUI" gnuplot-gui-swap-simple-complete
 	 (fboundp 'gnuplot-gui-swap-simple-complete)]
 	"---"
-	["Customize gnuplot"        gnuplot-customize t]
-	["Kill gnuplot"             gnuplot-kill-gnuplot-buffer t]
-	["Gnuplot version"          gnuplot-show-version t]
+	["Customize gnuplot"         gnuplot-customize t]
+	["Kill gnuplot"              gnuplot-kill-gnuplot-buffer t]
+	["Show gnuplot-mode version" gnuplot-show-version t]
 	;;["Submit bug report"        gnuplot-bug-report t]
 	))
 
@@ -1505,6 +1531,8 @@ nil, 'line, 'region, 'buffer, or 'file.  TEXT may be useful for
 functions in `gnuplot-after-plot-hook'.  `gnuplot-after-plot-hook' is
 called by this function after all of STRING is sent to gnuplot."
   (gnuplot-make-gnuplot-buffer)	; make sure a gnuplot buffer exists
+  (if gnuplot-program-version ()
+    (gnuplot-determine-gnuplot-version))
   (setq gnuplot-comint-recent-buffer (current-buffer))
   (if (equal gnuplot-display-process 'frame)
       (or (and gnuplot-process-frame
@@ -1687,34 +1715,41 @@ buffer.  Further customization is possible via
 	(message "Starting gnuplot plotting program...")
 	(setq gnuplot-buffer (make-comint gnuplot-process-name gnuplot-program)
 	      gnuplot-process (get-process gnuplot-process-name))
-	;; need to give emacs enough time to display gnuplot start-up
-	;; message so I can determine gnuplot's version number
-	(sleep-for 0.2) (sit-for 0)
 	(process-kill-without-query gnuplot-process nil)
 	(save-excursion
 	  (set-buffer gnuplot-buffer)
 	  (make-local-hook 'kill-buffer-hook)
 	  (add-hook 'kill-buffer-hook 'gnuplot-close-down nil t)
 	  (gnuplot-comint-start-function)
-
           (make-local-variable 'comint-output-filter-functions)
           (setq comint-output-filter-functions
                 (append comint-output-filter-functions
                         '(comint-postoutput-scroll-to-bottom
                           gnuplot-protect-prompt-fn)))
-	(message "Starting gnuplot plotting program...Done")
-	(save-excursion
-	  (set-buffer gnuplot-buffer)
- 	  (goto-char (point-min))
-	  (if (search-forward "version" (point-max) t)
-	      (progn
-		(cond ((looking-at "\\s-*3.7")
-		       (setq comint-process-echoes t
-			     gnuplot-program-version "3.7"))
-		      (t
-		       (setq comint-process-echoes nil
-			     gnuplot-program-version "3.5") )))
-	    (setq comint-process-echoes gnuplot-echo-command-line-flag))) ))))
+	(message "Starting gnuplot plotting program...Done")))))
+
+(defun gnuplot-determine-gnuplot-version ()
+  "Figure out which version of gnuplot we are running."
+  (let ((counter 0))
+    (save-excursion
+      (set-buffer gnuplot-buffer)
+      (goto-char (point-min))
+      ;; it may take a while for emacs to display the gnuplot start-up
+      ;; message.  since we need this to determine the version number
+      ;; and hence the value of `comint-process-echoes', we must wait
+      ;; for this to happen.
+      (while (and (equal (point-max) (point-min)) (< 10 counter))
+	(1+ counter)
+	(sleep-for 0.1))
+      (if (search-forward "version" (point-max) t)
+	  (progn
+	    (cond ((looking-at "\\s-*3.7")
+		   (setq comint-process-echoes nil          ;; t
+			 gnuplot-program-version "3.7"))
+		  (t
+		   (setq comint-process-echoes nil
+			 gnuplot-program-version "3.5") )))
+	(setq comint-process-echoes gnuplot-echo-command-line-flag)))))
 
 (defun gnuplot-protect-prompt-fn (string)
   "Prevent the Gnuplot prompt from being deleted or overwritten.
@@ -1736,7 +1771,8 @@ STRING is the text as originally inserted in the comint buffer."
 
 (defun gnuplot-close-down ()
   "Tidy up when deleting the gnuplot buffer."
-  (kill-process gnuplot-process)
+  (if (eq (process-status gnuplot-process) 'run);; <SE>
+      (kill-process gnuplot-process))
   (setq gnuplot-process nil
         gnuplot-buffer nil))
 
@@ -1751,7 +1787,8 @@ This is very similar to `comint-delchar-or-maybe-eof'."
 (defun gnuplot-kill-gnuplot-buffer ()
   "Kill the gnuplot process and its display buffers."
   (interactive)
-  (if (and gnuplot-process (get-process gnuplot-process))
+  (if (and gnuplot-process
+	   (eq (process-status gnuplot-process) 'run))  ;; <SE>
       (kill-process gnuplot-process))
   (if (and gnuplot-buffer (get-buffer gnuplot-buffer))
       (progn
@@ -1936,7 +1973,8 @@ See the comments in `gnuplot-info-hook'."
 	  ;; user will not want them lying around
 	  (and (get-buffer "info dir")    (kill-buffer "info dir"))
 	  (and (get-buffer "info dir<2>") (kill-buffer "info dir<2>")))
-	(setq gnuplot-keywords (gnuplot-set-keywords-list))	)
+	(setq gnuplot-keywords (gnuplot-set-keywords-list))
+	)
 
     ;; or do something sensible if info-look is not installed
     (defun info-lookup-interactive-arguments (symbol)
@@ -2063,8 +2101,9 @@ shown."
     (cond ((and (fboundp 'gnuplot-gui-set-options-and-insert)
 		gnuplot-gui-popup-flag)
 	   (gnuplot-gui-set-options-and-insert))
-	  ((and (fboundp 'info-lookup-symbol)
-		gnuplot-insertions-show-help-flag)
+	  (gnuplot-insertions-show-help-flag
+	   (if gnuplot-keywords-pending		; <HW>
+	       (gnuplot-setup-info-look))
 	   (gnuplot-info-lookup-symbol topic)) ) ))
 
 (defun gnuplot-toggle-info-display ()
@@ -2129,6 +2168,7 @@ maintainer of `gnuplot-mode'."
 	     gnuplot-gui-plot-splot-fit-style
 	     ;; plus a few more...
 	     gnuplot-comint-recent-buffer
+	     gnuplot-version
 	     Info-directory-list
 	     exec-path
 	     features ))
@@ -2185,21 +2225,17 @@ as the GUI) to setting arguments to plot options.  Here is a list:
  1.  Currently there is no way for `gnuplot-mode' to know if information
      sent to gnuplot was correctly plotted.
  2.  Indentation is sometimes a bit flaky.
- 3.  Command line echoing in the comint buffer should sometimes be on
-     and sometimes off, but I don't quite understand how to determine
-     this.  I think setting `gnuplot-echo-command-line-flag' to nil is
-     better, but try setting it to t and see which works better.
- 4.  \"plot\", \"splot\", and \"fit\" are handled in the GUI, but are
+ 3.  \"plot\", \"splot\", and \"fit\" are handled in the GUI, but are
      a bit flaky.  Their arguments may not be read correctly from
      existing text, and continuation lines (common for plot and splot)
      are not supported.
- 5.  The GUI does not know how to read from continuation lines.
- 6.  Comma separated position arguments to plot options are
+ 4.  The GUI does not know how to read from continuation lines.
+ 5.  Comma separated position arguments to plot options are
      unsupported in the GUI.  Colon separated datafile modifiers (used
      for plot, splot, and fit) are not supported either.  Arguments
      not yet supported by the GUI generate messages printed in grey
      text.
- 7.  The GUI handling of \"hidden3d\" is flaky and \"cntrparam\" is
+ 6.  The GUI handling of \"hidden3d\" is flaky and \"cntrparam\" is
      unsupported.
 
 			    ------O------
@@ -2275,8 +2311,8 @@ following in your .emacs file:
 (defun gnuplot-show-version ()
   "Show version number in echo area"
   (interactive)
-  (message "gnuplot-mode %s -- report bugs with %S" gnuplot-version
-	   (substitute-command-keys "\\[gnuplot-bug-report]")))
+  (message "gnuplot-mode %s -- URL: %s" gnuplot-version gnuplot-maintainer-url))
+
 
 ;;; That's it! ----------------------------------------------------------------
 
