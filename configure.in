@@ -146,9 +146,11 @@ fi
 dnl Operating systems.
 dnl FIXME AC_DEFINE(ISC22)
 dnl FIXME AC_DEFINE(KSR)
-dnl Check for MSDOS and djgpp, NeXT
+dnl Check for MSDOS and djgpp, NeXT, BeOS
 gp_MSDOS
 gp_NEXT
+gp_BEOS
+AC_SUBST(GNUPLOT_BE)
 
 dnl this has to be after -lsys_s on NeXT
 LIBS="$LIBS -lm"
@@ -160,12 +162,16 @@ dnl configure's HAVE_XXXX defines are translated into NO_XXXX for ANSI
 dnl headers and functions
 AC_HEADER_STDC
 
-dnl Standard headers
-AC_CHECK_HEADERS(errno.h float.h limits.h locale.h math.h stdlib.h string.h \
-  time.h sys/time.h sys/timeb.h sys/types.h)
-dnl other
-AC_CHECK_HEADERS(sys/bsdtypes.h sys/select.h sys/socket.h sys/stat.h \
-  sys/systeminfo.h sys/utsname.h libc.h malloc.h sgtty.h termios.h values.h)
+dnl Header files
+dnl ANSI/ISO C, POSIX, others
+AC_CHECK_HEADERS([
+  errno.h float.h limits.h locale.h math.h stdlib.h string.h \
+  time.h sys/time.h sys/timeb.h sys/types.h \
+  sys/bsdtypes.h sys/ioctl.h sys/select.h sys/socket.h \
+  sys/stat.h sys/systeminfo.h sys/utsname.h \
+  libc.h malloc.h sgtty.h termios.h values.h
+])
+
 test "$ac_cv_header_sys_stat_h" = yes && AC_HEADER_STAT
 
 dnl check if unistd actually declares anything. On NeXT 3.2 unistd is
@@ -194,15 +200,21 @@ AC_TYPE_SIGNAL
 
 dnl Functions. Standard first, then others
 
+dnl ANSI/ISO and their predecessors
 dnl sunos 4 has on_exit() in place of atexit()
-AC_CHECK_FUNCS(atexit on_exit memcpy memmove memset bcopy bzero setvbuf \
-  strerror strchr index strrchr rindex strstr)
-
 dnl gamma is called lgamma on apollos and linux
 dnl we prefer lgamma over gamma, see specfun.c
 dnl math lib is already available, see operating systems part
-AC_CHECK_FUNCS(erf erfc gamma lgamma getcwd pclose popen sleep snprintf \
-  strncasecmp strnicmp sysinfo tcgetattr)
+AC_CHECK_FUNCS([
+  atexit memcpy memmove memset \
+  on_exit bcopy bzero \
+  setvbuf strerror strchr strrchr strstr \
+  index rindex \
+  erf erfc gamma lgamma \
+  getcwd pclose popen sleep snprintf \
+  strncasecmp strnicmp sysinfo tcgetattr
+])
+
 if test "$ac_cv_func_pclose" = yes && test "$ac_cv_func_popen" = yes ; then
   AC_DEFINE(PIPES)
 fi
@@ -358,10 +370,10 @@ You lose.
 fi
 dnl end png and z
 
-dnl create list of terminals
+dnl create list of terminal drivers
 AC_MSG_CHECKING([terminal driver sources])
 ( cd $srcdir/term && for i in *.trm ; do echo '${srcdir}'/../term/$i ; done )\
- |(tr '\012' @; echo) |sed 's/@$/%/;s/@/ \\@/g' |tr @% '\012\012' >termlist
+ |tr '\012' @ |sed 's/@$/%/;s/@/ \\@/g' |tr @% '\012\012' >termlist
 TERM_LIST=termlist
 AC_SUBST_FILE(TERM_LIST)
 if test -s termlist ; then

@@ -33,6 +33,7 @@
 # N as the prefix for NeXT (eg NeXT/)
 # P as the prefix for OS/2 (eg os2/)
 # W as the prefix for Windows (eg win/)
+# B as the prefix for BeOS (eg beos/)
 
 ####################################################################
 # List of object files except version.$(O)
@@ -57,11 +58,11 @@ HEADERS = alloc.h ansichek.h binary.h bitmap.h fit.h fnproto.h help.h \
 	  matrix.h national.h plot.h protos.h setshow.h stdfn.h syscfg.h term.h
 
 CORETERM = $(T)aed.trm $(T)ai.trm $(T)amiga.trm $(T)apollo.trm \
-	   $(T)atariaes.trm $(T)atarivdi.trm $(T)cgi.trm $(T)cgm.trm \
-	   $(T)compact.c $(T)corel.trm $(T)debug.trm $(T)djsvga.trm \
-	   $(T)driver.h $(T)dumb.trm $(T)dxf.trm $(T)dxy.trm $(T)eepic.trm \
-	   $(T)emxvga.trm $(T)epson.trm $(T)excl.trm $(T)fg.trm $(T)fig.trm \
-	   $(T)gif.trm $(T)gnugraph.trm $(T)gpic.trm $(T)gpr.trm \
+	   $(T)atariaes.trm $(T)atarivdi.trm $(T)be.trm $(T)cgi.trm \
+	   $(T)cgm.trm $(T)compact.c $(T)corel.trm $(T)debug.trm \
+	   $(T)djsvga.trm $(T)driver.h $(T)dumb.trm $(T)dxf.trm $(T)dxy.trm \
+	   $(T)eepic.trm $(T)emxvga.trm $(T)epson.trm $(T)excl.trm $(T)fg.trm \
+	   $(T)fig.trm $(T)gif.trm $(T)gnugraph.trm $(T)gpic.trm $(T)gpr.trm \
 	   $(T)grass.trm $(T)hp26.trm $(T)hp2648.trm $(T)hp500c.trm \
 	   $(T)hpgl.trm $(T)hpljii.trm $(T)hppj.trm $(T)imagen.trm \
 	   $(T)impcodes.h $(T)iris4d.trm $(T)kyo.trm $(T)latex.trm \
@@ -88,6 +89,11 @@ NEXTSRC  = $(N)Controller.h $(N)Controller.m $(N)GnuTerm.iconheader \
 	   $(N)English.lproj/gnuview.nib/data.classes \
 	   $(N)English.lproj/gnuview.nib/data.nib \
 	   $(N)English.lproj/gnuview.nib/smaller.tiff
+
+BEOSSRC = $(B)GPApp.cpp $(B)GPApp.h $(B)GPBitmap.cpp $(B)GPBitmap.h \
+	  $(B)GPView.cpp $(B)GPView.h $(B)GPWindow.cpp $(B)GPWindow.h \
+	  $(B)Makefile.in $(B)XStringList.cpp $(B)XStringList.h \
+	  $(B)constants.h $(B)makefile
 
 OS2SRC = $(P)dialogs.c $(P)dialogs.h $(P)gclient.c $(P)gnuplot.ico \
 	 $(P)gnupmdrv.c $(P)gnupmdrv.def $(P)gnupmdrv.h $(P)gnupmdrv.ipf \
@@ -121,7 +127,7 @@ ETC =   0BUGS 0FAQ 0INSTALL 0PORTING 0README ChangeLog CodeStyle Copyright \
 	INSTALL.gnu Makefile.in NEWS PGPKEYS TODO acconfig.h $(ACLOCAL_M4) \
 	amiga.c buildvms.com commitvers $(CONFIG_HEADER_IN) configure \
 	configure.in corgraph.asm corplot.c ctrl87.c ctrl87.h descrip.mms \
-	djconfig.sh errorfix.sh genopt.com gnuplot.def gnuplot.el gnuplot.opt \
+	djconfig.sh errorfix.sh genopt.com gnuplot.def gnuplot.opt \
 	gnuplot.prj header.mac hrcgraph.asm install-sh intergra.x11 lasergnu \
 	lineproc.mac linkopt.vms linkopt.ztc make_vms.com makefile.286 \
 	makefile.all makefile.amg makefile.ami makefile.cyg makefile.dj2 \
@@ -129,7 +135,7 @@ ETC =   0BUGS 0FAQ 0INSTALL 0PORTING 0README ChangeLog CodeStyle Copyright \
 	makefile.msw makefile.mto makefile.nt makefile.os2 makefile.os9 \
 	makefile.st makefile.tc makefile.unx makefile.vms makefile.wc \
 	makefile.win makefile.ztc missing mkinstalldirs os9.c pcgraph.asm \
-	rgipgnu stamp-h.in strftime.c vms.c m4/msdos.m4 m4/next.m4 \
+	rgipgnu stamp-h.in strftime.c vms.c m4/beos.m4 m4/msdos.m4 m4/next.m4 \
 	m4/search-hdr.m4 m4/search-lib.m4 m4/select.m4 $(T)README
 
 # Documentation and help files

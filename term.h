@@ -90,6 +90,12 @@
 #endif
 
 
+/* BeOS */
+#ifdef __BEOS__
+# include "be.trm"
+#endif
+
+
 /****************************************************************************/
 /* MS-DOS and Windows */
 #if defined(MSDOS) || defined(_Windows)

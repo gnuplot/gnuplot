@@ -8,7 +8,7 @@
 
 # default target
 
-all: @ERRORFIX@ gnuplot @GNUPLOT_X11@ doc demo/binary1
+all: @ERRORFIX@ gnuplot @GNUPLOT_X11@ @GNUPLOT_BE@ doc demo/binary1
 
 
 # this tells GNU make not to export variables into the environment
@@ -157,6 +157,7 @@ E=$(srcdir)/lisp/
 N=$(srcdir)/NeXT/
 P=$(srcdir)/os2/
 W=$(srcdir)/win/
+B=$(srcdir)/beos/
 
 #standard unix make does not support included makefiles.
 #we inline the contents of makefile.all here
@@ -198,6 +199,7 @@ W=$(srcdir)/win/
 # N as the prefix for NeXT (eg NeXT/)
 # P as the prefix for OS/2 (eg os2/)
 # W as the prefix for Windows (eg win/)
+# B as the prefix for BeOS (eg beos/)
 
 ####################################################################
 # List of object files except version.$(O)
@@ -222,11 +224,11 @@ HEADERS = alloc.h ansichek.h binary.h bitmap.h fit.h fnproto.h help.h \
 	  matrix.h national.h plot.h protos.h setshow.h stdfn.h syscfg.h term.h
 
 CORETERM = $(T)aed.trm $(T)ai.trm $(T)amiga.trm $(T)apollo.trm \
-	   $(T)atariaes.trm $(T)atarivdi.trm $(T)cgi.trm $(T)cgm.trm \
-	   $(T)compact.c $(T)corel.trm $(T)debug.trm $(T)djsvga.trm \
-	   $(T)driver.h $(T)dumb.trm $(T)dxf.trm $(T)dxy.trm $(T)eepic.trm \
-	   $(T)emxvga.trm $(T)epson.trm $(T)excl.trm $(T)fg.trm $(T)fig.trm \
-	   $(T)gif.trm $(T)gnugraph.trm $(T)gpic.trm $(T)gpr.trm \
+	   $(T)atariaes.trm $(T)atarivdi.trm $(T)be.trm $(T)cgi.trm \
+	   $(T)cgm.trm $(T)compact.c $(T)corel.trm $(T)debug.trm \
+	   $(T)djsvga.trm $(T)driver.h $(T)dumb.trm $(T)dxf.trm $(T)dxy.trm \
+	   $(T)eepic.trm $(T)emxvga.trm $(T)epson.trm $(T)excl.trm $(T)fg.trm \
+	   $(T)fig.trm $(T)gif.trm $(T)gnugraph.trm $(T)gpic.trm $(T)gpr.trm \
 	   $(T)grass.trm $(T)hp26.trm $(T)hp2648.trm $(T)hp500c.trm \
 	   $(T)hpgl.trm $(T)hpljii.trm $(T)hppj.trm $(T)imagen.trm \
 	   $(T)impcodes.h $(T)iris4d.trm $(T)kyo.trm $(T)latex.trm \
@@ -253,6 +255,11 @@ NEXTSRC  = $(N)Controller.h $(N)Controller.m $(N)GnuTerm.iconheader \
 	   $(N)English.lproj/gnuview.nib/data.classes \
 	   $(N)English.lproj/gnuview.nib/data.nib \
 	   $(N)English.lproj/gnuview.nib/smaller.tiff
+
+BEOSSRC = $(B)GPApp.cpp $(B)GPApp.h $(B)GPBitmap.cpp $(B)GPBitmap.h \
+	  $(B)GPView.cpp $(B)GPView.h $(B)GPWindow.cpp $(B)GPWindow.h \
+	  $(B)Makefile.in $(B)XStringList.cpp $(B)XStringList.h \
+	  $(B)constants.h $(B)makefile
 
 OS2SRC = $(P)dialogs.c $(P)dialogs.h $(P)gclient.c $(P)gnuplot.ico \
 	 $(P)gnupmdrv.c $(P)gnupmdrv.def $(P)gnupmdrv.h $(P)gnupmdrv.ipf \
@@ -294,7 +301,7 @@ ETC =   0BUGS 0FAQ 0INSTALL 0PORTING 0README ChangeLog CodeStyle Copyright \
 	makefile.msw makefile.mto makefile.nt makefile.os2 makefile.os9 \
 	makefile.st makefile.tc makefile.unx makefile.vms makefile.wc \
 	makefile.win makefile.ztc missing mkinstalldirs os9.c pcgraph.asm \
-	rgipgnu stamp-h.in strftime.c vms.c m4/msdos.m4 m4/next.m4 \
+	rgipgnu stamp-h.in strftime.c vms.c m4/beos.m4 m4/msdos.m4 m4/next.m4 \
 	m4/search-hdr.m4 m4/search-lib.m4 m4/select.m4 $(T)README
 
 # Documentation and help files
@@ -362,6 +369,7 @@ install: all $(LASERGNU)
 	$(srcdir)/mkinstalldirs $(mandir)/man1
 	$(INSTALL_PROGRAM) gnuplot $(bindir)/gnuplot
 	test ! -f gnuplot_x11 || $(INSTALL_PROGRAM) gnuplot_x11 $(bindir)/gnuplot_x11
+	test ! -f beos/gnuplot_be || $(INSTALL_PROGRAM) beos/gnuplot_be $(bindir)/gnuplot_be
 	-$(INSTALL_DATA) $(srcdir)/docs/gnuplot.1 $(mandir)/man1/gnuplot.1
 	-cd docs && $(MAKE) $(MFLAGS) install
 	@LINUXSUID@
@@ -373,7 +381,7 @@ lasergnu_install: lasergnu docs/lasergnu.1
 lasergnu_noinstall:
 
 uninstall:
-	rm -f $(bindir)/gnuplot $(bindir)/gnuplot_x11
+	rm -f $(bindir)/gnuplot $(bindir)/gnuplot_x11 $(bindir)/gnuplot_be
 	rm -f $(mandir)/man1/gnuplot.1 $(mandir)/man1/lasergnu.1
 	cd docs && $(MAKE) $(MFLAGS)
 
@@ -388,6 +396,11 @@ gnuplot: $(OBJS) version.o
 
 gnuplot_x11: gplt_x11.o stdfn.o
 	$(LINK) gplt_x11.o stdfn.o $(XLIBS) $(LIBS)
+
+$(B)/gnuplot_be : 
+	cd $(B) && make $(MFLAGS)
+
+gnuplot_be: $(B)/gnuplot_be
 
 doc:
 	cd docs && $(MAKE) $(MFLAGS) gnuplot.gih
@@ -430,8 +443,8 @@ Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	cd $(top_builddir) \
 	  && CONFIG_FILES=$@ CONFIG_HEADERS= $(SHELL) ./config.status
 
-$(ACLOCAL_M4): configure.in m4/msdos.m4 m4/next.m4 m4/search-hdr.m4 \
-		m4/search-lib.m4
+$(ACLOCAL_M4): configure.in m4/beos.m4 m4/msdos.m4 m4/next.m4 \
+		m4/search-hdr.m4 m4/search-lib.m4
 	cd $(srcdir) && $(ACLOCAL) $(ACLOCAL_AMFLAGS)
 
 config.status: $(srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
@@ -457,13 +470,13 @@ $(srcdir)/stamp-h.in: $(top_srcdir)/configure.in $(ACLOCAL_M4) acconfig.h
 # Miscellaneous targets
 
 SOURCES = $(HEADERS) $(CSOURCE) $(CSOURCE8) $(CORETERM) $(NEXTSRC) \
-	  $(OS2SRC) $(WINDOWS)
+	  $(OS2SRC) $(BEOSSRC) $(WINDOWS)
 
 DISTFILES = $(ETC) $(SOURCES) $(DEMOS) $(DOCS) $(LISP)
 
 SUBDIRS = NeXT NeXT/English.lproj NeXT/English.lproj/GnuTerm.nib \
-	  NeXT/English.lproj/gnuview.nib demo docs docs/latextut docs/old \
-	  docs/ps lisp lisp/old m4 os2 term win
+	  NeXT/English.lproj/gnuview.nib beos demo docs docs/latextut \
+	docs/old docs/ps lisp lisp/old m4 os2 term win
 
 clean:
 	rm -f gnuplot gnuplot_x11 bf_test *.o core *~
