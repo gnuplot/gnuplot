@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: color.c,v 1.40 2003/11/11 06:07:41 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: color.c,v 1.41 2003/11/13 08:18:15 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - color.c */
@@ -418,8 +418,8 @@ cbtick_callback(axis, place, text, grid)
     /* calculate tic position */
     if (color_box.rotation == 'h') {
 	x1 = x2 = cb_x_from + cb_place * (cb_x_to - cb_x_from);
-	y1 = cb_y_to;
-	y2 = cb_y_to + len;
+	y1 = cb_y_from;
+	y2 = cb_y_from - len;
     } else {
 	x1 = cb_x_to;
 	x2 = cb_x_to + len;
@@ -478,8 +478,8 @@ cbtick_callback(axis, place, text, grid)
     /* draw tic on the mirror side */
     if (CB_AXIS.ticmode & TICS_MIRROR) {
 	if (color_box.rotation == 'h') {
-	    y1 = cb_y_from;
-	    y2 = cb_y_from - len;
+	    y1 = cb_y_to;
+	    y2 = cb_y_to + len;
 	} else {
 	    x1 = cb_x_from;
 	    x2 = cb_x_from - len;
