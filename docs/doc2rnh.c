@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: doc2rnh.c,v 1.8 1999/06/11 18:51:01 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: doc2rnh.c,v 1.9 1999/06/14 19:17:08 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - doc2rnh.c */
@@ -69,7 +69,7 @@ static char *RCSid() { return RCSid("$Id: doc2rnh.c,v 1.8 1999/06/11 18:51:01 lh
 #include "stdfn.h"
 #include "doc2x.h"
 
-extern boolean single_top_level;
+extern TBOOLEAN single_top_level;
 
 #define LINE_SKIP		3
 #define DSR_RM		70
@@ -82,9 +82,9 @@ void putrnh __PROTO((char *, FILE *));
 void putrnh_ __PROTO((char *, FILE *));
 void finish __PROTO((FILE *));
 
-static boolean intable = FALSE;
-static boolean rnh_table = FALSE;
-static boolean initial_entry = FALSE;
+static TBOOLEAN intable = FALSE;
+static TBOOLEAN rnh_table = FALSE;
+static TBOOLEAN initial_entry = FALSE;
 
 int
 main(argc, argv)

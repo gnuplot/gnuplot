@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: doc2tex.c,v 1.8 1998/10/19 13:18:05 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: doc2tex.c,v 1.9 1999/06/14 19:17:09 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - doc2tex.c */
@@ -69,8 +69,8 @@ void section __PROTO((char *, FILE *));
 void puttex __PROTO((char *, FILE *));
 void finish __PROTO((FILE *));
 
-static boolean intable = FALSE;
-static boolean verb = FALSE;
+static TBOOLEAN intable = FALSE;
+static TBOOLEAN verb = FALSE;
 
 int
 main(argc, argv)
@@ -260,7 +260,7 @@ FILE *file;
 register char *str;
 {
     register char ch;
-    static boolean inquote = FALSE;
+    static TBOOLEAN inquote = FALSE;
     int i;
 
     while ((ch = *str++) != NUL) {

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: doc2html.c,v 1.7 1998/10/28 21:04:09 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: doc2html.c,v 1.8 1999/06/14 19:17:08 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - doc2html.c */
@@ -61,7 +61,7 @@ static char *RCSid() { return RCSid("$Id: doc2html.c,v 1.7 1998/10/28 21:04:09 l
 #include "doc2x.h"
 #include "xref.h"
 
-static boolean debug = FALSE;
+static TBOOLEAN debug = FALSE;
 char title[256];
 
 void convert __PROTO((FILE *, FILE *));

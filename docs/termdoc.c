@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: termdoc.c,v 1.8 1998/11/03 12:47:57 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: termdoc.c,v 1.9 1999/06/14 19:17:09 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - termdoc.c */
@@ -56,7 +56,7 @@ static char *RCSid() { return RCSid("$Id: termdoc.c,v 1.8 1998/11/03 12:47:57 lh
  * Hmm - this is turning more and more into a preprocessor !
  * gnuplot.doc now has multiple top-level entries, but
  * some help systems (eg VMS) cannot tolerate this.
- * As a complete bodge, conditional on boolean single_top_level == TRUE,
+ * As a complete bodge, conditional on TBOOLEAN single_top_level == TRUE,
  * we accept only the first 1, and map any subsequent 1's to 2's
  * At present, this leaves a bogus, empty section called
  * commands, but that's a small price to pay to get it
@@ -80,7 +80,7 @@ static char *RCSid() { return RCSid("$Id: termdoc.c,v 1.8 1998/11/03 12:47:57 lh
 int termdoc_lineno;
 char termdoc_filename[80];
 
-boolean single_top_level;
+TBOOLEAN single_top_level;
 
 char *
 get_line(buffer, max, fp)

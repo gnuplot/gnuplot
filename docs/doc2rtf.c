@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: doc2rtf.c,v 1.7 1999/03/30 15:19:13 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: doc2rtf.c,v 1.8 1999/06/14 19:17:08 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - doc2rtf.c */
@@ -59,7 +59,7 @@ static char *RCSid() { return RCSid("$Id: doc2rtf.c,v 1.7 1999/03/30 15:19:13 lh
 #include "doc2x.h"
 #include "xref.h"
 
-static boolean debug = FALSE;
+static TBOOLEAN debug = FALSE;
 
 void footnote __PROTO((int, char *, FILE *));
 void convert __PROTO((FILE *, FILE *));

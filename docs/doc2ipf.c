@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: doc2ipf.c,v 1.7 1998/10/19 13:17:45 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: doc2ipf.c,v 1.8 1999/06/14 19:17:08 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - doc2ipf.c */
@@ -80,7 +80,7 @@ int tablecols = 0;
 int tablewidth[MAX_COL] = {0, 0, 0, 0, 0, 0};	/* there must be the correct */
 int tablelines = 0;		/* number of zeroes here */
 
-static boolean debug = FALSE;
+static TBOOLEAN debug = FALSE;
 
 
 int

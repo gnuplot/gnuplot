@@ -1,5 +1,5 @@
 /*
- * $Id: $
+ * $Id: doc2x.h,v 1.3 1998/11/03 12:47:36 lhecking Exp $
  *
  */
 
@@ -38,7 +38,8 @@
 #ifndef DOCS_DOC2X_H
 # define DOCS_DOC2X_H
 
-typedef int boolean;
+/* TRUE or FALSE */
+typedef int TBOOLEAN;
 
 #ifdef TRUE
 # undef TRUE
