@@ -1,5 +1,5 @@
 /*
- * $Id: pslatex.trm,v 1.19 1999/06/19 20:30:55 lhecking Exp $
+ * $Id: pslatex.trm,v 1.20 1999/06/22 11:54:22 lhecking Exp $
  */
 
 /* GNUPLOT - pslatex.trm */
@@ -86,6 +86,9 @@ TERM_PUBLIC void PSLATEX_linewidth __PROTO((double width));
 #ifndef TERM_PROTO_ONLY
 
 #ifdef TERM_BODY
+
+#include "post.h"
+
 static int PSLATEX_angle;
 static int PSLATEX_justify;
 static int PSLATEX_rotate = TRUE;

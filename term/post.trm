@@ -1,5 +1,5 @@
 /*
- * $Id: post.trm,v 1.28 1999/06/25 17:07:55 lhecking Exp $
+ * $Id: post.trm,v 1.29 1999/07/05 13:10:54 lhecking Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -84,20 +84,6 @@ TERM_PUBLIC void PS_fillbox __PROTO((int style, unsigned int x1, unsigned int y1
 TERM_PUBLIC void PS_linewidth __PROTO((double linewidth)); /* JFi [linewidth] */
 TERM_PUBLIC void PS_pointsize __PROTO((double ptsize)); /* JFi [pointsize] */
 
-#define PS_POINT_TYPES 8
-#define PS_XOFF	50	/* page offset in pts */
-#define PS_YOFF	50
-#define PS_XMAX 7200 /* assumes landscape */
-#define PS_YMAX 5040
-#define PS_XLAST (PS_XMAX - 1)
-#define PS_YLAST (PS_YMAX - 1)
-#define PS_VTIC (PS_YMAX/80)
-#define PS_HTIC (PS_YMAX/80)
-#define PS_SC (10)				/* scale is 1pt = 10 units */
-#define	PS_LW (0.5*PS_SC)		/* linewidth = 0.5 pts */
-#define PS_VCHAR (14*PS_SC)		/* default is 14 point characters */
-#define PS_HCHAR (14*PS_SC*6/10)
-
 #endif
 
 
@@ -105,6 +91,8 @@ TERM_PUBLIC void PS_pointsize __PROTO((double ptsize)); /* JFi [pointsize] */
 
 #ifdef TERM_BODY
 /* PostScript driver by Russell Lang, rjl@monu1.cc.monash.edu.au */
+
+#include "post.h"
 
 /* From version.c */
 extern char gnuplot_version[];
@@ -126,9 +114,9 @@ static char ps_enh_font[MAX_ID_LEN+1];
 static int  ps_enh_fontsize;
 
 static TBOOLEAN ps_portrait = FALSE;				 /* vertical page */
-static TBOOLEAN ps_color = FALSE;
+/* static */ TBOOLEAN ps_color = FALSE;
 static TBOOLEAN ps_blacktext = FALSE;           /*  text always black  */
-static TBOOLEAN ps_solid = FALSE;   		/*  use solid lines */
+/* static */ TBOOLEAN ps_solid = FALSE;   		/*  use solid lines */
 static float ps_dash_length = 1.0;   /*  scale factor for dash-dot patterns  */
 static float ps_linewidth_factor = 1.0;   /*  scale factor for linewidth  */
 static TBOOLEAN ps_eps = FALSE;	/* Is this for an eps file? */
