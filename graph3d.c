@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: graph3d.c,v 1.13.2.2 1999/09/14 19:19:11 lhecking Exp $";
+static char *RCSid = "$Id: graph3d.c,v 1.13.2.3 1999/09/15 15:30:29 lhecking Exp $";
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -400,6 +400,9 @@ int count;
       if (ptitl_cnt > 0) {
 	/* calculate max no cols, limited by label-length */
 	key_cols = (int) (xright - xleft) / ((max_ptitl_len + 4) * (t->h_char) + key_sample_width);
+	/* HBB 991019: fix division by zero problem */
+	if (key_cols == 0)
+	    key_cols = 1;
 	key_rows = (int) (ptitl_cnt / key_cols) + ((ptitl_cnt % key_cols) > 0);
 	/* now calculate actual no cols depending on no rows */
 	key_cols = (int) (ptitl_cnt / key_rows) + ((ptitl_cnt % key_rows) > 0);
