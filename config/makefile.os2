@@ -94,14 +94,6 @@ DOCDIR  = ..\docs
 DEMODIR = ..\demo
 TERMDIR = ..\term
 
-OS2TERM= $(TERMDIR)\pm.trm
-ifdef X11
-	OS2TERM += $(TERMDIR)\x11.trm
-endif
-ifdef VESA
-	OS2TERM += $(TERMDIR)\emxvga.trm
-endif
-
 
 # where to place gnuplot.gih helpfile
 HELPFILE = gnuplot.gih
@@ -235,15 +227,12 @@ PLAINTEX = tex
 include makefile.all
 
 
-# Imporant dependency
-term.$(O): $(CORETERM) $(OS2TERM)
-
 #
 # Pre-defined sets of targets:
 #
 all:         runtime demo
 alldocs:     gnuplot.gih gnuplot.inf gnuplot.html gnuplot.info \
-             gnuplot.dvi gnuplot.ps
+             gnuplot.dvi gnuplot.ps gnuplot.pdf
 runtime:     binaries infomin gnuplot.inf
 infomin:     gnupmdrv.hlp gnuplot.gih
 demo:        $(M)binary1 $(M)binary2 $(M)binary3
@@ -254,7 +243,7 @@ binaries: gnuplot.exe gnupmdrv.exe
 endif
 
 OBJS = $(COREOBJS) version.$(O)
-term.$(O): $(OS2TERM) term.h
+term.$(O): $(CORETERM) term.h
 
 gnuplot.exe: $(OBJS)
 	$(CC) $(LDFLAGS) -o $@ $(OBJS) $(TERMLIBS) $(LIBS)
@@ -268,7 +257,7 @@ $(OS2DIR)\dialogs.$(O2):   $(OS2DIR)\dialogs.c    $(OS2DIR)\gnupmdrv.h  $(OS2DIR
 $(OS2DIR)\print.$(O2):     $(OS2DIR)\print.c      $(OS2DIR)\gnupmdrv.h
 $(OS2DIR)\gpexecute.$(O2): gpexecute.c            gpexecute.h
 $(OS2DIR)\gnupmdrv.res :   $(OS2DIR)\gnupmdrv.rc  $(OS2DIR)\gnuplot.ico $(OS2DIR)\dialogs.h
-	cd $(OS2DIR) & rc -r gnupmdrv.rc & cd ..
+	cd $(OS2DIR) && rc -r gnupmdrv.rc & cd ..
 
 OS2OBJ = $(OS2DIR)\gnupmdrv.$(O2) $(OS2DIR)\gclient.$(O2) $(OS2DIR)\print.$(O2) \
          $(OS2DIR)\dialogs.$(O2) gpexecute.$(O2)
@@ -306,23 +295,23 @@ gplt_x11.o: gplt_x11.c mouse.h gpexecute.h
 # Call LaTeX three times to get the toc right.
 gnuplot.dvi: gnuplot.tex
 	copy gnuplot.tex $(DOCDIR)\gnuplot_2.tex
-	cd $(DOCDIR) & $(LATEX) gnuplot_2.tex & $(LATEX) gnuplot_2.tex & $(LATEX) gnuplot_2.tex
+	cd $(DOCDIR) && $(LATEX) gnuplot_2.tex && $(LATEX) gnuplot_2.tex && $(LATEX) gnuplot_2.tex
 	move $(DOCDIR)\gnuplot_2.dvi gnuplot.dvi
 	del $(DOCDIR)\gnuplot_2*
 gnuplot.ps: gnuplot.dvi
 	$(DVIPS) -o gnuplot.ps gnuplot.dvi
 gnuplot.pdf: gnuplot.tex
 	copy gnuplot.tex $(DOCDIR)\gnuplot_2.tex
-	cd $(DOCDIR) & $(PDFLATEX) gnuplot_2.tex & $(PDFLATEX) gnuplot_2.tex & $(PDFLATEX) gnuplot_2.tex
+	cd $(DOCDIR) && $(PDFLATEX) gnuplot_2.tex && $(PDFLATEX) gnuplot_2.tex && $(PDFLATEX) gnuplot_2.tex
 	move $(DOCDIR)\gnuplot_2.pdf gnuplot.pdf
 	del $(DOCDIR)\gnuplot_2*
 gnuplot.tex:  $(DOCDIR)\gnuplot.doc doc2tex.exe
-	doc2tex $(DOCDIR)\gnuplot.doc gnuplot.tex
+	doc2tex.exe $(DOCDIR)\gnuplot.doc gnuplot.tex
 gnuplot.inf:  $(DOCDIR)\gnuplot.ipf
 	copy $(DOCDIR)\gnuplot.ipf .
 	ipfc /INF gnuplot.ipf
 gnuplot.gih:  $(DOCDIR)\gnuplot.doc doc2gih.exe
-	doc2gih $(DOCDIR)\gnuplot.doc gnuplot.gih
+	doc2gih.exe $(DOCDIR)\gnuplot.doc gnuplot.gih
 gnuplot.html: $(DOCDIR)\gnuplot.texi $(DOCDIR)\gnuplot.doc
 	$(MAKEINFO) --html -I$(DOCDIR) $(DOCDIR)\gnuplot.texi --no-split --output=$@
 gnuplot.info: $(DOCDIR)\gnuplot.texi $(DOCDIR)\gnuplot.doc
@@ -340,7 +329,7 @@ gpcard.ps: $(DOCDIR)\gpcard.dvi
 	$(DVIPS) -o gpcard_letter.ps $< 
 	psresize -pletter -Pa4 gpcard_letter.ps $@
 $(DOCDIR)\gpcard.dvi: $(DOCDIR)\gpcard.tex
-	cd $(DOCDIR) & $(PLAINTEX) gpcard.tex
+	cd $(DOCDIR) && $(PLAINTEX) gpcard.tex && $(PLAINTEX) gpcard.tex
 
 #
 # Tools for converting the documentation from docs\gnuplot.doc
@@ -356,7 +345,7 @@ doc2gih.exe doc2ipf.exe doc2html.exe doc2info.exe doc2tex.exe doc2rtf.exe: \
 
 $(DOCDIR)\allterm.h: $(CORETERM)
 #   echo > $@
-	cd $(TERMDIR) & type *.trm > $@
+	cd $(TERMDIR) && type *.trm > $@
 doc2gih.exe:  $(DOCDIR)\doc2gih.c $(DOCDIR)\termdoc.c $(OS2TERM)
 	$(CC3) $(CFLAGS3) $(TERMFLAGS) -DALL_TERM_DOC -o $@ $(DOCDIR)\doc2gih.c $(DOCDIR)\termdoc.c
 doc2ipf.exe:  $(DOCDIR)\doc2ipf.c $(DOCDIR)\termdoc.c $(DOCDIR)\xref.c $(OS2TERM)
@@ -370,46 +359,46 @@ doc2ms.exe:   $(DOCDIR)\doc2ms.c $(DOCDIR)\termdoc.c $(OS2TERM)
 #
 # Create binary demo files
 #
-$(M)binary1: $(M)bf_test.exe
-	cd $(DEMODIR) & bf_test.exe & cd ..
-$(M)binary2: $(M)bf_test.exe
-	cd $(DEMODIR) & bf_test.exe & cd ..
-$(M)binary3: $(M)bf_test.exe
-	cd $(DEMODIR) & bf_test.exe & cd ..
-$(M)bf_test.exe : bf_test.c binary.$(O) alloc.$(O)
-	$(CC3) $(CFLAGS3) -o $@ bf_test.c binary.$(O) alloc.$(O)
+$(M)binary1 $(M)binary2 $(M)binary3: $(M)bf_test.exe
+	cd $(DEMODIR) && bf_test.exe
+
+$(M)bf_test.exe : bf_test.c binary.$(O3) alloc.$(O3)
+	$(CC3) $(CFLAGS3) -o $@ bf_test.c binary.$(O3) alloc.$(O3)
+
 #
 # Clean up
 #
 
 # Clean up all files temporary used
 clean:
-	IF EXIST *.$(O)                  DEL *.$(O)
-	IF EXIST *.$(O2)                 DEL *.$(O2)
-	cd $(OS2DIR) & IF EXIST *.$(O2)  DEL *.$(O2)
-	IF EXIST $(OS2DIR)\gnupmdrv.res  DEL $(OS2DIR)\gnupmdrv.res
-	IF EXIST $(DEMODIR)\bf_test.exe  DEL $(DEMODIR)\bf_test.exe
-	IF EXIST doc2*.exe               DEL doc2*.exe
-	IF EXIST $(DOCDIR)\gnuplot.ipf   DEL $(DOCDIR)\gnuplot.ipf
-	IF EXIST core                    DEL core
-	IF EXIST $(DOCDIR)\allterm.h     DEL $(DOCDIR)\allterm.h
+	IF EXIST *.$(O)                    DEL *.$(O)
+	IF EXIST *.$(O2)                   DEL *.$(O2)
+	IF EXIST *.$(O3)                   DEL *.$(O3)
+	cd $(OS2DIR) && IF EXIST *.$(O2)   DEL *.$(O2)
+	IF EXIST $(OS2DIR)\gnupmdrv.res    DEL $(OS2DIR)\gnupmdrv.res
+	IF EXIST $(DEMODIR)\bf_test.exe    DEL $(DEMODIR)\bf_test.exe
+	IF EXIST doc2*.exe                 DEL doc2*.exe
+	IF EXIST $(DOCDIR)\gnuplot.ipf     DEL $(DOCDIR)\gnuplot.ipf
+	IF EXIST core                      DEL core
+	IF EXIST $(DOCDIR)\allterm.h       DEL $(DOCDIR)\allterm.h
 
 # Clean up ALL files that were not part of the source distribution
 veryclean: clean
-	IF EXIST *.exe                   DEL *.exe         
-	IF EXIST gnupmdrv.hlp            DEL gnupmdrv.hlp
-	IF EXIST gnuplot.gih             DEL gnuplot.gih
-	IF EXIST gnuplot.inf             DEL gnuplot.inf
-	IF EXIST gnuplot.dvi             DEL gnuplot.dvi
-	IF EXIST gnuplot.html            DEL gnuplot.html
-	IF EXIST gnuplot.tex             DEL gnuplot.tex
-	IF EXIST gnuplot.info            DEL gnuplot.info
-	IF EXIST gnuplot.ms              DEL gnuplot.ms
-	IF EXIST gnuplot.rtf             DEL gnuplot.rtf
-	IF EXIST gnuplot.ps              DEL gnuplot.ps
-	IF EXIST gpcard*.ps              DEL gpcard*.ps
-	cd $(DOCDIR)  & IF EXIST *.dvi   DEL *.dvi
-	cd $(DOCDIR)  & IF EXIST *.log   DEL *.log
-	cd $(DOCDIR)  & IF EXIST *.aux   DEL *.aux
-	cd $(DOCDIR)  & IF EXIST *.toc   DEL *.toc
-	cd $(DEMODIR) & IF EXIST binary? DEL binary?
+	IF EXIST *.exe                     DEL *.exe         
+	IF EXIST gnuplot.dvi               DEL gnuplot.dvi
+	IF EXIST gnuplot.gih               DEL gnuplot.gih
+	IF EXIST gnupmdrv.hlp              DEL gnupmdrv.hlp
+	IF EXIST gnuplot.html              DEL gnuplot.html
+	IF EXIST gnuplot.inf               DEL gnuplot.inf
+	IF EXIST gnuplot.info              DEL gnuplot.info
+	IF EXIST gnuplot.ms                DEL gnuplot.ms
+	IF EXIST gnuplot.ps                DEL gnuplot.ps
+	IF EXIST gnuplot.pdf               DEL gnuplot.pdf
+	IF EXIST gnuplot.rtf               DEL gnuplot.rtf
+	IF EXIST gnuplot.tex               DEL gnuplot.tex
+	IF EXIST gpcard*.ps                DEL gpcard*.ps
+	cd $(DOCDIR)  && IF EXIST *.dvi    DEL *.dvi
+	cd $(DOCDIR)  && IF EXIST *.log    DEL *.log
+	cd $(DOCDIR)  && IF EXIST *.aux    DEL *.aux
+	cd $(DOCDIR)  && IF EXIST *.toc    DEL *.toc
+	cd $(DEMODIR) && IF EXIST binary?  DEL binary?
