@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.129 2004/07/03 06:08:50 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.130 2004/07/05 03:49:22 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -886,10 +886,6 @@ show_version(FILE *fp)
 %s\t%s\n\
 %s\tThomas Williams, Colin Kelley and many others\n\
 %s\n\
-%s\tThis is gnuplot version 4.0.  Please refer to the documentation\n\
-%s\tfor command syntax changes.  The old syntax will be accepted\n\
-%s\tthroughout the 4.0 series, but all save files use the new syntax.\n\
-%s\n\
 %s\tType `help` to access the on-line reference manual.\n\
 %s\tThe gnuplot FAQ is available from\n\
 %s\t\t%s\n\
@@ -907,10 +903,6 @@ show_version(FILE *fp)
 	    p,			/* empty line */
 	    p, gnuplot_copyright,
 	    p,			/* authors */
-	    p,			/* empty line */
-	    p,			/* 4.0 info */
-	    p,			/* 4.0 info */
-	    p,			/* 4.0 info */
 	    p,			/* empty line */
 	    p,			/* Type `help` */
 	    p,			/* FAQ is at */
