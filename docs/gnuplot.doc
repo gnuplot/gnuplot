@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.57 2000/11/30 08:23:01 mikulik Exp $
+C RCS $Id: gnuplot.doc,v 1.58 2000/12/04 12:01:08 mikulik Exp $
 C 3 December 1998
 C Copyright (C) 1986 - 1993, 1998   Thomas Williams, Colin Kelley
 C
@@ -5535,16 +5535,14 @@ C ... and restart the table:
  publication or before downloading a very large file into a slow printer. 
  Usage: `awk -f pm3dCompress.awk thefile.ps >smallerfile.ps`.
 
- Other (non-postscript) terminals have discrete number of colours.  All entries
- of the palette remaining after linetype colours declaration are allocated by
- default.  Then multiplot will fail since no more colour positions are available
- (aha, that's also because sharing same palette is not implemented!  todo?!).
- Then use `set palette maxcolors <maxcolors>` with a reasonably small value.
- Default is 0 for allocating all remaining entries.
-
- PROPOSAL for future: list of palettes, like it is currently for labels, arrows 
- etc. Proposed usage: `set pm3d palette <n>`, `set contour ... filled palette 
- <n>`, etc.
+ Many terminals have discrete number of colours (e.g. 256 colours in gif).  All
+ entries of the palette remaining after linetype colours declaration are 
+ allocated for pm3d by default.  Then multiplot could fail if there are no more
+ colour positions available.  You should use `set palette maxcolors <maxcolors>`
+ with a reasonably small value. This option can also be used to separate levels
+ of z=constant in discrete steps, thus to emulate filled contours.
+   Default value is 0 for allocating all remaining entries or for to use 
+ exact mapping to RGB.
 
 3 color box
 ?commands set colorbox

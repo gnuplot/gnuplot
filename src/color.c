@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: color.c,v 1.10 2000/11/23 14:14:32 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: color.c,v 1.11 2000/11/24 19:17:22 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - color.c */
@@ -310,7 +310,9 @@ filled_polygon_3dcoords_zfixed(int points, struct coordinate GPHUGE * coords, do
  */
 static void draw_inside_color_smooth_box_postscript(FILE * out, int x_from, int y_from, int x_to, int y_to) {
     int scale_x = (x_to - x_from), scale_y = (y_to - y_from);
-    fprintf(out, "stroke gsave /imax 1024 def\t%% draw gray scale smooth box\n");
+    fputs("stroke gsave\t%% draw gray scale smooth box\n"
+	  "maxcolors 0 gt {/imax maxcolors def} {/imax 1024 def} ifelse\n", out);
+
     /* nb. of discrete steps (counted in the loop) */
     fprintf(out, "%i %i translate %i %i scale 0 setlinewidth\n", x_from, y_from, scale_x, scale_y);
     /* define left bottom corner and scale of the box so that all coordinates
@@ -319,16 +321,16 @@ static void draw_inside_color_smooth_box_postscript(FILE * out, int x_from, int 
     fprintf(out, "/ystep 1 imax div def /y0 0 def /ii 0 def\n");
     /* local variables; y-step, current y position and counter ii;  */
     if (sm_palette.positive == SMPAL_NEGATIVE)	/* inverted gray for negative figure */
-	fprintf(out, "{ 1 y0 sub g ");
+	fputs("{ 1 y0 sub g ", out);
     else
-	fprintf(out, "{ y0 g ");
+	fputs("{ y0 g ", out);
     if (color_box.rotation == 'v')
-	fprintf(out, "0 y0 N 1 0 V 0 ystep V -1 0 f\n");
+	fputs("0 y0 N 1 0 V 0 ystep V -1 0 f\n", out);
     else
-	fprintf(out, "y0 0 N 0 1 V ystep 0 V 0 -1 f\n");
-    fprintf(out, "/y0 y0 ystep add def /ii ii 1 add def\n");
-    fprintf(out, "ii imax gt {exit} if } loop\n");
-    fprintf(out, "grestore 0 setgray\n");
+	fputs("y0 0 N 0 1 V ystep 0 V 0 -1 f\n", out);
+    fputs("/y0 y0 ystep add def /ii ii 1 add def\n"
+	  "ii imax ge {exit} if } loop\n"
+	  "grestore 0 setgray\n", out);
 }				/* end of optimized PS output */
 
 /* plot the colour smooth box for from terminal's integer coordinates

@@ -1,5 +1,5 @@
 /*
- * $Id: post.trm,v 1.47 2000/11/29 10:20:32 mikulik Exp $
+ * $Id: post.trm,v 1.48 2000/12/04 12:02:20 mikulik Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -1906,9 +1906,11 @@ if (palette == NULL)
   return 0;
 /* write header for smooth colours */
 
-fprintf(gpoutfile, "gsave %% colour palette begin\n");
-/* print the definition of R,G,B formulae */
+fputs("gsave %% colour palette begin\n", gpoutfile);
+fprintf(gpoutfile, "/maxcolors %i def\n", sm_palette.use_maxcolors);
+fputs("/pm3dround {maxcolors 0 gt {maxcolors mul floor maxcolors div} if} def\n", gpoutfile);
 
+/* print the definition of R,G,B formulae */
 if (sm_palette.ps_allcF == 0) { /* print only those 3 used formulae */
     fprintf(gpoutfile, "/cF%i {%s} bind def\t%% %s\n", R, ps_math_color_formulae[ 2*abs(R) ], ps_math_color_formulae[ 2*abs(R)+1 ]);
     if (abs(G) != abs(R))
@@ -1930,7 +1932,7 @@ if (sm_palette.ps_allcF == 0) { /* print only those 3 used formulae */
 fprintf(gpoutfile,"Color %s and { %% COLOUR vs. GRAY map\n",
   (sm_palette.colorMode == SMPAL_COLOR_MODE_RGB) ? "true" : "false"
   );
-fprintf(gpoutfile,"  /g {stroke dup ");
+fprintf(gpoutfile,"  /g {stroke pm3dround dup ");
 if (R < 0) fprintf(gpoutfile, "1 exch sub "); /* negate */
 fprintf(gpoutfile,"cF%i exch dup ", abs(R));
 if (G < 0) fprintf(gpoutfile, "1 exch sub "); /* negate */
@@ -1946,7 +1948,7 @@ fprintf(gpoutfile, "%%  /H {h setrgbcolor pop} bind def\n");
 */
 fprintf(gpoutfile, "  /F {rlineto fill setrgbcolor pop} bind def\n");
 fprintf(gpoutfile, "}{\n");
-fprintf(gpoutfile, "  /g {stroke setgray} bind def\n");
+fprintf(gpoutfile, "  /g {stroke pm3dround setgray} bind def\n");
 fprintf(gpoutfile, "  /h {rlineto rlineto rlineto fill} bind def\n");
 /*
 fprintf(gpoutfile, "%%  /g {currentgray exch stroke setgray} bind def\n");
@@ -1965,7 +1967,7 @@ return 0;
 
 
 #if 0 /* caching of color value removed; won't be so efficient for z=const
-	 surfaces/map, but will save a lot of headache (linetype changes 
+	 surfaces/map, but will save a lot of headache (linetype changes
 	 color, for instance) */
 double pm3d_last_color;
   /* last choosen colour */

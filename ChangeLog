@@ -1,3 +1,10 @@
+2000-12-06  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* src/color.c term/post.trm docs/gnuplot.doc: support 'set palette
+	maxcolors <n>' also for postscript terminal (allow discrete filled
+	contour-like steps).
+	
+
 2000-12-06  Johannes Zellner  <johannes@zellner.org>
 
 	* term/ggi.trm, configure.in:
@@ -15,7 +22,7 @@
 	terminal entry.
 
 	* src/win/wgraph.c: include "getcolor.h". Fixes bug in Win32-pm3d
- 	handling reported by Petr Mikulik
+ 	handling reported by Petr Mikulik.
 
 	* src/win/wgnuplib.h (farmalloc): make this macro definition
  	active for Borland C++ compilers higher than a certain version.
@@ -35,7 +42,7 @@
 
 2000-12-04  Johannes Zellner  <johannes@zellner.org>
 
-	* term/ggi.trm: copy the ggi options to term_options
+	* term/ggi.trm: copy the ggi options to term_options.
 
 2000-12-04  Johannes Zellner  <johannes@zellner.org>
 
