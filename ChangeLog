@@ -1,5 +1,10 @@
 2004-02-12  Petr Mikulik  <mikulik@physics.muni.cz>
 
+	* src/term.c (do_point): Let sequence of the 6 defined point types be
+	the same as in postscript, png and x11.
+
+2004-02-12  Petr Mikulik  <mikulik@physics.muni.cz>
+
 	* NEWS src/plot.c src/win/winmain.c src/win/pgnuplot.c term/win.trm:
 	Let gnuplot on Windows accept the '-persist' command line option
 	(preferred synonym to '-noend' and '/noend').

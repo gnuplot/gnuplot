@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.65 2004/01/07 19:11:30 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.66 2004/01/11 20:06:57 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -752,8 +752,12 @@ int number;
     htic = (term_pointsize * t->h_tic / 2);
     vtic = (term_pointsize * t->v_tic / 2);
 
+    /* point types 1..4 are same as in postscript, png and x11
+       point types 5..6 are "similar"
+       (note that (number) equals (pointtype-1)
+    */
     switch (number) {
-    case 0:			/* do diamond */
+    case 4:			/* do diamond */
 	(*t->move) (x - htic, y);
 	(*t->vector) (x, y - vtic);
 	(*t->vector) (x + htic, y);
@@ -762,7 +766,7 @@ int number;
 	(*t->move) (x, y);
 	(*t->vector) (x, y);
 	break;
-    case 1:			/* do plus */
+    case 0:			/* do plus */
 	(*t->move) (x - htic, y);
 	(*t->vector) (x - htic, y);
 	(*t->vector) (x + htic, y);
@@ -770,7 +774,7 @@ int number;
 	(*t->vector) (x, y - vtic);
 	(*t->vector) (x, y + vtic);
 	break;
-    case 2:			/* do box */
+    case 3:			/* do box */
 	(*t->move) (x - htic, y - vtic);
 	(*t->vector) (x - htic, y - vtic);
 	(*t->vector) (x + htic, y - vtic);
@@ -780,7 +784,7 @@ int number;
 	(*t->move) (x, y);
 	(*t->vector) (x, y);
 	break;
-    case 3:			/* do X */
+    case 1:			/* do X */
 	(*t->move) (x - htic, y - vtic);
 	(*t->vector) (x - htic, y - vtic);
 	(*t->vector) (x + htic, y + vtic);
@@ -788,7 +792,7 @@ int number;
 	(*t->vector) (x - htic, y + vtic);
 	(*t->vector) (x + htic, y - vtic);
 	break;
-    case 4:			/* do triangle */
+    case 5:			/* do triangle */
 	(*t->move) (x, y + (4 * vtic / 3));
 	(*t->vector) (x - (4 * htic / 3), y - (2 * vtic / 3));
 	(*t->vector) (x + (4 * htic / 3), y - (2 * vtic / 3));
@@ -796,7 +800,7 @@ int number;
 	(*t->move) (x, y);
 	(*t->vector) (x, y);
 	break;
-    case 5:			/* do star */
+    case 2:			/* do star */
 	(*t->move) (x - htic, y);
 	(*t->vector) (x - htic, y);
 	(*t->vector) (x + htic, y);
