@@ -1,3 +1,10 @@
+2004-05-04  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/set.c (set_range): Fix SF bug #946900: buggy interaction of
+	'set view map' with 'set yrange'.
+	(set_view): Make error message string variables static and const
+	to preserve some stack.
+
 2004-05-03  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/mouse.c, term/x11.trm:  Move handling of mouse click after

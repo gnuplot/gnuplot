@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.129 2004/04/13 17:24:00 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.130 2004/05/04 02:43:21 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -3305,8 +3305,8 @@ set_view()
 {
     int i;
     TBOOLEAN was_comma = TRUE;
-    char *errmsg1 = "rot_%c must be in [0:%d] degrees range; view unchanged";
-    char *errmsg2 = "%sscale must be > 0; view unchanged";
+    static const char errmsg1[] = "rot_%c must be in [0:%d] degrees range; view unchanged";
+    static const char errmsg2[] = "%sscale must be > 0; view unchanged";
     double local_vals[4];
     struct value a;
 
@@ -3388,6 +3388,9 @@ set_range(axis)
 {
     c_token++;
 
+    if (splot_map)
+	splot_map_deactivate();
+
     if(almost_equals(c_token,"re$store")) { /* ULIG */
 	c_token++;
 	axis_array[axis].set_min = get_writeback_min(axis);
@@ -3419,6 +3422,8 @@ set_range(axis)
 	    axis_array[axis].range_flags &= ~RANGE_WRITEBACK;
 	}
     }
+    if (splot_map)
+	splot_map_activate();
 }
 
 /* process 'set xzeroaxis' command */
