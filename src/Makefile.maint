@@ -10,8 +10,10 @@ coresrc := $(filter-out $(noncoresrc),$(wildcard *.c))
 coreterm := $(shell cd ../term && echo *.trm)
 
 version := $(shell cat ../VERSION)
+file_version := $(shell sed -n 's/.*gnuplot_version.*"\(.*\)".*/\1/p' ./version.c|tr -d ' ')
 
 patchlevel := $(shell cat ../PATCHLEVEL)
+file_pl := $(shell sed -n 's/.*gnuplot_patchlevel.*"\(.*\)".*/\1/p' ./version.c|tr -d ' ')
 
 date := $(shell date)
 
@@ -28,14 +30,10 @@ makefile.all: Makefile.maint
 	 | tr @% '\012\012' >>$@t
 	@if cmp -s $@ $@t; then rm -f $@t; else mv $@t $@; fi
 
-version.c: ../VERSION ../PATCHLEVEL Makefile.maint
+version.c: ../VERSION ../PATCHLEVEL
 	@echo Making $@
-	@vn=`sed -n 's/.*gnuplot_version.*"\(.*\)".*/\1/p' ./version.c|tr -d ' '`; \
-	pl=`sed -n 's/.*gnuplot_patchlevel.*"\(.*\)".*/\1/p' ./version.c|tr -d ' '`; \
-	dt=`sed -n 's/.*gnuplot_date.*"\(.*\)".*/\1/p' ./version.c`; \
-	if [ "$(version)" != $$vn -o \
-	     "$(patchlevel)" != $$pl -o \
-	     "$$date" != "$$dt" ]; then \
+	@if [ "$(version)" != "$(file_version)" -o \
+	     "$(patchlevel)" != "$(file_pl)" ]; then \
 	  sed -e '/^const char gnuplot_version/ s/"[^"]*"/"@VERS@"/' \
 	      -e '/^const char gnuplot_patchlevel/ s/"[^"]*"/"@PLVL@"/' \
 	      -e '/^const char gnuplot_date/ s/"[^"]*"/"@DATE@"/' \
