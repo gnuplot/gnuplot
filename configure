@@ -579,7 +579,7 @@ fi
   
 
 
-# From configure.in Revision: 1.90 
+# From configure.in Revision: 1.91 
 
 VERSION="`cat $srcdir/VERSION`"
 PATCHLEVEL="`cat $srcdir/PATCHLEVEL`"

@@ -135,10 +135,10 @@ SUBDIRS = $(d_beos)
 
 OTHER_SOURCES = amiga.c corplot.c os9.c strftime.c vms.c
 
-EXTRA_DIST = GNUmakefile Makefile.maint NeXT OpenStep corgraph.asm genopt.com \
-gnuplot.def gnuplot.opt gnuplot.prj gpexecute.inc header.mac hrcgraph.asm \
-intergra.x11 lasergnu lineproc.mac linkopt.vms linkopt.ztc makefile.all os2 \
-pcgraph.asm rgipgnu win x11.opt $(OTHER_SOURCES)
+EXTRA_DIST = GNUmakefile Makefile.maint NeXT OpenStep README corgraph.asm \
+genopt.com gnuplot.def gnuplot.opt gnuplot.prj gpexecute.inc header.mac \
+hrcgraph.asm intergra.x11 lasergnu lineproc.mac linkopt.vms linkopt.ztc \
+makefile.all os2 pcgraph.asm rgipgnu win x11.opt $(OTHER_SOURCES)
 
 
 O = o
@@ -230,7 +230,8 @@ $(DEPDIR)/specfun$U.Po $(DEPDIR)/standard$U.Po $(DEPDIR)/stdfn$U.Po \
 $(DEPDIR)/tables$U.Po $(DEPDIR)/term$U.Po $(DEPDIR)/time$U.Po \
 $(DEPDIR)/unset$U.Po $(DEPDIR)/util$U.Po $(DEPDIR)/util3d$U.Po \
 $(DEPDIR)/variable$U.Po $(DEPDIR)/version$U.Po
-DIST_COMMON =  Makefile.am Makefile.in ansi2knr.1 ansi2knr.c depcomp
+DIST_COMMON =  README Makefile.am Makefile.in ansi2knr.1 ansi2knr.c \
+depcomp
 
 
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
