@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.29 2000/05/02 20:56:27 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.30 2000/07/25 13:12:18 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -249,10 +249,9 @@ plotrequest()
     }				/* first '[' */
     if (parametric || polar)	/* set optional x ranges */
 	LOAD_RANGE(FIRST_X_AXIS);
-    else {
-	/* order of t doesn't matter, but x does */
-	CHECK_REVERSE(FIRST_X_AXIS);
-    }
+
+    /* order of x range does matter, even if we're in parametric mode */
+    CHECK_REVERSE(FIRST_X_AXIS);
 
     LOAD_RANGE(FIRST_Y_AXIS);
     CHECK_REVERSE(FIRST_Y_AXIS);
