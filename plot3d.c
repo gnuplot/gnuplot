@@ -44,17 +44,6 @@ static char    *RCSid = "$Id: plot3d.c,v 1.36 1998/06/18 14:55:14 ddenholm Exp $
 # define MAXSTR 255
 #endif
 
-#if defined(ATARI) || defined(MTOS)
-# ifdef __PUREC__
-#  include <ext.h>
-#  include <tos.h>
-#  include <aes.h>
-# else /* !PUREC */
-#  include <osbind.h>
-#  include <aesbind.h>
-# endif /* !PUREC */
-#endif /* ATARI || MTOS */
-
 #ifndef STDOUT
 #define STDOUT 1
 #endif
@@ -411,6 +400,9 @@ struct surface_points *this_plot;
 			    break;
 		    }
 
+#ifndef BUGGY_DGRID_RANGING /* HBB 981026: correctly generate OUTRANGE/UNDEFINED, where applicable */
+                    points->type = (dist == 0.0) ? UNDEFINED : INRANGE ;
+#endif
 		    /* The weight of this point is inverse proportional
 		     * to the distance.
 		     */
@@ -438,10 +430,16 @@ struct surface_points *this_plot;
 		}
 	    }
 
+#ifndef BUGGY_DGRID_RANGING /* HBB 981026: modify ranges, mark points as outrange, if they are... */
+            STORE_WITH_LOG_AND_FIXUP_RANGE(points->x, x,    points->type, x_axis, NOOP, continue);
+            STORE_WITH_LOG_AND_FIXUP_RANGE(points->y, y,    points->type, y_axis, NOOP, continue);
+            STORE_WITH_LOG_AND_FIXUP_RANGE(points->z, z/w , points->type, z_axis, NOOP, continue);
+#else /* HBB 981026: original, short version of this code */
 	    points->x = x;
 	    points->y = y;
 	    points->z = z / w;
 	    points->type = INRANGE;
+#endif
 	}
     }
 	

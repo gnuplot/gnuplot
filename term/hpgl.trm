@@ -1114,7 +1114,7 @@ TERM_PUBLIC int HPGL2_justify_text (just)
 
 #ifdef TERM_TABLE
 TERM_TABLE_START(hpgl_driver)
-   "hpgl", "HP7475 and (hopefully) lots of others [number of pens] [eject]",
+   "hpgl", "HP7475 and relatives [number of pens] [eject]",
            HPGL_XMAX, HPGL_YMAX, HPGL_VCHAR, HPGL_HCHAR,
            HPGL_VTIC, HPGL_HTIC, HPGL_options, HPGL_init, HPGL_reset,
            HPGL_text, null_scale, HPGL_graphics, HPGL_move, HPGL_vector,

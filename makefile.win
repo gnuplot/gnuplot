@@ -44,11 +44,11 @@ BIN = $(TC)\bin\\
 #    capability add -DREADLINE to CFLAGS then add 'readline' to the /o
 #    section of the linker call.
 !if $(WIN32)
-CFLAGS = -c -W -M -G -y -v -w-rvl -w-use -w-par -w-aus -w-pro $(PROCESSOR_OPT) -I$(TC)\include -Iwin -DREADLINE -DHAVE_STRNICMP -DHAVE_SLEEP -DWIN32 -DHAVE_STRERROR -DNO_GIH -DNOGAMMA -DWIN32_LEAN_AND_MEAN -DANSI_C -DHAVE_GETCWD
+CFLAGS = -c -W -M -G -y -v -w-rvl -w-use -w-par -w-aus -w-pro $(PROCESSOR_OPT) -I$(TC)\include -Iwin -DREADLINE=1 -DHAVE_STRNICMP -DHAVE_SLEEP -DWIN32=1 -DHAVE_STRERROR -DNO_GIH -DNOGAMMA -DWIN32_LEAN_AND_MEAN -DANSI_C -DHAVE_GETCWD
 CAUXFLAGS = -ml -w-par -w-use -w-aus -f -N -M -y -v -d -I$(TC)\include -DHAVE_STRNICMP -DANSI_C
 !else
-CFLAGS = -c -W -ml -w-par -w-use -w-aus -f -h -N -M -y -v -d -Ff=32 -I$(TC)\include -Iwin -DREADLINE -zEGPFAR_DATA -DHAVE_STRNICMP -DMSDOS -DNO_GIH -DANSI_C -DHAVE_GETCWD -DNDEBUG
-CAUXFLAGS = -ml -w-par -w-use -w-aus -f -N -M -y -v -d -I$(TC)\include -DMSDOS -DHAVE_STRNICMP -DANSI_C
+CFLAGS = -c -W -ml -w-par -w-use -w-aus -f -h -N -M -y -v -d -Ff=32 -I$(TC)\include -Iwin -DREADLINE=1 -zEGPFAR_DATA -DHAVE_STRNICMP -DMSDOS=1 -DNO_GIH -DANSI_C -DHAVE_GETCWD -DNDEBUG
+CAUXFLAGS = -ml -w-par -w-use -w-aus -f -N -M -y -v -d -I$(TC)\include -DMSDOS=1 -DHAVE_STRNICMP -DANSI_C
 !endif
 
 OBJS = 	bitmap.obj command.obj contour.obj eval.obj graphics.obj graph3d.obj \
@@ -180,7 +180,7 @@ set.obj: set.c plot.h setshow.h
 
 show.obj: show.c plot.h setshow.h
 	$(BIN)$(CC) @&&!
-$(CFLAGS) -DHELPFILE=\"$(HELPFILE)\"
+$(CFLAGS) -DHELPFILE="$(HELPFILE)"
 ! show.c
 
 specfun.obj: specfun.c
@@ -257,7 +257,7 @@ $(HELPFILE): win\gnuplot.rtf
 win\gnuplot.rtf: doc2rtf.exe docs\gnuplot.doc win\wgnuplot.hpj
 	doc2rtf docs\gnuplot.doc win\gnuplot.rtf
 
-doc2rtf.exe: docs\doc2rtf.c \docs\termdoc.c docs\xref.c
+doc2rtf.exe: docs\doc2rtf.c docs\termdoc.c docs\xref.c
 	$(BIN)$(CCAUX) -edoc2rtf.exe @&&!
 -D_Windows
 -w-pro
