@@ -1,9 +1,15 @@
+1998-08-19  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* readline.c: Fix termios/sgtty logic.
+
 1998-08-18  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* configure.in: Unconditional test for <sgtty.h>.
 
 	* plot.h, readline.c: Indentation, comments for readability.
 
+	* Makefile.in, makefile.all: Forgot Makefile in DOCS4.
+	
 1998-08-17  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* term/hpljii.trm: Output file is opened in ASCII mode under DJGPP,
