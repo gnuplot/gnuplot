@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.79 2002/03/09 14:23:23 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.80 2002/03/09 22:41:45 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -2317,21 +2317,29 @@ set_parametric()
     }
 }
 
+
 #ifdef PM3D
+/* default settings for palette */
+void
+reset_palette()
+{
+    sm_palette.colorMode = SMPAL_COLOR_MODE_RGB;
+    sm_palette.formulaR = 7; sm_palette.formulaG = 5;
+    sm_palette.formulaB = 15;
+    sm_palette.positive = SMPAL_POSITIVE;
+    sm_palette.ps_allcF = 0;
+    sm_palette.use_maxcolors = 0;
+}
+
+
 /* process 'set palette' command */
 static void
 set_palette()
 {
     c_token++;
 
-    if (END_OF_COMMAND) { /* assume default settings */
-	sm_palette.colorMode = SMPAL_COLOR_MODE_RGB;
-	sm_palette.formulaR = 7; sm_palette.formulaG = 5;
-	sm_palette.formulaB = 15;
-	sm_palette.positive = SMPAL_POSITIVE;
-	sm_palette.ps_allcF = 0;
-	sm_palette.use_maxcolors = 0;
-    }
+    if (END_OF_COMMAND) /* reset to default settings */
+	reset_palette();
     else { /* go through all options of 'set palette' */
 	for ( ; !END_OF_COMMAND; c_token++ ) {
 	    switch (lookup_table(&set_palette_tbl[0],c_token)) {
@@ -2398,18 +2406,14 @@ set_palette()
 }
 
 
-/* process 'set colorobox' command */
+/* process 'set colorbox' command */
 static void
 set_colorbox()
 {
     c_token++;
 
-    if (END_OF_COMMAND) { /* assume default settings */
+    if (END_OF_COMMAND) /* reset to default position */
 	color_box.where = SMCOLOR_BOX_DEFAULT;
-	color_box.rotation = 'v';
-	color_box.border = 1;
-	color_box.border_lt_tag = -1; /* use default border */
-    }
     else { /* go through all options of 'set colorbox' */
 	for ( ; !END_OF_COMMAND; c_token++ ) {
 	    switch (lookup_table(&set_colorbox_tbl[0],c_token)) {

@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.103 2002/03/09 22:41:45 mikulik Exp $
+C RCS $Id: gnuplot.doc,v 1.104 2002/03/10 18:54:58 mikulik Exp $
 C 18 September 2001
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001   Thomas Williams, Colin Kelley et al.
 C
@@ -5766,8 +5766,10 @@ C ... and restart the table:
 3 color box
 ?commands set colorbox
 ?commands show colorbox
+?commands unset colorbox
 ?set colorbox
 ?show colorbox
+?unset colorbox
 ?colorbox
 
  The color scheme, i.e. the gradient of the smooth color with min_z and
@@ -5810,6 +5812,10 @@ C ... and restart the table:
  usual axes commands, i.e. `set/unset/show` with `cbrange`, `[m]cbtics`,
  `format cb`, `grid [m]cb`, `cblabel`, and perhaps even `cbdata`, `[no]cbdtics`,
  `[no]cbmtics`.
+
+ `set colorbox` without any parameter switches the position to default.
+ `unset colorbox` resets the default parameters for the colorbox and switches
+ the colorbox off.
 
  See also `help pm3d`, `help palette`, `help x11 pm3d`, `help vgagl`, 
  `help set style line`.

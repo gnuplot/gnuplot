@@ -1,5 +1,5 @@
 /*
- * $Id: setshow.h,v 1.29 2001/02/28 16:41:09 broeker Exp $
+ * $Id: setshow.h,v 1.30 2001/06/11 16:47:59 broeker Exp $
  */
 
 /* GNUPLOT - setshow.h */
@@ -74,5 +74,8 @@ void show_version __PROTO((FILE *fp));
 char *conv_text __PROTO((const char *s));
 void delete_linestyle __PROTO((struct linestyle_def *, struct linestyle_def *));
 void reset_key __PROTO((void));
+#ifdef PM3D
+void reset_palette __PROTO((void));
+#endif
 
 #endif /* GNUPLOT_SETSHOW_H */

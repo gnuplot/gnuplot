@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.30 2002/02/14 14:28:20 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.31 2002/02/14 21:14:24 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -113,6 +113,7 @@ static void unset_parametric __PROTO((void));
 #ifdef PM3D
 static void unset_pm3d __PROTO((void));
 static void unset_palette __PROTO((void));
+static void reset_colorbox __PROTO((void));
 static void unset_colorbox __PROTO((void));
 #endif
 static void unset_pointsize __PROTO((void));
@@ -1069,11 +1070,28 @@ unset_palette()
 }
 
 
-/* process 'unset colorbox' command */
+/* reset colorbox to default settings */
+void
+reset_colorbox()
+{
+    color_box.where = SMCOLOR_BOX_DEFAULT;
+    color_box.rotation = 'v';
+    color_box.border = 1;
+    color_box.border_lt_tag = -1; /* use default border */
+    color_box.xorigin = 0.9; /* default user origin and size */
+    color_box.yorigin = 0.2;
+    color_box.xsize = 0.1;
+    color_box.ysize = 0.63;
+}
+
+
+/* process 'unset colorbox' command: reset to default settings and then
+ * switch it off */
 static void
 unset_colorbox()
 {
     c_token++;
+    reset_colorbox();
     color_box.where = SMCOLOR_BOX_NO;
 }
 
@@ -1471,6 +1489,8 @@ reset_command()
     unset_decimalsign();
 #ifdef PM3D
     pm3d_reset();
+    reset_colorbox();
+    reset_palette();
 #endif
     unset_locale();
     unset_loadpath();
