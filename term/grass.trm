@@ -67,10 +67,6 @@ TERM_PUBLIC void GRASS_arrow __PROTO((unsigned int sx, unsigned int sy, unsigned
 #include <string.h>
 /* #include "gis.h" */ /* this causes conflicts with things in term.c */
 
-#include <stdio.h>
-#include <string.h>
-/* #include "gis.h" */ /* this causes conflicts with things in term.c */
-
 #define GRASS_XMAX 1000
 #define GRASS_YMAX 1000
 #define GRASS_VCHAR 5
