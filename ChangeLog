@@ -1,3 +1,14 @@
+2002-01-19  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* 0INSTALL: Remove references to the GP_PATH_* macros.
+	
+	* configure.in: General cleanup and bugfixing. Replace all references
+	to GP_PATH_* macros with code that uses generic autoconf macros.
+
+	* version.c: Increment patchlevel to 2, update date and copyright.
+
+	* m4/path-hdr.m4, m4/path-lib.m4: Remove.
+
 2001-12-09  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* src/specfun.c: Remove "non-commercial" clause for ibeta() and

@@ -128,31 +128,27 @@ $ ./configure --help
   --libdir=DIR            object code libraries in DIR [EPREFIX/lib]
   --includedir=DIR        C header files in DIR [PREFIX/include]
   --mandir=DIR            Man documentation in DIR [PREFIX/man]
-  --with-readline (*)     use the builtin minimal readline function
-  --without-readline      do not use the builtin readline function
-  --with-readline=gnu     use the GNU readline library
-  --with-readline=PATH            Specify the location of GNU readline
-  --with-plot             use the Unix plot library
-  --with-plot=PATH                Specify the location of GNU libplot
-  --with-gd (*)           enable gif terminal with Tom Boutell's gd library
-                          (requires GD library)
-  --with-gd=PATH                  Specify the location of libgd
-  --with-png (*)          enable png terminal
-                          (requires libpng and libz)
-  --with-png=PATH                 Specify the location of libpng
-  --with-cwdrc            check current directory for .gnuplot file,
-                          normally disabled for security reasons
+  --with-x (*)            use the X Window System
   --with-lasergnu         install lasergnu printer script
   --with-linux-vga        use the Linux SVGA console driver
                           (requires /usr/lib/libvga)
-  --enable-apollo         Apollo Graphics Primitive Resource
-  --enable-gpr            Apollo Graphics Primitive Resource (fixed-size window)
-  --enable-cgi            enable CGI terminal (SCO only)
+  --with-readline (*)     use the builtin minimal readline function (default)
+  --without-readline      do not use the builtin readline function
+  --with-readline=gnu     use the GNU readline library
+  --with-readline=[PATH]          Specify the location of GNU readline
+  --with-gd[=PATH]        enable gif terminal with Tom Boutell's gd library
+                          (requires GD library)
+  --with-plot=[PATH]      use the Unix plot library
+  --with-png[=PATH] (*)   enable png terminal
+                          (requires libpng and libz)
+  --with-cwdrc            check current directory for .gnuplot file,
+                          normally disabled for security reasons
+  --enable-emf            enable Enhanced Metafile Format driver (EXPERIMENTAL)
+  --enable-epslatex       enable epslatex driver (EXPERIMENTAL)
+  --enable-ggi            enable ggi driver (EXPERIMENTAL)
   --enable-iris           enable IRIS terminal (IRIS4D only)
-  --enable-sun            enable sunview terminal (Sun only)
-  --enable-unixpc         enable unixpc terminal (ATT 3b1 or ATT 7300)
-  --enable-system-time    use the system time routines in time.c
-  --with-x (*)            Use the X Window System
+  --enable-mgr            enable MGR terminal
+  --enable-rgip           enable Redwood Graphics Interface Protocol
 
  Options marked with (*) are enabled by default, ie. these features or
 packages are used if configure detects them even if the corresponding
@@ -386,100 +382,55 @@ LD_LIBRARY_PATH environment variable should be set.
 About --with-PACKAGE[=PATH]
 ***************************
 
- The following description applies to gnuplot only.
-
  Every `--with-PACKAGE' option sets a `with_package' variable in
 configure.  Depending on how `--with-PACKAGE' was invoked, there are
 only three different possible values for the `with_package' variable:
 
  Option                   $with_package
 ----------------------------------------
-(not specified)           yes
+(not specified)           yes or no
 --with-package            yes
 --with-package=yes        yes
 --with-package=no         no
 --with-package=PATH       PATH
 --without-package         no
 
- This means that configure will always (by default) try to locate PACKAGE
-unless `--with-package=no' or `--without-package' was specified. Examples
-for with-PACKAGE options used by gnuplot's configure are `--with-gd',
-`--with-png'. The corresponding package variables are `with_gd',
-and `with_png'.
+ In gnuplot, the following --with-PACKAGE options are available:
 
- For gnuplot, configure uses the macros `gp_SEARCH_LIBDIRS' and
-`gp_SEARCH_HEADERDIRS' to search for libraries and includes, resp.  These
-macros are different from the standard GNU autoconf macros for this purpose,
-`AC_CHECK_LIB' and `AC_CHECK_HEADER/S' (see autoconf manual). The
-gp_XXX macros are closely tied to gnuplot, and cannot be used for other
-packages without modification.
+  --with-readline
 
- The difference between these package specific macros and standard
-autoconf macros is that they do search more than one (the default)
-directory to determine the location of the specified file.
+   Use gnuplot's builtin readline function. This is enabled by default.
 
- Libraries will be searched in at least three, and up to five different
-directories, depending on the PATH specified with `--with-PACKAGE=PATH':
+  --without-readline
 
- o the default linker path (this is really more than one directory)
- o /usr/local/lib, which is a fairly common place for 3rd party libs
- o the PATH directory, trailing `/lib/libPACKAGE.a' stripped off
- o the PATH directory, trailing `/lib/libPACKAGE.a' stripped off and
-   `/lib' added
- o the PATH directory, trailing `/libPACKAGE.a' stripped off.
+   (same as --with-readline=no) Do not use gnuplot's builtin readline function.
 
- Using the default linker path as the first search directory has one
-big, but not so obvious advantage: if all libraries are in the same
-directory, the path to the first library specified with --with-PACKAGE
-is added to the linker path with a `-L' option.  The library searched
-for with the next --with-PACKAGE option will now be found faster, because
-only one additional directory is checked.  This is also true for header files.
+  --with-readline=gnu
 
- Example: the user has unpacked the gd library distribution into
-/home/user/source/gd:
+   Use the GNU readline library instead of gnuplot's builtin readline.
 
-$ configure --with-gd=/home/user/source/gd
+  --with-readline=[PATH]
 
-will search the following directories for libgd.a:
+   Use the GNU readline library instead of gnuplot's builtin readline.
+   This form is required if GNU readline is not installed in a default
+   location.
 
- o the default linker path
- o /usr/local/lib
- o /home/user/source/gd
- o /home/user/source/gd/lib
- o /home/user/source/gd
+  --with-gd[=PATH]
 
- Include files will be searched in at least two, and up to three different
-directories, depending on the PATH specified with `--with-PACKAGE=PATH':
+   Dto. for Thomas Boutell's gd library. This option is off by default,
+   as the developers want to encourage users to use the png format instead
+   of gif.
 
- o the default include path (can be more than one diretcory)
- o /usr/local/include, a fairly common place for 3rd party headers
- o the PATH directory, trailing `/lib/libPACKAGE.a' stripped off
- o the PATH directory, trailing `/lib/libPACKAGE.a' stripped off and
-   `/include' added
+  --with-png[=PATH]
 
- Here are some more examples:
+    Dto. for the png library. This option is on by default.
 
- o the gd and png libraries are in /usr/local/gnu/lib, which is
-   automatically searched by gcc.  The corresponding header files are
-   in /usr/local/gnu/include, which is not in gcc's include search path.
-   Solution:
+  --with-plot=[PATH]
 
-   $ ./configure --with-gd=/usr/local/gnu
-
- o the gd and png libraries are in /opt/gnu/lib, the header files are
-   in /opt/gnu/include.  Solution:
- 
-   $ ./configure --with-gd=/opt/gnu
-
- o the gd and png libraries and headers are all in different directories,
-   none of which is in the compilers search path:
-
-   $ ./configure --with-gd=/tmp/gd --with-png=/tmp/libpng
-
- o the gd and png libraries are in /usr/local/gnu, the GNU plotutils
-   stuff is in /opt/plotutils
-
-   $ ./configure --with-gd=/usr/local/gnu --with-plot=/opt/plotutils
+    If used without the PATH argument, this option selects the standard
+    UNIX plot library, if available. If used with the PATH argument,
+    configure looks for the plot library from GNU plotutils. Version 2.2
+    or better is required. The option is off by default.
 
 Platform problems and testing
 *****************************
