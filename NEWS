@@ -12,6 +12,7 @@ News, changes and fixes since gnuplot version 4.0
 * NEW option to read plot title from data file: set key autotitle columnheader
 * NEW command 'set termoption <foo>' changes single property of current terminal
 * NEW png driver supports antialiasing and TrueColor images
+* NEW encoding koi8-u
 * CHANGE libgd versions 2.0.28+ support GIF images as well as PNG/JPEG
 * CHANGE remove old (non-libgd) GIF and PNG drivers
 * CHANGE X-resource gnuplot*ctrlq:on requires <ctrl>q to kill plot window

@@ -1,3 +1,10 @@
+2004-09-15  Konstantin Korikov  <lostclus@ua.fm>
+
+	* NEWS docs/gnuplot.doc src/gplt_x11.c src/set.c src/term_api.h
+	src/term.c term/post.trm: Add support for character encoding koi8-u
+	(cyrillic koi8 for Ukrainian users).
+	SourceForge patch #966815.
+
 2004-09-14  Ethan Merritt  <merritt@u.washington.edu>
 
 	* demo/borders.dem demo/Makefile.am.in: Rewrite the borders demo to 
