@@ -1,15 +1,15 @@
 #ifdef INCRCSDATA
-static char RCSid[]="$Id: print.c,v 1.1 1999/03/26 22:15:54 lhecking Exp $" ;
+static char RCSid[]="$Id: print.c,v 1.2 2004/04/13 17:24:05 broeker Exp $" ;
 #endif
 
 /****************************************************************************
 
     PROGRAM: gnupmdrv
-    
+
     Outboard PM driver for GNUPLOT 3.3
 
-    MODULE:  print.c -- support for printing graphics under OS/2 
-        
+    MODULE:  print.c -- support for printing graphics under OS/2
+
 ****************************************************************************/
 
 /* PM driver for GNUPLOT */
@@ -46,7 +46,7 @@ static char RCSid[]="$Id: print.c,v 1.1 1999/03/26 22:15:54 lhecking Exp $" ;
 
 /*
  * AUTHOR
- * 
+ *
  *   Gnuplot driver for OS/2:  Roger Fearick
  */
 
@@ -75,13 +75,13 @@ typedef struct {            /* for print thread parameters */
     PQPRINT pqp ;       /* print queue info */
     } PRINTPARAMS ;
 
-static struct { 
+static struct {
     long    lTech ;     // printer technology
     long    lVer ;      // driver version
     long    lWidth ;    // page width in pels
     long    lHeight ;   // page height in pels
-    long    lWChars ;   // page width in chars    
-    long    lHChars ;   // page height in chars    
+    long    lWChars ;   // page width in chars
+    long    lHChars ;   // page height in chars
     long    lHorRes ;   // horizontal resolution pels / metre
     long    lVertRes ;  // vertical resolution pels / metre
     } prCaps ;
@@ -93,7 +93,7 @@ static DEVOPENSTRUC devop ;
 
 ULONG GetPrinters( PPRQINFO3 *, ULONG *  ) ;
 int FindPrinter( char *, PPRQINFO3  ) ;
-HMF     CopyToMetaFile( HPS ) ; 
+HMF     CopyToMetaFile( HPS ) ;
 static void    ThreadPrintPage( ) ;
 
 MPARAM PrintCmdProc( HWND hWnd, ULONG msg, MPARAM mp1, MPARAM mp2 )
@@ -102,7 +102,7 @@ MPARAM PrintCmdProc( HWND hWnd, ULONG msg, MPARAM mp1, MPARAM mp2 )
 ** (i.e for the appropriate 1-and 2-d child windows )
 */
     {
-    static BYTE abStack[4096] ;  
+    static BYTE abStack[4096] ;
     static PRINTPARAMS tp ;
     static char szBusy[] = "Busy - try again later" ;
     static char szStart[] = "Printing started" ;
@@ -119,13 +119,13 @@ MPARAM PrintCmdProc( HWND hWnd, ULONG msg, MPARAM mp1, MPARAM mp2 )
         }
 
     switch( msg ) {
-        
+
         case WM_USER_PRINT_BEGIN:
-        
+
             if( DosRequestMutexSem( semPrint, SEM_IMMEDIATE_RETURN ) != 0 ) {
                 pszMess = szBusy ;
                 WinMessageBox( HWND_DESKTOP,
-                               hWnd, 
+                               hWnd,
                                pszMess,
                                APP_NAME,
                                0,
@@ -143,7 +143,7 @@ MPARAM PrintCmdProc( HWND hWnd, ULONG msg, MPARAM mp1, MPARAM mp2 )
                                          (PFNWP)CancelPrintDlgProc,
                                          0L,
                                          ID_PRINTSTOP,
-                                         NULL ) ; 
+                                         NULL ) ;
                 }
             break ;
 
@@ -151,7 +151,7 @@ MPARAM PrintCmdProc( HWND hWnd, ULONG msg, MPARAM mp1, MPARAM mp2 )
         case WM_USER_PRINT_OK :
 
             if( hwndCancel != NULLHANDLE ) {
-                WinDismissDlg( hwndCancel, 0 ) ; 
+                WinDismissDlg( hwndCancel, 0 ) ;
                 hwndCancel = NULLHANDLE ;
                 }
              DosReleaseMutexSem( semPrint ) ;
@@ -160,13 +160,13 @@ MPARAM PrintCmdProc( HWND hWnd, ULONG msg, MPARAM mp1, MPARAM mp2 )
         case WM_USER_DEV_ERROR :
 
             if( hwndCancel != NULLHANDLE ) {
-                WinDismissDlg( hwndCancel, 0 ) ; 
+                WinDismissDlg( hwndCancel, 0 ) ;
                 hwndCancel = NULLHANDLE ;
                 }
             lErr = ERRORIDERROR( (ERRORID) mp1 ) ;
             sprintf( szTemp, "Dev error: %d %x", lErr, lErr ) ;
             WinMessageBox( HWND_DESKTOP,
-                           hWnd, 
+                           hWnd,
                            szTemp,
                            APP_NAME,
                            0,
@@ -175,15 +175,15 @@ MPARAM PrintCmdProc( HWND hWnd, ULONG msg, MPARAM mp1, MPARAM mp2 )
              break ;
 
         case WM_USER_PRINT_ERROR :
-        
+
             if( hwndCancel != NULLHANDLE ) {
-                WinDismissDlg( hwndCancel, 0 ) ; 
+                WinDismissDlg( hwndCancel, 0 ) ;
                 hwndCancel = NULLHANDLE ;
                 }
             lErr = ERRORIDERROR( (ERRORID) mp1 ) ;
             sprintf( szTemp, "Print error: %d %x", lErr, lErr ) ;
             WinMessageBox( HWND_DESKTOP,
-                           hWnd, 
+                           hWnd,
                            szTemp,
                            APP_NAME,
                            0,
@@ -200,10 +200,10 @@ MPARAM PrintCmdProc( HWND hWnd, ULONG msg, MPARAM mp1, MPARAM mp2 )
         case WM_USER_PRINT_QBUSY :
 
             return( (MPARAM)DosRequestMutexSem( semPrint, SEM_IMMEDIATE_RETURN ) ) ;
-            
+
         default : break ;
         }
-        
+
     return 0L ;
     }
 
@@ -228,7 +228,7 @@ int SetupPrinter( HWND hwnd, PQPRINT pqp )
         pqp->szFilename[0] = 0 ;
         szPrintFile[0] = 0 ;
         pqp->caps  = prCaps.lTech & (CAPS_TECH_VECTOR_PLOTTER|CAPS_TECH_POSTSCRIPT) ?
-                   QP_CAPS_FILE : QP_CAPS_NORMAL ;        
+                   QP_CAPS_FILE : QP_CAPS_NORMAL ;
         if( WinDlgBox( HWND_DESKTOP,
                       hwnd,
                     (PFNWP)QPrintDlgProc,
@@ -239,11 +239,11 @@ int SetupPrinter( HWND hwnd, PQPRINT pqp )
               if( pqp->szFilename[0] != 0 ) strcpy( szPrintFile, pqp->szFilename ) ;
               }
           return 1 ;
-          }    
+          }
         pqp->xfrac = flXFrac ;
         pqp->yfrac = flYFrac ;
         }
-    
+
     return 0 ;
     }
 
@@ -302,12 +302,12 @@ int SetPrinterMode( HWND hwnd, PQPRINT pqp )
 
 static void ThreadPrintPage( PRINTPARAMS *ptp )
 /*
-**  thread to set up printer DC and print page 
+**  thread to set up printer DC and print page
 **
 **  Input: THREADPARAMS *ptp -- pointer to thread data passed by beginthread
 **
 */
-    {    
+    {
     HAB         hab ;       // thread anchor block nandle
     HDC         hdc ;       // printer device context handle
     HPS         hps ;       // presentation space handle
@@ -320,13 +320,13 @@ static void ThreadPrintPage( PRINTPARAMS *ptp )
     char        *szPrintFile ;
     HMF         hmf ;
     LONG        alOpt[9] ;
-    HPS         hpsSc ;    
+    HPS         hpsSc ;
     hab = WinInitialize( 0 ) ;
-    
+
     szPrintFile = ptp->szPrintFile[0] == '\0' ? NULL : ptp->szPrintFile ;
-    
+
     if( (hdc = OpenPrinterDC( hab, ptp->pqp, 0L, szPrintFile )) != DEV_ERROR ) {
-    
+
             // create presentation space for printer
 
         ptp->hdc = hdc ;
@@ -346,19 +346,19 @@ static void ThreadPrintPage( PRINTPARAMS *ptp )
         rectPage.xRight = alPage[0] ;
         rectPage.yTop = alPage[1] ;//alPage[1]*(1.0-flYFrac) ;
         rectPage.yBottom = 0L ; //  = alPage[1] ;
-       
+
         {
         double ratio = 1.560 ;
         double xs = rectPage.xRight - rectPage.xLeft ;
         double ys = rectPage.yTop - rectPage.yBottom ;
         if( ys > xs/ratio ) { /* reduce ys to fit */
-            rectPage.yTop = rectPage.yBottom + (int)(xs/ratio) ; 
+            rectPage.yTop = rectPage.yBottom + (int)(xs/ratio) ;
             }
         else if( ys < xs/ratio ) { /* reduce xs to fit */
             rectPage.xRight = rectPage.xLeft + (int)(ys*ratio) ;
             }
         }
-       
+
         rectPage.xRight = rectPage.xRight*ptp->pqp->xfrac ;
         rectPage.yTop = rectPage.yTop*ptp->pqp->yfrac ;//alPage[1]*(1.0-flYFrac) ;
 
@@ -367,7 +367,7 @@ static void ThreadPrintPage( PRINTPARAMS *ptp )
         double xs = rectPage.xRight - rectPage.xLeft ;
         double ys = rectPage.yTop - rectPage.yBottom ;
         if( ys > xs/ratio ) { /* reduce ys to fit */
-            rectPage.yTop = rectPage.yBottom + (int)(xs/ratio) ; 
+            rectPage.yTop = rectPage.yBottom + (int)(xs/ratio) ;
             }
         else if( ys < xs/ratio ) { /* reduce xs to fit */
             rectPage.xRight = rectPage.xLeft + (int)(ys*ratio) ;
@@ -376,8 +376,8 @@ static void ThreadPrintPage( PRINTPARAMS *ptp )
 
 
             // start printing
-                    
-        if( DevEscape( hdc, 
+
+        if( DevEscape( hdc,
                        DEVESC_STARTDOC,
                        7L,
                        APP_NAME,
@@ -405,17 +405,17 @@ static void ThreadPrintPage( PRINTPARAMS *ptp )
               }
             else
               msgRet = WM_USER_PRINT_ERROR;
-              
+
             }
         else
             msgRet = WM_USER_PRINT_ERROR ;
-        
+
         GpiDestroyPS( hps ) ;
         DevCloseDC( hdc ) ;
         }
     else
         msgRet = WM_USER_DEV_ERROR ;
-        
+
     DosEnterCritSec() ;
     WinPostMsg( ptp->hwnd, msgRet, (MPARAM)WinGetLastError(hab), 0L ) ;
     WinTerminate( hab ) ;
@@ -441,27 +441,27 @@ HDC OpenPrinterDC( HAB hab, PQPRINT pqp, LONG lMode, char *szPrintFile )
     static CHAR   achPrinterData[256] ;
 
     if( pqp->piPrinter == NULL ) return DEV_ERROR ;
-        
+
     strcpy( achPrinterData, pqp->piPrinter->pszDriverName ) ;
     achPrinterData[ strcspn(achPrinterData,".") ] = '\0' ;
 
     devop.pszDriverName = achPrinterData ;
     devop.pszLogAddress = pqp->piPrinter->pszName ;
 
-    if( pqp->pdriv != NULL 
+    if( pqp->pdriv != NULL
         && strcmp( pqp->pdriv->szDeviceName, pqp->piPrinter->pDriverData->szDeviceName ) == 0 ) {
         devop.pdriv = pqp->pdriv ;
         }
     else devop.pdriv = pqp->piPrinter->pDriverData ;
 
     if( szPrintFile != NULL )  devop.pszLogAddress = szPrintFile ;
-        
+
             // set data type to RAW
-            
+
     devop.pszDataType = "PM_Q_RAW" ;
-    
+
             // open device context
-    if( lMode != 0L ) 
+    if( lMode != 0L )
         lType = lMode ;
     else
         lType = (szPrintFile == NULL) ? OD_QUEUED: OD_DIRECT ;
@@ -482,7 +482,7 @@ int FindPrinter( char *szName, PPRQINFO3 piPrinter )
     PPRQINFO3 pprq = NULL ;
     PDRIVDATA pdriv = NULL ;
     LONG np ;
-    
+
     if( *szName && (strcmp( szName, piPrinter->pszName ) == 0) ) return 0 ;
     if( GetPrinters( &pprq , &np ) == 0 ) return 1 ;
     for( --np; np>=0; np-- ) {
@@ -515,7 +515,7 @@ MRESULT EXPENTRY CancelPrintDlgProc ( HWND hwnd, ULONG usMsg, MPARAM mp1, MPARAM
                                     WM_USER_PRINT_CANCEL,
                                     0L,
                                     0L ) ;
-                    WinDismissDlg( hwnd, 0 ) ; 
+                    WinDismissDlg( hwnd, 0 ) ;
                     break ;
                 default:
                     break ;
@@ -526,5 +526,5 @@ MRESULT EXPENTRY CancelPrintDlgProc ( HWND hwnd, ULONG usMsg, MPARAM mp1, MPARAM
         /* fall through to the default control processing */
     return WinDefDlgProc ( hwnd , usMsg , mp1 , mp2 ) ;
     }
-    
+
 

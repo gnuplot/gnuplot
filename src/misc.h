@@ -1,5 +1,5 @@
 /*
- * $Id: misc.h,v 1.15 2003/06/30 18:51:14 sfeam Exp $
+ * $Id: misc.h,v 1.16 2004/04/13 17:23:58 broeker Exp $
  */
 
 /* GNUPLOT - misc.h */
@@ -73,9 +73,9 @@ void lp_use_properties __PROTO((struct lp_style_type *lp, int tag, int pointflag
 void arrow_use_properties __PROTO((struct arrow_style_type *arrow, int tag));
 void arrow_parse __PROTO((struct arrow_style_type *, int default_linetype, TBOOLEAN));
 
-void parse_fillstyle __PROTO((struct fill_style_type *fs, int def_style, 
+void parse_fillstyle __PROTO((struct fill_style_type *fs, int def_style,
                               int def_density, int def_pattern, int def_border ));
-  
+
 
 
 /* State information for load_file(), to recover from errors

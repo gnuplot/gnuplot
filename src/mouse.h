@@ -1,5 +1,5 @@
 /*
- * $Id: mouse.h,v 1.12 2003/10/10 13:16:45 mikulik Exp $
+ * $Id: mouse.h,v 1.13 2004/06/04 06:29:32 mikulik Exp $
  */
 
 /* GNUPLOT - mouse.h */
@@ -34,7 +34,7 @@
 
 /*
  * AUTHORS
- * 
+ *
  *   Original Software (October 1999 - January 2000):
  *     Pieter-Tjerk de Boer <ptdeboer@cs.utwente.nl>
  *     Petr Mikulik <mikulik@physics.muni.cz>
@@ -72,7 +72,7 @@ typedef struct mouse_setting_t {
 extern mouse_setting_t mouse_setting;
 
 
-/* enum of GP_ -keycodes has moved to mousecmn.h so that it can be 
+/* enum of GP_ -keycodes has moved to mousecmn.h so that it can be
  * accessed by standalone terminals too */
 
 

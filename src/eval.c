@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: eval.c,v 1.15 2003/08/17 22:49:49 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: eval.c,v 1.16 2004/04/13 17:23:53 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - eval.c */
@@ -196,8 +196,7 @@ static JMP_BUF fpe_env;
 /* Internal helper functions: */
 
 static RETSIGTYPE
-fpe(an_int)
-    int an_int;
+fpe(int an_int)
 {
 #if defined(MSDOS) && !defined(__EMX__) && !defined(DJGPP) && !defined(_Windows) || defined(DOS386)
     /* thanks to lotto@wjh12.UUCP for telling us about this  */
@@ -221,9 +220,9 @@ fpe(an_int)
  * On an Apollo, the OS can signal a couple errors that are not mapped into
  * SIGFPE, namely signalling NaN and branch on an unordered comparison.  I
  * suppose there are others, but none of these are documented, so I handle
- * them as they arise. 
+ * them as they arise.
  *
- * Anyway, we need to catch these faults and signal SIGFPE. 
+ * Anyway, we need to catch these faults and signal SIGFPE.
  */
 
 static pfm_$fh_func_val_t
@@ -250,8 +249,7 @@ apollo_pfm_catch()
  * them, to avoid execution ordering problems if this function is
  * called more than once between sequence points. */
 static char *
-num_to_str(r)
-    double r;
+num_to_str(double r)
 {
     static int i = 0;
     static char s[4][25];
@@ -277,9 +275,7 @@ num_to_str(r)
 
 /* Display a value in human-readable form. */
 void
-disp_value(fp, val)
-    FILE *fp;
-    struct value *val;
+disp_value(FILE *fp, struct value *val)
 {
     switch (val->type) {
     case INTGR:
@@ -299,10 +295,9 @@ disp_value(fp, val)
     }
 }
 
-
+/* returns the real part of val */
 double
-real(val)			/* returns the real part of val */
-    struct value *val;
+real(struct value *val)
 {
     switch (val->type) {
     case INTGR:
@@ -316,9 +311,9 @@ real(val)			/* returns the real part of val */
 }
 
 
+/* returns the imag part of val */
 double
-imag(val)			/* returns the imag part of val */
-    struct value *val;
+imag(struct value *val)
 {
     switch (val->type) {
     case INTGR:
@@ -333,9 +328,9 @@ imag(val)			/* returns the imag part of val */
 
 
 
+/* returns the magnitude of val */
 double
-magnitude(val)			/* returns the magnitude of val */
-    struct value *val;
+magnitude(struct value *val)
 {
     switch (val->type) {
     case INTGR:
@@ -353,9 +348,9 @@ magnitude(val)			/* returns the magnitude of val */
 
 
 
+/* returns the angle of val */
 double
-angle(val)			/* returns the angle of val */
-    struct value *val;
+angle(struct value *val)
 {
     switch (val->type) {
     case INTGR:
@@ -377,9 +372,7 @@ angle(val)			/* returns the angle of val */
 
 
 struct value *
-Gcomplex(a, realpart, imagpart)
-    struct value *a;
-    double realpart, imagpart;
+Gcomplex(struct value *a, double realpart, double imagpart)
 {
     a->type = CMPLX;
     a->v.cmplx_val.real = realpart;
@@ -389,9 +382,7 @@ Gcomplex(a, realpart, imagpart)
 
 
 struct value *
-Ginteger(a, i)
-    struct value *a;
-    int i;
+Ginteger(struct value *a, int i)
 {
     a->type = INTGR;
     a->v.int_val = i;
@@ -406,15 +397,14 @@ Ginteger(a, i)
  */
 
 double
-gp_exp(x)
-    double x;
+gp_exp(double x)
 {
-#ifdef MINEXP    
+#ifdef MINEXP
     return (x < (MINEXP)) ? 0.0 : exp(x);
 #else  /* MINEXP */
     int old_errno = errno;
     double result = exp(x);
-    
+
     /* exp(-large) quite uselessly raises ERANGE --- stop that */
     if (result == 0.0)
 	errno = old_errno;
@@ -439,8 +429,7 @@ warning:  internal error--stack not empty!\n\
 }
 
 struct value *
-pop(x)
-    struct value *x;
+pop(struct value *x)
 {
     if (s_p < 0)
 	int_error(NO_CARET, "stack underflow (function call with missing parameters?)");
@@ -450,8 +439,7 @@ pop(x)
 
 
 void
-push(x)
-    struct value *x;
+push(struct value *x)
 {
     if (s_p == STACK_DEPTH - 1)
 	int_error(NO_CARET, "stack overflow");
@@ -460,8 +448,7 @@ push(x)
 
 
 void
-int_check(v)
-    struct value *v;
+int_check(struct value *v)
 {
     if (v->type != INTGR)
 	int_error(NO_CARET, "non-integer passed to boolean operator");
@@ -475,8 +462,7 @@ int_check(v)
 
 /* converts top-of-stack to boolean */
 void
-f_bool(x)
-    union argument *x;
+f_bool(union argument *x)
 {
     (void) x;			/* avoid -Wunused warning */
 
@@ -486,8 +472,7 @@ f_bool(x)
 
 
 void
-f_jump(x)
-    union argument *x;
+f_jump(union argument *x)
 {
     (void) x;			/* avoid -Wunused warning */
     jump_offset = x->j_arg;
@@ -495,8 +480,7 @@ f_jump(x)
 
 
 void
-f_jumpz(x)
-    union argument *x;
+f_jumpz(union argument *x)
 {
     struct value a;
 
@@ -510,8 +494,7 @@ f_jumpz(x)
 
 
 void
-f_jumpnz(x)
-    union argument *x;
+f_jumpnz(union argument *x)
 {
     struct value a;
 
@@ -525,8 +508,7 @@ f_jumpnz(x)
 }
 
 void
-f_jtern(x)
-    union argument *x;
+f_jtern(union argument *x)
 {
     struct value a;
 
@@ -545,7 +527,7 @@ f_jtern(x)
    arguments to be passed to them.
 
    at_ptr is a pointer to the action table which must be executed
-   (evaluated). 
+   (evaluated).
 
    so the iterated line exectues the function indexed by the at_ptr
    and passes the address of the argument which is pointed to by the
@@ -554,8 +536,7 @@ f_jtern(x)
 */
 
 void
-execute_at(at_ptr)
-    struct at_type *at_ptr;
+execute_at(struct at_type *at_ptr)
 {
     register int instruction_index, operator, count;
     int saved_jump_offset = jump_offset;
@@ -568,15 +549,13 @@ execute_at(at_ptr)
 	assert(is_jump(operator) || (jump_offset == 1));
 	instruction_index += jump_offset;
     }
-    
+
     jump_offset = saved_jump_offset;
 }
 
 /* 20010724: moved here from parse.c, where it didn't belong */
 void
-evaluate_at(at_ptr, val_ptr)
-    struct at_type *at_ptr;
-    struct value *val_ptr;
+evaluate_at(struct at_type *at_ptr, struct value *val_ptr)
 {
     double temp;
 

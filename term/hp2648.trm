@@ -1,5 +1,5 @@
-/*
- * $Id: hp2648.trm,v 1.9 2002/07/26 16:42:29 mikulik Exp $
+/* Hello, Emacs, this is -*-C-*-
+ * $Id: hp2648.trm,v 1.10 2004/04/13 17:24:33 broeker Exp $
  *
  */
 
@@ -43,9 +43,9 @@
  *
  * AUTHORS
  *  Russell Lang
- * 
+ *
  * send your comments or suggestions to (gnuplot-info@lists.sourceforge.net).
- * 
+ *
  */
 
 /*
@@ -116,8 +116,7 @@ HP2648text()
 
 
 TERM_PUBLIC void
-HP2648linetype(linetype)
-int linetype;
+HP2648linetype(int linetype)
 {
     static int hpline[] = { 1, 7, 1, 4, 5, 6, 8, 9, 10, 7, 2 };
     fprintf(gpoutfile, "\033*m%dbZ", hpline[(linetype + 2) % 11]);
@@ -125,8 +124,7 @@ int linetype;
 
 
 TERM_PUBLIC void
-HP2648move(x, y)
-unsigned int x, y;
+HP2648move(unsigned int x, unsigned int y)
 {
     fprintf(gpoutfile, "\033*paf%d,%dZ", x, y);
     /*               1     23     4
@@ -139,20 +137,17 @@ unsigned int x, y;
 
 
 TERM_PUBLIC void
-HP2648vector(x, y)
-unsigned int x, y;
+HP2648vector(unsigned int x, unsigned int y)
 {
     fprintf(gpoutfile, "\033*pbf%d,%dZ", x, y);
-    /*                     1 
+    /*                     1
        1        "pen down"
      */
 }
 
 
 TERM_PUBLIC void
-HP2648put_text(x, y, str)
-unsigned int x, y;
-const char *str;
+HP2648put_text(unsigned int x, unsigned int y, const char *str)
 {
     HP2648move(x, y - HP2648VCHAR / 2 + 1);
     fprintf(gpoutfile, "\033*l%s\n", str);
@@ -160,8 +155,7 @@ const char *str;
 
 
 TERM_PUBLIC int
-HP2648_text_angle(ang)
-int ang;
+HP2648_text_angle(int ang)
 {
 int hp_ang = (ang ? 1 : 0);
 

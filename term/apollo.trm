@@ -1,5 +1,5 @@
-/*
- * $Id: apollo.trm,v 1.10 1999/06/19 20:30:45 lhecking Exp $
+/* Hello, Emacs, this is -*-C-*-
+ * $Id: apollo.trm,v 1.11 1999/06/22 11:54:14 lhecking Exp $
  *
  */
 
@@ -429,8 +429,7 @@ static APOLLO_LINE apollo_lines[] =
 
 /* set the line style */
 TERM_PUBLIC void
-APOLLO_linetype(ltype)
-int ltype;
+APOLLO_linetype(int ltype)
 {
     status_$t status;
 
@@ -516,8 +515,7 @@ APOLLO_text()
 }
 
 TERM_PUBLIC int
-APOLLO_text_angle(ang)
-int ang;
+APOLLO_text_angle(int ang)
 {
     status_$t status;
 
@@ -529,8 +527,7 @@ int ang;
 static enum JUSTIFY apollo_text_mode;
 
 TERM_PUBLIC int
-APOLLO_justify_text(mode)
-enum JUSTIFY mode;
+APOLLO_justify_text(enum JUSTIFY mode)
 {
     apollo_text_mode = mode;
     return TRUE;
@@ -542,9 +539,7 @@ enum JUSTIFY mode;
     text does not cover the tick marks.
 */
 TERM_PUBLIC void
-APOLLO_put_text(x, y, str)
-unsigned int x, y;
-const char str[];
+APOLLO_put_text(unsigned int x, unsigned int y, const char str[])
 {
     gpr_$offset_t size;
     status_$t status;

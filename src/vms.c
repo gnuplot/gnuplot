@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: vms.c,v 1.3 2000/11/01 18:57:34 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: vms.c,v 1.4 2004/04/13 17:24:03 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - vms.c */
@@ -44,13 +44,13 @@ static char *RCSid() { return RCSid("$Id: vms.c,v 1.3 2000/11/01 18:57:34 broeke
 static int something_in_this_file;
 
 #ifdef PIPES
- 
+
 /* (to aid porting) - how are errors dealt with */
 
 #define ERROR(msg) { fprintf(stderr, "%s\nFile %s line %d\n", msg, __FILE__, __LINE__); }
 #define FATAL(msg) { fprintf(stderr, "%s\nFile %s line %d\n", msg, __FILE__, __LINE__); exit(EXIT_FAILURE); }
 
- 
+
 #include <dvidef.h>
 #include <syidef.h>
 #include <jpidef.h>
@@ -75,7 +75,7 @@ create_mbx(unsigned short int *chan, struct dsc$descriptor_s *namdsc)
 	static unsigned long int mbxbufsiz;
 		long int syiitm = SYI$_MAXBUF, dviitm = DVI$_DEVNAM;
 	unsigned long sts;  /* for _cksts */
-  
+
   if (!mbxbufsiz) {
     /*
      * Get the SYSGEN parameter MAXBUF, and the smaller of it and the
@@ -84,7 +84,7 @@ create_mbx(unsigned short int *chan, struct dsc$descriptor_s *namdsc)
      */
 
     _cksts(lib$getsyi(&syiitm, &mbxbufsiz, 0, 0, 0, 0));
-    if (mbxbufsiz > BUFSIZ) mbxbufsiz = BUFSIZ; 
+    if (mbxbufsiz > BUFSIZ) mbxbufsiz = BUFSIZ;
   }
   _cksts(sys$crembx(0,chan,mbxbufsiz,mbxbufsiz,0,0,0));
 
@@ -125,7 +125,7 @@ popen(char *cmd, char *mode)
                                       DSC$K_CLASS_S, mbxname},
                             cmddsc = {0, DSC$K_DTYPE_T,
                                       DSC$K_CLASS_S, 0};
-	unsigned long sts;                            
+	unsigned long sts;
 
     if (!(info=malloc(sizeof(struct pipe_details))))
     {
@@ -134,7 +134,7 @@ popen(char *cmd, char *mode)
     }
 
     info->completion=0;  /* I assume this will remain 0 until terminates */
-        
+
     /* create mailbox */
     create_mbx(&chan,&namdsc);
 
@@ -146,7 +146,7 @@ popen(char *cmd, char *mode)
 
     if (!info->fp)
         return NULL;
-        
+
     cmddsc.dsc$w_length=strlen(cmd);
     cmddsc.dsc$a_pointer=cmd;
 
@@ -162,7 +162,7 @@ popen(char *cmd, char *mode)
 
     info->next=open_pipes;  /* prepend to list */
     open_pipes=info;
-        
+
     return info->fp;
 }
 
@@ -171,7 +171,7 @@ int pclose(FILE *fp)
     struct pipe_details *info, *last = NULL;
     unsigned long int abort = SS$_TIMEOUT, retsts;
     unsigned long sts;
-    
+
     for (info = open_pipes; info != NULL; last = info, info = info->next)
         if (info->fp == fp) break;
 
@@ -185,7 +185,7 @@ int pclose(FILE *fp)
     }
     if (!info->completion)  /* We tried to be nice . . . */
       _cksts(sys$delprc(&info->pid));
-    
+
     fclose(info->fp);
     /* remove from list of open pipes */
     if (last) last->next = info->next;
@@ -205,7 +205,7 @@ waitpid(unsigned long int pid, int *statusp, int flags)
     struct pipe_details *info;
     unsigned long int abort = SS$_TIMEOUT;
     unsigned long sts;
-    
+
     for (info = open_pipes; info != NULL; info = info->next)
         if (info->pid == pid) break;
 
@@ -243,7 +243,7 @@ waitpid(unsigned long int pid, int *statusp, int flags)
       *statusp = 0;
       return pid;
     }
-                    
+
 }  /* end of waitpid() */
 
 #endif /* PIPES */

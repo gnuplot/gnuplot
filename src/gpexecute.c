@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gpexecute.c,v 1.11 2002/02/27 21:19:05 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: gpexecute.c,v 1.12 2002/03/06 16:27:41 amai Exp $"); }
 #endif
 
 /* GNUPLOT - gpexecute.c */
@@ -34,7 +34,7 @@ static char *RCSid() { return RCSid("$Id: gpexecute.c,v 1.11 2002/02/27 21:19:05
 
 /*
  * AUTHORS
- * 
+ *
  *   Original Software (October 1999 - January 2000):
  *     Pieter-Tjerk de Boer <ptdeboer@cs.utwente.nl>
  *     Petr Mikulik <mikulik@physics.muni.cz>
@@ -79,7 +79,7 @@ char mouseShareMemName[40];
 PVOID input_from_PM_Terminal;
   /* pointer to shared memory for storing the command to be executed */
 HEV semInputReady = 0;
-  /* handle to event semaphore (post an event to gnuplot that the shared 
+  /* handle to event semaphore (post an event to gnuplot that the shared
      memory contains a command to be executed) */
 int pausing = 0;
   /* avoid passing data back to gnuplot in `pause' mode */
@@ -91,7 +91,7 @@ ULONG ppidGnu = 0;
  * Let the command in the shared memory be executed.
  */
 void
-gp_post_shared_mem(void)
+gp_post_shared_mem()
 {
     APIRET rc;
     if (semInputReady == 0) {	/* but it must be open for the first time */
@@ -101,7 +101,7 @@ gp_post_shared_mem(void)
     }
     rc = DosPostEventSem(semInputReady);
     DosSleep(10);
-    /* dirty trick: wait a little bit; otherwise problems to 
+    /* dirty trick: wait a little bit; otherwise problems to
      * distinguish mouse button down and up, for instance
      * (info sent to shared memory was too fast; maybe a blocking
      * semaphore would help, but no fun to implement it...)
@@ -150,7 +150,7 @@ gp_execute(char *s)
 int buffered_output_pending = 0;
 
 static gpe_fifo_t *
-gpe_init(void)
+gpe_init()
 {
     gpe_fifo_t *base = malloc(sizeof(gpe_fifo_t));
     /* fprintf(stderr, "(gpe_init) \n"); */
@@ -252,7 +252,7 @@ gp_exec_event(char type, int mx, int my, int par1, int par2)
 #endif
 #ifdef WIN_IPC
     /* FIXME HBB 20010216: this breaks the wgnuplot.exe+wgnuplot.dll type of
-     * compilation (for Win16). do_event is in the main program(mouse.c), but 
+     * compilation (for Win16). do_event is in the main program(mouse.c), but
      * gpexecute is in the DLL --> can't reach it, from here. */
     do_event(&ge);
     return;

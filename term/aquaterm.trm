@@ -1,5 +1,5 @@
 /* -*- objc -*-
- * $Id: aquaterm.trm,v 1.3 2004/03/29 10:30:18 persquare Exp $
+ * $Id: aquaterm.trm,v 1.4 2004/05/26 11:17:42 mikulik Exp $
  *
  */
 
@@ -14,7 +14,7 @@
  *
  * AUTHORS
  *  Per Persson from openstep.trm by Robert Lutwak
- * 
+ *
  * Homepage: http://aquaterm.sourceforge.net
  * send your comments or suggestions to (persquare@users.sourceforge.net).
  *
@@ -22,15 +22,15 @@
  * Objects system, to the "aquatermServer."  If there is no such
  * service registered with the OS, the terminal attempts to fire
  * up AquaTerm.app.  If the user has not set the environment variable
- * AQUATERM_PATH, the terminal searches for AquaTerm.app in standard 
+ * AQUATERM_PATH, the terminal searches for AquaTerm.app in standard
  * locations like /Applications, ~/Applications, etc.
  * In order to use this filter, you MUST have AquaTerm.app installed
  * on your system.
  *
- * Once connected to the server, all gnuplot graphs are sent, 
- * via the D.O. system, to AquaTerm.app, which produces renders graphs, 
+ * Once connected to the server, all gnuplot graphs are sent,
+ * via the D.O. system, to AquaTerm.app, which produces renders graphs,
  * manages the windows, takes care of printing etc.
- * 
+ *
  */
 
 #include "driver.h"
@@ -38,7 +38,7 @@
 #ifdef TERM_REGISTER
 register_term(aqua)
 #endif
-     
+
 #ifdef TERM_PROTO
 /* Required entries */
 TERM_PUBLIC void AQUA_options __PROTO((void));
@@ -70,10 +70,10 @@ TERM_PUBLIC void AQUA_filled_polygon __PROTO((int points, gpiPoint *corners));
 #endif /* PM3D */
 /* End of entries */
 
-#define AQUA_RESOLUTION (20.0)                    /* Increase resolution */ 
+#define AQUA_RESOLUTION (20.0)                    /* Increase resolution */
 #define AQUA_XMAX (11.75 * 72 * AQUA_RESOLUTION)  /* = paper width (in) times screen resolution */
 #define AQUA_YMAX (8.25 * 72 * AQUA_RESOLUTION)	  /* = paper height (in) times screen resolution */
-#define AQUA_VTIC (8.0*AQUA_RESOLUTION)     
+#define AQUA_VTIC (8.0*AQUA_RESOLUTION)
 #define AQUA_HTIC (8.0*AQUA_RESOLUTION)
 #define AQUA_VCHAR (16.0*AQUA_RESOLUTION)         /* default font is Times at 14 points */
 #define AQUA_HCHAR (AQUA_VCHAR*6.0/10.0)
@@ -107,9 +107,9 @@ static inline void NOOP_(id x, ...) {;}
 #endif	/* LOGGING */
 
 /* AquaTerm specific */
-static NSAutoreleasePool *arpool;   
-static NSAutoreleasePool *loopPool;   
-static AQTAdapter *adapter;    
+static NSAutoreleasePool *arpool;
+static NSAutoreleasePool *loopPool;
+static AQTAdapter *adapter;
 
 /* Internal state */
 static int AQUA_plotRef = 0; /* A ref to the current plot */
@@ -124,14 +124,14 @@ static float AQUA_TextAngle = 0.0; /* current text orientation*/
 static enum JUSTIFY AQUA_TextJust = LEFT; /* current text justification*/
 
 /* default text font family: */
-static char AQUA_fontNameDef[MAX_ID_LEN + 1] = "Times-Roman"; 
+static char AQUA_fontNameDef[MAX_ID_LEN + 1] = "Times-Roman";
 static double AQUA_fontSizeDef = 14; /* default text size*/
 /* current text font family: */
 static char AQUA_fontNameCur[MAX_ID_LEN + 1] = "Times-Roman";
 static double AQUA_fontSizeCur = 14; /* current text size*/
 
 /* Helper functions */
-static void AQUA_local_reset __PROTO(());
+static void AQUA_local_reset __PROTO((void));
 
 /*
  * ----------------------------------------------------------------
@@ -139,21 +139,22 @@ static void AQUA_local_reset __PROTO(());
  * ----------------------------------------------------------------
  *
  *   Current options are:
- *   <n> title "theTitle" size <x> <y> fname "fontface" fsize <fontsize>   
+ *   <n> title "theTitle" size <x> <y> fname "fontface" fsize <fontsize>
  */
 TERM_PUBLIC void
 AQUA_options()
 {
   struct value a;
+
   AQUA_local_reset();
   if (!END_OF_COMMAND  && !isstring (c_token)) { /* plot ref number*/
     AQUA_plotRef = (int) real (const_express (&a));
   }
-  
+
   if (!END_OF_COMMAND) {/* plot title*/
     if (almost_equals (c_token, "ti$tle"))  {
       c_token++;
-      
+
       if (!END_OF_COMMAND && isstring (c_token)) {
 	quote_str (AQUA_title, c_token, MAX_LINE_LEN);
 	c_token++;
@@ -161,36 +162,36 @@ AQUA_options()
 	int_error(c_token,"fname: expecting plot title");
     }
   }
-    
+
   if (AQUA_title[0]=='\0') /* always set title */
     sprintf(AQUA_title, "Figure %d", AQUA_plotRef);
-  
+
   if (!END_OF_COMMAND) { /* get terminal size*/
     if (almost_equals (c_token, "s$ize")) {
       double value;
-      
+
       c_token++;
-      
+
       if (END_OF_COMMAND)
 	int_error(c_token,"expecting x size");
       value = real(const_express (&a));
       if (value < 2 || value > 2048)
 	int_error(c_token,"x size out of range");
       AQUA_xSize = (unsigned int) value * AQUA_RESOLUTION;
-      
+
       if (END_OF_COMMAND)
 	int_error(c_token,"expecting y size");
       value = real(const_express (&a));
       if (value < 2 || value > 2048)
 	int_error(c_token,"y size out of range");
-      AQUA_ySize = (unsigned int) value * AQUA_RESOLUTION;    
+      AQUA_ySize = (unsigned int) value * AQUA_RESOLUTION;
     }
   }
 
   if (!END_OF_COMMAND) { /* get default font family name*/
     if (almost_equals (c_token, "fn$ame"))  {
       c_token++;
-      
+
       if (!END_OF_COMMAND && isstring (c_token)) {
 	quote_str (AQUA_fontNameCur, c_token, MAX_ID_LEN);
 	c_token++;
@@ -202,16 +203,16 @@ AQUA_options()
   if (!END_OF_COMMAND) { /* get default font size*/
     if (almost_equals (c_token, "fs$ize")) {
       c_token++;
-      
+
       if (END_OF_COMMAND)
 	int_error(c_token,"fsize: expecting font size");
       AQUA_fontSizeCur = real (const_express (&a));
     }
   }
-  
+
   if (!END_OF_COMMAND)
-    int_error(c_token, "unexpected text at end of command"); 
-  
+    int_error(c_token, "unexpected text at end of command");
+
   /* Save options back into options string in normalized format */
   sprintf(term_options, "%d title '%s' size %d %d fname '%s'  fsize %g",
 	  AQUA_plotRef,
@@ -236,13 +237,14 @@ AQUA_init()
 {
   float fontSize, fontWHRatio;
   NSString *title;
+
   LOG(@"Aqua Init (open plot)");
   if (arpool == NULL) {
     /* FIXME: This should be removed when pools are handled in gnuplot proper */
     arpool = [[NSAutoreleasePool alloc] init];
   }
   if (adapter == NULL) {
-    adapter = [[AQTAdapter alloc] init]; 
+    adapter = [[AQTAdapter alloc] init];
     if (!adapter) { /* server could be invalid (=nil) for several reasons */
       /* FIXME: Issue warning here? */
     }
@@ -256,7 +258,7 @@ AQUA_init()
   term->ymax = AQUA_ySize;
   /* set current font*/
   [adapter setFontname:[NSString stringWithCString:AQUA_fontNameCur]];
-  [adapter setFontsize:AQUA_fontSizeCur];                                                                   
+  [adapter setFontsize:AQUA_fontSizeCur];
   /* set h_char, v_char*/
   term->h_char = (int) (AQUA_fontSizeCur * 0.7 * AQUA_RESOLUTION);
   term->v_char = (int) (AQUA_fontSizeCur * 1.5 * AQUA_RESOLUTION);
@@ -266,9 +268,9 @@ AQUA_init()
 
   [adapter setPlotSize:NSMakeSize(AQUA_xSize/AQUA_RESOLUTION, AQUA_ySize/AQUA_RESOLUTION)];
   [adapter setPlotTitle:[NSString stringWithCString:AQUA_title]];
-  
+
   /*
-   * Set up the basic indexed colormap for gnuplot 
+   * Set up the basic indexed colormap for gnuplot
    */
   /*  Special colors */
   [adapter setColormapEntry:0 red:0.1 green:0.1 blue:0.1]; /* linetype -4 */
@@ -312,11 +314,11 @@ AQUA_graphics()
   /* Avoid buildup of objects in the autoreleasepools */
   [loopPool release];
   loopPool = [[NSAutoreleasePool alloc] init];
-#ifdef LOGGING 
+#ifdef LOGGING
   /* Keep the compiler quiet when not debugging */
   LOG(@"Post: (arpool + loopPool, loopPool) =(%d, %d)",[NSAutoreleasePool autoreleasedObjectCount],
       [NSAutoreleasePool topAutoreleasePoolCount]);
-#endif  
+#endif
   [adapter eraseRect:NSMakeRect(0.0, 0.0, AQUA_xSize/AQUA_RESOLUTION, AQUA_ySize/AQUA_RESOLUTION)];
 }
 
@@ -348,13 +350,13 @@ AQUA_put_text(unsigned int x, unsigned int y, const char *str)
 {
   if (!strlen(str))
     return;
-  [adapter  addLabel:[NSString stringWithCString: str] 
-	     atPoint:NSMakePoint(x/AQUA_RESOLUTION, y/AQUA_RESOLUTION) 
-	       angle:AQUA_TextAngle 
+  [adapter  addLabel:[NSString stringWithCString: str]
+	     atPoint:NSMakePoint(x/AQUA_RESOLUTION, y/AQUA_RESOLUTION)
+	       angle:AQUA_TextAngle
 	       align:(AQUA_TextJust | AQTAlignMiddle)];
 }
 
-TERM_PUBLIC int 
+TERM_PUBLIC int
 AQUA_justify_text (enum JUSTIFY mode)
 {
   AQUA_TextJust = mode;
@@ -368,39 +370,39 @@ AQUA_text_angle (int angle)
   return (TRUE);
 }
 
-TERM_PUBLIC int 
+TERM_PUBLIC int
 AQUA_set_font(const char *font) /* "font,size" */
 {
   NSString *fontFace = [NSString stringWithCString:AQUA_fontNameCur];
   float fontSize = AQUA_fontSizeCur;
   if (strlen(font)>0) {
-    NSArray *parts = [[NSString stringWithCString:font] componentsSeparatedByString:@","];            
+    NSArray *parts = [[NSString stringWithCString:font] componentsSeparatedByString:@","];
     if ([parts count] < 2) {
       /* FIXME: Issue warning here? */
-	  LOG(@"Error: %@", [NSString stringWithCString:font]);                                    
+	  LOG(@"Error: %@", [NSString stringWithCString:font]);
     } else {
-      fontSize = [[parts objectAtIndex:1] floatValue];                                           
-      fontFace = [parts objectAtIndex:0];                                                        
+      fontSize = [[parts objectAtIndex:1] floatValue];
+      fontFace = [parts objectAtIndex:0];
     }
   }
-  
-  LOG(@"Setting:(%@,%f)", fontFace, fontSize);                                                    
+
+  LOG(@"Setting:(%@,%f)", fontFace, fontSize);
   [adapter setFontname:fontFace];
-  [adapter setFontsize:fontSize];                                                                   
+  [adapter setFontsize:fontSize];
 
   term->h_char = (int) (fontSize * 0.7 * AQUA_RESOLUTION);
   term->v_char = (int) (fontSize * 1.5 * AQUA_RESOLUTION);
-  
+
   return (TRUE);
 }
 
-TERM_PUBLIC void 
+TERM_PUBLIC void
 AQUA_set_pointsize(double size) /* notification of set pointsize */
 {
   LOG(@"AQUA_set_pointsize(%f)", size);
 }
 
-TERM_PUBLIC void 
+TERM_PUBLIC void
 AQUA_point(unsigned int x, unsigned int y, int number)
 {
   /* The default dot-routine doesn't work with AQT */
@@ -413,19 +415,22 @@ AQUA_point(unsigned int x, unsigned int y, int number)
   do_point(x, y, number);
 }
 
-TERM_PUBLIC void 
-AQUA_suspend(void)  /* after one plot of multiplot */
+/* after one plot of multiplot */
+TERM_PUBLIC void
+AQUA_suspend()
 {
   [adapter renderPlot];
 }
- 
-TERM_PUBLIC void 
-AQUA_resume(void) /* before subsequent plot of multiplot */
+
+/* before subsequent plot of multiplot */
+TERM_PUBLIC void
+AQUA_resume()
 {
 }
 
-TERM_PUBLIC void 
-AQUA_boxfill(int style, unsigned int x1, unsigned int y1, unsigned int width, unsigned int height) /* clear part of multiplot */
+/* clear part of multiplot */
+TERM_PUBLIC void
+AQUA_boxfill(int style, unsigned int x1, unsigned int y1, unsigned int width, unsigned int height)
 {
   float r,g,b;
 
@@ -439,23 +444,23 @@ AQUA_boxfill(int style, unsigned int x1, unsigned int y1, unsigned int width, un
    * - pattern : 0 - 100
    */
   int fillpar = style >> 4;
-  
+
   style &= 0xf;
-  
+
   switch (style) {
   case 0: /* fill with background color */
     {
       float rb, gb, bb;
       [adapter getBackgroundColorRed:&rb green:&gb blue:&bb];
-      [adapter setColorRed:rb green:gb blue:bb];  
+      [adapter setColorRed:rb green:gb blue:bb];
     }
     break;
   case FS_SOLID: /* solid fill */
     {
-      /* Alpha channel? RGB -> HSV -> R'G'B'? */ 
+      /* Alpha channel? RGB -> HSV -> R'G'B'? */
       float density = (100 - fillpar)*0.01;
-      [adapter setColorRed:r*(1-density) + density 
-	             green:g*(1-density) + density 
+      [adapter setColorRed:r*(1-density) + density
+	             green:g*(1-density) + density
 	              blue:b*(1-density) + density];
     }
     break;
@@ -470,19 +475,19 @@ AQUA_boxfill(int style, unsigned int x1, unsigned int y1, unsigned int width, un
   /* FIXME: Actions here? */
 #endif
   NSRect scaledRect = NSMakeRect(x1/AQUA_RESOLUTION, y1/AQUA_RESOLUTION, width/AQUA_RESOLUTION, height/AQUA_RESOLUTION);
-  [adapter eraseRect:scaledRect];  
+  [adapter eraseRect:scaledRect];
   [adapter addFilledRect:scaledRect];
   /* Restore color */
   [adapter setColorRed:r green:g blue:b];
 }
-  
-TERM_PUBLIC void 
+
+TERM_PUBLIC void
 AQUA_linewidth(double linewidth)
 {
   [adapter setLinewidth:linewidth];
 }
 
-TERM_PUBLIC void 
+TERM_PUBLIC void
 AQUA_pointsize(double pointsize)
 {
   LOG(@"AQUA_pointsize(%f)", pointsize);
@@ -490,7 +495,7 @@ AQUA_pointsize(double pointsize)
 }
 
 #ifdef PM3D
-TERM_PUBLIC int 
+TERM_PUBLIC int
 AQUA_make_palette(t_sm_palette *palette)
 {
   if (palette == NULL) {
@@ -500,17 +505,17 @@ AQUA_make_palette(t_sm_palette *palette)
   return 0;
 }
 
-TERM_PUBLIC void 
+TERM_PUBLIC void
 AQUA_set_color(double gray)
 {
   rgb_color color;
-  
+
   rgb1maxcolors_from_gray( gray, &color );
   [adapter setColorRed:color.r green:color.g blue:color.b];
-  AQUA_LineType = LT_UNDEFINED; 
+  AQUA_LineType = LT_UNDEFINED;
 }
 
-TERM_PUBLIC void 
+TERM_PUBLIC void
 AQUA_filled_polygon(int pc, gpiPoint *corners)
 {
   int i;
@@ -518,12 +523,12 @@ AQUA_filled_polygon(int pc, gpiPoint *corners)
 					 corners[0].y/AQUA_RESOLUTION)];
   for (i=1; i<pc; i++) {
     [adapter addEdgeToVertexPoint:NSMakePoint(corners[i].x/AQUA_RESOLUTION,
-					      corners[i].y/AQUA_RESOLUTION)];	
+					      corners[i].y/AQUA_RESOLUTION)];
   }
 }
 
 TERM_PUBLIC void
-AQUA_previous_palette(void)
+AQUA_previous_palette()
 {
 }
 
@@ -539,7 +544,7 @@ TERM_TABLE_START(aqua_driver)
   0 /* vtic */ , 0 /* htic */ ,
   AQUA_options, AQUA_init, AQUA_reset,
   AQUA_text, null_scale, AQUA_graphics, AQUA_move, AQUA_vector,
-  AQUA_linetype, AQUA_put_text, 
+  AQUA_linetype, AQUA_put_text,
   /* optionals */
   AQUA_text_angle,
   AQUA_justify_text, AQUA_point, do_arrow, AQUA_set_font,
@@ -551,7 +556,7 @@ TERM_TABLE_START(aqua_driver)
 #endif /* USE_MOUSE */
 #ifdef PM3D
   , AQUA_make_palette,
-  AQUA_previous_palette, 
+  AQUA_previous_palette,
   AQUA_set_color,
   AQUA_filled_polygon
 #endif /* PM3D */
@@ -575,7 +580,7 @@ START_HELP(aqua)
 "?Aqua",
 " This terminal relies on AquaTerm.app for display on Mac OS X.",
 "",
-" Syntax:", 
+" Syntax:",
 "       set terminal aqua {<n>} {title \"<wintitle>\"} {size <x> <y>}",
 "                         {fname \"<fontface>\"} {fsize <fontsize>}",
 "",
@@ -583,7 +588,7 @@ START_HELP(aqua)
 " <wintitle> is the name shown in the title bar (default \"Figure <n>\"),",
 " <x> <y> is the size of the plot (default is 846x594 pt = 11.75x8.25 in).",
 "",
-" Use <fontface> to specify the font to use (default is \"Times-Roman\"),", 
+" Use <fontface> to specify the font to use (default is \"Times-Roman\"),",
 " <fontzise> sets the font size (default is 14.0 pt)."
 END_HELP(aqua)
 #endif /* TERM_HELP */

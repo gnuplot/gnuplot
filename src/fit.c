@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.40 2004/06/13 00:34:32 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.41 2004/06/30 19:51:22 broeker Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -50,7 +50,7 @@ static char *RCSid() { return RCSid("$Id: fit.c,v 1.40 2004/06/13 00:34:32 sfeam
 #include <signal.h>
 
 #include "alloc.h"
-#include "axis.h" 
+#include "axis.h"
 #include "command.h"
 #include "datafile.h"
 #include "eval.h"
@@ -63,7 +63,7 @@ static char *RCSid() { return RCSid("$Id: fit.c,v 1.40 2004/06/13 00:34:32 sfeam
 #if defined(VA_START) && defined(STDC_HEADERS)
 static void Dblfn __PROTO((const char *fmt, ...));
 #else
-static void Dblfn __PROTO(());
+static void Dblfn __PROTO((void));
 #endif
 #define Dblf  Dblfn
 #define Dblf2 Dblfn
@@ -141,7 +141,7 @@ static int max_data;
 static int max_params;
 
 static double epsilon = 1e-5;	/* convergence limit */
-static int maxiter = 0;	
+static int maxiter = 0;
 
 static char fit_script[256];
 
@@ -196,7 +196,7 @@ static TBOOLEAN is_variable __PROTO((char *s));
 static double getdvar __PROTO((const char *varname));
 static int getivar __PROTO((const char *varname));
 static void setvar __PROTO((char *varname, struct value data));
-static char *get_next_word __PROTO((char **s, char *subst)); 
+static char *get_next_word __PROTO((char **s, char *subst));
 static double createdvar __PROTO((char *varname, double value));
 static void splitpath __PROTO((char *s, char *p, char *f));
 static void backup_file __PROTO((char *, const char *));
@@ -212,8 +212,7 @@ static void setvarerr __PROTO((char *varname, double value));
 *****************************************************************/
 
 size_t
-wri_to_fil_last_fit_cmd(fp)
-FILE *fp;
+wri_to_fil_last_fit_cmd(FILE *fp)
 {
     if (fp == NULL)
 	return strlen(last_fit_command);
@@ -227,8 +226,7 @@ FILE *fp;
 *****************************************************************/
 
 static RETSIGTYPE
-ctrlc_handle(an_int)
-    int an_int;
+ctrlc_handle(int an_int)
 {
     (void) an_int;		/* avoid -Wunused warning */
     /* reinstall signal handler (necessary on SysV) */
@@ -313,11 +311,7 @@ error_ex()
     Marquardt's nonlinear least squares fit
 *****************************************************************/
 static marq_res_t
-marquardt(a, C, chisq, lambda)
-double a[];
-double **C;
-double *chisq;
-double *lambda;
+marquardt(double a[], double **C, double *chisq, double *lambda)
 {
     int i, j;
     static double *da = 0,	/* delta-step of the parameter */
@@ -418,26 +412,18 @@ double *lambda;
 }
 
 
-/* FIXME: in the new code, this function doesn't really do enough to be
- * useful. Maybe it ought to be deleted, i.e. integrated with
- * calculate() ?
- */
 /*****************************************************************
     compute chi-square and numeric derivations
 *****************************************************************/
+/* used by marquardt to evaluate the linearized fitting matrix C and
+ * vector d, fills in only the top part of C and d I don't use a
+ * temporary array zfunc[] any more. Just use d[] instead.  */
+/* FIXME: in the new code, this function doesn't really do enough to
+ * be useful. Maybe it ought to be deleted, i.e. integrated with
+ * calculate() ? */
 static TBOOLEAN
-analyze(a, C, d, chisq)
-double a[];
-double **C;
-double d[];
-double *chisq;
+analyze(double a[], double **C, double d[], double *chisq)
 {
-/*
- *  used by marquardt to evaluate the linearized fitting matrix C
- *  and vector d, fills in only the top part of C and d
- *  I don't use a temporary array zfunc[] any more. Just use
- *  d[] instead.
- */
     int i, j;
 
     *chisq = 0;
@@ -462,10 +448,7 @@ double *chisq;
     compute function values and partial derivatives of chi-square
 *****************************************************************/
 static void
-calculate(zfunc, dzda, a)
-double *zfunc;
-double **dzda;
-double a[];
+calculate(double *zfunc, double **dzda, double a[])
 {
     int k, p;
     double tmp_a;
@@ -517,9 +500,7 @@ double a[];
     call internal gnuplot functions
 *****************************************************************/
 static void
-call_gnuplot(par, data)
-double *par;
-double *data;
+call_gnuplot(double *par, double *data)
 {
     int i;
     struct value v;
@@ -590,8 +571,7 @@ fit_interrupt()
     frame routine for the marquardt-fit
 *****************************************************************/
 static TBOOLEAN
-regress(a)
-    double a[];
+regress(double a[])
 {
     double **covar, *dpar, **C, chisq, last_chisq, lambda;
     int iter, i, j;
@@ -628,7 +608,7 @@ regress(a)
  *
  *  I hope that other OSes do it better, if not... add #ifdefs :-(
  *  EMX does not have kbhit.
- * 
+ *
  *  HBB: I think this can be enabled for DJGPP V2. SIGINT is actually
  *  handled there, AFAIK.
  */
@@ -692,10 +672,10 @@ regress(a)
     /* compute errors in the parameters */
 
 #ifdef GP_FIT_ERRVARS
-    if (fit_errorvariables) 
+    if (fit_errorvariables)
 	/* Set error variable to zero before doing this */
 	/* Thus making sure they are created */
-	for (i = 0; i < num_params; i++) 
+	for (i = 0; i < num_params; i++)
 	    setvarerr(par_name[i], 0.0);
 #endif
 
@@ -814,21 +794,19 @@ regress(a)
     display actual state of the fit
 *****************************************************************/
 static void
-show_fit(i, chisq, last_chisq, a, lambda, device)
-int i;
-double chisq;
-double last_chisq;
-double *a;
-double lambda;
-FILE *device;
+show_fit(
+    int i,
+    double chisq, double last_chisq,
+    double *a, double lambda,
+    FILE *device)
 {
     int k;
 
     fprintf(device, "\n\n\
-Iteration %d\n\
-WSSR        : %-15g   delta(WSSR)/WSSR   : %g\n\
-delta(WSSR) : %-15g   limit for stopping : %g\n\
-lambda	  : %g\n\n%s parameter values\n\n",
+ Iteration %d\n\
+ WSSR        : %-15g   delta(WSSR)/WSSR   : %g\n\
+ delta(WSSR) : %-15g   limit for stopping : %g\n\
+ lambda	  : %g\n\n%s parameter values\n\n",
 	    i, chisq, chisq > NEARLY_ZERO ? (chisq - last_chisq) / chisq : 0.0,
 	    chisq - last_chisq, epsilon, lambda,
 	    (i > 0 ? "resultant" : "initial set of free"));
@@ -842,8 +820,7 @@ lambda	  : %g\n\n%s parameter values\n\n",
     is_empty: check for valid string entries
 *****************************************************************/
 static TBOOLEAN
-is_empty(s)
-char *s;
+is_empty(char *s)
 {
     while (*s == ' ' || *s == '\t' || *s == '\n')
 	s++;
@@ -855,9 +832,7 @@ char *s;
     get next word of a multi-word string, advance pointer
 *****************************************************************/
 static char *
-get_next_word(s, subst)
-char **s;
-char *subst;
+get_next_word(char **s, char *subst)
 {
     char *tmp = *s;
 
@@ -877,8 +852,7 @@ char *subst;
     check for variable identifiers
 *****************************************************************/
 static TBOOLEAN
-is_variable(s)
-char *s;
+is_variable(char *s)
 {
     while (*s != '\0') {
 	if (!isalnum((unsigned char) *s) && *s != '_')
@@ -903,9 +877,7 @@ init_fit()
 ******************************************************************/
 
 static void
-setvar(varname, data)
-    char *varname;
-    struct value data;
+setvar(char *varname, struct value data)
 {
     register struct udvt_entry *udv_ptr = first_udv, *last = first_udv;
 
@@ -938,15 +910,13 @@ setvar(varname, data)
             and then set it.
 ******************************************************************/
 static void
-setvarerr(varname, value)
-    char *varname;
-    double value;
+setvarerr(char *varname, double value)
 {
 	struct value errval;    /* This will hold the gnuplot value created from value*/
 	char* pErrValName;      /* The name of the (new) error variable */
 
 	/* Create the variable name by appending _err */
-	pErrValName = (char*)gp_alloc(strlen(varname)+sizeof(char)+4, "");
+	pErrValName = gp_alloc(strlen(varname)+sizeof(char)+4, "");
 
 	sprintf(pErrValName,"%s_err",varname);
 	Gcomplex(&errval, value, 0.0);
@@ -959,8 +929,7 @@ setvarerr(varname, value)
     Read INTGR Variable value, return 0 if undefined or wrong type
 *****************************************************************/
 static int
-getivar(varname)
-const char *varname;
+getivar(const char *varname)
 {
     register struct udvt_entry *udv_ptr = first_udv;
 
@@ -980,8 +949,7 @@ const char *varname;
    I dont think it's a problem that it's an integer - div
 *****************************************************************/
 static double
-getdvar(varname)
-const char *varname;
+getdvar(const char *varname)
 {
     register struct udvt_entry *udv_ptr = first_udv;
 
@@ -999,9 +967,7 @@ const char *varname;
    - create it with value INITIAL_VALUE if not found or undefined
 *****************************************************************/
 static double
-createdvar(varname, value)
-char *varname;
-double value;
+createdvar(char *varname, double value)
 {
     register struct udvt_entry *udv_ptr = first_udv;
 
@@ -1031,10 +997,7 @@ double value;
     Split Identifier into path and filename
 *****************************************************************/
 static void
-splitpath(s, p, f)
-    char *s;
-    char *p;
-    char *f;
+splitpath(char *s, char *p, char *f)
 {
     register char *tmp;
     tmp = s + strlen(s) - 1;
@@ -1055,8 +1018,7 @@ splitpath(s, p, f)
     write the actual parameters to start parameter file
 *****************************************************************/
 void
-update(pfile, npfile)
-char *pfile, *npfile;
+update(char *pfile, char *npfile)
 {
     char fnam[256], path[256], sstr[256], pname[64], tail[127], *s = sstr, *tmp, c;
     char ifilename[256], *ofilename;
@@ -1156,9 +1118,7 @@ char *pfile, *npfile;
 /* tofile must point to a char array[] or allocated data. See update() */
 
 static void
-backup_file(tofile, fromfile)
-    char *tofile;
-    const char *fromfile;
+backup_file(char *tofile, const char *fromfile)
 {
 #if defined (WIN32) || defined(MSDOS) || defined(VMS)
     char *tmpn;
@@ -1213,10 +1173,8 @@ backup_file(tofile, fromfile)
 
 /* A modified copy of save.c:save_range(), but this one reports
  * _current_ values, not the 'set' ones, by default */
-static void 
-log_axis_restriction(log_f, axis)
-    FILE *log_f;
-    AXIS_INDEX axis;
+static void
+log_axis_restriction(FILE *log_f, AXIS_INDEX axis)
 {
     char s[80];
     AXIS *this_axis = axis_array + axis;
@@ -1232,7 +1190,7 @@ log_axis_restriction(log_f, axis)
     } else {
 	fprintf(log_f, "%#g", this_axis->min);
     }
-    
+
     fputs(" : ", log_f);
     if (this_axis->autoscale & AUTOSCALE_MAX) {
 	putc('*', log_f);
@@ -1271,22 +1229,22 @@ fit_command()
     c_token++;
 
     /* first look for a restricted x fit range... */
-    
+
     /* put stuff into arrays to simplify access */
     AXIS_INIT3D(FIRST_X_AXIS, 0, 0);
     AXIS_INIT3D(FIRST_Y_AXIS, 0, 0);
     AXIS_INIT3D(FIRST_Z_AXIS, 0, 1);
 
-    /* use global default indices in axis.c to simplify access to 
+    /* use global default indices in axis.c to simplify access to
      * per-axis variables */
     x_axis = FIRST_X_AXIS;
     y_axis = FIRST_Y_AXIS;
-    z_axis = FIRST_Z_AXIS;    
-    
+    z_axis = FIRST_Z_AXIS;
+
     PARSE_NAMED_RANGE(FIRST_X_AXIS, dummy_x);
     PARSE_NAMED_RANGE(FIRST_Y_AXIS, dummy_y);
     /* HBB 980401: new: allow restricting the z range as well */
-    if (equals(c_token, "[")) 
+    if (equals(c_token, "["))
       zrange_token = c_token;
     PARSE_RANGE(FIRST_Z_AXIS);
 
@@ -1396,7 +1354,7 @@ fit_command()
 	printf("Lambda scaling factors reset:  %g\n", lambda_up_factor);
     }
     *fit_script = NUL;
-    if ((tmp = getenv(FITSCRIPT)) != NULL) 
+    if ((tmp = getenv(FITSCRIPT)) != NULL)
 	safe_strncpy(fit_script, tmp, sizeof(fit_script));
 
     {
@@ -1421,7 +1379,7 @@ fit_command()
     }
 
     /* HBB 20040201: somebody insisted they need this ... */
-    if (AUTOSCALE_BOTH != (X_AXIS.autoscale & AUTOSCALE_BOTH)) 
+    if (AUTOSCALE_BOTH != (X_AXIS.autoscale & AUTOSCALE_BOTH))
 	log_axis_restriction(log_f, x_axis);
     if (AUTOSCALE_BOTH != (Y_AXIS.autoscale & AUTOSCALE_BOTH))
 	log_axis_restriction(log_f, y_axis);
@@ -1703,9 +1661,7 @@ static void
 Dblfn(const char *fmt, ...)
 #else
 static void
-Dblfn(fmt, va_alist)
-const char *fmt;
-va_dcl
+Dblfn(const char *fmt, va_dcl)
 #endif
 {
 #ifdef VA_START
@@ -1740,12 +1696,12 @@ getfitlogfile()
 
 	if (tmp != NULL && *tmp != '\0') {
 	    char *tmp2 = tmp + (strlen(tmp) - 1);
-	    
+
 	    /* if given log file name ends in path separator, treat it
 	     * as a directory to store the default "fit.log" in */
 	    if (*tmp2 == '/' || *tmp2 == '\\') {
 		logfile = gp_alloc(strlen(tmp)
-				   + strlen(fitlogfile_default) + 1, 
+				   + strlen(fitlogfile_default) + 1,
 				   "logfile");
 		strcpy(logfile, tmp);
 		strcat(logfile, fitlogfile_default);

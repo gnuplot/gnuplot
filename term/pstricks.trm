@@ -1,6 +1,6 @@
 /* Hey Emacs this is -*- C -*-
- * 
- * $Id: pstricks.trm,v 1.24 2004/03/29 10:43:36 broeker Exp $
+ *
+ * $Id: pstricks.trm,v 1.25 2004/04/13 17:24:38 broeker Exp $
  */
 
 /* GNUPLOT - pstricks.trm */
@@ -303,8 +303,7 @@ PSTRICKS_text()
 
 
 TERM_PUBLIC void
-PSTRICKS_linetype(linetype)
-int linetype;
+PSTRICKS_linetype(int linetype)
 {
     PSTRICKS_endline();
 
@@ -317,9 +316,7 @@ int linetype;
 
 
 TERM_PUBLIC void
-PSTRICKS_move(x, y)
-unsigned int x;
-unsigned int y;
+PSTRICKS_move(unsigned int x, unsigned int y)
 {
     PSTRICKS_endline();
 
@@ -329,10 +326,7 @@ unsigned int y;
 
 
 TERM_PUBLIC void
-PSTRICKS_point(x, y, number) /* version of line_and_point */
-unsigned x;
-unsigned y;
-int number;
+PSTRICKS_point(unsigned int x, unsigned int y, int number)
 {
     PSTRICKS_move(x, y);
 
@@ -354,9 +348,7 @@ int number;
 
 
 TERM_PUBLIC void
-PSTRICKS_vector(ux, uy)
-unsigned ux;
-unsigned uy;
+PSTRICKS_vector(unsigned ux, unsigned uy)
 {
     if (!PSTRICKS_inline) {
 	PSTRICKS_inline = TRUE;
@@ -396,9 +388,10 @@ PSTRICKS_endline()
 
 
 TERM_PUBLIC void
-PSTRICKS_arrow(sx, sy, ex, ey, head)
-    unsigned int sx, sy, ex, ey;
-    int head;
+PSTRICKS_arrow(
+    unsigned int sx, unsigned int sy,
+    unsigned int ex, unsigned int ey,
+    int head)
 {
     fprintf(gpoutfile, "\\PST@Arrow%s(%.4f,%.4f)(%.4f,%.4f)\n",
 	    head ? "{->}" : "",
@@ -428,8 +421,7 @@ PSTRICKS_arrow(sx, sy, ex, ey, head)
 
 
 static char *
-PSTRICKS_hack_text(s)
-const char *s;
+PSTRICKS_hack_text(const char *s)
 {
     double value;
     char *ends;
@@ -504,10 +496,7 @@ const char *s;
 }
 
 TERM_PUBLIC void
-PSTRICKS_put_text(x, y, str)
-unsigned int x;
-unsigned int y;
-const char str[];
+PSTRICKS_put_text(unsigned int x, unsigned int y, const char str[])
 {
     PSTRICKS_endline();
 
@@ -560,16 +549,14 @@ const char str[];
 
 
 TERM_PUBLIC int
-PSTRICKS_justify_text(mode)
-enum JUSTIFY mode;
+PSTRICKS_justify_text(enum JUSTIFY mode)
 {
     PSTRICKS_justify = mode;
     return (TRUE);
 }
 
 TERM_PUBLIC int
-PSTRICKS_text_angle(ang)
-int ang;
+PSTRICKS_text_angle(int ang)
 {
     PSTRICKS_angle = (ang ? 1 : 0);
     return (TRUE);
@@ -592,7 +579,7 @@ PSTRICKS_make_palette (t_sm_palette *palette)
     if (palette==NULL) {
 	return PSTRICKS_palette_size;
     }
-	
+
     if (PSTRICKS_palette_set == FALSE) {
 	int i;
 	/* Create new palette */
@@ -662,7 +649,7 @@ PSTRICKS_filled_polygon (int points, gpiPoint *corners)
     }
     fprintf(gpoutfile, "\n");
 }
-	 
+
 #endif /*PM3D*/
 
 #endif /* TERM_BODY */

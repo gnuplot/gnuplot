@@ -1,5 +1,5 @@
 /*
-** static char RCSid[]="$Id: gnupmdrv.h,v 1.4 2002/02/15 20:17:35 amai Exp $" ;
+** static char RCSid[]="$Id: gnupmdrv.h,v 1.5 2004/04/13 17:24:05 broeker Exp $" ;
 */
 
 /* PM driver for GNUPLOT */
@@ -37,12 +37,12 @@
 
 /*
  * AUTHOR
- * 
+ *
  *   Gnuplot driver for OS/2:  Roger Fearick
  */
 
 /* include resource defines */
-    
+
 #ifndef DISPDEFS_H
 /*#include "dispdefs.h"*/
 #include "dialogs.h"
@@ -56,7 +56,7 @@
 #define WM_GPSTART          (WM_USER+23)
 #define WM_USER_SET_DATA    (WM_USER+90)
 #define WM_USER_GET_DATA    (WM_USER+91)
-#define WM_USER_CHGFONT     (WM_USER+10) 
+#define WM_USER_CHGFONT     (WM_USER+10)
 #define WM_USER_PRINT_BEGIN (WM_USER+200)
 #define WM_USER_PRINT_OK    (WM_USER+201)
 #define WM_USER_PRINT_ERROR (WM_USER+202)
@@ -81,12 +81,12 @@
 #define INISHELLPOS  "PosShell"
 #define INIPAUSEPOS  "PosPause"
 #define INIPLOTPOS   "PosPlot"
-#define INIFONT      "DefFont" 
+#define INIFONT      "DefFont"
 #define INIFRAC      "PageFrac"
-#define INIPRDRIV    "DrivData"  
-#define INIPRPR      "Printer"  
-#define INIOPTS      "DefOpts"      
-#define INICHAR      "Fontdata"      
+#define INIPRDRIV    "DrivData"
+#define INIPRPR      "Printer"
+#define INIOPTS      "DefOpts"
+#define INICHAR      "Fontdata"
 #define INIKEEPRATIO "KeepRatio"	/* PM */
 #define INIUSEMOUSE  "UseMouse"	/* PM */
 #define INIMOUSECOORD "MouseCoord"	/* PM */

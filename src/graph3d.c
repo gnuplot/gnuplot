@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.89 2004/06/19 07:52:35 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.90 2004/06/20 05:53:04 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -85,7 +85,7 @@ static int key_entry_height;	/* bigger of t->v_size, pointsize*t->v_tick */
 /* is contouring wanted ? */
 t_contour_placement draw_contour = CONTOUR_NONE;
 /* different linestyles are used for contours when set */
-TBOOLEAN label_contours = TRUE;	
+TBOOLEAN label_contours = TRUE;
 
 /* Want to draw surfaces? FALSE mainly useful in contouring mode */
 TBOOLEAN draw_surface = TRUE;
@@ -204,7 +204,7 @@ f_min(double a, double b)
 /* Define the boundary of the plot
  * These are computed at each call to do_plot, and are constant over
  * the period of one do_plot. They actually only change when the term
- * type changes and when the 'set size' factors change. 
+ * type changes and when the 'set size' factors change.
  */
 
 int xmiddle, ymiddle, xscaler, yscaler;
@@ -261,9 +261,7 @@ static double tic_unitx, tic_unity, tic_unitz;
  * Note that a blank line is issued after each set of contours
  */
 static int
-find_maxl_keys3d(plots, count, kcnt)
-    struct surface_points *plots;
-    int count, *kcnt;
+find_maxl_keys3d(struct surface_points *plots, int count, int *kcnt)
 {
     int mlen, len, surf, cnt;
     struct surface_points *this_plot;
@@ -295,9 +293,7 @@ find_maxl_keys3d(plots, count, kcnt)
 }
 
 static int
-find_maxl_cntr(contours, count)
-    struct gnuplot_contours *contours;
-    int *count;
+find_maxl_cntr(struct gnuplot_contours *contours, int *count)
 {
     register int cnt;
     register int mlen, len;
@@ -322,9 +318,7 @@ find_maxl_cntr(contours, count)
 /* borders of plotting area */
 /* computed once on every call to do_plot */
 static void
-boundary3d(plots, count)
-    struct surface_points *plots;
-    int count;
+boundary3d(struct surface_points *plots, int count)
 {
     legend_key *key = &keyT;
     register struct termentry *t = term;
@@ -400,7 +394,7 @@ boundary3d(plots, count)
 	    key_cols = (int) ((ptitl_cnt - 1)/ i) + 1;
 	    /* now calculate actual no rows depending on no cols */
 	    key_rows = (int) ((ptitl_cnt - 1) / key_cols) + 1;
-	} 
+	}
 	key_rows += ktitle_lines;
     }
     if (key->flag == KEY_AUTO_PLACEMENT && key->hpos == TOUT) {
@@ -435,7 +429,7 @@ boundary3d(plots, count)
 	if (current_aspect_ratio >= 0.01 && current_aspect_ratio <= 100.0) {
 	    double current = (double)yscaler / xscaler ;
 	    double required = current_aspect_ratio * t->v_tic / t->h_tic;
-	
+
 	    if (current > required)
 		/* too tall */
 		yscaler = xscaler * required;
@@ -447,12 +441,10 @@ boundary3d(plots, count)
 }
 
 static void
-get_arrow3d(arrow, sx, sy, ex, ey)
-    struct arrow_def* arrow;
-    unsigned int* sx;
-    unsigned int* sy;
-    unsigned int* ex;
-    unsigned int* ey;
+get_arrow3d(
+    struct arrow_def* arrow,
+    unsigned int* sx, unsigned int* sy,
+    unsigned int* ex, unsigned int* ey)
 {
     map3d_position(&(arrow->start), sx, sy, "arrow");
     if (arrow->relative) {
@@ -478,9 +470,7 @@ get_arrow3d(arrow, sx, sy, ex, ey)
 }
 
 static void
-place_labels3d(listhead, layer)
-    struct text_label *listhead;
-    int layer;
+place_labels3d(struct text_label *listhead, int layer)
 {
     struct termentry *t = term;
     struct text_label *this_label;
@@ -505,7 +495,7 @@ place_labels3d(listhead, layer)
 	/* EAM - Allow arbitrary rotation of label text */
 	if (this_label->rotate && (*t->text_angle) (this_label->rotate)) {
 	    write_multiline(x + htic, y + vtic, this_label->text,
-			    this_label->pos, CENTRE, this_label->rotate, 
+			    this_label->pos, CENTRE, this_label->rotate,
 			    this_label->font);
 	    (*t->text_angle) (0);
 	} else {
@@ -522,8 +512,7 @@ place_labels3d(listhead, layer)
 }
 
 static void
-place_arrows3d(layer)
-    int layer;
+place_arrows3d(int layer)
 {
     struct termentry *t = term;
     struct arrow_def *this_arrow;
@@ -554,10 +543,10 @@ static int key_size_right;	/* distance from x to right edge of box */
 
 
 void
-do_3dplot(plots, pcount, quick)
-    struct surface_points *plots;
-    int pcount;			/* count of plots in linked list */
-    int quick;		 	/* !=0 means plot only axes etc., for quick rotation */
+do_3dplot(
+    struct surface_points *plots,
+    int pcount,			/* count of plots in linked list */
+    int quick)		 	/* !=0 means plot only axes etc., for quick rotation */
 {
     struct termentry *t = term;
     int surface;
@@ -788,7 +777,7 @@ do_3dplot(plots, pcount, quick)
 	    xl /= 1000;
 	    xl += xleft;
 #else
-	    /* HBB 19990608: why calculate these again? boundary3d has already 
+	    /* HBB 19990608: why calculate these again? boundary3d has already
 	     * done it... */
 	    if (ptitl_cnt > 0) {
 		/* maximise no cols, limited by label-length */
@@ -834,7 +823,7 @@ do_3dplot(plots, pcount, quick)
 	int tmp = (int)(0.5 * key->height_fix * (t->v_char));
 	yt += 2 * tmp;
 	yl += tmp;
-	
+
 	/* key_rows seems to contain title at this point ??? */
 	term_apply_lp_properties(&key->box);
 	(*t->move) (xl - key_size_left, yb);
@@ -943,7 +932,7 @@ do_3dplot(plots, pcount, quick)
 		{
 		    if (lkey) {
 #ifdef PM3D
-			if (this_plot->lp_properties.use_palette) 
+			if (this_plot->lp_properties.use_palette)
 			    key_sample_line_pm3d(this_plot, xl, yl);
 			else
 #endif
@@ -1215,7 +1204,7 @@ do_3dplot(plots, pcount, quick)
 			cntr3d_impulses(cntrs, &thiscontour_lp_properties);
 			break;
 
-		    case STEPS:	
+		    case STEPS:
 		    case FSTEPS:
 		    case HISTEPS:
 			/* treat all the above like 'lines' */
@@ -1226,7 +1215,7 @@ do_3dplot(plots, pcount, quick)
 		    case LINESPOINTS:
 			cntr3d_lines(cntrs, &thiscontour_lp_properties);
 			/* FALLTHROUGH to draw the points */
-		    case YERRORLINES:	
+		    case YERRORLINES:
 		    case XERRORLINES:
 		    case XYERRORLINES:
 		    case YERRORBARS:
@@ -1296,7 +1285,7 @@ do_3dplot(plots, pcount, quick)
 
 #ifdef PM3D
     /* Release the palette we have made use of. Actually, now it is used only
-     * in postscript terminals which write all pm3d plots in between 
+     * in postscript terminals which write all pm3d plots in between
      * gsave/grestore. Thus, now I'm wondering whether term->previous_palette()
      * is really needed anymore, for any terminal, or could this termentry
      * be removed completely? Any future driver won't need it?
@@ -1319,8 +1308,7 @@ do_3dplot(plots, pcount, quick)
  * Plot the surfaces in IMPULSES style
  */
 static void
-plot3d_impulses(plot)
-struct surface_points *plot;
+plot3d_impulses(struct surface_points *plot)
 {
     int i;				/* point index */
     unsigned int x, y, xx0, yy0;	/* point in terminal coordinates */
@@ -1403,8 +1391,7 @@ struct surface_points *plot;
    and we get splotches.  */
 
 static void
-plot3d_lines(plot)
-struct surface_points *plot;
+plot3d_lines(struct surface_points *plot)
 {
     int i;
     unsigned int x, y, xx0, yy0;	/* point in terminal coordinates */
@@ -1511,8 +1498,7 @@ struct surface_points *plot;
  *  - checks if inside on scan of a set the order should be inverted
  */
 static void
-plot3d_lines_pm3d(plot)
-    struct surface_points *plot;
+plot3d_lines_pm3d(struct surface_points *plot)
 {
     struct iso_curve** icrvs_pair[2];
     int invert[2];
@@ -1673,9 +1659,7 @@ plot3d_lines_pm3d(plot)
  * Plot the surfaces in POINTSTYLE style
  */
 static void
-plot3d_points(plot, p_type)
-    struct surface_points *plot;
-    int p_type;
+plot3d_points(struct surface_points *plot, int p_type)
 {
     int i;
     unsigned int x, y;
@@ -1700,9 +1684,7 @@ plot3d_points(plot, p_type)
 
 #ifdef PM3D
 static void
-plot3d_points_pm3d(plot, p_type)
-    struct surface_points *plot;
-    int p_type;
+plot3d_points_pm3d(struct surface_points *plot, int p_type)
 {
     struct iso_curve** icrvs_pair[2];
     int invert[2];
@@ -1767,9 +1749,7 @@ plot3d_points_pm3d(plot, p_type)
  * Plot a surface contour in IMPULSES style
  */
 static void
-cntr3d_impulses(cntr, lp)
-    struct gnuplot_contours *cntr;
-    struct lp_style_type *lp;
+cntr3d_impulses(struct gnuplot_contours *cntr, struct lp_style_type *lp)
 {
     int i;				/* point index */
     vertex vertex_on_surface, vertex_on_base;
@@ -1797,9 +1777,7 @@ cntr3d_impulses(cntr, lp)
 /* HBB NEW 20031218: changed to use move/vector() style polyline
  * drawing. Gets rid of variable "previous_vertex" */
 static void
-cntr3d_lines(cntr, lp)
-    struct gnuplot_contours *cntr;
-    struct lp_style_type *lp;
+cntr3d_lines(struct gnuplot_contours *cntr, struct lp_style_type *lp)
 {
     int i;			/* point index */
     vertex this_vertex;
@@ -1812,7 +1790,7 @@ cntr3d_lines(cntr, lp)
 	 * is a hidden3d plot */
 	if (hidden3d && !VERTEX_IS_UNDEFINED(this_vertex))
 	    this_vertex.z += 1e-2;
-	
+
 	polyline3d_start(&this_vertex);
 
 	for (i = 1; i < cntr->num_pts; i++) {
@@ -1850,9 +1828,7 @@ cntr3d_lines(cntr, lp)
 /* cntr3d_linespoints:
  * Plot a surface contour in LINESPOINTS style */
 static void
-cntr3d_linespoints(cntr, lp)
-    struct gnuplot_contours *cntr;
-    struct lp_style_type *lp;
+cntr3d_linespoints(struct gnuplot_contours *cntr, struct lp_style_type *lp)
 {
     int i;			/* point index */
     vertex previous_vertex, this_vertex;
@@ -1912,9 +1888,7 @@ cntr3d_linespoints(cntr, lp)
  * Plot a surface contour in POINTSTYLE style
  */
 static void
-cntr3d_points(cntr, lp)
-    struct gnuplot_contours *cntr;
-    struct lp_style_type *lp;
+cntr3d_points(struct gnuplot_contours *cntr, struct lp_style_type *lp)
 {
     int i;
     vertex v;
@@ -1951,8 +1925,7 @@ cntr3d_points(cntr, lp)
  * without hiddenlining. It should probably deleted altogether, and
  * its call replaced by one of cntr3d_points */
 static void
-cntr3d_dots(cntr)
-struct gnuplot_contours *cntr;
+cntr3d_dots(struct gnuplot_contours *cntr)
 {
     int i;
     unsigned int x, y;
@@ -1989,10 +1962,9 @@ struct gnuplot_contours *cntr;
  * but we are not assuming order of corners
  */
 static void
-check_corner_height(p, height, depth)
-struct coordinate GPHUGE *p;
-double height[2][2];
-double depth[2][2];
+check_corner_height(
+    struct coordinate GPHUGE *p,
+    double height[2][2], double depth[2][2])
 {
     if (p->type != INRANGE)
 	return;
@@ -2051,10 +2023,7 @@ setup_3d_box_corners()
 /* Draw all elements of the 3d graph box, including borders, zeroaxes,
  * tics, gridlines, ticmarks, axis labels and the base plane. */
 static void
-draw_3d_graphbox(plot, plot_num, whichgrid)
-    struct surface_points *plot;
-    int plot_num;
-    WHICHGRID whichgrid;
+draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid)
 {
     unsigned int x, y;		/* point in terminal coordinates */
     struct termentry *t = term;
@@ -2062,7 +2031,7 @@ draw_3d_graphbox(plot, plot_num, whichgrid)
     if (draw_border) {
 	/* the four corners of the base plane, in normalized view
 	 * coordinates (-1..1) on all three axes. */
-	vertex bl, bb, br, bf;  
+	vertex bl, bb, br, bf;
 
 	/* map to normalized view coordinates the corners of the
 	 * baseplane: left, back, right and front, in that order: */
@@ -2102,7 +2071,7 @@ draw_3d_graphbox(plot, plot_num, whichgrid)
 	   ) {
 	    vertex fl, fb, fr, ff; /* floor left/back/right/front corners */
 	    vertex tl, tb, tr, tf; /* top left/back/right/front corners */
-	    
+
 	    map3d_xyz(zaxis_x, zaxis_y, floor_z, &fl);
 	    map3d_xyz(back_x , back_y , floor_z, &fb);
 	    map3d_xyz(right_x, right_y, floor_z, &fr);
@@ -2128,7 +2097,7 @@ draw_3d_graphbox(plot, plot_num, whichgrid)
 		    draw3d_line(&fr, &tr, &border_lp);
 #ifdef USE_GRID_LAYERS
 		}
-		if (BACKGRID != whichgrid) 
+		if (BACKGRID != whichgrid)
 #endif
 		    /* Draw the front vertical: floor-to-ceiling, front: */
 		    draw3d_line(&ff, &tf, &border_lp);
@@ -2249,7 +2218,7 @@ draw_3d_graphbox(plot, plot_num, whichgrid)
 	/* Don't output tics and grids if this is the front part of a
 	 * two-part grid drawing process: */
 	if ((surface_rot_x <= 90 && FRONTGRID != whichgrid) ||
-	    (surface_rot_x > 90 && BACKGRID != whichgrid)) 
+	    (surface_rot_x > 90 && BACKGRID != whichgrid))
 #endif
 	if (X_AXIS.ticmode) {
 	    gen_tics(FIRST_X_AXIS, xtick_callback);
@@ -2332,7 +2301,7 @@ draw_3d_graphbox(plot, plot_num, whichgrid)
 	/* Don't output tics and grids if this is the front part of a
 	 * two-part grid drawing process: */
 	if ((surface_rot_x <= 90 && FRONTGRID != whichgrid) ||
-	    (surface_rot_x > 90 && BACKGRID != whichgrid)) 
+	    (surface_rot_x > 90 && BACKGRID != whichgrid))
 #endif
 	if (Y_AXIS.ticmode) {
 	    gen_tics(FIRST_Y_AXIS, ytick_callback);
@@ -2494,11 +2463,11 @@ draw_3d_graphbox(plot, plot_num, whichgrid)
  * HP-UX 10 and higher, if GCC tries to use it */
 
 void
-xtick_callback(axis, place, text, grid)
-    AXIS_INDEX axis;
-    double place;
-    char *text;
-    struct lp_style_type grid;	/* linetype or -2 for none */
+xtick_callback(
+    AXIS_INDEX axis,
+    double place,
+    char *text,
+    struct lp_style_type grid)	/* linetype or -2 for none */
 {
     vertex v1, v2;
     double scale = (text ? ticscale : miniticscale) * (tic_in ? 1 : -1);
@@ -2528,7 +2497,7 @@ xtick_callback(axis, place, text, grid)
 #endif
     draw3d_line(&v1, &v2, &border_lp);
     term_apply_lp_properties(&border_lp);
-	
+
     if (text) {
 	int just;
 	unsigned int x2, y2;
@@ -2567,11 +2536,11 @@ xtick_callback(axis, place, text, grid)
 }
 
 void
-ytick_callback(axis, place, text, grid)
-    AXIS_INDEX axis;
-    double place;
-    char *text;
-    struct lp_style_type grid;
+ytick_callback(
+    AXIS_INDEX axis,
+    double place,
+    char *text,
+    struct lp_style_type grid)
 {
     vertex v1, v2;
     double scale = (text ? ticscale : miniticscale) * (tic_in ? 1 : -1);
@@ -2592,7 +2561,7 @@ ytick_callback(axis, place, text, grid)
 	) {
 	map3d_xyz(0.0, place, base_z, &v1);
     }
-    
+
     v2.x = v1.x + tic_unitx * scale * t->h_tic;
     v2.y = v1.y + tic_unity * scale * t->h_tic;
     v2.z = v1.z + tic_unitz * scale * t->h_tic;
@@ -2639,11 +2608,11 @@ ytick_callback(axis, place, text, grid)
 }
 
 void
-ztick_callback(axis, place, text, grid)
-    AXIS_INDEX axis;
-    double place;
-    char *text;
-    struct lp_style_type grid;
+ztick_callback(
+    AXIS_INDEX axis,
+    double place,
+    char *text,
+    struct lp_style_type grid)
 {
     /* HBB: inserted some ()'s to shut up gcc -Wall, here and below */
     int len = (text ? ticscale : miniticscale)
@@ -2669,7 +2638,7 @@ ztick_callback(axis, place, text, grid)
 
     if (text) {
 	unsigned int x1, y1;
-	
+
 	TERMCOORD(&v1, x1, y1);
 	x1 -= (term->h_tic) * 2;
 	if (!tic_in)
@@ -2677,7 +2646,7 @@ ztick_callback(axis, place, text, grid)
         /* User-specified different color for the tics text */
 	if (axis_array[axis].ticdef.textcolor.lt != TC_DEFAULT)
 	    apply_textcolor(&(axis_array[axis].ticdef.textcolor), term);
-	clip_put_text_just(x1, y1, text, RIGHT, JUST_CENTRE, 
+	clip_put_text_just(x1, y1, text, RIGHT, JUST_CENTRE,
 			   axis_array[axis].ticdef.font);
 	term_apply_lp_properties(&border_lp);
     }
@@ -2695,12 +2664,10 @@ ztick_callback(axis, place, text, grid)
 }
 
 static int
-map3d_getposition(pos, what, xpos, ypos, zpos)
-  struct position *pos;
-const char *what;
-double* xpos;
-double* ypos;
-double* zpos;
+map3d_getposition(
+    struct position *pos,
+    const char *what,
+    double *xpos, double *ypos, double *zpos)
 {
     int screens = 0;		/* need either 0 or 3 screen co-ordinates */
 
@@ -2744,10 +2711,10 @@ double* zpos;
 }
 
 void
-map3d_position(pos, x, y, what)
-struct position *pos;
-unsigned int *x, *y;
-const char *what;
+map3d_position(
+    struct position *pos,
+    unsigned int *x, unsigned int *y,
+    const char *what)
 {
     double xpos = pos->x;
     double ypos = pos->y;
@@ -2761,7 +2728,7 @@ const char *what;
     }
     if (screens != 3) {
 	graph_error("Cannot mix screen co-ordinates with other types");
-    } 
+    }
     {
 	register struct termentry *t = term;
 	/* HBB 20000914: off-by-one bug. Maximum allowed output is
@@ -2774,11 +2741,11 @@ const char *what;
 }
 
 static void
-map3d_position_r(pos_s, pos_e, x, y, what)
-struct position *pos_s;
-struct position *pos_e;
-unsigned int *x, *y;
-const char *what;
+map3d_position_r(
+    struct position *pos_s,
+    struct position *pos_e,
+    unsigned int *x, unsigned int *y,
+    const char *what)
 {
     double xpos_s = pos_s->x;
     double ypos_s = pos_s->y;
@@ -2814,12 +2781,10 @@ const char *what;
  */
 
 static void
-key_text(xl, yl, text)
-int xl, yl;
-char *text;
+key_text(int xl, int yl, char *text)
 {
     legend_key *key = &keyT;
-	
+
     if (key->just == JLEFT && key->flag == KEY_AUTO_PLACEMENT) {
 	(*term->justify_text) (LEFT);
 	(*term->put_text) (xl + key_text_left, yl, text);
@@ -2842,11 +2807,10 @@ char *text;
 }
 
 static void
-key_sample_line(xl, yl)
-int xl, yl;
+key_sample_line(int xl, int yl)
 {
     legend_key *key = &keyT;
-	
+
     if (key->flag == KEY_AUTO_PLACEMENT) {
 	(*term->move) (xl + key_sample_left, yl);
 	(*term->vector) (xl + key_sample_right, yl);
@@ -2857,12 +2821,10 @@ int xl, yl;
 }
 
 static void
-key_sample_point(xl, yl, pointtype)
-int xl, yl;
-int pointtype;
+key_sample_point(int xl, int yl, int pointtype)
 {
     legend_key *key = &keyT;
-	
+
     /* HBB 20000412: fixed incorrect clipping: the point sample was
      * clipped against the graph box, even if in 'below' or 'outside'
      * position. But the result of that clipping was utterly ignored,
@@ -2886,9 +2848,7 @@ int pointtype;
  * color from the z value) of the given surface
  */
 static void
-get_surface_cbminmax(plot, cbmin, cbmax)
-    struct surface_points *plot;
-    double *cbmin, *cbmax;
+get_surface_cbminmax(struct surface_points *plot, double *cbmin, double *cbmax)
 {
     int i, curve = 0;
     TBOOLEAN color_from_column = plot->pm3d_color_from_column; /* just a shortcut */
@@ -2916,16 +2876,14 @@ get_surface_cbminmax(plot, cbmin, cbmax)
 }
 
 
-/* 
+/*
  * Draw a gradient color line for a key (legend).
  */
 static void
-key_sample_line_pm3d(plot, xl, yl)
-    struct surface_points *plot;
-int xl, yl;
+key_sample_line_pm3d(struct surface_points *plot, int xl, int yl)
 {
     legend_key *key = &keyT;
-    int steps = GPMIN(24, abs(key_sample_right - key_sample_left)); 
+    int steps = GPMIN(24, abs(key_sample_right - key_sample_left));
         /* don't multiply by key->swidth --- could be >> palette.maxcolors */
     /* int x_from = xl + key_sample_left; */
     int x_to = xl + key_sample_right;
@@ -2934,7 +2892,7 @@ int xl, yl;
     double cbmin, cbmax;
     double gray, gray_from, gray_to, gray_step;
 
-    /* color gradient only over the cb-values of the surface, if smaller than the 
+    /* color gradient only over the cb-values of the surface, if smaller than the
      * cb-axis range (the latter are gray values [0:1]) */
     get_surface_cbminmax(plot, &cbmin, &cbmax);
     if (cbmin > cbmax) return; /* splot 1/0, for example */
@@ -2946,7 +2904,7 @@ int xl, yl;
 
     if (key->flag == KEY_AUTO_PLACEMENT)
 	(*term->move) (x1, yl);
-    else 
+    else
 	clip_move(x1, yl);
     x2 = x1;
     while (i <= steps) {
@@ -2968,10 +2926,10 @@ int xl, yl;
  * Draw a sequence of points with gradient color a key (legend).
  */
 static void
-key_sample_point_pm3d(plot, xl, yl, pointtype)
-    struct surface_points *plot;
-int xl, yl;
-int pointtype;
+key_sample_point_pm3d(
+    struct surface_points *plot,
+    int xl, int yl,
+    int pointtype)
 {
     legend_key *key = &keyT;
     /* int x_from = xl + key_sample_left; */
@@ -2979,14 +2937,14 @@ int pointtype;
     int i = 0, x1 = xl + key_sample_left, x2;
     double cbmin, cbmax;
     double gray, gray_from, gray_to, gray_step;
-    /* rule for number of steps: 3*char_width*pointsize or char_width for dots, 
+    /* rule for number of steps: 3*char_width*pointsize or char_width for dots,
      * but at least 3 points */
     double step = term->h_char * (pointtype == -1 ? 1 : 3*(1+(pointsize-1)/2));
     int steps = (int)(((double)(key_sample_right - key_sample_left)) / step + 0.5);
     if (steps < 2) steps = 2;
     step = ((double)(key_sample_right - key_sample_left)) / steps;
 
-    /* color gradient only over the cb-values of the surface, if smaller than the 
+    /* color gradient only over the cb-values of the surface, if smaller than the
      * cb-axis range (the latter are gray values [0:1]) */
     get_surface_cbminmax(plot, &cbmin, &cbmax);
     if (cbmin > cbmax) return; /* splot 1/0, for example */

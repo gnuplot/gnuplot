@@ -1,5 +1,5 @@
-/*
- * $Id: gd.trm,v 1.40 2004/05/25 04:14:53 sfeam Exp $
+/* Hello, Emacs, this is -*-C-*-
+ * $Id: gd.trm,v 1.41 2004/06/21 05:46:31 sfeam Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -76,8 +76,8 @@
  *  Alfred Reibenschuh <alfred.reibenschuh@it-austria.com> or <fredo@blackbox.at>
  *  Ben Laurie <ben@algroup.co.uk>
  *
- * This version outputs either color or monochrome PNGs.  
- * The default is 640x480 pixels.  
+ * This version outputs either color or monochrome PNGs.
+ * The default is 640x480 pixels.
  *
  ******************************************************************************
  * PLEASE READ                                                                *
@@ -320,7 +320,7 @@ PNG_FillPattern(int fillpar)
 	PNG_fill_tile.im = gdImageCreate(8, 8);
 
 	/* background */
-	background = gdImageColorAllocate(PNG_fill_tile.im, 255, 255, 255); 
+	background = gdImageColorAllocate(PNG_fill_tile.im, 255, 255, 255);
 	/* gdImageColorTransparent(PNG_fill_tile.im, background); */
 	gdImageFilledRectangle(PNG_fill_tile.im, 0, 0, 7, 7, background);
 
@@ -378,9 +378,7 @@ PNG_FillPattern(int fillpar)
 #endif
 
 static void
-PNG_PointX(x, y)
-    unsigned int x;
-    unsigned int y;
+PNG_PointX(unsigned int x, unsigned int y)
 {
     gdImageLine(png_state.image, x - PNG_ps, y - PNG_ps,
 	    x + PNG_ps, y + PNG_ps, png_state.color);
@@ -389,9 +387,7 @@ PNG_PointX(x, y)
 }
 
 static void
-PNG_PointPlus(x, y)
-    unsigned int x;
-    unsigned int y;
+PNG_PointPlus(unsigned int x, unsigned int y)
 {
     gdImageLine(png_state.image, x - PNG_ps, y,
 	    x + PNG_ps, y, png_state.color);
@@ -400,14 +396,14 @@ PNG_PointPlus(x, y)
 }
 
 static void
-PNG_Triangle(x, y, direction, draw_func)
-    unsigned int x;
-    unsigned int y;
-    int direction;
-    void (*draw_func)(gdImagePtr, gdPointPtr, int, int);
+PNG_Triangle(
+    unsigned int x, unsigned int y,
+    int direction,
+    void (*draw_func)(gdImagePtr, gdPointPtr, int, int))
 {
     int delta  = (int)((1.33 * (double)PNG_ps) + 0.5);
     int delta_ = (int)((0.67 * (double)PNG_ps) + 0.5);
+
     gdPoint points[4];
     points[0].x = x;
     points[0].y = y - direction * delta;
@@ -421,10 +417,9 @@ PNG_Triangle(x, y, direction, draw_func)
 }
 
 static void
-PNG_Diamond(x, y, draw_func)
-    unsigned int x;
-    unsigned int y;
-    void (*draw_func)(gdImagePtr, gdPointPtr, int, int);
+PNG_Diamond(
+    unsigned int x, unsigned int y,
+    void (*draw_func)(gdImagePtr, gdPointPtr, int, int))
 {
     gdPoint points[5];
     points[0].x = x;
@@ -441,11 +436,11 @@ PNG_Diamond(x, y, draw_func)
 }
 
 /*
- * _options()  Called when terminal type is selected.  
- * This procedure should parse options on the command line.  A list of the 
- * currently selected options should be stored in term_options[] in a form 
- * suitable for use with the set term command.  term_options[] is used by 
- * the save command.  Use options_null() if no options are available. 
+ * _options()  Called when terminal type is selected.
+ * This procedure should parse options on the command line.  A list of the
+ * currently selected options should be stored in term_options[] in a form
+ * suitable for use with the set term command.  term_options[] is used by
+ * the save command.  Use options_null() if no options are available.
  */
 TERM_PUBLIC void
 PNG_options()
@@ -561,7 +556,7 @@ PNG_options()
 		c_token++;
 		strcpy(png_state.default_ttffont, png_state.ttffont);
 	        png_state.ttfsize = 2 * term->h_char - 2;
-		err = gdImageStringFT(NULL, &brect[0], 0, 
+		err = gdImageStringFT(NULL, &brect[0], 0,
 			png_state.ttffont, (double)png_state.ttfsize,
 			0.0, 0, 0, "test");
 		if (err) {
@@ -652,7 +647,7 @@ PNG_options()
 		strncpy(png_state.ttffont, external_default, sizeof(png_state.ttffont));
 		strcpy(png_state.default_ttffont, png_state.ttffont);
 	        png_state.ttfsize = 2 * term->h_char - 2;
-		err = gdImageStringFT(NULL, &brect[0], 0, 
+		err = gdImageStringFT(NULL, &brect[0], 0,
 			png_state.ttffont, (double)png_state.ttfsize,
 			0.0, 0, 0, "test");
 		if (err) {
@@ -664,7 +659,7 @@ PNG_options()
     }
 
     /* If no explicit TTF font size found, generate default */
-    if (png_state.default_ttfsize == 0) 
+    if (png_state.default_ttfsize == 0)
 	png_state.default_ttfsize = 2 * term->h_char - 2;
     png_state.ttfsize = png_state.default_ttfsize;
 
@@ -673,7 +668,7 @@ PNG_options()
     if (png_state.default_ttffont[0]) {
     	int brect[8];
 	char *err;
-	err = gdImageStringFT(NULL, &brect[0], 0, 
+	err = gdImageStringFT(NULL, &brect[0], 0,
 		png_state.default_ttffont, (double)png_state.default_ttfsize,
 		0.0, 0, 0, "f00000000g");
 	if (!err) {
@@ -695,7 +690,7 @@ PNG_options()
 	strcat(term_options, "no");
     }
     strcat(term_options, "crop ");
-    
+
     if (png_state.flags & PNG_USE_ENHANCED) {
 	strcat(term_options, "enhanced ");
     }
@@ -725,7 +720,7 @@ PNG_options()
     sprintf(term_options + strlen(term_options),
 	    "size %d,%d ", PNG_XMAX, PNG_YMAX);
 
-    for (i = 0; strlen(term_options) + 9 < MAX_LINE_LEN && 
+    for (i = 0; strlen(term_options) + 9 < MAX_LINE_LEN &&
            i < png_state.n_colors; i++) {
 	sprintf(term_options + strlen(term_options),
 		"x%06x ", png_state.rgb_table[i]);
@@ -748,9 +743,9 @@ int i;
     /* EAM - pre-define brushes to implement linewidth */
     for (i=2; i<=6; i++) {
     	PNG_brush[i].im = gdImageCreate(i,i);
-    	PNG_brush[i].bgnd = gdImageColorAllocate( PNG_brush[i].im, 255, 255, 255 ); 
+    	PNG_brush[i].bgnd = gdImageColorAllocate( PNG_brush[i].im, 255, 255, 255 );
     	gdImageColorTransparent( PNG_brush[i].im, PNG_brush[i].bgnd );
-    	PNG_brush[i].fgnd = gdImageColorAllocate( PNG_brush[i].im, 0, 0, 0 ); 
+    	PNG_brush[i].fgnd = gdImageColorAllocate( PNG_brush[i].im, 0, 0, 0 );
 	PNG_brush[i].last_rgb = 0;
     }
     /* EAM - quick and dirty is to fill the entire brush (square nib).    */
@@ -764,7 +759,7 @@ int i;
 
 /*
  * _reset()  Called when gnuplot is exited, the output device changed or
- * the terminal type changed.  This procedure should reset the device, 
+ * the terminal type changed.  This procedure should reset the device,
  * possibly flushing a buffer somewhere or generating a form feed.
  */
 TERM_PUBLIC void
@@ -789,16 +784,20 @@ PNG_reset()
 
 #if 0
 /* use  #if 1  that's just for debugging */
-void PNG_show_current_palette()
+void
+PNG_show_current_palette()
 {
-int i;
-fprintf(stderr,"*****\n SHOW THE PALETTE! total=%i\n",gdImageColorsTotal(png_state.image));
-for (i=0; i < gdImageColorsTotal(png_state.image); i++) {
-  /* Use access macros to learn colors. */
-  fprintf(stderr,"%i\tr=%d\t g=%d\tb=%d\n", i,
-    gdImageRed(png_state.image,i),
-    gdImageGreen(png_state.image,i),
-    gdImageBlue(png_state.image,i));
+    int i;
+
+    fprintf(stderr, "*****\n SHOW THE PALETTE! total=%i\n",
+	    gdImageColorsTotal(png_state.image));
+    for (i=0; i < gdImageColorsTotal(png_state.image); i++) {
+	/* Use access macros to learn colors. */
+	fprintf(stderr, "%i\tr=%d\t g=%d\tb=%d\n",
+		i,
+		gdImageRed(png_state.image,i),
+		gdImageGreen(png_state.image,i),
+		gdImageBlue(png_state.image,i));
     }
 }
 #endif
@@ -855,7 +854,7 @@ TERM_PUBLIC int PNG_make_palette (t_sm_palette *palette)
     }
 
 
-TERM_PUBLIC 
+TERM_PUBLIC
 void PNG_set_color (double gray)
 {
     int png_color = (gray <= 0) ? 0 : (int)(gray * sm_palette.colors);
@@ -904,9 +903,10 @@ void PNG_filled_polygon(int points, gpiPoint *corners)
  * style parameter is some garbled hash combining fillstyle and filldensity
  */
 TERM_PUBLIC void
-PNG_boxfill(style, x, y, width, height)
-int style;
-unsigned int x, y, width, height;
+PNG_boxfill(
+    int style,
+    unsigned int x, unsigned int y,
+    unsigned int width, unsigned int height)
 {
     unsigned int x1, y1, x2, y2;
     int          color;
@@ -917,7 +917,7 @@ unsigned int x, y, width, height;
      * - pattern : 0 - 100
      */
     int fillpar = style >> 4;
-    
+
     style &= 0xf;
 
     switch (style) {
@@ -949,7 +949,7 @@ unsigned int x, y, width, height;
 /*
  * _graphics()  Called just before a plot is going to be displayed.  This
  * procedure should set the device into graphics mode.  Devices which can't
- * be used as terminals (like plotters) will probably be in graphics mode 
+ * be used as terminals (like plotters) will probably be in graphics mode
  * always and therefore won't need this.
  */
 TERM_PUBLIC void
@@ -966,7 +966,7 @@ PNG_graphics()
     png_state.charw = term->h_char;	/* png_state.font->w; */
     png_state.charh = term->v_char;	/* png_state.font->h; */
     for (i = png_state.n_colors; i < WEB_N_COLORS; i++)
-	png_state.rgb_table[i] = 
+	png_state.rgb_table[i] =
 	    (web_color_rgbs[i].r << 16) |
 	    (web_color_rgbs[i].g << 8) |
 	    web_color_rgbs[i].b;
@@ -985,8 +985,8 @@ PNG_graphics()
 	gdImageColorTransparent(png_state.image, -1);
     }
 
-/* 
- * _text()  Called immediately after a plot is displayed.  This procedure 
+/*
+ * _text()  Called immediately after a plot is displayed.  This procedure
  * should set the device back into text mode if it is also a terminal, so
  * that commands can be seen as they're typed.  Again, this will probably
  * do nothing if the device can't be used as a terminal.
@@ -1092,7 +1092,7 @@ PNG_vector(unsigned int x, unsigned int y)
  * line(s) plotted.
  * Negative linetypes are defined in gadgets.h
  * lt 0 and upwards are used for plots 0 and upwards.
- * If _linetype() is called with lt greater than the available line types, 
+ * If _linetype() is called with lt greater than the available line types,
  * it should map it to one of the available line types.
  */
 TERM_PUBLIC void
@@ -1123,9 +1123,9 @@ PNG_linewidth(double linewidth)
        DEBUG */
 }
 
-/* _put_text(x,y,str)  Called to display text at the (x,y) position, 
- * while in graphics mode.   The text should be vertically (with respect 
- * to the text) justified about (x,y).  The text is rotated according 
+/* _put_text(x,y,str)  Called to display text at the (x,y) position,
+ * while in graphics mode.   The text should be vertically (with respect
+ * to the text) justified about (x,y).  The text is rotated according
  * to _text_angle and then horizontally (with respect to the text)
  * justified according to _justify_text.
  */
@@ -1137,7 +1137,7 @@ PNG_put_text(unsigned int x, unsigned int y, const char *string)
     	int brect[8]; char *err;
 	/* Draw once with a NULL image to get the bounding rectangle */
 	/* then draw it again, centered.                             */
-	err = gdImageStringFT(NULL, brect, png_state.color, 
+	err = gdImageStringFT(NULL, brect, png_state.color,
 			png_state.ttffont, (double)png_state.ttfsize,
 			(double)png_state.angle * M_PI_2 / 90. ,
 			x, Y(y), (char *)string);
@@ -1148,7 +1148,7 @@ PNG_put_text(unsigned int x, unsigned int y, const char *string)
 	    x += sin((double)png_state.angle * M_PI_2/90.) * (double)png_state.charh/2.;
 	    y -= cos((double)png_state.angle * M_PI_2/90.) * (double)png_state.charh/2.;
 	    switch (png_state.justify) {
-		case RIGHT:	
+		case RIGHT:
 		    		x -= (brect[2]-brect[0]);
 		    		y += (brect[3]-brect[1]);
 		    		break;
@@ -1159,7 +1159,7 @@ PNG_put_text(unsigned int x, unsigned int y, const char *string)
 		case LEFT:
 		default:	break;
 	    }
-	    err = gdImageStringFT(png_state.image, brect, png_state.color, 
+	    err = gdImageStringFT(png_state.image, brect, png_state.color,
 			png_state.ttffont, (double)png_state.ttfsize,
 			(double)png_state.angle * M_PI_2 / 90.,
 			x, Y(y), (char *)string);
@@ -1223,8 +1223,7 @@ PNG_text_angle(int ang)
 }
 
 TERM_PUBLIC int
-PNG_justify_text(mode)
-enum JUSTIFY mode;
+PNG_justify_text(enum JUSTIFY mode)
 {
     png_state.justify = mode;
     return TRUE;
@@ -1241,48 +1240,53 @@ PNG_point(unsigned int x, unsigned int y, int number)
     y = Y(y);
 
     switch (number % 13) {
-	case 0: /* plus */
-	default:
-	    PNG_PointPlus(x, y);
-	    break;
-	case 1: /* X */
-	    PNG_PointX(x, y);
-	    break;
-	case 2: /* star */
-	    PNG_PointPlus(x, y);
-	    PNG_PointX(x, y);
-	    break;
-	case 3: /* box */
-	    gdImageRectangle(png_state.image, x - PNG_ps, y - PNG_ps, x + PNG_ps, y + PNG_ps, png_state.color);
-	    break;
-	case 4: /* box                   filled */
-	    gdImageFilledRectangle(png_state.image, x - PNG_ps, y - PNG_ps, x + PNG_ps, y + PNG_ps, png_state.color);
-	    break;
-	case 5: /* circle */
-	    gdImageArc(png_state.image, x, y, 2 * PNG_ps, 2 * PNG_ps, 0, 360, png_state.color);
-	    break;
-	case 6: /* circle (disk)         filled */
-	    gdImageArc(png_state.image, x, y, 2 * PNG_ps, 2 * PNG_ps, 0, 360, png_state.color);
-	    gdImageFillToBorder(png_state.image, x, y, png_state.color, png_state.color);
-	    break;
-	case 7: /* triangle */
-	    PNG_Triangle(x, y, 1, gdImagePolygon);
-	    break;
-	case 8: /* triangle              filled */
-	    PNG_Triangle(x, y, 1, gdImageFilledPolygon);
-	    break;
-	case 9: /* upside down triangle */
-	    PNG_Triangle(x, y, -1, gdImagePolygon);
-	    break;
-	case 10: /* upside down triangle  filled */
-	    PNG_Triangle(x, y, -1, gdImageFilledPolygon);
-	    break;
-	case 11: /* diamond */
-	    PNG_Diamond(x, y, gdImagePolygon);
-	    break;
-	case 12: /* diamond               filled */
-	    PNG_Diamond(x, y, gdImageFilledPolygon);
-	    break;
+    case 0: /* plus */
+    default:
+	PNG_PointPlus(x, y);
+	break;
+    case 1: /* X */
+	PNG_PointX(x, y);
+	break;
+    case 2: /* star */
+	PNG_PointPlus(x, y);
+	PNG_PointX(x, y);
+	break;
+    case 3: /* box */
+	gdImageRectangle(png_state.image, x - PNG_ps, y - PNG_ps,
+			 x + PNG_ps, y + PNG_ps, png_state.color);
+	break;
+    case 4: /* box                   filled */
+	gdImageFilledRectangle(png_state.image, x - PNG_ps, y - PNG_ps,
+			       x + PNG_ps, y + PNG_ps, png_state.color);
+	break;
+    case 5: /* circle */
+	gdImageArc(png_state.image, x, y, 2 * PNG_ps, 2 * PNG_ps,
+		   0, 360, png_state.color);
+	break;
+    case 6: /* circle (disk)         filled */
+	gdImageArc(png_state.image, x, y, 2 * PNG_ps, 2 * PNG_ps,
+		   0, 360, png_state.color);
+	gdImageFillToBorder(png_state.image, x, y,
+			    png_state.color, png_state.color);
+	break;
+    case 7: /* triangle */
+	PNG_Triangle(x, y, 1, gdImagePolygon);
+	break;
+    case 8: /* triangle              filled */
+	PNG_Triangle(x, y, 1, gdImageFilledPolygon);
+	break;
+    case 9: /* upside down triangle */
+	PNG_Triangle(x, y, -1, gdImagePolygon);
+	break;
+    case 10: /* upside down triangle  filled */
+	PNG_Triangle(x, y, -1, gdImageFilledPolygon);
+	break;
+    case 11: /* diamond */
+	PNG_Diamond(x, y, gdImagePolygon);
+	break;
+    case 12: /* diamond               filled */
+	PNG_Diamond(x, y, gdImageFilledPolygon);
+	break;
     }
 }
 
@@ -1332,7 +1336,7 @@ PNG_set_font(const char *fontname)
     if (*png_state.ttffont) {
     	int brect[8];
 	char *err;
-	err = gdImageStringFT(NULL, &brect[0], 0, 
+	err = gdImageStringFT(NULL, &brect[0], 0,
 		png_state.ttffont, (double)png_state.ttfsize,
 		0.0, 0, 0, "f00000000g");
 	if (!err) {
@@ -1346,8 +1350,7 @@ PNG_set_font(const char *fontname)
 }
 
 TERM_PUBLIC void
-PNG_pointsize(ptsize)
-    double ptsize;
+PNG_pointsize(double ptsize)
 {
     PNG_ps = (int)(((double)PNG_POINT_SCALE * ptsize) + 0.5);
 }
@@ -1384,11 +1387,12 @@ static TBOOLEAN ENHgd_widthflag = TRUE;
 static unsigned int ENHgd_xsave, ENHgd_ysave;
 
 TERM_PUBLIC void
-ENHGD_OPEN(fontname, fontsize, base, widthflag, showflag, overprint)
-    char *fontname;
-    TBOOLEAN widthflag, showflag;
-    double fontsize, base;
-    int overprint;
+ENHGD_OPEN(
+    char *fontname,
+    double fontsize, double base,
+    TBOOLEAN widthflag,
+    TBOOLEAN showflag,
+    int overprint)
 {
     /* If the overprint code requests a save or restore, that's all we do */
     if (overprint == 3) {
@@ -1413,7 +1417,7 @@ ENHGD_OPEN(fontname, fontsize, base, widthflag, showflag, overprint)
 }
 
 /* Write a string fragment and update the current position */
-TERM_PUBLIC void 
+TERM_PUBLIC void
 ENHGD_FLUSH()
 {
     int brect[8]; char *err;
@@ -1429,7 +1433,7 @@ ENHGD_FLUSH()
 	    x += sin((double)png_state.angle * M_PI_2/90.) * (double)png_state.charh/2.;
 	    y -= cos((double)png_state.angle * M_PI_2/90.) * (double)png_state.charh/2.;
 	    err = gdImageStringFT(
-			(ENHgd_show && !ENHgd_sizeonly) ? png_state.image : NULL, 
+			(ENHgd_show && !ENHgd_sizeonly) ? png_state.image : NULL,
 	    		brect, png_state.color,
 			ENHgd_font, ENHgd_fontsize,
 			(double)png_state.angle * M_PI_2/90.,
@@ -1448,12 +1452,10 @@ ENHGD_FLUSH()
 }
 
 TERM_PUBLIC void
-ENHGD_put_text(x, y, str)
-    unsigned int x, y;
-    const char *str;
+ENHGD_put_text(unsigned int x, unsigned int y, const char *str)
 {
     char *original_string = (char *)str;
-    
+
     if (ignore_enhanced_text || !png_state.ttffont) {
 	PNG_put_text(x,y,str);
 	return;
@@ -1500,8 +1502,8 @@ ENHGD_put_text(x, y, str)
      * closing brace in the string. We increment past it (else
      * we get stuck in an infinite loop) and try again.
      */
-    while (*(str = enhanced_recursion((char *)str, TRUE, 
-    			ENHgd_font, ENHgd_fontsize, 
+    while (*(str = enhanced_recursion((char *)str, TRUE,
+    			ENHgd_font, ENHgd_fontsize,
 			0.0, TRUE, TRUE, 0))) {
 	(term->enhanced_flush)();
 
@@ -1529,7 +1531,7 @@ ENHGD_put_text(x, y, str)
 	    y_offset = x_offset * tan((double)png_state.angle * M_PI_2/90.);
 	png_state.justify = LEFT;
 	ENHgd_sizeonly = FALSE;
-	
+
 	if (justification == RIGHT) {
 	    ENHGD_put_text(x - x_offset, y - y_offset, original_string);
 	} else if (justification == CENTRE) {
@@ -1552,15 +1554,15 @@ TERM_TABLE_START(png_driver)
     PNG_text, null_scale, PNG_graphics, PNG_move, PNG_vector,
     PNG_linetype, PNG_put_text, PNG_text_angle,
 #ifdef HAVE_GD_TTF
-    PNG_justify_text, 
+    PNG_justify_text,
 #else
     null_justify_text,
 #endif
     PNG_point, do_arrow, PNG_set_font,
     PNG_pointsize,
     TERM_CAN_MULTIPLOT | TERM_BINARY,
-    0 /*suspend*/, 0 /*resume*/, 
-    PNG_boxfill /*EAM - fillbox*/,   
+    0 /*suspend*/, 0 /*resume*/,
+    PNG_boxfill /*EAM - fillbox*/,
     PNG_linewidth /*EAM - linewidth*/
 #ifdef USE_MOUSE
     , 0, 0, 0, 0, 0 /* no mouse support */
@@ -1688,8 +1690,8 @@ TERM_PUBLIC void JPEG_text __PROTO((void));
 #ifdef TERM_BODY
 
 #include "gd.h"
-/* 
- * All functions except the final write to file 
+/*
+ * All functions except the final write to file
  * are actually performed by the PNG driver code
  */
 TERM_PUBLIC void
@@ -1716,8 +1718,8 @@ TERM_TABLE_START(jpeg_driver)
     PNG_justify_text, PNG_point, do_arrow, PNG_set_font,
     PNG_pointsize,
     TERM_CAN_MULTIPLOT | TERM_BINARY,
-    0 /*suspend*/, 0 /*resume*/, 
-    PNG_boxfill /*EAM - fillbox*/,   
+    0 /*suspend*/, 0 /*resume*/,
+    PNG_boxfill /*EAM - fillbox*/,
     PNG_linewidth /*EAM - linewidth*/
 #ifdef USE_MOUSE
     , 0, 0, 0, 0, 0 /* no mouse support */

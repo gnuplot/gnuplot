@@ -1,17 +1,17 @@
 #ifdef INCRCSDATA
-static char RCSid[]="$Id: gnupmdrv.c,v 1.2 2002/02/15 20:17:35 amai Exp $" ;
+static char RCSid[]="$Id: gnupmdrv.c,v 1.3 2004/04/13 17:24:05 broeker Exp $" ;
 #endif
 
 /****************************************************************************
 
     PROGRAM: gnupmdrv
-    
+
     Outboard PM driver for GNUPLOT 3.x
 
     MODULE:  gnupmdrv.c
-        
+
     This file contains the startup procedures for gnupmdrv
-       
+
 ****************************************************************************/
 
 /* PM driver for GNUPLOT */
@@ -49,7 +49,7 @@ static char RCSid[]="$Id: gnupmdrv.c,v 1.2 2002/02/15 20:17:35 amai Exp $" ;
 
 /*
  * AUTHOR
- * 
+ *
  *   Gnuplot driver for OS/2:  Roger Fearick
  */
 
@@ -92,8 +92,8 @@ static HWND      InitHelp( HAB, HWND ) ;
 
 int main ( int argc, char **argv )
 /*
-** args:  argv[1] : name to be used for IPC (pipes/semaphores) with gnuplot 
-** 
+** args:  argv[1] : name to be used for IPC (pipes/semaphores) with gnuplot
+**
 ** Standard PM initialisation:
 ** -- set up message processing loop
 ** -- register all window classes
@@ -109,7 +109,7 @@ int main ( int argc, char **argv )
     HMQ          hmq ;
     QMSG         qmsg ;
     PFNWP        pfnOldFrameWndProc ;
-    HWND         hwndHelp ;        
+    HWND         hwndHelp ;
     BOOL         bPos ;
 
     /* (am, 19981001)
@@ -147,13 +147,13 @@ int main ( int argc, char **argv )
                     char *p = szTitle ;
                     argv[i]++ ;
                     while( *argv[i] != '"' ) {
-                        *p++ = *argv[i]++ ; 
-                        } 
+                        *p++ = *argv[i]++ ;
+                        }
                     *p = '\0' ;
                     }
                 argv[i]++ ;
                 }
-            } 
+            }
         }
     {
     char *p ;
@@ -161,26 +161,26 @@ int main ( int argc, char **argv )
     strcpy( szIniFile, argv[0] ) ;
     while( (p=strchr(szIniFile,'/'))!=NULL ) *p = '\\' ;
     p = strrchr(szIniFile,'\\') ;
-    if(p==NULL) p = strrchr(szIniFile,':') ;    
+    if(p==NULL) p = strrchr(szIniFile,':') ;
     if(p==NULL) p = szIniFile ;
     else ++p ;
     strcpy(p,GNUINI);
     }
-    
-    hab = WinInitialize( 0 ) ;    
+
+    hab = WinInitialize( 0 ) ;
     hmq = WinCreateMsgQueue( hab, 50 ) ;
 
                 // get defaults from gnupmdrv.ini
 
     bPos = QueryIni( hab ) ;
-                
+
                 // register window and child window classes
 
     if( ! WinRegisterClass( hab,        /* Exit if can't register */
                             APP_NAME,
                             (PFNWP)DisplayClientWndProc,
                             CS_SIZEREDRAW,
-                            0 ) 
+                            0 )
                             ) return 0L ;
 
                 // create main window
@@ -205,7 +205,7 @@ int main ( int argc, char **argv )
 
                 // init the help manager
 
-    hwndHelp = InitHelp( hab, hwndFrame ) ;        
+    hwndHelp = InitHelp( hab, hwndFrame ) ;
 
                 // set window title and make it active
 
@@ -216,8 +216,8 @@ int main ( int argc, char **argv )
     strcat( text, "]" ) ;
     WinSetWindowText( hwndFrame, text ) ;
     }
-                // process window messages 
-      
+                // process window messages
+
     while (WinGetMsg (hab, &qmsg, NULLHANDLE, 0, 0))
          WinDispatchMsg (hab, &qmsg) ;
 
@@ -271,16 +271,16 @@ MRESULT EXPENTRY NewFrameWndProc (HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2)
 */
     {
     PFNWP       pfnOldFrameWndProc ;
-    
-    pfnOldFrameWndProc = (PFNWP) WinQueryWindowULong( hwnd, QWL_USER ) ; 
+
+    pfnOldFrameWndProc = (PFNWP) WinQueryWindowULong( hwnd, QWL_USER ) ;
     switch( msg ) {
-        default: 
+        default:
             break ;
 
         case HM_QUERY_KEYS_HELP:
-            return (MRESULT) IDH_KEYS ;            
+            return (MRESULT) IDH_KEYS ;
         }
-    return (*pfnOldFrameWndProc)(hwnd, msg, mp1, mp2) ;    
+    return (*pfnOldFrameWndProc)(hwnd, msg, mp1, mp2) ;
     }
 
 

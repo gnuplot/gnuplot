@@ -1,5 +1,5 @@
-/*
- * $Id: linux.trm,v 1.24 2002/10/18 10:05:06 lhecking Exp $
+/* Hello, Emacs, this is -*-C-*-
+ * $Id: linux.trm,v 1.25 2004/04/13 17:24:34 broeker Exp $
  *
  */
 
@@ -85,7 +85,7 @@ TERM_PUBLIC void LINUX_suspend __PROTO((void));
 TERM_PUBLIC void LINUX_resume __PROTO((void));
 
 /* also used in vgagl.trm, so export it: */
-TERM_PUBLIC int LINUX_graphics_allowed; 
+TERM_PUBLIC int LINUX_graphics_allowed;
 
 #endif
 
@@ -115,7 +115,7 @@ static void LINUX_putc __PROTO((unsigned int x, unsigned int y, int c, int ang,
  * don't support the linux terminal */
 
 void
-LINUX_setup(void)
+LINUX_setup()
 {
     char line[256];
     FILE *pipe;
@@ -132,10 +132,10 @@ LINUX_setup(void)
 	line[strlen(line) - 1] = '\0';
 	if (
 	    strcmp(line, "/dev/console") == 0 ||
-	    
+
 	    ( ( strncmp(line, "/dev/tty", 8) == 0 || strncmp(line, "/dev/vc/", 8) == 0 )
 	     && isdigit((unsigned char) line[8]))
-	     
+
 	     ) {
 	    LINUX_graphics_allowed = TRUE;
 	} else {
@@ -233,8 +233,7 @@ LINUX_resume()
 }
 
 TERM_PUBLIC void
-LINUX_linetype(linetype)
-int linetype;
+LINUX_linetype(int linetype)
 {
     if (linetype >= 13)
 	linetype %= 13;
@@ -242,18 +241,14 @@ int linetype;
 }
 
 TERM_PUBLIC void
-LINUX_move(x, y)
-unsigned int x;
-unsigned int y;
+LINUX_move(unsigned int x, unsigned int y)
 {
     linux_startx = x;
     linux_starty = y;
 }
 
 TERM_PUBLIC void
-LINUX_vector(x, y)
-unsigned int x;
-unsigned int y;
+LINUX_vector(unsigned int x, unsigned int y)
 {
     vga_drawline(linux_startx, linux_lasty - linux_starty, x, linux_lasty - y);
     linux_startx = x;
@@ -261,22 +256,22 @@ unsigned int y;
 }
 
 TERM_PUBLIC int
-LINUX_text_angle(ang)
-int ang;
+LINUX_text_angle(int ang)
 {
     linux_angle = (ang ? 1 : 0);
     return TRUE;
 }
 
 static void
-LINUX_putc(x, y, c, ang, line_func)
-unsigned int x, y;
-int c;
-int ang;
-linux_line_func_ptr line_func;
+LINUX_putc(
+    unsigned int x, unsigned int y,
+    int c,
+    int ang,
+    linux_line_func_ptr line_func)
 {
     int i, j, k;
     unsigned int pixelon;
+
     i = (int) (c) - 32;
     for (j = 0; j < FNT5X9_VBITS; j++) {
 	for (k = 0; k < FNT5X9_HBITS; k++) {
@@ -296,9 +291,7 @@ linux_line_func_ptr line_func;
 }
 
 TERM_PUBLIC void
-LINUX_put_text(x, y, str)
-unsigned int x, y;
-const char *str;
+LINUX_put_text(unsigned int x, unsigned int y, const char *str)
 {
     int i;
     switch (linux_angle) {

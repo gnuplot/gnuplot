@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: cgm.trm,v 1.56 2004/03/11 06:28:10 sfeam Exp $
+ * $Id: cgm.trm,v 1.57 2004/04/13 17:24:16 broeker Exp $
  */
 
 /* GNUPLOT - cgm.trm */
@@ -41,7 +41,7 @@
  *   Computer Graphics Metafile
  *
  * TODO
- *   better control over plot size (never cutting off labels, correct font 
+ *   better control over plot size (never cutting off labels, correct font
  *   sizes)
 
  * REFERENCES
@@ -62,7 +62,7 @@
  *
  *   MIL-D-28003A "Digital Representation for Communication of
  *   Illustration Data: CGM Application Profile", 15 November 1991,
- *   http://www-cals.itsi.disa.mil/core/standards/28003aa1.pdf. 
+ *   http://www-cals.itsi.disa.mil/core/standards/28003aa1.pdf.
  *
  *   "The computer graphics metafile", Lofton R. Henderson and Anne
  *   M. Mumford, Butterworths, London, 1990, ISBN 0-408-02680-4.
@@ -100,7 +100,7 @@ TERM_PUBLIC int CGM_justify_text __PROTO((enum JUSTIFY mode));
 TERM_PUBLIC void CGM_point __PROTO((unsigned int x, unsigned int y,
 				    int number));
 #ifdef USE_ULIG_FILLEDBOXES
-TERM_PUBLIC void CGM_fillbox __PROTO((int style, unsigned int x1, unsigned int y1, 
+TERM_PUBLIC void CGM_fillbox __PROTO((int style, unsigned int x1, unsigned int y1,
 				unsigned int width, unsigned int height));
 #endif
 #ifdef PM3D
@@ -239,7 +239,7 @@ struct fontdata {
                                    monospaced. Also, metrics of the
                                    same font from different foundaries
                                    are sometimes different.  */
-};  
+};
 
 static struct fontdata cgm_basic_font_data[]={
     /* these are WebCGM recommended fonts */
@@ -438,13 +438,13 @@ CGM_options()
 
 	    if (string[0] == 'x') { /* set color */
 	        unsigned short red, green, blue;
-	      
+
 		if (sscanf(string, "x%2hx%2hx%2hx", &red, &green, &blue ) != 3)
 		     int_error(c_token, "invalid color spec, must be xRRGGBB");
 		if (cgm_user_color_count >= cgm_user_color_max) {
 		     cgm_user_color_max = cgm_user_color_max*2 + 4;
-		     cgm_user_color_table = 
-			  gp_realloc(cgm_user_color_table, 
+		     cgm_user_color_table =
+			  gp_realloc(cgm_user_color_table,
 				     (cgm_user_color_max*3+1)*sizeof(int),
 				     "CGM color table");
 		     /* 1st table entry is the minimum color index value */
@@ -473,7 +473,7 @@ CGM_options()
 			   if (l <= 255) {
 				struct fontdata *new_font_data;
 				int i;
-				new_font_data = 
+				new_font_data =
 				     gp_alloc((n + 2)*sizeof(struct fontdata),
 					      "CGM font list");
 				new_font_data->name = gp_alloc(l+1,"CGM font list");
@@ -524,7 +524,7 @@ CGM_options()
 
     if (cgm_user_color_count) {
 	 int i, red, green, blue;
-	 for (i = 0; i < cgm_user_color_count && 
+	 for (i = 0; i < cgm_user_color_count &&
 		   (strlen(term_options) + 9 < MAX_LINE_LEN); i++) {
 	      red = cgm_user_color_table[1 + 3*i];
 	      green = cgm_user_color_table[2 + 3*i];
@@ -540,7 +540,7 @@ CGM_options()
 	      * the default colors */
 
 	     /* 1st table entry is the minimum color index value */
-	     gp_realloc(cgm_user_color_table, 
+	     gp_realloc(cgm_user_color_table,
 		     (CGM_COLORS * 3 + 1) * sizeof (int), "CGM color table");
 
 	     for (i = cgm_user_color_count, j = cgm_user_color_count * 3 + 1;
@@ -692,7 +692,7 @@ CGM_graphics()
       char description_data[256];
       sprintf(description_data, "\
 Gnuplot version %s patchlevel %s,\
- Computer Graphics Metafile version 1 per MIL-D-28003A/BASIC-1.%d", 
+ Computer Graphics Metafile version 1 per MIL-D-28003A/BASIC-1.%d",
 	      gnuplot_version, gnuplot_patchlevel, cgm_monochrome?0:2);
 	CGM_write_char_record(1, 2, strlen(description_data),
 			      description_data);
@@ -803,10 +803,7 @@ Gnuplot version %s patchlevel %s,\
    relative to Times Bold Italic.  If the font is not in the table,
    set *relwidth to 1.0 and return 0. */
 static int
-CGM_find_font(name, numchar, relwidth)
-    const char *name;
-    int numchar;
-    double *relwidth;
+CGM_find_font(const char *name, int numchar, double *relwidth)
 {
     int i;
     *relwidth = 1.;
@@ -823,8 +820,7 @@ CGM_find_font(name, numchar, relwidth)
 }
 
 TERM_PUBLIC int
-CGM_set_font(font)
-    const char *font;
+CGM_set_font(const char *font)
 {
     register struct termentry *t = term;
     int size, font_index;
@@ -878,8 +874,7 @@ CGM_text()
 }
 
 TERM_PUBLIC void
-CGM_linetype(linetype)
-    int linetype;
+CGM_linetype(int linetype)
 {
     assert(linetype > L_TYPE_NODRAW);
     if (linetype == cgm_linetype)
@@ -898,8 +893,7 @@ CGM_linetype(linetype)
 }
 
 TERM_PUBLIC void
-CGM_linecolor(linecolor)
-    int linecolor;
+CGM_linecolor(int linecolor)
 {
     assert(linecolor > L_TYPE_NODRAW);
     if (linecolor >= 0) {
@@ -923,9 +917,10 @@ CGM_linecolor(linecolor)
 
 #ifdef USE_ULIG_FILLEDBOXES
 TERM_PUBLIC void
-CGM_fillbox(style, x1,y1,width,height)
-    int style;
-    unsigned int x1,y1,width,height;
+CGM_fillbox(
+     int style,
+     unsigned int x1, unsigned int y1,
+     unsigned int width, unsigned int height)
 {
     int saved_fill_color = cgm_next.fill_color;
     /* CGM defines six hatch patterns.  For pattern 0 we want solid
@@ -957,7 +952,7 @@ CGM_fillbox(style, x1,y1,width,height)
 
 	cgm_next.interior_style = 1; /* solid */
         break;
-    case FS_PATTERN: 
+    case FS_PATTERN:
 	/* style == 2 --> fill with pattern according to fillpattern */
 	/* the upper 3 nibbles of 'style' contain hatch pattern number */
 	cgm_next.fill_color = 0; /* index 0 is always the background color */
@@ -980,8 +975,7 @@ CGM_fillbox(style, x1,y1,width,height)
 #endif /* USE_ULIG_FILLEDBOXES */
 
 TERM_PUBLIC void
-CGM_linewidth(width)
-    double width;
+CGM_linewidth(double width)
 {
     int new_linewidth;
 
@@ -999,8 +993,7 @@ CGM_linewidth(width)
 }
 
 TERM_PUBLIC void
-CGM_dashtype(dashtype)
-    int dashtype;
+CGM_dashtype(int dashtype)
 {
     int i, j;
     /* Each group of 8 entries in dot_length[] defines a dash
@@ -1048,8 +1041,7 @@ CGM_dashtype(dashtype)
 }
 
 TERM_PUBLIC void
-CGM_move(x, y)
-unsigned int x, y;
+CGM_move(unsigned int x, unsigned int y)
 {
     if (x >= term->xmax)
 	x = term->xmax;
@@ -1065,22 +1057,23 @@ unsigned int x, y;
 
 #ifdef PM3D
 
-TERM_PUBLIC int CGM_make_palette(palette)
-     t_sm_palette *palette;
+TERM_PUBLIC int
+CGM_make_palette(t_sm_palette *palette)
 {
     if (palette) {
 	 int i, k;
+
 	 cgm_smooth_colors = palette->colors;
 	 if (CGM_COLORS + cgm_smooth_colors > cgm_user_color_max) {
 	      cgm_user_color_max = CGM_COLORS + cgm_smooth_colors;
 	      cgm_user_color_table =
-		   gp_realloc(cgm_user_color_table, 
+		   gp_realloc(cgm_user_color_table,
 			      (cgm_user_color_max*3+1)*sizeof(int),
 			      "CGM color table");
 	      /* include default colors */
 	      memcpy(cgm_user_color_table, cgm_default_color_table,
 		     sizeof(cgm_default_color_table));
-	      }
+	 }
 	 k = 1 + (CGM_COLORS)*3;
 	 for (i = 0; i < cgm_smooth_colors; i++) {
 	      cgm_user_color_table[k++] = palette->color[i].r*255.9;
@@ -1097,32 +1090,32 @@ TERM_PUBLIC int CGM_make_palette(palette)
     }
 }
 
-TERM_PUBLIC void CGM_set_color(gray)
-     double gray;
+TERM_PUBLIC void
+CGM_set_color(double gray)
 {
-    /* map [0...1] to interval [0...cgm_smooth_colors-1], then add
-       offset to get past the default colors */
-    cgm_next.fill_color = (gray <= 0) ? 0 : (int)(gray * cgm_smooth_colors);
-    if (cgm_next.fill_color >= cgm_smooth_colors)
-	cgm_smooth_colors = cgm_smooth_colors - 1;
-    cgm_next.fill_color += CGM_COLORS;
-    /* EAM - force color immediately so that lines and text can use it */
-    if (cgm_color != cgm_next.fill_color) {
-	cgm_color = cgm_next.fill_color;
-	cgm_linetype = cgm_color;
-    	CGM_flush_polyline();
-    	CGM_write_int_record(5,  4, 2, (int *) &cgm_color); /* line color */
-    	CGM_write_int_record(5, 14, 2, (int *) &cgm_color); /* text color */
-    }
+     /* map [0...1] to interval [0...cgm_smooth_colors-1], then add
+	offset to get past the default colors */
+     cgm_next.fill_color = (gray <= 0) ? 0 : (int)(gray * cgm_smooth_colors);
+     if (cgm_next.fill_color >= cgm_smooth_colors)
+	  cgm_smooth_colors = cgm_smooth_colors - 1;
+     cgm_next.fill_color += CGM_COLORS;
+     /* EAM - force color immediately so that lines and text can use it */
+     if (cgm_color != cgm_next.fill_color) {
+	  cgm_color = cgm_next.fill_color;
+	  cgm_linetype = cgm_color;
+	  CGM_flush_polyline();
+	  CGM_write_int_record(5,  4, 2, (int *) &cgm_color); /* line color */
+	  CGM_write_int_record(5, 14, 2, (int *) &cgm_color); /* text color */
+     }
 }
 #endif /* PM3D */
 
 #if defined(PM3D) || defined(USE_ULIG_FILLEDBOXES)
-TERM_PUBLIC void CGM_filled_polygon(points, corner)
-     int points;
-     gpiPoint *corner;
+TERM_PUBLIC void
+CGM_filled_polygon(int points, gpiPoint *corner)
 {
     int i;
+
     if (cgm_current.interior_style != cgm_next.interior_style){
       cgm_current.interior_style = cgm_next.interior_style;
       CGM_write_int_record(5, 22, 2, &cgm_next.interior_style);
@@ -1159,9 +1152,7 @@ CGM_flush_polyline()
 }
 
 static void
-CGM_write_char_record(class, cgm_id, numbytes, data)
-int class, cgm_id, numbytes;
-char *data;
+CGM_write_char_record(int class, int cgm_id, int numbytes, char *data)
 {
     int i, pad, length;
     static unsigned char flag = 0xff;
@@ -1195,9 +1186,7 @@ char *data;
 }
 
 static void
-CGM_write_byte_record(class, cgm_id, numbytes, data)
-int class, cgm_id, numbytes;
-char *data;
+CGM_write_byte_record(int class, int cgm_id, int numbytes, char *data)
 {
     int pad;
     static unsigned char paddata = 0;
@@ -1210,8 +1199,7 @@ char *data;
 }
 
 static void
-CGM_write_int_record(class, cgm_id, numbytes, data)
-int class, cgm_id, numbytes, *data;
+CGM_write_int_record(int class, int cgm_id, int numbytes, int *data)
 {
     int i;
     assert((numbytes & 1) == 0);
@@ -1222,9 +1210,10 @@ int class, cgm_id, numbytes, *data;
 }
 
 static void
-CGM_write_mixed_record(class, cgm_id, numint, int_data, numchar, char_data)
-int class, cgm_id, numint, *int_data, numchar;
-const char *char_data;
+CGM_write_mixed_record(
+     int class, int cgm_id,
+     int numint, int *int_data,
+     int numchar, const char *char_data)
 {
     int i, pad, length;
     static unsigned char paddata = 0;
@@ -1259,15 +1248,14 @@ const char *char_data;
    Write the code word that starts a CGM record.
    bits in code word are as follows...
    cccciiiiiiilllll
-   where 
+   where
    cccc is a 4-bit class number
    iiiiiii is a 7-bit ID number
-   lllll is a 5-bit length (# bytes following the code word, or 
+   lllll is a 5-bit length (# bytes following the code word, or
             31 followed by a word with the actual number)
    */
 static void
-CGM_write_code(class, cgm_id, length)
-int class, cgm_id, length;
+CGM_write_code(int class, int cgm_id, int length)
 {
     unsigned code;
 
@@ -1289,8 +1277,7 @@ int class, cgm_id, length;
 }
 
 static void
-CGM_write_int(value)
-int value;
+CGM_write_int(int value)
 {
     union {
 	short s;
@@ -1308,14 +1295,12 @@ int value;
     fwrite(&u.s, 1, 2, gpoutfile);
 }
 
-	/* Draw a dashed line to (ux,uy).  CGM has linestyles, but
-	   they are not usable -- at least with the Word for Windows
-	   6.0 filter, where lines of significant width (even 1 pt)
-	   always come out solid.  Therefore, we implement dashed
-	   lines here instead.  */
+/* Draw a dashed line to (ux,uy).  CGM has linestyles, but they are
+ * not usable -- at least with the Word for Windows 6.0 filter, where
+ * lines of significant width (even 1 pt) always come out solid.
+ * Therefore, we implement dashed lines here instead. */
 TERM_PUBLIC void
-CGM_dashed_vector(ux, uy)
-unsigned int ux, uy;
+CGM_dashed_vector(unsigned int ux, unsigned int uy)
 {
     int xa, ya;
     int dx, dy, adx, ady;
@@ -1335,8 +1320,8 @@ unsigned int ux, uy;
     adx = abs(dx);
     ady = abs(dy * 10);
 
-    /* using the approximation 
-       sqrt(x**2 + y**2)  ~  x + (5*x*x)/(12*y)   when x > y.  
+    /* using the approximation
+       sqrt(x**2 + y**2)  ~  x + (5*x*x)/(12*y)   when x > y.
        Note ordering of calculations to avoid overflow on 16 bit
        architectures */
     if (10 * adx < ady)
@@ -1371,8 +1356,7 @@ unsigned int ux, uy;
 }
 
 TERM_PUBLIC void
-CGM_solid_vector(ux, uy)
-unsigned int ux, uy;
+CGM_solid_vector(unsigned int ux, unsigned int uy)
 {
     if (ux >= term->xmax)
 	ux = term->xmax;
@@ -1396,9 +1380,7 @@ unsigned int ux, uy;
 }
 
 TERM_PUBLIC void
-CGM_put_text(x, y, str)
-unsigned int x, y;
-const char str[];
+CGM_put_text(unsigned int x, unsigned int y, const char str[])
 {
     static int where[3] = { 0, 0, 1 }; /* the final "1" signals that
 					  this is the last text in the
@@ -1482,8 +1464,7 @@ const char str[];
 }
 
 TERM_PUBLIC int
-CGM_text_angle(ang)
-int ang;
+CGM_text_angle(int ang)
 {
     if (cgm_rotate) {
 	cgm_next.angle = ang * M_PI_2 / 90.;
@@ -1493,8 +1474,7 @@ int ang;
 }
 
 TERM_PUBLIC int
-CGM_justify_text(mode)
-enum JUSTIFY mode;
+CGM_justify_text(enum JUSTIFY mode)
 {
   cgm_next.justify_mode = mode;
   return (TRUE);
@@ -1507,9 +1487,7 @@ CGM_reset()
 }
 
 TERM_PUBLIC void
-CGM_point(x, y, number)
-unsigned int x, y;
-int number;
+CGM_point(unsigned int x, unsigned int y, int number)
 {
     int old_dashtype;
 
@@ -1554,7 +1532,7 @@ int number;
       cgm_current.edge_visibility = cgm_next.edge_visibility;
       CGM_write_int_record(5, 30, 2, &cgm_current.edge_visibility);
     }
-      
+
     switch (number) {
     case 0:			/* draw plus */
 	CGM_move(x - cgm_tic, y);
@@ -1631,8 +1609,7 @@ int number;
 
 
 TERM_PUBLIC void
-CGM_set_pointsize(size)
-double size;
+CGM_set_pointsize(double size)
 {
     /* Markers were chosen to have approximately equal
        areas.  Dimensions are as follows, in units of

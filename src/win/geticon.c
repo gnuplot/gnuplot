@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: geticon.c,v 1.1 1999/03/26 22:10:58 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: geticon.c,v 1.2 2002/03/10 18:54:52 mikulik Exp $"); }
 #endif
 
 /* geticon.c */
@@ -38,9 +38,10 @@ int htoi(char ch)
 }
 
 void
-geticon(void)
+geticon()
 {
-char ch;
+    char ch;
+
     fgets(inputline,MAXLINE,rcfile);
     line++;
     if (strncmp(inputline,"BEGIN",5)) {
@@ -96,5 +97,5 @@ main(int argc, char *argv[])
 	    geticon();
 	}
     }
-    return (0);
+    return 0;
 }

@@ -1,5 +1,5 @@
-/*
- * $Id: qms.trm,v 1.8 1999/06/22 11:54:22 lhecking Exp $
+/* Hello, Emacs, this is -*-C-*-
+ * $Id: qms.trm,v 1.9 2004/04/13 17:24:38 broeker Exp $
  *
  */
 
@@ -43,9 +43,9 @@
  *
  * AUTHORS
  *  Colin Kelley, Thomas Williams, Russell Lang
- * 
+ *
  * send your comments or suggestions to (gnuplot-info@lists.sourceforge.net).
- * 
+ *
  */
 
 /*
@@ -93,7 +93,7 @@ QMS_init()
      *            ^landscape         ^free format
      */
 
-/* set defaults are: implicit decimal point, units in inches, 
+/* set defaults are: implicit decimal point, units in inches,
  * numbers left justified, units in 1/1000 inch, do not ignore spaces
  * margins are in 1/1000 inch units
  */
@@ -123,8 +123,7 @@ QMS_text()
 
 
 TERM_PUBLIC void
-QMS_linetype(linetype)
-int linetype;
+QMS_linetype(int linetype)
 {
     static int width[2 + 9] = { 7, 3, 3, 3, 3, 5, 5, 5, 7, 7, 7 };
     static int type[2 + 9] = { 0, 1, 0, 2, 3, 0, 2, 3, 0, 2, 3 };
@@ -166,8 +165,7 @@ int linetype;
 
 
 TERM_PUBLIC void
-QMS_move(x, y)
-unsigned int x, y;
+QMS_move(unsigned int x, unsigned int y)
 {
     fprintf(gpoutfile, "^U%05d:%05d\n", 1000 + x, QMS_YLAST + 1000 - y);
     /*                   ^pen up vector*/
@@ -175,8 +173,7 @@ unsigned int x, y;
 
 
 TERM_PUBLIC void
-QMS_vector(x2, y2)
-unsigned int x2, y2;
+QMS_vector(unsigned int x2, unsigned int y2)
 {
     fprintf(gpoutfile, "^D%05d:%05d\n", 1000 + x2, QMS_YLAST + 1000 - y2);
     /*                  ^pen down vector*/
@@ -184,9 +181,7 @@ unsigned int x2, y2;
 
 
 TERM_PUBLIC void
-QMS_put_text(x, y, str)
-unsigned int x, y;
-const char str[];
+QMS_put_text(unsigned int x, unsigned int y, const char str[])
 {
     char ch;
     QMS_move(x, y + QMS_VCHAR / 3);

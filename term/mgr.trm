@@ -1,5 +1,5 @@
-/*
- * $Id: mgr.trm,v 1.7 1999/06/22 11:54:20 lhecking Exp $
+/* Hello, Emacs, this is -*-C-*-
+ * $Id: mgr.trm,v 1.8 2004/04/13 17:24:35 broeker Exp $
  */
 
 /* GNUPLOT - mgr.trm */
@@ -168,8 +168,7 @@ MGR_text()
 
 
 TERM_PUBLIC void
-MGR_linetype(linetype)
-int linetype;
+MGR_linetype(int linetype)
 {
 /*
  * this mapping of colors is intended for a color sun on which
@@ -180,25 +179,21 @@ int linetype;
 
 
 TERM_PUBLIC void
-MGR_move(x, y)
-unsigned int x, y;
+MGR_move(unsigned int x, unsigned int y)
 {
     m_go(x, MGR_winheight - 1 - y);
 }
 
 
 TERM_PUBLIC void
-MGR_vector(x, y)
-unsigned int x, y;
+MGR_vector(unsigned int x, unsigned int y)
 {
     m_draw(x, MGR_winheight - 1 - y);
 }
 
 
 TERM_PUBLIC void
-MGR_put_text(x, y, str)
-unsigned int x, y;
-const char *str;
+MGR_put_text(unsigned int x, unsigned int y, const char *str)
 {
     MGR_move(x, y - MGR_vchar / 2);
     m_aligntext();

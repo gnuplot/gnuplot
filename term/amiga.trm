@@ -1,5 +1,5 @@
-/*
- * $Id: amiga.trm,v 1.15 2002/08/30 20:18:23 sfeam Exp $
+/* Hello, Emacs, this is -*-C-*-
+ * $Id: amiga.trm,v 1.16 2004/04/13 17:24:15 broeker Exp $
  *
  */
 
@@ -43,7 +43,7 @@
  *
  * AUTHORS
  *   Carsten Steger
- * 
+ *
  *   Pat R. Empleo      Slightly modified for Aztec C v5.2a (beta); sort of
  *   08/27/91           supports overscan; for large WB 2.0 virtual screens,
  *                      we limit the plot size so we don't have to scroll
@@ -57,7 +57,7 @@
  *   Pat R. Empleo      Defined some 2.0 stuff in order to get Aztec C to
  *   09/20/91           work with Carsten's new code (see above).  When
  *                      KS/WB 2.0 support gets implemented in Aztec C, this
- *                      kludge will get deleted! 
+ *                      kludge will get deleted!
  *                      (Aztec C release 5.2 beta)
  *
  *   Carsten Steger     Converted to new terminal layout.
@@ -71,7 +71,7 @@
  *   06/21/97           arrays with AllocMem()'d memory.
  *
  * send your comments or suggestions to (gnuplot-info@lists.sourceforge.net).
- * 
+ *
  */
 
 #include "driver.h"
@@ -298,7 +298,7 @@ AMIGA_options()
 		}
 
 		AMIGA_FontNameLen = token_len(c_token);
-	    
+
 		AMIGA_FontName = AllocMem(AMIGA_FontNameLen,0);
 		if (AMIGA_FontName == NULL)
 		    AMIGA_ERROR("No memory for font name", RETURN_FAIL);
@@ -551,8 +551,7 @@ AMIGA_graphics()
  *
  */
 TERM_PUBLIC void
-AMIGA_move(x, y)
-unsigned int x, y;
+AMIGA_move(unsigned int x, unsigned int y)
 {
     if ((x >= AMIGA_xmax) || (y >= AMIGA_ymax))
 	return;
@@ -565,8 +564,7 @@ unsigned int x, y;
  *
  */
 TERM_PUBLIC void
-AMIGA_vector(x, y)
-unsigned int x, y;
+AMIGA_vector(unsigned int x, unsigned int y)
 {
     if ((x >= AMIGA_xmax) || (y >= AMIGA_ymax))
 	return;
@@ -579,8 +577,7 @@ unsigned int x, y;
  *
  */
 TERM_PUBLIC void
-AMIGA_linetype(linetype)
-    int linetype;
+AMIGA_linetype(int linetype)
 {
     if (AMIGA_window_mode != TRUE) {
 	if (linetype >= 13)
@@ -607,9 +604,7 @@ AMIGA_linetype(linetype)
  *
  */
 TERM_PUBLIC void
-AMIGA_put_text(x, y, str)
-unsigned int x, y;
-const char *str;
+AMIGA_put_text(unsigned int x, unsigned int y, const char *str)
 {
     LONG len, tx_len;
     WORD x_min, x_max, y_min, y_max;
@@ -651,8 +646,7 @@ const char *str;
  *
  */
 TERM_PUBLIC int
-AMIGA_justify_text(mode)
-enum JUSTIFY mode;
+AMIGA_justify_text(enum JUSTIFY mode)
 {
     AMIGA_justify = mode;
     return TRUE;
@@ -663,8 +657,7 @@ enum JUSTIFY mode;
  *
  */
 TERM_PUBLIC int
-AMIGA_set_font(font)
-const char *font;
+AMIGA_set_font(const char *font)
 {
     static char test_str[] =
     " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~";
@@ -783,7 +776,7 @@ AMIGA_resume()
  * and the stack is smaller than 120000 bytes.
  */
 void
-AMIGA_exit(void)
+AMIGA_exit()
 {
     AMIGA_reset();
     RAWCON(0);

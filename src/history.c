@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: history.c,v 1.12 2003/12/01 08:33:42 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: history.c,v 1.13 2004/04/13 17:23:58 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - history.c */
@@ -56,8 +56,7 @@ struct hist *cur_entry = NULL;
 
 /* add line to the history */
 void
-add_history(line)
-char *line;
+add_history(char *line)
 {
     struct hist *entry;
 
@@ -119,10 +118,7 @@ char *line;
  *	       ignored if history is written to a pipe
 */
 void
-write_history_n(n, filename, mode)
-const int n;
-const char *filename;
-const char *mode;
+write_history_n(const int n, const char *filename, const char *mode)
 {
     struct hist *entry = history, *start = NULL;
     FILE *out = stdout;
@@ -181,8 +177,7 @@ const char *mode;
  * plot.c:#if defined(HAVE_LIBREADLINE) && defined(GNUPLOT_HISTORY)
  */
 void
-write_history(filename)
-char *filename;
+write_history(char *filename)
 {
     write_history_n(0, filename, "w");
 }
@@ -193,8 +188,7 @@ char *filename;
  * Returns NULL if nothing found
  */
 char *
-history_find(cmd)
-char *cmd;
+history_find(char *cmd)
 {
     struct hist *entry = history;
     size_t len;
@@ -233,8 +227,7 @@ char *cmd;
  * Returns 1 on success, 0 if no such entry exists
  */
 int
-history_find_all(cmd)
-char *cmd;
+history_find_all(char *cmd)
 {
     struct hist *entry = history;
     int hist_index = 1;
@@ -276,7 +269,7 @@ char *cmd;
 /*
  * Interface between 'gnuplot' and GNU 'readline-4.0'.
  * NOTE:  'show_version()' should report the used readline version too.
- *        There are more version around. '2.0, 2.1, 2.2, 4.0' 
+ *        There are more version around. '2.0, 2.1, 2.2, 4.0'
  */
 /*
  * Copyright (C) 1999, 2004 Thomas Walter
@@ -287,10 +280,9 @@ char *cmd;
  */
 
 static void do_history_list(FILE * out_stream);
+static int history_list_save(const int quantity, const char *const place);
 
-int history_list_save(const int quantity, const char *const place);
-
-int
+static int
 history_list_save(const int quantity, const char *const place)
 {
     /*

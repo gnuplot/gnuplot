@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.74 2004/05/09 14:35:03 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.75 2004/05/24 15:44:12 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -45,7 +45,7 @@ static char *RCSid() { return RCSid("$Id: term.c,v 1.74 2004/05/09 14:35:03 miku
   * terminal session lasts only until _either_ terminal
   * or output file changes. Before either is changed,
   * the terminal is shut down.
-  * 
+  *
   * Entry points : (see also term/README)
   *
   * term_set_output() : called when  set output  invoked
@@ -216,7 +216,7 @@ static double enhanced_fontscale;
 static char enhanced_escape_format[16];
 static double enhanced_max_height, enhanced_min_height;
 char * enhanced_recursion __PROTO((char *p, TBOOLEAN brace,
-	     char *fontname, double fontsize, double base, 
+	     char *fontname, double fontsize, double base,
 	     TBOOLEAN widthflag, TBOOLEAN showflag, int overprint));
 static void enh_err_check __PROTO((const char *str));
 static void do_enh_writec __PROTO((int c));
@@ -324,8 +324,7 @@ term_close_output()
  * and it must not be outstr itself !
  */
 void
-term_set_output(dest)
-char *dest;
+term_set_output(char *dest)
 {
     FILE *f = NULL;
 
@@ -397,7 +396,7 @@ char *dest;
 #if defined(PIPES)
 	}
 #endif
-	
+
 	term_close_output();
 	gpoutfile = f;
 	outstr = dest;
@@ -602,8 +601,7 @@ term_reset()
 }
 
 void
-term_apply_lp_properties(lp)
-struct lp_style_type *lp;
+term_apply_lp_properties(struct lp_style_type *lp)
 {
     /*  This function passes all the line and point properties to the
      *  terminal driver and issues the corresponding commands.
@@ -632,8 +630,7 @@ struct lp_style_type *lp;
 
 
 void
-term_check_multiplot_okay(f_interactive)
-TBOOLEAN f_interactive;
+term_check_multiplot_okay(TBOOLEAN f_interactive)
 {
     FPRINTF((stderr, "term_multiplot_okay(%d)\n", f_interactive));
 
@@ -671,13 +668,13 @@ TBOOLEAN f_interactive;
 
 
 void
-write_multiline(x, y, text, hor, vert, angle, font)
-    unsigned int x, y;
-    char *text;
-    JUSTIFY hor;		/* horizontal ... */
-    VERT_JUSTIFY vert;		/* ... and vertical just - text in hor direction despite angle */
-    int angle;			/* assume term has already been set for this */
-    const char *font;		/* NULL or "" means use default */
+write_multiline(
+    unsigned int x, unsigned y,
+    char *text,
+    JUSTIFY hor,		/* horizontal ... */
+    VERT_JUSTIFY vert,		/* ... and vertical just - text in hor direction despite angle */
+    int angle,			/* assume term has already been set for this */
+    const char *font)		/* NULL or "" means use default */
 {
     register struct termentry *t = term;
     char *p = text;
@@ -740,9 +737,7 @@ write_multiline(x, y, text, hor, vert, angle, font)
 
 
 static void
-do_point(x, y, number)
-unsigned int x, y;
-int number;
+do_point(unsigned int x, unsigned int y, int number)
 {
     register int htic, vtic;
     register struct termentry *t = term;
@@ -823,8 +818,7 @@ int number;
 }
 
 static void
-do_pointsize(size)
-double size;
+do_pointsize(double size)
 {
     term_pointsize = (size >= 0 ? size : 1);
 }
@@ -834,22 +828,20 @@ double size;
  * general point routine
  */
 static void
-line_and_point(x, y, number)
-unsigned int x, y;
-int number;
+line_and_point(unsigned int x, unsigned int y, int number)
 {
-    /* temporary(?) kludge to allow terminals with bad linetypes 
+    /* temporary(?) kludge to allow terminals with bad linetypes
        to make nice marks */
 
     (*term->linetype) (NICE_LINE);
     do_point(x, y, number);
 }
 
-/* 
+/*
  * general arrow routine
  *
  * I set the angle between the arrowhead and the line 15 degree.
- * The length of arrowhead varies depending on the line length 
+ * The length of arrowhead varies depending on the line length
  * within the the range [0.3*(the-tic-length), 2*(the-tic-length)].
  * No head is printed if the arrow length is zero.
  *
@@ -872,10 +864,10 @@ double curr_arrow_headbackangle;  /* angle in degrees */
 int curr_arrow_headfilled;	/* arrow head filled or not */
 
 static void
-do_arrow(sx, sy, ex, ey, head)
-    unsigned int sx, sy;	/* start point */
-    unsigned int ex, ey;	/* end point (point of arrowhead) */
-    int head;
+do_arrow(
+    unsigned int sx, unsigned int sy,	/* start point */
+    unsigned int ex, unsigned int ey,	/* end point (point of arrowhead) */
+    int head)
 {
     register struct termentry *t = term;
     float len_tic = ((double) (t->h_tic + t->v_tic)) / 2.0;
@@ -989,12 +981,12 @@ do_arrow(sx, sy, ex, ey, head)
 	}
     }
     /* Draw the line for the arrow. */
-    if ( (head == 2) && 
+    if ( (head == 2) &&
 	 (fabs(len_arrow) >= DBL_EPSILON) && (curr_arrow_headfilled!=0) )
 	(*t->move) (sx - xm, sy - ym);
     else
 	(*t->move) (sx, sy);
-    if ( head && 
+    if ( head &&
 	 (fabs(len_arrow) >= DBL_EPSILON) && (curr_arrow_headfilled!=0) )
 	(*t->vector) (ex + xm, ey + ym);
     else
@@ -1019,21 +1011,19 @@ do_arrow(sx, sy, ex, ey, head)
  */
 
 /* change angle of text.  0 is horizontal left to right.
-   * 1 is vertical bottom to top (90 deg rotate)  
+   * 1 is vertical bottom to top (90 deg rotate)
  */
 static int
-null_text_angle(ang)
-int ang;
+null_text_angle(int ang)
 {
     return (ang == 0);
 }
 
-/* change justification of text.  
+/* change justification of text.
  * modes are LEFT (flush left), CENTRE (centred), RIGHT (flush right)
  */
 static int
-null_justify_text(just)
-enum JUSTIFY just;
+null_justify_text(enum JUSTIFY just)
 {
     return (just == LEFT);
 }
@@ -1044,8 +1034,7 @@ enum JUSTIFY just;
  * Some terminals (eg latex) need to do scaling themselves.
  */
 static int
-null_scale(x, y)
-    double x, y;
+null_scale(double x, double y)
 {
     (void) x;			/* avoid -Wunused warning */
     (void) y;
@@ -1055,9 +1044,7 @@ null_scale(x, y)
 /* HBB 990829: unused --> commented out */
 #if 0
 int
-do_scale(x, y)
-double x;
-double y;
+do_scale(double x, double y)
 {
     return TRUE;		/* can be done */
 }
@@ -1075,24 +1062,20 @@ UNKNOWN_null()
 }
 
 static void
-MOVE_null(x, y)
-    unsigned int x, y;
+MOVE_null(unsigned int x, unsigned int y)
 {
     (void) x;			/* avoid -Wunused warning */
     (void) y;
 }
 
 static void
-LINETYPE_null(t)
-    int t;
+LINETYPE_null(int t)
 {
     (void) t;			/* avoid -Wunused warning */
 }
 
 static void
-PUTTEXT_null(x, y, s)
-    unsigned int x, y;
-    const char *s;
+PUTTEXT_null(unsigned int x, unsigned int y, const char *s)
 {
     (void) s;			/* avoid -Wunused warning */
     (void) x;
@@ -1101,30 +1084,27 @@ PUTTEXT_null(x, y, s)
 
 
 static int
-set_font_null(s)
-    const char *s;
+set_font_null(const char *s)
 {
     (void) s;			/* avoid -Wunused warning */
     return FALSE;
 }
 
 static void
-null_linewidth(s)
-    double s;
+null_linewidth(double s)
 {
     (void) s;			/* avoid -Wunused warning */
 }
 
 
 /* cast to get rid of useless warnings about UNKNOWN_null */
-/* FIXME HBB 20010527: not used anywhere! */
-typedef void (*void_fp) __PROTO((void));
+/* HBB 20040619: unused --- commented out */
+/* typedef void (*void_fp) __PROTO((void)); */
 
 
 /* setup the magic macros to compile in the right parts of the
  * terminal drivers included by term.h
  */
-
 #define TERM_TABLE
 #define TERM_TABLE_START(x) ,{
 #define TERM_TABLE_END(x)   }
@@ -1172,7 +1152,7 @@ list_terms()
 	sort_idxs[i] = i;
     qsort( sort_idxs, TERMCOUNT, sizeof(int), termcomp );
     /* now sort_idxs[] contains the sorted indices */
-    
+
     StartOutput();
     strcpy(line_buffer, "\nAvailable terminal types:\n");
     OutLine(line_buffer);
@@ -1189,8 +1169,7 @@ list_terms()
 }
 
 static int
-termcomp(arga, argb)
-    const generic *arga, *argb;
+termcomp(const generic *arga, const generic *argb)
 {
     const int *a = arga;
     const int *b = argb;
@@ -1202,8 +1181,7 @@ termcomp(arga, argb)
  * will change 'term' variable if successful
  */
 struct termentry *
-set_term(c_token_arg)
-int c_token_arg;
+set_term(int c_token_arg)
 {
     register struct termentry *t = NULL;
     char *input_name;
@@ -1226,9 +1204,7 @@ int c_token_arg;
  * driver pointer
  */
 struct termentry *
-change_term(name, length)
-const char *name;
-int length;
+change_term(const char *name, int length)
 {
     int i;
     struct termentry *t = NULL;
@@ -1284,9 +1260,9 @@ int length;
 /*
  * Routine to detect what terminal is being used (or do anything else
  * that would be nice).  One anticipated (or allowed for) side effect
- * is that the global ``term'' may be set. 
+ * is that the global ``term'' may be set.
  * The environment variable GNUTERM is checked first; if that does
- * not exist, then the terminal hardware is checked, if possible, 
+ * not exist, then the terminal hardware is checked, if possible,
  * and finally, we can check $TERM for some kinds of terminals.
  * A default can be set with -DDEFAULTTERM=myterm in the Makefile
  * or #define DEFAULTTERM myterm in term.h
@@ -1472,10 +1448,6 @@ ztc_init()
 #endif /* __ZTC__ */
 
 
-#if defined(UNIXPLOT) && !defined(GNUGRAPH)
-static void
-UP_redirect(caller)
-int caller;
 /*
  * Unixplot can't really write to gpoutfile--it wants to write to stdout.
  * This is normally ok, but the original design of gnuplot gives us
@@ -1487,7 +1459,10 @@ int caller;
  * 3 - called from SET TERM other
  * 4 - called from SET OUTPUT
  */
+static void
+UP_redirect(int caller)
 {
+#if defined(UNIXPLOT) && !defined(GNUGRAPH)
     switch (caller) {
     case 1:
 	/* Don't save, just replace stdout w/gpoutfile (save was already done). */
@@ -1516,22 +1491,11 @@ int caller;
 	    *(stdout) = save_stdout;	/* Copy FILE structure */
 	}
 	break;
-    }
-}
+    } /* switch() */
 #else /* !UNIXPLOT || GNUGRAPH */
-/*
- * This is always defined so we don't have to have command.c know if it
- * is there or not.
- */
-static void
-UP_redirect(caller)
-int caller;
-{
-    caller = caller;		/* to stop Turbo C complaining 
-				   * about caller not being used */
-}
+    (void) caller;		/* avoid -Wunused warning */
 #endif /* !UNIXPLOT || GNUGRAPH */
-
+}
 
 /* test terminal by drawing border and text */
 /* called from command test */
@@ -1703,7 +1667,7 @@ test_term()
     yl = ymax_t / 25;
     x = xmax_t * .075;
     y = yl;
-   
+
     for (i=1; i<7; i++) {
 	(*t->linewidth) ((float)(i)); (*t->linetype)(LT_BLACK);
 	(*t->move) (x, y); (*t->vector) (x+xl, y);
@@ -1740,40 +1704,44 @@ test_term()
 
 #ifdef PM3D
     {
-    int cen_x = (int)(0.75 * xmax_t);
-    int cen_y = (int)(0.83 * ymax_t);
-    int radius = xmax_t / 20;
-    (*t->linetype)(2);
-    /* test pm3d -- filled_polygon(), but not set_color() */
-    if (t->filled_polygon) {
+	int cen_x = (int)(0.75 * xmax_t);
+	int cen_y = (int)(0.83 * ymax_t);
+	int radius = xmax_t / 20;
+
+	(*t->linetype)(2);
+	/* test pm3d -- filled_polygon(), but not set_color() */
+	if (t->filled_polygon) {
 #define NUMBER_OF_VERTICES 6
-	int n = NUMBER_OF_VERTICES;
-	gpiPoint corners[NUMBER_OF_VERTICES+1];
+	    int n = NUMBER_OF_VERTICES;
+	    gpiPoint corners[NUMBER_OF_VERTICES+1];
 #undef  NUMBER_OF_VERTICES
-	int i;
-	for (i = 0; i < n; i++) {
-	    corners[i].x = cen_x + radius * cos(2*M_PI*i/n);
-	    corners[i].y = cen_y + radius * sin(2*M_PI*i/n);
-	}
-	corners[n].x = corners[0].x;
-	corners[n].y = corners[0].y;
-	term->filled_polygon(n+1, corners);
-	str = "(color) filled polygon:";
-    } else
-	str = "filled polygons not supported";
-    i = ((*t->justify_text) (CENTRE)) ? 0 : t->h_char * strlen(str) / 2;
-    (*t->put_text) (cen_x + i, cen_y + radius + t->v_char * 0.5, str);
-    (*t->linetype)(LT_BLACK);
+	    int i;
+
+	    for (i = 0; i < n; i++) {
+		corners[i].x = cen_x + radius * cos(2*M_PI*i/n);
+		corners[i].y = cen_y + radius * sin(2*M_PI*i/n);
+	    }
+	    corners[n].x = corners[0].x;
+	    corners[n].y = corners[0].y;
+	    term->filled_polygon(n+1, corners);
+	    str = "(color) filled polygon:";
+	} else
+	    str = "filled polygons not supported";
+	i = ((*t->justify_text) (CENTRE)) ? 0 : t->h_char * strlen(str) / 2;
+	(*t->put_text) (cen_x + i, cen_y + radius + t->v_char * 0.5, str);
+	(*t->linetype)(LT_BLACK);
     }
-#endif
+#endif /* PM3D */
+
     term_end_plot();
 }
 
 #if 0
 # if defined(MSDOS)||defined(g)||defined(MTOS)||defined(OS2)||defined(_Windows)||defined(DOS386)
+
 /* output for some terminal types must be binary to stop non Unix computers
-   changing \n to \r\n. 
-   If the output is not STDOUT, the following code reopens gpoutfile 
+   changing \n to \r\n.
+   If the output is not STDOUT, the following code reopens gpoutfile
    with binary mode. */
 void
 reopen_binary()
@@ -1808,12 +1776,12 @@ reopen_binary()
 	    regs.h.al = 1;	/* set device info */
 	    intdos(&regs, &regs);
 	}
-#   endif			/* !_Windows */
-#  endif			/* TURBOC && MSDOS */
+#   endif /* !_Windows */
+#  endif /* TURBOC && MSDOS */
     }
 }
 
-# endif				/* MSDOS || g || MTOS || ... */
+# endif /* MSDOS || g || MTOS || ... */
 #endif /* 0 */
 
 #ifdef VMS
@@ -1829,7 +1797,7 @@ reopen_binary()
 # include <dcdef.h>
 # include <stat.h>
 # include <fab.h>
-/* If you use WATCOM C or a very strict ANSI compiler, you may have to 
+/* If you use WATCOM C or a very strict ANSI compiler, you may have to
  * delete or comment out the following 3 lines: */
 # ifndef TT2$M_DECCRT3		/* VT300 not defined as of VAXC v2.4 */
 #  define TT2$M_DECCRT3 0X80000000
@@ -1838,13 +1806,10 @@ static unsigned short chan;
 static int old_char_buf[3], cur_char_buf[3];
 $DESCRIPTOR(sysoutput_desc, "SYS$OUTPUT");
 
+/* Look first for decw$display (decterms do regis).  Determine if we
+ * have a regis terminal and save terminal characteristics */
 char *
 vms_init()
-/*
- *  Look first for decw$display (decterms do regis)
- *  Determine if we have a regis terminal
- * and save terminal characteristics
- */
 {
     /* Save terminal characteristics in old_char_buf and
        initialise cur_char_buf to current settings. */
@@ -1864,11 +1829,12 @@ vms_init()
     return (NULL);
 }
 
+/* set terminal to original state */
 void
 vms_reset()
-/* set terminal to original state */
 {
     int i;
+
     sys$assign(&sysoutput_desc, &chan, 0, 0);
     sys$qiow(0, chan, IO$_SETMODE, 0, 0, 0, old_char_buf, 12, 0, 0, 0, 0);
     for (i = 0; i < 3; ++i)
@@ -1876,11 +1842,12 @@ vms_reset()
     sys$dassgn(chan);
 }
 
+/* set terminal mode to tektronix */
 void
 term_mode_tek()
-/* set terminal mode to tektronix */
 {
     long status;
+
     if (gpoutfile != stdout)
 	return;			/* don't modify if not stdout */
     sys$assign(&sysoutput_desc, &chan, 0, 0);
@@ -1935,11 +1902,12 @@ term_mode_tek()
     sys$dassgn(chan);
 }
 
+/* set terminal mode back to native */
 void
 term_mode_native()
-/* set terminal mode back to native */
 {
     int i;
+
     if (gpoutfile != stdout)
 	return;			/* don't modify if not stdout */
     sys$assign(&sysoutput_desc, &chan, 0, 0);
@@ -1949,9 +1917,9 @@ term_mode_native()
     sys$dassgn(chan);
 }
 
+/* set terminal mode pasthru */
 void
 term_pasthru()
-/* set terminal mode pasthru */
 {
     if (gpoutfile != stdout)
 	return;			/* don't modify if not stdout */
@@ -1961,9 +1929,9 @@ term_pasthru()
     sys$dassgn(chan);
 }
 
+/* set terminal mode nopasthru */
 void
 term_nopasthru()
-/* set terminal mode nopasthru */
 {
     if (gpoutfile != stdout)
 	return;			/* don't modify if not stdout */
@@ -1978,6 +1946,7 @@ fflush_binary()
 {
     typedef short int INT16;	/* signed 16-bit integers */
     register INT16 k;		/* loop index */
+
     if (gpoutfile != stdout) {
 	/* Stupid VMS fflush() raises error and loses last data block
 	   unless it is full for a fixed-length record binary file.
@@ -1992,14 +1961,14 @@ fflush_binary()
 /*
  * This is an abstraction of the enhanced text mode originally written
  * for the postscript terminal driver by David Denholm and Matt Heffron.
- * I have split out a terminal-independent recursive syntax-parser 
+ * I have split out a terminal-independent recursive syntax-parser
  * routine that can be shared by all drivers that want to add support
  * for enhanced text mode.
  *
  * A driver that wants to make use of this common framework must provide
  * three new entries in TERM_TABLE:
  *	void *enhanced_open   (char *fontname, double fontsize, double base,
- *	                       TBOOLEAN widthflag, TBOOLEAN showflag, 
+ *	                       TBOOLEAN widthflag, TBOOLEAN showflag,
  *	                       int overprint)
  *	void *enhanced_writec (char c)
  *	void *enhanced_flush  ()
@@ -2013,7 +1982,7 @@ fflush_binary()
  * I bent over backwards to make the output of the revised code identical
  * to the output of the original postscript version.  That means there is
  * some cruft left in here (enhanced_max_height for one thing, and all
- * the code relating to RememberFont) that is probably irrelevant to any 
+ * the code relating to RememberFont) that is probably irrelevant to any
  * new drivers using the code.
  *
  * Ethan A Merritt - November 2003
@@ -2026,9 +1995,10 @@ fflush_binary()
 #endif
 
 static void
-do_enh_writec(c)
-    int c; /* note: c is char */
+do_enh_writec(int c)
 {
+    /* note: c is meant to hold a char, but is actually an int, for
+     * the same reasons applying to putc() and friends */
     *enhanced_cur_text++ = c;
 }
 
@@ -2049,16 +2019,19 @@ do_enh_writec(c)
  */
 
 char *
-enhanced_recursion(p, brace, fontname, fontsize, base, widthflag, showflag, overprint)
-    char *p, *fontname;
-    TBOOLEAN brace, widthflag, showflag;
-    double fontsize, base;
-    int overprint;
+enhanced_recursion(
+    char *p,
+    TBOOLEAN brace,
+    char *fontname,
+    double fontsize,
+    double base,
+    TBOOLEAN widthflag,
+    TBOOLEAN showflag,
+    int overprint)
 {
-
     ENH_DEBUG(("RECURSE WITH [%p] \"%s\", %d %s %.1f %.1f %d %d %d\n", p, p, brace, fontname, fontsize, base, widthflag, showflag, overprint));
 
-/* Start each recursion with a clean string */
+    /* Start each recursion with a clean string */
     (term->enhanced_flush)();
 
     if (base + fontsize > enhanced_max_height) {
@@ -2104,7 +2077,7 @@ enhanced_recursion(p, brace, fontname, fontsize, base, widthflag, showflag, over
 		/*{{{  recurse (possibly with a new font) */
 
 		ENH_DEBUG(("Dealing with {\n"));
-	    
+
 		/* get vertical offset (if present) for overprinted text */
 		while (*++p == ' ');
 		if (overprint == 2) {
@@ -2130,7 +2103,7 @@ enhanced_recursion(p, brace, fontname, fontsize, base, widthflag, showflag, over
 			++p;
 		    save = *(savepos=p);
 		    if (ch == '=') {
-			*p++ = '\0';				
+			*p++ = '\0';
 			/*{{{  get optional font size*/
 			ENH_DEBUG(("Calling strtod(\"%s\") ...", p));
 			f = (float)strtod(p, &p);
@@ -2144,7 +2117,7 @@ enhanced_recursion(p, brace, fontname, fontsize, base, widthflag, showflag, over
 			ENH_DEBUG(("Font size %.1f\n", f));
 			/*}}}*/
 		    } else if (ch == '*') {
-			*p++ = '\0';				
+			*p++ = '\0';
 			/*{{{  get optional font size scale factor*/
 			ENH_DEBUG(("Calling strtod(\"%s\") ...", p));
 			f = (float)strtod(p, &p);
@@ -2160,7 +2133,7 @@ enhanced_recursion(p, brace, fontname, fontsize, base, widthflag, showflag, over
 		    } else {
 			*p++ = '\0';
 			f = fontsize;
-		    }				
+		    }
 
 		    while (*p == ' ')
 			++p;
@@ -2219,20 +2192,20 @@ enhanced_recursion(p, brace, fontname, fontsize, base, widthflag, showflag, over
 	     * horizontally on the first and (optionally) vertically
 	     * shifted by an amount specified (as a fraction of the
 	     * current fontsize) at the beginning of the second string
-	      
+
 	     * Note that in this implementation neither the under- nor
 	     * overprinted string can contain syntax that would result
 	     * in additional recursions -- no subscripts,
 	     * superscripts, or anything else, with the exception of a
 	     * font definition at the beginning of the text */
-	    
+
 	    (term->enhanced_flush)();
 	    p = enhanced_recursion(++p, FALSE, fontname, fontsize, base,
 			      widthflag, showflag, 1);
 	    (term->enhanced_flush)();
 	    p = enhanced_recursion(++p, FALSE, fontname, fontsize, base,
 			      FALSE, showflag, 2);
-		
+
 	    overprint = 0;   /* may not be necessary, but just in case . . . */
 	    break;
 	    /*}}}*/
@@ -2259,7 +2232,7 @@ enhanced_recursion(p, brace, fontname, fontsize, base, widthflag, showflag, over
 		   most other terminal types want some variant of "\\%o". */
 	    } else if (p[1] >= '0' && p[1] <= '7') {
 		char *e, escape[16], octal[4] = {'\0','\0','\0','\0'};
-		
+
 		(term->enhanced_open)(fontname, fontsize, base, widthflag, showflag, overprint);
 		octal[0] = *(++p);
 		if (p[1] >= '0' && p[1] <= '7') {
@@ -2301,7 +2274,7 @@ enhanced_recursion(p, brace, fontname, fontsize, base, widthflag, showflag, over
 	}
 
 	if (*p) /* only not true if { not terminated, I think */
-	    ++p;	
+	    ++p;
     } /* while (*p) */
 
     (term->enhanced_flush)();
@@ -2310,11 +2283,11 @@ enhanced_recursion(p, brace, fontname, fontsize, base, widthflag, showflag, over
 
 /* Called after the end of recursion to check for errors */
 static void
-enh_err_check( str )
-    const char *str;
+enh_err_check(const char *str)
 {
     if (*str == '}')
 	fputs("enhanced text mode parser - ignoring spurious }\n", stderr);
     else
-	fprintf(stderr, "enhanced text mode parsing error - *str=0x%x\n", *str);
+	fprintf(stderr, "enhanced text mode parsing error - *str=0x%x\n",
+		*str);
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: term_api.h,v 1.28 2004/04/13 17:24:02 broeker Exp $
+ * $Id: term_api.h,v 1.29 2004/05/09 14:35:03 mikulik Exp $
  */
 
 /* GNUPLOT - term_api.h */
@@ -187,18 +187,18 @@ typedef struct TERMENTRY {
     int (*make_palette) __PROTO((t_sm_palette *palette));
     /* 1. if palette==NULL, then return nice/suitable
        maximal number of colours supported by this terminal.
-       Returns 0 if it can make colours without palette (like 
+       Returns 0 if it can make colours without palette (like
        postscript).
        2. if palette!=NULL, then allocate its own palette
        return value is undefined
-       3. available: some negative values of max_colors for whatever 
+       3. available: some negative values of max_colors for whatever
        can be useful
      */
-    void (*previous_palette) __PROTO((void));  
-    /* release the palette that the above routine allocated and get 
+    void (*previous_palette) __PROTO((void));
+    /* release the palette that the above routine allocated and get
        back the palette that was active before.
        Some terminals, like displays, may draw parts of the figure
-       using their own palette. Those terminals that possess only 
+       using their own palette. Those terminals that possess only
        one palette for the whole plot don't need this routine.
      */
 
@@ -216,7 +216,7 @@ typedef struct TERMENTRY {
 		double base, TBOOLEAN widthflag, TBOOLEAN showflag,
 		int overprint));
     void (*enhanced_flush) __PROTO((void));
-    void (*enhanced_writec) __PROTO((char c));
+    void (*enhanced_writec) __PROTO((int c));
 
 } TERMENTRY;
 
@@ -293,7 +293,7 @@ extern FILE *gpoutfile;
 		for 'set term': pslatex
 	postscript_gpoutfile == 0
 		for all other terminals
-   It is non-zero for for the family of postscript terminals, thus making 
+   It is non-zero for for the family of postscript terminals, thus making
    this a unique check for postscript output (pm3d has some code optimized
    for PS, for instance).
 */
@@ -315,7 +315,7 @@ extern TBOOLEAN term_initialised;
 #ifdef OS2
 extern int mouseGnupmdrv;
 extern FILE *PM_pipe;
-#endif 
+#endif
 
 
 /* Prototypes of functions exported by term.c */

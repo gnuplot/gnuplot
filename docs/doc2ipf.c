@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: doc2ipf.c,v 1.15 2004/02/23 13:35:00 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: doc2ipf.c,v 1.16 2004/04/13 17:23:30 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - doc2ipf.c */
@@ -38,7 +38,7 @@ static char *RCSid() { return RCSid("$Id: doc2ipf.c,v 1.15 2004/02/23 13:35:00 b
  * doc2ipf.c  -- program to convert Gnuplot .DOC format to OS/2
  * ipfc  (.inf/.hlp) format.
  *
- * Modified by Roger Fearick from doc2rtf by M Castro 
+ * Modified by Roger Fearick from doc2rtf by M Castro
  *
  * usage:  doc2ipf gnuplot.doc gnuplot.ipf
  *
@@ -267,7 +267,7 @@ process_line(char *line, FILE *b)
 		break;
 
 	    case '.':
-		/* Makes code less readable but fixes warnings like 
+		/* Makes code less readable but fixes warnings like
 		   <..\docs\gnuplot.ipf:6546> Warning 204: Invalid macro [.gnuplot_iris4d]
 		   which seems to be triggered by a '.' character in the first column?! */
 		strcpy(line2+j, "&per.");

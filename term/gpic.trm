@@ -1,8 +1,8 @@
-/*
- * $Id: gpic.trm,v 1.13 2004/03/29 10:43:36 broeker Exp $
+/* Hello, Emacs, this is -*-C-*-
+ * $Id: gpic.trm,v 1.14 2004/04/13 17:24:32 broeker Exp $
  */
 
-/* GNUPLOT - gpic.trm -*-C-*- */
+/* GNUPLOT - gpic.trm */
 
 /*[
  * Copyright 1993, 1998, 2004
@@ -46,7 +46,7 @@
  *  Sigfrid Lundberg
  *
  * send your comments or suggestions to (siglun@volterra.teorekol.lu.se).
- * 
+ *
  */
 
 /*
@@ -168,8 +168,7 @@ GPIC_text()
 }
 
 TERM_PUBLIC void
-GPIC_linetype(linetype)
-int linetype;
+GPIC_linetype(int linetype)
 {
     if (linetype >= GPIC_NUMLINES - 2)
 	linetype %= (GPIC_NUMLINES - 2);
@@ -186,8 +185,7 @@ GPIC_close_line()
 }
 
 TERM_PUBLIC void
-GPIC_move(x, y)
-unsigned int x, y;
+GPIC_move(unsigned int x, unsigned int y)
 {
     GPIC_close_line();
     fprintf(gpoutfile, "move to (x+%f,y+%f)\n", GPIC_coord(x), GPIC_coord(y));
@@ -196,8 +194,7 @@ unsigned int x, y;
 
 
 TERM_PUBLIC void
-GPIC_vector(ux, uy)
-unsigned int ux, uy;
+GPIC_vector(unsigned int ux, unsigned int uy)
 {
     if (GPIC_linecount == 1) {
 	fprintf(gpoutfile, "line %s to (x+%f,y+%f)",
@@ -214,9 +211,10 @@ unsigned int ux, uy;
 
 
 TERM_PUBLIC void
-GPIC_arrow(sx, sy, ex, ey, head)
-    unsigned int sx, sy, ex, ey;
-    int head;
+GPIC_arrow(
+    unsigned int sx, unsigned int sy,
+    unsigned int ex, unsigned int ey,
+    int head)
 {
     GPIC_close_line();
     if (head) {
@@ -230,9 +228,7 @@ GPIC_arrow(sx, sy, ex, ey, head)
 
 
 TERM_PUBLIC void
-GPIC_put_text(x, y, str)
-unsigned int x, y;		/* reference point of string */
-const char str[];			/* the text */
+GPIC_put_text(unsigned int x, unsigned int y, const char str[])
 {
     GPIC_close_line();
     fprintf(gpoutfile, "\"%s\" ", str);
@@ -256,18 +252,16 @@ const char str[];			/* the text */
 
 
 TERM_PUBLIC int
-GPIC_justify_text(mode)
-enum JUSTIFY mode;
+GPIC_justify_text(enum JUSTIFY mode)
 {
     GPIC_justify = mode;
     return (TRUE);
 }
 
 TERM_PUBLIC int
-GPIC_text_angle(ang)
-    int ang;
+GPIC_text_angle(int ang)
 {
-    (void) ang; 
+    (void) ang;
     GPIC_close_line();
     return (FALSE);
 }

@@ -1,5 +1,5 @@
-/*
- * $Id: pm.trm,v 1.34 2003/12/21 20:06:56 mikulik Exp $
+/* Hello, Emacs, this is -*-C-*-
+ * $Id: pm.trm,v 1.35 2004/04/13 17:24:36 broeker Exp $
  */
 
 /* GNUPLOT - pm.trm */
@@ -42,7 +42,7 @@
  *    since March 1998: additions for mouse support implemented by Petr Mikulik
  *	 last change: January 2000
  *	 for mouse support, pm.trm has to be compiled with USE_MOUSE, e.g.
- *	 gcc ... -DUSE_MOUSE ... 
+ *	 gcc ... -DUSE_MOUSE ...
  *    January 1999: terminal entries for PM3D functionality by Petr Mikulik
  */
 
@@ -90,7 +90,7 @@ TERM_PUBLIC void PM_filled_polygon (int, gpiPoint *);
 /* approximations for typical font/screen sizes */
 #define PM_VCHAR (550)
 #define PM_HCHAR (220)
-/* Note: VCHAR AND HCHAR sizes in gnuplot 3.5 were 415 and 242, 
+/* Note: VCHAR AND HCHAR sizes in gnuplot 3.5 were 415 and 242,
    in X11 are 500 and 195, respectively.
 */
 #if 0 /* Sizes of gnuplot 3.6 and 3.7: */
@@ -554,8 +554,7 @@ PM_justify_text(enum JUSTIFY mode)
 }
 
 TERM_PUBLIC int
-PM_set_font(font) /* Entry font added by DJL */
-const char *font;
+PM_set_font(const char *font)
 {
     int len, fontsize;
     char *p;
@@ -606,7 +605,7 @@ PM_abortplot()
 
 
 void
-PM_intc_cleanup(void)
+PM_intc_cleanup()
 {
     if (PM_pipe == NULL || PM_mode == SET_TEXT)
 	PM_abortplot();
@@ -703,7 +702,7 @@ TERM_PUBLIC void PM_previous_palette ()
 }
 
 
-#if 0 /* caching of color value removed; won't be so efficient for z=const 
+#if 0 /* caching of color value removed; won't be so efficient for z=const
 	 surfaces/map, but will save a lot of headache (linetype changes
 	 color, for instance) */
 int pm_color = -1;
@@ -806,7 +805,7 @@ TERM_TABLE_START(PM_driver)
     0 /*pointsize */ , TERM_CAN_MULTIPLOT, PM_suspend, PM_resume,
     PM_fillbox, PM_linewidth
 #ifdef USE_MOUSE
-    , 0 /* PM_waitforinput */, 
+    , 0 /* PM_waitforinput */,
     PM_put_tmptext, PM_set_ruler, PM_set_cursor, PM_set_clipboard
 #endif
 #ifdef PM3D

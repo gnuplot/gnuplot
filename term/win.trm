@@ -1,5 +1,5 @@
-/*
- * $Id: win.trm,v 1.31 2004/04/05 13:04:03 broeker Exp $
+/* Hello, Emacs, this is -*-C-*-
+ * $Id: win.trm,v 1.32 2004/04/13 17:24:39 broeker Exp $
  */
 
 /* GNUPLOT - win.trm */
@@ -37,10 +37,10 @@
 /*
  *
  * AUTHORS
- * 
+ *
  *   Gnuplot for Windows:
  *       Maurice Castro, Russell Lang
- * 
+ *
  */
 
 
@@ -236,8 +236,7 @@ WIN_graphics()
 }
 
 TERM_PUBLIC void
-WIN_move(x, y)
-    unsigned int x, y;
+WIN_move(unsigned int x, unsigned int y)
 {
     /* Notice HBB 20010208: on Win32 platforms, passing int or
      * unsigned int arguments to GraphOp() might cause problems: int
@@ -246,16 +245,14 @@ WIN_move(x, y)
 }
 
 TERM_PUBLIC void
-WIN_vector(x, y)
-    unsigned int x, y;
+WIN_vector(unsigned int x, unsigned int y)
 {
     /* Notice HBB 20010208: --> WIN_move() */
     GraphOp(&graphwin, W_vect, x, y, NULL);
 }
 
 TERM_PUBLIC void
-WIN_linetype(lt)
-    int lt;
+WIN_linetype(int lt)
 {
     if (lt != WIN_last_linetype) {
 	/* Notice HBB 20010208: --> see WIN_move() */
@@ -265,17 +262,14 @@ WIN_linetype(lt)
 }
 
 TERM_PUBLIC void
-WIN_put_text(x, y, str)
-    unsigned int x, y;
-    const char *str;
+WIN_put_text(unsigned int x, unsigned int y, const char *str)
 {
     /* Notice HBB 20010208: --> WIN_move() */
     GraphOp(&graphwin, W_put_text, x, y, str);
 }
 
 TERM_PUBLIC int
-WIN_justify_text(mode)
-    enum JUSTIFY mode;
+WIN_justify_text(enum JUSTIFY mode)
 {
     /* Notice HBB 20010208: --> WIN_move() */
     GraphOp(&graphwin, W_justify, mode, 0, NULL);
@@ -283,8 +277,7 @@ WIN_justify_text(mode)
 }
 
 TERM_PUBLIC int
-WIN_text_angle(ang)
-    int ang;
+WIN_text_angle(int ang)
 {
     if (graphwin.rotate)
 	/* Notice HBB 20010208: --> WIN_move() */
@@ -293,9 +286,7 @@ WIN_text_angle(ang)
 }
 
 TERM_PUBLIC void
-WIN_point(x, y, number)
-    unsigned int x, y;
-    int number;
+WIN_point(unsigned int x, unsigned int y, int number)
 {
     /* draw point shapes later to save memory */
     /* size of point symbols */
@@ -312,14 +303,13 @@ WIN_point(x, y, number)
 }
 
 TERM_PUBLIC void
-WIN_resume(void)
+WIN_resume()
 {
     GraphResume(&graphwin);
 }
 
 TERM_PUBLIC void
-WIN_set_pointsize(s)
-double s;
+WIN_set_pointsize(double s)
 {
     /* Save new pointsize as string */
     char scale[30];
@@ -338,8 +328,7 @@ double s;
 }
 
 TERM_PUBLIC void
-WIN_linewidth(linewidth)
-    double linewidth;
+WIN_linewidth(double linewidth)
 {
     /* HBB 20000813: New routine */
     WIN_last_linetype = -3;        /* invalidate cached linetype */
@@ -349,8 +338,8 @@ WIN_linewidth(linewidth)
 
 #ifdef USE_MOUSE
 
-/* Implemented by Petr Mikulik, February 2001 --- the best Windows solutions 
- * come from OS/2 :-)) 
+/* Implemented by Petr Mikulik, February 2001 --- the best Windows solutions
+ * come from OS/2 :-))
  */
 
 TERM_PUBLIC void
@@ -382,9 +371,8 @@ WIN_set_clipboard ( const char s[] )
 #ifdef PM3D
 
 TERM_PUBLIC int
-WIN_make_palette(palette)
-    t_sm_palette *palette;
-{	
+WIN_make_palette(t_sm_palette *palette)
+{
     /* Win can do continuous colors. However, we round them only to 256 levels
      * in order to pass an integer to GraphOp; it also reasonably limits
      * the number of colors if "copy to clipboard" is used. Don't change this
@@ -394,17 +382,14 @@ WIN_make_palette(palette)
 }
 
 TERM_PUBLIC void
-WIN_set_color(gray)
-    double gray;
+WIN_set_color(double gray)
 {
     WIN_last_linetype = -3;      /* invalidate cached linetype */
     GraphOp(&graphwin, W_pm3d_setcolor, (int)(256*gray), 0, NULL);
 }
 
 TERM_PUBLIC void
-WIN_filled_polygon(points, corners)
-    int points;
-    gpiPoint *corners;
+WIN_filled_polygon(int points, gpiPoint *corners)
 {
     int i;
     /* Notice HBB 20010208: --> WIN_move() */
@@ -417,14 +402,15 @@ WIN_filled_polygon(points, corners)
 #endif /* PM3D */
 
 TERM_PUBLIC void
-WIN_boxfill(style, xleft, ybottom, width, height)  /* changes by ULIG */
-    int style;
-    unsigned int xleft, ybottom, width, height;
+WIN_boxfill(
+    int style,
+    unsigned int xleft, unsigned int ybottom,
+    unsigned int width, unsigned int height)
 {
     /* split into two commands to squeeze through all the necessary info */
     /* Notice HBB 20010208: --> WIN_move() */
 #if USE_ULIG_FILLEDBOXES
-    GraphOp(&graphwin, W_fillstyle, style, 0, NULL); 
+    GraphOp(&graphwin, W_fillstyle, style, 0, NULL);
 #endif /* USE_ULIG_FILLEDBOXES */
     GraphOp(&graphwin, W_move, xleft, ybottom, NULL);
     GraphOp(&graphwin, W_boxfill, width, height, NULL);
@@ -443,16 +429,16 @@ TERM_TABLE_START(win_driver)
     WIN_linetype, WIN_put_text, WIN_text_angle,
     WIN_justify_text, WIN_point, do_arrow, set_font_null,
     WIN_set_pointsize, TERM_CAN_MULTIPLOT,
-    WIN_text /* suspend */ , WIN_resume, 
+    WIN_text /* suspend */ , WIN_resume,
     WIN_boxfill, WIN_linewidth
 #ifdef USE_MOUSE
-    , 0 /* WIN_waitforinput */, 
+    , 0 /* WIN_waitforinput */,
     WIN_put_tmptext, WIN_set_ruler, WIN_set_cursor, WIN_set_clipboard
 #endif
 #ifdef PM3D
     , WIN_make_palette, 0 /* previous_palette */,
     WIN_set_color, WIN_filled_polygon
-#endif            
+#endif
 TERM_TABLE_END(win_driver)
 
 #undef LAST_TERM
@@ -487,7 +473,7 @@ START_HELP(windows)
 "",
 " The Windows version normally terminates immediately as soon as the end of",
 " any files given as command line arguments is reached (i.e. in non-interactive",
-" mode), unless you specify `-` as the last command line option.", 
+" mode), unless you specify `-` as the last command line option.",
 " It will also not show the text-window at all, in this mode, only the plot.",
 " By giving the optional argument `-persist` (same as for gnuplot under x11;",
 " former Windows-only options `/noend` or `-noend` are still accepted as well),",

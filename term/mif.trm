@@ -1,5 +1,5 @@
-/*
- * $Id: mif.trm,v 1.25 2004/02/27 21:01:36 sfeam Exp $
+/* Hello, Emacs, this is -*-C-*-
+ * $Id: mif.trm,v 1.26 2004/04/13 17:24:35 broeker Exp $
  */
 
 /* GNUPLOT -- mif.trm */
@@ -73,12 +73,12 @@
  *
  * AUTHORS:
  *      Olof Franksson, Physics IV, KTH, S-100 44 Stockholm, Sweden
- * 
+ *
  * NEW TERMINAL FORMAT:  David C. Schooley
- 
+
  * COMMENTS:
  *      Send comments and/or suggestions to olof@fysik4.kth.se
- * 
+ *
  * CHANGES:
  *	Changed to new terminal format 9/29/95		schooley@ee.gatech.edu
  *      Changed order of routine declarations.          olof@fysik4.kth.se
@@ -444,7 +444,7 @@ MIF_filled_polygon(int points, gpiPoint* corners)
     fprintf(gpoutfile, "\t\t<NumPoints %d> ", points);
     for (i=0; i<points; i++) {
 	fprintf(gpoutfile, "<Point  %.3f %.3f> ",
-		GNP_TO_MIF(corners[i].x), 
+		GNP_TO_MIF(corners[i].x),
 		GNP_TO_MIF(MIF_YLAST - corners[i].y));
     }
 
@@ -459,9 +459,7 @@ MIF_filled_polygon(int points, gpiPoint* corners)
 
 /* Draw a point */
 static void
-mif_put_point(x, y, np)
-unsigned int x, y;
-int np;
+mif_put_point(unsigned int x, unsigned int y, int np)
 {
     /* Process if inside a Frame */
     if (mif_initialized != 0 && mif_in_frame != 0) {
@@ -504,9 +502,7 @@ int np;
  *  draw points
  */
 TERM_PUBLIC void
-MIF_point(x, y, number)
-unsigned int x, y;
-int number;
+MIF_point(unsigned int x, unsigned int y, int number)
 {
     if (number < 0) {		/* dot */
 	number = -1;
@@ -689,10 +685,9 @@ MIF_text()
 /* Select type of line in grapics */
 /* NOTE: actually written to output the first time a primitive
  * is drawn AFTER this call */
-TERM_PUBLIC void
-MIF_linetype(linetype)
 /* -2=border, -1=X/Y-axis, 0-13=lines, and 14-=mapped back */
-int linetype;
+TERM_PUBLIC void
+MIF_linetype(int linetype)
 {
     /* Process if inside a Frame */
     if (mif_initialized != 0 && mif_in_frame != 0) {
@@ -736,8 +731,7 @@ int linetype;
 
 /* Allow arbitrary text rotation */
 TERM_PUBLIC int
-MIF_text_angle(ang)
-int ang;
+MIF_text_angle(int ang)
 {
     mif_text_ang = ang;
     return (TRUE);
@@ -748,8 +742,7 @@ int ang;
  * NOTE: actually written to output in text primitives which are
  * drawn AFTER this call */
 TERM_PUBLIC int
-MIF_justify_text(mode)
-enum JUSTIFY mode;
+MIF_justify_text(enum JUSTIFY mode)
 {
     int rval = TRUE;
 
@@ -783,8 +776,7 @@ enum JUSTIFY mode;
  * NOTE: actually written to output the first time another primitive
  * is called AFTER this call */
 TERM_PUBLIC void
-MIF_vector(x, y)
-unsigned int x, y;
+MIF_vector(unsigned int x, unsigned int y)
 {
     /* Process if inside a Frame */
     if (mif_initialized != 0 && mif_in_frame != 0) {
@@ -801,8 +793,7 @@ unsigned int x, y;
 
 /* Move current position */
 TERM_PUBLIC void
-MIF_move(x, y)
-unsigned int x, y;
+MIF_move(unsigned int x, unsigned int y)
 {
     /* Process if inside a Frame */
     if (mif_initialized != 0 && mif_in_frame != 0) {
@@ -819,8 +810,7 @@ unsigned int x, y;
 
 /* set font */
 static void
-MIF_set_font(font)
-const char *font;
+MIF_set_font(const char *font)
 {
     if (font != mif_font) {
 	fprintf(gpoutfile, "\t\t<Font\n\t\t\t<FTag `%s'>\n\t\t>\n", font);
@@ -832,9 +822,7 @@ const char *font;
 /* Draw the text string str at (x, y). Adjust according to MIF_justify_text().
  * Change current position. */
 TERM_PUBLIC void
-MIF_put_text(x, y, str)
-unsigned int x, y;
-const char str[];
+MIF_put_text(unsigned int x, unsigned int y, const char str[])
 {
     /* Process if inside a Frame */
     if (mif_initialized != 0 && mif_in_frame != 0) {
@@ -877,8 +865,7 @@ const char str[];
 
 /* Insert one point in the line */
 static int
-insert_mif_line(fx, fy)
-double fx, fy;
+insert_mif_line(double fx, double fy)
 {
     int rval = TRUE;
 
@@ -911,8 +898,7 @@ double fx, fy;
 	       -2       group ID list is full
  */
 static int
-proc_group_id(group_id)
-int group_id;
+proc_group_id(int group_id)
 {
     int i, rval = 0;
 

@@ -1,5 +1,5 @@
-/*
- * $Id: aed.trm,v 1.9 1999/06/22 11:54:13 lhecking Exp $
+/* Hello, Emacs, this is -*-C-*-
+ * $Id: aed.trm,v 1.10 2004/04/13 17:24:15 broeker Exp $
  *
  */
 
@@ -45,7 +45,7 @@
  *     Colin Kelley, Thomas Williams, Russell Lang
  *
  * send your comments or suggestions to (gnuplot-info@lists.sourceforge.net).
- * 
+ *
  */
 
 /*
@@ -120,9 +120,8 @@ AED_text()
 
 
 
-TERM_PUBLIC
-void AED_linetype(linetype)
-int linetype;
+TERM_PUBLIC void
+AED_linetype(int linetype)
 {
     static int color[2 + 9] = { 7, 1, 6, 2, 3, 5, 1, 6, 2, 3, 5 };
     static int type[2 + 9] = { 85, 85, 255, 255, 255, 255, 255, 85, 85, 85, 85 };
@@ -140,25 +139,21 @@ int linetype;
 
 
 TERM_PUBLIC void
-AED_move(x, y)
-unsigned int x, y;
+AED_move(unsigned int x, unsigned int y)
 {
     fprintf(gpoutfile, "\033MOV%d.%d.", x, y);
 }
 
 
 TERM_PUBLIC void
-AED_vector(x, y)
-unsigned int x, y;
+AED_vector(unsigned int x, unsigned int y)
 {
     fprintf(gpoutfile, "\033DVA%d.%d.", x, y);
 }
 
 
 TERM_PUBLIC void
-AED_put_text(x, y, str)
-unsigned int x, y;
-const char *str;
+AED_put_text(unsigned int x, unsigned int y, const char *str)
 {
     AED_move(x, y - AED_VCHAR / 2 + 2);
     fprintf(gpoutfile, "\033XXX%s\033", str);

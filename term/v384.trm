@@ -1,5 +1,5 @@
-/*
- * $Id: v384.trm,v 1.8 1999/06/22 11:54:24 lhecking Exp $
+/* Hello, Emacs, this is -*-C-*-
+ * $Id: v384.trm,v 1.9 2004/04/13 17:24:39 broeker Exp $
  *
  */
 
@@ -42,10 +42,10 @@
  *  Vectrix 384 - works with tandy color printer as well
  *
  * AUTHORS
- *   roland@moncskermit.OZ (Roland Yap) 
- * 
+ *   roland@moncskermit.OZ (Roland Yap)
+ *
  * send your comments or suggestions to (gnuplot-info@lists.sourceforge.net).
- * 
+ *
  */
 
 /*
@@ -125,8 +125,7 @@ V384_text()
 
 
 TERM_PUBLIC void
-V384_linetype(linetype)
-int linetype;
+V384_linetype(int linetype)
 {
     static int color[] =
     {
@@ -149,25 +148,21 @@ int linetype;
 
 
 TERM_PUBLIC void
-V384_move(x, y)
-unsigned int x, y;
+V384_move(unsigned int x, unsigned int y)
 {
     fprintf(gpoutfile, "M %d %d\n", x + 20, y);
 }
 
 
 TERM_PUBLIC void
-V384_vector(x, y)
-unsigned int x, y;
+V384_vector(unsigned int x, unsigned int y)
 {
     fprintf(gpoutfile, "L %d %d\n", x + 20, y);
 }
 
 
 TERM_PUBLIC void
-V384_put_text(x, y, str)
-unsigned int x, y;
-const char str[];
+V384_put_text(unsigned int x, unsigned int y, const char str[])
 {
     V384_move(x, y + V384_VCHAR / 2);
     fprintf(gpoutfile, "$%s\n", str);

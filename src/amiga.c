@@ -1,4 +1,4 @@
-/* $Id: amiga.c,v 1.2 2002/04/30 13:39:11 lhecking Exp $ */
+/* $Id: amiga.c,v 1.3 2004/04/13 17:23:51 broeker Exp $ */
 
 /* GNUPLOT - amiga.c */
 
@@ -108,178 +108,177 @@ static void CleanUpPipes (void);
 static int __saveds ChildEntry (void);
 
 
-FILE *popen (command, mode)
-const char *command;
-const char *mode;
+FILE *
+popen (const char *command, const char *mode)
 {
-  UBYTE PipeName[16];
-  ULONG ProcAddress;
-  UBYTE HexDigit;
-  UBYTE *NextChar;
-  struct CommandLineInterface *ThisCli;
-  struct PipeFileDescriptor *PipeToUse;
-  LONG PipeNumToUse;
-  LONG ChildPipeMode;
-  BPTR ChildPipe;
-  FILE *ParentPipe;
-  struct Process *ChildProcess;
-  struct TagItem NewProcTags[8] = {
-    {NP_Entry, (Tag) ChildEntry},
-    {NP_Cli, TRUE},
-    {NP_StackSize, 4096},
-    {NP_Input, NULL},
-    {NP_Output, NULL},
-    {NP_CloseInput, FALSE},
-    {NP_CloseOutput, FALSE},
-    {TAG_DONE, 0}
-  };
+    UBYTE PipeName[16];
+    ULONG ProcAddress;
+    UBYTE HexDigit;
+    UBYTE *NextChar;
+    struct CommandLineInterface *ThisCli;
+    struct PipeFileDescriptor *PipeToUse;
+    LONG PipeNumToUse;
+    LONG ChildPipeMode;
+    BPTR ChildPipe;
+    FILE *ParentPipe;
+    struct Process *ChildProcess;
+    struct TagItem NewProcTags[8] = {
+	{NP_Entry, (Tag) ChildEntry},
+	{NP_Cli, TRUE},
+	{NP_StackSize, 4096},
+	{NP_Input, NULL},
+	{NP_Output, NULL},
+	{NP_CloseInput, FALSE},
+	{NP_CloseOutput, FALSE},
+	{TAG_DONE, 0}
+    };
 
-  /* Test whether we're using the right Dos version. */
-  if (DOSBase->dl_lib.lib_Version < DOS_VERSION) {
-    errno = EPIPE;
-    return NULL;
-  }
-
-  /* If we're called for the first time, install exit trap and do some
-   * initialisation stuff.
-   */
-  if (FirstCall) {
-    /* Initialise pipe file descriptor table. */
-    memset (OpenPipes, 0, sizeof (OpenPipes));
-    
-    /* Install our exit trap. */
-    if (atexit (CleanUpPipes) != 0) {
-      errno = EPIPE;
-      return NULL;
+    /* Test whether we're using the right Dos version. */
+    if (DOSBase->dl_lib.lib_Version < DOS_VERSION) {
+	errno = EPIPE;
+	return NULL;
     }
-    FirstCall = FALSE;
-  }
 
-  /* If we don't know our process' address yet, we should get it now. */
-  if (ThisProcess == NULL)
-    ThisProcess = (struct Process *) FindTask (NULL);
+    /* If we're called for the first time, install exit trap and do some
+     * initialisation stuff.
+     */
+    if (FirstCall) {
+	/* Initialise pipe file descriptor table. */
+	memset (OpenPipes, 0, sizeof (OpenPipes));
 
-  /* Get our Cli structure. */
-  ThisCli = Cli ();
+	/* Install our exit trap. */
+	if (atexit (CleanUpPipes) != 0) {
+	    errno = EPIPE;
+	    return NULL;
+	}
+	FirstCall = FALSE;
+    }
 
-  /* Now try to find an empty slot in the pipe file descriptor table.
-   * Return NULL if no slot is available.
-   */
-  for (PipeNumToUse = 0; PipeNumToUse < MAX_OPEN_PIPES; PipeNumToUse++)
-    if (OpenPipes[PipeNumToUse].pfd_File == NULL) break;
-  if (PipeNumToUse >= MAX_OPEN_PIPES) {
-    errno = EMFILE;
+    /* If we don't know our process' address yet, we should get it now. */
+    if (ThisProcess == NULL)
+	ThisProcess = (struct Process *) FindTask (NULL);
+
+    /* Get our Cli structure. */
+    ThisCli = Cli ();
+
+    /* Now try to find an empty slot in the pipe file descriptor table.
+     * Return NULL if no slot is available.
+     */
+    for (PipeNumToUse = 0; PipeNumToUse < MAX_OPEN_PIPES; PipeNumToUse++)
+	if (OpenPipes[PipeNumToUse].pfd_File == NULL) break;
+    if (PipeNumToUse >= MAX_OPEN_PIPES) {
+	errno = EMFILE;
+	return NULL;
+    }
+    PipeToUse = &OpenPipes[PipeNumToUse];
+
+    /* Check if the specified mode is valid. */
+    if (strcmp (mode, "r") == 0)
+	ChildPipeMode = MODE_NEWFILE;
+    else if (strcmp (mode, "w") == 0)
+	ChildPipeMode = MODE_OLDFILE;
+    else {
+	errno = EINVAL;
+	return NULL;
+    }
+
+    /* Make a unique file name for the pipe that we are about to open. The
+     * file name has the following format: "PIPE:XXXXXXXX_Y", where
+     * XXXXXXXX is the address of our process in hex, Y is the number of the
+     * slot in the pipe descriptor table that we will use. The code is
+     * equivalent to
+     * sprintf (PipeNameWriter, "PIPE:%08lX_%1d", ThisProcess, PipeNumToUse);
+     * but it doesn't need sprintf and therefore makes programs that don't
+     * use printf a lot shorter.
+     */
+    strcpy (PipeName, "PIPE:00000000_0");
+    NextChar = PipeName + 12;
+    ProcAddress = (ULONG) ThisProcess;
+    while (ProcAddress != 0) {
+	HexDigit = (UBYTE) ProcAddress & 0xf;
+	HexDigit = HexDigit < 10 ? HexDigit + '0' : HexDigit - 10 + 'A';
+	*NextChar-- = HexDigit;
+	ProcAddress >>= 4;
+    }
+    /* If MAX_OPEN_PIPES > 10, this will have to be modified. */
+    PipeName[14] = ((UBYTE) PipeNumToUse) + '0';
+
+    /* Create tags for the child process. */
+    if (ThisProcess->pr_CLI)
+	NewProcTags[2].ti_Data = ThisCli->cli_DefaultStack << 2;
+    else
+	NewProcTags[2].ti_Data = ThisProcess->pr_StackSize;
+
+    /* Open both ends of the pipe. The child's side is opened with Open (),
+     * while the parent's side is opened with fopen ().
+     */
+    ChildPipe = Open (PipeName, ChildPipeMode);
+    ParentPipe = fopen (PipeName, mode);
+    if (ChildPipeMode == MODE_NEWFILE) {
+	NewProcTags[3].ti_Data = Input ();
+	NewProcTags[4].ti_Data = ChildPipe;
+	NewProcTags[5].ti_Data = FALSE;
+	NewProcTags[6].ti_Data = TRUE;
+    } else {
+	NewProcTags[3].ti_Data = ChildPipe;
+	NewProcTags[4].ti_Data = Output ();
+	NewProcTags[5].ti_Data = TRUE;
+	NewProcTags[6].ti_Data = FALSE;
+    }
+    if (ChildPipe == NULL || ParentPipe == NULL) {
+	errno = EPIPE;
+	goto cleanup;
+    }
+
+    /* Now generate a entry in the pipe file descriptor table. */
+    PipeToUse->pfd_Msg.sm_Cmd = malloc (strlen (command) + 1);
+    if (PipeToUse->pfd_Msg.sm_Cmd == NULL) {
+	errno = ENOMEM;
+	goto cleanup;
+    }
+    strcpy (PipeToUse->pfd_Msg.sm_Cmd, command);
+    PipeToUse->pfd_Msg.sm_Msg.mn_ReplyPort = CreateMsgPort ();
+    if (PipeToUse->pfd_Msg.sm_Msg.mn_ReplyPort == NULL) {
+	errno = ENOMEM;
+	goto cleanup;
+    }
+    PipeToUse->pfd_Msg.sm_Msg.mn_Node.ln_Type = NT_MESSAGE;
+    PipeToUse->pfd_Msg.sm_Msg.mn_Node.ln_Pri = 0;
+    PipeToUse->pfd_Msg.sm_Msg.mn_Length = sizeof (struct StartupMessage);
+    PipeToUse->pfd_File = ParentPipe;
+
+    /* Now create the child process. */
+    ChildProcess = CreateNewProc (NewProcTags);
+    if (ChildProcess == NULL) {
+	errno = ENOMEM;
+	goto cleanup;
+    }
+
+    /* Pass the startup message to the child process. */
+    PutMsg (&ChildProcess->pr_MsgPort, (struct Message *) &PipeToUse->pfd_Msg);
+
+    /* This is the normal exit point for the function. */
+    return ParentPipe;
+
+    /* This code is only executed if there was an error. In this case the
+     * allocated resources must be freed. The code is actually clearer (at
+     * least in my opinion) and more concise by using goto than by using a
+     * function (global variables or function parameters needed) or a lot
+     * of if-constructions (code gets blown up unnecessarily).
+     */
+  cleanup:
+    if (PipeToUse->pfd_Msg.sm_Msg.mn_ReplyPort == NULL)
+	DeleteMsgPort (PipeToUse->pfd_Msg.sm_Msg.mn_ReplyPort);
+    if (ParentPipe)
+	fclose (ParentPipe);
+    if (ChildPipe)
+	Close (ChildPipe);
     return NULL;
-  }
-  PipeToUse = &OpenPipes[PipeNumToUse];
-
-  /* Check if the specified mode is valid. */
-  if (strcmp (mode, "r") == 0)
-    ChildPipeMode = MODE_NEWFILE;
-  else if (strcmp (mode, "w") == 0)
-    ChildPipeMode = MODE_OLDFILE;
-  else {
-    errno = EINVAL;
-    return NULL;
-  }
-
-  /* Make a unique file name for the pipe that we are about to open. The
-   * file name has the following format: "PIPE:XXXXXXXX_Y", where
-   * XXXXXXXX is the address of our process in hex, Y is the number of the
-   * slot in the pipe descriptor table that we will use. The code is
-   * equivalent to
-   * sprintf (PipeNameWriter, "PIPE:%08lX_%1d", ThisProcess, PipeNumToUse);
-   * but it doesn't need sprintf and therefore makes programs that don't
-   * use printf a lot shorter.
-   */
-  strcpy (PipeName, "PIPE:00000000_0");
-  NextChar = PipeName + 12;
-  ProcAddress = (ULONG) ThisProcess;
-  while (ProcAddress != 0) {
-    HexDigit = (UBYTE) ProcAddress & 0xf;
-    HexDigit = HexDigit < 10 ? HexDigit + '0' : HexDigit - 10 + 'A';
-    *NextChar-- = HexDigit;
-    ProcAddress >>= 4;
-  }
-  /* If MAX_OPEN_PIPES > 10, this will have to be modified. */
-  PipeName[14] = ((UBYTE) PipeNumToUse) + '0';
-
-  /* Create tags for the child process. */
-  if (ThisProcess->pr_CLI)
-    NewProcTags[2].ti_Data = ThisCli->cli_DefaultStack << 2;
-  else
-    NewProcTags[2].ti_Data = ThisProcess->pr_StackSize;
-
-  /* Open both ends of the pipe. The child's side is opened with Open (),
-   * while the parent's side is opened with fopen ().
-   */
-  ChildPipe = Open (PipeName, ChildPipeMode);
-  ParentPipe = fopen (PipeName, mode);
-  if (ChildPipeMode == MODE_NEWFILE) {
-    NewProcTags[3].ti_Data = Input ();
-    NewProcTags[4].ti_Data = ChildPipe;
-    NewProcTags[5].ti_Data = FALSE;
-    NewProcTags[6].ti_Data = TRUE;
-  } else {
-    NewProcTags[3].ti_Data = ChildPipe;
-    NewProcTags[4].ti_Data = Output ();
-    NewProcTags[5].ti_Data = TRUE;
-    NewProcTags[6].ti_Data = FALSE;
-  }
-  if (ChildPipe == NULL || ParentPipe == NULL) {
-    errno = EPIPE;
-    goto cleanup;
-  }
-
-  /* Now generate a entry in the pipe file descriptor table. */
-  PipeToUse->pfd_Msg.sm_Cmd = malloc (strlen (command) + 1);
-  if (PipeToUse->pfd_Msg.sm_Cmd == NULL) {
-    errno = ENOMEM;
-    goto cleanup;
-  }
-  strcpy (PipeToUse->pfd_Msg.sm_Cmd, command);
-  PipeToUse->pfd_Msg.sm_Msg.mn_ReplyPort = CreateMsgPort ();
-  if (PipeToUse->pfd_Msg.sm_Msg.mn_ReplyPort == NULL) {
-    errno = ENOMEM;
-    goto cleanup;
-  }
-  PipeToUse->pfd_Msg.sm_Msg.mn_Node.ln_Type = NT_MESSAGE;
-  PipeToUse->pfd_Msg.sm_Msg.mn_Node.ln_Pri = 0;
-  PipeToUse->pfd_Msg.sm_Msg.mn_Length = sizeof (struct StartupMessage);
-  PipeToUse->pfd_File = ParentPipe;
-
-  /* Now create the child process. */
-  ChildProcess = CreateNewProc (NewProcTags);
-  if (ChildProcess == NULL) {
-    errno = ENOMEM;
-    goto cleanup;
-  }
-
-  /* Pass the startup message to the child process. */
-  PutMsg (&ChildProcess->pr_MsgPort, (struct Message *) &PipeToUse->pfd_Msg);
-
-  /* This is the normal exit point for the function. */
-  return ParentPipe;
-
-  /* This code is only executed if there was an error. In this case the
-   * allocated resources must be freed. The code is actually clearer (at
-   * least in my opinion) and more concise by using goto than by using a
-   * function (global variables or function parameters needed) or a lot
-   * of if-constructions (code gets blown up unnecessarily).
-   */
-cleanup:
-  if (PipeToUse->pfd_Msg.sm_Msg.mn_ReplyPort == NULL)
-    DeleteMsgPort (PipeToUse->pfd_Msg.sm_Msg.mn_ReplyPort);
-  if (ParentPipe)
-    fclose (ParentPipe);
-  if (ChildPipe)
-    Close (ChildPipe);
-  return NULL;
 }
 
 
-int pclose (stream)
-FILE *stream;
+int
+pclose (FILE *stream)
 {
   LONG PipeToClose;
 
@@ -319,7 +318,8 @@ FILE *stream;
 }
 
 
-static void CleanUpPipes ()
+static void
+CleanUpPipes ()
 {
   LONG Count;
   FILE *Pipe;
@@ -333,44 +333,45 @@ static void CleanUpPipes ()
 }
 
 
-static int __saveds ChildEntry ()
+static int __saveds
+ChildEntry ()
 {
-  struct Process *ChildProc;
-  struct StartupMessage *StartUpMessage;
-  LONG ReturnCode;
-  struct DosLibrary *DOSBase;
-  struct TagItem SysTags[3] = {
-    {SYS_Asynch, FALSE},
-    {SYS_UserShell, TRUE},
-    {TAG_DONE, 0}
-  };
+    struct Process *ChildProc;
+    struct StartupMessage *StartUpMessage;
+    LONG ReturnCode;
+    struct DosLibrary *DOSBase;
+    struct TagItem SysTags[3] = {
+	{SYS_Asynch, FALSE},
+	{SYS_UserShell, TRUE},
+	{TAG_DONE, 0}
+    };
 
-  /* We need to open this library, because we don't inherit it from our
-   * parent process.
-   */
-  DOSBase = (struct DosLibrary *) OpenLibrary ("dos.library", DOS_VERSION);
+    /* We need to open this library, because we don't inherit it from our
+     * parent process.
+     */
+    DOSBase = (struct DosLibrary *) OpenLibrary ("dos.library", DOS_VERSION);
 
-  /* Get the childs process structure. */
-  ChildProc = (struct Process *) FindTask (NULL);
+    /* Get the childs process structure. */
+    ChildProc = (struct Process *) FindTask (NULL);
 
-  /* Wait for the startup message from the parent. */
-  WaitPort (&ChildProc->pr_MsgPort);
-  StartUpMessage = (struct StartupMessage *) GetMsg (&ChildProc->pr_MsgPort);
+    /* Wait for the startup message from the parent. */
+    WaitPort (&ChildProc->pr_MsgPort);
+    StartUpMessage = (struct StartupMessage *) GetMsg (&ChildProc->pr_MsgPort);
 
-  /* Now run the command and return the result. */
-  if (DOSBase != NULL)
-    ReturnCode = System (StartUpMessage->sm_Cmd, SysTags);
-  else
-    ReturnCode = 10000;
-  StartUpMessage->sm_RetCode = ReturnCode;
+    /* Now run the command and return the result. */
+    if (DOSBase != NULL)
+	ReturnCode = System (StartUpMessage->sm_Cmd, SysTags);
+    else
+	ReturnCode = 10000;
+    StartUpMessage->sm_RetCode = ReturnCode;
 
-  /* Tell the parent that we are done. */
-  ReplyMsg ((struct Message *) StartUpMessage);
+    /* Tell the parent that we are done. */
+    ReplyMsg ((struct Message *) StartUpMessage);
 
-  if (DOSBase)
-    CloseLibrary ((struct Library *) DOSBase);
+    if (DOSBase)
+	CloseLibrary ((struct Library *) DOSBase);
 
-  return 0;
+    return 0;
 }
 
 #endif /* PIPES */

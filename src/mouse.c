@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.56 2004/06/21 03:54:49 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.57 2004/06/24 16:54:18 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -36,7 +36,7 @@ static char *RCSid() { return RCSid("$Id: mouse.c,v 1.56 2004/06/21 03:54:49 sfe
 
 /*
  * AUTHORS
- * 
+ *
  *   Original Software (October 1999 - January 2000):
  *     Pieter-Tjerk de Boer <ptdeboer@cs.utwente.nl>
  *     Petr Mikulik <mikulik@physics.muni.cz>
@@ -258,7 +258,7 @@ void send_gpPMmenu __PROTO((FILE * PM_pipe));
 
 /* produce a beep */
 static void
-alert(void)
+alert()
 {
 # ifdef GNUPMDRV
     DosBeep(444, 111);
@@ -292,7 +292,7 @@ stpcpy(char *s, const char *p)
 # endif
 
 
-/* a macro to check whether 2D functionality is allowed: 
+/* a macro to check whether 2D functionality is allowed:
    either the plot is a 2D plot, or it is a suitably oriented 3D plot
 */
 # define ALMOST2D      \
@@ -380,7 +380,7 @@ MousePosToGraphPosReal(int xx, int yy, double *x, double *y, double *x2, double 
 }
 
 static char *
-xy_format(void)
+xy_format()
 {
     static char format[0xff];
     format[0] = NUL;
@@ -391,7 +391,7 @@ xy_format(void)
 }
 
 static char *
-zoombox_format(void)
+zoombox_format()
 {
     static char format[0xff];
     format[0] = NUL;
@@ -544,7 +544,7 @@ GetCoordinateString(char *s, double x, double y)
 
 /* formats the ruler information (position, distance,...) into string p
 	(it must be sufficiently long)
-   x, y is the current mouse position in real coords (for the calculation 
+   x, y is the current mouse position in real coords (for the calculation
 	of distance)
 */
 static void
@@ -625,7 +625,7 @@ apply_zoom(struct t_zoom *z)
 	return;
     }
 
-    sprintf(s, "set xr[%.12g:%.12g]; set yr[%.12g:%.12g]", 
+    sprintf(s, "set xr[%.12g:%.12g]; set yr[%.12g:%.12g]",
 	       zoom_now->xmin, zoom_now->xmax, zoom_now->ymin, zoom_now->ymax);
 
     /* HBB 20011004: the final part of 'unzoom to autoscale mode'.
@@ -652,7 +652,7 @@ apply_zoom(struct t_zoom *z)
 			: "");						     \
 	}								     \
     }
-	    
+
     if (zoom_now == zoom_head) {
 	/* new current zoom is the head --> returning to unzoomed
 	 * settings --> restore autoscale */
@@ -710,7 +710,7 @@ do_zoom(double xmin, double ymin, double x2min, double y2min, double xmax, doubl
 
 
 static void
-ZoomNext(void)
+ZoomNext()
 {
     if (zoom_now == NULL || zoom_now->next == NULL)
 	alert();
@@ -722,7 +722,7 @@ ZoomNext(void)
 }
 
 static void
-ZoomPrevious(void)
+ZoomPrevious()
 {
     if (zoom_now == NULL || zoom_now->prev == NULL)
 	alert();
@@ -734,7 +734,7 @@ ZoomPrevious(void)
 }
 
 static void
-ZoomUnzoom(void)
+ZoomUnzoom()
 {
     if (zoom_head == NULL || zoom_now == zoom_head)
 	alert();
@@ -791,7 +791,7 @@ incr_clipboardmode(const int amount)
 # define TICS_ON(ti) (((ti)&TICS_MASK)!=NO_TICS)
 
 void
-UpdateStatusline(void)
+UpdateStatusline()
 {
     UpdateStatuslineWithMouseSetting(&mouse_setting);
 }
@@ -875,7 +875,7 @@ UpdateStatuslineWithMouseSetting(mouse_setting_t * ms)
 
 
 void
-recalc_statusline(void)
+recalc_statusline()
 {
     MousePosToGraphPosReal(mouse_x, mouse_y, &real_x, &real_y, &real_x2, &real_y2);
     UpdateStatusline();
@@ -929,7 +929,7 @@ builtin_toggle_grid(struct gp_event_t *ge)
     if (!ge) {
 	return "`builtin-toggle-grid`";
     }
-    if (! some_grid_selected()) 
+    if (! some_grid_selected())
 	do_string_replot("set grid");
     else
 	do_string_replot("unset grid");
@@ -1579,7 +1579,7 @@ event_buttonrelease(struct gp_event_t *ge)
     /* Export current mouse coords to user-accessible variables also */
     load_mouse_variables(mouse_x, mouse_y, TRUE, b);
     UpdateStatusline();
-     
+
 #ifdef _Windows
     if (paused_for_mouse) {
 	/* remove pause message box after 'pause mouse' */
@@ -1664,7 +1664,7 @@ event_motion(struct gp_event_t *ge)
 	if (redraw) {
 	    if (allowmotion) {
 		/* is processing of motions allowed right now?
-		 * then replot while 
+		 * then replot while
 		 * disabling further replots until it completes */
 		allowmotion = FALSE;
 		do_save_3dplot(first_3dplot, plot3d_num, !!(modifier_mask & Mod_Ctrl));
@@ -1861,7 +1861,7 @@ do_save_3dplot(struct surface_points *plots, int pcount, int quick)
  */
 
 static void
-bind_install_default_bindings(void)
+bind_install_default_bindings()
 {
     bind_remove_all();
     bind_append("a", (char *) 0, builtin_autoscale);
@@ -2160,7 +2160,7 @@ bind_process(char *lhs, char *rhs)
 }
 
 void
-bind_remove_all(void)
+bind_remove_all()
 {
     bind_t *ptr;
     bind_t *safe;
@@ -2173,11 +2173,11 @@ bind_remove_all(void)
     bindings = (bind_t *) 0;
 }
 
-/* Ruler is on, thus recalc its (px,py) from (x,y) for the current zoom and 
+/* Ruler is on, thus recalc its (px,py) from (x,y) for the current zoom and
    log axes.
 */
 static void
-recalc_ruler_pos(void)
+recalc_ruler_pos()
 {
     double P, dummy;
     if (is_3d_plot) {
@@ -2209,7 +2209,7 @@ recalc_ruler_pos(void)
 /* Recalculate and replot the ruler after a '(re)plot'. Called from term.c.
 */
 void
-update_ruler(void)
+update_ruler()
 {
     if (!term->set_ruler || !ruler.on)
 	return;
@@ -2233,7 +2233,7 @@ plot_mode(int set)
 }
 
 static void
-turn_ruler_off(void)
+turn_ruler_off()
 {
     if (ruler.on) {
 	ruler.on = FALSE;
@@ -2324,7 +2324,7 @@ send_gpPMmenu(FILE * PM_pipe)
 
 /* update menu items in PM terminal */
 void
-update_menu_items_PM_terminal(void)
+update_menu_items_PM_terminal()
 {
     send_gpPMmenu(PM_pipe);
 }

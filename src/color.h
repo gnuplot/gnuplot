@@ -1,5 +1,5 @@
 /*
- * $Id: color.h,v 1.13 2003/11/13 08:18:15 mikulik Exp $
+ * $Id: color.h,v 1.14 2003/12/14 22:07:33 vanzandt Exp $
  */
 
 /* GNUPLOT - color.h */
@@ -40,12 +40,12 @@ of palettes between terminals and making palette routines.
 /*
  *    color modes
  */
-typedef enum { 
+typedef enum {
     SMPAL_COLOR_MODE_NONE = '0',
     SMPAL_COLOR_MODE_GRAY = 'g',      /* grayscale only */
-    SMPAL_COLOR_MODE_RGB = 'r',       /* one of several fixed transforms */ 
+    SMPAL_COLOR_MODE_RGB = 'r',       /* one of several fixed transforms */
     SMPAL_COLOR_MODE_FUNCTIONS = 'f', /* user defined transforms */
-    SMPAL_COLOR_MODE_GRADIENT = 'd'   /* interpolated table: 
+    SMPAL_COLOR_MODE_GRADIENT = 'd'   /* interpolated table:
 				       * explicitly defined or read from file */
 } palette_color_mode;
 
@@ -141,7 +141,7 @@ typedef struct {
   rgb_color *color;
 
   /** Variables used by some terminals **/
-  
+
   /* Option unique for output to PostScript file.  By default,
    * ps_allcF=0 and only the 3 selected rgb color formulae are written
    * into the header preceding pm3d map in the file.  If ps_allcF is
@@ -155,15 +155,15 @@ typedef struct {
   char ps_allcF;
 
   /* These variables are used to define interpolated color palettes:
-   * gradient is an array if (gray,color) pairs.  This array is 
-   * gradient_num entries big.  
+   * gradient is an array if (gray,color) pairs.  This array is
+   * gradient_num entries big.
    * Interpolated tables are used if colorMode==SMPAL_COLOR_MODE_GRADIENT */
   int gradient_num;
   gradient_struct *gradient;
 
   /* the used color model: RGB, HSV, XYZ, etc. */
-  int cmodel;  
-  
+  int cmodel;
+
   /* Three mapping function for gray->RGB/HSV/XYZ/etc. mapping
    * used if colorMode == SMPAL_COLOR_MODE_FUNCTIONS */
   struct udft_entry Afunc;  /* R for RGB, H for HSV, C for CMY, ... */

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.41 2004/04/13 17:23:56 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.42 2004/06/30 19:55:14 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - hidden3d.c */
@@ -185,7 +185,7 @@ typedef edge GPHUGE *p_edge;
 typedef struct polygon {
     long vertex[POLY_NVERT];    /* The vertices (indices on vlist) */
     /* min/max in all three directions */
-    coordval xmin, xmax, ymin, ymax, zmin, zmax; 
+    coordval xmin, xmax, ymin, ymax, zmin, zmax;
     t_plane plane;		/* the plane coefficients */
     TBOOLEAN frontfacing;	/* is polygon facing front- or backwards? */
 #if ! HIDDEN3D_QUADTREE
@@ -268,7 +268,7 @@ static dynarray qtree;
 #endif /* HIDDEN3D_QUADTREE*/
 
 /* Prototypes for internal functions of this module. */
-static long int store_vertex __PROTO((struct coordinate GPHUGE *point, 
+static long int store_vertex __PROTO((struct coordinate GPHUGE *point,
 				      int pointtype, TBOOLEAN color_from_column));
 static long int make_edge __PROTO((long int vnum1, long int vnum2,
 				   struct lp_style_type *lp,
@@ -410,9 +410,8 @@ show_hidden3doptions()
 }
 
 /* Implements proper 'save'ing of the new hidden3d options... */
-void 
-save_hidden3doptions(fp)
-    FILE *fp;
+void
+save_hidden3doptions(FILE *fp)
 {
     if (!hidden3d) {
 	fputs("unset hidden3d\n", fp);
@@ -428,7 +427,7 @@ save_hidden3doptions(fp)
 
 /* Initialize the necessary steps for hidden line removal and
    initialize global variables. */
-void 
+void
 init_hidden_line_removal()
 {
     /* Check for some necessary conditions to be set elsewhere: */
@@ -465,7 +464,7 @@ reset_hidden_line_removal()
 
 /* Terminates the hidden line removal process.                  */
 /* Free any memory allocated by init_hidden_line_removal above. */
-void 
+void
 term_hidden_line_removal()
 {
     free_dynarray(&polygons);
@@ -477,31 +476,7 @@ term_hidden_line_removal()
 }
 
 
-/* Gets Minimum 'var' value of polygon 'poly' into variable 'min. C is
- * one of x, y, or z: */
-#define GET_MIN(poly, var, min)			\
-do {						\
-    int i;					\
-    long *v = poly->vertex;			\
-						\
-    min = vlist[*v++].var;			\
-    for (i = 1; i< POLY_NVERT; i++, v++)	\
-	if (vlist[*v].var < min)		\
-	    min = vlist[*v].var;		\
-} while (0)
-
-/* Gets Maximum 'var' value of polygon 'poly', as with GET_MIN */
-#define GET_MAX(poly, var, max)			\
-do {						\
-    int i;					\
-    long *v = poly->vertex;			\
-						\
-    max = vlist[*v++].var;			\
-    for (i = 1; i< POLY_NVERT; i++, v++)	\
-	if (vlist[*v].var > max)		\
-	    max = vlist[*v].var;		\
-} while (0)
-
+#if 0 /* UNUSED ! */
 /* Do we see the top or bottom of the polygon, or is it 'on edge'? */
 #define GET_SIDE(vlst,csign)						\
 do {									\
@@ -511,17 +486,18 @@ do {									\
 	vlist[vlst[2]].x * (vlist[vlst[0]].y - vlist[vlst[1]].y);	\
     csign = SIGN (ctmp);						\
 } while (0)
+#endif /* UNUSED */
 
-static long int 
-store_vertex (point, pointtype, color_from_column)
-    struct coordinate GPHUGE * point;
-    int pointtype;
-    TBOOLEAN color_from_column;
+static long int
+store_vertex (
+    struct coordinate GPHUGE * point,
+    int pointtype,
+    TBOOLEAN color_from_column)
 {
     p_vertex thisvert = nextfrom_dynarray(&vertices);
-	
+
     thisvert->style = pointtype;
-    if ((int)point->type >= hiddenHandleUndefinedPoints) {
+    if ((int) point->type >= hiddenHandleUndefinedPoints) {
 	FLAG_VERTEX_AS_UNDEFINED(*thisvert);
 	return (-1);
     }
@@ -538,12 +514,12 @@ store_vertex (point, pointtype, color_from_column)
 
 /* A part of store_edge that does the actual storing. Used by
  * in_front(), as well, so I separated it out. */
-static long int 
-make_edge(vnum1, vnum2, lp, style, next)
-    long int vnum1, vnum2;
-    struct lp_style_type *lp;
-    int style;
-    int next;
+static long int
+make_edge(
+    long vnum1, long vnum2,
+    struct lp_style_type *lp,
+    int style,
+    int next)
 {
     p_edge thisedge = nextfrom_dynarray(&edges);
     p_vertex v1 = vlist + vnum1;
@@ -568,12 +544,12 @@ make_edge(vnum1, vnum2, lp, style, next)
 /* store the edge from vnum1 to vnum2 into the edge list. Ensure that
  * the vertex with higher z is stored in v1, to ease sorting by zmax */
 static long int
-store_edge(vnum1, direction, crvlen, lp, style)
-    long int vnum1;
-    edge_direction direction;
-    long int crvlen;
-    struct lp_style_type *lp;
-    int style;
+store_edge(
+    long int vnum1,
+    edge_direction direction,
+    long int crvlen,
+    struct lp_style_type *lp,
+    int style)
 {
     p_vertex v1 = vlist + vnum1;
     p_vertex v2 = NULL;		/* just in case: initialize... */
@@ -616,7 +592,7 @@ store_edge(vnum1, direction, crvlen, lp, style)
 	! (hiddenTriangleLinesdrawnPattern & drawbits)
 	)
 	style = -3;
-	
+
     return make_edge(vnum1, vnum2, lp, style, -1);
 }
 
@@ -626,15 +602,13 @@ store_edge(vnum1, direction, crvlen, lp, style)
  * that it doesn't rely on only three of the vertices of 'p', as the
  * naive cross product method does. */
 static TBOOLEAN
-get_plane(poly, plane)
-    p_polygon poly;
-    t_plane plane;
+get_plane(p_polygon poly, t_plane plane)
 {
     int i;
     p_vertex v1, v2;
     double x, y, z, s;
     TBOOLEAN frontfacing=TRUE;
-	
+
     /* calculate the signed areas of the polygon projected onto the
      * planes x=0, y=0 and z=0, respectively. The three areas form
      * the components of the plane's normal vector: */
@@ -685,7 +659,7 @@ get_plane(poly, plane)
 	s *= -1.0;
 	frontfacing = FALSE;
     }
-	
+
     plane[0] /= s;
     plane[1] /= s;
     plane[2] /= s;
@@ -702,10 +676,8 @@ get_plane(poly, plane)
 /* Evaluate the plane equation represented a four-vector for the given
  * vector. For points in the plane, this should result in values ==0.
  * < 0 is 'away' from the polygon, > 0 is infront of it */
-static GP_INLINE double 
-eval_plane_equation(p, v)
-    t_plane p;
-    p_vertex v;
+static GP_INLINE double
+eval_plane_equation(t_plane p, p_vertex v)
 {
     return (p[0]*v->x + p[1]*v->y + p[2]*v->z + p[3]);
 }
@@ -716,18 +688,15 @@ eval_plane_equation(p, v)
  * to polygons in the previous isoline, from the next-following
  * one. */
 static long int
-store_polygon(vnum1, direction, crvlen)
-    long int vnum1;
-    polygon_direction direction;
-    long int crvlen;
+store_polygon(long vnum1, polygon_direction direction, long crvlen)
 {
     long int v[POLY_NVERT];
     p_vertex v1, v2, v3;
     p_polygon p;
-	
+
     switch (direction) {
     case pdir_NE:
-	v[0] = vnum1; 
+	v[0] = vnum1;
 	v[2] = vnum1 - crvlen;
 	v[1] = v[2] - 1;
 	break;
@@ -753,7 +722,7 @@ store_polygon(vnum1, direction, crvlen)
     v1 = vlist + v[0];
     v2 = vlist + v[1];
     v3 = vlist + v[2];
-	
+
     if (VERTEX_IS_UNDEFINED(*v1)
 	|| VERTEX_IS_UNDEFINED(*v2)
 	|| VERTEX_IS_UNDEFINED(*v3)
@@ -761,25 +730,55 @@ store_polygon(vnum1, direction, crvlen)
 	return (-2);
 
     /* All else OK, fill in the polygon: */
-	
+
     p = nextfrom_dynarray(&polygons);
 
     memcpy (p->vertex, v, sizeof(v));
 #if ! HIDDEN3D_QUADTREE
     p->next = -1;
 #endif
+
+    /* Some helper macros for repeted code blocks: */
+
+    /* Gets Minimum 'var' value of polygon 'poly' into variable
+     * 'min. C is one of x, y, or z: */
+#define GET_MIN(poly, var, min)			\
+    do {					\
+	int i;					\
+	long *v = poly->vertex;			\
+						\
+	min = vlist[*v++].var;			\
+	for (i = 1; i< POLY_NVERT; i++, v++)	\
+	    if (vlist[*v].var < min)		\
+		min = vlist[*v].var;		\
+    } while (0)
+
+    /* Gets Maximum 'var' value of polygon 'poly', as with GET_MIN */
+#define GET_MAX(poly, var, max)			\
+    do {					\
+	int i;					\
+	long *v = poly->vertex;			\
+						\
+	max = vlist[*v++].var;			\
+	for (i = 1; i< POLY_NVERT; i++, v++)	\
+	    if (vlist[*v].var > max)		\
+		max = vlist[*v].var;		\
+    } while (0)
+
     GET_MIN(p, x, p->xmin);
     GET_MIN(p, y, p->ymin);
     GET_MIN(p, z, p->zmin);
     GET_MAX(p, x, p->xmax);
     GET_MAX(p, y, p->ymax);
     GET_MAX(p, z, p->zmax);
+#undef GET_MIN
+#undef GET_MAX
 
 #if HIDDEN3D_GRIDBOX
     p->xbits = CALC_BITRANGE(p->xmin, p->xmax);
     p->ybits = CALC_BITRANGE(p->ymin, p->ymax);
 #endif
-	
+
     p->frontfacing = get_plane(p, p->plane);
 
     return (p - plist);
@@ -793,13 +792,13 @@ store_polygon(vnum1, direction, crvlen)
  * viewer), this routine has to resolve that conflict.  Edge colours
  * are changed only if the edge wasn't invisible, before */
 static void
-color_edges(new_edge, old_edge, new_poly, old_poly, above, below)
-    long int new_edge;		/* index of 'new', conflictless edge */
-    long int old_edge;		/* index of 'old' edge, may conflict */
-    long int new_poly;		/* index of current polygon */
-    long int old_poly;		/* index of poly sharing old_edge */
-    int above;			/* style number for front of polygons */
-    int below;			/* style number for backside of polys */
+color_edges(
+    long int new_edge,		/* index of 'new', conflictless edge */
+    long int old_edge,		/* index of 'old' edge, may conflict */
+    long int new_poly,		/* index of current polygon */
+    long int old_poly,		/* index of poly sharing old_edge */
+    int above,			/* style number for front of polygons */
+    int below)			/* style number for backside of polys */
 {
     int casenumber;
 
@@ -808,7 +807,7 @@ color_edges(new_edge, old_edge, new_poly, old_poly, above, below)
 	if (old_poly <= -2)
 	    /* old polygon doesn't exist. Use new_polygon for both: */
 	    old_poly = new_poly;
-			
+
 	casenumber =
 	    (plist[new_poly].frontfacing ? 1 : 0)
 	    + 2 * (plist[old_poly].frontfacing ? 1 : 0);
@@ -899,10 +898,8 @@ color_edges(new_edge, old_edge, new_poly, old_poly, above, below)
 /* NEW FEATURE HBB 20000715: allow non-grid datasets too, by storing
  * only vertices and 'direct' edges, but no polygons or 'cross' edges
  * */
-static void 
-build_networks(plots, pcount)
-    struct surface_points *plots;
-    int pcount;
+static void
+build_networks(struct surface_points *plots, int pcount)
 {
     long int i;
     struct surface_points *this_plot;
@@ -932,7 +929,7 @@ build_networks(plots, pcount)
 	/* register maximal isocurve length. Only necessary for
 	 * grid-topology plots that will create polygons, so I can do
 	 * it here, already. */
-	if (crvlen > max_crvlen) 
+	if (crvlen > max_crvlen)
 	    max_crvlen = crvlen;
 
 	/* count 'curves' (i.e. isolines) and vertices in this plot */
@@ -964,7 +961,7 @@ build_networks(plots, pcount)
 	 * available in 3d. */
 	switch (this_plot->plot_style) {
 	case LINESPOINTS:
-	case STEPS:		
+	case STEPS:
 	case FSTEPS:
 	case HISTEPS:
 	case LINES:
@@ -975,7 +972,7 @@ build_networks(plots, pcount)
 		np += 2 * (ncrvs - 1) * (crvlen - 1);
 	    }
 	    break;
-	case BOXES:		
+	case BOXES:
 #ifdef PM3D
 	case FILLEDCURVES:
 #endif
@@ -1049,10 +1046,10 @@ build_networks(plots, pcount)
 
 		for (i = 0; i < icrvs->p_count; i++) {
 		    long int thisvertex, basevertex;
-		    
+
 		    thisvertex = store_vertex(points+i, pointtype,
 					      color_from_column);
-		
+
 		    if (thisvertex < 0 || previousvertex < 0) {
 			previousvertex = thisvertex;
 			continue;
@@ -1060,13 +1057,13 @@ build_networks(plots, pcount)
 
 		    switch (this_plot->plot_style) {
 		    case LINESPOINTS:
-		    case STEPS:		
+		    case STEPS:
 		    case FSTEPS:
 		    case HISTEPS:
 		    case LINES:
 			store_edge(thisvertex, edir_west, 0, lp, above);
 			break;
-		    case BOXES:		
+		    case BOXES:
 #ifdef PM3D
 		    case FILLEDCURVES:
 #endif
@@ -1074,7 +1071,7 @@ build_networks(plots, pcount)
 			/* set second vertex to the low end of zrange */
 			{
 			    coordval remember_z = points[i].z;
-			    
+
 			    points[i].z = axis_array[FIRST_Z_AXIS].min;
 			    basevertex = store_vertex(points + i, pointtype,
 						      color_from_column);
@@ -1083,7 +1080,7 @@ build_networks(plots, pcount)
 			if (basevertex > 0)
 			    store_edge(thisvertex, edir_impulse, 0, lp, above);
 			break;
-			
+
 		    case POINTSTYLE:
 		    default:	/* treat all the others like 'points' */
 			store_edge(thisvertex, edir_point, crvlen, lp, above);
@@ -1093,9 +1090,9 @@ build_networks(plots, pcount)
 		    previousvertex = thisvertex;
 		} /* for(vertex) */
 	    } /* for(crv) */
-		    
+
 	    continue;		/* done with this plot! */
-	} 
+	}
 
 	/* initialize stored indices of north-of-this-isoline polygons and
 	 * edges properly */
@@ -1107,7 +1104,7 @@ build_networks(plots, pcount)
 		= north_edges[3 * i + 2]
 		= -3;
 	}
-			
+
 	for (crv = 0, icrvs = this_plot->iso_crvs;
 	     icrvs;
 	     crv++, icrvs = icrvs->next) {
@@ -1130,7 +1127,7 @@ build_networks(plots, pcount)
 
 		switch (this_plot->plot_style) {
 		case LINESPOINTS:
-		case STEPS:		
+		case STEPS:
 		case FSTEPS:
 		case HISTEPS:
 		case LINES:
@@ -1155,7 +1152,7 @@ build_networks(plots, pcount)
 				     * later: it doesn't share edges
 				     * with any others to the south or
 				     * east, so there's need to */
-				    pnum 
+				    pnum
 					= store_polygon(vertices.end - 1, pdir_NW, crvlen);
 				    /* The other two edges of this
 				     * polygon need to be checked
@@ -1171,7 +1168,7 @@ build_networks(plots, pcount)
 			    }
 			    break; /* nothing else to do for invalid vertex */
 			}
-			
+
 			/* Coming here means that the current vertex
 			 * is valid: check the other three of this
 			 * cell, by trying to set up the edges from
@@ -1236,30 +1233,30 @@ build_networks(plots, pcount)
 					elist[e1].style = elist[e2].style = elist[e3].style
 					    = below;
 				}
-			    } 
-			} 
-		    } else if ((crv > 0) 
+			    }
+			}
+		    } else if ((crv > 0)
 			       && (thisvertex >= 0)) {
 			/* We're at the west border of the grid, but
 			 * not on the north one: put vertical end-wall
 			 * edge:*/
-			these_edges[3*i + 1] = 
+			these_edges[3*i + 1] =
 			    store_edge(thisvertex, edir_north, crvlen, lp, above);
 		    }
 		    break;
 
-		case BOXES:		
+		case BOXES:
 #ifdef PM3D
 		case FILLEDCURVES:
 #endif
 		case IMPULSES:
 		    if (thisvertex < 0)
 			break;
-						
+
 		    /* set second vertex to the low end of zrange */
 		    {
 			coordval remember_z = points[i].z;
-						
+
 			points[i].z = axis_array[FIRST_Z_AXIS].min;
 			basevertex = store_vertex(points + i, pointtype,
 						  color_from_column);
@@ -1301,16 +1298,14 @@ build_networks(plots, pcount)
  * plist indices, and then fills in the 'next' fields in struct
  * polygon to store the resulting order inside the plist */
 /* HBB 20010720: removed 'static' to avoid HP-sUX gcc bug */
-int 
-compare_edges_by_zmin(p1, p2)
-    SORTFUNC_ARGS p1;
-    SORTFUNC_ARGS p2;
+int
+compare_edges_by_zmin(SORTFUNC_ARGS p1, SORTFUNC_ARGS p2)
 {
     return SIGN(vlist[elist[*(const long *) p1].v2].z
 		- vlist[elist[*(const long *) p2].v2].z);
 }
 
-static void 
+static void
 sort_edges_by_z()
 {
     long *sortarray, i;
@@ -1338,26 +1333,24 @@ sort_edges_by_z()
 
     /* 'efirst' is the index of the leading element of plist */
     efirst = sortarray[0];
-	
+
     free(sortarray);
 }
 
 /* HBB 20010720: removed 'static' to avoid HP-sUX gcc bug */
-int 
-compare_polys_by_zmax(p1, p2)
-    SORTFUNC_ARGS p1;
-    SORTFUNC_ARGS p2;
+int
+compare_polys_by_zmax(SORTFUNC_ARGS p1, SORTFUNC_ARGS p2)
 {
     return (SIGN(plist[*(const long *) p1].zmax
 		 - plist[*(const long *) p2].zmax));
 }
 
-static void 
+static void
 sort_polys_by_z()
 {
     long *sortarray, i;
     p_polygon this;
-	
+
     if (!polygons.end)
 	return;
 
@@ -1384,10 +1377,10 @@ sort_polys_by_z()
 	for (grid_x = 0; grid_x < QUADTREE_GRANULARITY; grid_x++)
 	    for (grid_y = 0; grid_y < QUADTREE_GRANULARITY; grid_y++)
 		quadtree[grid_x][grid_y] = -1;
-	    
+
 	for (i=polygons.end - 1; i >= 0; i--) {
 	    this = plist + sortarray[i];
-		
+
 	    grid_x_low = COORD_TO_TREECELL(this->xmin);
 	    grid_x_high = COORD_TO_TREECELL(this->xmax);
 	    grid_y_low = COORD_TO_TREECELL(this->ymin);
@@ -1396,16 +1389,16 @@ sort_polys_by_z()
 	    for (grid_x = grid_x_low; grid_x <= grid_x_high; grid_x++) {
 		for (grid_y = grid_y_low; grid_y <= grid_y_high; grid_y++) {
 		    p_qtreelist newhead = nextfrom_dynarray(&qtree);
-			
+
 		    newhead->next = quadtree[grid_x][grid_y];
 		    newhead->p = sortarray[i];
-			
+
 		    quadtree[grid_x][grid_y] = newhead - qlist;
 		}
 	    }
 	}
     }
-	    
+
 #else /* HIDDEN3D_QUADTREE */
     this = plist + sortarray[0];
     for (i = 1; i < polygons.end; i++) {
@@ -1416,7 +1409,7 @@ sort_polys_by_z()
     /* 'pfirst' is the index of the leading element of plist */
 #endif /* HIDDEN3D_QUADTREE */
     pfirst = sortarray[0];
-	
+
     free(sortarray);
 }
 
@@ -1430,8 +1423,7 @@ sort_polys_by_z()
 /* draw a single vertex as a point symbol, if requested by the chosen
  * plot style (linespoints, points, or dots...) */
 static void
-draw_vertex(v)
-    p_vertex v;
+draw_vertex(p_vertex v)
 {
     unsigned int x, y;
 
@@ -1449,9 +1441,7 @@ draw_vertex(v)
 /* HBB 20001108: changed to take the pointers to the end vertices as
  * additional arguments. */
 static void
-draw_edge(e, v1, v2)
-    p_edge e;
-    p_vertex v1, v2;
+draw_edge(p_edge e, p_vertex v1, p_vertex v2)
 {
     assert (e >= elist && e < elist + edges.end);
 
@@ -1479,9 +1469,9 @@ draw_edge(e, v1, v2)
  * rather than pointers, to avoid problems with dangling pointers
  * after nextfrom_dynarray() call. */
 static long
-split_line_at_ratio(vnum1, vnum2, w)
-    long int  vnum1, vnum2;	/* vertex indices of line to split */
-    double w;			/* where to split it */
+split_line_at_ratio(
+    long vnum1, long vnum2, 	/* vertex indices of line to split */
+    double w)			/* where to split it */
 {
     p_vertex v;
 
@@ -1489,7 +1479,7 @@ split_line_at_ratio(vnum1, vnum2, w)
 	return vnum1;
     if (EQ(w, 1.0))
 	return vnum2;
-	
+
     /* Create a new vertex */
     v = nextfrom_dynarray(&vertices);
 
@@ -1497,7 +1487,7 @@ split_line_at_ratio(vnum1, vnum2, w)
     v->y = (vlist[vnum2].y - vlist[vnum1].y) * w + vlist[vnum1].y;
     v->z = (vlist[vnum2].z - vlist[vnum1].z) * w + vlist[vnum1].z;
 #ifdef PM3D
-    v->real_z = (vlist[vnum2].real_z - vlist[vnum1].real_z) * w 
+    v->real_z = (vlist[vnum2].real_z - vlist[vnum1].real_z) * w
 	+ vlist[vnum1].real_z;
 #endif
 
@@ -1522,9 +1512,8 @@ split_line_at_ratio(vnum1, vnum2, w)
  * to the x-y plane. Essentially the z component of the crossproduct.
  * Should come out positive if v1, v2, v3 are ordered counter-clockwise */
 
-static GP_INLINE double 
-area2D (v1, v2, v3)
-    p_vertex v1, v2, v3;	/* The vertices */
+static GP_INLINE double
+area2D(p_vertex v1, p_vertex v2, p_vertex v3)
 {
     register double
 	dx12 = v2->x - v1->x,	/* x/y components of (v2-v1) and (v3-v1) */
@@ -1544,10 +1533,7 @@ area2D (v1, v2, v3)
  * be worth having. I.e. it can be replaced by a direct recursion call
  * of in_front(), sometime soon. */
 static GP_INLINE void
-handle_edge_fragment(edgenum, vnum1, vnum2, firstpoly)
-    long int edgenum;
-    long int vnum1, vnum2;
-    long int firstpoly;
+handle_edge_fragment(long edgenum, long vnum1, long vnum2, long firstpoly)
 {
 #if !HIDDEN3D_QUADTREE
     /* Avoid checking against the same polygon again. */
@@ -1561,7 +1547,7 @@ handle_edge_fragment(edgenum, vnum1, vnum2, firstpoly)
  * of the elist is in_front of all the polygons, or not. If necessary,
  * it will recursively call itself to isolate more than one visible
  * fragment of the input edge. Wherever possible, recursion is
- * avoided, by in-place modification of the edge. 
+ * avoided, by in-place modification of the edge.
  *
  * The visible fragments are then drawn by a call to 'draw_edge' from
  * inside this routine. */
@@ -1573,11 +1559,11 @@ handle_edge_fragment(edgenum, vnum1, vnum2, firstpoly)
  * it. FIXME: allocates new vertices when splitting, but never frees
  * them, currently. */
 
-static int 
-in_front(edgenum, vnum1, vnum2, firstpoly)
-    long int edgenum;		/* number of the edge in elist */
-    long int vnum1, vnum2;	/* numbers of its endpoints */
-    long int *firstpoly;	/* first plist index to consider */
+static int
+in_front(
+    long edgenum,		/* number of the edge in elist */
+    long vnum1, long vnum2,	/* numbers of its endpoints */
+    long *firstpoly)		/* first plist index to consider */
 {
     p_polygon p;		/* pointer to current testing polygon */
     long int polynum;		/* ... and its index in the plist */
@@ -1643,10 +1629,10 @@ in_front(edgenum, vnum1, vnum2, firstpoly)
 	}					\
 	SET_YEXTENT;				\
     } while (0) /* end macro setup_edge */
-	
+
     /* use the macro for initial setup, too: */
     setup_edge(vnum1, vnum2);
-	
+
     first_zmin = zmin;
 
 #if HIDDEN3D_QUADTREE
@@ -1654,9 +1640,9 @@ in_front(edgenum, vnum1, vnum2, firstpoly)
     grid_x_high = COORD_TO_TREECELL(xmax);
     grid_y_low = COORD_TO_TREECELL(ymin);
     grid_y_high = COORD_TO_TREECELL(ymax);
-    
+
     for (grid_x = grid_x_low; grid_x <= grid_x_high; grid_x ++)
-	for (grid_y = grid_y_low; grid_y <= grid_y_high; grid_y ++) 
+	for (grid_y = grid_y_low; grid_y <= grid_y_high; grid_y ++)
 	    for (listhead = quadtree[grid_x][grid_y],
 		     polynum = qlist[listhead].p, p = plist + polynum;
 		 listhead >= 0;
@@ -1676,7 +1662,7 @@ in_front(edgenum, vnum1, vnum2, firstpoly)
 	    /* signed areas of each of e's vertices wrt. the edges of
 	     * p. I store them explicitly, because they are used more
 	     * than once, eventually */
-	    double e_side[2][POLY_NVERT]; 
+	    double e_side[2][POLY_NVERT];
 	    /* signed areas of each of p's vertices wrt. to edge e. Stored
 	     * for re-use in intersection calculations, as well */
 	    double p_side[POLY_NVERT];
@@ -1776,7 +1762,7 @@ in_front(edgenum, vnum1, vnum2, firstpoly)
 	    /* p->plane[2] is now forced >=0, so it doesn't tell anything
 	     * about which side the polygon is facing */
 	    whichside = (p->frontfacing) ? -1 : 1;
-			
+
 #if 0
 	    /* Just make sure I got this the right way round: */
 	    if (p->frontfacing)
@@ -1822,12 +1808,12 @@ in_front(edgenum, vnum1, vnum2, firstpoly)
 	    classify(e_side[0][s], e_side[1][s], s);		\
 	    if (classification[s] == 3)				\
 		continue;
-		
+
 	    checkside(w1, w2, 0);
 	    checkside(w2, w3, 1);
 	    checkside(w3, w1, 2);
 #undef checkside		/* get rid of that macro, again */
-		
+
 
 	    /* Test 5 (2D): Does the whole polygon lie on one and the same
 	     * side of the tested edge? Again, area2D is used to determine on
@@ -1838,7 +1824,7 @@ in_front(edgenum, vnum1, vnum2, firstpoly)
 		p_side[0] = area2D(v1, v2, w1);
 		p_side[1] = area2D(v1, v2, w2);
 		p_side[2] = area2D(v1, v2, w3);
-		
+
 		/* HBB 20001104: made this more restrictive: only
 		 * reject p if areas are greater than 0, i.e. don't
 		 * allow EQ(..,0). Otherwise, edges coincident with a
@@ -1859,7 +1845,7 @@ in_front(edgenum, vnum1, vnum2, firstpoly)
 			&& GR(0 , p_side[1])
 			&& GR(0 , p_side[2])
 			)
-		    ) 
+		    )
 		    continue;
 #else
 		/* HBB 20020406: try to repair this */
@@ -1968,7 +1954,7 @@ in_front(edgenum, vnum1, vnum2, firstpoly)
 		int side1, side2;
 		double hit1, hit2;
 		unsigned int full_class;
-			
+
 		/* find out which of the three edges would be intersected: */
 		if ((p_side[0] > 0) == (p_side[1] > 0)) {
 		    /* first two vertices on the same side, the third
@@ -1986,13 +1972,13 @@ in_front(edgenum, vnum1, vnum2, firstpoly)
 		    side1 = 0;
 		    side2 = 2;
 		}
-				
+
 		/* Carry out the classification into those 27 cases,
 		 * based upon classification bits precomputed above,
 		 * and calculate the intersection parameters, as
 		 * appropriate. Start by regarding the polygon's
 		 * plane: '1' means point is in front of plane.
-		 * 
+		 *
 		 * First, some utility macros: */
 #define cleanup_hit(hit)			\
 		do {				\
@@ -2065,7 +2051,7 @@ in_front(edgenum, vnum1, vnum2, firstpoly)
 
 		if (!full_class)
 		    /* all suspected intersections cleared, already! */
-		    continue;								
+		    continue;
 
 		/* First sort out all cases where one endpoint is
 		 * attributed to more than one intersecting
@@ -2080,7 +2066,7 @@ in_front(edgenum, vnum1, vnum2, firstpoly)
 		switch (full_class & makeclass(1, 1, 1)) {
 		case makeclass(0,1,1):
 		    /* v1 is out 'side1' and infront of 'p' */
-		    if (front_hit < hit1) 
+		    if (front_hit < hit1)
 			classification[3] = 0;
 		    else
 			classification[side1] = 0;
@@ -2088,12 +2074,12 @@ in_front(edgenum, vnum1, vnum2, firstpoly)
 
 		case makeclass(1,0,1):
 		    /* v1 is out 'side2' and infront of 'p' */
-		    if (front_hit < hit2) 
+		    if (front_hit < hit2)
 			classification[3] = 0;
 		    else
 			classification[side2] = 0;
 		    break;
-		    
+
 		    /* The following two cases never trigger, even in
 		     * a full run through all.dem. Neither do the
 		     * corresponding 2 cases for the vertex2
@@ -2105,7 +2091,7 @@ in_front(edgenum, vnum1, vnum2, firstpoly)
 		     * completely on one side of the edge.  */
 		case makeclass(1,1,0):
 		    /* v1 out both sides, but behind the front */
-		    if (hit1 < hit2) 
+		    if (hit1 < hit2)
 			/* hit2 is closer to the hidden vertex v2, so
 			 * it's the relevant intersection: */
 			classification[side1] = 0;
@@ -2124,7 +2110,7 @@ in_front(edgenum, vnum1, vnum2, firstpoly)
 			    classification[side2] = 0;
 		    } else {
 			classification[side1] = 0;
-			if (front_hit < hit2) 
+			if (front_hit < hit2)
 			    classification[3] = 0;
 			else
 			    classification[side2] = 0;
@@ -2135,37 +2121,37 @@ in_front(edgenum, vnum1, vnum2, firstpoly)
 		    ; /* do nothing */
 		} /* switch(v1 classes) */
 
-			
+
 		/* And the same, for v2 */
 		switch (full_class & makeclass(2, 2, 2)) {
 		case makeclass(0,2,2):
 		    /* v2 is out 'side1' and infront of 'p' */
-		    if (front_hit > hit1) 
+		    if (front_hit > hit1)
 			classification[3] = 0;
 		    else
 			classification[side1] = 0;
 		    break;
-				
+
 		case makeclass(2,0,2):
 		    /* v2 out side 'side2' and infront of 'p' */
-		    if (front_hit > hit2) 
+		    if (front_hit > hit2)
 			classification[3] = 0;
 		    else
 			classification[side2] = 0;
 		    break;
-				
+
 		    /* See note in v1 handling about these two cases
 		     * being impossible... */
 		case makeclass(2,2,0):
 		    /* v2 out both sides, but behind the front */
-		    if (hit1 > hit2) 
+		    if (hit1 > hit2)
 			/* hit2 is closer to the hidden vertex v2, so
 			 * it's the relevant intersection: */
 			classification[side1] = 0;
 		    else
 			classification[side2] = 0;
 		    break;
-				
+
 		case makeclass(2,2,2):
 		    /* v2 out both sides, and in front of p (--> v1 is
 		     * hidden) */
@@ -2177,7 +2163,7 @@ in_front(edgenum, vnum1, vnum2, firstpoly)
 			    classification[side2] = 0;
 		    } else {
 			classification[side1] = 0;
-			if (front_hit > hit2) 
+			if (front_hit > hit2)
 			    classification[3] = 0;
 			else
 			    classification[side2] = 0;
@@ -2193,7 +2179,7 @@ in_front(edgenum, vnum1, vnum2, firstpoly)
 		full_class = makeclass(classification[side2],
 				       classification[side1],
 				       classification[3]);
-				
+
 		/* This monster switch catches all the 13 remaining cases
 		 * individually. */
 		switch (full_class) {
@@ -2201,7 +2187,7 @@ in_front(edgenum, vnum1, vnum2, firstpoly)
 		    printf("in_front: (T9) class %d is illegal. Should never happen.\n",
 			   full_class);
 		    break;
-		case makeclass(0,0,0):									
+		case makeclass(0,0,0):
 		    /* can happen, by resetting of classification bits
 		     * inside this test */
 		    break;
@@ -2225,7 +2211,7 @@ in_front(edgenum, vnum1, vnum2, firstpoly)
 		    handle_singleplane_hit(vnum1,hit2);
 		case makeclass(2,0,0): /* v2 is out side2 */
 		    handle_singleplane_hit(vnum2,hit2);
-				
+
 /*----------- cases with 2 certain intersections: --------------*/
 		case makeclass(1,2,0):
 		case makeclass(2,1,0):
@@ -2244,7 +2230,7 @@ in_front(edgenum, vnum1, vnum2, firstpoly)
 			setup_edge(newvert[0], vnum2);
 		    }
 		    break;
-						
+
 /*----------- cases with either 2 or no intersections: --------------*/
 
 		    /* Mainly identical code block to be used 4 times
@@ -2301,9 +2287,9 @@ in_front(edgenum, vnum1, vnum2, firstpoly)
  * hidden3d 'vlist' structure. If they are, they may become invalid
  * before they're used, because of the nextfrom_dynarray() call. */
 void
-draw_line_hidden(v1, v2, lp)
-    p_vertex v1, v2;		/* pointers to the end vertices */
-    struct lp_style_type *lp;	/* line and point style to draw in */
+draw_line_hidden(
+    p_vertex v1, p_vertex v2,	/* pointers to the end vertices */
+    struct lp_style_type *lp)	/* line and point style to draw in */
 {
     long int vstore1, vstore2;
     long int edgenum;
@@ -2316,7 +2302,7 @@ draw_line_hidden(v1, v2, lp)
 	draw3d_line_unconditional(v1, v2, lp, lp->l_type);
 	return;
     }
-	
+
     /* Copy two vertices into hidden3d arrays: */
     nextfrom_dynarray(&vertices);
     vstore1 = vertices.end - 1;
@@ -2333,14 +2319,14 @@ draw_line_hidden(v1, v2, lp)
 	vstore2 = vstore1;
 	vlist[vstore2].style = lp->p_type;
     }
-    
+
     /* store the edge into the hidden3d datastructures */
     edgenum = make_edge(vstore1, vstore2, lp, lp->l_type, -1);
 
     /* remove hidden portions of the line, and draw what remains */
     temp_pfirst = pfirst;
     in_front(edgenum, elist[edgenum].v1, elist[edgenum].v2, &temp_pfirst);
-    
+
     /* release allocated storage slots: */
     droplast_dynarray(&edges);
     droplast_dynarray(&vertices);
@@ -2352,9 +2338,7 @@ draw_line_hidden(v1, v2, lp)
  * and, finally, the 'mother function' that uses all these lots of tools
  ***********************************************************************/
 void
-plot3d_hidden(plots, pcount)
-    struct surface_points *plots;
-    int pcount;
+plot3d_hidden(struct surface_points *plots, int pcount)
 {
     /* make vertices, edges and polygons out of all the plots */
     build_networks(plots, pcount);
@@ -2390,7 +2374,7 @@ plot3d_hidden(plots, pcount)
 	    efirst = elist[efirst].next;
 	}
     }
-		
+
     /* Free memory */
     /* FIXME: anything to free? */
 }

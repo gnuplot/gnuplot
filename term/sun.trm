@@ -1,5 +1,5 @@
-/*
- * $Id: sun.trm,v 1.8 1999/06/22 11:54:23 lhecking Exp $
+/* Hello, Emacs, this is -*-C-*-
+ * $Id: sun.trm,v 1.9 2004/04/13 17:24:38 broeker Exp $
  *
  */
 
@@ -43,9 +43,9 @@
  *
  * AUTHORS
  *  Maurice Castro
- * 
+ *
  * send your comments or suggestions to (gnuplot-info@lists.sourceforge.net).
- * 
+ *
  */
 /*
  * adapted to the new terminal layout by Stefan Bodewig (Dec. 1995)
@@ -174,8 +174,7 @@ SUN_text()
 }
 
 TERM_PUBLIC void
-SUN_linetype(linetype)
-int linetype;
+SUN_linetype(int linetype)
 {
     if (linetype >= 7)
 	linetype %= 7;
@@ -185,8 +184,7 @@ int linetype;
 
 
 TERM_PUBLIC void
-SUN_move(x, y)
-unsigned int x, y;
+SUN_move(unsigned int x, unsigned int y)
 {
     sun_lastx = x;
     sun_lasty = y;
@@ -195,8 +193,7 @@ unsigned int x, y;
 }
 
 TERM_PUBLIC void
-SUN_vector(x, y)
-unsigned int x, y;
+SUN_vector(unsigned int x, unsigned int y)
 {
     if ((x >= term->xmax) || (y >= term->ymax))
 	return;
@@ -207,9 +204,7 @@ unsigned int x, y;
 }
 
 TERM_PUBLIC void
-SUN_put_text(x, y, str)
-unsigned int x, y;
-const char *str;
+SUN_put_text(unsigned int x, unsigned int y, const char *str)
 {
     struct pr_subregion bound;
 
@@ -237,8 +232,7 @@ const char *str;
 
 
 TERM_PUBLIC int
-SUN_justify_text(mode)
-enum JUSTIFY mode;
+SUN_justify_text(enum JUSTIFY mode)
 {
     sun_justify = mode;
     return (TRUE);
@@ -260,8 +254,7 @@ SUN_reset()
 
 
 void
-sun_setmaskpixel(x, y, value)
-unsigned int x, y, value;
+sun_setmaskpixel(unsigned int x, unsigned int y, unsigned int value)
 {
     /* dotted line generator */
     if ((sun_line_mask >> sun_mask_count) & (unsigned int) (1)) {
@@ -276,8 +269,7 @@ unsigned int x, y, value;
 
 
 void
-sun_line(x1, x2, y1, y2)
-unsigned int x1, x2, y1, y2;
+sun_line(unsigned int x1, unsigned int x2, unsigned int y1, unsigned int y2)
 {
     int runcount;
     int dx, dy;
@@ -334,9 +326,7 @@ unsigned int x1, x2, y1, y2;
 
 
 static Notify_value
-local_notice_destroy(frame, status)
-Frame frame;
-Destroy_status status;
+local_notice_destroy(Frame frame, Destroy_status status)
 {
     if (status != DESTROY_CHECKING) {
 	SUN_reset();

@@ -1,5 +1,5 @@
-/*
- * $Id: fg.trm,v 1.8 2002/07/26 16:42:29 mikulik Exp $
+/* Hello, Emacs, this is -*-C-*-
+ * $Id: fg.trm,v 1.9 2004/04/13 17:24:31 broeker Exp $
  */
 
 /* GNUPLOT - fg.trm */
@@ -199,16 +199,14 @@ static int text_angle;
 static fg_line_t line_to_draw;
 
 TERM_PUBLIC int
-VGA_text_angle(ang)
-int ang;
+VGA_text_angle(int ang)
 {
     text_angle = (ang ? 1 : 0);
     return TRUE;
 }
 
 TERM_PUBLIC int
-VGA_justify_text(mode)
-enum JUSTIFY mode;
+VGA_justify_text(enum JUSTIFY mode)
 {
     return FALSE;
 }
@@ -272,7 +270,7 @@ SSVGA_graphics()
 }
 
 TERM_PUBLIC void
-VGA_linetype(linetype)
+VGA_linetype(int linetype)
 {
     if (linetype >= 13)
 	linetype %= 13;
@@ -280,16 +278,13 @@ VGA_linetype(linetype)
 }
 
 TERM_PUBLIC void
-VGA_put_text(x, y, str)
-unsigned int x, y;
-const char *str;
+VGA_put_text(unsigned int x, unsigned int y, const char *str)
 {
     fg_puts(vga_color, FG_MODE_SET, ~0, text_angle, x, y, str, fg.displaybox);
 }
 
 TERM_PUBLIC void
-VGA_move(x, y)
-int x, y;
+VGA_move(unsigned int x, unsigned int y)
 {
     line_to_draw[FG_X1] = x;
     line_to_draw[FG_Y1] = y;
@@ -297,8 +292,7 @@ int x, y;
 
 
 TERM_PUBLIC void
-VGA_vector(x, y)
-int x, y;
+VGA_vector(unsigned int x, unsigned int y);
 {
     line_to_draw[FG_X2] = x;
     line_to_draw[FG_Y2] = y;

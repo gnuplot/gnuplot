@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.75 2004/04/13 17:23:59 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.76 2004/06/16 06:53:48 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -69,8 +69,7 @@ static void save_textcolor __PROTO((FILE *, const struct t_colorspec *));
  *  functions corresponding to the arguments of the GNUPLOT `save` command
  */
 void
-save_functions(fp)
-FILE *fp;
+save_functions(FILE *fp)
 {
     /* I _love_ information written at the top and the end
      * of a human readable ASCII file. */
@@ -81,8 +80,7 @@ FILE *fp;
 
 
 void
-save_variables(fp)
-FILE *fp;
+save_variables(FILE *fp)
 {
 	show_version(fp);
 	save_variables__sub(fp);
@@ -91,8 +89,7 @@ FILE *fp;
 
 
 void
-save_set(fp)
-FILE *fp;
+save_set(FILE *fp)
 {
 	show_version(fp);
 	save_set_all(fp);
@@ -101,8 +98,7 @@ FILE *fp;
 
 
 void
-save_all(fp)
-FILE *fp;
+save_all(FILE *fp)
 {
 	show_version(fp);
 	save_set_all(fp);
@@ -122,8 +118,7 @@ FILE *fp;
  */
 
 static void
-save_functions__sub(fp)
-FILE *fp;
+save_functions__sub(FILE *fp)
 {
     register struct udft_entry *udf = first_udf;
 
@@ -136,8 +131,7 @@ FILE *fp;
 }
 
 static void
-save_variables__sub(fp)
-FILE *fp;
+save_variables__sub(FILE *fp)
 {
     /* always skip pi */
     register struct udvt_entry *udv = first_udv->next_udv;
@@ -157,8 +151,7 @@ FILE *fp;
  * sequence. It's the only 'save' function that will write the
  * current term setting to a file uncommentedly. */
 void
-save_term(fp)
-FILE *fp;
+save_term(FILE *fp)
 {
 	show_version(fp);
 
@@ -182,8 +175,7 @@ FILE *fp;
 
 
 static void
-save_set_all(fp)
-    FILE *fp;
+save_set_all(FILE *fp)
 {
     struct text_label *this_label;
     struct arrow_def *this_arrow;
@@ -246,7 +238,7 @@ set y2data%s\n",
     SAVE_TIMEFMT(COLOR_AXIS);
 #endif
 #undef SAVE_TIMEFMT
-    
+
     if (boxwidth < 0.0)
 	fputs("set boxwidth\n", fp);
     else
@@ -259,13 +251,13 @@ set y2data%s\n",
 
 #if USE_ULIG_FILLEDBOXES
     switch(default_fillstyle.fillstyle) {
-    case FS_SOLID: 
+    case FS_SOLID:
 	fprintf(fp, "set style fill solid %f ", default_fillstyle.filldensity / 100.0);
 	break;
-    case FS_PATTERN: 
+    case FS_PATTERN:
 	fprintf(fp, "set style fill pattern %d ", default_fillstyle.fillpattern);
 	break;
-    default: 
+    default:
 	fprintf(fp, "set style fill empty ");
 	break;
     }
@@ -308,7 +300,7 @@ set y2data%s\n",
 	    fprintf(fp, "set grid polar %f\n", polar_grid_angle / ang2rad);
         else
 	    fputs("set grid nopolar\n", fp);
-	
+
 #define SAVE_GRID(axis)					\
 	fprintf(fp, " %s%stics %sm%stics",		\
 		axis_array[axis].gridmajor ? "" : "no",	\
@@ -329,7 +321,7 @@ set y2data%s\n",
 #undef SAVE_GRID
 
 	fprintf(fp, "set grid %s\n", (grid_layer==-1) ? "layerdefault" : ((grid_layer==0) ? "back" : "front"));
-    }	
+    }
 
     fprintf(fp, "set key title \"%s\"\n", conv_text(key->title));
     if (!(key->visible))
@@ -614,7 +606,7 @@ set origin %g,%g\n",
     save_zeroaxis(fp, FIRST_Y_AXIS);
     save_zeroaxis(fp, SECOND_X_AXIS);
     save_zeroaxis(fp, SECOND_Y_AXIS);
-    
+
     fprintf(fp, "\
 set tics %s\n\
 set ticslevel %g\n\
@@ -623,20 +615,21 @@ set ticscale %g %g\n",
 	    ticslevel,
 	    ticscale, miniticscale);
 
-#define SAVE_MINI(axis)							  \
-    switch(axis_array[axis].minitics & TICS_MASK) {				  \
-    case 0:								  \
-	fprintf(fp, "set nom%stics\n", axis_defaults[axis].name);		  \
-	break;								  \
-    case MINI_AUTO:							  \
-	fprintf(fp, "set m%stics\n", axis_defaults[axis].name);		  \
-	break;								  \
-    case MINI_DEFAULT:							  \
-	fprintf(fp, "set m%stics default\n", axis_defaults[axis].name);	  \
-	break;								  \
-    case MINI_USER: fprintf(fp, "set m%stics %f\n", axis_defaults[axis].name, \
-			    axis_array[axis].mtic_freq);			  \
-	break;								  \
+#define SAVE_MINI(axis)							\
+    switch(axis_array[axis].minitics & TICS_MASK) {			\
+    case 0:								\
+	fprintf(fp, "set nom%stics\n", axis_defaults[axis].name);	\
+	break;								\
+    case MINI_AUTO:							\
+	fprintf(fp, "set m%stics\n", axis_defaults[axis].name);		\
+	break;								\
+    case MINI_DEFAULT:							\
+	fprintf(fp, "set m%stics default\n", axis_defaults[axis].name);	\
+	break;								\
+    case MINI_USER:							\
+	fprintf(fp, "set m%stics %f\n", axis_defaults[axis].name,	\
+		axis_array[axis].mtic_freq);				\
+	break;								\
     }
 
     SAVE_MINI(FIRST_X_AXIS);
@@ -658,15 +651,15 @@ set ticscale %g %g\n",
     save_tics(fp, COLOR_AXIS);
 #endif
 
-#define SAVE_AXISLABEL_OR_TITLE(name,suffix,lab)	\
-    {							\
-	fprintf(fp, "set %s%s \"%s\" %f,%f ",		\
-		name, suffix, conv_text(lab.text),	\
-		lab.xoffset, lab.yoffset);		\
-	fprintf(fp, " font \"%s\"", conv_text(lab.font)); \
-	save_textcolor(fp, &(lab.textcolor)); \
-	fprintf(fp, "\n"); \
-}
+#define SAVE_AXISLABEL_OR_TITLE(name,suffix,lab)		\
+    {								\
+	fprintf(fp, "set %s%s \"%s\" %f,%f ",			\
+		name, suffix, conv_text(lab.text),		\
+		lab.xoffset, lab.yoffset);			\
+	fprintf(fp, " font \"%s\"", conv_text(lab.font));	\
+	save_textcolor(fp, &(lab.textcolor));			\
+	fprintf(fp, "\n");					\
+    }
 
     SAVE_AXISLABEL_OR_TITLE("", "title", title);
 
@@ -686,7 +679,7 @@ set ticscale %g %g\n",
 #define SAVE_AXISLABEL(axis)					\
     SAVE_AXISLABEL_OR_TITLE(axis_defaults[axis].name,"label",	\
 			    axis_array[axis].label)
-	
+
     SAVE_AXISLABEL(FIRST_X_AXIS);
     SAVE_AXISLABEL(SECOND_X_AXIS);
     save_range(fp, FIRST_X_AXIS);
@@ -773,7 +766,7 @@ set ticscale %g %g\n",
       fputs( "\nset palette ", fp );
       switch( sm_palette.colorMode ) {
       case SMPAL_COLOR_MODE_RGB:
-	fprintf( fp, "rgbformulae %d, %d, %d\n", sm_palette.formulaR, 
+	fprintf( fp, "rgbformulae %d, %d, %d\n", sm_palette.formulaR,
 		 sm_palette.formulaG, sm_palette.formulaB );
 	break;
       case SMPAL_COLOR_MODE_GRADIENT: {
@@ -850,9 +843,7 @@ set ticscale %g %g\n",
 }
 
 static void
-save_tics(fp, axis)
-    FILE *fp;
-    AXIS_INDEX axis;
+save_tics(FILE *fp, AXIS_INDEX axis)
 {
     if (axis_array[axis].ticmode == NO_TICS) {
 	fprintf(fp, "set no%stics\n", axis_defaults[axis].name);
@@ -910,7 +901,7 @@ save_tics(fp, axis)
 	    break;
 	}
     }
- 
+
     if (axis_array[axis].ticdef.font && *axis_array[axis].ticdef.font) {
         fprintf(fp, " font \"%s\"", axis_array[axis].ticdef.font);
     }
@@ -920,9 +911,7 @@ save_tics(fp, axis)
 }
 
 static void
-save_position(fp, pos)
-    FILE *fp;
-    struct position *pos;
+save_position(FILE *fp, struct position *pos)
 {
     static const char *msg[] = { "first ", "second ", "graph ", "screen " };
 
@@ -936,9 +925,7 @@ save_position(fp, pos)
 
 
 void
-save_range(fp, axis)
-    FILE *fp;
-    AXIS_INDEX axis;
+save_range(FILE *fp, AXIS_INDEX axis)
 {
     fprintf(fp, "set %srange [ ", axis_defaults[axis].name);
     if (axis_array[axis].set_autoscale & AUTOSCALE_MIN) {
@@ -969,7 +956,7 @@ save_range(fp, axis)
 	}
 	fputs("] )\n", fp);
 
-	if (axis_array[axis].set_autoscale & (AUTOSCALE_FIXMIN)) 
+	if (axis_array[axis].set_autoscale & (AUTOSCALE_FIXMIN))
 	    fprintf(fp, "set autoscale %sfixmin\n", axis_defaults[axis].name);
 	if (axis_array[axis].set_autoscale & AUTOSCALE_FIXMAX)
 	    fprintf(fp, "set autoscale %sfixmax\n", axis_defaults[axis].name);
@@ -978,9 +965,7 @@ save_range(fp, axis)
 }
 
 static void
-save_zeroaxis(fp, axis)
-    FILE *fp;
-    AXIS_INDEX axis;
+save_zeroaxis(FILE *fp, AXIS_INDEX axis)
 {
     fprintf(fp, "set %szeroaxis lt %d lw %.3f\n", axis_defaults[axis].name,
 	    axis_array[axis].zeroaxis.l_type + 1,
@@ -989,12 +974,12 @@ save_zeroaxis(fp, axis)
 }
 
 static void
-save_textcolor( FILE *fp, const struct t_colorspec *tc )
+save_textcolor(FILE *fp, const struct t_colorspec *tc)
 {
     if (tc->type) {
     	fprintf(fp, " textcolor");
 	switch(tc->type) {
-	case TC_LT:   fprintf(fp," lt %d", tc->lt+1); 
+	case TC_LT:   fprintf(fp," lt %d", tc->lt+1);
 		      break;
 	case TC_Z:    fprintf(fp," palette z");
 		      break;
@@ -1007,7 +992,7 @@ save_textcolor( FILE *fp, const struct t_colorspec *tc )
 }
 
 void
-save_data_func_style( FILE *fp, char *which, enum PLOT_STYLE style)
+save_data_func_style(FILE *fp, char *which, enum PLOT_STYLE style)
 {
     switch (style) {
     case LINES:

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.130 2004/05/04 02:43:21 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.131 2004/05/04 16:58:01 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -47,7 +47,7 @@ static char *RCSid() { return RCSid("$Id: set.c,v 1.130 2004/05/04 02:43:21 sfea
 #include "command.h"
 #include "contour.h"
 #include "datafile.h"
-#include "fit.h"	       
+#include "fit.h"
 #include "gadgets.h"
 #include "gp_time.h"
 #include "hidden3d.h"
@@ -107,7 +107,7 @@ static void set_mapping __PROTO((void));
 static void set_margin __PROTO((int *));
 static void set_missing __PROTO((void));
 static void set_separator __PROTO((void));
-static void set_datafile_commentschars __PROTO((void)); 
+static void set_datafile_commentschars __PROTO((void));
 #ifdef USE_MOUSE
 static void set_mouse __PROTO((void));
 #endif
@@ -148,7 +148,7 @@ static void set_xyzlabel __PROTO((label_struct * label));
 static void load_tics __PROTO((AXIS_INDEX axis));
 static void load_tic_user __PROTO((AXIS_INDEX axis));
 static void add_tic_user __PROTO((AXIS_INDEX, char * label, double position,
-				  int level)); 
+				  int level));
 static void load_tic_series __PROTO((AXIS_INDEX axis));
 static void load_offsets __PROTO((double *a, double *b, double *c, double *d));
 static void parse_colorspec __PROTO((struct t_colorspec *tc, int option));
@@ -177,7 +177,7 @@ static void set_nolinestyle __PROTO((void));
 void
 set_command()
 {
-    static char GPFAR setmess[] = 
+    static char GPFAR setmess[] =
     "valid set options:  [] = choose one, {} means optional\n\n\
 \t'angles', 'arrow', 'autoscale', 'bars', 'border', 'boxwidth',\n\
 \t'clabel', 'clip', 'cntrparam', 'colorbox', 'contour', 'decimalsign',\n\
@@ -213,7 +213,7 @@ set_command()
 	    int_error(c_token,"expecting keyword 'style'");
 	else {
 	    enum PLOT_STYLE temp_style = get_style();
-	
+
 	    if (temp_style & PLOT_STYLE_HAS_ERRORBAR)
 		int_error(c_token, "style not usable for function plots, left unchanged");
 	    else
@@ -441,7 +441,7 @@ set_command()
 	case S_NOXTICS:
 	case S_XDTICS:
 	case S_NOXDTICS:
-	case S_XMTICS: 
+	case S_XMTICS:
 	case S_NOXMTICS:
 	    set_tic_prop(FIRST_X_AXIS);
 	    break;
@@ -451,7 +451,7 @@ set_command()
 	case S_NOYTICS:
 	case S_YDTICS:
 	case S_NOYDTICS:
-	case S_YMTICS: 
+	case S_YMTICS:
 	case S_NOYMTICS:
 	    set_tic_prop(FIRST_Y_AXIS);
 	    break;
@@ -461,7 +461,7 @@ set_command()
 	case S_NOX2TICS:
 	case S_X2DTICS:
 	case S_NOX2DTICS:
-	case S_X2MTICS: 
+	case S_X2MTICS:
 	case S_NOX2MTICS:
 	    set_tic_prop(SECOND_X_AXIS);
 	    break;
@@ -471,7 +471,7 @@ set_command()
 	case S_NOY2TICS:
 	case S_Y2DTICS:
 	case S_NOY2DTICS:
-	case S_Y2MTICS: 
+	case S_Y2MTICS:
 	case S_NOY2MTICS:
 	    set_tic_prop(SECOND_Y_AXIS);
 	    break;
@@ -481,7 +481,7 @@ set_command()
 	case S_NOZTICS:
 	case S_ZDTICS:
 	case S_NOZDTICS:
-	case S_ZMTICS: 
+	case S_ZMTICS:
 	case S_NOZMTICS:
 	    set_tic_prop(FIRST_Z_AXIS);
 	    break;
@@ -492,7 +492,7 @@ set_command()
 	case S_NOCBTICS:
 	case S_CBDTICS:
 	case S_NOCBDTICS:
-	case S_CBMTICS: 
+	case S_CBMTICS:
 	case S_NOCBMTICS:
 	    set_tic_prop(COLOR_AXIS);
 	    break;
@@ -709,7 +709,7 @@ set_arrow()
 	    set_tag = TRUE;
 	    continue;
 	}
-    
+
 	if (!END_OF_COMMAND)
 	    int_error(c_token, "wrong argument in set arrow");
 
@@ -717,11 +717,11 @@ set_arrow()
 
     if (duplication)
 	int_error(c_token, "duplicated or contradicting arguments in set arrow");
-    
+
     /* no tag given, the default is the next tag */
     if (!set_tag)
 	tag = assign_arrow_tag();
-    
+
     /* OK! add arrow */
     if (first_arrow != NULL) {	/* skip to last arrow */
 	for (this_arrow = first_arrow; this_arrow != NULL;
@@ -739,7 +739,7 @@ set_arrow()
 	    this_arrow->end = epos;
 	    this_arrow->relative = relative;
 	}
-	if (set_arrowstyle) 
+	if (set_arrowstyle)
 	    this_arrow->arrow_properties = loc_arrow;
     } else {	/* adding the arrow */
 	new_arrow = (struct arrow_def *)
@@ -804,7 +804,7 @@ set_autoscale()
 	return;
     } else if (almost_equals(c_token, "ke$epfix")) {
 	int a = 0;
-	while (a < AXIS_ARRAY_SIZE) 
+	while (a < AXIS_ARRAY_SIZE)
 	    axis_array[a++].set_autoscale |= AUTOSCALE_BOTH;
 	c_token++;
 	return;
@@ -1004,9 +1004,9 @@ set_cntrparam()
 	contour_kind = CONTOUR_KIND_BSPLINE;
     } else if (almost_equals(c_token, "le$vels")) {
 	c_token++;
-	
+
 	init_dynarray(&dyn_contour_levels_list, sizeof(double), 5, 10);
-	
+
 	/*  RKC: I have modified the next two:
 	 *   to use commas to separate list elements as in xtics
 	 *   so that incremental lists start,incr[,end]as in "
@@ -1371,7 +1371,7 @@ set_grid()
 	if (END_OF_COMMAND) {
 	    memcpy(&mgrid_lp,&grid_lp,sizeof(struct lp_style_type));
 	} else {
-	    if (equals(c_token,",")) 
+	    if (equals(c_token,","))
 		c_token++;
 	    old_token = c_token;
 	    lp_parse(&mgrid_lp,1,0,-1,1);
@@ -1691,7 +1691,7 @@ set_label()
 	 * treat it as a numeric expression whose value is to be
 	 * sprintf()ed into the label string (which contains an
 	 * appropriate %f format string) */
-	if (!END_OF_COMMAND && equals(c_token, ",")) 
+	if (!END_OF_COMMAND && equals(c_token, ","))
 	    text = fill_numbers_into_string(text);
 	this_label->text = text;
     }
@@ -1833,7 +1833,7 @@ set_logscale()
 	/* do reverse search because of "x", "x1", "x2" sequence in axisname_tbl */
 	int i = 0;
 	while (i < token[c_token].length) {
-	    axis = lookup_table_nth_reverse( axisname_tbl, AXIS_ARRAY_SIZE, 
+	    axis = lookup_table_nth_reverse( axisname_tbl, AXIS_ARRAY_SIZE,
 		       input_line+token[c_token].start_index+i );
 	    if (axis < 0) {
 		token[c_token].start_index += i;
@@ -2127,7 +2127,7 @@ set_origin()
 	    int_error(c_token, "',' expected");
 	c_token++;
 	yoffset = real(const_express(&a));
-    } 
+    }
 }
 
 
@@ -2243,15 +2243,15 @@ reset_palette()
 /* Process 'set palette defined' gradient specification */
 /* Syntax
  *   set palette defined   -->  use default palette
- *   set palette defined ( <pos1> <colorspec1>, ... , <posN> <colorspecN> ) 
+ *   set palette defined ( <pos1> <colorspec1>, ... , <posN> <colorspecN> )
  *     <posX>  gray value, automatically rescaled to [0, 1]
  *     <colorspecX>   :=  { "<color_name>" | "<X-style-color>" |  <r> <g> <b> }
  *        <color_name>     predefined colors (see below)
  *        <X-style-color>  "#rrggbb" with 2char hex values for red, green, blue
  *        <r> <g> <b>      three values in [0, 1] for red, green and blue
- *   return 1 if named colors where used, 0 otherwise 
- */ 
-static int 
+ *   return 1 if named colors where used, 0 otherwise
+ */
+static int
 set_palette_defined()
 {
     struct value a;
@@ -2262,13 +2262,13 @@ set_palette_defined()
     if (sm_palette.gradient) {
 	free( sm_palette.gradient );
     }
-    sm_palette.gradient = (gradient_struct*) 
+    sm_palette.gradient = (gradient_struct*)
       gp_alloc( actual_size*sizeof(gradient_struct), "pm3d gradient" );
-    
+
     if (END_OF_COMMAND) {
 	/* lets use some default gradient */
-	double pal[][4] = { {0.0, 0.05, 0.05, 0.2}, {0.1, 0, 0, 1},       
-			    {0.25, 0.7, 0.85, 0.9}, {0.4, 0, 0.75, 0}, 
+	double pal[][4] = { {0.0, 0.05, 0.05, 0.2}, {0.1, 0, 0, 1},
+			    {0.25, 0.7, 0.85, 0.9}, {0.4, 0, 0.75, 0},
 			    {0.5, 1, 1, 0}, {0.7, 1, 0, 0},
 			    {0.9, 0.6, 0.6, 0.6}, {1.0, 0.95, 0.95, 0.95} };
 	int i;
@@ -2283,12 +2283,12 @@ set_palette_defined()
 	return 0;
     }
 
-    if ( !equals(c_token,"(") ) 
-	int_error( c_token, "Expected ( to start gradient definition." ); 
+    if ( !equals(c_token,"(") )
+	int_error( c_token, "Expected ( to start gradient definition." );
 
     ++c_token;
     num = -1;
-    
+
     while (!END_OF_COMMAND) {
 	p = real(const_express(&a));
 	if (isstring(c_token)) {
@@ -2299,16 +2299,16 @@ set_palette_defined()
 		/* X-style specifier */
 		int rr,gg,bb;
 		if (sscanf( col_buf, "#%2x%2x%2x", &rr, &gg, &bb ) != 3 )
-		    int_error( c_token-1, 
+		    int_error( c_token-1,
 			       "Unknown color specifier. Use '#rrggbb'." );
 		r = (double)(rr)/255.;
 		g = (double)(gg)/255.;
 		b = (double)(bb)/255.;
 	    }
 	    else { /* some predefined names */
-		/* Maybe we could scan the X11 rgb.txt file to look up color 
-		 * names?  Or at least move these definitions to some file 
-		 * which is included somehow during compilation instead 
+		/* Maybe we could scan the X11 rgb.txt file to look up color
+		 * names?  Or at least move these definitions to some file
+		 * which is included somehow during compilation instead
 		 * hardcoding them. */
 		/* Can't use lookupt_table() as it works for tokens only,
 		   so we'll do it manually */
@@ -2322,7 +2322,7 @@ set_palette_defined()
 		    }
 		    tbl++;
 		}
-		if (!tbl->key) 
+		if (!tbl->key)
 		    int_error( c_token-1, "Unknown color name." );
 		named_colors = 1;
 	    }
@@ -2337,13 +2337,13 @@ set_palette_defined()
 	    if (b<0 || b>1 )  int_error(c_token-1,"Value out of range [0,1].");
 	}
 	++num;
-	
+
 	if ( num >= actual_size ) {
  	    /* get more space for the gradient */
 	    actual_size += 10;
-	    sm_palette.gradient = (gradient_struct*) 
-	      gp_realloc( sm_palette.gradient, 
-			  actual_size*sizeof(gradient_struct), 
+	    sm_palette.gradient = (gradient_struct*)
+	      gp_realloc( sm_palette.gradient,
+			  actual_size*sizeof(gradient_struct),
 			  "pm3d gradient" );
 	}
 	sm_palette.gradient[num].pos = p;
@@ -2364,7 +2364,7 @@ set_palette_defined()
 }
 
 
-/*  process 'set palette file' command  
+/*  process 'set palette file' command
  *  load a palette from file, honor datafile modifiers
  */
 static void
@@ -2382,8 +2382,8 @@ set_palette_file()
     specs = df_open( 4 );
     if (df_binary)
 	int_error( c_token, "Binary palette files not implemented");
-  
-    if (specs > 0 && specs < 3) 
+
+    if (specs > 0 && specs < 3)
 	int_error( c_token, "Less than 3 using specs for palette");
 
     if (sm_palette.gradient) {
@@ -2391,18 +2391,18 @@ set_palette_file()
 	sm_palette.gradient = 0;
     }
     actual_size = 10;
-    sm_palette.gradient = (gradient_struct*) 
+    sm_palette.gradient = (gradient_struct*)
       gp_alloc( actual_size*sizeof(gradient_struct), "gradient" );
 
     i = 0;
-    
+
 #define VCONSTRAIN(x) ( (x)<0 ? 0 : ( (x)>1 ? 1: (x) ) )
     /* values are simply clipped to [0,1] without notice */
     while ((j = df_readline(v, 4)) != DF_EOF) {
 	if (i >= actual_size) {
 	  actual_size += 10;
-	  sm_palette.gradient = (gradient_struct*) 
-	    gp_realloc( sm_palette.gradient, 
+	  sm_palette.gradient = (gradient_struct*)
+	    gp_realloc( sm_palette.gradient,
 			actual_size*sizeof(gradient_struct),
 			"pm3d gradient" );
 	}
@@ -2446,30 +2446,30 @@ set_palette_file()
  *    This syntax is different from the usual '[u=<start>:<end>]', but
  *    as <start> and <end> are fixed to 0 and 1 you would have to type
  *    always '[u=]' which looks strange, especially as just '[u]'
- *    wouldn't work. 
- *  If unset:  dummy variable is fixed to 'gray'. 
+ *    wouldn't work.
+ *  If unset:  dummy variable is fixed to 'gray'.
  */
-static void 
+static void
 set_palette_function()
 {
     int start_token;
     char saved_dummy_var[MAX_ID_LEN+1];
-    
+
     ++c_token;
     strncpy( saved_dummy_var, c_dummy_var[0], MAX_ID_LEN );
-    
+
     /* set dummy variable */
 #ifdef ALLOW_DUMMY_VAR_FOR_GRAY
-    if (isstring(c_token)) { 
+    if (isstring(c_token)) {
 	quote_str( c_dummy_var[0], c_token, MAX_ID_LEN );
 	++c_token;
     }
-    else 
+    else
 #endif /* ALLOW_DUMMY_VAR_FOR_GRAY */
     strncpy( c_dummy_var[0], "gray", MAX_ID_LEN );
 
 
-    /* Afunc */ 
+    /* Afunc */
     start_token = c_token;
     if (sm_palette.Afunc.at) {
 	free( sm_palette.Afunc.at );
@@ -2500,7 +2500,7 @@ set_palette_function()
     if (!equals(c_token,","))
 	int_error(c_token,"Expected comma" );
     ++c_token;
-    
+
     /* Cfunc */
     start_token = c_token;
     if (sm_palette.Cfunc.at) {
@@ -2513,16 +2513,16 @@ set_palette_function()
 	int_error(start_token, "not enough memory for function");
     m_capture(&(sm_palette.Cfunc.definition), start_token, c_token-1);
     dummy_func = NULL;
-    
+
     strncpy( c_dummy_var[0], saved_dummy_var, MAX_ID_LEN );
 }
 
 
-/* 
+/*
  *  Normalize gray scale of gradient to fill [0,1] and
  *  complain if gray values are not strictly increasing.
  *  Maybe automatic sorting of the gray values could be a
- *  feature. 
+ *  feature.
  */
 static void
 check_palette_grayscale()
@@ -2631,7 +2631,7 @@ set_palette()
 		set_palette_file();
 		sm_palette.colorMode = SMPAL_COLOR_MODE_GRADIENT;
 		pm3d_last_set_palette_mode = SMPAL_COLOR_MODE_GRADIENT;
-		--c_token; 
+		--c_token;
 		continue;
 	    }
 	    case S_PALETTE_FUNCTIONS: { /* "func$tions" */
@@ -2679,7 +2679,7 @@ set_palette()
     } /* else(arguments found) */
 
     if (named_color && sm_palette.cmodel != C_MODEL_RGB && interactive)
-	int_warn(NO_CARET, 
+	int_warn(NO_CARET,
 		 "Named colors will produce strange results if not in color mode RGB." );
 }
 
@@ -2748,7 +2748,7 @@ set_colorbox()
 		    c_token++;
 		    color_box.yorigin = real(const_express(&a));
 		    c_token--;
-		} 
+		}
 		continue;
 	    /* colorbox size */
 	    case S_COLORBOX_SIZE: /* "s$ize" */
@@ -2763,7 +2763,7 @@ set_colorbox()
 		    c_token++;
 		    color_box.ysize = real(const_express(&a));
 		    c_token--;
-		} 
+		}
 		continue;
 	    } /* switch over colorbox lookup table */
 	    int_error(c_token,"invalid colorbox option");
@@ -2950,7 +2950,7 @@ set_polar()
 	    /* only if user has not set a range manually */
 	    axis_array[T_AXIS].set_min = 0.0;
 	    /* 360 if degrees, 2pi if radians */
-	    axis_array[T_AXIS].set_max = 2 * M_PI / ang2rad;  
+	    axis_array[T_AXIS].set_max = 2 * M_PI / ang2rad;
 	}
     }
 }
@@ -3044,7 +3044,7 @@ set_style()
 
 	    if (temp_style & PLOT_STYLE_HAS_ERRORBAR)
 		int_error(c_token, "style not usable for function plots, left unchanged");
-	    else 
+	    else
 		func_style = temp_style;
 #ifdef PM3D
 	    if (func_style == FILLEDCURVES) {
@@ -3059,9 +3059,9 @@ set_style()
 	set_linestyle();
 	break;
     case SHOW_STYLE_FILLING:
-	parse_fillstyle( &default_fillstyle, 
+	parse_fillstyle( &default_fillstyle,
 			default_fillstyle.fillstyle,
-			default_fillstyle.filldensity, 
+			default_fillstyle.filldensity,
 			default_fillstyle.fillpattern,
 			default_fillstyle.border_linetype);
 	break;
@@ -3122,7 +3122,7 @@ set_terminal()
 	c_token++;
 	return;
     } /* set term pop */
-    
+
     /* `set term <normal terminal>' */
     term = 0; /* in case set_term() fails */
     term = set_term(c_token);
@@ -3240,7 +3240,7 @@ set_timefmt()
 	}
 	} else if (isstring(c_token)) {
 	    /* set the given parse string for all current timedata axes: */
-	    for (axis = 0; axis < AXIS_ARRAY_SIZE; axis++) 
+	    for (axis = 0; axis < AXIS_ARRAY_SIZE; axis++)
 		quote_str(axis_array[axis].timefmt, c_token, MAX_ID_LEN);
 	c_token++;
 	} else {
@@ -3369,8 +3369,7 @@ set_zero()
 
 /* process 'set {x|y|z|x2|y2}data' command */
 static void
-set_timedata(axis)
-    AXIS_INDEX axis;
+set_timedata(AXIS_INDEX axis)
 {
     c_token++;
     if(END_OF_COMMAND) {
@@ -3383,8 +3382,7 @@ set_timedata(axis)
 
 
 static void
-set_range(axis)
-    AXIS_INDEX axis;
+set_range(AXIS_INDEX axis)
 {
     c_token++;
 
@@ -3428,8 +3426,7 @@ set_range(axis)
 
 /* process 'set xzeroaxis' command */
 static void
-set_zeroaxis(axis)
-    AXIS_INDEX axis;
+set_zeroaxis(AXIS_INDEX axis)
 {
 
     c_token++;
@@ -3460,18 +3457,18 @@ set_allzeroaxis()
  * The set.c PROCESS_TIC_PROP macro has the following characteristics:
  *   (a) options must in the correct order
  *   (b) 'set xtics' (no option) resets only the interval (FREQ)
- *       {it will also negate NO_TICS, see (d)} 
+ *       {it will also negate NO_TICS, see (d)}
  *   (c) changing any property also resets the interval to automatic
- *   (d) set no[xy]tics; set [xy]tics changes border to nomirror, rather 
+ *   (d) set no[xy]tics; set [xy]tics changes border to nomirror, rather
  *       than to the default, mirror.
  *   (e) effect of 'set no[]tics; set []tics border ...' is compiler
- *       dependent;  if '!(TICS)' is evaluated first, 'border' is an 
+ *       dependent;  if '!(TICS)' is evaluated first, 'border' is an
  *       undefined variable :-(
  *
  * This function replaces the macro, and introduces a new option
  * 'au$tofreq' to give somewhat different behaviour:
  *   (a) no change
- *   (b) 'set xtics' (no option) only affects NO_TICS;  'autofreq' resets 
+ *   (b) 'set xtics' (no option) only affects NO_TICS;  'autofreq' resets
  *       the interval calulation to automatic
  *   (c) the interval mode is not affected by changing some other option
  *   (d) if NO_TICS, set []tics will restore defaults (borders, mirror
@@ -3486,14 +3483,13 @@ set_allzeroaxis()
  *  in other code ( e.g. for  'if (xtics)', use 'if (xtics > 0)'
  */
 
-/*    generates PROCESS_TIC_PROP strings from tic_side, e.g. "x2" 
+/*    generates PROCESS_TIC_PROP strings from tic_side, e.g. "x2"
  *  STRING, NOSTRING, MONTH, NOMONTH, DAY, NODAY, MINISTRING, NOMINI
- *  "nox2t$ics"     "nox2m$tics"  "nox2d$tics"    "nomx2t$ics" 
+ *  "nox2t$ics"     "nox2m$tics"  "nox2d$tics"    "nomx2t$ics"
  */
 
 static int
-set_tic_prop(axis)
-    AXIS_INDEX axis;
+set_tic_prop(AXIS_INDEX axis)
 {
     int match = 0;		/* flag, set by matching a tic command */
     char nocmd[12];		/* fill w/ "no"+axis_name+suffix */
@@ -3551,11 +3547,11 @@ set_tic_prop(axis)
 	    }
 	    axis_array[axis].ticdef.type = TIC_COMPUTED;
 	}
-	else if (!END_OF_COMMAND && !almost_equals(c_token, "f$ont") && !equals(c_token,"tc") && 
+	else if (!END_OF_COMMAND && !almost_equals(c_token, "f$ont") && !equals(c_token,"tc") &&
 		 !almost_equals(c_token,"text$color")) {
 	    load_tics(axis);
 	}
- 
+
 	if (almost_equals(c_token, "f$ont")) {
 	    ++c_token;
 	    /* Make sure they've specified a font */
@@ -3658,7 +3654,7 @@ set_xyzlabel(label_struct *label)
 
 	if (almost_equals(c_token, "f$ont"))  {
 	    ++c_token;
-	    if (isstring(c_token)) {  
+	    if (isstring(c_token)) {
 		quote_str(label->font, c_token, MAX_LINE_LEN);
 		c_token++;
 	    } else
@@ -3668,7 +3664,7 @@ set_xyzlabel(label_struct *label)
 
 #ifdef BACKWARDS_COMPATIBLE
 	/* You didn't used to have to say "font" before giving a fontspec */
-	    if (isstring(c_token)) {  
+	    if (isstring(c_token)) {
 		int_warn(c_token,"deprecated syntax - please use 'font' keyword");
 		quote_str(label->font, c_token, MAX_LINE_LEN);
 		c_token++;
@@ -3779,21 +3775,20 @@ assign_linestyle_tag()
 }
 
 /* delete linestyle from linked list started by first_linestyle.
- * called with pointers to the previous linestyle (prev) and the 
+ * called with pointers to the previous linestyle (prev) and the
  * linestyle to delete (this).
  * If there is no previous linestyle (the linestyle to delete is
  * first_linestyle) then call with prev = NULL.
  */
 void
-delete_linestyle(prev, this)
-    struct linestyle_def *prev, *this;
+delete_linestyle(struct linestyle_def *prev, struct linestyle_def *this)
 {
     if (this != NULL) {		/* there really is something to delete */
 	if (prev != NULL)	/* there is a previous linestyle */
 	    prev->next = this->next;
 	else			/* this = first_linestyle so change first_linestyle */
 	    first_linestyle = this->next;
-	free((char *) this);
+	free(this);
     }
 }
 
@@ -3878,8 +3873,7 @@ assign_arrowstyle_tag()
 
 /* For set [xy]tics... command */
 static void
-load_tics(axis)
-    AXIS_INDEX axis;
+load_tics(AXIS_INDEX axis)
 {
     if (equals(c_token, "(")) {	/* set : TIC_USER */
 	c_token++;
@@ -3895,15 +3889,14 @@ load_tics(axis)
  * Left paren is already scanned off before entry.
  */
 static void
-load_tic_user(axis)
-    AXIS_INDEX axis;
+load_tic_user(AXIS_INDEX axis)
 {
     char temp_string[MAX_LINE_LEN];
     char *ticlabel;
     double ticposition;
 
     /* Free any old tic labels */
-    if (axis_array[axis].ticdef.type == TIC_USER) 
+    if (axis_array[axis].ticdef.type == TIC_USER)
 	free_marklist(axis_array[axis].ticdef.def.user);
 
     axis_array[axis].ticdef.type = TIC_USER;
@@ -3928,8 +3921,8 @@ load_tic_user(axis)
 	/* in any case get the value */
 	GET_NUM_OR_TIME(ticposition, axis);
 
-	if (!END_OF_COMMAND && 
-	    !equals(c_token, ",") && 
+	if (!END_OF_COMMAND &&
+	    !equals(c_token, ",") &&
 	    !equals(c_token, ")")) {
 	  struct value value;
 	  ticlevel = (int) real(const_express(&value)); /* tic level */
@@ -3958,11 +3951,7 @@ load_tic_user(axis)
  */
 /* HBB 20020911: added 'static' */
 static void
-add_tic_user(axis,label,position,level)
-    AXIS_INDEX axis;
-    double position;
-    char *label;
-    int level;
+add_tic_user(AXIS_INDEX axis, char *label, double position, int level)
 {
     struct ticmark *tic;		/* new ticmark */
 
@@ -3982,8 +3971,7 @@ add_tic_user(axis,label,position,level)
 }
 
 void
-free_marklist(list)
-    struct ticmark *list;
+free_marklist(struct ticmark *list)
 {
     while (list != NULL) {
 	register struct ticmark *freeable = list;
@@ -3997,8 +3985,7 @@ free_marklist(list)
 /* load TIC_SERIES definition */
 /* [start,]incr[,end] */
 static void
-load_tic_series(axis)
-    AXIS_INDEX axis;
+load_tic_series(AXIS_INDEX axis)
 {
     double start, incr, end;
     int incr_token;
@@ -4053,8 +4040,7 @@ load_tic_series(axis)
 }
 
 static void
-load_offsets(a, b, c, d)
-double *a, *b, *c, *d;
+load_offsets(double *a, double *b, double *c, double *d)
 {
     struct value t;
 
@@ -4082,8 +4068,7 @@ double *a, *b, *c, *d;
 /* FIXME HBB 20000430: as coded, this will only check the *first*
  * format string, not all of them. */
 static int
-looks_like_numeric(format)
-    char *format;
+looks_like_numeric(char *format)
 {
     if (!(format = strchr(format, '%')))
 	return 0;
@@ -4135,8 +4120,7 @@ static void set_nolinestyle()
 
 /* HBB 20001021: new function: make label texts decoratable with numbers */
 static char *
-fill_numbers_into_string(pattern)
-     char *pattern;
+fill_numbers_into_string(char *pattern)
 {
     size_t pattern_length = strlen(pattern) + 1;
     size_t newlen = pattern_length;
@@ -4146,10 +4130,10 @@ fill_numbers_into_string(pattern)
     do {			/* loop over string/value pairs */
 	struct value a;
 	double value;
-	
+
 	if (isstring(++c_token)) {
-	    free(output); 
-	    free(pattern); 
+	    free(output);
+	    free(pattern);
 	    int_error(c_token, "constant expression expected");
 	}
 
@@ -4175,7 +4159,7 @@ fill_numbers_into_string(pattern)
 
 	if (!END_OF_COMMAND && isstring(c_token)) {
 	    size_t length = token_len(c_token);
-	    
+
 	    if (length >= pattern_length)
 		pattern = gp_realloc(pattern, pattern_length = length,
 				     "fill_numbers resize pattern");
@@ -4187,7 +4171,7 @@ fill_numbers_into_string(pattern)
 	    int_error(c_token, "string expected");
 	} /* if (string after comma) */
     } while (!END_OF_COMMAND && equals(c_token, ","));
-	
+
     /* came out here --> the last element was a string, not a number.
      * that means that there is a string in pattern which was not yet
      * copied to 'output' */
@@ -4209,7 +4193,7 @@ fill_numbers_into_string(pattern)
  * coloring, while TC_Z allows all coloring options up to and including pal z
  */
 static void
-parse_colorspec( struct t_colorspec *tc, int options )
+parse_colorspec(struct t_colorspec *tc, int options)
 {
     struct value a;
 
@@ -4248,7 +4232,7 @@ parse_colorspec( struct t_colorspec *tc, int options )
     	    if (END_OF_COMMAND)
     		int_error(c_token, "expected palette fraction");
     	    tc->value = real(const_express(&a));
-	    if (tc->value < 0. || tc->value > 1.0) 
+	    if (tc->value < 0. || tc->value > 1.0)
     		int_error(c_token, "palette fraction out of range");
 	} else if (equals(c_token,"z")) {
 	    /* The actual z value is not yet known, fill it in later */
@@ -4265,17 +4249,16 @@ parse_colorspec( struct t_colorspec *tc, int options )
     }
 }
 
-/* 
+/*
  * new_text_label() allocates and initializes a text_label structure.
  * This routine will eventually be exported so it can be shared by the
  * plot and splot with labels commands.
  */
-static
-struct text_label *
+static struct text_label *
 new_text_label(int tag)
 {
     struct text_label *new;
-    
+
     new = gp_alloc( sizeof(struct text_label), "text_label");
     new->next = NULL;
     new->tag = tag;
@@ -4301,7 +4284,7 @@ new_text_label(int tag)
 /*
  * Parse the sub-options for label style and placement.
  * This is called from set_label, and will eventually be called from
- * plot2d and plot3d to handle options for 'plot with labels' 
+ * plot2d and plot3d to handle options for 'plot with labels'
  */
 static void
 parse_label_options( struct text_label *this_label )
@@ -4401,19 +4384,19 @@ parse_label_options( struct text_label *this_label )
 		continue;
 	    }
 	}
-    
+
 	if (loc_lp.pointflag == -2) {
 	    if (almost_equals(c_token, "po$int")) {
 		int stored_token = ++c_token;
 	    struct lp_style_type tmp_lp;
-	    
+
 	    lp_parse(&tmp_lp, 0, 1, -2, -2);
 	    if (stored_token != c_token) {
 		loc_lp = tmp_lp;
 		loc_lp.pointflag = 1;
 		if (loc_lp.p_type < -1)
 		    loc_lp.p_type = 0;
-		} 
+		}
 		continue;
 	    } else if (almost_equals(c_token, "nopo$int")) {
 		loc_lp.pointflag = 0;
@@ -4482,7 +4465,7 @@ parse_label_options( struct text_label *this_label )
 	}
 
     /* Make sure the z coord and the z-coloring agree */
-    if (this_label->textcolor.type == TC_Z) 
+    if (this_label->textcolor.type == TC_Z)
 	this_label->textcolor.value = this_label->place.z;
 }
 

@@ -1,5 +1,5 @@
-/*
- * $Id: cgi.trm,v 1.10 1999/06/22 11:54:14 lhecking Exp $
+/* Hello, Emacs, this is -*-C-*-
+ * $Id: cgi.trm,v 1.11 2002/01/26 19:12:12 lhecking Exp $
  *
  */
 
@@ -194,16 +194,14 @@ CGI_reset()
 
 
 TERM_PUBLIC void
-CGI_move(x, y)
-unsigned int x, y;
+CGI_move(unsigned int x, unsigned int y)
 {
     vect[0] = x;
     vect[1] = y;
 }
 
 TERM_PUBLIC void
-CGI_vector(x, y)
-unsigned int x, y;
+CGI_vector(unsigned int x, unsigned int y)
 {
     vect[2] = x;
     vect[3] = y;
@@ -214,8 +212,7 @@ unsigned int x, y;
 
 
 TERM_PUBLIC void
-CGI_linetype(linetype)
-int linetype;
+CGI_linetype(int linetype)
 {
     short lcolor;
 
@@ -229,17 +226,14 @@ int linetype;
 
 
 TERM_PUBLIC void
-CGI_put_text(x, y, str)
-unsigned int x, y;
-const char *str;
+CGI_put_text(unsigned int x, unsigned int y, const char *str)
 {
     v_gtext(cgidev, (short) x, (short) y, str);
 }
 
 
 TERM_PUBLIC int
-CGI_text_angle(ang)
-int ang;
+CGI_text_angle(int ang)
 {
     if (!CGIROTATES)
 	return FALSE;
@@ -250,8 +244,7 @@ int ang;
 
 
 TERM_PUBLIC int
-CGI_justify_text(mode)
-enum JUSTIFY mode;
+CGI_justify_text(enum JUSTIFY mode)
 {
     short hor_in, hor_out, vert_out;
 
@@ -277,9 +270,7 @@ enum JUSTIFY mode;
 #define POINT_TYPES 6
 
 TERM_PUBLIC void
-CGI_point(x, y, num)
-unsigned int x, y;
-int num;
+CGI_point(unsigned int x, unsigned y, int num)
 {
     short point[2];
     static short cgimarker[POINT_TYPES] = { 1, 2, 6, 4, 5, 3 };

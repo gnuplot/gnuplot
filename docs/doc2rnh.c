@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: doc2rnh.c,v 1.13 2004/02/23 13:35:00 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: doc2rnh.c,v 1.14 2004/04/13 17:23:30 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - doc2rnh.c */
@@ -35,12 +35,12 @@ static char *RCSid() { return RCSid("$Id: doc2rnh.c,v 1.13 2004/02/23 13:35:00 b
 ]*/
 
 /*
- * doc2rnh.c  -- program to convert Gnuplot .DOC format to 
+ * doc2rnh.c  -- program to convert Gnuplot .DOC format to
  *               Digital Standard Runoff for VMS HELP files
  *               (gnuplot.doc, including the terminal documentation
  *                is no longer formated for VMS HELP by default)
- * 
- * From hlp2ms by Thomas Williams 
+ *
+ * From hlp2ms by Thomas Williams
  *
  * Modified by Russell Lang, 2nd October 1989
  * to make vms help level 1 and 2 create the same ms section level.
@@ -51,14 +51,14 @@ static char *RCSid() { return RCSid("$Id: doc2rnh.c,v 1.13 2004/02/23 13:35:00 b
  * Adapted from doc2ms.c (the unix 'runoff' text-processor)
  * by Lucas Hart 3/97
  *
- * right margin is adjusted two spaces for each level to compensate 
+ * right margin is adjusted two spaces for each level to compensate
  * for the indentation by VMS HELP
  *
- * the page width can be adjusted by changing the value of DSR_RM 
+ * the page width can be adjusted by changing the value of DSR_RM
  * usage: $ MCR []doc2rnh gnuplot.doc gnuplot.rnh
  *        $ RUNOFF gnuplot.rnh
  *
- * 
+ *
  */
 
 #ifdef HAVE_CONFIG_H
@@ -187,18 +187,18 @@ process_line(char *line, FILE *b)
  * other than period (command indicator) in first column
  *
  * However, for ease of maintainence, two tables have sublevels
- * and descriptions, corresponding to the printed table entries, 
+ * and descriptions, corresponding to the printed table entries,
  * encapsulated by the table markers.  Therefore we need to
  * do some more work.
  *
  * Doc2hlp just ignores the table headings and treats
  * lower levels irrespectively, but we need to break
- * the level designators out of the table format.   
+ * the level designators out of the table format.
  *
- *  The first entry in a table will have either 
+ *  The first entry in a table will have either
  *     - a level number in the first column => remainder of text in
- *                                             table is help text 
- *     - spaces in the first two columns => rest of text is literal 
+ *                                             table is help text
+ *     - spaces in the first two columns => rest of text is literal
  *                                          to be placed in table format
  *
  */
@@ -276,7 +276,7 @@ section(char *line, FILE *b)
 {
     int sh_i;
     static int old = 1;
-/*  
+/*
    (void) sscanf(line,"%d",&sh_i);
    *
    * check to make sure this works with terminals also
@@ -296,7 +296,7 @@ section(char *line, FILE *b)
     }
     /* added by dfk to capitalize section headers */
     /* Header name starts at [2] */
-/* omit for online documentation 
+/* omit for online documentation
  *    if (islower(line[2]))
  *       line[2] = toupper(line[2]);
  */
@@ -309,7 +309,7 @@ section(char *line, FILE *b)
 
 /*
  * dummy function in case we need to convert some characters in
- * output string ala doc2tex and doc2ms 
+ * output string ala doc2tex and doc2ms
  */
 
 void
@@ -318,11 +318,11 @@ putrnh(char *s, FILE *file)
     (void) fputs(s, file);
 }
 
-/* 
+/*
  * LBR$OUTPUT_HELP treats spaces and "/"s as list separators for topics,
  * but they are used in gnuplot.doc for the printed docs; convert to
- * "_" and "|"   Modeled after section heading conversions in doc2tex 
- * and doc2ms. 
+ * "_" and "|"   Modeled after section heading conversions in doc2tex
+ * and doc2ms.
  *
  */
 

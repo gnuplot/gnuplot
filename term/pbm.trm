@@ -1,5 +1,5 @@
-/*
- * $Id: pbm.trm,v 1.18 2001/08/27 15:04:12 broeker Exp $
+/* Hello, Emacs, this is -*-C-*-
+ * $Id: pbm.trm,v 1.19 2004/04/13 17:24:36 broeker Exp $
  *
  */
 
@@ -45,7 +45,7 @@
  *  Russell Lang
  *
  * send your comments or suggestions to (gnuplot-info@lists.sourceforge.net).
- * 
+ *
  */
 
 /* The following pbmplus drivers use the generic bit mapped graphics
@@ -53,11 +53,11 @@
    interchanges colomns and lines in order to access entire lines
    easily and returns the lines to get bits in the right order :
    (x,y) -> (y,XMAX-1-x). */
-/* This interchange is done by calling b_makebitmap() with reversed 
+/* This interchange is done by calling b_makebitmap() with reversed
    xmax and ymax, and then setting b_rastermode to TRUE.  b_setpixel()
    will then perform the interchange before each pixel is plotted */
 /* See Jef Poskanzer's excellent PBMplus package for more details of
-   the Portable BitMap format and for programs to convert PBM files  
+   the Portable BitMap format and for programs to convert PBM files
    to other bitmap formats. */
 
 #include "driver.h"
@@ -152,7 +152,7 @@ PBM_options()
 	    break;
 	case PBM_OTHER:
 	default:
-	    /* reset to default, since term is already set */ 
+	    /* reset to default, since term is already set */
 	    pbm_font = 1;
 	    pbm_mode = 0;
 	    int_error(c_token, "expecting: {small, medium, large} and {monochrome, gray, color}");
@@ -251,7 +251,7 @@ PBM_graphics()
      * fields of the termtable entry, and therefore must be called by init()
      * already. */
     /* PBMsetfont(); */
-    /* rotate plot -90 degrees by reversing XMAX and YMAX and by 
+    /* rotate plot -90 degrees by reversing XMAX and YMAX and by
        setting b_rastermode to TRUE */
     b_makebitmap((unsigned int) (PBM_YMAX * ysize),
 		 (unsigned int) (PBM_XMAX * xsize), numplanes);
@@ -385,8 +385,7 @@ PBM_text()
 
 
 TERM_PUBLIC void
-PBM_linetype(linetype)
-int linetype;
+PBM_linetype(int linetype)
 {
     switch (pbm_mode) {
     case 0:
@@ -406,9 +405,7 @@ int linetype;
 }
 
 TERM_PUBLIC void
-PBM_point(x, y, point)
-unsigned int x, y;
-int point;
+PBM_point(unsigned int x, unsigned int y, int point)
 {
     if (pbm_mode == 0)
 	line_and_point(x, y, point);

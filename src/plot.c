@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot.c,v 1.69 2004/04/13 17:23:58 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot.c,v 1.70 2004/04/14 15:26:21 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - plot.c */
@@ -117,7 +117,7 @@ extern int rl_complete_with_tilde_expansion;
 #   define HISTORY_SIZE 666
 #  endif
 long int gnuplot_history_size = HISTORY_SIZE;
-/* 
+/*
  * The next variable is a pointer to the value returned from 'tilde_expand()'.
  * This function expands '~' to the user's home directory, or $HOME, with
  * UN*X, AmigaOS, MSDOS.
@@ -157,7 +157,7 @@ char HelpFile[MAXPATH];
 /* a longjmp buffer to get back to the command line */
 /* FIXME HBB 20001103: should probably just use GPFAR, rather than
  * check for _Windows */
-#ifdef _Windows 
+#ifdef _Windows
 static JMP_BUF far command_line_env;
 #else
 static JMP_BUF command_line_env;
@@ -186,8 +186,7 @@ extern int aesid;
 #endif
 
 static RETSIGTYPE
-inter(anint)
-    int anint;
+inter(int anint)
 {
     (void) anint;		/* aovid -Wunused warning */
     (void) signal(SIGINT, (sigfunc) inter);
@@ -199,7 +198,7 @@ inter(anint)
 #ifdef OS2
     if (!strcmp(term->name,"pm")) {
         PM_intc_cleanup();
-        /* ?? 
+        /* ??
           putc('\n', stderr);
           LONGJMP(command_line_env, TRUE);
          */
@@ -273,15 +272,14 @@ bail_to_command_line()
 
 #if defined(_Windows) || defined(_Macintosh)
 int
-gnu_main(argc, argv)
+gnu_main(int argc, char **argv)
 #else
 int
-main(argc, argv)
+main(int argc, char **argv)
 #endif
-    int argc;
-    char **argv;
 {
     int i;
+
 #ifdef LINUXVGA
     LINUX_setup();		/* setup VGA before dropping privilege DBT 4/5/99 */
     drop_privilege();
@@ -291,9 +289,11 @@ main(argc, argv)
 #ifdef __linux__
     setuid(getuid());
 #endif
+
 #if defined(MSDOS) && !defined(_Windows) && !defined(__GNUC__)
     PC_setup();
 #endif /* MSDOS !Windows */
+
 /* HBB: Seems this isn't needed any more for DJGPP V2? */
 /* HBB: disable all floating point exceptions, just keep running... */
 #if defined(DJGPP) && (DJGPP!=2)
@@ -543,7 +543,7 @@ main(argc, argv)
 		    gnuplot_history_size = strtol (temp_env, (char **) NULL, 10);
 	    } /* END: Go local to get environment variable */
 
-	    /* 
+	    /*
 	     * It is safe to ignore the return values of 'atexit()' and
 	     * 'on_exit()'. In the worst case, there is no history of your
 	     * currrent session and you have to type all again in your next
@@ -651,7 +651,7 @@ main(argc, argv)
 #endif
     /* HBB 20040223: Not all compilers like exit() to end main() */
     /* exit(exit_status); */
-    return exit_status;    
+    return exit_status;
 }
 
 
@@ -718,7 +718,7 @@ get_user_env()
     if (user_homedir == NULL) {
 	const char *env_home;
 
-	if ((env_home = getenv(HOME)) 
+	if ((env_home = getenv(HOME))
 #ifdef WIN32
 	    || (env_home = getenv("USERPROFILE"))
 #endif
@@ -758,8 +758,7 @@ get_user_env()
  * we may change that later
  */
 void
-gp_expand_tilde(pathp)
-    char **pathp;
+gp_expand_tilde(char **pathp)
 {
     if (!*pathp)
 	int_error(NO_CARET, "Cannot expand empty path");
@@ -869,7 +868,7 @@ ExecuteMacro(char *argv, int namelength)
         /* Interpreter couldn't be started */
         if (rc == -4)
            /* run was cancelled, but don't give error message */
-            rc = 0;  
+            rc = 0;
     } else if (rc==0) {
         /* all was fine */
     }

@@ -1,5 +1,5 @@
-/*
- * $Id: regis.trm,v 1.10 2002/07/26 16:42:29 mikulik Exp $
+/* Hello, Emacs, this is -*-C-*-
+ * $Id: regis.trm,v 1.11 2004/04/13 17:24:38 broeker Exp $
  *
  */
 
@@ -43,9 +43,9 @@
  *
  * AUTHORS
  *  Colin Kelley, Thomas Williams
- * 
+ *
  * send your comments or suggestions to (gnuplot-info@lists.sourceforge.net).
- * 
+ *
  */
 
 #include "driver.h"
@@ -134,8 +134,7 @@ REGIS_text()
 
 
 TERM_PUBLIC void
-REGIS_linetype(linetype)
-int linetype;
+REGIS_linetype(int linetype)
 {
     /* This will change color in order G,R,B,G-dot,R-dot,B-dot */
 
@@ -170,16 +169,14 @@ int linetype;
 */
 
 TERM_PUBLIC void
-REGIS_move(x, y)
-unsigned int x, y;
+REGIS_move(unsigned int x, unsigned int y)
 {
     fprintf(gpoutfile, "P[%d,%d]\n", x, REGISYLAST - y);
 }
 
 
 TERM_PUBLIC void
-REGIS_vector(x, y)
-unsigned int x, y;
+REGIS_vector(unsigned int x, unsigned int y)
 {
     fprintf(gpoutfile, "v[]v[%d,%d]\n", x, REGISYLAST - y);
     /* the initial v[] is needed to get the first pixel plotted */
@@ -188,9 +185,7 @@ unsigned int x, y;
 
 /* put_text and text_angle by rjl */
 TERM_PUBLIC void
-REGIS_put_text(x, y, str)
-unsigned int x, y;
-const char *str;
+REGIS_put_text(unsigned int x, unsigned int y, const char *str)
 {
     if (REGISang == 1)
 	REGIS_move(x - REGISVCHAR / 2 - 1, y);
@@ -210,8 +205,7 @@ const char *str;
 
 
 TERM_PUBLIC int
-REGIS_text_angle(ang)
-int ang;
+REGIS_text_angle(int ang)
 {
     REGISang = (ang ? 1 : 0);
     if (REGISang == 1)

@@ -35,7 +35,7 @@
     [prInfo setLeftMargin:0];
 
     [prInfo setRightMargin:0];
-    
+
     [prInfo setTopMargin:0];
 
     [prInfo setBottomMargin:50];
@@ -94,7 +94,7 @@
 - (void) setActiveTerm:(id) newTerm
 {
 	if (activeTerm != nil) [activeTerm deactivate:self];
-	
+
 	activeTerm = newTerm;
 }
 
@@ -104,7 +104,7 @@
 }
 
 - (void) setKeyTerm: (id) newTerm
-{	
+{
 	keyTerm = newTerm;
 
 	[NameField setStringValue:[[keyTerm window] title]];
@@ -122,7 +122,7 @@
         NSLog(@"Request for window: %@\n", title);
 
 	if (activeTerm == nil) [self newGnuTerm:self];
-	
+
 	[[activeTerm gnuView] executePS:PSstring];
 }
 

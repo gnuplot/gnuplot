@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: strftime.c,v 1.5 2002/02/25 03:10:41 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: strftime.c,v 1.6 2004/04/13 17:24:01 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - strftime.c */
@@ -77,10 +77,7 @@ static void fill __PROTO((char *from, char **pto, size_t *pmaxsize));
 static void number __PROTO((int num, int pad, char **pto, size_t *pmaxsize));
 
 static void
-fill(from, pto, pmaxsize)
-    char *from;
-    char **pto;
-    size_t *pmaxsize;
+fill(char *from, char **pto, size_t *pmaxsize)
 {
     safe_strncpy(*pto, from, *pmaxsize);
     if (*pmaxsize < strlen(from)) {
@@ -93,11 +90,7 @@ fill(from, pto, pmaxsize)
 }
 
 static void
-number(num, pad, pto, pmaxsize)
-    int num;
-    int pad;
-    char **pto;
-    size_t *pmaxsize;
+number(int num, int pad, char **pto, size_t *pmaxsize)
 {
     char str[100];
 
@@ -106,11 +99,7 @@ number(num, pad, pto, pmaxsize)
 }
 
 size_t
-strftime(s, max, format, tp)
-    char *s;
-    size_t max;
-    const char *format;
-    const struct tm *tp;
+strftime(char *s, size_t max, const char *format, const struct tm *tp)
 {
     char *start = s;
     size_t maxsize = max;

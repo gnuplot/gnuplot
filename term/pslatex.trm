@@ -1,5 +1,5 @@
-/*
- * $Id: pslatex.trm,v 1.39 2003/06/20 04:55:00 sfeam Exp $
+/* Hello, Emacs, this is -*-C-*-
+ * $Id: pslatex.trm,v 1.40 2004/04/13 17:24:38 broeker Exp $
  */
 
 /* GNUPLOT - pslatex.trm */
@@ -45,7 +45,7 @@
  *  George Phillips
  *  Russell Lang
  *  David Kotz
- * 
+ *
  *  Petr Mikulik, May 2000: terminal entries for PM3D functionality
  *
  * send your comments or suggestions to (gnuplot-info@lists.sourceforge.net).
@@ -364,9 +364,7 @@ PSLATEX_graphics()
 }
 
 TERM_PUBLIC void
-PSLATEX_put_text(x, y, str)
-unsigned int x, y;
-const char str[];
+PSLATEX_put_text(unsigned int x, unsigned int y, const char str[])
 {
     struct text_command *tc;
 
@@ -388,18 +386,16 @@ const char str[];
 }
 
 TERM_PUBLIC int
-PSLATEX_justify_text(mode)
-enum JUSTIFY mode;
+PSLATEX_justify_text(enum JUSTIFY mode)
 {
     PSLATEX_justify = mode;
     return TRUE;
 }
 
 TERM_PUBLIC int
-PSLATEX_text_angle(ang)
-int ang;
+PSLATEX_text_angle(int ang)
 {
-    /* rotated text is put in a short stack, and optionally uses 
+    /* rotated text is put in a short stack, and optionally uses
      * postscript specials depending on PSLATEX_rotate */
     PSLATEX_angle = ang;
     return TRUE;
@@ -523,8 +519,7 @@ PSLATEX_text()
 }
 
 TERM_PUBLIC void
-PSLATEX_move(x, y)
-unsigned int x, y;
+PSLATEX_move(unsigned int x, unsigned int y)
 {
     if (PSLATEX_auxfile) {
 	FILE *tmp = gpoutfile;
@@ -538,8 +533,7 @@ unsigned int x, y;
 
 
 TERM_PUBLIC void
-PSLATEX_vector(x, y)
-unsigned int x, y;
+PSLATEX_vector(unsigned int x, unsigned int y)
 {
 
     if (PSLATEX_auxfile) {
@@ -554,8 +548,7 @@ unsigned int x, y;
 
 
 TERM_PUBLIC void
-PSLATEX_linetype(lt)
-int lt;
+PSLATEX_linetype(int lt)
 {
     if (PSLATEX_auxfile) {
 	FILE *tmp = gpoutfile;
@@ -568,9 +561,7 @@ int lt;
 }
 
 TERM_PUBLIC void
-PSLATEX_point(x, y, number)
-unsigned int x, y;
-int number;
+PSLATEX_point(unsigned int x, unsigned int y, int number)
 {
     if (PSLATEX_auxfile) {
 	FILE *tmp = gpoutfile;
@@ -583,8 +574,7 @@ int number;
 
 
 TERM_PUBLIC void
-PSLATEX_pointsize(ps)
-double ps;
+PSLATEX_pointsize(double ps)
 {
     if (PSLATEX_auxfile) {
 	FILE *tmp = gpoutfile;
@@ -597,8 +587,7 @@ double ps;
 
 
 TERM_PUBLIC void
-PSLATEX_linewidth(ps)
-double ps;
+PSLATEX_linewidth(double ps)
 {
     if (PSLATEX_auxfile) {
 	FILE *tmp = gpoutfile;
@@ -610,7 +599,7 @@ double ps;
 }
 
 TERM_PUBLIC void
-PSLATEX_fillbox(int style, unsigned int x1, unsigned int y1, 
+PSLATEX_fillbox(int style, unsigned int x1, unsigned int y1,
                 unsigned int width, unsigned int height)
 {
     if (PSLATEX_auxfile) {
@@ -625,7 +614,8 @@ PSLATEX_fillbox(int style, unsigned int x1, unsigned int y1,
 
 #ifdef PM3D
 
-TERM_PUBLIC int PSLATEX_make_palette (t_sm_palette *palette)
+TERM_PUBLIC int
+PSLATEX_make_palette (t_sm_palette *palette)
 {
     if (PSLATEX_auxfile) {
 	FILE *tmp = gpoutfile;
@@ -638,7 +628,8 @@ TERM_PUBLIC int PSLATEX_make_palette (t_sm_palette *palette)
 	return PS_make_palette(palette);
 }
 
-TERM_PUBLIC void PSLATEX_set_color (double gray)
+TERM_PUBLIC void
+PSLATEX_set_color (double gray)
 {
     if (PSLATEX_auxfile) {
 	FILE *tmp = gpoutfile;
@@ -649,7 +640,8 @@ TERM_PUBLIC void PSLATEX_set_color (double gray)
 	PS_set_color(gray);
 }
 
-TERM_PUBLIC void PSLATEX_filled_polygon ( int points, gpiPoint *corners )
+TERM_PUBLIC void
+PSLATEX_filled_polygon(int points, gpiPoint *corners)
 {
     if (PSLATEX_auxfile) {
 	FILE *tmp = gpoutfile;
@@ -660,7 +652,8 @@ TERM_PUBLIC void PSLATEX_filled_polygon ( int points, gpiPoint *corners )
 	PS_filled_polygon(points,corners);
 }
 
-TERM_PUBLIC void PSLATEX_previous_palette ( void )
+TERM_PUBLIC void
+PSLATEX_previous_palette ()
 {
     if (PSLATEX_auxfile) {
 	FILE *tmp = gpoutfile;
@@ -691,7 +684,7 @@ TERM_TABLE_START(pslatex_driver)
     PSLATEX_vector, PSLATEX_linetype, PSLATEX_put_text, PSLATEX_text_angle,
     PSLATEX_justify_text, PSLATEX_point, do_arrow, set_font_null,
     PSLATEX_pointsize, 0 /*flags */ , 0 /*suspend */
-    , 0 /*resume */ , 
+    , 0 /*resume */ ,
     PSLATEX_fillbox ,
     PSLATEX_linewidth
 #ifdef PM3D

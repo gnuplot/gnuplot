@@ -1,5 +1,5 @@
-/*
- * $Id: tkcanvas.trm,v 1.21 2002/04/16 11:02:11 broeker Exp $
+/* Hello, Emacs, this is -*-C-*-
+ * $Id: tkcanvas.trm,v 1.22 2004/04/13 17:24:39 broeker Exp $
  *
  */
 
@@ -45,12 +45,12 @@
  *  Martin Yii, eln557h@monu3.OZ
  *  Further modified Jan 1990 by Russell Lang, rjl@monu1.cc.monash.oz
  *
- * Port to the Tk/Tcl canvas widget  
+ * Port to the Tk/Tcl canvas widget
  *  D. Jeff Dionne, July 1995 jeff@ryeham.ee.ryerson.ca
  *  Alex Woo, woo@playfair.stanford.edu
  *
  * send your comments or suggestions to (gnuplot-info@lists.sourceforge.net).
- * 
+ *
  */
 
 /*
@@ -58,7 +58,7 @@
  */
 
 /*
- * extended interactive Tk/Tcl capabilities 
+ * extended interactive Tk/Tcl capabilities
  * Thomas Sefzick, March 1999, t.sefzick@fz-juelich.de
  *
  * added the perltk.trm code written by Slaven Rezic <eserte@cs.tu-berlin.de>,
@@ -212,22 +212,19 @@ TK_reset()
 }
 
 TERM_PUBLIC void
-TK_linetype(linetype)
-int linetype;
+TK_linetype(int linetype)
 {
     tk_color = (linetype + 2) & 7;
 }
 
 TERM_PUBLIC void
-TK_linewidth(linewidth)
-double linewidth;
+TK_linewidth(double linewidth)
 {
     tk_linewidth = linewidth;
 }
 
 TERM_PUBLIC void
-TK_move(x, y)
-unsigned int x, y;
+TK_move(unsigned int x, unsigned int y)
 {
     tk_lastx = x;
     tk_lasty = 1000 - y;
@@ -240,7 +237,7 @@ unsigned int x, y;
 	  + value*(axis_array[axis].max-axis_array[axis].min))	\
 	: axis_array[axis].min					\
           + value*(axis_array[axis].max-axis_array[axis].min)
-    
+
 #define TK_X_VALUE(value) \
  (double)(value-xleft)/(double)(xright-xleft)
 
@@ -248,8 +245,7 @@ unsigned int x, y;
  (double)((TK_YMAX-value)-ybot)/(double)(ytop-ybot)
 
 TERM_PUBLIC void
-TK_vector(x, y)
-unsigned int x, y;
+TK_vector(unsigned int x, unsigned int y)
 {
 	/*
 	 * this is the 1st part of the wrapper around the 'create line' command
@@ -293,7 +289,7 @@ $can create line \
 	 * this is the 2nd part of the wrapper around the 'create line'
          * command it generates a mechanism which calls 'gnuplot_xy' for
          * the line segment pointed to by the mouse cursor when a mouse
-         * button is pressed 
+         * button is pressed
 	 */
     if (tk_interactive && !is_3d_plot) {
 	if (tk_perl) {
@@ -389,18 +385,13 @@ $can create line \
 #undef TK_Y_VALUE
 
 TERM_PUBLIC void
-TK_put_text(x, y, str)
-    unsigned int x, y;
-    const char *str;
+TK_put_text(unsigned int x, unsigned int y, const char *str)
 {
     y = 1000 - y;
     if (tk_perl) {
 	fprintf(gpoutfile,"\
-$can->createText(\
-$cmx * %d / 1000, \
-$cmy * %d / 1000, \
--text => q{%s}, -fill => q{%s}, -anchor => '%s', \
-(defined $font ? (-font => $font) : ()));\n",
+$can->createText($cmx * %d / 1000, $cmy * %d / 1000, -text => q{%s}, \
+-fill => q{%s}, -anchor => '%s', (defined $font ? (-font => $font) : ()));\n",
 		x, y, str, tk_colors[tk_color], tk_anchor);
     } else {
         /* Have to quote-protect '[' and ']' characters */
@@ -415,7 +406,7 @@ $cmy * %d / 1000, \
         quoted_str = gp_alloc(newsize + 1, "TK_put_text: quoted string");
 
         for (i=0, newsize = 0; str[i] != '\0'; i++) {
-            if ((str[i] == '[') || (str[i] == ']')) 
+            if ((str[i] == '[') || (str[i] == ']'))
                 quoted_str[newsize++] = '\\';
             quoted_str[newsize++] = str[i];
         }
@@ -432,8 +423,7 @@ eval $can create text \
 }
 
 TERM_PUBLIC int
-TK_justify_text(anchor)
-enum JUSTIFY anchor;
+TK_justify_text(enum JUSTIFY anchor)
 {
     int return_value;
 
@@ -458,8 +448,7 @@ enum JUSTIFY anchor;
 }
 
 TERM_PUBLIC int
-TK_set_font(font)
-const char *font;
+TK_set_font(const char *font)
 {
     if (!font || *font == NUL) {
 	if (tk_perl)

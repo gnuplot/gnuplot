@@ -1,6 +1,6 @@
 #import <AppKit/AppKit.h>
 
-@interface Controller:NSObject 
+@interface Controller:NSObject
 {
 	id activeTerm;
 	id keyTerm;

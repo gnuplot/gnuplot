@@ -1,5 +1,5 @@
-/*
- * $Id: dxf.trm,v 1.12 2003/06/26 13:19:59 broeker Exp $
+/* Hello, Emacs, this is -*-C-*-
+ * $Id: dxf.trm,v 1.13 2004/04/13 17:24:16 broeker Exp $
  *
  */
 
@@ -79,7 +79,7 @@ TERM_PUBLIC void DXF_reset __PROTO((void));
 #else
 /* HBB 20030626: make them have the same length in DXF_UNITs ! */
 # define DXF_HTIC (2.0 * DXF_UNIT)
-# define DXF_VTIC (2.0 * DXF_UNIT) 
+# define DXF_VTIC (2.0 * DXF_UNIT)
 #endif
 #define DXF_HCHAR (0.014 * DXF_XMAX)	/* 1.4 percent */
 #define DXF_VCHAR (0.026 * DXF_YMAX)	/* 2.6 percent */
@@ -115,7 +115,7 @@ static unsigned int DXF_posy;
 /* linetype is mapped to a layer. see below. */
 static unsigned int dxf_linetype;
 static enum JUSTIFY dxf_justify = LEFT;
-static float dxf_angle = 0.0;	/* either 0 (horizontal) or 90.0 (vertical) */
+static float dxf_angle = 0.0;	/* 0 is horizontal, 90.0 is vertical */
 
 /* text style used in the entire drawing */
 static const char *text_style = "STANDARD";
@@ -239,8 +239,7 @@ DXF_text()
 }
 
 TERM_PUBLIC void
-DXF_linetype(linetype)
-int linetype;
+DXF_linetype(int linetype)
 {
     linetype = ABS(linetype);
     linetype = linetype % DXF_LINE_TYPES;
@@ -248,8 +247,7 @@ int linetype;
 }
 
 TERM_PUBLIC void
-DXF_move(x, y)
-unsigned int x, y;
+DXF_move(unsigned int x, unsigned int y)
 {
     DXF_posx = x;
     DXF_posy = y;
@@ -271,8 +269,7 @@ unsigned int x, y;
 }
 
 TERM_PUBLIC void
-DXF_vector(ux, uy)
-unsigned int ux, uy;
+DXF_vector(unsigned int ux, unsigned int uy)
 {
     DXF_posx = ux;
     DXF_posy = uy;
@@ -288,9 +285,7 @@ unsigned int ux, uy;
 }
 
 TERM_PUBLIC void
-DXF_put_text(x, y, str)
-unsigned int x, y;
-const char str[];
+DXF_put_text(unsigned int x, unsigned int y, const char str[])
 {
     int stl;
     float xleftpos, yleftpos, xrightpos, yrightpos;
@@ -370,16 +365,14 @@ const char str[];
 }
 
 TERM_PUBLIC int
-DXF_text_angle(ang)
-int ang;
+DXF_text_angle(int ang)
 {
     dxf_angle = (ang ? 90.0 : 0.0);
     return (TRUE);
 }
 
 TERM_PUBLIC int
-DXF_justify_text(mode)
-enum JUSTIFY mode;
+DXF_justify_text(enum JUSTIFY mode)
 {
     dxf_justify = mode;
     return (TRUE);

@@ -1,5 +1,5 @@
 /*
- * $Id: contour.h,v 1.6 2000/11/02 19:11:07 lhecking Exp $
+ * $Id: contour.h,v 1.7 2004/04/13 17:23:52 broeker Exp $
  */
 
 /* GNUPLOT - contour.h */
@@ -80,7 +80,7 @@ extern int contour_order;
 extern int contour_pts;
 
 /* storage for z levels to draw contours at */
-extern dynarray dyn_contour_levels_list; 
+extern dynarray dyn_contour_levels_list;
 #define contour_levels_list ((double *)dyn_contour_levels_list.v)
 
 /* Prototypes of functions exported by contour.c */

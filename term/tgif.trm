@@ -1,4 +1,5 @@
-/* $Id: tgif.trm,v 1.23 2004/03/29 10:43:36 broeker Exp $ */
+/* Hello, Emacs, this is -*-C-*- */
+/* $Id: tgif.trm,v 1.24 2004/04/13 17:24:38 broeker Exp $ */
 
 /* GNUPLOT - tgif.trm */
 
@@ -62,7 +63,7 @@
 /* Modified  04 February 2002 by Levente Novák                             */
 /*          - break long "polygon()" directives into lines, as it made     */
 /*            Tgif fail polygons had >8 sides                              */
-/*            (e.g. when using "filledcurves")                             */  
+/*            (e.g. when using "filledcurves")                             */
 /***************************************************************************/
 
 /*}}}  */
@@ -192,7 +193,7 @@ static const char *psFonts[] = {
     "Symbol", NULL
 };
 
-static unsigned int psFontSizes[] = { 
+static unsigned int psFontSizes[] = {
     8, 10, 11, 12, 14, 17, 18, 20, 24, 25, 34, 40, 45, 50
 };
 #endif
@@ -392,7 +393,10 @@ TGIF_init()
     fprintf(gpoutfile, "\
 %%TGIF 2.15-p7\n\
 state(%d,30,%u,0,0,%u,16,1,9,1,1,0,0,0,0,1,0,'%s',0,%u,0,0,1,10,0,0,1,1,0,16,0,0,1,1,1).\n\
-%%\n%% @(#)$Header: /cvsroot/gnuplot/gnuplot/term/tgif.trm,v 1.23 2004/03/29 10:43:36 broeker Exp $\n%% %%W%%\n%%\n\
+%%\n\
+%% @(#)$Header: /cvsroot/gnuplot/gnuplot/term/tgif.trm,v 1.24 2004/04/13 17:24:38 broeker Exp $\n\
+%% %%W%%\n\
+%%\n\
 page(1,\"\").\n",
 	    TgifPortrait ? 0 : 1, uActResolution, uActZoom, sActFont, uActFontSize);
     eTgifState = NEWPOLY;
@@ -490,8 +494,7 @@ TGIF_reset()
 /*}}}  */
 /***************************************************************************/
 TERM_PUBLIC void
-TGIF_linetype(linetype)
-int linetype;
+TGIF_linetype(int linetype)
 {
     unsigned int ult;
 
@@ -520,8 +523,7 @@ int linetype;
 /*}}}  */
 /***************************************************************************/
 TERM_PUBLIC void
-TGIF_move(ux, uy)
-unsigned int ux, uy;
+TGIF_move(unsigned int ux, unsigned int uy)
 {
 
     uLastTgifX = ux + uXshift;
@@ -536,8 +538,7 @@ unsigned int ux, uy;
 /*}}}  */
 /***************************************************************************/
 TERM_PUBLIC void
-TGIF_vector(ux, uy)
-unsigned int ux, uy;
+TGIF_vector(unsigned int ux, unsigned int uy)
 {
 
     ux = ux + uXshift;
@@ -566,9 +567,10 @@ unsigned int ux, uy;
 /*}}}  */
 /***************************************************************************/
 TERM_PUBLIC void
-TGIF_arrow(sx, sy, ex, ey, head)
-    unsigned int sx, sy, ex, ey;
-    int head;
+TGIF_arrow(
+    unsigned int sx, unsigned int sy,
+    unsigned int ex, unsigned int ey,
+    int head)
 {
 
     TGIF_flush_poly();
@@ -602,9 +604,7 @@ poly('%s',%d,[\n\
 /*}}}  */
 /***************************************************************************/
 TERM_PUBLIC void
-TGIF_put_text(ux, uy, str)
-unsigned int ux, uy;
-const char *str;
+TGIF_put_text(unsigned int ux, unsigned int uy, const char *str)
 {
 
     unsigned int x, y;
@@ -620,7 +620,7 @@ const char *str;
 
     fprintf(gpoutfile, "\
 text('%s',%u,%u,'%s',0,%u,1,%u,%u,1,55,119,%u,0,15,4,0,0,0,0,[\n\t\"%s\"]).\n",
-	    sActColor, x, y, sActFont, uActFontSize, 
+	    sActColor, x, y, sActFont, uActFontSize,
 	    (uActAngle ? CENTRE : uActJust), uActAngle,
 	    uActNr, str);
 
@@ -634,8 +634,7 @@ text('%s',%u,%u,'%s',0,%u,1,%u,%u,1,55,119,%u,0,15,4,0,0,0,0,[\n\t\"%s\"]).\n",
 /*}}}  */
 /***************************************************************************/
 TERM_PUBLIC int
-TGIF_text_angle(ang)
-int ang;
+TGIF_text_angle(int ang)
 {
     switch (ang) {
 	case   90:	uActAngle = 3; break;
@@ -651,8 +650,7 @@ int ang;
 /*}}}  */
 /***************************************************************************/
 TERM_PUBLIC int
-TGIF_justify_text(mode)
-enum JUSTIFY mode;
+TGIF_justify_text(enum JUSTIFY mode)
 {
     uActJust = mode;
     return (TRUE);
@@ -661,9 +659,7 @@ enum JUSTIFY mode;
 /*}}}  */
 /***************************************************************************/
 TERM_PUBLIC void
-TGIF_point(ux, uy, number)
-unsigned int ux, uy;
-int number;
+TGIF_point(unsigned int ux, unsigned int uy, int number)
 {
     double p;		/* all pointtypes fit in a (x +/-p)x(y +/-p) box */
 
@@ -1480,8 +1476,7 @@ arc('%s',1,1,1,0,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,0,%.1f,%.1f,17280,5760,
 /*}}}  */
 /***************************************************************************/
 TERM_PUBLIC void
-TGIF_set_pointsize(size)
-double size;
+TGIF_set_pointsize(double size)
 {
     uActPointSize = size;
 }
@@ -1489,8 +1484,7 @@ double size;
 /*}}}  */
 /***************************************************************************/
 TERM_PUBLIC int
-TGIF_set_font(font) /* Entry font as added by DJL in post.trm */
-const char *font;
+TGIF_set_font(const char *font)
 {
     char name[32];
     int size;
@@ -1506,8 +1500,8 @@ const char *font;
 }
 
 #ifdef PM3D
-TERM_PUBLIC int TGIF_make_palette(palette)
-    t_sm_palette *palette;
+TERM_PUBLIC int
+TGIF_make_palette(t_sm_palette *palette)
 {
     int i;
 
@@ -1533,8 +1527,8 @@ TERM_PUBLIC int TGIF_make_palette(palette)
     return(0);
 }
 
-TERM_PUBLIC void TGIF_set_color(gray)
-    double gray;
+TERM_PUBLIC void
+TGIF_set_color(double gray)
 {
     int color = (gray <= 0) ? 0 : (int)(gray * TGIF_palette_size);
     if (color >= TGIF_palette_size)
@@ -1545,9 +1539,8 @@ TERM_PUBLIC void TGIF_set_color(gray)
     sprintf(sActColor, "%s", TGIF_colours[color]);
 }
 
-TERM_PUBLIC void TGIF_filled_polygon(points, corners)
-    int points;
-    gpiPoint *corners;
+TERM_PUBLIC void
+TGIF_filled_polygon(int points, gpiPoint *corners)
 {
     int i;
 

@@ -1,5 +1,5 @@
-/*
- * $Id: t410x.trm,v 1.11 1999/10/29 18:39:40 lhecking Exp $
+/* Hello, Emacs, this is -*-C-*-
+ * $Id: t410x.trm,v 1.12 2004/04/13 17:24:38 broeker Exp $
  *
  */
 
@@ -42,9 +42,9 @@
  *
  * AUTHORS
  *   Colin Kelley, Thomas Williams
- * 
+ *
  * send your comments or suggestions to (gnuplot-info@lists.sourceforge.net).
- * 
+ *
  */
 
 /* Tektronix 410X and 420X driver written by Cary D. Renzema.
@@ -157,8 +157,7 @@ T410X_text()
 
 
 TERM_PUBLIC void
-T410X_move(x, y)
-unsigned int x, y;
+T410X_move(unsigned int x, unsigned int y)
 {
     fputs("\033LF", gpoutfile);
 
@@ -168,8 +167,7 @@ unsigned int x, y;
 
 
 TERM_PUBLIC void
-T410X_vector(x, y)
-unsigned int x, y;
+T410X_vector(unsigned int x, unsigned int y)
 {
     fputs("\033LG", gpoutfile);
     (void) T410X_encode_x_y(x, y);
@@ -178,9 +176,7 @@ unsigned int x, y;
 
 
 TERM_PUBLIC void
-T410X_point(x, y, number)
-unsigned int x, y;
-int number;
+T410X_point(unsigned int x, unsigned int y, int number)
 {
     fputs("\033MM", gpoutfile);
     (void) T410X_encode_int(GPMAX(number, 0) % 11);
@@ -191,8 +187,7 @@ int number;
 
 
 TERM_PUBLIC void
-T410X_linetype(linetype)
-int linetype;
+T410X_linetype(int linetype)
 {
     switch (linetype) {
     case -1:
@@ -213,9 +208,7 @@ int linetype;
 
 
 TERM_PUBLIC void
-T410X_put_text(x, y, str)
-unsigned int x, y;
-const char str[];
+T410X_put_text(unsigned int x, unsigned int y, const char str[])
 {
 
     if (T410X_angle == 0) {
@@ -232,8 +225,7 @@ const char str[];
 }
 
 TERM_PUBLIC int
-T410X_text_angle(ang)
-int ang;
+T410X_text_angle(int ang)
 {
 
     T410X_angle = ang;
@@ -245,8 +237,7 @@ int ang;
  */
 
 static void
-T410X_encode_x_y(x, y)
-unsigned int x, y;
+T410X_encode_x_y(unsigned int x, unsigned int y)
 {
     static char chix = 0, chiy = 0, cloy = 0, ceb = 0;
 
@@ -279,8 +270,7 @@ unsigned int x, y;
 
 
 static void
-T410X_encode_int(number)
-int number;
+T410X_encode_int(int number)
 {
     register unsigned int mag, hi1, hi2, lo;
 

@@ -1,10 +1,10 @@
 /*
- * $Id: getcolor.h,v 1.5 2003/11/13 08:18:15 mikulik Exp $
+ * $Id: getcolor.h,v 1.6 2004/05/26 11:17:42 mikulik Exp $
  */
 
 /* GNUPLOT - getcolor.h */
 
-/* Routines + constants for mapping interval [0,1] into another [0,1] to be 
+/* Routines + constants for mapping interval [0,1] into another [0,1] to be
  * used to get RGB triplets from gray (palette of smooth colours).
  *
  * Note: The code in getcolor.h,.c cannot be inside color.h,.c since gplt_x11.c
@@ -32,7 +32,7 @@ enum color_models_id {
     C_MODEL_HSV = 'h',
     C_MODEL_CMY = 'c',
     C_MODEL_YIQ = 'y',
-    C_MODEL_XYZ = 'x' 
+    C_MODEL_XYZ = 'x'
 };
 
 
@@ -52,7 +52,7 @@ int calculate_color_from_formulae __PROTO(( double, rgb_color * ));
 /* used to (de-)serialize color/gradient information */
 char *color_to_str __PROTO(( rgb_color col, char *buf ));
 void str_to_color __PROTO(( char *buf, rgb_color *col ));
-char *gradient_entry_to_str __PROTO(( gradient_struct *gs )); 
+char *gradient_entry_to_str __PROTO(( gradient_struct *gs ));
 void str_to_gradient_entry __PROTO(( char *s, gradient_struct *gs ));
 
 /* check if two palettes p1 and p2 differ */

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: specfun.c,v 1.26 2004/02/13 01:16:39 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: specfun.c,v 1.27 2004/04/13 17:24:01 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - specfun.c */
@@ -170,9 +170,7 @@ int             merror = 0;
 #define MTHERR_PLPREC	 6
 
 static int
-mtherr(name, code)
-    char *name;
-    int code;
+mtherr(char *name, int code)
 {
     static const char *ermsg[7] = {
 	"unknown",                  /* error code 0 */
@@ -251,16 +249,12 @@ Cephes Math Library Release 2.1:  December, 1988
 Copyright 1984, 1987, 1988 by Stephen L. Moshier
 Direct inquiries to 30 Frost Street, Cambridge, MA 02140
 */
-
 static double
-polevl(x, coef, N)
-    double x;
-    const double coef[];
-    int N;
+polevl(double x, const double coef[], int N)
 {
     double          ans;
     int             i;
-    const double         *p;
+    const double    *p;
 
     p = coef;
     ans = *p++;
@@ -277,16 +271,12 @@ polevl(x, coef, N)
  * Evaluate polynomial when coefficient of x  is 1.0.
  * Otherwise same as polevl.
  */
-
 static double
-p1evl(x, coef, N)
-    double x;
-    const double coef[];
-    int N;
+p1evl(double x, const double coef[], int N)
 {
-    double          ans;
-    const double         *p;
-    int             i;
+    double		ans;
+    const double	*p;
+    int		 	i;
 
     p = coef;
     ans = x + *p++;
@@ -306,28 +296,27 @@ p1evl(x, coef, N)
 int             sgngam;
 
 static int
-ISNAN(x)
-    double x;
+ISNAN(double x)
 {
     volatile double a = x;
+
     if (a != a)
         return 1;
     return 0;
 }
 
 static int
-ISFINITE(x)
-    double x;
+ISFINITE(double x)
 {
     volatile double a = x;
+
     if (a < DBL_MAX)
         return 1;
     return 0;
 }
 
 double
-lngamma(x)
-    double x;
+lngamma(double x)
 {
     /* A[]: Stirling's formula expansion of log gamma
      * B[], C[]: log gamma function between 2 and 3
@@ -562,8 +551,7 @@ lngamma(x)
 #endif /* !GAMMA */
 
 void
-f_erf(arg)
-    union argument *arg;
+f_erf(union argument *arg)
 {
     struct value a;
     double x;
@@ -593,8 +581,7 @@ f_erf(arg)
 }
 
 void
-f_erfc(arg)
-    union argument *arg;
+f_erfc(union argument *arg)
 {
     struct value a;
     double x;
@@ -613,7 +600,7 @@ f_erfc(arg)
 	if (x == -1.0) {
 	    undefined = TRUE;
 	    x = 0.0;
-	} else { 
+	} else {
 	    x = fsign ? (1.0 - x) : (1.0 + x);
 	}
     }
@@ -622,8 +609,7 @@ f_erfc(arg)
 }
 
 void
-f_ibeta(arg)
-    union argument *arg;
+f_ibeta(union argument *arg)
 {
     struct value a;
     double x;
@@ -643,8 +629,7 @@ f_ibeta(arg)
 	push(Gcomplex(&a, x, 0.0));
 }
 
-void f_igamma(arg)
-    union argument *arg;
+void f_igamma(union argument *arg)
 {
     struct value a;
     double x;
@@ -662,8 +647,7 @@ void f_igamma(arg)
 	push(Gcomplex(&a, x, 0.0));
 }
 
-void f_gamma(arg)
-    union argument *arg;
+void f_gamma(union argument *arg)
 {
     register double y;
     struct value a;
@@ -677,8 +661,7 @@ void f_gamma(arg)
 	push(Gcomplex(&a, signgam * gp_exp(y), 0.0));
 }
 
-void f_lgamma(arg)
-    union argument *arg;
+void f_lgamma(union argument *arg)
 {
     struct value a;
 
@@ -688,8 +671,7 @@ void f_lgamma(arg)
 
 #ifndef BADRAND
 
-void f_rand(arg)
-    union argument *arg;
+void f_rand(union argument *arg)
 {
     struct value a;
 
@@ -700,8 +682,7 @@ void f_rand(arg)
 #else /* BADRAND */
 
 /* Use only to observe the effect of a "bad" random number generator. */
-void f_rand(arg)
-    union argument *arg;
+void f_rand(union argument *arg)
 {
     struct value a;
 
@@ -754,8 +735,7 @@ void f_rand(arg)
  */
 
 static double
-ibeta(a, b, x)
-    double a, b, x;
+ibeta(double a, double b, double x)
 {
     /* Test for admissibility of arguments */
     if (a <= 0.0 || b <= 0.0)
@@ -772,8 +752,7 @@ ibeta(a, b, x)
 }
 
 static double
-confrac(a, b, x)
-    double a, b, x;
+confrac(double a, double b, double x)
 {
     double Alo = 0.0;
     double Ahi;
@@ -853,8 +832,7 @@ confrac(a, b, x)
  */
 
 static double
-igamma(a, x)
-    double a, x;
+igamma(double a, double x)
 {
     double arg;
     double aa;
@@ -961,8 +939,7 @@ igamma(a, x)
      Software, 17:98-111 (1991)
 ***********************************************************************/
 static double
-ranf(init)
-    struct value *init;
+ranf(struct value *init)
 {
     long k, z;
     static int firsttime = 1;
@@ -993,7 +970,7 @@ ranf(init)
 	    seed2 = seed1;
     }
     FPRINTF((stderr,"ranf: seed = %lo %lo        %ld %ld\n", seed1,seed2));
-    
+
     /* Generate pseudo random integers */
     k = seed1 / 53668L;
     seed1 = Xa1 * (seed1 - k * 53668L) - k * 12211;
@@ -1020,15 +997,14 @@ ranf(init)
    ---------------------------------------------------------------- */
 
 void
-f_normal(arg)
-    union argument *arg;
+f_normal(union argument *arg)
 {				/* Normal or Gaussian Probability Function */
     struct value a;
     double x;
 
-    /* ref. Abramowitz and Stegun 1964, "Handbook of Mathematical 
+    /* ref. Abramowitz and Stegun 1964, "Handbook of Mathematical
        Functions", Applied Mathematics Series, vol 55,
-       Chapter 26, page 934, Eqn. 26.2.29 and Jos van der Woude 
+       Chapter 26, page 934, Eqn. 26.2.29 and Jos van der Woude
        code found above */
 
     (void) arg;				/* avoid -Wunused warning */
@@ -1045,7 +1021,7 @@ f_normal(arg)
 	if (x == 1.0) {
 	    undefined = TRUE;
 	    x = 0.0;
-	} else { 
+	} else {
 	    if (fsign == 0)
 		x = -(x);
 	    x = 0.5 * (1.0 + x);
@@ -1056,8 +1032,7 @@ f_normal(arg)
 }
 
 void
-f_inverse_normal(arg)
-    union argument *arg;
+f_inverse_normal(union argument *arg)
 {				/* Inverse normal distribution function */
     struct value a;
     double x;
@@ -1075,8 +1050,7 @@ f_inverse_normal(arg)
 
 
 void
-f_inverse_erf(arg)
-    union argument *arg;
+f_inverse_erf(union argument *arg)
 {				/* Inverse error function */
     struct value a;
     double x;
@@ -1167,8 +1141,7 @@ static unsigned short s2p[] = {
 #endif
 
 static double
-inverse_normal_func(y0)
-    double y0;
+inverse_normal_func(double y0)
 {
     /* approximation for 0 <= |y - 0.5| <= 3/8 */
 #ifdef UNK
@@ -1547,8 +1520,7 @@ Copyright 1984, 1987, 1988, 1992, 2000 by Stephen L. Moshier
  */
 
 static double
-erfc(a)
-    double a;
+erfc(double a)
 {
 #ifdef UNK
     static const double   P[] = {
@@ -1802,11 +1774,10 @@ erfc(a)
  */
 
 double
-erf(x)
-    double x;
+erf(double x)
 {
 
-#ifdef UNK
+# ifdef UNK
     static const double   T[] = {
 	9.60497373987051638749E0,
 	9.00260197203842689217E1,
@@ -1822,9 +1793,9 @@ erf(x)
 	2.26290000613890934246E4,
 	4.92673942608635921086E4
     };
-#endif
+# endif
 
-#ifdef DEC
+# ifdef DEC
     static const unsigned short T[] = {
 	0041031, 0126770, 0170672, 0166101,
 	0041664, 0006522, 0072360, 0031770,
@@ -1840,9 +1811,9 @@ erf(x)
 	0043660, 0145000, 0004013, 0160114,
 	0044100, 0071544, 0167107, 0125471
     };
-#endif
+# endif
 
-#ifdef IBMPC
+# ifdef IBMPC
     static const unsigned short T[] = {
 	0x5d88, 0x1e37, 0x35bf, 0x4023,
 	0x067f, 0x4e9e, 0x81aa, 0x4056,
@@ -1858,9 +1829,9 @@ erf(x)
 	0x7c0a, 0x0101, 0x1940, 0x40d6,
 	0xf567, 0x9dc8, 0x0e6c, 0x40e8
     };
-#endif
+# endif
 
-#ifdef MIEEE
+# ifdef MIEEE
     static const unsigned short T[] = {
 	0x4023, 0x35bf, 0x1e37, 0x5d88,
 	0x4056, 0x81aa, 0x4e9e, 0x067f,
@@ -1875,7 +1846,7 @@ erf(x)
 	0x40d6, 0x1940, 0x0101, 0x7c0a,
 	0x40e8, 0x0e6c, 0x9dc8, 0xf567
     };
-#endif
+# endif
 
     double y, z;
 
@@ -1884,9 +1855,8 @@ erf(x)
     z = x * x;
     y = x * polevl(z, T, 4) / p1evl(z, U, 5);
     return (y);
-
 }
-#endif
+#endif /* !HAVE_ERF */
 
 /*                                                      ndtr.c
  *
@@ -1940,8 +1910,7 @@ erf(x)
 /* Note: changed here to have more mnemonic name than the original */
 
 static double
-inverse_error_func(y)
-    double y;
+inverse_error_func(double y)
 {
     double x = 0.0;    /* The output */
     double z = 0.0;    /* Intermadiate variable */
@@ -1992,15 +1961,14 @@ inverse_error_func(y)
 
 /* Implementation of Lamberts W-function which is defined as
  * w(x)*e^(w(x))=x
- * Implementation by Gunter Kuhnle, gk@uni-leipzig.de 
+ * Implementation by Gunter Kuhnle, gk@uni-leipzig.de
  * Algorithm originally developed by
  * KEITH BRIGGS, DEPARTMENT OF PLANT SCIENCES,
  * e-mail:kmb28@cam.ac.uk
  * http://epidem13.plantsci.cam.ac.uk/~kbriggs/W-ology.html */
 
-static double 
-lambertw(x)
-    double x;
+static double
+lambertw(double x)
 {
     double p, e, t, w, eps;
     int i;
@@ -2035,8 +2003,7 @@ lambertw(x)
 }
 
 void
-f_lambertw(arg)
-union argument *arg;
+f_lambertw(union argument *arg)
 {
     struct value a;
     double x;

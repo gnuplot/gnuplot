@@ -1,5 +1,5 @@
-/*
- * $Id: hp26.trm,v 1.13 2002/07/26 16:42:29 mikulik Exp $
+/* Hello, Emacs, this is -*-C-*-
+ * $Id: hp26.trm,v 1.14 2004/04/13 17:24:33 broeker Exp $
  */
 
 /* GNUPLOT - HP26.trm */
@@ -38,14 +38,14 @@
  * This file is included by ../term.c.
  *
  * This terminal driver supports:
- *  HP2623A 
+ *  HP2623A
  *
  * AUTHORS
- *   luecken@udel.edu (Bruce Lueckenhoff) 
- *   hplvlch!ch (Chuck Heller) 
- * 
+ *   luecken@udel.edu (Bruce Lueckenhoff)
+ *   hplvlch!ch (Chuck Heller)
+ *
  * send your comments or suggestions to (gnuplot-info@lists.sourceforge.net).
- * 
+ *
  */
 
 /*
@@ -108,8 +108,7 @@ typedef struct _HP26_Buffer_Node {
 
 /* constructor method */
 static HP26_Buffer_Node *
-BN_create(index, size, linetype)
-int index, size, linetype;
+BN_create(int index, int size, int linetype)
 {
     HP26_Buffer_Node *the_node;
     the_node = (HP26_Buffer_Node *) malloc(sizeof(HP26_Buffer_Node));
@@ -130,8 +129,7 @@ int index, size, linetype;
 
 /* destructor method */
 static void
-BN_delete(the_node)
-HP26_Buffer_Node *the_node;
+BN_delete(HP26_Buffer_Node *the_node)
 {
     free(the_node->x);
     free(the_node->y);
@@ -180,7 +178,7 @@ static char HP26_bin_short_table[32] =
     '?', ' ', '!', '"', '#', '$', '%', '&', '\'', '(', ')', '*', '+', ',', '-',
     '.', '/'
 };
-/* encodes an integer (assumed to be in range) into 
+/* encodes an integer (assumed to be in range) into
    binary short incremental format (j)*/
 #define short_encode(n) (HP26_bin_short_table[n+16])
 
@@ -202,20 +200,19 @@ static char HP26_bin_table[32] =
 
 
 
-/* the guts of the program 
--- first checks if any work need be done and, failing that, returns 
+/* the guts of the program
+-- first checks if any work need be done and, failing that, returns
 	immediately
 -- tries to compress the vector stream
--- goes through the buffer, using binary short incremental (2 bytes/point) 
+-- goes through the buffer, using binary short incremental (2 bytes/point)
 	as much as possible, even if must output two pairs to express one vector
 	(it's no more expensive, and will hopefully damp any excessive switching
 	back and forth between the two formats)
-	if can't use binary short incremental, use binary 
+	if can't use binary short incremental, use binary
 	absolute(4 bytes/point)
 -- finally, resets the HP26_next pointer to zero    */
 static int
-HP26_flush(the_buff)
-HP26_Buffer_Node *the_buff;
+HP26_flush(HP26_Buffer_Node *the_buff)
 {
     int i, delta_x, delta_y, half_dx, half_dy;
     int *buff_x, *buff_y;
@@ -364,8 +361,7 @@ HP26_handle_overflow()
 
 /* checks for NOP, overcapacity condition, and then adds vector to the list */
 TERM_PUBLIC void
-HP26_vector(x, y)
-unsigned int x, y;
+HP26_vector(unsigned int x, unsigned int y)
 {
     if (HP26_buff->next > 2
 	&& x == (HP26_buff->x)[HP26_buff->next - 1]
@@ -385,8 +381,7 @@ unsigned int x, y;
 
 /* checks for NOP, checks for overcapacity, puts self on list */
 TERM_PUBLIC void
-HP26_move(x, y)
-unsigned int x, y;
+HP26_move(unsigned int x, unsigned int y)
 {
     if (HP26_buff->next > 0) {
 	if (((HP26_buff->x)[HP26_buff->next - 1] == x)
@@ -445,7 +440,7 @@ HP26_graphics()
     fputs("\033*daflsC", gpoutfile);
     /*           12345
        1.  clear graphics display
-       2.  shut off the alphanumeric display 
+       2.  shut off the alphanumeric display
        3.  graphics cursor off
        4.  into graphics text mode
        5.  enable graphics display */
@@ -521,8 +516,7 @@ HP26_reset()
 }
 
 TERM_PUBLIC int
-HP26_text_angle(ang)
-int ang;
+HP26_text_angle(int ang)
 {
     HP26_angle = (ang ? 2 : 1);
     fprintf(gpoutfile, "\033*m%dN", HP26_angle);
@@ -531,9 +525,7 @@ int ang;
 
 
 TERM_PUBLIC void
-HP26_put_text(x, y, str)
-unsigned int x, y;
-const char *str;
+HP26_put_text(unsigned int x, unsigned int y, const char *str)
 {
     char abs_str[10], rel_str[10];
 
@@ -570,8 +562,7 @@ const char *str;
 
 /* checks for NOP, sets HP26_buff to point to the right buffer */
 TERM_PUBLIC void
-HP26_linetype(linetype)
-int linetype;
+HP26_linetype(int linetype)
 {
     if (linetype > 8)
 	linetype %= 9;
@@ -587,9 +578,7 @@ int linetype;
 
 /* switches to a solid linetype and calls do_point, then switches back */
 TERM_PUBLIC void
-HP26_line_and_point(x, y, number)
-unsigned int x, y;
-int number;
+HP26_line_and_point(unsigned int x, unsigned int y, int number)
 {
     int line_save, not_solid;
 
@@ -606,13 +595,11 @@ int number;
 }
 
 
-/* provides 9 point types so they stay in sync with the linetypes 
+/* provides 9 point types so they stay in sync with the linetypes
 puts simpler point types first on the assumption they are more
 frequently used */
 static void
-HP26_do_point(x, y, number)
-unsigned int x, y;
-int number;
+HP26_do_point(unsigned int x, unsigned int y, int number)
 {
     int htic, vtic;
     HP26_Buffer_Node *tmp;

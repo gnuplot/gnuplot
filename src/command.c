@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.94 2004/06/20 05:53:04 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.95 2004/06/21 03:54:49 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -36,7 +36,7 @@ static char *RCSid() { return RCSid("$Id: command.c,v 1.94 2004/06/20 05:53:04 m
 
 /*
  * Changes:
- * 
+ *
  * Feb 5, 1992  Jack Veenstra   (veenstra@cs.rochester.edu) Added support to
  * filter data values read from a file through a user-defined function before
  * plotting. The keyword "thru" was added to the "plot" command. Example
@@ -45,7 +45,7 @@ static char *RCSid() { return RCSid("$Id: command.c,v 1.94 2004/06/20 05:53:04 m
  * data before any log-scaling occurs. This capability should be generalized
  * to filter x values as well and a similar feature should be added to the
  * "splot" command.
- * 
+ *
  * 19 September 1992  Lawrence Crowl  (crowl@cs.orst.edu)
  * Added user-specified bases for log scaling.
  *
@@ -57,7 +57,7 @@ static char *RCSid() { return RCSid("$Id: command.c,v 1.94 2004/06/20 05:53:04 m
  * Use gnuplot's pid in shared mem name
  *
  * August 1999 Franz Bakan and Petr Mikulik
- * Encapsulating read_line into a thread, acting on input when thread or 
+ * Encapsulating read_line into a thread, acting on input when thread or
  * gnupmdrv posts an event semaphore. Thus mousing works even when gnuplot
  * is used as a plotting device (commands passed via pipe).
  *
@@ -383,8 +383,7 @@ do_line()
 
 
 void
-do_string(s)
-    char *s;
+do_string(char *s)
 {
     char *orig_input_line = gp_strdup(input_line);
 
@@ -406,7 +405,7 @@ do_string(s)
 
 #ifdef USE_MOUSE
 void
-toggle_display_of_ipc_commands(void)
+toggle_display_of_ipc_commands()
 {
     if (mouse_setting.verbose)
 	mouse_setting.verbose = 0;
@@ -415,14 +414,13 @@ toggle_display_of_ipc_commands(void)
 }
 
 int
-display_ipc_commands(void)
+display_ipc_commands()
 {
     return mouse_setting.verbose;
 }
 
 void
-do_string_replot(s)
-    char *s;
+do_string_replot(char *s)
 {
     char *orig_input_line = gp_strdup(input_line);
 
@@ -441,7 +439,7 @@ do_string_replot(s)
 }
 
 void
-restore_prompt(void)
+restore_prompt()
 {
     if (interactive) {
 #if defined(HAVE_LIBREADLINE)
@@ -458,9 +456,9 @@ restore_prompt(void)
 void
 define()
 {
-    register int start_token;	/* the 1st token in the function definition */
-    register struct udvt_entry *udv;
-    register struct udft_entry *udf;
+    int start_token;	/* the 1st token in the function definition */
+    struct udvt_entry *udv;
+    struct udft_entry *udf;
 
     if (equals(c_token + 1, "(")) {
 	/* function ! */
@@ -1015,11 +1013,11 @@ pause_command()
     }
     if (sleep_time > 0)
 	GP_SLEEP(sleep_time);
-    
+
     if (text != 0 && sleep_time >= 0)
 	fputc('\n', stderr);
     screen_ok = FALSE;
-    
+
     free(buf);
 
 }
@@ -1048,10 +1046,8 @@ plot_command()
 }
 
 
-void 
-print_set_output(name, append_p)
-    char *name;
-    TBOOLEAN append_p;
+void
+print_set_output(char *name, TBOOLEAN append_p)
 {
     if (print_out && print_out != stderr && print_out != stdout) {
 #ifdef PIPES
@@ -1096,7 +1092,7 @@ print_set_output(name, append_p)
     print_out_name = name;
 }
 
-char * 
+char *
 print_show_output()
 {
     if (!print_out_name)
@@ -1164,8 +1160,8 @@ replot_command()
 {
     if (!*replot_line)
 	int_error(c_token, "no previous plot");
-    /* Disable replot for some reason; currently used by the mouse/hotkey 
-       capable terminals to avoid replotting when some data come from stdin, 
+    /* Disable replot for some reason; currently used by the mouse/hotkey
+       capable terminals to avoid replotting when some data come from stdin,
        i.e. when  plotted_data_from_stdin==1  after plot "-".
     */
     if (replot_disabled) {
@@ -1241,7 +1237,7 @@ save_command()
 	    if (!isstring(c_token))
 		int_error(c_token, "filename or keyword 'functions', 'variables', 'terminal' or 'set' expected");
     }
-    
+
     if (!isstring(c_token))
 	    int_error(c_token, "expecting filename");
     fp = capture_filename_and_pfopen(&save_file, "w");
@@ -1395,7 +1391,7 @@ se tit'R,G,B profiles of the current color palette';";
     /* generate r,g,b curves */
     for (i = 0; i < test_palette_colors; i++) {
 	/* colours equidistantly from [0,1] */
-	z[i] = (double)i / (test_palette_colors - 1); 
+	z[i] = (double)i / (test_palette_colors - 1);
 	gray = (sm_palette.positive == SMPAL_NEGATIVE) ? 1-z[i] : z[i];
 	rgb1_from_gray(gray, &rgb1[i]);
     }
@@ -1582,8 +1578,7 @@ invalid_command()
 
 /* used by changedir_command() */
 static int
-changedir(path)
-char *path;
+changedir(char *path)
 {
 #if defined(MSDOS) || defined(WIN16) || defined(ATARI) || defined(DOS386)
 # if defined(__ZTC__)
@@ -1708,7 +1703,7 @@ static float splot_map_surface_scale;
  * parameters needed to present the 'set view map'.
  */
 void
-splot_map_activate(void)
+splot_map_activate()
 {
     if (splot_map_active)
 	return;
@@ -1732,7 +1727,7 @@ splot_map_activate(void)
  * available for mousing.
  */
 void
-splot_map_deactivate(void)
+splot_map_deactivate()
 {
     if (!splot_map_active)
 	return;
@@ -1780,8 +1775,7 @@ $DESCRIPTOR(helpfile_desc, "GNUPLOT$HELP");
 /* HBB 990829: confirmed this to be used on VMS, only --> moved into
  * the VMS-specific section */
 void
-done(status)
-int status;
+done(int status)
 {
     term_reset();
     exit(status);
@@ -1791,16 +1785,15 @@ int status;
    length (yet) */
 
 static int
-read_line(prompt)
-const char *prompt;
+read_line(const char *prompt)
 {
     int more, start = 0;
     char expand_prompt[40];
 
     prompt_desc.dsc$w_length = strlen(prompt);
-    prompt_desc.dsc$a_pointer = (char *)prompt;
-    (void) strcpy(expand_prompt, "_");
-    (void) strncat(expand_prompt, prompt, 38);
+    prompt_desc.dsc$a_pointer = (char *) prompt;
+    strcpy(expand_prompt, "_");
+    strncat(expand_prompt, prompt, 38);
     do {
 	line_desc.dsc$w_length = MAX_LINE_LEN - start;
 	line_desc.dsc$a_pointer = &input_line[start];
@@ -1864,7 +1857,7 @@ do_shell()
 {
     screen_ok = FALSE;
     c_token++;
- 
+
     if ((vaxc$errno = lib$spawn()) != SS$_NORMAL) {
 	os_error(NO_CARET, "spawn error");
     }
@@ -1872,14 +1865,13 @@ do_shell()
 
 
 static void
-do_system(cmd)
-const char *cmd;
+do_system(const char *cmd)
 {
 
      if (!cmd)
 	return;
 
-    /* input_line is filled by read_line or load_file, but 
+    /* input_line is filled by read_line or load_file, but
      * line_desc length is set only by read_line; adjust now
      */
     line_desc.dsc$w_length = strlen(cmd);
@@ -1924,8 +1916,8 @@ help_command()
  * This can be done repeatedly.  If null input is given, the function returns,
  * effecting a backward climb up the tree.
  * David Kotz (David.Kotz@Dartmouth.edu) 10/89
- * drd - The help buffer is first cleared when called with toplevel=1. 
- * This is to fix a bug where help is broken if ^C is pressed whilst in the 
+ * drd - The help buffer is first cleared when called with toplevel=1.
+ * This is to fix a bug where help is broken if ^C is pressed whilst in the
  * help.
  * Lars - The "int toplevel" argument is gone. I have converted it to a
  * static variable.
@@ -1978,9 +1970,9 @@ help_command()
 #ifdef OS2
   {
   /* look in the path where the executable lives */
-  static char buf[MAXPATHLEN]; 
+  static char buf[MAXPATHLEN];
   char *ptr;
-  
+
   _execname(buf, sizeof(buf));
   _fnslashify(buf);
   ptr=strrchr(buf, '/');
@@ -2107,8 +2099,7 @@ help_command()
 #ifndef VMS
 
 static void
-do_system(cmd)
-    const char *cmd;
+do_system(const char *cmd)
 {
 # ifdef AMIGA_AC_5
     static char *parms[80];
@@ -2155,15 +2146,13 @@ do_system(cmd)
 # ifdef AMIGA_AC_5
 /******************************************************************************
  * Parses the command string (for fexecv use) and  converts the first token
- * to lower case                                                 
+ * to lower case
  *****************************************************************************/
 static void
-getparms(command, parms)
-    char *command;
-    char **parms;
+getparms(char *command, char **parms)
 {
     static char strg0[256];
-    register int i = 0, j = 0, k = 0;		/* A bunch of indices */
+    int i = 0, j = 0, k = 0;		/* A bunch of indices */
 
     while (command[j] != NUL) {	/* Loop on string characters */
 	parms[k++] = strg0 + i;
@@ -2198,10 +2187,7 @@ getparms(command, parms)
 static char *rlgets __PROTO((char *s, size_t n, const char *prompt));
 
 static char *
-rlgets(s, n, prompt)
-char *s;
-size_t n;
-const char *prompt;
+rlgets(char *s, size_t n, const char *prompt)
 {
     static char *line = (char *) NULL;
     static int leftover = -1;	/* index of 1st char leftover from last call */
@@ -2308,7 +2294,7 @@ do_shell()
 
     screen_ok = FALSE;
     c_token++;
- 
+
     if (user_shell) {
 	if (system(safe_strncpy(&exec[sizeof(EXEC) - 1], user_shell,
 				sizeof(exec) - sizeof(EXEC) - 1)))
@@ -2335,8 +2321,7 @@ do_shell()
 static char *doscgets __PROTO((char *));
 
 static char *
-doscgets(s)
-char *s;
+doscgets(char *s)
 {
     long datseg;
 
@@ -2362,7 +2347,7 @@ char *s;
 void
 cputs(char *s)
 {
-    register int i = 0;
+    int i = 0;
     while (s[i] != NUL)
 	bdos(0x02, s[i++], NULL);
 }
@@ -2382,9 +2367,7 @@ cgets(char *s)
 
 /* emulate a fgets like input function with DOS cgets */
 char *
-cgets_emu(str, len)
-char *str;
-int len;
+cgets_emu(char *str, int len)
 {
     static char buffer[128] = "";
     static int leftover = 0;
@@ -2418,9 +2401,9 @@ int len;
  * terminals waitforinput() (if USE_MOUSE, and terminal is
  * mouseable). This function will be used when reading from a pipe. */
 static char*
-fgets_ipc(dest, len)
-    char *dest;			/* string to fill */
-    int len;			/* size of it */
+fgets_ipc(
+    char *dest,			/* string to fill */
+    int len)			/* size of it */
 {
 #ifdef USE_MOUSE
     if (term && term->waitforinput) {
@@ -2439,17 +2422,16 @@ fgets_ipc(dest, len)
 	    } else {
 		dest[i] = c;
 	    }
-	} 
+	}
 	return dest;
-    } else 
+    } else
 #endif
 	return fgets(dest, len, stdin);
 }
 
 /* Non-VMS version */
 static int
-read_line(prompt)
-    const char *prompt;
+read_line(const char *prompt)
 {
     int start = 0;
     TBOOLEAN more = FALSE;
@@ -2465,7 +2447,7 @@ read_line(prompt)
 # if defined(READLINE) || defined(HAVE_LIBREADLINE)
 	if (((interactive)
 	     ? rlgets(input_line + start, input_line_len - start,
-		     ((more) ? "> " : prompt)) 
+		     ((more) ? "> " : prompt))
 	     : fgets_ipc(input_line + start, input_line_len - start)
 	    ) == (char *) NULL)
 # else /* !(READLINE || HAVE_LIBREADLINE) */
@@ -2521,8 +2503,8 @@ read_line(prompt)
 #endif /* !VMS */
 
 #ifdef _Windows
-/* there is a system like call on MS Windows but it is a bit difficult to 
-   use, so we will invoke the command interpreter and use it to execute the 
+/* there is a system like call on MS Windows but it is a bit difficult to
+   use, so we will invoke the command interpreter and use it to execute the
    commands */
 static int
 winsystem(const char *s)

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: internal.c,v 1.17 2003/07/22 17:22:47 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: internal.c,v 1.18 2004/04/13 17:23:58 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - internal.c */
@@ -55,7 +55,7 @@ static char *RCSid() { return RCSid("$Id: internal.c,v 1.17 2003/07/22 17:22:47 
 
 
 int
-GP_MATHERR(STRUCT_EXCEPTION_P_X)
+GP_MATHERR( STRUCT_EXCEPTION_P_X )
 {
 #if (defined(ATARI) || defined(MTOS)) && defined(__PUREC__)
     char *c;
@@ -97,8 +97,7 @@ math exception : %s\n\
 #define BAD_DEFAULT default: int_error(NO_CARET, "internal error : type neither INT or CMPLX"); return;
 
 void
-f_push(x)
-    union argument *x;		/* contains pointer to value to push; */
+f_push(union argument *x)
 {
     struct udvt_entry *udv;
 
@@ -112,15 +111,14 @@ f_push(x)
 #ifdef GP_ISVAR
 /* JSR - Like f_push but pushes the defined/undefined status of the argument */
 void
-f_pushv(x)
-    union argument *x;		/* contains pointer to value to push; */
+f_pushv(union argument *x)
 {
     struct udvt_entry *udv;
     struct value a;
 
     udv = x->udv_arg;
 
-    if (udv->udv_undef) 
+    if (udv->udv_undef)
         push(Ginteger(&a, 0));
     else
         push(Ginteger(&a, 1));
@@ -129,32 +127,28 @@ f_pushv(x)
 
 
 void
-f_pushc(x)
-    union argument *x;
+f_pushc(union argument *x)
 {
     push(&(x->v_arg));
 }
 
 
 void
-f_pushd1(x)
-    union argument *x;
+f_pushd1(union argument *x)
 {
     push(&(x->udf_arg->dummy_values[0]));
 }
 
 
 void
-f_pushd2(x)
-    union argument *x;
+f_pushd2(union argument *x)
 {
     push(&(x->udf_arg->dummy_values[1]));
 }
 
 
 void
-f_pushd(x)
-    union argument *x;
+f_pushd(union argument *x)
 {
     struct value param;
     (void) pop(&param);
@@ -162,11 +156,11 @@ f_pushd(x)
 }
 
 
+/* execute a udf */
 void
-f_call(x)			/* execute a udf */
-    union argument *x;
+f_call(union argument *x)
 {
-    register struct udft_entry *udf;
+    struct udft_entry *udf;
     struct value save_dummy;
 
     udf = x->udf_arg;
@@ -181,11 +175,11 @@ f_call(x)			/* execute a udf */
 }
 
 
+/* execute a udf of n variables */
 void
-f_calln(x)			/* execute a udf of n variables */
-    union argument *x;
+f_calln(union argument *x)
 {
-    register struct udft_entry *udf;
+    struct udft_entry *udf;
     struct value save_dummy[MAX_NUM_VAR];
 
     int i;
@@ -225,8 +219,7 @@ f_calln(x)			/* execute a udf of n variables */
 
 
 void
-f_lnot(arg)
-    union argument *arg;
+f_lnot(union argument *arg)
 {
     struct value a;
 
@@ -237,8 +230,7 @@ f_lnot(arg)
 
 
 void
-f_bnot(arg)
-    union argument *arg;
+f_bnot(union argument *arg)
 {
     struct value a;
 
@@ -249,8 +241,7 @@ f_bnot(arg)
 
 
 void
-f_lor(arg)
-    union argument *arg;
+f_lor(union argument *arg)
 {
     struct value a, b;
 
@@ -261,8 +252,7 @@ f_lor(arg)
 }
 
 void
-f_land(arg)
-    union argument *arg;
+f_land(union argument *arg)
 {
     struct value a, b;
 
@@ -274,8 +264,7 @@ f_land(arg)
 
 
 void
-f_bor(arg)
-    union argument *arg;
+f_bor(union argument *arg)
 {
     struct value a, b;
 
@@ -287,8 +276,7 @@ f_bor(arg)
 
 
 void
-f_xor(arg)
-    union argument *arg;
+f_xor(union argument *arg)
 {
     struct value a, b;
 
@@ -300,8 +288,7 @@ f_xor(arg)
 
 
 void
-f_band(arg)
-    union argument *arg;
+f_band(union argument *arg)
 {
     struct value a, b;
 
@@ -313,8 +300,7 @@ f_band(arg)
 
 
 void
-f_uminus(arg)
-    union argument *arg;
+f_uminus(union argument *arg)
 {
     struct value a;
 
@@ -337,12 +323,11 @@ f_uminus(arg)
 
 
 void
-f_eq(arg)
-    union argument *arg;
+f_eq(union argument *arg)
 {
     /* note: floating point equality is rare because of roundoff error! */
     struct value a, b;
-    register int result = 0;
+    int result = 0;
 
     (void) arg;			/* avoid -Wunused warning */
     (void) pop(&b);
@@ -384,11 +369,10 @@ f_eq(arg)
 
 
 void
-f_ne(arg)
-    union argument *arg;
+f_ne(union argument *arg)
 {
     struct value a, b;
-    register int result = 0;
+    int result = 0;
 
     (void) arg;			/* avoid -Wunused warning */
     (void) pop(&b);
@@ -431,11 +415,10 @@ f_ne(arg)
 
 
 void
-f_gt(arg)
-    union argument *arg;
+f_gt(union argument *arg)
 {
     struct value a, b;
-    register int result = 0;
+    int result = 0;
 
     (void) arg;			/* avoid -Wunused warning */
     (void) pop(&b);
@@ -474,11 +457,10 @@ f_gt(arg)
 
 
 void
-f_lt(arg)
-    union argument *arg;
+f_lt(union argument *arg)
 {
     struct value a, b;
-    register int result = 0;
+    int result = 0;
 
     (void) arg;			/* avoid -Wunused warning */
     (void) pop(&b);
@@ -517,11 +499,10 @@ f_lt(arg)
 
 
 void
-f_ge(arg)
-    union argument *arg;
+f_ge(union argument *arg)
 {
     struct value a, b;
-    register int result = 0;
+    int result = 0;
 
     (void) arg;			/* avoid -Wunused warning */
     (void) pop(&b);
@@ -560,11 +541,10 @@ f_ge(arg)
 
 
 void
-f_le(arg)
-    union argument *arg;
+f_le(union argument *arg)
 {
     struct value a, b;
-    register int result = 0;
+    int result = 0;
 
     (void) arg;			/* avoid -Wunused warning */
     (void) pop(&b);
@@ -603,8 +583,7 @@ f_le(arg)
 
 
 void
-f_plus(arg)
-    union argument *arg;
+f_plus(union argument *arg)
 {
     struct value a, b, result;
 
@@ -649,8 +628,7 @@ f_plus(arg)
 
 
 void
-f_minus(arg)
-    union argument *arg;
+f_minus(union argument *arg)
 {
     struct value a, b, result;
 
@@ -695,8 +673,7 @@ f_minus(arg)
 
 
 void
-f_mult(arg)
-    union argument *arg;
+f_mult(union argument *arg)
 {
     struct value a, b, result;
 
@@ -748,11 +725,10 @@ f_mult(arg)
 
 
 void
-f_div(arg)
-    union argument *arg;
+f_div(union argument *arg)
 {
     struct value a, b, result;
-    register double square;
+    double square;
 
     (void) arg;			/* avoid -Wunused warning */
     (void) pop(&b);
@@ -831,8 +807,7 @@ f_div(arg)
 
 
 void
-f_mod(arg)
-    union argument *arg;
+f_mod(union argument *arg)
 {
     struct value a, b;
 
@@ -852,12 +827,11 @@ f_mod(arg)
 
 
 void
-f_power(arg)
-    union argument *arg;
+f_power(union argument *arg)
 {
     struct value a, b, result;
-    register int i, t, count;
-    register double mag, ang;
+    int i, t, count;
+    double mag, ang;
 
     (void) arg;			/* avoid -Wunused warning */
     (void) pop(&b);
@@ -965,12 +939,11 @@ f_power(arg)
 
 
 void
-f_factorial(arg)
-    union argument *arg;
+f_factorial(union argument *arg)
 {
     struct value a;
-    register int i;
-    register double val = 0.0;
+    int i;
+    double val = 0.0;
 
     (void) arg;			/* avoid -Wunused warning */
     (void) pop(&a);		/* find a! (factorial) */

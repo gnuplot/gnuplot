@@ -1,5 +1,5 @@
-/*
- * $Id: x11.trm,v 1.112 2004/05/25 04:14:53 sfeam Exp $
+/* Hello, Emacs, this is -*-C-*-
+ * $Id: x11.trm,v 1.113 2004/06/07 05:33:00 sfeam Exp $
  *
  */
 
@@ -43,7 +43,7 @@
  * Implementation and functionality is based on pm.trm
  */
 
-/* X11 support for Petr Mikulik's pm3d 
+/* X11 support for Petr Mikulik's pm3d
  * by Johannes Zellner <johannes@zellner.org>
  * (November 1999 - January 2000)
  */
@@ -271,7 +271,7 @@ parse_driver(const char *cmd)
 	else
 	    sprintf(X11_full_command_path, "%s", optvec[0]);
     }
-	       
+
     return nr;
 }
 
@@ -519,7 +519,7 @@ X11_options()
 
 #ifdef USE_MOUSE
 TERM_PUBLIC void
-X11_update_opts(void)
+X11_update_opts()
 {
     if (X11_ipc && (UNSET != do_raise || UNSET != persist)) {
 	fprintf(X11_ipc, "X %d %d\n", do_raise, persist);
@@ -533,7 +533,7 @@ X11_update_opts(void)
  *   Three different versions of the remainder of the X11 terminal driver
  *   are provided to support three different types of IPC with the
  *   gnuplot_x11 outboard terminal driver:
- * 
+ *
  *   DEFAULT_X11:      popen() pipe for most un*x platforms
  *
  *   CRIPPLED_SELECT : file IPC for un*x platforms with incomplete or faulty
@@ -702,7 +702,7 @@ X11_init()
 	 * freshly built gnuplot until 'make install' */
 
    	   X11_ipc = popen(X11_command, "w");
-#else 
+#else
 #if defined(OS2)
       /* FIXME amai 20020219: nice try...
        * But popen() does return a non-NULL handle to almost command,
@@ -737,7 +737,7 @@ X11_init()
 	    } else {
 		char **ptr;
 		for (ptr = optvec; ptr && *ptr; ptr++)
-		    ;		/* do nothing: skip over set arguments */ 
+		    ;		/* do nothing: skip over set arguments */
 		/* tell the driver not to supply any events by
 		 * appending "-noevents" to the optvec list. */
 		*ptr = noevents;
@@ -947,7 +947,7 @@ X11_init()
 	pgmdsc.dsc$w_length = cmdp - cmdline;
 	pgmdsc.dsc$a_pointer = cmdline;
 
-	/* Create a mailbox which will be used as a pipe for commands to the 
+	/* Create a mailbox which will be used as a pipe for commands to the
 	 * subprocess.  What we'll write to it will be read by the subprocess
 	 * as its STDIN.  Use an unnamed mailbox and refer to it by its device
 	 * number */
@@ -985,7 +985,7 @@ X11_init()
 }
 
 
-/*   We use $QIO in order to avoid buffering problems, although it might 
+/*   We use $QIO in order to avoid buffering problems, although it might
  *   work  as well with simple Fprintf calls.
  */
 
@@ -1099,7 +1099,7 @@ X11_graphics()
     }
 #endif
     /* Force default font at start of plot */
-    X11_set_default_font(); 
+    X11_set_default_font();
     X11_set_font("");
 }
 
@@ -1117,29 +1117,29 @@ X11_text()
 	/* Construct a mask showing which axes are active */
 	int axis_mask = 0;
 	int i;
-	
+
 	for (i = FIRST_AXES; i < 2*SECOND_AXES; i++) {
 	    if (axis_array[i].ticmode != NO_TICS)
 		axis_mask |= (1 << i);
 	}
 	PRINT2("S %2d %d\n", -1, axis_mask);
 	PRINT5("S %2d %14.3g %14d %14.3g %14.3g\n", FIRST_X_AXIS,
-		axis_array[FIRST_X_AXIS].min, 
+		axis_array[FIRST_X_AXIS].min,
 		axis_array[FIRST_X_AXIS].term_lower,
 		axis_array[FIRST_X_AXIS].term_scale,
 		axis_array[FIRST_X_AXIS].log ? axis_array[FIRST_X_AXIS].log_base : 0);
 	PRINT5("S %2d %14.3g %14d %14.3g %14.3g\n", FIRST_Y_AXIS,
-		axis_array[FIRST_Y_AXIS].min, 
+		axis_array[FIRST_Y_AXIS].min,
 		axis_array[FIRST_Y_AXIS].term_lower,
 		axis_array[FIRST_Y_AXIS].term_scale,
 		axis_array[FIRST_Y_AXIS].log ? axis_array[FIRST_Y_AXIS].log_base : 0);
 	PRINT5("S %2d %14.3g %14d %14.3g %14.3g\n", SECOND_X_AXIS,
-		axis_array[SECOND_X_AXIS].min, 
+		axis_array[SECOND_X_AXIS].min,
 		axis_array[SECOND_X_AXIS].term_lower,
 		axis_array[SECOND_X_AXIS].term_scale,
 		axis_array[SECOND_X_AXIS].log ? axis_array[SECOND_X_AXIS].log_base : 0);
 	PRINT5("S %2d %14.3g %14d %14.3g %14.3g\n", SECOND_Y_AXIS,
-		axis_array[SECOND_Y_AXIS].min, 
+		axis_array[SECOND_Y_AXIS].min,
 		axis_array[SECOND_Y_AXIS].term_lower,
 		axis_array[SECOND_Y_AXIS].term_scale,
 		axis_array[SECOND_Y_AXIS].log ? axis_array[SECOND_Y_AXIS].log_base : 0);
@@ -1295,9 +1295,9 @@ static void transmit_gradient( gradient_struct *gradient, int cnt )
     fprintf( X11_ipc, "%d", cnt );
     for( i=0; i<cnt; i++ ) {
         /* this %50 *must* match the corresponding %50 in gplt_x11.c  */
-        if( i%50 == 0 ) { 
-	    fputs( "\n", X11_ipc ); 
-	    fflush( X11_ipc ); 
+        if( i%50 == 0 ) {
+	    fputs( "\n", X11_ipc );
+	    fflush( X11_ipc );
 	}
 	fprintf( X11_ipc, "%s", gradient_entry_to_str( &(gradient[i]) ) );
     }
@@ -1311,26 +1311,26 @@ X11_make_palette(t_sm_palette *palette)
     if( !palette ) {
         return 0;
     }
-    
+
     if( !X11_ipc ) {
 	    fprintf(stderr, "(X11_make_palette) 0 == X11_ipc\n");
 	    return -1;
 	}
-    
+
     fprintf( X11_ipc, "%c %c %c %c %d\n",
-	     X11_GR_MAKE_PALETTE, (char)(palette->colorMode), 
+	     X11_GR_MAKE_PALETTE, (char)(palette->colorMode),
 	     (char)(palette->positive), (char)(palette->cmodel),
 	     palette->use_maxcolors );
-    
+
     switch( palette->colorMode ) {
-    case SMPAL_COLOR_MODE_GRAY:  
+    case SMPAL_COLOR_MODE_GRAY:
         fprintf( X11_ipc,"%g\n", palette->gamma );
         break;
     case SMPAL_COLOR_MODE_RGB:
         fprintf( X11_ipc, "%d %d %d\n", palette->formulaR,
 		 palette->formulaG, palette->formulaB );
 	break;
-    case SMPAL_COLOR_MODE_GRADIENT: 
+    case SMPAL_COLOR_MODE_GRADIENT:
         transmit_gradient( palette->gradient, palette->gradient_num );
 	break;
     case SMPAL_COLOR_MODE_FUNCTIONS: {
@@ -1392,7 +1392,7 @@ X11_filled_polygon(int points, gpiPoint *corners)
  * PROBLEMS:
  *	- The default font must be scalable
  *	- Without more feedback from the outboard driver (gnuplot_x11) it is
- *	  hard to set up proper text rotation. The current approximation is so-so. 
+ *	  hard to set up proper text rotation. The current approximation is so-so.
  *	- Right- and Center- justified text is problematic for the same reason.
  *	- The default font size is not really known, and font scaling
  *	  in general could be improved
@@ -1408,11 +1408,11 @@ static double ENHx11_fontsize;
 static char  *ENHx11_font;
 
 TERM_PUBLIC void
-ENHX11_OPEN(fontname, fontsize, base, widthflag, showflag, overprint)
-    char *fontname;
-    TBOOLEAN widthflag, showflag;
-    double fontsize, base;
-    int overprint;
+ENHX11_OPEN(
+    char *fontname,
+    double fontsize, double base,
+    TBOOLEAN widthflag, TBOOLEAN showflag,
+    int overprint)
 {
     /* If the overprint code requests a save or request, that's all we do */
     if (overprint == 3) {
@@ -1465,13 +1465,11 @@ ENHX11_FLUSH()
 }
 
 TERM_PUBLIC void
-ENHX11_put_text(x, y, str)
-    unsigned int x, y;
-    const char *str;
+ENHX11_put_text(unsigned int x, unsigned int y, const char *str)
 {
     char *original_string = (char *)str;
     int pass = 1;
-    
+
     if (ignore_enhanced_text) {
 	X11_put_text(x,y,str);
 	return;
@@ -1519,8 +1517,8 @@ PASS2:
      * closing brace in the string. We increment past it (else
      * we get stuck in an infinite loop) and try again.
      */
-    while (*(str = enhanced_recursion((char *)str, TRUE, 
-    			ENHx11_font, ENHx11_fontsize, 
+    while (*(str = enhanced_recursion((char *)str, TRUE,
+    			ENHx11_font, ENHx11_fontsize,
 			0.0, TRUE, TRUE, 0))) {
 	(term->enhanced_flush)();
 
@@ -1543,7 +1541,7 @@ PASS2:
     /* uses information stored by gnuplot_x11 during the first pass.      */
     if (X11_last_justification != LEFT) {
 	ENHx11_sizeonly = FALSE;
-	
+
 	if (X11_last_justification == RIGHT) {
 		PRINT2("Tj%04d%04d\n", x, y);
 	} else if (X11_last_justification == CENTRE) {
@@ -1552,7 +1550,7 @@ PASS2:
 	str = original_string;
 	pass = 2;
 	goto PASS2;
-	
+
     }
 
 }
@@ -1660,7 +1658,7 @@ START_HELP(x11)
 " The gnuplot outboard driver, gnuplot_x11, is searched in a default place",
 " chosen when the program is compiled.  You can override that by defining",
 " the environment variable GNUPLOT_DRIVER_DIR to point to a different",
-" location.",    
+" location.",
 "",
 " Plot windows will automatically be closed at the end of the session",
 " unless the `-persist` option was given.",
@@ -1868,7 +1866,7 @@ START_HELP(x11)
 " Examples:",
 "",
 "       gnuplot -background coral",
-" to change the background color.", 
+" to change the background color.",
 "",
 "       gnuplot -xrm 'gnuplot*line1Color:blue'",
 " to override the first linetype color.",

@@ -1,12 +1,12 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: pgnuplot.c,v 1.10 2004/02/12 09:08:40 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: pgnuplot.c,v 1.11 2004/04/13 17:24:06 broeker Exp $"); }
 #endif
 
 /*
  * pgnuplot.c -- pipe stdin to wgnuplot
- * 
+ *
  * Version 0.4 -- October 2002
- * 
+ *
  * This program is based on pgnuplot.c Copyright (C) 1999 Hans-Bernhard Broeker
  * with substantial modifications Copyright (C) 1999 Craig R. Schardt.
  *
@@ -64,7 +64,7 @@ static char *RCSid() { return RCSid("$Id: pgnuplot.c,v 1.10 2004/02/12 09:08:40 
  */
 
 /*	Modifications by Craig R. Schardt (17 Jun 1999)
-		
+
 	Copyright (C) 1999 by Craig R. Schardt (craig@silica.mse.ufl.edu)
 
 	Major changes: (See the explanation below for more information)
@@ -72,32 +72,32 @@ static char *RCSid() { return RCSid("$Id: pgnuplot.c,v 1.10 2004/02/12 09:08:40 
 		+ If stdin isn't redirected then start wgnuplot and give it focus.
 		+ Uses CreateProcess() instead of WinExec() to start wgnuplot when stdin
 		  is redirected.
-	
+
 	Other changes:
 		+ New technique for building the command line to pass to wgnuplot.exe
-		  which is less complicated and seems to work more reliably than the old 
+		  which is less complicated and seems to work more reliably than the old
 		  technique.
-		+ Simplified message passing section of the code. 
-		+ All printf(...) statements are now fprintf(stderr,...) so that errors 
+		+ Simplified message passing section of the code.
+		+ All printf(...) statements are now fprintf(stderr,...) so that errors
 		  are sent to the console, even if stdout is redirected.
 
 	The previous version of pgnuplot would fail when more than one program
 	tried to access wgnuplot simultaneously or when one program tried to start
 	more than one wgnuplot session. Only a single instance of wgnuplot would be
 	started and all input would be sent to that instance. When two or more programs
-	tried to pipe input to wgnuplot, the two seperate input streams would be sent 
+	tried to pipe input to wgnuplot, the two seperate input streams would be sent
 	to one wgnuplot window resulting in one very confused copy of wgnuplot. The only
-	way to avoid this problem was to change pgnuplot so that it would start a 
+	way to avoid this problem was to change pgnuplot so that it would start a
 	new instance of wgnuplot every time.
 
 	Just starting a new instance of wgnuplot isn't enough. pgnuplot must also
-	make sure that the data on each stdin pipe is sent to the proper wgnuplot 
-	instance. This is achieved by using CreateProcess() which returns a handle 
-	to the newly created process. Once the process has initialized, it can be 
-	searched for the text window and then data can be routed correctly. The search 
-	is carried out by the EnumThreadWindows() call and the data passing is carried 
-	out by a rewritten version of the original code. With these changes, pgnuplot 
-	now behaves in a manner consistent with the behavior of gnuplot on UNIX 
+	make sure that the data on each stdin pipe is sent to the proper wgnuplot
+	instance. This is achieved by using CreateProcess() which returns a handle
+	to the newly created process. Once the process has initialized, it can be
+	searched for the text window and then data can be routed correctly. The search
+	is carried out by the EnumThreadWindows() call and the data passing is carried
+	out by a rewritten version of the original code. With these changes, pgnuplot
+	now behaves in a manner consistent with the behavior of gnuplot on UNIX
 	computers.
 
 	This program has been compiled using Microsoft Visual C++ 4.0 with the
@@ -108,22 +108,22 @@ static char *RCSid() { return RCSid("$Id: pgnuplot.c,v 1.10 2004/02/12 09:08:40 
 	The resulting program has been tested on WinNT and Win98 both by calling
 	it directly from the command line with and without redirected input. The
 	program also works on WinNT with a modified version of Gnuplot.py (a script
-	for interactive control of Gnuplot from Python). 
-	
+	for interactive control of Gnuplot from Python).
+
 	22 JUN 1999:
 	+ Fixed command line code to behave properly when the first
 	  item is quoted in the original command line.
-	
+
 	29 JUN 1999:
 	+ Added some code to print the command line. This is for testing
-	  only and should be removed before the general release. To enable, 
+	  only and should be removed before the general release. To enable,
 	  compile with SHOWCMDLINE defined.
 
 	30 JUN 1999:
 	+ New function FindUnquotedSpace() which replaces the earlier technique for
 	  finding the command line arguments to send on to wgnuplot. Prior to this
 	  the arguments were assumed to start after argv[0], however argv[0] is not
-	  set the same by all combinitaions of compiler, command processor, and OS. 
+	  set the same by all combinitaions of compiler, command processor, and OS.
 	  The new method ignores argv completely and manually search the command line
 	  string for the first space which isn't enclosed in double-quotes.
 
@@ -149,8 +149,8 @@ static char *RCSid() { return RCSid("$Id: pgnuplot.c,v 1.10 2004/02/12 09:08:40 
 #define PROGNAME "wgnuplot.exe"
 /* CRS: The value given above will work correctly as long as pgnuplot.exe
  * is in the same directory as wgnuplot.exe or the directory containing
- * wgnuplot.exe is included in the path. I would recommend placing the 
- * pgnuplot.exe executable in the same directory as wgnuplot.exe and 
+ * wgnuplot.exe is included in the path. I would recommend placing the
+ * pgnuplot.exe executable in the same directory as wgnuplot.exe and
  * leaving this definition alone.
  */
 
@@ -165,8 +165,8 @@ static char *RCSid() { return RCSid("$Id: pgnuplot.c,v 1.10 2004/02/12 09:08:40 
 HWND hwndParent = NULL;
 HWND hwndText = NULL;
 
-PROCESS_INFORMATION piProcInfo; 
-STARTUPINFO         siStartInfo; 
+PROCESS_INFORMATION piProcInfo;
+STARTUPINFO         siStartInfo;
 
 /* CRS: Callback for the EnumThreadWindows function */
 BOOL CALLBACK cbGetTextWindow(HWND  hwnd, LPARAM  lParam )
@@ -186,15 +186,15 @@ void PostString(HWND hwnd, char *pc)
 {
 	while( *pc ){
 		PostMessage( hwnd, WM_CHAR, *pc, 1L );
-		/* CRS: should add a check of return code on PostMessage. If 0, the 
+		/* CRS: should add a check of return code on PostMessage. If 0, the
 		   message que was full and the message wasn't posted. */
 		pc++;
 	}
 }
 
 /* FindUnquotedSpace(): Search a string for the first space not enclosed in quotes.
- *   Returns a pointer to the space, or the empty string if no space is found. 
- *   -CRS 30061999  
+ *   Returns a pointer to the space, or the empty string if no space is found.
+ *   -CRS 30061999
  */
 char* FindUnquotedSpace( char *pc )
 {
@@ -216,7 +216,7 @@ int main (int argc, char *argv[])
 	LPTSTR  psCmdLine;
 	BOOL    bSuccess;
 	int	i;
-	
+
 #if !defined(_O_BINARY) && defined(O_BINARY)
 # define _O_BINARY O_BINARY
 # define _setmode setmode /* this is for BC4.5 ... */
@@ -257,7 +257,7 @@ int main (int argc, char *argv[])
 	fprintf(stderr,"argv[0]: %s\n",argv[0]);
 #endif
 
-	/* CRS 30061999: Search for the first unquoted space. This should 
+	/* CRS 30061999: Search for the first unquoted space. This should
 	   separate the program name from the arguments. */
 	psCmdLine = FindUnquotedSpace( psCmdLine );
 
@@ -274,21 +274,21 @@ int main (int argc, char *argv[])
 		if ( WinExec(psGnuplotCommandLine, SW_SHOWDEFAULT) > 31 ){
 			exit(EXIT_SUCCESS);
 		}
-		fprintf(stderr,"ERROR %u: Couldn't execute: \"%s\"\n", 
+		fprintf(stderr,"ERROR %u: Couldn't execute: \"%s\"\n",
 			    GetLastError(), psGnuplotCommandLine);
 		exit(EXIT_FAILURE);
 	}
 
-	/* CRS: initialize the STARTUPINFO and call CreateProcess(). */ 
-	siStartInfo.cb = sizeof(STARTUPINFO); 
-	siStartInfo.lpReserved = NULL; 
-	siStartInfo.lpReserved2 = NULL; 
-	siStartInfo.cbReserved2 = 0; 
-	siStartInfo.lpDesktop = NULL; 
+	/* CRS: initialize the STARTUPINFO and call CreateProcess(). */
+	siStartInfo.cb = sizeof(STARTUPINFO);
+	siStartInfo.lpReserved = NULL;
+	siStartInfo.lpReserved2 = NULL;
+	siStartInfo.cbReserved2 = 0;
+	siStartInfo.lpDesktop = NULL;
 	siStartInfo.dwFlags = STARTF_USESHOWWINDOW;
 	siStartInfo.wShowWindow = SW_SHOWMINIMIZED;
 
-	bSuccess = CreateProcess( 
+	bSuccess = CreateProcess(
 			NULL,                   /* pointer to name of executable module   */
 			psGnuplotCommandLine,   /* pointer to command line string         */
 			NULL,                   /* pointer to process security attributes */
@@ -303,7 +303,7 @@ int main (int argc, char *argv[])
 
 	/* if CreateProcess() failed, print a warning and exit. */
 	if ( ! bSuccess ) {
-		fprintf(stderr,"ERROR %u: Couldn't execute: \"%s\"\n", 
+		fprintf(stderr,"ERROR %u: Couldn't execute: \"%s\"\n",
 						GetLastError(), psGnuplotCommandLine);
 		exit(EXIT_FAILURE);
 	}
@@ -332,7 +332,7 @@ int main (int argc, char *argv[])
 	while ( fgets(psBuffer, BUFFER_SIZE, stdin) != NULL ) {
 		PostString(hwndText, psBuffer);
 	}
-	
+
 	/* exit gracefully */
 	/* CRS: Add a test to see if gnuplot is still running? */
 	PostString(hwndText, "\nexit\n");

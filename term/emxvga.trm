@@ -1,5 +1,5 @@
-/*
- * $Id: emxvga.trm,v 1.11 2002/07/26 16:42:29 mikulik Exp $
+/* Hello, Emacs, this is -*-C-*-
+ * $Id: emxvga.trm,v 1.12 2004/04/13 17:24:16 broeker Exp $
  */
 
 /* GNUPLOT - emxvga.trm */
@@ -49,7 +49,7 @@
  * with additions by David J. Liu (liudj0@minerva.cis.yale.edu)
  * supports VESA, Trident, Cirrus, ET4000, WD and S3.
  */
-/* 
+/*
  * adapted to the new terminal layout by Stefan Bodewig (Dec. 1995)
  */
 
@@ -273,10 +273,7 @@ unsigned char font[128][8] =
 void g_set(int x, int y, int color);	/* part of SVGA */
 
 void
-g_string(x0, y0, color, angle, s)
-/* upper left corner of text, color and angle */
-int x0, y0, color, angle;
-char *s;
+g_string(int x0, int y0, int color, int angle, char *s)
 {
     int i, j, k;
     float sa, ca, x, y;
@@ -336,23 +333,20 @@ EMXVGA_graphics()
 }
 
 TERM_PUBLIC void
-EMXVGA_linetype(linetype)
-int linetype;
+EMXVGA_linetype(int linetype)
 {
     EMXVGA_color = vgacolor[(linetype % 13) + 2];
 }
 
 TERM_PUBLIC void
-EMXVGA_move(x, y)
-unsigned int x, y;
+EMXVGA_move(unsigned int x, unsigned int y)
 {
     startx = x;
     starty = y;
 }
 
 TERM_PUBLIC void
-EMXVGA_vector(x, y)
-unsigned int x, y;
+EMXVGA_vector(unsigned int x, unsigned int y)
 {
     g_line(startx, lasty - starty, x, lasty - y, EMXVGA_color);
     startx = x;
@@ -360,17 +354,14 @@ unsigned int x, y;
 }
 
 TERM_PUBLIC int
-EMXVGA_text_angle(ang)
-int ang;
+EMXVGA_text_angle(int ang)
 {
     EMXVGA_angle = (ang ? 90 : 0);
     return (TRUE);
 }
 
 TERM_PUBLIC void
-EMXVGA_put_text(x, y, str)
-unsigned int x, y;
-const char *str;
+EMXVGA_put_text(unsigned int x, unsigned int y, const char *str)
 {
     g_string(x, lasty - y - 3, EMXVGA_color, EMXVGA_angle, str);
 }

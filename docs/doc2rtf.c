@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: doc2rtf.c,v 1.12 2003/02/18 16:38:08 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: doc2rtf.c,v 1.13 2004/04/13 17:23:30 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - doc2rtf.c */
@@ -40,7 +40,7 @@ static char *RCSid() { return RCSid("$Id: doc2rtf.c,v 1.12 2003/02/18 16:38:08 b
  *
  * This involves stripping all lines with a leading digit or
  * a leading @, #, or %.
- * Modified by Maurice Castro from doc2gih.c by Thomas Williams 
+ * Modified by Maurice Castro from doc2gih.c by Thomas Williams
  *
  * usage:  doc2rtf file.doc file.rtf [-d]
  *

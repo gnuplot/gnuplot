@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.101 2004/06/17 20:44:37 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.102 2004/06/21 03:58:52 sfeam Exp $"); }
 #endif
 
 #define X11_POLYLINE 1
@@ -49,9 +49,9 @@ static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.101 2004/06/17 20:44:37
  *
  *   Requires installation of companion inboard x11 driver in gnuplot/term.c
  *
- *   Acknowledgements: 
+ *   Acknowledgements:
  *      Chris Peterson (MIT)
- *      Dana Chee (Bellcore) 
+ *      Dana Chee (Bellcore)
  *      Arthur Smith (Cornell)
  *      Hendri Hondorp (University of Twente, The Netherlands)
  *      Bill Kucharski (Solbourne)
@@ -63,7 +63,7 @@ static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.101 2004/06/17 20:44:37
  *   This code is provided as is and with no warranties of any kind.
  *
  * drd: change to allow multiple windows to be maintained independently
- *       
+ *
  *---------------------------------------------------------------------------*/
 
 /* drd : export the graph via ICCCM primary selection. well... not quite
@@ -72,7 +72,7 @@ static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.101 2004/06/17 20:44:37
  */
 
 /*lph: add a "feature" to undefine EXPORT_SELECTION
-   The following makes EXPORT_SELECTION the default and 
+   The following makes EXPORT_SELECTION the default and
    defining NOEXPORT over-rides the default
  */
 
@@ -82,12 +82,12 @@ static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.101 2004/06/17 20:44:37
  * of mouse patches. (November 1999) (See also mouse.[ch]).
  */
 
-/* X11 support for Petr Mikulik's pm3d 
+/* X11 support for Petr Mikulik's pm3d
  * by Johannes Zellner <johannes@zellner.org>
  * (November 1999 - January 2000, Oct. 2000)
  */
 
-/* Polyline support May 2003 
+/* Polyline support May 2003
  * Ethan Merritt <merritt@u.washington.edu>
  */
 
@@ -289,7 +289,7 @@ typedef struct plot_struct {
     int xLast, yLast;
     /* Saved text position  - used by enhanced text mode */
     int xSave, ySave;
-    
+
     struct plot_struct *prev_plot;  /* Linked list pointers and number */
     struct plot_struct *next_plot;
     int plot_number;
@@ -331,7 +331,7 @@ static char selection[SEL_LEN] = "";
 #ifdef USE_MOUSE
 # define GRAPH_HEIGHT(plot)  ((plot)->gheight)
 # define PIXMAP_HEIGHT(plot)  ((plot)->gheight + vchar)
-  /* note: PIXMAP_HEIGHT is the height of the plot including the status line, 
+  /* note: PIXMAP_HEIGHT is the height of the plot including the status line,
      even if the latter is not enabled right now */
 #else
 # define GRAPH_HEIGHT(plot)  ((plot)->height)
@@ -385,7 +385,7 @@ static TBOOLEAN is_meta __PROTO((KeySym));
 static char* __PROTO((getMultiTabConsoleSwitchCommand(unsigned long *)));
 #endif
 
-static void DrawRotated __PROTO((plot_struct *, Display *, GC, 
+static void DrawRotated __PROTO((plot_struct *, Display *, GC,
 				 int, int, const char *, int));
 static int DrawRotatedErrorHandler __PROTO((Display *, XErrorEvent *));
 static void exec_cmd __PROTO((plot_struct *, char *));
@@ -683,16 +683,16 @@ main(int argc, char *argv[])
  *
  *   Three different versions of main loop processing are provided to support
  *   three different platforms.
- * 
- *   DEFAULT_X11:     use select() for both X events and input on stdin 
+ *
+ *   DEFAULT_X11:     use select() for both X events and input on stdin
  *                    from gnuplot inboard driver
  *
- *   CRIPPLED_SELECT: use select() to service X events and check during 
+ *   CRIPPLED_SELECT: use select() to service X events and check during
  *                    select timeout for temporary plot file created
  *                    by inboard driver
  *
  *   VMS:             use XNextEvent to service X events and AST to
- *                    service input from gnuplot inboard driver on stdin 
+ *                    service input from gnuplot inboard driver on stdin
  *---------------------------------------------------------------------------*/
 
 
@@ -1063,7 +1063,7 @@ prepare_plot(plot_struct *plot, int term_number)
     }
 /* We don't know that it is the same window as before, so we reset the
  * cursors for all windows and then define the cursor for the active
- * window 
+ * window
  */
     /* allow releasing of the cmap at the first drawing
      * operation if no palette was allocated until then.
@@ -1160,13 +1160,13 @@ gnuplot: X11 aborted.\n", stderr);
 
 
 #ifdef PM3D
-/*  
+/*
  * This function builds back a palette from what x11.trm has written
  * into the pipe.  It cheats:  SMPAL_COLOR_MODE_FUNCTIONS for user defined
  * formulaes to transform gray into the three color components is not
  * implemented.  If this had to be done, one would have to include all
  * the code for evaluating functions here too, and, even worse: how to
- * transmit all function definition from gnuplot to here! 
+ * transmit all function definition from gnuplot to here!
  * To avoid this, the following is done:  For grayscale, and rgbformulae
  * everything is easy.  Gradients are more difficult: Each gradient point
  * is encoded in a 8-byte string (which does not include any '\n' and
@@ -1177,7 +1177,7 @@ gnuplot: X11 aborted.\n", stderr);
  * than used in the palette.
  *
  * This function belongs completely into record(), but is quiet large so it
- * became a function of its own.  
+ * became a function of its own.
 */
 static void
 scan_palette_from_buf( plot_struct *plot )
@@ -1186,12 +1186,12 @@ scan_palette_from_buf( plot_struct *plot )
     char cm, pos, mod;
     if (4 != sscanf( buf+2, "%c %c %c %d", &cm, &pos, &mod,
 		     &(tpal.use_maxcolors) ) ) {
-        fprintf( stderr, "%s:%d error in setting palette.\n", 
+        fprintf( stderr, "%s:%d error in setting palette.\n",
 		 __FILE__, __LINE__);
-	
+
 	return;
-    } 
-    
+    }
+
     tpal.colorMode = cm;
     tpal.positive = pos;
     tpal.cmodel = mod;
@@ -1201,10 +1201,10 @@ scan_palette_from_buf( plot_struct *plot )
       tpal.colorMode = SMPAL_COLOR_MODE_GRADIENT;
 
     switch( tpal.colorMode ) {
-    case SMPAL_COLOR_MODE_GRAY:  
+    case SMPAL_COLOR_MODE_GRAY:
 	read_input();  /*  FIXME: discarding status  */
 	if (1 != sscanf( buf, "%lf", &(tpal.gamma) )) {
-	    fprintf( stderr, "%s:%d error in setting palette.\n", 
+	    fprintf( stderr, "%s:%d error in setting palette.\n",
 		     __FILE__, __LINE__);
 	    return;
 	}
@@ -1213,7 +1213,7 @@ scan_palette_from_buf( plot_struct *plot )
 	read_input();  /*  FIXME: discarding status  */
 	if (3 != sscanf( buf, "%d %d %d", &(tpal.formulaR),
 			 &(tpal.formulaG), &(tpal.formulaB) )) {
-	    fprintf( stderr, "%s:%d error in setting palette.\n", 
+	    fprintf( stderr, "%s:%d error in setting palette.\n",
 		     __FILE__, __LINE__);
 	    return;
 	}
@@ -1222,7 +1222,7 @@ scan_palette_from_buf( plot_struct *plot )
 	int i=0;
 	read_input();  /*  FIXME: discarding status  */
 	if (1 != sscanf( buf, "%d", &(tpal.gradient_num) )) {
-	    fprintf( stderr, "%s:%d error in setting palette.\n", 
+	    fprintf( stderr, "%s:%d error in setting palette.\n",
 		     __FILE__, __LINE__);
 	    return;
 	}
@@ -1231,14 +1231,14 @@ scan_palette_from_buf( plot_struct *plot )
 	for( i=0; i<tpal.gradient_num; i++ ) {
 	    /*  this %50 *must* match the amount of gradient structs
 		written to the pipe by x11.trm!  */
-	    if (i%50 == 0) {  
+	    if (i%50 == 0) {
 	        read_input();  /*  FIXME: discarding status  */
 	    }
 	    str_to_gradient_entry( &(buf[8*(i%50)]), &(tpal.gradient[i]) );
 	}
 	break;
       }
-    case SMPAL_COLOR_MODE_FUNCTIONS: 
+    case SMPAL_COLOR_MODE_FUNCTIONS:
         fprintf( stderr, "%s:%d ooops: No function palettes for x11!\n",
 		 __FILE__, __LINE__ );
 	break;
@@ -1551,7 +1551,7 @@ record()
 	    return 1;
 #endif
 #ifdef USE_MOUSE
-	case 'Q':		
+	case 'Q':
 	    /* Set default font immediately and return size info through pipe */
 	    if (buf[1] == 'G') {
 		int scaled_hchar, scaled_vchar;
@@ -1566,9 +1566,9 @@ record()
 		    yscale = (plot->height > 0) ? plot->height / 4096. : gH / 4096.;
 		    scaled_hchar = (1.0/xscale) * hchar;
 		    scaled_vchar = (1.0/yscale) * vchar;
-		    FPRINTF((stderr,"gplt_x11: preset default font to %s hchar = %d vchar = %d \n", 
+		    FPRINTF((stderr,"gplt_x11: preset default font to %s hchar = %d vchar = %d \n",
 			     default_font, scaled_hchar, scaled_vchar));
-		    gp_exec_event(GE_fontprops, plot->width, plot->height, 
+		    gp_exec_event(GE_fontprops, plot->width, plot->height,
 				  scaled_hchar, scaled_vchar);
 		}
 		return 1;
@@ -1615,7 +1615,7 @@ record()
 	    break;
 	}
     case 'E':			/* leave graphics mode */
-	if (plot) 
+	if (plot)
 	    display(plot);
 	break;
     case 'R':			/* exit x11 mode */
@@ -1764,7 +1764,7 @@ DrawRotated(plot_struct *plot, Display *dpy, GC gc, int xdest, int ydest,
     /* grab the current screen area where the new text will go */
     s = XGetWindowAttributes(dpy, w, &win_attrib);
     /* compute screen coords that are within the current window */
-    xscr = (xdest<0)? 0 : xdest; 
+    xscr = (xdest<0)? 0 : xdest;
     yscr = (ydest<0)? 0 : ydest;;
     scr_width = dest_width; scr_height = dest_height;
     if (xscr + dest_width > win_attrib.width){
@@ -2073,7 +2073,7 @@ exec_cmd(plot_struct *plot, char *command)
 	plot->lt = (plot->lt % 8) + 2;
 	if (plot->lt < 0) /* LT_NODRAW, LT_BACKGROUND, LT_UNDEFINED */
 	    plot->lt = -3;
-	
+
 	/* default width is 0 {which X treats as 1} */
 	plot->lwidth = widths[plot->lt] ? plot->user_width * widths[plot->lt] : plot->user_width;
 	if (dashes[plot->lt][0]) {
@@ -2626,13 +2626,13 @@ PaletteMake(plot_struct * plot, t_sm_palette * tpal)
     else
 	max_colors = maximal_possible_colors;
 
-    if (minimal_possible_colors < max_colors) 
-        min_colors = minimal_possible_colors; 
+    if (minimal_possible_colors < max_colors)
+        min_colors = minimal_possible_colors;
     else
         min_colors = max_colors / (num_colormaps > 1 ? 2 : 8);
 
     if (tpal) {
-	FPRINTF((stderr, "(PaletteMake) tpal->use_maxcolors = %d\n", 
+	FPRINTF((stderr, "(PaletteMake) tpal->use_maxcolors = %d\n",
 		 tpal->use_maxcolors));
     } else {
 	FPRINTF((stderr, "(PaletteMake) tpal=NULL\n"));
@@ -2661,10 +2661,10 @@ PaletteMake(plot_struct * plot, t_sm_palette * tpal)
 	sm_palette.positive = tpal->positive;
 	sm_palette.use_maxcolors = tpal->use_maxcolors;
 	sm_palette.cmodel = tpal->cmodel;
-	
+
 	virgin = no;
 	switch( sm_palette.colorMode ) {
-          case SMPAL_COLOR_MODE_GRAY:  
+          case SMPAL_COLOR_MODE_GRAY:
 	    sm_palette.gamma = tpal->gamma;
 	    break;
 	  case SMPAL_COLOR_MODE_RGB:
@@ -2675,7 +2675,7 @@ PaletteMake(plot_struct * plot, t_sm_palette * tpal)
         case SMPAL_COLOR_MODE_FUNCTIONS:
 	  fprintf( stderr, "Ooops:  no SMPAL_COLOR_MODE_FUNCTIONS here!\n" );
 	  break;
-	case SMPAL_COLOR_MODE_GRADIENT: 
+	case SMPAL_COLOR_MODE_GRADIENT:
 	  sm_palette.gradient_num = tpal->gradient_num;
 	  sm_palette.gradient = tpal->gradient;
 	  break;
@@ -2724,7 +2724,7 @@ PaletteMake(plot_struct * plot, t_sm_palette * tpal)
     /* EventuallyChangeVisual(plot); */
 
     /*
-     * start with trying to allocate max_colors. This should 
+     * start with trying to allocate max_colors. This should
      * always succeed with TrueColor visuals >= 16bit. If it
      * fails (for example for a PseudoColor visual of depth 8),
      * try it with half of the colors. Proceed until min_colors
@@ -2748,7 +2748,7 @@ PaletteMake(plot_struct * plot, t_sm_palette * tpal)
 	    xcolor.red = 0xffff * color.r + 0.5;
 	    xcolor.green = 0xffff * color.g + 0.5;
 	    xcolor.blue = 0xffff * color.b + 0.5;
-	    
+
 	    if (XAllocColor(dpy, plot->cmap->colormap, &xcolor)) {
 		plot->cmap->pixels[plot->cmap->allocated] = xcolor.pixel;
 	    } else {
@@ -2819,7 +2819,7 @@ PaletteSetColor(plot_struct * plot, double gray)
 	index = gray * (plot->cmap->allocated - 1);
 	if (index >= plot->cmap->allocated)
 		index = plot->cmap->allocated -1;
-	
+
 	XSetForeground(dpy, gc_pm3d, plot->cmap->pixels[index]);
     }
 }
@@ -2962,7 +2962,7 @@ AllocateXorPixel(cmap_t *cmap_ptr)
 
     if (xcolor.red + xcolor.green + xcolor.blue < 0xffff) {
 	/* it is admittedly somehow arbitrary to call
-	 * everything with a gray value < 0xffff a 
+	 * everything with a gray value < 0xffff a
 	 * dark background. Try to use the background's
 	 * complement for drawing which will always
 	 * result in white when using xor. */
@@ -3412,7 +3412,7 @@ process_event(XEvent *event)
 	/* shift, ctrl, alt, and meta modifiers to yield a character. */
 	/* keysym = XKeycodeToKeysym(dpy, event->xkey.keycode, 0); */
 	XLookupString((XKeyEvent *)event,key_sequence,sizeof(key_sequence),&keysym,NULL);
-	
+
 #ifdef USE_MOUSE
 	update_modifiers(event->xkey.state);
 
@@ -3459,7 +3459,7 @@ process_event(XEvent *event)
 
 	if (is_meta(keysym))
 	    return;
-	    
+
 	switch (keysym) {
 
 #define KNOWN_KEYSYMS(gp_keysym)                                             \
@@ -3730,19 +3730,19 @@ process_event(XEvent *event)
 		mouse_to_coords(plot, event, &x, &y, &x2, &y2);
 		if (plot->axis_mask & (1<<FIRST_X_AXIS)) {
 		    sprintf(m,"x=  %10g %c",x,'\0');
-		    m += 15; 
+		    m += 15;
 		}
 		if (plot->axis_mask & (1<<SECOND_X_AXIS)) {
 		    sprintf(m,"x2= %10g %c",x2,'\0');
-		    m += 15; 
+		    m += 15;
 		}
 		if (plot->axis_mask & (1<<FIRST_Y_AXIS)) {
 		    sprintf(m,"y=  %10g %c",y,'\0');
-		    m += 15; 
+		    m += 15;
 		}
 		if (plot->axis_mask & (1<<SECOND_Y_AXIS)) {
 		    sprintf(m,"y2= %10g %c",y2,'\0');
-		    m += 15; 
+		    m += 15;
 		}
 		DisplayCoords(plot, mouse_format);
 	    } else if (!plot->mouse_on) {
@@ -3793,7 +3793,7 @@ process_event(XEvent *event)
 #ifdef DEBUG
 #if defined(USE_MOUSE) && defined(MOUSE_ALL_WINDOWS)
 	/* This causes gnuplot_x11 to pass mouse clicks back from all plot windows,
-	 * not just the current plot. But who should we notify that a click has 
+	 * not just the current plot. But who should we notify that a click has
 	 * happened, and how?  The fprintf to stderr is just for debugging. */
 	else if (plot->axis_mask) {
 	    double x, y, x2, y2;
@@ -3981,7 +3981,7 @@ gnuplot: X11 aborted.\n", ldisplay);
 /* for XFree86 ... */
     {
 	char appdefdir[MAXPATHLEN];
-	strncpy(appdefdir, 
+	strncpy(appdefdir,
 	        __XOS2RedirRoot("/XFree86/lib/X11/app-defaults"),
 	        sizeof(appdefdir));
 	sprintf(buffer, "%s/%s", appdefdir, "Gnuplot");
@@ -4146,9 +4146,7 @@ gnuplot: X11 aborted.\n", ldisplay);
  *---------------------------------------------------------------------------*/
 
 static char *
-pr_GetR(xrdb, resource)
-    XrmDatabase xrdb;
-    char *resource;
+pr_GetR(XrmDatabase xrdb, char *resource)
 {
     char name[128], class[128], *rc;
 
@@ -4270,7 +4268,7 @@ pr_color(cmap_t * cmap_ptr)
 }
 
 /*-----------------------------------------------------------------------------
- *   pr_dashes - determine line dash styles 
+ *   pr_dashes - determine line dash styles
  *---------------------------------------------------------------------------*/
 
 static const char dash_keys[Ndashes][10] = {
@@ -4322,7 +4320,7 @@ pr_dashes()
 }
 
 /*-----------------------------------------------------------------------------
- *   pr_font - determine font          
+ *   pr_font - determine font
  *---------------------------------------------------------------------------*/
 
 static void
@@ -4373,7 +4371,7 @@ char *fontname;
 	    sscanf( &(fontname[sep+1]),"%d",&fontsize);
 	if (fontsize > 99 || fontsize < 1)
 	    fontsize = 12;
-	   
+
 	slant = strstr(&fontname[sep+1],"italic")  ? 'i' :
 		strstr(&fontname[sep+1],"oblique") ? 'o' :
 		                                     'r' ;
@@ -4430,7 +4428,7 @@ char *fontname;
 	}
 
     }
-    
+
     if (font) {
         strncpy(previous_font_name, fontname, sizeof(previous_font_name)-1);
         FPRINTF((stderr,"gnuplot_x11:saving current font name \"%s\"\n",previous_font_name));
@@ -4459,7 +4457,7 @@ gnuplot: no useable font - X11 aborted.\n", FallbackFont);
 }
 
 /*-----------------------------------------------------------------------------
- *   pr_geometry - determine window geometry      
+ *   pr_geometry - determine window geometry
  *---------------------------------------------------------------------------*/
 
 static void
@@ -4540,7 +4538,7 @@ pr_width()
 }
 
 /*-----------------------------------------------------------------------------
- *   pr_window - create window 
+ *   pr_window - create window
  *---------------------------------------------------------------------------*/
 static void
 ProcessEvents(Window win)
@@ -5001,7 +4999,7 @@ Add_Plot_To_Remove_FIFO_Queue(Window plot_window)
  *---------------------------------------------------------------------------*/
 
 static void
-Process_Remove_FIFO_Queue(void)
+Process_Remove_FIFO_Queue()
 {
     plot_remove_struct *prsp = remove_fifo_queue_start;
 

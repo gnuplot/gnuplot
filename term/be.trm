@@ -1,5 +1,5 @@
-/*
- * $Id: be.trm,v 1.12 2003/02/18 16:38:12 broeker Exp $
+/* Hello, Emacs, this is -*-C-*-
+ * $Id: be.trm,v 1.13 2004/04/13 17:24:15 broeker Exp $
  *
  */
 
@@ -133,7 +133,7 @@ TERM_PUBLIC void
 BE_options()
 {
     struct value a;
- 
+
     while (!END_OF_COMMAND) {
 	switch(lookup_table(&BE_opts[0],c_token)) {
 	case BE_RESET:
@@ -157,9 +157,7 @@ BE_options()
  */
 
 int
-BE_args(argc, argv)
-int argc;
-char *argv[];
+BE_args(int argc, char *argv[])
 {
     int nbe = 0, i = 0, n;
 
@@ -286,45 +284,38 @@ BE_text()
 
 
 TERM_PUBLIC void
-BE_move(x, y)
-unsigned int x, y;
+BE_move(unsigned int x, unsigned int y)
 {
     PRINT2("M%04d%04d\n", x, y);
 }
 
 TERM_PUBLIC void
-BE_vector(x, y)
-unsigned int x, y;
+BE_vector(unsigned int x, unsigned int y)
 {
     PRINT2("V%04d%04d\n", x, y);
 }
 
 TERM_PUBLIC void
-BE_pointsize(ps)
-double ps;
+BE_pointsize(double ps)
 {
     PRINT2("P7%04d%04d\n",	/* size of point symbols */
 	   (int) (term->h_tic * ps * 0.5), (int) (term->v_tic * ps * 0.5));
 }
 
 TERM_PUBLIC void
-BE_linewidth(lw)
-double lw;
+BE_linewidth(double lw)
 {
     PRINT1("W%04d\n", (int) lw);
 }
 
 TERM_PUBLIC void
-BE_linetype(lt)
-int lt;
+BE_linetype(int lt)
 {
     PRINT1("L%04d\n", lt);
 }
 
 TERM_PUBLIC void
-BE_put_text(x, y, str)
-unsigned int x, y;
-const char str[];
+BE_put_text(unsigned int x, unsigned int y, const char str[])
 {
     /* badly outrange labels can overflow into text field */
     if (x < 10000 && y < 10000) {
@@ -333,17 +324,14 @@ const char str[];
 }
 
 TERM_PUBLIC int
-BE_justify_text(mode)
-enum JUSTIFY mode;
+BE_justify_text(enum JUSTIFY mode)
 {
     PRINT1("J%04d\n", mode);
     return (TRUE);
 }
 
 TERM_PUBLIC void
-BE_point(x, y, number)
-unsigned int x, y;
-int number;
+BE_point(unsigned int x, unsigned int y, int number)
 {
     if (number >= 0)
 	number %= POINT_TYPES;
@@ -352,9 +340,10 @@ int number;
 }
 
 TERM_PUBLIC void
-BE_fillbox(style, x, y, w, h)
-int style;
-unsigned int x, y, w, h;
+BE_fillbox(
+    int style;
+    unsigned int x, unsigned int y,
+    unsigned int w, unsigned int h)
 {
     PRINT5("F%04d%04u%04u%04u%04u\n", style, x, y, w, h);
 }

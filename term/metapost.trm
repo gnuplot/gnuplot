@@ -1,5 +1,5 @@
-/*
- * $Id: metapost.trm,v 1.24 2004/03/29 10:43:36 broeker Exp $
+/* Hello, Emacs, this is -*-C-*-
+ * $Id: metapost.trm,v 1.25 2004/04/13 17:24:34 broeker Exp $
  */
 
 /* GNUPLOT - metapost.trm */
@@ -787,19 +787,20 @@ TERM_PUBLIC void
 MP_reset()
 {
     if (MP_tex == MP_LATEX) {
-	fputs("% BEGPOST\n",gpoutfile); 
+	fputs("% BEGPOST\n",gpoutfile);
 	fputs("verbatimtex\n",gpoutfile);
 	fputs(" \\end{document}\n",gpoutfile);
 	fputs("etex\n",gpoutfile);
-	fputs("% ENDPOST\n",gpoutfile); 
+	fputs("% ENDPOST\n",gpoutfile);
     };
     fputs("end.\n", gpoutfile);
 }
 
 TERM_PUBLIC void
-MP_boxfill(sty, x1, y1, wd, ht)
-int sty;
-unsigned int x1, y1, wd, ht;
+MP_boxfill(
+    int sty,
+    unsigned int x1, unsigned int y1,
+    unsigned int wd, unsigned int ht)
 {
     /* for now simply clear box if sty <= 0, do nothing otherwise */
     if (MP_inline)
@@ -866,7 +867,7 @@ MP_filled_polygon(int points, gpiPoint *corners)
 }
 
 TERM_PUBLIC void
-MP_previous_palette(void)
+MP_previous_palette()
 {
     return;
 }

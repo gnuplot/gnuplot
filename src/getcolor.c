@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: getcolor.c,v 1.15 2004/05/26 11:17:42 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: getcolor.c,v 1.16 2004/05/28 10:59:07 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - getcolor.c */
@@ -55,7 +55,7 @@ int palettes_differ( t_sm_palette *p1, t_sm_palette *p2 )
     if (p1->use_maxcolors != p2->use_maxcolors)   return 1;
     switch(  p1->colorMode ) {
         case SMPAL_COLOR_MODE_NONE:  return 0;  /* ?? */
-        case SMPAL_COLOR_MODE_GRAY:  
+        case SMPAL_COLOR_MODE_GRAY:
 	    if (fabs(p1->gamma - p2->gamma) > 1e-3)  return 1;
 	    break;
 	case SMPAL_COLOR_MODE_RGB:
@@ -89,8 +89,8 @@ int palettes_differ( t_sm_palette *p1, t_sm_palette *p2 )
 
 
 /* Store double value from [0,1] in 2 characters. Resolution is 6.1e-5.
- * No '\n' are generated. */ 
-static char *dbl_to_str( double val, char *dest ) 
+ * No '\n' are generated. */
+static char *dbl_to_str( double val, char *dest )
 {
     unsigned int ival = (unsigned int)( ((1<<14)-1) * val) ;
     dest[0] = (ival >> 7) + 33;
@@ -101,10 +101,10 @@ static char *dbl_to_str( double val, char *dest )
 /* Reverse of dbl_to_str(): map 2 characters to double in [0,1] */
 static double str_to_dbl( char *s )
 {
-    unsigned int ival = ( ((unsigned int)((s[0]-33))&127)<<7) | 
+    unsigned int ival = ( ((unsigned int)((s[0]-33))&127)<<7) |
       (unsigned int)( (s[1]-33) & 127 );
     double val = ((double)ival) / ((1<<14)-1);
-    return val; 
+    return val;
 }
 
 
@@ -128,7 +128,7 @@ void str_to_color( char *buf, rgb_color *col )
 
 
 /* Store a gradient entry in 8 characters which do not contain '\n' */
-char *gradient_entry_to_str( gradient_struct *gs ) 
+char *gradient_entry_to_str( gradient_struct *gs )
 {
     static char buf[20];
     dbl_to_str( gs->pos, buf );
@@ -203,7 +203,7 @@ static int interpolate_color_from_gray( double gray, rgb_color *color )
 
 #ifndef GPLT_X11_MODE
 /*  Fills color with the values calculated from sm_palette.[ABC]func
- *  The color values are clipped to [0,1] without further notice. 
+ *  The color values are clipped to [0,1] without further notice.
  *  Returns 0 or does an int_error() when function evaluatin failed.
  *  The result is not in RGB color space jet.
  */
@@ -217,7 +217,7 @@ calculate_color_from_formulae( double gray, rgb_color *color )
   (void) Gcomplex( &sm_palette.Afunc.dummy_values[0], gray, 0.0 );
   evaluate_at( sm_palette.Afunc.at, &v );
   if (undefined)
-    int_error( NO_CARET, 
+    int_error( NO_CARET,
 	       "Undefined value first color during function evaluation");
   a = real(&v);
   a = CONSTRAIN(a);
@@ -225,7 +225,7 @@ calculate_color_from_formulae( double gray, rgb_color *color )
   (void) Gcomplex( &sm_palette.Bfunc.dummy_values[0], gray, 0.0 );
   evaluate_at( sm_palette.Bfunc.at, &v );
   if (undefined)
-    int_error( NO_CARET, 
+    int_error( NO_CARET,
 	       "Undefined value second color during function evaluation");
   b = real(&v);
   b = CONSTRAIN(b);
@@ -233,7 +233,7 @@ calculate_color_from_formulae( double gray, rgb_color *color )
   (void) Gcomplex( &sm_palette.Cfunc.dummy_values[0], gray, 0.0 );
   evaluate_at( sm_palette.Cfunc.at, &v );
   if (undefined)
-    int_error( NO_CARET, 
+    int_error( NO_CARET,
 	       "Undefined value third color during function evaluation");
   c = real(&v);
   c = CONSTRAIN(c);
@@ -302,13 +302,13 @@ rgb1_from_gray( double gray, rgb_color *color )
       case C_MODEL_YIQ:  YIQ_2_RGB( color );  break;
       case C_MODEL_XYZ:  CIEXYZ_2_RGB( color );  break;
       default:
-	fprintf( stderr, "%s:%d ooops: Unknown color model '%c'\n", 
+	fprintf( stderr, "%s:%d ooops: Unknown color model '%c'\n",
 		 __FILE__, __LINE__, (char)(sm_palette.cmodel) );
     }
 }
 
 
-/*  
+/*
  *  Convenience function to map R, G and B float values [0,1] to uchars [0,255].
  */
 void
@@ -320,7 +320,7 @@ rgb255_from_rgb1( rgb_color rgb1, rgb255_color *rgb255 )
 }
 
 
-/*  
+/*
  *  Convenience function to map gray values to R, G and B values in [0,255].
  */
 void
@@ -378,7 +378,7 @@ static double get_max_dev( rgb_color *colors, int j, double limit )
     if( rdev > max_dev ) max_dev = rdev;
     if( gdev > max_dev ) max_dev = gdev;
     if( bdev > max_dev ) max_dev = bdev;
-    if( max_dev >= limit ) break;  
+    if( max_dev >= limit ) break;
   }
   return max_dev;
 }
@@ -421,10 +421,10 @@ static int is_extremum( rgb_color left, rgb_color mid, rgb_color right )
  *  gradient.  Use a sufficiently large number of samples (500 to 5000).
  *  Please free() the returned gradient after use.  samples, allowed_deviation
  *  and max_skip may be <=0 and useful defaults will be used.
- *  Most probably it's useless to approximate a gradient- or rgbformulae- 
+ *  Most probably it's useless to approximate a gradient- or rgbformulae-
  *  palette.  Use it to build gradients from function palettes.
  */
-gradient_struct *approximate_palette( t_sm_palette *palette, int samples, 
+gradient_struct *approximate_palette( t_sm_palette *palette, int samples,
 				      double allowed_deviation,
 				      int *gradient_num )
 {
@@ -433,7 +433,7 @@ gradient_struct *approximate_palette( t_sm_palette *palette, int samples,
     int gradient_size=50;
     gradient_struct *gradient;
     int colors_size=100;
-    rgb_color *colors; 
+    rgb_color *colors;
     int cnt=0;
     rgb_color color;
     double max_dev=0.0;
@@ -442,7 +442,7 @@ gradient_struct *approximate_palette( t_sm_palette *palette, int samples,
     /* useful defaults */
     if (samples <= 0)  samples = 2000;
     if (allowed_deviation <= 0)  allowed_deviation = 0.003;
-    
+
     gradient = (gradient_struct*)malloc(gradient_size*sizeof(gradient_struct));
     colors = (rgb_color*) malloc( colors_size*sizeof(rgb_color) );
 
@@ -453,7 +453,7 @@ gradient_struct *approximate_palette( t_sm_palette *palette, int samples,
     gradient[0].col = colors[0];
     ++cnt;
     color_components_from_gray( 1.0/samples, &(colors[1] ) );
-    
+
     for( i=0; i<samples; ++i ) {
 	for( j=2; i+j<=samples; ++j ) {
 	    gray = ((double)(i+j)) / samples;
@@ -463,11 +463,11 @@ gradient_struct *approximate_palette( t_sm_palette *palette, int samples,
 		  realloc( colors, colors_size*sizeof(gradient_struct) );
 	    }
 	    color_components_from_gray( gray, &(colors[j]) );
-	    
+
 	    /* test for extremum */
 	    if( is_extremum( colors[j-2], colors[j-1], colors[j] ) ) {
 	        /* fprintf(stderr,"Extremum at %g\n", gray ); */
-	        /* ++extrema; */  
+	        /* ++extrema; */
 		break;
 	    }
 
@@ -480,25 +480,25 @@ gradient_struct *approximate_palette( t_sm_palette *palette, int samples,
 	}
 	GROW_GRADIENT(25);
 
-	gradient[cnt].pos = gray; 
-	gradient[cnt].col = colors[j-1]; 
-	++cnt;  
-	
+	gradient[cnt].pos = gray;
+	gradient[cnt].col = colors[j-1];
+	++cnt;
+
 	/* if( j-1 > maximum_j ) maximum_j = j-1; */
 
 	colors[0] = colors[j-1];
 	colors[1] = colors[j];
 	i += j-1;
     }
-    
+
     color_components_from_gray( 1.0, &color );
     GROW_GRADIENT(1);
     gradient[cnt].pos = 1.0;
     gradient[cnt].col = color;
     ++cnt;
-    
+
     /***********
-    fprintf( stderr, 
+    fprintf( stderr,
 	     "PS interpolation table: %d samples, allowed deviation %.2f%%:\n",
 	     samples, 100*allowed_deviation );
 

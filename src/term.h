@@ -1,5 +1,5 @@
 /*
- * $Id: term.h,v 1.23 2004/03/29 10:30:18 persquare Exp $
+ * $Id: term.h,v 1.24 2004/04/13 17:24:02 broeker Exp $
  */
 
 /* GNUPLOT - term.h */
@@ -38,9 +38,9 @@
  * term.h: terminal support definitions
  *   Edit this file depending on the set of terminals you wish to support.
  * Comment out the terminal types that you don't want or don't have, and
- * uncomment those that you want included. Be aware that some terminal 
- * types (eg, SUN, UNIXPLOT) will require changes in the makefile 
- * LIBS definition. 
+ * uncomment those that you want included. Be aware that some terminal
+ * types (eg, SUN, UNIXPLOT) will require changes in the makefile
+ * LIBS definition.
  */
 
 /*
@@ -152,7 +152,7 @@
 /*
  * #if defined(__APPLE__) && defined(__MACH__)
  * # include "openstep.trm"
- * #endif 
+ * #endif
 */
 
 /* Apple Mac OS X */

@@ -1,5 +1,5 @@
 /*
- * $Id: alloc.h,v 1.7 2000/10/31 19:59:30 joze Exp $
+ * $Id: alloc.h,v 1.8 2004/04/13 17:23:51 broeker Exp $
  */
 
 /* GNUPLOT - alloc.h */
@@ -59,7 +59,7 @@ generic *gp_realloc __PROTO((generic *p, size_t size, const char *message));
  * START_LEAK_CHECK and END_LEAK_CHECK allow assert that no net memory
  * is allocated within enclosed block
  */
- 
+
 void checked_free(void *p);
 void check_pointer_in_block(void *block, void *p, int size, char *file, int line);
 void start_leak_check(char *file,int line);

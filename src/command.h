@@ -1,5 +1,5 @@
 /*
- * $Id: command.h,v 1.28 2004/04/13 17:23:52 broeker Exp $
+ * $Id: command.h,v 1.29 2004/06/07 05:33:00 sfeam Exp $
  */
 
 /* GNUPLOT - command.h */
@@ -47,7 +47,7 @@ extern char *input_line;
 extern int inline_num;
 
 typedef struct lexical_unit {	/* produced by scanner */
-    TBOOLEAN is_token;		/* true if token, false if a value */ 
+    TBOOLEAN is_token;		/* true if token, false if a value */
     struct value l_val;
     int start_index;		/* index of first char in token */
     int length;			/* length of token in chars */

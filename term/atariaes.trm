@@ -1,5 +1,5 @@
-/*
- * $Id: atariaes.trm,v 1.15 2002/11/05 16:47:38 lhecking Exp $
+/* Hello, Emacs, this is -*-C-*-
+ * $Id: atariaes.trm,v 1.16 2004/04/13 17:24:15 broeker Exp $
  *
  */
 
@@ -155,7 +155,7 @@ static char *put_text_str;
 #define WINTYPE (NAME|CLOSER|FULLER|MOVER|SIZER)
 
 static void
-open_window(void)
+open_window()
 {
     int x, y, w, h;
 
@@ -174,7 +174,7 @@ open_window(void)
 }
 
 static void
-close_window(void)
+close_window()
 {
     if (window_id != -1) {
 	wind_close(window_id);
@@ -184,7 +184,7 @@ close_window(void)
 }
 
 static void
-text_mode(void)
+text_mode()
 {
     if (!multi_aes) {
 	if (!cursor_is_on) {
@@ -197,7 +197,7 @@ text_mode(void)
 }
 
 static void
-mouse_mode(void)
+mouse_mode()
 {
     if (!multi_aes) {
 	if (cursor_is_on) {
@@ -209,7 +209,7 @@ mouse_mode(void)
 }
 
 static void
-application_exit(void)
+application_exit()
 {
     close_window();
 
@@ -220,7 +220,7 @@ application_exit(void)
 }
 
 void
-application_init(void)
+application_init()
 {
     if (aesid < 0) {
 	if ((aesid = appl_init()) < 0)

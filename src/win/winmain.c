@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: winmain.c,v 1.13 2004/02/12 09:08:40 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: winmain.c,v 1.14 2004/04/13 17:24:14 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - win/winmain.c */
@@ -35,10 +35,10 @@ static char *RCSid() { return RCSid("$Id: winmain.c,v 1.13 2004/02/12 09:08:40 m
 
 /*
  * AUTHORS
- * 
+ *
  *   Maurice Castro
  *   Russell Lang
- * 
+ *
  */
 
 /* This file implements the initialization code for running gnuplot   */
@@ -94,7 +94,7 @@ char *authors[]={
                  "Colin Kelley",
                  "Thomas Williams"
                 };
- 
+
 void WinExit(void);
 int gnu_main(int argc, char *argv[], char *env[]);
 
@@ -115,7 +115,7 @@ Pause(LPSTR str)
 }
 
 void
-kill_pending_Pause_dialog (void)
+kill_pending_Pause_dialog ()
 {
 	if (pausewin.bPause == FALSE) /* no Pause dialog displayed */
 	    return;
@@ -131,7 +131,7 @@ kill_pending_Pause_dialog (void)
 
 /* atexit procedure */
 void
-WinExit(void)
+WinExit()
 {
 	term_reset();
 
@@ -149,7 +149,7 @@ WinExit(void)
 
 /* call back function from Text Window WM_CLOSE */
 int CALLBACK WINEXPORT
-ShutDown(void)
+ShutDown()
 {
 #if 0  /* HBB 19990505: try to avoid crash on clicking 'close' */
        /* Problem was that WinExit was called *twice*, once directly,
@@ -167,7 +167,7 @@ int PASCAL WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 {
 	/*WNDCLASS wndclass;*/
 	LPSTR tail;
-	
+
 #ifdef __MSC__  /* MSC doesn't give us _argc and _argv[] so ...   */
 # ifdef WIN32    /* WIN32 has __argc and __argv */
 #  define _argv __argv
@@ -197,7 +197,7 @@ int PASCAL WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	if ((tail = (LPSTR)_fstrrchr(szModuleName,'\\')) != (LPSTR)NULL)
 	{
 		tail++;
-		*tail = 0; 
+		*tail = 0;
 	}
 	szModuleName = (LPSTR)farrealloc(szModuleName, _fstrlen(szModuleName)+1);
 	CheckMemory(szModuleName);
@@ -284,7 +284,7 @@ int PASCAL WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 
 
 /* replacement stdio routines that use Text Window for stdin/stdout */
-/* WARNING: Do not write to stdout/stderr with functions not listed 
+/* WARNING: Do not write to stdout/stderr with functions not listed
    in win/wtext.h */
 
 #undef kbhit
@@ -321,154 +321,163 @@ int PASCAL WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 int
 MyPutCh(int ch)
 {
-	return TextPutCh(&textwin, (BYTE)ch);
+    return TextPutCh(&textwin, (BYTE)ch);
 }
 
 int
-MyKBHit(void)
+MyKBHit()
 {
-	return TextKBHit(&textwin);
+    return TextKBHit(&textwin);
 }
 
 int
-MyGetCh(void)
+MyGetCh()
 {
-	return TextGetCh(&textwin);
+    return TextGetCh(&textwin);
 }
 
 int
-MyGetChE(void)
+MyGetChE()
 {
-	return TextGetChE(&textwin);
+    return TextGetChE(&textwin);
 }
 
 int
 MyFGetC(FILE *file)
 {
-	if (isterm(file)) {
-		return MyGetChE();
-	}
-	return fgetc(file);
+    if (isterm(file)) {
+	return MyGetChE();
+    }
+    return fgetc(file);
 }
 
 char *
 MyGetS(char *str)
 {
-	TextPutS(&textwin,"\nDANGER: gets() used\n");
-	MyFGetS(str,80,stdin);
-	if (strlen(str) > 0 
-	 && str[strlen(str)-1]=='\n')
-		str[strlen(str)-1] = '\0';
-	return str;
+    TextPutS(&textwin,"\nDANGER: gets() used\n");
+    MyFGetS(str,80,stdin);
+    if (strlen(str) > 0
+	&& str[strlen(str)-1]=='\n')
+	str[strlen(str)-1] = '\0';
+    return str;
 }
 
 char *
 MyFGetS(char *str, unsigned int size, FILE *file)
 {
-char FAR *p;
-	if (isterm(file)) {
-		p = TextGetS(&textwin, str, size);
-		if (p != (char FAR *)NULL)
-			return str;
-		return (char *)NULL;
-	}	
-	return fgets(str,size,file);
+    char FAR *p;
+
+    if (isterm(file)) {
+	p = TextGetS(&textwin, str, size);
+	if (p != (char FAR *)NULL)
+	    return str;
+	return (char *)NULL;
+    }
+    return fgets(str,size,file);
 }
 
 int
 MyFPutC(int ch, FILE *file)
 {
-	if (isterm(file)) {
-		MyPutCh((BYTE)ch);
-		TextMessage();
-		return ch;
-	}
-	return fputc(ch,file);
+    if (isterm(file)) {
+	MyPutCh((BYTE)ch);
+	TextMessage();
+	return ch;
+    }
+    return fputc(ch,file);
 }
 
 int
 MyFPutS(const char *str, FILE *file)
 {
-	if (isterm(file)) {
-		TextPutS(&textwin,(char*)str);
-		TextMessage();
-		return (*str);	/* different from Borland library */
-	}
-	return fputs(str,file);
+    if (isterm(file)) {
+	TextPutS(&textwin, (char*) str);
+	TextMessage();
+	return (*str);	/* different from Borland library */
+    }
+    return fputs(str,file);
 }
 
 int
 MyPutS(char *str)
 {
-	TextPutS(&textwin, str);
-	MyPutCh('\n');
-	TextMessage();
-	return 0;	/* different from Borland library */
+    TextPutS(&textwin, str);
+    MyPutCh('\n');
+    TextMessage();
+    return 0;	/* different from Borland library */
 }
 
-int MyFPrintF(FILE *file, const char *fmt, ...)
+int
+MyFPrintF(FILE *file, const char *fmt, ...)
 {
-int count;
-va_list args;
-	va_start(args,fmt);
-	if (isterm(file)) {
-		char buf[MAXPRINTF];
-		count = vsprintf(buf,fmt,args);
-		TextPutS(&textwin,&buf[0]);
-	}
-	else
-		count = vfprintf(file, fmt, args);
-	va_end(args);
-	return count;
-}
+    int count;
+    va_list args;
 
-int MyVFPrintF(FILE *file, const char *fmt, va_list args)
-{
-	int count;
+    va_start(args,fmt);
+    if (isterm(file)) {
+	char buf[MAXPRINTF];
 
-	if (isterm(file)) {
-        	char buf[MAXPRINTF];
-                count = vsprintf(buf,fmt,args);
-                TextPutS(&textwin, buf);
-        } else
-        	count = vfprintf(file, fmt, args);
-        return count;
-}
-
-int MyPrintF(const char *fmt, ...)
-{
-int count;
-char buf[MAXPRINTF];
-va_list args;
-	va_start(args,fmt);
 	count = vsprintf(buf,fmt,args);
-	TextPutS(&textwin,buf);
-	va_end(args);
-	return count;
+	TextPutS(&textwin,&buf[0]);
+    } else
+	count = vfprintf(file, fmt, args);
+    va_end(args);
+    return count;
 }
 
-size_t MyFWrite(const void *ptr, size_t size, size_t n, FILE *file)
+int
+MyVFPrintF(FILE *file, const char *fmt, va_list args)
 {
-	if (isterm(file)) {
-		size_t i;
-		for (i=0; i<n; i++)
-			TextPutCh(&textwin, ((BYTE *)ptr)[i]);
-		TextMessage();
-		return n;
-	}
-	return fwrite(ptr, size, n, file);
+    int count;
+
+    if (isterm(file)) {
+	char buf[MAXPRINTF];
+	count = vsprintf(buf,fmt,args);
+	TextPutS(&textwin, buf);
+    } else
+	count = vfprintf(file, fmt, args);
+    return count;
 }
 
-size_t MyFRead(void *ptr, size_t size, size_t n, FILE *file)
+int
+MyPrintF(const char *fmt, ...)
 {
-	if (isterm(file)) {
-		size_t i;
-		for (i=0; i<n; i++)
-			((BYTE *)ptr)[i] = TextGetChE(&textwin);
-		TextMessage();
-		return n;
-	}
-	return fread(ptr, size, n, file);
+    int count;
+    char buf[MAXPRINTF];
+    va_list args;
+
+    va_start(args,fmt);
+    count = vsprintf(buf,fmt,args);
+    TextPutS(&textwin,buf);
+    va_end(args);
+    return count;
+}
+
+size_t
+MyFWrite(const void *ptr, size_t size, size_t n, FILE *file)
+{
+    if (isterm(file)) {
+	size_t i;
+	for (i=0; i<n; i++)
+	    TextPutCh(&textwin, ((BYTE *)ptr)[i]);
+	TextMessage();
+	return n;
+    }
+    return fwrite(ptr, size, n, file);
+}
+
+size_t
+MyFRead(void *ptr, size_t size, size_t n, FILE *file)
+{
+    if (isterm(file)) {
+	size_t i;
+
+	for (i=0; i<n; i++)
+	    ((BYTE *)ptr)[i] = TextGetChE(&textwin);
+	TextMessage();
+	return n;
+    }
+    return fread(ptr, size, n, file);
 }
 
 /* public interface to printer routines : Windows PRN emulation
@@ -481,34 +490,35 @@ static char win_prntmp[MAX_PRT_LEN+1];
 FILE *
 open_printer()
 {
-char *temp;
-	if ((temp = getenv("TEMP")) == (char *)NULL)
-		*win_prntmp='\0';
-	else  {
-		strncpy(win_prntmp,temp,MAX_PRT_LEN);
-		/* stop X's in path being converted by mktemp */
-		for (temp=win_prntmp; *temp; temp++)
-			*temp = tolower(*temp);
-		if ( strlen(win_prntmp) && (win_prntmp[strlen(win_prntmp)-1]!='\\') )
-			strcat(win_prntmp,"\\");
-	}
-	strncat(win_prntmp, "_gptmp",MAX_PRT_LEN-strlen(win_prntmp));
-	strncat(win_prntmp, "XXXXXX",MAX_PRT_LEN-strlen(win_prntmp));
-	mktemp(win_prntmp);
-	return fopen(win_prntmp, "w");
+    char *temp;
+
+    if ((temp = getenv("TEMP")) == (char *)NULL)
+	*win_prntmp='\0';
+    else  {
+	strncpy(win_prntmp,temp,MAX_PRT_LEN);
+	/* stop X's in path being converted by mktemp */
+	for (temp=win_prntmp; *temp; temp++)
+	    *temp = tolower(*temp);
+	if ( strlen(win_prntmp) && (win_prntmp[strlen(win_prntmp)-1]!='\\') )
+	    strcat(win_prntmp,"\\");
+    }
+    strncat(win_prntmp, "_gptmp",MAX_PRT_LEN-strlen(win_prntmp));
+    strncat(win_prntmp, "XXXXXX",MAX_PRT_LEN-strlen(win_prntmp));
+    mktemp(win_prntmp);
+    return fopen(win_prntmp, "w");
 }
 
 void
 close_printer(FILE *outfile)
 {
-	fclose(outfile);
-	DumpPrinter(graphwin.hWndGraph, graphwin.Title, win_prntmp);
+    fclose(outfile);
+    DumpPrinter(graphwin.hWndGraph, graphwin.Title, win_prntmp);
 }
 
 void
-screen_dump(void)
+screen_dump()
 {
-	GraphPrint(&graphwin);
+    GraphPrint(&graphwin);
 }
 
 

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: stdfn.c,v 1.14 2002/02/21 12:27:37 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: stdfn.c,v 1.15 2004/04/13 17:24:01 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - stdfn.c */
@@ -58,13 +58,11 @@ static char *RCSid() { return RCSid("$Id: stdfn.c,v 1.14 2002/02/21 12:27:37 lhe
 #ifndef HAVE_MEMCPY
 # ifndef HAVE_BCOPY
 /*
- * cheap and slow version of memcpy() in case you don't have one 
+ * cheap and slow version of memcpy() in case you don't have one
  */
 
 char *
-memcpy(dest, src, len)
-    char *dest, *src;
-    size_t len;
+memcpy(char *dest, char *src, size_t len)
 {
     while (len--)
 	*dest++ = *src++;
@@ -82,9 +80,7 @@ memcpy(dest, src, len)
 # ifndef HAVE_INDEX
 
 char *
-strchr(s, c)
-    const char *s;
-    int c;
+strchr(const char *s, int c)
 {
     do {
 	if (*s == (char) c)
@@ -97,7 +93,7 @@ strchr(s, c)
 #endif /* HAVE_STRCHR */
 
 
-/* memset () 
+/* memset ()
  *
  * Since we want to use memset, we have to map a possibly nonzero fill byte
  * to the bzero function. The following defined might seem a bit odd, but I
@@ -121,8 +117,7 @@ do {                      \
 #ifndef HAVE_STRERROR
 
 char *
-strerror(no)
-    int no;
+strerror(int no)
 {
     static char res_str[30];
 
@@ -140,8 +135,7 @@ strerror(no)
 #ifndef HAVE_STRSTR
 
 char *
-strstr(cs, ct)
-const char *cs, *ct;
+strstr(const char *cs, const char *ct)
 {
     size_t len;
 
@@ -310,18 +304,17 @@ purec_sscanf(const char *string, const char *format,...)
 #endif
 
 unsigned int
-sleep(delay)
-unsigned int delay;
+sleep(unsigned int delay)
 {
 #if defined(MSDOS) || defined(_Windows) || defined(DOS386) || defined(AMIGA_AC_5)
-#if !(defined(__TURBOC__) || defined(__EMX__) || defined(DJGPP)) || defined(_Windows)	/* Turbo C already has sleep() */
-/* kludge to provide sleep() for msc 5.1 */
+# if !(defined(__TURBOC__) || defined(__EMX__) || defined(DJGPP)) || defined(_Windows)	/* Turbo C already has sleep() */
+    /* kludge to provide sleep() for msc 5.1 */
     unsigned long time_is_up;
 
     time_is_up = time(NULL) + (unsigned long) delay;
     while (time(NULL) < time_is_up)
 	/* wait */ ;
-#endif /* !__TURBOC__ ... */
+# endif /* !__TURBOC__ ... */
 #endif /* MSDOS ... */
 
 #ifdef AMIGA_SC_6_1
@@ -332,7 +325,7 @@ unsigned int delay;
     Sleep((DWORD) delay * 1000);
 #endif
 
-    return (unsigned int) 0;
+    return 0;
 }
 
 #endif /* HAVE_SLEEP */
@@ -351,12 +344,10 @@ unsigned int delay;
 /* return (see MSVC documentation and strcasecmp()):
  *  -1  if str1 < str2
  *   0  if str1 == str2
- *   1  if str1 > str2 
+ *   1  if str1 > str2
  */
 int
-gp_stricmp(s1, s2)
-    const char *s1;
-    const char *s2;
+gp_stricmp(const char *s1, const char *s2)
 {
     unsigned char c1, c2;
 
@@ -386,10 +377,7 @@ gp_stricmp(s1, s2)
 # ifndef HAVE_STRNICMP
 
 int
-gp_strnicmp(s1, s2, n)
-    const char *s1;
-    const char *s2;
-    size_t n;
+gp_strnicmp(const char *s1, const char *s2, size_t n)
 {
     unsigned char c1, c2;
 
@@ -420,10 +408,7 @@ gp_strnicmp(s1, s2, n)
  * This is basically the old fit.c(copy_max) function
  */
 char *
-safe_strncpy(d, s, n)
-char *d;
-const char *s;
-size_t n;
+safe_strncpy(char *d, const char *s, size_t n)
 {
     char *ret;
 
@@ -443,8 +428,7 @@ size_t n;
  * from str2 are in str1
  * based in misc.c(instring) */
 size_t
-gp_strcspn(str1, str2)
-const char *str1, *str2;
+gp_strcspn(const char *str1, const char *str2)
 {
     char *s;
     size_t pos;

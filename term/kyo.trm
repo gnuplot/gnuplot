@@ -1,5 +1,5 @@
-/*
- * $Id: kyo.trm,v 1.8 1999/06/22 11:54:19 lhecking Exp $
+/* Hello, Emacs, this is -*-C-*-
+ * $Id: kyo.trm,v 1.9 2004/04/13 17:24:34 broeker Exp $
  *
  */
 
@@ -117,8 +117,7 @@ PRE_text()
 }
 
 TERM_PUBLIC void
-PRE_linetype(linetype)
-int linetype;
+PRE_linetype(int linetype)
 {
     /* actually choose pendiameter */
     if (linetype < 0)
@@ -129,23 +128,19 @@ int linetype;
 }
 
 TERM_PUBLIC void
-PRE_move(x, y)
-unsigned int x, y;
+PRE_move(unsigned int x, unsigned int y)
 {
     (void) fprintf(gpoutfile, "MAP %1d,%1d;\n", x, PRE_YMAX - y);
 }
 
 TERM_PUBLIC void
-PRE_vector(x, y)
-unsigned int x, y;
+PRE_vector(unsigned int x, unsigned int y)
 {
     (void) fprintf(gpoutfile, "DAP %1d, %1d;\n", x, PRE_YMAX - y);
 }
 
 TERM_PUBLIC void
-PRE_put_text(x, y, str)
-unsigned int x, y;
-const char *str;
+PRE_put_text(unsigned int x, unsigned int y, const char *str)
 {
     PRE_move(x, y);
     switch (pre_justify) {
@@ -158,8 +153,7 @@ const char *str;
 }
 
 TERM_PUBLIC int
-PRE_justify_text(mode)
-enum JUSTIFY mode;
+PRE_justify_text(enum JUSTIFY mode)
 {
     pre_justify = mode;
     switch (pre_justify) {

@@ -1,5 +1,5 @@
-/*
- * $Id: hpljii.trm,v 1.20 2004/04/13 17:24:33 broeker Exp $
+/* Hello, Emacs, this is -*-C-*-
+ * $Id: hpljii.trm,v 1.21 2004/05/24 15:44:12 mikulik Exp $
  *
  */
 
@@ -47,7 +47,7 @@
  *  Maurice Castro
  *
  * send your comments or suggestions to (gnuplot-info@lists.sourceforge.net).
- * 
+ *
  */
 
 /* The following HP laserjet series II driver uses generic bit mapped graphics
@@ -55,7 +55,7 @@
    interchanges colomns and lines in order to access entire lines
    easily and returns the lines to get bits in the right order :
    (x,y) -> (y,XMAX-1-x). */
-/* This interchange is done by calling b_makebitmap() with reversed 
+/* This interchange is done by calling b_makebitmap() with reversed
    xmax and ymax, and then setting b_rastermode to TRUE.  b_setpixel()
    will then perform the interchange before each pixel is plotted */
 /* by John Engels JENGELS@BNANDP51.BITNET, inspired by the hpljet driver
@@ -203,7 +203,7 @@ HPLJII_graphics()
 {
     HPLJII_COURIER;
     HPLJII_PUSH_CURSOR;
-    /* rotate plot -90 degrees by reversing XMAX and YMAX and by 
+    /* rotate plot -90 degrees by reversing XMAX and YMAX and by
        setting b_rastermode to TRUE */
     b_makebitmap(HPLJII_YMAX, HPLJII_XMAX, 1);
     b_rastermode = TRUE;
@@ -241,8 +241,7 @@ HPLJII_text()
 
 
 TERM_PUBLIC void
-HPLJII_linetype(linetype)
-int linetype;
+HPLJII_linetype(int linetype)
 {
 
     if (hplj_dpp == 1) {
@@ -257,9 +256,7 @@ int linetype;
 }
 
 TERM_PUBLIC void
-HPLJII_put_text(x, y, str)
-unsigned int x, y;
-const char *str;
+HPLJII_put_text(unsigned int x, unsigned int y, const char *str)
 {
     switch (b_angle) {
     case 0:
@@ -283,17 +280,14 @@ const char *str;
 }
 
 static void
-HPLJII_putc(x, y, c, ang)
-    unsigned int x, y;
-    int c; /* note: c is char */
-    int ang;
+HPLJII_putc(unsigned int x, unsigned int y, int c, int ang)
 {
     HPLJII_POP_CURSOR;
     HPLJII_PUSH_CURSOR;
     (void) ang;			/* avoid -Wunused warnings */
     /* (0,0) is the upper left point of the paper */
-    fprintf(gpoutfile, "\033*p%+dx%+dY", x * HPLJII_DPP
-	    ,(HPLJII_YMAX - y - 1) * HPLJII_DPP);
+    fprintf(gpoutfile, "\033*p%+dx%+dY",
+	    x * HPLJII_DPP, (HPLJII_YMAX - y - 1) * HPLJII_DPP);
     fputc(c, gpoutfile);
 }
 
@@ -333,7 +327,7 @@ HPDJ_graphics()
 	term->h_char = FNT5X9_HCHAR;
 	break;
     }
-    /* rotate plot -90 degrees by reversing XMAX and YMAX and by 
+    /* rotate plot -90 degrees by reversing XMAX and YMAX and by
        setting b_rastermode to TRUE */
     b_makebitmap(HPLJII_YMAX, HPLJII_XMAX, 1);
     b_rastermode = TRUE;

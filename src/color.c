@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: color.c,v 1.44 2004/06/19 07:52:34 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: color.c,v 1.45 2004/06/20 05:53:04 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - color.c */
@@ -8,7 +8,7 @@ static char *RCSid() { return RCSid("$Id: color.c,v 1.44 2004/06/19 07:52:34 mik
  *
  * Petr Mikulik, since December 1998
  * Copyright: open source as much as possible
- * 
+ *
  * What is here:
  *   - Global variables declared in .h are initialized here
  *   - Palette routines
@@ -101,7 +101,7 @@ init_color()
    Put number of allocated colours into sm_palette.colors
  */
 int
-make_palette(void)
+make_palette()
 {
     int i;
     double gray;
@@ -144,7 +144,7 @@ make_palette(void)
 	|| sm_palette.formulaR != save_pal.formulaR
 	|| sm_palette.formulaG != save_pal.formulaG
 	|| sm_palette.formulaB != save_pal.formulaB
-	|| sm_palette.positive != save_pal.positive 
+	|| sm_palette.positive != save_pal.positive
 	|| sm_palette.colors != save_pal.colors) {
 	/* print the message only if colors have changed */
 	if (interactive)
@@ -157,7 +157,7 @@ make_palette(void)
 	free(sm_palette.color);
 	sm_palette.color = NULL;
     }
-    sm_palette.color = gp_alloc( sm_palette.colors * sizeof(rgb_color), 
+    sm_palette.color = gp_alloc( sm_palette.colors * sizeof(rgb_color),
 				 "pm3d palette color");
 
     /*  fill sm_palette.color[]  */
@@ -165,7 +165,7 @@ make_palette(void)
 	gray = (double) i / (sm_palette.colors - 1);	/* rescale to [0;1] */
 	rgb1_from_gray( gray, &(sm_palette.color[i]) );
     }
-    
+
     /* let the terminal make the palette from the supplied RGB triplets */
     term->make_palette(&sm_palette);
 
@@ -312,8 +312,7 @@ filled_polygon_3dcoords_zfixed(int points, struct coordinate GPHUGE * coords, do
    PS routine.
  */
 static void
-draw_inside_color_smooth_box_postscript(out)
-FILE * out;
+draw_inside_color_smooth_box_postscript(FILE * out)
 {
     int scale_x = (cb_x_to - cb_x_from), scale_y = (cb_y_to - cb_y_from);
     fputs("stroke gsave\t%% draw gray scale smooth box\n"
@@ -337,7 +336,7 @@ FILE * out;
     fputs("/y0 y0 ystep add def /ii ii 1 add def\n"
 	  "ii imax ge {exit} if } loop\n"
 	  "grestore 0 setgray\n", out);
-}	
+}
 
 
 
@@ -347,14 +346,13 @@ FILE * out;
    over all thin rectangles
  */
 static void
-draw_inside_color_smooth_box_bitmap(out)
-FILE * out;
+draw_inside_color_smooth_box_bitmap(FILE * out)
 {
     int steps = 128; /* I think that nobody can distinguish more colours drawn in the palette */
     int i, xy, xy2, xy_from, xy_to;
     double xy_step, gray;
     gpiPoint corners[4];
-    
+
     (void) out;			/* to avoid "unused parameter" warning */
     if (color_box.rotation == 'v') {
 	corners[0].x = corners[3].x = cb_x_from;
@@ -397,11 +395,11 @@ FILE * out;
 /* Notice HBB 20010720: would be static, but HP-UX gcc bug forbids
  * this, for now */
 void
-cbtick_callback(axis, place, text, grid)
-    AXIS_INDEX axis;
-    double place;
-    char *text;
-    struct lp_style_type grid; /* linetype or -2 for no grid */
+cbtick_callback(
+    AXIS_INDEX axis,
+    double place,
+    char *text,
+    struct lp_style_type grid) /* linetype or -2 for no grid */
 {
     int len = (text ? ticscale : miniticscale)
 	* (tic_in ? -1 : 1) * (term->h_tic);
@@ -456,7 +454,7 @@ cbtick_callback(axis, place, text, grid)
 		term->justify_text(CENTRE);
 	    (*term->put_text)(x2, y3, text);
 #else /* clipping does not work properly for text around 3d graph */
-	    clip_put_text_just(x2, y3, text, CENTRE, JUST_TOP, 
+	    clip_put_text_just(x2, y3, text, CENTRE, JUST_TOP,
 			       axis_array[axis].ticdef.font);
 #endif
 	} else {
@@ -467,7 +465,7 @@ cbtick_callback(axis, place, text, grid)
 		term->justify_text(LEFT);
 	    (*term->put_text)(x3, y2, text);
 #else /* clipping does not work properly for text around 3d graph */
-	    clip_put_text_just(x3, y2, text, LEFT, JUST_CENTRE, 
+	    clip_put_text_just(x3, y2, text, LEFT, JUST_CENTRE,
 			       axis_array[axis].ticdef.font);
 #endif
 	}
@@ -519,7 +517,7 @@ draw_color_smooth_box()
 	cb_x_to += cb_x_from;
 	cb_y_to += cb_y_from;
     } else {			/* color_box.where == SMCOLOR_BOX_DEFAULT */
-#if 0 
+#if 0
 	/* HBB 20031215: replaced this by view-independant placment method */
 	double dx = (X_AXIS.max - X_AXIS.min);
 	/* don't use CB_AXIS here, CB_AXIS might be completely
@@ -635,7 +633,7 @@ draw_color_smooth_box()
 	    if (x<0) x = 0;
 	    if (y<0) y = 0;
 	    if ((*term->text_angle)(TEXT_VERTICAL)) {
-		write_multiline(x, y, CB_AXIS.label.text, CENTRE, JUST_TOP, 
+		write_multiline(x, y, CB_AXIS.label.text, CENTRE, JUST_TOP,
 				TEXT_VERTICAL, CB_AXIS.label.font);
 		(*term->text_angle)(0);
 	    } else {

@@ -1,5 +1,5 @@
-/* 
- * $Id: axis.h,v 1.35 2004/03/04 16:49:16 broeker Exp $
+/*
+ * $Id: axis.h,v 1.36 2004/04/13 17:23:51 broeker Exp $
  *
  */
 
@@ -48,7 +48,7 @@
 
 /* give some names to some array elements used in command.c and grap*.c
  * maybe one day the relevant items in setshow will also be stored
- * in arrays. 
+ * in arrays.
  *
  * Always keep the following conditions alive:
  * SECOND_X_AXIS = FIRST_X_AXIS + SECOND_AXES
@@ -56,7 +56,7 @@
  */
 typedef enum AXIS_INDEX {
 #define FIRST_AXES 0
-    FIRST_Z_AXIS, 
+    FIRST_Z_AXIS,
     FIRST_Y_AXIS,
     FIRST_X_AXIS,
     T_AXIS,			/* fill gap */
@@ -102,7 +102,7 @@ typedef struct ticmark {
 
 /* Tic-mark labelling definition; see set xtics */
 typedef struct ticdef {
-    t_ticseries_type type;	
+    t_ticseries_type type;
     char *font;
     struct t_colorspec textcolor;
     union {
@@ -187,9 +187,9 @@ typedef struct axis {
     t_autoscale set_autoscale;	/* what does 'set' think autoscale to be? */
     int range_flags;		/* flag bits about autoscale/writeback: */
     /* write auto-ed ranges back to variables for autoscale */
-#define RANGE_WRITEBACK 1	
+#define RANGE_WRITEBACK 1
     /* allow auto and reversed ranges */
-#define RANGE_REVERSE   2	
+#define RANGE_REVERSE   2
     TBOOLEAN range_is_reverted;	/* range [high:low] silently reverted? */
     double min;			/* 'transient' axis extremal values */
     double max;
@@ -360,7 +360,7 @@ do {						\
 } while(0)
 
 /* HBB 20000430: New macros, logarithmize a value into a stored
- * coordinate*/ 
+ * coordinate*/
 #define AXIS_DO_LOG(axis,value) (log(value) / axis_array[axis].log_base)
 #define AXIS_UNDO_LOG(axis,value) exp((value) * axis_array[axis].log_base)
 
@@ -369,7 +369,7 @@ do {						\
     (axis_array[axis].log ? AXIS_DO_LOG(axis,value) : (value))
 #define AXIS_DE_LOG_VALUE(axis,coordinate)				  \
     (axis_array[axis].log ? AXIS_UNDO_LOG(axis,coordinate): (coordinate))
- 
+
 
 /* copy scalar data to arrays. The difference between 3D and 2D
  * versions is: dont know we have to support ranges [10:-10] - lets
@@ -440,7 +440,7 @@ do {								\
 	    set_writeback_max(axis);				\
 	}							\
 } while(0)
-	    
+
 /* get optional [min:max] */
 #define PARSE_RANGE(axis)						   \
 do {									   \
@@ -624,7 +624,7 @@ do {						\
 #define NearlyEqual(x,y,tic) (fabs((x)-(y)) < ((tic) * SIGNIF))
 
 
-	
+
 /* ------------ functions exported by axis.c */
 t_autoscale load_range __PROTO((AXIS_INDEX, double *, double *, t_autoscale));
 void axis_unlog_interval __PROTO((AXIS_INDEX, double *, double *, TBOOLEAN));

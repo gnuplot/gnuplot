@@ -1,5 +1,5 @@
-/*
- * $Id: pdf.trm,v 1.29 2004/05/25 04:14:53 sfeam Exp $
+/* Hello, Emacs, this is -*-C-*-
+ * $Id: pdf.trm,v 1.30 2004/05/26 11:17:42 mikulik Exp $
  */
 
 /*------------------------------
@@ -34,7 +34,7 @@
 #include "driver.h"
 
 #ifdef TERM_REGISTER
-register_term (pdf)
+register_term(pdf)
 #endif
 
 #ifdef TERM_PROTO
@@ -97,10 +97,10 @@ static int PDF_TextAngle = 0;		/* current text orientation*/
 static enum JUSTIFY PDF_TextJust = LEFT; /* current text justification*/
 
 /* default text font family: */
-static char PDF_fontNameDef[MAX_ID_LEN + 1] = "Helvetica"; 
+static char PDF_fontNameDef[MAX_ID_LEN + 1] = "Helvetica";
 static double PDF_fontSizeDef = 6;	/* default text size*/
 /* current text font family: */
-static char PDF_fontNameCur[MAX_ID_LEN + 1] = "Helvetica"; 
+static char PDF_fontNameCur[MAX_ID_LEN + 1] = "Helvetica";
 static double PDF_fontSizeCur = 6; /* current text size*/
 
 static TBOOLEAN PDF_pageIsOpen = FALSE; /* already started a page ?? */
@@ -124,9 +124,8 @@ static int PDF_patternHandles[PDF_patterns];
 
 /*------------------------ helper functions -------------------*/
 
-static short 
-PDF_Pen_RealID (inPenCode)
-    int inPenCode;
+static short
+PDF_Pen_RealID (int inPenCode)
 {
     if (inPenCode >= 12)
 	inPenCode %= 12;	/* normalize pen code*/
@@ -174,8 +173,8 @@ PDF_SetFont ()
     PDF_setfont(myPDF, font_handle, PDF_fontSizeCur * PDF_RESOLUTION);
 
     /* Ask PDFlib for the actual numbers */
-    PDF_fontAscent = (int) (PDF_RESOLUTION * PDF_fontSizeCur * PDF_get_value(myPDF, "ascender", 0));	
-    PDF_fontDescent = (int) (- PDF_RESOLUTION * PDF_fontSizeCur * PDF_get_value(myPDF, "descender", 0));	
+    PDF_fontAscent = (int) (PDF_RESOLUTION * PDF_fontSizeCur * PDF_get_value(myPDF, "ascender", 0));
+    PDF_fontDescent = (int) (- PDF_RESOLUTION * PDF_fontSizeCur * PDF_get_value(myPDF, "descender", 0));
     PDF_fontLeading = (int) (PDF_RESOLUTION * PDF_fontSizeCur * 0.25);
 
     /* Assume this particular string is a somewhat reasonable typical
@@ -296,7 +295,7 @@ PDF_options ()
 	    term->put_text = PDF_put_text;
 	}
     }
-    
+
     if (!END_OF_COMMAND) {	/* get default font family name*/
 	if (almost_equals (c_token, "fn$ame"))  {
 	    c_token++;
@@ -333,7 +332,7 @@ TERM_PUBLIC void
 PDF_init ()
 {
     static TBOOLEAN PDFlib_booted = FALSE;
-    
+
     if (!PDFlib_booted) {
 	PDF_boot();
 	PDFlib_booted = TRUE;
@@ -342,7 +341,7 @@ PDF_init ()
     if (!myPDF)
 	myPDF = PDF_new();
 
-    /*open new PDF file */ 
+    /*open new PDF file */
     if (PDF_open_fp(myPDF, gpoutfile) == -1)
 	int_error(NO_CARET, "Error:cannot open PDF file .\n");
 
@@ -355,7 +354,7 @@ PDF_init ()
     PDF_set_info(myPDF,"Creator","gnuplot-3.8e");
     PDF_set_info(myPDF,"Author","Hans-Bernhard Broeker"); /* FIXME: put in username? */
     PDF_set_info(myPDF,"Title","gnuplot diagram"); /* FIXME: use 'set title', if any ? */
-    
+
     PDF_LineType = LT_UNDEFINED;
 
     /* set current font to default */
@@ -378,14 +377,14 @@ PDF_init ()
     term->h_tic = term->v_tic = 3 * PDF_RESOLUTION;
 
     /* initialize terminal's pointsize from "set pointsize" value */
-    term_pointsize = pointsize;	
+    term_pointsize = pointsize;
 }
 
 
 TERM_PUBLIC void
 PDF_graphics ()
 {
-    if (PDF_pageIsOpen) 
+    if (PDF_pageIsOpen)
 	return;			/* already open --> nothing to do */
 
     PDF_pathIsOpen = FALSE;
@@ -394,7 +393,7 @@ PDF_graphics ()
     /* set xmax, ymax*/
     term->xmax = PDF_XMAX * xsize;
     term->ymax = PDF_YMAX * ysize;
-    
+
     PDF_begin_page(myPDF, (double)term->xmax / PDF_RESOLUTION,
 		   (double)term->ymax / PDF_RESOLUTION);
     PDF_scale(myPDF, 1.0/PDF_RESOLUTION, 1.0/PDF_RESOLUTION);
@@ -435,7 +434,7 @@ PDF_linetype (int linetype)
 
 	PDF_PathClose ();
 	PDF_LineType = linetype;
-	
+
 	PDF_setrgbcolor(myPDF, this_color->r / 255.0,
 			this_color->g / 255.0, this_color->b / 255.0);
     }
@@ -454,7 +453,7 @@ PDF_linewidth (double linewidth)
 TERM_PUBLIC void
 PDF_move (unsigned int x, unsigned int y)
 {
-    if (PDF_pathIsOpen && x == PDF_xLast && y == PDF_yLast)  
+    if (PDF_pathIsOpen && x == PDF_xLast && y == PDF_yLast)
 	return;
 
     PDF_PathOpen ();
@@ -468,7 +467,7 @@ PDF_move (unsigned int x, unsigned int y)
 TERM_PUBLIC void
 PDF_vector (unsigned int x, unsigned int y)
 {
-    if (PDF_pathIsOpen && x == PDF_xLast && y == PDF_yLast) 
+    if (PDF_pathIsOpen && x == PDF_xLast && y == PDF_yLast)
 	return;
 
     PDF_PathOpen ();
@@ -490,7 +489,7 @@ PDF_dot (unsigned int x, unsigned int y)
     PDF_lineto(myPDF, x, y);
     PDF_stroke(myPDF);
 }
-    
+
 
 TERM_PUBLIC void
 PDF_point (unsigned int x, unsigned int y, int number)
@@ -539,12 +538,12 @@ PDF_point (unsigned int x, unsigned int y, int number)
 	    PDF_stroke(myPDF);
 	    break;
 
-/* For each x = 0..5, 4 shapes are defined: 
+/* For each x = 0..5, 4 shapes are defined:
  * 3 + 2*x --> hollow symbol with a dot at its center
  * 4 + 2*x --> solid symbol filled in linetype's color
- * 63 + x  --> hollow symbol without the center dot 
+ * 63 + x  --> hollow symbol without the center dot
  * 69 + x  --> symbol filled with white --> opaque symbol */
- 
+
 	case 63+0:		/* BoxEmpty */
 	case 3+2*0:		/* Box */
 	    PDF_moveto(myPDF, -1, -1);
@@ -656,7 +655,7 @@ PDF_point (unsigned int x, unsigned int y, int number)
 	    PDF_lineto(myPDF, +0.95, 0.31);
 	    PDF_closepath_fill_stroke(myPDF);
 	    break;
-	    
+
 /* 15 + (0..15): circles with varying parts of'em filled. The added
  * number is a bit-pattern of the 4 quadrants: 1 signals a quadrant
  * filled */
@@ -693,7 +692,7 @@ PDF_point (unsigned int x, unsigned int y, int number)
 
 #define CIRCLE_TWO_NEIGHBOR_QUADRANTS(x, y, angle)		\
 	    CIRCLE_SINGLE_PIESLICE(x, y, angle, angle+180)
-	case 15+3:	
+	case 15+3:
 	    CIRCLE_TWO_NEIGHBOR_QUADRANTS(1, 0, 0);
 	case 15+6:
 	    CIRCLE_TWO_NEIGHBOR_QUADRANTS(0, 1, 90);
@@ -702,7 +701,7 @@ PDF_point (unsigned int x, unsigned int y, int number)
 	case 15+9:
 	    CIRCLE_TWO_NEIGHBOR_QUADRANTS(0, -1, 270);
 #undef CIRCLE_TWO_NEIGHBOR_QUADRANTS
-	  
+
 #define CIRCLE_TWO_OPPOSING_QUADRANTS(x, y, angle)		\
 	    PDF_moveto(myPDF, 0, 0);				\
 	    PDF_lineto(myPDF, x, y);				\
@@ -722,21 +721,21 @@ PDF_point (unsigned int x, unsigned int y, int number)
 	case 15+10:
 	    CIRCLE_TWO_OPPOSING_QUADRANTS(0, 1, 90);
 #undef CIRCLE_TWO_OPPOSING_QUADRANTS
-	    
+
 #define CIRCLE_THREE_QUADRANTS(x, y, angle)			\
 	    CIRCLE_SINGLE_PIESLICE(x, y, angle, angle+270)
 	case 15+7:
-	    CIRCLE_THREE_QUADRANTS(1, 0, 0);	    
+	    CIRCLE_THREE_QUADRANTS(1, 0, 0);
 	case 15+14:
-	    CIRCLE_THREE_QUADRANTS(0, 1, 90);	    
+	    CIRCLE_THREE_QUADRANTS(0, 1, 90);
 	case 15+13:
-	    CIRCLE_THREE_QUADRANTS(-1, 0, 180);	    
+	    CIRCLE_THREE_QUADRANTS(-1, 0, 180);
 	case 15+11:
-	    CIRCLE_THREE_QUADRANTS(0, -1, 270);	    
+	    CIRCLE_THREE_QUADRANTS(0, -1, 270);
 #undef CIRCLE_THREE_QUADRANTS
 #undef CIRCLE_SINGLE_PIESLICE
 
-	case 15+15:		
+	case 15+15:
 	    PDF_circle(myPDF, 0, 0, 1);
 	    PDF_closepath_fill_stroke(myPDF);
 	    break;
@@ -767,7 +766,7 @@ PDF_point (unsigned int x, unsigned int y, int number)
 	case 47+15:
 	    PDF_rotate(myPDF, 45);
 	    /* FALLTHROUGH */
-	case 31+15:		
+	case 31+15:
 	    PDF_moveto(myPDF, -1, 1);
 	    PDF_lineto(myPDF, -1, -1);
 	    PDF_lineto(myPDF, 1, -1);
@@ -856,7 +855,7 @@ PDF_point (unsigned int x, unsigned int y, int number)
 
 #define SQUARE_TWO_NEIGHBOR_QUADRANTS(x, y, angle)		\
 	    SQUARE_SINGLE_PIESLICE(x, y, 2)
-	case 31+3:	
+	case 31+3:
 	    SQUARE_TWO_NEIGHBOR_QUADRANTS(1, 0, 0);
 	case 31+6:
 	    SQUARE_TWO_NEIGHBOR_QUADRANTS(0, 1, 90);
@@ -865,22 +864,22 @@ PDF_point (unsigned int x, unsigned int y, int number)
 	case 31+9:
 	    SQUARE_TWO_NEIGHBOR_QUADRANTS(0, -1, 270);
 #undef SQUARE_TWO_NEIGHBOR_QUADRANTS
-	  
+
 	case 31+5:
 	    SQUARE_TWO_OPPOSING_QUADRANTS(1, 0, 0);
 	case 31+10:
 	    SQUARE_TWO_OPPOSING_QUADRANTS(0, 1, 90);
-	    
+
 #define SQUARE_THREE_QUADRANTS(x, y, angle)			\
 	    SQUARE_SINGLE_PIESLICE(x, y, 3)
 	case 31+7:
-	    SQUARE_THREE_QUADRANTS(1, 0, 0);	    
+	    SQUARE_THREE_QUADRANTS(1, 0, 0);
 	case 31+14:
-	    SQUARE_THREE_QUADRANTS(0, 1, 90);	    
+	    SQUARE_THREE_QUADRANTS(0, 1, 90);
 	case 31+13:
-	    SQUARE_THREE_QUADRANTS(-1, 0, 180);	    
+	    SQUARE_THREE_QUADRANTS(-1, 0, 180);
 	case 31+11:
-	    SQUARE_THREE_QUADRANTS(0, -1, 270);	    
+	    SQUARE_THREE_QUADRANTS(0, -1, 270);
 #undef SQUARE_THREE_QUADRANTS
 
 #define DIAMOND_SINGLE_QUADRANT(x, y, angle)			\
@@ -897,7 +896,7 @@ PDF_point (unsigned int x, unsigned int y, int number)
 
 #define DIAMOND_TWO_NEIGHBOR_QUADRANTS(x, y, angle)		\
 	    DIAMOND_SINGLE_PIESLICE(x, y, 2)
-	case 47+3:	
+	case 47+3:
 	    DIAMOND_TWO_NEIGHBOR_QUADRANTS(1, 0, 0);
 	case 47+6:
 	    DIAMOND_TWO_NEIGHBOR_QUADRANTS(0, 1, 90);
@@ -906,7 +905,7 @@ PDF_point (unsigned int x, unsigned int y, int number)
 	case 47+9:
 	    DIAMOND_TWO_NEIGHBOR_QUADRANTS(0, -1, 270);
 #undef DIAMOND_TWO_NEIGHBOR_QUADRANTS
-	  
+
 
 	case 47+5:
 	    DIAMOND_TWO_OPPOSING_QUADRANTS(1, 0, 0);
@@ -914,24 +913,24 @@ PDF_point (unsigned int x, unsigned int y, int number)
 	    DIAMOND_TWO_OPPOSING_QUADRANTS(0, 1, 90);
 #undef DIAMOND_TWO_OPPOSING_QUADRANTS
 #undef SQUARE_TWO_OPPOSING_QUADRANTS
-	    
+
 #define DIAMOND_THREE_QUADRANTS(x, y, angle)			\
 	    DIAMOND_SINGLE_PIESLICE(x, y, 3)
 	case 47+7:
-	    DIAMOND_THREE_QUADRANTS(1, 0, 0);	    
+	    DIAMOND_THREE_QUADRANTS(1, 0, 0);
 	case 47+14:
-	    DIAMOND_THREE_QUADRANTS(0, 1, 90);	    
+	    DIAMOND_THREE_QUADRANTS(0, 1, 90);
 	case 47+13:
-	    DIAMOND_THREE_QUADRANTS(-1, 0, 180);	    
+	    DIAMOND_THREE_QUADRANTS(-1, 0, 180);
 	case 47+11:
-	    DIAMOND_THREE_QUADRANTS(0, -1, 270);	    
+	    DIAMOND_THREE_QUADRANTS(0, -1, 270);
 #undef DIAMOND_THREE_QUADRANTS
 #undef DIAMOND_SINGLE_PIESLICE
 #undef SQUARE_SINGLE_PIESLICE
 
 	default:
 	    int_warn(NO_CARET, "PDF: unknown point type number %d", number);
-	}	
+	}
     }
 
     PDF_restore(myPDF);
@@ -961,7 +960,7 @@ PDF_put_text (unsigned int x, unsigned int y, const char *str)
 {
     char *alignment = NULL;
     double h = x, v = y;
-    
+
     PDF_PathClose ();
 
     /* horizontal justification*/
@@ -1030,10 +1029,10 @@ PDF_set_font (const char *font)
 
     PDF_PathClose();
     PDF_SetFont();
-   
+
     term->h_char = PDF_fontAvWidth;
     term->v_char = (PDF_fontAscent + PDF_fontDescent + PDF_fontLeading);
-    
+
     return (TRUE);
 }
 
@@ -1150,7 +1149,7 @@ PDF_filled_polygon(int points, gpiPoint* corners)
 }
 
 TERM_PUBLIC void
-PDF_previous_palette(void)
+PDF_previous_palette()
 {
 }
 
@@ -1186,11 +1185,11 @@ static unsigned int ENHpdf_xsave, ENHpdf_ysave;
 
 /* Start a new string fragment */
 TERM_PUBLIC void
-ENHPDF_OPEN(fontname, fontsize, base, widthflag, showflag, overprint)
-    char *fontname;
-    TBOOLEAN widthflag, showflag;
-    double fontsize, base;
-    int overprint;
+ENHPDF_OPEN(
+    char *fontname,
+    double fontsize, double base,
+    TBOOLEAN widthflag, TBOOLEAN showflag,
+    int overprint)
 {
     /* If the overprint code requests a save or request, that's all we do */
     if (overprint == 3) {
@@ -1215,7 +1214,7 @@ ENHPDF_OPEN(fontname, fontsize, base, widthflag, showflag, overprint)
 }
 
 /* Write a string fragment and update the current position */
-TERM_PUBLIC void 
+TERM_PUBLIC void
 ENHPDF_FLUSH()
 {
     int x, y;
@@ -1234,7 +1233,7 @@ ENHPDF_FLUSH()
 	    /* Select current font */
 	    PDF_fontSizeCur = ENHpdf_fontsize;
 	    PDF_set_font(ENHpdf_font);
-	    
+
 	    /* Find length of string in current font */
 	    stringlength = PDF_stringwidth(myPDF, enhanced_text,
 		PDF_currentFontHandle, ENHpdf_fontsize);
@@ -1265,12 +1264,10 @@ ENHPDF_FLUSH()
 }
 
 TERM_PUBLIC void
-ENHPDF_put_text(x, y, str)
-    unsigned int x, y;
-    const char *str;
+ENHPDF_put_text(unsigned int x, unsigned int y, const char *str)
 {
     char *original_string = (char *)str;
-    
+
     if (ignore_enhanced_text || !PDF_fontNameCur) {
 	PDF_put_text(x,y,str);
 	return;
@@ -1318,7 +1315,7 @@ ENHPDF_put_text(x, y, str)
      * closing brace in the string. We increment past it (else
      * we get stuck in an infinite loop) and try again.
      */
-    while (*(str = enhanced_recursion((char *)str, TRUE, 
+    while (*(str = enhanced_recursion((char *)str, TRUE,
     			PDF_fontNameDef, PDF_fontSizeDef,
 			0.0, TRUE, TRUE, 0))) {
 	(term->enhanced_flush)();
@@ -1349,7 +1346,7 @@ ENHPDF_put_text(x, y, str)
 	    y_offset = x_offset * tan((double)PDF_TextAngle * M_PI_2/90.);
 	PDF_TextJust = LEFT;
 	ENHpdf_sizeonly = FALSE;
-	
+
 	if (justification == RIGHT) {
 	    ENHPDF_put_text(x - x_offset, y - y_offset, original_string);
 	} else if (justification == CENTRE) {

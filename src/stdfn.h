@@ -1,5 +1,5 @@
 /*
- * $Id: stdfn.h,v 1.25 2004/01/07 14:45:22 lhecking Exp $
+ * $Id: stdfn.h,v 1.26 2004/04/13 17:24:01 broeker Exp $
  */
 
 /* GNUPLOT - stdfn.h */
@@ -144,8 +144,7 @@ double strtod();
 #  define VA_START(args, lastarg) va_start(args)
 # endif /* !STDC_HEADERS */
 #else /* HAVE_VFPRINTF || HAVE_DOPRNT */
-# define va_alist a1, a2, a3, a4, a5, a6, a7, a8
-# define va_dcl char *a1, *a2, *a3, *a4, *a5, *a6, *a7, *a8;
+# define va_dcl char *a1, char *a2, char *a3, char *a4, char *a5, char *a6, char *a7, char *a8
 #endif /* !(HAVE_VFPRINTF || HAVE_DOPRNT) */
 
 #ifdef HAVE_UNISTD_H
@@ -381,7 +380,7 @@ int gp_strnicmp __PROTO((const char *, const char *, size_t));
 
 /* The XOPEN ln(10) macro */
 #ifndef M_LN10
-#  define M_LN10    2.3025850929940456840e0 
+#  define M_LN10    2.3025850929940456840e0
 #endif
 
 /* HBB 20010223: moved this whole block from syscfg.h to here. It
@@ -412,10 +411,10 @@ int gp_strnicmp __PROTO((const char *, const char *, size_t));
 
 /*
  * Note about VERYLARGE:  This is the upper bound double (or float, if PC)
- * numbers. This flag indicates very large numbers. It doesn't have to 
- * be the absolutely biggest number on the machine.  
+ * numbers. This flag indicates very large numbers. It doesn't have to
+ * be the absolutely biggest number on the machine.
  * If your machine doesn't have HUGE, or float.h,
- * define VERYLARGE here. 
+ * define VERYLARGE here.
  *
  * example:
 #define VERYLARGE 1e37
@@ -443,7 +442,7 @@ int gp_strnicmp __PROTO((const char *, const char *, size_t));
 # endif
 #endif /* COORDVAL_FLOAT */
 
-                 
+
 #ifndef VERYLARGE
 # ifdef HUGE
 #  define VERYLARGE (HUGE/2-1)
@@ -506,7 +505,7 @@ int gp_strnicmp __PROTO((const char *, const char *, size_t));
 	       (z) = (max);			\
        }					\
     } while (0)
-#endif	      
+#endif
 
 /* both min/max and MIN/MAX are defined by some compilers.
  * we are now on GPMIN / GPMAX

@@ -1,5 +1,5 @@
-/*
- * $Id: mac.trm,v 1.5 2003/02/18 16:38:12 broeker Exp $
+/* Hello, Emacs, this is -*-C-*-
+ * $Id: mac.trm,v 1.6 2004/04/13 17:24:34 broeker Exp $
  *
  */
 
@@ -84,31 +84,31 @@ register_term(mac)
 
 #define MAC_XMAX 494
 #define MAC_YMAX 274
-/* 
+/*
  * #define MAC_XOFFSET (497-MAC_XMAX)
- * 
+ *
  * #define MAC_XLAST (MAC_XMAX - 1)
  * #define MAC_YLAST (MAC_YMAX - 1)
  */
 
 #define MAC_VCHAR 12	 /* monaco 9 point plain style */
-#define MAC_HCHAR 6	 
+#define MAC_HCHAR 6
 #define MAC_VTIC 3
 #define MAC_HTIC 3
 
-void MAC_init __PROTO(());
-void MAC_graphics __PROTO(());
-void MAC_text __PROTO(());
+void MAC_init __PROTO((void));
+void MAC_graphics __PROTO((void));
+void MAC_text __PROTO((void));
 void MAC_linetype __PROTO((int linetype));
 void MAC_move __PROTO((unsigned int x,unsigned int y));
 void MAC_vector __PROTO((unsigned int x,unsigned int y));
 void MAC_put_text __PROTO((unsigned int x,unsigned int y,const char *str));
 int  MAC_text_angle __PROTO((int angle));
 int  MAC_justify_text __PROTO((enum JUSTIFY just));
-void MAC_reset __PROTO(());
-void MAC_options __PROTO(());
-void MAC_suspend __PROTO(());
-void MAC_resume __PROTO(());
+void MAC_reset __PROTO((void));
+void MAC_options __PROTO((void));
+void MAC_suspend __PROTO((void));
+void MAC_resume __PROTO((void));
 int  MAC_setfont __PROTO((char *font));
 #endif /* TERM_PROTO */
 
@@ -160,7 +160,7 @@ START_HELP(mac)
 "  'set term mac size default' sets the window size settings to those set in",
 "     the preferences dialog.",
 "",
-"  'set term mac default' sets all options to their default values.", 
+"  'set term mac default' sets all options to their default values.",
 "     Default values: nogx, multiwin, novertical.",
 "",
 "  If you generate graphs under the multiwin option and then switch to singlewin,",

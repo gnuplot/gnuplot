@@ -693,7 +693,7 @@ The Atari version of readline defines some additional key aliases:
       Ctrl Home       - same as ^E.
       Esc             - same as ^U.
       Help            - @ref{help} plus return.
-      Ctrl Help       - @ref{help}.
+      Ctrl Help       - `help `.
 
 @end example
 
@@ -11424,8 +11424,8 @@ Boutell's gd library, which is available from http://www.boutell.com/gd/
 Support for GIF output was removed from the gd library beginning with 
 version 1.6; newer versions support PNG output instead.
 
->>> This copy of gnuplot was configured to produce PNG images <<<
->>> instead of GIF images when 'set term gif' is selected.    <<<
+NOTE: This copy of gnuplot was configured to produce PNG images
+instead of GIF images when 'set term gif' is selected.
 
 Syntax:
 @example

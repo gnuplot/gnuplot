@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: parse.c,v 1.21 2003/11/22 04:49:51 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: parse.c,v 1.22 2004/04/13 17:23:58 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - parse.c */
@@ -82,21 +82,18 @@ static int at_size = 0;
 
 #ifdef GP_ISVAR
 /* isvar - When this variable is true PUSH operations become PUSHV */
-static TBOOLEAN push_vars = TRUE; 
+static TBOOLEAN push_vars = TRUE;
 #endif
 
 static void
-convert(val_ptr, t_num)
-    struct value *val_ptr;
-    int t_num;
+convert(struct value *val_ptr, int t_num)
 {
     *val_ptr = token[t_num].l_val;
 }
 
 
 struct value *
-const_express(valptr)
-struct value *valptr;
+const_express(struct value *valptr)
 {
     register int tkn = c_token;
 
@@ -162,10 +159,9 @@ extend_at()
     FPRINTF((stderr, "Extending at size to %d\n", at_size));
 }
 
-/* moved from eval.c, the function is only called from this module */
+/* Add function number <sf_index> to the current action table */
 static union argument *
-add_action(sf_index)
-enum operators sf_index;	/* index of p-code function */
+add_action(enum operators sf_index)
 {
     if (at->a_count >= at_size) {
 	extend_at();
@@ -627,12 +623,9 @@ parse_unary_expression()
 	parse_primary_expression();
 }
 
-/* FIXME HBB 20010724: These functions (add_udv, add_udf, and
- * is_builtin_function) belong into parse.c, really ! */
 /* find or add value and return pointer */
 struct udvt_entry *
-add_udv(t_num)		
-    int t_num;
+add_udv(int t_num)
 {
     register struct udvt_entry **udv_ptr = &first_udv;
 
@@ -655,9 +648,9 @@ add_udv(t_num)
 }
 
 
+/* find or add function at index <t_num>, and return pointer */
 struct udft_entry *
-add_udf(t_num)			/* find or add function and return pointer */
-    int t_num;			/* index to token[] */
+add_udf(int t_num)
 {
     register struct udft_entry **udf_ptr = &first_udf;
 
@@ -689,10 +682,9 @@ add_udf(t_num)			/* find or add function and return pointer */
     return (*udf_ptr);
 }
 
-
+/* return standard function index or 0 */
 static int
-is_builtin_function(t_num)		/* return standard function index or 0 */
-    int t_num;
+is_builtin_function(int t_num)
 {
     register int i;
 
@@ -706,8 +698,7 @@ is_builtin_function(t_num)		/* return standard function index or 0 */
 /* EAM July 2003 - get_udv() is like add_udv except that it does not require
  * that the udv key be a token in the current command line. */
 struct udvt_entry *
-get_udv(key)		
-    char *key;
+get_udv(char *key)
 {
     register struct udvt_entry **udv_ptr = &first_udv;
 

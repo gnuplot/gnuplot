@@ -1,5 +1,5 @@
 /*
- * $Id: wcommon.h,v 1.2 2001/09/19 14:47:02 mikulik Exp $
+ * $Id: wcommon.h,v 1.3 2004/04/13 17:24:06 broeker Exp $
  */
 
 /* GNUPLOT - wcommon.h */
@@ -36,7 +36,7 @@
 
 /*
  * AUTHORS
- * 
+ *
  *   Maurice Castro
  *   Russell Lang
  */

@@ -1,5 +1,5 @@
 /*
- * $Id: pm3d.h,v 1.18 2003/09/08 12:55:59 broeker Exp $
+ * $Id: pm3d.h,v 1.19 2004/03/11 18:28:43 broeker Exp $
  */
 
 /* GNUPLOT - pm3d.h */
@@ -9,8 +9,8 @@
  * Petr Mikulik, since December 1998
  * Copyright: open source as much as possible
  *
- * 
- * What is here: #defines, global variables and declaration of routines for 
+ *
+ * What is here: #defines, global variables and declaration of routines for
  * the pm3d plotting mode
  *
 ]*/
@@ -45,7 +45,7 @@
     - if pm3d.where is "", then don't plot in pm3d mode
     - pm3d_at_where can be any combination of the #defines below. For instance,
 	"b" plot at botton only, "st" plots firstly surface, then top, etc.
-  (for pm3d.where)	
+  (for pm3d.where)
 */
 #define PM3D_AT_BASE	'b'
 #define PM3D_AT_TOP	't'
@@ -60,7 +60,7 @@
 #define PM3D_FLUSH_END     'r'
 #define PM3D_FLUSH_CENTER  'c'
 
-/* 
+/*
   direction of taking the scans: forward = as the scans are stored in the
   file; backward = opposite direction, i.e. like from the end of the file
 */
@@ -120,7 +120,7 @@ typedef struct {
 			/* 1: [default] draw ALL surfaces with pm3d
 			   0: only surfaces specified with 'with pm3d' */
   PM3D_WHICH_CORNERS2COLOR which_corner_color;
-			/* default: average color from all 4 points */ 
+			/* default: average color from all 4 points */
 } pm3d_struct;
 
 

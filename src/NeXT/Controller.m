@@ -18,7 +18,7 @@
 	NXRect *paperRect;
 
 	static NXDefaultsVector GnuTermDefaults = {
-		{"Width", "400"}, 
+		{"Width", "400"},
 		{"Height", "300"},
 		{"Backing", "Buffered"},
 		{NULL}
@@ -41,7 +41,7 @@
 
 	[DefaultSize setStringValue:NXGetDefaultValue("GnuTerm","Width") at:0];
 	[DefaultSize setStringValue:NXGetDefaultValue("GnuTerm","Height") at:1];
-		
+
 	if (!strcmp(NXGetDefaultValue("GnuTerm","Backing"), "Buffered")) {
 		backing = NX_BUFFERED;
 		[useBufferedSwitch setState:YES];
@@ -59,7 +59,7 @@
 - newGnuTerm:sender
 {
 	NXRect frame;
-					
+
 	if ([gvList indexOf:keyTerm] != NX_NOT_IN_LIST) {
 		[[keyTerm window] getFrame: &frame];
 		NX_X(&frame) += 24;
@@ -69,21 +69,21 @@
 		NX_WIDTH(&frame) = 	atof(NXGetDefaultValue("GnuTerm","Width"));
 		NX_HEIGHT(&frame) = atof(NXGetDefaultValue("GnuTerm","Height"));
 		NX_X(&frame) = 200;
-		NX_Y(&frame) = 350;	
+		NX_Y(&frame) = 350;
 	}
 
 	if ([NXApp loadNibSection: "gnuview.nib" owner: self] == nil) {
 		return nil;
 	}
 //	fprintf(stderr,"newGnuTerm: %g x %g\n",NX_WIDTH(&frame),NX_HEIGHT(&frame));
-	
+
 	[[activeTerm window] setBackingType:backing];
 	[[activeTerm window] placeWindowAndDisplay: &frame];
 	[self setKeyTerm:activeTerm];
-		
+
 	[gvList addObject:activeTerm];
 	++wcnt;
-		
+
 	return activeTerm;
 }
 
@@ -91,10 +91,10 @@
 - setActiveTerm:(id) newTerm
 {
 	if (activeTerm != nil) [activeTerm deactivate:self];
-	
+
 	activeTerm = newTerm;
 	[activeTerm GVactivate:self];
-	
+
 	return self;
 }
 
@@ -108,12 +108,12 @@
 }
 
 - setKeyTerm:newTerm
-{	
+{
 	keyTerm = newTerm;
 
 	[NameField setStringValue:[[keyTerm window] title]];
 	[NameField selectText:self];
-		
+
 	return self;
 }
 
@@ -129,10 +129,10 @@
 	int i, cnt;
 	id test;
 	char buf[50];
-	
+
 	//fprintf(stderr, "Request for window: %s\n", title);
 
-	if (*title) {		
+	if (*title) {
 										/* If the window exists, use it */
 		cnt = [gvList count];
 		for (i=0; i < cnt; ++i) {
@@ -141,7 +141,7 @@
 				if (test != activeTerm) [self setActiveTerm:test];
 				break;
 			}
-		}	
+		}
 										/* O.K., it doesn't exist, what now? */
 		if (i == cnt) {
 			[self newGnuTerm:self];
@@ -155,8 +155,8 @@
 			[[activeTerm window] setTitle: buf];
 		}
 	}
-	
-	
+
+
 	[[activeTerm window] makeKeyAndOrderFront: nil];
 	[[activeTerm gnuView] executePS:PSstring];
 
@@ -176,7 +176,7 @@
 	NXRect frame;
 
 	if (sender == useKeyButton) {
-		fprintf(stderr, "useKey\n");		
+		fprintf(stderr, "useKey\n");
 		if ([gvList indexOf:keyTerm] != NX_NOT_IN_LIST) {
 			[[keyTerm window] getFrame: &frame];
 			[DefaultSize setFloatValue:NX_WIDTH(&frame) at:0];
@@ -187,8 +187,8 @@
 	NXWriteDefault("GnuTerm", "Width",  [DefaultSize stringValueAt:0]);
 	NXWriteDefault("GnuTerm", "Height", [DefaultSize stringValueAt:1]);
 
-	
-	fprintf(stderr, "setDefaultGTSize: %s x %s\n", 
+
+	fprintf(stderr, "setDefaultGTSize: %s x %s\n",
 		[DefaultSize stringValueAt:0],[DefaultSize stringValueAt:1]);
 
 	return self;
@@ -212,15 +212,15 @@
 
 
 - closeAll:sender
-{	
+{
 	while([gvList count]) [[[gvList objectAt:0] window] performClose:self];
 	return self;
 }
 - miniaturizeAll:sender
 {
 	int i, cnt;
-	
-	cnt = [gvList count]; 
+
+	cnt = [gvList count];
 
 	for (i=0; i < cnt; ++i)
 		[[[gvList objectAt:i] window] performMiniaturize:self];

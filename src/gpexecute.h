@@ -30,7 +30,7 @@
 
 /*
  * AUTHORS
- * 
+ *
  *   Original Software (October 1999 - January 2000):
  *     Pieter-Tjerk de Boer <ptdeboer@cs.utwente.nl>
  *     Petr Mikulik <mikulik@physics.muni.cz>

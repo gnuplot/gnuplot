@@ -41,12 +41,12 @@ class GPWindow : public BWindow {
 		virtual void	FrameResized(float width, float height);
 
 		status_t		Save(BMessage *message);
-	
+
 	private:
 		void			_InitWindow(void);
 		void			Register(bool need_id);
 		void			Unregister(void);
-		
+
 		BMenuBar		*menubar;
 		BView			*plotview;
 //		GPView			*plotview;

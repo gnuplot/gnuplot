@@ -1,5 +1,5 @@
-/*
- * $Id: epson.trm,v 1.18 2002/12/13 14:58:39 lhecking Exp $
+/* Hello, Emacs, this is -*-C-*-
+ * $Id: epson.trm,v 1.19 2004/04/13 17:24:30 broeker Exp $
  *
  */
 
@@ -48,7 +48,7 @@
  *  William Wilson
  *
  * send your comments or suggestions to (gnuplot-info@lists.sourceforge.net).
- * 
+ *
  */
 
 /*
@@ -331,8 +331,7 @@ NEC_text()
 }
 
 TERM_PUBLIC void
-NEC_linetype(linetype)
-    int linetype;
+NEC_linetype(int linetype)
 {
     if (NECmode == 'c') {
 	if (linetype >= 6)
@@ -505,8 +504,7 @@ STARC_text()
 }
 
 TERM_PUBLIC void
-STARC_linetype(linetype)
-int linetype;
+STARC_linetype(int linetype)
 {
     if (linetype >= 6)
 	linetype %= 6;

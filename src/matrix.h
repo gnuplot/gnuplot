@@ -1,5 +1,5 @@
 /*
- * $Id: matrix.h,v 1.8 2001/04/24 18:43:09 broeker Exp $
+ * $Id: matrix.h,v 1.9 2004/04/13 17:23:58 broeker Exp $
  */
 
 /* GNUPLOT - matrix.h */
@@ -37,7 +37,7 @@ void    free_matr __PROTO((double **m));
 double  *redim_vec __PROTO((double **v, int n));
 void    solve __PROTO((double **a, int n, double **b, int m));
 void    Givens __PROTO((double **C, double *d, double *x,
-    		double *r, int N, int n, int want_r)); 
+    		double *r, int N, int n, int want_r));
 void    Invert_RtR __PROTO((double **R, double **I, int n));
 
 /* Functions for use by THIN_PLATE_SPLINES_GRID method */

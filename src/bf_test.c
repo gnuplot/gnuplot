@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: bf_test.c,v 1.7 2002/03/07 16:11:25 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: bf_test.c,v 1.8 2004/02/23 13:35:00 broeker Exp $"); }
 #endif
 
 
@@ -46,9 +46,7 @@ static range TheRange[] = {{-3,3,-2,2},
 
 /*---- Stubs to make this work without including huge libraries ----*/
 void
-int_error(dummy, error_text)
-    int dummy;
-    const char *error_text;
+int_error(int dummy, const char *error_text)
 {
     (void) dummy;		/* avoid -Wunused warning */
     fprintf(stderr, "Fatal error..\n%s\n...now exiting to system ...\n",
@@ -66,9 +64,7 @@ FreeHelp()
 
 
 static float
-function(p, x, y)
-int p;
-double x, y;
+function(int p, double x, double y)
 {
     float t = 0;			/* HBB 990828: initialize */
 
@@ -95,9 +91,10 @@ double x, y;
     return t;
 }
 
-#define ISOSAMPLES (double)5
+#define ISOSAMPLES 5.0
+
 int
-main()
+main(void)
 {
     int plot;
     int i, j;

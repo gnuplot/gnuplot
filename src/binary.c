@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: binary.c,v 1.9 2001/08/22 14:15:33 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: binary.c,v 1.10 2002/02/25 03:10:40 broeker Exp $"); }
 #endif
 
 /*
@@ -7,7 +7,7 @@ static char *RCSid() { return RCSid("$Id: binary.c,v 1.9 2001/08/22 14:15:33 bro
  * to command.c, will permit gnuplot to plot binary files.
  * gnubin  - contains the code that relies on gnuplot include files
  *                     and other definitions
- * binary      - contains those things that are independent of those 
+ * binary      - contains those things that are independent of those
  *                     definitions and files
  *
  * With these routines, hidden line removal of your binary data is possible!
@@ -22,25 +22,28 @@ static char *RCSid() { return RCSid("$Id: binary.c,v 1.9 2001/08/22 14:15:33 bro
  *
  */
 
+/* NOTE: a significant fraction of these routines is not called from
+ * anywhere in gnuplot.  They're provided as a utility library for
+ * people wanting to write binary files usable by gnuplot, as the
+ * bf_test.c demo does it. */
+
 #include "binary.h"
 
 #include "alloc.h"
 #include "util.h"
 
-/* 
- * This routine scans the first block of the file to see if the file is a 
- * binary file.  A file is considered binary if 10% of the characters in it 
- * are not in the ascii character set. (values < 128), or if a NUL is found.
- * I hope this doesn't break when used on the bizzare PC's.
- */
+/* This routine scans the first block of the file to see if the file
+ * is a binary file.  A file is considered binary if 10% of the
+ * characters in it are not in the ascii character set. (values <
+ * 128), or if a NUL is found.  I hope this doesn't break when used on
+ * the bizzare PC's. */
 int
-is_binary_file(fp)
-register FILE *fp;
+is_binary_file(FILE *fp)
 {
-    register int i, len;
-    register int odd;		/* Contains a count of the odd characters */
+    int i, len;
+    int odd;		/* Contains a count of the odd characters */
     long where;
-    register unsigned char *c;
+    unsigned char *c;
     unsigned char buffer[512];
 
     if ((where = ftell(fp)) == -1) {	/* Find out where we start */
@@ -80,33 +83,32 @@ register FILE *fp;
 
 
 /*========================= I/O Routines ================================
-  These may be useful for situations other than just gnuplot.  Note that I 
-  have included the reading _and_ the writing routines, so others can create 
+  These may be useful for situations other than just gnuplot.  Note that I
+  have included the reading _and_ the writing routines, so others can create
   the file as well as read the file.
 */
 
-/*
-   This function reads a matrix from a stream
-
-   This routine never returns anything other than vectors and arrays
-   that range from 0 to some number.  
-
- */
 #define START_ROWS 100		/* Each of these must be at least 1 */
 #define ADD_ROWS 50
+
+
+/* This function reads a matrix from a stream
+ *
+ * This routine never returns anything other than vectors and arrays
+ * that range from 0 to some number. */
 int
-fread_matrix(fin, ret_matrix, nr, nc, row_title, column_title)
-    FILE *fin;
-    float GPFAR * GPFAR * GPFAR * ret_matrix;
-    float GPFAR * GPFAR * row_title;
-    float GPFAR * GPFAR * column_title;
-    int *nr, *nc;
+fread_matrix(
+    FILE *fin,
+    float GPFAR * GPFAR * GPFAR * ret_matrix,
+    int *nr, int *nc,
+    float GPFAR * GPFAR * row_title,
+    float GPFAR * GPFAR * column_title)
 {
-    float GPFAR *GPFAR * m, GPFAR * rt, GPFAR * ct;
+    float GPFAR * GPFAR * m, GPFAR * rt, GPFAR * ct;
     int num_rows = START_ROWS;
     size_t num_cols;
     int current_row = 0;
-    float GPFAR *GPFAR * temp_array;
+    float GPFAR * GPFAR * temp_array;
     float fdummy;
 
     if (fread(&fdummy, sizeof(fdummy), 1, fin) != 1)
@@ -114,11 +116,9 @@ fread_matrix(fin, ret_matrix, nr, nc, row_title, column_title)
 
     num_cols = (size_t) fdummy;
 
-    /* 
-       Choose a reasonable number of rows,
-       allocate space for it and continue until this space
-       runs out, then extend the matrix as necessary.
-     */
+    /* Choose a reasonable number of rows, allocate space for it and
+     * continue until this space runs out, then extend the matrix as
+     * necessary. */
     ct = vector(0, num_cols - 1);
     fread(ct, sizeof(*ct), num_cols, fin);
 
@@ -153,16 +153,19 @@ fread_matrix(fin, ret_matrix, nr, nc, row_title, column_title)
     return (TRUE);
 }
 
-/* This writes a matrix to a stream 
-   Note that our ranges are inclusive ranges--and we can specify subsets.
-   This behaves similarly to the xrange and yrange operators in gnuplot
-   that we all are familiar with.
+/* This writes a matrix to a stream
+ *
+ * Note that our ranges are inclusive ranges--and we can specify
+ * subsets.  This behaves similarly to the xrange and yrange operators
+ * in gnuplot that we all are familiar with.
  */
 int
-fwrite_matrix(fout, m, nrl, nrh, ncl, nch, row_title, column_title)
-register FILE *fout;
-register float GPFAR *GPFAR * m, GPFAR * row_title, GPFAR * column_title;
-register int nrl, nrh, ncl, nch;
+fwrite_matrix(
+    FILE *fout,
+    float GPFAR * GPFAR *m,
+    int nrl, int nrh, int ncl, int nch,
+    float GPFAR *row_title,
+    float GPFAR *column_title)
 {
     register int j;
     float length;
@@ -213,12 +216,11 @@ register int nrl, nrh, ncl, nch;
  *
  */
 float GPFAR *
-vector(nl, nh)
-register int nl, nh;
+vector(int nl, int nh)
 {
-    register float GPFAR *vec;
+    float GPFAR *vec;
 
-    if (!(vec = (float GPFAR *) gp_alloc((nh - nl + 1) * sizeof(float), NULL))) {
+    if (! (vec = gp_alloc((nh - nl + 1) * sizeof(float), NULL))) {
 	int_error(NO_CARET, "not enough memory to create vector");
 	return NULL;		/* Not reached */
     }
@@ -226,7 +228,7 @@ register int nl, nh;
 }
 
 
-/* 
+/*
  *  Free a vector allocated above
  *
  *   This subroutine based on a subroutine listed in "Numerical Recipies in C",
@@ -234,36 +236,25 @@ register int nl, nh;
  *
  */
 void
-free_vector(vec, nl)
-    float GPFAR *vec;
-    int nl;
+free_vector(float GPFAR *vec, int nl)
 {
     free(vec + nl);
 }
 
 /************ Routines to modify the length of a vector ****************/
 float GPFAR *
-extend_vector(vec, old_nl, new_nh)
-    float GPFAR *vec;
-    register int old_nl, new_nh;
+extend_vector(float GPFAR *vec, int old_nl, int new_nh)
 {
-    register float GPFAR *new_v;
-    new_v = (float GPFAR *) gp_realloc((void *) (vec + old_nl),
-				       (new_nh - old_nl + 1) * sizeof(float),
-				       "extend vector");
+    float GPFAR *new_v = gp_realloc((vec + old_nl),
+				    (new_nh - old_nl + 1) * sizeof(new_v[0]),
+				    "extend/retract vector");
     return new_v - old_nl;
 }
 
 float GPFAR *
-retract_vector(v, old_nl, new_nh)
-    float GPFAR *v;
-    register int old_nl, new_nh;
+retract_vector(float GPFAR *v, int old_nl, int new_nh)
 {
-    register float GPFAR *new_v;
-    new_v = (float GPFAR *) gp_realloc((void *) (v + old_nl),
-				       (new_nh - old_nl + 1) * sizeof(float),
-				       "retract vector");
-    return new_v - old_nl;
+    return extend_vector(v, old_nl, new_nh);
 }
 
 
@@ -274,33 +265,30 @@ retract_vector(v, old_nl, new_nh)
  * 	 I always get confused with this, so here I write it down:
  * 			  for nrl<= nri <=nrh and
  * 			  for ncl<= ncj <=nch
- *  
+ *
  *   This matrix is accessed as:
- *   
+ *
  *     matrix[nri][ncj];
  *     where nri is the offset to the pointer to a vector where the
  *     ncjth element lies.
- * 
+ *
  *   If there is an error we don't really return - int_error breaks us out.
  *
  *   This subroutine based on a subroutine listed in "Numerical Recipies in C",
  *   by Press, Flannery, Teukoilsky and Vetterling (1988).
  *
  */
-float
-GPFAR *GPFAR *
-matrix(nrl, nrh, ncl, nch)
-register int nrl, nrh, ncl, nch;
+float GPFAR * GPFAR *
+matrix(int nrl, int nrh, int ncl, int nch)
 {
-    register int i;
-    register float GPFAR *GPFAR * m;
+    int i;
+    float GPFAR * GPFAR * m;
 
-    m = (float GPFAR * GPFAR *) gp_alloc((nrh - nrl + 1) * sizeof(float GPFAR *),
-					 "matrix");
+    m = gp_alloc((nrh - nrl + 1) * sizeof(m[0]), "matrix rows");
     m -= nrl;
 
     for (i = nrl; i <= nrh; i++) {
-	if (!(m[i] = (float GPFAR *) gp_alloc((nch - ncl + 1) * sizeof(float), NULL))) {
+	if (!(m[i] = gp_alloc((nch - ncl + 1) * sizeof(m[i][0]), NULL))) {
 	    free_matrix(m, nrl, i - 1, ncl);
 	    int_error(NO_CARET, "not enough memory to create matrix");
 	    return NULL;
@@ -309,7 +297,8 @@ register int nrl, nrh, ncl, nch;
     }
     return m;
 }
-/* 
+
+/*
  * Free a matrix allocated above
  *
  *
@@ -318,34 +307,30 @@ register int nrl, nrh, ncl, nch;
  *
  */
 void
-free_matrix(m, nrl, nrh, ncl)
-    float GPFAR *GPFAR * m;
-    unsigned int nrl, nrh, ncl;
+free_matrix(
+    float GPFAR * GPFAR * m,
+    int nrl, int nrh, int ncl)
 {
-    register unsigned int i;
+    int i;
 
     for (i = nrl; i <= nrh; i++)
-	free((char GPFAR *) (m[i] + ncl));
-    free((char GPFAR *) (m + nrl));
+	free(m[i] + ncl);
+    free(m + nrl);
 }
 
-/*
-   This routine takes a sub matrix and extends the number of rows and 
-   columns for a new matrix
- */
-float GPFAR *GPFAR *
-extend_matrix(a, nrl, nrh, ncl, nch, srh, sch)
-register float GPFAR *GPFAR * a;
-register int nrl, nrh, ncl, nch;
-register int srh, sch;
+/* This routine takes a sub matrix and extends the number of rows and
+ * columns for a new matrix */
+float GPFAR * GPFAR *
+extend_matrix(
+    float GPFAR * GPFAR * a,
+    int nrl, int nrh, int ncl, int nch,
+    int srh, int sch)
 {
-    register int i;
-    register float GPFAR *GPFAR * m;
+    int i;
+    float GPFAR * GPFAR * m;
 
-    m = (float GPFAR * GPFAR *) gp_realloc((void *) (a + nrl),
-					   (srh - nrl + 1) * sizeof(float GPFAR *),
-					   "extend matrix");
-
+    m = gp_realloc(a + nrl, (srh - nrl + 1) * sizeof(m[0]),
+		    "extend matrix");
     m -= nrl;
 
     if (sch != nch) {
@@ -358,7 +343,7 @@ register int srh, sch;
 	}
     }
     for (i = nrh + 1; i <= srh; i++) {
-	if (!(m[i] = (float GPFAR *) gp_alloc((nch - ncl + 1) * sizeof(float), NULL))) {
+	if (!(m[i] = gp_alloc((nch - ncl + 1) * sizeof(m[i][0]), NULL))) {
 	    free_matrix(m, nrl, i - 1, nrl);
 	    int_error(NO_CARET, "not enough memory to extend matrix");
 	    return NULL;
@@ -367,35 +352,31 @@ register int srh, sch;
     }
     return m;
 }
-/*
-   this routine carves a large matrix down to size
- */
-float GPFAR *GPFAR *
-retract_matrix(a, nrl, nrh, ncl, nch, srh, sch)
-register float GPFAR *GPFAR * a;
-register int nrl, nrh, ncl, nch;
-register int srh, sch;
+/* this routine carves a large matrix down to size */
+float GPFAR * GPFAR *
+retract_matrix(
+    float GPFAR * GPFAR * a,
+    int nrl, int nrh, int ncl, int nch,
+    int srh, int sch)
 {
-    register int i;
-    register float GPFAR *GPFAR * m;
+    int i;
+    float GPFAR * GPFAR * m;
 
     for (i = srh + 1; i <= nrh; i++) {
 	free_vector(a[i], ncl);
     }
 
-    m = (float GPFAR * GPFAR *) gp_realloc((void *) (a + nrl),
-					   (srh - nrl + 1) * sizeof(float GPFAR *),
-					   "retract matrix");
-
+    m = gp_realloc(a + nrl, (srh - nrl + 1) * sizeof(m[0]),
+		   "retract matrix");
     m -= nrl;
 
     if (sch != nch) {
 	for (i = nrl; i <= srh; i++)
-	    if (!(m[i] = retract_vector(m[i], ncl, sch))) { {	/* Shrink rows */
-		    free_matrix(m, nrl, srh, ncl);
-		    int_error(NO_CARET, "not enough memory to retract matrix");
-		    return NULL;
-	    }
+	    if (!(m[i] = retract_vector(m[i], ncl, sch))) {
+		/* Shrink rows */
+		free_matrix(m, nrl, srh, ncl);
+		int_error(NO_CARET, "not enough memory to retract matrix");
+		return NULL;
 	    }
     }
     return m;
@@ -403,24 +384,24 @@ register int srh, sch;
 
 
 /* allocate a float matrix m[nrl...nrh][ncl...nch] that points to the
-   matrix declared in the standard C manner as a[nrow][ncol], where 
+   matrix declared in the standard C manner as a[nrow][ncol], where
    nrow=nrh-nrl+1, ncol=nch-ncl+1.  The routine should be called with
    the address &a[0][0] as the first argument.  This routine does
    not free the memory used by the original array a but merely assigns
    pointers to the rows. */
 
-float GPFAR *GPFAR *
-convert_matrix(a, nrl, nrh, ncl, nch)
-    float GPFAR *a;
-    register int nrl, nrh, ncl, nch;
+float GPFAR * GPFAR *
+convert_matrix(
+    float GPFAR *a,
+    int nrl, int nrh, int ncl, int nch)
 {
-    register int i, j, ncol, nrow;
-    register float GPFAR *GPFAR * m;
+    int i, j, ncol, nrow;
+    float GPFAR * GPFAR * m;
 
     nrow = nrh - nrl + 1;
     ncol = nch - ncl + 1;
-    m = (float GPFAR * GPFAR *) gp_alloc((nrh - nrl + 1) * sizeof(float GPFAR *),
-					 "convert_matrix");
+    m = gp_alloc((nrh - nrl + 1) * sizeof(m[0]),
+		 "convert_matrix");
     m -= nrl;
 
     m[nrl] = a - ncl;
@@ -431,9 +412,7 @@ convert_matrix(a, nrl, nrh, ncl, nch)
 
 
 void
-free_convert_matrix(b, nrl)
-    float GPFAR *GPFAR * b;
-    register int nrl;
+free_convert_matrix(float GPFAR * GPFAR * b, int nrl)
 {
-    free((char *) (b + nrl));
+    free(b + nrl);
 }

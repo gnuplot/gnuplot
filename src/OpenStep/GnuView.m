@@ -11,7 +11,7 @@ static void setprintsize();
 - initWithFrame:(NSRect)rects
 {
     [super initWithFrame:rects];
-		
+
     PSstring = @"";
     [self display];
 
@@ -29,7 +29,7 @@ static void setprintsize();
 
 - executePS:(NSString *) PStext
 {
-    if (PSstring) 
+    if (PSstring)
 	[PSstring release];
     PSstring = PStext;
     [PSstring retain];
@@ -43,10 +43,10 @@ static void setprintsize();
 - (void) drawRect:(NSRect) rect
 {
     DPSContext d;
-	
+
     d = DPSGetCurrentContext();
 
-    if (!printing) { /* Clear Screen */ 
+    if (!printing) { /* Clear Screen */
 	PSsetgray(NSWhite);
 	NSRectFill([self bounds]);
 	[self setBoundsSize:NSMakeSize(xsize, ysize)];    /* scale to gnuplot coords */
@@ -80,13 +80,13 @@ static void setprintsize()
 
     DPSPrintf(d, "grestore\ngrestore\ngrestore\n");
 
-    if ([prInfo orientation] == NSLandscapeOrientation) {		
+    if ([prInfo orientation] == NSLandscapeOrientation) {
         DPSPrintf(d, "-90 rotate\n");
         DPSPrintf(d, "%g 0 translate\n", -1.0 * paperSize.width);
         DPSPrintf(d, "0 %g translate\n", paperSize.height/20);
     }
-    else {					
-        DPSPrintf(d, "%g %g scale\n", paperSize.width/paperSize.height, paperSize.height/paperSize.width);	
+    else {
+        DPSPrintf(d, "%g %g scale\n", paperSize.width/paperSize.height, paperSize.height/paperSize.width);
     }
 
     DPSPrintf(d, "gsave\ngsave\n");

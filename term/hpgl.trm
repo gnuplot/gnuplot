@@ -1,5 +1,5 @@
-/*
- * $Id: hpgl.trm,v 1.16 2002/12/16 14:18:36 lhecking Exp $
+/* Hello, Emacs, this is -*-C-*-
+ * $Id: hpgl.trm,v 1.17 2004/04/13 17:24:33 broeker Exp $
  */
 
 /* GNUPLOT - hpgl.trm */
@@ -44,9 +44,9 @@
  *
  * AUTHORS
  *  Colin Kelley, Thomas Williams, Russell Lang
- * 
+ *
  * send your comments or suggestions to (gnuplot-info@lists.sourceforge.net).
- * 
+ *
  */
 
 /*
@@ -851,7 +851,7 @@ HPGL_graphics()
 	    ((encoding == S_ENC_CP850) || (encoding == S_ENC_ISO8859_1)) ?
 	    "CA7;" : "",
 	    HPGL_XMAX, HPGL_YMAX, ((double) (HPGL_HCHAR) * 200 / 3 / HPGL_XMAX), ((double) (HPGL_VCHAR) * 100 / 2 / HPGL_YMAX));
-/*	 1    2             3 
+/*	 1    2             3
 	1. reset to power-up defaults
 	2. set SCaling
 	3. set character size
@@ -963,8 +963,7 @@ PCL_text()
 }
 
 TERM_PUBLIC void
-HPGL_linetype(linetype)
-int linetype;
+HPGL_linetype(int linetype)
 {
 /* allow for set number of pens */
     linetype = (linetype + 2) % HPGL_numpen + 1;
@@ -977,8 +976,7 @@ int linetype;
 }
 
 TERM_PUBLIC void
-HPGL2_linetype(linetype)
-int linetype;
+HPGL2_linetype(int linetype)
 {
 /*
  * If in Polyline Encoded command, leave Polyline Encoded command
@@ -1037,9 +1035,7 @@ int linetype;
 }
 
 TERM_PUBLIC void
-HPGL_put_text(x, y, str)
-unsigned int x, y;
-const char *str;
+HPGL_put_text(unsigned int x, unsigned int y, const char *str)
 {
     if (HPGL_ang == 1)
 	HPGL_move(x + HPGL_VCHAR / 4, y);
@@ -1068,9 +1064,7 @@ const char *str;
 }
 
 TERM_PUBLIC void
-HPGL2_put_text(x, y, str)
-unsigned int x, y;
-const char *str;
+HPGL2_put_text(unsigned int x, unsigned int y, const char *str)
 {
     struct termentry *t = term;
 /*
@@ -1100,8 +1094,7 @@ const char *str;
  */
 
 TERM_PUBLIC void
-HPGL_move(x, y)
-unsigned int x, y;
+HPGL_move(unsigned int x, unsigned int y)
 {
     if (HPGL_x != x || HPGL_y != y) {	/* only move if necessary */
 	fprintf(gpoutfile, "PU;PA%d,%d;\n", x, y);
@@ -1112,8 +1105,7 @@ unsigned int x, y;
 }
 
 TERM_PUBLIC void
-HPGL_vector(x, y)
-unsigned int x, y;
+HPGL_vector(unsigned int x, unsigned int y)
 {
     if (HPGL_penstate != DOWN) {
 	fprintf(gpoutfile, "PD;PA%d,%d;\n", x, y);
@@ -1125,10 +1117,9 @@ unsigned int x, y;
 }
 
 TERM_PUBLIC void
-HPGL2_move(x, y)
-unsigned int x, y;
+HPGL2_move(unsigned int x, unsigned int y)
 {
-    register int dx, dy;
+    int dx, dy;
     if (HPGL2_in_pe) {
 	dx = x - HPGL_x;
 	dy = y - HPGL_y;
@@ -1162,10 +1153,9 @@ unsigned int x, y;
 }
 
 TERM_PUBLIC void
-HPGL2_vector(x, y)
-unsigned int x, y;
+HPGL2_vector(unsigned int x, unsigned int y)
 {
-    register int dx, dy;
+    int dx, dy;
     if (HPGL2_in_pe) {
 	dx = x - HPGL_x;
 	dy = y - HPGL_y;
@@ -1209,10 +1199,10 @@ unsigned int x, y;
  */
 
 TERM_PUBLIC void
-HPGL2_encode(d)
-register int d;
+HPGL2_encode(int d)
 {
-    register int c;
+    int c;
+
     if ((d <<= 1) < 0)
 	d = 1 - d;
     do {
@@ -1226,14 +1216,13 @@ register int d;
 }
 
 TERM_PUBLIC int
-HPGL_text_angle(ang)
-int ang;
+HPGL_text_angle(int ang)
 {
     if (ang == -90 || ang == 270)
 	HPGL_ang = -1;
     else
 	HPGL_ang = (ang ? 1 : 0);
-    
+
     if (HPGL_ang == 0) 			/* Horizontal */
 	fputs("DI1,0;\n", gpoutfile);
     else if (HPGL_ang == -1)		/* Vertical Down */
@@ -1244,8 +1233,7 @@ int ang;
 }
 
 TERM_PUBLIC int
-HPGL2_text_angle(ang)
-int ang;
+HPGL2_text_angle(int ang)
 {
 /*
  * If in Polyline Encoded command, leave Polyline Encoded command
@@ -1301,8 +1289,7 @@ PCL_reset()
 }
 
 TERM_PUBLIC int
-HPGL2_justify_text(just)
-enum JUSTIFY just;
+HPGL2_justify_text(enum JUSTIFY just)
 {
 /*
  * If in Polyline Encoded command, leave Polyline Encoded command
@@ -1328,8 +1315,7 @@ enum JUSTIFY just;
 }
 
 TERM_PUBLIC int
-HPGL2_set_font(font)
-const char *font;
+HPGL2_set_font(const char *font)
 {
     struct termentry *t = term;
     char name[MAX_ID_LEN + 1];
@@ -1380,9 +1366,7 @@ const char *font;
 }
 
 TERM_PUBLIC void
-HPGL2_point(x, y, number)
-unsigned int x, y;
-int number;
+HPGL2_point(unsigned int x, unsigned int y, int number)
 {
     int htic, vtic;
     if (pspointset) {		/* postscript style points */
@@ -2274,9 +2258,7 @@ int number;
  */
 
 TERM_PUBLIC void
-HPGL2_neg_point(x, y, number)
-unsigned int x, y;
-int number;
+HPGL2_neg_point(unsigned int x, unsigned int y, int number)
 {
     int htic, vtic;
     htic = (int) (HPGL2_psize * PCL_HTIC / 2);
@@ -2597,8 +2579,7 @@ int number;
 }
 
 TERM_PUBLIC void
-HPGL2_pointsize(size)
-double size;
+HPGL2_pointsize(double size)
 {
     HPGL2_psize = (size >= 0 ? size : 1);
 }

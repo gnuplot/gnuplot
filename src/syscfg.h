@@ -1,5 +1,5 @@
 /*
- * $Id: syscfg.h,v 1.27 2004/03/23 18:09:28 broeker Exp $
+ * $Id: syscfg.h,v 1.28 2004/04/13 17:24:01 broeker Exp $
  */
 
 /* GNUPLOT - syscfg.h */
@@ -58,7 +58,7 @@
  * DIRSEP1:  ['/'] Primary character which separates path components.
  * DIRSEP2:  ['\0'] Secondary character which separates path components.
  * PATHSEP:  [':'] Character which separates path names
- *        
+ *
  */
 
 #if defined(AMIGA_SC_6_1) || defined(AMIGA_AC_5) || defined(__amigaos__)

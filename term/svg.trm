@@ -1,6 +1,5 @@
-/*
- * $Id: svg.trm,v 1.35 2004/04/05 04:16:20 sfeam Exp $
- *
+/* Hello, Emacs, this is -*-C-*-
+ * $Id: svg.trm,v 1.36 2004/05/26 11:17:42 mikulik Exp $
  */
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -16,7 +15,7 @@
 		Amedeo Farello
 		afarello@libero.it
 
-	HEAVILY MODIFIED by 
+	HEAVILY MODIFIED by
 
 		Hans-Bernhard Br"oker
 		broeker@physik.rwth-aachen.de
@@ -29,14 +28,14 @@
  * Wilhelm Braunschober <Wilhelm.Braunschober@t-online.de>, Feb-21-2002 */
 
 /* Tweaked code for compatibility with Sodipodi svg viewer/editor.
- * Added beginnings of enhanced text support.  
+ * Added beginnings of enhanced text support.
  *   Ethan Merritt  <merritt@u.washington.edu>
  */
 
 #include "driver.h"
 
 #ifdef TERM_REGISTER
-register_term (svg)
+register_term(svg)
 #endif
 
 #ifdef TERM_PROTO
@@ -68,7 +67,7 @@ TERM_PUBLIC void SVG_filled_polygon __PROTO((int, gpiPoint *));
 TERM_PUBLIC void ENHsvg_OPEN __PROTO((char *, double, double, TBOOLEAN, TBOOLEAN, int));
 TERM_PUBLIC void ENHsvg_FLUSH __PROTO((void));
 TERM_PUBLIC void ENHsvg_put_text __PROTO((unsigned int, unsigned int, const char *));
-TERM_PUBLIC void ENHsvg_writec __PROTO((char));
+TERM_PUBLIC void ENHsvg_writec __PROTO((int));
 
 
 #define SVG_XMAX	600
@@ -109,7 +108,7 @@ static int SVG_TextAngle = 0;	/* current text orientation*/
 static enum JUSTIFY SVG_TextJust = LEFT; /* current text justification*/
 
 /* default text font family: */
-static char SVG_fontNameDef[MAX_ID_LEN + 1] = "Arial"; 
+static char SVG_fontNameDef[MAX_ID_LEN + 1] = "Arial";
 static double SVG_fontSizeDef = 12;	/* default text size*/
 /* current text font family: */
 static char SVG_fontNameCur[MAX_ID_LEN + 1] = "Arial";
@@ -138,7 +137,7 @@ static void SVG_GroupFilledOpen __PROTO ((void));
 static void SVG_GroupFilledClose __PROTO ((void));
 static void SVG_StyleColor __PROTO((const char*));
 static void SVG_StyleFillColor __PROTO((void));
-static void SVG_local_reset __PROTO(());
+static void SVG_local_reset __PROTO((void));
 #if USE_ULIG_FILLEDBOXES
 static void SVG_DefineFillPattern __PROTO((int fillpat));
 #endif
@@ -154,9 +153,8 @@ static int ENHsvg_string_state = 0;
 /*------------------------------------------------------------------------------------------------------------------------------------
 	SVG_Pen_RealID
 ------------------------------------------------------------------------------------------------------------------------------------*/
-static short 
-SVG_Pen_RealID (inPenCode)
-    int inPenCode;
+static short
+SVG_Pen_RealID (int inPenCode)
 {
     if (inPenCode >= 13)
 	inPenCode %= 13;	/* normalize pen code*/
@@ -269,7 +267,7 @@ SVG_SetFont (const char *name, double size)
 }
 
 static void
-SVG_GroupFilledOpen(void)
+SVG_GroupFilledOpen()
 {
     SVG_PathClose();
     if (!SVG_groupFilledIsOpen) {
@@ -279,7 +277,7 @@ SVG_GroupFilledOpen(void)
 }
 
 static void
-SVG_GroupFilledClose(void)
+SVG_GroupFilledClose()
 {
     if (SVG_groupFilledIsOpen) {
 	fprintf(gpoutfile, "\t</g>\n");
@@ -300,7 +298,7 @@ SVG_StyleColor(const char* paint)
 }
 
 static void
-SVG_StyleFillColor(void)
+SVG_StyleFillColor()
 {
     SVG_StyleColor("fill");
 }
@@ -418,14 +416,14 @@ SVG_options ()
 	    c_token++;
 	    term->put_text = ENHsvg_put_text;
 	    continue;
-	} 
+	}
 
 	if (almost_equals(c_token, "noenh$anced")) {
 	    c_token++;
 	    term->put_text = SVG_put_text;
 	    continue;
 	}
-	    
+
 	if (almost_equals (c_token, "fn$ame"))  {
 	    c_token++;
 
@@ -591,7 +589,7 @@ SVG_init ()
      * marker definition into the file, rather than referencing a
      * defined one :-( That would make for much larger files */
     /* "\t<path id='gpPt3' style='stroke-width:%.3f' d='M-1,-1 h2 v2 h-2 z'/>\n" */
-	
+
     stroke_width = 2.0 / term->h_tic;
     fprintf (gpoutfile,
 	     "\n"
@@ -742,7 +740,7 @@ SVG_fillbox(int style, unsigned int x1, unsigned int y1, unsigned int width, uns
     }
 #endif
 
-    fprintf(gpoutfile, " x='%d' y='%d' width='%d' height='%d'/>\n", 
+    fprintf(gpoutfile, " x='%d' y='%d' width='%d' height='%d'/>\n",
 	    x1, (term->ymax - y1 - height), width, height);
 }
 
@@ -759,7 +757,7 @@ SVG_linewidth (double linewidth)
 
 	for (k = 0; k < 16; k++)
 	    SVG_pens[k].width = SVG_LineWidth;
-    
+
 	SVG_PathClose ();
 	SVG_GroupClose ();
 	SVG_GroupOpen ();
@@ -817,7 +815,7 @@ SVG_point (unsigned int x, unsigned int y, int number)
 #endif
 
     SVG_PathClose ();
-    
+
     if (number < 0) {		/* do dot */
 	fprintf (gpoutfile,
 		 "\t<use xlink:href='#gpDot' x='%u' y='%u'"
@@ -879,7 +877,7 @@ SVG_put_text (unsigned int x, unsigned int y, const char *str)
 {
     char *alignment;
     int h = x, v = y;
-    
+
     SVG_PathClose ();
 
 /* horizontal justification*/
@@ -1033,7 +1031,7 @@ SVG_filled_polygon(int points, gpiPoint* corners)
     SVG_StyleFillColor();
     fputs(" points = '", gpoutfile);
     for (i = 0; i < points; i++)
-        fprintf(gpoutfile, "%d,%d%s", 
+        fprintf(gpoutfile, "%d,%d%s",
 	    corners[i].x, term->ymax - corners[i].y, (i % 16 == 15 ? "\n" : " "));
     fputs("'/>\n", gpoutfile);
 }
@@ -1042,7 +1040,7 @@ SVG_filled_polygon(int points, gpiPoint* corners)
 	SVG_previous_palette
 ------------------------------------------------------------------------------------------------------------------------------------*/
 TERM_PUBLIC void
-SVG_previous_palette(void)
+SVG_previous_palette()
 {
     SVG_GroupFilledClose();
 }
@@ -1056,11 +1054,11 @@ static TBOOLEAN ENHsvg_opened_string = FALSE;
 static int ENHsvg_charcount = 0;
 
 TERM_PUBLIC void
-ENHsvg_OPEN(fontname, fontsize, base, widthflag, showflag, overprint)
-    char *fontname;
-    TBOOLEAN widthflag, showflag;
-    double fontsize, base;
-    int overprint;
+ENHsvg_OPEN(
+    char *fontname,
+    double fontsize, double base,
+    TBOOLEAN widthflag, TBOOLEAN showflag,
+    int overprint)
 {
     /* overprint = 1 means print the base text (leave position in center)
      * overprint = 2 means print the overlying text
@@ -1085,7 +1083,7 @@ ENHsvg_OPEN(fontname, fontsize, base, widthflag, showflag, overprint)
     default:
 	break;
     }
-   
+
     if (!ENHsvg_opened_string) {
 	ENHsvg_opened_string = TRUE;
 	enhanced_cur_text = &enhanced_text[0];
@@ -1109,7 +1107,7 @@ ENHsvg_OPEN(fontname, fontsize, base, widthflag, showflag, overprint)
 	}
 	fprintf(gpoutfile,">");
     }
-    
+
 }
 
 TERM_PUBLIC void
@@ -1147,7 +1145,7 @@ ENHsvg_put_text(unsigned int x, unsigned int y, const char *str)
     enhanced_fontscale = 1.0;
     strncpy(enhanced_escape_format,"&#x%2.2x;",sizeof(enhanced_escape_format));
 
-    while (*(str = enhanced_recursion((char *)str, TRUE, 
+    while (*(str = enhanced_recursion((char *)str, TRUE,
     			fontname, fontsize, 0.0, TRUE, TRUE, 0))) {
 	(term->enhanced_flush)();
 	enh_err_check(str);
@@ -1164,8 +1162,8 @@ ENHsvg_put_text(unsigned int x, unsigned int y, const char *str)
 
 }
 
-TERM_PUBLIC void 
-ENHsvg_writec (char c)
+TERM_PUBLIC void
+ENHsvg_writec(int c)
 {
     int symb = (unsigned char)c;
 
@@ -1300,7 +1298,7 @@ START_HELP(svg)
 " Syntax:",
 "       set terminal svg {size <x> <y> {|fixed|dynamic}}",
 "                        {fname \"<font>\"} {fsize <fontsize>}",
-"                        {{no}enhanced} {fontfile <filename>}", 
+"                        {{no}enhanced} {fontfile <filename>}",
 "",
 " where <x> and <y> are the size of the SVG plot to generate,",
 " `dynamic` allows a svg-Viewer to resize plot, whereas the default",

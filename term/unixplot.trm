@@ -1,5 +1,5 @@
-/*
- * $Id: unixplot.trm,v 1.11 2003/11/24 09:50:40 lhecking Exp $
+/* Hello, Emacs, this is -*-C-*-
+ * $Id: unixplot.trm,v 1.12 2004/04/13 17:24:39 broeker Exp $
  *
  */
 
@@ -43,9 +43,9 @@
  *
  * AUTHORS
  *  Colin Kelley, Thomas Williams, Russell Lang
- * 
+ *
  * send your comments or suggestions to (gnuplot-info@lists.sourceforge.net).
- * 
+ *
  */
 
 /*
@@ -112,8 +112,7 @@ UP_text()
 
 
 TERM_PUBLIC void
-UP_linetype(linetype)
-int linetype;
+UP_linetype(int linetype)
 {
     static char *lt[2 + 5] = {"solid", "longdashed", "solid", "dotted",
      "shortdashed", "dotdashed", "longdashed"};
@@ -126,25 +125,21 @@ int linetype;
 
 
 TERM_PUBLIC void
-UP_move(x, y)
-unsigned int x, y;
+UP_move(unsigned int x, unsigned int y)
 {
     move(x, y);
 }
 
 
 TERM_PUBLIC void
-UP_vector(x, y)
-unsigned int x, y;
+UP_vector(unsigned int x, unsigned int y)
 {
     cont(x, y);
 }
 
 
 TERM_PUBLIC void
-UP_put_text(x, y, str)
-unsigned int x, y;
-const char str[];
+UP_put_text(unsigned int x, unsigned int y, const char str[])
 {
     UP_move(x + UP_HCHAR / 2, y + UP_VCHAR / 5);
     label(str);

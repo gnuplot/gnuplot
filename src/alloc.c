@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: alloc.c,v 1.9 1999/11/08 19:24:27 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: alloc.c,v 1.10 2004/04/13 17:23:50 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - alloc.c */
@@ -106,10 +106,7 @@ static long bytes_allocated = 0;
 #define CHECKSUM_CHAR 0xc5
 
 static void
-mark(p, size, usage)
-struct frame_struct *p;
-unsigned long size;
-char *usage;
+mark(struct frame_struct *p, unsigned long size, char *usage)
 {
     p->use = usage;
     p->requested_size = size;
@@ -120,8 +117,7 @@ char *usage;
 #define mark_free(p) ( ((struct frame_struct *)p)[-1].checksum = CHECKSUM_FREE)
 
 static void
-validate(x)
-void *x;
+validate(generic *x)
 {
     struct frame_struct *p = (struct frame_struct *) x - 1;
     if (p->checksum != (CHECKSUM_INT ^ (int) (p->use) ^ p->requested_size)) {
@@ -145,7 +141,7 @@ void *x;
  */
 
 void
-check_pointer_in_block(void *block, void *p, int size, char *file, int line)
+check_pointer_in_block(generic *block, generic *p, int size, char *file, int line)
 {
     struct frame_struct *f = (struct frame_struct *) block - 1;
     validate(block);
@@ -157,9 +153,7 @@ check_pointer_in_block(void *block, void *p, int size, char *file, int line)
 }
 
 generic *
-gp_alloc(size, usage)
-size_t size;
-const char *usage;
+gp_alloc(size_t size, const char *usage)
 {
     struct frame_struct *p;
     size_t total_size = size + RESERVED_SIZE + 1;
@@ -178,10 +172,7 @@ const char *usage;
 }
 
 generic *
-gp_realloc(old, size, usage)
-generic *old;
-size_t size;
-const char *usage;
+gp_realloc(generic *old, size_t size, const char *usage)
 {
     if (!old)
 	return gp_alloc(size, usage);
@@ -213,8 +204,7 @@ const char *usage;
 #undef free
 
 void
-checked_free(p)
-void *p;
+checked_free(generic *p)
 {
     validate(p);
     mark_free(p);		/* trap attempts to free twice */
@@ -260,19 +250,17 @@ end_leak_check(char *file, int line)
 #else /* CHECK_HEAP_USE */
 
 /* gp_alloc:
- * allocate memory 
- * This is a protected version of malloc. It causes an int_error 
- * if there is not enough memory, but first it tries FreeHelp() 
- * to make some room, and tries again. If message is NULL, we 
+ * allocate memory
+ * This is a protected version of malloc. It causes an int_error
+ * if there is not enough memory, but first it tries FreeHelp()
+ * to make some room, and tries again. If message is NULL, we
  * allow NULL return. Otherwise, we handle the error, using the
  * message to create the int_error string. Note cp/sp_extend uses realloc,
  * so it depends on this using malloc().
  */
 
 generic *
-gp_alloc(size, message)
-size_t size;			/* # of bytes */
-const char *message;		/* description of what is being allocated */
+gp_alloc(size_t size, const char *message)
 {
     char *p;			/* the new allocation */
 
@@ -282,7 +270,7 @@ const char *message;		/* description of what is being allocated */
 	FreeHelp();		/* out of memory, try to make some room */
 #endif /* NO_GIH */
 	p = GP_FARMALLOC(size);	/* try again */
-	if (p == (char *) NULL) {
+	if (p == NULL) {
 	    /* really out of memory */
 	    if (message != NULL) {
 		int_error(NO_CARET, "out of memory for %s", message);
@@ -303,10 +291,7 @@ const char *message;		/* description of what is being allocated */
  */
 
 generic *
-gp_realloc(p, size, message)
-generic *p;			/* old mem block */
-size_t size;			/* # of bytes */
-const char *message;		/* description of what is being allocated */
+gp_realloc(generic *p, size_t size, const char *message)
 {
     char *res;			/* the new allocation */
 
@@ -338,8 +323,7 @@ const char *message;		/* description of what is being allocated */
 
 #ifdef FARALLOC
 void
-gpfree(p)
-generic *p;
+gpfree(generic *p)
 {
 #ifdef _Windows
     HGLOBAL hGlobal = GlobalHandle(SELECTOROF(p));

@@ -1,5 +1,5 @@
-/*
- * $Id: dxy.trm,v 1.9 2002/07/26 16:42:28 mikulik Exp $
+/* Hello, Emacs, this is -*-C-*-
+ * $Id: dxy.trm,v 1.10 2004/04/13 17:24:16 broeker Exp $
  *
  */
 
@@ -39,14 +39,14 @@
  * This file is included by ../term.c.
  *
  * This terminal driver supports:
- *  Roland DXY800A plotter 
+ *  Roland DXY800A plotter
  *
  * AUTHORS
  *  Martin Yii, eln557h@monu3.OZ
  *  Further modified Jan 1990 by Russell Lang, rjl@monu1.cc.monash.oz
- * 
+ *
  * send your comments or suggestions to (gnuplot-info@lists.sourceforge.net).
- * 
+ *
  */
 
 /*
@@ -110,8 +110,7 @@ DXY_text()
 
 
 TERM_PUBLIC void
-DXY_linetype(linetype)
-int linetype;
+DXY_linetype(int linetype)
 {
     /* select pen */
     fprintf(gpoutfile, "J%d\n", (linetype + 2) % 8 + 1);
@@ -129,25 +128,21 @@ int linetype;
 
 
 TERM_PUBLIC void
-DXY_move(x, y)
-unsigned int x, y;
+DXY_move(unsigned int x, unsigned int y)
 {
     fprintf(gpoutfile, "M%d,%d\n", x, y);
 }
 
 
 TERM_PUBLIC void
-DXY_vector(x, y)
-unsigned int x, y;
+DXY_vector(unsigned int x, unsigned int y)
 {
     fprintf(gpoutfile, "D%d,%d\n", x, y);
 }
 
 
 TERM_PUBLIC void
-DXY_put_text(x, y, str)
-unsigned int x, y;
-const char *str;
+DXY_put_text(unsigned int x, unsigned int y, const char *str)
 {
     if (dxy_angle == 1) {
 	/* vertical */
@@ -161,8 +156,7 @@ const char *str;
 
 
 TERM_PUBLIC int
-DXY_text_angle(ang)
-int ang;
+DXY_text_angle(int ang)
 {
     dxy_angle = (ang ? 1 : 0);
     fprintf(gpoutfile, "Q%d\n", ang);

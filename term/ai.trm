@@ -1,5 +1,5 @@
-/*
- * $Id: ai.trm,v 1.14 1999/10/01 15:09:09 lhecking Exp $
+/* Hello, Emacs, this is -*-C-*-
+ * $Id: ai.trm,v 1.15 2004/04/13 17:24:15 broeker Exp $
  *
  */
 
@@ -43,17 +43,17 @@
  *
  * AUTHORS
  *  Ray Ghanbari
- * 
+ *
  * send your comments or suggestions to (gnuplot-info@lists.sourceforge.net).
  *
  * The 'aifm' driver produces files editable by Adobe Illustrator 3.0
- * To change font to Courier and font size to 20pts use 
+ * To change font to Courier and font size to 20pts use
  * 'set term aifm "Courier" 20'.
  * To switch to color output use
  * 'set term aifm color'.
  */
 
- /* AIFM driver by Ray Ghanbari, ray@mtl.mit.edu, 
+ /* AIFM driver by Ray Ghanbari, ray@mtl.mit.edu,
   *   based on PostScript driver by Russell Lang, rjl@monu1.cc.monash.edu.au */
 
 /* Changed to 3.6 terminal format, David C. Schooley, 9/29/95 */
@@ -246,8 +246,7 @@ AI_reset()
 
 
 TERM_PUBLIC void
-AI_linetype(linetype)
-int linetype;
+AI_linetype(int linetype)
 {
     if (ai_stroke) {
 	fputs("S\n", gpoutfile);
@@ -393,8 +392,7 @@ int linetype;
 
 
 TERM_PUBLIC void
-AI_move(x, y)
-unsigned int x, y;
+AI_move(unsigned int x, unsigned int y)
 {
     if (ai_stroke)
 	fputs("S\n", gpoutfile);
@@ -405,8 +403,7 @@ unsigned int x, y;
 
 
 TERM_PUBLIC void
-AI_vector(x, y)
-unsigned int x, y;
+AI_vector(unsigned int x, unsigned int y)
 {
     fprintf(gpoutfile, "%.2f %.2f l\n", x / AI_SC, y / AI_SC);
     ai_path_count += 1;
@@ -419,9 +416,7 @@ unsigned int x, y;
 
 
 TERM_PUBLIC void
-AI_put_text(x, y, str)
-unsigned int x, y;
-const char *str;
+AI_put_text(unsigned int x, unsigned int y, const char *str)
 {
     char ch;
     if (ai_stroke) {
@@ -460,24 +455,21 @@ const char *str;
 }
 
 TERM_PUBLIC int
-AI_text_angle(ang)
-int ang;
+AI_text_angle(int ang)
 {
     ai_ang = ang;
     return TRUE;
 }
 
 TERM_PUBLIC int
-AI_justify_text(mode)
-enum JUSTIFY mode;
+AI_justify_text(enum JUSTIFY mode)
 {
     ai_justify = mode;
     return TRUE;
 }
 
 TERM_PUBLIC int
-AI_set_font(font) /* Entry font added by DJL */
-const char *font;
+AI_set_font(const char *font)
 {
     char name[32];
     size_t sep;

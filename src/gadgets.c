@@ -158,8 +158,7 @@ filledcurves_opts filledcurves_opts_func = EMPTY_FILLEDCURVES_OPTS;
  * 0 is returned if inside.
  */
 int
-clip_point(x, y)
-    unsigned int x, y;
+clip_point(unsigned int x, unsigned int y)
 {
     int ret_val = 0;
 
@@ -181,8 +180,7 @@ clip_point(x, y)
  */
 /* FIXME HBB 20000522: The parameter type has to become unsigned int */
 void
-draw_clip_line(x1, y1, x2, y2)
-int x1, y1, x2, y2;
+draw_clip_line(int x1, int y1, int x2, int y2)
 {
     register struct termentry *t = term;
 
@@ -221,9 +219,7 @@ int x1, y1, x2, y2;
 
 /* And text clipping routine. */
 void
-clip_put_text(x, y, str)
-unsigned int x, y;
-char *str;
+clip_put_text(unsigned int x, unsigned y, char *str)
 {
     register struct termentry *t = term;
 
@@ -235,16 +231,16 @@ char *str;
 
 /* seems sensible to put the justification in here too..? */
 void
-clip_put_text_just(x, y, str, just, vert_just, font)
-    unsigned int x, y;
-    char *str;
-    JUSTIFY just;
-    VERT_JUSTIFY vert_just;
-    char *font;
+clip_put_text_just(
+    unsigned int x, unsigned int y,
+    char *str,
+    JUSTIFY just,
+    VERT_JUSTIFY vert_just,
+    char *font)
 {
     if (clip_point(x, y))
 	return;
-    
+
     write_multiline(x, y, str, just, vert_just, 0, font);
 }
 
@@ -257,8 +253,7 @@ clip_put_text_just(x, y, str, just, vert_just, font)
 /* FIXME HBB 20000521: the parameters of this routine should become
  * unsigned ints. */
 int
-clip_line(x1, y1, x2, y2)
-int *x1, *y1, *x2, *y2;
+clip_line(int *x1, int *y1, int *x2, int *y2)
 {
     int x, y, dx, dy, x_intr[4], y_intr[4], count, pos1, pos2;
     int x_max, x_min, y_max, y_min;
@@ -360,16 +355,14 @@ int *x1, *y1, *x2, *y2;
 static unsigned int move_pos_x, move_pos_y;
 
 void
-clip_move(x, y)
-unsigned int x, y;
+clip_move(unsigned int x, unsigned int y)
 {
     move_pos_x = x;
     move_pos_y = y;
 }
 
 void
-clip_vector(x, y)
-unsigned int x, y;
+clip_vector(unsigned int x, unsigned int y)
 {
     draw_clip_line(move_pos_x, move_pos_y, x, y);
     move_pos_x = x;
@@ -412,7 +405,7 @@ reset_textcolor(const struct t_colorspec *tc, const struct termentry *t)
 }
 
 
-void 
+void
 default_arrow_style(struct arrow_style_type *arrow)
 {
     struct lp_style_type tmp_lp_style = DEFAULT_LP_STYLE_TYPE;

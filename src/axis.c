@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.43 2004/04/13 17:23:51 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.44 2004/04/22 13:41:37 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -60,18 +60,18 @@ AXIS axis_array[AXIS_ARRAY_SIZE]
 /* Keep defaults varying by axis in their own array, to ease initialization
  * of the main array */
 const AXIS_DEFAULTS axis_defaults[AXIS_ARRAY_SIZE] = {
-    { -10, 10, "z" , TICS_ON_BORDER,               }, 
-    { -10, 10, "y" , TICS_ON_BORDER | TICS_MIRROR, }, 
-    { -10, 10, "x" , TICS_ON_BORDER | TICS_MIRROR, }, 
-    { - 5,  5, "t" , NO_TICS,                      }, 
+    { -10, 10, "z" , TICS_ON_BORDER,               },
+    { -10, 10, "y" , TICS_ON_BORDER | TICS_MIRROR, },
+    { -10, 10, "x" , TICS_ON_BORDER | TICS_MIRROR, },
+    { - 5,  5, "t" , NO_TICS,                      },
     { -10, 10, "z2", NO_TICS,                      },
     { -10, 10, "y2", NO_TICS,                      },
     { -10, 10, "x2", NO_TICS,                      },
-    { - 0, 10, "r" , NO_TICS,                      }, 
-    { - 5,  5, "u" , NO_TICS,                      }, 
-    { - 5,  5, "v" , NO_TICS,                      }, 
+    { - 0, 10, "r" , NO_TICS,                      },
+    { - 5,  5, "u" , NO_TICS,                      },
+    { - 5,  5, "v" , NO_TICS,                      },
 #ifdef PM3D
-    { -10, 10, "cb", TICS_ON_BORDER | TICS_MIRROR, }, 
+    { -10, 10, "cb", TICS_ON_BORDER | TICS_MIRROR, },
 #endif
 };
 
@@ -114,7 +114,7 @@ const struct gen_table axisname_tbl[AXIS_ARRAY_SIZE + 1] =
 #endif
     { NULL, -1}
 };
-    
+
 
 /* penalty for doing tics by callback in gen_tics is need for global
  * variables to communicate with the tic routines. Dont need to be
@@ -137,7 +137,7 @@ const label_struct default_axis_label = EMPTY_LABELSTRUCT;
 /* zeroaxis drawing */
 const lp_style_type default_axis_zeroaxis = DEFAULT_AXIS_ZEROAXIS;
 
-/* grid drawing */  
+/* grid drawing */
 /* int grid_selection = GRID_OFF; */
 #ifdef PM3D
 # define DEFAULT_GRID_LP { 0, -1, 0, 1.0, 1.0, 0 }
@@ -182,10 +182,7 @@ static void get_position_type __PROTO((enum position_type * type, int *axes));
  * a given range if necessary. If checkrange is TRUE, will int_error() if
  * range is invalid */
 void
-axis_unlog_interval( /* axis, min, max, checkrange) */
-    AXIS_INDEX axis,
-    double *min, double *max,
-    TBOOLEAN checkrange)
+axis_unlog_interval(AXIS_INDEX axis, double *min, double *max, TBOOLEAN checkrange)
 {
     if (axis_array[axis].log) {
 	if (checkrange && (*min<= 0.0 || *max <= 0.0))
@@ -195,11 +192,10 @@ axis_unlog_interval( /* axis, min, max, checkrange) */
 	*min = (*min<=0) ? -VERYLARGE : AXIS_DO_LOG(axis,*min);
 	*max = (*max<=0) ? -VERYLARGE : AXIS_DO_LOG(axis,*max);
     }
-} 
+}
 
 void
-axis_revert_and_unlog_range(axis)
-    AXIS_INDEX axis;
+axis_revert_and_unlog_range(AXIS_INDEX axis)
 {
   if (axis_array[axis].range_is_reverted) {
     double temp = axis_array[axis].min;
@@ -212,10 +208,7 @@ axis_revert_and_unlog_range(axis)
 
 /*{{{  axis_log_value_checked() */
 double
-axis_log_value_checked(axis, coord, what)
-     AXIS_INDEX axis;
-     double coord;		/* the value */
-     const char *what;		/* what is the coord for? */
+axis_log_value_checked(AXIS_INDEX axis, double coord, const char *what)
 {
     if (axis_array[axis].log) {
 	if (coord <= 0.0) {
@@ -272,7 +265,7 @@ axis_log_value_checked(axis, coord, what)
  *
  * The current code plots all the above examples correctly and without
  * infinite looping.
- * 
+ *
  * HBB 2000/05/01: added an additional up-front test, active only if
  *   the new 'mesg' parameter is non-NULL.
  *
@@ -289,7 +282,7 @@ axis_log_value_checked(axis, coord, what)
  *             if it isn't.
  *
  * Global Variables:
- * auto_array, min_array, max_array (in out) (defined in axis.[ch]): 
+ * auto_array, min_array, max_array (in out) (defined in axis.[ch]):
  *    variables describing the status of autoscaling and range ends, for
  *    each of the possible axes.
  *
@@ -297,9 +290,7 @@ axis_log_value_checked(axis, coord, what)
  *
  */
 void
-axis_checked_extend_empty_range(axis,mesg)
-     AXIS_INDEX axis;
-     const char *mesg;
+axis_checked_extend_empty_range(AXIS_INDEX axis, const char *mesg)
 {
     /* These two macro definitions set the range-widening policy: */
 
@@ -325,7 +316,7 @@ axis_checked_extend_empty_range(axis,mesg)
 	if (axis_array[axis].autoscale) {
 	    /* range came from autoscaling ==> widen it */
 	    double widen = (dmax == 0.0) ?
-		FIXUP_RANGE__WIDEN_ZERO_ABS 
+		FIXUP_RANGE__WIDEN_ZERO_ABS
 		: FIXUP_RANGE__WIDEN_NONZERO_REL * dmax;
 	    fprintf(stderr, "Warning: empty %s range [%g:%g], ",
 		    axis_defaults[axis].name, dmin, dmax);
@@ -353,9 +344,7 @@ axis_checked_extend_empty_range(axis,mesg)
 
 /* make smalltics for time-axis */
 static double
-make_auto_time_minitics(tlevel, incr)
-    t_timelevel tlevel;
-    double incr;
+make_auto_time_minitics(t_timelevel tlevel, double incr)
 {
     double tinc = 0.0;
 
@@ -457,8 +446,7 @@ make_auto_time_minitics(tlevel, incr)
  * change across the range to be unimportant */
 /* HBB 20010803: removed two arguments, and renamed function */
 char *
-copy_or_invent_formatstring(axis)
-     AXIS_INDEX axis;
+copy_or_invent_formatstring(AXIS_INDEX axis)
 {
     struct tm t_min, t_max;
 
@@ -530,9 +518,7 @@ copy_or_invent_formatstring(axis)
 /*{{{  dbl_raise() used by quantize_normal_tics */
 /* FIXME HBB 20000426: is this really useful? */
 static double
-dbl_raise(x, y)
-double x;
-int y;
+dbl_raise(double x, int y)
 {
     register int i = abs(y);
     double val = 1.0;
@@ -561,12 +547,10 @@ int y;
  * log10(value).  Done to allow changing the calculation method
  * to avoid numerical problems */
 double
-quantize_normal_tics(arg, guide)
-     double arg;
-     int guide;
+quantize_normal_tics(double arg, int guide)
 {
     /* order of magnitude of argument: */
-    double power = dbl_raise(10.0, floor(log10(arg))); 
+    double power = dbl_raise(10.0, floor(log10(arg)));
     double xnorm = arg / power;	/* approx number of decades */
     /* we expect 1 <= xnorm <= 10 */
     double posns = guide / xnorm; /* approx number of tic posns per decade */
@@ -611,9 +595,7 @@ quantize_normal_tics(arg, guide)
  * ticking interval for the given axis. For the meaning of the guide
  * parameter, see the comment on quantize_normal_tics() */
 static double
-make_tics(axis, guide)
-    AXIS_INDEX axis;
-    int guide;
+make_tics(AXIS_INDEX axis, int guide)
 {
     register double xr, tic;
 
@@ -636,12 +618,10 @@ make_tics(axis, guide)
  * hours, 12 months). Derived from quantize_normal_tics(). The default
  * guide is assumed to be 12, here, not 20 */
 static double
-quantize_duodecimal_tics(arg, guide)
-     double arg;
-     int guide;
+quantize_duodecimal_tics(double arg, int guide)
 {
     /* order of magnitude of argument: */
-    double power = dbl_raise(12.0, floor(log(arg)/log(12.0))); 
+    double power = dbl_raise(12.0, floor(log(arg)/log(12.0)));
     double xnorm = arg / power;	/* approx number of decades */
     double posns = guide / xnorm; /* approx number of tic posns per decade */
 
@@ -682,10 +662,7 @@ quantize_duodecimal_tics(arg, guide)
  * this routine also modifies the static timelevel[axis] to indicate
  * the units these tics are calculated in. */
 static double
-quantize_time_tics(axis, tic, xr, guide)
-    AXIS_INDEX axis;
-    double tic, xr;
-    int guide;
+quantize_time_tics(AXIS_INDEX axis, double tic, double xr, int guide)
 {
     int guide12 = guide * 3 / 5; /* --> 12 for default of 20 */
 
@@ -741,35 +718,27 @@ quantize_time_tics(axis, tic, xr, guide)
  * that rounds an axis endpoint outward. If the axis is a time/date
  * one, take care to round towards the next whole time unit, not just
  * a multiple of the (averaged) tic size */
-#if 0
-static double
-round_outward(axis, upwards, input)
-    AXIS_INDEX axis;		/* Axis to work on */
-    TBOOLEAN upwards;		/* extend upwards or downwards? */
-    double input;		/* the current endpoint */
-#else /* HBB 20040415: ANSI-style definition fixes the problem */
 static double
 round_outward(
     AXIS_INDEX axis,		/* Axis to work on */
     TBOOLEAN upwards,		/* extend upwards or downwards? */
     double input)		/* the current endpoint */
-#endif
 {
     double tic = ticstep[axis];
     double result = tic * (upwards
 			   ? ceil(input / tic)
 			   : floor(input / tic));
-    
+
     if (axis_array[axis].is_timedata) {
 	double ontime = time_tic_just(timelevel[axis], result);
-	
+
 	/* FIXME: how certain is it that we don't want to *always*
 	 * return 'ontime'? */
 	if ((upwards && (ontime > result))
 	    || (!upwards && (ontime <result)))
 	    return ontime;
     }
-    
+
     return result;
 }
 
@@ -779,9 +748,7 @@ round_outward(
  * this gives division by zero.  */
 
 void
-setup_tics(axis, max)
-    AXIS_INDEX axis;
-    int max;			/* approx max number of slots available */
+setup_tics(AXIS_INDEX axis, int max)
 {
     double tic = 0;
     AXIS *this = axis_array + axis;
@@ -809,7 +776,7 @@ setup_tics(axis, max)
 	ticstep[axis] = tic = make_tics(axis, max);
     } else {
 	/* user-defined, day or month */
-	autoextend_min = autoextend_max = FALSE; 
+	autoextend_min = autoextend_max = FALSE;
     }
 
     /* BUGFIX HBB 20010831: for time/date axes, if an explicit
@@ -822,10 +789,10 @@ setup_tics(axis, max)
     if (this->is_timedata && ticdef->type == TIC_SERIES)
 	quantize_time_tics(axis, tic, fabs(this->max - this->min), 20);
 
-    if (autoextend_min) 
+    if (autoextend_min)
 	this->min = round_outward(axis, ! (this->min < this->max), this->min);
 
-    if (autoextend_max) 
+    if (autoextend_max)
 	this->max = round_outward(axis, this->min < this->max, this->max);
 
 
@@ -836,25 +803,23 @@ setup_tics(axis, max)
 }
 
 /*{{{  gen_tics */
-/* uses global arrays ticstep[], ticfmt[], axis_array[], 
+/* uses global arrays ticstep[], ticfmt[], axis_array[],
  * we use any of GRID_X/Y/X2/Y2 and  _MX/_MX2/etc - caller is expected
  * to clear the irrelevent fields from global grid bitmask
  * note this is also called from graph3d, so we need GRID_Z too
  */
 void
-gen_tics(axis, callback)
-     AXIS_INDEX axis;		/* FIRST_X_AXIS, etc */
-     tic_callback callback;	/* fn to call to actually do the work */
+gen_tics(AXIS_INDEX axis, tic_callback callback)
 {
     /* separate main-tic part of grid */
     struct lp_style_type lgrd, mgrd;
     /* tic defn */
-    struct ticdef *def = &axis_array[axis].ticdef; 
+    struct ticdef *def = &axis_array[axis].ticdef;
     /* minitics - off/default/auto/explicit */
     int minitics = axis_array[axis].minitics;
     /* minitic frequency */
     double minifreq = axis_array[axis].mtic_freq;
-     
+
 
     memcpy(&lgrd, &grid_lp, sizeof(grid_lp));
     memcpy(&mgrd, &mgrid_lp, sizeof(mgrid_lp));
@@ -862,7 +827,7 @@ gen_tics(axis, callback)
 	lgrd.l_type = L_TYPE_NODRAW;
     if (! axis_array[axis].gridminor)
 	mgrd.l_type = L_TYPE_NODRAW;
-    
+
 
     if (def->type == TIC_USER) {	/* special case */
 	/*{{{  do user tics then return */
@@ -1180,9 +1145,7 @@ gen_tics(axis, callback)
 
 /* justify ticplace to a proper date-time value */
 static double
-time_tic_just(level, ticplace)
-     t_timelevel level;
-     double ticplace;
+time_tic_just(t_timelevel level, double ticplace)
 {
     struct tm tm;
 
@@ -1219,7 +1182,7 @@ time_tic_just(level, ticplace)
 	}
 	tm.tm_mday = 1;
     }
-    
+
     ticplace = gtimegm(&tm);
     return (ticplace);
 }
@@ -1232,12 +1195,12 @@ time_tic_just(level, ticplace)
  * "non-running", below. */
 
 void
-axis_output_tics(axis, ticlabel_position, zeroaxis_basis, callback)
-     AXIS_INDEX axis;		/* axis number we're dealing with */
-     int *ticlabel_position;	/* 'non-running' coordinate */
-     AXIS_INDEX zeroaxis_basis;	/* axis to base 'non-running' position of
+axis_output_tics(
+     AXIS_INDEX axis,		/* axis number we're dealing with */
+     int *ticlabel_position,	/* 'non-running' coordinate */
+     AXIS_INDEX zeroaxis_basis,	/* axis to base 'non-running' position of
 				 * zeroaxis on */
-     tic_callback callback;	/* tic-drawing callback function */
+     tic_callback callback)	/* tic-drawing callback function */
 {
     struct termentry *t = term;
     TBOOLEAN axis_is_vertical = ((axis % SECOND_AXES) == FIRST_Y_AXIS);
@@ -1251,12 +1214,12 @@ axis_output_tics(axis, ticlabel_position, zeroaxis_basis, callback)
     } else {
 	axis_position = axis_array[zeroaxis_basis].term_lower;
 	mirror_position = axis_array[zeroaxis_basis].term_upper;
-    }	
+    }
 
     if (axis_array[axis].ticmode) {
 	/* set the globals needed by the _callback() function */
 
-	if (axis_array[axis].tic_rotate == TEXT_VERTICAL 
+	if (axis_array[axis].tic_rotate == TEXT_VERTICAL
 	    && (*t->text_angle)(TEXT_VERTICAL)) {
 	    tic_hjust = axis_is_vertical
 		? CENTRE
@@ -1335,19 +1298,16 @@ axis_output_tics(axis, ticlabel_position, zeroaxis_basis, callback)
 	(*t->text_angle) (0);	/* reset rotation angle */
     }
 }
-		 
+
 void
-axis_set_graphical_range(axis, lower, upper)
-    AXIS_INDEX axis;
-    unsigned int lower, upper;
+axis_set_graphical_range(AXIS_INDEX axis, unsigned int lower, unsigned int upper)
 {
     axis_array[axis].term_lower = lower;
     axis_array[axis].term_upper = upper;
 }
 
-static TBOOLEAN 
-axis_position_zeroaxis(axis)
-     AXIS_INDEX axis;
+static TBOOLEAN
+axis_position_zeroaxis(AXIS_INDEX axis)
 {
     TBOOLEAN is_inside = FALSE;
     AXIS *this = axis_array + axis;
@@ -1356,7 +1316,7 @@ axis_position_zeroaxis(axis)
     if ((this->min >= 0.0 && this->max >= 0.0)
 	|| this->log) {
 	this->term_zero = (this->max < this->min)
-	    ? this->term_upper : this->term_lower;	
+	    ? this->term_upper : this->term_lower;
     } else if (this->min <= 0.0 && this->max <= 0.0) {
 	this->term_zero = (this->max < this->min)
 	    ? this->term_lower : this->term_upper;
@@ -1369,8 +1329,7 @@ axis_position_zeroaxis(axis)
 }
 
 void
-axis_draw_2d_zeroaxis(axis, crossaxis)
-    AXIS_INDEX axis, crossaxis;
+axis_draw_2d_zeroaxis(AXIS_INDEX axis, AXIS_INDEX crossaxis)
 {
     AXIS *this = axis_array + axis;
 
@@ -1392,10 +1351,7 @@ axis_draw_2d_zeroaxis(axis, crossaxis)
 /* loads a range specification from the input line into variables 'a'
  * and 'b' */
 t_autoscale
-load_range(axis, a, b, autoscale)
-     AXIS_INDEX axis;
-     double *a, *b;
-     t_autoscale autoscale;
+load_range(AXIS_INDEX axis, double *a, double *b, t_autoscale autoscale)
 {
     if (equals(c_token, "]"))
 	return (autoscale);
@@ -1431,9 +1387,9 @@ load_range(axis, a, b, autoscale)
     /* HBB 20040315: ... and clear it automatically if a fixed range
      * was given the "right" way round! */
     if ((autoscale & AUTOSCALE_BOTH) == AUTOSCALE_NONE) {
-      if (*b < *a) 
+      if (*b < *a)
 	axis_array[axis].range_flags |= RANGE_REVERSE;
-      else 
+      else
 	axis_array[axis].range_flags &= ~RANGE_REVERSE;
     }
 
@@ -1446,11 +1402,7 @@ load_range(axis, a, b, autoscale)
  */
 
 void
-widest_tic_callback(axis, place, text, grid)
-    AXIS_INDEX axis;
-    double place;
-    char *text;
-    struct lp_style_type grid;
+widest_tic_callback(AXIS_INDEX axis, double place, char *text, struct lp_style_type grid)
 {
     (void) axis;		/* avoid "unused parameter" warnings */
     (void) place;
@@ -1468,41 +1420,37 @@ widest_tic_callback(axis, place, text, grid)
  * ULIG *
  */
 
-double 
-get_writeback_min(axis)
-    AXIS_INDEX axis;
+double
+get_writeback_min(AXIS_INDEX axis)
 {
     /* printf("get min(%d)=%g\n",axis,axis_array[axis].writeback_min); */
     return axis_array[axis].writeback_min;
 }
 
-double 
-get_writeback_max(axis)
-    AXIS_INDEX axis;
+double
+get_writeback_max(AXIS_INDEX axis)
 {
     /* printf("get max(%d)=%g\n",axis,axis_array[axis].writeback_min); */
     return axis_array[axis].writeback_max;
 }
 
-void 
-set_writeback_min(axis)
-    AXIS_INDEX axis;
+void
+set_writeback_min(AXIS_INDEX axis)
 {
     double val = AXIS_DE_LOG_VALUE(axis,axis_array[axis].min);
     /* printf("set min(%d)=%g\n",axis,val); */
     axis_array[axis].writeback_min = val;
 }
 
-void 
-set_writeback_max(axis)
-    AXIS_INDEX axis;
+void
+set_writeback_max(AXIS_INDEX axis)
 {
     double val = AXIS_DE_LOG_VALUE(axis,axis_array[axis].max);
     /* printf("set max(%d)=%g\n",axis,val); */
     axis_array[axis].writeback_max = val;
 }
 
-TBOOLEAN 
+TBOOLEAN
 some_grid_selected()
 {
     AXIS_INDEX i;
@@ -1564,9 +1512,7 @@ set_cbminmax()
 #endif /* PM3D */
 
 static void
-get_position_type(type, axes)
-enum position_type *type;
-int *axes;
+get_position_type(enum position_type *type, int *axes)
 {
     if (almost_equals(c_token, "fir$st")) {
 	++c_token;
@@ -1597,8 +1543,7 @@ int *axes;
 /* get_position() - reads a position for label,arrow,key,... */
 
 void
-get_position(pos)
-struct position *pos;
+get_position(struct position *pos)
 {
     int axes;
     enum position_type type = first_axes;

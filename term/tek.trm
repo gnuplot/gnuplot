@@ -1,5 +1,5 @@
-/*
- * $Id: tek.trm,v 1.13 2002/02/25 03:10:42 broeker Exp $
+/* Hello, Emacs, this is -*-C-*-
+ * $Id: tek.trm,v 1.14 2004/04/13 17:24:38 broeker Exp $
  *
  */
 
@@ -44,9 +44,9 @@
  *
  * AUTHORS
  *   Colin Kelley, Thomas Williams, Russell Lang
- * 
+ *
  * send your comments or suggestions to (gnuplot-info@lists.sourceforge.net).
- * 
+ *
  */
 
 /*
@@ -151,7 +151,7 @@ TEK40graphics()
 */
     (void) fflush(gpoutfile);
     sleep(1);
-    /* sleep 1 second to allow screen time to clear on real 
+    /* sleep 1 second to allow screen time to clear on real
        tektronix terminals */
 }
 
@@ -173,15 +173,13 @@ TEK40text()
 
 
 TERM_PUBLIC void
-TEK40linetype(linetype)
-    int linetype;
+TEK40linetype(int linetype)
 {
     (void) linetype;
 }
 
 TERM_PUBLIC void
-TEK40move(x, y)
-unsigned int x, y;
+TEK40move(unsigned int x, unsigned int y)
 {
     (void) putc('\035', gpoutfile);	/* into graphics */
     TEK40vector(x, y);
@@ -189,8 +187,7 @@ unsigned int x, y;
 
 
 TERM_PUBLIC void
-TEK40vector(x, y)
-unsigned int x, y;
+TEK40vector(unsigned int x, unsigned int y)
 {
     (void) putc((HY | (y & UPPER5) >> 5), gpoutfile);
     (void) putc((LY | (y & LOWER5)), gpoutfile);
@@ -200,9 +197,7 @@ unsigned int x, y;
 
 
 TERM_PUBLIC void
-TEK40put_text(x, y, str)
-unsigned int x, y;
-const char str[];
+TEK40put_text(unsigned int x, unsigned int y, const char str[])
 {
     TEK40move(x, y - 11);
     fprintf(gpoutfile, "\037%s\n", str);
@@ -261,9 +256,7 @@ BG_text()
 
 
 TERM_PUBLIC void
-BG_put_text(x, y, str)
-unsigned int x, y;
-const char str[];
+BG_put_text(unsigned int x, unsigned int y, const char str[])
 {
     BG_move(x, y - 11);
     fprintf(gpoutfile, "\037%s\n", str);
@@ -307,7 +300,7 @@ KTEK40Ctext()
 }
 
 /* special color linetypes for MS-DOS Kermit v2.31 tektronix emulator */
-/*	0 = normal, 1 = bright 
+/*	0 = normal, 1 = bright
 	foreground color (30-37) = 30 + colors
 		where colors are   1=red, 2=green, 4=blue */
 static const char *kermit_color[15] =
@@ -318,8 +311,7 @@ static const char *kermit_color[15] =
  "\033[0;33m"};
 
 TERM_PUBLIC void
-KTEK40Clinetype(linetype)
-int linetype;
+KTEK40Clinetype(int linetype)
 {
     if (linetype >= 13)
 	linetype %= 13;
@@ -328,13 +320,12 @@ int linetype;
 
 
 /* linetypes for MS-DOS Kermit v2.30 tektronix emulator */
-/* `=solid, a=fine dots, b=short dashes, c=dash dot, 
+/* `=solid, a=fine dots, b=short dashes, c=dash dot,
    d=long dash dot, e=dash dot dot */
 static const char *kerm_linetype = "`a`abcde";
 
 TERM_PUBLIC void
-KTEK40Mlinetype(linetype)
-int linetype;
+KTEK40Mlinetype(int linetype)
 {
     if (linetype >= 6)
 	linetype %= 6;
@@ -447,8 +438,7 @@ static const char *vt_linetype = "`a`abcdhijkl";
 static int last_vt_linetype = 0;
 
 TERM_PUBLIC void
-VTTEK40linetype(linetype)
-int linetype;
+VTTEK40linetype(int linetype)
 {
     if (linetype >= 10)
 	linetype %= 10;
@@ -457,9 +447,7 @@ int linetype;
 }
 
 TERM_PUBLIC void
-VTTEK40put_text(x, y, str)
-unsigned int x, y;
-const char str[];
+VTTEK40put_text(unsigned int x, unsigned int y, const char str[])
 {
     int linetype;
     linetype = last_vt_linetype;
@@ -516,8 +504,7 @@ static unsigned long *CT_pattern = &CT_lines[0];
 static int CT_last_linetype = 0, CT_last_x, CT_last_y;
 
 TERM_PUBLIC void
-CTEK_linetype(linetype)
-int linetype;
+CTEK_linetype(int linetype)
 {
     if (linetype < 0)
 	linetype = 0;
@@ -527,9 +514,7 @@ int linetype;
 }
 
 TERM_PUBLIC void
-CTEK_move(x, y)
-unsigned int x;
-unsigned int y;
+CTEK_move(unsigned int x, unsigned int y)
 {
     TEK40move(x, y);
     CT_last_x = x;
@@ -537,9 +522,7 @@ unsigned int y;
 }
 
 static void
-CT_solid_vector(x, y)
-int x;
-int y;
+CT_solid_vector(int x, int y)
 {
     TEK40vector(x, y);
     CT_last_x = x;
@@ -554,10 +537,7 @@ int y;
 static int CT_penon = 0;	/* is Pen on? */
 
 static void
-CT_draw_vpoint(x, y, last)
-    int x;
-    int y;
-    int last;
+CT_draw_vpoint(int x, int y, int last)
 {
     static int xx0, yy0, xx1, yy1;
 
@@ -592,9 +572,7 @@ CT_draw_vpoint(x, y, last)
 */
 
 static void
-CT_pattern_vector(x1, y1)
-int x1;
-int y1;
+CT_pattern_vector(int x1, int y1)
 {
     int op;			/* order parameter */
     int x0 = CT_last_x;
@@ -629,9 +607,7 @@ int y1;
 }
 
 TERM_PUBLIC void
-CTEK_vector(x, y)
-unsigned int x;
-unsigned int y;
+CTEK_vector(unsigned int x, unsigned int y)
 {
     if (CT_last_linetype <= 0)
 	CT_solid_vector(x, y);

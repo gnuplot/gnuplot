@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: emf.trm,v 1.18 2004/04/13 17:24:16 broeker Exp $
+ * $Id: emf.trm,v 1.19 2004/06/03 20:23:02 sfeam Exp $
  */
 
 /* GNUPLOT - emf.trm */
@@ -44,10 +44,10 @@
  *
  * HISTORY
  *
- * 3-Feb-2003 Ethan A Merritt 
+ * 3-Feb-2003 Ethan A Merritt
  * - modify text and point color handling to match other terminal types
  * - FIXME! alignment of rotated text is not correct.
- * 1.0.6 25-Jul-2002 Ethan A Merritt <merritt@u.washington.edu> 
+ * 1.0.6 25-Jul-2002 Ethan A Merritt <merritt@u.washington.edu>
  * - generalized text rotation and justification
  * 1.0.5 2000/07/20
  * - Handles were not freed at all, resulting to resource leaks when viewing on Windows 9x (not on NT4/W2000!!!)
@@ -231,7 +231,7 @@ static void EMF_write_long __PROTO((unsigned long));
 static void EMF_write_float __PROTO((double)); /* HBB 20001102: was 'float' */
 static void EMF_setfont __PROTO((void));
 
-static void 
+static void
 EMF_setfont()
 {
     int i, count;
@@ -294,7 +294,7 @@ EMF_setfont()
     EMF_SelectObject(EMF_HANDLE_FONT);
 }
 
-static void 
+static void
 EMF_flush_polygon()
 {
     if (emf_coords == 0)
@@ -316,7 +316,7 @@ EMF_flush_polygon()
     emf_coords = 0;
 }
 
-static void 
+static void
 EMF_flush_polyline()
 {
     if (emf_coords == 0)
@@ -341,17 +341,15 @@ EMF_flush_polyline()
 }
 
 /* HBB 20001103: K&R'ized these 4 functions a bit better. */
-static void 
-EMF_write_byte(value)
-    int value;
+static void
+EMF_write_byte(int value)
 {
     char c = value;
     fwrite(&c, 1, 1, gpoutfile);
 }
 
-static void 
-EMF_write_short(value)
-    int value;
+static void
+EMF_write_short(int value)
 {
     short int actual_value = value;
     char c[2];
@@ -362,9 +360,8 @@ EMF_write_short(value)
     fwrite(c, 1, 2, gpoutfile);
 }
 
-static void 
-EMF_write_long(value)
-    unsigned long value;
+static void
+EMF_write_long(unsigned long value)
 {
     char c[4];
 
@@ -378,9 +375,8 @@ EMF_write_long(value)
 
 /* FIXME HBB 20001103: this only works as given iff 'float' is the
  * same format as on x86's, i.e. IEEE 4-byte floating point format */
-static void 
-EMF_write_float(value)
-    double value;
+static void
+EMF_write_float(double value)
 {
     char c[4];
 
@@ -399,7 +395,7 @@ EMF_write_float(value)
     fwrite(c, 1, 4, gpoutfile);
 }
 
-TERM_PUBLIC void 
+TERM_PUBLIC void
 EMF_options()
 {
     term->xmax = EMF_XMAX;
@@ -447,7 +443,7 @@ EMF_options()
 	emf_defaultfontsize = (int) real(const_express(&a));
     }
     EMF_set_font(NULL);		/* set default font */
-    
+
     emf_colors = emf_monochrome ? 1 : EMF_COLORS;
 
     sprintf(term_options, "%s %s \"%s\" %d",
@@ -456,7 +452,7 @@ EMF_options()
 	    emf_defaultfontname, emf_defaultfontsize);
 }
 
-TERM_PUBLIC void 
+TERM_PUBLIC void
 EMF_init()
 {
     emf_posx = emf_posy = 0;
@@ -465,7 +461,7 @@ EMF_init()
     emf_graphics = FALSE;
 }
 
-TERM_PUBLIC void 
+TERM_PUBLIC void
 EMF_graphics()
 {
     /* header start */
@@ -509,7 +505,7 @@ EMF_graphics()
     EMF_set_font(NULL);		/* init default font */
 }
 
-TERM_PUBLIC int 
+TERM_PUBLIC int
 EMF_set_font(const char *font)
 {
     int sep;			/* hope this function exist everywhere... */
@@ -531,7 +527,7 @@ EMF_set_font(const char *font)
     return TRUE;
 }
 
-TERM_PUBLIC void 
+TERM_PUBLIC void
 EMF_text()
 {
     long pos;
@@ -556,9 +552,8 @@ EMF_text()
     emf_graphics = FALSE;
 }
 
-TERM_PUBLIC void 
-EMF_linetype(linetype)
-    int linetype;
+TERM_PUBLIC void
+EMF_linetype(int linetype)
 {
     /* Note : separating linetype and color would have not been futile, but anyway... */
 
@@ -571,9 +566,8 @@ EMF_linetype(linetype)
     EMF_dashtype(linetype);
 }
 
-TERM_PUBLIC void 
-EMF_linecolor(linecolor)
-    int linecolor;
+TERM_PUBLIC void
+EMF_linecolor(int linecolor)
 {
     static long GPFAR color_table_data[] =
     {
@@ -603,9 +597,8 @@ EMF_linecolor(linecolor)
     EMF_flush_polyline();
 }
 
-TERM_PUBLIC void 
-EMF_linewidth(width)
-double width;
+TERM_PUBLIC void
+EMF_linewidth(double width)
 {
     int current_dashtype = emf_dashtype;
 
@@ -618,9 +611,8 @@ double width;
     EMF_dashtype(current_dashtype);	/* Force re-evaluation of dash type */
 }
 
-TERM_PUBLIC void 
-EMF_dashtype(dashtype)
-    int dashtype;
+TERM_PUBLIC void
+EMF_dashtype(int dashtype)
 {
     int i, j;
     /* Each group of 8 entries in dot_length[] defines a dash
@@ -676,9 +668,8 @@ EMF_dashtype(dashtype)
     }
 }
 
-TERM_PUBLIC void 
-EMF_move(x, y)
-unsigned int x, y;
+TERM_PUBLIC void
+EMF_move(unsigned int x, unsigned int y)
 {
     assert(x < term->xmax && y < term->ymax);
     if (x == emf_posx && y == emf_posy)
@@ -688,9 +679,8 @@ unsigned int x, y;
     emf_posy = y;
 }
 
-TERM_PUBLIC void 
-EMF_dashed_vector(ux, uy)
-unsigned int ux, uy;
+TERM_PUBLIC void
+EMF_dashed_vector(unsigned int ux, unsigned int uy)
 {
     int xa, ya;
     int dx, dy, adx, ady;
@@ -704,7 +694,7 @@ unsigned int ux, uy;
     adx = abs(dx);
     ady = abs(dy * 10);
 
-    /* using the approximation sqrt(x**2 + y**2)  ~  x + (5*x*x)/(12*y)   when x > y.  
+    /* using the approximation sqrt(x**2 + y**2)  ~  x + (5*x*x)/(12*y)   when x > y.
        Note ordering of calculations to avoid overflow on 16 bit architectures */
     if (10 * adx < ady)
 	dist = (ady / 2 + 25 * adx / ady * adx / 6 * 5) / 5;
@@ -736,9 +726,8 @@ unsigned int ux, uy;
     emf_step -= (int) remain;
 }
 
-TERM_PUBLIC void 
-EMF_solid_vector(ux, uy)
-unsigned int ux, uy;
+TERM_PUBLIC void
+EMF_solid_vector(unsigned int ux, unsigned int uy)
 {
     assert(ux < term->xmax && uy < term->ymax);
     if (ux == emf_posx && uy == emf_posy)
@@ -755,10 +744,8 @@ unsigned int ux, uy;
     emf_coords++;
 }
 
-TERM_PUBLIC void 
-EMF_put_text(x, y, str)
-unsigned int x, y;
-const char str[];
+TERM_PUBLIC void
+EMF_put_text(unsigned int x, unsigned int y, const char str[])
 {
     int i, len = strlen(str);
     if (len % 2)		/* Must be long aligned! */
@@ -785,9 +772,8 @@ const char str[];
     emf_posx = emf_posy = -2000;
 }
 
-TERM_PUBLIC int 
-EMF_text_angle(ang)
-int ang;
+TERM_PUBLIC int
+EMF_text_angle(int ang)
 {
     /* Win GDI rotation is scaled in tenth of degrees, so... */
     switch (ang) {
@@ -811,9 +797,8 @@ int ang;
     return TRUE;
 }
 
-TERM_PUBLIC int 
-EMF_justify_text(mode)
-enum JUSTIFY mode;
+TERM_PUBLIC int
+EMF_justify_text(enum JUSTIFY mode)
 {
     int align = 8;		/* y referenced to bottom */
     switch (mode) {
@@ -831,17 +816,15 @@ enum JUSTIFY mode;
     return (TRUE);
 }
 
-TERM_PUBLIC void 
+TERM_PUBLIC void
 EMF_reset()
 {
     emf_posx = emf_posy = 0;
     emf_graphics = FALSE;
 }
 
-TERM_PUBLIC void 
-EMF_point(x, y, number)
-    unsigned int x, y;
-    int number;
+TERM_PUBLIC void
+EMF_point(unsigned int x, unsigned int y, int number)
 {
     int old_dashtype;
 
@@ -927,9 +910,8 @@ EMF_point(x, y, number)
 }
 
 
-TERM_PUBLIC void 
-EMF_set_pointsize(size)
-double size;
+TERM_PUBLIC void
+EMF_set_pointsize(double size)
 {
     emf_tic = (size * term->h_tic / 2);
     emf_tic707 = emf_tic * 12 / 17;

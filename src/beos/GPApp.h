@@ -52,7 +52,7 @@ class GPApp : public BApplication {
 		virtual void	ReadyToRun(void);
 		virtual void	MessageReceived(BMessage *message);
 		virtual void	RefsReceived(BMessage *message);
-	
+
 	private:
 		int32			window_count;
 		int32			next_untitled_number;

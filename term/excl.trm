@@ -1,11 +1,11 @@
-/*
- * $Id: excl.trm,v 1.11 1999/06/22 11:54:16 lhecking Exp $
+/* Hello, Emacs, this is -*-C-*-
+ * $Id: excl.trm,v 1.12 2004/04/13 17:24:31 broeker Exp $
  *
  */
 
 /* GNUPLOT - excl.trm */
 
-/* Copyright 1992, 1998, 2004 by P. Klosowski at NIST.  All Rights Reserved 
+/* Copyright 1992, 1998, 2004 by P. Klosowski at NIST.  All Rights Reserved
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted,
@@ -35,7 +35,7 @@
  *
  * This file is included by ../term.c.
  *
- * 
+ *
  * send your comments or suggestions to (gnuplot-info@lists.sourceforge.net).
  *
  */
@@ -46,7 +46,7 @@
    PURPOSE
      QUIC driver for GNUPLOT
    NOTES
-     
+
    HISTORY
      przemek - Aug 16, 1992: Created.
      lars - Nov 30, 1998: Updated to new gnuplot copyright by
@@ -123,7 +123,7 @@ c     TALPOP: pop controller params                           (p. 168)
 c     TALPSH: push controller params                          (p. 167)
 c     TALPRM: set units of measure ** to 1/1000 inch          (p.  64)
 c     TALGLT: set line type ** solid                          (p. 211)
-c     TALORG: set page absolute origin ** (0,0) UL corner     (p.  78) 
+c     TALORG: set page absolute origin ** (0,0) UL corner     (p.  78)
 c     TALPCW: set page clip window *** for landsc/full page   (p.  84)
 c     TALGLP: line: **pen7x7mil*draw*smear*glyph112*font5279* (p. 208)
 c     TALGLPE: ending for TALGLP command, forcing DRAW mode
@@ -188,10 +188,9 @@ EXCL_text()
 
 
 TERM_PUBLIC void
-EXCL_linetype(linetype)
-int linetype;
+EXCL_linetype(int linetype)
 {
-/* excl line widths in mils: 4 is mimimum, but too thin; then 
+/* excl line widths in mils: 4 is mimimum, but too thin; then
    7,10,14,17,20,24,27...
    exclpen=MOD(NPEN,8)*7
    CSI  exclpen; exclpen; TALGLPE
@@ -216,8 +215,7 @@ int linetype;
 
 
 TERM_PUBLIC void
-EXCL_move(x, y)
-unsigned int x, y;
+EXCL_move(unsigned int x, unsigned int y)
 {
     fprintf(gpoutfile, TALGMV, 1000 + x, EXCL_YLAST + 1000 - y);
     /*                 ^pen up vector */
@@ -225,8 +223,7 @@ unsigned int x, y;
 
 
 TERM_PUBLIC void
-EXCL_vector(x2, y2)
-unsigned int x2, y2;
+EXCL_vector(unsigned int x2, unsigned int y2)
 {
     fprintf(gpoutfile, TALGDW, 1000 + x2, EXCL_YLAST + 1000 - y2);
     /*                 ^pen down vector */
@@ -234,9 +231,7 @@ unsigned int x2, y2;
 
 
 TERM_PUBLIC void
-EXCL_put_text(x, y, str)
-unsigned int x, y;
-const char str[];
+EXCL_put_text(unsigned int x, unsigned int y, const char str[])
 {
     char ch;
     EXCL_move(x, y - EXCL_VCHAR / 3);

@@ -1,5 +1,5 @@
-/*
- * $Id: unixpc.trm,v 1.9 2002/07/26 16:42:29 mikulik Exp $
+/* Hello, Emacs, this is -*-C-*-
+ * $Id: unixpc.trm,v 1.10 2004/04/13 17:24:39 broeker Exp $
  *
  */
 
@@ -43,20 +43,20 @@
  *
  * AUTHORS
  *    John Campbell
- * 
+ *
  * send your comments or suggestions to (gnuplot-info@lists.sourceforge.net).
- * 
+ *
  */
 
 /*
 >From: John Campbell (...!arizona!naucse!jdc)
 
 I originally ported gnuplot to the ATT 3b1 (ATT7300) on 12/4/88, and then
-added the minimal code needed to bring it up to 2.0 level on 1/28/90.  The 
-3b1, as I view it, is a 720x300 bitmapped, monochrome display (often people 
-don't use the top 12 scan lines and thus the effective size is 720x288).  I 
-tried to maximize the size of the graph area, by using these top 12 lines 
-(normally reserved) and set up a signal handler to restore them upon exit, 
+added the minimal code needed to bring it up to 2.0 level on 1/28/90.  The
+3b1, as I view it, is a 720x300 bitmapped, monochrome display (often people
+don't use the top 12 scan lines and thus the effective size is 720x288).  I
+tried to maximize the size of the graph area, by using these top 12 lines
+(normally reserved) and set up a signal handler to restore them upon exit,
 abort, etc.
 
 Line styles were "fudged" (they do not know the aspect ratio).  The same
@@ -136,15 +136,17 @@ static Scr_type lookup[] =
 #define uPC_YLAST (uPC_YMAX - 1)
 
 
-static struct urdata uPC_ur = { (unsigned short *) uPC_display,
-				2 * uPC_XSIZE, 0, 0, 0, 0, 0, 0,
-				uPC_XMAX, uPC_YMAX, SRCSRC, DSTOR, 0
+static struct urdata uPC_ur = {
+    (unsigned short *) uPC_display,
+    2 * uPC_XSIZE, 0, 0, 0, 0, 0, 0,
+    uPC_XMAX, uPC_YMAX, SRCSRC, DSTOR, 0
 };
 
-#define IfErrOut(e1,e2,s1,s2) if (e1 e2) {\
-fprintf(stderr, "%s:: %s %s\n", sys_errlist[errno], s1, s2);\
-uPC_fixwind(0);\
-exit(-1);}
+#define IfErrOut(e1,e2,s1,s2) if (e1 e2) {				\
+    fprintf(stderr, "%s:: %s %s\n", sys_errlist[errno], s1, s2);	\
+    uPC_fixwind(0);							\
+    exit(-1);								\
+}
 
 TERM_PUBLIC void
 uPC_init()
@@ -211,8 +213,7 @@ uPC_text()
 
 
 TERM_PUBLIC void
-uPC_linetype(linetype)
-int linetype;
+uPC_linetype(int linetype)
 {
 /* This routine records the current linetype. */
     if (uPC_cur_linetype != linetype) {
@@ -223,8 +224,7 @@ int linetype;
 
 
 TERM_PUBLIC void
-uPC_move(x, y)
-unsigned int x, y;
+uPC_move(unsigned int x, unsigned int y)
 {
 /* This routine just records x and y in uPC_sx, uPC_sy */
     uPC_sx = x;
@@ -236,9 +236,6 @@ unsigned int x, y;
 #define uPC_PLOT(a,b)   (uPC_cur_linetype != 0 ? uPC_plot_word (a,b) :\
                                 (*(a)|=(b)))
 
-void
-uPC_plot_word(a, b)
-Scr_type *a, b;
 /*
    Weak attempt to make line styles.  The real problem is the aspect
    ratio.  This routine is called only when a bit is to be turned on in
@@ -248,8 +245,10 @@ Scr_type *a, b;
 
    This yields 3 working linetypes plus a usable axis line type.
 */
+void
+uPC_plot_word(Scr_type *a, Scr_type b)
 {
-/* Various line types */
+    /* Various line types */
     switch (uPC_cur_linetype) {
     case -1:
 	/* Distinguish between horizontal and vertical axis. */
@@ -295,8 +294,7 @@ Scr_type *a, b;
 }
 
 TERM_PUBLIC void
-uPC_vector(x, y)
-unsigned int x, y;
+uPC_vector(unsigned int x, unsigned int y)
 {
 /* This routine calls line with x,y */
     int x1 = uPC_sx, y1 = uPC_sy, x2 = x, y2 = y;
@@ -483,19 +481,18 @@ unsigned int x, y;
 
 
 #ifdef uPC_NOT_USED
+
 /* Added by Russell Lang, eln272v@monu1.cc.monash.oz
    This placement to the nearest character cell worked, and I'm leaving
    it here so the calculations involved won't be lost!  (jdc)
 */
 TERM_PUBLIC void
-uPC_put_text(x, y, str)
-unsigned int x, y;
-const char str[];
+uPC_put_text(unsigned int x, unsigned int y, const char str[])
 {
-/* This routine puts the text at the cursor location nearest
-   to (x,y).  Obviously the exact postion would look better */
+    /* This routine puts the text at the cursor location nearest
+       to (x,y).  Obviously the exact postion would look better */
 
-/* Just use the ANSI escape sequence CUP (iswind said that was ok!) */
+    /* Just use the ANSI escape sequence CUP (iswind said that was ok!) */
     printf("\033[%d;%dH%s\033[25;1H",
 	   (int) (24 - (y - uPC_VCHAR / 2) * 25 / uPC_YMAX),
 	   (int) (x * 80 / uPC_XMAX), str);
@@ -506,9 +503,7 @@ const char str[];
 
 
 TERM_PUBLIC void
-uPC_put_text(x, y, str)
-unsigned int x, y;
-const char str[];
+uPC_put_text(unsigned int x, unsigned int y, const char str[])
 {
     if (uPC_angle == 1)
 	x += uPC_VCHAR / 2;
@@ -528,14 +523,12 @@ const char str[];
 }
 
 
-void
-uPC_putc(x, y, c, angle)
-unsigned int x, y;
-int c, angle;
 /*
    Put a character at an x,y location in the bit map (using the fnt5x9
    array.  This is mostly just copied from the bitmap.c driver.
 */
+void
+uPC_putc(unsigned int x, unsigned int y, int c, int angle)
 {
     int i, j, k;
     register Scr_type mask, *a;
@@ -566,8 +559,7 @@ int c, angle;
 
 
 TERM_PUBLIC int
-uPC_text_angle(ang)
-int ang;
+uPC_text_angle(int ang)
 {
     uPC_angle = (ang ? 1 : 0);
     return TRUE;
@@ -577,15 +569,14 @@ int ang;
 TERM_PUBLIC void
 uPC_reset()
 {
-/* Reset window to normal size. */
+    /* Reset window to normal size. */
     uPC_fixwind(0);
 }
 
 
 
 void
-uPC_fixwind(signo)
-int signo;
+uPC_fixwind(int signo)
 {
     static struct uwdata wreset =
     {0, 12, 720, 288, 0x1};

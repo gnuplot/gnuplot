@@ -1,5 +1,5 @@
-/*
- * $Id: ggi.trm,v 1.17 2004/01/07 19:11:30 lhecking Exp $
+/* Hello, Emacs, this is -*-C-*-
+ * $Id: ggi.trm,v 1.18 2004/04/13 17:24:32 broeker Exp $
  */
 
 /* GNUPLOT - ggi.trm */
@@ -243,7 +243,7 @@ enum GGI_id {
     GGI_OTHER
 };
 
-static struct gen_table GGI_opts[] = 
+static struct gen_table GGI_opts[] =
 {
     { "mo$de", GGI_MODE },
     { "ac$celeration", GGI_ACCELERATION },
@@ -280,7 +280,7 @@ GGI_line_colors()
 
 /* Called bevore a graphic is displayed */
 TERM_PUBLIC void GGI_graphics()
-{ 
+{
 #ifdef USE_MOUSE
     int i, j;
     int display_frame = ggiGetDisplayFrame(GGIvisual);
@@ -331,7 +331,7 @@ TERM_PUBLIC void GGI_graphics()
 }
 
 TERM_PUBLIC void
-GGI_set_size(void)
+GGI_set_size()
 {
     ggi_mode mode;
     ggiGetMode(GGIvisual,&mode);
@@ -355,9 +355,9 @@ GGI_set_size(void)
  * -----------------------
  * Called only once, when the terminal is initialized. We have to open the visual here because it
  * is during 'init' that we have to change the terminal dimensions (xmax, ymax).
- */ 
-TERM_PUBLIC void GGI_init() 
-{ 
+ */
+TERM_PUBLIC void GGI_init()
+{
     int success = 0;
     ggi_mode mode;
 
@@ -488,18 +488,20 @@ TERM_PUBLIC void GGI_init()
     setvbuf(stdin, (char*)0, _IONBF, 0);
 }
 
-TERM_PUBLIC void GGI_linetype(linetype)
-    int linetype;
+TERM_PUBLIC void GGI_linetype(int linetype)
 {
-    if(linetype==-2) ggiSetGCForeground(GGIvisual,GGIborderColor);
-    if(linetype==-1) ggiSetGCForeground(GGIvisual,GGIaxisColor);
-    if(linetype<0) return;
-    if(linetype>=6) linetype%=6;
+    if(linetype == -2)
+	ggiSetGCForeground(GGIvisual,GGIborderColor);
+    if(linetype == -1)
+	ggiSetGCForeground(GGIvisual,GGIaxisColor);
+    if(linetype < 0)
+	return;
+    if(linetype >= 6)
+	linetype%=6;
     ggiSetGCForeground(GGIvisual,GGIcolors[linetype]);
 }
 
-TERM_PUBLIC void GGI_move(x,y)
-    unsigned int x,y;
+TERM_PUBLIC void GGI_move(unsigned int x, unsigned int y)
 {
     GGIx=x;
     GGIy=GGI_y(y);
@@ -510,34 +512,36 @@ GGI_options()
 {
     while (!END_OF_COMMAND) {
 	switch(lookup_table(&GGI_opts[0], c_token)) {
-	    case GGI_ACCELERATION:
-		{
-		    int itmp;
-		    struct value a;
-		    c_token++;
-		    itmp = (int) real(const_express(&a));
-		    if (itmp < 1) {
-			fprintf(stderr, "acceleration must be strictly positive!\n");
-		    } else {
-			GGI_acceleration = itmp;
-		    }
-		}
-		break;
-	    case GGI_MODE:
-		/* fallthru */
-		c_token++;
-	    default:
-		if (!END_OF_COMMAND) {
-		    copy_str(GGI_mode_spec, c_token, 0xfe);
-		    GGI_mode_changed = 1;
-		}
-		break;
+	case GGI_ACCELERATION:
+	{
+	    int itmp;
+	    struct value a;
+
+	    c_token++;
+	    itmp = (int) real(const_express(&a));
+	    if (itmp < 1) {
+		fprintf(stderr, "acceleration must be strictly positive!\n");
+	    } else {
+		GGI_acceleration = itmp;
+	    }
+	    break;
+	}
+	case GGI_MODE:
+	    c_token++;
+	    /* fallthru */
+	default:
+	    if (!END_OF_COMMAND) {
+		copy_str(GGI_mode_spec, c_token, 0xfe);
+		GGI_mode_changed = 1;
+	    }
+	    break;
 	}
 	c_token++;
-    }
+    } /* while(command) */
+
     if (*GGI_mode_spec) {
 	sprintf(term_options, "mode %s acceleration %d",
-	    GGI_mode_spec, GGI_acceleration);
+		GGI_mode_spec, GGI_acceleration);
     } else {
 	sprintf(term_options, "acceleration %d", GGI_acceleration);
     }
@@ -557,7 +561,7 @@ GGI_close()
     xmiDetach(GGIvisual);
 #endif
 
-    ggiClose(GGIvisual); 
+    ggiClose(GGIvisual);
     GGIvisual = (ggi_visual_t)0;
 
     /* EXIT EXTENSIONS */
@@ -568,29 +572,27 @@ GGI_close()
     }
 #endif
 #ifdef ENABLE_XMI
-    xmiExit();	
+    xmiExit();
 #endif
 }
 
 /* Called when terminal is terminated i.e.
  * when switching to another terminal. */
 TERM_PUBLIC void
-GGI_reset() 
+GGI_reset()
 {
     if(GGIvisual!=NULL) {
 	GGI_close();
     }
 #ifdef PM3D
-    /* not needed */
-#if 0
+# if 0 /* not needed */
     GGI_save_pal.colorFormulae = -1; /* force later reallocation of palette */
-#endif
+# endif
 #endif
 }
 
-TERM_PUBLIC void GGI_put_text(x,y,str)
-    unsigned int x,y;
-    const char *str;
+TERM_PUBLIC void
+GGI_put_text(unsigned int x, unsigned int y, const char *str)
 {
     ggi_pixel current_foreground;
     ggiGetGCForeground(GGIvisual,&current_foreground);
@@ -613,14 +615,15 @@ GGI_resume()
 }
 
 TERM_PUBLIC void
-GGI_fillbox(style, x, y, w, h)
-int style;
-unsigned int x, y, w, h;
+GGI_fillbox(
+    int style,
+    unsigned int x, unsigned int y,
+    unsigned int w, unsigned int h)
 {
     /* when is this called ? */
     /* ULIG: the style parameter is now used for the fillboxes style
      * (not implemented here), see the documentation */
-    
+
 #if 0
     fprintf(stderr, "(GGI_fillbox) style, x, y, w, y = %d, %d, %d, %d, %d\n",
 	style, x, y, w, h);
@@ -644,8 +647,8 @@ GGI_text()
 #endif
 }
 
-TERM_PUBLIC void GGI_vector(x,y)
-    unsigned int x,y;
+TERM_PUBLIC void
+GGI_vector(unsigned int x, unsigned int y)
 {
     y = GGI_y(y);
     ggiDrawLine(GGIvisual,GGIx,GGIy,x,y);
@@ -655,10 +658,9 @@ TERM_PUBLIC void GGI_vector(x,y)
 
 #ifdef USE_MOUSE
 
-/* tranlate ggi keysym to gnuplot keysym */
+/* translate ggi keysym to gnuplot keysym */
 TERM_PUBLIC int
-GGI_from_keysym(keysym)
-    uint32 keysym;
+GGI_from_keysym(uint32 keysym)
 {
     switch (keysym) {
 	case GIIUC_BackSpace:
@@ -812,62 +814,58 @@ GGI_from_keysym(keysym)
 }
 
 TERM_PUBLIC long int
-GGI_SetTime(current)
-    const struct timeval* current;
+GGI_SetTime(const struct timeval* current)
 {
     /* --> dsec in musec */
     int dsec = (current->tv_sec - GGI_timestamp.tv_sec) * 1000000;
     /* --> dmu in millisec */
     int dmu = (current->tv_usec - GGI_timestamp.tv_usec + dsec) / 1000;
+
     GGI_timestamp = *current;
     return dmu;
 }
 
 TERM_PUBLIC int
-GGI_from_button(button)
-    uint32 button;
+GGI_from_button(uint32 button)
 {
     switch (button) {
-	case GII_PBUTTON_LEFT:
-	    return 1;
-	case GII_PBUTTON_MIDDLE:
-	    return 2;
-	case GII_PBUTTON_RIGHT:
-	    return 3;
-	default:
-	    /* should not happen */
-	    return 0;
+    case GII_PBUTTON_LEFT:
+	return 1;
+    case GII_PBUTTON_MIDDLE:
+	return 2;
+    case GII_PBUTTON_RIGHT:
+	return 3;
+    default:
+	/* should not happen */
+	return 0;
     }
 }
 
 TERM_PUBLIC int
-GGI_y(y)
-    sint32 y;
+GGI_y(sint32 y)
 {
     return GGIymax - y;
 }
 
 TERM_PUBLIC int
-GGI_eventually_update_modifiers(event, add)
-    const ggi_event* event;
-    const int add;
+GGI_eventually_update_modifiers(const ggi_event* event, const int add)
 {
     int mod = 0;
     int old_modifiers = GGI_modifiers;
 
     switch (event->key.sym) {
-	case GIIK_Shift:
-	    mod = Mod_Shift;
-	    break;
-	case GIIK_Ctrl:
-	    mod = Mod_Ctrl;
-	    break;
-	case GIIK_Alt:
-	case GIIK_Meta:
-	    mod = Mod_Alt;
-	    break;
-	default:
-	    return 0;
+    case GIIK_Shift:
+	mod = Mod_Shift;
+	break;
+    case GIIK_Ctrl:
+	mod = Mod_Ctrl;
+	break;
+    case GIIK_Alt:
+    case GIIK_Meta:
+	mod = Mod_Alt;
+	break;
+    default:
+	return 0;
     }
 
     if (add) {
@@ -894,8 +892,7 @@ GGI_eventually_update_modifiers(event, add)
 }
 
 TERM_PUBLIC int
-GGI_dispatch_event(event)
-    const ggi_event* event;
+GGI_dispatch_event(const ggi_event* event)
 {
     struct gp_event_t gp_ev;
 
@@ -908,73 +905,73 @@ GGI_dispatch_event(event)
     switch (event->any.type) {
 
 	/* [-- KEY EVENTS --] */
-	case evKeyPress:
-	case evKeyRepeat:
-	    if (GGI_eventually_update_modifiers(event, 1)) {
-		/* was just a modifier pressed */
-		return 0;
-	    }
-	    gp_ev.type = GE_keypress;
-	    gp_ev.par1 = GGI_from_keysym(event->key.sym);
-	    if ('q' == gp_ev.par1) {
-		return 'q';
-	    }
-	    break;
-	case evKeyRelease:
-	    if (GGI_eventually_update_modifiers(event, 0)) {
-		/* was just a modifier pressed */
-		return 0;
-	    }
-	    break;
+    case evKeyPress:
+    case evKeyRepeat:
+	if (GGI_eventually_update_modifiers(event, 1)) {
+	    /* was just a modifier pressed */
+	    return 0;
+	}
+	gp_ev.type = GE_keypress;
+	gp_ev.par1 = GGI_from_keysym(event->key.sym);
+	if ('q' == gp_ev.par1) {
+	    return 'q';
+	}
+	break;
+    case evKeyRelease:
+	if (GGI_eventually_update_modifiers(event, 0)) {
+	    /* was just a modifier pressed */
+	    return 0;
+	}
+	break;
 
 	/* [-- POINTER EVENTS --] */
-	case evPtrRelative:
-	    /* relative motion is not implemented. Should it ? */
-	    /*
-	     * fprintf(stderr, "%s:%d report this to <johannes@zellner.org> %d %d\n",
-	     *     __FILE__, __LINE__, event->pmove.x, event->pmove.y);
-	     */
-	    gp_ev.type  = GE_motion;
-	    GGI_mouse_x += GGI_acceleration * event->pmove.x;
-	    GGI_mouse_y += GGI_acceleration * event->pmove.y;
-	    break;
-	case evPtrAbsolute:
-	    gp_ev.type  = GE_motion;
-	    GGI_mouse_x = event->pmove.x;
-	    GGI_mouse_y = event->pmove.y;
-	    break;
-	case evPtrButtonPress:
-	    gp_ev.type = GE_buttonpress;
-	    gp_ev.par1 = GGI_from_button(event->pbutton.button);
-	    break;
-	case evPtrButtonRelease:
-	    gp_ev.type = GE_buttonrelease;
-	    gp_ev.par1 = GGI_from_button(event->pbutton.button);
-	    gp_ev.par2 = GGI_SetTime(&(event->pbutton.time));
-	    break;
+    case evPtrRelative:
+	/* relative motion is not implemented. Should it ? */
+	/*
+	 * fprintf(stderr, "%s:%d report this to <johannes@zellner.org> %d %d\n",
+	 *     __FILE__, __LINE__, event->pmove.x, event->pmove.y);
+	 */
+	gp_ev.type  = GE_motion;
+	GGI_mouse_x += GGI_acceleration * event->pmove.x;
+	GGI_mouse_y += GGI_acceleration * event->pmove.y;
+	break;
+    case evPtrAbsolute:
+	gp_ev.type  = GE_motion;
+	GGI_mouse_x = event->pmove.x;
+	GGI_mouse_y = event->pmove.y;
+	break;
+    case evPtrButtonPress:
+	gp_ev.type = GE_buttonpress;
+	gp_ev.par1 = GGI_from_button(event->pbutton.button);
+	break;
+    case evPtrButtonRelease:
+	gp_ev.type = GE_buttonrelease;
+	gp_ev.par1 = GGI_from_button(event->pbutton.button);
+	gp_ev.par2 = GGI_SetTime(&(event->pbutton.time));
+	break;
 #ifdef HAVE_GGI_WMH_H
-	case evCommand:
-	    /* [-- resizing --] */
-	    if (GGI_use_whm) {
-		/* fprintf(stderr, "(GGI_dispatch_event) \n"); */
-		if (event->cmd.code==GGICMD_REQUEST_SWITCH) {
-		    /*
-		     * ggi_cmddata_switchrequest *req;
-		     * req = &(event->cmd.data);
-		     * ggi_resize(GGIvisual, &(req->mode));
-		     */
-		    /*
-		     * while( ggiEventPoll(GGIvisual, emAll, &tv) ) {
-		     *     ggiEventRead(GGIvisual, event, emAll);
-		     * }
-		     */
-		}
+    case evCommand:
+	/* [-- resizing --] */
+	if (GGI_use_whm) {
+	    /* fprintf(stderr, "(GGI_dispatch_event) \n"); */
+	    if (event->cmd.code==GGICMD_REQUEST_SWITCH) {
+		/*
+		 * ggi_cmddata_switchrequest *req;
+		 * req = &(event->cmd.data);
+		 * ggi_resize(GGIvisual, &(req->mode));
+		 */
+		/*
+		 * while( ggiEventPoll(GGIvisual, emAll, &tv) ) {
+		 *     ggiEventRead(GGIvisual, event, emAll);
+		 * }
+		 */
 	    }
-	    break;
+	}
+	break;
 #endif
-	default:
-	    /* fprintf(stderr, "(GGI_dispatch_event) unhandled event\n"); */
-	    break;
+    default:
+	/* fprintf(stderr, "(GGI_dispatch_event) unhandled event\n"); */
+	break;
     }
     do_event(&gp_ev);
     gp_ev.type = GE_plotdone;
@@ -1019,7 +1016,7 @@ GGI_save_frame_stl()
 	 * the previous plot is copied to the current frame) */
 	ggiSetReadFrame(GGIvisual, !display_frame);
 	ggiCopyBox(GGIvisual, 0, GGIcanvas_height,
-	    GGIwidth, GGI_font_height, 0, GGIcanvas_height);
+		   GGIwidth, GGI_font_height, 0, GGIcanvas_height);
 
 	GGI_saved_stl = 1;
     }
@@ -1033,13 +1030,12 @@ GGI_replot()
 	0, 0, 0, 0,
 	"replot"
     };
+
     do_event(&ev);
 }
 
 TERM_PUBLIC void
-GGI_clear(v, tag)
-    const GGI_vertex_t* v;
-    const int tag;
+GGI_clear(const GGI_vertex_t* v, const int tag)
 {
     if (tag && v->width) {
 	/* turn off current */
@@ -1049,9 +1045,7 @@ GGI_clear(v, tag)
 }
 
 TERM_PUBLIC void
-GGI_save_puts(v, tag)
-    GGI_vertex_t* v;
-    const int tag;
+GGI_save_puts(GGI_vertex_t* v, const int tag)
 {
     GGI_clear(v, tag);
 
@@ -1067,12 +1061,12 @@ GGI_save_puts(v, tag)
 }
 
 TERM_PUBLIC void
-GGI_set_vertex(v, x, y, str, tag)
-    GGI_vertex_t* v;
-    const int x;
-    const int y;
-    const char* str;
-    const int tag;
+GGI_set_vertex(
+    GGI_vertex_t* v,
+    const int x,
+    const int y,
+    const char* str,
+    const int tag)
 {
     GGI_clear(v, tag);
 
@@ -1091,8 +1085,7 @@ GGI_set_vertex(v, x, y, str, tag)
 }
 
 TERM_PUBLIC void
-GGI_relative(r)
-    int r[2];
+GGI_relative(int r[2])
 {
     int diff = r[1] - r[0];
     if (diff < 0) {
@@ -1104,10 +1097,7 @@ GGI_relative(r)
 }
 
 TERM_PUBLIC void
-GGI_clear_hline(x1, x2, y)
-    int x1;
-    int x2;
-    int y;
+GGI_clear_hline(int x1, int x2, int y)
 {
     if (GGI_saved_canvas && x1 >= 0 && x2 >= 0 && y >= 0) {
 	int r[2];
@@ -1122,10 +1112,7 @@ GGI_clear_hline(x1, x2, y)
 }
 
 TERM_PUBLIC void
-GGI_clear_vline(y1, y2, x)
-    int y1;
-    int y2;
-    int x;
+GGI_clear_vline(int y1, int y2, int x)
 {
     if (GGI_saved_canvas && y1 >= 0 && y2 >= 0 && x >= 0) {
 	int r[2];
@@ -1140,10 +1127,7 @@ GGI_clear_vline(y1, y2, x)
 }
 
 TERM_PUBLIC void
-GGI_draw_hline(x1, x2, y)
-    int x1;
-    int x2;
-    int y;
+GGI_draw_hline(int x1, int x2, int y)
 {
     if (x1 >= 0 && x2 >= 0 && y >= 0) {
 	int r[2];
@@ -1157,10 +1141,7 @@ GGI_draw_hline(x1, x2, y)
 }
 
 TERM_PUBLIC void
-GGI_draw_vline(y1, y2, x)
-    int y1;
-    int y2;
-    int x;
+GGI_draw_vline(int y1, int y2, int x)
 {
     if (y1 >= 0 && y2 >= 0 && x >= 0) {
 	int r[2];
@@ -1308,9 +1289,7 @@ GGI_waitforinput()
 }
 
 TERM_PUBLIC void
-GGI_put_tmptext(i, str)
-    int i;
-    const char str[];
+GGI_put_tmptext(int i, const char str[])
 {
     char* second;
 
@@ -1342,7 +1321,7 @@ GGI_put_tmptext(i, str)
 	case 1: /* coordinate text for first  corner of zoombox */
 	case 2: /* coordinate text for second corner of zoombox */
 	    GGI_save_frame_canvas();
-	    second = (char*) strchr(str, '\r'); 
+	    second = (char*) strchr(str, '\r');
 	    --i; /* transform to [0, 1] */
 	    GGI_clear_zoombox();
 	    if (second == NULL) {
@@ -1364,8 +1343,7 @@ GGI_put_tmptext(i, str)
 }
 
 TERM_PUBLIC void
-GGI_set_ruler(x, y)
-    int x, y;
+GGI_set_ruler(int x, int y)
 {
     if (x < 0) {
 
@@ -1383,8 +1361,7 @@ GGI_set_ruler(x, y)
 }
 
 TERM_PUBLIC void
-GGI_set_cursor(c, x, y)
-    int c, x, y;
+GGI_set_cursor(int c, int x, int y)
 {
     /* TODO */
     switch (c) {
@@ -1402,17 +1379,17 @@ GGI_set_cursor(c, x, y)
 }
 
 TERM_PUBLIC void
-GGI_set_clipboard(s)
-    const char s[];
+GGI_set_clipboard(const char s[])
 {
     /* XXX: not implemented */
+    (void) s;			/* avoid -Wunused */
 }
+
 #endif
 
 #ifdef PM3D
 TERM_PUBLIC int
-GGI_make_palette(palette)
-    t_sm_palette *palette;
+GGI_make_palette(t_sm_palette *palette)
 {
     /* reallocate only, if it has changed */
     if (palette && (GGI_save_pal.colorFormulae < 0
@@ -1454,8 +1431,7 @@ GGI_previous_palette()
 }
 
 TERM_PUBLIC void
-GGI_set_color(gray)
-    double gray;
+GGI_set_color(double gray)
 {
     if (GGIvisual) {
 	int idx = (gray <= 0) ? 0 : (int)(gray * ggi_pm3d_colors);
@@ -1470,9 +1446,7 @@ GGI_set_color(gray)
 
 #ifdef ENABLE_XMI
 TERM_PUBLIC void
-GGI_filled_polygon(points, corners)
-    int points;
-    gpiPoint *corners;
+GGI_filled_polygon(int points, gpiPoint *corners)
 {
     static miPoint offset = {0, 0};
     if (GGI_miPaintedSet) {

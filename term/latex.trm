@@ -1,5 +1,5 @@
-/*
- * $Id: latex.trm,v 1.25 2004/03/29 10:43:36 broeker Exp $
+/* Hello, Emacs, this is -*-C-*-
+ * $Id: latex.trm,v 1.26 2004/04/13 17:24:34 broeker Exp $
  *
  */
 
@@ -40,19 +40,19 @@
  *
  * This terminal driver supports:
  *   LaTeX pictures (latex).
- *   LaTeX pictures with emTeX specials (emtex). 
+ *   LaTeX pictures with emTeX specials (emtex).
  *
  * AUTHORS
  *   David Kotz, Russell Lang
  *
  * send your comments or suggestions to (gnuplot-info@lists.sourceforge.net).
- * 
+ *
  */
 
 /* modified to optimize use of \rule for long lines */
 /* TLDC: modified to have nice line types */
 
-/* the following LATEX driver has been modified by 
+/* the following LATEX driver has been modified by
    Russell Lang, eln272v@monu1.cc.monash.oz from the
    GnuTeX 1.3 driver by David Kotz, David.Kotz@Dartmouth.edu.
    Since then it has been further extended by David Kotz.
@@ -313,8 +313,7 @@ LATEX_text()
 }
 
 TERM_PUBLIC void
-LATEX_linetype(linetype)
-int linetype;
+LATEX_linetype(int linetype)
 {
     float size;
 
@@ -350,8 +349,7 @@ int linetype;
 }
 
 TERM_PUBLIC void
-LATEX_move(x, y)
-unsigned int x, y;
+LATEX_move(unsigned int x, unsigned int y)
 {
     LATEX_flushdot();
 
@@ -362,13 +360,11 @@ unsigned int x, y;
 
 
 TERM_PUBLIC void
-LATEX_point(x, y, number) /* version of line_and_point */
-unsigned int x, y;
-int number;			/* type of point */
+LATEX_point(unsigned int x, unsigned int y, int number)
 {
     LATEX_move(x, y);
 
-    /* Print the character defined by 'number'; number < 0 means 
+    /* Print the character defined by 'number'; number < 0 means
        to use a dot, otherwise one of the defined points. */
     fprintf(gpoutfile, "\\put(%d,%d){%s}\n", x, y,
 	    (number < 0 ? LATEX_TINY_DOT
@@ -377,8 +373,7 @@ int number;			/* type of point */
 
 
 TERM_PUBLIC void
-LATEX_vector(ux, uy)
-unsigned int ux, uy;
+LATEX_vector(unsigned int ux, unsigned int uy)
 {
     if (LATEX_dotspace == 0.0) {
 	/* solid line */
@@ -397,8 +392,7 @@ unsigned int ux, uy;
 }
 
 static void
-LATEX_solid_line(x1, x2, y1, y2)
-int x1, x2, y1, y2;
+LATEX_solid_line(int x1, int x2, int y1, int y2)
 {
     float slope;
     int inc;
@@ -498,11 +492,11 @@ int x1, x2, y1, y2;
  * The previous rule is output, and the new one ignored, if code is 2.
  */
 static void
-LATEX_rule(code, x, y, width, height)
-int code;			/* how do we treat this rule? */
-double x, y;
-double width;
-double height;
+LATEX_rule(
+    int code,			/* how do we treat this rule? */
+    double x, double y,
+    double width,
+    double height)
 {
     static float lastx, lasty;
     static float lastw, lasth;
@@ -560,8 +554,7 @@ double height;
 }
 
 static void
-LATEX_dot_line(x1, x2, y1, y2)
-int x1, x2, y1, y2;
+LATEX_dot_line(int x1, int x2, int y1, int y2)
 {
     static float LATEX_left;	/* fraction of space left after last dot */
 
@@ -636,9 +629,10 @@ LATEX_flushdot()
 }
 
 TERM_PUBLIC void
-LATEX_arrow(sx, sy, ex, ey, head)
-    unsigned int sx, sy, ex, ey;
-    int head;
+LATEX_arrow(
+    unsigned int sx, unsigned int sy,
+    unsigned int ex, unsigned int ey,
+    int head)
 {
     best_latex_arrow(sx, sy, ex, ey, 1, head);
 
@@ -647,10 +641,10 @@ LATEX_arrow(sx, sy, ex, ey, head)
 }
 
 static void
-best_latex_arrow(sx, sy, ex, ey, who, head)
-    int sx, sy, ex, ey;		/* start and end points */
-    int who;			/* 1=LATEX, 2=EEPIC */
-    int head;
+best_latex_arrow(
+    int sx, int sy, int ex, int ey, /* start and end points */
+    int who,			/* 1=LATEX, 2=EEPIC */
+    int head)
 {
     int dx = ex - sx;
     int dy = ey - sy;
@@ -725,9 +719,7 @@ best_latex_arrow(sx, sy, ex, ey, who, head)
 }
 
 TERM_PUBLIC void
-LATEX_put_text(x, y, str)
-unsigned int x, y;		/* reference point of string */
-const char str[];			/* the text */
+LATEX_put_text(unsigned int x, unsigned int y, const char str[])
 {
     static const char *justify[] = { "[l]", "", "[r]" };
     int flag, i;
@@ -751,18 +743,16 @@ const char str[];			/* the text */
 }
 
 TERM_PUBLIC int
-LATEX_justify_text(mode)
-enum JUSTIFY mode;
+LATEX_justify_text(enum JUSTIFY mode)
 {
     latex_justify = mode;
     return (TRUE);
 }
 
 TERM_PUBLIC int
-LATEX_text_angle(ang)
-int ang;
+LATEX_text_angle(int ang)
 {
-    /* we can't really write text vertically, but this will 
+    /* we can't really write text vertically, but this will
        put the ylabel centred at the left of the plot, and
        then we'll make a \shortstack */
     latex_angle = (ang ? 1 : 0);
@@ -809,8 +799,7 @@ EMTEX_text()
 
 
 static void
-EMTEX_solid_line(x1, x2, y1, y2)
-int x1, x2, y1, y2;
+EMTEX_solid_line(int x1, int x2, int y1, int y2)
 {
     /* emtex special solid line */
     if (LATEX_moved)

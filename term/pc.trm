@@ -1,5 +1,5 @@
-/*
- * $Id: pc.trm,v 1.17 2004/02/23 13:59:37 broeker Exp $
+/* Hello, Emacs, this is -*-C-*-
+ * $Id: pc.trm,v 1.18 2004/04/13 17:24:36 broeker Exp $
  *
  */
 
@@ -131,8 +131,7 @@ enum {
     HORIZ_DIR, VERT_DIR
 };
 static void
-_settextang(ang)
-int ang;
+_settextang(int ang)
 {
     if (ang == HORIZ_DIR) {
 	_settextorient(1, 0);
@@ -143,7 +142,7 @@ int ang;
 #endif /* WATCOMC */
 
 static int huge
-detect_svga(void)
+detect_svga()
 {
     return 0;			/* the default mode, just a place holder */
 }
@@ -347,7 +346,7 @@ PC_graphics()
 }
 
 TERM_PUBLIC void
-PC_linetype(linetype)
+PC_linetype(int linetype)
 {
     if (pc_colors > 14) {	/* 16 or more colors */
 	if (linetype >= 13)
@@ -377,8 +376,7 @@ PC_linetype(linetype)
 }
 
 TERM_PUBLIC void
-PC_move(x, y)
-    unsigned int x, y;
+PC_move(unsigned int x, unsigned int y)
 {
 #ifdef __TURBOC__
     moveto(x, pc_lasty - y);
@@ -393,8 +391,7 @@ PC_move(x, y)
 }
 
 TERM_PUBLIC void
-PC_vector(x, y)
-    unsigned int x, y;
+PC_vector(unsigned int x, unsigned int y)
 {
 #ifdef __TURBOC__
     lineto(x, pc_lasty - y);
@@ -450,8 +447,7 @@ PC_text()
 }
 
 TERM_PUBLIC int
-PC_text_angle(ang)
-    int ang;
+PC_text_angle(int ang)
 {
     switch (ang) {
     case 0:
@@ -466,8 +462,7 @@ PC_text_angle(ang)
 }
 
 TERM_PUBLIC int
-PC_justify_text(just)
-    enum JUSTIFY just;
+PC_justify_text(enum JUSTIFY just)
 {
 #if defined(__TURBOC__)
     switch (just) {
@@ -509,9 +504,7 @@ PC_justify_text(just)
 }
 
 TERM_PUBLIC void
-PC_put_text(x, y, str)
-    unsigned int x, y;
-    const char *str;
+PC_put_text(unsigned int x, unsigned int y, const char *str)
 {
 #ifdef __TURBOC__
     settextstyle(DEFAULT_FONT, pc_text_dir, pc_text_size);

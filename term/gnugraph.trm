@@ -1,5 +1,5 @@
-/*
- * $Id: gnugraph.trm,v 1.19 2003/03/26 09:08:54 mikulik Exp $
+/* Hello, Emacs, this is -*-C-*-
+ * $Id: gnugraph.trm,v 1.20 2004/04/13 17:24:32 broeker Exp $
  */
 
 /* GNUPLOT -- gnugraph.trm */
@@ -43,7 +43,7 @@
  * AUTHORS
  *  Tony Richardson from the unixplot.trm by Colin Kelley, Thomas Williams,
  *  and Russell Lang and from post.trm by Russell Lang.
- * 
+ *
  * send your comments or suggestions to (info-gnuplot@ames.arc.nasa.gov).
  */
 
@@ -98,7 +98,7 @@ TERM_PUBLIC int UP_justify_text __PROTO((enum JUSTIFY mode));
 TERM_PUBLIC void UP_reset __PROTO((void));
 #define UP_XMAX 19859
 #define UP_YMAX 11565
-/* UP_VCHAR = ((UP_FONTSIZE*UP_YMAX)/(UP_YINCHES*72)) 
+/* UP_VCHAR = ((UP_FONTSIZE*UP_YMAX)/(UP_YINCHES*72))
             = UP_FONTSIZE*UP_VFONTSC
    UP_HCHAR = ((UP_FONTSIZE/2)*UP_XMAX)/(UP_XINCHES*72))
             = UP_FONTSIZE*UP_HFONTSC
@@ -219,7 +219,7 @@ TERM_PUBLIC void
 UP_options()
 {
     struct value a;
-  
+
     while (!END_OF_COMMAND) {
 	switch(lookup_table(&UP_opts[0],c_token)) {
 	case UP_DEFAULT:
@@ -324,8 +324,7 @@ UP_text()
 
 
 TERM_PUBLIC void
-UP_linetype(linetype)
-int linetype;
+UP_linetype(int linetype)
 {
     /* T.Walter, 1999-05-23 */
 #if 0
@@ -356,25 +355,21 @@ int linetype;
 
 
 TERM_PUBLIC void
-UP_move(x, y)
-unsigned int x, y;
+UP_move(unsigned int x, unsigned int y)
 {
     pl_move(x + UP_XOFF, y + UP_YOFF);
 }
 
 
 TERM_PUBLIC void
-UP_vector(x, y)
-unsigned int x, y;
+UP_vector(unsigned int x, unsigned int y)
 {
     pl_cont(x + UP_XOFF, y + UP_YOFF);
 }
 
 
 TERM_PUBLIC void
-UP_put_text(x, y, str)
-unsigned int x, y;
-const char str[];
+UP_put_text(unsigned int x, unsigned int y, const char str[])
 {
     UP_move(x, y);		/* Don't adjust x and y! It's done in UP_move. */
     switch (up_justify) {
@@ -392,16 +387,14 @@ const char str[];
 }
 
 TERM_PUBLIC int
-UP_text_angle(ang)
-int ang;
+UP_text_angle(int ang)
 {
     ROTATE(ang ? 1 : 0);
     return TRUE;
 }
 
 TERM_PUBLIC int
-UP_justify_text(mode)
-enum JUSTIFY mode;
+UP_justify_text(enum JUSTIFY mode)
 {
     up_justify = mode;
     return TRUE;

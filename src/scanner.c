@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: scanner.c,v 1.15 2001/02/01 17:56:05 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: scanner.c,v 1.16 2004/04/13 17:24:00 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - scanner.c */
@@ -103,13 +103,11 @@ static int t_num;		/* number of token I'm working on */
  *                      white space between tokens is ignored
  */
 int
-scanner(expressionp, expressionlenp)
-char **expressionp;
-size_t *expressionlenp;
+scanner(char **expressionp, size_t *expressionlenp)
 {
-    register int current;	/* index of current char in expression[] */
+    int current;	/* index of current char in expression[] */
     char *expression = *expressionp;
-    register int quote;
+    int quote;
     char brace;
 
     for (current = t_num = 0; expression[current] != NUL; current++) {
@@ -238,11 +236,10 @@ size_t *expressionlenp;
 
 
 static int
-get_num(str)
-char str[];
+get_num(char str[])
 {
-    register int count = 0;
-    register long lval;
+    int count = 0;
+    long lval;
 
     token[t_num].is_token = FALSE;
     token[t_num].l_val.type = INTGR;	/* assume unless . or E found */
@@ -278,32 +275,19 @@ char str[];
     return (count);
 }
 
-#if defined(VMS) || defined(PIPES) || (defined(ATARI) || defined(MTOS)) && defined(__PUREC__)
-
-/* A macro to reduce clutter ... */
-# ifdef AMIGA_AC_5
-#  define CLOSE_FILE_OR_PIPE ((void) close(fd))
-# elif (defined(ATARI) || defined(MTOS)) && defined(__PUREC__)
-#  define CLOSE_FILE_OR_PIPE ((void) fclose(f); (void) unlink(atari_tmpfile))
-# else				/* Rest of the world */
-#  define CLOSE_FILE_OR_PIPE ((void) pclose(f))
-# endif
-
-/* substitute output from ` ` 
+/* substitute output from ` `
  * *strp points to the input string.  (*strp)[current] is expected to
  * be the initial back tic.  Characters through the following back tic
  * are replaced by the output of the command.  extend_input_line()
  * is called to extend *strp array if needed.
  */
 static void
-substitute(strp, str_lenp, current)
-char **strp;
-size_t *str_lenp;
-int current;
+substitute(char **strp, size_t *str_lenp, int current)
 {
-    register char *last;
-    register int c;
-    register FILE *f;
+#if defined(VMS) || defined(PIPES) || (defined(ATARI) || defined(MTOS)) && defined(__PUREC__)
+    char *last;
+    int c;
+    FILE *f;
 # ifdef AMIGA_AC_5
     int fd;
 # elif (defined(ATARI) || defined(MTOS)) && defined(__PUREC__)
@@ -311,12 +295,11 @@ int current;
 # endif				/* !AMIGA_AC_5 */
     char *str, *pgm, *rest = NULL;
     size_t pgm_len, rest_len = 0;
-
 # ifdef VMS
     int chan, one = 1;
     struct dsc$descriptor_s pgmdsc = {0, DSC$K_DTYPE_T, DSC$K_CLASS_S, 0};
     static $DESCRIPTOR(lognamedsc, MAILBOX);
-# endif				/* VMS */
+# endif /* VMS */
 
     /* forgive missing closing backquote at end of line */
     str = *strp + current;
@@ -385,7 +368,14 @@ int current;
     }
     (*strp)[current] = 0;
 
-    CLOSE_FILE_OR_PIPE;
+# ifdef AMIGA_AC_5
+    (void) close(fd);
+# elif (defined(ATARI) || defined(MTOS)) && defined(__PUREC__)
+    (void) fclose(f);
+    (void) unlink(atari_tmpfile);
+# else				/* Rest of the world */
+    (void) pclose(f);
+# endif
 
     /* tack on rest of line to output */
     if (rest) {
@@ -395,17 +385,12 @@ int current;
 	free(rest);
     }
     screen_ok = FALSE;
-}
 
 #else /* VMS || PIPES || ATARI && PUREC */
 
-static void
-substitute(strp, str_lenp, current)
-char **strp;
-size_t *str_lenp;
-int current;
-{
     int_error(t_num, "substitution not supported by %s", OS);
+
+#endif /* VMS || PIPES || ATARI && PUREC */
 }
 
-#endif /* unix || VMS || PIPES || ATARI && PUREC */
+

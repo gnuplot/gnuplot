@@ -113,7 +113,7 @@
 #define ID_PRINT              5100
 #define ID_QPRINT             5000
 #define ID_QPRINTERS          5200
-#define ID_PRINTSTOP          5300 
+#define ID_PRINTSTOP          5300
 #define IDD_QPRSLIST          5201
 #define IDD_QPRSSEL           5202
 #define IDD_QPRNAME           5009

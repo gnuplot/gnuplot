@@ -1,5 +1,5 @@
-/*
- * $Id: gpr.trm,v 1.9 2002/07/26 16:42:29 mikulik Exp $
+/* Hello, Emacs, this is -*-C-*-
+ * $Id: gpr.trm,v 1.10 2004/04/13 17:24:32 broeker Exp $
  *
  */
 
@@ -44,9 +44,9 @@
  * AUTHORS
  *  Michael Aramini
  *  Roque D Oliveira , oliveria@caen.engin.umich.edu
- * 
+ *
  * send your comments or suggestions to (gnuplot-info@lists.sourceforge.net).
- * 
+ *
  */
 
 /*
@@ -110,8 +110,7 @@ unsigned int Debug = 0;
 
 
 static void
-check(messagex)
-char *messagex;
+check(char *messagex)
 {
     if (status.all = status_$ok) {
 	error_$print(status);
@@ -173,7 +172,7 @@ GPR_init()
     gpr_$init(gpr_$direct, stream_id, dm_bitmap_size, hi_plane, &dm_bitmap_desc, &status);
     check("in gpr_$init");
 /*
-  gpr_$set_obscured_opt(gpr_$pop_if_obs, &status); 
+  gpr_$set_obscured_opt(gpr_$pop_if_obs, &status);
   check("in gpr_$set_obscured_opt");
 */
     gpr_$set_auto_refresh(true, &status);
@@ -255,8 +254,7 @@ GPR_text()
 
 
 void
-GPRold_linetype(linetype)
-int linetype;
+GPRold_linetype(int linetype)
 {
     static gpr_$line_pattern_t patterns[2 + 5] =
     {
@@ -275,8 +273,7 @@ int linetype;
 }
 
 TERM_PUBLIC void
-GPR_linetype(linetype)
-int linetype;
+GPR_linetype(int linetype)
 {
     static gpr_$line_pattern_t patterns[2 + 7] =
     {
@@ -303,8 +300,7 @@ int linetype;
 
 
 TERM_PUBLIC void
-GPR_move(x, y)
-unsigned int x, y;
+GPR_move(unsigned int x, unsigned int y)
 {
     gpr_$move((short) x, (short) (GPR_YMAX - 1 - y), &status);
     check("in gpr_$move");
@@ -312,8 +308,7 @@ unsigned int x, y;
 
 
 TERM_PUBLIC void
-GPR_vector(x, y)
-unsigned int x, y;
+GPR_vector(unsigned int x, unsigned int y)
 {
     gpr_$line((short) x, (short) (GPR_YMAX - 1 - y), &status);
     check("in gpr_$line");
@@ -321,9 +316,7 @@ unsigned int x, y;
 
 
 TERM_PUBLIC void
-GPR_put_text(x, y, str)
-unsigned int x, y;		/* reference point of string */
-const char str[];		/* the text */
+GPR_put_text(unsigned int x, unsigned int y, const char str[])
 {
     gpr_$coordinate_t xgpr, ygpr;
     gpr_$offset_t str_size_in_pixels;
@@ -425,8 +418,7 @@ const char str[];		/* the text */
 }
 
 TERM_PUBLIC int
-GPR_text_angle(ang)
-int ang;
+GPR_text_angle(int ang)
 {
     if (gpr_ang != ang) {
 	gpr_ang = ang;
@@ -436,8 +428,7 @@ int ang;
 }
 
 TERM_PUBLIC int
-GPR_justify_text(mode)
-enum JUSTIFY mode;
+GPR_justify_text(enum JUSTIFY mode)
 {
     gpr_justify = mode;
     return (TRUE);

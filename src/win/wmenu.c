@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wmenu.c,v 1.4 2003/01/23 13:22:05 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: wmenu.c,v 1.5 2004/04/13 17:24:14 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - win/wmenu.c */
@@ -35,10 +35,10 @@ static char *RCSid() { return RCSid("$Id: wmenu.c,v 1.4 2003/01/23 13:22:05 broe
 
 /*
  * AUTHORS
- * 
+ *
  *   Maurice Castro
  *   Russell Lang
- * 
+ *
  */
 
 #define STRICT
@@ -71,9 +71,9 @@ LRESULT CALLBACK WINEXPORT MenuButtonProc(HWND, UINT, WPARAM, LPARAM);
 char * keyword[] = {
 	"[INPUT]", "[EOS]", "[OPEN]", "[SAVE]",
         "{ENTER}", "{ESC}", "{TAB}",
-        "{^A}", "{^B}", "{^C}", "{^D}", "{^E}", "{^F}", "{^G}", "{^H}", 
-	"{^I}", "{^J}", "{^K}", "{^L}", "{^M}", "{^N}", "{^O}", "{^P}", 
-	"{^Q}", "{^R}", "{^S}", "{^T}", "{^U}", "{^V}", "{^W}", "{^X}", 
+        "{^A}", "{^B}", "{^C}", "{^D}", "{^E}", "{^F}", "{^G}", "{^H}",
+	"{^I}", "{^J}", "{^K}", "{^L}", "{^M}", "{^N}", "{^O}", "{^P}",
+	"{^Q}", "{^R}", "{^S}", "{^T}", "{^U}", "{^V}", "{^W}", "{^X}",
 	"{^Y}", "{^Z}", "{^[}", "{^\\}", "{^]}", "{^^}", "{^_}",
 	NULL};
 BYTE keyeq[] = {
@@ -81,7 +81,7 @@ BYTE keyeq[] = {
         13, 27, 9,
         1, 2, 3, 4, 5, 6, 7, 8,
 	9, 10, 11, 12, 13, 14, 15, 16,
-	17, 18, 19, 20, 21, 22, 23, 24, 
+	17, 18, 19, 20, 21, 22, 23, 24,
 	25, 26, 28, 29, 30, 31,
 	0};
 
@@ -117,7 +117,7 @@ char *szFilter;
 			case SAVE: /* [SAVE] - get a save filename from a file list box */
 			case OPEN: /* [OPEN] - get a filename from a file list box */
 #if WINVER >= 0x030a
-				/* This uses COMMDLG.DLL from Windows 3.1 
+				/* This uses COMMDLG.DLL from Windows 3.1
 				   COMMDLG.DLL is redistributable */
 				{
 				BOOL save;
@@ -249,7 +249,7 @@ typedef struct tagGFILE {
 GFILE * Gfopen(LPSTR lpszFileName, int fnOpenMode)
 {
 GFILE *gfile;
-	
+
 	gfile = (GFILE *)LocalAllocPtr(LHND, sizeof(GFILE));
 	if (!gfile)
 		return NULL;
@@ -266,7 +266,7 @@ GFILE *gfile;
 
 void Gfclose(GFILE * gfile)
 {
-	
+
 	_lclose(gfile->hfile);
 	LocalFreePtr((void NEAR *)OFFSETOF(gfile));
 	return;
@@ -306,11 +306,11 @@ int GetLine(char * buffer, int len, GFILE *gfile)
 {
 BOOL  status;
 int nLine = 0;
-    
+
    status = (Gfgets(buffer,len,gfile) != 0);
    nLine++;
    while( status && ( buffer[0] == 0 || buffer[0] == '\n' || buffer[0] == ';' ) ) {
-      /* blank line or comment - ignore */ 
+      /* blank line or comment - ignore */
    	  status = (Gfgets(buffer,len,gfile) != 0);
       nLine++;
    }
@@ -319,7 +319,7 @@ int nLine = 0;
 
    if (!status)
       nLine = 0;	/* zero lines if file error */
-        
+
     return nLine;
 }
 
@@ -350,7 +350,7 @@ LPSTR ptr;
 }
 
 /* Load Macros, and create Menu from Menu file */
-void 
+void
 LoadMacros(LPTW lptw)
 {
 GFILE *menufile;
@@ -549,7 +549,7 @@ char FAR *ButtonText[BUTTONMAX];
 	lptw->ButtonHeight = ButtonY+1;
 	GetClientRect(lptw->hWndParent, &rect);
 	SetWindowPos(lptw->hWndText, (HWND)NULL, 0, lptw->ButtonHeight,
-			rect.right, rect.bottom-lptw->ButtonHeight, 
+			rect.right, rect.bottom-lptw->ButtonHeight,
 			SWP_NOZORDER | SWP_NOACTIVATE);
 
 	/* create the buttons */

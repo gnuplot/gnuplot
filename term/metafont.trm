@@ -1,5 +1,5 @@
-/*
- * $Id: metafont.trm,v 1.15 2004/03/29 10:43:36 broeker Exp $
+/* Hello, Emacs, this is -*-C-*-
+ * $Id: metafont.trm,v 1.16 2004/04/13 17:24:34 broeker Exp $
  */
 
 /* GNUPLOT - metafont.trm */
@@ -125,7 +125,7 @@ static enum JUSTIFY MF_justify;
 static double MF_dist_left;
 static int MF_is_solid;
 static int MF_picked_up_pen;
-/* 
+/*
  * We keep track of where we are with respect to dashed lines by using
  * the next five variables. MF_dash_index indicates which element of
  * MF_lines[..].dashlen should be used. The MF_last.. variables keep
@@ -276,7 +276,7 @@ input romspl.mf %Lowercase specials (dotless \\i, ligature \\ae, etc.)\n\
 input romspu.mf %Uppercase specials (\\AE, \\OE, \\O)\n\
 input punct.mf %Punctuation symbols.\n\
 \nminus=ASCII\"-\"; cmchar \"Minus sign\";\n\
-beginarithchar(minus); \n\
+ beginarithchar(minus); \n\
   pickup rule.nib;\n\
   lft x1=hround 1.5u-eps;\n\
   x2=w-x1; y1=y2=math_axis;\n\
@@ -350,8 +350,7 @@ MF_text()
 
 
 TERM_PUBLIC int
-MF_justify_text(mode)
-enum JUSTIFY mode;
+MF_justify_text(enum JUSTIFY mode)
 {
     MF_justify = mode;
     return TRUE;
@@ -359,8 +358,7 @@ enum JUSTIFY mode;
 
 
 TERM_PUBLIC int
-MF_text_angle(ang)
-int ang;
+MF_text_angle(int ang)
 {
     if (ang > 0)
 	MF_ang = 90;
@@ -371,8 +369,7 @@ int ang;
 
 
 TERM_PUBLIC void
-MF_linetype(linetype)
-int linetype;
+MF_linetype(int linetype)
 {
     if (linetype >= 8)
 	linetype %= 8;
@@ -392,8 +389,7 @@ int linetype;
 
 
 TERM_PUBLIC void
-MF_move(x, y)
-unsigned int x, y;
+MF_move(unsigned int x, unsigned int y)
 {
     MF_last_x = x;
     MF_last_y = y;
@@ -403,8 +399,7 @@ unsigned int x, y;
 
 
 TERM_PUBLIC void
-MF_vector(x, y)
-unsigned int x, y;
+MF_vector(unsigned int x, unsigned int y)
 {
     if (MF_is_solid) {
 	if (x == MF_last_x && y == MF_last_y)
@@ -463,9 +458,10 @@ unsigned int x, y;
 
 
 TERM_PUBLIC void
-MF_arrow(sx, sy, ex, ey, head)
-    unsigned int sx, sy, ex, ey;
-    int head;
+MF_arrow(
+    unsigned int sx, unsigned int sy,
+    unsigned int ex, unsigned int ey,
+    int head)
 {
     int delta_x, delta_y;
 
@@ -481,9 +477,7 @@ MF_arrow(sx, sy, ex, ey, head)
 
 
 TERM_PUBLIC void
-MF_put_text(x, y, str)
-unsigned int x, y;
-const char *str;
+MF_put_text(unsigned int x, unsigned int y, const char *str)
 {
     int i, j = 0;
     char *text;

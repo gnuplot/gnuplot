@@ -57,8 +57,8 @@
 #define LT_BACKGROUND (-4)
 #define LT_UNDEFINED  (-5)
 
-/* Constant value passed to (term->text_angle)(ang) to generate vertical 
- * text. Current implementation has ang equal to rotation in degrees. 
+/* Constant value passed to (term->text_angle)(ang) to generate vertical
+ * text. Current implementation has ang equal to rotation in degrees.
  */
 #define TEXT_VERTICAL (90)
 
@@ -71,7 +71,7 @@ typedef enum position_type {
     second_axes,
     graph,
     screen
-} position_type; 
+} position_type;
 
 /* A full 3D position, with all 3 coordinates of different axes,
  * possibly. Used for 'set label' and 'set arrow' positions: */
@@ -188,7 +188,7 @@ typedef struct {
 /* single structure. Eventually this will allow multiple keys.    */
 
 
-typedef struct { 
+typedef struct {
     TBOOLEAN visible;		/* Do we show this key at all? */
     t_key_flag flag;		/* if so: where? */
     struct position user_pos;	/* if user specified position, this is it */
@@ -200,8 +200,8 @@ typedef struct {
     double width_fix;		/* user specified additional (+/-) width of key titles */
     double height_fix;
     TBOOLEAN auto_titles;	/* auto title curves unless plotted 'with notitle' */
-    TBOOLEAN reverse;		/* key back to front */ 
-    TBOOLEAN enhanced;		/* enable/disable enhanced text of key titles */ 
+    TBOOLEAN reverse;		/* key back to front */
+    TBOOLEAN enhanced;		/* enable/disable enhanced text of key titles */
     struct lp_style_type default_keybox_lp; /* linetype of box around key:  */
     struct lp_style_type box;		    /*    default and current state */
     char title[MAX_LINE_LEN+1];	/* title line for the key as a whole */

@@ -1,5 +1,5 @@
-/*
- * $Id: vgagl.trm,v 1.9 2004/02/23 13:27:13 broeker Exp $
+/* Hello, Emacs, this is -*-C-*-
+ * $Id: vgagl.trm,v 1.10 2004/04/13 17:24:39 broeker Exp $
  */
 
 #if defined(USE_MOUSE) && defined(PM3D)
@@ -39,7 +39,7 @@
  * This file is included by ../term.c.
  *
  * This terminal driver supports SVGA in the following modes:
- * 
+ *
  *  G1024x768x256,
  *  G800x600x256,
  *  G640x480x256,
@@ -223,7 +223,7 @@ static int VGAGL_angle = 0;
 
 
 void
-VGAGL_init_keytable(void)
+VGAGL_init_keytable()
 {
     int i;
     for (i = 0; i < sizeof(VGAGL_Keytable); i++) {
@@ -529,7 +529,7 @@ VGAGL_set_black_and_white()
 #endif
 	    VGAGL_setpalettecolor(0,
 		(double) VGAGL_bg_red / (double) 0xff,
-		(double) VGAGL_bg_green / (double) 0xff, 
+		(double) VGAGL_bg_green / (double) 0xff,
 		(double) VGAGL_bg_blue / (double) 0xff);
 #ifdef VGAGL_ENABLE_TRUECOLOR
     }
@@ -581,7 +581,7 @@ VGAGL_set_black_and_white()
 
 /* set up line colors */
 TERM_PUBLIC void
-VGAGL_set_line_colors(void)
+VGAGL_set_line_colors()
 {
     gl_setrgbpalette();
     VGAGL_set_black_and_white();
@@ -623,7 +623,7 @@ VGAGL_set_line_colors(void)
 }
 
 TERM_PUBLIC int
-VGAGL_get_mode(void)
+VGAGL_get_mode()
 {
     int *iptr;
 
@@ -693,12 +693,12 @@ VGAGL_get_mode(void)
 }
 
 TERM_PUBLIC void
-VGAGL_init(void)
+VGAGL_init()
 {
     static int keytable_initialized = no;
 
     if (!VGAGL_graphics_on) {
-	
+
 	/* initialize keyboard tranlation table, only done once */
 	if (!keytable_initialized) {
 	    VGAGL_init_keytable();
@@ -758,7 +758,7 @@ VGAGL_text()
 
     /* go to the input event loop */
     VGAGL_eventually_process_graphics_events();
-    
+
     /* switch to TEXT mode */
     VGAGL_reset();
 }
@@ -835,8 +835,7 @@ VGAGL_resume()
 }
 
 TERM_PUBLIC void
-VGAGL_linetype(linetype)
-    int linetype;
+VGAGL_linetype(int linetype)
 {
 #ifdef VGAGL_ENABLE_TRUECOLOR
     switch (VGAGL_truecolor) {
@@ -852,18 +851,14 @@ VGAGL_linetype(linetype)
 }
 
 TERM_PUBLIC void
-VGAGL_move(x, y)
-    unsigned int x;
-    unsigned int y;
+VGAGL_move(unsigned int x, unsigned int y)
 {
     VGAGL_startx = x;
     VGAGL_starty = Y(y);
 }
 
 TERM_PUBLIC void
-VGAGL_vector(x, y)
-    unsigned int x;
-    unsigned int y;
+VGAGL_vector(unsigned int x, unsigned int y)
 {
     /* fprintf(stderr, "(VGAGL_vector) x, y = %d %d\n", x, y); */
     int sy = Y(y);
@@ -873,8 +868,7 @@ VGAGL_vector(x, y)
 }
 
 TERM_PUBLIC int
-VGAGL_text_angle(ang)
-    int ang;
+VGAGL_text_angle(int ang)
 {
     VGAGL_angle = (ang ? 1 : 0);
     return TRUE;
@@ -890,14 +884,11 @@ VGAGL_xor_pixel_wrapper(int x, int y, int color)
 
 /* driver's coordinate system */
 static void
-VGAGL_putc(x, y, c, ang, color)
-    unsigned int x, y;
-    int c;
-    int ang;
-    int color;
+VGAGL_putc(unsigned int x, unsigned int y, int c, int ang, int color)
 {
     int i, j, k;
     void (*pixelfun)(int, int, int);
+
     i = (int) (c) - 32;
 
     switch (color) {
@@ -935,10 +926,10 @@ VGAGL_putc(x, y, c, ang, color)
 
 /* driver's coordinate system */
 TERM_PUBLIC void
-VGAGL_put_text_with_color(x, y, str, color)
-    unsigned int x, y;
-    const char *str;
-    int color;
+VGAGL_put_text_with_color(
+    unsigned int x, unsigned int y,
+    const char *str,
+    int color)
 {
     const char* ptr;
 
@@ -970,9 +961,7 @@ VGAGL_put_text_with_color(x, y, str, color)
 
 /* gnuplot's coordinate system */
 TERM_PUBLIC void
-VGAGL_put_text(x, y, str)
-    unsigned int x, y;
-    const char *str;
+VGAGL_put_text(unsigned int x, unsigned int y, const char *str)
 {
     VGAGL_put_text_with_color(x, Y(y), str, current_color);
 }
@@ -1024,6 +1013,7 @@ VGAGL_vline_xor(int y1, int y2, int x)
 	vga_accel(ACCEL_SETRASTEROP, ROP_COPY); /* switching back */
     }
 }
+
 #if 0
 void
 VGAGL_line_xor(unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2)
@@ -1037,6 +1027,7 @@ VGAGL_line_xor(unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y
     }
 }
 #endif
+
 TERM_PUBLIC void
 VGAGL_draw_cursor(int x, int y)
 {
@@ -1046,6 +1037,7 @@ VGAGL_draw_cursor(int x, int y)
     VGAGL_last_cursorx = x;
     VGAGL_last_cursory = y;
 }
+
 void
 VGAGL_zoombox(int x, int y)
 {
@@ -1072,6 +1064,7 @@ VGAGL_zoombox(int x, int y)
     VGAGL_zoom.currentx = x;
     VGAGL_zoom.currenty = y;
 }
+
 void
 VGAGL_update_zoombox(int x, int y)
 {
@@ -1085,6 +1078,7 @@ VGAGL_update_zoombox(int x, int y)
 	VGAGL_need_update = yes;
     }
 }
+
 void
 VGAGL_update_cursor(int x, int y)
 {
@@ -1092,6 +1086,7 @@ VGAGL_update_cursor(int x, int y)
     VGAGL_draw_cursor(x, y); /* draw new cursor */
     VGAGL_need_update = yes;
 }
+
 void
 VGAGL_signal_handler(int signum)
 {
@@ -1103,8 +1098,9 @@ VGAGL_signal_handler(int signum)
     signal(SIGINT, VGAGL_old_handler); /* reset signal handler */
     VGAGL_reset();
 }
+
 void
-VGAGL_eventually_process_graphics_events(void)
+VGAGL_eventually_process_graphics_events()
 {
     /*
        VGA_FPRINTF((stderr, "(VGAGL_eventually_process_graphics_events) \n"));
@@ -1240,10 +1236,9 @@ VGAGL_eventually_process_graphics_events(void)
 	signal(SIGINT, VGAGL_old_handler);
     } /* VGAGL_graphics_on */
 }
+
 TERM_PUBLIC void
-VGAGL_put_tmptext(i, str)
-    int i;
-    const char str[];
+VGAGL_put_tmptext(int i, const char str[])
 {
     int y = 0;
     int x;
@@ -1266,7 +1261,7 @@ VGAGL_put_tmptext(i, str)
 	case 1:
 	case 2:
 	    --i;
-	    second = (char*) strchr(str, '\r'); 
+	    second = (char*) strchr(str, '\r');
 	    if (second == NULL) {
 		VGAGL_zoom.xstr[i][0] = '\0';
 		VGAGL_zoom.ystr[i][0] = '\0';
@@ -1283,9 +1278,9 @@ VGAGL_put_tmptext(i, str)
     }
     return;
 }
+
 TERM_PUBLIC void
-VGAGL_set_ruler(x, y)
-    int x, y;
+VGAGL_set_ruler(int x, int y)
 {
     if (x < 0) {
 	/* erase last ruler */
@@ -1303,8 +1298,7 @@ VGAGL_set_ruler(x, y)
 }
 
 TERM_PUBLIC void
-VGAGL_set_cursor(c, x, y)
-    int c, x, y;
+VGAGL_set_cursor(int c, int x, int y)
 {
     /* VGA_FPRINTF((stderr, "(VGAGL_set_cursor) \n")); */
     switch (c) {
@@ -1344,10 +1338,10 @@ VGAGL_set_cursor(c, x, y)
 }
 
 TERM_PUBLIC void
-VGAGL_set_clipboard(s)
-    const char s[];
+VGAGL_set_clipboard(const char s[])
 {
-    return;
+    (void) s;			/* avoid -Wunused */
+    return;			/* does nothing. */
 }
 
 TERM_PUBLIC int
@@ -1482,7 +1476,7 @@ VGAGL_filled_polygon(int points, gpiPoint *corners)
 }
 #ifdef VGAGL_DEBUGGING
 void
-VGAGL_write_dump_file(void)
+VGAGL_write_dump_file()
 {
     FILE* fp;
     unsigned char* buf;
@@ -1508,7 +1502,7 @@ VGAGL_write_dump_file(void)
 	for (x = 0; x < modeinfo->width; x++) {
 	    index = gl_getpixel(x, y);
 	    while (index < 0) {
-		/* this is a kludge, as gl_getpixel() seems to 
+		/* this is a kludge, as gl_getpixel() seems to
 		 * return pixels > 128 as the negative complement */
 		index += 256;
 	    }

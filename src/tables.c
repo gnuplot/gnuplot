@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: tables.c,v 1.49 2003/12/01 16:15:51 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: tables.c,v 1.50 2004/04/13 17:24:01 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - tables.c */
@@ -154,11 +154,11 @@ const struct gen_table set_tbl[] =
     { "ac$tion_table", S_ACTIONTABLE },
     { "at", S_ACTIONTABLE },
     { "an$gles", S_ANGLES },
-    { "ar$row", S_ARROW }, 
-    { "au$toscale", S_AUTOSCALE }, 
+    { "ar$row", S_ARROW },
+    { "au$toscale", S_AUTOSCALE },
     { "b$ars", S_BARS },
     { "bor$der", S_BORDER },
-    { "box$width", S_BOXWIDTH }, 
+    { "box$width", S_BOXWIDTH },
     { "cl$abel", S_CLABEL },
     { "c$lip", S_CLIP },
     { "cn$trparam", S_CNTRPARAM },
@@ -166,7 +166,7 @@ const struct gen_table set_tbl[] =
     { "da$ta", S_DATA },
 
     { "data$file", S_DATAFILE },
-    
+
     { "dg$rid3d", S_DGRID3D },
     { "du$mmy", S_DUMMY },
     { "enc$oding", S_ENCODING },
@@ -426,13 +426,13 @@ const struct gen_table set_palette_tbl[] =
 };
 
 
-const struct gen_table color_model_tbl[] = 
+const struct gen_table color_model_tbl[] =
 {
     { "RGB", C_MODEL_RGB },
-    { "HSV", C_MODEL_HSV }, 
-    { "CMY", C_MODEL_CMY }, 
-    { "YIQ", C_MODEL_YIQ }, 
-    { "XYZ", C_MODEL_XYZ }, 
+    { "HSV", C_MODEL_HSV },
+    { "CMY", C_MODEL_CMY },
+    { "YIQ", C_MODEL_YIQ },
+    { "XYZ", C_MODEL_XYZ },
     { NULL,  -1 }
 };
 
@@ -611,9 +611,7 @@ const struct gen_table filledcurves_opts_tbl[] =
 #endif
 
 int
-lookup_table(tbl, find_token)
-    const struct gen_table *tbl;
-    int find_token;
+lookup_table(const struct gen_table *tbl, int find_token)
 {
     while (tbl->key) {
 	if (almost_equals(find_token, tbl->key))
@@ -624,9 +622,7 @@ lookup_table(tbl, find_token)
 }
 
 parsefuncp_t
-lookup_ftable(ftbl, find_token)
-    const struct gen_ftable *ftbl;
-    int find_token;
+lookup_ftable(const struct gen_ftable *ftbl, int find_token)
 {
     while (ftbl->key) {
 	if (almost_equals(find_token, ftbl->key))
@@ -636,14 +632,12 @@ lookup_ftable(ftbl, find_token)
     return ftbl->value;
 }
 
-/* Returns index of the table tbl whose key matches the beginning of the 
+/* Returns index of the table tbl whose key matches the beginning of the
  * search string search_str.
  * It returns index into the table or -1 if there is no match.
- */ 
+ */
 int
-lookup_table_nth(tbl, search_str)
-    const struct gen_table *tbl;
-    const char *search_str;
+lookup_table_nth(const struct gen_table *tbl, const char *search_str)
 {
     int k = -1;
     while (tbl[++k].key)
@@ -652,17 +646,17 @@ lookup_table_nth(tbl, search_str)
     return -1; /* not found */
 }
 
-/* Returns index of the table tbl whose key matches the beginning of the 
+/* Returns index of the table tbl whose key matches the beginning of the
  * search string search_str. The table_len is necessary because the table
  * is searched in the reversed order. The routine is used in parsing commands
  * '(un)set log x2zcb', for instance.
  * It returns index into the table or -1 if there is no match.
- */ 
+ */
 int
-lookup_table_nth_reverse(tbl, table_len, search_str)
-    const struct gen_table *tbl;
-    int table_len;
-    const char *search_str;
+lookup_table_nth_reverse(
+    const struct gen_table *tbl,
+    int table_len,
+    const char *search_str)
 {
     while (--table_len >= 0) {
 	if (tbl[table_len].key && !strncmp(search_str, tbl[table_len].key, strlen(tbl[table_len].key)))

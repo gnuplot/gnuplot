@@ -60,7 +60,7 @@ class GPBitmap {
 		int32		ncommands, max_commands;
 		int 		cx, cy;
 		char	**	commands;
-		
+
 //int gX = 100, gY = 100;
 //unsigned int gW = 640, gH = 450;
 
@@ -78,7 +78,7 @@ class GPBitmap {
 		color_space	ColorSpace() { return m_bitmap->ColorSpace(); };
 		int32		BitsLength() { return m_bitmap->BitsLength(); };
 		int32		BytesPerRow() { return m_bitmap->BytesPerRow(); };
-				
+
 		BView *		View() { return m_view; };
 		void		SetDirty(BRegion *r);
 

@@ -1,5 +1,5 @@
 /*
- * $Id: gp_types.h,v 1.18 2003/10/10 13:16:45 mikulik Exp $
+ * $Id: gp_types.h,v 1.19 2004/04/13 17:23:53 broeker Exp $
  */
 
 /* GNUPLOT - gp_types.h */
@@ -101,7 +101,7 @@ typedef enum PLOT_STYLE {
 #endif
 } PLOT_STYLE;
 
-typedef enum PLOT_SMOOTH { 
+typedef enum PLOT_SMOOTH {
     SMOOTH_NONE,
     SMOOTH_ACSPLINES,
     SMOOTH_BEZIER,

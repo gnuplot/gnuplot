@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.126 2004/06/13 06:01:12 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.127 2004/06/20 05:53:04 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -194,7 +194,7 @@ show_command()
 \t'[xyz,cb]{2}[md]tics', '[xyz]{2}zeroaxis', '[xyz,cb]data', 'zero',\n\
 \t'zeroaxis'";
 
-    enum set_id token_found; 
+    enum set_id token_found;
     struct value a;
     int tag =0;
 
@@ -371,7 +371,7 @@ show_command()
 	if (almost_equals(c_token, "st$yle")) {
 	    show_styles("Data", data_style);
 	    c_token++;
-	} else 
+	} else
 	    int_error(c_token, "keyword 'style' expected after 'show data'");
 	break;
 #endif
@@ -665,14 +665,12 @@ show_at()
 }
 
 
-/* called by show_at() */
+/* called by show_at(), and recursively by itself */
 static void
-disp_at(curr_at, level)
-struct at_type *curr_at;
-int level;
+disp_at(struct at_type *curr_at, int level)
 {
-    register int i, j;
-    register union argument *arg;
+    int i, j;
+    union argument *arg;
 
     for (i = 0; i < curr_at->a_count; i++) {
 	(void) putc('\t', stderr);
@@ -852,8 +850,7 @@ show_all()
 
 /* process 'show version' command */
 void
-show_version(fp)
-    FILE *fp;
+show_version(FILE *fp)
 {
     /* If printed to a file, we prefix everything with
      * a hash mark to comment out the version information.
@@ -1055,7 +1052,7 @@ Compile options:\n\
 	{
 	    char *driverdir = getenv("GNUPLOT_DRIVER_DIR");
 
-	    if (driverdir == NULL) 
+	    if (driverdir == NULL)
 		driverdir = X11_DRIVER_DIR;
 	    fprintf(stderr, "\
 DRIVER_DIR   = \"%s\"\n", driverdir);
@@ -1176,7 +1173,7 @@ show_fillstyle()
     switch(default_fillstyle.fillstyle) {
     case FS_SOLID:
         fprintf(stderr,
-	    "\tFill style is solid colour with density %f", 
+	    "\tFill style is solid colour with density %f",
 	    default_fillstyle.filldensity/100.0);
         break;
     case FS_PATTERN:
@@ -1417,9 +1414,7 @@ show_style()
 
 /* called by show_data() and show_func() */
 static void
-show_styles(name, style)
-    const char *name;
-    enum PLOT_STYLE style;
+show_styles(const char *name, enum PLOT_STYLE style)
 {
     fprintf(stderr, "\t%s are plotted with ", name);
     save_data_func_style(stderr, (char *)name, style);
@@ -1476,9 +1471,9 @@ show_grid()
 	    "", ""
 #endif /* PM3D */
 	    );
-#else 
+#else
     /* HBB 20010806: new storage method for grid options: */
-    fprintf(stderr, "\t%s grid drawn at", 
+    fprintf(stderr, "\t%s grid drawn at",
 	    (polar_grid_angle != 0) ? "Polar" : "Rectangular");
 #define SHOW_GRID(axis)						\
     if (axis_array[axis].gridmajor)				\
@@ -1514,8 +1509,7 @@ show_grid()
 
 /* process 'show {x|y}zeroaxis' command */
 static void
-show_zeroaxis(axis)
-    AXIS_INDEX axis;
+show_zeroaxis(AXIS_INDEX axis)
 {
     SHOW_ALL_NL;
 
@@ -1532,13 +1526,12 @@ show_zeroaxis(axis)
 	/* this is a 'first' axis. To output secondary axis, call self
 	 * recursively: */
 	show_zeroaxis(axis + SECOND_AXES);
-}
+    }
 }
 
-/* */
+/* Show label number <tag> (0 means show all) */
 static void
-show_label(tag)
-int tag;			/* 0 means show all */
+show_label(int tag)
 {
     struct text_label *this_label;
     TBOOLEAN showed = FALSE;
@@ -1548,7 +1541,7 @@ int tag;			/* 0 means show all */
 	if (tag == 0 || tag == this_label->tag) {
 	    showed = TRUE;
 	    fprintf(stderr, "\tlabel %d \"%s\" at ",
-		    this_label->tag, 
+		    this_label->tag,
 		    (this_label->text==NULL) ? "" : conv_text(this_label->text));
 	    show_position(&this_label->place);
 	    switch (this_label->pos) {
@@ -1566,7 +1559,7 @@ int tag;			/* 0 means show all */
 		}
 	    }
 	    if (this_label->rotate)
-	    	fprintf(stderr, " rotated by %d degrees (if possible)", this_label->rotate); 
+	    	fprintf(stderr, " rotated by %d degrees (if possible)", this_label->rotate);
 	    else
 	    	fprintf(stderr, " not rotated");
 	    fprintf(stderr, " %s ", this_label->layer ? "front" : "back");
@@ -1575,7 +1568,7 @@ int tag;			/* 0 means show all */
 	    if (this_label->textcolor.type) {
 	    	fprintf(stderr, " textcolor");
 		switch(this_label->textcolor.type) {
-		case TC_LT:   fprintf(stderr," lt %d", this_label->textcolor.lt+1); 
+		case TC_LT:   fprintf(stderr," lt %d", this_label->textcolor.lt+1);
 			      break;
 		case TC_Z:    fprintf(stderr," palette z");
 			      break;
@@ -1604,9 +1597,9 @@ int tag;			/* 0 means show all */
 }
 
 
+/* Show arrow number <tag> (0 means show all) */
 static void
-show_arrow(tag)
-int tag;			/* 0 means show all */
+show_arrow(int tag)
 {
     struct arrow_def *this_arrow;
     TBOOLEAN showed = FALSE;
@@ -1630,12 +1623,12 @@ int tag;			/* 0 means show all */
 	    if (this_arrow->arrow_properties.head_length > 0) {
 		static char *msg[] =
 		{"(first x axis) ", "(second x axis) ", "(graph units) ", "(screen units) "};
-		fprintf(stderr,"\n\t  arrow head: length %s%g, angle %g deg", 
+		fprintf(stderr,"\n\t  arrow head: length %s%g, angle %g deg",
 		   this_arrow->arrow_properties.head_lengthunit == first_axes ? "" : msg[this_arrow->arrow_properties.head_lengthunit],
 		   this_arrow->arrow_properties.head_length,
                    this_arrow->arrow_properties.head_angle);
 		if (this_arrow->arrow_properties.head_filled!=0)
-		    fprintf(stderr,", backangle %g deg", 
+		    fprintf(stderr,", backangle %g deg",
 			    this_arrow->arrow_properties.head_backangle);
 	    }
 	    putc('\n', stderr);
@@ -1667,9 +1660,10 @@ show_key()
     SHOW_ALL_NL;
 
     if (!(key->visible)) {
-	fputs("\tkey is OFF\n", stderr);
+	fputs("\
+\tkey is OFF\n", stderr);
 	return;
-    } 
+    }
 
     switch (key->flag) {
     case KEY_AUTO_PLACEMENT:
@@ -1690,7 +1684,8 @@ show_key()
 	if (key->vpos != TUNDER && key->hpos != TOUT) {
 	    strcat(str, " corner");
 	}
-	fprintf(stderr, "\tkey is ON, position: %s\n", str);
+	fprintf(stderr, "\
+\tkey is ON, position: %s\n", str);
 	free(str);
 	break;
     case KEY_USER_PLACEMENT:
@@ -1700,7 +1695,8 @@ show_key()
 	break;
     }
 
-	fprintf(stderr, "\tkey is %s justified, %sreversed, %senhanced and ",
+	fprintf(stderr, "\
+\tkey is %s justified, %sreversed, %senhanced and ",
 		key->just == JLEFT ? "left" : "right",
 		key->reverse ? "" : "not ",
 		key->enhanced ? "" : "not ");
@@ -1709,7 +1705,8 @@ show_key()
 		    key->box.l_type + 1, key->box.l_width);
 	else
 	    fprintf(stderr, "not boxed\n");
-	fprintf(stderr, "\tsample length is %g characters\n\
+	fprintf(stderr, "\
+\tsample length is %g characters\n\
 \tvertical spacing is %g characters\n\
 \twidth adjustment is %g characters\n\
 \theight adjustment is %g characters\n\
@@ -1725,10 +1722,8 @@ show_key()
 }
 
 
-/* */
 static void
-show_position(pos)
-struct position *pos;
+show_position(struct position *pos)
 {
     static const char *msg[] = { "(first axes) ", "(second axes) ",
 				 "(graph units) ", "(screen units) " };
@@ -1917,8 +1912,8 @@ show_palette_fit2rgbformulae()
 		dist = 0; /* calculate distance of the two rgb profiles */
 		for (p = 0; p < pts; p++) {
 		double tmp = rgb_distance(
-			    currRGB[p].r - formulae[ir][p], 
-			    currRGB[p].g - formulae[ig][p], 
+			    currRGB[p].r - formulae[ir][p],
+			    currRGB[p].g - formulae[ig][p],
 			    currRGB[p].b - formulae[ib][p] );
 		    dist += tmp;
 		}
@@ -1968,14 +1963,14 @@ show_palette_palette()
     }
 
     f = (print_out) ? print_out : stderr;
-    fprintf(stderr, "%s palette with %i discrete colors", 
+    fprintf(stderr, "%s palette with %i discrete colors",
 	    (sm_palette.colorMode == SMPAL_COLOR_MODE_GRAY) ? "Gray" : "Color", colors);
     if (print_out) fprintf(stderr," saved to \"%s\".", print_out_name);
 	else fprintf(stderr, ".\n");
 
     for (i = 0; i < colors; i++) {
 	/* colours equidistantly from [0,1]  */
-	gray = (double)i / (colors - 1); 
+	gray = (double)i / (colors - 1);
 	if (sm_palette.positive == SMPAL_NEGATIVE)
 	    gray = 1 - gray;
 	rgb1_from_gray(gray, &rgb1);
@@ -1986,7 +1981,7 @@ show_palette_palette()
 		fprintf(f, "%0.4f\t%0.4f\t%0.4f\n", rgb1.r, rgb1.g, rgb1.b);
 		break;
 	    case 2:
-		fprintf(f, "%i\t%i\t%i\n", 
+		fprintf(f, "%i\t%i\t%i\n",
 			(int)rgb255.r, (int)rgb255.g, (int)rgb255.b);
 		break;
 	    default:
@@ -2017,7 +2012,7 @@ show_palette_gradient()
         r = sm_palette.gradient[i].col.r;
         g = sm_palette.gradient[i].col.g;
         b = sm_palette.gradient[i].col.b;
-        fprintf(stderr, 
+        fprintf(stderr,
  "%3i. gray=%0.4f, (r,g,b)=(%0.4f,%0.4f,%0.4f), #%02x%02x%02x = %3i %3i %3i\n",
 		i, gray, r,g,b,
                 (int)(255*r+.5),(int)(255*g+.5),(int)(255*b+.5),
@@ -2066,7 +2061,7 @@ show_palette()
 	  case SMPAL_COLOR_MODE_GRAY: break;
 	  case SMPAL_COLOR_MODE_RGB:
 	    fprintf(stderr,"\trgb color mapping by rgbformulae are %i,%i,%i\n",
-		    sm_palette.formulaR, sm_palette.formulaG, 
+		    sm_palette.formulaR, sm_palette.formulaG,
 		    sm_palette.formulaB);
 	    break;
 	  case SMPAL_COLOR_MODE_GRADIENT:
@@ -2074,14 +2069,14 @@ show_palette()
 	    break;
 	  case SMPAL_COLOR_MODE_FUNCTIONS:
 	    fputs("\tcolor maping is done by user defined functions\n",stderr);
-	    if (sm_palette.Afunc.at && sm_palette.Afunc.definition) 
-	        fprintf( stderr, "\t  A-formula: %s\n", 
+	    if (sm_palette.Afunc.at && sm_palette.Afunc.definition)
+	        fprintf( stderr, "\t  A-formula: %s\n",
 			 sm_palette.Afunc.definition);
 	    if (sm_palette.Bfunc.at && sm_palette.Bfunc.definition)
-	        fprintf( stderr, "\t  B-formula: %s\n", 
+	        fprintf( stderr, "\t  B-formula: %s\n",
 			 sm_palette.Bfunc.definition);
 	    if (sm_palette.Cfunc.at && sm_palette.Cfunc.definition)
-	        fprintf( stderr, "\t  C-formula: %s\n", 
+	        fprintf( stderr, "\t  C-formula: %s\n",
 			 sm_palette.Cfunc.definition);
 	    break;
 	  default:
@@ -2090,7 +2085,7 @@ show_palette()
 	}
 	fprintf(stderr,"\tfigure is %s\n",
 	    sm_palette.positive == SMPAL_POSITIVE ? "POSITIVE" : "NEGATIVE");
-	fprintf( stderr, 
+	fprintf( stderr,
            "\tall color formulae ARE%s written into output postscript file\n",
 		 sm_palette.ps_allcF == 0 ? " NOT" : "");
 	fputs("\tallocating ", stderr);
@@ -2439,13 +2434,14 @@ show_term()
 /* process 'show tics|[xyzx2y2cb]tics' commands */
 static void
 #ifdef PM3D
-show_tics(showx, showy, showz, showx2, showy2, showcb)
+show_tics(
+    TBOOLEAN showx, TBOOLEAN showy, TBOOLEAN showz,
+    TBOOLEAN showx2, TBOOLEAN showy2,
+    TBOOLEAN showcb)
 #else
-show_tics(showx, showy, showz, showx2, showy2)
-#endif
-TBOOLEAN showx, showy, showz, showx2, showy2;
-#ifdef PM3D
-TBOOLEAN showcb;
+show_tics(
+    TBOOLEAN showx, TBOOLEAN showy, TBOOLEAN showz,
+    TBOOLEAN showx2, TBOOLEAN showy2)
 #endif
 {
     SHOW_ALL_NL;
@@ -2477,8 +2473,7 @@ TBOOLEAN showcb;
 
 /* process 'show m[xyzx2y2cb]tics' commands */
 static void
-show_mtics(axis)
-    AXIS_INDEX axis;
+show_mtics(AXIS_INDEX axis)
 {
     switch (axis_array[axis].minitics) {
     case MINI_OFF:
@@ -2520,8 +2515,7 @@ show_timestamp()
 
 /* process 'show [xyzx2y2rtuv]range' commands */
 static void
-show_range(axis)
-    AXIS_INDEX axis;
+show_range(AXIS_INDEX axis)
 {
     SHOW_ALL_NL;
     if (axis_array[axis].is_timedata)
@@ -2533,9 +2527,7 @@ show_range(axis)
 
 /* called by the functions below */
 static void
-show_xyzlabel(name, suffix, label)
-    const char *name, *suffix;
-    label_struct *label;
+show_xyzlabel(const char *name, const char *suffix, label_struct *label)
 {
     fprintf(stderr, "\t%s%s is \"%s\", offset at %f, %f",
 	    name, suffix, conv_text(label->text),
@@ -2562,8 +2554,7 @@ show_title()
 
 /* process 'show {x|y|z|x2|y2}label' command */
 static void
-show_axislabel(axis)
-    AXIS_INDEX axis;
+show_axislabel(AXIS_INDEX axis)
 {
     SHOW_ALL_NL;
     show_xyzlabel(axis_defaults[axis].name, "label", &axis_array[axis].label);
@@ -2572,8 +2563,7 @@ show_axislabel(axis)
 
 /* process 'show [xyzx2y2]data' commands */
 static void
-show_data_is_timedate(axis)
-    AXIS_INDEX axis;
+show_data_is_timedate(AXIS_INDEX axis)
 {
     SHOW_ALL_NL;
     fprintf(stderr, "\t%s is set to %s\n", axis_defaults[axis].name,
@@ -2597,7 +2587,7 @@ show_timefmt()
     } else {
         /* show all currently active time axes' formats: */
 	for (axis = 0; axis<AXIS_ARRAY_SIZE; axis++)
-	    if (axis_array[axis].is_timedata) 
+	    if (axis_array[axis].is_timedata)
 		fprintf(stderr,
 			"\tread format for time on %s axis is \"%s\"\n",
 			axis_defaults[axis].name,
@@ -2754,9 +2744,9 @@ show_variables()
 }
 
 
+/* Show line style number <tag> (0 means show all) */
 static void
-show_linestyle(tag)
-int tag;			/* 0 means show all */
+show_linestyle(int tag)
 {
     struct linestyle_def *this_linestyle;
     TBOOLEAN showed = FALSE;
@@ -2785,9 +2775,9 @@ int tag;			/* 0 means show all */
 }
 
 
+/* Show arrow style number <tag> (0 means show all) */
 static void
-show_arrowstyle(tag)
-int tag;			/* 0 means show all */
+show_arrowstyle(int tag)
 {
     struct arrowstyle_def *this_arrowstyle;
     TBOOLEAN showed = FALSE;
@@ -2802,8 +2792,8 @@ int tag;			/* 0 means show all */
 	    fprintf(stderr, "\tlinetype %d, linewidth %.3f %s %s\n",
 		    this_arrowstyle->arrow_properties.lp_properties.l_type+1,
 		    this_arrowstyle->arrow_properties.lp_properties.l_width,
-		    this_arrowstyle->arrow_properties.head ? 
-		    (this_arrowstyle->arrow_properties.head==2 ? 
+		    this_arrowstyle->arrow_properties.head ?
+		    (this_arrowstyle->arrow_properties.head==2 ?
 		     " both heads " : " one head ") : " nohead",
 		    this_arrowstyle->arrow_properties.layer ? "front" : "back");
 	    if (this_arrowstyle->arrow_properties.head > 0) {
@@ -2813,14 +2803,14 @@ int tag;			/* 0 means show all */
 		      "nofilled" )));
 		if (this_arrowstyle->arrow_properties.head_length > 0) {
 		    static char *msg[] =
-			{"(first x axis) ", "(second x axis) ", 
+			{"(first x axis) ", "(second x axis) ",
 			 "(graph units) ", "(screen units) "};
-		    fprintf(stderr," length %s%g, angle %g deg", 
+		    fprintf(stderr," length %s%g, angle %g deg",
 			    this_arrowstyle->arrow_properties.head_lengthunit == first_axes ? "" : msg[this_arrowstyle->arrow_properties.head_lengthunit],
 			    this_arrowstyle->arrow_properties.head_length,
 			    this_arrowstyle->arrow_properties.head_angle);
 		    if (this_arrowstyle->arrow_properties.head_filled!=0)
-			fprintf(stderr,", backangle %g deg", 
+			fprintf(stderr,", backangle %g deg",
 				this_arrowstyle->arrow_properties.head_backangle);
 		    fprintf(stderr,"\n");
 		}
@@ -2836,8 +2826,7 @@ int tag;			/* 0 means show all */
 
 /* called by show_tics */
 static void
-show_ticdef(axis)
-AXIS_INDEX axis;
+show_ticdef(AXIS_INDEX axis)
 {
     register struct ticmark *t;
 
@@ -2917,12 +2906,12 @@ AXIS_INDEX axis;
 	    /* NOTREACHED */
 	}
     }
- 
+
     if (axis_array[axis].ticdef.textcolor.type != TC_DEFAULT) {
         fprintf(stderr,"\t  textcolor lt %d\n",
             axis_array[axis].ticdef.textcolor.lt+1);
     }
- 
+
     if (axis_array[axis].ticdef.font && *axis_array[axis].ticdef.font) {
         fprintf(stderr,"\t  font \"%s\"\n", axis_array[axis].ticdef.font);
     }
@@ -2931,8 +2920,7 @@ AXIS_INDEX axis;
 
 /* convert unprintable characters as \okt, tab as \t, newline \n .. */
 char *
-conv_text(t)
-const char *t;
+conv_text(const char *t)
 {
     static char *r = NULL, *s;
 

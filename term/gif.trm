@@ -1,5 +1,5 @@
-/*
- * $Id: gif.trm,v 1.44 2004/03/11 15:30:19 mikulik Exp $
+/* Hello, Emacs, this is -*-C-*-
+ * $Id: gif.trm,v 1.45 2004/04/13 17:24:32 broeker Exp $
  */
 
 /* GNUPLOT -- gif.trm */
@@ -72,9 +72,9 @@
  *  Alfred Reibenschuh <alfred.reibenschuh@it-austria.com> or <fredo@blackbox.at>
  *  Ben Laurie <ben@algroup.co.uk>
  *
- * 
+ *
  * This version outputs either color or monochrome GIFs.  The default
- * is 640x480 pixels.  
+ * is 640x480 pixels.
  *
  * link with -Lterm/gd -lgd if your directory structure is gnuplot/term/gd
  *
@@ -96,7 +96,7 @@
 /*
  * This definition is triggered by the configuration option --with-gif=png
  * It provides backwards compatibility with existing scripts that used the
- * old gif driver and libgd versions <1.6 by substituting creation of PNG 
+ * old gif driver and libgd versions <1.6 by substituting creation of PNG
  * images in response to * 'set term gif' using the PNG support in libgd
  * versions >= 1.8
  * Ethan A Merritt - Nov 2001
@@ -212,11 +212,11 @@ static struct gen_table GIF_opts[] =
 };
 
 /*
- * _options()  Called when terminal type is selected.  
- * This procedure should parse options on the command line.  A list of the 
- * currently selected options should be stored in term_options[] in a form 
- * suitable for use with the set term command.  term_options[] is used by 
- * the save command.  Use options_null() if no options are available. 
+ * _options()  Called when terminal type is selected.
+ * This procedure should parse options on the command line.  A list of the
+ * currently selected options should be stored in term_options[] in a form
+ * suitable for use with the set term command.  term_options[] is used by
+ * the save command.  Use options_null() if no options are available.
  */
 TERM_PUBLIC void
 GIF_options()
@@ -225,7 +225,7 @@ GIF_options()
     int gif_font, i;
     char *string;
     unsigned long color;
-    
+
     term_options[0] = NUL;
     gif_state.n_colors = 0;
     gif_state.flags = 0;
@@ -342,7 +342,7 @@ GIF_options()
     sprintf(term_options + strlen(term_options),
 	    "size %d,%d ", GIF_XMAX, GIF_YMAX);
 
-    for (i = 0; strlen(term_options) + 9 < MAX_LINE_LEN && 
+    for (i = 0; strlen(term_options) + 9 < MAX_LINE_LEN &&
 	   i < gif_state.n_colors; i++) {
 	sprintf(term_options + strlen(term_options),
 		"x%06x ", gif_state.rgb_table[i]);
@@ -363,7 +363,7 @@ GIF_init()
 
 /*
  * _reset()  Called when gnuplot is exited, the output device changed or
- * the terminal type changed.  This procedure should reset the device, 
+ * the terminal type changed.  This procedure should reset the device,
  * possibly flushing a buffer somewhere or generating a form feed.
  */
 TERM_PUBLIC void
@@ -377,15 +377,20 @@ GIF_reset()
 /* use  #if 1  that's just for debugging */
 void GIF_show_current_palette()
 {
-int i;
-fprintf(stderr,"*****\n SHOW THE PALETTE! total=%i\n",gdImageColorsTotal(gif_state.image));
-for (i=0; i < gdImageColorsTotal(gif_state.image); i++) {
-  /* Use access macros to learn colors. */
-  fprintf(stderr,"%i\tr=%d\t g=%d\tb=%d\n", i,
-    gdImageRed(gif_state.image,i),
-    gdImageGreen(gif_state.image,i),
-    gdImageBlue(gif_state.image,i));
-  }
+    int i;
+
+    fprintf(stderr,"\
+*****\n SHOW THE PALETTE! total=%i\n",
+	    gdImageColorsTotal(gif_state.image));
+    for (i=0; i < gdImageColorsTotal(gif_state.image); i++) {
+	/* Use access macros to learn colors. */
+	fprintf(stderr,"\
+%i\tr=%d\t g=%d\tb=%d\n",
+		i,
+		gdImageRed(gif_state.image, i),
+		gdImageGreen(gif_state.image, i),
+		gdImageBlue(gif_state.image, i));
+    }
 }
 #endif
 
@@ -488,7 +493,7 @@ void GIF_filled_polygon(int points, gpiPoint *corners)
 /*
  * _graphics()  Called just before a plot is going to be displayed.  This
  * procedure should set the device into graphics mode.  Devices which can't
- * be used as terminals (like plotters) will probably be in graphics mode 
+ * be used as terminals (like plotters) will probably be in graphics mode
  * always and therefore won't need this.
  */
 TERM_PUBLIC void
@@ -505,7 +510,7 @@ GIF_graphics()
     gif_state.charw = term->h_char;	/* gif_state.font->w; */
     gif_state.charh = term->v_char;	/* gif_state.font->h; */
     for (i = gif_state.n_colors; i < WEB_N_COLORS; i++)
-	gif_state.rgb_table[i] = 
+	gif_state.rgb_table[i] =
 	    (web_color_rgbs[i].r << 16) |
 	    (web_color_rgbs[i].g << 8) |
 	    web_color_rgbs[i].b;
@@ -524,8 +529,8 @@ GIF_graphics()
 	gdImageColorTransparent(gif_state.image, -1);
 }
 
-/* 
- * _text()  Called immediately after a plot is displayed.  This procedure 
+/*
+ * _text()  Called immediately after a plot is displayed.  This procedure
  * should set the device back into text mode if it is also a terminal, so
  * that commands can be seen as they're typed.  Again, this will probably
  * do nothing if the device can't be used as a terminal.
@@ -578,12 +583,12 @@ GIF_vector(unsigned int x, unsigned int y)
 
 /* _linetype(lt)  Called to set the line type before text is displayed or
  * line(s) plotted.  This procedure should select a pen color or line
- * style if the device has these capabilities.  
- * lt is an integer from -2 to 0 or greater.  
+ * style if the device has these capabilities.
+ * lt is an integer from -2 to 0 or greater.
  * An lt of -2 is used for the border of the plot.
- * An lt of -1 is used for the X and Y axes.  
+ * An lt of -1 is used for the X and Y axes.
  * lt 0 and upwards are used for plots 0 and upwards.
- * If _linetype() is called with lt greater than the available line types, 
+ * If _linetype() is called with lt greater than the available line types,
  * it should map it to one of the available line types.
  * Most drivers provide 9 different linetypes (lt is 0 to 8).
  */
@@ -597,9 +602,9 @@ GIF_linetype(int type)
     gif_state.linetype = type;
 }
 
-/* _put_text(x,y,str)  Called to display text at the (x,y) position, 
- * while in graphics mode.   The text should be vertically (with respect 
- * to the text) justified about (x,y).  The text is rotated according 
+/* _put_text(x,y,str)  Called to display text at the (x,y) position,
+ * while in graphics mode.   The text should be vertically (with respect
+ * to the text) justified about (x,y).  The text is rotated according
  * to _text_angle and then horizontally (with respect to the text)
  * justified according to _justify_text.
  */
@@ -663,20 +668,21 @@ GIF_set_font(const char *fontname)
 }
 
 TERM_PUBLIC void
-GIF_boxfill(style, x, y, w, h)
-    int style;
-    unsigned int x, y, w, h;
+GIF_boxfill(
+    int style,
+    unsigned int x, unsigned int y,
+    unsigned int w, unsigned int h)
 {
     /* Only solid filling style is supported, i.e. no pattern nor density. */
-    gdImageFilledRectangle(gif_state.image, x, gif_state.height-(y+h), 
+    gdImageFilledRectangle(gif_state.image, x, gif_state.height-(y+h),
 	    x+w, gif_state.height-y, gif_state.color);
 }
-    
+
 #endif /* TERM_BODY */
 #ifdef TERM_TABLE
 
 TERM_TABLE_START(gif_driver)
-    "gif", 
+    "gif",
 #ifdef PNG_FOR_GIF
     "GIF format [mode] [fontsize] [size] [colors] (will actually generate PNG images)",
 #else
@@ -689,7 +695,7 @@ TERM_TABLE_START(gif_driver)
     null_justify_text, do_point, do_arrow, GIF_set_font,
     0,				/* pointsize */
     TERM_CAN_MULTIPLOT | TERM_BINARY
-    , 0 /*suspend*/, 0 /*resume*/, 
+    , 0 /*suspend*/, 0 /*resume*/,
     GIF_boxfill,   0 /*linewidth*/
 #ifdef PM3D
 #ifdef USE_MOUSE
@@ -723,8 +729,8 @@ START_HELP(gif)
 " version 1.6; newer versions support PNG output instead.",
 #ifdef PNG_FOR_GIF
 "",
-" >>> This copy of gnuplot was configured to produce PNG images <<<",
-" >>> instead of GIF images when 'set term gif' is selected.    <<<",
+" NOTE: This copy of gnuplot was configured to produce PNG images",
+" instead of GIF images when 'set term gif' is selected.",
 #endif
 "",
 " Syntax:",
@@ -774,8 +780,3 @@ START_HELP(gif)
 END_HELP(gif)
 #endif /* TERM_HELP */
 
-/*
- * Local Variables:
- * mode:C
- * End:
- */

@@ -1,5 +1,5 @@
-/*
- * $Id: hp500c.trm,v 1.13 2001/08/27 15:04:12 broeker Exp $
+/* Hello, Emacs, this is -*-C-*-
+ * $Id: hp500c.trm,v 1.14 2004/04/13 17:24:33 broeker Exp $
  *
  */
 
@@ -48,7 +48,7 @@
  *  UdoHessenauer    ----> derived this version from the above one
  *
  * send your comments or suggestions to (gnuplot-info@lists.sourceforge.net).
- * 
+ *
  */
 
 /* The following HP Deskjet500c  driver uses generic bit mapped graphics
@@ -56,7 +56,7 @@
    interchanges colomns and lines in order to access entire lines
    easily and returns the lines to get bits in the right order :
    (x,y) -> (y,XMAX-1-x). */
-/* This interchange is done by calling b_makebitmap() with reversed 
+/* This interchange is done by calling b_makebitmap() with reversed
    xmax and ymax, and then setting b_rastermode to TRUE.  b_setpixel()
    will then perform the interchange before each pixel is plotted */
 /* by John Engels JENGELS@BNANDP51.BITNET, inspired by the hpljet driver
@@ -255,8 +255,7 @@ HP500C_reset()
 /* HP DeskJet 500c routines */
 
 TERM_PUBLIC void
-HP500C_linetype(linetype)
-int linetype;
+HP500C_linetype(int linetype)
 {
     if (linetype < 0)
 	linetype = 7;
@@ -289,23 +288,20 @@ int linetype;
 
 }
 
-/*
+#if 0
 void
-HP500C_point(x,y,value)
-int x;
-int y;
-int value;
+HP500C_point(unsigned int x, unsigned int y, int value)
 {
-	 HP500C_linetype(value);
-	 do_point(x,y,value);
+    HP500C_linetype(value);
+    do_point(x,y,value);
 }
-*/
+#endif
 
 TERM_PUBLIC void
 HP500C_graphics()
 {
     /* HBB 980226: moved block of code from here to init() */
-    /* rotate plot -90 degrees by reversing XMAX and YMAX and by 
+    /* rotate plot -90 degrees by reversing XMAX and YMAX and by
        setting b_rastermode to TRUE */
     b_makebitmap(HP500C_YMAX, HP500C_XMAX, 3);
     b_rastermode = TRUE;
@@ -318,10 +314,10 @@ HP500C_graphics()
  */
 
 static int
-HP_compress(op, oe, cp)
-unsigned char *op, *oe, *cp;
+HP_compress(unsigned char *op, unsigned char *oe, unsigned char *cp)
 {
     unsigned char *ce = cp;
+
     while (op < oe) {
 	unsigned char prevchar;
 	unsigned char count;
@@ -341,21 +337,21 @@ unsigned char *op, *oe, *cp;
 }
 
 static unsigned char
-HP_complement(c)
-int c;
+HP_complement(int c)
 {
     return (unsigned char) (256 - c);
 }
 
 
 static int
-HP_compress_to_TIFF(op, oe, cp)
-unsigned char *op;		/* original pointer */
-unsigned char *oe;		/* end of orig string */
-unsigned char *cp;		/* pointer for compressed data */
+HP_compress_to_TIFF(
+    unsigned char *op,		/* original pointer */
+    unsigned char *oe,		/* end of orig string */
+    unsigned char *cp)		/* pointer for compressed data */
 {
     unsigned char *countposition;
     unsigned char *ce = cp;
+
     while (op < oe) {
 	unsigned char prevchar;
 	unsigned char count;
@@ -393,12 +389,13 @@ unsigned char *cp;		/* pointer for compressed data */
 }
 
 static int
-HP_nocompress(op, oe, cp)
-unsigned char *op;
-unsigned char *oe;
-unsigned char *cp;
+HP_nocompress(
+    unsigned char *op,
+    unsigned char *oe,
+    unsigned char *cp)
 {
     unsigned char *ce = cp;
+
     while (op < oe)
 	*ce++ = *op++;
     return ce - cp;

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util3d.c,v 1.19 2003/12/29 04:03:43 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: util3d.c,v 1.20 2004/04/13 17:24:02 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - util3d.c */
@@ -60,8 +60,7 @@ static void mat_unit __PROTO((transform_matrix mat));
 static GP_INLINE void draw3d_point_unconditional __PROTO((p_vertex, struct lp_style_type *));
 
 static void
-mat_unit(mat)
-transform_matrix mat;
+mat_unit(transform_matrix mat)
 {
     int i, j;
 
@@ -75,9 +74,7 @@ transform_matrix mat;
 
 #if 0 /* HBB 990829: unused --> commented out */
 void
-mat_trans(tx, ty, tz, mat)
-double tx, ty, tz;
-transform_matrix mat;
+mat_trans(double tx, double ty, double tz, transform_matrix mat)
 {
     mat_unit(mat);		/* Make it unit matrix. */
     mat[3][0] = tx;
@@ -87,9 +84,7 @@ transform_matrix mat;
 #endif /* commented out */
 
 void
-mat_scale(sx, sy, sz, mat)
-double sx, sy, sz;
-transform_matrix mat;
+mat_scale(double sx, double sy, double sz, transform_matrix mat)
 {
     mat_unit(mat);		/* Make it unit matrix. */
     mat[0][0] = sx;
@@ -98,9 +93,7 @@ transform_matrix mat;
 }
 
 void
-mat_rot_x(teta, mat)
-double teta;
-transform_matrix mat;
+mat_rot_x(double teta, transform_matrix mat)
 {
     double cos_teta, sin_teta;
 
@@ -117,9 +110,7 @@ transform_matrix mat;
 
 #if 0 /* HBB 990829: unused --> commented out */
 void
-mat_rot_y(teta, mat)
-double teta;
-transform_matrix mat;
+mat_rot_y(double teta, transform_matrix mat)
 {
     double cos_teta, sin_teta;
 
@@ -136,9 +127,7 @@ transform_matrix mat;
 #endif /* commented out */
 
 void
-mat_rot_z(teta, mat)
-double teta;
-transform_matrix mat;
+mat_rot_z(double teta, transform_matrix mat)
 {
     double cos_teta, sin_teta;
 
@@ -155,8 +144,9 @@ transform_matrix mat;
 
 /* Multiply two transform_matrix. Result can be one of two operands. */
 void
-mat_mult(mat_res, mat1, mat2)
-transform_matrix mat_res, mat1, mat2;
+mat_mult(
+    transform_matrix mat_res,
+    transform_matrix mat1, transform_matrix mat2)
 {
     int i, j, k;
     transform_matrix mat_res_temp;
@@ -175,14 +165,14 @@ transform_matrix mat_res, mat1, mat2;
 
 /* single edge intersection algorithm */
 /* Given two points, one inside and one outside the plot, return
- * the point where an edge of the plot intersects the line segment defined 
+ * the point where an edge of the plot intersects the line segment defined
  * by the two points.
  */
 void
-edge3d_intersect(points, i, ex, ey, ez)
-struct coordinate GPHUGE *points;	/* the points array */
-int i;				/* line segment from point i-1 to point i */
-double *ex, *ey, *ez;		/* the point where it crosses an edge */
+edge3d_intersect(
+    struct coordinate GPHUGE *points,	/* the points array */
+    int i,				/* line segment from point i-1 to point i */
+    double *ex, double *ey, double *ez)	/* the point where it crosses an edge */
 {
     int count;
     double ix = points[i - 1].x;
@@ -206,7 +196,7 @@ double *ex, *ey, *ez;		/* the point where it crosses an edge */
 	oz = z;
     }
     /* nasty degenerate cases, effectively drawing to an infinity point (?)
-       cope with them here, so don't process them as a "real" OUTRANGE point 
+       cope with them here, so don't process them as a "real" OUTRANGE point
 
        If more than one coord is -VERYLARGE, then can't ratio the "infinities"
        so drop out by returning the INRANGE point.
@@ -214,7 +204,7 @@ double *ex, *ey, *ez;		/* the point where it crosses an edge */
        Obviously, only need to test the OUTRANGE point (coordinates) */
 
     /* nasty degenerate cases, effectively drawing to an infinity point (?)
-       cope with them here, so don't process them as a "real" OUTRANGE point 
+       cope with them here, so don't process them as a "real" OUTRANGE point
 
        If more than one coord is -VERYLARGE, then can't ratio the "infinities"
        so drop out by returning FALSE */
@@ -227,7 +217,7 @@ double *ex, *ey, *ez;		/* the point where it crosses an edge */
     if (oz == -VERYLARGE)
 	count++;
 
-    /* either doesn't pass through 3D volume *or* 
+    /* either doesn't pass through 3D volume *or*
        can't ratio infinities to get a direction to draw line, so return the INRANGE point */
     if (count > 1) {
 	*ex = ix;
@@ -514,8 +504,8 @@ double *ex, *ey, *ez;		/* the point where it crosses an edge */
 	}
     }
     /* If we reach here, the inrange point is on the edge, and
-     * the line segment from the outrange point does not cross any 
-     * other edges to get there. In this case, we return the inrange 
+     * the line segment from the outrange point does not cross any
+     * other edges to get there. In this case, we return the inrange
      * point as the 'edge' intersection point. This will basically draw
      * line.
      */
@@ -527,19 +517,19 @@ double *ex, *ey, *ez;		/* the point where it crosses an edge */
 
 /* double edge intersection algorithm */
 /* Given two points, both outside the plot, return
- * the points where an edge of the plot intersects the line segment defined 
+ * the points where an edge of the plot intersects the line segment defined
  * by the two points. There may be zero, one, two, or an infinite number
  * of intersection points. (One means an intersection at a corner, infinite
  * means overlaying the edge itself). We return FALSE when there is nothing
- * to draw (zero intersections), and TRUE when there is something to 
- * draw (the one-point case is a degenerate of the two-point case and we do 
+ * to draw (zero intersections), and TRUE when there is something to
+ * draw (the one-point case is a degenerate of the two-point case and we do
  * not distinguish it - we draw it anyway).
  */
 TBOOLEAN			/* any intersection? */
-two_edge3d_intersect(points, i, lx, ly, lz)
-struct coordinate GPHUGE *points;	/* the points array */
-int i;				/* line segment from point i-1 to point i */
-double *lx, *ly, *lz;		/* lx[2], ly[2], lz[2]: points where it crosses edges */
+two_edge3d_intersect(
+    struct coordinate GPHUGE *points,	/* the points array */
+    int i,				/* line segment from point i-1 to point i */
+    double *lx, double *ly, double *lz)	/* lx[2], ly[2], lz[2]: points where it crosses edges */
 {
     int count;
     /* global axis_array[FIRST_X_AXIS].min, axis_array[FIRST_X_AXIS].max, axis_array[FIRST_Y_AXIS].min, axis_array[FIRST_Y_AXIS].max, axis_array[FIRST_Z_AXIS].min, axis_array[FIRST_Z_AXIS].max */
@@ -555,7 +545,7 @@ double *lx, *ly, *lz;		/* lx[2], ly[2], lz[2]: points where it crosses edges */
     double t_min, t_max;
 
     /* nasty degenerate cases, effectively drawing to an infinity point (?)
-       cope with them here, so don't process them as a "real" OUTRANGE point 
+       cope with them here, so don't process them as a "real" OUTRANGE point
 
        If more than one coord is -VERYLARGE, then can't ratio the "infinities"
        so drop out by returning FALSE */
@@ -574,7 +564,7 @@ double *lx, *ly, *lz;		/* lx[2], ly[2], lz[2]: points where it crosses edges */
     if (oz == -VERYLARGE)
 	count++;
 
-    /* either doesn't pass through 3D volume *or* 
+    /* either doesn't pass through 3D volume *or*
        can't ratio infinities to get a direction to draw line, so simply return(FALSE) */
     if (count > 1) {
 	return (FALSE);
@@ -667,7 +657,7 @@ double *lx, *ly, *lz;		/* lx[2], ly[2], lz[2]: points where it crosses edges */
      * Quick outcode tests on the 3d graph volume
      */
 
-    /* 
+    /*
      * test z coord first --- most surface OUTRANGE points generated between
      * axis_array[FIRST_Z_AXIS].min and axis_array[FIRST_Z_AXIS].min (i.e. when ticslevel is non-zero)
      */
@@ -686,8 +676,8 @@ double *lx, *ly, *lz;		/* lx[2], ly[2], lz[2]: points where it crosses edges */
      *
      * The slant line intersections are solved using the parametric form
      * of the equation for a line, since if we test x/y/z min/max planes explicitly
-     * then e.g. a  line passing through a corner point (x_min,y_min,z_min) 
-     * actually intersects all 3 planes and hence further tests would be required 
+     * then e.g. a  line passing through a corner point (x_min,y_min,z_min)
+     * actually intersects all 3 planes and hence further tests would be required
      * to anticipate this and similar situations.
      */
 
@@ -965,13 +955,13 @@ double *lx, *ly, *lz;		/* lx[2], ly[2], lz[2]: points where it crosses edges */
 /* Performs transformation from 'user coordinates' to a normalized
  * vector in 'graph coordinates' (-1..1 in all three directions).  */
 void
-map3d_xyz(x, y, z, out)
-     double x, y, z;		/* user coordinates */
-     p_vertex out;
+map3d_xyz(
+    double x, double y, double z,		/* user coordinates */
+    p_vertex out)
 {
     int i, j;
     double V[4], Res[4];	/* Homogeneous coords. vectors. */
-	
+
     /* Normalize object space to -1..1 */
     V[0] = map_x3d(x);
     V[1] = map_y3d(y);
@@ -1001,9 +991,9 @@ map3d_xyz(x, y, z, out)
 /* Function to map from user 3D space to normalized 'camera' view
  * space, and from there directly to terminal coordinates */
 void
-map3d_xy(x, y, z, xt, yt)
-    double x, y, z;
-    unsigned int *xt, *yt;
+map3d_xy(
+    double x, double y, double z,
+    unsigned int *xt, unsigned int *yt)
 {
     int i, j;
     double v[4], res[4],	/* Homogeneous coords. vectors. */
@@ -1033,9 +1023,7 @@ map3d_xy(x, y, z, xt, yt)
 /* HBB 20020313: New routine, broken out of draw3d_point, to be used
  * to output a single point without any checks for hidden3d */
 static GP_INLINE void
-draw3d_point_unconditional(v, lp)
-    p_vertex v;
-    struct lp_style_type *lp;
+draw3d_point_unconditional(p_vertex v, struct lp_style_type *lp)
 {
     unsigned int x, y;
 
@@ -1049,17 +1037,17 @@ draw3d_point_unconditional(v, lp)
 #endif
     if (!clip_point(x, y))
 	(term->point) (x, y, lp->p_type);
-}    
+}
 
 /* Moved this upward, to make optional inlining in draw3d_line easier
  * for compilers */
 /* HBB 20021128: removed GP_INLINE qualifier to avoid MSVC++ silliness */
 void
-draw3d_line_unconditional(v1, v2, lp, linetype)
-    p_vertex v1, v2;
-    struct lp_style_type *lp;
-    int linetype;
-{    
+draw3d_line_unconditional(
+    p_vertex v1, p_vertex v2,
+    struct lp_style_type *lp,
+    int linetype)
+{
     unsigned int x1, y1, x2, y2;
 
     /* HBB 20020312: v2 can be NULL, if this call is coming from
@@ -1088,9 +1076,7 @@ draw3d_line_unconditional(v1, v2, lp, linetype)
 }
 
 void
-draw3d_line (v1, v2, lp)
-    p_vertex v1, v2;
-    struct lp_style_type *lp;
+draw3d_line (p_vertex v1, p_vertex v2, struct lp_style_type *lp)
 {
 #ifndef LITE
     /* hidden3d routine can't work if no surface was drawn at all */
@@ -1099,7 +1085,7 @@ draw3d_line (v1, v2, lp)
 	return;
     }
 #endif
-    
+
     draw3d_line_unconditional(v1, v2, lp, lp->l_type);
 
 }
@@ -1107,9 +1093,7 @@ draw3d_line (v1, v2, lp)
 /* HBB 20000621: new routine, to allow for hiding point symbols behind
  * the surface */
 void
-draw3d_point(v, lp)
-    p_vertex v;
-    struct lp_style_type *lp;
+draw3d_point(p_vertex v, struct lp_style_type *lp)
 {
 #ifndef LITE
     /* hidden3d routine can't work if no surface was drawn at all */
@@ -1121,7 +1105,7 @@ draw3d_point(v, lp)
 #endif
 
     draw3d_point_unconditional(v, lp);
-}    
+}
 
 /* HBB NEW 20031218: tools for drawing polylines in 3D with a semantic
  * like term->move() and term->vector() */
@@ -1130,8 +1114,7 @@ draw3d_point(v, lp)
 static vertex polyline3d_previous_vertex;
 
 void
-polyline3d_start (v1)
-    p_vertex v1;
+polyline3d_start(p_vertex v1)
 {
     unsigned int x1, y1;
 
@@ -1147,9 +1130,7 @@ polyline3d_start (v1)
 }
 
 void
-polyline3d_next (v2, lp)
-    p_vertex v2;
-    struct lp_style_type *lp;
+polyline3d_next(p_vertex v2, struct lp_style_type *lp)
 {
     unsigned int x2, y2;
 
@@ -1161,12 +1142,12 @@ polyline3d_next (v2, lp)
 	draw_line_hidden(&polyline3d_previous_vertex, v2, lp);
 	polyline3d_previous_vertex = *v2;
 	return;
-    } 
+    }
 #endif
-    
+
     /* Copied from draw3d_line_unconditional: */
 #ifdef PM3D
-    /* If use_palette is active, polylines can't be used --> 
+    /* If use_palette is active, polylines can't be used -->
      * revert back to old method */
     if (lp->use_palette) {
 	draw3d_line_unconditional(&polyline3d_previous_vertex, v2,
@@ -1178,7 +1159,7 @@ polyline3d_next (v2, lp)
 #endif
 
     TERMCOORD(v2, x2, y2);
-    /* FIXME HBB 20031219: no clipping?! */ 
+    /* FIXME HBB 20031219: no clipping?! */
     term->vector(x2, y2);
 
     polyline3d_previous_vertex = *v2;

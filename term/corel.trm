@@ -1,5 +1,5 @@
-/*
- * $Id: corel.trm,v 1.11 1999/08/24 11:24:52 lhecking Exp $
+/* Hello, Emacs, this is -*-C-*-
+ * $Id: corel.trm,v 1.12 1999/10/01 15:09:10 lhecking Exp $
  */
 
 /*
@@ -21,7 +21,7 @@
 
 */
 
-/* 
+/*
  * adapted to the new terminal layout by Stefan Bodewig (Dec. 1995)
  */
 
@@ -198,8 +198,7 @@ COREL_reset()
 
 
 TERM_PUBLIC void
-COREL_linetype(linetype)
-int linetype;
+COREL_linetype(int linetype)
 {
     if (corel_stroke) {
 	fputs("S\n", gpoutfile);
@@ -332,8 +331,7 @@ int linetype;
 
 
 TERM_PUBLIC void
-COREL_move(x, y)
-unsigned int x, y;
+COREL_move(unsigned int x, unsigned int y)
 {
     if (corel_stroke)
 	fputs("S\n", gpoutfile);
@@ -344,8 +342,7 @@ unsigned int x, y;
 
 
 TERM_PUBLIC void
-COREL_vector(x, y)
-unsigned int x, y;
+COREL_vector(unsigned int x, unsigned int y)
 {
     fprintf(gpoutfile, "%.2f %.2f l\n", x / COREL_SC, y / COREL_SC);
     corel_path_count += 1;
@@ -358,9 +355,7 @@ unsigned int x, y;
 
 
 TERM_PUBLIC void
-COREL_put_text(x, y, str)
-unsigned int x, y;
-const char *str;
+COREL_put_text(unsigned int x, unsigned int y, const char *str)
 {
     char ch;
     if (corel_stroke) {
@@ -402,16 +397,14 @@ const char *str;
 }
 
 TERM_PUBLIC int
-COREL_text_angle(ang)
-int ang;
+COREL_text_angle(int ang)
 {
     corel_ang = ang;
     return TRUE;
 }
 
 TERM_PUBLIC int
-COREL_justify_text(mode)
-enum JUSTIFY mode;
+COREL_justify_text(enum JUSTIFY mode)
 {
     corel_justify = mode;
     return TRUE;

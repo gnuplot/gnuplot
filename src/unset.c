@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.61 2004/04/13 17:24:02 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.62 2004/05/04 02:43:21 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -145,7 +145,7 @@ static void unset_axislabel __PROTO((AXIS_INDEX));
 void
 unset_command()
 {
-    static char GPFAR unsetmess[] = 
+    static char GPFAR unsetmess[] =
     "valid unset options:  [] = choose one, {} means optional\n\n\
 \t'angles', 'arrow', 'autoscale', 'bar', 'border', 'boxwidth', 'clabel',\n\
 \t'clip', 'cntrparam', 'colorbox', 'contour', 'dgrid3d', 'decimalsign',\n\
@@ -359,7 +359,7 @@ unset_command()
 	unset_tics(FIRST_X_AXIS);
 	break;
     case S_XDTICS:
-    case S_XMTICS: 
+    case S_XMTICS:
 	break;
     case S_MYTICS:
 	unset_mtics(FIRST_Y_AXIS);
@@ -368,7 +368,7 @@ unset_command()
 	unset_tics(FIRST_Y_AXIS);
 	break;
     case S_YDTICS:
-    case S_YMTICS: 
+    case S_YMTICS:
 	break;
     case S_MX2TICS:
 	unset_mtics(SECOND_X_AXIS);
@@ -377,7 +377,7 @@ unset_command()
 	unset_tics(SECOND_X_AXIS);
 	break;
     case S_X2DTICS:
-    case S_X2MTICS: 
+    case S_X2MTICS:
 	break;
     case S_MY2TICS:
 	unset_mtics(SECOND_Y_AXIS);
@@ -386,7 +386,7 @@ unset_command()
 	unset_tics(SECOND_Y_AXIS);
 	break;
     case S_Y2DTICS:
-    case S_Y2MTICS: 
+    case S_Y2MTICS:
 	break;
     case S_MZTICS:
 	unset_mtics(FIRST_Z_AXIS);
@@ -395,7 +395,7 @@ unset_command()
 	unset_tics(FIRST_Z_AXIS);
 	break;
     case S_ZDTICS:
-    case S_ZMTICS: 
+    case S_ZMTICS:
 	break;
 #ifdef PM3D
     case S_MCBTICS:
@@ -405,7 +405,7 @@ unset_command()
 	unset_tics(COLOR_AXIS);
 	break;
     case S_CBDTICS:
-    case S_CBMTICS: 
+    case S_CBMTICS:
 	break;
 #endif
     case S_XDATA:
@@ -550,14 +550,13 @@ unset_arrow()
 
 
 /* delete arrow from linked list started by first_arrow.
- * called with pointers to the previous arrow (prev) and the 
+ * called with pointers to the previous arrow (prev) and the
  * arrow to delete (this).
  * If there is no previous arrow (the arrow to delete is
  * first_arrow) then call with prev = NULL.
  */
 static void
-delete_arrow(prev, this)
-struct arrow_def *prev, *this;
+delete_arrow(struct arrow_def *prev, struct arrow_def *this)
 {
     if (this != NULL) {		/* there really is something to delete */
 	if (prev != NULL)	/* there is a previous arrow */
@@ -839,7 +838,7 @@ unset_isosamples()
 
 
 void
-reset_key(void)
+reset_key()
 {
     legend_key temp_key = DEFAULT_KEY_PROPS;
     memcpy(&keyT, &temp_key, sizeof(keyT));
@@ -895,14 +894,13 @@ unset_label()
 
 
 /* delete label from linked list started by first_label.
- * called with pointers to the previous label (prev) and the 
+ * called with pointers to the previous label (prev) and the
  * label to delete (this).
  * If there is no previous label (the label to delete is
  * first_label) then call with prev = NULL.
  */
 static void
-delete_label(prev, this)
-struct text_label *prev, *this;
+delete_label(struct text_label *prev, struct text_label *this)
 {
     if (this != NULL) {		/* there really is something to delete */
 	if (prev != NULL)	/* there is a previous label */
@@ -932,8 +930,7 @@ unset_locale()
 }
 
 static void
-reset_logscale(axis)
-    AXIS_INDEX axis;
+reset_logscale(AXIS_INDEX axis)
 {
     axis_array[axis].log = FALSE;
     axis_array[axis].base = 0.0;
@@ -954,7 +951,7 @@ unset_logscale()
 	int i = 0;
 	/* do reverse search because of "x", "x1", "x2" sequence in axisname_tbl */
 	while (i < token[c_token].length) {
-	    axis = lookup_table_nth_reverse( axisname_tbl, AXIS_ARRAY_SIZE, 
+	    axis = lookup_table_nth_reverse( axisname_tbl, AXIS_ARRAY_SIZE,
 		       input_line+token[c_token].start_index+i );
 	    if (axis < 0) {
 		token[c_token].start_index += i;
@@ -1007,8 +1004,7 @@ unset_mouse()
 
 /* process 'unset mxtics' command */
 static void
-unset_mtics(axis)
-    AXIS_INDEX axis;
+unset_mtics(AXIS_INDEX axis)
 {
     axis_array[axis].minitics = MINI_DEFAULT;
     axis_array[axis].mtic_freq = 10.0;
@@ -1017,8 +1013,7 @@ unset_mtics(axis)
 
 /*process 'unset {x|y|x2|y2|z}tics' command */
 static void
-unset_tics(axis)
-    AXIS_INDEX axis;
+unset_tics(AXIS_INDEX axis)
 {
     axis_array[axis].ticmode = NO_TICS;
 
@@ -1205,7 +1200,7 @@ unset_style()
 #endif
 	c_token++;
 	return;
-    } 
+    }
 
     switch(lookup_table(show_style_tbl, c_token)){
     case SHOW_STYLE_DATA:
@@ -1304,7 +1299,7 @@ unset_timefmt()
     else
 	/* int_error() from inside 'reset' would cause problems */
 	int_warn(c_token, "expected optional axis name");
-	
+
 }
 
 
@@ -1340,8 +1335,7 @@ unset_zero()
 
 /* process 'unset {x|y|z|x2|y2}data' command */
 static void
-unset_timedata(axis)
-    AXIS_INDEX axis;
+unset_timedata(AXIS_INDEX axis)
 {
     axis_array[axis].is_timedata = FALSE;
 }
@@ -1349,8 +1343,7 @@ unset_timedata(axis)
 
 /* process 'unset {x|y|z|x2|y2|t|u|v|r}range' command */
 static void
-unset_range(axis)
-    AXIS_INDEX axis;
+unset_range(AXIS_INDEX axis)
 {
     /* FIXME HBB 20000506: do we want to reset the axis autoscale and
      * min/max, too?  */
@@ -1359,8 +1352,7 @@ unset_range(axis)
 
 /* process 'unset {x|y|z|x2|y2}zeroaxis' command */
 static void
-unset_zeroaxis(axis)
-    AXIS_INDEX axis;
+unset_zeroaxis(AXIS_INDEX axis)
 {
     axis_array[axis].zeroaxis = default_axis_zeroaxis;
 }
@@ -1379,8 +1371,7 @@ unset_all_zeroaxes()
 
 /* process 'unset [xyz]{2}label command */
 static void
-unset_axislabel_or_title(label)
-    label_struct *label;
+unset_axislabel_or_title(label_struct *label)
 {
     strcpy(label->text, "");
     strcpy(label->font, "");
@@ -1390,8 +1381,7 @@ unset_axislabel_or_title(label)
 }
 
 static void
-unset_axislabel(axis)
-    AXIS_INDEX axis;
+unset_axislabel(AXIS_INDEX axis)
 {
     axis_array[axis].label = default_axis_label;
 }

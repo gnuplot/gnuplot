@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.37 2004/04/13 17:24:06 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.38 2004/05/27 06:59:38 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - win/wgraph.c */
@@ -35,7 +35,7 @@ static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.37 2004/04/13 17:24:06 br
 
 /*
  * AUTHORS
- * 
+ *
  *   Maurice Castro
  *   Russell Lang
  */
@@ -61,7 +61,7 @@ static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.37 2004/04/13 17:24:06 br
 #endif
 #ifdef PM3D
 # include "color.h"
-# include "getcolor.h"         
+# include "getcolor.h"
 #endif
 
 #ifdef USE_MOUSE
@@ -141,7 +141,7 @@ int wginitstyle[WGDEFSTYLE] = {PS_SOLID, PS_DASH, PS_DOT, PS_DASHDOT, PS_DASHDOT
 /*  extern int fillpattern; */
 
 static unsigned char halftone_bitmaps[][16] ={
-  { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,  
+  { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
     0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF },   /* no fill */
   { 0xEE, 0xEE, 0xBB, 0xBB, 0xEE, 0xEE, 0xBB, 0xBB,
     0xEE, 0xEE, 0xBB, 0xBB, 0xEE, 0xEE, 0xBB, 0xBB },   /* 25% pattern */
@@ -358,9 +358,9 @@ GraphInit(LPGW lpgw)
 		NULL, NULL, lpgw->hInstance, lpgw);
 
 	lpgw->hPopMenu = CreatePopupMenu();
-	AppendMenu(lpgw->hPopMenu, MF_STRING | (lpgw->graphtotop ? MF_CHECKED : MF_UNCHECKED), 
+	AppendMenu(lpgw->hPopMenu, MF_STRING | (lpgw->graphtotop ? MF_CHECKED : MF_UNCHECKED),
 		M_GRAPH_TO_TOP, "Bring to &Top");
-	AppendMenu(lpgw->hPopMenu, MF_STRING | (lpgw->color ? MF_CHECKED : MF_UNCHECKED), 
+	AppendMenu(lpgw->hPopMenu, MF_STRING | (lpgw->color ? MF_CHECKED : MF_UNCHECKED),
 		M_COLOR, "C&olor");
 	AppendMenu(lpgw->hPopMenu, MF_STRING, M_COPY_CLIP, "&Copy to Clipboard");
 #if WINVER >= 0x030a
@@ -402,7 +402,7 @@ GraphClose(LPGW lpgw)
 	DestroyBlocks(lpgw);
 	lpgw->locked = FALSE;
 }
-	
+
 
 void WDPROC
 GraphStart(LPGW lpgw, double pointsize)
@@ -420,15 +420,15 @@ GraphStart(LPGW lpgw, double pointsize)
 #ifdef USE_MOUSE
 		if (mouse_setting.on) {
 			BringWindowToTop(lpgw->hWndGraph);
-			return; 
+			return;
 		}
-#endif /* USE_MOUSE */		
-		SetWindowPos(lpgw->hWndGraph, 
+#endif /* USE_MOUSE */
+		SetWindowPos(lpgw->hWndGraph,
 			     HWND_TOP, 0,0,0,0,
 			     SWP_NOACTIVATE | SWP_NOMOVE | SWP_NOSIZE);
 	}
 }
-		
+
 void WDPROC
 GraphEnd(LPGW lpgw)
 {
@@ -497,7 +497,7 @@ StorePen(LPGW lpgw, int i, COLORREF ref, int colorstyle, int monostyle)
 }
 
 /* Prepare pens and brushes (--> colors) for use by the driver. Pens are (now) created
- * on-the-fly (--> DeleteObject(SelectObject(...)) idiom), but the brushes are still 
+ * on-the-fly (--> DeleteObject(SelectObject(...)) idiom), but the brushes are still
  * all created statically, and kept until the window is closed */
 static void
 MakePens(LPGW lpgw, HDC hdc)
@@ -691,13 +691,13 @@ SetFont(LPGW lpgw, HDC hdc)
 }
 
 static void
-SelFont(LPGW lpgw) 
+SelFont(LPGW lpgw)
 {
 #if WINVER >= 0x030a
 	LOGFONT lf;
 	CHOOSEFONT cf;
 	HDC hdc;
-	char lpszStyle[LF_FACESIZE]; 
+	char lpszStyle[LF_FACESIZE];
 	char FAR *p;
 
 	/* Set all structure fields to zero. */
@@ -795,14 +795,14 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
     int idx;
 #endif /*  USE_ULIG_FILLEDBOXES */
 
-    if (lpgw->locked) 
+    if (lpgw->locked)
 	return;
 
     /* HBB 20010218: the GDI status query functions don't work on Metafile
      * handles, so can't know whether the screen is actually showing
      * color or not, if drawgraph() is being called from CopyClip().
      * Solve by defaulting isColor to 1 if hdc is a metafile. */
-    isColor = (((GetDeviceCaps(hdc, PLANES) * GetDeviceCaps(hdc,BITSPIXEL)) 
+    isColor = (((GetDeviceCaps(hdc, PLANES) * GetDeviceCaps(hdc,BITSPIXEL))
 		> 2)
 	       || (GetDeviceCaps(hdc, TECHNOLOGY) == DT_METAFILE));
 
@@ -891,7 +891,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 		SetTextColor(hdc, lpgw->colorpen[pen].lopnColor);
 	    }
 	break;
-	    
+
 	case W_put_text:
 	    {
 		char *str;
@@ -923,14 +923,14 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 	case W_boxfill:   /* ULIG */
 
 	    assert (polyi == 1);
-		
+
 #if USE_ULIG_FILLEDBOXES
 	    /* NOTE: the x and y passed with this call are the width and
 	     * height of the box, actually. The left corner was stored into
 	     * ppt[0] by a preceding W_move, and the style was memorized
 	     * by a W_fillstyle call. */
 	    switch(fillstyle & 0x0f) {
-		case FS_SOLID: 
+		case FS_SOLID:
 		    /* style == 1 --> use halftone fill pattern
 		     * according to filldensity. Density is from
 		     * 0..100 percent: */
@@ -941,11 +941,11 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 			idx = halftone_num - 1;
 		    SelectObject(hdc, halftone_brush[idx]);
 		    break;
-		case FS_PATTERN: 
+		case FS_PATTERN:
 		    /* style == 2 --> use fill pattern according to
                      * fillpattern. Pattern number is enumerated */
-		    idx = fillstyle >> 4;  
-		    if (idx < 0) 
+		    idx = fillstyle >> 4;
+		    if (idx < 0)
 			idx = 0;
 		    if (idx > pattern_num - 1)
 			idx = 0;
@@ -1062,19 +1062,19 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 	case W_dot:
 	    dot(hdc, xdash, ydash);
 	    break;
-	case W_plus: /* do plus */ 
+	case W_plus: /* do plus */
 	    MoveTo(hdc,xdash-htic,ydash);
 	    LineTo(hdc,xdash+htic+1,ydash);
 	    MoveTo(hdc,xdash,ydash-vtic);
 	    LineTo(hdc,xdash,ydash+vtic+1);
 	    break;
-	case W_cross: /* do X */ 
+	case W_cross: /* do X */
 	    MoveTo(hdc,xdash-htic,ydash-vtic);
 	    LineTo(hdc,xdash+htic+1,ydash+vtic+1);
 	    MoveTo(hdc,xdash-htic,ydash+vtic);
 	    LineTo(hdc,xdash+htic+1,ydash-vtic-1);
 	    break;
-	case W_star: /* do star */ 
+	case W_star: /* do star */
 	    MoveTo(hdc,xdash-htic,ydash);
 	    LineTo(hdc,xdash+htic+1,ydash);
 	    MoveTo(hdc,xdash,ydash-vtic);
@@ -1084,12 +1084,12 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 	    MoveTo(hdc,xdash-htic,ydash+vtic);
 	    LineTo(hdc,xdash+htic+1,ydash-vtic-1);
 	    break;
-	case W_circle: /* do open circle */ 
+	case W_circle: /* do open circle */
 	    Arc(hdc, xdash-htic, ydash-vtic, xdash+htic+1, ydash+vtic+1,
 		xdash, ydash+vtic+1, xdash, ydash+vtic+1);
 	    dot(hdc, xdash, ydash);
 	    break;
-	case W_fcircle: /* do filled circle */ 
+	case W_fcircle: /* do filled circle */
 	    Ellipse(hdc, xdash-htic, ydash-vtic,
 		    xdash+htic+1, ydash+vtic+1);
 	    break;
@@ -1135,7 +1135,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 		    filled = 1;
 		    break;
 		}
-						
+
 		for (i = 0; i < 5; ++i) {
 		    if (pointshapes[shape][i * 2 + 1] == 0
 			&& pointshapes[shape][i * 2] == 0)
@@ -1341,7 +1341,7 @@ CopyPrint(LPGW lpgw)
 	pr.bUserAbort = FALSE;
 #ifdef WIN32
 	pr.hDlgPrint = CreateDialogParam(hdllInstance,"CancelDlgBox",hwnd,PrintDlgProc,(LPARAM)lpgw->Title);
-	SetAbortProc(printer,PrintAbortProc);  
+	SetAbortProc(printer,PrintAbortProc);
 
 	memset(&docInfo, 0, sizeof(DOCINFO));
 	docInfo.cbSize = sizeof(DOCINFO);
@@ -1357,7 +1357,7 @@ CopyPrint(LPGW lpgw)
 	lpfnAbortProc = (DLGPROC)MakeProcInstance((FARPROC)PrintAbortProc, hdllInstance);
 #  endif /* __DLL__ */
 	pr.hDlgPrint = CreateDialogParam(hdllInstance,"CancelDlgBox",hwnd,lpfnPrintDlgProc,(LPARAM)lpgw->Title);
-	Escape(printer,SETABORTPROC,0,(LPSTR)lpfnAbortProc,NULL);  
+	Escape(printer,SETABORTPROC,0,(LPSTR)lpfnAbortProc,NULL);
 	if (Escape(printer, STARTDOC, lstrlen(lpgw->Title),lpgw->Title, NULL) > 0) {
 #endif
 		SetMapMode(printer, MM_TEXT);
@@ -1444,7 +1444,7 @@ WriteGraphIni(LPGW lpgw)
 		pm = &lpgw->monopen[i];
 		wsprintf(profile, "%d %d %d %d %d",GetRValue(pc->lopnColor),
 			GetGValue(pc->lopnColor), GetBValue(pc->lopnColor),
-			(pc->lopnWidth.x != 1) ? -pc->lopnWidth.x : pc->lopnStyle, 
+			(pc->lopnWidth.x != 1) ? -pc->lopnWidth.x : pc->lopnStyle,
 			(pm->lopnWidth.x != 1) ? -pm->lopnWidth.x : pm->lopnStyle);
 		WritePrivateProfileString(section, entry, profile, file);
 	}
@@ -1573,7 +1573,7 @@ typedef struct tagLS {
 	LOGPEN	monopen[WGNUMPENS+2];	/* logical mono pens */
 } LS;
 typedef LS FAR*  LPLS;
-	
+
 
 static COLORREF
 GetColor(HWND hwnd, COLORREF ref)
@@ -1639,41 +1639,41 @@ LineStyleDlgProc(HWND hdlg, UINT wmsg, WPARAM wparam, LPARAM lparam)
 					_fstrcpy(buf,"Axis");
 				else
 			 		wsprintf(buf,"Line%d",i-1);
-				SendDlgItemMessage(hdlg, LS_LINENUM, LB_ADDSTRING, 0, 
+				SendDlgItemMessage(hdlg, LS_LINENUM, LB_ADDSTRING, 0,
 					(LPARAM)((LPSTR)buf));
 			}
 			SendDlgItemMessage(hdlg, LS_LINENUM, LB_SETCURSEL, pen, 0L);
 
-			SendDlgItemMessage(hdlg, LS_MONOSTYLE, CB_ADDSTRING, 0, 
+			SendDlgItemMessage(hdlg, LS_MONOSTYLE, CB_ADDSTRING, 0,
 				(LPARAM)((LPSTR)"Solid"));
-			SendDlgItemMessage(hdlg, LS_MONOSTYLE, CB_ADDSTRING, 0, 
+			SendDlgItemMessage(hdlg, LS_MONOSTYLE, CB_ADDSTRING, 0,
 				(LPARAM)((LPSTR)"Dash"));
-			SendDlgItemMessage(hdlg, LS_MONOSTYLE, CB_ADDSTRING, 0, 
+			SendDlgItemMessage(hdlg, LS_MONOSTYLE, CB_ADDSTRING, 0,
 				(LPARAM)((LPSTR)"Dot"));
-			SendDlgItemMessage(hdlg, LS_MONOSTYLE, CB_ADDSTRING, 0, 
+			SendDlgItemMessage(hdlg, LS_MONOSTYLE, CB_ADDSTRING, 0,
 				(LPARAM)((LPSTR)"DashDot"));
-			SendDlgItemMessage(hdlg, LS_MONOSTYLE, CB_ADDSTRING, 0, 
+			SendDlgItemMessage(hdlg, LS_MONOSTYLE, CB_ADDSTRING, 0,
 				(LPARAM)((LPSTR)"DashDotDot"));
 
 			plpm = &lpls->monopen[pen];
-			SendDlgItemMessage(hdlg, LS_MONOSTYLE, CB_SETCURSEL, 
+			SendDlgItemMessage(hdlg, LS_MONOSTYLE, CB_SETCURSEL,
 				plpm->lopnStyle, 0L);
 			wsprintf(buf,"%d",plpm->lopnWidth.x);
 			SetDlgItemText(hdlg, LS_MONOWIDTH, buf);
 
-			SendDlgItemMessage(hdlg, LS_COLORSTYLE, CB_ADDSTRING, 0, 
+			SendDlgItemMessage(hdlg, LS_COLORSTYLE, CB_ADDSTRING, 0,
 				(LPARAM)((LPSTR)"Solid"));
-			SendDlgItemMessage(hdlg, LS_COLORSTYLE, CB_ADDSTRING, 0, 
+			SendDlgItemMessage(hdlg, LS_COLORSTYLE, CB_ADDSTRING, 0,
 				(LPARAM)((LPSTR)"Dash"));
-			SendDlgItemMessage(hdlg, LS_COLORSTYLE, CB_ADDSTRING, 0, 
+			SendDlgItemMessage(hdlg, LS_COLORSTYLE, CB_ADDSTRING, 0,
 				(LPARAM)((LPSTR)"Dot"));
-			SendDlgItemMessage(hdlg, LS_COLORSTYLE, CB_ADDSTRING, 0, 
+			SendDlgItemMessage(hdlg, LS_COLORSTYLE, CB_ADDSTRING, 0,
 				(LPARAM)((LPSTR)"DashDot"));
-			SendDlgItemMessage(hdlg, LS_COLORSTYLE, CB_ADDSTRING, 0, 
+			SendDlgItemMessage(hdlg, LS_COLORSTYLE, CB_ADDSTRING, 0,
 				(LPARAM)((LPSTR)"DashDotDot"));
 
 			plpc = &lpls->colorpen[pen];
-			SendDlgItemMessage(hdlg, LS_COLORSTYLE, CB_SETCURSEL, 
+			SendDlgItemMessage(hdlg, LS_COLORSTYLE, CB_SETCURSEL,
 				plpc->lopnStyle, 0L);
 			wsprintf(buf,"%d",plpc->lopnWidth.x);
 			SetDlgItemText(hdlg, LS_COLORWIDTH, buf);
@@ -1687,16 +1687,16 @@ LineStyleDlgProc(HWND hdlg, UINT wmsg, WPARAM wparam, LPARAM lparam)
 				case LS_LINENUM:
 					wsprintf(buf,"%d",plpm->lopnWidth.x);
 					SetDlgItemText(hdlg, LS_MONOWIDTH, buf);
-					SendDlgItemMessage(hdlg, LS_MONOSTYLE, CB_SETCURSEL, 
+					SendDlgItemMessage(hdlg, LS_MONOSTYLE, CB_SETCURSEL,
 						plpm->lopnStyle, 0L);
 					wsprintf(buf,"%d",plpc->lopnWidth.x);
 					SetDlgItemText(hdlg, LS_COLORWIDTH, buf);
-					SendDlgItemMessage(hdlg, LS_COLORSTYLE, CB_SETCURSEL, 
+					SendDlgItemMessage(hdlg, LS_COLORSTYLE, CB_SETCURSEL,
 						plpc->lopnStyle, 0L);
 					UpdateColorSample(hdlg);
 					return FALSE;
 				case LS_MONOSTYLE:
-					plpm->lopnStyle = 
+					plpm->lopnStyle =
 						(UINT)SendDlgItemMessage(hdlg, LS_MONOSTYLE, CB_GETCURSEL, 0, 0L);
 					if (plpm->lopnStyle != 0) {
 						plpm->lopnWidth.x = 1;
@@ -1709,7 +1709,7 @@ LineStyleDlgProc(HWND hdlg, UINT wmsg, WPARAM wparam, LPARAM lparam)
 					GetInt(buf, (LPINT)&plpm->lopnWidth.x);
 					if (plpm->lopnWidth.x != 1) {
 						plpm->lopnStyle = 0;
-						SendDlgItemMessage(hdlg, LS_MONOSTYLE, CB_SETCURSEL, 
+						SendDlgItemMessage(hdlg, LS_MONOSTYLE, CB_SETCURSEL,
 							plpm->lopnStyle, 0L);
 					}
 					return FALSE;
@@ -1718,7 +1718,7 @@ LineStyleDlgProc(HWND hdlg, UINT wmsg, WPARAM wparam, LPARAM lparam)
 					UpdateColorSample(hdlg);
 					return FALSE;
 				case LS_COLORSTYLE:
-					plpc->lopnStyle = 
+					plpc->lopnStyle =
 						(UINT)SendDlgItemMessage(hdlg, LS_COLORSTYLE, CB_GETCURSEL, 0, 0L);
 					if (plpc->lopnStyle != 0) {
 						plpc->lopnWidth.x = 1;
@@ -1731,7 +1731,7 @@ LineStyleDlgProc(HWND hdlg, UINT wmsg, WPARAM wparam, LPARAM lparam)
 					GetInt(buf, (LPINT)&plpc->lopnWidth.x);
 					if (plpc->lopnWidth.x != 1) {
 						plpc->lopnStyle = 0;
-						SendDlgItemMessage(hdlg, LS_COLORSTYLE, CB_SETCURSEL, 
+						SendDlgItemMessage(hdlg, LS_COLORSTYLE, CB_SETCURSEL,
 							plpc->lopnStyle, 0L);
 					}
 					return FALSE;
@@ -1770,7 +1770,7 @@ LineStyleDlgProc(HWND hdlg, UINT wmsg, WPARAM wparam, LPARAM lparam)
 						plpm->lopnStyle, 0L);
 					wsprintf(buf,"%d",plpc->lopnWidth.x);
 					SetDlgItemText(hdlg, LS_COLORWIDTH, buf);
-					SendDlgItemMessage(hdlg, LS_COLORSTYLE, CB_SETCURSEL, 
+					SendDlgItemMessage(hdlg, LS_COLORSTYLE, CB_SETCURSEL,
 						plpc->lopnStyle, 0L);
 					UpdateColorSample(hdlg);
 					return FALSE;
@@ -1809,7 +1809,7 @@ LineStyle(LPGW lpgw)
 #ifndef WIN32
 	DLGPROC lpfnLineStyleDlgProc;
 #endif
-	
+
 	SetWindowLong(lpgw->hWndGraph, 4, (LONG)((LPLS)&ls));
 	_fmemcpy(&ls.colorpen, &lpgw->colorpen, (WGNUMPENS + 2) * sizeof(LOGPEN));
 	_fmemcpy(&ls.monopen, &lpgw->monopen, (WGNUMPENS + 2) * sizeof(LOGPEN));
@@ -2373,7 +2373,7 @@ Graph_put_tmptext (LPGW lpgw, int where, LPCSTR text )
 	case 0:
 		UpdateStatusLine(lpgw, text);
 		break;
-	case 1: 
+	case 1:
 		DrawZoomBox(lpgw);
 		if (zoombox.text1) {
 			free((char*)zoombox.text1);
@@ -2381,7 +2381,7 @@ Graph_put_tmptext (LPGW lpgw, int where, LPCSTR text )
 		zoombox.text1 = strdup(text);
 		DrawZoomBox(lpgw);
 		break;
-	case 2: 
+	case 2:
 		DrawZoomBox(lpgw);
 		if (zoombox.text2) {
 			free((char*)zoombox.text2);

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: time.c,v 1.15 2004/02/13 12:03:19 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: time.c,v 1.16 2004/04/13 17:24:02 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - time.c */
@@ -115,9 +115,7 @@ static char *read_int __PROTO((char *s, int nr, int *d));
 
 
 static char *
-read_int(s, nr, d)
-char *s;
-int nr, *d;
+read_int(char *s, int nr, int *d)
 {
     int result = 0;
 
@@ -144,8 +142,7 @@ static size_t xstrftime __PROTO((char *buf, size_t bufsz, const char *fmt, struc
 
 /* days in year */
 static int
-gdysize(yr)
-int yr;
+gdysize(int yr)
 {
 
     if (!(yr % 4)) {
@@ -162,10 +159,7 @@ int yr;
  * year 2000.... */
 
 char *
-gstrptime(s, fmt, tm)
-    char *s;
-    char *fmt;
-    struct tm *tm;
+gstrptime(char *s, char *fmt, struct tm *tm)
 {
     int yday, date;
 
@@ -315,11 +309,11 @@ gstrptime(s, fmt, tm)
 		/* offset from UNIX epoch (1970) to gnuplot epoch */
 		static const long epoch_offset
 		    = (long)((ZERO_YEAR - 1970) * 365.25) * DAY_SEC;
-		
+
 		when = strtod (s, &s) - epoch_offset;
 		ggmtime(tm, when);
 		break;
-	    }		
+	    }
 #endif
 	default:
 	    int_warn(DATAFILE, "Bad time format in string");
@@ -398,11 +392,7 @@ gstrptime(s, fmt, tm)
 }
 
 size_t
-gstrftime(s, bsz, fmt, l_clock)
-char *s;
-size_t bsz;
-const char *fmt;
-double l_clock;
+gstrftime(char *s, size_t bsz, const char *fmt, double l_clock)
 {
     struct tm tm;
 
@@ -418,11 +408,11 @@ double l_clock;
 
 
 static size_t
-xstrftime(str, bsz, fmt, tm)
-    char *str;			/* output buffer */
-    size_t bsz;			/* space available */
-    const char *fmt;
-    struct tm *tm;
+xstrftime(
+    char *str,			/* output buffer */
+    size_t bsz,			/* space available */
+    const char *fmt,
+    struct tm *tm)
 {
     size_t l = 0;			/* chars written so far */
 
@@ -463,7 +453,7 @@ xstrftime(str, bsz, fmt, tm)
 		    CHECK_SPACE(strlen(z)) ;	\
 		    strcpy(s, z);		\
 		} while (0)
-		
+
 		/* format a string, using default spec if none given w
 		 * and z are width and zero-flag dw and dz are the
 		 * defaults for these In fact, CHECK_SPACE(w) is not a
@@ -660,8 +650,7 @@ xstrftime(str, bsz, fmt, tm)
 
 /* time_t  */
 double
-gtimegm(tm)
-struct tm *tm;
+gtimegm(struct tm *tm)
 {
     register int i;
     /* returns sec from year ZERO_YEAR, defined in plot.h */
@@ -699,10 +688,7 @@ struct tm *tm;
 }
 
 int
-ggmtime(tm, l_clock)
-struct tm *tm;
-/* time_t l_clock; */
-double l_clock;
+ggmtime(struct tm *tm, double l_clock)
 {
     /* l_clock is relative to ZERO_YEAR, jan 1, 00:00:00,defined in plot.h */
     int i, days;
@@ -765,27 +751,20 @@ double l_clock;
 /* define gnu time routines in terms of system time routines */
 
 size_t
-gstrftime(buf, bufsz, fmt, l_clock)
-char *buf;
-size_t bufsz;
-const char *fmt;
-double l_clock;
+gstrftime(char *buf, size_t bufsz, const char *fmt, double l_clock)
 {
     time_t t = (time_t) l_clock;
     return strftime(buf, bufsz, fmt, gmtime(&t));
 }
 
 double
-gtimegm(tm)
-struct tm *tm;
+gtimegm(struct tm *tm)
 {
     return (double) mktime(tm);
 }
 
 int
-ggmtime(tm, l_clock)
-struct tm *tm;
-double l_clock;
+ggmtime(struct tm *tm, double l_clock)
 {
     time_t t = (time_t) l_clock;
     struct tm *m = gmtime(&t);
@@ -796,10 +775,7 @@ double l_clock;
 /* supplemental routine gstrptime() to read a formatted time */
 
 char *
-gstrptime(s, fmt, tm)
-    char *s;
-    char *fmt;
-    struct tm *tm;
+gstrptime(char *s, char *fmt, struct tm *tm)
 {
     FPRINTF((stderr, "gstrptime(\"%s\", \"%s\")\n", s, fmt));
 
@@ -879,9 +855,7 @@ gstrptime(s, fmt, tm)
 
 
 int
-main(argc, argv)
-int argc;
-char *argv[];
+main(int argc, char *argv[])
 {
     char output[80];
 

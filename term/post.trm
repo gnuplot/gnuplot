@@ -1,5 +1,5 @@
-/*
- * $Id: post.trm,v 1.108 2004/05/27 07:58:10 mikulik Exp $
+/* Hello, Emacs: this is -*-C-*- !
+ * $Id: post.trm,v 1.109 2004/06/30 19:56:20 broeker Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -43,11 +43,11 @@
  *
  * modified 10/5/95 by drd - put in support for other postscript drivers
  * (enhpost, pslatex, ...) so they dont have to work quite so hard
- * 
+ *
  * send your comments or suggestions to (gnuplot-info@lists.sourceforge.net).
  *
- * The 'postscript' driver produces landscape output 10" wide and 7" high.  
- * To change font to Times-Roman and font size to 20pts use 
+ * The 'postscript' driver produces landscape output 10" wide and 7" high.
+ * To change font to Times-Roman and font size to 20pts use
  * 'set term postscript "Times-Roman" 20'.
  * To get a smaller (5" x 3.5") eps output use 'set term post eps'
  * and make only one plot per file.  Font size for eps will be half
@@ -99,7 +99,7 @@ TERM_PUBLIC void ENHPS_OPEN __PROTO((char * fontname, double fontsize,
 	    		double base, TBOOLEAN widthflag, TBOOLEAN showflag,
 			int overprint));
 TERM_PUBLIC void ENHPS_FLUSH __PROTO((void));
-TERM_PUBLIC void ENHPS_WRITEC __PROTO((char c));
+TERM_PUBLIC void ENHPS_WRITEC __PROTO((int c));
 TERM_PUBLIC char *PS_RememberFont __PROTO((char *fname, int reencode));
 
 #endif /* TERM_PROTO */
@@ -128,14 +128,14 @@ static int ps_fontsize = 14;					 /* size of font in pts */
 
 #ifdef PM3D
 static int ps_palfunc_samples = 2000;        /* setable via "palf$uncparam" */
-static double ps_palfunc_deviation = 0.003;  /* terminal option */ 
-static void make_interpolation_code __PROTO(());
-static void make_color_model_code __PROTO(());
+static double ps_palfunc_deviation = 0.003;  /* terminal option */
+static void make_interpolation_code __PROTO((void));
+static void make_color_model_code __PROTO((void));
 static char * save_space __PROTO(( double gray ));
 static void write_component_array __PROTO(( const char *text, gradient_struct *grad, int cnt, int offset ));
 static void write_gradient_definition __PROTO(( gradient_struct *gradient, int cnt ));
 static void write_color_space __PROTO(( t_sm_palette *palette ));
-static void make_palette_formulae __PROTO(());
+static void make_palette_formulae __PROTO((void));
 #endif /* PM3D */
 
 /* for enhanced mode, we keep a separate font name and size, which
@@ -183,19 +183,19 @@ static const char GPFAR * GPFAR PS_header[] = {
 "/R {rmoveto} bind def\n",
 "/V {rlineto} bind def\n",
 "/N {newpath moveto} bind def\n",
-"/C {setrgbcolor} bind def\n", 
+"/C {setrgbcolor} bind def\n",
 "/f {rlineto fill} bind def\n",
 "/vpt2 vpt 2 mul def\n",
 "/hpt2 hpt 2 mul def\n",
 /* flush left show */
 "/Lshow { currentpoint stroke M\n",
-"  0 vshift R show } def\n", 
+"  0 vshift R show } def\n",
 /* flush right show */
 "/Rshow { currentpoint stroke M\n",
-"  dup stringwidth pop neg vshift R show } def\n", 
+"  dup stringwidth pop neg vshift R show } def\n",
 /* centred show */
 "/Cshow { currentpoint stroke M\n",
-"  dup stringwidth pop -2 div vshift R show } def\n", 
+"  dup stringwidth pop -2 div vshift R show } def\n",
 /* set pointsize */
 "/UP { dup vpt_ mul /vpt exch def hpt_ mul /hpt exch def\n",
 "  /hpt2 hpt 2 mul def /vpt2 vpt 2 mul def } def\n",
@@ -279,7 +279,7 @@ static const char GPFAR * GPFAR PS_header[] = {
 
 /* Matt Heffron: added a few more types */
 /* Triangle Down */
-"/TriD { stroke [] 0 setdash 2 copy vpt 1.12 mul sub M\n", 
+"/TriD { stroke [] 0 setdash 2 copy vpt 1.12 mul sub M\n",
 "  hpt neg vpt 1.62 mul V\n",
 "  hpt 2 mul 0 V\n",
 "  hpt neg vpt -1.62 mul V closepath stroke\n",
@@ -437,7 +437,7 @@ static const char GPFAR * GPFAR PS_header[] = {
 "  hpt neg vpt 1.62 mul V closepath stroke } def\n",
 
 /* Triangle Down */
-"/TriDE { stroke [] 0 setdash vpt 1.12 mul sub M\n", 
+"/TriDE { stroke [] 0 setdash vpt 1.12 mul sub M\n",
 "  hpt neg vpt 1.62 mul V\n",
 "  hpt 2 mul 0 V\n",
 "  hpt neg vpt -1.62 mul V closepath stroke } def\n",
@@ -472,7 +472,7 @@ static const char GPFAR * GPFAR PS_header[] = {
 "  hpt neg vpt 1.62 mul V Opaque stroke } def\n",
 
 /* Triangle Down */
-"/TriDW { stroke [] 0 setdash vpt 1.12 mul sub M\n", 
+"/TriDW { stroke [] 0 setdash vpt 1.12 mul sub M\n",
 "  hpt neg vpt 1.62 mul V\n",
 "  hpt 2 mul 0 V\n",
 "  hpt neg vpt -1.62 mul V Opaque stroke } def\n",
@@ -564,15 +564,15 @@ static const char GPFAR * GPFAR ENHPS_header[] = {
 
 /* flush left show */
 "/MLshow { currentpoint stroke M\n",
-"  0 exch R MFshow } bind def\n", 
+"  0 exch R MFshow } bind def\n",
 
 /* flush right show */
 "/MRshow { currentpoint stroke M\n",
-"  exch dup MFwidth neg 3 -1 roll R MFshow } def\n", 
+"  exch dup MFwidth neg 3 -1 roll R MFshow } def\n",
 
 /* centred show */
 "/MCshow { currentpoint stroke M\n",
-"  exch dup MFwidth -2 div 3 -1 roll R MFshow } def\n", 
+"  exch dup MFwidth -2 div 3 -1 roll R MFshow } def\n",
 NULL
 };
 
@@ -590,11 +590,9 @@ static char PS_default_font[MAX_ID_LEN+1] = {'\0'};
  * if so, return NULL. If not, reencode it if allowed to, otherwise
  * return an appropriate re-encode string
  */
- 
+
 TERM_PUBLIC char *
-PS_RememberFont(fname, can_reencode)
-char *fname;
-int can_reencode;
+PS_RememberFont(char *fname, int can_reencode)
 {
     struct PS_FontName *fnp;
     char *recode = NULL;
@@ -608,7 +606,7 @@ int can_reencode;
 	    return NULL;
 
     /* we did not find the name */
-   
+
     fnp = (struct PS_FontName *)gp_alloc(sizeof(struct PS_FontName),
 					 "PostScript Font record");
     fnp->name = gp_strdup(myfname);
@@ -628,7 +626,7 @@ int can_reencode;
     case S_ENC_CP437:
 	recode = "reencodeCP437 def\n";
 	break;
-    case S_ENC_CP850 : 
+    case S_ENC_CP850 :
 	recode = "reencodeCP850 def\n";
 	break;
     case S_ENC_CP852 :
@@ -740,7 +738,7 @@ PS_options()
 	    ps_duplex_option = FALSE;
 	    ps_rounded = FALSE;
 	    while (first_ps_fontfile != NULL) {
-		delete_ps_fontfile((struct ps_fontfile_def *) NULL, 
+		delete_ps_fontfile((struct ps_fontfile_def *) NULL,
 				   first_ps_fontfile);
 		first_ps_fontfile = NULL;
 	    }
@@ -826,7 +824,7 @@ PS_options()
         case PS_FONTFILE: {
             TBOOLEAN deleteentry = FALSE;
             c_token++;
-           
+
             if (!isstring(c_token)) {
                 if (equals(c_token, "add"))
                     c_token++;
@@ -840,21 +838,21 @@ PS_options()
                 TBOOLEAN filename_doubled = FALSE;
                 struct ps_fontfile_def *curr_ps_fontfile = first_ps_fontfile;
                 struct ps_fontfile_def *prev_ps_fontfile = NULL;
-                struct ps_fontfile_def *new_ps_fontfile = 
-                     gp_alloc(sizeof(struct ps_fontfile_def), 
+                struct ps_fontfile_def *new_ps_fontfile =
+                     gp_alloc(sizeof(struct ps_fontfile_def),
                              "new_ps_fontfile");
- 
-                new_ps_fontfile->fontfile_name = 
-                    gp_alloc (token_len(c_token), 
+
+                new_ps_fontfile->fontfile_name =
+                    gp_alloc (token_len(c_token),
                               "new_ps_fontfile->fontfile_name");
-                quote_str(new_ps_fontfile->fontfile_name, 
+                quote_str(new_ps_fontfile->fontfile_name,
                           c_token, token_len(c_token));
                 gp_expand_tilde(&(new_ps_fontfile->fontfile_name));
 		if (!deleteentry) {
 #if defined(PIPES)
 		    if ( *(new_ps_fontfile->fontfile_name) != '<' ) {
 #endif
-			new_ps_fontfile->fontfile_fullname = 
+			new_ps_fontfile->fontfile_fullname =
 			    fontpath_fullname(new_ps_fontfile->fontfile_name);
 			if (!new_ps_fontfile->fontfile_fullname)
 			    int_error(c_token, "Font file '%s' not found",
@@ -884,7 +882,7 @@ PS_options()
                                    new_ps_fontfile->fontfile_name) == 0) {
                             filename_doubled = TRUE;
                             if (deleteentry) {
-				delete_ps_fontfile(prev_ps_fontfile, 
+				delete_ps_fontfile(prev_ps_fontfile,
 						   curr_ps_fontfile);
                                 curr_ps_fontfile = NULL;
                                 break;
@@ -914,7 +912,7 @@ PS_options()
         }
         case PS_NOFONTFILES:
 	    while (first_ps_fontfile != NULL) {
-		delete_ps_fontfile((struct ps_fontfile_def *) NULL, 
+		delete_ps_fontfile((struct ps_fontfile_def *) NULL,
 				   first_ps_fontfile);
 		first_ps_fontfile = NULL;
 	    }
@@ -953,14 +951,14 @@ PS_options()
 	ps_blacktext = TRUE;
 
     sprintf(PS_default_font,"%s,%d",ps_font,ps_fontsize);
-  
+
     if (first_ps_fontfile) {
 	struct ps_fontfile_def *curr_ps_fontfile = first_ps_fontfile;
 	unsigned int totlength = 0;
 	char *running;
 
 	while (curr_ps_fontfile) {
-	    totlength += strlen(curr_ps_fontfile->fontfile_name) + 
+	    totlength += strlen(curr_ps_fontfile->fontfile_name) +
 		strlen(" fontfile \"\"");
 	    curr_ps_fontfile = curr_ps_fontfile->next;
 	}
@@ -974,7 +972,7 @@ PS_options()
 	    curr_ps_fontfile = curr_ps_fontfile->next;
 	}
     }
-  
+
     /* HBB 19990823: fixed the options string. It violated the 'save
      * loadable output' rule */
     sprintf(term_options,"%s %senhanced %s %s \\\n"
@@ -1010,9 +1008,7 @@ static unsigned int ps_common_xoff, ps_common_yoff;
 
 
 TERM_PUBLIC void
-PS_load_fontfile(current_ps_fontfile,doload)
-     struct ps_fontfile_def *current_ps_fontfile;
-     TBOOLEAN doload;
+PS_load_fontfile(struct ps_fontfile_def *current_ps_fontfile, TBOOLEAN doload)
 {
     if (current_ps_fontfile) {
 	unsigned int linesread = 0;
@@ -1025,6 +1021,7 @@ PS_load_fontfile(current_ps_fontfile,doload)
 	char *envcmd = NULL;
 	TBOOLEAN ispipe = FALSE;
 #endif
+
 	ext[0] = '\0';
 	cmd[0] = '\0';
 
@@ -1038,14 +1035,14 @@ PS_load_fontfile(current_ps_fontfile,doload)
 	    /* Filename is given */
 #endif
 	    if ( strlen(current_ps_fontfile->fontfile_name) > 3 )
-		strcpy(ext, current_ps_fontfile->fontfile_name + 
+		strcpy(ext, current_ps_fontfile->fontfile_name +
 		       strlen(current_ps_fontfile->fontfile_name) - 3);
 	    else
 		strcpy(ext, current_ps_fontfile->fontfile_name);
 
 	    /* make extension lowercase for comparison */
 	    lower_case(ext);
-	    
+
 	    if (!current_ps_fontfile->fontfile_fullname)
 		int_error(NO_CARET, "Font file '%s' not found",
 			  current_ps_fontfile->fontfile_name);
@@ -1074,7 +1071,7 @@ PS_load_fontfile(current_ps_fontfile,doload)
 		sprintf(cmd,"ttf2pt1 -a -e -W 0 %s -",
 			current_ps_fontfile->fontfile_fullname);
 	    if (strlen(cmd) == 0)
-		int_error(NO_CARET, 
+		int_error(NO_CARET,
 			  "No command for automatic font conversion ttf->pfa defined");
 	    else {
 		ffont = popen(cmd,"r");
@@ -1082,7 +1079,7 @@ PS_load_fontfile(current_ps_fontfile,doload)
 		    int_error(NO_CARET,"Could not execute command '%s'", cmd);
 	    }
 #else
-	    os_error(NO_CARET, 
+	    os_error(NO_CARET,
 		     "Automatic font conversion ttf->pfa not supported");
 #endif
 	} else if ( strcmp(ext,"pfb") == 0 ) {
@@ -1096,7 +1093,7 @@ PS_load_fontfile(current_ps_fontfile,doload)
 		sprintf(cmd,"pfbtops %s",
 			current_ps_fontfile->fontfile_fullname);
 	    if (strlen(cmd) == 0)
-		int_error(NO_CARET, 
+		int_error(NO_CARET,
 			  "No command for automatic font conversion pfb->pfa defined");
 	    else {
 		ffont = popen(cmd,"r");
@@ -1104,14 +1101,14 @@ PS_load_fontfile(current_ps_fontfile,doload)
 		    int_error(NO_CARET,"Could not execute command '%s'", cmd);
 	    }
 #else
-	    os_error(NO_CARET, 
+	    os_error(NO_CARET,
 		     "Automatic font conversion pfb->pfa not supported");
 #endif
 	} else {
 	    /* PFA */
 	    if ( strcmp(ext,"pfa") != 0 )
-		int_warn(NO_CARET, 
-			 "Font file '%s' has unknown extension. Assume it is a pfa file", 
+		int_warn(NO_CARET,
+			 "Font file '%s' has unknown extension. Assume it is a pfa file",
 			 current_ps_fontfile->fontfile_name);
 	    ffont = fopen(current_ps_fontfile->fontfile_fullname, "r");
 	    if (!ffont)
@@ -1121,7 +1118,7 @@ PS_load_fontfile(current_ps_fontfile,doload)
 	/* read the file */
 	while (fgets(line,255,ffont)) {
 	    /* test file format */
-	    if ( (linesread == 0) && 
+	    if ( (linesread == 0) &&
 		 (strstr(line,"%!PS-AdobeFont") != line) &&
 		 (strstr(line,"%!FontType1") != line) ) {
 #if defined(PIPES)
@@ -1131,7 +1128,7 @@ PS_load_fontfile(current_ps_fontfile,doload)
 			     cmd);
 		else
 #endif
-		    int_warn(NO_CARET, 
+		    int_warn(NO_CARET,
 			     "Font file '%s' seems not to be a PFA file",
 			     current_ps_fontfile->fontfile_name);
 	    }
@@ -1145,15 +1142,15 @@ PS_load_fontfile(current_ps_fontfile,doload)
 		/* Print font name */
 		if (!doload) {
 		    if (current_ps_fontfile->fontfile_fullname)
-			fprintf(stderr, 
+			fprintf(stderr,
 				"Font file '%s' contains the font '%s'. Location:\n   %s\n",
-				current_ps_fontfile->fontfile_name, 
+				current_ps_fontfile->fontfile_name,
 				fontname,
 				current_ps_fontfile->fontfile_fullname);
 		    else
-			fprintf(stderr, 
+			fprintf(stderr,
 				"Pipe '%s' contains the font '%s'.\n",
-				current_ps_fontfile->fontfile_name, 
+				current_ps_fontfile->fontfile_name,
 				fontname);
 #if defined(PIPES)
 		    /* Stop reading font file in order to save time */
@@ -1216,10 +1213,10 @@ PS_load_fontfile(current_ps_fontfile,doload)
 
 
 TERM_PUBLIC void
-PS_load_fontfiles(doload)
-     TBOOLEAN doload;
+PS_load_fontfiles(TBOOLEAN doload)
 {
     struct ps_fontfile_def *current_ps_fontfile=first_ps_fontfile;
+
     while (current_ps_fontfile) {
 	PS_load_fontfile(current_ps_fontfile,doload);
 	current_ps_fontfile = current_ps_fontfile->next;
@@ -1228,13 +1225,14 @@ PS_load_fontfiles(doload)
 
 
 TERM_PUBLIC void
-PS_common_init(encap, portrait, uses_fonts, xoff, yoff, bb_xmin, bb_ymin, bb_xmax, bb_ymax, dict)
-int encap; /* encapsulated or not - 1 for pslatex */
-int portrait; /* 1 for pslatex */
-int uses_fonts; /* 0 for ps(la)tex */
-unsigned int xoff, yoff; /* how much to translate by */
-unsigned int bb_xmin, bb_ymin, bb_xmax, bb_ymax; /* bounding box */
-const char **dict; /* extra entries for the dictionary */
+PS_common_init(
+    int encap,			/* encapsulated or not - 1 for pslatex */
+    int portrait,		/* 1 for pslatex */
+    int uses_fonts,		/* 0 for ps(la)tex */
+    unsigned int xoff, unsigned int yoff, /* how much to translate by */
+    unsigned int bb_xmin, unsigned int bb_ymin,
+    unsigned int bb_xmax, unsigned int bb_ymax, /* bounding box */
+    const char **dict) /* extra entries for the dictionary */
 {
     static const char GPFAR psi1[] = "\
 %%%%Creator: gnuplot %s patchlevel %s\n\
@@ -1691,7 +1689,7 @@ NULL };
 
     if (dict)
 	while (*dict)
-	    fputs(*(dict++), gpoutfile);	
+	    fputs(*(dict++), gpoutfile);
 
     PS_load_fontfiles(TRUE);
 
@@ -1793,8 +1791,8 @@ PS_reset()
 {
     fputs("%%Trailer\n", gpoutfile);
 
-    /* I think the following commands should be executed 
-       `if (ps_common_uses_fonts)`. So I changed the next line. 
+    /* I think the following commands should be executed
+       `if (ps_common_uses_fonts)`. So I changed the next line.
        Please see "PS_RememberFont", too.                       */  /* JFi */
 
     /*	if (!ps_common_uses_fonts) {  */                             /* JFi */
@@ -1815,8 +1813,7 @@ PS_reset()
 
 
 TERM_PUBLIC void
-PS_linetype(linetype)
-    int linetype;
+PS_linetype(int linetype)
 {
     linetype = (linetype % 9) + 3;
     if (linetype < 0)	/* LT_NODRAW, LT_BACKGROUND, LT_UNDEFINED */
@@ -1843,8 +1840,7 @@ PS_linetype(linetype)
 
 
 TERM_PUBLIC void
-PS_linewidth (linewidth)
-    double linewidth;
+PS_linewidth (double linewidth)
 {
     /* HBB NEW 20031219: don't do anything if nothing changed */
     if (ps_path_count != 0 && PS_linewidth_last == linewidth)
@@ -1855,7 +1851,7 @@ PS_linewidth (linewidth)
     PS_FLUSH_PATH;
     fprintf(gpoutfile,"%.3f UL\n",linewidth);
 
-    /*  
+    /*
 	Documentation of the 'change linewidth' strategy of the postscript terminal:
 
 	1. define a new postscript variable with a default value:
@@ -1880,19 +1876,18 @@ PS_linewidth (linewidth)
 
 
 TERM_PUBLIC void
-PS_pointsize (ptsize)
-double ptsize;
+PS_pointsize (double ptsize)
 {
     fprintf(gpoutfile,"%.3f UP\n",ptsize);
 
-/*  
+/*
  *  Documentation of the 'change pointsize' strategy of the postscript
  * terminal:
  *
  * 1. define two new postscript variables to hold the overall pointsize:
  *    /hpt_  and  /vpt_
  *
- * 2. define a new postscript command to use the contents of these variables: 
+ * 2. define a new postscript command to use the contents of these variables:
  *    /UP { cf. definition above } def
  *    usage:  multiplication_factor UP
  *
@@ -1904,15 +1899,14 @@ double ptsize;
  *        4.0 UL  % optionally change linewidth, too
  *        LT0
  *    result:
- *        Next symbols will be drawn 2.5 times as big as defined by the 
+ *        Next symbols will be drawn 2.5 times as big as defined by the
  *        GNUPLOT `set pointsize` command (= overall pointsize).
  */
 }
 
 
 TERM_PUBLIC void
-PS_move(x,y)
-    unsigned int x,y;
+PS_move(unsigned int x, unsigned int y)
 {
     /* Make this semi-dynamic and independent of architecture */
     char abso[5+2*INT_STR_LEN], rel[5+2*INT_STR_LEN];
@@ -1939,8 +1933,7 @@ PS_move(x,y)
 }
 
 TERM_PUBLIC void
-PS_vector(x,y)
-    unsigned int x,y;
+PS_vector(unsigned int x, unsigned int y)
 {
     char abso[5+2*INT_STR_LEN], rel[5+2*INT_STR_LEN];
     int dx = x - PS_pen_x;
@@ -1951,13 +1944,13 @@ PS_vector(x,y)
 
     sprintf(abso, "%d %d L\n", x, y);
     sprintf(rel, "%d %d V\n", dx, dy);
-    
+
     /* The following PS_move() is executed only when the limit of ps_path_count
      * has been reached below: then PS_FLUSH_PATH has been called which has not
      * moved to currentpoint after the stroke. */
     if (!PS_relative_ok)
 	PS_move(PS_pen_x, PS_pen_y);
-    
+
     if (strlen(rel) < strlen(abso)) {
 	fputs(rel, gpoutfile);
 	PS_taken++;
@@ -1969,7 +1962,7 @@ PS_vector(x,y)
     PS_pen_x = x;
     PS_pen_y = y;
     /* Ghostscript has a "pile-up of rounding errors" bug: a sequence of many
-     * rmove's or rlineto's does not give the same line made aby move's or 
+     * rmove's or rlineto's does not give the same line made aby move's or
      * lineto's.
      * Therefore, let us do a stroke very often. There was a case when 400
      * rlineto's were too much, so let's go a little bit higher than the default
@@ -1992,9 +1985,7 @@ PS_vector(x,y)
 
 
 TERM_PUBLIC void
-PS_put_text(x,y,str)
-    unsigned int x, y;
-    const char *str;
+PS_put_text(unsigned int x, unsigned int y, const char *str)
 {
     char ch;
 
@@ -2036,8 +2027,7 @@ PS_put_text(x,y,str)
 
 
 TERM_PUBLIC int
-PS_text_angle(ang)
-int ang;
+PS_text_angle(int ang)
 {
     ps_ang = ang;
     return TRUE;
@@ -2045,8 +2035,7 @@ int ang;
 
 
 TERM_PUBLIC int
-PS_justify_text(mode)
-enum JUSTIFY mode;
+PS_justify_text(enum JUSTIFY mode)
 {
     ps_justify = mode;
     return TRUE;
@@ -2054,8 +2043,7 @@ enum JUSTIFY mode;
 
 
 TERM_PUBLIC int
-PS_set_font(font)  /* Entry font added by DJL */
-const char *font;
+PS_set_font(const char *font)
 {
     char name[32];
     int  i,size;
@@ -2083,9 +2071,7 @@ const char *font;
 
 
 TERM_PUBLIC void
-PS_point(x,y,number)
-    unsigned int x,y;
-    int number;
+PS_point(unsigned int x, unsigned int y, int number)
 {
     static const char GPFAR * GPFAR pointFNS[] = {
 	"Pnt",  "Pls",   "Crs",    "Star",
@@ -2120,9 +2106,10 @@ PS_point(x,y,number)
 }
 
 TERM_PUBLIC void
-PS_fillbox(style, x1,y1,width,height)
-    int style;
-    unsigned int x1,y1,width,height;
+PS_fillbox(
+    int style,
+    unsigned int x1, unsigned int y1,
+    unsigned int width, unsigned int height)
 {
 #if USE_ULIG_FILLEDBOXES
     double filldens;
@@ -2133,7 +2120,7 @@ PS_fillbox(style, x1,y1,width,height)
 
 #if USE_ULIG_FILLEDBOXES
     switch( style & 0xf ) {
-    
+
     case FS_SOLID:
 	/* style == 1 --> fill with intensity according to filldensity */
         filldens = (style >> 4) / 100.0;
@@ -2144,8 +2131,8 @@ PS_fillbox(style, x1,y1,width,height)
         fprintf(gpoutfile, "%.3f %d %d %d %d BoxColFill\n",
 		filldens, x1,y1, width,height);
         break;
-	
-    case FS_PATTERN: 
+
+    case FS_PATTERN:
 	/* style == 2 --> fill with pattern according to fillpattern */
 	/* the upper 3 nibbles of 'style' contain pattern number */
 	pattern = (style >> 4) % 8;
@@ -2183,8 +2170,8 @@ PS_fillbox(style, x1,y1,width,height)
 			x1, y1, width, height, 40, -30);
 		break;
 	}
-        break; /* end of pattern filling part */ 
-	
+        break; /* end of pattern filling part */
+
     default: /* style == 0 or unknown --> fill with background color */
         fprintf(gpoutfile, "%d %d %d %d BoxFill\n", x1, y1, width, height);
     }
@@ -2204,7 +2191,7 @@ static TBOOLEAN ENHps_opened_string;  /* try to cut out empty ()'s */
 /*
  * close a postscript string if it has been opened
  */
-TERM_PUBLIC void 
+TERM_PUBLIC void
 ENHPS_FLUSH()
 {
     if (ENHps_opened_string) {
@@ -2216,12 +2203,12 @@ ENHPS_FLUSH()
 /*
  * open a postscript string
  */
-TERM_PUBLIC void 
-ENHPS_OPEN(fontname, fontsize, base, widthflag, showflag, overprint)
-    char *fontname;
-    TBOOLEAN widthflag, showflag;
-    double fontsize, base;
-    int overprint;
+TERM_PUBLIC void
+ENHPS_OPEN(
+    char *fontname,
+    double fontsize, double base,
+    TBOOLEAN widthflag, TBOOLEAN showflag,
+    int overprint)
 {
     /* overprint 3 means save current position; 4 means restore saved position */
     /* EAM FIXME - I couldn't figure out how to use less than the 7 parameters */
@@ -2248,8 +2235,8 @@ ENHPS_OPEN(fontname, fontsize, base, widthflag, showflag, overprint)
 /*
  * write one or more characters from inside enhanced text processing
  */
-TERM_PUBLIC void 
-ENHPS_WRITEC(char c)
+TERM_PUBLIC void
+ENHPS_WRITEC(int c)
 {
     fputc(c, gpoutfile);
 }
@@ -2260,8 +2247,7 @@ ENHPS_WRITEC(char c)
  */
 
 TERM_PUBLIC int
-ENHPS_set_font(font)  /* Entry font added by DJL */
-const char *font;
+ENHPS_set_font(const char *font)
 {
     if (ignore_enhanced_text)
 	return PS_set_font(font);
@@ -2285,9 +2271,7 @@ const char *font;
 }
 
 TERM_PUBLIC void
-ENHPS_put_text(x, y, str)
-    unsigned int x, y;
-    const char *str;
+ENHPS_put_text(unsigned int x, unsigned int y, const char *str)
 {
     if (ignore_enhanced_text) {
 	PS_put_text(x,y,str);
@@ -2394,23 +2378,23 @@ static void make_palette_formulae()
 /* print the definition of R,G,B formulae */
   fputs("/InterpolatedColor false def\n",gpoutfile);
 if (sm_palette.ps_allcF == 0) { /* print only those 3 used formulae */
-    fprintf( gpoutfile, "/cF%i {%s} bind def\t%% %s\n", 
-	     abs(R), ps_math_color_formulae[ 2*abs(R) ], 
+    fprintf( gpoutfile, "/cF%i {%s} bind def\t%% %s\n",
+	     abs(R), ps_math_color_formulae[ 2*abs(R) ],
 	     ps_math_color_formulae[ 2*abs(R)+1 ]);
     if (abs(G) != abs(R))
-      fprintf( gpoutfile, "/cF%i {%s} bind def\t%% %s\n", 
-	       abs(G), ps_math_color_formulae[ 2*abs(G) ], 
+      fprintf( gpoutfile, "/cF%i {%s} bind def\t%% %s\n",
+	       abs(G), ps_math_color_formulae[ 2*abs(G) ],
 	       ps_math_color_formulae[ 2*abs(G)+1 ]);
     if ((abs(B) != abs(R)) && (abs(B) != abs(G)))
-      fprintf( gpoutfile, "/cF%i {%s} bind def\t%% %s\n", 
-	       abs(B), ps_math_color_formulae[ 2*abs(B) ], 
+      fprintf( gpoutfile, "/cF%i {%s} bind def\t%% %s\n",
+	       abs(B), ps_math_color_formulae[ 2*abs(B) ],
 	       ps_math_color_formulae[ 2*abs(B)+1 ]);
     }
   else { /* all color formulae are written into the output PostScript file */
     int i = 0;
     while ( *(ps_math_color_formulae[2*i]) ) {
-      fprintf( gpoutfile, "/cF%i {%s} bind def\t%% %s\n", 
-	       i, ps_math_color_formulae[ 2*i ], 
+      fprintf( gpoutfile, "/cF%i {%s} bind def\t%% %s\n",
+	       i, ps_math_color_formulae[ 2*i ],
 	       ps_math_color_formulae[ 2*i+1 ]);
       i++;
       }
@@ -2490,13 +2474,13 @@ static void make_color_model_code()
 
 static char *save_space( double gray )
 {
-    /* printing the gray with 4 digits and without the leading 0 
+    /* printing the gray with 4 digits and without the leading 0
      * ... saving space */
     static char s[40];
 
     gray = 0.0001*(int)(gray*10000+0.5); /* round it to 4 digits */
     sprintf( s, "%.4g", gray );
-    if ( s[0] == '0' && s[1] == '.' ) 
+    if ( s[0] == '0' && s[1] == '.' )
         return &(s[1]);  /* strip leading 0 */
     else
         return s;
@@ -2515,7 +2499,7 @@ static void write_color_space( t_sm_palette *palette )
       case C_MODEL_CMY: fputs( "(CMY)", gpoutfile ); break;
       case C_MODEL_YIQ: fputs( "(YIQ)", gpoutfile ); break;
       case C_MODEL_XYZ: fputs( "(XYZ)", gpoutfile ); break;
-      default:  
+      default:
 	fprintf(stderr,"%s:%d ooops: Unkown color model '%c'. Will be RGB\n",
 		__FILE__, __LINE__, (char)(palette->cmodel) );
 	fputs( "(RGB)", gpoutfile ); break;
@@ -2524,12 +2508,12 @@ static void write_color_space( t_sm_palette *palette )
 }
 
 
-static void write_component_array( const char *text, gradient_struct *grad, 
+static void write_component_array( const char *text, gradient_struct *grad,
 				   int cnt, int offset )
 {
     /*  write someting like
      *     /RedA [ 0 .1 .2 .3 .35 .3 .2 .1 0 0 0 ] def
-     *  nicely formated to gpoutfile 
+     *  nicely formated to gpoutfile
      */
     int i=0, len=0;
     char *val;
@@ -2555,7 +2539,7 @@ static void write_gradient_definition( gradient_struct *gradient, int cnt )
     int r = (char*)(&(gradient[0].col.r)) - ref;
     int g = (char*)(&(gradient[0].col.g)) - ref;
     int b = (char*)(&(gradient[0].col.b)) - ref;
-    
+
     write_component_array( "GrayA", gradient, cnt, p );
     write_component_array( "RedA", gradient, cnt, r );
     write_component_array( "GreenA", gradient, cnt, g );
@@ -2563,7 +2547,7 @@ static void write_gradient_definition( gradient_struct *gradient, int cnt )
 }
 
 
-static void 
+static void
 PS_make_header(t_sm_palette *palette)
 {
     /* write header for smooth colors */
@@ -2582,7 +2566,7 @@ PS_make_header(t_sm_palette *palette)
 	gradient_struct *gradient;
 	fputs("/InterpolatedColor true def\n",gpoutfile);
 	make_interpolation_code();
-	gradient = approximate_palette( palette, ps_palfunc_samples, 
+	gradient = approximate_palette( palette, ps_palfunc_samples,
 					ps_palfunc_deviation, &cnt );
 	write_gradient_definition( gradient, cnt );
 	free( gradient );
@@ -2608,19 +2592,24 @@ PS_make_header(t_sm_palette *palette)
 #define R sm_palette.formulaR
 #define G sm_palette.formulaG
 #define B sm_palette.formulaB
-fprintf(gpoutfile,"Color %s and { %% COLOUR vs. GRAY map\n",
+
+    fprintf(gpoutfile,"Color %s and { %% COLOUR vs. GRAY map\n",
 	    (sm_palette.colorMode!=SMPAL_COLOR_MODE_GRAY) ? "true":"false" );
     fputs("  InterpolatedColor { %% Interpolation vs. RGB-Formula\n", gpoutfile);
     fputs("    /g {stroke pm3dround /grayv exch def interpolate\n", gpoutfile);
     fputs("        SelectSpace setrgbcolor} bind def\n", gpoutfile);
     fputs("  }{\n", gpoutfile );
     fputs("  /g {stroke pm3dround dup ", gpoutfile);
-    if (R < 0) fputs("1 exch sub ", gpoutfile); /* negate */
+    if (R < 0)
+	fputs("1 exch sub ", gpoutfile); /* negate */
     fprintf(gpoutfile,"cF%i Constrain exch dup ", abs(R));
-    if (G < 0) fputs("1 exch sub ", gpoutfile); /* negate */
+    if (G < 0)
+	fputs("1 exch sub ", gpoutfile); /* negate */
     fprintf(gpoutfile,"cF%i Constrain exch ", abs(G));
-    if (R<0 || G<0 || B<0) fputs("\n\t", gpoutfile);
-    if (B < 0) fputs("1 exch sub ", gpoutfile); /* negate */
+    if (R<0 || G<0 || B<0)
+	fputs("\n\t", gpoutfile);
+    if (B < 0)
+	fputs("1 exch sub ", gpoutfile); /* negate */
     fprintf(gpoutfile,"cF%i Constrain ", abs(B));
     fputs("\n       SelectSpace setrgbcolor} bind def\n", gpoutfile);
     fputs("  } ifelse\n", gpoutfile );
@@ -2649,10 +2638,10 @@ TERM_PUBLIC void PS_set_color (double gray)
 {
 /* map [0;1] to gray/colors */
     if (gray <= 0)
-	fputs( "0 g ", gpoutfile ); 
+	fputs( "0 g ", gpoutfile );
     else {
 	if (gray >= 1)
-	    fputs( "1 g ", gpoutfile ); 
+	    fputs( "1 g ", gpoutfile );
 	else
 	    fprintf( gpoutfile, "%s g ", save_space(gray) );
     }
@@ -2677,7 +2666,7 @@ TERM_PUBLIC void PS_filled_polygon ( int points, gpiPoint *corners )
 	    corners[2].x-corners[1].x, corners[2].y-corners[1].y,
 	    corners[1].x-corners[0].x, corners[1].y-corners[0].y
 	       );
-    else {  
+    else {
 	int i;
 	for (i = 1; i < points-1; i++)
 	    fprintf(gpoutfile, " %i %i V",
@@ -2688,7 +2677,7 @@ TERM_PUBLIC void PS_filled_polygon ( int points, gpiPoint *corners )
     PS_relative_ok = FALSE;
 }
 
-TERM_PUBLIC void PS_previous_palette(void)
+TERM_PUBLIC void PS_previous_palette()
 {
     /* Needed to stroke the previous graphic element. */
     PS_FLUSH_PATH;
@@ -2698,8 +2687,7 @@ TERM_PUBLIC void PS_previous_palette(void)
 #endif /* PM3D */
 
 static void
-delete_ps_fontfile(prev, this)
-struct ps_fontfile_def *prev, *this;
+delete_ps_fontfile(struct ps_fontfile_def *prev, struct ps_fontfile_def *this)
 {
     if (this != NULL) {		/* there really is something to delete */
 	printf("hallo1\n");
@@ -2721,12 +2709,12 @@ struct ps_fontfile_def *prev, *this;
 TERM_TABLE_START(post_driver)
 "postscript",
 "PostScript graphics language [mode \042fontname\042 font_size]",
-   PS_XMAX, PS_YMAX, PS_VCHAR, PS_HCHAR, 
-   PS_VTIC, PS_HTIC, PS_options, PS_init, PS_reset, 
-   PS_text, null_scale, PS_graphics, PS_move, PS_vector, 
-   PS_linetype, PS_put_text, PS_text_angle, 
+   PS_XMAX, PS_YMAX, PS_VCHAR, PS_HCHAR,
+   PS_VTIC, PS_HTIC, PS_options, PS_init, PS_reset,
+   PS_text, null_scale, PS_graphics, PS_move, PS_vector,
+   PS_linetype, PS_put_text, PS_text_angle,
    PS_justify_text, PS_point, do_arrow, PS_set_font, PS_pointsize,
-   TERM_BINARY|TERM_IS_POSTSCRIPT /*flags*/, 
+   TERM_BINARY|TERM_IS_POSTSCRIPT /*flags*/,
    0 /*suspend*/, 0 /*resume*/, PS_fillbox, PS_linewidth
 #ifdef USE_MOUSE
    , 0, 0, 0, 0, 0 /* no mouse support for postscript */
@@ -2845,7 +2833,7 @@ START_HELP(post)
 " of a PostScript file written by `gnuplot`), and \"ps_fontfile_doc.tex\"",
 " (a LaTeX file which contains a short documentation concerning the",
 " encapsulation of LaTeX fonts with a glyph table of the math fonts).",
-"", 
+"",
 " A PostScript file is editable, so once `gnuplot` has created one, you are",
 " free to modify it to your heart's desire.  See the `editing postscript`",
 " section for some hints.",

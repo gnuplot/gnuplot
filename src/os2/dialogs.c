@@ -1,15 +1,15 @@
 #ifdef INCRCSDATA
-static char RCSid[]="$Id: dialogs.c,v 1.4 2002/02/15 20:17:35 amai Exp $" ;
+static char RCSid[]="$Id: dialogs.c,v 1.5 2004/04/13 17:24:04 broeker Exp $" ;
 #endif
 
 /****************************************************************************
 
     PROGRAM: gnupmdrv
-    
+
         Outboard PM driver for GNUPLOT 3.x
 
-    MODULE:  dialogs.c  Dialog procedures for gnupmdrv 
-        
+    MODULE:  dialogs.c  Dialog procedures for gnupmdrv
+
 ****************************************************************************/
 
 /* PM driver for GNUPLOT */
@@ -46,7 +46,7 @@ static char RCSid[]="$Id: dialogs.c,v 1.4 2002/02/15 20:17:35 amai Exp $" ;
 
 /*
  * AUTHOR
- * 
+ *
  *   Gnuplot driver for OS/2:  Roger Fearick
  */
 
@@ -72,13 +72,13 @@ static char RCSid[]="$Id: dialogs.c,v 1.4 2002/02/15 20:17:35 amai Exp $" ;
 
 /* struct for printer capabilities */
 
-static struct { 
+static struct {
     long    lTech ;     // printer technology
     long    lVer ;      // driver version
     long    lWidth ;    // page width in pels
     long    lHeight ;   // page height in pels
-    long    lWChars ;   // page width in chars    
-    long    lHChars ;   // page height in chars    
+    long    lWChars ;   // page width in chars
+    long    lHChars ;   // page height in chars
     long    lHorRes ;   // horizontal resolution pels / metre
     long    lVertRes ;  // vertical resolution pels / metre
     } prCaps ;
@@ -92,7 +92,7 @@ MRESULT EXPENTRY QPrintDlgProc ( HWND hwnd, ULONG usMsg, MPARAM mp1, MPARAM mp2 
 */
     {
     static PQPRINT pqp = NULL ;
-    static SWP     swp ;    
+    static SWP     swp ;
     static RECTL   rectlDef ;
     TRACKINFO   ti ;
     RECTL       rectlBox ;
@@ -103,7 +103,7 @@ MRESULT EXPENTRY QPrintDlgProc ( HWND hwnd, ULONG usMsg, MPARAM mp1, MPARAM mp2 
     switch ( usMsg ) {
 
         case WM_INITDLG :
-                                   
+
             pqp = (PQPRINT) PVOIDFROMMP( mp2 ) ;
             if( pqp->caps & QP_CAPS_FILE ) {
                 ulStyle = WinQueryWindowULong( WinWindowFromID( hwnd, IDD_PRINTQNAME ),
@@ -117,7 +117,7 @@ MRESULT EXPENTRY QPrintDlgProc ( HWND hwnd, ULONG usMsg, MPARAM mp1, MPARAM mp2 
                 }
             WinQueryWindowRect( WinWindowFromID( hwnd, IDD_QPRBOX ),
                                 &rectlDef ) ;
-             
+
         case WM_USER_SET_DATA :
 
             psz = *pqp->piPrinter->pszComment ? pqp->piPrinter->pszComment :
@@ -132,7 +132,7 @@ MRESULT EXPENTRY QPrintDlgProc ( HWND hwnd, ULONG usMsg, MPARAM mp1, MPARAM mp2 
             {
             int y = rectlDef.yTop ;
             rectlBox = rectlDef ;
-            if( pqp->xsize < pqp->ysize )                    
+            if( pqp->xsize < pqp->ysize )
                 rectlBox.xRight = rectlDef.yTop * pqp->xsize/pqp->ysize ;
             else {
                 int x = rectlDef.yTop * pqp->ysize/pqp->xsize ;
@@ -147,7 +147,7 @@ MRESULT EXPENTRY QPrintDlgProc ( HWND hwnd, ULONG usMsg, MPARAM mp1, MPARAM mp2 
             double xs = rectlBox.xRight - rectlBox.xLeft ;
             double ys = rectlBox.yTop - rectlBox.yBottom ;
             if( ys > xs/ratio ) { /* reduce ys to fit */
-                 rectlBox.yTop = rectlBox.yBottom + (int)(xs/ratio) ; 
+                 rectlBox.yTop = rectlBox.yBottom + (int)(xs/ratio) ;
                  }
             else if( ys < xs/ratio ) { /* reduce xs to fit */
                  rectlBox.xRight = rectlBox.xLeft + (int)(ys*ratio) ;
@@ -156,11 +156,11 @@ MRESULT EXPENTRY QPrintDlgProc ( HWND hwnd, ULONG usMsg, MPARAM mp1, MPARAM mp2 
             rectlBox.xRight *= pqp->xfrac ;
             rectlBox.yTop *= pqp->yfrac ;
             WinSetWindowPos( WinWindowFromID( hwnd, IDD_QPRFRAME ),
-                             NULLHANDLE, 
+                             NULLHANDLE,
                              swp.x, swp.y, //+(short)(swp.cy*(1.0-pqp->yfrac)),
                              (short)rectlBox.xRight, (short)rectlBox.yTop, SWP_SIZE|SWP_MOVE ) ;
             break ;
-            
+
         case WM_COMMAND :
 
             switch ( SHORT1FROMMP(mp1) ) {
@@ -176,9 +176,9 @@ MRESULT EXPENTRY QPrintDlgProc ( HWND hwnd, ULONG usMsg, MPARAM mp1, MPARAM mp2 
 
                 case IDD_QPRSETPR:   /* printer setup */
                     if( SetPrinterMode( hwnd, pqp ) == 1 ) {
-                        if( (hdc = OpenPrinterDC( WinQueryAnchorBlock( hwnd ), 
-                                                  pqp, 
-                                                  OD_INFO, 
+                        if( (hdc = OpenPrinterDC( WinQueryAnchorBlock( hwnd ),
+                                                  pqp,
+                                                  OD_INFO,
                                                   NULL )) != DEV_ERROR ) {
                             DevQueryCaps( hdc, CAPS_TECHNOLOGY, (long)sizeof(prCaps)/sizeof(long), (PLONG)&prCaps ) ;
                             DevCloseDC( hdc ) ;
@@ -197,7 +197,7 @@ MRESULT EXPENTRY QPrintDlgProc ( HWND hwnd, ULONG usMsg, MPARAM mp1, MPARAM mp2 
                     double xs = rectlBox.xRight - rectlBox.xLeft ;
                     double ys = rectlBox.yTop - rectlBox.yBottom ;
                     if( ys > xs/ratio ) { /* reduce ys to fit */
-                        rectlBox.yTop = rectlBox.yBottom + (int)(xs/ratio) ; 
+                        rectlBox.yTop = rectlBox.yBottom + (int)(xs/ratio) ;
                         }
                     else if( ys < xs/ratio ) { /* reduce xs to fit */
                         rectlBox.xRight = rectlBox.xLeft + (int)(ys*ratio) ;
@@ -215,10 +215,10 @@ MRESULT EXPENTRY QPrintDlgProc ( HWND hwnd, ULONG usMsg, MPARAM mp1, MPARAM mp2 
                     ti.rclTrack.xLeft = 0 ;
                     ti.rclTrack.yBottom = 0 ;//(1.0-pqp->yfrac) * rectlBox.yTop ;
                     ti.fs = TF_RIGHT|TF_TOP|TF_STANDARD|TF_SETPOINTERPOS|TF_ALLINBOUNDARY ;
-                    WinSetPointer( HWND_DESKTOP, 
+                    WinSetPointer( HWND_DESKTOP,
                                    WinQuerySysPointer( HWND_DESKTOP, SPTR_SIZENWSE, FALSE ) ) ;
                     WinTrackRect( WinWindowFromID( hwnd, IDD_QPRBOX ),
-                                  NULLHANDLE, 
+                                  NULLHANDLE,
                                   &ti ) ;
                     pqp->xfrac = (float)ti.rclTrack.xRight / (float)rectlBox.xRight ;
                     pqp->yfrac = ((float)(ti.rclTrack.yTop-ti.rclTrack.yBottom) / (float)rectlBox.yTop) ;
@@ -229,24 +229,24 @@ MRESULT EXPENTRY QPrintDlgProc ( HWND hwnd, ULONG usMsg, MPARAM mp1, MPARAM mp2 
                     double xs = rectlBox.xRight - rectlBox.xLeft ;
                     double ys = rectlBox.yTop - rectlBox.yBottom ;
                     if( ys > xs/ratio ) { /* reduce ys to fit */
-                        rectlBox.yTop = rectlBox.yBottom + (int)(xs/ratio) ; 
+                        rectlBox.yTop = rectlBox.yBottom + (int)(xs/ratio) ;
                         }
                     else if( ys < xs/ratio ) { /* reduce xs to fit */
                         rectlBox.xRight = rectlBox.xLeft + (int)(ys*ratio) ;
                         }
                     }
                     WinSetWindowPos( WinWindowFromID( hwnd, IDD_QPRFRAME ),
-                                     NULLHANDLE, 
+                                     NULLHANDLE,
                                      swp.x, swp.y,//+(short)(swp.cy*(1.0-pqp->yfrac)),
                                      (short)rectlBox.xRight, (short)rectlBox.yTop, SWP_SIZE|SWP_MOVE ) ;
                     WinSetDlgItemFloat( hwnd, IDD_QPRXFRAC, pqp->xfrac ) ;
                     WinSetDlgItemFloat( hwnd, IDD_QPRYFRAC, pqp->yfrac ) ;
                     return 0L ;
-                    
+
                 default:
                     break ;
                 }
-                
+
          default:
             break ;
             }
@@ -285,13 +285,13 @@ MRESULT EXPENTRY QPrintersDlgProc ( HWND hwnd, ULONG usMsg, MPARAM mp1, MPARAM m
                             MPFROMP(psz) ) ;
                 if( strcmp( pprq[i].pszName, szPrinterName ) == 0 )
                     iSelect = i ;
-                } 
-                
+                }
+
             WinSendMsg( hwndLB,
                         LM_SELECTITEM,
                         MPFROMSHORT( iSelect ),
                         (MPARAM)TRUE ) ;
-       
+
             break ;
 
         case WM_COMMAND :
@@ -308,7 +308,7 @@ MRESULT EXPENTRY QPrintersDlgProc ( HWND hwnd, ULONG usMsg, MPARAM mp1, MPARAM m
             break ;
 
         case WM_CONTROL:
-        
+
             if( SHORT1FROMMP( mp1 ) == IDD_QPRSLIST ) {
                 if( SHORT2FROMMP( mp1 ) == LN_SELECT  ) {
                     usItem = (ULONG)WinSendMsg( hwndLB,
@@ -324,7 +324,7 @@ MRESULT EXPENTRY QPrintersDlgProc ( HWND hwnd, ULONG usMsg, MPARAM mp1, MPARAM m
         /* fall through to the default control processing */
     return WinDefDlgProc ( hwnd , usMsg , mp1 , mp2 ) ;
     }
-    
+
 ULONG GetPrinters( PPRQINFO3 *pprq, ULONG *pcTot  )
 /*
 ** get a list of printers
@@ -332,9 +332,9 @@ ULONG GetPrinters( PPRQINFO3 *pprq, ULONG *pcTot  )
     {
     ULONG rc ;
     ULONG cQueues, cbData ;
-    
+
     rc = SplEnumQueue( NULL, 3, NULL, 0, &cQueues, pcTot, &cbData, NULL ) ;
-   
+
     if( *pprq != NULL ) {
         free( *pprq ) ;
         *pprq = NULL ;
@@ -367,9 +367,9 @@ MRESULT EXPENTRY PauseMsgDlgProc ( HWND hwnd, ULONG usMsg, MPARAM mp1, MPARAM mp
                 /* set the position so user can move out the way, and
                    have it come back there next time */
             ppdata = (PPAUSEDATA) PVOIDFROMMP( mp2 ) ;
-            if( ppdata->pswp != NULL ) 
+            if( ppdata->pswp != NULL )
                 WinSetWindowPos( hwnd, HWND_TOP, ppdata->pswp->x, ppdata->pswp->y,
-                                 0, 0, SWP_MOVE ) ; 
+                                 0, 0, SWP_MOVE ) ;
             pszText = ppdata->pszMessage ;
             while(*pszText==' ') ++pszText ;
             WinSetDlgItemText( hwnd, IDD_PAUSETEXT, pszText ) ;
@@ -380,17 +380,17 @@ MRESULT EXPENTRY PauseMsgDlgProc ( HWND hwnd, ULONG usMsg, MPARAM mp1, MPARAM mp
                 case DID_OK:
                 case DID_CANCEL:
                     WinPostMsg( WinQueryWindow( hwnd, QW_OWNER ),
-                                WM_PAUSEEND, 
-                                SHORT1FROMMP(mp1)==DID_OK?(MPARAM)1L:0L, 
+                                WM_PAUSEEND,
+                                SHORT1FROMMP(mp1)==DID_OK?(MPARAM)1L:0L,
                                 0L ) ;
                     if( ppdata->pswp == NULL ) ppdata->pswp = (PSWP)malloc( sizeof(SWP) ) ;
                     WinQueryWindowPos( hwnd, ppdata->pswp ) ;
-                    WinDismissDlg( hwnd, 0 ) ; 
+                    WinDismissDlg( hwnd, 0 ) ;
                     break ;
                 case IDM_PRINT:
                     WinPostMsg( WinQueryWindow( hwnd, QW_OWNER ),
-                                WM_COMMAND, 
-                                MPFROMSHORT(IDM_PRINT), 
+                                WM_COMMAND,
+                                MPFROMSHORT(IDM_PRINT),
                                 0L ) ;
                     return 0 ;
                 default:
@@ -402,7 +402,7 @@ MRESULT EXPENTRY PauseMsgDlgProc ( HWND hwnd, ULONG usMsg, MPARAM mp1, MPARAM mp
         /* fall through to the default control processing */
     return WinDefDlgProc ( hwnd , usMsg , mp1 , mp2 ) ;
     }
-    
+
 void WinSetDlgItemFloatF( HWND hwnd, USHORT usID, int nDec, float flValue )
 /*
 */
@@ -434,7 +434,7 @@ void WinQueryDlgItemFloat( HWND hwnd, USHORT usID, float *pflValue )
     {
     char achBuffer [ 34 ] ; // default string field size ...
     ULONG ulTemp ;
-    
+
     WinQueryDlgItemText( hwnd, usID, 34, achBuffer ) ;
     *pflValue = (float) atof( achBuffer ) ;
     }

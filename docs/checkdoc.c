@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: checkdoc.c,v 1.11 2004/02/23 13:35:00 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: checkdoc.c,v 1.12 2004/04/13 17:23:30 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - checkdoc.c */
@@ -35,14 +35,14 @@ static char *RCSid() { return RCSid("$Id: checkdoc.c,v 1.11 2004/02/23 13:35:00 
 ]*/
 
 /*
- * checkdoc -- check a doc file for correctness of first column. 
+ * checkdoc -- check a doc file for correctness of first column.
  *
  * Prints out lines that have an illegal first character.
- * First character must be space, digit, or ?, @, #, %, 
+ * First character must be space, digit, or ?, @, #, %,
  * or line must be empty.
  *
  * usage: checkdoc [docfile]
- * Modified by Russell Lang from hlp2ms.c by Thomas Williams 
+ * Modified by Russell Lang from hlp2ms.c by Thomas Williams
  *
  * Original version by David Kotz used the following one line script!
  * sed -e '/^$/d' -e '/^[ 0-9?@#%]/d' gnuplot.doc

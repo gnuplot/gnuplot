@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: dynarray.c,v 1.9 2001/02/15 18:13:23 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: dynarray.c,v 1.10 2004/04/13 17:23:53 broeker Exp $"); }
 #endif
 
 /*[
@@ -47,83 +47,72 @@ static char *RCSid() { return RCSid("$Id: dynarray.c,v 1.9 2001/02/15 18:13:23 b
 
 /* The 'constructor' of a dynarray object: initializes all the
  * variables to well-defined startup values */
-void 
-init_dynarray(array, entry_size, size, increment)
-     dynarray *array;		/* the 'this' pointer */
-     size_t entry_size;		/* size of the array's elements */
-     long size, increment;	/* original size, and incrementation
-				 * step of the dynamical array */
+void
+init_dynarray(dynarray *this, size_t entry_size, long size, long increment)
 {
-  array->v = 0;			/* preset value, in case gp_alloc fails */
-  if (size)
-    array->v = gp_alloc(entry_size*size, "init dynarray");
-  array->size = size;
-  array->end = 0;
-  array->increment = increment;
-  array->entry_size = entry_size;
+    this->v = 0;		/* preset value, in case gp_alloc fails */
+    if (size)
+	this->v = gp_alloc(entry_size*size, "init dynarray");
+    this->size = size;
+    this->end = 0;
+    this->increment = increment;
+    this->entry_size = entry_size;
 }
 
 /* The 'destructor'; sets all crucial elements of the structure to
  * well-defined values to avoid problems by use of bad pointers... */
-void 
-free_dynarray(array)
-     dynarray *array;		/* the 'this' pointer */
+void
+free_dynarray(dynarray *this)
 {
-    free(array->v);		/* should work, even if gp_alloc failed */
-    array->v = 0;
-    array->end = array->size = 0;
+    free(this->v);		/* should work, even if gp_alloc failed */
+    this->v = 0;
+    this->end = this->size = 0;
 }
 
 /* Set the size of the dynamical array to a new, fixed value */
-void 
-resize_dynarray(array, newsize)
-     dynarray *array;		/* the 'this' pointer */
-     long newsize;		/* the new size to set it to */
+void
+resize_dynarray(dynarray *this, long newsize)
 {
-    if (!array->v)
+    if (!this->v)
 	graph_error("resize_dynarray: dynarray wasn't initialized!");
 
     if (newsize == 0)
-	free_dynarray(array);
+	free_dynarray(this);
     else {
-	array->v = gp_realloc(array->v, array->entry_size * newsize, "extend dynarray");
-	array->size = newsize;
+	this->v = gp_realloc(this->v, this->entry_size * newsize, "extend dynarray");
+	this->size = newsize;
     }
 }
 
 /* Increase the size of the dynarray by a given amount */
-void 
-extend_dynarray(array, increment)
-     dynarray *array;		/* the 'this' pointer */
-     long increment;		/* the amount to increment by */
+void
+extend_dynarray(dynarray *this, long increment)
 {
-    resize_dynarray(array, array->size + increment);
+    resize_dynarray(this, this->size + increment);
 }
 
 /* Get pointer to the element one past the current end of the dynamic
  * array. Resize it if necessary. Returns a pointer-to-void to that
  * element. */
 void GPHUGE *
-nextfrom_dynarray(array)
-     dynarray *array;		/* the 'this' pointer */
+nextfrom_dynarray(dynarray *this)
 {
-    if (!array->v)
+    if (!this->v)
 	graph_error("nextfrom_dynarray: dynarray wan't initialized!");
 
-    if (array->end >= array->size)
-	extend_dynarray(array, array->increment);
-    return (void *)((char *)(array->v) + array->entry_size * (array->end++));
+    if (this->end >= this->size)
+	extend_dynarray(this, this->increment);
+    return (void *)((char *)(this->v) + this->entry_size * (this->end++));
 }
 
 /* Release the element at the current end of the dynamic array, by
  * moving the 'end' index one element backwards */
-void 
-droplast_dynarray(array)
-     dynarray *array;
+void
+droplast_dynarray(dynarray *this)
 {
-    if (!array->v)
+    if (!this->v)
 	graph_error("droplast_dynarray: dynarray wasn't initialized!");
 
-    if (array->end)
-	array->end--;
+    if (this->end)
+	this->end--;
 }

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: variable.c,v 1.19 2003/11/25 12:55:07 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: variable.c,v 1.20 2004/04/13 17:24:03 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - variable.c */
@@ -68,9 +68,7 @@ do {						\
  *
  */
 char *
-loadpath_handler(action, path)
-    int action;
-    char *path;
+loadpath_handler(int action, char *path)
 {
     /* loadpath variable
      * the path elements are '\0' separated (!)
@@ -277,9 +275,7 @@ static TBOOLEAN fontpath_init_done = FALSE;
  *
  */
 char *
-fontpath_handler(action, path)
-    int action;
-    char *path;
+fontpath_handler(int action, char *path)
 {
     /* fontpath variable
      * the path elements are '\0' separated (!)
@@ -334,10 +330,10 @@ fontpath_handler(action, path)
 
 		    currdir = gp_strdup( curr_fontpath->dir );
 
-		    while ( (envbeg=strstr(currdir, "$(")) 
+		    while ( (envbeg=strstr(currdir, "$("))
 #  if defined(PIPES)
 			    || (cmdbeg=strstr( currdir, "$`" ))
-#  endif 
+#  endif
 			    ) {
 			/* Read environment variables */
 			if (envbeg) {
@@ -408,19 +404,19 @@ fontpath_handler(action, path)
 			plen = strlen(currdir);
 			if (fontpath) {
 			    size_t elen = strlen(fontpath);
-			    fontpath = gp_realloc(fontpath, 
-						  elen + 1 + plen + 1, 
+			    fontpath = gp_realloc(fontpath,
+						  elen + 1 + plen + 1,
 						  "expand fontpath");
 			    last = fontpath+elen;
 			    *last = PATHSEP;
 			    ++last;
 			    *last = '\0';
 			} else {
-			    fontpath = gp_alloc(plen + 1, 
+			    fontpath = gp_alloc(plen + 1,
 						"expand fontpath");
 			    last = fontpath;
 			}
-		    
+
 			strcpy(last, currdir );
 			last += plen;
 		    }
@@ -435,7 +431,7 @@ fontpath_handler(action, path)
 		    PATHSEP_TO_NUL(fontpath);
 	    }
 #endif /* HAVE_DIRENT_H */
-		
+
 	}			/* else: already initialised; int_warn (?) */
 	/* point to env portion of fontpath */
 	envptr = fontpath;
@@ -535,9 +531,7 @@ char abbrev_day_names[7][8] =
 { ADAY0, ADAY1, ADAY2, ADAY3, ADAY4, ADAY5, ADAY6 };
 
 char *
-locale_handler(action, newlocale)
-int action;
-char *newlocale;
+locale_handler(int action, char *newlocale)
 {
     static char *current_locale = NULL;
     struct tm tm;

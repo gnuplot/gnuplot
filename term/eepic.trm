@@ -1,6 +1,6 @@
 /* Hello, Emacs! This is -*-C-*- !*/
 /*
- * $Id: eepic.trm,v 1.23 2004/03/29 10:43:36 broeker Exp $
+ * $Id: eepic.trm,v 1.24 2004/04/13 17:24:16 broeker Exp $
  *
  */
 
@@ -40,17 +40,17 @@
  * This file is included by ../term.c.
  *
  * This terminal driver supports:
- *   The EEPIC macros for LaTeX. 
+ *   The EEPIC macros for LaTeX.
  *
  * AUTHORS
  *   David Kotz
  *
  * send your comments or suggestions to (gnuplot-info@lists.sourceforge.net).
- * 
+ *
  */
 /*
- *  This file contains the eepic terminal driver, intended for use with the 
- *  eepic.sty macro package for LaTeX. This is an alternative to the 
+ *  This file contains the eepic terminal driver, intended for use with the
+ *  eepic.sty macro package for LaTeX. This is an alternative to the
  *  latex driver. You need eepic.sty, epic.sty, and a printer driver that
  *  supports the tpic \specials.
  *
@@ -256,7 +256,7 @@ EEPIC_graphics()
     if ( fontsize_set )
     {
 	float x = t->v_char * EEPIC_UNIT + 0.5;
-	fprintf(gpoutfile,"\\fontsize{%d}{%g}\\selectfont\n", 
+	fprintf(gpoutfile,"\\fontsize{%d}{%g}\\selectfont\n",
 		(int) x,  1.2 * x );
     }
     else
@@ -274,8 +274,7 @@ EEPIC_text()
 
 
 TERM_PUBLIC void
-EEPIC_linetype(linetype)
-    int linetype;
+EEPIC_linetype(int linetype)
 {
     EEPIC_endline();
 
@@ -298,8 +297,7 @@ EEPIC_linetype(linetype)
 
 
 TERM_PUBLIC void
-EEPIC_move(x, y)
-    unsigned int x, y;
+EEPIC_move(unsigned int x, unsigned int y)
 {
     EEPIC_endline();
 
@@ -309,13 +307,11 @@ EEPIC_move(x, y)
 
 
 TERM_PUBLIC void
-EEPIC_point(x, y, number)	/* version of line_and_point */
-    unsigned int x, y;
-    int number;			/* type of point */
+EEPIC_point(unsigned int x, unsigned int y, int number)
 {
     EEPIC_move(x, y);
 
-    /* Print the character defined by 'number'; number < 0 means 
+    /* Print the character defined by 'number'; number < 0 means
        to use a dot, otherwise one of the defined points. */
     fprintf(gpoutfile, "\\put(%d,%d){%s}\n", x, y,
 	    (number < 0 ? EEPIC_TINY_DOT
@@ -324,29 +320,28 @@ EEPIC_point(x, y, number)	/* version of line_and_point */
 
 
 TERM_PUBLIC void
-EEPIC_vector(ux, uy)
-unsigned int ux, uy;
+EEPIC_vector(unsigned int ux, unsigned int uy)
 {
-	if (!EEPIC_inline) {
-		EEPIC_inline = TRUE;
+    if (!EEPIC_inline) {
+	EEPIC_inline = TRUE;
 
-		/* Start a new line. This depends on line type */
-		fprintf(gpoutfile, "%s(%u,%u)",
-				EEPIC_lines[eepic_lineset][EEPIC_type + 2],
-				EEPIC_posx, EEPIC_posy);
-		EEPIC_linecount = 1;
-	} else {
-		/* Even though we are in middle of a path, 
-		 * we may want to start a new path command. 
-		 * If they are too long then latex will choke.
-		 */
-		if (EEPIC_linecount++ >= EEPIC_LINEMAX) {
-			fprintf(gpoutfile, "\n%s(%u,%u)",
-					EEPIC_lines[eepic_lineset][EEPIC_type + 2],
-					EEPIC_posx, EEPIC_posy);
-			EEPIC_linecount = 1;
-		}
+	/* Start a new line. This depends on line type */
+	fprintf(gpoutfile, "%s(%u,%u)",
+		EEPIC_lines[eepic_lineset][EEPIC_type + 2],
+		EEPIC_posx, EEPIC_posy);
+	EEPIC_linecount = 1;
+    } else {
+	/* Even though we are in middle of a path,
+	 * we may want to start a new path command.
+	 * If they are too long then latex will choke.
+	 */
+	if (EEPIC_linecount++ >= EEPIC_LINEMAX) {
+	    fprintf(gpoutfile, "\n%s(%u,%u)",
+		    EEPIC_lines[eepic_lineset][EEPIC_type + 2],
+		    EEPIC_posx, EEPIC_posy);
+	    EEPIC_linecount = 1;
 	}
+    }
     fprintf(gpoutfile, "(%u,%u)", ux, uy);
     EEPIC_posx = ux;
     EEPIC_posy = uy;
@@ -363,9 +358,10 @@ EEPIC_endline()
 
 
 TERM_PUBLIC void
-EEPIC_arrow(sx, sy, ex, ey, head)
-    unsigned int sx, sy, ex, ey;
-    int head;
+EEPIC_arrow(
+    unsigned int sx, unsigned int sy,
+    unsigned int ex, unsigned int ey,
+    int head)
 {
     best_latex_arrow(sx, sy, ex, ey, 2, head);	/* call latex routine */
 
@@ -375,9 +371,7 @@ EEPIC_arrow(sx, sy, ex, ey, head)
 
 
 TERM_PUBLIC void
-EEPIC_put_text(x, y, str)
-    unsigned int x, y;		/* reference point of string */
-    const char str[];		/* the text */
+EEPIC_put_text(unsigned int x, unsigned y, const char str[])
 {
     int i, l;
 
@@ -455,16 +449,14 @@ EEPIC_put_text(x, y, str)
 
 
 TERM_PUBLIC int
-EEPIC_justify_text(mode)
-enum JUSTIFY mode;
+EEPIC_justify_text(enum JUSTIFY mode)
 {
     eepic_justify = mode;
     return (TRUE);
 }
 
 TERM_PUBLIC int
-EEPIC_text_angle(ang)
-int ang;
+EEPIC_text_angle(int ang)
 {
     eepic_angle = (ang ? 1 : 0);
     return (TRUE);
@@ -477,7 +469,7 @@ EEPIC_reset()
     EEPIC_posx = EEPIC_posy = 0;
 }
 
-TERM_PUBLIC void 
+TERM_PUBLIC void
 EEPIC_options()
 {
     float fontsize = 0;

@@ -1,5 +1,5 @@
 /*
- * $Id: eval.h,v 1.9 2003/08/17 22:49:49 sfeam Exp $
+ * $Id: eval.h,v 1.10 2004/04/13 17:23:53 broeker Exp $
  */
 
 /* GNUPLOT - eval.h */
@@ -52,11 +52,11 @@
 /* HBB 20010725: Moved here, from parse.h */
 enum operators {
     /* keep this in line with table in eval.c */
-    PUSH, PUSHC, PUSHD1, PUSHD2, PUSHD, 
+    PUSH, PUSHC, PUSHD1, PUSHD2, PUSHD,
 #ifdef GP_ISVAR
-    PUSHV, 
+    PUSHV,
 #endif  /*GP_ISVAR*/
-    CALL, CALLN, LNOT, BNOT, UMINUS, 
+    CALL, CALLN, LNOT, BNOT, UMINUS,
     LOR, LAND, BOR, XOR, BAND, EQ, NE, GT, LT, GE, LE, PLUS, MINUS, MULT,
     DIV, MOD, POWER, FACTORIAL, BOOLE,
     DOLLARS, /* for using extension - div */

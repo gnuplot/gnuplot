@@ -1,5 +1,5 @@
-/*
- * $Id: dumb.trm,v 1.16 2004/04/13 17:24:16 broeker Exp $
+/* Hello, Emacs, this is -*-C-*-
+ * $Id: dumb.trm,v 1.17 2004/05/25 04:14:53 sfeam Exp $
  *
  */
 
@@ -47,7 +47,7 @@
  *
  *   Ethan A Merritt Nov 2003
  *	Added support for enhanced text mode.
- *	Yes, this is frivolous, but it serves as an example for 
+ *	Yes, this is frivolous, but it serves as an example for
  *	adding enhanced text to other terminals.  You can disable
  *	it by adding a line
  *	#define NO_DUMB_ENHANCED_SUPPORT
@@ -168,15 +168,14 @@ DUMB_options()
     }
 
     sprintf(term_options, "%sfeed %s %d %d",
-	    dumb_feed ? "" : "no", 
+	    dumb_feed ? "" : "no",
 	    term->put_text == ENHdumb_put_text ? "enhanced" : "",
 	    dumb_xmax, dumb_ymax);
 }
 
 
 static void
-dumb_set_pixel(x, y, v, p)
-int x, y, v, p;
+dumb_set_pixel(int x, int y, int v, int p)
 {
     if ((unsigned) x <= dumb_xmax &&	/* ie x>=0 && x<=dumb_xmax */
 	(unsigned) y <= dumb_ymax &&
@@ -239,8 +238,7 @@ DUMB_reset()
 
 
 TERM_PUBLIC void
-DUMB_linetype(linetype)
-int linetype;
+DUMB_linetype(int linetype)
 {
     static char pen_type[7] = { '*', '#', '$', '%', '@', '&', '=' };
 
@@ -256,8 +254,7 @@ int linetype;
 
 
 TERM_PUBLIC void
-DUMB_move(x, y)
-unsigned int x, y;
+DUMB_move(unsigned int x, unsigned int y)
 {
     dumb_x = x;
     dumb_y = y;
@@ -265,21 +262,18 @@ unsigned int x, y;
 
 
 TERM_PUBLIC void
-DUMB_point(x, y, point)
-unsigned int x, y;
-int point;
+DUMB_point(unsigned int x, unsigned int y, int point)
 {
     dumb_set_pixel(x, y, point == -1 ? '.' : point % 26 + 'A', 4);
 }
 
 
 TERM_PUBLIC void
-DUMB_vector(_x, _y)
-unsigned int _x, _y;
+DUMB_vector(unsigned int arg_x, unsigned int arg_y)
 {
-    int x = _x;			/* we need signed int, since
+    int x = arg_x;		/* we need signed int, since
 				 * unsigned-signed=unsigned and */
-    int y = _y;			/* abs and cast to double wouldn't work */
+    int y = arg_y;		/* abs and cast to double wouldn't work */
     char pen, pen1;
     int priority;
     int delta;
@@ -367,9 +361,7 @@ unsigned int _x, _y;
 
 
 TERM_PUBLIC void
-DUMB_put_text(x, y, str)
-unsigned int x, y;
-const char *str;
+DUMB_put_text(unsigned int x, unsigned int y, const char *str)
 {
     int length;
 
@@ -383,9 +375,10 @@ const char *str;
 
 
 TERM_PUBLIC void
-DUMB_arrow(sx, sy, ex, ey, head)
-    unsigned int sx, sy, ex, ey;
-    int head;		/* ignored */
+DUMB_arrow(
+    unsigned int sx, unsigned int sy,
+    unsigned int ex, unsigned int ey,
+    int head)		/* ignored */
 {
     char saved_pen;
     char saved_x;
@@ -423,11 +416,11 @@ static unsigned int ENHdumb_xsave, ENHdumb_ysave;
 static double ENHdumb_base;
 
 TERM_PUBLIC void
-ENHdumb_OPEN(fontname, fontsize, base, widthflag, showflag, overprint)
-    char *fontname;
-    TBOOLEAN widthflag, showflag;
-    double fontsize, base;
-    int overprint;
+ENHdumb_OPEN(
+    char *fontname,
+    double fontsize, double base,
+    TBOOLEAN widthflag, TBOOLEAN showflag,
+    int overprint)
 {
     /* There are two special cases:
      * overprint = 3 means save current position
@@ -486,7 +479,7 @@ ENHdumb_FLUSH()
 	else
 	    /* Normal case is to update position to end of fragment */
 	    dumb_x += len;
-	    
+
 	ENHdumb_opened_string = FALSE;
     }
 }
@@ -515,8 +508,8 @@ ENHdumb_put_text(unsigned int x, unsigned int y, const char *str)
      * closing brace in the string. We increment past it (else
      * we get stuck in an infinite loop) and try again.
      */
-    while (*(str = enhanced_recursion((char *)str, TRUE, 
-    			ENHdumb_font, ENHdumb_fontsize, 
+    while (*(str = enhanced_recursion((char *)str, TRUE,
+    			ENHdumb_font, ENHdumb_fontsize,
 			0.0, TRUE, TRUE, 0))) {
 	(term->enhanced_flush)();
 

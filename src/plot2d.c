@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.66 2004/05/20 16:56:43 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.67 2004/06/13 00:34:32 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -85,7 +85,7 @@ TBOOLEAN boxwidth_is_absolute  = TRUE;
 
 /* function implementations */
 
-/* HBB 20000508: moved cp_alloc() &friends to the main module using them, and 
+/* HBB 20000508: moved cp_alloc() &friends to the main module using them, and
  * made cp_alloc 'static'.
  */
 /*
@@ -93,8 +93,7 @@ TBOOLEAN boxwidth_is_absolute  = TRUE;
  * points.
  */
 static struct curve_points *
-cp_alloc(num)
-int num;
+cp_alloc(int num)
 {
     struct curve_points *cp;
 
@@ -117,13 +116,11 @@ int num;
  * points. This will either expand or shrink the storage.
  */
 void
-cp_extend(cp, num)
-    struct curve_points *cp;
-    int num;
+cp_extend(struct curve_points *cp, int num)
 {
 
 #if defined(DOS16) || defined(WIN16)
-    /* Make sure we do not allocate more than 64k points in msdos since 
+    /* Make sure we do not allocate more than 64k points in msdos since
      * indexing is done with 16-bit int
      * Leave some bytes for malloc maintainance.
      */
@@ -136,17 +133,17 @@ cp_extend(cp, num)
 
     if (num > 0) {
 	if (cp->points == NULL) {
-	    cp->points = (struct coordinate GPHUGE *)
-		gp_alloc(num * sizeof(struct coordinate), "curve points");
+	    cp->points = gp_alloc(num * sizeof(cp->points[0]),
+				  "curve points");
 	} else {
-	    cp->points = (struct coordinate GPHUGE *)
-		gp_realloc(cp->points, num * sizeof(struct coordinate), "expanding curve points");
+	    cp->points = gp_realloc(cp->points, num * sizeof(cp->points[0]),
+				    "expanding curve points");
 	}
 	cp->p_max = num;
     } else {
-	if (cp->points != (struct coordinate GPHUGE *) NULL)
+	if (cp->points != NULL)
 	    free(cp->points);
-	cp->points = (struct coordinate GPHUGE *) NULL;
+	cp->points = NULL;
 	cp->p_max = 0;
     }
 }
@@ -158,8 +155,7 @@ cp_extend(cp, num)
 /* HBB 20000506: instead of risking stack havoc by recursion, operate
  * iteratively */
 void
-cp_free(cp)
-struct curve_points *cp;
+cp_free(struct curve_points *cp)
 {
     while (cp) {
 	struct curve_points *next = cp->next;
@@ -168,7 +164,7 @@ struct curve_points *cp;
 	    free(cp->title);
 	if (cp->points)
 	    free(cp->points);
-	free((char *) cp);
+	free(cp);
 	cp = next;
     }
 }
@@ -203,7 +199,7 @@ plotrequest()
     AXIS_INIT2D(SECOND_Y_AXIS, 1);
     AXIS_INIT2D(T_AXIS, 0);
     AXIS_INIT2D(R_AXIS, 1);
-    
+
     t_axis = (parametric || polar) ? T_AXIS : FIRST_X_AXIS;
 
     PARSE_NAMED_RANGE(t_axis, dummy_token);
@@ -245,8 +241,7 @@ plotrequest()
  * it will later be moved passed title/with/linetype/pointtype
  */
 static int
-get_data(current_plot)
-    struct curve_points *current_plot;
+get_data(struct curve_points *current_plot)
 {
     int i /* num. points ! */ , j;
     int max_cols, min_cols;    /* allowed range of column numbers */
@@ -315,7 +310,7 @@ get_data(current_plot)
 	current_plot->z_axis = FIRST_Z_AXIS;
 	df_axis[2] = FIRST_Z_AXIS;
     }
-	
+
     if (df_no_use_specs > max_cols)
 	int_error(NO_CARET, "Too many using specs for this style");
 
@@ -559,13 +554,14 @@ get_data(current_plot)
 
 /* called by get_data for each point */
 static void
-store2d_point(current_plot, i, x, y, xlow, xhigh, ylow, yhigh, width)
-    struct curve_points *current_plot;
-    int i;			/* point number */
-    double x, y;
-    double ylow, yhigh;
-    double xlow, xhigh;
-    double width;		/* BOXES widths: -1 -> autocalc, 0 -> use xlow/xhigh */
+store2d_point(
+    struct curve_points *current_plot,
+    int i,			/* point number */
+    double x, double y,
+    double xlow, double xhigh,
+    double ylow, double yhigh,
+    double width)		/* BOXES widths: -1 -> autocalc, 0 ->
+				 * use xlow/xhigh */
 {
     struct coordinate GPHUGE *cp = &(current_plot->points[i]);
     int dummy_type = INRANGE;	/* sometimes we dont care about outranging */
@@ -653,7 +649,7 @@ store2d_point(current_plot, i, x, y, xlow, xhigh, ylow, yhigh, width)
      * store 'width' to that axis and be done with it */
     if ((int)current_plot->z_axis != -1)
 	STORE_WITH_LOG_AND_UPDATE_RANGE(cp->z, width, dummy_type, current_plot->z_axis, NOOP, cp->z = -VERYLARGE);
-    else 
+    else
 	cp->z = width;
 }				/* store2d_point */
 
@@ -682,8 +678,7 @@ static char *plot_smooth_names[] =
 };
 
 static void
-print_points(curve)
-int curve;			/* which curve to print */
+print_points(int curve)
 {
     register struct curve_points *this_plot;
     int i;
@@ -747,12 +742,10 @@ current points %d\n\n",
 }
 #endif /* not used */
 
-		  
+
 
 static void
-print_table(current_plot, plot_num)
-    struct curve_points *current_plot;
-    int plot_num;
+print_table(struct curve_points *current_plot, int plot_num)
 {
     int i, curve;
     char *buffer = gp_alloc(150, "print_table: output buffer");
@@ -1153,9 +1146,9 @@ eval_plots()
 		    if (equals(c_token,"fs") || equals(c_token,"fill")) {
 			int stored_token = c_token;
 			parse_fillstyle(&this_plot->fill_properties,
-				default_fillstyle.fillstyle, 
-				default_fillstyle.filldensity, 
-				pattern_num, 
+				default_fillstyle.fillstyle,
+				default_fillstyle.filldensity,
+				pattern_num,
 				default_fillstyle.border_linetype);
 			set_fillstyle = TRUE;
 			if (stored_token != c_token)
@@ -1196,7 +1189,7 @@ eval_plots()
 		lp_parse(&this_plot->lp_properties, 1,
 			 this_plot->plot_style & PLOT_STYLE_HAS_POINT,
 			 line_num, point_num);
-		
+
 		/* allow old-style syntax too - ignore case lt 3 4 for
 		 * example */
 		if (!equals(c_token, ",") && !END_OF_COMMAND) {
@@ -1204,7 +1197,7 @@ eval_plots()
 		    this_plot->lp_properties.l_type =
 			this_plot->lp_properties.p_type =
 			(int) real(const_express(&t)) - 1;
-		    
+
 		    if (!equals(c_token, ",") && !END_OF_COMMAND)
 			this_plot->lp_properties.p_type =
 			    (int) real(const_express(&t)) - 1;
@@ -1216,8 +1209,8 @@ eval_plots()
 	    if (this_plot->plot_style & PLOT_STYLE_HAS_BOXES){
 		if (! set_fillstyle)
 		    parse_fillstyle(&this_plot->fill_properties,
-				default_fillstyle.fillstyle, 
-				default_fillstyle.filldensity, 
+				default_fillstyle.fillstyle,
+				default_fillstyle.filldensity,
 				pattern_num,
 				default_fillstyle.border_linetype);
 		if (this_plot->fill_properties.fillstyle == FS_PATTERN)
@@ -1419,7 +1412,7 @@ eval_plots()
 			struct value a;
 			double t = t_min + i * t_step;
 			/* parametric/polar => NOT a log quantity */
-			double x = (!parametric && !polar) 
+			double x = (!parametric && !polar)
 			    ? AXIS_DE_LOG_VALUE(x_axis, t) : t;
 
 			(void) Gcomplex(&plot_func.dummy_values[0], x, 0.0);
@@ -1646,12 +1639,10 @@ eval_plots()
  * various lists.  Examples (hand checked): start_plot:F1->F2->NULL ==>
  * F2->NULL start_plot:F1->F2->F3->F4->F5->F6->NULL ==> F2->F4->F6->NULL
  * start_plot:F1->F2->D1->D2->F3->F4->D3->NULL ==> F2->D1->D2->F4->D3->NULL
- * 
+ *
  */
 static void
-parametric_fixup(start_plot, plot_num)
-    struct curve_points *start_plot;
-    int *plot_num;
+parametric_fixup(struct curve_points *start_plot, int *plot_num)
 {
     struct curve_points *xp, *new_list = NULL, *free_list = NULL;
     struct curve_points **last_pointer = &new_list;
@@ -1664,7 +1655,7 @@ parametric_fixup(start_plot, plot_num)
      * originally was written to look for a NULL next pointer, but gnuplot
      * wants to be sticky in grabbing memory and the right number of items in
      * the plot list is controlled by the plot_num variable.
-     * 
+     *
      * Since gnuplot wants to do this sticky business, a free_list of
      * curve_points is kept and then tagged onto the end of the plot list as
      * this seems more in the spirit of the original memory behavior than
@@ -1708,9 +1699,9 @@ parametric_fixup(start_plot, plot_num)
 		    }
 		    x = r * cos(t);
 		    y = r * sin(t);
-                    if (boxwidth >= 0 
+                    if (boxwidth >= 0
 #if USE_ULIG_RELATIVE_BOXWIDTH
-		    && boxwidth_is_absolute 
+		    && boxwidth_is_absolute
 #endif	/* USE_ULIG_RELATIVE_BOXWIDTH */
 		    ) {
                         int dmy_type = INRANGE;
@@ -1725,9 +1716,9 @@ parametric_fixup(start_plot, plot_num)
 		    double x = xp->points[i].y;
 		    double y = yp->points[i].y;
 
-                    if (boxwidth >= 0 
+                    if (boxwidth >= 0
 #if USE_ULIG_RELATIVE_BOXWIDTH
-		    && boxwidth_is_absolute 
+		    && boxwidth_is_absolute
 #endif /* USE_ULIG_RELATIVE_BOXWIDTH */
 		    ) {
                         int dmy_type = INRANGE;

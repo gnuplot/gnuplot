@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.67 2004/06/13 00:34:32 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.68 2004/06/30 20:01:56 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -107,13 +107,10 @@ int plot3d_num=0;
  * If, however num_iso_2 or num_samp_1 is zero no iso curves are allocated.
  */
 static struct surface_points *
-sp_alloc(num_samp_1, num_iso_1, num_samp_2, num_iso_2)
-    int num_samp_1, num_iso_1, num_samp_2, num_iso_2;
+sp_alloc(int num_samp_1, int num_iso_1, int num_samp_2, int num_iso_2)
 {
-    struct surface_points *sp;
+    struct surface_points *sp = gp_alloc(sizeof(*sp), "surface");
 
-    sp = (struct surface_points *) gp_alloc(sizeof(struct surface_points),
-					    "surface");
     sp->next_sp = NULL;
     sp->title = NULL;
     sp->contours = NULL;
@@ -140,7 +137,7 @@ sp_alloc(num_samp_1, num_iso_1, num_samp_2, num_iso_2)
 	    sp->iso_crvs = icrv;
 	}
     } else
-	sp->iso_crvs = (struct iso_curve *) NULL;
+	sp->iso_crvs = NULL;
 
     return (sp);
 }
@@ -152,9 +149,9 @@ sp_alloc(num_samp_1, num_iso_1, num_samp_2, num_iso_2)
  * If, however num_iso_2 or num_samp_1 is zero no iso curves are allocated.
  */
 static void
-sp_replace(sp, num_samp_1, num_iso_1, num_samp_2, num_iso_2)
-struct surface_points *sp;
-int num_samp_1, num_iso_1, num_samp_2, num_iso_2;
+sp_replace(
+    struct surface_points *sp,
+    int num_samp_1, int num_iso_1, int num_samp_2, int num_iso_2)
 {
     int i;
     struct iso_curve *icrv, *icrvs = sp->iso_crvs;
@@ -178,7 +175,7 @@ int num_samp_1, num_iso_1, num_samp_2, num_iso_2;
 	    sp->iso_crvs = icrv;
 	}
     } else
-	sp->iso_crvs = (struct iso_curve *) NULL;
+	sp->iso_crvs = NULL;
 }
 
 /*
@@ -188,8 +185,7 @@ int num_samp_1, num_iso_1, num_samp_2, num_iso_2;
 /* HBB 20000506: don't risk stack havoc by recursion, use iterative list
  * cleanup unstead */
 void
-sp_free(sp)
-struct surface_points *sp;
+sp_free(struct surface_points *sp)
 {
     while (sp) {
 	struct surface_points *next = sp->next_sp;
@@ -198,7 +194,7 @@ struct surface_points *sp;
 
 	while (sp->contours) {
 	    struct gnuplot_contours *next_cntrs = sp->contours->next;
-	    
+
 	    free(sp->contours->coords);
 	    free(sp->contours);
 	    sp->contours = next_cntrs;
@@ -226,7 +222,7 @@ plot3drequest()
  * in the parametric case we would say splot [u= -Pi:Pi] [v= 0:2*Pi] [-1:1]
  * [-1:1] [-1:1] sin(v)*cos(u),sin(v)*cos(u),sin(u) in the non-parametric
  * case we would say only splot [x= -2:2] [y= -5:5] sin(x)*cos(y)
- * 
+ *
  */
 {
     int dummy_token0 = -1, dummy_token1 = -1;
@@ -288,8 +284,7 @@ plot3drequest()
 #ifdef THIN_PLATE_SPLINES_GRID
 
 static double
-splines_kernel(h)
-double h;
+splines_kernel(double h)
 {
 #if 0
     /* this is normaly not useful ... */
@@ -309,7 +304,7 @@ double h;
 
 #ifdef PM3D
 
-/* Set flag plot_has_palette to 1 if there is any element on the graph 
+/* Set flag plot_has_palette to 1 if there is any element on the graph
  * which requires palette of continuous colors.
  */
 static void
@@ -350,7 +345,7 @@ set_plot_with_palette(int plot_num)
 }
 
 int
-is_plot_with_palette(void)
+is_plot_with_palette()
 {
     return plot_has_palette;
 }
@@ -358,8 +353,7 @@ is_plot_with_palette(void)
 #endif
 
 static void
-grid_nongrid_data(this_plot)
-    struct surface_points *this_plot;
+grid_nongrid_data(struct surface_points *this_plot)
 {
     int i, j, k;
     double x, y, z, w, dx, dy, xmin, xmax, ymin, ymax;
@@ -413,12 +407,12 @@ grid_nongrid_data(this_plot)
     for (oicrv = old_iso_crvs; oicrv != NULL; oicrv = oicrv->next) {
 	numpoints += oicrv->p_count;
     }
-    xx = (double *) gp_alloc(sizeof(double) * (numpoints + 3) * (numpoints + 8),
-			     "thin plate splines in dgrid3d");
+    xx = gp_alloc(sizeof(xx[0]) * (numpoints + 3) * (numpoints + 8),
+		  "thin plate splines in dgrid3d");
     /* the memory needed is not really (n+3)*(n+8) for now,
        but might be if I take into account errors ... */
-    K = (double **) gp_alloc(sizeof(double *) * (numpoints + 3),
-			     "matrix : thin plate splines 2d");
+    K = gp_alloc(sizeof(K[0]) * (numpoints + 3),
+		 "matrix : thin plate splines 2d");
     yy = xx + numpoints;
     zz = yy + numpoints;
     b = zz + numpoints;
@@ -428,6 +422,7 @@ grid_nongrid_data(this_plot)
     numpoints = 0;
     for (oicrv = old_iso_crvs; oicrv != NULL; oicrv = oicrv->next) {
 	struct coordinate GPHUGE *opoints = oicrv->points;
+
 	for (k = 0; k < oicrv->p_count; k++, opoints++) {
 	    /* HBB 20010424: avoid crashing for undefined input */
 	    if (opoints->type == UNDEFINED)
@@ -438,7 +433,7 @@ grid_nongrid_data(this_plot)
 	    numpoints++;
 	}
     }
-    
+
     for (i = 0; i < numpoints + 3; i++) {
 	K[i] = b + (numpoints + 3) * (i + 1);
     }
@@ -468,8 +463,8 @@ grid_nongrid_data(this_plot)
     K[numpoints + 2][numpoints] = 0.0;
     K[numpoints + 2][numpoints + 1] = 0.0;
     K[numpoints + 2][numpoints + 2] = 0.0;
-    indx = (int *) gp_alloc(sizeof(int) * (numpoints + 3), "indexes lu");
-    /* actually, K is *not* positive definite, but 
+    indx = gp_alloc(sizeof(indx[0]) * (numpoints + 3), "indexes lu");
+    /* actually, K is *not* positive definite, but
        has only non zero real eigenvalues ->
        we can use an lu_decomp safely */
     lu_decomp(K, numpoints + 3, indx, &d);
@@ -570,7 +565,9 @@ grid_nongrid_data(this_plot)
 #ifndef THIN_PLATE_SPLINES_GRID
 	    z = z / w;
 #endif
+
 	    STORE_WITH_LOG_AND_UPDATE_RANGE(points->z, z, points->type, z_axis, NOOP, continue);
+
 #ifdef PM3D
 	    if (this_plot->pm3d_color_from_column)
 		int_error(NO_CARET, "Gridding of the color column is not implemented");
@@ -597,12 +594,11 @@ grid_nongrid_data(this_plot)
 
 /* Get 3D data from file, and store into this_plot data
  * structure. Takes care of 'set mapping' and 'set dgrid3d'.
- * 
+ *
  * Notice: this_plot->token is end of datafile spec, before title etc
  * will be moved past title etc after we return */
 static void
-get_3ddata(this_plot)
-    struct surface_points *this_plot;
+get_3ddata(struct surface_points *this_plot)
 {
     int xdatum = 0;
     int ydatum = 0;
@@ -663,12 +659,14 @@ get_3ddata(this_plot)
 	while ((j = df_readline(v,
 #ifdef PM3D
 		    /* currently pm3d mapping is only implemented for
-		     * MAP3D_CARTESIAN; and it is used if the 4th column is 
+		     * MAP3D_CARTESIAN; and it is used if the 4th column is
 		     * explicitly given */
-		    (MAP3D_CARTESIAN == mapping3d && df_no_use_specs==4) ? 4 : 3
+				(MAP3D_CARTESIAN
+				 == mapping3d && df_no_use_specs==4)
+				? 4 : 3
 #else
-		    3
-#endif
+				3
+#endif /* PM3D */
 		    )) != DF_EOF) {
 	    if (j == DF_SECOND_BLANK)
 		break;		/* two blank lines */
@@ -891,10 +889,9 @@ get_3ddata(this_plot)
 
 
 static void
-print_3dtable(pcount)
-    int pcount;
+print_3dtable(int pcount)
 {
-    register struct surface_points *this_plot;
+    struct surface_points *this_plot;
     int i, surface;
     struct coordinate GPHUGE *point;
     char *buffer = gp_alloc(150, "print_3dtable output buffer");
@@ -927,7 +924,7 @@ print_3dtable(pcount)
 		    OUTPUT_NUMBER(x, FIRST_X_AXIS);
 		    OUTPUT_NUMBER(y, FIRST_Y_AXIS);
 		    OUTPUT_NUMBER(z, FIRST_Z_AXIS);
-		    fprintf(gpoutfile, "%c\n", 
+		    fprintf(gpoutfile, "%c\n",
 			    point->type == INRANGE
 			    ? 'i' : point->type == OUTRANGE
 			    ? 'o' : 'u');
@@ -975,16 +972,17 @@ print_3dtable(pcount)
  * respectively.  The latter only are done for in non-hidden3d
  * mode. */
 static void
-calculate_set_of_isolines(value_axis, cross, this_iso,
-			  iso_axis, iso_min, iso_step, num_iso_to_use,
-			  sam_axis, sam_min, sam_step, num_sam_to_use,
-			  need_palette)
-    AXIS_INDEX iso_axis, sam_axis, value_axis;
-    struct iso_curve **this_iso;
-    TBOOLEAN cross;
-    double iso_min, iso_step, sam_min, sam_step;
-    int num_iso_to_use, num_sam_to_use;
-    TBOOLEAN need_palette;
+calculate_set_of_isolines(
+    AXIS_INDEX value_axis,
+    TBOOLEAN cross,
+    struct iso_curve **this_iso,
+    AXIS_INDEX iso_axis,
+    double iso_min, double iso_step,
+    int num_iso_to_use,
+    AXIS_INDEX sam_axis,
+    double sam_min, double sam_step,
+    int num_sam_to_use,
+    TBOOLEAN need_palette)
 {
     int i, j;
     struct coordinate GPHUGE *points = (*this_iso)->points;
@@ -1170,7 +1168,7 @@ eval_3dplots()
 		    if (axis_array[FIRST_Y_AXIS].is_timedata) {
 			int_error(c_token, "Need full using spec for y time data");
 		    }
-		    /* df_axis[0] = FIRST_Z_AXIS; */ 
+		    /* df_axis[0] = FIRST_Z_AXIS; */
 		} /*  else */ {  /* HBB 20000725: testestest */
 		    df_axis[0] = FIRST_X_AXIS;
 		    df_axis[1] = FIRST_Y_AXIS;
@@ -1328,7 +1326,7 @@ eval_3dplots()
 			    set_lpstyle = TRUE;
 			    continue;
 			}
-		    }		
+		    }
 		}
 
 		break; /* unknown option */
@@ -1351,7 +1349,7 @@ eval_3dplots()
 		if (key->auto_titles) {
 		    if (this_plot->plot_type == DATA3D && df_binary==TRUE && end_token==start_token+1)
 			/* let default title for  splot 'a.dat' binary  is 'a.dat'
-			 * while for  'a.dat' binary using 2:1:3  will be all 4 words */ 
+			 * while for  'a.dat' binary using 2:1:3  will be all 4 words */
 			m_capture(&(this_plot->title), start_token, start_token);
 		    else
 			m_capture(&(this_plot->title), start_token, end_token);
@@ -1519,13 +1517,12 @@ eval_3dplots()
      */
 
     if (some_functions) {
-
 	/* I've changed the controlled variable in fn plots to u_min etc since
 	 * it's easier for me to think parametric - 'normal' plot is after all
 	 * a special case. I was confused about x_min being both minimum of
 	 * x values found, and starting value for fn plots.
 	 */
-	register double u_min, u_max, u_step, v_min, v_max, v_step; 
+	double u_min, u_max, u_step, v_min, v_max, v_step;
 	double u_isostep, v_isostep;
 	AXIS_INDEX u_axis, v_axis;
 	struct surface_points *this_plot;
@@ -1534,7 +1531,7 @@ eval_3dplots()
 	 * non-parametric mode, x is used as u, and y as v */
 	u_axis = parametric ? U_AXIS : FIRST_X_AXIS;
 	v_axis = parametric ? V_AXIS : FIRST_Y_AXIS;
-	
+
 	if (!parametric) {
 	    /*{{{  check ranges */
 	    /* give error if xrange badly set from missing datafile error
@@ -1560,7 +1557,7 @@ eval_3dplots()
 		axis_array[FIRST_Y_AXIS].max = -VERYLARGE;
 	    /*}}} */
 	}
-	
+
 	/*{{{  figure ranges, taking logs etc into account */
 	u_min = axis_log_value_checked(u_axis, axis_array[u_axis].min, "x range");
 	u_max = axis_log_value_checked(u_axis, axis_array[u_axis].max, "x range");
@@ -1637,7 +1634,7 @@ eval_3dplots()
 						  u_axis, u_min, u_isostep,
 						  num_iso_to_use,
 						  v_axis, v_min, v_step,
-						  num_sam_to_use, 
+						  num_sam_to_use,
 						  NEED_PALETTE(this_plot));
 		    }
 		    /*}}} */
@@ -1772,10 +1769,6 @@ eval_3dplots()
 
 
 
-static void
-parametric_3dfixup(start_plot, plot_num)
-struct surface_points *start_plot;
-int *plot_num;
 /*
  * The hardest part of this routine is collapsing the FUNC plot types in the
  * list (which are gauranteed to occur in (x,y,z) triplets while preserving
@@ -1785,16 +1778,12 @@ int *plot_num;
  * start_plot:F1->F2->F3->F4->F5->F6->NULL ==> F3->F6->NULL
  * start_plot:F1->F2->F3->D1->D2->F4->F5->F6->D3->NULL ==>
  * F3->D1->D2->F6->D3->NULL
- */
-{
-/*
- * I initialized *free_list with NULL, because my compiler warns some lines
- * later that it might be uninited. The code however seems to not access that
- * line in that case, but if I'm right, my change is OK and if not, this is a
- * serious bug in the code.
  *
  * x and y ranges now fixed in eval_3dplots
  */
+static void
+parametric_3dfixup(struct surface_points *start_plot, int *plot_num)
+{
     struct surface_points *xp, *new_list, *free_list = NULL;
     struct surface_points **last_pointer = &new_list;
     size_t tlen;
@@ -1806,7 +1795,7 @@ int *plot_num;
      * this originally was written to look for a NULL next pointer, but
      * gnuplot wants to be sticky in grabbing memory and the right number of
      * items in the plot list is controlled by the plot_num variable.
-     * 
+     *
      * Since gnuplot wants to do this sticky business, a free_list of
      * surface_points is kept and then tagged onto the end of the plot list
      * as this seems more in the spirit of the original memory behavior than
@@ -1850,11 +1839,11 @@ int *plot_num;
 		yicrvs = yicrvs->next;
 		zicrvs = zicrvs->next;
 	    }
-	    
+
 #if 0 /* FIXME HBB 20001101: seems to cause a crash */
-    if (first_3dplot)
-      sp_free(first_3dplot);
-    first_3dplot = NULL;
+	    if (first_3dplot)
+		sp_free(first_3dplot);
+	    first_3dplot = NULL;
 #endif
 
 	    /* Ok, fix up the title to include xp and yp plots. */

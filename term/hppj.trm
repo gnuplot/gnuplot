@@ -1,5 +1,5 @@
-/*
- * $Id: hppj.trm,v 1.11 2001/08/27 15:04:12 broeker Exp $
+/* Hello, Emacs, this is -*-C-*-
+ * $Id: hppj.trm,v 1.12 2004/04/13 17:24:34 broeker Exp $
  *
  */
 
@@ -50,7 +50,7 @@
  *  Maurice Castro
  *
  * send your comments or suggestions to (gnuplot-info@lists.sourceforge.net).
- * 
+ *
  */
 
 /* The following HP laserjet series II driver uses generic bit mapped graphics
@@ -240,8 +240,7 @@ HPPJ_text()
 
 
 TERM_PUBLIC void
-HPPJ_linetype(linetype)
-int linetype;
+HPPJ_linetype(int linetype)
 {
     if (linetype >= 0) {
 	b_setlinetype(0);

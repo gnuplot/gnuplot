@@ -37,16 +37,16 @@
 }
 
 - activatePushed:sender
-{	
+{
 	if ([sender state] == 1) {
 		[controller setActiveTerm: self];
-		[sender setTitle:@"--- ACTIVE ---"];		
+		[sender setTitle:@"--- ACTIVE ---"];
 	}
 	else {
 		[controller setActiveTerm:nil];
 		[sender setTitle:@"Activate"];
 	}
-		
+
 	return self;
 }
 
@@ -54,7 +54,7 @@
 {
 	[activateButton setState:0];
 	[activateButton setTitle:@"Activate"];
-			
+
 	return self;
 }
 

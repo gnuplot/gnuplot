@@ -1,5 +1,5 @@
-/*
- * $Id: debug.trm,v 1.11 2004/04/13 17:24:16 broeker Exp $
+/* Hello, Emacs, this is -*-C-*-
+ * $Id: debug.trm,v 1.12 2004/06/30 19:57:06 broeker Exp $
  *
  */
 
@@ -43,9 +43,9 @@
  *
  * AUTHORS
  *    luecken@udel.edu
- * 
+ *
  * send your comments or suggestions to (luecken@udel.edu).
- * 
+ *
  */
 
 /*
@@ -124,8 +124,7 @@ DEBUG_text()
 
 
 TERM_PUBLIC void
-DEBUG_linetype(linetype)
-    int linetype;
+DEBUG_linetype(int linetype)
 {
     /*
        if (linetype != DEBUG_linetype_last){
@@ -138,8 +137,7 @@ DEBUG_linetype(linetype)
 
 
 TERM_PUBLIC void
-DEBUG_move(x, y)
-    unsigned int x, y;
+DEBUG_move(unsigned int x, unsigned int y)
 {
     /*
        if (x != DEBUG_xlast || y != DEBUG_ylast){
@@ -155,8 +153,7 @@ DEBUG_move(x, y)
 
 
 TERM_PUBLIC void
-DEBUG_vector(x, y)
-    unsigned int x, y;
+DEBUG_vector(unsigned int x, unsigned int y)
 {
     /*
        if (x != DEBUG_xlast || y != DEBUG_ylast){
@@ -172,9 +169,7 @@ DEBUG_vector(x, y)
 
 
 TERM_PUBLIC void
-DEBUG_put_text(x, y, str)
-    unsigned int x, y;
-    const char *str;
+DEBUG_put_text(unsigned int x, unsigned int y, const char *str)
 {
     /*
        DEBUG_move(x,y);
@@ -194,8 +189,7 @@ DEBUG_reset()
 }
 
 TERM_PUBLIC int
-DEBUG_justify_text(mode)
-    enum JUSTIFY mode;
+DEBUG_justify_text(enum JUSTIFY mode)
 {
     fputs("justify ", gpoutfile);
     switch (mode) {
@@ -215,8 +209,7 @@ DEBUG_justify_text(mode)
 }
 
 TERM_PUBLIC int
-DEBUG_text_angle(ang)
-    int ang;
+DEBUG_text_angle(int ang)
 {
     fprintf(gpoutfile, "text_angle %d:", ang);
     switch (ang) {
@@ -234,25 +227,23 @@ DEBUG_text_angle(ang)
 }
 
 TERM_PUBLIC void
-DEBUG_point(x, y, pointstyle)
-    unsigned int x, y;
-    int pointstyle;
+DEBUG_point((unsigned int x, unsigned int y, int pointstyle)
 {
     fprintf(gpoutfile, "point at (%ud,%ud), pointstyle %d\n", x, y, pointstyle);
 }
 
 TERM_PUBLIC void
-DEBUG_arrow(sx, sy, ex, ey, head)
-    unsigned int sx, sy, ex, ey;
-    int head;
+DEBUG_arrow(
+    unsigned int sx, unsigned int sy,
+    unsigned int ex, unsigned int ey,
+    int head)
 {
     fprintf(gpoutfile, "arrow from (%ud,%ud) to (%ud,%ud), %s head\n",
 	    sx, sy, ex, ey, head ? "with" : "without");
 }
 
 TERM_PUBLIC int
-DEBUG_set_font(font)
-    const char *font;
+DEBUG_set_font(const char *font)
 {
     fprintf(gpoutfile, "set font to \"%s\"\n",
 	    font ? (*font ? font : "\aempty string!") : "\aNULL string!");
@@ -260,28 +251,28 @@ DEBUG_set_font(font)
 }
 
 TERM_PUBLIC void
-DEBUG_pointsize(pointsize)
-    double pointsize;
+DEBUG_pointsize(double pointsize)
 {
     fprintf(gpoutfile, "set pointsize to %lf\n", pointsize);
 }
 
 TERM_PUBLIC void
-DEBUG_suspend(void)
+DEBUG_suspend()
 {
     fputs("suspended terminal driver\n", gpoutfile);
 }
 
 TERM_PUBLIC void
-DEBUG_resume(void)
+DEBUG_resume()
 {
     fputs("resumed terminal driver\n", gpoutfile);
 }
 
 TERM_PUBLIC void
-DEBUG_fillbox(style, x1, y1, width, height)
-    int style;
-    unsigned int x1, y1, width, height;
+DEBUG_fillbox(
+    int style,
+    unsigned int x1, unsigned int y1,
+    unsigned int width, unsigned int height)
 {
     fprintf(gpoutfile, "fillbox/clear at (%ud,%ud), area (%ud,%ud), style %d)\n",
 	    x1, y1, width, height, style);

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.106 2004/06/21 05:51:08 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.107 2004/06/30 20:01:54 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -43,7 +43,7 @@ static char *RCSid() { return RCSid("$Id: graphics.c,v 1.106 2004/06/21 05:51:08
 #include "gadgets.h"
 /* FIXME HBB 20010822: this breaks the plan of disentangling graphics
  * and plot2d, because each #include's the other's header: */
-#include "plot2d.h"		/* for boxwidth */ 
+#include "plot2d.h"		/* for boxwidth */
 #include "term_api.h"
 #include "util.h"
 
@@ -149,7 +149,7 @@ static void map_position_r __PROTO((struct position* pos, double* x, double* y, 
 
 static int find_maxl_keys __PROTO((struct curve_points *plots, int count, int *kcnt));
 
-static void do_key_sample __PROTO((struct curve_points *this_plot, legend_key *key, 
+static void do_key_sample __PROTO((struct curve_points *this_plot, legend_key *key,
 				   char *title,  struct termentry *t, int xl, int yl));
 
 /* for plotting error bars
@@ -208,9 +208,7 @@ static TBOOLEAN lkey;
 /*}}} */
 
 static int
-find_maxl_keys(plots, count, kcnt)
-struct curve_points *plots;
-int count, *kcnt;
+find_maxl_keys(struct curve_points *plots, int count, int *kcnt)
 {
     int mlen, len, curve, cnt;
     register struct curve_points *this_plot;
@@ -238,7 +236,7 @@ int count, *kcnt;
  * The order in which things is done is getting pretty critical:
  *  ytop depends on title, x2label, ylabels (if no rotated text)
  *  ybot depends on key, if TUNDER
- *  once we have these, we can setup the y1 and y2 tics and the 
+ *  once we have these, we can setup the y1 and y2 tics and the
  *  only then can we calculate xleft and xright
  *  xright depends also on key TRIGHT
  *  then we can do x and x2 tics
@@ -253,9 +251,7 @@ int count, *kcnt;
  */
 
 static void
-boundary(plots, count)
-    struct curve_points *plots;
-    int count;
+boundary(struct curve_points *plots, int count)
 {
     int yticlin = 0, y2ticlin = 0, timelin = 0;
     legend_key *key = &keyT;
@@ -821,7 +817,7 @@ boundary(plots, count)
 	int i = ytop; ytop = ybot; ybot = i;
 	FPRINTF((stderr,"boundary: Big problems! ybot > ytop\n"));
     }
-    
+
     /*  compute coordinates for axis labels, title et al
      *     (some of these may not be used) */
 
@@ -922,10 +918,10 @@ boundary(plots, count)
 ** then the graph scaling is not yet known and the box is positioned incorrectly;
 ** you must do "replot" to avoid the wrong plot ... bad luck if output does not
 ** go to screen */
-#define OK fprintf(stderr,"Line %i of %s is OK\n",__LINE__,__FILE__);
-OK
-fprintf(stderr,"\tHELE: user pos: x=%i y=%i\n",key->user_pos.x,key->user_pos.y);
-fprintf(stderr,"\tHELE: user pos: x=%i y=%i\n",x,y);
+#define OK fprintf(stderr,"Line %i of %s is OK\n",__LINE__,__FILE__)
+	    OK;
+            fprintf(stderr,"\tHELE: user pos: x=%i y=%i\n",key->user_pos.x,key->user_pos.y);
+            fprintf(stderr,"\tHELE: user pos: x=%i y=%i\n",x,y);
 #endif
 	    keybox.xl = x - key_size_left;
 	    keybox.xr = keybox.xl + key_w;
@@ -940,7 +936,10 @@ fprintf(stderr,"\tHELE: user pos: x=%i y=%i\n",x,y);
 /*}}} */
 
 void
-get_offsets(struct text_label *this_label, struct termentry *t, int *htic, int *vtic)
+get_offsets(
+    struct text_label *this_label,
+    struct termentry *t,
+    int *htic, int *vtic)
 {
     if (this_label->lp_properties.pointflag) {
 	*htic = (pointsize * t->h_tic * 0.5 * this_label->hoffset);
@@ -953,12 +952,10 @@ get_offsets(struct text_label *this_label, struct termentry *t, int *htic, int *
 
 
 static void
-get_arrow(arrow, sx, sy, ex, ey)
-struct arrow_def* arrow;
-unsigned int* sx;
-unsigned int* sy;
-unsigned int* ex;
-unsigned int* ey;
+get_arrow(
+    struct arrow_def *arrow,
+    unsigned int* sx, unsigned int* sy,
+    unsigned int* ex, unsigned int* ey)
 {
     if (arrow->relative) {
 	if (arrow->start.scalex == arrow->end.scalex &&
@@ -1074,8 +1071,7 @@ place_grid()
 }
 
 static void
-place_arrows(layer)
-    int layer;
+place_arrows(int layer)
 {
     struct arrow_def *this_arrow;
     register struct termentry *t = term;
@@ -1093,9 +1089,7 @@ place_arrows(layer)
 }
 
 static void
-place_labels(listhead, layer)
-    struct text_label *listhead;
-    int layer;
+place_labels(struct text_label *listhead, int layer)
 {
     struct text_label *this_label;
     register struct termentry *t = term;
@@ -1119,11 +1113,11 @@ place_labels(listhead, layer)
 
 	/* EAM - Allow arbitrary rotation of label text */
 	if (this_label->rotate && (*t->text_angle) (this_label->rotate)) {
-	    write_multiline(x + htic, y + vtic, this_label->text, this_label->pos, JUST_TOP, 
+	    write_multiline(x + htic, y + vtic, this_label->text, this_label->pos, JUST_TOP,
 	    		    this_label->rotate, this_label->font);
 	    (*t->text_angle) (0);
 	} else {
-	    write_multiline(x + htic, y + vtic, this_label->text, this_label->pos, JUST_TOP, 
+	    write_multiline(x + htic, y + vtic, this_label->text, this_label->pos, JUST_TOP,
 	    		    0, this_label->font);
 	}
 	if (this_label->lp_properties.pointflag) {
@@ -1136,9 +1130,7 @@ place_labels(listhead, layer)
 }
 
 void
-do_plot(plots, pcount)
-    struct curve_points *plots;
-    int pcount;			/* count of plots in linked list */
+do_plot(struct curve_points *plots, int pcount)
 {
     register struct termentry *t = term;
     register int curve;
@@ -1151,7 +1143,7 @@ do_plot(plots, pcount)
     x_axis = FIRST_X_AXIS;
     y_axis = FIRST_Y_AXIS;
 
-/*      Apply the desired viewport offsets. */
+    /* Apply the desired viewport offsets. */
     if (Y_AXIS.min < Y_AXIS.max) {
 	Y_AXIS.min -= boff;
 	Y_AXIS.max += toff;
@@ -1205,7 +1197,6 @@ do_plot(plots, pcount)
 
 /* DRAW AXES */
     /* after grid so that axes linetypes are on top */
-
     x_axis = FIRST_X_AXIS;
     y_axis = FIRST_Y_AXIS;	/* chose scaling */
 
@@ -1229,11 +1220,11 @@ do_plot(plots, pcount)
 	if ((*t->text_angle) (TEXT_VERTICAL)) {
 	    unsigned int x = ylabel_x + (t->v_char / 2);
 	    unsigned int y = (ytop + ybot) / 2 + axis_array[FIRST_Y_AXIS].label.yoffset * (t->h_char);
-	    write_multiline(x, y, axis_array[FIRST_Y_AXIS].label.text, CENTRE, JUST_TOP, 
+	    write_multiline(x, y, axis_array[FIRST_Y_AXIS].label.text, CENTRE, JUST_TOP,
 	    		    TEXT_VERTICAL, axis_array[FIRST_Y_AXIS].label.font);
 	    (*t->text_angle) (0);
 	} else {
-	    /* really bottom just, but we know number of lines 
+	    /* really bottom just, but we know number of lines
 	       so we need to adjust x-posn by one line */
 	    unsigned int x = ylabel_x;
 	    unsigned int y = ylabel_y;
@@ -1241,6 +1232,7 @@ do_plot(plots, pcount)
 	}
 	reset_textcolor(&(axis_array[FIRST_Y_AXIS].label.textcolor),t);
     }
+
 /* Y2LABEL */
     if (*axis_array[SECOND_Y_AXIS].label.text) {
 	apply_textcolor(&(axis_array[SECOND_Y_AXIS].label.textcolor),t);
@@ -1248,7 +1240,7 @@ do_plot(plots, pcount)
 	if ((*t->text_angle) (TEXT_VERTICAL)) {
 	    unsigned int x = y2label_x + (t->v_char / 2) - 1;
 	    unsigned int y = (ytop + ybot) / 2 + axis_array[SECOND_Y_AXIS].label.yoffset * (t->h_char);
-	    write_multiline(x, y, axis_array[SECOND_Y_AXIS].label.text, CENTRE, JUST_TOP, 
+	    write_multiline(x, y, axis_array[SECOND_Y_AXIS].label.text, CENTRE, JUST_TOP,
 	    		    TEXT_VERTICAL, axis_array[SECOND_Y_AXIS].label.font);
 	    (*t->text_angle) (0);
 	} else {
@@ -1259,6 +1251,7 @@ do_plot(plots, pcount)
 	}
 	reset_textcolor(&(axis_array[SECOND_Y_AXIS].label.textcolor),t);
     }
+
 /* XLABEL */
     if (*axis_array[FIRST_X_AXIS].label.text) {
 	unsigned int x = (xright + xleft) / 2 + axis_array[FIRST_X_AXIS].label.xoffset * (t->h_char);
@@ -1267,6 +1260,7 @@ do_plot(plots, pcount)
 	write_multiline(x, y, axis_array[FIRST_X_AXIS].label.text, CENTRE, JUST_TOP, 0, axis_array[FIRST_X_AXIS].label.font);
 	reset_textcolor(&(axis_array[FIRST_X_AXIS].label.textcolor),t);
     }
+
 /* PLACE TITLE */
     if (*title.text) {
 	/* we worked out y-coordinate in boundary() */
@@ -1276,6 +1270,7 @@ do_plot(plots, pcount)
 	write_multiline(x, y, title.text, CENTRE, JUST_TOP, 0, title.font);
 	reset_textcolor(&(title.textcolor),t);
     }
+
 /* X2LABEL */
     if (*axis_array[SECOND_X_AXIS].label.text) {
 	/* we worked out y-coordinate in boundary() */
@@ -1285,6 +1280,7 @@ do_plot(plots, pcount)
 	write_multiline(x, y, axis_array[SECOND_X_AXIS].label.text, CENTRE, JUST_TOP, 0, axis_array[SECOND_X_AXIS].label.font);
 	reset_textcolor(&(axis_array[SECOND_X_AXIS].label.textcolor),t);
     }
+
 /* PLACE TIMEDATE */
     if (*timelabel.text) {
 	/* we worked out coordinates in boundary() */
@@ -1322,7 +1318,6 @@ do_plot(plots, pcount)
     place_arrows( 0 );
 
 /* WORK OUT KEY SETTINGS AND DO KEY TITLE / BOX */
-
     if (lkey) {			/* may have been cancelled if something went wrong */
 	/* just use keybox.xl etc worked out in boundary() */
 	xl = keybox.xl + key_size_left;
@@ -1371,7 +1366,7 @@ do_plot(plots, pcount)
 	}
     } /* lkey */
 
-    /* DRAW CURVES */
+/* DRAW CURVES */
     this_plot = plots;
     for (curve = 0; curve < pcount; this_plot = this_plot->next, curve++) {
 	TBOOLEAN localkey = lkey;	/* a local copy */
@@ -1506,9 +1501,7 @@ do_plot(plots, pcount)
  */
 
 static void
-plot_impulses(plot, yaxis_x, xaxis_y)
-    struct curve_points *plot;
-    int yaxis_x, xaxis_y;
+plot_impulses(struct curve_points *plot, int yaxis_x, int xaxis_y)
 {
     int i;
     int x, y;
@@ -1551,8 +1544,7 @@ plot_impulses(plot, yaxis_x, xaxis_y)
  * Plot the curves in LINES style
  */
 static void
-plot_lines(plot)
-struct curve_points *plot;
+plot_lines(struct curve_points *plot)
 {
     int i;			/* point index */
     int x, y;			/* point in terminal coordinates */
@@ -1621,10 +1613,10 @@ struct curve_points *plot;
 
 /* finalize and draw the filled curve */
 static void
-finish_filled_curve(points, corners, filledcurves_options)
-    int points;
-    gpiPoint *corners;
-    filledcurves_opts *filledcurves_options;
+finish_filled_curve(
+    int points,
+    gpiPoint *corners,
+    filledcurves_opts *filledcurves_options)
 {
     if (points <= 0) return;
     /* add side (closing) points */
@@ -1634,33 +1626,33 @@ finish_filled_curve(points, corners, filledcurves_options)
 	case FILLEDCURVES_X1:
 		corners[points].x   = corners[points-1].x;
 		corners[points+1].x = corners[0].x;
-		corners[points].y   = 
+		corners[points].y   =
 		corners[points+1].y = axis_array[FIRST_Y_AXIS].term_lower;
 		points += 2;
 		break;
 	case FILLEDCURVES_X2:
 		corners[points].x   = corners[points-1].x;
 		corners[points+1].x = corners[0].x;
-		corners[points].y   = 
+		corners[points].y   =
 		corners[points+1].y = axis_array[FIRST_Y_AXIS].term_upper;
 		points += 2;
 		break;
 	case FILLEDCURVES_Y1:
 		corners[points].y   = corners[points-1].y;
 		corners[points+1].y = corners[0].y;
-		corners[points].x   = 
+		corners[points].x   =
 		corners[points+1].x = axis_array[FIRST_X_AXIS].term_lower;
 		points += 2;
 		break;
 	case FILLEDCURVES_Y2:
 		corners[points].y   = corners[points-1].y;
 		corners[points+1].y = corners[0].y;
-		corners[points].x   = 
+		corners[points].x   =
 		corners[points+1].x = axis_array[FIRST_X_AXIS].term_upper;
 		points += 2;
 		break;
 	case FILLEDCURVES_ATX1:
-		corners[points].x   = 
+		corners[points].x   =
 		corners[points+1].x = map_x(filledcurves_options->at);
 		    /* should be mapping real x1axis/graph/screen => screen */
 		corners[points].y   = corners[points-1].y;
@@ -1668,7 +1660,7 @@ finish_filled_curve(points, corners, filledcurves_options)
 		points += 2;
 		break;
 	case FILLEDCURVES_ATX2:
-		corners[points].x   = 
+		corners[points].x   =
 		corners[points+1].x = map_x(filledcurves_options->at);
 		    /* should be mapping real x2axis/graph/screen => screen */
 		corners[points].y   = corners[points-1].y;
@@ -1676,7 +1668,7 @@ finish_filled_curve(points, corners, filledcurves_options)
 		points += 2;
 		break;
 	case FILLEDCURVES_ATY1:
-		corners[points].y   = 
+		corners[points].y   =
 		corners[points+1].y = map_y(filledcurves_options->at);
 		    /* should be mapping real y1axis/graph/screen => screen */
 		corners[points].x   = corners[points-1].x;
@@ -1684,7 +1676,7 @@ finish_filled_curve(points, corners, filledcurves_options)
 		points += 2;
 		break;
 	case FILLEDCURVES_ATY2:
-		corners[points].y   = 
+		corners[points].y   =
 		corners[points+1].y = map_y(filledcurves_options->at);
 		    /* should be mapping real y2axis/graph/screen => screen */
 		corners[points].x   = corners[points-1].x;
@@ -1716,8 +1708,7 @@ finish_filled_curve(points, corners, filledcurves_options)
 
 
 static void
-plot_filledcurves(plot)
-struct curve_points *plot;
+plot_filledcurves(struct curve_points *plot)
 {
     int i;			/* point index */
     int x, y;			/* point in terminal coordinates */
@@ -1728,7 +1719,7 @@ struct curve_points *plot;
     int points = 0;			/* how many corners */
     static gpiPoint *corners = 0;	/* array of corners */
     static int corners_allocated = 0;	/* how many allocated */
-    
+
     if (!t->filled_polygon) { /* filled polygons are not available */
 	plot_lines(plot);
 	return;
@@ -1859,12 +1850,11 @@ struct curve_points *plot;
 #endif /* plot_filledcurves() only ifdef PM3D */
 
 /* XXX - JG  */
-/* plot_steps:                          
+/* plot_steps:
  * Plot the curves in STEPS style
  */
 static void
-plot_steps(plot)
-struct curve_points *plot;
+plot_steps(struct curve_points *plot)
 {
     int i;			/* point index */
     int x, y;			/* point in terminal coordinates */
@@ -1930,12 +1920,11 @@ struct curve_points *plot;
 }
 
 /* XXX - HOE  */
-/* plot_fsteps:                         
+/* plot_fsteps:
  * Plot the curves in STEPS style by step on forward yvalue
  */
 static void
-plot_fsteps(plot)
-struct curve_points *plot;
+plot_fsteps(struct curve_points *plot)
 {
     int i;			/* point index */
     int x, y;			/* point in terminal coordinates */
@@ -2008,13 +1997,11 @@ static struct curve_points *histeps_current_plot;
 /* NOTE: I'd have made the comp.function 'static', but the HP-sUX gcc
  * bug seems to forbid that :-( */
 int
-histeps_compare(p1, p2)
-    SORTFUNC_ARGS p1;
-    SORTFUNC_ARGS p2;
+histeps_compare(SORTFUNC_ARGS p1, SORTFUNC_ARGS p2)
 {
     double x1=histeps_current_plot->points[*(int *)p1].x;
     double x2=histeps_current_plot->points[*(int *)p2].x;
-    
+
     if (x1 < x2)
 	return -1;
     else
@@ -2022,12 +2009,11 @@ histeps_compare(p1, p2)
 }
 
 /* CAC  */
-/* plot_histeps:                                
+/* plot_histeps:
  * Plot the curves in HISTEPS style
  */
 static void
-plot_histeps(plot)
-    struct curve_points *plot;
+plot_histeps(struct curve_points *plot)
 {
     int i;			/* point index */
     int xl, yl;			/* cursor position in terminal coordinates */
@@ -2066,7 +2052,7 @@ plot_histeps(plot)
     /* HBB 20010625: log y axis must treat 0.0 as -infinity. Define
      * the correct y position for the histogram's baseline once. It'll
      * be used twice (once for each endpoint of the histogram). */
-    if (Y_AXIS.log) 
+    if (Y_AXIS.log)
 	y_null = GPMIN(Y_AXIS.min, Y_AXIS.max);
     else
 	y_null = 0.0;
@@ -2097,16 +2083,17 @@ plot_histeps(plot)
     free(gl);
 }
 
-/* CAC 
+/* CAC
  * Draw vertical line for the histeps routine.
  * Performs clipping.
  */
 /* HBB 20010214: renamed parameters. xl vs. x1 is just _too_ easy to
  * mis-read */
 static void
-histeps_vertical(cur_x, cur_y, x, y1, y2)
-    int *cur_x, *cur_y;		/* keeps track of "cursor" position */
-    double x, y1, y2;		/* coordinates of vertical line */
+histeps_vertical(
+    int *cur_x, int *cur_y,	/* keeps track of "cursor" position */
+    double x,
+    double y1, double y2)	/* coordinates of vertical line */
 {
     struct termentry *t = term;
     int xm, y1m, y2m;
@@ -2136,7 +2123,7 @@ histeps_vertical(cur_x, cur_y, x, y1, y2)
 	    y2 = Y_AXIS.min;
 	if (y2 > Y_AXIS.max)
 	    y2 = Y_AXIS.max;
-    } else {	
+    } else {
 	if ((y1 < Y_AXIS.max && y2 < Y_AXIS.max)
 	    || (y1 > Y_AXIS.min && y2 > Y_AXIS.min))
 	    return;
@@ -2163,14 +2150,15 @@ histeps_vertical(cur_x, cur_y, x, y1, y2)
     return;
 }
 
-/* CAC 
+/* CAC
  * Draw horizontal line for the histeps routine.
  * Performs clipping.
  */
 static void
-histeps_horizontal(cur_x, cur_y, x1, x2, y)
-    int *cur_x, *cur_y;		/* keeps track of "cursor" position */
-    double x1, x2, y;		/* coordinates of vertical line */
+histeps_horizontal(
+    int *cur_x, int *cur_y,	/* keeps track of "cursor" position */
+    double x1, double x2,
+    double y)			/* coordinates of vertical line */
 {
     struct termentry *t = term;
     int x1m, x2m, ym;
@@ -2231,8 +2219,7 @@ histeps_horizontal(cur_x, cur_y, x1, x2, y)
  *  we just plot the bars; the points are plotted in plot_points
  */
 static void
-plot_bars(plot)
-    struct curve_points *plot;
+plot_bars(struct curve_points *plot)
 {
     int i;			/* point index */
     struct termentry *t = term;
@@ -2247,9 +2234,9 @@ plot_bars(plot)
 
     /* Limitation: no boxes with x errorbars */
 
-    if ((plot->plot_style == YERRORBARS) 
-	|| (plot->plot_style == XYERRORBARS) 
-	|| (plot->plot_style == BOXERROR) 
+    if ((plot->plot_style == YERRORBARS)
+	|| (plot->plot_style == XYERRORBARS)
+	|| (plot->plot_style == BOXERROR)
 	|| (plot->plot_style == YERRORLINES)
 	|| (plot->plot_style == XYERRORLINES)) {
 	/* Draw the vertical part of the bar */
@@ -2393,10 +2380,12 @@ plot_bars(plot)
 	    }			/* HBB 981130: see above */
 	}			/* for loop */
     }				/* if yerrorbars OR xyerrorbars OR yerrorlines OR xyerrorlines */
-    if ((plot->plot_style == XERRORBARS) ||
-	(plot->plot_style == XYERRORBARS) || (plot->plot_style == XERRORLINES) || (plot->plot_style == XYERRORLINES)) {
+    if ((plot->plot_style == XERRORBARS)
+	|| (plot->plot_style == XYERRORBARS)
+	|| (plot->plot_style == XERRORLINES)
+	|| (plot->plot_style == XYERRORLINES)) {
 
-/* Draw the horizontal part of the bar */
+	/* Draw the horizontal part of the bar */
 	for (i = 0; i < plot->p_count; i++) {
 	    /* undefined points don't count */
 	    if (plot->points[i].type == UNDEFINED)
@@ -2452,9 +2441,7 @@ plot_bars(plot)
  * EAM Sep 2002 - Consolidate BOXES and FILLEDBOXES
  */
 static void
-plot_boxes(plot, xaxis_y)
-    struct curve_points *plot;
-    int xaxis_y;
+plot_boxes(struct curve_points *plot, int xaxis_y)
 {
     int i;			/* point index */
     int xl, xr, yt;		/* point in terminal coordinates */
@@ -2532,14 +2519,14 @@ plot_boxes(plot, xaxis_y)
 		if ((plot->fill_properties.fillstyle != FS_EMPTY) && t->fillbox) {
                     int x, y, w, h;
                     int fillpar, style;
-		    
+
                     x = xl;
                     y = xaxis_y;
                     w = xr - xl + 1;
                     h = yt - xaxis_y + 1;
                     /* avoid negative width/height */
-                    if( w <= 0 ) { 
-			x = xr; 
+                    if( w <= 0 ) {
+			x = xr;
 			w = xl - xr + 1;
 		    }
                     if( h <= 0 ) {
@@ -2590,7 +2577,7 @@ plot_boxes(plot, xaxis_y)
 		(*t->vector) (xr, xaxis_y);
 		(*t->vector) (xl, xaxis_y);
 #if USE_ULIG_FILLEDBOXES
-                if( t->fillbox && 
+                if( t->fillbox &&
 		    plot->fill_properties.border_linetype != LT_UNDEFINED)
 		    (*t->linetype)(plot->lp_properties.l_type);
 #endif
@@ -2615,8 +2602,7 @@ plot_boxes(plot, xaxis_y)
  * Plot the curves in POINTSTYLE style
  */
 static void
-plot_points(plot)
-struct curve_points *plot;
+plot_points(struct curve_points *plot)
 {
     int i;
     int x, y;
@@ -2637,8 +2623,7 @@ struct curve_points *plot;
  * Plot the curves in DOTS style
  */
 static void
-plot_dots(plot)
-struct curve_points *plot;
+plot_dots(struct curve_points *plot)
 {
     int i;
     int x, y;
@@ -2658,8 +2643,7 @@ struct curve_points *plot;
  * Plot the curves in VECTORS style
  */
 static void
-plot_vectors(plot)
-    struct curve_points *plot;
+plot_vectors(struct curve_points *plot)
 {
     int i;
     int x1, y1, x2, y2;
@@ -2676,7 +2660,7 @@ plot_vectors(plot)
 	points[0] = plot->points[i];
 	points[1].x = plot->points[i].xhigh;
 	points[1].y = plot->points[i].yhigh;
-	
+
 	if (points[0].type == UNDEFINED)
 	    continue;
 
@@ -2737,8 +2721,7 @@ plot_vectors(plot)
 
 /* plot_f_bars() - finance bars */
 static void
-plot_f_bars(plot)
-struct curve_points *plot;
+plot_f_bars(struct curve_points *plot)
 {
     int i;			/* point index */
     struct termentry *t = term;
@@ -2803,11 +2786,10 @@ struct curve_points *plot;
 
 /* plot_c_bars:
  * Plot the curves in CANDLESTICSK style
- *  we just plot the bars; the points are not plotted 
+ *  we just plot the bars; the points are not plotted
  */
 static void
-plot_c_bars(plot)
-    struct curve_points *plot;
+plot_c_bars(struct curve_points *plot)
 {
     struct termentry *t = term;
     int i;
@@ -2872,10 +2854,10 @@ plot_c_bars(plot)
 	    /* EAM Feb 2003 - Old code did essentially this */
 	    xlowM = xM - bar_size * tic;
 	    xhighM = xM + bar_size * tic;
-	} else { 
+	} else {
 
 	    dxl = -boxwidth / 2.0;
-	    if (prev != UNDEFINED) 
+	    if (prev != UNDEFINED)
 #if USE_ULIG_RELATIVE_BOXWIDTH
 		if (! boxwidth_is_absolute)
 		    dxl = (plot->points[i-1].x - plot->points[i].x) * boxwidth / 2.0;
@@ -2883,7 +2865,7 @@ plot_c_bars(plot)
 
 	    dxr = -dxl;
 	    if (i < plot->p_count - 1) {
-		if (plot->points[i + 1].type != UNDEFINED) { 
+		if (plot->points[i + 1].type != UNDEFINED) {
 #if USE_ULIG_RELATIVE_BOXWIDTH
 		    if (! boxwidth_is_absolute)
 			dxr = (plot->points[i+1].x - plot->points[i].x) * boxwidth / 2.0;
@@ -2892,7 +2874,7 @@ plot_c_bars(plot)
 			dxr = boxwidth / 2.0;
 		}
 	    }
-	
+
 	if (prev == UNDEFINED)
 	    dxl = -dxr;
 
@@ -2921,7 +2903,7 @@ plot_c_bars(plot)
                         fillpar = 0;
                     }
 	    /* Set style parameter (horrible bit-packing hack) */
-	    style = ((fillpar & 0xfff) << 4) 
+	    style = ((fillpar & 0xfff) << 4)
 		  + (plot->fill_properties.fillstyle & 0xf);
 	    if (map_y(yopen) < map_y(yclose)) {
 		ymin = map_y(yopen); ymax = map_y(yclose);
@@ -2962,14 +2944,14 @@ plot_c_bars(plot)
  */
 /* single edge intersection algorithm */
 /* Given two points, one inside and one outside the plot, return
- * the point where an edge of the plot intersects the line segment defined 
+ * the point where an edge of the plot intersects the line segment defined
  * by the two points.
  */
 static void
-edge_intersect(points, i, ex, ey)
-struct coordinate GPHUGE *points;	/* the points array */
-int i;				/* line segment from point i-1 to point i */
-double *ex, *ey;		/* the point where it crosses an edge */
+edge_intersect(
+    struct coordinate GPHUGE *points, /* the points array */
+    int i,			/* line segment from point i-1 to point i */
+    double *ex, double *ey)	/* the point where it crosses an edge */
 {
     double ix = points[i - 1].x;
     double iy = points[i - 1].y;
@@ -2989,10 +2971,10 @@ double *ex, *ey;		/* the point where it crosses an edge */
 	oy = y;
     }
     /* nasty degenerate cases, effectively drawing to an infinity point (?)
-     * cope with them here, so don't process them as a "real" OUTRANGE point 
+     * cope with them here, so don't process them as a "real" OUTRANGE point
      *
      * If more than one coord is -VERYLARGE, then can't ratio the "infinities"
-     * so drop out by returning the INRANGE point. 
+     * so drop out by returning the INRANGE point.
      *
      * Obviously, only need to test the OUTRANGE point (coordinates) */
     if (ox == -VERYLARGE || oy == -VERYLARGE) {
@@ -3082,8 +3064,8 @@ double *ex, *ey;		/* the point where it crosses an edge */
 	}
     }
     /* If we reach here, the inrange point is on the edge, and
-     * the line segment from the outrange point does not cross any 
-     * other edges to get there. In this case, we return the inrange 
+     * the line segment from the outrange point does not cross any
+     * other edges to get there. In this case, we return the inrange
      * point as the 'edge' intersection point. This will basically draw
      * line.
      */
@@ -3094,20 +3076,20 @@ double *ex, *ey;		/* the point where it crosses an edge */
 
 /* XXX - JG  */
 /* single edge intersection algorithm for "steps" curves */
-/* 
+/*
  * Given two points, one inside and one outside the plot, return
  * the point where an edge of the plot intersects the line segments
- * forming the step between the two points. 
+ * forming the step between the two points.
  *
- * Recall that if P1 = (x1,y1) and P2 = (x2,y2), the step from  
- * P1 to P2 is drawn as two line segments: (x1,y1)->(x2,y1) and 
- * (x2,y1)->(x2,y2). 
+ * Recall that if P1 = (x1,y1) and P2 = (x2,y2), the step from
+ * P1 to P2 is drawn as two line segments: (x1,y1)->(x2,y1) and
+ * (x2,y1)->(x2,y2).
  */
 static void
-edge_intersect_steps(points, i, ex, ey)
-    struct coordinate GPHUGE *points; /* the points array */
-    int i;			/* line segment from point i-1 to point i */
-    double *ex, *ey;		/* the point where it crosses an edge */
+edge_intersect_steps(
+    struct coordinate GPHUGE *points, /* the points array */
+    int i,			/* line segment from point i-1 to point i */
+    double *ex, double *ey)	/* the point where it crosses an edge */
 {
     /* global X_AXIS.min, X_AXIS.max, Y_AXIS.min, X_AXIS.max */
     double ax = points[i - 1].x;
@@ -3141,20 +3123,20 @@ edge_intersect_steps(points, i, ex, ey)
 
 /* XXX - HOE  */
 /* single edge intersection algorithm for "fsteps" curves */
-/* fsteps means step on forward y-value. 
+/* fsteps means step on forward y-value.
  * Given two points, one inside and one outside the plot, return
  * the point where an edge of the plot intersects the line segments
- * forming the step between the two points. 
+ * forming the step between the two points.
  *
- * Recall that if P1 = (x1,y1) and P2 = (x2,y2), the step from  
- * P1 to P2 is drawn as two line segments: (x1,y1)->(x1,y2) and 
- * (x1,y2)->(x2,y2). 
+ * Recall that if P1 = (x1,y1) and P2 = (x2,y2), the step from
+ * P1 to P2 is drawn as two line segments: (x1,y1)->(x1,y2) and
+ * (x1,y2)->(x2,y2).
  */
 static void
-edge_intersect_fsteps(points, i, ex, ey)
-    struct coordinate GPHUGE *points; /* the points array */
-    int i;			/* line segment from point i-1 to point i */
-    double *ex, *ey;		/* the point where it crosses an edge */
+edge_intersect_fsteps(
+    struct coordinate GPHUGE *points, /* the points array */
+    int i,			/* line segment from point i-1 to point i */
+    double *ex, double *ey)	/* the point where it crosses an edge */
 {
     /* global X_AXIS.min, X_AXIS.max, Y_AXIS.min, X_AXIS.max */
     double ax = points[i - 1].x;
@@ -3188,24 +3170,24 @@ edge_intersect_fsteps(points, i, ex, ey)
 
 /* XXX - JG  */
 /* double edge intersection algorithm for "steps" plot */
-/* Given two points, both outside the plot, return the points where an 
- * edge of the plot intersects the line segments forming a step 
+/* Given two points, both outside the plot, return the points where an
+ * edge of the plot intersects the line segments forming a step
  * by the two points. There may be zero, one, two, or an infinite number
  * of intersection points. (One means an intersection at a corner, infinite
  * means overlaying the edge itself). We return FALSE when there is nothing
- * to draw (zero intersections), and TRUE when there is something to 
- * draw (the one-point case is a degenerate of the two-point case and we do 
+ * to draw (zero intersections), and TRUE when there is something to
+ * draw (the one-point case is a degenerate of the two-point case and we do
  * not distinguish it - we draw it anyway).
  *
- * Recall that if P1 = (x1,y1) and P2 = (x2,y2), the step from  
- * P1 to P2 is drawn as two line segments: (x1,y1)->(x2,y1) and 
- * (x2,y1)->(x2,y2). 
+ * Recall that if P1 = (x1,y1) and P2 = (x2,y2), the step from
+ * P1 to P2 is drawn as two line segments: (x1,y1)->(x2,y1) and
+ * (x2,y1)->(x2,y2).
  */
 static TBOOLEAN			/* any intersection? */
-two_edge_intersect_steps(points, i, lx, ly)
-    struct coordinate GPHUGE *points; /* the points array */
-    int i;			/* line segment from point i-1 to point i */
-    double *lx, *ly;		/* lx[2], ly[2]: points where it crosses edges */
+two_edge_intersect_steps(
+    struct coordinate GPHUGE *points, /* the points array */
+    int i,			/* line segment from point i-1 to point i */
+    double *lx, double *ly)	/* lx[2], ly[2]: points where it crosses edges */
 {
     /* global X_AXIS.min, X_AXIS.max, Y_AXIS.min, X_AXIS.max */
     double ax = points[i - 1].x;
@@ -3251,24 +3233,24 @@ two_edge_intersect_steps(points, i, lx, ly)
 
 /* XXX - HOE  */
 /* double edge intersection algorithm for "fsteps" plot */
-/* Given two points, both outside the plot, return the points where an 
- * edge of the plot intersects the line segments forming a step 
+/* Given two points, both outside the plot, return the points where an
+ * edge of the plot intersects the line segments forming a step
  * by the two points. There may be zero, one, two, or an infinite number
  * of intersection points. (One means an intersection at a corner, infinite
  * means overlaying the edge itself). We return FALSE when there is nothing
- * to draw (zero intersections), and TRUE when there is something to 
- * draw (the one-point case is a degenerate of the two-point case and we do 
+ * to draw (zero intersections), and TRUE when there is something to
+ * draw (the one-point case is a degenerate of the two-point case and we do
  * not distinguish it - we draw it anyway).
  *
- * Recall that if P1 = (x1,y1) and P2 = (x2,y2), the step from  
- * P1 to P2 is drawn as two line segments: (x1,y1)->(x1,y2) and 
- * (x1,y2)->(x2,y2). 
+ * Recall that if P1 = (x1,y1) and P2 = (x2,y2), the step from
+ * P1 to P2 is drawn as two line segments: (x1,y1)->(x1,y2) and
+ * (x1,y2)->(x2,y2).
  */
 static TBOOLEAN			/* any intersection? */
-two_edge_intersect_fsteps(points, i, lx, ly)
-    struct coordinate GPHUGE *points; /* the points array */
-    int i;			/* line segment from point i-1 to point i */
-    double *lx, *ly;		/* lx[2], ly[2]: points where it crosses edges */
+two_edge_intersect_fsteps(
+    struct coordinate GPHUGE *points, /* the points array */
+    int i,			/* line segment from point i-1 to point i */
+    double *lx, double *ly)	/* lx[2], ly[2]: points where it crosses edges */
 {
     /* global X_AXIS.min, X_AXIS.max, Y_AXIS.min, X_AXIS.max */
     double ax = points[i - 1].x;
@@ -3314,19 +3296,19 @@ two_edge_intersect_fsteps(points, i, lx, ly)
 
 /* double edge intersection algorithm */
 /* Given two points, both outside the plot, return
- * the points where an edge of the plot intersects the line segment defined 
+ * the points where an edge of the plot intersects the line segment defined
  * by the two points. There may be zero, one, two, or an infinite number
  * of intersection points. (One means an intersection at a corner, infinite
  * means overlaying the edge itself). We return FALSE when there is nothing
- * to draw (zero intersections), and TRUE when there is something to 
- * draw (the one-point case is a degenerate of the two-point case and we do 
+ * to draw (zero intersections), and TRUE when there is something to
+ * draw (the one-point case is a degenerate of the two-point case and we do
  * not distinguish it - we draw it anyway).
  */
 static TBOOLEAN			/* any intersection? */
-two_edge_intersect(points, i, lx, ly)
-    struct coordinate GPHUGE *points; /* the points array */
-    int i;			/* line segment from point i-1 to point i */
-    double *lx, *ly;		/* lx[2], ly[2]: points where it crosses edges */
+two_edge_intersect(
+    struct coordinate GPHUGE *points, /* the points array */
+    int i,			/* line segment from point i-1 to point i */
+    double *lx, double *ly)	/* lx[2], ly[2]: points where it crosses edges */
 {
     /* global X_AXIS.min, X_AXIS.max, Y_AXIS.min, X_AXIS.max */
     int count;
@@ -3435,8 +3417,8 @@ two_edge_intersect(points, i, lx, ly)
      *
      * The slant line intersections are solved using the parametric form
      * of the equation for a line, since if we test x/y min/max planes explicitly
-     * then e.g. a  line passing through a corner point (X_AXIS.min,Y_AXIS.min) 
-     * actually intersects 2 planes and hence further tests would be required 
+     * then e.g. a  line passing through a corner point (X_AXIS.min,Y_AXIS.min)
+     * actually intersects 2 planes and hence further tests would be required
      * to anticipate this and similar situations.
      */
 
@@ -3560,11 +3542,11 @@ two_edge_intersect(points, i, lx, ly)
 /* display a x-axis ticmark - called by gen_ticks */
 /* also uses global tic_start, tic_direction, tic_text and tic_just */
 void
-xtick2d_callback(axis, place, text, grid)
-    AXIS_INDEX axis;
-    double place;
-    char *text;
-    struct lp_style_type grid;	/* linetype or -2 for no grid */
+xtick2d_callback(
+    AXIS_INDEX axis,
+    double place,
+    char *text,
+    struct lp_style_type grid)	/* linetype or -2 for no grid */
 {
     register struct termentry *t = term;
     /* minitick if text is NULL - beware - h_tic is unsigned */
@@ -3633,7 +3615,7 @@ xtick2d_callback(axis, place, text, grid)
         /* User-specified different color for the tics text */
         if (axis_array[axis].ticdef.textcolor.lt != TC_DEFAULT)
             apply_textcolor(&(axis_array[axis].ticdef.textcolor), t);
-	write_multiline(x, tic_text, text, tic_hjust, tic_vjust, rotate_tics, 
+	write_multiline(x, tic_text, text, tic_hjust, tic_vjust, rotate_tics,
 			axis_array[axis].ticdef.font);
 	term_apply_lp_properties(&border_lp);	/* reset to border linetype */
     }
@@ -3642,11 +3624,11 @@ xtick2d_callback(axis, place, text, grid)
 /* display a y-axis ticmark - called by gen_ticks */
 /* also uses global tic_start, tic_direction, tic_text and tic_just */
 void
-ytick2d_callback(axis, place, text, grid)
-    AXIS_INDEX axis;
-    double place;
-    char *text;
-    struct lp_style_type grid;	/* linetype or -2 */
+ytick2d_callback(
+    AXIS_INDEX axis,
+    double place,
+    char *text,
+    struct lp_style_type grid)	/* linetype or -2 */
 {
     register struct termentry *t = term;
     /* minitick if text is NULL - v_tic is unsigned */
@@ -3706,7 +3688,7 @@ ytick2d_callback(axis, place, text, grid)
         /* User-specified different color for the tics text */
         if (axis_array[axis].ticdef.textcolor.lt != TC_DEFAULT)
             apply_textcolor(&(axis_array[axis].ticdef.textcolor), t);
-	write_multiline(tic_text, y, text, tic_hjust, tic_vjust, rotate_tics, 
+	write_multiline(tic_text, y, text, tic_hjust, tic_vjust, rotate_tics,
 			axis_array[axis].ticdef.font);
 	term_apply_lp_properties(&border_lp);	/* reset to border linetype */
     }
@@ -3717,9 +3699,7 @@ ytick2d_callback(axis, place, text, grid)
    LINES is not NULL, set *LINES to the number of lines in the
    label. */
 int
-label_width(str, lines)
-const char *str;
-int *lines;
+label_width(const char *str, int *lines)
 {
     char *lab = NULL, *s, *e;
     int mlen, len, l;
@@ -3749,10 +3729,10 @@ int *lines;
 
 /*{{{  map_position, wrapper, which maps double to int */
 void
-map_position(pos, x, y, what)
-struct position *pos;
-unsigned int *x, *y;
-const char *what;
+map_position(
+    struct position *pos,
+    unsigned int *x, unsigned int *y,
+    const char *what)
 {
     double xx, yy;
     map_position_double(pos, &xx, &yy, what);
@@ -3764,10 +3744,10 @@ const char *what;
 
 /*{{{  map_position_double */
 static void
-map_position_double(pos, x, y, what)
-    struct position *pos;
-    double *x, *y;
-    const char *what;
+map_position_double(
+    struct position *pos,
+    double *x, double *y,
+    const char *what)
 {
     switch (pos->scalex) {
     case first_axes:
@@ -3831,10 +3811,10 @@ map_position_double(pos, x, y, what)
 
 /*{{{  map_position_r */
 static void
-map_position_r(pos, x, y, what)
-struct position *pos;
-double *x, *y;
-const char *what;
+map_position_r(
+    struct position *pos,
+    double *x, double *y,
+    const char *what)
 {
     switch (pos->scalex) {
     case first_axes:
@@ -3926,14 +3906,14 @@ plot_border()
  */
 
 static void
-do_key_sample(this_plot, key, title, t, xl, yl)
-    struct curve_points *this_plot;
-    legend_key *key;
-    char *title;
-    struct termentry *t;
-    int xl, yl;
+do_key_sample(
+    struct curve_points *this_plot,
+    legend_key *key,
+    char *title,
+    struct termentry *t,
+    int xl, int yl)
 {
-    /* Draw key text in black */ 
+    /* Draw key text in black */
     (*t->linetype)(LT_BLACK);
 
     if (key->just == JLEFT) {
@@ -3950,7 +3930,7 @@ do_key_sample(this_plot, key, title, t, xl, yl)
 	}
     }
     /* Draw sample in same color as the corresponding plot */
-    (*t->linetype)(this_plot->lp_properties.l_type); 
+    (*t->linetype)(this_plot->lp_properties.l_type);
 
     /* draw sample depending on bits set in plot_style */
 #if USE_ULIG_FILLEDBOXES
@@ -3971,7 +3951,7 @@ do_key_sample(this_plot, key, title, t, xl, yl)
 	}
 
 	(*t->fillbox)(style,
-		      xl + key_sample_left, yl - key_entry_height/4, 
+		      xl + key_sample_left, yl - key_entry_height/4,
 		      key_sample_right - key_sample_left,
 		      key_entry_height/2);
 	if (fs->fillstyle != FS_EMPTY && fs->border_linetype != LT_UNDEFINED)
@@ -3998,8 +3978,8 @@ do_key_sample(this_plot, key, title, t, xl, yl)
 	    /* errors for data plots only */
 	    (*t->move) (xl + key_sample_left, yl);
 	    (*t->vector) (xl + key_sample_right, yl);
-	} 
-    
+	}
+
     if ((this_plot->plot_type == DATA)
 	&& (this_plot->plot_style & PLOT_STYLE_HAS_ERRORBAR)
 	&& (bar_size > 0.0)) {

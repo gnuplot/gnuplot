@@ -1,5 +1,5 @@
-/*
- * $Id: png.trm,v 1.40 2003/09/12 14:36:06 broeker Exp $
+/* Hello, Emacs, this is -*-C-*-
+ * $Id: png.trm,v 1.41 2004/04/13 17:24:36 broeker Exp $
  *
  */
 
@@ -173,7 +173,7 @@ PNG_options()
     term_options[0] = NUL;
 
     while (!END_OF_COMMAND) {
-	
+
 	switch(lookup_table(&PNG_opts[0],c_token)) {
 
 	case PNG_TRANSPARENT:
@@ -291,7 +291,7 @@ PNG_options()
     sprintf(term_options + strlen(term_options), "picsize %u %u ",
 	    term->xmax, term->ymax);
 
-    for (i = 0; strlen(term_options) + 9 < MAX_LINE_LEN && 
+    for (i = 0; strlen(term_options) + 9 < MAX_LINE_LEN &&
 	i < n_colors ; i++ ) {
 	sprintf(term_options + strlen(term_options),
 		"x%02x%02x%02x ",
@@ -415,7 +415,7 @@ PNG_text()
     }
 
 #ifdef __OLD_PNGLIB__
-    /* deprecated and no longer necessary */ 
+    /* deprecated and no longer necessary */
     png_info_init(info_ptr);
     png_write_init(png_ptr); */
 #endif /* __OLD_PNGLIB__ */
@@ -515,18 +515,17 @@ PNG_text()
 
 /* _linetype(lt)  Called to set the line type before text is displayed or
  * line(s) plotted.  This procedure should select a pen color or line
- * style if the device has these capabilities.  
- * lt is an integer from -2 to 0 or greater.  
+ * style if the device has these capabilities.
+ * lt is an integer from -2 to 0 or greater.
  * An lt of -2 is used for the border of the plot.
- * An lt of -1 is used for the X and Y axes.  
+ * An lt of -1 is used for the X and Y axes.
  * lt 0 and upwards are used for plots 0 and upwards.
- * If _linetype() is called with lt greater than the available line types, 
+ * If _linetype() is called with lt greater than the available line types,
  * it should map it to one of the available line types.
  * Most drivers provide 9 different linetypes (lt is 0 to 8).
  */
 TERM_PUBLIC void
-PNG_linetype(linetype)
-int linetype;
+PNG_linetype(int linetype)
 {
     switch (png_mode) {
     /* HBB 991008: this once made the grid lines and axes (-1) look the
@@ -563,9 +562,7 @@ int linetype;
 }
 
 TERM_PUBLIC void
-PNG_point(x, y, point)
-unsigned int x, y;
-int point;
+PNG_point(unsigned int x, unsigned int y, int point)
 {
     if (png_mode == 0)
 	line_and_point(x, y, point);

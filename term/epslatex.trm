@@ -1,5 +1,5 @@
-/*
- * $Id: epslatex.trm,v 1.22 2004/03/29 10:43:36 broeker Exp $
+/* Hello, Emacs, this is -*-C-*-
+ * $Id: epslatex.trm,v 1.23 2004/04/13 17:24:17 broeker Exp $
  */
 
 /* GNUPLOT - epslatex.trm */
@@ -120,8 +120,8 @@ static enum JUSTIFY EPSL_justify = LEFT;	/* text is flush left */
 /* static int x = 0; */
 
 /* for testing */
-/* 
-char GPFAR * GPFAR EPSL_header[] = {"(prolog.ps) run\n", NULL}; 
+/*
+char GPFAR * GPFAR EPSL_header[] = {"(prolog.ps) run\n", NULL};
  */
 
 static char GPFAR *GPFAR EPSL_header[] = {
@@ -694,7 +694,7 @@ Gpdict begin\n\
 		int_error(NO_CARET, "--- reopen failed");
 	}
     }
-    
+
     fputs("%%!PS-Adobe-3.0 EPSF-3.0\n", gpoutfile);
     if (outstr)
 	fprintf(gpoutfile, "%%%%Title: (%s)\n", outstr);
@@ -797,8 +797,7 @@ EPSL_reset()
 
 
 TERM_PUBLIC void
-EPSL_linetype(linetype)
-int linetype;
+EPSL_linetype(int linetype)
 {
     EPSL_FLUSH_PATH;
     linetype = (linetype % 4) + 2;
@@ -816,23 +815,20 @@ int linetype;
 
 
 TERM_PUBLIC void
-EPSL_linewidth(linewidth)
-double linewidth;
+EPSL_linewidth(double linewidth)
 {
     EPSL_FLUSH_PATH;
     fprintf(gpoutfile, "%.3f Gpsetlinewidth\n", linewidth);
 }
 
 TERM_PUBLIC void
-EPSL_pointsize(ptsize)
-double ptsize;
+EPSL_pointsize(double ptsize)
 {
     fprintf(gpoutfile, "%.3f Gpsetpointsize\n", ptsize);
 }
 
 TERM_PUBLIC void
-EPSL_move(x, y)
-unsigned int x, y;
+EPSL_move(unsigned int x, unsigned int y)
 {
     int dx, dy;
     /* Make this semi-dynamic and independent of architecture */
@@ -860,8 +856,7 @@ unsigned int x, y;
 }
 
 TERM_PUBLIC void
-EPSL_vector(x, y)
-unsigned int x, y;
+EPSL_vector(unsigned int x, unsigned int y)
 {
     int dx, dy;
     char abso[5 + 2 * INT_STR_LEN], rel[5 + 2 * INT_STR_LEN];
@@ -889,18 +884,17 @@ unsigned int x, y;
 }
 
 TERM_PUBLIC void
-EPSL_arrow(xstart, ystart, xend, yend, head)
-    unsigned int xstart, ystart, xend, yend;
-    int head;
+EPSL_arrow(
+    unsigned int xstart, unsigned int ystart,
+    unsigned int xend, unsigned int yend,
+    int head)
 {
     fprintf(gpoutfile, "%d %d M\n%d %d %s\n",
 	    xstart, ystart, xend, yend, head ? "Arrow" : "L Gpstroke");
 }
 
 TERM_PUBLIC void
-EPSL_put_text(x, y, str)
-    unsigned int x, y;
-    const char *str;
+EPSL_put_text(unsigned int x, unsigned int y, const char *str)
 {
     if (EPSL_texfile) {
 	fprintf(EPSL_texfile, "\\put(%d,%d){", x, y);
@@ -930,8 +924,7 @@ EPSL_put_text(x, y, str)
 
 
 TERM_PUBLIC int
-EPSL_text_angle(ang)
-int ang;
+EPSL_text_angle(int ang)
 {
     EPSL_ang = ang;
     return TRUE;
@@ -939,8 +932,7 @@ int ang;
 
 
 TERM_PUBLIC int
-EPSL_justify_text(mode)
-enum JUSTIFY mode;
+EPSL_justify_text(enum JUSTIFY mode)
 {
     EPSL_justify = mode;
     return TRUE;
@@ -948,8 +940,7 @@ enum JUSTIFY mode;
 
 
 TERM_PUBLIC int
-EPSL_set_font(font)		/* Entry font added by DJL */
-const char *font;
+EPSL_set_font(const char *font)
 {
     char name[32];
     int size, sep;
@@ -966,9 +957,7 @@ const char *font;
 }
 
 TERM_PUBLIC void
-EPSL_point(x, y, number)
-unsigned int x, y;
-int number;
+EPSL_point(unsigned int x, unsigned int y, int number)
 {
     static char GPFAR *GPFAR pointFNS[] = { "Pnt", "Dia", "Crc", "Crs", "CrX", "Box", "DaF", "CcF", "BxF" };
 
@@ -985,9 +974,10 @@ int number;
 }
 
 TERM_PUBLIC void
-EPSL_fillbox(style, x1, y1, width, height)
-    int style;
-    unsigned int x1, y1, width, height;
+EPSL_fillbox(
+    int style,
+    unsigned int x1, unsigned int y1,
+    unsigned int width, unsigned int height)
 {
 
     EPSL_FLUSH_PATH
@@ -1024,9 +1014,7 @@ EPSL_fillbox(style, x1, y1, width, height)
 #ifdef PM3D
 
 TERM_PUBLIC void
-EPSL_filled_polygon(points, corners)
-    int points;
-    gpiPoint *corners;
+EPSL_filled_polygon(int points, gpiPoint *corners)
 {
     PS_filled_polygon(points, corners);
     EPSL_relative_ok = FALSE;

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: termdoc.c,v 1.13 2002/12/16 14:16:52 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: termdoc.c,v 1.14 2004/04/13 17:23:36 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - termdoc.c */
@@ -48,7 +48,7 @@ static char *RCSid() { return RCSid("$Id: termdoc.c,v 1.13 2002/12/16 14:16:52 l
  * Can be compiled as a standalone program to generate the raw
  * .doc test, when compiled with -DTEST_TERMDOC
  *
- * Strips comment lines {so none of doc2* need to bother} 
+ * Strips comment lines {so none of doc2* need to bother}
  * but magic comments beginning  C#  are used as markers
  * for line number recording (as c compilers)
  * We set BEGIN_HELP macro to "C#<driver>" as a special marker.
@@ -163,7 +163,7 @@ get_line( char *buffer, int max, FILE *fp)
         buffer[max-2] = '\n';
     else
         strcat(buffer, "\n");
-        
+
     if (isdigit((int)buffer[0]))
 	buffer[0] += level;
 
@@ -200,9 +200,10 @@ safe_strncpy( char *d, const char *s, size_t n)
 
 #ifdef TEST_TERMDOC
 int
-main(void)
+main()
 {
     char line[256];
+
     while (get_line(line, sizeof(line), stdin))
 	printf("%s:%d:%s", termdoc_filename, termdoc_lineno, line);
     return 0;

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: interpol.c,v 1.28 2003/10/06 22:26:16 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: interpol.c,v 1.29 2004/04/13 17:23:58 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - interpol.c */
@@ -73,7 +73,7 @@ static char *RCSid() { return RCSid("$Id: interpol.c,v 1.28 2003/10/06 22:26:16 
  *    - structs: curve_points, coordval, coordinate
  *
  *  setshow.h
- *    - samples, axis array[] variables 
+ *    - samples, axis array[] variables
  *    - plottypes
  *
  *  proto.h
@@ -103,7 +103,7 @@ static char *RCSid() { return RCSid("$Id: interpol.c,v 1.28 2003/10/06 22:26:16 
  *  Dec 12, 1995 David Denholm
  *      oops - at the time this is called, stored co-ords are
  *      internal (ie maybe log of data) but min/max are in
- *      user co-ordinates. 
+ *      user co-ordinates.
  *      Work with min and max of internal co-ords, and
  *      check at the end whether external min and max need to
  *      be increased. (since samples_1 is typically 100 ; we
@@ -139,7 +139,7 @@ static char *RCSid() { return RCSid("$Id: interpol.c,v 1.28 2003/10/06 22:26:16 
  *
  * do { } while(0) is comp.lang.c recommendation for complex macros
  * also means that break can be specified as an action, and it will
- * 
+ *
  */
 
 
@@ -196,7 +196,7 @@ static int solve_five_diag __PROTO((five_diag m[], double r[], double x[], int n
 static spline_coeff *cp_approx_spline __PROTO((struct curve_points * plot, int first_point, int num_points));
 static spline_coeff *cp_tridiag __PROTO((struct curve_points * plot, int first_point, int num_points));
 static void do_cubic __PROTO((struct curve_points * plot, spline_coeff * sc, int first_point, int num_points, struct coordinate * dest));
-static void do_freq __PROTO((struct curve_points *plot,	int first_point, int num_points));		
+static void do_freq __PROTO((struct curve_points *plot,	int first_point, int num_points));
 int compare_points __PROTO((SORTFUNC_ARGS p1, SORTFUNC_ARGS p2));
 
 
@@ -209,9 +209,7 @@ int compare_points __PROTO((SORTFUNC_ARGS p1, SORTFUNC_ARGS p2));
  */
 
 static int
-next_curve(plot, curve_start)
-struct curve_points *plot;
-int *curve_start;
+next_curve(struct curve_points *plot, int *curve_start)
 {
     int curve_length;
 
@@ -230,14 +228,13 @@ int *curve_start;
 }
 
 
-/* 
+/*
  * determine the number of curves in plot->points, separated by
  * UNDEFINED points
  */
 
 static int
-num_curves(plot)
-struct curve_points *plot;
+num_curves(struct curve_points *plot)
 {
     int curves;
     int first_point;
@@ -277,8 +274,7 @@ struct curve_points *plot;
  * (MGR 1992)
  */
 static double *
-cp_binomial(points)
-    int points;
+cp_binomial(int points)
 {
     register double *coeff;
     register int n, k;
@@ -311,14 +307,14 @@ cp_binomial(points)
  */
 
 static void
-eval_bezier(cp, first_point, num_points, sr, px, py, c)
-    struct curve_points *cp;
-    int first_point;		/* where to start in plot->points (to find x-range) */
-    int num_points;		/* to determine end in plot->points */
-    double sr;			/* position inside curve, range [0:1] */
-    coordval *px;		/* OUTPUT: x and y */
-    coordval *py;
-    double *c;			/* Bezier coefficient array */
+eval_bezier(
+    struct curve_points *cp,
+    int first_point,		/* where to start in plot->points (to find x-range) */
+    int num_points,		/* to determine end in plot->points */
+    double sr,			/* position inside curve, range [0:1] */
+    coordval *px,		/* OUTPUT: x and y */
+    coordval *py,
+    double *c)			/* Bezier coefficient array */
 {
     unsigned int n = num_points - 1;
     struct coordinate GPHUGE *this_points;
@@ -359,12 +355,12 @@ eval_bezier(cp, first_point, num_points, sr, px, py, c)
  */
 
 static void
-do_bezier(cp, bc, first_point, num_points, dest)
-    struct curve_points *cp;
-    double *bc;			/* Bezier coefficient array */
-    int first_point;		/* where to start in plot->points */
-    int num_points;		/* to determine end in plot->points */
-    struct coordinate *dest;	/* where to put the interpolated data */
+do_bezier(
+    struct curve_points *cp,
+    double *bc,			/* Bezier coefficient array */
+    int first_point,		/* where to start in plot->points */
+    int num_points,		/* to determine end in plot->points */
+    struct coordinate *dest)	/* where to put the interpolated data */
 {
     int i;
     coordval x, y;
@@ -412,7 +408,7 @@ do_bezier(cp, bc, first_point, num_points, dest)
  * call contouring routines -- main entry
  */
 
-/* 
+/*
  * it should be like this, but it doesn't run. If you find out why,
  * contact me: mgr@asgard.bo.open.de or Lars Hanke 2:243/4802.22@fidonet
  *
@@ -423,11 +419,11 @@ do_bezier(cp, bc, first_point, num_points, dest)
  *
  */
 
-/* 
+/*
  * Solve five diagonal linear system equation. The five diagonal matrix is
  * defined via matrix M, right side is r, and solution X i.e. M * X = R.
  * Size of system given in n. Return TRUE if solution exist.
- *  G. Engeln-Muellges/ F.Reutter: 
+ *  G. Engeln-Muellges/ F.Reutter:
  *  "Formelsammlung zur Numerischen Mathematik mit Standard-FORTRAN-Programmen"
  *  ISBN 3-411-01677-9
  *
@@ -437,13 +433,10 @@ do_bezier(cp, bc, first_point, num_points, dest)
  * I    0 m30 m31 m32 m33 m34   0    .       .       . I   I  x3  I   I  r3  I
  *      .   .   .   .   .   .   .    .       .       .        .        .
  * \                           m(n-3)0 m(n-2)1 m(n-1)2 /   \x(n-1)/   \r(n-1)/
- * 
+ *
  */
 static int
-solve_five_diag(m, r, x, n)
-    five_diag m[];
-    double r[], x[];
-    int n;
+solve_five_diag(five_diag m[], double r[], double x[], int n)
 {
     int i;
     five_diag *hv;
@@ -497,14 +490,14 @@ solve_five_diag(m, r, x, n)
 /*
  * Calculation of approximation cubic splines
  * Input:  x[i], y[i], weights z[i]
- *         
+ *
  * Returns matrix of spline coefficients
  */
 static spline_coeff *
-cp_approx_spline(plot, first_point, num_points)
-    struct curve_points *plot;
-    int first_point;		/* where to start in plot->points */
-    int num_points;		/* to determine end in plot->points */
+cp_approx_spline(
+    struct curve_points *plot,
+    int first_point,		/* where to start in plot->points */
+    int num_points)		/* to determine end in plot->points */
 {
     spline_coeff *sc;
     five_diag *m;
@@ -627,13 +620,11 @@ cp_approx_spline(plot, first_point, num_points)
  *
  * This can be treated as a special case of approximation cubic splines, with
  * all weights -> infinity.
- *         
+ *
  * Returns matrix of spline coefficients
  */
 static spline_coeff *
-cp_tridiag(plot, first_point, num_points)
-    struct curve_points *plot;
-    int first_point, num_points;
+cp_tridiag(struct curve_points *plot, int first_point, int num_points)
 {
     spline_coeff *sc;
     tri_diag *m;
@@ -722,12 +713,12 @@ cp_tridiag(plot, first_point, num_points)
 }
 
 static void
-do_cubic(plot, sc, first_point, num_points, dest)
-    struct curve_points *plot;	/* still containes old plot->points */
-    spline_coeff *sc;		/* generated by cp_tridiag */
-    int first_point;		/* where to start in plot->points */
-    int num_points;		/* to determine end in plot->points */
-    struct coordinate *dest;	/* where to put the interpolated data */
+do_cubic(
+    struct curve_points *plot,	/* still containes old plot->points */
+    spline_coeff *sc,		/* generated by cp_tridiag */
+    int first_point,		/* where to start in plot->points */
+    int num_points,		/* to determine end in plot->points */
+    struct coordinate *dest)	/* where to put the interpolated data */
 {
     double xdiff, temp, x, y;
     double xstart, xend;	/* Endpoints of the sampled x range */
@@ -819,10 +810,10 @@ do_cubic(plot, sc, first_point, num_points, dest)
  */
 
 static void
-do_freq(plot, first_point, num_points)
-    struct curve_points *plot;	/* still contains old plot->points */
-    int first_point;		/* where to start in plot->points */
-    int num_points;		/* to determine end in plot->points */
+do_freq(
+    struct curve_points *plot,	/* still contains old plot->points */
+    int first_point,		/* where to start in plot->points */
+    int num_points)		/* to determine end in plot->points */
 {
     double x, y;
     int i;
@@ -872,10 +863,9 @@ do_freq(plot, first_point, num_points)
  * to adjust the plot ranges. Wedging this into gen_interp() would
  * make that code even harder to read.
  */
- 
+
 void
-gen_interp_frequency(plot)
-    struct curve_points *plot;
+gen_interp_frequency(struct curve_points *plot)
 {
 
     int i, curves;
@@ -898,8 +888,7 @@ gen_interp_frequency(plot)
  */
 
 void
-gen_interp(plot)
-    struct curve_points *plot;
+gen_interp(struct curve_points *plot)
 {
 
     spline_coeff *sc;
@@ -951,7 +940,7 @@ gen_interp(plot)
     return;
 }
 
-/* 
+/*
  * sort_points
  *
  * sort data succession for further evaluation by plot_splines, etc.
@@ -966,9 +955,7 @@ gen_interp(plot)
  * qsort() *really* wants */
 /* HBB 20010720: removed 'static' to avoid HP-sUX gcc bug */
 int
-compare_points(arg1, arg2)
-    SORTFUNC_ARGS arg1;
-    SORTFUNC_ARGS arg2;
+compare_points(SORTFUNC_ARGS arg1, SORTFUNC_ARGS arg2)
 {
     struct coordinate const *p1 = arg1;
     struct coordinate const *p2 = arg2;
@@ -981,8 +968,7 @@ compare_points(arg1, arg2)
 }
 
 void
-sort_points(plot)
-    struct curve_points *plot;
+sort_points(struct curve_points *plot)
 {
     int first_point, num_points;
 
@@ -1007,8 +993,7 @@ sort_points(plot)
  */
 
 void
-cp_implode(cp)
-    struct curve_points *cp;
+cp_implode(struct curve_points *cp)
 {
     int first_point, num_points;
     int i, j, k;
@@ -1017,8 +1002,8 @@ cp_implode(cp)
     /* int y_axis = cp->y_axis; */
     TBOOLEAN all_inrange = FALSE;
 
-    x_axis = cp->x_axis;                                                   
-    y_axis = cp->y_axis;                                                   
+    x_axis = cp->x_axis;
+    y_axis = cp->y_axis;
     j = 0;
     first_point = 0;
     while ((num_points = next_curve(cp, &first_point)) > 0) {
@@ -1074,7 +1059,7 @@ cp_implode(cp)
 			|| ((x > X_AXIS.max) && !(X_AXIS.autoscale & AUTOSCALE_MAX))) {
 			cp->points[j].type = OUTRANGE;
 			goto is_outrange;
-		    } 
+		    }
 		    if (Y_AXIS.log) {
 			if (y <= -VERYLARGE) {
 			    cp->points[j].type = OUTRANGE;
@@ -1117,7 +1102,7 @@ cp_implode(cp)
 			|| ((x > X_AXIS.max) && !(X_AXIS.autoscale & AUTOSCALE_MAX))) {
 			cp->points[j].type = OUTRANGE;
 			goto is_outrange2;
-		    } 
+		    }
 		    if (Y_AXIS.log) {
 			if (y <= -VERYLARGE) {
 			    cp->points[j].type = OUTRANGE;

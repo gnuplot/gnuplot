@@ -49,14 +49,14 @@ class GPView : public BView
 							GPView(BRect rect, ulong resizeMode,
 								ulong flags, GPBitmap *bitmap);
 							~GPView();
-		
+
 	GPBitmap *		Document() { return m_bitmap; };
-		
+
 				void		SetScale(float scale);
 				float		Scale();
-				
+
 				void		GetMaxSize(float *width, float *height);
-		
+
 		virtual void		MouseDown(BPoint point);
 		virtual void		MouseUp(BPoint point);
 		virtual	void		Draw(BRect updateRect);

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: doc2ms.c,v 1.15 2004/02/23 13:35:00 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: doc2ms.c,v 1.16 2004/04/13 17:23:30 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - doc2ms.c */
@@ -36,7 +36,7 @@ static char *RCSid() { return RCSid("$Id: doc2ms.c,v 1.15 2004/02/23 13:35:00 br
 
 /*
  * doc2ms.c  -- program to convert Gnuplot .DOC format to *roff -ms document
- * From hlp2ms by Thomas Williams 
+ * From hlp2ms by Thomas Williams
  *
  * Modified by Russell Lang, 2nd October 1989
  * to make vms help level 1 and 2 create the same ms section level.

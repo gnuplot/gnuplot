@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.49 2003/06/30 18:51:14 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.50 2004/04/13 17:23:58 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -103,7 +103,7 @@ iso_extend(struct iso_curve *ip, int num)
 	return;
 
 #if defined(DOS16) || defined(WIN16)
-    /* Make sure we do not allocate more than 64k points in msdos since 
+    /* Make sure we do not allocate more than 64k points in msdos since
        * indexing is done with 16-bit int
        * Leave some bytes for malloc maintainance.
      */
@@ -180,7 +180,7 @@ load_file(FILE *fp, char *name, TBOOLEAN can_do_args)
 /*         A GNUPLOT "call" command can have up to _10_ arguments named "$0"
    to "$9".  After reading the 10th argument (i.e.: "$9") the variable
    'aix' contains the value '10' because of the 'aix++' construction
-   in '&call_args[aix++]'.  So I think the following test of 'aix' 
+   in '&call_args[aix++]'.  So I think the following test of 'aix'
    should be done against '10' instead of '9'.                (JFi) */
 
 /*              if (c_token >= num_tokens && aix > 9) */
@@ -358,7 +358,7 @@ load_file_error()
 /* find max len of keys and count keys with len > 0 */
 
 /* FIXME HBB 2000508: by design, this one belongs into 'graphics', and the
- * next to into 'graph3d'. Actually, the existence of a module like this 
+ * next to into 'graph3d'. Actually, the existence of a module like this
  * 'misc' is almost always a sign of bad design, IMHO */
 /* may return NULL */
 FILE *
@@ -550,7 +550,7 @@ push_terminal(int is_interactive)
 	push_term_opts = gp_strdup(term_options);
 	if (is_interactive)
 	    fprintf(stderr, "   pushed terminal %s %s\n", push_term_name, push_term_opts);
-    } else { 
+    } else {
 	if (is_interactive)
 	    fputs("\tcurrent terminal type is unknown\n", stderr);
     }
@@ -898,11 +898,9 @@ parse_fillstyle(struct fill_style_type *fs, int def_style, int def_density, int 
  * allow_as controls whether we are allowed to accept arrowstyle in
  * the current context [ie not when doing a  set style arrow command]
  */
-  
+
 void
-arrow_use_properties(arrow, tag)
-     struct arrow_style_type *arrow;
-     int tag;
+arrow_use_properties(struct arrow_style_type *arrow, int tag)
 {
     /*  This function looks for an arrowstyle defined by 'tag' and copies
      *  its data into the structure 'ap'.
@@ -925,10 +923,10 @@ arrow_use_properties(arrow, tag)
 }
 
 void
-arrow_parse(arrow, default_linetype, allow_as)
-    struct arrow_style_type *arrow;
-    int default_linetype;
-    TBOOLEAN allow_as;
+arrow_parse(
+    struct arrow_style_type *arrow,
+    int default_linetype,
+    TBOOLEAN allow_as)
 {
     struct value t;
 
@@ -1056,10 +1054,10 @@ arrow_parse(arrow, default_linetype, allow_as)
 	arrow->head_backangle = 90.0;
 	arrow->head_filled = 0;
 	fprintf(stderr,
-		"arrow_properties at %s:%d : layer: %d, lt: %d, lw: %.3f, head: %d, headlength/unit: %.3f/%d, headangles: %.3f/%.3f, headfilled %d\n",     
-		__FILE__, __LINE__, arrow->layer, arrow->lp_properties.l_type, 
+		"arrow_properties at %s:%d : layer: %d, lt: %d, lw: %.3f, head: %d, headlength/unit: %.3f/%d, headangles: %.3f/%.3f, headfilled %d\n",
+		__FILE__, __LINE__, arrow->layer, arrow->lp_properties.l_type,
 		arrow->lp_properties.l_width, arrow->head, arrow->head_length,
-		arrow->head_lengthunit, arrow->head_angle, 
+		arrow->head_lengthunit, arrow->head_angle,
 		arrow->head_backangle, arrow->head_filled);
 #endif
     }

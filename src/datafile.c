@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.50 2004/06/01 16:20:03 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.51 2004/06/13 00:34:32 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -64,7 +64,7 @@ static char *RCSid() { return RCSid("$Id: datafile.c,v 1.50 2004/06/01 16:20:03 
  * have _anything_ to do with time series... for example,
  * we just look at columns in file, and that is independent
  * of 2d/3d. I really dont want to have to pass a flag to
- * this is plot or splot. 
+ * this is plot or splot.
  *
  * use a global array df_timecol[] - cleared by df_open, then
  * columns needing time set by client.
@@ -81,7 +81,7 @@ static char *RCSid() { return RCSid("$Id: datafile.c,v 1.50 2004/06/01 16:20:03 
  *    int df_eof          - end of file
  *    int df_timecol[]    - client controls which cols read as time
  *
- * functions 
+ * functions
  *   int df_open(int max_using)
  *      parses thru / index / using on command line
  *      max_using is max no of 'using' columns allowed
@@ -102,7 +102,7 @@ static char *RCSid() { return RCSid("$Id: datafile.c,v 1.50 2004/06/01 16:20:03 
  * we will always return exactly the number of items specified
  *
  * if no spec given, we return number of consecutive columns we parsed.
- * 
+ *
  * if we are processing indexes, separated by 'n' blank lines,
  * we will return n-1 blank lines before noticing the index change
  *
@@ -111,8 +111,8 @@ static char *RCSid() { return RCSid("$Id: datafile.c,v 1.50 2004/06/01 16:20:03 
  *
  *    void f_dollars(x)
  *    void f_column()    actions for expressions using $i, column(j), etc
- *    void f_valid()     
- * 
+ *    void f_valid()
+ *
  *
  * line parsing slightly differently from previous versions of gnuplot...
  * given a line containing fewer columns than asked for, gnuplot used to make
@@ -325,8 +325,7 @@ df_gets()
 
 /*{{{  static int df_tokenise(s) */
 static int
-df_tokenise(s)
-    char *s;
+df_tokenise(char *s)
 {
     /* implement our own sscanf that takes 'missing' into account,
      * and can understand fortran quad format
@@ -492,8 +491,7 @@ df_tokenise(s)
 /* FIXME HBB 20001207: doesn't respect 'index' at all, even though it
  * could, and probably should. */
 static float **
-df_read_matrix(rows, cols)
-    int *rows, *cols;
+df_read_matrix(int *rows, int *cols)
 {
     int max_rows = 0;
     int c;
@@ -558,14 +556,12 @@ df_read_matrix(rows, cols)
 
 
 /*{{{  int df_open(max_using) */
-int
-df_open(max_using)
-int max_using;
 
-/* open file, parsing using/thru/index stuff
- * return number of using specs  [well, we have to return something !]
+/* open file, parsing using/thru/index stuff return number of using
+ * specs [well, we have to return something !]
  */
-
+int
+df_open(int max_using)
 {
     /* now allocated dynamically */
     int i;
@@ -651,7 +647,7 @@ int max_using;
 	df_matrix = TRUE;
 	    continue;
 	}
-	
+
 	/* deal with matrix */
 	if (almost_equals(c_token, "mat$rix")) {
 	    if (df_matrix) { duplication=TRUE; break; }
@@ -802,7 +798,7 @@ df_showdata()
     fprintf(stderr, "%.77s%s\n%s:%d:", line,
 	    (strlen(line) > 77) ? "..." : "",
 	    df_filename, df_line_number);
-  }									
+  }
 }
 
 /*}}} */
@@ -901,8 +897,7 @@ plot_option_thru()
 
 
 static void
-plot_option_using(max_using)
-    int max_using;
+plot_option_using(int max_using)
 {
     if (!END_OF_COMMAND && !isstring(++c_token)) {
 	struct value a;
@@ -949,9 +944,7 @@ plot_option_using(max_using)
  */
 
 int
-df_readline(v, max)
-double v[];
-int max;
+df_readline(double v[], int max)
 {
     char *s;
 
@@ -1138,7 +1131,7 @@ int max;
 		    v[output] = df_datum;	/* using 0 */
 		} else if (column <= 0)	/* really < -2, but */
 		    int_error(NO_CARET, "internal error: column <= 0 in datafile.c");
-		else if ((df_axis[output] != -1) 
+		else if ((df_axis[output] != -1)
 		         && (axis_array[df_axis[output]].is_timedata)) {
 		    struct tm tm;
 		    if (column > df_no_cols ||
@@ -1158,7 +1151,7 @@ int max;
 		} else {	/* column > 0 */
 		    if ((column <= df_no_cols) && df_column[column - 1].good == DF_GOOD)
 			v[output] = df_column[column - 1].datum;
-		    /* 
+		    /*
 		     * EAM - Oct 2002 Distinguish between DF_MISSING and DF_BAD.
 		     * Previous versions would never notify caller of either case.
 		     * Now missing data will be noted. Bad data should arguably be
@@ -1203,8 +1196,7 @@ int max;
 
 /*{{{  int df_2dbinary(this_plot) */
 int
-df_2dbinary(this_plot)
-    struct curve_points *this_plot;
+df_2dbinary(struct curve_points *this_plot)
 {
     (void) this_plot;		/* avoid -Wunused warning */
     int_error(NO_CARET, "Binary file format for 2d data not yet defined");
@@ -1254,7 +1246,7 @@ df_2dbinary(this_plot)
 /*
  * Here we keep putting new plots onto the end of the linked list
  *
- * We assume the data's x,y values have x1<x2, x2<x3... and 
+ * We assume the data's x,y values have x1<x2, x2<x3... and
  * y1<y2, y2<y3... .
  * Actually, I think the assumption is less strong than that--it looks like
  * the direction just has to be the same.
@@ -1265,11 +1257,9 @@ df_2dbinary(this_plot)
  * does the autoscaling into the array versions (min_array[], max_array[]) */
 
 int
-df_3dmatrix(this_plot, need_palette)
-    struct surface_points *this_plot;
-    int need_palette;
+df_3dmatrix(struct surface_points *this_plot, int need_palette)
 {
-    float GPFAR *GPFAR * dmatrix, GPFAR * rt, GPFAR * ct;
+    float GPFAR * GPFAR * dmatrix, GPFAR * rt, GPFAR * ct;
     int nr, nc;
     int width, height;
     int row, col;
@@ -1309,7 +1299,7 @@ df_3dmatrix(this_plot, need_palette)
 	    df_current_index ++;
 	    return 0;
 	}
-	    
+
 	rt = NULL;
 	ct = NULL;
     }
@@ -1428,8 +1418,7 @@ df_3dmatrix(this_plot, need_palette)
 
 /*{{{  void f_dollars(x) */
 void
-f_dollars(x)
-    union argument *x;
+f_dollars(union argument *x)
 {
     int column = x->v_arg.v.int_val - 1;
     /* we checked it was an integer >= 0 at compile time */
@@ -1448,8 +1437,7 @@ f_dollars(x)
 
 /*{{{  void f_column() */
 void
-f_column(arg)
-    union argument *arg;
+f_column(union argument *arg)
 {
     struct value a;
     int column;
@@ -1477,8 +1465,7 @@ f_column(arg)
 
 /*{{{  void f_valid() */
 void
-f_valid(arg)
-    union argument *arg;
+f_valid(union argument *arg)
 {
     struct value a;
     int column, good;
@@ -1494,8 +1481,7 @@ f_valid(arg)
 
 /*{{{  void f_timecolumn() */
 void
-f_timecolumn(arg)
-    union argument *arg;
+f_timecolumn(union argument *arg)
 {
     struct value a;
     int column, output;
@@ -1529,11 +1515,10 @@ f_timecolumn(arg)
 /*}}} */
 
 #if 0				/* not used */
-/* count columns in timefmt */
 /*{{{  static int get_time_cols(fmt) */
+/* count columns in timefmt */
 static int
-get_time_cols(fmt)
-char *fmt;			/* format string */
+get_time_cols(char *fmt)
 {
     int cnt, i;
     char *p;
@@ -1552,15 +1537,14 @@ char *fmt;			/* format string */
     }
     return (cnt);
 }
-
 /*}}} */
 
-/* modify default use_spec, applies for no user spec and time datacolumns */
 /*{{{  static void mod_def_usespec(specno,jump) */
+/* modify default use_spec, applies for no user spec and time datacolumns */
 static void
-mod_def_usespec(specno, jump)
-int specno;			/* which spec in ?:?:? */
-int jump;			/* no of columns in timefmt (time data) */
+mod_def_usespec(
+    int specno,			/* which spec in ?:?:? */
+    int jump)			/* no of columns in timefmt (time data) */
 {
     int i;
 
@@ -1574,8 +1558,7 @@ int jump;			/* no of columns in timefmt (time data) */
 
 /*{{{  static int check_missing(s) */
 static int
-check_missing(s)
-char *s;
+check_missing(char *s)
 {
     if (missing_val != NULL) {
 	size_t len = strlen(missing_val);
@@ -1594,15 +1577,14 @@ char *s;
 /* HBB 20040601: Added check that the number of format specifiers is
  * workable (between 0 and 7) */
 static TBOOLEAN
-valid_format(format)
-    const char *format;
+valid_format(const char *format)
 {
     int formats_found = 0;
 
     for (;;) {
 	if (!(format = strchr(format, '%'))) 	/* look for format spec  */
 	    return (formats_found > 0 && formats_found <= 7);
-	
+
 	/* Found a % to check --- scan past option specifiers: */
 	do {
 	    format++;

@@ -1,5 +1,5 @@
-/*
- * $Id: tpic.trm,v 1.16 2004/03/29 10:43:36 broeker Exp $
+/* Hello, Emacs, this is -*-C-*-
+ * $Id: tpic.trm,v 1.17 2004/04/13 17:24:39 broeker Exp $
  */
 
 /* GNUPLOT - tpic.trm */
@@ -38,18 +38,18 @@
  * This file is included by ../term.c.
  *
  * This terminal driver supports:
- *   The tpic \specials (version 2.2) for LaTeX. 
+ *   The tpic \specials (version 2.2) for LaTeX.
  *
  * AUTHORS
  *   Oh-Yeah?   3 Sep. 1992 (closely following eepic.trm by David Kotz)
  *   A. Woo     5 Oct. 1992 (removed ansi prototypes for braindead compilers)
  *
  * send your comments or suggestions to (gnuplot-info@lists.sourceforge.net).
- * 
+ *
  */
 /*
- *  This file contains the tpic terminal driver for use with LaTeX. 
- *  This is an alternative to the latex and eepic drivers. You need 
+ *  This file contains the tpic terminal driver for use with LaTeX.
+ *  This is an alternative to the latex and eepic drivers. You need
  *  a printer driver that supports the tpic \specials version 2.2.
  *
  * Comparison with the eepic driver (eepic.trm):
@@ -68,11 +68,11 @@
  */
 
 
-/* These parameters can be modified as you like, through options.  Say 
-   "set terminal tpic <pointsize> <linewidth> <interval>".  <pointsize> 
-   and <linewidth> are integers in milli-inches; <interval> is a float 
-   in inches.  If non-positive value is specified, the default (below) 
-   is chosen. 
+/* These parameters can be modified as you like, through options.  Say
+   "set terminal tpic <pointsize> <linewidth> <interval>".  <pointsize>
+   and <linewidth> are integers in milli-inches; <interval> is a float
+   in inches.  If non-positive value is specified, the default (below)
+   is chosen.
 */
 
 /*
@@ -125,7 +125,7 @@ static void best_latex_arrow __PROTO((int sx, int sy, int ex, int ey, int who, i
 
 /* all prototypes ... */
 static void tpic_startline __PROTO((void));
-static void tpic_endline __PROTO((void));	
+static void tpic_endline __PROTO((void));
 static void tpic_pushpath __PROTO((unsigned int x, unsigned int y));
 static void tpic_scanpath __PROTO((void));
 static void tpic_diamond __PROTO((int size));
@@ -361,9 +361,7 @@ TPIC_graphics()
 }
 
 TERM_PUBLIC void
-TPIC_move(x, y)
-unsigned int x;
-unsigned int y;
+TPIC_move(unsigned int x, unsigned int y)
 {
     tpic_endline();
     tpic_posx = x;
@@ -375,14 +373,12 @@ static TBOOLEAN tpic_inline = FALSE;	/* are we in the middle of a line */
 static int tpic_linecount = 0;	/* number of points in line so far */
 
 TERM_PUBLIC void
-TPIC_vector(ux, uy)
-unsigned int ux;
-unsigned int uy;
+TPIC_vector(unsigned int ux, unsigned int uy)
 {
     if (!tpic_inline) {
 	tpic_startline();
     } else if (tpic_linecount >= TPIC_LINEMAX) {
-	/* Even though we are in middle of a path, we may start a new path 
+	/* Even though we are in middle of a path, we may start a new path
 	   command once in a while; if they are too long, latex will choke. */
 	tpic_endline();
 	tpic_startline();
@@ -469,9 +465,7 @@ tpic_endline()
 static unsigned int pathpoint[TPIC_LINEMAX][2];		/* point stack */
 
 static void
-tpic_pushpath(x, y)
-unsigned int x;
-unsigned int y;			/* private */
+tpic_pushpath(unsigned int x, unsigned int y)
 {
     if (tpic_linecount < TPIC_LINEMAX) {
 	pathpoint[tpic_linecount][0] = x;
@@ -492,8 +486,7 @@ tpic_scanpath()
 }
 
 TERM_PUBLIC void
-TPIC_linetype(linetype)
-int linetype;
+TPIC_linetype(int linetype)
 {
     tpic_endline();
     if (linetype >= tpic_numlines - 2)
@@ -505,10 +498,7 @@ static int tpic_angle = 0;	/* 0 = horizontal, 1 = vertical */
 static enum JUSTIFY tpic_justify = LEFT;
 
 TERM_PUBLIC void
-TPIC_put_text(x, y, str)
-unsigned int x;
-unsigned int y;
-const char *str;			/* ref point and text */
+TPIC_put_text(unsigned int x, unsigned int y, const char *str)
 {
     char *justify = NULL;
 
@@ -534,7 +524,7 @@ const char *str;			/* ref point and text */
 	    fprintf(gpoutfile, "{\\makebox(0,0)%s{%s}}\n", justify, str);
 	    break;
 	case 1:		/* vertical */
-	    /* we can't really write text vertically, but will put the ylabel 
+	    /* we can't really write text vertically, but will put the ylabel
 	       centred at the left of the plot, and then we'll make a \shortstack */
 	    switch (tpic_justify) {
 	    case LEFT:
@@ -554,32 +544,27 @@ const char *str;			/* ref point and text */
 }
 
 TERM_PUBLIC int
-TPIC_text_angle(ang)
-int ang;
+TPIC_text_angle(int ang)
 {
     tpic_angle = (ang ? 1 : 0);
     return (TRUE);
 }
 
 TERM_PUBLIC int
-TPIC_justify_text(mode)
-enum JUSTIFY mode;
+TPIC_justify_text(enum JUSTIFY mode)
 {
     tpic_justify = mode;
     return (TRUE);
 }
 
 TERM_PUBLIC void
-TPIC_point(x, y, number)
-unsigned int x;
-unsigned int y;
-int number;
+TPIC_point(unsigned int x, unsigned int y, int number)
 {
     int size = 0;
 
     TPIC_move(x, y);
 
-    /* Print the character defined by 'number'; number < 0 means 
+    /* Print the character defined by 'number'; number < 0 means
        to use a dot, otherwise one of the defined points. */
 
     fprintf(gpoutfile, "\\put(%d,%d){", x, y);	/* start putting */
@@ -625,9 +610,10 @@ int number;
 }
 
 TERM_PUBLIC void
-TPIC_arrow(sx, sy, ex, ey, head)
-    unsigned int sx, sy, ex, ey;
-    int head;
+TPIC_arrow(
+    unsigned int sx, unsigned int sy,
+    unsigned int ex, unsigned int ey,
+    int head)
 {
     best_latex_arrow(sx, sy, ex, ey, 1, head);	/* call latex routine */
     tpic_posx = ex;
@@ -637,8 +623,7 @@ TPIC_arrow(sx, sy, ex, ey, head)
 /* private: draw points with tpic commands */
 
 static void
-tpic_diamond(size)
-int size;
+tpic_diamond(int size)
 {
     size = (int) (size * 1.4142);	/* spread by sqrt(2) */
 
@@ -652,8 +637,7 @@ int size;
 }
 
 static void
-tpic_plus(size)
-int size;
+tpic_plus(int size)
 {
     tpic_path(0, size);
     tpic_path(0, -size);
@@ -665,8 +649,7 @@ int size;
 }
 
 static void
-tpic_box(size)
-int size;
+tpic_box(int size)
 {
     tpic_path(size, size);
     tpic_path(-size, size);
@@ -678,8 +661,7 @@ int size;
 }
 
 static void
-tpic_times(size)
-int size;
+tpic_times(int size)
 {
     size = (int) (size / 1.4142);	/* reduce by sqrt(2) */
 
@@ -693,8 +675,7 @@ int size;
 }
 
 static void
-tpic_triangle(size)
-int size;
+tpic_triangle(int size)
 {
     int x;
 
@@ -710,8 +691,7 @@ int size;
 }
 
 static void
-tpic_star(size)
-int size;
+tpic_star(int size)
 {
     int x;
 
@@ -731,8 +711,7 @@ int size;
 }
 
 static void
-tpic_hexagon(size)
-int size;
+tpic_hexagon(int size)
 {
     int x;
 
@@ -751,16 +730,14 @@ int size;
 }
 
 static void
-tpic_circle(size)
-int size;
+tpic_circle(int size)
 {
     tpic_arc(size);
     return;
 }
 
 static void
-tpic_doublecircle(size)
-int size;
+tpic_doublecircle(int size)
 {
     tpic_arc(size);
     tpic_shade(0.0);
@@ -769,8 +746,7 @@ int size;
 }
 
 static void
-tpic_vercircle(size)
-int size;			/* circle with | */
+tpic_vercircle(int size)			/* circle with | */
 {
     tpic_arc(size);
     tpic_path(0, size);
@@ -780,8 +756,7 @@ int size;			/* circle with | */
 }
 
 static void
-tpic_horcircle(size)
-int size;			/* circle with - */
+tpic_horcircle(int size)			/* circle with - */
 {
     tpic_arc(size);
     tpic_path(size, 0);
@@ -791,8 +766,7 @@ int size;			/* circle with - */
 }
 
 static void
-tpic_pluscircle(size)
-int size;			/* circle with + */
+tpic_pluscircle(int size)			/* circle with + */
 {
     tpic_arc(size);
     tpic_plus(size);
@@ -800,8 +774,7 @@ int size;			/* circle with + */
 }
 
 static void
-tpic_timescircle(size)
-int size;			/* circle with times */
+tpic_timescircle(int size)			/* circle with times */
 {
     tpic_arc(size);
     tpic_times(size);
@@ -809,8 +782,7 @@ int size;			/* circle with times */
 }
 
 static void
-tpic_starcircle(size)
-int size;			/* circle with star */
+tpic_starcircle(int size)			/* circle with star */
 {
     tpic_arc(size);
     tpic_star(size);
@@ -818,8 +790,7 @@ int size;			/* circle with star */
 }
 
 static void
-tpic_dotcircle(size)
-int size;			/* circle with dot (black circle) */
+tpic_dotcircle(int size)			/* circle with dot (black circle) */
 {
     tpic_arc(size);
     tpic_shade(1.0);
@@ -828,8 +799,7 @@ int size;			/* circle with dot (black circle) */
 }
 
 static void
-tpic_diamondcircle(size)
-int size;			/* not enough? circle with black diamond */
+tpic_diamondcircle(int size)			/* not enough? circle with black diamond */
 {
     tpic_arc(size);
     tpic_shade(1.0);
@@ -838,8 +808,7 @@ int size;			/* not enough? circle with black diamond */
 }
 
 static void
-tpic_boxcircle(size)
-int size;			/* need more? circle with black box */
+tpic_boxcircle(int size)			/* need more? circle with black box */
 {
     tpic_arc(size);
     tpic_shade(1.0);
@@ -848,8 +817,7 @@ int size;			/* need more? circle with black box */
 }
 
 static void
-tpic_trianglecircle(size)
-int size;			/* circle with black triangle */
+tpic_trianglecircle(int size)			/* circle with black triangle */
 {
     tpic_arc(size);
     tpic_shade(1.0);
@@ -858,8 +826,7 @@ int size;			/* circle with black triangle */
 }
 
 static void
-tpic_hexagoncircle(size)
-int size;			/* how about circle with black hexagon? */
+tpic_hexagoncircle(int size)			/* how about circle with black hexagon? */
 {
     tpic_arc(size);
     tpic_shade(1.0);
@@ -868,8 +835,7 @@ int size;			/* how about circle with black hexagon? */
 }
 
 static void
-tpic_plustimescircle(size)
-int size;			/* no more idea ... with plus & times */
+tpic_plustimescircle(int size)			/* no more idea ... with plus & times */
 {
     tpic_arc(size);
     tpic_plus(size);
@@ -880,9 +846,7 @@ int size;			/* no more idea ... with plus & times */
 /* private: draw lines */
 
 static void
-tpic_abspath(x, y)
-unsigned int x;
-unsigned int y;			/* absolute coord */
+tpic_abspath(unsigned int x, unsigned int y)
 {
     tpic_path(x, -y);
     fputs("%\n", gpoutfile);
@@ -892,9 +856,7 @@ unsigned int y;			/* absolute coord */
 /* private: tpic primitive functions */
 
 static void
-tpic_path(x, y)
-int x;
-int y;
+tpic_path(int x, int y)
 {
     fprintf(gpoutfile, "\\special{pa %d %d}", x, y);
     return;
@@ -908,40 +870,36 @@ tpic_flush()
 }
 
 static void
-tpic_arc(radius)
-int radius;			/* actually, draw a full circle */
+tpic_arc(int radius)
 {
+    /* actually, draw a full circle */
     fprintf(gpoutfile, "\\special{ar 0 0 %d %d 0 7}", radius, radius);
     return;
 }
 
 static void
-tpic_shade(grayscale)
-double grayscale;
+tpic_shade(double grayscale)
 {
     fprintf(gpoutfile, "\\special{sh %f}", grayscale);
     return;
 }
 
 static void
-tpic_pen(thickness)
-int thickness;
+tpic_pen(int thickness)
 {
     fprintf(gpoutfile, "\\special{pn %d}", thickness);
     return;
 }
 
 static void
-tpic_dottedflush(interval)
-double interval;
+tpic_dottedflush(double interval)
 {
     fprintf(gpoutfile, "\\special{dt %f}%%\n", interval);
     return;
 }
 
 static void
-tpic_dashedflush(interval)
-double interval;
+tpic_dashedflush(double interval)
 {
     fprintf(gpoutfile, "\\special{da %f}%%\n", interval);
     return;

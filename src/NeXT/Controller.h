@@ -1,7 +1,7 @@
 #import <appkit/appkit.h>
-	
 
-@interface Controller:Object 
+
+@interface Controller:Object
 {
 	id activeTerm;
 	id keyTerm;

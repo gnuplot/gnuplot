@@ -1,5 +1,5 @@
 /*
- * $Id: graphics.h,v 1.23 2002/10/21 10:24:18 mikulik Exp $
+ * $Id: graphics.h,v 1.24 2004/04/13 17:23:56 broeker Exp $
  */
 
 /* GNUPLOT - graphics.h */
@@ -70,7 +70,7 @@ typedef struct curve_points {
 } curve_points;
 
 /* From ESR's "Actual code patch" :) */
-/* An exclusion box.  
+/* An exclusion box.
  * Right now, the only exclusion region is the key box, but that will
  * change when we support boxed labels.
  */

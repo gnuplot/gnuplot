@@ -12,7 +12,7 @@ static void setprintsize();
 - initFrame: (NXRect *)rects
 {
     [super initFrame:rects];
-		
+
 	PSstring = NULL;
 	[self display];
 
@@ -26,7 +26,7 @@ static void setprintsize();
 {
 	if (PSstring) free(PSstring);
 	[super free];
-	
+
 	return self;
 
 }
@@ -47,15 +47,15 @@ static void setprintsize();
 - drawSelf:(const NXRect *) rects : (int) rectCount
 {
     DPSContext d;
-	
+
     d = DPSGetCurrentContext();
 
 	if (!printing) {
-							/* Clear Screen */ 
+							/* Clear Screen */
 		PSsetgray(NX_WHITE);
 		NXRectFill(&bounds);
 							/* scale to gnuplot coords */
-		[self setDrawSize:xsize:ysize];	
+		[self setDrawSize:xsize:ysize];
 	}
 	else {
 		setprintsize();
@@ -74,7 +74,7 @@ static void setprintsize();
 	printing = 1;
 	[super printPSCode:sender];
 	printing = 0;
-	
+
 	return self;
 }
 
@@ -89,31 +89,31 @@ static void setprintsize()
     d = DPSGetCurrentContext();
 	prInfo = [NXApp printInfo];
 	paperRect = (NXRect *) [prInfo paperRect];
-	
+
 	width = paperRect->size.width;
 	height = paperRect->size.height;
 
 							/* Leave margins on paper */
-	
-	DPSPrintf(d, "grestore\ngrestore\ngrestore\n");
-	
 
-	if ([prInfo orientation] == NX_LANDSCAPE) {		
+	DPSPrintf(d, "grestore\ngrestore\ngrestore\n");
+
+
+	if ([prInfo orientation] == NX_LANDSCAPE) {
 		DPSPrintf(d, "-90 rotate\n");
 		DPSPrintf(d, "%g 0 translate\n", -1 * paperRect->size.width);
 		DPSPrintf(d, "0 %g translate\n", paperRect->size.height/100);
-		
+
 		xscale = width/NEXT_XMAX*0.95;
 		yscale = height/NEXT_YMAX*0.9;
-		DPSPrintf(d, "%g %g scale\n", xscale, yscale);	
+		DPSPrintf(d, "%g %g scale\n", xscale, yscale);
 	}
-	else {				
+	else {
 		xscale = width/NEXT_XMAX*0.95;
-		yscale = height/NEXT_YMAX*0.95;	
+		yscale = height/NEXT_YMAX*0.95;
 		DPSPrintf(d, "%g %g scale\n", xscale, yscale);
 		DPSPrintf(d, "0 %g translate\n", paperRect->size.height/100);
 	}
-		
+
 	DPSPrintf(d, "gsave\ngsave\n");
 
     DPSFlushContext(d);

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: help.c,v 1.14 2002/03/21 15:11:57 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: help.c,v 1.15 2004/04/13 17:23:56 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - help.c */
@@ -39,7 +39,7 @@ static char *RCSid() { return RCSid("$Id: help.c,v 1.14 2002/03/21 15:11:57 miku
 #include "alloc.h"
 #include "util.h"
 
-/* 
+/*
  ** help -- help subsystem that understands defined keywords
  **
  ** Looks for the desired keyword in the help file at runtime, so you
@@ -76,7 +76,7 @@ static char *RCSid() { return RCSid("$Id: help.c,v 1.14 2002/03/21 15:11:57 miku
  **   keyword isn't given).  A command summary is usually here.
  **   Notice that the null keyword is equivalent to a "?" keyword
  **   here, because of the '?' and '??' topic lines above.
- **   If multiple keywords are given, the first is considered the 
+ **   If multiple keywords are given, the first is considered the
  **   'primary' keyword. This affects a listing of available topics.
  **   ?last-subject
  **   Note that help sections are terminated by the start of the next
@@ -157,14 +157,14 @@ static int pagelines;		/* count for builtin pager */
 #define SCREENSIZE 24		/* lines on screen (most have at least 24) */
 
 /* help:
- * print a help message 
+ * print a help message
  * also print available subtopics, if subtopics is TRUE
  */
 int
-help(keyword, path, subtopics)
-char *keyword;			/* on this topic */
-char *path;			/* from this file */
-TBOOLEAN *subtopics;		/* (in) - subtopics only? */
+help(
+    char *keyword,		/* on this topic */
+    char *path,			/* from this file */
+    TBOOLEAN *subtopics)	/* (in) - subtopics only? */
 				/* (out) - are there subtopics? */
 {
     static char oldpath[PATHSIZE] = "";		/* previous help file */
@@ -206,8 +206,7 @@ TBOOLEAN *subtopics;		/* (in) - subtopics only? */
  * just the keys and location of the text
  */
 static int
-LoadHelp(path)
-char *path;
+LoadHelp(char *path)
 {
     LINKEY *key = 0;		/* this key */
     long pos = 0;		/* ftell location within help file */
@@ -277,8 +276,7 @@ char *path;
 
 /* make a new line buffer and save this string there */
 static LINEBUF *
-storeline(text)
-char *text;
+storeline(char *text)
 {
     LINEBUF *new;
 
@@ -295,8 +293,7 @@ char *text;
 
 /* Add this keyword to the keys list, with the given text */
 static LINKEY *
-storekey(key)
-char *key;
+storekey(char *key)
 {
     LINKEY *new;
 
@@ -354,9 +351,7 @@ sortkeys()
  * illegal! */
 /* HBB 20010720: removed 'static' to avoid HP-sUX gcc bug */
 int
-keycomp(arg1, arg2)
-    SORTFUNC_ARGS arg1;
-    SORTFUNC_ARGS arg2;
+keycomp(SORTFUNC_ARGS arg1, SORTFUNC_ARGS arg2)
 {
     const KEY *a = arg1;
     const KEY *b = arg2;
@@ -399,12 +394,11 @@ FreeHelp()
  *  attempt to allow abbreviations. We search for the first thing that
  *  matches all the text we're given. If not an exact match, then
  *  it is an abbreviated match, and there must be no other abbreviated
- *  matches -- for if there are, the abbreviation is ambiguous. 
+ *  matches -- for if there are, the abbreviation is ambiguous.
  *  We print the ambiguous matches in that case, and return not found.
  */
 static KEY * /* NULL if not found */
-FindHelp(keyword)
-char *keyword;			/* string we look for */
+FindHelp(char *keyword)		/* string we look for */
 {
     KEY *key;
     size_t len = strlen(keyword);
@@ -430,9 +424,7 @@ char *keyword;			/* string we look for */
  * keys following it with the same leading substring.
  */
 static TBOOLEAN
-Ambiguous(key, len)
-KEY *key;
-size_t len;
+Ambiguous(KEY *key, size_t len)
 {
     char *first;
     char *prev;
@@ -475,9 +467,9 @@ size_t len;
  * print the text for key
  */
 static void
-PrintHelp(key, subtopics)
-KEY *key;
-TBOOLEAN *subtopics;		/* (in) - subtopics only? */
+PrintHelp(
+    KEY *key,
+    TBOOLEAN *subtopics)	/* (in) - subtopics only? */
 				/* (out) - are there subtopics? */
 {
     LINEBUF *t;
@@ -513,9 +505,9 @@ TBOOLEAN *subtopics;		/* (in) - subtopics only? */
 #define PER_LINE 4
 
 static void
-ShowSubtopics(key, subtopics)
-KEY *key;			/* the topic */
-TBOOLEAN *subtopics;		/* (out) are there any subtopics */
+ShowSubtopics(
+    KEY *key,			/* the topic */
+    TBOOLEAN *subtopics)	/* (out) are there any subtopics */
 {
     int subt = 0;		/* printed any subtopics yet? */
     KEY *subkey;		/* subtopic key */
@@ -580,7 +572,7 @@ TBOOLEAN *subtopics;		/* (out) are there any subtopics */
 	int subtopic;
 	int spacelen = 0, ispacelen;
 	int pos = 0;
-	
+
 	for (subtopic = 0; subtopic < stopics; subtopic++) {
 	    start = starts[subtopic];
 	    sublen = strcspn(start, " ");
@@ -676,8 +668,7 @@ StartOutput()
 /* write a line of help output  */
 /* line should contain only one \n, at the end */
 void
-OutLine(line)
-const char *line;
+OutLine(const char *line)
 {
     int c;			/* dummy input char */
 #if defined(PIPES)

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: readline.c,v 1.36 2004/04/08 23:54:34 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: readline.c,v 1.37 2004/04/13 17:23:59 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - readline.c */
@@ -35,7 +35,7 @@ static char *RCSid() { return RCSid("$Id: readline.c,v 1.36 2004/04/08 23:54:34 
 ]*/
 
 
-/* 
+/*
  * AUTHORS
  *
  *   Original Software:
@@ -122,7 +122,7 @@ readline_ipc(const char* prompt)
 #if defined(READLINE) && !defined(HAVE_LIBREADLINE)
 
 /* a small portable version of GNU's readline
- * this is not the BASH or GNU EMACS version of READLINE due to Copyleft 
+ * this is not the BASH or GNU EMACS version of READLINE due to Copyleft
  * restrictions
  * do not need any terminal capabilities except backspace,
  * and space overwrites a character
@@ -293,9 +293,7 @@ static int ansi_getc __PROTO((void));
 #  undef putc			/* Undefine the macro for putc */
 
 static int
-putc(c, fp)
-char c;
-FILE *fp;
+putc(char c, FILE *fp)
 {
     write(fileno(fp), &c, 1);
     if (c == '\012') {		/* A normal ASCII '\n' */
@@ -324,8 +322,7 @@ static char os2_getch __PROTO((void));
 
 /* initial size and increment of input line length */
 #define MAXBUF	1024
-/* ^H */
-#define BACKSPACE 0x08
+#define BACKSPACE 0x08   /* ^H */
 #define SPACE	' '
 
 #ifdef OSK
@@ -354,12 +351,11 @@ static void extend_cur_line __PROTO((void));
 
 /* user_putc and user_puts should be used in the place of
  * fputc(ch,stderr) and fputs(str,stderr) for all output
- * of user typed characters.  This allows MS-Windows to 
+ * of user typed characters.  This allows MS-Windows to
  * display user input in a different color.
  */
 static int
-user_putc(ch)
-int ch;
+user_putc(int ch)
 {
     int rv;
 #ifdef _Windows
@@ -373,8 +369,7 @@ int ch;
 }
 
 static int
-user_puts(str)
-char *str;
+user_puts(char *str)
 {
     int rv;
 #ifdef _Windows
@@ -413,16 +408,13 @@ extend_cur_line()
 }
 
 char *
-readline(prompt)
-const char *prompt;
+readline(const char *prompt)
 {
-
     int cur_char;
     char *new_line;
 
 
     /* start with a string of MAXBUF chars */
-
     if (line_len != 0) {
 	free(cur_line);
 	line_len = 0;
@@ -445,25 +437,24 @@ const char *prompt;
 
 	cur_char = special_getc();
 
-/*
- * The #define CHARSET7BIT should be used when one encounters problems with
- * 8bit characters that should not be entered on the commandline. I cannot
- * think on any reasonable example where this could happen, but what do I know?
- * After all, the unix world still ignores 8bit chars in most applications.
- *
- * Note that latin1 defines the chars 0x80-0x9f as control chars. For the
- * benefit of Atari, MSDOS, Windows and NeXT I have decided to ignore this,
- * since it would require more #ifs.
- *
- */
+	/* The #define CHARSET7BIT should be used when one encounters
+	 * problems with 8bit characters that should not be entered on
+	 * the commandline. I cannot think on any reasonable example
+	 * where this could happen, but what do I know?  After all,
+	 * the unix world still ignores 8bit chars in most
+	 * applications.
+	 *
+	 * Note that latin1 defines the chars 0x80-0x9f as control
+	 * chars. For the benefit of Atari, MSDOS, Windows and NeXT I
+	 * have decided to ignore this, since it would require more
+	 * #ifs. */
 
-#ifdef CHARSET7BIT
-	if (isprint(cur_char)) {
-#else /* CHARSET7BIT */
-	if (isprint(cur_char) 
-/*	|| ((unsigned char) cur_char == 011)	EAM allowing <tab> breaks auto-completion! */
-	|| (((unsigned char) cur_char > 0x7f) && cur_char != EOF)) {
+	if (isprint(cur_char)
+#ifndef CHARSET7BIT
+	    /* || ((unsigned char) cur_char == 011) */ /* EAM allowing <tab> breaks auto-completion! */
+	    || (((unsigned char) cur_char > 0x7f) && cur_char != EOF)
 #endif /* CHARSET7BIT */
+	    ) {
 	    size_t i;
 
 	    if (max_pos + 1 >= line_len) {
@@ -704,8 +695,7 @@ fix_line()
 
 /* redraw the entire line, putting the cursor where it belongs */
 static void
-redraw_line(prompt)
-const char *prompt;
+redraw_line(const char *prompt)
 {
     size_t i;
 
@@ -719,8 +709,7 @@ const char *prompt;
 
 /* clear cur_line and the screen line */
 static void
-clear_line(prompt)
-const char *prompt;
+clear_line(const char *prompt)
 {
     size_t i;
     for (i = 0; i < max_pos; i++)
@@ -755,8 +744,7 @@ clear_eoline()
 
 /* copy line to cur_line, draw it and set cur_pos and max_pos */
 static void
-copy_line(line)
-char *line;
+copy_line(char *line)
 {
     while (strlen(line) + 1 > line_len) {
 	extend_cur_line();
@@ -870,13 +858,13 @@ msdos_getch()
 #endif /* MSDOS || _Windows || DOS386 || OS2 */
 
 #ifdef OS2
-/* We need to call different procedures, dependent on the  
+/* We need to call different procedures, dependent on the
    session type: VIO/window or an (XFree86) xterm */
 static char
 os2_getch() {
   static int IsXterm = 0;
   static int init = 0;
-  
+
   if (!init) {
      if (getenv("WINDOWID")) {
         IsXterm = 1;
@@ -895,7 +883,8 @@ os2_getch() {
 
 /* Convert Arrow keystrokes to Control characters: TOS version */
 
-long poll_events(int);		/* from term/atariaes.trm */
+/* from term/atariaes.trm: */
+long poll_events(int);
 
 /* this function is used in help.c as well. this means that the
  * program doesn't work without -DREADLINE (which would be the case

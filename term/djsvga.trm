@@ -1,5 +1,5 @@
-/*
- * $Id: djsvga.trm,v 1.15 2002/12/13 14:58:36 lhecking Exp $
+/* Hello, Emacs, this is -*-C-*-
+ * $Id: djsvga.trm,v 1.16 2004/04/13 17:24:16 broeker Exp $
  */
 
 /* GNUPLOT - djsvga.trm */
@@ -260,8 +260,7 @@ DJSVGA_reset()
 }
 
 TERM_PUBLIC void
-DJSVGA_linetype(linetype)
-int linetype;
+DJSVGA_linetype(int linetype)
 {
     if (linetype >= 13)
 	linetype %= 13;
@@ -270,8 +269,7 @@ int linetype;
 }
 
 TERM_PUBLIC void
-DJSVGA_move(x, y)
-unsigned int x, y;
+DJSVGA_move(unsigned int x, unsigned int y)
 {
     dj_startx = x;
     dj_starty = y;
@@ -279,8 +277,7 @@ unsigned int x, y;
 
 
 TERM_PUBLIC void
-DJSVGA_vector(x, y)
-unsigned int x, y;
+DJSVGA_vector(unsigned int x, unsigned int y)
 {
 #ifdef GRX21
     GrLineOption dj_lineoption =
@@ -303,8 +300,7 @@ unsigned int x, y;
  *   cure that.
  */
 TERM_PUBLIC int
-DJSVGA_angle(ang)
-int ang;
+DJSVGA_angle(int ang)
 {
     if (ang) {
 	DJSVGA_TextOption.txo_direct = GR_TEXT_UP;
@@ -315,8 +311,7 @@ int ang;
 }
 
 TERM_PUBLIC int
-DJSVGA_justify_text(mode)
-enum JUSTIFY mode;
+DJSVGA_justify_text(enum JUSTIFY mode)
 {
     if (DJSVGA_TextOption.txo_direct == GR_TEXT_RIGHT) {
 	DJSVGA_TextOption.txo_yalign = GR_ALIGN_CENTER;
@@ -349,8 +344,7 @@ enum JUSTIFY mode;
 }
 
 TERM_PUBLIC int
-DJSVGA_set_font(fontname)
-const char *fontname;
+DJSVGA_set_font(const char *fontname)
 {
     char *cp;
     GrFont *font;
@@ -372,9 +366,7 @@ const char *fontname;
 }
 
 TERM_PUBLIC void
-DJSVGA_put_text(x, y, str)
-unsigned int x, y;
-const char *str;
+DJSVGA_put_text(unsigned int x, unsigned int y, const char *str)
 {
     /* HBB: why isn't font!=NULL ensured elsewhere? Testing it at
      * this point doesn't really make much sense (we're in graphics
@@ -400,9 +392,10 @@ DJSVGA_resume()
 }
 
 TERM_PUBLIC void
-DJSVGA_fillbox(style, left, bottom, width, height)
-int style;
-unsigned int left, bottom, width, height;
+DJSVGA_fillbox(
+    int style,
+    unsigned int left, unsigned int bottom,
+    unsigned int width, unsigned height)
 {
     if (style >= 13)
 	style %= 13;

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: standard.c,v 1.15 2004/03/02 19:12:53 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: standard.c,v 1.16 2004/04/13 17:24:01 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - standard.c */
@@ -481,8 +481,7 @@ static double GPFAR qyone[] = {
 #endif /* (ATARI || MTOS) && __PUREC__ */
 
 void
-f_real(arg)
-    union argument *arg;
+f_real(union argument *arg)
 {
     struct value a;
 
@@ -491,8 +490,7 @@ f_real(arg)
 }
 
 void
-f_imag(arg)
-    union argument *arg;
+f_imag(union argument *arg)
 {
     struct value a;
 
@@ -503,8 +501,7 @@ f_imag(arg)
 
 /* ang2rad is 1 if we are in radians, or pi/180 if we are in degrees */
 void
-f_arg(arg)
-    union argument *arg;
+f_arg(union argument *arg)
 {
     struct value a;
 
@@ -513,8 +510,7 @@ f_arg(arg)
 }
 
 void
-f_conjg(arg)
-    union argument *arg;
+f_conjg(union argument *arg)
 {
     struct value a;
 
@@ -526,8 +522,7 @@ f_conjg(arg)
 /* ang2rad is 1 if we are in radians, or pi/180 if we are in degrees */
 
 void
-f_sin(arg)
-    union argument *arg;
+f_sin(union argument *arg)
 {
     struct value a;
 
@@ -537,8 +532,7 @@ f_sin(arg)
 }
 
 void
-f_cos(arg)
-    union argument *arg;
+f_cos(union argument *arg)
 {
     struct value a;
 
@@ -548,8 +542,7 @@ f_cos(arg)
 }
 
 void
-f_tan(arg)
-    union argument *arg;
+f_tan(union argument *arg)
 {
     struct value a;
     register double den;
@@ -569,8 +562,7 @@ f_tan(arg)
 }
 
 void
-f_asin(arg)
-    union argument *arg;
+f_asin(union argument *arg)
 {
     struct value a;
     register double alpha, beta, x, y;
@@ -593,8 +585,7 @@ f_asin(arg)
 }
 
 void
-f_acos(arg)
-    union argument *arg;
+f_acos(union argument *arg)
 {
     struct value a;
     register double x, y;
@@ -607,22 +598,21 @@ f_acos(arg)
 	/* real result */
 	push(Gcomplex(&a, acos(x) / ang2rad, 0.0));
     } else {
-	double alpha = sqrt((x + 1) * (x + 1) + y * y) / 2 
+	double alpha = sqrt((x + 1) * (x + 1) + y * y) / 2
 	               + sqrt((x - 1) * (x - 1) + y * y) / 2;
-	double beta = sqrt((x + 1) * (x + 1) + y * y) / 2 
+	double beta = sqrt((x + 1) * (x + 1) + y * y) / 2
 	              - sqrt((x - 1) * (x - 1) + y * y) / 2;
 	if (beta > 1)
 	    beta = 1;		/* Avoid rounding error problems */
 	else if (beta < -1)
 	    beta = -1;
-	push(Gcomplex(&a, (y > 0? -1: 1)*acos(beta) / ang2rad, 
+	push(Gcomplex(&a, (y > 0? -1: 1)*acos(beta) / ang2rad,
 	                  log(alpha + sqrt(alpha * alpha - 1)) / ang2rad));
     }
 }
 
 void
-f_atan(arg)
-    union argument *arg;
+f_atan(union argument *arg)
 {
     struct value a;
     register double x, y, u, v, w, z;
@@ -659,8 +649,7 @@ f_atan(arg)
 
 /* real parts only */
 void
-f_atan2(arg)
-    union argument *arg;
+f_atan2(union argument *arg)
 {
     struct value a;
     double x;
@@ -679,19 +668,17 @@ f_atan2(arg)
 
 
 void
-f_sinh(arg)
-    union argument *arg;
+f_sinh(union argument *arg)
 {
     struct value a;
- 
+
     (void) arg;			/* avoid -Wunused warning */
     (void) pop(&a);
     push(Gcomplex(&a, sinh(real(&a)) * cos(imag(&a)), cosh(real(&a)) * sin(imag(&a))));
 }
 
 void
-f_cosh(arg)
-    union argument *arg;
+f_cosh(union argument *arg)
 {
     struct value a;
 
@@ -701,8 +688,7 @@ f_cosh(arg)
 }
 
 void
-f_tanh(arg)
-    union argument *arg;
+f_tanh(union argument *arg)
 {
     struct value a;
     double den;
@@ -718,7 +704,7 @@ f_tanh(arg)
 #else
     {
 	int old_errno = errno;
-	
+
 	if (exp(-fabs(real(&a))) == 0.0) {
 	    /* some libm's will raise a silly ERANGE in cosh() and sin() */
 	    errno = old_errno;
@@ -727,14 +713,13 @@ f_tanh(arg)
 	}
     }
 #endif
-	    
+
     den = cosh(2 * real(&a)) + cos(2 * imag(&a));
     push(Gcomplex(&a, sinh(2 * real(&a)) / den, sin(2 * imag(&a)) / den));
 }
 
 void
-f_asinh(arg)
-    union argument *arg;
+f_asinh(union argument *arg)
 {
     struct value a;		/* asinh(z) = -I*asin(I*z) */
     register double alpha, beta, x, y;
@@ -758,8 +743,7 @@ f_asinh(arg)
 }
 
 void
-f_acosh(arg)
-    union argument *arg;
+f_acosh(union argument *arg)
 {
     struct value a;
     register double alpha, beta, x, y;	/* acosh(z) = I*acos(z) */
@@ -773,18 +757,17 @@ f_acosh(arg)
     } else if (y == 0) {
 	push(Gcomplex(&a, log(x + sqrt(x * x - 1)) / ang2rad, 0.0));
     } else {
-	alpha = sqrt((x + 1) * (x + 1) + y * y) / 2 
+	alpha = sqrt((x + 1) * (x + 1) + y * y) / 2
 	        + sqrt((x - 1) * (x - 1) + y * y) / 2;
-	beta = sqrt((x + 1) * (x + 1) + y * y) / 2 
+	beta = sqrt((x + 1) * (x + 1) + y * y) / 2
 	       - sqrt((x - 1) * (x - 1) + y * y) / 2;
-	push(Gcomplex(&a, log(alpha + sqrt(alpha * alpha - 1)) / ang2rad, 
+	push(Gcomplex(&a, log(alpha + sqrt(alpha * alpha - 1)) / ang2rad,
 	                  (y<0 ? -1 : 1) * acos(beta) / ang2rad));
     }
 }
 
 void
-f_atanh(arg)
-    union argument *arg;
+f_atanh(union argument *arg)
 {
     struct value a;
     register double x, y, u, v, w, z;	/* atanh(z) = -I*atan(I*z) */
@@ -820,8 +803,7 @@ f_atanh(arg)
 }
 
 void
-f_int(arg)
-    union argument *arg;
+f_int(union argument *arg)
 {
     struct value a;
 
@@ -831,8 +813,7 @@ f_int(arg)
 
 
 void
-f_abs(arg)
-    union argument *arg;
+f_abs(union argument *arg)
 {
     struct value a;
 
@@ -848,8 +829,7 @@ f_abs(arg)
 }
 
 void
-f_sgn(arg)
-    union argument *arg;
+f_sgn(union argument *arg)
 {
     struct value a;
 
@@ -869,8 +849,7 @@ f_sgn(arg)
 
 
 void
-f_sqrt(arg)
-    union argument *arg;
+f_sqrt(union argument *arg)
 {
     struct value a;
     register double mag;
@@ -892,8 +871,7 @@ f_sqrt(arg)
 
 
 void
-f_exp(arg)
-    union argument *arg;
+f_exp(union argument *arg)
 {
     struct value a;
     register double mag, ang;
@@ -907,8 +885,7 @@ f_exp(arg)
 
 
 void
-f_log10(arg)
-    union argument *arg;
+f_log10(union argument *arg)
 {
     struct value a;
 
@@ -923,8 +900,7 @@ f_log10(arg)
 
 
 void
-f_log(arg)
-    union argument *arg;
+f_log(union argument *arg)
 {
     struct value a;
 
@@ -939,8 +915,7 @@ f_log(arg)
 
 
 void
-f_floor(arg)
-    union argument *arg;
+f_floor(union argument *arg)
 {
     struct value a;
 
@@ -957,8 +932,7 @@ f_floor(arg)
 
 
 void
-f_ceil(arg)
-    union argument *arg;
+f_ceil(union argument *arg)
 {
     struct value a;
 
@@ -979,8 +953,7 @@ f_ceil(arg)
 /* Returns 1 if the varibale is defined, 0 if not */
 /* If a constant is passed then returns the constant, i.e. isvar(10)=10 */
 void
-f_isvar(arg)
-    union argument *arg;
+f_isvar(union argument *arg)
 {
     struct value a;
 
@@ -991,14 +964,13 @@ f_isvar(arg)
        which should have checked the variable and pushed a value onto the stack */
 
     push(Ginteger(&a, a.v.int_val));
-    
+
 }
 #endif  /*GP_ISVAR*/
 
 /* bessel function approximations */
 static double
-jzero(x)
-double x;
+jzero(double x)
 {
     double p, q, x2;
     int n;
@@ -1014,8 +986,7 @@ double x;
 }
 
 static double
-pzero(x)
-double x;
+pzero(double x)
 {
     double p, q, z, z2;
     int n;
@@ -1032,8 +1003,7 @@ double x;
 }
 
 static double
-qzero(x)
-double x;
+qzero(double x)
 {
     double p, q, z, z2;
     int n;
@@ -1050,8 +1020,7 @@ double x;
 }
 
 static double
-yzero(x)
-double x;
+yzero(double x)
 {
     double p, q, x2;
     int n;
@@ -1067,8 +1036,7 @@ double x;
 }
 
 static double
-rj0(x)
-double x;
+rj0(double x)
 {
     if (x <= 0.0)
 	x = -x;
@@ -1081,8 +1049,7 @@ double x;
 }
 
 static double
-ry0(x)
-double x;
+ry0(double x)
 {
     if (x < 0.0)
 	return (dzero / dzero);	/* error */
@@ -1097,8 +1064,7 @@ double x;
 
 
 static double
-jone(x)
-double x;
+jone(double x)
 {
     double p, q, x2;
     int n;
@@ -1114,8 +1080,7 @@ double x;
 }
 
 static double
-pone(x)
-double x;
+pone(double x)
 {
     double p, q, z, z2;
     int n;
@@ -1132,8 +1097,7 @@ double x;
 }
 
 static double
-qone(x)
-double x;
+qone(double x)
 {
     double p, q, z, z2;
     int n;
@@ -1150,8 +1114,7 @@ double x;
 }
 
 static double
-yone(x)
-double x;
+yone(double x)
 {
     double p, q, x2;
     int n;
@@ -1167,8 +1130,7 @@ double x;
 }
 
 static double
-rj1(x)
-double x;
+rj1(double x)
 {
     double v, w;
     v = x;
@@ -1187,8 +1149,7 @@ double x;
 }
 
 static double
-ry1(x)
-double x;
+ry1(double x)
 {
     if (x <= 0.0)
 	return (dzero / dzero);	/* error */
@@ -1207,8 +1168,7 @@ double x;
  * complex number? */
 
 void
-f_besj0(arg)
-    union argument *arg;
+f_besj0(union argument *arg)
 {
     struct value a;
 
@@ -1221,8 +1181,7 @@ f_besj0(arg)
 
 
 void
-f_besj1(arg)
-    union argument *arg;
+f_besj1(union argument *arg)
 {
     struct value a;
 
@@ -1235,8 +1194,7 @@ f_besj1(arg)
 
 
 void
-f_besy0(arg)
-    union argument *arg;
+f_besy0(union argument *arg)
 {
     struct value a;
 
@@ -1254,8 +1212,7 @@ f_besy0(arg)
 
 
 void
-f_besy1(arg)
-    union argument *arg;
+f_besy1(union argument *arg)
 {
     struct value a;
 
@@ -1277,8 +1234,7 @@ f_besy1(arg)
  */
 #define TIMEFUNC(name, field)					\
 void								\
-name(arg)							\
-    union argument *arg;					\
+name(union argument *arg)					\
 {								\
     struct value a;						\
     struct tm tm;						\
@@ -1289,11 +1245,11 @@ name(arg)							\
     push(Gcomplex(&a, (double)tm.field, 0.0));			\
 }
 
-TIMEFUNC(f_tmsec, tm_sec)
-TIMEFUNC(f_tmmin, tm_min)
-TIMEFUNC(f_tmhour, tm_hour)
-TIMEFUNC(f_tmmday, tm_mday)
-TIMEFUNC(f_tmmon, tm_mon)
-TIMEFUNC(f_tmyear, tm_year)
-TIMEFUNC(f_tmwday, tm_wday)
-TIMEFUNC(f_tmyday, tm_yday)
+TIMEFUNC( f_tmsec, tm_sec)
+TIMEFUNC( f_tmmin, tm_min)
+TIMEFUNC( f_tmhour, tm_hour)
+TIMEFUNC( f_tmmday, tm_mday)
+TIMEFUNC( f_tmmon, tm_mon)
+TIMEFUNC( f_tmyear, tm_year)
+TIMEFUNC( f_tmwday, tm_wday)
+TIMEFUNC( f_tmyday, tm_yday)

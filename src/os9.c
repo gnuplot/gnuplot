@@ -1,4 +1,4 @@
-/* $Id: os9.c,v 1.1 1999/03/26 21:48:27 lhecking Exp $ */
+/* $Id: os9.c,v 1.2 2004/04/13 17:23:58 broeker Exp $ */
 
 /* GNUPLOT - os9.c */
 
@@ -59,9 +59,8 @@ extern mh_com *modloadp();
 static int proc[_NFILE];
 static mh_com *loadmods[_NFILE];
 
-FILE *popen(command, mode)
-char *command;
-char *mode;
+FILE *
+popen(char *command, char *mode)
 {
     int temp, fd;
     FILE *pipe;
@@ -70,9 +69,11 @@ char *mode;
     mh_com *mod;
     int linked = 0;
 
-    if(mode[1]!='\0' || (*mode!='r' && *mode!='w')) return (FILE *)NULL;
+    if(mode[1]!='\0' || (*mode!='r' && *mode!='w'))
+	return (FILE *)NULL;
     fd = (*mode=='r');
-    if((temp = dup(fd)) <= 0) return (FILE *)NULL;
+    if((temp = dup(fd)) <= 0)
+	return (FILE *)NULL;
     if((pipe = fopen("/pipe", "r+")) == NULL) {
     	close(temp);
     	return (FILE *)NULL;
@@ -81,62 +82,61 @@ char *mode;
     dup(fileno(pipe));
 
     if (strrchr (command, '/') == NULL)
-		mod = modlink (command, 0);
-	else
-		mod = (mh_com *) -1;
-	if (mod == (mh_com *) -1)
-		loadmods[fileno(pipe)] = mod = modloadp (command, 0, NULL);
-	else
-	{
-		linked = 1;
-		loadmods[fileno(pipe)] = (mh_com *) -1;
-	}
-		
-    argv[0] = "shell";
-    if (mod != (mh_com *) -1)
-    {
-	    argv[1] = "ex";
-	    argv[2] = command;
-    	argv[3] = (char *)NULL;
-    }
+	mod = modlink (command, 0);
     else
-    {
-    	argv[1] = command;
-	    argv[2] = (char *)NULL;
-	}
-    if((proc[fileno(pipe)] = os9exec(os9fork, argv[0], argv, _environ, 0, 0)) < 0)
-    {
-		fclose(pipe);
-		pipe = NULL;
-	}
+	mod = (mh_com *) -1;
+    if (mod == (mh_com *) -1)
+	loadmods[fileno(pipe)] = mod = modloadp (command, 0, NULL);
+    else {
+	linked = 1;
+	loadmods[fileno(pipe)] = (mh_com *) -1;
+    }
+
+    argv[0] = "shell";
+    if (mod != (mh_com *) -1) {
+	argv[1] = "ex";
+	argv[2] = command;
+	argv[3] = (char *)NULL;
+    } else {
+	argv[1] = command;
+	argv[2] = (char *)NULL;
+    }
+    if((proc[fileno(pipe)] = os9exec(os9fork, argv[0], argv, _environ, 0, 0))
+       < 0) {
+	fclose(pipe);
+	pipe = NULL;
+    }
     close(fd);
     dup(temp);
     close(temp);
-	if (linked && mod != (mh_com *) -1)
-		munlink (mod);
+    if (linked && mod != (mh_com *) -1)
+	munlink (mod);
     return pipe;
 }
 
-int pclose(pipe)
-FILE *pipe;
+int
+pclose(FILE *pipe)
 {
     int p, stat, w;
 
-    if((p = proc[fileno(pipe)]) <= 0) return -1;
+    if((p = proc[fileno(pipe)]) <= 0)
+	return -1;
     proc[fileno(pipe)] = 0;
     fflush(pipe);
-	if (loadmods[fileno(pipe)] != (mh_com *) -1)
-		munlink (loadmods[fileno(pipe)]);
+    if (loadmods[fileno(pipe)] != (mh_com *) -1)
+	munlink (loadmods[fileno(pipe)]);
     fclose(pipe);
-    while((w=wait(&stat)) != -1 && w!=p) {}
+    while((w=wait(&stat)) != -1 && w!=p)
+	;			/* do nothing */
+
     return w==-1 ? -1 : stat;
 }
 
 #endif	/* PIPES */
 
 
-int isatty(f)
-int f;
+int
+isatty(int f)
 {
     struct sgbuf sgbuf;
 
@@ -145,8 +145,8 @@ int f;
 }
 
 
-char *getwd(p)
-char *p;
+char *
+getwd(char *p)
 {
     register char *cp;
     register struct dirent *dp;
@@ -173,8 +173,9 @@ char *p;
 	    dp = &db[2];
 	    for(;;) {
 	        if(i <= 0) {
-		    if((i = read(d, (char *)db, sizeof(db))) == 0) {
-			if(*cp) chdir(cp+1);
+		    if((i = read(d, (char *) db, sizeof(db))) == 0) {
+			if(*cp)
+			    chdir(cp+1);
 			close(d);
 			return NULL;
 		    }
@@ -184,7 +185,8 @@ char *p;
 		    l = strlen(dp->dir_name);
 		    /* last character has parity bit set... */
 		    *--cp = dp->dir_name[--l] & 0x7f;
-		    while(l) *--cp = dp->dir_name[--l];
+		    while(l)
+			*--cp = dp->dir_name[--l];
 		    *--cp = '/';
 		    break;
 		}

@@ -1,5 +1,5 @@
-/*
- * $Id: fig.trm,v 1.40 2004/03/29 10:43:36 broeker Exp $
+/* Hello, Emacs, this is -*-C-*-
+ * $Id: fig.trm,v 1.41 2004/04/13 17:24:31 broeker Exp $
  */
 
 /* GNUPLOT - fig.trm */
@@ -148,8 +148,8 @@ TERM_PUBLIC void FIG_filled_polygon (int, gpiPoint *);
 
 /* Text flags (ULIG) */
 enum FIG_TEXT_STYLEBITS {
-    FIG_TEXT_RIGID      = 1<<0, 
-    FIG_TEXT_SPECIAL    = 1<<1, 
+    FIG_TEXT_RIGID      = 1<<0,
+    FIG_TEXT_SPECIAL    = 1<<1,
     FIG_TEXT_POSTSCRIPT = 1<<2,
     FIG_TEXT_HIDDEN     = 1<<3
 };
@@ -169,7 +169,7 @@ static int FIG_default_thickness = 1;
 static double FIG_current_pointsize = 1.;
 static double FIG_current_linewidth = 1.;
 
-/* Maximum number of points per POLYLINE. 
+/* Maximum number of points per POLYLINE.
    Default 1000 (hardcoded in help section as well) */
 static int FIG_poly_vec_max = 999;	/* JFS */
 
@@ -189,7 +189,7 @@ static enum FIG_poly_stat FIG_polyvec_stat;
 #define BFIG_VCHAR      FIG_to_pixel_v(INCH,BFIG_FONT_S)  /* height in pixels of font */
 #define BFIG_HCHAR      FIG_to_pixel_h(INCH,BFIG_FONT_S)  /* this is a guess at the width */
 
-static F_point *FIG_points = NULL;	/* Array for the collection of points for 
+static F_point *FIG_points = NULL;	/* Array for the collection of points for
 					   POLYLINE, allocated on demand. */
 static F_line FIG_line;
 
@@ -521,14 +521,16 @@ FIG_options()
 
 
 static void
-FIG_poly_clean(fig_stat)
-enum FIG_poly_stat fig_stat;
+FIG_poly_clean(enum FIG_poly_stat fig_stat)
 {
     int i, j;
     int cap_style;
+
     if (fig_stat == FIG_poly_part) {
-	cap_style = (FIG_line.style==DOTTED_LINE)? CAP_ROUND : FIG_line.cap_style;
-	fprintf(gpoutfile, "%d %d %d %d %d %d %d %d %d %9.3f %d %d %d %d %d %ld\n\t",
+	cap_style = (FIG_line.style==DOTTED_LINE)
+	    ? CAP_ROUND : FIG_line.cap_style;
+	fprintf(gpoutfile,
+		"%d %d %d %d %d %d %d %d %d %9.3f %d %d %d %d %d %ld\n\t",
 		O_POLYLINE, FIG_line.type, FIG_line.style, FIG_line.thickness,
 		FIG_line.pen_color, FIG_line.fill_color, FIG_line.depth,
 		FIG_line.pen_style, FIG_line.fill_style, FIG_line.style_val,
@@ -546,7 +548,7 @@ enum FIG_poly_stat fig_stat;
 	if (j != 0) {
 	    putc('\n', gpoutfile);
 	}
-	/* Give the memory back to the system because we are done with this 
+	/* Give the memory back to the system because we are done with this
 	 * polyline. Make sure FIG_points contains NULL afterwards!
 	 */
 	free(FIG_points);
@@ -601,11 +603,11 @@ FIG_init()
     else if( strcmp( FIG_version, "3.2" ) == 0 ) {
         fprintf( gpoutfile,
                  "#FIG 3.2\n%s\n%s\n%s\n%s\n%6.2f\n%s\n%d\n%d %d\n",
-                 FIG_ORIENT, 
+                 FIG_ORIENT,
                  FIG_JUST,
                  FIG_UNIT,
                  FIG_PAPER,
-                 FIG_MAGNIFICATION, 
+                 FIG_MAGNIFICATION,
                  FIG_MULTIPAGE,
                  FIG_TRANSCOLOR,
                  FIG_IRES, FIG_COORD_SYS
@@ -649,8 +651,7 @@ FIG_text()
  */
 
 TERM_PUBLIC void
-FIG_linetype(linetype)
-    int linetype;		/* expect linetype >= -2 */
+FIG_linetype(int linetype)		/* expect linetype >= -2 */
 {
     int last_FIG_type = FIG_type;
     int last_FIG_spacing = FIG_spacing;
@@ -717,8 +718,7 @@ FIG_linetype(linetype)
 }
 
 TERM_PUBLIC void
-FIG_move(x, y)
-unsigned int x, y;
+FIG_move(unsigned int x, unsigned int y)
 {
     int last_FIG_posx = FIG_posx;
     int last_FIG_posy = FIG_posy;
@@ -730,8 +730,7 @@ unsigned int x, y;
 
 
 TERM_PUBLIC void
-FIG_vector(ux, uy)
-unsigned int ux, uy;
+FIG_vector(unsigned int ux, unsigned int uy)
 {
     int x = ux, y = uy;
 
@@ -768,10 +767,10 @@ unsigned int ux, uy;
 
 
 TERM_PUBLIC void
-FIG_arrow(sx, sy, ex, ey, head)
-    unsigned int sx, sy;		/* start coord */
-    unsigned int ex, ey;		/* end coord */
-    int head;
+FIG_arrow(
+    unsigned int sx, unsigned int sy, /* start coord */
+    unsigned int ex, unsigned int ey, /* end coord */
+    int head)
 {
     int cap_style;
     double awidth, aheight;	/* arrow head sizes */
@@ -831,9 +830,7 @@ FIG_arrow(sx, sy, ex, ey, head)
 
 
 TERM_PUBLIC void
-FIG_put_text(x, y, str)
-    unsigned int x, y;
-    const char *str;
+FIG_put_text(unsigned int x, unsigned int y, const char *str)
 {
     char *s1, *s2, *output_string;
 
@@ -854,7 +851,7 @@ FIG_put_text(x, y, str)
 	x += (int)(term->v_char*sin(FIG_angle)/2.);
 	y -= (int)(term->v_char*cos(FIG_angle)/2.);
     }
-    
+
     /* (old: we assume that a string contains LaTeX commands if it contains */
     /* a backslash) --> obsoleted by 'textspecial' option (ULIG) */
     /* (it is not nice to mix LaTeX and Postscript fonts) */
@@ -873,8 +870,7 @@ FIG_put_text(x, y, str)
 }
 
 TERM_PUBLIC int
-FIG_justify_text(mode)
-enum JUSTIFY mode;
+FIG_justify_text(enum JUSTIFY mode)
 {
     switch (mode) {
     case LEFT:
@@ -896,17 +892,14 @@ enum JUSTIFY mode;
 }
 
 TERM_PUBLIC int
-FIG_text_angle(ang)
-int ang;
+FIG_text_angle(int ang)
 {
     FIG_angle = ang * M_PI_2 / 90. ;
     return (TRUE);
 }
 
 TERM_PUBLIC void
-FIG_lpoint(x, y, number)
-unsigned int x, y;
-int number;
+FIG_lpoint(unsigned int x, unsigned int y, int number)
 {
     FIG_type = 0;		/* Solid lines for marker outline */
     if (number % 100 >= 49 && number % 100 < 99) {	/* circles, squares, triangles */
@@ -983,8 +976,7 @@ int number;
 }
 
 TERM_PUBLIC void
-FIG_pointsize(arg_pointsize)
-double arg_pointsize;
+FIG_pointsize(double arg_pointsize)
 {
     FIG_current_pointsize = arg_pointsize;
     /* Bug-fix by hkeller@gwdg.de and K.B.: set pointsize for do_point() */
@@ -992,8 +984,7 @@ double arg_pointsize;
 }
 
 TERM_PUBLIC void
-FIG_linewidth(linewidth)
-double linewidth;
+FIG_linewidth(double linewidth)
 {
     FIG_current_linewidth = linewidth;
 }
@@ -1007,19 +998,20 @@ FIG_reset()
 }
 
 TERM_PUBLIC void
-FIG_boxfill(style, x, y, w, h)   /* ULIG */
-    int style;
-    unsigned int x, y, w, h;
+FIG_boxfill(
+    int style,
+    unsigned int x, unsigned int y,
+    unsigned int w, unsigned int h)
 {
 #if USE_ULIG_FILLEDBOXES
     int pen_color, fill_color, fill_style, fill_dens;
 #endif
-    
+
     FIG_poly_clean(FIG_polyvec_stat);
 
 #if USE_ULIG_FILLEDBOXES
     switch( style & 0xf ) {
-    case FS_SOLID: 
+    case FS_SOLID:
 	/* style == 1 --> filled with intensity according to filldensity */
         pen_color = FIG_line.pen_color;
         fill_color = FIG_line.pen_color;
@@ -1321,7 +1313,7 @@ of 74 ((4+1)*15 - 1).
 This means that figures converted from 2.1 and older files are offset by
 14 Fig units but new objects entered with version 3.0 are correct.
 
-In version 3.1 the magnet grid is at intervals 0, 75, 150, etc instead of 
+In version 3.1 the magnet grid is at intervals 0, 75, 150, etc instead of
 -1, 74, 149, etc.
 Figures from 2.1 and older are correctly converted now and a warning is popped
 up when you read in a version 3.0 file that says you may have to offset the
@@ -1331,13 +1323,13 @@ figure when you load it, using the x and y offsets in the file panel.
 Description of the Fig Format Follows
 --------------------------------------------------------------------------------
 
-(1) The very first line is a comment line containing the name and version:
+ (1) The very first line is a comment line containing the name and version:
 	#FIG 3.1
 
     The character # at the first column of a line indicates that the line
     is a comment line which will be ignored.
 
-(2) The first non-comment line consists of two numbers and two strings:
+ (2) The first non-comment line consists of two numbers and two strings:
 
 	int	fig_resolution		(Fig units/inch)
 	string	orientation		("Landscape" or "Portrait")
@@ -1365,7 +1357,7 @@ Description of the Fig Format Follows
     ** dash-lengths/dot-gaps are given in 1/80 of an inch.
 
 
-(3) The rest of the file contains various objects.  An object can be one
+ (3) The rest of the file contains various objects.  An object can be one
     of six classes (or types).
 
 	0)	Color pseudo-object.
@@ -1410,7 +1402,7 @@ Description of the Fig Format Follows
 	 are defined in color pseudo-objects (type 0)
 
     For WHITE color, the area fill field is defined as follows:
-	
+
 	-1 = not filled
 	 0 = black
 	...  values from 1 to 19 are shades of grey, from darker to lighter
@@ -1419,7 +1411,7 @@ Description of the Fig Format Follows
 	41-56 see patterns for colors, below
 
     For BLACK or DEFAULT color, the area fill field is defined as follows:
-	
+
 	-1 = not filled
 	 0 = white
 	...  values from 1 to 19 are shades of grey, from lighter to darker
@@ -1518,7 +1510,7 @@ Description of the Fig Format Follows
 	 0 = Hollow (actually filled with white)
 	 1 = Filled with pen_color
 
-(3.0) OBJECT DEFINITION:
+ (3.0) OBJECT DEFINITION:
 
     (3.1) Color Pseudo-objects (user-defined colors)
 	  This is used to define arbitrary colors beyond the 32 standard colors.

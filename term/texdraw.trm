@@ -1,5 +1,5 @@
-/*
- * $Id: texdraw.trm,v 1.14 2004/03/29 10:43:36 broeker Exp $
+/* Hello, Emacs, this is -*-C-*-
+ * $Id: texdraw.trm,v 1.15 2004/04/13 17:24:38 broeker Exp $
  */
 
 /* GNUPLOT - texdraw.trm */
@@ -191,8 +191,7 @@ TEXDRAW_text()
 }
 
 TERM_PUBLIC void
-TEXDRAW_linetype(linetype)
-int linetype;
+TEXDRAW_linetype(int linetype)
 {
     TEXDRAW_endline();
 
@@ -203,8 +202,7 @@ int linetype;
 }
 
 TERM_PUBLIC void
-TEXDRAW_move(x, y)
-unsigned int x, y;
+TEXDRAW_move(unsigned int x, unsigned int y)
 {
     TEXDRAW_endline();
 
@@ -213,9 +211,7 @@ unsigned int x, y;
 }
 
 TERM_PUBLIC void
-TEXDRAW_point(x, y, number)
-unsigned int x, y;
-int number;
+TEXDRAW_point(unsigned int x, unsigned int y, int number)
 {
     TEXDRAW_move(x, y);
 
@@ -235,8 +231,7 @@ int number;
 }
 
 TERM_PUBLIC void
-TEXDRAW_vector(ux, uy)
-unsigned int ux, uy;
+TEXDRAW_vector(unsigned int ux, unsigned int uy)
 {
     if (!TEXDRAW_inline) {
 	TEXDRAW_inline = TRUE;
@@ -279,9 +274,10 @@ TEXDRAW_endline()
 }
 
 TERM_PUBLIC void
-TEXDRAW_arrow(sx, sy, ex, ey, head)
-    unsigned int sx, sy, ex, ey;
-    int head;
+TEXDRAW_arrow(
+    unsigned int sx, unsigned int sy,
+    unsigned int ex, unsigned int ey,
+    int head)
 {
     char text;
 
@@ -300,9 +296,7 @@ TEXDRAW_arrow(sx, sy, ex, ey, head)
 }
 
 TERM_PUBLIC void
-TEXDRAW_put_text(x, y, str)
-unsigned int x, y;		/* reference point of string */
-const char str[];		/* the text */
+TEXDRAW_put_text(unsigned int x, unsigned int y, const char str[])
 {
     char text;
 
@@ -331,16 +325,14 @@ const char str[];		/* the text */
 
 
 TERM_PUBLIC int
-TEXDRAW_justify_text(mode)
-enum JUSTIFY mode;
+TEXDRAW_justify_text(enum JUSTIFY mode)
 {
     TEXDRAW_justify = mode;
     return (TRUE);
 }
 
 TERM_PUBLIC int
-TEXDRAW_text_angle(ang)
-int ang;
+TEXDRAW_text_angle(int ang)
 {
     TEXDRAW_angle = ang;
     return (TRUE);

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util.c,v 1.40 2004/06/30 20:01:56 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: util.c,v 1.41 2004/07/01 15:44:52 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - util.c */
@@ -67,11 +67,9 @@ static void mant_exp __PROTO((double, double, TBOOLEAN, double *, int *, const c
  * with c, and returns TRUE if a match was found.
  */
 int
-chr_in_str(t_num, c)
-int t_num;
-int c;
+chr_in_str(int t_num, int c)
 {
-    register int i;
+    int i;
 
     if (!token[t_num].is_token)
 	return (FALSE);		/* must be a value--can't be equal */
@@ -88,11 +86,9 @@ int c;
  *   returns TRUE if they are identical.
  */
 int
-equals(t_num, str)
-int t_num;
-const char *str;
+equals(int t_num, const char *str)
 {
-    register int i;
+    int i;
 
     if (!token[t_num].is_token)
 	return (FALSE);		/* must be a value--can't be equal */
@@ -111,14 +107,12 @@ const char *str;
  *   returns TRUE if they are identical up to the first $ in str[].
  */
 int
-almost_equals(t_num, str)
-int t_num;
-const char *str;
+almost_equals(int t_num, const char *str)
 {
-    register int i;
-    register int after = 0;
-    register int start = token[t_num].start_index;
-    register int length = token[t_num].length;
+    int i;
+    int after = 0;
+    int start = token[t_num].start_index;
+    int length = token[t_num].length;
 
     if (!str)
 	return FALSE;
@@ -143,8 +137,7 @@ const char *str;
 
 
 int
-isstring(t_num)
-int t_num;
+isstring(int t_num)
 {
 
     return (token[t_num].is_token &&
@@ -154,16 +147,14 @@ int t_num;
 
 
 int
-isanumber(t_num)
-int t_num;
+isanumber(int t_num)
 {
     return (!token[t_num].is_token);
 }
 
 
 int
-isletter(t_num)
-int t_num;
+isletter(int t_num)
 {
     return (token[t_num].is_token &&
 	    ((isalpha((unsigned char) input_line[token[t_num].start_index])) ||
@@ -178,8 +169,7 @@ int t_num;
  *   identifier ( identifer {,identifier} ) =
  */
 int
-is_definition(t_num)
-int t_num;
+is_definition(int t_num)
 {
     /* variable? */
     if (isletter(t_num) && equals(t_num + 1, "="))
@@ -207,14 +197,11 @@ int t_num;
  *   a null.  No more than max chars are copied (including \0).
  */
 void
-copy_str(str, t_num, max)
-char *str;
-int t_num;
-int max;
+copy_str(char *str, int t_num, int max)
 {
-    register int i = 0;
-    register int start = token[t_num].start_index;
-    register int count = token[t_num].length;
+    int i = 0;
+    int start = token[t_num].start_index;
+    int count = token[t_num].length;
 
     if (count >= max) {
 	count = max - 1;
@@ -230,8 +217,7 @@ int max;
 
 /* length of token string */
 size_t
-token_len(t_num)
-int t_num;
+token_len(int t_num)
 {
     return (size_t)(token[t_num].length);
 }
@@ -242,14 +228,11 @@ int t_num;
  *   efficency.
  */
 void
-quote_str(str, t_num, max)
-char *str;
-int t_num;
-int max;
+quote_str(char *str, int t_num, int max)
 {
-    register int i = 0;
-    register int start = token[t_num].start_index + 1;
-    register int count;
+    int i = 0;
+    int start = token[t_num].start_index + 1;
+    int count;
 
     if ((count = token[t_num].length - 2) >= max) {
 	count = max - 1;
@@ -272,12 +255,9 @@ int max;
  * the begining of token[start] and end of token[end].
  */
 void
-capture(str, start, end, max)
-char *str;
-int start, end;
-int max;
+capture(char *str, int start, int end, int max)
 {
-    register int i, e;
+    int i, e;
 
     e = token[end].start_index + token[end].length;
     if (e - token[start].start_index >= max) {
@@ -295,12 +275,10 @@ int max;
  * string.
  */
 void
-m_capture(str, start, end)
-char **str;
-int start, end;
+m_capture(char **str, int start, int end)
 {
-    register int i, e;
-    register char *s;
+    int i, e;
+    char *s;
 
     e = token[end].start_index + token[end].length;
     *str = gp_realloc(*str, (e - token[start].start_index + 1), "string");
@@ -316,12 +294,10 @@ int start, end;
  * quotes from either end of the string.
  */
 void
-m_quote_capture(str, start, end)
-char **str;
-int start, end;
+m_quote_capture(char **str, int start, int end)
 {
-    register int i, e;
-    register char *s;
+    int i, e;
+    char *s;
 
     e = token[end].start_index + token[end].length - 1;
     *str = gp_realloc(*str, (e - token[start].start_index + 1), "string");
@@ -343,8 +319,7 @@ int start, end;
  * valid parameters!
  */
 char *
-gp_strdup(s)
-const char *s;
+gp_strdup(const char *s)
 {
     char *d;
 
@@ -365,12 +340,13 @@ const char *s;
 /* HBB 20010121: added code that attempts to fix rounding-induced
  * off-by-one errors in 10^%T and similar output formats */
 static void
-mant_exp(log10_base, x, scientific, m, p, format)
-    double log10_base, x;
-    TBOOLEAN scientific;	/* round to power of 3 */
-    double *m;			/* results */
-    int *p;			
-    const char *format;		/* format string for fixup */
+mant_exp(
+    double log10_base,
+    double x,
+    TBOOLEAN scientific,	/* round to power of 3 */
+    double *m,			/* results */
+    int *p,
+    const char *format)		/* format string for fixup */
 {
     int sign = 1;
     double l10;
@@ -443,10 +419,10 @@ mant_exp(log10_base, x, scientific, m, p, format)
 
 	format = strchr (format, '.');
 	if (format != NULL)
-	    /* a decimal point was found in the format, so use that 
+	    /* a decimal point was found in the format, so use that
 	     * precision. */
 	    precision = strtol(format + 1, NULL, 10);
-	
+
 	/* See if mantissa would be right on the border.  The
 	 * condition to watch out for is that the mantissa is within
 	 * one printing precision of the next power of the logarithm
@@ -487,10 +463,12 @@ mant_exp(log10_base, x, scientific, m, p, format)
  * only, with logscaled axes, in combination with the occasional
  * round-off error. */
 void
-gprintf(dest, count, format, log10_base, x)
-    char *dest, *format;
-    size_t count;
-    double log10_base, x;
+gprintf(
+    char *dest,
+    size_t count,
+    char *format,
+    double log10_base,
+    double x)
 {
     char temp[MAX_LINE_LEN + 1];
     char *t;
@@ -610,7 +588,7 @@ gprintf(dest, count, format, log10_base, x)
 		t[1] = 0;
 		if (seen_mantissa)
 		    power = stored_power;
-		else 
+		else
 		    mant_exp(1.0, x, FALSE, NULL, &power, "%.0f");
 		sprintf(dest, temp, power);
 		break;
@@ -625,7 +603,7 @@ gprintf(dest, count, format, log10_base, x)
 		t[1] = 0;
 		if (seen_mantissa)
 		    power = stored_power;
-		else 
+		else
 		    mant_exp(1.0, x, TRUE, NULL, &power, "%.0f");
 		sprintf(dest, temp, power);
 		break;
@@ -640,7 +618,7 @@ gprintf(dest, count, format, log10_base, x)
 		t[1] = 0;
 		if (seen_mantissa)
 		    power = stored_power;
-		else 
+		else
 		    mant_exp(1.0, x, TRUE, NULL, &power, "%.0f");
 
 		if (power >= -18 && power <= 18) {
@@ -718,26 +696,30 @@ gprintf(dest, count, format, log10_base, x)
 /* some macros for the error and warning functions below
  * may turn this into a utility function later
  */
-#define PRINT_SPACES_UNDER_PROMPT \
-{ register size_t i; \
-  for (i = 0; i < sizeof(PROMPT) - 1; i++) \
-   (void) fputc(' ', stderr); \
+#define PRINT_SPACES_UNDER_PROMPT		\
+{						\
+    size_t i;					\
+						\
+    for (i = 0; i < sizeof(PROMPT) - 1; i++)	\
+	(void) fputc(' ', stderr);		\
 }
 
-#define PRINT_SPACES_UPTO_TOKEN \
-{ register int i; \
-   for (i = 0; i < token[t_num].start_index; i++) \
-    (void) fputc((input_line[i] == '\t') ? '\t' : ' ', stderr); \
+#define PRINT_SPACES_UPTO_TOKEN						\
+{									\
+    int i;								\
+									\
+    for (i = 0; i < token[t_num].start_index; i++)			\
+	(void) fputc((input_line[i] == '\t') ? '\t' : ' ', stderr);	\
 }
 
 #define PRINT_CARET fputs("^\n",stderr);
 
-#define PRINT_FILE_AND_LINE \
- if (!interactive) { \
-        if (infile_name != NULL) \
-            fprintf(stderr, "\"%s\", line %d: ", infile_name, inline_num); \
-        else fprintf(stderr, "line %d: ", inline_num); \
- }
+#define PRINT_FILE_AND_LINE						\
+if (!interactive) {							\
+    if (infile_name != NULL)						\
+	fprintf(stderr, "\"%s\", line %d: ", infile_name, inline_num);	\
+    else fprintf(stderr, "line %d: ", inline_num);			\
+}
 
 /* TRUE if command just typed; becomes FALSE whenever we
  * send some other output to screen.  If FALSE, the command line
@@ -750,10 +732,7 @@ void
 os_error(int t_num, const char *str,...)
 #else
 void
-os_error(t_num, str, va_alist)
-int t_num;
-const char *str;
-va_dcl
+os_error(int t_num, const char *str, va_dcl)
 #endif
 {
 #ifdef VA_START
@@ -770,7 +749,7 @@ va_dcl
     } else if (t_num != NO_CARET) {	/* put caret under error */
 	if (!screen_ok)
 	    fprintf(stderr, "\n%s%s\n", PROMPT, input_line);
-	
+
 	PRINT_SPACES_UNDER_PROMPT;
 	PRINT_SPACES_UPTO_TOKEN;
 	PRINT_CARET;
@@ -811,10 +790,7 @@ void
 int_error(int t_num, const char *str,...)
 #else
 void
-int_error(t_num, str, va_alist)
-int t_num;
-const char str[];
-va_dcl
+int_error(int t_num, const char str[], va_dcl)
 #endif
 {
 #ifdef VA_START
@@ -858,10 +834,7 @@ void
 int_warn(int t_num, const char *str,...)
 #else
 void
-int_warn(t_num, str, va_alist)
-int t_num;
-const char str[];
-va_dcl
+int_warn(int t_num, const char str[], va_dcl)
 #endif
 {
 #ifdef VA_START
@@ -892,11 +865,11 @@ va_dcl
     _doprnt(str, args, stderr);
 # endif
     va_end(args);
-#else
+#else  /* VA_START */
     fprintf(stderr, str, a1, a2, a3, a4, a5, a6, a7, a8);
-#endif
+#endif /* VA_START */
     putc('\n', stderr);
-}				/* int_warn */
+}
 
 /*{{{  graph_error() */
 /* handle errors during graph-plot in a consistent way */
@@ -906,9 +879,7 @@ void
 graph_error(const char *fmt, ...)
 #else
 void
-graph_error(fmt, va_alist)
-    const char *fmt;
-    va_dcl
+graph_error(const char *fmt, va_dcl)
 #endif
 {
 #ifdef VA_START
@@ -920,7 +891,7 @@ graph_error(fmt, va_alist)
 
 #ifdef VA_START
     VA_START(args, fmt);
-#if 0 
+#if 0
     /* HBB 20001120: this seems not to work at all. Probably because a
      * va_list argument, is, after all, something else than a varargs
      * list (i.e. a '...') */
@@ -954,10 +925,9 @@ graph_error(fmt, va_alist)
 /* Lower-case the given string (DFK) */
 /* Done in place. */
 void
-lower_case(s)
-char *s;
+lower_case(char *s)
 {
-    register char *p = s;
+    char *p = s;
 
     while (*p++) {
 	if (isupper((unsigned char)*p))
@@ -969,11 +939,10 @@ char *s;
 /* That is, reduce all multiple white-space chars to single spaces */
 /* Done in place. */
 void
-squash_spaces(s)
-char *s;
+squash_spaces(char *s)
 {
-    register char *r = s;	/* reading point */
-    register char *w = s;	/* writing point */
+    char *r = s;	/* reading point */
+    char *w = s;	/* writing point */
     TBOOLEAN space = FALSE;	/* TRUE if we've already copied a space */
 
     for (w = r = s; *r != NUL; r++) {
@@ -994,8 +963,7 @@ char *s;
 
 
 static void
-parse_esc(instr)
-char *instr;
+parse_esc(char *instr)
 {
     char *s = instr, *t = instr;
 
@@ -1040,17 +1008,16 @@ char *instr;
 }
 
 
-/* FIXME HH 20020915: This function does nothing if dirent.h and windows.h 
+/* FIXME HH 20020915: This function does nothing if dirent.h and windows.h
  * not available. */
-TBOOLEAN 
-existdir (name)
-     const char *name;
+TBOOLEAN
+existdir (const char *name)
 {
 #ifdef HAVE_DIRENT_H
     DIR *dp;
     if (! (dp = opendir(name) ) )
 	return FALSE;
-    
+
     closedir(dp);
     return TRUE;
 #elif defined(_Windows)

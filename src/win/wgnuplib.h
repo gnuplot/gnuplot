@@ -1,5 +1,5 @@
 /*
- * $Id: wgnuplib.h,v 1.15 2003/01/23 13:22:04 broeker Exp $
+ * $Id: wgnuplib.h,v 1.16 2004/04/13 17:24:06 broeker Exp $
  */
 
 /* GNUPLOT - win/wgnuplib.h */
@@ -36,7 +36,7 @@
 
 /*
  * AUTHORS
- * 
+ *
  *   Russell Lang
  */
 
@@ -283,7 +283,7 @@ struct GWOPBLK {			/* kept in local memory */
 #define W_ftriangle 22
 #define W_fpentagon 23
 #define W_itriangle 24		/* HBB 20010411: renumbered! */
-#define W_pentagon 25	
+#define W_pentagon 25
 #define W_move 30
 #define W_vect 31
 #define W_line_type 32

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.45 2004/05/24 15:43:55 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.46 2004/06/19 07:52:35 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - pm3d.c */
@@ -161,11 +161,11 @@ cb2gray(double cb)
  * Rearrange...
  */
 static void
-pm3d_rearrange_part(src, len, dest, invert)
-    struct iso_curve *src;
-    const int len;
-    struct iso_curve ***dest;
-    int *invert;
+pm3d_rearrange_part(
+    struct iso_curve *src,
+    const int len,
+    struct iso_curve ***dest,
+    int *invert)
 {
     struct iso_curve *scanA;
     struct iso_curve *scanB;
@@ -183,7 +183,6 @@ pm3d_rearrange_part(src, len, dest, invert)
     scan_array = *dest = gp_alloc(len * sizeof(scanA), "pm3d scan array");
 
     if (pm3d.direction == PM3D_SCANS_AUTOMATIC) {
-
 	int cnt;
 	int len2 = len;
 	TBOOLEAN exit_outer_loop = 0;
@@ -266,14 +265,17 @@ pm3d_rearrange_part(src, len, dest, invert)
 
 /*
  * Rearrange scan array
- * 
+ *
  * Allocates *first_ptr (and eventually *second_ptr)
  * which must be freed by the caller
  */
 void
-pm3d_rearrange_scan_array(struct surface_points *this_plot,
-			  struct iso_curve ***first_ptr, int *first_n, int *first_invert,
-			  struct iso_curve ***second_ptr, int *second_n, int *second_invert)
+pm3d_rearrange_scan_array(
+    struct surface_points *this_plot,
+    struct iso_curve ***first_ptr,
+    int *first_n, int *first_invert,
+    struct iso_curve ***second_ptr,
+    int *second_n, int *second_invert)
 {
     if (first_ptr) {
 	pm3d_rearrange_part(this_plot->iso_crvs, this_plot->num_iso_read, first_ptr, first_invert);
@@ -306,9 +308,7 @@ pm3d_rearrange_scan_array(struct surface_points *this_plot,
  * ANSI C K&R routines with int only.
  */
 static void
-pm3d_plot(this_plot, at_which_z)
-    struct surface_points *this_plot;
-    int at_which_z;
+pm3d_plot(struct surface_points *this_plot, int at_which_z)
 {
     int j, i, i1, ii, ii1, from, curve, scan, up_to, up_to_minus, invert = 0;
     int go_over_pts, max_pts;
@@ -409,15 +409,15 @@ pm3d_plot(this_plot, at_which_z)
 	else {
 	    max_pts = GPMAX(scanA->p_count, scanB->p_count);
 	    go_over_pts = max_pts - 1;
-	    /* the j-subrange of quadrangles; in the remaing of the interval 
+	    /* the j-subrange of quadrangles; in the remaing of the interval
 	     * [0..up_to] the flushing triangles are to be drawn */
 	    ftriangles_low_pt = from;
 	    ftriangles_high_pt = from + up_to_minus;
 	}
-	/* Go over 
+	/* Go over
 	 *   - the minimal number of points from both scans, if only quadrangles.
 	 *   - the maximal number of points from both scans if flush triangles
-	 *     (the missing points in the scan of lower nb of points will be 
+	 *     (the missing points in the scan of lower nb of points will be
 	 *     duplicated from the begin/end points).
 	 *
 	 * Notice: if it would be once necessary to go over points in `backward'
@@ -544,7 +544,7 @@ pm3d_plot(this_plot, at_which_z)
 		    icorners[3].z = pointsA[i1].z;
 		}
 		for (i = 0; i < 4; i++) {
-		    icorners[i].spec.gray = 
+		    icorners[i].spec.gray =
 			cb2gray( color_from_column ? icorners[i].z : z2cb(icorners[i].z) );
 		}
 	    }
@@ -566,9 +566,7 @@ pm3d_plot(this_plot, at_which_z)
  *  Now the implementation of the filled color contour plot
 */
 static void
-filled_color_contour_plot(this_plot, contours_where)
-    struct surface_points *this_plot;
-    int contours_where;
+filled_color_contour_plot(struct surface_points *this_plot, int contours_where)
 {
     double gray;
     struct gnuplot_contours *cntr;
@@ -617,7 +615,7 @@ filled_color_contour_plot(this_plot, contours_where)
  * unset pm3d for the reset command
  */
 void
-pm3d_reset(void)
+pm3d_reset()
 {
     pm3d.where[0] = 0;
     pm3d.flush = PM3D_FLUSH_BEGIN;
@@ -633,7 +631,7 @@ pm3d_reset(void)
 }
 
 
-/* 
+/*
  * Draw (one) PM3D color surface.
  */
 void
@@ -658,7 +656,7 @@ pm3d_draw_one(struct surface_points *plot)
 
     if (strchr(where, 'C') != NULL) {
 	/* !!!!! FILLED COLOR CONTOURS, *UNDOCUMENTED*
-	   !!!!! LATER CHANGE TO STH LIKE 
+	   !!!!! LATER CHANGE TO STH LIKE
 	   !!!!!   (if_filled_contours_requested)
 	   !!!!!      ...
 	   Currently filled color contours do not work because gnuplot generates
@@ -680,9 +678,11 @@ pm3d_draw_one(struct surface_points *plot)
  */
 
 static void
-pm3d_option_at_error(void)
+pm3d_option_at_error()
 {
-    int_error(c_token,"parameter to `pm3d at` requires combination of up to 6 characters b,s,t\n\t(drawing at bottom, surface, top)");
+    int_error(c_token, "\
+parameter to `pm3d at` requires combination of up to 6 characters b,s,t\n\
+\t(drawing at bottom, surface, top)");
 }
 
 
@@ -696,6 +696,7 @@ int
 get_pm3d_at_option(char *pm3d_where)
 {
     char* c;
+
     if (END_OF_COMMAND || token[c_token].length >= sizeof(pm3d.where)) {
 	pm3d_option_at_error();
 	return 1;

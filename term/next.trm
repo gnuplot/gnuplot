@@ -1,5 +1,5 @@
-/*
- * $Id: next.trm,v 1.22 2003/02/18 16:38:13 broeker Exp $
+/* Hello, Emacs, this is -*- objc -*-
+ * $Id: next.trm,v 1.23 2004/04/13 17:24:35 broeker Exp $
  *
  */
 
@@ -44,7 +44,7 @@
  * AUTHORS
  *  Robert Lutwak from Russell Lang's post.trm
  *  'old' option invokes Nick Strobel's original, single viewport terminal
- * 
+ *
  * send your comments or suggestions to (gnuplot-info@lists.sourceforge.net).
  *
  * This terminal attempts to connect, via the NeXTstep Distributed
@@ -58,15 +58,15 @@
  * on your system.
  *
  * Once connected to the server, this filter is basically Russell Lang's
- * Postscript filter, except that the resultant postscript code 
- * is sent, via the D.O. system, to GnuTerm.app, which manages 
+ * Postscript filter, except that the resultant postscript code
+ * is sent, via the D.O. system, to GnuTerm.app, which manages
  * the windows which produce the postscript output on the screen.
- * 
+ *
  *
  * Defaults are
  * 'set term next new dashed auto "Helvetica" 14'
  *
- * To change font to Times-Roman and font size to 20pts use 
+ * To change font to Times-Roman and font size to 20pts use
  * 'set term next "Times-Roman" 20'.
  *
  * to choose window by title
@@ -575,8 +575,7 @@ NEXT_options()
 
 
 TERM_PUBLIC char *
-NEXT_RememberFont(fname)
-char *fname;
+NEXT_RememberFont(char *fname)
 {
     struct NEXT_FontName *fnp;
 
@@ -608,11 +607,11 @@ static unsigned int NEXT_common_xoff, NEXT_common_yoff;
 
 
 TERM_PUBLIC void
-NEXT_common_init(uses_fonts, xoff, yoff, width, height, dict)
-int uses_fonts;			/* 0 for NEXT(la)tex */
-unsigned int xoff, yoff;	/* offset  - 50 for /post, 0 for NEXT(la)tex */
-unsigned int width, height;	/* for bounding box */
-char **dict;			/* extra entries for the dictionary */
+NEXT_common_init(
+    int uses_fonts,		/* 0 for NEXT(la)tex */
+    unsigned int xoff, unsigned int yoff, /* offset  - 50 for /post, 0 for NEXT(la)tex */
+    unsigned int width, unsigned int height, /* for bounding box */
+    char **dict)		/* extra entries for the dictionary */
 {
     static char GPFAR NEXTi1[] = "%%%%Creator: gnuplot\n\
 %%%%DocumentFonts: %s\n";
@@ -825,8 +824,7 @@ NEXT_reset()
 
 
 TERM_PUBLIC void
-NEXT_linetype(linetype)
-int linetype;
+NEXT_linetype(int linetype)
 {
     linetype = (linetype % 9) + 2;
     if (linetype < 0)
@@ -841,8 +839,7 @@ int linetype;
 
 
 TERM_PUBLIC void
-NEXT_move(x, y)
-unsigned int x, y;
+NEXT_move(unsigned int x, unsigned int y)
 {
     int dx, dy;
     char abso[20], rel[20];
@@ -866,8 +863,7 @@ unsigned int x, y;
 }
 
 TERM_PUBLIC void
-NEXT_vector(x, y)
-unsigned int x, y;
+NEXT_vector(unsigned int x, unsigned int y)
 {
     int dx, dy;
     char abso[20], rel[20];
@@ -896,8 +892,7 @@ unsigned int x, y;
 
 
 TERM_PUBLIC int
-NEXT_text_angle(ang)
-int ang;
+NEXT_text_angle(int ang)
 {
     NEXT_ang = ang;
     return TRUE;
@@ -905,8 +900,7 @@ int ang;
 
 
 TERM_PUBLIC int
-NEXT_justify_text(mode)
-enum JUSTIFY mode;
+NEXT_justify_text(enum JUSTIFY mode)
 {
     NEXT_justify = mode;
     return TRUE;
@@ -914,8 +908,7 @@ enum JUSTIFY mode;
 
 
 TERM_PUBLIC int
-NEXT_set_font(font) /* Entry font added by DJL */
-const char *font;
+NEXT_set_font(const char *font)
 {
     char name[32];
     int size, sep;
@@ -939,17 +932,14 @@ const char *font;
 /* postscript point routines */
 
 TERM_PUBLIC void
-NEXT_set_pointsize(size)
-double size;
+NEXT_set_pointsize(double size)
 {
     NEXTPrintf("/vpt %.1f def /hpt %.1f def /vpt2 vpt 2 mul def /hpt2 hpt 2 mul def\n",
 	       pointsize * NEXT_VTIC * 0.5, pointsize * NEXT_HTIC * 0.5);
 }
 
 TERM_PUBLIC void
-NEXT_point(x, y, number)
-unsigned int x, y;
-int number;
+NEXT_point(unsigned int x, unsigned int y, int number)
 {
     static char *pointFNS[] =
     {"Pnt", "Pls", "Crs", "Star",
@@ -1004,10 +994,12 @@ static float NEXT_max_height, NEXT_min_height;
  */
 
 static char *
-NEXT_recurse(p, brace, fontname, fontsize, base, widthflag)
-char *p, *fontname;
-TBOOLEAN brace, widthflag;
-double fontsize, base;
+NEXT_recurse(
+    char *p,
+    TBOOLEAN brace,
+    char *fontname,
+    double fontsize, double base,
+    TBOOLEAN widthflag)
 {
 
 /* close a postscript string if it has been opened */
@@ -1172,9 +1164,7 @@ double fontsize, base;
 
 
 TERM_PUBLIC void
-NEXT_put_text(x, y, str)
-    unsigned int x, y;
-    const char *str;
+NEXT_put_text(unsigned int x, unsigned int y, const char *str)
 {
     /* flush any pending graphics (all the XShow routines do this...) */
 
@@ -1240,8 +1230,8 @@ NEXT_colordetect()
 }
 */
 
-	/* This just packs all the postscript into one (possibly huge) string 
-	 * which will be passed (as a fake pointer) via D.O. to the server 
+	/* This just packs all the postscript into one (possibly huge) string
+	 * which will be passed (as a fake pointer) via D.O. to the server
 	 */
 
 void
@@ -1274,7 +1264,7 @@ NEXTPrintf(char *fmt,...)
 }
 
 /*  This next section implements the GnuTermDriver object which manages
-	the D.O. connection and interface to OBjC 
+	the D.O. connection and interface to OBjC
 */
 
 
@@ -1333,7 +1323,7 @@ PStext termTitle:(in char *) title;
 #endif
 	    }
 	}
-	/* I wish the gnuplot terminal interface would 
+	/* I wish the gnuplot terminal interface would
 	   let me return an error here.
 	 */
 
@@ -1342,14 +1332,14 @@ PStext termTitle:(in char *) title;
 	    /* Wait for it to register Server methods with OS */
 	    do {
 	      server =[NXConnection connectToName:"gnuplotServer"];
-	    } while (!server);	/* This could result in a hang, 
+	    } while (!server);	/* This could result in a hang,
 				   but I've never seen it fail */
 	}
     }
 
 
     /* By limiting ourselves to known protocol
-     * we speed up the messaging 
+     * we speed up the messaging
      */
   [server setProtocolForProxy:@protocol(GnuTermServerMethods)];
 
@@ -1370,11 +1360,11 @@ PStext termTitle:(in char *) title;
     if (!server)
 	[self init];
 
-    /* This is where we send the huge postscript string to the server 
+    /* This is where we send the huge postscript string to the server
        Note:
-       The D.O. system doesn't actually give this pointer to the server.  
+       The D.O. system doesn't actually give this pointer to the server.
        The pointer is dereferenced on the client side and the
-       resulting data is sent to the server. On the server side, 
+       resulting data is sent to the server. On the server side,
        space for the data is automatically allocated, and a pointer to
        the local data is received.
        For details check out:
@@ -1428,7 +1418,7 @@ width Height:(NXCoord) height
   [theNewWin setDelegate:self];
     /*
      * create a new View, make it the contentView of our new window,
-     * and destroy the window's old contentView 
+     * and destroy the window's old contentView
      */
   [[theNewWin setContentView:[[View alloc] init]] free];
     /* display the window, and bring it forth */

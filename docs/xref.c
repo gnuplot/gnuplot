@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: xref.c,v 1.8 2002/12/16 14:16:53 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: xref.c,v 1.9 2004/04/13 17:23:36 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - xref.c */
@@ -44,7 +44,7 @@ static char *RCSid() { return RCSid("$Id: xref.c,v 1.8 2002/12/16 14:16:53 lheck
  *  or doc2ipf by Roger Fearick
  *  or doc2html by Russel Lang
  *
- * I have modified the functions a little to make them more flexible 
+ * I have modified the functions a little to make them more flexible
  * (lookup returns list instead of list->line) or let them work with all
  * four programs (adding three parameters to refs).
  *
@@ -77,7 +77,7 @@ int listitems = 0;		/* number of topics */
 
 /* for debugging (invoke from gdb !) */
 void
-dump_list(void)
+dump_list()
 {
     struct LIST *element = head;
     while (element) {
@@ -88,18 +88,11 @@ dump_list(void)
 }
 
 
-#ifdef PROTOTYPES
-void *
+generic *
 xmalloc(size_t size)
 {
-    void *p = malloc(size);
-#else
-char *
-xmalloc(size)		/* think this is correct for K&R C */
-unsigned int size;
-{
-    char *p = malloc(size);
-#endif
+    generic *p = malloc(size);
+
     if (p)
 	return p;
     fprintf(stderr, "Malloc failed\n");
@@ -258,11 +251,13 @@ lkup_by_number(int line)
  * free the whole list (I never trust the OS -SB)
  */
 void
-list_free (void)
+list_free()
 {
     struct LIST *run;
 
-    for (run = head; run->next; run = run->next);
+    for (run = head; run->next; run = run->next)
+	; /* do nothing */
+
     for (run = run->prev; run; run = run->prev) {
 	free(run->next->string);
 	free(run->next);
@@ -270,7 +265,8 @@ list_free (void)
     free(head->string);
     free(head);
 
-    for (run = keyhead; run->next; run = run->next);
+    for (run = keyhead; run->next; run = run->next)
+	; /* do nothing */
     for (run = run->prev; run; run = run->prev) {
 	free(run->next->string);
 	free(run->next);
@@ -281,11 +277,11 @@ list_free (void)
 
 
 /* search through the list to find any references */
-/* 
+/*
  * writes a menu of all subtopics of the topic located at l
  * format must contain %s for the title of the subtopic and may contain
  * a %d for the line number of the subtopic (used by doc2html and doc2rtf
- * The whole menu is preceeded by start and gets the trailer end 
+ * The whole menu is preceeded by start and gets the trailer end
  */
 void
 refs( int l, FILE *f, char *start, char *end, char *format)

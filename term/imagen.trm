@@ -1,5 +1,5 @@
-/*
- * $Id: imagen.trm,v 1.14 2003/02/18 16:38:12 broeker Exp $
+/* Hello, Emacs, this is -*-C-*-
+ * $Id: imagen.trm,v 1.15 2004/04/13 17:24:34 broeker Exp $
  */
 
 /* GNUPLOT - imagen.trm */
@@ -45,7 +45,7 @@
  *   Rewritten/extended by:
  *	Hans Olav Eggestad
  * send your comments or suggestions to (gnuplot-info@lists.sourceforge.net).
- * 
+ *
  */
 
 /*
@@ -156,7 +156,7 @@ static unsigned int IM_yvector[STOREPATH]; /* draw path vector of y values */
 static unsigned int IM_veclen;	/* length of allocated path vector */
 static unsigned int IM_vecpos = 0; /* current pos in vector */
 
-/* char IMPdrpattern[10][10] = { {0}, {30,10,0}, {0}, {10,30,0}, {2,20,0}, 
+/* char IMPdrpattern[10][10] = { {0}, {30,10,0}, {0}, {10,30,0}, {2,20,0},
 	{20,10,0}, {30,20,10,20,0}, {30,20,4,10,10,10,4,20,0}, {40,20,0}, {30,15,4,15,0}
 };
 */
@@ -338,8 +338,7 @@ IMAGEN_text()
 
 
 TERM_PUBLIC void
-IMAGEN_linetype(lt)
-int lt;
+IMAGEN_linetype(int lt)
 {
     static int lastlinetype = -10;
     int pen /*, pattern */ ;
@@ -374,8 +373,7 @@ int lt;
 
 
 TERM_PUBLIC void
-IMAGEN_move(x, y)
-unsigned int x, y;
+IMAGEN_move(unsigned int x, unsigned int y)
 {
     if (IM_vecpos) {
 	/* fprintf(stderr,"move, draw path\n"); */
@@ -385,15 +383,14 @@ unsigned int x, y;
     IM_yvector[0] = y + IMAGEN_orgy;
     /* fprintf(stderr,"Ny vector: startpos: %1d %1d\n",IM_xvector[0],IM_yvector[0]); */
     IM_vecpos = 1;
-    /* 
+    /*
        IMAGEN_posx = x;
        IMAGEN_posy = y;
      */
 }
 
 TERM_PUBLIC void
-IMAGEN_vector(ux, uy)
-unsigned int ux, uy;
+IMAGEN_vector(unsigned int ux, unsigned int uy)
 {
     /* void IMAGEN_draw_path(); */
 
@@ -438,8 +435,7 @@ IMAGEN_draw_path()
 }
 
 static void
-IMAGEN_setpos(ux, uy)
-int ux, uy;
+IMAGEN_setpos(int ux, int uy)
 {
     /* Set x and y position (for text), also set beginning-of-line. */
 
@@ -455,10 +451,8 @@ int ux, uy;
 }
 
 TERM_PUBLIC int
-IMAGEN_text_angle(ang)
-int ang;
+IMAGEN_text_angle(int ang)
 {
-
     if (IM_vecpos) {
 	/* fprintf(stderr,"text_angle, draw path\n"); */
 	IMAGEN_draw_path();
@@ -472,8 +466,7 @@ int ang;
 }
 
 TERM_PUBLIC int
-IMAGEN_justify_text(mode)
-enum JUSTIFY mode;
+IMAGEN_justify_text(enum JUSTIFY mode)
 {
     if (IM_vecpos) {
 	/* fprintf(stderr,"justify_text, draw path\n"); */
@@ -484,10 +477,7 @@ enum JUSTIFY mode;
 }
 
 static unsigned char *
-IMAGEN_cvts(str, width, height)
-unsigned char *str;
-int *width;
-int *height;
+IMAGEN_cvts(unsigned char *str, int *width, int *height)
 {
     unsigned char *cp1;
     unsigned char *cp2;
@@ -557,9 +547,7 @@ int *height;
 }
 
 TERM_PUBLIC void
-IMAGEN_put_text(x, y, str)
-unsigned int x, y;		/* reference point of string */
-const char str[];			/* the text */
+IMAGEN_put_text(unsigned int x, unsigned int y, const char str[])
 {
     unsigned char *cvstr, *p;
     int height;
@@ -634,8 +622,7 @@ IMAGEN_reset()
 }
 
 static void
-IMAGEN_putwd(w)
-unsigned int w;
+IMAGEN_putwd(unsigned int w)
 {
     /* fprintf(stderr,"%1u\n",w); */
     putc(w >> 8, gpoutfile);
@@ -643,9 +630,7 @@ unsigned int w;
 }
 
 static void
-IMAGEN_createfamily(c, sz)
-char *c;
-int sz;
+IMAGEN_createfamily(char *c, int sz)
 {
 
     putc(imP_CREATE_FAMILY_TABLE, gpoutfile);
@@ -658,8 +643,7 @@ int sz;
 }
 
 static void
-IMAGEN_setfont(sz)
-int sz;
+IMAGEN_setfont(int sz)
 {
     char font[20];
 
@@ -682,8 +666,7 @@ int sz;
 }
 
 static void
-IMP_set_draw_pattern(pattern, sz)
-int pattern, sz;
+IMP_set_draw_pattern(int pattern, int sz)
 {
     int i /*,j */ ;
     putc(imP_SET_DRAW_PATTERN, gpoutfile);
@@ -853,9 +836,7 @@ IMAGEN_mapsinit()
 }
 
 static void
-IMAGEN_createmap(name, map)
-unsigned short *map;
-int name;
+IMAGEN_createmap(int name, unsigned short *map)
 {
     register int i, j;
     unsigned char s[4], *p;

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: bitmap.c,v 1.20 2003/04/25 03:23:00 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: bitmap.c,v 1.21 2004/04/13 17:23:52 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - bitmap.c */
@@ -37,7 +37,7 @@ static char *RCSid() { return RCSid("$Id: bitmap.c,v 1.20 2003/04/25 03:23:00 sf
 
 /*
  * AUTHORS
- * 
+ *
  *   Original Software:
  *     Jyrki Yli-Nokari <jty@intrin.UUCP>
  *     Ronald J. Hartranft <rjh2@ns.cc.lehigh.edu>
@@ -67,28 +67,35 @@ static char *RCSid() { return RCSid("$Id: bitmap.c,v 1.20 2003/04/25 03:23:00 sf
 #include "util.h"
 #include "term_api.h"	/* EAM - to pick up fillstyle definitions */
 
-static void b_putc __PROTO((unsigned int, unsigned int, int, unsigned int));
-static GP_INLINE void b_setpixel __PROTO((unsigned int x, unsigned int y, unsigned int value));
-static GP_INLINE void b_setmaskpixel __PROTO((unsigned int x, unsigned int y, unsigned int value));
-static void b_line __PROTO((unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2));
-
+/* global variables */
 bitmap *b_p = (bitmap *) NULL;	/* global pointer to bitmap */
-static unsigned int b_currx, b_curry; /* the current coordinates */
+
 unsigned int b_xsize, b_ysize;	/* the size of the bitmap */
 unsigned int b_planes;		/* number of color planes */
 unsigned int b_psize;		/* size of each plane */
 unsigned int b_rastermode;	/* raster mode rotates -90deg */
 unsigned int b_linemask = 0xffff; /* 16 bit mask for dotted lines */
+unsigned int b_angle;		/* rotation of text */
+
+int b_maskcount = 0;
+
+/* Local prototypes */
+static void b_putc __PROTO((unsigned int, unsigned int, int, unsigned int));
+static GP_INLINE void b_setpixel __PROTO((unsigned int x, unsigned int y, unsigned int value));
+static GP_INLINE void b_setmaskpixel __PROTO((unsigned int x, unsigned int y, unsigned int value));
+static void b_line __PROTO((unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2));
+
+/* file-scope variables */
+
 static unsigned int b_value = 1; /* colour of lines */
+static unsigned int b_currx, b_curry; /* the current coordinates */
 static unsigned int b_hchar;	/* width of characters */
 static unsigned int b_hbits;	/* actual bits in char horizontally */
 static unsigned int b_vchar;	/* height of characters */
 static unsigned int b_vbits;	/* actual bits in char vertically */
-unsigned int b_angle;		/* rotation of text */
 static char_box b_font[FNT_CHARS]; /* the current font */
 static unsigned int b_pattern[] = { 0xffff, 0x1111, 0xffff, 0x5555,
 				    0x3333, 0x7777, 0x3f3f, 0x0f0f, 0x5f5f };
-int b_maskcount = 0;
 static unsigned int b_lastx;
 static unsigned int b_lasty;	/* last pixel set - used by b_line */
 
@@ -800,7 +807,7 @@ struct rgb web_color_rgbs[] =
    **
    ** Plotting is done via b_move(x, y) and b_vector(x, y) functions,
    ** where the point (x,y) is the target to go from the current point
-   ** To set the color use b_setvalue(value) where value is the value 
+   ** To set the color use b_setvalue(value) where value is the value
    ** (0 or 1 or a color number) to be stored in every pixel.
    ** To get dotted line styles, use b_setlinetype(linetype).
    **
@@ -844,11 +851,10 @@ static unsigned char fill_pattern_bitmaps[fill_pattern_num][8] ={
  * set pixel (x, y, value) to value value (this can be 1/0 or a color number).
  */
 static GP_INLINE void
-b_setpixel(x, y, value)
-    unsigned int x, y, value;
+b_setpixel(unsigned int x, unsigned int y, unsigned int value)
 {
-    register unsigned int row;
-    register unsigned char mask;
+    unsigned int row;
+    unsigned char mask;
     unsigned int i;
 
     if (b_rastermode) {
@@ -887,12 +893,11 @@ b_setpixel(x, y, value)
  * get pixel (x,y) value
  */
 unsigned int
-b_getpixel(x, y)
-unsigned int x, y;
+b_getpixel(unsigned int x, unsigned int y)
 {
-    register unsigned int row;
-    register unsigned char mask;
-    register unsigned short value=0; /* HBB 991123: initialize! */
+    unsigned int row;
+    unsigned char mask;
+    unsigned short value=0; /* HBB 991123: initialize! */
     int i;
 
     if (b_rastermode) {
@@ -910,10 +915,10 @@ unsigned int x, y;
 	    row -= b_psize;
 	    value <<= 1;
 	}
-   
+
 	/* HBB 991123: the missing '>>1' was the 'every second color' problem
 	 * with PNG in 3.8a...*/
-	return(value>>1);		
+	return(value>>1);
     } else {
 #ifdef BITMAPDEBUG
 	if (b_rastermode)
@@ -931,11 +936,10 @@ unsigned int x, y;
  * allocate the bitmap
  */
 void
-b_makebitmap(x, y, planes)
-unsigned int x, y, planes;
+b_makebitmap(unsigned int x, unsigned int y, unsigned int planes)
 {
-    register unsigned j;
-    unsigned rows;
+    unsigned int j;
+    unsigned int rows;
 
     x = 8 * (unsigned int) (x / 8.0 + 0.9);	/* round up to multiple of 8 */
     y = 8 * (unsigned int) (y / 8.0 + 0.9);	/* round up to multiple of 8 */
@@ -984,8 +988,7 @@ b_freebitmap()
  * set pixel at (x,y) with color b_value and dotted mask b_linemask.
  */
 static GP_INLINE void
-b_setmaskpixel(x, y, value)
-    unsigned int x, y, value;
+b_setmaskpixel(unsigned int x, unsigned int y, unsigned int value)
 {
     /* dotted line generator */
     if ((b_linemask >> b_maskcount) & (unsigned int) (1)) {
@@ -1002,8 +1005,7 @@ b_setmaskpixel(x, y, value)
  * with color b_value and dotted mask b_linemask.
  */
 static void
-b_line(x1, y1, x2, y2)
-unsigned int x1, y1, x2, y2;
+b_line(unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2)
 {
     int runcount;
     int dx, dy;
@@ -1063,8 +1065,7 @@ unsigned int x1, y1, x2, y2;
  * set character size
  */
 void
-b_charsize(size)
-unsigned int size;
+b_charsize(unsigned int size)
 {
     int j;
     switch (size) {
@@ -1102,10 +1103,7 @@ unsigned int size;
  * put characater c at (x,y) rotated by angle with color b_value.
  */
 static
-void b_putc(x, y, c, c_angle)
-unsigned int x, y;
-int c;
-unsigned int c_angle;
+void b_putc(unsigned int x, unsigned int y, int c, unsigned int c_angle)
 {
     unsigned int i, j, k;
     char_row fc;
@@ -1155,8 +1153,7 @@ unsigned int c_angle;
    ** set b_linemask to b_pattern[linetype]
  */
 void
-b_setlinetype(linetype)
-int linetype;
+b_setlinetype(int linetype)
 {
     if (linetype >= 7)
 	linetype %= 7;
@@ -1169,8 +1166,7 @@ int linetype;
  * set b_value to value
  */
 void
-b_setvalue(value)
-unsigned int value;
+b_setvalue(unsigned int value)
 {
     b_value = value;
 }
@@ -1180,8 +1176,7 @@ unsigned int value;
  * move to (x,y)
  */
 void
-b_move(x, y)
-unsigned int x, y;
+b_move(unsigned int x, unsigned int y)
 {
     b_currx = x;
     b_curry = y;
@@ -1192,8 +1187,7 @@ unsigned int x, y;
  * draw to (x,y) with color b_value
  */
 void
-b_vector(x, y)
-unsigned int x, y;
+b_vector(unsigned int x, unsigned int y)
 {
     b_line(b_currx, b_curry, x, y);
     b_currx = x;
@@ -1205,9 +1199,7 @@ unsigned int x, y;
  * put text str at (x,y) with color b_value and rotation b_angle
  */
 void
-b_put_text(x, y, str)
-unsigned int x, y;
-const char *str;
+b_put_text(unsigned int x, unsigned int y, const char *str)
 {
     if (b_angle == 1)
 	x += b_vchar / 2;
@@ -1227,8 +1219,7 @@ const char *str;
 
 
 int
-b_text_angle(ang)
-int ang;
+b_text_angle(int ang)
 {
     b_angle = (unsigned int) (ang ? 1 : 0);
     return TRUE;
@@ -1236,10 +1227,11 @@ int ang;
 
 
 /* New function by ULIG */
-void 
-b_boxfill(style, x, y, w, h) 
-    int style;
-    unsigned int x, y, w, h;
+void
+b_boxfill(
+    int style,
+    unsigned int x, unsigned int y,
+    unsigned int w, unsigned int h)
 {
     unsigned int ix, iy;
 
@@ -1278,7 +1270,7 @@ b_boxfill(style, x, y, w, h)
     /* this implements a primitive raster generator, which plots the */
     /* bitmaps point by point calling b_setpixel(). Perhaps someone */
     /* will implement a more efficient solution */
-  
+
     bitoffs=0;
     for( iy = y; iy < y+h; iy ++ ) { /* box height */
 	pat = fillbitmap[bitoffs % fill_bitmap_width];
@@ -1287,7 +1279,7 @@ b_boxfill(style, x, y, w, h)
 	shiftcnt = 0;
 	for(ix = x; ix < x+w; ix ++) { /* box width */
 	    /* actual pixel = 0 or color, according to pattern */
-	    actpix = (pat & mask) ? pixcolor : 0; 
+	    actpix = (pat & mask) ? pixcolor : 0;
 	    mask >>= 1;
 	    if( mask == 0 ) {
 		mask = 1 << (fill_bitmap_width - 1);
@@ -1305,7 +1297,7 @@ b_boxfill(style, x, y, w, h)
 	    b_setpixel(ix, iy, 0);
 	}
     }
-  
+
 #endif /* USE_ULIG_FILLEDBOXES */
 }
 

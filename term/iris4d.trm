@@ -1,5 +1,5 @@
-/*
- * $Id: iris4d.trm,v 1.10 1999/06/22 11:54:19 lhecking Exp $
+/* Hello, Emacs, this is -*-C-*-
+ * $Id: iris4d.trm,v 1.11 2004/04/13 17:24:34 broeker Exp $
  *
  */
 
@@ -42,12 +42,12 @@
  *   IRIS terminals
  *
  * AUTHORS
- *   John H. Merritt 
+ *   John H. Merritt
  *           (Applied Research Corporation) 7/1/89
  *           INTERNET: merritt@iris613.gsfc.nasa.gov
- * 
+ *
  * send your comments or suggestions to (gnuplot-info@lists.sourceforge.net).
- * 
+ *
  */
 /*
  * adapted to the new terminal layout by Stefan Bodewig (Dec. 1995)
@@ -215,8 +215,7 @@ IRIS4D_text()
     return;			/* enter text from another window!!! */
 }
 
-TERM_PUBLIC void IRIS4D_linetype(linetype)
-int linetype;
+TERM_PUBLIC void IRIS4D_linetype(int linetype)
 {
     static int pen_color_24[11] =
     {
@@ -253,24 +252,21 @@ int linetype;
 }
 
 TERM_PUBLIC void
-IRIS4D_move(x, y)
-unsigned int x, y;
+IRIS4D_move(unsigned int x, unsigned int y)
 {
     move2i(x, y);
     return;
 }
 
 void
-IRIS4D_cmove(x, y)
-unsigned int x, y;
+IRIS4D_cmove(unsigned int x, unsigned int y)
 {
     cmov2i(x, y);
     return;
 }
 
 TERM_PUBLIC void
-IRIS4D_vector(x, y)
-unsigned int x, y;
+IRIS4D_vector(unsigned int x, unsigned int y)
 {
     draw2i(x, y);
     return;
@@ -278,9 +274,7 @@ unsigned int x, y;
 
 
 TERM_PUBLIC void
-IRIS4D_put_text(x, y, str)
-unsigned int x, y;
-const char *str;
+IRIS4D_put_text(unsigned int x, unsigned int y, const char *str)
 {
     IRIS4D_cmove(x, y - IRIS4D_VCHAR / 2);
     charstr(str);

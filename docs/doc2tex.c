@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: doc2tex.c,v 1.15 2004/02/23 13:35:00 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: doc2tex.c,v 1.16 2004/04/13 17:23:30 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - doc2tex.c */
@@ -36,8 +36,8 @@ static char *RCSid() { return RCSid("$Id: doc2tex.c,v 1.15 2004/02/23 13:35:00 b
 
 /*
  * doc2tex.c  -- program to convert Gnuplot .DOC format to LaTeX document
- * Also will work for VMS .HLP files. 
- * Modified by Russell Lang from hlp2ms.c by Thomas Williams 
+ * Also will work for VMS .HLP files.
+ * Modified by Russell Lang from hlp2ms.c by Thomas Williams
  * Extended by David Kotz to support quotes ("), backquotes, tables.
  * Extended by Jens Emmerich to handle '_', '---', paired single
  * quotes. Changed "-handling. Added pre/post-verbatim hooks.
@@ -50,7 +50,7 @@ static char *RCSid() { return RCSid("$Id: doc2tex.c,v 1.15 2004/02/23 13:35:00 b
  *
  * typical usage for GNUPLOT:
  *
- *   doc2tex gnuplot.doc gnuplot.tex 
+ *   doc2tex gnuplot.doc gnuplot.tex
  *   latex gnuplot.tex ; latex gnuplot.tex
  */
 
@@ -178,32 +178,32 @@ process_line( char *line, FILE *b)
 	     /* convert '^ <a href="#xxx"></a> to '\ref{xxx}' */
 	     /* convert '^ <a name="xxx"></a> to '\label{xxx}' */
             switch (line[3]) {
-            case 'a':{ 
+            case 'a':{
                     switch (line[5]) {
-                    case 'h':{ 
+                    case 'h':{
 	                    if (line[11] == '#') {
                                 fputs("{\\bf ",b);
-                                parsed = 0;    
+                                parsed = 0;
 		                for (i = 12; (c = line[i]) != '"'; i++) {
                                     string[i-12] = c;
-                                } 
+                                }
                                 string[i-12]= NUL;
                                 i++;i++;
                                 for ( ; i < initlen-5; i++) {
                                      fputc(line[i],b);
                                 }
-                                fputs(" (p.~\\pageref{",b); 
+                                fputs(" (p.~\\pageref{",b);
                                 fputs(string,b);
                                 fputs("})}} ",b);
                                 inhref = FALSE;
-                            } else {          
+                            } else {
 	                        inhref = TRUE;
                                 if (strstr(line,"</a>") == NULL){
                                    fputs("\\par\\hskip2.7em\\href{",b);
                                 } else {
                                    fputs("\\href{",b);
                                 }
-	                        parsed = 0; 
+	                        parsed = 0;
                                 for (i = 11; i < initlen-1 ; i++){
                                     c = line[i];
                                     if (c == '"') {
@@ -220,12 +220,12 @@ process_line( char *line, FILE *b)
                                         inhref = FALSE;
                                     } else {
                                         fputc(c,b);
-                                    } 
+                                    }
                                 }
-		            } 
+		            }
                             break;
 		    }
-                    case 'n': { 
+                    case 'n': {
                             fputs("\\label{",b);
 		            for (i = 11; (c = *(line +i)) != '"'; i++) {
                                  fputc(c,b);
@@ -233,9 +233,9 @@ process_line( char *line, FILE *b)
                             fputs("}\n",b);
 	                    break;
 		       }
-	            default: 
+	            default:
                             break;
-		    }       
+		    }
                     break;
     	       }
             case '/':
@@ -326,7 +326,7 @@ section(char *line, FILE *b)
 	break;
     case 6:
 	(void) fprintf(b, "\\paragraph{");
-	break; 
+	break;
     default:
         break;
 
@@ -398,7 +398,7 @@ puttex( char *str, FILE *file)
                     (void) fputs(" (p.~\\pageref{", file);
                     (void) fputs(string, file);
 		    (void) fputs("})", file);
-                    /* see = FALSE; */ 
+                    /* see = FALSE; */
                 }
                 (void) fputs("}", file);
 		inquote = FALSE;
@@ -408,7 +408,7 @@ puttex( char *str, FILE *file)
                     string[i] = c;
                 }
 		string[i] = NUL;
-		inquote = TRUE; 
+		inquote = TRUE;
 	    }
 	    break;
 	case '_':		/* emphasised text ? */
@@ -428,7 +428,7 @@ puttex( char *str, FILE *file)
         case 's':    /* find backquote after 'see' {see `} */
         case 'S':
             (void) fputc(ch, file);
-	    if ( str[0] == 'e' && str[1] == 'e' && isspace(str[2])){  
+	    if ( str[0] == 'e' && str[1] == 'e' && isspace(str[2])){
                 see = TRUE;
             }
             break;
