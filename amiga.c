@@ -171,9 +171,9 @@ const char *mode;
   PipeToUse = &OpenPipes[PipeNumToUse];
 
   /* Check if the specified mode is valid. */
-  if (STREQ(mode, "r"))
+  if (strcmp (mode, "r") == 0)
     ChildPipeMode = MODE_NEWFILE;
-  else if (STREQ(mode, "w"))
+  else if (strcmp (mode, "w") == 0)
     ChildPipeMode = MODE_OLDFILE;
   else {
     errno = EINVAL;

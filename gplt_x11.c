@@ -532,7 +532,7 @@ void mainloop()
 	if (xe.type == ClientMessage && xe.xclient.window == message_window) {
 	    if (xe.xclient.message_type == None &&
 		xe.xclient.format == 8 &&
-		STREQ(xe.xclient.data.b, "die gnuplot die")) {
+		strcmp(xe.xclient.data.b, "die gnuplot die") == 0) {
 		FPRINTF((stderr, "quit message from ast\n"));
 		return;
 	    } else {
@@ -1206,7 +1206,7 @@ char *argv[];
 /*---prescan arguments for "-name"----------------------------------------*/
 
     while (++Argv, --Argc > 0) {
-	if (STREQ(*Argv, "-name") && Argc > 1) {
+	if (!strcmp(*Argv, "-name") && Argc > 1) {
 	    safe_strncpy(Name, Argv[1], sizeof(Name));
 	    safe_strncpy(Class, Argv[1], sizeof(Class));
 	    if (Class[0] >= 'a' && Class[0] <= 'z')

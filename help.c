@@ -177,7 +177,7 @@ TBOOLEAN *subtopics;		/* (in) - subtopics only? */
      ** Calling routine may access errno to determine cause of H_ERROR.
      */
     errno = 0;
-    if (!STREQN(oldpath, path, PATHSIZE))
+    if (strncmp(oldpath, path, PATHSIZE) != 0)
 	FreeHelp();
     if (keys == NULL) {
 	status = LoadHelp(path);
@@ -359,7 +359,7 @@ static void sortkeys()
 static int keycomp(a, b)
 KEY *a, *b;
 {
-    return (STREQ(a->key, b->key));
+    return (strcmp(a->key, b->key));
 }
 
 /* Free the help file from memory. */
@@ -408,7 +408,7 @@ char *keyword;			/* string we look for */
     int compare;
 
     for (key = keys, compare = 1; key->key != NULL && compare > 0; key++) {
-	compare = STREQN(keyword, key->key, len);
+	compare = strncmp(keyword, key->key, len);
 	if (compare == 0)	/* we have a match! */
 	    if (!Ambiguous(key, len)) {
 		/* non-ambiguous abbreviation */
@@ -442,14 +442,14 @@ int len;
 
     for (prev = first = key->key, compare = 0, key++;
 	 key->key != NULL && compare == 0; key++) {
-	compare = STREQN(first, key->key, len);
+	compare = strncmp(first, key->key, len);
 	if (compare == 0) {
 	    /* So this key matches the first one, up to len.
 	     * But is it different enough from the previous one
 	     * to bother printing it as a separate choice?
 	     */
 	    sublen = instring(prev + len, ' ');
-	    if (!STREQN(key->key, prev, len + sublen)) {
+	    if (strncmp(key->key, prev, len + sublen) != 0) {
 		/* yup, this is different up to the next space */
 		if (!status) {
 		    /* first one we have printed is special */
@@ -526,7 +526,7 @@ TBOOLEAN *subtopics;		/* (out) are there any subtopics */
 
     for (subkey = key + 1; subkey->key != NULL; subkey++) {
 	int ispacelen = 0;
-	if (STREQN(subkey->key, key->key, len)) {
+	if (strncmp(subkey->key, key->key, len) == 0) {
 	    /* find this subtopic name */
 	    start = subkey->key + len;
 	    if (len > 0) {
@@ -540,7 +540,7 @@ TBOOLEAN *subtopics;		/* (out) are there any subtopics */
 		    continue;	/* not a main topic */
 	    }
 	    sublen = instring(start, ' ');
-	    if (prev == NULL || !STREQN(start, prev, sublen)) {
+	    if (prev == NULL || strncmp(start, prev, sublen) != 0) {
 		if (subt == 0) {
 		    subt++;
 		    if (len)

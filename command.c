@@ -389,10 +389,10 @@ static int command()
 		if (sleep_time >= 0)
 #else
 # ifdef OS2
-		if (!STREQ(term->name, "pm") || sleep_time >= 0)
+		if (strcmp(term->name, "pm") != 0 || sleep_time >= 0)
 # else
 #  ifdef MTOS
-	        if (!STREQ(term->name, "mtos") || sleep_time >= 0)
+		if (strcmp(term->name, "mtos") != 0 || sleep_time >= 0)
 #  endif /* MTOS */
 # endif /* OS2 */
 #endif /* _Windows */
@@ -406,7 +406,7 @@ static int command()
 		bail_to_command_line();
 #else
 # ifdef OS2
-	    if (STREQ(term->name, "pm") && sleep_time < 0) {
+	    if (strcmp(term->name, "pm") == 0 && sleep_time < 0) {
 		int rc;
 		if ((rc = PM_pause(buf)) == 0) {
 /*           if (!CallFromRexx)
@@ -421,11 +421,11 @@ static int command()
 	    }
 # else				/* !OS2 */
 #  ifdef _Macintosh
-	    if (STREQ(term->name, "macintosh") && sleep_time < 0)
+	    if (strcmp(term->name, "macintosh") == 0 && sleep_time < 0)
 		Pause(sleep_time);
 #  else				/* !_Macintosh */
 #   ifdef MTOS
-	    if (STREQ(term->name, "mtos")) {
+	    if (strcmp(term->name, "mtos") == 0) {
 		int MTOS_pause(char *buf);
 		int rc;
 		if ((rc = MTOS_pause(buf)) == 0)
@@ -435,7 +435,7 @@ static int command()
 		    text = 1;
 		    (void) fgets(buf, MAX_LINE_LEN, stdin);
 		}
-	    } else if (STREQ(term->name, "atari")) {
+	    } else if (strcmp(term->name, "atari") == 0) {
 		char *readline(char *);
 		char *line = readline("");
 		if (line)
@@ -444,7 +444,7 @@ static int command()
 		(void) fgets(buf, MAX_LINE_LEN, stdin);
 #   else			/* !MTOS */
 #    ifdef ATARI
-	    if (STREQ(term->name, "atari")) {
+	    if (strcmp(term->name, "atari") == 0) {
 		char *readline(char *);
 		char *line = readline("");
 		if (line)
@@ -594,7 +594,7 @@ static int command()
 	     * passes it on to load_file() so that it gets
 	     * pushed on the stack and recusion will work, etc
 	     */
-	    fp = STREQ(sv_file, "-") ? stdin : fopen(sv_file, "r");
+	    fp = strcmp(sv_file, "-") ? fopen(sv_file, "r") : stdin;
 	    load_file(fp, sv_file, FALSE);
 	    /* input_line[] and token[] now destroyed! */
 	    c_token = num_tokens = 0;
@@ -1011,7 +1011,7 @@ int toplevel;
     len = strlen(helpbuf);
 
     /* now, a lone ? will print subtopics only */
-    if (STREQ(helpbuf + (base ? base + 1 : 0), "?") == 0) {
+    if (strcmp(helpbuf + (base ? base + 1 : 0), "?") == 0) {
 	/* subtopics only */
 	subtopics = 1;
 	only = TRUE;
@@ -1176,7 +1176,7 @@ char *prompt;
 	    using_history();   
 	    temp = previous_history ();
 
-	    if (temp == 0 || STREQ (temp->line, line) == 0)
+	    if (temp == 0 || strcmp (temp->line, line) != 0)
 		add_history(line);
 
 #else /* !HAVE_LIBREADLINE */
@@ -1430,7 +1430,7 @@ static int winsystem(char *s)
     p = GetDOSEnvironment();
     comspec = "\\command.com";
     while (*p) {
-	if (STREQN(p, "COMSPEC=", 8)) {
+	if (!strncmp(p, "COMSPEC=", 8)) {
 	    comspec = p + 8;
 	    break;
 	}
