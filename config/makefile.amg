@@ -1,12 +1,12 @@
 #
-# $Id: makefile.amg,v 1.3 1999/05/31 18:38:59 lhecking Exp $
+# $Id: makefile.amg,v 1.4 1999/09/21 18:05:40 lhecking Exp $
 #
 # GNUPLOT Makefile for SAS/C 6.1 or better on the Amiga
 #
 # Makefile for use with SAS/C 6.50 or newer
 #   on AmigaOS 2.0 and above
 #
-# last modification date: 19990530
+# last modification date: 19991029
 #
 
 #
@@ -17,9 +17,11 @@
 # Substitute the path names for the actual path where includes/libs reside
 
 # GD (GIF) device driver
-# requires GD library (not part of gnuplot)
+# requires GD library version 1.3 or 1.4 (not part of gnuplot)
 # the library source code can be downloaded from
 #  http://www.boutell.com/gd/
+# if you can't find the required version, use the gnuplot
+# distribution sites for download
 #
 #GD_DEF = def=HAVE_LIBGD
 #GD_INCLUDE = IDIR=gd1.3
@@ -101,7 +103,7 @@ CFLAGS = $(COPTS) $(CPU) $(MATH) $(OFLAGS) $(DEFS) $(DEBUG) DATA=f
 #.c.oo:
 #	$(CC) $(CFLAGS) code=f objname=$@ $<
 
-all: gnuplot $(DEMODIR)/bf_test
+all: gnuplot $(DEMODIR)/bf_test docs
 
 # Normal compilation rule
 .c.o:
@@ -155,12 +157,6 @@ CSOURCE7 = $(TERMDIR)/pm.trm $(TERMDIR)/png.trm $(TERMDIR)/post.trm \
 CSOURCE8 = contour.c specfun.c amiga.c
 CORETERM = $(CSOURCE5) $(CSOURCE6) $(CSOURCE7)
 
-#gnuplot: $(OBJS)
-#	$(CC) <WITH <
-#$(CFLAGS)
-#LINK TO $@
-#FROM $(OBJS) $(PNG_LIB) $(Z_LIB) $(GD_LIB) $(LNDBG)
-#<
 gnuplot: $(OBJS)
 	$(CC) $(CFLAGS) LINK TO $@ $(OBJS) $(PNG_LIB) $(Z_LIB) $(GD_LIB) $(LNDBG)
 
