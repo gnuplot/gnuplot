@@ -916,6 +916,7 @@ char ss[MAX_LINE_LEN+1], *s, *e;
 					key_sample_point(xl,yl,-1);
 					break;
 				}
+				NEXT_KEY_LINE();
 			}
 
 			linetypeOffset = this_plot->lp_properties.l_type + (hidden3d ? 2 : 1);
