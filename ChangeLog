@@ -1,3 +1,8 @@
+2003-05-19  Ethan Merritt <merritt@u.washington.edu>
+
+	* term/svg.trm: Make pattern fill sequence consistent with other
+	terminal types. Fix off-by-one y coordinate error in box fill code.
+
 2003-05-19  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/show.c (show_palette_colornames): Fix a C++-ism (variable
