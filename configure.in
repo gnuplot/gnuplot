@@ -12,18 +12,12 @@ dnl  This reduced the size of configure by 30k!
 dnl
 dnl $Id: configure.in,v 1.90 1998/06/18 14:52:55 ddenholm Exp $
 dnl
-AC_PREREQ(2.12.2)
+AC_PREREQ(2.12)
 AC_REVISION($Revision: 1.90 $)
 AC_INIT(graphics.c)
 VERSION=`sed -n 's/.*patchlevel.*"\(.*\)".*/\1/p' $srcdir/version.c|tr -d ' '`
 AM_INIT_AUTOMAKE(gnuplot, $VERSION)
 AC_CONFIG_HEADER(config.h:config.hin)
-
-
-dnl Programs. Other checks have already been performed by AM_INIT_AUTOMAKE
-AC_PROG_CC
-AC_PROG_CPP
-
 
 dnl Optional features.
 
@@ -146,7 +140,9 @@ dnl configure.in body
 dnl Compiler characteristics
 dnl Check for ANSI C prototypes, the const and inline keywords,
 dnl and ANSI style stringification
+AC_PROG_CC
 AM_C_PROTOTYPES
+AC_PROG_CPP
 AC_C_CONST
 AC_C_INLINE
 AC_C_STRINGIZE
@@ -155,7 +151,12 @@ AC_MSG_CHECKING(if compiler handles warn and error directives correctly)
 dnl this used to test #warning, but that is not currently used
 AC_TRY_CPP([#if 0
 #error "error"
-#endif],ERRORFIX= AC_MSG_RESULT(yes),ERRORFIX=errorfix AC_MSG_RESULT(no))
+#warning "warning"
+#endif],
+  ERRORFIX=
+  AC_MSG_RESULT(yes),dnl
+  ERRORFIX=errorfix
+  AC_MSG_RESULT(no))
 AC_SUBST(ERRORFIX)
 
 dnl X Window System files.
@@ -448,11 +449,14 @@ AC_SUBST(TERMXLIBS)
 
 
 dnl Report configuration
+eval gp_bindir=$bindir
+test $gp_bindir = NONE/bin && gp_bindir=/usr/local/bin
 eval gp_datadir=$datadir
 test $gp_datadir = NONE/share && gp_datadir=/usr/local/share
 AC_MSG_RESULT([
 ** Configuration summary for $PACKAGE $VERSION:
 
+  Where are the binaries?           $gp_bindir
   Where is the help file?           $gp_datadir/gnuplot.gih
 ])
 test "$ac_cv_header_gd_h" = yes && \
