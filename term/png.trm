@@ -1,5 +1,5 @@
 /*
- * $Id: png.trm,v 1.27.2.2 2000/10/22 13:50:51 joze Exp $
+ * $Id: png.trm,v 1.30 2000/10/31 19:59:32 joze Exp $
  *
  */
 
@@ -114,6 +114,7 @@ enum PNG_id {
     PNG_TRANSPARENT, PNG_NOTRANSPARENT,
     PNG_SMALL, PNG_MEDIUM, PNG_LARGE,
     PNG_MONOCHROME, PNG_GRAY, PNG_COLOR,
+    PNG_PICSIZE,
     PNG_OTHER
 };
 
@@ -128,6 +129,7 @@ static struct gen_table PNG_opts[] =
     { "g$ray", PNG_GRAY },
     { "c$olor", PNG_COLOR },
     { "c$olour", PNG_COLOR },
+    { "pics$ize", PNG_PICSIZE },
     { NULL, PNG_OTHER }
 };
 
@@ -138,6 +140,8 @@ PNG_options()
     int n_colors = 0;
     char *string;
     int i;
+    int x, y;		/* reading x and y size of picure */
+    struct value a;
 
     rgb_color[0] = 0;
     rgb_color[1] = 0;
@@ -185,6 +189,17 @@ PNG_options()
 	    png_mode = 2;
 	    c_token++;
 	    break;
+	case PNG_PICSIZE:
+	    c_token++;
+	    x = (int) real(const_express(&a));
+	    if (!END_OF_COMMAND) {
+	    	y = (int) real(const_express(&a));
+		if ((x % 8) != 0) x = 8 * (x / 8);
+		term->xmax = x;
+		if ((y % 8) != 0) y = 8 * (y / 8);
+		term->ymax = y;		/* make x and y multiples of 8 */
+	    }
+	    break;
 	case PNG_OTHER:
 	default:
 	    /* set color */
@@ -204,7 +219,8 @@ PNG_options()
 		 * "> WEB_N_COLORS warning" scroll fests. */
 		if (!END_OF_COMMAND) {
 		    while (!END_OF_COMMAND)
-			++c_token; --c_token;
+			++c_token;
+		    --c_token;
 		}
 		++c_token;
 	    } else {
@@ -252,6 +268,9 @@ PNG_options()
 	strcat(term_options, "monochrome ");
 	break;
     }
+
+    sprintf(term_options + strlen(term_options), "picsize %u %u ",
+	    term->xmax, term->ymax);
 
     for (i = 0; strlen(term_options) + 9 < MAX_LINE_LEN && 
 	i < n_colors ; i++ ) {
@@ -332,8 +351,8 @@ PNG_graphics()
 
     /* rotate plot -90 degrees by reversing XMAX and YMAX and by
        setting b_rastermode to TRUE */
-    b_makebitmap((unsigned int) (PNG_YMAX * ysize),
-		 (unsigned int) (PNG_XMAX * xsize), numplanes);
+    b_makebitmap((unsigned int) (term->ymax * ysize),
+		 (unsigned int) (term->xmax * xsize), numplanes);
     b_rastermode = TRUE;
 
     if (png_mode != 0)
@@ -605,19 +624,20 @@ START_HELP(png)
 " Syntax:",
 "       set terminal png {small | medium | large}",
 "                        {transparent|notransparent}",
+"                        {picsize <xsize> <ysize>}",
 "                        {monochrome | gray | color}",
 "                        {<color0> <color1> <color2> ...}",
 "",
 " `transparent` instructs the driver to generate transparent PNGs.  The first",
 " color will be the transparent one.",
     "",
-" The defaults are small (fontsize) and color.  Default size of the output",
-" is 640*480 pixel. ",
+" The defaults are `small` (fontsize) and `color`.  Default size of the output",
+" is 640*480 pixel. This can be changed by the option `picsize`.",
 "",
-" Each color must be of the form 'xrrggbb', where x is the literal character",
+" Each <color> must be of the form 'xrrggbb', where x is the literal character",
 " 'x' and 'rrggbb' are the red, green and blue components in hex.  For example,",
 " 'x00ff00' is green.  The background color is set first, then the border",
-" colors, then the X & Y axis colors, then the plotting colors.  The maximum",
+" color, then the X & Y axis color, then the plotting colors.  The maximum",
 " number of colors that can be set is currently 99."
 END_HELP(png)
 #endif /* TERM_HELP */
