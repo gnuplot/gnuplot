@@ -51,19 +51,6 @@ extern struct value stack[STACK_DEPTH];
 extern int s_p;
 extern double zero;
 
-/* Function wrappers */
-#ifdef HAVE_ERF
-# define GP_ERF(x) erf(x)
-#else
-# define GP_ERF(x) ((x)<0.0 ? -igamma(0.5,(x)*(x)) : igamma(0.5,(x)*(x)))
-#endif
-#ifdef HAVE_ERFC
-# define GP_ERFC(x) erfc(x)
-#else
-# define GP_ERFC(x) ((x)<0.0 ? 1.0+igamma(0.5,(x)*(x)) : 1.0-igamma(0.5,(x)*(x)))
-#endif
-/* End wrappers */
-
 #define ITMAX   200
 
 #ifdef FLT_EPSILON
@@ -100,12 +87,10 @@ extern double zero;
 #ifndef GAMMA
 # ifdef HAVE_LGAMMA
 #  define GAMMA(x) lgamma (x)
+# elif defined(HAVE_GAMMA)
+#  define GAMMA(x) gamma (x)
 # else
-#  ifdef HAVE_GAMMA
-#   define GAMMA(x) gamma (x)
-#  else
-#   undef GAMMA
-#  endif
+#  undef GAMMA
 # endif
 #endif
 
@@ -251,7 +236,23 @@ void f_erf()
     double x;
 
     x = real(pop(&a));
-    x = GP_ERF(x);
+
+#ifdef HAVE_ERF
+    x = erf(x);
+#else
+    {
+	int fsign;
+	fsign = x >= 0 ? 1 : 0;
+	x = igamma(0.5, (x)*(x));
+	if (fabs(x+1.0) < DBL_EPSILON) {
+	    undefined = TRUE;
+	    x = 0.0;
+	} else {
+	    if (fsign == 0)
+		x = -x;
+	}
+    }
+#endif
     push(Gcomplex(&a, x, 0.0));
 }
 
@@ -261,7 +262,21 @@ void f_erfc()
     double x;
 
     x = real(pop(&a));
-    x = GP_ERFC(x);
+#ifdef HAVE_ERFC
+    x = erfc(x);
+#else
+    {
+	int fsign;
+	fsign = x >= 0 ? 1 : 0;
+	x = igamma(0.5, (x)*(x));
+	if (fabs(x+1.0) < DBL_EPSILON) {
+	    undefined = TRUE;
+	    x = 0.0;
+	} else { 
+	    x = fsign > 0 ? 1.0 - x : 1.0 + x ;
+	}
+    }
+#endif
     push(Gcomplex(&a, x, 0.0));
 }
 
@@ -638,7 +653,23 @@ void f_normal()
     x = real(pop(&a));
 
     x = 0.5 * SQRT_TWO * x;
-    x = 0.5 * (1.0 + GP_ERF(x));
+#ifdef HAVE_ERF
+    x = 0.5 * (1.0 + erf(x));
+#else
+    {
+	int fsign;
+	fsign = x >= 0 ? 1 : 0;
+	x = igamma(0.5, (x)*(x));
+	if (fabs(x+1.0) < DBL_EPSILON) {
+	    undefined = TRUE;
+	    x = 0.0;
+	} else { 
+	    if (fsign == 0)
+		x = -(x);
+	    x = 0.5 * (1.0 + x);
+	}
+    }
+#endif
     push(Gcomplex(&a, x, 0.0));
 }
 
