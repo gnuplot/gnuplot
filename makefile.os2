@@ -333,7 +333,7 @@ clean:
 	IF EXIST *.$(O2)                 DEL *.$(O2)
 	cd $(OS2DIR) & IF EXIST *.$(O2)  DEL *.$(O2)
 	IF EXIST $(OS2DIR)\gnupmdrv.res  DEL $(OS2DIR)\gnupmdrv.res
-	IF EXIST demo\bf_test.exe        DEL demo\bf_test.exe
+	IF EXIST $(DEMODIR)\bf_test.exe  DEL $(DEMODIR)\bf_test.exe
 	IF EXIST doc2*.exe               DEL doc2*.exe
 	IF EXIST $(DOCDIR)\gnuplot.ipf   DEL $(DOCDIR)\gnuplot.ipf
 	IF EXIST core                    DEL core
@@ -353,4 +353,4 @@ veryclean: clean
 	IF EXIST gnuplot.ms              DEL gnuplot.ms
 	IF EXIST gnuplot.rtf             DEL gnuplot.rtf
 	IF EXIST gnuplot.ps              DEL gnuplot.ps
-	cd demo & IF EXIST binary?       DEL binary?
+	cd $(DEMODIR) & IF EXIST binary? DEL binary?
