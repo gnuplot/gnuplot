@@ -1,5 +1,5 @@
 /*
- * $Id: x11.trm,v 1.76 2003/07/07 20:48:59 sfeam Exp $
+ * $Id: x11.trm,v 1.77 2003/07/10 19:32:59 sfeam Exp $
  *
  */
 
@@ -935,6 +935,44 @@ X11_graphics()
 TERM_PUBLIC void
 X11_text()
 {
+#ifdef USE_MOUSE
+    /* EAM July 2003:  send over a snapshot of the final axis scaling
+     * so that subsequent mouse events can be transformed into plot
+     * coordinates even though the plot is no longer active.
+     */
+    if (ipc_back_fd >= 0) {
+	/* Construct a mask showing which axes are active */
+	int axis_mask = 0;
+	int i;
+	
+	for (i = FIRST_AXES; i < 2*SECOND_AXES; i++) {
+	    if (axis_array[i].ticmode != NO_TICS)
+		axis_mask |= (1 << i);
+	}
+	PRINT2("S %2d %d\n", -1, axis_mask);
+	PRINT5("S %2d %14.3lg %14d %14.3lg %14.3lg\n", FIRST_X_AXIS,
+		axis_array[FIRST_X_AXIS].min, 
+		axis_array[FIRST_X_AXIS].term_lower,
+		axis_array[FIRST_X_AXIS].term_scale,
+		axis_array[FIRST_X_AXIS].log ? axis_array[FIRST_X_AXIS].log_base : 0);
+	PRINT5("S %2d %14.3lg %14d %14.3lg %14.3lg\n", FIRST_Y_AXIS,
+		axis_array[FIRST_Y_AXIS].min, 
+		axis_array[FIRST_Y_AXIS].term_lower,
+		axis_array[FIRST_Y_AXIS].term_scale,
+		axis_array[FIRST_Y_AXIS].log ? axis_array[FIRST_Y_AXIS].log_base : 0);
+	PRINT5("S %2d %14.3lg %14d %14.3lg %14.3lg\n", SECOND_X_AXIS,
+		axis_array[SECOND_X_AXIS].min, 
+		axis_array[SECOND_X_AXIS].term_lower,
+		axis_array[SECOND_X_AXIS].term_scale,
+		axis_array[SECOND_X_AXIS].log ? axis_array[SECOND_X_AXIS].log_base : 0);
+	PRINT5("S %2d %14.3lg %14d %14.3lg %14.3lg\n", SECOND_Y_AXIS,
+		axis_array[SECOND_Y_AXIS].min, 
+		axis_array[SECOND_Y_AXIS].term_lower,
+		axis_array[SECOND_Y_AXIS].term_scale,
+		axis_array[SECOND_Y_AXIS].log ? axis_array[SECOND_Y_AXIS].log_base : 0);
+    }
+#endif
+
     PRINT0("E\n");
     FFLUSH();
 #ifdef ULTRIX_KLUDGE

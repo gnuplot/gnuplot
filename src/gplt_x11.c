@@ -1,8 +1,9 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.63 2003/07/05 02:51:24 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.64 2003/07/07 20:49:00 sfeam Exp $"); }
 #endif
 
-#define X11_POLYLINE
+#define X11_POLYLINE 1
+#define MOUSE_ALL_WINDOWS 1
 
 /* GNUPLOT - gplt_x11.c */
 
@@ -187,6 +188,16 @@ Error. Incompatible options.
 # include <errno.h>
 static unsigned long gnuplotXID = 0; /* WINDOWID of gnuplot */
 
+#ifdef MOUSE_ALL_WINDOWS
+# include "axis.h" /* Just to pick up FIRST_X_AXIS enums */
+typedef struct axis_scale_t {
+    int term_lower;
+    double term_scale;
+    double min;
+    double logbase;
+} axis_scale_t;
+#endif
+
 #endif /* USE_MOUSE */
 
 #ifdef __EMX__
@@ -277,6 +288,14 @@ typedef struct plot_struct {
     cmap_t *cmap;
 #ifdef PM3D
     TBOOLEAN release_cmap;
+#endif
+#if (USE_MOUSE && MOUSE_ALL_WINDOWS)
+    /* This array holds per-axis scaling information sufficient to reconstruct
+     * plot coordinates of a mouse click.  It is a snapshot of the contents of
+     * gnuplot's axis_array structure at the time the plot was drawn.
+     */
+    int axis_mask;		/* Bits set to show which axes are active */
+    axis_scale_t axis_scale[2*SECOND_AXES];
 #endif
 } plot_struct;
 
@@ -370,6 +389,12 @@ static void pr_persist __PROTO((void));
 #ifdef EXPORT_SELECTION
 static void export_graph __PROTO((plot_struct * plot));
 static void handle_selection_event __PROTO((XEvent * event));
+#endif
+
+#if (USE_MOUSE && MOUSE_ALL_WINDOWS)
+static void mouse_to_coords __PROTO((plot_struct *plot, XEvent *event,
+			double *x, double *y, double *x2, double *y2));
+static double mouse_to_axis __PROTO((int mouse_coord, axis_scale_t *axis));
 #endif
 
 #define FallbackFont "fixed"
@@ -2074,6 +2099,24 @@ exec_cmd(plot_struct *plot, char *command)
 	}
     }
 #endif
+#if (USE_MOUSE && MOUSE_ALL_WINDOWS)
+    /*   Axis scaling information to save for later mouse clicks */
+    else if (*buffer == 'S') {
+	int axis, axis_mask;
+
+	sscanf(&buffer[1], "%d %d", &axis, &axis_mask);
+	if (axis < 0) {
+	    plot->axis_mask = axis_mask;
+	} else if (axis < 2*SECOND_AXES) {
+	    sscanf(&buffer[1], "%d %lg %d %lg %lg", &axis,
+		&(plot->axis_scale[axis].min), &(plot->axis_scale[axis].term_lower),
+		&(plot->axis_scale[axis].term_scale), &(plot->axis_scale[axis].logbase));
+	    FPRINTF((stderr,"gnuplot_x11: axis %d scaling %14.3lg %14d %14.3lg %14.3lg\n",
+		axis, plot->axis_scale[axis].min, plot->axis_scale[axis].term_lower,
+		plot->axis_scale[axis].term_scale, plot->axis_scale[axis].logbase));
+	}
+    }
+#endif
     else {
 	fprintf(stderr, "gnuplot_x11: unknown command <%s>\n", buffer);
     }
@@ -3371,6 +3414,32 @@ process_event(XEvent *event)
 	    if (plot == current_plot) {
 		Call_display(plot);
 		gp_exec_event(GE_motion, (int) RevX(pos_x), (int) RevY(pos_y), 0, 0);
+#if (USE_MOUSE && MOUSE_ALL_WINDOWS)
+	    } else if (plot->axis_mask) {
+		/* This is not the active plot window, but we can still update the mouse coords */
+		char mouse_format[60];
+		char *m = mouse_format;
+		double x, y, x2, y2;
+
+		mouse_to_coords(plot, event, &x, &y, &x2, &y2);
+		if (plot->axis_mask & (1<<FIRST_X_AXIS)) {
+		    sprintf(m,"x=  %10g %c",x,'\0');
+		    m += 15; 
+		}
+		if (plot->axis_mask & (1<<SECOND_X_AXIS)) {
+		    sprintf(m,"x2= %10g %c",x2,'\0');
+		    m += 15; 
+		}
+		if (plot->axis_mask & (1<<FIRST_Y_AXIS)) {
+		    sprintf(m,"y=  %10g %c",y,'\0');
+		    m += 15; 
+		}
+		if (plot->axis_mask & (1<<SECOND_Y_AXIS)) {
+		    sprintf(m,"y2= %10g %c",y2,'\0');
+		    m += 15; 
+		}
+		DisplayCoords(plot, mouse_format);
+#endif
 	    }
 
 	    if (plot->zoombox_on) {
@@ -3412,6 +3481,17 @@ process_event(XEvent *event)
 	    gp_exec_event(GE_buttonrelease,
 			  (int) RevX(event->xbutton.x), (int) RevY(event->xbutton.y), event->xbutton.button, (int) doubleclick);
 	}
+#if (USE_MOUSE && MOUSE_ALL_WINDOWS)
+	/* This causes gnuplot_x11 to pass mouse clicks back from all plot windows,
+	 * not just the current plot. But who should we notify that a click has 
+	 * happened, and how?  The fprintf to stderr is just for debugging. */
+	else if (plot->axis_mask) {
+	    double x, y, x2, y2;
+	    mouse_to_coords(plot, event, &x, &y, &x2, &y2);
+	    fprintf(stderr, "gnuplot_x11 %d: mouse button %1d from window %d at %g %g\n",
+		    __LINE__, event->xbutton.button, (plot-plot_array), x, y);
+	}
+#endif
 	break;
 #endif /* USE_MOUSE */
 #ifdef EXPORT_SELECTION
@@ -4297,3 +4377,38 @@ handle_selection_event(XEvent *event)
 }
 
 #endif /* EXPORT_SELECTION */
+
+#if (USE_MOUSE && MOUSE_ALL_WINDOWS)
+/* Convert X-window mouse coordinates to coordinate system of plot axes */
+static void
+mouse_to_coords(plot_struct *plot, XEvent *event,
+		double *x, double *y, double *x2, double *y2)
+{
+    int xx =         4096. * (event->xbutton.x + 0.5)/ plot->width;
+    int yy = 4095. - 4096. * (event->xbutton.y + 0.5)/ plot->gheight;
+
+    FPRINTF((stderr,"gnuplot_x11 %d: mouse at %d %d\t", __LINE__, xx, yy));
+
+    *x  = mouse_to_axis(xx, &(plot->axis_scale[FIRST_X_AXIS]));
+    *y  = mouse_to_axis(yy, &(plot->axis_scale[FIRST_Y_AXIS]));
+    *x2 = mouse_to_axis(xx, &(plot->axis_scale[SECOND_X_AXIS]));
+    *y2 = mouse_to_axis(yy, &(plot->axis_scale[SECOND_Y_AXIS]));
+
+    FPRINTF((stderr,"mouse x y %10g %10g x2 y2 %10g %10g\n", *x, *y, *x2, *y2 ));
+}
+
+static double
+mouse_to_axis(int mouse_coord, axis_scale_t *axis)
+{
+    double axis_coord;
+
+    if (axis->term_scale == 0.0)
+	return 0.;
+
+    axis_coord = ((double)(mouse_coord - axis->term_lower)) / axis->term_scale + axis->min;
+    if (axis->logbase > 0.0)
+	axis_coord = exp(axis_coord * axis->logbase);
+
+    return axis_coord;
+}
+#endif
