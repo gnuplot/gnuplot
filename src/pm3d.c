@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.38 2002/10/20 21:19:52 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.39 2003/03/13 14:47:54 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - pm3d.c */
@@ -599,7 +599,7 @@ pm3d_reset(void)
     pm3d.flush = PM3D_FLUSH_BEGIN;
     pm3d.ftriangles = 0;
     pm3d.direction = PM3D_SCANS_AUTOMATIC;
-    pm3d.clip = PM3D_CLIP_1IN;
+    pm3d.clip = PM3D_CLIP_4IN;
     pm3d.hidden3d_tag = 0;
     pm3d.solid = 0;
     pm3d.implicit = PM3D_IMPLICIT;
