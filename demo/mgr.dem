@@ -1,10 +1,11 @@
 #
-# $Id: mgr.dem,v 1.2 1998/12/07 22:08:02 lhecking Exp $
+# $Id: mgr.dem,v 1.3 1999/08/17 15:31:54 lhecking Exp $
 #
 pause 0 "Watch some  cubic splines"
 set samples 50
 set xlabel "Angle (deg)"
 set ylabel "Amplitude"
+set key box
 set title "Brag-Reflex -- Peak only"
 plot "big_peak.dat" title "Rate" with errorbars, \
                  "" smooth csplines t "Rate"
@@ -71,9 +72,5 @@ pause -1 "X-Bars only <CR>"
 plot [0:50] "battery.dat" u 1:2:3 t "Power" w xerr, n(x) t "Theory" w lines
 pause -1 "Y-Bars only <CR>"
 plot [0:50] "battery.dat" u 1:2:4 t "Power" w yerr, n(x) t "Theory" w lines
-set bars large
-
-set xlabel ""
-set ylabel ""
-set title ""
+reset
 

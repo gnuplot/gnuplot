@@ -1,9 +1,10 @@
 #
-# $Id: surface2.dem,v 1.2 1998/12/02 18:36:01 lhecking Exp $
+# $Id: surface2.dem,v 1.3 1999/06/10 20:01:46 lhecking Exp $
 #
 set parametric
 set isosamples 50,10
 set hidden
+set key below
 
 set title "Parametric Sphere"
 set urange [-pi/2:pi/2]
@@ -76,8 +77,4 @@ set isosamples 50,20
 splot cos(u)+.5*cos(u)*cos(v),sin(u)+.5*sin(u)*cos(v),.5*sin(v) with lines, \
       1+cos(u)+.5*cos(u)*cos(v),.5*sin(v),sin(u)+.5*sin(u)*cos(v) with lines
 pause -1 "Hit return to continue (9)"
-
-#
-# Clean up:
-#
 reset

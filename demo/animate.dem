@@ -20,3 +20,4 @@ pause -1 "Press a key to start the rotation..."
 
 iteration_count=0
 load "gnuplot.rot"
+reset

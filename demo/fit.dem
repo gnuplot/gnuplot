@@ -1,5 +1,5 @@
 #
-# $Id: fit.dem,v 1.9 1997/05/27 01:29:34 drd Exp $
+# $Id: fit.dem,v 1.2 1999/03/10 21:20:47 lhecking Exp $
 #
 
 print "Some examples how data fitting using nonlinear least squares fit"
@@ -11,6 +11,7 @@ set title 'data for first fit demo'
 plot 'lcdemo.dat'
 set xlabel "Temperature T  [deg Cels.]"
 set ylabel "Density [g/cm3]"
+set key below
 
 print "now fitting a straight line to the data :-)"
 print "only as a demo without physical meaning"
@@ -213,3 +214,4 @@ print  "Remember that this file will always be appended, so remove it"
 print  "from time to time!"
 print  ""
 pause -1 "Done with fitting demo  (-> return)"
+reset

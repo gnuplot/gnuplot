@@ -1,5 +1,5 @@
 #
-# $Id: param.dem,v 1.1.1.1 1998/04/15 19:16:42 lhecking Exp $
+# $Id: param.dem,v 1.2 1999/08/17 15:31:55 lhecking Exp $
 #
 # Show some of the new parametric capabilities.
 #
@@ -8,6 +8,8 @@ set dummy t
 set autoscale
 set samples 160
 set title ""
+set key box
+set key below
 plot t,sin(t)/t title "t,sin(t)/t or sin(x)/x"
 pause -1 "Hit return to continue"
 
