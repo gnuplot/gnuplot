@@ -1,3 +1,57 @@
+1999-07-30  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* src/Makefile.am: Add new file save.c to gnuplot_SOURCES.
+
+	* src/command.c: Remove unused vars.
+
+	* src/command.h, src/graphics.h: Remove duplicate AXIS_ARRAY_SIZE
+	#define.
+
+	* src/datafile.c(df_open): Fix coredump opening empty filename.
+
+	* src/datafile.c, src/plot2d.c: Split plot option parser into
+	smaller functions.
+
+	* src/datafile.c: valid_format() moved from misc.c.
+
+	* src/graphics.h: Include setshow.h.
+
+	* src/misc.c: Move all `save' related functions and definitions
+	to save.c. Move all `show' related functions and definitions to
+	show.c. Move valid_format() to datafile.c.
+
+	* src/plot.c(main): Add code to initialise axis properties.
+
+	* src/plot.h: struct ticdef and struct ticmark definitions moved
+	to setshow.h.
+
+	* src/protos.h: Update prototype declarations.
+
+	* src/save.c: New file, `save' related functions from misc.c.
+
+	* src/set.c, src/setshow.h: All axis related variables are now in
+	new struct axis_properties declarations. New function
+	reset_axis_properties().
+
+	* src/setshow.h: <sys/utsname> inclusion moved to show.c.
+
+	* src/show.c: Include <sys/utsname>. Functions moved from misc.c.
+
+	* src/show.c(conv_text): Now uses internal, static, malloc'd memory
+	for conversion target.
+
+	* src/command.c, src/contour.c, src/graph3d.c, src/graphics.c,
+	src/interpol.c, src/plot2d.c, src/plot3d.c, src/show.c, src/term.c,
+	term/epson.trm, term/gif.trm, term/hp500c.trm, term/hpljii.trm,
+	term/latex.trm, term/next.trm, term/openstep.trm, term/pbm.trm,
+	term/png.trm, term/post.trm, term/pslatex.trm, term/tgif.trm: Replace
+	xsize, ysize, with x_props.xsize, y_props.size, resp. Replace all
+	related vars with struct axis_properties elements. Change related
+	functions and macros to pass pointer to struct instead of several
+	struct elements.
+
+	* term/driver.h: Remove extern references to xsize, ysize.
+
 1999-07-27  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* README.1ST: Add note about gif support/gd library.

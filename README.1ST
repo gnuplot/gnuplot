@@ -10,9 +10,10 @@
  The UNISYS patent covers the LZW technology which is used to create
  gifs. To my knowledge, only gd library version 1.3, and possibly
  version 1.4 are free of LZW code and should therefore be used with
- gnuplot. The binaries provided here have been built with version 1.3.
- Versions 1.2 and 1.5 should not be used. Version 1.6+ does not create
- gifs, but only png images.
+ gnuplot (unless you have a license from Unisys to use LZW code). The
+ binaries provided here have been built with version 1.3. Versions 1.2
+ and 1.5 should not be used. Version 1.6+ does not create gifs, but only
+ png images.
 
  To install:
  ==========
