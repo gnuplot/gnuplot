@@ -109,14 +109,13 @@ $(T)/v384.trm $(T)/vws.trm $(T)/win.trm $(T)/x11.trm $(T)/xlib.trm
 
 DIST_COMMON = README Makefile.in
 
-SOURCES = checkdoc.c doc2gih.c doc2hlp.c doc2html.c doc2info.c \
-doc2ipf.c doc2ms.c doc2rnh.c doc2rtf.c doc2tex.c termdoc.c xref.c
+SOURCES = checkdoc.c doc2gih.c doc2hlp.c doc2ipf.c doc2ms.c doc2rnh.c \
+doc2rtf.c doc2tex.c termdoc.c xref.c
 
 HEADERS = doc2x.h xref.h
 
-EXTRA_DIST = doc2texi.el doc2texi.pl fixinfo.el gnuplot.doc gnuplot.texi \
-gpcard.tex makefile.ami makefile.dst titlepag.ms titlepag.tex toc_entr.sty \
-old psdoc
+EXTRA_DIST = doc2texi.el gnuplot.doc gnuplot.texi gpcard.tex makefile.ami \
+makefile.dst titlepag.ms titlepag.tex toc_entr.sty old psdoc
 
 DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(EXTRA_DIST)
 
@@ -192,25 +191,20 @@ doc2ms.o: doc2ms.c allterm.h
 ### html
 html: gnuplot.html
 
-# an alternative to doc2html; needs GNU texinfo-4.0 or better
-#gnuplot.html: $(srcdir)/gnuplot.texi $(srcdir)/gnuplot.doc
-#	$(MAKEINFO) --html -I$(srcdir) $(srcdir)/gnuplot.texi --no-split --output=$@
-
-gnuplot.html: doc2html $(srcdir)/gnuplot.doc
-	./doc2html $(srcdir)/gnuplot.doc gnuplot.html
-
-doc2html: doc2html.o termdoc.o xref.o
-	$(LINK) doc2html.o termdoc.o xref.o $(LDFLAGS) $(LIBS)
-
-doc2html.o: doc2html.c allterm.h
-	$(COMPILE) -DALL_TERM_DOC -c $(srcdir)/doc2html.c
+# requires makeinfo (GNU texinfo) 4.0 or better
+gnuplot.html: $(srcdir)/gnuplot.texi $(srcdir)/gnuplot.doc
+	$(MAKEINFO) --html -I$(srcdir) $(srcdir)/gnuplot.texi --no-split --output=$@
 
 ### PDF documentation
 pdf: gnuplot.pdf
 
 gnuplot.pdf: gnuplot.tex
-	$(PDFLATEX) gnuplot.tex
-	$(PDFLATEX) gnuplot.tex
+	@if test $(PDFLATEX) != no ; then \
+	  TEXINPUTS=.:$(srcdir):${TEXINPUTS}: $(PDFLATEX) gnuplot ; \
+	  TEXINPUTS=.:$(srcdir):${TEXINPUTS}: $(PDFLATEX) gnuplot ; \
+	else \
+	  echo pdflatex not found - cannot build pdf file ; \
+	fi
 
 ### LaTeX documentation
 tex: gnuplot.tex
@@ -283,27 +277,19 @@ alldoc2gih.o: doc2gih.c allterm.h
 ### GNU info format
 info: gnuplot.info
 
-gnuplot.info: doc2info $(srcdir)/gnuplot.doc
-	./doc2info $(srcdir)/gnuplot.doc gnuplot.info
-	@if test "$(EMACS)" != no; then \
-	  $(EMACS) --batch -l $(srcdir)/fixinfo.el; \
-	else \
-	  echo No emacs found - cannot fix info file; \
+gnuplot.info: $(srcdir)/gnuplot.texi $(srcdir)/gnuplot.doc
+	$(MAKEINFO) -I$(srcdir) $(srcdir)/gnuplot.texi --no-split --output=$@
+
+# Thanks to Bruce Ravel for doc2texi.el!
+gnuplot.texi: $(srcdir)/doc2texi.el $(srcdir)/gnuplot.doc
+	@if test ! -f gnuplot.texi ; then \
+	  cp $(srcdir)/gnuplot.texi . ; \
 	fi
-
-doc2info: doc2info.o termdoc.o xref.o
-	$(LINK) doc2info.o termdoc.o xref.o $(LIBS)
-
-## An alternative to doc2info.c, Thanks to Bruce Ravel
-#gnuplot.info: $(srcdir)/gnuplot.texi $(srcdir)/gnuplot.doc
-#	$(MAKEINFO) -I$(srcdir) $(srcdir)/gnuplot.texi --no-split --output=$@
-#
-#gnuplot.texi: $(srcdir)/doc2info.el $(srcdir)/gnuplot.doc
-#	@if test "$(EMACS)" != no; then \
-#	  $(EMACS) -batch -l $(srcdir)/doc2texi.el -f d2t-doc-to-texi; \
-#	else \
-#	  @echo No emacs found - cannot create texinfo file; \
-#	fi
+	@if test "$(EMACS)" != no; then \
+	  $(EMACS) -batch -l $(srcdir)/doc2texi.el -f d2t-doc-to-texi; \
+	else \
+	  @echo No emacs found - cannot create texinfo file; \
+	fi
 
 # this is how to make OS/2 ipfc documentation
 ipf: gnuplot.ipf
@@ -379,14 +365,16 @@ distdir: $(DISTFILES)
 	  fi; \
 	done
 
-clean:
+clean-local:
+	@test "$(top_srcdir)" = "$(top_builddir)" || rm -f gnuplot.texi
+
+clean: clean-local
 	-rm -f doc2tex gnuplot.tex gnuplot.dvi \
 	  gnuplot.aux gnuplot.log gnuplot.toc gnuplot.pdf \
 	  gnuplot.ps gpcard.dvi gpcard.log gpcard.ps \
 	  alldoc2gih doc2gih gnuplot.gih \
 	  doc2hlp gnuplot.hlp \
-	  doc2html gnuplot.html \
-	  doc2info gnuplot.info* gpltinfo.tex \
+	  gnuplot.html gnuplot.info* \
 	  doc2ipf gnuplot.ipf \
 	  doc2ms gnuplot.ms \
 	  doc2rnh gnuplot.rnh \
@@ -422,10 +410,6 @@ alldoc2gih.o: doc2gih.c ../config.h $(top_srcdir)/src/ansichek.h \
 doc2gih.o: doc2gih.c ../config.h $(top_srcdir)/src/ansichek.h \
 		$(top_srcdir)/src/stdfn.h doc2x.h $(TERM_H)
 doc2hlp.o: doc2hlp.c ../config.h $(top_srcdir)/src/ansichek.h \
-		$(top_srcdir)/src/stdfn.h doc2x.h $(TERM_H)
-doc2html.o: doc2html.c ../config.h $(top_srcdir)/src/ansichek.h \
-		$(top_srcdir)/src/stdfn.h doc2x.h allterm.h
-doc2info.o: doc2info.c ../config.h $(top_srcdir)/src/ansichek.h \
 		$(top_srcdir)/src/stdfn.h doc2x.h $(TERM_H)
 doc2ipf.o: doc2ipf.c ../config.h $(top_srcdir)/src/ansichek.h \
 		$(top_srcdir)/src/stdfn.h doc2x.h $(TERM_H)
