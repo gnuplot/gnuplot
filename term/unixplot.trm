@@ -1,0 +1,167 @@
+/*
+ * $Id: unixplot.trm,v 1.11 1997/04/10 02:34:39 drd Exp $
+ *
+ */
+
+/* GNUPLOT -- unixplot.trm */
+/*
+ * Copyright (C) 1990 - 1993, 1997
+ *
+ * Permission to use, copy, and distribute this software and its
+ * documentation for any purpose with or without fee is hereby granted, 
+ * provided that the above copyright notice appear in all copies and 
+ * that both that copyright notice and this permission notice appear 
+ * in supporting documentation.
+ *
+ * Permission to modify the software is granted, but not the right to
+ * distribute the modified code.  Modifications are to be distributed 
+ * as patches to released version.
+ *  
+ * This software  is provided "as is" without express or implied warranty.
+ * 
+ * This file is included by ../term.c.
+ *
+ * This terminal driver supports:
+ *  Unix plot(5) graphics language
+ *
+ * AUTHORS
+ *  Colin Kelley, Thomas Williams, Russell Lang
+ * 
+ * send your comments or suggestions to (info-gnuplot@dartmouth.edu).
+ * 
+ */
+
+/*
+Unixplot library writes to stdout.  A fix was put in place by
+..!arizona!naucse!jdc to let set term and set output redirect
+stdout.  All other terminals write to outfile.
+*/
+
+/*
+ * adapted to the new terminal layout by Stefan Bodewig (Dec. 1995)
+ */
+
+#ifndef GOT_DRIVER_H
+#include "driver.h"
+#endif
+
+#ifdef TERM_REGISTER
+register_term(unixplot)
+#endif
+
+#ifdef TERM_PROTO
+TERM_PUBLIC void UP_init __PROTO((void));
+TERM_PUBLIC void UP_graphics __PROTO((void));
+TERM_PUBLIC void UP_text __PROTO((void));
+TERM_PUBLIC void UP_linetype __PROTO((int linetype));
+TERM_PUBLIC void UP_move __PROTO((unsigned int x, unsigned int y));
+TERM_PUBLIC void UP_vector __PROTO((unsigned int x, unsigned int y));
+TERM_PUBLIC void UP_put_text __PROTO((unsigned int x, unsigned int y, char str[]));
+TERM_PUBLIC void UP_reset __PROTO((void));
+
+#define UP_XMAX 4096
+#define UP_YMAX 4096
+
+#define UP_XLAST (UP_XMAX - 1)
+#define UP_YLAST (UP_YMAX - 1)
+
+#define UP_VCHAR (UP_YMAX/30)	/* just a guess--no way to know this! */
+#define UP_HCHAR (UP_XMAX/60)	/* just a guess--no way to know this! */
+#define UP_VTIC (UP_YMAX/80)
+#define UP_HTIC (UP_XMAX/80)
+#endif /* TERM_PROTO */
+
+#ifndef TERM_PROTO_ONLY
+#ifdef TERM_BODY
+
+TERM_PUBLIC void UP_init()
+{
+	openpl();
+	space(0, 0, UP_XMAX, UP_YMAX);
+}
+
+
+TERM_PUBLIC void UP_graphics()
+{
+	erase();
+}
+
+
+TERM_PUBLIC void UP_text()
+{
+}
+
+
+TERM_PUBLIC void UP_linetype(linetype)
+int linetype;
+{
+static char *lt[2+5] = {"solid", "longdashed", "solid", "dotted","shortdashed",
+	"dotdashed", "longdashed"};
+
+	if (linetype >= 5)
+		linetype %= 5;
+	linemod(lt[linetype+2]);
+}
+
+
+TERM_PUBLIC void UP_move(x,y)
+unsigned int x,y;
+{
+	move(x,y);
+}
+
+
+TERM_PUBLIC void UP_vector(x,y)
+unsigned int x,y;
+{
+	cont(x,y);
+}
+
+
+TERM_PUBLIC void UP_put_text(x,y,str)
+unsigned int x,y;
+char str[];
+{
+	UP_move(x+UP_HCHAR/2,y+UP_VCHAR/5);
+	label(str);
+}
+
+TERM_PUBLIC void UP_reset()
+{
+	closepl();
+}
+
+#endif /* TERM_BODY */
+
+#ifdef TERM_TABLE
+
+TERM_TABLE_START(unixplot_driver)
+    "unixplot", "Unix plotting standard (see plot(1))",
+	   UP_XMAX, UP_YMAX, UP_VCHAR, UP_HCHAR, 
+	   UP_VTIC, UP_HTIC, options_null, UP_init, UP_reset, 
+	   UP_text, null_scale, UP_graphics, UP_move, UP_vector, 
+	   UP_linetype, UP_put_text, null_text_angle, 
+	   null_justify_text, line_and_point, do_arrow, set_font_null
+TERM_TABLE_END(unixplot_driver)
+
+#undef LAST_TERM
+#define LAST_TERM unixplot_driver
+
+#endif /* TERM_TABLE */
+#endif /* TERM_PROTO_ONLY */
+
+#ifdef TERM_HELP
+START_HELP(unixplot)
+"1 unixplot",
+"?set terminal unixplot",
+"?set term unixplot",
+"?terminal unixplot",
+"?term unixplot",
+"?unixplot",
+" The `unixplot` terminal driver generates output in the Unix \"plot\" graphics",
+" language.  It has no options."
+"",
+" This terminal cannot be compiled if the GNU version of plot is to be used; in",
+" that case, use the `gnugraph` terminal instead."
+END_HELP(unixplot)
+#endif

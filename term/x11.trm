@@ -1,0 +1,836 @@
+/*
+ * $Id: x11.trm,v 1.32 1997/07/22 23:24:46 drd Exp $
+ *
+ */
+
+/*
+ *    x11.trm  --- inboard terminal driver for X11
+ */
+
+#ifndef GOT_DRIVER_H
+#include "driver.h"
+#endif
+
+#ifdef TERM_REGISTER
+register_term(x11)
+#endif
+
+#ifdef TERM_PROTO
+int X11_args __PROTO((int argc, char *argv[]));
+TERM_PUBLIC void X11_options __PROTO((void));
+TERM_PUBLIC void X11_init __PROTO((void));
+TERM_PUBLIC void X11_graphics __PROTO((void));
+TERM_PUBLIC void X11_text __PROTO((void));
+TERM_PUBLIC void X11_reset __PROTO((void));
+TERM_PUBLIC void X11_move __PROTO((unsigned int x, unsigned int y));
+TERM_PUBLIC void X11_vector __PROTO((unsigned int x, unsigned int y));
+TERM_PUBLIC void X11_linewidth __PROTO((double lw));
+TERM_PUBLIC void X11_pointsize __PROTO((double ps));
+TERM_PUBLIC void X11_linetype __PROTO((int lt));
+TERM_PUBLIC void X11_put_text __PROTO((unsigned int x, unsigned int y, char str[]));
+TERM_PUBLIC int X11_justify_text __PROTO((enum JUSTIFY mode));
+TERM_PUBLIC void X11_point __PROTO((unsigned int x, unsigned int y, int number));
+TERM_PUBLIC void X11_fillbox __PROTO((int style, unsigned int x, unsigned y, unsigned int width, unsigned int height));
+#define X11_XMAX 4096
+#define X11_YMAX 4096
+
+/* approximations for typical font/screen sizes */
+#define X11_VCHAR (X11_YMAX/25) 
+#define X11_HCHAR (X11_XMAX/100) 
+#define X11_VTIC (X11_YMAX/100)
+#define X11_HTIC (X11_XMAX/150)
+#endif
+
+
+#ifndef TERM_PROTO_ONLY
+
+#ifdef TERM_BODY
+int X11_Display = 0; /* non-zero if '-display' found on command line */
+
+
+/* sunos 4 uses on_exit() in place of atexit(). If both are missing,
+ * we can probably survive since gnuplot_x11 should detect EOF on
+ * the pipe. Unfortunately, the handlers take different parameters.
+ */
+
+#ifdef NO_ATEXIT
+# define HANDLER_PROTO  __PROTO((int x, void *y))
+# define HANDLER_DECL (x,y) int x; void *y;
+# define HANDLER_PARAMS (0,NULL)
+# ifdef HAVE_ON_EXIT
+#  define atexit(x) on_exit(x, NULL)
+# else
+#  define atexit(x) /* nowt */
+# endif
+#else /* !NO_ATEXIT */
+# define HANDLER_PROTO __PROTO((void))
+# define HANDLER_DECL   ()
+# define HANDLER_PARAMS ()
+#endif
+
+static void X11_atexit HANDLER_PROTO;
+
+static char X11_opts[][20] = {
+   "-mono", "-gray", "-clear", "-tvtwm", "-pointsize",
+   "-iconic", "-rv", "-reverse", "+rv", "-synchronous", 
+   "-display", "-geometry", "-bg", "-background", "-bd", "-bordercolor", "-bw",
+   "-borderwidth", "-fg", "-foreground", "-fn", "-font", "-name", 
+   "-selectionTimeout", "-title", "-xnllanguage", "-xrm",
+   "-raise", "-noraise","-persist"
+};
+
+#define X11_nopts (sizeof(X11_opts) / sizeof(X11_opts[0]))
+
+static int X11_optarg[X11_nopts] = { 
+   0, 0, 0, 0, 1,
+   0, 0, 0, 0, 0,
+   1, 1, 1, 1, 1, 1, 1,
+   1, 1, 1, 1, 1, 1, 
+   1, 1, 1, 1,
+   0, 0, 0
+};
+
+static FILE *X11_ipc; 
+#ifdef OS2
+static char X11_command[1024]= "gnuplot_x11.exe";
+#else
+static char X11_command[1024]= "gnuplot_x11";
+#endif
+
+/*   X11_args - scan gnuplot command line for standard X Toolkit options
+ * called from plot.c so must not be TERM_PUBLIC (which may be static)
+ */
+
+int X11_args(argc, argv) int argc; char *argv[]; {
+   int nx11 = 0, n;
+
+   while(++argv, --argc > 0) {
+      for (n=0; n<X11_nopts; n++) {
+	 if (!strcmp(*argv, X11_opts[n])) {
+	    strcat(X11_command, " ");
+	    strcat(X11_command, *argv); 
+	    if (strcmp(*argv, "-display")==0)
+	 	X11_Display++;
+	    if (X11_optarg[n]) {
+	       if (--argc <= 0) return(nx11);
+	       strcat(X11_command, " \"");
+	       strcat(X11_command, *++argv); 
+	       strcat(X11_command, "\"");
+	       nx11++;
+	       }
+	    nx11++; break;
+	    }
+	 }
+      if (n == X11_nopts) break; 
+      }
+   return(nx11);
+   }
+
+
+static unsigned int X11_plot_number;
+
+TERM_PUBLIC void X11_options()
+{
+	if (almost_equals(c_token, "res$et"))
+	{
+		X11_atexit HANDLER_PARAMS; /* tell gnuplot_x11 to shut down */
+		++c_token;
+	}
+
+	if (!END_OF_COMMAND)
+	{
+		struct value a;
+		X11_plot_number = (int)  real(const_express(&a));
+		/* let gnuplot_x11 check range */
+	}
+	sprintf(term_options, "%d", X11_plot_number);
+}
+
+/*-----------------------------------------------------------------------------
+ *   Three different versions of the remainder of the X11 terminal driver
+ *   are provided to support three different types of IPC with the
+ *   gnuplot_x11 outboard terminal driver:
+ * 
+ *   DEFAULT_X11:      popen() pipe for most un*x platforms
+ *
+ *   CRIPPLED_SELECT : file IPC for un*x platforms with incomplete or faulty
+ *                     implementation of BSD select()
+ *
+ *   VMS :             mailbox/spawn IPC
+ *---------------------------------------------------------------------------*/
+
+#define DEFAULT_X11
+#if defined(VMS) || defined(CRIPPLED_SELECT)
+#undef DEFAULT_X11
+#endif
+#if defined(VMS) && defined(CRIPPLED_SELECT)
+Error. Incompatible options.
+#endif
+
+/* we do not want to have to duplicate all the code, so we
+ * do most of it with macros.
+ * PRINT0(format), PRINT1(format, p1), PRINT2(format, p1, p2) etc
+ * also  FLUSH0(format), etc, which do an additional flush
+ */
+
+
+#ifdef DEFAULT_X11
+/*-----------------------------------------------------------------------------
+ *   DEFAULT_X11 popen() pipe IPC
+ *---------------------------------------------------------------------------*/
+
+static void X11_atexit HANDLER_DECL
+{
+	if (X11_ipc)
+	{
+		fprintf(X11_ipc, "R\n");
+		fclose(X11_ipc);
+		/* dont wait(), since they might be -persist */
+		X11_ipc = NULL;
+	}
+}
+	
+TERM_PUBLIC void X11_init()
+{
+	if (!X11_ipc)
+	{
+		/* first time through or after a reset*/
+#ifdef OSK
+		/* OS-9 popen() does not block on close for child to end, so
+		 * we can safely use it here
+		 */
+		X11_ipc = popen(X11_command, "w");
+#else
+#ifdef OS2
+		X11_ipc = popen(X11_command, "w");
+#else
+		int fdes[2];
+		pipe(fdes);
+		if (fork()==0)
+		{
+			/* child */
+			close(fdes[1]);
+			dup2(fdes[0], 0); /* stdin from pipe */
+			execl("/bin/sh", "sh", "-c", X11_command, NULL);
+ 			/* if we get here, something went wrong */
+			perror("exec failed");
+			exit(1);
+		}
+
+		/* parent */
+		close(fdes[0]); /* read end of pipe */
+		X11_ipc = fdopen(fdes[1], "w");
+#endif
+#endif
+	}
+
+
+	{
+		static int been_here = 0;
+		if (!been_here)
+		{
+			atexit(X11_atexit);
+			been_here = 1;
+		}
+	}
+
+}
+
+TERM_PUBLIC void X11_reset()
+{
+	/* leave the pipe alone, until exit or  set term x11 reset */
+}
+
+#define PRINT0(fmt)          fprintf(X11_ipc, fmt)
+#define PRINT1(fmt,p1)       fprintf(X11_ipc, fmt,p1)
+#define PRINT2(fmt,p1,p2)    fprintf(X11_ipc, fmt,p1,p2)
+#define PRINT3(fmt,p1,p2,p3) fprintf(X11_ipc, fmt,p1,p2,p3)
+#define PRINT4(fmt,p1,p2,p3,p4) fprintf(X11_ipc, fmt,p1,p2,p3,p4)
+#define PRINT5(fmt,p1,p2,p3,p4,p5) fprintf(X11_ipc, fmt,p1,p2,p3,p4,p5)
+
+#define FFLUSH()             fflush(X11_ipc)
+
+#define BEFORE_GRAPHICS /* nowt */
+#define AFTER_TEXT      /* nowt */
+#endif /* DEFAULT_X11 */
+
+
+#ifdef CRIPPLED_SELECT
+
+/* PLEASE CAN SOMEONE CHECK THAT THIS STILL WORKS !!! */
+
+/*-----------------------------------------------------------------------------
+ *   CRIPPLED_SELECT file IPC
+ *---------------------------------------------------------------------------*/
+
+static char X11_tmp[32], X11_tmp0[32], X11_shutdown[32];
+static int X11_pid;
+
+TERM_PUBLIC void X11_init() { 
+   if (!(X11_pid = fork())) {
+      execl("/bin/sh", "sh", "-c", X11_command, NULL);
+      _exit(1);
+      }
+   sprintf(X11_tmp, "/tmp/Gnuplot_%d", X11_pid);
+   sprintf(X11_tmp0, "%s-", X11_tmp);
+   sprintf(X11_shutdown, "echo R >%s", X11_tmp);
+}
+
+TERM_PUBLIC void X11_reset() { system(X11_shutdown); }
+
+#define BEFORE_GRAPHICS \
+ if (!(X11_ipc = fopen(X11_tmp0, "w"))) { \
+   perror(X11_tmp0); system(X11_shutdown); exit(1); \
+ }
+
+#define AFTER_TEXT \
+ { fclose(X11_ipc); rename(X11_tmp0, X11_tmp); }
+
+#define PRINT0(fmt)          fprintf(X11_ipc, fmt)
+#define PRINT1(fmt,p1)       fprintf(X11_ipc, fmt,p1)
+#define PRINT2(fmt,p1,p2)    fprintf(X11_ipc, fmt,p1,p2)
+#define PRINT3(fmt,p1,p2,p3) fprintf(X11_ipc, fmt,p1,p2,p3)
+#define PRINT4(fmt,p1,p2,p3,p4) fprintf(X11_ipc, fmt,p1,p2,p3,p4)
+#define PRINT5(fmt,p1,p2,p3,p4,p5) fprintf(X11_ipc, fmt,p1,p2,p3,p4,p5)
+#define FFLUSH()             fflush(X11_ipc)
+
+static void X11_atexit HANDLER_DECL
+{
+	/* WHAT SHOULD I DO ? */
+}
+
+#endif /* CRIPPLED_SELECT */
+
+
+#ifdef VMS
+/*-----------------------------------------------------------------------------
+ *   VMS mailbox/spawn IPC - Yehavi Bourvine - YEHAVI@VMS.HUJI.AC.IL
+ *---------------------------------------------------------------------------*/
+
+#include <iodef.h>
+#include <descrip.h>
+#include <dvidef.h>
+
+#include <lib$routines.h>
+
+#ifdef __DECC
+#include <starlet.h>
+#endif 
+
+#ifdef __GNUC__
+#include <errno.h>
+#else
+int vaxc$errno;
+#endif
+
+#define SS$_NORMAL 1        /* or include <ssdef.h> for all SS$_ def's */
+
+static short X11_channel;
+
+struct iosb { unsigned short stat;
+              unsigned short count;
+              unsigned long info;
+            };
+
+
+TERM_PUBLIC void X11_init() {
+
+struct iosb iosb;
+
+char devnam_string[64];
+$DESCRIPTOR(devnam,devnam_string);
+
+struct  {
+	short int	buf_len;
+      	short int	item;
+      	char		*buf_addr;
+      	unsigned short int *ret_len;
+      	int		 end;
+      	}  item_list = {devnam.dsc$w_length, DVI$_DEVNAM,
+      			devnam.dsc$a_pointer,
+      			&devnam.dsc$w_length, 0};
+
+
+	if (!X11_channel)
+	{
+		int one = 1;
+
+		/* Create a descriptor for the command line that starts
+                 GNUPLOT_X11. $DESCRIP doesn't work in this context... */
+
+      		struct dsc$descriptor_s pgmdsc = {0, DSC$K_DTYPE_T,
+      						  DSC$K_CLASS_S, 0};
+                pgmdsc.dsc$w_length=strlen(X11_command);
+                pgmdsc.dsc$a_pointer=X11_command;
+ 		
+
+		/* Create a mailbox which will be used as a pipe for commands to the 
+		subprocess.  What we'll write to it will be read by the subprocess as 
+		its STDIN.  Use an unnamed mailbox and refer to it by its device
+                number */
+
+		vaxc$errno = sys$crembx(0,&X11_channel,128,128,0,0,0,0);
+		if ((vaxc$errno & SS$_NORMAL) != SS$_NORMAL) {
+		   printf("SYS$CreMbx failed with status=%d\r\n", vaxc$errno);
+		   os_error("sys$crembx failed",NO_CARET);
+		   }
+
+		vaxc$errno = sys$getdviw(0, X11_channel,0,&item_list,&iosb,0,0,0);
+                if ((vaxc$errno & SS$_NORMAL) == SS$_NORMAL) vaxc$errno = iosb.stat; 
+		if ((vaxc$errno & SS$_NORMAL) != SS$_NORMAL) {
+		   printf("SYS$Getdviw failed with status=%d\r\n", vaxc$errno);
+		   sys$dassgn(X11_channel);
+		   X11_channel = 0;
+		   os_error("sys$getdviw failed",NO_CARET);
+		   }
+		
+		/* Create a subprocess whose input is this mailbox. */
+		vaxc$errno = lib$spawn(&pgmdsc,&devnam,0,&one,0,0,0,0,0,0,0,0,0);
+		if ((vaxc$errno & SS$_NORMAL) != SS$_NORMAL) {
+		   printf("LIB$SPAWN failed with status=%d\r\n", vaxc$errno);
+		   sys$dassgn(X11_channel);
+		   X11_channel = 0;
+		   os_error("lib$spawn failed",NO_CARET);
+		}
+	}
+
+	{
+		static int been_here = 0;
+		if (!been_here)
+		{
+			atexit(X11_atexit);
+			been_here=1;
+		}
+	}
+}
+
+
+/*   We use $QIO in order to avoid buffering problems, although it might 
+ *   work  as well with simple Fprintf calls.
+ */
+
+#define GO(x) \
+{ \
+   char buffer[512]; int status; struct iosb iosb;\
+   sprintf x; \
+   status = sys$qiow(0, X11_channel, IO$_WRITEVBLK, &iosb, 0, 0, buffer, strlen(buffer), 0, 0, 0, 0); \
+   if ((status & SS$_NORMAL) == SS$_NORMAL) status = iosb.stat; \
+   if((status & SS$_NORMAL) != SS$_NORMAL) exit(status); \
+ }
+
+#define PRINT0(fmt)          GO( (buffer, fmt) )
+#define PRINT1(fmt,p1)       GO( (buffer, fmt,p1) )
+#define PRINT2(fmt,p1,p2)    GO( (buffer, fmt,p1,p2) )
+#define PRINT3(fmt,p1,p2,p3) GO( (buffer, fmt,p1,p2,p3) )
+#define PRINT4(fmt,p1,p2,p3,p4) GO( (buffer, fmt,p1,p2,p3,p4) )
+#define PRINT5(fmt,p1,p2,p3,p4,p5) GO( (buffer, fmt,p1,p2,p3,p4,p5) )
+
+#define FFLUSH() /* nowt */   
+#define BEFORE_GRAPHICS /* nowt */
+#define AFTER_TEXT /* nowt */
+
+static void X11_atexit HANDLER_DECL
+{
+	if (X11_channel)
+	{
+		PRINT0("R\n");
+		sleep(2);		/* Wait for subprocess to finish */
+		sys$dassgn(X11_channel);
+		X11_channel = 0;
+	}
+}
+
+
+TERM_PUBLIC void X11_reset()
+{
+	/* do nothing until exit */
+}
+
+#endif /* VMS */
+
+
+
+
+
+/* common stuff, using macros defined above */
+
+
+
+TERM_PUBLIC void X11_graphics()
+{ 
+   BEFORE_GRAPHICS; /* kludge for crippled select */
+
+	PRINT1("G%d\n", X11_plot_number); /* for VMS sake, keep as separate prints */
+
+#ifdef ULTRIX_KLUDGE
+   fflush(X11_ipc);
+#endif
+
+}
+
+TERM_PUBLIC void X11_text() { 
+   PRINT0("E\n"); FFLUSH();
+#ifdef ULTRIX_KLUDGE
+   PRINT0("E\n"); FFLUSH();
+#endif
+
+  AFTER_TEXT; /* kludge for crippled select */
+}
+
+
+TERM_PUBLIC void X11_move(x,y) unsigned int x,y; { PRINT2("M%04d%04d\n", x, y); }
+
+TERM_PUBLIC void X11_vector(x,y) unsigned int x,y; { PRINT2("V%04d%04d\n", x, y); }
+
+TERM_PUBLIC void X11_pointsize(ps) double ps;
+{
+	PRINT2("P7%04d%04d\n", /* size of point symbols */
+	   (int) (term->h_tic *ps * 0.5), (int) (term->v_tic*ps*0.5)); 
+}
+
+TERM_PUBLIC void X11_linewidth(lw) double lw; { PRINT1("W%04d\n", (int)lw); }
+
+TERM_PUBLIC void X11_linetype(lt) int lt; { PRINT1("L%04d\n", lt); }
+
+TERM_PUBLIC void X11_put_text(x,y,str) unsigned int x,y; char str[]; {
+	/* badly outrange labels can overflow into text field */
+	if (x<10000 && y<10000) {
+	   PRINT3("T%04d%04d%s\n", x, y, str);
+	}
+}
+
+TERM_PUBLIC int X11_justify_text(mode) enum JUSTIFY mode; {
+   PRINT1("J%04d\n", mode);
+   return(TRUE);
+}
+
+TERM_PUBLIC void X11_point(x,y,number) unsigned int x,y; int number; {
+   if (number>=0)
+      number %= POINT_TYPES;
+   number += 1;
+   PRINT3("P%01d%04d%04d\n", number, x, y);
+}
+
+TERM_PUBLIC void X11_fillbox(style,x,y,w,h)
+int style;
+unsigned int x,y,w,h;
+{
+	PRINT5("F%04d%04u%04u%04u%04u\n", style,x,y,w,h);
+}
+
+#endif /* TERM_BODY */
+
+#ifdef TERM_TABLE
+
+TERM_TABLE_START(x11_driver)
+      "x11", "X11 Window System",
+	   X11_XMAX, X11_YMAX, X11_VCHAR, X11_HCHAR, 
+	   X11_VTIC, X11_HTIC, X11_options, X11_init, X11_reset, 
+	   X11_text, null_scale, X11_graphics, X11_move, X11_vector, 
+	   X11_linetype, X11_put_text, null_text_angle, 
+	   X11_justify_text, X11_point, do_arrow, set_font_null,
+       X11_pointsize, TERM_CAN_MULTIPLOT,
+      X11_text /* suspend can use same routine */, 0 /* resume */,
+		X11_fillbox, X11_linewidth
+TERM_TABLE_END(x11_driver)
+
+#undef LAST_TERM
+#define LAST_TERM x11_driver
+
+TERM_TABLE_START(X11_driver)
+      "X11", "X11 Window System (identical to x11)",
+	   X11_XMAX, X11_YMAX, X11_VCHAR, X11_HCHAR, 
+	   X11_VTIC, X11_HTIC, X11_options, X11_init, X11_reset, 
+	   X11_text, null_scale, X11_graphics, X11_move, X11_vector, 
+	   X11_linetype, X11_put_text, null_text_angle, 
+	   X11_justify_text, X11_point, do_arrow, set_font_null,
+       X11_pointsize, TERM_CAN_MULTIPLOT,
+      X11_text /* suspend can use same routine */, 0 /* resume */,
+		X11_fillbox, X11_linewidth
+TERM_TABLE_END(X11_driver)
+
+#undef LAST_TERM
+#define LAST_TERM x11_driver
+
+#endif /* TERM_TABLE */
+#endif /* TERM_PROTO_ONLY */
+
+
+#ifdef TERM_HELP
+START_HELP(x11)
+"1 x11",
+"?set terminal x11",
+"?set term x11",
+"?terminal x11",
+"?term x11",
+"?x11",
+" `gnuplot` provides the `x11` terminal type for use with X servers.  This",
+" terminal type is set automatically at startup if the `DISPLAY` environment",
+" variable is set, if the `TERM` environment variable is set to `xterm`, or",
+" if the `-display` command line option is used.",
+"",
+" Syntax:",
+"       set terminal x11 {reset} {<n>}",
+"",
+" Multiple plot windows are supported: `set terminal x11 <n>` directs the",
+" output to plot window number n.  If n>0, the terminal number will be",
+" appended to the window title and the icon will be labeled `gplt <n>`.",
+" The active window may distinguished by a change in cursor (from default", 
+" to crosshair.)",
+"",
+" Plot windows remain open even when the `gnuplot` driver is changed to a",
+" different device.  A plot window can be closed by pressing the letter q",
+" while that window has input focus, or by choosing `close` from a window",
+" manager menu.",
+"",
+" All plot windows can be closed by specifying `reset`, which actually",
+" terminates the subprocess which maintains the windows (unless -persist was",
+" specified).",
+"",
+" For terminal type `x11`, `gnuplot` accepts (when initialized) the standard",
+" X Toolkit options and resources such as geometry, font, and background from",
+" from the command line arguments or a configuration file.  See the X(1) man",
+" page (or its equivalent) for a description of the options.",
+"",
+" Many other options are available for the `x11` terminal.  These may be",
+" specified either as command-line options when `gnuplot` is invoked or as",
+" resources in the configuration file \"/.Xdefaults\".  Thus they are chosen",
+" at start-up time and cannot be altered during a single `gnuplot` session.",
+"2 command-line-options",
+"?set terminal x11 command-line-options",
+"?set term x11 command-line-options",
+"?x11 command-line-options",
+"?command-line-options",
+" In addition to the X Toolkit options, the following options may be specified",
+" on the command line when starting `gnuplot` or as resources in your",
+" \".Xdefaults\" file:",
+"@start table - first is interactive cleartext form",
+"  `-mono`    forces monochrome rendering on color displays.",
+"  `-gray`    requests grayscale rendering on grayscale or color displays.",
+"             (Grayscale displays receive monochrome rendering by default.)",
+"  `-clear`   requests that the window be cleared momentarily before a",
+"             new plot is displayed.",
+"  `-tvtwm`   requests that geometry specifications for position of the",
+"             window be made relative to the currently displayed portion",
+"             of the virtual root.",
+"  `-raise`   raise plot window after each plot",
+"  `-noraise` do not raise plot window after each plot",
+"  `-persist` plot windows survive after main gnuplot program exits",
+"#`-mono`  && forces monochrome rendering on color displays.\\\\",
+"#`-gray`  && requests grayscale rendering on grayscale or color displays.\\\\",
+"#         && (Grayscale displays receive monochrome rendering by default.) \\\\",
+"#`-clear` && requests that the window be cleared momentarily before a\\\\",
+"#         && new plot is displayed. \\\\",
+"#`-tvtwm` && requests that geometry specifications for position of the\\\\",
+"#         && window be made relative to the currently displayed portion\\\\",
+"#         && of the virtual root. \\\\",
+"#`-raise` && raise plot window after each plot. \\\\",
+"#`-noraise` && do not raise plot window after each plot. \\\\",
+"#`-persist`&&plot windows survive after main gnuplot program exits. \\\\",
+"%`-mono`@@forces monochrome rendering on color displays.",
+"%`-gray`@@requests grayscale rendering on grayscale or color displays.",
+"%       @@(Grayscale displays receive monochrome rendering by default.)",
+"%`-clear`@@requests that the window be cleared momentarily before a",
+"%        @@new plot is displayed.",
+"%`-tvtwm`@@requests that geometry specifications for position of the",
+"%        @@window be made relative to the currently displayed portion",
+"%        @@of the virtual root.",
+"%`-raise`@@raise plot window after each plot",
+"%`-noraise`@@do not raise plot window after each plot",
+"%`-persist`@@plot windows survive after main gnuplot program exits",
+"@end table",
+" The options are shown above in their command-line syntax.  When entered as",
+" resources in \".Xdefaults\", they require a different syntax.",
+"",
+" Example:",
+"       gnuplot*gray: on",
+"",
+" `gnuplot` provides a command line option (`-pointsize v`) and a resource",
+" (`gnuplot*pointsize: v`) to control the size of points plotted with the",
+" `points` plotting style.  The value `v` is a real number (greater than 0 and",
+" less than or equal to ten) used as a scaling factor for point sizes.  For",
+" example, `-pointsize 2` uses points twice the default size, and `-pointsize`",
+" `0.5` uses points half the normal size.",
+"",
+" Plot windows will automatically be closed at the end of the session",
+" unless the `-persist` option was given.",
+"",
+" For monochrome displays, `gnuplot` does not honor foreground or background",
+" colors.  The default is black-on-white.  `-rv` or `gnuplot*reverseVideo: on`",
+" requests white-on-black.",
+"",
+" For color displays, `gnuplot` honors the following resources (shown here with",
+" their default values).  The values may be color names as listed in the X11",
+" rgb.txt file on your system, hexadecimal RGB color specifications (see X11",
+" documentation), or a color name followed by a comma and an `intensity` value",
+" from 0 to 1.  For example, `blue,.5` means a half intensity blue.",
+"@start table - first is interactive cleartext form",
+"  gnuplot*background: white",
+"  gnuplot*textColor: black",
+"  gnuplot*borderColor: black",
+"  gnuplot*axisColor: black",
+"  gnuplot*line1Color: red",
+"  gnuplot*line2Color: green",
+"  gnuplot*line3Color: blue",
+"  gnuplot*line4Color: magenta",
+"  gnuplot*line5Color: cyan",
+"  gnuplot*line6Color: sienna",
+"  gnuplot*line7Color: orange",
+"  gnuplot*line8Color: coral",
+"#&&gnuplot*background: white\\\\",
+"#&&gnuplot*textColor: black\\\\",
+"#&&gnuplot*borderColor: black\\\\",
+"#&&gnuplot*axisColor: black\\\\",
+"#&&gnuplot*line1Color: red\\\\",
+"#&&gnuplot*line2Color: green\\\\",
+"#&&gnuplot*line3Color: blue\\\\",
+"#&&gnuplot*line4Color: magenta\\\\",
+"#&&gnuplot*line5Color: cyan\\\\",
+"#&&gnuplot*line6Color: sienna\\\\",
+"#&&gnuplot*line7Color: orange\\\\",
+"#&&gnuplot*line8Color: coral\\\\",
+"%@@gnuplot*background: white",
+"%@@gnuplot*textColor: black",
+"%@@gnuplot*borderColor: black",
+"%@@gnuplot*axisColor: black",
+"%@@gnuplot*line1Color: red",
+"%@@gnuplot*line2Color: green",
+"%@@gnuplot*line3Color: blue",
+"%@@gnuplot*line4Color: magenta",
+"%@@gnuplot*line5Color: cyan",
+"%@@gnuplot*line6Color: sienna",
+"%@@gnuplot*line7Color: orange",
+"%@@gnuplot*line8Color: coral",
+"@end table",
+"",
+" The command-line syntax for these is, for example,",
+"",
+" Example:",
+"       gnuplot -background coral",
+"",
+" When `-gray` is selected, `gnuplot` honors the following resources for",
+" grayscale or color displays (shown here with their default values).  Note",
+" that the default background is black.",
+"@start table - first is interactive cleartext form",
+"  gnuplot*background: black",
+"  gnuplot*textGray: white",
+"  gnuplot*borderGray: gray50",
+"  gnuplot*axisGray: gray50",
+"  gnuplot*line1Gray: gray100",
+"  gnuplot*line2Gray: gray60",
+"  gnuplot*line3Gray: gray80",
+"  gnuplot*line4Gray: gray40",
+"  gnuplot*line5Gray: gray90",
+"  gnuplot*line6Gray: gray50",
+"  gnuplot*line7Gray: gray70",
+"  gnuplot*line8Gray: gray30",
+"#&&gnuplot*background: black\\\\",
+"#&&gnuplot*textGray: white\\\\",
+"#&&gnuplot*borderGray: gray50\\\\",
+"#&&gnuplot*axisGray: gray50\\\\",
+"#&&gnuplot*line1Gray: gray100\\\\",
+"#&&gnuplot*line2Gray: gray60\\\\",
+"#&&gnuplot*line3Gray: gray80\\\\",
+"#&&gnuplot*line4Gray: gray40\\\\",
+"#&&gnuplot*line5Gray: gray90\\\\",
+"#&&gnuplot*line6Gray: gray50\\\\",
+"#&&gnuplot*line7Gray: gray70\\\\",
+"#&&gnuplot*line8Gray: gray30\\\\",
+"%@@gnuplot*background: black",
+"%@@gnuplot*textGray: white",
+"%@@gnuplot*borderGray: gray50",
+"%@@gnuplot*axisGray: gray50",
+"%@@gnuplot*line1Gray: gray100",
+"%@@gnuplot*line2Gray: gray60",
+"%@@gnuplot*line3Gray: gray80",
+"%@@gnuplot*line4Gray: gray40",
+"%@@gnuplot*line5Gray: gray90",
+"%@@gnuplot*line6Gray: gray50",
+"%@@gnuplot*line7Gray: gray70",
+"%@@gnuplot*line8Gray: gray30",
+"@end table",
+"",
+" `gnuplot` honors the following resources for setting the width (in pixels) of",
+" plot lines (shown here with their default values.)  0 or 1 means a minimal",
+" width line of 1 pixel width.  A value of 2 or 3 may improve the appearance of",
+" some plots.",
+"@start table - first is interactive cleartext form",
+"  gnuplot*borderWidth: 2",
+"  gnuplot*axisWidth: 0",
+"  gnuplot*line1Width: 0",
+"  gnuplot*line2Width: 0",
+"  gnuplot*line3Width: 0",
+"  gnuplot*line4Width: 0",
+"  gnuplot*line5Width: 0",
+"  gnuplot*line6Width: 0",
+"  gnuplot*line7Width: 0",
+"  gnuplot*line8Width: 0",
+"#&&gnuplot*borderWidth: 2\\\\",
+"#&&gnuplot*axisWidth: 0\\\\",
+"#&&gnuplot*line1Width: 0\\\\",
+"#&&gnuplot*line2Width: 0\\\\",
+"#&&gnuplot*line3Width: 0\\\\",
+"#&&gnuplot*line4Width: 0\\\\",
+"#&&gnuplot*line5Width: 0\\\\",
+"#&&gnuplot*line6Width: 0\\\\",
+"#&&gnuplot*line7Width: 0\\\\",
+"#&&gnuplot*line8Width: 0\\\\",
+"%@@gnuplot*borderWidth: 2",
+"%@@gnuplot*axisWidth: 0",
+"%@@gnuplot*line1Width: 0",
+"%@@gnuplot*line2Width: 0",
+"%@@gnuplot*line3Width: 0",
+"%@@gnuplot*line4Width: 0",
+"%@@gnuplot*line5Width: 0",
+"%@@gnuplot*line6Width: 0",
+"%@@gnuplot*line7Width: 0",
+"%@@gnuplot*line8Width: 0",
+"@end table",
+"",
+" `gnuplot` honors the following resources for setting the dash style used for",
+" plotting lines.  0 means a solid line.  A two-digit number `jk` (`j` and `k`",
+" are >= 1  and <= 9) means a dashed line with a repeated pattern of `j` pixels",
+" on followed by `k` pixels off.  For example, '16' is a \"dotted\" line with one",
+" pixel on followed by six pixels off.  More elaborate on/off patterns can be",
+" specified with a four-digit value.  For example, '4441' is four on, four off,",
+" four on, one off.  The default values shown below are for monochrome displays",
+" or monochrome rendering on color or grayscale displays.  For color displays,",
+" the default for each is 0 (solid line) except for `axisDashes` which defaults",
+" to a '16' dotted line.",
+"@start table - first is interactive cleartext form",
+"  gnuplot*borderDashes: 0",
+"  gnuplot*axisDashes: 16",
+"  gnuplot*line1Dashes: 0",
+"  gnuplot*line2Dashes: 42",
+"  gnuplot*line3Dashes: 13",
+"  gnuplot*line4Dashes: 44",
+"  gnuplot*line5Dashes: 15",
+"  gnuplot*line6Dashes: 4441",
+"  gnuplot*line7Dashes: 42",
+"  gnuplot*line8Dashes: 13",
+"#&&gnuplot*borderDashes: 0\\\\",
+"#&&gnuplot*axisDashes: 16\\\\",
+"#&&gnuplot*line1Dashes: 0\\\\",
+"#&&gnuplot*line2Dashes: 42\\\\",
+"#&&gnuplot*line3Dashes: 13\\\\",
+"#&&gnuplot*line4Dashes: 44\\\\",
+"#&&gnuplot*line5Dashes: 15\\\\",
+"#&&gnuplot*line6Dashes: 4441\\\\",
+"#&&gnuplot*line7Dashes: 42\\\\",
+"#&&gnuplot*line8Dashes: 13\\\\",
+"%@@gnuplot*borderDashes: 0",
+"%@@gnuplot*axisDashes: 16",
+"%@@gnuplot*line1Dashes: 0",
+"%@@gnuplot*line2Dashes: 42",
+"%@@gnuplot*line3Dashes: 13",
+"%@@gnuplot*line4Dashes: 44",
+"%@@gnuplot*line5Dashes: 15",
+"%@@gnuplot*line6Dashes: 4441",
+"%@@gnuplot*line7Dashes: 42",
+"%@@gnuplot*line8Dashes: 13",
+"@end table",
+"",
+" The size or aspect ratio of a plot may be changed by resizing the `gnuplot`",
+" window."
+END_HELP(x11)
+#endif

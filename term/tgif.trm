@@ -1,0 +1,1419 @@
+/*{{{}}}*/
+/***************************************************************************/
+/*                                                                         */
+/* $Id: tgif.trm,v 1.64 1997/05/18 21:22:26 drd Exp $                     */
+/*                                                                         */
+/***************************************************************************/
+/* GNUPLOT - tgif.trm                                                      */
+/*                                                                         */
+/* Copyright (C) 1990, 1991, 1992                                          */
+/*                                                                         */
+/* Permission to use, copy, and distribute this software and its           */
+/* documentation for any purpose with or without fee is hereby granted,    */
+/* provided that the above copyright notice appear in all copies and       */
+/* that both that copyright notice and this permission notice appear       */
+/* in supporting documentation.                                            */
+/*                                                                         */
+/* Permission to modify the software is granted, but not the right to      */
+/* distribute the modified code.  Modifications are to be distributed      */
+/* as patches to released version.                                         */
+/*                                                                         */
+/* This software  is provided "as is" without express or implied warranty. */
+/*                                                                         */
+/* This file is included by ../term.c.                                     */
+/*                                                                         */
+/* This terminal driver supports:                                          */
+/*     TGIF                                                                */
+/*                                                                         */
+/* AUTHORS:                                                                */
+/*  Werner Geppert and Andreas Kuhlewind                                   */
+/*  March, 21st 1995                                                       */
+/*                                                                         */
+/* send your comments or suggestions to werner@mez.ruhr-uni-bochum.de      */
+/*                                                                         */
+/*                                                                         */
+/* MODIFIED May, 11st 1997 by NOVÁK Levente (novakl@tigris.klte.hu):       */
+/*                                                                         */
+/*          - Modified the default linewidth for borders from 3 to 2       */
+/*          - Modified the default size of markers' bounding box           */
+/*            to allow nicer shapes                                        */
+/*          - Slightly modified the markers and added several new ones,    */
+/*            now we have 64 different pointtypes, the same as for the     */
+/*            PostScript terminal                                          */
+/*          - I left the %.1f format for pixel positions, but I think      */
+/*            Tgif does only calculate with integer positions              */
+
+
+/***************************************************************************/
+
+/*}}}  */
+/***************************************************************************/
+#ifndef GOT_DRIVER_H
+#include "driver.h"
+#endif
+
+#ifdef TERM_REGISTER
+register_term(tgif)
+#endif           
+
+#ifdef TERM_PROTO
+TERM_PUBLIC void TGIF_options __PROTO((void));
+TERM_PUBLIC void TGIF_init __PROTO((void));
+TERM_PUBLIC void TGIF_reset __PROTO((void));
+TERM_PUBLIC void TGIF_text __PROTO((void));
+TERM_PUBLIC void TGIF_graphics __PROTO((void));
+TERM_PUBLIC void TGIF_move __PROTO((unsigned int ux, unsigned int uy));
+TERM_PUBLIC void TGIF_vector __PROTO((unsigned int ux, unsigned int uy));
+TERM_PUBLIC void TGIF_linetype __PROTO((int linetype));
+TERM_PUBLIC void TGIF_put_text __PROTO((unsigned int ux, unsigned int uy, char *str)); /* ref point and text */
+TERM_PUBLIC int  TGIF_text_angle __PROTO((int angle));
+TERM_PUBLIC int  TGIF_justify_text __PROTO((enum JUSTIFY mode));
+TERM_PUBLIC void TGIF_point __PROTO((unsigned int ux, unsigned int uy, int number));
+TERM_PUBLIC void TGIF_arrow __PROTO((unsigned int sx, unsigned int sy, unsigned int ex, unsigned int ey, TBOOLEAN head));
+TERM_PUBLIC int  TGIF_set_font __PROTO((char *font));
+TERM_PUBLIC void TGIF_set_pointsize __PROTO((double size));
+/*}}}  */
+/* default length for static strings */
+#define TGIF_STRLEN_MAX 255
+
+/* standard x/y plot size in portrait mode */
+#define TGIF_XMAX 950
+#define TGIF_YMAX 634
+
+/* total available plotting area */
+#define TGIF_XTOT 950
+#define TGIF_YTOT 1400
+
+/* Offset  */
+#define TGIF_XOFF 50
+#define TGIF_YOFF 50
+
+#define TGIF_XSHIFT 1030 /* 80 points skip */
+#define TGIF_YSHIFT 714
+
+#define TGIF_VCHAR 18		/* default is 18 pt	*/
+#define TGIF_HCHAR (18*6/10)
+
+#define TGIF_VTIC (TGIF_YMAX/80)
+#define TGIF_HTIC (TGIF_YMAX/80)
+
+
+#define TGIF_MAXPOLY 100
+/*}}}  */
+#define GOT_TGIF_PROTO
+#endif            
+
+#ifndef TERM_PROTO_ONLY
+
+#ifdef TERM_BODY 
+/* tgif driver by Werner Geppert, werner@mez.ruhr-uni-bochum.de */
+/***************************************************************************/
+/* Variables:                                                           */
+static unsigned int  uLastTgifX, uLastTgifY;      /* last Coordinate           */
+
+static unsigned int  uActNr;                      /* current elementnumber	*/
+static unsigned int  uActPage;                    /* current pagenumber	*/
+static unsigned int  uActResolution;              /* resolution in percent	*/
+static unsigned int  uActZoom;              	   /* zoom factor       	*/
+static unsigned int  uActAngle;                   /* current textangle		*/
+static unsigned int  uActThick;                   /* actual linethickness       */
+static unsigned int  uActPointSize;               /* point size                 */
+static unsigned int  uActStyle;                   /* actual linestyle           */
+static unsigned int  uActJust;                    /* actual textjustification 	*/
+static unsigned int  uXshift;                     /* actual shift x		*/
+static unsigned int  uYshift;                     /* actual shift y		*/
+static unsigned int  uTgifPlotCount;              /* counts number of plots    */
+static unsigned int  uTgifPlotRow,uTgifPlotCol;   /* actual plot row and col   */
+static unsigned int  uTgif_win_horiz,             /* number of plots in x and  */  
+                     uTgif_win_verti;             /*      y direction [x,y]         */
+
+
+
+static char          sActColor[TGIF_STRLEN_MAX];               /* current color	 	*/
+static unsigned int  uDefaultFontSize;            /* default font size         */
+static unsigned int  uActFontSize;                /* current font size         */
+static char          sDefaultFont[TGIF_STRLEN_MAX];            /* default font 		*/
+static char          sActFont[TGIF_STRLEN_MAX];                /* current font 		*/
+/* static char          sActPointString[TGIF_STRLEN_MAX]; HBB: unused */
+
+static TBOOLEAN TgifSolid=FALSE;
+static TBOOLEAN TgifPortrait=TRUE;
+
+static unsigned int  uTgifPlotsPerPage=1;
+static unsigned int  uTextAngle[] = {0, 3};
+
+/*
+ * 10 different pointtypes need 10 different linetypes
+ */
+
+static unsigned int  uLineThick[] = {2,1,1,1,1,1,1,1,1,1,1,1}; /* NL: Modified first value to 2 from 3 */
+static unsigned int  uLineStyle[] = {0,5,0,1,2,3,4,5,6,7,8,0};
+static char*         psColors[] =
+	      { "black", "black",     /* border and x/y-zero-axes       */
+                "red" , "green" , "blue" , "magenta" , "cyan", "yellow",
+                "DarkSeaGreen", "HotPink", "black", "coral" };
+
+#if 0 /* HBB: unused */
+static char*         psFonts[] =
+              { "Times-Roman", "Courier", "Helvetica", "NewCenturySchlbk-Roman", "Symbol" , NULL };
+
+static unsigned int  psFontSizes[] =
+              { 8, 10, 11, 12, 14, 17, 18, 20, 24, 25, 34, 40, 45, 50 };
+#endif
+
+static int      iTgifPolyCount;
+static unsigned int    uBuffX[TGIF_MAXPOLY], uBuffY[TGIF_MAXPOLY];
+
+enum  eState { NEWPOLY=100, INPOLY };
+static enum eState eTgifState = NEWPOLY;
+
+static void TGIF_flush_poly __PROTO((void));
+
+
+
+/*}}}  */
+/***************************************************************************/
+static void TGIF_flush_poly()
+{
+  int   i;
+
+
+	if(eTgifState == INPOLY) {
+		fprintf(outfile, "poly('%s',%d,[\n\t",sActColor, iTgifPolyCount);
+
+                for (i=0; i < iTgifPolyCount-1; i++) {
+                	fprintf(outfile,"%u,%u,",uBuffX[i],uBuffY[i]);
+                        if((i+1)%8 == 0) fprintf(outfile,"\n\t");
+                }
+
+		fprintf(outfile, "%u,%u],0,%u,1,%u,0,0,%u,0,8,3,0,[\n]).\n",
+			uBuffX[iTgifPolyCount-1],uBuffY[iTgifPolyCount-1],uActThick, uActNr, uActStyle);
+
+		uActNr++;
+
+                eTgifState = NEWPOLY;
+                iTgifPolyCount=0;
+                if(outfile != (FILE *)NULL)
+  			fflush(outfile);
+        }
+
+
+} /* TGIF_flush_poly */
+/*}}}  */
+/***************************************************************************/ 
+TERM_PUBLIC void TGIF_options()
+{
+        
+        struct value a,b;
+        double	dscaleH,dscaleV;
+
+
+        strcpy(sActFont,"Helvetica");
+        strcpy(sDefaultFont,"Helvetica");
+        uActFontSize=18;
+        uDefaultFontSize=18;
+	term->v_char = (unsigned int)(uActFontSize);
+	term->h_char = (unsigned int)(uActFontSize*6/10);
+
+        TgifPortrait = TRUE;
+        uTgifPlotsPerPage = 1;
+        uTgifPlotRow = 1;
+        uTgifPlotCol = 1;
+        uTgif_win_horiz = 1;
+        uTgif_win_verti = 1;
+        uActResolution=100;
+
+         
+/*}}}  */
+
+	if (!END_OF_COMMAND) {
+		if (almost_equals(c_token,"p$ortrait")) {
+			TgifPortrait=TRUE;
+			c_token++;
+		}
+		else if (almost_equals(c_token,"l$andscape")) {
+			TgifPortrait=FALSE;
+			uActResolution=140;
+			c_token++;
+		}
+	}
+
+/*}}}  */
+
+	if (!END_OF_COMMAND) {
+		if (equals(c_token,"[")) { /* windows specified */
+			c_token++;
+			if (END_OF_COMMAND) {
+	    			int_error("no. windows: [horizontal,vertical] expected",c_token);
+			} else if (!equals(c_token,","))  {
+				uTgif_win_horiz = (int)real(const_express(&a));
+			}	
+			if (!equals(c_token,","))
+				int_error("',' expected",c_token);
+			c_token++;
+			if (!equals(c_token,"]")) {
+				uTgif_win_verti = (int)real(const_express(&a));
+	 		}
+			if (!equals(c_token,"]"))
+		  		int_error("expecting ']'",c_token);
+			c_token++;  
+
+         		uTgifPlotsPerPage= uTgif_win_verti*uTgif_win_horiz;
+
+       
+			}
+		} 
+
+/*}}}  */
+
+	if (!END_OF_COMMAND) {
+		if (almost_equals(c_token,"s$olid")) {
+			TgifSolid=TRUE;
+			c_token++;
+		}
+		else if (almost_equals(c_token,"d$ashed")) {
+			TgifSolid=FALSE;
+			c_token++;
+		}
+	}
+/*}}}  */
+
+	if (!END_OF_COMMAND && isstring(c_token)) {
+		quote_str(sActFont,c_token,MAX_LINE_LEN);
+		strcpy(sDefaultFont,sActFont);  
+		c_token++;
+	}
+
+	if (!END_OF_COMMAND) {
+		/* We have font size specified */
+		uActFontSize= (unsigned int)real(const_express(&b));
+		uDefaultFontSize=uActFontSize;
+		term->v_char = (unsigned int)(uActFontSize);
+		term->h_char = (unsigned int)(uActFontSize*6/10);
+	}
+
+/*}}}  */
+
+		if(TgifPortrait) { 
+			dscaleH=(double)100.0*(TGIF_XTOT)/( xsize*(TGIF_XMAX +(uTgif_win_horiz-1)*TGIF_XSHIFT));
+			dscaleV=(double)100.0*(TGIF_YTOT)/( ysize*(TGIF_YMAX +(uTgif_win_verti-1)*TGIF_YSHIFT));
+                               uActResolution=(int)GPMIN(dscaleH,dscaleV);
+                               switch(uTgif_win_verti) {
+                               	case 1:
+                               		uActZoom = 0;
+                               		break;
+                                 		
+                               	case 2:
+                               		uActZoom = 1;
+                               		break; 
+                               	default:
+                               		uActZoom = 2;
+                               		break;
+                                 		
+                               }
+		} else {
+			dscaleH=(double)100.0*(TGIF_YTOT)/( xsize*(TGIF_XMAX +(uTgif_win_horiz-1)*TGIF_XSHIFT));
+			dscaleV=(double)100.0*(TGIF_XTOT)/( ysize*(TGIF_YMAX +(uTgif_win_verti-1)*TGIF_YSHIFT));
+                        uActResolution=(unsigned int)GPMIN(dscaleH,dscaleV);
+                                
+                        switch(uTgif_win_verti) {
+                               	case 1:
+                               		uActZoom = 0;
+                               		break;
+                                		
+                               	case 2:
+                               		uActZoom = 1;
+                               		break; 
+                               	default:
+                               		uActZoom = 2;
+                               		break;
+                                 		
+                       }
+	      }
+
+/*}}}  */
+
+	sprintf(term_options,"%s [%u,%u] %s \"%s\" %u",
+		TgifPortrait ? "portrait" : "landscape",
+		uTgif_win_horiz,uTgif_win_verti,
+		TgifSolid ? "solid" : "dashed",
+		sActFont,uActFontSize);
+}
+/*}}}  */
+/***************************************************************************/
+TERM_PUBLIC void TGIF_init()
+{
+
+if(multiplot) {                                      
+        /* uActResolution= TgifPortrait ? (unsigned int)100 : (unsigned int)145 ;*/
+        uActResolution =(unsigned int)100;
+
+        if(uTgifPlotsPerPage > 1) {
+         	fprintf(stderr,"warning: using standard multiplot\n");
+        	uTgifPlotsPerPage = 1;	
+        }
+        uActZoom = 1;
+}       
+
+
+
+
+fprintf(outfile,"%%TGIF 2.15-p7\n");
+fprintf(outfile,"state(%d,30,%u,0,0,%u,16,1,9,1,1,0,0,0,0,1,0,'%s',0,%u,0,0,1,10,0,0,1,1,0,16,0,0,1,1,1).\n",
+	TgifPortrait ? 0 : 1,uActResolution,uActZoom,sActFont,uActFontSize);
+fprintf(outfile,"%%\n%% @(#)$Header: /cvs/gnuplot/term/tgif.trm,v 1.64 1997/05/18 21:22:26 drd Exp $\n%% %%W%%\n%%\n");
+fprintf(outfile,"page(1,\"\").\n");
+eTgifState = NEWPOLY;
+iTgifPolyCount = 0;
+uTgifPlotCount = 0;
+uActPage = 1;
+
+} /* TGIF_init */
+/*}}}  */
+/***************************************************************************/
+TERM_PUBLIC void TGIF_graphics()
+{
+
+TGIF_flush_poly();
+
+if(multiplot) {
+
+        term->xmax = (TgifPortrait) ? TGIF_XTOT : TGIF_YTOT;
+        term->ymax = (TgifPortrait) ? TGIF_YTOT : TGIF_XTOT;
+        uLastTgifX = (TgifPortrait) ? TGIF_XOFF : TGIF_YOFF;
+        uLastTgifY = (TgifPortrait) ? TGIF_YTOT + TGIF_YOFF : TGIF_XTOT + TGIF_XOFF;
+
+        uYshift = uLastTgifY;
+ 	uXshift = uLastTgifX;
+ 	
+} else {
+        if(uTgifPlotCount<uTgifPlotsPerPage)
+               	uTgifPlotCount++;
+        else{
+               	fprintf(stderr,"error: number of plots > plots per page\n");
+              	return;
+        }
+        
+        uXshift = (unsigned int) TGIF_XOFF * 100/uActResolution + (xsize*(uTgifPlotCol-1)*TGIF_XSHIFT);
+        uYshift = (unsigned int) TGIF_YOFF * 100/uActResolution + (ysize*(TGIF_YMAX  + (uTgifPlotRow-1)*TGIF_YSHIFT));
+               
+        if(uTgifPlotCount%uTgif_win_horiz == 0) {
+               	uTgifPlotCol = 1;
+               	uTgifPlotRow++;
+        }else  {
+               	uTgifPlotCol++;
+        }
+
+        uLastTgifX = uXshift;
+        uLastTgifY = uYshift;
+        
+}	
+
+
+      
+
+
+/* default settings for each plot */
+iTgifPolyCount = 0;
+uActNr     = 0;
+uActAngle  = 0;
+uActThick  = 1;
+uActStyle  = 0;
+uActJust   = LEFT;
+strcpy(sActColor, psColors[0]);
+
+
+} /* TGIF_graphics */
+/*}}}  */
+/***************************************************************************/
+TERM_PUBLIC void TGIF_text()
+{
+TGIF_flush_poly();
+
+
+} /* TGIF_text */
+
+/*}}}  */
+/***************************************************************************/
+TERM_PUBLIC void TGIF_reset()
+{
+  TGIF_flush_poly();
+  iTgifPolyCount=0;
+  uTgifPlotCount = 0;
+  uTgifPlotRow = 1;
+  uTgifPlotCol = 1;
+
+
+  if(outfile != (FILE *)NULL)
+  	fflush(outfile);
+
+} /* TGIF_reset */
+/*}}}  */
+/***************************************************************************/
+TERM_PUBLIC void TGIF_linetype(linetype)
+int linetype;
+{
+unsigned int   ult;
+
+
+  TGIF_flush_poly();
+
+
+	if (linetype >= 0)
+   		ult = 2+linetype%10;
+        else
+		ult = linetype + 2;
+
+strcpy(sActColor, psColors[ult]);
+uActThick = uLineThick[ult];
+if(!TgifSolid)
+	uActStyle = uLineStyle[ult];
+else {
+        if(ult==1)  /* grid */
+        	uActStyle = uLineStyle[ult];
+        else
+                uActStyle = uLineStyle[2];
+
+}
+
+} /* TGIF_linetype */
+/*}}}  */
+/***************************************************************************/
+TERM_PUBLIC void TGIF_move(ux, uy)
+unsigned int ux, uy;
+{
+
+  uLastTgifX = ux + uXshift;
+  uLastTgifY = uYshift-uy;
+
+  if(eTgifState == INPOLY)
+  	TGIF_flush_poly();
+
+
+
+} /* TGIF_move */
+/*}}}  */
+/***************************************************************************/
+TERM_PUBLIC void TGIF_vector(ux, uy)
+unsigned int ux, uy;
+{
+
+ux = ux + uXshift;
+uy = uYshift - uy;
+
+
+
+        if(eTgifState == NEWPOLY){
+                uBuffX[0] = uLastTgifX;
+                uBuffY[0] = uLastTgifY;
+                iTgifPolyCount=1;
+                eTgifState = INPOLY;
+        }
+
+        uBuffX[iTgifPolyCount] = ux;
+        uBuffY[iTgifPolyCount] = uy;
+        uLastTgifX = ux;
+        uLastTgifY = uy;
+        iTgifPolyCount++;
+        eTgifState = INPOLY;
+
+        if(iTgifPolyCount == TGIF_MAXPOLY){
+                TGIF_flush_poly();
+
+        }
+
+} /* TGIF_vector */
+/*}}}  */
+/***************************************************************************/
+TERM_PUBLIC void TGIF_arrow(sx,sy,ex,ey,head)
+unsigned int sx,sy,ex,ey;
+TBOOLEAN head;
+{
+
+TGIF_flush_poly();
+
+sx = sx + uXshift;
+ex = ex + uXshift;
+sy = uYshift - sy;
+ey = uYshift - ey;
+
+
+if(head) {
+fprintf(outfile,"poly('%s',%d,[\n\t%u,%u,%u,%u],1,%u,1,%u,0,0,%u,0,8,3,0,[\n]).\n",
+                       sActColor,2,sx,sy,ex,ey,uActThick,uActNr,uActStyle);
+} else  {
+fprintf(outfile,"poly('%s',%d,[\n\t%u,%u,%u,%u],1,%u,1,%u,0,0,%u,0,8,3,0,[\n]).\n",
+                       sActColor,2,sx,sy,ex,ey,uActThick,uActNr,uActStyle);
+}
+
+uActNr++;
+
+
+
+uLastTgifX = ex;
+uLastTgifY = ey;
+
+} /* TGIF_arrow */
+/*}}}  */
+/***************************************************************************/
+TERM_PUBLIC void TGIF_put_text(ux, uy, str)
+unsigned int ux, uy;
+char *str;
+{
+
+ unsigned int x,y;
+ struct termentry *t = term;
+
+TGIF_flush_poly();
+
+  x = ux + uXshift;
+  y = uYshift - uy - t->v_char/2;
+
+
+
+if(strlen(str)==0) return;
+
+
+       fprintf(outfile,
+       "text('%s',%u,%u,'%s',0,%u,1,%u,%u,1,55,119,%u,0,15,4,0,0,0,0,[\n\t\"%s\"]).\n",
+       sActColor, x, y, sActFont,uActFontSize,uActJust,uActAngle,uActNr, str);
+
+  uActNr+=2;   
+
+  /* reset font size and font, they might have been changed */
+  uActFontSize=uDefaultFontSize; 
+  strcpy(sActFont,sDefaultFont);
+
+} /* TGIF_put_text */
+/*}}}  */
+/***************************************************************************/
+TERM_PUBLIC int TGIF_text_angle(angle)
+int angle;
+{
+uActAngle = uTextAngle[angle];      /* 0=waag.  1=senkrecht */
+return (TRUE);
+} /* TGIF_text_angle */
+
+/*}}}  */
+/***************************************************************************/
+TERM_PUBLIC int TGIF_justify_text(mode)
+enum JUSTIFY mode;
+{
+uActJust = mode;
+return (TRUE);
+} /* TGIF_justify_text */
+
+/*}}}  */
+/***************************************************************************/
+TERM_PUBLIC void TGIF_point(ux, uy, number)
+unsigned int ux, uy;
+int number;
+{
+double p;      /* all pointtypes fit in a (x +/-p)x(y +/-p) box */
+
+double x,y;   
+
+
+
+x = (double)(ux + uXshift);
+y = (double)(uYshift - uy);
+
+p=pointsize*8.0;        /* NL: Increased the bounding box (p value) from 4.0 to 8.0 */
+if(p==(double)0.0)	
+	p=0.1;
+	
+TGIF_flush_poly();
+
+if (number != -1)
+   number = number % 63;
+switch (number)
+  {
+  case -1:
+/* HBB: corrected format string, shuts up gcc -Wall */
+    fprintf(outfile, "poly('%s',2,[\n\t%.1f,%.1f,%.1f,%.1f],0,1,1,%u,0,0,0,0,8,3,0,[\n]).\n",
+            sActColor, x, y, x+1, y+1, uActNr++);
+    break;
+  case 0:
+    /* cross */
+    /* taking thickness 2 for cross & plus & star */
+    fprintf(outfile,"group([\n");
+    fprintf(outfile, "poly('%s',2,[\n\t%.1f,%.1f,%.1f,%.1f],0,2,1,%u,0,0,0,0,8,3,0,[\n]).\n",
+            sActColor, x-p, y-p, x+p, y+p, uActNr++);
+    fprintf(outfile, "poly('%s',2,[\n\t%.1f,%.1f,%.1f,%.1f],0,2,1,%u,0,0,0,0,8,3,0,[\n]).\n",
+            sActColor, x-p, y+p, x+p, y-p, uActNr++);
+    uActNr += 2;
+    fprintf(outfile,"],\n%u,0,[\n]).\n",uActNr++);
+    break;
+    /*}}}  */
+  case 1:
+    /* plus */
+    /* taking thickness 2 for cross & plus & star */
+    fprintf(outfile,"group([\n");
+    fprintf(outfile, "poly('%s',2,[\n\t%.1f,%.1f,%.1f,%.1f],0,2,1,%u,0,0,0,0,8,3,0,[\n]),\n",
+            sActColor, x, y-p-1, x, y+p+1, uActNr++);
+    fprintf(outfile, "poly('%s',2,[\n\t%.1f,%.1f,%.1f,%.1f],0,2,1,%u,0,0,0,0,8,3,0,[\n])\n",
+            sActColor, x-p-1, y, x+p+1, y, uActNr++);
+    uActNr+=2;
+    fprintf(outfile,"],\n%u,0,[\n]).\n",uActNr++);
+    break;
+    /*}}}  */
+  case 2:
+  /* star */
+  /* taking thickness 2 for cross & plus & star */
+    fprintf(outfile,"group([\n");
+    fprintf(outfile, "poly('%s',2,[\n\t%.1f,%.1f,%.1f,%.1f],0,2,1,%u,0,0,0,0,8,3,0,[\n]),\n",
+            sActColor, x, y-p-1, x, y+p+1, uActNr++);
+    fprintf(outfile, "poly('%s',2,[\n\t%.1f,%.1f,%.1f,%.1f],0,2,1,%u,0,0,0,0,8,3,0,[\n])\n",
+            sActColor, x-p-1, y, x+p+1, y, uActNr++);
+    fprintf(outfile, "poly('%s',2,[\n\t%.1f,%.1f,%.1f,%.1f],0,2,1,%u,0,0,0,0,8,3,0,[\n]).\n",
+            sActColor, x-p, y-p, x+p, y+p, uActNr++);
+    fprintf(outfile, "poly('%s',2,[\n\t%.1f,%.1f,%.1f,%.1f],0,2,1,%u,0,0,0,0,8,3,0,[\n]).\n",
+            sActColor, x-p, y+p, x+p, y-p, uActNr++);
+    uActNr+=4;
+    fprintf(outfile,"],\n%u,0,[\n]).\n",uActNr++);
+    break;
+    /*}}}  */
+  case 3:
+    /* box */
+    fprintf(outfile, "box('%s',%.1f,%.1f,%.1f,%.1f,2,1,1,%u,0,0,0,[\n]).\n",
+            sActColor, x-p, y-p, x+p, y+p, uActNr);
+    uActNr++;
+    break;
+    /*}}}  */
+  case 4:
+     /* filled box */
+    fprintf(outfile, "box('%s',%.1f,%.1f,%.1f,%.1f,1,1,1,%u,0,0,0,[\n]).\n",
+            sActColor, x-p, y-p, x+p, y+p, uActNr);
+    uActNr++;
+    break;
+     /*}}}  */
+  case 5:
+  /* circle */
+    fprintf(outfile, "oval('%s',%.1f,%.1f,%.1f,%.1f,2,1,1,%u,0,0,0,[\n]).\n",
+            sActColor, x-p, y-p, x+p, y+p, uActNr);
+    uActNr++;
+    break;
+    /*}}}  */
+  case 6:
+    /* filled circle */
+    fprintf(outfile, "oval('%s',%.1f,%.1f,%.1f,%.1f,1,1,1,%u,0,0,0,[\n]).\n",
+            sActColor, x-p, y-p, x+p, y+p, uActNr);
+    uActNr++;
+    break;
+    /*}}}  */
+  case 7:
+    /* triangle up */
+    fprintf(outfile, "polygon('%s',4,[\n%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f],0,1,1,0,%u,0,0,0,0,0,[\n]).\n",
+            sActColor, x, y-p, x+p, y+0.75*p, x-p, y+0.75*p, x, y-p, uActNr);
+    uActNr++;
+    break;
+    /*}}}  */
+  case 8:
+    /* filled triangle up */
+    fprintf(outfile, "polygon('%s',4,[\n%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f],1,1,1,0,%u,0,0,0,0,0,[\n]).\n",
+            sActColor, x, y-p, x+p, y+0.75*p, x-p, y+0.75*p, x, y-p, uActNr);
+    uActNr++;
+    break;
+    /*}}}  */
+  case 9:
+    /* triangle down */
+    fprintf(outfile, "polygon('%s',4,[\n%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f],0,1,1,0,%u,0,0,0,0,0,[\n]).\n",
+            sActColor, x, y+p, x-p, y-0.75*p, x+p, y-0.75*p, x, y+p, uActNr);
+    uActNr++;
+    break;
+    /*}}}  */
+  case 10:
+    /* filled triangle down */
+    fprintf(outfile, "polygon('%s',4,[\n%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f],1,1,1,0,%u,0,0,0,0,0,[\n]).\n",
+            sActColor, x, y+p, x-p, y-0.75*p, x+p, y-0.75*p, x, y+p, uActNr);
+    uActNr++;
+    break;
+    /*}}}  */
+  case 11:
+  /* diamond */
+    fprintf(outfile, "polygon('%s',5,[\n%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f],0,1,1,0,%u,0,0,0,0,0,[\n]).\n",
+            sActColor, x, y+p, x+p, y, x,y-p, x-p, y, x, y+p, uActNr);
+    uActNr++;
+    break;
+    /*}}}  */
+  case 12:
+  /* filled diamond */
+    fprintf(outfile, "polygon('%s',5,[\n%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f],1,1,1,0,%u,0,0,0,0,0,[\n]).\n",
+            sActColor, x, y+p, x+p, y, x,y-p, x-p, y, x, y+p, uActNr);
+    uActNr++;
+    break;
+    /*}}}  */
+  case 13:
+  /* pentagon */
+    fprintf(outfile, "polygon('%s',6,[\n%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f],0,1,1,0,%u,0,0,0,0,0,[\n]).\n",
+            sActColor, x, y-p, x+p, y-p/4, x+0.625*p, y+p, x-0.625*p, y+p, x-p, y-p/4, x, y-p, uActNr);
+    uActNr++;
+    break;
+    /*}}}  */
+  case 14:
+  /* filled pentagon */
+    fprintf(outfile, "polygon('%s',6,[\n%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f],1,1,1,0,%u,0,0,0,0,0,[\n]).\n",
+            sActColor, x, y-p, x+p, y-p/4, x+0.625*p, y+p, x-0.625*p, y+p, x-p, y-p/4, x, y-p, uActNr);
+    uActNr++;
+    break;
+    /*}}}  */
+  case 15:
+  /* circle1 */
+    fprintf(outfile,"group([\n");
+    fprintf(outfile, "oval('%s',%.1f,%.1f,%.1f,%.1f,2,1,1,%u,0,0,0,[\n]).\n",
+            sActColor, x-p, y-p, x+p, y+p, uActNr++);
+    fprintf(outfile, "arc('%s',1,1,1,0,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,0,%.1f,%.1f,4480,2560,%u,0,0,8,3,0,[\n]).\n",
+            sActColor, x-p, y-p, x, y, x+p*0.342, y-p*0.94, x-p*0.342, y-p*0.94, 2*p, 2*p, uActNr++);
+    uActNr+=2;
+    fprintf(outfile,"],\n%u,0,[\n]).\n",uActNr++);
+    break;
+    /*}}}  */
+  case 16:
+  /* circle2 */
+    fprintf(outfile,"group([\n");
+    fprintf(outfile, "oval('%s',%.1f,%.1f,%.1f,%.1f,2,1,1,%u,0,0,0,[\n]).\n",
+            sActColor, x-p, y-p, x+p, y+p, uActNr++);
+    fprintf(outfile, "arc('%s',1,1,1,0,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,0,%.1f,%.1f,0,5760,%u,0,0,8,3,0,[\n]).\n",
+            sActColor, x-p, y-p, x, y, x+p, y, x, y-p, 2*p, 2*p, uActNr++);
+    uActNr+=2;
+    fprintf(outfile,"],\n%u,0,[\n]).\n",uActNr++);
+    break;
+    /*}}}  */
+  case 17:
+  /* circle3 */
+    fprintf(outfile,"group([\n");
+    fprintf(outfile, "oval('%s',%.1f,%.1f,%.1f,%.1f,2,1,1,%u,0,0,0,[\n]).\n",
+            sActColor, x-p, y-p, x+p, y+p, uActNr++);
+    fprintf(outfile, "arc('%s',1,1,1,0,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,0,%.1f,%.1f,5760,5760,%u,0,0,8,3,0,[\n]).\n",
+            sActColor, x-p, y-p, x, y, x, y-p, x-p, y, 2*p, 2*p, uActNr++);
+    uActNr+=2;
+    fprintf(outfile,"],\n%u,0,[\n]).\n",uActNr++);
+    break;
+    /*}}}  */
+  case 18:
+  /* circle4 */
+    fprintf(outfile,"group([\n");
+    fprintf(outfile, "oval('%s',%.1f,%.1f,%.1f,%.1f,2,1,1,%u,0,0,0,[\n]).\n",
+            sActColor, x-p, y-p, x+p, y+p, uActNr++);
+    fprintf(outfile, "arc('%s',1,1,1,0,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,0,%.1f,%.1f,0,11520,%u,0,0,8,3,0,[\n]).\n",
+            sActColor, x-p, y-p, x, y, x+p, y, x-p, y, 2*p, 2*p, uActNr++);
+    uActNr+=2;
+    fprintf(outfile,"],\n%u,0,[\n]).\n",uActNr++);
+    break;
+    /*}}}  */
+  case 19:
+  /* circle5 */
+    fprintf(outfile,"group([\n");
+    fprintf(outfile, "oval('%s',%.1f,%.1f,%.1f,%.1f,2,1,1,%u,0,0,0,[\n]).\n",
+            sActColor, x-p, y-p, x+p, y+p, uActNr++);
+    fprintf(outfile, "arc('%s',1,1,1,0,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,0,%.1f,%.1f,11520,5760,%u,0,0,8,3,0,[\n]).\n",
+            sActColor, x-p, y-p, x, y, x-p, y, x, y+p, 2*p, 2*p, uActNr++);
+    uActNr+=2;
+    fprintf(outfile,"],\n%u,0,[\n]).\n",uActNr++);
+    break;
+    /*}}}  */
+  case 20:
+  /* circle6 */
+    fprintf(outfile,"group([\n");
+    fprintf(outfile, "oval('%s',%.1f,%.1f,%.1f,%.1f,2,1,1,%u,0,0,0,[\n]).\n",
+            sActColor, x-p, y-p, x+p, y+p, uActNr++);
+    fprintf(outfile, "arc('%s',1,1,1,0,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,0,%.1f,%.1f,0,5760,%u,0,0,8,3,0,[\n]).\n",
+            sActColor, x-p, y-p, x, y, x+p, y, x, y-p, 2*p, 2*p, uActNr++);
+    fprintf(outfile, "arc('%s',1,1,1,0,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,0,%.1f,%.1f,11520,5760,%u,0,0,8,3,0,[\n]).\n",
+            sActColor, x-p, y-p, x, y, x-p, y, x, y+p, 2*p, 2*p, uActNr++);
+    uActNr+=3;
+    fprintf(outfile,"],\n%u,0,[\n]).\n",uActNr++);
+    break;
+    /*}}}  */
+  case 21:
+  /* circle7 */
+    fprintf(outfile,"group([\n");
+    fprintf(outfile, "oval('%s',%.1f,%.1f,%.1f,%.1f,2,1,1,%u,0,0,0,[\n]).\n",
+            sActColor, x-p, y-p, x+p, y+p, uActNr++);
+    fprintf(outfile, "arc('%s',1,1,1,0,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,0,%.1f,%.1f,5760,11520,%u,0,0,8,3,0,[\n]).\n",
+            sActColor, x-p, y-p, x, y, x, y-p, x, y+p, 2*p, 2*p, uActNr++);
+    uActNr+=2;
+    fprintf(outfile,"],\n%u,0,[\n]).\n",uActNr++);
+    break;
+    /*}}}  */
+  case 22:
+  /* circle8 */
+    fprintf(outfile,"group([\n");
+    fprintf(outfile, "oval('%s',%.1f,%.1f,%.1f,%.1f,2,1,1,%u,0,0,0,[\n]).\n",
+            sActColor, x-p, y-p, x+p, y+p, uActNr++);
+    fprintf(outfile, "arc('%s',1,1,1,0,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,0,%.1f,%.1f,0,17280,%u,0,0,8,3,0,[\n]).\n",
+            sActColor, x-p, y-p, x, y, x+p, y, x, y+p, 2*p, 2*p, uActNr++);
+    uActNr+=2;
+    fprintf(outfile,"],\n%u,0,[\n]).\n",uActNr++);
+    break;
+    /*}}}  */
+  case 23:
+  /* circle9 */
+    fprintf(outfile,"group([\n");
+    fprintf(outfile, "oval('%s',%.1f,%.1f,%.1f,%.1f,2,1,1,%u,0,0,0,[\n]).\n",
+            sActColor, x-p, y-p, x+p, y+p, uActNr++);
+    fprintf(outfile, "arc('%s',1,1,1,0,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,0,%.1f,%.1f,17280,5760,%u,0,0,8,3,0,[\n]).\n",
+            sActColor, x-p, y-p, x, y, x, y+p, x+p, y, 2*p, 2*p, uActNr++);
+    uActNr+=2;
+    fprintf(outfile,"],\n%u,0,[\n]).\n",uActNr++);
+    break;
+    /*}}}  */
+  case 24:
+  /* circle10 */
+    fprintf(outfile,"group([\n");
+    fprintf(outfile, "oval('%s',%.1f,%.1f,%.1f,%.1f,2,1,1,%u,0,0,0,[\n]).\n",
+            sActColor, x-p, y-p, x+p, y+p, uActNr++);
+    fprintf(outfile, "arc('%s',1,1,1,0,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,0,%.1f,%.1f,17280,11520,%u,0,0,8,3,0,[\n]).\n",
+            sActColor, x-p, y-p, x, y, x, y+p, x, y-p, 2*p, 2*p, uActNr++);
+    uActNr+=2;
+    fprintf(outfile,"],\n%u,0,[\n]).\n",uActNr++);
+    break;
+    /*}}}  */
+  case 25:
+  /* circle11 */
+    fprintf(outfile,"group([\n");
+    fprintf(outfile, "oval('%s',%.1f,%.1f,%.1f,%.1f,2,1,1,%u,0,0,0,[\n]).\n",
+            sActColor, x-p, y-p, x+p, y+p, uActNr++);
+    fprintf(outfile, "arc('%s',1,1,1,0,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,0,%.1f,%.1f,5760,5760,%u,0,0,8,3,0,[\n]).\n",
+            sActColor, x-p, y-p, x, y, x, y-p, x-p, y, 2*p, 2*p, uActNr++);
+    fprintf(outfile, "arc('%s',1,1,1,0,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,0,%.1f,%.1f,17280,5760,%u,0,0,8,3,0,[\n]).\n",
+            sActColor, x-p, y-p, x, y, x, y+p, x+p, y, 2*p, 2*p, uActNr++);
+    uActNr+=3;
+    fprintf(outfile,"],\n%u,0,[\n]).\n",uActNr++);
+    break;
+    /*}}}  */
+  case 26:
+  /* circle12 */
+    fprintf(outfile,"group([\n");
+    fprintf(outfile, "oval('%s',%.1f,%.1f,%.1f,%.1f,2,1,1,%u,0,0,0,[\n]).\n",
+            sActColor, x-p, y-p, x+p, y+p, uActNr++);
+    fprintf(outfile, "arc('%s',1,1,1,0,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,0,%.1f,%.1f,17280,17280,%u,0,0,8,3,0,[\n]).\n",
+            sActColor, x-p, y-p, x, y, x, y+p, x-p, y, 2*p, 2*p, uActNr++);
+    uActNr+=2;
+    fprintf(outfile,"],\n%u,0,[\n]).\n",uActNr++);
+    break;
+    /*}}}  */
+  case 27:
+  /* circle13 */
+    fprintf(outfile,"group([\n");
+    fprintf(outfile, "oval('%s',%.1f,%.1f,%.1f,%.1f,2,1,1,%u,0,0,0,[\n]).\n",
+            sActColor, x-p, y-p, x+p, y+p, uActNr++);
+    fprintf(outfile, "arc('%s',1,1,1,0,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,0,%.1f,%.1f,11520,11520,%u,0,0,8,3,0,[\n]).\n",
+            sActColor, x-p, y-p, x, y, x-p, y, x+p, y, 2*p, 2*p, uActNr++);
+    uActNr+=2;
+    fprintf(outfile,"],\n%u,0,[\n]).\n",uActNr++);
+    break;
+    /*}}}  */
+  case 28:
+  /* circle14 */
+    fprintf(outfile,"group([\n");
+    fprintf(outfile, "oval('%s',%.1f,%.1f,%.1f,%.1f,2,1,1,%u,0,0,0,[\n]).\n",
+            sActColor, x-p, y-p, x+p, y+p, uActNr++);
+    fprintf(outfile, "arc('%s',1,1,1,0,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,0,%.1f,%.1f,11520,17280,%u,0,0,8,3,0,[\n]).\n",
+            sActColor, x-p, y-p, x, y, x-p, y, x, y-p, 2*p, 2*p, uActNr++);
+    uActNr+=2;
+    fprintf(outfile,"],\n%u,0,[\n]).\n",uActNr++);
+    break;
+    /*}}}  */
+  case 29:
+  /* circle15 */
+    fprintf(outfile,"group([\n");
+    fprintf(outfile, "oval('%s',%.1f,%.1f,%.1f,%.1f,2,1,1,%u,0,0,0,[\n]).\n",
+            sActColor, x-p, y-p, x+p, y+p, uActNr++);
+    fprintf(outfile, "arc('%s',1,1,1,0,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,0,%.1f,%.1f,5760,17280,%u,0,0,8,3,0,[\n]).\n",
+            sActColor, x-p, y-p, x, y, x, y-p, x+p, y, 2*p, 2*p, uActNr++);
+    uActNr+=2;
+    fprintf(outfile,"],\n%u,0,[\n]).\n",uActNr++);
+    break;
+    /*}}}  */
+  case 30:
+  /* circle16 */
+    fprintf(outfile, "oval('%s',%.1f,%.1f,%.1f,%.1f,1,1,1,%u,0,0,0,[\n]).\n",
+            sActColor, x-p, y-p, x+p, y+p, uActNr);
+    uActNr++;
+    break;
+    /*}}}  */
+  case 31:
+  /* box1 */
+    fprintf(outfile,"group([\n");
+    fprintf(outfile, "box('%s',%.1f,%.1f,%.1f,%.1f,2,1,1,%u,0,0,0,[\n]).\n",
+            sActColor, x-p, y-p, x+p, y+p, uActNr++);
+    fprintf(outfile, "box('%s',%.1f,%.1f,%.1f,%.1f,1,1,1,%u,0,0,0,[\n]).\n",
+            sActColor, x-p/4, y-p, x+p/4, y, uActNr++);
+    uActNr+=2;
+    fprintf(outfile,"],\n%u,0,[\n]).\n",uActNr++);
+    break;
+    /*}}}  */
+  case 32:
+  /* box2 */
+    fprintf(outfile,"group([\n");
+    fprintf(outfile, "box('%s',%.1f,%.1f,%.1f,%.1f,2,1,1,%u,0,0,0,[\n]).\n",
+            sActColor, x-p, y-p, x+p, y+p, uActNr++);
+    fprintf(outfile, "box('%s',%.1f,%.1f,%.1f,%.1f,1,1,1,%u,0,0,0,[\n]).\n",
+            sActColor, x, y-p, x+p, y, uActNr++);
+    uActNr+=2;
+    fprintf(outfile,"],\n%u,0,[\n]).\n",uActNr++);
+    break;
+    /*}}}  */
+  case 33:
+  /* box3 */
+    fprintf(outfile,"group([\n");
+    fprintf(outfile, "box('%s',%.1f,%.1f,%.1f,%.1f,2,1,1,%u,0,0,0,[\n]).\n",
+            sActColor, x-p, y-p, x+p, y+p, uActNr++);
+    fprintf(outfile, "box('%s',%.1f,%.1f,%.1f,%.1f,1,1,1,%u,0,0,0,[\n]).\n",
+            sActColor, x-p, y-p, x, y, uActNr++);
+    uActNr+=2;
+    fprintf(outfile,"],\n%u,0,[\n]).\n",uActNr++);
+    break;
+    /*}}}  */
+  case 34:
+  /* box4 */
+    fprintf(outfile,"group([\n");
+    fprintf(outfile, "box('%s',%.1f,%.1f,%.1f,%.1f,2,1,1,%u,0,0,0,[\n]).\n",
+            sActColor, x-p, y-p, x+p, y+p, uActNr++);
+    fprintf(outfile, "box('%s',%.1f,%.1f,%.1f,%.1f,1,1,1,%u,0,0,0,[\n]).\n",
+            sActColor, x-p, y-p, x+p, y, uActNr++);
+    uActNr+=2;
+    fprintf(outfile,"],\n%u,0,[\n]).\n",uActNr++);
+    break;
+    /*}}}  */
+  case 35:
+  /* box5 */
+    fprintf(outfile,"group([\n");
+    fprintf(outfile, "box('%s',%.1f,%.1f,%.1f,%.1f,2,1,1,%u,0,0,0,[\n]).\n",
+            sActColor, x-p, y-p, x+p, y+p, uActNr++);
+    fprintf(outfile, "box('%s',%.1f,%.1f,%.1f,%.1f,1,1,1,%u,0,0,0,[\n]).\n",
+            sActColor, x-p, y, x, y+p, uActNr++);
+    uActNr+=2;
+    fprintf(outfile,"],\n%u,0,[\n]).\n",uActNr++);
+    break;
+    /*}}}  */
+  case 36:
+  /* box6 */
+    fprintf(outfile,"group([\n");
+    fprintf(outfile, "box('%s',%.1f,%.1f,%.1f,%.1f,2,1,1,%u,0,0,0,[\n]).\n",
+            sActColor, x-p, y-p, x+p, y+p, uActNr++);
+    fprintf(outfile, "box('%s',%.1f,%.1f,%.1f,%.1f,1,1,1,%u,0,0,0,[\n]).\n",
+            sActColor, x, y-p, x+p, y, uActNr++);
+    fprintf(outfile, "box('%s',%.1f,%.1f,%.1f,%.1f,1,1,1,%u,0,0,0,[\n]).\n",
+            sActColor, x-p, y, x, y+p, uActNr++);
+    uActNr+=3;
+    fprintf(outfile,"],\n%u,0,[\n]).\n",uActNr++);
+    break;
+    /*}}}  */
+  case 37:
+  /* box7 */
+    fprintf(outfile,"group([\n");
+    fprintf(outfile, "box('%s',%.1f,%.1f,%.1f,%.1f,2,1,1,%u,0,0,0,[\n]).\n",
+            sActColor, x-p, y-p, x+p, y+p, uActNr++);
+    fprintf(outfile, "box('%s',%.1f,%.1f,%.1f,%.1f,1,1,1,%u,0,0,0,[\n]).\n",
+            sActColor, x-p, y-p, x, y+p, uActNr++);
+    uActNr+=2;
+    fprintf(outfile,"],\n%u,0,[\n]).\n",uActNr++);
+    break;
+    /*}}}  */
+  case 38:
+  /* box8 */
+    fprintf(outfile,"group([\n");
+    fprintf(outfile, "box('%s',%.1f,%.1f,%.1f,%.1f,2,1,1,%u,0,0,0,[\n]).\n",
+            sActColor, x-p, y-p, x+p, y+p, uActNr++);
+    fprintf(outfile, "box('%s',%.1f,%.1f,%.1f,%.1f,1,1,1,%u,0,0,0,[\n]).\n",
+            sActColor, x-p, y-p, x+p, y, uActNr++);
+    fprintf(outfile, "box('%s',%.1f,%.1f,%.1f,%.1f,1,1,1,%u,0,0,0,[\n]).\n",
+            sActColor, x-p, y, x, y+p, uActNr++);
+    uActNr+=3;
+    fprintf(outfile,"],\n%u,0,[\n]).\n",uActNr++);
+    break;
+    /*}}}  */
+  case 39:
+  /* box9 */
+    fprintf(outfile,"group([\n");
+    fprintf(outfile, "box('%s',%.1f,%.1f,%.1f,%.1f,2,1,1,%u,0,0,0,[\n]).\n",
+            sActColor, x-p, y-p, x+p, y+p, uActNr++);
+    fprintf(outfile, "box('%s',%.1f,%.1f,%.1f,%.1f,1,1,1,%u,0,0,0,[\n]).\n",
+            sActColor, x, y, x+p, y+p, uActNr++);
+    uActNr+=2;
+    fprintf(outfile,"],\n%u,0,[\n]).\n",uActNr++);
+    break;
+    /*}}}  */
+  case 40:
+  /* box10 */
+    fprintf(outfile,"group([\n");
+    fprintf(outfile, "box('%s',%.1f,%.1f,%.1f,%.1f,2,1,1,%u,0,0,0,[\n]).\n",
+            sActColor, x-p, y-p, x+p, y+p, uActNr++);
+    fprintf(outfile, "box('%s',%.1f,%.1f,%.1f,%.1f,1,1,1,%u,0,0,0,[\n]).\n",
+            sActColor, x, y-p, x+p, y+p, uActNr++);
+    uActNr+=2;
+    fprintf(outfile,"],\n%u,0,[\n]).\n",uActNr++);
+    break;
+    /*}}}  */
+  case 41:
+  /* box11 */
+    fprintf(outfile,"group([\n");
+    fprintf(outfile, "box('%s',%.1f,%.1f,%.1f,%.1f,2,1,1,%u,0,0,0,[\n]).\n",
+            sActColor, x-p, y-p, x+p, y+p, uActNr++);
+    fprintf(outfile, "box('%s',%.1f,%.1f,%.1f,%.1f,1,1,1,%u,0,0,0,[\n]).\n",
+            sActColor, x-p, y-p, x, y, uActNr++);
+    fprintf(outfile, "box('%s',%.1f,%.1f,%.1f,%.1f,1,1,1,%u,0,0,0,[\n]).\n",
+            sActColor, x, y, x+p, y+p, uActNr++);
+    uActNr+=3;
+    fprintf(outfile,"],\n%u,0,[\n]).\n",uActNr++);
+    break;
+    /*}}}  */
+  case 42:
+  /* box12 */
+    fprintf(outfile,"group([\n");
+    fprintf(outfile, "box('%s',%.1f,%.1f,%.1f,%.1f,2,1,1,%u,0,0,0,[\n]).\n",
+            sActColor, x-p, y-p, x+p, y+p, uActNr++);
+    fprintf(outfile, "box('%s',%.1f,%.1f,%.1f,%.1f,1,1,1,%u,0,0,0,[\n]).\n",
+            sActColor, x-p, y-p, x+p, y, uActNr++);
+    fprintf(outfile, "box('%s',%.1f,%.1f,%.1f,%.1f,1,1,1,%u,0,0,0,[\n]).\n",
+            sActColor, x, y, x+p, y+p, uActNr++);
+    uActNr+=3;
+    fprintf(outfile,"],\n%u,0,[\n]).\n",uActNr++);
+    break;
+    /*}}}  */
+  case 43:
+  /* box13 */
+    fprintf(outfile,"group([\n");
+    fprintf(outfile, "box('%s',%.1f,%.1f,%.1f,%.1f,2,1,1,%u,0,0,0,[\n]).\n",
+            sActColor, x-p, y-p, x+p, y+p, uActNr++);
+    fprintf(outfile, "box('%s',%.1f,%.1f,%.1f,%.1f,1,1,1,%u,0,0,0,[\n]).\n",
+            sActColor, x-p, y, x+p, y+p, uActNr++);
+    uActNr+=2;
+    fprintf(outfile,"],\n%u,0,[\n]).\n",uActNr++);
+    break;
+    /*}}}  */
+  case 44:
+  /* box14 */
+    fprintf(outfile,"group([\n");
+    fprintf(outfile, "box('%s',%.1f,%.1f,%.1f,%.1f,2,1,1,%u,0,0,0,[\n]).\n",
+            sActColor, x-p, y-p, x+p, y+p, uActNr++);
+    fprintf(outfile, "box('%s',%.1f,%.1f,%.1f,%.1f,1,1,1,%u,0,0,0,[\n]).\n",
+            sActColor, x, y-p, x+p, y, uActNr++);
+    fprintf(outfile, "box('%s',%.1f,%.1f,%.1f,%.1f,1,1,1,%u,0,0,0,[\n]).\n",
+            sActColor, x-p, y, x+p, y+p, uActNr++);
+    uActNr+=3;
+    fprintf(outfile,"],\n%u,0,[\n]).\n",uActNr++);
+    break;
+    /*}}}  */
+  case 45:
+  /* box15 */
+    fprintf(outfile,"group([\n");
+    fprintf(outfile, "box('%s',%.1f,%.1f,%.1f,%.1f,2,1,1,%u,0,0,0,[\n]).\n",
+            sActColor, x-p, y-p, x+p, y+p, uActNr++);
+    fprintf(outfile, "box('%s',%.1f,%.1f,%.1f,%.1f,1,1,1,%u,0,0,0,[\n]).\n",
+            sActColor, x-p, y-p, x, y, uActNr++);
+    fprintf(outfile, "box('%s',%.1f,%.1f,%.1f,%.1f,1,1,1,%u,0,0,0,[\n]).\n",
+            sActColor, x-p, y, x+p, y+p, uActNr++);
+    uActNr+=3;
+    fprintf(outfile,"],\n%u,0,[\n]).\n",uActNr++);
+    break;
+    /*}}}  */
+  case 46:
+  /* box16 */
+    fprintf(outfile, "box('%s',%.1f,%.1f,%.1f,%.1f,1,1,1,%u,0,0,0,[\n]).\n",
+            sActColor, x-p, y-p, x+p, y+p, uActNr);
+    uActNr++;
+    break;
+    /*}}}  */
+  case 47:
+  /* diamond1 */
+    fprintf(outfile,"group([\n");
+    fprintf(outfile, "polygon('%s',5,[\n%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f],0,1,1,0,%u,0,0,0,0,0,[\n]).\n",
+            sActColor, x, y+p, x+p, y, x,y-p, x-p, y, x, y+p, uActNr);
+    fprintf(outfile, "polygon('%s',5,[\n%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f],1,1,1,0,%u,0,0,0,0,0,[\n]).\n",
+            sActColor, x-0.625*p, y-0.375*p, x-0.375*p, y-0.625*p, x+p/8, y-p/8, x-p/8, y+p/8, x-0.625*p, y-0.375*p, uActNr);
+    fprintf(outfile,"],\n%u,0,[\n]).\n",uActNr++);
+    uActNr+=2;
+    break;
+    /*}}}  */
+  case 48:
+  /* diamond2 */
+    fprintf(outfile,"group([\n");
+    fprintf(outfile, "polygon('%s',5,[\n%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f],0,1,1,0,%u,0,0,0,0,0,[\n]).\n",
+            sActColor, x, y+p, x+p, y, x,y-p, x-p, y, x, y+p, uActNr);
+    fprintf(outfile, "polygon('%s',5,[\n%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f],1,1,1,0,%u,0,0,0,0,0,[\n]).\n",
+            sActColor, x-p/2, y-p/2, x, y-p, x+p/2, y-p/2, x, y, x-p/2, y-p/2, uActNr);
+    uActNr+=2;
+    fprintf(outfile,"],\n%u,0,[\n]).\n",uActNr++);
+    break;
+    /*}}}  */
+  case 49:
+  /* diamond3 */
+    fprintf(outfile,"group([\n");
+    fprintf(outfile, "polygon('%s',5,[\n%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f],0,1,1,0,%u,0,0,0,0,0,[\n]).\n",
+            sActColor, x, y+p, x+p, y, x,y-p, x-p, y, x, y+p, uActNr);
+    fprintf(outfile, "polygon('%s',5,[\n%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f],1,1,1,0,%u,0,0,0,0,0,[\n]).\n",
+            sActColor, x-p, y, x-p/2, y-p/2, x, y, x-p/2, y+p/2, x-p, y, uActNr);
+    uActNr+=2;
+    fprintf(outfile,"],\n%u,0,[\n]).\n",uActNr++);
+    break;
+    /*}}}  */
+  case 50:
+  /* diamond4 */
+    fprintf(outfile,"group([\n");
+    fprintf(outfile, "polygon('%s',5,[\n%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f],0,1,1,0,%u,0,0,0,0,0,[\n]).\n",
+            sActColor, x, y+p, x+p, y, x,y-p, x-p, y, x, y+p, uActNr);
+    fprintf(outfile, "polygon('%s',5,[\n%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f],1,1,1,0,%u,0,0,0,0,0,[\n]).\n",
+            sActColor, x-p, y, x, y-p, x+p/2, y-p/2, x-p/2, y+p/2, x-p, y, uActNr);
+    uActNr+=2;
+    fprintf(outfile,"],\n%u,0,[\n]).\n",uActNr++);
+    break;
+    /*}}}  */
+  case 51:
+  /* diamond5 */
+    fprintf(outfile,"group([\n");
+    fprintf(outfile, "polygon('%s',5,[\n%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f],0,1,1,0,%u,0,0,0,0,0,[\n]).\n",
+            sActColor, x, y+p, x+p, y, x,y-p, x-p, y, x, y+p, uActNr);
+    fprintf(outfile, "polygon('%s',5,[\n%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f],1,1,1,0,%u,0,0,0,0,0,[\n]).\n",
+            sActColor, x-p/2, y+p/2, x, y, x+p/2, y+p/2, x, y+p, x-p/2, y+p/2, uActNr);
+    uActNr+=2;
+    fprintf(outfile,"],\n%u,0,[\n]).\n",uActNr++);
+    break;
+    /*}}}  */
+  case 52:
+  /* diamond6 */
+    fprintf(outfile,"group([\n");
+    fprintf(outfile, "polygon('%s',5,[\n%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f],0,1,1,0,%u,0,0,0,0,0,[\n]).\n",
+            sActColor, x, y+p, x+p, y, x,y-p, x-p, y, x, y+p, uActNr);
+    fprintf(outfile, "polygon('%s',5,[\n%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f],1,1,1,0,%u,0,0,0,0,0,[\n]).\n",
+            sActColor, x-p/2, y-p/2, x, y-p, x+p/2, y-p/2, x, y, x-p/2, y-p/2, uActNr);
+    fprintf(outfile, "polygon('%s',5,[\n%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f],1,1,1,0,%u,0,0,0,0,0,[\n]).\n",
+            sActColor, x-p/2, y+p/2, x, y, x+p/2, y+p/2, x, y+p, x-p/2, y+p/2, uActNr);
+    uActNr+=3;
+    fprintf(outfile,"],\n%u,0,[\n]).\n",uActNr++);
+    break;
+    /*}}}  */
+  case 53:
+  /* diamond7 */
+    fprintf(outfile,"group([\n");
+    fprintf(outfile, "polygon('%s',5,[\n%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f],0,1,1,0,%u,0,0,0,0,0,[\n]).\n",
+            sActColor, x, y+p, x+p, y, x,y-p, x-p, y, x, y+p, uActNr);
+    fprintf(outfile, "polygon('%s',5,[\n%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f],1,1,1,0,%u,0,0,0,0,0,[\n]).\n",
+            sActColor, x-p, y, x-p/2, y-p/2, x+p/2, y+p/2, x, y+p, x-p, y, uActNr);
+    uActNr+=2;
+    fprintf(outfile,"],\n%u,0,[\n]).\n",uActNr++);
+    break;
+    /*}}}  */
+  case 54:
+  /* diamond8 */
+    fprintf(outfile,"group([\n");
+    fprintf(outfile, "polygon('%s',5,[\n%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f],0,1,1,0,%u,0,0,0,0,0,[\n]).\n",
+            sActColor, x, y+p, x+p, y, x,y-p, x-p, y, x, y+p, uActNr);
+    fprintf(outfile, "polygon('%s',7,[\n%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f],1,1,1,0,%u,0,0,0,0,0,[\n]).\n",
+            sActColor, x-p, y, x, y-p, x+p/2, y-p/2, x, y, x+p/2, y+p/2, x, y+p, x-p, y, uActNr);
+    uActNr+=2;
+    fprintf(outfile,"],\n%u,0,[\n]).\n",uActNr++);
+    break;
+    /*}}}  */
+  case 55:
+  /* diamond9 */
+    fprintf(outfile,"group([\n");
+    fprintf(outfile, "polygon('%s',5,[\n%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f],0,1,1,0,%u,0,0,0,0,0,[\n]).\n",
+            sActColor, x, y+p, x+p, y, x,y-p, x-p, y, x, y+p, uActNr);
+    fprintf(outfile, "polygon('%s',5,[\n%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f],1,1,1,0,%u,0,0,0,0,0,[\n]).\n",
+            sActColor, x, y, x+p/2, y-p/2, x+p, y, x+p/2, y+p/2, x, y, uActNr);
+    uActNr+=2;
+    fprintf(outfile,"],\n%u,0,[\n]).\n",uActNr++);
+    break;
+    /*}}}  */
+  case 56:
+  /* diamond10 */
+    fprintf(outfile,"group([\n");
+    fprintf(outfile, "polygon('%s',5,[\n%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f],0,1,1,0,%u,0,0,0,0,0,[\n]).\n",
+            sActColor, x, y+p, x+p, y, x,y-p, x-p, y, x, y+p, uActNr);
+    fprintf(outfile, "polygon('%s',5,[\n%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f],1,1,1,0,%u,0,0,0,0,0,[\n]).\n",
+            sActColor, x-p/2, y-p/2, x, y-p, x+p, y, x+p/2, y+p/2, x-p/2, y-p/2, uActNr);
+    uActNr+=2;
+    fprintf(outfile,"],\n%u,0,[\n]).\n",uActNr++);
+    break;
+    /*}}}  */
+  case 57:
+  /* diamond11 */
+    fprintf(outfile,"group([\n");
+    fprintf(outfile, "polygon('%s',5,[\n%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f],0,1,1,0,%u,0,0,0,0,0,[\n]).\n",
+            sActColor, x, y+p, x+p, y, x,y-p, x-p, y, x, y+p, uActNr);
+    fprintf(outfile, "polygon('%s',5,[\n%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f],1,1,1,0,%u,0,0,0,0,0,[\n]).\n",
+            sActColor, x-p, y, x-p/2, y-p/2, x, y, x-p/2, y+p/2, x-p, y, uActNr);
+    fprintf(outfile, "polygon('%s',5,[\n%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f],1,1,1,0,%u,0,0,0,0,0,[\n]).\n",
+            sActColor, x, y, x+p/2, y-p/2, x+p, y, x+p/2, y+p/2, x, y, uActNr);
+    uActNr+=3;
+    fprintf(outfile,"],\n%u,0,[\n]).\n",uActNr++);
+    break;
+    /*}}}  */
+  case 58:
+  /* diamond12 */
+    fprintf(outfile,"group([\n");
+    fprintf(outfile, "polygon('%s',5,[\n%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f],0,1,1,0,%u,0,0,0,0,0,[\n]).\n",
+            sActColor, x, y+p, x+p, y, x,y-p, x-p, y, x, y+p, uActNr);
+    fprintf(outfile, "polygon('%s',7,[\n%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f],1,1,1,0,%u,0,0,0,0,0,[\n]).\n",
+            sActColor, x-p, y, x, y-p, x+p, y, x+p/2, y+p/2, x, y, x-p/2, y+p/2, x-p, y, uActNr);
+    uActNr+=2;
+    fprintf(outfile,"],\n%u,0,[\n]).\n",uActNr++);
+    break;
+    /*}}}  */
+  case 59:
+  /* diamond13 */
+    fprintf(outfile,"group([\n");
+    fprintf(outfile, "polygon('%s',5,[\n%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f],0,1,1,0,%u,0,0,0,0,0,[\n]).\n",
+            sActColor, x, y+p, x+p, y, x,y-p, x-p, y, x, y+p, uActNr);
+    fprintf(outfile, "polygon('%s',5,[\n%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f],1,1,1,0,%u,0,0,0,0,0,[\n]).\n",
+            sActColor, x-p/2, y+p/2, x+p/2, y-p/2, x+p, y, x, y+p, x-p/2, y+p/2, uActNr);
+    uActNr+=2;
+    fprintf(outfile,"],\n%u,0,[\n]).\n",uActNr++);
+    break;
+    /*}}}  */
+ case 60:
+  /* diamond14 */
+    fprintf(outfile,"group([\n");
+    fprintf(outfile, "polygon('%s',5,[\n%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f],0,1,1,0,%u,0,0,0,0,0,[\n]).\n",
+            sActColor, x, y+p, x+p, y, x,y-p, x-p, y, x, y+p, uActNr);
+    fprintf(outfile, "polygon('%s',7,[\n%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f],1,1,1,0,%u,0,0,0,0,0,[\n]).\n",
+            sActColor, x-p/2, y-p/2, x, y-p, x+p, y, x, y+p, x-p/2, y+p/2, x, y, x-p/2, y-p/2, uActNr);
+    uActNr+=2;
+    fprintf(outfile,"],\n%u,0,[\n]).\n",uActNr++);
+    break;
+    /*}}}  */
+ case 61:
+  /* diamond15 */
+    fprintf(outfile,"group([\n");
+    fprintf(outfile, "polygon('%s',5,[\n%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f],0,1,1,0,%u,0,0,0,0,0,[\n]).\n",
+            sActColor, x, y+p, x+p, y, x,y-p, x-p, y, x, y+p, uActNr);
+    fprintf(outfile, "polygon('%s',7,[\n%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f],1,1,1,0,%u,0,0,0,0,0,[\n]).\n",
+            sActColor, x-p, y, x-p/2, y-p/2, x, y, x+p/2, y-p/2, x+p, y, x, y+p, x-p, y, uActNr);
+    uActNr+=2;
+    fprintf(outfile,"],\n%u,0,[\n]).\n",uActNr++);
+    break;
+    /*}}}  */
+ case 62:
+  /* diamond16 */
+    fprintf(outfile, "polygon('%s',5,[\n%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f],1,1,1,0,%u,0,0,0,0,0,[\n]).\n",
+            sActColor, x, y+p, x+p, y, x,y-p, x-p, y, x, y+p, uActNr);
+    uActNr++;
+    break;
+    /*}}}  */
+ 
+  } /* switch */
+} /* TGIF_point */
+    
+/*}}}  */
+/***************************************************************************/
+TERM_PUBLIC void  TGIF_set_pointsize(size)
+double size;
+ {
+  	uActPointSize = size;
+ }
+/*}}}  */
+/***************************************************************************/
+TERM_PUBLIC int TGIF_set_font(font)  /* Entry font as added by DJL in post.trm */
+char *font;
+{
+char name[32];
+int  size,sep;
+
+        sep=strcspn(font,",");
+        strncpy(name,font,sep); name[sep]='\0';
+        size=uActFontSize; sscanf (&(font[sep+1]),"%d",&size);
+        uActFontSize=size;
+        return TRUE;
+}
+
+/*}}}  */
+/***************************************************************************/
+
+#endif /* TERM_BODY */
+
+#ifdef TERM_TABLE
+
+TERM_TABLE_START(tgif_driver)
+
+	"tgif",
+	"TGIF X11 [mode] [x,y] [dashed] [\042font\042 [fontsize]]",
+	TGIF_XMAX, TGIF_YMAX, TGIF_VCHAR, TGIF_HCHAR,
+	TGIF_VTIC, TGIF_HTIC, TGIF_options, TGIF_init, TGIF_reset,
+	TGIF_text, null_scale, TGIF_graphics, TGIF_move, TGIF_vector,
+	TGIF_linetype, TGIF_put_text, TGIF_text_angle,
+	TGIF_justify_text, TGIF_point, TGIF_arrow, TGIF_set_font,
+	TGIF_set_pointsize,TERM_CAN_MULTIPLOT
+
+TERM_TABLE_END(tgif_driver)
+
+#undef LAST_TERM
+
+#define LAST_TERM tgif_driver
+
+#endif /* TERM_TABLE */
+
+#endif /* TERM_PROTO_ONLY */
+
+#ifdef TERM_HELP
+START_HELP(tgif)
+"1 tgif",
+"?set terminal tgif",
+"?set term tgif",
+"?terminal tgif",
+"?term tgif",
+"?tgif",
+" Tgif is an X11-based drawing tool---it has nothing to do with GIF.",
+"",
+" The `tgif` driver supports different pointsizes (with `set pointsize`),",
+" different label fonts and font sizes (e.g. `set label \"Hallo\" at x,y font",
+" \"Helvetica,34\"`) and multiple graphs on the page.  The proportions of the",
+" axes are not changed.",
+"",
+" Syntax:",
+"       set terminal tgif {portrait | landscape} {<[x,y]>}",
+"                         {solid | dashed}",
+"                         {\"<fontname>\"} {<fontsize>}",
+"",
+" where <[x,y]> specifies the number of graphs in the x and y directions on the",
+" page, \"<fontname>\" is the name of a valid PostScript font, and <fontsize>",
+" specifies the size of the PostScript font.  Defaults are `portrait`, `[1,1]`,",
+" `dashed`, `\"Helvetica\"`, and `18`.",
+"",
+" The `solid` option is usually prefered if lines are colored, as they often",
+" are in the editor.  Hardcopy will be black-and-white, so `dashed` should be",
+" chosen for that.",
+"",
+" Multiplot is implemented in two different ways.",
+"",
+" The first multiplot implementation is the standard gnuplot multiplot feature:",
+"",
+"       set terminal tgif",
+"       set output \"file.obj\"",
+"       set multiplot",
+"       set origin x01,y01",
+"       set size  xs,ys",
+"       plot ...",
+"            ...",
+"       set origin x02,y02",
+"       plot ...",
+"       set nomultiplot",
+"",
+" See `set multiplot` for further information.",
+"",
+" The second version is the [x,y] option for the driver itself.  The advantage",
+" of this implementation is that everything is scaled and placed automatically",
+" without the need for setting origins and sizes; the graphs keep their natural",
+" x/y proportions of 3/2 (or whatever is fixed by `set size`).",
+"",
+" If both multiplot methods are selected, the standard method is chosen and a",
+" warning message is given.",
+"",
+" Examples of single plots (or standard multiplot):",
+"       set terminal tgif                  # defaults",
+"       set terminal tgif \"Times-Roman\" 24",
+"       set terminal tgif landscape",
+"       set terminal tgif landscape solid",
+"",
+" Examples using the built-in multiplot mechanism:",
+"       set terminal tgif portrait [2,4]  # portrait; 2 plots in the x-",
+"                                         # and 4 in the y-direction",
+"       set terminal tgif [1,2]           # portrait; 1 plot in the x-",
+"                                         # and 2 in the y-direction",
+"       set terminal tgif landscape [3,3] # landscape; 3 plots in both",
+"                                         # directions"
+END_HELP(tgif)
+#endif
+/*{{{}}}*/

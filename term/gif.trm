@@ -1,0 +1,472 @@
+/* GNUPLOT -- gdgif.trm */
+/*
+ * Copyright (C) 1997
+ *
+ * Permission to use, copy, and distribute this software and its
+ * documentation for any purpose with or without fee is hereby granted, 
+ * provided that the above copyright notice appear in all copies and 
+ * that both that copyright notice and this permission notice appear 
+ * in supporting documentation.
+ *
+ * Permission to modify the software is granted, but not the right to
+ * distribute the modified code.  Modifications are to be distributed 
+ * as patches to released version.
+ *  
+ * This software  is provided "as is" without express or implied warranty.
+ * 
+ * This file is included by ../term.c.
+ *
+ * This terminal driver supports:
+ *  GD GIF library 1.2
+ *
+ * To Use:
+ *
+ * set terminal gif ?options ...?
+ *
+ * Where an option is:
+ *
+ * transparent - generate transparent GIFs.  The first color will
+ * be the transparent one.
+ *
+ * interlace - generate interlaced GIFs.
+ *
+ * size (in pixels)
+ *
+ * font (small,medium,large)
+ *
+ * xrrggbb - sets the next color.  x is the literal character 'x',
+ * rrggbb are the red green and blue components in hex.  For example
+ * x00ff00 is green.  The background color is set first, then the
+ * color borders, then the X & Y axis, then the plotting colors.
+ * (The wierd color spec is in order to get around limitations
+ * in gnuplot's scanner.)
+ *
+ * This driver is modeled after the PBM driver pbm.trm.
+ *
+ * AUTHORS
+ *  Sam Shen sls@mh1.lbl.gov
+ *  Alex Woo woo@playfair.stanford.edu
+ *
+ * send your comments or suggestions to (info-gnuplot@cs.dartmouth.edu).
+ * 
+ * This version outputs either color or monochrome GIFs.  The default
+ * is 640x480 pixels.  
+ *
+ * link with -Lterm/gd -lgd if your directory structure is gnuplot/term/gd
+ *
+ * gd is not distributed with gnuplot, because of the UNISYS license thing.
+ *
+ * find out about gd from http://www.boutell.com/gd/
+ */
+
+#ifndef GOT_DRIVER_H
+#include "driver.h"
+#endif
+
+#ifdef TERM_REGISTER
+register_term(gif)
+#endif
+
+#ifdef TERM_PROTO
+TERM_PUBLIC void GIF_options __PROTO((void));
+TERM_PUBLIC void GIF_init __PROTO((void));
+TERM_PUBLIC void GIF_graphics __PROTO((void));
+TERM_PUBLIC void GIF_text __PROTO((void));
+TERM_PUBLIC void GIF_linetype __PROTO((int linetype));
+TERM_PUBLIC void GIF_move __PROTO((unsigned int x, unsigned int y));
+TERM_PUBLIC void GIF_vector __PROTO((unsigned int x, unsigned int y));
+TERM_PUBLIC void GIF_put_text __PROTO((unsigned int x, unsigned int y, char str[]));
+TERM_PUBLIC int GIF_text_angle __PROTO((int ang));
+TERM_PUBLIC void GIF_reset __PROTO((void));
+
+#include "gd.h"
+extern gdFontPtr gdFontSmall;  /* 6x12 */
+extern gdFontPtr gdFontLarge;  /* 8x16 */
+extern gdFontPtr gdFontMediumBold;  /* 7x13 */
+
+
+#define GREG_XMAX 640
+#define GREG_YMAX 480
+
+
+int GIF_XMAX= GREG_XMAX;
+int GIF_YMAX= GREG_YMAX;
+
+
+#define GIF_FONT_SMALL 1
+#ifdef GIF_FONT_SMALL
+# define gdfont gdFontSmall
+# define GIF_VCHAR 12
+# define GIF_HCHAR 6
+#else
+# define gdfont gdFontMediumBold
+# define GIF_VCHAR 13
+# define GIF_HCHAR 7
+#endif
+
+static gdFontPtr GIF_font;
+
+#define GIF_VTIC (GREG_YMAX/100)
+#define GIF_HTIC (GREG_XMAX/150)
+
+#define GIF_MAX_COLORS 256
+#define GOT_NEXT_PROTO
+#endif
+
+#ifndef TERM_PROTO_ONLY
+#ifdef TERM_BODY
+
+static struct {
+    gdImagePtr image;
+    gdFontPtr font;
+    unsigned int x, y;
+    int height;
+    int charh, charw;
+    int color;
+    int n_colors;
+    int color_table[GIF_MAX_COLORS];
+    int rgb_table[GIF_MAX_COLORS];
+    int angle;
+    int flags;
+} gif_state;
+
+#define GIF_USE_TRANSPARENT 1
+#define GIF_USE_INTERLACE   2
+
+static unsigned int gif_color_rgbs[] = {
+    0xffffff, /* white - background */
+    0x000000, /* black - borders */
+    0x404040, /* gray - X & y axes */
+    0xff0000, /* red */
+    0xffa500, /* orange */
+    0x66cdaa, /* mediumacquamarine */
+    0xcdb5cd, /* thistle3 */
+    0xadd8e6, /* lightblue */
+    0x0000ff, /* blue */
+    0xdda0dd, /* plum */
+    0x9500d3  /* dark violet */
+};
+#define GIF_N_DEFAULT_COLORS (sizeof(gif_color_rgbs)/sizeof(gif_color_rgbs[0]))
+
+/*
+ * _options()  Called when terminal type is selected.  
+ * This procedure should parse options on the command line.  A list of the 
+ * currently selected options should be stored in term_options[] in a form 
+ * suitable for use with the set term command.  term_options[] is used by 
+ * the save command.  Use options_null() if no options are available. 
+ */
+TERM_PUBLIC void GIF_options()
+{
+    int gif_font,i;
+    term_options[0] = '\0';
+    gif_state.n_colors = 0;
+    gif_state.flags = 0;
+    gif_font = 1;
+    GIF_font = gdfont;
+
+    while (!END_OF_COMMAND) {
+      if (almost_equals(c_token, "t$ransparent")) {
+	gif_state.flags |= GIF_USE_TRANSPARENT;
+	++c_token;
+      } else if (almost_equals(c_token, "i$nterlace")) {
+	gif_state.flags |= GIF_USE_INTERLACE;
+	++c_token;
+      } else if (almost_equals(c_token,"s$mall")) {
+	GIF_font=gdFontSmall;
+	gif_font = 1;
+	term->v_char = (unsigned int)(12);
+	term->h_char = (unsigned int)(6);
+	++c_token;
+      } else if (almost_equals(c_token,"m$edium")) {
+	GIF_font=gdFontMediumBold;
+	gif_font = 2;
+	term->v_char = (unsigned int)(13);
+	term->h_char = (unsigned int)(7);
+	++c_token;
+      } else if(almost_equals(c_token,"l$arge")) {
+	GIF_font=gdFontLarge;
+	gif_font = 3;
+	term->v_char = (unsigned int)(16);
+	term->h_char = (unsigned int)(8);
+	++c_token;
+      } else if(almost_equals(c_token,"si$ze")){
+	struct value s;
+	c_token++;
+	if(END_OF_COMMAND){
+	  GIF_XMAX = GREG_XMAX;
+	  GIF_YMAX = GREG_YMAX;
+	  term->v_tic = GIF_YMAX/80;
+	  term->h_tic = GIF_XMAX/80;
+	} else {
+	  GIF_XMAX = real(const_express(&s));
+	  if( equals(c_token,",")){
+	    c_token++;
+	    GIF_YMAX = real(const_express(&s));
+	    term->v_tic = GIF_YMAX/80;
+	    term->h_tic = GIF_XMAX/80;
+	    term->ymax  = GIF_YMAX;
+	    term->xmax  = GIF_XMAX;
+	  }
+	}
+      } else { /* not "size" */
+	char *string = input_line + token[c_token].start_index;
+	unsigned long color;
+	if (sscanf(string, "x%x", &color) != 1) {
+	  int_error("invalid color spec, must be xRRGGBB", c_token);
+	} else if (gif_state.n_colors == GIF_MAX_COLORS) {
+	  int_warn("too many colors, ingoring", c_token);
+	  ++c_token;
+	} else {
+	  gif_state.rgb_table[gif_state.n_colors++] = color;
+	  ++c_token;
+	}
+      }
+    }
+
+
+    /* now generate options string */
+
+    if (gif_state.flags & GIF_USE_TRANSPARENT) {
+      strcat(term_options, "transparent ");
+    }
+    if (gif_state.flags & GIF_USE_INTERLACE) {
+      strcat(term_options, "interlace ");
+    }
+    
+    switch(gif_font) {
+    	case 1: strcat(term_options,"small "); break;
+    	case 2: strcat(term_options,"medium "); break;
+    	case 3: strcat(term_options,"large "); break;
+    }
+    sprintf(term_options+strlen(term_options),
+      "size %d,%d ", GIF_XMAX, GIF_YMAX);
+
+    for( i=0; i < gif_state.n_colors; i++) {
+      sprintf(term_options+strlen(term_options),
+        "x%06x ", gif_state.rgb_table[i] );
+    }
+}
+
+
+/*
+ * _init()  Called once, when the device is first selected.  This procedure
+ * should set up things that only need to be set once, like handshaking and
+ * character sets etc...
+ */
+TERM_PUBLIC void GIF_init()
+{
+}
+
+/*
+ * _reset()  Called when gnuplot is exited, the output device changed or
+ * the terminal type changed.  This procedure should reset the device, 
+ * possibly flushing a buffer somewhere or generating a form feed.
+ */
+TERM_PUBLIC void GIF_reset()
+{
+}
+ 
+/*
+ * _graphics()  Called just before a plot is going to be displayed.  This
+ * procedure should set the device into graphics mode.  Devices which can't
+ * be used as terminals (like plotters) will probably be in graphics mode 
+ * always and therefore won't need this.
+ */
+TERM_PUBLIC void GIF_graphics()
+{
+    int i;
+    unsigned int rgb;
+    gif_state.font = GIF_font;
+    gif_state.color = 0;
+    gif_state.image = gdImageCreate((int) (xsize * GIF_XMAX),
+				    (int) (ysize * GIF_YMAX));
+    gif_state.height = (int) (ysize * GIF_YMAX);
+    gif_state.charw = term->h_char; /* gif_state.font->w; */
+    gif_state.charh = term->v_char; /* gif_state.font->h; */
+    for (i = gif_state.n_colors; i < GIF_N_DEFAULT_COLORS; i++)
+	gif_state.rgb_table[i] = gif_color_rgbs[i];
+    if (gif_state.n_colors < GIF_N_DEFAULT_COLORS)
+	gif_state.n_colors = GIF_N_DEFAULT_COLORS;
+    for (i = 0 ; i < gif_state.n_colors; i++) {
+	rgb = gif_state.rgb_table[i];
+	gif_state.color_table[i] =
+	    gdImageColorAllocate(gif_state.image, (rgb >> 16) & 0xff,
+				 (rgb >> 8) & 0xff, rgb & 0xff);
+    }
+    if (gif_state.flags & GIF_USE_TRANSPARENT)
+	gdImageColorTransparent(gif_state.image,
+				gif_state.color_table[0]);
+    else
+	gdImageColorTransparent(gif_state.image, -1);
+}
+
+/* 
+ * _text()  Called immediately after a plot is displayed.  This procedure 
+ * should set the device back into text mode if it is also a terminal, so
+ * that commands can be seen as they're typed.  Again, this will probably
+ * do nothing if the device can't be used as a terminal.
+ */
+TERM_PUBLIC void GIF_text()
+{
+    if (gif_state.flags & GIF_USE_INTERLACE)
+	gdImageInterlace(gif_state.image, 1);
+    gdImageGif(gif_state.image, outfile);
+    gdImageDestroy(gif_state.image);
+}
+ 
+/* _move(x,y)  Called at the start of a line.  The cursor should move to the
+ * (x,y) position without drawing.
+ */
+TERM_PUBLIC void GIF_move(unsigned int x, unsigned int y)
+{
+    gif_state.x = x;
+    gif_state.y = y;
+}
+
+/* _vector(x,y)  Called when a line is to be drawn.  This should display a line
+ * from the last (x,y) position given by _move() or _vector() to this new (x,y)
+ * position.
+ */
+TERM_PUBLIC void GIF_vector(unsigned int x, unsigned int y)
+{
+    gdImageLine(gif_state.image, gif_state.x, gif_state.height - gif_state.y,
+		x, gif_state.height - y, gif_state.color);
+    gif_state.x = x;
+    gif_state.y = y;
+}
+ 
+/* _linetype(lt)  Called to set the line type before text is displayed or
+ * line(s) plotted.  This procedure should select a pen color or line
+ * style if the device has these capabilities.  
+ * lt is an integer from -2 to 0 or greater.  
+ * An lt of -2 is used for the border of the plot.
+ * An lt of -1 is used for the X and Y axes.  
+ * lt 0 and upwards are used for plots 0 and upwards.
+ * If _linetype() is called with lt greater than the available line types, 
+ * it should map it to one of the available line types.
+ * Most drivers provide 9 different linetypes (lt is 0 to 8).
+ */
+TERM_PUBLIC void GIF_linetype(int type)
+{
+    if (type >= (gif_state.n_colors - 3))
+	type %= (gif_state.n_colors - 3);
+    gif_state.color = gif_state.color_table[type + 3];
+}
+ 
+/* _put_text(x,y,str)  Called to display text at the (x,y) position, 
+ * while in graphics mode.   The text should be vertically (with respect 
+ * to the text) justified about (x,y).  The text is rotated according 
+ * to _text_angle and then horizontally (with respect to the text)
+ * justified according to _justify_text.
+ */
+TERM_PUBLIC void GIF_put_text(unsigned int x, unsigned int y, char* string)
+{
+    if (gif_state.angle == 1) {
+	x += gif_state.charw / 2;
+	gdImageStringUp(gif_state.image, gif_state.font,
+			x, gif_state.height - y,
+			string, gif_state.color);
+    } else {
+	y += gif_state.charh / 2;
+	gdImageString(gif_state.image, gif_state.font,
+		      x, gif_state.height - y,
+		      string, gif_state.color);
+    }
+}
+ 
+/* _text_angle(ang)  Called to rotate the text angle when placing the y label.
+ * If ang = 0 then text is horizontal.  If ang = 1 then text is vertically
+ * upwards.  Returns TRUE if text can be rotated, FALSE otherwise.
+ */
+TERM_PUBLIC int GIF_text_angle(int angle)
+{
+    gif_state.angle = angle;
+    return TRUE;
+}
+
+/*
+ * Local Variables:
+ * mode:C
+ * End:
+ */
+
+#endif /* TERM_BODY */
+#ifdef TERM_TABLE
+
+TERM_TABLE_START(gif_driver)
+        "gif", "GIF format format [\042fontname]",
+       GREG_XMAX, GREG_YMAX, GIF_VCHAR, GIF_HCHAR,
+       GIF_VTIC, GIF_HTIC, GIF_options, GIF_init, GIF_reset,
+       GIF_text, null_scale, GIF_graphics, GIF_move, GIF_vector,
+       GIF_linetype, GIF_put_text, GIF_text_angle,
+       null_justify_text,do_point, do_arrow, set_font_null,
+                        0, /* pointsize */
+                        TERM_CAN_MULTIPLOT | TERM_BINARY
+TERM_TABLE_END(gif_driver)
+
+
+#undef LAST_TERM
+#define LAST_TERM gif_driver
+
+#endif /* TERM_TABLE */
+#endif /* TERM_PROTO_ONLY */
+
+#ifdef TERM_HELP
+START_HELP(gif)
+"1 gif",
+"?set terminal gif",
+"?set term gif",
+"?terminal gif",
+"?term gif",
+"?gif",
+" The `gif` terminal driver generates output in GIF format.  It must be linked",
+" with the \"gd\" library (link with \"-Lterm/gd -lgd\" if your directory structure",
+" is \"gnuplot/term/gd\").  \"gd\" cannot be distributed with `gnuplot` because of",
+" license problems.  Find out about \"gd\" from http://www.boutell.com/",
+"",
+" Syntax:",
+"       set terminal gif {transparent} {interlace}",
+"                        {small | medium | large}",
+"                        {size <x>,<y>}",
+"                        {<color0> <color1> <color2> ...}",
+"",
+" `transparent` instructs the driver to generate transparent GIFs.  The first",
+" color will be the transparent one.",
+"",
+" `interlace` instructs the driver to generate interlaced GIFs.",
+"",
+" The choice of fonts is `small` (6x12 pixels), `medium` (7x13 Bold) or `large`",
+" (8x16).",
+"",
+" The size <x,y> is given in pixels---it defaults to 640x480.  The number of",
+" pixels can be also modified by scaling with the `set size` command.",
+"",
+" Each color must be of the form 'xrrggbb', where x is the literal character",
+" 'x' and 'rrggbb' are the red, green and blue components in hex.  For example,",
+" 'x00ff00' is green.  The background color is set first, then the border",
+" colors, then the X & Y axis colors, then the plotting colors.  The maximum",
+" number of colors that can be set is 256.",
+"",
+" Examples:",
+"       set terminal gif small size 640,480 \\",
+"                        xffffff x000000 x404040 \\",
+"                        xff0000 xffa500 x66cdaa xcdb5cd \\",
+"                        xadd8e6 x0000ff xdda0dd x9500d3    # defaults",
+"",
+" which uses white for the non-transparent background, black for borders, gray",
+" for the axes, and red, orange, medium aquamarine, thistle 3, light blue, blue,",
+" plum and dark violet for eight plotting colors.",
+"",
+"       set terminal gif transparent xffffff \\",
+"                        x000000 x202020 x404040 x606060 \\",
+"                        x808080 xA0A0A0 xC0C0C0 xE0E0E0 \\",
+" which uses white for the transparent background, black for borders, dark",
+" gray for axes, and a gray-scale for the six plotting colors.",
+"",
+" The page size is 640x480 pixels.  The `gif` driver can create either color",
+" or monochromatic output, but you have no control over which is produced.",
+"",
+" The current version of the `gif` driver does not support animated GIFs."
+END_HELP(gif)
+
+#endif

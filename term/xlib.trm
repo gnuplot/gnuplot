@@ -1,0 +1,125 @@
+/*
+ * $Id: xlib.trm,v 1.10 1996/12/08 13:11:51 drd Exp $
+ */
+
+
+/*
+ * xlib.trm - inboard terminal driver for X11 (dumps gnuplot_x11 commands)
+ *
+ * To be used with gnulib_x11.
+ */
+
+/*
+ * adapted to new terminal layout by Stefan Bodewig (Dec. 1995)
+ */
+
+#ifndef GOT_DRIVER_H
+#include "driver.h"
+#endif
+
+#ifdef TERM_REGISTER
+register_term(xlib)
+#endif
+
+#ifdef TERM_PROTO
+TERM_PUBLIC void Xlib_init __PROTO((void));
+TERM_PUBLIC void Xlib_graphics __PROTO((void));
+TERM_PUBLIC void Xlib_text __PROTO((void));
+TERM_PUBLIC void Xlib_reset __PROTO((void));
+TERM_PUBLIC void Xlib_move __PROTO((unsigned int x, unsigned int y));
+TERM_PUBLIC void Xlib_vector __PROTO((unsigned int x, unsigned int y));
+TERM_PUBLIC void Xlib_linetype __PROTO((int lt));
+TERM_PUBLIC void Xlib_put_text __PROTO((unsigned int x, unsigned int y, char str[]));
+TERM_PUBLIC int Xlib_justify_text __PROTO((enum JUSTIFY mode));
+
+#define Xlib_XMAX 4096
+#define Xlib_YMAX 4096
+
+/* approximations for typical font/screen sizes */
+#define Xlib_VCHAR (Xlib_YMAX/25) 
+#define Xlib_HCHAR (Xlib_XMAX/100) 
+#define Xlib_VTIC (Xlib_YMAX/100)
+#define Xlib_HTIC (Xlib_XMAX/150)
+
+#define GOT_XLIB_PROTO
+#endif
+
+#ifndef TERM_PROTO_ONLY
+#ifdef TERM_BODY
+
+TERM_PUBLIC void Xlib_init() { ; }
+
+TERM_PUBLIC void Xlib_graphics() { fprintf(outfile, "G\n"); }
+
+TERM_PUBLIC void Xlib_text()
+{ 
+  fprintf(outfile, "E\n"); fflush(outfile);
+#ifdef ULTRIX_KLUDGE
+  fprintf(outfile, "E\n"); fflush(outfile);
+#endif
+}
+
+TERM_PUBLIC void Xlib_reset() { fprintf(outfile, "R\n"); fflush(outfile); }
+
+TERM_PUBLIC void Xlib_move(x,y)
+     unsigned int x,y;
+{
+  fprintf(outfile, "M%04d%04d\n", x, y);
+}
+
+TERM_PUBLIC void Xlib_vector(x,y)
+     unsigned int x,y;
+{
+  fprintf(outfile, "V%04d%04d\n", x, y);
+}
+
+TERM_PUBLIC void Xlib_linetype(lt)
+     int lt;
+{
+  fprintf(outfile, "L%04d\n", lt);
+}
+
+TERM_PUBLIC void Xlib_put_text(x,y,str)
+     unsigned int x,y;
+     char str[];
+{
+  fprintf(outfile, "T%04d%04d%s\n", x, y, str);
+}
+
+TERM_PUBLIC int Xlib_justify_text(mode)
+     enum JUSTIFY mode;
+{
+  fprintf(outfile, "J%04d\n", mode);
+  return(TRUE);
+}
+
+#endif
+
+#ifdef TERM_TABLE
+TERM_TABLE_START(xlib_driver)
+     "xlib", "X11 Window System (gnulib_x11 dump)",
+	   Xlib_XMAX, Xlib_YMAX, Xlib_VCHAR, Xlib_HCHAR, 
+	   Xlib_VTIC, Xlib_HTIC, options_null, Xlib_init, Xlib_reset, 
+	   Xlib_text, null_scale, Xlib_graphics, Xlib_move, Xlib_vector, 
+	   Xlib_linetype, Xlib_put_text, null_text_angle, 
+	   Xlib_justify_text, line_and_point, do_arrow, set_font_null
+TERM_TABLE_END(xlib_driver)
+#undef LAST_TERM
+#define LAST_TERM xlib_driver
+
+#endif /* TERM_TABLE */
+#endif /* TERM_PROTO_ONLY */
+
+#ifdef TERM_HELP
+START_HELP(xlib)
+"1 xlib",
+"?set terminal xlib",
+"?set term xlib",
+"?terminal xlib",
+"?term xlib",
+"?xlib",
+" The `xlib` terminal driver supports the X11 Windows System.  It generates",
+" gnulib_x11 commands.  `set term x11` behaves similarly to `set terminal xlib;",
+" set output \"|gnuplot_x11\"`.  `xlib` has no options, but see `x11`."
+END_HELP(xlib)
+#endif
