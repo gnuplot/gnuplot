@@ -158,14 +158,14 @@ wgnuplot.mnu: win/wgnuplot.mnu
 texticon.ico: grpicon.ico
 
 grpicon.ico: geticon.exe win/wgnuplot.rc
-	geticon win/wgnuplot.rc
+	./geticon win/wgnuplot.rc
 
 geticon.exe: win/geticon.c
 	$(LD) $(LDFLAGS) -o $@ win/geticon.c
 
 # convert gnuplot.doc to gnuplot.rtf
 $(HELPFILE): doc2rtf.exe docs/gnuplot.doc win/wgnuplot.hpj
-	doc2rtf docs/gnuplot.doc win/gnuplot.rtf
+	./doc2rtf docs/gnuplot.doc win/gnuplot.rtf
 	$(HCW) \/c \/e win/wgnuplot.hpj
 
 doc2rtf.exe: docs/doc2rtf.c docs/termdoc.c docs/xref.c
