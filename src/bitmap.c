@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: bitmap.c,v 1.10 1999/10/29 18:47:16 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: bitmap.c,v 1.11 1999/11/08 19:24:27 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - bitmap.c */
@@ -861,7 +861,7 @@ unsigned int x, y;
 {
   register unsigned int row;
   register unsigned char mask;
-  register unsigned char value;
+  register unsigned short value=0; /* HBB 991123: initialize! */
   int i;
 
   if (b_rastermode) {
@@ -880,7 +880,10 @@ unsigned int x, y;
 		row -= b_psize;
 		value <<= 1;
 	}
-    return(value);
+   
+/* HBB 991123: the missing '>>1' was the 'every second color' problem
+ * with PNG in 3.8a...*/
+    return(value>>1);		
   }
   else
   {
