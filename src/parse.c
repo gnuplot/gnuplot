@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: parse.c,v 1.22 2004/04/13 17:23:58 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: parse.c,v 1.23 2004/07/01 17:10:07 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - parse.c */
@@ -729,6 +729,7 @@ cleanup_udvlist()
 	    udv_dead = udv_ptr->next_udv;
 	    udv_ptr->next_udv = udv_dead->next_udv;
 	    FPRINTF((stderr,"cleanup_udvlist: deleting %s\n",udv_dead->udv_name));
+	    free(udv_dead->udv_name);
 	    free(udv_dead);
 	} else
 	    udv_ptr = udv_ptr->next_udv;
