@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.38 2002/02/02 12:03:31 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.39 2002/02/13 17:59:36 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -626,9 +626,11 @@ set style data ",
     case CANDLESTICKS:
 	fputs("candlesticks\n", fp);
 	break;
+#ifdef PM3D
     case PM3DSURFACE:
 	fputs("pm3d\n", fp);
 	break;
+#endif
     }
     
     /* FIXME HBB 20010816: Useless code duplication. Outputting the

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.38 2002/02/02 12:03:31 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.39 2002/02/13 22:58:17 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -255,9 +255,11 @@ plot3drequest()
     AXIS_INIT3D(V_AXIS, 1, 0);
     /* will set CB_AXIS.min / CB_AXIS.max to VERYLARGE / -VERYLARGE
      * respectively, which is used and assumed in pm3d.c:set_pm3d_zminmax() */
+#ifdef PM3D
     AXIS_INIT3D(COLOR_AXIS, 0, 1);
     g_non_pm3d_min =  VERYLARGE;
     g_non_pm3d_max = -VERYLARGE;
+#endif
 
     if (!term)			/* unknown */
 	int_error(c_token, "use 'set term' to set terminal type first");
@@ -833,9 +835,7 @@ get_3ddata(this_plot)
 		    cp->ylow = color; /* abuse ylow for storing the color value */
 		    update_pm3d_zrange(color, NEED_PALETTE(this_plot));
 		} else {
-#endif
 		    update_pm3d_zrange(z, NEED_PALETTE(this_plot));
-#ifdef PM3D
 		}
 #endif
 	    }

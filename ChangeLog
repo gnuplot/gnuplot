@@ -1,3 +1,8 @@
+2002-02-15  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* src/graphics.c src/mouse.c src/plot3d.c src/save.c src/show.c:
+	Let them compile without PM3D #defined.
+
 2002-02-15  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* docs/Makefile.in: Add missing .trm files to CORETERM. Always build

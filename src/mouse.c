@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.27 2002/02/13 22:58:17 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.28 2002/02/14 14:28:11 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -1763,10 +1763,13 @@ do_save_3dplot(struct surface_points *plots, int pcount, int quick)
 	 * should set up again everything. */
 	replotrequest();
     } else {
-	if ((X_AXIS.log && (X_AXIS.min <= 0 || X_AXIS.max <= 0)) ||
-	    (Y_AXIS.log && (Y_AXIS.min <= 0 || Y_AXIS.max <= 0)) ||
-	    (Z_AXIS.log && (Z_AXIS.min <= 0 || Z_AXIS.max <= 0)) ||
-	    (CB_AXIS.log && (CB_AXIS.min <= 0 || CB_AXIS.max <= 0))) {
+	if ((X_AXIS.log && (X_AXIS.min <= 0 || X_AXIS.max <= 0))
+	    || (Y_AXIS.log && (Y_AXIS.min <= 0 || Y_AXIS.max <= 0))
+	    || (Z_AXIS.log && (Z_AXIS.min <= 0 || Z_AXIS.max <= 0))
+#ifdef PM3D
+	    || (CB_AXIS.log && (CB_AXIS.min <= 0 || CB_AXIS.max <= 0))
+#endif
+	    ) {
 		graph_error("axis ranges must be above 0 for log scale!");
 		return;
 	}

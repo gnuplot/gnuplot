@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.72 2002/02/13 17:59:36 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.73 2002/02/15 13:23:45 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -1416,9 +1416,11 @@ show_styles(name, style)
     case CANDLESTICKS:
 	fputs("candlesticks\n", stderr);
 	break;
+#ifdef PM3D
     case PM3DSURFACE:
 	fputs("pm3d\n", stderr);
 	break;
+#endif
     }
 }
 
