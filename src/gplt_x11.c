@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.91 2004/03/24 19:28:21 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.92 2004/03/25 17:21:42 mikulik Exp $"); }
 #endif
 
 #define X11_POLYLINE 1
@@ -8,7 +8,7 @@ static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.91 2004/03/24 19:28:21 
 /* GNUPLOT - gplt_x11.c */
 
 /*[
- * Copyright 1986 - 1993, 1998   Thomas Williams, Colin Kelley
+ * Copyright 1986 - 1993, 1998, 2004   Thomas Williams, Colin Kelley
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted,
@@ -64,24 +64,6 @@ static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.91 2004/03/24 19:28:21 
  *
  * drd: change to allow multiple windows to be maintained independently
  *       
- * There is a mailing list for gnuplot users. Note, however, that the
- * newsgroup 
- *	comp.graphics.apps.gnuplot 
- * is identical to the mailing list (they
- * both carry the same set of messages). We prefer that you read the
- * messages through that newsgroup, to subscribing to the mailing list.
- * (If you can read that newsgroup, and are already on the mailing list,
- * please send a message to majordomo@dartmouth.edu, asking to be
- * removed from the mailing list.)
- *
- * The address for mailing to list members is
- *	   info-gnuplot@dartmouth.edu
- * and for mailing administrative requests is 
- *	   majordomo@dartmouth.edu
- * The mailing list for bug reports is 
- *	   bug-gnuplot@dartmouth.edu
- * The list of those interested in beta-test versions is
- *	   info-gnuplot-beta@dartmouth.edu
  *---------------------------------------------------------------------------*/
 
 /* drd : export the graph via ICCCM primary selection. well... not quite

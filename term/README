@@ -89,7 +89,7 @@ new interface entry pointers to dummy functions.
 We can add fields to the terminal structure, but only at the end of the list.
 If you design a terminal that can't work without a new interface being defined,
 and consequent changes to the main gnuplot source, please contact
-bug-gnuplot@dartmouth.edu simply to ensure that you have the most
+gnuplot-beta@lists.sourceforge.net simply to ensure that you have the most
 up to date definition of the terminal structure. Also, please ensure that
 the 'set term' command checks for 0 values in added fields when an
 old driver is selected, and a pointer to a suitable 'can't do' function

@@ -1,11 +1,11 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.59 2003/11/25 18:13:12 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.60 2003/12/01 16:15:53 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
 
 /*[
- * Copyright 1986 - 1993, 1998   Thomas Williams, Colin Kelley
+ * Copyright 1986 - 1993, 1998, 2004   Thomas Williams, Colin Kelley
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted,

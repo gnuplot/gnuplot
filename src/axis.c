@@ -1,11 +1,11 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.41 2004/03/23 17:15:24 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.42 2004/03/30 16:29:07 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
 
 /*[
- * Copyright 2000   Thomas Williams, Colin Kelley
+ * Copyright 2000, 2004   Thomas Williams, Colin Kelley
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted,

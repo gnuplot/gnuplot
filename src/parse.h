@@ -1,11 +1,11 @@
 /*
- * $Id: parse.h,v 1.8 2003/07/22 17:41:10 sfeam Exp $
+ * $Id: parse.h,v 1.9 2003/11/25 18:13:12 sfeam Exp $
  */
 
 /* GNUPLOT - parse.h */
 
 /*[
- * Copyright 1986 - 1993, 1998   Thomas Williams, Colin Kelley
+ * Copyright 1986 - 1993, 1998, 2004   Thomas Williams, Colin Kelley
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted,

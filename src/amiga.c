@@ -1,9 +1,9 @@
-/* $Id: amiga.c,v 1.1 1999/03/26 21:47:21 lhecking Exp $ */
+/* $Id: amiga.c,v 1.2 2002/04/30 13:39:11 lhecking Exp $ */
 
 /* GNUPLOT - amiga.c */
 
 /*[
- * Copyright 1986 - 1993, 1998   Thomas Williams, Colin Kelley
+ * Copyright 1986 - 1993, 1998, 2004   Thomas Williams, Colin Kelley
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted,

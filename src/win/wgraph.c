@@ -1,10 +1,10 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.35 2003/11/20 11:19:35 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.36 2004/02/21 19:06:18 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - win/wgraph.c */
 /*[
- * Copyright 1992, 1993, 1998   Maurice Castro, Russell Lang
+ * Copyright 1992, 1993, 1998, 2004   Maurice Castro, Russell Lang
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted,
@@ -38,13 +38,6 @@ static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.35 2003/11/20 11:19:35 br
  * 
  *   Maurice Castro
  *   Russell Lang
- * 
- * Send your comments or suggestions to 
- *  info-gnuplot@dartmouth.edu.
- * This is a mailing list; to join it send a note to 
- *  majordomo@dartmouth.edu.  
- * Send bug reports to
- *  bug-gnuplot@dartmouth.edu.
  */
 
 #define STRICT

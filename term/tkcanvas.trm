@@ -1,12 +1,12 @@
 /*
- * $Id: tkcanvas.trm,v 1.20 2001/10/01 13:42:51 lhecking Exp $
+ * $Id: tkcanvas.trm,v 1.21 2002/04/16 11:02:11 broeker Exp $
  *
  */
 
 /* GNUPLOT - tkcanvas.trm */
 
 /*[
- * Copyright 1990 - 1993, 1998
+ * Copyright 1990 - 1993, 1998, 2004
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted,
@@ -49,7 +49,7 @@
  *  D. Jeff Dionne, July 1995 jeff@ryeham.ee.ryerson.ca
  *  Alex Woo, woo@playfair.stanford.edu
  *
- * send your comments or suggestions to (info-gnuplot@dartmouth.edu).
+ * send your comments or suggestions to (gnuplot-info@lists.sourceforge.net).
  * 
  */
 

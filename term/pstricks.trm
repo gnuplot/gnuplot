@@ -1,12 +1,12 @@
 /* Hey Emacs this is -*- C -*-
  * 
- * $Id: pstricks.trm,v 1.23 2003/04/04 21:19:08 sfeam Exp $
+ * $Id: pstricks.trm,v 1.24 2004/03/29 10:43:36 broeker Exp $
  */
 
 /* GNUPLOT - pstricks.trm */
 
 /*[
- * Copyright 1990 - 1993, 1998
+ * Copyright 1990 - 1993, 1998, 2004
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted,
@@ -59,7 +59,7 @@
  *		"nice" numbers for axis labels.  This should really be at
  *		a higher level in the code, but I'm lazy right now.
  *
- * send your comments or suggestions to (info-gnuplot@dartmouth.edu).
+ * send your comments or suggestions to (gnuplot-info@lists.sourceforge.net).
  *
  */
 

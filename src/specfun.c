@@ -1,11 +1,11 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: specfun.c,v 1.25 2003/12/14 22:16:01 vanzandt Exp $"); }
+static char *RCSid() { return RCSid("$Id: specfun.c,v 1.26 2004/02/13 01:16:39 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - specfun.c */
 
 /*[
- * Copyright 1986 - 1993, 1998   Thomas Williams, Colin Kelley
+ * Copyright 1986 - 1993, 1998, 2004   Thomas Williams, Colin Kelley
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted,

@@ -1,5 +1,5 @@
 /*
- * $Id: mac.trm,v 1.4 1999/06/22 11:54:19 lhecking Exp $
+ * $Id: mac.trm,v 1.5 2003/02/18 16:38:12 broeker Exp $
  *
  */
 
@@ -8,7 +8,7 @@
 /* Macintosh graphics terminal */
 
 /*[
- * Copyright 1986 - 1993, 1998   Thomas Williams, Colin Kelley
+ * Copyright 1986 - 1993, 1998, 2004   Thomas Williams, Colin Kelley
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted,

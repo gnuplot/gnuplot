@@ -1,12 +1,12 @@
 /*
- * $Id: doc2x.h,v 1.6 1999/11/08 19:24:52 lhecking Exp $
+ * $Id: doc2x.h,v 1.7 1999/11/15 22:23:06 lhecking Exp $
  *
  */
 
 /* GNUPLOT - doc2x.h */
 
 /*[
- * Copyright 1986 - 1993, 1998   Thomas Williams, Colin Kelley
+ * Copyright 1986 - 1993, 1998, 2004   Thomas Williams, Colin Kelley
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted,

@@ -1,11 +1,11 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: strftime.c,v 1.4 2000/11/01 18:57:33 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: strftime.c,v 1.5 2002/02/25 03:10:41 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - strftime.c */
 
 /*[
- * Copyright 1986 - 1993, 1998   Thomas Williams, Colin Kelley
+ * Copyright 1986 - 1993, 1998, 2004   Thomas Williams, Colin Kelley
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted,

@@ -1,11 +1,11 @@
 /*
- * $Id: term_api.h,v 1.26 2004/03/25 12:36:02 broeker Exp $
+ * $Id: term_api.h,v 1.27 2004/03/29 10:43:36 broeker Exp $
  */
 
 /* GNUPLOT - term_api.h */
 
 /*[
- * Copyright 1999   Thomas Williams, Colin Kelley
+ * Copyright 1999, 2004   Thomas Williams, Colin Kelley
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted,

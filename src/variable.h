@@ -1,11 +1,11 @@
 /*
- * $Id: variable.h,v 1.11 2001/08/22 14:15:34 broeker Exp $
+ * $Id: variable.h,v 1.12 2002/09/02 21:03:28 mikulik Exp $
  */
 
 /* GNUPLOT - variable.h */
 
 /*[
- * Copyright 1999   Lars Hecking
+ * Copyright 1999, 2004   Lars Hecking
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted,

@@ -1,5 +1,5 @@
 #ifdef INCRCSDATA
-static char RCSid[]="$Id: print.c,v 1.10 1998/03/22 22:34:24 drd Exp $" ;
+static char RCSid[]="$Id: print.c,v 1.1 1999/03/26 22:15:54 lhecking Exp $" ;
 #endif
 
 /****************************************************************************
@@ -15,7 +15,7 @@ static char RCSid[]="$Id: print.c,v 1.10 1998/03/22 22:34:24 drd Exp $" ;
 /* PM driver for GNUPLOT */
 
 /*[
- * Copyright 1992, 1993, 1998 Roger Fearick
+ * Copyright 1992, 1993, 1998, 2004 Roger Fearick
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted,
@@ -48,14 +48,7 @@ static char RCSid[]="$Id: print.c,v 1.10 1998/03/22 22:34:24 drd Exp $" ;
  * AUTHOR
  * 
  *   Gnuplot driver for OS/2:  Roger Fearick
- * 
- * Send your comments or suggestions to 
- *  info-gnuplot@dartmouth.edu.
- * This is a mailing list; to join it send a note to 
- *  majordomo@dartmouth.edu.  
- * Send bug reports to
- *  bug-gnuplot@dartmouth.edu.
-**/
+ */
 
 #define INCL_SPLDOSPRINT
 #define INCL_DOSPROCESS

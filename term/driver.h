@@ -1,9 +1,9 @@
-/* $Id: driver.h,v 1.18 2000/11/14 15:35:51 mikulik Exp $ */
+/* $Id: driver.h,v 1.19 2002/02/25 03:10:41 broeker Exp $ */
 
 /* GNUPLOT - driver.h */
 
 /*[
- * Copyright 1986 - 1993, 1998   Thomas Williams, Colin Kelley
+ * Copyright 1986 - 1993, 1998, 2004   Thomas Williams, Colin Kelley
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted,

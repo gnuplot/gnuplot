@@ -1,11 +1,11 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: cgm.trm,v 1.55 2003/05/09 20:01:28 sfeam Exp $
+ * $Id: cgm.trm,v 1.56 2004/03/11 06:28:10 sfeam Exp $
  */
 
 /* GNUPLOT - cgm.trm */
 
 /*[
- * Copyright 1998
+ * Copyright 1998, 2004
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted,
@@ -71,7 +71,7 @@
  *   Jim Van Zandt <jrv@vanzandt.mv.com>
  *
  * send your comments or suggestions to the author or
- * info-gnuplot@dartmouth.edu.
+ * gnuplot-info@lists.sourceforge.net.
 */
 
 #include "driver.h"

@@ -1,11 +1,11 @@
 /*
- * $Id: graphics.h,v 1.22 2002/09/27 00:12:25 sfeam Exp $
+ * $Id: graphics.h,v 1.23 2002/10/21 10:24:18 mikulik Exp $
  */
 
 /* GNUPLOT - graphics.h */
 
 /*[
- * Copyright 1999
+ * Copyright 1999, 2004
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted,

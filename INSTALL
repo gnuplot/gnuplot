@@ -17,20 +17,14 @@ Table of contents:
     * Front-ends for gnuplot
 	- Few notes about graphical front-ends for gnuplot.
 
+  The description of preprocessor options previously found here has
+been moved to a new file called PORTING. Generic installation
+instructions for `configure', such as distributed with FSF/GNU
+packages, are in INSTALL.gnu.
 
-???????????
-Part three explains in detail how --with-PACKAGE=PATH works, and how
-this option interacts with --libdir and --includedir.
-???????????
-Part four addresses some platform specific problems and testing issues.
-???????????
-There are also some hints how to build gnuplot with pre-ANSI C compilers.
-
-
-  The description of preprocessor options previously found here has been moved
-to a new file called PORTING. Generic installation instructions for `configure',
-such as distributed with FSF/GNU packages, have been moved to the file
-INSTALL.gnu.
+If you're installing a binary package, you may still want to check out
+some sections of this document, particularly the one discussing
+environment variables.
 
 
 Installation from sources
@@ -39,20 +33,17 @@ Installation from sources
 For the impatient
 -----------------
 
-   First, tune term.h to choose which terminal drivers you wish to enable.
-If you want to support gif output, you need to download, compile and
-install the gd library : see term/gif.trm for details.
+   Configuration options are in the Makefile and in src/term.h, which
+selects the set of terminal drivers to be compiled in.  
 
-   If you want to support png output (free gif alternative), you need
-png and z libraries : see term/png.trm for details.  Note that the
-png library will probably not compile without an ANSI/ISO C compiler.
+   The recommended way to configure both of these is the GNU-style
+"./configure" script described below, and also in INSTALL.gnu.
 
    A complete overview of configure options is below in the Basic
 Installation section. On platforms which do not support GNU
 autoconf/configure, ie. most non-Unix platforms, look for a makefile
-that looks suitable, (makefile.emx for emx on dos, makefile.nt for
-MS VC++ 4.x on NT and probably win95, makefile.win for borland c on
-win95/nt, makefile.wc for DOS Watcom C etc.)
+that looks suitable in the "config" directory.  Check "config/README"
+to see which of them to use for which platform.
 
 File location defaults
 ----------------------
@@ -125,13 +116,16 @@ can be controlled in different ways:
    make X11_DRIVER_DIR='/gnuplot/lib/4.0'
    gnuplot_x11 will be installed as /gnuplot/lib/4.0/gnuplot_x11
 
-   If the executables are not installed in the default location, files
-written by the `save' command cannot be used as scripts on Un*x platforms.
-There is no way to specify the location of the executables during
-runtime. Other platforms are not affected by this. 
+If you don't install the program at the place chosen by ./configure,
+e.g. by overriding the "prefix" at "make install" time, files written
+by the `save' command cannot be used as scripts on Un*x platforms, so
+this should be avoided.  There is no way to specify the location of
+the executables during runtime. Other platforms are not affected by
+this.
 
-   The gnuplot demo files are not installed by default. If desired, they
-should be copied manually to a location of choice.
+   The gnuplot demo files are not installed by default, mainly because
+there is no universally agreed place where such files should go.
+If desired, they should be copied manually to a location of choice.
 
 Unix, configure
 ---------------
@@ -143,7 +137,7 @@ $ make
 $ make install
 
    If gcc is installed, it is used by default. A different compiler can be
-used through the CC environment variable:
+used by passing its name to configure:
 
 $ ./configure CC=c89
  
@@ -203,10 +197,10 @@ $ ./configure --help
   --enable-mgr            enable MGR terminal
   --enable-rgip           enable Redwood Graphics Interface Protocol
 
-Options marked with (*) are enabled by default, ie. these features or packages
-are used if configure detects them even if the corresponding option is not
-specified.  Please note that the `--with-PACKAGE' options can have additional
-arguments:
+Options marked with (*) are enabled by default, ie. these features or
+packages are used if configure detects them even if the corresponding
+option is not specified.  Please note that the `--with-PACKAGE'
+options can have additional arguments:
 
  o `--with-PACKAGE' is equivalent to `--with-PACKAGE=yes'
  o `--with-PACKAGE=no' disables checking for PACKAGE. It has the same
@@ -221,6 +215,14 @@ Unix, no configure
   any changes.  See especially the HELPDEST and TERMFLAGS variables.  Edit 
   if needed.  Alternatively, all these variables may be set as command 
   line arguments to 'make'. For example:
+
+   Next tune term.h to choose which terminal drivers you wish to
+   enable.  If you want to support gif output, you need to download,
+   compile and install the gd library : see term/gif.trm for details.
+
+   If you want to support png output (free gif alternative), you need
+png and z libraries : see term/png.trm for details.  Note that the
+png library will probably not compile without an ANSI/ISO C compiler.
 
         make <MACHINE> HELPDEST='/usr/um/misc/lib' \
                 DEST='/usr/um/misc/bin' READLINE=
@@ -307,42 +309,61 @@ Using TurboC
 MS-Windows
 ----------
 
+You'll need a help compiler from Microsoft to build the on-line help
+for gnuplot.  Some versions of that, including the one coming with
+version 4.0 of MSVC++ and with Borland C++ Builder 1.0, appear unable
+to compile gnuplot.rtf.  The freely available "Help Workshop" download
+from Microsoft is known to work, so in case of down you should get and
+use that.
+
+General install instructions:
+ Change into the "src" subdirectory.
+ Build the program using one of the ways shown below this note.
+ Put wgnuplot.exe, wgnuplot.hlp and wgnuplot.mnu all in a single
+  directory somewhere.  You may want to add that directory to your PATH.
+ There's no installer for gnuplot, so if you want a desktop link,
+  program manager group or an association of *.plt or *.gpl files to
+  wgnuplot, you'll have to do all that yourself.
+
 Using Visual C++ and compiling for Windows (32-bit, i.e. 9x and NT family)
-      nmake -f makefile.nt
+      nmake -f ..\config\makefile.nt
  or
-      copy makefile.nt makefile
+      copy ..\config\makefile.nt makefile
       nmake
 
 Using the MinGW32 port of gcc: you need parts of the Micrsoft SDK for the
 moment.
-      copy makefile.mgw makefile
+      copy ..\config\makefile.mgw makefile
   Look through the Makefile to see if you need to make any changes.
       make 
       make install
 
 Using the Cygwin port of gcc, which includes MinGW32: you need parts of
 the Microsoft SDK for the moment.
-      copy makefile.cyg makefile
+      copy ..\config\makefile.cyg makefile
   Look through the Makefile to see if you need to make any changes.
       make
-  Put wgnuplot.exe, wgnuplot.dll, wgnuplot.hlp and wgnuplot.mnu
-  in the windows directory.
 
+Using Borland C++ 32 bit compilers, like the freely downloadable BCC55:
+      copy ..\config\makefile.win makefile.win
+  Look through makefile.win to see if you need to make any changes.
+  You'll probably have to change TC and some others.
+      make -fmakefile.win WIN32=1
+      
 [NOTE: the 16-bit Windows version no longer work.  gnuplot has become
 too large.]
 
 Using Microsoft C 7.0 and compiling for MS-Windows (16-bit)
-      copy makefile.msw makefile
+      copy ..\config\makefile.msw makefile
+  Look through the Makefile to see if you need to make any changes.
       nmake
-  Put wgnuplot.exe, wgnuplot.dll, wgnuplot.hlp and wgnuplot.mnu
-  in the windows directory.
 
 Using Borland C++ 3.1 and compiling for MS-Windows (16-bit)
-      copy makefile.win makefile
-  Edit makefile to change TC.
-      make
-  Put wgnuplot.exe, wgnuplot.dll, wgnuplot.hlp and wgnuplot.mnu
-  in the windows directory.
+      copy ..\config\makefile.win makefile.win
+  Look through the Makefile to see if you need to make any changes.
+  You'll probably have to change TC and some others.
+      make -fmakefile.win
+
 
 MSDOS
 -----
@@ -351,7 +372,8 @@ Using DJGPP (32-bit DOS port of GNU CC)
   Basically the same as Unix+configure. Andris Pavenis <pavenis@lanet.lv>
   has contributed a shell script which makes the whole process even easier:
   just run djconfig.sh, and then make.
-  For novices, it is recommended to use makefile.dj2 instead:
+  Only if you don't have a complete Unix toolset installed with your
+  DJGPP, it is recommended to use makefile.dj2 instead:
       copy makefile.dj2 makefile
       make
 
@@ -367,6 +389,9 @@ Using Borland C++ 3.0 targetting 16-bit DOS
   Edit makefile to change TC, BIN, BGI, BGIOBJ. You may also want to turn
   off overlays (See manual for more on overlays).
       make
+
+You'll want to copy the compiled executable and gnuplot.gih to a
+directory on your PATH to make them easily usable.
 
 The file gnuplot.gih is needed for help on the PC.
 If the file gnuplot.gih is not in the default directory, then use:
@@ -448,7 +473,10 @@ non-default location that is not searched by the preprocessor or linker.
   --with-gd[=DIR]
 
    Dto. for Thomas Boutell's gd library. configure determines whether
-   the found library supports gif, png, jpeg, and freetype. On by default.
+   the found library supports gif, png, jpeg, and freetype.  This option
+   is on by default, i.e. configure will check if the library exists,
+   and use it if found, if you don't specify any option regarding this
+   package.
 
   --with-png[=DIR]
 
@@ -483,33 +511,34 @@ Platform and compiler notes
 ---------------------------
 
    Generally, if you think that configure has made a mistake in detecting
-platform features, there are two ways to switch these off. 
+platform features, you should consider that a bug either in GNU autoconf
+or in gnuplot's use of it, which you should report.  As a workaround
+you can override such faulty tests in a site-wide collection
+of preset configure test results, or manually override them after running
+configure.
 
    Example:
 configure was for some reason unable to detect the memset() function, but
-you are sure it is ok to use on your platform. Now you can either edit
-config.cache and change
+you are sure it is ok to use on your platform.  To fix that, you'll have
+to edit the generated config.h and change the line 
 
- ac_cv_func_memset=${ac_cv_func_memset='no'}  to
- ac_cv_func_memset=${ac_cv_func_memset='yes'}  
+	/* #undef HAVE_MEMSET */ 
+to
+	#define HAVE_MEMSET 1
 
-and rerun configure, or, edit config.h and change
-
-/* #undef HAVE_MEMSET */ to
-#define HAVE_MEMSET 1
-
-   Note that changing such defines at compile time, eg. via
-'make DEFS=-DHAVE_MEMSET' is wrong, because the DEFS variable in Makefile
-may contain other defines (make DEFS='-DHAVE_CONFIG_H -DHAVE_MEMSET'
-should work, though).
+   Note that changing such defines from outside config.h, eg. via
+'make DEFS=-DHAVE_MEMSET' is wrong, because config.h will usually
+override such changes.  Also note that this change will be lost 
+whenever you re-run configure.
 
  - gcc -ansi
+
    If you wish to compile with gcc -ansi (CC='gcc -ansi -pedantic'
   ./configure), additional platform specific defines may be necessary
-  to include non-ANSI function prototypes. E.g. on Solaris, -D__EXTENSIONS__
-  is needed. Otherwise, non-declared functions not returning int will be
-  assumed to return int, with possibly dangerous consequences. Especially
-  scpecfun.c is vulnerable here.
+  to include non-ANSI function prototypes. E.g. on Solaris,
+  -D__EXTENSIONS__ is needed. Otherwise, non-declared functions not
+  returning int will be assumed to return int, with possibly
+  dangerous consequences. Especially scpecfun.c is vulnerable here.
 
  - HP-UX 9.x
    It is recommended to use gcc, although the native compiler cc may
@@ -536,11 +565,6 @@ should work, though).
   are too old. Note that you need be very careful to select the
   correct compiler options/ABI's.
 
- - MS-DOS
-   If ports of common Unix utilities (bash, sed etc) are available,
-  gnuplot can be built with DJGPP. Install instructions are the same
-  as for Unix (with configure).
-
  - SunOS 4.x
    An ANSI/ISO C compiler should be used to compile gnuplot. It is
   recommended to install gcc. If this is not an option, the system
@@ -553,6 +577,11 @@ should work, though).
    An ANSI/ISO C compiler should be used to compile gnuplot. It is
   recommended to install gcc. If this is not an option, the system
   compiler cc can be made to work with Wietse Venema's unproto tool.
+
+  Note that as of gnuplot-4.0, the alternative tool ansi2knr is
+  included with the gnuplot source distribution and should
+  automatically be used by automake to do this job for you, so you
+  shouldn't need unproto any longer.
 
   unproto is available from
   ftp://ftp.win.tue.nl/pub/unix/unproto5.shar.Z
@@ -576,65 +605,76 @@ should work, though).
   not necessary to "install" unproto, one can just create a subdirectory
   in gnuplot's source directory and use it from there.
 
-
 Environment variables
 =====================
 
 See 'help environment'.
 
-If the environment variable GNUTERM is found, it is used as the terminal
-type. Otherwise, in some cases the variable TERM will be used, or the
-hardware may be automatically detected.
+If the environment variable GNUTERM is found, it is used as the
+terminal type.  Otherwise, in some cases the variable TERM will be
+used, or the hardware may be detected automatically.  If all else
+fails, a compile-time default will be used.
 
 The PC version looks for the environment variable GNUPLOT to contain
 the name of the directory from which to load the initialization file
-GNUPLOT.INI.  See the help on 'start_up' for more information.
+GNUPLOT.INI and also to be used as the home directory in ~
+substitution.  See the help on 'start_up' for more information.
 
 HOME is examined as a directory where a .gnuplot startup file might be
-found. See help on "start-up". The Atari/MTOS version uses GNUPLOTPATH.
+found. See help on "start-up". The Atari/MTOS version uses
+GNUPLOTPATH.
 
-If defined, the environment variable GNUHELP is used for the name
-of the .gih help file, otherwise HELPFILE (defined in makefile or
+If defined, the environment variable GNUHELP is used for the name of
+the .gih help file, otherwise HELPFILE (defined in makefile or
 command.c) is used.
 
-The VMS version looks for the logical name GNUPLOT$HELP to locate
-the help library.
+The VMS version looks for the logical name GNUPLOT$HELP to locate the
+help library.
 
-If gnuplot is configured to use its own, private history file, the size
-of this file can be set via GNUPLOT_HISTORY_SIZE. The default is 666
-(lines).
+The usual system-wide environment variable is used to locate a command
+line shell to be used for executing commands and starting sub-shells.
+On the DOS family of platforms (including all versions of Windows and
+OS/2) the variable looked at is COMSPEC.  Other platforms will consult
+SHELL.
 
-If gnuplot is configured for the X11 window system, it looks for the X11
-driver program in GNUPLOT_DRIVER_DIR (default platform-dependent). This
-variable was introduced when the X11 driver program was moved into a
-platform-dependent location to allow concurrent use of drivers with
-different builtin features.
+If gnuplot is configured to use its own, private history file, the
+size of this file can be set via GNUPLOT_HISTORY_SIZE. The default is
+666 (lines).
+
+If gnuplot is configured for the X11 window system, it looks for the
+X11 driver program in GNUPLOT_DRIVER_DIR.  The default position used
+for the driver is fixed by the build process, so you should only have
+to set this if you moved gnuplot_x11 away from its original location.
 
 GNUPLOT_FONTPATH is used by the postscript driver as search path for
 TrueType fonts.
 
-GNUPLOT_LIB may be used to define additional search directories for data
-and command files. The variable may contain a single directory name, or
-a list of directories separated by a platform-specific path separator,
-eg. ':' on Unix, or ';' on DOS/Windows/OS/2/Amiga platforms. The contents
-of GNUPLOT_LIB are appended to the `loadpath` variable, but not saved
-with the `save` and `save set` commands.
+GNUPLOT_LIB may be used to define additional search directories for
+data and command files. The variable may contain a single directory
+name, or a list of directories separated by a platform-specific path
+separator, eg. ':' on Unix, or ';' on DOS/Windows/OS/2/Amiga
+platforms. The contents of GNUPLOT_LIB are appended to the `loadpath`
+variable, but not saved with the `save` and `save set` commands.
 
-GNUFITLOG holds the name of a file that saves fit results. The default is
-fit.log. If the name ends with a "/" or "\", it is treated as a directory
-name, and fit.log appended.
+GNUFITLOG holds the name of a file that saves fit results. The default
+is fit.log. If the name ends with a "/" or "\", it is treated as a
+directory name, and "fit.log" will be created as a file in that
+directory.
 
 The CGI drivers need the CGIPATH environment variable to set the path
 to the CGI agents, and the CGIDISP and/or CGIPRNT environment variables
 to the CGI agents, and the CGIDISP and/or CGIPRNT environment variables
 to set the output devices.
 
-If creating dynamically linked executables for the X11 Window System, it may
-be necessary to add flags to the LIBS variable in Makefile to make sure
-gnuplot finds all required libraries at runtime.  Systems like SunOS and
-Solaris use -R to specify the runtime library search path, whereas OSF/Dec
-Unix, Irix and Linux use -rpath. If this is not possible, the
-LD_LIBRARY_PATH environment variable should be set.
+If creating dynamically linked executables, it may be necessary to add
+flags to the LIBS variable in Makefile to make sure gnuplot finds all
+required libraries at runtime.  Systems like SunOS and Solaris use -R
+to specify the runtime library search path, whereas OSF/Dec Unix, Irix
+and Linux use -rpath. If this is not possible, the LD_LIBRARY_PATH
+environment variable should be set.  Generally it's recommended to
+install shared libraries only in places that are already searched by
+the linker without such options.  LD_LIBRARY_PATH is the second-best
+choice.
 
 
 How to test gnuplot
@@ -692,8 +732,8 @@ $ gnuplot
         Copyright(C) 1986 - 1993, 1998, 2004
         Thomas Williams, Colin Kelley and many others
 
-        Send comments and requests for help to info-gnuplot@dartmouth.edu
-        Send bugs, suggestions and mods to bug-gnuplot@dartmouth.edu
+        Send comments and requests for help to gnuplot-info@lists.sf.net
+        Send bugs, suggestions and mods to gnuplot-bugs@lists.sf.net
 
 Terminal type set to 'x11'
 gnuplot> test
@@ -743,8 +783,8 @@ Front-ends for gnuplot
  o Bruce Ravel <ravel@phys.washington.edu> has written a new version of
    gnuplot-mode for GNU emacs and XEmacs. This version is based on
    the gnuplot.el file by Gershon Elber which used to be included with 
-   gnuplot's source distribution. The package is available from
-   http://feff.phys.washington.edu/~ravel/gnuplot/.
+   earlier versions of gnuplot's source distribution. The package is
+   available from http://feff.phys.washington.edu/~ravel/gnuplot/.
    As of gnuplot 4.0 Bruce's version of gnuplot-mode is included 
-   with the gnuplot distribution.
+   with the gnuplot distribution, so you should already have it.
 

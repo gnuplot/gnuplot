@@ -1,11 +1,11 @@
 /*
- * $Id: scanner.h,v 1.4 2000/10/31 19:59:31 joze Exp $
+ * $Id: scanner.h,v 1.5 2000/11/01 18:57:33 broeker Exp $
  */
 
 /* GNUPLOT - scanner.h */
 
 /*[
- * Copyright 1999   Thomas Williams, Colin Kelley
+ * Copyright 1999, 2004   Thomas Williams, Colin Kelley
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted,

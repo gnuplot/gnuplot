@@ -1,10 +1,10 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wtext.c,v 1.5 2001/12/18 16:36:22 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: wtext.c,v 1.6 2002/03/10 18:54:52 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - win/wtext.c */
 /*[
- * Copyright 1992, 1993, 1998   Russell Lang
+ * Copyright 1992, 1993, 1998, 2004   Russell Lang
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted,
@@ -37,13 +37,6 @@ static char *RCSid() { return RCSid("$Id: wtext.c,v 1.5 2001/12/18 16:36:22 miku
  * AUTHORS
  * 
  *   Russell Lang
- * 
- * Send your comments or suggestions to 
- *  info-gnuplot@dartmouth.edu.
- * This is a mailing list; to join it send a note to 
- *  majordomo@dartmouth.edu.  
- * Send bug reports to
- *  bug-gnuplot@dartmouth.edu.
  */
 
 /* WARNING: Do not write to stdout/stderr with functions not listed 

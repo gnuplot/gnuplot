@@ -1,10 +1,10 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wmenu.c,v 1.3 2002/03/11 08:43:10 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: wmenu.c,v 1.4 2003/01/23 13:22:05 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - win/wmenu.c */
 /*[
- * Copyright 1992, 1993, 1998   Maurice Castro, Russell Lang
+ * Copyright 1992, 1993, 1998, 2004   Maurice Castro, Russell Lang
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted,
@@ -39,12 +39,6 @@ static char *RCSid() { return RCSid("$Id: wmenu.c,v 1.3 2002/03/11 08:43:10 miku
  *   Maurice Castro
  *   Russell Lang
  * 
- * Send your comments or suggestions to 
- *  info-gnuplot@dartmouth.edu.
- * This is a mailing list; to join it send a note to 
- *  majordomo@dartmouth.edu.  
- * Send bug reports to
- *  bug-gnuplot@dartmouth.edu.
  */
 
 #define STRICT

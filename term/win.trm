@@ -1,11 +1,11 @@
 /*
- * $Id: win.trm,v 1.30 2004/02/12 09:08:40 mikulik Exp $
+ * $Id: win.trm,v 1.31 2004/04/05 13:04:03 broeker Exp $
  */
 
 /* GNUPLOT - win.trm */
 
 /*[
- * Copyright 1992 - 1993, 1998
+ * Copyright 1992 - 1993, 1998, 2004
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted,
@@ -41,24 +41,6 @@
  *   Gnuplot for Windows:
  *       Maurice Castro, Russell Lang
  * 
- * There is a mailing list for gnuplot users. Note, however, that the
- * newsgroup 
- *	comp.graphics.apps.gnuplot 
- * is identical to the mailing list (they
- * both carry the same set of messages). We prefer that you read the
- * messages through that newsgroup, to subscribing to the mailing list.
- * (If you can read that newsgroup, and are already on the mailing list,
- * please send a message to majordomo@dartmouth.edu, asking to be
- * removed from the mailing list.)
- *
- * The address for mailing to list members is
- *	   info-gnuplot@dartmouth.edu
- * and for mailing administrative requests is 
- *	   majordomo@dartmouth.edu
- * The mailing list for bug reports is 
- *	   bug-gnuplot@dartmouth.edu
- * The list of those interested in beta-test versions is
- *	   info-gnuplot-beta@dartmouth.edu
  */
 
 

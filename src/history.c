@@ -1,11 +1,11 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: history.c,v 1.11 2003/11/24 16:22:31 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: history.c,v 1.12 2003/12/01 08:33:42 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - history.c */
 
 /*[
- * Copyright 1986 - 1993, 1999   Thomas Williams, Colin Kelley
+ * Copyright 1986 - 1993, 1999, 2004   Thomas Williams, Colin Kelley
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted,
@@ -273,16 +273,13 @@ char *cmd;
 
 #elif defined(HAVE_LIBREADLINE)
 
-/* #include <readline/history.h> --- HBB 20000508: no #inc'ed directly from 
- * this module's header */
-
 /*
  * Interface between 'gnuplot' and GNU 'readline-4.0'.
  * NOTE:  'show_version()' should report the used readline version too.
  *        There are more version around. '2.0, 2.1, 2.2, 4.0' 
  */
 /*
- * Copyright (C) 1999 Thomas Walter
+ * Copyright (C) 1999, 2004 Thomas Walter
  *
  * This can be used by anybody
  *

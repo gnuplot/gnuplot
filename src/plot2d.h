@@ -1,11 +1,11 @@
 /*
- * $Id: plot2d.h,v 1.7 2000/11/01 18:57:33 broeker Exp $
+ * $Id: plot2d.h,v 1.8 2001/08/27 15:02:14 broeker Exp $
  */
 
 /* GNUPLOT - plot2d.h */
 
 /*[
- * Copyright 1999   Thomas Williams, Colin Kelley
+ * Copyright 1999, 2004   Thomas Williams, Colin Kelley
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted,

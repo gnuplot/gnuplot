@@ -1,11 +1,11 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: version.c,v 1.51 2004/03/11 23:38:02 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: version.c,v 1.52 2004/03/29 13:48:12 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - version.c */
 
 /*[
- * Copyright 1986 - 1993, 1998   Thomas Williams, Colin Kelley
+ * Copyright 1986 - 1993, 1998, 2004   Thomas Williams, Colin Kelley
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted,
@@ -39,10 +39,10 @@ static char *RCSid() { return RCSid("$Id: version.c,v 1.51 2004/03/11 23:38:02 b
 #include "syscfg.h"		/* for FAQ_LOCATION */
 
 
-const char gnuplot_version[] = "3.8k";
-const char gnuplot_patchlevel[] = "3";
-const char gnuplot_date[] = "Mon Mar 29 15:17:53 CEST 2004";
-const char gnuplot_copyright[] = "Copyright(C) 1986 - 1993, 1999 - 2003";
+const char gnuplot_version[] = "4.0";
+const char gnuplot_patchlevel[] = "0";
+const char gnuplot_date[] = "Sat Apr 10 19:01:10 CEST 2004";
+const char gnuplot_copyright[] = "Copyright (C) 1986 - 1993, 1998, 2004";
 
 const char faq_location[] = FAQ_LOCATION;
 
@@ -51,8 +51,8 @@ const char faq_location[] = FAQ_LOCATION;
 const char bug_email[] = CONTACT;
 const char help_email[] = HELPMAIL;
 #else
-const char bug_email[] = "info-gnuplot-beta@dartmouth.edu";
-const char help_email[] = "info-gnuplot-beta@dartmouth.edu";
+const char bug_email[] = "gnuplot-beta@lists.sourceforge.net";
+const char help_email[] = "gnuplot-beta@lists.sourceforge.net";
 #endif
 
 char os_name[32];

@@ -1,11 +1,11 @@
 /*
- * $Id: command.h,v 1.26 2003/11/13 08:59:09 mikulik Exp $
+ * $Id: command.h,v 1.27 2003/11/24 15:15:14 mikulik Exp $
  */
 
 /* GNUPLOT - command.h */
 
 /*[
- * Copyright 1999
+ * Copyright 1999, 2004
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted,

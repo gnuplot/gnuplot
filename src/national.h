@@ -1,11 +1,11 @@
 /*
- * $Id: national.h,v 1.2.2.1 2000/05/03 21:26:11 joze Exp $
+ * $Id: national.h,v 1.4 2000/10/31 19:59:31 joze Exp $
  */
 
 /* GNUPLOT - national.h */
 
 /*[
- * Copyright 1986 - 1993, 1998   Thomas Williams, Colin Kelley
+ * Copyright 1986 - 1993, 1998, 2004   Thomas Williams, Colin Kelley
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted,

@@ -25,11 +25,6 @@ for an up-to-date bug tracking system.
     If the filesystem doesn't allow deleting open files these file are
     locked for the time the terminal driver is running.
 
- *) compiling help file with Visual C++ 4.0/Windows NT
-    The help compiler coming with this version of MSVC++ appers unable
-    to compile gnuplot.rtf.  As a workaround download the freely
-    available "Help Workshop" from Microsoft and use that instead.
-
  *) In pcl5 mode, the hpgl driver prints a spurious "DI,1DI,0" string in the
     upper left corner of the plot. 
     [Source code suggests this is solved.  Needs confirmation.]

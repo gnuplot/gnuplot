@@ -1,5 +1,5 @@
 #ifdef INCRCSDATA
-static char RCSid[]="$Id: gclient.c,v 1.24 2003/11/28 17:15:52 mikulik Exp $" ;
+static char RCSid[]="$Id: gclient.c,v 1.25 2004/02/12 17:31:52 mikulik Exp $" ;
 #endif
 
 /****************************************************************************
@@ -15,7 +15,7 @@ static char RCSid[]="$Id: gclient.c,v 1.24 2003/11/28 17:15:52 mikulik Exp $" ;
 /* PM driver for GNUPLOT */
 
 /*[
- * Copyright 1992, 1993, 1998   Roger Fearick
+ * Copyright 1992, 1993, 1998, 2004   Roger Fearick
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted,
@@ -69,15 +69,7 @@ static char RCSid[]="$Id: gclient.c,v 1.24 2003/11/28 17:15:52 mikulik Exp $" ;
  *   Franz Bakan
  *       - communication gnupmdrv -> gnuplot via shared memory (April 1999)
  *       - date and time on x axis (August 1999)
- *
- *
- * Send your comments or suggestions to 
- *  info-gnuplot@dartmouth.edu.
- * This is a mailing list; to join it send a note to
- *  majordomo@dartmouth.edu.
- * Send bug reports to
- *  bug-gnuplot@dartmouth.edu.
-**/
+ */
 
 #define INCL_PM
 #define INCL_WIN

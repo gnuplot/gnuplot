@@ -1,11 +1,11 @@
 /*
- * $Id: syscfg.h,v 1.26 2003/04/29 07:04:31 mikulik Exp $
+ * $Id: syscfg.h,v 1.27 2004/03/23 18:09:28 broeker Exp $
  */
 
 /* GNUPLOT - syscfg.h */
 
 /*[
- * Copyright 1986 - 1993, 1998   Thomas Williams, Colin Kelley
+ * Copyright 1986 - 1993, 1998, 2004   Thomas Williams, Colin Kelley
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted,
@@ -232,11 +232,11 @@
 #endif
 
 #ifndef CONTACT
-# define CONTACT "bug-gnuplot@dartmouth.edu"
+# define CONTACT "gnuplot-bugs@lists.sourceforge.net"
 #endif
 
 #ifndef HELPMAIL
-# define HELPMAIL "info-gnuplot@dartmouth.edu"
+# define HELPMAIL "gnuplot-info@lists.sourceforge.net"
 #endif
 /* End fall-through defaults */
 

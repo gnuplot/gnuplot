@@ -1,10 +1,10 @@
 /* 
- * $Id: axis.h,v 1.34 2003/12/26 22:59:12 vanzandt Exp $
+ * $Id: axis.h,v 1.35 2004/03/04 16:49:16 broeker Exp $
  *
  */
 
 /*[
- * Copyright 2000   Thomas Williams, Colin Kelley
+ * Copyright 2000, 2004   Thomas Williams, Colin Kelley
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted,

@@ -1,5 +1,5 @@
 /*
- * $Id: fit.h,v 1.10 2002/09/27 12:17:42 broeker Exp $
+ * $Id: fit.h,v 1.11 2003/02/18 16:19:50 broeker Exp $
  */
 
 /* GNUPLOT - fit.h */
@@ -18,7 +18,7 @@
  *	Header file: public functions in fit.c
  *
  *
- *	Copyright of this module:   Carsten Grammes, 1993
+ *	Previous copyright of this module:   Carsten Grammes, 1993
  *      Experimental Physics, University of Saarbruecken, Germany
  *
  *	Internet address: cagr@rz.uni-sb.de

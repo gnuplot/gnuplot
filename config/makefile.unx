@@ -1,5 +1,5 @@
 #
-# $Id: makefile.unx,v 1.4 1999/05/31 18:38:58 lhecking Exp $
+# $Id: makefile.unx,v 1.5 2002/02/21 12:27:37 lhecking Exp $
 #
 #
 ############################################################
@@ -30,7 +30,7 @@ MANDEST=/usr/local/man/man1
 HELPDEST=/usr/local/lib
 #HELPDEST=docs
 # Where to send email about bugs and comments (locally)
-EMAIL=bug-gnuplot@dartmouth.edu
+EMAIL=gnuplot-bugs@lists.sourceforge.net
 
 ############################################################
 #>>> Some machines may need MAKE to be defined explicitly

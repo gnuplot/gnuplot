@@ -1,11 +1,11 @@
 /*
- * $Id: wresourc.h,v 1.3 2001/02/28 16:37:08 broeker Exp $
+ * $Id: wresourc.h,v 1.4 2003/01/23 13:22:05 broeker Exp $
  */
 
 /* GNUPLOT - win/wresourc.h */
 
 /*[
- * Copyright 1992 - 1993, 1998  Maurice Castro, Russell Lang
+ * Copyright 1992 - 1993, 1998, 2004  Maurice Castro, Russell Lang
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted,
@@ -39,13 +39,6 @@
  * 
  *   Maurice Castro
  *   Russell Lang
- * 
- * Send your comments or suggestions to 
- *  info-gnuplot@dartmouth.edu.
- * This is a mailing list; to join it send a note to 
- *  majordomo@dartmouth.edu.  
- * Send bug reports to
- *  bug-gnuplot@dartmouth.edu.
  */
 
 #ifndef DS_3DLOOK

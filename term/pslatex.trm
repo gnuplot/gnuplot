@@ -1,11 +1,11 @@
 /*
- * $Id: pslatex.trm,v 1.38 2003/06/12 00:09:06 sfeam Exp $
+ * $Id: pslatex.trm,v 1.39 2003/06/20 04:55:00 sfeam Exp $
  */
 
 /* GNUPLOT - pslatex.trm */
 
 /*[
- * Copyright 1990 - 1993, 1998
+ * Copyright 1990 - 1993, 1998, 2004
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted,
@@ -48,7 +48,7 @@
  * 
  *  Petr Mikulik, May 2000: terminal entries for PM3D functionality
  *
- * send your comments or suggestions to (info-gnuplot@dartmouth.edu).
+ * send your comments or suggestions to (gnuplot-info@lists.sourceforge.net).
  */
 
 #include "driver.h"

@@ -1,11 +1,11 @@
 /*
- * $Id: wtext.h,v 1.6 2001/02/12 15:43:22 broeker Exp $
+ * $Id: wtext.h,v 1.7 2001/02/15 18:13:23 broeker Exp $
  */
 
 /* GNUPLOT - win/wtext.h */
 
 /*[
- * Copyright 1992 - 1993, 1998   Russell Lang
+ * Copyright 1992 - 1993, 1998, 2004   Russell Lang
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted,

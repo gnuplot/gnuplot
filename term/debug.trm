@@ -1,12 +1,12 @@
 /*
- * $Id: debug.trm,v 1.9 1999/06/22 11:54:15 lhecking Exp $
+ * $Id: debug.trm,v 1.10 2001/10/02 17:21:16 broeker Exp $
  *
  */
 
 /* GNUPLOT - debug.trm */
 
 /*[
- * Copyright 1990 - 1993, 1998   Thomas Williams, Colin Kelley
+ * Copyright 1990 - 1993, 1998, 2004   Thomas Williams, Colin Kelley
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted,

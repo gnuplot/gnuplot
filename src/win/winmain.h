@@ -1,11 +1,11 @@
 /*
- * $Id: winmain.h,v 1.1 2000/11/09 16:15:26 broeker Exp $
+ * $Id: winmain.h,v 1.2 2002/10/25 10:06:50 mikulik Exp $
  */
 
 /* GNUPLOT - win/winmain.h */
 
 /*[
- * Copyright 2000   Hans-Bernhard Broeker
+ * Copyright 2000, 2004   Hans-Bernhard Broeker
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted,
@@ -38,13 +38,6 @@
  * AUTHORS
  * 
  *   Hans-Bernhard Broeker
- * 
- * Send your comments or suggestions to 
- *  info-gnuplot@dartmouth.edu.
- * This is a mailing list; to join it send a note to 
- *  majordomo@dartmouth.edu.  
- * Send bug reports to
- *  bug-gnuplot@dartmouth.edu.
  */
 
 /* this file contains items defined by winmain.c that other parts of

@@ -1,11 +1,11 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.120 2004/03/11 18:28:44 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.121 2004/03/31 15:42:52 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
 
 /*[
- * Copyright 1986 - 1993, 1998   Thomas Williams, Colin Kelley
+ * Copyright 1986 - 1993, 1998, 2004   Thomas Williams, Colin Kelley
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted,

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: matrix.c,v 1.7 1999/11/08 19:24:31 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: matrix.c,v 1.8 2001/04/24 18:43:09 broeker Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -22,17 +22,8 @@ static char *RCSid() { return RCSid("$Id: matrix.c,v 1.7 1999/11/08 19:24:31 lhe
  *      by Carsten Grammes
  *      Experimental Physics, University of Saarbruecken, Germany
  *
- *      Internet address: cagr@rz.uni-sb.de
+ *      Previous copyright of this module:   Carsten Grammes, 1993
  *
- *      Copyright of this module:   Carsten Grammes, 1993
- *
- *      Permission to use, copy, and distribute this software and its
- *      documentation for any purpose with or without fee is hereby granted,
- *      provided that the above copyright notice appear in all copies and
- *      that both that copyright notice and this permission notice appear
- *      in supporting documentation.
- *
- *      This software is provided "as is" without express or implied warranty.
  */
 
 #include "matrix.h"

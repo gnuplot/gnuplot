@@ -1,11 +1,11 @@
 /*
- * $Id: hpgl.trm,v 1.15 2002/08/29 04:10:08 sfeam Exp $
+ * $Id: hpgl.trm,v 1.16 2002/12/16 14:18:36 lhecking Exp $
  */
 
 /* GNUPLOT - hpgl.trm */
 
 /*[
- * Copyright 1990 - 1993, 1998
+ * Copyright 1990 - 1993, 1998, 2004
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted,
@@ -45,7 +45,7 @@
  * AUTHORS
  *  Colin Kelley, Thomas Williams, Russell Lang
  * 
- * send your comments or suggestions to (info-gnuplot@dartmouth.edu).
+ * send your comments or suggestions to (gnuplot-info@lists.sourceforge.net).
  * 
  */
 

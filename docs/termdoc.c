@@ -1,11 +1,11 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: termdoc.c,v 1.12 2000/11/01 18:57:24 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: termdoc.c,v 1.13 2002/12/16 14:16:52 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - termdoc.c */
 
 /*[
- * Copyright 1986 - 1993, 1998   Thomas Williams, Colin Kelley
+ * Copyright 1986 - 1993, 1998, 2004   Thomas Williams, Colin Kelley
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted,

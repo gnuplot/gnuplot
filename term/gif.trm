@@ -1,11 +1,11 @@
 /*
- * $Id: gif.trm,v 1.43 2003/03/21 17:18:21 mikulik Exp $
+ * $Id: gif.trm,v 1.44 2004/03/11 15:30:19 mikulik Exp $
  */
 
 /* GNUPLOT -- gif.trm */
 
 /*[
- * Copyright 1998
+ * Copyright 1998, 2004
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted,
@@ -72,8 +72,6 @@
  *  Alfred Reibenschuh <alfred.reibenschuh@it-austria.com> or <fredo@blackbox.at>
  *  Ben Laurie <ben@algroup.co.uk>
  *
- * send your comments or suggestions to:
- *  info-gnuplot@cs.dartmouth.edu
  * 
  * This version outputs either color or monochrome GIFs.  The default
  * is 640x480 pixels.  

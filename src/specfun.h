@@ -1,11 +1,11 @@
 /*
- * $Id: specfun.h,v 1.6 2000/11/07 14:37:28 broeker Exp $
+ * $Id: specfun.h,v 1.7 2001/08/22 14:15:34 broeker Exp $
  */
 
 /* GNUPLOT - specfun.h */
 
 /*[
- * Copyright 1999   Thomas Williams, Colin Kelley
+ * Copyright 1999, 2004   Thomas Williams, Colin Kelley
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted,

@@ -1,11 +1,11 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: xref.c,v 1.7 2002/03/07 16:11:25 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: xref.c,v 1.8 2002/12/16 14:16:53 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - xref.c */
 
 /*[
- * Copyright 1986 - 1993, 1998   Thomas Williams, Colin Kelley
+ * Copyright 1986 - 1993, 1998, 2004   Thomas Williams, Colin Kelley
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted,

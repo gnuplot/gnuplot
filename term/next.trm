@@ -1,12 +1,12 @@
 /*
- * $Id: next.trm,v 1.21 2003/02/11 06:08:01 sfeam Exp $
+ * $Id: next.trm,v 1.22 2003/02/18 16:38:13 broeker Exp $
  *
  */
 
 /* GNUPLOT - next.trm */
 
 /*[
- * Copyright 1991 - 1993, 1998
+ * Copyright 1991 - 1993, 1998, 2004
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted,
@@ -45,7 +45,7 @@
  *  Robert Lutwak from Russell Lang's post.trm
  *  'old' option invokes Nick Strobel's original, single viewport terminal
  * 
- * send your comments or suggestions to (info-gnuplot@dartmouth.edu).
+ * send your comments or suggestions to (gnuplot-info@lists.sourceforge.net).
  *
  * This terminal attempts to connect, via the NeXTstep Distributed
  * Objects system, to the "gnuplotServer."  If there is no such

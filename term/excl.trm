@@ -1,11 +1,11 @@
 /*
- * $Id: excl.trm,v 1.10 1999/06/19 20:30:48 lhecking Exp $
+ * $Id: excl.trm,v 1.11 1999/06/22 11:54:16 lhecking Exp $
  *
  */
 
 /* GNUPLOT - excl.trm */
 
-/* Copyright (c) 1992, 1998 by P. Klosowski at NIST.  All Rights Reserved 
+/* Copyright 1992, 1998, 2004 by P. Klosowski at NIST.  All Rights Reserved 
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted,
@@ -36,7 +36,7 @@
  * This file is included by ../term.c.
  *
  * 
- * send your comments or suggestions to (info-gnuplot@dartmouth.edu).
+ * send your comments or suggestions to (gnuplot-info@lists.sourceforge.net).
  *
  */
 

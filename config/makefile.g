@@ -1,5 +1,5 @@
 #
-# $Id: makefile.g,v 1.4 1999/12/01 22:07:56 lhecking Exp $
+# $Id: makefile.g,v 1.5 2002/03/07 16:20:15 lhecking Exp $
 #
 # GNUPLOT Makefile for GRASS, a geographic information system. 
 #
@@ -51,7 +51,7 @@ HELPDEST=$(GISBASE)/man/help/g.gnuplot
 EMAIL="mccauley@ecn.purdue.edu\\n\tor grassp-list@moon.cecer.army.mil [info.grass.programmer]"
 
 # Where to ask questions about general usage
-HELPMAIL="grassu-list@moon.cecer.army.mil\\n\t[info.grass.user] or info-gnuplot@dartmouth.edu [comp.graphics.gnuplot]"
+HELPMAIL="grassu-list@moon.cecer.army.mil\\n\t[info.grass.user] or gnuplot-info@lists.sourceforge.net [comp.graphics.gnuplot]"
  
 # This causes grass.trm to be included in term.h
 GTERMFLAGS = -DGISBASE -I. -I./term

@@ -59,9 +59,9 @@ Thomas Williams & Colin Kelley
 .br
   Copyright (C) 1986 - 1993, 1998, 2004   Thomas Williams, Colin Kelley
 .AI
-   Mailing list for comments: info-gnuplot@dartmouth.edu
+   Mailing list for comments: gnuplot-info@lists.sourceforge.net
 .br
-   Mailing list for bug reports: bug-gnuplot@dartmouth.edu
+   Mailing list for bug reports: gnuplot-bugs@lists.sourceforge.net
 \*(DY
 .br
 

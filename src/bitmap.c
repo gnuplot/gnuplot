@@ -1,11 +1,11 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: bitmap.c,v 1.19 2003/03/31 22:16:57 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: bitmap.c,v 1.20 2003/04/25 03:23:00 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - bitmap.c */
 
 /*[
- * Copyright 1986 - 1993, 1998   Thomas Williams, Colin Kelley
+ * Copyright 1986 - 1993, 1998, 2004   Thomas Williams, Colin Kelley
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted,

@@ -1,11 +1,11 @@
 /*
- * $Id: tpic.trm,v 1.15 2002/12/13 14:59:05 lhecking Exp $
+ * $Id: tpic.trm,v 1.16 2004/03/29 10:43:36 broeker Exp $
  */
 
 /* GNUPLOT - tpic.trm */
 
 /*[
- * Copyright 1990 - 1993, 1998
+ * Copyright 1990 - 1993, 1998, 2004
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted,
@@ -44,7 +44,7 @@
  *   Oh-Yeah?   3 Sep. 1992 (closely following eepic.trm by David Kotz)
  *   A. Woo     5 Oct. 1992 (removed ansi prototypes for braindead compilers)
  *
- * send your comments or suggestions to (info-gnuplot@dartmouth.edu).
+ * send your comments or suggestions to (gnuplot-info@lists.sourceforge.net).
  * 
  */
 /*

@@ -1,11 +1,11 @@
 /*
- * $Id: imagen.trm,v 1.13 1999/10/29 18:39:40 lhecking Exp $
+ * $Id: imagen.trm,v 1.14 2003/02/18 16:38:12 broeker Exp $
  */
 
 /* GNUPLOT - imagen.trm */
 
 /*[
- * Copyright 1990 - 1993, 1998
+ * Copyright 1990 - 1993, 1998, 2004
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted,
@@ -44,7 +44,7 @@
  *   Paul E. McKenney, David Kotz
  *   Rewritten/extended by:
  *	Hans Olav Eggestad
- * send your comments or suggestions to (info-gnuplot@dartmouth.edu).
+ * send your comments or suggestions to (gnuplot-info@lists.sourceforge.net).
  * 
  */
 

@@ -176,8 +176,8 @@ If PATTERN is omitted, it defaults to \"[ \\f\\t\\n\\r\\v]+\"."
 
  Copyright (C) 1986 - 1993, 1998, 2004   Thomas Williams, Colin Kelley
 
-       Mailing list for comments: info-gnuplot@@dartmouth.edu
-     Mailing list for bug reports: bug-gnuplot@@dartmouth.edu
+       Mailing list for comments: gnuplot-info@@lists.sourceforge.net
+     Mailing list for bug reports: gnuplot-bugs@@lists.sourceforge.net
 
          This manual was prepared by Dick Crawford
                    3 December 1998

@@ -1,13 +1,13 @@
 /* Hello, Emacs! This is -*-C-*- !*/
 /*
- * $Id: eepic.trm,v 1.22 2003/04/04 21:19:06 sfeam Exp $
+ * $Id: eepic.trm,v 1.23 2004/03/29 10:43:36 broeker Exp $
  *
  */
 
 /* GNUPLOT - eepic.trm */
 
 /*[
- * Copyright 1990 - 1993, 1998
+ * Copyright 1990 - 1993, 1998, 2004
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted,
@@ -45,7 +45,7 @@
  * AUTHORS
  *   David Kotz
  *
- * send your comments or suggestions to (info-gnuplot@dartmouth.edu).
+ * send your comments or suggestions to (gnuplot-info@lists.sourceforge.net).
  * 
  */
 /*

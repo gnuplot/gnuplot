@@ -1,12 +1,12 @@
 /*
- * $Id: t410x.trm,v 1.10 1999/10/01 15:09:13 lhecking Exp $
+ * $Id: t410x.trm,v 1.11 1999/10/29 18:39:40 lhecking Exp $
  *
  */
 
 /* GNUPLOT - t410x.trm */
 
 /*[
- * Copyright 1990 - 1993, 1998
+ * Copyright 1990 - 1993, 1998, 2004
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted,
@@ -43,7 +43,7 @@
  * AUTHORS
  *   Colin Kelley, Thomas Williams
  * 
- * send your comments or suggestions to (info-gnuplot@dartmouth.edu).
+ * send your comments or suggestions to (gnuplot-info@lists.sourceforge.net).
  * 
  */
 

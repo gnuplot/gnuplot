@@ -1,9 +1,9 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: dynarray.c,v 1.8 2000/11/01 18:57:28 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: dynarray.c,v 1.9 2001/02/15 18:13:23 broeker Exp $"); }
 #endif
 
 /*[
- * Copyright 1986 - 1993, 1998, 1999   Thomas Williams, Colin Kelley
+ * Copyright 1999, 2004   Hans-Bernhard Broeker
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted,

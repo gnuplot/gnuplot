@@ -1,11 +1,11 @@
 /*
- * $Id: metapost.trm,v 1.23 2003/11/13 08:18:18 mikulik Exp $
+ * $Id: metapost.trm,v 1.24 2004/03/29 10:43:36 broeker Exp $
  */
 
 /* GNUPLOT - metapost.trm */
 
 /*[
- * Copyright 1990 - 1993, 1998
+ * Copyright 1990 - 1993, 1998, 2004
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted,

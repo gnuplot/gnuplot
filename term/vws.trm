@@ -1,12 +1,12 @@
 /*
- * $Id: vws.trm,v 1.12 2002/03/01 20:46:17 mikulik Exp $
+ * $Id: vws.trm,v 1.13 2002/07/26 16:42:29 mikulik Exp $
  *
  */
 
 /* GNUPLOT - vws.trm */
 
 /*[
- * Copyright 1990 - 1993, 1998
+ * Copyright 1990 - 1993, 1998, 2004
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted,
@@ -45,7 +45,7 @@
  *   Walter Speth
  *           BITNET: SPETH@DBNPIB5
  *
- * send your comments or suggestions to (info-gnuplot@dartmouth.edu).
+ * send your comments or suggestions to (gnuplot-info@lists.sourceforge.net).
  *
  */
 /*

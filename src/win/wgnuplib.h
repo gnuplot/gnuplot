@@ -1,11 +1,11 @@
 /*
- * $Id: wgnuplib.h,v 1.14 2002/01/23 09:57:07 mikulik Exp $
+ * $Id: wgnuplib.h,v 1.15 2003/01/23 13:22:04 broeker Exp $
  */
 
 /* GNUPLOT - win/wgnuplib.h */
 
 /*[
- * Copyright 1982 - 1993, 1998   Russell Lang
+ * Copyright 1982 - 1993, 1998, 2004   Russell Lang
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted,
@@ -38,13 +38,6 @@
  * AUTHORS
  * 
  *   Russell Lang
- * 
- * Send your comments or suggestions to 
- *  info-gnuplot@dartmouth.edu.
- * This is a mailing list; to join it send a note to 
- *  majordomo@dartmouth.edu.  
- * Send bug reports to
- *  bug-gnuplot@dartmouth.edu.
  */
 
 /* this file contains items to be visible outside wgnuplot.dll */

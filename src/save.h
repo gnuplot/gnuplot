@@ -1,11 +1,11 @@
 /*
- * $Id: save.h,v 1.5 2000/11/01 18:57:33 broeker Exp $
+ * $Id: save.h,v 1.6 2004/01/18 01:30:38 sfeam Exp $
  */
 
 /* GNUPLOT - save.h */
 
 /*[
- * Copyright 1999   Thomas Williams, Colin Kelley
+ * Copyright 1999, 2004   Thomas Williams, Colin Kelley
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted,

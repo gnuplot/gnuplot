@@ -1,11 +1,11 @@
 /*
- * $Id: help.h,v 1.6 2000/10/31 19:59:31 joze Exp $
+ * $Id: help.h,v 1.7 2000/11/01 18:57:32 broeker Exp $
  */
 
 /* GNUPLOT - help.h */
 
 /*[
- * Copyright 1986 - 1993, 1998   Thomas Williams, Colin Kelley
+ * Copyright 1986 - 1993, 1998, 2004   Thomas Williams, Colin Kelley
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted,

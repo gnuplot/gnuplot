@@ -1,12 +1,12 @@
 /*
- * $Id: amiga.trm,v 1.14 2002/04/30 14:08:53 broeker Exp $
+ * $Id: amiga.trm,v 1.15 2002/08/30 20:18:23 sfeam Exp $
  *
  */
 
 /* GNUPLOT - amiga.trm */
 
 /*[
- * Copyright 1991, 1992, 1993, 1998
+ * Copyright 1991, 1992, 1993, 1998, 2004
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted,
@@ -70,7 +70,7 @@
  *   Lars Hecking       Replace static arrays for AMIGA_FontName and temporary
  *   06/21/97           arrays with AllocMem()'d memory.
  *
- * send your comments or suggestions to (info-gnuplot@dartmouth.edu).
+ * send your comments or suggestions to (gnuplot-info@lists.sourceforge.net).
  * 
  */
 

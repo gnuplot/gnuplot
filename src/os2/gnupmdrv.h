@@ -1,11 +1,11 @@
 /*
-** static char RCSid[]="$Id: gnupmdrv.h,v 1.3 1999/09/21 18:24:40 lhecking Exp $" ;
+** static char RCSid[]="$Id: gnupmdrv.h,v 1.4 2002/02/15 20:17:35 amai Exp $" ;
 */
 
 /* PM driver for GNUPLOT */
 
 /*[
- * Copyright 1992, 1993, 1998 Roger Fearick
+ * Copyright 1992, 1993, 1998, 2004 Roger Fearick
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted,
@@ -39,16 +39,9 @@
  * AUTHOR
  * 
  *   Gnuplot driver for OS/2:  Roger Fearick
- * 
- * Send your comments or suggestions to 
- *  info-gnuplot@dartmouth.edu.
- * This is a mailing list; to join it send a note to 
- *  majordomo@dartmouth.edu.  
- * Send bug reports to
- *  bug-gnuplot@dartmouth.edu.
-**/
+ */
 
-    /* include resource defines */
+/* include resource defines */
     
 #ifndef DISPDEFS_H
 /*#include "dispdefs.h"*/

@@ -1,11 +1,11 @@
 /*
- * $Id: eval.h,v 1.8 2003/07/22 17:22:47 sfeam Exp $
+ * $Id: eval.h,v 1.9 2003/08/17 22:49:49 sfeam Exp $
  */
 
 /* GNUPLOT - eval.h */
 
 /*[
- * Copyright 1999   Thomas Williams, Colin Kelley
+ * Copyright 1999, 2004   Thomas Williams, Colin Kelley
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted,

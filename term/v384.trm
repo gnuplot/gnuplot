@@ -1,12 +1,12 @@
 /*
- * $Id: v384.trm,v 1.7 1999/06/19 20:30:58 lhecking Exp $
+ * $Id: v384.trm,v 1.8 1999/06/22 11:54:24 lhecking Exp $
  *
  */
 
 /* GNUPLOT - v384.trm */
 
 /*[
- * Copyright 1990 - 1993, 1998
+ * Copyright 1990 - 1993, 1998, 2004
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted,
@@ -44,7 +44,7 @@
  * AUTHORS
  *   roland@moncskermit.OZ (Roland Yap) 
  * 
- * send your comments or suggestions to (info-gnuplot@dartmouth.edu).
+ * send your comments or suggestions to (gnuplot-info@lists.sourceforge.net).
  * 
  */
 

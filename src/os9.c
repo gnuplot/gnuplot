@@ -1,9 +1,9 @@
-/* $Id: os9.c,v 1.2 1998/03/22 22:31:54 drd Exp $ */
+/* $Id: os9.c,v 1.1 1999/03/26 21:48:27 lhecking Exp $ */
 
 /* GNUPLOT - os9.c */
 
 /*[
- * Copyright 1986 - 1993, 1998   Thomas Williams, Colin Kelley
+ * Copyright 1986 - 1993, 1998, 2004   Thomas Williams, Colin Kelley
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted,

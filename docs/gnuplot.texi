@@ -30,8 +30,8 @@
 
  Copyright (C) 1986 - 1993, 1998, 2004   Thomas Williams, Colin Kelley
 
-       Mailing list for comments: info-gnuplot@@dartmouth.edu
-     Mailing list for bug reports: bug-gnuplot@@dartmouth.edu
+       Mailing list for comments: gnuplot-info@@lists.sourceforge.net
+     Mailing list for bug reports: gnuplot-bugs@@lists.sourceforge.net
 
          This manual was prepared by Dick Crawford
                    3 December 1998
@@ -94,7 +94,7 @@ James R. Van Zandt
 Johannes Zellner
 @end itemize
 
-@c ^<h2>  Copyright (C) 1986 - 1993, 1998 - 2002   Thomas Williams, Colin Kelley<p>
+@c ^<h2>  Copyright (C) 1986 - 1993, 1998 - 2004   Thomas Williams, Colin Kelley<p>
 @c ^   Mailing list for comments: gnuplot-info@@lists.sourceforge.net <p>
 @c ^   Mailing list for bug reports: gnuplot-bugs@@lists.sourceforge.net <p>
 @c ^</h2><p>
@@ -146,7 +146,7 @@ Johannes Zellner
 @cindex license
 
 @example
-      Copyright (C) 1986 - 1993, 1998   Thomas Williams, Colin Kelley
+      Copyright (C) 1986 - 1993, 1998, 2004   Thomas Williams, Colin Kelley
 
 @end example
 
@@ -9724,6 +9724,7 @@ to you, depending on its output format.
 * kyo::                         
 * latex::                       
 * linux::                       
+* linux_::                      
 * macintosh::                   
 * mf::                          
 * mp::                          
@@ -9744,7 +9745,6 @@ to you, depending on its output format.
 * regis_::                      
 * rgip::                        
 * sun::                         
-* sun_::                        
 * svg::                         
 * tek410x::                     
 * tek410x_::                    
@@ -12065,7 +12065,7 @@ The other label -- account for long ticlabels:
 
 @end example
 
-@node linux, macintosh, latex, terminal
+@node linux, linux_, latex, terminal
 @subsubsection linux
 
 @c ?commands set terminal linux
@@ -12082,7 +12082,24 @@ environment variable GSVGAMODE for the default mode; if not set, it uses
 1024x768x256 as default mode or, if that is not possible, 640x480x16
 (standard VGA)."
 
-@node macintosh, mf, linux, terminal
+@node linux_, macintosh, linux, terminal
+@subsubsection linux
+
+@c ?commands set terminal linux
+@c ?set terminal linux
+@c ?set term linux
+@c ?terminal linux
+@c ?term linux
+@cindex linux
+@tmindex linux
+
+
+The `linux` driver has no additional options to specify.  It looks at the
+environment variable GSVGAMODE for the default mode; if not set, it uses
+1024x768x256 as default mode or, if that is not possible, 640x480x16
+(standard VGA)."
+
+@node macintosh, mf, linux_, terminal
 @subsubsection macintosh
 
 @c ?set terminal macintosh
@@ -13351,7 +13368,7 @@ Example:
 
 puts six graphs on a page in three rows of two in portrait orientation."
 
-@node sun, sun_, rgip, terminal
+@node sun, svg, rgip, terminal
 @subsubsection sun
 
 @c ?commands set terminal sun
@@ -13366,22 +13383,7 @@ puts six graphs on a page in three rows of two in portrait orientation."
 The `sun` terminal driver supports the SunView window system.  It has no
 options."
 
-@node sun_, svg, sun, terminal
-@subsubsection sun
-
-@c ?commands set terminal sun
-@c ?set terminal sun
-@c ?set term sun
-@c ?terminal sun
-@c ?term sun
-@cindex sun
-@tmindex sun
-
-
-The `sun` terminal driver supports the SunView window system.  It has no
-options."
-
-@node svg, tek410x, sun_, terminal
+@node svg, tek410x, sun, terminal
 @subsubsection svg
 
 @c ?commands set terminal svg

@@ -1,11 +1,11 @@
 /*
- * $Id: version.h,v 1.2 2000/11/01 18:57:34 broeker Exp $
+ * $Id: version.h,v 1.3 2000/11/02 15:13:38 broeker Exp $
  */
 
 /* GNUPLOT - version.h */
 
 /*[
- * Copyright 2000   Thomas Williams, Colin Kelley
+ * Copyright 2000, 2004   Thomas Williams, Colin Kelley
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted,

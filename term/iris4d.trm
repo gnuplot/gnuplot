@@ -1,12 +1,12 @@
 /*
- * $Id: iris4d.trm,v 1.9 1999/06/19 20:30:51 lhecking Exp $
+ * $Id: iris4d.trm,v 1.10 1999/06/22 11:54:19 lhecking Exp $
  *
  */
 
 /* GNUPLOT - iris4d.trm */
 
 /*[
- * Copyright 1990 - 1993, 1998   Thomas Williams, Colin Kelley
+ * Copyright 1990 - 1993, 1998, 2004   Thomas Williams, Colin Kelley
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted,
@@ -46,7 +46,7 @@
  *           (Applied Research Corporation) 7/1/89
  *           INTERNET: merritt@iris613.gsfc.nasa.gov
  * 
- * send your comments or suggestions to (info-gnuplot@dartmouth.edu).
+ * send your comments or suggestions to (gnuplot-info@lists.sourceforge.net).
  * 
  */
 /*

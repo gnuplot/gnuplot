@@ -1,11 +1,11 @@
 /*
- * $Id: plot3d.h,v 1.12 2002/07/22 09:22:18 mikulik Exp $
+ * $Id: plot3d.h,v 1.13 2004/02/23 13:29:35 broeker Exp $
  */
 
 /* GNUPLOT - plot3d.h */
 
 /*[
- * Copyright 1999   Thomas Williams, Colin Kelley
+ * Copyright 1999, 2004   Thomas Williams, Colin Kelley
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted,

@@ -1,11 +1,11 @@
 /*
- * $Id: bitmap.h,v 1.11 2001/08/22 14:15:33 broeker Exp $
+ * $Id: bitmap.h,v 1.12 2001/08/27 15:02:14 broeker Exp $
  */
 
 /* GNUPLOT - bitmap.h */
 
 /*[
- * Copyright 1986 - 1993, 1998   Thomas Williams, Colin Kelley
+ * Copyright 1986 - 1993, 1998, 2004   Thomas Williams, Colin Kelley
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted,

@@ -1,11 +1,11 @@
 /*
- * $Id: graph3d.h,v 1.13 2002/03/18 18:19:10 broeker Exp $
+ * $Id: graph3d.h,v 1.14 2002/10/20 21:19:50 mikulik Exp $
  */
 
 /* GNUPLOT - graph3d.h */
 
 /*[
- * Copyright 1999   Thomas Williams, Colin Kelley
+ * Copyright 1999, 2004   Thomas Williams, Colin Kelley
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted,

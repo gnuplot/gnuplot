@@ -1,12 +1,12 @@
 /*
- * $Id: table.trm,v 1.7 1998/11/25 21:08:17 lhecking Exp $
+ * $Id: table.trm,v 1.8 1999/11/24 12:47:12 lhecking Exp $
  *
  */
 
 /* GNUPLOT - table.trm */
 
 /*[
- * Copyright 1986 - 1993, 1998   Thomas Williams, Colin Kelley
+ * Copyright 1986 - 1993, 1998, 2004   Thomas Williams, Colin Kelley
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted,

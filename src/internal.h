@@ -1,11 +1,11 @@
 /*
- * $Id: internal.h,v 1.6 2001/08/22 14:15:34 broeker Exp $
+ * $Id: internal.h,v 1.7 2003/07/22 17:22:47 sfeam Exp $
  */
 
 /* GNUPLOT - internal.h */
 
 /*[
- * Copyright 1999   Thomas Williams, Colin Kelley
+ * Copyright 1999, 2004   Thomas Williams, Colin Kelley
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted,

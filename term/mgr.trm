@@ -1,11 +1,11 @@
 /*
- * $Id: mgr.trm,v 1.6 1999/06/19 20:30:52 lhecking Exp $
+ * $Id: mgr.trm,v 1.7 1999/06/22 11:54:20 lhecking Exp $
  */
 
 /* GNUPLOT - mgr.trm */
 
 /*[
- * Copyright 1986 - 1993, 1998   Thomas Williams, Colin Kelley
+ * Copyright 1986 - 1993, 1998, 2004   Thomas Williams, Colin Kelley
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted,

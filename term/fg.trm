@@ -1,11 +1,11 @@
 /*
- * $Id: fg.trm,v 1.7 1999/06/22 11:54:16 lhecking Exp $
+ * $Id: fg.trm,v 1.8 2002/07/26 16:42:29 mikulik Exp $
  */
 
 /* GNUPLOT - fg.trm */
 
 /*[
- * Copyright 1990 - 1993, 1998
+ * Copyright 1990 - 1993, 1998, 2004
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted,
@@ -45,25 +45,8 @@
  *		  Gnuplot for DOS 386/flash graphics
  *				  Clifton T. Liu
  *
- * There is a mailing list for gnuplot users. Note, however, that the
- * newsgroup 
- *	comp.graphics.apps.gnuplot 
- * is identical to the mailing list (they
- * both carry the same set of messages). We prefer that you read the
- * messages through that newsgroup, to subscribing to the mailing list.
- * (If you can read that newsgroup, and are already on the mailing list,
- * please send a message to majordomo@dartmouth.edu, asking to be
- * removed from the mailing list.)
- *
- * The address for mailing to list members is
- *	   info-gnuplot@dartmouth.edu
- * and for mailing administrative requests is 
- *	   majordomo@dartmouth.edu
- * The mailing list for bug reports is 
- *	   bug-gnuplot@dartmouth.edu
- * The list of those interested in beta-test versions is
- *	   info-gnuplot-beta@dartmouth.edu
  */
+
 /* The modifications to allow Gnuplot to compile with Zortech C/C++   */
 /* 3.1 /Flash Graphics	were made by Clifton T. Liu		  */
 /* (cliu@merlin.appmath.columbia.edu)		 20 Feb 1993	  */

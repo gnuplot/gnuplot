@@ -1,11 +1,11 @@
 /*
- * $Id: texdraw.trm,v 1.13 1999/10/01 15:09:13 lhecking Exp $
+ * $Id: texdraw.trm,v 1.14 2004/03/29 10:43:36 broeker Exp $
  */
 
 /* GNUPLOT - texdraw.trm */
 
 /*[
- * Copyright 1990 - 1993, 1998
+ * Copyright 1990 - 1993, 1998, 2004
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted,
@@ -45,7 +45,7 @@
  *   clipper@csd.uwo.ca
  *   January 20, 1992
  *
- * send your comments or suggestions to (info-gnuplot@dartmouth.edu).
+ * send your comments or suggestions to (gnuplot-info@lists.sourceforge.net).
  *
  */
 

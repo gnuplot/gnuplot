@@ -5,7 +5,7 @@
 /* GNUPLOT - gadgets.h */
 
 /*[
- * Copyright 2000   Thomas Williams, Colin Kelley
+ * Copyright 2000, 2004   Thomas Williams, Colin Kelley
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted,

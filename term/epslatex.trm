@@ -1,11 +1,11 @@
 /*
- * $Id: epslatex.trm,v 1.21 2003/06/15 06:01:29 sfeam Exp $
+ * $Id: epslatex.trm,v 1.22 2004/03/29 10:43:36 broeker Exp $
  */
 
 /* GNUPLOT - epslatex.trm */
 
 /*[
- * Copyright 2000
+ * Copyright 2000, 2004
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted,

@@ -1,12 +1,12 @@
 /*
- * $Id: xref.h,v 1.2 1998/10/19 13:19:28 lhecking Exp $
+ * $Id: xref.h,v 1.3 2000/11/02 19:05:10 lhecking Exp $
  *
  */
 
 /* GNUPLOT - xref.h */
 
 /*[
- * Copyright 1986 - 1993, 1998   Thomas Williams, Colin Kelley
+ * Copyright 1986 - 1993, 1998, 2004   Thomas Williams, Colin Kelley
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted,

@@ -1,4 +1,31 @@
-2004-04-12  Hans-Bernhard Broeker  <broeker@accip02.physik.rwth-aachen.de>
+2004-04-13  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* PATCHLEVEL: Reset to zero.
+
+	* VERSION: Updated to 4.0 for the release.
+
+	* All over the place: Removed pointers to mailing lists at
+	Dartmouth from all source files.  Updated Copyright statements to
+	list 2004 as one of the years.  Changed remaining references to
+	mailing lists to the new ones as SourceForge.net.
+	
+	* docs/gpcard.tex: Small updates to reflect at least the major
+	changes since 3.7.
+	
+	* lisp/README.1st: A new file to explain the relation between this
+	directory and the stand-alone gnuplot-mode package made by Bruce
+	Ravel.
+
+	* lisp/configure.in: Set AC_PREREQ() to 2.52 like in the master
+	configure.in, to avoid strange interactions caused by mixed
+	autoconf versions.
+	
+	* tutorial/.cvsignore: Ignore *.toc files, too.
+
+	* term/gd.trm (PNG_options): Bugfix: font options "tiny"
+	... "giant" failed to unset the freetype "font" option.
+
+2004-04-12  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/command.c (do_system) [!USE_OWN_WINSYSTEM_FUNCTION]: disable
 	usage of winsystem(), which apparently causes more trouble than
@@ -7,15 +34,15 @@
 
 2003-04-10  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
-	* INSTALL: Include a notice about the demise of 16-bit versions
-	on MS-DOS and Windows.  Updated the paragraph about the history
-	of gnuplot-mode.
+	* INSTALL: Include a notice about the demise of 16-bit versions on
+	MS-DOS and Windows.  Updated the paragraph about the history of
+	gnuplot-mode.
 
 	* README.1ST: Updated. Added a paragraph about PDFlib licensing.
 
 	* README: Updated to reflect imminent release.  Changed text about
-	mailing lists.  Added pointers to the web pages at SF.net.  Removed
-	some mirrors that don't exist any longer.
+	mailing lists.  Added pointers to the web pages at SF.net.
+	Removed some mirrors that don't exist any longer.
 
 	* src/fit.c (Dblfn): Re-initialize va_args between uses.  Needed
 	to be C standard compliant and survive running on Linux/AMD64.
@@ -23,11 +50,11 @@
 	
 2003-04-08  Ethan Merritt  <merritt@u.washington.edu>
 
-	* src/readline.c: Revert patch from 2003-05-10 
-	"Allow <tab> characters in input stream." This broke filename auto-
-	completion by gnu libreadline. Reversion re-introduces the problem that
-	gnuplot's own readline makes it impossible to enter <tabs> in a command
-	line.
+	* src/readline.c: Revert patch from 2003-05-10 "Allow <tab>
+	characters in input stream." This broke filename auto- completion
+	by gnu libreadline. Reversion re-introduces the problem that
+	gnuplot's own readline makes it impossible to enter <tabs> in a
+	command line.
 
 2004-04-08  Petr Mikulik  <mikulik@physics.muni.cz>
 

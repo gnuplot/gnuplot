@@ -1,12 +1,12 @@
 /*
- * $Id: dumb.trm,v 1.14 2004/03/23 05:40:48 sfeam Exp $
+ * $Id: dumb.trm,v 1.15 2004/03/29 10:43:36 broeker Exp $
  *
  */
 
 /* GNUPLOT - dumb.trm */
 
 /*[
- * Copyright 1991 - 1993, 1998   Thomas Williams, Colin Kelley
+ * Copyright 1991 - 1993, 1998, 2004   Thomas Williams, Colin Kelley
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted,
@@ -52,7 +52,7 @@
  *	it by adding a line
  *	#define NO_DUMB_ENHANCED_SUPPORT
  *
- * send your comments or suggestions to (info-gnuplot@dartmouth.edu).
+ * send your comments or suggestions to (gnuplot-info@lists.sourceforge.net).
  *
  */
 #include "driver.h"

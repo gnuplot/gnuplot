@@ -1,11 +1,11 @@
 /*
- * $Id: post.trm,v 1.103 2004/02/14 03:14:45 sfeam Exp $
+ * $Id: post.trm,v 1.104 2004/03/23 05:40:48 sfeam Exp $
  */
 
 /* GNUPLOT - post.trm */
 
 /*[
- * Copyright 1990 - 1993, 1998, 1999, 2000, 2001
+ * Copyright 1990 - 1993, 1998, 1999, 2000, 2001, 2004
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted,
@@ -44,7 +44,7 @@
  * modified 10/5/95 by drd - put in support for other postscript drivers
  * (enhpost, pslatex, ...) so they dont have to work quite so hard
  * 
- * send your comments or suggestions to (info-gnuplot@dartmouth.edu).
+ * send your comments or suggestions to (gnuplot-info@lists.sourceforge.net).
  *
  * The 'postscript' driver produces landscape output 10" wide and 7" high.  
  * To change font to Times-Roman and font size to 20pts use 

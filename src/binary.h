@@ -1,11 +1,11 @@
 /*
- * $Id: binary.h,v 1.7 2000/11/01 18:57:27 broeker Exp $
+ * $Id: binary.h,v 1.8 2001/08/22 14:15:33 broeker Exp $
  */
 
 /* GNUPLOT - binary.h */
 
 /*[
- * Copyright 1986 - 1993, 1998   Thomas Williams, Colin Kelley
+ * Copyright 1986 - 1993, 1998, 2004   Thomas Williams, Colin Kelley
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted,

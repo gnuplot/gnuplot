@@ -1,11 +1,11 @@
 /*
- * $Id: tables.h,v 1.41 2003/11/24 15:15:14 mikulik Exp $
+ * $Id: tables.h,v 1.42 2003/12/01 16:15:50 broeker Exp $
  */
 
 /* GNUPLOT - tables.h */
 
 /*[
- * Copyright 1999  Lars Hecking
+ * Copyright 1999, 2004  Lars Hecking
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted,

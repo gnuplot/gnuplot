@@ -1,11 +1,11 @@
 /*
- * $Id: plot.h,v 1.38 2000/11/01 18:57:33 broeker Exp $
+ * $Id: plot.h,v 1.39 2000/11/14 15:35:51 mikulik Exp $
  */
 
 /* GNUPLOT - plot.h */
 
 /*[
- * Copyright 1986 - 1993, 1998   Thomas Williams, Colin Kelley
+ * Copyright 1986 - 1993, 1998, 2004   Thomas Williams, Colin Kelley
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted,

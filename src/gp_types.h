@@ -1,11 +1,11 @@
 /*
- * $Id: gp_types.h,v 1.17 2003/07/16 04:17:32 sfeam Exp $
+ * $Id: gp_types.h,v 1.18 2003/10/10 13:16:45 mikulik Exp $
  */
 
 /* GNUPLOT - gp_types.h */
 
 /*[
- * Copyright 2000   Thomas Williams, Colin Kelley
+ * Copyright 2000, 2004   Thomas Williams, Colin Kelley
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted,

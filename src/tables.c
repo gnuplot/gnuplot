@@ -1,11 +1,11 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: tables.c,v 1.48 2003/11/28 15:25:09 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: tables.c,v 1.49 2003/12/01 16:15:51 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - tables.c */
 
 /*[
- * Copyright 1999  Lars Hecking
+ * Copyright 1999, 2004   Lars Hecking
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted,

@@ -1,12 +1,12 @@
 /*
- * $Id: kyo.trm,v 1.7 1999/06/19 20:30:51 lhecking Exp $
+ * $Id: kyo.trm,v 1.8 1999/06/22 11:54:19 lhecking Exp $
  *
  */
 
 /* Prescribe (KYOCERA) driver - Michael Waldor */
 
 /*[
- * Copyright 1990 - 1993, 1998
+ * Copyright 1990 - 1993, 1998, 2004
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted,

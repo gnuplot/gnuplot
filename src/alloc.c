@@ -1,11 +1,11 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: alloc.c,v 1.8 1999/10/29 18:47:16 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: alloc.c,v 1.9 1999/11/08 19:24:27 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - alloc.c */
 
 /*[
- * Copyright 1986 - 1993, 1998   Thomas Williams, Colin Kelley
+ * Copyright 1986 - 1993, 1998, 2004   Thomas Williams, Colin Kelley
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted,

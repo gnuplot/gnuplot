@@ -1,11 +1,11 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.86 2004/03/30 11:49:24 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.87 2004/03/31 17:05:29 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
 
 /*[
- * Copyright 1986 - 1993, 1998   Thomas Williams, Colin Kelley
+ * Copyright 1986 - 1993, 1998, 2004   Thomas Williams, Colin Kelley
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted,

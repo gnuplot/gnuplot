@@ -1,10 +1,10 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wgnuplib.c,v 1.3 2001/09/19 14:47:02 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: wgnuplib.c,v 1.4 2002/03/10 18:54:52 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - win/wgnuplib.c */
 /*[
- * Copyright 1992, 1993, 1998   Russell Lang
+ * Copyright 1992, 1993, 1998, 2004   Russell Lang
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted,
@@ -37,13 +37,6 @@ static char *RCSid() { return RCSid("$Id: wgnuplib.c,v 1.3 2001/09/19 14:47:02 m
  * AUTHORS
  * 
  *   Russell Lang
- * 
- * Send your comments or suggestions to 
- *  info-gnuplot@dartmouth.edu.
- * This is a mailing list; to join it send a note to 
- *  majordomo@dartmouth.edu.  
- * Send bug reports to
- *  bug-gnuplot@dartmouth.edu.
  */
 
 #define STRICT

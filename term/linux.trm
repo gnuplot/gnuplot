@@ -1,12 +1,12 @@
 /*
- * $Id: linux.trm,v 1.23 2002/07/26 16:42:29 mikulik Exp $
+ * $Id: linux.trm,v 1.24 2002/10/18 10:05:06 lhecking Exp $
  *
  */
 
 /* GNUPLOT - linux.trm */
 
 /*[
- * Copyright 1993, 1998
+ * Copyright 1993, 1998, 2004
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted,

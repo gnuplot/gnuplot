@@ -1,5 +1,5 @@
 #
-# $Id: makefile.ami,v 1.5 1999/12/01 22:07:56 lhecking Exp $
+# $Id: makefile.ami,v 1.6 2002/02/21 12:27:37 lhecking Exp $
 #
 # GNUPLOT Makefile for Manx Aztec C 5.2 beta of better on the Amiga
 # 
@@ -14,7 +14,7 @@
 # where to install help file gnuplot.gih
 HELPFILE=S:gnuplot.gih
 # Where to send email about bugs and comments (locally)
-EMAIL="bug-gnuplot@dartmouth.edu"
+EMAIL="gnuplot-bugs@lists.sourceforge.net"
 
 #
 # Manx Aztec C v5.2 compiler options

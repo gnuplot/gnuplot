@@ -1,12 +1,12 @@
 /*
- * $Id: hp500c.trm,v 1.12 1999/12/10 16:59:48 lhecking Exp $
+ * $Id: hp500c.trm,v 1.13 2001/08/27 15:04:12 broeker Exp $
  *
  */
 
 /* GNUPLOT - hp500c.trm */
 
 /*[
- * Copyright 1990 - 1993, 1998
+ * Copyright 1990 - 1993, 1998, 2004
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted,
@@ -47,7 +47,7 @@
  *  Maurice Castro   -- /
  *  UdoHessenauer    ----> derived this version from the above one
  *
- * send your comments or suggestions to (info-gnuplot@dartmouth.edu).
+ * send your comments or suggestions to (gnuplot-info@lists.sourceforge.net).
  * 
  */
 

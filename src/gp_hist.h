@@ -1,11 +1,11 @@
 /*
- * $Id: gp_hist.h,v 1.4 2000/11/01 18:57:28 broeker Exp $
+ * $Id: gp_hist.h,v 1.5 2003/11/24 16:22:31 mikulik Exp $
  */
 
 /* GNUPLOT - gp_hist.h */
 
 /*[
- * Copyright 1999   Thomas Williams, Colin Kelley
+ * Copyright 1999, 2004   Thomas Williams, Colin Kelley
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted,

@@ -1,11 +1,11 @@
 /*
- * $Id: wcommon.h,v 1.1 1999/03/26 22:11:00 lhecking Exp $
+ * $Id: wcommon.h,v 1.2 2001/09/19 14:47:02 mikulik Exp $
  */
 
 /* GNUPLOT - wcommon.h */
 
 /*[
- * Copyright 1992 - 1993, 1998 Maurice Castro, Russell Lang
+ * Copyright 1992 - 1993, 1998, 2004 Maurice Castro, Russell Lang
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted,
@@ -39,13 +39,6 @@
  * 
  *   Maurice Castro
  *   Russell Lang
- * 
- * Send your comments or suggestions to 
- *  info-gnuplot@dartmouth.edu.
- * This is a mailing list; to join it send a note to 
- *  majordomo@dartmouth.edu.  
- * Send bug reports to
- *  bug-gnuplot@dartmouth.edu.
  */
 
 #if WINVER >= 0x030a

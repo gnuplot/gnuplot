@@ -1,11 +1,11 @@
 /*
- * $Id: rgip.trm,v 1.11 1999/06/22 11:54:23 lhecking Exp $
+ * $Id: rgip.trm,v 1.12 2002/08/01 16:51:20 broeker Exp $
  */
 
 /* GNUPLOT - rgip.trm Uniplex graphics metafile */
 
 /*[
- * Copyright 1990 - 1993, 1998
+ * Copyright 1990 - 1993, 1998, 2004
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted,
@@ -43,7 +43,7 @@
  * AUTHORS
  *   Hans Olav Eggestad
  *
- * send your comments or suggestions to (info-gnuplot@dartmouth.edu).
+ * send your comments or suggestions to (gnuplot-info@lists.sourceforge.net).
  *
  */
 

@@ -1,12 +1,12 @@
 /*
- * $Id: epson.trm,v 1.17 2002/02/25 03:10:41 broeker Exp $
+ * $Id: epson.trm,v 1.18 2002/12/13 14:58:39 lhecking Exp $
  *
  */
 
 /* GNUPLOT - epson.trm */
 
 /*[
- * Copyright 1990 - 1993, 1998
+ * Copyright 1990 - 1993, 1998, 2004
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted,
@@ -47,7 +47,7 @@
  *  Russell Lang
  *  William Wilson
  *
- * send your comments or suggestions to (info-gnuplot@dartmouth.edu).
+ * send your comments or suggestions to (gnuplot-info@lists.sourceforge.net).
  * 
  */
 

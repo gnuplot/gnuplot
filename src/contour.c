@@ -1,11 +1,11 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: contour.c,v 1.21 2002/01/31 16:57:02 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: contour.c,v 1.22 2002/02/20 03:19:43 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - contour.c */
 
 /*[
- * Copyright 1986 - 1993, 1998   Thomas Williams, Colin Kelley
+ * Copyright 1986 - 1993, 1998, 2004   Thomas Williams, Colin Kelley
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted,

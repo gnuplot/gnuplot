@@ -1,12 +1,12 @@
 /*
- * $Id: pc.trm,v 1.16 2002/07/26 16:42:29 mikulik Exp $
+ * $Id: pc.trm,v 1.17 2004/02/23 13:59:37 broeker Exp $
  *
  */
 
 /* GNUPLOT - pc.trm */
 
 /*[
- * Copyright 1990 - 1993, 1998
+ * Copyright 1990 - 1993, 1998, 2004
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted,
@@ -50,7 +50,7 @@
  *  Colin Kelley, Thomas Williams, William Wilson, Russell Lang
  *  modified by David J. Liu (liu@csb.yale.edu) for version 3.6
  *
- * send your comments or suggestions to (info-gnuplot@dartmouth.edu).
+ * send your comments or suggestions to (gnuplot-info@lists.sourceforge.net).
  *
  * Because only one compiler is used to generate gnuplot.exe
  * and the type of the single graphics board is auto-detected,

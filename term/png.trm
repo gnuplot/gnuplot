@@ -1,12 +1,12 @@
 /*
- * $Id: png.trm,v 1.39 2003/02/18 16:38:13 broeker Exp $
+ * $Id: png.trm,v 1.40 2003/09/12 14:36:06 broeker Exp $
  *
  */
 
 /* GNUPLOT - png.trm */
 
 /*[
- * Copyright 1995, 1998
+ * Copyright 1995, 1998, 2004
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted,
@@ -49,7 +49,7 @@
  *  Hartmut Freihofer  updates
  *  H.-B. Broeker      fixes to Eric's and Hartmut's changes
  *
- * send your comments or suggestions to (info-gnuplot@dartmouth.edu).
+ * send your comments or suggestions to (gnuplot-info@lists.sourceforge.net).
  *
  */
 

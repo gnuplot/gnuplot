@@ -1,12 +1,12 @@
 /*
- * $Id: latex.trm,v 1.24 2002/12/13 14:58:49 lhecking Exp $
+ * $Id: latex.trm,v 1.25 2004/03/29 10:43:36 broeker Exp $
  *
  */
 
 /* GNUPLOT - latex.trm */
 
 /*[
- * Copyright 1990 - 1993, 1998
+ * Copyright 1990 - 1993, 1998, 2004
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted,
@@ -45,7 +45,7 @@
  * AUTHORS
  *   David Kotz, Russell Lang
  *
- * send your comments or suggestions to (info-gnuplot@dartmouth.edu).
+ * send your comments or suggestions to (gnuplot-info@lists.sourceforge.net).
  * 
  */
 

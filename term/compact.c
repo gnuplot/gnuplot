@@ -1,5 +1,5 @@
 /*
- * $Id: compact.c,v 1.3 1999/10/01 15:09:10 lhecking Exp $
+ * $Id: compact.c,v 1.4 1999/11/24 12:31:37 lhecking Exp $
  *
  */
 
@@ -8,7 +8,7 @@
 /* contains routines to compress a vector stream without modifying it */
 
 /*[
- * Copyright 1986 - 1993, 1998   Thomas Williams, Colin Kelley
+ * Copyright 1986 - 1993, 1998, 2004   Thomas Williams, Colin Kelley
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted,

@@ -1,11 +1,11 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: scanner.c,v 1.14 1999/11/08 19:24:33 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: scanner.c,v 1.15 2001/02/01 17:56:05 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - scanner.c */
 
 /*[
- * Copyright 1986 - 1993, 1998   Thomas Williams, Colin Kelley
+ * Copyright 1986 - 1993, 1998, 2004   Thomas Williams, Colin Kelley
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted,

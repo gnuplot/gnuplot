@@ -1,11 +1,11 @@
 /*
- * $Id: djsvga.trm,v 1.14 2001/08/27 15:04:11 broeker Exp $
+ * $Id: djsvga.trm,v 1.15 2002/12/13 14:58:36 lhecking Exp $
  */
 
 /* GNUPLOT - djsvga.trm */
 
 /*[
- * Copyright 1992 - 1993, 1998
+ * Copyright 1992 - 1993, 1998, 2004
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted,
@@ -45,7 +45,7 @@
  *  Edzer Pebesma (gnuplot 3.6: new terminal layout, fonts, grx20)
  *  Hans-Bernhard Broeker (several improvements)
  *
- * send your comments or suggestions to (info-gnuplot@dartmouth.edu).
+ * send your comments or suggestions to (gnuplot-info@lists.sourceforge.net).
  *
  */
 

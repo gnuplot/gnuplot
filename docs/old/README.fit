@@ -28,13 +28,6 @@ GNUFIT is available as follows:
     gft12dos.zip	DOS executables 
 
 
-The files may be downloaded by anonymous ftp from
-
-	dartmouth.edu
-	129.170.16.4
-	/pub/gnuplot
-
-
 A description of the files in gnufit12.tar.gz
 =================================================
 
@@ -114,7 +107,7 @@ rubbish but because it will be included as an internal part into the next
 official release of gnuplot. Development is under way!
 
 Please send any comments, bug-reports, implementation reports and
-improvement proposals to bug-gnuplot@dartmouth.edu
+improvement proposals to gnuplot-bugs@lists.sourceforge.net
 
 ***************************************************************************
 

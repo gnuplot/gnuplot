@@ -1,12 +1,12 @@
 /*
- * $Id: dxy.trm,v 1.8 1999/06/22 11:54:16 lhecking Exp $
+ * $Id: dxy.trm,v 1.9 2002/07/26 16:42:28 mikulik Exp $
  *
  */
 
 /* GNUPLOT - dxy.trm */
 
 /*[
- * Copyright 1990 - 1993, 1998
+ * Copyright 1990 - 1993, 1998, 2004
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted,
@@ -45,7 +45,7 @@
  *  Martin Yii, eln557h@monu3.OZ
  *  Further modified Jan 1990 by Russell Lang, rjl@monu1.cc.monash.oz
  * 
- * send your comments or suggestions to (info-gnuplot@dartmouth.edu).
+ * send your comments or suggestions to (gnuplot-info@lists.sourceforge.net).
  * 
  */
 

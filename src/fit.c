@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.37 2004/01/07 19:11:30 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.38 2004/04/10 14:28:02 broeker Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -18,26 +18,13 @@ static char *RCSid() { return RCSid("$Id: fit.c,v 1.37 2004/01/07 19:11:30 lheck
  *
  *      added as Patch to Gnuplot (v3.2 and higher)
  *      by Carsten Grammes
- *      Experimental Physics, University of Saarbruecken, Germany
- *
- *      Internet address: cagr@rz.uni-sb.de
- *
- *      Copyright of this module:  1993, 1998  Carsten Grammes
- *
- *      Permission to use, copy, and distribute this software and its
- *      documentation for any purpose with or without fee is hereby granted,
- *      provided that the above copyright notice appear in all copies and
- *      that both that copyright notice and this permission notice appear
- *      in supporting documentation.
- *
- *      This software is provided "as is" without express or implied warranty.
  *
  *      930726:     Recoding of the Unix-like raw console I/O routines by:
  *                  Michele Marziani (marziani@ferrara.infn.it)
  * drd: start unitialised variables at 1 rather than NEARLY_ZERO
  *  (fit is more likely to converge if started from 1 than 1e-30 ?)
  *
- * HBB (Broeker@physik.rwth-aachen.de) : fit didn't calculate the errors
+ * HBB (broeker@physik.rwth-aachen.de) : fit didn't calculate the errors
  * in the 'physically correct' (:-) way, if a third data column containing
  * the errors (or 'uncertainties') of the input data was given. I think
  * I've fixed that, but I'm not sure I really understood the M-L-algo well

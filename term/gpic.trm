@@ -1,11 +1,11 @@
 /*
- * $Id: gpic.trm,v 1.12 2002/02/25 03:10:41 broeker Exp $
+ * $Id: gpic.trm,v 1.13 2004/03/29 10:43:36 broeker Exp $
  */
 
 /* GNUPLOT - gpic.trm -*-C-*- */
 
 /*[
- * Copyright 1993, 1998
+ * Copyright 1993, 1998, 2004
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted,
