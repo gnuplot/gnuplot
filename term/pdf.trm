@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: pdf.trm,v 1.43 2005/01/12 00:05:42 sfeam Exp $
+ * $Id: pdf.trm,v 1.44 2005/02/14 10:19:16 mikulik Exp $
  */
 
 /*------------------------------
@@ -94,6 +94,7 @@ static unsigned int PDF_xLast = UINT_MAX; /* current pen horizontal position*/
 static unsigned int PDF_yLast = UINT_MAX; /* current pen vertical position*/
 
 static int PDF_LineType = LT_UNDEFINED;	/* current line type*/
+static int PDF_LineCap = 0; /* Butt ends */
 static double PDF_LineWidth = 1.0; /* current line width*/
 static int PDF_TextAngle = 0;		/* current text orientation*/
 static enum JUSTIFY PDF_TextJust = LEFT; /* current text justification*/
@@ -334,14 +335,26 @@ PDF_options ()
 	    continue;
 	}
 
+	if (almost_equals(c_token, "rou$nded")) {
+	    c_token++;
+	    PDF_LineCap = 1;
+	    continue;
+	}
+
+	if (equals(c_token, "butt")) {
+	    PDF_LineCap = 0;
+	    continue;
+	}
+
 	int_error(c_token, "unexpected text at end of command");
 
     }
 
     /* Save options back into options string in normalized format */
-    sprintf(term_options, "%s fname '%s'  fsize %g linewidth %3.1f ",
+    sprintf(term_options, "%s fname '%s'  fsize %g linewidth %3.1f %s ",
 	    term->put_text == ENHPDF_put_text ? "enhanced" : "noenhanced",
-	    PDF_fontNameDef, PDF_fontSizeDef, PDF_linewidth_factor);
+	    PDF_fontNameDef, PDF_fontSizeDef, PDF_linewidth_factor,
+	    PDF_LineCap == 1 ? "rounded" : "");
 }
 
 
@@ -424,6 +437,10 @@ PDF_init ()
 
     /* initialize terminal's pointsize from "set pointsize" value */
     term_pointsize = pointsize;
+
+    /* Initialize other default settings */
+    PDF_setlinecap(myPDF, PDF_LineCap);
+    PDF_setlinejoin(myPDF, PDF_LineCap);	/* round+round or butt+mitre */
 }
 
 
@@ -538,6 +555,7 @@ PDF_dot (unsigned int x, unsigned int y)
     PDF_moveto(myPDF, x, y);
     PDF_lineto(myPDF, x, y);
     PDF_stroke(myPDF);
+    PDF_setlinecap(myPDF, PDF_LineCap); /* restore ends */
 }
 
 
@@ -1495,7 +1513,7 @@ START_HELP(pdf)
 "",
 " Syntax:",
 "       set terminal pdf {fname \"<font>\"} {fsize <fontsize>}",
-"                        {{no}enhanced} {linewidth <n>}",
+"                        {{no}enhanced} {linewidth <n>} {rounded|butt}",
 "",
 " where <font> is the name of the default font to use (default Helvetica)",
 " and <fontsize> is the font size (in points, default 12).",
@@ -1505,6 +1523,9 @@ START_HELP(pdf)
 " information. Only the core PDF fonts are supported.",
 "",
 " The width of all lines in the plot can be increased by the factor <n>",
-" specified in `linewidth`."
+" specified in `linewidth`.",
+" `rounded` sets line caps and line joins to be rounded; `butt` is the",
+" default, butt caps and mitered joins;"
+""
 END_HELP(pdf)
 #endif

@@ -1,3 +1,10 @@
+2005-02-14  Ethan Merritt  <merritt@u.washington.edu>
+
+	* term/pdf.trm (PDF_options PDF_init PDF_dot): Add terminal option
+	{rounded|butt} exactly parallel to post.trm. The default is butt
+	ends and mitred line joins. "rounded" switches to rounded ends and
+	rounded joins.
+
 2005-02-14  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/term.c: Added #include "getcolor.h".
