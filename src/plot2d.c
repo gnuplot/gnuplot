@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.39 2001/06/11 16:47:59 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.40 2001/06/22 15:44:58 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -942,22 +942,16 @@ eval_plots()
 
 	    /*  deal with smooth */
 	    if (almost_equals(c_token, "s$mooth")) {
-		c_token++;
-		switch(lookup_table(&plot_smooth_tbl[0],c_token)) {
+	        int found_token =
+		    lookup_table(plot_smooth_tbl, ++c_token);
+
+		switch(found_token) {
 		case SMOOTH_ACSPLINES:
-		    this_plot->plot_smooth = SMOOTH_ACSPLINES;
-		    break;
 		case SMOOTH_BEZIER:
-		    this_plot->plot_smooth = SMOOTH_BEZIER;
-		    break;
 		case SMOOTH_CSPLINES:
-		    this_plot->plot_smooth = SMOOTH_CSPLINES;
-		    break;
 		case SMOOTH_SBEZIER:
-		    this_plot->plot_smooth = SMOOTH_SBEZIER;
-		    break;
 		case SMOOTH_UNIQUE:
-		    this_plot->plot_smooth = SMOOTH_UNIQUE;
+		    this_plot->plot_smooth = found_token;
 		    break;
 		case SMOOTH_NONE:
 		default:
