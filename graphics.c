@@ -130,7 +130,7 @@ static void ytick2d_callback __PROTO((int axis, double place, char *text, struct
 static void xtick2d_callback __PROTO((int axis, double place, char *text, struct lp_style_type grid));
 static void map_position __PROTO((struct position *pos, unsigned int *x, unsigned int *y, char *what));
 static void mant_exp __PROTO((double log_base, double x, int scientific, double *m, int *p));
-static void gprintf __PROTO((char *dest, char *format, double log_base, double x));
+static void gprintf __PROTO((char *dest, size_t count, char *format, double log_base, double x));
 
 #if defined(sun386) || defined(AMIGA_SC_6_1)
 static double CheckLog __PROTO((TBOOLEAN is_log, double base_log, double x));
@@ -3747,11 +3747,23 @@ int *p; /* results */
 }
 /*}}}*/
 	
+/*
+ * Kludge alert!!
+ * Workaround until we have a better solution ...
+ * Note: this assumes that all calls to sprintf in gprintf have
+ * exactly three args. Lars
+ */
+#ifdef HAVE_SNPRINTF
+# define sprintf(str,fmt,arg) \
+    if (snprintf((str),count,(fmt),(arg)) > count) \
+      fprintf (stderr,"%s:%d: Warning: too many digits for format\n",__FILE__,__LINE__)
+#endif
 
 /*{{{  gprintf*/
-/* extended sprintf */
-static void gprintf(dest, format, log_base, x)
+/* extended snprintf */
+static void gprintf(dest, count, format, log_base, x)
 char *dest, *format;
+size_t count;
 double log_base, x; /* we print one number in a number of different formats */
 {
 #define LOC_PI 3.14159265358979323846   /* local definition of PI */
@@ -3928,6 +3940,11 @@ double log_base, x; /* we print one number in a number of different formats */
 }
 #undef LOC_PI   /* local definition of PI */
 /*}}}*/
+#ifdef HAVE_SNPRINTF
+# undef sprintf
+#endif
+
+
 
 /*{{{  gen_tics*/
 /* uses global arrays ticstep[], ticfmt[], min_array[], max_array[],
@@ -3980,7 +3997,7 @@ tic_callback callback;  /* fn to call to actually do the work */
 		if  (datatype[axis] == TIME)
 			gstrftime(label, 24, mark->label ? mark->label : ticfmt[axis], mark->position);
 		else
-			gprintf(label, mark->label ? mark->label : ticfmt[axis], log_base, mark->position);
+			gprintf(label, sizeof(label), mark->label ? mark->label : ticfmt[axis], log_base, mark->position);
  
 		(*callback)(axis, internal, label, lgrd);
 	}
@@ -4172,9 +4189,9 @@ tic_callback callback;  /* fn to call to actually do the work */
 					} else if (polar) {
 						/* if rmin is set, we stored internally with r-rmin */
 						double r = fabs(user) + (autoscale_r&1 ? 0 : rmin);
-						gprintf(label, ticfmt[axis], log_base, r);
+						gprintf(label, sizeof(label), ticfmt[axis], log_base, r);
 					} else {
-						gprintf(label, ticfmt[axis], log_base, user);
+						gprintf(label, sizeof(label), ticfmt[axis], log_base, user);
 					}
 					(*callback)(axis, internal, label, lgrd);
 				}
