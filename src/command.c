@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.80 2003/11/24 15:15:14 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.81 2003/11/24 16:22:31 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -1360,7 +1360,7 @@ se tit'R,G,B profiles of the current color palette';";
 	    int_error(c_token, "combination rgb or gbr or brg etc. expected");
 	c_token++;
     }
-    cmd = gp_alloc(strlen(pre1)+strlen(pre2)+strlen(pre3)+strlen(saveFile)+128+strlen(post), "test rgb");
+    cmd = gp_alloc(strlen(pre1)+strlen(pre2)+strlen(pre3)+strlen(palFile)+128+strlen(post), "test rgb");
     if (!cmd) return;
 #ifdef TESTPAL_SAVEFILE
     /* save current gnuplot 'set' status because of the tricky set's for our temporary testing plot */
