@@ -4963,7 +4963,7 @@ cat >> $CONFIG_STATUS <<EOF
 EOF
 cat >> $CONFIG_STATUS <<\EOF
 \
-test -z "$CONFIG_HEADERS" || echo timestamp >stamp-h ; rm -f termlist
+test -z "$CONFIG_HEADERS" || echo timestamp >stamp-h
 exit 0
 EOF
 chmod +x $CONFIG_STATUS
