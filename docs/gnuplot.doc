@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.231 2004/07/08 12:42:16 broeker Exp $
+C RCS $Id: gnuplot.doc,v 1.232 2004/07/29 21:03:10 sfeam Exp $
 C 18 September 2001
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -7283,11 +7283,17 @@ C ... and restart the table:
 ?style filledcurves
 ?filledcurves
  The `filledcurves` style is only relevant to 2-d plotting. Three variants
- are possible. The default is `closed`, which treats the curve itself as a
- closed polygon. The second option is to fill the area between the curve and
- a given axis, horizontal or vertical line, or a point.
- The third option requires three columns of input data: the x coordinate and
- two corresponding y coordinates; the area between the two curves is filled.
+ are possible. The first two variants require either a function or two columns
+ of input data, and may be further modified by the options listed below.
+ The first variant, `closed`, treats the curve itself as a closed polygon.
+ This is the default.
+ 
+ The second variant is to fill the area between the curve and a given axis, 
+ a horizontal or vertical line, or a point.
+
+ The third variant requires three columns of input data: the x coordinate and
+ two y coordinates corresponding to two curves sampled at the same set of 
+ x coordinates; the area between the two curves is filled.
 
  Syntax:
 
@@ -7298,7 +7304,8 @@ C ... and restart the table:
 
      [closed | {above | below} {x1 | x2 | y1 | y2}[=<a>] | xy=<x>,<y>]
 
- The area is filled between the current curve and
+ The first two plot variants can be further modified by the options
+
      filledcurves closed   ... just filled closed curve,
      filledcurves x1       ... x1 axis,
      filledcurves x2       ... x2 axis, etc for y1 and y2 axes,
@@ -7306,12 +7313,21 @@ C ... and restart the table:
      filledcurves y2=42    ... line y=42 (at y2 axis) ie parallel to x2, etc,
      filledcurves xy=10,20 ... point 10,20 of x1,y1 axes (arc-like shape).
 
- The `above` and `below` options apply only to commands of the form
-     ... filledcurves above {x1|x2|y1|y2}=<val>
- and limit the filled area to one side of the bounding line.
+ Example of filling the area between two input curves.
+^ <a href="http://www.gnuplot.info/demo/fillbetween.html">
+ fill between curves demo.
+^ </a>
 
- Note: filling is supported on filled-polygon capable terminals, see help of
- `set pm3d` for their list.
+     plot 'data' using 1:2:3 with filledcurves
+
+ The `above` and `below` options apply both to commands of the form
+     ... filledcurves above {x1|x2|y1|y2}=<val>
+ and to commands of the form
+     ... using 1:2:3 with filledcurves below
+ In either case the option limits the filled area to one side of the bounding
+ line or curve.
+
+ Note: Not all terminal types support this plotting mode.
 
  Zoom of a filled curve drawn from a datafile may produce empty or incorrect
  area because gnuplot is clipping points and lines, and not areas.

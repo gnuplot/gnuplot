@@ -1,3 +1,12 @@
+2004-08-13  Ethan Merritt  <merritt@u.washington.edu>
+
+	* docs/gnuplot.doc:  Re-word the filledcurves section according to
+	suggestions from Petr Mikulik.
+
+	* term/post.trm:  Rename new option once again: set term post {level1}
+	(naming history: nolevel2 -> ai -> level1). Audit code to confirm that
+	in fact it excutes only commands required by PostScript Level 1.
+
 2004-08-12  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/post.trm: Rename 'nolevel2' option to 'ai', since its primary
