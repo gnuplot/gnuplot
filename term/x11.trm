@@ -1,5 +1,5 @@
 /*
- * $Id: x11.trm,v 1.108 2004/05/03 18:22:59 sfeam Exp $
+ * $Id: x11.trm,v 1.109 2004/05/04 02:43:23 sfeam Exp $
  *
  */
 
@@ -340,6 +340,7 @@ enum X11_id {
     X11_FONT,
     X11_TITLE,
     X11_ENHANCED,
+    X11_NOENHANCED,
     X11_OTHER
 };
 
@@ -354,6 +355,7 @@ static struct gen_table X11_opts[] = {
     {"fn$ame", X11_FONT},
     {"ti$tle", X11_TITLE},
     {"enh$anced", X11_ENHANCED},
+    {"noenh$anced", X11_NOENHANCED},
     {NULL, X11_OTHER}
 };
 
@@ -430,6 +432,10 @@ X11_options()
 	    break;
 	case X11_ENHANCED:
 	    term->put_text = ENHX11_put_text;
+	    c_token++;
+	    break;
+	case X11_NOENHANCED:
+	    term->put_text = X11_put_text;
 	    c_token++;
 	    break;
 	case X11_OTHER:

@@ -1,3 +1,9 @@
+2004-05-07  Ethan Merritt  <merritt@u.washington.edu>
+
+	* term/x11.trm: Add an explicit "noenhanced" option to set term x11,
+	since otherwise once you select enhanced text you cannot turn it off
+	again.
+
 2004-05-07  Franz Bakan  <fbakan@users.sourceforge.net>
 
 	* src/os2/gclient.c: SF bug #940596. Match menu items "GnuplotPM ->
