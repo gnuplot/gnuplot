@@ -3383,12 +3383,16 @@ Examples:
 @end example
 
 See
-@uref{http://www.gnuplot.info/demo/simple.html,simple plot demos (simple.dem) }
+@uref{http://www.gnuplot.info/demo/simple.html,simple plot demos (simple.dem)
+}
 ,
-@uref{http://www.gnuplot.info/demo/surfacea.html,Non-parametric splot demos }
-, and
-@uref{http://www.gnuplot.info/demo/surfaceb.html,Parametric splot demos}
+@uref{http://www.gnuplot.info/demo/surface1.html,Non-parametric splot demos
+}
+, and 
+@uref{http://gnuplot.sourceforge.net/demo/surface2.html,Parametric splot demos
+}
 .
+
 
 @node example_datafile, index, every, data-file
 @subsubsection example datafile
@@ -3953,8 +3957,9 @@ The error bars have crossbars at each end unless @ref{bars} is used
 (see @ref{bars} for details).
 
 If autoscaling is on, the ranges will be adjusted to include the error bars.
+
 See also
-@uref{http://www.gnuplot.info/demo/errorbar.html,errorbar demos.
+@uref{http://gnuplot.sourceforge.net/demo/mgr.html,errorbar demos.
 }
 
 See @ref{using}, @ref{with}, and @ref{style} for more information.
@@ -4148,9 +4153,6 @@ This sets the x range for a timeseries:
 
 @end example
 
-See also
-@uref{http://www.gnuplot.info/demo/ranges.html,ranges demo.
-}
 
 @node title, with, ranges, plot
 @subsection title
@@ -4384,9 +4386,6 @@ This plots two color surfaces at different altitudes:
 
 @end example
 
-See @ref{style} to change the default styles. See also
-@uref{http://www.gnuplot.info/demo/styles.html,styles demos.
-}
 
 @node print, pwd, plot, Commands
 @section print
@@ -4529,9 +4528,8 @@ The result is a single graph consisting of five plots.  The yrange must be
 set explicitly to guarantee that the five separate graphs (drawn on top of
 each other in multiplot mode) will have exactly the same axes.  The linetype
 must be specified; otherwise all the plots would be drawn with the same type.
-See also
-@uref{http://www.gnuplot.info/demo/animate.html,Reread Animation Demo (animate.dem).
-}
+See animate.dem in demo directory for an animated example.
+
 
 @node reset, save, reread, Commands
 @section reset
@@ -4948,11 +4946,12 @@ To delete all arrows, use:
 To show all arrows (in tag order), use:
 @example
       show arrow
+
 @end example
 
-See also 
-@uref{http://www.gnuplot.info/demo/arrows.html,arrows demos.
+@uref{http://gnuplot.sourceforge.net/demo/arrowstyle.html,arrows demos.
 }
+
 
 @node autoscale, bars, arrow, set-show
 @subsection autoscale
@@ -5278,9 +5277,6 @@ Draw only the top and right borders for a `plot` and label them as axes:
 
 @end example
 
-See also
-@uref{http://www.gnuplot.info/demo/borders.html,borders demo.
-}
 
 @node boxwidth, clabel, border, set-show
 @subsection boxwidth
@@ -7460,9 +7456,11 @@ See @ref{margin} for their use.  Note that the margin settings are absolute,
 in character units, so the appearance of the graph in the remaining space
 will depend on the screen size of the display device, e.g., perhaps quite
 different on a video display and a printer.
+
 See also
-@uref{http://www.gnuplot.info/demo/multiplot.html,multiplot demo (multiplt.dem).
-}
+@uref{http://gnuplot.sourceforge.net/demo/multiplt.html,multiplot demo (multiplt.dem)}
+.
+
 
 @node mx2tics, mxtics, multiplot, set-show
 @subsection mx2tics
@@ -9101,7 +9099,7 @@ The box height is determined from the y error in the same way as it is for
 the `yerrorbars` style---either from y-ydelta to y+ydelta or from ylow to
 yhigh, depending on how many data columns are provided.
 See also
-@uref{http://www.gnuplot.info/demo/errorbar.html,errorbar demo.
+@uref{http://www.gnuplot.info/demo/mgr.html,errorbar demo.
 }
 
 
@@ -9275,8 +9273,9 @@ By default the rectangle is empty if (open > close), and filled with three
 vertical bars if (close > open). If filled-boxes support is present, then
 the rectangle is colored according to `set style fill <fillstyle>`.
 See @ref{bars} and `financebars`.  See also
-@uref{http://www.gnuplot.info/demo/finance.html,finance demos.
+@uref{http://gnuplot.sourceforge.net/demo/candlesticks.html,finance demos
 }
+.
 
 Note: To place additional symbols, such as the median value, on a
 box-and-whisker plot requires additional plot commands as in this example:
@@ -9526,7 +9525,7 @@ from (x,ylow) to (x,yhigh), depending on how many data columns are provided.
 A tic mark is placed at the ends of the error bar (unless @ref{bars} is
 used---see @ref{bars} for details).
 See also
-@uref{http://www.gnuplot.info/demo/errorbar.html,errorbar demo.
+@uref{http://www.gnuplot.info/demo/mgr.html,errorbar demo.
 }
 
 
@@ -9593,7 +9592,7 @@ on how many data columns are provided. A tic mark is placed at the
 ends of the error bar (unless @ref{bars} is used---see @ref{bars} for
 details).
 See also
-@uref{http://www.gnuplot.info/demo/errorbar.html,errorbar demo.
+@uref{http://www.gnuplot.info/demo/mgr.html,errorbar demo.
 }
 
 @node surface, terminal, style, set-show
@@ -9728,7 +9727,6 @@ to you, depending on its output format.
 * kyo::                         
 * latex::                       
 * linux::                       
-* linux_::                      
 * macintosh::                   
 * mf::                          
 * mp::                          
@@ -9749,6 +9747,7 @@ to you, depending on its output format.
 * regis_::                      
 * rgip::                        
 * sun::                         
+* sun_::                        
 * svg::                         
 * tek410x::                     
 * tek410x_::                    
@@ -12069,7 +12068,7 @@ The other label -- account for long ticlabels:
 
 @end example
 
-@node linux, linux_, latex, terminal
+@node linux, macintosh, latex, terminal
 @subsubsection linux
 
 @c ?commands set terminal linux
@@ -12086,24 +12085,7 @@ environment variable GSVGAMODE for the default mode; if not set, it uses
 1024x768x256 as default mode or, if that is not possible, 640x480x16
 (standard VGA)."
 
-@node linux_, macintosh, linux, terminal
-@subsubsection linux
-
-@c ?commands set terminal linux
-@c ?set terminal linux
-@c ?set term linux
-@c ?terminal linux
-@c ?term linux
-@cindex linux
-@tmindex linux
-
-
-The `linux` driver has no additional options to specify.  It looks at the
-environment variable GSVGAMODE for the default mode; if not set, it uses
-1024x768x256 as default mode or, if that is not possible, 640x480x16
-(standard VGA)."
-
-@node macintosh, mf, linux_, terminal
+@node macintosh, mf, linux, terminal
 @subsubsection macintosh
 
 @c ?set terminal macintosh
@@ -13372,7 +13354,7 @@ Example:
 
 puts six graphs on a page in three rows of two in portrait orientation."
 
-@node sun, svg, rgip, terminal
+@node sun, sun_, rgip, terminal
 @subsubsection sun
 
 @c ?commands set terminal sun
@@ -13387,7 +13369,22 @@ puts six graphs on a page in three rows of two in portrait orientation."
 The `sun` terminal driver supports the SunView window system.  It has no
 options."
 
-@node svg, tek410x, sun, terminal
+@node sun_, svg, sun, terminal
+@subsubsection sun
+
+@c ?commands set terminal sun
+@c ?set terminal sun
+@c ?set term sun
+@c ?terminal sun
+@c ?term sun
+@cindex sun
+@tmindex sun
+
+
+The `sun` terminal driver supports the SunView window system.  It has no
+options."
+
+@node svg, tek410x, sun_, terminal
 @subsubsection svg
 
 @c ?commands set terminal svg
