@@ -1,5 +1,5 @@
 /*
- * $Id: gnugraph.trm,v 1.9 1999/03/31 19:49:36 lhecking Exp $
+ * $Id: gnugraph.trm,v 1.10 1999/06/19 20:30:49 lhecking Exp $
  */
 
 /* GNUPLOT -- gnugraph.trm */
@@ -74,6 +74,10 @@ stdout.  All other terminals write to gpoutfile.
 
 #include "driver.h"
 
+#if defined (HAVE_PLOTCOMPAT_H)
+# include <plotcompat.h>
+#endif
+
 #ifdef TERM_REGISTER
 register_term(unixplot)
 #endif
@@ -86,7 +90,7 @@ TERM_PUBLIC void UP_text __PROTO((void));
 TERM_PUBLIC void UP_linetype __PROTO((int linetype));
 TERM_PUBLIC void UP_move __PROTO((unsigned int x, unsigned int y));
 TERM_PUBLIC void UP_vector __PROTO((unsigned int x, unsigned int y));
-TERM_PUBLIC void UP_put_text __PROTO((unsigned int x, unsigned int y, char str[]));
+TERM_PUBLIC void UP_put_text __PROTO((unsigned int x, unsigned int y, const char str[]));
 TERM_PUBLIC int UP_text_angle __PROTO((int ang));
 TERM_PUBLIC int UP_justify_text __PROTO((enum JUSTIFY mode));
 TERM_PUBLIC void UP_reset __PROTO((void));
@@ -145,24 +149,7 @@ int up_fontsize = 10;
 enum JUSTIFY up_justify = LEFT;
 
 #ifdef GNU_PLOTUTILS
-# if GNU_PLOTUTILS==2
-/* From plotutils 2.2 onwards the functions got a "pl" prefix */
-#  ifdef HAVE_STRINGIZE
-/* ANSI preprocessor concatenation */
-#   define GNU_PLOTUTILS_PREFIX(x) pl_##x
-#  else
-/* K&R preprocessor concatenation */
-#   define GNU_PLOTUTILS_PREFIX(x) pl_/**/x
-#  endif
-# else
-#  define GNU_PLOTUTILS_PREFIX(x) x
-# endif
-#else 
-# define GNU_PLOTUTILS_PREFIX(x) x
-#endif
-
-#ifdef GNU_PLOTUTILS
-# define ROTATE(angle) GNU_PLOTUTILS_PREFIX(textangle)(90*angle)
+# define ROTATE(angle) textangle(90*angle)
 #else
 # define ROTATE(angle) rotate(0,0,90*angle)
 #endif
@@ -171,17 +158,17 @@ enum JUSTIFY up_justify = LEFT;
 /* We don't include plot.h from plotutils because of
  * the name clash with ../plot.h.
  */
-extern int GNU_PLOTUTILS_PREFIX(openpl) __PROTO((void));
-extern int GNU_PLOTUTILS_PREFIX(space) __PROTO((int, int, int, int));
-extern int GNU_PLOTUTILS_PREFIX(fontname) __PROTO((const char *));
-extern int GNU_PLOTUTILS_PREFIX(fontsize) __PROTO((int));
-extern int GNU_PLOTUTILS_PREFIX(erase) __PROTO((void));
-extern int GNU_PLOTUTILS_PREFIX(linemod) __PROTO((const char *));
-extern int GNU_PLOTUTILS_PREFIX(move) __PROTO((int, int));
-extern int GNU_PLOTUTILS_PREFIX(cont) __PROTO((int, int));
-extern int GNU_PLOTUTILS_PREFIX(alabel) __PROTO((int, int, const char *));
-extern int GNU_PLOTUTILS_PREFIX(textangle) __PROTO((int));
-extern int GNU_PLOTUTILS_PREFIX(closepl) __PROTO((void));
+extern int openpl __PROTO((void));
+extern int space __PROTO((int, int, int, int));
+extern int fontname __PROTO((const char *));
+extern int fontsize __PROTO((int));
+extern int erase __PROTO((void));
+extern int linemod __PROTO((const char *));
+extern int move __PROTO((int, int));
+extern int cont __PROTO((int, int));
+extern int alabel __PROTO((int, int, const char *));
+extern int textangle __PROTO((int));
+extern int closepl __PROTO((void));
 #endif
 
 TERM_PUBLIC void
@@ -213,15 +200,15 @@ UP_options()
 TERM_PUBLIC void
 UP_init()
 {
-    GNU_PLOTUTILS_PREFIX(openpl)();
-    GNU_PLOTUTILS_PREFIX(space)(0, 0, UP_SCREENX - 1, UP_SCREENY - 1);
-    GNU_PLOTUTILS_PREFIX(fontname)(up_font);
+    openpl();
+    space(0, 0, UP_SCREENX - 1, UP_SCREENY - 1);
+    fontname(up_font);
 /*
 #ifdef GNU_PLOTUTILS
-	GNU_PLOTUTILS_PREFIX(fontsize)((int)((up_fontsize / 72.0 * 8.0) * (UP_SCREENY-1)));
+	fontsize((int)((up_fontsize / 72.0 * 8.0) * (UP_SCREENY-1)));
 #else
 */
-    GNU_PLOTUTILS_PREFIX(fontsize)(up_fontsize);
+    fontsize(up_fontsize);
 /*
 #endif
 */
@@ -231,7 +218,7 @@ UP_init()
 TERM_PUBLIC void
 UP_graphics()
 {
-    GNU_PLOTUTILS_PREFIX(erase)();
+    erase();
 }
 
 
@@ -252,7 +239,7 @@ int linetype;
 
     if (linetype >= 5)
 	linetype %= 5;
-    GNU_PLOTUTILS_PREFIX(linemod)(lt[linetype + 2]);
+    linemod(lt[linetype + 2]);
 }
 
 
@@ -260,7 +247,7 @@ TERM_PUBLIC void
 UP_move(x, y)
 unsigned int x, y;
 {
-    GNU_PLOTUTILS_PREFIX(move)(x + UP_XOFF, y + UP_YOFF);
+    move(x + UP_XOFF, y + UP_YOFF);
 }
 
 
@@ -268,25 +255,25 @@ TERM_PUBLIC void
 UP_vector(x, y)
 unsigned int x, y;
 {
-    GNU_PLOTUTILS_PREFIX(cont)(x + UP_XOFF, y + UP_YOFF);
+    cont(x + UP_XOFF, y + UP_YOFF);
 }
 
 
 TERM_PUBLIC void
 UP_put_text(x, y, str)
 unsigned int x, y;
-char str[];
+const char str[];
 {
     UP_move(x, y);		/* Don't adjust x and y! It's done in UP_move. */
     switch (up_justify) {
     case LEFT:
-	GNU_PLOTUTILS_PREFIX(alabel)('l', 'c', str);
+	alabel('l', 'c', str);
 	break;
     case CENTRE:
-	GNU_PLOTUTILS_PREFIX(alabel)('c', 'c', str);
+	alabel('c', 'c', str);
 	break;
     case RIGHT:
-	GNU_PLOTUTILS_PREFIX(alabel)('r', 'c', str);
+	alabel('r', 'c', str);
 	break;
     }
 
@@ -311,7 +298,7 @@ enum JUSTIFY mode;
 TERM_PUBLIC void
 UP_reset()
 {
-    GNU_PLOTUTILS_PREFIX(closepl)();
+    closepl();
 }
 
 #endif /* TERM_BODY */
