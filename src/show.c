@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.102 2003/02/18 16:19:54 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.103 2003/03/13 14:47:54 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -1748,7 +1748,7 @@ show_key()
 	putc('\n', stderr);
 	break;
     }
-    if (key != KEY_NONE) {
+    if (key->flag != KEY_NONE) {
 	fprintf(stderr, "\tkey is %s justified, %sreversed, %senhanced and ",
 		key->just == JLEFT ? "left" : "right",
 		key->reverse ? "" : "not ",
