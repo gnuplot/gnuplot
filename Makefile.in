@@ -1,6 +1,6 @@
 ############################################################
 #
-# $Id: Makefile.in,v 1.42.2.3 1999/08/20 12:38:43 lhecking Exp $
+# $Id: Makefile.in,v 1.42.2.4 1999/08/25 16:14:56 lhecking Exp $
 #
 # GNUPLOT Makefile.in for autoconf (Unix X11 support)
 # Adapted from makefile.unx by djm@gnu.ai.mit.edu
@@ -165,7 +165,7 @@ W=$(srcdir)/win/
 #<<<makefile.all>>>
 ########################################################
 #
-# $Id: Makefile.in,v 1.42.2.3 1999/08/20 12:38:43 lhecking Exp $
+# $Id: Makefile.in,v 1.42.2.4 1999/08/25 16:14:56 lhecking Exp $
 #
 ########################################################
 #
@@ -345,7 +345,7 @@ term.$(O) : term.h $(CORETERM)
 
 # List of object files except version.o
 
-OBJS = $(COREOBJS) @NEXTOBJS@
+OBJS = $(COREOBJS)
 
 ################################################################
 
