@@ -1,3 +1,11 @@
+2004-03-29  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* PATCHLEVEL: Increased for yet another release candidate tarball.
+
+	* src/version.c: Updated accordingly.
+
+	* lisp/.cvsignore: Add autom4te.cache to set of ignored names.
+
 2004-03-29  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* tutorial/Makefile.am.in: Add tutorial.toc to CLEANFILES.
