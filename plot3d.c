@@ -363,6 +363,11 @@ struct surface_points *this_plot;
 	for (j = 0, y = ymin; j < dgrid3d_row_fineness; j++, y += dy, points++) {
 	    z = w = 0.0;
 
+#ifndef BUGGY_DGRID_RANGING /* HBB 981209 */
+	    /* as soon as ->type is changed to UNDEFINED, break out of
+	     * two inner loops! */
+	    points->type = INRANGE;
+#endif
 	    for (oicrv = old_iso_crvs; oicrv != NULL; oicrv = oicrv->next) {
 		struct coordinate GPHUGE *opoints = oicrv->points;
 		for (k = 0; k < oicrv->p_count; k++, opoints++) {
@@ -396,14 +401,21 @@ struct surface_points *this_plot;
 			break;
 		    }
 
-#ifndef BUGGY_DGRID_RANGING
-/* HBB 981026: correctly generate OUTRANGE/UNDEFINED, where applicable */
-		    points->type = (dist == 0.0) ? UNDEFINED : INRANGE;
-#endif
 		    /* The weight of this point is inverse proportional
 		     * to the distance.
 		     */
-		    if (dist == 0.0)
+		    if (dist == 0.0) {
+#ifndef BUGGY_DGRID_RANGING
+		        /* HBB 981209: revised flagging as undefined */
+			/* Supporting all those infinities on various
+			 * platforms becomes tiresome, to say the least :-(
+			 * Let's just return the first z where this happens,
+			 * unchanged, and be done with this, period. */
+		        points->type = UNDEFINED;
+			z = opoints->z;
+			w = 1.0;
+			break; /* out of for (k...) loop */
+#else
 #if !defined(AMIGA_SC_6_1) && !defined(__PUREC__)
 			dist = VERYLARGE;
 #else /* !AMIGA_SC_6_1 && !__PUREC__ */
@@ -419,16 +431,25 @@ struct surface_points *this_plot;
 			 * with respect to any value that has been read. */
 			dist = ((double) FLT_MAX) * ((double) FLT_MAX);
 #endif /* !AMIGA_SC_6_1 && !__PUREC__ */
-		    else
+#endif /* BUGGY_DGRID_RANGING */
+		    } else
 			dist = 1.0 / dist;
 
 		    z += opoints->z * dist;
 		    w += dist;
 		}
+#ifndef BUGGY_DGRID_RANGING
+		if (points->type != INRANGE)
+		  break; /* out of the second-inner loop as well ... */
+#endif
 	    }
 
 #ifndef BUGGY_DGRID_RANGING
-/* HBB 981026: modify ranges, mark points as outrange, if they are... */
+	    /* Now that we've escaped the loops safely, we know that we
+	     * do have a good value in z and w, so we can proceed just as
+	     * if nothing had happened at all. Nice, isn't it? */
+	    points->type = INRANGE;
+
 	    STORE_WITH_LOG_AND_FIXUP_RANGE(points->x, x, points->type, x_axis, NOOP, continue);
 	    STORE_WITH_LOG_AND_FIXUP_RANGE(points->y, y, points->type, y_axis, NOOP, continue);
 	    STORE_WITH_LOG_AND_FIXUP_RANGE(points->z, z / w, points->type, z_axis, NOOP, continue);
