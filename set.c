@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: set.c,v 1.21 1998/12/07 22:09:12 lhecking Exp $";
+static char *RCSid = "$Id: set.c,v 1.21.2.1 1999/08/19 14:36:35 lhecking Exp $";
 #endif
 
 /* GNUPLOT - set.c */
@@ -44,9 +44,6 @@ static char *RCSid = "$Id: set.c,v 1.21 1998/12/07 22:09:12 lhecking Exp $";
 #include "stdfn.h"
 #include "setshow.h"
 #include "national.h"
-
-#define DEF_FORMAT   "%g"	/* default format for tic mark labels */
-#define SIGNIF (0.01)		/* less than one hundredth of a tic mark */
 
 /*
  * global variables to hold status of 'set' options
