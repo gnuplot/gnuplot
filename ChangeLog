@@ -1,3 +1,7 @@
+2004-09-01  Lars Hecking  <lhecking@users.sourceforge.net>
+
+	* docs/Makefile.in: Update CLEANFILES and clean-generic.
+
 2005-08-03  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* config/makefile.nt: Introduce variable OPTIONS for compile time
