@@ -27,6 +27,7 @@ static char *RCSid = "$Id: bf_test.c,v 1.11 1998/04/14 00:14:48 drd Exp $";
 #include "alloc.h"
 
 void int_error __PROTO((char *error_text, int dummy));
+void FreeHelp __PROTO((void));
 float function __PROTO((int p, double x, double y));
 
 
