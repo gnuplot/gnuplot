@@ -1,4 +1,12 @@
 Changes in release 3.7.1:
+[3.7.0.9]
+* moved some declarations to new header files
+* FIXED bug in plot positioning with multiplot
+* more static arrays removed or replaced with malloc'd storage
+* FIXED bug in J. Pepin's layers patch
+* FIXED bug in M. Gardner's help formatting patch
+* duplicate functions removed
+* FIXED definition of ANSI_C on autoconf platforms
 [3.7.0.8]
 * embedding document font is now default font in latex output
 * static limits for user defined function and variable names removed

@@ -39,11 +39,12 @@ Lars' list
 - [HBB] rewrite hidden3d code
 - for post-3.7 release: integrate new feature patches (M. Koga's
   polygon patch, various postscript driver patches by Dick, T. Walter's
-  gnuplot command line history save file, etc)? pm3d?
-  [PARTIALLY DONE]
+  gnuplot command line history save file, etc)? 
+  All done except polygon patch. Better to use pm3d.
 - standardise float/double comparisons around the suggestion in the
   comp.lang.c FAQ (What's a good way to check for "close enough"
   floating-point equality?) and symbolic constants from standard header files.
+  LOADS of errors throughout the code, especially in graphics.c
 - autogenerate term.h from config file in text format and/or configure?
 - should gnuplot_x11 be in prefix/libexec???
 - parse "~" in filenames as $HOME
@@ -76,4 +77,6 @@ Lars' list
 - non-integer time value in 'pause' command
 - tilde and variable expansion to be done by 
   gp_fopen() - to be implemented
+- fix bug which prints "DI,1DI,0" in the upper left corner of the plot when
+  in pcl5 mode and printing to an HP Laserjet 4+ (J. Breeding, bug-gnuplot)
 
