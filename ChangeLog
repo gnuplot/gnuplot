@@ -1,3 +1,8 @@
+2002-06-08  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* config/makefile.cyg config/makefile.mgw config/makefile.os2:
+ 	Minor changes relative to the new gd driver.
+
 2002-06-08  Johannes Zellner  <johannes@zellner.org>
 
 	* term/svg.trm: changes to make it compile w/o PM3D defined
@@ -597,7 +602,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/06/07 22:52:36 $).
+	last modification date (from the tag $Date: 2002/06/07 23:03:05 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 

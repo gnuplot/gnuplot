@@ -1,6 +1,6 @@
 #
 #
-# $Id: makefile.cyg,v 1.11 2002/03/02 14:21:37 mikulik Exp $
+# $Id: makefile.cyg,v 1.12 2002/05/23 20:28:35 mikulik Exp $
 #
 # GNUPLOT Makefile for Cygwin on WinNT and Win95/98/2000
 #
@@ -36,8 +36,6 @@
 # Requires GD, PNG and Z libraries, optionally libfreetype.
 #
 NEWGD=1
-GD=1
-PNG=1
 PNG_FOR_GIF=1
 #JPEG=1
 FREETYPE=1
@@ -152,6 +150,11 @@ ifdef PM3D
   CFLAGS += -DPM3D=1
 endif
 
+ifdef NEWGD
+  GD=1
+  PNG=1
+endif
+
 ifdef GD
   CFLAGS += -DHAVE_LIBGD
   TERMLIBS += -lgd
@@ -161,14 +164,13 @@ ifdef GIF
   CFLAGS += -DHAVE_GIF
 endif
 
-ifdef LIBPNG
+ifdef PNG
   CFLAGS += -DHAVE_PNG
   TERMLIBS += -lpng -lz
 endif
 
 ifdef NEWGD
-  CFLAGS += -DHAVE_NEWGD -DHAVE_PNG
-  TERMLIBS += -lpng -lz
+  CFLAGS += -DHAVE_NEWGD
 ifdef FREETYPE
   CFLAGS += -DHAVE_TTF
   TERMLIBS += -lfreetype
@@ -186,7 +188,12 @@ endif
 ifdef PDF
   CFLAGS += -DHAVE_LIBPDF
   TERMLIBS += -lpdf-w -ltiff-w
-if !defined(PNG) || !defined(NEWGD)
+if !defined(PNG)
+  NEED_PNG_W = 1
+elseif !defined(NEWGD)
+  NEED_PNG_W = 1
+end
+ifdef NEED_PNG_W
   CFLAGS += -DHAVE_LIBPNG
   TERMLIBS += -lpng-w -lz-w
 endif

@@ -1,5 +1,5 @@
 #
-# $Id: makefile.os2,v 1.32 2002/03/21 21:46:13 amai Exp $
+# $Id: makefile.os2,v 1.33 2002/05/23 20:28:35 mikulik Exp $
 #
 # GNUPLOT Makefile for use on OS/2 2.x (and above)
 # using emx 0.9 (and above) and GNUMake
@@ -39,8 +39,6 @@ X11=1
 # Requires GD, PNG and Z libraries, optionally libfreetype.
 #
 NEWGD=1
-GD=1
-PNG=1
 PNG_FOR_GIF=1
 #JPEG=1
 FREETYPE=1
@@ -167,6 +165,11 @@ endif
 #
 TERMFLAGS = -I. -I.. -I$(T)
 
+ifdef NEWGD
+  GD=1
+  PNG=1
+endif
+
 ifdef GD
   CFLAGS += -DHAVE_LIBGD
   TERMLIBS += -lgd
@@ -176,14 +179,13 @@ ifdef GIF
   CFLAGS += -DHAVE_GIF
 endif
 
-ifdef LIBPNG
+ifdef PNG
   CFLAGS += -DHAVE_PNG
   TERMLIBS += -lpng -lz
 endif
 
 ifdef NEWGD
-  CFLAGS += -DHAVE_NEWGD -DHAVE_PNG
-  TERMLIBS += -lpng -lz
+  CFLAGS += -DHAVE_NEWGD
 ifdef FREETYPE
   CFLAGS += -DHAVE_TTF
   TERMLIBS += -lfreetype
@@ -201,7 +203,10 @@ endif
 ifdef PDF
   TERMFLAGS += -DHAVE_LIBPDF
   # amai: don't ask me... My libpdf requires all those additional libs
-  TERMLIBS  += -lpdf -ltiff -ljpeg -lz
+  TERMLIBS += -lpdf -ltiff -ljpeg
+ifndef PNG
+  TERMLIBS += -lz
+endif
 endif
 
 # SVGA-/VESAkit support
