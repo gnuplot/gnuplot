@@ -102,7 +102,7 @@ void check_stack()	/* make sure stack's empty */
 struct value *pop(x)
 struct value *x;
 {
-	if (s_p  < 0 )
+	if (s_p < 0 )
 		int_error("stack underflow",NO_CARET);
 	*x = stack[s_p--];
 	return(x);

@@ -382,6 +382,7 @@ int max;
 {
 	char line[100];
 
-	int_error( strcat(strcpy(line,"substitution not supported by "),OS),t_num);
+	sprintf (line, "substitution not supported by %s", OS);
+	int_error (line,t_num);
 }
 #endif /* unix || VMS || PIPES || ATARI && PUREC */
