@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.60 2003/01/07 22:29:30 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.61 2003/02/05 00:01:01 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -215,6 +215,7 @@ save_set_all(fp)
     struct arrow_def *this_arrow;
     struct linestyle_def *this_linestyle;
     struct arrowstyle_def *this_arrowstyle;
+    legend_key *key = &keyT;
 
     /* opinions are split as to whether we save term and outfile
      * as a compromise, we output them as comments !
@@ -339,11 +340,11 @@ set y2data%s\n",
 	fprintf(fp, "set grid %s\n", (grid_layer==-1) ? "layerdefault" : ((grid_layer==0) ? "back" : "front"));
     }	
 
-    fprintf(fp, "set key title \"%s\"\n", conv_text(key_title));
-    switch (key) {
+    fprintf(fp, "set key title \"%s\"\n", conv_text(key->title));
+    switch (key->flag) {
     case KEY_AUTO_PLACEMENT:
 	    fputs("set key", fp);
-	    switch (key_hpos) {
+	    switch (key->hpos) {
 	    case TRIGHT:
 		fputs(" right", fp);
 		break;
@@ -354,7 +355,7 @@ set y2data%s\n",
 		fputs(" out", fp);
 		break;
 	    }
-	    switch (key_vpos) {
+	    switch (key->vpos) {
 	    case TTOP:
 		fputs(" top", fp);
 		break;
@@ -371,17 +372,17 @@ set y2data%s\n",
 	break;
     case KEY_USER_PLACEMENT:
 	fputs("set key ", fp);
-	save_position(fp, &key_user_pos);
+	save_position(fp, &key->user_pos);
 	break;
     }
     if (key != KEY_NONE) {
 	fprintf(fp, " %s %sreverse %senhanced box linetype %d linewidth %.3f samplen %g spacing %g width %g height %g %sautotitles\n",
-		key_just == JLEFT ? "Left" : "Right",
-		key_reverse ? "" : "no",
-		key_enhanced ? "" : "no",
-		key_box.l_type + 1, key_box.l_width,
-		key_swidth, key_vert_factor, key_width_fix, key_height_fix,
-		key_auto_titles ? "" : "no" );
+		key->just == JLEFT ? "Left" : "Right",
+		key->reverse ? "" : "no",
+		key->enhanced ? "" : "no",
+		key->box.l_type + 1, key->box.l_width,
+		key->swidth, key->vert_factor, key->width_fix, key->height_fix,
+		key->auto_titles ? "" : "no" );
     }
     fputs("unset label\n", fp);
     for (this_label = first_label; this_label != NULL;

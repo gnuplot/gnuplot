@@ -49,33 +49,7 @@ static char *RCSid() { return RCSid("gadgets.c,v 1.1.3.1 2000/05/03 21:47:15 hbb
  * but better than mixing internal status and the user interface as we
  * used to have it, in set.c and setshow.h */
 
-/* Control variables for the 'key' */
-t_key_flag key = KEY_AUTO_PLACEMENT;	/* default position */
-struct position key_user_pos;	/* user specified position for key */
-/* horizontal auto-positioning: left/right/'out' */
-t_key_horizontal_position key_hpos = TRIGHT;
-/* vertical auto-positioning: top/bottom/below */
-t_key_vertical_position key_vpos = TTOP;
-/* alignment of key labels: left/right */
-t_key_sample_positioning key_just = JRIGHT;
-TBOOLEAN key_reverse = FALSE;	/* reverse text & sample ? */
-TBOOLEAN key_enhanced = TRUE; /* enable/disable enhanced text of key titles */ 
-/* FIXME HBB 20000521: these initial values should be accessible
- * separately, as defaults for unset.c */
-double key_swidth = 4.0;
-double key_vert_factor = 1.0;
-double key_width_fix = 0.0;
-double key_height_fix = 0.0;
-int key_auto_titles = 1;
-char key_title[MAX_LINE_LEN + 1] = "";
-
-#ifdef PM3D
-# define DEFAULT_KEYBOX_LP { 0, -3, 0, 1.0, 1.0, 0 }	/* -3 = no linetype */
-#else
-# define DEFAULT_KEYBOX_LP { 0, -3, 0, 1.0, 1.0 }	/* -3 = no linetype */
-#endif
-const struct lp_style_type default_keybox_lp = DEFAULT_KEYBOX_LP;
-struct lp_style_type key_box = DEFAULT_KEYBOX_LP;
+legend_key keyT = DEFAULT_KEY_PROPS;
 
 /* The graph box, in terminal coordinates, as calculated by boundary()
  * or boundary3d(): */

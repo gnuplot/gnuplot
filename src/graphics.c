@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.80 2003/01/07 22:29:28 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.81 2003/01/27 20:39:32 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -62,7 +62,7 @@ double bar_size = 1.0;
 
 /* key placement is calculated in boundary, so we need file-wide variables
  * To simplify adjustments to the key, we set all these once [depends on
- * key_reverse] and use them throughout.
+ * key->reverse] and use them throughout.
  */
 
 /*{{{  local and global variables */
@@ -72,13 +72,13 @@ static int key_sample_right;	/* offset from x for right of line sample */
 static int key_point_offset;	/* offset from x for point sample */
 static int key_text_left;	/* offset from x for left-justified text */
 static int key_text_right;	/* offset from x for right-justified text */
-static int key_size_left;	/* size of left bit of key (text or sample, depends on key_reverse) */
+static int key_size_left;	/* size of left bit of key (text or sample, depends on key->reverse) */
 static int key_size_right;	/* size of right part of key (including padding) */
 
 /* I think the following should also be static ?? */
 
 static int max_ptitl_len = 0;	/* max length of plot-titles (keys) */
-static int ktitl_lines = 0;	/* no lines in key_title (key header) */
+static int ktitl_lines = 0;	/* no lines in key->title (key header) */
 static int ptitl_cnt;		/* count keys with len > 0  */
 static int key_cols;		/* no cols of keys */
 static int key_rows, key_col_wth, yl_ref;
@@ -255,6 +255,7 @@ boundary(plots, count)
 {
     int ytlen;
     int yticlin = 0, y2ticlin = 0, timelin = 0;
+    legend_key *key = &keyT;
 
     register struct termentry *t = term;
     int key_h, key_w;
@@ -292,7 +293,7 @@ boundary(plots, count)
     int vertical_ytics  = can_rotate ? axis_array[FIRST_Y_AXIS].tic_rotate : 0;
     int vertical_y2tics = can_rotate ? axis_array[SECOND_Y_AXIS].tic_rotate : 0;
 
-    lkey = key;			/* but we may have to disable it later */
+    lkey = key->flag;		/* but we may have to disable it later */
 
     xticlin = ylablin = y2lablin = xlablin = x2lablin = titlelin = 0;
 
@@ -496,36 +497,36 @@ boundary(plots, count)
 	p_width = pointsize * t->h_tic;
 	p_height = pointsize * t->v_tic;
 
-	if (key_swidth >= 0)
-	    key_sample_width = key_swidth * (t->h_char) + p_width;
+	if (key->swidth >= 0)
+	    key_sample_width = key->swidth * (t->h_char) + p_width;
 	else
 	    key_sample_width = 0;
 
-	key_entry_height = p_height * 1.25 * key_vert_factor;
+	key_entry_height = p_height * 1.25 * key->vert_factor;
 	if (key_entry_height < (t->v_char))
-	    key_entry_height = (t->v_char) * key_vert_factor;
+	    key_entry_height = (t->v_char) * key->vert_factor;
 	/* HBB 20020122: safeguard to prevent division by zero later */
 	if (key_entry_height == 0)
 	    key_entry_height = 1;
 
 	/* count max_len key and number keys with len > 0 */
 	max_ptitl_len = find_maxl_keys(plots, count, &ptitl_cnt);
-	if ((ytlen = label_width(key_title, &ktitl_lines)) > max_ptitl_len)
+	if ((ytlen = label_width(key->title, &ktitl_lines)) > max_ptitl_len)
 	    max_ptitl_len = ytlen;
 
-	if (key_reverse) {
+	if (key->reverse) {
 	    key_sample_left = -key_sample_width;
 	    key_sample_right = 0;
 	    /* if key width is being used, adjust right-justified text */
 	    key_text_left = t->h_char;
-	    key_text_right = (t->h_char) * (max_ptitl_len + 1 + key_width_fix);
+	    key_text_right = (t->h_char) * (max_ptitl_len + 1 + key->width_fix);
 	    key_size_left = t->h_char - key_sample_left;	/* sample left is -ve */
 	    key_size_right = key_text_right;
 	} else {
 	    key_sample_left = 0;
 	    key_sample_right = key_sample_width;
 	    /* if key width is being used, adjust left-justified text */
-	    key_text_left = -(int) ((t->h_char) * (max_ptitl_len + 1 + key_width_fix));
+	    key_text_left = -(int) ((t->h_char) * (max_ptitl_len + 1 + key->width_fix));
 	    key_text_right = -(int) (t->h_char);
 	    key_size_left = -key_text_left;
 	    key_size_right = key_sample_right + t->h_char;
@@ -543,7 +544,7 @@ boundary(plots, count)
 	 */
 
 	if (lkey == KEY_AUTO_PLACEMENT) {
-	    if (key_vpos == TUNDER) {
+	    if (key->vpos == TUNDER) {
 		/* maximise no cols, limited by label-length */
 		key_cols = (int) (xright - xleft) / key_col_wth;
 		KEY_PANIC(key_cols == 0);
@@ -565,12 +566,12 @@ boundary(plots, count)
 		keybox.xr = keybox.xl + key_col_wth * (key_cols - 1) + key_size_left + key_size_right;
 		keybox.yb = t->ymax * yoffset;
 		keybox.yt = keybox.yb + key_rows * key_entry_height + ktitl_lines * t->v_char;
-		keybox.yt += (int)(key_height_fix * (t->v_char));
+		keybox.yt += (int)(key->height_fix * (t->v_char));
 		ybot += key_entry_height * key_rows + (int) ((t->v_char) * (ktitl_lines + 1));
-		ybot += (int)(key_height_fix * (t->v_char));
+		ybot += (int)(key->height_fix * (t->v_char));
 	    } else {
 		/* maximise no rows, limited by ytop-ybot */
-		int i = (int) (ytop - ybot - key_height_fix * (t->v_char)
+		int i = (int) (ytop - ybot - key->height_fix * (t->v_char)
 			       - (ktitl_lines + 1) * (t->v_char))
 		    / key_entry_height;
 
@@ -721,7 +722,7 @@ boundary(plots, count)
 	    xright -= y2label_textwidth;
 
 	/* adjust for outside key */
-	if (lkey == KEY_AUTO_PLACEMENT && key_hpos == TOUT) {
+	if (lkey == KEY_AUTO_PLACEMENT && key->hpos == TOUT) {
 	    xright -= key_col_wth * key_cols;
 	    keybox.xl = xright + (int) (t->h_tic);
 	}
@@ -865,24 +866,24 @@ boundary(plots, count)
     axis_set_graphical_range(SECOND_Y_AXIS, ybot, ytop);
 
     /*{{{  calculate the window in the grid for the key */
-    if (lkey == KEY_USER_PLACEMENT || (lkey == KEY_AUTO_PLACEMENT && key_vpos != TUNDER)) {
+    if (lkey == KEY_USER_PLACEMENT || (lkey == KEY_AUTO_PLACEMENT && key->vpos != TUNDER)) {
 	/* calculate space for keys to prevent grid overwrite the keys */
 	/* do it even if there is no grid, as do_plot will use these to position key */
 	key_w = key_col_wth * key_cols;
 	key_h = (ktitl_lines) * t->v_char + key_rows * key_entry_height;
-	key_h += (int)(key_height_fix * (t->v_char));
+	key_h += (int)(key->height_fix * (t->v_char));
 	if (lkey == KEY_AUTO_PLACEMENT) {
-	    if (key_vpos == TTOP) {
+	    if (key->vpos == TTOP) {
 		keybox.yt = (int) ytop - (t->v_tic);
 		keybox.yb = keybox.yt - key_h;
 	    } else {
 		keybox.yb = ybot + (t->v_tic);
 		keybox.yt = keybox.yb + key_h;
 	    }
-	    if (key_hpos == TLEFT) {
+	    if (key->hpos == TLEFT) {
 		keybox.xl = xleft + (t->h_char);	/* for Left just */
 		keybox.xr = keybox.xl + key_w;
-	    } else if (key_hpos == TRIGHT) {
+	    } else if (key->hpos == TRIGHT) {
 		keybox.xr = xright - (t->h_char);	/* for Right just */
 		keybox.xl = keybox.xr - key_w;
 	    } else {		/* TOUT */
@@ -893,16 +894,16 @@ boundary(plots, count)
 	    }
 	} else {
 	    unsigned int x, y;
-	    map_position(&key_user_pos, &x, &y, "key");
+	    map_position(&key->user_pos, &x, &y, "key");
 #if 0
 // FIXME!!!
-// pm 22.1.2002: if key_user_pos.scalex or scaley == first_axes or second_axes,
+// pm 22.1.2002: if key->user_pos.scalex or scaley == first_axes or second_axes,
 // then the graph scaling is not yet known and the box is positioned incorrectly;
 // you must do "replot" to avoid the wrong plot ... bad luck if output does not
 // go to screen
 #define OK fprintf(stderr,"Line %i of %s is OK\n",__LINE__,__FILE__);
 OK
-fprintf(stderr,"\tHELE: user pos: x=%i y=%i\n",key_user_pos.x,key_user_pos.y);
+fprintf(stderr,"\tHELE: user pos: x=%i y=%i\n",key->user_pos.x,key->user_pos.y);
 fprintf(stderr,"\tHELE: user pos: x=%i y=%i\n",x,y);
 #endif
 	    keybox.xl = x - key_size_left;
@@ -1123,6 +1124,7 @@ do_plot(plots, pcount)
     register struct curve_points *this_plot = NULL;
     register int xl = 0, yl = 0;	/* avoid gcc -Wall warning */
     register int key_count = 0;
+    legend_key *key = &keyT;
     char *s, *e;
 
     x_axis = FIRST_X_AXIS;
@@ -1323,18 +1325,18 @@ do_plot(plots, pcount)
 	/* just use keybox.xl etc worked out in boundary() */
 	xl = keybox.xl + key_size_left;
 	yl = keybox.yt;
-	yl -= (int)(0.5 * key_height_fix * (t->v_char));
+	yl -= (int)(0.5 * key->height_fix * (t->v_char));
 
-	if (*key_title) {
-	    char *ss = gp_alloc(strlen(key_title) + 2, "tmp string ss");
-	    strcpy(ss, key_title);
+	if (*key->title) {
+	    char *ss = gp_alloc(strlen(key->title) + 2, "tmp string ss");
+	    strcpy(ss, key->title);
 	    strcat(ss, "\n");
 
 	    s = ss;
 	    yl -= t->v_char / 2;
 	    while ((e = (char *) strchr(s, '\n')) != NULL) {
 		*e = '\0';
-		if (key_just == JLEFT) {
+		if (key->just == JLEFT) {
 		    (*t->justify_text) (LEFT);
 		    (*t->put_text) (xl + key_text_left, yl, s);
 		} else {
@@ -1342,7 +1344,7 @@ do_plot(plots, pcount)
 			(*t->put_text) (xl + key_text_right, yl, s);
 		    } else {
 			int x = xl + key_text_right - (t->h_char) * strlen(s);
-			if (key_hpos == TOUT || key_vpos == TUNDER ||	/* HBB 990327 */
+			if (key->hpos == TOUT || key->vpos == TUNDER ||	/* HBB 990327 */
 			    inrange(x, xleft, xright))
 			    (*t->put_text) (x, yl, s);
 		    }
@@ -1356,8 +1358,8 @@ do_plot(plots, pcount)
 	yl_ref = yl -= key_entry_height / 2;	/* centralise the keys */
 	key_count = 0;
 
-	if (key_box.l_type > L_TYPE_NODRAW) {
-	    term_apply_lp_properties(&key_box);
+	if (key->box.l_type > L_TYPE_NODRAW) {
+	    term_apply_lp_properties(&key->box);
 	    (*t->move) (keybox.xl, keybox.yb);
 	    (*t->vector) (keybox.xl, keybox.yt);
 	    (*t->vector) (keybox.xr, keybox.yt);
@@ -1391,7 +1393,7 @@ do_plot(plots, pcount)
 		/* EAM - force key text to black, then restore */ 
 		    (*t->linetype)(LT_BLACK);
 
-		if (key_just == JLEFT) {
+		if (key->just == JLEFT) {
 		    (*t->justify_text) (LEFT);
 		    (*t->put_text) (xl + key_text_left, yl, this_plot->title);
 		} else {
@@ -1399,7 +1401,7 @@ do_plot(plots, pcount)
 			(*t->put_text) (xl + key_text_right, yl, this_plot->title);
 		    } else {
 			int x = xl + key_text_right - (t->h_char) * strlen(this_plot->title);
-			if (key_hpos == TOUT || key_vpos == TUNDER ||	/* HBB 990327 */
+			if (key->hpos == TOUT || key->vpos == TUNDER ||	/* HBB 990327 */
 			    i_inrange(x, xleft, xright))
 			    (*t->put_text) (x, yl, this_plot->title);
 		    }

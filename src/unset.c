@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.48 2003/01/07 22:29:35 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.49 2003/02/05 00:01:07 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -838,25 +838,16 @@ unset_isosamples()
 void
 reset_key(void)
 {
-    key = KEY_AUTO_PLACEMENT;
-    key_hpos = TRIGHT;
-    key_vpos = TTOP;
-    key_just = JRIGHT;
-    key_reverse = FALSE;
-    key_enhanced = TRUE;
-    key_box = default_keybox_lp;
-    key_swidth = 4;
-    key_vert_factor = 1;
-    key_width_fix = 0;
-    key_height_fix = 0;
-    key_auto_titles = 1;
+    legend_key temp_key = DEFAULT_KEY_PROPS;
+    memcpy(&keyT, &temp_key, sizeof(keyT));
 }
 
 /* process 'unset key' command */
 static void
 unset_key()
 {
-    key = KEY_NONE;
+    legend_key *key = &keyT;
+    key->flag = KEY_NONE;
 }
 
 
@@ -864,7 +855,8 @@ unset_key()
 static void
 unset_keytitle()
 {
-    key_title[0] = '\0';	/* empty string */
+    legend_key *key = &keyT;
+    key->title[0] = '\0';	/* empty string */
 }
 
 

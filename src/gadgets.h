@@ -184,33 +184,48 @@ typedef struct {
 /***********************************************************/
 
 
-/* Variables controlling key (aka 'legend') output */
-/* Key wanted at all? and if so: where? */
-extern t_key_flag key;
-/* if user specified position for key, this is it: */
-extern struct position key_user_pos;
-/* otherwise: these tell how the automatic method should position it: */
-extern t_key_vertical_position key_vpos;
-extern t_key_horizontal_position key_hpos;
-extern t_key_sample_positioning key_just;
-/* 'width' of the linestyle sample line in the key */
-extern double key_swidth;
-/* user specified vertical spacing multiplier */
-extern double key_vert_factor; 
-/* user specified additional (+/-) width of key titles */
-extern double key_width_fix;
-extern double key_height_fix;
-/* auto title for curves */
-extern int key_auto_titles;
-/* key back to front */ 
-extern TBOOLEAN	key_reverse;
-/* enable/disable enhanced text of key titles */ 
-extern TBOOLEAN	key_enhanced;
-/* title line for the key as a whole */
-extern char key_title[];
-/* linetype of box around key: default and current state */
-extern const struct lp_style_type default_keybox_lp;
-extern struct lp_style_type key_box;
+
+/* EAM Feb 2003 - Move all global variables related to key into a */
+/* single structure. Eventually this will allow multiple keys.    */
+
+
+typedef struct { 
+    t_key_flag flag;		/* Key wanted at all? and if so: where? */
+    struct position user_pos;	/* if user specified position, this is it */
+    t_key_vertical_position vpos; /* otherwise these guide auto-positioning */
+    t_key_horizontal_position hpos;
+    t_key_sample_positioning just;
+    double swidth;		/* 'width' of the linestyle sample line in the key */
+    double vert_factor;		/* user specified vertical spacing multiplier */
+    double width_fix;		/* user specified additional (+/-) width of key titles */
+    double height_fix;
+    TBOOLEAN auto_titles;	/* auto title curves unless plotted 'with notitle' */
+    TBOOLEAN reverse;		/* key back to front */ 
+    TBOOLEAN enhanced;		/* enable/disable enhanced text of key titles */ 
+    struct lp_style_type default_keybox_lp; /* linetype of box around key:  */
+    struct lp_style_type box;		    /*    default and current state */
+    char title[MAX_LINE_LEN+1];	/* title line for the key as a whole */
+} legend_key;
+
+extern legend_key keyT;
+
+#ifdef PM3D
+# define DEFAULT_KEYBOX_LP { 0, -3, 0, 1.0, 1.0, 0 }	/* -3 = no linetype */
+#else
+# define DEFAULT_KEYBOX_LP { 0, -3, 0, 1.0, 1.0 }	/* -3 = no linetype */
+#endif
+
+#define DEFAULT_KEY_POSITION { graph, graph, graph, 0.9, 0.9, 0. }
+
+#define DEFAULT_KEY_PROPS \
+		{ KEY_AUTO_PLACEMENT, \
+		DEFAULT_KEY_POSITION, \
+		TTOP, TRIGHT, JRIGHT,  \
+		4.0, 1.0, 0.0, 0.0, \
+		TRUE, FALSE, TRUE,  \
+		DEFAULT_KEYBOX_LP, \
+		DEFAULT_KEYBOX_LP, \
+		"" }
 
 /* bounding box position, in terminal coordinates */
 extern int xleft, xright, ybot, ytop;

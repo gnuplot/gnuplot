@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.56 2002/10/20 21:19:50 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.57 2002/10/21 10:24:18 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -870,6 +870,7 @@ eval_plots()
     int pattern_num;
     char *xtitle = NULL;
     int begin_token = c_token;	/* so we can rewind for second pass */
+    legend_key *key = &keyT;
 
     uses_axis[FIRST_X_AXIS] =
 	uses_axis[FIRST_Y_AXIS] =
@@ -1052,7 +1053,7 @@ eval_plots()
 			duplication=TRUE;
 			break;
 		    }
-		    this_plot->title_no_enhanced = !key_enhanced;
+		    this_plot->title_no_enhanced = !key->enhanced;
 			/* title can be enhanced if not explicitly disabled */
 		    if (parametric) {
 			if (xparam)
@@ -1173,7 +1174,7 @@ eval_plots()
 	    /* set default values for title if this has not been specified */
 	    if (!set_title) {
 		this_plot->title_no_enhanced = 1; /* filename or function cannot be enhanced */
-		if (key_auto_titles) {
+		if (key->auto_titles) {
   		    m_capture(&(this_plot->title), start_token, end_token);
 		    if (xparam)
 		        xtitle = this_plot->title;

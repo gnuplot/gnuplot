@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.99 2003/01/25 11:27:37 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.100 2003/02/05 00:01:01 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -1701,9 +1701,10 @@ int tag;			/* 0 means show all */
 static void
 show_keytitle()
 {
+    legend_key *key = &keyT;
     SHOW_ALL_NL;
 
-    fprintf(stderr, "\tkeytitle is \"%s\"\n", conv_text(key_title));
+    fprintf(stderr, "\tkeytitle is \"%s\"\n", conv_text(key->title));
 }
 
 
@@ -1711,27 +1712,28 @@ show_keytitle()
 static void
 show_key()
 {
+    legend_key *key = &keyT;
     char *str = gp_alloc(30, "show_key");
 
     SHOW_ALL_NL;
 
-    switch (key) {
+    switch (key->flag) {
     case KEY_AUTO_PLACEMENT:
-	if (key_vpos == TUNDER) {
+	if (key->vpos == TUNDER) {
 	    strcpy(str, "below");
-	} else if (key_vpos == TTOP) {
+	} else if (key->vpos == TTOP) {
 	    strcpy(str, "top");
 	} else {
 	    strcpy(str, "bottom");
 	}
-	if (key_hpos == TOUT) {
+	if (key->hpos == TOUT) {
 	    strcpy(str, "outside (right)");
-	} else if (key_hpos == TLEFT) {
+	} else if (key->hpos == TLEFT) {
 	    strcat(str, " left");
 	} else {
 	    strcat(str, " right");
 	}
-	if (key_vpos != TUNDER && key_hpos != TOUT) {
+	if (key->vpos != TUNDER && key->hpos != TOUT) {
 	    strcat(str, " corner");
 	}
 	fprintf(stderr, "\tkey is ON, position: %s\n", str);
@@ -1742,18 +1744,18 @@ show_key()
 	break;
     case KEY_USER_PLACEMENT:
 	fputs("\tkey is at ", stderr);
-	show_position(&key_user_pos);
+	show_position(&key->user_pos);
 	putc('\n', stderr);
 	break;
     }
     if (key != KEY_NONE) {
 	fprintf(stderr, "\tkey is %s justified, %sreversed, %senhanced and ",
-		key_just == JLEFT ? "left" : "right",
-		key_reverse ? "" : "not ",
-		key_enhanced ? "" : "not ");
-	if (key_box.l_type > L_TYPE_NODRAW)
+		key->just == JLEFT ? "left" : "right",
+		key->reverse ? "" : "not ",
+		key->enhanced ? "" : "not ");
+	if (key->box.l_type > L_TYPE_NODRAW)
 	    fprintf(stderr, "boxed\n\twith linetype %d, linewidth %.3f\n",
-		    key_box.l_type + 1, key_box.l_width);
+		    key->box.l_type + 1, key->box.l_width);
 	else
 	    fprintf(stderr, "not boxed\n");
 	fprintf(stderr, "\tsample length is %g characters\n\
@@ -1762,12 +1764,12 @@ show_key()
 \theight adjustment is %g characters\n\
 \tcurves are%s automatically titled\n\
 \tkey title is \"%s\"\n",
-		    key_swidth,
-		    key_vert_factor,
-		    key_width_fix,
-		    key_height_fix,
-                    key_auto_titles ? "" : " not",
-		    key_title);
+		    key->swidth,
+		    key->vert_factor,
+		    key->width_fix,
+		    key->height_fix,
+                    key->auto_titles ? "" : " not",
+		    key->title);
     }
 }
 

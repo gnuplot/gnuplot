@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.109 2003/02/05 00:01:01 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.110 2003/02/05 21:43:39 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -1441,119 +1441,120 @@ static void
 set_key()
 {
     struct value a;
+    legend_key *key = &keyT;
 
     c_token++;
     if (END_OF_COMMAND) {
 	reset_key(); 		/* reset to defaults */
-	key_title[0] = 0;
+	key->title[0] = 0;
     } else {
 	while (!END_OF_COMMAND) {
 	    switch(lookup_table(&set_key_tbl[0],c_token)) {
 	    case S_KEY_TOP:
-		key_vpos = TTOP;
-		key = KEY_AUTO_PLACEMENT;
+		key->vpos = TTOP;
+		key->flag = KEY_AUTO_PLACEMENT;
 		break;
 	    case S_KEY_BOTTOM:
-		key_vpos = TBOTTOM;
-		key = KEY_AUTO_PLACEMENT;
+		key->vpos = TBOTTOM;
+		key->flag = KEY_AUTO_PLACEMENT;
 		break;
 	    case S_KEY_LEFT:
-		key_hpos = TLEFT;
-		/* key_just = TRIGHT; */
-		key = KEY_AUTO_PLACEMENT;
+		key->hpos = TLEFT;
+		/* key->just = TRIGHT; */
+		key->flag = KEY_AUTO_PLACEMENT;
 		break;
 	    case S_KEY_RIGHT:
-		key_hpos = TRIGHT;
-		key = KEY_AUTO_PLACEMENT;
+		key->hpos = TRIGHT;
+		key->flag = KEY_AUTO_PLACEMENT;
 		break;
 	    case S_KEY_UNDER:
-		key_vpos = TUNDER;
-		if (key_hpos == TOUT)
-		    key_hpos = TRIGHT;
-		key = KEY_AUTO_PLACEMENT;
+		key->vpos = TUNDER;
+		if (key->hpos == TOUT)
+		    key->hpos = TRIGHT;
+		key->flag = KEY_AUTO_PLACEMENT;
 		break;
 	    case S_KEY_OUTSIDE:
-		key_hpos = TOUT;
-		if (key_vpos == TUNDER)
-		    key_vpos = TBOTTOM;
-		key = KEY_AUTO_PLACEMENT;
+		key->hpos = TOUT;
+		if (key->vpos == TUNDER)
+		    key->vpos = TBOTTOM;
+		key->flag = KEY_AUTO_PLACEMENT;
 		break;
 	    case S_KEY_LLEFT:
-		/* key_hpos = TLEFT; */
-		key_just = JLEFT;
+		/* key->hpos = TLEFT; */
+		key->just = JLEFT;
 		break;
 	    case S_KEY_RRIGHT:
-		/* key_hpos = TLEFT; */
-		key_just = JRIGHT;
+		/* key->hpos = TLEFT; */
+		key->just = JRIGHT;
 		break;
 	    case S_KEY_REVERSE:
-		key_reverse = TRUE;
+		key->reverse = TRUE;
 		break;
 	    case S_KEY_NOREVERSE:
-		key_reverse = FALSE;
+		key->reverse = FALSE;
 		break;
 	    case S_KEY_ENHANCED:
-		key_enhanced = TRUE;
+		key->enhanced = TRUE;
 		break;
 	    case S_KEY_NOENHANCED:
-		key_enhanced = FALSE;
+		key->enhanced = FALSE;
 		break;
 	    case S_KEY_BOX:
 		c_token++;
 		if (END_OF_COMMAND)
-		    key_box.l_type = -2;
+		    key->box.l_type = -2;
 		else {
 		    int old_token = c_token;
 
-		    lp_parse(&key_box,1,0,-2,0);
+		    lp_parse(&key->box,1,0,-2,0);
 		    if (old_token == c_token)
-			key_box.l_type = real(const_express(&a)) -1;
+			key->box.l_type = real(const_express(&a)) -1;
 		}
 		c_token--;  /* is incremented after loop */
 		break;
 	    case S_KEY_NOBOX:
-		key_box.l_type = L_TYPE_NODRAW;
+		key->box.l_type = L_TYPE_NODRAW;
 		break;
 	    case S_KEY_SAMPLEN:
 		c_token++;
-		key_swidth = real(const_express(&a));
+		key->swidth = real(const_express(&a));
 		c_token--; /* it is incremented after loop */
 		break;
 	    case S_KEY_SPACING:
 		c_token++;
-		key_vert_factor = real(const_express(&a));
-		if (key_vert_factor < 0.0)
-		    key_vert_factor = 0.0;
+		key->vert_factor = real(const_express(&a));
+		if (key->vert_factor < 0.0)
+		    key->vert_factor = 0.0;
 		c_token--; /* it is incremented after loop */
 		break;
 	    case S_KEY_WIDTH:
 		c_token++;
-		key_width_fix = real(const_express(&a));
+		key->width_fix = real(const_express(&a));
 		c_token--; /* it is incremented after loop */
 		break;
 	    case S_KEY_HEIGHT:
 		c_token++;
-		key_height_fix = real(const_express(&a));
+		key->height_fix = real(const_express(&a));
 		c_token--; /* it is incremented after loop */
 		break;
             case S_KEY_AUTOTITLES:
-                key_auto_titles = 1;
+                key->auto_titles = TRUE;
                 break;
             case S_KEY_NOAUTOTITLES:
-                key_auto_titles = 0;
+                key->auto_titles = FALSE;
                 break;
 	    case S_KEY_TITLE:
 		if (isstring(c_token+1)) {
 		    /* We have string specified - grab it. */
-		    quote_str(key_title,++c_token, MAX_LINE_LEN);
+		    quote_str(key->title,++c_token, MAX_LINE_LEN);
 		}
 		else
-		    key_title[0] = 0;
+		    key->title[0] = 0;
 		break;
 	    case S_KEY_INVALID:
 	    default:
-		get_position(&key_user_pos);
-		key = KEY_USER_PLACEMENT;
+		get_position(&key->user_pos);
+		key->flag = KEY_USER_PLACEMENT;
 		c_token--;  /* will be incremented again soon */
 		break;
 	    }
@@ -1567,13 +1568,15 @@ set_key()
 static void
 set_keytitle()
 {
+    legend_key *key = &keyT;
+
     c_token++;
     if (END_OF_COMMAND) {	/* set to default */
-	key_title[0] = NUL;
+	key->title[0] = NUL;
     } else {
 	if (isstring(c_token)) {
 	    /* We have string specified - grab it. */
-	    quote_str(key_title,c_token, MAX_LINE_LEN);
+	    quote_str(key->title,c_token, MAX_LINE_LEN);
 	    c_token++;
 	}
 	/* c_token++; */

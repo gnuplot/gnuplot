@@ -1,3 +1,11 @@
+2003-02-15  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/gadgets.h src/gadgets.c src/set.c src/save.c src/unset.c 
+	src/graph3d.c src/graphics.c src/plot2d.c src/plot3d.c:
+	Move all globals related to the plot legend (key) into a single
+	structure. This yields cleaner code, and should eventually allow 
+	multiple legends per plot.
+
 2003-02-14  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* docs/gnuplot.doc (fit): Mention that 'thru' doesn't apply to
@@ -1922,7 +1930,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2003/02/11 06:08:00 $).
+	last modification date (from the tag $Date: 2003/02/14 16:09:25 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.59 2002/10/20 21:19:51 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.60 2003/01/13 13:22:10 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -1062,7 +1062,7 @@ eval_3dplots()
     int crnt_param = 0;
     char *xtitle;
     char *ytitle;
-
+    legend_key *key = &keyT;
 
     /* Reset first_3dplot. This is usually done at the end of this function.
      * If there is an error within this function, the memory is left allocated,
@@ -1242,7 +1242,7 @@ eval_3dplots()
 			duplication=TRUE;
 			break;
 		    }
-		    this_plot->title_no_enhanced = !key_enhanced;
+		    this_plot->title_no_enhanced = !key->enhanced;
 			/* title can be enhanced if not explicitly disabled */
 		    if (parametric) {
 			if (crnt_param != 0)
@@ -1346,7 +1346,7 @@ eval_3dplots()
 	    /* set default values for title if this has not been specified */
 	    if (!set_title) {
 		this_plot->title_no_enhanced = 1; /* filename or function cannot be enhanced */
-		if (key_auto_titles) {
+		if (key->auto_titles) {
 		    if (this_plot->plot_type == DATA3D && df_binary==TRUE && end_token==start_token+1)
 			/* let default title for  splot 'a.dat' binary  is 'a.dat'
 			 * while for  'a.dat' binary using 2:1:3  will be all 4 words */ 

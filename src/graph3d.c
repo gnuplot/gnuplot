@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.78 2003/01/27 20:39:33 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.79 2003/02/10 04:28:09 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -318,6 +318,7 @@ boundary3d(plots, count)
     struct surface_points *plots;
     int count;
 {
+    legend_key *key = &keyT;
     register struct termentry *t = term;
     int ytlen, i;
 
@@ -325,18 +326,18 @@ boundary3d(plots, count)
 
     p_height = pointsize * t->v_tic;
     p_width = pointsize * t->h_tic;
-    if (key_swidth >= 0)
-	key_sample_width = key_swidth * (t->h_char) + pointsize * (t->h_tic);
+    if (key->swidth >= 0)
+	key_sample_width = key->swidth * (t->h_char) + pointsize * (t->h_tic);
     else
 	key_sample_width = 0;
-    key_entry_height = pointsize * (t->v_tic) * 1.25 * key_vert_factor;
+    key_entry_height = pointsize * (t->v_tic) * 1.25 * key->vert_factor;
     if (key_entry_height < (t->v_char)) {
 	/* is this reasonable ? */
-	key_entry_height = (t->v_char) * key_vert_factor;
+	key_entry_height = (t->v_char) * key->vert_factor;
     }
     /* count max_len key and number keys (plot-titles and contour labels) with len > 0 */
     max_ptitl_len = find_maxl_keys3d(plots, count, &ptitl_cnt);
-    if ((ytlen = label_width(key_title, &ktitle_lines)) > max_ptitl_len)
+    if ((ytlen = label_width(key->title, &ktitle_lines)) > max_ptitl_len)
 	max_ptitl_len = ytlen;
     key_col_wth = (max_ptitl_len + 4) * (t->h_char) + key_sample_width;
 
@@ -349,7 +350,7 @@ boundary3d(plots, count)
     xright = xsize * t->xmax - t->h_char * 2 - t->h_tic;
     key_rows = ptitl_cnt;
     key_cols = 1;
-    if (key == KEY_AUTO_PLACEMENT && key_vpos == TUNDER) {
+    if (key->flag == KEY_AUTO_PLACEMENT && key->vpos == TUNDER) {
 	if (ptitl_cnt > 0) {
 	    /* calculate max no cols, limited by label-length */
 	    key_cols = (int) (xright - xleft) / ((max_ptitl_len + 4) * (t->h_char) + key_sample_width);
@@ -370,7 +371,7 @@ boundary3d(plots, count)
 
     /* an absolute 1, with no terminal-dependent scaling ? */
     ybot = (t->v_char) * 2.5 + 1;
-    if (key_rows && key == KEY_AUTO_PLACEMENT && key_vpos == TUNDER)
+    if (key_rows && key->flag == KEY_AUTO_PLACEMENT && key->vpos == TUNDER)
 	ybot += key_rows * key_entry_height + ktitle_lines * t->v_char;
 
     if (strlen(title.text)) {
@@ -381,7 +382,7 @@ boundary3d(plots, count)
 	}
     }
     ytop = ysize * t->ymax - t->v_char * (titlelin + 1.5) - 1;
-    if (key == KEY_AUTO_PLACEMENT && key_vpos != TUNDER) {
+    if (key->flag == KEY_AUTO_PLACEMENT && key->vpos != TUNDER) {
 	/* calculate max no rows, limited be ytop-ybot */
 	i = (int) (ytop - ybot) / (t->v_char) - 1 - ktitle_lines;
 	if (ptitl_cnt > i) {
@@ -391,7 +392,7 @@ boundary3d(plots, count)
 	}
 	key_rows += ktitle_lines;
     }
-    if (key == KEY_AUTO_PLACEMENT && key_hpos == TOUT) {
+    if (key->flag == KEY_AUTO_PLACEMENT && key->hpos == TOUT) {
 	xright -= key_col_wth * (key_cols - 1) + key_col_wth - 2 * (t->h_char);
     }
     xleft += t->xmax * xoffset;
@@ -488,7 +489,6 @@ place_labels3d(listhead, layer)
 	    continue;
 	map3d_position(&this_label->place, &x, &y, "label");
 
-	/* EAM - textcolor support in progress */
 	apply_textcolor(&(this_label->textcolor),t);
 
 	/* EAM - Allow arbitrary rotation of label text */
@@ -555,6 +555,7 @@ do_3dplot(plots, pcount, quick)
     /* double ztemp, temp; unused */
     transform_matrix mat;
     int key_count;
+    legend_key *key = &keyT;
     char *s, *e;
 #ifdef PM3D
     TBOOLEAN can_pm3d = 0;
@@ -747,25 +748,25 @@ do_3dplot(plots, pcount, quick)
 
     /* WORK OUT KEY SETTINGS AND DO KEY TITLE / BOX */
 
-    if (key_reverse) {
+    if (key->reverse) {
 	key_sample_left = -key_sample_width;
 	key_sample_right = 0;
 	key_text_left = t->h_char;
 	key_text_right = (t->h_char) * (max_ptitl_len + 1);
-	key_size_right = (t->h_char) * (max_ptitl_len + 2 + key_width_fix);
+	key_size_right = (t->h_char) * (max_ptitl_len + 2 + key->width_fix);
 	key_size_left = (t->h_char) + key_sample_width;
     } else {
 	key_sample_left = 0;
 	key_sample_right = key_sample_width;
 	key_text_left = -(int) ((t->h_char) * (max_ptitl_len + 1));
 	key_text_right = -(int) (t->h_char);
-	key_size_left = (t->h_char) * (max_ptitl_len + 2 + key_width_fix);
+	key_size_left = (t->h_char) * (max_ptitl_len + 2 + key->width_fix);
 	key_size_right = (t->h_char) + key_sample_width;
     }
     key_point_offset = (key_sample_left + key_sample_right) / 2;
 
-    if (key == KEY_AUTO_PLACEMENT) {
-	if (key_vpos == TUNDER) {
+    if (key->flag == KEY_AUTO_PLACEMENT) {
+	if (key->vpos == TUNDER) {
 #if 0
 	    yl = yoffset * t->ymax + (key_rows) * key_entry_height + (ktitle_lines + 2) * t->v_char;
 	    xl = max_ptitl_len * 1000 / (key_sample_width / (t->h_char) + max_ptitl_len + 2);
@@ -793,15 +794,15 @@ do_3dplot(plots, pcount, quick)
 	    }
 #endif
 	} else {
-	    if (key_vpos == TTOP) {
+	    if (key->vpos == TTOP) {
 		yl = ytop - (t->v_tic) - t->v_char;
 	    } else {
 		yl = ybot + (t->v_tic) + key_entry_height * key_rows + ktitle_lines * t->v_char;
 	    }
-	    if (key_hpos == TOUT) {
+	    if (key->hpos == TOUT) {
 		/* keys outside plot border (right) */
 		xl = xright + (t->h_tic) + key_size_left;
-	    } else if (key_hpos == TLEFT) {
+	    } else if (key->hpos == TLEFT) {
 		xl = xleft + (t->h_tic) + key_size_left;
 	    } else {
 		xl = xright - key_size_right - key_col_wth * (key_cols - 1);
@@ -809,19 +810,19 @@ do_3dplot(plots, pcount, quick)
 	}
 	yl_ref = yl - ktitle_lines * (t->v_char);
     }
-    if (key == KEY_USER_PLACEMENT) {
-	map3d_position(&key_user_pos, &xl, &yl, "key");
+    if (key->flag == KEY_USER_PLACEMENT) {
+	map3d_position(&key->user_pos, &xl, &yl, "key");
     }
-    if (key != KEY_NONE && key_box.l_type > L_TYPE_NODRAW) {
+    if (key->flag != KEY_NONE && key->box.l_type > L_TYPE_NODRAW) {
 	int yt = yl;
 	int yb = yl - key_entry_height * (key_rows - ktitle_lines) - ktitle_lines * t->v_char;
 	int key_xr = xl + key_col_wth * (key_cols - 1) + key_size_right;
-	int tmp = (int)(0.5 * key_height_fix * (t->v_char));
+	int tmp = (int)(0.5 * key->height_fix * (t->v_char));
 	yt += 2 * tmp;
 	yl += tmp;
 	
 	/* key_rows seems to contain title at this point ??? */
-	term_apply_lp_properties(&key_box);
+	term_apply_lp_properties(&key->box);
 	(*t->move) (xl - key_size_left, yb);
 	(*t->vector) (xl - key_size_left, yt);
 	(*t->vector) (key_xr, yt);
@@ -840,15 +841,15 @@ do_3dplot(plots, pcount, quick)
 #endif /* not LITE */
 
     /* KEY TITLE */
-    if (key != KEY_NONE && strlen(key_title)) {
-	char *ss = gp_alloc(strlen(key_title) + 2, "tmp string ss");
-	strcpy(ss, key_title);
+    if (key->flag != KEY_NONE && strlen(key->title)) {
+	char *ss = gp_alloc(strlen(key->title) + 2, "tmp string ss");
+	strcpy(ss, key->title);
 	strcat(ss, "\n");
 	s = ss;
 	yl -= t->v_char / 2;
 	while ((e = (char *) strchr(s, '\n')) != NULL) {
 	    *e = '\0';
-	    if (key_just == JLEFT) {
+	    if (key->just == JLEFT) {
 		(*t->justify_text) (LEFT);
 		(*t->put_text) (xl + key_text_left, yl, s);
 	    } else {
@@ -890,7 +891,7 @@ do_3dplot(plots, pcount, quick)
 #endif
 
 	    if (draw_surface) {
-		TBOOLEAN lkey = (key != 0 && this_plot->title && this_plot->title[0]);
+		TBOOLEAN lkey = (key->flag != KEY_NONE && this_plot->title && this_plot->title[0]);
 		term_apply_lp_properties(&(this_plot->lp_properties));
 
 
@@ -1057,7 +1058,7 @@ do_3dplot(plots, pcount, quick)
 
 		term_apply_lp_properties(&(thiscontour_lp_properties));
 
-		if (key != KEY_NONE && this_plot->title && this_plot->title[0]
+		if (key->flag != KEY_NONE && this_plot->title && this_plot->title[0]
 		    && !draw_surface && !label_contours) {
 		    /* unlabelled contours but no surface : put key entry in now */
 		    /* EAM - force key text to black, then restore */
@@ -1121,8 +1122,7 @@ do_3dplot(plots, pcount, quick)
 		}
 		while (cntrs) {
 		    if (label_contours && cntrs->isNewLevel) {
-		    	if (key != KEY_NONE) {
-			    /* EAM - force key text to black */
+		    	if (key->flag != KEY_NONE) {
 			    (*t->linetype)(LT_BLACK);
 			    key_text(xl, yl, cntrs->label);
 			}
@@ -1133,7 +1133,7 @@ do_3dplot(plots, pcount, quick)
 #endif
 			    (*t->linetype) (++thiscontour_lp_properties.l_type);
 
-			if (key != KEY_NONE) {
+			if (key->flag != KEY_NONE) {
 
 			    switch (this_plot->plot_style) {
 			    case IMPULSES:
@@ -2784,18 +2784,20 @@ key_text(xl, yl, text)
 int xl, yl;
 char *text;
 {
-    if (key_just == JLEFT && key == KEY_AUTO_PLACEMENT) {
+    legend_key *key = &keyT;
+	
+    if (key->just == JLEFT && key->flag == KEY_AUTO_PLACEMENT) {
 	(*term->justify_text) (LEFT);
 	(*term->put_text) (xl + key_text_left, yl, text);
     } else {
 	if ((*term->justify_text) (RIGHT)) {
-	    if (key == KEY_USER_PLACEMENT)
+	    if (key->flag == KEY_USER_PLACEMENT)
 		clip_put_text(xl + key_text_right, yl, text);
 	    else
 		(*term->put_text) (xl + key_text_right, yl, text);
 	} else {
 	    int x = xl + key_text_right - (term->h_char) * strlen(text);
-	    if (key == KEY_USER_PLACEMENT) {
+	    if (key->flag == KEY_USER_PLACEMENT) {
 		if (i_inrange(x, xleft, xright))
 		    clip_put_text(x, yl, text);
 	    } else {
@@ -2809,7 +2811,9 @@ static void
 key_sample_line(xl, yl)
 int xl, yl;
 {
-    if (key == KEY_AUTO_PLACEMENT) {
+    legend_key *key = &keyT;
+	
+    if (key->flag == KEY_AUTO_PLACEMENT) {
 	(*term->move) (xl + key_sample_left, yl);
 	(*term->vector) (xl + key_sample_right, yl);
     } else {
@@ -2823,6 +2827,8 @@ key_sample_point(xl, yl, pointtype)
 int xl, yl;
 int pointtype;
 {
+    legend_key *key = &keyT;
+	
     /* HBB 20000412: fixed incorrect clipping: the point sample was
      * clipped against the graph box, even if in 'below' or 'outside'
      * position. But the result of that clipping was utterly ignored,
@@ -2832,7 +2838,7 @@ int pointtype;
      *
      * Now, all 'automatically' placed cases will never be clipped,
      * only user-specified ones. */
-    if ((key == KEY_AUTO_PLACEMENT)            /* ==-1 means auto-placed key */
+    if ((key->flag == KEY_AUTO_PLACEMENT)            /* ==-1 means auto-placed key */
 	|| !clip_point(xl + key_point_offset, yl)) {
 	(*term->point) (xl + key_point_offset, yl, pointtype);
     }
@@ -2884,8 +2890,9 @@ key_sample_line_pm3d(plot, xl, yl)
     struct surface_points *plot;
 int xl, yl;
 {
+    legend_key *key = &keyT;
     int steps = GPMIN(24, abs(key_sample_right - key_sample_left)); 
-        /* don't multiply by key_swidth --- could be >> palette.maxcolors */
+        /* don't multiply by key->swidth --- could be >> palette.maxcolors */
     /* int x_from = xl + key_sample_left; */
     int x_to = xl + key_sample_right;
     double step = ((double)(key_sample_right - key_sample_left)) / steps;
@@ -2903,7 +2910,7 @@ int xl, yl;
     gray_to = cb2gray(cbmax);
     gray_step = (gray_to > gray_from) ? (gray_to - gray_from)/steps : 0;
 
-    if (key == KEY_AUTO_PLACEMENT)
+    if (key->flag == KEY_AUTO_PLACEMENT)
 	(*term->move) (x1, yl);
     else 
 	clip_move(x1, yl);
@@ -2914,7 +2921,7 @@ int xl, yl;
 	if (i>0) set_color( i==steps ? gray_to : gray_from+i*gray_step );
 	(*term->move) (x2, yl);
 	x2 = (i==steps) ? x_to : x1 + (int)(i*step+0.5);
-	if (key == KEY_AUTO_PLACEMENT)
+	if (key->flag == KEY_AUTO_PLACEMENT)
 	    (*term->vector) (x2, yl);
 	else
 	    clip_vector(x2, yl);
@@ -2932,6 +2939,7 @@ key_sample_point_pm3d(plot, xl, yl, pointtype)
 int xl, yl;
 int pointtype;
 {
+    legend_key *key = &keyT;
     /* int x_from = xl + key_sample_left; */
     int x_to = xl + key_sample_right;
     int i = 0, x1 = xl + key_sample_left, x2;
@@ -2966,7 +2974,7 @@ int pointtype;
 #endif
 	x2 = i==0 ? x1 : (i==steps ? x_to : x1 + (int)(i*step+0.5));
 	/* x2 += key_point_offset; ... that's if there is only 1 point */
-	if (key == KEY_AUTO_PLACEMENT || !clip_point(x2, yl))
+	if (key->flag == KEY_AUTO_PLACEMENT || !clip_point(x2, yl))
 	    (*term->point) (x2, yl, pointtype);
 	i++;
     }
