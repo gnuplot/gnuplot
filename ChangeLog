@@ -1,3 +1,9 @@
+2004-10-04  Ethan Merritt  <merritt@u.washington.edu>
+
+	* term/x11.trm (X11_graphics): Initialize font-tracking variable at the
+	start of each plot (fixes problems seen with opening multiple plot 
+	windows with different default fonts).
+
 2004-10-04  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/gplt_x11.c (process_event): Added missing cmd_tried = 1.
