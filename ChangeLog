@@ -1,3 +1,12 @@
+2002-12-17  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/gplt_x11.c: Initialize gcCurrentFunction because gcc is too
+	stupid to see that it can never be used before it is set.
+
+	* src/misc.c: Do not allow input of negative pointsize or linewidth.
+
+	* term/gd.trm: Check for valid linetype (Mike Kay <kay@fsl.noaa.gov>).
+
 2002-12-17  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/save.c: Fix saving of 'set xtics 7'.  Patch from
@@ -1648,7 +1657,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/12/17 14:14:14 $).
+	last modification date (from the tag $Date: 2002/12/17 15:38:58 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
