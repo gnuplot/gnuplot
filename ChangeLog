@@ -1,3 +1,19 @@
+2004-06-20  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/mouse.c (event_reset), src/command.c (pause_command),
+	docs/gnuplot.doc: Set MOUSE_KEY to -1 when the "pause mouse {key}" 
+	command is issued; if it is still -1 when checked later, then the 
+	calling program may assume that no mouse input was successfully given.
+
+	* src/command.c (pause_command): Change the test for legality of
+	"pause mouse" command from "if (term_initialised)" to
+	"if (mouse_setting.on)". Really it should test whether the current
+	terminal supports mousing at all, but we don't yet have such a flag.
+
+	* src/gplt_x11.c (process_event): Translate keystrokes using
+	XLookupString() rather than XKeycodeToKeysym(). This method handles
+	characters produced using shift, alt, or other multi-key sequences.
+
 2004-06-20  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/graph3d.c (key_sample_line_pm3d key_sample_point_pm3d): Fixed

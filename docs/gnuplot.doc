@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.223 2004/06/01 16:20:02 broeker Exp $
+C RCS $Id: gnuplot.doc,v 1.224 2004/06/07 05:33:00 sfeam Exp $
 C 18 September 2001
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -1516,7 +1516,9 @@ C ... and restart the table:
 
  If 'pause mouse keypress' is terminated by a mouse click rather than by a
  keypress, then MOUSE_KEY will contain the button number, otherwise it will
- contain the ascii character value of the key that was pressed.
+ contain the ascii character value of the key that was pressed. If the
+ pause command is terminated abnormally (e.g. by ctrl-C or by externally
+ closing the plot window) then MOUSE_KEY will equal -1.
 
 2 Plotting
 ?plotting
@@ -2416,6 +2418,7 @@ C ... and restart the table:
 2 pause
 ?commands pause
 ?pause
+?pause mouse
  The `pause` command displays any text associated with the command and then
  waits a specified amount of time or until the carriage return is pressed.
  `pause` is especially useful in conjunction with `load` files.

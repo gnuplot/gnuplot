@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.93 2004/06/07 05:33:00 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.94 2004/06/20 05:53:04 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -905,7 +905,12 @@ pause_command()
     if (equals(c_token,"mouse")) {
 	sleep_time = -1;
 	c_token++;
-	if (term_initialised) {
+
+/*	EAM FIXME - This is not the correct test; what we really want */
+/*	to know is whether or not the terminal supports mouse feedback */
+/*	if (term_initialised) { */
+	if (mouse_setting.on && term) {
+	    struct udvt_entry *current;
 	    paused_for_mouse = TRUE;
 	    if (!(END_OF_COMMAND)) {
 		if (almost_equals(c_token,"key$press")) {
@@ -913,6 +918,13 @@ pause_command()
 		c_token++;
 		}
 	    }
+	    /* Set the pause mouse return codes to -1 */
+	    current = get_udv("MOUSE_KEY");
+	    current->udv_undef = FALSE;
+	    Ginteger(&current->udv_value,-1);
+	    current = get_udv("MOUSE_BUTTON");
+	    current->udv_undef = FALSE;
+	    Ginteger(&current->udv_value,-1);
 	} else
 	    int_warn(NO_CARET,"Mousing not active");
     } else
