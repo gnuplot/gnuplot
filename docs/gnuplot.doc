@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.158 2003/02/05 00:00:59 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.159 2003/02/05 21:43:36 sfeam Exp $
 C 18 September 2001
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001   Thomas Williams, Colin Kelley et al.
 C
@@ -4078,7 +4078,7 @@ C ... and restart the table:
 ?missing
  The `set datafile missing` command allows you to tell `gnuplot` what character
  string is used in a data file to denote missing data.  Exactly how this missing
- value will be treated depends on the `using` specifier on the {`s`}`plot` 
+ value will be treated depends on the `using` specifier of the {`s`}`plot` 
  command.
 
  Syntax:
@@ -4129,7 +4129,7 @@ C ... and restart the table:
 4 set datafile separator
 ?set datafile separator
 ?separator
- The command `set datafile separator "<char>"` tell `gnuplot` that data fields
+ The command `set datafile separator "<char>"` tells `gnuplot` that data fields
  in subsequent input files are separated by <char> rather than by whitespace.
  The most common use is to read in csv (comma-separated value) files written 
  by spreadsheet or database programs. By default data fields are separated by 
