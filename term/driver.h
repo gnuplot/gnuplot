@@ -77,11 +77,11 @@ static int sign(int x)
 
 /* abs as macro is now uppercase, there are conflicts with a few C compilers
    that have abs as macro, even though ANSI defines abs as function
-   (int abs(int)). Most calls to ABS in term/* could be changed to abs if
+   (int abs(int)). Most calls to ABS in term/ could be changed to abs if
    they use only int arguments and others to fabs, but for the time being,
    all calls are done via the macro */
 #ifndef ABS
-#define ABS(x) ((x) >= 0 ? (x) : -(x))
+# define ABS(x) ((x) >= 0 ? (x) : -(x))
 #endif /* ABS */
 
 /*  GPMIN/GPMAX are already defined in "plot.h"  */
