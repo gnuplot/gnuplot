@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: graph3d.c,v 1.13.2.4 1999/10/19 13:31:49 lhecking Exp $";
+static char *RCSid = "$Id: graph3d.c,v 1.13.2.5 1999/11/18 20:31:29 lhecking Exp $";
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -416,7 +416,7 @@ int count;
 
     /* an absolute 1, with no terminal-dependent scaling ? */
     ybot = (t->v_char) * 2.5 + 1;
-    if (key_rows && key_vpos == TUNDER)
+    if (key_rows && key == -1 && key_vpos == TUNDER) /* HBB 20000328 */
 	ybot += key_rows * key_entry_height + ktitle_lines * t->v_char;
 
     if (strlen(title.text)) {
@@ -834,7 +834,7 @@ int pcount;			/* count of plots in linked list */
 	    case FINANCEBARS:
 	    case VECTOR:
 	    case POINTSTYLE:
-		if (lkey && !clip_point(xl + key_point_offset, yl)) {
+		if (lkey) {
 		    key_sample_point(xl, yl, this_plot->lp_properties.p_type);
 		}
 		if (!(hidden3d && draw_surface))
@@ -850,7 +850,7 @@ int pcount;			/* count of plots in linked list */
 		    plot3d_lines(this_plot);
 
 		/* put points */
-		if (lkey && !clip_point(xl + key_point_offset, yl))
+		if (lkey)
 		    key_sample_point(xl, yl, this_plot->lp_properties.p_type);
 
 		if (!(hidden3d && draw_surface))
@@ -1969,9 +1969,17 @@ static void key_sample_point(xl, yl, pointtype)
 int xl, yl;
 int pointtype;
 {
-    if (!clip_point(xl + key_point_offset, yl)) {
-	(*term->point) (xl + key_point_offset, yl, pointtype);
-    } else {
+    /* HBB 20000412: fixed incorrect clipping: the point sample was
+     * clipped against the graph box, even if in 'below' or 'outside'
+     * position. But the result of that clipping was utterly ignored,
+     * because the 'else' part did exactly the same thing as the
+     * 'then' one. Some callers of this routine thus did their own
+     * clipping, which I removed, along with this change.
+     *
+     * Now, all 'automatically' placed cases will never be clipped,
+     * only user-specified ones. */
+    if ((key == -1)		/* ==-1 means auto-placed key */
+	|| !clip_point(xl + key_point_offset, yl)) {
 	(*term->point) (xl + key_point_offset, yl, pointtype);
     }
 }
