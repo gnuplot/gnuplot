@@ -1,0 +1,470 @@
+/*
+ * $Id: amiga.trm,v 1.16 1996/12/08 13:11:07 drd Exp $
+ *
+ */
+
+/* GNUPLOT - amiga.trm */
+/*
+ * Copyright (C) 1991, 1992, 1995
+ *
+ * Permission to use, copy, and distribute this software and its
+ * documentation for any purpose with or without fee is hereby granted, 
+ * provided that the above copyright notice appear in all copies and 
+ * that both that copyright notice and this permission notice appear 
+ * in supporting documentation.
+ *
+ * Permission to modify the software is granted, but not the right to
+ * distribute the modified code.  Modifications are to be distributed 
+ * as patches to released version.
+ *  
+ * This software  is provided "as is" without express or implied warranty.
+ * 
+ * This file is included by ../term.c.
+ *
+ * This terminal driver supports:
+ *   Amiga Custom Screen
+ *
+ * AUTHORS
+ *   Carsten Steger
+ * 
+ *   Pat R. Empleo      Slightly modified for Aztec C v5.2a (beta); sort of
+ *   08/27/91           supports overscan; for large WB 2.0 virtual screens,
+ *                      we limit the plot size so we don't have to scroll
+ *                      around (not fun).
+ *
+ *   Carsten Steger     Modified to support Kickstart 2.0.
+ *   09/11/91           Opens a text overscan screen when used with WB 2.0.
+ *                      Discerns between NTSC and PAL Amigas when used with
+ *                      WB 1.3 and lower.
+ *
+ *   Pat R. Empleo      Defined some 2.0 stuff in order to get Aztec C to
+ *   09/20/91           work with Carsten's new code (see above).  When
+ *                      KS/WB 2.0 support gets implemented in Aztec C, this
+ *                      kludge will get deleted! 
+ *                      (Aztec C release 5.2 beta)
+ *
+ *   Carsten Steger     Converted to new terminal layout.
+ *   10/01/95
+ *
+ * send your comments or suggestions to (info-gnuplot@dartmouth.edu).
+ * 
+ */
+
+#ifndef GOT_DRIVER_H
+#include "driver.h"
+#endif
+
+#ifdef TERM_REGISTER
+register_term(amiga)
+#endif
+
+#ifdef TERM_PROTO
+
+#define AMIGA_XMAX 640
+#define AMIGA_YMAX 512
+
+#define AMIGA_VCHAR 12
+#define AMIGA_HCHAR 8
+#define AMIGA_VTIC  5
+#define AMIGA_HTIC  5
+
+TERM_PUBLIC void AMIGA_reset __PROTO((void));
+TERM_PUBLIC void AMIGA_init __PROTO((void));
+TERM_PUBLIC void AMIGA_options __PROTO((void));
+TERM_PUBLIC void AMIGA_text __PROTO((void));
+TERM_PUBLIC void AMIGA_graphics __PROTO((void));
+TERM_PUBLIC void AMIGA_move __PROTO((unsigned int x, unsigned int y));
+TERM_PUBLIC void AMIGA_vector __PROTO((unsigned int x, unsigned int y));
+TERM_PUBLIC void AMIGA_linetype __PROTO((int linetype));
+TERM_PUBLIC void AMIGA_put_text __PROTO((unsigned int x, unsigned int y,
+                                     char *str));
+TERM_PUBLIC int AMIGA_justify_text __PROTO((enum JUSTIFY mode));
+TERM_PUBLIC int AMIGA_set_font __PROTO((char * font));
+TERM_PUBLIC void AMIGA_suspend __PROTO((void));
+TERM_PUBLIC void AMIGA_resume __PROTO((void));
+#define GOT_AMIGA_PROTO
+
+#endif /* TERM_PROTO */
+
+
+#ifndef TERM_PROTO_ONLY
+
+#ifdef TERM_BODY
+
+
+#ifdef AMIGA_AC_5
+#include <intuition/intuitionbase.h>
+#include <intuition/screens.h>
+#include <graphics/text.h>
+#include <graphics/gfxbase.h>
+#else
+/* You will have to use the Kickstart 2.0 header files for this to compile */
+#include <exec/types.h>
+#include <intuition/intuitionbase.h>
+#include <graphics/gfxbase.h>
+#include <proto/intuition.h>
+#include <proto/graphics.h>
+#include <proto/exec.h>
+#include <proto/diskfont.h>
+#endif
+
+/* The origin is in the upper left hand corner, so we have to translate */
+/* and flip the coordinates: */
+#define AMIGA_VTF(y) (AMIGA_ymax-1-(y))
+
+
+struct IntuitionBase *IntuitionBase;
+struct GfxBase *GfxBase;
+struct Library *DiskfontBase;
+static char AMIGA_FontName[MAX_ID_LEN+1] = ""; /* name of font */
+static int AMIGA_FontSize = 0;                 /* size of font in pts */
+static struct TextAttr AMIGA_Font = {
+  "topaz.font",TOPAZ_EIGHTY,FS_NORMAL,FPF_ROMFONT
+};
+static struct TextFont *AMIGA_TextFont;
+static struct NewScreen AMIGA_NewScreen = {
+  0,0,AMIGA_XMAX,AMIGA_YMAX,4,15,0,HIRES|LACE,
+  CUSTOMSCREEN|SCREENBEHIND|SCREENQUIET,NULL,NULL,NULL,NULL
+};
+static struct Screen *AMIGA_Screen;
+static UWORD AMIGA_Colors [] = {
+  0x000,0xfff,0xbbb,0x0f0,0xf00,0x00f,0x3ca,0xf0f,
+  0x94d,0x0ff,0x82f,0xff0,0x0af,0xc5e,0xfa2,0xf44
+};
+static int AMIGA_slinetype;
+static enum JUSTIFY AMIGA_justify = LEFT;
+static unsigned int AMIGA_ymax,AMIGA_xmax; 
+static WORD AMIGA_cwd,AMIGA_cht,AMIGA_bsl,AMIGA_vadj;
+static struct TagItem AMIGA_ScrTagList[] = {
+  {SA_Overscan,OSCAN_TEXT},{TAG_DONE,0}
+};
+
+
+TERM_PUBLIC void AMIGA_reset()
+{
+  if (AMIGA_TextFont != NULL) CloseFont(AMIGA_TextFont);
+  if (DiskfontBase != NULL) CloseLibrary(DiskfontBase);
+  if (AMIGA_Screen != NULL) CloseScreen(AMIGA_Screen);
+  if (IntuitionBase != NULL) CloseLibrary((struct Library *)IntuitionBase);
+  if (GfxBase != NULL) CloseLibrary((struct Library *)GfxBase);
+  AMIGA_TextFont = NULL;
+  DiskfontBase = NULL;
+  AMIGA_Screen = NULL;
+  IntuitionBase = NULL;
+  GfxBase = NULL;
+}
+
+
+TERM_PUBLIC void AMIGA_init()
+{
+  char name[MAX_ID_LEN+1];
+
+#ifdef AMIGA_SC_6_1
+  /* Install exit trap in case of abnormal termination (see below). */
+  int AMIGA_exit(int);
+  if (!onexit((void (*)(void))(&AMIGA_exit))) {
+    fprintf(stderr,"Couldn't set exit trap\n");
+    exit(20);
+  }
+#endif
+  GfxBase = (struct GfxBase *) OpenLibrary("graphics.library",0);
+  if (GfxBase == NULL) {
+    fprintf(stderr,"No Graphics-Library\n");
+    AMIGA_reset();
+    exit(20);
+  }
+  IntuitionBase = (struct IntuitionBase *) OpenLibrary("intuition.library",0);
+  if (IntuitionBase == NULL) {
+    fprintf(stderr,"No Intuition-Library\n");
+    AMIGA_reset();
+    exit(20);
+  }
+
+  if (IntuitionBase->LibNode.lib_Version <= 34) {
+    /* We compute the vertical resolution for those poor NTSC-souls   :-)   */
+    if (GfxBase->DisplayFlags & PAL) AMIGA_ymax = 512;
+    else AMIGA_ymax = 400;
+    AMIGA_xmax = 640;
+    AMIGA_NewScreen.Width = AMIGA_xmax;
+    AMIGA_NewScreen.Height = AMIGA_ymax;
+    AMIGA_Screen = OpenScreen(&AMIGA_NewScreen);
+    if (AMIGA_Screen == NULL) {
+      fprintf(stderr,"No Screen\n");
+      AMIGA_reset();
+      exit(20);
+    }
+  } else {
+    /* Kickstart 2.0 support */
+    AMIGA_NewScreen.Width = STDSCREENWIDTH;
+    AMIGA_NewScreen.Height = STDSCREENHEIGHT;
+    AMIGA_Screen = OpenScreenTagList(&AMIGA_NewScreen,AMIGA_ScrTagList);
+    if (AMIGA_Screen == NULL) {
+      fprintf(stderr,"No Screen\n");
+      AMIGA_reset();
+      exit(20);
+    }
+    AMIGA_xmax = AMIGA_Screen->Width;
+    AMIGA_ymax = AMIGA_Screen->Height;
+  }
+  term->xmax = AMIGA_xmax;
+  term->ymax = AMIGA_ymax;
+
+  sprintf(name,"%s,%d",AMIGA_FontName,AMIGA_FontSize);
+  AMIGA_set_font(name);
+
+  LoadRGB4(&AMIGA_Screen->ViewPort,AMIGA_Colors,16);
+  RemakeDisplay();
+  AMIGA_slinetype = 1;
+  SetAPen(&AMIGA_Screen->RastPort,AMIGA_slinetype);
+  SetDrMd(&AMIGA_Screen->RastPort,JAM1);
+}
+
+
+TERM_PUBLIC void AMIGA_options()
+{
+  if (!END_OF_COMMAND && isstring(c_token)) {
+    quote_str(AMIGA_FontName,c_token, MAX_ID_LEN);
+    c_token++;
+  }
+
+  if (!END_OF_COMMAND) {
+    /* We have font size specified */
+    struct value a;
+    AMIGA_FontSize = (int)real(const_express(&a));
+  }
+  
+  if (strcmp(AMIGA_FontName,"") == 0 && AMIGA_FontSize != 0)
+    strcpy(AMIGA_FontName,"topaz");
+  if (strcmp(AMIGA_FontName,"") != 0 && AMIGA_FontSize == 0)
+    AMIGA_FontSize = 8;
+
+  if (strcmp(AMIGA_FontName,"") != 0 && AMIGA_FontSize != 0) {
+    sprintf(default_font,"%s,%d",AMIGA_FontName,AMIGA_FontSize);
+    sprintf(term_options,"\"%s\" %d",AMIGA_FontName,AMIGA_FontSize);
+  }
+}
+
+
+TERM_PUBLIC void AMIGA_text()
+{
+  char c;
+  FILE *fp;
+
+  if ((fp = fopen("*","r")) != NULL) {
+    c = getc(fp);
+    ungetc(c,stdin);
+  }
+  fclose(fp);
+  ScreenToBack(AMIGA_Screen);
+}
+
+
+TERM_PUBLIC void AMIGA_graphics()
+{
+  SetRast(&AMIGA_Screen->RastPort,0);
+  SetAPen(&AMIGA_Screen->RastPort,AMIGA_slinetype);
+  ScreenToFront(AMIGA_Screen);
+}
+
+
+TERM_PUBLIC void AMIGA_move(x,y)
+unsigned int x,y;
+{
+  if ((x>=AMIGA_xmax) || (y>=AMIGA_ymax)) return;
+  Move(&AMIGA_Screen->RastPort,x,AMIGA_VTF(y));
+}
+
+
+TERM_PUBLIC void AMIGA_vector(x,y)
+unsigned int x,y;
+{
+  if ((x>=AMIGA_xmax) || (y>=AMIGA_ymax)) return;
+  Draw(&AMIGA_Screen->RastPort,x,AMIGA_VTF(y));
+}
+
+
+TERM_PUBLIC void AMIGA_linetype(linetype)
+int linetype;
+{
+  if (linetype >= 13) linetype %= 13;
+  if (linetype < -2) linetype = -2;
+  AMIGA_slinetype = linetype+3;
+  SetAPen(&AMIGA_Screen->RastPort,AMIGA_slinetype);
+}
+
+
+TERM_PUBLIC void AMIGA_put_text(x,y,str)
+unsigned int x,y;
+char *str;
+{
+  LONG len,tx_len;
+  WORD xmin,xmax,ymin,ymax;
+
+  len = strlen(str);
+  tx_len = TextLength(&AMIGA_Screen->RastPort,str,len);
+  switch (AMIGA_justify) {
+    case LEFT:
+      xmin = x;
+      xmax = x + tx_len;
+      break;
+    case CENTRE:
+      xmin = x - tx_len / 2;
+      xmax = x + tx_len - tx_len / 2; /* aviod roundoff errors ! */
+      break;
+    case RIGHT:
+      xmin = x - tx_len;
+      xmax = x;
+      break;
+  }
+  ymin = AMIGA_VTF(y) - AMIGA_vadj;
+  ymax = ymin + AMIGA_cht;
+  /* Check if character-string lies completely within the screen: */
+  if ((xmax >= AMIGA_xmax) || (ymin < 0) || (ymax >= AMIGA_ymax)) return;
+  Move(&AMIGA_Screen->RastPort,xmin,ymin+AMIGA_bsl);
+  Text(&AMIGA_Screen->RastPort,str,len);
+}
+
+
+TERM_PUBLIC int AMIGA_justify_text(mode)
+enum JUSTIFY mode;
+{
+  AMIGA_justify = mode;
+  return TRUE;
+}
+
+
+TERM_PUBLIC int AMIGA_set_font(font)
+char *font;
+{
+  static char test_str[] =
+    " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~";
+  static WORD test_len,test_pxl;
+  char name[MAX_ID_LEN+1];
+  int  size,sep;
+  
+  sep = strcspn(font,",");
+  strncpy(name,font,sep);
+  name[sep] = '\0';
+  size = AMIGA_FontSize;
+  sscanf(&(font[sep+1]),"%d",&size);
+
+  if (strcmp(name,"") != 0) {
+    strncat(name,".font",MAX_ID_LEN+1);
+    /* Avoid opening "diskfont.library" if a built-in font is desired */
+    if ((strcmp("topaz.font",name) == 0) &&
+        ((size == TOPAZ_EIGHTY) || (size == TOPAZ_SIXTY))) {
+      AMIGA_Font.ta_Name = name;
+      AMIGA_Font.ta_YSize = size;
+      AMIGA_Font.ta_Style = FS_NORMAL;
+      AMIGA_Font.ta_Flags = FPF_ROMFONT;
+      AMIGA_TextFont = OpenFont(&AMIGA_Font);
+      if (AMIGA_TextFont != NULL) 
+        SetFont(&AMIGA_Screen->RastPort,AMIGA_TextFont);
+    } else {
+      DiskfontBase = OpenLibrary("diskfont.library",0);
+      if (DiskfontBase != NULL) {
+        AMIGA_Font.ta_Name = name;
+        AMIGA_Font.ta_YSize = size;
+        AMIGA_Font.ta_Style = FS_NORMAL;
+        AMIGA_Font.ta_Flags = FPF_ROMFONT|FPF_DISKFONT;
+        AMIGA_TextFont = OpenDiskFont(&AMIGA_Font);
+        if (AMIGA_TextFont != NULL)
+          SetFont(&AMIGA_Screen->RastPort,AMIGA_TextFont);
+      }
+    }
+  }
+
+  /* Width of characters: This works better for proportional fonts than */
+  /* AMIGA_Screen->RastPort.TxWidth + AMIGA_Screen->RastPort.TxSpacing */
+  test_len = strlen(test_str);
+  test_pxl = TextLength(&AMIGA_Screen->RastPort,test_str,test_len);
+  AMIGA_cwd = test_pxl / test_len;
+  AMIGA_cht = AMIGA_Screen->RastPort.TxHeight; /* Height of characters */
+  AMIGA_bsl = AMIGA_Screen->RastPort.TxBaseline; /* Reference line */
+  /* Amount by which characters have to be shifted upwards to be */
+  /* vertically justified: */
+  AMIGA_vadj = AMIGA_bsl / 2;
+  term->v_char = AMIGA_cht + 4; /* So lines won't be too close */
+  term->h_char = AMIGA_cwd;
+
+  return TRUE;
+}
+
+
+TERM_PUBLIC void AMIGA_suspend()
+{
+  char c;
+  FILE *fp;
+
+  if ((fp = fopen("*","r")) != NULL) {
+    c = getc(fp);
+    ungetc(c,stdin);
+  }
+  fclose(fp);
+  ScreenToBack(AMIGA_Screen);
+}
+
+
+TERM_PUBLIC void AMIGA_resume()
+{
+  ScreenToFront(AMIGA_Screen);
+}
+
+
+/* This function is mainly included if the program terminates abnormally */
+/* and the screen and libraries are still open. It closes down all opened */
+/* libraries and screens. This happens e.g. when loading "bivariat.demo" */
+/* and the stack is smaller than 120000 bytes. */
+#ifdef AMIGA_SC_6_1
+int AMIGA_exit(rc)
+int rc;
+{
+  AMIGA_reset();
+  rawcon(0);
+  return rc;
+}
+#endif
+
+
+#endif /* TERM_BODY */
+
+#ifdef TERM_TABLE
+
+TERM_TABLE_START(amiga_driver)
+  "amiga", "Amiga Custom Screen",
+  AMIGA_XMAX, AMIGA_YMAX, AMIGA_VCHAR, AMIGA_HCHAR, 
+  AMIGA_VTIC, AMIGA_HTIC, AMIGA_options, AMIGA_init, AMIGA_reset, 
+  AMIGA_text, null_scale, AMIGA_graphics, AMIGA_move, AMIGA_vector,
+  AMIGA_linetype, AMIGA_put_text, null_text_angle, 
+  AMIGA_justify_text, do_point, do_arrow, AMIGA_set_font,
+  0, /* pointsize */
+  TERM_CAN_MULTIPLOT, AMIGA_suspend, AMIGA_resume
+TERM_TABLE_END(amiga_driver)
+
+#undef LAST_TERM
+#define LAST_TERM amiga_driver
+
+#endif /* TERM_TABLE */
+#endif /* TERM_PROTO_ONLY */
+
+
+#ifdef TERM_HELP
+START_HELP(amiga)
+"1 amiga",
+"?set terminal amiga",
+"?set term amiga",
+"?terminal amiga",
+"?term amiga",
+"?amiga",
+" The `amiga` terminal, for Commodore Amiga computers, allows the user to",
+" select the font and its size.",
+"",
+" Syntax:",
+"       set terminal amiga {\"<fontname>\"} {<fontsize>}",
+"",
+" The default font is 8-point \"topaz\".",
+"",
+" This terminal uses a virtual screen, so it is possible that the graph will be",
+" larger than the screen."
+END_HELP(amiga)
+#endif

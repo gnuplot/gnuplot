@@ -1,0 +1,72 @@
+METAFONT Terminal Driver for gnuplot (mf.trm):
+----------------------------------------------
+
+The METAFONT terminal driver creates a input file to the METAFONT program.
+Thus a figure may be used in the TeX document in the same way as a
+character is.
+
+To use the plot in a document the METAFONT program must be run
+with the output file from gnuplot as input. Thus, the user needs a basic
+knowledge of the font creating prosess and inclusion of a new font in a
+document. However, if the METAFONT program are set up properly at the
+local site an unexperienced user could perform the operation without
+much trouble.
+
+The text support is based on a METAFONT character set.
+Currently the Computer Modern Roman font set is input but the
+user are in principal free to chose whatever fonts he/she needs.
+The METAFONT source files for the chosen font must be available.
+Each character is stored in a separate picture variable in METAFONT. These
+variables may be manipulated (rotated, scaled etc.) when characters are
+needed. The drawback is the interpretation time in the METAFONT
+program. On some machines (i.e. PC) the limited amount of memory available
+may also cause problem if too many pictures are stored.
+
+To use the METAFONT terminal driver:
+------------------------------------
+1) In gnuplot use:   set terminal mf
+                     set output "myfile.mf"
+                          .
+                          .
+                          .
+                     plot ....
+                     exit
+
+
+2) Run METAFONT. Syntax is site dependant:
+
+   On my UNIX I use:   cmmf '\mode=localfont; \mag=1;' input myfile.mf
+   On my PC I use:     mf286 &cm \mode=localfont; \mag=1; input myfile.mf
+
+   Be aware that METAFONT can only handle number less than 4096. Thus if you
+
+   have very high resolution in your localfont and a large picture you will
+   probably get an error message when running METAFONT. To solve the
+problem,
+   reduce the resolution or the plot size.
+
+3) Run GfToPk, syntax is
+
+   on my UNIX:   gftpk myfile.xxxgf myfile.pk
+   on my PC:     gftpk myfile.xxx myfile.pk
+
+   where xxx is the resolution (typically 300).
+
+4) Copy the files myfile.pk and myfile.tfm to a place where you are sure TeX
+   and the dvi processing programs you use  can find them. (They can
+probably
+   be located in your current working directory)
+
+5) Include in your TeX document the following statement:
+
+      \font\myfont=myfile  % Declares the new font you just have made
+      {\myfont\char0}      % Typeset character with code zero which
+                           % MF.TRM uses as default character
+
+Paal Hedne
+SINTEF Multiphase Laboratory
+N-7034 Trondheim
+Norway
+
+Tel.: -47-7-591060
+E.mail: Pal.Hedne@termo.unit.no

@@ -1,0 +1,533 @@
+DOCUMENTATION FOR GNUPLOT TERMINAL DRIVER WRITERS
+By Russell Lang 1/90
+
+Updated for new file layout by drd 4/95
+
+Paragraphs about inclusion of TERM_HELP added by rcc 1/96
+
+No change to the interface between gnuplot and the terminal drivers,
+but we would like to make the terminal drivers standalone
+
+1) in order move the support for the terminal drivers outside of the
+   support for the main program, thereby encouraging a library of
+   contributed drivers
+2) To make it easy for users to add contributed drivers, by adding
+   a single #include line to term.h
+3) To allow individual compilation on DOS, to save the overlay
+   manager from having to load _all_ drivers together.
+
+CORRECTION - scale() interface is no longer supported, since it
+is incompatible with multiplot.
+
+Whole of terminal driver should be contained in one <driver>.trm file,
+with a fairly strict layout as detailed below - this allows the
+gnuplot maintainers to change the way the terminal drivers are
+compiled without having to change the drivers themselves.
+
+term.h, and therefore each file.trm file, may be loaded more than once,
+with different sections selected by macros.
+
+Each driver provides all the functions it needs, and a table of
+function pointers and other data to interface to gnuplot.
+The table entry is currently defined as follows in plot.h:
+
+struct TERMENTRY {
+
+/* required entries */
+
+	char *name;
+	char *description;
+	unsigned int xmax,ymax,v_char,h_char,v_tic,h_tic;
+
+	void (*options) __PROTO((void));
+	void (*init) __PROTO((void));
+	void (*reset) __PROTO((void));
+	void (*text) __PROTO((void));
+	int (*scale) __PROTO((double, double));
+	void (*graphics) __PROTO((void));
+	void (*move) __PROTO((unsigned int, unsigned int));
+	void (*vector) __PROTO((unsigned int, unsigned int));
+	void (*linetype) __PROTO((int));
+	void (*put_text) __PROTO((unsigned int, unsigned int,char*));
+
+/* optional entries */
+
+	int (*text_angle) __PROTO((int));
+	int (*justify_text) __PROTO((enum JUSTIFY));
+	void (*point) __PROTO((unsigned int, unsigned int,int));
+	void (*arrow) __PROTO((unsigned int, unsigned int, unsigned int,
+			   unsigned int, int));
+   int (*set_font) __PROTO((char *font));  /* "font,size" */
+	void (*set_pointsize) __PROTO((double size)); /* notification of set pointsize */
+	int flags; /* various flags */
+   void (*suspend) __PROTO((void)); /* after one plot of multiplot */
+   void (*resume) __PROTO((void));  /* before subsequent plot of multiplot */
+   void (*boxfill) __PROTO((int style, unsigned int x1, unsigned int y1, unsigned int width, unsigned int height)); /* clear part of multiplot */
+   void (*linewidth) __PROTO((double linewidth));
+   void (*pointsize) __PROTO((double pointsize));
+};
+
+One consequence of (1) is that we would like drivers to be backwards
+compatible - drivers in the correct form below should work in future
+versions of gnuplot without change. C compilers guarantee to fill
+unitialised members of a structure to zero, so gnuplot can detect old
+drivers, in which fields have not been initalised, and can point
+new interface entry pointers to dummy functions.
+
+We can add fields to the terminal structure, but only at the end of the list.
+If you design a terminal that cant work without a new interface being defined,
+and consequent changes to the main gnuplot source, please contact
+bug-gnuplot@dartmouth.edu simply to ensure that you have the most
+up to date defn of the terminal structure. Also, please ensure that
+the 'set term' command checks for 0 values in added fields when an
+old driver is selected, and a pointer to a suitable 'cant do' function
+is provided. It is therefore not required (and in fact not possible)
+to add padding fields to the end of all drivers.
+
+Similarly, if you add an optional field to an old driver, take care
+to ensure that all intervening fields are padded with zeros.
+
+Some of the above fields are required - this should not be a problem,
+since they were all required in earlier releases of gnuplot.
+The later fields are interfaces to capabilities that not all devices
+can do, or for which the generic routines provided should be adequate.
+There are several null ('cant do') functions provided by term.c which
+a driver can reference in the table. Similarly, for bitmap devices, there
+are generic routines for lines and text provided by bitmap.c
+
+
+
+Here's a brief description of each variable:
+
+The char *name is a pointer to a string containing the name
+of the terminal.  This name is used by the 'set terminal' and 
+'show terminal' commands.  
+The name must be unique and must not be confused with an abbreviation 
+of another name.  For example if the name "postscript" exists, it is not
+possible to have another name "postscript2".
+Keep the name under 15 characters.
+
+The char *description is a pointer to a string containing a
+description of the terminal, which is displayed in response
+to the 'set terminal' command.  
+Keep the description under 60 characters.
+
+xmax is the maximum number of points in the x direction.  
+The range of points used by gnuplot is 0 to xmax-1.
+
+ymax is the maximum number of points in the y direction.  
+The range of points used by gnuplot is 0 to ymax-1.
+
+v_char is the height of characters, in the same units as xmax and ymax.
+The border for labelling at the top and bottom of the plot is 
+calculated using v_char.  
+v_char is used as the vertical line spacing for characters.
+
+h_char is the width of characters, in the same units as xmax and ymax.
+The border for labelling at the left and right of the plot is 
+calculated using h_char, for example.
+If the _justify_text function returns FALSE, h_char is used to justify 
+text right or centre.  If characters are not fixed width, then the 
+_justify_text function must correctly justify the text.
+
+v_tic is the vertical size of tics along the x axis, 
+in the same units as ymax.
+
+h_tic is the horizontal size of tics along the y axis, 
+in the same units as xmax.
+
+v_tic and h_tic should give tics of the same physical size on the
+output. The ratio of these two quantities is used by gnuplot to set the
+aspect ratio to 1 so that circles appear circular when 'set size square'
+is active.
+
+All the above values need not be static - values can be substituted
+into the table during terminal initialisation, based on options for
+example.
+
+
+
+Here's a brief description of what each term.c function does:
+
+_options()  Called when terminal type is selected.  
+This procedure should parse options on the command line.  A list of the 
+currently selected options should be stored in term_options[] in a form 
+suitable for use with the set term command.  term_options[] is used by 
+the save command.  Use options_null() if no options are available. 
+
+_init()  Called once, when the device is first selected.  This procedure
+should set up things that only need to be set once, like handshaking and
+character sets etc...
+There is a global variable 'pointsize' which you might want to use here.
+If set pointsize is issued after init has been called, the set_pointsize()
+function is called.
+
+_reset()  Called when gnuplot is exited, the output device changed or
+the terminal type changed.  This procedure should reset the device, 
+possibly flushing a buffer somewhere or generating a form feed.
+
+_scale(xs,ys) Called just before _graphics(). This takes the x and y
+scaling factors as information. If the terminal would like to do its
+own scaling, it returns TRUE. Otherwise, it can ignore the information
+and return FALSE: do_plot will do the scaling for you. null_scale is
+provided to do just this, so most drivers can ignore this function
+entirely. The Latex driver is currently the only one providing its own
+scaling. PLEASE DO NOT USE THIS INTERFACE - IT IS NOT COMPATIBLE WITH
+MULTIPLOT.
+
+_graphics()  Called just before a plot is going to be displayed.  This
+procedure should set the device into graphics mode.  Devices which can't
+be used as terminals (like plotters) will probably be in graphics mode 
+always and therefore won't need this.
+
+_text()  Called immediately after a plot is displayed.  This procedure 
+should set the device back into text mode if it is also a terminal, so
+that commands can be seen as they're typed.  Again, this will probably
+do nothing if the device can't be used as a terminal. This call can
+be used to trigger conversion and output for bitmap devices.
+
+_move(x,y)  Called at the start of a line.  The cursor should move to the
+(x,y) position without drawing.
+
+_vector(x,y)  Called when a line is to be drawn.  This should display a line
+from the last (x,y) position given by _move() or _vector() to this new (x,y)
+position.
+
+_linetype(lt)  Called to set the line type before text is displayed or
+line(s) plotted.  This procedure should select a pen color or line
+style if the device has these capabilities.  
+lt is an integer from -2 to 0 or greater.  
+An lt of -2 is used for the border of the plot.
+An lt of -1 is used for the X and Y axes.  
+lt 0 and upwards are used for plots 0 and upwards.
+If _linetype() is called with lt greater than the available line types, 
+it should map it to one of the available line types.
+Most drivers provide 9 different linetypes (lt is 0 to 8).
+
+_put_text(x,y,str)  Called to display text at the (x,y) position, 
+while in graphics mode.   The text should be vertically (with respect 
+to the text) justified about (x,y).  The text is rotated according 
+to _text_angle and then horizontally (with respect to the text)
+justified according to _justify_text.
+
+
+The following are optional
+
+
+_text_angle(ang)  Called to rotate the text angle when placing the y label.
+If ang = 0 then text is horizontal.  If ang = 1 then text is vertically
+upwards.  Returns TRUE if text can be rotated, FALSE otherwise.
+[But you must return TRUE if called with ang=0]
+
+_justify_text(mode)  Called to justify text left, right or centre.
+If mode = LEFT then text placed by _put_text is flushed left against (x,y).
+If mode = CENTRE then centre of text is at (x,y).  
+If mode = RIGHT then text is placed flushed right against (x,y).
+Returns TRUE if text can be justified
+Returns FALSE otherwise and then _put_text assumes text is flushed left;
+justification of text is then performed by calculating the text width
+using strlen(text) * h_char.
+
+_point(x,y,point)  Called to place a point at position (x,y).
+point is -1 or an integer from 0 upwards.  
+At least 6 point types (numbered 0 to 5) are normally provided.  
+Point type -1 is a dot.
+If point is more than the available point types then it should 
+be mapped back to one of the available points.
+Two _point() functions called do_point() and line_and_point() are 
+provided in term.c and should be suitable for most drivers.  
+do_point() draws the points in the current line type.
+If your driver uses dotted line types (generally because it is
+monochrome), you should use line_and_point() which changes to 
+line type 0 before drawing the point.  line type 0 should be solid.
+
+There is a global variable 'pointsize' which is controlled by the
+set pointsize command. If possible, use that. pointsize should be
+examined at terminal init. If it is subsequently changed, the
+set_pointsize() fn will be called.
+
+
+_arrow(sx,sy,ex,ey,head)  Called to draw an arrrow from (sx,sy) to (ex,ey).
+A head is drawn on the arrow if head = TRUE.
+An _arrow() function called do_arrow() is provided in term.c which will
+draw arrows using the _move() and _vector() functions.  
+Drivers should use do_arrow unless it causes problems.
+
+_set_font() is called to set the font of labels, etc [new 3.6 feature]
+fonts are selected as strings "name,size"
+
+_pointsize() is used to set the pointsize for subsequent points
+
+_flags stores various flags describing driver capabilities. Currently
+ three bits are allocated
+  - TERM_CAN_MULTIPLOT - driver can do multiplot
+  fully-interactively when output is not redirected. ie text and graphics
+  go to different places, or driver can flip using suspend.
+  - TERM_CANT_MULTIPLOT - driver cannot multiplot, even if output
+  is redirected.
+  - TERM_BINARY - output file must be opened in binary mode
+  Another bit is earmarked for VMS_PASTHRU, but not yet implemented.
+
+_suspend() - called before gnuplot issues a prompt in multiplot mode
+   linux vga driver uses this entry point to flip from graphics to
+   text mode. X11 driver will take this opportunity to paint the window
+   on the display.
+
+_resume() - called after suspend(), before subsequent plots of a multiplot.
+
+_boxfill() - fills a box in given style (currently unimplemented - always
+           background colour at present). used by 'clear' in multiplot for
+           support of inset graphs
+
+_linewidth() - sets the linewidth
+
+The following should illustrate the order in which calls to these
+routines are made:
+
+  _init()
+    _scale(xs,ys)
+    _graphics()
+      _linewidth(lw)
+      _linetype(lt)
+      _move(x,y)
+      _vector(x,y)
+      _pointsize(size)
+      _point(x,y,point)
+      _text_angle(angle)
+      _justify(mode)
+      _set_font(font)
+      _put_text(x,y,text)
+      _arrow(sx,sy,ex,ey)
+    _text()
+    _graphics()
+      .
+    _suspend()
+    _set_pointsize()
+    _resume()
+      .
+    _text()
+  _reset()
+
+
+------------------------------------
+
+BITMAP DEVICES
+
+A file bitmap.c is provided, implementing a generic set of bitmap
+routines. It provides all the routines required to generate a
+bitmap in memory, drawing lines and writing text. A simple driver
+need provide only a text() entry point, which converts and outputs
+the stored bitmap in the format required by the device.
+
+Internally, the bitmap is built of one or more planes of 1
+bit per pixel. In fact, I think the library would be easier to
+use if it offered one or more planes of pixels with 1,2,4 or 8
+bits per pixel, since not all bitmap devices are based on planes,
+and the planes have to be recombined at the end at present.
+In general, a device would use either planes or bits-per-pixel,
+though I guess a 24-bit bitmap could use 3 planes of 8 bits
+per pixel..?
+
+
+The pixels are currently organised horizontally packed into bytes.
+
+ie
+
+********%%%%%%%%$$$$$$$$!!!!!!!! etc
+^^^^^^^^@@@@@@@@########++++++++ etc
+
+where like symbols are stored in one byte. Vertical packing can be
+arranged by reversing x and y dimensions and setting the global
+b_rastermode to TRUE.  (eg epson 8-pin dot-matrix printer)
+
+
+Functions provided are
+
+(internal fns ? - should probably be static, not external ?)
+b_setpixel(x,y,value)     
+b_setmaskpixel(x,y,value)
+b_putc(x,y,char,angle)
+b_setvalue(size)
+
+setting up stuff
+
+b_makebitmap(x,y,planes)  - make a bitmap of size x * y
+b_freebitmap()            - free bitmap
+b_charsize(size)
+
+
+gnuplot driver interface functions  (can go straight into gnuplot structure)
+
+b_setlinetype(linetype)
+b_move(x,y)
+b_vector(x,y)
+b_put_text(x,y,*str)
+b_text_angle(ang)
+
+
+
+I think that the library could be made easier to use if we defined
+a structure which described the bitmap (raster mode, planes, bits-per-pixel,
+colours, etc) and then added to the gnuplot term struct a pointer to
+this structure. Then we could have b_graphics() routine which did all
+the initialisation that presently has to be done by the driver graphics()
+entry point.  Also, one day I would like to have parsing, including
+terminal driver options, table-driven, but I'm getting ahead of myself
+here.
+
+
+At present, bitmap.c is linked into gnuplot unconditionally. Perhaps
+it should be put into a library, so that it is linked in only if
+any of the user-selected drivers require bitmap support.
+
+There may be scope to do similar things with some of the other
+stuff that is shared by several drivers. Rather than requiring,
+for example, that LATEX driver is required if EMTEX is to be used,
+the shared routines could be extracted to a library and linked
+if any of the drivers which use them are used.  Just a thought...
+
+------------------------------------
+
+FILE LAYOUT
+-----------
+
+I think a file layout like the following will leave most flexibility
+to the gnuplot maintainers. I use REGIS for example.
+
+
+#ifndef GOT_DRIVER_H
+#include "driver.h"
+#endif
+
+
+#ifdef TERM_REGISTER
+register_term(regis) /* no ; */
+#endif
+
+
+#ifdef TERM_PROTO
+TERM_PUBLIC void REGISinit __PROTO((void));
+TERM_PUBLIC void REGISgraphics __PROTO((void));
+/* etc */
+#define GOT_REGIS_PROTO
+#endif
+
+
+#ifndef TERM_PROTO_ONLY
+#ifdef TERM_BODY
+
+TERM_PUBLIC void REGISinit()
+{
+  /* etc */
+}
+
+/* etc */
+
+#endif
+
+
+#ifdef TERM_TABLE
+
+TERM_TABLE_START(regis_driver)
+  /* no { */
+  "regis", "REGIS graphics language",
+  REGISXMAX, /* etc */
+  /* no } */
+TERM_TABLE_END(regis_driver)
+
+#undef LAST_TERM
+#define LAST_TERM regis_driver
+
+#endif /* TERM_TABLE */
+#endif /* TERM_PROTO_ONLY */
+
+
+
+
+#ifdef TERM_HELP
+START_HELP(regis)
+"1 regis",
+"?set terminal regis",
+"?regis",
+" The `regis` terminal device generates output in the REGIS graphics language.",
+" It has the option of using 4 (the default) or 16 colors.",
+"",
+" Syntax:",
+"         set term regis {4 | 16}"
+END_HELP(regis)
+#endif
+
+
+--------------
+
+The first three lines in the TERM_HELP section must contain the same
+name as that specified by register_term, since this is the name that
+will be entered into the list of available terminals.  If more than
+one name is registered, the additional names should have their own
+two "?" lines, but not the "1" line.
+
+Each record is enclosed in double-quotes and (except for the last
+record) followed by a comma.  The text is copied as a single string
+into gnuplot.doc, so the syntax must obey the rules of that entity.
+If the text includes double-quotes or backslashes, these must be
+escaped by preceding each occurence with a backslash.
+
+--------------
+
+Rationale:
+
+We may want to compile all drivers into term.c or one driver at a time
+this layout should support both
+TERM_PUBLIC will be static  if all modules are in term.c, or blank
+otherwise.
+Please make private support functions static if possible.
+
+
+We may include term.h, and therefore all these files, one or more times.
+If just once (all modules compiled into term.c) putting the four
+parts in this order should make it work.
+
+we may compile the table entries into either an array or a linked list
+This organisation should support both
+
+For separate compilation, we may write a program which
+defines TERM_REGISTER and #include term.h to find out which drivers are
+selected in term.h and thereby generate a makefile.
+
+
+
+For a driver which depends on another (eg enhpost and pslatex on post)
+the driver can do something like
+
+#ifndef GOT_POST_PROTO
+#define TERM_PROTO_ONLY
+#include "post.trm"
+#undef TERM_PROTO_ONLY
+#endif
+
+this is probably needed only in the TERM_TABLE section only, but may
+also be used in the body. The TERM_PROTO_ONLY means that we pick up
+only the protos from post.trm, even if current driver is being compiled
+with TERM_BODY or TERM_TABLE
+
+If we do it the linked-list way, the arg to TERM_TABLE_START will be
+the name of the variable, so any valid, unique name is fine.
+The TERM_TABLE_START macro will do all the work of linking the entries
+together, probably using LAST_TERM
+
+The inclusion of the TERM_HELP section (and removal of terminal documentation
+from the master gnuplot.doc file) means that the online help will include
+discussions of only those terminals available to the user.  For generation
+of the printed manual, all can be included.
+
+
+Please make as many things as possible static, but do still try to use unique
+names since all drivers may all be compiled into term.o
+
+The bit in the PROTO section is basically what you would put into a .h
+file if we had them - everything that is needed by the TABLE_ENTRY
+should be defined in this part. In particular, dont forget all the maxes
+and character sizes and things for the table entry.
+
+Dont forget to put TERM_PUBLIC in the defns of the fns as well as the
+prototypes. It will probably always expand to 'static' except for pcs.

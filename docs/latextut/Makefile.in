@@ -1,0 +1,54 @@
+# Makefile for gnuplot LaTeX tutorial
+# To make the manual from scratch, we run latex two times
+
+# default target
+all: tutorial.dvi done
+
+# this tells GNU make not to export variables into the environment
+# But other makes dont understand its significance, so it must
+# not be the first target in the file. So it is here, before
+# any variables are created, but after the default target
+.NOEXPORT:
+
+SHELL = /bin/sh
+
+srcdir = @srcdir@
+VPATH = @srcdir@
+
+prefix = /usr/local
+exec_prefix = $(prefix)
+bindir = $(exec_prefix)/bin
+datadir = $(prefix)/lib
+mandir = $(prefix)/man
+
+
+done:
+	latex tutorial
+	echo > done
+
+# To touch it up after changes:
+remake: tutorial.dvi
+
+# Always runs latex, e.g., to get labels right
+force:
+	latex tutorial
+
+tutorial.dvi: eg1.tex eg2.tex eg3.tex eg4.tex eg5.tex eg6.tex linepoin.tex \
+	tutorial.tex header.tex
+	latex tutorial
+	rm -f done
+
+.SUFFIXES: .tex .plt
+
+.plt.tex:
+	gnuplot $<
+
+clean:
+	rm -f *.log eg?.tex linepoin.tex
+
+mostlyclean: clean
+
+distclean: clean
+	rm -f Makefile
+
+realclean: distclean

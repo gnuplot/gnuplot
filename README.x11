@@ -1,0 +1,78 @@
+X11 changes for gnuplot 3.3
+---------------------------
+
+Enhancements
+------------
+
+   o VMS X11 support (Jehavi Bourvine)
+
+   o New X11 rendering for 'points' plotting style improves point
+     quality and eliminates the 'X11' terminal type whose only
+     function was to request multi-colored points. (Russell Lang)
+
+   o tailorable linewidths, dash styles, and point sizes (see
+     the man page)
+
+   o Color handling:
+
+       - "colorname,intensity" where 0 < intensity < 1
+         For example, 'blue,.5' means a half intensity blue
+
+       - hexadecimal RGB colors accepted (needed for HP VUE)
+
+       - Failure to parse/allocate a color defaults to black
+         for that color rather than monochrome for whole plot
+
+   o 'set term x11' assumed if '-display' option on command line.
+
+Bug Fixes
+---------
+
+   o On monochrome servers, any lines plotted before the first label
+     was printed were lost. This lost zero axes and garbled some
+     other plots. (Kenneth H. Carpenter)
+
+   o User specified geometry position ignored with some window managers.
+     Negative positions miscalculated. (Mike Coleman)
+
+
+Vendor Botch Circumventions
+---------------------------
+
+   o New X11FLAGS options:
+
+      - OW_BOTCH circumvents "ld.so: Undefined symbol: __XtInherit"
+        loader errors on Sun Open Windows platforms. (Vivek Khera)
+
+      - ISC22 circumvents select() problem with ISC2.2 (Robert Eckardt)
+
+      - BSD_TYPES pulls select FD_SET definitions from <sys/bsdtypes.h>
+        (Michael Herrmann)
+
+      - ULTRIX_KLUDGE expanded to circumvent missing demo plots at
+        Ultrix 4.1 (chan@holo.iitsg.nrc.ca)
+
+   o Random window geometry with Esix X11R3 (Al Bolduc)
+
+
+Miscellaneous
+-------------
+
+   o The man page has been updated to document that background and
+     foreground are not honored for monochrome displays, only -rv
+     and 'gnuplot*reverseVideo:on'.
+
+   o '-tvtwm' command line option and gnuplot*tvtwm resource
+
+     Mike Coleman's fix for user-specified geometry position for
+     other window managers causes tvtwm to use absolute rather
+     then virtual-relative coordinates when the user specifies
+     geometry. This command line option and resource tells
+     gnuplot_x11 to use PPosition (virtual-relative) when a
+     geometry position is requested.
+
+     Unfortunately, negative y positions are off by the size of the
+     window manager title bar. Thus, for example, -0-20 rather than
+     -0-0 is needed to place the lower right corner of the window
+     at the lower right corner of the screen.
+

@@ -1,0 +1,1207 @@
+/* Hey Emacs this is -*- C -*-
+ * $Id: cgm.trm,v 1.13 1997/07/22 23:24:42 drd Exp $
+ */
+
+/* GNUPLOT - cgm.trm */
+/*
+ * Copyright (C) 1997
+ *
+ * Permission to use, copy, and distribute this software and its
+ * documentation for any purpose with or without fee is hereby granted,
+ * provided that the above copyright notice appear in all copies and
+ * that both that copyright notice and this permission notice appear
+ * in supporting documentation.
+ *
+ * Permission to modify the software is granted, but not the right to
+ * distribute the modified code.  Modifications are to be distributed
+ * as patches to released version.
+ *
+ * This software  is provided "as is" without express or implied warranty.
+ *
+ * This file is included by ../term.c and ../docs/termdoc.c.
+ *
+ * This terminal driver supports:
+ *   Computer Graphics Metafile
+ *
+ * TODO
+ *   better control over plot size (never cutting off labels, correct font 
+ *   sizes)
+ *   Fix font sizes for portrait orientation
+ *
+ * AUTHOR
+ *   Jim Van Zandt <jrv@vanzandt.mv.com>
+ *
+ * send your comments or suggestions to (info-gnuplot@dartmouth.edu).
+*/
+
+#ifndef GOT_DRIVER_H
+#include "driver.h"
+#endif
+
+#ifdef TERM_REGISTER
+register_term(cgm)
+#endif
+
+#ifdef TERM_PROTO
+TERM_PUBLIC void CGM_options __PROTO((void));
+TERM_PUBLIC void CGM_init __PROTO((void));
+TERM_PUBLIC void CGM_reset __PROTO((void));
+TERM_PUBLIC void CGM_text __PROTO((void));
+TERM_PUBLIC void CGM_graphics __PROTO((void));
+TERM_PUBLIC void CGM_move __PROTO((unsigned int x, unsigned int y));
+TERM_PUBLIC void CGM_dashed_vector __PROTO((unsigned int ux, unsigned int uy));
+TERM_PUBLIC void CGM_solid_vector __PROTO((unsigned int ux, unsigned int uy));
+TERM_PUBLIC void CGM_linetype __PROTO((int linetype));
+TERM_PUBLIC void CGM_linecolor __PROTO((int color));
+TERM_PUBLIC void CGM_dashtype __PROTO((int dashtype));
+TERM_PUBLIC void CGM_linewidth __PROTO((double width));
+TERM_PUBLIC void CGM_put_text __PROTO((unsigned int x, unsigned int y, 
+				       char *str));
+TERM_PUBLIC int CGM_text_angle __PROTO((int angle));
+TERM_PUBLIC int CGM_justify_text __PROTO((enum JUSTIFY mode));
+TERM_PUBLIC void CGM_point __PROTO((unsigned int x, unsigned int y, 
+				    int number));
+TERM_PUBLIC int CGM_find_font __PROTO((char *font, int numchar));
+TERM_PUBLIC int CGM_set_font __PROTO((char * font));
+TERM_PUBLIC void CGM_set_pointsize __PROTO((double size));
+
+#define CGM_LARGE 32767
+#define CGM_SMALL 32767/18*13	/* aspect ratio 1:.7222 */
+#define CGM_MARGIN (CGM_LARGE/180)
+				/* convert from plot units to pt */
+#define CGM_PT ((term->xmax + CGM_MARGIN)/cgm_plotwidth)
+#define CGM_LINE_TYPES 9	/* number of line types we support */
+#define CGM_COLORS 7		/* number of colors we support */
+#define CGM_POINTS 8		/* number of markers we support */
+#define CGM_MAX_SEGMENTS 104	/* maximum # polyline coordinates */
+#define CGM_VCHAR (CGM_SMALL/360*12)
+#define CGM_HCHAR (CGM_SMALL/360*12*5/9)
+#define CGM_VTIC (CGM_LARGE/80)
+#define CGM_HTIC (CGM_LARGE/80)
+#endif
+
+#ifndef TERM_PROTO_ONLY
+#ifdef TERM_BODY
+
+/*
+ * on NeXTstep, id is an identifier (in ObjC) and causes a parse error
+ * since some asserts below are mistaken as casts. datum is a type
+ * defined in ndbm.h which also causes a parse error (ndbm.h is
+ * included as part of appkit.h, I think).  Strangely enough, both
+ * errors only happen with cpp-precomp -smart, not with the regular
+ * cpp. (AL)
+ */
+
+#ifdef NEXT
+#define id id_
+#define datum datum_
+#endif
+
+#include <ctype.h>		/* for isspace() */
+
+#ifndef assert
+#define assert(x) 0		/* defeat assertions */
+#endif
+
+/* uncomment the following to enable assertions for this module only,
+   regardless of compiler switches */
+#ifdef NDEBUG
+#define DEFEAT_ASSERTIONS
+#endif
+#undef NDEBUG
+#include <assert.h>
+
+
+#define CGM_ADJ (sizeof(int)/sizeof(short))
+
+static unsigned int cgm_posx;
+static unsigned int cgm_posy;
+static unsigned int cgm_linetype=1;
+static unsigned int cgm_dashtype=0;
+static unsigned int cgm_color=0;
+static int cgm_polyline[CGM_MAX_SEGMENTS]; /* stored polyline coordinates */
+static int cgm_coords=0;		  /* # polyline coordinates saved */
+enum JUSTIFY cgm_justify = LEFT;
+static int cgm_vert_text = 0;	/* text orientation -- nonzero for vertical */
+static int cgm_vert_text_requested = 0;
+static int cgm_step_sizes[8];	/* array of currently used dash
+				   lengths in plot units */
+static int cgm_step_index = 0;	/* index into cgm_step_sizes[] */
+static int cgm_step = 0;	/* amount of current dash not yet
+				   drawn, in plot units */
+static int cgm_tic, cgm_tic707, cgm_tic866, cgm_tic500, cgm_tic1241, 
+	cgm_tic1077, cgm_tic621; /* marker dimensions */
+	/* Each font string is preceded by a byte with its length */
+static char cgm_font_data[]={"\
+\005Arial\
+\014Arial Italic\
+\012Arial Bold\
+\021Arial Bold Italic\
+\013Times Roman\
+\022Times Roman Italic\
+\020Times Roman Bold\
+\027Times Roman Bold Italic\
+\011Helvetica\
+\005Roman\
+"};
+
+	/* variables to record the options */
+static char cgm_font[32] = "Arial Bold";
+static unsigned int cgm_fontsize=10;
+static unsigned cgm_linewidth; /* line width in plot units */
+static unsigned cgm_linewidth_pt = 1; /* line width in pt */
+static TBOOLEAN cgm_monochrome = FALSE; /* colors enabled? */
+static int cgm_plotwidth = 432;	/* assumed width of plot in pt. */
+static TBOOLEAN cgm_portrait = FALSE; /* portrait orientation? */
+static TBOOLEAN cgm_rotate = TRUE; /* text rotation enabled? */
+static TBOOLEAN cgm_winword6_mode = FALSE; /* workaround for WinWord bug? */
+
+/* prototypes for static functions */
+static void CGM_flush_polyline __PROTO(( void ));
+static void CGM_flush_polygon __PROTO(( void ));
+static void CGM_write_char_record __PROTO(( int class, int cgm_id, int length, 
+					    char *data ));
+static void CGM_write_code __PROTO(( int class, int cgm_id, int length ));
+static void CGM_write_int __PROTO(( int value ));
+static void CGM_write_int_record __PROTO(( int class, int cgm_id, int length, 
+					   int *data ));
+static void CGM_write_mixed_record __PROTO(( int class, int cgm_id, 
+					     int numint, int *int_data, 
+					     int numchar, char *char_data ));
+
+
+
+TERM_PUBLIC void CGM_init()
+{
+  cgm_posx = cgm_posy = 0;
+  cgm_linetype = 0;
+  cgm_vert_text = 0;
+}
+
+TERM_PUBLIC void CGM_graphics()
+{
+  register struct termentry *t = term;
+  static int version_data[] = {1};
+  static char description_data[] = 
+    "Computer Graphics Metafile version of Gnuplot";
+  static int vdc_type_data[] = {0};
+  static int integer_precision_data[] = {16};
+  static int real_precision_data[] = {1, 16, 16};
+  static int index_precision_data[] = {16};
+  static int color_precision_data[] = {16};
+  static int color_index_precision_data[] = {16};
+  static int maximum_color_index_data_data[] = {CGM_COLORS};
+  static int scaling_mode_data[] = {0, 0, 0};
+  static int color_value_extent_data[] = {0, 0, 0, 255, 255, 255};
+  static int color_table_data[] =
+/* for testing
+    {
+      8, 0,0,0, 64,64,64, 128,128,128, 196,196,196, 0,255,255, 255,0,255, 
+      255,255,0, 255,255,255
+    };
+*/
+    {
+      CGM_COLORS, 
+      0,0,0, 255,0,0, 0,255,0, 0,0,255, 255,255,0, 255,0,255, 0,255,255
+/*    black    red     green    blue      yellow    magenta     cyan  */
+    };
+
+  static int color_selection_mode_data[] = {0};
+  static int linewidth_specification_mode_data[] = {0};
+  static int marker_size_specification_mode_data[] = {0};
+  static int vdc_extent_data[] = {0, 0, 0, 0};
+  static int vdc_integer_precision_data[] = {16};
+  static int transparency_data[]={0}; /* text background: 1=transparent */
+  static int clip_indicator_data[]={0};
+/*  static int line_color_data[]={1}; */
+  static int line_type_data[]={1};
+  static int interior_style_data[]={1};	/* 1=filled */
+
+  static int elements_list_data[] = {
+    0,				/* will be set to # elements in this list */
+    0,  1,			/* Begin Metafile */
+    0,  2,			/* End Metafile */
+    0,  3,			/* Begin Picture */
+    0,  4,			/* Begin Picture Body */
+    0,  5,			/* End Picture */
+    1,  1,			/* Metafile Version */
+    1,  2,			/* Metafile Description */
+    1,  3,			/* VDC Type */
+    1,  4,			/* Integer Precision */
+    1,  5,			/* Real Precision */
+    1,  6,			/* Index Precision */
+    1,  7,                      /* Color Precision */
+    1,  8,			/* Color Index Precision */
+    1,  9,			/* Maximum Color Index */
+    2,  1,			/* Scaling Mode */
+    2,  2,			/* Color Selection Mode */
+    2,  3,			/* Line Width Specification Mode */
+    2,  4,			/* Marker Size Specification Mode */
+    2,  6,			/* VDC Extent */
+    3,  1,			/* VDC Integer Precision */
+    3,  4,			/* Transparency */
+    3,  6,			/* Clip Indicator */
+    4,  1,			/* Polyline */
+    4,  3,			/* Polymarker */
+    4,  4,			/* Text */
+    4,  7,			/* Polygon */
+    4, 11,			/* Rectangle */
+    4, 12,			/* Circle */
+    4, 15,			/* Circular Arc Center */
+    4, 16,			/* Circular Arc Center Close */
+    4, 17,			/* Ellipse */
+    4, 18,			/* Elliptical Arc */
+    4, 19,			/* Elliptical Arc Close */
+    5,  2,			/* Line Type */
+    5,  3,			/* Line Width */
+    5,  4,			/* Line Color */
+    5,  6,			/* Marker Type */
+    5,  7,			/* Marker Size */
+    5,  8,			/* Marker Color */
+    5, 10,			/* Text Font Index */
+    5, 14,			/* Text Color */
+    5, 15,			/* Character Height */
+    5, 16,			/* Character Orientation */
+    5, 18,			/* Text Alignment */
+    5, 22,			/* Interior Style */
+    5, 23,			/* Fill Color */
+    5, 24,			/* Hatch Index */
+    6,  1,			/* Escape */
+    7,  2			/* Application Data */
+  };
+
+	/* metafile description (class 1) */
+  CGM_write_char_record(0, 1, strlen(outstr)+1, outstr);
+  CGM_write_int_record(1, 1, 2, version_data);
+  CGM_write_char_record(1, 2, sizeof(description_data), description_data);
+  CGM_write_int_record(1, 3, 2, vdc_type_data);
+  CGM_write_int_record(1, 4, 2, integer_precision_data);
+  CGM_write_int_record(1, 5, 6, real_precision_data);
+  CGM_write_int_record(1, 6, 2, index_precision_data);
+  CGM_write_int_record(1, 7, 2, color_precision_data);
+  CGM_write_int_record(1, 8, 2, color_index_precision_data);
+  CGM_write_int_record(1, 9, 2, maximum_color_index_data_data);
+  CGM_write_int_record(1, 10, sizeof(color_value_extent_data)/CGM_ADJ, 
+		       color_value_extent_data);
+  elements_list_data[0] = (sizeof(elements_list_data)/CGM_ADJ - 2)/4;
+  CGM_write_int_record(1, 11, sizeof(elements_list_data)/CGM_ADJ, 
+		       elements_list_data);
+  if(cgm_winword6_mode == FALSE)
+    CGM_write_char_record(1, 13, strlen(cgm_font_data), cgm_font_data);
+
+	/* picture description (classes 2 and 3) */
+  CGM_write_char_record(0, 3, 8, "PICTURE1");
+  CGM_write_int_record(2, 1, 6, scaling_mode_data);
+  CGM_write_int_record(2, 2, 2, color_selection_mode_data);
+  CGM_write_int_record(2, 3, 2, linewidth_specification_mode_data);
+  CGM_write_int_record(2, 4, 2, marker_size_specification_mode_data);
+  vdc_extent_data[2] = t->xmax + CGM_MARGIN;
+  vdc_extent_data[3] = t->ymax + CGM_MARGIN;
+  CGM_write_int_record(2, 6, 8, vdc_extent_data);
+  CGM_write_int_record(3, 1, 2, vdc_integer_precision_data);
+  CGM_write_int_record(3, 4, sizeof(transparency_data)/CGM_ADJ, 
+		       transparency_data);
+  CGM_write_int_record(3, 6, sizeof(clip_indicator_data)/CGM_ADJ, 
+		       clip_indicator_data);
+
+	/* picture body (classes 4 and 5) */
+  CGM_write_int_record(0, 4, 0, NULL);
+				/* The WinWord 6.0 and PublishIt input
+                                   filters seem to mostly ignore the
+                                   color table.  With the table, WinWord
+                                   maps color 7 to black. */
+  if (!cgm_winword6_mode)
+    CGM_write_int_record(5, 34, sizeof(color_table_data)/CGM_ADJ, 
+		       color_table_data);
+  CGM_write_int_record(5, 2, sizeof(line_type_data)/CGM_ADJ, 
+		       line_type_data);
+  cgm_linewidth = cgm_linewidth_pt*CGM_PT;
+  CGM_write_int_record(5, 3, sizeof(cgm_linewidth)/CGM_ADJ, 
+		       (int *)&cgm_linewidth);
+  CGM_linecolor(0);
+/*  CGM_write_int_record(5, 4, sizeof(line_color_data)/CGM_ADJ, line_color_data); */
+  CGM_write_int_record(5, 15, 2, (int *)&t->v_char);
+  CGM_write_int_record(5, 22, 2, interior_style_data);
+  {
+    char buf[35];
+    sprintf(buf, "%.31s,%d", cgm_font, cgm_fontsize);
+    CGM_set_font(buf);
+  }
+  CGM_set_pointsize(pointsize);
+}
+
+TERM_PUBLIC int CGM_find_font(font, numchar)
+     char *font;
+     int numchar;
+{
+  int font_index = 1;
+  char *s;
+  for (s=cgm_font_data; s < cgm_font_data+strlen(cgm_font_data); s+=(int)*s+1)
+    { /* strnicmp is not standard, but defined by fit.c if not available */
+      if (numchar == (int)*s && strnicmp(font, s+1, numchar-1) == 0)
+	return font_index;
+      font_index++;
+    }
+  return 0;
+}
+
+TERM_PUBLIC int CGM_set_font(font)
+     char *font;
+{
+  register struct termentry *t = term;
+  int  size, font_index;
+  char *comma;
+  int sep;
+
+  comma=strchr(font,',');
+  if (comma == NULL) return FALSE; /* bad format */
+  sep = comma - font;
+				/* find font in font table, or use 1st font */
+  font_index = CGM_find_font(font, sep);
+  if (font_index == 0)
+    font_index = 1;
+  CGM_write_int_record(5, 10, 2, &font_index);
+
+				/* set font size */
+  size=cgm_fontsize; sscanf(comma+1,"%d",&size);
+  if (sep > 31) sep = 31;
+  strncpy(cgm_font,font, sep); cgm_font[sep]='\0';
+  t->v_char = size*CGM_PT;
+  t->h_char = (t->v_char*5)/9;
+  CGM_write_int_record(5, 15, 2, (int *)&t->v_char);
+  return TRUE;
+}
+
+TERM_PUBLIC void CGM_text()
+{
+  CGM_flush_polyline();
+  CGM_write_int_record(0, 5, 0, NULL); /* end picture */
+  CGM_write_int_record(0, 2, 0, NULL); /* end metafile */
+}
+
+TERM_PUBLIC void CGM_linetype(linetype)
+	int linetype;
+{
+  assert(linetype >= -2);
+  if (linetype == cgm_linetype) return;
+  cgm_linetype = linetype;
+
+  CGM_linecolor(linetype);
+  CGM_dashtype(linetype);
+}
+
+TERM_PUBLIC void CGM_linecolor(linecolor)
+	int linecolor;
+{
+  assert(linecolor >= -2);
+  linecolor = (linecolor < 1) ? 1 : linecolor%CGM_COLORS + 1;
+  if (cgm_monochrome || linecolor == cgm_color) return;
+  cgm_color = linecolor;
+
+  CGM_flush_polyline();
+  CGM_write_int_record(5, 4, 2, (int *)&cgm_color);
+  CGM_write_int_record(5, 23, 2, (int *)&cgm_color);
+}
+
+TERM_PUBLIC void CGM_linewidth(width)
+	double width;
+{
+  int new_linewidth;
+
+  assert(width >= 1.);
+  new_linewidth = width*cgm_linewidth_pt*CGM_PT;
+  if (new_linewidth == cgm_linewidth) return;
+  cgm_linewidth = new_linewidth;
+  CGM_write_int_record(5, 3, sizeof(cgm_linewidth)/CGM_ADJ, 
+		       (int *)&cgm_linewidth);
+  CGM_dashtype(cgm_dashtype);	/* have dash lengths recalculated */
+}
+
+TERM_PUBLIC void CGM_dashtype(dashtype)
+	int dashtype;
+{
+  int i, j;
+	/* Each group of 8 entries in dot_length[] defines a dash
+           pattern.  Entries in each group are alternately length of
+           whitespace and length of line, in units of 2/3 of the
+           linewidth. */
+  static int dot_length[CGM_LINE_TYPES*8]={ /* 0 - solid             */
+	5,8,5,8,5,8,5,8,	/* 1 - dashes            */
+	5,3,5,3,5,3,5,3,	/* 2 - short dashes      */
+	4,1,4,1,4,1,4,1,	/* 3 - dotted            */
+	4,8,4,1,4,8,4,1,	/* 4 - dash-dot          */
+	4,9,4,1,4,1,0,0,	/* 5 - dash-dot-dot      */
+	4,10,4,1,4,1,4,1,	/* 6 - dash-dot-dot-dot  */
+	4,10,4,10,4,1,0,0,	/* 7 - dash-dash-dot     */
+	4,10,4,10,4,1,4,1};	/* 8 - dash-dash-dot-dot */
+
+
+  assert(dashtype >= -2);
+  if (dashtype == cgm_dashtype) return;
+  cgm_dashtype = dashtype;
+
+  CGM_flush_polyline();
+
+  if (dashtype >= CGM_LINE_TYPES)
+    dashtype = dashtype%CGM_LINE_TYPES;
+  if (dashtype < 1) 
+    {
+      term->vector = CGM_solid_vector;
+      return;
+    }
+  term->vector = CGM_dashed_vector;
+
+				/* set up dash dimensions */
+  j = (dashtype-1)*8;
+  for (i = 0; i < 8; i++, j++)
+    {
+      if (dot_length[j])
+	cgm_step_sizes[i] = (dot_length[j]*cgm_linewidth)*2/3;
+      else 
+	cgm_step_sizes[i] = 0;
+     }
+				/* first thing drawn will be a line */
+  cgm_step = cgm_step_sizes[1];
+  cgm_step_index = 1;
+}
+
+TERM_PUBLIC void CGM_move(x, y)
+	unsigned int x, y;
+{
+  assert(x < term->xmax && y < term->ymax);
+  if (x == cgm_posx && y == cgm_posy) return;
+  CGM_flush_polyline();
+  cgm_posx = x;
+  cgm_posy = y;
+}
+
+static void CGM_flush_polyline()
+{	
+  if (cgm_coords == 0) return;
+  CGM_write_int_record(4, 1, cgm_coords*2, cgm_polyline);
+  cgm_coords = 0;
+}
+
+static void CGM_write_char_record(class, cgm_id, numbytes, data)
+     int class, cgm_id, numbytes;
+     char *data;
+{	
+  int pad, padded_length;
+  static unsigned char flag=0xff;
+  char short_len;
+
+  pad = 0;
+  padded_length = numbytes + 1;
+  if (numbytes >= 255) padded_length += 2; /* long string */
+  if (padded_length&1) padded_length += pad = 1; /* needs pad */
+  CGM_write_code(class, cgm_id, padded_length);
+  short_len = numbytes;
+  if (numbytes < 255)
+    fwrite(&short_len, 1, 1, outfile); /* write true length */
+  else
+    {
+      fwrite(&flag, 1, 1, outfile);
+      CGM_write_int(numbytes);
+    }
+  fwrite(data, 1, numbytes + pad, outfile); /* write string */
+}
+
+static void CGM_write_int_record(class, cgm_id, numbytes, data)
+     int class, cgm_id, numbytes, *data;
+{	
+  int i;
+  assert((numbytes&1) == 0);
+  CGM_write_code(class, cgm_id, numbytes);
+  numbytes >>= 1;
+  for (i = 0; i < numbytes; i++) 
+    CGM_write_int(data[i]);
+}
+
+static void CGM_write_mixed_record(class, cgm_id, numint, int_data, 
+				   numchar, char_data)
+     int class, cgm_id, numint, *int_data, numchar;
+     char *char_data;
+{	
+  int i, pad, padded_length;
+  static unsigned char flag=0xff;
+  char short_len;
+
+  pad = 0;
+  padded_length = numchar + 1;
+  if (numchar >= 255) padded_length += 2; /* long string */
+  if (padded_length&1) padded_length += pad = 1; /* needs pad */
+
+  CGM_write_code(class, cgm_id, numint*2 + padded_length);
+
+  for (i = 0; i < numint; i++) 
+    CGM_write_int(int_data[i]); /* write integers */
+
+  short_len = numchar;
+  if (numchar < 255)
+    fwrite(&short_len, 1, 1, outfile); /* write string length */
+  else
+    {
+      fwrite(&flag, 1, 1, outfile);
+      CGM_write_int(numchar);
+    }
+  fwrite(char_data, 1, numchar + pad, outfile); /* write string */
+}
+
+/*
+   Write the code word that starts a CGM record.
+   bits in code word are as follows...
+   cccciiiiiiilllll
+   where 
+   cccc is a 4-bit class number
+   iiiiiii is a 7-bit ID number
+   lllll is a 5-bit length (# bytes following the code word, or 
+            31 followed by a word with the actual number)
+   */
+static void CGM_write_code(class, cgm_id, length)
+     int class, cgm_id, length;
+{	
+  unsigned code;
+
+  assert((0 <= class) && (class < 16));
+  assert((0 <= cgm_id) && (cgm_id < 128));
+  assert(0 <= length);
+  if(length < 31) 
+    {
+      code = ((class&0x0f) << 12) |
+	((cgm_id & 0x7f) << 5) |
+	  ((length & 0x1f));
+      CGM_write_int(code);	
+    }
+  else
+    {
+      code = ((class&0x0f) << 12) |
+	((cgm_id & 0x7f) << 5) |
+	  0x1f;
+      CGM_write_int(code);	
+      CGM_write_int(length);
+    }
+}
+
+static void CGM_write_int(value)
+     int value;
+{	
+  union {short s; char c[2];} u;
+
+  assert(-32768 <= value && value <= 32767);
+
+  u.c[0] = (value >> 8) & 255;	/* convert to network order */
+  u.c[1] = value & 255;
+
+  fwrite(&u.s, 1, 2, outfile);
+}
+
+	/* Draw a dashed line to (ux,uy).  CGM has linestyles, but
+           they are not usable -- at least with the Word for Windows
+           6.0 filter, where lines of significant width (even 1 pt)
+           always come out solid.  Therefore, we implement dashed
+           lines here instead.  */
+TERM_PUBLIC void CGM_dashed_vector(ux, uy)
+	unsigned int ux, uy;
+{
+  int xa, ya;
+  int dx, dy, adx, ady;
+  int dist;			/* approximate distance in plot units
+				 from starting point to specified end
+				 point. */
+  long remain;			/* approximate distance in plot units
+				 remaining to specified end point. */
+
+  assert(ux < term->xmax && uy < term->ymax);
+
+  dx = (ux - cgm_posx); dy = (uy - cgm_posy);
+  adx = abs(dx); ady = abs(dy*10);
+
+  /* using the approximation 
+     sqrt(x**2 + y**2)  ~  x + (5*x*x)/(12*y)   when x > y.  
+   Note ordering of calculations to avoid overflow on 16 bit
+   architectures */
+  if (10*adx < ady) 
+    dist = (ady/2 + 25*adx/ady*adx/6*5)/5;
+  else
+    {
+      if(adx==0) return;
+      dist = (adx*10 + (ady/24)*(ady/adx))/10;
+    }
+  remain = dist; 
+  xa = cgm_posx; ya = cgm_posy;
+  while (remain > cgm_step)
+    {
+      remain -= cgm_step;
+      if (cgm_step_index&1)
+	CGM_solid_vector((int)(ux - (remain*dx)/dist),
+			 (int)(uy - (remain*dy)/dist)); 
+      else   
+	{
+	  xa = (int)(ux - (remain*dx)/dist); 
+	  ya = (int)(uy - (remain*dy)/dist);
+	  CGM_move(xa, ya);
+	}
+      if (++cgm_step_index >= 8) cgm_step_index = 0;
+      cgm_step = cgm_step_sizes[cgm_step_index];
+    }
+  if (cgm_step_index&1)
+    CGM_solid_vector(ux, uy);
+  cgm_step -= (int)remain;
+}
+
+TERM_PUBLIC void CGM_solid_vector(ux, uy)
+	unsigned int ux, uy;
+{
+  assert(ux < term->xmax && uy < term->ymax);
+  if(ux == cgm_posx && uy == cgm_posy) return;
+  if(cgm_coords > CGM_MAX_SEGMENTS-2) 
+    {
+      CGM_flush_polyline();
+      cgm_polyline[cgm_coords++] = cgm_posx;
+      cgm_polyline[cgm_coords++] = cgm_posy + CGM_MARGIN;
+    }
+  else if(cgm_coords == 0) 
+    {
+      cgm_polyline[cgm_coords++] = cgm_posx;
+      cgm_polyline[cgm_coords++] = cgm_posy + CGM_MARGIN;
+    }
+  cgm_polyline[cgm_coords++] = ux;
+  cgm_polyline[cgm_coords++] = uy + CGM_MARGIN;
+  cgm_posx = ux;
+  cgm_posy = uy;
+}
+
+TERM_PUBLIC void CGM_put_text(x, y, str)
+	unsigned int x, y;
+	char str[];
+{
+  static int where[3] = {0,0,1};
+  int data[4];
+  char *s = str;
+
+  while(*s) 
+    if(!isspace(*s++)) 
+      goto showit;
+  return;
+
+ showit:
+  if(cgm_vert_text != cgm_vert_text_requested)
+    {
+      cgm_vert_text = cgm_vert_text_requested;
+      if(cgm_vert_text)
+	{
+	  data[0] = -term->v_char;
+	  data[1] = data[2] = 0;
+	  data[3] = term->v_char;
+	}
+      else
+	{
+	  data[1] = data[2] = term->v_char;
+	  data[0] = data[3] = 0;
+	}
+      CGM_write_int_record(5, 16, 8, data);
+    }
+  CGM_flush_polyline();
+  where[0] = x;
+  where[1] = y + CGM_MARGIN;
+  CGM_write_mixed_record(4, 4, 3, where, strlen(str), str);
+  
+  cgm_posx = cgm_posy = -2000;
+}
+
+TERM_PUBLIC int CGM_text_angle(vertical)
+	int vertical;
+{
+  if(cgm_rotate)
+    {
+      cgm_vert_text_requested = vertical;
+      return TRUE;
+    }
+  return vertical?FALSE:TRUE;
+}
+
+TERM_PUBLIC int CGM_justify_text(mode)
+	enum JUSTIFY mode;
+{
+  static int data[6]={1,3,0,0,0,0};
+
+  switch(mode)
+    {
+    case LEFT:
+      data[0] = 1; break;
+    case CENTRE:
+      data[0] = 2; break;
+    case RIGHT:
+      data[0] = 3; break;
+    default:
+      assert(0);
+    }
+  CGM_write_int_record(5, 18, 12, data);
+  return(TRUE);
+}
+
+TERM_PUBLIC void CGM_reset()
+{
+  cgm_posx = cgm_posy = 0;
+}
+
+TERM_PUBLIC void CGM_point(x,y,number)
+     unsigned int x,y;
+     int number;
+{
+  int old_dashtype;
+
+  if (number < 0) 
+    {				/* draw dot */
+      CGM_move(x,y);
+      CGM_solid_vector(x+1,y);
+      return;
+    }
+
+  number %= CGM_POINTS;
+
+  CGM_flush_polyline();
+  old_dashtype = cgm_dashtype;
+  CGM_dashtype(0);
+
+  switch(number) 
+    {
+    case 0:			/* draw diamond */ 
+      CGM_move(x-cgm_tic,y);
+      CGM_solid_vector(x,y-cgm_tic);
+      CGM_solid_vector(x+cgm_tic,y);
+      CGM_solid_vector(x,y+cgm_tic);
+      CGM_flush_polygon();
+      break;
+    case 1:			/* draw plus */ 
+      CGM_move(x-cgm_tic,y);
+      CGM_solid_vector(x+cgm_tic,y);
+      CGM_move(x,y-cgm_tic);
+      CGM_solid_vector(x,y+cgm_tic);
+      break;
+    case 2:			/* draw box */ 
+      CGM_move(x-cgm_tic707,y-cgm_tic707);
+      CGM_solid_vector(x+cgm_tic707,y-cgm_tic707);
+      CGM_solid_vector(x+cgm_tic707,y+cgm_tic707);
+      CGM_solid_vector(x-cgm_tic707,y+cgm_tic707);
+      CGM_flush_polygon();
+      break;
+    case 3:			/* draw X */ 
+      CGM_move(x-cgm_tic707,y-cgm_tic707);
+      CGM_solid_vector(x+cgm_tic707,y+cgm_tic707);
+      CGM_move(x-cgm_tic707,y+cgm_tic707);
+      CGM_solid_vector(x+cgm_tic707,y-cgm_tic707);
+      break;
+    case 4:			/* draw triangle (point up) */ 
+      CGM_move(x,y+cgm_tic1241);
+      CGM_solid_vector(x-cgm_tic1077,y-cgm_tic621);
+      CGM_solid_vector(x+cgm_tic1077,y-cgm_tic621);
+      CGM_flush_polygon();
+      break;
+    case 5:			/* draw star (asterisk) */ 
+      CGM_move(x,y-cgm_tic);
+      CGM_solid_vector(x,y+cgm_tic);
+      CGM_move(x+cgm_tic866,y-cgm_tic500);
+      CGM_solid_vector(x-cgm_tic866,y+cgm_tic500);
+      CGM_move(x+cgm_tic866,y+cgm_tic500);
+      CGM_solid_vector(x-cgm_tic866,y-cgm_tic500);
+      break;
+    case 6:			/* draw triangle (point down) */ 
+      CGM_move(x,y-cgm_tic1241);
+      CGM_solid_vector(x-cgm_tic1077,y+cgm_tic621);
+      CGM_solid_vector(x+cgm_tic1077,y+cgm_tic621);
+      CGM_flush_polygon();
+      break;
+    case 7:			/* draw circle (actually, dodecagon)
+				   (WinWord 6 accepts the CGM "circle"
+				    element, but the resulting circle
+				    is not correctly centered!) */
+      CGM_move(x,y-cgm_tic);
+      CGM_solid_vector(x+cgm_tic500,y-cgm_tic866);
+      CGM_solid_vector(x+cgm_tic866,y-cgm_tic500);
+      CGM_solid_vector(x+cgm_tic,y);
+      CGM_solid_vector(x+cgm_tic866,y+cgm_tic500);
+      CGM_solid_vector(x+cgm_tic500,y+cgm_tic866);
+      CGM_solid_vector(x,y+cgm_tic);
+      CGM_solid_vector(x-cgm_tic500,y+cgm_tic866);
+      CGM_solid_vector(x-cgm_tic866,y+cgm_tic500);
+      CGM_solid_vector(x-cgm_tic,y);
+      CGM_solid_vector(x-cgm_tic866,y-cgm_tic500);
+      CGM_solid_vector(x-cgm_tic500,y-cgm_tic866);
+      CGM_flush_polygon();
+      break;
+    }
+  CGM_dashtype(old_dashtype);
+}
+
+
+TERM_PUBLIC void CGM_set_pointsize(size)
+     double size;
+{
+		/* Markers were chosen to have approximately equal
+		   areas.  Dimensions are as follows, in units of
+		   cgm_tic:
+
+		   plus, diamond: half height = 1
+
+		   square, cross: half height = sqrt(1/2) ~ 12/17
+
+		   triangle: half width = sqrt(sqrt(4/3)) ~ 14/13,
+		   height = sqrt(3*sqrt(4/3)) ~ 54/29
+
+		   star: half height = 1, half width = sqrt(3/4) ~ 13/15
+
+		   dodecagon: coordinates of vertices are 0,
+		   sin(30) = 1/2, cos(30) = sqrt(3/4) ~ 13/15, or 1
+
+		   The fractions are approximates of the equivalent
+		   continued fractions. */
+  cgm_tic = (size*term->h_tic/2);
+  cgm_tic707 = cgm_tic*12/17;
+  cgm_tic866 = cgm_tic*13/15;
+  cgm_tic500 = cgm_tic/2;
+  cgm_tic1241 = cgm_tic*36/29;
+  cgm_tic1077 = cgm_tic*14/13;
+  cgm_tic621 = cgm_tic*18/29;
+}
+
+static void CGM_flush_polygon()
+{	
+  if(cgm_coords == 0) return;
+  CGM_write_int_record(4, 7, cgm_coords*2, cgm_polyline);
+  cgm_coords = 0;
+}
+
+TERM_PUBLIC void CGM_options()
+{
+  while (!END_OF_COMMAND) 
+    {
+      if (almost_equals(c_token,"p$ortrait")) 
+	{
+	  cgm_portrait=TRUE;
+	  c_token++;
+	  continue;
+	}
+      if (almost_equals(c_token,"la$ndscape")) 
+	{
+	  cgm_portrait=FALSE;
+	  c_token++;
+	  continue;
+	}
+      if (almost_equals(c_token,"d$efault"))
+	{
+	  strcpy(cgm_font,"Arial Bold");
+	  cgm_fontsize = 10;
+	  term->v_char = (unsigned int)(cgm_fontsize*CGM_PT);
+	  term->h_char = (unsigned int)(cgm_fontsize*CGM_PT*5/9);
+	  cgm_linewidth_pt = 1;
+	  cgm_monochrome=FALSE;
+	  cgm_plotwidth = 6*72;
+	  cgm_portrait=FALSE;
+	  cgm_rotate=TRUE;
+	  cgm_winword6_mode=FALSE;
+	  c_token++;
+	  continue;
+	}
+      if (almost_equals(c_token,"w$inword6"))
+	{
+	  cgm_winword6_mode=TRUE;
+	  c_token++;
+	  continue;
+	}
+      if (almost_equals(c_token,"m$onochrome"))
+	{
+	  cgm_monochrome=TRUE;
+	  c_token++;
+	  continue;
+	}
+      if (almost_equals(c_token,"c$olor"))
+	{
+	  cgm_monochrome=FALSE;
+	  c_token++;
+	  continue;
+	}
+      if (almost_equals(c_token,"r$otate"))
+	{
+	  cgm_rotate=TRUE;
+	  c_token++;
+	  continue;
+	}
+      if (almost_equals(c_token,"nor$otate"))
+	{
+	  cgm_rotate=FALSE;
+	  c_token++;
+	  continue;
+	}
+      if (almost_equals(c_token,"li$newidth"))
+	{
+	  c_token++;
+	  if(!END_OF_COMMAND)
+	    {
+	      struct value a;
+	      cgm_linewidth_pt = (unsigned int)real(const_express(&a));
+	      if(cgm_linewidth_pt > 10000)
+		{
+		  fprintf(stderr, 
+			  "gnuplot(cgm.trm): linewidth out of range\n");
+		  cgm_linewidth_pt = 1;
+		}
+	    }
+	      
+	  continue;
+	}
+      if (almost_equals(c_token,"wid$th"))
+	{
+	  c_token++;
+	  if(!END_OF_COMMAND)
+	    {
+	      struct value a;
+	      cgm_plotwidth = (int)real(const_express(&a));
+	      if(cgm_plotwidth < 0 || cgm_plotwidth > 10000)
+		{
+		  fprintf(stderr, "gnuplot(cgm.trm): width out of range\n");
+		  cgm_plotwidth = 6*72;
+		}
+	    }
+	      
+	  continue;
+	}
+      break;
+    }
+  
+  if (!END_OF_COMMAND && isstring(c_token))
+    {
+      quote_str(cgm_font, c_token, MAX_ID_LEN);
+      if(CGM_find_font(cgm_font, strlen(cgm_font)) == 0)
+	{			/* insert the font in the font table */
+	  int n;
+	  n = strlen(cgm_font);
+	  if(n+1 <= sizeof(cgm_font_data) && n <= 255)
+	    {
+	      cgm_font_data[0] = n;
+	      strncpy(cgm_font_data+1, cgm_font, n);
+	      cgm_font_data[n+1] = 0;
+	    }
+	}
+      c_token++;
+    }
+
+  if (!END_OF_COMMAND)
+    {
+      /* We have font size specified */
+      struct value a;
+      cgm_fontsize = (int)real(const_express(&a));
+      term->v_char = (unsigned int)(cgm_fontsize*CGM_PT);
+      term->h_char = (unsigned int)(cgm_fontsize*CGM_PT*5/9);
+    }
+  
+  if (cgm_portrait)
+    {
+      term->xmax = CGM_SMALL - CGM_MARGIN;
+      term->ymax = CGM_LARGE - CGM_MARGIN;
+    }
+  else
+    {
+      term->xmax = CGM_LARGE - CGM_MARGIN;
+      term->ymax = CGM_SMALL - CGM_MARGIN;
+    }
+
+  sprintf(default_font,"%s,%d",cgm_font,cgm_fontsize);
+  /* default_font holds the font and size set at 'set term' */
+  sprintf(term_options,"%s %s %s %s width %d linewidth %d \"%s\" %d",
+	  cgm_portrait ? "portrait" : "landscape",
+	  cgm_monochrome ? "monochrome" :"color",
+	  cgm_rotate ? "rotate" : "norotate",
+	  cgm_winword6_mode ? "winword6" : "",
+	  cgm_plotwidth,
+	  cgm_linewidth_pt,
+	  cgm_font, cgm_fontsize);
+}
+
+#ifdef DEFEAT_ASSERTIONS
+#define NDEBUG
+#include <assert.h>
+#undef DEFEAT_ASSERTIONS
+#endif /* DEFEAT_ASSERTIONS */
+
+#ifdef NEXT
+#undef id
+#undef datum
+#endif
+
+#endif /* TERM_BODY */
+
+#ifdef TERM_TABLE
+TERM_TABLE_START(cgm_driver)
+   "cgm", "Computer Graphics Metafile",
+     CGM_LARGE - CGM_MARGIN, CGM_SMALL - CGM_MARGIN, CGM_VCHAR, CGM_HCHAR,
+     CGM_VTIC, CGM_HTIC, CGM_options, CGM_init, CGM_reset,
+     CGM_text, null_scale, CGM_graphics, CGM_move, CGM_solid_vector,
+     CGM_linetype, CGM_put_text, CGM_text_angle,
+     CGM_justify_text, CGM_point, do_arrow, CGM_set_font,
+     CGM_set_pointsize,
+     TERM_BINARY,		/* various flags */
+     NULL,			/* after one plot of multiplot */
+     NULL,			/* before subsequent plot of multiplot */
+     NULL,			/* clear part of multiplot */
+     CGM_linewidth
+TERM_TABLE_END(cgm_driver)
+
+#undef LAST_TERM
+#define LAST_TERM cgm_driver
+
+#endif /* TERM_TABLE */
+#endif /* TERM_PROTO_ONLY */
+
+#ifdef TERM_HELP
+START_HELP(cgm)
+"1 cgm",
+"?set terminal cgm",
+"?set term cgm",
+"?terminal cgm",
+"?term cgm",
+"?cgm",
+" The `cgm` terminal generates a Computer Graphics Metafile.  This file format",
+" is a subset of the ANSI X3.122-1986 standard entitled \"Computer Graphics -",
+" Metafile for the Storage and Transfer of Picture Description Information\".",
+" Several options may be set in `cgm`.",
+"",
+" Syntax:",
+"       set terminal cgm {<mode>} {<color>} {<rotation>}",
+"                        {width <plot_width>} {linewidth <line_width>}",
+"                        {\"<font>\"} {<fontsize>}",
+"",
+" where <mode> is `landscape`, `portrait`, or `default`;",
+" <color> is either `color` or `monochrome`; ",
+" <rotation> is either `rotate` or `norotate`;",
+" <plot_width> is the width of the page in points; ",
+" <line_width> is the line width in points; ",
+" <font> is the name of a font; and ",
+" `<fontsize>` is the size of the font in points.",
+"",
+" By default, `cgm` uses rotated text for the Y axis label.",
+"",
+" The first five options can be in any order.  Selecting `default` sets all",
+" options to their default values.",
+"",
+" Examples:",
+"       set terminal cgm landscape color rotate width 432 linewidth 1 \\",
+"                      'Arial Bold' 12                  # defaults",
+"       set terminal cgm 14 linewidth 2  14  # wider lines & larger font",
+"       set terminal cgm portrait 'Times Roman Italic' 12",
+"2 font",
+"?set terminal cgm font",
+"?set term cgm font",
+"?cgm font",
+" The first part of a Computer Graphics Metafile, the metafile description,",
+" includes a font table.  In the picture body, a font is designated by an",
+" index into this table.  By default, this terminal generates a table with",
+" the following fonts:",
+"@start table - first is interactive cleartext form",
+"       Arial",
+"       Arial Italic",
+"       Arial Bold",
+"       Arial Bold Italic",
+"       Times Roman",
+"       Times Roman Italic",
+"       Times Roman Bold",
+"       Times Roman Bold Italic",
+"       Helvetica",
+"       Roman",
+"#&Arial&\\\\",
+"#&Arial Italic&\\\\",
+"#&Arial Bold&\\\\",
+"#&Arial Bold Italic&\\\\",
+"#&Times Roman&\\\\",
+"#&Times Roman Italic&\\\\",
+"#&Times Roman Bold&\\\\",
+"#&Times Roman Bold Italic&\\\\",
+"#&Helvetica&\\\\",
+"#&Roman&\\\\",
+"%@@Arial",
+"%@@Arial Italic",
+"%@@Arial Bold",
+"%@@Arial Bold Italic",
+"%@@Times Roman",
+"%@@Times Roman Italic",
+"%@@Times Roman Bold",
+"%@@Times Roman Bold Italic",
+"%@@Helvetica",
+"%@@Roman",
+"@end table",
+" Case is not distinct, but the modifiers must appear in the above order (that",
+" is, not 'Arial Italic Bold').  'Arial Bold' is the default font.",
+"",
+" You may also specify a font name which does not appear in the default font",
+" table.  In that case, a new font table is constructed with the specified",
+" font as its only entry.  You must ensure that the spelling, capitalization,",
+" and spacing of the name are appropriate for the application that will read",
+" the CGM file.",
+"2 fontsize",
+"?set terminal cgm fontsize",
+"?set term cgm fontsize",
+"?cgm fontsize",
+" Fonts are scaled assuming the page is 6 inches wide.  If the `size` command",
+" is used to change the aspect ratio of the page or the CGM file is converted",
+" to a different width (e.g. it is imported into a document in which the",
+" margins are not 6 inches apart), the resulting font sizes will be different.",
+" To change the assumed width, use the `width` option.",
+"2 linewidth",
+"?set terminal cgm linewidth",
+"?set term cgm linewidth",
+"?cgm linewidth",
+" The `linewidth` option sets the width of lines in pt.  The default width is",
+" 1 pt.  Scaling is affected by the actual width of the page, as discussed",
+" under the `fontsize` and `width` options",
+"2 rotate",
+"?set terminal cgm rotate",
+"?set term cgm rotate",
+"?cgm rotate",
+" The `norotate` option may be used to disable text rotation.  For example,",
+" the CGM input filter for Word for Windows 6.0c can accept rotated text, but",
+" the DRAW editor within Word cannot.  If you edit a graph (for example, to",
+" label a curve), all rotated text is restored to horizontal.  The Y axis",
+" label will then extend beyond the clip boundary.  With `norotate`, the Y",
+" axis label starts in a less attractive location, but the page can be edited",
+" without damage.  The `rotate` option confirms the default behavior.",
+"2 size",
+"?set terminal cgm size",
+"?set term cgm size",
+"?scgm size",
+" Default size of a CGM page is 32599 units wide and 23457 units high for",
+" landscape, or 23457 units wide by 32599 units high for portrait.",
+"2 width",
+"?set terminal cgm width",
+"?set term cgm width",
+"?cgm width",
+" All distances in the CGM file are in abstract units.  The application that",
+" reads the file determines the size of the final page.  By default, the width",
+" of the final page is assumed to be 6 inches (15.24 cm).  This distance is",
+" used to calculate the correct font size, and may be changed with the `width`",
+" option.  The keyword should be followed by the width in points.  (Here, a",
+" point is 1/72 inch, as in PostScript.  This unit is known as a \"big point\"",
+" in TeX.)  `gnuplot` arithmetic can be used to convert from other units, as",
+" follows:",
+"       set terminal cgm width 432            # default",
+"       set terminal cgm width 6*72           # same as above",
+"       set terminal cgm width 10/2.54*72     # 10 cm wide",
+"2 winword6",
+"?set terminal cgm winword6",
+"?set term cgm winword6",
+"?cgm winword6",
+" The default font table was chosen to match, where possible, the default font",
+" assignments made by the Computer Graphics Metafile input filter for",
+" Microsoft Word 6.0c, although the filter makes available only 'Arial' and",
+" 'Times Roman' fonts and their bold and/or italic variants.  Other fonts such",
+" as 'Helvetica' and 'Roman' are not available.  If the CGM file includes a",
+" font table, the filter mostly ignores it.  However, it changes certain font",
+" assignments so that they disagree with the table.  As a workaround, the",
+" `winword6` option deletes the font table from the CGM file.  In this case,",
+" the filter makes predictable font assignments.  'Arial Bold' is correctly",
+" assigned even with the font table present, which is one reason it was chosen",
+" as the default.",
+"",
+" `winword6` disables the color tables for a similar reason---with the color",
+" table included, Microsoft Word displays black for color 7."
+END_HELP(cgm)
+#endif  /* TERM_HELP */

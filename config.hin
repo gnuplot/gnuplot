@@ -1,0 +1,163 @@
+/* config.hin.  Generated automatically from configure.in by autoheader.  */
+
+/* Define to empty if the keyword does not work.  */
+#undef const
+
+/* Define if you have <unistd.h>.  */
+#undef HAVE_UNISTD_H
+
+/* Define as __inline if that's what the C compiler calls it.  */
+#undef inline
+
+/* Define as the return type of signal handlers (int or void).  */
+#undef RETSIGTYPE
+
+/* Define to `unsigned' if <sys/types.h> doesn't define.  */
+#undef size_t
+
+/* Define if you have the ANSI C header files.  */
+#undef STDC_HEADERS
+
+/* Define if compiler can handle ANSI prototypes.  */
+#undef ANSI_C
+
+/* Define if autoconf/configure has already been run.  */
+#undef AUTOCONF
+
+/* Define if this system uses a 32-bit DOS extender (djgpp/emx).  */
+#undef DOS32
+
+/* Define if <errno.h> declares errno.  */
+#undef EXTERN_ERRNO
+
+/* Define if you are using the GNU readline library.  */
+#undef GNU_READLINE
+
+/* Define if you have Thomas Boutell's gd library.  */
+#undef HAVE_LIBGD
+
+/* Define if you have the png library.  */
+#undef HAVE_LIBPNG
+
+/* Define if this is a Linux system with SuperVGA library.  */
+#undef LINUXVGA
+
+/* Define if this is an MSDOS system with djgpp.  */
+#undef MSDOS
+
+/* Define if you do not have the bcopy function.  */
+#undef NOCOPY
+
+/* Define if you do not want to read .gnuplotrc in the current directory.  */
+#undef NOCWDRC
+
+/* Define if you do not have the atexit function.  */
+#undef NO_ATEXIT
+
+/* Define if you do not have the <errno.h> header file.  */
+#undef NO_ERRNO_H
+
+/* Define if you do not have the <float.h> header file.  */
+#undef NO_FLOAT_H
+
+/* Define if you do not have the <limits.h> header file.  */
+#undef NO_LIMITS_H
+
+/* Define if you do not have the <locale.h> header file.  */
+#undef NO_LOCALE_H
+
+/* Define if you do not have the memcpy function.  */
+#undef NO_MEMCPY
+
+/* Define if you do not have the memset function.  */
+#undef NO_MEMSET
+
+/* Define if you do not have the <stdlib.h> header file.  */
+#undef NO_STDLIB_H
+
+/* Define if you do not have the strchr function.  */
+#undef NO_STRCHR
+
+/* Define if you do not have the <string.h> header file.  */
+#undef NO_STRING_H
+
+/* Define if you do not have the <sys/types.h> header file.  */
+#undef NO_SYS_TYPES_H
+
+/* Define if you do not have the <time.h> header file.  */
+#undef NO_TIME_H
+
+/* Define if you do not have the <sys/select.h> header file.  */
+#undef OLD_SELECT
+
+/* Define if you do have the popen and pclose functions.  */
+#undef PIPES
+
+/* Define if you have the function prototypes.  */
+#undef PROTOTYPES
+
+/* Define if you want to use the included readline function.  */
+#undef READLINE
+
+/* Define if you are using the X11 window system.  */
+#undef X11
+
+/* Define to `long' if <sys/types.h> doesn't define.  */
+#undef time_t
+
+/* Define if you have the erf function.  */
+#undef HAVE_ERF
+
+/* Define if you have the gamma function.  */
+#undef HAVE_GAMMA
+
+/* Define if you have the getcwd function.  */
+#undef HAVE_GETCWD
+
+/* Define if you have the lgamma function.  */
+#undef HAVE_LGAMMA
+
+/* Define if you have the on_exit function.  */
+#undef HAVE_ON_EXIT
+
+/* Define if you have the setvbuf function.  */
+#undef HAVE_SETVBUF
+
+/* Define if you have the sleep function.  */
+#undef HAVE_SLEEP
+
+/* Define if you have the strerror function.  */
+#undef HAVE_STRERROR
+
+/* Define if you have the strncasecmp function.  */
+#undef HAVE_STRNCASECMP
+
+/* Define if you have the strnicmp function.  */
+#undef HAVE_STRNICMP
+
+/* Define if you have the sysinfo function.  */
+#undef HAVE_SYSINFO
+
+/* Define if you have the tcgetattr function.  */
+#undef HAVE_TCGETATTR
+
+/* Define if you have the <libc.h> header file.  */
+#undef HAVE_LIBC_H
+
+/* Define if you have the <sgtty.h> header file.  */
+#undef HAVE_SGTTY_H
+
+/* Define if you have the <string.h> header file.  */
+#undef HAVE_STRING_H
+
+/* Define if you have the <sys/bsdtypes.h> header file.  */
+#undef HAVE_SYS_BSDTYPES_H
+
+/* Define if you have the <sys/systeminfo.h> header file.  */
+#undef HAVE_SYS_SYSTEMINFO_H
+
+/* Define if you have the <termios.h> header file.  */
+#undef HAVE_TERMIOS_H
+
+/* Define if you have the <values.h> header file.  */
+#undef HAVE_VALUES_H

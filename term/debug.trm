@@ -1,0 +1,212 @@
+/*
+ * $Id: debug.trm,v 1.9 1996/12/08 13:11:11 drd Exp $
+ *
+ */
+
+/* GNUPLOT - debug.trm */
+/*
+ * Copyright (C) 1990   
+ *
+ * Permission to use, copy, and distribute this software and its
+ * documentation for any purpose with or without fee is hereby granted, 
+ * provided that the above copyright notice appear in all copies and 
+ * that both that copyright notice and this permission notice appear 
+ * in supporting documentation.
+ *
+ * Permission to modify the software is granted, but not the right to
+ * distribute the modified code.  Modifications are to be distributed 
+ * as patches to released version.
+ *  
+ * This software  is provided "as is" without express or implied warranty.
+ * 
+ * This file is included by ../term.c.
+ *
+ * This terminal driver supports:
+ *  DEBUG
+ *
+ * AUTHORS
+ *    luecken@udel.edu
+ * 
+ * send your comments or suggestions to (luecken@udel.edu).
+ * 
+ */
+
+/*
+ * adapted to the new terminal layout by Stefan Bodewig (Dec. 1995)
+ */
+
+#ifndef GOT_DRIVER_H
+#include "driver.h"
+#endif
+
+#ifdef TERM_REGISTER
+register_term(debug)
+#endif
+
+#ifdef TERM_PROTO
+TERM_PUBLIC void DEBUG_init __PROTO((void));
+TERM_PUBLIC void DEBUG_graphics __PROTO((void));
+TERM_PUBLIC void DEBUG_text __PROTO((void));
+TERM_PUBLIC void DEBUG_linetype __PROTO((int linetype));
+TERM_PUBLIC void DEBUG_move __PROTO((unsigned int x, unsigned int y));
+TERM_PUBLIC void DEBUG_vector __PROTO((unsigned int x, unsigned int y));
+TERM_PUBLIC void DEBUG_put_text __PROTO((unsigned int x, unsigned int y, char *str));
+TERM_PUBLIC void DEBUG_reset __PROTO((void));
+TERM_PUBLIC int DEBUG_justify_text __PROTO((enum JUSTIFY mode));
+
+#define DEBUG_XMAX 512 
+#define DEBUG_YMAX 390
+
+#define DEBUG_XLAST (DEBUG_XMAX - 1)
+#define DEBUG_YLAST (DEBUG_XMAX - 1)
+
+/* Assume a character size of 1, or a 7 x 10 grid. */
+#define DEBUG_VCHAR	10
+#define DEBUG_HCHAR	7
+#define DEBUG_VTIC	(DEBUG_YMAX/70)		
+#define DEBUG_HTIC	(DEBUG_XMAX/75)		
+#endif /* TERM_PROTO */
+
+#ifndef TERM_PROTO_ONLY
+#ifdef TERM_BODY
+
+int DEBUG_linetype_last;
+int DEBUG_xlast;
+int DEBUG_ylast;
+
+TERM_PUBLIC void DEBUG_init()
+{
+	fprintf(outfile,"init\n");
+	DEBUG_linetype_last = -3;
+}
+
+
+TERM_PUBLIC void DEBUG_graphics()
+{
+	DEBUG_xlast = DEBUG_ylast=0;
+	fprintf(outfile,"graphics\n");
+}
+
+
+TERM_PUBLIC void DEBUG_text()
+{
+	fprintf(outfile,"text\n");
+}
+
+
+TERM_PUBLIC void DEBUG_linetype(linetype)
+int linetype;
+{
+	/*
+	if (linetype != DEBUG_linetype_last){
+		fprintf(outfile,"l%d",linetype);
+		DEBUG_linetype_last = linetype;
+	}
+	*/
+	fprintf(outfile,"line %d\n",linetype);
+}
+
+
+TERM_PUBLIC void DEBUG_move(x,y)
+unsigned int x,y;
+{
+	/*
+	if (x != DEBUG_xlast || y != DEBUG_ylast){
+		fprintf(outfile,"mm");
+		DEBUG_xlast = x;
+		DEBUG_ylast = y;
+	}
+	*/
+	fprintf(outfile,"move %d, %d\t(%d, %d)\n",x,y,x-DEBUG_xlast,y-DEBUG_ylast);
+	DEBUG_xlast = x;
+	DEBUG_ylast = y;
+}
+
+
+TERM_PUBLIC void DEBUG_vector(x,y)
+unsigned int x,y;
+{
+	/*
+	if (x != DEBUG_xlast || y != DEBUG_ylast){
+		fprintf(outfile,"vv");
+		DEBUG_xlast = x;
+		DEBUG_ylast = y;
+	}
+	*/
+	fprintf(outfile,"vect %d, %d\t(%d, %d)\n",x,y,x-DEBUG_xlast,y-DEBUG_ylast);
+	DEBUG_xlast = x;
+	DEBUG_ylast = y;
+}
+
+
+TERM_PUBLIC void DEBUG_put_text(x,y,str)
+unsigned int x, y;
+char *str;
+{
+	/*
+	DEBUG_move(x,y);
+	fprintf(outfile,"tx%s\r",str);
+	*/
+	fprintf(outfile,"put_text calls:");
+	DEBUG_move(x,y);
+	fprintf(outfile,"put_text '%s'\n",str);
+}
+
+
+
+TERM_PUBLIC void DEBUG_reset()
+{
+	fprintf(outfile,"reset");
+}
+
+TERM_PUBLIC int DEBUG_justify_text(mode) /* HBB: added 'int' to shut up gcc -Wall */
+enum JUSTIFY mode;
+{
+	fprintf(outfile,"justify ");
+	switch(mode){
+		case (CENTRE):
+			fprintf(outfile,"centre");
+			break;
+		case (RIGHT):
+			fprintf(outfile,"right");
+			break;
+		default:
+		case (LEFT):
+			fprintf(outfile,"left");
+			break;
+	}
+	fprintf(outfile,"\n");
+	return(TRUE);
+}
+
+#endif /* TERM_BODY */
+
+#ifdef TERM_TABLE
+
+TERM_TABLE_START(debug_driver)
+    "debug", "debugging driver",
+	   DEBUG_XMAX, DEBUG_YMAX, DEBUG_VCHAR, DEBUG_HCHAR,
+	   DEBUG_VTIC, DEBUG_HTIC, options_null, DEBUG_init, DEBUG_reset,
+	   DEBUG_text, null_scale, DEBUG_graphics, DEBUG_move, DEBUG_vector,
+	   DEBUG_linetype, DEBUG_put_text, null_text_angle, 
+	   DEBUG_justify_text, line_and_point, do_arrow, set_font_null
+TERM_TABLE_END(debug_driver)
+
+#undef LAST_TERM
+#define LAST_TERM debug_driver
+
+#endif /* TERM_TABLE */
+#endif /* TERM_PROTO_ONLY */
+
+#ifdef TERM_HELP
+START_HELP(debug)
+"1 debug",
+"?set terminal debug",
+"?set term debug",
+"?terminal debug",
+"?term debug",
+"?debug",
+" This terminal is provided to allow for the debugging of `gnuplot`.  It is",
+" likely to be of use only for users who are modifying the source code."
+END_HELP(debug)
+#endif

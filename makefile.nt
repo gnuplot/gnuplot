@@ -1,0 +1,162 @@
+# To compile gnuplot for WinNT and Win95
+#
+# Make file for microsoft nmake with visual c++ on NT
+# run this on the command line with "nmake -f makefile.nt"
+#
+
+# where to place gnuplot.gih helpfile
+HELPFILE = wgnuplot.hlp
+TOP = .
+
+
+# /c  means don't link
+# /I  means extra include directory
+# /Fm means produce link map
+# /Od means suppress optimizations (esp. for debug)
+# /O2 mans optimize for speed
+# /Zi mean prepare for codeview
+# /G5 means optimize code for pentium
+# /G4 means optimize code for 486
+# /G3 means optimize code for 386
+
+CC = cl /c
+LD = link
+CFLAGS = /O2 /I$(TOP) /nologo /D_Windows /D__MSC__ /DWIN32 /DNO_GIH /DHAVE_STRNICMP /DHAVE_STRERROR /DNOGAMMA /DREADLINE /DHELPFILE=$(HELPFILE) /DGP_INLINE=__inline /DANSI_C -DHAVE_GETCWD
+LDFLAGS = /subsystem:windows /nologo /MACHINE:I386 /MAP:GNUPLOT
+
+# see other terminal defines in term.h
+TERMFLAGS = /I$(TOP)\\term
+
+
+# macros for makefile.all
+O=obj
+T=term\\
+D=docs\\
+L=docs\\latex\\
+M=demo\\
+
+
+default: wgnuplot.exe $(HELPFILE) wgnuplot.mnu $(M)bf_test.exe
+
+!INCLUDE makefile.all
+
+OBJS = $(COREOBJS) version.obj
+
+WINOBJS = winmain.obj wgnuplib.obj wgraph.obj wprinter.obj wtext.obj wpause.obj wmenu.obj
+
+WINDOWS = makefile.win makefile.nt README.win win\wcommon.h \
+	win\wgnuplib.c win\wgnuplib.def win\wgnuplib.h win\wgnuplib.rc \
+	win\wgnuplot.def win\wgnuplot.hpj win\wgnuplot.mnu win\wgraph.c \
+	win\winmain.c win\wmenu.c win\wpause.c win\wprinter.c \
+	win\wresourc.h win\wtext.c win\wtext.h win\geticon.c \
+	docs\doc2rtf.c term\win.trm win\grpicon.ico win\texticon.ico
+
+
+# default rules
+.c.obj:
+	$(CC) $(CFLAGS) $*.c
+
+linkopt1.msw: makefile.nt
+	copy gnuplot.opt linkopt1.msw
+	echo winmain >> linkopt1.msw
+	echo readline >> linkopt1.msw
+	echo wgnuplib >> linkopt1.msw
+	echo wtext >> linkopt1.msw
+	echo wmenu >> linkopt1.msw
+	echo wpause >> linkopt1.msw
+	echo wgraph >> linkopt1.msw
+	echo wprinter >> linkopt1.msw
+	echo kernel32.lib >> linkopt1.msw
+	echo user32.lib >> linkopt1.msw
+	echo gdi32.lib >> linkopt1.msw
+	echo winspool.lib >> linkopt1.msw
+	echo comdlg32.lib >> linkopt1.msw
+	echo advapi32.lib >> linkopt1.msw
+	echo shell32.lib >> linkopt1.msw
+	echo advapi32.lib >> linkopt1.msw
+	echo wgnuplot.res >> linkopt1.msw
+
+wgnuplot.exe: $(OBJS) $(WINOBJS) win\wgnuplot.def wgnuplot.res linkopt1.msw texticon.ico grpicon.ico
+	$(LD) $(LDFLAGS) /out:wgnuplot.exe @linkopt1.msw
+
+# rules
+
+wgnuplot.res :  win\wgnuplot.rc win\wgnuplib.rc win\wresourc.h texticon.ico grpicon.ico
+   rc /l 0x409 /fowgnuplot.res /i "win" /d "NDEBUG" /d WIN32 /d MSRC win\wgnuplot.rc
+
+term.obj: term.c term.h plot.h setshow.h bitmap.h $(CSOURCE5) $(CSOURCE6) $(CSOURCE7)
+	$(CC) $(CFLAGS) $(TERMFLAGS) term.c
+
+
+WINDEPS = win\wgnuplib.h win\wcommon.h win\wresourc.h
+winmain.obj: win\winmain.c win\wgnuplib.h win\wtext.h plot.h
+	$(CC) $(CFLAGS) /DHELPFILE=\"$(HELPFILE)\"  win\winmain.c
+
+wgnuplib.obj: win\wgnuplib.c $(WINDEPS)
+	$(CC) $(CFLAGS) win\wgnuplib.c
+	
+wmenu.obj: win\wmenu.c $(WINDEPS)
+	$(CC) $(CFLAGS) win\wmenu.c
+
+wtext.obj: win\wtext.c $(WINDEPS)
+	$(CC) $(CFLAGS) win\wtext.c
+	
+wpause.obj: win\wpause.c $(WINDEPS)
+	$(CC) $(CFLAGS) win\wpause.c
+	
+wprinter.obj: win\wprinter.c $(WINDEPS)
+	$(CC) $(CFLAGS) win\wprinter.c
+	
+wgraph.obj: win\wgraph.c $(WINDEPS)
+	$(CC) $(CFLAGS) win\wgraph.c
+	
+wgnuplot.mnu: win\wgnuplot.mnu
+	copy win\wgnuplot.mnu wgnuplot.mnu
+
+# extract icons from wgnuplot.rc
+texticon.ico: grpicon.ico
+
+grpicon.ico: geticon.exe win\wgnuplot.rc
+	geticon win\wgnuplot.rc
+
+geticon.exe: win\geticon.c
+	cl /DMSDOS /F 5000 /W1 win\geticon.c
+
+# convert gnuplot.doc to gnuplot.gih
+$(HELPFILE): doc2rtf.exe docs\gnuplot.doc win\wgnuplot.hpj
+	doc2rtf docs\gnuplot.doc win\gnuplot.rtf
+	hcw /c /e win\wgnuplot.hpj 
+
+doc2rtf.exe: docs\doc2rtf.c
+	cl $(CFLAGS) /F 5000 /W1 /I. /Idocs /Iterm docs\doc2rtf.c
+
+#make binary demo files
+$(M)bf_test.exe : bf_test.c dbinary.obj alloc.obj
+        cl $(CFLAGS) /F 5000 /W1 /Fe$(M)bf_test.exe bf_test.c dbinary.obj alloc.obj
+	cd demo
+	bf_test
+	cd ..
+
+# _Windows causes wtext.h to define fread() etc
+dbinary.obj: binary.c
+        $(CC) $(CFLAGS) /U_Windows /F 5000 /W1 /Fodbinary.obj binary.c
+
+# clean up temporary files
+clean:
+	del *.obj
+        del *.ico
+	del wgnuplot.res
+	del win\gnuplot.rtf
+	del demo\bf_test.exe
+	del linkopt1.msw
+	del doc2rtf.exe
+        del geticon.exe
+	
+veryclean: clean
+	del wgnuplot.exe
+	del wgnuplot.hlp
+	del wgnuplot.mnu
+	del demo\binary1
+	del demo\binary2
+	del demo\binary3
+

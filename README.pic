@@ -1,0 +1,125 @@
+
+HOW TO USE PIC driver: 
+
+
+I have tested driver under gnuplot3.2, and I am currently using it
+with the reengineered troff, groff, which is distributed by Free
+Software Foundation, but it should work for AT&T's DWB as well. As
+gpic can produce TeX output, it could possibly be an alternative to
+the LaTeX driver for TeX-users having the tpic macros (see the gpic
+man page - I don't know much about TeX so please don't ask me about
+this).
+
+A simple graph can be formatted using
+
+groff -p -mpic -Tps file.pic > file.ps.
+
+The output from pic can be pipe-lined into eqn, so it is possible to put
+complex functions in a graph with the set label and set {x/y}label commands.
+For instance,
+
+set ylab '@space 0 int from 0 to x alpha ( t ) roman d t@'
+
+Will lable the y-axis with a nice integral if formatted with the
+command:
+
+gpic filename.pic | geqn -d@@ -Tps | groff -m[macro-package] -Tps > filename.ps
+
+Figures made this way can be scaled to fit into a document. The pic
+language is easy to understand, so the graphs can be edited by hand if
+need be. All coordinates in the pic-file produced by gnuplot are given
+as x+gnuplotx and y+gnuploty. By default x and y are given the value 0
+If this line is removed with an editor in a number of files one can
+put several graphs i one figure like this (default size is 5.0x3.0 inches)
+
+.PS 8.0
+x=0;y=3
+copy "figa.pic"
+x=5;y=3
+copy "figb.pic"
+x=0;y=0
+copy "figc.pic"
+x=5;y=0
+copy "figd.pic"
+.PE
+
+This will produce an 8 inches wide figure with four graphs in two rows
+on top of each other
+
+One can also achieve the same thing by the command
+ 
+set term pic x y
+
+For example, using
+
+.PS 6.0
+copy "trig.pic"
+.PE
+
+the following session generated a two by two figure with
+four graphs:
+
+
+	G N U P L O T
+	unix version 3.2 
+	patchlevel 2, Mar 24 92
+	last modified Sat Mar 24 21:08:47 PST 1992
+
+Copyright(C) 1986, 1987, 1990, 1991, 1992  Thomas Williams, Colin Kelley
+
+	Send bugs and comments to bug-gnuplot@ames.arc.nasa.gov
+
+Terminal type set to 'x11'
+gnuplot> set out 'trig.pic'
+gnuplot> set ter pic 0 5
+Terminal type set to 'pic'
+Options are 'Pic's origin is at (0.000000,5.000000)'
+gnuplot> plot sin(x)
+gnuplot> set ter pic 5 5
+Terminal type set to 'pic'
+Options are 'Pic's origin is at (5.000000,5.000000)'
+gnuplot> plot cos(x)
+gnuplot> set ter pic 0 0
+set ter pic 0 0
+Terminal type set to 'pic'
+Options are 'Pic's origin is at (0.000000,0.000000)'
+gnuplot> plot tan(x)
+gnuplot> set ter pic 5 0
+Terminal type set to 'pic'
+Options are 'Pic's origin is at (5.000000,0.000000)'
+gnuplot> plot cos(x)/sin(x)
+plot cos(x)/sin(x)
+gnuplot> quit
+
+
+
+Scaling can be done using set size.
+
+
+I prefer this way of including graphs to using encapsulated in troff
+documents, because of the possiblity to preprocess with eqn, and
+because pic is much easier to understand than postscript  - at least for me.
+
+
+WHAT HAS TO BE DONE TO IMPROVE THIS DRIVER
+
+1.) Nice markers
+
+2.) Dot-dashed line styles
+
+3.) Possibly make line thickness an option when set term pic
+
+4.) Making it possible to select fonts for both pic and eqn from
+    gnuplot's command line.
+
+
+I am happy to share this piece of software with anyone, in the hope
+that it will be useful for at least someone. But taking into account
+that it is the very first version of the driver, I would be happy if I
+could get into contact with people able to help me improve it.
+
+Mind you: Anything thats free comes with no guarantee!
+
+Good Luck
+
+Sigfrid Lundberg (siglun@volterra.teorekol.lu.se)

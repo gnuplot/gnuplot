@@ -1,0 +1,52 @@
+README file for MS Windows version of gnuplot.
+28th January 1993
+
+Windows 3.0 and 3.1  (WIN16)
+----------------------------
+
+Windows gnuplot requires 4 files to run:
+    WGNUPLOT.EXE        Main program
+    WGNUPLOT.DLL        Graphics and Text window library
+    WGNUPLOT.HLP        Windows Help file
+    WGNUPLOT.MNU        Menu file
+These 4 files must be in the same directory.
+
+More information is available from gnuplot 'help set terminal windows'.
+
+WGNUPLOT runs in standard and enhanced modes.
+
+Windows 3.1 is preferred, but it will run under Windows 3.0
+with the following restrictions:
+1. COMMDLG.DLL and SHELL.DLL (available with Windows 3.1 or Borland C++ 3.1)
+   must be in the windows directory.
+2. WGNUPLOT.HLP produced by Borland C++ 3.1 is in Windows 3.1 format.
+   You need to use the WINHELP.EXE supplied with Borland C++ 3.1.
+3. WGNUPLOT won't run in real mode due to lack of memory.
+4. Truetype fonts are not available in the graph window.
+5. Drag-drop does not work.
+
+The Borland makefile is makefile.win.
+Windows gnuplot has only been tested with Borland C++ 3.1.  
+Before making wgnuplot you will need to edit the TC = line 
+to specify the location of your compiler.
+
+The Microsoft C 7.0 makefile is makefile.msw.
+This version has had very little testing and currently crashes
+if you set samples >= 2048.
+
+Windows 95 and Windows NT (WIN32) (or 3.1 with win32s ?)
+---------------------------------
+
+When compiling with Microsoft Visual C/C++ for NT you should use
+makefile.nt from the top directory and build the project from a
+command line prompt with nmake 
+
+  nmake -f makefile.nt
+
+If you want to use the interactive debugger you will need to
+compile gnuplot from the IDE. For this purpose you can use the
+gnuplot.mak file in this directory, but first copy it into the
+top directory. Remember that this project file for the IDE will
+*not* build the complete package, just the executable for
+debugging purposes.
+

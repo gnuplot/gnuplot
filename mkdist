@@ -1,0 +1,23 @@
+#! /bin/sh
+#
+# $Id: mkdist,v 1.5 1997/04/10 02:33:06 drd Exp $
+#
+# script to create a tar.gz of a development version. This script will not be
+# in any `real' distribution
+#
+
+mkdir dist.tmp
+cd dist.tmp
+# -P (prune) means dont checkout empty directories
+# I would delete directory emx from the repository if I knew how !
+cvs co -P $1 gnuplot
+cd gnuplot
+find . -name CVS -o -name .cvsignore|xargs rm -r
+cd ..
+pl=`sed -n 's/.*patchlevel.*"\(.*\)".*/\1/p' gnuplot/version.c|tr -d " "`
+# what compression level does tar z use ?
+tar cvf - gnuplot | gzip -9 > gnuplot-$pl.tar.gz
+rm -r gnuplot
+mv gnuplot-$pl.tar.gz ..
+cd ..
+rmdir dist.tmp

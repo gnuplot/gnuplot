@@ -1,0 +1,51 @@
+#
+# $Id: polar.dem,v 1.4 1995/03/27 18:07:43 drd Exp $
+#
+# Show some of the new polar capabilities.
+#
+set noborder
+set clip
+set polar
+set xtics axis nomirror
+set ytics axis nomirror
+set samples 160
+set zeroaxis
+set trange [0:2*pi]
+set title "Three circles (with aspect ratio distortion)"
+plot .5,1,1.5
+pause -1 "Hit return to continue"
+set title ""
+
+plot cos(2*t)
+pause -1 "Hit return to continue"
+
+plot 2*sqrt(cos(t)),-2*sqrt(cos(t))
+pause -1 "Hit return to continue"
+
+plot sin(4*t),cos(4*t)
+set offset 0,0,0,0
+pause -1 "Hit return to continue"
+
+set xrange [-5:5]
+set yrange [-5:5]
+plot t/cos(3*t)
+pause -1 "Hit return to continue"
+set autoscale
+
+plot 1-sin(t)
+pause -1 "Hit return to continue"
+
+set trange [0:12*pi]
+plot 2*t
+pause -1 "Hit return to continue"
+
+butterfly(x)=exp(cos(x))-2*cos(4*x)+sin(x/12)**5
+set samples 800
+pause 0 "This is a big one (many samples), be patient..."
+set title "Butterfly"
+set nokey
+plot butterfly(t)
+pause -1 "Hit return to continue"
+
+# undo what we've done above
+reset

@@ -1,0 +1,423 @@
+############################################################
+#
+# $Id: Makefile.in,v 1.48 1997/05/27 01:28:44 drd Exp $
+#
+# GNUPLOT Makefile.in for autoconf (Unix X11 support)
+# Adapted from makefile.unx by djm@gnu.ai.mit.edu
+############################################################
+
+# default target
+
+all: @ERRORFIX@ gnuplot @GNUPLOT_X11@ doc demo/binary1
+
+
+# this tells GNU make not to export variables into the environment
+# But other makes dont understand its significance, so it must
+# not be the first target in the file. So it is here, before
+# any variables are created, but after the default target
+.NOEXPORT:
+
+
+SHELL = /bin/sh
+
+srcdir = @srcdir@
+top_srcdir = @top_srcdir@
+VPATH = @srcdir@
+prefix = @prefix@
+exec_prefix = @exec_prefix@
+
+bindir = @bindir@
+datadir = @datadir@
+includedir = @includedir@
+infodir = @infodir@
+libdir = @libdir@
+mandir = @mandir@/man1
+
+top_builddir = .
+
+HELPFILE=$(datadir)/gnuplot.gih
+
+INSTALL = @INSTALL@
+INSTALL_PROGRAM = @INSTALL_PROGRAM@
+INSTALL_DATA = @INSTALL_DATA@
+
+CC     = @CC@
+CPPFLAGS = @CPPFLAGS@
+DEFS  = @DEFS@ @X_INCLUDES@
+INCLUDES = -I. -I$(top_srcdir)
+CFLAGS = @CFLAGS@
+LDFLAGS = @LDFLAGS@
+
+# Additional devices you can add.
+# -DAPOLLO      Apollo Graphics Primitive Resource (window resize after replot)
+# -DGPR         Apollo Graphics Primitive Resource (fixed-size window)
+# -DCGI         SCO CGI
+# -DIRIS4D      IRIS4D series computer
+# -DSUN         Sun Microsystems Workstation
+# -DLINUXVGA	Linux PC with SuperVGA library
+# -DUNIXPC      unixpc (ATT 3b1 or ATT 7300)
+# -DUNIXPLOT    unixplot
+# -DGNUGRAPH    use GNU graphics version of UNIX plot library
+#               This can only be used in combination with -DUNIXPLOT
+TERMFLAGS = @TERMFLAGS@
+
+#  -lplot if you have -DUNIXPLOT in TERMFLAGS
+#  -lsuntool -lsunwindow -lpixrect  if you have -DSUN in TERMFLAGS
+#  -lgl_s if -DIRIS4D in TERMFLAGS
+#  -lccgi if -DCGI in TERMFLAGS
+#  -lvga if -DLINUXVGA in TERMFLAGS
+#  -L/usr/somewhere/gd -lgd  if gif driver used
+TERMLIBS = @TERMLIBS@
+
+LIBS = @LIBS@
+XLIBS = @X_LIBRARIES@
+
+# Where to send email about bugs and comments (locally)
+EMAIL=bug-gnuplot@dartmouth.edu
+
+# Lasergnu is a handy shell script for creating a plot from the
+# command line and sending it directly to the printer. It currently
+# supports PostScript and imagen printers, and probably would need
+# tailoring to your site.
+# Use lasergnu_install to install lasergnu.
+# Use lasergnu_noinstall to not install lasergnu (default).
+LASERGNU = @LASERGNU@
+
+############################################################
+# -DREADLINE:
+#   If READLINE is defined, then command-line editing is supported.
+#   Otherwise, your normal terminal editing is all you get.
+#   Some machines will not support this, and they will turn this
+#   option off (for example, apollos running SR10.2 or SR10.3 and
+#   loaded with BSD4.3 instead of SYS5). Note: problems with
+#   gnuplot prompts have been noted when this feature is selected
+#   on IBM RS/6000 AIX, and compile errors are encountered on
+#   Sequent Dynix 3 and Convex OS 9.0.
+# -DNOCWDRC:
+#   If NOCWDRC is defined, then any .gnuplot in the current directory
+#   is not read on startup. This is a security consideration
+#   especially for root users ( we recommend you define -DNOCWDRC ).
+# -DOLD_SELECT if you have an old 4.2 BSD OS (e.g. Sun OS 3.5) and
+#   encounter compile error for missing FD_* macros for select
+# -DBSD_TYPES if your system defines FD_* macros for select in
+#   <sys/bsdtypes.h>
+# -ISC22 to circumvent missing plots past the first on ISC 2.2
+
+#  -DNO_MEMSET if you need to use bzero() instead of memset()
+#  -DNO_MEMCPY if your memcpy() is called bcopy
+#  -DNOCOPY if you don't have a memcpy() by any name
+#  -DGAMMA=foo if your gamma function is called foo(). Apollos and
+#    Linux have lgamma(3m). The default is -DGAMMA=gamma.
+#  -DHAVE_GETCWD if your unix uses getcwd() instead of getwd()
+#    this is needed by HP-UX and Cray Unicos systems.
+#  -DULTRIX_KLUDGE if you run X windows on Ultrix and experience the
+#    "every other plot" problem.
+#  -DCRIPPLED_SELECT if "select errors" are encountered with X. This
+#    option is needed on SVR3 platforms with incomplete support for
+#    the BSD select() system call
+#  -DHAVE_LOCALE if your system uses the 'setlocale' function to
+#    support foreign charactersets (currently only ISO8859-1).
+#  -DSYSTEM_TIME to use the system-provided set of time routines -
+#    in case the gnuplot routines in time.c misbehave
+#  -Dunix is required to explicitly define "unix" for SCO and IBM
+#          RS/6000 running AIX 3.2
+
+#
+# You probably don't need to change anything below here.
+#
+
+ACLOCAL = $(top_srcdir)/aclocal.m4
+ACCONFIG = acconfig.h
+CONFIG_HEADER_IN = config.hin
+CONFIG_HEADER = config.h
+
+####################################################################
+#
+
+
+# definitions for macros used in makefile.all (updated automatically)
+
+O=o
+T=$(srcdir)/term/
+D=$(srcdir)/docs/
+L=$(srcdir)/docs/latextut/
+M=$(srcdir)/demos
+
+#standard unix make does not support included makefiles.
+#we inline the contents of makefile.all here
+#it will be updated using a script whenever makefile.all is changed
+
+
+#<<<makefile.all>>>
+########################################################
+#
+# $Id: Makefile.in,v 1.48 1997/05/27 01:28:44 drd Exp $
+#
+########################################################
+#
+# Please note that this is NOT a standalone makefile
+# it is intended to be merged into, or included by
+# other makefiles once some macros have been defined
+#
+# If this segment appears in a makefile other than makefile.all,
+# do not modify it in situ. This segment will be entirely
+# replaced in all makefiles whenever makefile.all is updated
+#
+# If you are porting gnuplot to a new system, it would
+# be very helpful if you could include this one in it.
+# This reduces the amount of work required when files are
+# added to the distribution
+#
+# note that there exists a file gnuplot.opt which lists all the
+# core files (but without extension)
+#
+# please define
+# O as the object extension
+# T as the prefix for terminals (eg term/ or [.term])
+# D as the prefix for docs (eg docs/)
+# L as the prefix for latex tutorial (eg docs/latextut/ or [.docs.latextut])
+# M as the prefix for demos (eg demo/)
+
+
+####################################################################
+# List of object files except version.$(O)
+COREOBJS = alloc.$(O) binary.$(O) bitmap.$(O) command.$(O) contour.$(O) datafile.$(O) eval.$(O) fit.$(O)\
+       graphics.$(O) graph3d.$(O) help.$(O) hidden3d.$(O) internal.$(O) interpol.$(O)\
+       matrix.$(O) misc.$(O) parse.$(O) plot.$(O) plot2d.$(O) plot3d.$(O) readline.$(O)\
+       scanner.$(O) set.$(O) show.$(O) specfun.$(O) standard.$(O) term.$(O) time.$(O) util.$(O) \
+       util3d.$(O)
+
+####################################################################
+# List of source files
+# Used for making shar files, lint, and some dependencies.
+DIRS = term demo docs $(D)latextut
+
+CSOURCE1 = alloc.c binary.c bitmap.c command.c contour.c datafile.c eval.c fit.c
+CSOURCE2 = graphics.c graph3d.c help.c hidden3d.c internal.c interpol.c
+CSOURCE3 = matrix.c misc.c parse.c plot.c plot2d.c plot3d.c readline.c
+CSOURCE4 = scanner.c set.c show.c specfun.c standard.c term.c time.c util.c util3d.c version.c
+
+
+CSOURCE5 = $(T)ai.trm $(T)amiga.trm $(T)aed.trm \
+	$(T)cgi.trm $(T)corel.trm $(T)cgm.trm \
+	$(T)djsvga.trm $(T)dumb.trm \
+	$(T)dxf.trm $(T)dxy.trm $(T)debug.trm \
+	$(T)emxvga.trm $(T)eepic.trm $(T)epson.trm $(T)excl.trm \
+	$(T)fig.trm $(T)gif.trm $(T)grass.trm $(T)hp26.trm $(T)hp2648.trm $(T)hpgl.trm \
+	$(T)hp500c.trm $(T)hpljii.trm $(T)metafont.trm \
+	$(T)apollo.trm $(T)gpr.trm $(T)hppj.trm $(T)compact.c
+CSOURCE6 = $(T)impcodes.h $(T)imagen.trm $(T)next.trm $(T)object.h \
+	$(T)iris4d.trm $(T)kyo.trm $(T)latex.trm $(T)mif.trm \
+	$(T)pbm.trm $(T)pslatex.trm $(T)gpic.trm $(T)png.trm
+CSOURCE7 = $(T)post.trm $(T)pstricks.trm $(T)qms.trm $(T)regis.trm \
+	$(T)rgip.trm $(T)sun.trm \
+	$(T)t410x.trm $(T)tek.trm $(T)texdraw.trm \
+	$(T)tgif.trm $(T)tpic.trm \
+	$(T)unixpc.trm $(T)unixplot.trm \
+	$(T)v384.trm $(T)vws.trm $(T)x11.trm $(T)xlib.trm
+CSOURCE8 = bf_test.c gplt_x11.c
+
+CORETERM = $(CSOURCE5) $(CSOURCE6) $(CSOURCE7)
+
+NEXTSRC  = epsviewe.m epsviewe.h
+# not C code, but still needed
+
+DEMOS = $(M)1.dat $(M)2.dat $(M)3.dat $(M)contours.dem \
+	$(M)controls.dem $(M)electron.dem $(M)glass.dat $(M)param.dem \
+	$(M)polar.dem $(M)simple.dem $(M)surface1.dem \
+	$(M)surface2.dem $(M)using.dat $(M)using.dem $(M)world.cor \
+	$(M)world.dat $(M)world.dem \
+	$(M)err.dat $(M)poldat.dem $(M)errorbar.dem \
+	$(M)all.dem $(M)animate.dem $(M)bivariat.dem \
+	$(M)prob.dem $(M)stat.inc $(M)prob2.dem $(M)random.dem \
+	$(M)discrete.dem $(M)hidden.dem $(M)airfoil.dem $(M)gnuplot.rot\
+	$(M)binary.dem $(M)spline.dem $(M)steps.dem $(M)steps.dat \
+	$(M)multimsh.dem $(M)whale.dat $(M)hemisphr.dat \
+	$(M)scatter.dem $(M)scatter2.dat $(M)singulr.dem $(M)klein.dat
+
+ETC = Copyright 0README README.gnu README.ami makefile.unx makefile.vms \
+	linkopt.amg makefile.amg makefile.ami linkopt.vms buildvms.com \
+	lasergnu makefile.r makefile.nt makefile.g 0FAQ 0BUGS\
+	$(T)README History gnuplot.el intergra.x11 0INSTALL\
+	README.3p2 README.3p3 README.3p4 README.pro README.nex README.x11 \
+	README.3d README.mf README.win configure configure.in Makefile.in \
+	$(ACCONFIG) $(ACLOCAL) $(CONFIG_HEADER_IN) stamp-h.in
+
+
+# Documentation and help files
+DOCS1 = $(D)makefile.org $(D)README $(D)checkdoc.c $(D)doc2gih.c \
+	$(D)doc2hlp.c $(D)doc2hlp.com $(D)doc2ms.c $(D)doc2tex.c \
+	$(D)gnuplot.1 $(D)lasergnu.1 $(D)toc_entr.sty $(D)doc2info.pl \
+	$(D)titlepag.ms $(D)titlepag.tex $(D)makefile.ami \
+	$(D)doc2rtf.c $(D)Makefile.in
+DOCS2 = $(D)gnuplot.doc $(D)gpcard.tex
+DOCS3 = $(L)makefile.org $(L)eg1.plt \
+	$(L)eg2.plt $(L)eg3.dat $(L)eg3.plt \
+	$(L)eg4.plt $(L)eg5.plt $(L)eg6.plt \
+	$(L)header.tex $(L)tutorial.tex \
+	$(L)linepoin.plt $(L)Makefile.in
+
+DOCS  = $(DOCS1) $(DOCS2) $(DOCS3)
+
+#########################################################################
+
+# Simple Dependencies
+# - note that VMS requires space before and after the :
+
+
+$(COREOBJS) : plot.h protos.h stdfn.h
+
+help.$(O) misc.$(O) : help.h
+
+graphics.$(O) graph3d.$(O) misc.$(O) plot.$(O) set.$(O) show.$(O) term.$(O) : setshow.h
+
+fit.$(O) : fit.c fit.h matrix.h plot.h
+
+matrix.$(O) : matrix.c matrix.h fit.h
+
+bitmap.$(O) term.$(O) : bitmap.h
+
+term.$(O) : term.h $(CORETERM)
+
+# Complex Dependencies
+
+
+
+#   ... should be defined in the system specific makefiles, eg
+#term.$(O) : ...
+
+
+#>>>makefile.all<<<
+
+####################################################
+
+# (that's the end of makefile.all, by the way...)
+
+# List of object files except version.o
+
+OBJS = $(COREOBJS) @NEXTOBJS@
+
+
+#########################################################################
+
+
+gnuplot: $(OBJS) version.o
+	$(CC) -o $@ $(OBJS) version.o $(LDFLAGS) $(TERMLIBS) $(LIBS)
+
+gnuplot_x11: gplt_x11.o
+	$(CC) -o $@ gplt_x11.o $(LDFLAGS) $(XLIBS) $(LIBS)
+
+
+docs/allterm.h: $(CORETERM)
+	cat $(T)*.trm > docs/allterm.h
+
+doc: docs/allterm.h
+	( cd docs; $(MAKE) $(MFLAGS) gnuplot.gih )
+
+demo/binary1 demo/binary2 demo/binary3: bf_test
+	( wd=`pwd`; cd $(srcdir)/demo; $$wd/bf_test )
+
+bf_test: bf_test.o binary.o alloc.o
+	$(CC) -o $@ bf_test.o binary.o alloc.o $(LDFLAGS) $(LIBS)
+
+errorfix: $(srcdir)/errorfix.sh
+	$(srcdir)/errorfix.sh $(srcdir)
+	touch errorfix
+
+################################################################
+
+install: all $(LASERGNU)
+	$(srcdir)/mkinstalldirs $(bindir)
+	$(srcdir)/mkinstalldirs $(datadir)
+	$(srcdir)/mkinstalldirs $(mandir)
+	$(INSTALL_PROGRAM) gnuplot $(bindir)/gnuplot
+	test ! -f gnuplot_x11 || $(INSTALL_PROGRAM) gnuplot_x11 $(bindir)/gnuplot_x11
+	-$(INSTALL_DATA) $(srcdir)/docs/gnuplot.1 $(mandir)/gnuplot.1
+	( cd docs; $(MAKE) $(MFLAGS) install datadir=$(datadir) )
+	@LINUXSUID@
+
+lasergnu_install: lasergnu docs/lasergnu.1
+	$(INSTALL_PROGRAM) $(srcdir)/lasergnu $(bindir)/lasergnu
+	$(INSTALL_DATA) $(srcdir)/docs/lasergnu.1 $(mandir)/lasergnu.1
+
+lasergnu_noinstall:
+
+uninstall:
+	rm -f $(bindir)/gnuplot $(bindir)/gnuplot_x11
+	rm -f $(mandir)/gnuplot.1 $(mandir)/lasergnu.1
+	( cd docs; $(MAKE) $(MFLAGS) uninstall datadir=$(datadir) )
+
+################################################################
+# Dependencies
+
+.c.o:
+	$(CC) -c $(CPPFLAGS) $(DEFS) $(INCLUDES) $(CFLAGS) $<
+
+command.o: command.c fit.h help.h setshow.h
+	$(CC) -c $(CPPFLAGS) $(DEFS) $(INCLUDES) $(CFLAGS) -DHELPFILE=\"$(HELPFILE)\" $<
+
+term.o: term.c term.h $(CORETERM)
+	$(CC) -c $(TERMFLAGS) $(CPPFLAGS) $(INCLUDES) -I./term -I$(top_srcdir)/term $(DEFS) $(CFLAGS) $<
+
+version.o: version.c
+	$(CC) -c -DCONTACT=\"$(EMAIL)\" $(CPPFLAGS) $(DEFS) $(CFLAGS) $<
+
+################################################################
+
+# Some of these rules are disabled, because not everybody has
+# autoconf and automake installed.
+
+#$(srcdir)/aclocal.m4: configure.in
+#	cd $(srcdir) && aclocal
+
+#$(srcdir)/Makefile.in: Makefile.am $(top_srcdir)/configure.in $(ACLOCAL)
+#	cd $(top_srcdir) && automake --strictness=gnu Makefile
+
+# For an explanation of the following Makefile rules, see node
+# `Automatic Remaking' in GNU Autoconf documentation.
+Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
+	cd $(top_builddir) \
+	&& CONFIG_FILES=$@ CONFIG_HEADERS= $(SHELL) ./config.status
+config.status: configure
+	$(SHELL) ./config.status --recheck
+#$(srcdir)/configure: configure.in $(ACLOCAL) $(CONFIGURE_DEPENDENCIES)
+#	cd $(srcdir) && autoconf
+$(CONFIG_HEADER): stamp-h
+stamp-h: $(CONFIG_HEADER_IN) $(top_builddir)/config.status
+	cd $(top_builddir) \
+	&& CONFIG_FILES= CONFIG_HEADERS=$(CONFIG_HEADER) \
+	   $(SHELL) ./config.status
+	@echo timestamp > stamp-h
+$(srcdir)/$(CONFIG_HEADER_IN): stamp-h.in
+#$(srcdir)/stamp-h.in: $(top_srcdir)/configure.in $(ACLOCAL) $(ACCONFIG) $(CONFIG_TOP) $(CONFIG_BOT)
+#	cd $(top_srcdir) && autoheader
+#	echo timestamp > $(srcdir)/stamp-h.in
+
+################################################################
+# Miscellaneous targets
+
+SOURCES=plot.h help.h setshow.h bitmap.h term.h $(CSOURCE1) $(CSOURCE2) \
+	$(CSOURCE3) $(CSOURCE4) $(CSOURCE5) $(CSOURCE6) $(CSOURCE7)\
+	$(CSOURCE8) $(NEXTSRC) $(WINDOWS) $(OS2)
+
+DOCS  = $(DOCS1) $(DOCS2) $(DOCS3)
+
+clean:
+# HBB: also delete *~ backup files
+	rm -f gnuplot gnuplot_x11 bf_test *.o core *~ stamp-h
+	rm -f demo/binary? demo/temp.set demo/defaults.ini demo/fit.log \
+		demo/soundfit.par
+	( cd docs; $(MAKE) $(MFLAGS) clean )
+
+mostlyclean: clean
+
+distclean: clean
+	rm -f Makefile config.status config.cache $(CONFIG_HEADER) config.log
+	rm -f docs/Makefile docs/latextut/Makefile
+
+realclean: distclean
+	rm -f TAGS docs/TAGS
+
+dist: $(ETC) $(SOURCES) $(PC) $(DEMOS) $(BETA) $(DOCS)
+	$(TAR) cvf /tmp/gnuplot.tar $(ETC) $(SOURCES) $(PC)\
+	     $(DEMOS) $(BETA) $(DOCS)

@@ -1,0 +1,94 @@
+The 3.6 version of gnuplot is proud to include a new NeXTstep
+terminal driver.  The new driver offers the following new
+features:
+
+1) Multiple windows
+2) Resizable windows
+3) Direct print interface from windows
+4) Titleable and re-addressable windows
+5) A real NeXTstep-style interface to the terminal driver
+
+The driver runs as a separate application, and hence has
+it's own set of controls and interfaces.  It registers itself
+with the operating system as a distributed objects "GnuTerm"
+server, and thereafter accepts requests from any gnuplot instances
+on the machine.
+
+Nick Strobel's original single-viewport NeXTstep terminal is available 
+as an option to the next terminal.  It can be invoked from the gnuplot 
+command line as:
+gnuplot>  set term next old
+There are several reasons why one might choose the older terminal.
+First, the new terminal will probably not work on NeXT systems
+running a pre-3.0 version of the operating system.
+Second, because all of the postscript must be buffered in order
+to allow re-sizing and printing of the window's contents, the
+new terminal can be a memory hog for very complicated plots.
+The original README.nex file for the original next terminal is 
+included at the end of this document.
+
+
+Installation
+------------
+
+In addition to enabling the #include next.trm in term.h before
+compiling gnuplot, the GnuTerm.app application must be separately
+built and installed.  All of the source code is included in
+the NeXT subdirectory of the gnuplot distribution.  GnuTerm.app
+can be built for the current architecture by cd-ing to the NeXT
+directory and type "make".  For more complicated installations,
+or to build the application "FAT" (to run on more than one
+processor architecture), it's easiest to fire up NeXT's 
+ProjectBuilder.app and open NeXT/PB.project.
+
+GnuTerm.app can be installed in any directory contained in the
+WorkSpace's ApplicationPaths dwrite.  For most situations,
+this means installing GnuTerm.app in either /LocalApps or
+~/Apps.  
+
+If you wish to locate the GnuTerm.app somewhere other than ~/Apps 
+or /LocalApps, you can "setenv GNUTERMPATH  /newpath" to tell 
+gnuplot where to find it.
+Example (wherein GnuTerm.app is in /LocalApps/Data):
+
+host%  setenv GNUTERMPATH "/LocalApps/Data"
+
+Robert Lutwak
+robert@amo.mit.edu
+July 14, 1996
+
+
+Following is the README.nex that accompanied the original 
+(single viewport) next terminal, which is still accessible
+as "set term next old".
+-------------------------------
+        This directory contains version 2 of the additional files
+you'll need to get gnuplot3.0 to display it's postscript directly to a
+window instead of going through the klunky process of writing the
+postscript to a file and launching Previewer to view the file.  Note
+that all input is still done at the shell level! Fancier NeXTStep
+interfaces will be a future project.
+
+        This version is faster and leaner than the old method.  It
+also does not eat up swap space like the older version (this was
+particularly noticeable when doing animation-like plots).  To do this
+I used DPS function calls instead of creating a NXImage and
+compositing the stream of commands. I based my code on the program
+called "epsview" in the hackkit tar file on the archive servers.
+
+        The next.trm (next terminal) is basically the post.trm
+(postscript terminal) with the fprintf replaced by DPSPrintf and
+outfile by the DPSContext d.  You'll also see that I also used some
+code (with modifications) from David S. Joerg's MovieApp.  Using the
+DPS functions enabled me to slim down the EpsViewer.[hm] and
+EPSView.[hm] files.
+
+        No claim is made to code elegance or to it being a good example of
+objective-c coding.  This is my first (well, second, sort of) objective-c
+program. It seems to work for me. Any constructive criticism would be
+appreciated.  I can be reached at strobel@phast.phys.washington.edu
+
+cheers!
+
+nick strobel
+-----------------------------------

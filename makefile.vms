@@ -1,0 +1,96 @@
+#
+# $Id: makefile.vms,v 1.25 1996/03/01 21:17:28 drd Exp $
+#
+#
+# GNUPLOT Makefile
+# for VMS
+# 
+# use with the MAKE that was posted by Tony Ivanov (tony@gvgpvd.GVG.TEK.COM)
+# in comp.os.vms on 5 December 1988
+#
+
+########### COMPILE OPTIONS ###########
+
+
+# select these lines for DECC
+#
+# WHICHRTL=DECCRTL
+# PREFIXALL=/prefix=all
+#
+# select these lines for VAXC
+
+WHICHRTL=VAXCRTL
+CRTL_SHARE=,sys$$disk:[]linkopt.vms/opt
+
+# uncomment the following line for gnu cc
+# EXTRALIB=,gnu_cc:[000000]gcclib/lib
+
+#maybe ABJ and AXE if that's your local convention for alpha
+#(that's how I build vax and axp programs in same directory)
+O=OBJ
+X=EXE
+
+# NOOP  NO Optimiser
+# take out X11 if you dont want windows support
+# pipes compiles with popen emulation (from VMS perl-5 port)
+CFLAGS = /NOOP/define=(NOGAMMA,NO_GIH,X11,PIPES,$(WHICHRTL)) $(PREFIXALL)
+
+TERMFLAGS = /include=[.term]
+
+
+############## okay, that's enough fiddling ###############
+
+OBJS1 = alloc.$O,binary.$O,bitmap.$O,command.$O,contour.$O,datafile.$O,eval.$O,
+OBJS2 = fit.$O,graphics.$O,graph3d.$O,hidden3d.$O,internal.$O,interpol.$O,
+OBJS3 = matrix.$O,misc.$O,parse.$O,plot.$O,plot2d.$O,plot3d.$O,scanner.$O,set.$O,
+OBJS4 = show.$O,specfun.$O,standard.$O,term.$O,time.$O,util.$O,util3d.$O,version.$O,vms.$O
+OBJS = $(OBJS1)$(OBJS2)$(OBJS3)$(OBJS4)$(EXTRAOBJ)
+
+CSOURCE1 = command.c set.c show.c 
+CSOURCE2 = help.c graphics.c graph3d.c internal.c 
+CSOURCE3 = misc.c eval.c parse.c plot.c plot2d.c plot3d.c scanner.c standard.c 
+CSOURCE4 = bitmap.c term.c time.c util.c version.c interpol.c fit.c matrix.c
+CSOURCE5 = [.term]aed.trm [.term]cgi.trm [.term]dumb.trm [.term]dxf.trm [.term]dxy.trm \
+	[.term]eepic.trm [.term]epson.trm [.term]fig.trm [.term]hp26.trm \
+	[.term]hp2648.trm [.term]hpgl.trm [.term]hpljii.trm 
+CSOURCE6 = [.term]impcodes.h [.term]imagen.trm [.term]object.h \
+	[.term]iris4d.trm [.term]kyo.trm [.term]latex.trm [.term]pbm.trm  \
+	[.term]pc.trm 
+CSOURCE7 = [.term]post.trm [.term]qms.trm [.term]regis.trm [.term]sun.trm \
+	[.term]t410x.trm [.term]tek.trm [.term]unixpc.trm [.term]unixplot.trm \
+	[.term]v384.trm [.term]x11.trm gplt_x11.c
+CSOURCE8 = contour.c specfun.c interpol.c vms.c
+
+all :   gnuplot.$X gnuplot.hlp gnuplot.hlb
+
+gnuplot.$X : $(OBJS) $(EXTRAOBJ)
+	link /exe=gnuplot.$X vms.$O gnuplot.opt/opt $(EXTRAOBJ) $(EXTRALIB) $(CRTL_SHARE)
+
+gnuplot.hlp : doc2hlp.$X [.docs]gnuplot.doc [.docs]doc2hlp.com
+	$$@[.docs]doc2hlp.com
+
+gnuplot.hlb : gnuplot.hlp
+	library/create/help gnuplot.hlb gnuplot.hlp
+
+doc2hlp.$X: [.docs]doc2hlp.c
+	$(CC) /include=([.docs],[],[.term]) [.docs]doc2hlp.c
+	link doc2hlp $(CTRL_SHARE)
+
+term.$O: term.h term.c $(CSOURCE5) $(CSOURCE6) $(CSOURCE7)
+	$(CC) $(CFLAGS) $(TERMFLAGS) term.c /object=term.$O
+
+$(OBJS): plot.h
+
+command.$O help.$O misc.$O: help.h
+
+command.$O graphics.$O graph3d.$O misc.$O plot.$O set.$O show.$O term.O interpol.$O: setshow.h
+
+command.$O fit.$O matrix.$O: fit.h
+
+fit.$O matrix.$O: matrix.h
+
+bitmap.$O term.$O: bitmap.h
+
+clean :
+	purge/log
+	del/log *.$O;*

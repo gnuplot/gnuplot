@@ -1,0 +1,75 @@
+SOME NOTES ON GNUPLOT ON THE AMIGA ...
+
+
+
+Environment Variables:
+
+   GNUHELP   Allows you to define a pathname for the gnuplot help file.  For
+             example, "setenv GNUHELP TEX:gnuplot.gih"
+
+   GNUPLOT   Your current directory is searched for the file ".gnuplot".
+             If you say "setenv GNUPLOT <Path>" (without the filename!)
+             gnuplot will look for it there.
+
+   GNUTERM   You can define a default driver with "setenv GNUTERM <driver>".
+             A good choice is "setenv GNUTERM amiga" :^)
+
+   SHELL     If you don't like "NewShell" as your shell, you can say
+             "setenv SHELL <Shell>".
+
+
+Stack Size:
+
+   A stack size of at least 25000 bytes should be used while running gnuplot.
+   If you use recursive functions, e.g. like in "bivariat.dem", you will have
+   to increase your stack size accordingly. Otherwise gnuplot will exit with
+   a run time error.
+
+
+Pipes:
+
+  As of version 3.6 gnuplot supports the use of pipes for the input of data
+  in the same manner as under Unix. See the appropriate part of the manual
+  for further details. This feature is only available if Kickstart 2.0 or
+  higher is installed on your Amiga.
+
+  To execute the examples given in the docs, you will have to use the port
+  of AT&T awk that is available on aminet-sites as ATT-awk-1_0.lha. Don't
+  use the port of gawk that has been uploaded to aminet because it is
+  severely broken. None of the examples will work with that version of awk.
+
+  The Amiga version now supports output of the online documentation through
+  external pagers. This feature is enabled if you set the environment
+  variable PAGER to a reasonable value. The pager used must be able to take
+  its input from stdin. Older versions of more supplied with Commodore's
+  workbench don't allow this and won't work. I recommend the use of
+  Less 1.6Z (available on aminet). Set your environment variable PAGER to
+  "less -[cli]" or set the variable LESS to "-[cli]" and PAGER to "less".
+
+
+
+--------------------------   SAS/C 6.1 VERSION   -----------------------------
+
+
+Default paths/directories:
+
+   Gnuplot looks for the file "gnuplot.gih" in your "S:"-directory unless you
+   specify the full pathname including the filename via "setenv GNUHELP".
+
+
+
+
+---------------------------   AZTEC C VERSION   ------------------------------
+
+Default paths/directories:
+
+   Gnuplot looks for the "gnuplot.gih" file in "GNUPLOT:docs/gnuplot.gih" if
+   GNUHELP is not defined.   This is defined in the makefile (makefile.ami).
+
+
+Terminal Drivers:
+
+   The Aztec C version can now use the "amiga.trm" driver written by
+   Carsten Steger.  Under KS/WB 2.0, a custom screen will be used with a size
+   specified by the Prefs/Overscan program.
+

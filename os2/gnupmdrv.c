@@ -1,0 +1,274 @@
+#ifdef INCRCSDATA
+static char RCSid[]="$Id: gnupmdrv.c,v 1.9 1997/04/08 06:14:42 drd Exp $" ;
+#endif
+
+/****************************************************************************
+
+    PROGRAM: gnupmdrv
+    
+    Outboard PM driver for GNUPLOT 3.3
+
+    MODULE:  gnupmdrv.c
+        
+    This file contains the startup procedures for gnupmdrv
+       
+****************************************************************************/
+
+/*
+ * PM driver for GNUPLOT
+ * Copyright (C) 1992   Roger Fearick
+ *
+ * Permission to use, copy, and distribute this software and its
+ * documentation for any purpose with or without fee is hereby granted, 
+ * provided that the above copyright notice appear in all copies and 
+ * that both that copyright notice and this permission notice appear 
+ * in supporting documentation.
+ *
+ * Permission to modify the software is granted, but not the right to
+ * distribute the modified code.  Modifications are to be distributed 
+ * as patches to released version.
+ *  
+ * This software is provided "as is" without express or implied warranty.
+ * 
+ *
+ * AUTHOR
+ * 
+ *   Gnuplot driver for OS/2:  Roger Fearick
+ * 
+ * Send your comments or suggestions to 
+ *  info-gnuplot@dartmouth.edu.
+ * This is a mailing list; to join it send a note to 
+ *  majordomo@dartmouth.edu.  
+ * Send bug reports to
+ *  bug-gnuplot@dartmouth.edu.
+**/
+
+#define INCL_PM
+#define INCL_WIN
+#define INCL_SPL
+#define INCL_SPLDOSPRINT
+#define INCL_DOSMEMMGR
+#define INCL_DOSPROCESS
+#define INCL_DOSFILEMGR
+#include <os2.h>
+#include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include "gnupmdrv.h"
+
+/*==== g l o b a l    d a t a ================================================*/
+
+char szIPCName[256] ;
+char szIniFile[256] ;
+#define IPCDEFAULT "gnuplot"
+int  bServer=0 ;
+int  bPersist=0 ;
+int  bWideLines=0 ;
+int  bEnhanced=0 ;
+
+/*==== l o c a l    d a t a ==================================================*/
+
+            /* class names for window registration */
+
+static char szChildName []     = "Gnuchild" ;
+
+static char szTitle[256] = "Gnuplot" ;
+
+/*==== f u n c t i o n s =====================================================*/
+
+BOOL             QueryIni( HAB ) ;
+int              main( int, char** ) ;
+static HWND      InitHelp( HAB, HWND ) ;
+
+/*==== c o d e ===============================================================*/
+
+int main ( int argc, char **argv )
+/*
+** args:  argv[1] : name to be used for IPC (pipes/semaphores) with gnuplot 
+** 
+** Standard PM initialisation:
+** -- set up message processing loop
+** -- register all window classes
+** -- start up main window
+** -- subclass main window for help and dde message trapping to frame window
+** -- init help system
+** -- check command line and open any filename found there
+**
+*/
+    {
+    static ULONG flFrameFlags = (FCF_ACCELTABLE|FCF_STANDARD);//&(~FCF_TASKLIST) ;
+    static ULONG flClientFlags = WS_VISIBLE ;
+    HMQ          hmq ;
+    QMSG         qmsg ;
+    PFNWP        pfnOldFrameWndProc ;
+    HWND         hwndHelp ;        
+    BOOL         bPos ;
+
+    if( argc <= 1 ) strcpy( szIPCName, IPCDEFAULT ) ;
+    else {
+        int i ;
+        strcpy( szIPCName, argv[1] ) ;
+        for ( i=2; i<argc; i++ ) {
+                    while( *argv[i] != '\0' ) {
+                if( *argv[i] == '-' ) {
+                    ++argv[i] ;
+                    switch( *argv[i] ) {
+                        case 's' :
+                            bServer = 1 ;
+                            break ;
+                        case 'e' :
+                            bEnhanced = 1 ;
+                            break ;
+                        case 'p' :
+                            bPersist = 1 ;
+                            break ;
+                        case 'w' :
+                            bWideLines = 1 ;
+                            break ;
+                        }
+                    }
+                else if ( *argv[i] == '"' ) {
+                    char *p = szTitle ;
+                    argv[i]++ ;
+                    while( *argv[i] != '"' ) {
+                        *p++ = *argv[i]++ ; 
+                        } 
+                    *p = '\0' ;
+                    }
+                argv[i]++ ;
+                }
+            } 
+        }
+    {
+    char *p ;
+        /* get path from argv[0] to track down program files */
+    strcpy( szIniFile, argv[0] ) ;
+    while( (p=strchr(szIniFile,'/'))!=NULL ) *p = '\\' ;
+    p = strrchr(szIniFile,'\\') ;
+    if(p==NULL) p = strrchr(szIniFile,':') ;    
+    if(p==NULL) p = szIniFile ;
+    else ++p ;
+    strcpy(p,GNUINI);
+    }
+    
+    hab = WinInitialize( 0 ) ;    
+    hmq = WinCreateMsgQueue( hab, 50 ) ;
+
+                // get defaults from gnupmdrv.ini
+
+    bPos = QueryIni( hab ) ;
+                
+                // register window and child window classes
+
+    if( ! WinRegisterClass( hab,        /* Exit if can't register */
+                            APP_NAME,
+                            (PFNWP)DisplayClientWndProc,
+                            CS_SIZEREDRAW,
+                            0 ) 
+                            ) return 0L ;
+
+                // create main window
+
+    hwndFrame = WinCreateStdWindow (
+                    HWND_DESKTOP,
+                    0,//WS_VISIBLE,
+                    &flFrameFlags,
+                    APP_NAME,
+                    NULL,
+                    flClientFlags,
+                    0L,
+                    1,
+                    &hApp) ;
+
+    if ( ! hwndFrame ) return 0 ;
+
+                // subclass window for help & DDE trapping
+
+    pfnOldFrameWndProc = WinSubclassWindow( hwndFrame, (PFNWP)NewFrameWndProc ) ;
+    WinSetWindowULong( hwndFrame, QWL_USER, (ULONG) pfnOldFrameWndProc ) ;
+
+                // init the help manager
+
+    hwndHelp = InitHelp( hab, hwndFrame ) ;        
+
+                // set window title and make it active
+
+    {
+    char text[256] = APP_NAME;
+    strcat( text, " [" ) ;
+    strcat( text, szTitle ) ;
+    strcat( text, "]" ) ;
+    WinSetWindowText( hwndFrame, text ) ;
+    }
+                // process window messages 
+      
+    while (WinGetMsg (hab, &qmsg, NULLHANDLE, 0, 0))
+         WinDispatchMsg (hab, &qmsg) ;
+
+                // shut down
+
+    WinDestroyHelpInstance( hwndHelp ) ;
+    WinDestroyWindow (hwndFrame) ;
+    WinDestroyMsgQueue (hmq) ;
+    WinTerminate (hab) ;
+
+    return 0 ;
+    }
+
+static HWND InitHelp( HAB hab, HWND hwnd )
+/*
+**  initialise the help system
+*/
+    {
+    static HELPINIT helpinit = { sizeof(HELPINIT),
+                                 0L,
+                                 NULL,
+                                 (PHELPTABLE)MAKELONG(1, 0xFFFF),
+                                 0L,
+                                 0L,
+                                 0,
+                                 0,
+                                 "GnuplotPM Help",
+                                 CMIC_HIDE_PANEL_ID,
+                                 "gnupmdrv.hlp" } ;
+    HWND hwndHelp ;
+    static char helppath[256] ;
+    char *p ;
+    if( (p=getenv("GNUPLOT")) != NULL ) {
+        strcpy( helppath, p ) ;
+        strcat( helppath, "/" ) ;
+        strcat( helppath, helpinit.pszHelpLibraryName ) ;
+        helpinit.pszHelpLibraryName = helppath ;
+        }    
+    hwndHelp = WinCreateHelpInstance( hab, &helpinit ) ;
+    WinAssociateHelpInstance( hwndHelp, hwnd ) ;
+    return hwndHelp ;
+    }
+
+MRESULT EXPENTRY NewFrameWndProc (HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2)
+/*
+**  Subclasses top-level frame window to trap help & dde messages
+*/
+    {
+    PFNWP       pfnOldFrameWndProc ;
+    
+    pfnOldFrameWndProc = (PFNWP) WinQueryWindowULong( hwnd, QWL_USER ) ; 
+    switch( msg ) {
+        default: 
+            break ;
+
+        case HM_QUERY_KEYS_HELP:
+            return (MRESULT) IDH_KEYS ;            
+        }
+    return (*pfnOldFrameWndProc)(hwnd, msg, mp1, mp2) ;    
+    }
+
+
+MRESULT EXPENTRY About( HWND hDlg, ULONG message, MPARAM mp1, MPARAM mp2)
+/*
+** 'About' box dialog function
+*/
+    {
+    return WinDefDlgProc( hDlg, message, mp1, mp2 ) ;
+    }
+

@@ -1,0 +1,27 @@
+1. The hidden line algorithm is not perfect.  The back of the object
+can bleed through to the front.  We should put in a option of not
+drawing the back at all.
+
+2. The list of available devices is often longer than the length of
+a screen.  This output should be sent through a pager.
+
+3. In the Atari version, windows are not currently supported.  This
+means gnuplot 3.4 will not run with MultiAES.  We hope to correct
+this shortly in gpcontrb.tar.z.
+
+4. autoscale writeback is probably broken. One problem is that
+ the range is written back before the range is extented to a
+ whole number of tics. eg  if data is 0.9->10.1, that is what
+ gets written back, but the plot is 0 -> 11. If autoscale
+ is switched off, you do get 0.9->10.1 since switching off
+ autoscale switches off the extend-to-tic-multiple stuff.
+
+ Also, writeback with log scales writes back the log of the min/max
+
+5. system commands in a script file on VMS get truncated to the
+  length of the last interactive command entered. Workaround :
+    load 'script.gnu'   # a long comment to pad the line
+
+6. "\n" does not work in the format for the tics in splot
+
+7. core dumps if key is manually placed in hidden3d splot

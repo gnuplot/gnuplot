@@ -1,0 +1,335 @@
+dnl -*-Mode: M4 -*-
+dnl Process this file with autoconf to produce a configure script.
+dnl configure.in for gnuplot 3.5 (pre-3.6) on Unix.
+dnl Send any mail about this file to David Denholm <David.Denholm@insignia.co.uk>.
+dnl
+dnl this file has now been integrated into the normal gnuplot distribution
+dnl
+dnl Where possible, please adopt a convention that the absense of
+dnl a macro is the usual case : this saves having to update
+dnl countless makefiles when new tests are added. By usual case
+dnl I guess ansi compiler on posix system or something like that
+dnl
+dnl $Id: configure.in,v 1.88 1997/07/23 23:15:26 drd Exp $
+dnl
+AC_PREREQ(2.1)
+AC_REVISION($Revision: 1.88 $)
+AC_INIT(graphics.c)
+AC_CONFIG_HEADER(config.h:config.hin)
+
+dnl Programs.
+AC_PROG_CC
+AC_PROG_CPP
+AC_PROG_INSTALL
+
+
+dnl Optional features.
+
+dnl Do not use the included readline function
+AC_ARG_WITH(readline,dnl
+[  --without-readline      do not use the included readline function],,
+  AC_DEFINE(READLINE)
+)dnl
+
+dnl The GNU readline library
+AC_ARG_WITH(gnu-readline,dnl
+[  --with-gnu-readline     use the GNU readline version
+  --with-gnu-readline=/path/to/libreadline.a    Specify the location of libreadline],,
+with_gnu_readline=no
+)dnl
+
+dnl The gif terminal with Tom Boutell's gd library
+AC_ARG_WITH(gd,dnl
+[  --with-gd               enable gif terminal with Tom Boutell's gd library
+                          (requires GD library)
+  --with-gd=/path/to[/libgd.a]                  Specify the location of libgd],,
+with_gd=NONE
+)dnl
+
+dnl The Portable Network Graphics (png) terminal
+AC_ARG_WITH(png,dnl
+[  --with-png              enable png terminal
+                          (requires libpng and libz)
+  --with-png=/path/to[/libpng.a]                Specify the location of libpng],,
+with_png=NONE
+)dnl
+
+dnl Use the .gnuplotrc file
+AC_ARG_WITH(cwdrc,dnl
+[  --with-cwdrc            check current directory for .gnuplotrc file,
+                          normally disabled for security reasons],
+if test "$withval" = no; then AC_DEFINE(NOCWDRC) fi, AC_DEFINE(NOCWDRC)
+)dnl
+
+dnl Install the lasergnu printer script
+AC_ARG_WITH(lasergnu,dnl
+[  --with-lasergnu         install lasergnu printer script],
+if test "$withval" = yes; then LASERGNU=lasergnu_install; \
+else LASERGNU=lasergnu_noinstall; fi, LASERGNU=lasergnu_noinstall
+)dnl
+
+dnl The Linux console driver
+AC_ARG_WITH(linux-vga,dnl
+[  --without-linux-vga     do not use the Linux console driver
+                          (requires Linux SVGAlib /usr/lib/libvga)],,
+with_linux_vga=yes
+)dnl
+
+
+dnl configure.in body
+
+dnl figure out if can handle ANSI style prototypes
+dnl with gcc we're well off, but other compiler might require additional
+dnl options
+dnl Compiler characteristics
+AM_C_PROTOTYPES
+AC_C_CONST
+AC_C_INLINE
+
+dnl this shell variable is set to no if above failed to set
+dnl compiler to ansi mode (see aclocal.m4)
+if test "$am_cv_prog_cc_stdc" != no; then
+  AC_DEFINE(ANSI_C)
+fi
+
+AC_MSG_CHECKING(if compiler handles warn and error directives correctly)
+dnl this used to test #warning, but that is not currently used
+dnl
+dnl this test used to use AC_TRY_CPP, but since the ANSI flag above is
+dnl only added to CFLAGS and not to CPPFLAGS, it didn't work on e.g.
+dnl hpux with ANSI cc (adding the flag to CPPFLAGS may or may not make
+dnl sense, depending on whether we use cc -E or /lib/cpp). Let's hope
+dnl autoconf gets a more sound ANSI-C detection macro in the future
+dnl :-)
+AC_TRY_COMPILE(,[#if 0
+#error "error"
+#endif],ERRORFIX= AC_MSG_RESULT(yes),ERRORFIX=errorfix AC_MSG_RESULT(no))
+AC_SUBST(ERRORFIX)
+
+
+dnl X Window System files.
+AC_SUBST(X_INCLUDES)
+AC_SUBST(X_LIBRARIES)
+AC_SUBST(GNUPLOT_X11)
+AC_PATH_X
+if test "$no_x" = yes; then
+  X_INCLUDES= X_LIBRARIES= GNUPLOT_X11=
+else
+  if test -n "$x_includes"; then
+    X_INCLUDES="-I$x_includes"
+  fi
+  if test -n "$x_libraries"; then
+    X_LIBRARIES="-L$x_libraries -lX11"
+  else
+    X_LIBRARIES="-lX11"
+  fi
+  GNUPLOT_X11=gnuplot_x11
+  AC_DEFINE(X11)
+fi
+
+
+dnl Operating systems.
+dnl FIXME AC_DEFINE(ISC22)
+dnl FIXME AC_DEFINE(KSR)
+dnl Check for MSDOS and djgpp, NeXT
+gp_MSDOS
+gp_NEXT
+
+dnl this has to be after -lsys_s on NeXT
+LIBS="$LIBS -lm"
+
+
+dnl Header files.
+AC_HEADER_STDC
+AC_CHECK_HEADERS(sys/bsdtypes.h)
+AC_CHECK_HEADER(sys/select.h, , AC_DEFINE(OLD_SELECT))
+AC_CHECK_HEADER(string.h, , AC_DEFINE(NO_STRING_H))
+AC_CHECK_HEADER(stdlib.h, , AC_DEFINE(NO_STDLIB_H))
+AC_CHECK_HEADER(sys/types.h, , AC_DEFINE(NO_SYS_TYPES_H))
+AC_CHECK_HEADER(float.h, ,AC_DEFINE(NO_FLOAT_H))
+AC_CHECK_HEADERS(libc.h)
+
+AC_CHECK_HEADER(limits.h, ,AC_DEFINE(NO_LIMITS_H))
+AC_CHECK_HEADERS(values.h)
+AC_CHECK_HEADER(locale.h, ,AC_DEFINE(NO_LOCALE_H))
+
+dnl check for errno.h header and if it declares errno
+AC_CHECK_HEADER(errno.h, , AC_DEFINE(NO_ERRNO_H))
+AC_MSG_CHECKING(if errno variable is declared)
+AC_TRY_COMPILE([#include <stdio.h>
+#ifndef NO_ERRNO_H
+#include <errno.h>
+#endif],errno=0,AC_MSG_RESULT(yes),AC_DEFINE(EXTERN_ERRNO) AC_MSG_RESULT(no))
+
+dnl check if unistd actually declares anything. On NeXT 3.2 unistd is
+dnl conditionalized for _POSIX_SOURCE
+AC_MSG_CHECKING(for unistd.h)
+AC_EGREP_HEADER(execv, unistd.h, AC_DEFINE(HAVE_UNISTD_H) AC_MSG_RESULT(yes), AC_MSG_RESULT(no))
+
+AC_CHECK_HEADERS(sgtty.h termios.h)
+AC_CHECK_FUNCS(tcgetattr)
+
+
+dnl Types.
+AC_TYPE_SIZE_T
+AC_TYPE_SIGNAL
+dnl HBB: this will not work for DJGPP, nor for many other
+dnl   compilers. time_t is not defined in any place where
+dnl   AC_CHECK_TYPE would be searching for it...
+dnl   (at least not necessarily so).
+dnl AC_CHECK_TYPE(time_t, unsigned)
+AC_CHECK_HEADER(time.h, ,AC_DEFINE(NO_TIME_H) AC_CHECK_TYPE(time_t, long))
+ 
+
+dnl Functions.
+dnl gamma is called lgamma on apollos and linux
+dnl math lib is already available, see Operating systems part
+AC_CHECK_FUNCS(erf lgamma gamma)
+
+dnl We prefer that the absense of a macro is the norm, so we
+dnl define NO_WHATEVER if an ansi fn is missing, but HAVE_SOMETHING
+dnl if it is a non-ansi fn we would like to use if available
+
+AC_CHECK_FUNCS(getcwd)
+AC_CHECK_FUNC(memcpy, ,AC_DEFINE(NO_MEMCPY) AC_CHECK_FUNC(bcopy, ,AC_DEFINE(NOCOPY)))
+AC_CHECK_FUNC(memset, ,AC_DEFINE(NO_MEMSET))
+AC_CHECK_FUNC(strchr, ,AC_DEFINE(NO_STRCHR))
+AC_CHECK_FUNCS(setvbuf, ,AC_DEFINE(NO_SETVBUF))
+AC_CHECK_FUNCS(sleep)
+AC_CHECK_FUNCS(strncasecmp strnicmp strerror)
+
+dnl Check for pipes
+AC_CHECK_FUNC(popen)
+AC_CHECK_FUNC(pclose)
+if test "$ac_cv_func_popen" = yes && test "$ac_cv_func_pclose" = yes; then
+    AC_DEFINE(PIPES)
+fi
+
+dnl sunos 4 has on_exit() in place of atexit()
+AC_CHECK_FUNC(atexit, ,AC_DEFINE(NO_ATEXIT) AC_CHECK_FUNCS(on_exit))
+
+dnl SVR4 (?)
+AC_CHECK_HEADERS(sys/systeminfo.h)
+if test "$ac_cv_header_sys_systeminfo_h" = yes; then
+  AC_CHECK_FUNCS(sysinfo)
+fi
+
+dnl On SVR3.
+dnl FIXME AC_DEFINE(CRIPPLED_SELECT)
+
+
+dnl Libraries.
+dnl -lsocket is needed on SVR4.
+dnl
+dnl Is this true ?  Can anyone remember why ?
+AC_CHECK_LIB(socket, main, LIBS="$LIBS -lsocket")
+
+dnl check for installed linux vgalib
+if test "$with_linux_vga" = yes; then
+  AC_MSG_CHECKING(for linux vga library)
+  AC_CHECK_LIB(vga, vga_init,
+    AC_DEFINE(LINUXVGA)
+    LINUXSUID='chown root $(bindir)/gnuplot;chmod u+s $(bindir)/gnuplot'
+    TERMLIBS="$TERMLIBS -lvga")
+fi
+
+dnl This will work only with gnu readline installed in a standard library path
+dnl However, if libreadline.a is not installed in a standard path, then
+dnl all subsequent library tests will fail because we will try to link with
+dnl -lreadline.  This isn't acceptable, so we do check for the existence of
+dnl readline in a standard path.
+dnl
+dnl most unices need termcap with readline, but not Debian linux, which
+dnl does not even supply it, or so I am told
+
+if test "$with_gnu_readline" = yes; then
+    AC_CHECK_LIB(termcap, tputs, gp_tcap="-ltermcap", gp_tcap="")
+    AC_CHECK_LIB(readline, readline, 
+      LIBS="$LIBS -lreadline $gp_tcap",
+   AC_MSG_ERROR(Can't find -lreadline in a standard path -- specify its location using --with-gnu-readline=/path/to/libreadline.a),
+	  $gp_tcap 
+    )dnl readline
+    AC_DEFINE(GNU_READLINE)
+
+  elif test "$with_gnu_readline" != no; then
+    if test ! -f $with_gnu_readline ; then
+      AC_MSG_ERROR(No such file $withval)
+    fi
+
+    AC_CHECK_LIB(termcap, tputs, gp_tcap=" -ltermcap", gp_tcap="")
+    LIBS="$LIBS $with_gnu_readline $gp_tcap"
+    AC_DEFINE(GNU_READLINE)
+fi
+dnl end readline
+
+
+dnl drd - I have inverted the logic of this, since I think
+dnl the macro can be blank for no, so rather than assuming
+dnl true unless macro is no, we assume false unless macro is yes
+dnl Also, the header is checked only if the lib is there.
+dnl Is the macro for the header test actually used ? What
+dnl if the lib is there but the header is not ?
+
+dnl check for Tom Boutell's gd library
+gp_CHECK_LIB_PATH(gd, gdImageCreate)
+if test "$ac_cv_lib_gd_gdImageCreate" = yes; then
+  gp_CHECK_HEADER(gd.h)
+  AC_DEFINE(HAVE_LIBGD)
+else
+  AC_MSG_RESULT(- see term/gif.trm for download details)
+fi
+dnl end gd
+
+dnl check for png library
+gp_CHECK_LIB_PATH(png, png_info_init, -lz)
+if test "$ac_cv_lib_png_png_info_init" = yes; then
+  AC_DEFINE(HAVE_LIBPNG)
+  gp_CHECK_HEADER(png.h)
+  if test "$ac_cv_header_png_h" = yes; then
+    gp_CHECK_HEADER(zlib.h)
+  fi
+else
+  AC_MSG_RESULT(- see term/png.trm for download details)
+fi
+dnl end png
+
+dnl How do we detect the Ultrix X libraries?
+dnl Or is it really a server (run-time) problem?
+dnl FIXME AC_DEFINE(ULTRIX_KLUDGE)
+
+
+dnl Substitute variables
+AC_SUBST(LASERGNU)
+AC_SUBST(LINUXSUID)
+AC_SUBST(TERMFLAGS)
+AC_SUBST(TERMLIBS)
+
+dnl tell ansichek.h that we already know whether we are ANSI or not
+AC_DEFINE(AUTOCONF)
+
+
+dnl rename makefiles in subdirectories, so that they don't take precedence
+dnl over our creates Makefiles
+dnl HBB: BUG on MSDOS/DJGPP: if you run configure a second time, it
+dnl  won't notice the difference between 'makefile' and 'Makefile',
+dnl  and happily overwrite the backup copies with the autoconf-ed
+dnl  Makefile. Remedy: don't backup if backups are already there.
+dnl  (and make the backup file name 8.3 compatible to be safe)
+
+if test ! -f docs/makefile.dst && test -f docs/makefile && \
+   test -z "$no_create"; then
+  echo moving docs/makefile out of the way
+  mv docs/makefile docs/makefile.dst
+fi
+
+if test ! -f docs/latextut/makefile.dst && \
+   test -f docs/latextut/makefile && test -z "$no_create"; then
+  echo moving docs/latextut/makefile out of the way
+  mv docs/latextut/makefile docs/latextut/makefile.dst
+fi
+
+dnl Write Makefiles and configuration header
+AC_OUTPUT([Makefile docs/Makefile docs/latextut/Makefile], \
+[test -z "$CONFIG_HEADERS" || echo timestamp >stamp-h])
+
+dnl end configure.in
