@@ -300,7 +300,7 @@ known bugs:
 }
 
 Before seeking help, please check the
-@uref{http://www.gnuplot.org/gnuplot/faq/,FAQ (Frequently Asked Questions) list.
+@uref{http://www.gnuplot.org/faq/,FAQ (Frequently Asked Questions) list.
 }
 
 When posting a question, please include full details of the version of
