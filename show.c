@@ -1542,13 +1542,13 @@ show_version_long ()
 	/* something is fundamentally wrong if this fails ... */
 	if (uname (&uts) > -1) {
 		puts ("");
-#ifdef _AIX
+# ifdef _AIX
 		printf ("System: %s %s.%s", uts.sysname, uts.version, uts.release);
-#elif defined (SCO)
+# elif defined (SCO)
 		printf ("System: SCO %s", uts.release);
-#else
+# else
 		printf ("System: %s %s", uts.sysname, uts.release);
-#endif
+# endif
 	}
 	else {
 		puts ("");
@@ -1564,7 +1564,6 @@ show_version_long ()
 
 	puts ("\nCompile options:");
 
-#if 1 /* HBB 980812: made this compile on BC4.52 ... */
         {
           char readline[] =
 #ifdef READLINE
@@ -1613,47 +1612,6 @@ show_version_long ()
           printf("%s%s%s%s%s%s\n", readline, gnu_readline, libgd, libpng,
                linuxvga, nocwdrc, x11);
         }
-#else /* HBB: 0/1 */
-	puts (
-#ifdef READLINE
-	      "+READLINE  "
-#else
-	      "-READLINE  "
-#endif
-
-#ifdef GNU_READLINE
-	      "+GNU_READLINE  "
-#else
-	      "-GNU_READLINE  "
-#endif
-
-#ifdef HAVE_LIBGD
-	      "+LIBGD  "
-#else
-	      "-LIBGD  "
-#endif
-
-#ifdef HAVE_LIBPNG
-	      "+LIBPNG  "
-#else
-	      "-LIBPNG  "
-#endif
-
-#ifdef LINUXVGA
-	      "+LINUXVGA  "
-#endif
-
-#ifdef NOCWDRC
-	      "+NOCWDRC  "
-#else
-	      "-NOCWDRC  "
-#endif
-
-#ifdef X11
-	      "+X11  "
-#endif
-	      );
-#endif /* HBB: 0/1 */
 
 	printf ("HELPFILE=\"%s\"\n", HELPFILE);
 	printf ("CONTACT=<%s>\n", bug_email);
