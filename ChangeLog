@@ -1,5 +1,12 @@
 2002-08-25  Petr Mikulik  <mikulik@physics.muni.cz>
 
+	* src/show.c: Added 'include "gp_hist.h".
+
+	* src/gadgets.h: Added declarations for apply_textcolor() and
+	reset_textcolor().
+
+2002-08-25  Petr Mikulik  <mikulik@physics.muni.cz>
+
 	* src/color.c: Automatic positioning of the color box label.
 
 2002-08-25  Petr Mikulik  <mikulik@physics.muni.cz>
@@ -970,7 +977,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/08/25 15:13:53 $).
+	last modification date (from the tag $Date: 2002/08/25 15:18:32 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 

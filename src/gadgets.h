@@ -288,6 +288,10 @@ void clip_put_text_just __PROTO((unsigned int, unsigned int, char *, JUSTIFY, VE
 void clip_move __PROTO((unsigned int x, unsigned int y));
 void clip_vector __PROTO((unsigned int x, unsigned int y));
 
+/* Common routines for setting text color from t_colorspec */
+void apply_textcolor __PROTO((const struct t_colorspec *tc, const struct termentry *t));
+void reset_textcolor __PROTO((const struct t_colorspec *tc, const struct termentry *t));
+
 #if USE_ULIG_FILLEDBOXES
 /* filledboxes parameters (ULIG) */
 extern int fillstyle;
