@@ -65,6 +65,8 @@ should be tested again)
 -- unify color and pointtype sequence, alias similar line and point type
 sequences for the main terminal drivers (joze)
 
+-- implement filledboxes for cgm
+
 
 GNUPLOT LIBRARY:
 
