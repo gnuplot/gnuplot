@@ -1,3 +1,36 @@
+1998-12-08  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* 0BUGS: Add m[]tics entry, provided by Lucas Hart. Add entry about
+	Windows help file.
+
+	* TODO: Add entry for snprintf(3).
+
+	* command.c, fit.c, gplt_x11.c, help.c, hidden3d.c, misc.c, plot.c,
+	plot2d.c, plot2d.c, show.c, term.c, time.c, util.c: Replace
+	fprintf'ing of static strings with fputs.
+
+	* configure: Regenerated.
+
+	* configure.in: Cleanup, fix typo.
+
+	* protos.h: Put ifdef around readline functions.
+
+1998-12-08  Andy Dougherty  <doughera@lafayette.edu>
+
+	* 0INSTALL: Mention PATH=.:$PATH trick for testing of uninstalled
+	binaries.
+
+	* 0PORTING: Clarification of build instructions.
+
+	* term.c: Enhance comment about pedantic preprocessors.
+
+	* demo/contours.dem, demo/surface1.dem: Change "gnu plot" to
+	"gnuplot".
+
+1998-12-08  Dick Crawford  <u600256@gamma.lanl.gov>
+
+	* docs/gnuplot.doc, docs/titlepag.ms, docs/titlepag.tex: 3.7ise.
+
 1998-12-07  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* 0BUGS: Remove entry about truncation of script files on VMS.
@@ -9,7 +42,7 @@
 	* configure: Regenerated.
 
 	* configure.in: Add binaries location to configuration summary.
-	Fix compiling under HP-UX.
+	Fix configuring under HP-UX.
 
 	* graphics.c: Run through indent.
 
@@ -41,7 +74,7 @@
 1998-12-06  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* 0FAQ, 0README, NEWS, configure.in, makefile.dj2, makefile.os9,
-	version.c, term/README: 3.7ise.
+	term/README: 3.7ise.
 
 	* Makefile.in, makefile.all: Add mac.trm to CORETERM.
 
