@@ -4533,7 +4533,8 @@ C ... and restart the table:
  order to open it properly.
 
  On machines with popen functions (Unix), output can be piped through a shell
- command if the first character of the filename is '|'.  For instance,
+ command if the first non-whitespace character of the filename is '|'.
+ For instance,
 
        set output "|lpr -Plaser filename"
        set output "|lp -dlaser filename"
