@@ -1,5 +1,5 @@
 #ifdef INCRCSDATA
-static char RCSid[]="$Id: gnupmdrv.c,v 1.3 2004/04/13 17:24:05 broeker Exp $" ;
+static char RCSid[]="$Id: gnupmdrv.c,v 1.4 2004/07/01 17:10:10 broeker Exp $" ;
 #endif
 
 /****************************************************************************
@@ -118,7 +118,7 @@ int main ( int argc, char **argv )
      * it may inherit handles of files opened (temporarily) by gnuplot itself!
      * We close them here.
      */
-    fcloseall();
+    _fcloseall();
 
     if( argc <= 1 ) strcpy( szIPCName, IPCDEFAULT ) ;
     else {
