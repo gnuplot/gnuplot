@@ -1,3 +1,13 @@
+1999-10-15  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* Makefile.in: Add m4/select.m4 to ETC.
+
+	* configure.in: AC_FUNC_SELECT replaces AC_FUNC_SELECT_ARGTYPES.
+
+	* gplt_x11.c, stdfn.h: Updated for new select argtype macro.
+
+	* m4/select.m4: New macro for select argtypes.
+
 1999-10-11  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* help.c: Change subtopic help entry formatting to skip next column
