@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: internal.c,v 1.3 1999/06/09 12:13:30 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: internal.c,v 1.4 1999/06/11 11:18:55 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - internal.c */
@@ -36,7 +36,6 @@ static char *RCSid() { return RCSid("$Id: internal.c,v 1.3 1999/06/09 12:13:30 l
 
 
 #include "plot.h"
-#include "fnproto.h"
 
 /* some machines have trouble with exp(-x) for large x
  * if MINEXP is defined at compile time, use gp_exp(x) instead,
