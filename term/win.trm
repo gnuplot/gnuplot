@@ -1,5 +1,5 @@
 /*
- * $Id: win.trm,v 1.17 2000/11/09 16:14:01 broeker Exp $
+ * $Id: win.trm,v 1.18 2000/12/05 18:00:19 broeker Exp $
  */
 
 /* GNUPLOT - win.trm */
@@ -374,7 +374,21 @@ WIN_filled_polygon(points, corners)
     /* finish series: */
     GraphOp(&graphwin, W_pm3d_filled_polygon, points, 0, "n");
 }
+
 #endif /* PM3D */
+
+TERM_PUBLIC void
+WIN_filledbox(linetype, xleft, ybottom, width, height)
+    int linetype;
+    unsigned int xleft, ybottom, width, height;
+{
+    (void) linetype;  /* unused parameter */
+
+    /* split into two ocmmands to squeeze through all the necessary info */
+    GraphOp(&graphwin, W_move, xleft, ybottom, NULL);
+    GraphOp(&graphwin, W_filledbox, width, height, NULL);
+}
+
 
 #endif /* TERM_BODY */
 
@@ -389,7 +403,7 @@ TERM_TABLE_START(win_driver)
     WIN_justify_text, WIN_point, do_arrow, set_font_null,
     WIN_set_pointsize, TERM_CAN_MULTIPLOT,
     WIN_text /* suspend */ , WIN_resume, 
-    0 /*boxfill */, WIN_linewidth,
+    WIN_filledbox, WIN_linewidth,
 #ifdef PM3D
 #ifdef USE_MOUSE
     0, 0, 0, 0, 0, /* mouse functions */

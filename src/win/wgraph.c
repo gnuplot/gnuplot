@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: wgraph.c,v 1.6 2000/11/09 16:14:38 broeker Exp $";
+static char *RCSid = "$Id: wgraph.c,v 1.7 2000/12/05 18:00:19 broeker Exp $";
 #endif
 
 /* GNUPLOT - win/wgraph.c */
@@ -678,6 +678,22 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 					polyi = 1;;
 				}
 				break;
+                        case W_filledbox:
+                             {
+                                 RECT rect;
+
+                                 assert (polyi == 1);
+                                 
+                                 rect.left = ppt[0].x;
+                                 rect.bottom = ppt[0].y;
+                                 rect.right = ppt[0].x + xdash;
+                                 rect.top = ppt[0].y - ydash;
+
+                                 SetBkColor(hdc,lpgw->background);
+                                 FillRect(hdc, &rect, lpgw->hbrush);
+                                 polyi = 0;
+                             }
+
 			case W_line_type:
 #if 0 /* HBB 20000813 */			
 				switch (curptr->x)
