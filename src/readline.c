@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: readline.c,v 1.30 2002/06/03 23:06:07 joze Exp $"); }
+static char *RCSid() { return RCSid("$Id: readline.c,v 1.31 2002/08/14 18:43:42 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - readline.c */
@@ -479,8 +479,9 @@ const char *prompt;
 #ifdef CHARSET7BIT
 	if (isprint(cur_char)) {
 #else /* CHARSET7BIT */
-	if (isprint(cur_char) || (((unsigned char) cur_char > 0x7f) &&
-				  cur_char != EOF)) {
+	if (isprint(cur_char) 
+	|| ((unsigned char) cur_char == 011)	/* EAM allow <tab> */
+	|| (((unsigned char) cur_char > 0x7f) && cur_char != EOF)) {
 #endif /* CHARSET7BIT */
 	    size_t i;
 
