@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: plot2d.c,v 1.16.2.5 1999/11/17 19:55:43 lhecking Exp $";
+static char *RCSid = "$Id: plot2d.c,v 1.16.2.6 1999/11/18 20:42:15 lhecking Exp $";
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -1224,14 +1224,20 @@ do{ assert(!polar && !parametric); \
 
     if (uses_axis[FIRST_X_AXIS]) {
 	if (max_array[FIRST_X_AXIS] == -VERYLARGE ||
-	    min_array[FIRST_X_AXIS] == VERYLARGE)
+	    min_array[FIRST_X_AXIS] == VERYLARGE) {
+	    cp_free(first_plot);
+	    first_plot = NULL;
 	    int_error("all points undefined!", NO_CARET);
+	}
 	FIXUP_RANGE_FOR_LOG(FIRST_X_AXIS, x);
     }
     if (uses_axis[SECOND_X_AXIS]) {
 	if (max_array[SECOND_X_AXIS] == -VERYLARGE ||
-	    min_array[SECOND_X_AXIS] == VERYLARGE)
+	    min_array[SECOND_X_AXIS] == VERYLARGE) {
+	    cp_free(first_plot);
+	    first_plot = NULL;
 	    int_error("all points undefined!", NO_CARET);
+	}
 	FIXUP_RANGE_FOR_LOG(SECOND_X_AXIS, x2);
     } else {
 	assert(uses_axis[FIRST_X_AXIS]);
@@ -1253,15 +1259,21 @@ do{ assert(!polar && !parametric); \
 
     if (uses_axis[FIRST_Y_AXIS]) {
 	if (max_array[FIRST_Y_AXIS] == -VERYLARGE ||
-	    min_array[FIRST_Y_AXIS] == VERYLARGE)
+	    min_array[FIRST_Y_AXIS] == VERYLARGE) {
+	    cp_free(first_plot);
+	    first_plot = NULL;
 	    int_error("all points undefined!", NO_CARET);
+	}
 	fixup_range(FIRST_Y_AXIS, "y");
 	FIXUP_RANGE_FOR_LOG(FIRST_Y_AXIS, y);
     }
     if (uses_axis[SECOND_Y_AXIS]) {
 	if (max_array[SECOND_Y_AXIS] == -VERYLARGE ||
-	    min_array[SECOND_Y_AXIS] == VERYLARGE)
+	    min_array[SECOND_Y_AXIS] == VERYLARGE) {
+	    cp_free(first_plot);
+	    first_plot = NULL;
 	    int_error("all points undefined!", NO_CARET);
+	}
 	fixup_range(SECOND_Y_AXIS, "y2");
 	FIXUP_RANGE_FOR_LOG(SECOND_Y_AXIS, y2);
     } else {
