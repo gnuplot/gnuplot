@@ -1089,7 +1089,7 @@ TERM_PUBLIC void CGM_options()
 
 #ifdef TERM_TABLE
 TERM_TABLE_START(cgm_driver)
-   "cgm", "Computer Graphics Metafile xxxxx",
+   "cgm", "Computer Graphics Metafile",
      CGM_LARGE - CGM_MARGIN, CGM_SMALL - CGM_MARGIN, CGM_VCHAR, CGM_HCHAR,
      CGM_VTIC, CGM_HTIC, CGM_options, CGM_init, CGM_reset,
      CGM_text, null_scale, CGM_graphics, CGM_move, CGM_solid_vector,
