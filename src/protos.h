@@ -1,5 +1,5 @@
 /*
- * $Id: protos.h,v 1.9 1999/06/14 19:23:54 lhecking Exp $
+ * $Id: protos.h,v 1.10 1999/06/17 14:18:14 lhecking Exp $
  *
  */
 
@@ -157,7 +157,7 @@ void save_set_all __PROTO((FILE *fp));
 void load_file __PROTO((FILE *fp, char *name, TBOOLEAN subst_args));
 FILE *lf_top __PROTO((void));
 void load_file_error __PROTO((void));
-int instring __PROTO((char *str, int c));
+size_t gp_strcspn __PROTO((const char *, const char *));
 void show_functions __PROTO((void));
 void show_at __PROTO((void));
 void disp_at __PROTO((struct at_type *curr_at, int level));
