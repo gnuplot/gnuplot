@@ -333,12 +333,11 @@ if test "$with_png" != no; then
     gp_SEARCH_HEADERDIRS(zlib.h,,
      AC_MSG_WARN([please add path to zlib.h to INCLUDES in Makefile])
     )dnl gp_SEARCH_HEADERDIRS
-    AC_EGREP_CPP(yes,
-     [#include "png.h"
-     # if PNG_LIBPNG_VER < 89
-       yes
-     # endif
-     ], AC_MSG_WARN([- not using old libpng version]), AC_DEFINE(HAVE_LIBPNG)
+    AC_EGREP_CPP([You lose], [#include "png.h"
+#if PNG_LIBPNG_VER < 89
+You lose.
+#endif
+], AC_MSG_WARN([- not using old libpng version]), AC_DEFINE(HAVE_LIBPNG)
     )dnl AC_EGREP_CPP
   else
     AC_MSG_RESULT([- see term/png.trm for download details])
