@@ -1,10 +1,10 @@
 #! /bin/sh --
-# $Id: prepare,v 1.8 2003/01/28 21:22:54 lhecking Exp $
+# $Id: prepare,v 1.9 2003/11/24 09:49:37 lhecking Exp $
 # Small shell script to prepare the gnuplot sources when
 # checked out from CVS.
 
-# Note that both autoconf 2.13/automake 1.5 and autoconf 2.5x/automake 1.7 or
-# newer may be used, although the gnuplot project continues to use the former
+# Note that autoconf 2.52 or newer is required; automake versions older than
+# 1.7 might not work
 
 exelist="configure configure.vms depcomp install-sh missing mkinstalldirs config/djconfig.sh lisp/configure"
 
