@@ -1,3 +1,7 @@
+2003-06-04  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* src/show.c (show_palette_fit2rgbformulae): Take care of color models.
+
 2003-06-03  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/show.c (show_palette_rgbformulae show_palette_palette

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.109 2003/06/03 08:06:26 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.110 2003/06/03 08:59:30 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -1933,7 +1933,7 @@ show_palette_fit2rgbformulae()
     int *formulaeSeq;
     double **formulae;
     ++c_token;
-    if (sm_palette.colorMode == SMPAL_COLOR_MODE_RGB) {
+    if (sm_palette.colorMode == SMPAL_COLOR_MODE_RGB && sm_palette.cmodel == C_MODEL_RGB) {
 	fprintf(stderr, "\tCurrent palette is\n\t    set palette rgbformulae %i,%i,%i\n", sm_palette.formulaR, sm_palette.formulaG, sm_palette.formulaB);
 	return;
     }
@@ -1941,7 +1941,7 @@ show_palette_fit2rgbformulae()
     currRGB = (rgb_color*)gp_alloc(pts * sizeof(rgb_color), "RGB pts");
     for (p = 0; p < pts; p++) {
 	gray = (double)p / (pts - 1);
-	color_components_from_gray(gray, &(currRGB[p]));
+	color_from_gray(gray, &(currRGB[p]));
     }
     /* organize sequence of rgb formulae */
     formulaeSeq = gp_alloc((2*maxFormula+1) * sizeof(int), "formulaeSeq");
