@@ -1,4 +1,4 @@
-$Id: CodeStyle,v 1.9 1996/12/19 19:12:28 drd Exp $
+$Id: CodeStyle,v 1.6 1999/05/12 13:44:08 lhecking Exp $
 
 The following things have be observed when writing new code for gnuplot:
 (this file is currently under construction)  Some of the following is
@@ -243,6 +243,6 @@ Unary operators should be writen as usual, ie i++.
 
 No C++ style comments (//).
 No comments on #ifdef/#ifndef lines.
-
+No #error and #warning directives.
 
 [more to come]
