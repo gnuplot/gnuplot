@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.60 2001/08/27 15:02:14 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.61 2001/09/08 00:50:01 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -992,15 +992,17 @@ show_autoscale()
 {
     SHOW_ALL_NL;
 
-#define SHOW_AUTOSCALE(axis)							     \
-    fprintf(stderr, "\t%s: %s%s%s%s%s, ",					     \
-	    axis_defaults[axis].name,						     \
-	    (axis_array[axis].set_autoscale & AUTOSCALE_BOTH) ? "ON" : "OFF",	     \
-	    (axis_array[axis].set_autoscale == AUTOSCALE_MIN) ? " (min)" : "",	     \
-	    (axis_array[axis].set_autoscale == AUTOSCALE_MAX) ? " (max)" : "",	     \
-	    (axis_array[axis].set_autoscale & AUTOSCALE_FIXMIN) ? " (fixmin)" : "", \
-	    (axis_array[axis].set_autoscale & AUTOSCALE_FIXMAX) ? " (fixmax)" : ""  \
-	    );
+#define SHOW_AUTOSCALE(axis) {						      \
+	t_autoscale ascale = axis_array[axis].set_autoscale;		      \
+									      \
+	fprintf(stderr, "\t%s: %s%s%s%s%s, ",				      \
+		axis_defaults[axis].name,				      \
+		(ascale & AUTOSCALE_BOTH) ? "ON" : "OFF",		      \
+		((ascale & AUTOSCALE_BOTH) == AUTOSCALE_MIN) ? " (min)" : "", \
+		((ascale & AUTOSCALE_BOTH) == AUTOSCALE_MAX) ? " (max)" : "", \
+		(ascale & AUTOSCALE_FIXMIN) ? " (fixmin)" : "",		      \
+		(ascale & AUTOSCALE_FIXMAX) ? " (fixmax)" : "");	      \
+    }
 
     fputs("\tautoscaling is ", stderr);
     if (parametric) {
@@ -1010,8 +1012,7 @@ show_autoscale()
 	    SHOW_AUTOSCALE(U_AXIS);
 	    SHOW_AUTOSCALE(V_AXIS);
 	}
-    } else
-	putc('\t', stderr);
+    }
 
     if (polar) {
 	SHOW_AUTOSCALE(R_AXIS)
@@ -1019,8 +1020,10 @@ show_autoscale()
 
     SHOW_AUTOSCALE(FIRST_X_AXIS );
     SHOW_AUTOSCALE(FIRST_Y_AXIS );
+    fputs("\n\t               ", stderr);
     SHOW_AUTOSCALE(SECOND_X_AXIS);
     SHOW_AUTOSCALE(SECOND_Y_AXIS);
+    fputs("\n\t               ", stderr);
     SHOW_AUTOSCALE(FIRST_Z_AXIS );
 #ifdef PM3D
     SHOW_AUTOSCALE(COLOR_AXIS);
