@@ -47,9 +47,6 @@ TERMINALS:
 Amiga:
   -- update its docs from docs/old/README.ami, then delete this file
 
-CGM:
-  -- implement filledboxes
-
 Emx:
   -- update its docs from docs/old/README.emx, then delete this file
 
