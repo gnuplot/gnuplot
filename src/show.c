@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.136 2004/09/01 15:53:49 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.137 2004/10/19 03:26:20 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -1728,9 +1728,11 @@ static void
 show_position(struct position *pos)
 {
     static const char *msg[] = { "(first axes) ", "(second axes) ",
-				 "(graph units) ", "(screen units) " };
-
-    assert(first_axes == 0 && second_axes == 1 && graph == 2 && screen == 3);
+				 "(graph units) ", "(screen units) ",
+				 "(character units) "};
+ 
+    assert(first_axes == 0 && second_axes == 1 && graph == 2 && screen == 3 &&
+	   character == 4);
 
     fprintf(stderr, "(%s%g, %s%g, %s%g)",
 	    pos->scalex == first_axes ? "" : msg[pos->scalex], pos->x,
@@ -2848,7 +2850,8 @@ show_arrowstyle(int tag)
 		if (this_arrowstyle->arrow_properties.head_length > 0) {
 		    static char *msg[] =
 			{"(first x axis) ", "(second x axis) ",
-			 "(graph units) ", "(screen units) "};
+			 "(graph units) ", "(screen units) ",
+			 "(character units) "};
 		    fprintf(stderr," length %s%g, angle %g deg",
 			    this_arrowstyle->arrow_properties.head_lengthunit == first_axes ? "" : msg[this_arrowstyle->arrow_properties.head_lengthunit],
 			    this_arrowstyle->arrow_properties.head_length,

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.128 2004/10/13 22:24:00 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.129 2004/10/19 03:26:16 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -4223,6 +4223,12 @@ map_position_double(
 	    *x = pos->x * (t->xmax - 1);
 	    break;
 	}
+    case character:
+	{
+	    register struct termentry *t = term;
+	    *x = pos->x * t->h_char;
+	    break;
+	}
     }
     switch (pos->scaley) {
     case first_axes:
@@ -4248,6 +4254,12 @@ map_position_double(
 	    /* HBB 20000914: Off-by-one bug. Max. allowable result is
 	     * t->ymax - 1, not t->ymax ! */
 	    *y = pos->y * (t->ymax -1);
+	    break;
+	}
+    case character:
+	{
+	    register struct termentry *t = term;
+	    *y = pos->y * t->v_char; 
 	    break;
 	}
     }
@@ -4288,6 +4300,12 @@ map_position_r(
 	    *x = pos->x * (t->xmax - 1);
 	    break;
 	}
+    case character:
+	{
+	    register struct termentry *t = term;
+	    *x = pos->x * t->h_char;
+	    break;
+	}
     }
     switch (pos->scaley) {
     case first_axes:
@@ -4314,6 +4332,12 @@ map_position_r(
 	     * t->ymax - 1, not t->ymax ! */
 	    *y = pos->y * (t->ymax -1);
 	    return;
+	}
+    case character:
+	{
+	    register struct termentry *t = term;
+	    *y = pos->y * t->v_char; 
+	    break;
 	}
     }
 }

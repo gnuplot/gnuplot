@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.100 2004/10/15 03:32:56 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.101 2004/10/19 03:26:15 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -162,7 +162,7 @@ static void key_sample_point_pm3d __PROTO((struct surface_points *plot, int xl, 
 #endif
 static void key_text __PROTO((int xl, int yl, char *text));
 
-static TBOOLEAN get_arrow3d __PROTO((struct arrow_def*, unsigned int*, unsigned int*, unsigned int*, unsigned int*));
+static TBOOLEAN get_arrow3d __PROTO((struct arrow_def*, int*, int*, int*, int*));
 static void place_arrows3d __PROTO((int));
 static void place_labels3d __PROTO((struct text_label * listhead, int layer));
 static int map3d_getposition __PROTO((struct position* pos, const char* what, double* xpos, double* ypos, double* zpos));
@@ -447,15 +447,14 @@ boundary3d(struct surface_points *plots, int count)
 static TBOOLEAN
 get_arrow3d(
     struct arrow_def* arrow,
-    unsigned int* sx, unsigned int* sy,
-    unsigned int* ex, unsigned int* ey)
+    int* sx, int* sy,
+    int* ex, int* ey)
 {
     map3d_position(&(arrow->start), sx, sy, "arrow");
 
-    /* EAM  FIXME - This should really be a general test for out-of-bounds */
-    /* but at least we can catch the sometimes fatal case of negative ints */
-    /* wrapping around to huge positive unsigned ints.                     */
-    if (*sx > 0x7fffffff || *sy > 0x7fffffff)
+    /* EAM  FIXME - Is this a sufficiently general test for out-of-bounds? */
+    /*              Should we test the other end of the arrow also?        */
+    if (*sx < 0 || *sx > term->xmax || *sy < 0 || *sy > term->ymax)
 	return FALSE;
 
     if (arrow->relative) {
@@ -473,7 +472,7 @@ static void
 place_labels3d(struct text_label *listhead, int layer)
 {
     struct text_label *this_label;
-    unsigned int x, y;
+    int x, y;
 
     if (term->pointsize)
 	(*term->pointsize)(pointsize);
@@ -485,10 +484,8 @@ place_labels3d(struct text_label *listhead, int layer)
 
 	map3d_position(&this_label->place, &x, &y, "label");
 
-	/* EAM  FIXME - This should really be a general test for out-of-bounds */
-	/* but at least we can catch the sometimes fatal case of negative ints */
-	/* wrapping around to huge positive unsigned ints.                     */
-	if (x > 0x7fffffff || y > 0x7fffffff) {
+	/* EAM FIXME - Is this a sufficient test for out-of-bounds? */
+	if (x < 0 || x > term->xmax || y < 0 || y > term->ymax) {
 	    FPRINTF((stderr,"place_labels3d: skipping out-of-bounds label\n"));
 	    continue;
 	}
@@ -504,14 +501,15 @@ place_arrows3d(int layer)
     struct arrow_def *this_arrow;
     for (this_arrow = first_arrow; this_arrow != NULL;
 	 this_arrow = this_arrow->next) {
-	unsigned int sx, sy, ex, ey;
+	int sx, sy, ex, ey;
 
 	if (this_arrow->arrow_properties.layer != layer)
 	    continue;
 	if (get_arrow3d(this_arrow, &sx, &sy, &ex, &ey)) {
 	    term_apply_lp_properties(&(this_arrow->arrow_properties.lp_properties));
 	    apply_head_properties(&(this_arrow->arrow_properties));
-	    (*t->arrow) (sx, sy, ex, ey, this_arrow->arrow_properties.head);
+	    (*t->arrow) ((unsigned int)sx, (unsigned int)sy, (unsigned int)ex, (unsigned int)ey, 
+		this_arrow->arrow_properties.head);
 	} else {
 	    FPRINTF((stderr,"place_arrows3d: skipping out-of-bounds arrow\n"));
 	}
@@ -2732,72 +2730,91 @@ map3d_getposition(
     const char *what,
     double *xpos, double *ypos, double *zpos)
 {
-    int screens = 0;		/* need either 0 or 3 screen co-ordinates */
+    TBOOLEAN screen_coords = FALSE;
+    TBOOLEAN char_coords = FALSE;
+    TBOOLEAN plot_coords = FALSE;
 
     switch (pos->scalex) {
     case first_axes:
     case second_axes:
 	*xpos = axis_log_value_checked(FIRST_X_AXIS, *xpos, what);
+	plot_coords = TRUE;
 	break;
     case graph:
 	*xpos = X_AXIS.min + *xpos * (X_AXIS.max - X_AXIS.min);
+	plot_coords = TRUE;
 	break;
     case screen:
-	++screens;
+	*xpos = *xpos * (term->xmax -1) + 0.5;
+	screen_coords = TRUE;
+	break;
+    case character:
+	*xpos = *xpos * term->h_char + 0.5;
+	char_coords = TRUE;
+	break;
     }
 
     switch (pos->scaley) {
     case first_axes:
     case second_axes:
 	*ypos = axis_log_value_checked(FIRST_Y_AXIS, *ypos, what);
+	plot_coords = TRUE;
 	break;
     case graph:
 	*ypos = Y_AXIS.min + *ypos * (Y_AXIS.max - Y_AXIS.min);
+	plot_coords = TRUE;
 	break;
     case screen:
-	++screens;
+	*ypos = *ypos * (term->ymax -1) + 0.5;
+	screen_coords = TRUE;
+	break;
+    case character:
+	*ypos = *ypos * term->v_char + 0.5;
+	char_coords = TRUE;
+	break;
     }
 
     switch (pos->scalez) {
     case first_axes:
     case second_axes:
 	*zpos = axis_log_value_checked(FIRST_Z_AXIS, *zpos, what);
+	plot_coords = TRUE;
 	break;
     case graph:
 	*zpos = Z_AXIS.min + *zpos * (Z_AXIS.max - Z_AXIS.min);
+	plot_coords = TRUE;
 	break;
     case screen:
-	++screens;
+	screen_coords = TRUE;
+	break;
+    case character:
+	char_coords = TRUE;
+	break;
     }
 
-    return screens;
+    if (plot_coords && (screen_coords || char_coords))
+	graph_error("Cannot mix screen or character coords with plot coords");
+
+    return (screen_coords || char_coords);
 }
 
 void
 map3d_position(
     struct position *pos,
-    unsigned int *x, unsigned int *y,
+    int *x, int *y,
     const char *what)
 {
     double xpos = pos->x;
     double ypos = pos->y;
     double zpos = pos->z;
-    /* need either 0 or 3 screen co-ordinates */
-    int screens = map3d_getposition(pos, what, &xpos, &ypos, &zpos);
-
-    if (screens == 0) {
+    
+    
+    if (map3d_getposition(pos, what, &xpos, &ypos, &zpos) == 0) {
 	map3d_xy(xpos, ypos, zpos, x, y);
-	return;
-    }
-    if (screens != 3) {
-	graph_error("Cannot mix screen co-ordinates with other types");
-    }
-    {
-	struct termentry *t = term;
-	/* HBB 20000914: off-by-one bug. Maximum allowed output is
-         * t->?max - 1, not t->?max itself! */
-	*x = pos->x * (t->xmax -1) + 0.5;
-	*y = pos->y * (t->ymax -1) + 0.5;
+    } else {
+	/* Screen or character coordinates */
+	*x = xpos;
+	*y = ypos;
     }
 
     return;
@@ -2812,10 +2829,9 @@ map3d_position_r(
     double xpos = pos->x;
     double ypos = pos->y;
     double zpos = pos->z;
-    int screens = map3d_getposition(pos, what, &xpos, &ypos, &zpos);
 
     /* startpoint in graph coordinates */
-    if (screens == 0) {
+    if (map3d_getposition(pos, what, &xpos, &ypos, &zpos) == 0) {
 	unsigned int xoriginlocal, yoriginlocal;
 	map3d_xy(xpos, ypos, zpos, x, y);
 	if (pos->scalex == graph)
@@ -2833,16 +2849,11 @@ map3d_position_r(
 	map3d_xy(xpos, ypos, zpos, &xoriginlocal, &yoriginlocal);
 	*x -= xoriginlocal;
 	*y -= yoriginlocal;
-	return;
+    } else {
+    /* endpoint `screen' or 'character' coordinates */
+	    *x = xpos;
+	    *y = ypos;
     }
-    /* endpoint `screen' coordinates */
-    if (screens == 3) {
-	struct termentry *t = term;
-	*x = pos->x * (t->xmax -1) + 0.5;
-	*y = pos->y * (t->ymax -1) + 0.5;
-	return;
-    }
-    graph_error("Cannot mix screen co-ordinates with other types");
     return;
 }
 

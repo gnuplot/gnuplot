@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.46 2004/07/03 06:08:48 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.47 2004/07/25 12:25:00 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -1527,6 +1527,9 @@ get_position_type(enum position_type *type, int *axes)
     } else if (almost_equals(c_token, "sc$reen")) {
 	++c_token;
 	*type = screen;
+    } else if (almost_equals(c_token, "char$acter")) {
+	++c_token;
+	*type = character;
     }
     switch (*type) {
     case first_axes:

@@ -1,5 +1,5 @@
 /*
- * $Id: graph3d.h,v 1.17 2004/07/03 06:08:48 sfeam Exp $
+ * $Id: graph3d.h,v 1.18 2004/09/19 23:42:24 sfeam Exp $
  */
 
 /* GNUPLOT - graph3d.h */
@@ -142,8 +142,7 @@ extern int axis3d_o_x, axis3d_o_y, axis3d_x_dx, axis3d_x_dy, axis3d_y_dx, axis3d
 /* Prototypes from file "graph3d.c" */
 
 void do_3dplot __PROTO((struct surface_points *plots, int pcount, int quick));
-void map3d_position __PROTO((struct position * pos, unsigned int *x,
-				  unsigned int *y, const char *what));
+void map3d_position __PROTO((struct position * pos, int *x, int *y, const char *what));
 
 
 #endif /* GNUPLOT_GRAPH3D_H */

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.87 2004/10/15 22:42:11 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.88 2004/10/19 03:26:19 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -423,7 +423,8 @@ set y2data%s\n",
 		this_arrow->arrow_properties.lp_properties.l_type + 1,
 		this_arrow->arrow_properties.lp_properties.l_width);
 	if (this_arrow->arrow_properties.head_length > 0) {
-	    static char *msg[] = {"first", "second", "graph", "screen"};
+	    static char *msg[] = {"first", "second", "graph", "screen",
+				  "character"};
 	    fprintf(fp, " size %s %.3f,%.3f,%.3f",
 		    msg[this_arrow->arrow_properties.head_lengthunit],
 		    this_arrow->arrow_properties.head_length,
@@ -464,7 +465,8 @@ set y2data%s\n",
 		this_arrowstyle->arrow_properties.lp_properties.l_type + 1,
 		this_arrowstyle->arrow_properties.lp_properties.l_width);
 	if (this_arrowstyle->arrow_properties.head_length > 0) {
-	    static char *msg[] = {"first", "second", "graph", "screen"};
+	    static char *msg[] = {"first", "second", "graph", "screen",
+				  "character"};
 	    fprintf(fp, " size %s %.3f,%.3f,%.3f",
 		    msg[this_arrowstyle->arrow_properties.head_lengthunit],
 		    this_arrowstyle->arrow_properties.head_length,
@@ -938,9 +940,11 @@ save_tics(FILE *fp, AXIS_INDEX axis)
 static void
 save_position(FILE *fp, struct position *pos)
 {
-    static const char *msg[] = { "first ", "second ", "graph ", "screen " };
-
-    assert(first_axes == 0 && second_axes == 1 && graph == 2 && screen == 3);
+    static const char *msg[] = { "first ", "second ", "graph ", "screen ",
+				 "character "};
+ 
+    assert(first_axes == 0 && second_axes == 1 && graph == 2 && screen == 3 &&
+	   character == 4);
 
     fprintf(fp, "%s%g, %s%g, %s%g",
 	    pos->scalex == first_axes ? "" : msg[pos->scalex], pos->x,

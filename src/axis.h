@@ -1,5 +1,5 @@
 /*
- * $Id: axis.h,v 1.37 2004/07/01 17:10:03 broeker Exp $
+ * $Id: axis.h,v 1.38 2004/07/03 06:08:48 sfeam Exp $
  *
  */
 
@@ -481,7 +481,7 @@ do {									     \
 
 /* parse a position of the form
  *    [coords] x, [coords] y {,[coords] z}
- * where coords is one of first,second.graph,screen
+ * where coords is one of first,second.graph,screen,character
  * if first or second, we need to take axis_is_timedata into account
  */
 #define GET_NUMBER_OR_TIME(store,axes,axis)				\

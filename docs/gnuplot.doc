@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.246 2004/10/19 03:26:13 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.247 2004/10/19 12:59:50 persquare Exp $
 C 18 September 2001
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -547,15 +547,19 @@ C
 
        {<system>} <x>, {<system>} <y> {,{<system>} <z>}
 
- Each <system> can either be `first`, `second`, `graph` or `screen`.
+ Each <system> can either be `first`, `second`, `graph`, `screen`, or
+ `character`.
 
  `first` places the x, y, or z coordinate in the system defined by the left
  and bottom axes; `second` places it in the system defined by the second axes
  (top and right); `graph` specifies the area within the axes---0,0 is bottom
  left and 1,1 is top right (for splot, 0,0,0 is bottom left of plotting area;
- use negative z to get to the base---see `set ticslevel`); and `screen`
+ use negative z to get to the base---see `set ticslevel`); `screen`
  specifies the screen area (the entire area---not just the portion selected by
- `set size`), with 0,0 at bottom left and 1,1 at top right.
+ `set size`), with 0,0 at bottom left and 1,1 at top right; and `character`
+ gives the position in character widths and heights from the bottom left of
+ the screen area (screen 0,0), `character` coordinates depend on the chosen
+ font size.
 
  If the coordinate system for x is not specified, `first` is used.  If the
  system for y is not specified, the one used for x is adopted.
@@ -4075,19 +4079,19 @@ C ... and restart the table:
  parts of the arrow to be changed.
 
  The <position>s are specified by either x,y or x,y,z, and may be preceded by
- `first`, `second`, `graph`, or `screen` to select the coordinate system.
- Unspecified coordinates default to 0.  The end points can be specified in
- one of four coordinate systems---`first` or `second` axes, `graph` or
- `screen`.  See `coordinates` for details.  A coordinate system specifier
- does not carry over from the "from" position to the "to" position.  Arrows
- outside the screen boundaries are permitted but may cause device errors.
- If the end point is specified by "rto" instead of "to" it is drawn relatively
- to the start point.  For linear axes, `graph` and `screen` coordinates,
- the distance between the start and the end point corresponds to the given 
- relative coordinate.  For logarithmic axes, the relative given coordinate 
- corresponds to the factor of the coordinate between start and end point.
- Thus, a negative relative value or zero are not allowed for logarithmic
- axes.
+ `first`, `second`, `graph`, `screen`, or `character` to select the coordinate
+ system.  Unspecified coordinates default to 0.  The end points can be
+ specified in one of five coordinate systems---`first` or `second` axes,
+ `graph`, `screen`, or `character`.  See `coordinates` for details.  A
+ coordinate system specifier does not carry over from the "from" position to
+ the "to" position.  Arrows outside the screen boundaries are permitted but
+ may cause device errors.  If the end point is specified by "rto" instead of
+ "to" it is drawn relatively to the start point.  For linear axes, `graph`
+ and `screen` coordinates, the distance between the start and the end point
+ corresponds to the given relative coordinate.  For logarithmic axes, the
+ relative given coordinate corresponds to the factor of the coordinate
+ between start and end point.  Thus, a negative relative value or zero are
+ not allowed for logarithmic axes.
 
  Specifying `nohead` produces an arrow drawn without a head---a line segment.
  This gives you yet another way to draw a line segment on the plot.  By
@@ -4097,8 +4101,8 @@ C ... and restart the table:
  Head size can be controlled by `size <length>,<angle>`, where <length>
  defines length of each branch of the arrow head and <angle> the angle (in
  degrees) they make with the arrow. <Length> is in x-axis units; this can be
- changed by `first`, `second`, `graph` or `screen` before the <length>;
- see `coordinates` for details.
+ changed by `first`, `second`, `graph`, `screen`, or `character` before the
+ <length>;  see `coordinates` for details.
 
  Specifying `filled` produces filled arrow heads (if heads are used).
  Filling is supported on filled-polygon capable terminals, see help of `pm3d`
@@ -5722,9 +5726,9 @@ C ... and restart the table:
  Entering `set key default` returns the key to its default configuration.
 
  The <position> can be a simple x,y,z as in previous versions, but these can
- be preceded by one of four keywords (`first`, `second`, `graph`, `screen`)
- which selects the coordinate system in which the position of the first sample
- line is specified.  See `coordinates` for more details.
+ be preceded by one of five keywords (`first`, `second`, `graph`, `screen`,
+ `character`) which selects the coordinate system in which the position of
+ the first sample line is specified.  See `coordinates` for more details.
 
  The key is drawn as a sequence of lines, with one plot described on each
  line.  On the right-hand side (or the left-hand side, if `reverse` is
@@ -5801,8 +5805,8 @@ C ... and restart the table:
        show label
 
  The <position> is specified by either x,y or x,y,z, and may be preceded by
- `first`, `second`, `graph`, or `screen` to select the coordinate system.
- See `coordinates` for details.
+ `first`, `second`, `graph`, `screen`, or `character` to select the coordinate
+ system.  See `coordinates` for details.
 
  The tag is an integer that is used to identify the label. If no <tag>
  is given, the lowest unused tag value is assigned automatically.  The
@@ -7313,12 +7317,11 @@ C ... and restart the table:
  Head size can be controlled by `size <length>,<angle>` or 
  `size <length>,<angle>,<backangle>` where `<length>` defines length of each 
  branch of the arrow head and `<angle>` the angle (in degrees) they make with 
- the arrow. `<Length>` is in x-axis units; this can be
- changed by `first`, `second`, `graph` or `screen` before the `<length>`; 
- see `coordinates` for details.
- `<Backangle>` only takes effect when `filled` or `empty` is also used. Then, 
- `<backangle>` is the angle (in degrees) the back branches make with the 
- arrow (in the same direction as `<angle>`).
+ the arrow. `<Length>` is in x-axis units; this can be changed by `first`,
+ `second`, `graph`, `screen`, `character` before the <length>;  see
+ `coordinates` for details.  `<Backangle>` only takes effect when `filled`
+ or `empty` is also used.  Then, `<backangle>` is the angle (in degrees) the
+ back branches make with the arrow (in the same direction as `<angle>`).
  The `fig` terminal has a restricted backangle function. It supports three
  different angles. There are two thresholds: Below 70 degrees, the arrow head
  gets an indented back angle. Above 110 degrees, the arrow head has an acute

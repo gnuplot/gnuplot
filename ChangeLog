@@ -1,3 +1,25 @@
+2004-10-20  Harald Harders  <h.harders@tu-bs.de>
+
+	Introduce a new coordinate system 'character' that uses character width
+	and height as units. Its is a 2d coordinate system similar to 'screen'.
+	The origin is the same as for 'screen'. SourceForge patch #993411.
+	The intended use is for setting label and text offsets in terms of 
+	character size, and generalizing this to all places where an offset is
+	legal.
+	
+	* NEWS docs/gnuplot.doc:
+	* src/axis.h src/axis.c (get_position_type) src/gadgets.h:
+	New coordinate system "character".
+
+	* src/graph3d.c (get_arrow3d place_labels3d place_arrows3d): 
+	* src/graph3d.c (map3d_getposition map3d_position):
+	Track 3D coordinates internally as (int) rather than (unsigned int) so
+	that out-of-bounds on the negative side can be detected. Interpret
+	character offsets.
+
+	* src/save.c (save_set_all) src/show.c (show_position show_arrowstyle):
+	* src/graphics.c (map_position_double): Interpret character offsets.
+
 2004-10-20  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/gplt_x11.c (pr_font): Fix bug that whatever fallback font was used
