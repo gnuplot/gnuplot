@@ -1,5 +1,10 @@
 2000-11-02  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
+	* src/gadgets.c (draw_clip_line): fixed bug in argument ordering
+	of the clip_line() call.
+
+2000-11-02  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
 	* term/emf.trm (EMF_write_byte): change argument to type
  	'int'. Necessary if the function definitions are to be
  	K&R-compatible.

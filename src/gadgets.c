@@ -187,7 +187,7 @@ unsigned int x, y;
 /* FIXME HBB 20000522: The parameter type has to become unsigned int */
 void
 draw_clip_line(x1, y1, x2, y2)
-int x1, y1, x2, y2;
+    int x1, y1, x2, y2;
 {
     register struct termentry *t = term;
 
@@ -202,7 +202,7 @@ int x1, y1, x2, y2;
      * clip_line(), in a movement to reduce code duplication. There
      * was one very small difference between these two routines. See
      * clip_line() for a comment about it, at the relevant place. */
-    if (!clip_line(&x1,&x2,&y1,&y2))
+    if (!clip_line(&x1,&y1,&x2,&y2))
 	/* clip_line() returns zero --> segment completely outside
 	 * bounding box */
 	return;
