@@ -1,20 +1,20 @@
 #!/usr/local/bin/gnuplot -persist
-# FILE: "/home/joze/pub/gnuplot/gnuplot-MAIN/pm3d/demo/pm3dColumn.gpi"
-# LAST MODIFICATION: "Sun, 27 Jan 2002 17:46:36 +0100 (joze)"
 # (C) 2002 by Johannes Zellner, <johannes@zellner.org>
-# $Id: pm3dColumn.gpi,v 1.1 2002/01/26 21:48:13 joze Exp $
+# $Id: pm3dColumn.gpi,v 1.2 2002/01/27 16:50:50 joze Exp $
 
 sinc(u,v) = sin(sqrt(u**2+v**2)) /sqrt(u**2+v**2)
 
 # create a data file
+set term push
 set term table
 set out 'pm3dColumn.dat'
 set sam 40
 set iso 40
 splot sinc(x, y)
+set out
+set term pop
 
-set term x11
-set title "pm3d explicit mode / coloring according to 4 column"
+set title "pm3d explicit mode --- coloring according to 4 columns"
 set ticslevel 0
 
 set pm3d at s explicit solid
@@ -31,3 +31,4 @@ splot \
       # 'pm3dColumn.dat' u (1 - column(3)):2:1 notitle w pm3d
 
 pause -1 "Hit return to finish"
+
