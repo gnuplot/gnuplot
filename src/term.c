@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.85 2004/09/15 04:14:50 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.86 2004/09/15 11:13:04 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -653,7 +653,7 @@ term_start_multiplot()
 		    }
 		    break;
 		default:
-		    int_error(c_token,"did not expect anythig here");
+		    int_error(c_token,"invalid option");
 		    break;
 	    }
 	}
