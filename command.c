@@ -327,10 +327,7 @@ static int command()
 {
     FILE *fp;
     int i;
-    /* name of save or load file; size guaranteed to be at least PATH_MAX */
     char *sv_file = NULL;
-
-    sv_file = (char *) gp_alloc (PATH_MAX, "save or load file");
 
     for (i = 0; i < MAX_NUM_VAR; i++)
 	c_dummy_var[i][0] = NUL;	/* no dummy variables */
@@ -555,29 +552,29 @@ static int command()
 	    if (!isstring(++c_token))
 		int_error("expecting filename", c_token);
 	    else {
-		quote_str(sv_file, c_token, PATH_MAX-1);
-		gp_expand_tilde(sv_file,PATH_MAX-1);
+		m_quote_capture(&sv_file, c_token, c_token);
+		gp_expand_tilde(sv_file,strlen(sv_file));
 		save_functions(fopen(sv_file, "w"));
 	    }
 	} else if (almost_equals(c_token, "v$ariables")) {
 	    if (!isstring(++c_token))
 		int_error("expecting filename", c_token);
 	    else {
-		quote_str(sv_file, c_token, PATH_MAX-1);
-		gp_expand_tilde(sv_file,PATH_MAX-1);
+		m_quote_capture(&sv_file, c_token, c_token);
+		gp_expand_tilde(sv_file,strlen(sv_file));
 		save_variables(fopen(sv_file, "w"));
 	    }
 	} else if (almost_equals(c_token, "s$et")) {
 	    if (!isstring(++c_token))
 		int_error("expecting filename", c_token);
 	    else {
-		quote_str(sv_file, c_token, PATH_MAX-1);
-		gp_expand_tilde(sv_file,PATH_MAX-1);
+		m_quote_capture(&sv_file, c_token, c_token);
+		gp_expand_tilde(sv_file,strlen(sv_file));
 		save_set(fopen(sv_file, "w"));
 	    }
 	} else if (isstring(c_token)) {
-	    quote_str(sv_file, c_token, PATH_MAX-1);
-	    gp_expand_tilde(sv_file,PATH_MAX-1);
+	    m_quote_capture(&sv_file, c_token, c_token);
+	    gp_expand_tilde(sv_file,strlen(sv_file));
 	    save_all(fopen(sv_file, "w"));
 	} else {
 	    int_error("filename or keyword 'functions', 'variables', or 'set' expected", c_token);
@@ -587,8 +584,8 @@ static int command()
 	if (!isstring(++c_token))
 	    int_error("expecting filename", c_token);
 	else {
-	    quote_str(sv_file, c_token, PATH_MAX-1);
-	    gp_expand_tilde(sv_file,PATH_MAX-1);
+	    m_quote_capture(&sv_file, c_token, c_token);
+	    gp_expand_tilde(sv_file,strlen(sv_file));
 	    /* load_file(fp=fopen(sv_file, "r"), sv_file, FALSE); OLD
 	     * DBT 10/6/98 handle stdin as special case
 	     * passes it on to load_file() so that it gets
@@ -603,8 +600,8 @@ static int command()
 	if (!isstring(++c_token))
 	    int_error("expecting filename", c_token);
 	else {
-	    quote_str(sv_file, c_token, PATH_MAX-1);
-	    gp_expand_tilde(sv_file,PATH_MAX-1);
+	    m_quote_capture(&sv_file, c_token, c_token);
+	    gp_expand_tilde(sv_file,strlen(sv_file));
 	    /* Argument list follows filename */
 	    load_file(fopen(sv_file, "r"), sv_file, TRUE);
 	    /* input_line[] and token[] now destroyed! */
@@ -635,15 +632,19 @@ static int command()
 	if (!isstring(++c_token))
 	    int_error("expecting directory name", c_token);
 	else {
-	    quote_str(sv_file, c_token, MAX_LINE_LEN);
+	    m_quote_capture(&sv_file, c_token, c_token);
 	    if (changedir(sv_file)) {
 		int_error("Can't change to this directory", c_token);
 	    }
 	    c_token++;
 	}
     } else if (almost_equals(c_token, "pwd")) {
-	GP_GETCWD(sv_file, PATH_MAX);
-	fprintf(stderr, "%s\n", sv_file);
+	sv_file = (char *) gp_alloc (PATH_MAX, "print current dir");
+	if (sv_file) {
+	    GP_GETCWD(sv_file, PATH_MAX);
+	    fprintf(stderr, "%s\n", sv_file);
+	    free (sv_file); sv_file = NULL;
+	}
 	c_token++;
     } else if (almost_equals(c_token, "ex$it") ||
 	       almost_equals(c_token, "q$uit")) {
@@ -665,6 +666,10 @@ static int command()
 #endif
 	int_error("invalid command", c_token);
     }
+
+    if (sv_file)
+	free (sv_file);
+
     return (0);
 }
 
