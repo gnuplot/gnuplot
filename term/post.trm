@@ -1750,7 +1750,7 @@ START_HELP(post)
 " the size of the font in PostScript points.",
 "",
 " `default` mode sets all options to their defaults: `landscape`, `monochrome`,",
-" `dashed`, `dl 1.0`, 'lw 1.0`, `defaultplex`, `noenhanced`, \"Helvetica\" and",
+" `dashed`, `dl 1.0`, `lw 1.0`, `defaultplex`, `noenhanced`, \"Helvetica\" and",
 " 14pt.  Default size of a PostScript plot is 10 inches wide and 7 inches high.",
 "",
 " `eps` mode generates EPS (Encapsulated PostScript) output, which is just",
