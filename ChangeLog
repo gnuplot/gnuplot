@@ -1,3 +1,10 @@
+2003-12-12  Ethan Merritt  <merritt@u.washington.edu>
+
+	* docs/gnuplot.doc docs/gnuplot.texi term/post.trm term/x11.trm:
+	Update the "New in Version 4.0" section of the docs, and change all the
+	URLs for demos to point to the SourceForge web site rather than to
+	Alex Woo's old web site at nasa.gov.
+
 2003-12-05  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/x11.trm: Leave current window unchanged when closing old window

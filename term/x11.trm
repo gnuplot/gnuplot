@@ -1,5 +1,5 @@
 /*
- * $Id: x11.trm,v 1.87 2003/12/01 03:32:02 sfeam Exp $
+ * $Id: x11.trm,v 1.88 2003/12/06 06:44:40 sfeam Exp $
  *
  */
 
@@ -1624,6 +1624,7 @@ START_HELP(x11)
 "",
 " The option `title \"<title name>\"` will supply the title name of the window",
 " for the current plot window or plot window <n> if a number is given.",
+" Where (or if) this title is shown depends on your X window manager.",
 "",
 " The size or aspect ratio of a plot may be changed by resizing the `gnuplot`",
 " window.",

@@ -1,10 +1,10 @@
-C RCS $Id: gnuplot.doc,v 1.192 2003/11/30 11:20:35 mikulik Exp $
+C RCS $Id: gnuplot.doc,v 1.193 2003/12/01 08:33:42 mikulik Exp $
 C 18 September 2001
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001   Thomas Williams, Colin Kelley et al.
 C
 ^ <h2> An Interactive Plotting Program </h2><p>
 ^ <h2>  Thomas Williams & Colin Kelley</h2><p>
-^ <h2>   Version 3.8 organized by Hans-Bernhard Broeker and others</h2><p>
+^ <h2>   Version 4.0 organized by Hans-Bernhard Broeker and others</h2><p>
 ^ <h2>Major contributors (alphabetic order):</h2>
 ^<ul><h3>
 ^<li>  Hans-Bernhard Broeker
@@ -81,6 +81,9 @@ C
 
        Gnuplot 3.0 additions:
           Gershon Elber and many others.
+
+       Gnuplot 4.0 additions:
+          See list of contributors at head of this document.
 2 Introduction
 ?introduction
 ?
@@ -134,8 +137,8 @@ C
  type `help plotting`).
 
  See the simple.dem demo, also available together with other demos on the web page
-^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/simple/simple.html">
-           http://www.nas.nasa.gov/~woo/gnuplot/simple/simple.html
+^ <a href="http://gnuplot.sourceforge.net/demo/simple.html">
+           http://gnuplot.sourceforge.net/demo/simple.html
 ^ </a>
 2 Seeking-assistance
 ^ <a name="Seeking-assistance"></a>
@@ -179,9 +182,11 @@ C
  you are subscribed to the list, so that users who use news will know to email
  a reply to you.  There is a form for such postings on the WWW site.
 
-2 What is New since version 3.7
+2 What is New in Version 4.0
 ?new-features
- Gnuplot version 3.8 contains many new features.  This section lists major
+ The previous official release of gnuplot was version 3.7.  Gnuplot version 4.0
+ contains many new features, which were gradually introduced into a series of  
+ development snapshots 3.8a through 3.8k.  This section lists major
  additions and gives a partial list of changes and minor new features.
  Sample gnuplot scripts demonstrating many of these features are provided
  in the gnuplot distribution, and are referred to here by name.
@@ -200,7 +205,7 @@ C
 
  The `splot` command is now capable of plotting generates 2D and 3D surfaces 
  coloured by greyscale or color palettes. See `help pm3d`, `set palette`, 
- `set cbrange`, `set view map` and `set colorbox`.
+ `set cbrange`, `set view map`, `set colorbox` and `test palette`.
 
  Sample script: pm3d.dem
 
@@ -237,7 +242,10 @@ C
 
  Most gnuplot plot commands that produce text labels now accept modifiers to 
  specify text color, font, size, and rotation angle. See `set label`.
- Not all terminal types support these options, however.
+ Not all terminal types support these options, however.  The enhanced text
+ mode previously available for the postscript and pm terminals has been
+ extended to other terminal types as well.  Terminal types currently supported
+ include dumb, jpeg, pdf, pm, png, postscript, and x11. See `enhanced text`.
 
  Sample scripts: textcolor.dem textrotate.dem
 
@@ -270,13 +278,15 @@ C
 
  The X-windows driver now allows you to specify fonts, text rotation, and text
  color.  It also allows interaction with the current plot using the mouse and 
- hotkeys. See `set term x11 x11_fonts`.
+ hotkeys. See `set term x11 x11_fonts`.  There is no longer a limit to the 
+ number of x11 plot windows opened simultaneously, and each plot window can be
+ given its own title.  See `set term x11`.
 
 3 Other changes and additions
 
  The preferred syntax to undo a command `set <something>` is now 
  `unset <something>` rather than `set no<something>`. The older form has been
- deprecated.  Version 3.8 continues to allow the older syntax, but such 
+ deprecated.  Version 4.0 continues to allow the older syntax, but such 
  backwards compatibility may be lost in future versions.
 
  Commands of the form `set <something> <style>` also are deprectated in favor
@@ -1032,7 +1042,7 @@ C
  to fits or datafile plots.  See `plot datafile using`.
 @end table
  See also
-^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/airfoil/airfoil.html">
+^ <a href="http://gnuplot.sourceforge.net/demo/airfoil.html">
  airfoil.dem: use of functions and complex variables for airfoils demo.
 ^ </a>
 3 Operators
@@ -1204,7 +1214,7 @@ C ... and restart the table:
  and undefined elsewhere:
        f(x) = 0<=x && x<1 ? sin(x) : 1<=x && x<2 ? 1/x : 1/0
        plot f(x)
-^ <img align=bottom src="http://www.nas.nasa.gov/~woo/gnuplot/doc/ternary.gif" alt="[ternary.gif]" width=640 height=480>
+^ <img align=bottom src="http://gnuplot.sourceforge.net/doc/ternary.gif" alt="[ternary.gif]" width=640 height=480>
  Note that `gnuplot` quietly ignores undefined values, so the final branch of
  the function (1/0) will produce no plottable points.  Note also that f(x)
  will be plotted as a continuous function across the discontinuity if a line
@@ -1244,7 +1254,7 @@ C ... and restart the table:
        len3d(x,y,z) = sqrt(x*x+y*y+z*z)
        plot f(x) = sin(x*a), a = 0.2, f(x), a = 0.4, f(x)
 
-^ <img align=bottom src="http://www.nas.nasa.gov/~woo/gnuplot/doc/userdefined.gif" alt="[userdefined.gif]" width=640 height=480>
+^ <img align=bottom src="http://gnuplot.sourceforge.net/doc/userdefined.gif" alt="[userdefined.gif]" width=640 height=480>
  Note that the variable `pi` is already defined.  But it is in no way magic;
  you may redefine it to be whatever you like.
 
@@ -2471,11 +2481,11 @@ C ... and restart the table:
        every ::5::15    # selects points 5 through 15 in each block
 
  See
-^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/simple/simple.html"> simple plot demos (simple.dem) </a>
+^ <a href="http://gnuplot.sourceforge.net/demo/simple.html"> simple plot demos (simple.dem) </a>
  ,
-^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/surfacea/surfacea.html">Non-parametric splot demos </a>
+^ <a href="http://gnuplot.sourceforge.net/demo/surfacea.html">Non-parametric splot demos </a>
  , and
-^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/surfaceb/surfaceb.html">Parametric splot demos</a>
+^ <a href="http://gnuplot.sourceforge.net/demo/surfaceb.html">Parametric splot demos</a>
  .
 4 example datafile
 ?commands plot datafile example
@@ -2499,7 +2509,7 @@ C ... and restart the table:
           1980   24
           1985   10
 
-^ <img align=bottom src="http://www.nas.nasa.gov/~woo/gnuplot/doc/population.gif" alt="[population.gif]" width=640 height=480>
+^ <img align=bottom src="http://gnuplot.sourceforge.net/doc/population.gif" alt="[population.gif]" width=640 height=480>
 4 index
 ?commands plot datafile index
 ?plot datafile index
@@ -2524,7 +2534,7 @@ C ... and restart the table:
        plot 'file' index 4:5
 
 ^ See also web page
-^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/multimsh/multimsh.html"> splot with indices demo. </a>
+^ <a href="http://gnuplot.sourceforge.net/demo/multimsh.html"> splot with indices demo. </a>
 4 smooth
 ?commands plot datafile smooth
 ?plot datafile smooth
@@ -2637,7 +2647,7 @@ C ... and restart the table:
  x-value are replaced by a single point having the average y-value.  The
  resulting points are then connected by straight line segments.
 ^ See this
-^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/mgr/mgr.html">
+^ <a href="http://gnuplot.sourceforge.net/demo/mgr.html">
  demos
 ^ </a>
 ^ web page.
@@ -2868,7 +2878,7 @@ C ... and restart the table:
  However, if you want to leave text in your data files, it is safer to put the
  comment character (#) in the first column of the text lines.
 ^ See also the web page
-^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/using/using.html">
+^ <a href="http://gnuplot.sourceforge.net/demo/using.html">
  Feeble using demos.
 ^ </a>
 3 errorbars
@@ -2918,7 +2928,7 @@ C ... and restart the table:
 
  If autoscaling is on, the ranges will be adjusted to include the error bars.
  See also
-^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/errorbar/errorbar.html">
+^ <a href="http://gnuplot.sourceforge.net/demo/errorbar.html">
  errorbar demos.
 ^ </a>
 
@@ -2992,7 +3002,7 @@ C ... and restart the table:
        plot sin(t),t**2 title 'Parametric example' with linespoints
 
  See also
-^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/param/param.html">
+^ <a href="http://gnuplot.sourceforge.net/demo/param.html">
  Parametric Mode Demos.
 ^ </a>
 3 ranges
@@ -3066,7 +3076,7 @@ C ... and restart the table:
        plot ["1/6/93 12:00":"5/6/93 12:00"] 'timedata.dat'
 
  See also
-^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/ranges/ranges.html">
+^ <a href="http://gnuplot.sourceforge.net/demo/ranges.html">
  ranges demo.
 ^ </a>
 3 title
@@ -3236,7 +3246,7 @@ C ... and restart the table:
        splot x*x-y*y with pm3d, x*x+y*y with pm3d at t
 
  See `set style` to change the default styles. See also
-^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/styles/styles.html">
+^ <a href="http://gnuplot.sourceforge.net/demo/styles.html">
  styles demos.
 ^ </a>
 2 print
@@ -3334,7 +3344,7 @@ C ... and restart the table:
  each other in multiplot mode) will have exactly the same axes.  The linetype
  must be specified; otherwise all the plots would be drawn with the same type.
  See also
-^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/animate/animate.html">
+^ <a href="http://gnuplot.sourceforge.net/demo/animate.html">
  Reread Animation Demo (animate.dem).
 ^ </a>
 2 reset
@@ -3458,7 +3468,7 @@ C ... and restart the table:
        print y         #prints {1.16933, 0.154051}
        print asinh(y)  #prints {57.29578, 5.729578}
  See also
-^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/poldat/poldat.html">
+^ <a href="http://gnuplot.sourceforge.net/demo/poldat.html">
  poldat.dem: polar plot using `set angles` demo.
 ^ </a>
 3 arrow
@@ -3565,7 +3575,7 @@ C ... and restart the table:
  To show all arrows (in tag order), use:
        show arrow
  See also 
-^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/arrows/arrows.html"> 
+^ <a href="http://gnuplot.sourceforge.net/demo/arrows.html"> 
  arrows demos.
 ^ </a>
 3 autoscale
@@ -3694,7 +3704,7 @@ C ... and restart the table:
  Explicitly setting one or two ranges but not others may lead to unexpected
  results.
  See also
-^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/poldat/poldat.html">
+^ <a href="http://gnuplot.sourceforge.net/demo/poldat.html">
  polar demos.
 ^ </a>
 3 bars
@@ -3836,7 +3846,7 @@ C ... and restart the table:
        unset xtics; unset ytics; set x2tics; set y2tics; set border 12
 
  See also
-^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/borders/borders.html">
+^ <a href="http://gnuplot.sourceforge.net/demo/borders.html">
  borders demo.
 ^ </a>
 3 boxwidth
@@ -4057,11 +4067,11 @@ C ... and restart the table:
  `set clabel` for control of the format of the contour labels and linetypes.
 
  See also
-^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/contours/contours.html">
+^ <a href="http://gnuplot.sourceforge.net/demo/contours.html">
  contours demo (contours.dem)
 ^ </a>
  and
-^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/discrete/discrete.html">
+^ <a href="http://gnuplot.sourceforge.net/demo/discrete.html">
  contours with user defined levels demo (discrete.dem).
 ^ </a>
 3 color box
@@ -4172,11 +4182,11 @@ C ... and restart the table:
  If contours are desired from non-grid data, `set dgrid3d` can be used to
  create an appropriate grid.  See `set dgrid3d` for more information.
  See also
-^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/contours/contours.html">
+^ <a href="http://gnuplot.sourceforge.net/demo/contours.html">
  contours demo (contours.dem)
 ^ </a>
  and
-^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/discrete/discrete.html">
+^ <a href="http://gnuplot.sourceforge.net/demo/discrete.html">
  contours with user defined levels demo (discrete.dem).
 ^ </a>
 3 data style
@@ -4376,7 +4386,7 @@ C ... and restart the table:
  a norm value of 1 in the weight computation.  The second only modifies the
  norm, changing it to 4.
  See also
-^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/scatter/scatter.html">
+^ <a href="http://gnuplot.sourceforge.net/demo/scatter.html">
  scatter.dem: dgrid3d demo.
 ^ </a>
 
@@ -4555,7 +4565,7 @@ C ... and restart the table:
  `set decimalsign` for how to use non-default decimal separators in numbers
  printed this way.
  See also
-^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/electron/electron.html">
+^ <a href="http://gnuplot.sourceforge.net/demo/electron.html">
  electron demo (electron.dem).
 ^ </a>
 4 format specifiers
@@ -4769,11 +4779,11 @@ C ... and restart the table:
  For information about the definition and usage of functions in `gnuplot`,
  please see `expressions`.
  See also
-^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/spline/spline.html">
+^ <a href="http://gnuplot.sourceforge.net/demo/spline.html">
  splines as user defined functions (spline.dem)
 ^ </a>
  and
-^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/airfoil/airfoil.html">
+^ <a href="http://gnuplot.sourceforge.net/demo/airfoil.html">
  use of functions and complex variables for airfoils (airfoil.dem).
 ^ </a>
 3 grid
@@ -4934,11 +4944,11 @@ C ... and restart the table:
  default option of `bentover` will turn it visible in this case.  If you don't
  want that, you may choose `nobentover` instead.
  See also
-^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/hidden/hidden.html">
+^ <a href="http://gnuplot.sourceforge.net/demo/hidden.html">
  hidden line removal demo (hidden.dem)
 ^ </a>
  and
-^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/singulr/singulr.html">
+^ <a href="http://gnuplot.sourceforge.net/demo/singulr.html">
  complex hidden line demo (singulr.dem).
 ^ </a>
 3 historysize
@@ -5069,7 +5079,7 @@ C ... and restart the table:
  same justification as do the plot titles.
 
  An explicitly given title is typeset using enhanced text properties on
- terminals supporting this, see `enhanced postscript` for more details.
+ terminals supporting this, see `enhanced text` for more details.
  This default behavior can be switched off by the `noenhanced` option.
 
  The defaults for `set key` are `on`, `right`, `top`, `Right`, `noreverse`,
@@ -5397,7 +5407,7 @@ C ... and restart the table:
 
  `mapping` has no effect on `plot`.
 ^ See also
-^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/world/world.html">
+^ <a href="http://gnuplot.sourceforge.net/demo/world.html">
  world.dem: mapping demos.
 ^ </a>
 3 margin
@@ -5598,7 +5608,7 @@ C ... and restart the table:
  will depend on the screen size of the display device, e.g., perhaps quite
  different on a video display and a printer.
  See also
-^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/multiplot/multiplt.html">
+^ <a href="http://gnuplot.sourceforge.net/demo/multiplot.html">
  multiplot demo (multiplt.dem).
 ^ </a>
 3 mx2tics
@@ -5975,7 +5985,7 @@ C ... and restart the table:
  algorithm to the 4x4 grid of data points in script `demo/pm3d.dem` (please have
  a look) produces only (4-1)x(4-1)=9 colored rectangles.
 
- Another drawing algorithm, which would draw qudrangles around a given node
+ Another drawing algorithm, which would draw quadrangles around a given node
  by taking corners from averaged (x,y)-coordinates of its surrounding 4 nodes
  while using node's color, could be implemented in the future.
 
@@ -6240,7 +6250,7 @@ C ... and restart the table:
 
  To produce a gray palette (useless but instructive) use:
       set palette model RGB
-      set pallette defined ( 0 "black", 1 "white" )
+      set palette defined ( 0 "black", 1 "white" )
 
  To produce a blue yellow red palette use (all equivalent):
        set palette defined ( 0 "blue", 1 "yellow", 2 "red" )
@@ -6273,7 +6283,7 @@ C ... and restart the table:
  on the variable `gray` which will take values in [0,1] and should also
  produce values in [0,1].
  Please note that <Rexpr> might be a formula for the H-value if HSV color
- space has been choosen (same for all other formulae and color spaces).
+ space has been chosen (same for all other formulae and color spaces).
 
  Examples:
 
@@ -6459,11 +6469,11 @@ C ... and restart the table:
  You may want to `set size square` to have `gnuplot` try to make the aspect
  ratio equal to unity, so that circles look circular.
  See also
-^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/polar/polar.html">
+^ <a href="http://gnuplot.sourceforge.net/demo/polar.html">
  polar demos (polar.dem)
 ^ </a>
  and
-^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/poldat/poldat.html">
+^ <a href="http://gnuplot.sourceforge.net/demo/poldat.html">
  polar data plot (poldat.dem).
 ^ </a>
 3 print
@@ -6583,7 +6593,7 @@ C ... and restart the table:
        set size ratio 2
 
  See also
-^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/airfoil/airfoil.html">
+^ <a href="http://gnuplot.sourceforge.net/demo/airfoil.html">
   airfoil demo.
 ^ </a>
 3 style
@@ -6897,7 +6907,7 @@ C ... and restart the table:
  the `yerrorbars` style---either from y-ydelta to y+ydelta or from ylow to
  yhigh, depending on how many data columns are provided.
  See also
-^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/errorbar/errorbar.html">
+^ <a href="http://gnuplot.sourceforge.net/demo/errorbar.html">
  errorbar demo.
 ^ </a>
 5 boxes
@@ -7039,7 +7049,7 @@ C ... and restart the table:
  vertical bars if (close > open). If filled-boxes support is present, then
  the rectangle is colored according to `set style fill <fillstyle>`.
  See `set bars` and `financebars`.  See also
-^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/finance/finance.html">
+^ <a href="http://gnuplot.sourceforge.net/demo/finance.html">
  finance demos.
 ^ </a>
 
@@ -7076,7 +7086,7 @@ C ... and restart the table:
  closing price.  The length of these tics may be changed by `set bars`.  The
  symbol will be unchanged if the high and low prices are interchanged.
  See `set bars` and `candlesticks`, and also the
-^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/finance/finance.html">
+^ <a href="http://gnuplot.sourceforge.net/demo/finance.html">
  finance demo.
 ^ </a>
 5 fsteps
@@ -7089,7 +7099,7 @@ C ... and restart the table:
  points with two line segments: the first from (x1,y1) to (x1,y2) and the
  second from (x1,y2) to (x2,y2).
  See also
-^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/steps/steps.html">
+^ <a href="http://gnuplot.sourceforge.net/demo/steps.html">
  steps demo.
 ^ </a>
 5 histeps
@@ -7108,7 +7118,7 @@ C ... and restart the table:
  If `autoscale` is in effect, it selects the xrange from the data rather than
  the steps, so the end points will appear only half as wide as the others.
  See also
-^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/steps/steps.html">
+^ <a href="http://gnuplot.sourceforge.net/demo/steps.html">
  steps demo.
 ^ </a>
 
@@ -7165,7 +7175,7 @@ C ... and restart the table:
  points with two line segments: the first from (x1,y1) to (x2,y1) and the
  second from (x2,y1) to (x2,y2).
  See also
-^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/steps/steps.html">
+^ <a href="http://gnuplot.sourceforge.net/demo/steps.html">
  steps demo.
 ^ </a>
 5 vectors
@@ -7231,7 +7241,7 @@ C ... and restart the table:
  A tic mark is placed at the ends of the error bar (unless `set bars` is
  used---see `set bars` for details).
  See also
-^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/errorbar/errorbar.html">
+^ <a href="http://gnuplot.sourceforge.net/demo/errorbar.html">
  errorbar demo.
 ^ </a>
 5 xerrorlines
@@ -7284,7 +7294,7 @@ C ... and restart the table:
  ends of the error bar (unless `set bars` is used---see `set bars` for
  details).
  See also
-^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/errorbar/errorbar.html">
+^ <a href="http://gnuplot.sourceforge.net/demo/errorbar.html">
  errorbar demo.
 ^ </a>
 3 surface
@@ -7532,7 +7542,7 @@ C ... and restart the table:
  your data---what began as a tab may have been converted to spaces somewhere
  along the line; the format string must match what is actually in the file.)
  See also
-^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/timedat/timedat.html">
+^ <a href="http://gnuplot.sourceforge.net/demo/timedat.html">
  time data demo.
 ^ </a>
 3 title
@@ -8490,7 +8500,7 @@ C ... and restart the table:
  instead of two.
 
  The `plot` options `thru` and `smooth` are not available for `splot`, but
- `cntrparam` and `dgrid3d` provide limited smoothing cabilities.
+ `cntrparam` and `dgrid3d` provide limited smoothing capabilities.
 
  Data file organization is essentially the same as for `plot`, except that
  each point is an (x,y,z) triple.  If only a single value is provided, it
@@ -8558,7 +8568,7 @@ C ... and restart the table:
  surface per file.  The `every` and `using` filters are supported.  `using`
  operates as if the data were read in the above triplet form.
  See also
-^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/binary/binary.html">
+^ <a href="http://gnuplot.sourceforge.net/demo/binary.html">
  Binary File Splot Demo.
 ^ </a>
 4 example datafile
@@ -8591,7 +8601,7 @@ C ... and restart the table:
  Note that "datafile.dat" defines a 4 by 3 grid ( 4 rows of 3 points each ).
  Rows (datablocks) are separated by blank records.
 
-^ <img align=bottom src="http://www.nas.nasa.gov/~woo/gnuplot/doc/splot.gif" alt="[splot.gif]" width=640 height=480>
+^ <img align=bottom src="http://gnuplot.sourceforge.net/doc/splot.gif" alt="[splot.gif]" width=640 height=480>
  Note also that the x value is held constant within each dataline.  If you
  instead keep y constant, and plot with hidden-line removal enabled, you will
  find that the surface is drawn 'inside-out'.

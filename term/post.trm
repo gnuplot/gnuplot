@@ -1,5 +1,5 @@
 /*
- * $Id: post.trm,v 1.95 2003/11/14 16:56:47 sfeam Exp $
+ * $Id: post.trm,v 1.96 2003/12/01 03:31:48 sfeam Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -2692,6 +2692,8 @@ START_HELP(post)
 "?enhanced_postscript",
 "?enhanced postscript",
 "?Enhanced postscript",
+"?enhanced text",
+"?Enhanced text",
 "?enhanced",
 " Several terminal types support an enhanced text mode in which ",
 " additional formatting information is embedded in the text string.",

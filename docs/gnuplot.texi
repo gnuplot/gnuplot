@@ -41,7 +41,7 @@ Major contributors (alphabetic order):
 
 @c ^ <h2> An Interactive Plotting Program </h2><p>
 @c ^ <h2>  Thomas Williams & Colin Kelley</h2><p>
-@c ^ <h2>   Version 3.8 organized by Hans-Bernhard Broeker and others</h2><p>
+@c ^ <h2>   Version 4.0 organized by Hans-Bernhard Broeker and others</h2><p>
 @c ^ <h2>Major contributors (alphabetic order):</h2>
 
 @itemize @bullet
@@ -121,7 +121,7 @@ Johannes Zellner
 * Copyright::                   
 * Introduction::                
 * Seeking-assistance::          
-* What_is_New_since_version_3.7::  
+* What_is_New_in_Version_4.0::  
 * Batch/Interactive_Operation::  
 * Command-line-editing::        
 * Comments::                    
@@ -202,6 +202,12 @@ to the extent permitted by applicable law.
 
 @end example
 
+@example
+      Gnuplot 4.0 additions:
+         See list of contributors at head of this document.
+
+@end example
+
 @node Introduction, Seeking-assistance, Copyright, gnuplot
 @section Introduction
 
@@ -261,10 +267,10 @@ The new `gnuplot` user should begin by reading about `plotting` (if on-line,
 type `help plotting`).
 
 See the simple.dem demo, also available together with other demos on the web page
-@uref{http://www.nas.nasa.gov/~woo/gnuplot/simple/simple.html,http://www.nas.nasa.gov/~woo/gnuplot/simple/simple.html
+@uref{http://gnuplot.sourceforge.net/demo/simple.html,http://gnuplot.sourceforge.net/demo/simple.html
 }
 
-@node Seeking-assistance, What_is_New_since_version_3.7, Introduction, gnuplot
+@node Seeking-assistance, What_is_New_in_Version_4.0, Introduction, gnuplot
 @section Seeking-assistance
 
 ^ <a name="Seeking-assistance"></a>
@@ -323,12 +329,14 @@ you are subscribed to the list, so that users who use news will know to email
 a reply to you.  There is a form for such postings on the WWW site.
 
 
-@node What_is_New_since_version_3.7, Batch/Interactive_Operation, Seeking-assistance, gnuplot
-@section What is New since version 3.7
+@node What_is_New_in_Version_4.0, Batch/Interactive_Operation, Seeking-assistance, gnuplot
+@section What is New in Version 4.0
 
 @cindex new-features
 
-Gnuplot version 3.8 contains many new features.  This section lists major
+The previous official release of gnuplot was version 3.7.  Gnuplot version 4.0
+contains many new features, which were gradually introduced into a series of  
+development snapshots 3.8a through 3.8k.  This section lists major
 additions and gives a partial list of changes and minor new features.
 Sample gnuplot scripts demonstrating many of these features are provided
 in the gnuplot distribution, and are referred to here by name.
@@ -349,7 +357,7 @@ in the gnuplot distribution, and are referred to here by name.
 * Other_changes_and_additions::  
 @end menu
 
-@node Mouse_support, New_plotting_style_PM3D, What_is_New_since_version_3.7, What_is_New_since_version_3.7
+@node Mouse_support, New_plotting_style_PM3D, What_is_New_in_Version_4.0, What_is_New_in_Version_4.0
 @subsection Mouse support
 
 
@@ -362,18 +370,18 @@ the documentation for individual mousing terminals `ggi`, `pm`, `windows` and
 Sample script: mousevariables.dem
 
 
-@node New_plotting_style_PM3D, New_terminal_types, Mouse_support, What_is_New_since_version_3.7
+@node New_plotting_style_PM3D, New_terminal_types, Mouse_support, What_is_New_in_Version_4.0
 @subsection New plotting style PM3D
 
 
 The `splot` command is now capable of plotting generates 2D and 3D surfaces 
 coloured by greyscale or color palettes. See @ref{pm3d}, @ref{palette}, 
-@ref{cbrange}, `set view map` and `set colorbox`.
+@ref{cbrange}, `set view map`, `set colorbox` and @ref{palette}.
 
 Sample script: pm3d.dem
 
 
-@node New_terminal_types, New_plot_style_`filledcurves`, New_plotting_style_PM3D, What_is_New_since_version_3.7
+@node New_terminal_types, New_plot_style_`filledcurves`, New_plotting_style_PM3D, What_is_New_in_Version_4.0
 @subsection New terminal types
 
 
@@ -389,14 +397,14 @@ Sample script: pm3d.dem
 @end example
 
 
-@node New_plot_style_`filledcurves`, Filled_boxes, New_terminal_types, What_is_New_since_version_3.7
+@node New_plot_style_`filledcurves`, Filled_boxes, New_terminal_types, What_is_New_in_Version_4.0
 @subsection New plot style `filledcurves`
 
 
 Sample script: fillcrvs.dem
 
 
-@node Filled_boxes, New_plot_option_smooth_frequency, New_plot_style_`filledcurves`, What_is_New_since_version_3.7
+@node Filled_boxes, New_plot_option_smooth_frequency, New_plot_style_`filledcurves`, What_is_New_in_Version_4.0
 @subsection Filled boxes
 
 
@@ -407,7 +415,7 @@ contains boxes. See `boxes`, `boxerrorbars`, `boxxyerrorbars`,
 Sample scripts: fillstyle.dem candlesticks.dem
 
 
-@node New_plot_option_smooth_frequency, Improved_text_options, Filled_boxes, What_is_New_since_version_3.7
+@node New_plot_option_smooth_frequency, Improved_text_options, Filled_boxes, What_is_New_in_Version_4.0
 @subsection New plot option smooth frequency
 
 
@@ -417,18 +425,21 @@ or approximation of data.  See @ref{smooth}, `frequency`, `unique`.
 Sample scripts: step.dem mgr.dem
 
 
-@node Improved_text_options, Data_file_format, New_plot_option_smooth_frequency, What_is_New_since_version_3.7
+@node Improved_text_options, Data_file_format, New_plot_option_smooth_frequency, What_is_New_in_Version_4.0
 @subsection Improved text options
 
 
 Most gnuplot plot commands that produce text labels now accept modifiers to 
 specify text color, font, size, and rotation angle. See @ref{label}.
-Not all terminal types support these options, however.
+Not all terminal types support these options, however.  The enhanced text
+mode previously available for the postscript and pm terminals has been
+extended to other terminal types as well.  Terminal types currently supported
+include dumb, jpeg, pdf, pm, png, postscript, and x11. See `enhanced text`.
 
 Sample scripts: textcolor.dem textrotate.dem
 
 
-@node Data_file_format, Arrows, Improved_text_options, What_is_New_since_version_3.7
+@node Data_file_format, Arrows, Improved_text_options, What_is_New_in_Version_4.0
 @subsection Data file format
 
 
@@ -440,7 +451,7 @@ datafile format settings.  This allows input from csv (comma-separated value)
 files. See `set datafile`.
 
 
-@node Arrows, PostScript_output_features, Data_file_format, What_is_New_since_version_3.7
+@node Arrows, PostScript_output_features, Data_file_format, What_is_New_in_Version_4.0
 @subsection Arrows
 
 
@@ -451,7 +462,7 @@ See @ref{arrow}, `plotting styles vectors`.
 Sample script: arrowstyle.dem
 
 
-@node PostScript_output_features, X11_output_features, Arrows, What_is_New_since_version_3.7
+@node PostScript_output_features, X11_output_features, Arrows, What_is_New_in_Version_4.0
 @subsection PostScript output features
 
 
@@ -462,22 +473,24 @@ CP-852 character encodings. See `postscript fontfile`.
 Sample script: fontfile.dem
 
 
-@node X11_output_features, Other_changes_and_additions, PostScript_output_features, What_is_New_since_version_3.7
+@node X11_output_features, Other_changes_and_additions, PostScript_output_features, What_is_New_in_Version_4.0
 @subsection X11 output features
 
 
 The X-windows driver now allows you to specify fonts, text rotation, and text
 color.  It also allows interaction with the current plot using the mouse and 
-hotkeys. See `set term x11 x11_fonts`.
+hotkeys. See `set term x11 x11_fonts`.  There is no longer a limit to the 
+number of x11 plot windows opened simultaneously, and each plot window can be
+given its own title.  See `set term x11`.
 
 
-@node Other_changes_and_additions,  , X11_output_features, What_is_New_since_version_3.7
+@node Other_changes_and_additions,  , X11_output_features, What_is_New_in_Version_4.0
 @subsection Other changes and additions
 
 
 The preferred syntax to undo a command `set <something>` is now 
 `unset <something>` rather than `set no<something>`. The older form has been
-deprecated.  Version 3.8 continues to allow the older syntax, but such 
+deprecated.  Version 4.0 continues to allow the older syntax, but such 
 backwards compatibility may be lost in future versions.
 
 Commands of the form `set <something> <style>` also are deprectated in favor
@@ -504,7 +517,7 @@ New commands `set term push` and `set term pop`.
 The `load` command accepts piped input.
 
 
-@node Batch/Interactive_Operation, Command-line-editing, What_is_New_since_version_3.7, gnuplot
+@node Batch/Interactive_Operation, Command-line-editing, What_is_New_in_Version_4.0, gnuplot
 @section Batch/Interactive Operation
 
 @cindex batch/interactive
@@ -625,7 +638,7 @@ The Atari version of readline defines some additional key aliases:
       Ctrl Home       - same as ^E.
       Esc             - same as ^U.
       Help            - @ref{help} plus return.
-      Ctrl Help       - `help `.
+      Ctrl Help       - @ref{help}.
 
 @end example
 
@@ -1454,7 +1467,7 @@ The @ref{tm_year} function interprets its argument as a time, in seconds from
 to fits or datafile plots.  See @ref{using}.
 
 See also
-@uref{http://www.nas.nasa.gov/~woo/gnuplot/airfoil/airfoil.html,airfoil.dem: use of functions and complex variables for airfoils demo.
+@uref{http://gnuplot.sourceforge.net/demo/airfoil.html,airfoil.dem: use of functions and complex variables for airfoils demo.
 }
 
 @node Operators, User-defined, Functions, Expressions
@@ -1578,7 +1591,7 @@ and undefined elsewhere:
       plot f(x)
 @end example
 
-@c ^ <img align=bottom src="http://www.nas.nasa.gov/~woo/gnuplot/doc/ternary.gif" alt="[ternary.gif]" width=640 height=480>
+@c ^ <img align=bottom src="http://gnuplot.sourceforge.net/doc/ternary.gif" alt="[ternary.gif]" width=640 height=480>
 Note that `gnuplot` quietly ignores undefined values, so the final branch of
 the function (1/0) will produce no plottable points.  Note also that f(x)
 will be plotted as a continuous function across the discontinuity if a line
@@ -1637,7 +1650,7 @@ Examples:
 
 @end example
 
-@c ^ <img align=bottom src="http://www.nas.nasa.gov/~woo/gnuplot/doc/userdefined.gif" alt="[userdefined.gif]" width=640 height=480>
+@c ^ <img align=bottom src="http://gnuplot.sourceforge.net/doc/userdefined.gif" alt="[userdefined.gif]" width=640 height=480>
 Note that the variable `pi` is already defined.  But it is in no way magic;
 you may redefine it to be whatever you like.
 
@@ -3279,11 +3292,11 @@ Examples:
 @end example
 
 See
-@uref{http://www.nas.nasa.gov/~woo/gnuplot/simple/simple.html,simple plot demos (simple.dem) }
+@uref{http://gnuplot.sourceforge.net/demo/simple.html,simple plot demos (simple.dem) }
 ,
-@uref{http://www.nas.nasa.gov/~woo/gnuplot/surfacea/surfacea.html,Non-parametric splot demos }
+@uref{http://gnuplot.sourceforge.net/demo/surfacea.html,Non-parametric splot demos }
 , and
-@uref{http://www.nas.nasa.gov/~woo/gnuplot/surfaceb/surfaceb.html,Parametric splot demos}
+@uref{http://gnuplot.sourceforge.net/demo/surfaceb.html,Parametric splot demos}
 .
 
 @node example_datafile, index, every, data-file
@@ -3317,7 +3330,7 @@ The file "population.dat" might contain:
 
 @end example
 
-@c ^ <img align=bottom src="http://www.nas.nasa.gov/~woo/gnuplot/doc/population.gif" alt="[population.gif]" width=640 height=480>
+@c ^ <img align=bottom src="http://gnuplot.sourceforge.net/doc/population.gif" alt="[population.gif]" width=640 height=480>
 
 @node index, smooth, example_datafile, data-file
 @subsubsection index
@@ -3352,7 +3365,7 @@ Example:
 @end example
 
 @c ^ See also web page
-@uref{http://www.nas.nasa.gov/~woo/gnuplot/multimsh/multimsh.html,splot with indices demo. }
+@uref{http://gnuplot.sourceforge.net/demo/multimsh.html,splot with indices demo. }
 
 @node smooth, special-filenames, index, data-file
 @subsubsection smooth
@@ -3498,7 +3511,7 @@ The `unique` option makes the data monotonic in x; points with the same
 x-value are replaced by a single point having the average y-value.  The
 resulting points are then connected by straight line segments.
 @c ^ See this
-@uref{http://www.nas.nasa.gov/~woo/gnuplot/mgr/mgr.html,demos
+@uref{http://gnuplot.sourceforge.net/demo/mgr.html,demos
 }
 @c ^ web page.
 
@@ -3792,7 +3805,7 @@ the top simply by specifying
 However, if you want to leave text in your data files, it is safer to put the
 comment character (#) in the first column of the text lines.
 @c ^ See also the web page
-@uref{http://www.nas.nasa.gov/~woo/gnuplot/using/using.html,Feeble using demos.
+@uref{http://gnuplot.sourceforge.net/demo/using.html,Feeble using demos.
 }
 
 @node errorbars, errorlines, data-file, plot
@@ -3851,7 +3864,7 @@ The error bars have crossbars at each end unless @ref{bars} is used
 
 If autoscaling is on, the ranges will be adjusted to include the error bars.
 See also
-@uref{http://www.nas.nasa.gov/~woo/gnuplot/errorbar/errorbar.html,errorbar demos.
+@uref{http://gnuplot.sourceforge.net/demo/errorbar.html,errorbar demos.
 }
 
 See @ref{using}, @ref{with}, and @ref{style} for more information.
@@ -3943,7 +3956,7 @@ parametric function has been completed:
 @end example
 
 See also
-@uref{http://www.nas.nasa.gov/~woo/gnuplot/param/param.html,Parametric Mode Demos.
+@uref{http://gnuplot.sourceforge.net/demo/param.html,Parametric Mode Demos.
 }
 
 @node ranges, title, parametric, plot
@@ -4046,7 +4059,7 @@ This sets the x range for a timeseries:
 @end example
 
 See also
-@uref{http://www.nas.nasa.gov/~woo/gnuplot/ranges/ranges.html,ranges demo.
+@uref{http://gnuplot.sourceforge.net/demo/ranges.html,ranges demo.
 }
 
 @node title, with, ranges, plot
@@ -4282,7 +4295,7 @@ This plots two color surfaces at different altitudes:
 @end example
 
 See @ref{style} to change the default styles. See also
-@uref{http://www.nas.nasa.gov/~woo/gnuplot/styles/styles.html,styles demos.
+@uref{http://gnuplot.sourceforge.net/demo/styles.html,styles demos.
 }
 
 @node print, pwd, plot, Commands
@@ -4427,7 +4440,7 @@ set explicitly to guarantee that the five separate graphs (drawn on top of
 each other in multiplot mode) will have exactly the same axes.  The linetype
 must be specified; otherwise all the plots would be drawn with the same type.
 See also
-@uref{http://www.nas.nasa.gov/~woo/gnuplot/animate/animate.html,Reread Animation Demo (animate.dem).
+@uref{http://gnuplot.sourceforge.net/demo/animate.html,Reread Animation Demo (animate.dem).
 }
 
 @node reset, save, reread, Commands
@@ -4705,7 +4718,7 @@ but
 @end example
 
 See also
-@uref{http://www.nas.nasa.gov/~woo/gnuplot/poldat/poldat.html,poldat.dem: polar plot using @ref{angles} demo.
+@uref{http://gnuplot.sourceforge.net/demo/poldat.html,poldat.dem: polar plot using @ref{angles} demo.
 }
 
 @node arrow, autoscale, angles, set-show
@@ -4848,7 +4861,7 @@ To show all arrows (in tag order), use:
 @end example
 
 See also 
-@uref{http://www.nas.nasa.gov/~woo/gnuplot/arrows/arrows.html,arrows demos.
+@uref{http://gnuplot.sourceforge.net/demo/arrows.html,arrows demos.
 }
 
 @node autoscale, bars, arrow, set-show
@@ -5018,7 +5031,7 @@ a polar plot of only that single quadrant.
 Explicitly setting one or two ranges but not others may lead to unexpected
 results.
 See also
-@uref{http://www.nas.nasa.gov/~woo/gnuplot/poldat/poldat.html,polar demos.
+@uref{http://gnuplot.sourceforge.net/demo/poldat.html,polar demos.
 }
 
 @node bars, bmargin, autoscale, set-show
@@ -5172,7 +5185,7 @@ Draw only the top and right borders for a `plot` and label them as axes:
 @end example
 
 See also
-@uref{http://www.nas.nasa.gov/~woo/gnuplot/borders/borders.html,borders demo.
+@uref{http://gnuplot.sourceforge.net/demo/borders.html,borders demo.
 }
 
 @node boxwidth, clabel, border, set-show
@@ -5474,10 +5487,10 @@ See also @ref{contour} for control of where the contours are drawn, and
 @ref{clabel} for control of the format of the contour labels and linetypes.
 
 See also
-@uref{http://www.nas.nasa.gov/~woo/gnuplot/contours/contours.html,contours demo (contours.dem)
+@uref{http://gnuplot.sourceforge.net/demo/contours.html,contours demo (contours.dem)
 }
 and
-@uref{http://www.nas.nasa.gov/~woo/gnuplot/discrete/discrete.html,contours with user defined levels demo (discrete.dem).
+@uref{http://gnuplot.sourceforge.net/demo/discrete.html,contours with user defined levels demo (discrete.dem).
 }
 
 @node color_box, contour, cntrparam, set-show
@@ -5613,10 +5626,10 @@ See also `splot datafile`.
 If contours are desired from non-grid data, @ref{dgrid3d} can be used to
 create an appropriate grid.  See @ref{dgrid3d} for more information.
 See also
-@uref{http://www.nas.nasa.gov/~woo/gnuplot/contours/contours.html,contours demo (contours.dem)
+@uref{http://gnuplot.sourceforge.net/demo/contours.html,contours demo (contours.dem)
 }
 and
-@uref{http://www.nas.nasa.gov/~woo/gnuplot/discrete/discrete.html,contours with user defined levels demo (discrete.dem).
+@uref{http://gnuplot.sourceforge.net/demo/discrete.html,contours with user defined levels demo (discrete.dem).
 }
 
 @node data_style, datafile_, contour, set-show
@@ -5897,7 +5910,7 @@ The first specifies that a grid of size 10 by 10 is to be constructed using
 a norm value of 1 in the weight computation.  The second only modifies the
 norm, changing it to 4.
 See also
-@uref{http://www.nas.nasa.gov/~woo/gnuplot/scatter/scatter.html,scatter.dem: dgrid3d demo.
+@uref{http://gnuplot.sourceforge.net/demo/scatter.html,scatter.dem: dgrid3d demo.
 }
 
 
@@ -6126,7 +6139,7 @@ See also @ref{xtics} for more information about tic labels, and
 @ref{decimalsign} for how to use non-default decimal separators in numbers
 printed this way.
 See also
-@uref{http://www.nas.nasa.gov/~woo/gnuplot/electron/electron.html,electron demo (electron.dem).
+@uref{http://gnuplot.sourceforge.net/demo/electron.html,electron demo (electron.dem).
 }
 
 @menu
@@ -6296,10 +6309,10 @@ Syntax:
 For information about the definition and usage of functions in `gnuplot`,
 please see `expressions`.
 See also
-@uref{http://www.nas.nasa.gov/~woo/gnuplot/spline/spline.html,splines as user defined functions (spline.dem)
+@uref{http://gnuplot.sourceforge.net/demo/spline.html,splines as user defined functions (spline.dem)
 }
 and
-@uref{http://www.nas.nasa.gov/~woo/gnuplot/airfoil/airfoil.html,use of functions and complex variables for airfoils (airfoil.dem).
+@uref{http://gnuplot.sourceforge.net/demo/airfoil.html,use of functions and complex variables for airfoils (airfoil.dem).
 }
 
 @node grid, hidden3d, functions, set-show
@@ -6482,10 +6495,10 @@ normally, making the resulting display hard to understand.  Therefore, the
 default option of `bentover` will turn it visible in this case.  If you don't
 want that, you may choose `nobentover` instead.
 See also
-@uref{http://www.nas.nasa.gov/~woo/gnuplot/hidden/hidden.html,hidden line removal demo (hidden.dem)
+@uref{http://gnuplot.sourceforge.net/demo/hidden.html,hidden line removal demo (hidden.dem)
 }
 and
-@uref{http://www.nas.nasa.gov/~woo/gnuplot/singulr/singulr.html,complex hidden line demo (singulr.dem).
+@uref{http://gnuplot.sourceforge.net/demo/singulr.html,complex hidden line demo (singulr.dem).
 }
 
 @node historysize, isosamples, hidden3d, set-show
@@ -6645,7 +6658,7 @@ distinction between text in single- or double-quotes.  The key title uses the
 same justification as do the plot titles.
 
 An explicitly given title is typeset using enhanced text properties on
-terminals supporting this, see @ref{postscript} for more details.
+terminals supporting this, see `enhanced text` for more details.
 This default behavior can be switched off by the `noenhanced` option.
 
 The defaults for @ref{key} are `on`, `right`, `top`, `Right`, `noreverse`,
@@ -7095,7 +7108,7 @@ necessary if the data in the file are not in the required order.
 
 @ref{mapping} has no effect on `plot`.
 @c ^ See also
-@uref{http://www.nas.nasa.gov/~woo/gnuplot/world/world.html,world.dem: mapping demos.
+@uref{http://gnuplot.sourceforge.net/demo/world.html,world.dem: mapping demos.
 }
 
 @node margin, mouse, mapping, set-show
@@ -7337,7 +7350,7 @@ in character units, so the appearance of the graph in the remaining space
 will depend on the screen size of the display device, e.g., perhaps quite
 different on a video display and a printer.
 See also
-@uref{http://www.nas.nasa.gov/~woo/gnuplot/multiplot/multiplt.html,multiplot demo (multiplt.dem).
+@uref{http://gnuplot.sourceforge.net/demo/multiplot.html,multiplot demo (multiplt.dem).
 }
 
 @node mx2tics, mxtics, multiplot, set-show
@@ -7809,7 +7822,7 @@ contributing to the color of any quadrangle.  For example, applying the pm3d
 algorithm to the 4x4 grid of data points in script `demo/pm3d.dem` (please have
 a look) produces only (4-1)x(4-1)=9 colored rectangles.
 
-Another drawing algorithm, which would draw qudrangles around a given node
+Another drawing algorithm, which would draw quadrangles around a given node
 by taking corners from averaged (x,y)-coordinates of its surrounding 4 nodes
 while using node's color, could be implemented in the future.
 
@@ -8129,7 +8142,7 @@ Examples:
 To produce a gray palette (useless but instructive) use:
 @example
      set palette model RGB
-     set pallette defined ( 0 "black", 1 "white" )
+     set palette defined ( 0 "black", 1 "white" )
 
 @end example
 
@@ -8182,7 +8195,7 @@ for the R(gray), G(gray) and B(gray) mapping.  The three formulae may depend
 on the variable `gray` which will take values in [0,1] and should also
 produce values in [0,1].
 Please note that <Rexpr> might be a formula for the H-value if HSV color
-space has been choosen (same for all other formulae and color spaces).
+space has been chosen (same for all other formulae and color spaces).
 
 Examples:
 
@@ -8431,10 +8444,10 @@ directions.
 You may want to `set size square` to have `gnuplot` try to make the aspect
 ratio equal to unity, so that circles look circular.
 See also
-@uref{http://www.nas.nasa.gov/~woo/gnuplot/polar/polar.html,polar demos (polar.dem)
+@uref{http://gnuplot.sourceforge.net/demo/polar.html,polar demos (polar.dem)
 }
 and
-@uref{http://www.nas.nasa.gov/~woo/gnuplot/poldat/poldat.html,polar data plot (poldat.dem).
+@uref{http://gnuplot.sourceforge.net/demo/poldat.html,polar data plot (poldat.dem).
 }
 
 @node print_, rmargin, polar, set-show
@@ -8598,7 +8611,7 @@ To make the graph twice as high as wide use:
 @end example
 
 See also
-@uref{http://www.nas.nasa.gov/~woo/gnuplot/airfoil/airfoil.html,airfoil demo.
+@uref{http://gnuplot.sourceforge.net/demo/airfoil.html,airfoil demo.
 }
 
 @node style, surface, size, set-show
@@ -8987,7 +9000,7 @@ The box height is determined from the y error in the same way as it is for
 the `yerrorbars` style---either from y-ydelta to y+ydelta or from ylow to
 yhigh, depending on how many data columns are provided.
 See also
-@uref{http://www.nas.nasa.gov/~woo/gnuplot/errorbar/errorbar.html,errorbar demo.
+@uref{http://gnuplot.sourceforge.net/demo/errorbar.html,errorbar demo.
 }
 
 
@@ -9161,7 +9174,7 @@ By default the rectangle is empty if (open > close), and filled with three
 vertical bars if (close > open). If filled-boxes support is present, then
 the rectangle is colored according to `set style fill <fillstyle>`.
 See @ref{bars} and `financebars`.  See also
-@uref{http://www.nas.nasa.gov/~woo/gnuplot/finance/finance.html,finance demos.
+@uref{http://gnuplot.sourceforge.net/demo/finance.html,finance demos.
 }
 
 Note: To place additional symbols, such as the median value, on a
@@ -9211,7 +9224,7 @@ tic on the left marks the opening price and one on the right marks the
 closing price.  The length of these tics may be changed by @ref{bars}.  The
 symbol will be unchanged if the high and low prices are interchanged.
 See @ref{bars} and `candlesticks`, and also the
-@uref{http://www.nas.nasa.gov/~woo/gnuplot/finance/finance.html,finance demo.
+@uref{http://gnuplot.sourceforge.net/demo/finance.html,finance demo.
 }
 
 
@@ -9227,7 +9240,7 @@ The `fsteps` style is only relevant to 2-d plotting.  It connects consecutive
 points with two line segments: the first from (x1,y1) to (x1,y2) and the
 second from (x1,y2) to (x2,y2).
 See also
-@uref{http://www.nas.nasa.gov/~woo/gnuplot/steps/steps.html,steps demo.
+@uref{http://gnuplot.sourceforge.net/demo/steps.html,steps demo.
 }
 
 
@@ -9249,7 +9262,7 @@ line at their average x, that is, from ((x1+x2)/2,y1) to ((x1+x2)/2,y2).
 If @ref{autoscale} is in effect, it selects the xrange from the data rather than
 the steps, so the end points will appear only half as wide as the others.
 See also
-@uref{http://www.nas.nasa.gov/~woo/gnuplot/steps/steps.html,steps demo.
+@uref{http://gnuplot.sourceforge.net/demo/steps.html,steps demo.
 }
 
 `histeps` is only a plotting style; `gnuplot` does not have the ability to
@@ -9325,7 +9338,7 @@ The `steps` style is only relevant to 2-d plotting.  It connects consecutive
 points with two line segments: the first from (x1,y1) to (x2,y1) and the
 second from (x2,y1) to (x2,y2).
 See also
-@uref{http://www.nas.nasa.gov/~woo/gnuplot/steps/steps.html,steps demo.
+@uref{http://gnuplot.sourceforge.net/demo/steps.html,steps demo.
 }
 
 
@@ -9412,7 +9425,7 @@ from (x,ylow) to (x,yhigh), depending on how many data columns are provided.
 A tic mark is placed at the ends of the error bar (unless @ref{bars} is
 used---see @ref{bars} for details).
 See also
-@uref{http://www.nas.nasa.gov/~woo/gnuplot/errorbar/errorbar.html,errorbar demo.
+@uref{http://gnuplot.sourceforge.net/demo/errorbar.html,errorbar demo.
 }
 
 
@@ -9479,7 +9492,7 @@ on how many data columns are provided. A tic mark is placed at the
 ends of the error bar (unless @ref{bars} is used---see @ref{bars} for
 details).
 See also
-@uref{http://www.nas.nasa.gov/~woo/gnuplot/errorbar/errorbar.html,errorbar demo.
+@uref{http://gnuplot.sourceforge.net/demo/errorbar.html,errorbar demo.
 }
 
 @node surface, terminal, style, set-show
@@ -9613,6 +9626,7 @@ to you, depending on its output format.
 * kyo::                         
 * latex::                       
 * linux::                       
+* linux_::                      
 * macintosh::                   
 * mf::                          
 * mp::                          
@@ -9633,7 +9647,6 @@ to you, depending on its output format.
 * regis_::                      
 * rgip::                        
 * sun::                         
-* sun_::                        
 * svg::                         
 * tek410x::                     
 * tek410x_::                    
@@ -11924,7 +11937,7 @@ The other label -- account for long ticlabels:
 
 @end example
 
-@node linux, macintosh, latex, terminal
+@node linux, linux_, latex, terminal
 @subsubsection linux
 
 @c ?commands set terminal linux
@@ -11941,7 +11954,24 @@ environment variable GSVGAMODE for the default mode; if not set, it uses
 1024x768x256 as default mode or, if that is not possible, 640x480x16
 (standard VGA)."
 
-@node macintosh, mf, linux, terminal
+@node linux_, macintosh, linux, terminal
+@subsubsection linux
+
+@c ?commands set terminal linux
+@c ?set terminal linux
+@c ?set term linux
+@c ?terminal linux
+@c ?term linux
+@cindex linux
+@tmindex linux
+
+
+The `linux` driver has no additional options to specify.  It looks at the
+environment variable GSVGAMODE for the default mode; if not set, it uses
+1024x768x256 as default mode or, if that is not possible, 640x480x16
+(standard VGA)."
+
+@node macintosh, mf, linux_, terminal
 @subsubsection macintosh
 
 @c ?set terminal macintosh
@@ -12750,6 +12780,8 @@ section for some hints.
 
 @c ?enhanced postscript
 @c ?Enhanced postscript
+@c ?enhanced text
+@c ?Enhanced text
 @cindex enhanced
 @tmindex enhanced
 
@@ -13208,7 +13240,7 @@ Example:
 
 puts six graphs on a page in three rows of two in portrait orientation."
 
-@node sun, sun_, rgip, terminal
+@node sun, svg, rgip, terminal
 @subsubsection sun
 
 @c ?commands set terminal sun
@@ -13223,22 +13255,7 @@ puts six graphs on a page in three rows of two in portrait orientation."
 The `sun` terminal driver supports the SunView window system.  It has no
 options."
 
-@node sun_, svg, sun, terminal
-@subsubsection sun
-
-@c ?commands set terminal sun
-@c ?set terminal sun
-@c ?set term sun
-@c ?terminal sun
-@c ?term sun
-@cindex sun
-@tmindex sun
-
-
-The `sun` terminal driver supports the SunView window system.  It has no
-options."
-
-@node svg, tek410x, sun_, terminal
+@node svg, tek410x, sun, terminal
 @subsubsection svg
 
 @c ?commands set terminal svg
@@ -14143,6 +14160,7 @@ the behaviour of an already running driver can be modified.
 
 The option `title "<title name>"` will supply the title name of the window
 for the current plot window or plot window <n> if a number is given.
+Where (or if) this title is shown depends on your X window manager.
 
 The size or aspect ratio of a plot may be changed by resizing the `gnuplot`
 window.
@@ -14537,6 +14555,7 @@ the behaviour of an already running driver can be modified.
 
 The option `title "<title name>"` will supply the title name of the window
 for the current plot window or plot window <n> if a number is given.
+Where (or if) this title is shown depends on your X window manager.
 
 The size or aspect ratio of a plot may be changed by resizing the `gnuplot`
 window.
@@ -15094,7 +15113,7 @@ tells `gnuplot` to read date and time separated by tab.  (But look closely at
 your data---what began as a tab may have been converted to spaces somewhere
 along the line; the format string must match what is actually in the file.)
 See also
-@uref{http://www.nas.nasa.gov/~woo/gnuplot/timedat/timedat.html,time data demo.
+@uref{http://gnuplot.sourceforge.net/demo/timedat.html,time data demo.
 }
 
 @node title_, tmargin, timefmt, set-show
@@ -16484,7 +16503,7 @@ does so also, except that the @ref{using} list must provide three entries
 instead of two.
 
 The `plot` options @ref{thru} and @ref{smooth} are not available for `splot`, but
-@ref{cntrparam} and @ref{dgrid3d} provide limited smoothing cabilities.
+@ref{cntrparam} and @ref{dgrid3d} provide limited smoothing capabilities.
 
 Data file organization is essentially the same as for `plot`, except that
 each point is an (x,y,z) triple.  If only a single value is provided, it
@@ -16574,7 +16593,7 @@ The @ref{index} keyword is not supported, since the file format allows only one
 surface per file.  The @ref{every} and @ref{using} filters are supported.  @ref{using}
 operates as if the data were read in the above triplet form.
 See also
-@uref{http://www.nas.nasa.gov/~woo/gnuplot/binary/binary.html,Binary File Splot Demo.
+@uref{http://gnuplot.sourceforge.net/demo/binary.html,Binary File Splot Demo.
 }
 
 @node example_datafile_, matrix, binary, data-file_
@@ -16624,7 +16643,7 @@ where the file "datafile.dat" might contain:
 Note that "datafile.dat" defines a 4 by 3 grid ( 4 rows of 3 points each ).
 Rows (datablocks) are separated by blank records.
 
-@c ^ <img align=bottom src="http://www.nas.nasa.gov/~woo/gnuplot/doc/splot.gif" alt="[splot.gif]" width=640 height=480>
+@c ^ <img align=bottom src="http://gnuplot.sourceforge.net/doc/splot.gif" alt="[splot.gif]" width=640 height=480>
 Note also that the x value is held constant within each dataline.  If you
 instead keep y constant, and plot with hidden-line removal enabled, you will
 find that the surface is drawn 'inside-out'.
