@@ -1,3 +1,11 @@
+2002-03-10  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* docs/gnuplot.doc: Minor corrections.
+
+	* src/readline.c src/win/geticon.c src/win/wgnuplib.c src/win/wgraph.c
+	src/win/winmain.c src/win/wmenu.c src/win/wpause.c src/win/wprinter.c
+	src/win/wtext.c: Remove MinGW32 compiler warnings.
+
 2002-03-09  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* NEWS docs/gnuplot.doc demo/pm3d.dem src/pm3d.h src/pm3d.c src/save.c
@@ -20,13 +28,13 @@
 
 2002-03-09  Petr Mikulik  <mikulik@physics.muni.cz>
 
-	* src/win/wgraph.c src/win/winmain.c: Remove compiler warnings.
+	* src/win/wgraph.c src/win/winmain.c: Remove MinGW32 compiler warnings.
 
 2002-03-07  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/03/09 17:48:38 $).
+	last modification date (from the tag $Date: 2002/03/09 22:41:45 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
