@@ -7,6 +7,7 @@ Changes in release 3.7.1:
 * FIXED bug in M. Gardner's help formatting patch
 * duplicate functions removed
 * FIXED definition of ANSI_C on autoconf platforms
+* FIXED argument passing to gnuplot_x11 on VMS
 [3.7.0.8]
 * embedding document font is now default font in latex output
 * static limits for user defined function and variable names removed

@@ -1,3 +1,37 @@
+1999-06-29  John Hasstedt  <manager@nuclear.physics.sunysb.edu>
+
+	* config/makefile.vms: More improvements.
+
+	* term/x11.trm: Fix argument passing to gnuplot_x11 on VMS.
+
+1999-06-25  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* INSTALL: Updated for renamed configure macros.
+
+	* configure.in: Changed for new GP_PATH_LIB macro, which replaces
+	GP_SEARCH_LIBDIRS.
+
+	* m4/path-llib.m4: New macro file, replaces search-lib.m4.
+
+	* src/Makefile.am: Add OpenStep directory and x11.opt to EXTRA_DIST.
+
+1999-06-25  Leigh Smith  <leigh@tomandandy.com>
+
+	* src/OpenStep/: New files for complete MacOS X Server port.
+
+1999-06-25  John Hasstedt  <manager@nuclear.physics.sunysb.edu>
+
+	* config/makefile.vms: Updated to work with mmk and build gnuplot_x11,
+	fixes.
+
+	* docs/doc2hlp.vms: Removed, functionality is now in makefile.vms.
+
+	* src/gnuplot.opt: Updated.
+
+	* src/scanner.c: Some changes in the VMS parts.
+
+	* src/x11.opt: New file for VMS.
+
 1999-06-25  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* configure.in, m4/*.m4: All gp_* macros renamed to GP_*.
