@@ -1,23 +1,29 @@
+2002-12-12  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/win/wpause.c (PauseBox): Nigel Nunn's change to the message
+ 	loop of the pause window to avoid CPU hogging.
+
 2002-12-12  Petr Mikulik  <mikulik@physics.muni.cz>
 
-	* src/unset.c(reset_command): Call unset_view() before resetting
-	yrange because its reverse status depends on splot_map_active.
+	* src/unset.c (reset_command): Call unset_view() before resetting
+ 	yrange because its reverse status depends on splot_map_active.
 
 2002-12-12  Petr Mikulik  <mikulik@physics.muni.cz>
 
-	* term/gd.trm term/gif.trm term/png.trm: Replaced typo "ingoring" by
-	"ignoring".
+	* term/gd.trm term/gif.trm term/png.trm: Replaced typo "ingoring"
+ 	by "ignoring".
 
 2002-12-11  Johannes Zellner  <johannes@zellner.org>
 
-	* docs/titlepag.ms docs/titlepag.tex docs/gnuplot.doc docs/gnuplot.texi:
-	Added my name to the authors section.
+	* docs/titlepag.ms docs/titlepag.tex docs/gnuplot.doc
+ 	docs/gnuplot.texi: Added my name to the authors section.
 
 2002-12-09  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/unset.c: Implement 'unset style arrow'.
+
 	* src/set.c src/setshow.h: Comment out unused function
-	delete_arrowstyle(prev,next).
+ 	delete_arrowstyle(prev,next).
 
 2002-12-07  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
@@ -1535,7 +1541,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/12/12 11:10:45 $).
+	last modification date (from the tag $Date: 2002/12/12 12:27:46 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wpause.c,v 1.2 2001/01/16 20:20:17 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: wpause.c,v 1.3 2002/03/10 18:54:52 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - win/wpause.c */
@@ -139,17 +139,17 @@ PauseBox(LPPW lppw)
 
 	lppw->bPause = TRUE;
 	lppw->bPauseCancel = IDCANCEL;
-	while (lppw->bPause)
-	    while (PeekMessage(&msg, 0, 0, 0, PM_REMOVE)) {
+	while (lppw->bPause) {
+	    /* HBB 20021211: Nigel Nunn found a better way to avoid
+	     * 100% CPU load --> use it */
+	    if (PeekMessage(&msg, 0, 0, 0, PM_REMOVE)) {
 		/* wait until window closed */
 		TranslateMessage(&msg);
 		DispatchMessage(&msg);
-		/* HBB 20001217: inserted waiting to reduce CPU load
-		 * of the pause window. Using GetMessage might be
-		 * preferrable, but that breaks its operation, for
-		 * reasons I don't really understand :-( */
+	    } else
 		WaitMessage();
-	    }
+	}
+
 	DestroyWindow(lppw->hWndPause);
 #ifndef WIN32
 #ifndef __DLL__
