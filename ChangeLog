@@ -1,3 +1,10 @@
+2003-02-16  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/graphics.c: Fix overlooked instance of general text
+	rotation angle.
+	* docs/gnuplot.doc: Mention that 'set datafile missing' can be
+	used to filter out NaN records.
+
 2003-02-15  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/gadgets.h src/gadgets.c src/set.c src/save.c src/unset.c 
@@ -1930,7 +1937,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2003/02/14 16:09:25 $).
+	last modification date (from the tag $Date: 2003/02/16 00:07:28 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
