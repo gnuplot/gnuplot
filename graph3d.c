@@ -434,8 +434,9 @@ static void boundary3d(scaling,plots,count)
    /* HBB 980308: sigh... another 16bit glitch: on term's with more than
     * 8000 pixels in either direction, these calculations produce garbage
     * results if done in (16bit) ints */
-   xscaler = ((xright - xleft) * 4L) / 7L;
+   xscaler = (xright - xleft) *4 / 7; /* HBB: Magic number alert! */
    yscaler = ((ytop - ybot) * 4L) / 7L;
+
 }
 
 #if 0
@@ -1736,8 +1737,8 @@ struct lp_style_type grid; /* linetype or -2 for none */
 		x1=x-tic_unitx*(t->h_char)*1;
 		y1=y-tic_unity*(t->v_char)*1;
 #else
-		x1=x-tic_unitx*(t->h_tic)*2;
-		y1=y-tic_unity*(t->v_tic)*2;
+                x1=x-tic_unitx*(t->h_tic)*2;
+                y1=y-tic_unity*(t->v_tic)*2;
 #endif
 		if (!tic_in) {
 			x1 -= tic_unitx*(t->h_tic)*ticscale;
@@ -1788,8 +1789,8 @@ struct lp_style_type grid;
 		x1=x-tic_unitx*(t->h_char)*1;
 		y1=y-tic_unity*(t->v_char)*1;
 #else
-		x1=x-tic_unitx*(t->h_tic)*2;
-		y1=y-tic_unity*(t->v_tic)*2;
+                x1=x-tic_unitx*(t->h_tic)*2;
+                y1=y-tic_unity*(t->v_tic)*2;
 #endif
 		if (!tic_in) {
 			x1 -= tic_unitx*(t->h_tic)*ticscale;
