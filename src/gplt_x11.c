@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.67 2003/08/05 05:25:59 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.68 2003/08/12 19:41:36 sfeam Exp $"); }
 #endif
 
 #define X11_POLYLINE 1
@@ -544,7 +544,7 @@ static XSegment Plus[2], Cross[2], Star[4];
 #define stipple_halftone_width 8
 #define stipple_halftone_height 8
 #define stipple_halftone_num 5
-static const unsigned char stipple_halftone_bits[stipple_halftone_num][8] = {
+static const char stipple_halftone_bits[stipple_halftone_num][8] = {
     { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 },	/* no fill */
     { 0x11, 0x44, 0x11, 0x44, 0x11, 0x44, 0x11, 0x44 },	/* 25% pattern */
     { 0x55, 0xaa, 0x55, 0xaa, 0x55, 0xaa, 0x55, 0xaa },	/* 50% pattern */
@@ -556,7 +556,7 @@ static const unsigned char stipple_halftone_bits[stipple_halftone_num][8] = {
 #define stipple_pattern_width 8
 #define stipple_pattern_height 8
 #define stipple_pattern_num 8
-static const unsigned char stipple_pattern_bits[stipple_pattern_num][8] = {
+static const char stipple_pattern_bits[stipple_pattern_num][8] = {
     { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 } /* no fill */
    ,{ 0x81, 0x42, 0x24, 0x18, 0x18, 0x24, 0x42, 0x41 } /* cross-hatch      (1) */
    ,{ 0x88, 0x55, 0x22, 0x55, 0x88, 0x55, 0x22, 0x55 } /* double crosshatch(2) */

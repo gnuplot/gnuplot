@@ -1,5 +1,5 @@
 /* 
- * $Id: axis.h,v 1.28 2003/01/27 09:30:28 mikulik Exp $
+ * $Id: axis.h,v 1.29 2003/01/27 20:39:31 broeker Exp $
  *
  */
 
@@ -66,9 +66,9 @@ typedef enum AXIS_INDEX {
     SECOND_X_AXIS,
     R_AXIS,			/* never used ? */
     U_AXIS,			/* dito */
-    V_AXIS,			/* dito */
+    V_AXIS			/* dito */
 #ifdef PM3D
-    COLOR_AXIS
+    ,COLOR_AXIS
 #endif
 } AXIS_INDEX;
 
@@ -574,9 +574,9 @@ do {									  \
 }
 #endif
 
-/* use this instead empty macro arguments to work around NeXT cpp bug */
+/* use this instead of empty macro arguments to work around NeXT cpp bug */
 /* if this fails on any system, we might use ((void)0) */
-#define NOOP			/* */
+#define NOOP 0
 
 /* HBB 20000506: new macro, initializes one variable to the same
  * value, for all axes. */

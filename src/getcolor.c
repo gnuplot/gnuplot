@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: getcolor.c,v 1.11 2001/09/18 23:08:26 amai Exp $"); }
+static char *RCSid() { return RCSid("$Id: getcolor.c,v 1.12 2002/08/30 18:45:45 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - getcolor.c */
@@ -270,7 +270,7 @@ void color_components_from_gray( double gray, rgb_color *color )
 	fprintf(stderr, "%s:%d ooops: Unknown colorMode '%c'.\n",
 		__FILE__, __LINE__, (char)(sm_palette.colorMode));
     }
-};
+}
 
 /*
  *  Map a gray value in [0,1] to the corresponding RGB values,

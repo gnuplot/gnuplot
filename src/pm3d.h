@@ -1,5 +1,5 @@
 /*
- * $Id: pm3d.h,v 1.16 2002/10/20 21:19:52 mikulik Exp $
+ * $Id: pm3d.h,v 1.17 2003/03/13 14:47:54 mikulik Exp $
  */
 
 /* GNUPLOT - pm3d.h */
@@ -91,7 +91,7 @@ typedef enum {
     /* now in any order */
     PM3D_WHICHCORNER_MEAN    = 4, /* average color from all 4 corners */
     PM3D_WHICHCORNER_GEOMEAN = 5, /* geometrical mean of 4 corners */
-    PM3D_WHICHCORNER_MEDIAN  = 6, /* median of 4 corner */
+    PM3D_WHICHCORNER_MEDIAN  = 6  /* median of 4 corner */
 } PM3D_WHICH_CORNERS2COLOR;
 
 /*
