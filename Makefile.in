@@ -410,7 +410,7 @@ $(COREOBJS) version.o bf_test.o : $(CONFIG_HEADER)
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	cd $(top_builddir) \
 	  && CONFIG_FILES=$@ CONFIG_HEADERS= \
-	  INCLUDES="@CPPFLAGS@" TERMLIBS="@TERMLIBS@" \
+	  CPPFLAGS="@CPPFLAGS@" TERMLIBS="@TERMLIBS@" \
 	  $(SHELL) ./config.status
 
 $(ACLOCAL_M4): configure.in
