@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.94 2004/04/25 00:08:52 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.95 2004/05/21 20:10:21 sfeam Exp $"); }
 #endif
 
 #define X11_POLYLINE 1
@@ -513,6 +513,7 @@ static unsigned int gFlags = PSize;
 
 static unsigned int BorderWidth = 2;
 static unsigned int dep;		/* depth */
+static long max_request_size;
 
 static Bool Mono = 0, Gray = 0, Rv = 0, Clear = 0;
 static char Name[64] = "gnuplot";
@@ -1836,11 +1837,18 @@ exec_cmd(plot_struct *plot, char *command)
 	polyline[polyline_size].y = Y(y);
 	cx = x;
 	cy = y;
-	FPRINTF((stderr, "(display) loading polyline element %d\n",polyline_size));
+	/* Limit the number of vertices in any single polyline */
+	if (polyline_size > max_request_size) {
+ 	    FPRINTF((stderr, "(display) dumping polyline size %d\n",polyline_size));
+	    XDrawLines(dpy, plot->pixmap, *current_gc,
+			polyline, polyline_size+1, CoordModeOrigin);
+	    polyline_size = 0;
+	}
 	return;
     } else if (polyline_size > 0) {
 	FPRINTF((stderr, "(display) dumping polyline size %d\n",polyline_size));
-	XDrawLines(dpy, plot->pixmap, *current_gc, polyline, polyline_size+1, CoordModeOrigin);
+	XDrawLines(dpy, plot->pixmap, *current_gc,
+			polyline, polyline_size+1, CoordModeOrigin);
 	polyline_size = 0;
     }
 #else
@@ -3957,6 +3965,7 @@ gnuplot: X11 aborted.\n", ldisplay);
     vis = DefaultVisual(dpy, scr);
     dep = DefaultDepth(dpy, scr);
     cmap.colormap = DefaultColormap(dpy, scr);
+    max_request_size = XMaxRequestSize(dpy) / 2;
 
 
 /**** atoms we will need later ****/

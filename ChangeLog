@@ -1,3 +1,12 @@
+2004-05-24  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/gplt_x11.c (exec_cmd): Flush polyline to X-server when it reaches
+	half the maximum single request size supported on the current display.
+
+	* term/dumb.trm term/gd.trm term/pfg.trm term/x11.trm: The enhanced text
+	overprint parameter was used as an (int) in some drivers, even though it
+	is declared as a TBOOLEAN.  Change it to (int) everywhere.
+
 2004-05-24  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/pm3d.c src/term.c term/hpljii.trm: SF bug #953887 non-portable C
