@@ -217,26 +217,6 @@ NORTH AMERICA:
      other sites first!
      ftp://ftp.dartmouth.edu/pub/gnuplot/gnuplot-3.7.tar.gz
 
-[ At time of release, we are not sure whether this service
-  is still available. -lh
-
-     Users without ftp capability can obtain it through a mail ftp
-     server. Email a message to ftpmail@ftp.dartmouth.edu
-     whose BODY contains the following: 
-
-        open
-        cd pub/gnuplot
-        mode binary
-        get gnuplot-3.7.tar.Z
-        quit
-
-     If you have some problem, you might need to stick 
-        reply-to  <your-email-address-here>
-     before all the above.
-
-     You will receive gnuplot as uuencoded compressed tar file.
-]
-
 AUSTRALIA:
 
      Anonymous ftp to ftp.cc.monash.edu.au:
