@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.69 2003/10/21 10:07:39 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.70 2004/01/13 20:51:58 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -34,9 +34,9 @@ static char *RCSid() { return RCSid("$Id: save.c,v 1.69 2003/10/21 10:07:39 miku
  * to the extent permitted by applicable law.
 ]*/
 
+#include "axis.h"
 #include "save.h"
 
-#include "axis.h"
 #include "command.h"
 #include "contour.h"
 #include "datafile.h"
@@ -61,11 +61,9 @@ static void save_functions__sub __PROTO((FILE *));
 static void save_variables__sub __PROTO((FILE *));
 static void save_tics __PROTO((FILE *, AXIS_INDEX));
 static void save_position __PROTO((FILE *, struct position *));
-static void save_range __PROTO((FILE *, AXIS_INDEX));
 static void save_zeroaxis __PROTO((FILE *,AXIS_INDEX));
 static void save_set_all __PROTO((FILE *));
 static void save_textcolor __PROTO((FILE *, const struct t_colorspec *));
-static void save_data_func_style __PROTO((FILE *, char *, enum PLOT_STYLE));
 
 /*
  *  functions corresponding to the arguments of the GNUPLOT `save` command
@@ -592,7 +590,9 @@ set origin %g,%g\n",
 	    aspect_ratio, xsize, ysize,
 	    xoffset, yoffset);
 
+    fprintf(fp, "set style data ");
     save_data_func_style(fp,"data",data_style);
+    fprintf(fp, "set style function ");
     save_data_func_style(fp,"function",func_style);
 
     save_zeroaxis(fp, FIRST_X_AXIS);
@@ -932,17 +932,11 @@ save_position(fp, pos)
 }
 
 
-static void
+void
 save_range(fp, axis)
     FILE *fp;
     AXIS_INDEX axis;
 {
-#if 0 /* unused ?*/
-    int i;
-
-    i = axis;
-#endif
-    
     fprintf(fp, "set %srange [ ", axis_defaults[axis].name);
     if (axis_array[axis].set_autoscale & AUTOSCALE_MIN) {
 	putc('*', fp);
@@ -1009,10 +1003,9 @@ save_textcolor( FILE *fp, const struct t_colorspec *tc )
     }
 }
 
-static void
+void
 save_data_func_style( FILE *fp, char *which, enum PLOT_STYLE style)
 {
-    fprintf(fp, "set style %s ", which);
     switch (style) {
     case LINES:
 	fputs("lines\n", fp);
@@ -1053,7 +1046,7 @@ save_data_func_style( FILE *fp, char *which, enum PLOT_STYLE style)
 #ifdef PM3D
     case FILLEDCURVES:
 	fputs("filledcurves ", fp);
-	if (!strcmp(which,"data"))
+	if (!strcmp(which,"data") || !strcmp(which,"Data"))
 	    filledcurves_options_tofile(&filledcurves_opts_data, fp);
 	else
 	    filledcurves_options_tofile(&filledcurves_opts_func, fp);

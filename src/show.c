@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.117 2003/12/01 16:15:52 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.118 2003/12/24 23:17:53 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -57,6 +57,7 @@ static char *RCSid() { return RCSid("$Id: show.c,v 1.117 2003/12/01 16:15:52 bro
 #include "plot.h" /* for gnuplot_history_size */
 #include "plot2d.h"
 #include "plot3d.h"
+#include "save.h"
 #include "tables.h"
 #include "util.h"
 #include "term_api.h"
@@ -1396,86 +1397,8 @@ show_styles(name, style)
     const char *name;
     enum PLOT_STYLE style;
 {
-
     fprintf(stderr, "\t%s are plotted with ", name);
-    /* perhaps these need to be put into a constant array ? */
-    switch (style) {
-    case LINES:
-	fputs("lines\n", stderr);
-	break;
-    case POINTSTYLE:
-	fputs("points\n", stderr);
-	break;
-    case IMPULSES:
-	fputs("impulses\n", stderr);
-	break;
-    case LINESPOINTS:
-	fputs("linespoints\n", stderr);
-	break;
-    case DOTS:
-	fputs("dots\n", stderr);
-	break;
-
-    case YERRORLINES:
-	fputs("yerrorlines\n", stderr);
-	break;
-    case XERRORLINES:
-	fputs("xerrorlines\n", stderr);
-	break;
-    case XYERRORLINES:
-	fputs("xyerrorlines\n", stderr);
-	break;
-
-    case YERRORBARS:
-	fputs("yerrorbars\n", stderr);
-	break;
-    case XERRORBARS:
-	fputs("xerrorbars\n", stderr);
-	break;
-    case XYERRORBARS:
-	fputs("xyerrorbars\n", stderr);
-	break;
-    case BOXES:
-	fputs("boxes\n", stderr);
-	break;
-#ifdef PM3D
-    case FILLEDCURVES:
-	fputs("filledcurves ", stderr);
-	filledcurves_options_tofile( (!strcmp(name,"Data")) ? 
-		&filledcurves_opts_data : &filledcurves_opts_func, stderr );
-	fputc('\n', stderr);
-	break;
-#endif
-    case BOXERROR:
-	fputs("boxerrorbars\n", stderr);
-	break;
-    case BOXXYERROR:
-	fputs("boxxyerrorbars\n", stderr);
-	break;
-    case STEPS:
-	fputs("steps\n", stderr);
-	break;
-    case FSTEPS:
-	fputs("fsteps\n", stderr);
-	break;
-    case HISTEPS:
-	fputs("histeps\n", stderr);
-	break;
-    case VECTOR:
-	fputs("vector\n", stderr);
-	break;
-    case FINANCEBARS:
-	fputs("financebars\n", stderr);
-	break;
-    case CANDLESTICKS:
-	fputs("candlesticks\n", stderr);
-	break;
-#ifdef PM3D
-    case PM3DSURFACE:
-	fputs("pm3d\n", stderr);
-	break;
-#endif
-    }
+    save_data_func_style(stderr, (char *)name, style);
 }
 
 
@@ -2575,47 +2498,11 @@ static void
 show_range(axis)
     AXIS_INDEX axis;
 {
-    /* this probably ought to just invoke save_range(stderr) from misc.c
-     * since I think it is identical
-     */
     SHOW_ALL_NL;
-
     if (axis_array[axis].is_timedata)
 	fprintf(stderr, "\tset %sdata time\n", axis_defaults[axis].name);
-    fprintf(stderr, "\tset %srange [", axis_defaults[axis].name);
-    if (axis_array[axis].set_autoscale & AUTOSCALE_MIN) {
-	fputc('*', stderr);
-    } else {
-	SHOW_NUM_OR_TIME(axis_array[axis].set_min, axis);
-    }
-    fputs(" : ", stderr);
-    if (axis_array[axis].set_autoscale & AUTOSCALE_MAX) {
-	fputc('*', stderr);
-    } else {
-	SHOW_NUM_OR_TIME(axis_array[axis].set_max, axis);
-    }
-    fprintf(stderr, "] %sreverse %swriteback",
-	    (axis_array[axis].range_flags & RANGE_REVERSE) ? "" : "no",
-	    (axis_array[axis].range_flags & RANGE_WRITEBACK) ? "" : "no");
-
-    if (axis_array[axis].set_autoscale & AUTOSCALE_BOTH) {
-	/* add current (hidden) range as comments */
-	fputs("  # (currently [", stderr);
-	if (axis_array[axis].set_autoscale & AUTOSCALE_MIN) {
-	    SHOW_NUM_OR_TIME(axis_array[axis].set_min, axis);
-	}
-	putc(':', stderr);
-	if (axis_array[axis].set_autoscale & AUTOSCALE_MAX) {
-	    SHOW_NUM_OR_TIME(axis_array[axis].set_max, axis);
-	}
-	fputs("] )\n", stderr);
-	if (axis_array[axis].set_autoscale & AUTOSCALE_FIXMIN)
-	    fputs("\t\tLower end will not be extended to ticstep boundary\n", stderr);
-	if (axis_array[axis].set_autoscale & AUTOSCALE_FIXMAX)
-	    fputs("\t\tUpper end will not be extended to ticstep boundary\n", stderr);
-    } else {
-	putc('\n', stderr);
-    }
+    fprintf(stderr,"\t");
+    save_range(stderr, axis);
 }
 
 
