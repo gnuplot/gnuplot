@@ -177,6 +177,9 @@
 /* Define if you have the <pdflib.h> header file.  */
 #undef HAVE_PDFLIB_H
 
+/* Define if you have the <png.h> header file.  */
+#undef HAVE_PNG_H
+
 /* Define if you have the <poll.h> header file.  */
 #undef HAVE_POLL_H
 
@@ -248,9 +251,6 @@
 
 /* Define if you have the <zlib.h> header file.  */
 #undef HAVE_ZLIB_H
-
-/* Define if you have the gd library (-lgd).  */
-#undef HAVE_LIBGD
 
 /* Define if you have the m library (-lm).  */
 #undef HAVE_LIBM
@@ -324,32 +324,29 @@
 /*  Define if you want to use the GNU version of the Unix plot library.  */
 #undef GNUGRAPH
 
-/*  Define if you have Thomas Boutell's gd library.  */
+/*  Define if you have zlib.  */
+#undef HAVE_LIBZ
+
+/*  Define if you have the png library.  */
+#undef HAVE_LIBPNG
+
+/*  Define if you have gd library.  */
 #undef HAVE_LIBGD
 
-/*  Define if you have libgd version >= 1.8  */
-#undef HAVE_NEWGD
+/*  Define if libgd supports gif.  */
+#undef HAVE_GD_GIF
 
-/*  Define if you have want png support  */
-#undef HAVE_PNG
-
-/*  Define if you have libjpeg and libgd version >= 1.8  */
-#undef HAVE_JPEG
-
-/*  Define if you have libgd version 1.2 - 1.4  */
-#undef HAVE_GIF
+/*  Define if libgd supports jpeg.  */
+#undef HAVE_GD_JPEG
 
 /*  libgd versions < 1.8.4 need gdImageStringTTF rather than gdImageStringFT  */
 #undef gdImageStringFT
 
-/*  Define if TrueType font support in libgd  */
-#undef HAVE_TTF
+/*  Define if libgd supports TrueType fonts through libfreetype.  */
+#undef HAVE_GD_TTF
 
-/*  Define to have 'set term gif' produce PNG images instead  */
-#undef PNG_FOR_GIF
-
-/*  Define if you have the png library.  */
-#undef HAVE_LIBPNG
+/*  Define if libgd supports png.  */
+#undef HAVE_GD_PNG
 
 /*  Define if you have the pdf library.  */
 #undef HAVE_LIBPDF
