@@ -6,7 +6,7 @@ ELCS = gnuplot.elc gnuplot-gui.elc @INFO_LOOK_ELC@
 EXTRA_DIST = dot.el dotemacs gnuplot.el.old gpelcard.dvi gpelcard.pdf gpelcard.ps gpelcard.tex $(ELS)
 
 CLEANFILES = $(ELCS) gpelcard.pdf gpelcard.ps gpelcard.dvi gpelcard.log gpelcard.aux
-DISTCLEANFILES = info-look.el install-sh missing mkinstalldirs
+DISTCLEANFILES = info-look.el
 
 BYTEC = $(EMACS) -batch -q -no-site-file -l $(srcdir)/dot.el -f batch-byte-compile
 
@@ -60,8 +60,5 @@ distclean-local:
 	@if test "$(top_srcdir)" != "$(top_builddir)" ; then \
 	  rm -f gnuplot.el gnuplot-gui.el gpelcard.tex ; \
 	fi
-
-dist-hook:
-	@cp install-sh missing mkinstalldirs $(distdir)
 
 SUFFIXES = .el .elc .pdf .ps .tex
