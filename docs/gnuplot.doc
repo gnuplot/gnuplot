@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.178 2003/07/22 17:41:10 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.179 2003/07/22 19:34:42 sfeam Exp $
 C 18 September 2001
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001   Thomas Williams, Colin Kelley et al.
 C
@@ -5454,13 +5454,13 @@ C ... and restart the table:
 ?help mouse variables
 ?help mouse mouse_variables
 ?mouse variables
- When mousing is active, clicking in the active window will, in addition to
- the effects described above, set several user variables that can be 
- accessed from the gnuplot command line. These are MOUSE_X MOUSE_Y MOUSE_X2
- MOUSE_Y2 and MOUSE_BUTTON.  These variables are set to undefined at the
- start of every plot, and only become defined in the event of a mouse click
- in the active plot window. MOUSE_BUTTON tells which button was clicked
- most recently; the others hold the mouse coordinates at that time.
+ When mousing is active, clicking in the active window will set several user
+ variables that can be accessed from the gnuplot command line. The coordinates
+ of the mouse at the time of the click are stored in MOUSE_X MOUSE_Y MOUSE_X2
+ and MOUSE_Y2. The mouse button clicked, and any meta-keys active at that time,
+ are stored in MOUSE_BUTTON MOUSE_SHIFT MOUSE_ALT and MOUSE_CTRL.  These 
+ variables are set to undefined at the start of every plot, and only become 
+ defined in the event of a mouse click in the active plot window. 
 3 multiplot
 ?commands set multiplot
 ?commands unset multiplot

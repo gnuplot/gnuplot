@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.74 2003/07/22 17:44:13 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.75 2003/07/22 19:34:42 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -997,6 +997,9 @@ plot_command()
     get_udv("MOUSE_X2")->udv_undef = TRUE;
     get_udv("MOUSE_Y2")->udv_undef = TRUE;
     get_udv("MOUSE_BUTTON")->udv_undef = TRUE;
+    get_udv("MOUSE_SHIFT")->udv_undef = TRUE;
+    get_udv("MOUSE_ALT")->udv_undef = TRUE;
+    get_udv("MOUSE_CTRL")->udv_undef = TRUE;
 #endif
     plotrequest();
     SET_CURSOR_ARROW;

@@ -1,3 +1,9 @@
+2003-07-27  Ethan Merritt <merritt@u.washington.edu>
+
+	* src/command.c src/mouse.c docs/gnuplot.doc: Report key modifiers
+	active at the time of a mouse click in variables MOUSE_SHIFT,
+	MOUSE_ALT, and MOUSE_CTRL.
+
 2003-07-23  Ethan Merritt <merritt@u.washington.edu>
 
 	* configure.in: Rename the configuration option for Jaime Reed's

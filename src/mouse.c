@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.42 2003/07/22 17:41:10 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.43 2003/07/22 19:34:42 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -1549,37 +1549,41 @@ event_buttonrelease(struct gp_event_t *ge)
      * FIXME EAM: Maybe don't export if axis ticmode == NO_TICS     */
     {
 	struct udvt_entry *current;
-	if ((current = get_udv("MOUSE_BUTTON"))) {
-	    current->udv_undef = FALSE;
-	    current->udv_value.type = INTGR;
-	    current->udv_value.v.int_val = b;
-	}
+
 	if ((current = get_udv("MOUSE_X"))) {
 	    current->udv_undef = FALSE;
-	    current->udv_value.type = CMPLX;
-	    current->udv_value.v.cmplx_val.real = real_x;
-	    current->udv_value.v.cmplx_val.imag = 0;
+	    Gcomplex(&current->udv_value,real_x,0);
 	}
 	if ((current = get_udv("MOUSE_Y"))) {
 	    current->udv_undef = FALSE;
-	    current->udv_value.type = CMPLX;
-	    current->udv_value.v.cmplx_val.real = real_y;
-	    current->udv_value.v.cmplx_val.imag = 0;
+	    Gcomplex(&current->udv_value,real_y,0);
 	}
 	if ((current = get_udv("MOUSE_X2"))) {
 	    current->udv_undef = FALSE;
-	    current->udv_value.type = CMPLX;
-	    current->udv_value.v.cmplx_val.real = real_x2;
-	    current->udv_value.v.cmplx_val.imag = 0;
+	    Gcomplex(&current->udv_value,real_x2,0);
 	}
 	if ((current = get_udv("MOUSE_Y2"))) {
 	    current->udv_undef = FALSE;
-	    current->udv_value.type = CMPLX;
-	    current->udv_value.v.cmplx_val.real = real_y2;
-	    current->udv_value.v.cmplx_val.imag = 0;
+	    Gcomplex(&current->udv_value,real_y2,0);
+	}
+	if ((current = get_udv("MOUSE_BUTTON"))) {
+	    current->udv_undef = FALSE;
+	    Ginteger(&current->udv_value,b);
+	}
+	if ((current = get_udv("MOUSE_SHIFT"))) {
+	    current->udv_undef = FALSE;
+	    Ginteger(&current->udv_value, modifier_mask & Mod_Shift);
+	}
+	if ((current = get_udv("MOUSE_ALT"))) {
+	    current->udv_undef = FALSE;
+	    Ginteger(&current->udv_value, modifier_mask & Mod_Alt);
+	}
+	if ((current = get_udv("MOUSE_CTRL"))) {
+	    current->udv_undef = FALSE;
+	    Ginteger(&current->udv_value, modifier_mask & Mod_Ctrl);
 	}
     }
-    /* Terminate via replot is we are in 'pause mouse' */
+    /* Terminate via replot if we are in 'pause mouse' */
     /* FIXME EAM: untested for mouse devices other than X11 */
     if (paused_for_mouse) {
 	paused_for_mouse = FALSE;
