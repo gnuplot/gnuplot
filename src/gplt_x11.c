@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.12.2.6 2000/10/23 04:35:27 joze Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.16 2000/10/31 19:59:31 joze Exp $"); }
 #endif
 
 /* GNUPLOT - gplt_x11.c */
@@ -407,7 +407,6 @@ t_sm_palette sm_palette = {
     0,                           /* ps_allcF */
 };
 static GC gc_pm3d = (GC) 0;
-static GC* current_gc = (GC*) 0;
 static int have_pm3d = 1;
 static int num_colormaps = 0;
 unsigned int maximal_possible_colors = 0x100;
@@ -437,6 +436,13 @@ int scr;
 Window root;
 Visual *vis = (Visual*) 0;
 GC gc = (GC) 0;
+/* current_gc points to either the `line' GC `gc' or
+ * to the pm3d smooth palette GC `gc_pm3d'. If pm3d
+ * is disabled at compile time, current_gc always
+ * points to the `line' GC `gc'. Thus the purpose of
+ * current_gc is to switch between the `line' and the
+ * pm3d GC's. */
+static GC* current_gc = (GC*) 0;
 GC gc_xor = (GC) 0;
 GC gc_xor_dashed = (GC) 0;
 XFontStruct *font;

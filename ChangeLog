@@ -1,5 +1,10 @@
 2000-10-31 Johannes Zellner <johannes@zellner.org>
 
+	* src/gplt_x11.c: moved current_gc outside the #ifdef PM3D
+	block, so it is also defined, if compiling w/o PM3d support.
+
+2000-10-31 Johannes Zellner <johannes@zellner.org>
+
 	* merged the pm3d branch to MAIN
 	* docs/gnuplot.doc: added GGI/win to the list of pm3d capable terminals
 
