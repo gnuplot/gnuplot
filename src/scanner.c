@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: scanner.c,v 1.6 1999/06/11 11:18:57 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: scanner.c,v 1.7 1999/06/17 14:17:50 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - scanner.c */
@@ -306,7 +306,7 @@ int current;
     char *atari_tmpfile;
 # endif				/* !AMIGA_AC_5 */
     char *str, *pgm, *rest = NULL;
-    int pgm_len, rest_len;
+    size_t pgm_len, rest_len;
 
 # ifdef VMS
     int chan, one = 1;
