@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: emf.trm,v 1.26 2004/12/08 04:25:00 sfeam Exp $
+ * $Id: emf.trm,v 1.27 2004/12/21 13:09:41 broeker Exp $
  */
 
 /* GNUPLOT - emf.trm */
@@ -285,6 +285,7 @@ static unsigned int emf_polyline[EMF_MAX_SEGMENTS];	/* stored polyline coordinat
 static unsigned int emf_graphics = FALSE;
 static unsigned int emf_dashed = TRUE;
 static unsigned int emf_monochrome = FALSE;
+static double emf_linewidth_factor = 1.0;
 static int emf_coords = 0;	/* # polyline coordinates saved */
 static char emf_fontname[255] = EMF_FONTNAME;
 static int emf_fontsize = EMF_FONTSIZE;
@@ -528,6 +529,14 @@ EMF_options()
 	    c_token++;
 	    continue;
 	}
+	if (equals(c_token, "lw") || almost_equals(c_token, "linew$idth")) {
+	    struct value a;
+	    c_token++;
+	    emf_linewidth_factor = real(const_express(&a));
+	    if (emf_linewidth_factor < 0.1)
+		emf_linewidth_factor = 1.0;
+	    continue;
+	}
 	break;
     } /* while(!end of command) */
     if (!END_OF_COMMAND && isstring(c_token)) {
@@ -547,6 +556,9 @@ EMF_options()
 	    emf_monochrome ? "monochrome" : "color",
 	    emf_dashed ? "dashed" : "solid",
 	    emf_defaultfontname, emf_defaultfontsize);
+    if (emf_linewidth_factor != 1.0)
+	sprintf(&(term_options[strlen(term_options)]), " lw %4.1f",
+		emf_linewidth_factor);
 }
 
 TERM_PUBLIC void 
@@ -769,7 +781,8 @@ TERM_PUBLIC void
 EMF_linewidth(double width)
 {
 	int current_dashtype = emf_dashtype;
-
+    
+    width *= emf_linewidth_factor;
     assert(width >= 0);
     if (width == emf_linewidth)
 	return;
@@ -1157,11 +1170,12 @@ START_HELP(emf)
 " format is the metafile standard on MS Win32 Systems.",
 "",
 " Syntax:",
-"       set terminal emf {<color>} {solid | dashed}",
+"       set terminal emf {<color>} {solid | dashed} {linewidth <X>}",
 "                        {\"<font>\"} {<fontsize>}",
 "",
 " <color> is either `color` or `monochrome`; ",
 " `solid` draws all curves with solid lines, overriding any dashed patterns;",
+" `linewidth <factor>` multiplies all line widths by this factor.",
 " <font> is the name of a font; and ",
 " `<fontsize>` is the size of the font in points.",
 "",
