@@ -11274,10 +11274,26 @@ GNUPLOT_FONTPATH. If this is not set a system dependent default search
 list is used. See @ref{fontpath} for more details.
 
 For using the encapsulated font file you have to specify the font name
-(which normally is not the same as the file name). When using pfa or pfb
-fonts, you can find it out by looking into the font file. There is a line
-similar to "/FontName /CMR8 def". The middle string without the slash
-is the fontname, here "CMR8".
+(which normally is not the same as the file name). When embedding a
+font file by using the `fontfile` option in interactive mode, the 
+font name is printed on the screen. E.g.
+@example
+   Font file 'p052004l.pfb' contains the font 'URWPalladioL-Bold'. Location:
+   /usr/lib/X11/fonts/URW/p052004l.pfb
+
+@end example
+
+When using pfa or pfb fonts, you can also find it out by looking into the
+font file. There is a line similar to "/FontName /URWPalladioL-Bold def".
+The middle string without the slash is the fontname, here
+"URWPalladioL-Bold".
+For TrueType fonts, this is not so easy since the font name is stored in a
+binary format. In addition, they often have spaces in the font names which
+is not supported by Type 1 fonts (in which a TrueType is converted on the
+fly). The font names are changed in order to eliminate the spaces in the
+fontnames. The easiest way to find out which font name is generated for
+use with Gnuplot, start Gnuplot in interactive mode and type in
+"set terminal postscript fontfile '<filename.ttf>'".
 
 For converting font files to pfa format the conversion tool has to read
 the font from a file and write it to standard output.
@@ -11305,7 +11321,7 @@ by using the tool "ttf2pt1" which is available from
 If the build in conversion does not
 work, the conversion command can be changed by the environment variable
 GNUPLOT_TTFTOPFA. For usage with ttf2pt1 it may be set to
-"ttf2pt1 -a -e %s - 2>/dev/null". Here again, `%s` stands for the
+"ttf2pt1 -a -e -W 0 %s - ". Here again, `%s` stands for the
 file name.
 
 For special purposes you also can use a pipe (if available for your
@@ -11321,22 +11337,23 @@ in pfb format from any CTAN server, e.g.
 @uref{ftp://ftp.dante.de/tex-archive/fonts/ps-type1/cm-super/,ftp://ftp.dante.de/tex-archive/fonts/ps-type1/cm-super/
 }
 For example, the file "sfrm1000.pfb" contains the normal upright fonts
-with serifs in the design size 10pt.
+with serifs in the design size 10pt (font name "SFRM1000").
 The computer modern fonts, which are still necessary for mathematics,
-are available from `ftp://ftp.dante.de/tex-archive/fonts/cm/ps-type1/bluesky`.
+are available from
+@uref{ftp://ftp.dante.de/tex-archive/fonts/cm/ps-type1/bluesky,ftp://ftp.dante.de/tex-archive/fonts/cm/ps-type1/bluesky
+}
 With these you can use any character available in TeX. However, the
 computer modern fonts have a strange encoding. (This is why you should not
 use cmr10.pfb for text, but sfrm1000.pfb instead.)
 The usage of TeX fonts is shown in one of the demos.
+The file "ps_fontfile_doc.tex" in the /docs/psdoc subdirectory of the
+`gnuplot` source distribution contains a table with glyphs of the TeX
+mathfonts.
 
 If the font "CMEX10" is embedded (file "cmex10.pfb") Gnuplot defines
 the additional font "CMEX10-Baseline". It is shifted vertically in order
 to fit better to the other glyphs (CMEX10 has its baseline at the top of
-the symbols).
-
-The file "ps_fontfile_doc.tex" in the /docs/psdoc subdirectory of the
-`gnuplot` source distribution contains a table with glyphs of the TeX
-mathematics fonts."
+the symbols)."
 
 @node pslatex_and_pstex, pstricks, postscript_, terminal
 @subsubsection pslatex and pstex

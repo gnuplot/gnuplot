@@ -144,6 +144,9 @@
 /* Define if you have the <3dkit.h> header file.  */
 #undef HAVE_3DKIT_H
 
+/* Define if you have the <dirent.h> header file.  */
+#undef HAVE_DIRENT_H
+
 /* Define if you have the <errno.h> header file.  */
 #undef HAVE_ERRNO_H
 
