@@ -1,3 +1,11 @@
+2000-10-22  Johannes Zellner <johannes@zellner.org>
+
+	* ggi driver:
+	  - event / mouse support
+	  - multiplot support
+	  - autoconf support
+	  - mode selection support
+
 2000-10-20  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/win/wgnuplib.h (WGNUPLOTVERSION): bumped version number of

@@ -1,5 +1,5 @@
 /*
- * $Id: term.h,v 1.6 2000/05/02 19:02:10 lhecking Exp $
+ * $Id: term.h,v 1.7 2000/06/10 17:33:47 lhecking Exp $
  */
 
 /* GNUPLOT - term.h */
@@ -400,5 +400,9 @@
 
 /* METAPOST */
 #include "metapost.trm"
+
+#ifdef USE_GGI_DRIVER
+# include "ggi.trm"
+#endif
 
 #endif /* !SHORT_TERMLIST */

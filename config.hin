@@ -321,3 +321,6 @@
 /*  Define if you want to use the experimental epslatex driver.  */
 #undef USE_EPSLATEX_DRIVER
 
+/*  Define if you want to use the experimental ggi driver.  */
+#undef USE_GGI_DRIVER
+

@@ -1,12 +1,12 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot 3.7 on Unix.
 dnl
-dnl $Id: configure.in,v 1.85 2000/05/04 21:50:41 joze Exp $
+dnl $Id: configure.in,v 1.86 2000/06/10 17:33:05 lhecking Exp $
 dnl
 AC_INIT(src/graphics.c)
 AM_CONFIG_HEADER(config.h:config.hin)
 AC_PREREQ(2.13)
-AC_REVISION($Revision: 1.85 $)
+AC_REVISION($Revision: 1.86 $)
 
 VERSION="`cat $srcdir/VERSION`"
 AM_INIT_AUTOMAKE(gnuplot, $VERSION)
@@ -133,6 +133,12 @@ dnl new epslatex driver
 AC_ARG_ENABLE(epslatex,dnl
 [  --enable-epslatex       enable epslatex driver (EXPERIMENTAL)],,
 test -z "$enable_epslatex" && enable_epslatex=no
+)dnl
+
+dnl new ggi driver
+AC_ARG_ENABLE(ggi,dnl
+[  --enable-ggi            enable ggi driver (EXPERIMENTAL)],,
+test -z "$enable_ggi" && enable_ggi=no
 )dnl
 
 dnl use a different x11 driver name ?
@@ -515,6 +521,23 @@ if test "$enable_epslatex" = yes; then
             [ Define if you want to use the experimental epslatex driver. ])
 fi
 
+dnl check for ggi lib
+GGI_SUPPORT=no
+if test "$enable_ggi" = yes; then
+    AC_CHECK_LIB(ggi, ggiInit,
+	[dnl action if lib is ok
+	    TERMLIBS="$TERMLIBS -lggi"
+	    AC_DEFINE(USE_GGI_DRIVER, 1,
+		[ Define if you want to use the experimental ggi driver. ])
+	    GGI_SUPPORT=yes
+	],
+	[dnl action if lib was not found
+	    AC_MSG_RESULT(no)
+	]
+    )
+fi
+
+
 dnl Substitute variables
 AC_SUBST(PACKAGE)
 AC_SUBST(VERSION)
@@ -625,6 +648,9 @@ test "$enable_emf" = yes && \
 
 test "$enable_epslatex" = yes && \
   AC_MSG_RESULT([  Enable epslatex terminal (EXPERIMENTAL)])
+
+test "$GGI_SUPPORT" = yes && \
+  AC_MSG_RESULT([  Enable ggi terminal (EXPERIMENTAL)])
 
 test "$enable_iris" = yes && \
   AC_MSG_RESULT([  Enable IRIS terminal])
