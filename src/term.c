@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.57 2003/05/06 20:36:48 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.58 2003/05/09 21:44:49 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -1764,7 +1764,7 @@ test_term()
     {
     int cen_x = (int)(0.75 * xmax_t);
     int cen_y = (int)(0.83 * ymax_t);
-    int radius = t->v_tic * 8;
+    int radius = xmax_t / 20;
     (*t->linetype)(2);
     /* test pm3d -- filled_polygon(), but not set_color() */
     if (t->filled_polygon) {
