@@ -1,5 +1,5 @@
 /*
- * $Id: gd.trm,v 1.20 2002/12/18 00:57:00 sfeam Exp $
+ * $Id: gd.trm,v 1.21 2002/12/18 17:38:52 lhecking Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -261,7 +261,7 @@ typedef struct {
     int fillpar;
 }   PNG_FILL_TILE;
 
-static PNG_FILL_TILE PNG_fill_tile = { (gdImagePtr)0, 0 };
+static PNG_FILL_TILE PNG_fill_tile = { (gdImagePtr)0, 0, 0 };
 
 static int PNG_FillSolid __PROTO((int fillpar));
 static int PNG_FillPattern __PROTO((int fillpar));
