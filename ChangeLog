@@ -6,6 +6,8 @@
 	docs/ps_guide.ps, term/cgm.trm, term/post.trm,term/x11.trm:
  	Cleanup patches by Dick Crawford <rccrawford@lanl.gov>.
 
+	* docs/gnuplot.doc, term/post.trm: FIx typos.
+	
 1998-05-12  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* set.c: Fix axis width in lp_style_type. HBB and Lars Hecking.
