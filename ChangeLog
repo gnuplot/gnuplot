@@ -3,6 +3,8 @@
 	* src/set.c: Use 0 rather than NULL in initializing a union, to quiet
 	gcc warnings.
 
+	* src/plot3d.c: #include "plot2d.h" so that store_label is imported.
+
 2004-11-01  Daniel Sebald  <daniel.sebald@ieee.org>
 
 	* src/datafile.c (df_readbinary): Do not try to access Z coordinate

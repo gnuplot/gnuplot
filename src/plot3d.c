@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.88 2004/10/19 03:26:19 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.89 2004/10/26 04:30:52 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -55,6 +55,10 @@ static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.88 2004/10/19 03:26:19 sf
 #endif
 #ifdef BINARY_DATA_FILE
 #include "plot.h"
+#endif
+
+#ifdef EAM_DATASTRINGS
+#include "plot2d.h" /* Only for store_label() */
 #endif
 
 #ifdef THIN_PLATE_SPLINES_GRID
