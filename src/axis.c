@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.48 2004/10/20 20:14:17 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.49 2004/10/22 01:30:51 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -172,12 +172,15 @@ static TBOOLEAN axis_position_zeroaxis __PROTO((AXIS_INDEX));
 static double quantize_duodecimal_tics __PROTO((double, int));
 static void get_position_type __PROTO((enum position_type * type, int *axes));
 
+
 /* ---------------------- routines ----------------------- */
 
 /* check range and take logs of min and max if logscale
  * this also restores min and max for ranges like [10:-10]
  */
 #define LOG_MSG(x) x " range must be greater than 0 for scale"
+
+/* {{{ axis_unlog_interval() */
 
 /* this is used in a few places all over the code: undo logscaling of
  * a given range if necessary. If checkrange is TRUE, will int_error() if
@@ -195,6 +198,10 @@ axis_unlog_interval(AXIS_INDEX axis, double *min, double *max, TBOOLEAN checkran
     }
 }
 
+/* }}} */
+
+/* {{{ axis_revert_and_unlog_range() */
+
 void
 axis_revert_and_unlog_range(AXIS_INDEX axis)
 {
@@ -206,8 +213,9 @@ axis_revert_and_unlog_range(AXIS_INDEX axis)
   axis_unlog_interval(axis, &axis_array[axis].min, &axis_array[axis].max, 1);
 }
 
+/* }}} */
 
-/*{{{  axis_log_value_checked() */
+/* {{{ axis_log_value_checked() */
 double
 axis_log_value_checked(AXIS_INDEX axis, double coord, const char *what)
 {
@@ -221,9 +229,9 @@ axis_log_value_checked(AXIS_INDEX axis, double coord, const char *what)
     return (coord);
 }
 
-/*}}} */
+/* }}} */
 
-/*{{{  axis_checked_extend_empty_range() */
+/* {{{ axis_checked_extend_empty_range() */
 /*
  * === SYNOPSIS ===
  *
@@ -341,9 +349,9 @@ axis_checked_extend_empty_range(AXIS_INDEX axis, const char *mesg)
     }
 }
 
-/*}}} */
+/* }}} */
 
-/* make smalltics for time-axis */
+/* {{{ make smalltics for time-axis */
 static double
 make_auto_time_minitics(t_timelevel tlevel, double incr)
 {
@@ -438,8 +446,9 @@ make_auto_time_minitics(t_timelevel tlevel, double incr)
     }
     return (tinc);
 }
+/* }}} */
 
-/*{{{  copy_or_invent_formatstring() */
+/* {{{ copy_or_invent_formatstring() */
 /* Either copies the axis formatstring over to the ticfmt[] array, or
  * in case that's not applicable because the format hasn't been
  * specified correctly, invents a time/date output format by looking
@@ -514,9 +523,9 @@ copy_or_invent_formatstring(AXIS_INDEX axis)
     return ticfmt[axis];
 }
 
-/*}}} */
+/* }}} */
 
-/*{{{  dbl_raise() used by quantize_normal_tics */
+/* {{{ dbl_raise() used by quantize_normal_tics */
 /* FIXME HBB 20000426: is this really useful? */
 static double
 dbl_raise(double x, int y)
@@ -532,9 +541,9 @@ dbl_raise(double x, int y)
     return (val);
 }
 
-/*}}} */
+/* }}} */
 
-/*{{{  quantize_normal_tics() */
+/* {{{ quantize_normal_tics() */
 /* the guide parameter was intended to allow the number of tics
  * to depend on the relative sizes of the plot and the font.
  * It is the approximate upper limit on number of tics allowed.
@@ -589,9 +598,9 @@ quantize_normal_tics(double arg, int guide)
     return (tics * power);
 }
 
-/*}}} */
+/* }}} */
 
-/*{{{  make_tics() */
+/* {{{ make_tics() */
 /* Implement TIC_COMPUTED case, i.e. automatically choose a usable
  * ticking interval for the given axis. For the meaning of the guide
  * parameter, see the comment on quantize_normal_tics() */
@@ -612,8 +621,9 @@ make_tics(AXIS_INDEX axis, int guide)
     else
 	return tic;
 }
+/* }}} */
 
-/*{{{ quantize_duodecimal_tics */
+/* {{{ quantize_duodecimal_tics */
 /* HBB 20020220: New function, to be used to properly tic axes with a
  * duodecimal reference, as used in times (60 seconds, 60 minuts, 24
  * hours, 12 months). Derived from quantize_normal_tics(). The default
@@ -653,8 +663,9 @@ quantize_duodecimal_tics(double arg, int guide)
 	 */
 	return power * ceil(xnorm);
 }
-/*}}} */
+/* }}} */
 
+/* {{{ quantize_time_tics */
 /* HBB 20010831: newly isolated subfunction. Used to be part of
  * make_tics() */
 /* Look at the tic interval given, and round it to a nice figure
@@ -713,8 +724,10 @@ quantize_time_tics(AXIS_INDEX axis, double tic, double xr, int guide)
     return (tic);
 }
 
-/*}}} */
+/* }}} */
 
+
+/* {{{ round_outward */
 /* HBB 20011204: new function (repeated code ripped out of setup_tics)
  * that rounds an axis endpoint outward. If the axis is a time/date
  * one, take care to round towards the next whole time unit, not just
@@ -743,6 +756,9 @@ round_outward(
     return result;
 }
 
+/* }}} */
+
+/* {{{ setup_tics */
 /* setup_tics allows max number of tics to be specified but users dont
  * like it to change with size and font, so we use value of 20, which
  * is 3.5 behaviour.  Note also that if format is '', yticlin = 0, so
@@ -803,8 +819,10 @@ setup_tics(AXIS_INDEX axis, int max)
     copy_or_invent_formatstring(axis);
 }
 
-/*{{{  gen_tics */
-/* uses global arrays ticstep[], ticfmt[], axis_array[],
+/* }}} */
+
+/* {{{  gen_tics */
+/* uses global arrays ticstep[], ticfmt[], axis_array[], 
  * we use any of GRID_X/Y/X2/Y2 and  _MX/_MX2/etc - caller is expected
  * to clear the irrelevent fields from global grid bitmask
  * note this is also called from graph3d, so we need GRID_Z too
@@ -831,7 +849,7 @@ gen_tics(AXIS_INDEX axis, tic_callback callback)
 
 
     if (def->type == TIC_USER) {	/* special case */
-	/*{{{  do user tics then return */
+	/* {{{  do user tics then return */
 	struct ticmark *mark = def->def.user;
 	double uncertain = (axis_array[axis].max - axis_array[axis].min) / 10;
 	double internal_min = axis_array[axis].min - SIGNIF * uncertain;
@@ -866,7 +884,7 @@ gen_tics(AXIS_INDEX axis, tic_callback callback)
 	}
 
 	return;
-	/*}}} */
+	/* }}} */
     }
 
     /* series-tics
@@ -900,7 +918,7 @@ gen_tics(AXIS_INDEX axis, tic_callback callback)
 	    lmin = lmax;
 	    lmax = temp;
 	}
-	/*{{{  choose start, step and end */
+	/* {{{  choose start, step and end */
 	switch (def->type) {
 	case TIC_SERIES:
 	    if (axis_array[axis].log) {
@@ -950,9 +968,9 @@ gen_tics(AXIS_INDEX axis, tic_callback callback)
 	    graph_error("Internal error : unknown tic type");
 	    return;		/* avoid gcc -Wall warning about start */
 	}
-	/*}}} */
+	/* }}} */
 
-	/*{{{  ensure ascending order */
+	/* {{{  ensure ascending order */
 	if (end < start) {
 	    double temp;
 	    temp = end;
@@ -960,10 +978,10 @@ gen_tics(AXIS_INDEX axis, tic_callback callback)
 	    start = temp;
 	}
 	step = fabs(step);
-	/*}}} */
+	/* }}} */
 
 	if (minitics) {
-	    /*{{{  figure out ministart, ministep, miniend */
+	    /* {{{  figure out ministart, ministep, miniend */
 	    if (minitics == MINI_USER) {
 		/* they have said what they want */
 		if (minifreq <= 0)
@@ -977,15 +995,15 @@ gen_tics(AXIS_INDEX axis, tic_callback callback)
 /* 		} */
 	    } else if (axis_array[axis].log) {
 		if (step > 1.5) {	/* beware rounding errors */
-		    /*{{{  10,100,1000 case */
+		    /* {{{  10,100,1000 case */
 		    /* no more than five minitics */
 		    ministart = ministep = (int) (0.2 * step);
 		    if (ministep < 1)
 			ministart = ministep = 1;
 		    miniend = step;
-		    /*}}} */
+		    /* }}} */
 		} else {
-		    /*{{{  2,5,8 case */
+		    /* {{{  2,5,8 case */
 		    miniend = axis_array[axis].base;
 		    if (end - start >= 10)
 			minitics = 0;	/* none */
@@ -996,7 +1014,7 @@ gen_tics(AXIS_INDEX axis, tic_callback callback)
 			ministart = 2;
 			ministep = 1;
 		    }
-		    /*}}} */
+		    /* }}} */
 		}
 	    } else if (axis_array[axis].is_timedata) {
 		ministart = ministep =
@@ -1013,10 +1031,10 @@ gen_tics(AXIS_INDEX axis, tic_callback callback)
 
 	    if (ministep <= 0)
 		minitics = 0;	/* dont get stuck in infinite loop */
-	    /*}}} */
+	    /* }}} */
 	}
 
-	/*{{{  a few tweaks and checks */
+	/* {{{  a few tweaks and checks */
 	/* watch rounding errors */
 	end += SIGNIF * step;
 	/* HBB 20011002: adjusting the endpoints doesn't make sense if
@@ -1032,7 +1050,7 @@ gen_tics(AXIS_INDEX axis, tic_callback callback)
 
 	if (step == 0)
 	    return;		/* just quietly ignore them ! */
-	/*}}} */
+	/* }}} */
 
 	/* FIXME HBB 20010121: keeping adding 'step' to 'tic' is
 	 * begging for rounding errors to strike us. */
@@ -1058,7 +1076,7 @@ gen_tics(AXIS_INDEX axis, tic_callback callback)
 	    } else
 		anyticput = 1;
 
-	    /*{{{  calc internal and user co-ords */
+	    /* {{{  calc internal and user co-ords */
 	    if (!axis_array[axis].log) {
 		internal = (axis_array[axis].is_timedata)
 		    ? time_tic_just(timelevel[axis], tic)
@@ -1069,14 +1087,14 @@ gen_tics(AXIS_INDEX axis, tic_callback callback)
 		internal = tic;
 		user = AXIS_UNDO_LOG(axis, internal);
 	    }
-	    /*}}} */
+	    /* }}} */
 	    if (internal > internal_max)
 		break;		/* gone too far - end of series = VERYLARGE perhaps */
 	    if (internal >= internal_min) {
 #if 0 /* maybe minitics!!!. user series starts below min ? */
 		continue;
 #endif
-		/*{{{  draw tick via callback */
+		/* {{{  draw tick via callback */
 		switch (def->type) {
 		case TIC_DAY:{
 			int d = (long) floor(user + 0.5) % 7;
@@ -1117,11 +1135,11 @@ gen_tics(AXIS_INDEX axis, tic_callback callback)
 			(*callback) (axis, internal, label, lgrd);
 		    }
 		}
-		/*}}} */
+		/* }}} */
 
 	    }
 	    if (minitics) {
-		/*{{{  process minitics */
+		/* {{{  process minitics */
 		double mplace, mtic;
 		for (mplace = ministart; mplace < miniend; mplace += ministep) {
 		    if (axis_array[axis].is_timedata)
@@ -1136,14 +1154,15 @@ gen_tics(AXIS_INDEX axis, tic_callback callback)
 			&& inrange(mtic, start - step * SIGNIF, end + step * SIGNIF))
 			(*callback) (axis, mtic, NULL, mgrd);
 		}
-		/*}}} */
+		/* }}} */
 	    }
 	}
     }
 }
 
-/*}}} */
+/* }}} */
 
+/* {{{ time_tic_just() */
 /* justify ticplace to a proper date-time value */
 static double
 time_tic_just(t_timelevel level, double ticplace)
@@ -1187,14 +1206,16 @@ time_tic_just(t_timelevel level, double ticplace)
     ticplace = gtimegm(&tm);
     return (ticplace);
 }
+/* }}} */
 
+
+/* {{{ axis_output_tics() */
 /* HBB 20000416: new routine. Code like this appeared 4 times, once
  * per 2D axis, in graphics.c. Always slightly different, of course,
  * but generally, it's always the same. I distinguish two coordinate
  * directions, here. One is the direction of the axis itself (the one
  * it's "running" along). I refer to the one orthogonal to it as
  * "non-running", below. */
-
 void
 axis_output_tics(
      AXIS_INDEX axis,		/* axis number we're dealing with */
@@ -1300,13 +1321,20 @@ axis_output_tics(
     }
 }
 
+/* }}} */
+		 
+/* {{{ axis_set_graphical_range() */
+
 void
 axis_set_graphical_range(AXIS_INDEX axis, unsigned int lower, unsigned int upper)
 {
     axis_array[axis].term_lower = lower;
     axis_array[axis].term_upper = upper;
 }
+/* }}} */
 
+
+/* {{{ axis_position_zeroaxis */
 static TBOOLEAN
 axis_position_zeroaxis(AXIS_INDEX axis)
 {
@@ -1328,7 +1356,10 @@ axis_position_zeroaxis(AXIS_INDEX axis)
 
     return is_inside;
 }
+/* }}} */
 
+
+/* {{{ axis_draw_2d_zeroaxis() */
 void
 axis_draw_2d_zeroaxis(AXIS_INDEX axis, AXIS_INDEX crossaxis)
 {
@@ -1346,9 +1377,10 @@ axis_draw_2d_zeroaxis(AXIS_INDEX axis, AXIS_INDEX crossaxis)
 	}
     }
 }
+/* }}} */
 
 
-
+/* {{{ load_range() */
 /* loads a range specification from the input line into variables 'a'
  * and 'b' */
 t_autoscale
@@ -1388,14 +1420,19 @@ load_range(AXIS_INDEX axis, double *a, double *b, t_autoscale autoscale)
     /* HBB 20040315: ... and clear it automatically if a fixed range
      * was given the "right" way round! */
     if ((autoscale & AUTOSCALE_BOTH) == AUTOSCALE_NONE) {
-      if (*b < *a)
+      if (*b < *a) {
+	double temp = *a;
+
+	*a = *b; *b = temp;
 	axis_array[axis].range_flags |= RANGE_REVERSE;
-      else
+      } else 
 	axis_array[axis].range_flags &= ~RANGE_REVERSE;
     }
 
     return (autoscale);
 }
+
+/* }}} */
 
 
 /* we determine length of the widest tick label by getting gen_ticks to
