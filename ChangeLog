@@ -7,8 +7,17 @@
 	* src/graph3d.c (plot_labels3d): Simplify place_labels3d by calling
 	a new shared routine.
 	
-	src/gadgets.c (get_offsets write_label) src/gadgets.h:
+	* src/gadgets.c (get_offsets write_label) src/gadgets.h:
 	New routine write_label that is shared by both the 2D and 3D code.
+
+	* demo/fit.dem demo/vector.dem demo/histograms2.dem:
+	Revise demo instructions slightly to work with the webify script.
+
+	* demo/webify.pl: Use "pause 0" in demo scripts to signal that the
+	output file needs to be reset during web page generation.
+
+	* demo/Makefile.am.in: Update list of demos to include in web page
+	generation ("make html").
 
 2004-09-20  Ethan Merritt  <merritt@u.washington.edu>
 
