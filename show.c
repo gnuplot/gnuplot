@@ -152,7 +152,7 @@ show_command()
 	/* show at is undocumented/hidden... */
     static char GPFAR showmess[] =
 "valid set options:  [] = choose one, {} means optional\n\n\
-\t'all',  'angles',  'arrow',  'autoscale',  'border',  'boxwidth',\n\
+\t'all',  'angles',  'arrow',  'autoscale',  'bar', 'border',  'boxwidth',\n\
 \t'clip',  'contour',  'data',  'dgrid3d',  'dummy',  'encoding',\n\
 \t'format', 'function',  'grid',  'hidden',  'isosamples',  'key',\n\
 \t'label', 'linestyle', 'locale', 'logscale', 'mapping', 'margin',\n\
