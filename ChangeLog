@@ -1,5 +1,11 @@
 2003-02-19  Petr Mikulik  <mikulik@physics.muni.cz>
 
+	* config/makefile.mgw config/makefile.cyg config/makefile.os2: Somebody
+	has redefined HAVE_TTF to HAVE_GD_TTF without making appropriate changes
+	here!
+
+2003-02-19  Petr Mikulik  <mikulik@physics.muni.cz>
+
 	* src/graphics.c(histeps_compare): There was a wrong comparison returned
 	by this qsort-called routine, which caused 'plot with histeps' buggy.
 
