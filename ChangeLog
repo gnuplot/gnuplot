@@ -1,3 +1,44 @@
+1998-09-16  Lars Hecking  <lhecking+usenet@nmrc.ucc.ie>
+
+	* acconfig.h: Add NO_SYS_STAT_H, remove X11.
+
+	* config.hin, configure: Regenerated.
+
+	* configure.in: Don't define X11. Add check for <sys/stat.h> and
+	AC_HEADER_STAT.
+
+	* datafile.c: Add modified version of Alexander Mai's stat(2) patch
+	(check if regular file or pipe before opening data file).
+
+	* makefile.amg: Remove stdfn.h from datafile.c deps.
+
+	* plot.h: Define X11 in terms of X_DISPLAY_MISSING.
+
+	* stdfn.h: Add stat(2) related macros.
+
+	* term.h: Use X_DISPLAY_MISSING instead of X11.
+	
+1998-09-15  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* term/gif.term: Patch from REIBENSCHUH Alfred
+	<alfred.reibenschuh@cait.co.at> to draw grids with the gdStyled
+	functions.
+
+	* term/cgm.trm(CGM_graphics): Fix core dump with strlen(NULL).
+
+1998-09-02  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* term/gif.term: Patch from REIBENSCHUH Alfred
+	<alfred.reibenschuh@cait.co.at> to prevent rotated labels from
+	extending into graph area.
+
+1998-09-01  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* graphics.c: Patch from Dick Crawford to fix timestamp positioning.
+	
+	* term/post.trm: Patch from Dick Crawford to update help section to
+	new directory structure for postscript docs.
+
 1998-08-28  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* descrip.mms: Patch by Rolf Niepraschk
