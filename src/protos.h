@@ -181,6 +181,7 @@ void disp_at __PROTO((struct at_type *curr_at, int level));
 int find_maxl_keys __PROTO((struct curve_points *plots, int count, int *kcnt));
 int find_maxl_keys3d __PROTO((struct surface_points *plots, int count, int *kcnt));
 TBOOLEAN valid_format __PROTO((const char *format));
+FILE *loadpath_fopen __PROTO((const char *, const char *));
 
 
 /* Prototypes from file "parse.c" */

@@ -1060,6 +1060,8 @@ TBOOLEAN can_do_args;
 
     if (fp == (FILE *) NULL) {
 	/* HBB 980311: alloc() it, to save valuable stack space: */
+	/* LH  980528: uhm, HBB, you implemented a perfect memory
+	 * leak, because os_error() doesn't return! */
 	char *errbuf = gp_alloc(BUFSIZ, "load_file errorstring");
 	(void) sprintf(errbuf, "Cannot open %s file '%s'",
 		       can_do_args ? "call" : "load", name);
@@ -1524,3 +1526,38 @@ const char *format;
 	}
     }
 }
+
+/* may return NULL */
+FILE *loadpath_fopen(filename, mode)
+const char *filename, *mode;
+{
+    FILE *fp;
+
+    if ((fp = fopen(filename,mode)) == (FILE *) NULL) {
+	/* try 'loadpath' variable */
+	char *fullname = NULL, *path;
+
+	while ((path = get_loadpath()) != NULL) {
+	    /* length of path, dir separator, filename, \0 */
+	    fullname = gp_realloc(fullname,strlen(path)+1+strlen(filename)+1, "loadpath_fopen");
+	    strcpy(fullname,path);
+	    PATH_CONCAT(fullname,filename);
+	    if ((fp = fopen(fullname,mode)) != NULL) {
+		free(fullname);
+		fullname = NULL;
+		/* reset loadpath internals!
+		 * maybe this can be replaced by calling get_loadpath with
+		 * a NULL argument and some loadpath_handler internal logic */
+		while(get_loadpath())
+		    ;
+		break;
+	    }
+	}
+
+	if (fullname)
+	    free(fullname);
+
+    }
+    return fp;
+}
+
