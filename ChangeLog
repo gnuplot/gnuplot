@@ -1,11 +1,29 @@
+1998-12-22  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* 0README: Updated.
+
+	* TODO: Updated.
+
+	* configure: Regenerated.
+
+	* configure.in: Add ${with_gnu_readline}/lib to locations searched
+	for GNU libreadline.
+
+	* plot.h, term/post.trm: Implement and use architecture-independent
+	INT_STR_LEN constant as suggested by Andris Pavenis <pavenis@lanet.lv>.
+
+1998-12-22  Dick Crawford  <u600256@gamma.lanl.gov>, Lucas Hart  <hartl@ucs.orst.edu 
+
+	* docs/gnuplot.doc: Update fit documentation.
+
 1998-12-21  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* 0BUGS: Amend entry about label and arrow clipping.
 
 	* configure: Regenerated.
 
-	* configure.in: Change readline test so that full path to
-	libreadline is not required anymore. Edit some warning messages.
+	* configure.in: Change readline test so that full path to libreadline
+	is allowed, but not required. Edit some warning messages.
 
 1998-12-21  Lucas Hart  <hartl@ucs.orst.edu>
 

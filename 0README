@@ -186,13 +186,14 @@ Date: Fri Aug 27 05:21:33 GMT 1993
 
 Version: 3.7
 
-In general, GNUPLOT 3.7 is available as the file gnuplot-3.7.tar.Z.
+In general, GNUPLOT 3.7 is available as the file gnuplot-3.7.tar.gz.
 Because of the numerous changes since version 3.5, no patch files
 will be available to bring 3.5 to 3.7.
 (Version 3.6 was skipped because of possible confusion
 with the numerous BETA releases.)  It will be made available to simtel20 
-and its mirrors in ZIP format, along with a DOS, MS-Windows 3.1 and
-OS/2 2.0 executables.
+and its mirrors in ZIP format, along with a DOS, MS-Windows 3.1,
+Windows 95/98/NT and OS/2 2.0 executables. Amiga binaries will be
+made available on Aminet.
 
 Also, some sites will have gpdoc_ps.zip which contains
 PostScript versions of the manuals and tutorials.
@@ -207,9 +208,12 @@ USENET users:
 
 NORTH AMERICA:
 
+[ At time of release, we are not sure whether this service
+  is still available. -lh
+
      Anonymous ftp to ftp.dartmouth.edu (129.170.16.4)
      Fetch
-        pub/gnuplot/gnuplot-3.7.tar.Z
+        pub/gnuplot/gnuplot-3.7.tar.gz
      in binary mode.
 
      Users without ftp capability can obtain it through a mail ftp
@@ -227,18 +231,18 @@ NORTH AMERICA:
      before all the above.
 
      You will receive gnuplot as uuencoded compressed tar file.
-
+]
 
 AUSTRALIA:
 
      Anonymous ftp to ftp.cc.monash.edu.au (130.194.11.8).
-     Fetch /pub/gnuplot/gnuplot-3.7.tar.Z in binary mode.
+     Fetch /pub/gnuplot/gnuplot-3.7.tar.gz in binary mode.
 
 
 EUROPE:
 
      Anonymous ftp to ftp.irisa.fr (131.254.254.10).
-     Fetch /pub/gnuplot/gnuplot-3.7.tar.Z in binary mode.
+     Fetch /pub/gnuplot/gnuplot-3.7.tar.gz in binary mode.
 
 ----
 

@@ -37,7 +37,7 @@ Lars' list
   gnuplot command line history save file, etc)?
 - standardise float/double comparisons around the suggestion in the
   comp.lang.c FAQ (What's a good way to check for "close enough"
-  floating-point equality?) and symbolic vars from standard header files.
+  floating-point equality?) and symbolic constants from standard header files.
 - autogenerate term.h from config file in text format and/or configure
 - add load path for files/GNUPLOT_LIBRARY env var
 - provide library of replacement functions instead of stdfn.c
@@ -47,5 +47,5 @@ Lars' list
   already require >=0.89; possible compile problems under Irix 6.x which
   comes with png 0.88/zlib 1.0)
 - write or organise a portable version of snprintf(3) with a copyright
-  compatible with the gnuplot copyright
+  compatible with the gnuplot copyright (ie. no GPL)
 
