@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.in,v 1.126 2003/01/31 15:28:22 lhecking Exp $
+dnl $Id: configure.in,v 1.127 2003/02/03 15:50:45 lhecking Exp $
 dnl
 AC_INIT(src/graphics.c)
 AM_CONFIG_HEADER(config.h:config.hin)
@@ -170,10 +170,10 @@ dnl On SVR3.
 dnl FIXME AC_DEFINE(CRIPPLED_SELECT)
 
 dnl Install the lasergnu printer script
-LASERGNU=lasergnu_noinstall
+LASERGNU=lasergnu-noinstall
 AC_ARG_WITH(lasergnu,dnl
 [  --with-lasergnu         install lasergnu printer script],
-  test "$withval" = yes && LASERGNU=lasergnu_install)
+  test "$withval" = yes && LASERGNU=lasergnu-install)
 
 dnl .gih help file location
 eval gp_datadir=$datadir

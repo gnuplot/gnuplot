@@ -12,8 +12,8 @@ uninstall-local:
 	@$(NORMAL_UNINSTALL)
 	rm -f $(DESTDIR)$(man1dir)/lasergnu.1
 
-lasergnu_install:
+lasergnu-install:
 	$(INSTALL_DATA) $(srcdir)/lasergnu.1 $(DESTDIR)$(man1dir)
 
-lasergnu_noinstall:
+lasergnu-noinstall:
 
