@@ -58,7 +58,7 @@ Makefile.am: Makefile.am.in
 	rm -f $@ $@t
 	sed -n '1,/^##m4-files-begin/p' Makefile.am.in > $@t
 	echo EXTRA_DIST = Makefile.am.in *.bor *.cor *.dat *.dem *.fnc *.inc \
-	  sound.par sound2.par start.par webify.pl *.rot | fmt | \
+	  labelplot.pdb sound.par sound2.par start.par webify.pl *.rot | fmt | \
 	  (tr '\012' @; echo) | sed 's/@$$/%/;s/@/ \\@/g' | tr @% '\012 ' \
 	  >> $@t
 	sed -n '/^##m4-files-end/,$$p' $< >> $@t
