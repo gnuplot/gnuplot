@@ -5237,6 +5237,10 @@ If a `splot` draws only on the base, as is the case with "`unset surface; set
 contour base`", then the verticals and the top are not drawn even if they are
 specified.
 
+The `set grid` options 'back', 'front' and 'layerdefault' also
+control the order in which the border lines are drawn with respect to
+the output of the plotted data.
+
 Examples:
 
 Draw default borders:
@@ -6469,10 +6473,14 @@ major gridlines is used.  The default polar angle is 30 degrees.
 If `front` is given, the grid is drawn on top of the graphed data. If
 `back` is given, the grid is drawn underneath the graphed data. Using
 `front` will prevent the grid from being obscured by dense data. The
-default setup, `layerdefault`, is `back` for 2d plots.  In 3D plots,
-the default is to split up the grid and the graph box into two
-layers, one behind, the other in front of the plotted data and
-functions.
+default setup, `layerdefault`, is equivalent to `back` for 2d plots.  
+In 3D plots the default is to split up the grid and the graph box into 
+two layers: one behind, the other in front of the plotted data and
+functions. Since @ref{hidden3d} mode does its own sorting, it ignores
+all grid drawing order options and passes the grid lines through the
+hidden line removal machinery instead. These options actually affect
+not only the grid, but also the lines output by @ref{border} and the
+various ticmarks (see @ref{xtics}).
 
 Z grid lines are drawn on the bottom of the plot.  This looks better if a
 partial box is drawn around the plot---see @ref{border}.
@@ -15895,8 +15903,9 @@ The same syntax applies to @ref{ytics}, @ref{ztics}, @ref{x2tics}, @ref{y2tics} 
 
 `axis` or @ref{border} tells `gnuplot` to put the tics (both the tics themselves
 and the accompanying labels) along the axis or the border, respectively.  If
-the axis is very close to the border, the `axis` option can result in tic
-labels overwriting other text written in the margin.
+the axis is very close to the border, the `axis` option will move the
+tic labels to outside the border.  The relevant margin settings will usually
+be sized badly by the automatic layout algorithm in this case.
 
 `mirror` tells `gnuplot` to put unlabelled tics at the same positions on the
 opposite border.  `nomirror` does what you think it does.
@@ -15927,6 +15936,9 @@ increment may be negative.  If neither <start> nor <end> is given, <start> is
 assumed to be negative infinity, <end> is assumed to be positive infinity,
 and the tics will be drawn at integral multiples of <incr>.  If the axis is
 logarithmic, the increment will be used as a multiplicative factor.
+
+The `set grid` options 'front', 'back' and 'layerdefault' affect the drawing
+order of the xtics, too.
 
 Examples:
 
