@@ -1,5 +1,8 @@
                                   Gnuplot FAQ
-                                  Version 12. 3. 2004
+
+   This document deals with gnuplot version 4.0 which is the latest official
+   release as of April 2004.
+   Its version is $Revision: 1.15 $, dated $Date: 2004/04/14 13:18:59 $.
 
 Contents
 
@@ -38,9 +41,10 @@ Contents
           * 3.11 Drawing a (color) map, i.e. 2D projection of 3D data
           * 3.12 How to overlay dots/points scatter plot onto a pm3d
             map/surface
-          * 3.13 How to overlay contour plot over pm3d map/surface
-          * 3.14 Color facets with pm3d
-          * 3.15 Palette for printing my color map on color as well as
+          * 3.13 How to draw black contour plot, and contours with labels
+          * 3.14 How to overlay contour plot over pm3d map/surface
+          * 3.15 Color facets with pm3d
+          * 3.16 Palette for printing my color map on color as well as
             blank&white printer?
      * 4 Wanted features
           * 4.1 What's new in gnuplot 3.7, 4.0 etc?
@@ -83,7 +87,7 @@ Contents
           * 6.4 How do I save and restore my settings?
           * 6.5 How do I plot lines (not grids) using splot?
           * 6.6 How do I plot a function f(x,y) that is bounded by other
-            functions in the x-y plain?
+            functions in the x-y plane?
           * 6.7 How do I turn off <feature> in a plot?
           * 6.8 How do I call gnuplot from my own programs?
           * 6.9 What if I need h-bar (Planck's constant)?
@@ -112,20 +116,18 @@ Contents
 
 0.1 Where do I get this document?
 
-   This document is posted sometimes to the newsgroups
-    ~comp.graphics.apps.gnuplot. Its newest (plaintext) version is available
-   via anonymous ftp from ftp.gnuplot.info in /pub/gnuplot/faq/faq.txt.
-
    The newest version of this document is on the web at
    http://www.gnuplot.info/faq/.
 
-   Today's version is version $Revision: 1.12 $, dated $Date: 2004/02/13
-   15:42:40 $
+   This document was/is posted sometimes to the newsgroups
+    ~comp.graphics.apps.gnuplot.
 
 0.2 Where do I send comments about this document?
 
    Send comments, suggestions etc via email to the developer mailing list
-   gnuplot-beta@lists.sourceforge.net.
+   gnuplot-beta@lists.sourceforge.net. Please contribute your suggestions
+   with respect to the file faq.tex available from
+   http://cvs.sourceforge.net/viewcvs.py/gnuplot/faq/.
 
 
 1 General Information
@@ -137,10 +139,6 @@ Contents
    three-dimensional plots in many different formats. It is designed
    primarily for the visual display of scientific data. gnuplot is
    copyrighted, but freely distributable; you don't have to pay for it.
-
-   This document deals with gnuplot Version 3.7 which is the latest official
-   release as of April 1, 2004. References to bug-fix versions or (recent)
-   beta versions are explicitly marked.
 
 1.2 How did it come about and why is it called gnuplot?
 
@@ -231,46 +229,26 @@ Contents
 
 1.8 Where do I get further information?
 
-   The following sites have more information about gnuplot.
+   See the main gnuplot web page http://www.gnuplot.info and references
+   therein, mainly gnuplot links http://gnuplot.sourceforge.net/links.html.
 
-     * http://www.gnuplot.info - the main gnuplot web page and references
-       therein
-     * http://www.comnets.rwth-aachen.de/doc/gnu/gnuplot37/gnuplot.html an
-       online documentation in html-format
-     * http://www.usf.uni-osnabrueck.de/ breiter/tools/gnuplot/index.en.html
-       has many links to many features and add-ons for gnuplot
-     * http://web.cs.uni.edu/Help/gnuplot/ contains an online tutorial
-     * http://ndevilla.free.fr/gnuplot/ explains the use of a gnuplot API in
-       ANSI C (commonly known as gnuplot_pipes)
-     * http://ricardo.ecn.wfu.edu/ cottrell/qplot/ on how to plot quarterly
-       time data
-     * http://feff.phys.washington.edu/ ravel/gnuplot has a new mode for the
-       users of (X)Emacs
-
-   Some documentation is available in other languages than English. Those
-   include:
-     * French: (Version 3.5) http://membres.lycos.fr/gersoo/gnuplt/
-     * German: (Version 3.5)
-       http://www.we.fh-osnabrueck.de/fbwe/vorlesung/edv2/gplot/gplot.html
-     * Portuguese: http://pages.udesc.br/ j6ca/
-     * Japanese: http://t16web.lanl.gov/Kawano/gnuplot/
-       http://mibai.tec.u-ryukyu.ac.jp/ oshiro/Doc/gnuplot_primer/
+   Some documentation and tutorials are available in other languages than
+   English. See http://gnuplot.sourceforge.net/help.html, section "Localized
+   learning pages about gnuplot", for the most up-to-date list.
 
 
 2 Setting it up
 
 2.1 What is the current version of gnuplot?
 
-   The current released version of gnuplot is 3.7.3. The current development
-   series consists of a series of snapshots with version labels 3.8a through
-   3.8k.
+   The current released version of gnuplot is 4.0.
 
 2.2 Where can I get gnuplot?
 
    The best place is definitely http://www.gnuplot.info. From there you find
    various pointers to other sites.
 
-   The source distribution ("gnuplot-3.7.tar.gz" or a similar name) is
+   The source distribution ("gnuplot-4.0.0.tar.gz" or a similar name) is
    available from the official distribution site and its mirrors.
 
    The main server is ftp.gnuplot.info in /pub/gnuplot/. This server is
@@ -293,8 +271,8 @@ Contents
        oes.orst.edu or ftp.luth.se.
 
      * MS-DOS and MS-Windows binaries are available from the above servers
-       and are called gp37dos.zip, gp37dj.zip, gp37w16.zip, gp37mgw.zip,
-       gnuplot3.7cyg.zip. OS/2 binaries are called gp37os2.zip.
+       and are called for example gp37dos.zip, gp37dj.zip, gp37w16.zip,
+       gp37mgw.zip, gnuplot3.7cyg.zip. OS/2 binaries are called gp37os2.zip.
 
      * The NeXTSTEP front end can be found at next-ftp.peak.org in
        /pub/next/binaries/plotting/Gnuplot1.2_bin.tar.Z.
@@ -345,7 +323,7 @@ Contents
        djconfig.sh.
      * For other platforms, copy the relevant makefile (e.g. makefile.os2 for
        OS/2, or makefile.mgw or makefile.cyg for Windows) from config/ to
-       src, optionally update options in the makefile's header, then change
+       src/, optionally update options in the makefile's header, then change
        directory to src and run make.
 
 2.5 What documentation is there, and how do I get it?
@@ -358,15 +336,18 @@ Contents
      * a tutorial on using gnuplot with LATEX
      * a quick reference summary sheet for TEX only
 
-   PostScript copies of the documentation can be ftp'd from ftp.gnuplot.info
-   in /pub/gnuplot, as manual.ps.Z and tutorial.ps.Z. Documentation about
-   gnuplot is available at the gnuplot distribution sites in the files
-   gpdoc.zip and gpdoc2.zip.
-
    The documentation is built during installation if you have LATEX installed
    on your system, look in the directories docs and tutorial. make pdf in the
    docs subdirectory will make a gnuplot.pdf hypertext file ready for
    browsing or printing.
+
+   Online gnuplot documentation is available at
+   http://gnuplot.sourceforge.net/documentation.html.
+
+   (Obsolete?) PostScript copies of the documentation can be ftp'd from
+   ftp.gnuplot.info in /pub/gnuplot, as manual.ps.Z and tutorial.ps.Z.
+   Documentation about gnuplot is available at the gnuplot distribution sites
+   in the files gpdoc.zip and gpdoc2.zip.
 
 2.6 Worked examples
 
@@ -386,6 +367,9 @@ Contents
    and autoconf. On many UNIX systems these will already be installed; If
    they aren't, you can find them wherever GNU software is archived. Typical
    command for applying a patch is patch -p0 <newfunctionality.diff.
+
+   There is repository of contributed patches in the "Patches" section on
+   gnuplot's sourceforge site http://www.sourceforge.net/projects/gnuplot/.
 
 
 3 Working with it.
@@ -516,8 +500,9 @@ Contents
 
      * You may use the svg terminal (scalable vector graphics), which can be
        further edited by a svg editor, e.g. Sodipodi
-       (http://sodipodi.sourceforge.net) or Sketch
-       (http://sketch.sourceforge.net).
+       (http://sodipodi.sourceforge.net), Sketch
+       (http://sketch.sourceforge.net) or Dia
+       (http://http://www.lysator.liu.se/ alla/dia).
 
      * PostScript or PDF output can be edited directly by tools such as Adobe
        Illustrator or Acrobat, or can be converted to a variety of other
@@ -546,6 +531,14 @@ Contents
    More recent versions of libgd also support jpeg output. If your
    installation of gnuplot is linked to the gd library, you will get support
    for whatever formats (gif, png, jpeg) are in that version of libgd.
+
+   Thus, nowadays, the usual way is to output the image as png and then use
+   your favourite program to convert it into gif, either using command line
+   (e.g. convert f.png f.gif or nconvert -out gif f.png) or by any GUI
+   program. Another possibility is to output the image as (encapsulated)
+   postscript and convert (export) it into gif or png by ghostscript, e.g.
+   convert -density 150 f.eps f.gif or by any ghostscript-based GUI like
+   gsview, gv or kghostview.
 
 3.7 Can I animate my graphs?
 
@@ -578,7 +571,7 @@ Contents
  gnuplot> set out 'curve.dat'
  gnuplot> splot f(x,y)
  gnuplot> set out
- gnuplot> set term {your usual terminal for interactive work}
+ gnuplot> set term pop
  gnuplot> plot 'curve.dat' w l
 
    The trick is to draw the single contour line z=0 of the surface z=f(x,y),
@@ -587,7 +580,7 @@ Contents
 3.9 How to fill an area between two curves
 
    A plot with filled area between two given curves requires a parametric
-   plot with filledcurves closed. The example below demonstrate this for two
+   plot with filledcurves closed. The example below demonstrates this for two
    curves f(x) and g(x) with a tricky "folded" parameter t:
 
  set parametric
@@ -631,11 +624,11 @@ Contents
 
 3.11 Drawing a (color) map, i.e. 2D projection of 3D data
 
-   Use set view map or set pm3d map rather than set view 180,0. The latter
-   facilitates drawing matrices or data files as maps, even without the
-   necessity for matrix-like data organization (gridding). It is possible to
-   decrease the output postscript file size by postprocessing it by
-   pm3dCompress.awk or pm3dConvertToImage.awk.
+   Use set view map; unset surface or set pm3d map rather than set view
+   180,0. The latter facilitates drawing matrices or data files as maps, even
+   without the necessity for matrix-like data organization (gridding). It is
+   possible to decrease the output postscript file size by postprocessing it
+   by pm3dCompress.awk or pm3dConvertToImage.awk.
 
    Note there is a new plotting style with image for plotting 2D color images
    with support for almost arbitrary text or binary files in "Patches"
@@ -649,11 +642,41 @@ Contents
  gnuplot> set pm3d explicit
  gnuplot> splot x with pm3d, x*y with points
 
-3.13 How to overlay contour plot over pm3d map/surface
+3.13 How to draw black contour plot, and contours with labels
+
+   Drawing contour plot in one colour requires to write contours into a
+   temporary file using the table terminal:
+
+ set contour base; set cntrparam levels 15; unset surface; set view map
+ splot x*x+y*y; pause -1
+ set term table; set out 'contour.dat'
+ replot; set out; set term pop
+
+   Now, for drawing it in 2D, do
+
+ reset
+ plot 'contour.dat' with line -1
+
+   end for contours in 3D do
+
+ reset
+ # Change single blank lines to double blank lines
+ !awk "NF<2{printf\"\n\"}{print}" <contour.dat >contour1.dat
+ plot 'contour1.dat' with line -1
+
+   See also the following question "How to overlay contour plot over pm3d
+   map/surface".
+
+   Labelling contours by their z-value can be achieved by a suitable script
+   generating automatically the appropriate set label commands; you can find
+   one at gnuplot scripts page
+   http://gnuplot.sourceforge.net/scripts/index.html#tricks-here.
+
+3.14 How to overlay contour plot over pm3d map/surface
 
    It is necessary to write contours into a temporary file using the table
    terminal, and then use this file in the final drawing without set
-   contours. The following example demonstrate this for a map; for surface,
+   contours. The following example demonstrates this for a map; for surface,
    remove set pm3d map and put set ticslevel 0.
 
  # Write contours of function  x*x-y*y  to a (temporary) file
@@ -678,7 +701,7 @@ Contents
 
    The last command deletes the two temporary files.
 
-3.14 Color facets with pm3d
+3.15 Color facets with pm3d
 
    It is possible to draw colors facets of a 3D objects, organized in such a
    file:
@@ -725,7 +748,7 @@ Contents
    reality. It works OK for set pm3d map but for true 3D you would be
    probably more happy writing a convertor of your facets into a VRML file.
 
-3.15 Palette for printing my color map on color as well as blank&white printer?
+3.16 Palette for printing my color map on color as well as blank&white printer?
 
    I think it is this one, for example: set palette rgbformulae -25,-24,-32.
    Can somebody prove this?
@@ -1105,7 +1128,7 @@ Contents
    under MS Windows as well, but that is for experienced users: (A) When
    gnuplot has been compiled by cygwin with the unixish way of ./configure;
    make with X11 terminal instead of the 'windows' terminal. You have to run
-   this under an X-server. This is procedure is out of knowledge for usual
+   this under an X-server. This procedure is out of knowledge for usual
    users, but powerful for others. (B) Compile gnuplot yourself by
    makefile.mgw or makefile.cyg and set PIPES=1 therein. The drawback is that
    each wgnuplot.exe will be accompanied by a boring shell box.
@@ -1139,7 +1162,7 @@ Contents
    course.
 
 6.6 How do I plot a function f(x,y) that is bounded by other functions in the
-x-y plain?
+x-y plane?
 
    An example:
 
@@ -1280,8 +1303,8 @@ What can I do?
 
 7.7 When using the LATEX-terminal, there is an error during the LATEX-run!
 
-   Please upgrade to at least gnuplot 3.7. The LATEX2[IMAGE png]-core no
-   longer includes the commands "[IMAGE png]Diamond" and "[IMAGE png]Box";
+   Please upgrade to at least gnuplot 3.7. The LATEX2$\epsilon$-core no
+   longer includes the commands "$\backslash$Diamond" and "$\backslash$Box";
    they are included in the latexsym package, which is part of the base
    distribution and thus part of any LaTeX implementation. Please do not
    forget to use this package.
@@ -1335,5 +1358,5 @@ What can I do?
    corrections and additions from Alex Woo, John Campbell, Russell Lang,
    David Kotz and many corrections from Daniel Lewart. Again reworked for
    gnuplot 3.7 by Alexander Mai and Juergen v.Hagen with corrections by Lars
-   Hecking, Hans-Bernhard Broecker and other people. Revised prior to gnuplot
-   4.0 release by Petr Mikulik and Ethan Merritt.
+   Hecking, Hans-Bernhard Broecker and other people. Revised for gnuplot 4.0
+   release by Petr Mikulik and Ethan Merritt.
