@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: readline.c,v 1.21 2000/11/23 18:25:12 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: readline.c,v 1.22 2000/11/24 15:44:31 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - readline.c */
@@ -62,7 +62,6 @@ static char *RCSid() { return RCSid("$Id: readline.c,v 1.21 2000/11/23 18:25:12 
 /* #include <readline/history.h> --- HBB 20000508: now included by gp_hist */
 
 
-#ifdef OS2_IPC
 static char* line_buffer;
 static int line_complete;
 
@@ -70,7 +69,7 @@ static int line_complete;
  * called by libreadline if the input
  * was typed (not from the ipc).
  */
-void
+static void
 LineCompleteHandler(char* ptr)
 {
     rl_callback_handler_remove();
@@ -78,7 +77,7 @@ LineCompleteHandler(char* ptr)
     line_complete = 1;
 }
 
-int
+static int
 getc_wrapper(FILE* fp /* should be stdin, supplied by readline */)
 {
     if (term && term->waitforinput && interactive)
@@ -86,7 +85,6 @@ getc_wrapper(FILE* fp /* should be stdin, supplied by readline */)
     else
 	return getc(fp);
 }
-#endif
 
 #endif /* HAVE_LIBREADLINE */
 

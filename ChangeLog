@@ -1,3 +1,9 @@
+2000-11-27  Alexander Mai  <st002279@hrzpub.tu-darmstadt.de>
+
+        * src/readline.c: readline.c did not built with HAVE_LIBREADLINE.
+	                  So remove an #ifdef and - being here -
+			  make two symbols static
+
 2000-11-24  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* docs/Makefile.in: New variables BUILT_SOURCES, CLEANFILES. Reorganise
