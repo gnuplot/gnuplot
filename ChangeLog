@@ -1,5 +1,12 @@
 2001-09-18  Alexander Mai <st002279@hrzpub.tu-darmstadt.de>
 
+	* term/post.trm: Fix broken PS code for Symbol Oblique font
+	definition. Thanks to Michael Vulis from MicroPress
+
+	* src/getcolor.c: Add an #include
+
+2001-09-18  Alexander Mai <st002279@hrzpub.tu-darmstadt.de>
+
 	* config/makefile.os2: Various updates/fixes/new targets, ...
 
 2001-09-18  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>

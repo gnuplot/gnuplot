@@ -1,11 +1,11 @@
 /*
- * $Id: post.trm,v 1.54 2001/09/08 00:50:01 mikulik Exp $
+ * $Id: post.trm,v 1.55 2001/09/13 21:31:05 amai Exp $
  */
 
 /* GNUPLOT - post.trm */
 
 /*[
- * Copyright 1990 - 1993, 1998
+ * Copyright 1990 - 1993, 1998, 1999, 2000, 2001
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted,
@@ -39,7 +39,7 @@
  *     postscript
  *
  * AUTHORS
- *  Russell Lang
+ *  Russell Lang  <rjl@monu1.cc.monash.edu.au>
  *
  * modified 10/5/95 by drd - put in support for other postscript drivers
  * (enhpost, pslatex, ...) so they dont have to work quite so hard
@@ -92,15 +92,14 @@ TERM_PUBLIC int PS_make_palette (t_sm_palette *);
 TERM_PUBLIC void PS_previous_palette (void);
 TERM_PUBLIC void PS_set_color (double);
 TERM_PUBLIC void PS_filled_polygon (int, gpiPoint *);
-#endif
+#endif /* PM3D */
 
-#endif
+#endif /* TERM_PROTO */
 
 
 #ifndef TERM_PROTO_ONLY
 
 #ifdef TERM_BODY
-/* PostScript driver by Russell Lang, rjl@monu1.cc.monash.edu.au */
 
 #include "post.h"
 #ifdef PM3D
@@ -465,7 +464,7 @@ static const char GPFAR * GPFAR PS_header[] = {
    gives an oblique (slanted) beta character */
 "/Symbol-Oblique /Symbol findfont [1 0 .167 1 0 0] makefont\n",
 "dup length dict begin {1 index /FID eq {pop pop} {def} ifelse} forall\n",
-"currentdict end definefont\n",
+"currentdict end definefont pop\n",
 
 NULL
 };
@@ -2086,7 +2085,7 @@ TERM_TABLE_START(post_driver)
    PS_previous_palette, /* write grestore */
    PS_set_color,
    PS_filled_polygon
-#endif
+#endif /* PM3D */
 TERM_TABLE_END(post_driver)
 
 #undef LAST_TERM
@@ -2292,5 +2291,4 @@ START_HELP(post)
 " the text file \"ps_file.doc\" in the docs/ps subdirectory of the gnuplot",
 " source distribution."
 END_HELP(post)
-#endif
-
+#endif /* TERM_HELP */
