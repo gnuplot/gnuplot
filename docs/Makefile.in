@@ -58,12 +58,13 @@ INSTALL_DATA = @INSTALL_DATA@
 CC     = @CC@
 CPP    = @CPP@
 DEFS   = @DEFS@
+CPPFLAGS = @CPPFLAGS@
 CFLAGS = @CFLAGS@
 INCLUDES = -I.. -I$(top_srcdir)/src -I$(top_srcdir)/term -I.
 LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
 
-COMPILE = $(CC) $(DEFS) $(INCLUDES) $(CFLAGS)
+COMPILE = $(CC) $(DEFS) $(INCLUDES) $(CPPFLAGS) $(CFLAGS)
 LINK = $(CC) $(CFLAGS) $(LDFLAGS) -o $@
 
 .c.o:
