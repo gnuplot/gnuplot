@@ -138,7 +138,7 @@ dnl Header files. ANSI first
 dnl We prefer that the absense of a macro is the norm, so we
 dnl define NO_WHATEVER if an ansi header/fn is missing, but HAVE_SOMETHING
 dnl if it is a non-ansi header/fn we would like to use if available
-AC_HEADER_STDC
+
 dnl check for errno.h header and if it declares errno
 AC_CHECK_HEADER(errno.h, , AC_DEFINE(NO_ERRNO_H))
 AC_MSG_CHECKING(if errno variable is declared)
@@ -157,10 +157,11 @@ AC_CHECK_HEADER(stdlib.h, ,AC_DEFINE(NO_STDLIB_H))
 AC_CHECK_HEADER(string.h, ,AC_DEFINE(NO_STRING_H))
 AC_CHECK_HEADER(time.h, ,AC_DEFINE(NO_TIME_H) AC_CHECK_TYPE(time_t, long))
 dnl
+AC_CHECK_HEADER(sys/time.h, , AC_DEFINE(NO_SYS_TIME_H))
 AC_CHECK_HEADER(sys/types.h, , AC_DEFINE(NO_SYS_TYPES_H))
 AC_CHECK_HEADER(sys/stat.h, AC_HEADER_STAT, AC_DEFINE(NO_SYS_STAT_H))
-AC_CHECK_HEADERS(sys/bsdtypes.h sys/select.h sys/systeminfo.h sys/utsname.h \
-  libc.h malloc.h sgtty.h termios.h)
+AC_CHECK_HEADERS(sys/bsdtypes.h sys/select.h sys/socket.h sys/systeminfo.h \
+  sys/utsname.h libc.h malloc.h sgtty.h termios.h)
 
 dnl check if unistd actually declares anything. On NeXT 3.2 unistd is
 dnl conditionalized for _POSIX_SOURCE
@@ -193,6 +194,9 @@ AC_CHECK_FUNCS(erf gamma lgamma getcwd pclose popen sleep snprintf \
 if test "$ac_cv_func_pclose" = yes && test "$ac_cv_func_popen" = yes ; then
   AC_DEFINE(PIPES)
 fi
+
+dnl arg types for select
+gp_FIND_SELECT_ARGTYPES
 
 dnl On SVR3.
 dnl FIXME AC_DEFINE(CRIPPLED_SELECT)
