@@ -330,6 +330,9 @@
 /*  Define if you want to have mouse support for the x11 terminal.  */
 #undef USE_MOUSE
 
+/*  Unix-type of Interprocess Communication is required for mouse support.  */
+#undef PIPE_IPC
+
 /*  Define if you want to have Petr Mikulik's fancy pm3d.  */
 #undef PM3D
 
