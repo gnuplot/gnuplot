@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: command.c,v 1.20 1998/12/09 15:22:38 lhecking Exp $";
+static char *RCSid = "$Id: command.c,v 1.20.2.1 1999/08/19 14:42:21 lhecking Exp $";
 #endif
 
 /* GNUPLOT - command.c */
@@ -248,7 +248,7 @@ int do_line()
 	    (void) fputs("!\n", stderr);	/* why do we need this ? */
 	return (0);
     }
-    num_tokens = scanner(input_line);
+    num_tokens = scanner(&input_line, &input_line_len);
     c_token = 0;
     while (c_token < num_tokens) {
 	if (command())
@@ -728,7 +728,7 @@ void replotrequest()
     plot_token = 0;		/* whole line to be saved as replot line */
 
     screen_ok = FALSE;
-    num_tokens = scanner(input_line);
+    num_tokens = scanner(&input_line, &input_line_len);
     c_token = 1;		/* skip the 'plot' part */
     if (is_3d_plot)
 	plot3drequest();
@@ -1006,7 +1006,7 @@ int toplevel;
 		    else
 			(void) strcpy(prompt, "Help topic: ");
 		    read_line(prompt);
-		    num_tokens = scanner(input_line);
+		    num_tokens = scanner(&input_line, &input_line_len);
 		    c_token = 0;
 		    more_help = !(END_OF_COMMAND);
 		    if (more_help)
