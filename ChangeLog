@@ -1,3 +1,8 @@
+2002-08-14  Harald Harders  <h.harders@tu-bs.de>
+
+	* term/post.trm: Fix writing an error message to gpoutfile instead of
+	stderr.
+
 2002-08-01  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/next.trm (NEXT_put_text): Fix incorrect multiplication of
@@ -871,7 +876,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/08/01 13:52:42 $).
+	last modification date (from the tag $Date: 2002/08/01 16:51:20 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 

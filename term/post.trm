@@ -1,5 +1,5 @@
 /*
- * $Id: post.trm,v 1.67 2002/07/26 16:42:29 mikulik Exp $
+ * $Id: post.trm,v 1.68 2002/08/01 16:51:20 broeker Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -1974,7 +1974,7 @@ ENHPS_put_text(x, y, str)
 
 	/* I think we can only get here if *str == '}' */
 	if (*str == '}')
-	    fputs("enhpost printer driver - ignoring spurious }\n", gpoutfile);
+	    fputs("enhpost printer driver - ignoring spurious }\n", stderr);
 	else
 	    fprintf(stderr, "internal error in enhpost driver - *str=0x%x\n", *str);
 
