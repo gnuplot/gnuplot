@@ -1,5 +1,5 @@
 /*
- * $Id: gif.trm,v 1.29 2000/10/31 19:59:32 joze Exp $
+ * $Id: gif.trm,v 1.30 2000/11/22 10:04:25 mikulik Exp $
  */
 
 /* GNUPLOT -- gif.trm */
@@ -399,8 +399,17 @@ TERM_PUBLIC int GIF_make_palette (t_sm_palette *palette)
 	/* the latter is the number of currently allocated colours. We want
 	   to allocate the rest */
 	/*BACK PLEASE  fprintf(stderr,"colors in GIF palette=%i\n",(int)gdMaxColors); */
+	if (i == 0) {
+	    i = (sm_palette.colors <= 0) ? -1 : sm_palette.colors;
+		/* (no more colours) : (previous palette (obviously multiplot mode)) */
+#if 1
+	    if (i > 0) fprintf(stderr,"reusing it again\n");
+#endif
+	}
 	return i;
     }
+    if (0 == gdMaxColors /*256*/ - gdImageColorsTotal(gif_state.image))
+	return 0; /* reuse previous palette (without warning) */
     for (i = 0; i < sm_palette.colors; i++) {
 	gif_smooth_color[i] = gdImageColorAllocate(gif_state.image,
 	    (int)( palette->color[i].r * 255 + 0.5 ), /* r,g,b values for gif */

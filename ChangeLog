@@ -1,14 +1,18 @@
+2000-12-08  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* term/gif.trm: don't crash on pm3d in multiplot (reuse the previous
+	colour palette if no more colours are available).
+
 2000-12-06  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/color.c term/post.trm docs/gnuplot.doc: support 'set palette
 	maxcolors <n>' also for postscript terminal (allow discrete filled
 	contour-like steps).
 	
-
 2000-12-06  Johannes Zellner  <johannes@zellner.org>
 
 	* term/ggi.trm, configure.in:
-	prepared for using wmh if it's available
+	prepared for using wmh if it's available.
 
 2000-12-05  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
