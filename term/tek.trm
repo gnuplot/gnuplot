@@ -156,6 +156,9 @@ TERM_PUBLIC void TEK40graphics()
 
 TERM_PUBLIC void TEK40text()
 {
+#ifdef VMS
+       (void) fflush(outfile);		/* finish the graphics */
+#endif
 	TEK40move(0,12);
 	fprintf(outfile,"\037");
 /*                   1
@@ -238,6 +241,9 @@ TERM_PUBLIC void TEK40reset()
 
 TERM_PUBLIC void BG_text()
 {
+#ifdef VMS
+       (void) fflush(outfile);		/* finish the graphics */
+#endif
 	BG_move(0, BG_SCREEN_HEIGHT - 2 * BG_VCHAR);
 	fprintf(outfile,"\037");
 /*                   1
@@ -354,16 +360,25 @@ TERM_PUBLIC void SEL_graphics()
 	2. set to TEK mode
 	3. clear screen
 */
+#ifdef VMS
+	term_pasthru();
+#endif /* VMS */
 }
 
 
 TERM_PUBLIC void SEL_text()
 {
+#ifdef VMS
+       (void) fflush(outfile);		/* finish the graphics */
+#endif
 	TEK40move(0,12);
 	fprintf(outfile,"\033\062");
 /*                   1
 	1. into ANSI mode
 */
+#ifdef VMS
+	term_nopasthru();
+#endif /* VMS */
 }
 
 TERM_PUBLIC void SEL_reset()
