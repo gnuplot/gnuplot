@@ -545,7 +545,7 @@ static void load_rcfile()
 
     tmp_home = getenv(HOME);
     if (tmp_home) {
-	strncpy(home, tmp_home, (sizeof(home)) - 1);
+	safe_strncpy(home, tmp_home, sizeof(home));
 	if (strlen(home))
 	    p = &home[strlen(home) - 1];
 	else
@@ -559,7 +559,7 @@ static void load_rcfile()
 	}
     }
 #else /* VMS */
-    (void) strncpy(home, HOME, sizeof(home) - 1);
+    safe_strncpy(home, HOME, sizeof(home));
     tmp_home = home;
 #endif /* VMS */
 
@@ -600,8 +600,7 @@ int ExecuteMacro(char *argv, int namelength)
     short sRc;
     int rc;
 
-    strncpy(pszName, argv, namelength);
-    pszName[namelength] = '\0';
+    safe_strncpy(pszName, argv, sizeof(pszname));
     MAKERXSTRING(rxRc, pszRc, 256);
     MAKERXSTRING(rxArg, argv, strlen(argv));
     rc = RexxStart(1,

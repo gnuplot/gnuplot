@@ -206,12 +206,7 @@ boolean *subtopics;		/* (in) - subtopics only? */
 	    return (status);
 
 	/* save the new path in oldpath */
-	if (strlen(path) < PATHSIZE)
-	    (void) strcpy(oldpath, path);
-	else {			/* not enough room in oldpath, sigh */
-	    (void) strncpy(oldpath, path, PATHSIZE - 1);
-	    oldpath[PATHSIZE - 1] = NUL;
-	}
+	safe_strncpy(oldpath, path, PATHSIZE);
     }
     /* look for the keyword in the help file */
     key = FindHelp(keyword);
@@ -672,14 +667,14 @@ char *line;
     /* leave room for prompt line */
     if (pagelines >= SCREENSIZE - 2) {
 	fprintf(stderr, "Press return for more: ");
-#if !defined(ATARI) && !defined(MTOS)
-	do
-	    c = getchar();
-	while (c != EOF && c != '\n');
-#else
+#if defined(ATARI) || defined(MTOS)
 	do
 	    c = tos_getch();
 	while (c != '\x04' && c != '\r' && c != '\n');
+#else
+	do
+	    c = getchar();
+	while (c != EOF && c != '\n');
 #endif
 	pagelines = 0;
     }

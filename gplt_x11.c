@@ -1181,8 +1181,8 @@ char *argv[];
 
     while (++Argv, --Argc > 0) {
 	if (!strcmp(*Argv, "-name") && Argc > 1) {
-	    strncpy(Name, Argv[1], 64);
-	    strncpy(Class, Argv[1], 64);
+	    safe_strncpy(Name, Argv[1], sizeof(Name));
+	    safe_strncpy(Class, Argv[1], sizeof(Class));
 	    if (Class[0] >= 'a' && Class[0] <= 'z')
 		Class[0] -= 0x20;
 	}

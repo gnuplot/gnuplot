@@ -73,18 +73,6 @@ extern char HelpFile[80];	/* patch for do_help  - DJL */
 # define MAXSTR 255
 #endif /* _Windows */
 
-#if defined(ATARI) || defined(MTOS)
-# ifdef __PUREC__
-#  include <ext.h>
-#  include <tos.h>
-#  include <aes.h>
-# else
-#  include <osbind.h>
-#  include <aesbind.h>
-#  include <support.h>
-# endif				/* __PUREC__ */
-#endif /* ATARI || MTOS */
-
 #ifndef STDOUT
 # define STDOUT 1
 #endif
@@ -247,7 +235,7 @@ int com_line()
 #ifdef OS2
 void set_input_line(char *line, int nchar)
 {
-    strncpy(input_line, line, nchar);
+    safe_strncpy(input_line, line, nchar);
     input_line[nchar] = NUL;
 }
 
@@ -1152,8 +1140,7 @@ char *prompt;
 	    add_history(line);
     }
     if (line) {
-	strncpy(s, line + leftover, n);
-	s[n - 1] = NUL;
+	safe_strncpy(s, line + leftover, n);
 	leftover += strlen(s);
 	if (line[leftover] == NUL)
 	    leftover = -1;
@@ -1223,7 +1210,7 @@ static void do_shell()
     if (!(shell = getenv("SHELL")))
 	shell = SHELL;
 
-    if (system(strncpy(&exec[sizeof(EXEC) - 1], shell,
+    if (system(safe_strncpy(&exec[sizeof(EXEC) - 1], shell,
 		       sizeof(exec) - sizeof(EXEC) - 1)))
 	os_error("system() failed", NO_CARET);
 
@@ -1310,8 +1297,7 @@ int len;
 	    return NULL;
 	leftover = 2;
     }
-    strncpy(str, buffer + leftover, len);
-    str[len - 1] = NUL;
+    safe_strncpy(str, buffer + leftover, len);
     leftover += strlen(str);
     return str;
 }

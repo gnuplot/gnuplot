@@ -62,7 +62,7 @@ static void fill(from, pto, pmaxsize)
      char **pto;
      size_t *pmaxsize;
 {
-  strncpy(*pto, from, *pmaxsize);
+  safe_strncpy(*pto, from, *pmaxsize);
   if(*pmaxsize<strlen(from)) {
     (*pto) += *pmaxsize;
     *pmaxsize = 0;

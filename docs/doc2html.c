@@ -97,10 +97,10 @@ char **argv;
 		    argv[0], argv[2]);
 	    exit(EXIT_FAILURE);
 	}
-	strncpy(title, argv[2], sizeof(title));
+	safe_strncpy(title, argv[2], sizeof(title));
     } else {
 	outfile = stdout;
-	strncpy(title, argv[1], sizeof(title));
+	safe_strncpy(title, argv[1], sizeof(title));
     }
     strtok(title, ".");		/* remove type */
     parse(infile);

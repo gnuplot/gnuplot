@@ -263,7 +263,7 @@ register long lval;
 	return(count);
 }
 
-#if defined(VMS) || defined(PIPES) || (defined(ATARI) && defined(__PUREC__)) || (defined(MTOS) && defined(__PUREC__))
+#if defined(VMS) || defined(PIPES) || (defined(ATARI) || defined(MTOS)) && defined(__PUREC__)
 
 /* this really ought to make use of the dynamic-growth of the
  * input line in 3.6.  And it definitely should not have
@@ -368,9 +368,10 @@ static $DESCRIPTOR(lognamedsc,MAILBOX);
 
 	if (i + strlen(last) > max)
 		int_error("substitution overflowed rest of line", t_num);
-	(void) strncpy(output+i,last,MAX_LINE_LEN-i);
-									/* tack on rest of line to output */
-	(void) strcpy(str,output);				/* now replace ` ` with output */
+	/* tack on rest of line to output */
+	safe_strncpy(output+i,last,MAX_LINE_LEN-i);
+	/* now replace ` ` with output */
+	(void) strcpy(str,output);
 	screen_ok = FALSE;
 }
 

@@ -106,7 +106,7 @@ FILE *fp;
 	    if (buffer[0] == 'C') {
 		if (buffer[1] == '#') {
 		    /* should not happen in gnuplot.doc, but... */
-		    strncpy(termdoc_filename, buffer + 2, sizeof(termdoc_filename));
+		    safe_strncpy(termdoc_filename, buffer + 2, sizeof(termdoc_filename));
 		    termdoc_filename[strlen(termdoc_filename) - 1] = NUL;
 		    termdoc_lineno = 0;
 		}
@@ -139,7 +139,7 @@ FILE *fp;
 
     while (termtext[line][0] == 'C') {
 	if (termtext[line][1] == '#') {
-	    strncpy(termdoc_filename, termtext[line] + 2, sizeof(termdoc_filename));
+	    safe_strncpy(termdoc_filename, termtext[line] + 2, sizeof(termdoc_filename));
 	    termdoc_lineno = 0;
 	}
 	++termdoc_lineno;
@@ -161,7 +161,7 @@ FILE *fp;
      */
 
     ++termdoc_lineno;
-    strncpy(buffer, termtext[line], max);
+    safe_strncpy(buffer, termtext[line], max);
     /* dodgy; can overrun buffer; lh */
     /* strncat(buffer, "\n", max); */
     if (strlen(buffer) == (max - 1))
