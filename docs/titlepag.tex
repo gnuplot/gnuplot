@@ -1,5 +1,5 @@
 %
-% $Id: titlepag.tex,v 1.8 2002/01/18 15:07:11 cgaylord Exp $
+% $Id: titlepag.tex,v 1.9 2002/02/25 03:10:40 broeker Exp $
 %
 
 \ifx\LaTeXe\undefined
@@ -76,18 +76,35 @@
 \begin{document}
 \sloppy
 \pagestyle{empty}
-   \rule{0in}{2.0in}
-   \begin{center}
-   {\huge\bf gnuplot}\\
-   \vspace{3ex}
-   {\Large An Interactive Plotting Program}\\
+  \rule{0in}{2.0in}
+  \begin{center}
+
+  {\huge\bf gnuplot}\\
+  \vspace{3ex}
+  {\Large An Interactive Plotting Program}\\
+
+  \vspace{2ex}
+
+  \large
+  Thomas Williams \& Colin Kelley\\
+
+  \vspace{2ex}
+
+\iffalse
+  Version 3.7 organized by: David Denholm \\
+\else
+  \IfFileExists{../VERSION.}{\gdef\gpVersion{\input{../VERSION.}}}{\gdef\gpVersion{\input{../VERSION}}}
+  \newbox\GpVersion \setbox\GpVersion=\hbox{\gpVersion}
+  \gdef\gnuplotVersion{\usebox\GpVersion}
+  Version
+    \gnuplotVersion
+  organized by: David Denholm \\
+\fi
+
    \vspace{2ex}
-   \large
-   Thomas Williams \& Colin Kelley\\
-   \vspace{2ex}
-   Version 3.7 organized by: David Denholm \\
-   \vspace{2ex}
-   Major contributors (alphabetic order):\\
+
+  Major contributors (alphabetic order):\\
+
   Hans-Bernhard Br\"oker \\
   John Campbell\\
   Robert Cunningham\\
@@ -109,13 +126,26 @@
   James R. Van Zandt \\
   Alex Woo\\
   Copyright (C) 1986 - 1993, 1998   Thomas Williams, Colin Kelley\\
-   \vspace{2ex}
-   Mailing list for comments: \verb+info-gnuplot@dartmouth.edu+\\
-   Mailing list for bug reports: \verb+bug-gnuplot@dartmouth.edu+
 
-   \vfill
-   This manual was prepared by Dick Crawford. \\
-   3 December 1998
+  \vspace{2ex}
+
+  Mailing list for comments: \verb+info-gnuplot@dartmouth.edu+\\
+  Mailing list for bug reports: \verb+bug-gnuplot@dartmouth.edu+
+
+  \vfill
+  This manual was prepared by Dick Crawford. \\
+
+  \vspace{2ex}
+
+\iffalse
+  3 December 1998
+\else {
+  \catcode`\$=10 \let\$\relax
+  \def\ignoredate#1Date: #2{#2}
+  Last edited: \ignoredate $Date: 2002/03/07 21:37:00 $
+  }
+\fi
+
    \end{center}
 \newpage
 
@@ -127,5 +157,8 @@
 
 \setcounter{page}{1}
 \pagestyle{myheadings}
-\markboth{{\bf gnuplot} 3.7}{{\bf gnuplot} 3.7}
-
+\iffalse
+  \markboth{{\bf gnuplot} 3.7}{{\bf gnuplot} 3.7}
+\else
+  \markboth{{\bf gnuplot} \gnuplotVersion}{{\bf gnuplot} \gnuplotVersion}
+\fi
