@@ -101,6 +101,13 @@ TERM_PUBLIC void TK_linewidth __PROTO((double linewidth));
 #ifndef TERM_PROTO_ONLY
 #ifdef TERM_BODY
 
+/* plot2d.c */
+extern double min_array[], max_array[], base_array[], log_base_array[];
+extern TBOOLEAN log_array[];
+/* graphics.c */
+extern int xleft, xright, ybot, ytop;
+extern TBOOLEAN is_3d_plot;
+
 static int tk_angle = 0;
 static int tk_lastx;
 static int tk_lasty;
@@ -194,11 +201,6 @@ unsigned int x, y;
 TERM_PUBLIC void TK_vector(x, y)
 unsigned int x, y;
 {
-    extern double min_array[], max_array[], base_array[], log_base_array[];
-    extern TBOOLEAN log_array[];
-    extern int xleft, xright, ybot, ytop;
-    extern TBOOLEAN is_3d_plot;
-
     if (tk_interactive && !is_3d_plot) {
 	if (tk_perl)
 	    fprintf(gpoutfile, "$can->bind(");
@@ -404,9 +406,6 @@ $font = $can->fontCreate(-family => q{%s}",
 
 TERM_PUBLIC void TK_text()
 {
-    extern double min_array[], max_array[];
-    extern int xleft, xright, ybot, ytop;
-    extern TBOOLEAN is_3d_plot;
     if (tk_perl) {
 	fputs("};\n", gpoutfile);
 	if (!is_3d_plot) {
