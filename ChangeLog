@@ -1,6 +1,66 @@
+1998-10-01  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* 0INSTALL: Update with-PACKAGE section.
+
+	* acinclude.m4: Remove caching from gp_CHECK_HEADER_QUIET and
+	gp_CHECK_LIB_QUIET, cleanup.
+
+	* aclocal.m4, configure: Regenerated.
+
+	* command.c, makefile.os2: Patches from Alexander Mai
+	<st002279@hrzpub.tu-darmstadt.de>.
+
+	* configure.in: Cleanup, remove caching of CPPFLAGS and TERMLIBS.
+
+	* docs/gnuplot.doc: Updates by Dick Crawford <u600256@gamma.lanl.gov>.
+
+	* gplt_x11.c: Move inclusion of ansichk.h and stdfn.h below
+	select stuff. Replace call to index() with strchr().
+
+	* graphics.c(boundary): Remove unnecessary \ at end of line.
+
+	* help.c(ShowSubtopics): Move spacelen out of for loop and init
+	spacelen and ispacelen to zero. Suggested by HBB.
+
+	* term/gif.trm: Update help text.
+
+1998-09-30  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* Makefile.in: Add $(INCLUDES) to version.o target.
+
+1998-09-28  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* 0PORTING, buildvms.com, term.h: Lucas Hart's NO_ALLTERM patch.
+
+	* configure.in: Re-add AC_HEADER_STDC. Otherwise STDC_HEADERS is
+	not defined.
+
+	* help.c(ShowSubtopics): spacelen and ispacelen must not be
+	initialised with zero. Bug report from Stefan Schroepfer
+	<scr@iis.fhg.de>. Indentation.
+
+	* plot.c(load_rcfile): Bugfix: ~/.gnuplot not read. Report from
+	Stefan Schroepfer <scr@iis.fhg.de>.
+
+	* stdfn.h: OS/2 fixes.
+
+	* util.c: Indentation, add braces.
+
+	* docs/ps/ps_guide.ps: Add page numbers to enable browsing with ps
+	viewers. Patch from Petr Mikulik <mikulik@physics.muni.cz>.
+
+1998-09-26  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* 0INSTALL, makefile.os2, plot.c, term/emxvga.trm, term/pm.trm:
+	More OS/2 patches from Alexander Mai <st002279@hrzpub.tu-darmstadt.de>.
+
+	* term/sun.trm(local_notice_destroy): Comment out assignment to
+	non-existent variable term_init.
+
 1998-09-25  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
-	* 0INSTALL, makefile.os2: Some patches from Alexander Mai.
+	* 0INSTALL, makefile.os2: Some patches from Alexander Mai
+ 	<st002279@hrzpub.tu-darmstadt.de>.
 
 	* command.c, plot.c: DJGPP patches from Andris Pavenis
 	<pavenis@lanet.lv>.

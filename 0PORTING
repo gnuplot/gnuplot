@@ -110,17 +110,17 @@ Terminal Selection Options
 
    These defines are used to include the drivers for various plotting 
 terminals, printers, and protocols that a given version of gnuplot can 
-access and the description of such for the help file.  {T
+access and the description of such for the help file.
 
 
 define      file            note
 ------      ----            --------
 TERMFLAGS   Makefile        the set of terminals you want, from below
             or term.h
-NO_ALL_TERM_H  term.h          edit term.h to specify desired devices at
+NO_ALL_TERM  term.h            edit term.h to specify desired devices at
                                the beginning (instead of to comment out, 
                                throughout the file, devices not desired.) 
-                                       
+
 ALL_TERM_DOC   docs/termdoc.c  on-line help documentation for all devices
                                rather than only for the drivers selected
                                in term.h.

@@ -226,15 +226,20 @@ OS/2
 To compile under OS/2 (2.x and above) you need the development
 suite EMX 0.9 (including gcc). To build the complete set
 of files you should also have GNUMake and IPFC (Information Presentation
-Facility Compiler (available from the Developer's Toolkit; nowadays it's
-accessible through IBM's website for free).
+Facility Compiler; available from the Developer's Toolkit; nowadays it's
+accessible through an IBM website for free!).
 
-    make -f makefile.os2
+At the beginning of Makefile.os2 you will find a configuration
+section where you have to adjust all settings which control the build
+process. Most important is probably to select the terminal devices
+which should be supported. You can create a version offering
+PM graphics as well as X11 support (to use with XFree86).
+Be sure to enable only those devices for which you have the 
+necessary software already installed!
 
-will show you all options which the makefile.os2 can handle.
-You may choose between different compiling options and specify
-some additional terminals to include. You can create a version offering
-PM graphics as well as a X11 version (to use with XFree86 for OS/2).
+Finally executing 
+  make -f Makefile.os2
+will show you all pre-defined targets.
 
 See other sections of the manuals for more information about
 installing gnuplot on OS/2.
@@ -488,11 +493,10 @@ packages without modification.
 autoconf macros is that they do search more than one (the default)
 directory to determine the location of the specified file.
 
- Libraries will be searched in at least two, and up to five different
+ Libraries will be searched in at least two, and up to four different
 directories, depending on the PATH specified with `--with-PACKAGE=PATH':
 
  o the default linker path (this is really more than one directory)
- o the directory specified with the --libdir option ($libdir)
  o the PATH directory, trailing `/lib/libPACKAGE.a' stripped off
  o the PATH directory, trailing `/lib/libPACKAGE.a' stripped off and
    `/lib' added
@@ -513,16 +517,14 @@ $ configure --with-gd=/home/user/source/gd
 will search the following directories for libgd.a:
 
  o the default linker path
- o /usr/local/lib (default $libdir)
  o /home/user/source/gd
  o /home/user/source/gd/lib
  o /home/user/source/gd
 
- Include files will be searched in at least two, and up to four different
+ Include files will be searched in at least two, and up to three different
 directories, depending on the PATH specified with `--with-PACKAGE=PATH':
 
  o the default include path (can be more than one diretcory)
- o the directory specified with --includedir ($includedir)
  o the PATH directory, trailing `/lib/libPACKAGE.a' stripped off
  o the PATH directory, trailing `/lib/libPACKAGE.a' stripped off and
    `/include' added
@@ -540,7 +542,7 @@ if the corresponding library is not found.
    in /usr/local/gnu/include, which is not in gcc's include search path.
    Solution:
 
-   $ ./configure --includedir=/usr/local/gnu/include
+   $ ./configure --with-gd=/usr/local/gnu
 
  o the gd and png libraries are in /opt/gnu/lib, the header files are
    in /opt/gnu/include.  Solution:
@@ -552,13 +554,10 @@ if the corresponding library is not found.
 
    $ ./configure --with-gd=/tmp/gd --with-png=/tmp/libpng
 
- Caveat: the `--libdir' and `--includedir' configure options are used in
-slightly non-standard fashion: these options are normally used to
-specify directories to install libraries and headers into. [I would like
-to implement the more generic `--site-includes' and `--site-libraries'
-options, but this is painfully difficult with the current autoconf.  It
-also seems that the current autoconf maintainer and Stallman/FSF are
-opposed to adding such options to the FSF autoconf distribution.]
+[I would like to implement the more generic `--site-includes' and
+`--site-libraries' options for additional flexibility, but this is
+painfully difficult with the current autoconf.  It also seems that such
+a feature would not comply with GNU coding standards.]
 
 Platform problems and testing
 *****************************
