@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.37 2003/11/13 08:37:57 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.38 2003/12/26 22:59:12 vanzandt Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -1442,9 +1442,13 @@ load_range(axis, a, b, autoscale)
 
     /* HBB 20030127: If range input backwards, automatically turn on
        the "reverse" option, too. */
-    if (((autoscale & AUTOSCALE_BOTH) == AUTOSCALE_NONE)
-	&& *b < *a) {
+    /* HBB 20040315: ... and clear it automatically if a fixed range
+     * was given the "right" way round! */
+    if ((autoscale & AUTOSCALE_BOTH) == AUTOSCALE_NONE) {
+      if (*b < *a) 
 	axis_array[axis].range_flags |= RANGE_REVERSE;
+      else 
+	axis_array[axis].range_flags &= ~RANGE_REVERSE;
     }
 
     return (autoscale);

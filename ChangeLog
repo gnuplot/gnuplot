@@ -1,3 +1,8 @@
+2004-03-15  Hans-Bernhard Broeker  <broeker@ac3b07.physik.rwth-aachen.de>
+
+	* src/axis.c (load_range): Un-set 'reverse' option if fixed range
+	specification is given in forward order.
+
 2004-03-12  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* PATCHLEVEL: Raised to 2 for new release candidate.
