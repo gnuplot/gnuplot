@@ -21,6 +21,7 @@ register_term(xlib)
 
 #ifdef TERM_PROTO
 TERM_PUBLIC void Xlib_init __PROTO((void));
+TERM_PUBLIC void Xlib_text __PROTO((void));
 #define GOT_XLIB_PROTO
 #endif
 
@@ -40,6 +41,18 @@ Xlib_init()
 #endif
 }
 
+TERM_PUBLIC void
+Xlib_text()
+{
+    PRINT0("E\n");
+    FFLUSH();
+    X11_ipc = 0;
+#ifdef PIPE_IPC
+    ipc_back_fd = IPC_BACK_CLOSED;
+#endif
+
+}
+
 #endif
 
 #ifdef TERM_TABLE
@@ -47,7 +60,7 @@ TERM_TABLE_START(xlib_driver)
     "xlib", "X11 Window System (gnulib_x11 dump)",
     X11_XMAX, X11_YMAX, X11_VCHAR, X11_HCHAR,
     X11_VTIC, X11_HTIC, X11_options, Xlib_init, X11_reset,
-    X11_text, null_scale, X11_graphics, X11_move, X11_vector,
+    Xlib_text, null_scale, X11_graphics, X11_move, X11_vector,
     X11_linetype, X11_put_text, X11_text_angle,
     X11_justify_text, X11_point, do_arrow, X11_set_font,
     X11_pointsize, TERM_CAN_MULTIPLOT|TERM_INIT_ON_REPLOT,
