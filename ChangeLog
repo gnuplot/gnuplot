@@ -1,3 +1,7 @@
+2004-09-02  Ethan Merritt  <merritt@u.washington.edu>
+	* demo/all.dem: Include demos for candlesticks, multiplot, and
+	enhanced text mode in the all.dem script used by "make check".
+
 2004-09-01  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/gd.trm (PNG_set_color PNG_image) term/pdf.trm (PDF_image)

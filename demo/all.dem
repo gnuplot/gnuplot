@@ -1,5 +1,5 @@
 #
-# $Id: all.dem,v 1.12 2004/07/09 00:26:00 sfeam Exp $
+# $Id: all.dem,v 1.13 2004/09/01 15:53:45 mikulik Exp $
 #
 # Executes ALL demos in this directory, in functionality order.
 #
@@ -29,6 +29,10 @@ load "fillcrvs.dem"
 load "fillbetween.dem"
 reset
 
+print "******************** file candlesticks.dem ********************"
+load "candlesticks.dem"
+reset
+
 print "******************** file mgr.dem ********************"
 load "mgr.dem"
 reset
@@ -47,6 +51,11 @@ reset
 
 print "******************** file poldat.dem ********************"
 load "poldat.dem"
+reset
+
+print "******************** file multiplt.dem ********************"
+load "multiplt.dem"
+load "layout.dem"
 reset
 
 print "******************** file surface1.dem ********************"
@@ -143,6 +152,10 @@ reset
 
 print "********************** file textrotate.dem *********************"
 load "textrotate.dem"
+reset
+
+print "********************** file enhancedtext.dem *********************"
+load "enhancedtext.dem"
 reset
 
 print "********************** file arrowstyle.dem *********************"
