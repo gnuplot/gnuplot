@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.84 2001/10/06 10:33:52 mikulik Exp $
+C RCS $Id: gnuplot.doc,v 1.85 2001/10/31 17:14:00 mikulik Exp $
 C 18 September 2001
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001   Thomas Williams, Colin Kelley et al.
 C
@@ -4643,7 +4643,7 @@ C ... and restart the table:
                  {at <position>}
                  {<justification>} {{no}rotate} {font "<name>{,<size>}"}
                  {front | back}
-                 {pointstyle <style> {offset x, y}| nopointstyle}
+                 {<pointstyle> {offset x, y}| nopoint}
        set nolabel {<tag>}
        show label
 
@@ -4682,15 +4682,16 @@ C ... and restart the table:
  `back` is given (the default), the label is written underneath the graphed
  data.  Using `front` will prevent a label from being obscured by dense data.
 
- If `pointstyle` is given, a point with the given style is plotted at
- the label position and the text of the label is displaced slightly.
+ If a style is given, using keywords `lw`, `pt` and `ps`, see `style`, a point
+ with the given style and colour of the given line type is plotted at the
+ label position and the text of the label is displaced slightly.
  The displacement defaults to 1, 1 in `pointsize` units and can be
  controlled by the optional `offset x, y`. Example: `offset 2, -3` would
  displace the labels 2 * pointsize horizontally and -3 * pointsize vertically
  from the actual coordinate point as given by `position`.  The size of the
  point depends also on the setting of `pointsize`.
  This option is used by default for placing labels in mouse enhanced
- terminals.  Use `nopointstyle` to turn off the drawing of a point near
+ terminals.  Use `nopoint` to turn off the drawing of a point near
  the label (this is the default).
 
  If one (or more) axis is timeseries, the appropriate coordinate should be
@@ -4733,6 +4734,9 @@ C ... and restart the table:
  fitted function, do this after the 'fit', but before the 'plot':
        set label 'a = %3.5g',par_a     at 30, 15
        set label 'b = %s*10^%S',par_b  at 30, 20
+
+ To set a label displaced a little bit from a small point:
+	set label 'origin' at 0,0 lt 1 pt 2 ps 3 offset 1,-1
 
 3 linestyle
 ?commands set style line

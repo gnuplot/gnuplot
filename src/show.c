@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.62 2001/10/05 16:36:19 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.63 2001/10/31 17:13:59 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -1541,12 +1541,15 @@ int tag;			/* 0 means show all */
 	    fprintf(stderr, " %s ", this_label->layer ? "front" : "back");
 	    if (this_label->font != NULL)
 		fprintf(stderr, " font \"%s\"", this_label->font);
-	    if (this_label->pointstyle < 0)
-		fprintf(stderr, "nopointstyle");
+	    if (this_label->lp_properties.pointflag == 0)
+		fprintf(stderr, "nopoint");
 	    else {
-		fprintf(stderr, "pointstyle %d offset %f,%f",
-		    this_label->pointstyle, this_label->hoffset, this_label->voffset);
+		fprintf(stderr, "point with color of linetype %d pointtype %d offset %f,%f",
+		    this_label->lp_properties.l_type+1,
+		    this_label->lp_properties.p_type+1,
+		    this_label->hoffset, this_label->voffset);
 	    }
+
 	    /* Entry font added by DJL */
 	    fputc('\n', stderr);
 	}

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.57 2001/10/11 15:46:56 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.58 2001/10/31 17:13:59 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -922,7 +922,7 @@ boundary(plots, count)
 void
 get_offsets(struct text_label *this_label, struct termentry *t, int *htic, int *vtic)
 {
-    if (-1 != this_label->pointstyle) {
+    if (this_label->lp_properties.pointflag) {
 	*htic = (pointsize * t->h_tic * 0.5 * this_label->hoffset);
 	*vtic = (pointsize * t->v_tic * 0.5 * this_label->voffset);
     } else {
@@ -1092,8 +1092,11 @@ place_labels(int layer)
 	} else {
 	    write_multiline(x + htic, y + vtic, this_label->text, this_label->pos, JUST_TOP, 0, this_label->font);
 	}
-	if (-1 != this_label->pointstyle) {
-	    (*t->point) (x, y, this_label->pointstyle);
+	if (this_label->lp_properties.pointflag) {
+	    term_apply_lp_properties(&this_label->lp_properties);
+	    (*t->point) (x, y, this_label->lp_properties.p_type);
+	    /* the default label colour is that of border */
+	    term_apply_lp_properties(&border_lp);
 	}
     }
 }

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.48 2001/10/31 15:32:38 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.49 2001/10/31 17:13:59 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -481,8 +481,11 @@ place_labels(int layer)
 	    write_multiline(x + htic, y + vtic, this_label->text,
 			    this_label->pos, CENTRE, 0, this_label->font);
 	}
-	if (-1 != this_label->pointstyle) {
-	    (*t->point)(x, y, this_label->pointstyle);
+	if (this_label->lp_properties.pointflag) {
+	    term_apply_lp_properties(&this_label->lp_properties);
+	    (*t->point) (x, y, this_label->lp_properties.p_type);
+	    /* the default label colour is that of border */
+	    term_apply_lp_properties(&border_lp);
 	}
     }
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: mouse.h,v 1.8 2000/11/01 20:37:48 joze Exp $
+ * $Id: mouse.h,v 1.9 2001/02/09 15:06:11 broeker Exp $
  */
 
 /* GNUPLOT - mouse.h */
@@ -72,7 +72,7 @@ typedef struct mouse_setting_t {
 /* FIXME HBB 20010207: Codestyle violation: these should be in mouse.c! */
 #if defined(_MOUSE_C) || defined(_GPLT_X11)
 mouse_setting_t mouse_setting = {
-    1, 300 /* ms */, 1, 0, 0, 0, 0, "% #g", "pointstyle 1"
+    1, 300 /* ms */, 1, 0, 0, 0, 0, "% #g", "pointtype 1"
 };
 
 /* the status of the shift, ctrl and alt keys

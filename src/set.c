@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.64 2001/10/06 10:33:52 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.65 2001/10/31 17:13:59 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -1647,14 +1647,15 @@ set_label()
     enum JUSTIFY just = LEFT;
     int rotate = 0;
     int tag;
-    TBOOLEAN set_text, set_position, set_just = FALSE, set_rot = FALSE;
-    TBOOLEAN set_font, set_offset = FALSE;
+    TBOOLEAN set_text, set_position = FALSE, set_just = FALSE, set_rot = FALSE;
+    TBOOLEAN set_font = FALSE, set_offset = FALSE;
     TBOOLEAN set_layer = FALSE;
     int layer = 0;
-    int pointstyle = -2; /* untouched (this is /not/ -1) */
+    struct lp_style_type loc_lp = DEFAULT_LP_STYLE_TYPE;
     float hoff = 1.0;
     float voff = 1.0;
 
+    loc_lp.pointflag = -1; /* untouched */
     c_token++;
     /* get tag */
     if (!END_OF_COMMAND
@@ -1668,6 +1669,10 @@ set_label()
 	&& !equals(c_token, "back")
 	&& !almost_equals(c_token, "rot$ate")
 	&& !almost_equals(c_token, "norot$ate")
+	&& !equals(c_token, "lt")
+	&& !almost_equals(c_token, "linet$ype")
+	&& !equals(c_token, "pt")
+	&& !almost_equals(c_token, "pointt$ype")
 	&& !equals(c_token, "font")) {
 	/* must be a tag expression! */
 	tag = (int) real(const_express(&a));
@@ -1694,73 +1699,79 @@ set_label()
     } else
 	set_text = FALSE; /* default no text */
 
+    /* pm: tricky way for any order of opts */
+    while (!END_OF_COMMAND) while (1) {
     /* get justification - what the heck, let him put it here */
-    if (!END_OF_COMMAND) {
 	if (almost_equals(c_token, "l$eft")) {
 	    just = LEFT;
 	    c_token++;
 	    set_just = TRUE;
-	} else if (almost_equals(c_token, "c$entre")
-		   || almost_equals(c_token, "c$enter")) {
+	    break;
+    }
+    if (almost_equals(c_token, "c$entre") || almost_equals(c_token, "c$enter")) {
 	    just = CENTRE;
 	    c_token++;
 	    set_just = TRUE;
-	} else if (almost_equals(c_token, "r$ight")) {
+	    break;
+    }
+    if (almost_equals(c_token, "r$ight")) {
 	    just = RIGHT;
 	    c_token++;
 	    set_just = TRUE;
-	}
+	    break;
     }
 
     /* get position */
-    if (!END_OF_COMMAND && equals(c_token, "at")) {
+    if (equals(c_token, "at")) {
 	c_token++;
 	get_position(&pos);
 	set_position = TRUE;
+	break;
+#if 0 /* pm, 10.11.2001: don't support position without "at" keyword */
     } else {
 	pos.x = pos.y = pos.z = 0;
 	pos.scalex = pos.scaley = pos.scalez = first_axes;
+#endif
 	set_position = FALSE;
     }
 
     /* get justification */
-    if (!END_OF_COMMAND) {
-	if (set_just)
-	    int_error(c_token, "only one justification is allowed");
 	if (almost_equals(c_token, "l$eft")) {
 	    just = LEFT;
 	    c_token++;
 	    set_just = TRUE;
-	} else if (almost_equals(c_token, "c$entre")
-		   || almost_equals(c_token, "c$enter")) {
+	    break;
+    }
+    if (almost_equals(c_token, "c$entre") || almost_equals(c_token, "c$enter")) {
 	    just = CENTRE;
 	    c_token++;
 	    set_just = TRUE;
-	} else if (almost_equals(c_token, "r$ight")) {
+	    break;
+    }
+    if (almost_equals(c_token, "r$ight")) {
 	    just = RIGHT;
 	    c_token++;
 	    set_just = TRUE;
-	}
-
+	    break;
     }
 
     /* get rotation (added by RCC) */
-    if (!END_OF_COMMAND) {
 	if (almost_equals(c_token, "rot$ate")) {
 	    rotate = TRUE;
 	    c_token++;
 	    set_rot = TRUE;
-	} else if (almost_equals(c_token, "norot$ate")) {
+	    break;
+    }
+    if (almost_equals(c_token, "norot$ate")) {
 	    rotate = FALSE;
 	    c_token++;
 	    set_rot = TRUE;
-	}
+	    break;
     }
 
     /* get font */
     /* Entry font added by DJL */
-    set_font = FALSE;
-    if (!END_OF_COMMAND && equals(c_token, "font")) {
+    if (equals(c_token, "font")) {
 	c_token++;
 	if (END_OF_COMMAND)
 	    int_error(c_token, "font name and size expected");
@@ -1771,8 +1782,8 @@ set_label()
 	    set_font = TRUE;
 	} else
 	    int_error(c_token, "'fontname,fontsize' expected");
-
 	c_token++;
+	break;
     }
 
     /* get front/back (added by JDP) */
@@ -1790,24 +1801,25 @@ set_label()
 	set_layer = TRUE;
     }
     
-    /* FIXME HBB 20010813: ill-named option. This should be
-     * 'pointtype'.  And it should allow to pass in a point _size_ and
-     * linetype (i.e.  pen color), too. Or a true (line)style
-     * number. */
-    if(!END_OF_COMMAND && almost_equals(c_token, "po$intstyle")) {
-	c_token++;
-	pointstyle = (int) real(const_express(&a));
-	if (pointstyle < 0)
-	    pointstyle = -1; /* UNSET */
-	/* HBB 20010813: removed code that modulo'ed the pointstyle
-	 * with POINT_TYPES==6. */
-    }
-    if(!END_OF_COMMAND && almost_equals(c_token, "nopo$intstyle")) {
-	pointstyle = -1; /* UNSET */
-	c_token++;
+    { /* read point type */
+	int stored_token = c_token;
+	struct lp_style_type tmp_lp;
+	lp_parse(&tmp_lp, 0, 1, -2, -2);
+	if (stored_token != c_token) {
+	    loc_lp = tmp_lp;
+	    loc_lp.pointflag = 1;
+	    if (loc_lp.p_type < -1) loc_lp.p_type = 0;
+	    break;
+	}
     }
 
-    if(!END_OF_COMMAND && almost_equals(c_token, "of$fset")) {
+    if (almost_equals(c_token, "nopo$int")) {
+	loc_lp.pointflag = 0;
+	c_token++;
+	break;
+    }
+
+    if (almost_equals(c_token, "of$fset")) {
 	c_token++;
 	if (END_OF_COMMAND)
 	    int_error(c_token, "Expected horizontal offset");
@@ -1822,10 +1834,11 @@ set_label()
 	    int_error(c_token, "Expected vertical offset");
 	voff = real(const_express(&a));
 	set_offset = TRUE;
+	break;
     }
 
-    if (!END_OF_COMMAND)
-	int_error(c_token, "extraenous or out-of-order arguments in set label");
+    int_error(c_token, "extraenous argument in set label");
+    } /* while(1) loop */
 
     /* OK! add label */
     if (first_label != NULL) {	/* skip to last label */
@@ -1850,8 +1863,8 @@ set_label()
 	    this_label->layer = layer;
 	if (set_font)
 	    this_label->font = font;
-	if (pointstyle != -2)
-	    this_label->pointstyle = pointstyle;
+	if (loc_lp.pointflag >= 0)
+	    memcpy(&(this_label->lp_properties), &loc_lp, sizeof(loc_lp));
 	if (set_offset) {
 	    this_label->hoffset = hoff;
 	    this_label->voffset = voff;
@@ -1872,14 +1885,11 @@ set_label()
 	new_label->rotate = rotate;
 	new_label->layer = layer;
 	new_label->font = font;
-	if (pointstyle == -2)
-	    new_label->pointstyle = -1; /* unset */
-	else
-	    new_label->pointstyle = pointstyle;
+	memcpy(&(new_label->lp_properties), &loc_lp, sizeof(loc_lp));
 	new_label->hoffset = hoff;
 	new_label->voffset = voff;
     }
-}				/* Entry font added by DJL */
+}
 
 
 /* assign a new label tag

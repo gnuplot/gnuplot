@@ -11,6 +11,7 @@ Changes in release 4.0:
 * NEW "set boxwidth <number> relative"
 * NEW options to FIG terminal driver
 * NEW parse errors in datafile reading now show the culprit
+* NEW labels can be printed attached to a point
 * FIXED interaction of "set xtics <incr>"  with time/date axes
 * FIXED candlesticks now ignore order of high/low entries
 * FIXED keeping old arrow options if new "set" command modifies it
@@ -23,6 +24,7 @@ Changes in release 4.0:
 * FIXED pgnuplot for Windows NT/2K/XP
 
 [3.8g]
+* CHANGE set label with any line type (colour), point type and point size
 * CHANGE use either two or five minitic steps, never 4 (in logscale)
 * CHANGE reject candlesticks/financebars plots of to few colums --- warn
   and then plot with "points", instead

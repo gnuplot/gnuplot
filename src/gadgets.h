@@ -78,7 +78,7 @@ typedef struct text_label {
     int layer;
     char *text;
     char *font;			/* Entry font added by DJL */
-    int pointstyle;		/* joze */
+    struct lp_style_type lp_properties;
     double hoffset;
     double voffset;
 } text_label;
