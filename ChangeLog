@@ -1,3 +1,7 @@
+2003-11-18  Ethan Merritt <merritt@u.washington.edu>
+
+	* src/specfun.c: Add parens to make DEC cc compiler happy.
+
 2003-11-18  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/unset.c (unset_colorbox) (unset_pm3d): Removed extra c_token++.
