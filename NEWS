@@ -1,5 +1,13 @@
 Changes in release 4.0:
-[3.7.0.10]
+[3.8a]
+* doc2texi.el, gnuplot.texi added; remove doc2info.c,
+  doc2html.c, doc2texi.pl, and fixinfo.el; the info
+  and html files are now created with makeinfo, the
+  latter requires makeinfo (GNU texinfo) 4.0
+* FIXED the 'set ?range' commands now use a decimal point
+  to prevent integer overflow on 16 bit platforms
+* FIXED 'save'd files are now consistent with the new syntax
+[3.7.0.10 - internal only]
 * removed DJGPP version 1 support
 * improved version of stdin wrapper for Win32
 * ongoing work: rewrite of the input parser
