@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: pdf.trm,v 1.31 2004/07/01 17:10:33 broeker Exp $
+ * $Id: pdf.trm,v 1.31.2.1 2004/07/08 12:47:15 broeker Exp $
  */
 
 /*------------------------------
@@ -353,7 +353,7 @@ PDF_init ()
     PDF_set_value(myPDF, "compress", 0);
 #endif
 
-    PDF_set_info(myPDF,"Creator","gnuplot-3.8e");
+    PDF_set_info(myPDF,"Creator","gnuplot-4.0");
     PDF_set_info(myPDF,"Author","Hans-Bernhard Broeker"); /* FIXME: put in username? */
     PDF_set_info(myPDF,"Title","gnuplot diagram"); /* FIXME: use 'set title', if any ? */
 
