@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.68 2003/08/12 19:41:36 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.69 2003/09/08 12:56:00 broeker Exp $"); }
 #endif
 
 #define X11_POLYLINE 1
@@ -1463,7 +1463,9 @@ record()
 	    return 1;
 
 	case 'z':
+#ifdef PIPE_IPC
 	    if (!pipe_died)
+#endif
 	    {
 		int len = strlen(buf + 1) - 1;	/* discard newline '\n' */
 		memcpy(selection, buf + 1, len < SEL_LEN ? len : SEL_LEN);

@@ -1,5 +1,5 @@
 /*
- * $Id: x11.trm,v 1.81 2003/09/12 14:36:06 broeker Exp $
+ * $Id: x11.trm,v 1.82 2003/10/23 18:49:00 uid93776 Exp $
  *
  */
 
@@ -940,13 +940,19 @@ X11_graphics()
     /* to gnuplot_x11, then wait for it to return the resulting    */
     /* font size information (v_char and h_char).                  */
     if (!default_font_size_known) {
+#ifdef PIPE_IPC
 	IPC_LOCK = TRUE;
+#endif
 	X11_set_default_font(); 
 	FFLUSH();
+#ifdef PIPE_IPC
 	if (ipc_back_fd >= 0)
+#endif
 	    X11_waitforinput();
 	default_font_size_known = TRUE;
+#ifdef PIPE_IPC
 	IPC_LOCK = FALSE;
+#endif
     }
 #else
     X11_set_default_font(); 
@@ -962,7 +968,9 @@ X11_text()
      * so that subsequent mouse events can be transformed into plot
      * coordinates even though the plot is no longer active.
      */
+#ifdef PIPE_IPC
     if (ipc_back_fd >= 0) {
+#endif
 	/* Construct a mask showing which axes are active */
 	int axis_mask = 0;
 	int i;
@@ -992,7 +1000,9 @@ X11_text()
 		axis_array[SECOND_Y_AXIS].term_lower,
 		axis_array[SECOND_Y_AXIS].term_scale,
 		axis_array[SECOND_Y_AXIS].log ? axis_array[SECOND_Y_AXIS].log_base : 0);
+#ifdef PIPE_IPC
     }
+#endif
 #endif
 
     PRINT0("E\n");
