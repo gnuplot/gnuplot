@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.82 2003/05/17 05:59:00 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.83 2003/10/10 10:33:39 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -119,8 +119,9 @@ static void cntr3d_impulses __PROTO((struct gnuplot_contours * cntr,
 				     struct lp_style_type * lp));
 static void cntr3d_lines __PROTO((struct gnuplot_contours * cntr,
 				  struct lp_style_type * lp));
-static void cntr3d_linespoints __PROTO((struct gnuplot_contours * cntr,
-					struct lp_style_type * lp));
+/* HBB UNUSED 20031219 */
+/* static void cntr3d_linespoints __PROTO((struct gnuplot_contours * cntr, */
+/* 					struct lp_style_type * lp)); */
 static void cntr3d_points __PROTO((struct gnuplot_contours * cntr,
 				   struct lp_style_type * lp));
 static void cntr3d_dots __PROTO((struct gnuplot_contours * cntr));
@@ -1212,6 +1213,9 @@ do_3dplot(plots, pcount, quick)
 			cntr3d_lines(cntrs, &thiscontour_lp_properties);
 			break;
 
+		    case LINESPOINTS:
+			cntr3d_lines(cntrs, &thiscontour_lp_properties);
+			/* FALLTHROUGH to draw the points */
 		    case YERRORLINES:	
 		    case XERRORLINES:
 		    case XYERRORLINES:
@@ -1226,9 +1230,6 @@ do_3dplot(plots, pcount, quick)
 			/* treat all the above like points */
 		    case POINTSTYLE:
 			cntr3d_points(cntrs, &thiscontour_lp_properties);
-			break;
-		    case LINESPOINTS:
-			cntr3d_linespoints(cntrs, &thiscontour_lp_properties);
 			break;
 		    case DOTS:
 			cntr3d_dots(cntrs);
@@ -1778,25 +1779,27 @@ cntr3d_impulses(cntr, lp)
     }
 }
 
-/* cntr3d_lines:
- * Plot a surface contour in LINES style
- */
+/* cntr3d_lines: Plot a surface contour in LINES style */
+/* HBB NEW 20031218: changed to use move/vector() style polyline
+ * drawing. Gets rid of variable "previous_vertex" */
 static void
 cntr3d_lines(cntr, lp)
     struct gnuplot_contours *cntr;
     struct lp_style_type *lp;
 {
     int i;			/* point index */
-    vertex previous_vertex, this_vertex;
+    vertex this_vertex;
 
     if (draw_contour & CONTOUR_SRF) {
 	map3d_xyz(cntr->coords[0].x, cntr->coords[0].y, cntr->coords[0].z,
-		  &previous_vertex);
+		  &this_vertex);
 	/* move slightly frontward, to make sure the contours are
 	 * visible in front of the the triangles they're in, if this
 	 * is a hidden3d plot */
-	if (hidden3d && !VERTEX_IS_UNDEFINED(previous_vertex))
-	    previous_vertex.z += 1e-2;
+	if (hidden3d && !VERTEX_IS_UNDEFINED(this_vertex))
+	    this_vertex.z += 1e-2;
+	
+	polyline3d_start(&this_vertex);
 
 	for (i = 1; i < cntr->num_pts; i++) {
 	    map3d_xyz(cntr->coords[i].x, cntr->coords[i].y, cntr->coords[i].z,
@@ -1806,35 +1809,30 @@ cntr3d_lines(cntr, lp)
 	     * is a hidden3d plot */
 	    if (hidden3d && !VERTEX_IS_UNDEFINED(this_vertex))
 		this_vertex.z += 1e-2;
-	    draw3d_line(&previous_vertex, &this_vertex, lp);
-	    previous_vertex = this_vertex;
+	    polyline3d_next(&this_vertex, lp);
 	}
     }
 
     if (draw_contour & CONTOUR_BASE) {
 	map3d_xyz(cntr->coords[0].x, cntr->coords[0].y, base_z,
-		  &previous_vertex);
+		  &this_vertex);
 #ifdef PM3D
-	/* HBB 20010822: in "linetype palette" mode,
-	 * draw3d_line_unconditional() will look at real_z to
-	 * determine the contour line's color --> override base_z by
-	 * the actual z position of the contour line */
-	previous_vertex.real_z = cntr->coords[0].z;
+	this_vertex.real_z = cntr->coords[0].z;
 #endif
+	polyline3d_start(&this_vertex);
 
 	for (i = 1; i < cntr->num_pts; i++) {
 	    map3d_xyz(cntr->coords[i].x, cntr->coords[i].y, base_z,
 		      &this_vertex);
 #ifdef PM3D
-	    /* HBB 20010822: see above */
 	    this_vertex.real_z = cntr->coords[i].z;
 #endif
-	    draw3d_line(&previous_vertex, &this_vertex, lp);
-	    previous_vertex=this_vertex;
+	    polyline3d_next(&this_vertex, lp);
 	}
     }
 }
 
+#if 0 /* HBB UNUSED 20031219 */
 /* cntr3d_linespoints:
  * Plot a surface contour in LINESPOINTS style */
 static void
@@ -1894,6 +1892,7 @@ cntr3d_linespoints(cntr, lp)
 	}
     }
 }
+#endif
 
 /* cntr3d_points:
  * Plot a surface contour in POINTSTYLE style

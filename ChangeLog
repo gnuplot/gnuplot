@@ -1,11 +1,33 @@
+2003-12-19  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/util3d.h (polyline3d_start, polyline3d_next): Prototypes
+	added.
+
+	* src/util3d.c (draw3d_line_unconditional): Avoid re-doing the
+	linetype change if it's to the same as in the lp_style_type
+	already applied.
+	(polyline3d_previous_vertex): New static variable.
+	(polyline3d_start, polyline3d_next): New functions. Draw connected
+	polylines in 3D.  Hidden3d currently disables this --- to be added
+	in later.  Polylines can't change colour in the middle of a run,
+	so palette mode turns this optimization off, too.
+
+	* src/graph3d.c (cntr3d_lines): Use new helper routines to draw
+	connected polyline instead of isolated segments.
+	(do_3dplot): Since cntr3d_linespoints would break polyline
+	handling, call cntr3d_lines() and cntr3d_points() in a row,
+	instead.
+	(cntr3d_linespoints): Now unused --> #if'ed out.
+
 2003-12-16  Ethan Merritt  <merritt@u.washington.edu>
 
-	* src/gplt_x11.c term/x11.trm:  Add a new x11 command line option
-	-nofeedback, and the corresponding Xresource gnuplot*feedback.
-	It disables the feedback loop by which gnuplot_x11 reports font and
-	plot size information back to gnuplot via the mouse pipe. This
-	is a work-around for feedback synchronization problems triggered by 
-	certain scripting environments and possibly by other causes under os2.
+	* src/gplt_x11.c term/x11.trm: Add a new x11 command line option
+	-nofeedback, and the corresponding Xresource gnuplot*feedback.  It
+	disables the feedback loop by which gnuplot_x11 reports font and
+	plot size information back to gnuplot via the mouse pipe. This is
+	a work-around for feedback synchronization problems triggered by
+	certain scripting environments and possibly by other causes under
+	os2.
 
 2003-12-16  Petr Mikulik  <mikulik@physics.muni.cz>
 
@@ -13,43 +35,44 @@
 
 	* src/mouse.c (bind_display): Minor change in the hotkey help.
 
-	* term/post.trm (START_HELP): Fixed undefined references in gnuplot.tex.
+	* term/post.trm (START_HELP): Fixed undefined references in
+	gnuplot.tex.
 
-	* src/gplt_x11.c: #if (USE_MOUSE && MOUSE_ALL_WINDOWS) =>
-	#if defined(...) && defined(...)
-
-2003-12-15  Ethan Merritt  <merritt@u.washington.edu>
-
-	* demo/Makefile.am.in demo/webify.pl demo/airfoil.dem demo/prob2.dem:
-	Integrate generation of demo web pages into the Makefile, so that
-	'make html' autogenerates most of them.  A few oddball scripts need
-	to be processed by hand.
+	* src/gplt_x11.c: #if (USE_MOUSE && MOUSE_ALL_WINDOWS) => #if
+	defined(...) && defined(...)
 
 2003-12-15  Ethan Merritt  <merritt@u.washington.edu>
 
-	* term/svg.trm:  Lauris Kaplinski <lauris@users.sourceforge.net>
-	diagnosed that the reason gnuplot point styles were not displaying 
-	properly in some svg applications was our failure to specify the 
+	* demo/Makefile.am.in demo/webify.pl demo/airfoil.dem
+	demo/prob2.dem: Integrate generation of demo web pages into the
+	Makefile, so that 'make html' autogenerates most of them.  A few
+	oddball scripts need to be processed by hand.
+
+2003-12-15  Ethan Merritt  <merritt@u.washington.edu>
+
+	* term/svg.trm: Lauris Kaplinski <lauris@users.sourceforge.net>
+	diagnosed that the reason gnuplot point styles were not displaying
+	properly in some svg applications was our failure to specify the
 	xlink: namespace.
 
-	* term/post.trm:  PS_filled_polygon() must flush current path on 
-	entry if there is one.  This fixes the missing arrow-shaft problems
-	seen in arrowstyle.dem.  It is possible that the awk scripts in
-	pm3d/contrib need to be modified to parse the resulting "stroke"
-	command.
+	* term/post.trm: PS_filled_polygon() must flush current path on
+	entry if there is one.  This fixes the missing arrow-shaft
+	problems seen in arrowstyle.dem.  It is possible that the awk
+	scripts in pm3d/contrib need to be modified to parse the resulting
+	"stroke" command.
 
 2003-12-15  Petr Mikulik  <mikulik@physics.muni.cz>
 
-	* config/makefile.os2: Lowercased IF EXIST and DEL commands (there is
-	a make.exe program reported to dislike uppercases).
+	* config/makefile.os2: Lowercased IF EXIST and DEL commands (there
+	is a make.exe program reported to dislike uppercases).
 
 2003-12-15  Petr Mikulik  <mikulik@physics.muni.cz>
 
         * src/gplt_x11.c:
-        (getMultiTabConsoleSwitchCommand): New routine to return system command
-        to switch to the appropriate "tab" of a multitab console window where
-        gnuplot is running. Currently implemented for KDE's Konsole (it returns
-        a "dcop" command).
+        (getMultiTabConsoleSwitchCommand): New routine to return system
+	command to switch to the appropriate "tab" of a multitab console
+	window where gnuplot is running. Currently implemented for KDE's
+	Konsole (it returns a "dcop" command).
         (process_event): Let hotkey "<space>" in gnuplot_x11 work also in
 	gnuplot running in multitab KDE's Konsole.
 

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util3d.c,v 1.16 2002/03/13 12:59:16 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: util3d.c,v 1.17 2002/11/28 16:14:56 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - util3d.c */
@@ -1075,10 +1075,12 @@ draw3d_line_unconditional(v1, v2, lp, linetype)
 #ifdef PM3D
     if (lp->use_palette) {
 	double z =  (v1->real_z + v2->real_z) * 0.5;
-	set_color(cb2gray( z2cb(z) ));
+
+	set_color(cb2gray(z2cb(z)));
     } else
 #endif
-	(term->linetype)(linetype);
+	if (linetype != lp->l_type)
+	    (term->linetype)(linetype);
 
     /* FIXME HBB 20000621: should this call clip_line, instead? */
     (term->move)(x1, y1);
@@ -1120,3 +1122,53 @@ draw3d_point(v, lp)
 
     draw3d_point_unconditional(v, lp);
 }    
+
+/* HBB NEW 20031218: tools for drawing polylines in 3D with a semantic
+ * like term->move() and term->vector() */
+
+/* Previous points 3D position */
+static vertex polyline3d_previous_vertex;
+
+void
+polyline3d_start (v1)
+    p_vertex v1;
+{
+    unsigned int x1, y1;
+
+    polyline3d_previous_vertex = *v1;
+    TERMCOORD(v1, x1, y1);
+    /* HBB FIXME 20031219: no clipping!? */
+    term->move(x1, y1);
+}
+
+void
+polyline3d_next (v2, lp)
+    p_vertex v2;
+    struct lp_style_type *lp;
+{
+    unsigned int x2, y2;
+
+    /* Copied from draw3d_line(): */
+#ifndef LITE
+    /* FIXME HBB 20031218: hidden3d mode will still create isolated
+     * edges! */
+    if (hidden3d && draw_surface) {
+	draw_line_hidden(&polyline3d_previous_vertex, v2, lp);
+	return;
+    }
+#endif
+    
+#ifdef PM3D
+    /* If use_palette is active, polylines can't be used --> 
+     * revert back to old method */
+    if (lp->use_palette)
+	draw3d_line_unconditional(&polyline3d_previous_vertex, v2,
+				  lp, lp->l_type);
+#endif
+
+    TERMCOORD(v2, x2, y2);
+
+    /* FIXME HBB 20031219: no clipping?! */ 
+    term->vector(x2, y2);
+    polyline3d_previous_vertex = *v2;
+}
