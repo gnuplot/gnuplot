@@ -1042,7 +1042,7 @@ static void do_system()
 {
 # ifdef AMIGA_AC_5
     getparms(input_line + 1, parms);
-    if (fexecv(parms[0], parms) < 0)
+    fexecv(parms[0], parms);
 # elif (defined(ATARI) && defined(__GNUC__))
 /* || (defined(MTOS) && defined(__GNUC__)) */
     /* use preloaded shell, if available */
@@ -1054,9 +1054,12 @@ static void do_system()
     Super(ssp);
 
     /* this is a bit strange, but we have to have a single if */
-    if ((shell_p ? (*shell_p) (input_line + 1) : system(input_line + 1)))
+    if (shell_p)
+	(*shell_p) (input_line + 1);
+    else
+	system(input_line + 1);
 # elif defined(_Windows)
-    if (winsystem(input_line + 1))
+    winsystem(input_line + 1);
 # else /* !(AMIGA_AC_5 || ATARI && __GNUC__ || _Windows) */
 /* (am, 19980929)
  * OS/2 related note: cmd.exe returns 255 if called w/o argument.
@@ -1064,9 +1067,8 @@ static void do_system()
  * A workaround has to include checking for EMX,OS/2, two environment
  *  variables,...
  */
-    if (system(input_line + 1))
+    system(input_line + 1);
 # endif /* !(AMIGA_AC_5 || ATARI&&__GNUC__ || _Windows) */
-	os_error("system() failed", NO_CARET);
 }
 
 
