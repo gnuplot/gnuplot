@@ -1,11 +1,11 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot 3.7 on Unix.
 dnl
-dnl $Id: configure.in,v 1.41.2.4 1999/10/15 16:00:49 lhecking Exp $
+dnl $Id: configure.in,v 1.41.2.5 1999/10/20 21:19:54 lhecking Exp $
 dnl
 AC_INIT(graphics.c)
 AC_PREREQ(2.13)
-AC_REVISION($Revision: 1.41.2.4 $)
+AC_REVISION($Revision: 1.41.2.5 $)
 VERSION=`sed -n 's/.*version.*"\(.*\)".*/\1/p' $srcdir/version.c|tr -d ' '`
 AM_INIT_AUTOMAKE(gnuplot, $VERSION)
 AC_CONFIG_HEADER(config.h:config.hin)
@@ -136,7 +136,10 @@ GP_NEXT
 
 dnl Apparently, -lNeXT_s is needed on NeXT
 dnl _instead_ of -lm ...
-AC_CHECK_LIB(c,sin,,AC_CHECK_LIB(m,sin))
+AC_CHECK_FUNC(sin)
+if test "$ac_cv_func_sin" = no ; then
+  AC_CHECK_LIB(m,sin)
+fi
 dnl this has to be after -lsys_s on NeXT
 dnlLIBS="$LIBS -lm"
 
