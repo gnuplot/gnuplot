@@ -1,5 +1,5 @@
 /*
- * $Id: x11.trm,v 1.109 2004/05/04 02:43:23 sfeam Exp $
+ * $Id: x11.trm,v 1.110 2004/05/08 22:21:58 sfeam Exp $
  *
  */
 
@@ -642,11 +642,13 @@ AGAIN:
     /* IPC_LOCK indicates that we are specifically waiting for a reply on */
     /* the mousing channel.  If stdin unblocks first, defer reading it,   */
     /* wait a few microseconds, and try again.                            */
-    /* FIXME EAM - Give up after 10 seconds.  This will drop input chars, */
+    /* FIXME EAM - Give up after a few seconds. This will drop input chars*/
     /* but at least it won't hang forever if the X11 connection goes bad. */
     if (IPC_LOCK) {
-	sleep(1);
-        if (repeat_count++ < 10)
+#ifdef HAVE_USLEEP
+	usleep(100);
+#endif
+        if (repeat_count++ < 10000)
 	    goto AGAIN;
     }
 
