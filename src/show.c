@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.110 2003/06/03 08:59:30 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.111 2003/06/04 06:42:54 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -2797,10 +2797,10 @@ show_variables()
     fputs("\n\tVariables:\n", stderr);
     while (udv) {
 	len = strcspn(udv->udv_name, " ");
-	fprintf(stderr, "\t%-*s ", len, udv->udv_name);
-	if (udv->udv_undef)
-	    fputs("is undefined\n", stderr);
-	else {
+	if (udv->udv_undef) {
+	    FPRINTF((stderr, "\t%-*s is undefined\n", len, udv->udv_name));
+	} else {
+	    fprintf(stderr, "\t%-*s ", len, udv->udv_name);
 	    fputs("= ", stderr);
 	    disp_value(stderr, &(udv->udv_value));
 	    (void) putc('\n', stderr);
