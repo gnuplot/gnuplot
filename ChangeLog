@@ -1,3 +1,9 @@
+2004-05-09  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* docs/gnuplot.doc src/term_api.h src/term.c term/post.trm: Add support
+	for CP1250 character encoding (Central and Eastern Europe encoding on
+	MS-Windows).
+
 2004-05-09  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* config/README: Clean up some of the descriptions.

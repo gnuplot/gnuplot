@@ -1,5 +1,5 @@
 /*
- * $Id: post.trm,v 1.104 2004/03/23 05:40:48 sfeam Exp $
+ * $Id: post.trm,v 1.105 2004/04/13 17:24:36 broeker Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -636,6 +636,9 @@ int can_reencode;
 	break;
     case S_ENC_KOI8_R :
 	recode = "reencodeKOI8R def\n";
+	break;
+    case S_ENC_CP1250 :
+	recode = "reencodeCP1250 def\n";
 	break;
     default:
 	/* do nothing */
@@ -1574,6 +1577,49 @@ NULL };
 "] def\n",
 NULL };
 
+/*   encoding for code page 1250            */
+/*   Petr Mikulik <mikulik@physics.muni.cz> */
+
+    static const char GPFAR * GPFAR PS_cp_1250_encoding[] = {
+"/reencodeCP1250 {\n",
+"dup dup findfont dup length dict begin\n",
+"{ 1 index /FID ne { def }{ pop pop } ifelse } forall\n",
+"currentdict /CharStrings known {\n",
+"\tCharStrings /Idieresis known {\n",
+"\t\t/Encoding CP1250Encoding def } if\n} if\n",
+"currentdict end definefont\n",
+"} def\n",
+"/CP1250Encoding [\n",
+"/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef\n",
+"/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef\n",
+"/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef\n",
+"/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef\n",
+"/space/exclam/quotedbl/numbersign/dollar/percent/ampersand/quoteright\n",
+"/parenleft/parenright/asterisk/plus/comma/minus/period/slash/zero/one\n",
+"/two/three/four/five/six/seven/eight/nine/colon/semicolon/less/equal/greater\n",
+"/question/at/A/B/C/D/E/F/G/H/I/J/K/L/M/N/O/P/Q/R/S/T/U/V/W/X/Y/Z\n",
+"/bracketleft/backslash/bracketright/asciicircum/underscore/quoteleft\n",
+"/a/b/c/d/e/f/g/h/i/j/k/l/m/n/o/p/q/r/s/t/u/v/w/x/y/z/braceleft/bar\n",
+"/braceright/tilde/.notdef/.notdef/.notdef/quotesinglbase/.notdef/quotedblbase\n",
+"/ellipsis/dagger/daggerdbl/.notdef/perthousand/Scaron/guilsinglleft/Sacute\n",
+"/Tcaron/Zcaron/Zacute/.notdef/quoteleft/quoteright/quotedblleft\n",
+"/quotedblright/bullet/endash/emdash/.notdef/trademark/scaron\n",
+"/guilsinglright/sacute/tcaron/zcaron/zacute/space/caron/breve/Lslash\n",
+"/currency/Aogonek/brokenbar/section/dieresis/copyright/Scedilla\n",
+"/guillemotleft/logicalnot/hyphen/registered/Zdotaccent\n",
+"/degree/plusminus/ogonek/lslash/acute/mu/paragraph/bullet\n",
+"/cedilla/aogonek/scedilla/guillemotright/Ydieresis/hungarumlaut/Lcaron\n",
+"/zdotaccent/Racute/Aacute/Acircumflex/Abreve/Adieresis/Lacute/Cacute\n",
+"/Ccedilla/Ccaron/Eacute/Eogonek/Edieresis/Ecaron/Iacute/Icircumflex\n",
+"/Dcaron/Eth/Nacute/Ncaron/Oacute/Ocircumflex/Ohungarumlaut/Odieresis\n",
+"/multiply/Rcaron/Uring/Uacute/Uhungarumlaut/Udieresis/Yacute/Tcedilla\n",
+"/germandbls/racute/aacute/acircumflex/abreve/adieresis/lacute/cacute\n",
+"/ccedilla/ccaron/eacute/eogonek/edieresis/ecaron/iacute/icircumflex\n",
+"/dcaron/dbar/nacute/ncaron/oacute/ocircumflex/ohungarumlaut/odieresis\n",
+"/divide/rcaron/uring/uacute/uhungarumlaut/udieresis/yacute/tcedilla/dotaccent\n",
+"] def\n",
+NULL };
+
     struct termentry *t = term;
     int i;
     time_t now;
@@ -1614,45 +1660,25 @@ NULL };
 	    PS_VTIC/2.0,		/* half point height */
 	    ps_rounded ? "true" : "false");
 
-    if (uses_fonts && (encoding == S_ENC_ISO8859_1)) {
-	for (i = 0; PS_iso_8859_1_encoding[i] != NULL; i++) {
-	    fprintf(gpoutfile,"%s",PS_iso_8859_1_encoding[i]);
+    /* insert font encoding vector */
+    if (uses_fonts) {
+	const char GPFAR * GPFAR *e = NULL;
+	switch (encoding) {
+	    case S_ENC_ISO8859_1:   e = PS_iso_8859_1_encoding; break;
+	    case S_ENC_ISO8859_2:   e = PS_iso_8859_2_encoding; break;
+	    case S_ENC_ISO8859_15:  e = PS_iso_8859_15_encoding; break;
+	    case S_ENC_CP437:	    e = PS_cp_437_encoding; break;
+	    case S_ENC_CP850:	    e = PS_cp_850_encoding; break;
+	    case S_ENC_CP852:	    e = PS_cp_852_encoding; break;
+	    case S_ENC_CP1250:	    e = PS_cp_1250_encoding; break;
+	    case S_ENC_KOI8_R:	    e = PS_koi8r_encoding; break;
+	}
+	if (e) {
+	    for (i = 0; e[i] != NULL; i++) {
+		fprintf(gpoutfile, "%s", e[i]);
+    }
 	}
     }
-    if (uses_fonts && (encoding == S_ENC_ISO8859_2)) {
-	for (i = 0; PS_iso_8859_2_encoding[i] != NULL; i++) {
-	    fprintf(gpoutfile,"%s",PS_iso_8859_2_encoding[i]);
-	}
-    }
-    if (uses_fonts && (encoding == S_ENC_ISO8859_15)) {
-	for (i = 0; PS_iso_8859_15_encoding[i] != NULL; i++) {
-	    fprintf(gpoutfile,"%s",PS_iso_8859_15_encoding[i]);
-	}
-    }
-    if (uses_fonts && (encoding == S_ENC_CP437)) {       /* JFi */
-	for (i = 0; PS_cp_437_encoding[i] != NULL; i++) {
-	    fprintf(gpoutfile,"%s",PS_cp_437_encoding[i]);
-	}
-    }
-    if (uses_fonts && (encoding == S_ENC_CP850)) {       /* JFi */
-	for (i = 0; PS_cp_850_encoding[i] != NULL; i++) {
-	    fprintf(gpoutfile,"%s",PS_cp_850_encoding[i]);
-	}
-    }
-    if (uses_fonts && (encoding == S_ENC_CP852)) {
-	for (i = 0; PS_cp_852_encoding[i] != NULL; i++) {
-	    fprintf(gpoutfile,"%s",PS_cp_852_encoding[i]);
-	}
-    }
-    if (uses_fonts && (encoding == S_ENC_KOI8_R)) {
-	for (i = 0; PS_koi8r_encoding[i] != NULL; i++) {
-	    fprintf(gpoutfile,"%s",PS_koi8r_encoding[i]);
-	}
-    }
-    /* Duplicate code! 
-     * As long as only two code pages are implemented, that's not a big 
-     * problem. Otherwise a small procedure might be beneficial.
-     */
 
     for ( i = 0; PS_header[i] != NULL; i++)
 	fprintf(gpoutfile,"%s",PS_header[i]);
