@@ -281,19 +281,19 @@ DEMOS = $(M)1.dat $(M)2.dat $(M)3.dat $(M)airfoil.dem $(M)all.dem \
 	$(M)whale.dat $(M)world.cor $(M)world.dat $(M)world.dem
 
 ETC =   0BUGS 0FAQ 0INSTALL 0PORTING 0README ChangeLog CodeStyle Copyright \
-	INSTALL.gnu Makefile.in NEWS TODO acconfig.h $(ACLOCAL_M4) amiga.c \
-	buildvms.com commitvers $(CONFIG_HEADER_IN) configure configure.in \
-	corgraph.asm corplot.c ctrl87.c ctrl87.h descrip.mms djconfig.sh \
-	errorfix.sh genopt.com gnuplot.def gnuplot.el gnuplot.opt gnuplot.prj \
-	header.mac hrcgraph.asm install-sh intergra.x11 lasergnu lineproc.mac \
-	linkopt.vms linkopt.ztc make_vms.com makefile.286 makefile.all \
-	makefile.amg makefile.ami makefile.cyg makefile.dj2 makefile.djg \
-	makefile.emx makefile.g makefile.mgw makefile.msc makefile.msw \
-	makefile.mto makefile.nt makefile.os2 makefile.os9 makefile.st \
-	makefile.tc makefile.unx makefile.vms makefile.wc makefile.win \
-	makefile.ztc missing mkinstalldirs os9.c pcgraph.asm rgipgnu \
-	stamp-h.in strftime.c vms.c m4/msdos.m4 m4/next.m4 m4/search-hdr.m4 \
-	m4/search-lib.m4 $(T)README 
+	INSTALL.gnu Makefile.in NEWS PGPKEYS TODO acconfig.h $(ACLOCAL_M4) \
+	amiga.c buildvms.com commitvers $(CONFIG_HEADER_IN) configure \
+	configure.in corgraph.asm corplot.c ctrl87.c ctrl87.h descrip.mms \
+	djconfig.sh errorfix.sh genopt.com gnuplot.def gnuplot.el gnuplot.opt \
+	gnuplot.prj header.mac hrcgraph.asm install-sh intergra.x11 lasergnu \
+	lineproc.mac linkopt.vms linkopt.ztc make_vms.com makefile.286 \
+	makefile.all makefile.amg makefile.ami makefile.cyg makefile.dj2 \
+	makefile.djg makefile.emx makefile.g makefile.mgw makefile.msc \
+	makefile.msw makefile.mto makefile.nt makefile.os2 makefile.os9 \
+	makefile.st makefile.tc makefile.unx makefile.vms makefile.wc \
+	makefile.win makefile.ztc missing mkinstalldirs os9.c pcgraph.asm \
+	rgipgnu stamp-h.in strftime.c vms.c m4/msdos.m4 m4/next.m4 \
+	m4/search-hdr.m4 m4/search-lib.m4 $(T)README 
 
 # Documentation and help files
 DOCS1 = $(D)Makefile.in $(D)README $(D)checkdoc.c $(D)doc2gih.c \
