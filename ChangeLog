@@ -1,4 +1,9 @@
+2004-09-30  Ethan Merritt  <merritt@u.washington.edu>
+
+	* term/gd.trm: Change #ifdef GD2_VERS to #if (GD2_VERS >= 2) everywhere.
+
 2004-09-29  Ethan Merritt  <merritt@u.washington.edu>
+
 	* demo/all.dem:  Remove vector.dem again, since it turns out that it
 	breaks for any terminal type whose default value of 'set output' is
 	not the current display.

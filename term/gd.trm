@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: gd.trm,v 1.50 2004/09/02 02:53:42 sfeam Exp $
+ * $Id: gd.trm,v 1.51 2004/09/17 19:22:47 sfeam Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -324,7 +324,7 @@ PNG_FillPattern(int fillpar)
 	PNG_fill_tile.last_rgb = rgb;
 
 	/* create new tile */
-#ifdef GD2_VERS
+#if (GD2_VERS >= 2)
 	if (png_state.TrueColor)
 	    PNG_fill_tile.im = gdImageCreateTrueColor(8, 8);
 	else
@@ -1023,7 +1023,7 @@ PNG_graphics()
     int i;
     unsigned int rgb;
 
-#ifdef GD2_VERS
+#if (GD2_VERS >= 2)
     /* TrueColor images default to a black background; load white instead */
     if (png_state.TrueColor) {
 	png_state.image = gdImageCreateTrueColor(
@@ -1096,7 +1096,7 @@ PNG_text()
 	}
 	x = x2 - x1 + 1; /* width */
 	y = y2 - y1 + 1; /* height */
-#ifdef GD2_VERS
+#if (GD2_VERS >= 2)
 	if (png_state.TrueColor)
 	    im_crop = gdImageCreateTrueColor(x,y);
 	else
@@ -1145,7 +1145,7 @@ PNG_vector(unsigned int x, unsigned int y)
 		    x, Y(y), gdStyled);
     } else {
 	if (png_state.linewidth == 1) {
-#if defined(GD2_VERS) && defined(gdAntiAliased) 
+#if (GD2_VERS >= 2) && defined(gdAntiAliased) 
 	    gdImageSetAntiAliased(png_state.image, png_state.color);
 	    gdImageLine(png_state.image, png_state.x, Y(png_state.y),
 			x, Y(y), gdAntiAliased);
@@ -1661,7 +1661,7 @@ PNG_image (unsigned M, unsigned N, coordval * image, gpiPoint * corner, t_imagec
     int pixel;
     gdImagePtr im;
 
-#ifdef GD2_VERS
+#if (GD2_VERS >= 2)
     if (png_state.TrueColor)
 	im = gdImageCreateTrueColor(M, N);
     else
