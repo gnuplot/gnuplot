@@ -6,6 +6,8 @@ top_srcdir = ../..
 
 all: ps_symbols.ps ps_fontfile_doc.ps
 
+pdf: ps_fontfile_doc.pdf
+
 ps_symbols.ps: ps_symbols.gpi
 	@if test -f $(top_srcdir)/src/gnuplot ; then \
 		$(top_srcdir)/src/gnuplot ps_symbols.gpi ; \
@@ -18,8 +20,12 @@ ps_fontfile_doc.ps: ps_fontfile_doc.tex
 	latex ps_fontfile_doc
 	dvips -j0 ps_fontfile_doc
 
+ps_fontfile_doc.pdf: ps_fontfile_doc.tex
+	pdflatex ps_fontfile_doc
+	pdflatex ps_fontfile_doc
+
 clean:
-	-rm -f ps_symbols.ps ps_fontfile_doc.{ps,log,aux,dvi}
+	-rm -f ps_symbols.ps ps_fontfile_doc.{ps,log,aux,dvi,pdf}
 
 distclean: clean
 

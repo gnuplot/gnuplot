@@ -1,9 +1,12 @@
 \documentclass[a4paper,10pt]{article}
-%\usepackage[width=18cm,height=24cm]{geometry}
 \usepackage[T1]{fontenc}
 \usepackage{booktabs}
 \usepackage{longtable}
 \usepackage{graphicx}
+\usepackage{array}
+%\usepackage[width=18cm,height=24cm]{geometry}
+\addtolength{\textwidth}{30mm}
+\addtolength{\oddsidemargin}{-15mm}
 
 \font\cmmi=cmmi10
 \font\cmr=cmr10
@@ -39,8 +42,8 @@
 
 \begin{document}
 \title{Using \TeX\ Fonts in the Gnuplot Postscript Terminal}
-\author{Harald Harders}
-\date{2002-08-30}
+\author{Harald Harders, {\ttfamily h.harders@tu-bs.de}}
+\date{2002-10-15}
 \maketitle
 
 The Postscript terminal can embed Postscript Type\,1 fonts (with
@@ -78,7 +81,58 @@ in lowercase letters: \texttt{sfrm1000}.} (The
 Replace the \verb|rm| by \verb|it|, \verb|bx| or other combinations in
 both the file name and the font name (here, in uppercase letters) in order 
 to get other font shapes.
-The encoding of these fonts is ordinary and thus is not described here.
+The encoding of these fonts is ordinary and thus is not described
+here.
+Table~\ref{tab:fontnames} shows some examples of fonts contained in
+the cm-super font bundle.
+%
+\begin{table}
+  \centering
+  \begin{tabular}{>{\ttfamily}l>{\ttfamily}ll}
+    \toprule
+    \multicolumn{1}{l}{File name}&
+    \multicolumn{1}{l}{Full font name} &
+    Example \\
+    & \multicolumn{1}{l}{(all preceded by \texttt{Computer Modern})} & \\
+    \midrule
+    sfrm1000.pfb& Roman &
+    {\rmfamily\upshape Example} \\
+    sfbx1000.pfb& Bold Extended &
+    {\rmfamily\bfseries\upshape Example} \\
+    sfti1000.pfb& Italic &
+    {\rmfamily\itshape Example} \\
+    sfbi1000.pfb& Bold Extended Italic &
+    {\rmfamily\bfseries\itshape Example} \\
+    sfsl1000.pfb& Slanted &
+    {\rmfamily\slshape Example} \\
+    sfbl1000.pfb& Bold Extended Slanted &
+    {\rmfamily\bfseries\slshape Example} \\
+    sfcc1000.pfb& Caps and Small Caps &
+    {\rmfamily\bfseries\scshape Example} \\
+    \midrule
+    sfss1000.pfb& Sans Serif &
+    {\sffamily\upshape Example} \\
+    sfsi1000.pfb& Sans Serif Slanted &
+    {\sffamily\slshape Example} \\
+    sfsx1000.pfb& Sans Serif Bold Extended &
+    {\sffamily\bfseries\upshape Example} \\
+    sfso1000.pfb& Sans Serif Bold Extended Slanted &
+    {\sffamily\bfseries\slshape Example} \\
+    \midrule
+    sftt1000.pfb& Typewriter &
+    {\ttfamily\upshape Example} \\
+    sfit1000.pfb& Typewriter Italic &
+    {\ttfamily\itshape Example} \\
+    sfst1000.pfb& Typewriter Slanted &
+    {\ttfamily\slshape Example} \\
+    sftc1000.pfb& Typewriter Caps and Small Caps &
+    {\ttfamily\scshape Example} \\
+    \bottomrule
+  \end{tabular}
+  \caption{Some fonts in the cm-super font bundle (for a designsize of
+    10\,pt)}%
+  \label{tab:fontnames}%
+\end{table}
 
 For mathematics the Type\,1 versions of the Computer Modern fonts are
 useful.
