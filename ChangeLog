@@ -1,5 +1,10 @@
 2003-06-03  Petr Mikulik  <mikulik@physics.muni.cz>
 
+	* src/show.c (show_palette_rgbformulae show_palette_palette
+	show_palette_colornames): Fixed indentation.
+
+2003-06-03  Petr Mikulik  <mikulik@physics.muni.cz>
+
 	* NEWS src/show.c docs/gnuplot.doc: New command 'show palette
 	fit2rgbformulae'.
 

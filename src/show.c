@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.108 2003/05/19 13:57:10 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.109 2003/06/03 08:06:26 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -1900,25 +1900,26 @@ show_parametric()
 static void
 show_palette_rgbformulae()
 {
-	int i;
-	fprintf(stderr,"\t  * there are %i available rgb color mapping formulae:",
+    int i;
+    fprintf(stderr,"\t  * there are %i available rgb color mapping formulae:",
 	    sm_palette.colorFormulae);
-	/* print the description of the color formulae */
-	i = 0;
-	    while ( *(ps_math_color_formulae[2*i]) ) {
-		if (i % 3 == 0)
-		    fputs("\n\t    ", stderr);
-		fprintf(stderr, "%2i: %-15s",i,ps_math_color_formulae[2*i+1]);
-		i++;
-	    }
-	    fputs("\n", stderr);
+    /* print the description of the color formulae */
+    i = 0;
+    while ( *(ps_math_color_formulae[2*i]) ) {
+	if (i % 3 == 0)
+	    fputs("\n\t    ", stderr);
+	fprintf(stderr, "%2i: %-15s",i,ps_math_color_formulae[2*i+1]);
+	i++;
+    }
+    fputs("\n", stderr);
     fputs("\t  * negative numbers mean inverted=negative colour component\n",
-	  stderr);
+	    stderr);
     fprintf(stderr,
 	    "\t  * thus the ranges in `set pm3d rgbformulae' are -%i..%i\n",
 	    sm_palette.colorFormulae-1,sm_palette.colorFormulae-1);
     ++c_token;
-    }
+}
+
 
 static void
 show_palette_fit2rgbformulae()
@@ -1990,27 +1991,28 @@ show_palette_fit2rgbformulae()
     free(currRGB);
 }
 
+
 static void
 show_palette_palette()
 {
-	int colors, i;
-	struct value a;
-	double gray, r, g, b;
+    int colors, i;
+    struct value a;
+    double gray, r, g, b;
     rgb_color color;
-    
-	c_token++;
-	if (END_OF_COMMAND)
-	    int_error(c_token,"palette size required");
-	colors = (int) real(const_express(&a));
-	if (colors<2) colors = 100;
-	if (sm_palette.colorMode == SMPAL_COLOR_MODE_GRAY)
-	    fprintf(stderr, "Gray palette with %i discrete colors\n", colors);
-	else
-        fprintf(stderr, "Color palette with %i discrete colors\n", colors );
-    
-	for (i = 0; i < colors; i++) {
-        /* colours equidistantly from [0,1]  */
-        gray = (double)i / (colors - 1); 
+
+    c_token++;
+    if (END_OF_COMMAND)
+	int_error(c_token,"palette size required");
+    colors = (int) real(const_express(&a));
+    if (colors<2) colors = 100;
+    if (sm_palette.colorMode == SMPAL_COLOR_MODE_GRAY)
+	fprintf(stderr, "Gray palette with %i discrete colors\n", colors);
+    else
+	fprintf(stderr, "Color palette with %i discrete colors\n", colors );
+
+    for (i = 0; i < colors; i++) {
+	/* colours equidistantly from [0,1]  */
+	gray = (double)i / (colors - 1); 
 	if (sm_palette.positive == SMPAL_NEGATIVE) {
 	    /* needed, since printing without call to set_color()  */
 	    color_from_gray( 1 - gray , &color );
@@ -2018,14 +2020,15 @@ show_palette_palette()
 	else
 	    color_from_gray( gray , &color );
 	r = color.r;  g = color.g;  b = color.b; 
-	
+
 	fprintf( stderr, 
- "%3i. gray=%0.4f, (r,g,b)=(%0.4f,%0.4f,%0.4f), #%02x%02x%02x = %3i %3i %3i\n",
+		"%3i. gray=%0.4f, (r,g,b)=(%0.4f,%0.4f,%0.4f), #%02x%02x%02x = %3i %3i %3i\n",
 		i, gray, r,g,b,
-		 (int)(255*r+.5),(int)(255*g+.5),(int)(255*b+.5),
-		 (int)(255*r+.5),(int)(255*g+.5),(int)(255*b+.5)  );
-	}
-	    }
+		(int)(255*r+.5),(int)(255*g+.5),(int)(255*b+.5),
+		(int)(255*r+.5),(int)(255*g+.5),(int)(255*b+.5)  );
+    }
+}
+
 
 static void
 show_palette_gradient()
@@ -2053,30 +2056,31 @@ show_palette_gradient()
 }
 
 
-static void show_palette_colornames()
+static void
+show_palette_colornames()
 {
-  const struct gen_table *tbl = pm3d_color_names_tbl;
-  int i=0;
-  fputs( "\tList of known color names:", stderr );
-  while (tbl->key) {
+    const struct gen_table *tbl = pm3d_color_names_tbl;
+    int i=0;
+    fputs( "\tList of known color names:", stderr );
+    while (tbl->key) {
 #if 0
-      /* Print only color names, table with 4 columns */
-      if (i%4 == 0) fputs( "\n  ", stderr );
-      fprintf( stderr, "%-18s ", tbl->key );
+	/* Print only color names, table with 4 columns */
+	if (i%4 == 0) fputs( "\n  ", stderr );
+	fprintf( stderr, "%-18s ", tbl->key );
 #else
-      /* Print color names and their rgb values, table with 1 column */
-      int r = ((tbl->value >> 16 ) & 255);
-      int g = ((tbl->value >> 8 ) & 255);
-      int b = (tbl->value & 255);
+	/* Print color names and their rgb values, table with 1 column */
+	int r = ((tbl->value >> 16 ) & 255);
+	int g = ((tbl->value >> 8 ) & 255);
+	int b = (tbl->value & 255);
 
-      fprintf( stderr, "\n  %-18s ", tbl->key );
-      fprintf(stderr, "#%02x%02x%02x = %3i %3i %3i", r,g,b, r,g,b);
+	fprintf( stderr, "\n  %-18s ", tbl->key );
+	fprintf(stderr, "#%02x%02x%02x = %3i %3i %3i", r,g,b, r,g,b);
 #endif
-      ++tbl;
-      ++i;
-  }
-  fputs( "\n", stderr );
-  ++c_token;
+	++tbl;
+	++i;
+    }
+    fputs( "\n", stderr );
+    ++c_token;
 }
 
 
