@@ -962,7 +962,8 @@ PDF_set_color(double gray)
 	    blue  = GetColorValueFromFormula(PDF_palette.formulaB, gray);
 	    break;
 	default:
-	    fprintf(stderr, "** ERROR PDF_set_color line %d\n", __LINE__);
+	    fprintf(stderr, "** ERROR PDF_set_color (file %s, line %d)\n",
+		    __FILE__, __LINE__);
 	    return;
     }
 
@@ -974,6 +975,9 @@ PDF_filled_polygon(int points, gpiPoint* corners)
 {
     PDF_PathClose();
     if (4 != points) {
+	fprintf(stderr,
+	       	"** ERROR PDF_filled_polygon supports only 4 points (file %s, line %d)",
+	       	__FILE__, __LINE__);
 	return;
     }
     PDF_moveto(myPDF, corners[0].x, corners[0].y);
