@@ -1,23 +1,40 @@
 /*
- * $Id: post.trm,v 1.43 1997/07/22 23:24:44 drd Exp $
+ * $Id: post.trm,v 1.44 1998/03/22 22:34:58 drd Exp $
  */
 
 /* GNUPLOT - post.trm */
-/*
- * Copyright (C) 1990 - 1993, 1997   
+
+/*[
+ * Copyright 1990 - 1993, 1998
  *
  * Permission to use, copy, and distribute this software and its
- * documentation for any purpose with or without fee is hereby granted, 
- * provided that the above copyright notice appear in all copies and 
- * that both that copyright notice and this permission notice appear 
+ * documentation for any purpose with or without fee is hereby granted,
+ * provided that the above copyright notice appear in all copies and
+ * that both that copyright notice and this permission notice appear
  * in supporting documentation.
  *
  * Permission to modify the software is granted, but not the right to
- * distribute the modified code.  Modifications are to be distributed 
- * as patches to released version.
- *  
- * This software  is provided "as is" without express or implied warranty.
- * 
+ * distribute the complete modified source code.  Modifications are to
+ * be distributed as patches to the released version.  Permission to
+ * distribute binaries produced by compiling modified sources is granted,
+ * provided you
+ *   1. distribute the corresponding source modifications from the
+ *    released version in the form of a patch file along with the binaries,
+ *   2. add special version identification to distinguish your version
+ *    in addition to the base release version number,
+ *   3. provide your name and address as the primary contact for the
+ *    support of your modified version, and
+ *   4. retain our contact information in regard to use of the base
+ *    software.
+ * Permission to distribute the released version of the source code along
+ * with corresponding source modifications in the form of a patch file is
+ * granted with same provisions 2 through 4 for binary distributions.
+ *
+ * This software is provided "as is" without express or implied warranty
+ * to the extent permitted by applicable law.
+]*/
+
+/*
  * This terminal driver supports:
  *     postscript
  *
@@ -153,9 +170,9 @@ static char GPFAR * GPFAR PS_header[] = {
 /* Line Types */
 "/LTb { BL [] 0 0 0 DL } def\n", /* border */
 "/LTa { AL [1 dl 2 dl] 0 setdash 0 0 0 setrgbcolor } def\n", /* axes */
-"/LT0 { PL [] 0 1 0 DL } def\n",
-"/LT1 { PL [4 dl 2 dl] 0 0 1 DL } def\n",
-"/LT2 { PL [2 dl 3 dl] 1 0 0 DL } def\n",
+"/LT0 { PL [] 1 0 0 DL } def\n",
+"/LT1 { PL [4 dl 2 dl] 0 1 0 DL } def\n",
+"/LT2 { PL [2 dl 3 dl] 0 0 1 DL } def\n",
 "/LT3 { PL [1 dl 1.5 dl] 1 0 1 DL } def\n",
 "/LT4 { PL [5 dl 2 dl 1 dl 2 dl] 0 1 1 DL } def\n",
 "/LT5 { PL [4 dl 3 dl 1 dl 3 dl] 1 1 0 DL } def\n",
@@ -353,7 +370,7 @@ static char GPFAR * GPFAR PS_header[] = {
 "/D14 { gsave translate 45 rotate 0 0 S14 stroke grestore } bind def\n",
 "/D15 { gsave translate 45 rotate 0 0 S15 stroke grestore } bind def\n",
 
-/* closed figures w/o the point in the middle (added by Dick Crafword) */
+/* closed figures w/o the point in the middle (added by Dick Crawford) */
 
 /* Diamond */
 "/DiaE { stroke [] 0 setdash vpt add M\n",
@@ -385,6 +402,41 @@ static char GPFAR * GPFAR PS_header[] = {
 /* Circle */
 "/CircE { stroke [] 0 setdash \n",
 "  hpt 0 360 arc stroke } def\n",
+
+/* opaque closed figures w/o the point in the middle (added by Dick Crawford) */
+
+"/Opaque { gsave closepath 1 setgray fill grestore 0 setgray closepath } def\n"
+
+/* Diamond */
+"/DiaW { stroke [] 0 setdash vpt add M\n",
+"  hpt neg vpt neg V hpt vpt neg V\n",
+"  hpt vpt V hpt neg vpt V Opaque stroke } def\n",
+
+/* Box */
+"/BoxW { stroke [] 0 setdash exch hpt sub exch vpt add M\n",
+"  0 vpt2 neg V hpt2 0 V 0 vpt2 V\n",
+"  hpt2 neg 0 V Opaque stroke } def\n",
+
+/* Triangle Up*/
+"/TriUW { stroke [] 0 setdash vpt 1.12 mul add M\n",
+"  hpt neg vpt -1.62 mul V\n",
+"  hpt 2 mul 0 V\n",
+"  hpt neg vpt 1.62 mul V Opaque stroke } def\n",
+
+/* Triangle Down */
+"/TriDW { stroke [] 0 setdash vpt 1.12 mul sub M\n", 
+"  hpt neg vpt 1.62 mul V\n",
+"  hpt 2 mul 0 V\n",
+"  hpt neg vpt -1.62 mul V Opaque stroke } def\n",
+
+/* Pentagon */
+"/PentW { stroke [] 0 setdash gsave\n",
+"  translate 0 hpt M 4 {72 rotate 0 hpt L} repeat\n",
+"  Opaque stroke grestore } def\n",
+
+/* Circle */
+"/CircW { stroke [] 0 setdash \n",
+"  hpt 0 360 arc Opaque stroke } def\n",
 
 /* filled box : usage   x1 y1 x2 y2 BoxFill */
 "/BoxFill { gsave Rec 1 setgray fill grestore } def\n",
@@ -1134,24 +1186,25 @@ TERM_PUBLIC void PS_point(x,y,number)
 unsigned int x,y;
 int number;
 {
-static char *pointFNS[] = {"Pnt",  "Pls",   "Crs",    "Star",
-                           "Box",  "BoxF",  "Circle", "CircleF",
-                           "TriU", "TriUF", "TriD",   "TriDF",
-                           "Dia",  "DiaF",  "Pent",   "PentF",
-        		   "C0",   "C1",    "C2",     "C3",
-			   "C4",   "C5",    "C6",     "C7",
-          		   "C8",   "C9",    "C10",    "C11",
-			   "C12",  "C13",   "C14",    "C15",
-                           "S0",   "S1",    "S2",     "S3",
-			   "S4",   "S5",    "S6",     "S7",
-                           "S8",   "S9",    "S10",    "S11",
-			   "S12",  "S13",   "S14",    "S15",
-          		   "D0",   "D1",    "D2",     "D3",
-			   "D4",   "D5",    "D6",     "D7",
-			   "D8",   "D9",    "D10",    "D11",
-			   "D12",  "D13",   "D14",    "D15",
-                           "BoxE", "CircE", "TriUE",  "TriDE",
-                           "DiaE", "PentE"
+static char *pointFNS[] = {"Pnt",   "Pls",   "Crs",    "Star",
+                           "Box",   "BoxF",  "Circle", "CircleF",
+                           "TriU",  "TriUF", "TriD",   "TriDF",
+                           "Dia",   "DiaF",  "Pent",   "PentF",
+        		   "C0",    "C1",    "C2",     "C3",
+			   "C4",    "C5",    "C6",     "C7",
+          		   "C8",    "C9",    "C10",    "C11",
+			   "C12",   "C13",   "C14",    "C15",
+                           "S0",    "S1",    "S2",     "S3",
+			   "S4",    "S5",    "S6",     "S7",
+                           "S8",    "S9",    "S10",    "S11",
+			   "S12",   "S13",   "S14",    "S15",
+          		   "D0",    "D1",    "D2",     "D3",
+			   "D4",    "D5",    "D6",     "D7",
+			   "D8",    "D9",    "D10",    "D11",
+			   "D12",   "D13",   "D14",    "D15",
+                           "BoxE",  "CircE", "TriUE",  "TriDE",
+                           "DiaE",  "PentE", "BoxW",   "CircW",
+                           "TriUW", "TriDW", "DiaW",   "PentW"
 };
 	if (number < 0)
 		number = -1;		/* negative types are all 'dot' */
@@ -1605,12 +1658,12 @@ START_HELP(post)
 "                               {enhanced | noenhanced}",
 "                               {\"<fontname>\"} {<fontsize>}",
 "",
-" where <mode> is `landscape`, `portrait`, `eps` or `default`",
+" where <mode> is `landscape`, `portrait`, `eps` or `default`;",
 " `solid` draws all plots with solid lines, overriding any dashed patterns;",
 " <duplexing> is `defaultplex`, `simplex` or `duplex` (\"duplexing\" in",
 " PostScript is the ability of the printer to print on both sides of the same",
 " page---don't set this if your printer can't do it);",
-" `enhanced` activates the \"Enhanced PostScript\" features (subscripts,",
+" `enhanced` activates the \"enhanced PostScript\" features (subscripts,",
 " superscripts and mixed fonts);",
 " `\"<fontname>\"` is the name of a valid PostScript font; and `<fontsize>` is",
 " the size of the font in PostScript points.",
@@ -1634,19 +1687,37 @@ START_HELP(post)
 "       set terminal postscript eps 14        # old epsf1",
 "       set terminal postscript eps 22        # old epsf2",
 "       set size 0.7,1.4; set term post portrait color \"Times-Roman\" 14",
+"",
+" Linewidths and pointsizes may be changed with `set linestyle`.",
+"",
+" The `postscript` driver supports about 70 distinct pointtypes, selectable",
+" through the `pointtype` option on `plot` and `set linestyle`.",
+"",
+" Several possibly useful files about `gnuplot`'s PostScript are included in",
+" the /docs subdirectory of the `gnuplot` distribution and at the distribution",
+" sites.  These are \"ps_symbols.gpi\" (a `gnuplot` command file that, when",
+" executed, creates the file \"ps_symbols.ps\"), \"ps_symbols.ps\" (which shows",
+" all the symbols available through the `postscript` terminal), \"ps_guide.ps\"",
+" (which contains a summary of the enhanced syntax and pages showing what the",
+" octal codes produce with text and symbol fonts) and \"ps_file.doc\" (a text",
+" file discussing the organization of a PostScript file written by `gnuplot`).",
+"", 
+" A PostScript file is editable, so once `gnuplot` has created one, you are",
+" free to modify it to your heart's desire.  See the \"editing postscript\"",
+" section for some hints.",
 "2 enhanced postscript",
 "?set terminal postscript enhanced",
 "?set term postscript enhanced",
 "?terminal postscript enhanced",
 "?term postscript enhanced",
-"?enhanced postscript",
+"?enhanced_postscript",
 "@start table - first is interactive cleartext form",
 "  Control      Examples        Explanation",
 "   ^           a^x             superscript",
 "   _           a_x             subscript",
 "   @           @x or a@^b_c    phantom box (occupies no width)",
 "   &           &{space}        inserts space of specified length",
-"#\\multicolumn{3}{|c|}{Enhanced Text Control Codes} \\\\",
+"#\\multicolumn{3}{|c|}{Enhanced Text Control Codes} \\\\ \\hline \\hline",
 "#Control & Examples & Explanation \\\\ \\hline",
 "#\\verb~^~ & \\verb~a^x~ & superscript\\\\",
 "#\\verb~_~ & \\verb~a_x~ & subscript\\\\",
@@ -1664,11 +1735,11 @@ START_HELP(post)
 "% & $ &{space}$inserts space of specified length",
 "@end table",
 "",
-" {text} can be used to allow multiple-character text, where only a single",
-" character is expected (e.g., 2^{10}).  To change the font and/or size, use",
-" the full form:  {/[fontname][=fontsize] text}   (For example, {/Symbol=20 G}",
-" is a 20 point GAMMA).  (The '/' character MUST be the first character after",
-" the '{'.)",
+" Braces can be used to place multiple-character text where a single character",
+" is expected (e.g., 2^{10}).  To change the font and/or size, use the full",
+" form:  {/[fontname][=fontsize] text}   (For example, {/Symbol=20 G} is a ",
+" 20 point GAMMA).  (The '/' character MUST be the first character after the",
+" '{'.)",
 "",
 " If the encoding vector has been changed by `set encoding`, the default",
 " encoding vector can be used instead by following the slash with a dash.  This",
@@ -1704,7 +1775,29 @@ START_HELP(post)
 "                  {/Helvetica e^{-{/Symbol m}^2/2} d}{/Symbol m}'",
 "",
 " The file \"ps_guide.ps\" in the /docs subdirectory of the `gnuplot` source",
-" distribution contains more examples of the enhanced syntax."
+" distribution contains more examples of the enhanced syntax.",
+"2 editing postscript",
+"?set terminal postscript editing",
+"?set term postscript editing",
+"?terminal postscript editing",
+"?term postscript editing",
+"?editing_postscript",
+" The PostScript language is a very complex language---far too complex to",
+" describe in any detail in this document.  Nevertheless there are some things",
+" in a PostScript file written by `gnuplot` that can be changed without risk of",
+" introducing fatal errors into the file.",
+"",
+" For example, the PostScript statement \"/Color true def\" (written into the",
+" file in response to the command `set terminal postscript color`), may be",
+" altered in an obvious way to generate a black-and-white version of a plot.",
+" Similarly line colors, text colors, line weights and symbol sizes can also be",
+" altered in straight-forward ways.  Text (titles and labels) can be edited to",
+" correct misspellings or to change fonts.  Anything can be repositioned, and",
+" of course anything can be added or deleted, but modifications such as these",
+" may require deeper knowledge of the PostScript language.",
+"",
+" The organization of a PostScript file written by `gnuplot` is discussed in",
+" the text file \"ps_file.doc\" in the /docs subdirectory."
 END_HELP(post)
 #endif
 

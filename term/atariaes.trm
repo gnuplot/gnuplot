@@ -1,11 +1,12 @@
 /*
- * $Id: atariaes.trm,v 1.6 1997/04/10 02:34:09 drd Exp $
+ * $Id: atariaes.trm,v 1.7 1998/03/22 22:34:30 drd Exp $
  *
  */
 
 /* GNUPLOT - atari.trm */
-/*
- * Copyright (C) 1992, 1993, 1997
+
+/*[
+ * Copyright 1992, 1993, 1998
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted,
@@ -14,11 +15,27 @@
  * in supporting documentation.
  *
  * Permission to modify the software is granted, but not the right to
- * distribute the modified code.  Modifications are to be distributed
- * as patches to released version.
+ * distribute the complete modified source code.  Modifications are to
+ * be distributed as patches to the released version.  Permission to
+ * distribute binaries produced by compiling modified sources is granted,
+ * provided you
+ *   1. distribute the corresponding source modifications from the
+ *    released version in the form of a patch file along with the binaries,
+ *   2. add special version identification to distinguish your version
+ *    in addition to the base release version number,
+ *   3. provide your name and address as the primary contact for the
+ *    support of your modified version, and
+ *   4. retain our contact information in regard to use of the base
+ *    software.
+ * Permission to distribute the released version of the source code along
+ * with corresponding source modifications in the form of a patch file is
+ * granted with same provisions 2 through 4 for binary distributions.
  *
- * This software  is provided "as is" without express or implied warranty.
- *
+ * This software is provided "as is" without express or implied warranty
+ * to the extent permitted by applicable law.
+]*/
+
+/*
  * This file is included by ../term.c.
  *
  * This terminal driver supports:
@@ -103,8 +120,8 @@ static void flush_line __PROTO((void));
 static void put_text __PROTO((int x, int y, int w, int h));
 
 static int multi_aes;
-static int window_id=-1;
-static int vdi_handle=-1;
+static int window_id= -1;
+static int vdi_handle= -1;
 static int win_xpos, win_ypos;
 static int win_xsize,win_ysize;
 
@@ -138,13 +155,13 @@ static void open_window(void)
 {
   int x,y,w,h;
 
-  if(window_id==-1) {
+  if(window_id== -1) {
     wind_calc(WC_BORDER, WINTYPE, win_xpos, win_ypos,
                 win_xsize, win_ysize, &x, &y, &w, &h);
     window_id=wind_create(WINTYPE, x, y, w, h);
 
     if(window_id<0) {
-        window_id=-1;
+        window_id= -1;
         int_error("Can't create window", NO_CARET);
     }
 
@@ -155,10 +172,10 @@ static void open_window(void)
 
 static void close_window(void)
 {
-  if(window_id!=-1) {
+  if(window_id!= -1) {
     wind_close(window_id);
     wind_delete(window_id);
-    window_id=-1;
+    window_id= -1;
   }
 }
 
@@ -189,7 +206,7 @@ static void application_exit(void)
 {
   close_window();
 
-  if (vdi_handle!=-1) {
+  if (vdi_handle!= -1) {
     v_clsvwk(vdi_handle);
   }
   mouse_mode();
@@ -292,7 +309,7 @@ static void process_message(int *msg)
   static int small_xpos, small_ypos, small_xsize, small_ysize;
   int x,y,w,h;
 
-  if(window_id==-1 || msg[3]!=window_id) return;
+  if(window_id== -1 || msg[3]!=window_id) return;
 
   switch(msg[0]) {
     case WM_REDRAW:
@@ -572,12 +589,12 @@ TERM_PUBLIC void ATARI_reset( )
     int i;
 
     close_window();
-    if( vdi_handle!=-1 ) {
+    if( vdi_handle!= -1 ) {
         for( i=0 ; i<ATARI_numpalette ; i++ ) {
             vs_color(vdi_handle, i, ATARI_savecolors[i] );
         }
         v_clsvwk( vdi_handle );
-        vdi_handle=-1;
+        vdi_handle= -1;
     }
 }
 
@@ -600,7 +617,7 @@ TERM_PUBLIC void ATARI_text( )
 {
     flush_line( );
     if(!multi_aes) {
-        while(window_id!=-1 && !poll_events(1));
+        while(window_id!= -1 && !poll_events(1));
         close_window();
     }
     text_mode();

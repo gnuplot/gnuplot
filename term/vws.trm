@@ -1,11 +1,12 @@
 /*
- * $Id: vws.trm,v 1.12 1997/04/10 02:34:40 drd Exp $
+ * $Id: vws.trm,v 1.13 1998/03/22 22:35:11 drd Exp $
  *
  */
 
 /* GNUPLOT - vws.trm */
-/*
- * Copyright (C) 1990 - 1993, 1997
+
+/*[
+ * Copyright 1990 - 1993, 1998
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted,
@@ -14,11 +15,27 @@
  * in supporting documentation.
  *
  * Permission to modify the software is granted, but not the right to
- * distribute the modified code.  Modifications are to be distributed
- * as patches to released version.
+ * distribute the complete modified source code.  Modifications are to
+ * be distributed as patches to the released version.  Permission to
+ * distribute binaries produced by compiling modified sources is granted,
+ * provided you
+ *   1. distribute the corresponding source modifications from the
+ *    released version in the form of a patch file along with the binaries,
+ *   2. add special version identification to distinguish your version
+ *    in addition to the base release version number,
+ *   3. provide your name and address as the primary contact for the
+ *    support of your modified version, and
+ *   4. retain our contact information in regard to use of the base
+ *    software.
+ * Permission to distribute the released version of the source code along
+ * with corresponding source modifications in the form of a patch file is
+ * granted with same provisions 2 through 4 for binary distributions.
  *
- * This software  is provided "as is" without express or implied warranty.
- *
+ * This software is provided "as is" without express or implied warranty
+ * to the extent permitted by applicable law.
+]*/
+
+/*
  * This file is included by ../term.c.
  *
  * This terminal driver supports:
@@ -33,6 +50,8 @@
  */
 /*
  * adapted to the new terminal layout by Stefan Bodewig (Dec. 1995)
+ * adapted to VAX VMS 4.7, VAX C 2.4 and activated the INTENSITY and COLOR 
+ * monitor features (Lucas P. Hart, June 1997) 
  */
 
 #ifndef GOT_DRIVER_H
@@ -59,7 +78,7 @@ TERM_PUBLIC void VWS_point __PROTO((unsigned int x, unsigned int y, int point));
 TERM_PUBLIC void VWS_arrow __PROTO((unsigned int sx, unsigned int sy, unsigned int ex, unsigned int ey, int head));
  
 #define VWS_XMAX 1024
-#define VWS_YMAX 780
+#define VWS_YMAX 864		/* was 780, but VAXstation 2000 is 864 */
 #define VWS_VCHAR 25
 #define VWS_HCHAR 15
 #define VWS_VTIC 10
@@ -71,10 +90,10 @@ TERM_PUBLIC void VWS_arrow __PROTO((unsigned int sx, unsigned int sy, unsigned i
 void VWS_resize_ast __PROTO((void));
 
 #include <stdio.h>
-/*
+/*lph: the first two were commented out, but are needed for VAXC 2.4 */
 #include <math.h>
 #include <ssdef.h>
-*/
+/* */
 #include <descrip.h>
  
 #include <uisentry.h>
@@ -92,7 +111,7 @@ void VWS_resize_ast __PROTO((void));
 float current_x, current_y;
  
 int vd_id, wd_id;
-int vcm_id;
+int vcm_id, ws_type;
  
 static $DESCRIPTOR(ws_devname, "SYS$WORKSTATION");
 static $DESCRIPTOR(vd_title, "gnuplot");
@@ -104,6 +123,7 @@ static float x0, y0, xsiz, ysiz,
  
 void VWS_resize_ast()
 {
+  extern void replotrequest();     /* in command.c */
   uis$resize_window(&vd_id, &wd_id, &x0, &y0, &xsiz, &ysiz,
 		    &wc_xmin, &wc_ymin, &wc_xmax, &wc_ymax);
   replotrequest();
@@ -132,6 +152,27 @@ TERM_PUBLIC void VWS_init()
   const int line_attr = LINE_ATTR;
   const int back_attr = BACK_ATTR;
 
+/* lph:  the similar notation may lead to some confusion
+ * attributes are grouped in "attribute block" data structures
+ * which are referenced by block number
+ * attribute block 0 contains default attribute settings
+ *
+ * To customize settings, a function will read the source 
+ * attribute block, set the particular attribute, and
+ * write to the destination attribute block.
+ * Both the block number and attribute are integers, so it
+ * is easy to confuse an attribute and an attribute blcok
+ */
+
+/*  lph:  Color map corresponding to an example in
+ *  MicroVMS Graphics Progamming Guide (V3.0) */
+ 
+  const float r_map[8] = {0.40, 0.50, 0.50, 0.00, 0.25, 0.90, 0.80, 0.35};
+  const float g_map[8] = {0.30, 0.50, 0.25, 0.70, 0.25, 0.50, 0.30, 0.65};
+  const float b_map[8] = {0.00, 0.50, 0.50, 0.30, 0.90, 0.00, 0.00, 0.95};
+
+/* the array format is easier to customize */   
+
   vd_width  = 14;
   vd_height = 10;		/* aspect sqrt(2) as DIN A paper */
  
@@ -144,7 +185,14 @@ TERM_PUBLIC void VWS_init()
  
   vd_id = uis$create_display(&wc_xmin, &wc_ymin, &wc_xmax, &wc_ymax,
                              &vd_width, &vd_height, &vcm_id);
- 
+  uis$get_hw_color_info(&ws_devname, &ws_type);
+
+/* lph: ws's color table for monochrome  */
+/* by default,  color table index 0 is backgound, and 1 is foregound */
+/* a color {index into the color table} is assigned to the active line */
+/* in VWS_linetype */
+
+if (ws_type == UIS$C_DEV_MONO) {
   uis$set_color(&vd_id, &i0, &p5, &p5, &p5);
   uis$set_color(&vd_id, &i1, &p0, &p0, &p0);
   uis$set_color(&vd_id, &i2, &p0, &p0, &p0);
@@ -153,26 +201,35 @@ TERM_PUBLIC void VWS_init()
   uis$set_color(&vd_id, &i5, &p0, &p0, &p0);
   uis$set_color(&vd_id, &i6, &p0, &p0, &p0);
   uis$set_color(&vd_id, &i7, &p0, &p0, &p0);
- 
-/*
+  }
+else if (ws_type == UIS$C_DEV_INTENSITY) { /* Intensity scale, untested */
   uis$set_color(&vd_id, &i2, &p2, &p2, &p2);
   uis$set_color(&vd_id, &i3, &p3, &p3, &p3);
   uis$set_color(&vd_id, &i4, &p4, &p4, &p4);
   uis$set_color(&vd_id, &i5, &p5, &p5, &p5);
   uis$set_color(&vd_id, &i6, &p6, &p6, &p6);
   uis$set_color(&vd_id, &i7, &p7, &p7, &p7);
-  
-  /* perhaps better for color terms (which I do not have)
-     uis$set_color(&vd_id, &i0, &0p0, &0p0, &0p0);
-     uis$set_color(&vd_id, &i1, &0p9, &0p0, &0p0);
-     uis$set_color(&vd_id, &i2, &0p0, &0p9, &0p0);
-     uis$set_color(&vd_id, &i3, &0p9, &0p9, &0p0);
-     uis$set_color(&vd_id, &i4, &0p0, &0p0, &0p9);
-     uis$set_color(&vd_id, &i5, &0p9, &0p0, &0p9);
-     uis$set_color(&vd_id, &i6, &0p0, &0p9, &0p9);
-     uis$set_color(&vd_id, &i7, &0p9, &0p9, &0p9);
-     /*
-      */
+  }
+  /* ws: perhaps better for color terms (which I do not have) */
+   
+else if (ws_type == UIS$C_DEV_COLOR) {
+/* */
+     uis$set_color(&vd_id, &i0, &p0, &p0, &p0);
+     uis$set_color(&vd_id, &i1, &p9, &p0, &p0);
+     uis$set_color(&vd_id, &i2, &p0, &p9, &p0);
+     uis$set_color(&vd_id, &i3, &p9, &p9, &p0);
+     uis$set_color(&vd_id, &i4, &p0, &p0, &p9);
+     uis$set_color(&vd_id, &i5, &p9, &p0, &p9);
+     uis$set_color(&vd_id, &i6, &p0, &p9, &p9);
+     uis$set_color(&vd_id, &i7, &p9, &p9, &p9);
+ /* 
+  * lph: Another way to set up the color table is to use arrays,
+  * which simplifies customizing the appearance.
+  *
+     uis$set_colors(&vd_id, &i0, &i8, &r_map, &g_map, &b_map);  
+  */
+   }
+
   uis$disable_display_list(&vd_id);
  
   wd_id = uis$create_window(&vd_id, &ws_devname, &vd_title,
@@ -182,17 +239,36 @@ TERM_PUBLIC void VWS_init()
   uis$set_resize_ast(&vd_id, &wd_id, &VWS_resize_ast, &i0,
                      &x0, &y0, &xsiz, &ysiz,
                      &wc_xmin_new, &wc_ymin_new, &wc_xmax_new, &wc_ymax_new);
- 
+/* 
+ * lph: This sets up three different attribute blocks, each having a different
+ * mode, but they are never utilized and it is not clear when they might
+ * be of use.
+ * The attribute blocks used for writing are line_attr, text_attr.
+ * 
   uis$set_writing_mode(&vd_id, &default_attr, &over_attr, &uis$c_mode_over);
   uis$set_writing_mode(&vd_id, &default_attr, &eras_attr, &uis$c_mode_eras);
   uis$set_writing_mode(&vd_id, &default_attr, &bis_attr, &uis$c_mode_bis);
-/*
-  for (i=0; i<8; i++) {
+ */
+
+/* lph:  this was commented out;  it changes the COLOR_ATTR BLOCK and 
+ * the following BLOCKS
+ *
+if (ws_type >=  UIS$C_DEV_INTENSITY) {
+ for (i=0; i<8; i++) {
   cattr = COLOR_ATTR+i;
-  uis$set_writing_index(&vd_id, &copy_attr, &cattr, &i);
+  uis$set_writing_index(&vd_id, &default_attr, &cattr, &i);
   }
-  */
+}
+ *
+ */
+
+/* lph: default value for the background index into the virtual color
+/* table is 0, and the back_attr block is never used
+ *
   uis$set_background_index(&vd_id, &default_attr, &back_attr, &i0);
+ *
+ * the rest look OK, setting up the two attribute blocks 
+ */
   uis$set_writing_mode(&vd_id, &default_attr, &text_attr, &uis$c_mode_over);
   uis$set_font(&vd_id,&text_attr,&text_attr,&a_font);
   uis$set_char_size(&vd_id,&text_attr,&text_attr,&i0,&vws_hchar,&vws_vchar);
@@ -245,31 +321,67 @@ TERM_PUBLIC void VWS_linetype(lt)
 int lt;
 {
   const int n1=0xFFFFFFFF;
-  const float p15=1.5, p20=2.0, p10=1.0;
+  const int i[8]={0,1,2,3,4,5,6,7};  /* indices into the color map */
+  const float p15=2.0, p20=3.0, p10=1.0;
   long int lstyle[9] = { 0xffffffff,
 			 0Xff00ff00,
 			 0xffffff00,
 			 0xffff0000,
 			 0xf0f0f0f0,
-			 0Xfff0fff0,
+  			 0Xfff0fff0,
 			 0xf000f000,
 			 0xa5a5a5af,
 			 0xf00f00f0 };
   int line_attr = LINE_ATTR;
- 
-  switch(lt) {
-  case -1: uis$set_line_style(&vd_id,&line_attr,&line_attr,&n1);
-    uis$set_line_width(&vd_id,&line_attr,&line_attr,&p15);
-    break;
-  case -2: uis$set_line_style(&vd_id,&line_attr,&line_attr,&n1);
-    uis$set_line_width(&vd_id,&line_attr,&line_attr,&p20);
-    break;
-/*
-  default:  uis$set_line_style(&vd_id,&line_attr,&line_attr,&lstyle[lt % 8]);
-  makes part of curve disappear on my workstation
-  */
-  default:  uis$set_line_style(&vd_id,&line_attr,&line_attr,&n1);
-    uis$set_line_width(&vd_id,&line_attr,&line_attr,&p10);
+  /* use multiplier of normal line width; default is width in pixels */
+  const int uis$c_width_world = UIS$C_WIDTH_WORLD;
+
+  if (lt < 0) {
+    switch(lt) {
+      case -1:			/* used for axis */
+	uis$set_line_style(&vd_id,&line_attr,&line_attr,&n1);
+        uis$set_line_width(&vd_id,&line_attr,&line_attr,&p15,
+			   &uis$c_width_world);
+        if (ws_type >=  UIS$C_DEV_INTENSITY) {
+          uis$set_writing_index(&vd_id, &line_attr, &line_attr,&i[1]);
+        }
+        break;
+      case -2: 			/* the borders */
+	uis$set_line_style(&vd_id,&line_attr,&line_attr,&n1);
+        uis$set_line_width(&vd_id,&line_attr,&line_attr,&p20,
+			   &uis$c_width_world);
+        if (ws_type >=  UIS$C_DEV_INTENSITY) {
+        uis$set_writing_index(&vd_id, &line_attr, &line_attr,&i[1]);
+        }
+	break;
+      default: 		/* else a thick line ? */
+	uis$set_line_style(&vd_id,&line_attr,&line_attr,&n1);
+        uis$set_line_width(&vd_id,&line_attr,&line_attr,&p20,
+			   &uis$c_width_world);
+        if (ws_type >=  UIS$C_DEV_INTENSITY) {
+        uis$set_writing_index(&vd_id, &line_attr, &line_attr,
+			      &i[1+((-lt) % 7)]);
+        }
+	break;
+    }
+  } 
+  else {
+/* assign the color index (excluding the background index, 0*/
+    if (ws_type >=  UIS$C_DEV_INTENSITY) {
+    uis$set_writing_index(&vd_id, &line_attr, &line_attr,&i[1+lt %7]);
+    }
+/* assign the line style
+    uis$set_line_style(&vd_id,&line_attr,&line_attr,&lstyle[lt % 8]);
+ * ws: makes part of curve disappear on my workstation
+ * lph: also observed w/ VS2000 and 4 plane graphics coprocesssor; line 
+ * types change appropriately, but has problems as pixels/line segment 
+ * decreases.  Better with full screen display and "set samples" smaller
+ * but start out with only solid lines
+ */
+    uis$set_line_style(&vd_id,&line_attr,&line_attr,&n1);
+
+    uis$set_line_width(&vd_id,&line_attr,&line_attr,&p10,
+			   &uis$c_width_world);
   }
 }
  
@@ -363,14 +475,16 @@ TERM_TABLE_END(vws_driver)
 #endif /* TERM_PROTO_ONLY */
 
 #ifdef TERM_HELP
-START_HELP(vws)
-"1 vws",
-"?set terminal vws",
-"?set term vws",
-"?terminal vws",
-"?term vws",
-"?vws",
-" The `vws` terminal driver supports the VAX Windowing System.  It has no",
-" options."
-END_HELP(vws)
+START_HELP(VWS)
+"1 VWS",
+"?set terminal VWS",
+"?set term VWS",
+"?terminal VWS",
+"?term VWS",
+"?VWS",
+" The `VWS` terminal driver supports the VAX Windowing System.  It has",
+" no options.  It will sense the display type (monochrome, gray scale,",
+" or color.)  All line styles are plotted as solid lines."
+END_HELP(VWS)
 #endif
+

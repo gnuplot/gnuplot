@@ -1,11 +1,12 @@
 /*
- * $Id: atarivdi.trm,v 1.4 1996/09/15 13:07:55 drd Exp $
+ * $Id: atarivdi.trm,v 1.5 1998/03/22 22:34:32 drd Exp $
  *
  */
 
 /* GNUPLOT - atari.trm */
-/*
- * Copyright (C) 1992
+
+/*[
+ * Copyright 1992, 1993, 1998
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted,
@@ -14,11 +15,27 @@
  * in supporting documentation.
  *
  * Permission to modify the software is granted, but not the right to
- * distribute the modified code.  Modifications are to be distributed
- * as patches to released version.
+ * distribute the complete modified source code.  Modifications are to
+ * be distributed as patches to the released version.  Permission to
+ * distribute binaries produced by compiling modified sources is granted,
+ * provided you
+ *   1. distribute the corresponding source modifications from the
+ *    released version in the form of a patch file along with the binaries,
+ *   2. add special version identification to distinguish your version
+ *    in addition to the base release version number,
+ *   3. provide your name and address as the primary contact for the
+ *    support of your modified version, and
+ *   4. retain our contact information in regard to use of the base
+ *    software.
+ * Permission to distribute the released version of the source code along
+ * with corresponding source modifications in the form of a patch file is
+ * granted with same provisions 2 through 4 for binary distributions.
  *
- * This software  is provided "as is" without express or implied warranty.
- *
+ * This software is provided "as is" without express or implied warranty
+ * to the extent permitted by applicable law.
+]*/
+
+/*
  * This file is included by ../term.c.
  *
  * This terminal driver supports:
@@ -91,7 +108,7 @@ static int VDI_linetypes[VDI_LINETYPES_MAX] = {
         0xffff, 0x5555, 0x3333, 0x7777,
         0x3f3f, 0x0f0f, 0x5f5f, 0xe4e4, 0x55f5};
 static int VDI_lt;
-static int vdi_vdi_handle=-1;
+static int vdi_vdi_handle= -1;
 static int VDI_maxycoord;
 static int VDI_rotation;
 static int VDI_numcolors;
@@ -237,7 +254,7 @@ TERM_PUBLIC void VDI_reset( )
 {
     int i;
 
-    if( vdi_vdi_handle!=-1 ) {
+    if( vdi_vdi_handle!= -1 ) {
         for( i=0 ; i<VDI_numpalette ; i++ ) {
             vs_color(vdi_vdi_handle, i, VDI_savecolors[i] );
         }
@@ -246,7 +263,7 @@ TERM_PUBLIC void VDI_reset( )
 	v_show_c(vdi_vdi_handle, 0);
 #endif
         v_clsvwk( vdi_vdi_handle );
-        vdi_vdi_handle=-1;
+        vdi_vdi_handle= -1;
     }
 }
 

@@ -398,7 +398,7 @@ START_HELP(corel)
 "?corel",
 " The `corel` terminal driver supports CorelDraw.",
 "",
-" Syntax:"
+" Syntax:",
 "       set terminal corel {  default",
 "                           | {monochrome | color",
 "                                {<fontname> {\"<fontsize>\" ",

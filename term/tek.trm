@@ -1,24 +1,41 @@
 /*
- * $Id: tek.trm,v 1.18 1997/04/10 02:34:35 drd Exp $
+ * $Id: tek.trm,v 1.19 1998/03/22 22:35:05 drd Exp $
  *
  */
 
 /* GNUPLOT - tek.trm */
-/*
- * Copyright (C) 1990 - 1993, 1997
+
+/*[
+ * Copyright 1990 - 1993, 1998
  *
  * Permission to use, copy, and distribute this software and its
- * documentation for any purpose with or without fee is hereby granted, 
- * provided that the above copyright notice appear in all copies and 
- * that both that copyright notice and this permission notice appear 
+ * documentation for any purpose with or without fee is hereby granted,
+ * provided that the above copyright notice appear in all copies and
+ * that both that copyright notice and this permission notice appear
  * in supporting documentation.
  *
  * Permission to modify the software is granted, but not the right to
- * distribute the modified code.  Modifications are to be distributed 
- * as patches to released version.
- *  
- * This software  is provided "as is" without express or implied warranty.
- * 
+ * distribute the complete modified source code.  Modifications are to
+ * be distributed as patches to the released version.  Permission to
+ * distribute binaries produced by compiling modified sources is granted,
+ * provided you
+ *   1. distribute the corresponding source modifications from the
+ *    released version in the form of a patch file along with the binaries,
+ *   2. add special version identification to distinguish your version
+ *    in addition to the base release version number,
+ *   3. provide your name and address as the primary contact for the
+ *    support of your modified version, and
+ *   4. retain our contact information in regard to use of the base
+ *    software.
+ * Permission to distribute the released version of the source code along
+ * with corresponding source modifications in the form of a patch file is
+ * granted with same provisions 2 through 4 for binary distributions.
+ *
+ * This software is provided "as is" without express or implied warranty
+ * to the extent permitted by applicable law.
+]*/
+
+/*
  * This file is included by ../term.c.
  *
  * This terminal driver supports:
@@ -442,14 +459,14 @@ static void CT_pattern_vector __PROTO((int x1, int y1));
 
 /* CT_lines are line types defined as bit pattern */
 static unsigned long CT_lines[]=
-{  0xffffffffU,  /* solid line */
-   0x000fffffU,  /* long dash */
-   0x00ff00ffU,  /* short dash */
-   0x00f00fffU,  /* dash-dot */
-   0x00f07fffU,  /* long dash - dot */
-   0x07070707U,
-   0x07ff07ffU,
-   0x070707ffU};
+{  0xffffffff,  /* solid line */
+   0x000fffff,  /* long dash */
+   0x00ff00ff,  /* short dash */
+   0x00f00fff,  /* dash-dot */
+   0x00f07fff,  /* long dash - dot */
+   0x07070707,
+   0x07ff07ff,
+   0x070707ff};
 
 /* current line pattern */
 static unsigned long *CT_pattern = &CT_lines[0];
@@ -508,7 +525,7 @@ int last;
       yy0=yy1=y;
       CT_penon=1;
     }
-    *CT_pattern = ((*CT_pattern)>>1) | 0x80000000U; /* rotate the pattern */
+    *CT_pattern = ((*CT_pattern)>>1) | 0x80000000; /* rotate the pattern */
     if(last) { /* draw the line anyway if this is the last point */
       TEK40move(xx0,yy0);
       TEK40vector(xx1,yy1);
