@@ -1,3 +1,7 @@
+2001-06-01  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* config/makefile.nt (WINOBJS): Add gpexecute.obj to the list.
+
 2001-05-31  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* term/pslatex.trm (PSLATEX_graphics): Use PSLATEX_{X|Y}MAX
