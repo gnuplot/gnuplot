@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.70 2001/07/11 10:38:12 broeker Exp $
+C RCS $Id: gnuplot.doc,v 1.71 2001/07/27 14:46:09 broeker Exp $
 C 3 December 1998
 C Copyright (C) 1986 - 1993, 1998   Thomas Williams, Colin Kelley
 C
@@ -4482,8 +4482,8 @@ C ... and restart the table:
  The length of the sample line can be controlled by `samplen`.  The sample
  length is computed as the sum of the tic length and <sample_length> times the
  character width.  `samplen` also affects the positions of point samples in
- the key since these are drawn at the midpoint of the sample line, even if it
- is not drawn.  <sample_length> must be an integer.
+ the key since these are drawn at the midpoint of the sample line, even if 
+ the sample line itself is not drawn.  
 
  The vertical spacing between lines is controlled by `spacing`.  The spacing
  is set equal to the product of the pointsize, the vertical tic size, and
