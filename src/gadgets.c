@@ -143,6 +143,10 @@ filledcurves_opts filledcurves_opts_data = EMPTY_FILLEDCURVES_OPTS;
 filledcurves_opts filledcurves_opts_func = EMPTY_FILLEDCURVES_OPTS;
 #endif
 
+#ifdef EAM_HISTOGRAMS
+histogram_style histogram_opts = DEFAULT_HISTOGRAM_STYLE;
+#endif
+
 /*****************************************************************/
 /* Routines that deal with global objects defined in this module */
 /*****************************************************************/

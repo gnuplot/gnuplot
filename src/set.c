@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.134 2004/07/03 06:08:49 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.135 2004/07/04 13:16:03 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -165,6 +165,11 @@ static int set_palette_defined __PROTO((void));
 static void set_palette_file __PROTO((void));
 static void set_palette_function __PROTO((void));
 #endif
+#ifdef EAM_HISTOGRAMS
+static void parse_histogramstyle __PROTO((histogram_style *hs, 
+		t_histogram_type def_type, int def_gap));
+#endif
+  
 
 /* Backwards compatibility ... */
 static void set_nolinestyle __PROTO((void));
@@ -212,6 +217,10 @@ set_command()
 
 	    if (temp_style & PLOT_STYLE_HAS_ERRORBAR)
 		int_error(c_token, "style not usable for function plots, left unchanged");
+#ifdef EAM_HISTOGRAMS
+	    else if (temp_style == HISTOGRAMS)
+		int_error(c_token, "style not usable for function plots, left unchanged");
+#endif
 	    else
 		func_style = temp_style;
 	}
@@ -1527,6 +1536,12 @@ set_key()
 		break;
 	    case S_KEY_NOREVERSE:
 		key->reverse = FALSE;
+		break;
+	    case S_KEY_INVERT:
+		key->invert = TRUE;
+		break;
+	    case S_KEY_NOINVERT:
+		key->invert = FALSE;
 		break;
 	    case S_KEY_ENHANCED:
 		key->enhanced = TRUE;
@@ -3047,6 +3062,9 @@ set_style()
 #ifdef EAM_DATASTRINGS
 	       || (temp_style == LABELPOINTS)
 #endif
+#ifdef EAM_HISTOGRAMS
+		|| (temp_style == HISTOGRAMS)
+#endif
 	        )
 		int_error(c_token, "style not usable for function plots, left unchanged");
 	    else
@@ -3073,6 +3091,11 @@ set_style()
     case SHOW_STYLE_ARROW:
 	set_arrowstyle();
 	break;
+#ifdef EAM_HISTOGRAMS
+    case SHOW_STYLE_HISTOGRAM:
+	parse_histogramstyle(&histogram_opts,HT_CLUSTERED,histogram_opts.gap);
+	break;
+#endif
     default:
 	int_error(c_token,
 		  "expecting 'data', 'function', 'line', 'fill' or 'arrow'" );
@@ -4453,3 +4476,55 @@ parse_label_options( struct text_label *this_label )
 	this_label->textcolor.value = this_label->place.z;
 }
 
+
+#ifdef EAM_HISTOGRAMS
+/* <histogramstyle> = {clustered {gap <n>} | rowstacked | columnstacked} */
+/*                    {title <title_options>}                            */
+void
+parse_histogramstyle( histogram_style *hs, 
+		t_histogram_type def_type,
+		int def_gap)
+{
+    struct value a;
+    label_struct title_specs;
+
+    /* Set defaults */
+    hs->type  = def_type;
+    hs->gap   = def_gap;
+
+    if (END_OF_COMMAND)
+	return;
+    if (!equals(c_token,"hs") && !almost_equals(c_token,"hist$ogram"))
+	return;
+    c_token++;
+
+    while (!END_OF_COMMAND) {
+	if (almost_equals(c_token, "clust$ered")) {
+	    hs->type = HT_CLUSTERED;
+	    c_token++;
+	} else if (almost_equals(c_token, "rows$tacked")) {
+	    hs->type = HT_STACKED_IN_LAYERS;
+	    c_token++;
+	} else if (almost_equals(c_token, "columns$tacked")) {
+	    hs->type = HT_STACKED_IN_TOWERS;
+	    c_token++;
+	} else if (equals(c_token, "gap")) {
+	    if (isanumber(++c_token))
+		hs->gap = (int)real(const_express(&a));
+	    else
+		int_error(c_token,"expected gap value");
+	} else if (almost_equals(c_token, "ti$tle")) {
+	    title_specs.xoffset = hs->title.hoffset;
+	    title_specs.yoffset = hs->title.voffset;
+	    set_xyzlabel(&title_specs);
+	    memcpy(&hs->title.textcolor,&title_specs.textcolor,sizeof(t_colorspec));
+	    hs->title.hoffset = title_specs.xoffset;
+	    hs->title.voffset = title_specs.yoffset;
+	    /* EAM FIXME - could allocate space and copy parsed font instead */
+	    hs->title.font = &(axis_array[FIRST_X_AXIS].label.font[0]);
+	} else
+	    /* We hit something unexpected */
+	    break;
+    }
+}
+#endif /* EAM_HISTOGRAMS */

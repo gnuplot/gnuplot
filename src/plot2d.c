@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.71 2004/07/03 06:08:49 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.72 2004/07/04 23:58:45 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -68,7 +68,9 @@ static void store2d_point __PROTO((struct curve_points *, int i, double x, doubl
 static void print_table __PROTO((struct curve_points * first_plot, int plot_num));
 static void eval_plots __PROTO((void));
 static void parametric_fixup __PROTO((struct curve_points * start_plot, int *plot_num));
-
+#ifdef EAM_HISTOGRAMS
+static void histogram_range_fiddling __PROTO((struct curve_points *plot));
+#endif
 
 /* internal and external variables */
 
@@ -83,6 +85,12 @@ double   boxwidth              = -1.0;
 TBOOLEAN boxwidth_is_absolute  = TRUE;
 #endif
 
+#ifdef EAM_HISTOGRAMS
+static double histogram_rightmost = 0.0;	/* Highest x-coord of histogram so far */
+static char histogram_title[64] = { '\0' };	/* Subtitle for this histogram */
+static struct coordinate GPHUGE *stackheight = NULL; /* Scratch space for y autoscale */
+static int stack_count = 0;			/* counter for stackheight */
+#endif
 
 /* function implementations */
 
@@ -110,6 +118,10 @@ cp_alloc(int num)
     cp->title = NULL;
 #ifdef EAM_DATASTRINGS
     cp->labels = NULL;	/* Will be allocated later if plot_style == LABELPOINTS */
+#endif
+#ifdef EAM_HISTOGRAMS
+    cp->histogram = NULL; /* Will be allocated later if plot_style == HISTOGRAM */
+    cp->histogram_sequence = 0;
 #endif
     return (cp);
 }
@@ -294,8 +306,15 @@ get_data(struct curve_points *current_plot)
 	max_cols = 4;
 	break;
 
+#ifdef EAM_HISTOGRAMS
+    case HISTOGRAMS:
+	min_cols = 1;
+	max_cols = 1;
+	break;
+#endif
+
     case BOXES:
-	min_cols = 2;
+	min_cols = 1;
 	max_cols = 4;
 	/* HBB 20010214: commented out. z_axis is abused to store a
 	 * flag here, not for the actual width, as I thought it
@@ -313,7 +332,7 @@ get_data(struct curve_points *current_plot)
 #ifdef EAM_DATASTRINGS
     case LABELPOINTS:
 	/* 3 column data: X Y Label */
-    	min_cols = 3;
+	min_cols = 3;
 	max_cols = 3;
 	expect_string( 3 );
 	break;
@@ -338,6 +357,15 @@ get_data(struct curve_points *current_plot)
 	int_error(NO_CARET, "Not enough columns for this style");
 
     i = 0;
+
+#ifdef EAM_HISTOGRAMS
+    /* EAM FIXME - There are places in df_readline where it would be really */
+    /* nice to know what kind of plot we are making, so I think that        */
+    /* current_plot should be a parameter to df_readline. For now, however, */
+    /* I am using a global variable, and only for HISTOGRAMS.               */
+    df_current_plot = (current_plot->plot_style == HISTOGRAMS) ? current_plot : NULL;
+#endif
+
     while ((j = df_readline(v, max_cols)) != DF_EOF) {
 	/* j <= max_cols */
 
@@ -361,7 +389,15 @@ get_data(struct curve_points *current_plot)
 	    /* Plot type specific handling of missing points could go here. */
 	    /* For now missing data is treated the same as undefined */
 	case DF_UNDEFINED:
-	    /* bad result from extended using expression */
+	    /* bad result from extended using expression, */
+	    /* or data field contains missing-data symbol */
+#ifdef EAM_HISTOGRAMS
+	    /* HISTOGRAMS need to reserve a slot for this x-coord value even  */
+	    /* if the point is missing or undefined.                          */
+	    if (current_plot->plot_style == HISTOGRAMS)
+		store2d_point(current_plot, i, df_datum, 0, 
+			df_datum-boxwidth/2, df_datum+boxwidth/2, 0, 0, 0.0);
+#endif
 	    current_plot->points[i].type = UNDEFINED;
 	    i++;
 	    continue;
@@ -415,6 +451,29 @@ get_data(struct curve_points *current_plot)
 		store2d_point(current_plot, i++, v[0], v[1],
 			      v[0] - boxwidth / 2, v[0] + boxwidth / 2,
 			      v[1], v[1], 0.0);
+#ifdef EAM_HISTOGRAMS
+	    } else if (current_plot->plot_style == HISTOGRAMS) {
+		if (histogram_opts.type == HT_STACKED_IN_TOWERS) {
+		    histogram_rightmost = current_plot->histogram_sequence
+					+ current_plot->histogram->start;
+		    current_plot->histogram->end = histogram_rightmost;
+		} else if (v[0] + current_plot->histogram->start > histogram_rightmost) {
+		    histogram_rightmost = v[0] + current_plot->histogram->start;
+		    current_plot->histogram->end = histogram_rightmost;
+		}
+		if (boxwidth > 0
+#if USE_ULIG_RELATIVE_BOXWIDTH
+		     && boxwidth_is_absolute
+#endif /* USE_ULIG_RELATIVE_BOXWIDTH */
+		)
+		    store2d_point(current_plot, i++, v[0], v[1],
+			      v[0] - boxwidth / 2, v[0] + boxwidth / 2,
+			      v[1], v[1], 0.0);
+		else
+		    store2d_point(current_plot, i++, v[0], v[1], 
+			      v[0], v[0], v[1],
+			      v[1], -1.0);
+#endif
 	    } else {
 		if (current_plot->plot_style == CANDLESTICKS
 		    || current_plot->plot_style == FINANCEBARS) {
@@ -479,7 +538,7 @@ get_data(struct curve_points *current_plot)
 		    /* Allocate and fill in a text_label structure to match it */
 		    if (df_tokens[2])
 			store_label(current_plot->labels,
-		    		  &(current_plot->points[i]), i, df_tokens[2]);
+				  &(current_plot->points[i]), i, df_tokens[2]);
 		    else
 			current_plot->points[i].type = UNDEFINED;
 		    i++;
@@ -598,6 +657,12 @@ get_data(struct curve_points *current_plot)
     current_plot->p_count = i;
     cp_extend(current_plot, i);	/* shrink to fit */
 
+#ifdef EAM_HISTOGRAMS
+    /* Fiddle the auto-scaling data for histograms */
+    if (current_plot->plot_style == HISTOGRAMS)
+	histogram_range_fiddling(current_plot);
+#endif
+
     df_close();
 
     return i;			/* i==0 indicates an 'empty' file */
@@ -703,6 +768,74 @@ store2d_point(
     else
 	cp->z = width;
 }				/* store2d_point */
+
+#ifdef EAM_HISTOGRAMS
+/* Since the stored x values for histogrammed data do not correspond exactly */
+/* to the eventual x coordinates, we need to modify the x axis range bounds. */
+/* Also the two stacked histogram modes need adjustment of the y axis bounds.*/
+void
+histogram_range_fiddling(struct curve_points *plot)
+{
+    double xlow, xhigh, yhigh;
+    int i;
+    /*
+     * EAM FIXME - HT_STACKED_IN_TOWERS forcibly resets xman, which is only
+     *   correct if no other plot came first.
+     */
+    switch (histogram_opts.type) {
+	case HT_STACKED_IN_LAYERS:
+	    if (axis_array[plot->y_axis].set_autoscale & AUTOSCALE_MAX) {
+		if (plot->histogram_sequence == 0) {
+		    if (stackheight)
+			free(stackheight);
+		    stackheight = gp_alloc( plot->p_count * sizeof(struct coordinate GPHUGE),
+					    "stackheight array");
+		    for (stack_count=0; stack_count < plot->p_count; stack_count++)
+			stackheight[stack_count].y = 0;
+		} else if (plot->p_count > stack_count) {
+		    stackheight = gp_realloc( stackheight,
+					    plot->p_count * sizeof(struct coordinate GPHUGE),
+					    "stackheight array");
+		    for ( ; stack_count < plot->p_count; stack_count++)
+			stackheight[stack_count].y = 0;
+		}
+		for (i=0; i<stack_count; i++) {
+		    stackheight[i].y += plot->points[i].y;
+		    if (axis_array[plot->y_axis].max < stackheight[i].y)
+			axis_array[plot->y_axis].max = stackheight[i].y;
+		}
+	    }
+		/* fall through to checks on x range */
+	case HT_CLUSTERED:	
+		if (!axis_array[plot->x_axis].set_autoscale)
+		    break;
+		xlow = -1.0;
+		xhigh = plot->points[plot->p_count-1].x;
+		xhigh += plot->histogram->start + 1.0;
+		if (axis_array[FIRST_X_AXIS].min > xlow)
+		    axis_array[FIRST_X_AXIS].min = xlow;
+		if (axis_array[FIRST_X_AXIS].max < xhigh)
+		    axis_array[FIRST_X_AXIS].max = xhigh;
+		break;
+	case HT_STACKED_IN_TOWERS:
+		if (!axis_array[plot->x_axis].set_autoscale)
+		    break;
+		xlow = 0.0;
+		xhigh = plot->histogram_sequence;
+		xhigh += plot->histogram->start + 1.0;
+		if (axis_array[FIRST_X_AXIS].min > xlow)
+		    axis_array[FIRST_X_AXIS].min = xlow;
+		if (axis_array[FIRST_X_AXIS].max != xhigh)
+		    axis_array[FIRST_X_AXIS].max  = xhigh;
+		for (i=0, yhigh=0.0; i<plot->p_count; i++)
+		    if (plot->points[i].type != UNDEFINED)
+			yhigh += plot->points[i].y;
+		if (axis_array[plot->y_axis].max < yhigh)
+		    axis_array[plot->y_axis].max = yhigh;
+		break;
+    }
+}
+#endif
 
 #ifdef EAM_DATASTRINGS
 /* store_label() is called by get_data for each point */
@@ -981,6 +1114,17 @@ eval_plots()
     int begin_token = c_token;	/* so we can rewind for second pass */
     legend_key *key = &keyT;
 
+#ifdef EAM_HISTOGRAMS
+    double newhist_start = 0.0;
+    int histogram_sequence = -1;
+    int newhist_color = LT_UNDEFINED;
+    int newhist_pattern = LT_UNDEFINED;
+    histogram_rightmost = 0.0;
+    *histogram_title = '\0';
+    free_histlist(&histogram_opts);
+    init_histogram(NULL,"");
+#endif
+
     uses_axis[FIRST_X_AXIS] =
 	uses_axis[FIRST_Y_AXIS] =
 	uses_axis[SECOND_X_AXIS] =
@@ -1009,10 +1153,43 @@ eval_plots()
 	if (END_OF_COMMAND)
 	    int_error(c_token, "function to plot expected");
 
+#ifdef EAM_HISTOGRAMS
+	if (almost_equals(c_token,"newhist$ogram")) {
+	    struct lp_style_type lp;
+	    struct fill_style_type fs;
+	    int previous_token;
+	    c_token++;
+	    histogram_sequence = -1;
+
+	    if (histogram_rightmost > 0)
+		newhist_start = histogram_rightmost + 2;
+
+	    lp.l_type = LT_UNDEFINED;
+	    fs.fillpattern = LT_UNDEFINED;
+
+	    do {
+		previous_token = c_token;
+
+		/* Store title in temporary variable and then copy into the */
+		/* new histogram structure when it is allocated.            */
+		if (isstring(c_token)) {
+		    quote_str(&histogram_title[0], c_token++, sizeof(histogram_title));
+		} else
+		    histogram_title[0] = '\0';
+
+		/* Allow explicit starting color or pattern for this histogram */
+		lp_parse(&lp, TRUE, FALSE, lp.l_type, 0);
+		parse_fillstyle(&fs, FS_SOLID, 100, fs.fillpattern, -1); 
+
+		} while (c_token != previous_token);
+
+	    newhist_color = lp.l_type;
+	    newhist_pattern = fs.fillpattern;
+	} else
+#endif
 	if (is_definition(c_token)) {
 	    define();
 	} else {
-	    /* int x_axis = 0, y_axis = 0; */ /* HBB 20000520: have global in axis.c now */
 	    int specs = 0;
 
 	    /* for datafile plot, record datafile spec for title */
@@ -1319,7 +1496,7 @@ eval_plots()
 	    if (!set_title) {
 		this_plot->title_no_enhanced = 1; /* filename or function cannot be enhanced */
 		if (key->auto_titles == FILENAME_KEYTITLES) {
-  		    m_capture(&(this_plot->title), start_token, end_token);
+		    m_capture(&(this_plot->title), start_token, end_token);
 		    if (xparam)
 		        xtitle = this_plot->title;
 		    this_plot->title_is_filename = TRUE;
@@ -1376,6 +1553,41 @@ eval_plots()
 
 	    this_plot->x_axis = x_axis;
 	    this_plot->y_axis = y_axis;
+
+#ifdef EAM_HISTOGRAMS
+	    /* Initialize histogram data structure */
+	    if (this_plot->plot_style == HISTOGRAMS) {
+		if ((histogram_opts.type == HT_STACKED_IN_LAYERS
+		||   histogram_opts.type == HT_STACKED_IN_TOWERS)
+		&&  axis_array[FIRST_Y_AXIS].log)
+		    int_error(c_token, "Log scale on Y is incompatible with stacked histogram plot\n");
+		this_plot->histogram_sequence = ++histogram_sequence;
+		/* Current histogram always goes at the front of the list */
+		if (this_plot->histogram_sequence == 0) {
+		    this_plot->histogram = gp_alloc(sizeof(struct histogram_style), "New histogram");
+		    init_histogram(this_plot->histogram,histogram_title);
+		    this_plot->histogram->start = newhist_start;
+		    this_plot->histogram->startcolor = newhist_color;
+		    this_plot->histogram->startpattern = newhist_pattern;
+		} else {
+		    this_plot->histogram = histogram_opts.next;
+		    this_plot->histogram->clustersize++;
+		}
+		/* Modify X and Y coordinate placement info so that xtic and */
+		/* title coords are handled correctly during get_data().     */
+		if (histogram_opts.type == HT_STACKED_IN_TOWERS)
+		    this_plot->histogram->start = 0.5;
+
+		/* Normally each histogram gets a new set of colors, but in */
+		/* 'newhistogram' you can force a starting color instead.   */
+		if (!set_lpstyle && this_plot->histogram->startcolor != LT_UNDEFINED)
+		    this_plot->lp_properties.l_type = this_plot->histogram_sequence
+						    + this_plot->histogram->startcolor;
+		if (this_plot->histogram->startpattern != LT_UNDEFINED)
+		    this_plot->fill_properties.fillpattern = this_plot->histogram_sequence
+						    + this_plot->histogram->startpattern;
+	    }
+#endif
 
 	    /* we can now do some checks that we deferred earlier */
 
@@ -1545,7 +1757,7 @@ eval_plots()
 	    if (is_definition(c_token)) {
 		define();
 	    } else {
-	    	/* HBB 20000820: now globals in 'axis.c' */
+		/* HBB 20000820: now globals in 'axis.c' */
 		x_axis = this_plot->x_axis;
 		y_axis = this_plot->y_axis;
 

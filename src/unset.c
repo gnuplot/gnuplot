@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.62 2004/05/04 02:43:21 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.63 2004/07/01 17:10:08 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -83,6 +83,9 @@ static void unset_fit __PROTO((void));
 static void unset_format __PROTO((void));
 static void unset_grid __PROTO((void));
 static void unset_hidden3d __PROTO((void));
+#ifdef EAM_HISTOGRAMS
+static void unset_histogram __PROTO((void));
+#endif
 #if defined(HAVE_LIBREADLINE) && defined(GNUPLOT_HISTORY)
 static void unset_historysize __PROTO((void));
 #endif
@@ -811,6 +814,14 @@ unset_hidden3d()
 #endif
 }
 
+#ifdef EAM_HISTOGRAMS
+static void
+unset_histogram()
+{
+    histogram_opts.type = HT_CLUSTERED;
+    histogram_opts.gap = 2;
+}
+#endif
 
 #if defined(HAVE_LIBREADLINE) && defined(GNUPLOT_HISTORY)
 /* process 'unset historysize' command */
@@ -1198,6 +1209,9 @@ unset_style()
 #if USE_ULIG_FILLEDBOXES
 	unset_fillstyle();
 #endif
+#ifdef EAM_HISTOGRAMS
+	unset_histogram();
+#endif
 	c_token++;
 	return;
     }
@@ -1222,6 +1236,12 @@ unset_style()
 	c_token++;
 	break;
 #endif /* USE_ULIG_FILLEDBOXES */
+#ifdef EAM_HISTOGRAMS
+    case SHOW_STYLE_HISTOGRAM:
+	unset_histogram();
+	c_token++;
+	break;
+#endif
     case SHOW_STYLE_ARROW:
 	unset_arrowstyles();
 	c_token++;
@@ -1517,6 +1537,9 @@ reset_command()
 #endif
 #if USE_ULIG_FILLEDBOXES
     unset_fillstyle();
+#endif
+#ifdef EAM_HISTOGRAMS
+    unset_histogram();
 #endif
 
     unset_missing();

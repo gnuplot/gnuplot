@@ -1,5 +1,5 @@
 /*
- * $Id: graphics.h,v 1.25 2004/07/01 17:10:06 broeker Exp $
+ * $Id: graphics.h,v 1.26 2004/07/03 06:08:49 sfeam Exp $
  */
 
 /* GNUPLOT - graphics.h */
@@ -71,6 +71,10 @@ typedef struct curve_points {
 #ifdef EAM_DATASTRINGS
     struct text_label *labels;	/* Only used if plot_style == LABELPOINTS */
 #endif
+#ifdef EAM_HISTOGRAMS
+    struct histogram_style *histogram;	/* Only used if plot_style == HISTOGRAM */
+    int histogram_sequence;	/* Ordering of this dataset within the histogram */
+#endif
 } curve_points;
 
 /* From ESR's "Actual code patch" :) */
@@ -104,7 +108,11 @@ void map_position __PROTO((struct position * pos, unsigned int *x,
 #if defined(sun386) || defined(AMIGA_SC_6_1)
 double CheckLog __PROTO((TBOOLEAN, double, double));
 #endif
-
 void apply_head_properties __PROTO((struct arrow_style_type *arrow_properties));
+
+#ifdef EAM_HISTOGRAMS
+void init_histogram __PROTO((struct histogram_style *hist, char *title));
+void free_histlist __PROTO((struct histogram_style *hist));
+#endif
 
 #endif /* GNUPLOT_GRAPHICS_H */

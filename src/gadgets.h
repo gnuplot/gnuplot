@@ -178,6 +178,27 @@ typedef struct {
 #define EMPTY_FILLEDCURVES_OPTS { 0, 0, 0.0, 0.0, 0 }
 #endif
 
+#ifdef EAM_HISTOGRAMS
+typedef struct histogram_style {
+    int type;		/* enum t_histogram_type */
+    int gap;		/* set style hist gap <n> (space between clusters) */
+    int clustersize;	/* number of datasets in this histogram */
+    double start;	/* X-coord of first histogram entry */
+    double end;		/* X-coord of last histogram entry */
+    int startcolor;	/* LT_UNDEFINED or explicit color for first entry */
+    int startpattern;	/* LT_UNDEFINED or explicit pattern for first entry */
+    struct histogram_style *next;
+    struct text_label title;
+} histogram_style;
+typedef enum histogram_type {
+	HT_NONE,
+	HT_STACKED_IN_LAYERS,
+	HT_STACKED_IN_TOWERS,
+	HT_CLUSTERED
+} t_histogram_type;
+#define DEFAULT_HISTOGRAM_STYLE { HT_NONE, 2, 1, 0.0, 0.0, LT_UNDEFINED, LT_UNDEFINED, NULL, { 0 } }
+
+#endif
 
 /***********************************************************/
 /* Variables defined by gadgets.c needed by other modules. */
@@ -205,6 +226,7 @@ typedef struct {
     double height_fix;
     keytitle_type auto_titles;	/* auto title curves unless plotted 'with notitle' */
     TBOOLEAN reverse;		/* key back to front */
+    TBOOLEAN invert;		/* key top to bottom */
     TBOOLEAN enhanced;		/* enable/disable enhanced text of key titles */
     struct lp_style_type default_keybox_lp; /* linetype of box around key:  */
     struct lp_style_type box;		    /*    default and current state */
@@ -227,7 +249,8 @@ extern legend_key keyT;
 		DEFAULT_KEY_POSITION, \
 		TTOP, TRIGHT, JRIGHT,  \
 		4.0, 1.0, 0.0, 0.0, \
-		FILENAME_KEYTITLES, FALSE, TRUE,  \
+		FILENAME_KEYTITLES, \
+		FALSE, FALSE, TRUE, \
 		DEFAULT_KEYBOX_LP, \
 		DEFAULT_KEYBOX_LP, \
 		"" }
@@ -326,6 +349,10 @@ extern fill_style_type default_fillstyle;
 /* filledcurves style options set by 'set style [data|func] filledcurves opts' */
 extern filledcurves_opts filledcurves_opts_data;
 extern filledcurves_opts filledcurves_opts_func;
+#endif
+
+#ifdef EAM_HISTOGRAMS
+extern histogram_style histogram_opts;
 #endif
 
 void default_arrow_style __PROTO((struct arrow_style_type *arrow));

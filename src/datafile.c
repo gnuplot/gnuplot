@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.52 2004/07/01 17:10:04 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.53 2004/07/03 06:08:48 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -178,6 +178,9 @@ static TBOOLEAN valid_format __PROTO((const char *));
 static void plot_ticlabel_using __PROTO((int));
 static void df_parse_string_field __PROTO((char *, char *));
 #endif
+#ifdef EAM_HISTOGRAMS
+static void add_key_entry __PROTO((char *temp_string, int df_datum));
+#endif
 
 /*}}} */
 
@@ -191,7 +194,7 @@ struct use_spec_s {
 };
 
 #ifdef EAM_DATASTRINGS
-enum COLUMN_TYPE { CT_DEFAULT, CT_STRING,
+enum COLUMN_TYPE { CT_DEFAULT, CT_STRING, CT_KEYLABEL,
 		CT_XTICLABEL, CT_X2TICLABEL, CT_YTICLABEL, CT_Y2TICLABEL,
 		CT_ZTICLABEL, CT_CBTICLABEL };
 #endif
@@ -201,6 +204,9 @@ enum COLUMN_TYPE { CT_DEFAULT, CT_STRING,
 int df_no_use_specs;		/* how many using columns were specified */
 #ifdef EAM_DATASTRINGS
 int df_no_tic_specs;		/* except ticlabel columns are counted here */
+#endif
+#ifdef EAM_HISTOGRAMS
+struct curve_points *df_current_plot; /* set before calling df_readline() */
 #endif
 int df_line_number;
 int df_datum;			/* suggested x value if none given */
@@ -1018,6 +1024,9 @@ plot_option_using(int max_using)
 	    } else if (almost_equals(c_token, "cbtic$labels")) {
 		plot_ticlabel_using(CT_CBTICLABEL);
 #endif
+	    } else if (almost_equals(c_token, "key")) {
+		plot_ticlabel_using(CT_KEYLABEL);
+
 #endif
 	    } else {
 		int col = (int) real(const_express(&a));
@@ -1285,9 +1294,18 @@ df_readline(double v[], int max)
 			xpos = (axcol == 0) ? df_datum : v[axcol-1];
 		    else
 			xpos = v[axcol];
+#ifdef EAM_HISTOGRAMS
+		    if (df_current_plot) xpos += df_current_plot->histogram->start;
+#endif
 
 		    df_parse_string_field(temp_string,df_tokens[output]);
 		    add_tic_user(axis,temp_string,xpos,0);
+#ifdef EAM_HISTOGRAMS
+		} else if (use_spec[output].expected_type == CT_KEYLABEL) {
+		    char temp_string[64];
+		    df_parse_string_field(temp_string,df_tokens[output]);
+		    add_key_entry(temp_string,df_datum);
+#endif
 		} else
 #endif
 		if (use_spec[output].at) {
@@ -1816,6 +1834,19 @@ expect_string(const char column)
 void
 df_set_key_title(struct curve_points *plot)
 {
+#ifdef EAM_HISTOGRAMS
+    if (plot->plot_style == HISTOGRAMS
+    &&  histogram_opts.type == HT_STACKED_IN_TOWERS) {
+	/* In this case it makes no sense to treat key titles in the usual */
+	/* way, so we assume that it is supposed to be an xtic label.      */
+	/* FIXME EAM - This style should default to notitle!               */
+	double xpos = plot->histogram_sequence + plot->histogram->start;
+	add_tic_user(FIRST_X_AXIS,df_key_title,xpos,0);
+	df_key_title[0] = '\0';
+	return;
+    }
+#endif
+
     /* What if there was already a title specified? */
     if (plot->title && !plot->title_is_filename)
 	return;
@@ -1846,4 +1877,29 @@ df_parse_string_field(char *string, char *field)
     parse_esc(temp_string);
     strcpy(string,temp_string);
 }
+
+#ifdef EAM_HISTOGRAMS
+static void
+add_key_entry(char *temp_string, int df_datum)
+{
+    text_label *new_entry = gp_alloc(sizeof(text_label), "key entry");
+
+    /* Associate this key list with the histogram it belongs to. */
+    if (!df_current_plot->labels) {
+	df_current_plot->labels = gp_alloc(sizeof(text_label), "key entry");
+	df_current_plot->labels->tag  = -1;
+	df_current_plot->labels->next = NULL;
+	df_current_plot->labels->text = NULL;
+	df_current_plot->labels->font = NULL;
+    }
+
+    new_entry->text = gp_strdup(temp_string);
+    new_entry->tag = df_datum;
+    new_entry->font = NULL;
+    new_entry->next = df_current_plot->labels->next;
+    df_current_plot->labels->next = new_entry;
+}
+#endif
+
 #endif /* EAM_DATASTRINGS */
+

@@ -1,5 +1,28 @@
 2004-07-04  Ethan Merritt  <merritt@u.washington.edu>
 
+	* configure.in: --enable-histograms
+
+	* demo/histograms.dem demo/histograms2.dem demo/immigration.dat:
+	Demonstration files for 'plot with histograms'
+
+	* docs/gnuplot.doc: Documentation for 'plot with histograms'.
+
+	* src/datafile.c src/datafile.h src/gadgets.c src/gadgets.h
+	src/gp_types.h src/graph3d.c src/graphics.c src/graphics.h
+	src/plot2d.c src/save.c src/set.c src/show.c src/tables.c
+	src/tables.h src/unset.c:  Integrate SourceForge patchset #606169.
+
+	New plot style "with histograms" produces a bar chart from a sequence
+	of data columns in parallel. Each element of the `plot` command must
+	specify a single input data source (e.g. one column of the input file),
+	possibly with associated tic values or key titles.  Three styles of
+	histogram layout are currently supported. 
+	     set style histogram clustered {gap <gapsize>}
+	     set style histogram rowstacked
+	     set style histogram columnstacked
+			   
+2004-07-04  Ethan Merritt  <merritt@u.washington.edu>
+
 	* src/color.h src/plot2d.c (get_data) src/plot3d.c (get_3ddata)
 	src/save.c (save_set_all) graphics.c (bound_intersect)
 	term/cgm.trm term/pdf.trm term/svg.trm:

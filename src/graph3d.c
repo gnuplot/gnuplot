@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.91 2004/07/01 17:10:05 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.92 2004/07/03 06:08:48 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -1054,6 +1054,10 @@ do_3dplot(
 		    place_labels3d(this_plot->labels->next, 1);
 		break;
 #endif
+#ifdef EAM_HISTOGRAMS
+	    case HISTOGRAMS: /* Cannot happen */
+		break;
+#endif
 	    }			/* switch(plot-style) */
 
 		/* move key on a line */
@@ -1130,6 +1134,10 @@ do_3dplot(
 		    case PM3DSURFACE: /* ignored */
 			break;
 #endif
+#ifdef EAM_HISTOGRAMS
+		    case HISTOGRAMS: /* ignored */
+			break;
+#endif
 #ifdef EAM_DATASTRINGS
 		    case LABELPOINTS: /* Already handled above */
 			break;
@@ -1173,7 +1181,7 @@ do_3dplot(
 			    case XYERRORBARS:	/* ignored; treat like points */
 			    case BOXERROR:		/* HBB: treat these likewise */
 			    case BOXXYERROR:
-			    case CANDLESTICKS:	/* HBB: dito */
+			    case CANDLESTICKS:	/* HBB: ditto */
 			    case FINANCEBARS:
 			    case VECTOR:
 			    case POINTSTYLE:
@@ -1194,6 +1202,10 @@ do_3dplot(
 				break;
 #ifdef PM3D
 			    case PM3DSURFACE: /* ignored */
+				break;
+#endif
+#ifdef EAM_HISTOGRAMS
+			    case HISTOGRAMS: /* ignored */
 				break;
 #endif
 #ifdef EAM_DATASTRINGS
@@ -1249,6 +1261,10 @@ do_3dplot(
 			break;
 #ifdef PM3D
 		    case PM3DSURFACE: /* ignored */
+			break;
+#endif
+#ifdef EAM_HISTOGRAMS 
+		    case HISTOGRAMS: /* ignored */
 			break;
 #endif
 #ifdef EAM_DATASTRINGS

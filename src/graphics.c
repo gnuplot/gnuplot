@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.113 2004/07/04 21:43:35 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.114 2004/07/04 23:58:45 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -101,6 +101,13 @@ static int p_width, p_height;	/* pointsize * { t->h_tic | t->v_tic } */
 static int ylabel_x, y2label_x, xlabel_y, x2label_y, title_y, time_y, time_x;
 static int ylabel_y, y2label_y, xtic_y, x2tic_y, ytic_x, y2tic_x;
 /*}}} */
+
+#ifdef EAM_HISTOGRAMS
+/* Status information for stacked histogram plots */
+static struct coordinate GPHUGE *stackheight = NULL;	/* top of previous row */
+static int stack_count;					/* points actually used */
+static void place_histogram_titles __PROTO((void));
+#endif
 
 /*{{{  static fns and local macros */
 static void plot_border __PROTO((void));
@@ -220,7 +227,7 @@ find_maxl_keys(struct curve_points *plots, int count, int *kcnt)
 
     mlen = cnt = 0;
     this_plot = plots;
-    for (curve = 0; curve < count; this_plot = this_plot->next, curve++)
+    for (curve = 0; curve < count; this_plot = this_plot->next, curve++) {
 	if (this_plot->title
 	    && ((len = /*assign */ strlen(this_plot->title)) != 0)	/* HBB 980308: quiet BCC warning */
 	    ) {
@@ -228,6 +235,25 @@ find_maxl_keys(struct curve_points *plots, int count, int *kcnt)
 	    if (len > mlen)
 		mlen = strlen(this_plot->title);
 	}
+#ifdef EAM_HISTOGRAMS
+	/* Check for new histogram here and save space for divider */
+	if (this_plot->plot_style == HISTOGRAMS 
+	&&  this_plot->histogram_sequence == 0 && cnt > 1)
+	    cnt++;
+	/* Check for column-stacked histogram with key entries */
+	if (this_plot->plot_style == HISTOGRAMS &&  this_plot->labels) {
+	    text_label *key_entry = this_plot->labels;
+	    for (; key_entry; key_entry=key_entry->next) {
+		cnt++;
+		len = key_entry->text ? strlen(key_entry->text) : 0;
+		if (len > mlen)
+		    mlen = len;
+	    }
+	}
+#endif
+    }
+
+
     if (kcnt != NULL)
 	*kcnt = cnt;
     return (mlen);
@@ -517,10 +543,6 @@ boundary(struct curve_points *plots, int count)
 	/* count max_len key and number keys with len > 0 */
 	max_ptitl_len = find_maxl_keys(plots, count, &ptitl_cnt);
 	ytlen = label_width(key->title, &ktitl_lines);
-#if (0)
-	/* This is wrong, as the title may span multiple key columns */
-	if (ytlen > max_ptitl_len) max_ptitl_len = ytlen;
-#endif
 
 	if (key->reverse) {
 	    key_sample_left = -key_sample_width;
@@ -561,7 +583,7 @@ boundary(struct curve_points *plots, int count)
 		/* now calculate actual no cols depending on no rows */
 		key_cols = (int) (ptitl_cnt + key_rows - 1) / key_rows;
 		KEY_PANIC(key_cols == 0);
-		key_col_wth = (int) (xright - xleft) / key_cols;
+
 		/* we divide into columns, then centre in column by considering
 		 * ratio of * key_left_size to key_right_size
 		 *
@@ -925,8 +947,8 @@ boundary(struct curve_points *plots, int count)
 ** go to screen */
 #define OK fprintf(stderr,"Line %i of %s is OK\n",__LINE__,__FILE__)
 	    OK;
-            fprintf(stderr,"\tHELE: user pos: x=%i y=%i\n",key->user_pos.x,key->user_pos.y);
-            fprintf(stderr,"\tHELE: user pos: x=%i y=%i\n",x,y);
+	    fprintf(stderr,"\tHELE: user pos: x=%i y=%i\n",key->user_pos.x,key->user_pos.y);
+	    fprintf(stderr,"\tHELE: user pos: x=%i y=%i\n",x,y);
 #endif
 	    keybox.xl = x - key_size_left;
 	    keybox.xr = keybox.xl + key_w;
@@ -1119,11 +1141,11 @@ place_labels(struct text_label *listhead, int layer)
 	/* EAM - Allow arbitrary rotation of label text */
 	if (this_label->rotate && (*t->text_angle) (this_label->rotate)) {
 	    write_multiline(x + htic, y + vtic, this_label->text, this_label->pos, JUST_TOP,
-	    		    this_label->rotate, this_label->font);
+			    this_label->rotate, this_label->font);
 	    (*t->text_angle) (0);
 	} else {
 	    write_multiline(x + htic, y + vtic, this_label->text, this_label->pos, JUST_TOP,
-	    		    0, this_label->font);
+			    0, this_label->font);
 	}
 	if (this_label->lp_properties.pointflag) {
 	    term_apply_lp_properties(&this_label->lp_properties);
@@ -1226,7 +1248,7 @@ do_plot(struct curve_points *plots, int pcount)
 	    unsigned int x = ylabel_x + (t->v_char / 2);
 	    unsigned int y = (ytop + ybot) / 2 + axis_array[FIRST_Y_AXIS].label.yoffset * (t->h_char);
 	    write_multiline(x, y, axis_array[FIRST_Y_AXIS].label.text, CENTRE, JUST_TOP,
-	    		    TEXT_VERTICAL, axis_array[FIRST_Y_AXIS].label.font);
+			    TEXT_VERTICAL, axis_array[FIRST_Y_AXIS].label.font);
 	    (*t->text_angle) (0);
 	} else {
 	    /* really bottom just, but we know number of lines
@@ -1246,7 +1268,7 @@ do_plot(struct curve_points *plots, int pcount)
 	    unsigned int x = y2label_x + (t->v_char / 2) - 1;
 	    unsigned int y = (ytop + ybot) / 2 + axis_array[SECOND_Y_AXIS].label.yoffset * (t->h_char);
 	    write_multiline(x, y, axis_array[SECOND_Y_AXIS].label.text, CENTRE, JUST_TOP,
-	    		    TEXT_VERTICAL, axis_array[SECOND_Y_AXIS].label.font);
+			    TEXT_VERTICAL, axis_array[SECOND_Y_AXIS].label.font);
 	    (*t->text_angle) (0);
 	} else {
 	    /* really bottom just, but we know number of lines */
@@ -1382,6 +1404,38 @@ do_plot(struct curve_points *plots, int pcount)
 
 	term_apply_lp_properties(&(this_plot->lp_properties));
 
+#ifdef EAM_HISTOGRAMS
+	/* Skip a line in the key between histogram clusters */
+	if (this_plot->plot_style == HISTOGRAMS 
+	&&  this_plot->histogram_sequence == 0 && yl != yl_ref) {
+	    if (++key_count >= key_rows) {
+		yl = yl_ref;
+		xl += key_col_wth;
+		key_count = 0;
+	    } else
+		yl = yl - key_entry_height;
+	}
+
+	/* Column-stacked histograms store their key titles internally */
+	if (this_plot->plot_style == HISTOGRAMS
+	&&  histogram_opts.type == HT_STACKED_IN_TOWERS) {
+	    text_label *key_entry;
+	    localkey = 0;
+	    if (this_plot->labels) {
+		for (key_entry = this_plot->labels; key_entry; key_entry = key_entry->next) {
+		    key_count++;
+		    this_plot->lp_properties.l_type = key_entry->tag;
+		    if (key_entry->text)
+			do_key_sample(this_plot, key, key_entry->text, t, xl, yl);
+		    yl = yl - key_entry_height;
+		}
+		/* EAM FIXME - where/when should this be freed again?  Here? */
+		free_labels(this_plot->labels);
+		this_plot->labels = NULL;
+	    }
+	} else
+#endif
+
 	if (this_plot->title && !*this_plot->title) {
 	    localkey = FALSE;
 	} else {
@@ -1389,6 +1443,8 @@ do_plot(struct curve_points *plots, int pcount)
 		/* don't write filename or function enhanced */
 	    if (localkey && this_plot->title) {
 		key_count++;
+		if (key->invert)
+		    yl = keybox.yb + yl_ref + key_entry_height/2 - yl;
 		do_key_sample(this_plot, key, this_plot->title, t, xl, yl);
 	    }
 	ignore_enhanced_text = 0;
@@ -1441,6 +1497,9 @@ do_plot(struct curve_points *plots, int pcount)
 	    break;
 	case BOXXYERROR:
 	case BOXES:
+#ifdef EAM_HISTOGRAMS
+	case HISTOGRAMS:
+#endif
 	    plot_boxes(this_plot, Y_AXIS.term_zero);
 	    break;
 	case BOXERROR:
@@ -1482,7 +1541,8 @@ do_plot(struct curve_points *plots, int pcount)
 	    /* we deferred point sample until now */
 	    if (this_plot->plot_style & PLOT_STYLE_HAS_POINT)
 		(*t->point) (xl + key_point_offset, yl, this_plot->lp_properties.p_type);
-
+	    if (key->invert)
+		yl = keybox.yb + yl_ref + key_entry_height/2 - yl;
 	    if (key_count >= key_rows) {
 		yl = yl_ref;
 		xl += key_col_wth;
@@ -1502,6 +1562,11 @@ do_plot(struct curve_points *plots, int pcount)
 
 /* PLACE LABELS */
     place_labels( first_label, 1 );
+
+#ifdef EAM_HISTOGRAMS
+/* PLACE HISTOGRAM TITLES */
+    place_histogram_titles();
+#endif
 
 /* PLACE ARROWS */
     place_arrows( 1 );
@@ -1818,7 +1883,7 @@ plot_filledcurves(struct curve_points *plot)
 		if (prev == INRANGE) {
 		    /* Split this segment if it crosses a bounding line */
 		    if (bound_intersect(plot->points, i, &ex, &ey, 
-		 			&plot->filledcurves_options)) {
+					&plot->filledcurves_options)) {
 			corners[points].x = map_x(ex);
 			corners[points++].y = map_y(ey);
 			FPRINTF((stderr,"Breaking line segment at %d,%d = %g,%g\n",
@@ -1925,7 +1990,7 @@ plot_betweencurves(struct curve_points *plot)
 
 	if ((yu1-yl1)*(yu2-yl2) < 0) {
 	    xmid = (x1*(yl2-yu2) + x2*(yu1-yl1))
-	         / ((yu1-yl1) + (yl2-yu2));
+		 / ((yu1-yl1) + (yl2-yu2));
 	    ymid = yu1 + (yu2-yu1)*(xmid-x1)/(x2-x1);
 	    fill_between(x1,yl1,yu1,xmid,ymid,ymid,plot);
 	    fill_between(xmid,ymid,ymid,x2,yl2,yu2,plot);
@@ -2621,10 +2686,38 @@ static void
 plot_boxes(struct curve_points *plot, int xaxis_y)
 {
     int i;			/* point index */
-    int xl, xr, yt;		/* point in terminal coordinates */
+    int xl, xr, yb, yt;		/* point in terminal coordinates */
     double dxl, dxr, dyt;
     struct termentry *t = term;
     enum coord_type prev = UNDEFINED;	/* type of previous point */
+
+#ifdef EAM_HISTOGRAMS
+    double dyb = 0.0;
+    /* The stackheight[] array contains the y coord of the top   */
+    /* of the stack so far for each point.                       */
+    if (plot->plot_style == HISTOGRAMS) {
+	int newsize = plot->p_count;
+	if (histogram_opts.type == HT_STACKED_IN_TOWERS)
+	    stack_count = 0;
+	if (histogram_opts.type == HT_STACKED_IN_LAYERS && plot->histogram_sequence == 0)
+	    stack_count = 0;
+	if (!stackheight) {
+	    stackheight = gp_alloc( 
+				newsize * sizeof(struct coordinate GPHUGE),
+				"stackheight array");
+	    for (i = 0; i < newsize; i++)
+		stackheight[i].y = 0;
+	    stack_count = newsize;
+	} else if (stack_count < newsize) {
+	    stackheight = gp_realloc( stackheight, 
+				newsize * sizeof(struct coordinate GPHUGE),
+				"stackheight array");
+	    for (i = stack_count; i < newsize; i++)
+		stackheight[i].y = 0;
+	    stack_count = newsize;
+	}
+    }
+#endif
 
     for (i = 0; i < plot->p_count; i++) {
 
@@ -2637,10 +2730,10 @@ plot_boxes(struct curve_points *plot, int xaxis_y)
 			if (boxwidth < 0)
 			    dxl = (plot->points[i-1].x - plot->points[i].x) / 2.0;
 #if USE_ULIG_RELATIVE_BOXWIDTH
-                        else if (! boxwidth_is_absolute)
+			else if (! boxwidth_is_absolute)
 			    dxl = (plot->points[i-1].x - plot->points[i].x) * boxwidth / 2.0;
 #endif /* USE_RELATIVE_BOXWIDTH */
-                        else /* shouldn't happen, as graphics.c was supposed to */
+			else /* shouldn't happen, as graphics.c was supposed to */
 			     /* handle this case and then set points[i].z to 0 */
 			    dxl = boxwidth / 2.0;
 		    else
@@ -2648,14 +2741,14 @@ plot_boxes(struct curve_points *plot, int xaxis_y)
 
 		    if (i < plot->p_count - 1) {
 			if (plot->points[i + 1].type != UNDEFINED)
-                            if (boxwidth < 0)
-			        dxr = (plot->points[i+1].x - plot->points[i].x) / 2.0;
+			    if (boxwidth < 0)
+				dxr = (plot->points[i+1].x - plot->points[i].x) / 2.0;
 #if USE_ULIG_RELATIVE_BOXWIDTH
-                            else if (! boxwidth_is_absolute)
-			        dxr = (plot->points[i+1].x - plot->points[i].x) * boxwidth / 2.0;
+			    else if (! boxwidth_is_absolute)
+				dxr = (plot->points[i+1].x - plot->points[i].x) * boxwidth / 2.0;
 #endif /* USE_RELATIVE_BOXWIDTH */
-                            else /* shouldn't happen */
-			        dxr = boxwidth / 2.0;
+			    else /* shouldn't happen */
+				dxr = boxwidth / 2.0;
 			else
 			    dxr = -dxl;
 		    } else {
@@ -2683,6 +2776,56 @@ plot_boxes(struct curve_points *plot, int xaxis_y)
 		    dyt = plot->points[i].y;
 		}
 
+#ifdef EAM_HISTOGRAMS
+		if (plot->plot_style == HISTOGRAMS) {
+		    int ix = i;
+		    /* Shrink each cluster to fit within one unit along X axis,   */
+		    /* centered about the integer representing the cluster number */
+		    /* 'start' is reset to 0 at the top of eval_plots(), and then */
+		    /* incremented if 'plot new histogram' is encountered.        */
+		    if (histogram_opts.type == HT_CLUSTERED) {
+			int clustersize = plot->histogram->clustersize + histogram_opts.gap;
+			dxl  += (i-1) * (clustersize - 1) + plot->histogram_sequence;
+			dxr  += (i-1) * (clustersize - 1) + plot->histogram_sequence;
+			dxl  += histogram_opts.gap/2;
+			dxr  += histogram_opts.gap/2;
+			dxl  /= clustersize;
+			dxr  /= clustersize;
+			dxl  += plot->histogram->start + 0.5;
+			dxr  += plot->histogram->start + 0.5;
+		    } else if (histogram_opts.type == HT_STACKED_IN_TOWERS) {
+			dxl  = plot->histogram->start - boxwidth / 2.0;
+			dxr  = plot->histogram->start + boxwidth / 2.0;
+			dxl += plot->histogram_sequence;
+			dxr += plot->histogram_sequence;
+		    } else if (histogram_opts.type == HT_STACKED_IN_LAYERS) {
+			dxl += plot->histogram->start;
+			dxr += plot->histogram->start;
+		    }
+
+		    switch (histogram_opts.type) {
+		    case HT_STACKED_IN_TOWERS:
+			ix = 0;
+			/* Line type (color) must match row number */
+			(*t->linetype)(i);
+		    case HT_STACKED_IN_LAYERS:
+			dyb = stackheight[ix].y;
+			dyt += stackheight[ix].y;
+			stackheight[ix].y += plot->points[i].y;
+			if ((Y_AXIS.min < Y_AXIS.max && dyb < Y_AXIS.min)
+			||  (Y_AXIS.max < Y_AXIS.min && dyb > Y_AXIS.min))
+			    dyb = Y_AXIS.min;
+			if ((Y_AXIS.min < Y_AXIS.max && dyb > Y_AXIS.max)
+			||  (Y_AXIS.max < Y_AXIS.min && dyb < Y_AXIS.max))
+			    dyb = Y_AXIS.max;
+			break;
+		    case HT_CLUSTERED:
+			stackheight[i].y = plot->points[i].y;
+			break;
+		    }
+		}
+#endif
+
 		/* clip to border */
 		cliptorange(dyt, Y_AXIS.min, Y_AXIS.max);
 		cliptorange(dxr, X_AXIS.min, X_AXIS.max);
@@ -2691,29 +2834,43 @@ plot_boxes(struct curve_points *plot, int xaxis_y)
 		xl = map_x(dxl);
 		xr = map_x(dxr);
 		yt = map_y(dyt);
+		yb = xaxis_y;
 
 #if USE_ULIG_FILLEDBOXES
+#ifdef EAM_HISTOGRAMS
+		if (plot->plot_style == HISTOGRAMS
+		&& (histogram_opts.type == HT_STACKED_IN_LAYERS
+		    || histogram_opts.type == HT_STACKED_IN_TOWERS))
+			yb = map_y(dyb);
+#endif
 		if ((plot->fill_properties.fillstyle != FS_EMPTY) && t->fillbox) {
-                    int x, y, w, h;
-                    int style;
+		    int x, y, w, h;
+		    int style;
 
-                    x = xl;
-                    y = xaxis_y;
-                    w = xr - xl + 1;
-                    h = yt - xaxis_y + 1;
-                    /* avoid negative width/height */
-                    if( w <= 0 ) {
+		    x = xl;
+		    y = yb;
+		    w = xr - xl + 1;
+		    h = yt - yb + 1;
+		    /* avoid negative width/height */
+		    if( w <= 0 ) {
 			x = xr;
 			w = xl - xr + 1;
 		    }
-                    if( h <= 0 ) {
+		    if( h <= 0 ) {
 			y = yt;
-			h = xaxis_y - yt + 1;
+			h = yb - yt + 1;
 		    }
 
 		    style = style_from_fill(&plot->fill_properties);
+#ifdef EAM_HISTOGRAMS
+		    /* FIXME EAM - broken, and doesn't match key entries */
+		    if (plot->plot_style == HISTOGRAMS
+		    && plot->fill_properties.fillstyle == FS_PATTERN
+		    && histogram_opts.type == HT_STACKED_IN_TOWERS)
+			style += (i<<4);
+#endif
 
-                    (*t->fillbox) (style, x, y, w, h);
+		    (*t->fillbox) (style, x, y, w, h);
 
 		    /* FIXME EAM - Is this still correct??? */
 		    if (strcmp(t->name, "fig") == 0) break;
@@ -2725,13 +2882,13 @@ plot_boxes(struct curve_points *plot, int xaxis_y)
 		}
 #endif /* USE_ULIG_FILLEDBOXES */
 
-		(*t->move) (xl, xaxis_y);
+		(*t->move) (xl, yb);
 		(*t->vector) (xl, yt);
 		(*t->vector) (xr, yt);
-		(*t->vector) (xr, xaxis_y);
-		(*t->vector) (xl, xaxis_y);
+		(*t->vector) (xr, yb);
+		(*t->vector) (xl, yb);
 #if USE_ULIG_FILLEDBOXES
-                if( t->fillbox &&
+		if( t->fillbox &&
 		    plot->fill_properties.border_linetype != LT_UNDEFINED)
 		    (*t->linetype)(plot->lp_properties.l_type);
 #endif
@@ -3803,9 +3960,9 @@ xtick2d_callback(
 	(*t->vector) (x, tic_mirror - ticsize);
     }
     if (text) {
-        /* User-specified different color for the tics text */
-        if (axis_array[axis].ticdef.textcolor.lt != TC_DEFAULT)
-            apply_textcolor(&(axis_array[axis].ticdef.textcolor), t);
+	/* User-specified different color for the tics text */
+	if (axis_array[axis].ticdef.textcolor.lt != TC_DEFAULT)
+	    apply_textcolor(&(axis_array[axis].ticdef.textcolor), t);
 	write_multiline(x, tic_text, text, tic_hjust, tic_vjust, rotate_tics,
 			axis_array[axis].ticdef.font);
 	term_apply_lp_properties(&border_lp);	/* reset to border linetype */
@@ -3876,9 +4033,9 @@ ytick2d_callback(
 	(*t->vector) (tic_mirror - ticsize, y);
     }
     if (text) {
-        /* User-specified different color for the tics text */
-        if (axis_array[axis].ticdef.textcolor.lt != TC_DEFAULT)
-            apply_textcolor(&(axis_array[axis].ticdef.textcolor), t);
+	/* User-specified different color for the tics text */
+	if (axis_array[axis].ticdef.textcolor.lt != TC_DEFAULT)
+	    apply_textcolor(&(axis_array[axis].ticdef.textcolor), t);
 	write_multiline(tic_text, y, text, tic_hjust, tic_vjust, rotate_tics,
 			axis_array[axis].ticdef.font);
 	term_apply_lp_properties(&border_lp);	/* reset to border linetype */
@@ -4088,6 +4245,61 @@ plot_border()
 	    (*term->move) (xleft, ybot);
 	}
 }
+
+
+#ifdef EAM_HISTOGRAMS
+void
+init_histogram(struct histogram_style *histogram, char *title)
+{
+    if (stackheight)
+	free(stackheight);
+    stackheight = NULL;
+    if (histogram) {
+	memcpy(histogram,&histogram_opts,sizeof(histogram_opts));
+	/* Insert in linked list */
+	histogram_opts.next = histogram;
+	if (*title) {
+	    histogram->title.text = gp_alloc(strlen(title)+1, "histogram title");
+	    strcpy(histogram->title.text,title);
+	} else
+	    histogram->title.text = NULL;
+    }
+}
+
+void
+free_histlist(struct histogram_style *hist)
+{
+    if (!hist) 
+	return;
+    if (hist->title.text)
+	free(hist->title.text);
+    if (hist->next) {
+	free_histlist(hist->next);
+	free(hist->next);
+	hist->next = NULL;
+    }
+}
+
+void
+place_histogram_titles()
+{
+    histogram_style *hist = &histogram_opts;
+    unsigned int x, y;
+    while ((hist = hist->next)) {
+	if (hist->title.text && *(hist->title.text)) {
+	    x = map_x((hist->start + hist->end) / 2.);
+	    y = xlabel_y;
+	    x += (term->h_char * hist->title.hoffset);
+	    y += (term->v_char * (hist->title.voffset+0.25));
+	    apply_textcolor(&hist->title.textcolor,term);
+	    write_multiline(x, y, hist->title.text, 
+			    CENTRE, JUST_BOT, 0, hist->title.font);
+	    reset_textcolor(&hist->title.textcolor,term);
+	}
+    }
+}
+
+#endif
 
 /*
  * Make this code a subroutine, rather than in-line, so that it can

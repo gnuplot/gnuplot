@@ -1,5 +1,5 @@
 /*
- * $Id: datafile.h,v 1.12 2004/06/13 00:34:32 sfeam Exp $
+ * $Id: datafile.h,v 1.13 2004/07/03 06:08:48 sfeam Exp $
  */
 
 /* GNUPLOT - datafile.h */
@@ -53,6 +53,10 @@
 #ifdef EAM_DATASTRINGS
 #define DF_FOUND_KEY_TITLE   (-6)
 #define DF_KEY_TITLE_MISSING (-7)
+#endif
+#ifdef EAM_HISTOGRAMS
+/* should really be a parameter to df_readline rather than a global */
+extern struct curve_points *df_current_plot;
 #endif
 
 

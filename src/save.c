@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.78 2004/07/03 06:08:49 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.79 2004/07/04 23:58:45 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -358,9 +358,10 @@ set y2data%s\n",
 	    save_position(fp, &key->user_pos);
 	    break;
 	}
-	fprintf(fp, " %s %sreverse %senhanced box linetype %d linewidth %.3f samplen %g spacing %g width %g height %g %s\n",
+	fprintf(fp, " %s %sreverse %sinvert %senhanced box linetype %d linewidth %.3f samplen %g spacing %g width %g height %g %s\n",
 		key->just == JLEFT ? "Left" : "Right",
 		key->reverse ? "" : "no",
+		key->invert ? "" : "no",
 		key->enhanced ? "" : "no",
 		key->box.l_type + 1, key->box.l_width,
 		key->swidth, key->vert_factor, key->width_fix, key->height_fix,
@@ -469,6 +470,23 @@ set y2data%s\n",
 	}
 	fprintf(fp, "\n");
     }
+
+#ifdef EAM_HISTOGRAMS
+    fprintf(fp, "set style histogram ");
+    switch (histogram_opts.type) {
+	default:
+	case HT_CLUSTERED:
+	    fprintf(fp,"clustered gap %d ",histogram_opts.gap); break;
+	case HT_STACKED_IN_LAYERS:
+	    fprintf(fp,"rowstacked "); break;
+	case HT_STACKED_IN_TOWERS:
+	    fprintf(fp,"columnstacked "); break;
+    }
+    fprintf(fp,"title %g,%g ",histogram_opts.title.hoffset,histogram_opts.title.voffset);
+    save_textcolor(fp, &histogram_opts.title.textcolor);
+    fprintf(fp, "\n");
+#endif
+
     fputs("unset logscale\n", fp);
 #define SAVE_LOG(axis)							\
     if (axis_array[axis].log)						\
@@ -1035,6 +1053,11 @@ save_data_func_style(FILE *fp, char *which, enum PLOT_STYLE style)
     case BOXES:
 	fputs("boxes\n", fp);
 	break;
+#ifdef EAM_HISTOGRAMS
+    case HISTOGRAMS:
+	fputs("histograms\n", fp);
+	break;
+#endif
 #ifdef PM3D
     case FILLEDCURVES:
 	fputs("filledcurves ", fp);

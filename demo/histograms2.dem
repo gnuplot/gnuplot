@@ -1,0 +1,67 @@
+#
+# Example of using histogram modes
+#
+reset
+set title "US immigration from Europe by decade"
+set missing "-"
+set xtics nomirror rotate by -45
+#
+# 'newhistogram' keyword to plot
+#
+set title "Default Histogram Colouring"
+set key under
+set key invert
+set style data histogram
+set style histogram clustered gap 1 title 2,0.25
+set style fill solid noborder
+set boxwidth 0.95
+unset xtics
+set xtics rotate by -45
+set xlabel "Immigration from different regions" 0,-3
+set ytics
+set grid y
+set auto y
+plot \
+newhistogram "Northern Europe", \
+'immigration.dat' using 6:xtic(1) t 6, '' u 13 t 13, '' u 14 t 14, \
+newhistogram "Southern Europe", \
+'' u 9:xtic(1) t 9, '' u 17 t 17, '' u 22 t 22, \
+newhistogram "British Isles", \
+'' u 10:xtic(1) t 10, '' u 21 t 21
+#
+pause -1 "Same plot using explicit histogram start colors"
+set title "Explicit start color in 'newhistogram' command"
+plot \
+newhistogram "Northern Europe" lt 4, \
+'immigration.dat' using 6:xtic(1) t 6, '' u 13 t 13, '' u 14 t 14, \
+newhistogram "Southern Europe" lt 4, \
+'' u 9:xtic(1) t 9, '' u 17 t 17, '' u 22 t 22, \
+newhistogram "British Isles" lt 4, \
+'' u 10:xtic(1) t 10, '' u 21 t 21
+#
+#
+pause -1 "Same plot using explicit histogram start pattern"
+set title "Explicit start pattern in 'newhistogram' command"
+set style fill pattern 1 border -1
+plot \
+newhistogram "Northern Europe" fs pattern 1, \
+'immigration.dat' using 6:xtic(1) t 6, '' u 13 t 13, '' u 14 t 14, \
+newhistogram "Southern Europe" fs pattern 1, \
+'' u 9:xtic(1) t 9, '' u 17 t 17, '' u 22 t 22, \
+newhistogram "British Isles" fs pattern 1, \
+'' u 10:xtic(1) t 10, '' u 21 t 21
+#
+#
+pause -1 "Same plot with both explicit color and pattern"
+set title "Explicit start pattern and linetype"
+set style fill pattern 1 border -1
+plot \
+newhistogram "Northern Europe" lt 2 fs pattern 1, \
+'immigration.dat' using 6:xtic(1) t 6, '' u 13 t 13, '' u 14 t 14, \
+newhistogram "Southern Europe" lt 2 fs pattern 1, \
+'' u 9:xtic(1) t 9, '' u 17 t 17, '' u 22 t 22, \
+newhistogram "British Isles" lt 2 fs pattern 1, \
+'' u 10:xtic(1) t 10, '' u 21 t 21
+#
+#
+pause -1

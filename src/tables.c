@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: tables.c,v 1.52 2004/07/02 23:58:40 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: tables.c,v 1.53 2004/07/03 06:08:50 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - tables.c */
@@ -367,6 +367,8 @@ const struct gen_table set_key_tbl[] =
     { "R$ight", S_KEY_RRIGHT },
     { "rev$erse", S_KEY_REVERSE },
     { "norev$erse", S_KEY_NOREVERSE },
+    { "inv$ert", S_KEY_INVERT },
+    { "noinv$ert", S_KEY_NOINVERT },
     { "enh$anced", S_KEY_ENHANCED },
     { "noenh$anced", S_KEY_NOENHANCED },
     { "b$ox", S_KEY_BOX },
@@ -560,6 +562,9 @@ const struct gen_table show_style_tbl[] =
     { "fill", SHOW_STYLE_FILLING },
     { "fs", SHOW_STYLE_FILLING },
     { "ar$row", SHOW_STYLE_ARROW },
+#ifdef EAM_HISTOGRAMS
+    { "hist$ogram", SHOW_STYLE_HISTOGRAM },
+#endif
     { NULL, SHOW_STYLE_INVALID }
 };
 
@@ -580,6 +585,9 @@ const struct gen_table plotstyle_tbl[] =
     { "xe$rrorbars", XERRORBARS },
     { "xye$rrorbars", XYERRORBARS },
     { "boxes", BOXES },
+#ifdef EAM_HISTOGRAMS
+    { "hist$ograms", HISTOGRAMS },
+#endif
 #ifdef PM3D
     { "filledc$urves", FILLEDCURVES },
 #endif

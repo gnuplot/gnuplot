@@ -1,0 +1,167 @@
+#
+# Example of using histogram modes
+#
+reset
+set title "US immigration from Europe by decade"
+set missing "-"
+set xtics nomirror rotate by -45
+#
+# First plot using linespoints
+set style data linespoints
+plot 'immigration.dat' using 2:xtic(1) t 2, \
+'' u 3 t 3, '' u 4 t 4, '' u 5 t 5, '' u 6 t 6, \
+'' u 7 t 7, '' u 8 t 8, '' u 9 t 9, '' u 10 t 10, \
+'' u 11 t 11, '' u 12 t 12, '' u 13 t 13, '' u 14 t 14, \
+'' u 15 t 15, '' u 16 t 16, '' u 17 t 17, '' u 18 t 18, \
+'' u 19 t 19, '' u 20 t 20, '' u 21 t 21, '' u 22 t 22
+#
+pause -1 "<cr> to plot the same data as a histogram"
+#
+set title "US immigration from Northern Europe\nPlot selected data columns as histogram of clustered boxes"
+set auto x
+set yrange [0:300000]
+set style data histogram
+set style histogram cluster gap 1
+set style fill solid border -1
+set boxwidth 0.9
+set xtic rotate by -45
+set bmargin 6
+plot 'immigration.dat' using 6:xtic(1) ti col, '' u 12 ti col, '' u 13 ti col, '' u 14 ti col
+#
+pause -1 "<cr> to change the gap between clusters"
+#
+set title "US immigration from Northern Europe\n(same plot with larger gap between clusters)"
+set style histogram gap 5
+replot
+#
+pause -1 "<cr> to plot the same dataset as stacked histogram"
+#
+#
+# Stacked histograms
+#
+set title "US immigration from Europe by decade\nPlot as stacked histogram"
+set key invert reverse Left outside
+set key autotitle columnheader
+set yrange [0:7e6]
+set auto x
+unset xtics
+set xtics nomirror rotate by -45
+set style data histogram
+set style histogram rowstacked
+set style fill solid border -1
+set boxwidth 0.75
+#
+plot 'immigration.dat' using 2:xtic(1), \
+'' using 3, \
+'' using 4, \
+'' using 5, \
+'' using 6, \
+'' using 7, \
+'' using 8, \
+'' using 9, \
+'' using 10, \
+'' using 11, \
+'' using 12, \
+'' using 13, \
+'' using 14, \
+'' using 15, \
+'' using 16, \
+'' using 17, \
+'' using 18, \
+'' using 19, \
+'' using 20, \
+'' using 21, \
+'' using 22
+#
+pause -1 "<cr> to rescale each stack to % of total"
+#
+# Stacked histograms by percent
+#
+set title "US immigration from Europe by decade\nFraction of total plotted as stacked histogram"
+set key invert reverse Left outside
+set yrange [0:100]
+set ylabel "% of total"
+unset ytics
+set grid y
+set border 3
+set style data histograms
+set style histogram rowstacked
+set style fill solid border -1
+set boxwidth 0.75
+#
+plot 'immigration.dat' using (100.*$2/$24):xtic(1) t 2, \
+'' using (100.*$3/$24) t 3, \
+'' using (100.*$4/$24) t 4, \
+'' using (100.*$5/$24) t 5, \
+'' using (100.*$6/$24) t 6, \
+'' using (100.*$7/$24) t 7, \
+'' using (100.*$8/$24) t 8, \
+'' using (100.*$9/$24) t 9, \
+'' using (100.*$10/$24) t 10, \
+'' using (100.*$11/$24) t 11, \
+'' using (100.*$12/$24) t 12, \
+'' using (100.*$13/$24) t 13, \
+'' using (100.*$14/$24) t 14, \
+'' using (100.*$15/$24) t 15, \
+'' using (100.*$16/$24) t 16, \
+'' using (100.*$17/$24) t 17, \
+'' using (100.*$18/$24) t 18, \
+'' using (100.*$19/$24) t 19, \
+'' using (100.*$20/$24) t 20, \
+'' using (100.*$21/$24) t 21, \
+'' using (100.*$22/$24) t 22, \
+'' using (100.*$23/$24) t 23
+#
+pause -1 "Now try histograms stacked by columns"
+#
+# Columnstacks
+#	xtic labels should be picked up from column heads ('title column')
+#	key titles should be picked up from row heads ('key(1)')
+#
+set title "Immigration from Northern Europe\n(columstacked histogram)"
+set style histogram columnstacked
+set key noinvert box
+set yrange [0:*]
+set xrange [0:*]
+set ylabel "Immigration by decade"
+set xlabel "Country of Origin"
+set ticscale 0.0
+set ytics
+unset xtics
+set xtics norotate
+plot 'immigration.dat' using 6 ti col, '' using 12 ti col, \
+     '' using 13 ti col, '' using 14:key(1) ti col
+#
+pause -1 "Next we do several sets of parallel histograms"
+#
+# 'newhistogram' keyword to plot
+#
+set title "Immigration from different regions\n(give each histogram a separate title)"
+set key under
+set style histogram clustered gap 1 title 2,0.25
+set style fill solid noborder
+set boxwidth 0.95
+unset xtics
+set xtics rotate by -45
+set xlabel "(note: histogram titles have specified offset relative to X-axis label)" 0,-3
+set ytics
+set grid y
+set auto y
+plot \
+newhistogram "Northern Europe", \
+'immigration.dat' using 6:xtic(1) t 6, '' u 13 t 13, '' u 14 t 14, \
+newhistogram "Southern Europe", \
+'' u 9:xtic(1) t 9, '' u 17 t 17, '' u 22 t 22, \
+newhistogram "British Isles", \
+'' u 10:xtic(1) t 10, '' u 21 t 21
+#
+pause -1 "Same plot using rowstacked histogram"
+#
+set style histogram rows
+set boxwidth 0.8
+set yrange [0:900000]
+set xlabel "(Same plot using rowstacked rather than clustered histogram)"
+replot
+#
+pause -1
+

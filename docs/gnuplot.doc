@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.228 2004/07/02 23:58:34 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.229 2004/07/03 06:08:22 sfeam Exp $
 C 18 September 2001
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -3364,7 +3364,7 @@ C ... and restart the table:
  where <style> is either `lines`, `points`, `linespoints`, `impulses`,
  `dots`, `steps`, `fsteps`, `histeps`, `errorbars`, `labels`, `xerrorbars`,
  `yerrorbars`, `xyerrorbars`, `errorlines`, `xerrorlines`, `yerrorlines`,
- `xyerrorlines`, `boxes`, `filledcurves`, `boxerrorbars`,
+ `xyerrorlines`, `boxes`, `histograms`, `filledcurves`, `boxerrorbars`,
  `boxxyerrorbars`, `financebars`, `candlesticks`, `vectors` or `pm3d`. Some
  of these styles require additional information. See `plotting styles` for
  details of each style.  `fill` is relevant only to certain 2D plots
@@ -4067,7 +4067,7 @@ C ... and restart the table:
 ?show boxwidth
 ?boxwidth
  The `set boxwidth` command is used to set the default width of boxes in the
- `boxes`, `boxerrorbars` and `candlesticks` styles.
+ `boxes`, `boxerrorbars`, `candlesticks` and `histogram` styles.
 
  Syntax:
        set boxwidth {<width>} {absolute|relative}
@@ -5251,6 +5251,7 @@ C ... and restart the table:
        set key {on|off} {default}
                {left | right | top | bottom | outside | below | <position>}
                {Left | Right} {{no}reverse}
+               {{no}invert}
                {samplen <sample_length>} {spacing <vertical_spacing>}
                {width <width_increment>}
                {height <height_increment>}
@@ -5275,6 +5276,12 @@ C ... and restart the table:
  box can be drawn around the key (`box {...}`) in a specified `linetype`
  and `linewidth`, or a user-defined `linestyle`. Note that not all
  terminal drivers support linewidth selection, though.
+
+ By default the first plot label is at the top of the key and successive labels
+ are entered below it. The `invert` option causes the first label to be placed
+ at the bottom of the key, with successive labels entered above it. This option
+ is useful to force the vertical ordering of labels in the key to match the
+ order of box types in a stacked histogram.
 
  The length of the sample line can be controlled by `samplen`.  The sample
  length is computed as the sum of the tic length and <sample_length> times the
@@ -5320,9 +5327,9 @@ C ... and restart the table:
  This default behavior can be switched off by the `noenhanced` option.
 
  The defaults for `set key` are `on`, `right`, `top`, `Right`, `noreverse`,
- `samplen 4`, `spacing 1.25`, `title ""`, and `nobox`.  The default <linetype>
- is the same as that used for the plot borders.  Entering `set key default` 
- returns the key to its default configuration.
+ `noinvert`, `samplen 4`, `spacing 1.25`, `title ""`, and `nobox`.  
+ The default <linetype> is the same as that used for the plot borders.
+ Entering `set key default` returns the key to its default configuration.
 
  The <position> can be a simple x,y,z as in previous versions, but these can
  be preceded by one of four keywords (`first`, `second`, `graph`, `screen`)
@@ -6848,6 +6855,7 @@ C ... and restart the table:
  Syntax:
        set style arrow <n> <arrowstyle>
        set style fill <fillstyle>
+       set style histogram <histogram style options>
        set style line <n> <linestyle>
 
 4 set style arrow
@@ -6948,8 +6956,8 @@ C ... and restart the table:
 ?set style fill
 ?show style fill
 ?fillstyle
- The `set style fill` command is used to set the style of boxes
- or candlesticks.
+ The `set style fill` command is used to set the style of boxes,
+ histograms or candlesticks.
 
  Syntax:
        set style fill {empty | solid {<density>} | pattern {<n>}}
@@ -7100,7 +7108,7 @@ C ... and restart the table:
  a column in the data file and an entry in the `using` list.)
 
  For three columns, only `xerrorbars`, `yerrorbars` (or `errorbars`),
- `xerrorlines`, `yerrorlines` (or `errorlines`), `boxes` 
+ `xerrorlines`, `yerrorlines` (or `errorlines`), `boxes`,
  and `boxerrorbars` are allowed. If another plot style is used, the style
  will be changed to `yerrorbars`. The `boxerrorbars` style will
  calculate the boxwidth automatically.
@@ -7204,6 +7212,115 @@ C ... and restart the table:
  x11, windows, pm, postscript, fig, pbm, png, gif, hpdj, hppj, hpljii, hp500c,
  jpeg, nec_cp6, epson_180dpi, epson_60dpi, epson_lx800, okidata, starc and
  tandy_60dpi. The BeOS driver (`be`) is untested.
+5 histograms
+?commands set style histograms
+?set style histograms
+?style histograms
+?histograms
+ The `histograms` style is only relevant to 2-d plotting.  It produces a bar
+ chart from a sequence of data columns in parallel. Each element of the 
+ `plot` command must specify a single input data source (e.g. one column of 
+ the input file), possibly with associated tic values or key titles.
+ Three styles of histogram layout are currently supported. 
+ 
+       set style histogram clustered {gap <gapsize>}
+       set style histogram rowstacked
+       set style histogram columnstacked
+ 
+ The default style corresponds to `set style histogram clustered gap 2`. 
+ Each set of parallel data values is collected into a group of boxes clustered
+ at the x-axis coordinate corresponding to their sequential position (row #)
+ in the selected datafile columns.  Thus if <n> datacolumns are selected, the
+ first cluster is centered about x=1, and contains <n> boxes whose heights are
+ taken from the first entry in the corresponding <n> data columns. This
+ is followed by a gap and then a second cluster of boxes centered about x=2
+ corresponding to the second entry in the respective data columns, and so on.
+ The default gap width of 2 indicates that the empty space between clusters is
+ equivalent to the width of 2 boxes.  All boxes derived from any one column
+ are given the same fill color and/or pattern (see `set style fill`).
+
+ Each cluster of boxes is derived from a single row of the input data file.
+ It is common in such input files that the first element of each row is a
+ label. Labels from this column may be placed along the x-axis underneath
+ the appropriate cluster of boxes with the `xticlabels` option to `using`.
+
+ Two styles of stacked histogram are supported, chosen by the command
+ `set style histogram {rowstacked|columnstacked}`.  In these styles the data
+ values from the selected columns are collected into stacks of boxes.
+ The default stacking mode is `rowstacked`.
+
+ The `rowstacked` style places a box resting on the x-axis for each
+ data value in the first selected column; the first data value results in 
+ a box a x=1, the second at x=2, and so on.  Boxes corresponding to the
+ second and subsequent data columns are layered on top of these, resulting
+ in a stack of boxes at x=1 representing the first data value from each
+ column, a stack of boxes at x=2 representing the second data value from
+ each column, and so on.  All boxes derived from any one column are given the 
+ same fill color and/or pattern (see `set style fill`).
+
+ The `columnstacked` style is similar, except that each stack of boxes is
+ built up from a single data column. Each data value from the first specified
+ column yields a box in the stack at x=1, each data value from the second
+ specified column yields a box in the stack at x=2, and so on.  In this style
+ the color of each box is taken from the row number, rather than the column
+ number, of the corresponding data field.
+
+ Box widths may be modified using the `set boxwidth` command.
+ Box fill styles may be set using the `set style fill` command.
+
+ Examples:
+
+ To plot a data file containing multiple columns of data as a histogram
+ of clustered boxes (the default style):
+
+       set boxwidth 0.9 relative
+       set style data histograms
+       set style fill solid 1.0 border -1
+       plot 'file.dat' using 2, '' using 4, '' using 3 
+
+ This will produce a plot with clusters of three boxes (vertical bars) centered
+ at each integral value on the x axis. If the first column of the input file
+ contains labels, they may be placed along the x-axis using the variant command
+
+       plot 'file.dat' using 2, '' using 4, '' using 3:xticlabels(1) 
+
+ To plot the same data as a rowstacked histogram:
+
+       set style histogram rows
+       plot 'file.dat' using 2, '' using 4, '' using 3:xtic(1) 
+
+ This will produce a plot in which each vertical bar contains a stack of three
+ segments, corresponding in height to the values found in columns 2, 4 and 3
+ of the datafile.
+
+ Finally, the commands
+
+       set style histogram columnstacked
+       plot 'file.dat' using 2, '' using 4, '' using 3 
+
+ will produce three vertical stacks. The stack at x=1 will contain a box for
+ each entry in column 2 of the datafile.  The stack at x=2 will contain a box
+ for each parallel entry in column 4 of the datafile, and the stack at x=3 a
+ box for each entry of column 3.  
+
+ More than one set of histograms can appear in a single plot. In this case you
+ can force a gap between them, and a separate label for each set, by using the
+ `newhistogram { "title" } { <linestyle> }` plot command.  For example
+       set style histogram  cluster
+       plot newhistogram "Set A", 'a' using 1, '' using 2, '' using 3, \
+            newhistogram "Set B", 'b' using 1, '' using 2, '' using 3
+
+ The labels "Set A" and "Set B" will appear beneath the respective sets of 
+ histograms, under the overall x axis label.
+
+ The newhistogram command can also be used to force histogram coloring to
+ begin with a specific color (linetype). By default colors will continue to
+ increment successively even across histogram boundaries. Here is an example
+ using the same coloring for multiple histograms
+       plot newhistogram "Set A" lt 4, 'a' using 1, '' using 2, '' using 3, \
+            newhistogram "Set B" lt 4, 'b' using 1, '' using 2, '' using 3
+ 
+
 5 filledcurves
 ?commands set style filledcurves
 ?set style filledcurves
