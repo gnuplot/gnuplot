@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.254 2004/10/27 04:41:23 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.255 2004/10/27 07:46:46 mikulik Exp $
 C 18 September 2001
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -687,6 +687,13 @@ C
  Gnuplot can also perform simple operations on strings and string variables.
  For example, the expression ("A" . "B" eq "AB") evaluates as true, illustrating
  the string concatenation operator and the string equality operator.
+
+ A string which contains a numerical value is promoted to the corresponding
+ integer or real value if used in a numerical expression. Thus ("3" + "4" == 7)
+ and (6.78 == "6.78") both evaluate to true.  An integer, but not a real or
+ complex value, is promoted to a string if used in string concatenation.
+ A typical case is the use of integers to construct file names or other strings;
+ e.g. ("file" . 4 eq "file4") is true.
 3 Functions
 ?expressions functions
 ?functions
@@ -1674,6 +1681,12 @@ C ... and restart the table:
        plot 'data.4' title graph4
        plot 'data.4' title "Title for plot #".four
        plot 'data.4' title graph(4)
+
+ Since integers are promoted to strings when operated on by the string
+ concatenation operator, the following method also works:
+
+       N = 4
+       plot 'data.'.N title "Title for plot #".N
 
  In general, elements on the command line will only be evaluated as possible
  string variables if they are not otherwise recognizable as part of the normal

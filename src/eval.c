@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: eval.c,v 1.19 2004/08/17 21:21:25 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: eval.c,v 1.20 2004/10/26 04:30:51 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - eval.c */
@@ -64,6 +64,10 @@ struct udvt_entry udv_pi = { NULL, "pi", FALSE, {INTGR, {0} } };
 /* first in linked list */
 struct udvt_entry *first_udv = &udv_pi;
 struct udft_entry *first_udf = NULL;
+
+#if (GP_STRING_VARS > 1)
+TBOOLEAN STRING_RESULT_ONLY = FALSE;
+#endif
 
 TBOOLEAN undefined;
 
@@ -485,6 +489,24 @@ pop(struct value *x)
     return (x);
 }
 
+#if (GP_STRING_VARS > 1)
+/*
+ * Allow autoconversion of string variables to floats if they
+ * are dereferenced in a numeric context.
+ */
+struct value *
+pop_or_convert_from_string(struct value *v)
+{
+    (void) pop(v);
+    if (v->type == STRING && !STRING_RESULT_ONLY) {
+	double d = atof(v->v.string_val);
+	free(v->v.string_val);
+	Gcomplex(v, d, 0.);
+	FPRINTF((stderr,"converted string to CMPLX value %g\n",real(v)));
+    }
+    return(v);
+}
+#endif
 
 void
 push(struct value *x)
@@ -610,7 +632,7 @@ execute_at(struct at_type *at_ptr)
 void
 evaluate_at(struct at_type *at_ptr, struct value *val_ptr)
 {
-    double temp;
+    double temp = 0;
 
     undefined = FALSE;
     errno = 0;
@@ -634,6 +656,9 @@ evaluate_at(struct at_type *at_ptr, struct value *val_ptr)
 	(void) pop(val_ptr);
 	check_stack();
 	/* At least one machine (ATT 3b1) computes Inf without a SIGFPE */
+#if (GP_STRING_VARS > 1)
+	if (val_ptr->type != STRING)
+#endif
 	temp = real(val_ptr);
 	if (temp > VERYLARGE || temp < -VERYLARGE) {
 	    undefined = TRUE;

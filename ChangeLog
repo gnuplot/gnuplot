@@ -1,3 +1,25 @@
+2004-10-27  Ethan Merritt  <merritt@u.washington.edu>
+
+	String variables - extra features
+	---------------------------------
+	Autoconversion of strings to numerical values if encountered during
+	evaluation of a numerical expression.  ("3" + "4.5" == 7.5) is true.
+	Autoconverion of integers to strings if encountered as an operand for
+	string concatenation. ("file" . 4 eq "file4") is true.
+
+	* configure.in: GP_STRING_VARS is #defined as 2 if these extra features
+	are desired. Defining it as 1 leaves the basic feature set enabled but
+	disables the extra stuff.
+
+	* docs/gnuplot.doc src/eval.c src/eval.h src/internal.c src/standard.c:
+	New routine pop_or_convert_from_string(), aliased to pop() during
+	numerical evaluation. Treat INTGR operand to f_concatenate as a
+	special case, promoting it to STRING.
+	
+	* src/parse.c (const_express):
+	Suppress possible autoconversion to a number if the caller specifically
+	expects a string value to be returned.
+
 2004-10-27  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/term.c docs/gnuplot.doc: New 'set multiplot layout' options

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: internal.c,v 1.19 2004/07/01 17:10:06 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: internal.c,v 1.20 2004/10/26 04:30:51 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - internal.c */
@@ -38,7 +38,7 @@ static char *RCSid() { return RCSid("$Id: internal.c,v 1.19 2004/07/01 17:10:06 
 #include "internal.h"
 
 #include "stdfn.h"
-
+#include "alloc.h"
 #include "util.h"		/* for int_error() */
 
 #include <math.h>
@@ -303,6 +303,14 @@ f_band(union argument *arg)
 }
 
 
+#if (GP_STRING_VARS > 1)
+/*
+ * Make all the following internal routines perform autoconversion
+ * from string to numeric value.
+ */
+#define pop(x) pop_or_convert_from_string(x)
+#endif
+
 void
 f_uminus(union argument *arg)
 {
@@ -336,6 +344,7 @@ f_eq(union argument *arg)
     (void) arg;			/* avoid -Wunused warning */
     (void) pop(&b);
     (void) pop(&a);
+
     switch (a.type) {
     case INTGR:
 	switch (b.type) {
@@ -670,7 +679,17 @@ f_minus(union argument *arg)
 	    BAD_DEFAULT
 	}
 	break;
-	BAD_DEFAULT
+
+#if (GP_STRING_VARS > 1)
+    case STRING:
+    /* We can only get here if the STRING_RESULT_ONLY flag was set. */
+    /* This is triggered by the old syntax "set xlabel 'foo' -1,1"  */
+	FPRINTF((stderr,"Ignore <string> - <number>\n"));
+	result = a;
+	break;
+#endif
+
+    BAD_DEFAULT
     }
     push(&result);
 }
@@ -968,6 +987,10 @@ f_factorial(union argument *arg)
 }
 
 #ifdef GP_STRING_VARS
+/*
+ * Terminate the autoconversion from string to numeric values
+ */
+#undef pop
 
 void
 f_concatenate(union argument *arg)
@@ -978,7 +1001,14 @@ f_concatenate(union argument *arg)
     (void) pop(&b);
     (void) pop(&a);
 
-    if(a.type != STRING || b.type != STRING)
+    if (b.type == INTGR) {
+	int i = b.v.int_val;
+	b.type = STRING;
+	b.v.string_val = (char *)gp_alloc(16,"str_const");
+	snprintf(b.v.string_val,16,"%d",i);
+    }
+
+    if (a.type != STRING || b.type != STRING)
 	int_error(NO_CARET, "internal error : STRING operator applied to non-STRING type");
 
     (void) Gstring(&result, gp_stradd(a.v.string_val, b.v.string_val));

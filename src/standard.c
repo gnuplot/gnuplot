@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: standard.c,v 1.18 2004/07/25 12:25:01 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: standard.c,v 1.19 2004/10/26 04:31:12 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - standard.c */
@@ -480,6 +480,14 @@ static double GPFAR qyone[] = {
 
 #endif /* (ATARI || MTOS) && __PUREC__ */
 
+#if (GP_STRING_VARS > 1)
+/*
+ * Make all the following internal routines perform autoconversion
+ * from string to numeric value.
+ */
+#define pop(x) pop_or_convert_from_string(x)
+#endif
+
 void
 f_real(union argument *arg)
 {
@@ -955,6 +963,10 @@ f_ceil(union argument *arg)
     }
 }
 
+#if (GP_STRING_VARS > 1)
+/* Terminate the autoconversion from string to numeric values */
+#undef pop
+#endif
 
 #ifdef GP_ISVAR
 /* JSR - Check to see if a variable is defined */

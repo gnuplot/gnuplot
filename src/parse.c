@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: parse.c,v 1.26 2004/09/11 17:46:02 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: parse.c,v 1.27 2004/10/26 04:30:51 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - parse.c */
@@ -101,7 +101,17 @@ const_express(struct value *valptr)
     /* div - no dummy variables in a constant expression */
     dummy_func = NULL;
 
-    evaluate_at(temp_at(), valptr);	/* run it and send answer back */
+#if (GP_STRING_VARS > 1)
+    /* If the caller insists on a string return, honor the request */
+    if (valptr->type == STRING) {
+	STRING_RESULT_ONLY = TRUE;
+	evaluate_at(temp_at(), valptr);	/* run it and send answer back */
+	STRING_RESULT_ONLY = FALSE;
+    } else
+#endif
+    /* The usual case */
+	evaluate_at(temp_at(), valptr);	/* run it and send answer back */
+
     if (undefined) {
 	int_error(tkn, "undefined value");
     }
