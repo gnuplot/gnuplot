@@ -1,5 +1,5 @@
 /*
- * $Id: ipc.h,v 1.6 2000/10/31 19:59:31 joze Exp $
+ * $Id: ipc.h,v 1.7 2000/11/01 18:57:33 broeker Exp $
  */
 
 /* GNUPLOT - ipc.h */
@@ -45,11 +45,11 @@
 
 #include "syscfg.h"
 
-char* readline_ipc __PROTO((const char*));
 /*
- * special readline_ipc routine for IPC communication, usual readline 
- * otherwise (OS/2)
+ * special readline_ipc routine for IPC communication,
+ * usual readline otherwise (OS/2)
  */
+char *readline_ipc __PROTO((const char*));
 
 # ifndef OS2
 /*
