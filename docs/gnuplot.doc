@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.271 2005/01/09 00:04:44 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.272 2005/02/01 11:55:05 broeker Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -6088,6 +6088,7 @@ C ... and restart the table:
     `textcolor` may be abbreviated `tc`.
     `tc default` resets the text color to its default state.
     `tc lt <n>` sets the text color to that of line type <n>.
+    `tc ls <n>` sets the text color to that of line style <n>.
     `tc palette z` selects a palette color corresponding to the label z position.
     `tc palette cb <val>` selects a color corresponding to <val> on the colorbar.
     `tc palette fraction <val>`, with 0<=val<=1, selects a color corresponding to

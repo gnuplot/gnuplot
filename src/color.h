@@ -1,5 +1,5 @@
 /*
- * $Id: color.h,v 1.20 2004/11/28 02:02:51 sfeam Exp $
+ * $Id: color.h,v 1.21 2004/12/05 08:04:41 sfeam Exp $
  */
 
 /* GNUPLOT - color.h */
@@ -36,15 +36,16 @@ of palettes between terminals and making palette routines.
  * Supplements basic linetype choice */
 typedef struct t_colorspec {
     int type;			/* TC_<type> definitions below */
-    int lt;			/* used for TC_LT and TC_RGB */
+    int lt;			/* used for TC_LT, TC_LINESTYLE and TC_RGB */
     double value;		/* used for TC_CB and TC_FRAC */
 } t_colorspec;
 #define	TC_DEFAULT	0
 #define	TC_LT		1
-#define	TC_RGB		2
-#define	TC_CB		3
-#define	TC_FRAC		4
-#define	TC_Z		5
+#define	TC_LINESTYLE	2
+#define	TC_RGB		3
+#define	TC_CB		4
+#define	TC_FRAC		5
+#define	TC_Z		6
 
 #define DEFAULT_COLORSPEC {TC_DEFAULT, 0, 0.0}
 

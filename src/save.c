@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.97 2005/01/10 21:02:43 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.98 2005/02/03 06:47:59 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -1052,6 +1052,8 @@ save_textcolor(FILE *fp, const struct t_colorspec *tc)
     	fprintf(fp, " textcolor");
 	switch(tc->type) {
 	case TC_LT:   fprintf(fp," lt %d", tc->lt+1);
+		      break;
+	case TC_LINESTYLE:   fprintf(fp," linestyle %d", tc->lt);
 		      break;
 	case TC_Z:    fprintf(fp," palette z");
 		      break;

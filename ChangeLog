@@ -1,3 +1,10 @@
+2005-02-05  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/color.h src/save.c (save_textcolor) src/gadgets (apply_pm3dcolor)
+	src/misc.c (lp_use_properties) docs/gnuplot.doc:
+	New internal flag TC_LINESTYLE allows text to take its color from a
+	line style. For example:    set label "foo" textcolor linestyle 2
+
 2005-02-04  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c (do_key_sample plot_boxes)

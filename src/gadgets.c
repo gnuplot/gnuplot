@@ -384,13 +384,26 @@ clip_vector(unsigned int x, unsigned int y)
 void
 apply_pm3dcolor(struct t_colorspec *tc, const struct termentry *t)
 {
+
+    /* Replace colorspec with that of the requested line style */
+    struct lp_style_type style;
+    if (tc->type == TC_LINESTYLE) {
+	lp_use_properties(&style, tc->lt, 0);
+	(*t->linetype)(style.l_type);
+#ifdef PM3D
+	tc = &style.pm3d_color;
+#else
+	return;
+#endif
+    }
+
     if (tc->type == TC_DEFAULT) {
 	(*t->linetype)(LT_BLACK);
-       return;
+	return;
     }
     if (tc->type == TC_LT) {
 	(*t->linetype)(tc->lt);
-       return;
+	return;
     }
 #ifdef PM3D
     if (tc->type == TC_RGB && t->set_color) {

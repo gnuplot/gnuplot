@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.60 2004/12/01 21:10:35 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.61 2005/02/01 11:28:51 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -726,6 +726,13 @@ lp_use_properties(struct lp_style_type *lp, int tag, int pointflag)
     while (this != NULL) {
 	if (this->tag == tag) {
 	    *lp = this->lp_properties;
+#ifdef PM3D
+	    /* FIXME - It would be nicer if this were always true already */
+	    if (!lp->use_palette) {
+		lp->pm3d_color.type = TC_LT;
+		lp->pm3d_color.lt = lp->l_type;
+	    }
+#endif
 	    lp->pointflag = pointflag;
 	    return;
 	} else {
@@ -966,6 +973,10 @@ parse_colorspec(struct t_colorspec *tc, int options)
     } else if (options <= TC_LT) {
 	tc->type = TC_DEFAULT;
 	int_error(c_token, "only tc lt <n> possible here");
+    } else if (equals(c_token,"ls") || almost_equals(c_token,"lines$tyle")) {
+    	c_token++;
+	tc->type = TC_LINESTYLE;
+	tc->lt = (int)real(const_express(&a));
 #ifdef PM3D
     } else if (almost_equals(c_token,"rgb$color")) {
 	char *color;
