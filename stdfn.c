@@ -151,12 +151,11 @@ const char *cs, *ct;
     return (char *)cs;
   
   len = strlen(ct);
-  while (*cs)
-    {
-      if (STREQN(cs, ct, len))
+  while (*cs) {
+    if (strncmp(cs, ct, len)==0)
 	return (char *)cs;
       cs++;
-    }
+  }
 
   return NULL;
 }

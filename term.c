@@ -875,7 +875,7 @@ int length;
     struct termentry *t = NULL;
 
     for (i = 0; i < TERMCOUNT; i++) {
-	if (STREQN(name, term_tbl[i].name, length)) {
+	if (!strncmp(name, term_tbl[i].name, length)) {
 	    if (t)
 		return (NULL);	/* ambiguous */
 	    t = term_tbl + i;
@@ -911,7 +911,7 @@ int length;
 	term->linewidth = null_linewidth;
 
     /* Special handling for unixplot term type */
-    if (STREQN("unixplot", name, 8)) {
+    if (!strncmp("unixplot", name, 8)) {
 	UP_redirect(2);		/* Redirect actual stdout for unixplots */
     } else if (unixplot) {
 	UP_redirect(3);		/* Put stdout back together again. */
@@ -961,21 +961,21 @@ void init_terminal()
 #ifdef NEXT
 	env_term = getenv("TERM");
 	if (term_name == (char *) NULL
-	    && env_term != (char *) NULL && STREQ(env_term, "next"))
+	    && env_term != (char *) NULL && strcmp(env_term, "next") == 0)
 	    term_name = "next";
 #endif /* NeXT */
 
 #ifdef __BEOS__
 	env_term = getenv("TERM");
 	if (term_name == (char *) NULL
-	    && env_term != (char *) NULL && STREQ(env_term, "beterm"))
+	    && env_term != (char *) NULL && strcmp(env_term, "beterm") == 0)
 	    term_name = "be";
 #endif /* BeOS */
 
 #ifdef SUN
 	env_term = getenv("TERM");	/* try $TERM */
 	if (term_name == (char *) NULL
-	    && env_term != (char *) NULL && STREQ(env_term, "sun"))
+	    && env_term != (char *) NULL && strcmp(env_term, "sun") == 0)
 	    term_name = "sun";
 #endif /* SUN */
 
@@ -998,7 +998,7 @@ void init_terminal()
 #ifdef X11
 	env_term = getenv("TERM");	/* try $TERM */
 	if (term_name == (char *) NULL
-	    && env_term != (char *) NULL && STREQ(env_term, "xterm"))
+	    && env_term != (char *) NULL && strcmp(env_term, "xterm") == 0)
 	    term_name = "x11";
 	display = getenv("DISPLAY");
 	if (term_name == (char *) NULL && display != (char *) NULL)

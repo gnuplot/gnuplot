@@ -111,10 +111,6 @@ typedef int TBOOLEAN;
 /* Minimum number of chars to represent an integer */
 #define INT_STR_LEN (3*sizeof(int))
 
-/* Useful macros to compare strings */
-#define STREQ(a, b) ((a)[0] == (b)[0] && strcmp(a, b) == 0)
-#define STREQN(a, b, n) ((a)[0] == (b)[0] && strncmp(a, b, n) == 0)
-
 /* Concatenate a path name and a file name. The file name
  * may or may not end with a "directory separation" character.
  * Path must not be NULL, but can be empty

@@ -704,7 +704,7 @@ char *line;
     entry = history;
     while (entry != NULL) {
 	/* Don't store duplicate entries */
-	if (STREQ(entry->line, line)) {
+	if (!strcmp(entry->line, line)) {
 	    /* cmd lines are equal, relink entry that was found last */
 	    if (entry->next == NULL) {
 		/* previous command repeated, no change */
@@ -852,7 +852,7 @@ char tos_getch()
     int scan_code;
     static int in_help = 0;
 
-    if (STREQ(term->name, "atari"))
+    if (strcmp(term->name, "atari") == 0)
 	poll_events(0);
 
     if (in_help) {
@@ -877,7 +877,7 @@ char tos_getch()
 	    return ' ';
 	}
     }
-    if (STREQ(term->name, "atari")) {
+    if (strcmp(term->name, "atari") == 0) {
 	do {
 	    if (Bconstat(2))
 		rawkey = Cnecin();

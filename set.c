@@ -2014,7 +2014,7 @@ char *tic_side;
 	/* if tics are off, reset to default (border) */
 	if (*TICS == NO_TICS) {
 	    *TICS = TICS_ON_BORDER;
-	    if (STREQ(tic_side, "x") || STREQ(tic_side, "y")) {
+	    if (!strcmp(tic_side, "x") || !strcmp(tic_side, "y")) {
 		*TICS |= TICS_MIRROR;
 	    }
 	}

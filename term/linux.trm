@@ -126,8 +126,8 @@ void LINUX_setup(void)
 	fgets(line, 256, pipe);
 	pclose(pipe);
 	line[strlen(line) - 1] = '\0';
-	if (STREQ(line, "/dev/console") ||
-	    (STREQN(line, "/dev/tty", 8)  && isdigit(line[8])))
+	if (strcmp(line, "/dev/console") == 0 ||
+	    (strncmp(line, "/dev/tty", 8) == 0 && isdigit(line[8])))
 	    LINUX_graphics_allowed = TRUE;
     }
     if (LINUX_graphics_allowed) {
