@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.21 2000/12/20 19:49:23 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.22 2001/03/19 14:52:23 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -287,7 +287,11 @@ set y2data%s\n",
 	else
 	    fputs("set grid nopolar\n", fp);
 	fprintf(fp,
+#ifdef PM3D
+		"set grid %sxtics %sytics %sztics %sx2tics %sy2tics %smxtics %smytics %smztics %smx2tics %smy2tics %scbtics %smcbtics lt %d lw %.3f, lt %d lw %.3f\n",
+#else
 		"set grid %sxtics %sytics %sztics %sx2tics %sy2tics %smxtics %smytics %smztics %smx2tics %smy2tics lt %d lw %.3f, lt %d lw %.3f\n",
+#endif
 		grid_selection & GRID_X ? "" : "no",
 		grid_selection & GRID_Y ? "" : "no",
 		grid_selection & GRID_Z ? "" : "no",
@@ -298,6 +302,10 @@ set y2data%s\n",
 		grid_selection & GRID_MZ ? "" : "no",
 		grid_selection & GRID_MX2 ? "" : "no",
 		grid_selection & GRID_MY2 ? "" : "no",
+#ifdef PM3D
+		grid_selection & GRID_CB ? "" : "no",
+		grid_selection & GRID_MCB ? "" : "no",
+#endif
 		grid_lp.l_type + 1, grid_lp.l_width,
 		mgrid_lp.l_type + 1, mgrid_lp.l_width);
     }
@@ -679,6 +687,9 @@ set ticscale %g %g\n",
     SAVE_MINI(FIRST_Z_AXIS);	/* HBB 20000506: noticed mztics were not saved! */
     SAVE_MINI(SECOND_X_AXIS);
     SAVE_MINI(SECOND_Y_AXIS);
+#ifdef PM3D
+    SAVE_MINI(COLOR_AXIS);
+#endif
 #undef SAVE_MINI
 
     save_tics(fp, FIRST_X_AXIS);
@@ -686,6 +697,9 @@ set ticscale %g %g\n",
     save_tics(fp, FIRST_Z_AXIS);
     save_tics(fp, SECOND_X_AXIS);
     save_tics(fp, SECOND_Y_AXIS);
+#ifdef PM3D
+    save_tics(fp, COLOR_AXIS);
+#endif
 
 #define SAVE_AXISLABEL_OR_TITLE(name,suffix,lab)	\
     {							\
@@ -719,6 +733,9 @@ set ticscale %g %g\n",
     SAVE_TIMEFMT(FIRST_Z_AXIS);
     SAVE_TIMEFMT(SECOND_X_AXIS);
     SAVE_TIMEFMT(SECOND_Y_AXIS);
+#ifdef PM3D
+    SAVE_TIMEFMT(COLOR_AXIS);
+#endif
 #undef SAVE_TIMEFMT
     
 #define SAVE_AXISLABEL(axis)					\
@@ -738,6 +755,10 @@ set ticscale %g %g\n",
     SAVE_AXISLABEL(FIRST_Z_AXIS);
     save_range(fp, FIRST_Z_AXIS);
 
+#ifdef PM3D
+    SAVE_AXISLABEL(COLOR_AXIS);
+    save_range(fp, COLOR_AXIS);
+#endif
 #undef SAVE_AXISLABEL
 #undef SAVE_AXISLABEL_OR_TITLE
 

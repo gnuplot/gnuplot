@@ -1,3 +1,9 @@
+2001-03-27  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* src/save.c: save color axis properties.
+
+	* docs/gnuplot.doc: link 'set term push/pop' from 'help save'.
+
 2001-03-21  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/color.c: changed default colour box position and size;

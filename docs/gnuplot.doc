@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.63 2001/03/19 14:52:23 mikulik Exp $
+C RCS $Id: gnuplot.doc,v 1.64 2001/03/21 17:05:34 mikulik Exp $
 C 3 December 1998
 C Copyright (C) 1986 - 1993, 1998   Thomas Williams, Colin Kelley
 C
@@ -3152,7 +3152,9 @@ C ... and restart the table:
  the comment marker in front of it. This is mainly useful for
  switching the `terminal` setting for a short while, and getting back
  to the previously set terminal, afterwards, by loading the saved
- `terminal` status.
+ `terminal` status. Note that for a single gnuplot session you may
+ rather use the other method of saving and restoring current terminal
+ by the commands `set term push` and `set term pop`, see `set term`.
 
  The filename must be enclosed in quotes.
 
@@ -5002,7 +5004,7 @@ C ... and restart the table:
 
  Choose the option `labels` to get real gnuplot labels on Button 2.
  (The default is `nolabels` which makes Button 2 drawing only
-  temporary annotations at the mouse positions). The labes are
+ temporary annotations at the mouse positions). The labes are
  drawn with the current setting of `mouseformat`. `labeloptions`
  controls which options are passed to the `set label` command.
  The default is "pointstyle 1" which will plot a small plus at
@@ -5032,7 +5034,7 @@ C ... and restart the table:
  (see `help bind`).  Note, that user defined `hotkeys` may override
  the default bindings.
 
- see also `help bind` and `help label`.
+ See also `help bind` and `help label`.
 3 multiplot
 
 ?commands set nomultiplot
@@ -6148,7 +6150,7 @@ C  The `lines` style connects adjacent points with straight line segments.
  Several terminals have additional options.  For example, see `dumb`,
  `iris4d`, `hpljii` or `postscript`.
 
- The command `set term push` remembers the current terminal including its 
+ The command `set term push` remembers the current terminal including its
  settings while `set term pop` restores it. This is equivalent to `save term`
  and `load term`, but without accessing the filesystem. Therefore they can be
  used to achieve platform independent restoring of the terminal after printing,
