@@ -131,6 +131,9 @@ static void mif_put_point __PROTO((unsigned int x, unsigned int y, int np));
 #define cfree free
 #endif
 
+/* From version.c */
+extern char version[];
+extern char patchlevel[];
 
 static struct mif_line { /* Line point structure specification */
 	float fpos_x;           /* Line point X coordinate */
@@ -412,9 +415,6 @@ int number;
 TERM_PUBLIC void MIF_init()
 {
 	int i;
-
-	extern char version[];		/* Declared in ../version.c */
-	extern char patchlevel[];
 
 	/* Process if not inside a MIF file and Frame */
 	if (mif_initialized == 0 && mif_in_frame == 0) {

@@ -107,7 +107,12 @@ TERM_PUBLIC void PS_pointsize __PROTO((double pointsize)); /* JFi [pointsize] */
 #ifdef TERM_BODY
 /* PostScript driver by Russell Lang, rjl@monu1.cc.monash.edu.au */
 
-#define PS_FLUSH_PATH if (ps_path_count) { fprintf(gpoutfile, "stroke "); ps_path_count = 0; }
+/* From version.c */
+extern char version[];
+extern char patchlevel[];
+
+#define PS_FLUSH_PATH \
+    if (ps_path_count) { fprintf(gpoutfile, "stroke "); ps_path_count = 0; }
 
 static char *PS_RememberFont __PROTO((char *fname, int reencode));
 static void ENHPS_put_text __PROTO((unsigned int x, unsigned int y, char *str));
@@ -810,8 +815,6 @@ NULL };
 	struct termentry *t = term;
 	int i;
         time_t now;
-	extern char version[];
-	extern char patchlevel[];
 
 	ps_common_encap = encap; /* store for later */
 	ps_common_portrait = portrait; /* store for later */

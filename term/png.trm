@@ -90,6 +90,10 @@ TERM_PUBLIC void PNGpoint __PROTO((unsigned int x, unsigned int y, int point));
 
 /* png version test now in configure */
 
+/* From version.c */
+extern char version[];
+extern char patchlevel[];
+
 /* make XMAX and YMAX a multiple of 8 */
 #define PNG_XMAX (640)
 #define PNG_YMAX (480)
@@ -225,8 +229,6 @@ void PNGtext()
   int red, green, blue;
   png_text pngtext;
   char text[100];
-  extern char version[];
-  extern char patchlevel[];
 
   png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
   if (!png_ptr) {
