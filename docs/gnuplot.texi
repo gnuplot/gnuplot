@@ -115,7 +115,7 @@ Alex Woo
 * Copyright::                   
 * Introduction::                
 * Seeking-assistance::          
-* What's_New_in_version_3.7::   
+* What_is_New_in_version_3.7::  
 * bind::                        
 * Batch/Interactive_Operation::  
 * Command-line-editing::        
@@ -255,7 +255,7 @@ The new `gnuplot` user should begin by reading about `plotting` (if on-line,
 type `help plotting`).
 @uref{http://www.nas.nasa.gov/~woo/gnuplot/simple/simple.html,Simple Plots Demo }
 
-@node Seeking-assistance, What's_New_in_version_3.7, Introduction, gnuplot
+@node Seeking-assistance, What_is_New_in_version_3.7, Introduction, gnuplot
 @section Seeking-assistance
 
 @cindex seeking-assistance
@@ -300,15 +300,8 @@ known bugs:
 }
 
 Before seeking help, please check the
-@uref{http://www.uni-karlsruhe.de/~ig25/gnuplot-faq.html,FAQ (Frequently Asked Questions) list.
+@uref{http://www.gnuplot.org/gnuplot/faq/,FAQ (Frequently Asked Questions) list.
 }
-If you do not have a copy of the FAQ, you may request a copy by email from
-the Majordomo address above, ftp a copy from
-@example
-      ftp://ftp.dartmouth.edu/pub/gnuplot
-@end example
-
-or see the WWW `gnuplot` page.
 
 When posting a question, please include full details of the version of
 `gnuplot`, the machine, and operating system you are using.  A _small_ script
@@ -317,8 +310,9 @@ datafile plots.  If email-ing to info-gnuplot, please state whether or not
 you are subscribed to the list, so that users who use news will know to email
 a reply to you.  There is a form for such postings on the WWW site.
 
-@node What's_New_in_version_3.7, bind, Seeking-assistance, gnuplot
-@section What's New in version 3.7
+
+@node What_is_New_in_version_3.7, bind, Seeking-assistance, gnuplot
+@section What is New in version 3.7
 
 @cindex new-features
 
@@ -395,7 +389,7 @@ combined and stored for further use.  See `set style line`.
 26. Text (labels, tic labels, and the time stamp) can be written vertically
 by those terminals capable of doing so.
 
-@node bind, Batch/Interactive_Operation, What's_New_in_version_3.7, gnuplot
+@node bind, Batch/Interactive_Operation, What_is_New_in_version_3.7, gnuplot
 @section bind
 
 @c ?commands bind
@@ -2195,7 +2189,7 @@ for details.
 
 @menu
 * adjustable_parameters::       
-* beginner's_guide::            
+* short_introduction::          
 * error_estimates::             
 * fit_controlling::             
 * multi-branch::                
@@ -2203,7 +2197,7 @@ for details.
 * tips::                        
 @end menu
 
-@node adjustable_parameters, beginner's_guide, fit, fit
+@node adjustable_parameters, short_introduction, fit, fit
 @subsection adjustable parameters
 
 @c ?commands fit parameters
@@ -2242,8 +2236,8 @@ designate variables as fixed parameters so that their values are reported by
 `fit`.  The keyword `# FIXED` has to appear in exactly this form.
 
 
-@node beginner's_guide, error_estimates, adjustable_parameters, fit
-@subsection beginner's guide
+@node short_introduction, error_estimates, adjustable_parameters, fit
+@subsection short introduction
 
 @c ?commands fit beginners_guide
 @c ?fit beginners_guide
@@ -2313,7 +2307,7 @@ However, if all you really want is a smooth curve through your data points,
 the @ref{smooth} option to @ref{plot} may be what you've been looking for rather
 than `fit`.
 
-@node error_estimates, fit_controlling, beginner's_guide, fit
+@node error_estimates, fit_controlling, short_introduction, fit
 @subsection error estimates
 
 @c ?commands fit error_estimate
