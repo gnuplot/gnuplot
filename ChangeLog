@@ -1,3 +1,13 @@
+2002-03-26  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	MS VC++ build patches from John Bollinger <bbands@yahoo.com>:
+
+	* config/makefile.nt (MACHINE): Don't strictly require
+ 	$PROCESSOR_ARCHITECTURE in their environment variable
+	(bf_test.exe): Change "cd" argument to be more portable.
+	(clean, veryclean): Avoid error spurious messages by not deleting
+ 	non-existant files.
+
 2002-03-26  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/command.h src/command.c: Routine do_string() always available
@@ -182,7 +192,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/03/25 14:15:02 $).
+	last modification date (from the tag $Date: 2002/03/26 09:43:00 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
