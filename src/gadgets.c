@@ -166,17 +166,17 @@ TBOOLEAN suppressMove = FALSE;	/* to prevent moveto while drawing contours */
  */
 int
 clip_point(x, y)
-unsigned int x, y;
+    unsigned int x, y;
 {
     int ret_val = 0;
 
-    if (x < xleft)
+    if ((int)x < xleft)
 	ret_val |= 0x01;
-    if (x > xright)
+    if ((int)x > xright)
 	ret_val |= 0x02;
-    if (y < ybot)
+    if ((int)y < ybot)
 	ret_val |= 0x04;
-    if (y > ytop)
+    if ((int)y > ytop)
 	ret_val |= 0x08;
 
     return ret_val;
