@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.50 2003/02/16 00:07:36 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.51 2003/02/18 16:19:53 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -95,10 +95,7 @@ static void unset_locale __PROTO((void));
 static void reset_logscale __PROTO((AXIS_INDEX));
 static void unset_logscale __PROTO((void));
 static void unset_mapping __PROTO((void));
-static void unset_bmargin __PROTO((void));
-static void unset_lmargin __PROTO((void));
-static void unset_rmargin __PROTO((void));
-static void unset_tmargin __PROTO((void));
+static void unset_margin __PROTO((int *));
 static void unset_missing __PROTO((void));
 #ifdef USE_MOUSE
 static void unset_mouse __PROTO((void));
@@ -256,16 +253,16 @@ unset_command()
 	unset_mapping();
 	break;
     case S_BMARGIN:
-	unset_bmargin();
+	unset_margin(&bmargin);
 	break;
     case S_LMARGIN:
-	unset_lmargin();
+	unset_margin(&lmargin);
 	break;
     case S_RMARGIN:
-	unset_rmargin();
+	unset_margin(&rmargin);
 	break;
     case S_TMARGIN:
-	unset_tmargin();
+	unset_margin(&tmargin);
 	break;
     case S_DATAFILE:
 	unset_missing();
@@ -732,7 +729,7 @@ static void
 unset_decimalsign()
 {
     if (decimalsign != NULL)
-        free(decimalsign);
+	free(decimalsign);
     decimalsign = NULL;
 }
 
@@ -742,7 +739,7 @@ static void
 unset_fit()
 {
     if (fitlogfile != NULL)
-        free(fitlogfile);
+	free(fitlogfile);
     fitlogfile = NULL;
 #if GP_FIT_ERRVARS
     fit_errorvariables = FALSE;
@@ -761,12 +758,12 @@ unset_format()
     if ((axis = lookup_table(axisname_tbl, c_token)) >= 0) {
 	set_for_axis[axis] = TRUE;
     } else if (equals(c_token,"xy") || equals(c_token,"yx")) {
-        set_for_axis[FIRST_X_AXIS]
+	set_for_axis[FIRST_X_AXIS]
 	    = set_for_axis[FIRST_Y_AXIS]
 	    = TRUE;
-        c_token++;
+	c_token++;
     } else if (isstring(c_token) || END_OF_COMMAND) {
-        /* Assume he wants all */
+	/* Assume he wants all */
 	for (axis = 0; axis < AXIS_ARRAY_SIZE; axis++)
 	    set_for_axis[axis] = TRUE;
     }
@@ -977,37 +974,12 @@ unset_mapping()
 }
 
 
-/* process 'unset bmargin' command */
+/* process 'unset {blrt}margin' command */
 static void
-unset_bmargin()
+unset_margin(int *margin)
 {
-    bmargin = -1;
+    *margin = -1;
 }
-
-
-/* process 'unset lmargin' command */
-static void
-unset_lmargin()
-{
-    lmargin = -1;
-}
-
-
-/* process 'unset rmargin' command */
-static void
-unset_rmargin()
-{
-    rmargin = -1;
-}
-
-
-/* process 'unset tmargin' command */
-static void
-unset_tmargin()
-{
-    tmargin = -1;
-}
-
 
 /* process 'unset datafile' command */
 static void
@@ -1048,8 +1020,8 @@ unset_tics(axis)
     axis_array[axis].ticmode = NO_TICS;
 
     if (axis_array[axis].ticdef.font) {
-        free(axis_array[axis].ticdef.font);
-        axis_array[axis].ticdef.font = NULL;
+	free(axis_array[axis].ticdef.font);
+	axis_array[axis].ticdef.font = NULL;
     }
     axis_array[axis].ticdef.textcolor.type = TC_DEFAULT;
     axis_array[axis].ticdef.textcolor.lt = 0;
@@ -1222,8 +1194,8 @@ static void
 unset_style()
 {
     if (END_OF_COMMAND) {
-        data_style = POINTSTYLE;
-        func_style = LINES;
+	data_style = POINTSTYLE;
+	func_style = LINES;
 	while (first_linestyle != NULL)
 	    delete_linestyle((struct linestyle_def *) NULL, first_linestyle);
 #if USE_ULIG_FILLEDBOXES
@@ -1235,11 +1207,11 @@ unset_style()
 
     switch(lookup_table(show_style_tbl, c_token)){
     case SHOW_STYLE_DATA:
-        data_style = POINTSTYLE;
+	data_style = POINTSTYLE;
 	c_token++;
 	break;
     case SHOW_STYLE_FUNCTION:
-        func_style = LINES;
+	func_style = LINES;
 	c_token++;
 	break;
     case SHOW_STYLE_LINE:
@@ -1259,9 +1231,9 @@ unset_style()
 	break;
     default:
 #if USE_ULIG_FILLEDBOXES
-        int_error(c_token, "expecting 'data', 'function', 'line', 'fill' or 'arrow'");
+	int_error(c_token, "expecting 'data', 'function', 'line', 'fill' or 'arrow'");
 #else
-        int_error(c_token, "expecting 'data', 'function', 'line', 'fill' or 'arrow'");
+	int_error(c_token, "expecting 'data', 'function', 'line', 'fill' or 'arrow'");
 #endif /* USE_ULIG_FILLEDBOXES */
     }
 }
@@ -1539,10 +1511,10 @@ reset_command()
     unset_ticscale();
     unset_ticslevel();
     unset_tics_in();
-    unset_lmargin();
-    unset_bmargin();
-    unset_rmargin();
-    unset_tmargin();
+    unset_margin(&bmargin);
+    unset_margin(&lmargin);
+    unset_margin(&rmargin);
+    unset_margin(&tmargin);
     unset_pointsize();
     unset_encoding();
     unset_decimalsign();
