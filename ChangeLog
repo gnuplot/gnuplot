@@ -1,3 +1,9 @@
+2002-01-25  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/save.c (save_set_all): Removed unused variable. Fixed highly
+ 	probable typo this_arrow->layer in the middle of 'set label'
+ 	treatment.
+	
 2002-01-25  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* NEWS: Added some text from ANNOUNCE-MOUSE.

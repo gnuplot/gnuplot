@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.34 2002/01/22 15:52:24 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.35 2002/01/24 13:55:27 amai Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -211,7 +211,6 @@ save_set_all(fp)
     struct text_label *this_label;
     struct arrow_def *this_arrow;
     struct linestyle_def *this_linestyle;
-    AXIS_INDEX i;
 
     /* opinions are split as to whether we save term and outfile
      * as a compromise, we output them as comments !
@@ -394,7 +393,7 @@ set y2data%s\n",
 	fprintf(fp, " %srotate", this_label->rotate ? "" : "no");
 	if (this_label->font != NULL)
 	    fprintf(fp, " font \"%s\"", this_label->font);
-	fprintf(fp, " %s", (this_arrow->layer==0) ? "back" : "front");
+	fprintf(fp, " %s", (this_label->layer==0) ? "back" : "front");
 	if (this_label->lp_properties.pointflag)
 	    fprintf(fp, " nopoint");
 	else {
