@@ -1,5 +1,5 @@
 /*
- * $Id: vws.trm,v 1.7 1998/12/14 18:41:49 lhecking Exp $
+ * $Id: vws.trm,v 1.8 1999/06/10 19:54:57 lhecking Exp $
  *
  */
 
@@ -117,7 +117,6 @@ wc_ymin, wc_xmax, wc_ymax, vd_width, vd_height;
 
 void VWS_resize_ast()
 {
-    extern void replotrequest();	/* in command.c */
     uis$resize_window(&vd_id, &wd_id, &x0, &y0, &xsiz, &ysiz,
 		      &wc_xmin, &wc_ymin, &wc_xmax, &wc_ymax);
     replotrequest();
