@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.29 2001/10/05 16:58:55 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.30 2001/11/29 14:12:55 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -945,6 +945,7 @@ eval_3dplots()
 
 	    TBOOLEAN duplication = FALSE;
 	    TBOOLEAN set_title = FALSE, set_with = FALSE;
+	    TBOOLEAN set_lpstyle = FALSE;
 
 	    if (isstring(c_token)) {	/* data file to plot */
 
@@ -1063,69 +1064,84 @@ eval_3dplots()
 	    while (!END_OF_COMMAND) {
 
 		/* deal with title */
-	    if (almost_equals(c_token, "t$itle")) {
-		    if (set_title) { duplication=TRUE; break; }
-		this_plot->title_no_enhanced = 0; /* can be enhanced */
-		if (parametric) {
-		    if (crnt_param != 0)
-			int_error(c_token, "\"title\" allowed only after parametric function fully specified");
-		    else {
-			if (xtitle != NULL)
-			    xtitle[0] = NUL;	/* Remove default title . */
-			if (ytitle != NULL)
-			    ytitle[0] = NUL;	/* Remove default title . */
+		if (almost_equals(c_token, "t$itle")) {
+		    if (set_title) {
+			duplication=TRUE;
+			break;
 		    }
-		}
-		if (isstring(++c_token))
-		    m_quote_capture(&(this_plot->title), c_token, c_token);
-		else
-		    int_error(c_token, "expecting \"title\" for plot");
-		/* end of new method */
+		    this_plot->title_no_enhanced = 0; /* can be enhanced */
+		    if (parametric) {
+			if (crnt_param != 0)
+			    int_error(c_token, "\"title\" allowed only after parametric function fully specified");
+			else {
+			    if (xtitle != NULL)
+				xtitle[0] = NUL;	/* Remove default title . */
+			    if (ytitle != NULL)
+				ytitle[0] = NUL;	/* Remove default title . */
+			}
+		    }
+		    if (isstring(++c_token))
+			m_quote_capture(&(this_plot->title), c_token, c_token);
+		    else
+			int_error(c_token, "expecting \"title\" for plot");
+		    /* end of new method */
 		    c_token++;
 		    set_title = TRUE;
 		    continue;
 		}
 
 		if (almost_equals(c_token, "not$itle")) {
-		    if (set_title) { duplication=TRUE; break; }
-		if (xtitle != NULL)
-		    xtitle[0] = '\0';
-		if (ytitle != NULL)
-		    ytitle[0] = '\0';
-		/*   this_plot->title = NULL;   */
+		    if (set_title) {
+			duplication=TRUE;
+			break;
+		    }
+		    if (xtitle != NULL)
+			xtitle[0] = '\0';
+		    if (ytitle != NULL)
+			ytitle[0] = '\0';
+		    /*   this_plot->title = NULL;   */
 		    c_token++;
 		    set_title = TRUE;
 		    continue;
-	    }
+		}
 
 		/* deal with style */
-	    if (almost_equals(c_token, "w$ith")) {
-		    if (set_with) { duplication=TRUE; break; }
-		this_plot->plot_style = get_style();
-	        if ((this_plot->plot_type == FUNC3D)
-                    && (this_plot->plot_style & PLOT_STYLE_HAS_ERRORBAR))
-                    {
-                        int_warn(c_token, "This plot style is only for datafiles , reverting to \"points\"");
-                        this_plot->plot_style = POINTSTYLE;
-                    }
+		if (almost_equals(c_token, "w$ith")) {
+		    if (set_with) {
+			duplication=TRUE;
+			break;
+		    }
+		    this_plot->plot_style = get_style();
+		    if ((this_plot->plot_type == FUNC3D)
+			&& (this_plot->plot_style & PLOT_STYLE_HAS_ERRORBAR))
+			{
+			    int_warn(c_token, "This plot style is only for datafiles , reverting to \"points\"");
+			    this_plot->plot_style = POINTSTYLE;
+			}
 		    set_with = TRUE;
 		    continue;
-	    }
+		}
 
-	    /* pick up line/point specs
-	     * - point spec allowed if style uses points, ie style&2 != 0
-	     * - keywords are optional
-	     */
+		/* pick up line/point specs
+		 * - point spec allowed if style uses points, ie style&2 != 0
+		 * - keywords are optional
+		 */
 		{
 		    int stored_token = c_token;
+		    struct lp_style_type lp;
 
-	    lp_parse(&this_plot->lp_properties, 1,
-		     this_plot->plot_style & PLOT_STYLE_HAS_POINT,
-		     line_num, point_num);
+		    lp_parse(&lp, 1,
+			     this_plot->plot_style & PLOT_STYLE_HAS_POINT,
+			     line_num, point_num);
 		    if (stored_token != c_token) {
-			/* the following would be just too restrictive */
-			/* set_line = TRUE; */
-			continue;
+			if (set_lpstyle) {
+			    duplication=TRUE;
+			    break;
+			} else {
+			    this_plot->lp_properties = lp;
+			    set_lpstyle = TRUE;
+			    continue;
+			}
 		    }
 		}
 

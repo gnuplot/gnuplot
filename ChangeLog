@@ -1,3 +1,16 @@
+2001-12-13  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/plot2d.c (eval_plots): Re-do handling of possible
+ 	duplication of line/point style options. Fixes "plot 2 lt 2, 1 lt
+ 	1" which would plot both in linetype 1 introduced by Petr's "any
+ 	order of options" patches.  The line/point style options have to
+ 	be all together, now. And some codestyle fixes and reindentation.
+
+	* src/plot3d.c (eval_3dplots): Dito.
+
+	* src/misc.c (lp_parse): codestyle fixes.
+	
+
 2001-12-04  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/axis.c (setup_tics): Went over automatic ticmark extension

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.31 2001/11/24 11:30:32 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.32 2001/11/29 14:12:55 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -505,12 +505,14 @@ lp_parse(lp, allow_ls, allow_point, def_line, def_point)
 	lp->p_size = pointsize; /* as in "set pointsize" */
 	while (!END_OF_COMMAND) {
 	    if (almost_equals(c_token, "linet$ype") || equals(c_token, "lt")) {
-		if (set_lt++) break;
+		if (set_lt++)
+		    break;
 		c_token++;
 #ifdef PM3D
 		/* both syntaxes allowed: 'with lt pal' as well as 'with pal' */
 		if (almost_equals(c_token, "pal$ette")) {
-		    if (set_pal++) break;
+		    if (set_pal++)
+			break;
 		    c_token++;
 		    lp->use_palette = 1;
 		} else
@@ -522,7 +524,8 @@ lp_parse(lp, allow_ls, allow_point, def_line, def_point)
 #ifdef PM3D
 	    /* both syntaxes allowed: 'with lt pal' as well as 'with pal' */
 	    if (almost_equals(c_token, "pal$ette")) {
-		if (set_pal++) break;
+		if (set_pal++)
+		    break;
 		c_token++;
 		lp->use_palette = 1;
 		continue;
@@ -530,18 +533,20 @@ lp_parse(lp, allow_ls, allow_point, def_line, def_point)
 #endif
 
 	    if (almost_equals(c_token, "linew$idth") || equals(c_token, "lw")) {
-		if (set_lw++) break;
+		if (set_lw++)
+		    break;
 		c_token++;
 		lp->l_width = real(const_express(&t));
 		continue;
 	    }
 
 	    /* HBB 20010622: restructured to allow for more descriptive
-	    * error message, here. Would otherwise only print out
-	    * 'undefined variable: pointtype' --- rather unhelpful. */
+	     * error message, here. Would otherwise only print out
+	     * 'undefined variable: pointtype' --- rather unhelpful. */
 	    if (almost_equals(c_token, "pointt$ype") || equals(c_token, "pt")) {
 		if (allow_point) {
-		    if (set_pt++) break;
+		    if (set_pt++)
+			break;
 		    c_token++;
 		    lp->p_type = (int) real(const_express(&t)) - 1;
 		} else {
@@ -553,7 +558,8 @@ lp_parse(lp, allow_ls, allow_point, def_line, def_point)
 
 	    if (almost_equals(c_token, "points$ize") || equals(c_token, "ps")) {
 		if (allow_point) {
-		    if (set_ps++) break;
+		    if (set_ps++)
+			break;
 		    c_token++;
 		    lp->p_size = real(const_express(&t));
 		} else {

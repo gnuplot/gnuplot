@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.44 2001/08/27 15:02:14 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.45 2001/11/29 14:12:55 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -916,7 +916,7 @@ eval_plots()
 
 	    TBOOLEAN duplication = FALSE;
 	    TBOOLEAN set_smooth = FALSE, set_axes = FALSE, set_title = FALSE;
-	    TBOOLEAN set_with = FALSE;
+	    TBOOLEAN set_with = FALSE, set_lpstyle = FALSE;
 
 	    plot_num++;
 
@@ -974,129 +974,152 @@ eval_plots()
 	    /* pm 25.11.2001 allow any order of options */
 	    while (!END_OF_COMMAND) {
 
-	    /*  deal with smooth */
-	    if (almost_equals(c_token, "s$mooth")) {
+		/*  deal with smooth */
+		if (almost_equals(c_token, "s$mooth")) {
 		    int found_token;
-		    if (set_smooth) { duplication=TRUE; break; }
+
+		    if (set_smooth) {
+			duplication=TRUE;
+			break;
+		    }
 		    found_token = lookup_table(plot_smooth_tbl, ++c_token);
 
-		switch(found_token) {
-		case SMOOTH_ACSPLINES:
-		case SMOOTH_BEZIER:
-		case SMOOTH_CSPLINES:
-		case SMOOTH_SBEZIER:
-		case SMOOTH_UNIQUE:
-		case SMOOTH_FREQUENCY:
-		    this_plot->plot_smooth = found_token;
-		    break;
-		case SMOOTH_NONE:
-		default:
-		    int_error(c_token, "expecting 'unique', 'frequency', 'acsplines', 'csplines', 'bezier' or 'sbezier'");
-		    break;
-		}
-		this_plot->plot_style = LINES;
-		c_token++;      /* skip format */
+		    switch(found_token) {
+		    case SMOOTH_ACSPLINES:
+		    case SMOOTH_BEZIER:
+		    case SMOOTH_CSPLINES:
+		    case SMOOTH_SBEZIER:
+		    case SMOOTH_UNIQUE:
+		    case SMOOTH_FREQUENCY:
+			this_plot->plot_smooth = found_token;
+			break;
+		    case SMOOTH_NONE:
+		    default:
+			int_error(c_token, "expecting 'unique', 'frequency', 'acsplines', 'csplines', 'bezier' or 'sbezier'");
+			break;
+		    }
+		    this_plot->plot_style = LINES;
+		    c_token++;      /* skip format */
 		    set_smooth = TRUE;
 		    continue;
-	    }
-
-	    /* look for axes/axis */
-	    if (almost_equals(c_token, "ax$es") || almost_equals(c_token, "ax$is")) {
-		    if (set_axes) { duplication=TRUE; break; }
-		if (parametric && xparam)
-		    int_error(c_token, "previous parametric function not fully specified");
-
-		c_token++;
-		switch(lookup_table(&plot_axes_tbl[0],c_token)) {
-		case AXES_X1Y1:
-		    x_axis = FIRST_X_AXIS;
-		    y_axis = FIRST_Y_AXIS;
-		    ++c_token;
-		    break;
-		case AXES_X2Y2:
-		    x_axis = SECOND_X_AXIS;
-		    y_axis = SECOND_Y_AXIS;
-		    ++c_token;
-		    break;
-		case AXES_X1Y2:
-		    x_axis = FIRST_X_AXIS;
-		    y_axis = SECOND_Y_AXIS;
-		    ++c_token;
-		    break;
-		case AXES_X2Y1:
-		    x_axis = SECOND_X_AXIS;
-		    y_axis = FIRST_Y_AXIS;
-		    ++c_token;
-		    break;
-		case AXES_NONE:
-		default:
-		    int_error(c_token, "axes must be x1y1, x1y2, x2y1 or x2y2");
-		    break;
 		}
+
+		/* look for axes/axis */
+		if (almost_equals(c_token, "ax$es")
+		    || almost_equals(c_token, "ax$is")) {
+		    if (set_axes) {
+			duplication=TRUE;
+			break;
+		    }
+		    if (parametric && xparam)
+			int_error(c_token, "previous parametric function not fully specified");
+
+		    c_token++;
+		    switch(lookup_table(&plot_axes_tbl[0],c_token)) {
+		    case AXES_X1Y1:
+			x_axis = FIRST_X_AXIS;
+			y_axis = FIRST_Y_AXIS;
+			++c_token;
+			break;
+		    case AXES_X2Y2:
+			x_axis = SECOND_X_AXIS;
+			y_axis = SECOND_Y_AXIS;
+			++c_token;
+			break;
+		    case AXES_X1Y2:
+			x_axis = FIRST_X_AXIS;
+			y_axis = SECOND_Y_AXIS;
+			++c_token;
+			break;
+		    case AXES_X2Y1:
+			x_axis = SECOND_X_AXIS;
+			y_axis = FIRST_Y_AXIS;
+			++c_token;
+			break;
+		    case AXES_NONE:
+		    default:
+			int_error(c_token, "axes must be x1y1, x1y2, x2y1 or x2y2");
+			break;
+		    }
 		    set_axes = TRUE;
 		    continue;
-	    }
+		}
 
 		/* deal with title */
-	    if (almost_equals(c_token, "t$itle")) {
-		    if (set_title) { duplication=TRUE; break; }
-		this_plot->title_no_enhanced = 0; /* can be enhanced */
-		if (parametric) {
-		    if (xparam)
-			int_error(c_token, "\"title\" allowed only after parametric function fully specified");
-		    else if (xtitle != NULL)
-			xtitle[0] = '\0';       /* Remove default title . */
-		}
-		c_token++;
-		if (isstring(c_token)) {
-		    m_quote_capture(&(this_plot->title), c_token, c_token);
-		} else {
-		    int_error(c_token, "expecting \"title\" for plot");
-		}
-		c_token++;
+		if (almost_equals(c_token, "t$itle")) {
+		    if (set_title) {
+			duplication=TRUE;
+			break;
+		    }
+		    this_plot->title_no_enhanced = 0; /* can be enhanced */
+		    if (parametric) {
+			if (xparam)
+			    int_error(c_token, "\"title\" allowed only after parametric function fully specified");
+			else if (xtitle != NULL)
+			    xtitle[0] = '\0';       /* Remove default title . */
+		    }
+		    c_token++;
+		    if (isstring(c_token)) {
+			m_quote_capture(&(this_plot->title), c_token, c_token);
+		    } else {
+			int_error(c_token, "expecting \"title\" for plot");
+		    }
+		    c_token++;
 		    set_title = TRUE;
 		    continue;
 		}
 
 		if (almost_equals(c_token, "not$itle")) {
-		    if (set_title) { duplication=TRUE; break; }
-		if (xtitle != NULL)
-		    xtitle[0] = '\0';
-		c_token++;
+		    if (set_title) {
+			duplication=TRUE;
+			break;
+		    }
+		    if (xtitle != NULL)
+			xtitle[0] = '\0';
+		    c_token++;
 		    set_title = TRUE;
 		    continue;
-	    }
+		}
 
 		/* deal with style */
-	    if (almost_equals(c_token, "w$ith")) {
-		    if (set_with) { duplication=TRUE; break; }
-		if (parametric && xparam)
-		    int_error(c_token, "\"with\" allowed only after parametric function fully specified");
-		this_plot->plot_style = get_style();
-		if ((this_plot->plot_type == FUNC)
-		    && (this_plot->plot_style & PLOT_STYLE_HAS_ERRORBAR))
-		    {
-			int_warn(c_token, "This plot style is only for datafiles, reverting to \"points\"");
-			this_plot->plot_style = POINTSTYLE;
+		if (almost_equals(c_token, "w$ith")) {
+		    if (set_with) {
+			duplication=TRUE;
+			break;
 		    }
+		    if (parametric && xparam)
+			int_error(c_token, "\"with\" allowed only after parametric function fully specified");
+		    this_plot->plot_style = get_style();
+		    if ((this_plot->plot_type == FUNC)
+			&& (this_plot->plot_style & PLOT_STYLE_HAS_ERRORBAR))
+			{
+			    int_warn(c_token, "This plot style is only for datafiles, reverting to \"points\"");
+			    this_plot->plot_style = POINTSTYLE;
+			}
 		    set_with = TRUE;
 		    continue;
-	    }
+		}
 
-	    /* pick up line/point specs
-	     * - point spec allowed if style uses points, ie style&2 != 0
-	     * - keywords for lt and pt are optional
-	     */
+		/* pick up line/point specs
+		 * - point spec allowed if style uses points, ie style&2 != 0
+		 * - keywords for lt and pt are optional
+		 */
 		{
 		    int stored_token = c_token;
+		    struct lp_style_type lp;
 
-		    lp_parse(&this_plot->lp_properties, 1,
-		     this_plot->plot_style & PLOT_STYLE_HAS_POINT,
-		     line_num, point_num);
+		    lp_parse(&lp, 1,
+			     this_plot->plot_style & PLOT_STYLE_HAS_POINT,
+			     line_num, point_num);
 		    if (stored_token != c_token) {
-			/* the following would be just too restrictive */
-			/* set_line = TRUE; */
-			continue;
+			if (set_lpstyle) {
+			    duplication=TRUE;
+			    break;
+			} else {
+			    this_plot->lp_properties = lp;
+			    set_lpstyle = TRUE;
+			    continue;
+			}
 		    }
 		}
 
