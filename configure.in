@@ -133,22 +133,18 @@ test -z "$enable_unixpc" && enable_unixpc=no
 dnl configure.in body
 
 dnl Compiler characteristics
-
-dnl figure out if can handle ANSI style prototypes
-dnl with gcc we're well off, but other compilers might require additional
-dnl options
+dnl Check for ANSI C prototypes, the const and inline keywords,
+dnl and ANSI style stringification
 AM_C_PROTOTYPES
 AC_C_CONST
 AC_C_INLINE
+AC_C_STRINGIZE
 
 dnl this shell variable is set to no if above failed to set
 dnl compiler to ansi mode (see aclocal.m4)
 if test "$am_cv_prog_cc_stdc" != no; then
   AC_DEFINE(ANSI_C)
 fi
-
-dnl check for ANSI style stringification
-AC_C_STRINGIZE
 
 AC_MSG_CHECKING(if compiler handles warn and error directives correctly)
 dnl this used to test #warning, but that is not currently used
@@ -181,33 +177,17 @@ LIBS="$LIBS -lm"
 
 
 dnl Header files. ANSI first
-dnl We prefer that the absense of a macro is the norm, so we
-dnl define NO_WHATEVER if an ansi header/fn is missing, but HAVE_SOMETHING
-dnl if it is a non-ansi header/fn we would like to use if available
+dnl We prefer that the absense of a macro is the norm, so in syscfg.h
+dnl configure's HAVE_XXXX defines are translated into NO_XXXX for ANSI
+dnl headers and functions
 AC_HEADER_STDC
 
-dnl check for errno.h header and if it declares errno
-AC_CHECK_HEADER(errno.h, , AC_DEFINE(NO_ERRNO_H))
-AC_MSG_CHECKING(if errno variable is declared)
-AC_TRY_COMPILE(
-[#include <stdio.h>
-#ifndef NO_ERRNO_H
-#include <errno.h>
-#endif],
- errno=0,AC_MSG_RESULT(yes),AC_DEFINE(EXTERN_ERRNO) AC_MSG_RESULT(no))
-dnl
-AC_CHECK_HEADER(float.h, ,AC_DEFINE(NO_FLOAT_H))
-AC_CHECK_HEADER(limits.h, ,AC_DEFINE(NO_LIMITS_H) AC_CHECK_HEADERS(values.h))
-AC_CHECK_HEADER(locale.h, ,AC_DEFINE(NO_LOCALE_H))
-AC_CHECK_HEADER(math.h, ,AC_DEFINE(NO_MATH_H))
-AC_CHECK_HEADER(stdlib.h, ,AC_DEFINE(NO_STDLIB_H))
-AC_CHECK_HEADER(string.h, ,AC_DEFINE(NO_STRING_H))
-AC_CHECK_HEADER(time.h, ,AC_DEFINE(NO_TIME_H) AC_CHECK_TYPE(time_t, long))
-dnl
-AC_CHECK_HEADER(sys/time.h, , AC_DEFINE(NO_SYS_TIME_H))
-AC_CHECK_HEADER(sys/types.h, , AC_DEFINE(NO_SYS_TYPES_H))
+dnl ANSI headers
+AC_CHECK_HEADERS(errno.h float.h limits.h locale.h math.h stdlib.h string.h \
+  time.h sys/time.h sys/types.h)
+dnl other
 AC_CHECK_HEADERS(sys/bsdtypes.h sys/select.h sys/socket.h sys/stat.h \
-  sys/systeminfo.h sys/utsname.h libc.h malloc.h sgtty.h termios.h)
+  sys/systeminfo.h sys/utsname.h libc.h malloc.h sgtty.h termios.h values.h)
 test "$ac_cv_header_sys_stat_h" = yes && AC_HEADER_STAT
 
 dnl check if unistd actually declares anything. On NeXT 3.2 unistd is
@@ -215,23 +195,27 @@ dnl conditionalized for _POSIX_SOURCE
 AC_MSG_CHECKING(for unistd.h)
 AC_EGREP_HEADER(execv, unistd.h, AC_DEFINE(HAVE_UNISTD_H) AC_MSG_RESULT(yes), AC_MSG_RESULT(no))
 
+dnl check if errno.h header declares errno
+AC_MSG_CHECKING(if errno variable is declared)
+AC_TRY_COMPILE(
+[#include <stdio.h>
+#ifdef HAVE_ERRNO_H
+#include <errno.h>
+#endif],
+  errno=0,AC_MSG_RESULT(yes),AC_DEFINE(EXTERN_ERRNO) AC_MSG_RESULT(no))
+
 
 dnl Types.
 AC_TYPE_SIZE_T
+AC_CHECK_TYPE(time_t, long)
 AC_TYPE_SIGNAL
  
 
 dnl Functions. ANSI first, then others
 
 dnl sunos 4 has on_exit() in place of atexit()
-AC_CHECK_FUNC(atexit, ,AC_DEFINE(NO_ATEXIT) AC_CHECK_FUNCS(on_exit))
-AC_CHECK_FUNC(memcpy, ,AC_DEFINE(NO_MEMCPY) AC_CHECK_FUNCS(bcopy))
-AC_CHECK_FUNC(memset, ,AC_DEFINE(NO_MEMSET) AC_CHECK_FUNCS(bzero))
-AC_CHECK_FUNC(setvbuf, ,AC_DEFINE(NO_SETVBUF))
-AC_CHECK_FUNC(strerror, ,AC_DEFINE(NO_STRERROR))
-AC_CHECK_FUNC(strchr, ,AC_DEFINE(NO_STRCHR) AC_CHECK_FUNCS(index))
-AC_CHECK_FUNC(strrchr, ,AC_DEFINE(NO_STRRCHR) AC_CHECK_FUNCS(rindex))
-AC_CHECK_FUNC(strstr, ,AC_DEFINE(NO_STRSTR))
+AC_CHECK_FUNCS(atexit on_exit memcpy bcopy memset bzero setvbuf strerror \
+  strchr index strrchr rindex strstr)
 
 dnl gamma is called lgamma on apollos and linux
 dnl we prefer lgamma over gamma, see specfun.c
@@ -257,15 +241,7 @@ if test "$with_linux_vga" = yes; then
     TERMLIBS="$TERMLIBS -lvga",with_linux_vga=no)
 fi
 
-dnl This will work only with gnu readline installed in a standard library path
-dnl However, if libreadline.a is not installed in a standard path, then
-dnl all subsequent library tests will fail because we will try to link with
-dnl -lreadline.  This isn't acceptable, so we do check for the existence of
-dnl readline in a standard path.
-dnl
-dnl most unices need termcap with readline, but not Debian linux, which
-dnl does not even supply it, or so I am told
-
+dnl GNU readline and the required terminal library
 if test "$with_gnu_readline" != no; then
   dnl check for terminal library
   dnl this is a very cool solution from octave's configure.in
