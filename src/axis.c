@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.19 2001/07/03 12:48:56 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.20 2001/08/22 14:15:33 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -75,12 +75,22 @@ const AXIS_DEFAULTS axis_defaults[AXIS_ARRAY_SIZE] = {
 };
 
 
-/* either xformat etc or invented time format
- * index with FIRST_X_AXIS etc
- * global because used in gen_tics, which graph3d also uses
- */
+/* either the 'set format <axis>' or an automatically invented time
+ * format string */
 static char ticfmt[AXIS_ARRAY_SIZE][MAX_ID_LEN+1];
-static int timelevel[AXIS_ARRAY_SIZE];
+
+/* HBB 20010831: new enum typedef, to make code using this more
+ * self-explanatory */
+/* The unit the tics of a given time/date axis are to interpreted in */
+typedef enum e_timelevel {
+    TIMELEVEL_SECONDS, TIMELEVEL_MINUTES, TIMELEVEL_HOURS,
+    TIMELEVEL_DAYS, TIMELEVEL_WEEKS, TIMELEVEL_MONTHS,
+    TIMELEVEL_YEARS
+} t_timelevel;
+static t_timelevel timelevel[AXIS_ARRAY_SIZE];
+
+/* The <increment> given in a 'set {x|y|...}tics', or an automatically
+ * generated one, if automatic tic placement is active */
 static double ticstep[AXIS_ARRAY_SIZE];
 
 /* HBB 20000506 new variable: parsing table for use with the table
@@ -147,10 +157,11 @@ AXIS_INDEX z_axis = FIRST_Z_AXIS;
 
 /* --------- internal prototypes ------------------------- */
 static double dbl_raise __PROTO((double x, int y));
-static double make_ltic __PROTO((int, double));
+static double make_auto_time_minitics __PROTO((t_timelevel, double));
 static double make_tics __PROTO((AXIS_INDEX, int));
+static double quantize_time_tics __PROTO((AXIS_INDEX, double, double, int));
 static void   mant_exp __PROTO((double, double, TBOOLEAN, double *, int *, const char *));
-static double time_tic_just __PROTO((int, double));
+static double time_tic_just __PROTO((t_timelevel, double));
 
 /* ---------------------- routines ----------------------- */
 
@@ -334,100 +345,94 @@ axis_checked_extend_empty_range(axis,mesg)
 
 /* make smalltics for time-axis */
 static double
-make_ltic(tlevel, incr)
-int tlevel;
-double incr;
+make_auto_time_minitics(tlevel, incr)
+    t_timelevel tlevel;
+    double incr;
 {
     double tinc = 0.0;
 
-    if (tlevel < 0)
-	tlevel = 0;
+    if (tlevel < TIMELEVEL_SECONDS)
+	tlevel = TIMELEVEL_SECONDS;
     switch (tlevel) {
-    case 0:
-    case 1:{
-	    if (incr >= 20)
-		tinc = 10;
-	    if (incr >= 60)
-		tinc = 30;
-	    if (incr >= 2 * 60)
-		tinc = 60;
-	    if (incr >= 5 * 60)
-		tinc = 2 * 60;
-	    if (incr >= 10 * 60)
-		tinc = 5 * 60;
-	    if (incr >= 20 * 60)
-		tinc = 10 * 60;
-	    break;
-	}
-    case 2:{
-	    if (incr >= 20 * 60)
-		tinc = 10 * 60;
-	    if (incr >= 3600)
-		tinc = 30 * 60;
-	    if (incr >= 2 * 3600)
-		tinc = 3600;
-	    if (incr >= 5 * 3600)
-		tinc = 2 * 3600;
-	    if (incr >= 10 * 3600)
-		tinc = 5 * 3600;
-	    if (incr >= 20 * 3600)
-		tinc = 10 * 3600;
-	    break;
-	}
-    case 3:{
-	    if (incr > 2 * 3600)
-		tinc = 3600;
-	    if (incr > 4 * 3600)
-		tinc = 2 * 3600;
-	    if (incr > 7 * 3600)
-		tinc = 3 * 3600;
-	    if (incr > 13 * 3600)
-		tinc = 6 * 3600;
-	    if (incr > DAY_SEC)
-		tinc = 12 * 3600;
-	    if (incr > 2 * DAY_SEC)
-		tinc = DAY_SEC;
-	    break;
-	}
-    case 4:{			/* week: tic per day */
-	    if (incr > 2 * DAY_SEC)
-		tinc = DAY_SEC;
-	    if (incr > 7 * DAY_SEC)
-		tinc = 7 * DAY_SEC;
-	    break;
-	}
-    case 5:{			/* month */
-	    if (incr > 2 * DAY_SEC)
-		tinc = DAY_SEC;
-	    if (incr > 15 * DAY_SEC)
-		tinc = 10 * DAY_SEC;
-	    if (incr > 2 * MON_SEC)
-		tinc = MON_SEC;
-	    if (incr > 6 * MON_SEC)
-		tinc = 3 * MON_SEC;
-	    if (incr > 2 * YEAR_SEC)
-		tinc = YEAR_SEC;
-	    break;
-	}
-    case 6:{			/* year */
-	    if (incr > 2 * MON_SEC)
-		tinc = MON_SEC;
-	    if (incr > 6 * MON_SEC)
-		tinc = 3 * MON_SEC;
-	    if (incr > 2 * YEAR_SEC)
-		tinc = YEAR_SEC;
-	    if (incr > 10 * YEAR_SEC)
-		tinc = 5 * YEAR_SEC;
-	    if (incr > 50 * YEAR_SEC)
-		tinc = 10 * YEAR_SEC;
-	    if (incr > 100 * YEAR_SEC)
-		tinc = 20 * YEAR_SEC;
-	    if (incr > 200 * YEAR_SEC)
-		tinc = 50 * YEAR_SEC;
-	    if (incr > 300 * YEAR_SEC)
-		tinc = 100 * YEAR_SEC;
-	    break;
-	}
+    case TIMELEVEL_SECONDS:
+    case TIMELEVEL_MINUTES:
+	if (incr >= 20)
+	    tinc = 10;
+	if (incr >= 60)
+	    tinc = 30;
+	if (incr >= 2 * 60)
+	    tinc = 60;
+	if (incr >= 5 * 60)
+	    tinc = 2 * 60;
+	if (incr >= 10 * 60)
+	    tinc = 5 * 60;
+	if (incr >= 20 * 60)
+	    tinc = 10 * 60;
+	break;
+    case TIMELEVEL_HOURS:
+	if (incr >= 20 * 60)
+	    tinc = 10 * 60;
+	if (incr >= 3600)
+	    tinc = 30 * 60;
+	if (incr >= 2 * 3600)
+	    tinc = 3600;
+	if (incr >= 5 * 3600)
+	    tinc = 2 * 3600;
+	if (incr >= 10 * 3600)
+	    tinc = 5 * 3600;
+	if (incr >= 20 * 3600)
+	    tinc = 10 * 3600;
+	break;
+    case TIMELEVEL_DAYS:
+	if (incr > 2 * 3600)
+	    tinc = 3600;
+	if (incr > 4 * 3600)
+	    tinc = 2 * 3600;
+	if (incr > 7 * 3600)
+	    tinc = 3 * 3600;
+	if (incr > 13 * 3600)
+	    tinc = 6 * 3600;
+	if (incr > DAY_SEC)
+	    tinc = 12 * 3600;
+	if (incr > 2 * DAY_SEC)
+	    tinc = DAY_SEC;
+	break;
+    case TIMELEVEL_WEEKS:
+	if (incr > 2 * DAY_SEC)
+	    tinc = DAY_SEC;
+	if (incr > 7 * DAY_SEC)
+	    tinc = 7 * DAY_SEC;
+	break;
+    case TIMELEVEL_MONTHS:
+	if (incr > 2 * DAY_SEC)
+	    tinc = DAY_SEC;
+	if (incr > 15 * DAY_SEC)
+	    tinc = 10 * DAY_SEC;
+	if (incr > 2 * MON_SEC)
+	    tinc = MON_SEC;
+	if (incr > 6 * MON_SEC)
+	    tinc = 3 * MON_SEC;
+	if (incr > 2 * YEAR_SEC)
+	    tinc = YEAR_SEC;
+	break;
+    case TIMELEVEL_YEARS:
+	if (incr > 2 * MON_SEC)
+	    tinc = MON_SEC;
+	if (incr > 6 * MON_SEC)
+	    tinc = 3 * MON_SEC;
+	if (incr > 2 * YEAR_SEC)
+	    tinc = YEAR_SEC;
+	if (incr > 10 * YEAR_SEC)
+	    tinc = 5 * YEAR_SEC;
+	if (incr > 50 * YEAR_SEC)
+	    tinc = 10 * YEAR_SEC;
+	if (incr > 100 * YEAR_SEC)
+	    tinc = 20 * YEAR_SEC;
+	if (incr > 200 * YEAR_SEC)
+	    tinc = 50 * YEAR_SEC;
+	if (incr > 300 * YEAR_SEC)
+	    tinc = 100 * YEAR_SEC;
+	break;
     }
     return (tinc);
 }
@@ -782,12 +787,12 @@ copy_or_invent_formatstring(axis)
 	if (t_max.tm_hour != t_min.tm_hour) {
 	    strcpy(ticfmt[axis], "%H");
 	}
-	if (timelevel[axis] < 3) {
+	if (timelevel[axis] < TIMELEVEL_DAYS) {
 	    if (ticfmt[axis][0])
 		strcat(ticfmt[axis], ":");
 	    strcat(ticfmt[axis], "%M");
 	}
-	if (timelevel[axis] < 2) {
+	if (timelevel[axis] < TIMELEVEL_HOURS) {
 	    strcat(ticfmt[axis], ":%S");
 	}
     } else {
@@ -815,7 +820,7 @@ copy_or_invent_formatstring(axis)
 		strcpy(ticfmt[axis], "%d/%m");
 	    }
 	}
-	if (timelevel[axis] < 4) {
+	if (timelevel[axis] < TIMELEVEL_WEEKS) {
 	    /* Note: seconds can't be useful if there's more than 1
 	     * day's worth of data... */
 	    strcat(ticfmt[axis], "\n%H:%M");
@@ -826,7 +831,7 @@ copy_or_invent_formatstring(axis)
 
 /*}}} */
 
-/*{{{  dbl_raise() used by set_tics */
+/*{{{  dbl_raise() used by quantize_normal_tics */
 /* FIXME HBB 20000426: is this really useful? */
 static double
 dbl_raise(x, y)
@@ -846,7 +851,7 @@ int y;
 
 /*}}} */
 
-/*{{{  set_tic() */
+/*{{{  quantize_normal_tics() */
 /* the guide parameter was intended to allow the number of tics
  * to depend on the relative sizes of the plot and the font.
  * It is the approximate upper limit on number of tics allowed.
@@ -857,7 +862,7 @@ int y;
  */
 
 double
-set_tic(l10, guide)
+quantize_normal_tics(l10, guide)
      double l10;
      int guide;
 {
@@ -897,73 +902,97 @@ set_tic(l10, guide)
 /*}}} */
 
 /*{{{  make_tics() */
+/* Implement TIC_COMPUTED case, i.e. automatically choose a usable
+ * ticking interval for the given axis. For the meaning of the guide
+ * parameter, see the comment on quantize_normal_tics() */
 static double
 make_tics(axis, guide)
-     AXIS_INDEX axis;
-     int guide;
+    AXIS_INDEX axis;
+    int guide;
 {
-    register double xr, tic, l10;
+    register double xr, tic;
 
     xr = fabs(axis_array[axis].min - axis_array[axis].max);
-
-    l10 = log10(xr);
-    tic = set_tic(l10, guide);
+    tic = quantize_normal_tics(log10(xr), guide);
+    /* FIXME HBB 20010831: disabling this might allow short log axis
+     * to receive better ticking... */
     if (axis_array[axis].log && tic < 1.0)
 	tic = 1.0;
-    if (axis_array[axis].is_timedata) {
-	struct tm ftm, etm;
-	/* this is not fun */
-	ggmtime(&ftm, (double) axis_array[axis].min);
-	ggmtime(&etm, (double) axis_array[axis].max);
 
-	timelevel[axis] = 0;	/* seconds */
-	if (tic > 20) {
-	    /* turn tic into units of minutes */
-	    tic = set_tic(log10(xr / 60.0), guide) * 60;
-	    timelevel[axis] = 1;	/* minutes */
+    if (axis_array[axis].is_timedata)
+	return quantize_time_tics(axis, tic, xr, guide);
+    else
+	return tic;
+}
+
+/* HBB 20010831: newly isolated subfunction. Used to be part of
+ * make_tics() */
+/* Look at the tic interval given, and round it to a nice figure
+ * suitable for time/data axes, i.e. a small integer number of
+ * seconds, minutes, hours, days, weeks or months. As a side effec,
+ * this routine also modifies the static timelevel[axis] to indicate
+ * the units these tics are calculated in. */
+static double
+quantize_time_tics(axis, tic, xr, guide)
+    AXIS_INDEX axis;
+    double tic, xr;
+    int guide;
+{
+#if 0 /* FIXME HBB 20010831: unused ! ??? */
+    struct tm ftm, etm;
+
+    /* this is not fun */
+    ggmtime(&ftm, (double) axis_array[axis].min);
+    ggmtime(&etm, (double) axis_array[axis].max);
+#endif
+
+    timelevel[axis] = TIMELEVEL_SECONDS;
+    if (tic > 20) {
+	/* turn tic into units of minutes */
+	tic = quantize_normal_tics(log10(xr / 60.0), guide) * 60;
+	timelevel[axis] = TIMELEVEL_MINUTES;
+    }
+    if (tic > 20 * 60) {
+	/* turn tic into units of hours */
+	tic = quantize_normal_tics(log10(xr / 3600.0), guide) * 3600;
+	timelevel[axis] = TIMELEVEL_HOURS;
+    }
+    if (tic > 2 * 3600) {
+	/* need some tickling */
+	tic = quantize_normal_tics(log10(xr / (3 * 3600.0)), guide) * 3 * 3600;
+    }
+    if (tic > 6 * 3600) {
+	/* turn tic into units of days */
+	tic = quantize_normal_tics(log10(xr / DAY_SEC), guide) * DAY_SEC;
+	timelevel[axis] = TIMELEVEL_DAYS;
+    }
+    if (tic > 3 * DAY_SEC) {
+	/* turn tic into units of weeks */
+	tic = quantize_normal_tics(log10(xr / WEEK_SEC), guide) * WEEK_SEC;
+	if (tic < WEEK_SEC) {	/* force */
+	    tic = WEEK_SEC;
 	}
-	if (tic > 20 * 60) {
-	    /* turn tic into units of hours */
-	    tic = set_tic(log10(xr / 3600.0), guide) * 3600;
-	    timelevel[axis] = 2;	/* hours */
+	timelevel[axis] = TIMELEVEL_WEEKS;
+    }
+    if (tic > 3 * WEEK_SEC) {
+	/* turn tic into units of month */
+	tic = quantize_normal_tics(log10(xr / MON_SEC), guide) * MON_SEC;
+	if (tic < MON_SEC) {	/* force */
+	    tic = MON_SEC;
 	}
-	if (tic > 2 * 3600) {
-	    /* need some tickling */
-	    tic = set_tic(log10(xr / (3 * 3600.0)), guide) * 3 * 3600;
+	timelevel[axis] = TIMELEVEL_MONTHS;
+    }
+    if (tic > 2 * MON_SEC) {
+	/* turn tic into units of month */
+	tic = quantize_normal_tics(log10(xr / (3 * MON_SEC)), guide) * 3 * MON_SEC;
+    }
+    if (tic > 6 * MON_SEC) {
+	/* turn tic into units of years */
+	tic = quantize_normal_tics(log10(xr / YEAR_SEC), guide) * YEAR_SEC;
+	if (tic < (YEAR_SEC / 2)) {
+	    tic = YEAR_SEC / 2;
 	}
-	if (tic > 6 * 3600) {
-	    /* turn tic into units of days */
-	    tic = set_tic(log10(xr / DAY_SEC), guide) * DAY_SEC;
-	    timelevel[axis] = 3;	/* days */
-	}
-	if (tic > 3 * DAY_SEC) {
-	    /* turn tic into units of weeks */
-	    tic = set_tic(log10(xr / WEEK_SEC), guide) * WEEK_SEC;
-	    if (tic < WEEK_SEC) {	/* force */
-		tic = WEEK_SEC;
-	    }
-	    timelevel[axis] = 4;	/* weeks */
-	}
-	if (tic > 3 * WEEK_SEC) {
-	    /* turn tic into units of month */
-	    tic = set_tic(log10(xr / MON_SEC), guide) * MON_SEC;
-	    if (tic < MON_SEC) {	/* force */
-		tic = MON_SEC;
-	    }
-	    timelevel[axis] = 5;	/* month */
-	}
-	if (tic > 2 * MON_SEC) {
-	    /* turn tic into units of month */
-	    tic = set_tic(log10(xr / (3 * MON_SEC)), guide) * 3 * MON_SEC;
-	}
-	if (tic > 6 * MON_SEC) {
-	    /* turn tic into units of years */
-	    tic = set_tic(log10(xr / YEAR_SEC), guide) * YEAR_SEC;
-	    if (tic < (YEAR_SEC / 2)) {
-		tic = YEAR_SEC / 2;
-	    }
-	    timelevel[axis] = 6;	/* year */
-	}
+	timelevel[axis] = TIMELEVEL_YEARS;
     }
     return (tic);
 }
@@ -1025,6 +1054,17 @@ setup_tics(axis, max)
      * time/date output format), make up a formatstring that suits the
      * range of data */
     copy_or_invent_formatstring(axis);
+
+    /* BUGFIX HBB 20010831: for time/date axes, if an explicit
+     * stepsize was set, timelevel[axis] wasn't defined, leading to
+     * strange misbehaviours of minor tics on time axes. This would
+     * usually be used to redefine the 'tic' interval, but as a side
+     * effect, it defines ticlevel[axis]. */
+    if (axis_array[axis].is_timedata && ticdef->type == TIC_SERIES)
+	    quantize_time_tics(axis, tic,
+			       axis_array[axis].max - axis_array[axis].min,
+			       20);
+    
 }
 
 /*{{{  gen_tics */
@@ -1102,6 +1142,7 @@ gen_tics(axis, callback)
 	return;			/* NO MINITICS FOR USER-DEF TICS */
 	/*}}} */
     }
+
     /* series-tics
      * need to distinguish user co-ords from internal co-ords.
      * - for logscale, internal = log(user), else internal = user
@@ -1232,10 +1273,12 @@ gen_tics(axis, callback)
 		    /*}}} */
 		}
 	    } else if (axis_array[axis].is_timedata) {
-		ministart = ministep = make_ltic(timelevel[axis], step);
+		ministart = ministep =
+		    make_auto_time_minitics(timelevel[axis], step);
 		miniend = step * 0.9;
 	    } else if (minitics == MINI_AUTO) {
 		int k = fabs(step)/pow(10.,floor(log10(fabs(step))));
+
 		/* so that step == k times some power of 10 */
 		ministart = ministep = (k==2 ? 0.5 : 0.2) * step;
 		miniend = step;
@@ -1246,6 +1289,7 @@ gen_tics(axis, callback)
 		minitics = 0;	/* dont get stuck in infinite loop */
 	    /*}}} */
 	}
+
 	/*{{{  a few tweaks and checks */
 	/* watch rounding errors */
 	end += SIGNIF * step;
@@ -1368,26 +1412,26 @@ gen_tics(axis, callback)
 /* justify ticplace to a proper date-time value */
 static double
 time_tic_just(level, ticplace)
-     int level;
+     t_timelevel level;
      double ticplace;
 {
     struct tm tm;
 
-    if (level <= 0) {
+    if (level <= TIMELEVEL_SECONDS) {
 	return (ticplace);
     }
     ggmtime(&tm, (double) ticplace);
-    if (level > 0) {		/* units of minutes */
+    if (level > TIMELEVEL_SECONDS) { /* units of minutes */
 	if (tm.tm_sec > 50)
 	    tm.tm_min++;
 	tm.tm_sec = 0;
     }
-    if (level > 1) {		/* units of hours */
+    if (level > TIMELEVEL_MINUTES) { /* units of hours */
 	if (tm.tm_min > 50)
 	    tm.tm_hour++;
 	tm.tm_min = 0;
     }
-    if (level > 2) {		/* units of days */
+    if (level > TIMELEVEL_HOURS) { /* units of days */
 	if (tm.tm_hour > 14) {
 	    tm.tm_hour = 0;
 	    tm.tm_mday = 0;
@@ -1402,7 +1446,7 @@ time_tic_just(level, ticplace)
 	}
     }
     /* skip it, I have not bothered with weekday so far */
-    if (level > 4) {		/* units of month */
+    if (level > TIMELEVEL_WEEKS) {		/* units of month */
 	if (tm.tm_mday > 25) {
 	    tm.tm_mon++;
 	    if (tm.tm_mon > 11) {
@@ -1412,7 +1456,7 @@ time_tic_just(level, ticplace)
 	}
 	tm.tm_mday = 1;
     }
-    if (level > 5) {
+    if (level > TIMELEVEL_MONTHS) {
 	if (tm.tm_mon >= 7)
 	    tm.tm_year++;
 	tm.tm_mon = 0;

@@ -1,3 +1,33 @@
+2001-08-31  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/axis.c (typedef enum t_timelevel): New type to give names to
+ 	values of timelevel[] array.
+	(timelevel): Type changed to array of t_timelevel.
+	(make_auto_time_minitics): Renamed former function make_ltic() to
+ 	this.  Parameter type changed to t_timelevel, and enum labels used
+ 	instead of magic numbers inside the functions.
+	(copy_or_invent_formatstring): Use new enum labels.
+	(quantize_normal_tics): Renamed former function set_tic() to more
+ 	descriptive name.
+	(make_tics): Remove local variable l10, and. Extracted the timetic
+ 	quantization part into a separate function.
+	(quantize_time_tics): New function, extracted out of make_tics().
+  	Unused code and variables commented #if'ed out. Use new
+ 	t_timelevel names.
+	(setup_tics): Fix bug with fixed-increment series ticks on
+ 	time/data axes. timelevel[axis] wasn't defined at all, in that
+ 	case, using whatever value was left in there from the previous
+ 	plot. BAD thing.
+	(gen_tics): Call of make_ltic() renamed.
+	(time_tic_just): Type of "level" argument changed to t_timelevel.
+	Use t_timelevel names.
+	
+	* src/contour.c (contour): Changed call of renamed function
+ 	set_tic.
+
+	* src/axis.h (quantize_normal_tics): Changed prototype to reflect
+ 	renamed function set_tic().
+
 2001-08-27  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	A monster patch by Ulrich Gruenebaum. Implements plotting of

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: contour.c,v 1.18 2001/01/22 18:30:21 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: contour.c,v 1.19 2001/08/22 14:15:33 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - contour.c */
@@ -224,7 +224,7 @@ struct iso_curve *iso_lines;
 	if (dz == 0)
 	    return NULL;	/* empty z range ? */
 	/* what is the deeper sense of this ? (joze) */
-	dz = set_tic(log10(dz), ((int) contour_levels + 1) * 2);
+	dz = quantize_normal_tics(log10(dz), ((int) contour_levels + 1) * 2);
 	z = floor(z_min / dz) * dz;
 	num_of_z_levels = (int) floor((z_max - z) / dz);
     }

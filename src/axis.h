@@ -1,5 +1,5 @@
 /* 
- * $Id: axis.h,v 1.9 2001/07/03 12:48:56 broeker Exp $
+ * $Id: axis.h,v 1.10 2001/08/22 14:15:33 broeker Exp $
  *
  */
 
@@ -601,7 +601,7 @@ void axis_revert_and_unlog_range __PROTO((AXIS_INDEX));
 double axis_log_value_checked __PROTO((AXIS_INDEX, double, const char *));
 void axis_checked_extend_empty_range __PROTO((AXIS_INDEX, const char *mesg));
 char * copy_or_invent_formatstring __PROTO((AXIS_INDEX));
-double set_tic __PROTO((double, int));
+double quantize_normal_tics __PROTO((double, int));
 void setup_tics __PROTO((AXIS_INDEX, int));
 void gen_tics __PROTO((AXIS_INDEX, /* int, */ tic_callback));
 void gprintf __PROTO((char *, size_t, char *, double, double));
