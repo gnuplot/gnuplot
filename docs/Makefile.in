@@ -32,6 +32,8 @@ exec_prefix = @exec_prefix@
 bindir = $(exec_prefix)/bin
 datadir = $(prefix)/lib
 mandir = $(prefix)/man
+top_builddir = .
+top_srcdir = @top_srcdir@
 
 INSTALL = @INSTALL@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
@@ -55,12 +57,22 @@ DVIPS=dvips
 
 ### [tn]roff documentation
 troff: gnuplot.ms titlepag.ms
-	tbl $(srcdir)/gnuplot.ms | eqn | $(TROFF) -ms
+	@if [ "$(srcdir)" = "$(top_builddir)" ] ; then \
+	    tbl gnuplot.ms | eqn | $(TROFF) -ms ; \
+	else \
+	    < gnuplot.ms sed "s,titlepag\.ms,$(srcdir)/titlepag\.ms," |\
+	      tbl | eqn | $(TROFF) -ms ; \
+	fi
 
 nroff: gnuplot.nroff
 
 gnuplot.nroff: gnuplot.ms titlepag.ms
-	tbl $(srcdir)/gnuplot.ms | neqn | nroff -ms | col > gnuplot.nroff
+	@if [ "$(srcdir)" = "$(top_builddir)" ] ; then \
+	    tbl gnuplot.ms | neqn | nroff -ms | col > gnuplot.nroff ; \
+	else \
+	    < gnuplot.ms sed "s,titlepag\.ms,$(srcdir)/titlepag\.ms," |\
+	      tbl | neqn | nroff -ms | col > gnuplot.nroff ; \
+	fi
 
 ms: gnuplot.ms
 
@@ -116,24 +128,15 @@ gnuplot.tex: doc2tex $(srcdir)/gnuplot.doc
 doc2tex: doc2tex.o
 	$(CC) -o $@ doc2tex.o $(LDFLAGS) $(LIBS)
 
-titlepag.tex: $(srcdir)/titlepag.tex
-	$(CP) $< $@
-
-toc_entry.sty: $(srcdir)/toc-entr.sty
-	$(CP) $< $@
-
-gpcard.tex: $(srcdir)/gpcard.tex
-	$(CP) $< $@
-
 # this is how to make DVI files
 dvi: gnuplot.dvi gpcard.dvi
 
 gnuplot.dvi: gnuplot.tex titlepag.tex toc_entr.sty
-	latex gnuplot
-	latex gnuplot
+	TEXINPUTS=.:$(srcdir): latex gnuplot
+	TEXINPUTS=.:$(srcdir): latex gnuplot
 
 gpcard.dvi: gpcard.tex
-	tex gpcard
+	TEXINPUTS=.:$(srcdir): tex gpcard
 
 # this is how to make PostScript files
 # if pslatex has been installed, add "times" to titlepage.tex
@@ -193,7 +196,7 @@ tutorial: latextut/tutorial.tex
 	( cd latextut; $(MAKE) )
 
 # this is how to check the gnuplot.doc file
-check: checkdoc $(srcdir)gnuplot.doc
+check: checkdoc $(srcdir)/gnuplot.doc
 	./checkdoc < $(srcdir)/gnuplot.doc
 
 checkdoc: checkdoc.o
