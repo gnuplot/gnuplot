@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: help.c,v 1.7 1999/06/19 20:53:21 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: help.c,v 1.8 1999/06/22 12:00:48 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - help.c */
@@ -498,6 +498,7 @@ TBOOLEAN *subtopics;		/* (in) - subtopics only? */
 /* ShowSubtopics:
  *  Print a list of subtopic names
  */
+/* The maximum number of subtopics per line */
 #define PER_LINE 4
 
 static void
@@ -540,7 +541,7 @@ TBOOLEAN *subtopics;		/* (out) are there any subtopics */
 		    subt++;
 		    if (len) {
 			strcpy(line, "\nSubtopics available for ");
-			strncat(line, key->key, BUFSIZ - 28);
+			strncat(line, key->key, BUFSIZ - 25 - 2 - 1);
 			strcat(line, ":\n");
 		    } else
 			strcpy(line, "\nHelp topics available:\n");
@@ -556,15 +557,19 @@ TBOOLEAN *subtopics;		/* (out) are there any subtopics */
 	}
     }
 
+/* The number of the first column for subtopic entries */
 #define FIRSTCOL	4
+/* Length of a subtopic entry; if COLLENGTH is exceeded,
+ * the next column is skipped */
 #define COLLENGTH	18
+
 #ifndef COLUMN_HELP
     {
 	/* sort subtopics by row - default */
-	int ispacelen;
 	int subtopic;
-	int spacelen = 0;
+	int spacelen = 0, ispacelen;
 	int pos = 0;
+	
 	for (subtopic = 0; subtopic < stopics; subtopic++) {
 	    start = starts[subtopic];
 	    sublen = strcspn(start, " ");
@@ -574,17 +579,22 @@ TBOOLEAN *subtopics;		/* (out) are there any subtopics */
 	    for (ispacelen = 0; ispacelen < spacelen; ispacelen++)
 		(void) strcat(line, " ");
 	    (void) strncat(line, start, sublen);
+
 	    spacelen = COLLENGTH - sublen;
-	    if (spacelen <= 0)
-		spacelen = 1;
+	    while (spacelen <= 0) {
+		spacelen += COLLENGTH;
+		pos++;
+	    }
+
 	    pos++;
-	    if (pos == PER_LINE) {
+	    if (pos >= PER_LINE) {
 		(void) strcat(line, "\n");
 		OutLine(line);
 		*line = NUL;
 		pos = 0;
 	    }
 	}
+
 	/* put out the last line */
 	if (subt > 0 && pos > 0) {
 	    (void) strcat(line, "\n");
@@ -594,15 +604,16 @@ TBOOLEAN *subtopics;		/* (out) are there any subtopics */
 #else /* COLUMN_HELP */
     {
 	/* sort subtopics by column */
-	int subtopic;
-	int ispacelen;
-	int spacelen;
+	int subtopic, sublen;
+	int spacelen = 0, ispacelen;
 	int row, col;
-	int rows = (int) (stopics / PER_LINE + 0.5);
+	int rows = (int) (stopics / PER_LINE) + 1;
+
 	for (row = 0; row < rows; row++) {
 	    *line = NUL;
 	    for (ispacelen = 0; ispacelen < FIRSTCOL; ispacelen++)
 		(void) strcat(line, " ");
+
 	    for (col = 0; col < PER_LINE; col++) {
 		subtopic = row + rows * col;
 		if (subtopic >= stopics) {
@@ -612,6 +623,8 @@ TBOOLEAN *subtopics;		/* (out) are there any subtopics */
 		    sublen = strcspn(start, " ");
 		    (void) strncat(line, start, sublen);
 		    spacelen = COLLENGTH - sublen;
+		    if (spacelen <= 0)
+			spacelen = 1;
 		    for (ispacelen = 0; ispacelen < spacelen; ispacelen++)
 			(void) strcat(line, " ");
 		}
