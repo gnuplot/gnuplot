@@ -6,9 +6,9 @@ dnl a macro is the usual case : this saves having to update
 dnl countless makefiles when new tests are added. By usual case
 dnl I guess ansi compiler on posix system or something like that
 dnl
-dnl [Lars: this is no longer necessary. I have cut out this stuff
-dnl  out of configure.in and reduced the size of configure by 30k!
-dnl  The necessery definitions are now in syscfg.h]
+dnl [Lars: this is no longer necessary. I have cut this stuff out
+dnl  of configure.in and added the necessery definitions to syscfg.h.
+dnl  This reduced the size of configure by 30k!
 dnl
 dnl $Id: configure.in,v 1.90 1998/06/18 14:52:55 ddenholm Exp $
 dnl
