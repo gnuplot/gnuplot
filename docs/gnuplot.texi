@@ -402,14 +402,14 @@ by those terminals capable of doing so.
 @c ?commands bind
 @cindex bind
 
-The @ref{bind} command allows to (re-)define a sequence of gnuplot commands
-which will be executed when a certain key or key sequence is pressed
-while the driver's window has the input focus.
-Note that @ref{bind} is only available if gnuplot was compiled with mouse
-support and it is used by all mouse-capable terminals.
-Bindings overwrite the builtin bindings (like in every real editor),
-except <space> and 'q' which cannot be rebound.
-Mouse buttons cannot be rebound.
+@c ?help bind
+The @ref{bind} command allows to (re-)define a sequence of gnuplot commands which
+will be executed when a certain key or key sequence is pressed while the
+driver's window has the input focus. Note that @ref{bind} is only available if
+gnuplot was compiled with mouse support and it is used by all mouse-capable
+terminals. Bindings overwrite the builtin bindings (like in every real
+editor), except <space> and 'q' which cannot be rebound. Mouse buttons cannot
+be rebound.
 
 Note that multikey-bindings with modifiers have to be quoted.
 
@@ -490,7 +490,7 @@ List of supported special keys:
 
 @end example
 
-type also @ref{mouse} and @ref{if}.
+See also @ref{mouse} and @ref{if}.
 
 
 @node Batch/Interactive_Operation, Command-line-editing, What_is_New_in_version_3.7, gnuplot
@@ -3957,7 +3957,7 @@ the index of the desired style.
 
 If gnuplot was built with @ref{pm3d} support, the special keyword 'palette' is
 allowed for smooth color change of lines, points and dots in splots. The
-color is choosen from a smooth palette which was set previously with the 
+color is choosen from a smooth palette which was set previously with the
 command @ref{palette}. The color value corresponds to the z-value of the
 point coordinates. The 2d @ref{plot} command ignores this option.
 
@@ -6365,7 +6365,7 @@ line and q(x) using small triangles connected by a green line.
 creates a surface plot using smooth colors according to @ref{palette}. Note,
 that this works only on some terminals.
 
-Type also @ref{palette}, @ref{pm3d}.
+See also @ref{palette}, @ref{pm3d}.
 
 
 @node lmargin, loadpath, linestyle, set-show
@@ -6657,30 +6657,30 @@ There is no default character for @ref{missing}.
 
 @cindex nomouse
 
-The command @ref{mouse} enables mouse actions. Currently the pm, x11,
-ggi and windows terminals are mouse enhanced. There are two mouse modes.
-The 2d-graph mode works for 2d graphs and for maps (i.e. splots with 
-@ref{view} having z-rotation 0, 90, 180, 270 or 360 degrees) and it
-allows tracing the position over graph, zooming, annotating graph etc.
-For 3d graphs `splot`, the view and scaling of the graph can be changed
-with mouse buttons 1 and 2. If additionally to these buttons the modifier
-<ctrl> is hold down, the coordinate system only is rotated which is
-useful for large data sets. A vertical motion of Button 2 with the
-shift key hold down changes the ticslevel.
+@c ?help mouse
+The command @ref{mouse} enables mouse actions. Currently the pm, x11, ggi and
+windows terminals are mouse enhanced. There are two mouse modes. The 2d-graph
+mode works for 2d graphs and for maps (i.e. splots with @ref{view} having
+z-rotation 0, 90, 180, 270 or 360 degrees) and it allows tracing the position
+over graph, zooming, annotating graph etc. For 3d graphs `splot`, the view
+and scaling of the graph can be changed with mouse buttons 1 and 2. If
+additionally to these buttons the modifier <ctrl> is hold down, the
+coordinate system only is rotated which is useful for large data sets. A
+vertical motion of Button 2 with the shift key hold down changes the
+ticslevel.
 
-Mousing is not available in multiplot mode. If multiplot is disabled
-using @ref{multiplot} though,  the mouse will be turned on again and
-acts on the last plot (like replot do).
+Mousing is not available in multiplot mode. If multiplot is disabled using
+@ref{multiplot} though,  the mouse will be turned on again and acts on the
+last plot (like replot do).
 
-X11 specific implementation details:
-Mouse support is turned on by default if standard input comes from
-a terminal (tty). Mouse support is turned off, if standard input
-does not come from a tty e.g. a pipe. If you want to use mouse support
-while writing to gnuplot from a pipe, the mouse must be turned on *before*
-starting the x11 driver, e.g. immediately after startup with the explicit
-command @ref{mouse}. Beware: on some UNIX flavours, special input devices
-as /dev/null might not be `select-able`; turning on the mouse when using
-such devices will hang gnuplot.
+X11 specific implementation details: Mouse support is turned on by default if
+standard input comes from a terminal (tty). Mouse support is turned off, if
+standard input does not come from a tty e.g. a pipe. If you want to use mouse
+support while writing to gnuplot from a pipe, the mouse must be turned on
+*before* starting the x11 driver, e.g. immediately after startup with the
+explicit command @ref{mouse}. Beware: on some UNIX flavours, special input
+devices as /dev/null might not be `select-able`; turning on the mouse when
+using such devices will hang gnuplot.
 
 Syntax:
 @example
@@ -6696,33 +6696,31 @@ Syntax:
 
 @end example
 
-The doubleclick resolution is given in millieseconds and used
-for Button 1 which copies the current mouse position to the
-`clipboard`. If you want that to be done by single clicking
-a value of 0 ms can be used. The default value is 300 ms.
+The doubleclick resolution is given in miliseconds and used for Button 1
+which copies the current mouse position to the `clipboard`. If you want that
+to be done by single clicking a value of 0 ms can be used. The default value
+is 300 ms.
 
-The option zoomcoordinates determines if the coordinates of
-the zoom box are drawn at the edges while zooming. (on by default)
+The option zoomcoordinates determines if the coordinates of the zoom box are
+drawn at the edges while zooming. This is on by default.
 
-The option polarcoordinates determines if the distance to the
-ruler is also shown in polar coordinates. This corresponds to
-the default key binding '5'.
+The option polarcoordinates determines if the distance to the ruler is also
+shown in polar coordinates. This corresponds to the default key binding '5'.
 
-The `format` option takes a fprintf like format string which
-determines how floating point numbers are printed to the drivers
-window and the clipboard. The default is "% #g".
+The `format` option takes a fprintf like format string which determines how
+floating point numbers are printed to the drivers window and the clipboard.
+The default is "% #g".
 
-`clipboardformat` and `mouseformat` are used for formatting the text
-on Button1 and Button2 actions -- copying the coordinates to the
-clipboard and temporaryly annotating the mouse position. This
-corresponds to the key bindings '1', '2', '3', '4' (see the
-drivers's help window). If the argument is a string this string
-is used as c format specifier and should contain two float
-specifiers, e.g. `set mouse mouseformat "mouse = %5.2g, %10.2f"`.
-Use `set mouseformat ""` to turn this string off again.
+`clipboardformat` and `mouseformat` are used for formatting the text on
+Button1 and Button2 actions -- copying the coordinates to the clipboard and
+temporaryly annotating the mouse position. This corresponds to the key
+bindings '1', '2', '3', '4' (see the drivers's help window). If the argument
+is a string this string is used as c format specifier and should contain two
+float specifiers, e.g. `set mouse mouseformat "mouse = %5.2g, %10.2f"`. Use
+`set mouse mouseformat ""` to turn this string off again.
 
-The following formats are available (format 5 may only be selected
-if the format string was specified already):
+The following formats are available (format 5 may only be selected if the
+format string was specified already):
 
 @example
  0   real coordinates in  brackets e.g. [1.23, 2.45]
@@ -6735,39 +6733,38 @@ if the format string was specified already):
 
 @end example
 
-Choose the option `labels` to get real gnuplot labels on Button 2.
-(The default is `nolabels` which makes Button 2 drawing only
-temporary annotations at the mouse positions). The labes are
-drawn with the current setting of `mouseformat`. `labeloptions`
-controls which options are passed to the @ref{label} command.
-The default is "pointstyle 1" which will plot a small plus at
-the label position.  Note that the pointsize is taken from the
+Choose the option `labels` to get real gnuplot labels on Button 2. (The
+default is `nolabels` which makes Button 2 drawing only temporary annotations
+at the mouse positions). The labes are drawn with the current setting of
+`mouseformat`. `labeloptions` controls which options are passed to the 
+@ref{label} command. The default is "pointstyle 1" which will plot a small
+plus at the label position.  Note that the pointsize is taken from the 
 @ref{pointsize} command.
-Labels can be removed by holding the Ctrl-Key down while clicking
-with Button 2 on the label's point. The threshold for how close
-you must be to the label is also determined by the @ref{pointsize}.
+@example
+  Labels can be removed by holding the Ctrl-Key down while clicking with 
+@end example
+
+Button 2 on the label's point. The threshold for how close you must be to the
+label is also determined by the @ref{pointsize}.
 
 If the option `zoomjump` is on, the mouse pointer will be automatically
-offset a small distance after starting a zoom region with button 3.
-This can be useful to avoid a tiny (or even empty) zoom region.
-`zoomjump` is off by default.
+offset a small distance after starting a zoom region with button 3. This can
+be useful to avoid a tiny (or even empty) zoom region. `zoomjump` is off by
+default.
 
-If the option `verbose` is turned on the communication commands are 
-shown during execution. This option can also be toggled by hitting `6`
-in the driver's window. `verbose` is off by default.
+If the option `verbose` is turned on the communication commands are shown
+during execution. This option can also be toggled by hitting `6` in the
+driver's window. `verbose` is off by default.
 
-Press 'h' in the driver's window for a short summary of the
-mouse and key bindings.  This will also display user defined
-bindings (type @ref{bind}).
+Press 'h' in the driver's window for a short summary of the mouse and key
+bindings.  This will also display user defined bindings or `hotkeys` which
+can be defined using the @ref{bind} command, see @ref{bind}.  Note, that user
+defined `hotkeys` may override the default bindings.
 
-Press 'q' in the driver's window to close the window. This key
-cannot be overridden with the @ref{bind} command.
+Press 'q' in the driver's window to close the window. This key cannot be
+overridden with the @ref{bind} command.
 
-User defined `hotkeys` can be defined using the @ref{bind} command.
-(type @ref{bind}).  Note, that user defined `hotkeys` may override
-the default bindings.
-
-Type also @ref{bind} and @ref{label}.
+See also @ref{bind} and @ref{label}.
 
 @node multiplot, mx2tics, mouse, set-show
 @subsection multiplot
@@ -7149,10 +7146,10 @@ commands.  Currently the default range for these parametric variables is
 
 pm3d is a [new] type of `splot` mode for drawing colour/gray maps and
 surfaces.  It can be used for plotting gridded as well as non-gridded data.
-The main power of the pm3d algorithm (see also my program pm3d) is that
-it can draw maps or surfaces from large data sets without preprocessing even 
-when the data are non-gridded and the scans do not have same number of 
-points---thus it produces no artefacts.  Currently supported terminals are:
+The main power of the pm3d algorithm (see also my program pm3d) is that it
+can draw maps or surfaces from large data sets without preprocessing even
+when the data are non-gridded and the scans do not have same number of
+points, thus it produces no artefacts.  Currently supported terminals are:
 
 @example
   Screen terminals:
@@ -7175,48 +7172,43 @@ points---thus it produces no artefacts.  Currently supported terminals are:
 
 The pm3d algorithm fills the region between two neighbouring points in one 
 scan with another two points in the next scan by a gray (or colour) according 
-to the average of the z data in these four points.  From this follows, that 
-the neighbouring scans should not cross and the number of points in the
-neighbouring scans should not differ too much (you see---scans can have 
-different number of points).  No other requirements (e.g.  the data must be
-gridded) are needed.  Another advantage is that the algorithm does not draw 
-anything outside of the input (measured or calculated) region.
+to the average of the z data (or an additional 'color' column, see `splot`)
+in these four points.  From this follows, that the neighbouring scans should
+not cross and the number of points in the neighbouring scans should not
+differ too much (you see --- scans can have different number of points).
+No other requirements (e.g.  the data must be gridded) are needed.  Another
+advantage is that the algorithm does not draw anything outside of the input
+(measured or calculated) region.
 
-The gray is obtained by mapping the averaged z coordinate of the four corners
-of the quadrangle into the range [min_color_z,max_color_z] providing range of
-grays [0:1]. This value can be used directly as the gray for gray maps. The
-normalized gray value can be further mapped into a colour. See @ref{palette}
-for the complete description. 
+1. function splot or data splot with one ore three data columns:
+@example
+    The gray is obtained by mapping the averaged z coordinate of the four
+    corners of the quadrangle into the range [min_color_z,max_color_z]
+    providing range of grays [0:1].  This value can be used directly as the
+    gray for gray maps.  The normalized gray value can be further mapped into
+    a colour.  See @ref{palette} for the complete description. 
+@end example
+
+2. data splot with two ore four data columns:
+@example
+    The gray is obtained by using the LAST coordinate instead of the z value.
+
+@end example
 
 The pm3d mode requires a terminal supporting filled coloured polygons and
-palettes of smooth colours. See above for the list of currently available
+palettes of smooth colours.  See above for the list of currently available
 terminals.
 
 Notes: 
 @example
-   1. What I call scan, it is called iso_curve in gnuplot sources. I am 
-      physicist and we measure maps taking one scan after another scan, 
-      that's why.
+   1. The term 'scan' referenced above is used more among physicists then the
+      the term 'iso_curve' in gnuplot documentation and sources.  You measure
+      maps recording one scan after another scan, that's why.
    2. Map is obtained by `set view 180,0,1.25; set yrange [*:*] reverse`, 
-      plus something more. This can be easily switched on by using
-      `set pm3d map`. Use @ref{pm3d} before switching to 2d plots.
-   3. If you find this help unclear, then your assistance is welcome.
-      Similarly, any feedback for the code is welcome as well as the
-      required terminal entries (pm3d support) for other terminals.
-   4. pm3d mode has been developed by Petr Mikulik. It has been greatly
-      improved and support for many new terminals has been added since the
-      first public release as a gnuplot patch in March 1999.  Major
-      contributions by Johannes Zellner are very appreciated.
+      plus something more.  This can be easily switched on by using
+      `set pm3d map`.  Use @ref{pm3d} before switching to 2d plots.
 
 @end example
-
-Please read the READMEs enclosed with the pm3d patch distribution.  
-You may find snapshots at my web page:
-
-@uref{http://www.sci.muni.cz/~mikulik/gnuplot.html#pm3d,http://www.sci.muni.cz/~mikulik/gnuplot.html#pm3d
-}
-
-and you should also run pm3d/demo/Demo.gp.
 
 Syntax:
 @example
@@ -7229,6 +7221,7 @@ Syntax:
                  @{ hidden3d <linestyle> | nohidden3d @}
                  @{ transparent | solid @}
                  @{ map @}
+                 @{ implicit | explicit @}
                @}
       show pm3d
       unset pm3d
@@ -7238,46 +7231,45 @@ Syntax:
 @ref{pm3d} (i.e. without options) sets up the default values.
 Otherwise, the options can be given in any order.
 
-pm3d can be drawn at the base or top (colour/gray map) or as surface 
-(colour/gray surface).  This is defined by the `at` option with a 
-a string of up to 6 combinations of `b`, `t` and `s`.  For instance, `at b`
-plots at bottom only, `at st` plots firstly surface, then top, `at bstbst`...
+pm3d can be drawn at the base or top (colour or gray map) or as surface
+(colour or gray surface).  This is defined by the `at` option with a a string
+of up to 6 combinations of `b`, `t` and `s`.  For instance, `at b` plots at
+bottom only, `at st` plots firstly surface, then top, `at bstbst`...
 
 Coloured quadrangles are plotted one after another.  When plotting surfaces
 (`at s`), the later overlaps the previous ones.  You may try to switch
 between `scansforward` and `scansbackward` to change whether the first scan
-of the data is plotted first or last. The default is `scansautomatic`
-where gnuplot makes a guess about the scan direction.
+of the data is plotted first or last. The default is `scansautomatic` where
+gnuplot makes a guess about the scan direction.
 
-If two subsequent scans do not have the same number of points, then it 
-has to be decided whether to start taking points for quadrangles from the 
-beginning of both scans (`flush begin`), from their ends (`flush end`) or to 
-center them (`flush center`). Note, that `flush (center|end)` are incompatible
-with `scansautomatic`: if you specify `flush center` or `flush end` and
+If two subsequent scans do not have the same number of points, then it has to
+be decided whether to start taking points for quadrangles from the beginning
+of both scans (`flush begin`), from their ends (`flush end`) or to center
+them (`flush center`). Note, that `flush (center|end)` are incompatible with
+`scansautomatic`: if you specify `flush center` or `flush end` and
 `scansautomatic` is set, it is silently switched to `scansforward`.
 
-Clipping with respect to the x,y coordinates can be done in two ways. 
-`clip1in`:  all 4 points of the quadrangle must be defined and at least
-1 point of the quadrangle must be in the x and y ranges. `clip4in`: all 4
+Clipping with respect to the x,y coordinates can be done in two ways.
+`clip1in`:  all 4 points of the quadrangle must be defined and at least 1
+point of the quadrangle must be in the x and y ranges. `clip4in`: all 4
 points of the quadrangle must be in the x and y ranges.
 
 The above clipping is OK for plotting maps.  For surfaces, clipping with
-respect to the z coordinate will be necessary.  Maybe in future...  (maybe
+respect to the z coordinate will be necessary.  Maybe in future... (maybe
 something like "clipz1in" and "clipz4in").  Really needed?
 
 By default, the range of z-values for colouring is the same as that from 
-@ref{zrange}. That's OK for maps; for surfaces, however, using separate 
-z ranges for plotting and for colouring can be of advantage.  Then 
+@ref{zrange}. That's OK for maps; for surfaces, however, using separate z
+ranges for plotting and for colouring can be of advantage.  Then 
 @ref{cbrange} should be used.
 
-The option @ref{hidden3d} takes as the argument a linestyle which must be
-created by `set style line ...`. (The style need not to be present when
-setting pm3d, but it must be present when plotting).  If set, lines are
-drawn using the specified line style, taking into account hidden line
-removal.  This is by far more efficient then using the command @ref{hidden3d}
-as it doesn't really calculate hidden line removal, but just draws the filled
-polygons in the correct order. So the recommended choice when using pm3d
-is
+The option @ref{hidden3d} takes as the argument a linestyle which must be created
+by `set style line ...`. (The style need not to be present when setting pm3d,
+but it must be present when plotting).  If set, lines are drawn using the
+specified line style, taking into account hidden line removal.  This is by
+far more efficient then using the command @ref{hidden3d} as it doesn't really
+calculate hidden line removal, but just draws the filled polygons in the
+correct order. So the recommended choice when using pm3d is
 @example
       set pm3d at s hidden3d 100
       set style line 100 lt 5 lw 0.5
@@ -7290,32 +7282,57 @@ is
 If the option `transparent` is on, borders, tics and labels are drawn always
 above (that is after) the surface. This option is on by default to be
 compatible with the standard splot hidden3d style. If the option is off
-(`solid`), borders, tics and labels might be partially hidden by the surface.
-This is accomplished by drawing the surface and decorations in the right order
-and looks more realistic.
+(`solid`), borders, tics and labels might be partially hidden by the
+surface. This is accomplished by drawing the surface and decorations in the
+right order and looks more realistic.
 
-The `set pm3d map` is actually a macro which facilitates plotting maps. It 
-is equivalent to these user commands:
+The `set pm3d map` is actually a macro which facilitates plotting maps. It is
+equivalent to these user commands:
 @example
       set pm3d at b; unset surface; unset contour
       set view 180,0,1.3
       set yrange [*:*] reverse
       a trick to rotate the ylabel
-      ... and something on size, origin (no! gnuplot bug of negative origin!)
 @end example
 
 Notice that *now* the ylabel is rotated by an internal 'set pm3d map' switch,
-as far as no user option is available to rotate x,y,z labels explicitly. 
-Furthermore, the graph area is smaller than that of 2D graphs (some more 
-white space than I would expect like). Thus: 
-PLEASE IMPLEMENT A 2D LAYOUT FOR 3D MAPS!
-Please use @ref{pm3d} to correctly get rid of the pm3d setup, notably
-the reversed y axis and rotated ylabel.
+as far as no user option is available to rotate x,y,z labels explicitly.
+Furthermore, the graph area is smaller than that of 2D graphs (some more
+white space than I would expect like). Thus could be solved if someone (why
+not you?!) likes to implement a 2d layout for 3d maps, e.g. 'set view map').
+Please use @ref{pm3d} to correctly get rid of the pm3d setup, notably the
+reversed y axis and rotated ylabel.
 
-The colouring setup as well as the colour box drawing are determinated by @ref{palette}. Maybe in future there could be a possibility of using more palettes, 
-which will add new option `set pm3d palette <n>`.
+The colouring setup as well as the colour box drawing are determinated by
+@ref{palette}. Maybe in future there could be a possibility of using more
+palettes, which will add new option `set pm3d palette <n>`.
 
-Type also @ref{palette}, `help colorbox`, @ref{pm3d}, `help vgagl`.
+If the option `implicit` is on (which is the default), all surface plots
+will be plotted additionally to the default type, e.g.
+@example
+      splot 'fred.dat' w l, 'lola.dat' w l
+@end example
+
+would give both plots additionally a pm3d surface.
+If the option `implicit` is off (or `explicit` is on) only plots specified
+by the @ref{pm3d} attribute are plotted with a pm3d surface, e.g.:
+@example
+      splot 'fred.dat' w l, 'lola.dat' w pm3d
+@end example
+
+would plot 'fred.dat' with lines (and only lines) and 'lola.dat' with
+a pm3d surface.
+If `explicit` is on, you can also switch to the default style @ref{pm3d}, e.g.:
+@example
+      set style data pm3d
+
+@end example
+
+Note that when plotting several plots, they're plotted in the order given
+on the command line. This can be of interest especially for pm3d surfaces
+which can overwrite and therefore hide part of earlier plots.
+
+See also @ref{palette}, `help colorbox`, @ref{pm3d}, `help vgagl`.
 
 
 @node palette, color_box, pm3d, set-show
@@ -7329,10 +7346,10 @@ Type also @ref{palette}, `help colorbox`, @ref{pm3d}, `help vgagl`.
 @opindex palette
 
 
-Palette is a colour storage for use by @ref{pm3d}, filled colour contours or 
-polygons, colour histograms, colour gradient background, and whatever it is or
-it will be implemented...  Here it stands for a palette of smooth "continuous"
-colours or grays, but let's call it just a palette.
+Palette is a colour storage for use by @ref{pm3d}, filled colour contours or
+polygons, colour histograms, colour gradient background, and whatever it is
+or it will be implemented...  Here it stands for a palette of smooth
+"continuous" colours or grays, but let's call it just a palette.
 
 Colour palettes, or requires terminal entries for filled colour polygons and
 palettes of smooth colours, are currently available for terminals listed in
@@ -7354,8 +7371,8 @@ Syntax:
 @end example
 
 @ref{palette} (i.e. without options) sets up the default values.
-Otherwise, the options can be given in any order. @ref{palette} shows the 
-current palette properties. `show palette palette <n>` shows RGB triplets for 
+Otherwise, the options can be given in any order. @ref{palette} shows the
+current palette properties. `show palette palette <n>` shows RGB triplets for
 the current settings and a palette having <n> discrete colours.
 
 The following options determine the colouring properties.
@@ -7402,17 +7419,17 @@ If a postscript file has been produced for grided (or mostly regular) data,
 then it is possible to reduce the size of that postscript file up to at about
 50% by the enclosed awk script `pm3dCompress.awk`.  This you may find
 interesting if you intend to keep the file for including it into your
-publication or before downloading a very large file into a slow printer. 
+publication or before downloading a very large file into a slow printer.
 Usage: `awk -f pm3dCompress.awk thefile.ps >smallerfile.ps`.
 
-Many terminals have discrete number of colours (e.g. 256 colours in gif).  All
-entries of the palette remaining after linetype colours declaration are 
-allocated for pm3d by default.  Then multiplot could fail if there are no more
-colour positions available.  You should use `set palette maxcolors <maxcolors>`
-with a reasonably small value. This option can also be used to separate levels
-of z=constant in discrete steps, thus to emulate filled contours.
-Default value is 0 for allocating all remaining entries or for to use 
-exact mapping to RGB.
+Many terminals have discrete number of colours (e.g. 256 colours in gif). All
+entries of the palette remaining after linetype colours declaration are
+allocated for pm3d by default.  Then multiplot could fail if there are no
+more colour positions available.  You should use `set palette maxcolors
+<maxcolors>` with a reasonably small value. This option can also be used to
+separate levels of z=constant in discrete steps, thus to emulate filled
+contours. Default value is 0 for allocating all remaining entries or for to
+use exact mapping to RGB.
 
 
 @node color_box, pointsize, palette, set-show
@@ -7425,8 +7442,9 @@ exact mapping to RGB.
 @cindex colorbox
 
 
-The colour scheme, i.e. the gradient of the smooth colour with min_z and max_z
-values of @ref{pm3d}'s @ref{palette}, is drawn in a colour box unless `unset colorbox`.
+The colour scheme, i.e. the gradient of the smooth colour with min_z and
+max_z values of @ref{pm3d}'s @ref{palette}, is drawn in a colour box unless `unset
+colorbox`.
 
 @example
       set colorbox
@@ -7474,7 +7492,7 @@ usual axes commands, i.e. `set/unset/show` with @ref{cbrange}, `[m]cbtics`,
 `format cb`, `grid [m]cb`, @ref{cblabel}, and perhaps even @ref{cbdata}, `[no]cbdtics`,
 `[no]cbmtics`.
 
-Type also @ref{pm3d}, @ref{palette}, @ref{pm3d}, `help vgagl`, 
+See also @ref{pm3d}, @ref{palette}, @ref{pm3d}, `help vgagl`, 
 `help set style line`.
 
 
@@ -7938,7 +7956,8 @@ The area is filled between the current curve and
 
 @end example
 
-Note: filling is supported on filled-polygon capable terminals, type @ref{pm3d} for their list.
+Note: filling is supported on filled-polygon capable terminals, see 
+@ref{pm3d} for their list.
 
 Zoom of a filled curve drawn from a datafile may produce empty or incorrect
 area because gnuplot is clipping points and lines, and not areas.
@@ -12943,10 +12962,10 @@ The @ref{plot} options @ref{thru} and @ref{smooth} are not available for `splot`
 Data file organization is essentially the same as for @ref{plot}, except that
 each point is an (x,y,z) triple.  If only a single value is provided, it
 will be used for z, the datablock number will be used for y, and the index
-of the data point in the datablock will be used for x.  If two values are
-provided, `gnuplot` gives you an error message.  Three values are interpreted
-as an (x,y,z) triple.  Additional values are generally used as errors, which
-can be used by `fit`.
+of the data point in the datablock will be used for x.  If two or four values
+are provided, `gnuplot` uses the last value for calculating the color in
+pm3d plots.  Three values are interpreted as an (x,y,z) triple.  Additional
+values are generally used as errors, which can be used by `fit`.
 
 Single blank records separate datablocks in a `splot` datafile; `splot`
 treats datablocks as the equivalent of function y-isolines.  No line will
