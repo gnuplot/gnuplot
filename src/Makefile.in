@@ -111,7 +111,7 @@ EXTRA_gnuplot_SOURCES = @NEXTOBJS@
 
 gnuplot_LDADD = $(TERMLIBS) $(TERMXLIBS)
 
-gnuplot_x11_SOURCES = gplt_x11.c stdfn.c
+gnuplot_x11_SOURCES = gplt_x11.c
 
 gnuplot_x11_LDADD = $(XLIBS)
 
@@ -187,7 +187,7 @@ util$U.o util3d$U.o variable$U.o version$U.o
 gnuplot_OBJECTS =  $(am_gnuplot_OBJECTS)
 gnuplot_DEPENDENCIES = 
 gnuplot_LDFLAGS = 
-am_gnuplot_x11_OBJECTS =  gplt_x11$U.o stdfn$U.o
+am_gnuplot_x11_OBJECTS =  gplt_x11$U.o
 gnuplot_x11_OBJECTS =  $(am_gnuplot_x11_OBJECTS)
 gnuplot_x11_DEPENDENCIES = 
 gnuplot_x11_LDFLAGS = 

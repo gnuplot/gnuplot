@@ -99,6 +99,9 @@
 /* Define if you have the strchr function.  */
 #undef HAVE_STRCHR
 
+/* Define if you have the strcspn function.  */
+#undef HAVE_STRCSPN
+
 /* Define if you have the strdup function.  */
 #undef HAVE_STRDUP
 
