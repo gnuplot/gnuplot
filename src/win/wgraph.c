@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.29 2002/08/30 18:45:46 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.30 2002/10/25 16:37:54 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - win/wgraph.c */
@@ -817,9 +817,9 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
      * position: */
     hshift = MulDiv(lpgw->vchar, rr-rl, lpgw->xmax)/2;
 
-    pen = 0;
+    pen = 2;
     SelectObject(hdc, lpgw->hapen);
-    SelectObject(hdc, lpgw->colorbrush[pen+2]);
+    SelectObject(hdc, lpgw->colorbrush[pen]);
 
     /* do the drawing */
     blkptr = lpgw->gwopblk_head;
@@ -880,9 +880,9 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 		if (lpgw->color && isColor)
 		    SetTextColor(hdc, lpgw->colorpen[0].lopnColor);
 #endif
+		pen = curptr->x;
+		SelectObject(hdc, lpgw->colorbrush[pen]);
 	    }
-	pen = curptr->x;
-	SelectObject(hdc, lpgw->colorbrush[pen%WGNUMPENS + 2]);
 	break;
 	    
 	case W_put_text:
@@ -950,7 +950,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 		    SelectObject(hdc, halftone_brush[0]);
 	    }
 	    /* needs to be fixed for monochrome devices */
-	    SetTextColor(hdc, lpgw->colorpen[pen+2].lopnColor);
+	    SetTextColor(hdc, lpgw->colorpen[pen].lopnColor);
 	    xdash -= rl;
 	    ydash -= rb - 1;
 	    PatBlt(hdc, ppt[0].x, ppt[0].y, xdash, ydash, PATCOPY);

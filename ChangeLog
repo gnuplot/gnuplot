@@ -1,9 +1,19 @@
+2003-04-18  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/win/wgraph.c (drawgraph): Fix signedness bug exposed by
+	saving the "test" page to the clipboard.  Shift value of local
+	variable "pen" by 2 to keep it non-negative.
+
+	* config/makefile.cyg (CFLAGS): Add missing "endif".
+	(veryclean): Remove pgnuplot.exe, too.
+
 2003-04-18  Daniel J Sebald  <daniel.sebald@ieee.org>
 
-	* src/gplt_x11.c(process_event): Patch "[ 707940 ] bug fix for graph
-	height underflow 690018". Fixes graph size when mouse is on/off. The
-	fix is simply to check if vchar > plot->height, and if so set
-	plot->gheight to zero otherwise plot->gheight = plot->height - vchar. 
+	* src/gplt_x11.c (process_event): Patch "[ 707940 ] bug fix for
+	graph height underflow 690018". Fixes graph size when mouse is
+	on/off. The fix is simply to check if vchar > plot->height, and if
+	so set plot->gheight to zero otherwise plot->gheight =
+	plot->height - vchar.
 
 2003-04-18  Harald Harders  <h.harders@tu-bs.de>
 
@@ -13,24 +23,25 @@
 
 2003-04-18  Petr Mikulik  <mikulik@physics.muni.cz>
 
-	* gnuplot.doc unset.c(reset_command): Remove "unset_loadpath()" from
-	reset command. After discussion on gnuplot-beta list, the "reset"
-	command should reset only graphics settings, while it should let
-	unchanged non-graphics settings (like set term, out, loadpath and
-	fontpath).
+	* gnuplot.doc unset.c(reset_command): Remove "unset_loadpath()"
+	from reset command. After discussion on gnuplot-beta list, the
+	"reset" command should reset only graphics settings, while it
+	should let unchanged non-graphics settings (like set term, out,
+	loadpath and fontpath).
 
 2003-04-13  Ethan Merritt <merritt@u.washington.edu>
 
-	* src/term.c src/graphics.c: Correct a syntax error in test for terminal
-	support of filled boxes.  This fixes reported crashes under MSWin.
+	* src/term.c src/graphics.c: Correct a syntax error in test for
+	terminal support of filled boxes.  This fixes reported crashes
+	under MSWin.
 
-	* src/gadgets.c src/mouse.c: Fix the same syntax error in other files
-	also, although no crashes have been reported for these.
+	* src/gadgets.c src/mouse.c: Fix the same syntax error in other
+	files also, although no crashes have been reported for these.
 
 2003-04-13  Ethan Merritt <merritt@u.washington.edu>
 
-	* term/gd.trm: Document that libgd will handle both TrueType
-	and Adobe Type 1 fonts.
+	* term/gd.trm: Document that libgd will handle both TrueType and
+	Adobe Type 1 fonts.
 
 	* src/unset.c: Set tic label rotation to 0 on unset or reset.
 
@@ -40,12 +51,13 @@
 
 	* term/eepic.trm: Fix broken parsing of terminal options.
 
-	* term/pstricks.trm: Remove unused prototype PSTRICKS_previous_palette.
+	* term/pstricks.trm: Remove unused prototype
+	PSTRICKS_previous_palette.
 
 2003-04-04  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* config/makefile.nt (winmain.obj): Don't repeat HELPFILE
- 	definition --- already part of CFLAGS.
+	definition --- already part of CFLAGS.
 
 2003-04-04  Petr Mikulik  <mikulik@physics.muni.cz>
 

@@ -1,11 +1,14 @@
 #
 #
-# $Id: makefile.cyg,v 1.19 2003/01/09 09:21:54 mikulik Exp $
+# $Id: makefile.cyg,v 1.20 2003/02/19 18:59:22 mikulik Exp $
 #
 # GNUPLOT Makefile for Cygwin on WinNT and Win95/98/2000
 #
 # To compile gnuplot for WinXX:
 #
+# - check the beginning of this file settings you may want to change
+#   You'll have to tell it where to find the Help Compiler, among other
+#   things.
 # - compile the package: go to directory 'gnuplot' and therefrom run
 #	 make -C src -f ../config/makefile.cyg
 # - resource compiler used is windres.exe in Cygwin
@@ -182,6 +185,7 @@ endif
 ifdef PNG_FOR_GIF
   CFLAGS += -DPNG_FOR_GIF
   CFLAGS += -DHAVE_GD_GIF
+endif
 endif
 
 ifdef PDF
@@ -399,6 +403,7 @@ realclean: veryclean
 veryclean: clean
 	$(RM) wgnuplot.exe wgnuplot.hlp wgnuplot.mnu wgnuplot.gid
 	$(RM) $(M)binary[123] $(M)fit.log $(M)soundfit.par
+	$(RM) pgnuplot.exe
 
 # now move the whole stuff to its destination
 install: default
