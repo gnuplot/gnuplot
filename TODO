@@ -81,11 +81,6 @@ PBM:
 	      As to the patch - there is none, just a comment that two
 	      of the colors are hard to see.
   
-Postscript:
-  -- Patch 400372 Enables LaTeX psfrag labels in the postscript terminal
-  -- Patch 401009 Enables LaTeX psfrag labels in postscript (updated for 3.8c)
-	Can somebody comment on this? Can these patches be still applied?
-
 Pstricks:
   -- Patch 559611 color + variable pointsize in pstricks
 	Can somebody comment on this?
