@@ -1691,14 +1691,15 @@ START_HELP(post)
 " The `postscript` driver supports about 70 distinct pointtypes, selectable",
 " through the `pointtype` option on `plot` and `set linestyle`.",
 "",
-" Several possibly useful files about `gnuplot`'s PostScript are included in",
-" the /docs subdirectory of the `gnuplot` distribution and at the distribution",
-" sites.  These are \"ps_symbols.gpi\" (a `gnuplot` command file that, when",
-" executed, creates the file \"ps_symbols.ps\"), \"ps_symbols.ps\" (which shows",
-" all the symbols available through the `postscript` terminal), \"ps_guide.ps\"",
-" (which contains a summary of the enhanced syntax and pages showing what the",
-" octal codes produce with text and symbol fonts) and \"ps_file.doc\" (a text",
-" file discussing the organization of a PostScript file written by `gnuplot`).",
+" Several possibly useful files about `gnuplot`'s PostScript are included",
+" in the /docs/ps subdirectory of the `gnuplot` distribution and at the",
+" distribution sites.  These are \"ps_symbols.gpi\" (a `gnuplot` command file",
+" that, when executed, creates the file \"ps_symbols.ps\" which shows all the",
+" symbols available through the `postscript` terminal), \"ps_guide.ps\" (a",
+" PostScript file that contains a summary of the enhanced syntax and a page",
+" showing what the octal codes produce with text and symbol fonts) and",
+" \"ps_file.doc\" (a text file that contains a discussion of the organization",
+" of a PostScript file written by `gnuplot`).",
 "", 
 " A PostScript file is editable, so once `gnuplot` has created one, you are",
 " free to modify it to your heart's desire.  See the \"editing postscript\"",
@@ -1775,7 +1776,7 @@ START_HELP(post)
 "       set title '{/Symbol=18 \\362@_{/=9.6 0}^{/=12 x}} \\",
 "                  {/Helvetica e^{-{/Symbol m}^2/2} d}{/Symbol m}'",
 "",
-" The file \"ps_guide.ps\" in the /docs subdirectory of the `gnuplot` source",
+" The file \"ps_guide.ps\" in the /docs/ps subdirectory of the `gnuplot` source",
 " distribution contains more examples of the enhanced syntax.",
 "2 editing postscript",
 "?set terminal postscript editing",
@@ -1798,7 +1799,7 @@ START_HELP(post)
 " may require deeper knowledge of the PostScript language.",
 "",
 " The organization of a PostScript file written by `gnuplot` is discussed in",
-" the text file \"ps_file.doc\" in the /docs subdirectory."
+" the text file \"ps_file.doc\" in the /docs/ps subdirectory."
 END_HELP(post)
 #endif
 
