@@ -120,12 +120,14 @@ double zero = ZERO;
 double pointsize = 1.0;
 
 /* set border */
-#ifdef PM3D
-struct lp_style_type border_lp = { 0, -2, 0, 1.0, 1.0, 0 };
-#else
-struct lp_style_type border_lp = { 0, -2, 0, 1.0, 1.0 };
-#endif
 int draw_border = 31;
+#ifdef PM3D
+# define DEFAULT_BORDER_LP { 0, -2, 0, 1.0, 1.0, 0 }
+#else
+# define DEFAULT_BORDER_LP { 0, -2, 0, 1.0, 1.0 }
+#endif
+struct lp_style_type border_lp = DEFAULT_BORDER_LP;
+const struct lp_style_type default_border_lp = DEFAULT_BORDER_LP;
 
 /* set clip */
 TBOOLEAN clip_lines1 = TRUE;

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.52 2001/02/01 17:56:05 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.53 2001/02/15 17:02:56 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -149,7 +149,6 @@ static void load_offsets __PROTO((double *a, double *b, double *c, double *d));
 static void set_linestyle __PROTO((void));
 static int assign_linestyle_tag __PROTO((void));
 static int looks_like_numeric __PROTO((char *));
-static void reset_lp_properties __PROTO((struct lp_style_type *arg));
 static int set_tic_prop __PROTO((AXIS_INDEX));
 static char *fill_numbers_into_string __PROTO((char *pattern));
 
@@ -574,7 +573,7 @@ set_arrow()
     struct arrow_def *new_arrow = NULL;
     struct arrow_def *prev_arrow = NULL;
     struct position spos, epos, headsize;
-    struct lp_style_type loc_lp;
+    struct lp_style_type loc_lp = DEFAULT_LP_STYLE_TYPE;
     int tag;
     TBOOLEAN set_start, set_end, head = 1;
     TBOOLEAN set_line = 0, set_headsize = 0, set_layer = 0;
@@ -583,9 +582,6 @@ set_arrow()
     headsize.x = 0; /* length being zero means the default head size */
 
     c_token++;
-
-    /* Init struct lp_style_type loc_lp */
-    reset_lp_properties (&loc_lp);
 
     /* get tag */
     if (!END_OF_COMMAND
@@ -854,7 +850,7 @@ set_border()
      * for any other solution, currently */
     /* not for long, I hope. Lars */
     if(END_OF_COMMAND) {
-	set_lp_properties(&border_lp, 0, -2, 0, 1.0, 1.0);
+	border_lp = default_border_lp;
     } else {
 	lp_parse(&border_lp, 1, 0, -2, 0);
     }
@@ -2669,7 +2665,7 @@ set_terminal()
 		if (push_term_opts != NULL) free(push_term_opts);
 		if (push_term) {
 		    memcpy((void*)&push_term[0], (void*)term, sizeof(struct termentry));
-		    push_term_opts = strdup(term_options);
+		    push_term_opts = gp_strdup(term_options);
 		    fprintf(stderr, "\tpushed terminal %s %s\n", term->name, push_term_opts);
 		}
 	    } else
@@ -3233,13 +3229,10 @@ set_linestyle()
     struct linestyle_def *this_linestyle = NULL;
     struct linestyle_def *new_linestyle = NULL;
     struct linestyle_def *prev_linestyle = NULL;
-    struct lp_style_type loc_lp;
+    struct lp_style_type loc_lp = DEFAULT_LP_STYLE_TYPE;
     int tag;
 
     c_token++;
-
-    /* Init struct lp_style_type loc_lp */
-    reset_lp_properties (&loc_lp);
 
     /* get tag */
     if (!END_OF_COMMAND) {
@@ -3598,32 +3591,6 @@ struct position *pos;
 	pos->scalez = type;	/* same as y */
     }
 }
-
-void
-set_lp_properties(arg, allow_points, lt, pt, lw, ps)
-struct lp_style_type *arg;
-int allow_points, lt, pt;
-double lw, ps;
-{
-    arg->pointflag = allow_points;
-    arg->l_type = lt;
-    arg->p_type = pt;
-    arg->l_width = lw;
-    arg->p_size = ps;
-}
-
-static void
-reset_lp_properties(arg)
-struct lp_style_type *arg;
-{
-    /* See plot.h for struct lp_style_type */
-    arg->pointflag = arg->l_type = arg->p_type = 0;
-    arg->l_width = arg->p_size = 1.0;
-#ifdef PM3D
-    arg->use_palette = 0;
-#endif
-}
-
 
 /*
  * Backwards compatibility ...

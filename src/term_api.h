@@ -1,5 +1,5 @@
 /*
- * $Id: term_api.h,v 1.11 2000/12/04 12:02:20 mikulik Exp $
+ * $Id: term_api.h,v 1.12 2000/12/18 08:21:17 mikulik Exp $
  */
 
 /* GNUPLOT - term_api.h */
@@ -75,6 +75,12 @@ typedef struct lp_style_type {	/* contains all Line and Point properties */
 #endif
     /* ... more to come ? */
 } lp_style_type;
+
+#ifdef PM3D
+# define DEFAULT_LP_STYLE_TYPE {0, 0, 0, 1.0, 1.0, FALSE}
+#else
+# define DEFAULT_LP_STYLE_TYPE {0, 0, 0, 1.0, 1.0}
+#endif
 
 /* values for the optional flags field - choose sensible defaults
  * these aren't really very sensible names - multiplot attributes

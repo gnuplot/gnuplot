@@ -1,5 +1,5 @@
 /*
- * $Id: setshow.h,v 1.27 2000/10/31 19:59:31 joze Exp $
+ * $Id: setshow.h,v 1.28 2000/11/01 18:57:33 broeker Exp $
  */
 
 /* GNUPLOT - setshow.h */
@@ -74,7 +74,6 @@ void show_version __PROTO((FILE *fp));
 char *conv_text __PROTO((const char *s));
 void delete_linestyle __PROTO((struct linestyle_def *, struct linestyle_def *));
 int set_label_tag __PROTO((void));
-void set_lp_properties __PROTO((struct lp_style_type *, int, int, int, double, double));
 void reset_key __PROTO((void));
 
 #endif /* GNUPLOT_SETSHOW_H */
