@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gpltconv.c,v 1.1 1999/08/17 15:51:16 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: gpltconv.c,v 1.2 1999/08/24 11:22:04 lhecking Exp $"); }
 #endif
 
 /* gnuplot - gpltconv.c */
@@ -55,10 +55,10 @@ static char *RCSid() { return RCSid("$Id: gpltconv.c,v 1.1 1999/08/17 15:51:16 l
 
 /* translation buffer; should be big enough for everyone ...
  * we don't use dynamic memory to keep it nice and simple */
-static char tbuf[4096];
+static char tbuf[4*BUFSIZ];
 
 /* strings to be changed */
-static char *instrings[] =
+static const char *instrings[] =
 {
     "set data style ",
     "set function style ",
@@ -67,7 +67,7 @@ static char *instrings[] =
 };
 
 /* replacements */
-static char *outstrings[] =
+static const char *outstrings[] =
 {
     "set style data ",
     "set style function ",
