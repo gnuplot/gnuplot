@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: hidden3d.c,v 1.13 1998/12/09 15:23:56 lhecking Exp $";
+static char *RCSid = "$Id: hidden3d.c,v 1.13.2.1 1999/08/19 14:39:28 lhecking Exp $";
 #endif
 
 /* GNUPLOT - hidden3d.c */
@@ -2140,14 +2140,20 @@ long Last, Test;
 	    test->tested = is_moved_or_split;
 	    SPLIT_TEST_BY_P;
 	} else {
-	    if (loop && (p->tested == is_tested)) {
-		/* Ouch, seems like we're in trouble, really */
+	    if (loop && (p->tested == is_in_loop)) { 
+		/* Ouch, seems like we're in trouble, really: no way to
+		 * split one of them, and we're in a loop, so we can't
+		 * move p to the front of the list, without risking an
+		 * endless loop. Well, let's just output the darn thing,
+		 * then, no matter what. :-( */
+#if DEBUG /* normally off */
 		fprintf(stderr, "\
 #Failed: In loop, without intersections.\n\
 #Relations are %d, %d\n",
 			p_rel_tplane, t_rel_pplane);
 		print_polygon(test, "test");
 		print_polygon(p, "p");
+#endif	
 		continue;	/* Keep quiet, maybe no-one will notice (;-) */
 	    } else {
 		PUT_P_IN_FRONT_TEST(is_in_loop);
