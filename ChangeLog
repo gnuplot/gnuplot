@@ -1,3 +1,10 @@
+2003-04-18  Daniel J Sebald  <daniel.sebald@ieee.org>
+
+	* src/gplt_x11.c(process_event): Patch "[ 707940 ] bug fix for graph
+	height underflow 690018". Fixes graph size when mouse is on/off. The
+	fix is simply to check if vchar > plot->height, and if so set
+	plot->gheight to zero otherwise plot->gheight = plot->height - vchar. 
+
 2003-04-18  Harald Harders  <h.harders@tu-bs.de>
 
 	* docs/psdoc/ps_fontfile_doc.tex: Patch "[ 696421 ] Improved

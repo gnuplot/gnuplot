@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.54 2002/12/18 00:57:02 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.55 2003/03/31 22:16:58 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - gplt_x11.c */
@@ -2962,7 +2962,11 @@ process_event(XEvent *event)
 		plot->width = w;
 		plot->height = h;
 #ifdef USE_MOUSE
-		plot->gheight = plot->height - (plot->str[0] ? vchar : 0);
+		if (plot->str[0])
+		    /* Make sure that unsigned number doesn't underflow. */
+		    plot->gheight = (vchar > plot->height) ? 0 : plot->height - vchar;
+		else
+		    plot->gheight = plot->height;
 #endif
 		plot->posn_flags = (plot->posn_flags & ~PSize) | USSize;
 #if USE_ULIG_FILLEDBOXES
