@@ -709,7 +709,6 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 					}
 				break;
 			case W_pointsize:
-#if 1
 				/* HBB 980309: term->pointsize() passes the number as a scaled-up
 				 * integer now, so we can avoid calling sscanf() here (in a Win16
 				 * DLL sharing stack with the stack-starved wgnuplot.exe !).
@@ -720,9 +719,8 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 					 * pointsize at all! That obviously can't be correct. So use it! */
 					htic = pointsize*MulDiv(lpgw->htic, rr-rl, lpgw->xmax) + 1;
 					vtic = pointsize*MulDiv(lpgw->vtic, rb-rt, lpgw->ymax) + 1;
-				} else
-#endif
-				{	char *str;
+                               } else {
+					char *str;
 					str = LocalLock(curptr->htext);
 					if (str) {
 						double pointsize;
@@ -879,17 +877,34 @@ CopyClip(LPGW lpgw)
 	{
 	GW gwclip = *lpgw;
 	int windowfontsize = MulDiv(lpgw->fontsize, GetDeviceCaps(hdc, LOGPIXELSY), 72);
+	int i;
 	gwclip.fontsize = MulDiv(windowfontsize, lpgw->ymax, rect.bottom);
 	gwclip.hfonth = gwclip.hfontv = 0;
+
+	/* HBB 981203: scale up pens as well... */
+	for (i=0; i<WGNUMPENS+2; i++) {
+		if(gwclip.monopen[i].lopnWidth.x > 1)
+			gwclip.monopen[i].lopnWidth.x =
+				MulDiv(gwclip.monopen[i].lopnWidth.x,
+					gwclip.xmax, rect.right-rect.left);
+		if(gwclip.colorpen[i].lopnWidth.x > 1)
+			gwclip.colorpen[i].lopnWidth.x =
+				MulDiv(gwclip.colorpen[i].lopnWidth.x,
+					gwclip.xmax, rect.right-rect.left);
+	}
+
 	rect.right = lpgw->xmax;
 	rect.bottom = lpgw->ymax;
 	
+	MakePens(&gwclip, hdc);
 	MakeFonts(&gwclip, &rect, hdc);
 
 	ReleaseDC(hwnd, hdc);
 
 	hdc = CreateMetaFile((LPSTR)NULL);
-	SetMapMode(hdc, MM_ANISOTROPIC);
+
+/* HBB 981203: According to Petzold, Metafiles shouldn't contain SetMapMode() calls: */
+	/*SetMapMode(hdc, MM_ANISOTROPIC);*/
 #ifdef WIN32
 	SetWindowExtEx(hdc, rect.right, rect.bottom, (LPSIZE)NULL);
 #else
@@ -898,6 +913,7 @@ CopyClip(LPGW lpgw)
 	drawgraph(&gwclip, hdc, (void *) &rect);
 	hmf = CloseMetaFile(hdc);
 	DestroyFonts(&gwclip);
+	DestroyPens(&gwclip);
 	}
 
 	hGMem = GlobalAlloc(GMEM_MOVEABLE, (DWORD)sizeof(METAFILEPICT));
@@ -907,7 +923,8 @@ CopyClip(LPGW lpgw)
 	/* in MM_ANISOTROPIC, xExt & yExt give suggested size in 0.01mm units */
 	lpMFP->mm = MM_ANISOTROPIC;
 	lpMFP->xExt = MulDiv(rect.right-rect.left, 2540, GetDeviceCaps(hdc, LOGPIXELSX));
-	lpMFP->yExt = MulDiv(rect.bottom-rect.top, 2540, GetDeviceCaps(hdc, LOGPIXELSX));
+	/* HBB 981203: Seems it should be LOGPIXELS_Y_, here, not _X_*/
+	lpMFP->yExt = MulDiv(rect.bottom-rect.top, 2540, GetDeviceCaps(hdc, LOGPIXELSY));
 	lpMFP->hMF = hmf;
 	ReleaseDC(hwnd, hdc);
 	GlobalUnlock(hGMem);

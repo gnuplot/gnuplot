@@ -91,7 +91,9 @@ LPSTR szModuleName;
 LPSTR winhelpname;
 LPSTR szMenuName;
 #define MENUNAME "wgnuplot.mnu"
+#ifndef HELPFILE /* HBB 981203: makefile.win predefines this... */
 #define HELPFILE "wgnuplot.hlp"
+#endif
 
 extern char version[];
 extern char patchlevel[];
