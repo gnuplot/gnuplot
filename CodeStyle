@@ -116,11 +116,12 @@ char s;
 #endif
 
 but since there's no benefit from using a character as parameter, may
-as well use the int  (?)  ie
+as well use the int ie.
   char *foo(s)
   int s;
 
-gcc -Wtraditional  might help with this
+gcc -Wtraditional  might help with this.
+[char parameters should be avoided. int can safely be used in this case.]
 
 
 

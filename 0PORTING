@@ -103,7 +103,9 @@ HAVE_LGAMMA       lgamma()       specfun.c       prefered over gamma()
 HAVE_ON_EXIT      on_exit()      term/x11.trm    atexit() substitute on SunOS
 HAVE_RINDEX       rindex()       stdfn.h         pre-ANSI version of strrchr()
 HAVE_SLEEP        sleep()        command.c
-HAVE_SYSINFO      sysinfo()      gplt_x11.c      SysV version of gethostname()
+HAVE_SYSINFO      sysinfo()      gplt_x11.c      SysV function to get and set
+                                                 system information. Used
+                                                 instead of gethostname().
 HAVE_STRNCASECMP  strncasecmp()  stdfn.c
 HAVE_STRNICMP     strnicmp()     stdfn.c
 HAVE_TCGETATTR    tcgetattr()    readline.c

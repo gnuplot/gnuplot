@@ -625,7 +625,7 @@ may work, though).
   compiler cc can be made to work with Wietse Venema's unproto tool.
 
   unproto is available from
-  ftp://ftp.win.tue.nl/pub/unix/unproto4.shar.Z
+  ftp://ftp.win.tue.nl/pub/unix/unproto5.shar.Z
   ftp://ftp.porcupine.org/pub/lang/unproto5.shar.Z
 
   After installing unproto, configure gnuplot with

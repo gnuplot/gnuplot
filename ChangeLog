@@ -1,3 +1,51 @@
+1998-11-06  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* 0INSTALL: Updated pointer to unproto.
+
+	* 0PORTING: Updated.
+
+	* acconfig.h: New symbol USE_SYSTEM_TIME (see time.c).
+
+	* config.hin, configure: Regenerated.
+
+	* configure.in: Improved time_t test by Andris Pavenis
+	<pavenis@lanet.lv>. New option '--enable-system-time' (see time.c).
+	Add check for <sys/timeb.h>.
+
+	* fit.c: Remove obsolete function subst().
+	
+	* Makefile.in, makefile.all: Remove mkdist from ETC variable.
+
+	* mkdist: Obsolete, removed. Use 'make dist'.
+
+	* protos.h: Change prototpe for util.c(chr_in_str).
+
+	* time.c: Fix indentation. Rename SYSTEM_TIME to USE_SYSTEM_TIME.
+	Fix compiler warnings about variable shadowing (rename clock l_clock).
+	Replace return statements with exit().
+
+	* util.c(chr_in_str): Make second arg int instead of char.
+
+	* docs/Makefile.in: New target allgih for .gih file with docs for
+	all terminals.
+
+1998-11-05  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* makefile.dj2: stdfn.o missing in OBJ3. Reported by William D Kirby
+	<wdkirby@ix.netcom.com>. demo\binary? target fixed as per suggestion
+	by Juergen Breitlow <Juergen.Breitlow@blns.siemens.de> and W. Kirby.
+
+	* plot.c(ExecuteMacro): Fix typo in variable name. Reported by
+	Lucas Hart <hartl@ucs.orst.edu>.
+
+	* syscfg.h: #ifdef directives simplified.
+
+	* term.c: Fixes to allow 'set output' in gnugraph terminal. Problem
+	reported by Berthold Hoellmann <se6y095@public.uni-hamburg.de>.
+
+	* term/djsvga.trm(DJSVGA_set_font): Add missing parenthesis. Reported
+	by William D Kirby <wdkirby@ix.netcom.com>.
+
 1998-11-04  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* graphics.c, hidden3d.c, specfun.c, stdfn.h: VMS fixes by
