@@ -1,5 +1,5 @@
 #
-# $Id: makefile.os2,v 1.39 2003/01/09 09:21:54 mikulik Exp $
+# $Id: makefile.os2,v 1.40 2003/02/19 18:59:24 mikulik Exp $
 #
 # GNUPLOT Makefile for use on OS/2 2.x (and above)
 # using emx 0.9 (and above) and GNUMake
@@ -300,7 +300,10 @@ gnupmdrv.exe: $(OS2OBJ) $(OS2DIR)\gnupmdrv.res $(OS2DIR)\gnupmdrv.def
 	$(CC2) $(LDFLAGS2) -o $@ $(OS2OBJ) $(OS2DIR)\gnupmdrv.res $(OS2DIR)\gnupmdrv.def
 
 gnupmdrv.hlp: $(OS2DIR)\gnupmdrv.ipf
-	$(IPF_C) $< $@
+#	Cannot use the command
+#	$(IPF_C) $< $@
+#	because IPFC 2.1 does not support this syntax. Use instead:
+	copy $< . && $(IPF_C) gnupmdrv.ipf && del gnupmdrv.ipf
 
 #
 # Build the X11 outboard driver
@@ -357,7 +360,10 @@ $(DOCDIR)\gnuplot.pdf: $(DOCDIR)\gnuplot.tex
 $(DOCDIR)\gnuplot.tex:  $(DOCDIR)\gnuplot.doc $(DOCDIR)\doc2tex.exe
 	$(DOCDIR)\doc2tex.exe $(DOCDIR)\gnuplot.doc $@
 $(DOCDIR)\gnuplot.inf:  $(DOCDIR)\gnuplot.ipf
-	$(IPF_C) /INF $< $@
+#	Cannot use the command
+#	$(IPF_C) /INF $< $@
+#	because IPFC 2.1 does not support this syntax. Use instead:
+	cd $(DOCDIR) && $(IPF_C) /INF gnuplot.ipf
 $(DOCDIR)\gnuplot.gih:  $(DOCDIR)\gnuplot.doc $(DOCDIR)\doc2gih.exe
 	$(DOCDIR)\doc2gih.exe $(DOCDIR)\gnuplot.doc $@
 $(DOCDIR)\gnuplot.html: $(DOCDIR)\gnuplot.texi $(DOCDIR)\gnuplot.doc
@@ -394,7 +400,10 @@ SORT_TERMINALS=1
 ifdef SORT_TERMINALS
 # sort alphabetically all terminals
 $(DOCDIR)\allterm.h: $(CORETERM)
-	# Note: untested, maybe req. bash? Test/fix it!
+	@echo "Building allterm.h"
+ifdef NO_BUGGY_GMAKE
+#	This is the original version, like in makefile.mgw or .cyg; but OS/2's
+#	GNU make crashes so we cannot use it.
 	@echo "Building allterm.h"
 	@for e in `egrep "^[ 	]*START_HELP" $(CORETERM) |\
 	     gsort -f -t':' -k2` ; do \
@@ -402,10 +411,27 @@ $(DOCDIR)\allterm.h: $(CORETERM)
 	  sed -n "/^[ 	]*$$s/,/^[ 	]*END_HELP/p" $$f ; \
 	done >$@
 else
-# sequence of terminals according to "ls term/*.trm":
+#	Instead, create a temporary script file and run bash on it:
+	echo T=$(TERMDIR)\ | tr \\ / >4alltrm.sh
+	grep "(T)" makefile.all | \
+	  sed "s/CORETERM = /CORETERM=%/;s/xlib.trm/xlib.trm%/" | \
+	  sed "s/%/\""/g;s/(/{/g;s/)/}/g" >>4alltrm.sh
+	@echo \
+	  for e in `egrep "^[ 	]*START_HELP" $${CORETERM} % \
+	  gsort -f -t':' -k2` ; do | tr  "%" "|" >>4alltrm.sh
+	@echo \
+	  f=`echo $$e % cut -d\: -f1` ; s=`echo $$e % cut -d\: -f2` ;\
+	    | tr  "%" "|" >>4alltrm.sh
+	@echo \
+	  sed -n "/^[ 	]*$$s/,/^[ 	]*END_HELP/p" $$f ; >>4alltrm.sh
+	@echo \
+	  done >>4alltrm.sh
+	bash ./4alltrm.sh >$@
+	del 4alltrm.sh
+endif
+else
+# SORT_TERMINALS==0, then sequence of terminals according to "ls term/*.trm":
 $(DOCDIR)\allterm.h: $(CORETERM)
-#   echo > $@
-#	cd $(TERMDIR) && type *.trm > $@
 	cd $(DOCDIR) && cat $(TERMDIR)/*.trm > allterm.c
 	cd $(DOCDIR) && $(CPP) -I$(TERMDIR) -DTERM_DRIVER_H -DTERM_HELP allterm.c | \
       sed -e "/^ *$$/d;/^#/d" > allterm.h

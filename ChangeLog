@@ -1,3 +1,8 @@
+2003-04-04  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* config/makefile.os2: Support for IPFC 2.1. Use temporary script file
+	when creating allterm.h.
+
 2003-04-03  Ethan Merritt <merritt@u.washington.edu>
 
 	* src/term.c: Only test fill patterns on terminals that support it.
