@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.5 2001/01/16 20:56:08 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.6 2001/01/22 18:30:21 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -565,7 +565,7 @@ gprintf(dest, count, format, log10_base, x)
 	t = temp;
 	*t++ = '%';
 	/* dont put isdigit first since sideeffect in macro is bad */
-	while (*++format == '.' || isdigit((int) *format)
+	while (*++format == '.' || isdigit((unsigned char) *format)
 	       || *format == '-' || *format == '+' || *format == ' ')
 	    *t++ = *format;
 	/*}}} */

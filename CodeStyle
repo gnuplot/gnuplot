@@ -1,4 +1,4 @@
-$Id: CodeStyle,v 1.7 1999/06/10 20:05:42 lhecking Exp $
+$Id: CodeStyle,v 1.8 1999/06/14 19:17:37 lhecking Exp $
 
 The following things have be observed when writing new code for gnuplot:
 (this file is currently under construction)  Some of the following is
@@ -175,7 +175,11 @@ coordval is typedef-ed to either double or float - it is almost always
 double, but please take care not to mix coordval's with doubles.
 
 
-
+An important rule unknown to many, it seems: *never* pass a 'char' to
+any of the <ctype.h> functions, as-is. Don't cast it to (int), either
+--- that would happen automatically, anyway. You *must* cast to
+(unsigned char), instead. Otherwise, there'll quite likely be crashes
+with 8-bit characters on systems where 'char' is signed.
 
 
 LAYOUT AND INDENTATION

@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: cgm.trm,v 1.33 2000/11/12 23:14:02 vanzandt Exp $
+ * $Id: cgm.trm,v 1.34 2000/11/23 18:26:44 lhecking Exp $
  */
 
 /* GNUPLOT - cgm.trm */
@@ -1248,7 +1248,7 @@ const char str[];
     const char *s = str;
 
     while (*s)
-	if (!isspace((int) *s++))
+	if (!isspace((unsigned char) *s++))
 	    goto showit;
     return;
 

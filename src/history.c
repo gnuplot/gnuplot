@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: history.c,v 1.4 2000/10/31 19:59:31 joze Exp $"); }
+static char *RCSid() { return RCSid("$Id: history.c,v 1.5 2000/11/01 18:57:33 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - history.c */
@@ -194,7 +194,7 @@ char *cmd;
     /* search through the history */
     while (entry->prev != NULL) {
 	line = entry->line;
-	while (isspace((int) *line))
+	while (isspace((unsigned char) *line))
 	    line++;		/* skip leading spaces */
 	if (!strncmp(cmd, line, len))	/* entry found */
 	    return line;
@@ -236,7 +236,7 @@ char *cmd;
     /* search through the history */
     while (entry != NULL) {
 	line = entry->line;
-	while (isspace((int) *line))
+	while (isspace((unsigned char) *line))
 	    line++;		/* skip leading spaces */
 	if (!strncmp(cmd, line, len)) {	/* entry found */
 	    printf("%5i  %s\n", hist_index, line);

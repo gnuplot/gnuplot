@@ -1,5 +1,13 @@
 2001-02-01  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
+	* src/*.c, term/*.trm: Fixed incorrect usage of <ctype.h> macros.
+  	If you pass a char to any of those, you *have* to cast it to
+	(unsigned char). Not to (int). The only exception would be ints
+ 	holding the result of an fgetc() or similar call, but those don't
+ 	occur in gnuplot.
+	
+2001-02-01  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
 	* src/set.c (set_command): Fix incorrect c_token movement in 'set
  	xdata {time}'.
 

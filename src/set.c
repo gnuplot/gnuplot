@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.50 2001/01/22 18:30:21 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.51 2001/02/01 16:45:55 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -2144,7 +2144,7 @@ set_output()
 	m_quote_capture(&testfile,c_token, c_token); /* reallocs store */
 	gp_expand_tilde(&testfile);
 	/* Skip leading whitespace */
-	while (isspace((int)*testfile))
+	while (isspace((unsigned char)*testfile))
 	    testfile++;
 	c_token++;
 	term_set_output(testfile);

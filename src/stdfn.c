@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: stdfn.c,v 1.7 1999/11/08 19:24:34 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: stdfn.c,v 1.8 2000/02/11 19:14:05 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - stdfn.c */
@@ -195,9 +195,9 @@ purec_sscanf(const char *string, const char *format,...)
     while (*f && *s) {
 	ch = *f++;
 	if (ch != '%') {
-	    if (isspace(ch)) {
+	    if (isspace((unsigned char) ch)) {
 		/* match any number of whitespace */
-		while (isspace(*s))
+		while (isspace((unsigned char) *s))
 		    s++;
 	    } else {
 		/* match exactly the character ch */
@@ -222,7 +222,7 @@ purec_sscanf(const char *string, const char *format,...)
 		    ignore = 1;
 		    ch = f2[-1] = *f++;
 		}
-		while (isdigit(ch)) {
+		while (isdigit((unsigned char) ch)) {
 		    ch = *f2++ = *f++;
 		}
 		if (ch == 'l' || ch == 'L' || ch == 'h') {

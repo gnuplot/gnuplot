@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.23 2000/11/01 18:57:28 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.24 2001/01/22 18:30:21 broeker Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -866,7 +866,7 @@ is_variable(s)
 char *s;
 {
     while (*s != '\0') {
-	if (!isalnum((int) *s) && *s != '_')
+	if (!isalnum((unsigned char) *s) && *s != '_')
 	    return FALSE;
 	s++;
     }

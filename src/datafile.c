@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.23 2000/12/08 17:57:08 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.24 2000/12/21 18:05:27 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -383,7 +383,7 @@ df_tokenise(s)
 #ifndef NO_FORTRAN_NUMS
 		count = sscanf(s, "%lf%n", &df_column[df_no_cols].datum, &used);
 #else
-		while (isspace(*s))
+		while (isspace((unsigned char) *s))
 		    ++s;
 		count = *s ? 1 : 0;
 		df_column[df_no_cols].datum = atof(s);
@@ -427,11 +427,11 @@ df_tokenise(s)
 
 	++df_no_cols;
 	/*{{{  skip chars to end of column */
-	while ((!isspace((int) *s)) && (*s != '\0'))
+	while ((!isspace((unsigned char) *s)) && (*s != '\0'))
 	    ++s;
 	/*}}} */
 	/*{{{  skip spaces to start of next column */
-	while (isspace((int) *s))
+	while (isspace((unsigned char) *s))
 	    ++s;
 	/*}}} */
     }
@@ -464,7 +464,7 @@ df_read_matrix(rows, cols)
 	    df_eof = 1;
 	    return rmatrix;	/* NULL if we have not read anything yet */
 	}
-	while (isspace((int) *s))
+	while (isspace((unsigned char) *s))
 	    ++s;
 
 	if (!*s || is_comment(*s)) {
@@ -882,7 +882,7 @@ int max;
 
 	/*{{{  check for blank lines, and reject by index/every */
 	/*{{{  skip leading spaces */
-	while (isspace((int) *s))
+	while (isspace((unsigned char) *s))
 	    ++s;		/* will skip the \n too, to point at \0  */
 	/*}}} */
 
@@ -1402,13 +1402,14 @@ char *fmt;			/* format string */
 
     p = fmt;
     cnt = 0;
-    while (isspace(*p))
+    while (isspace((unsigned char) *p))
 	p++;
     if (!strlen(p))
 	int_error(NO_CARET, "Empty time-data format");
     cnt++;
     for (i = 0; i < strlen(p) - 1; i++) {
-	if (isspace(p[i]) && !isspace(p[i + 1]))
+	if (isspace((unsigned char) p[i])
+	    && !isspace((unsigned char) p[i + 1]))
 	    cnt++;
     }
     return (cnt);
@@ -1441,7 +1442,7 @@ char *s;
     if (missing_val != NULL) {
 	size_t len = strlen(missing_val);
 	if (strncmp(s, missing_val, len) == 0 &&
-	    (isspace((int) s[len]) || !s[len]))
+	    (isspace((unsigned char) s[len]) || !s[len]))
 	    return 1;	/* store undefined point in plot */
     }
     return (0);

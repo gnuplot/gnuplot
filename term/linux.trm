@@ -1,5 +1,5 @@
 /*
- * $Id: linux.trm,v 1.15.2.1 2000/05/01 00:17:20 joze Exp $
+ * $Id: linux.trm,v 1.19 2000/10/31 19:59:32 joze Exp $
  *
  */
 
@@ -128,7 +128,8 @@ LINUX_setup(void)
 	pclose(pipe);
 	line[strlen(line) - 1] = '\0';
 	if (strcmp(line, "/dev/console") == 0 ||
-	    (strncmp(line, "/dev/tty", 8) == 0 && isdigit(line[8]))) {
+	    (strncmp(line, "/dev/tty", 8) == 0
+	     && isdigit((unsigned char) line[8]))) {
 	    LINUX_graphics_allowed = TRUE;
 	} else {
 	    /* check for socket name as set for example by `screen' */

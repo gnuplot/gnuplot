@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util.c,v 1.24 2000/11/01 18:57:34 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: util.c,v 1.25 2000/11/22 12:53:29 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - util.c */
@@ -152,7 +152,7 @@ isletter(t_num)
 int t_num;
 {
     return (token[t_num].is_token &&
-	    ((isalpha((int) input_line[token[t_num].start_index])) ||
+	    ((isalpha((unsigned char) input_line[token[t_num].start_index])) ||
 	     (input_line[token[t_num].start_index] == '_')));
 }
 
@@ -751,7 +751,7 @@ char *s;
     TBOOLEAN space = FALSE;	/* TRUE if we've already copied a space */
 
     for (w = r = s; *r != NUL; r++) {
-	if (isspace((int) *r)) {
+	if (isspace((unsigned char) *r)) {
 	    /* white space; only copy if we haven't just copied a space */
 	    if (!space) {
 		space = TRUE;

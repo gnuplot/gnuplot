@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: scanner.c,v 1.13 1999/10/29 18:47:20 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: scanner.c,v 1.14 1999/11/08 19:24:33 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - scanner.c */
@@ -60,14 +60,14 @@ int close(int);
 #endif /* VMS */
 
 
-#define isident(c) (isalnum(c) || (c) == '_')
+#define isident(c) (isalnum((unsigned char)c) || (c) == '_')
 
 #define LBRACE '{'
 #define RBRACE '}'
 
 #define APPEND_TOKEN {token[t_num].length++; current++;}
 
-#define SCAN_IDENTIFIER while (isident((int)expression[current + 1]))\
+#define SCAN_IDENTIFIER while (isident(expression[current + 1]))\
 				APPEND_TOKEN
 
 static int t_num;		/* number of token I'm working on */
@@ -118,7 +118,7 @@ size_t *expressionlenp;
 	    /* leave space for dummy end token */
 	    extend_token_table();
 	}
-	if (isspace((int) expression[current]))
+	if (isspace((unsigned char) expression[current]))
 	    continue;		/* skip the whitespace */
 	token[t_num].start_index = current;
 	token[t_num].length = 1;
@@ -130,9 +130,9 @@ size_t *expressionlenp;
 	    goto again;
 	}
 	/* allow _ to be the first character of an identifier */
-	if (isalpha((int) expression[current]) || expression[current] == '_') {
+	if (isalpha((unsigned char) expression[current]) || expression[current] == '_') {
 	    SCAN_IDENTIFIER;
-	} else if (isdigit((int) expression[current]) || expression[current] == '.') {
+	} else if (isdigit((unsigned char) expression[current]) || expression[current] == '.') {
 	    token[t_num].is_token = FALSE;
 	    token[t_num].length = get_num(&expression[current]);
 	    current += (token[t_num].length - 1);
@@ -246,12 +246,12 @@ char str[];
 
     token[t_num].is_token = FALSE;
     token[t_num].l_val.type = INTGR;	/* assume unless . or E found */
-    while (isdigit((int) str[count]))
+    while (isdigit((unsigned char) str[count]))
 	count++;
     if (str[count] == '.') {
 	token[t_num].l_val.type = CMPLX;
 	/* swallow up digits until non-digit */
-	while (isdigit((int) str[++count]));
+	while (isdigit((unsigned char) str[++count]));
 	/* now str[count] is other than a digit */
     }
     if (str[count] == 'e' || str[count] == 'E') {
@@ -261,11 +261,11 @@ char str[];
 	count++;
 	if (str[count] == '-' || str[count] == '+')
 	    count++;
-	if (!isdigit((int) str[count])) {
+	if (!isdigit((unsigned char) str[count])) {
 	    token[t_num].start_index += count;
 	    int_error(t_num, "expecting exponent");
 	}
-	while (isdigit((int) str[++count]));
+	while (isdigit((unsigned char) str[++count]));
     }
     if (token[t_num].l_val.type == INTGR) {
 	lval = atol(str);
