@@ -1,3 +1,23 @@
+1999-04-03  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* Makefile.am: Add conditional building of lisp files. Remove
+	CVS directories when building distribution.
+
+	* Makefile.in, aclocal.m4, configure, config/Makefile.in,
+	demo/Makefile.in, m4/Makefile.in, man/Makefile.in, term/Makefile.in,
+	tutorial/Makefile.am, tutorial/Makefile.in: Regenerated.
+
+	* configure.in: Conditional build of lisp files and tutorial.
+
+	* lisp/Makefile.in: Remove conditionals for EMACS.
+
+	* tutorial/Makefile.am.in: Add code for conditional build.
+
+1999-04-01  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* term/tkcanvas.trm(TK_vector): Rewrite #define statements which
+	are rejected by SunOS cc.
+
 1999-03-31  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* NEWS: Updated.
