@@ -1,5 +1,5 @@
 /* 
- * $Id: axis.h,v 1.20 2002/07/11 10:24:06 mikulik Exp $
+ * $Id: axis.h,v 1.21 2002/08/24 22:04:13 sfeam Exp $
  *
  */
 
@@ -308,6 +308,9 @@ extern TBOOLEAN	tic_in;		/* tics to be drawn inward?  */
 extern struct lp_style_type grid_lp; /* linestyle for major grid lines */
 extern struct lp_style_type mgrid_lp; /* linestyle for minor grid lines */
 extern double polar_grid_angle; /* angle step in polar grid in radians */
+
+/* Length of the longest tics label, set by widest_tic_callback(): */
+extern int widest_tic_strlen;
 
 /* axes being used by the current plot */
 extern AXIS_INDEX x_axis, y_axis, z_axis;
@@ -632,6 +635,8 @@ double get_writeback_max __PROTO((AXIS_INDEX));
 void set_writeback_min __PROTO((AXIS_INDEX));
 void set_writeback_max __PROTO((AXIS_INDEX));
 
+/* set widest_tic_label: length of the longest tics label */
+void widest_tic_callback __PROTO((AXIS_INDEX, double place, char *text, struct lp_style_type grid));
 
 /* ------------ autoscaling of the color axis */
 #ifdef PM3D

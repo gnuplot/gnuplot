@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.31 2002/04/05 17:15:51 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.32 2002/08/24 22:04:13 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -147,6 +147,9 @@ struct lp_style_type grid_lp   = DEFAULT_GRID_LP;
 struct lp_style_type mgrid_lp  = DEFAULT_GRID_LP;
 int grid_layer = -1;
 double polar_grid_angle = 0;	/* nonzero means a polar grid */
+
+/* Length of the longest tics label, set by widest_tic_callback(): */
+int widest_tic_strlen;
 
 /* axes being used by the current plot */
 /* These are mainly convenience variables, replacing separate copies of
@@ -1434,6 +1437,28 @@ load_range(axis, a, b, autoscale)
 	}
     }
     return (autoscale);
+}
+
+
+/* we determine length of the widest tick label by getting gen_ticks to
+ * call this routine with every label
+ */
+
+void
+widest_tic_callback(axis, place, text, grid)
+    AXIS_INDEX axis;
+    double place;
+    char *text;
+    struct lp_style_type grid;
+{
+    (void) axis;		/* avoid "unused parameter" warnings */
+    (void) place;
+    (void) grid;
+    if (text) {			/* minitics have no text at all */
+	int len = label_width(text, NULL);
+	if (len > widest_tic_strlen)
+	    widest_tic_strlen = len;
+    }
 }
 
 

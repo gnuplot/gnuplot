@@ -1,5 +1,12 @@
 2002-08-25  Petr Mikulik  <mikulik@physics.muni.cz>
 
+	* src/graphics.c src/axis.h src/axis.c: Added global routine
+	widest_tic_callback() for the calculation of the length of the widest
+	tic label. Removed similar routine widest2d_callback(), which was
+	available only for 2d plots.
+
+2002-08-25  Petr Mikulik  <mikulik@physics.muni.cz>
+
 	* src/graph3d.c: Obvious typo "inrange (0.0, X_AXIS.min, Y_AXIS.max)"
 	corrected.
 
@@ -959,7 +966,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/08/24 22:59:36 $).
+	last modification date (from the tag $Date: 2002/08/25 13:10:11 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 

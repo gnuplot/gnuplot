@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.70 2002/07/26 16:42:27 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.71 2002/08/24 22:04:13 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -141,11 +141,7 @@ static TBOOLEAN two_edge_intersect_fsteps __PROTO((struct coordinate GPHUGE * po
 
 static void boundary __PROTO((struct curve_points * plots, int count));
 
-/* widest2d_callback keeps longest so far in here */
-static int widest_tic;
-
 /* HBB 20010118: these should be static, but can't --- HP-UX assembler bug */
-void widest2d_callback __PROTO((AXIS_INDEX, double place, char *text, struct lp_style_type grid));
 void ytick2d_callback __PROTO((AXIS_INDEX, double place, char *text, struct lp_style_type grid));
 void xtick2d_callback __PROTO((AXIS_INDEX, double place, char *text, struct lp_style_type grid));
 int histeps_compare __PROTO((SORTFUNC_ARGS p1, SORTFUNC_ARGS p2));
@@ -231,34 +227,6 @@ int count, *kcnt;
 	*kcnt = cnt;
     return (mlen);
 }
-
-
-/*{{{  widest2d_callback() */
-/* we determine widest tick label by getting gen_ticks to call this
- * routine with every label
- */
-/* HBB 20010118: all the *_callback() functions made non-static. This
- * is necessary to work around a bug in HP's assembler shipped with
- * HP-UX 10 and higher, if GCC tries to use it */
-
-void
-widest2d_callback(axis, place, text, grid)
-    AXIS_INDEX axis;
-    double place;
-    char *text;
-    struct lp_style_type grid;
-{
-    (void) axis;		/* avoid "unused parameter" warnings */
-    (void) place;
-    (void) grid;
-    if (text) {			/* minitics have no text at all */
-	int len = label_width(text, NULL);
-	if (len > widest_tic)
-	    widest_tic = len;
-    }
-}
-
-/*}}} */
 
 
 /*{{{  boundary() */
@@ -641,14 +609,14 @@ boundary(plots, count)
 	     * Same will be done to similar calc.'s elsewhere */
 	    ytic_textwidth = (int) ((t->v_char) * (yticlin + 2));
 	else {
-	    widest_tic = 0;	/* reset the global variable ... */
-	    /* get gen_tics to call widest2d_callback with all labels
-	     * the latter sets widest_tic to the length of the widest one
-	     * ought to consider tics on axis if axis near border...
+	    widest_tic_strlen = 0;	/* reset the global variable ... */
+	    /* get gen_tics to call widest_tic_callback with all labels
+	     * the latter sets widest_tic_strlen to the length of the widest
+	     * one ought to consider tics on axis if axis near border...
 	     */
-	    gen_tics(FIRST_Y_AXIS, /* 0, */ widest2d_callback);
+	    gen_tics(FIRST_Y_AXIS, /* 0, */ widest_tic_callback);
 
-	    ytic_textwidth = (int) ((t->h_char) * (widest_tic + 2));
+	    ytic_textwidth = (int) ((t->h_char) * (widest_tic_strlen + 2));
 	}
     } else {
 	ytic_textwidth = 0;
@@ -713,14 +681,14 @@ boundary(plots, count)
 	if (vertical_y2tics)
 	    y2tic_textwidth = (int) ((t->v_char) * (y2ticlin + 2));
 	else {
-	    widest_tic = 0;	/* reset the global variable ... */
-	    /* get gen_tics to call widest2d_callback with all labels
-	     * the latter sets widest_tic to the length of the widest one
-	     * ought to consider tics on axis if axis near border...
+	    widest_tic_strlen = 0;	/* reset the global variable ... */
+	    /* get gen_tics to call widest_tic_callback with all labels
+	     * the latter sets widest_tic_strlen to the length of the widest
+	     * one ought to consider tics on axis if axis near border...
 	     */
-	    gen_tics(SECOND_Y_AXIS, /* 0, */ widest2d_callback);
+	    gen_tics(SECOND_Y_AXIS, /* 0, */ widest_tic_callback);
 
-	    y2tic_textwidth = (int) ((t->h_char) * (widest_tic + 2));
+	    y2tic_textwidth = (int) ((t->h_char) * (widest_tic_strlen + 2));
 	}
     } else {
 	y2tic_textwidth = 0;
@@ -818,20 +786,20 @@ boundary(plots, count)
     if (tmargin < 0
 	&& axis_array[SECOND_X_AXIS].ticmode & TICS_ON_BORDER
 	&& vertical_x2tics) {
-	widest_tic = 0;		/* reset the global variable ... */
-	gen_tics(SECOND_X_AXIS, /* 0, */ widest2d_callback);
+	widest_tic_strlen = 0;		/* reset the global variable ... */
+	gen_tics(SECOND_X_AXIS, /* 0, */ widest_tic_callback);
 	ytop += x2tic_textheight;
 	/* Now compute a new one and use that instead: */
-	x2tic_textheight = (int) ((t->h_char) * (widest_tic));
+	x2tic_textheight = (int) ((t->h_char) * (widest_tic_strlen));
 	ytop -= x2tic_textheight;
     }
     if (bmargin < 0
 	&& axis_array[FIRST_X_AXIS].ticmode & TICS_ON_BORDER
 	&& vertical_xtics) {
-	widest_tic = 0;		/* reset the global variable ... */
-	gen_tics(FIRST_X_AXIS, /* 0, */ widest2d_callback);
+	widest_tic_strlen = 0;		/* reset the global variable ... */
+	gen_tics(FIRST_X_AXIS, /* 0, */ widest_tic_callback);
 	ybot -= xtic_textheight;
-	xtic_textheight = (int) ((t->h_char) * widest_tic);
+	xtic_textheight = (int) ((t->h_char) * widest_tic_strlen);
 	ybot += xtic_textheight;
     }
     /*  compute coordinates for axis labels, title et al
