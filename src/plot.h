@@ -1,5 +1,5 @@
 /*
- * $Id: plot.h,v 1.25 1999/11/08 19:24:16 lhecking Exp $
+ * $Id: plot.h,v 1.26 1999/11/15 22:02:51 lhecking Exp $
  *
  */
 
@@ -727,7 +727,6 @@ extern TBOOLEAN noinputfiles;
 extern struct termentry *term;/* from term.c */
 extern TBOOLEAN undefined;		/* from internal.c */
 extern char *input_line;		/* from command.c */
-extern size_t input_line_len;
 extern char *replot_line;
 extern struct lexical_unit *token;
 extern int token_table_size;
@@ -744,6 +743,9 @@ extern const char gnuplot_copyright[];
 extern const char faq_location[];
 extern const char bug_email[];
 extern const char help_email[];
+
+extern char os_name[];
+extern char os_rel[];
 
 /* Windows needs to redefine stdin/stdout functions */
 #if defined(_Windows) && !defined(WINDOWS_NO_GUI)
@@ -788,20 +790,6 @@ extern const char help_email[];
 # else
 #  define GP_INLINE /*nothing*/
 # endif
-#endif
-
-#if 0
-#include "command.h"
-#include "datafile.h"
-#include "graphics.h"
-#include "graph3d.h"
-#include "internal.h"
-#include "misc.h"
-#include "parse.h"
-#include "plot2d.h"
-#include "plot3d.h"
-#include "util.h"
-#include "util3d.h"
 #endif
 
 /* line/point parsing...
