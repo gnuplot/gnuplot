@@ -353,7 +353,7 @@ enum JUSTIFY just;
 int clip_line(x1, y1, x2, y2)
      int *x1, *y1, *x2, *y2;
 {
-  int x, y, dx, dy, x_intr[2], y_intr[2], count, pos1, pos2;
+  int x, y, dx, dy, x_intr[4], y_intr[4], count, pos1, pos2;
   int x_max, x_min, y_max, y_min;
   pos1 = clip_point(*x1, *y1);
   pos2 = clip_point(*x2, *y2);
@@ -392,7 +392,7 @@ int clip_line(x1, y1, x2, y2)
       y_intr[count++] = y;
     }
   }
-  if (count != 2) return 0;
+  if (count < 2) return 0;
   if (*x1 < *x2)
     x_min=*x1, x_max=*x2;
   else
@@ -409,7 +409,7 @@ int clip_line(x1, y1, x2, y2)
   }
   else if (pos1) 
     {				/* Only x1/y1 was out - update only it */
-      if (dx * (*x2 - x_intr[0]) + dy * (*y2 - y_intr[0]) > 0) 
+      if (dx * (*x2 - x_intr[0]) + dy * (*y2 - y_intr[0]) >= 0) 
 	{    
 	  *x1 = x_intr[0];   
 	  *y1 = y_intr[0];  
@@ -422,7 +422,7 @@ int clip_line(x1, y1, x2, y2)
     }
   else 
     {				/* Only x2/y2 was out - update only it */
-      if (dx * (x_intr[0] - *x1) + dy * (y_intr[0] - *x1) > 0) 
+      if (dx * (x_intr[0] - *x1) + dy * (y_intr[0] - *y1) >= 0) 
 	{    
 	  *x2 = x_intr[0];   
 	  *y2 = y_intr[0];  

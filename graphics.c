@@ -3529,9 +3529,12 @@ struct lp_style_type grid; /* linetype or -2 for no grid */
     if (polar_grid_angle) {
 	double x=place, y=0, s=sin(0.1), c=cos(0.1);
 	int i;
+	int ogx = map_x(x);
+	int ogy = map_y(0);
+	int tmpgx, tmpgy, gx, gy;
+	
 	if (place > largest_polar_circle) largest_polar_circle=place;
 	else if (-place > largest_polar_circle) largest_polar_circle=-place;
-	clip_move(map_x(x),map_y(0));
 	for (i=1;i<=63 /* 2pi/0.1*/; ++i) {
 		{
 			/* cos(t+dt)=cos(t)cos(dt)-sin(t)cos(dt) */
@@ -3540,7 +3543,14 @@ struct lp_style_type grid; /* linetype or -2 for no grid */
 			y=y*c+x*s;
 			x=tx;
 		}
-		clip_vector(map_x(x), map_y(y));
+		tmpgx = gx = map_x(x);
+		tmpgy = gy = map_y(y);
+		if (clip_line(&ogx,&ogy,&tmpgx,&tmpgy)) {
+			(*t->move)((unsigned int) ogx, (unsigned int) ogy);
+			(*t->vector)((unsigned int) tmpgx, (unsigned int) tmpgy);
+		}
+		ogx = gx;
+		ogy = gy;
 	}
     } else {
 	    if (lkey && key_yt > ybot && x < key_xr && x > key_xl ) {
