@@ -1,5 +1,7 @@
 2002-07-04  Petr Mikulik  <mikulik@physics.muni.cz>
 
+	* term/metapost.trm: Support for 'set palette maxcolors'.
+
 	* term/post.trm: Added "0 setgray" for the case Color==false in the
 	definition of "DL".
 
@@ -703,7 +705,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/07/04 14:50:26 $).
+	last modification date (from the tag $Date: 2002/07/04 15:58:04 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 

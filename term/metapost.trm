@@ -1,5 +1,5 @@
 /*
- * $Id: metapost.trm,v 1.13 2002/06/06 18:31:01 lhecking Exp $
+ * $Id: metapost.trm,v 1.14 2002/06/07 21:25:16 mikulik Exp $
  */
 
 /* GNUPLOT - metapost.trm */
@@ -773,7 +773,7 @@ fill (%.1fa,%.1fb)--(%.1fa,%.1fb)--(%.1fa,%.1fb)--(%.1fa,%.1fb)--cycle withcolor
 TERM_PUBLIC int
 MP_make_palette(t_sm_palette *palette)
 {
-    /* metapost can do continous number of colours */
+    /* metapost can do continuous number of colours */
     return 0;
 }
 
@@ -783,6 +783,10 @@ MP_set_color(double gray)
 {
     if (MP_inline)
 	MP_endline();
+
+    if (sm_palette.colors != 0) /* finite nb of colors explicitly requested */
+	    gray = (gray >= ((double)(sm_palette.colors-1)) / sm_palette.colors) ?
+		    1 : floor(gray * sm_palette.colors) / sm_palette.colors;
 
     if (!MP_color) {		/* gray mode */
 	fprintf(gpoutfile, "currentcolor:=%3fwhite;\n", gray);
