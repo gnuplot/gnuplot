@@ -290,8 +290,8 @@ finish:
 
 #ifndef HAVE_SLEEP
 /* The implementation below does not even come close
-   to what is required by POSIX.1, but I suppose
-   it doesn't really matter on these systems. lh
+ * to what is required by POSIX.1, but I suppose
+ * it doesn't really matter on these systems. lh
  */
 
 unsigned int sleep __PROTO((unsigned int));
