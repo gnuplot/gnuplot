@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.112 2004/07/13 14:11:25 broeker Exp $
+ * $Id: post.trm,v 1.113 2004/07/17 01:41:35 sfeam Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -2741,7 +2741,7 @@ PS_make_header(t_sm_palette *palette)
     fputs("}{\n", gpoutfile);
     fputs("  /g {stroke pm3dround pm3dGamma exp setgray} bind def\n", gpoutfile);
     fputs("} ifelse\n", gpoutfile);
-    fputs("/h {rlineto rlineto rlineto fill} bind def\n", gpoutfile);
+    fputs("/h {rlineto rlineto rlineto gsave fill grestore} bind def\n", gpoutfile);
 #undef R
 #undef G
 #undef B
@@ -2785,11 +2785,21 @@ TERM_PUBLIC void PS_filled_polygon (int points, gpiPoint *corners)
     if (PS_relative_ok)
 	PS_FLUSH_PATH;
 
-    /* produce lines like:
-	 * 9055 29350 N 695 0 V 0 564 V density PolyFill
-     */
     fprintf(gpoutfile, "gsave ");
     fprintf(gpoutfile, "%i %i N", corners[0].x, corners[0].y);
+
+    if (points == 4 && style == FS_OPAQUE) {
+	/* Special case for pm3d surface quadrangles
+	 *  <x0> <y0> ... <x4> <y4> h
+	 */
+	    fprintf(gpoutfile, " %i %i %i %i %i %i h\n",
+	    corners[3].x-corners[2].x, corners[3].y-corners[2].y,
+	    corners[2].x-corners[1].x, corners[2].y-corners[1].y,
+	    corners[1].x-corners[0].x, corners[1].y-corners[0].y);
+    } else {
+	/* General case for solid or pattern-filled polygons
+	 * gsave <x0> <y0> N <x1> <y1> ... <xn> <yn> density PolyFill
+	 */
 	for (i = 1; i < points; i++)
 	    fprintf(gpoutfile, " %i %i V",
 		corners[i].x-corners[i-1].x, corners[i].y-corners[i-1].y);
@@ -2814,19 +2824,20 @@ TERM_PUBLIC void PS_filled_polygon (int points, gpiPoint *corners)
 		fprintf(gpoutfile, " %.1f PolyFill\n", filldens);
 	    } else {
 		fprintf(gpoutfile," gsave 1 setgray fill grestore Pattern%d fill grestore\n", pattern);
-	}
-	break;
+	    }
+	    break;
 #else
-	filldens = (style >> 4) % 8;
-	filldens = 0.125 * (filldens + 1);
-	fprintf(gpoutfile, " %.2f PolyFill\n", filldens);
-	break;
+	    filldens = (style >> 4) % 8;
+	    filldens = 0.125 * (filldens + 1);
+	    fprintf(gpoutfile, " %.2f PolyFill\n", filldens);
+	    break;
 #endif
 
-    default:
-	fprintf(gpoutfile, " 1 PolyFill\n");
-        break;
+	default:
+	    fprintf(gpoutfile, " 1 PolyFill\n");
+	    break;
 
+	}
     }
 
     PS_relative_ok = FALSE;

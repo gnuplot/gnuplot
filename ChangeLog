@@ -5,6 +5,12 @@
 	results. Fixes bug #992565 and also the loss of color information
 	in pattern-filled fillcurves.
 
+	* term/post.trm (PS_filled_polygon): Restore Petr's preferred
+	compact format for the quadrangles that make up a pm3d surface,
+	and add a gsave/grestore pair around the fill command. Fixes the
+	moiré effect observed in ghostscript/gv with antialiasing enabled.
+	Downside: takes longer to render; noticeable on a slow machine.
+
 2004-07-15  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* term/fig.trm (FIG_arrow): Use actual linetype variables rather
