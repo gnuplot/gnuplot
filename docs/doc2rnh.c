@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: doc2rno.c,v 0.01 1997/03/09 21:00:00 lph Exp $";
+static char *RCSid = "$Id: doc2rnh.c,v 1.7 1998/11/20 12:16:15 lhecking Exp $";
 #endif
 
 /* GNUPLOT - doc2rnh.c */
@@ -206,7 +206,7 @@ FILE *b;
 
 /* use the "cleartext" table or other text in tables */
 
-/*                if (intable)  { /* its already literal */
+/*                if (intable)  { */ /* its already literal */
 	    if (rnh_table) {	/* its a literal */
 		putrnh(line + 1, b);
 		break;
