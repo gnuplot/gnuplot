@@ -1,5 +1,5 @@
 /*
- * $Id: pm.trm,v 1.24 2000/11/01 18:57:34 broeker Exp $
+ * $Id: pm.trm,v 1.25 2000/11/30 08:22:59 mikulik Exp $
  */
 
 /* GNUPLOT - pm.trm */
@@ -67,6 +67,7 @@ TERM_PUBLIC int PM_justify_text __PROTO((enum JUSTIFY mode));
 TERM_PUBLIC void PM_point __PROTO((unsigned int x, unsigned int y, int number));
 TERM_PUBLIC void PM_suspend __PROTO((void));
 TERM_PUBLIC void PM_resume __PROTO((void));
+TERM_PUBLIC void PM_fillbox __PROTO((int style, unsigned int x, unsigned int y, unsigned int w, unsigned int h));
 TERM_PUBLIC void PM_linewidth __PROTO((double linewidth));
 #ifdef USE_MOUSE
 TERM_PUBLIC void PM_set_ruler __PROTO((int, int));
@@ -120,6 +121,7 @@ TERM_PUBLIC void PM_filled_polygon (int, gpiPoint *);
 #define SET_GRAPHICS    'G'
 #define SET_TEXT        'E'
 #define SET_LINE        'L'
+#define SET_FILLBOX	'B'
 #define SET_LINEWIDTH   'W'
 #define SET_ANGLE       'A'
 #define SET_JUSTIFY     'J'
@@ -686,6 +688,17 @@ PM_pause(char *str)
 }
 
 TERM_PUBLIC void
+PM_fillbox(int style, unsigned int x, unsigned int y, unsigned int w, unsigned int h)
+{
+    putc(SET_FILLBOX, PM_pipe);
+    fwrite(&style, sizeof(style), 1, PM_pipe);
+    fwrite(&x, sizeof(x), 1, PM_pipe);
+    fwrite(&y, sizeof(y), 1, PM_pipe);
+    fwrite(&w, sizeof(w), 1, PM_pipe);
+    fwrite(&h, sizeof(h), 1, PM_pipe);
+}
+
+TERM_PUBLIC void
 PM_linewidth(double linewidth)
 {
     int lw;
@@ -836,7 +849,7 @@ TERM_TABLE_START(PM_driver)
     PM_linetype, PM_put_text, PM_text_angle,
     PM_justify_text, PM_point, do_arrow, PM_set_font,
     0 /*pointsize */ , TERM_CAN_MULTIPLOT, PM_suspend, PM_resume,
-    0 /*fillbox */ , PM_linewidth
+    PM_fillbox, PM_linewidth
 #ifdef USE_MOUSE
     , 0 /* PM_waitforinput */, 
     PM_put_tmptext, PM_set_ruler, PM_set_cursor, PM_set_clipboard

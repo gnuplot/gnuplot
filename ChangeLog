@@ -1,3 +1,9 @@
+2000-12-20  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* term/pm.trm src/os2/gclient.c: support for filled boxes (added
+	PM_fillbox routine) --- it is used by the 'clear' command in multiplot
+	mode to clear the subfigure area.
+
 2000-12-19  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* docs/gnuplot.doc: small change to docs about EEPIC driver

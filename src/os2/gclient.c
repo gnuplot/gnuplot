@@ -1,5 +1,5 @@
 #ifdef INCRCSDATA
-static char RCSid[]="$Id: gclient.c,v 1.11 2000/11/15 11:18:11 mikulik Exp $" ;
+static char RCSid[]="$Id: gclient.c,v 1.12 2000/11/30 08:23:00 mikulik Exp $" ;
 #endif
 
 /****************************************************************************
@@ -2368,7 +2368,7 @@ lOldLine=lt ;
 //                    GpiSetLineType( hps, (bLineTypes||bBW)?lLineTypes[lt]:lLineTypes[0] ) ;
                     if( !bBW ) { /* maintain some flexibility here in case we don't want
                            the model T option */ 
-                        if( bColours ) GpiSetColor( hps, lCols[col] ) ;
+			if( bColours ) GpiSetColor( hps, lCols[col] ) ;
 //                        else GpiSetColor( hps, CLR_BLACK ) ;
                         else GpiSetColor( hps, CLR_NEUTRAL ) ;
                         }
@@ -2378,6 +2378,26 @@ lOldLine=lt ;
                     }
                     break ;
                     
+                case 'B' :   /* fill box */
+                    {
+		    int style;
+		    unsigned int x, y, w, h;
+		    POINTL pt;
+		    BufRead(hRead,&style, sizeof(style), &cbR) ;
+		    BufRead(hRead,&x, sizeof(x), &cbR) ;
+		    BufRead(hRead,&y, sizeof(y), &cbR) ;
+		    BufRead(hRead,&w, sizeof(w), &cbR) ;
+		    BufRead(hRead,&h, sizeof(h), &cbR) ;
+		    pt.x = x;
+		    pt.y = y;
+		    GpiMove( hpsScreen, &pt ) ;
+		    pt.x += w;
+		    pt.y += h;
+		    GpiSetColor( hps, CLR_BACKGROUND );
+		    GpiBox(hps, DRO_FILL, &pt, 0,0);
+		    }
+                    break ;
+
                 case 'W' :   /* line width */
                     {
                     int lw ;
@@ -2407,7 +2427,7 @@ lOldLine=lt ;
 //                    else GpiSetLineWidthGeom( hps, 50 ) ;
 		    bDots = lt ;
                     }
-                    break ;
+		    break ;
                 
                 case 'F' :   /* set font */
 
