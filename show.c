@@ -1693,10 +1693,10 @@ show_version_long ()
 #endif
 	}
 
-	fprintf (stderr,"HELPFILE=\"%s\"\n\
-FAQ location=<%s>\n\
-CONTACT=<%s>\n\
-HELPMAIL=<%s>\n",helpfile,faq_location,bug_email,help_email);
+	fprintf (stderr,"HELPFILE     = \"%s\"\n\
+FAQ location = <%s>\n\
+CONTACT      = <%s>\n\
+HELPMAIL     = <%s>\n",helpfile,faq_location,bug_email,help_email);
 }
 
 static void
