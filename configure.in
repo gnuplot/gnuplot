@@ -1,12 +1,12 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot 3.7 on Unix.
 dnl
-dnl $Id: configure.in,v 1.81 2000/02/11 19:25:00 lhecking Exp $
+dnl $Id: configure.in,v 1.82 2000/03/28 21:27:40 lhecking Exp $
 dnl
 AC_INIT(src/graphics.c)
 AM_CONFIG_HEADER(config.h:config.hin)
 AC_PREREQ(2.13)
-AC_REVISION($Revision: 1.81 $)
+AC_REVISION($Revision: 1.82 $)
 
 VERSION="`cat $srcdir/VERSION`"
 AM_INIT_AUTOMAKE(gnuplot, $VERSION)
@@ -290,7 +290,7 @@ if test "$with_readline" != no; then
        TERMLIBS="$TERMLIBS -lreadline $gp_tcap",, ${gp_tcap})
     else
       GP_PATH_LIB(readline,readline,[$with_readline],[${gp_tcap}])
-      if test "$ac_cv_lib_readline_readline" != no; then
+      if test "$ac_cv_lib_readline_readline" = yes; then
         TERMLIBS="$TERMLIBS $gp_tcap"
       fi
     fi
@@ -359,7 +359,7 @@ dnl end libplot
 dnl check for Tom Boutell's gd library
 if test "$with_gd" != no; then
   GP_PATH_LIB(gd,gdImageCreate,[$with_gd])
-  if test "$ac_cv_lib_gd_gdImageCreate" != no; then
+  if test "$ac_cv_lib_gd_gdImageCreate" = yes; then
     GP_PATH_HEADER(gd.h,[$with_gd],
       dnl ACTION-IF-FOUND
       AC_DEFINE(HAVE_LIBGD, 1,
@@ -376,7 +376,7 @@ dnl end gd
 dnl check for png and z library
 if test "$with_png" != no; then
   GP_PATH_LIB(png,png_info_init,[$with_png],[-lz])
-  if test "$ac_cv_lib_png_png_info_init" != no; then
+  if test "$ac_cv_lib_png_png_info_init" = yes; then
     TERMLIBS="$TERMLIBS -lz"
     GP_PATH_HEADER(png.h,[$with_png],,
      AC_MSG_WARN([found png library but not png.h])
