@@ -1,3 +1,7 @@
+2001-09-13  Alexander Mai <st002279@hrzpub.tu-darmstadt.de>
+
+	* config/makefile.os2: Add missing dependency
+
 2001-09-17  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/save.c (save_set_all): Fixed saving of 'set grid'. Was

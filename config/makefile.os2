@@ -1,5 +1,5 @@
 #
-# $Id: makefile.os2,v 1.14 2000/11/14 15:35:50 mikulik Exp $
+# $Id: makefile.os2,v 1.15 2000/11/24 15:44:31 mikulik Exp $
 #
 # GNUPLOT Makefile for use on OS/2 3.x and above (might also work for OS/2 2.x)
 # using emx 0.9 (and above) and GNUMake
@@ -87,12 +87,12 @@ DOCDIR  = ..\docs
 DEMODIR = ..\demo
 TERMDIR = ..\term
 
-OS2TERMS= $(TERMDIR)\pm.trm
+OS2TERM= $(TERMDIR)\pm.trm
 ifdef X11
-	OS2TERMS += $(TERMDIR)\x11.trm
+	OS2TERM += $(TERMDIR)\x11.trm
 endif
 ifdef VESA
-	OS2TERMS += $(TERMDIR)\emxvga.trm
+	OS2TERM += $(TERMDIR)\emxvga.trm
 endif
 
 
@@ -209,6 +209,10 @@ endif
 #
 include makefile.all
 
+
+# Imporant dependency
+term.$(O): $(CORETERM) $(OS2TERM)
+
 #
 # Pre-defined sets of targets:
 #
@@ -225,7 +229,7 @@ binaries: gnuplot.exe gnupmdrv.exe
 endif
 
 OBJS = $(COREOBJS) version.$(O)
-term.$(O): $(OS2TERMS) term.h
+term.$(O): $(OS2TERM) term.h
 
 gnuplot.exe: $(OBJS)
 	$(CC) -o $@ $(OBJS) $(TERMLIBS) $(LIBS) $(LFLAGS)
@@ -327,15 +331,15 @@ doc2gih.exe doc2ipf.exe doc2html.exe doc2info.exe doc2tex.exe doc2rtf.exe: \
 $(DOCDIR)\allterm.h: $(CORETERM)
 #   echo > $@
 	cd $(TERMDIR) & type *.trm > $@
-doc2gih.exe:  $(DOCDIR)\doc2gih.c $(DOCDIR)\termdoc.c $(OS2TERMS)
+doc2gih.exe:  $(DOCDIR)\doc2gih.c $(DOCDIR)\termdoc.c $(OS2TERM)
 	$(CC3) $(CFLAGS3) $(TERMFLAGS) -DALL_TERM_DOC -o $@ $(DOCDIR)\doc2gih.c $(DOCDIR)\termdoc.c
-doc2ipf.exe:  $(DOCDIR)\doc2ipf.c $(DOCDIR)\termdoc.c $(DOCDIR)\xref.c $(OS2TERMS)
+doc2ipf.exe:  $(DOCDIR)\doc2ipf.c $(DOCDIR)\termdoc.c $(DOCDIR)\xref.c $(OS2TERM)
 	$(CC3) $(CFLAGS3) $(TERMFLAGS) -DALL_TERM_DOC -o $@ $(DOCDIR)\doc2ipf.c $(DOCDIR)\termdoc.c $(DOCDIR)\xref.c
-doc2tex.exe:  $(DOCDIR)\doc2tex.c $(DOCDIR)\termdoc.c $(OS2TERMS) $(DOCDIR)\allterm.h
+doc2tex.exe:  $(DOCDIR)\doc2tex.c $(DOCDIR)\termdoc.c $(OS2TERM) $(DOCDIR)\allterm.h
 	$(CC3) $(CFLAGS3) $(TERMFLAGS) -DALL_TERM_DOC -o $@ $(DOCDIR)\doc2tex.c $(DOCDIR)\termdoc.c
-doc2rtf.exe:  $(DOCDIR)\doc2rtf.c $(DOCDIR)\termdoc.c $(DOCDIR)\xref.c $(OS2TERMS)
+doc2rtf.exe:  $(DOCDIR)\doc2rtf.c $(DOCDIR)\termdoc.c $(DOCDIR)\xref.c $(OS2TERM)
 	$(CC3) $(CFLAGS3) $(TERMFLAGS) -DALL_TERM_DOC -o $@ $(DOCDIR)\doc2rtf.c $(DOCDIR)\termdoc.c $(DOCDIR)\xref.c
-doc2ms.exe:   $(DOCDIR)\doc2ms.c $(DOCDIR)\termdoc.c $(OS2TERMS)
+doc2ms.exe:   $(DOCDIR)\doc2ms.c $(DOCDIR)\termdoc.c $(OS2TERM)
 	$(CC3) $(CFLAGS3) $(TERMFLAGS) -DALL_TERM_DOC -o $@ $(DOCDIR)\doc2ms.c $(DOCDIR)\termdoc.c
 #
 # Create binary demo files
