@@ -134,6 +134,11 @@ static void do_help __PROTO((int toplevel));
 static void do_system __PROTO((void));
 static int changedir __PROTO((char *path));
 
+
+/* plot.c */
+extern const char *user_shell;
+
+
 /* input data, parsing variables */
 #ifdef AMIGA_SC_6_1
 __far int num_tokens, c_token;
@@ -320,8 +325,10 @@ static int command()
 {
     FILE *fp;
     int i;
-    /* string holding name of save or load file */
-    char sv_file[MAX_LINE_LEN + 1];
+    /* name of save or load file; size guaranteed to be at least PATH_MAX */
+    char *sv_file = NULL;
+
+    sv_file = (char *) gp_alloc (PATH_MAX, "save or load file");
 
     for (i = 0; i < MAX_NUM_VAR; i++)
 	c_dummy_var[i][0] = NUL;	/* no dummy variables */
@@ -546,25 +553,29 @@ static int command()
 	    if (!isstring(++c_token))
 		int_error("expecting filename", c_token);
 	    else {
-		quote_str(sv_file, c_token, MAX_LINE_LEN);
+		quote_str(sv_file, c_token, PATH_MAX-1);
+		gp_expand_tilde(sv_file,PATH_MAX-1);
 		save_functions(fopen(sv_file, "w"));
 	    }
 	} else if (almost_equals(c_token, "v$ariables")) {
 	    if (!isstring(++c_token))
 		int_error("expecting filename", c_token);
 	    else {
-		quote_str(sv_file, c_token, MAX_LINE_LEN);
+		quote_str(sv_file, c_token, PATH_MAX-1);
+		gp_expand_tilde(sv_file,PATH_MAX-1);
 		save_variables(fopen(sv_file, "w"));
 	    }
 	} else if (almost_equals(c_token, "s$et")) {
 	    if (!isstring(++c_token))
 		int_error("expecting filename", c_token);
 	    else {
-		quote_str(sv_file, c_token, MAX_LINE_LEN);
+		quote_str(sv_file, c_token, PATH_MAX-1);
+		gp_expand_tilde(sv_file,PATH_MAX-1);
 		save_set(fopen(sv_file, "w"));
 	    }
 	} else if (isstring(c_token)) {
-	    quote_str(sv_file, c_token, MAX_LINE_LEN);
+	    quote_str(sv_file, c_token, PATH_MAX-1);
+	    gp_expand_tilde(sv_file,PATH_MAX-1);
 	    save_all(fopen(sv_file, "w"));
 	} else {
 	    int_error("filename or keyword 'functions', 'variables', or 'set' expected", c_token);
@@ -574,13 +585,13 @@ static int command()
 	if (!isstring(++c_token))
 	    int_error("expecting filename", c_token);
 	else {
-	    quote_str(sv_file, c_token, MAX_LINE_LEN);
+	    quote_str(sv_file, c_token, PATH_MAX-1);
+	    gp_expand_tilde(sv_file,PATH_MAX-1);
 	    /* load_file(fp=fopen(sv_file, "r"), sv_file, FALSE); OLD
 	     * DBT 10/6/98 handle stdin as special case
 	     * passes it on to load_file() so that it gets
 	     * pushed on the stack and recusion will work, etc
 	     */
-/*	    fp = strcmp(sv_file, "-") ? fopen(sv_file, "r") : stdin; */
 	    fp = STREQ(sv_file, "-") ? stdin : fopen(sv_file, "r");
 	    load_file(fp, sv_file, FALSE);
 	    /* input_line[] and token[] now destroyed! */
@@ -590,8 +601,10 @@ static int command()
 	if (!isstring(++c_token))
 	    int_error("expecting filename", c_token);
 	else {
-	    quote_str(sv_file, c_token, MAX_LINE_LEN);
-	    load_file(fopen(sv_file, "r"), sv_file, TRUE);	/* Argument list follows filename */
+	    quote_str(sv_file, c_token, PATH_MAX-1);
+	    gp_expand_tilde(sv_file,PATH_MAX-1);
+	    /* Argument list follows filename */
+	    load_file(fopen(sv_file, "r"), sv_file, TRUE);
 	    /* input_line[] and token[] now destroyed! */
 	    c_token = num_tokens = 0;
 	}
@@ -627,7 +640,7 @@ static int command()
 	    c_token++;
 	}
     } else if (almost_equals(c_token, "pwd")) {
-	GP_GETCWD(sv_file, sizeof(sv_file));
+	GP_GETCWD(sv_file, PATH_MAX);
 	fprintf(stderr, "%s\n", sv_file);
 	c_token++;
     } else if (almost_equals(c_token, "ex$it") ||
@@ -1184,71 +1197,57 @@ char *prompt;
 # if defined(MSDOS) || defined(_Windows) || defined(DOS386)
 static void do_shell()
 {
-    register char *comspec;
-    if ((comspec = getenv("COMSPEC")) == (char *) NULL)
-	comspec = "\\command.com";
-#  ifdef _Windows
-    if (WinExec(comspec, SW_SHOWNORMAL) <= 32)
+    if (user_shell) {
+#  if defined(_Windows)
+	if (WinExec(user_shell, SW_SHOWNORMAL) <= 32)
+#  elif defined(DJGPP)
+	if (system(user_shell) == -1)
 #  else
-#   ifdef DJGPP
-    if (system(comspec) == -1)
-#   else
-    if (spawnl(P_WAIT, comspec, NULL) == -1)
-#   endif /* !DJGPP */
-#  endif /* !_Windows */
-	os_error("unable to spawn shell", NO_CARET);
+	if (spawnl(P_WAIT, user_shell, NULL) == -1)
+#  endif /* !(_Windows || DJGPP) */
+	    os_error("unable to spawn shell", NO_CARET);
+    }
 }
 
-# else /* !MSDOS */
+# elif defined(AMIGA_SC_6_1)
+
+static void do_shell()
+{
+    if (user_shell) {
+	if (system(user_shell))
+	    os_error("system() failed", NO_CARET);
+    }
+    (void) putc('\n', stderr);
+}
+
+#  elif defined(OS2)
+
+static void do_shell()
+{
+    if (user_shell) {
+	if (system(user_shell) == -1)
+	    os_error("system() failed", NO_CARET);
+
+    }
+    (void) putc('\n', stderr);
+}
+#  else /* !OS2 */
 
 /* plain old Unix */
-
-#  ifdef AMIGA_SC_6_1
-static void do_shell()
-{
-    register char *shell;
-    if (!(shell = getenv("SHELL")))
-	shell = SHELL;
-
-    if (system(shell))
-	os_error("system() failed", NO_CARET);
-
-    (void) putc('\n', stderr);
-}
-
-#  else /* !AMIGA_SC_6_1 */
-
-#   ifdef OS2
-static void do_shell()
-{
-    register char *shell;
-    if (!(shell = getenv("SHELL")) && !(shell = getenv("COMSPEC")))
-	shell = SHELL;
-
-    if (system(shell) == -1)
-	os_error("system() failed", NO_CARET);
-
-    (void) putc('\n', stderr);
-}
-#   else /* !OS2 */
 
 #define EXEC "exec "
 static void do_shell()
 {
     static char exec[100] = EXEC;
-    register char *shell;
-    if (!(shell = getenv("SHELL")))
-	shell = SHELL;
 
-    if (system(safe_strncpy(&exec[sizeof(EXEC) - 1], shell,
-		       sizeof(exec) - sizeof(EXEC) - 1)))
-	os_error("system() failed", NO_CARET);
-
+    if (user_shell) {
+	if (system(safe_strncpy(&exec[sizeof(EXEC) - 1], user_shell,
+				sizeof(exec) - sizeof(EXEC) - 1)))
+	    os_error("system() failed", NO_CARET);
+    }
     (void) putc('\n', stderr);
 }
 
-#   endif /* !OS2 */
-#  endif /* !AMIGA_SC_6_1 */
 # endif /* !MSDOS */
 
 /* read from stdin, everything except VMS */
