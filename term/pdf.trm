@@ -1,5 +1,5 @@
 /*
- * $Id: pdf.trm,v 1.21 2003/03/31 22:17:00 sfeam Exp $
+ * $Id: pdf.trm,v 1.23 2003/05/03 02:47:16 sfeam Exp $
  */
 
 /*------------------------------
@@ -177,7 +177,7 @@ PDF_SetFont ()
 	 / 20.0);
 }
 
-#if USE_ULIG_FILLEDBOXES
+#if USE_ULIG_FILLEDBOXES && !HAVE_OLD_LIBPDF
 static void
 PDF_DefinePatterns()
 {
@@ -340,7 +340,7 @@ PDF_init ()
     strcpy(PDF_fontNameCur, PDF_fontNameDef);
     PDF_fontSizeCur = PDF_fontSizeDef;
 
-#if USE_ULIG_FILLEDBOXES
+#if USE_ULIG_FILLEDBOXES && !HAVE_OLD_LIBPDF
     PDF_DefinePatterns();
 #endif
 
@@ -1053,9 +1053,10 @@ PDF_boxfill(int style, unsigned int x1, unsigned int y1,
 		double green = (double)this_color->g * fact_ + fact;
 		double blue = (double)this_color->b  * fact_ + fact;
 
-		PDF_setcolor(myPDF, "fill", "rgb", red, green, blue, 0 /* unused */);
+		PDF_setrgbcolor_fill(myPDF, red, green, blue);
 	    }
 	    break;
+#ifndef HAVE_OLD_LIBPDF
 	case FS_PATTERN:
 	    fillpar = fillpar % (PDF_patterns + 1) /* 0 == white */;
 	    switch (fillpar) {
@@ -1073,6 +1074,7 @@ PDF_boxfill(int style, unsigned int x1, unsigned int y1,
 		    PDF_setcolor(myPDF, "fill", "pattern", PDF_patternHandles[fillpar - 1], 0, 0, 0);
 	    }
 	    break;
+#endif
 	default:
 	    break;
     }
@@ -1118,7 +1120,7 @@ PDF_set_color(double gray)
     /* make sure that the path is stroked with the current color
      * before changing the color */
     PDF_PathClose();
-    PDF_setcolor(myPDF, "both", "rgb", color.r, color.g, color.b, 0 /* unused */);
+    PDF_setrgbcolor(myPDF, color.r, color.g, color.b);
     /* mark linetype invalid so that the color will be
      * set, when PDF_linetype() is called */
     PDF_LineType = -3;

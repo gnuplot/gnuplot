@@ -1,3 +1,8 @@
+2003-11-06  Ethan Merritt <merritt@u.washington.edu>
+
+	* configure.in, term/pdf.trm:  Test for and accommodate older
+	versions of pdflib.
+
 2003-11-01  Ethan Merritt <merritt@u.washington.edu>
 
 	* term/x11.trm: Do not use %lg to printf doubles. Some compilers
