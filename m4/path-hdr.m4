@@ -14,8 +14,7 @@ changequote(, )dnl
   ac_tr_hdr=HAVE_`echo $1 | sed 'y%abcdefghijklmnopqrstuvwxyz./-%ABCDEFGHIJKLMNOPQRSTUVWXYZ___%'`
 changequote([, ])dnl
 AC_MSG_CHECKING([for $1])
-AC_CACHE_VAL(ac_cv_header_$ac_safe,
-[gp_save_CPPFLAGS="$CPPFLAGS"
+gp_save_CPPFLAGS="$CPPFLAGS"
 if test "$2" != yes && test "$2" != no; then
   gp_h_path=`echo "$2" | sed -e 's%/lib$1\.a$%%'`
   gp_h_prfx=`echo "$gp_h_path" | sed -e 's%/lib$%%' -e 's%/include$%%'`
@@ -23,26 +22,23 @@ if test "$2" != yes && test "$2" != no; then
 else
   gp_h_list=''
 fi
-for ac_dir in '' $gp_h_list /usr/local/include ; do
+for ac_dir in $gp_h_list '' /usr/local/include ; do
   test x${ac_dir} != x && CPPFLAGS="$gp_save_CPPFLAGS -I${ac_dir}"
-  AC_TRY_CPP([#include <$1>], eval "ac_cv_header_$ac_safe=${ac_dir}",
+  AC_TRY_CPP([#include <$1>], eval "ac_cv_header_$ac_safe=yes",
     eval "ac_cv_header_$ac_safe=no")
-  CPPFLAGS="$gp_save_CPPFLAGS"
-  if eval "test \"`echo '$ac_cv_header_'$ac_safe`\" != no"; then
+  if eval "test \"`echo '$ac_cv_header_'$ac_safe`\" = yes"; then
     break
   fi
 done
-])
-if eval "test \"`echo '$ac_cv_header_'$ac_safe`\" != no"; then
-  if eval "test \"`echo x'$ac_cv_header_'$ac_safe`\" != x" && eval "test \"`echo x'$ac_cv_header_'$ac_safe`\" != xyes"; then
-    eval "CPPFLAGS=\"$gp_save_CPPFLAGS -I`echo '$ac_cv_header_'$ac_safe`\""
-  fi
+
+if eval "test \"`echo '$ac_cv_header_'$ac_safe`\" = yes"; then
   AC_DEFINE_UNQUOTED($ac_tr_hdr)
   AC_MSG_RESULT(yes)
   ifelse([$3], , :, [$3])
 else
   AC_MSG_RESULT(no)
-ifelse([$4], , , [$4
+  CPPFLAGS="$gp_save_CPPFLAGS"
+  ifelse([$4], , , [$4
 ])dnl
 fi
 ])
