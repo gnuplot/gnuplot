@@ -19,7 +19,9 @@
 
 ------------------------------*/
 
-/* CODEME: Add patterned lines (?). Implement the PM3D stuff.  */
+/* CODEME: Add patterned lines (?). */
+
+/* PM3D support by Johannes Zellner <johannes@zellner.org>, May-15-2002 */
 
 #include "driver.h"
 
@@ -44,6 +46,13 @@ TERM_PUBLIC int PDF_set_font __PROTO ((const char *font));
 TERM_PUBLIC void PDF_boxfill __PROTO((int style, unsigned int x1, unsigned int y1, unsigned int width, unsigned int height));
 TERM_PUBLIC void PDF_linewidth __PROTO ((double linewidth));
 
+#ifdef PM3D
+TERM_PUBLIC int PDF_make_palette __PROTO((t_sm_palette *));
+TERM_PUBLIC void PDF_previous_palette __PROTO((void));
+TERM_PUBLIC void PDF_set_color __PROTO((double));
+TERM_PUBLIC void PDF_filled_polygon __PROTO((int, gpiPoint *));
+#endif /* PM3D */
+
 #define PDF_NUM_POINTTYPES 75	/* number of point symbol types not counting the dot */
 
 #define PDF_RESOLUTION  (20)	/* number of terminal pixels per pt */
@@ -56,6 +65,11 @@ TERM_PUBLIC void PDF_linewidth __PROTO ((double linewidth));
 #ifdef TERM_BODY
 
 #include <pdflib.h>
+
+#ifdef PM3D
+#   include "getcolor.h"
+static t_sm_palette PDF_palette;
+#endif
 
 static PDF *myPDF = NULL;
 
@@ -908,6 +922,74 @@ PDF_boxfill(int style, unsigned int x1, unsigned int y1,
     PDF_fill(myPDF);
     PDF_restore(myPDF);
 }
+
+#ifdef PM3D
+
+TERM_PUBLIC int
+PDF_make_palette(t_sm_palette *palette)
+{
+    if (palette == NULL) {
+	/* pdf can do continous colors */
+	return 0;
+    }
+
+    /* save palette */
+
+    /* mapping formulae for SMPAL_COLOR_MODE_RGB */
+    PDF_palette.colorMode = palette->colorMode;
+    PDF_palette.formulaR = palette->formulaR;
+    PDF_palette.formulaG = palette->formulaG;
+    PDF_palette.formulaB = palette->formulaB;
+    PDF_palette.positive = palette->positive;
+
+    return 0;
+}
+
+TERM_PUBLIC void
+PDF_set_color(double gray)
+{
+    double red, green, blue;
+
+    red = GetColorValueFromFormula(PDF_palette.formulaR, gray);
+
+    switch (PDF_palette.colorMode) {
+	case SMPAL_COLOR_MODE_GRAY:
+	    green = red;
+	    blue  = red;
+	    break;
+	case SMPAL_COLOR_MODE_RGB:
+	    green = GetColorValueFromFormula(PDF_palette.formulaG, gray);
+	    blue  = GetColorValueFromFormula(PDF_palette.formulaB, gray);
+	    break;
+	default:
+	    fprintf(stderr, "** ERROR PDF_set_color line %d\n", __LINE__);
+	    return;
+    }
+
+    PDF_setcolor(myPDF, "fill", "rgb", red, green, blue, 0 /* unused */);
+}
+
+TERM_PUBLIC void
+PDF_filled_polygon(int points, gpiPoint* corners)
+{
+    PDF_PathClose();
+    if (4 != points) {
+	return;
+    }
+    PDF_moveto(myPDF, corners[0].x, corners[0].y);
+    PDF_lineto(myPDF, corners[1].x, corners[1].y);
+    PDF_lineto(myPDF, corners[2].x, corners[2].y);
+    PDF_lineto(myPDF, corners[3].x, corners[3].y);
+    PDF_lineto(myPDF, corners[0].x, corners[0].y);
+    PDF_fill(myPDF);
+}
+
+TERM_PUBLIC void
+PDF_previous_palette(void)
+{
+}
+
+#endif /* PM3D */
     
 #endif /* TERM_BODY */
 
@@ -921,6 +1003,15 @@ TERM_TABLE_START (pdf_driver)
     PDF_justify_text, PDF_point, do_arrow, PDF_set_font, do_pointsize,
     TERM_BINARY,
     0 /* suspend */, 0 /* resume */ , PDF_boxfill, PDF_linewidth
+#ifdef PM3D
+#   ifdef USE_MOUSE
+   , 0, 0, 0, 0, 0 /* no mouse support for pdf */
+#   endif
+   , PDF_make_palette,
+   PDF_previous_palette,
+   PDF_set_color,
+   PDF_filled_polygon
+#endif /* PM3D */
 TERM_TABLE_END (pdf_driver)
 #undef LAST_TERM
 #define LAST_TERM pdf_driver

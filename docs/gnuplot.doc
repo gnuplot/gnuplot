@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.111 2002/04/10 11:02:09 broeker Exp $
+C RCS $Id: gnuplot.doc,v 1.112 2002/05/01 12:42:04 mikulik Exp $
 C 18 September 2001
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001   Thomas Williams, Colin Kelley et al.
 C
@@ -5584,6 +5584,7 @@ C ... and restart the table:
      Xfig
      tgif
      cgm
+     pdf
 
  You are welcome to implement the support for other terminals.
 

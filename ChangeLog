@@ -1,3 +1,8 @@
+2002-05-15  Johannes Zellner  <johannes@zellner.org>
+
+	* term/pdf.trm, docs/gnuplot.doc, pm3d/README: pm3d support
+	for the pdf driver
+
 2002-05-01  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* docs/gnuplot.doc: Mention PNG supports pm3d.
@@ -414,7 +419,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/04/30 19:16:52 $).
+	last modification date (from the tag $Date: 2002/05/01 12:42:04 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
