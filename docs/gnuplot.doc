@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.183 2003/08/05 05:25:59 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.184 2003/08/05 16:06:33 lhecking Exp $
 C 18 September 2001
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001   Thomas Williams, Colin Kelley et al.
 C
@@ -7767,7 +7767,7 @@ C ... and restart the table:
  on the other axes.
 
  Syntax:
-       set xlabel {"<label>"} {<xoff>}{,<yoff>} {"<font>{,<size>}"}
+       set xlabel {"<label>"} {<xoff>}{,<yoff>} {font "<font>{,<size>}"}
                   {{textcolor | tc} {lt <line_type> | default}}
        show xlabel
 

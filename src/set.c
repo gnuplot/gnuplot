@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.117 2003/06/28 05:47:56 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.118 2003/06/30 18:51:14 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -3613,11 +3613,12 @@ set_tic_prop(axis)
 }
 
 /* process a 'set {x/y/z}label command */
-/* set {x/y/z}label {label_text} {x}{,y} */
+/* set {x/y/z}label {label_text} {x}{,y} {<fontspec>} {<textcolor>} */
 static void
-set_xyzlabel(label)
-    label_struct *label;
+set_xyzlabel(label_struct *label)
 {
+    TBOOLEAN got_offsets = FALSE;
+
     c_token++;
     if (END_OF_COMMAND) {	/* no label specified */
 	*label->text = '\0';
@@ -3628,46 +3629,51 @@ set_xyzlabel(label)
 	quote_str(label->text, c_token, MAX_LINE_LEN);
 	c_token++;
     }
-    if (END_OF_COMMAND)
-	return;
 
-    if (!almost_equals(c_token, "font") 
-    &&  !almost_equals(c_token, "text$color") && !equals(c_token,"tc")
-    &&  !isstring(c_token)) {
-	/* We have x,y offsets specified */
-	struct value a;
-	if (!equals(c_token, ","))
-	    label->xoffset = real(const_express(&a));
+    while (!END_OF_COMMAND) {
 
-	if (END_OF_COMMAND)
-	    return;
-
-	if (equals(c_token, ",")) {
-	    c_token++;
-	    label->yoffset = real(const_express(&a));
+	if (almost_equals(c_token, "f$ont"))  {
+	    ++c_token;
+	    if (isstring(c_token)) {  
+		quote_str(label->font, c_token, MAX_LINE_LEN);
+		c_token++;
+	    } else
+		int_error(c_token,"expecting font");
+	    continue;
 	}
-    }
-    if (END_OF_COMMAND)
-	return;
 
-    /* optional keyword 'font' can go here */
+#ifdef BACKWARDS_COMPATIBLE
+	/* You didn't used to have to say "font" before giving a fontspec */
+	    if (isstring(c_token)) {  
+		int_warn(c_token,"deprecated syntax - please use 'font' keyword");
+		quote_str(label->font, c_token, MAX_LINE_LEN);
+		c_token++;
+	    continue;
+	    }
+#endif
 
-    if (almost_equals(c_token, "f$ont"))  
-	++c_token;		/* skip it */
-    if (isstring(c_token)) {  
-	quote_str(label->font, c_token, MAX_LINE_LEN);
-	c_token++;
-    }
-    if (END_OF_COMMAND)
-	return;
+	/* EAM - allow to set textcolor lt <n>, but not cb frac or z */
+	if (equals(c_token,"tc") || almost_equals(c_token,"text$color")) {
+	    parse_colorspec( &(label->textcolor), TC_LT );
+	    continue;
+	}
 
-    /* EAM - allow to set textcolor lt <n>, but not cb frac or z */
-    if (equals(c_token,"tc") || almost_equals(c_token,"text$color")) {
-	parse_colorspec( &(label->textcolor), TC_LT );
-    }
+	if (!isstring(c_token) && !got_offsets) {
+	    /* We have x,y offsets specified */
+	    struct value a;
+	    if (!equals(c_token, ","))
+		label->xoffset = real(const_express(&a));
 
-    if (!END_OF_COMMAND) 
+	    if (!END_OF_COMMAND && equals(c_token, ",")) {
+		c_token++;
+		label->yoffset = real(const_express(&a));
+	    }
+	    got_offsets = TRUE;
+	    continue;
+	}
+
     	int_error(c_token,"unexpected or unrecognized option");
+    }
 }
 
 
