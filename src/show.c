@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.111 2003/06/04 06:42:54 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.112 2003/07/23 23:58:53 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -1641,9 +1641,10 @@ int tag;			/* 0 means show all */
 	    if (this_label->lp_properties.pointflag == 0)
 		fprintf(stderr, " nopoint");
 	    else {
-		fprintf(stderr, " point with color of linetype %d pointtype %d offset %g,%g",
+		fprintf(stderr, " point with color of linetype %d pointtype %d pointsize %g offset %g,%g",
 		    this_label->lp_properties.l_type+1,
 		    this_label->lp_properties.p_type+1,
+		    this_label->lp_properties.p_size,
 		    this_label->hoffset, this_label->voffset);
 	    }
 

@@ -1,3 +1,11 @@
+2003-08-20  Ethan Merritt <merritt@u.washington.edu>
+
+	* src/save.c src/show.c: Fix incomplete/incorrect description of point
+	properties from 'set label' commands.
+
+	* src/set.c docs/gnuplot.doc: Remove order-dependence of options to
+	'set [xyz]label' command. Deprecate omission of 'font' keyword.
+
 2003-08-18 14:28:07 2003  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/parse.c (push_vars): Changed initialization to TRUE, as it
