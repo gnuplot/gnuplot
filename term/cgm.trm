@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: cgm.trm,v 1.36 2001/10/26 12:58:38 mikulik Exp $
+ * $Id: cgm.trm,v 1.37 2002/02/25 03:10:41 broeker Exp $
  */
 
 /* GNUPLOT - cgm.trm */
@@ -99,10 +99,11 @@ TERM_PUBLIC int CGM_text_angle __PROTO((int ang));
 TERM_PUBLIC int CGM_justify_text __PROTO((enum JUSTIFY mode));
 TERM_PUBLIC void CGM_point __PROTO((unsigned int x, unsigned int y,
 				    int number));
-TERM_PUBLIC void CGM_filled_polygon __PROTO((int points, gpiPoint *corner));
-TERM_PUBLIC void CGM_set_color __PROTO((double gray));
+#ifdef PM3D
 TERM_PUBLIC int CGM_make_palette __PROTO((t_sm_palette *palette));
-
+TERM_PUBLIC void CGM_set_color __PROTO((double gray));
+TERM_PUBLIC void CGM_filled_polygon __PROTO((int points, gpiPoint *corner));
+#endif
 TERM_PUBLIC void CGM_set_pointsize __PROTO((double size));
 
 #define CGM_LARGE 32767
