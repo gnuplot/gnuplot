@@ -18,6 +18,7 @@
 #define STAT_MACROS_BROKEN	1
 #define STDC_HEADERS		1
 
+#define HAVE_DIRENT_H		1
 #define HAVE_ERRNO_H		1
 #define HAVE_FLOAT_H		1
 #define HAVE_LIMITS_H		1

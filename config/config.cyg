@@ -25,6 +25,7 @@
 # define WIN32
 #endif
 
+#define HAVE_DIRENT_H		1
 #define HAVE_ERRNO_H		1
 #define HAVE_FLOAT_H		1
 #define HAVE_LIMITS_H		1
