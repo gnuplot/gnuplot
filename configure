@@ -3894,13 +3894,13 @@ fi
 #line 3895 "configure"
 #include "confdefs.h"
 #include "png.h"
-     # if PNG_LIBPNG_VER < 89
-       yes
-     # endif
-     
+#if PNG_LIBPNG_VER < 89
+You lose.
+#endif
+
 EOF
 if (eval "$ac_cpp conftest.$ac_ext") 2>&5 |
-  egrep "yes" >/dev/null 2>&1; then
+  egrep "You lose" >/dev/null 2>&1; then
   rm -rf conftest*
   echo "configure: warning: - not using old libpng version" 1>&2
 else
