@@ -268,7 +268,7 @@ The new `gnuplot` user should begin by reading about `plotting` (if on-line,
 type `help plotting`).
 
 See the simple.dem demo, also available together with other demos on the web page
-@uref{http://gnuplot.sourceforge.net/demo/simple.html,http://gnuplot.sourceforge.net/demo/simple.html
+@uref{http://www.gnuplot.info/demo/simple.html,http://www.gnuplot.info/demo/simple.html
 }
 
 @node Seeking-assistance, What_is_New_in_Version_4.0, Introduction, gnuplot
@@ -289,7 +289,7 @@ is identical to the mailing list (they both carry the same set of messages).
 We prefer that you read the messages through the newsgroup rather than
 subscribing to the mailing list.  Instructions for subscribing to gnuplot
 mailing lists may be found via the gnuplot development website on SourceForge
-@uref{http://gnuplot.sourceforge.net,http://gnuplot.sourceforge.net
+@uref{http://sourceforge.net/projects/gnuplot,http://sourceforge.net/projects/gnuplot
 }
 
 The address for mailing to list members is:
@@ -310,7 +310,7 @@ The list of those interested in beta-test versions is:
 
 @end example
 
-There is also a perennially out-of-date gnuplot web page at
+There is also the canonical (if occassionally out-of-date) gnuplot web page at
 
 @uref{http://www.gnuplot.info,http://www.gnuplot.info
 }
@@ -568,7 +568,7 @@ for example by
 
 before asking for help.  Plots produced by the demo scripts can also be viewed
 at 
-@uref{http://gnuplot.sourceforge.net/demo/,http://gnuplot.sourceforge.net/demo/
+@uref{http://www.gnuplot.info/demo/,http://www.gnuplot.info/demo/
 }
 
 
@@ -1533,7 +1533,7 @@ The @ref{tm_year} function interprets its argument as a time, in seconds from
 to fits or datafile plots.  See @ref{using}.
 
 See also 
-@uref{http://gnuplot.sourceforge.net/demo/airfoil.html,airfoil.dem: use of functions and complex variables for airfoils demo.
+@uref{http://www.gnuplot.info/demo/airfoil.html,airfoil.dem: use of functions and complex variables for airfoils demo.
 }
 
 
@@ -1680,7 +1680,7 @@ and undefined elsewhere:
       plot f(x)
 @end example
 
-@c ^ <img align=bottom src="http://gnuplot.sourceforge.net/doc/ternary.gif" alt="[ternary.gif]" width=640 height=480>
+@c ^ <img align=bottom src="http://www.gnuplot.info/doc/ternary.gif" alt="[ternary.gif]" width=640 height=480>
 Note that `gnuplot` quietly ignores undefined values, so the final branch of
 the function (1/0) will produce no plottable points.  Note also that f(x)
 will be plotted as a continuous function across the discontinuity if a line
@@ -1739,7 +1739,7 @@ Examples:
 
 @end example
 
-@c ^ <img align=bottom src="http://gnuplot.sourceforge.net/doc/userdefined.gif" alt="[userdefined.gif]" width=640 height=480>
+@c ^ <img align=bottom src="http://www.gnuplot.info/doc/userdefined.gif" alt="[userdefined.gif]" width=640 height=480>
 Note that the variable `pi` is already defined.  But it is in no way magic;
 you may redefine it to be whatever you like.
 
@@ -3383,11 +3383,11 @@ Examples:
 @end example
 
 See
-@uref{http://gnuplot.sourceforge.net/demo/simple.html,simple plot demos (simple.dem) }
+@uref{http://www.gnuplot.info/demo/simple.html,simple plot demos (simple.dem) }
 ,
-@uref{http://gnuplot.sourceforge.net/demo/surfacea.html,Non-parametric splot demos }
+@uref{http://www.gnuplot.info/demo/surfacea.html,Non-parametric splot demos }
 , and
-@uref{http://gnuplot.sourceforge.net/demo/surfaceb.html,Parametric splot demos}
+@uref{http://www.gnuplot.info/demo/surfaceb.html,Parametric splot demos}
 .
 
 @node example_datafile, index, every, data-file
@@ -3421,7 +3421,7 @@ The file "population.dat" might contain:
 
 @end example
 
-@c ^ <img align=bottom src="http://gnuplot.sourceforge.net/doc/population.gif" alt="[population.gif]" width=640 height=480>
+@c ^ <img align=bottom src="http://www.gnuplot.info/doc/population.gif" alt="[population.gif]" width=640 height=480>
 
 @node index, smooth, example_datafile, data-file
 @subsubsection index
@@ -3456,7 +3456,7 @@ Example:
 @end example
 
 @c ^ See also web page
-@uref{http://gnuplot.sourceforge.net/demo/multimsh.html,splot with indices demo. }
+@uref{http://www.gnuplot.info/demo/multimsh.html,splot with indices demo. }
 
 @node smooth, special-filenames, index, data-file
 @subsubsection smooth
@@ -3602,7 +3602,7 @@ The `unique` option makes the data monotonic in x; points with the same
 x-value are replaced by a single point having the average y-value.  The
 resulting points are then connected by straight line segments.
 @c ^ See this
-@uref{http://gnuplot.sourceforge.net/demo/mgr.html,demos
+@uref{http://www.gnuplot.info/demo/mgr.html,demos
 }
 @c ^ web page.
 
@@ -3895,7 +3895,7 @@ the top simply by specifying
 However, if you want to leave text in your data files, it is safer to put the
 comment character (#) in the first column of the text lines.
 @c ^ See also the web page
-@uref{http://gnuplot.sourceforge.net/demo/using.html,Feeble using demos.
+@uref{http://www.gnuplot.info/demo/using.html,Feeble using demos.
 }
 
 @node errorbars, errorlines, data-file, plot
@@ -3954,7 +3954,7 @@ The error bars have crossbars at each end unless @ref{bars} is used
 
 If autoscaling is on, the ranges will be adjusted to include the error bars.
 See also
-@uref{http://gnuplot.sourceforge.net/demo/errorbar.html,errorbar demos.
+@uref{http://www.gnuplot.info/demo/errorbar.html,errorbar demos.
 }
 
 See @ref{using}, @ref{with}, and @ref{style} for more information.
@@ -4046,7 +4046,7 @@ parametric function has been completed:
 @end example
 
 See also
-@uref{http://gnuplot.sourceforge.net/demo/param.html,Parametric Mode Demos.
+@uref{http://www.gnuplot.info/demo/param.html,Parametric Mode Demos.
 }
 
 @node ranges, title, parametric, plot
@@ -4149,7 +4149,7 @@ This sets the x range for a timeseries:
 @end example
 
 See also
-@uref{http://gnuplot.sourceforge.net/demo/ranges.html,ranges demo.
+@uref{http://www.gnuplot.info/demo/ranges.html,ranges demo.
 }
 
 @node title, with, ranges, plot
@@ -4385,7 +4385,7 @@ This plots two color surfaces at different altitudes:
 @end example
 
 See @ref{style} to change the default styles. See also
-@uref{http://gnuplot.sourceforge.net/demo/styles.html,styles demos.
+@uref{http://www.gnuplot.info/demo/styles.html,styles demos.
 }
 
 @node print, pwd, plot, Commands
@@ -4530,7 +4530,7 @@ set explicitly to guarantee that the five separate graphs (drawn on top of
 each other in multiplot mode) will have exactly the same axes.  The linetype
 must be specified; otherwise all the plots would be drawn with the same type.
 See also
-@uref{http://gnuplot.sourceforge.net/demo/animate.html,Reread Animation Demo (animate.dem).
+@uref{http://www.gnuplot.info/demo/animate.html,Reread Animation Demo (animate.dem).
 }
 
 @node reset, save, reread, Commands
@@ -4808,7 +4808,7 @@ but
 @end example
 
 See also
-@uref{http://gnuplot.sourceforge.net/demo/poldat.html,poldat.dem: polar plot using @ref{angles} demo.
+@uref{http://www.gnuplot.info/demo/poldat.html,poldat.dem: polar plot using @ref{angles} demo.
 }
 
 @node arrow, autoscale, angles, set-show
@@ -4951,7 +4951,7 @@ To show all arrows (in tag order), use:
 @end example
 
 See also 
-@uref{http://gnuplot.sourceforge.net/demo/arrows.html,arrows demos.
+@uref{http://www.gnuplot.info/demo/arrows.html,arrows demos.
 }
 
 @node autoscale, bars, arrow, set-show
@@ -5121,7 +5121,7 @@ a polar plot of only that single quadrant.
 Explicitly setting one or two ranges but not others may lead to unexpected
 results.
 See also
-@uref{http://gnuplot.sourceforge.net/demo/poldat.html,polar demos.
+@uref{http://www.gnuplot.info/demo/poldat.html,polar demos.
 }
 
 @node bars, bmargin, autoscale, set-show
@@ -5279,7 +5279,7 @@ Draw only the top and right borders for a `plot` and label them as axes:
 @end example
 
 See also
-@uref{http://gnuplot.sourceforge.net/demo/borders.html,borders demo.
+@uref{http://www.gnuplot.info/demo/borders.html,borders demo.
 }
 
 @node boxwidth, clabel, border, set-show
@@ -5581,10 +5581,10 @@ See also @ref{contour} for control of where the contours are drawn, and
 @ref{clabel} for control of the format of the contour labels and linetypes.
 
 See also
-@uref{http://gnuplot.sourceforge.net/demo/contours.html,contours demo (contours.dem)
+@uref{http://www.gnuplot.info/demo/contours.html,contours demo (contours.dem)
 }
 and
-@uref{http://gnuplot.sourceforge.net/demo/discrete.html,contours with user defined levels demo (discrete.dem).
+@uref{http://www.gnuplot.info/demo/discrete.html,contours with user defined levels demo (discrete.dem).
 }
 
 @node color_box, contour, cntrparam, set-show
@@ -5720,10 +5720,10 @@ See also `splot datafile`.
 If contours are desired from non-grid data, @ref{dgrid3d} can be used to
 create an appropriate grid.  See @ref{dgrid3d} for more information.
 See also
-@uref{http://gnuplot.sourceforge.net/demo/contours.html,contours demo (contours.dem)
+@uref{http://www.gnuplot.info/demo/contours.html,contours demo (contours.dem)
 }
 and
-@uref{http://gnuplot.sourceforge.net/demo/discrete.html,contours with user defined levels demo (discrete.dem).
+@uref{http://www.gnuplot.info/demo/discrete.html,contours with user defined levels demo (discrete.dem).
 }
 
 @node data_style, datafile_, contour, set-show
@@ -6004,7 +6004,7 @@ The first specifies that a grid of size 10 by 10 is to be constructed using
 a norm value of 1 in the weight computation.  The second only modifies the
 norm, changing it to 4.
 See also
-@uref{http://gnuplot.sourceforge.net/demo/scatter.html,scatter.dem: dgrid3d demo.
+@uref{http://www.gnuplot.info/demo/scatter.html,scatter.dem: dgrid3d demo.
 }
 
 
@@ -6245,7 +6245,7 @@ See also @ref{xtics} for more information about tic labels, and
 @ref{decimalsign} for how to use non-default decimal separators in numbers
 printed this way.
 See also
-@uref{http://gnuplot.sourceforge.net/demo/electron.html,electron demo (electron.dem).
+@uref{http://www.gnuplot.info/demo/electron.html,electron demo (electron.dem).
 }
 
 @menu
@@ -6415,10 +6415,10 @@ Syntax:
 For information about the definition and usage of functions in `gnuplot`,
 please see `expressions`.
 See also
-@uref{http://gnuplot.sourceforge.net/demo/spline.html,splines as user defined functions (spline.dem)
+@uref{http://www.gnuplot.info/demo/spline.html,splines as user defined functions (spline.dem)
 }
 and
-@uref{http://gnuplot.sourceforge.net/demo/airfoil.html,use of functions and complex variables for airfoils (airfoil.dem).
+@uref{http://www.gnuplot.info/demo/airfoil.html,use of functions and complex variables for airfoils (airfoil.dem).
 }
 
 @node grid, hidden3d, functions, set-show
@@ -6608,10 +6608,10 @@ normally, making the resulting display hard to understand.  Therefore, the
 default option of `bentover` will turn it visible in this case.  If you don't
 want that, you may choose `nobentover` instead.
 See also
-@uref{http://gnuplot.sourceforge.net/demo/hidden.html,hidden line removal demo (hidden.dem)
+@uref{http://www.gnuplot.info/demo/hidden.html,hidden line removal demo (hidden.dem)
 }
 and
-@uref{http://gnuplot.sourceforge.net/demo/singulr.html,complex hidden line demo (singulr.dem).
+@uref{http://www.gnuplot.info/demo/singulr.html,complex hidden line demo (singulr.dem).
 }
 
 @node historysize, isosamples, hidden3d, set-show
@@ -7220,7 +7220,7 @@ necessary if the data in the file are not in the required order.
 
 @ref{mapping} has no effect on `plot`.
 @c ^ See also
-@uref{http://gnuplot.sourceforge.net/demo/world.html,world.dem: mapping demos.
+@uref{http://www.gnuplot.info/demo/world.html,world.dem: mapping demos.
 }
 
 @node margin, mouse, mapping, set-show
@@ -7461,7 +7461,7 @@ in character units, so the appearance of the graph in the remaining space
 will depend on the screen size of the display device, e.g., perhaps quite
 different on a video display and a printer.
 See also
-@uref{http://gnuplot.sourceforge.net/demo/multiplot.html,multiplot demo (multiplt.dem).
+@uref{http://www.gnuplot.info/demo/multiplot.html,multiplot demo (multiplt.dem).
 }
 
 @node mx2tics, mxtics, multiplot, set-show
@@ -8547,10 +8547,10 @@ directions.
 You may want to `set size square` to have `gnuplot` try to make the aspect
 ratio equal to unity, so that circles look circular.
 See also
-@uref{http://gnuplot.sourceforge.net/demo/polar.html,polar demos (polar.dem)
+@uref{http://www.gnuplot.info/demo/polar.html,polar demos (polar.dem)
 }
 and
-@uref{http://gnuplot.sourceforge.net/demo/poldat.html,polar data plot (poldat.dem).
+@uref{http://www.gnuplot.info/demo/poldat.html,polar data plot (poldat.dem).
 }
 
 @node print_, rmargin, polar, set-show
@@ -8714,7 +8714,7 @@ To make the graph twice as high as wide use:
 @end example
 
 See also
-@uref{http://gnuplot.sourceforge.net/demo/airfoil.html,airfoil demo.
+@uref{http://www.gnuplot.info/demo/airfoil.html,airfoil demo.
 }
 
 @node style, surface, size, set-show
@@ -9101,7 +9101,7 @@ The box height is determined from the y error in the same way as it is for
 the `yerrorbars` style---either from y-ydelta to y+ydelta or from ylow to
 yhigh, depending on how many data columns are provided.
 See also
-@uref{http://gnuplot.sourceforge.net/demo/errorbar.html,errorbar demo.
+@uref{http://www.gnuplot.info/demo/errorbar.html,errorbar demo.
 }
 
 
@@ -9275,7 +9275,7 @@ By default the rectangle is empty if (open > close), and filled with three
 vertical bars if (close > open). If filled-boxes support is present, then
 the rectangle is colored according to `set style fill <fillstyle>`.
 See @ref{bars} and `financebars`.  See also
-@uref{http://gnuplot.sourceforge.net/demo/finance.html,finance demos.
+@uref{http://www.gnuplot.info/demo/finance.html,finance demos.
 }
 
 Note: To place additional symbols, such as the median value, on a
@@ -9325,7 +9325,7 @@ tic on the left marks the opening price and one on the right marks the
 closing price.  The length of these tics may be changed by @ref{bars}.  The
 symbol will be unchanged if the high and low prices are interchanged.
 See @ref{bars} and `candlesticks`, and also the
-@uref{http://gnuplot.sourceforge.net/demo/finance.html,finance demo.
+@uref{http://www.gnuplot.info/demo/finance.html,finance demo.
 }
 
 
@@ -9341,7 +9341,7 @@ The `fsteps` style is only relevant to 2-d plotting.  It connects consecutive
 points with two line segments: the first from (x1,y1) to (x1,y2) and the
 second from (x1,y2) to (x2,y2).
 See also
-@uref{http://gnuplot.sourceforge.net/demo/steps.html,steps demo.
+@uref{http://www.gnuplot.info/demo/steps.html,steps demo.
 }
 
 
@@ -9363,7 +9363,7 @@ line at their average x, that is, from ((x1+x2)/2,y1) to ((x1+x2)/2,y2).
 If @ref{autoscale} is in effect, it selects the xrange from the data rather than
 the steps, so the end points will appear only half as wide as the others.
 See also
-@uref{http://gnuplot.sourceforge.net/demo/steps.html,steps demo.
+@uref{http://www.gnuplot.info/demo/steps.html,steps demo.
 }
 
 `histeps` is only a plotting style; `gnuplot` does not have the ability to
@@ -9439,7 +9439,7 @@ The `steps` style is only relevant to 2-d plotting.  It connects consecutive
 points with two line segments: the first from (x1,y1) to (x2,y1) and the
 second from (x2,y1) to (x2,y2).
 See also
-@uref{http://gnuplot.sourceforge.net/demo/steps.html,steps demo.
+@uref{http://www.gnuplot.info/demo/steps.html,steps demo.
 }
 
 
@@ -9526,7 +9526,7 @@ from (x,ylow) to (x,yhigh), depending on how many data columns are provided.
 A tic mark is placed at the ends of the error bar (unless @ref{bars} is
 used---see @ref{bars} for details).
 See also
-@uref{http://gnuplot.sourceforge.net/demo/errorbar.html,errorbar demo.
+@uref{http://www.gnuplot.info/demo/errorbar.html,errorbar demo.
 }
 
 
@@ -9593,7 +9593,7 @@ on how many data columns are provided. A tic mark is placed at the
 ends of the error bar (unless @ref{bars} is used---see @ref{bars} for
 details).
 See also
-@uref{http://gnuplot.sourceforge.net/demo/errorbar.html,errorbar demo.
+@uref{http://www.gnuplot.info/demo/errorbar.html,errorbar demo.
 }
 
 @node surface, terminal, style, set-show
@@ -15286,7 +15286,7 @@ tells `gnuplot` to read date and time separated by tab.  (But look closely at
 your data---what began as a tab may have been converted to spaces somewhere
 along the line; the format string must match what is actually in the file.)
 See also
-@uref{http://gnuplot.sourceforge.net/demo/timedat.html,time data demo.
+@uref{http://www.gnuplot.info/demo/timedat.html,time data demo.
 }
 
 @node title_, tmargin, timefmt, set-show
@@ -16776,7 +16776,7 @@ The @ref{index} keyword is not supported, since the file format allows only one
 surface per file.  The @ref{every} and @ref{using} filters are supported.  @ref{using}
 operates as if the data were read in the above triplet form.
 See also
-@uref{http://gnuplot.sourceforge.net/demo/binary.html,Binary File Splot Demo.
+@uref{http://www.gnuplot.info/demo/binary.html,Binary File Splot Demo.
 }
 
 @node example_datafile_, matrix, binary, data-file_
@@ -16826,7 +16826,7 @@ where the file "datafile.dat" might contain:
 Note that "datafile.dat" defines a 4 by 3 grid ( 4 rows of 3 points each ).
 Rows (datablocks) are separated by blank records.
 
-@c ^ <img align=bottom src="http://gnuplot.sourceforge.net/doc/splot.gif" alt="[splot.gif]" width=640 height=480>
+@c ^ <img align=bottom src="http://www.gnuplot.info/doc/splot.gif" alt="[splot.gif]" width=640 height=480>
 Note also that the x value is held constant within each dataline.  If you
 instead keep y constant, and plot with hidden-line removal enabled, you will
 find that the surface is drawn 'inside-out'.
