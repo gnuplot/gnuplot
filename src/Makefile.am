@@ -52,7 +52,7 @@ SUBDIRS = $(d_beos)
 
 OTHER_SOURCES = amiga.c corplot.c os9.c strftime.c vms.c
 
-EXTRA_DIST = GNUmakefile Makefile.maint Macintosh NeXT OpenStep README \
+EXTRA_DIST = GNUmakefile Makefile.maint NeXT OpenStep README \
 corgraph.asm genopt.com gnuplot.def gnuplot.opt gnuplot.prj header.mac \
 hrcgraph.asm intergra.x11 lasergnu lineproc.mac linkopt.vms linkopt.ztc \
 makefile.all os2 pcgraph.asm rgipgnu win x11.opt $(OTHER_SOURCES)
