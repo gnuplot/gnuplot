@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.64 2004/10/26 04:30:51 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.65 2004/11/01 01:17:59 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -1828,6 +1828,10 @@ do_event(struct gp_event_t *ge)
 	break;
     case GE_cmd:
 	do_string(ge->text);
+	break;
+    case GE_replot:
+	/* used only by ggi.trm */
+	do_string("replot");
 	break;
     case GE_reset:
 	event_reset(ge);

@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: ggi.trm,v 1.18 2004/04/13 17:24:32 broeker Exp $
+ * $Id: ggi.trm,v 1.19 2004/07/01 17:10:14 broeker Exp $
  */
 
 /* GNUPLOT - ggi.trm */
@@ -1026,9 +1026,8 @@ TERM_PUBLIC void
 GGI_replot()
 {
     struct gp_event_t ev = {
-	GE_cmd,
-	0, 0, 0, 0,
-	"replot"
+	GE_replot,
+	0, 0, 0, 0
     };
 
     do_event(&ev);

@@ -1,5 +1,5 @@
 /*
- * $Id: mousecmn.h,v 1.9 2004/06/04 06:29:32 mikulik Exp $
+ * $Id: mousecmn.h,v 1.10 2004/11/01 01:17:59 sfeam Exp $
  */
 
 /* GNUPLOT - mousecnm.h */
@@ -65,6 +65,7 @@ enum {
     GE_stdout,          /* print text to stdout */
     GE_stderr,          /* print text to stderr */
     GE_cmd,             /* text = literal command string */
+    GE_replot,          /* used only by ggi.trm */
     GE_reset            /* reset to a well-defined state
 			   (e.g.  after an X11 error occured) */
     , GE_fontprops	/* par1 = hchar par2 = vchar */

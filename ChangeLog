@@ -1,3 +1,9 @@
+2004-12-21  Ethan Merritt  <merritt@u.washington.edu>
+
+	* term/ggi.trm (GGI_replot) src/mousecmn.h src/mouse.c (do_event):
+	Remove the one and only instance of GE_cmd as an event type, used
+	by ggi.trm to trigger a replot.
+
 2004-12-21  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* term/emf.trm (EMF_filled_polygon): Renamed macro META_POLYGON to
