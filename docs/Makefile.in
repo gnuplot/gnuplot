@@ -128,7 +128,9 @@ DIST_COMMON = README Makefile.in
 SOURCES = checkdoc.c doc2gih.c doc2hlp.c doc2ipf.c doc2ms.c doc2rnh.c \
 doc2rtf.c doc2tex.c termdoc.c xref.c
 
-BUILT_SOURCES = allterm.h term.h
+TERM_H = $(top_srcdir)/src/term.h
+
+BUILT_SOURCES = allterm.h 
 
 HEADERS = doc2x.h xref.h
 
@@ -151,12 +153,13 @@ allterm.h: $(CORETERM)
 	  sed -n "/^[ 	]*$$s/,/^[ 	]*END_HELP/p" $$f ; \
 	done >$@
 
-term.h: $(CORETERM)
-	@echo "Building term.h"
-	@cat ../config.h $(CORETERM) > term.c
-	$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(CPPFLAGS) -DTERM_DRIVER_H -DTERM_HELP term.c | \
-	  sed '/^ *$$/d;/^#/d' >$@
-	@rm -f term.c
+# HBB 20041111: commented out, since it's no longer used.
+#term.h: $(CORETERM)
+#	@echo "Building term.h"
+#	@cat ../config.h $(CORETERM) > term.c
+#	$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(CPPFLAGS) -DTERM_DRIVER_H -DTERM_HELP term.c | \
+#	  sed '/^ *$$/d;/^#/d' >$@
+#	@rm -f term.c
 
 # for debugging
 alldoc: check dvi gih hlp html info ipf ms nroff pdf ps rnh rtf
@@ -224,7 +227,7 @@ doc2ms.o: doc2ms.c $(BUILT_SOURCES)
 html: gnuplot.html
 
 # requires makeinfo (GNU texinfo) 4.0 or better
-gnuplot.html: $(srcdir)/gnuplot.texi $(srcdir)/gnuplot.doc
+gnuplot.html: $(srcdir)/gnuplot.texi 
 	$(MAKEINFO) --html -I$(srcdir) $(srcdir)/gnuplot.texi --no-split --output=$@
 
 ### PDF documentation
@@ -323,20 +326,15 @@ alldoc2gih.o: doc2gih.c $(BUILT_SOURCES)
 ### GNU info format
 info: gnuplot.info
 
-gnuplot.info: $(srcdir)/gnuplot.texi $(srcdir)/gnuplot.doc
+gnuplot.info: $(srcdir)/gnuplot.texi
 	$(MAKEINFO) -I$(srcdir) $(srcdir)/gnuplot.texi --no-split --output=$@
 
 # Thanks to Bruce Ravel for doc2texi.el!
-# FIXME: this rule still breaks in out-of-source-tree builds: it forgets
-#  to copy a modified gnuplot.doc again, and it never copies the 
-#  generated gnuplot.texi back to $(srcdir).
 $(srcdir)/gnuplot.texi: $(srcdir)/doc2texi.el $(srcdir)/gnuplot.doc
 	@echo "Creating texinfo"
-	@if test ! -f gnuplot.doc ; then \
-	  cp $(srcdir)/gnuplot.doc . ; \
-	fi
 	@if test "$(EMACS)" != no; then \
-	   $(EMACS) -batch -l $(srcdir)/doc2texi.el -f d2t-doc-to-texi ; \
+	   cd $(srcdir) ;  \
+	   $(EMACS) -batch -l doc2texi.el -f d2t-doc-to-texi ; \
 	else \
 	   echo "No emacs found - cannot create texinfo file" ; \
 	fi
@@ -497,17 +495,17 @@ checkdoc.o: checkdoc.c ../config.h $(top_srcdir)/src/syscfg.h \
 alldoc2gih.o: doc2gih.c ../config.h $(top_srcdir)/src/syscfg.h \
 		$(top_srcdir)/src/stdfn.h doc2x.h allterm.h
 doc2gih.o: doc2gih.c ../config.h $(top_srcdir)/src/syscfg.h \
-		$(top_srcdir)/src/stdfn.h doc2x.h term.h
+		$(top_srcdir)/src/stdfn.h doc2x.h $(TERM_H)
 doc2hlp.o: doc2hlp.c ../config.h $(top_srcdir)/src/syscfg.h \
-		$(top_srcdir)/src/stdfn.h doc2x.h term.h
+		$(top_srcdir)/src/stdfn.h doc2x.h $(TERM_H)
 doc2ipf.o: doc2ipf.c ../config.h $(top_srcdir)/src/syscfg.h \
-		$(top_srcdir)/src/stdfn.h doc2x.h term.h
+		$(top_srcdir)/src/stdfn.h doc2x.h $(TERM_H)
 doc2ms.o: doc2ms.c ../config.h $(top_srcdir)/src/syscfg.h \
 		$(top_srcdir)/src/stdfn.h doc2x.h allterm.h
 doc2rnh.o: doc2rnh.c ../config.h $(top_srcdir)/src/syscfg.h \
-		$(top_srcdir)/src/stdfn.h doc2x.h term.h
+		$(top_srcdir)/src/stdfn.h doc2x.h $(TERM_H)
 doc2rtf.o: doc2rtf.c ../config.h $(top_srcdir)/src/syscfg.h \
-		$(top_srcdir)/src/stdfn.h doc2x.h term.h
+		$(top_srcdir)/src/stdfn.h doc2x.h $(TERM_H)
 doc2tex.o: doc2tex.c ../config.h $(top_srcdir)/src/syscfg.h \
 		$(top_srcdir)/src/stdfn.h doc2x.h allterm.h
 termdoc.o: termdoc.c ../config.h $(top_srcdir)/src/syscfg.h \
