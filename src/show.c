@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.74 2002/02/15 15:40:58 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.75 2002/03/09 22:41:45 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -2116,7 +2116,7 @@ show_term()
     SHOW_ALL_NL;
 
     if (term)
-	fprintf(stderr, "\tterminal type is %s %s\n",
+	fprintf(stderr, "   terminal type is %s %s\n",
 		term->name, term_options);
     else
 	fputs("\tterminal type is unknown\n", stderr);
