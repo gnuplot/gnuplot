@@ -1,5 +1,5 @@
 #
-# $Id: airfoil.dem,v 1.1.1.1 1998/04/15 19:16:40 lhecking Exp $
+# $Id: airfoil.dem,v 1.2 1999/08/11 18:14:49 lhecking Exp $
 #
 # This demo shows how to use bezier splines to define NACA four
 # series airfoils and complex variables to define Joukowski
