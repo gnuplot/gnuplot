@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.36 2002/03/18 18:19:10 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.37 2002/03/23 21:28:23 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -1324,7 +1324,7 @@ df_3dmatrix(this_plot)
 	    /* there should be `color' instead of used[2], when this is
 	     * implemented for binary files */
 	    if (NEED_PALETTE(this_plot))
-		STORE_WITH_LOG_AND_UPDATE_RANGE(point->color, used[2], point->type, COLOR_AXIS, NOOP, goto skip);
+		STORE_WITH_LOG_AND_UPDATE_RANGE(point->CRD_COLOR, used[2], point->type, COLOR_AXIS, NOOP, goto skip);
 #endif
 
 	    /* some of you won't like this, but I say goto is for this */

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.31 2002/03/18 18:19:10 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.32 2002/03/21 15:11:57 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - pm3d.c */
@@ -400,7 +400,7 @@ pm3d_plot(this_plot, at_which_z)
 		   I always wonder what is faster: d*0.25 or d/4? Someone knows? -- 0.25 (joze) */
 		if (color_from_column)
 		    /* color is set in plot3d.c:get_3ddata() */
-		    avgC = (pointsA[i].color + pointsA[i1].color + pointsB[ii].color + pointsB[ii1].color) * 0.25;
+		    avgC = (pointsA[i].CRD_COLOR + pointsA[i1].CRD_COLOR + pointsB[ii].CRD_COLOR + pointsB[ii1].CRD_COLOR) * 0.25;
 		else
 		    avgC = (z2cb(pointsA[i].z) + z2cb(pointsA[i1].z) + z2cb(pointsB[ii].z) + z2cb(pointsB[ii1].z)) * 0.25;
 		/* transform z value to gray, i.e. to interval [0,1] */
@@ -439,10 +439,10 @@ pm3d_plot(this_plot, at_which_z)
 #ifdef EXTENDED_COLOR_SPECS
 	    if (supply_extended_color_specs) {
 		if (color_from_column) {
-		    icorners[0].z = pointsA[i].color;
-		    icorners[1].z = pointsB[ii].color;
-		    icorners[2].z = pointsB[ii1].color;
-		    icorners[3].z = pointsA[i1].color;
+		    icorners[0].z = pointsA[i].CRD_COLOR;
+		    icorners[1].z = pointsB[ii].CRD_COLOR;
+		    icorners[2].z = pointsB[ii1].CRD_COLOR;
+		    icorners[3].z = pointsA[i1].CRD_COLOR;
 		} else {
 		    /* the target wants z and gray value */
 		    icorners[0].z = pointsA[i].z;
@@ -504,7 +504,7 @@ filled_color_contour_plot(this_plot, contours_where)
 	    /* get the z-coordinate */
 	    /* transform contour z-coordinate value to gray, i.e. to interval [0,1] */
 	    if (color_from_column)
-		gray = cb2gray(cntr->coords[0].color);
+		gray = cb2gray(cntr->coords[0].CRD_COLOR);
 	    else
 		gray = cb2gray( z2cb(cntr->coords[0].z) );
 	    set_color(gray);

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.33 2002/02/01 16:05:08 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.34 2002/03/18 18:19:10 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - hidden3d.c */
@@ -511,7 +511,7 @@ store_vertex (point, pointtype, color_from_column)
     map3d_xyz(point->x, point->y, point->z, thisvert);
 #ifdef PM3D
     if (color_from_column)
-	thisvert->real_z = point->color;
+	thisvert->real_z = point->CRD_COLOR;
 #else
     (void) color_from_column; /* avoid -Wunused warning */
 #endif

@@ -1,3 +1,17 @@
+2002-03-26  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* src/gp_types.h src/datafile.c src/graph3d.c src/hidden3d.c
+	src/plot3d.c src/pm3d.c: Do not store the color of a 3D coordinate in
+	separate field 'color' of 'struct coordinate', but in the first field
+	unused by 3D. This is currently 'ylow', and it gains access by
+	'#define CRD_COLOR ylow'. This saves 8 B for each data point.
+	  A proposal for the future, aiming to reduce the memory allocated,
+	is the complete separation of 2d and 3d coordinates and reorganization
+	of their storage...
+
+	* win/wgraph.c: Remove compiler warning.
+
+
 2002-03-26  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	MS VC++ build patches from John Bollinger <bbands@yahoo.com>:
@@ -192,7 +206,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/03/26 09:43:00 $).
+	last modification date (from the tag $Date: 2002/03/26 17:03:52 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 

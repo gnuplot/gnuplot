@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.62 2002/02/25 03:10:41 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.63 2002/03/18 18:19:10 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -1507,7 +1507,7 @@ plot3d_lines_pm3d(plot)
 
 			if (prev == INRANGE) {
 			    if (color_from_column)
-				z =  (points[i - step].color + points[i].color) * 0.5;
+				z =  (points[i - step].CRD_COLOR + points[i].CRD_COLOR) * 0.5;
 			    else
 				z =  (z2cb(points[i - step].z) + z2cb(points[i].z)) * 0.5;
 			    set_color( cb2gray(z) );
@@ -1528,7 +1528,7 @@ plot3d_lines_pm3d(plot)
 
 				    clip_move(xx0, yy0);
 				    if (color_from_column)
-					z =  (points[i - step].color + points[i].color) * 0.5;
+					z =  (points[i - step].CRD_COLOR + points[i].CRD_COLOR) * 0.5;
 				    else
 					z =  (z2cb(points[i - step].z) + z2cb(points[i].z)) * 0.5;
 				    set_color( cb2gray(z) );
@@ -1554,7 +1554,7 @@ plot3d_lines_pm3d(plot)
 				map3d_xy(clip_x, clip_y, clip_z, &xx0, &yy0);
 
 				if (color_from_column)
-				    z =  (points[i - step].color + points[i].color) * 0.5;
+				    z =  (points[i - step].CRD_COLOR + points[i].CRD_COLOR) * 0.5;
 				else
 				    z =  (z2cb(points[i - step].z) + z2cb(points[i].z)) * 0.5;
 				set_color( cb2gray(z));
@@ -1575,7 +1575,7 @@ plot3d_lines_pm3d(plot)
 
 				    clip_move(x, y);
 				    if (color_from_column)
-					z =  (points[i - step].color + points[i].color) * 0.5;
+					z =  (points[i - step].CRD_COLOR + points[i].CRD_COLOR) * 0.5;
 				    else
 					z =  (z2cb(points[i - step].z) + z2cb(points[i].z)) * 0.5;
 				    set_color( cb2gray(z) );
@@ -1686,7 +1686,7 @@ plot3d_points_pm3d(plot, p_type)
 
 		    if (!clip_point(x, y)) {
 			if (color_from_column)
-			    set_color( cb2gray(points[i].color) );
+			    set_color( cb2gray(points[i].CRD_COLOR) );
 			else
 			    set_color( cb2gray( z2cb(points[i].z) ) );
 			(*t->point) (x, y, p_type);
@@ -2717,10 +2717,10 @@ get_surface_cbminmax(plot, cbmin, cbmax)
     while (icrvs && curve < plot->num_iso_read) {
 	/* fprintf(stderr,"**** NEW ISOCURVE - nb of pts: %i ****\n", icrvs->p_count); */
         for (i = 0, points = icrvs->points; i < icrvs->p_count; i++) {
-		/* fprintf(stderr,"  point i=%i => x=%4g y=%4g z=%4lg cb=%4lg\n",i, points[i].x,points[i].y,points[i].z,points[i].color); */
+		/* fprintf(stderr,"  point i=%i => x=%4g y=%4g z=%4lg cb=%4lg\n",i, points[i].x,points[i].y,points[i].z,points[i].CRD_COLOR); */
 		if (points[i].type == INRANGE) {
 		    /* ?? if (!clip_point(x, y)) ... */
-		    cb = color_from_column ? points[i].color : points[i].z;
+		    cb = color_from_column ? points[i].CRD_COLOR : points[i].z;
 		    if (cb < *cbmin) *cbmin = cb;
 		    if (cb > *cbmax) *cbmax = cb;
 		}
