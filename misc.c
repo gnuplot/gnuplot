@@ -427,6 +427,16 @@ FILE *fp;
 #if 1 /* HBB 980311: reduce DATA size: move these string tables to FAR mem */
         /* don't use tabs in an ASCII file */
      static char GPFAR version_string []=
+              /* for UN*X, save the path, commandname and */
+              /* the -persist option to keep the x-windows open */
+              /* other arguments need not be saved. jvh 19981213 */
+#ifdef GNUPLOT_BINDIR
+        "#!" GNUPLOT_BINDIR "/gnuplot "
+# ifdef X11
+                                        "-persist"
+# endif /* X11 */
+        "\n#\n"
+#endif /* GNUPLOT_BINDIR */
         "#    %s\n"
         "#    %sversion %s\n"
         "#    patchlevel %s\n"
@@ -547,6 +557,8 @@ char str[MAX_LINE_LEN+1];
 	fprintf(fp,"set format x2 \"%s\"\n", conv_text(str,x2format));
 	fprintf(fp,"set format y2 \"%s\"\n", conv_text(str,y2format));
 	fprintf(fp,"set format z \"%s\"\n", conv_text(str,zformat));
+	fprintf(fp,"set angles %s\n", (angles_format == ANGLES_RADIANS)?
+						"radians" : "degrees");
 	if (work_grid.l_type==0)
 		fputs("set nogrid\n", fp);
 	else {
@@ -667,8 +679,6 @@ char str[MAX_LINE_LEN+1];
 	fprintf(fp,"set pointsize %g\n", pointsize); 
 	fprintf(fp,"set encoding %s\n",encoding_names[encoding]);
 	fprintf(fp,"set %spolar\n", (polar)? "" : "no");
-	fprintf(fp,"set angles %s\n", (angles_format == ANGLES_RADIANS)?
-						"radians" : "degrees");
 	fprintf(fp,"set %sparametric\n", (parametric)? "" : "no");
 	fprintf(fp,"set view %g, %g, %g, %g\n",
 		surface_rot_x, surface_rot_z, surface_scale, surface_zscale);
