@@ -711,7 +711,7 @@ int pcount;
 		    /* dont display count - contour split across chunks */
 		    /* put # in case user wants to use it for a plot */
 		    /* double blank line to allow plot ... index ... */
-		    fprintf(gpoutfile, "\n# Contour %d, label:%s\n", number++, c->label);
+		    fprintf(gpoutfile, "\n# Contour %d, label: %s\n", number++, c->label);
 		for (; --count >= 0; ++p)
 		    fprintf(gpoutfile, "%g %g %g\n", p->x, p->y, p->z);
 		/* blank line between segments of same contour */
