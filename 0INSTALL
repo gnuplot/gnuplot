@@ -9,6 +9,7 @@ used by gnuplot.  Part three explains in detail how --with-PACKAGE=PATH
 works, and how this option interacts with --libdir and --includedir.
 Part four addresses some platform specific problems and testing issues.
 There are also some hints how to build gnuplot with pre-ANSI C compilers.
+Part five finally describes a few graphical front ends for gnuplot.
 
  The description of preprocessor options previously found here has been
 moved to a new file called 0PORTING. Generic installation instructions
@@ -522,7 +523,7 @@ should work, though).
   is the full path name of the directory where unproto is installed. It is
   not necessary to "install" unproto, one can just create a subdirectory
   in gnuplot's source directory and use it from there.
- 
+
 How to test gnuplot
 ===================
 
@@ -576,4 +577,18 @@ gnuplot> test
 
    `test` creates a display of line and point styles and other useful things
 appropriate for the terminal you are using.
+
+Front Ends for gnuplot
+======================
+
+ o Xgfe by David Ishee <dmishee@jasper.he.net>, available from
+   http://von-mises.home.ml.org/xgfe/xgfe.html
+   If you download the source, you need Qt library from
+   http://www.troll.no/
+
+ o Bruce Ravel <ravel@phys.washington.edu> has written a new version of
+   gnuplot-mode for GNU emacs and XEmacs. This version is based on
+   the gnuplot.el file by Gershon Elber which is included with this
+   distribution. The package is available from
+   http://feff.phys.washington.edu/~ravel/gnuplot/
 

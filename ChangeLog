@@ -1,3 +1,18 @@
+1999-01-05  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* 0INSTALL: Add section about front ends.
+
+	* TODO: Fix some typos.
+
+1999-01-05  Jens Emmerich  <Jens.Emmerich@itp.uni-leipzig.de>
+
+	* term/pslatex.trm: Remove doubled '%' chars.
+
+1998-12-24  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* fit.c, protos.h: Change wri_to_fil_last_fit_cmd() return value
+	to size_t.
+
 1998-12-23  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* 0INSTALL: Add note about MSDOS/DJGPP and djconfig.sh.
