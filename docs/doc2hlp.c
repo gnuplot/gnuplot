@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: doc2hlp.c,v 1.15 1998/04/14 00:16:58 drd Exp $";
+static char *RCSid() { return RCSid("$Id: doc2hlp.c,v 1.7 1998/10/19 13:17:32 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - doc2hlp.c */
@@ -49,7 +49,7 @@ static char *RCSid = "$Id: doc2hlp.c,v 1.15 1998/04/14 00:16:58 drd Exp $";
  */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+# include "config.h"
 #endif
 
 #include "ansichek.h"
@@ -61,7 +61,8 @@ extern boolean single_top_level;
 void convert __PROTO((FILE *, FILE *));
 void process_line __PROTO((char *, FILE *));
 
-int main(argc, argv)
+int
+main(argc, argv)
 int argc;
 char **argv;
 {
@@ -98,7 +99,8 @@ char **argv;
 }
 
 
-void convert (inf, outf)
+void
+convert (inf, outf)
 FILE *inf, *outf;
 {
     static char line[MAX_LINE_LEN+1];
@@ -108,7 +110,8 @@ FILE *inf, *outf;
 }
 
 
-void process_line(line, b)
+void
+process_line(line, b)
 char *line;
 FILE *b;
 {

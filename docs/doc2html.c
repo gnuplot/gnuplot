@@ -1,7 +1,6 @@
-/*
- * $Id: doc2html.c,v 1.10 1998/04/14 00:16:58 drd Exp $
- *
- */
+#ifndef lint
+static char *RCSid() { return RCSid("$Id: doc2html.c,v 1.7 1998/10/28 21:04:09 lhecking Exp $"); }
+#endif
 
 /* GNUPLOT - doc2html.c */
 
@@ -71,7 +70,8 @@ void process_line __PROTO((char *, FILE *));
 /* From xref.c */
 extern struct LIST *lookup __PROTO((char *));
 
-int main(argc, argv)
+int
+main(argc, argv)
 int argc;
 char **argv;
 {
@@ -108,7 +108,8 @@ char **argv;
     exit(EXIT_SUCCESS);
 }
 
-void convert(a, b)
+void
+convert(a, b)
 FILE *a, *b;
 {
     static char line[MAX_LINE_LEN+1];
@@ -134,7 +135,8 @@ FILE *a, *b;
     list_free();
 }
 
-void process_line(line, b)
+void
+process_line(line, b)
 char *line;
 FILE *b;
 {

@@ -1,7 +1,6 @@
-/*
- * $Id: checkdoc.c,v 1.17 1998/04/14 00:16:57 drd Exp $
- *
- */
+#ifndef lint
+static char *RCSid() { return RCSid("$Id: checkdoc.c,v 1.7 1998/10/19 13:17:15 lhecking Exp $"); }
+#endif
 
 /* GNUPLOT - checkdoc.c */
 
@@ -51,7 +50,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+# include "config.h"
 #endif
 
 #include "ansichek.h"
@@ -61,7 +60,8 @@
 void convert __PROTO((FILE *, FILE *));
 void process_line __PROTO((char *, FILE *));
 
-int main(argc, argv)
+int
+main(argc, argv)
 int argc;
 char **argv;
 {
@@ -82,7 +82,8 @@ char **argv;
     exit(EXIT_SUCCESS);
 }
 
-void convert(a, b)
+void
+convert(a, b)
 FILE *a, *b;
 {
     static char line[MAX_LINE_LEN+1];
@@ -92,7 +93,8 @@ FILE *a, *b;
     }
 }
 
-void process_line(line, b)
+void
+process_line(line, b)
 char *line;
 FILE *b;
 {

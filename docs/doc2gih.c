@@ -1,7 +1,6 @@
-/*
- * $Id: doc2gih.c,v 1.16 1998/04/14 00:16:58 drd Exp $
- *
- */
+#ifndef lint
+static char *RCSid() { return RCSid("$Id: doc2gih.c,v 1.7 1998/10/19 13:17:28 lhecking Exp $"); }
+#endif
 
 /* GNUPLOT - doc2gih.c */
 
@@ -60,7 +59,8 @@
 void convert __PROTO((FILE *, FILE *));
 void process_line __PROTO((char *, FILE *));
 
-int main(argc, argv)
+int
+main(argc, argv)
 int argc;
 char **argv;
 {
@@ -95,7 +95,8 @@ char **argv;
 }
 
 
-void convert (inf, outf)
+void
+convert (inf, outf)
 FILE *inf, *outf;
 {
     static char line[MAX_LINE_LEN+1];
@@ -105,7 +106,8 @@ FILE *inf, *outf;
 }
 
 
-void process_line(line, b)
+void
+process_line(line, b)
 char *line;
 FILE *b;
 {

@@ -1,7 +1,6 @@
-/*
- * $Id: doc2rtf.c,v 1.16 1998/04/14 00:17:00 drd Exp $
- *
- */
+#ifndef lint
+static char *RCSid() { return RCSid("$Id: doc2rtf.c,v 1.7 1999/03/30 15:19:13 lhecking Exp $"); }
+#endif
 
 /* GNUPLOT - doc2rtf.c */
 
@@ -51,7 +50,7 @@
 /* be formatted correctly and tabs are forbidden */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+# include "config.h"
 #endif
 
 #include "ansichek.h"
@@ -66,7 +65,8 @@ void footnote __PROTO((int, char *, FILE *));
 void convert __PROTO((FILE *, FILE *));
 void process_line __PROTO((char *, FILE *));
 
-int main(argc, argv)
+int
+main(argc, argv)
 int argc;
 char **argv;
 {
@@ -95,7 +95,8 @@ char **argv;
 }
 
 /* generate an RTF footnote with reference char c and text s */
-void footnote(c, s, b)
+void
+footnote(c, s, b)
 int c;
 char *s;
 FILE *b;
@@ -103,7 +104,8 @@ FILE *b;
     fprintf(b, "%c{\\footnote %c %s}\n", c, c, s);
 }
 
-void convert(a, b)
+void
+convert(a, b)
 FILE *a, *b;
 {
     static char line[MAX_LINE_LEN+1];
@@ -125,7 +127,8 @@ FILE *a, *b;
     list_free();
 }
 
-void process_line(line, b)
+void
+process_line(line, b)
 char *line;
 FILE *b;
 {

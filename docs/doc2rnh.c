@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: doc2rnh.c,v 1.7 1998/11/20 12:16:15 lhecking Exp $";
+static char *RCSid() { return RCSid("$Id: doc2rnh.c,v 1.8 1999/06/11 18:51:01 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - doc2rnh.c */
@@ -86,7 +86,8 @@ static boolean intable = FALSE;
 static boolean rnh_table = FALSE;
 static boolean initial_entry = FALSE;
 
-int main(argc, argv)
+int
+main(argc, argv)
 int argc;
 char **argv;
 {
@@ -122,11 +123,13 @@ char **argv;
 }
 
 
-void init(b)
+void
+init(b)
 FILE *b;
 {
     /*     */
-    (void) fputs(".no paging\n\
+    (void) fputs("\
+.no paging\n\
 .no flags all\n\
 .left margin 1\n\
 .right margin 70\n\
@@ -134,7 +137,8 @@ FILE *b;
 }
 
 
-void convert(a, b)
+void
+convert(a, b)
 FILE *a, *b;
 {
     static char line[MAX_LINE_LEN+1];
@@ -144,7 +148,8 @@ FILE *a, *b;
     }
 }
 
-void process_line(line, b)
+void
+process_line(line, b)
 char *line;
 FILE *b;
 {
@@ -272,7 +277,8 @@ FILE *b;
 /* starts a new [sub]section */
 /* We want to retain section number, so its simpler than w/ TeX or roff */
 
-void section(line, b)
+void
+section(line, b)
 char *line;
 FILE *b;
 {
@@ -314,7 +320,8 @@ FILE *b;
  * output string ala doc2tex and doc2ms 
  */
 
-void putrnh(s, file)
+void
+putrnh(s, file)
 char *s;
 FILE *file;
 {
@@ -329,7 +336,8 @@ FILE *file;
  *
  */
 
-void putrnh_(s, file)
+void
+putrnh_(s, file)
 char *s;
 FILE *file;
 {
@@ -362,7 +370,8 @@ FILE *file;
     }
 }
 
-void finish(b)			/* not used */
+void
+finish(b)			/* not used */
 FILE *b;
 {
     return;

@@ -1,7 +1,6 @@
-/*
- * $Id: doc2info.c,v 1.7 1998/04/14 00:16:59 drd Exp $
- *
- */
+#ifndef lint
+static char *RCSid() { return RCSid("$Id: doc2info.c,v 1.10 1999/03/26 15:15:14 lhecking Exp $"); }
+#endif
 
 /* GNUPLOT - doc2info.c */
 
@@ -98,7 +97,8 @@ void clear_buffer __PROTO((struct BUFFER *, FILE *));
 int inxreflist __PROTO((struct LIST *));
 void xref_free __PROTO((void));
 
-int main(argc, argv)
+int
+main(argc, argv)
 int argc;
 char **argv;
 {
@@ -137,7 +137,8 @@ char **argv;
 }
 
 
-void convert(a, b)
+void
+convert(a, b)
 FILE *a, *b;
 {
     static char line[MAX_LINE_LEN+1];
@@ -174,7 +175,8 @@ END-INFO-DIR-ENTRY\n\n",
  * containing them. All lines of the paragraph are written into a buffer
  * and printed at the end of the paragraph.
  */
-void process_line(line, b)
+void
+process_line(line, b)
 char *line;
 FILE *b;
 {
@@ -367,7 +369,8 @@ FILE *b;
 /*
  * write the header of an Info node, treat Top node specially
  */
-void node_head(node, prev, next, up, b)
+void
+node_head(node, prev, next, up, b)
 char *node, *prev, *next, *up;
 FILE *b;
 {
@@ -403,7 +406,8 @@ FILE *b;
  * allocate memory for the node titles (up and prev) 
  * need at most maxlevel+Top+(dir) entries
  */
-char **name_alloc __PROTO((void))
+char **
+name_alloc()
 {
     char **a;
     int i;
@@ -417,7 +421,8 @@ char **name_alloc __PROTO((void))
 /*
  * free node names
  */
-void name_free(names)
+void
+name_free(names)
 char **names;
 {
     int i;
@@ -430,7 +435,8 @@ char **names;
 /*
  * reformat the buffered lines
  */
-void clear_buffer(buf_head, b)
+void
+clear_buffer(buf_head, b)
 struct BUFFER *buf_head;
 FILE *b;
 {
@@ -518,7 +524,8 @@ FILE *b;
 /*
  * test whether topic is allready referenced in node
  */
-int inxreflist(reflist)
+int
+inxreflist(reflist)
 struct LIST *reflist;
 {
     struct XREFLIST *run;
@@ -532,7 +539,8 @@ struct LIST *reflist;
 /*
  * free the list of xrefs
  */
-void xref_free __PROTO((void))
+void
+xref_free __PROTO((void))
 {
     struct XREFLIST *lastref;
 

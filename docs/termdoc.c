@@ -1,7 +1,6 @@
-/*
- * $Id: termdoc.c,v 1.19 1998/04/14 00:17:14 drd Exp $
- *
- */
+#ifndef lint
+static char *RCSid() { return RCSid("$Id: termdoc.c,v 1.8 1998/11/03 12:47:57 lhecking Exp $"); }
+#endif
 
 /* GNUPLOT - termdoc.c */
 
@@ -83,7 +82,8 @@ char termdoc_filename[80];
 
 boolean single_top_level;
 
-char *get_line(buffer, max, fp)
+char *
+get_line(buffer, max, fp)
 char *buffer;
 int max;
 FILE *fp;
@@ -190,7 +190,8 @@ FILE *fp;
  * This is basically the old fit.c(copy_max) function
  */
 
-char *safe_strncpy(d, s, n)
+char *
+safe_strncpy(d, s, n)
 char *d, *s;
 size_t n;
 {
@@ -205,7 +206,8 @@ size_t n;
 
 
 #ifdef TEST_TERMDOC
-int main()
+int
+main()
 {
     char line[256];
     while (get_line(line, sizeof(line), stdin))

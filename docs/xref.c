@@ -1,7 +1,6 @@
-/*
- * $Id: xref.c,v 1.9 1998/03/22 23:31:53 drd Exp $
- *
- */
+#ifndef lint
+static char *RCSid() { return RCSid("$Id: xref.c,v 1.4 1998/10/19 13:19:18 lhecking Exp $"); }
+#endif
 
 /* GNUPLOT - xref.c */
 
@@ -75,7 +74,8 @@ int maxlevel = 0;		/* how deep are the topics nested? */
 int listitems = 0;		/* number of topics */
 
 /* for debugging (invoke from gdb !) */
-void dump_list()
+void
+dump_list()
 {
     struct LIST *element = head;
     while (element) {
@@ -86,11 +86,13 @@ void dump_list()
 
 
 #ifdef PROTOTYPES
-void *xmalloc(size_t size)
+void *
+xmalloc(size_t size)
 {
     void *p = malloc(size);
 #else
-char *xmalloc(size)		/* think this is correct for K&R C */
+char *
+xmalloc(size)		/* think this is correct for K&R C */
 unsigned int size;
 {
     char *p = malloc(size);
@@ -103,7 +105,8 @@ unsigned int size;
 }
 
 /* scan the file and build a list of line numbers where particular levels are */
-void parse(a)
+void
+parse(a)
 FILE *a;
 {
     static char line[MAX_LINE_LEN+1];
@@ -181,7 +184,7 @@ FILE *a;
  * of one to `splot`. Switched the search order -SB.
  */
 struct LIST *
- lookup(s)
+lookup(s)
 char *s;
 {
     char *c;
@@ -236,7 +239,8 @@ char *s;
 /*
  * find title-entry for keyword-entry
  */
-struct LIST *lkup_by_number(line)
+struct LIST *
+lkup_by_number(line)
 int line;
 {
     struct LIST *run = head;
@@ -253,7 +257,8 @@ int line;
 /*
  * free the whole list (I never trust the OS -SB)
  */
-void list_free __PROTO((void))
+void
+list_free ()
 {
     struct LIST *run;
 
@@ -282,7 +287,8 @@ void list_free __PROTO((void))
  * a %d for the line number of the subtopic (used by doc2html and doc2rtf
  * The whole menu is preceeded by start and gets the trailer end 
  */
-void refs(l, f, start, end, format)
+void
+refs(l, f, start, end, format)
 int l;
 FILE *f;
 char *start, *end, *format;

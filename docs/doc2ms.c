@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: doc2ms.c,v 1.19 1998/06/18 14:59:11 ddenholm Exp $";
+static char *RCSid() { return RCSid("$Id: doc2ms.c,v 1.9 1998/10/19 13:17:49 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - doc2ms.c */
@@ -78,7 +78,8 @@ void finish __PROTO((FILE *));
 
 static boolean intable = FALSE;
 
-int main(argc, argv)
+int
+main(argc, argv)
 int argc;
 char **argv;
 {
@@ -111,7 +112,8 @@ char **argv;
 }
 
 
-void init(b)
+void
+init(b)
 FILE *b;
 {
     /* in nroff, increase line length by 8 and don't adjust lines */
@@ -129,7 +131,8 @@ FILE *b;
 }
 
 
-void convert(a, b)
+void
+convert(a, b)
 FILE *a, *b;
 {
     static char line[MAX_LINE_LEN+1];
@@ -139,7 +142,8 @@ FILE *a, *b;
     }
 }
 
-void process_line(line, b)
+void
+process_line(line, b)
 char *line;
 FILE *b;
 {
@@ -225,7 +229,8 @@ FILE *b;
 /* process a line with a digit control char */
 /* starts a new [sub]section */
 
-void section(line, b)
+void
+section(line, b)
 char *line;
 FILE *b;
 {
@@ -265,7 +270,8 @@ FILE *b;
     (void) fputs("\n.XE\n", b);
 }
 
-void putms(s, file)
+void
+putms(s, file)
 char *s;
 FILE *file;
 {
@@ -305,7 +311,8 @@ FILE *file;
  * (added by Alexander Lehmann 01/30/93)
  */
 
-void putms_verb(s, file)
+void
+putms_verb(s, file)
 char *s;
 FILE *file;
 {
@@ -318,11 +325,14 @@ FILE *file;
     }
 }
 
-void finish(b)			/* spit out table of contents */
+/* spit out table of contents */
+void
+finish(b)
 FILE *b;
 {
-    (void) fputs(".pn 1\n", b);
-    (void) fputs(".ds RH %\n", b);
-    (void) fputs(".af % i\n", b);
-    (void) fputs(".bp\n.PX\n", b);
+    fputs("\
+.pn 1\n\
+.ds RH %\n\
+.af % i\n\
+.bp\n.PX\n", b);
 }

@@ -1,7 +1,6 @@
-/*
- * $Id: doc2tex.c,v 1.21 1998/06/18 14:59:12 ddenholm Exp $
- *
- */
+#ifndef lint
+static char *RCSid() { return RCSid("$Id: doc2tex.c,v 1.8 1998/10/19 13:18:05 lhecking Exp $"); }
+#endif
 
 /* GNUPLOT - doc2tex.c */
 
@@ -73,7 +72,8 @@ void finish __PROTO((FILE *));
 static boolean intable = FALSE;
 static boolean verb = FALSE;
 
-int main(argc, argv)
+int
+main(argc, argv)
 int argc;
 char **argv;
 {
@@ -108,14 +108,16 @@ char **argv;
 }
 
 
-void init(b)
+void
+init(b)
 FILE *b;
 {
     (void) fputs("\\input{titlepag.tex}\n", b);
 }
 
 
-void convert(a, b)
+void
+convert(a, b)
 FILE *a, *b;
 {
     static char line[MAX_LINE_LEN+1];
@@ -125,7 +127,8 @@ FILE *a, *b;
 
 }
 
-void process_line(line, b)
+void
+process_line(line, b)
 char *line;
 FILE *b;
 {
@@ -209,7 +212,8 @@ FILE *b;
 /* process a line with a digit control char */
 /* starts a new [sub]section */
 
-void section(line, b)
+void
+section(line, b)
 char *line;
 FILE *b;
 {
@@ -250,7 +254,8 @@ FILE *b;
 }
 
 /* put text in string str to file while buffering special TeX characters */
-void puttex(str, file)
+void
+puttex(str, file)
 FILE *file;
 register char *str;
 {

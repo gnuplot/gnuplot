@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: doc2ipf.c,v 1.20 1998/04/14 00:16:59 drd Exp $";
+static char *RCSid() { return RCSid("$Id: doc2ipf.c,v 1.7 1998/10/19 13:17:45 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - doc2ipf.c */
@@ -83,7 +83,8 @@ int tablelines = 0;		/* number of zeroes here */
 static boolean debug = FALSE;
 
 
-int main(argc, argv)
+int
+main(argc, argv)
 int argc;
 char **argv;
 {
@@ -112,7 +113,8 @@ char **argv;
     exit(EXIT_SUCCESS);
 }
 
-void convert(a, b)
+void
+convert(a, b)
 FILE *a, *b;
 {
     static char line[MAX_LINE_LEN+1];
@@ -133,7 +135,8 @@ FILE *a, *b;
     list_free();
 }
 
-void process_line(line, b)
+void
+process_line(line, b)
 char *line;
 FILE *b;
 {
