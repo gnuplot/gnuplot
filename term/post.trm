@@ -1,5 +1,5 @@
 /*
- * $Id: post.trm,v 1.27 1999/06/22 11:52:32 lhecking Exp $
+ * $Id: post.trm,v 1.28 1999/06/25 17:07:55 lhecking Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -133,10 +133,10 @@ static float ps_dash_length = 1.0;   /*  scale factor for dash-dot patterns  */
 static float ps_linewidth_factor = 1.0;   /*  scale factor for linewidth  */
 static TBOOLEAN ps_eps = FALSE;	/* Is this for an eps file? */
 			/* Added by Robert Davis <davis@ecn.purdue.edu> */
-static int ps_page=0;			/* page count */
-static int ps_path_count=0; 	/* count of lines in path */
-static int ps_ang=0;			/* text angle */
-static enum JUSTIFY ps_justify=LEFT;	/* text is flush left */
+static int ps_page = 0;			/* page count */
+static int ps_path_count = 0; 	/* count of lines in path */
+static int ps_ang = 0;			/* text angle */
+static enum JUSTIFY ps_justify = LEFT;	/* text is flush left */
 
 /* added by Matt Heffron <heffron@falstaff.css.beckman.com> */
 static TBOOLEAN ps_duplex_state = FALSE;
@@ -496,8 +496,8 @@ int can_reencode;
     struct PS_FontName *fnp;
     char *recode = NULL;
 
-    for (fnp=PS_DocFonts; fnp ; fnp = fnp->next)
-	if (strcmp(fnp->name, fname)==0)
+    for (fnp = PS_DocFonts; fnp ; fnp = fnp->next)
+	if (strcmp(fnp->name, fname) == 0)
 	    return NULL;
 
     /* we did not find the name */
@@ -538,26 +538,26 @@ PS_options()
 {
     if (!END_OF_COMMAND) {
 	if (almost_equals(c_token,"p$ortrait")) {
-	    ps_portrait=TRUE;
-	    ps_eps=FALSE;
+	    ps_portrait = TRUE;
+	    ps_eps = FALSE;
 	    c_token++;
 	} else if (almost_equals(c_token,"l$andscape")) {
-	    ps_portrait=FALSE;
-	    ps_eps=FALSE;
+	    ps_portrait = FALSE;
+	    ps_eps = FALSE;
 	    c_token++;
 	} else if (almost_equals(c_token,"ep$sf")) {
-	    ps_portrait=TRUE;
+	    ps_portrait = TRUE;
 	    ps_eps = TRUE;
 	    c_token++;
 	} else if (almost_equals(c_token,"d$efault")) {
-	    ps_portrait=FALSE;
-	    ps_eps=FALSE;
-	    ps_color=FALSE;
-	    ps_blacktext=FALSE;
-	    ps_solid=FALSE;
+	    ps_portrait = FALSE;
+	    ps_eps = FALSE;
+	    ps_color = FALSE;
+	    ps_blacktext = FALSE;
+	    ps_solid = FALSE;
 	    ps_dash_length = 1.0;
 	    ps_linewidth_factor = 1.0;
-	    ps_duplex_option=FALSE;
+	    ps_duplex_option = FALSE;
 	    strcpy(ps_font,"Helvetica");
 	    ps_fontsize = 14;
 	    term->v_char = (unsigned int)(ps_fontsize*PS_SC);
@@ -579,32 +579,32 @@ PS_options()
 
     if (!END_OF_COMMAND) {
 	if (almost_equals(c_token,"m$onochrome")) {
-	    ps_color=FALSE;
+	    ps_color = FALSE;
 	    c_token++;
 	} else if (almost_equals(c_token,"c$olor")
 		   || almost_equals(c_token,"c$olour")) {
-	    ps_color=TRUE;
+	    ps_color = TRUE;
 	    c_token++;
 	}
     }
 
     if (!END_OF_COMMAND) {
 	if (almost_equals(c_token,"b$lacktext")) {
-	    ps_blacktext=TRUE;
+	    ps_blacktext = TRUE;
 	    c_token++;
 	} else if (almost_equals(c_token,"color$text") ||
 		   almost_equals(c_token,"colour$text")) {
-	    ps_blacktext=FALSE;
+	    ps_blacktext = FALSE;
 	    c_token++;
 	}
     }
 
     if (!END_OF_COMMAND) {
 	if (almost_equals(c_token,"so$lid")) {
-	    ps_solid=TRUE;
+	    ps_solid = TRUE;
 	    c_token++;
 	} else if (almost_equals(c_token,"da$shed")) {
-	    ps_solid=FALSE;
+	    ps_solid = FALSE;
 	    c_token++;
 	}
     }
@@ -657,7 +657,7 @@ PS_options()
 	term->h_char = (unsigned int)(ps_fontsize*PS_SC*6/10);
     }
 
-    if (!ps_color) ps_blacktext=TRUE;
+    if (!ps_color) ps_blacktext = TRUE;
 
     sprintf(default_font,"%s,%d",ps_font,ps_fontsize);
     /* default_font holds the font and size set at 'set term' */
@@ -893,17 +893,17 @@ NULL };
 	    PS_VTIC/2.0);		/* half point height */
 
     if (uses_fonts && (encoding == ENCODING_ISO_8859_1)) {
-	for (i=0; PS_iso_8859_1_encoding[i] != NULL; i++) {
+	for (i = 0; PS_iso_8859_1_encoding[i] != NULL; i++) {
 	    fprintf(gpoutfile,"%s",PS_iso_8859_1_encoding[i]);
 	}
     }
     if (uses_fonts && (encoding == ENCODING_CP_437)) {       /* JFi */
-	for (i=0; PS_cp_437_encoding[i] != NULL; i++) {
+	for (i = 0; PS_cp_437_encoding[i] != NULL; i++) {
 	    fprintf(gpoutfile,"%s",PS_cp_437_encoding[i]);
 	}
     }
     if (uses_fonts && (encoding == ENCODING_CP_850)) {       /* JFi */
-	for (i=0; PS_cp_850_encoding[i] != NULL; i++) {
+	for (i = 0; PS_cp_850_encoding[i] != NULL; i++) {
 	    fprintf(gpoutfile,"%s",PS_cp_850_encoding[i]);
 	}
     }
@@ -912,7 +912,7 @@ NULL };
      * problem. Otherwise a small procedure might be beneficial.
      */
 
-    for ( i=0; PS_header[i] != NULL; i++)
+    for ( i = 0; PS_header[i] != NULL; i++)
 	fprintf(gpoutfile,"%s",PS_header[i]);
     if (ps_duplex_option)
 	fprintf(gpoutfile, "statusdict begin %s setduplexmode end\n",
@@ -1027,7 +1027,7 @@ PS_reset()
 	    fprintf(gpoutfile, "%s%s", PS_DocFonts->name, fnp ? " " : "\n");
 	    free(PS_DocFonts->name);
 	    free(PS_DocFonts);
-	    PS_DocFonts=fnp;
+	    PS_DocFonts = fnp;
 	}
     }
     if (!ps_common_encap)
@@ -1214,7 +1214,7 @@ TERM_PUBLIC int
 PS_text_angle(ang)
 int ang;
 {
-    ps_ang=ang;
+    ps_ang = ang;
     return TRUE;
 }
 
@@ -1223,7 +1223,7 @@ TERM_PUBLIC int
 PS_justify_text(mode)
 enum JUSTIFY mode;
 {
-    ps_justify=mode;
+    ps_justify = mode;
     return TRUE;
 }
 
@@ -1239,7 +1239,7 @@ const char *font;
     sep = strcspn(font,",");
     strncpy(name,font,sep);
     name[sep] = NUL;
-    size=ps_fontsize;
+    size = ps_fontsize;
     sscanf (&(font[sep+1]),"%d",&size);
     fprintf(gpoutfile,"/%s findfont %d scalefont setfont\n",name,size*PS_SC);
     PS_RememberFont(name,1 );
@@ -1397,10 +1397,10 @@ double fontsize, base;
 	    /*}}}*/
 	case '{'  :
 	{
-	    char *savepos=NULL, save=0;
-	    char *localfontname=fontname, ch;
-	    int recode=1;
-	    float f=fontsize;
+	    char *savepos = NULL, save = 0;
+	    char *localfontname = fontname, ch;
+	    int recode = 1;
+	    float f = fontsize;
 
 	    /*{{{  recurse (possibly with a new font) */
 
@@ -1410,7 +1410,7 @@ double fontsize, base;
 		/* then parse a fontname, optional fontsize */
 		while (*++p == ' ');
 		if (*p=='-') {
-		    recode=0;
+		    recode = 0;
 		    while (*++p == ' ');
 		}
 		localfontname = p;
@@ -1581,7 +1581,7 @@ const char *font;
     if (*font) {
 	size_t sep = strcspn(font,",");
 	strncpy(ps_enh_font,font,sep);
-	ps_enh_font[sep]=NUL;
+	ps_enh_font[sep] = NUL;
 	ps_enh_fontsize = ps_fontsize;
 	sscanf (font+sep+1,"%d",&ps_enh_fontsize);
 	PS_RememberFont(ps_enh_font, 1);
@@ -1606,8 +1606,8 @@ const char *str;
 
     if (ps_path_count) {
 	fputs(" stroke\n",gpoutfile);
-	ps_path_count=0;
-	PS_relative_ok=FALSE;
+	ps_path_count = 0;
+	PS_relative_ok = FALSE;
     }
 
     /* if there are no magic characters, we should just be able
@@ -1652,7 +1652,7 @@ const char *str;
      * "font,size". That is to say, ps_font is used only
      * at startup and by ENHPS_set_font
      */
-    while (*(str = ENHPS_recurse(str, TRUE, ps_enh_font,
+    while (*(str = ENHPS_recurse((char *)str, TRUE, ps_enh_font,
 				 (double)(ps_enh_fontsize*PS_SC),
 				 0.0, TRUE, TRUE))) {
 	ENHPS_FLUSH;
@@ -1687,7 +1687,7 @@ const char *str;
     if (ps_ang != 0 && ps_blacktext)
 	fputs("grestore\n", gpoutfile);
     ps_path_count = 0;
-    PS_relative_ok=FALSE;
+    PS_relative_ok = FALSE;
 }
 
 
