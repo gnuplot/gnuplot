@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.74 2003/12/01 03:32:02 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.75 2003/12/15 07:52:14 mikulik Exp $"); }
 #endif
 
 #define X11_POLYLINE 1
@@ -400,6 +400,7 @@ static int is_control __PROTO((KeySym mod));
 static int is_meta __PROTO((KeySym mod));
 static int is_shift __PROTO((KeySym mod));
 #endif
+static char* __PROTO((getMultiTabConsoleSwitchCommand(unsigned long *newGnuplotXID)));
 #endif
 
 static void DrawRotated __PROTO((Display *dpy, Drawable d, GC gc, int xdest,
@@ -3099,7 +3100,104 @@ is_shift(KeySym mod)
 }
 #endif
 
+
+/* It returns NULL if we are not running in any known (=implemented) multitab
+ * console.
+ * Otherwise it returns a command to be executed in order to switch to the
+ * appropriate tab of a multitab console.
+ * In addition, it may return non-zero newGnuplotXID in order to overwrite zero
+ * value of gnuplotXID (because Konsole's in KDE <3.2 don't set WINDOWID contrary
+ * to all other xterm's).
+ * Currently implemented for:
+ *	- KDE's Konsole.
+ * Note: if the returned command is !NULL, then it must be free()'d by the caller.
+ */
+char*
+getMultiTabConsoleSwitchCommand(unsigned long *newGnuplotXID)
+{
+    char *cmd = NULL; /* result */
+    char *ptr = getenv("KONSOLE_DCOP_SESSION"); /* Try KDE's Konsole first. */
+    *newGnuplotXID = 0;
+    if (ptr) {
+	/* We are in KDE's Konsole, or in a terminal window detached from a Konsole.
+	 * In order to active a tab:
+	 * 1. get environmental variable KONSOLE_DCOP_SESSION: it includes konsole id and session name
+	 * 2. if
+	 *	$WINDOWID is defined and it equals
+	 *	    `dcop konsole-3152 konsole-mainwindow#1 getWinID`
+	 *	(KDE 3.2) or when $WINDOWID is undefined (KDE 3.1), then run commands
+	 *    dcop konsole-3152 konsole activateSession session-2; \
+	 *    dcop konsole-3152 konsole-mainwindow#1 raise
+	 * Note: by $WINDOWID we mean gnuplot's text console WINDOWID.
+	 * Missing: focus is not transferred unless $WINDOWID is defined (should be fixed in KDE 3.2).
+	 *
+	 * Implementation and tests on KDE 3.1.4: Petr Mikulik.
+	 */
+	char *konsole_name = NULL;
+	*newGnuplotXID = 0; /* don't change gnuplotXID by default */
+	/* use 'while' instead of 'if' to easily break out (aka catch exception) */
+	while (1) {
+	    char *konsole_tab;
+	    unsigned long w;
+	    FILE *p;
+	    ptr = strchr(ptr, '(');
+	    /* the string for tab nb 4 looks like 'DCOPRef(konsole-2866,session-4)' */
+	    if (!ptr) return NULL;
+	    konsole_name = strdup(ptr+1);
+	    konsole_tab = strchr(konsole_name, ',');
+	    if (!konsole_tab) break;
+	    *konsole_tab++ = 0;
+	    ptr = strchr(konsole_tab, ')');
+	    if (ptr) *ptr = 0;
+#if 0
+	    fprintf(stderr, "konsole_name = |%s|\n", konsole_name);
+	    fprintf(stderr, "konsole_tab  = |%s|\n", konsole_tab);
 #endif
+	    /* Not necessary to define DCOP_RAISE: returning newly known
+	     * newGnuplotXID instead is sufficient.
+	     */
+/* #define DCOP_RAISE */
+#ifdef DCOP_RAISE
+	    cmd = malloc(2*strlen(konsole_name) + strlen(konsole_tab) + 128);
+#else
+	    cmd = malloc(strlen(konsole_name) + strlen(konsole_tab) + 64);
+#endif
+	    sprintf(cmd, "dcop %s konsole-mainwindow#1 getWinID 2>/dev/null", konsole_name);
+      		/* is  2>/dev/null  portable among various shells? */
+	    p = popen(cmd, "r");
+	    if (p) {
+		fscanf(p, "%lu", &w);
+		pclose(p);
+	    }
+	    if (gnuplotXID) { /* $WINDOWID is known */
+		if (w != gnuplotXID) break;
+		    /* `dcop getWinID`==$WINDOWID thus we are running in a window detached from Konsole */
+	    } else {
+		*newGnuplotXID = w;
+		    /* $WINDOWID has not been known (KDE 3.1), thus set it up */
+	    }
+#ifdef DCOP_RAISE
+	    /* not necessary: returning newly known newGnuplotXID instead is sufficient */
+	    sprintf(cmd, "dcop %s konsole-mainwindow#1 raise;", konsole_name);
+	    sprintf(cmd+strlen(cmd), "dcop %s konsole activateSession %s", konsole_name, konsole_tab);
+#else
+	    sprintf(cmd, "dcop %s konsole activateSession %s", konsole_name, konsole_tab);
+#endif
+	    free(konsole_name);
+	    return cmd;
+	}
+	free(konsole_name);
+	free(cmd);
+	return NULL;
+    }
+    /* now test for GNOME multitab console */
+    /* ... if somebody bothers to implement it ... */
+    /* we are not running in any known (implemented) multitab console */
+    return NULL;
+}
+
+#endif
+
 
 /*---------------------------------------------------------------------------
  *  reset all cursors (since we dont have a record of the previous terminal #)
@@ -3260,7 +3358,24 @@ process_event(XEvent *event)
 #endif
 	    switch (keysym) {
 #ifdef USE_MOUSE
-	    case ' ':
+	    case ' ': {
+		static int cmd_tried = 0;
+		static char *cmd = NULL;
+		static unsigned long newGnuplotXID = 0;
+		if (!cmd_tried)
+		    cmd = getMultiTabConsoleSwitchCommand(&newGnuplotXID);
+		/* overwrite gnuplotXID (re)set after x11.trm:X11_options() */
+	    	if (newGnuplotXID) gnuplotXID = newGnuplotXID;
+#if 0 
+	    	fprintf(stderr, "Command is: |%s|\nAnd newGnuplotXID=%lu\n", cmd, newGnuplotXID);
+#endif
+    		if (cmd) system(cmd);
+#if 0
+		/* having cmd static in order to call getMultiTabConsoleSwitchCommand()
+		 * only once (it may need to read from popen()), thus don't free it */
+		free(cmd); /* works also for NULL parameter */
+#endif
+		}
 		if (gnuplotXID) {
 		    XMapRaised(dpy, gnuplotXID);
 		    XSetInputFocus(dpy, gnuplotXID, 0 /*revert */ , CurrentTime);

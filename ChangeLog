@@ -1,3 +1,13 @@
+2003-12-15  Petr Mikulik  <mikulik@physics.muni.cz>
+
+        * src/gplt_x11.c:
+        (getMultiTabConsoleSwitchCommand): New routine to return system command
+        to switch to the appropriate "tab" of a multitab console window where
+        gnuplot is running. Currently implemented for KDE's Konsole (it returns
+        a "dcop" command).
+        (process_event): Let hotkey "<space>" in gnuplot_x11 work also in
+	gnuplot running in multitab KDE's Konsole.
+
 2003-12-15  Andrey V. Panov  <panov@iacp.dvo.ru>
 
 	* NEWS docs/gnuplot.doc src/term_api.h src/term.c src/gplt_x11.c
