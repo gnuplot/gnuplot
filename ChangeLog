@@ -1,3 +1,9 @@
+2002-03-17  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* term/pslatex.trm (PSLATEX_init): Changed "encap" argument of
+	PS_common_init calls to get the relative scaling of the PostScript
+	and LaTeX coordinate systems right.
+
 2002-03-12  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* makefile.cyg: Reformatted one comment for legibility.

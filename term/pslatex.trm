@@ -1,5 +1,5 @@
 /*
- * $Id: pslatex.trm,v 1.15.2.4 2000/10/24 20:13:16 lhecking Exp $
+ * $Id: pslatex.trm,v 1.15.2.5 2001/05/31 11:12:45 broeker Exp $
  */
 
 /* GNUPLOT - pslatex.trm */
@@ -271,11 +271,13 @@ Turning off auxfile option\n", outstr);
 	if (PSLATEX_auxFile) {
 	    FILE *tmp = gpoutfile;
 	    gpoutfile = PSLATEX_auxFile;
-	    PS_common_init(1, 1, 0, 0, 0, xmin_t, ymin_t, xmax_t, ymax_t, NULL);
+	    PS_common_init(0, 1, 0, 0, 0, 
+			   xmin_t, ymin_t, xmax_t, ymax_t, NULL);
 	    gpoutfile = tmp;
 	} else {
 	    fputs("{\\GNUPLOTspecial{!\n", gpoutfile);
-	    PS_common_init(1, 1, 0, 0, 0, xmin_t, ymin_t, xmax_t, ymax_t, NULL);
+	    PS_common_init(0, 1, 0, 0, 0,
+			   xmin_t, ymin_t, xmax_t, ymax_t, NULL);
 	    fputs("}}%\n", gpoutfile);
 	}
     }
