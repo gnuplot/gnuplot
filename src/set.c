@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.16 1999/06/19 20:52:07 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.17 1999/07/20 15:33:36 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -59,15 +59,45 @@ static char *RCSid() { return RCSid("$Id: set.c,v 1.16 1999/06/19 20:52:07 lheck
  * done in reset_command() as well (if that makes sense).
  */
 
+struct axis_properties x_props = {
+    { "", "", 0.0, 0.0 },
+    NULL, DTRUE, NULL, 1, FALSE, 0.0, 0.0, 1.0, -10.0, 10.0,
+    TICS_ON_BORDER | TICS_MIRROR, MINI_DEFAULT, 10.0, FALSE,
+    { TIC_COMPUTED }
+};
+
+struct axis_properties y_props = {
+    { "", "", 0.0, 0.0 },
+    NULL, DTRUE, NULL, 1, FALSE, 0.0, 0.0, 1.0, -10.0, 10.0,
+    TICS_ON_BORDER | TICS_MIRROR, MINI_DEFAULT, 10.0, FALSE,
+    { TIC_COMPUTED }
+};
+
+struct axis_properties z_props = {
+    { "", "", 0.0, 0.0 },
+    NULL, DTRUE, NULL, 1, FALSE, 0.0, 0.0, 1.0, -10.0, 10.0,
+    TICS_ON_BORDER, MINI_DEFAULT, 10.0, FALSE,
+    { TIC_COMPUTED }
+};
+
+struct axis_properties x2_props = {
+    { "", "", 0.0, 0.0 },
+    NULL, DTRUE, NULL, 1, FALSE, 0.0, 0.0, 1.0, -10.0, 10.0,
+    NO_TICS, MINI_DEFAULT, 10.0, FALSE,
+    { TIC_COMPUTED }
+};
+
+struct axis_properties y2_props = {
+    { "", "", 0.0, 0.0 },
+    NULL, DTRUE, NULL, 1, FALSE, 0.0, 0.0, 1.0, -10.0, 10.0,
+    NO_TICS, MINI_DEFAULT, 10.0, FALSE,
+    { TIC_COMPUTED }
+};
+
 TBOOLEAN autoscale_r = DTRUE;
 TBOOLEAN autoscale_t = DTRUE;
 TBOOLEAN autoscale_u = DTRUE;
 TBOOLEAN autoscale_v = DTRUE;
-TBOOLEAN autoscale_x = DTRUE;
-TBOOLEAN autoscale_y = DTRUE;
-TBOOLEAN autoscale_z = DTRUE;
-TBOOLEAN autoscale_x2 = DTRUE;
-TBOOLEAN autoscale_y2 = DTRUE;
 TBOOLEAN autoscale_lt = DTRUE;
 TBOOLEAN autoscale_lu = DTRUE;
 TBOOLEAN autoscale_lv = DTRUE;
@@ -85,11 +115,6 @@ int draw_border = 31;
 TBOOLEAN draw_surface = TRUE;
 char dummy_var[MAX_NUM_VAR][MAX_ID_LEN+1] = { "x", "y" };
 char default_font[MAX_ID_LEN+1] = "";	/* Entry font added by DJL */
-char xformat[MAX_ID_LEN+1] = DEF_FORMAT;
-char yformat[MAX_ID_LEN+1] = DEF_FORMAT;
-char zformat[MAX_ID_LEN+1] = DEF_FORMAT;
-char x2format[MAX_ID_LEN+1] = DEF_FORMAT;
-char y2format[MAX_ID_LEN+1] = DEF_FORMAT;
 
 /* do formats look like times - use FIRST_X_AXIS etc as index
  * - never saved or shown ...
@@ -115,21 +140,7 @@ struct lp_style_type key_box = { 0, -3, 0, 1.0, 1.0 };		/* -3 = no linetype */
 double key_swidth = 4.0;
 double key_vert_factor = 1.0;
 double key_width_fix = 0.0;
-TBOOLEAN is_log_x = FALSE;
-TBOOLEAN is_log_y = FALSE;
-TBOOLEAN is_log_z = FALSE;
-TBOOLEAN is_log_x2 = FALSE;
-TBOOLEAN is_log_y2 = FALSE;
-double base_log_x = 0.0;
-double base_log_y = 0.0;
-double base_log_z = 0.0;
-double base_log_x2 = 0.0;
-double base_log_y2 = 0.0;
-double log_base_log_x = 0.0;
-double log_base_log_y = 0.0;
-double log_base_log_z = 0.0;
-double log_base_log_x2 = 0.0;
-double log_base_log_y2 = 0.0;
+
 FILE *gpoutfile;
 char *outstr = NULL;		/* means "STDOUT" */
 TBOOLEAN parametric = FALSE;
@@ -148,9 +159,6 @@ int samples_1 = SAMPLES;
 int samples_2 = SAMPLES;
 int iso_samples_1 = ISO_SAMPLES;
 int iso_samples_2 = ISO_SAMPLES;
-float xsize = 1.0;		/* scale factor for size */
-float ysize = 1.0;		/* scale factor for size */
-float zsize = 1.0;		/* scale factor for size */
 float xoffset = 0.0;		/* x origin */
 float yoffset = 0.0;		/* y origin */
 float aspect_ratio = 0.0;	/* don't attempt to force it */
@@ -160,13 +168,8 @@ float surface_scale = 1.0;
 float surface_zscale = 1.0;
 struct termentry *term = NULL;	/* unknown */
 char term_options[MAX_LINE_LEN+1] = "";
-label_struct title = { "", 0.0, 0.0, "" };
-label_struct timelabel = { "", 0.0, 0.0, "" };
-label_struct xlabel = { "", 0.0, 0.0, "" };
-label_struct ylabel = { "", 0.0, 0.0, "" };
-label_struct zlabel = { "", 0.0, 0.0, "" };
-label_struct x2label = { "", 0.0, 0.0, "" };
-label_struct y2label = { "", 0.0, 0.0, "" };
+label_struct title = { "", "", 0.0, 0.0 };
+label_struct timelabel = { "", "", 0.0, 0.0 };
 
 int timelabel_rotate = FALSE;
 int timelabel_bottom = TRUE;
@@ -179,16 +182,6 @@ double umin = -5.0;
 double umax = 5.0;
 double vmin = -5.0;
 double vmax = 5.0;
-double xmin = -10.0;
-double xmax = 10.0;
-double ymin = -10.0;
-double ymax = 10.0;
-double zmin = -10.0;
-double zmax = 10.0;
-double x2min = -10.0;
-double x2max = 10.0;
-double y2min = -10.0;
-double y2max = 10.0;
 double loff = 0.0;
 double roff = 0.0;
 double toff = 0.0;
@@ -213,44 +206,12 @@ struct lp_style_type yzeroaxis = { 0, -3, 0, 1.0, 1.0 };
 struct lp_style_type x2zeroaxis = { 0, -3, 0, 1.0, 1.0 };
 struct lp_style_type y2zeroaxis = { 0, -3, 0, 1.0, 1.0 };
 
-/* perhaps make these into an array one day */
-
-int xtics = TICS_ON_BORDER | TICS_MIRROR;
-int ytics = TICS_ON_BORDER | TICS_MIRROR;
-int ztics = TICS_ON_BORDER;	/* no mirror by default for ztics */
-int x2tics = NO_TICS;
-int y2tics = NO_TICS;
-
-TBOOLEAN rotate_xtics = FALSE;
-TBOOLEAN rotate_ytics = FALSE;
-TBOOLEAN rotate_ztics = FALSE;
-TBOOLEAN rotate_x2tics = FALSE;
-TBOOLEAN rotate_y2tics = FALSE;
-
 int range_flags[AXIS_ARRAY_SIZE];	/* = {0,0,...} */
-
-int mxtics = MINI_DEFAULT;
-int mytics = MINI_DEFAULT;
-int mztics = MINI_DEFAULT;
-int mx2tics = MINI_DEFAULT;
-int my2tics = MINI_DEFAULT;
-
-double mxtfreq = 10;		/* # intervals between major */
-double mytfreq = 10;		/* tic marks */
-double mztfreq = 10;
-double mx2tfreq = 10;
-double my2tfreq = 10;
 
 double ticscale = 1.0;		/* scale factor for tic mark */
 double miniticscale = 0.5;	/* and for minitics */
 
 float ticslevel = 0.5;
-
-struct ticdef xticdef = { TIC_COMPUTED };
-struct ticdef yticdef = { TIC_COMPUTED };
-struct ticdef zticdef = { TIC_COMPUTED };
-struct ticdef x2ticdef = { TIC_COMPUTED };
-struct ticdef y2ticdef = { TIC_COMPUTED };
 
 TBOOLEAN tic_in = TRUE;
 
@@ -260,18 +221,18 @@ struct linestyle_def *first_linestyle = NULL;
 
 /* space between left edge and xleft in chars (-1: computed) */
 int lmargin = -1;
+
 /* space between bottom and ybot in chars (-1: computed) */
 int bmargin = -1;
+
 /* space between right egde and xright in chars (-1: computed) */
 int rmargin = -1;
+
 /* space between top egde and ytop in chars (-1: computed) */
 int tmargin = -1;
 
 /* string representing missing values in ascii datafiles */
 char *missing_val = NULL;
-
-/* date&time language conversions */
-/* extern struct dtconv *dtc; *//* HBB 980317: unused and not defined anywhere !? */
 
 /*** other things we need *****/
 
@@ -279,6 +240,7 @@ char *missing_val = NULL;
 
 /* From plot2d.c */
 extern struct curve_points *first_plot;
+
 /* From plot3d.c */
 extern struct surface_points *first_3dplot;
 
@@ -381,36 +343,20 @@ reset_command()
     strcpy(dummy_var[0], "x");
     strcpy(dummy_var[1], "y");
     strcpy(title.text, "");
-    strcpy(xlabel.text, "");
-    strcpy(ylabel.text, "");
-    strcpy(zlabel.text, "");
-    strcpy(x2label.text, "");
-    strcpy(y2label.text, "");
     *title.font = 0;
-    *xlabel.font = 0;
-    *ylabel.font = 0;
-    *zlabel.font = 0;
-    *x2label.font = 0;
-    *y2label.font = 0;
     strcpy(key_title, "");
     strcpy(timefmt, TIMEFMT);
-    strcpy(xformat, DEF_FORMAT);
-    strcpy(yformat, DEF_FORMAT);
-    strcpy(zformat, DEF_FORMAT);
-    strcpy(x2format, DEF_FORMAT);
-    strcpy(y2format, DEF_FORMAT);
-    format_is_numeric[FIRST_X_AXIS] = format_is_numeric[SECOND_X_AXIS] = 1;
-    format_is_numeric[FIRST_Y_AXIS] = format_is_numeric[SECOND_Y_AXIS] = 1;
-    format_is_numeric[FIRST_Z_AXIS] = format_is_numeric[SECOND_Z_AXIS] = 1;
+    reset_axis_properties(&x_props, "x", TICS_ON_BORDER | TICS_MIRROR);
+    reset_axis_properties(&y_props, "y", TICS_ON_BORDER | TICS_MIRROR);
+    /* no mirror by default */
+    reset_axis_properties(&z_props, "z", TICS_ON_BORDER);
+    reset_axis_properties(&x2_props, "x2", NO_TICS);
+    reset_axis_properties(&y2_props, "y2", NO_TICS);
+    format_is_numeric[SECOND_Z_AXIS] = 1;
     autoscale_r = DTRUE;
     autoscale_t = DTRUE;
     autoscale_u = DTRUE;
     autoscale_v = DTRUE;
-    autoscale_x = DTRUE;
-    autoscale_y = DTRUE;
-    autoscale_z = DTRUE;
-    autoscale_x2 = DTRUE;
-    autoscale_y2 = DTRUE;
     autoscale_lt = DTRUE;
     autoscale_lu = DTRUE;
     autoscale_lv = DTRUE;
@@ -432,21 +378,6 @@ reset_command()
     set_lp_properties(&mgrid_lp, 0, -1, 0, 0.5, 1.0);
     polar_grid_angle = 0;
     key = -1;
-    is_log_x = FALSE;
-    is_log_y = FALSE;
-    is_log_z = FALSE;
-    is_log_x2 = FALSE;
-    is_log_y2 = FALSE;
-    base_log_x = 0.0;
-    base_log_y = 0.0;
-    base_log_z = 0.0;
-    base_log_x2 = 0.0;
-    base_log_y2 = 0.0;
-    log_base_log_x = 0.0;
-    log_base_log_y = 0.0;
-    log_base_log_z = 0.0;
-    log_base_log_x2 = 0.0;
-    log_base_log_y2 = 0.0;
     parametric = FALSE;
     polar = FALSE;
     hidden3d = FALSE;
@@ -460,9 +391,6 @@ reset_command()
     samples_2 = SAMPLES;
     iso_samples_1 = ISO_SAMPLES;
     iso_samples_2 = ISO_SAMPLES;
-    xsize = 1.0;
-    ysize = 1.0;
-    zsize = 1.0;
     xoffset = 0.0;
     yoffset = 0.0;
     aspect_ratio = 0.0;		/* dont force it */
@@ -478,16 +406,6 @@ reset_command()
     timelabel_bottom = TRUE;
     title.xoffset = 0;
     title.yoffset = 0;
-    xlabel.xoffset = 0;
-    xlabel.yoffset = 0;
-    ylabel.xoffset = 0;
-    ylabel.yoffset = 0;
-    zlabel.xoffset = 0;
-    zlabel.yoffset = 0;
-    x2label.xoffset = 0;
-    x2label.yoffset = 0;
-    y2label.xoffset = 0;
-    y2label.yoffset = 0;
     rmin = -0.0;
     rmax = 10.0;
     tmin = -5.0;
@@ -496,16 +414,6 @@ reset_command()
     umax = 5.0;
     vmin = -5.0;
     vmax = 5.0;
-    xmin = -10.0;
-    xmax = 10.0;
-    ymin = -10.0;
-    ymax = 10.0;
-    zmin = -10.0;
-    zmax = 10.0;
-    x2min = -10.0;
-    x2max = 10.0;
-    y2min = -10.0;
-    y2max = 10.0;
     memset(range_flags, 0, sizeof(range_flags));	/* all = 0 */
 
     loff = 0.0;
@@ -527,29 +435,9 @@ reset_command()
     set_lp_properties(&yzeroaxis, 0, -3, 0, 1.0, 1.0);
     set_lp_properties(&x2zeroaxis, 0, -3, 0, 1.0, 1.0);
     set_lp_properties(&y2zeroaxis, 0, -3, 0, 1.0, 1.0);
-    xtics =
-	ytics = TICS_ON_BORDER | TICS_MIRROR;
-    ztics = TICS_ON_BORDER;	/* no mirror by default */
-    x2tics = NO_TICS;
-    y2tics = NO_TICS;
-    mxtics =
-	mytics =
-	mztics =
-	mx2tics =
-	my2tics = MINI_DEFAULT;
-    mxtfreq = 10.0;
-    mytfreq = 10.0;
-    mztfreq = 10.0;
-    mx2tfreq = 10.0;
-    my2tfreq = 10.0;
     ticscale = 1.0;
     miniticscale = 0.5;
     ticslevel = 0.5;
-    xticdef.type = TIC_COMPUTED;
-    yticdef.type = TIC_COMPUTED;
-    zticdef.type = TIC_COMPUTED;
-    x2ticdef.type = TIC_COMPUTED;
-    y2ticdef.type = TIC_COMPUTED;
     tic_in = TRUE;
     lmargin =
 	bmargin =
@@ -617,28 +505,31 @@ else if (almost_equals(c_token, MAX)) { AUTO |= 2;    ++c_token; }
     } else if (almost_equals(c_token, "au$toscale")) {
 	c_token++;
 	if (END_OF_COMMAND) {
-	    autoscale_r = autoscale_t = autoscale_x = autoscale_y = autoscale_z = autoscale_x2 = autoscale_y2 = DTRUE;
+	    autoscale_r = autoscale_t =
+		x_props.autoscale = y_props.autoscale = z_props.autoscale =
+		x2_props.autoscale = y2_props.autoscale = DTRUE;
 	} else if (equals(c_token, "xy") || equals(c_token, "yx")) {
-	    autoscale_x = autoscale_y = DTRUE;
+	    x_props.autoscale = y_props.autoscale = DTRUE;
 	    c_token++;
 	}
 	PROCESS_AUTO_LETTER(autoscale_r, "r", "rmi$n", "rma$x")
 	PROCESS_AUTO_LETTER(autoscale_t, "t", "tmi$n", "tma$x")
 	PROCESS_AUTO_LETTER(autoscale_u, "u", "umi$n", "uma$x")
 	PROCESS_AUTO_LETTER(autoscale_v, "v", "vmi$n", "vma$x")
-	PROCESS_AUTO_LETTER(autoscale_x, "x", "xmi$n", "xma$x")
-	PROCESS_AUTO_LETTER(autoscale_y, "y", "ymi$n", "yma$x")
-	PROCESS_AUTO_LETTER(autoscale_z, "z", "zmi$n", "zma$x")
-	PROCESS_AUTO_LETTER(autoscale_x2, "x2", "x2mi$n", "x2ma$x")
-	PROCESS_AUTO_LETTER(autoscale_y2, "y2", "y2mi$n", "y2ma$x")
+	PROCESS_AUTO_LETTER(x_props.autoscale, "x", "xmi$n", "xma$x")
+	PROCESS_AUTO_LETTER(y_props.autoscale, "y", "ymi$n", "yma$x")
+	PROCESS_AUTO_LETTER(z_props.autoscale, "z", "zmi$n", "zma$x")
+	PROCESS_AUTO_LETTER(x2_props.autoscale, "x2", "x2mi$n", "x2ma$x")
+	PROCESS_AUTO_LETTER(y2_props.autoscale, "y2", "y2mi$n", "y2ma$x")
 	else
 	    int_error(c_token, "Invalid range");
     } else if (almost_equals(c_token,"noau$toscale")) {
 	c_token++;
 	if (END_OF_COMMAND) {
-	    autoscale_r = autoscale_t = autoscale_x = autoscale_y = autoscale_z = FALSE;
+	    autoscale_r = autoscale_t =
+		x_props.autoscale = y_props.autoscale = z_props.autoscale = FALSE;
 	} else if (equals(c_token, "xy") || equals(c_token, "tyx")) {
-	    autoscale_x = autoscale_y = FALSE;
+	    x_props.autoscale = y_props.autoscale = FALSE;
 	    c_token++;
 	} else if (equals(c_token, "r")) {
 	    autoscale_r = FALSE;
@@ -653,19 +544,19 @@ else if (almost_equals(c_token, MAX)) { AUTO |= 2;    ++c_token; }
 	    autoscale_v = FALSE;
 	    c_token++;
 	} else if (equals(c_token, "x")) {
-	    autoscale_x = FALSE;
+	    x_props.autoscale = FALSE;
 	    c_token++;
 	} else if (equals(c_token, "y")) {
-	    autoscale_y = FALSE;
+	    y_props.autoscale = FALSE;
 	    c_token++;
 	} else if (equals(c_token, "x2")) {
-	    autoscale_x2 = FALSE;
+	    x2_props.autoscale = FALSE;
 	    c_token++;
 	} else if (equals(c_token, "y2")) {
-	      autoscale_y2 = FALSE;
+	      y2_props.autoscale = FALSE;
 	      c_token++;
 	} else if (equals(c_token, "z")) {
-	    autoscale_z = FALSE;
+	    z_props.autoscale = FALSE;
 	    c_token++;
 	}
     } else if (almost_equals(c_token,"nobor$der")) {
@@ -958,48 +849,53 @@ else if (almost_equals(c_token, MAX)) { AUTO |= 2;    ++c_token; }
 
 	if (END_OF_COMMAND) {
 	    if (setx) {
-		(void) strcpy(xformat,DEF_FORMAT);
-		format_is_numeric[FIRST_X_AXIS] = 1;
+		free(x_props.format);
+		x_props.format = gp_strdup(DEF_FORMAT);
+		x_props.format_is_numeric = 1;
 	    }
 	    if (sety) {
-		(void) strcpy(yformat,DEF_FORMAT);
-		format_is_numeric[FIRST_Y_AXIS] = 1;
+		free(y_props.format);
+		y_props.format = gp_strdup(DEF_FORMAT);
+		y_props.format_is_numeric = 1;
 	    }
 	    if (setz) {
-		(void) strcpy(zformat,DEF_FORMAT);
-		format_is_numeric[FIRST_Z_AXIS] = 1;
+		free(z_props.format);
+		z_props.format = gp_strdup(DEF_FORMAT);
+		z_props.format_is_numeric = 1;
 	    }
 	    if (setx2) {
-		(void) strcpy(x2format,DEF_FORMAT);
-		format_is_numeric[SECOND_X_AXIS] = 1;
+		free(x2_props.format);
+		x2_props.format = gp_strdup(DEF_FORMAT);
+		x2_props.format_is_numeric = 1;
 	    }
 	    if (sety2) {
-		(void) strcpy(y2format,DEF_FORMAT);
-		format_is_numeric[SECOND_Y_AXIS] = 1;
+		free(y2_props.format);
+		y2_props.format = gp_strdup(DEF_FORMAT);
+		y2_props.format_is_numeric = 1;
 	    }
 	} else {
 	    if (!isstring(c_token))
 		int_error(c_token, "expecting format string");
 	    else {
 		if (setx) {
-		    quote_str(xformat,c_token, MAX_ID_LEN);
-		    format_is_numeric[FIRST_X_AXIS] = looks_like_numeric(xformat);
+		    m_quote_capture(&x_props.format,c_token,c_token);
+		    x_props.format_is_numeric = looks_like_numeric(x_props.format);
 		}
 		if (sety) {
-		    quote_str(yformat,c_token, MAX_ID_LEN);
-		    format_is_numeric[FIRST_Y_AXIS] = looks_like_numeric(yformat);
+		    m_quote_capture(&y_props.format,c_token,c_token);
+		    y_props.format_is_numeric = looks_like_numeric(y_props.format);
 		}
 		if (setz) {
-		    quote_str(zformat,c_token, MAX_ID_LEN);
-		    format_is_numeric[FIRST_Z_AXIS] =looks_like_numeric(zformat);
+		    m_quote_capture(&z_props.format,c_token,c_token);
+		    z_props.format_is_numeric = looks_like_numeric(z_props.format);
 		}
 		if (setx2) {
-		    quote_str(x2format,c_token, MAX_ID_LEN);
-		    format_is_numeric[SECOND_X_AXIS] = looks_like_numeric(x2format);
+		    m_quote_capture(&x2_props.format,c_token,c_token);
+		    x2_props.format_is_numeric = looks_like_numeric(x2_props.format);
 		}
 		if (sety2) {
-		    quote_str(y2format,c_token, MAX_ID_LEN);
-		    format_is_numeric[SECOND_Y_AXIS] = looks_like_numeric(y2format);
+		    m_quote_capture(&y2_props.format,c_token,c_token);
+		    y2_props.format_is_numeric = looks_like_numeric(y2_props.format);
 		}
 		c_token++;
 	    }
@@ -1024,9 +920,12 @@ else if (almost_equals(c_token, MAX)) { AUTO |= 2;    ++c_token; }
     } else if (almost_equals(c_token,"lo$gscale")) {
 	c_token++;
 	if (END_OF_COMMAND) {
-	    is_log_x = is_log_y = is_log_z = is_log_x2 = is_log_y2 = TRUE;
-	    base_log_x = base_log_y = base_log_z = base_log_x2 = base_log_y2 = 10.0;
-	    log_base_log_x = log_base_log_y = log_base_log_z = log_base_log_x2 = log_base_log_y2 = M_LN10;
+	    x_props.is_log = y_props.is_log = z_props.is_log =
+		x2_props.is_log = y2_props.is_log = TRUE;
+	    x_props.base_log = y_props.base_log = z_props.base_log =
+		x2_props.base_log = y2_props.base_log = 10.0;
+	    x_props.log_base_log = y_props.log_base_log = z_props.log_base_log =
+		x2_props.log_base_log = y2_props.log_base_log = M_LN10;
 	} else {
 	    TBOOLEAN change_x = FALSE;
 	    TBOOLEAN change_y = FALSE;
@@ -1057,54 +956,55 @@ else if (almost_equals(c_token, MAX)) { AUTO |= 2;    ++c_token; }
 	    log_newbase = log(newbase);
 
 	    if (change_x) {
-		is_log_x = TRUE;
-		base_log_x = newbase;
-		log_base_log_x = log_newbase;
+		x_props.is_log = TRUE;
+		x_props.base_log = newbase;
+		x_props.log_base_log = log_newbase;
 	    }
 	    if (change_y) {
-		is_log_y = TRUE;
-		base_log_y = newbase;
-		log_base_log_y = log_newbase;
+		y_props.is_log = TRUE;
+		y_props.base_log = newbase;
+		y_props.log_base_log = log_newbase;
 	    }
 	    if (change_z) {
-		is_log_z = TRUE;
-		base_log_z = newbase;
-		log_base_log_z = log_newbase;
+		z_props.is_log = TRUE;
+		z_props.base_log = newbase;
+		z_props.log_base_log = log_newbase;
 	    }
 	    if (change_x2) {
-		is_log_x2 = TRUE;
-		base_log_x2 = newbase;
-		log_base_log_x2 = log_newbase;
+		x2_props.is_log = TRUE;
+		x2_props.base_log = newbase;
+		x2_props.log_base_log = log_newbase;
 	    }
 	    if (change_y2) {
-		is_log_y2 = TRUE;
-		base_log_y2 = newbase;
-		log_base_log_y2 = log_newbase;
+		y2_props.is_log = TRUE;
+		y2_props.base_log = newbase;
+		y2_props.log_base_log = log_newbase;
 	    }
 	}
     } else if (almost_equals(c_token,"nolo$gscale")) {
 	c_token++;
 	if (END_OF_COMMAND) {
-	    is_log_x = is_log_y = is_log_z = is_log_x2 = is_log_y2 = FALSE;
+	    x_props.is_log = y_props.is_log = z_props.is_log =
+		x2_props.is_log = y2_props.is_log = FALSE;
 	} else if (equals(c_token, "x2")) {
-	    is_log_x2 = FALSE; ++c_token;
+	    x2_props.is_log = FALSE; ++c_token;
 	} else if (equals(c_token, "y2")) {
-	    is_log_y2 = FALSE; ++c_token;
+	    y2_props.is_log = FALSE; ++c_token;
 	} else {
 	    if (chr_in_str(c_token, 'x')) {
-		is_log_x = FALSE;
-		base_log_x = 0.0;
-		log_base_log_x = 0.0;
+		x_props.is_log = FALSE;
+		x_props.base_log = 0.0;
+		x_props.log_base_log = 0.0;
 	    }
 	    if (chr_in_str(c_token, 'y')) {
-		is_log_y = FALSE;
-		base_log_y = 0.0;
-		log_base_log_y = 0.0;
+		y_props.is_log = FALSE;
+		y_props.base_log = 0.0;
+		y_props.log_base_log = 0.0;
 	    }
 	    if (chr_in_str(c_token, 'z')) {
-		is_log_z = FALSE;
-		base_log_z = 0.0;
-		log_base_log_z = 0.0;
+		z_props.is_log = FALSE;
+		z_props.base_log = 0.0;
+		z_props.log_base_log = 0.0;
 	    }
 	    c_token++;
 	}
@@ -1208,15 +1108,15 @@ set_two()
     } else if (almost_equals(c_token,"tit$le")) {
 	set_xyzlabel(&title);
     } else if (almost_equals(c_token,"xl$abel")) {
-	set_xyzlabel(&xlabel);
+	set_xyzlabel(&x_props.label);
     } else if (almost_equals(c_token,"yl$abel")) {
-	set_xyzlabel(&ylabel);
+	set_xyzlabel(&y_props.label);
     } else if (almost_equals(c_token,"zl$abel")) {
-	set_xyzlabel(&zlabel);
+	set_xyzlabel(&z_props.label);
     } else if (almost_equals(c_token,"x2l$abel")) {
-	set_xyzlabel(&x2label);
+	set_xyzlabel(&x2_props.label);
     } else if (almost_equals(c_token,"y2l$abel")) {
-	set_xyzlabel(&y2label);
+	set_xyzlabel(&y2_props.label);
     } else if (almost_equals(c_token,"keyt$itle")) {
 	c_token++;
 	if (END_OF_COMMAND) {	/* set to default */
@@ -1682,16 +1582,16 @@ else if (almost_equals(c_token, neg)) { work_grid.l_type &= ~(mask); ++c_token; 
  * the args
  */
 
-    else if (set_tic_prop(&x2tics, &mx2tics, &mx2tfreq, &x2ticdef, 
-	 SECOND_X_AXIS, &rotate_x2tics, "x2"));
-    else if (set_tic_prop(&y2tics, &my2tics, &my2tfreq, &y2ticdef,
-	 SECOND_Y_AXIS, &rotate_y2tics, "y2"));
-    else if (set_tic_prop(&xtics,   &mxtics, &mxtfreq,  &xticdef,
-	 FIRST_X_AXIS, &rotate_xtics, "x"));
-    else if (set_tic_prop(&ytics,   &mytics, &mytfreq,  &yticdef, 
-	 FIRST_Y_AXIS, &rotate_ytics, "y"));
-    else if (set_tic_prop(&ztics,   &mztics, &mztfreq,  &zticdef,
-	 FIRST_Z_AXIS, &rotate_ztics, "z"));
+    else if (set_tic_prop(&x2_props.tics, &x2_props.mtics, &x2_props.mtfreq, &x2_props.ticdef, 
+	 SECOND_X_AXIS, &x2_props.rotate_tics, "x2"));
+    else if (set_tic_prop(&y2_props.tics, &y2_props.mtics, &y2_props.mtfreq, &y2_props.ticdef,
+	 SECOND_Y_AXIS, &y2_props.rotate_tics, "y2"));
+    else if (set_tic_prop(&x_props.tics,   &x_props.mtics, &x_props.mtfreq,  &x_props.ticdef,
+	 FIRST_X_AXIS, &x_props.rotate_tics, "x"));
+    else if (set_tic_prop(&y_props.tics,   &y_props.mtics, &y_props.mtfreq,  &y_props.ticdef, 
+	 FIRST_Y_AXIS, &y_props.rotate_tics, "y"));
+    else if (set_tic_prop(&z_props.tics,   &z_props.mtics, &z_props.mtfreq,  &z_props.ticdef,
+	 FIRST_Z_AXIS, &z_props.rotate_tics, "z"));
 
     else if (almost_equals(c_token,"ticsl$evel")) {
 	double tlvl;
@@ -1782,8 +1682,8 @@ set_three()
 	struct value s;
 	c_token++;
 	if (END_OF_COMMAND) {
-	    xsize = 1.0;
-	    ysize = 1.0;
+	    x_props.size = 1.0;
+	    y_props.size = 1.0;
 	} else {
 	    if (almost_equals(c_token, "sq$uare")) {
 		aspect_ratio = 1.0;
@@ -1797,12 +1697,12 @@ set_three()
 	    }
 					
 	    if (!END_OF_COMMAND) {
-		xsize = real(const_express(&s));
+		x_props.size = real(const_express(&s));
 		if (equals(c_token,",")) {
 		    c_token++;
-		    ysize = real(const_express(&s));
+		    y_props.size = real(const_express(&s));
 		} else {
-		    ysize = xsize;
+		    y_props.size = x_props.size;
 		}
 	    }
 	}
@@ -1953,11 +1853,11 @@ else if (almost_equals(c_token, STRING)) { \
     PROCESS_RANGE(T_AXIS, "tr$ange", tmin, tmax, autoscale_t)
     PROCESS_RANGE(U_AXIS, "ur$ange", umin, umax, autoscale_u)
     PROCESS_RANGE(V_AXIS, "vr$ange", vmin, vmax, autoscale_v)
-    PROCESS_RANGE(FIRST_X_AXIS, "xr$ange", xmin, xmax, autoscale_x)
-    PROCESS_RANGE(FIRST_Y_AXIS, "yr$ange", ymin, ymax, autoscale_y)
-    PROCESS_RANGE(FIRST_Z_AXIS, "zr$ange", zmin, zmax, autoscale_z)
-    PROCESS_RANGE(SECOND_X_AXIS, "x2r$ange", x2min, x2max, autoscale_x2)
-    PROCESS_RANGE(SECOND_Y_AXIS, "y2r$ange", y2min, y2max, autoscale_y2)
+    PROCESS_RANGE(FIRST_X_AXIS, "xr$ange", x_props.min, x_props.max, x_props.autoscale)
+    PROCESS_RANGE(FIRST_Y_AXIS, "yr$ange", y_props.min, y_props.max, y_props.autoscale)
+    PROCESS_RANGE(FIRST_Z_AXIS, "zr$ange", z_props.min, z_props.max, z_props.autoscale)
+    PROCESS_RANGE(SECOND_X_AXIS, "x2r$ange", x2_props.min, x2_props.max, x2_props.autoscale)
+    PROCESS_RANGE(SECOND_Y_AXIS, "y2r$ange", y2_props.min, y2_props.max, y2_props.autoscale)
 
     else if (almost_equals(c_token,"z$ero")) {
 	struct value a;
@@ -3245,5 +3145,37 @@ struct lp_style_type *arg;
     /* See plot.h for struct lp_style_type */
     arg->pointflag = arg->l_type = arg->p_type = 0;
     arg->l_width = arg->p_size = 1.0;
+}
+
+void
+reset_axis_properties (arg, name, tics)
+struct axis_properties *arg;
+char *name;
+int tics;
+{
+    /* label_struct */
+    strcpy(arg->label.text, "");
+    *arg->label.font = NUL;
+    arg->label.xoffset = 0.0;
+    arg->label.yoffset = 0.0;
+
+    free(arg->name);
+    arg->name = gp_strdup(name);
+
+    arg->autoscale = DTRUE;
+    free(arg->format);
+    arg->format = gp_strdup(DEF_FORMAT);
+    arg->format_is_numeric = 1;
+    arg->is_log = FALSE;
+    arg->base_log = 0.0;
+    arg->log_base_log = 0.0;
+    arg->size = 1.0;
+    arg->min = -10.0;
+    arg->max = 10.0;
+    arg->tics = tics;
+    arg->mtics = MINI_DEFAULT;
+    arg->mtfreq = 10.0;
+    arg->rotate_tics = FALSE;
+    arg->ticdef.type = TIC_COMPUTED;
 }
 
