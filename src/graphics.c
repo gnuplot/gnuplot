@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.84 2003/02/18 16:38:09 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.85 2003/02/19 18:41:51 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -284,6 +284,7 @@ boundary(plots, count)
     int xtic_height;
     int ytic_width;
     int y2tic_width;
+    int old_xleft;		/* Allow iterative approach to boundary definition */
 
     /* figure out which rotatable items are to be rotated
      * (ylabel and y2label are rotated if possible) */
@@ -648,7 +649,7 @@ boundary(plots, count)
 
     /* compute xleft from the various components
      *     unless lmargin is explicitly specified  */
-
+    old_xleft = xleft;
     xleft = (int) (0.5 + (t->xmax) * xoffset);
 
     if (lmargin < 0) {
@@ -671,6 +672,9 @@ boundary(plots, count)
 
     /*  end of xleft calculation }}} */
 
+    /* EAM Feb 2003 - Revisit key placement */
+    if (lkey == KEY_AUTO_PLACEMENT && key->vpos == TUNDER)
+	keybox.xl += xleft - old_xleft;
 
     /*{{{  recompute xright based on widest y2tic. y2labels, key TOUT
        unless it has been explicitly set by rmargin */

@@ -1,3 +1,10 @@
+2003-03-02  Ethan Merritt <merritt@u.washington.edu>
+	
+	* src/graphics.c: The calculation of plot boundary size is a tangle of
+	interdependent size estimates. While not addressing the underlying
+	problem, this patch at least makes the key size match the final plot
+	size.
+
 2003-02-26  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* demo/fillbox.dem: Update to changed syntax of filled boxplots
