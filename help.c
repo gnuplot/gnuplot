@@ -40,10 +40,7 @@ static char *RCSid = "$Id: help.c,v 1.29 1998/04/14 00:15:36 drd Exp $";
 
 #include "help.h"		/* values passed back */
 
-/* since there are only two external references, we won't include protos.h */
-
 void int_error __PROTO((char str[], int t_num));
-extern int instring __PROTO((char *str, char c));
 
 #if defined(__EMX__) || defined(DJGPP) || defined(DOS386)
 /* we have plenty of memory under __EMX__ or DJGPP */
@@ -124,12 +121,6 @@ extern int instring __PROTO((char *str, char c));
 # define PATHSIZE BUFSIZ
 #endif
 
-typedef int boolean;
-#ifndef TRUE
-# define TRUE (1)
-# define FALSE (0)
-#endif
-
 typedef struct line_s LINEBUF;
 struct line_s {
     char *line;			/* the text of this line */
@@ -141,7 +132,7 @@ struct linkey_s {
     char *key;			/* the name of this key */
     long pos;			/* ftell position */
     LINEBUF *text;		/* the text for this key */
-    boolean primary;		/* TRUE -> is a primary name for a text block */
+    TBOOLEAN primary;		/* TRUE -> is a primary name for a text block */
     LINKEY *next;		/* the next key in linked list */
 };
 
@@ -150,7 +141,7 @@ struct key_s {
     char *key;			/* the name of this key */
     long pos;			/* ftell position */
     LINEBUF *text;		/* the text for this key */
-    boolean primary;		/* TRUE -> is a primary name for a text block */
+    TBOOLEAN primary;		/* TRUE -> is a primary name for a text block */
 };
 static LINKEY *keylist = NULL;	/* linked list of keys */
 static KEY *keys = NULL;	/* array of keys */
@@ -163,7 +154,7 @@ static int keycomp __PROTO((struct key_s * a, struct key_s * b));
 static LINEBUF *storeline __PROTO((char *text));
 static LINKEY *storekey __PROTO((char *key));
 static KEY *FindHelp __PROTO((char *keyword));
-static boolean Ambiguous __PROTO((struct key_s * key, int len));
+static TBOOLEAN Ambiguous __PROTO((struct key_s * key, int len));
 
 /* Help output */
 static void PrintHelp __PROTO((struct key_s * key, int *subtopics));
@@ -184,7 +175,7 @@ static int pagelines;		/* count for builtin pager */
 int help(keyword, path, subtopics)
 char *keyword;			/* on this topic */
 char *path;			/* from this file */
-boolean *subtopics;		/* (in) - subtopics only? */
+TBOOLEAN *subtopics;		/* (in) - subtopics only? */
 				/* (out) - are there subtopics? */
 {
     static char oldpath[PATHSIZE] = "";		/* previous help file */
@@ -233,8 +224,8 @@ char *path;
     char buf[BUFSIZ];		/* line from help file */
     LINEBUF *head;		/* head of text list  */
     LINEBUF *firsthead = NULL;
-    boolean primary;		/* first ? line of a set is primary */
-    boolean flag;
+    TBOOLEAN primary;		/* first ? line of a set is primary */
+    TBOOLEAN flag;
 
     if ((helpfp = fopen(path, "r")) == NULL) {
 	/* can't open help file, so error exit */
@@ -447,14 +438,14 @@ char *keyword;			/* string we look for */
  * It is ambiguous if it is not a complete string and there are other
  * keys following it with the same leading substring.
  */
-static boolean
+static TBOOLEAN
  Ambiguous(key, len)
 KEY *key;
 int len;
 {
     char *first;
     char *prev;
-    boolean status = FALSE;	/* assume not ambiguous */
+    TBOOLEAN status = FALSE;	/* assume not ambiguous */
     int compare;
     int sublen;
 
@@ -494,8 +485,8 @@ int len;
  */
 static void PrintHelp(key, subtopics)
 KEY *key;
-boolean *subtopics;		/* (in) - subtopics only? */
-						/* (out) - are there subtopics? */
+TBOOLEAN *subtopics;		/* (in) - subtopics only? */
+				/* (out) - are there subtopics? */
 {
     LINEBUF *t;
 #ifdef MSDOS
@@ -529,7 +520,7 @@ boolean *subtopics;		/* (in) - subtopics only? */
 
 static void ShowSubtopics(key, subtopics)
 KEY *key;			/* the topic */
-boolean *subtopics;		/* (out) are there any subtopics */
+TBOOLEAN *subtopics;		/* (out) are there any subtopics */
 {
     int subt = 0;		/* printed any subtopics yet? */
     KEY *subkey;		/* subtopic key */
@@ -554,11 +545,10 @@ boolean *subtopics;		/* (out) are there any subtopics */
 		    start++;	/* skip space */
 		else
 		    break;	/* not the same topic after all  */
-	    }
-	    else {
+	    } else {
 		/* here we are looking for main topics */
-	        if (!subkey->primary)
-		  continue;	/* not a main topic */
+		if (!subkey->primary)
+		    continue;	/* not a main topic */
 	    }
 	    sublen = instring(start, ' ');
 	    if (prev == NULL || strncmp(start, prev, sublen) != 0) {
@@ -645,9 +635,8 @@ static void StartOutput()
 
 #if defined(ATARI) || defined(MTOS)
 # ifndef READLINE
-# error cannot compile atari versions without -DREADLINE
+#  error cannot compile atari versions without -DREADLINE
 # endif
-char tos_getch();		/* from readline.c */
 #endif
 
 /* write a line of help output  */
