@@ -104,6 +104,11 @@ TERM_PUBLIC void EMTEX_reset __PROTO((void));
 TERM_PUBLIC void EMTEX_text __PROTO((void));
 #endif
 
+#ifdef EEPIC
+TERM_PUBLIC void EEPIC_move __PROTO((unsigned int x, unsigned int y));
+TERM_PUBLIC void EEPIC_vector __PROTO((unsigned int ux, unsigned int uy));
+#endif
+
 #define TINY_STEP 0.5		/* tiny steps for high quality lines */
 
 #define LATEX_PTS_PER_INCH (72.27)
