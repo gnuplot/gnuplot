@@ -1,3 +1,92 @@
+1999-11-24  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* configure.in: Rename --enable-history option to
+	--enable-history-file, because it is unrelated to the new 'history'
+	command. Add checking for gethostbyname() in -lbsd.
+
+	* configure.in, m4/apple.m4, m4/beos.m4, m4/msdos.m4, m4/next.m4:
+	Remove some superfluous dnl's.
+
+	* m4/path-hdr.m4, m4/path_lib.m4: Change search order for includes
+	and libs (default first).
+
+	* m4/select.m4: Updated according suggestions from automake list.
+
+	* src/Makefile.am: Add new files to gnuplot_SOURCES.
+
+	* src/command.c: Include gp_hist.h.
+
+	* src/command.c: Some minor cleanups.
+
+	* src/command.h: Add declaration of input_line_len.
+
+	* src/datafile.c: Fix formatting.
+
+	* src/gp_hist.h: New file, declarations for history.c.
+
+	* src/graph3d.c, src/graphics.c, src/set.c: Move SIGNIF define to
+	setshow.h.
+
+	* src/hidden3d.c: Remove statement with no effect.
+
+	* src/history.c: History related functions (builtin readline) moved
+	from readline.c.
+
+	* src/plot.c: UTSNAME stuff moved here from show.c, init os related
+	variables from version.c.
+
+	* src/plot.h: Don't declare input_line_len, add declarations for new
+	version.c variables.
+
+	* src/readline.c: Move history related functions (builtin readline
+	portion) to history.c.
+
+	* src/readline.h: Remove history related function declarations.
+
+	* src/setshow.h: Add SIGNIF define, change DEF_FROMAT to "% g".
+
+	* src/show.c: Change version string and handling, integrate
+	show_version_long into show_version.
+
+	* src/syscfg.h: Remove trailing space from OS define, remove unix
+	define.
+
+	* src/version.c: New, OS related variables os_name and os_rel.
+
+	* term/compact.c: Ifdef out unused function.
+
+	* term/gnugraph.trm: Switch to GNU plotutils 2.2+ API.
+
+	* term/png.trm: Initialise allocated png structures.
+
+1999-11-23  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/bitmap.c(b_getpixel): Fix bug where only every other colour
+	show up in png output.
+	
+1999-11-23  Hartmut Freihofer  <Freihofer@ike.uni-stuttgart.de>, Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* term/png.trm: Fix png driver to use web-friendly palette, add RGB
+	colour spec.
+
+1999-11-18  Lucas Hart  <hartl@ucs.orst.edu>
+
+	* config/makefile.vms: Build rnh docs.
+
+	* src/plot2d.c, src/plot3d.c: Fix data format for table terminal.
+
+	* term/table.trm: Add note to docs that columns are separated by
+	single spaces.
+
+1999-11-15  Thomas Walter  <walter@pctc.chemie.uni-erlangen.de>
+
+	* src/history.c: New file. Code for the 'history' command and GNU
+	readline.
+	
+1999-11-15  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/win/wgraph.c: Initialise pens in monochrome mode.
+
 1999-11-15  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* config/makefile.dj2, src/Makefile.am: Remove references to protos.h.
