@@ -571,8 +571,7 @@ TERM_TABLE_END(rgip_driver)
 #define LAST_TERM rgip_driver
 
 TERM_TABLE_START(uniplex_driver)
-    "uniplex", "RGIP metafile (Uniplex). Option: fontsize (1-8) (Same
-as rgip)",
+    "uniplex", "RGIP metafile (Uniplex). Option: fontsize (1-8) (Same as rgip)",
 	   RGIP_XMAX, RGIP_YMAX, RGIP_VCHAR, RGIP_HCHAR,
 	   RGIP_VTIC, RGIP_HTIC, RGIP_options, RGIP_init, RGIP_reset,
 	   RGIP_text, null_scale, RGIP_graphics, RGIP_move,
