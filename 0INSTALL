@@ -605,7 +605,7 @@ may work, though).
   gnuplot can be built with DJGPP. Install instructions are the same
   as under Unix (with configure).
 
- - SunOS 4.x/System V.2/Ultrix 4.x
+ - SunOS 4.x/System V.2/Ultrix 4.x/M88 SysV.3
    An ANSI/ISO C compiler is reqiured to compile gnuplot. It is
   recommended to install gcc. If this is not an option, the system
   compiler cc can be made to work with Wietse Venema's unproto tool.
@@ -614,11 +614,23 @@ may work, though).
   ftp://ftp.win.tue.nl/pub/unix/unproto4.shar.Z
   ftp://ftp.porcupine.org/pub/lang/unproto5.shar.Z
 
-  A patch to gnuplot [VERSION] complete with installation instructions is
-  available as ftp://cmpc1.phys.soton.ac.uk/incoming/[FILE]. The patch can
-  also be retrieved by sending email to Lars Hecking <lhecking@nmrc.ucc.ie>
-  with "send gnuplot unproto patch" in the Subject:
+  After installing unproto, configure gnuplot with
 
+  (Bourne shell syntax)
+
+  $ cd gnuplot
+  $ CC='cc -Qpath /full/path/to/unproto/dir' ./configure <options>
+
+  or (C shell syntax)
+
+  prompt (41) cd gnuplot
+  prompt (42) setenv CC 'cc -Qpath /full/path/to/unproto/dir''
+  prompt (43) ./configure <options>
+
+  The `-Qpath path' option shown here is for SunOS 4.x. For other
+  platforms, check the unproto documentation. `/full/path/to/unproto/dir'
+  is the full path name of the directory where unproto is installed.
+ 
 How to test gnuplot
 ===================
 
