@@ -1,3 +1,87 @@
+1999-03-10  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* acconfig.h: Remove symbols whose description was moved to
+	configure.in.
+
+	* aclocal.m4, config.hin, configure: Regenerated.
+
+	* command.c: Add extern user_shell reference. Simplify the do_shell()
+	variants accordingly.
+
+	* configure.in: Change evaluation of with-cwdrc option. Add option
+	for experimental thin plate splines. Add description to all
+	AC_DEFINE() statements.
+
+	* makefile.os2: Add -DHAVE_SLEEP to EMXSPECIFIC.
+
+	* plot.c: Add global variable for user shell. New function
+	getenv_user_shell().
+
+	* plot3d: Add patch by Jean-Michel Savignat <savignat@cges.ensmp.fr>
+	to implement thin plate splines.
+
+	* syscfg.h: Add SHELL definitions for DOSish systems.
+
+	* term.c(term_set_output): Initialise FILE *f.
+
+	* m4/dos.m4, m4/select.m4: Add description to AC_DEFINE() statements.
+
+1999-03-10  "Dr. Werner Fink"  <werner@suse.de>
+
+	* plot.c, term/linux.trm: New functions to assume and drop root
+	privileges.
+
+	* demo/contours.dem, demo/fit.dem: Small patches, axis ranges etc.
+
+	* docs/gnuplot.doc: FIx some backquotes.
+
+	* docs/latextut/Makefile.in: Use @prefix@ instead of /usr/local.
+
+1999-03-09  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* command.c(command): Make sv_file dynamic. Use gp_expand_tilde()
+	where appropriate.
+
+	* config.hin, configure: Regenerated.
+
+	* configure.in: Add <sys/param.h>.
+
+	* datafile(df_open): Make filename dynamic. Use tilde expansion.
+
+	* plot.c: Add global variable for user home directory. Use new
+	function getenv_user_homedir() in main(). Rewrite load_rcfile to
+	not use static arrays. New function gp_expand_tilde().
+
+	* plot.h: Define PATH_MAX. New macro PATH_CONCAT.
+
+	* protos.h: Prototype for gp_expand_tilde().
+
+	* term/iris4d.trm: Rewrite IRIS4D_init() to eliminate potential
+	security risk.
+
+1999-03-08  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* configure: Regenerated.
+
+	* configure.in: Make --with-linux-vga=no the default. Add security
+	notice to configuration report.
+
+	* plot.c(load_rcfile): Change order of tests in if statement.
+
+	* show.c: Small changes.
+
+	* syscfg.h: Use linux and __linux preprocessor symbols.
+
+	* term/be.trm: Use execvp() instead of execl() to start outboard
+	driver, and related changes, indentation.
+
+1999-03-08  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* datafile.c(df_tokenise): Change casts in isspace() to unsigned
+	char. Fix bug in for() loop.
+
+	* fit.c(regress): Remove unneeded call to free().
+
 1999-03-04  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* term/be.trm: Convert tabs to spaces in help text.
