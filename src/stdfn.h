@@ -1,5 +1,5 @@
 /*
- * $Id: stdfn.h,v 1.5 1999/06/19 20:55:05 lhecking Exp $
+ * $Id: stdfn.h,v 1.6 1999/10/01 14:54:36 lhecking Exp $
  *
  */
 
@@ -271,7 +271,7 @@ int pclose __PROTO((FILE *));
 # endif
 #endif
 
-/* Arument types for select */
+/* Argument types for select */
 /* These may need some work ... */
 #ifndef fd_set_size_t
 # define fd_set_size_t size_t
