@@ -1,3 +1,8 @@
+2004-09-29  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* src/datafile.c (df_show_binary): In fprintf(), use "%f" not "%lf" for
+	doubles.
+
 2004-09-27  Ethan Merritt  <merritt@u.washington.edu>
 
 	* demo/airfoil.dem demo/fillcrvs.dem demo/histograms.dem

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.58 2004/09/03 15:56:28 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.59 2004/09/13 21:50:24 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -4150,20 +4150,20 @@ df_show_binary(FILE *fp)
 	    }
 	    if (no_flip)
 		fprintf(fp, "all forward");
-	    fprintf(fp, "\n\t    Sample periods: dx=%lf", bin_record[i].cart_delta[0]);
+	    fprintf(fp, "\n\t    Sample periods: dx=%f", bin_record[i].cart_delta[0]);
 	    if (dimension > 1)
-		fprintf(fp, ", dy=%lf", bin_record[i].cart_delta[1]);
+		fprintf(fp, ", dy=%f", bin_record[i].cart_delta[1]);
 	    if (dimension > 2)
-		fprintf(fp, ", dz=%lf", bin_record[i].cart_delta[2]);
+		fprintf(fp, ", dz=%f", bin_record[i].cart_delta[2]);
 	    if (bin_record[i].cart_trans == DF_TRANSLATE_VIA_ORIGIN)
 		fprintf(fp, "\n\t    Origin:");
 	    else if (bin_record[i].cart_trans == DF_TRANSLATE_VIA_CENTER)
 		fprintf(fp, "\n\t    Center:");
 	    if ((bin_record[i].cart_trans == DF_TRANSLATE_VIA_ORIGIN) || (bin_record[i].cart_trans == DF_TRANSLATE_VIA_CENTER))
-		fprintf(fp, " (%lf, %lf, %lf)", bin_record[i].cart_cen_or_ori[0],
+		fprintf(fp, " (%f, %f, %f)", bin_record[i].cart_cen_or_ori[0],
 			bin_record[i].cart_cen_or_ori[1], bin_record[i].cart_cen_or_ori[2]);
-	    fprintf(fp, "\n\t    2D rotation angle: %lf", bin_record[i].cart_alpha);
-	    fprintf(fp, "\n\t    3D normal vector: (%lf, %lf, %lf)", bin_record[i].cart_p[0],
+	    fprintf(fp, "\n\t    2D rotation angle: %f", bin_record[i].cart_alpha);
+	    fprintf(fp, "\n\t    3D normal vector: (%f, %f, %f)", bin_record[i].cart_p[0],
 		    bin_record[i].cart_p[1], bin_record[i].cart_p[2]);
 	    for (j=0; j < (sizeof(df_bin_scan_table_3D)/sizeof(df_bin_scan_table_3D[0])); j++) {
 		if ( !strncmp((char *)bin_record[i].cart_scan, (char *)df_bin_scan_table_3D[j].scan, sizeof(bin_record[0].cart_scan)) ) {
