@@ -60,6 +60,12 @@ plot 'table.dat' using ($0-0.2):2 title 2 with boxes, \
      ''          using ($0):4     title 4 with linespoints, \
      ''          using ($0):5:xtic(1) title 5 with linespoints
 #
+pause -1 "<cr> to show double use of y values"
+plot 'table.dat' using 0:2 title 2 with boxes, \
+     ''          using 0:2:2 with labels center offset 0,1 notitle
+#
+set title "Plot actual y-value as a label"
+#
 pause -1 "<cr> continue"
 #
 # Now show the plot with labels options
@@ -90,8 +96,9 @@ set view 70,210, 1.0,1.7
 set ticslevel 0.0
 
 splot 'labelplot.pdb' using 7:8:9 with lines notitle, \
-      '' using 7:8:9:4 with labels left offset 4,0 point \
+      '' using 7:8:9:4 with labels left offset 1,0 point \
 	   ps 2 pt 1 tc lt 3 font "Helvetica,10" notitle
+#
 pause -1 "<cr> to view star map"
 #
 reset

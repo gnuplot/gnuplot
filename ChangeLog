@@ -1,3 +1,8 @@
+2004-11-11  Ethan Merritt  <merritt@u.washington.edu>
+
+	* demo/datastrings.dem: Add example of using a column both as a 
+	numerical value and a string (use y value as a label).
+
 2004-11-11  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* docs/doc2texi.el (d2t-get-terminals): Fix search pattern for
