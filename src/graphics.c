@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.74 2002/08/31 00:28:12 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.75 2002/09/02 18:15:31 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -108,11 +108,7 @@ static void plot_lines __PROTO((struct curve_points * plot));
 static void plot_points __PROTO((struct curve_points * plot));
 static void plot_dots __PROTO((struct curve_points * plot));
 static void plot_bars __PROTO((struct curve_points * plot));
-#if USE_ULIG_FILLEDBOXES
-static void plot_boxes __PROTO((struct curve_points * plot, int xaxis_y, TBOOLEAN fill));  /* ULIG */
-#else
 static void plot_boxes __PROTO((struct curve_points * plot, int xaxis_y));
-#endif /* USE_ULIG_FILLEDBOXES */
 #ifdef PM3D
 static void plot_filledcurves __PROTO((struct curve_points * plot));
 static void finish_filled_curve __PROTO((int, gpiPoint *, filledcurves_opts *));
@@ -1411,28 +1407,33 @@ do_plot(plots, pcount)
 
 		/* draw sample depending on bits set in plot_style */
 #if USE_ULIG_FILLEDBOXES
-		if (this_plot->plot_style == FILLEDBOXES && *t->fillbox) {
+		if (this_plot->plot_style == BOXES && *t->fillbox) {
 		    int style;
-		    switch(fillstyle) {
-		    	case 1:
-		    	case 3:  style = (filldensity << 4) + 1; break;
-		    	case 2:
-		    	case 4:  style = (fillpattern << 4) + 2; break;
+		    struct fill_style_type *fs = &this_plot->fill_properties;
+		    switch(fs->fillstyle) {
+			case FS_SOLID:
+			    style = (fs->filldensity << 4) + FS_SOLID;
+			    break;
+			case FS_PATTERN:
+			    style = (fs->fillpattern << 4) + FS_PATTERN;
+			    break;
 			default: style = 0;
 		    }
 		    (*t->fillbox)( style,
-		    		  xl + key_sample_left, yl - key_entry_height/4, 
+				  xl + key_sample_left, yl - key_entry_height/4, 
 				  key_sample_right - key_sample_left,
 				  key_entry_height/2);
-		    if (fillstyle == 3 || fillstyle == 4)
-		    	(*t->linetype)(LT_BLACK);
-		    (*t->move)  (xl + key_sample_left,  yl - key_entry_height/4);
-		    (*t->vector)(xl + key_sample_right, yl - key_entry_height/4);
-		    (*t->vector)(xl + key_sample_right, yl + key_entry_height/4);
-		    (*t->vector)(xl + key_sample_left,  yl + key_entry_height/4);
-		    (*t->vector)(xl + key_sample_left,  yl - key_entry_height/4);
-		    if (fillstyle == 3 || fillstyle == 4)
-		    	(*t->linetype)(this_plot->lp_properties.l_type);
+		    if (fs->fillstyle != FS_EMPTY && fs->border_linetype != LT_UNDEFINED)
+			(*t->linetype)(fs->border_linetype);
+		    if (fs->border_linetype != LT_NODRAW) {
+			(*t->move)  (xl + key_sample_left,  yl - key_entry_height/4);
+			(*t->vector)(xl + key_sample_right, yl - key_entry_height/4);
+			(*t->vector)(xl + key_sample_right, yl + key_entry_height/4);
+			(*t->vector)(xl + key_sample_left,  yl + key_entry_height/4);
+			(*t->vector)(xl + key_sample_left,  yl - key_entry_height/4);
+		    }
+		    if (fs->fillstyle != FS_EMPTY && fs->border_linetype != LT_UNDEFINED)
+			(*t->linetype)(this_plot->lp_properties.l_type);
 		} else
 #endif
 		if ((this_plot->plot_style & PLOT_STYLE_HAS_LINE)
@@ -1554,11 +1555,7 @@ do_plot(plots, pcount)
 	    /*}}} */
 	    /*{{{  BOXXYERROR */
 	case BOXXYERROR:
-#if USE_ULIG_FILLEDBOXES
-          plot_boxes(this_plot, Y_AXIS.term_zero, FALSE);
-#else
 	  plot_boxes(this_plot, Y_AXIS.term_zero);
-#endif /* USE_ULIG_FILLEDBOXES */
 	    break;
 	    /*}}} */
 	    /*{{{  BOXERROR (falls through to) */
@@ -1569,20 +1566,9 @@ do_plot(plots, pcount)
 	    /*}}} */
 	    /*{{{  BOXES */
 	case BOXES:
-#if USE_ULIG_FILLEDBOXES
-          plot_boxes(this_plot, Y_AXIS.term_zero, FALSE);
-#else	
           plot_boxes(this_plot, Y_AXIS.term_zero);
-#endif /* USE_ULIG_FILLEDBOXES */
 	    break;
 	    /*}}} */
-#if USE_ULIG_FILLEDBOXES
-	    /*{{{  FILLEDBOXES (ULIG) */
-	case FILLEDBOXES:
-	    plot_boxes(this_plot, Y_AXIS.term_zero, TRUE);
-	    break;
-	    /*}}} */
-#endif /* USE_ULIG_FILLEDBOXES */
 #ifdef PM3D
 	    /*{{{  FILLEDCURVES */
 	case FILLEDCURVES:
@@ -2585,20 +2571,12 @@ struct curve_points *plot;
 }
 
 /* plot_boxes:
- * Plot the curves in BOXES or FILLEDBOXES style
+ * EAM Sep 2002 - Consolidate BOXES and FILLEDBOXES
  */
-#if USE_ULIG_FILLEDBOXES
-static void
-plot_boxes(plot, xaxis_y, fill)
-    struct curve_points *plot;
-    int xaxis_y;
-    TBOOLEAN fill;		/* FALSE (boxes) or TRUE (filledboxes) */
-#else
 static void
 plot_boxes(plot, xaxis_y)
     struct curve_points *plot;
     int xaxis_y;
-#endif /* USE_ULIG_FILLEDBOXES */
 {
     int i;			/* point index */
     int xl, xr, yt;		/* point in terminal coordinates */
@@ -2684,7 +2662,7 @@ plot_boxes(plot, xaxis_y)
 		yt = map_y(dyt);
 
 #if USE_ULIG_FILLEDBOXES
-                if( fill && t->fillbox ) { /* ULIG: implement filled boxes */
+		if ((plot->fill_properties.fillstyle != FS_EMPTY) && t->fillbox) {
                     int x, y, w, h;
                     int fillpar, style;
 		    
@@ -2711,15 +2689,13 @@ plot_boxes(plot, xaxis_y)
                      * number of styles to 16 and the fill parameter's
                      * values to the range 0...4095, which seems
                      * acceptable. */
-                    switch( fillstyle ) {
-                    case 1: /* solid fill */
-                    case 3: /* solid fill with border */
-			fillpar = filldensity;
+                    switch( plot->fill_properties.fillstyle ) {
+                    case FS_SOLID:
+			fillpar = plot->fill_properties.filldensity;
 			style = ((fillpar & 0xfff) << 4) + (1 & 0xf);
                         break;
-                    case 2: /* pattern fill */
-                    case 4: /* pattern fill with border */
-			fillpar = fillpattern;
+                    case FS_PATTERN:
+			fillpar = plot->fill_properties.fillpattern;
 			style = ((fillpar & 0xfff) << 4) + (2 & 0xf);
                         break;
                     default:
@@ -2731,16 +2707,14 @@ plot_boxes(plot, xaxis_y)
 
                     (*t->fillbox) (style, x, y, w, h);
 
-                    /* break here, if we don't need the box frame
-                     * around, i.e. fillstyle is "solid" and
-                     * filldensity is 100%, or if we are using the fig
-                     * driver (frame and fill are one object) */
-                    if ((fillstyle == 1 && filldensity == 100)
-		        || (strcmp(t->name, "fig") == 0))
+		    /* FIXME EAM - Is this still correct??? */
+		    if (strcmp(t->name, "fig") == 0) break;
+
+		    if (plot->fill_properties.border_linetype == LT_NODRAW)
 			break;
-		    if (fillstyle == 3 || fillstyle == 4)
-			(*t->linetype)(LT_BLACK);
-                }
+		    if (plot->fill_properties.border_linetype != LT_UNDEFINED)
+			(*t->linetype)(plot->fill_properties.border_linetype);
+		}
 #endif /* USE_ULIG_FILLEDBOXES */
 
 		(*t->move) (xl, xaxis_y);
@@ -2749,7 +2723,8 @@ plot_boxes(plot, xaxis_y)
 		(*t->vector) (xr, xaxis_y);
 		(*t->vector) (xl, xaxis_y);
 #if USE_ULIG_FILLEDBOXES
-                if( fill && t->fillbox && (fillstyle == 3 || fillstyle == 4))
+                if( t->fillbox && 
+		    plot->fill_properties.border_linetype != LT_UNDEFINED)
 		    (*t->linetype)(plot->lp_properties.l_type);
 #endif
 		break;
@@ -3017,33 +2992,30 @@ plot_c_bars(plot)
 
 #ifdef USE_ULIG_FILLEDBOXES
 	/* EAM Sep 2001 use term->fillbox() code if present */
-	if ((fillstyle > 0) && (term->fillbox)) {
+	if ((plot->fill_properties.fillstyle != FS_EMPTY) && (term->fillbox)) {
 	    int ymin, ymax, fillpar, style;
-	    /* Set style parameter (horrible bit-packing hack) */
-	    /* This code copied from filledboxes below         */
-                    switch( fillstyle ) {
-                    case 1:
-                    case 3:
-			/* style == 1 --> solid fill with 'filldensity' */
-                        fillpar = filldensity;
+	    /* This code duplicated in plot_boxes() */
+                    switch( plot->fill_properties.fillstyle ) {
+                    case FS_SOLID:
+                        fillpar = plot->fill_properties.filldensity;
                         break;
-                    case 2:  
-                    case 4:  
-			/* style == 2 --> pattern fill with 'fillpattern' */
-                        fillpar = fillpattern;
+                    case FS_PATTERN:
+                        fillpar = plot->fill_properties.fillpattern;
                         break;
+		    case FS_EMPTY:
                     default:
-			/* style == 0 or unknown --> solid fill with background color */
                         fillpar = 0;
                     }
-                    style = ((fillpar & 0xfff) << 4) + (fillstyle & 0xf);
+	    /* Set style parameter (horrible bit-packing hack) */
+                    style = ((fillpar & 0xfff) << 4) 
+			  + (plot->fill_properties.fillstyle & 0xf);
 	    if (map_y(yopen) < map_y(yclose)) {
-	    	ymin = map_y(yopen); ymax = map_y(yclose);
+		ymin = map_y(yopen); ymax = map_y(yclose);
 	    } else {
-	    	ymax = map_y(yopen); ymin = map_y(yclose);
+		ymax = map_y(yopen); ymin = map_y(yclose);
 	    }
 	    term->fillbox( style,
-	    	    (unsigned int)(xM - bar_size * tic),
+		    (unsigned int)(xM - bar_size * tic),
 		    (unsigned int)(ymin),
 		    (unsigned int)(2 * bar_size * tic),
 		    (unsigned int)(ymax-ymin)  );

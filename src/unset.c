@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.36 2002/08/16 08:11:37 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.37 2002/08/24 22:04:13 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -613,13 +613,14 @@ unset_boxwidth()
 
 
 #if USE_ULIG_FILLEDBOXES
-/* process 'unset fillstyle' command */
+/* process 'unset fill' command */
 static void
 unset_fillstyle()
 {
-    fillstyle = 1;
-    filldensity = 100;
-    fillpattern = 0;
+    default_fillstyle.fillstyle = FS_EMPTY;
+    default_fillstyle.filldensity = 100;
+    default_fillstyle.fillpattern = 0;
+    default_fillstyle.border_linetype = LT_UNDEFINED;
 }
 #endif /* USE_ULIG_FILLEDBOXES */
 
@@ -1219,7 +1220,7 @@ unset_style()
 #endif /* USE_ULIG_FILLEDBOXES */
     default:
 #if USE_ULIG_FILLEDBOXES
-        int_error(c_token, "expecting 'data', 'function', 'line' or 'filling'");
+        int_error(c_token, "expecting 'data', 'function', 'line' or 'fill'");
 #else
         int_error(c_token, "expecting 'data', 'function', or 'line'");
 #endif /* USE_ULIG_FILLEDBOXES */
@@ -1505,6 +1506,9 @@ reset_command()
     pm3d_reset();
     reset_colorbox();
     reset_palette();
+#endif
+#if USE_ULIG_FILLEDBOXES
+    unset_fillstyle();
 #endif
     unset_locale();
     unset_loadpath();

@@ -1,5 +1,5 @@
 /*
- * $Id: post.trm,v 1.76 2002/09/03 21:41:05 sfeam Exp $
+ * $Id: post.trm,v 1.77 2002/09/06 17:36:29 sfeam Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -1898,13 +1898,14 @@ PS_fillbox(style, x1,y1,width,height)
 {
 #if USE_ULIG_FILLEDBOXES
     double filldens;
+    int pattern;
 #endif /* USE_ULIG_FILLEDBOXES */
 
     PS_FLUSH_PATH;
 
 #if USE_ULIG_FILLEDBOXES
     switch( style & 0xf ) {
-    case 1:
+    case FS_SOLID:
 	/* style == 1 --> fill with intensity according to filldensity */
         filldens = (style >> 4) / 100.0;
         if( filldens < 0.0 )
@@ -1914,14 +1915,15 @@ PS_fillbox(style, x1,y1,width,height)
         fprintf(gpoutfile, "%.3f %d %d %d %d BoxColFill\n",
 		filldens, x1,y1, width,height);
         break;
-    case 2: 
+    case FS_PATTERN: 
 	/* style == 2 --> fill with pattern according to fillpattern */
         /* 20020302 Lutz Maibaum: Added basic support for filling
 	 * patterns 6 patterns are available, which are similar to
 	 * those in gplt_x11.c. */
 	
 	/* the upper 3 nibbles of 'style' contain pattern number */
-	switch ((int) (style >> 4)) {
+	pattern = (style >> 4) % 7;
+	switch (pattern) {
 	    int h;		/* loop variable for pattern lines */
 	    /* HBB 20020330: 6 times essentially the same code -->
 	     * turned into a macro. */

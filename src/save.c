@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.51 2002/09/11 20:52:30 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.52 2002/09/25 05:33:56 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -268,23 +268,23 @@ set y2data%s\n",
 #endif /* USE_ULIG_RELATIVE_BOXWIDTH */
 
 #if USE_ULIG_FILLEDBOXES
-    switch(fillstyle) {
-    case 1: 
-	fprintf(fp, "set style filling solid %f\n", filldensity / 100.0);
+    switch(default_fillstyle.fillstyle) {
+    case FS_SOLID: 
+	fprintf(fp, "set style fill solid %f ", default_fillstyle.filldensity / 100.0);
 	break;
-    case 2: 
-	fprintf(fp, "set style filling pattern %d\n", fillpattern);
-	break;
-    case 3: 
-	fprintf(fp, "set style filling bsolid %f\n", filldensity / 100.0);
-	break;
-    case 4: 
-	fprintf(fp, "set style filling bpattern %d\n", fillpattern);
+    case FS_PATTERN: 
+	fprintf(fp, "set style fill pattern %d ", default_fillstyle.fillpattern);
 	break;
     default: 
-	fprintf(fp, "set style filling empty\n");
+	fprintf(fp, "set style fill empty ");
 	break;
     }
+    if (default_fillstyle.border_linetype == LT_NODRAW)
+	fprintf(fp, "noborder\n");
+    else if (default_fillstyle.border_linetype == LT_UNDEFINED)
+	fprintf(fp, "border\n");
+    else
+	fprintf(fp, "border %d\n",default_fillstyle.border_linetype+1);
 #endif
 
     if (dgrid3d)
@@ -992,11 +992,6 @@ save_data_func_style( FILE *fp, char *which, enum PLOT_STYLE style)
     case BOXES:
 	fputs("boxes\n", fp);
 	break;
-#if USE_ULIG_FILLEDBOXES
-    case FILLEDBOXES:
-	fputs("filledboxes\n", fp);
-	break;
-#endif /* USE_ULIG_FILLEDBOXES */
 #ifdef PM3D
     case FILLEDCURVES:
 	fputs("filledcurves ", fp);

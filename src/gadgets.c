@@ -156,12 +156,8 @@ TBOOLEAN parametric = FALSE;
 
 TBOOLEAN suppressMove = FALSE;	/* to prevent moveto while drawing contours */
 
-#if USE_ULIG_FILLEDBOXES
-/* filledboxes parameters (ULIG) */
-int fillstyle = 1;
-int filldensity = 100;
-int fillpattern = 0;
-#endif /* USE_ULIG_FILLEDBOXES */
+/* EAM Sep 2002 - EMPTY fillstyle valid even if USE_ULIG_FILLEDBOXES is not selected */
+fill_style_type default_fillstyle = { FS_EMPTY, 100, 0, LT_UNDEFINED } ;
 
 #ifdef PM3D
 /* filledcurves style options */

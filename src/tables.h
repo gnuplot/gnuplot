@@ -1,5 +1,5 @@
 /*
- * $Id: tables.h,v 1.31 2002/08/30 18:45:46 mikulik Exp $
+ * $Id: tables.h,v 1.32 2002/09/02 21:03:26 mikulik Exp $
  */
 
 /* GNUPLOT - tables.h */
@@ -164,9 +164,7 @@ enum set_pm3d_id {
 enum show_style_id {
     SHOW_STYLE_INVALID,
     SHOW_STYLE_DATA, SHOW_STYLE_FUNCTION, SHOW_STYLE_LINE
-#if USE_ULIG_FILLEDBOXES
     , SHOW_STYLE_FILLING
-#endif
 };
 
 #ifdef PM3D

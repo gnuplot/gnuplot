@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.89 2002/09/02 21:03:25 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.90 2002/09/11 20:52:30 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -1130,29 +1130,37 @@ show_boxwidth()
 
 
 #if USE_ULIG_FILLEDBOXES
-/* process 'show fillstyle' command (ULIG) */
+/* process 'show fillstyle' command */
 static void
 show_fillstyle()
 {
     SHOW_ALL_NL;
 
-    switch(fillstyle) {
-    case 1:
-    case 3:
+    switch(default_fillstyle.fillstyle) {
+    case FS_SOLID:
         fprintf(stderr,
-	    "\tFill style is solid colour with density %f", filldensity/100.0);
+	    "\tFill style is solid colour with density %f", 
+	    default_fillstyle.filldensity/100.0);
         break;
-    case 2:
-    case 4:
+    case FS_PATTERN:
         fprintf(stderr,
-	    "\tFill style uses pattern number %d", fillpattern);
+	    "\tFill style uses patterns starting at %d",
+	    default_fillstyle.fillpattern);
         break;
     default:
-        fprintf(stderr, "\tFilling is deactivated");
+        fprintf(stderr, "\tFill style is empty");
     }
-    if (fillstyle == 3 || fillstyle == 4)
-	fprintf(stderr," with border");
-    fprintf(stderr,"\n");
+    switch(default_fillstyle.border_linetype) {
+    case LT_NODRAW:
+	fprintf(stderr," with no border\n");
+	break;
+    case LT_UNDEFINED:
+	fprintf(stderr," with border\n");
+	break;
+    default:
+	fprintf(stderr," with border linetype %d\n",default_fillstyle.border_linetype+1);
+	break;
+    }
 }
 #endif /* USE_ULIG_FILLEDBOXES */
 
@@ -1412,11 +1420,6 @@ show_styles(name, style)
     case BOXES:
 	fputs("boxes\n", stderr);
 	break;
-#if USE_ULIG_FILLEDBOXES
-    case FILLEDBOXES:
-	fputs("filledboxes\n", stderr);
-	break;
-#endif /* USE_ULIG_FILLEDBOXES */
 #ifdef PM3D
     case FILLEDCURVES:
 	fputs("filledcurves ", stderr);

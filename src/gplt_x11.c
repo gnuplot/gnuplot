@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.48 2002/09/05 19:42:49 joze Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.49 2002/09/09 20:37:59 uid93776 Exp $"); }
 #endif
 
 /* GNUPLOT - gplt_x11.c */
@@ -1699,8 +1699,8 @@ exec_cmd(plot_struct *plot, char *command)
 
 	    /* lower nibble contains fillstyle */
 	    switch (style & 0xf) {
-	    case 1:
-	    /* style == 1 --> use halftone fill pattern according to filldensity */
+	    case FS_SOLID:
+	    /* use halftone fill pattern according to filldensity */
 		/* filldensity is from 0..100 percent */
 		idx = (int) (fillpar * (stipple_halftone_num - 1) / 100);
 		if (idx < 0)
@@ -1711,19 +1711,19 @@ exec_cmd(plot_struct *plot, char *command)
 		XSetFillStyle(dpy, gc, FillOpaqueStippled);
 		XSetForeground(dpy, gc, plot->cmap->colors[plot->lt + 3]);
 		break;
-	    case 2:
-	    /* style == 2 --> use fill pattern according to fillpattern */
+	    case FS_PATTERN:
+	    /* use fill pattern according to fillpattern */
 		idx = (int) fillpar;	/* fillpattern is enumerated */
 		if (idx < 0)
 		    idx = 0;
-		if (idx >= stipple_pattern_num)
-		    idx = 0;
+		idx = idx % stipple_pattern_num;
 		XSetStipple(dpy, gc, stipple_pattern[idx]);
 		XSetFillStyle(dpy, gc, FillOpaqueStippled);
 		XSetForeground(dpy, gc, plot->cmap->colors[plot->lt + 3]);
 		break;
+	    case FS_EMPTY:
 	    default:
-	    /* style == 0 or unknown --> fill with background color */
+	    /* fill with background color */
 		XSetFillStyle(dpy, gc, FillSolid);
 		XSetForeground(dpy, gc, plot->cmap->colors[0]);
 	    }

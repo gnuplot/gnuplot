@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.39 2002/09/06 17:36:28 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.40 2002/09/16 18:24:58 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -399,7 +399,7 @@ const char *filename, *mode;
 }
 
 
-char *
+static char *
 recursivefullname(path, filename, recursive)
      const char *path;
      const char *filename;
@@ -523,21 +523,12 @@ get_style()
     c_token++;
 
     if (ps == -1) {
-#if USE_ULIG_FILLEDBOXES
-	int_error(c_token,"\
-expecting 'lines', 'points', 'linespoints', 'dots', 'impulses',\n\
-\t'yerrorbars', 'xerrorbars', 'xyerrorbars', 'steps', 'fsteps',\n\
-\t'histeps', 'filledcurves', 'boxes', 'filledboxes', 'boxerrorbars',\n\
-\t'boxxyerrorbars', 'vectors', 'financebars', 'candlesticks',\n\
-\t'errorlines', 'xerrorlines', 'yerrorlines', 'xyerrorlines', 'pm3d'");
-#else  /* USE_ULIG_FILLEDBOXES*/
 	int_error(c_token,"\
 expecting 'lines', 'points', 'linespoints', 'dots', 'impulses',\n\
 \t'yerrorbars', 'xerrorbars', 'xyerrorbars', 'steps', 'fsteps',\n\
 \t'histeps', 'filledcurves', 'boxes', 'boxerrorbars', 'boxxyerrorbars',\n\
 \t'vectors', 'financebars', 'candlesticks', 'errorlines', 'xerrorlines',\n\
 \t'yerrorlines', 'xyerrorlines', 'pm3d'");
-#endif /* USE_ULIG_FILLEDBOXES */
 	ps = LINES;
     }
 
@@ -746,6 +737,76 @@ lp_parse(lp, allow_ls, allow_point, def_line, def_point)
     }
 }
 
+/* <fillstyle> = {empty | solid {<density>} | pattern {<n>}} {noborder | border {<lt>}} */
+void
+parse_fillstyle( struct fill_style_type *fs, 
+		int def_style, int def_density, int def_pattern,
+		int def_bordertype)
+{
+    struct value a;
+    TBOOLEAN set_fill  = FALSE;
+    TBOOLEAN set_param = FALSE;
 
+    /* Set defaults */
+    fs->fillstyle = def_style;
+    fs->filldensity = def_density;
+    fs->fillpattern = def_pattern;
+    fs->border_linetype = def_bordertype;
 
+    if (END_OF_COMMAND)
+	return;
+    if (!equals(c_token,"fs") && !equals(c_token,"fill"))
+	return;
+    c_token++;
 
+    while (!END_OF_COMMAND) {
+	if (almost_equals(c_token, "e$mpty")) {
+	    fs->fillstyle = FS_EMPTY;
+	    c_token++;
+	} else if (almost_equals(c_token, "s$olid")) {
+	    fs->fillstyle = FS_SOLID;
+	    set_fill = TRUE;
+	    c_token++;
+	} else if (almost_equals(c_token, "p$attern")) {
+	    fs->fillstyle = FS_PATTERN;
+	    set_fill = TRUE;
+	    c_token++;
+	} 
+	
+	if (END_OF_COMMAND)
+	    continue;
+	else if (almost_equals(c_token, "bo$rder")) {
+	    fs->border_linetype = LT_UNDEFINED;
+	    c_token++;
+	    /* FIXME EAM - isanumber really means `is a positive number` */
+	    if (isanumber(c_token) || (equals(c_token,"-")&&isanumber(c_token+1)))
+		fs->border_linetype = (int)real(const_express(&a)) - 1;
+	    continue;
+	} else if (almost_equals(c_token, "nobo$rder")) {
+	    fs->border_linetype = LT_NODRAW;
+	    c_token++;
+	    continue;
+	}
+	/* We hit something unexpected */
+	else if (!set_fill || !isanumber(c_token) || set_param)
+ 	    break;
+
+	if (fs->fillstyle == FS_SOLID) {
+	    /* user sets 0...1, but is stored as an integer 0..100 */
+	    fs->filldensity = 100.0 * real(const_express(&a)) + 0.5;
+	    if( fs->filldensity < 0 )
+		fs->filldensity = 0; 
+	    if( fs->filldensity > 100 )
+		fs->filldensity = 100;
+	    set_param = TRUE;
+	} else if (fs->fillstyle == FS_PATTERN) {
+	    fs->fillpattern = real(const_express(&a));
+	    if( fs->fillpattern < 0 )
+		fs->fillpattern = 0;
+	    set_param = TRUE;
+	}
+    }
+#ifndef USE_ULIG_FILLEDBOXES
+    int_warn(NO_CARET,"This gnuplot was not built with --enable-fillboxes");
+#endif /* USE_ULIG_FILLEDBOXES */
+}

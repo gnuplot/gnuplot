@@ -50,9 +50,12 @@
 /* #if... / #include / #define collection: */
 
 /* Default line type is LT_BLACK; reset to this after changing colors */
+/* LT_NODRAW must == L_TYPE_NODRAW; the latter should probably go away */
 #define LT_AXIS       (-1)
 #define LT_BLACK      (-2)
-#define LT_BACKGROUND (-3)
+#define LT_NODRAW     (-3)
+#define LT_BACKGROUND (-4)
+#define LT_UNDEFINED  (-5)
 
 /* Constant value passed to (term->text_angle)(ang) to generate vertical 
  * text. Current implementation has ang equal to rotation in degrees. 
@@ -292,12 +295,7 @@ void clip_vector __PROTO((unsigned int x, unsigned int y));
 void apply_textcolor __PROTO((const struct t_colorspec *tc, const struct termentry *t));
 void reset_textcolor __PROTO((const struct t_colorspec *tc, const struct termentry *t));
 
-#if USE_ULIG_FILLEDBOXES
-/* filledboxes parameters (ULIG) */
-extern int fillstyle;
-extern int filldensity;
-extern int fillpattern;
-#endif /* USE_ULIG_FILLEDBOXES */
+extern fill_style_type default_fillstyle;
 
 #ifdef PM3D
 /* filledcurves style options set by 'set style [data|func] filledcurves opts' */

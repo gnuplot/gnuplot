@@ -1,5 +1,5 @@
 /*
- * $Id: term_api.h,v 1.16 2002/02/25 03:10:41 broeker Exp $
+ * $Id: term_api.h,v 1.17 2002/07/23 18:53:13 mikulik Exp $
  */
 
 /* GNUPLOT - term_api.h */
@@ -83,6 +83,22 @@ typedef struct lp_style_type {	/* contains all Line and Point properties */
 # define DEFAULT_LP_STYLE_TYPE {0, 0, 0, 1.0, 1.0, FALSE}
 #else
 # define DEFAULT_LP_STYLE_TYPE {0, 0, 0, 1.0, 1.0}
+#endif
+
+/* EAM Sep 2002 - define fillstyle structure whether or not USE_ULIG_FILLEDBOXES */
+typedef struct fill_style_type {
+    int fillstyle;
+    int filldensity;
+    int fillpattern;
+    int border_linetype;
+} fill_style_type;
+
+#ifdef USE_ULIG_FILLEDBOXES
+typedef enum t_fillstyle { FS_EMPTY, FS_SOLID, FS_PATTERN }
+	     t_fillstyle;
+#else
+typedef enum t_fillstyle { FS_EMPTY }
+	     t_fillstyle;
 #endif
 
 /* values for the optional flags field - choose sensible defaults

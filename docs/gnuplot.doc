@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.133 2002/09/02 21:03:15 mikulik Exp $
+C RCS $Id: gnuplot.doc,v 1.134 2002/09/03 17:58:01 lhecking Exp $
 C 18 September 2001
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001   Thomas Williams, Colin Kelley et al.
 C
@@ -3014,18 +3014,20 @@ C ... and restart the table:
                          {linewidth | lw <line_width>}
                          {pointtype | pt <point_type>}
                          {pointsize | ps <point_size>}
+                         {fill | fs <fillstyle>}
                          {palette}}
                     }
 
  where <style> is either `lines`, `points`, `linespoints`, `impulses`,
  `dots`, `steps`, `fsteps`, `histeps`, `errorbars`, `xerrorbars`,
  `yerrorbars`, `xyerrorbars`, `errorlines`, `xerrorlines`, `yerrorlines`,
- `xyerrorlines`, `boxes`, `filledboxes`, `filledcurves`, `boxerrorbars`,
+ `xyerrorlines`, `boxes`, `filledcurves`, `boxerrorbars`,
  `boxxyerrorbars`, `financebars`, `candlesticks`, `vectors` or `pm3d`. Some
  of these styles require additional information. See `set style <style>` for
- details of each style.  Note that `filledcurves` and `pm3d` can take an
- additional option not listed above (the latter only when used in the `splot`
- command)---see their help or examples below for more details.
+ details of each style.  `fill` is relevant only to certain 2D plots
+ (currently `boxes` and `candlesticks`).  Note that `filledcurves` and `pm3d` 
+ can take an additional option not listed above (the latter only when used in 
+ the `splot` command)---see their help or examples below for more details.
 
  Default styles are chosen with the `set style function` and `set style data`
  commands.
@@ -3711,7 +3713,7 @@ C ... and restart the table:
 ?show boxwidth
 ?boxwidth
  The `set boxwidth` command is used to set the default width of boxes in the
- `boxes`, `filledboxes` and `boxerrorbars` styles.
+ `boxes` and `boxerrorbars` styles.
 
  Syntax:
        set boxwidth {<width>} {absolute|relative}
@@ -3747,43 +3749,41 @@ C ... and restart the table:
 
  or, if you didn't specify a relative boxwidth before,
        set boxwidth 2
-3 fillstyle
-?commands set style filling
-?commands show style filling
-?set style filling
-?show style filling
+3 fill
+?commands set style fill
+?commands show style fill
+?set style fill
+?show style fill
 ?fillstyle
- The `set style filling` command is used to set the fillstyle of boxes in the
- `filledboxes` style.
+ The `set style fill` command is used to set the style of boxes
+ or candlesticks.
 
  Syntax:
-       set style filling {empty | {b}solid {<density>} | {b}pattern {<number>}}
+       set style fill {empty | solid {<density>} | pattern {<n>}}
+                      {border {<linetype>} | noborder}
 
- The default fillstyle is `solid 1.0`.
+ The default fillstyle is `empty`.
 
  The `solid` option causes filling with a solid color, if the terminal
- supports that. The <density> parameter specifies the intensity
- of the filled colors. At a <density> of 0.0, the box is empty, at
- <density> of 1.0, the inner area is of the same color as the border of
- the box. Solid filling may be implemented either by modifying the
- color of the box border continuously, or by dithering, depending on
- the terminal driver. If no <density> parameter is given, a default of
- 1.0 is used, automatically.
-
- The `bsolid` option is identical to `solid` except that the box border is
- drawn in black.
+ supports that. The <density> parameter specifies the intensity of the 
+ fill color. At a <density> of 0.0, the box is empty, at <density> of 1.0, 
+ the inner area is of the same color as the border of the box. 
+ Some terminal types can vary the density continuously; others implement 
+ only a few levels of partial fill.  If no <density> parameter is given, 
+ it defaults to 1.
 
  The `pattern` option causes filling to be done with a fill pattern supplied
- by the terminal driver. <pattern> is the pattern number, starting at 0.
- The kind and number of available fill patterns depend on the terminal driver.
- If no <pattern> number is given, a default of 0 is assumed.
+ by the terminal driver.  The kind and number of available fill patterns 
+ depend on the terminal driver.  If multiple datasets using filled boxes are 
+ plotted, the pattern cycles through all available pattern types, starting
+ from pattern <n>, much as the line type cycles for multiple line plots.
 
- The `bpattern` option is identical to `pattern` except that the box border is
- drawn in black.
+ The `empty` option causes filled boxes not to be filled. This is the default.
+ It is equivalent to the `solid` option with a <density> parameter of zero.
 
- The `empty` option causes filled boxes not to be filled, after all. This
- makes the `filledboxes` style equivalent to simple `boxes`. It is equivalent
- to the `solid` option with a <density> parameter of zero.
+ By default, `border`, the box is bounded by a solid line of the current
+ linetype. `border <lt>` specifies that a border is to be drawn using
+ linetype <lt>. `noborder` specifies that no bounding lines are drawn.
 3 clabel
 ?commands set clabel
 ?commands unset clabel
@@ -6458,7 +6458,7 @@ C ... and restart the table:
 
  None of the styles requiring more than two columns of information
  (e.g., `errorbars` or `errorlines`) can be used with `splot`s or
- function `plot`s. Neither `boxes`, `filledboxes`, `filledcurves` nor any
+ function `plot`s. Neither `boxes`, `filledcurves` nor any
  of the `steps` styles can be used with `splot`s. If an inappropriate style
  is specified, it will be changed to `points`.
 
@@ -6469,7 +6469,7 @@ C ... and restart the table:
  a column in the data file and an entry in the `using` list.)
 
  For three columns, only `xerrorbars`, `yerrorbars` (or `errorbars`),
- `xerrorlines`, `yerrorlines` (or `errorlines`), `boxes`, `filledboxes`
+ `xerrorlines`, `yerrorlines` (or `errorlines`), `boxes` 
  and `boxerrorbars` are allowed. If another plot style is used, the style
  will be changed to `yerrorbars`. The `boxerrorbars` style will
  calculate the boxwidth automatically.
@@ -6524,35 +6524,21 @@ C ... and restart the table:
  to set the width of the box.  If not, if a width has been set using the `set
  boxwidth` command, this will be used.  If neither of these is available, the
  width of each box will be calculated automatically so that it touches the
- adjacent boxes. For filled boxes, see the `filledboxes` style.
-4 filledboxes
-?commands set style filledboxes
-?set style filledboxes
-?style filledboxes
-?filledboxes
- The `filledboxes` style is only relevant to 2-d plotting.  Like `boxes`, it
- draws a box centered about the given x coordinate from the x axis (not the
- graph border) to the given y coordinate.  See the `boxes` style for how the
- width of the box is obtained.  The `filledboxes` keyword may be abbreviated
- to `fillb`. The drawn box is filled with a color pattern according to a style
- defined by the `set style filling` command.  The fillstyle may be one of
- `empty`, `solid` and `pattern`.
+ adjacent boxes. 
+ 
+ The interior of the boxes is drawn according to the current fillstyle.
+ See `set style fill` for details.  Alternatively a new fillstyle
+ may be specified in the plot command.
 
  For fillstyle `empty` the box is filled with the background color.
 
- For fillstyle `solid` the box is filled with a solid pattern using the
- current drawing color. The fill density is determined by `set filldensity`.
- Values for `filldensity` are in the range from 0.0 (empty) to 1.0 (solid).
- It depends on the terminal driver how many density steps between 0.0 and 1.0
- are available (e.g. the bitmap drivers currently support only filldensities
- 0.0, 0.25, 0.5, 0.75 and 1.0). Most drivers (e.g. x11, windows, bitmap
- drivers) use halftone patterns to achieve several filldensities, others
- (e.g. postscript) use true RGB colors.
+ For fillstyle `solid` the box is filled with a solid rectangle of the
+ current drawing color. There is an optional parameter <density> that
+ controls the fill density; it runs from 0 (background color) to 1
+ (current drawing color).
 
  For fillstyle `pattern` the box is filled in the current drawing color with
- a pattern as selected by `set style filling pattern <number>`.
- `fillpattern` is a number starting at 0. The kind and number of the available
- fillpatterns depend on the terminal driver.
+ a pattern, if supported by the terminal driver.
 
  Examples:
 
@@ -6560,19 +6546,31 @@ C ... and restart the table:
  seperating them (bargraph):
 
        set boxwidth 0.9 relative
-       plot 'file.dat' with filledboxes
+       set style fill solid 1.0
+       plot 'file.dat' with boxes
 
- To plot a sine and a cosine curve in filledboxes style with
- filldensity 50 percent:
-       set style function filledboxes
-       set style filling solid 0.5
-       plot sin(x), cos(x)
+ To plot a sine and a cosine curve in pattern-filled boxes style:
 
- Currently only the following terminal drivers support the `filledboxes` style:
+       set style fill pattern
+       plot sin(x), cos(x) with boxes
+
+ The sin plot will use pattern 0; the cos plot will use pattern 1.
+ Any additional plots would cycle through the patterns supported by the
+ terminal driver.
+
+ To specify explicit fillstyles for each dataset:
+
+      plot 'file1' with boxes fs bsolid 0.25, \
+           'file2' with boxes fs bsolid 0.50, \
+           'file3' with boxes fs bsolid 0.75, \
+           'file4' with boxes fill pattern 1, \
+           'file5' with boxes fill empty
+
+ Currently only the following terminal drivers support fillstyles other
+ than `empty`:
  x11, windows, pm, postscript, fig, pbm, png, gif, hpdj, hppj, hpljii, hp500c,
- nec_cp6, epson_180dpi, epson_60dpi, epson_lx800, okidata, starc and
- tandy_60dpi. The BeOS driver (`be`) supports `filledboxes` too, but it is
- unknown whether it works as intended.
+ jpeg, nec_cp6, epson_180dpi, epson_60dpi, epson_lx800, okidata, starc and
+ tandy_60dpi. The BeOS driver (`be`) is untested.
 4 filledcurves
 ?commands set style filledcurves
 ?set style filledcurves
@@ -6653,7 +6651,7 @@ C ... and restart the table:
    plot 'stat.dat' using 1:3:2:6:5 with candlesticks title 'Quartiles', \
         ''         using 1:4:4:4:4 with candlesticks lt -1 notitle
 
-  See `set bars` and `set style filling`.
+  See `set bars` and `set style fill`.
 4 dots
 ?commands set style dots
 ?set style dots

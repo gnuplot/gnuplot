@@ -1,5 +1,5 @@
 /*
- * $Id: gd.trm,v 1.15 2002/08/28 20:49:35 sfeam Exp $
+ * $Id: gd.trm,v 1.16 2002/09/03 21:41:07 sfeam Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -320,7 +320,7 @@ PNG_FillPattern(int fillpar)
 
 	/* background */
 	background = gdImageColorAllocate(PNG_fill_tile.im, 255, 255, 255); 
-	gdImageColorTransparent(PNG_fill_tile.im, background);
+	/* gdImageColorTransparent(PNG_fill_tile.im, background); */
 	gdImageFilledRectangle(PNG_fill_tile.im, 0, 0, 7, 7, background);
 
 	/* foreground */
@@ -843,24 +843,19 @@ unsigned int x, y, width, height;
      * - pattern : 0 - 100
      */
     int fillpar = style >> 4;
-
-    /* style:
-     *   0 == empty
-     *   1 == solid
-     *   2 == pattern
-     */
+    
     style &= 0xf;
 
     switch (style) {
-	case 0: /* fill with background color */
+	case FS_EMPTY: /* fill with background color */
 #endif
 	    color = png_state.color_table[0];
 #if USE_ULIG_FILLEDBOXES
 	    break;
-	case 1: /* solid fill */
+	case FS_SOLID: /* solid fill */
 	    color = PNG_FillSolid(fillpar);
 	    break;
-	case 2: /* pattern fill */
+	case FS_PATTERN: /* pattern fill */
 	    color = PNG_FillPattern(fillpar);
 	    break;
 	default:

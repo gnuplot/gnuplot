@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.70 2002/08/25 13:10:11 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.71 2002/09/02 18:15:31 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -880,9 +880,6 @@ do_3dplot(plots, pcount, quick)
 
 	    switch (this_plot->plot_style) {
 	    case BOXES:	/* can't do boxes in 3d yet so use impulses */
-#if USE_ULIG_FILLEDBOXES
-	    case FILLEDBOXES:	/* can't do filledboxes in 3d yet so use impulses */
-#endif /* USE_ULIG_FILLEDBOXES */
 #ifdef PM3D
 	    case FILLEDCURVES:
 #endif
@@ -1047,9 +1044,6 @@ do_3dplot(plots, pcount, quick)
 		    case IMPULSES:
 		    case LINES:
 		    case BOXES:	/* HBB: I think these should be here... */
-#if USE_ULIG_FILLEDBOXES
-		    case FILLEDBOXES:
-#endif /* USE_ULIG_FILLEDBOXES */
 #ifdef PM3D
 		    case FILLEDCURVES:
 #endif
@@ -1121,9 +1115,6 @@ do_3dplot(plots, pcount, quick)
 			    case LINES:
 			    case LINESPOINTS:
 			    case BOXES:	/* HBB: these should be treated as well... */
-#if USE_ULIG_FILLEDBOXES
-			    case FILLEDBOXES:
-#endif /* USE_ULIG_FILLEDBOXES */
 #ifdef PM3D
 			    case FILLEDCURVES:
 #endif
@@ -1173,9 +1164,6 @@ do_3dplot(plots, pcount, quick)
 		    /* now draw the contour */
 		    switch (this_plot->plot_style) {
 		    case BOXES:
-#if USE_ULIG_FILLEDBOXES
-		    case FILLEDBOXES:
-#endif /* USE_ULIG_FILLEDBOXES */
 #ifdef PM3D
 		    case FILLEDCURVES:
 #endif

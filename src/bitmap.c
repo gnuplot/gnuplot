@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: bitmap.c,v 1.15 2001/08/27 15:02:14 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: bitmap.c,v 1.16 2002/07/26 16:42:27 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - bitmap.c */
@@ -65,6 +65,7 @@ static char *RCSid() { return RCSid("$Id: bitmap.c,v 1.15 2001/08/27 15:02:14 br
 
 #include "alloc.h"
 #include "util.h"
+#include "term_api.h"	/* EAM - to pick up fillstyle definitions */
 
 static void b_putc __PROTO((unsigned int, unsigned int, int, unsigned int));
 static GP_INLINE void b_setpixel __PROTO((unsigned int x, unsigned int y, unsigned int value));
@@ -1242,8 +1243,8 @@ b_boxfill(style, x, y, w, h)
     unsigned char *fillbitmap;
 
     switch( style & 0xf ) {
-    case 1:
-	/* style == 1 --> use halftone fill pattern according to filldensity */
+    case FS_SOLID:
+	/* use halftone fill pattern according to filldensity */
 	/* filldensity is from 0..100 percent */
 	idx = (int) ((style >> 4) * (fill_halftone_num - 1) / 100 );
 	if( idx < 0 )
@@ -1253,20 +1254,18 @@ b_boxfill(style, x, y, w, h)
 	fillbitmap = fill_halftone_bitmaps[idx];
 	pixcolor = b_value;
 	break;
-    case 2:
-	/* style == 2 --> use fill pattern according to fillpattern */
+    case FS_PATTERN:
+	/* use fill pattern according to fillpattern */
 	idx = (style >> 4);  /* fillpattern is enumerated */
 	if( idx < 0 )
 	    idx = 0;
-	/* HBB 20010817: wrap around instead of forcing to zero, as in
-	 * Uli's original version. This is closer to the usual gnuplot
-	 * way of doing things. */
 	idx %= fill_pattern_num;
 	fillbitmap = fill_pattern_bitmaps[idx];
 	pixcolor = b_value;
 	break;
+    case FS_EMPTY:
     default:
-	/* style == 0 or unknown --> fill with background color */
+	/* fill with background color */
 	fillbitmap = fill_halftone_bitmaps[0];
 	pixcolor = 0;
     }

@@ -1,3 +1,20 @@
+2002-09-26  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/plot2d.c: Fix boxwidth handling when relative-boxwidth disabled.
+	* demo/all.dem demo/fillstyle.dem docs/gnuplot.doc 
+	src/bitmap.c src/gadgets.c src/gadgets.h src/gp_types.h src/gplt_x11.c 
+	src/graph3d.c src/graphics.c src/graphics.h src/hidden3d.c src/misc.c 
+	src/misc.h src/plot2d.c src/save.c src/set.c src/show.c src/tables.c 
+	src/tables.h src/term_api.h src/unset.c 
+	term/gd.trm term/post.trm term/svg.trm:
+	Remove filledboxes as separate plot style. Remove bsolid and bpattern
+	as separate fill styles. New consolidated syntax for default is
+	`set style fill <fillstyle>` where <fillstyle> is 
+	{empty | solid <density>| pattern <n>} {noborder | border <lt>}`.
+	Individual plot commands with style boxes or candlesticks can override
+	this default, e.g.  plot ... with boxes fill <fillstyle>.
+	Fill pattern auto-increments for successive datasets or functions.
+
 2002-09-26  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* term/pm.trm src/os2/gclient.c: Support for rotated text.
@@ -1117,7 +1134,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/09/26 19:10:06 $).
+	last modification date (from the tag $Date: 2002/09/26 19:19:27 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 

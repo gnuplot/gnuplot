@@ -1,5 +1,5 @@
 /*
- * $Id: svg.trm,v 1.19 2002/08/22 20:36:48 mikulik Exp $
+ * $Id: svg.trm,v 1.20 2002/08/30 18:45:46 mikulik Exp $
  *
  */
 
@@ -610,14 +610,9 @@ SVG_fillbox(int style, unsigned int x1, unsigned int y1, unsigned int width, uns
      */
     int fillpar = style >> 4;
 
-    /* style:
-     *   0 == empty
-     *   1 == solid
-     *   2 == pattern
-     */
     style &= 0xf;
 
-    if (2 == style) {
+    if (style == FS_PATTERN) {
 	/* make sure the pattern is defined (with the current stroke color)
 	 * must be defined AFTER the current group is opened with the color
 	 * attribue set, as the patterns use 'currentColor' */
@@ -636,12 +631,12 @@ SVG_fillbox(int style, unsigned int x1, unsigned int y1, unsigned int width, uns
 	    fputs(" fill = 'white'", gpoutfile);
 #if USE_ULIG_FILLEDBOXES
 	    break;
-	case 1: /* solid fill */
+	case FS_SOLID: /* solid fill */
 	    SVG_StyleFillColor();
 	    if (fillpar >= 0 && fillpar < 100)
 		fprintf(gpoutfile, " style = 'fill-opacity:%f'", ((double)fillpar * 0.01));
 	    break;
-	case 2: /* pattern fill */
+	case FS_PATTERN: /* pattern fill */
 	    fprintf(gpoutfile, " fill = 'url(#gpPat%d)'", SVG_fillPatternIndex);
 	    break;
 	default:
