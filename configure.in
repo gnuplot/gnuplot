@@ -1,12 +1,12 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot 3.7 on Unix.
 dnl
-dnl $Id: configure.in,v 1.71 1999/06/25 17:11:17 lhecking Exp $
+dnl $Id: configure.in,v 1.72 1999/06/30 12:10:40 lhecking Exp $
 dnl
 AC_INIT(src/graphics.c)
 AM_CONFIG_HEADER(config.h:config.hin)
 AC_PREREQ(2.13)
-AC_REVISION($Revision: 1.71 $)
+AC_REVISION($Revision: 1.72 $)
 
 VERSION="`cat $srcdir/VERSION`.`cat $srcdir/PATCHLEVEL`"
 AM_INIT_AUTOMAKE(gnuplot, $VERSION)
@@ -353,11 +353,12 @@ if test "$with_gd" != no; then
   GP_PATH_LIB(gd,gdImageCreate,[$with_gd])
   if test "$ac_cv_lib_gd_gdImageCreate" != no; then
     GP_PATH_HEADER(gd.h,[$with_gd],dnl
-     AC_DEFINE(HAVE_LIBGD, 1,
-               [ Define if you have Thomas Boutell's gd library. ]),dnl
-     AC_MSG_WARN([found gd library but not gd.h])
-     AC_MSG_WARN([please add path to gd.h to CPPFLAGS in Makefile])
-    )
+      dnl ACTION-IF-FOUND
+      AC_DEFINE(HAVE_LIBGD, 1,
+                [ Define if you have Thomas Boutell's gd library. ]),dnl
+      dnl ACTION-IF-NOT-FOUND
+      AC_MSG_WARN([found gd library but not gd.h])
+      AC_MSG_WARN([please add path to gd.h to CPPFLAGS in Makefile]))
   else
     AC_MSG_RESULT([- see term/gif.trm for download details])
   fi
