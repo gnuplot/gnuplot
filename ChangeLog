@@ -1,3 +1,8 @@
+2003-02-19  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* docs/psdoc/ps_guide.ps: DSC requires the page separators %Page: to
+	have 2 parameters.
+
 2003-02-18  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* term/post.trm: Re-indented in several places.
@@ -1985,7 +1990,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2003/02/16 23:51:43 $).
+	last modification date (from the tag $Date: 2003/02/18 16:38:32 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
