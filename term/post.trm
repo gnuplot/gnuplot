@@ -1,5 +1,5 @@
 /*
- * $Id: post.trm,v 1.78 2002/09/27 00:12:26 sfeam Exp $
+ * $Id: post.trm,v 1.79 2002/10/09 14:20:19 mikulik Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -2730,6 +2730,7 @@ TERM_PUBLIC void PS_previous_palette(void)
     fprintf(gpoutfile, "grestore %% colour palette end\n");
 }
 
+#endif /* PM3D */
 
 static void
 delete_ps_fontfile(prev, this)
@@ -2747,9 +2748,6 @@ struct ps_fontfile_def *prev, *this;
 	this = NULL;
     }
 }
-
-
-#endif /* PM3D */
 
 #endif /* TERM_BODY */
 
