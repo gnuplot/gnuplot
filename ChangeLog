@@ -1,3 +1,10 @@
+2004-11-27  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/plot2d.c (eval_plots) src/plot3d.c (eval_3dplots): Add 
+	END_OF_COMMAND check before trying to parse possible backwards
+	compatibility options.  Fixes incorrect error message if the
+	text option parsing consumes the rest of the command line.
+
 2004-11-30  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* term/post.trm docs/Changes.doc: Typos.

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.90 2004/11/03 07:02:50 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.91 2004/11/22 00:43:05 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -1501,7 +1501,7 @@ eval_3dplots()
 
 #ifdef BACKWARDS_COMPATIBLE
 		/* allow old-style syntax - ignore case lt 3 4 for example */
-		if (isanumber(c_token)) {
+		if (!END_OF_COMMAND && isanumber(c_token)) {
 		    struct value t;
 
 		    this_plot->lp_properties.l_type =
