@@ -2,19 +2,24 @@ Changes in release 4.0:
 [3.8b]
 * retain backwards compatibility for old syntax
 * ongoing work: modularisation
-* new, improved version of hidden3d code
+* NEW, improved version of hidden3d code
 * --enable-history configure option renamed to --enable-history-file
   to avoid mixup with new 'history' command
 * fix to find gethostbyname(3) on LynxOS
 * added new implementation of hidden3d code
-* fixed png driver now shares web-friendly palette with gif driver;
+* FIXED png driver now shares web-friendly palette with gif driver;
   also new transparency option and user defined colour specs
-* fixed data format for table driver
+* FIXED data format for table driver
+* FIXED monochrome plots with Windows driver
+* FIXED bug in contour handling
+* FIXED clipping of contour input points outside fixed ranges
+* FIXED bug in coordinates saving
 * history command now works with GNU readline
-* fixed monochrome plots with Windows driver
-* fixed bug in contour handling
-* switch gnugraph driver to plotutils 2.2+ API
-* updated FAQ
+* implemented vector style clipping for 2D plots
+* UPDATED gnugraph driver now requires plotutils 2.2+
+* UPDATED platform makefileS
+* UPDATED hpgl driver
+* UPDATED FAQ
 
 [3.8a]
 * doc2texi.el, gnuplot.texi added; remove doc2info.c,
