@@ -1,5 +1,5 @@
 #
-# $Id: makefile.wc,v 1.3 1999/09/21 18:05:41 lhecking Exp $
+# $Id: makefile.wc,v 1.4 1999/11/08 19:20:59 lhecking Exp $
 #
 # GNUPLOT Makefile for Watcom C 9.5a
 #
@@ -54,7 +54,7 @@ OBJ2 = dynarray.obj eval.obj fit.obj graph3d.obj graphics.obj help.obj
 OBJ3 = hidden3d.obj internal.obj interpol.obj matrix.obj misc.obj parse.obj
 OBJ4 = plot.obj plot2d.obj plot3d.obj readline.obj save.obj scanner.obj
 OBJ5 = set.obj show.obj specfun.obj standard.obj stdfn.obj tables.obj term.obj
-OBJ6 = time.obj unset.obj util.obj util3d.obj variable.obj version.obj
+OBJ6 = time.obj unset.obj util.obj util3d.obj variable.obj version.obj history.obj
 
 OBJS = $(OBJ1) $(OBJ2) $(OBJ3) $(OBJ4) $(OBJ5)
 

@@ -1,5 +1,5 @@
 #
-# $Id: makefile.amg,v 1.5 1999/10/29 18:41:29 lhecking Exp $
+# $Id: makefile.amg,v 1.6 1999/11/08 19:20:58 lhecking Exp $
 #
 # GNUPLOT Makefile for SAS/C 6.1 or better on the Amiga
 #
@@ -34,8 +34,8 @@
 #  http://www.cdrom.com/pub/infozip/zlib/
 #
 #PNG_DEF = def=HAVE_LIBPNG
-#PNG_INCLUDE = IDIR=libpng-1.0.2
-#PNG_LIB = libpng-1.0.2/png.lib
+#PNG_INCLUDE = IDIR=libpng-1.0.5
+#PNG_LIB = libpng-1.0.5/png.lib
 #Z_INCLUDE = IDIR=zlib-1.1.3
 #Z_LIB = zlib-1.1.3/z.lib
 
@@ -120,12 +120,13 @@ term.o: term.c term.h plot.h setshow.h bitmap.h $(CSOURCE5) $(CSOURCE6) $(CSOURC
 
 OBJS = alloc.o amiga.o binary.o bitmap.o command.o contour.o datafile.o \
        dynarray.o eval.o fit.o graph3d.o graphics.o help.o hidden3d.o \
-       internal.o interpol.o matrix.o misc.o parse.o plot.o plot2d.o plot3d.o \
-       save.o scanner.o set.o show.o specfun.o standard.o stdfn.o tables.o \
-       term.o time.o unset.o util.o util3d.o variable.o version.o
+       history.o internal.o interpol.o matrix.o misc.o parse.o plot.o \
+       plot2d.o plot3d.o save.o scanner.o set.o show.o specfun.o standard.o \
+       stdfn.o tables.o term.o time.o unset.o util.o util3d.o variable.o \
+       version.o
 
 CSOURCE1 = alloc.c bf_test.c binary.c bitmap.c command.c set.c show.c
-CSOURCE2 = help.c graphics.c graph3d.o internal.c
+CSOURCE2 = help.c graphics.c graph3d.o internal.c history.c
 CSOURCE3 = misc.c eval.c parse.c plot.c plot2d.c plot3d.c save.c scanner.c \
 	standard.c stdfn.c tables.c variable.c
 CSOURCE4 = bitmap.c term.c util.c util3d.c version.c interpol.c fit.c matrix.c
@@ -227,6 +228,7 @@ fit.o: fit.c fit.h matrix.h plot.h
 graph3d.o: graph3d.c plot.h setshow.h
 help.o: help.c plot.h help.h
 hidden3d.o: hidden3d.c plot.h setshow.h
+history.o: history.c gp_hist.h plot.h
 internal.o: internal.c plot.h
 interpol.o: interpol.c plot.h setshow.h
 matrix.o: matrix.c matrix.h fit.h

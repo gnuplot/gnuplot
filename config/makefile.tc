@@ -1,5 +1,5 @@
 #
-# $Id: makefile.tc,v 1.5 1999/10/01 14:12:11 lhecking Exp $
+# $Id: makefile.tc,v 1.6 1999/11/08 19:20:59 lhecking Exp $
 #
 # GNUPLOT Makefile for Borland C++ 3.x
 #
@@ -93,11 +93,11 @@ ODASH = /o-
 #ODASH =
 
 OBJ1 = alloc.obj binary.obj bitmap.obj command.obj contour.obj datafile.obj
-OBJ2 = dynarray.obj eval.obj fit.obj graph3d.obj graphics.obj help.obj
+OBJ2 = dynarray.obj eval.obj fit.obj graph3d.obj graphics.obj help.obj time.obj
 OBJ3 = hidden3d.obj internal.obj interpol.obj matrix.obj misc.obj parse.obj
 OBJ4 = plot.obj plot2d.obj plot3d.obj readline.obj save.obj scanner.obj
 OBJ5 = set.obj show.obj specfun.obj standard.obj stdfn.obj tables.obj term.obj
-OBJ6 = time.obj unset.obj util.obj util3d.obj variable.obj version.obj
+OBJ6 = history.obj unset.obj util.obj util3d.obj variable.obj version.obj
 
 # uncomment svgaf.obj if you wish to include Super VGA support
 OBJBGI= cgaf.obj egavgaf.obj hercf.obj attf.obj pc3270f.obj svgaf.obj

@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vms,v 1.8 1999/11/08 19:20:59 lhecking Exp $
+# $Id: makefile.vms,v 1.9 1999/11/24 12:48:32 lhecking Exp $
 #
 # GNUPLOT Makefile for VMS
 #
@@ -65,7 +65,7 @@ TERMFLAGS = /include=[-.term]
 
 OBJS1 = alloc.$(O),binary.$(O),bitmap.$(O),command.$(O),contour.$(O),datafile.$(O),dynarray.$(O),eval.$(O),
 OBJS2 = fit.$(O),graphics.$(O),graph3d.$(O),help.$(O),hidden3d.$(O),internal.$(O),interpol.$(O),
-OBJS3 = matrix.$(O),misc.$(O),parse.$(O),plot.$(O),plot2d.$(O),plot3d.$(O),scanner.$(O),set.$(O),
+OBJS3 = matrix.$(O),misc.$(O),parse.$(O),plot.$(O),plot2d.$(O),plot3d.$(O),scanner.$(O),set.$(O),history.$(O),
 OBJS4 = show.$(O),specfun.$(O),standard.$(O),stdfn.$(O),term.$(O),time.$(O),util.$(O),util3d.$(O),version.$(O),vms.$(O),variable.$(O),save.$(O),tables.$(O),unset.$(O)
 OBJS = $(OBJS1)$(OBJS2)$(OBJS3)$(OBJS4)$(EXTRAOBJ)
 

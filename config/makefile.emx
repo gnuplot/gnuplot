@@ -1,5 +1,5 @@
 #
-# $Id: makefile.emx,v 1.2 1999/05/31 18:38:59 lhecking Exp $
+# $Id: makefile.emx,v 1.3 1999/11/08 19:20:58 lhecking Exp $
 #
 # GNUPLOT Makefile for use with emx-0.8f/gcc and ndmake 4.5 on MS-DOS
 #
@@ -23,10 +23,11 @@ CFLAGS = -c -O2 -DMSDOS -DDOS32 -DANSI_C -DREADLINE -DHAVE_STRNICMP
 TERMFLAGS = -DEMXVGA $(VESA)
 
 OBJS = 	alloc.o binary.o bitmap.o command.o contour.o datafile.o dynarray.o \
-	eval.o fit.o graphics.o graph3d.o help.o hidden3d.o internal.o \
-	interpol.o matrix.o misc.o parse.o plot.o plot2d.o plot3d.o readline.o \
-	save.o specfun.o scanner.o set.o show.o standard.o stdfn.o tables.o \
-	term.o time.o unset.o util.o util3d.o variable.o version.o
+	eval.o fit.o graphics.o graph3d.o help.o hidden3d.o history.o \
+	internal.o interpol.o matrix.o misc.o parse.o plot.o plot2d.o \
+	plot3d.o readline.o save.o specfun.o scanner.o set.o show.o \
+	standard.o stdfn.o tables.o term.o time.o unset.o util.o util3d.o \
+	variable.o version.o
 
 CSOURCE5 = term\aed.trm term\cgi.trm term/dumb.trm term/dxf.trm term\dxy.trm \
 	term\eepic.trm term\epson.trm term\fig.trm term\hp26.trm \
@@ -55,6 +56,8 @@ emxlink.rsp: makefile.emx
 	echo graphics.o>> emxlink.rsp
 	echo graph3d.o>> emxlink.rsp
 	echo help.o>> emxlink.rsp
+	echo hidden3d.o>> emxlink.rsp
+	echo history.o>> emxlink.rsp
 	echo internal.o>> emxlink.rsp
 	echo misc.o>> emxlink.rsp
 	echo parse.o>> emxlink.rsp

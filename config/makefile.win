@@ -1,5 +1,5 @@
 #
-# $Id: makefile.win,v 1.6 1999/10/21 21:05:00 lhecking Exp $
+# $Id: makefile.win,v 1.7 1999/11/08 19:21:00 lhecking Exp $
 #
 # GNUPLOT Makefile for Borland C++ 3.1 Windows version
 # and Win32 using Borland C++ 4 (or 5? --- 4.52 is known to work)
@@ -107,7 +107,7 @@ OBJS = 	alloc.obj binary.obj bitmap.obj command.obj contour.obj datafile.obj \
 	plot.obj plot2d.obj plot3d.obj readline.obj save.obj scanner.obj \
 	set.obj show.obj specfun.obj standard.obj stdfn.obj tables.obj \
 	term.obj time.obj unset.obj util.obj util3d.obj variable.obj \
-	version.obj winmain.obj
+	history.obj version.obj winmain.obj
 
 DLLOBJS = wgnuplib.obj wtext.obj wmenu.obj wpause.obj wgraph.obj wprinter.obj 
 

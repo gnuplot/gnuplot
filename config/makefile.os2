@@ -1,5 +1,5 @@
 #
-# $Id: makefile.os2,v 1.9 1999/09/21 18:05:40 lhecking Exp $
+# $Id: makefile.os2,v 1.10 1999/11/08 19:20:59 lhecking Exp $
 #
 # GNUPLOT Makefile for use on OS/2 3.x and above (might also work for OS/2 2.x)
 # using emx 0.9 (and above) and GNUMake
@@ -249,7 +249,7 @@ X11LIBS = -lX11 -lsocket -Zcrtdll
 X11INCLUDES = -I$(X11ROOT)/xfree86/include
 X11FLAGS= -D__ST_MT_ERRNO -Zmtd -Zsysv-signals
 
-gnuplot_x11.exe: gplt_x11.o stdfn.o
+gnuplot_x11.exe: gplt_x11.o
 	$(CC) $(LFLAGS) $(X11FLAGS) $(EMXSPECIFIC) -o $@ $^ $(X11LIBS)
 
 gplt_x11.o: gplt_x11.c

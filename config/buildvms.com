@@ -119,6 +119,7 @@ $ cc 'CFLAGS' graph3d.c
 $ cc 'CFLAGS' graphics.c
 $ cc 'CFLAGS' help.c
 $ cc 'CFLAGS' hidden3d.c
+$ cc 'CFLAGS' history.c
 $ cc 'CFLAGS' internal.c
 $ cc 'CFLAGS' interpol.c
 $ cc 'CFLAGS' matrix.c
@@ -148,10 +149,10 @@ $!
 $ link/exe=gnuplot.exe -
 alloc.obj,binary.obj,bitmap.obj,command.obj,contour.obj,dynarray.obj,-
 datafile.obj,eval.obj,fit.obj,graphics.obj,graph3d.obj,help.obj,hidden3d.obj,-
-internal.obj,interpol.obj,matrix.obj,misc.obj,parse.obj,plot.obj,plot2d.obj,-
-plot3d.obj,save.obj,scanner.obj,set.obj,show.obj,specfun.obj,standard.obj,-
-stdfn.obj,term.obj,time.obj,util.obj,util3d.obj,unset.obj,version.obj,-
-vms.obj'extralib''LINKOPT'
+history.obj,internal.obj,interpol.obj,matrix.obj,misc.obj,parse.obj,plot.obj,-
+plot2d.obj,plot3d.obj,save.obj,scanner.obj,set.obj,show.obj,specfun.obj,-
+standard.obj,stdfn.obj,term.obj,time.obj,util.obj,util3d.obj,unset.obj,-
+version.obj,vms.obj'extralib''LINKOPT'
 $!
 $ cc 'CFLAGS' bf_test.c
 $ link /exe=bf_test bf_test,binary,alloc 'extralib''LINKOPT'
@@ -160,7 +161,7 @@ $ if .NOT. its_decw  then goto do_docs
 $!
 $ CC 'CFLAGS' GPLT_X11
 $ CC 'CFLAGS' stdfn.c
-$ LINK /exe=GNUPLOT_X11 gplt_x11,stdfn 'extralib''LINKOPT',SYS$INPUT:/OPT
+$ LINK /exe=GNUPLOT_X11 gplt_x11 'extralib''LINKOPT',SYS$INPUT:/OPT
 SYS$SHARE:DECW$XLIBSHR/SHARE
 $!
 $DO_DOCS:
