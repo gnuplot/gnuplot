@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: help.c,v 1.8 1998/12/09 15:23:49 lhecking Exp $";
+static char *RCSid = "$Id: help.c,v 1.8.2.1 1999/10/11 17:11:16 lhecking Exp $";
 #endif
 
 /* GNUPLOT - help.c */
@@ -562,30 +562,28 @@ TBOOLEAN *subtopics;		/* (out) are there any subtopics */
 		    *line = NUL;
 		    pos = 0;
 		}
-		if (pos == PER_LINE) {
+		if (pos >= PER_LINE) {
 		    (void) strcat(line, "\n");
 		    OutLine(line);
 		    *line = NUL;
 		    pos = 0;
 		}
-		/* adapted by DvdSchaaf */
-		{
 #define FIRSTCOL	4
 #define COLLENGTH	18
 
-		    if (pos == 0)
-			spacelen = FIRSTCOL;
-		    for (ispacelen = 0;
-			 ispacelen < spacelen; ispacelen++)
-			(void) strcat(line, " ");
-		    /* commented out *
-		       (void) strcat(line, "\t");
-		     */
-		    (void) strncat(line, start, sublen);
-		    spacelen = COLLENGTH - sublen;
-		    if (spacelen <= 0)
-			spacelen = 1;
+		/* adapted by DvdSchaaf */
+		if (pos == 0)
+		    spacelen = FIRSTCOL;
+		for (ispacelen = 0; ispacelen < spacelen; ispacelen++)
+		    (void) strcat(line, " ");
+		(void) strncat(line, start, sublen);
+		spacelen = COLLENGTH - sublen;
+		
+		while (spacelen <= 0) {
+		    spacelen += COLLENGTH;
+			pos++;
 		}
+
 		pos++;
 		prev = start;
 	    }
