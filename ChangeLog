@@ -1,3 +1,11 @@
+2004-02-27  Ethan Merritt  <merritt@u.washington.edu>
+	
+	* term/mif.trm: Revise #ifdef so that it compiles if you select
+	configure --disable-filledboxes
+
+	* src/gplt_x11.c: Add #ifdef so that it compiles if you select
+	configure --disable-pm3d
+
 2004-02-27  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* config/config.cyg config/config.mgw config/config.os2: Shape these

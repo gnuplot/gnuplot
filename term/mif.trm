@@ -1,5 +1,5 @@
 /*
- * $Id: mif.trm,v 1.23 2002/12/13 14:58:51 lhecking Exp $
+ * $Id: mif.trm,v 1.24 2003/05/03 21:55:05 sfeam Exp $
  */
 
 /* GNUPLOT -- mif.trm */
@@ -392,10 +392,6 @@ MIF_boxfill(int style, unsigned int x1, unsigned int y1,
 #if USE_ULIG_FILLEDBOXES
     int fillpar = style >> 4;
     style &= 0xf;
-#else
-    style = MIF_FILL_NONE;
-#endif
-
     switch (style) {
 	default:
 	case FS_EMPTY:	fill_pattern = 7;
@@ -405,6 +401,10 @@ MIF_boxfill(int style, unsigned int x1, unsigned int y1,
 	case FS_PATTERN:fill_pattern = mif_fill_patterns[fillpar % 8];
 			break;
     }
+#else
+    style = MIF_FILL_NONE;
+    fill_pattern = 7;
+#endif
 
     /* Object preamble */
     fprintf(gpoutfile, "\t<Rectangle <GroupID %d> %s\n",
