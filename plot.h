@@ -400,6 +400,11 @@ typedef double coordval;
 # endif /* HUGE */
 #endif /* VERYLARGE */
 
+/* Some older platforms, namely SunOS 4.x, don't define this. */
+#ifndef DBL_EPSILON
+# define DBL_EPSILON     2.2204460492503131E-16
+#endif
+
 /* argument: char *fn */
 #define VALID_FILENAME(fn) ((fn) != NULL && (*fn) != '\0')
 
