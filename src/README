@@ -772,13 +772,10 @@ void (*previous_palette) __PROTO((void));
     functions gray->RGB defined in the local header.
 
 void (*set_color) __PROTO((double gray));
-    The value of gray is in range [0;1] (terminals with any continuous palette
-    like postscript) or in [0;1) (terminals with discrete palette, i.e. all
-    those not returning 0 from make_palette).
-    The terminal uses its color palette or any other way to transform in into
-    true gray or to r,g,b. This terminal entry remembers (or not) this colour
-    so that it can reuse it for a subsequent drawing (for each terminal
-    separately).
+    The value of gray is [0;1]. The terminal uses its color palette or any
+    other way to transform in into true gray or to r,g,b. This terminal entry
+    remembers (or not) this colour so that it can reuse it for a subsequent
+    drawing (for each terminal separately).
 
 void (*filled_polygon) __PROTO((int points, gpiPoint *corners));
     The declaration has been made the same as in GIF's gd.h. It fills the given
