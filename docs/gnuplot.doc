@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.109 2002/03/30 13:15:21 broeker Exp $
+C RCS $Id: gnuplot.doc,v 1.110 2002/04/05 17:17:47 broeker Exp $
 C 18 September 2001
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001   Thomas Williams, Colin Kelley et al.
 C
@@ -6691,6 +6691,7 @@ C ... and restart the table:
        %j           day of the year, 1--365
        %H           hour, 0--24
        %M           minute, 0--60
+       %s           seconds since the Unix epoch (1970-01-01, 00:00 UTC)
        %S           second, 0--60
        %b           three-character abbreviation of the name of the month
        %B           name of the month
@@ -6705,6 +6706,7 @@ C ... and restart the table:
 #\verb@%j@ & day of the year, 1--365 \\
 #\verb@%H@ & hour, 0--24 \\
 #\verb@%M@ & minute, 0--60 \\
+#\verb@%s@ & seconds since the Unix epoch (1970-01-01 00:00 UTC) \\
 #\verb@%S@ & second, 0--60 \\
 #\verb@%b@ & three-character abbreviation of the name of the month \\
 #\verb@%B@ & name of the month \\
@@ -6718,6 +6720,7 @@ C ... and restart the table:
 %%j@day of the year, 1--365
 %%H@hour, 0--24
 %%M@minute, 0--60
+%%s@seconds since the Unix epoch (1970-01-01 00:00 UTC)
 %%S@second, 0--60
 %%b@three-character abbreviation of the name of the month
 %%B@name of the month
