@@ -1,3 +1,22 @@
+1998-12-23  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* 0INSTALL: Add note about MSDOS/DJGPP and djconfig.sh.
+
+	* Makefile.in, makefile.all: Add djconfig.sh to ETC variable.
+
+	* configure: Regenerated.
+
+	* configure.in: Use sh comments instead of m4 comments in some places.
+
+1998-12-23  Andris Pavenis  <pavenis@lanet.lv>
+
+	* djconfig.sh: New file to make configuration under MSDOS/DJGPP
+	easier.
+
+1998-12-22  Alexander Mai  <st002279@HRzpUB.tu-darmstadt.DE>
+
+	* term/pm.trm: Small patch.
+
 1998-12-22  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* 0README: Updated.
