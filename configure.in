@@ -511,8 +511,8 @@ if test "$with_linux_vga" = yes; then
   AC_MSG_RESULT([    gnuplot is installed suid root!])
 fi
 
-if test "$enable_thin_splines" = yes && \
-  AC_MSG_RESULT([  Enable thin plate splines (EXPERIMENTAL])
+test "$enable_thin_splines" = yes && \
+  AC_MSG_RESULT([  Enable thin plate splines (EXPERIMENTAL)])
 
 test "$enable_iris" = yes && \
   AC_MSG_RESULT([  Enable IRIS terminal])
