@@ -93,16 +93,16 @@ TERM_PUBLIC void EPSONreset __PROTO((void));
 #define EPSON_text_angle b_text_angle
 
 #if defined(EPS60) || defined(EPSONP) || defined(TANDY60) || defined(OKIDATA)
-#define EPSONVCHAR		FNT5X9_VCHAR  	
-#define EPSONHCHAR		FNT5X9_HCHAR		
+#define EPSONVCHAR		FNT5X9_VCHAR
+#define EPSONHCHAR		FNT5X9_HCHAR
 #define EPSONVTIC		6
 #define EPSONHTIC		6
 
 #ifdef EPSONP
-#define EPSONXMAX	512 
+#define EPSONXMAX	512
 #define EPSONYMAX	384
-    TERM_PUBLIC void EPSONgraphics __PROTO((void));
-    TERM_PUBLIC void EPSONtext __PROTO((void));
+TERM_PUBLIC void EPSONgraphics __PROTO((void));
+TERM_PUBLIC void EPSONtext __PROTO((void));
 #endif /* EPSONP */
 #endif /* four drivers */
 #endif /* all five */
@@ -125,13 +125,13 @@ TERM_PUBLIC void EPS180text __PROTO((void));
 #define EPS60YMAX	360
 TERM_PUBLIC void EPS60graphics __PROTO((void));
 #ifdef TANDY60
-  TERM_PUBLIC void TANDY60text __PROTO((void));
+TERM_PUBLIC void TANDY60text __PROTO((void));
 #endif /* TANDY60 */
 #ifdef OKIDATA
-  TERM_PUBLIC void OKIDATAtext __PROTO((void));
+TERM_PUBLIC void OKIDATAtext __PROTO((void));
 #endif /* OKIDATA */
 #ifdef EPS60
-  TERM_PUBLIC void EPS60text __PROTO((void));
+TERM_PUBLIC void EPS60text __PROTO((void));
 #endif /* EPS60 */
 #endif /* all three */
 
@@ -146,10 +146,10 @@ TERM_PUBLIC void NECreset __PROTO((void));
 #define NECvector b_vector
 #define NECput_text b_put_text
 #define NEC_text_angle b_text_angle
-#define NECXMAX	400 
+#define NECXMAX	400
 #define NECYMAX	320
-#define NECVCHAR		FNT5X9_VCHAR  	
-#define NECHCHAR		FNT5X9_HCHAR		
+#define NECVCHAR		FNT5X9_VCHAR
+#define NECHCHAR		FNT5X9_HCHAR
 #define NECVTIC		6
 #define NECHTIC		6
 #endif /* NEC */
@@ -164,10 +164,10 @@ TERM_PUBLIC void STARCreset __PROTO((void));
 #define STARCvector b_vector
 #define STARCput_text b_put_text
 #define STARC_text_angle b_text_angle
-#define STARCXMAX	512 
+#define STARCXMAX	512
 #define STARCYMAX	384
-#define STARCVCHAR		FNT5X9_VCHAR  	
-#define STARCHCHAR		FNT5X9_HCHAR		
+#define STARCVCHAR		FNT5X9_VCHAR
+#define STARCHCHAR		FNT5X9_HCHAR
 #define STARCVTIC		6
 #define STARCHTIC		6
 #endif /* STARC */
@@ -176,7 +176,7 @@ TERM_PUBLIC void STARCreset __PROTO((void));
 
 #ifndef TERM_PROTO_ONLY
 #ifdef TERM_BODY
- 
+
 
 #ifdef EPSONP
 
@@ -197,23 +197,23 @@ TERM_PUBLIC void EPSONinit()
 
 TERM_PUBLIC void EPSONgraphics()
 {
-	b_charsize(FNT5X9);
-	b_makebitmap((unsigned int)(EPSONXMAX*xsize),
-	             (unsigned int)(EPSONYMAX*ysize),1);
+    b_charsize(FNT5X9);
+    b_makebitmap((unsigned int) (EPSONXMAX * xsize),
+		 (unsigned int) (EPSONYMAX * ysize), 1);
 }
 
 
 TERM_PUBLIC void EPSONtext()
 {
-	epson_dump();
-	b_freebitmap();
+    epson_dump();
+    b_freebitmap();
 }
 
 
 TERM_PUBLIC void EPSONreset()
 {
 #ifdef VMS
-	fflush_binary();
+    fflush_binary();
 #endif
 }
 
@@ -221,20 +221,20 @@ TERM_PUBLIC void EPSONreset()
 /* output file must be binary mode for epson_dump */
 void epson_dump()
 {
-  register unsigned int x;
-  int j;
-	for (j=(b_ysize/8)-1; j>=0; j--) {
-		/* select plotter graphics mode (square pixels) */
-		fprintf(gpoutfile,"\033J\030");	/* line feed 8/72" = 8 dots */
-		fprintf(gpoutfile,"\r\033*\005");
-		(void) fputc((char)(b_xsize%256),gpoutfile);
-		(void) fputc((char)(b_xsize/256),gpoutfile);
-		for (x=0; x<b_xsize; x++) {
-			(void) fputc( (char)(*((*b_p)[j]+x)), gpoutfile );
-		}
+    register unsigned int x;
+    int j;
+    for (j = (b_ysize / 8) - 1; j >= 0; j--) {
+	/* select plotter graphics mode (square pixels) */
+	fputs("\033J\030", gpoutfile);	/* line feed 8/72" = 8 dots */
+	fputs("\r\033*\005", gpoutfile);
+	(void) fputc((char) (b_xsize % 256), gpoutfile);
+	(void) fputc((char) (b_xsize / 256), gpoutfile);
+	for (x = 0; x < b_xsize; x++) {
+	    (void) fputc((char) (*((*b_p)[j] + x)), gpoutfile);
 	}
+    }
 #ifdef PC
-	fprintf(stderr,"Print using: COPY /B\n");
+    fputs("Print using: COPY /B\n", stderr);
 #endif
 }
 
@@ -259,37 +259,35 @@ void nec_draft_dump __PROTO((void));
 
 
 /* plane 0=black, 1=cyan(blue), 2=magenta(red), 3=yellow */
-static unsigned int neccolor[] = {1,8,4,2,10,12,6,14};
-static unsigned int necpcolor[]= {0,2,1,4};
+static unsigned int neccolor[] = { 1, 8, 4, 2, 10, 12, 6, 14 };
+static unsigned int necpcolor[] = { 0, 2, 1, 4 };
 
 static int NECmode;
 
 TERM_PUBLIC void NECoptions()
 {
-	if( END_OF_COMMAND ) {
-		strcpy(term_options,"monochrome");
-		NECmode='m';
-	} else
-	if( almost_equals(c_token,"m$onochrome") ) {
-		c_token++;
-		strcpy(term_options,"monochrome");
-		NECmode='m';
-	} else if (almost_equals(c_token, "c$olor")
-		   || almost_equals(c_token, "c$olour")) {
-		c_token++;
-		strcpy(term_options,"color");
-		NECmode='c';
-	} else
-	if( almost_equals(c_token,"d$raft") ) {
-		c_token++;
-		strcpy(term_options,"draft");
-		NECmode='d';
-	} else {
+    if (END_OF_COMMAND) {
+	strcpy(term_options, "monochrome");
+	NECmode = 'm';
+    } else if (almost_equals(c_token, "m$onochrome")) {
+	c_token++;
+	strcpy(term_options, "monochrome");
+	NECmode = 'm';
+    } else if (almost_equals(c_token, "c$olor")
+	       || almost_equals(c_token, "c$olour")) {
+	c_token++;
+	strcpy(term_options, "color");
+	NECmode = 'c';
+    } else if (almost_equals(c_token, "d$raft")) {
+	c_token++;
+	strcpy(term_options, "draft");
+	NECmode = 'd';
+    } else {
 	/* error, but since the terminal is already set, default to mono */
-		strcpy(term_options,"monochrome");
-		NECmode='m';
-		int_error("modes: color, monochrome, draft",c_token);
-	}
+	strcpy(term_options, "monochrome");
+	NECmode = 'm';
+	int_error("modes: color, monochrome, draft", c_token);
+    }
 }
 
 TERM_PUBLIC void NECinit()
@@ -298,39 +296,39 @@ TERM_PUBLIC void NECinit()
 
 TERM_PUBLIC void NECgraphics()
 {
-	b_charsize(FNT5X9);
-	b_makebitmap((unsigned int)(NECXMAX*xsize),
-		     (unsigned int)(NECYMAX*ysize),(NECmode=='c' ? 4 : 1));
+    b_charsize(FNT5X9);
+    b_makebitmap((unsigned int) (NECXMAX * xsize),
+		 (unsigned int) (NECYMAX * ysize), (NECmode == 'c' ? 4 : 1));
 }
 
 TERM_PUBLIC void NECtext()
 {
-	if( NECmode=='d' ) {
-		nec_draft_dump();
-	} else {
+    if (NECmode == 'd') {
+	nec_draft_dump();
+    } else {
 	nec_dump();
-	}
-	b_freebitmap();
+    }
+    b_freebitmap();
 }
 
 TERM_PUBLIC void NEClinetype(linetype)
 int linetype;
 {
-	if( NECmode=='c' ) {
-	if (linetype>=6)
-		linetype %= 6;
-	b_setvalue(neccolor[linetype+2]);
-	} else {
-		b_setlinetype(linetype);
-	}
+    if (NECmode == 'c') {
+	if (linetype >= 6)
+	    linetype %= 6;
+	b_setvalue(neccolor[linetype + 2]);
+    } else {
+	b_setlinetype(linetype);
+    }
 }
 
 
-	
+
 TERM_PUBLIC void NECreset()
 {
 #ifdef VMS
-	fflush_binary();
+    fflush_binary();
 #endif
 }
 
@@ -338,100 +336,108 @@ TERM_PUBLIC void NECreset()
 /* output file must be binary mode for nec_dump */
 void nec_dump()
 {
-unsigned int x;
-unsigned int plane,offset;
-int j;
-unsigned int column8;
-unsigned long column24;
-char column3, column2, column1;
-	fprintf(gpoutfile,"\033P\033l\005");  /* 10cpi, left margin 5 char */
-	for (j=(b_ysize/8)-1;j>=0;j--) {
-			fprintf(gpoutfile,"\033J\030");  /* 24/180" line feed */
-			for (plane=0; plane<b_planes; plane++) {
-				offset=plane*b_psize;
-				if (b_planes>1) {
-				    /* select colour for plane */
-				    fprintf(gpoutfile,"\033r");
-				    (void) fputc((char)necpcolor[plane],gpoutfile);
-				}
-				/* select plotter graphics mode (square pixels) */
-				fprintf(gpoutfile,"\r\033*\047");
-				(void) fputc((char)((b_xsize*3)%256),gpoutfile);
-				(void) fputc((char)((b_xsize*3)/256),gpoutfile);
-				for (x=0; x<b_xsize; x++) {
-					column8= (unsigned int)(*((*b_p)[j+offset]+x));
-					column24=0;
-					if (column8&0x01) column24|=(long)0x000007;
-					if (column8&0x02) column24|=(long)0x000038;
-					if (column8&0x04) column24|=(long)0x0001c0;
-					if (column8&0x08) column24|=(long)0x000e00;
-					if (column8&0x10) column24|=(long)0x007000;
-					if (column8&0x20) column24|=(long)0x038000;
-					if (column8&0x40) column24|=(long)0x1c0000;
-					if (column8&0x80) column24|=(long)0xe00000;
-					column1 = (char) ( column24      & (long)0xff);
-					column2 = (char) ((column24>>8)  & (long)0xff);
-					column3 = (char) ((column24>>16) & (long)0xff);
-					(void) fputc(column3,gpoutfile);
-					(void) fputc(column2,gpoutfile);
-					(void) fputc(column1,gpoutfile);
-					(void) fputc(column3,gpoutfile);
-					(void) fputc(column2,gpoutfile);
-					(void) fputc(column1,gpoutfile);
-					(void) fputc(column3,gpoutfile);
-					(void) fputc(column2,gpoutfile);
-					(void) fputc(column1,gpoutfile);
-				}
-			}
+    unsigned int x;
+    unsigned int plane, offset;
+    int j;
+    unsigned int column8;
+    unsigned long column24;
+    char column3, column2, column1;
+    fputs("\033P\033l\005", gpoutfile);	/* 10cpi, left margin 5 char */
+    for (j = (b_ysize / 8) - 1; j >= 0; j--) {
+	fputs("\033J\030", gpoutfile);	/* 24/180" line feed */
+	for (plane = 0; plane < b_planes; plane++) {
+	    offset = plane * b_psize;
+	    if (b_planes > 1) {
+		/* select colour for plane */
+		fputs("\033r", gpoutfile);
+		(void) fputc((char) necpcolor[plane], gpoutfile);
+	    }
+	    /* select plotter graphics mode (square pixels) */
+	    fputs("\r\033*\047", gpoutfile);
+	    (void) fputc((char) ((b_xsize * 3) % 256), gpoutfile);
+	    (void) fputc((char) ((b_xsize * 3) / 256), gpoutfile);
+	    for (x = 0; x < b_xsize; x++) {
+		column8 = (unsigned int) (*((*b_p)[j + offset] + x));
+		column24 = 0;
+		if (column8 & 0x01)
+		    column24 |= (long) 0x000007;
+		if (column8 & 0x02)
+		    column24 |= (long) 0x000038;
+		if (column8 & 0x04)
+		    column24 |= (long) 0x0001c0;
+		if (column8 & 0x08)
+		    column24 |= (long) 0x000e00;
+		if (column8 & 0x10)
+		    column24 |= (long) 0x007000;
+		if (column8 & 0x20)
+		    column24 |= (long) 0x038000;
+		if (column8 & 0x40)
+		    column24 |= (long) 0x1c0000;
+		if (column8 & 0x80)
+		    column24 |= (long) 0xe00000;
+		column1 = (char) (column24 & (long) 0xff);
+		column2 = (char) ((column24 >> 8) & (long) 0xff);
+		column3 = (char) ((column24 >> 16) & (long) 0xff);
+		(void) fputc(column3, gpoutfile);
+		(void) fputc(column2, gpoutfile);
+		(void) fputc(column1, gpoutfile);
+		(void) fputc(column3, gpoutfile);
+		(void) fputc(column2, gpoutfile);
+		(void) fputc(column1, gpoutfile);
+		(void) fputc(column3, gpoutfile);
+		(void) fputc(column2, gpoutfile);
+		(void) fputc(column1, gpoutfile);
+	    }
 	}
-	fprintf(gpoutfile,"\r\033l");
-	(void) fputc('\0',gpoutfile);				/* set left margin to 0 */
-	if (b_planes > 1) {
-		fprintf(gpoutfile,"\033r");
-		(void) fputc('\0',gpoutfile);				/* set color to black */
-	}
+    }
+    fputs("\r\033l", gpoutfile);
+    (void) fputc('\0', gpoutfile);	/* set left margin to 0 */
+    if (b_planes > 1) {
+	fprintf(gpoutfile, "\033r");
+	(void) fputc('\0', gpoutfile);	/* set color to black */
+    }
 #ifdef PC
-	fprintf(stderr,"Print using: COPY /B\n");
+    fputs("Print using: COPY /B\n", stderr);
 #endif
 #ifdef VMS
-	fflush_binary();
+    fflush_binary();
 #endif
 }
 
 /* output file must be binary mode for nec_dump */
 void nec_draft_dump()
 {
-unsigned int x;
-unsigned int plane,offset;
-int j;
-	fprintf(gpoutfile,"\033P\033l\005\r");  /* 10cpi, left margin 5 char */
-	for (j=(b_ysize/8)-1;j>=0;j--) {
-			fprintf(gpoutfile,"\033J\030");  /* 24/180" line feed */
-			for (plane=0; plane<b_planes; plane++) {
-				offset=plane*b_psize;
-				if (b_planes>1) {
-				    /* select colour for plane */
-				    fprintf(gpoutfile,"\033r");
-				    (void) fputc((char)necpcolor[plane],gpoutfile);
-				}
-				/* select plotter graphics mode (square pixels) */
-				fprintf(gpoutfile,"\r\033*");
-				(void) fputc('\0',gpoutfile);
-				(void) fputc((char)(b_xsize%256),gpoutfile);
-				(void) fputc((char)(b_xsize/256),gpoutfile);
-				for (x=0; x<b_xsize; x++) {
-					(void) fputc( (char)(*((*b_p)[j+offset]+x)), gpoutfile );
-				}
-			}
+    unsigned int x;
+    unsigned int plane, offset;
+    int j;
+    fputs("\033P\033l\005\r", gpoutfile);	/* 10cpi, left margin 5 char */
+    for (j = (b_ysize / 8) - 1; j >= 0; j--) {
+	fputs("\033J\030", gpoutfile);	/* 24/180" line feed */
+	for (plane = 0; plane < b_planes; plane++) {
+	    offset = plane * b_psize;
+	    if (b_planes > 1) {
+		/* select colour for plane */
+		fputs("\033r", gpoutfile);
+		(void) fputc((char) necpcolor[plane], gpoutfile);
+	    }
+	    /* select plotter graphics mode (square pixels) */
+	    fputs("\r\033*", gpoutfile);
+	    (void) fputc('\0', gpoutfile);
+	    (void) fputc((char) (b_xsize % 256), gpoutfile);
+	    (void) fputc((char) (b_xsize / 256), gpoutfile);
+	    for (x = 0; x < b_xsize; x++) {
+		(void) fputc((char) (*((*b_p)[j + offset] + x)), gpoutfile);
+	    }
 	}
-	fprintf(gpoutfile,"\r\033l");
-	(void) fputc('\0',gpoutfile);				/* set left margin to 0 */
-	if (b_planes > 1) {
-		fprintf(gpoutfile,"\033r");
-		(void) fputc('\0',gpoutfile);				/* set color to black */
-	}
+    }
+    fputs("\r\033l", gpoutfile);
+    (void) fputc('\0', gpoutfile);	/* set left margin to 0 */
+    if (b_planes > 1) {
+	fputs("\033r", gpoutfile);
+	(void) fputc('\0', gpoutfile);	/* set color to black */
+    }
 #ifdef PC
-	fprintf(stderr,"Print using: COPY /B\n");
+    fputs("Print using: COPY /B\n", gpoutfile);
 #endif
 }
 
@@ -451,8 +457,8 @@ void STARC_dump __PROTO((void));
 
 
 /* plane 0=black, 1=cyan(blue), 2=magenta(red), 3=yellow */
-static unsigned int STARCcolor[] = {1,8,4,2,10,12,6,14};
-static unsigned int STARCpcolor[]= {0,2,1,4};
+static unsigned int STARCcolor[] = { 1, 8, 4, 2, 10, 12, 6, 14 };
+static unsigned int STARCpcolor[] = { 0, 2, 1, 4 };
 
 TERM_PUBLIC void STARCinit()
 {
@@ -460,24 +466,24 @@ TERM_PUBLIC void STARCinit()
 
 TERM_PUBLIC void STARCgraphics()
 {
-	b_charsize(FNT5X9);
-	b_makebitmap((unsigned int)(STARCXMAX*xsize),
-	             (unsigned int)(STARCYMAX*ysize),4);
+    b_charsize(FNT5X9);
+    b_makebitmap((unsigned int) (STARCXMAX * xsize),
+		 (unsigned int) (STARCYMAX * ysize), 4);
 }
 
 
 TERM_PUBLIC void STARCtext()
 {
-	STARC_dump();
-	b_freebitmap();
+    STARC_dump();
+    b_freebitmap();
 }
 
 TERM_PUBLIC void STARClinetype(linetype)
 int linetype;
 {
-	if (linetype>=6)
-		linetype %= 6;
-	b_setvalue(STARCcolor[linetype+2]);
+    if (linetype >= 6)
+	linetype %= 6;
+    b_setvalue(STARCcolor[linetype + 2]);
 }
 
 
@@ -485,7 +491,7 @@ int linetype;
 TERM_PUBLIC void STARCreset()
 {
 #ifdef VMS
-	fflush_binary();
+    fflush_binary();
 #endif
 }
 
@@ -493,33 +499,33 @@ TERM_PUBLIC void STARCreset()
 /* output file must be binary mode for STARC_dump */
 void STARC_dump()
 {
-unsigned int x;
-unsigned int plane,offset;
-int j;
-	for (j=(b_ysize/8)-1;j>=0;j--) {
-		fprintf(gpoutfile,"\033J\030");	/* line feed 8/72" = 8 dots */
-		for (plane=0; plane<b_planes; plane++) {
-			offset=plane*b_psize;
-			if (b_planes>1) {
-				/* select colour for plane */
-				fprintf(gpoutfile,"\033r");
-				(void) fputc((char)STARCpcolor[plane],gpoutfile);
-			}
-			/* select plotter graphics mode (square pixels) */
-			fprintf(gpoutfile,"\r\033*\005");
-			(void) fputc((char)(b_xsize%256),gpoutfile);
-			(void) fputc((char)(b_xsize/256),gpoutfile);
-			for (x=0; x<b_xsize; x++) {
-				(void) fputc( (char)(*((*b_p)[j+offset]+x)), gpoutfile );
-			}
-		}
+    unsigned int x;
+    unsigned int plane, offset;
+    int j;
+    for (j = (b_ysize / 8) - 1; j >= 0; j--) {
+	fputs("\033J\030", gpoutfile);	/* line feed 8/72" = 8 dots */
+	for (plane = 0; plane < b_planes; plane++) {
+	    offset = plane * b_psize;
+	    if (b_planes > 1) {
+		/* select colour for plane */
+		fputs("\033r", gpoutfile);
+		(void) fputc((char) STARCpcolor[plane], gpoutfile);
+	    }
+	    /* select plotter graphics mode (square pixels) */
+	    fputs("\r\033*\005", gpoutfile);
+	    (void) fputc((char) (b_xsize % 256), gpoutfile);
+	    (void) fputc((char) (b_xsize / 256), gpoutfile);
+	    for (x = 0; x < b_xsize; x++) {
+		(void) fputc((char) (*((*b_p)[j + offset] + x)), gpoutfile);
+	    }
 	}
-	if (b_planes > 1) {
-		fprintf(gpoutfile,"\033r");
-		(void) fputc('\0',gpoutfile);				/* set color to black */
-	}
+    }
+    if (b_planes > 1) {
+	fputs("\033r", gpoutfile);
+	(void) fputc('\0', gpoutfile);	/* set color to black */
+    }
 #ifdef PC
-	fprintf(stderr,"Print using: COPY /B\n");
+    fputs("Print using: COPY /B\n", stderr);
 #endif
 }
 
@@ -535,16 +541,16 @@ void eps180_dump __PROTO((void));
 
 TERM_PUBLIC void EPS180graphics()
 {
-	b_charsize(FNT13X25);
-	b_makebitmap((unsigned int)(EPS180XMAX*xsize),
-	             (unsigned int)(EPS180YMAX*ysize),1);
+    b_charsize(FNT13X25);
+    b_makebitmap((unsigned int) (EPS180XMAX * xsize),
+		 (unsigned int) (EPS180YMAX * ysize), 1);
 }
 
 
 TERM_PUBLIC void EPS180text()
 {
-	eps180_dump();
-	b_freebitmap();
+    eps180_dump();
+    b_freebitmap();
 }
 
 
@@ -552,26 +558,26 @@ TERM_PUBLIC void EPS180text()
 /* output file must be binary mode for eps180_dump */
 void eps180_dump()
 {
-  register unsigned int x;
-  int j;
-	fprintf(gpoutfile,"\033@\033+\060\033l\005"); /* reset, set line spacing
-						       to 24/180", and
-						       move left margin */
-	for (j=(b_ysize/8)-1; j>=0; ) {
-		/* select printer graphics mode '39' */
-		fprintf(gpoutfile,"\r\n\033*'");
-		(void) fputc((char)(b_xsize%256),gpoutfile);
-		(void) fputc((char)(b_xsize/256),gpoutfile);
-		for (x=0; x<b_xsize; x++) {
-		           (void) fputc( (char)(*((*b_p)[j]+x)), gpoutfile );
-  			   (void) fputc( (char)(*((*b_p)[j-1]+x)), gpoutfile );
-			   (void) fputc( (char)(*((*b_p)[j-2]+x)), gpoutfile );
-		}
-	j -= 3;
+    register unsigned int x;
+    int j;
+
+    /* reset, set line spacing to 24/180", and move left margin */
+    fputs("\033@\033+\060\033l\005", gpoutfile);
+    for (j = (b_ysize / 8) - 1; j >= 0;) {
+	/* select printer graphics mode '39' */
+	fputs("\r\n\033*'", gpoutfile);
+	(void) fputc((char) (b_xsize % 256), gpoutfile);
+	(void) fputc((char) (b_xsize / 256), gpoutfile);
+	for (x = 0; x < b_xsize; x++) {
+	    (void) fputc((char) (*((*b_p)[j] + x)), gpoutfile);
+	    (void) fputc((char) (*((*b_p)[j - 1] + x)), gpoutfile);
+	    (void) fputc((char) (*((*b_p)[j - 2] + x)), gpoutfile);
 	}
-	fprintf(gpoutfile,"\r\n\033@\r\n"); 	/* reset printer */
+	j -= 3;
+    }
+    fputs("\r\n\033@\r\n", gpoutfile);	/* reset printer */
 #ifdef PC
-	fprintf(stderr,"Print using: COPY /B\n");
+    fputs("Print using: COPY /B\n", stderr);
 #endif
 }
 
@@ -586,16 +592,16 @@ void eps60_dump __PROTO((void));
 
 TERM_PUBLIC void EPS60graphics()
 {
-	b_charsize(FNT5X9);
-	b_makebitmap((unsigned int)(EPS60XMAX*xsize),
-	             (unsigned int)(EPS60YMAX*ysize),1);
+    b_charsize(FNT5X9);
+    b_makebitmap((unsigned int) (EPS60XMAX * xsize),
+		 (unsigned int) (EPS60YMAX * ysize), 1);
 }
 
 
 TERM_PUBLIC void EPS60text()
 {
-	eps60_dump();
-	b_freebitmap();
+    eps60_dump();
+    b_freebitmap();
 }
 
 
@@ -603,21 +609,21 @@ TERM_PUBLIC void EPS60text()
 /* output file must be binary mode for eps60_dump */
 void eps60_dump()
 {
-  register unsigned int x;
-  int j;
-	fprintf(gpoutfile,"\033%c\030",'3'); /* set line spacing 24/216" = 8 dots */
-	for (j=(b_ysize/8)-1; j>=0; j--) {
-		/* select printer graphics mode 'K' */
-		fprintf(gpoutfile,"\r\n\033K");
-		(void) fputc((char)(b_xsize%256),gpoutfile);
-		(void) fputc((char)(b_xsize/256),gpoutfile);
-		for (x=0; x<b_xsize; x++) {
-			(void) fputc( (char)(*((*b_p)[j]+x)), gpoutfile );
-		}
+    register unsigned int x;
+    int j;
+    fprintf(gpoutfile, "\033%c\030", '3');	/* set line spacing 24/216" = 8 dots */
+    for (j = (b_ysize / 8) - 1; j >= 0; j--) {
+	/* select printer graphics mode 'K' */
+	fputs("\r\n\033K", gpoutfile);
+	(void) fputc((char) (b_xsize % 256), gpoutfile);
+	(void) fputc((char) (b_xsize / 256), gpoutfile);
+	for (x = 0; x < b_xsize; x++) {
+	    (void) fputc((char) (*((*b_p)[j] + x)), gpoutfile);
 	}
-	fprintf(gpoutfile,"\033%c\044\r\n",'3'); /* set line spacing 36/216" = 1/6" */
+    }
+    fprintf(gpoutfile, "\033%c\044\r\n", '3');	/* set line spacing 36/216" = 1/6" */
 #ifdef PC
-	fprintf(stderr,"Print using: COPY /B\n");
+    fputs("Print using: COPY /B\n", stderr);
 #endif
 }
 
@@ -633,21 +639,21 @@ void eps60_dump()
 TERM_PUBLIC void TANDY60text()
 {
 #ifdef PC
-	fprintf(stderr, "Inserting Tandy/IBM mode conversion codes\n");
+    fputs("Inserting Tandy/IBM mode conversion codes\n", stderr);
 #endif
-	/* Switch to IBM mode, and leave 3 inches above the plot so as
-	   to get rough vertical centring on the page.  Perform the
-	   centring by setting 1" line feeds and issuing 3 of them. */
-	fprintf(gpoutfile, "\033!\033%c%c\n\n\n", '3',216);
-	eps60_dump();
-	b_freebitmap();
-	/* A form feed must be sent before switching back to Tandy mode,
-	   or else the form setting will be messed up. */
-	fprintf(gpoutfile, "\f\033!");
+    /* Switch to IBM mode, and leave 3 inches above the plot so as
+       to get rough vertical centring on the page.  Perform the
+       centring by setting 1" line feeds and issuing 3 of them. */
+    fprintf(gpoutfile, "\033!\033%c%c\n\n\n", '3', 216);
+    eps60_dump();
+    b_freebitmap();
+    /* A form feed must be sent before switching back to Tandy mode,
+       or else the form setting will be messed up. */
+    fputs("\f\033!", gpoutfile);
 }
 
 
-#endif  /* TANDY60 */
+#endif /* TANDY60 */
 
 #ifdef OKIDATA
 
@@ -655,72 +661,72 @@ void okidata_dump __PROTO((void));
 
 TERM_PUBLIC void OKIDATAtext()
 {
-	okidata_dump();
-	b_freebitmap();
+    okidata_dump();
+    b_freebitmap();
 }
 
-int bitrev_tbl[] = {
-0x00, 0x80, 0x40, 0xc0, 0x20, 0xa0, 0x60, 0xe0, 
-0x10, 0x90, 0x50, 0xd0, 0x30, 0xb0, 0x70, 0xf0, 
-0x08, 0x88, 0x48, 0xc8, 0x28, 0xa8, 0x68, 0xe8, 
-0x18, 0x98, 0x58, 0xd8, 0x38, 0xb8, 0x78, 0xf8, 
-0x04, 0x84, 0x44, 0xc4, 0x24, 0xa4, 0x64, 0xe4, 
-0x14, 0x94, 0x54, 0xd4, 0x34, 0xb4, 0x74, 0xf4, 
-0x0c, 0x8c, 0x4c, 0xcc, 0x2c, 0xac, 0x6c, 0xec, 
-0x1c, 0x9c, 0x5c, 0xdc, 0x3c, 0xbc, 0x7c, 0xfc, 
-0x02, 0x82, 0x42, 0xc2, 0x22, 0xa2, 0x62, 0xe2, 
-0x12, 0x92, 0x52, 0xd2, 0x32, 0xb2, 0x72, 0xf2, 
-0x0a, 0x8a, 0x4a, 0xca, 0x2a, 0xaa, 0x6a, 0xea, 
-0x1a, 0x9a, 0x5a, 0xda, 0x3a, 0xba, 0x7a, 0xfa, 
-0x06, 0x86, 0x46, 0xc6, 0x26, 0xa6, 0x66, 0xe6, 
-0x16, 0x96, 0x56, 0xd6, 0x36, 0xb6, 0x76, 0xf6, 
-0x0e, 0x8e, 0x4e, 0xce, 0x2e, 0xae, 0x6e, 0xee, 
-0x1e, 0x9e, 0x5e, 0xde, 0x3e, 0xbe, 0x7e, 0xfe, 
-0x01, 0x81, 0x41, 0xc1, 0x21, 0xa1, 0x61, 0xe1, 
-0x11, 0x91, 0x51, 0xd1, 0x31, 0xb1, 0x71, 0xf1, 
-0x09, 0x89, 0x49, 0xc9, 0x29, 0xa9, 0x69, 0xe9, 
-0x19, 0x99, 0x59, 0xd9, 0x39, 0xb9, 0x79, 0xf9, 
-0x05, 0x85, 0x45, 0xc5, 0x25, 0xa5, 0x65, 0xe5, 
-0x15, 0x95, 0x55, 0xd5, 0x35, 0xb5, 0x75, 0xf5, 
-0x0d, 0x8d, 0x4d, 0xcd, 0x2d, 0xad, 0x6d, 0xed, 
-0x1d, 0x9d, 0x5d, 0xdd, 0x3d, 0xbd, 0x7d, 0xfd, 
-0x03, 0x83, 0x43, 0xc3, 0x23, 0xa3, 0x63, 0xe3, 
-0x13, 0x93, 0x53, 0xd3, 0x33, 0xb3, 0x73, 0xf3, 
-0x0b, 0x8b, 0x4b, 0xcb, 0x2b, 0xab, 0x6b, 0xeb, 
-0x1b, 0x9b, 0x5b, 0xdb, 0x3b, 0xbb, 0x7b, 0xfb, 
-0x07, 0x87, 0x47, 0xc7, 0x27, 0xa7, 0x67, 0xe7, 
-0x17, 0x97, 0x57, 0xd7, 0x37, 0xb7, 0x77, 0xf7, 
-0x0f, 0x8f, 0x4f, 0xcf, 0x2f, 0xaf, 0x6f, 0xef, 
-0x1f, 0x9f, 0x5f, 0xdf, 0x3f, 0xbf, 0x7f, 0xff
+int bitrev_tbl[] =
+{
+    0x00, 0x80, 0x40, 0xc0, 0x20, 0xa0, 0x60, 0xe0,
+    0x10, 0x90, 0x50, 0xd0, 0x30, 0xb0, 0x70, 0xf0,
+    0x08, 0x88, 0x48, 0xc8, 0x28, 0xa8, 0x68, 0xe8,
+    0x18, 0x98, 0x58, 0xd8, 0x38, 0xb8, 0x78, 0xf8,
+    0x04, 0x84, 0x44, 0xc4, 0x24, 0xa4, 0x64, 0xe4,
+    0x14, 0x94, 0x54, 0xd4, 0x34, 0xb4, 0x74, 0xf4,
+    0x0c, 0x8c, 0x4c, 0xcc, 0x2c, 0xac, 0x6c, 0xec,
+    0x1c, 0x9c, 0x5c, 0xdc, 0x3c, 0xbc, 0x7c, 0xfc,
+    0x02, 0x82, 0x42, 0xc2, 0x22, 0xa2, 0x62, 0xe2,
+    0x12, 0x92, 0x52, 0xd2, 0x32, 0xb2, 0x72, 0xf2,
+    0x0a, 0x8a, 0x4a, 0xca, 0x2a, 0xaa, 0x6a, 0xea,
+    0x1a, 0x9a, 0x5a, 0xda, 0x3a, 0xba, 0x7a, 0xfa,
+    0x06, 0x86, 0x46, 0xc6, 0x26, 0xa6, 0x66, 0xe6,
+    0x16, 0x96, 0x56, 0xd6, 0x36, 0xb6, 0x76, 0xf6,
+    0x0e, 0x8e, 0x4e, 0xce, 0x2e, 0xae, 0x6e, 0xee,
+    0x1e, 0x9e, 0x5e, 0xde, 0x3e, 0xbe, 0x7e, 0xfe,
+    0x01, 0x81, 0x41, 0xc1, 0x21, 0xa1, 0x61, 0xe1,
+    0x11, 0x91, 0x51, 0xd1, 0x31, 0xb1, 0x71, 0xf1,
+    0x09, 0x89, 0x49, 0xc9, 0x29, 0xa9, 0x69, 0xe9,
+    0x19, 0x99, 0x59, 0xd9, 0x39, 0xb9, 0x79, 0xf9,
+    0x05, 0x85, 0x45, 0xc5, 0x25, 0xa5, 0x65, 0xe5,
+    0x15, 0x95, 0x55, 0xd5, 0x35, 0xb5, 0x75, 0xf5,
+    0x0d, 0x8d, 0x4d, 0xcd, 0x2d, 0xad, 0x6d, 0xed,
+    0x1d, 0x9d, 0x5d, 0xdd, 0x3d, 0xbd, 0x7d, 0xfd,
+    0x03, 0x83, 0x43, 0xc3, 0x23, 0xa3, 0x63, 0xe3,
+    0x13, 0x93, 0x53, 0xd3, 0x33, 0xb3, 0x73, 0xf3,
+    0x0b, 0x8b, 0x4b, 0xcb, 0x2b, 0xab, 0x6b, 0xeb,
+    0x1b, 0x9b, 0x5b, 0xdb, 0x3b, 0xbb, 0x7b, 0xfb,
+    0x07, 0x87, 0x47, 0xc7, 0x27, 0xa7, 0x67, 0xe7,
+    0x17, 0x97, 0x57, 0xd7, 0x37, 0xb7, 0x77, 0xf7,
+    0x0f, 0x8f, 0x4f, 0xcf, 0x2f, 0xaf, 0x6f, 0xef,
+    0x1f, 0x9f, 0x5f, 0xdf, 0x3f, 0xbf, 0x7f, 0xff
 };
 
 /* output file must be binary mode for okidata_dump */
 void okidata_dump()
 {
-  register unsigned int x;
-  int j;
-  char cur_char;
-  int  prev_char;
+    register unsigned int x;
+    int j;
+    char cur_char;
+    int prev_char;
 
-  prev_char = 0;
-	fprintf(gpoutfile,"\033%c%c\020\033*eP:\003",'%','9'); /* set line spacing 16/144" = 8 dots :Turned on single density graphics mode*/
-	for (j=(b_ysize/8)-1; j>=0; j--) {
-		fprintf(gpoutfile,"\003\016");
+    prev_char = 0;
+    fprintf(gpoutfile, "\033%c%c\020\033*eP:\003", '%', '9');	/* set line spacing 16/144" = 8 dots :Turned on single density graphics mode */
+    for (j = (b_ysize / 8) - 1; j >= 0; j--) {
+	fputs("\003\016", gpoutfile);
 /*		(void) fputc((char)(b_xsize%256),gpoutfile); */
 /*		(void) fputc((char)(b_xsize/256),gpoutfile); */
-		for (x=0; x<b_xsize; x++) {
-		  if ( (cur_char = (char) 
-			(bitrev_tbl[ (int) (*((*b_p)[j]+x))])) == '\003') {
-		    fprintf( gpoutfile, "\003\003");
-		  }
-		  else {
-		      (void) fputc( (char) cur_char , gpoutfile);
-		    }
-		}
-	      }
-	fprintf(gpoutfile,"\003\002\033%c%c\030\r\n",'%','9'); /* Turned off graphics mode: set line spacing 24/144" = 1/6"*/
+	for (x = 0; x < b_xsize; x++) {
+	    if ((cur_char = (char)
+		 (bitrev_tbl[(int) (*((*b_p)[j] + x))])) == '\003') {
+		fputs("\003\003", gpoutfile);
+	    } else {
+		(void) fputc((char) cur_char, gpoutfile);
+	    }
+	}
+    }
+    fprintf(gpoutfile, "\003\002\033%c%c\030\r\n", '%', '9');	/* Turned off graphics mode: set line spacing 24/144" = 1/6" */
 #ifdef PC
-	fprintf(stderr,"Print using: COPY /B\n");
+    fputs("Print using: COPY /B\n", stderr);
 #endif
 }
 
@@ -728,17 +734,18 @@ void okidata_dump()
 
 #endif /* TERM_BODY */
 
-#ifdef TERM_TABLE 
+#ifdef TERM_TABLE
 
 #ifdef EPS180
 TERM_TABLE_START(epson180_driver)
     "epson_180dpi", "Epson LQ-style 180-dot per inch (24 pin) printers",
-	   EPS180XMAX, EPS180YMAX, EPSON180VCHAR, EPSON180HCHAR,
-	   EPSON180VTIC, EPSON180HTIC, options_null, EPSONinit, EPSONreset,
-	   EPS180text, null_scale, EPS180graphics, EPSONmove, EPSONvector,
-	   EPSONlinetype, EPSONput_text, EPSON_text_angle,
-	   null_justify_text, do_point, do_arrow, set_font_null, 0, TERM_BINARY
+    EPS180XMAX, EPS180YMAX, EPSON180VCHAR, EPSON180HCHAR,
+    EPSON180VTIC, EPSON180HTIC, options_null, EPSONinit, EPSONreset,
+    EPS180text, null_scale, EPS180graphics, EPSONmove, EPSONvector,
+    EPSONlinetype, EPSONput_text, EPSON_text_angle,
+    null_justify_text, do_point, do_arrow, set_font_null, 0, TERM_BINARY
 TERM_TABLE_END(epson180_driver)
+
 #undef LAST_TERM
 #define LAST_TERM epson180_driver
 #endif /* EPS180 */
@@ -746,12 +753,13 @@ TERM_TABLE_END(epson180_driver)
 #ifdef EPS60
 TERM_TABLE_START(epson60_driver)
     "epson_60dpi", "Epson-style 60-dot per inch printers",
-	   EPS60XMAX, EPS60YMAX, EPSONVCHAR, EPSONHCHAR,
-	   EPSONVTIC, EPSONHTIC, options_null, EPSONinit, EPSONreset,
-	   EPS60text, null_scale, EPS60graphics, EPSONmove, EPSONvector,
-	   EPSONlinetype, EPSONput_text, EPSON_text_angle,
-	   null_justify_text, do_point, do_arrow, set_font_null, 0, TERM_BINARY
+    EPS60XMAX, EPS60YMAX, EPSONVCHAR, EPSONHCHAR,
+    EPSONVTIC, EPSONHTIC, options_null, EPSONinit, EPSONreset,
+    EPS60text, null_scale, EPS60graphics, EPSONmove, EPSONvector,
+    EPSONlinetype, EPSONput_text, EPSON_text_angle,
+    null_justify_text, do_point, do_arrow, set_font_null, 0, TERM_BINARY
 TERM_TABLE_END(epson60_driver)
+
 #undef LAST_TERM
 #define LAST_TERM epson60_driver
 #endif /* EPS60 */
@@ -759,25 +767,27 @@ TERM_TABLE_END(epson60_driver)
 #ifdef EPSONP
 TERM_TABLE_START(epsonlx_driver)
     "epson_lx800", "Epson LX-800, Star NL-10, NX-1000, PROPRINTER ...",
-	   EPSONXMAX, EPSONYMAX, EPSONVCHAR, EPSONHCHAR, 
-	   EPSONVTIC, EPSONHTIC, options_null, EPSONinit, EPSONreset, 
-	   EPSONtext, null_scale, EPSONgraphics, EPSONmove, EPSONvector, 
-	   EPSONlinetype, EPSONput_text, EPSON_text_angle, 
-	   null_justify_text, line_and_point, do_arrow, set_font_null, 0, TERM_BINARY
+    EPSONXMAX, EPSONYMAX, EPSONVCHAR, EPSONHCHAR,
+    EPSONVTIC, EPSONHTIC, options_null, EPSONinit, EPSONreset,
+    EPSONtext, null_scale, EPSONgraphics, EPSONmove, EPSONvector,
+    EPSONlinetype, EPSONput_text, EPSON_text_angle,
+    null_justify_text, line_and_point, do_arrow, set_font_null, 0, TERM_BINARY
 TERM_TABLE_END(epsonlx_driver)
+
 #undef LAST_TERM
 #define LAST_TERM epsonlx_driver
 #endif /* EPSONP */
 
 #ifdef NEC
-TERM_TABLE_START(nec_driver)
+    TERM_TABLE_START(nec_driver)
     "nec_cp6", "NEC printer CP6, Epson LQ-800 [monocrome color draft]",
-	   NECXMAX, NECYMAX, NECVCHAR, NECHCHAR, 
-	   NECVTIC, NECHTIC, NECoptions, NECinit, NECreset, 
-	   NECtext, null_scale, NECgraphics, NECmove, NECvector, 
-	   NEClinetype, NECput_text, NEC_text_angle, 
-	   null_justify_text, line_and_point, do_arrow, set_font_null, 0, TERM_BINARY
+    NECXMAX, NECYMAX, NECVCHAR, NECHCHAR,
+    NECVTIC, NECHTIC, NECoptions, NECinit, NECreset,
+    NECtext, null_scale, NECgraphics, NECmove, NECvector,
+    NEClinetype, NECput_text, NEC_text_angle,
+    null_justify_text, line_and_point, do_arrow, set_font_null, 0, TERM_BINARY
 TERM_TABLE_END(nec_driver)
+
 #undef LAST_TERM
 #define LAST_TERM nec_driver
 #endif /* NEC */
@@ -785,12 +795,13 @@ TERM_TABLE_END(nec_driver)
 #ifdef OKIDATA
 TERM_TABLE_START(okidata_driver)
     "okidata", "OKIDATA 320/321 Standard",
-	   EPS60XMAX, EPS60YMAX, EPSONVCHAR, EPSONHCHAR,
-	   EPSONVTIC, EPSONHTIC, options_null, EPSONinit, EPSONreset,
-	   OKIDATAtext, null_scale, EPS60graphics, EPSONmove, EPSONvector,
-	   EPSONlinetype, EPSONput_text, EPSON_text_angle,
-	   null_justify_text, do_point, do_arrow, set_font_null, 0, TERM_BINARY
+    EPS60XMAX, EPS60YMAX, EPSONVCHAR, EPSONHCHAR,
+    EPSONVTIC, EPSONHTIC, options_null, EPSONinit, EPSONreset,
+    OKIDATAtext, null_scale, EPS60graphics, EPSONmove, EPSONvector,
+    EPSONlinetype, EPSONput_text, EPSON_text_angle,
+    null_justify_text, do_point, do_arrow, set_font_null, 0, TERM_BINARY
 TERM_TABLE_END(okidata_driver)
+
 #undef LAST_TERM
 #define LAST_TERM okidata_driver
 #endif /* OKIDATA */
@@ -798,12 +809,13 @@ TERM_TABLE_END(okidata_driver)
 #ifdef STARC
 TERM_TABLE_START(starc_driver)
     "starc", "Star Color Printer",
-	   STARCXMAX, STARCYMAX, STARCVCHAR, STARCHCHAR, 
-	   STARCVTIC, STARCHTIC, options_null, STARCinit, STARCreset, 
-	   STARCtext, null_scale, STARCgraphics, STARCmove, STARCvector, 
-	   STARClinetype, STARCput_text, STARC_text_angle, 
-	   null_justify_text, line_and_point, do_arrow, set_font_null, 0, TERM_BINARY
+    STARCXMAX, STARCYMAX, STARCVCHAR, STARCHCHAR,
+    STARCVTIC, STARCHTIC, options_null, STARCinit, STARCreset,
+    STARCtext, null_scale, STARCgraphics, STARCmove, STARCvector,
+    STARClinetype, STARCput_text, STARC_text_angle,
+    null_justify_text, line_and_point, do_arrow, set_font_null, 0, TERM_BINARY
 TERM_TABLE_END(starc_driver)
+
 #undef LAST_TERM
 #define LAST_TERM starc_driver
 #endif /* STARC */
@@ -811,12 +823,13 @@ TERM_TABLE_END(starc_driver)
 #ifdef TANDY60
 TERM_TABLE_START(tandy60_driver)
     "tandy_60dpi", "Tandy DMP-130 series 60-dot per inch graphics",
-	   EPS60XMAX, EPS60YMAX, EPSONVCHAR, EPSONHCHAR,
-	   EPSONVTIC, EPSONHTIC, options_null, EPSONinit, EPSONreset,
-	   TANDY60text, null_scale, EPS60graphics, EPSONmove, EPSONvector,
-	   EPSONlinetype, EPSONput_text, EPSON_text_angle,
-	   null_justify_text, do_point, do_arrow, set_font_null, 0, TERM_BINARY
+    EPS60XMAX, EPS60YMAX, EPSONVCHAR, EPSONHCHAR,
+    EPSONVTIC, EPSONHTIC, options_null, EPSONinit, EPSONreset,
+    TANDY60text, null_scale, EPS60graphics, EPSONmove, EPSONvector,
+    EPSONlinetype, EPSONput_text, EPSON_text_angle,
+    null_justify_text, do_point, do_arrow, set_font_null, 0, TERM_BINARY
 TERM_TABLE_END(tandy60_driver)
+
 #undef LAST_TERM
 #define LAST_TERM tandy60_driver
 #endif /* TANDY60 */
@@ -897,4 +910,4 @@ START_HELP(epson_180dpi)
 " With each of these drivers, a binary copy is required on a PC to print.  Do",
 " not use `print`---use instead `copy file /b lpt1:`."
 END_HELP(epson_180dpi)
-#endif
+#endif /* TERM_HELP */

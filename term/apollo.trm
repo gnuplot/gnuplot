@@ -102,7 +102,7 @@ static void apollo_font_info(struct termentry *tbl, char *fname)
     pad_$inq_font(stream, &fwidth, &fheight, fname, name_$long_pnamlen_max,
 		  &flen, &status);
     apollo_check("inq_font");
-    fname[flen] = '\0';
+    fname[flen] = NUL;
 
     tbl->v_char = fheight;
     tbl->h_char = fwidth;
@@ -562,14 +562,15 @@ TERM_PUBLIC void APOLLO_reset()
 
 #ifdef TERM_TABLE
 TERM_TABLE_START(apollo_driver)
-"apollo",
-"Apollo Graphics Primitive Resource, rescaling of subsequent plots after window resizing",
-0, 0, 0, 0,			/* APOLLO_XMAX, APOLLO_YMAX, APOLLO_VCHAR, APOLLO_HCHAR, are filled in at run-time */
-APOLLO_VTIC, APOLLO_HTIC, options_null, APOLLO_init, APOLLO_reset,
-APOLLO_text, null_scale, APOLLO_graphics, APOLLO_move, APOLLO_vector,
-APOLLO_linetype, APOLLO_put_text, APOLLO_text_angle,
-APOLLO_justify_text, line_and_point, do_arrow, set_font_null
+    "apollo",
+    "Apollo Graphics Primitive Resource, rescaling of subsequent plots after window resizing",
+    0, 0, 0, 0,	/* APOLLO_XMAX, APOLLO_YMAX, APOLLO_VCHAR, APOLLO_HCHAR, are filled in at run-time */
+    APOLLO_VTIC, APOLLO_HTIC, options_null, APOLLO_init, APOLLO_reset,
+    APOLLO_text, null_scale, APOLLO_graphics, APOLLO_move, APOLLO_vector,
+    APOLLO_linetype, APOLLO_put_text, APOLLO_text_angle,
+    APOLLO_justify_text, line_and_point, do_arrow, set_font_null
 TERM_TABLE_END(apollo_driver)
+
 #undef LAST_TERM
 #define LAST_TERM apollo_driver
 
@@ -590,4 +591,4 @@ START_HELP(apollo)
 "",
 " If a fixed-size window is desired, the `gpr` terminal may be used instead."
 END_HELP(apollo)
-#endif
+#endif /* TERM_HELP */

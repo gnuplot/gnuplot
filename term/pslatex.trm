@@ -68,7 +68,7 @@ TERM_PUBLIC void PSLATEX_text __PROTO((void));
 TERM_PUBLIC void PSLATEX_move __PROTO((unsigned int x, unsigned int y));
 TERM_PUBLIC void PSLATEX_vector __PROTO((unsigned int x, unsigned int y));
 TERM_PUBLIC void PSLATEX_linetype __PROTO((int lt));
-TERM_PUBLIC void PSLATEX_point __PROTO((unsigned int x,unsigned int y, int number));
+TERM_PUBLIC void PSLATEX_point __PROTO((unsigned int x, unsigned int y, int number));
 TERM_PUBLIC void PSLATEX_pointsize __PROTO((double size));
 TERM_PUBLIC void PSLATEX_linewidth __PROTO((double width));
 
@@ -90,17 +90,17 @@ static int PSLATEX_angle;
 static int PSLATEX_justify;
 static int PSLATEX_rotate = TRUE;
 static char *PSLATEX_psfile = NULL;
-static TBOOLEAN PSLATEX_useAuxFile = FALSE; /* do we write two files? */
+static TBOOLEAN PSLATEX_useAuxFile = FALSE;	/* do we write two files? */
 static FILE *PSLATEX_auxFile;
-static TBOOLEAN PSLATEX_output = TRUE; /* do we write LaTeX? */
+static TBOOLEAN PSLATEX_output = TRUE;	/* do we write LaTeX? */
 
 struct text_command {
     int x, y, angle, justify;
-    char* label;
-    struct text_command* next;
+    char *label;
+    struct text_command *next;
 };
 
-static struct text_command* PSLATEX_labels;
+static struct text_command *PSLATEX_labels;
 
 TERM_PUBLIC void PSLATEX_options()
 {
@@ -113,62 +113,53 @@ TERM_PUBLIC void PSLATEX_options()
 	    c_token++;
 	}
     }
-
     if (!END_OF_COMMAND) {
 	if (almost_equals(c_token, "c$olor")
-	    || almost_equals(c_token,"c$olour")) {
+	    || almost_equals(c_token, "c$olour")) {
 	    ps_color = TRUE;
 	    c_token++;
 	}
     }
-
     if (!END_OF_COMMAND) {
 	if (almost_equals(c_token, "m$onochrome")) {
 	    ps_color = FALSE;
 	    c_token++;
 	}
     }
-
-	if (!END_OF_COMMAND) {
-		if (almost_equals(c_token,"so$lid")) {
-			ps_solid=TRUE;
-			c_token++;
-		}
-		else if (almost_equals(c_token,"da$shed")) {
-			ps_solid=FALSE;
-			c_token++;
-		}
+    if (!END_OF_COMMAND) {
+	if (almost_equals(c_token, "so$lid")) {
+	    ps_solid = TRUE;
+	    c_token++;
+	} else if (almost_equals(c_token, "da$shed")) {
+	    ps_solid = FALSE;
+	    c_token++;
 	}
-
+    }
     if (!END_OF_COMMAND) {
 	if (almost_equals(c_token, "r$otate")) {
 	    PSLATEX_rotate = TRUE;
 	    c_token++;
 	}
     }
-
     if (!END_OF_COMMAND) {
 	if (almost_equals(c_token, "n$orotate")) {
 	    PSLATEX_rotate = FALSE;
 	    c_token++;
 	}
     }
-
     if (!END_OF_COMMAND) {
 	if (almost_equals(c_token, "a$uxfile")) {
 	    PSLATEX_useAuxFile = TRUE;
 	    c_token++;
 	}
     }
-
-	if (!END_OF_COMMAND) {
-		/* We have font size specified */
-		struct value a;
-		int ps_fontsize = (int)real(const_express(&a));
-		term->v_char = (unsigned int)(ps_fontsize*PS_SC);
-		term->h_char = (unsigned int)(ps_fontsize*PS_SC/2);
-	}
-
+    if (!END_OF_COMMAND) {
+	/* We have font size specified */
+	struct value a;
+	int ps_fontsize = (int) real(const_express(&a));
+	term->v_char = (unsigned int) (ps_fontsize * PS_SC);
+	term->h_char = (unsigned int) (ps_fontsize * PS_SC / 2);
+    }
     /* be sure to generate an options string that PSLATEX_init understands */
 
     sprintf(term_options, "%s %s %s%s",
@@ -183,9 +174,9 @@ TERM_PUBLIC void PSLATEX_init()
     char *dotIndex;
 
     if (strcmp(term->name, "pstex") == 0)
-        PSLATEX_output = FALSE;
+	PSLATEX_output = FALSE;
 
-    PSLATEX_auxFile = NULL;  /* until we know otherwise */
+    PSLATEX_auxFile = NULL;	/* until we know otherwise */
     /* dont tweak PSLATEX_useAuxFile if we decide we cannot comply
      * since this affects subsequent plots even after a set out
      * Instead, we will use PSLATEX_auxFile != NULL to indicate
@@ -194,81 +185,79 @@ TERM_PUBLIC void PSLATEX_init()
 
     /* try to open the auxiliary file for the postscript parts. */
     if (outstr && PSLATEX_useAuxFile == TRUE &&
-        (dotIndex=strrchr(outstr,'.')) ) {
+	(dotIndex = strrchr(outstr, '.'))) {
 
 	/* assume file name is ending in ".tex" */
 	if (PSLATEX_psfile)
-		free(PSLATEX_psfile);
+	    free(PSLATEX_psfile);
 	PSLATEX_psfile = gp_alloc(dotIndex - outstr + 3, "pslatex aux filename");
 	if (PSLATEX_psfile) {
-	    safe_strncpy(PSLATEX_psfile, outstr, dotIndex-outstr+1); /* including . */
-	    strcpy(PSLATEX_psfile + (dotIndex-outstr) + 1,"ps");
-	    if ((PSLATEX_auxFile = fopen(PSLATEX_psfile,"w")) == (FILE *)NULL){
-		fprintf(stderr,"Cannot open aux file %s for output\n",
-			PSLATEX_psfile);
+            /* including . */
+	    safe_strncpy(PSLATEX_psfile, outstr, dotIndex - outstr + 1);
+	    strcpy(PSLATEX_psfile + (dotIndex - outstr) + 1, "ps");
+	    if ((PSLATEX_auxFile = fopen(PSLATEX_psfile, "w")) == (FILE *) NULL) {
+		fprintf(stderr, "Cannot open aux file %s for output\n",	PSLATEX_psfile);
 	    }
 	} else {
-	    fprintf(stderr,"Cannot make PostScript file name from %s\n",
-		    outstr);
-	    fprintf(stderr,"Turning off auxfile option\n");
+	    fprintf(stderr, "Cannot make PostScript file name from %s\n\
+Turning off auxfile option\n", outstr);
 	    PSLATEX_auxFile = NULL;
 	}
     }
-
     if (PSLATEX_output) {
-        fprintf(gpoutfile, "%% GNUPLOT: LaTeX picture with Postscript\n");
-	fprintf(gpoutfile, "\\begingroup%%\n");
-	fprintf(gpoutfile, "  \\makeatletter%%\n");
-	fprintf(gpoutfile, "  \\newcommand{\\GNUPLOTspecial}{%%\n");
-	fprintf(gpoutfile, "    \\@sanitize\\catcode`\\%%=14\\relax\\special}%%\n");
-	fprintf(gpoutfile, "  \\setlength{\\unitlength}{0.1bp}%%\n");
+	fputs("\
+%% GNUPLOT: LaTeX picture with Postscript\n\
+\\begingroup%%\n\
+  \\makeatletter%%\n\
+  \\newcommand{\\GNUPLOTspecial}{%%\n\
+    \\@sanitize\\catcode`\\%%=14\\relax\\special}%%\n\
+  \\setlength{\\unitlength}{0.1bp}%%\n", gpoutfile);
     } else {
 
-        /* write plain TeX header */
-
-        fprintf(gpoutfile, "%% GNUPLOT: plain TeX with Postscript\n");
-	fprintf(gpoutfile, "\\begingroup\n");
-	fprintf(gpoutfile, "  \\catcode`\\@=11\\relax\n");
-	fprintf(gpoutfile, "  \\def\\GNUPLOTspecial{%%\n");
-	fprintf(gpoutfile, "    \\def\\do##1{\\catcode`##1=12\\relax}\\dospecials\n");
-	fprintf(gpoutfile, "    \\catcode`\\{=1\\catcode`\\}=2\\catcode\\%%=14\\relax\\special}%%\n");
-	fprintf(gpoutfile, "%%\n");	
-	fprintf(gpoutfile, "\\expandafter\\ifx\\csname GNUPLOTpicture\\endcsname\\relax\n");
-	fprintf(gpoutfile, "  \\csname newdimen\\endcsname\\GNUPLOTunit\n");
-
-	fprintf(gpoutfile, "  \\gdef\\GNUPLOTpicture(#1,#2){\\vbox to#2\\GNUPLOTunit\\bgroup\n");
-	fprintf(gpoutfile, "    \\def\\put(##1,##2)##3{\\unskip\\raise##2\\GNUPLOTunit\n");
-	fprintf(gpoutfile, "      \\hbox to0pt{\\kern##1\\GNUPLOTunit ##3\\hss}\\ignorespaces}%%\n");
-	fprintf(gpoutfile, "    \\def\\ljust##1{\\vbox to0pt{\\vss\\hbox to0pt{##1\\hss}\\vss}}%%\n");
-	fprintf(gpoutfile, "    \\def\\cjust##1{\\vbox to0pt{\\vss\\hbox to0pt{\\hss ##1\\hss}\\vss}}%%\n");
-	fprintf(gpoutfile, "    \\def\\rjust##1{\\vbox to0pt{\\vss\\hbox to0pt{\\hss ##1}\\vss}}%%\n");
-	fprintf(gpoutfile, "    \\def\\stack##1{\\let\\\\=\\cr\\tabskip=0pt\\halign{\\hfil ####\\hfil\\cr ##1\\crcr}}%%\n");
-	fprintf(gpoutfile, "    \\def\\lstack##1{\\hbox to0pt{\\vbox to0pt{\\vss\\stack{##1}}\\hss}}%%\n");
-	fprintf(gpoutfile, "    \\def\\cstack##1{\\hbox to0pt{\\hss\\vbox to0pt{\\vss\\stack{##1}}\\hss}}%%\n");
-	fprintf(gpoutfile, "    \\def\\rstack##1{\\hbox to0pt{\\vbox to0pt{\\stack{##1}\\vss}\\hss}}%%\n");
-	fprintf(gpoutfile, "    \\vss\\hbox to#1\\GNUPLOTunit\\bgroup\\ignorespaces}%%\n");
-	fprintf(gpoutfile, "  \\gdef\\endGNUPLOTpicture{\\hss\\egroup\\egroup}%%\n");
-	fprintf(gpoutfile, "\\fi\n");
-	fprintf(gpoutfile, "\\GNUPLOTunit=0.1bp\n");
+	/* write plain TeX header */
+	fputs("\
+%% GNUPLOT: plain TeX with Postscript\n\
+\\begingroup\n\
+  \\catcode`\\@=11\\relax\n\
+  \\def\\GNUPLOTspecial{%%\n\
+    \\def\\do##1{\\catcode`##1=12\\relax}\\dospecials\n\
+    \\catcode`\\{=1\\catcode`\\}=2\\catcode\\%%=14\\relax\\special}%%\n\
+%%\n\
+\\expandafter\\ifx\\csname GNUPLOTpicture\\endcsname\\relax\n\
+  \\csname newdimen\\endcsname\\GNUPLOTunit\n\
+  \\gdef\\GNUPLOTpicture(#1,#2){\\vbox to#2\\GNUPLOTunit\\bgroup\n\
+    \\def\\put(##1,##2)##3{\\unskip\\raise##2\\GNUPLOTunit\n\
+      \\hbox to0pt{\\kern##1\\GNUPLOTunit ##3\\hss}\\ignorespaces}%%\n\
+    \\def\\ljust##1{\\vbox to0pt{\\vss\\hbox to0pt{##1\\hss}\\vss}}%%\n\
+    \\def\\cjust##1{\\vbox to0pt{\\vss\\hbox to0pt{\\hss ##1\\hss}\\vss}}%%\n\
+    \\def\\rjust##1{\\vbox to0pt{\\vss\\hbox to0pt{\\hss ##1}\\vss}}%%\n\
+    \\def\\stack##1{\\let\\\\=\\cr\\tabskip=0pt\\halign{\\hfil ####\\hfil\\cr ##1\\crcr}}%%\n\
+    \\def\\lstack##1{\\hbox to0pt{\\vbox to0pt{\\vss\\stack{##1}}\\hss}}%%\n\
+    \\def\\cstack##1{\\hbox to0pt{\\hss\\vbox to0pt{\\vss\\stack{##1}}\\hss}}%%\n\
+    \\def\\rstack##1{\\hbox to0pt{\\vbox to0pt{\\stack{##1}\\vss}\\hss}}%%\n\
+    \\vss\\hbox to#1\\GNUPLOTunit\\bgroup\\ignorespaces}%%\n\
+  \\gdef\\endGNUPLOTpicture{\\hss\\egroup\\egroup}%%\n\
+\\fi\n\
+\\GNUPLOTunit=0.1bp\n", gpoutfile);
     }
 
-	{
-		unsigned int xmin_t = xoffset * PSLATEX_XMAX / PS_SC;
-		unsigned int xmax_t = (xoffset+xsize) * PSLATEX_XMAX / PS_SC;
-		unsigned int ymin_t = yoffset * PSLATEX_YMAX / PS_SC;
-		unsigned int ymax_t = (yoffset+ysize) * PSLATEX_YMAX / PS_SC;
+    {
+	unsigned int xmin_t = xoffset * PSLATEX_XMAX / PS_SC;
+	unsigned int xmax_t = (xoffset + xsize) * PSLATEX_XMAX / PS_SC;
+	unsigned int ymin_t = yoffset * PSLATEX_YMAX / PS_SC;
+	unsigned int ymax_t = (yoffset + ysize) * PSLATEX_YMAX / PS_SC;
 
-		if (PSLATEX_auxFile) {
-			FILE *tmp = gpoutfile;
-			gpoutfile = PSLATEX_auxFile;
-			PS_common_init(1,1,0, 0,0, xmin_t, ymin_t, xmax_t, ymax_t, NULL);
-			gpoutfile = tmp;
-		} else {
-			fprintf(gpoutfile, "{\\GNUPLOTspecial{!\n");
-			PS_common_init(1,1,0, 0,0, xmin_t, ymin_t, xmax_t, ymax_t, NULL);
-			fprintf(gpoutfile, "}}%%\n");
-		}
+	if (PSLATEX_auxFile) {
+	    FILE *tmp = gpoutfile;
+	    gpoutfile = PSLATEX_auxFile;
+	    PS_common_init(1, 1, 0, 0, 0, xmin_t, ymin_t, xmax_t, ymax_t, NULL);
+	    gpoutfile = tmp;
+	} else {
+	    fputs("{\\GNUPLOTspecial{!\n", gpoutfile);
+	    PS_common_init(1, 1, 0, 0, 0, xmin_t, ymin_t, xmax_t, ymax_t, NULL);
+	    fputs("}}%%\n", gpoutfile);
 	}
+    }
 
     PSLATEX_angle = 0;
     PSLATEX_justify = 0;
@@ -280,9 +269,10 @@ TERM_PUBLIC void PSLATEX_graphics()
     struct termentry *t = term;
 
     if (PSLATEX_output)
-        fprintf(gpoutfile, "\\begin{picture}(%d,%d)(0,0)%%\n", (int)(xsize*t->xmax), (int)(ysize*t->ymax));
+	fprintf(gpoutfile, "\\begin{picture}(%d,%d)(0,0)%%\n", (int) (xsize * t->xmax), (int)
+		(ysize * t->ymax));
     else
-        fprintf(gpoutfile, "\\GNUPLOTpicture(%d,%d)\n", (int)(xsize*t->xmax), (int)(ysize*t->ymax));
+	fprintf(gpoutfile, "\\GNUPLOTpicture(%d,%d)\n", (int) (xsize * t->xmax), (int) (ysize * t->ymax));
 
     if (PSLATEX_auxFile) {
 	FILE *tmp;
@@ -290,39 +280,39 @@ TERM_PUBLIC void PSLATEX_graphics()
 	 * these are taken from the post.trm file computation
 	 * of the bounding box, but without the X_OFF and Y_OFF
 	 */
-	int urx = (int)(xsize * (PS_XMAX) / PS_SC + 0.5),
-	    ury = (int)(ysize * (PS_YMAX) / PS_SC + 0.5);
+	int urx = (int) (xsize * (PS_XMAX) / PS_SC + 0.5), ury = (int) (ysize * (PS_YMAX) / PS_SC
+									+ 0.5);
 
 	/* generate special which xdvi and dvips can handle */
 	fprintf(gpoutfile,
 		"\\special{psfile=%s llx=0 lly=0 urx=%d ury=%d rwi=%d}\n",
-		PSLATEX_psfile, urx, ury, 10*urx);
+		PSLATEX_psfile, urx, ury, 10 * urx);
 	tmp = gpoutfile;
 	gpoutfile = PSLATEX_auxFile;
 	PS_graphics();
 	gpoutfile = tmp;
     } else {
-	fprintf(gpoutfile, "{\\GNUPLOTspecial{\"\n");
+	fputs("{\\GNUPLOTspecial{\"\n", gpoutfile);
 	PS_graphics();
     }
 
-    PSLATEX_labels = (struct text_command *)NULL;
+    PSLATEX_labels = (struct text_command *) NULL;
 }
 
 TERM_PUBLIC void PSLATEX_put_text(x, y, str)
 unsigned int x, y;
 char str[];
 {
-    struct text_command* tc;
+    struct text_command *tc;
 
     /* ignore empty strings */
-    if (str[0] == '\0')
+    if (str[0] == NUL)
 	return;
-	
-    tc = (struct text_command*)gp_alloc(sizeof(struct text_command), term->name);
+
+    tc = (struct text_command *) gp_alloc(sizeof(struct text_command), term->name);
     tc->x = x;
     tc->y = y;
-    tc->label = (char *)gp_alloc(strlen(str) + 1, term->name);
+    tc->label = (char *) gp_alloc(strlen(str) + 1, term->name);
     strcpy(tc->label, str);
     tc->justify = PSLATEX_justify;
     tc->angle = PSLATEX_angle;
@@ -352,7 +342,7 @@ TERM_PUBLIC void PSLATEX_reset()
 {
     if (PSLATEX_auxFile) {
 	fclose(PSLATEX_auxFile);
-	PSLATEX_auxFile=NULL;
+	PSLATEX_auxFile = NULL;
     }
     if (PSLATEX_psfile) {
 	free(PSLATEX_psfile);
@@ -362,7 +352,7 @@ TERM_PUBLIC void PSLATEX_reset()
 
 TERM_PUBLIC void PSLATEX_text()
 {
-    struct text_command* tc;
+    struct text_command *tc;
 
     if (PSLATEX_auxFile) {
 	FILE *tmp = gpoutfile;
@@ -371,64 +361,66 @@ TERM_PUBLIC void PSLATEX_text()
 	gpoutfile = tmp;
     } else {
 	PS_text();
-	fprintf(gpoutfile, "}}%%\n");
+	fputs("}}%%\n", gpoutfile);
     }
 
-    for (tc = PSLATEX_labels; tc != (struct text_command*)NULL; tc = tc->next) {
+    for (tc = PSLATEX_labels; tc != (struct text_command *) NULL; tc = tc->next) {
 	fprintf(gpoutfile, "\\put(%d,%d){", tc->x, tc->y);
-        if (PSLATEX_output &&
-                     ((tc->label[0] == '{') || (tc->label[0] == '['))) {
-           fprintf(gpoutfile, "\\makebox(0,0)%s", tc->label);
-        } else switch (tc->angle) {
-	case 0:
-	    switch (tc->justify) {
-	    case LEFT:
-		fprintf(gpoutfile, (PSLATEX_output
-				  ? "\\makebox(0,0)[l]{%s}"
-				  : "\\ljust{%s}"), tc->label);
+	if (PSLATEX_output &&
+	    ((tc->label[0] == '{') || (tc->label[0] == '['))) {
+	    fprintf(gpoutfile, "\\makebox(0,0)%s", tc->label);
+	} else
+	    switch (tc->angle) {
+	    case 0:
+		switch (tc->justify) {
+		case LEFT:
+		    fprintf(gpoutfile, (PSLATEX_output
+					? "\\makebox(0,0)[l]{%s}"
+					: "\\ljust{%s}"), tc->label);
+		    break;
+		case CENTRE:
+		    fprintf(gpoutfile, (PSLATEX_output
+					? "\\makebox(0,0){%s}"
+					: "\\cjust{%s}"), tc->label);
+		    break;
+		case RIGHT:
+		    fprintf(gpoutfile, (PSLATEX_output
+					? "\\makebox(0,0)[r]{%s}"
+					: "\\rjust{%s}"), tc->label);
+		    break;
+		}
 		break;
-	    case CENTRE:
-		fprintf(gpoutfile, (PSLATEX_output
-				  ? "\\makebox(0,0){%s}"
-				  : "\\cjust{%s}"), tc->label);
-		break;
-	    case RIGHT:
-		fprintf(gpoutfile, (PSLATEX_output
-				  ? "\\makebox(0,0)[r]{%s}"
-				  : "\\rjust{%s}"), tc->label);
-		break;
+	    case 1:		/* put text in a short stack */
+		if (PSLATEX_rotate) {
+		    fputs("\
+%%\n\\special{ps: gsave currentpoint currentpoint translate\n\
+270 rotate neg exch neg exch translate}%%\n", gpoutfile);
+		}
+		switch (tc->justify) {
+		case LEFT:
+		    fprintf(gpoutfile, (PSLATEX_output
+					? "\\makebox(0,0)[lb]{\\shortstack{%s}}"
+					: "\\lstack{%s}"),
+			    tc->label);
+		    break;
+		case CENTRE:
+		    fprintf(gpoutfile, (PSLATEX_output
+					? "\\makebox(0,0)[b]{\\shortstack{%s}}"
+					: "\\cstack{%s}"),
+			    tc->label);
+		    break;
+		case RIGHT:
+		    fprintf(gpoutfile, (PSLATEX_output
+					? "\\makebox(0,0)[lt]{\\shortstack{%s}}"
+					: "\\rstack{%s}"),
+			    tc->label);
+		    break;
+		}
+		if (PSLATEX_rotate) {
+		    fputs("%%\n\\special{ps: currentpoint grestore moveto}%%\n", gpoutfile);
+		}
 	    }
-	    break;
-	case 1: /* put text in a short stack */
-	    if (PSLATEX_rotate) {
-	        fprintf(gpoutfile, "%%\n\\special{ps: gsave currentpoint currentpoint translate\n");
-	        fprintf(gpoutfile, "270 rotate neg exch neg exch translate}%%\n");
-	    }
-	    switch (tc->justify) {
-	    case LEFT:
-		fprintf(gpoutfile, (PSLATEX_output
-				  ? "\\makebox(0,0)[lb]{\\shortstack{%s}}"
-				  : "\\lstack{%s}"),
-			tc->label);
-		break;
-	    case CENTRE:
-		fprintf(gpoutfile, (PSLATEX_output
-				  ? "\\makebox(0,0)[b]{\\shortstack{%s}}"
-				  : "\\cstack{%s}"),
-			tc->label);
-		break;
-	    case RIGHT:
-		fprintf(gpoutfile, (PSLATEX_output
-				  ? "\\makebox(0,0)[lt]{\\shortstack{%s}}"
-				  : "\\rstack{%s}"),
-			tc->label);
-		break;
-	    }
-	    if (PSLATEX_rotate) {
-	        fprintf(gpoutfile, "%%\n\\special{ps: currentpoint grestore moveto}%%\n");
-	    }
-	}
-	fprintf(gpoutfile, "}%%\n");
+	fputs("}%%\n", gpoutfile);
     }
 
     while (PSLATEX_labels) {
@@ -439,41 +431,43 @@ TERM_PUBLIC void PSLATEX_text()
     }
 
     if (PSLATEX_output) {
-        fprintf(gpoutfile, "\\end{picture}%%\n");
-	fprintf(gpoutfile, "\\endgroup\n");
-	fprintf(gpoutfile, "\\endinput\n");
+	fputs("\
+\\end{picture}%%\n\
+\\endgroup\n\
+\\endinput\n", gpoutfile);
     } else {
-	fprintf(gpoutfile, "\\endGNUPLOTpicture\n");
-	fprintf(gpoutfile, "\\endgroup\n");
-	fprintf(gpoutfile, "\\endinput\n");
+	fputs("\
+\\endGNUPLOTpicture\n\
+\\endgroup\n\
+\\endinput\n", gpoutfile);
     }
 }
 
-TERM_PUBLIC void PSLATEX_move(x,y)
-unsigned int x,y;
+TERM_PUBLIC void PSLATEX_move(x, y)
+unsigned int x, y;
 {
     if (PSLATEX_auxFile) {
 	FILE *tmp = gpoutfile;
 	gpoutfile = PSLATEX_auxFile;
-	PS_move(x,y);
-	gpoutfile=tmp;
-    } else {
-	PS_move(x,y);
-    }
-}
-
-
-TERM_PUBLIC void PSLATEX_vector(x,y)
-unsigned int x,y;
-{
-
-    if (PSLATEX_auxFile) {
-	FILE *tmp = gpoutfile;
-	gpoutfile = PSLATEX_auxFile;
-	PS_vector(x,y);
+	PS_move(x, y);
 	gpoutfile = tmp;
     } else {
-	PS_vector(x,y);
+	PS_move(x, y);
+    }
+}
+
+
+TERM_PUBLIC void PSLATEX_vector(x, y)
+unsigned int x, y;
+{
+
+    if (PSLATEX_auxFile) {
+	FILE *tmp = gpoutfile;
+	gpoutfile = PSLATEX_auxFile;
+	PS_vector(x, y);
+	gpoutfile = tmp;
+    } else {
+	PS_vector(x, y);
     }
 }
 
@@ -491,17 +485,17 @@ int lt;
     }
 }
 
-TERM_PUBLIC void PSLATEX_point(x,y,number)
-unsigned int x,y;
+TERM_PUBLIC void PSLATEX_point(x, y, number)
+unsigned int x, y;
 int number;
 {
     if (PSLATEX_auxFile) {
 	FILE *tmp = gpoutfile;
 	gpoutfile = PSLATEX_auxFile;
-	PS_point(x,y,number);
+	PS_point(x, y, number);
 	gpoutfile = tmp;
     } else
-	PS_point(x,y,number);
+	PS_point(x, y, number);
 }
 
 
@@ -541,14 +535,15 @@ double ps;
 #endif
 
 TERM_TABLE_START(pslatex_driver)
-    "pslatex", "LaTeX picture environment with PostScript \\specials",
-	PSLATEX_XMAX, PSLATEX_YMAX, PSLATEX_VCHAR, PSLATEX_HCHAR,
-	PS_VTIC, PS_HTIC, PSLATEX_options, PSLATEX_init, PSLATEX_reset,
-	PSLATEX_text, null_scale, PSLATEX_graphics, PSLATEX_move,
-	PSLATEX_vector,	PSLATEX_linetype, PSLATEX_put_text, PSLATEX_text_angle,
-	PSLATEX_justify_text, PSLATEX_point, do_arrow, set_font_null,
-	PSLATEX_pointsize, 0 /*flags*/, 0/*suspend*/,0/*resume*/,0/*fillbox*/,
-	PSLATEX_linewidth
+   "pslatex", "LaTeX picture environment with PostScript \\specials",
+    PSLATEX_XMAX, PSLATEX_YMAX, PSLATEX_VCHAR, PSLATEX_HCHAR,
+    PS_VTIC, PS_HTIC, PSLATEX_options, PSLATEX_init, PSLATEX_reset,
+    PSLATEX_text, null_scale, PSLATEX_graphics, PSLATEX_move,
+    PSLATEX_vector, PSLATEX_linetype, PSLATEX_put_text, PSLATEX_text_angle,
+    PSLATEX_justify_text, PSLATEX_point, do_arrow, set_font_null,
+    PSLATEX_pointsize, 0 /*flags */ , 0 /*suspend */,
+    0 /*resume */ , 0 /*fillbox */ ,
+    PSLATEX_linewidth
 TERM_TABLE_END(pslatex_driver)
 
 #undef LAST_TERM
@@ -556,13 +551,14 @@ TERM_TABLE_END(pslatex_driver)
 
 TERM_TABLE_START(pstex_driver)
     "pstex", "plain TeX with PostScript \\specials",
-	PSLATEX_XMAX, PSLATEX_YMAX, PSLATEX_VCHAR, PSLATEX_HCHAR,
-	PS_VTIC, PS_HTIC, PSLATEX_options, PSLATEX_init, PSLATEX_reset,
-	PSLATEX_text, null_scale, PSLATEX_graphics, PSLATEX_move,
-	PSLATEX_vector,	PSLATEX_linetype, PSLATEX_put_text, PSLATEX_text_angle,
-	PSLATEX_justify_text, PSLATEX_point, do_arrow, set_font_null,
-	PSLATEX_pointsize, 0 /*flags*/, 0/*suspend*/,0/*resume*/,0/*fillbox*/,
-	PSLATEX_linewidth
+    PSLATEX_XMAX, PSLATEX_YMAX, PSLATEX_VCHAR, PSLATEX_HCHAR,
+    PS_VTIC, PS_HTIC, PSLATEX_options, PSLATEX_init, PSLATEX_reset,
+    PSLATEX_text, null_scale, PSLATEX_graphics, PSLATEX_move,
+    PSLATEX_vector, PSLATEX_linetype, PSLATEX_put_text, PSLATEX_text_angle,
+    PSLATEX_justify_text, PSLATEX_point, do_arrow, set_font_null,
+    PSLATEX_pointsize, 0 /*flags */ , 0 /*suspend */, 
+    0 /*resume */ , 0 /*fillbox */ ,
+    PSLATEX_linewidth
 TERM_TABLE_END(pstex_driver)
 
 #undef LAST_TERM
@@ -633,5 +629,4 @@ START_HELP(pslatex)
 "",
 " Linewidths and pointsizes may be changed with `set linestyle`."
 END_HELP(pslatex)
-#endif
-
+#endif /* TERM_HELP */

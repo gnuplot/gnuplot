@@ -82,7 +82,6 @@ TERM_PUBLIC void ATARI_point __PROTO((unsigned int x, unsigned int y, int number
 #define ATARI_HTIC (ATARI_XMAX/100)
 #define ATARI_VTIC ATARI_HTIC
 
-#define GOT_ATARI_PROTO
 #endif /* TERM_PROTO */
 
 #ifndef TERM_PROTO_ONLY
@@ -188,9 +187,9 @@ static void text_mode(void)
 	if (!cursor_is_on) {
 	    cursor_is_on = TRUE;
 	    graf_mouse(M_OFF, NULL);
-	    fprintf(stderr, "\033e");
+	    fputs("\033e", stderr);
 	}
-	fprintf(stderr, "\033E");
+	fputs("\033E", stderr);
     }
 }
 
@@ -200,7 +199,7 @@ static void mouse_mode(void)
 	if (cursor_is_on) {
 	    cursor_is_on = FALSE;
 	    graf_mouse(M_ON, NULL);
-	    fprintf(stderr, "\033f");
+	    fputs("\033f", stderr);
 	}
     }
 }
@@ -480,7 +479,7 @@ TERM_PUBLIC void ATARI_options()
 		strcpy(opt, opt + 1);
 	    }
 	    ATARI_colors[i - 1] = strtoul(opt, &tok_end, 16);
-	    if (*tok_end != '\0') {
+	    if (*tok_end != NUL) {
 		ATARI_numpalette = 0;
 		ATARI_c_height = ATARI_c_height_default;
 		term_options[0] = NUL;
@@ -712,14 +711,15 @@ TERM_PUBLIC void ATARI_point(unsigned int x, unsigned int y, int number)
 #ifdef TERM_TABLE
 
 TERM_TABLE_START(atari_driver)
-"atari", "Atari AES-Terminal",
-ATARI_XMAX, ATARI_YMAX, ATARI_VCHAR, ATARI_HCHAR,
-ATARI_VTIC, ATARI_HTIC, ATARI_options, ATARI_init, ATARI_reset,
-ATARI_text, null_scale, ATARI_graphics, ATARI_move, ATARI_vector,
-ATARI_linetype, ATARI_put_text, ATARI_text_angle,
-ATARI_justify_text, ATARI_point, do_arrow, set_font_null,
-0, TERM_CAN_MULTIPLOT, 0, 0
+    "atari", "Atari AES-Terminal",
+    ATARI_XMAX, ATARI_YMAX, ATARI_VCHAR, ATARI_HCHAR,
+    ATARI_VTIC, ATARI_HTIC, ATARI_options, ATARI_init, ATARI_reset,
+    ATARI_text, null_scale, ATARI_graphics, ATARI_move, ATARI_vector,
+    ATARI_linetype, ATARI_put_text, ATARI_text_angle,
+    ATARI_justify_text, ATARI_point, do_arrow, set_font_null,
+    0, TERM_CAN_MULTIPLOT, 0, 0
 TERM_TABLE_END(atari_driver)
+
 #undef LAST_TERM
 #define LAST_TERM atari_driver
 

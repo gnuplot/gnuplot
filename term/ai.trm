@@ -108,9 +108,9 @@ TERM_PUBLIC int AI_set_font __PROTO((char *font));
 #ifndef TERM_PROTO_ONLY
 #ifdef TERM_BODY
 
-char ai_font[MAX_ID_LEN+1] = "Times-Roman";	/* name of font */
+char ai_font[MAX_ID_LEN + 1] = "Times-Roman";	/* name of font */
 int ai_fontsize = 14;		/* size of font in pts */
-char ai_oldfont[MAX_ID_LEN+1] = "Times-Roman";	/* name of font */
+char ai_oldfont[MAX_ID_LEN + 1] = "Times-Roman";	/* name of font */
 int ai_oldfontsize = 14;	/* size of font in pts */
 TBOOLEAN ai_color = FALSE;
 TBOOLEAN ai_stroke = FALSE;
@@ -480,19 +480,20 @@ TERM_PUBLIC void AI_resume()
 #ifdef TERM_TABLE
 
 TERM_TABLE_START(aifm_driver)
-"aifm", "Adobe Illustrator 3.0 Format",
-AI_XMAX, AI_YMAX, AI_VCHAR, AI_HCHAR,
-AI_VTIC, AI_HTIC, AI_options, AI_init, AI_reset,
-AI_text, null_scale, AI_graphics, AI_move, AI_vector,
-AI_linetype, AI_put_text, AI_text_angle,
-AI_justify_text, do_point, do_arrow, AI_set_font,
-NULL, 0, AI_suspend, AI_resume
+    "aifm", "Adobe Illustrator 3.0 Format",
+    AI_XMAX, AI_YMAX, AI_VCHAR, AI_HCHAR,
+    AI_VTIC, AI_HTIC, AI_options, AI_init, AI_reset,
+    AI_text, null_scale, AI_graphics, AI_move, AI_vector,
+    AI_linetype, AI_put_text, AI_text_angle,
+    AI_justify_text, do_point, do_arrow, AI_set_font,
+    NULL, 0, AI_suspend, AI_resume
 TERM_TABLE_END(aifm_driver)
+
 #undef LAST_TERM
 #define LAST_TERM aifm_driver
-#endif
-#endif /* TERM_PROTO_ONLY */
 
+#endif /* TERM_TABLE */
+#endif /* TERM_PROTO_ONLY */
 
 #ifdef TERM_HELP
 START_HELP(aifm)
@@ -523,4 +524,4 @@ START_HELP(aifm)
 "       set term aifm 22",
 "       set size 0.7,1.4; set term aifm color \"Times-Roman\" 14"
 END_HELP(ai)
-#endif
+#endif /* TERM_HELP */

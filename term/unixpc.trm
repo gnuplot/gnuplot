@@ -96,8 +96,8 @@ TERM_PUBLIC void uPC_reset __PROTO((void));
 #define uPC_YMAX 300
 #define uPC_VCHAR FNT5X9_VCHAR
 #define uPC_HCHAR FNT5X9_HCHAR
-#define uPC_VTIC  uPC_VCHAR/2  /* Was 8  */
-#define uPC_HTIC  uPC_HCHAR    /* Was 12 */
+#define uPC_VTIC  uPC_VCHAR/2	/* Was 8  */
+#define uPC_HTIC  uPC_HCHAR	/* Was 12 */
 #endif /* TERM_PROTO */
 
 #ifndef TERM_PROTO_ONLY
@@ -105,7 +105,7 @@ TERM_PUBLIC void uPC_reset __PROTO((void));
 void uPC_fixwind __PROTO((int signo));
 void uPC_putc __PROTO((unsigned int x, unsigned int y, int c, int angle));
 void uPC_plot_word __PROTO((unsigned short *a, unsigned short b));
-#include <sys/window.h>   /* Started with tam.h--too much trouble. */
+#include <sys/window.h>		/* Started with tam.h--too much trouble. */
 #include <sys/signal.h>
 #include <errno.h>
 
@@ -115,28 +115,31 @@ typedef unsigned short Scr_type;
 typedef unsigned char Scr_kluge;
 
 
-#define uPC_XSIZE       45 /* Short ints. */
+#define uPC_XSIZE       45	/* Short ints. */
 #define uPC_YSIZE uPC_YMAX
 
 Scr_type uPC_display[uPC_YSIZE][uPC_XSIZE];
-int uPC_width = 2*uPC_XSIZE;
-int uPC_sx=0, uPC_sy=0;
-int uPC_cur_linetype=0;
+int uPC_width = 2 * uPC_XSIZE;
+int uPC_sx = 0, uPC_sy = 0;
+int uPC_cur_linetype = 0;
 int uPC_angle = 0;
-unsigned short uPC_raster_count=0;
-static Scr_type lookup[] = {
-      0x0001, 0x0002, 0x0004, 0x0008,
-      0x0010, 0x0020, 0x0040, 0x0080,
-      0x0100, 0x0200, 0x0400, 0x0800,
-      0x1000, 0x2000, 0x4000, 0x8000,
-   };
+unsigned short uPC_raster_count = 0;
+static Scr_type lookup[] =
+{
+    0x0001, 0x0002, 0x0004, 0x0008,
+    0x0010, 0x0020, 0x0040, 0x0080,
+    0x0100, 0x0200, 0x0400, 0x0800,
+    0x1000, 0x2000, 0x4000, 0x8000,
+};
 
 #define uPC_XLAST (uPC_XMAX - 1)
 #define uPC_YLAST (uPC_YMAX - 1)
 
 
-static struct urdata uPC_ur = {(unsigned short *)uPC_display, 2*uPC_XSIZE, 0, 0,
-                           0, 0, 0, 0, uPC_XMAX, uPC_YMAX, SRCSRC, DSTOR, 0};
+static struct urdata uPC_ur = { (unsigned short *) uPC_display,
+				2 * uPC_XSIZE, 0, 0, 0, 0, 0, 0,
+				uPC_XMAX, uPC_YMAX, SRCSRC, DSTOR, 0
+};
 
 #define IfErrOut(e1,e2,s1,s2) if (e1 e2) {\
 fprintf(stderr, "%s:: %s %s\n", sys_errlist[errno], s1, s2);\
@@ -145,54 +148,53 @@ exit(-1);}
 
 TERM_PUBLIC void uPC_init()
 {
-/* This routine will ioctl to change 0 size */
-   int i;
-   struct uwdata uw;
-   int uPC_fixwind();
-   short gw;
+    /* This routine will ioctl to change 0 size */
+    int i;
+    struct uwdata uw;
+    int uPC_fixwind();
+    short gw;
 
-/* Check that we are on the bitmapped window. */
-   if (iswind() != 0) {
-      fprintf (stderr, "Sorry--must run from the bitmapped terminal\n");
-      exit(-1);
-   }
-   for (i=1; i<=16; i++) {
-      if (i != SIGINT && i != SIGFPE)  /* Two are caught in plot.c */
-         signal (i, uPC_fixwind);
-   }
+    /* Check that we are on the bitmapped window. */
+    if (iswind() != 0) {
+	fputs("Sorry--must run from the bitmapped terminal\n", stderr);
+	exit(-1);
+    }
+    for (i = 1; i <= 16; i++) {
+	if (i != SIGINT && i != SIGFPE)		/* Two are caught in plot.c */
+	    signal(i, uPC_fixwind);
+    }
 
 /* Increase the screen size */
-   uw.uw_x = 0;
-   uw.uw_y = 0;   /* Leave room for top status line. */
-   uw.uw_width = uPC_XMAX;      /* 720 */
-   uw.uw_height = uPC_YMAX;     /* 288 normal--we clobber 12 (top row)*/
-   uw.uw_uflags = 1;         /* Creates with no border */
+    uw.uw_x = 0;
+    uw.uw_y = 0;		/* Leave room for top status line. */
+    uw.uw_width = uPC_XMAX;	/* 720 */
+    uw.uw_height = uPC_YMAX;	/* 288 normal--we clobber 12 (top row) */
+    uw.uw_uflags = 1;		/* Creates with no border */
 
-   IfErrOut (ioctl(1, WIOCSETD, &uw), <0, "ioctl failed on", "WIOCSETD");
+    IfErrOut(ioctl(1, WIOCSETD, &uw), <0, "ioctl failed on", "WIOCSETD");
 }
 
 
 TERM_PUBLIC void uPC_graphics()
 {
 /* This routine will clear the uPC_display buffer and window. */
-   register Scr_type *j;
-   register int i;
+    register Scr_type *j;
+    register int i;
 
-   j = (Scr_type *)uPC_display;
-   i = uPC_YSIZE*uPC_XSIZE + 1;
+    j = (Scr_type *) uPC_display;
+    i = uPC_YSIZE * uPC_XSIZE + 1;
 
-   while (--i)
-      *j++ = 0;
-/*
-   Position the cursor to the bottom of the screen so when we come back to
-   text mode we are just below the graph.
-*/
-   printf ("\033[25;1H");
+    while (--i)
+	*j++ = 0;
+   /* Position the cursor to the bottom of the screen so when we come back to
+    * text mode we are just below the graph.
+    */
+    fputs("\033[25;1H", stdout);
 
-   uPC_ur.ur_dstop = DSTSRC;   /* replace (clear screen). */
-   IfErrOut (ioctl(1, WIOCRASTOP, &uPC_ur), <0,
-      "ioctl failed", "WIOCRASTOP");
-   uPC_ur.ur_dstop = DSTOR;   /* Or in (show text) */
+    uPC_ur.ur_dstop = DSTSRC;	/* replace (clear screen). */
+    IfErrOut(ioctl(1, WIOCRASTOP, &uPC_ur), <0,
+	     "ioctl failed", "WIOCRASTOP");
+    uPC_ur.ur_dstop = DSTOR;	/* Or in (show text) */
 }
 
 
@@ -200,8 +202,8 @@ TERM_PUBLIC void uPC_text()
 {
 /* This routine will flush the display. */
 
-   IfErrOut (ioctl(1, WIOCRASTOP, &uPC_ur), <0,
-      "ioctl failed", "WIOCRASTOP");
+    IfErrOut(ioctl(1, WIOCRASTOP, &uPC_ur), <0,
+	     "ioctl failed", "WIOCRASTOP");
 }
 
 
@@ -209,19 +211,19 @@ TERM_PUBLIC void uPC_linetype(linetype)
 int linetype;
 {
 /* This routine records the current linetype. */
-   if (uPC_cur_linetype != linetype) {
-      uPC_raster_count = 0;
-      uPC_cur_linetype = linetype;
-   }
+    if (uPC_cur_linetype != linetype) {
+	uPC_raster_count = 0;
+	uPC_cur_linetype = linetype;
+    }
 }
 
 
-TERM_PUBLIC void uPC_move(x,y)
-unsigned int x,y;
+TERM_PUBLIC void uPC_move(x, y)
+unsigned int x, y;
 {
 /* This routine just records x and y in uPC_sx, uPC_sy */
-   uPC_sx = x;
-   uPC_sy = y;
+    uPC_sx = x;
+    uPC_sy = y;
 }
 
 
@@ -229,7 +231,7 @@ unsigned int x,y;
 #define uPC_PLOT(a,b)   (uPC_cur_linetype != 0 ? uPC_plot_word (a,b) :\
                                 (*(a)|=(b)))
 
-void uPC_plot_word(a,b)
+void uPC_plot_word(a, b)
 Scr_type *a, b;
 /*
    Weak attempt to make line styles.  The real problem is the aspect
@@ -242,228 +244,234 @@ Scr_type *a, b;
 */
 {
 /* Various line types */
-   switch (uPC_cur_linetype) {
-   case -1:
-   /* Distinguish between horizontal and vertical axis. */
-      if (uPC_sx > uPC_XMAX/8 && uPC_sx < 7*uPC_XMAX/8) {
-      /* Fuzzy tolerance because we don't know exactly where the y axis is */
-         if (++uPC_raster_count % 2 == 0) *(a) |= b;
-      }
-      else {
-      /* Due to aspect ratio, take every other y pixel and every third x. */
-         *(a) |= (b & 0x9999);
-      }
-   break;
-   case 1:
-   case 5:
-   /* Make a |    |----|    |----| type of line. */
-      if ((1<<uPC_raster_count) & 0xF0F0) *(a) |= b;
-      if (++uPC_raster_count > 15) uPC_raster_count = 0;
-   break;
-   case 2:
-   case 6:
-   /* Make a |----|----|----|--- |    | type of line. */
-      if ((1<<uPC_raster_count) & 0x0EFFF) *(a) |= b;
-      if (++uPC_raster_count > 19) uPC_raster_count = 0;
-   break;
-   case 3:
-   case 7:
-   /* Make a | -  | -  | -  | -  | type of line. */
-      if ((1<<uPC_raster_count) & 0x4444) *(a) |= b;
-      if (++uPC_raster_count > 15) uPC_raster_count = 0;
-   break;
-   case 4:
-   case 8:
-   default:
-      *(a) |= b;
-   break;
-   }
+    switch (uPC_cur_linetype) {
+    case -1:
+	/* Distinguish between horizontal and vertical axis. */
+	if (uPC_sx > uPC_XMAX / 8 && uPC_sx < 7 * uPC_XMAX / 8) {
+	    /* Fuzzy tolerance because we don't know exactly where the y axis is */
+	    if (++uPC_raster_count % 2 == 0)
+		*(a) |= b;
+	} else {
+	    /* Due to aspect ratio, take every other y pixel and every third x. */
+	    *(a) |= (b & 0x9999);
+	}
+	break;
+    case 1:
+    case 5:
+	/* Make a |    |----|    |----| type of line. */
+	if ((1 << uPC_raster_count) & 0xF0F0)
+	    *(a) |= b;
+	if (++uPC_raster_count > 15)
+	    uPC_raster_count = 0;
+	break;
+    case 2:
+    case 6:
+	/* Make a |----|----|----|--- |    | type of line. */
+	if ((1 << uPC_raster_count) & 0x0EFFF)
+	    *(a) |= b;
+	if (++uPC_raster_count > 19)
+	    uPC_raster_count = 0;
+	break;
+    case 3:
+    case 7:
+	/* Make a | -  | -  | -  | -  | type of line. */
+	if ((1 << uPC_raster_count) & 0x4444)
+	    *(a) |= b;
+	if (++uPC_raster_count > 15)
+	    uPC_raster_count = 0;
+	break;
+    case 4:
+    case 8:
+    default:
+	*(a) |= b;
+	break;
+    }
 }
 
-TERM_PUBLIC void uPC_vector(x,y)
-unsigned int x,y;
+TERM_PUBLIC void uPC_vector(x, y)
+unsigned int x, y;
 {
 /* This routine calls line with x,y */
-   int x1 = uPC_sx, y1=uPC_sy, x2 = x, y2 = y;
-   register int  c, e, dx, dy, width;
-   register Scr_type mask, *a;
+    int x1 = uPC_sx, y1 = uPC_sy, x2 = x, y2 = y;
+    register int c, e, dx, dy, width;
+    register Scr_type mask, *a;
 
 /* Record new sx, sy for next call to the vector routine. */
-   uPC_sx = x2;
-   uPC_sy = y2;
+    uPC_sx = x2;
+    uPC_sy = y2;
 
-   a = &uPC_display[(uPC_YSIZE - 1) - y1][x1 >> 4];
-   mask = lookup[x1 & 0x0f];
-   width = uPC_width;
+    a = &uPC_display[(uPC_YSIZE - 1) - y1][x1 >> 4];
+    mask = lookup[x1 & 0x0f];
+    width = uPC_width;
 
-   if ((dx = x2 - x1) > 0) {
-      if ((dy = y2 - y1) > 0) {
-         if (dx > dy) {         /* dx > 0, dy > 0, dx > dy */
-            dy <<= 1;
-            e = dy - dx;
-            c = dx + 2;
-            dx <<= 1;
+    if ((dx = x2 - x1) > 0) {
+	if ((dy = y2 - y1) > 0) {
+	    if (dx > dy) {	/* dx > 0, dy > 0, dx > dy */
+		dy <<= 1;
+		e = dy - dx;
+		c = dx + 2;
+		dx <<= 1;
 
-            while (--c) {
-               uPC_PLOT(a, mask);
-               if (e >= 0) {
-                  (Scr_kluge *)a -= width;
-                  e -= dx;
-               }
-               if (mask & uPC_HIGH_BIT) {
-                  mask = 1;
-                  a++;
-               } else
-                  mask <<= 1;
-               e += dy;
-            }
-         } else {            /* dx > 0, dy > 0, dx <= dy */
-            dx <<= 1;
-            e = dx - dy;
-            c = dy + 2;
-            dy <<= 1;
+		while (--c) {
+		    uPC_PLOT(a, mask);
+		    if (e >= 0) {
+			(Scr_kluge *) a -= width;
+			e -= dx;
+		    }
+		    if (mask & uPC_HIGH_BIT) {
+			mask = 1;
+			a++;
+		    } else
+			mask <<= 1;
+		    e += dy;
+		}
+	    } else {		/* dx > 0, dy > 0, dx <= dy */
+		dx <<= 1;
+		e = dx - dy;
+		c = dy + 2;
+		dy <<= 1;
 
-            while (--c) {
-               uPC_PLOT(a, mask);
-               if (e >= 0) {
-                  if (mask & uPC_HIGH_BIT) {
-                     mask = 1;
-                     a++;
-                  } else
-                     mask <<= 1;
-                  e -= dy;
-               }
-               (Scr_kluge *)a -= width;
-               e += dx;
-            }
-         }
-      } else {
-         dy = -dy;
-         if (dx > dy) {         /* dx > 0, dy <= 0, dx > dy */
-            dy <<= 1;
-            e = dy - dx;
-            c = dx + 2;
-            dx <<= 1;
+		while (--c) {
+		    uPC_PLOT(a, mask);
+		    if (e >= 0) {
+			if (mask & uPC_HIGH_BIT) {
+			    mask = 1;
+			    a++;
+			} else
+			    mask <<= 1;
+			e -= dy;
+		    }
+		    (Scr_kluge *) a -= width;
+		    e += dx;
+		}
+	    }
+	} else {
+	    dy = -dy;
+	    if (dx > dy) {	/* dx > 0, dy <= 0, dx > dy */
+		dy <<= 1;
+		e = dy - dx;
+		c = dx + 2;
+		dx <<= 1;
 
-            while (--c) {
-               uPC_PLOT(a, mask);
-               if (e >= 0) {
-                  (Scr_kluge *)a += width;
-                  e -= dx;
-               }
-               if (mask & uPC_HIGH_BIT) {
-                  mask = 1;
-                  a++;
-               } else
-                  mask <<= 1;
-               e += dy;
-            }
-         } else {            /* dx > 0, dy <= 0, dx <= dy */
-            dx <<= 1;
-            e = dx - dy;
-            c = dy + 2;
-            dy <<= 1;
+		while (--c) {
+		    uPC_PLOT(a, mask);
+		    if (e >= 0) {
+			(Scr_kluge *) a += width;
+			e -= dx;
+		    }
+		    if (mask & uPC_HIGH_BIT) {
+			mask = 1;
+			a++;
+		    } else
+			mask <<= 1;
+		    e += dy;
+		}
+	    } else {		/* dx > 0, dy <= 0, dx <= dy */
+		dx <<= 1;
+		e = dx - dy;
+		c = dy + 2;
+		dy <<= 1;
 
-            while (--c) {
-               uPC_PLOT(a, mask);
-               if (e >= 0) {
-                  if (mask & uPC_HIGH_BIT) {
-                     mask = 1;
-                     a++;
-                  } else
-                     mask <<= 1;
-                  e -= dy;
-               }
-               (Scr_kluge *)a += width;
-               e += dx;
-            }
-         }
-      }
-   } else {
-      dx = -dx;
-      if ((dy = y2 - y1) > 0) {
-         if (dx > dy) {         /* dx <= 0, dy > 0, dx > dy */
-            dy <<= 1;
-            e = dy - dx;
-            c = dx + 2;
-            dx <<= 1;
+		while (--c) {
+		    uPC_PLOT(a, mask);
+		    if (e >= 0) {
+			if (mask & uPC_HIGH_BIT) {
+			    mask = 1;
+			    a++;
+			} else
+			    mask <<= 1;
+			e -= dy;
+		    }
+		    (Scr_kluge *) a += width;
+		    e += dx;
+		}
+	    }
+	}
+    } else {
+	dx = -dx;
+	if ((dy = y2 - y1) > 0) {
+	    if (dx > dy) {	/* dx <= 0, dy > 0, dx > dy */
+		dy <<= 1;
+		e = dy - dx;
+		c = dx + 2;
+		dx <<= 1;
 
-            while (--c) {
-               uPC_PLOT(a, mask);
-               if (e >= 0) {
-                  (Scr_kluge *)a -= width;
-                  e -= dx;
-               }
-               if (mask & 1) {
-                  mask = uPC_HIGH_BIT;
-                  a--;
-               } else
-                  mask >>= 1;
-               e += dy;
-            }
-         } else {            /* dx <= 0, dy > 0, dx <= dy */
-            dx <<= 1;
-            e = dx - dy;
-            c = dy + 2;
-            dy <<= 1;
+		while (--c) {
+		    uPC_PLOT(a, mask);
+		    if (e >= 0) {
+			(Scr_kluge *) a -= width;
+			e -= dx;
+		    }
+		    if (mask & 1) {
+			mask = uPC_HIGH_BIT;
+			a--;
+		    } else
+			mask >>= 1;
+		    e += dy;
+		}
+	    } else {		/* dx <= 0, dy > 0, dx <= dy */
+		dx <<= 1;
+		e = dx - dy;
+		c = dy + 2;
+		dy <<= 1;
 
-            while (--c) {
-               uPC_PLOT(a, mask);
-               if (e >= 0) {
-                  if (mask & 1) {
-                     mask = uPC_HIGH_BIT;
-                     a--;
-                  } else
-                     mask >>= 1;
-                  e -= dy;
-               }
-               (Scr_kluge *)a -= width;
-               e += dx;
-            }
-         }
-      } else {
-         dy = -dy;
-         if (dx > dy) {         /* dx <= 0, dy <= 0, dx > dy */
-            dy <<= 1;
-            e = dy - dx;
-            c = dx + 2;
-            dx <<= 1;
+		while (--c) {
+		    uPC_PLOT(a, mask);
+		    if (e >= 0) {
+			if (mask & 1) {
+			    mask = uPC_HIGH_BIT;
+			    a--;
+			} else
+			    mask >>= 1;
+			e -= dy;
+		    }
+		    (Scr_kluge *) a -= width;
+		    e += dx;
+		}
+	    }
+	} else {
+	    dy = -dy;
+	    if (dx > dy) {	/* dx <= 0, dy <= 0, dx > dy */
+		dy <<= 1;
+		e = dy - dx;
+		c = dx + 2;
+		dx <<= 1;
 
-            while (--c) {
-               uPC_PLOT(a, mask);
-               if (e >= 0) {
-                  (Scr_kluge *)a += width;
-                  e -= dx;
-               }
-               if (mask & 1) {
-                  mask = uPC_HIGH_BIT;
-                  a--;
-               } else
-                  mask >>= 1;
-               e += dy;
-            }
-         } else {            /* dx <= 0, dy <= 0, dx <= dy */
-            dx <<= 1;
-            e = dx - dy;
-            c = dy + 2;
-            dy <<= 1;
+		while (--c) {
+		    uPC_PLOT(a, mask);
+		    if (e >= 0) {
+			(Scr_kluge *) a += width;
+			e -= dx;
+		    }
+		    if (mask & 1) {
+			mask = uPC_HIGH_BIT;
+			a--;
+		    } else
+			mask >>= 1;
+		    e += dy;
+		}
+	    } else {		/* dx <= 0, dy <= 0, dx <= dy */
+		dx <<= 1;
+		e = dx - dy;
+		c = dy + 2;
+		dy <<= 1;
 
-            while (--c) {
-               uPC_PLOT(a, mask);
-               if (e >= 0) {
-                  if (mask & 1) {
-                     mask = uPC_HIGH_BIT;
-                     a--;
-                  } else
-                     mask >>= 1;
-                  e -= dy;
-               }
-               (Scr_kluge *)a += width;
-               e += dx;
-            }
-         }
-      }
-   }
+		while (--c) {
+		    uPC_PLOT(a, mask);
+		    if (e >= 0) {
+			if (mask & 1) {
+			    mask = uPC_HIGH_BIT;
+			    a--;
+			} else
+			    mask >>= 1;
+			e -= dy;
+		    }
+		    (Scr_kluge *) a += width;
+		    e += dx;
+		}
+	    }
+	}
+    }
 }
 
 
@@ -472,44 +480,46 @@ unsigned int x,y;
    This placement to the nearest character cell worked, and I'm leaving
    it here so the calculations involved won't be lost!  (jdc)
 */
-TERM_PUBLIC void uPC_put_text(x,y,str)
-unsigned int x,y;
+TERM_PUBLIC void uPC_put_text(x, y, str)
+unsigned int x, y;
 char str[];
 {
 /* This routine puts the text at the cursor location nearest
    to (x,y).  Obviously the exact postion would look better */
 
 /* Just use the ANSI escape sequence CUP (iswind said that was ok!) */
-   printf ("\033[%d;%dH%s\033[25;1H", (int)(24-(y-uPC_VCHAR/2)*25/uPC_YMAX), 
-				(int)(x*80/uPC_XMAX), str); 
-   fflush (stdout);
+    printf("\033[%d;%dH%s\033[25;1H",
+	   (int) (24 - (y - uPC_VCHAR / 2) * 25 / uPC_YMAX),
+	   (int) (x * 80 / uPC_XMAX), str);
+    fflush(stdout);
 }
+
 #endif
 
 
-TERM_PUBLIC void uPC_put_text(x,y,str)
-unsigned int x,y;
+TERM_PUBLIC void uPC_put_text(x, y, str)
+unsigned int x, y;
 char str[];
 {
-   if (uPC_angle == 1)
-      x += uPC_VCHAR/2;
-   else
-      y -= uPC_VCHAR/2;
+    if (uPC_angle == 1)
+	x += uPC_VCHAR / 2;
+    else
+	y -= uPC_VCHAR / 2;
 
-   switch (uPC_angle) {
-      case 0:
-         for (; *str; ++str, x += uPC_HCHAR)
-            uPC_putc (x, y, *str, uPC_angle);
-      break;
-      case 1:
-         for (; *str; ++str, y += uPC_HCHAR)
-            uPC_putc (x, y, *str, uPC_angle);
-      break;
-   }
+    switch (uPC_angle) {
+    case 0:
+	for (; *str; ++str, x += uPC_HCHAR)
+	    uPC_putc(x, y, *str, uPC_angle);
+	break;
+    case 1:
+	for (; *str; ++str, y += uPC_HCHAR)
+	    uPC_putc(x, y, *str, uPC_angle);
+	break;
+    }
 }
 
 
-void uPC_putc (x, y, c, angle)
+void uPC_putc(x, y, c, angle)
 unsigned int x, y;
 int c, angle;
 /*
@@ -517,46 +527,46 @@ int c, angle;
    array.  This is mostly just copied from the bitmap.c driver.
 */
 {
-   int i, j, k;
-   register Scr_type mask, *a;
-   char_row fc;
-   unsigned int pixelon;
+    int i, j, k;
+    register Scr_type mask, *a;
+    char_row fc;
+    unsigned int pixelon;
 
-   i = c - ' ';
-   for (j=0; j<FNT5X9_VBITS; j++) {
-      fc = fnt5x9[i][j];
-      for (k=0; k<FNT5X9_HBITS; k++) {
-         pixelon = ((unsigned int)(fc))>>k & 1;
-         if (pixelon) {
-            switch (angle) {
-            case 0:
-               mask = lookup[x+k+1 & 0x0f];
-               a = &uPC_display[(uPC_YSIZE - 1) - (y+j)][(x+k+1) >> 4];
-            break;
-            case 1:
-               mask = lookup[x-j & 0x0f];
-               a = &uPC_display[(uPC_YSIZE - 1) - (y+k+1)][(x-j) >> 4];
-            break;
-            }
-            *(a) |= (mask);  /* see uPC_PLOT macro */
-         }
-      }
-   }
+    i = c - ' ';
+    for (j = 0; j < FNT5X9_VBITS; j++) {
+	fc = fnt5x9[i][j];
+	for (k = 0; k < FNT5X9_HBITS; k++) {
+	    pixelon = ((unsigned int) (fc)) >> k & 1;
+	    if (pixelon) {
+		switch (angle) {
+		case 0:
+		    mask = lookup[x + k + 1 & 0x0f];
+		    a = &uPC_display[(uPC_YSIZE - 1) - (y + j)][(x + k + 1) >> 4];
+		    break;
+		case 1:
+		    mask = lookup[x - j & 0x0f];
+		    a = &uPC_display[(uPC_YSIZE - 1) - (y + k + 1)][(x - j) >> 4];
+		    break;
+		}
+		*(a) |= (mask);	/* see uPC_PLOT macro */
+	    }
+	}
+    }
 }
 
 
-TERM_PUBLIC int uPC_text_angle (ang)
+TERM_PUBLIC int uPC_text_angle(ang)
 int ang;
 {
-   uPC_angle = ang;
-   return TRUE;
+    uPC_angle = ang;
+    return TRUE;
 }
 
 
 TERM_PUBLIC void uPC_reset()
 {
 /* Reset window to normal size. */
-   uPC_fixwind (0);
+    uPC_fixwind(0);
 }
 
 
@@ -564,20 +574,21 @@ TERM_PUBLIC void uPC_reset()
 void uPC_fixwind(signo)
 int signo;
 {
-   static struct uwdata wreset = { 0, 12, 720, 288, 0x1};
-   struct utdata ut;
+    static struct uwdata wreset =
+    {0, 12, 720, 288, 0x1};
+    struct utdata ut;
 
 /* Reset the window to the right size. */
-   ioctl(1, WIOCSETD, &wreset);   /* 0, not wncur here! */
+    ioctl(1, WIOCSETD, &wreset);	/* 0, not wncur here! */
 
 /* Scroll the screen once. (avoids typing over the same line) */
-   fprintf (stderr, "\n");
+    putc('\n', stderr);
 
-   if (signo) {
-      if (signo == SIGILL || signo == SIGTRAP || signo == SIGPWR)
-         signal (signo, SIG_DFL);
-      kill (0,signo);  /* Redo the signal (as if we never trapped it). */
-   }
+    if (signo) {
+	if (signo == SIGILL || signo == SIGTRAP || signo == SIGPWR)
+	    signal(signo, SIG_DFL);
+	kill(0, signo);		/* Redo the signal (as if we never trapped it). */
+    }
 }
 #endif /* TERM_BODY */
 
@@ -585,11 +596,11 @@ int signo;
 
 TERM_TABLE_START(unixpc_driver)
     "unixpc", "AT&T 3b1 or AT&T 7300 Unix PC",
-	   uPC_XMAX, uPC_YMAX, uPC_VCHAR, uPC_HCHAR, 
-	   uPC_VTIC, uPC_HTIC, options_null, uPC_init, uPC_reset, 
-	   uPC_text, null_scale, uPC_graphics, uPC_move, uPC_vector,
-	   uPC_linetype, uPC_put_text, uPC_text_angle, 
-	   null_justify_text, line_and_point, do_arrow, set_font_null
+    uPC_XMAX, uPC_YMAX, uPC_VCHAR, uPC_HCHAR,
+    uPC_VTIC, uPC_HTIC, options_null, uPC_init, uPC_reset,
+    uPC_text, null_scale, uPC_graphics, uPC_move, uPC_vector,
+    uPC_linetype, uPC_put_text, uPC_text_angle,
+    null_justify_text, line_and_point, do_arrow, set_font_null
 TERM_TABLE_END(unixpc_driver)
 
 #undef LAST_TERM
@@ -610,4 +621,4 @@ START_HELP(unixpc)
 " The `unixpc` terminal driver supports AT&T 3b1 and AT&T 7300 Unix PC.  It has",
 " no options."
 END_HELP(unixpc)
-#endif
+#endif /* TERM_HELP */

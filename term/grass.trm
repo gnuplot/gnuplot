@@ -57,7 +57,6 @@ TERM_PUBLIC void GRASS_point __PROTO((unsigned int x, unsigned int y, int point)
 TERM_PUBLIC int GRASS_set_font __PROTO((char *font));
 /* TERM_PUBLIC void GRASS_set_pointsize __PROTO((double size)); */
 TERM_PUBLIC void GRASS_arrow __PROTO((unsigned int sx, unsigned int sy, unsigned int ex, unsigned int ey, int head));
-#define GOT_GRASS_PROTO
 #endif /* TERM_PROTO */
 
 #ifndef TERM_PROTO_ONLY
