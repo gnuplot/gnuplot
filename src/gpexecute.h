@@ -43,10 +43,11 @@
 #include "syscfg.h"
 #include "mousecmn.h"
 
-#ifdef OS2
+#ifdef OS2_IPC
 
 void gp_execute(char *command);
 extern char mouseShareMemName[];
+
 extern PVOID input_from_PM_Terminal;
 extern HEV semInputReady;
 extern int pausing;
@@ -56,7 +57,9 @@ extern ULONG ppidGnu;
 void gp_post_shared_mem __PROTO((void));
 void gp_execute __PROTO((char *s));
 
-#else /* ! OS2 */
+#endif /* OS2_IPC */
+
+#ifdef PIPE_IPC
 
 extern int pipe_died;
 
@@ -67,7 +70,8 @@ typedef struct gpe_fifo_t {
 } gpe_fifo_t;
 extern int buffered_output_pending;
 RETSIGTYPE pipe_died_handler __PROTO((int signum));
-#endif /* !OS2 */
+
+#endif /* PIPE_IPC */
 
 
 void gp_exec_event __PROTO((char type, int mx, int my, int par1, int par2));

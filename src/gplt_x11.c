@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.25 2000/11/22 11:15:16 amai Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.26 2000/11/23 16:50:05 amai Exp $"); }
 #endif
 
 /* GNUPLOT - gplt_x11.c */
@@ -174,7 +174,7 @@ Error. Incompatible options.
 
 #ifdef USE_MOUSE
 
-# if defined(OS2) && !defined(GNUPMDRV)
+# ifdef OS2_IPC
 #  define INCL_DOSPROCESS
 #  define INCL_DOSSEMAPHORES
 #  include <os2.h>
@@ -185,11 +185,9 @@ Error. Incompatible options.
 # include "gpexecute.h"
 # include "mouse.h"
 
-# if !defined(OS2)
-#  include <unistd.h>
-#  include <fcntl.h>
-#  include <errno.h>
-# endif
+#include <unistd.h>
+#include <fcntl.h>
+#include <errno.h>
 
 unsigned long gnuplotXID = 0;	/* WINDOWID of gnuplot */
 
@@ -201,7 +199,7 @@ unsigned long gnuplotXID = 0;	/* WINDOWID of gnuplot */
 # endif
 # define EXIT(status) sys$delprc(0,0)	/* VMS does not drop itself */
 #else /* !VMS */
-# if defined(USE_MOUSE) && !defined(OS2)
+# ifdef PIPE_IPC
 #  define EXIT(status)                         \
     do {                                       \
 	gp_exec_event(GE_pending, 0, 0, 0, 0); \
@@ -211,7 +209,7 @@ unsigned long gnuplotXID = 0;	/* WINDOWID of gnuplot */
     } while (0)
 # else
 #  define EXIT(status) exit(status)
-# endif /* USE_MOUSE */
+# endif /* PIPE_IPC */
 #endif /* !VMS */
 
 #ifdef OSK
@@ -514,7 +512,7 @@ int argc;
 char *argv[];
 {
 
-#if defined(USE_MOUSE) && !defined(OS2)
+#ifdef PIPE_IPC
     int getfl;
 #endif
 
@@ -542,9 +540,8 @@ char *argv[];
     /* arrow, top_left_arrow, left_ptr, sb_left_arrow, sb_right_arrow,
      * plus, pencil, draft_large, right_ptr, draft_small */
     cursor_zooming = XCreateFontCursor(dpy, XC_draft_small);
-
-# if !defined(OS2)
-
+#endif
+#ifdef PIPE_IPC
     if (!pipe_died) {
 	/* set up nonblocking stdout */
 	getfl = fcntl(1, F_GETFL);	/* get current flags */
@@ -552,7 +549,6 @@ char *argv[];
 	signal(SIGPIPE, pipe_died_handler);
     }
 # endif
-#endif
 
     mainloop();
 
@@ -603,7 +599,7 @@ mainloop()
     struct timeval timeout, *timer = (struct timeval *) 0;
     fd_set tset;
 
-#if !defined(OS2)
+#ifdef PIPE_IPC
     int out;
     out = fileno(stdout);
 #endif
@@ -611,7 +607,7 @@ mainloop()
     X11_ipc = stdin;
     in = fileno(X11_ipc);
 
-#if !defined(OS2)
+#ifdef PIPE_IPC
     if (out > in)
 	nfds = ((cn > out) ? cn : out) + 1;
     else
@@ -652,7 +648,7 @@ mainloop()
 	    FD_SET(in, &tset);
 	}
 
-#if defined(USE_MOUSE) && !defined(OS2)
+#ifdef PIPE_IPC
 	if (buffered_output_pending && !pipe_died) {
 	    /* check, if stdout becomes writable */
 	    FD_SET(out, &tset);
@@ -694,7 +690,7 @@ mainloop()
 	    if (!record())	/* end of input */
 		return;
 	}
-#if defined(USE_MOUSE) && !defined(OS2)
+#ifdef PIPE_IPC
 	if (!pipe_died && (FD_ISSET(out, &tset) || buffered_output_pending)) {
 	    gp_exec_event(GE_pending, 0, 0, 0, 0);
 	}
@@ -1054,7 +1050,7 @@ record()
 #ifndef USE_MOUSE
 		sscanf(buf, "G%d", &plot_number);
 #else
-#ifdef OS2
+#ifdef OS2_IPC
 		sscanf(buf, "G%d %lu %li", &plot_number, &gnuplotXID, &ppidGnu);
 #else
 		sscanf(buf, "G%d %lu", &plot_number, &gnuplotXID);
@@ -1064,8 +1060,7 @@ record()
 		plot = plot_array + plot_number;
 		prepare_plot(plot, plot_number);
 		current_plot = plot;
-#ifdef USE_MOUSE
-#ifdef OS2
+#ifdef OS2_IPC
 		if (!input_from_PM_Terminal) {	/* get shared memory */
 		    sprintf(mouseShareMemName, "\\SHAREMEM\\GP%i_Mouse_Input", (int) ppidGnu);
 		    if (DosGetNamedSharedMem(&input_from_PM_Terminal, mouseShareMemName, PAG_WRITE))
@@ -1073,6 +1068,7 @@ record()
 		    semInputReady = 0;
 		}
 #endif
+#ifdef USE_MOUSE
 		/* show a message in the wm's title bar that the
 		 * graph will be redrawn. This might be useful
 		 * for slow redrawing (large plots). The title
@@ -2977,7 +2973,7 @@ char *argv[];
     XrmInitialize();
     XrmParseCommand(&dbCmd, options, Nopt, Name, &Argc, Argv);
     if (Argc > 1) {
-#if defined(USE_MOUSE) && !defined(OS2)
+#ifdef PIPE_IPC
 	if (!strcmp(Argv[1], "-noevents")) {
 	    pipe_died = 1;
 	} else {
@@ -2986,7 +2982,7 @@ char *argv[];
 gnuplot: bad option: %s\n\
 gnuplot: X11 aborted.\n", Argv[1]);
 	    EXIT(1);
-#if defined(USE_MOUSE) && !defined(OS2)
+#ifdef PIPE_IPC
 	}
 #endif
     }
@@ -3646,7 +3642,7 @@ XEvent *event;
 		XChangeProperty(dpy, reply.xselection.requestor,
 				reply.xselection.property, reply.xselection.target,
 				32, PropModeReplace, (unsigned char *) &(exported_plot->pixmap), 1);
-#if defined(USE_MOUSE) && !defined(OS2)
+#ifdef PIPE_IPC
 	    } else if (reply.xselection.target == XA_STRING) {
 		FPRINTF((stderr, "XA_STRING request\n"));
 		XChangeProperty(dpy, reply.xselection.requestor,

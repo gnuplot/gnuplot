@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot.c,v 1.40 2000/11/23 14:14:37 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot.c,v 1.41 2000/11/23 18:23:01 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - plot.c */
@@ -41,7 +41,6 @@ static char *RCSid() { return RCSid("$Id: plot.c,v 1.40 2000/11/23 14:14:37 broe
 #include "command.h"
 #include "eval.h"
 #include "fit.h"
-#include "gpexecute.h"
 #include "gp_hist.h"
 #include "misc.h"
 #include "readline.h"
@@ -54,12 +53,21 @@ static char *RCSid() { return RCSid("$Id: plot.c,v 1.40 2000/11/23 14:14:37 broe
 #include <signal.h>
 #include <setjmp.h>
 
+#ifdef OS2 /* os2.h required for gpexecute.h */
+# define INCL_DOS
+# define INCL_REXXSAA
+# ifdef OS2_IPC
+#  define INCL_DOSSEMAPHORES
+# endif
+# include <os2.h>
+#endif /* OS2 */
 
 #ifdef USE_MOUSE
-# ifndef OS2
+# ifdef PIPE_IPC
 #  include "ipc.h"   /* for isatty_state */
 # endif
 # include "mouse.h" /* for mouse_setting */
+# include "gpexecute.h"
 #endif
 
 /* Used nowhere else */
@@ -166,12 +174,6 @@ static void init_memory __PROTO((void));
 static int exit_status = EXIT_SUCCESS;
 
 #ifdef OS2
-# define INCL_DOS
-# define INCL_REXXSAA
-# ifdef USE_MOUSE
-#  define INCL_DOSSEMAPHORES
-# endif
-# include <os2.h>
 # include <process.h>
 static ULONG RexxInterface(PRXSTRING, PUSHORT, PRXSTRING);
 TBOOLEAN CallFromRexx = FALSE;
@@ -296,7 +298,7 @@ char **argv;
 #if defined(OS2)
     int rc;
     if (_osmode == OS2_MODE) {
-#ifdef USE_MOUSE
+#ifdef OS2_IPC
 	char semInputReadyName[40];
 	sprintf( semInputReadyName, "\\SEM32\\GP%i_Input_Ready", getpid() );
 	rc = DosCreateEventSem(semInputReadyName,&semInputReady,0,0);
@@ -404,7 +406,7 @@ char **argv;
     interactive = TRUE;
 # else
     interactive = isatty(fileno(stdin));
-#if defined(USE_MOUSE) && !defined(OS2)
+#ifdef PIPE_IPC
     /* isatty_state is set here and nowhere else! (used in term/x11.trm) */
     isatty_state = interactive;
     if (!isatty_state) {

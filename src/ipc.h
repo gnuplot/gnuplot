@@ -1,5 +1,5 @@
 /*
- * $Id: ipc.h,v 1.7 2000/11/01 18:57:33 broeker Exp $
+ * $Id: ipc.h,v 1.8 2000/11/23 18:23:01 lhecking Exp $
  */
 
 /* GNUPLOT - ipc.h */
@@ -34,11 +34,6 @@
  * to the extent permitted by applicable law.
 ]*/
 
-/*
- * LAST MODIFICATION: "Wed, 22 Mar 2000 21:31:36 +0100 (joze)"
- * 1999 by Johannes Zellner, <johannes@zellner.org>
- */
-
 
 #ifndef _IPC_H
 # define _IPC_H
@@ -46,22 +41,30 @@
 #include "syscfg.h"
 
 /*
- * special readline_ipc routine for IPC communication,
- * usual readline otherwise (OS/2)
+ * There are the following types of interprocess communication from
+ * (gnupmdrv, gnuplot_x11) => gnuplot:
+ *	OS2_IPC  ... the OS/2 shared memory + event semaphores approach
+ *	PIPE_IPC ... communication by using bidirectional pipe
+ */
+
+
+/*
+ * The following 'readline_ipc' routine is usual 'readline' for OS2_IPC,
+ * and a special one for IPC communication.
  */
 char *readline_ipc __PROTO((const char*));
 
-# ifndef OS2
 /*
- * gnuplot's terminals communicate with gnuplot by shared memory + event
- * semaphores, thus the code below is not used (see also gpexecute.inc)
+ * OS2_IPC: gnuplot's terminals communicate with it by shared memory + event
+ * semaphores => the code in gpexecute.inc is used, and nothing more from here.
  */
 
+#ifdef PIPE_IPC
 
 enum { IPC_BACK_UNUSABLE = -2, IPC_BACK_CLOSED = -1 };
 
 /*
- * currently only used for X11 && USE_MOUSE, but in principle
+ * Currently only used for PIPE_IPC, but in principle
  * every term could use this file descriptor to write back
  * commands to gnuplot.  Note, that terminals using this fd
  * should set it to a negative value when closing. (joze)
@@ -74,6 +77,6 @@ enum { IPC_BACK_UNUSABLE = -2, IPC_BACK_CLOSED = -1 };
     extern int isatty_state;
 #  endif
 
-# endif /* OS/2 */
+# endif /* PIPE_IPC */
 
 #endif /* _IPC_H */

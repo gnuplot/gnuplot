@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: readline.c,v 1.20 2000/11/01 18:57:33 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: readline.c,v 1.21 2000/11/23 18:25:12 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - readline.c */
@@ -62,7 +62,7 @@ static char *RCSid() { return RCSid("$Id: readline.c,v 1.20 2000/11/01 18:57:33 
 /* #include <readline/history.h> --- HBB 20000508: now included by gp_hist */
 
 
-#if defined(USE_MOUSE) && !defined(OS2)
+#ifdef OS2_IPC
 static char* line_buffer;
 static int line_complete;
 
@@ -93,7 +93,7 @@ getc_wrapper(FILE* fp /* should be stdin, supplied by readline */)
 char*
 readline_ipc(const char* prompt)
 {
-#if defined(USE_MOUSE) && defined(HAVE_LIBREADLINE) && !defined(OS2)
+#if defined(PIPE_IPC) && defined(HAVE_LIBREADLINE)
     /* use readline's alternate interface.
      * this requires rl_library_version > 2.2
      * TODO: make a check in configure.in */

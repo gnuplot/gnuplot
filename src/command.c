@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.44 2000/11/02 17:52:15 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.45 2000/11/15 18:26:10 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -93,8 +93,7 @@ static char *RCSid() { return RCSid("$Id: command.c,v 1.44 2000/11/02 17:52:15 b
 unsigned _stklen = 16394;        /* increase stack size */
 #endif /* MSDOS && TURBOC */
 
-#ifdef OS2
-# ifdef USE_MOUSE
+#ifdef OS2_IPC
 #  define INCL_DOSMEMMGR
 #  define INCL_DOSPROCESS
 #  define INCL_DOSSEMAPHORES
@@ -104,8 +103,7 @@ char mouseSharedMemName[40] = "";
 HEV semInputReady = 0;      /* semaphore to be created in plot.c */
 int thread_rl_Running = 0;  /* running status */
 int thread_rl_RetCode = -1; /* return code from readline in a thread */
-# endif /* USE_MOUSE */
-#endif /* OS2 */
+#endif /* OS2_IPC */
 
 /* always include ipc.h as it contains the prototype for readline_ipc */
 #include "ipc.h"
@@ -188,14 +186,14 @@ extend_input_line()
 	input_line_len = MAX_LINE_LEN;
 	input_line[0] = NUL;
 
-#if defined(USE_MOUSE) && defined(OS2)
+#ifdef OS2_IPC
 	sprintf( mouseSharedMemName, "\\SHAREMEM\\GP%i_Mouse_Input", getpid() );
 	if (DosAllocSharedMem((PVOID) & input_from_PM_Terminal,
 	    	mouseSharedMemName,
 			      MAX_LINE_LEN,
 			      PAG_WRITE | PAG_COMMIT))
 	    fputs("command.c: DosAllocSharedMem ERROR\n",stderr);
-#endif /* USE_MOUSE && OS2 */
+#endif /* OS2_IPC */
 
     } else {
 	input_line = gp_realloc(input_line, input_line_len + MAX_LINE_LEN, "extend input line");
@@ -225,7 +223,7 @@ extend_token_table()
 }
 
 
-#if defined(USE_MOUSE) && defined(OS2)
+#ifdef OS2_IPC
 void thread_read_line()
 {
    thread_rl_Running = 1;
@@ -233,13 +231,13 @@ void thread_read_line()
    thread_rl_Running = 0;
    DosPostEventSem(semInputReady);
 }
-#endif /* USE_MOUSE && OS2 */
+#endif /* OS2_IPC */
 
 
 int
 com_line()
 {
-#if defined(USE_MOUSE) && defined(OS2)
+#ifdef OS2_IPC
 static char *input_line_SharedMem = NULL;
     if (input_line_SharedMem == NULL) {  /* get shared mem only once */
     if (DosGetNamedSharedMem((PVOID) &input_line_SharedMem,
@@ -248,7 +246,7 @@ static char *input_line_SharedMem = NULL;
     else
 	*input_line_SharedMem = 0;
     }
-#endif /* USE_MOUSE && OS2 */
+#endif /* OS2_IPC */
 
     if (multiplot) {
 	/* calls int_error() if it is not happy */
@@ -262,7 +260,7 @@ static char *input_line_SharedMem = NULL;
 	if (read_line(PROMPT))
 	    return (1);
 #else
-#ifdef OS2
+#ifdef OS2_IPC
 	ULONG u;
         if (thread_rl_Running == 0) {
 	    int res = _beginthread(thread_read_line,NULL,32768,NULL);
@@ -303,7 +301,7 @@ static char *input_line_SharedMem = NULL;
 #else
 	if (read_line(PROMPT))
 	    return (1);
-#endif /* OS2 */
+#endif /* OS2_IPC */
 #endif /* USE_MOUSE */
     }
 

@@ -38,7 +38,7 @@
  */
 
 
-#ifdef OS2
+#ifdef OS2_IPC
 # define INCL_DOSPROCESS
 # define INCL_DOSSEMAPHORES
 # include <os2.h>
@@ -47,7 +47,7 @@
 
 #include "gpexecute.h"
 
-#ifndef OS2
+#ifdef PIPE_IPC
 # include <unistd.h> /* open(), write() */
 # include <stdlib.h>
 # include <assert.h>
@@ -58,13 +58,13 @@ static gpe_fifo_t* gpe_init __PROTO((void));
 static void gpe_push __PROTO((gpe_fifo_t** base, struct gp_event_t* ge));
 static struct gp_event_t* gpe_front __PROTO((gpe_fifo_t** base));
 static int gpe_pop __PROTO((gpe_fifo_t** base));
-#endif /* ! OS2 */
+#endif /* PIPE_IPC */
 
 /*
  * gp_execute functions
  */
 
-#ifdef OS2
+#ifdef OS2_IPC
 char mouseShareMemName[40];
 PVOID input_from_PM_Terminal;
   /* pointer to shared memory for storing the command to be executed */
@@ -129,7 +129,9 @@ void gp_execute(char *s)
     gp_post_shared_mem();
 }
 
-#else /* !OS2 */
+#endif /* OS2_IPC */
+
+#ifdef PIPE_IPC
 
 int buffered_output_pending = 0;
 
@@ -194,13 +196,13 @@ pipe_died_handler(int signum)
     close(1);
     pipe_died = 1;
 }
-#endif /* !OS2 */
+#endif /* PIPE_IPC */
 
 void
 gp_exec_event(char type, int mx, int my, int par1, int par2)
 {
     struct gp_event_t ge;
-#if !defined(OS2)
+#ifdef PIPE_IPC
     static struct gpe_fifo_t* base = (gpe_fifo_t*) 0;
 #endif
 #if 0
@@ -213,7 +215,7 @@ gp_exec_event(char type, int mx, int my, int par1, int par2)
     ge.my = my;
     ge.par1 = par1;
     ge.par2 = par2;
-#ifndef OS2
+#ifdef PIPE_IPC
     if (pipe_died)
 	return;
     if (!base) {
@@ -243,8 +245,9 @@ gp_exec_event(char type, int mx, int my, int par1, int par2)
 	    break;
 	}
     } while (gpe_pop(&base));
+#endif /* PIPE_IPC */
 
-#else /* OS/2 communication via shared memory; coded according to gp_execute() */
+#ifdef OS2_IPC /* OS/2 communication via shared memory; coded according to gp_execute() */
     if (input_from_PM_Terminal==NULL)
 	return;
     ((char*)input_from_PM_Terminal)[0] = '%'; /* flag that passing gp_event_t */

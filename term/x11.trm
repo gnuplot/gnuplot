@@ -1,5 +1,5 @@
 /*
- * $Id: x11.trm,v 1.31 2000/11/01 18:57:34 broeker Exp $
+ * $Id: x11.trm,v 1.32 2000/11/20 20:31:37 joze Exp $
  *
  */
 
@@ -170,7 +170,7 @@ static struct x11opt {
 #define X11_nopts (sizeof(X11_cmdopts) / sizeof(X11_cmdopts[0]))
 
 static FILE *X11_ipc = (FILE*) 0;
-#if defined(USE_MOUSE) && !defined(OS2)
+#ifdef PIPE_IPC
 #define X11_ipc_back_fd ipc_back_fd /* defined in ipc.h */
 #endif
 
@@ -389,7 +389,7 @@ X11_atexit HANDLER_DECL
 	fclose(X11_ipc);
 	/* dont wait(), since they might be -persist */
 	X11_ipc = NULL;
-#if defined(USE_MOUSE) && !defined(OS2)
+#ifdef PIPE_IPC
 	close(X11_ipc_back_fd);
 	X11_ipc_back_fd = -1;
 #endif
@@ -403,7 +403,7 @@ TERM_PUBLIC int
 X11_waitforinput()
 {
     char c;
-#if !defined(OS2)
+#ifdef PIPE_IPC
     fd_set fds;
     static struct gp_event_t ge;
     static int l=0;
@@ -438,7 +438,7 @@ X11_waitforinput()
 	    }
 	}
     } while (!FD_ISSET(fd, &fds));
-#endif
+#endif /* PIPE_IPC */
     if (read(0, &c, 1)!=1) return EOF;
     else return c;
 }
@@ -459,7 +459,7 @@ X11_init()
 	X11_ipc = popen(X11_command, "w");
 #else /* !(OSK || OS/2) */
 	int fdes[2];
-# ifdef USE_MOUSE
+# ifdef PIPE_IPC
 	int fdes_back[2];
 
 #define X11_ALLOW_EVENTS (mouse_setting.on || isatty_state)
@@ -467,13 +467,13 @@ X11_init()
 	    if (pipe(fdes_back))
 		perror("pipe() failed:");
 	}
-# endif
+# endif /* PIPE_IPC */
 	if (pipe(fdes))
 	    perror("pipe() failed:");
 
 	if (fork() == 0) {
 	    /* child */
-# ifdef USE_MOUSE
+# ifdef PIPE_IPC
 	    char noevents[] = "-noevents";
 	    if (X11_ALLOW_EVENTS) {
 		dup2(fdes_back[1], 1);	/* stdout to pipe */
@@ -487,7 +487,7 @@ X11_init()
 		*ptr = noevents;
 		*++ptr = (char*) 0; /* terminate */
 	    }
-# endif
+# endif /* PIPE_IPC */
 	    /* close the write side of the child's forward fd */
 	    close(fdes[1]);
 
@@ -498,7 +498,7 @@ X11_init()
 	    exit(EXIT_FAILURE);
 	}
 	/* parent */
-# ifdef USE_MOUSE
+# ifdef PIPE_IPC
 	/* X11_ipc_out = fdopen(fdes[0], "r"); */
 	if (X11_ipc_back_fd > 0) {
 	    fprintf (stderr, "(X11_init) warning: unclosed X11_ipc_back_fd.\n");
@@ -520,7 +520,7 @@ X11_init()
 	    /* mark X11_ipc_back_fd as unusable */
 	    X11_ipc_back_fd = IPC_BACK_UNUSABLE;
 	}
-# endif
+# endif /* PIPE_IPC */
 	/* close the read side of the parent's forward fd */
 	close(fdes[0]);
 	X11_ipc = fdopen(fdes[1], "w");
@@ -530,13 +530,6 @@ X11_init()
     if (!been_here) {
 	atexit(X11_atexit);
 	been_here++;
-#ifdef USE_MOUSE
-	/* removed this message as it can be annoying when
-	 * using gnuplot in a pipe (joze) */
-#if 0
-	fprintf(stderr,"Using mouse-enhanced x11 terminal: press 'h' for help\n");
-#endif
-#endif
     }
 #ifdef USE_MOUSE
     X11_update_opts();
@@ -797,7 +790,7 @@ X11_graphics()
     /* for VMS sake, keep as separate prints */
     PRINT1("G%d\n", X11_plot_number);
 #else
-#ifndef OS2
+#ifdef PIPE_IPC
     /* if we know the outboard driver has stopped, restart it */
     if (X11_ipc_back_fd == IPC_BACK_CLOSED) {
 	fclose(X11_ipc);

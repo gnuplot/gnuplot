@@ -1,3 +1,22 @@
+2000-11-24  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* configure.in config/makefile.os2 term/x11.trm src/gpexecute.h
+	src/ipc.h command.c gpexecute.c gplt_x11.c plot.c readline.c:
+	The patch introduces explicit #define directives for different types
+	of interprocess communication (gnupmdrv, gnuplot_x11 => gnuplot):
+	    OS2_IPC  ... the OS/2 shared memory + event semaphores approach,
+	    PIPE_IPC ... communication by using bidirectional pipe.
+	In the current sources, there is a mixture of #ifdef USE_MOUSE,
+	#if[n]def OS2, or #if defined() && () ... This patch makes it clear
+	what code is for what kind of IPC, while #ifdef USE_MOUSE ... #endif
+	parts don't mix with IPC codes. Of course, USE_MOUSE requires either
+	IPC defined.
+	  Now it should be easy to add any other IPC for whichever platform
+	with terminal independent from the main gnuplot executable which wants
+	to support mouse and hotkeys; or modify PIPE_IPC to work for it too.
+	For example, gnuplot + gnuplot_x11 compiles on OS/2 fine with PIPE_IPC
+	instead of OS2_IPC, just it does not work. 
+
 2000-11-23  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* configure.in: Fix GNUPLOT_X11 for the case that no X11 support is
