@@ -38,7 +38,7 @@
  *
  * be.trm  --- inboard terminal driver for BE
  *
- * AUTHORS
+ * AUTHOR
  *   Xavier Pianet
  *
  */
@@ -79,55 +79,42 @@ TERM_PUBLIC void BE_fillbox __PROTO((int style, unsigned int x, unsigned y, unsi
 #ifndef TERM_PROTO_ONLY
 
 #ifdef TERM_BODY
-int BE_Display = 0;		/* non-zero if '-display' found on command line */
 
+/* non-zero if '-display' found on command line */
+int BE_Display = 0;
 
-/* sunos 4 uses on_exit() in place of atexit(). If both are missing,
- * we can probably survive since gnuplot_be should detect EOF on
- * the pipe. Unfortunately, the handlers take different parameters.
- */
+static void BE_atexit __PROTO((void));
 
-#ifdef NO_ATEXIT
-# define HANDLER_PROTO  __PROTO((int x, void *y))
-# define HANDLER_DECL (x,y) int x; void *y;
-# define HANDLER_PARAMS (0,NULL)
-# ifdef HAVE_ON_EXIT
-#  define atexit(x) on_exit(x, NULL)
-# else
-#  define atexit(x)		/* nowt */
-# endif
-#else /* !NO_ATEXIT */
-# define HANDLER_PROTO __PROTO((void))
-# define HANDLER_DECL   ()
-# define HANDLER_PARAMS ()
-#endif
-
-static void BE_atexit HANDLER_PROTO;
-
-static char BE_opts[][20] =
+static struct beopt {
+    char *option;       /* Name of option */
+    OptionArg arg;      /* Whether option has argument */
+}  BE_opts[] =
 {
-    "-mono", "-gray", "-clear", "-tvtwm", "-pointsize",
-    "-iconic", "-rv", "-reverse", "+rv", "-synchronous",
-    "-display", "-geometry", "-bg", "-background", "-bd", "-bordercolor", "-bw",
-    "-borderwidth", "-fg", "-foreground", "-fn", "-font", "-name",
-    "-selectionTimeout", "-title", "-xnllanguage", "-xrm",
-    "-raise", "-noraise", "-persist"
+   { "-mono", hasNoArg }, { "-gray", hasNoArg }, { "-clear", hasNoArg },
+   { "-tvtwm", hasNoArg }, { "-pointsize", hasArg },
+   { "-iconic", hasNoArg }, { "-rv", hasNoArg },
+   { "-reverse", hasNoArg }, { "+rv", hasNoArg },
+   { "-synchronous", hasNoArg },
+   { "-display", hasArg }, { "-geometry", hasArg }, { "-bg", hasArg },
+   { "-background", hasArg }, { "-bd", hasArg },
+   { "-bordercolor", hasArg }, { "-bw", hasArg },
+   { "-borderwidth", hasArg }, { "-fg", hasArg },
+   { "-foreground", hasArg }, { "-fn", hasArg }, { "-font", hasArg },
+   { "-name", hasArg },
+   { "-selectionTimeout", hasArg }, { "-title", hasArg },
+   { "-xnllanguage", hasArg }, { "-xrm", hasArg },
+   { "-raise", hasNoArg }, { "-noraise", hasNoArg },
+   { "-persist", hasNoArg }
 };
 
 #define BE_nopts (sizeof(BE_opts) / sizeof(BE_opts[0]))
 
-static int BE_optarg[BE_nopts] =
-{
-    0, 0, 0, 0, 1,
-    0, 0, 0, 0, 0,
-    1, 1, 1, 1, 1, 1, 1,
-    1, 1, 1, 1, 1, 1,
-    1, 1, 1, 1,
-    0, 0, 0
-};
-
 static FILE *BE_ipc;
-static char BE_command[1024] = "gnuplot_be";
+
+static char **xargv = (char **)NULL;
+static char *optvec[2*BE_nopts+1];
+
+static char BE_command[] = "gnuplot_be";
 
 /*   BE_args - scan gnuplot command line for standard Toolkit options (to be done)
  * called from plot.c so must not be TERM_PUBLIC (which may be static)
@@ -137,31 +124,40 @@ int BE_args(argc, argv)
 int argc;
 char *argv[];
 {
-	int nbe = 0, n;
+    int nbe = 0, i = 0, n;
 
-	while (++argv, --argc > 0) {
-		for (n = 0; n < BE_nopts; n++) {
-			if (!strcmp(*argv, BE_opts[n])) {
-				strcat(BE_command, " ");
-				strcat(BE_command, *argv);
-				if (strcmp(*argv, "-display") == 0)
-					BE_Display++;
-				if (BE_optarg[n]) {
-					if (--argc <= 0)
-						return (nbe);
-					strcat(BE_command, " \"");
-					strcat(BE_command, *++argv);
-					strcat(BE_command, "\"");
-					nbe++;
-				}
-				nbe++;
-				break;
-			}
+    xargv = (char **) gp_alloc (argc*sizeof(char *), "<xargv>");
+
+    if (!xargv) {
+	fputs ("not enough memory to copy argv - quitting\n", stderr);
+	exit (EXIT_FAILURE);
+    }
+
+    /* We make a copy of the argument vector because
+     * argv is modified later. */
+    memcpy (xargv, argv, argc*sizeof(char *));
+    optvec[i++] = BE_command;
+
+    while (++argv, --argc > 0) {
+	for (n = 0; n < BE_nopts; n++) {
+	    if (strcmp(*argv, BE_opts[n].option) == 0) {
+		optvec[i++] = *xargv;
+		if (strcmp(*argv, "-display") == 0)
+		    BE_Display++;
+		if (BE_opts[n].arg == hasArg) {
+		    if (--argc <= 0)
+			return nbe;
+		    optvec[i++] = *++xargv, ++argv;
+		    nbe++;
 		}
-		if (n == BE_nopts)
-			break;
+		nbe++;
+		break;
+	    }
 	}
-	return (nbe);
+	if (n == BE_nopts)
+	    break;
+    }
+    return nbe;
 }
 
 
@@ -169,26 +165,17 @@ static unsigned int BE_plot_number;
 
 TERM_PUBLIC void BE_options()
 {
-	if (almost_equals(c_token, "res$et")) {
-		BE_atexit HANDLER_PARAMS;	/* tell gnuplot_be to shut down */
-		++c_token;
-	}
-	if (!END_OF_COMMAND) {
-		struct value a;
-		BE_plot_number = (int) real(const_express(&a));
-		/* let gnuplot_be check range */
-	}
-	sprintf(term_options, "%d", BE_plot_number);
+    if (almost_equals(c_token, "res$et")) {
+	BE_atexit ();	/* tell gnuplot_be to shut down */
+	++c_token;
+    }
+    if (!END_OF_COMMAND) {
+	struct value a;
+	BE_plot_number = (int) real(const_express(&a));
+	/* let gnuplot_be check range */
+    }
+    sprintf(term_options, "%d", BE_plot_number);
 }
-
-/*-----------------------------------------------------------------------------
- *   Three different versions of the remainder of the BE terminal driver
- *   are provided to support three different types of IPC with the
- *   gnuplot_be outboard terminal driver:
- * 
- *   DEFAULT_BE:	  popen() pipe for most un*x platforms
- *
- *---------------------------------------------------------------------------*/
 
 /* we do not want to have to duplicate all the code, so we
  * do most of it with macros.
@@ -197,50 +184,49 @@ TERM_PUBLIC void BE_options()
  */
 
 
-/*-----------------------------------------------------------------------------
- *   DEFAULT_BE popen() pipe IPC
- *---------------------------------------------------------------------------*/
-
-static void BE_atexit HANDLER_DECL
+/*
+ *   The Be terminal driver uses popen() pipe IPC
+ */
+static void BE_atexit ()
 {
-	if (BE_ipc) {
-		fputs("R\n", BE_ipc);
-		fclose(BE_ipc);
-		/* dont wait(), since they might be -persist */
-		BE_ipc = NULL;
-	}
+    if (BE_ipc) {
+	fputs("R\n", BE_ipc);
+	fclose(BE_ipc);
+	/* dont wait(), since they might be -persist */
+	BE_ipc = NULL;
+    }
 }
+
 TERM_PUBLIC void BE_init()
 {
-	if (!BE_ipc) {
-		/* first time through or after a reset */
-		int fdes[2];
-		pipe(fdes);
-		if (fork() == 0) {
-			/* child */
-			close(fdes[1]);
-			dup2(fdes[0], 0);	/* stdin from pipe */
-			execl("/bin/sh", "sh", "-c", BE_command, NULL);
-			/* if we get here, something went wrong */
-			perror("exec failed");
-			exit(1);
-		}
-		/* parent */
-		close(fdes[0]);		/* read end of pipe */
-		BE_ipc = fdopen(fdes[1], "w");
+    if (!BE_ipc) {
+	/* first time through or after a reset */
+	int fdes[2];
+	pipe(fdes);
+	if (fork() == 0) {
+	    /* child */
+	    close(fdes[1]);
+	    dup2(fdes[0], 0);	/* stdin from pipe */
+	    execvp(BE_command, optvec);
+	    /* if we get here, something went wrong */
+	    perror("exec failed");
+	    exit(1);
 	}
-	{
-		static int been_here = 0;
-		if (!been_here) {
-			atexit(BE_atexit);
-			been_here = 1;
-		}
+	/* parent */
+	close(fdes[0]);		/* read end of pipe */
+	BE_ipc = fdopen(fdes[1], "w");
+    } {
+	static int been_here = 0;
+	if (!been_here) {
+	    atexit(BE_atexit);
+	    been_here = 1;
 	}
+    }
 }
 
 TERM_PUBLIC void BE_reset()
 {
-	/* leave the pipe alone, until exit or  set term be reset */
+    /* leave the pipe alone, until exit or  set term be reset */
 }
 
 #define PRINT0(fmt)		  			fprintf(BE_ipc, fmt)
@@ -261,81 +247,81 @@ TERM_PUBLIC void BE_reset()
 
 TERM_PUBLIC void BE_graphics()
 {
-	BEFORE_GRAPHICS;		/* kludge for crippled select */
-	PRINT1("G%d\n", BE_plot_number);	/* for VMS sake, keep as separate prints */
+    BEFORE_GRAPHICS;		/* kludge for crippled select */
+    PRINT1("G%d\n", BE_plot_number);	/* for VMS sake, keep as separate prints */
 }
 
 TERM_PUBLIC void BE_text()
 {
-	PRINT0("E\n");
-	FFLUSH();
-	AFTER_TEXT;			/* kludge for crippled select */
+    PRINT0("E\n");
+    FFLUSH();
+    AFTER_TEXT;			/* kludge for crippled select */
 }
 
 
 TERM_PUBLIC void BE_move(x, y)
 unsigned int x, y;
 {
-	PRINT2("M%04d%04d\n", x, y);
+    PRINT2("M%04d%04d\n", x, y);
 }
 
 TERM_PUBLIC void BE_vector(x, y)
 unsigned int x, y;
 {
-	PRINT2("V%04d%04d\n", x, y);
+    PRINT2("V%04d%04d\n", x, y);
 }
 
 TERM_PUBLIC void BE_pointsize(ps)
 double ps;
 {
-	PRINT2("P7%04d%04d\n",	/* size of point symbols */
+    PRINT2("P7%04d%04d\n",	/* size of point symbols */
 	   (int) (term->h_tic * ps * 0.5), (int) (term->v_tic * ps * 0.5));
 }
 
 TERM_PUBLIC void BE_linewidth(lw)
 double lw;
 {
-	PRINT1("W%04d\n", (int) lw);
+    PRINT1("W%04d\n", (int) lw);
 }
 
 TERM_PUBLIC void BE_linetype(lt)
 int lt;
 {
-	PRINT1("L%04d\n", lt);
+    PRINT1("L%04d\n", lt);
 }
 
 TERM_PUBLIC void BE_put_text(x, y, str)
 unsigned int x, y;
 char str[];
 {
-	/* badly outrange labels can overflow into text field */
-	if (x < 10000 && y < 10000) {
-		PRINT3("T%04d%04d%s\n", x, y, str);
-	}
+    /* badly outrange labels can overflow into text field */
+    if (x < 10000 && y < 10000) {
+	PRINT3("T%04d%04d%s\n", x, y, str);
+    }
 }
 
 TERM_PUBLIC int BE_justify_text(mode)
 enum JUSTIFY mode;
 {
-	PRINT1("J%04d\n", mode);
-	return (TRUE);
+    PRINT1("J%04d\n", mode);
+    return (TRUE);
 }
 
 TERM_PUBLIC void BE_point(x, y, number)
 unsigned int x, y;
 int number;
 {
-	if (number >= 0)
-		number %= POINT_TYPES;
-	number += 1;
-	PRINT3("P%01d%04d%04d\n", number, x, y);
+    if (number >= 0)
+	number %= POINT_TYPES;
+    number += 1;
+    PRINT3("P%01d%04d%04d\n", number, x, y);
 }
 
 TERM_PUBLIC void BE_fillbox(style, x, y, w, h)
 int style;
 unsigned int x, y, w, h;
 {
-	PRINT5("F%04d%04u%04u%04u%04u\n", style, x, y, w, h);
+    PRINT5("F%04d%04u%04u%04u%04u\n", style, x, y, w, h);
 }
 
 #endif /* TERM_BODY */
@@ -343,30 +329,30 @@ unsigned int x, y, w, h;
 #ifdef TERM_TABLE
 
 TERM_TABLE_START(be_driver)
-	"be", "BeOS Window System",
-	BE_XMAX, BE_YMAX, BE_VCHAR, BE_HCHAR,
-	BE_VTIC, BE_HTIC, BE_options, BE_init, BE_reset,
-	BE_text, null_scale, BE_graphics, BE_move, BE_vector,
-	BE_linetype, BE_put_text, null_text_angle,
-	BE_justify_text, BE_point, do_arrow, set_font_null,
-	BE_pointsize, TERM_CAN_MULTIPLOT,
-	BE_text /* suspend can use same routine */ , 0 /* resume */ ,
-	BE_fillbox, BE_linewidth
+    "be", "BeOS Window System",
+    BE_XMAX, BE_YMAX, BE_VCHAR, BE_HCHAR,
+    BE_VTIC, BE_HTIC, BE_options, BE_init, BE_reset,
+    BE_text, null_scale, BE_graphics, BE_move, BE_vector,
+    BE_linetype, BE_put_text, null_text_angle,
+    BE_justify_text, BE_point, do_arrow, set_font_null,
+    BE_pointsize, TERM_CAN_MULTIPLOT,
+    BE_text /* suspend can use same routine */ , 0 /* resume */ ,
+    BE_fillbox, BE_linewidth
 TERM_TABLE_END(be_driver)
 
 #undef LAST_TERM
 #define LAST_TERM be_driver
 
 TERM_TABLE_START(BE_driver)
-	"BE", "BE Window System (identical to be)",
-	BE_XMAX, BE_YMAX, BE_VCHAR, BE_HCHAR,
-	BE_VTIC, BE_HTIC, BE_options, BE_init, BE_reset,
-	BE_text, null_scale, BE_graphics, BE_move, BE_vector,
-	BE_linetype, BE_put_text, null_text_angle,
-	BE_justify_text, BE_point, do_arrow, set_font_null,
-	BE_pointsize, TERM_CAN_MULTIPLOT,
-	BE_text /* suspend can use same routine */ , 0 /* resume */ ,
-	BE_fillbox, BE_linewidth
+    "BE", "BE Window System (identical to be)",
+    BE_XMAX, BE_YMAX, BE_VCHAR, BE_HCHAR,
+    BE_VTIC, BE_HTIC, BE_options, BE_init, BE_reset,
+    BE_text, null_scale, BE_graphics, BE_move, BE_vector,
+    BE_linetype, BE_put_text, null_text_angle,
+    BE_justify_text, BE_point, do_arrow, set_font_null,
+    BE_pointsize, TERM_CAN_MULTIPLOT,
+    BE_text /* suspend can use same routine */ , 0 /* resume */ ,
+    BE_fillbox, BE_linewidth
 TERM_TABLE_END(BE_driver)
 
 #undef LAST_TERM
