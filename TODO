@@ -57,6 +57,7 @@ Lars' list
   former, latter requires reading passwd file (-> not!)
 - general expansion of user defined and environment vars in
   labels?
+- string variables
 - [Lucas] fix axis ranges, overwritten labels in demos
 - png driver needs update for png versions >=0.95
   must be backwards compatible (do we want to require png >=0.95? We
@@ -79,4 +80,5 @@ Lars' list
 - update the FAQ!!!!
 - update NEWS
 - make dist-something: put current date into version.c
+- non-integer time value in 'pause' command
 

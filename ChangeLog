@@ -1,3 +1,23 @@
+1999-05-16  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* aclocal.m4, configure: Regenerated.
+
+	* m4/select.m4: Add 'void' to select fd_set test.
+
+	* src/Makefile.in: Remove commitvers from EXTRA_DIST.
+
+	* src/command.c(command): Clean up some ifdefs.
+
+	* src/commitvers: Removed.
+
+	* src/term.h: Add metapost.trm.
+
+	* term/Makefile.am, term/Makefile.in: Add metapost.trm.
+
+1999-04-29  "Daniel H. Luecking"  <luecking@comp.uark.edu>
+
+	* term/metapost.trm: New gnuplot driver for metapost output.
+
 1999-05-14  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* demo/Makefile.am.in: Improved check-* targets. List *.par files
@@ -5,9 +25,6 @@
 
 	* src/datafile.c(df_open): Storage for data file name is now fully
 	dynamic. Remove temporary static array.
-
-	* src/misc.c, src/plot.c, src/set.c, src/show.c: Add and use new
-	loadpath variable, access_loadpath() function.
 
 	* src/protos.h, src/util.c: New function is_notempty().
 
