@@ -1,3 +1,10 @@
+2004-09-01  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* demo/Makefile.am.in: Add new binary demo files to Makefile.am
+	target.
+
+	src/Makefile.am: Add missing binary.h to bf_test_SOURCES.
+
 2004-09-01  Daniel Sebald  <daniel.sebald@ieee.org>
 
 	* NEWS: Updated.

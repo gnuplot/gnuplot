@@ -47,7 +47,7 @@ getcolor_x11.o: getcolor.c
 
 gnuplot_x11_LDADD = getcolor_x11.o $(XLIBS)
 
-bf_test_SOURCES = bf_test.c binary.c alloc.c
+bf_test_SOURCES = bf_test.c binary.c binary.h alloc.c
 
 if BUILD_SRC_BEOS_SUBDIR
 d_beos = beos
