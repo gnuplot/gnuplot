@@ -318,20 +318,11 @@
 /*  Define if you have Thomas Boutell's gd library.  */
 #undef HAVE_LIBGD
 
-/*  Define if you have libgd version >= 1.8  */
-#undef HAVE_NEWGD
-
-/*  Define if you have want png support  */
-#undef HAVE_PNG
-
-/*  Define if you have libjpeg and libgd version >= 1.8  */
-#undef HAVE_JPEG
-
 /*  Define if you have libgd version 1.2 - 1.4  */
-#undef HAVE_GIF
+#undef HAVE_GD_GIF
 
 /*  Define if TrueType font support in libgd  */
-#undef HAVE_TTF
+#undef HAVE_GD_TTF
 
 /*  Define to have 'set term gif' produce PNG images instead  */
 #undef PNG_FOR_GIF

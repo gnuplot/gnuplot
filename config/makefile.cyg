@@ -1,6 +1,6 @@
 #
 #
-# $Id: makefile.cyg,v 1.15 2002/10/09 19:57:44 mikulik Exp $
+# $Id: makefile.cyg,v 1.16 2002/12/15 17:17:33 mikulik Exp $
 #
 # GNUPLOT Makefile for Cygwin on WinNT and Win95/98/2000
 #
@@ -161,7 +161,7 @@ ifdef GD
 endif
 
 ifdef GIF
-  CFLAGS += -DHAVE_GIF
+  CFLAGS += -DHAVE_GD_GIF
 endif
 
 ifdef PNG
@@ -170,19 +170,17 @@ ifdef PNG
 endif
 
 ifdef NEWGD
-  CFLAGS += -DHAVE_NEWGD
 ifdef FREETYPE
   CFLAGS += -DHAVE_TTF
   TERMLIBS += -lfreetype
 endif
 ifdef JPEG
-  CFLAGS += -DHAVE_JPEG
+  CFLAGS += -DHAVE_GD_JPEG
   TERMLIBS += -ljpeg
 endif
 ifdef PNG_FOR_GIF
   CFLAGS += -DPNG_FOR_GIF
-  CFLAGS += -DHAVE_GIF
-endif
+  CFLAGS += -DHAVE_GD_GIF
 endif
 
 ifdef PDF

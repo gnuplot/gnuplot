@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.95 2002/11/16 04:23:18 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.96 2002/11/26 18:50:00 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -941,7 +941,7 @@ show_version(fp)
 		"+LIBREADLINE  "
 # ifdef GNUPLOT_HISTORY
 		"+HISTORY  "
-#else
+# else
 		"-HISTORY  "
 # endif
 #else
@@ -949,20 +949,23 @@ show_version(fp)
 #endif
 		, libgd =
 #ifdef HAVE_LIBGD
-#ifdef PNG_FOR_GIF
-		"+NEWGD  +PNG_FOR_GIF  "
-#else
-#ifdef HAVE_NEWGD
-		"+NEWGD  "
-#else
-		"+GIF  "
-#endif
-#endif
+# ifdef HAVE_GD_PNG
+		"+GD_PNG  "
+# endif
+# ifdef HAVE_GD_JPEG
+		"+GD_JPEG  "
+# endif
+# ifdef HAVE_GD_GIF
+		"+GD_GIF  "
+# endif
+# ifdef HAVE_GD_TTY
+		"+GD_TTF  "
+# endif
 #else
 		"-LIBGD  "
 #endif
 		, libpng =
-#if defined(HAVE_PNG) || defined(HAVE_LIBPNG)
+#if defined(HAVE_LIBPNG) && !(defined(HAVE_GD_PNG) || defined(HAVE_GD_JPEG))
 		"+PNG  "
 #else
 		"-PNG  "

@@ -1,5 +1,5 @@
 #
-# $Id: makefile.os2,v 1.35 2002/09/26 19:10:07 mikulik Exp $
+# $Id: makefile.os2,v 1.36 2002/10/05 15:08:43 mikulik Exp $
 #
 # GNUPLOT Makefile for use on OS/2 2.x (and above)
 # using emx 0.9 (and above) and GNUMake
@@ -176,7 +176,7 @@ ifdef GD
 endif
 
 ifdef GIF
-  CFLAGS += -DHAVE_GIF
+  CFLAGS += -DHAVE_GD_GIF
 endif
 
 ifdef PNG
@@ -185,18 +185,17 @@ ifdef PNG
 endif
 
 ifdef NEWGD
-  CFLAGS += -DHAVE_NEWGD
 ifdef FREETYPE
   CFLAGS += -DHAVE_TTF
   TERMLIBS += -lfreetype
 endif
 ifdef JPEG
-  CFLAGS += -DHAVE_JPEG
+  CFLAGS += -DHAVE_GD_JPEG
   TERMLIBS += -ljpeg
 endif
 ifdef PNG_FOR_GIF
   CFLAGS += -DPNG_FOR_GIF
-  CFLAGS += -DHAVE_GIF
+  CFLAGS += -DHAVE_GD_GIF
 endif
 endif
 

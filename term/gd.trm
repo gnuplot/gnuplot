@@ -1,5 +1,5 @@
 /*
- * $Id: gd.trm,v 1.19 2002/12/12 11:10:45 mikulik Exp $
+ * $Id: gd.trm,v 1.20 2002/12/18 00:57:00 sfeam Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -516,7 +516,7 @@ PNG_options()
 	    break;
 	case PNG_FONT:
 	    c_token++;
-#ifdef HAVE_TTF
+#ifdef HAVE_GD_TTF
 	    if (END_OF_COMMAND) {
 	    	png_state.ttffont[0] = '\0';
 	    } else {
@@ -567,7 +567,7 @@ PNG_options()
 	    /* not "size" */
 	    string = input_line + token[c_token].start_index;
 
-#ifdef HAVE_TTF
+#ifdef HAVE_GD_TTF
 	    /* Check for explicit TTF font size */
 	    if (sscanf(string, "%d", &i) == 1) {
 		if (i > 0 && i < 999)
@@ -592,7 +592,7 @@ PNG_options()
 	}
     }
 
-#ifdef HAVE_TTF
+#ifdef HAVE_GD_TTF
     /* If no explicit TTF font size found, generate default */
     if (png_state.default_ttfsize == 0) 
 	png_state.default_ttfsize = 2 * term->h_char - 2;
@@ -1055,7 +1055,7 @@ PNG_linewidth(double linewidth)
  * to _text_angle and then horizontally (with respect to the text)
  * justified according to _justify_text.
  */
-#ifdef HAVE_TTF
+#ifdef HAVE_GD_TTF
 TERM_PUBLIC void
 PNG_put_text(unsigned int x, unsigned int y, const char *string)
 {
@@ -1120,7 +1120,7 @@ PNG_put_text(unsigned int x, unsigned int y, const char *string)
     }
 }
 
-#else  /* not HAVE_TTF */
+#else  /* not HAVE_GD_TTF */
 
 TERM_PUBLIC void
 PNG_put_text(unsigned int x, unsigned int y, const char *string)
@@ -1138,7 +1138,7 @@ PNG_put_text(unsigned int x, unsigned int y, const char *string)
     }
 }
 
-#endif /* HAVE_TTF */
+#endif /* HAVE_GD_TTF */
 
 
 TERM_PUBLIC int
@@ -1277,7 +1277,7 @@ TERM_TABLE_START(png_driver)
     PNG_VTIC, PNG_HTIC, PNG_options, PNG_init, PNG_reset,
     PNG_text, null_scale, PNG_graphics, PNG_move, PNG_vector,
     PNG_linetype, PNG_put_text, PNG_text_angle,
-#ifdef HAVE_TTF
+#ifdef HAVE_GD_TTF
     PNG_justify_text, 
 #else
     null_justify_text,
@@ -1383,7 +1383,7 @@ END_HELP(png)
  * JPEG support comes almost for free.
  * We just piggy-back on the PNG routines, since they both go via libgd
  */
-#ifdef HAVE_JPEG
+#ifdef HAVE_GD_JPEG
 
 #ifdef TERM_REGISTER
 register_term(jpeg)
@@ -1511,4 +1511,4 @@ START_HELP(jpeg)
 ""
 END_HELP(jpeg)
 #endif /* TERM_HELP */
-#endif /* HAVE_JPEG */
+#endif /* HAVE_GD_JPEG */

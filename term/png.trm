@@ -1,5 +1,5 @@
 /*
- * $Id: png.trm,v 1.36 2002/12/12 11:10:45 mikulik Exp $
+ * $Id: png.trm,v 1.37 2002/12/17 13:32:41 lhecking Exp $
  *
  */
 
@@ -58,8 +58,7 @@
    include dirs and libraries to TERMFLAGS and TERMLIBS. */
 
 /* There is a newer PNG driver that requires libgd version 1.8 or greater.
-   If the new driver is used (HAVE_NEWGD) then we should disable this one. */
-#ifndef HAVE_NEWGD
+   If the new driver is used, this driver is disabled in term.h */
 
 /* The following png drivers use the generic bit mapped graphics
    routines from bitmap.c to build up a bit map in memory.  The driver
@@ -612,5 +611,3 @@ START_HELP(png_old)
 " number of colors that can be set is currently 99."
 END_HELP(png_old)
 #endif /* TERM_HELP */
-
-#endif /* ifndef HAVE_NEWGD */

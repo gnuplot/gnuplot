@@ -1,5 +1,5 @@
 /*
- * $Id: term.h,v 1.17 2002/04/29 13:37:02 broeker Exp $
+ * $Id: term.h,v 1.18 2002/11/16 04:23:18 sfeam Exp $
  */
 
 /* GNUPLOT - term.h */
@@ -297,7 +297,7 @@
 
 /* NOTE THAT GIF REQUIRES A SEPARATE LIBRARY : see term/gif.trm */
 /* GIF format. */
-#if defined(PNG_FOR_GIF) || defined(HAVE_GIF)
+#if defined(PNG_FOR_GIF) || defined(HAVE_GD_GIF)
 # include "gif.trm"
 #endif
 
@@ -346,12 +346,12 @@
 /* then the best we can do is use a separate poor-quality PNG driver png.trm */
 /* But if you are using a newer libgd then it provides full blown support    */
 /* for both PNG and JPEG in term/gd.trm                                      */
-#ifdef HAVE_NEWGD
-# include "gd.trm"
-#else
-#if defined(HAVE_LIBPNG) || defined(HAVE_PNG)
-# include "png.trm"
-#endif
+#ifdef HAVE_LIBPNG
+# if defined(HAVE_GD_PNG) || defined(HAVE_GD_JPEG)
+#  include "gd.trm"
+# else
+#  include "png.trm"
+# endif
 #endif
 
 /* postscript */
