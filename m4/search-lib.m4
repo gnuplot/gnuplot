@@ -6,7 +6,7 @@
 
 # serial 1
 
-AC_DEFUN(gp_CHECK_LIB_QUIET,
+AC_DEFUN(GP_CHECK_LIB_QUIET,
 [ac_lib_var=`echo $1['_']$2 | sed 'y%./+-%__p_%'`
 ac_save_LIBS="$LIBS"
 LIBS="$TERMLIBS $TERMXLIBS -l$1 $5 $LIBS"
@@ -49,8 +49,8 @@ fi
 
 # serial 1
 
-dnl gp_SEARCH_LIBDIRS(LIBRARY, FUNCTION [, OTHER-LIBRARIES])
-AC_DEFUN(gp_SEARCH_LIBDIRS,
+dnl GP_SEARCH_LIBDIRS(LIBRARY, FUNCTION [, OTHER-LIBRARIES])
+AC_DEFUN(GP_SEARCH_LIBDIRS,
 [AC_MSG_CHECKING([for $2 in -l$1])
 gp_save_TERMLIBS="$TERMLIBS"
 changequote(, )dnl
@@ -68,7 +68,7 @@ case "$with_$1" in
 esac
 for ac_dir in '' /usr/local/lib $gp_lib_list ; do
   test x${ac_dir} != x && TERMLIBS="-L${ac_dir} $gp_save_TERMLIBS"
-  gp_CHECK_LIB_QUIET($1,$2,dnl
+  GP_CHECK_LIB_QUIET($1,$2,dnl
     TERMLIBS="$TERMLIBS -l$1"; break, dnl ACTION-IF-FOUND
     TERMLIBS="$gp_save_TERMLIBS",     dnl ACTION-IF-NOT-FOUND
     $3)                               dnl OTHER-LIBRARIES

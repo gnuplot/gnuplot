@@ -5,7 +5,7 @@
 
 # serial 1
 
-AC_DEFUN(gp_NEXT,
+AC_DEFUN(GP_NEXT,
 [AC_MSG_CHECKING(for NeXT)
 AC_EGREP_CPP(yes,
 [#if __NeXT__
