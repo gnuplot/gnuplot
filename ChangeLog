@@ -5,6 +5,11 @@
 	number of columns, and so that the various 3D mapping modes share
 	the interpretations of columns other than the first three.
 
+	src/plot3d.c (get_3ddata): Initialize variables to shut off stupid
+	compiler warnings.
+
+	src/unset.c: #include hidden3d.c to pick up reset_hidden3doptions.
+
 2004-10-15  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/save.c (save_set_all):  Do not try to save the current title and
