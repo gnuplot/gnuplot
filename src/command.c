@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: command.c,v 1.126 1998/06/22 12:24:48 ddenholm Exp $";
+static char *RCSid() { return RCSid("$Id: command.c,v 1.126 1998/06/22 12:24:48 ddenholm Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -141,7 +141,7 @@ static int command __PROTO((void));
 static int read_line __PROTO((char *prompt));
 static void do_shell __PROTO((void));
 static void do_help __PROTO((int toplevel));
-static void do_system __PROTO((char *cmd));
+static void do_system __PROTO((void));
 static int changedir __PROTO((char *path));
 
 
@@ -283,21 +283,13 @@ int do_line()
     FPRINTF((stderr, "Input line: \"%s\"\n", input_line));
 
     /* also used in load_file */
-#if 0
     if (is_system(input_line[0])) {
-	/* system command may be followed by ';' separated gnuplot commands */
-	char *gpcmds = strchr(input_line,';');
-
-	do_system(input_line);
+	do_system();
 	if (interactive)	/* 3.5 did it unconditionally */
 	    (void) fputs("!\n", stderr);	/* why do we need this ? */
-
-	if (gpcmds != NULL)
-	    memmove (input_line,gpcmds,strlen(gpcmds)+1); /* including '\0' */
-	else
-	    return (0);
+	return (0);
     }
-#endif
+
     num_tokens = scanner(&input_line, &input_line_len);
     c_token = 0;
     while (c_token < num_tokens) {
@@ -372,13 +364,13 @@ static int command()
 	do_help(1);
     } else if (equals(c_token, "testtime")) {
 	/* given a format and a time string, exercise the time code */
-	char format[160], string[160];
+	char *format = NULL, *string = NULL;
 	struct tm tm;
 	double secs;
 	if (isstring(++c_token)) {
-	    quote_str(format, c_token, 159);
+	    m_quote_capture(&format, c_token, c_token);
 	    if (isstring(++c_token)) {
-		quote_str(string, c_token++, 159);
+		m_quote_capture(&string, c_token, c_token);
 		memset(&tm, 0, sizeof(tm));
 		gstrptime(string, format, &tm);
 		secs = gtimegm(&tm);
@@ -393,7 +385,10 @@ static int command()
 			string, tm.tm_mday, tm.tm_mon + 1, tm.tm_year,
 			tm.tm_hour, tm.tm_min, tm.tm_sec, tm.tm_wday,
 			tm.tm_yday);
+		free(string);
+		++c_token;
 	    }
+	    free(format);
 	}
     } else if (almost_equals(c_token, "test")) {
 	c_token++;
@@ -495,10 +490,11 @@ static int command()
 	do {
 	    ++c_token;
 	    if (isstring(c_token)) {
-		char s[MAX_LINE_LEN+1];
-		quote_str(s, c_token, MAX_LINE_LEN);
+		char *s = NULL;
+		m_quote_capture(&s, c_token, c_token);
 		fputs(s, stderr);
 		need_space = 0;
+		free(s);
 		++c_token;
 	    } else {
 		struct value a;
@@ -515,23 +511,24 @@ static int command()
 	++c_token;
 	do_fit();
     } else if (almost_equals(c_token, "up$date")) {
-	char tmps[80];
-	char tmps2[80];
-	/* Have to initialise tmps2, otherwise
-	 * update() cannot decide whether a valid
-	 * filename was given. lh
-	 */
-	tmps2[0] = NUL;
+	char *opfname = NULL;  /* old parameter filename */
+	char *npfname = NULL;  /* new parameter filename */
+
 	if (!isstring(++c_token))
 	    int_error(c_token, "Parameter filename expected");
-	quote_str(tmps, c_token++, 80);
+	m_quote_capture(&opfname, c_token, c_token);
+	++c_token;
 	if (!(END_OF_COMMAND)) {
 	    if (!isstring(c_token))
 		int_error(c_token, "New parameter filename expected");
-	    else
-		quote_str(tmps2, c_token++, 80);
+	    else {
+		m_quote_capture(&npfname, c_token, c_token);
+		++c_token;
+	    }
 	}
-	update(tmps, tmps2);
+	update(opfname, npfname);
+	free(npfname);
+	free(opfname);
     } else if (almost_equals(c_token, "p$lot")) {
 	plot_token = c_token++;
 	SET_CURSOR_WAIT;
@@ -678,13 +675,6 @@ static int command()
 	       almost_equals(c_token, "q$uit")) {
 	/* graphics will be tidied up in main */
 	return (1);
-    } else if (equals(c_token, "!")) {  /* shell command */
-	++c_token;
-	if (!isletter(c_token)) {
-	    int_error(c_token, "expecting shell command");
-	} else
-	    do_system(input_line+token[c_token].start_index);
-	c_token++;
     } else if (!equals(c_token, ";")) {		/* null statement */
 #ifdef OS2
 	if (_osmode == OS2_MODE) {
@@ -781,13 +771,14 @@ void replotrequest()
 	int replot_len = strlen(replot_line);
 	int rest_len = strlen(rest_args);
 
+	/* preserve commands following 'replot ;' */
 	/* move rest of input line to the start
 	 * necessary because of realloc() in extend_input_line() */
 	memmove(input_line,rest_args,rest_len+1);
 	/* reallocs if necessary */
 	while (input_line_len < replot_len+rest_len+1)
 	    extend_input_line();
-	/* move old rest args off start of input line to
+	/* move old rest args off begin of input line to
 	 * make space for replot_line */
 	memmove(input_line+replot_len,input_line,rest_len+1);
 	/* copy previous plot command to start of input line */
@@ -926,36 +917,21 @@ static void do_shell()
     }
 }
 
-/* the leading '!' should already be stripped,
- * but it's not too hard to provide a safeguard */
-static void do_system(cmd)
-char *cmd;
+static void do_system()
 {
-    char *scol = strchr(cmd,';');
-    char *lcmd = NULL;
-
-    if (scol != NULL) {
-	int cmdlen = scol - cmd;
-
-	lcmd = gp_alloc (cmdlen+1, "shell cmd");
-	strncpy(lcmd,cmd,cmdlen);
-	*(lcmd+cmdlen) = NUL;
-    } else
-	lcmd = cmd;
+    /* input_line[0] = ' ';     an embarrassment, but... */
 
     /* input_line is filled by read_line or load_file, but 
      * line_desc length is set only by read_line; adjust now
      */
-    line_desc.dsc$w_length = strlen(lcmd);
-    line_desc.dsc$a_pointer = lcmd;
+    line_desc.dsc$w_length = strlen(input_line) - 1;
+    line_desc.dsc$a_pointer = &input_line[1];
 
     if ((vaxc$errno = lib$spawn(&line_desc)) != SS$_NORMAL)
 	os_error(NO_CARET, "spawn error");
 
     (void) putc('\n', stderr);
 
-    if (scol != NULL)
-	free(lcmd);
 }
 
 #endif /* VMS */
@@ -1144,45 +1120,28 @@ static char strg0[256];
 static void getparms __PROTO((char *, char **));
 # endif
 
-/* the leading '!' should already be stripped,
- * but it's not too hard to provide a safeguard */
-static void do_system(cmd)
-char *cmd;
+static void do_system()
 {
-    char *scol = strchr(cmd,';');
-    char *lcmd = NULL;
-
-    if (scol != NULL) {
-	int cmdlen = scol - cmd;
-
-	lcmd = gp_alloc(cmdlen+1, "shell cmd");
-	strncpy(lcmd,cmd,cmdlen);
-	*(lcmd+cmdlen) = NUL;
-    } else
-	lcmd = cmd;
-
 # ifdef AMIGA_AC_5
-    getparms(lcmd, parms);
+    getparms(input_line + 1, parms);
     fexecv(parms[0], parms);
 # elif (defined(ATARI) && defined(__GNUC__))
 /* || (defined(MTOS) && defined(__GNUC__)) */
-    {
-	/* use preloaded shell, if available */
-	short (*shell_p) (char *command);
-	void *ssp;
+    /* use preloaded shell, if available */
+    short (*shell_p) (char *command);
+    void *ssp;
 
-	ssp = (void *) Super(NULL);
-	shell_p = *(short (**)(char *)) 0x4f6;
-	Super(ssp);
+    ssp = (void *) Super(NULL);
+    shell_p = *(short (**)(char *)) 0x4f6;
+    Super(ssp);
 
-	/* this is a bit strange, but we have to have a single if */
-	if (shell_p)
-	    (*shell_p) (lcmd);
-	else
-	    system(lcmd);
-    }
+    /* this is a bit strange, but we have to have a single if */
+    if (shell_p)
+	(*shell_p) (input_line + 1);
+    else
+	system(input_line + 1);
 # elif defined(_Windows)
-    winsystem(lcmd);
+    winsystem(input_line + 1);
 # else /* !(AMIGA_AC_5 || ATARI && __GNUC__ || _Windows) */
 /* (am, 19980929)
  * OS/2 related note: cmd.exe returns 255 if called w/o argument.
@@ -1190,12 +1149,8 @@ char *cmd;
  * A workaround has to include checking for EMX,OS/2, two environment
  *  variables,...
  */
-    system(lcmd);
+    system(input_line + 1);
 # endif /* !(AMIGA_AC_5 || ATARI&&__GNUC__ || _Windows) */
-
-    if (scol != NULL)
-	free(lcmd);
-
 }
 
 
