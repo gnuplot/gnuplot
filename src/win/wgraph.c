@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.27 2002/03/26 20:30:57 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.28 2002/07/21 12:32:53 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - win/wgraph.c */
@@ -1030,14 +1030,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 		    }
 		}
 
-		if (sm_palette.colorMode == SMPAL_COLOR_MODE_GRAY) {
-		    R = G = B = curptr->x;
-		} else {
-		    R = 0xff * GetColorValueFromFormula(sm_palette.formulaR, level);
-		    G = 0xff * GetColorValueFromFormula(sm_palette.formulaG, level);
-		    B = 0xff * GetColorValueFromFormula(sm_palette.formulaB, level);
-		}
-
+		rgb_from_gray( level, &R, &G, &B );
 		c = RGB(R,G,B);
 		this_brush = CreateSolidBrush(c);
 		SelectObject(hdc, this_brush);

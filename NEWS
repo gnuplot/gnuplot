@@ -40,6 +40,8 @@ off with the hotkey 'm'. See 'help mouse' and 'help bind' for more details.
 
 
 [3.8i]
+* NEW color modes for pm3d, see `help palette`
+* NEW option `set terminal postscript ... palfuncparam`
 * NEW set key {no}autotitles
 * NEW arbitrary text rotations; 'set label ... [no]rotate [by] ...'
 * NEW set arrow ... filled | nofilled ...

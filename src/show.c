@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.85 2002/08/24 22:04:13 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.86 2002/08/25 16:13:23 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -107,6 +107,10 @@ static void show_parametric __PROTO((void));
 #ifdef PM3D
 static void show_pm3d __PROTO((void));
 static void show_palette __PROTO((void));
+static void show_palette_rgbformulae __PROTO((void));
+static void show_palette_palette __PROTO((void));
+static void show_palette_gradient __PROTO((void));
+static void show_palette_colornames __PROTO((void));
 static void show_colorbox __PROTO((void));
 #endif
 static void show_pointsize __PROTO((void));
@@ -1855,15 +1859,9 @@ show_parametric()
 
 #ifdef PM3D
 
-static void show_palette()
+static void show_palette_rgbformulae()
 {
-    /* no option given, i.e. "show palette" */
-    if (END_OF_COMMAND) {
 	int i;
-	fprintf(stderr,"\tpalette is %s\n",
-	    sm_palette.colorMode == SMPAL_COLOR_MODE_GRAY ? "GRAY" : "COLOR");
-	fprintf(stderr,"\trgb color mapping formulae are %i,%i,%i\n",
-	    sm_palette.formulaR, sm_palette.formulaG, sm_palette.formulaB);
 	fprintf(stderr,"\t  * there are %i available rgb color mapping formulae:",
 	    sm_palette.colorFormulae);
 	/* print the description of the color formulae */
@@ -1875,27 +1873,22 @@ static void show_palette()
 		i++;
 	    }
 	    fputs("\n", stderr);
-	fputs("\t  * negative numbers mean inverted=negative colour component\n", stderr);
-	fprintf(stderr,"\t  * thus the ranges in `set pm3d rgbformulae' are -%i..%i\n",
+    fputs("\t  * negative numbers mean inverted=negative colour component\n",
+	  stderr);
+    fprintf(stderr,
+	    "\t  * thus the ranges in `set pm3d rgbformulae' are -%i..%i\n",
 	    sm_palette.colorFormulae-1,sm_palette.colorFormulae-1);
-	fputs("\t  * use 'show palette palette <n>' to print the colormap\n", stderr);
-	fprintf(stderr,"\tfigure is %s\n",
-	    sm_palette.positive == SMPAL_POSITIVE ? "POSITIVE" : "NEGATIVE");
-	fprintf(stderr,"\tall color formulae ARE%s written into output postscript file\n",
-	    sm_palette.ps_allcF == 0 ? " NOT" : "");
-	fputs("\tallocating ", stderr);
-	if (sm_palette.use_maxcolors)
-	    fprintf(stderr,"MAX %i",sm_palette.use_maxcolors);
-	else
-	    fputs("ALL remaining", stderr);
-	fputs(" color positions for discrete palette terminals\n", stderr);
-	return;
+    ++c_token;
     }
-    /* option: "show palette palette <n>" */
-    if (almost_equals(c_token-1, "pal$ette")) {
+
+
+static void show_palette_palette()
+{
 	int colors, i;
 	struct value a;
 	double gray, r, g, b;
+    rgb_color color;
+    
 	c_token++;
 	if (END_OF_COMMAND)
 	    int_error(c_token,"palette size required");
@@ -1904,28 +1897,151 @@ static void show_palette()
 	if (sm_palette.colorMode == SMPAL_COLOR_MODE_GRAY)
 	    fprintf(stderr, "Gray palette with %i discrete colors\n", colors);
 	else
-	    fprintf(stderr, "Color palette with %i discrete colors, formulae R=%i, G=%i, B=%i:\n",
-		colors, sm_palette.formulaR, sm_palette.formulaG, sm_palette.formulaB);
+        fprintf(stderr, "Color palette with %i discrete colors\n", colors );
+    
 	for (i = 0; i < colors; i++) {
-	    gray = (double)i / (colors - 1); /* colours equidistantly from [0,1] */
-	    if (sm_palette.positive == SMPAL_NEGATIVE)
-		gray = 1 - gray; /* needed, since printing without call to set_color() */
-	    if (sm_palette.colorMode == SMPAL_COLOR_MODE_GRAY) /* gray scale only */
-		r = g = b = gray;
-	    else { /* i.e. sm_palette.colorMode == SMPAL_COLOR_MODE_RGB */
-		r = GetColorValueFromFormula(sm_palette.formulaR, gray);
-		g = GetColorValueFromFormula(sm_palette.formulaG, gray);
-		b = GetColorValueFromFormula(sm_palette.formulaB, gray);
-	    }
-	    fprintf(stderr, "%3i. gray=%0.4f, (r,g,b)=(%0.4f,%0.4f,%0.4f), #%02x%02x%02x = %3i %3i %3i\n",
-		i, gray, r,g,b,
-		(int)(colors*r),(int)(colors*g),(int)(colors*b),
-		(int)(colors*r),(int)(colors*g),(int)(colors*b));
+        /* colours equidistantly from [0,1]  */
+        gray = (double)i / (colors - 1); 
+	if (sm_palette.positive == SMPAL_NEGATIVE) {
+	    /* needed, since printing without call to set_color()  */
+	    color_from_gray( 1 - gray , &color );
 	}
+	else {
+	    color_from_gray( gray , &color );
+	    }
+	r = color.r;  g = color.g;  b = color.b; 
+	
+	fprintf( stderr, 
+ "%3i. gray=%0.4f, (r,g,b)=(%0.4f,%0.4f,%0.4f), #%02x%02x%02x = %3i %3i %3i\n",
+		i, gray, r,g,b,
+		 (int)(255*r+.5),(int)(255*g+.5),(int)(255*b+.5),
+		 (int)(255*r+.5),(int)(255*g+.5),(int)(255*b+.5)  );
+	}
+	    }
+
+static void show_palette_gradient()
+{
+    int i;
+    double gray,r,g,b;
+
+    ++c_token;
+    if (sm_palette.colorMode != SMPAL_COLOR_MODE_GRADIENT) {
+        fputs( "\tcolor mapping *not* done by defined gradient.\n", stderr );
 	return;
     }
-    /* wrong option to "show palette" */
-    int_error(c_token,"required 'show palette' or 'show palette palette <n>'");
+
+    for( i=0; i<sm_palette.gradient_num; ++i ) {
+        gray = sm_palette.gradient[i].pos;
+        r = sm_palette.gradient[i].col.r;
+        g = sm_palette.gradient[i].col.g;
+        b = sm_palette.gradient[i].col.b;
+        fprintf(stderr, 
+ "%3i. gray=%0.4f, (r,g,b)=(%0.4f,%0.4f,%0.4f), #%02x%02x%02x = %3i %3i %3i\n",
+		i, gray, r,g,b,
+                (int)(255*r+.5),(int)(255*g+.5),(int)(255*b+.5),
+                (int)(255*r+.5),(int)(255*g+.5),(int)(255*b+.5) );
+	}
+}
+
+
+static void show_palette_colornames()
+{
+  const struct gen_table *tbl = pm3d_color_names_tbl;
+  int i=0;
+  fputs( "\tList of known color names:", stderr );
+  while (tbl->key) {
+      if (i%4 == 0) fputs( "\n  ", stderr );
+      fprintf( stderr, "%-18s ", tbl->key );
+      ++tbl;
+      ++i;
+  }
+  fputs( "\n", stderr );
+  ++c_token;
+}
+
+
+static void show_palette()
+{
+    /* no option given, i.e. "show palette" */
+    if (END_OF_COMMAND) {
+	fprintf(stderr,"\tpalette is %s\n",
+	    sm_palette.colorMode == SMPAL_COLOR_MODE_GRAY ? "GRAY" : "COLOR");
+
+	switch( sm_palette.colorMode ) {
+	  case SMPAL_COLOR_MODE_GRAY: break;
+	  case SMPAL_COLOR_MODE_RGB:
+	    fprintf(stderr,"\trgb color mapping by rgbformulae are %i,%i,%i\n",
+		    sm_palette.formulaR, sm_palette.formulaG, 
+		    sm_palette.formulaB);
+	    break;
+	  case SMPAL_COLOR_MODE_GRADIENT:
+	    fputs( "\tcolor mapping by defined gradient\n", stderr );
+	    break;
+	  case SMPAL_COLOR_MODE_FUNCTIONS:
+	    fputs("\tcolor maping is done by user defined functions\n",stderr);
+	    if (sm_palette.Afunc.at && sm_palette.Afunc.definition) 
+	        fprintf( stderr, "\t  A-formula: %s\n", 
+			 sm_palette.Afunc.definition);
+	    if (sm_palette.Bfunc.at && sm_palette.Bfunc.definition)
+	        fprintf( stderr, "\t  B-formula: %s\n", 
+			 sm_palette.Bfunc.definition);
+	    if (sm_palette.Cfunc.at && sm_palette.Cfunc.definition)
+	        fprintf( stderr, "\t  C-formula: %s\n", 
+			 sm_palette.Cfunc.definition);
+	    break;
+	  default:
+	    fprintf( stderr, "%s:%d oops: Unknown color mode '%c'.\n",
+		     __FILE__, __LINE__, (char)(sm_palette.colorMode) );
+	}
+	fprintf(stderr,"\tfigure is %s\n",
+	    sm_palette.positive == SMPAL_POSITIVE ? "POSITIVE" : "NEGATIVE");
+	fprintf( stderr, 
+           "\tall color formulae ARE%s written into output postscript file\n",
+		 sm_palette.ps_allcF == 0 ? " NOT" : "");
+	fputs("\tallocating ", stderr);
+	if (sm_palette.use_maxcolors)
+	    fprintf(stderr,"MAX %i",sm_palette.use_maxcolors);
+	else
+	    fputs("ALL remaining", stderr);
+	fputs(" color positions for discrete palette terminals\n", stderr);
+	fputs( "\tColor-Model: ", stderr );
+	switch( sm_palette.cmodel ) {
+	case C_MODEL_RGB: fputs( "RGB\n", stderr ); break;
+	case C_MODEL_HSV: fputs( "HSV\n", stderr ); break;
+	case C_MODEL_CMY: fputs( "CMY\n", stderr ); break;
+	case C_MODEL_YIQ: fputs( "YIQ\n", stderr ); break;
+	case C_MODEL_XYZ: fputs( "XYZ\n", stderr ); break;
+	default:
+	  fprintf( stderr, "%s:%d ooops: Unknown color mode '%c'.\n",
+		   __FILE__, __LINE__, (char)(sm_palette.cmodel) );
+	}
+	fprintf(stderr,"\tgamma == %.4g\n", sm_palette.gamma );
+	return;
+    }
+
+    if (almost_equals(c_token, "pal$ette")) {
+        /* 'show palette palette <n>' */
+        show_palette_palette();
+	return;
+    }
+    else if (almost_equals(c_token, "gra$dient")) {
+        /* 'show palette gradient' */
+        show_palette_gradient();
+	return;
+    }
+    else if (almost_equals(c_token, "rgbfor$mulae" )) {
+        /* 'show palette rgbformulae' */
+        show_palette_rgbformulae();
+	return;
+    }
+    else if (almost_equals(c_token, "color$names" )) {
+        /* 'show palette colornames' */
+        show_palette_colornames();
+	return;
+    }
+    else { /* wrong option to "show palette" */
+        int_error( c_token, "Required 'show palette' or 'show palette gradient' or\n\t 'show palette palette <n>' or 'show palette rgbformulae' or\n\t 'show palette colornames'.");
+    }
 }
 
 

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.45 2002/08/21 21:42:15 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.46 2002/08/26 05:34:35 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - gplt_x11.c */
@@ -302,6 +302,7 @@ static unsigned long *ReallocColors __PROTO((plot_struct * plot, int n));
 static void PaletteMake __PROTO((plot_struct * plot, t_sm_palette * tpal));
 static void PaletteSetColor __PROTO((plot_struct * plot, double gray));
 static int GetVisual __PROTO((int class, Visual ** best, int *depth));
+static void scan_palette_from_buf __PROTO(( plot_struct *plot ));
 #endif
 
 static void store_command __PROTO((char *line, plot_struct * plot));
@@ -391,8 +392,11 @@ t_sm_palette sm_palette = {
     0,				/* positive */
     0,				/* use_maxcolors */
     -1,				/* colors */
-    (rgb_color *) 0,
+    (rgb_color *) 0,            /* color */
     0,				/* ps_allcF */
+    0,                          /* gradient_num */
+    (gradient_struct *) 0       /* gradient */
+    /* Afunc, Bfunc and Cfunc can't be initialised here */
 };
 static GC gc_pm3d = (GC) 0;
 static int have_pm3d = 1;
@@ -529,6 +533,7 @@ static Pixmap stipple_halftone[stipple_halftone_num];
 static Pixmap stipple_pattern[stipple_pattern_num];
 static int stipple_initialized = 0;
 #endif /* USE_ULIG_FILLEDBOXES */
+
 
 /*
  * Main program
@@ -1067,6 +1072,102 @@ gnuplot: X11 aborted.\n", stderr);
     return partial_read;
 }
 
+
+#ifdef PM3D
+/*  
+ * This function builds back a palette from what x11.trm has written
+ * into the pipe.  It cheats:  SMPAL_COLOR_MODE_FUNCTIONS for user defined
+ * formulaes to transform gray into the three color components is not
+ * implemented.  If this had to be done, one would have to include all
+ * the code for evaluating functions here too, and, even worse: how to
+ * transmit all function definition from gnuplot to here! 
+ * To avoid this, the following is done:  For grayscale, and rgbformulae
+ * everything is easy.  Gradients are more difficult: Each gradient point
+ * is encoded in a 8-byte string (which does not include any '\n' and
+ * transmitted here.  Here the gradient is rebuilt.
+ * Form user defined formulae x11.trm builds a special gradient:  The gray
+ * values are equally spaced and are not transmitted, only the 6 bytes for
+ * the rgbcolor are sent.  These are assembled into a gradient which is
+ * than used in the palette.
+ *
+ * This function belongs completely into record(), but is quiet large so it
+ * became a function of its own.  
+*/
+static void
+scan_palette_from_buf( plot_struct *plot )
+{
+    t_sm_palette tpal;
+    char cm, pos, mod;
+    if (4 != sscanf( buf+2, "%c %c %c %d", &cm, &pos, &mod,
+		     &(tpal.use_maxcolors) ) ) {
+        fprintf( stderr, "%s:%d error in setting palette.\n", 
+		 __FILE__, __LINE__);
+	
+	return;
+    } 
+    
+    tpal.colorMode = cm;
+    tpal.positive = pos;
+    tpal.cmodel = mod;
+
+    /* function palettes are transmitted as approximated gradients: */
+    if (tpal.colorMode == SMPAL_COLOR_MODE_FUNCTIONS)
+      tpal.colorMode = SMPAL_COLOR_MODE_GRADIENT;
+
+    switch( tpal.colorMode ) {
+    case SMPAL_COLOR_MODE_GRAY:  
+	read_input();  /*  FIXME: discarding status  */
+	if (1 != sscanf( buf, "%lf", &(tpal.gamma) )) {
+	    fprintf( stderr, "%s:%d error in setting palette.\n", 
+		     __FILE__, __LINE__);
+	    return;
+	}
+	break;
+    case SMPAL_COLOR_MODE_RGB:
+	read_input();  /*  FIXME: discarding status  */
+	if (3 != sscanf( buf, "%d %d %d", &(tpal.formulaR),
+			 &(tpal.formulaG), &(tpal.formulaB) )) {
+	    fprintf( stderr, "%s:%d error in setting palette.\n", 
+		     __FILE__, __LINE__);
+	    return;
+	}
+	break;
+    case SMPAL_COLOR_MODE_GRADIENT: {
+	int i=0;
+	read_input();  /*  FIXME: discarding status  */
+	if (1 != sscanf( buf, "%d", &(tpal.gradient_num) )) {
+	    fprintf( stderr, "%s:%d error in setting palette.\n", 
+		     __FILE__, __LINE__);
+	    return;
+	}
+	tpal.gradient = (gradient_struct*)
+	  malloc( tpal.gradient_num * sizeof(gradient_struct) );
+	for( i=0; i<tpal.gradient_num; i++ ) {
+	    /*  this %50 *must* match the amount of gradient structs
+		written to the pipe by x11.trm!  */
+	    if (i%50 == 0) {  
+	        read_input();  /*  FIXME: discarding status  */
+	    }
+	    str_to_gradient_entry( &(buf[8*(i%50)]), &(tpal.gradient[i]) );
+	}
+	break;
+      }
+    case SMPAL_COLOR_MODE_FUNCTIONS: 
+        fprintf( stderr, "%s:%d ooops: No function palettes for x11!\n",
+		 __FILE__, __LINE__ );
+	break;
+    default:
+        fprintf( stderr, "%s:%d ooops: Unknown colorMode '%c'.\n",
+		 __FILE__, __LINE__, (char)(tpal.colorMode) );
+	tpal.colorMode = SMPAL_COLOR_MODE_GRAY;
+	break;
+    }
+    PaletteMake(plot, &tpal);
+}
+#endif  /* PM3D */
+
+
+
 /*
  * record - record new plot from gnuplot inboard X11 driver (Unix)
  */
@@ -1153,18 +1254,7 @@ record()
 
 #ifdef PM3D
 	case X11_GR_MAKE_PALETTE:
-	    {
-		t_sm_palette tpal;
-		FPRINTF((stderr, "X11_GR_MAKE_PALETTE\n"));
-		if (6 != sscanf(buf + 1, "%c %d %d %d %c %d\n",
-				&(tpal.colorMode), &(tpal.formulaR), &(tpal.formulaG),
-				&(tpal.formulaB), &(tpal.positive), &(tpal.use_maxcolors))) {
-		    fprintf(stderr, "%s:%d error in setting palette.\n", __FILE__, __LINE__);
-		} else {
-		    /* dump_sm_palette(&tpal); */
-		    PaletteMake(plot, &tpal);
-		}
-	    }
+	    scan_palette_from_buf( plot );
 	    return 1;
 #if 0
 	case X11_GR_RELEASE_PALETTE:
@@ -1172,6 +1262,7 @@ record()
 	    FPRINTF((stderr, "X11_GR_RELEASE_PALETTE\n"));
 	    ReleaseColormap(plot);
 	    sm_palette.colorMode = SMPAL_COLOR_MODE_NONE;
+	    free( sm_palette.gradient );
 	    return 1;
 #endif
 #endif
@@ -2135,10 +2226,14 @@ PaletteMake(plot_struct * plot, t_sm_palette * tpal)
     else
 	max_colors = maximal_possible_colors;
 
-    min_colors = minimal_possible_colors < max_colors ? minimal_possible_colors : max_colors / (num_colormaps > 1 ? 2 : 8);
+    if (minimal_possible_colors < max_colors) 
+        min_colors = minimal_possible_colors; 
+    else
+        min_colors = max_colors / (num_colormaps > 1 ? 2 : 8);
 
     if (tpal) {
-	FPRINTF((stderr, "(PaletteMake) tpal->use_maxcolors = %d\n", tpal->use_maxcolors));
+	FPRINTF((stderr, "(PaletteMake) tpal->use_maxcolors = %d\n", 
+		 tpal->use_maxcolors));
     } else {
 	FPRINTF((stderr, "(PaletteMake) tpal=NULL\n"));
     }
@@ -2146,22 +2241,48 @@ PaletteMake(plot_struct * plot, t_sm_palette * tpal)
     /* reallocate the palette
      * only if it has changed.
      */
-    if (no == virgin && tpal &&
-	tpal->formulaR == sm_palette.formulaR &&
-	tpal->formulaG == sm_palette.formulaG &&
-	tpal->formulaB == sm_palette.formulaB &&
-	tpal->colorMode == sm_palette.colorMode &&
-	tpal->positive == sm_palette.positive && tpal->use_maxcolors == sm_palette.use_maxcolors) {
+    if (tpal) {
+        /*  make sure they do not differ by unused members of palette struct */
+	sm_palette.colorFormulae = tpal-> colorFormulae = 1;
+    }
+
+    if (no == virgin && tpal && !palettes_differ(tpal, &sm_palette)) {
 	FPRINTF((stderr, "(PaletteMake) palette didn't change.\n"));
 	return;
     } else if (tpal) {
-	sm_palette.formulaR = tpal->formulaR;
-	sm_palette.formulaG = tpal->formulaG;
-	sm_palette.formulaB = tpal->formulaB;
+        /*  free old gradient table  */
+        if (sm_palette.gradient) {
+	    free( sm_palette.gradient );
+	    sm_palette.gradient = NULL;
+	    sm_palette.gradient_num = 0;
+	}
+
 	sm_palette.colorMode = tpal->colorMode;
 	sm_palette.positive = tpal->positive;
 	sm_palette.use_maxcolors = tpal->use_maxcolors;
+	sm_palette.cmodel = tpal->cmodel;
+	
 	virgin = no;
+	switch( sm_palette.colorMode ) {
+          case SMPAL_COLOR_MODE_GRAY:  
+	    sm_palette.gamma = tpal->gamma;
+	    break;
+	  case SMPAL_COLOR_MODE_RGB:
+	    sm_palette.formulaR = tpal->formulaR;
+	    sm_palette.formulaG = tpal->formulaG;
+	    sm_palette.formulaB = tpal->formulaB;
+	    break;
+        case SMPAL_COLOR_MODE_FUNCTIONS:
+	  fprintf( stderr, "Ooops:  no SMPAL_COLOR_MODE_FUNCTIONS here!\n" );
+	  break;
+	case SMPAL_COLOR_MODE_GRADIENT: 
+	  sm_palette.gradient_num = tpal->gradient_num;
+	  sm_palette.gradient = tpal->gradient;
+	  break;
+	default:
+	  fprintf(stderr,"%s:%d ooops: Unknown color mode '%c'.\n",
+		  __FILE__, __LINE__, (char)(sm_palette.colorMode) );
+	}
     }
 
     if (!have_pm3d) {
@@ -2207,21 +2328,19 @@ PaletteMake(plot_struct * plot, t_sm_palette * tpal)
     for ( /* EMPTY */ ; max_colors >= min_colors; max_colors /= 2) {
 
 	XColor xcolor;
-	double fact = 1.0 / (double) max_colors;
+	double fact = 1.0 / (double)(max_colors-1);
 
 	ReallocColors(plot, max_colors);
 
 	for (plot->cmap->allocated = 0; plot->cmap->allocated < max_colors; plot->cmap->allocated++) {
 
 	    double gray = (double) plot->cmap->allocated * fact;
-	    if (sm_palette.colorMode == SMPAL_COLOR_MODE_GRAY) {
-		/* gray scale only */
-		xcolor.red = xcolor.green = xcolor.blue = 0xffff * gray;
-	    } else {
-		xcolor.red = 0xffff * GetColorValueFromFormula(sm_palette.formulaR, gray);
-		xcolor.green = 0xffff * GetColorValueFromFormula(sm_palette.formulaG, gray);
-		xcolor.blue = 0xffff * GetColorValueFromFormula(sm_palette.formulaB, gray);
-	    }
+	    rgb_color color;
+	    color_from_gray( gray, &color );
+	    xcolor.red = 0xffff * color.r;
+	    xcolor.green = 0xffff * color.g;
+	    xcolor.blue = 0xffff * color.b;
+	    
 	    if (XAllocColor(dpy, plot->cmap->colormap, &xcolor)) {
 		plot->cmap->pixels[plot->cmap->allocated] = xcolor.pixel;
 	    } else {
@@ -2290,7 +2409,7 @@ static void
 PaletteSetColor(plot_struct * plot, double gray)
 {
     if (plot->cmap->allocated) {
-	int index = gray * (plot->cmap->allocated - 1);
+	int index = gray * plot->cmap->allocated;
 	XSetForeground(dpy, gc_pm3d, plot->cmap->pixels[index]);
     }
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: svg.trm,v 1.18 2002/07/26 16:42:29 mikulik Exp $
+ * $Id: svg.trm,v 1.19 2002/08/22 20:36:48 mikulik Exp $
  *
  */
 
@@ -904,31 +904,19 @@ SVG_make_palette(t_sm_palette *palette)
 TERM_PUBLIC void
 SVG_set_color(double gray)
 {
-    int red, green, blue;
-    if (sm_palette.colors != 0) /* finite nb of colors explicitly requested */
-	gray = (gray >= ((double)(sm_palette.colors-1)) / sm_palette.colors) ?
-		1 : floor(gray * sm_palette.colors) / sm_palette.colors;
+    unsigned char red, green, blue;
 
-    switch (SVG_palette.colorMode) {
-	case SMPAL_COLOR_MODE_GRAY:
-	    red = (gray <= 0) ? 0 : (int)(256 * gray);
-	    if (red >= 256) red = 255;
-	    green = blue = red;
-	    break;
-	case SMPAL_COLOR_MODE_RGB:
-	    red   = (int)(256 * GetColorValueFromFormula(SVG_palette.formulaR, gray));
-	    green = (int)(256 * GetColorValueFromFormula(SVG_palette.formulaG, gray));
-	    blue  = (int)(256 * GetColorValueFromFormula(SVG_palette.formulaB, gray));
-	    if (red < 0)   red = 0;   else if (red >= 256)   red = 255;
-	    if (green < 0) green = 0; else if (green >= 256) green = 255;
-	    if (blue < 0)  blue = 0;  else if (blue >= 256)  blue = 255;
-	    break;
-	default:
-	    fprintf(stderr, "** ERROR SVG_set_color (file %s, line %d)\n",
-		    __FILE__, __LINE__);
-	    return;
+    if (sm_palette.use_maxcolors != 0) {
+        /* finite nb of colors explicitly requested */
+        if( gray >= ( (double)(sm_palette.use_maxcolors-1) )
+	              / sm_palette.use_maxcolors )
+	    gray = 1.0;
+	else
+	    gray = floor( gray * sm_palette.use_maxcolors ) 
+	           / sm_palette.use_maxcolors;
     }
 
+    rgb_from_gray( gray, &red, &green, &blue );
     SVG_use_pm3d_color = 1;
 
     if (red != SVG_red || green != SVG_green || blue != SVG_blue) {
@@ -940,6 +928,8 @@ SVG_set_color(double gray)
 	SVG_green = green;
 	SVG_blue = blue;
     }
+
+    return;
 }
 
 /*------------------------------------------------------------------------------------------------------------------------------------

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.89 2002/08/16 08:11:37 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.90 2002/08/24 22:04:13 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -65,6 +65,8 @@ static char *RCSid() { return RCSid("$Id: set.c,v 1.89 2002/08/16 08:11:37 mikul
 
 #ifdef PM3D
 #include "pm3d.h"
+#include "getcolor.h"
+palette_color_mode pm3d_last_set_palette_mode = SMPAL_COLOR_MODE_NONE;
 #endif
 
 #include <ctype.h>		/* for isdigit() */
@@ -158,6 +160,11 @@ static int assign_linestyle_tag __PROTO((void));
 static int looks_like_numeric __PROTO((char *));
 static int set_tic_prop __PROTO((AXIS_INDEX));
 static char *fill_numbers_into_string __PROTO((char *pattern));
+
+static void check_palette_grayscale __PROTO((void));
+static int set_palette_defined __PROTO((void));
+static void set_palette_file __PROTO((void));
+static void set_palette_function __PROTO((void));
 
 /* Backwards compatibility ... */
 static void set_nolinestyle __PROTO((void));
@@ -2413,13 +2420,344 @@ reset_palette()
     sm_palette.positive = SMPAL_POSITIVE;
     sm_palette.ps_allcF = 0;
     sm_palette.use_maxcolors = 0;
+    sm_palette.gradient_num = 0;
+    sm_palette.gradient = NULL;
+    sm_palette.cmodel = C_MODEL_RGB;
+    sm_palette.gamma = 1.5;
 }
 
 
-/* process 'set palette' command */
+
+/* Process 'set palette defined' gradient specification */
+/* Syntax
+ *   set palette defined   -->  use default palette
+ *   set palette defined ( <pos1> <colorspec1>, ... , <posN> <colorspecN> ) 
+ *     <posX>  gray value, automatically rescaled to [0, 1]
+ *     <colorspecX>   :=  { "<color_name>" | "<X-style-color>" |  <r> <g> <b> }
+ *        <color_name>     predefined colors (see below)
+ *        <X-style-color>  "#rrggbb" with 2char hex values for red, green, blue
+ *        <r> <g> <b>      three values in [0, 1] for red, green and blue
+ *   return 1 if named colors where used, 0 otherwise 
+ */ 
+static int 
+set_palette_defined()
+{
+    struct value a;
+    double p=0, r=0, g=0, b=0;
+    int num, named_colors=0;
+    int actual_size=8;
+
+    if (sm_palette.gradient) {
+        free( sm_palette.gradient );
+    }
+    sm_palette.gradient = (gradient_struct*) 
+      gp_alloc( actual_size*sizeof(gradient_struct), "pm3d gradient" );
+    
+    if (END_OF_COMMAND) {
+        /* lets use some default gradient */
+        double pal[][4] = { {0.0, 0.05, 0.05, 0.2}, {0.1, 0, 0, 1},       
+			    {0.25, 0.7, 0.85, 0.9}, {0.4, 0, 0.75, 0}, 
+			    {0.5, 1, 1, 0}, {0.7, 1, 0, 0},
+			    {0.9, 0.6, 0.6, 0.6}, {1.0, 0.95, 0.95, 0.95} };
+	int i;
+	for( i=0; i<8; ++i ) {
+	    sm_palette.gradient[i].pos = pal[i][0];
+	    sm_palette.gradient[i].col.r = pal[i][1];
+	    sm_palette.gradient[i].col.g = pal[i][2];
+	    sm_palette.gradient[i].col.b = pal[i][3];
+	}
+	sm_palette.gradient_num = 8;
+	sm_palette.cmodel = C_MODEL_RGB;
+	return 0;
+    }
+
+    if ( !equals(c_token,"(") ) 
+        int_error( c_token, "Expected ( to start gradient definition." ); 
+
+    ++c_token;
+    num = -1;
+    
+    while (!END_OF_COMMAND) {
+        p = real(const_express(&a));
+	if (isstring(c_token)) {
+	    /* either color name or X-styel rgb value "#rrggbb" */
+	    char col_buf[21];
+	    quote_str(col_buf, c_token++, 20);
+	    if (col_buf[0] == '#') {
+	        /* X-style specifier */
+	        int rr,gg,bb;
+		if (sscanf( col_buf, "#%2x%2x%2x", &rr, &gg, &bb ) != 3 )
+		    int_error( c_token-1, 
+			       "Unknown color specifier. Use '#rrggbb'." );
+		r = (double)(rr)/255.;
+		g = (double)(gg)/255.;
+		b = (double)(bb)/255.;
+	    }
+	    else { /* some predefined names */
+	        /* Maybe we could scan the X11 rgb.txt file to look up color 
+		 * names?  Or at least move these definitions to some file 
+		 * which is included somehow during compilation instead 
+		 * hardcoding them. */
+	        /* Can't use lookupt_table() as it works for tokens only,
+		   so we'll do it manually */
+	        const struct gen_table *tbl = pm3d_color_names_tbl;
+		while (tbl->key) {
+		    if (!strcmp(col_buf, tbl->key)) {
+			r = (double)((tbl->value >> 16 ) & 255) / 255.;
+			g = (double)((tbl->value >> 8 ) & 255) / 255.;
+		        b = (double)(tbl->value & 255) / 255.;
+		        break;
+		    }
+		    tbl++;
+		}
+		if (!tbl->key) 
+		    int_error( c_token-1, "Unknown color name." );
+		named_colors = 1;
+	    }
+}
+	else {
+	    /* numerical rgb, hsv, xyz, ... values  [0,1] */
+	    r = real(const_express(&a));
+	    if (r<0 || r>1 )  int_error(c_token-1,"Value out of range [0,1].");
+	    g = real(const_express(&a));
+	    if (g<0 || g>1 )  int_error(c_token-1,"Value out of range [0,1].");
+	    b = real(const_express(&a));
+	    if (b<0 || b>1 )  int_error(c_token-1,"Value out of range [0,1].");
+	}
+	++num;
+	
+	if ( num >= actual_size ) {
+ 	    /* get more space for the gradient */
+	    actual_size += 10;
+	    sm_palette.gradient = (gradient_struct*) 
+	      gp_realloc( sm_palette.gradient, 
+			  actual_size*sizeof(gradient_struct), 
+			  "pm3d gradient" );
+	}
+	sm_palette.gradient[num].pos = p;
+	sm_palette.gradient[num].col.r = r;
+ 	sm_palette.gradient[num].col.g = g;
+	sm_palette.gradient[num].col.b = b;
+	if (equals(c_token,")") ) break;
+	if ( !equals(c_token,",") )
+ 	    int_error( c_token, "Expected comma." );
+	++c_token;
+
+}
+
+    sm_palette.gradient_num = num + 1;
+    check_palette_grayscale();
+
+    return named_colors;
+}
+
+
+/*  process 'set palette file' command  
+ *  load a palette from file, honor datafile modiefiers
+ */
+static void
+set_palette_file()
+{
+    int specs;
+    double v[4];
+    int i, j, actual_size;
+
+
+    ++c_token;
+    if (END_OF_COMMAND || !isstring(c_token) )
+      int_error( c_token, "Expected file name" );
+
+    specs = df_open( 4 );
+    if (df_binary)
+        int_error( c_token, "Binary palette files not implemented");
+  
+    if (specs > 0 && specs < 3) 
+        int_error( c_token, "Less than 3 using specs for palette");
+
+    if (sm_palette.gradient) {
+        free( sm_palette.gradient );
+	sm_palette.gradient = 0;
+    }
+    actual_size = 10;
+    sm_palette.gradient = (gradient_struct*) 
+      gp_alloc( actual_size*sizeof(gradient_struct), "gradient" );
+
+    i = 0;
+    
+#define VCONSTRAIN(x) ( (x)<0 ? 0 : ( (x)>1 ? 1: (x) ) )
+    /* values are simply clipped to [0,1] without notice */
+    while ((j = df_readline(v, 4)) != DF_EOF) {
+        if (i >= actual_size) {
+	  actual_size += 10;
+	  sm_palette.gradient = (gradient_struct*) 
+	    gp_realloc( sm_palette.gradient, 
+			actual_size*sizeof(gradient_struct),
+			"pm3d gradient" );
+	}
+	switch (j) {
+	    case 3:
+	        sm_palette.gradient[i].col.r = VCONSTRAIN(v[0]);
+		sm_palette.gradient[i].col.g = VCONSTRAIN(v[1]);
+		sm_palette.gradient[i].col.b = VCONSTRAIN(v[2]);
+		sm_palette.gradient[i].pos = i ;
+		break;
+	    case 4:
+	        sm_palette.gradient[i].col.r = VCONSTRAIN(v[1]);
+		sm_palette.gradient[i].col.g = VCONSTRAIN(v[2]);
+		sm_palette.gradient[i].col.b = VCONSTRAIN(v[3]);
+		sm_palette.gradient[i].pos = v[0];
+		break;
+	    default:
+	        df_close();
+		int_error(c_token, "Bad data on line %d", df_line_number);
+		break;
+	}
+	++i;
+    }
+#undef VCONSTRAIN
+    df_close();
+    if (i==0)
+        int_error( c_token, "No valid palette found" );
+
+    sm_palette.gradient_num = i;
+    check_palette_grayscale();
+
+}
+
+
+
+/* Process a 'set palette function' command.
+ *  Three functions with fixed dummy variable gray are registered which
+ *  map gray to the different color components.
+ *  If ALLOW_DUMMY_VAR_FOR_GRAY is set:
+ *    A different dummy variable may proceed the formulae in quotes.
+ *    This syntax is different from the usual '[u=<start>:<end>]', but
+ *    as <start> and <end> are fixed to 0 and 1 you would have to type
+ *    always '[u=]' which looks strange, especially as just '[u]'
+ *    wouldn't work. 
+ *  If unset:  dummy variable is fixed to 'gray'. 
+ */
+static void 
+set_palette_function()
+{
+    int start_token;
+    char saved_dummy_var[MAX_ID_LEN+1];
+    
+    ++c_token;
+    strncpy( saved_dummy_var, c_dummy_var[0], MAX_ID_LEN );
+    
+    /* set dummy variable */
+#ifdef ALLOW_DUMMY_VAR_FOR_GRAY
+    if (isstring(c_token)) { 
+        quote_str( c_dummy_var[0], c_token, MAX_ID_LEN );
+	++c_token;
+    }
+    else 
+#endif /* ALLOW_DUMMY_VAR_FOR_GRAY */
+    strncpy( c_dummy_var[0], "gray", MAX_ID_LEN );
+
+
+    /* Afunc */ 
+    start_token = c_token;
+    if (sm_palette.Afunc.at) {
+        free( sm_palette.Afunc.at );
+	sm_palette.Afunc.at = NULL;
+    }
+    dummy_func = &sm_palette.Afunc;
+    sm_palette.Afunc.at = perm_at();
+    if (! sm_palette.Afunc.at)
+        int_error(start_token, "not enough memory for function");
+    m_capture(&(sm_palette.Afunc.definition), start_token, c_token-1);
+    dummy_func = NULL;
+    if (!equals(c_token,","))
+        int_error(c_token,"Expected comma" );
+    ++c_token;
+
+    /* Bfunc */
+    start_token = c_token;
+    if (sm_palette.Bfunc.at) {
+        free( sm_palette.Bfunc.at );
+	sm_palette.Bfunc.at = NULL;
+    }
+    dummy_func = &sm_palette.Bfunc;
+    sm_palette.Bfunc.at = perm_at();
+    if (! sm_palette.Bfunc.at)
+        int_error(start_token, "not enough memory for function");
+    m_capture(&(sm_palette.Bfunc.definition), start_token, c_token-1);
+    dummy_func = NULL;
+    if (!equals(c_token,","))
+        int_error(c_token,"Expected comma" );
+    ++c_token;
+    
+    /* Cfunc */
+    start_token = c_token;
+    if (sm_palette.Cfunc.at) {
+        free( sm_palette.Cfunc.at );
+	sm_palette.Cfunc.at = NULL;
+    }
+    dummy_func = &sm_palette.Cfunc;
+    sm_palette.Cfunc.at = perm_at();
+    if (! sm_palette.Cfunc.at)
+        int_error(start_token, "not enough memory for function");
+    m_capture(&(sm_palette.Cfunc.definition), start_token, c_token-1);
+    dummy_func = NULL;
+    
+    strncpy( c_dummy_var[0], saved_dummy_var, MAX_ID_LEN );
+}
+
+
+/* 
+ *  Normalize gray scale of gradient to fill [0,1] and
+ *  complain if gray values are not strictly increasing.
+ *  Maybe automatic sorting of the gray values could be a
+ *  feature. 
+ */
+static void
+check_palette_grayscale()
+{
+    int i;
+    double off, f;
+
+    /* check if gray values are sorted */
+    for (i=0; i<sm_palette.gradient_num-1; ++i ) {
+        if (sm_palette.gradient[i].pos > sm_palette.gradient[i+1].pos) {
+	    int_error( c_token, "Gray scale not sorted in gradient." );
+	}
+    }
+
+    /* fit gray axis into [0:1]:  subtract offset and rescale */
+    off = sm_palette.gradient[0].pos;
+    f = 1.0 / ( sm_palette.gradient[sm_palette.gradient_num-1].pos-off );
+    for (i=1; i<sm_palette.gradient_num-1; ++i ) {
+        sm_palette.gradient[i].pos = f*(sm_palette.gradient[i].pos-off);
+    }
+
+    /* paranoia on the first and last entries */
+    sm_palette.gradient[0].pos = 0.0;
+    sm_palette.gradient[sm_palette.gradient_num-1].pos = 1.0;
+}
+
+
+#define SCAN_RGBFORMULA(formula) do { \
+    c_token++; \
+    i = (int)real(const_express(&a)); \
+    if ( abs(i) >= sm_palette.colorFormulae ) \
+      int_error( c_token, \
+        "color formula out of range (use `show palette rgbformulae' to display the range)");\
+    formula = i; } while(0)
+
+#define CHECK_TRANSFORM  do { if (transform_defined)  \
+   int_error( c_token,  \
+   "Use either `rgbformulae`, `defined`, `file` or `formulae`." );  \
+   transform_defined = 1; }  while(0)
+
+/* Process 'set palette' command */
 static void
 set_palette()
 {
+    struct value a;
+    int transform_defined, named_color;
+    transform_defined = named_color = 0;
     c_token++;
 
     if (END_OF_COMMAND) /* reset to default settings */
@@ -2439,33 +2777,66 @@ set_palette()
 	    case S_PALETTE_GRAY: /* "gray" */
 		sm_palette.colorMode = SMPAL_COLOR_MODE_GRAY;
 		continue;
-	    case S_PALETTE_COLOR: /* "col$or" */
-		sm_palette.colorMode = SMPAL_COLOR_MODE_RGB;
+	    case S_PALETTE_GAMMA: /* "gamma" */
+	        ++c_token;
+	        sm_palette.gamma = real(const_express(&a));
 		continue;
-	    /* rgb color mapping formulae: rgb$formulae r,g,b (three integers) */
+	    case S_PALETTE_COLOR: /* "col$or" */
+		if (pm3d_last_set_palette_mode != SMPAL_COLOR_MODE_NONE) {
+		    sm_palette.colorMode = pm3d_last_set_palette_mode;
+		} else {
+		sm_palette.colorMode = SMPAL_COLOR_MODE_RGB;
+		}
+		continue;
+	    /* rgb color mapping formulae: rgb$formulae r,g,b (3 integers) */
 	    case S_PALETTE_RGBFORMULAE: { /* "rgb$formulae" */
-		struct value a;
 		int i;
-		c_token++;
-		i = (int)real(const_express(&a));
-		if ( abs(i) >= sm_palette.colorFormulae )
-		    int_error(c_token,"color formula out of range (use `show pm3d' to display the range)");
-		sm_palette.formulaR = i;
+		CHECK_TRANSFORM;
+		SCAN_RGBFORMULA( sm_palette.formulaR );
 		if (!equals(c_token,",")) { c_token--; continue; }
-		c_token++;
-		i = (int)real(const_express(&a));
-		if ( abs(i) >= sm_palette.colorFormulae )
-		    int_error(c_token,"color formula out of range (use `show pm3d' to display the range)");
-		sm_palette.formulaG = i;
+		SCAN_RGBFORMULA( sm_palette.formulaG );
 		if (!equals(c_token,",")) { c_token--; continue; }
-		c_token++;
-		i = (int)real(const_express(&a));
-		if ( abs(i) >= sm_palette.colorFormulae )
-		    int_error(c_token,"color formula out of range (`show pm3d' displays the range)");
-		sm_palette.formulaB = i;
+		SCAN_RGBFORMULA( sm_palette.formulaB );
 		c_token--;
+		sm_palette.colorMode = SMPAL_COLOR_MODE_RGB;
+		pm3d_last_set_palette_mode = SMPAL_COLOR_MODE_RGB;
 		continue;
 	    } /* rgbformulae */
+	    case S_PALETTE_DEFINED: { /* "def$ine" */
+	        CHECK_TRANSFORM;
+		++c_token;
+		named_color = set_palette_defined();
+		sm_palette.colorMode = SMPAL_COLOR_MODE_GRADIENT;
+		pm3d_last_set_palette_mode = SMPAL_COLOR_MODE_GRADIENT;
+		continue;
+	    }
+	    case S_PALETTE_FILE: { /* "file" */
+	        CHECK_TRANSFORM;
+		set_palette_file();
+		sm_palette.colorMode = SMPAL_COLOR_MODE_GRADIENT;
+		pm3d_last_set_palette_mode = SMPAL_COLOR_MODE_GRADIENT;
+		--c_token; 
+		continue;
+	    }
+	    case S_PALETTE_FUNCTIONS : { /* "func$tions" */
+	        CHECK_TRANSFORM;
+		set_palette_function();
+		sm_palette.colorMode = SMPAL_COLOR_MODE_FUNCTIONS;
+		pm3d_last_set_palette_mode = SMPAL_COLOR_MODE_FUNCTIONS;
+		--c_token;
+		continue;
+	    }
+	    case S_PALETTE_MODEL : { /* "mo$del" */
+	        int model;
+		++c_token;
+		if (END_OF_COMMAND)
+		    int_error( c_token, "Expected color model." );
+		model = lookup_table(&color_model_tbl[0],c_token);
+		if (model == -1)
+		    int_error(c_token,"Unknown color model.");
+		sm_palette.cmodel = model;
+		continue;
+	    }
 	    /* ps_allcF: write all rgb formulae into PS file? */
 	    case S_PALETTE_NOPS_ALLCF: /* "nops_allcF" */
 		sm_palette.ps_allcF = 0;
@@ -2481,14 +2852,21 @@ set_palette()
 		i = (int)real(const_express(&a));
 		if (i<0) int_error(c_token,"non-negative number required");
 		sm_palette.use_maxcolors = i;
+		--c_token;
 		continue;
 	    }
 	    } /* switch over palette lookup table */
 	    int_error(c_token,"invalid palette option");
 	} /* end of while !end of command over palette options */
     }
+
+    if (named_color && sm_palette.cmodel != C_MODEL_RGB && interactive)
+      int_warn( NO_CARET, 
+      "Named colors will produce strange results if not in color mode RGB." );
 }
 
+#undef CHECK_TRANSFORM
+#undef SCAN_RGBFORMULA
 
 /* process 'set colorbox' command */
 static void

@@ -1,5 +1,5 @@
 /*
- * $Id: metapost.trm,v 1.18 2002/07/21 13:21:30 mikulik Exp $
+ * $Id: metapost.trm,v 1.19 2002/07/26 16:42:29 mikulik Exp $
  */
 
 /* GNUPLOT - metapost.trm */
@@ -839,14 +839,13 @@ MP_set_color(double gray)
 	if (gray < 1e-3) gray = 0;
 	fprintf(gpoutfile, "currentcolor:=%.3gwhite;\n", gray);
     } else {			/* color mode */
-	double red = GetColorValueFromFormula(sm_palette.formulaR, gray);
-	double green = GetColorValueFromFormula(sm_palette.formulaG, gray);
-	double blue = GetColorValueFromFormula(sm_palette.formulaB, gray);
-	if (red < 1e-4) red = 0;
-	if (green < 1e-4) green = 0;
-	if (blue < 1e-4) blue = 0;
+        rgb_color color;
+	color_from_gray( gray, &color );
+	if (color.r < 1e-4) color.r = 0;
+	if (color.g < 1e-4) color.g = 0;
+	if (color.b < 1e-4) color.b = 0;
 	fprintf(gpoutfile, "currentcolor:=%.4g*red+%.4g*green+%.4g*blue;\n",
-		red, green, blue);
+		color.r, color.g, color.b);
     }
     return;
 }

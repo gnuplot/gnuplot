@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.129 2002/08/24 22:04:13 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.130 2002/08/29 04:10:08 sfeam Exp $
 C 18 September 2001
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001   Thomas Williams, Colin Kelley et al.
 C
@@ -5816,7 +5816,7 @@ C ... and restart the table:
  or it will be implemented...  Here it stands for a palette of smooth
  "continuous" colors or grays, but let's call it just a palette.
 
- Color palettes, or requires terminal entries for filled color polygons and
+ Color palettes require terminal entries for filled color polygons and
  palettes of smooth colors, are currently available for terminals listed in
  `help pm3d`. The range of color values are adjustable independently by 
  `set cbrange` and `set log cb`. The whole color palette is 
@@ -5826,18 +5826,30 @@ C ... and restart the table:
        set palette
        set palette {
                   { gray | color }
-                  { rgbformulae <r>,<g>,<b> }
+                  {   rgbformulae <r>,<g>,<b>  
+                    | defined { ( <gray1> <color1> {, <grayN> <colorN>}... ) }
+                    | file '<filename>' {datafile-modifiers}
+                    | functions <R>,<G>,<B>
+                  }
+                  { model { RGB | HSV | CMY | YIQ | XYZ } 
                   { positive | negative }
                   { nops_allcF | ps_allcF }
                   { maxcolors <maxcolors> }
+                  { gamma <gamma> }
                 }
        show palette
        show palette palette <n>
+       show palette gradient
+       show palette rgbformulae
+       show palette colornames
 
  `set palette` (i.e. without options) sets up the default values.
  Otherwise, the options can be given in any order. `show palette` shows the
  current palette properties. `show palette palette <n>` shows RGB triplets for
- the current settings and a palette having <n> discrete colors.
+ the current settings and a palette having <n> discrete colors.  `show palette
+ gradient` displays the gradient defining the palette (if apropriate).  `show
+ palette rgbformulae` prints the available fixed gray --> color transformation
+ formulaes.  `show palette colornames` prints the implemented color names.
 
  The following options determine the coloring properties.
 
@@ -5845,15 +5857,69 @@ C ... and restart the table:
  the gray is obtained by mapping the averaged z coordinate of the 4 corners of
  the quadrangle into the range [min_z,max_z] providing range of grays [0:1].
  This value can be used directly as the gray for gray maps.  The color map
- requires a transformation gray->(R,G,B), i.e.  a mapping
- [0:1]->([0:1],[0:1],[0:1]).  Therefore three suitable mapping functions have 
- to be chosen.  This is done via `rgbformulae <r>,<g>,<b>`.  The available 
- mapping functions are listed by `show palette`.  Default is `7,5,15`, some 
- other examples are `3,11,6`, `21,23,3` or `3,23,21`.  Negative numbers, like
- `3,-11,-6`, mean inverted color (i.e.  1-gray passed into the formula, see 
- also `positive` and `negative` options below).
+ requires a transformation gray --> (R,G,B), i.e. a mapping
+ [0:1] --> ([0:1],[0:1],[0:1]).  
 
- Some nice schemes:
+ Basically two different types of mappings can be used:  Analytic formulae
+ to convert gray to color, or discrete mapping tables which are interpolated.
+ `rgbformulae` and `functions` use analytic formulae whereas `defined` and
+ `file` use interpolated tables.  `rgbformulae` reduces the size of postscript
+ output to a minimum.
+
+ `set palette gray` switches to a gray only palette.  `rgbformulae`, `defined`,
+ `file` and `functions` switch to a color mapping.  `set palette color` is an 
+ easy way to switch back from the gray palette to the last color mapping.
+ 
+ Most terminals support only discrete number of colors (e.g. 256 colors in 
+ gif).  All entries of the palette remaining after the default gnuplot linetype
+ colors declaration are allocated for pm3d by default.  Then `multiplot` could
+ fail if there are no more color positions in the terminal available.  Then you
+ should use `set palette maxcolors <maxcolors>` with a reasonably small value. 
+ This option can also be used to separate levels of z=constant in discrete
+ steps, thus to emulate filled contours. Default value of 0 stays for
+ allocating all remaining entries in the terminal palette or for to use exact
+ mapping to RGB.
+
+ Automatic gamma correction via `set palette gamma <gamma>` can be done for
+ gray maps only (`set palette gray`).  Gamma is ignored for color mappings.
+
+ RGB color space might not be the most useful color space to work in.  For 
+ that reason you may change the color space with `model` to one of `RGB`, 
+ `HSV`, `CMY`, `YIQ` and `XYZ`.  Using color names for `defined` tables and a
+ color space other than RGB will result in funny colors.  All explanation have
+ been written for RGB color space, so please note, that `R` can be `H`, `C`, 
+ `Y`, or `X`, depending on the actual color space (`G` and `B` accordingly). 
+
+ All values for all color spaces are limited to [0,1]!
+
+ RGB stands for Red, Green and Blue;  CMY stands for Cyan, Magenta and Yellow;
+ HSV stands for Hue, Saturation, and Value;  YIQ is the color model used by 
+ the U.S. Commercial Color Television Broadcasting, it is basically an RGB
+ recoding with downward compatibility for black and white television;
+ XYZ are the three primary colors of the color model defined by the 'Commission
+ Internationale de l'Eclairage' (CIE).
+ For more information on color models see:
+^ <a href="http://www.cs.rit.edu/~ncs/color/glossary.htm">
+           http://www.cs.rit.edu/~ncs/color/glossary.htm
+^ </a>
+ and
+^ <a href="http://cs.fit.edu/wds/classes/cse5255/cse5255/davis/index.html">
+           http://cs.fit.edu/wds/classes/cse5255/cse5255/davis/index.html
+^ </a>
+
+4 rgbformulae
+?commands set palette rgbformulae
+?set palette rgbformulae
+?palette rgbformulae
+?rgbformulae
+ For `rgbformulae` three suitable mapping functions have 
+ to be chosen.  This is done via `rgbformulae <r>,<g>,<b>`.  The available 
+ mapping functions are listed by `show palette rgbformulae`.  Default is 
+ `7,5,15`, some other examples are `3,11,6`, `21,23,3` or `3,23,21`.  Negative
+ numbers, like `3,-11,-6`, mean inverted color (i.e.  1-gray passed into the
+ formula, see also `positive` and `negative` options below).
+
+ Some nice schemes in RGB color space
     7,5,15   ... traditional pm3d (black-blue-red-yellow)
     3,11,6   ... green-red-violet
     23,28,3  ... ocean (green-blue-white); try also all other permutations
@@ -5862,12 +5928,173 @@ C ... and restart the table:
     33,13,10 ... rainbow (blue-green-yellow-red)
     34,35,36 ... AFM hot (black-red-yellow-white)
 
+ A full color palette in HSV color space
+    3,2,2    ... red-yellow-green-cyan-blue-magenta-red
+
+ Please note that even if called `rgbformulae` the formulaes might actually
+ determine the <H>,<S>,<V> or <X>,<Y>,<Z> or ... color components as usual.
+
  Use `positive` and `negative` to invert the figure colors.
 ^ <a name="positive"></a>
 ^ <a name="negative"></a>
 
+4 defined
+?commands set palette defined
+?set palette defined
+?palette defined
+?defined
+ Gray-to-rgb mapping can be manualy set by use of `defined`:  A color gradient
+ is defined and used to give the rgb values.  Such a  gradient is a piecewise
+ linear mapping from gray values in [0,1] to the RGB space [0,1]x[0,1]x[0,1].
+ You have to specify the gray values and the corresponding RGB values in 
+ between a linear interpolation shall take place:
+ 
+ Syntax:
+       set palette  defined { ( <gray1> <color1> {, <grayN> <colorN>}... ) }
+
+ <grayX> are gray values which are mapped to [0,1] and <colorX> are the 
+ corresponding rgb colors.  The color can be specified in three different 
+ ways:  
+ 
+      <color> :=  { <r> <g> <b> | '<color-name>' | '#rrggbb' }
+
+ Either by three numbers (each in [0,1]) for red, green and blue, separated by
+ whitespace, or the name of the color in quotes or X style color specifiers
+ also in quotes.  You may freely mix the three types in a gradient definition,
+ but the named color "red" will be something strange if RGB is not selected
+ as color space.  Use `show palette colornames` for a list of known color 
+ names.
+
+ Please note, that even if written as <r>, this might actually be the
+ <H> component in HSV color space or <X> in CIE-XYZ space, or ...
+ depending on the selected color model.
+
+ The <gray> values have to form an ascending sequence of real numbers; the
+ sequence will be automatically rescaled to [0,1].
+
+ `set palette defined` (without a gradient definition in braces) switches to 
+ RGB color space and uses a preset full-spectrum color gradient.
+ Use `show palette gradient` to display the gradient.
+
+ Examples:
+
+ To produce a gray palette (useless but instructive) use:
+      set palette model RGB 
+      set pallette defined ( 0 "black", 1 "white" )
+
+ To produce a blue yellow red palette use (all equivalent):
+       set palette defined ( 0 "blue", 1 "yellow", 2 "red" )
+       set palette defined ( 0 0 0 1, 1 1 1 0, 2 1 0 0 )
+       set palette defined ( 0 "#0000ff", 1 "#ffff00", 2 "ff0000" )
+ 
+ To produce some rainbow-like palette use:
+       set palette defined ( 0 "blue", 3 "green", 6 "yellow", 10 "red" )
+
+ Full color spectrum within HSV color space:
+       set palette model HSV
+       set palette defined ( 0 0 1 1, 1 1 1 1 )
+       set palette defined ( 0 0 1 0, 1 0 1 1, 6 0.8333 1 1, 7 0.8333 0 1)
+
+ To produce a palette with few colors only use:
+       set palette model RGB maxcolors 4
+       set palette defined ( 0 "blue", 1 "green", 2 "yellow", 3 "red" ) 
+
+ 'Traffic light' palette (non-smooth color jumps at gray = 1/3 and 2/3).
+       set palette model RGB
+       set palette defined (0 "dark-green", 1 "green", 1 "yellow", \
+                            2 "dark-yellow", 2 "red", 3 "dark-red" ) 
+
+4 functions
+?commands set palette functions
+?set palette functions
+?palette functions
+?functions
+ Use `set palette functions <Rexpr>, <Gexpr>, <Bexpr>` to define three formulae
+ for the R(gray), G(gray) and B(gray) mapping.  The three formulae may depend
+ on the variable `gray` which will take values in [0,1] and should also 
+ produce values in [0,1].
+ Please note that <Rexpr> might be a formula for the H-value if HSV color
+ space has been choosen (same for all other formulae and color spaces).
+
+ Examples:
+
+ To produce a full color palette use:
+       set palette model HSV functions gray, 1, 1 
+
+ A nice black to gold palette:
+       set palette model XYZ functions gray**0.35, gray**0.5, gray**0.8
+
+ A gamma-corrected black and white palette
+       gamma = 2.2
+       color(gray) = gray**(1./gamma)
+       set palette model RGB functions color(gray), color(gray), color(gray) 
+
+4 file
+?commands set palette file
+?set palette file
+?palette file
+?file
+ `set palette file` is basically a `set palette defined (<gradient>)` where
+ <gradient> is read from a datafile.  Either 4 columns (gray,R,G,B) or
+ just three columns (R,G,B) have to be selected via the `using` data file
+ modifier.  In the three column case, the line number will be used as gray.
+ The gray range is automatically rescaled to [0,1].  The file is read as a 
+ normal data file, so all datafile modifiers can be used.
+ Please note, that `R` might actually be e.g. `H` if HSV color space is 
+ selected.
+
+ As usual <filename> may be `'-'` which means that the data follow the command
+ inline and are terminated by a single `e` on a line of its own. 
+
+ Use `show palette gradient` to display the gradient.
+
+ Examples:
+
+ Read in a palette of RGB triples each in range [0,255]:
+       set palette file 'some-palette' using ($1/255):($2/255):($3/255)
+
+ Equidistant rainbow (blue-green-yellow-red) palette:
+       set palette model RGB file "-" 
+       0 0 1
+       0 1 0
+       1 1 0
+       1 0 0
+       e
+
+4 gamma-correction
+?commands set palette gamma-correction
+?set palette gamma-correction
+?palette gamma-correction
+?gamma-correction
+ For gray mappings gamma correction can be turned on by `set palette gamma
+ <gamma>`.  <gamma> defaults to 1.5 which is quite suitable for most 
+ terminals.
+
+ For color mappings no automatic gamma correction is done by gnuplot.  But 
+ you may easily implement gamma correction, here an example for a gray scale
+ image by use of explicit functions for the red, green and blue component
+ with slightly different values of gamma
+ 
+ Example:
+       set palette model RGB
+       set palette functions gray**0.64, gray**0.67, gray**0.70
+  
+ To use gamma correction with interpolated gradients specify intermediate
+ gray values with apropriate colors.  Instead of
+
+       set palette defined ( 0 0 0 0, 1 1 1 1 )
+
+ use e.g.
+
+      set palette defined ( 0 0 0 0, 0.5 .73 .73 .73, 1 1 1 1 )
+ 
+ or even more intermediate points until the linear interpolation fits the
+ "gamma corrected" interpolation well enough.
+
+4 postscript
+?palette postscript
  In order to reduce the size of postscript files, the gray value and not all
- three calculated r,g,b values is written in the file.  Therefore the 
+ three calculated r,g,b values are written to the file.  Therefore the 
  analytical formulae are coded directly in the postscript language as a header
  just before the pm3d drawing, see /g and /cF definitions.  Usually, it makes
  sense to write therein definitions of only the 3 formulae used.  But for
@@ -5892,15 +6119,8 @@ C ... and restart the table:
  by the enclosed awk script `pm3dConvertToImage.awk`.  Usage:
      awk -f pm3dConvertToImage.awk <thefile.ps >smallerfile.ps
 
- Most terminals support only discrete number of colors (e.g. 256 colors in 
- gif).  All entries of the palette remaining after the default gnuplot linetype
- colors declaration are allocated for pm3d by default.  Then `multiplot` could
- fail if there are no more color positions in the terminal available.  Then you
- should use `set palette maxcolors <maxcolors>` with a reasonably small value. 
- This option can also be used to separate levels of z=constant in discrete
- steps, thus to emulate filled contours. Default value of 0 stays for
- allocating all remaining entries in the terminal palette or for to use exact
- mapping to RGB.
+ You may manually change the postscript output from gray to color and vice
+ versa and change the definition of <maxcolors>.
 
 3 color box
 ?commands set colorbox

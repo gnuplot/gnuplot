@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.46 2002/08/16 08:11:37 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.47 2002/08/24 22:04:13 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -54,6 +54,7 @@ static char *RCSid() { return RCSid("$Id: save.c,v 1.46 2002/08/16 08:11:37 miku
 #include "variable.h"
 #ifdef PM3D
 # include "pm3d.h"
+# include "getcolor.h"
 #endif
 
 static void save_functions__sub __PROTO((FILE *));
@@ -862,13 +863,63 @@ set ticscale %g %g\n",
     if (!pm3d.where[0]) fputs("\nunset pm3d", fp);
     fputs("\n", fp);
 
-    fprintf(fp, "set palette %s rgbformulae %d,%d,%d %stive %sps_allcF maxcolors %d\n",
-	sm_palette.colorMode == SMPAL_COLOR_MODE_GRAY ? "gray" : "color",
-	sm_palette.formulaR, sm_palette.formulaG, sm_palette.formulaB,
-	sm_palette.positive ? "posi" : "nega",
-	sm_palette.ps_allcF ? "" : "no",
+    /*
+     *  Save palette information
+     */
+    fprintf( fp, "set palette %s %s maxcolors %d ",
+	     sm_palette.positive ? "positive" : "negative",
+	     sm_palette.ps_allcF ? "ps_allcF" : "nops_allcF",
 	sm_palette.use_maxcolors);
+    fprintf( fp, "gamma %g ", sm_palette.gamma );
+    if (sm_palette.colorMode == SMPAL_COLOR_MODE_GRAY) {
+      fputs( "gray\n", fp );
+    }
+    else {
+      fputs( "color model ", fp );
+      switch( sm_palette.cmodel ) {
+        case C_MODEL_RGB: fputs( "RGB ", fp ); break;
+        case C_MODEL_HSV: fputs( "HSV ", fp ); break;
+        case C_MODEL_CMY: fputs( "CMY ", fp ); break;
+        case C_MODEL_YIQ: fputs( "YIQ ", fp ); break;
+        case C_MODEL_XYZ: fputs( "XYZ ", fp ); break;
+        default:
+	  fprintf( stderr, "%s:%d ooops: Unknown color model '%c'.\n",
+		   __FILE__, __LINE__, (char)(sm_palette.cmodel) );
+      }
+      fputs( "\nset palette ", fp );
+      switch( sm_palette.colorMode ) {
+      case SMPAL_COLOR_MODE_RGB:
+	fprintf( fp, "rgbformulae %d, %d, %d\n", sm_palette.formulaR, 
+		 sm_palette.formulaG, sm_palette.formulaB );
+	break;
+      case SMPAL_COLOR_MODE_GRADIENT: {
+	int i=0;
+	fprintf( fp, "defined (" );
+	for( i=0; i<sm_palette.gradient_num; ++i ) {
+	  fprintf( fp, " %.4g %.4g %.4g %.4g", sm_palette.gradient[i].pos,
+		   sm_palette.gradient[i].col.r, sm_palette.gradient[i].col.g,
+		   sm_palette.gradient[i].col.b );
+	  if (i<sm_palette.gradient_num-1)  {
+	      fputs( ",", fp);
+	      if (i==2 || i%4==2)  fputs( "\\\n    ", fp );
+	  }
+	}
+	fputs( " )\n", fp );
+	break;
+      }
+      case SMPAL_COLOR_MODE_FUNCTIONS:
+	fprintf( fp, "functions %s, %s, %s\n", sm_palette.Afunc.definition,
+		 sm_palette.Bfunc.definition, sm_palette.Cfunc.definition );
+	break;
+      default:
+	fprintf( stderr, "%s:%d ooops: Unknown color mode '%c'.\n",
+		 __FILE__, __LINE__, (char)(sm_palette.colorMode) );
+      }
+    }
 
+    /*
+     *  Save Colorbox info
+     */
     if (color_box.where != SMCOLOR_BOX_NO)
 	fprintf(fp,"set colorbox %s\n", color_box.where==SMCOLOR_BOX_DEFAULT ? "default" : "user");
     fprintf(fp, "set colorbox %sal origin %g,%g size %g,%g ",

@@ -33,7 +33,10 @@ util3d.c util3d.h variable.c variable.h version.c version.h
 
 gnuplot_LDADD = $(TERMLIBS) $(TERMXLIBS)
 
-gnuplot_x11_SOURCES = gplt_x11.c getcolor.c gpexecute.c gpexecute.h mousecmn.h
+gnuplot_x11_SOURCES = gplt_x11.c getcolor_x11.c gpexecute.c gpexecute.h mousecmn.h
+
+getcolor_x11.c: getcolor.c 
+	 $(CPP) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -DGPLT_X11_MODE -o getcolor_x11.c getcolor.c 
 
 gnuplot_x11_LDADD = $(XLIBS)
 

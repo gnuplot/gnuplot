@@ -1,5 +1,5 @@
 /*
- * $Id: color.h,v 1.10 2002/02/25 03:10:41 broeker Exp $
+ * $Id: color.h,v 1.11 2002/08/20 16:50:14 mikulik Exp $
  */
 
 /* GNUPLOT - color.h */
@@ -35,6 +35,20 @@ of palettes between terminals and making palette routines.
 #ifdef PM3D
 
 #include "gp_types.h"
+#include "eval.h"
+
+/*
+ *    color modes
+ */
+typedef enum { 
+    SMPAL_COLOR_MODE_NONE = '0',
+    SMPAL_COLOR_MODE_GRAY = 'g',      /* grayscale only */
+    SMPAL_COLOR_MODE_RGB = 'r',       /* one of several fixed transforms */ 
+    SMPAL_COLOR_MODE_FUNCTIONS = 'f', /* user definded transforms */
+    SMPAL_COLOR_MODE_GRADIENT = 'd'   /* interpolated table: 
+				       * explicitly defined or read from file */
+} palette_color_mode;
+
 
 /* Contains a colour in RGB scheme.
    Values of  r, g and b  are all in range [0;1] */
@@ -66,13 +80,13 @@ typedef struct {
 } gpdPoint;
 
 
-/*
-   colour modes
-*/
+/* to build up gradients:  whether it is really red, green and blue or maybe
+ * hue saturation and value in col depends on cmodel */
+typedef struct {
+  double pos;
+  rgb_color col;
+} gradient_struct;
 
-#define SMPAL_COLOR_MODE_NONE  0
-#define SMPAL_COLOR_MODE_GRAY 'g'
-#define SMPAL_COLOR_MODE_RGB  'r'
 
 /*
   inverting the colour for negative picture (default is positive picture)
@@ -96,7 +110,7 @@ typedef struct {
   /** Values that can be changed by `set' and shown by `show' commands: **/
 
   /* can be SMPAL_COLOR_MODE_GRAY or SMPAL_COLOR_MODE_RGB */
-  char colorMode;
+  palette_color_mode colorMode;
   /* mapping formulae for SMPAL_COLOR_MODE_RGB */
   int formulaR, formulaG, formulaB;
   char positive;		/* positive or negative figure */
@@ -135,6 +149,24 @@ typedef struct {
    * comfortable to move it to the particular .trm files. */
   char ps_allcF;
 
+  /* These variables are used to define interpolated color palettes:
+   * gradient is an array if (gray,color) pairs.  This array is 
+   * gradient_num entries big.  
+   * Interpolated tables are used if colorMode==SMPAL_COLOR_MODE_GRADIENT */
+  int gradient_num;
+  gradient_struct *gradient;
+
+  /* the used color model: RGB, HSV, XYZ, etc. */
+  int cmodel;  
+  
+  /* Three mapping function for gray->RGB/HSV/XYZ/etc. mapping
+   * used if colorMode == SMPAL_COLOR_MODE_FUNCTIONS */
+  struct udft_entry Afunc;  /* R for RGB, H for HSV, C for CMY, ... */
+  struct udft_entry Bfunc;  /* G for RGB, S for HSV, M for CMY, ... */
+  struct udft_entry Cfunc;  /* B for RGB, V for HSV, Y for CMY, ... */
+
+  /* gamma for gray scale palettes only */
+  double gamma;
 } t_sm_palette;
 
 
@@ -196,6 +228,10 @@ extern color_box_struct color_box;
 
 
 /* ROUTINES */
+
+
+void init_color __PROTO((void));  /* call once to initialize variables */
+
 
 /*
   Make the colour palette. Return 0 on success

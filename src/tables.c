@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: tables.c,v 1.35 2002/08/16 08:24:22 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: tables.c,v 1.36 2002/08/19 16:21:51 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - tables.c */
@@ -41,6 +41,10 @@ static char *RCSid() { return RCSid("$Id: tables.c,v 1.35 2002/08/16 08:24:22 mi
 #include "setshow.h"
 #include "term_api.h"
 #include "util.h"
+
+#ifdef PM3D
+# include "getcolor.h"
+#endif
 
 /* gnuplot commands */
 
@@ -395,10 +399,26 @@ const struct gen_table set_palette_tbl[] =
     { "gray",		S_PALETTE_GRAY },
     { "col$or",		S_PALETTE_COLOR },
     { "rgb$formulae",	S_PALETTE_RGBFORMULAE },
+    { "def$ined",       S_PALETTE_DEFINED },
+    { "file",           S_PALETTE_FILE },
+    { "func$tions",     S_PALETTE_FUNCTIONS },
+    { "mo$del",         S_PALETTE_MODEL },
     { "nops_allcF",	S_PALETTE_NOPS_ALLCF },
     { "ps_allcF",	S_PALETTE_PS_ALLCF },
     { "maxc$olors",	S_PALETTE_MAXCOLORS },
+    { "gam$ma",         S_PALETTE_GAMMA },
     { NULL, S_PALETTE_INVALID }
+};
+
+
+const struct gen_table color_model_tbl[] = 
+{
+    { "RGB", C_MODEL_RGB },
+    { "HSV", C_MODEL_HSV }, 
+    { "CMY", C_MODEL_CMY }, 
+    { "YIQ", C_MODEL_YIQ }, 
+    { "XYZ", C_MODEL_XYZ }, 
+    { NULL,  -1 }
 };
 
 /* 'set pm3d' options */
@@ -426,6 +446,94 @@ const struct gen_table set_pm3d_tbl[] =
     { "e$xplicit",	S_PM3D_EXPLICIT },
     { NULL, S_PM3D_INVALID }
 };
+
+/* fixed RGB color names for 'set palette defined' */
+const struct gen_table pm3d_color_names_tbl[] =
+{
+    /* black, white and gray */
+    { "white"           , 255*(1<<16) + 255*(1<<8) + 255 },
+    { "black"           ,   0*(1<<16) +   0*(1<<8) +   0 },
+    { "gray0"           ,   0*(1<<16) +   0*(1<<8) +   0 },
+    { "gray10"          ,  26*(1<<16) +  26*(1<<8) +  26 },
+    { "grey20"          ,  51*(1<<16) +  51*(1<<8) +  51 },
+    { "grey30"          ,  77*(1<<16) +  77*(1<<8) +  77 },
+    { "gray40"          , 102*(1<<16) + 102*(1<<8) + 102 },
+    { "gray50"          , 127*(1<<16) + 127*(1<<8) + 127 },
+    { "gray60"          , 153*(1<<16) + 153*(1<<8) + 153 },
+    { "grey70"          , 179*(1<<16) + 179*(1<<8) + 179 },
+    { "grey80"          , 204*(1<<16) + 204*(1<<8) + 204 },
+    { "gray90"          , 229*(1<<16) + 229*(1<<8) + 229 },
+    { "grey100"         , 255*(1<<16) + 255*(1<<8) + 255 },
+    { "grey"            , 190*(1<<16) + 190*(1<<8) + 190 },
+    { "light-grey"      , 211*(1<<16) + 211*(1<<8) + 211 },
+    { "dark-grey"       , 169*(1<<16) + 169*(1<<8) + 169 },
+    /* red */
+    { "red"             , 255*(1<<16) +   0*(1<<8) +   0 },
+    { "light-red"       , 240*(1<<16) +  50*(1<<8) +  50 },
+    { "dark-red"        , 139*(1<<16) +   0*(1<<8) +   0 },
+    /* yellow */
+    { "yellow"          , 255*(1<<16) + 255*(1<<8) +   0 },
+    { "light-yellow"    , 255*(1<<16) + 255*(1<<8) + 224 },
+    { "dark-yellow"     , 200*(1<<16) + 200*(1<<8) +   0 },
+    /* green */
+    { "green"           ,   0*(1<<16) + 255*(1<<8) +   0 },
+    { "light-green"     , 144*(1<<16) + 238*(1<<8) + 144 },
+    { "dark-green"      ,   0*(1<<16) + 100*(1<<8) +   0 },
+    { "spring-green"    ,   0*(1<<16) + 255*(1<<8) + 127 },
+    { "forest-green"    ,  34*(1<<16) + 139*(1<<8) +  34 },
+    { "sea-green"       ,  46*(1<<16) + 139*(1<<8) +  87 },
+    /* blue */
+    { "blue"            ,   0*(1<<16) +   0*(1<<8) + 255 },
+    { "light-blue"      , 173*(1<<16) + 216*(1<<8) + 230 },
+    { "dark-blue"       ,   0*(1<<16) +   0*(1<<8) + 139 },
+    { "midnight-blue"   ,  25*(1<<16) +  25*(1<<8) + 112 },
+    { "navy"            ,   0*(1<<16) +   0*(1<<8) + 128 },
+    { "medium-blue"     ,   0*(1<<16) +   0*(1<<8) + 205 },
+    { "royalblue"       ,  65*(1<<16) + 105*(1<<8) + 225 },
+    { "skyblue"         , 135*(1<<16) + 206*(1<<8) + 235 },
+    /* cyan */
+    { "cyan"            ,   0*(1<<16) + 255*(1<<8) + 255 },
+    { "light-cyan"      , 224*(1<<16) + 255*(1<<8) + 255 },
+    { "dark-cyan"       ,   0*(1<<16) + 139*(1<<8) + 139 },
+    /* magenta */
+    { "magenta"         , 255*(1<<16) +   0*(1<<8) + 255 },
+    { "light-magenta"   , 240*(1<<16) +  85*(1<<8) + 240 },
+    { "dark-magenta"    , 139*(1<<16) +   0*(1<<8) + 139 },
+    /* turquoise */
+    { "turquoise"       ,  64*(1<<16) + 224*(1<<8) + 208 },
+    { "light-turquoise" , 175*(1<<16) + 238*(1<<8) + 238 },
+    { "dark-turquoise"  ,   0*(1<<16) + 206*(1<<8) + 209 },
+    /* pink */
+    { "pink"            , 255*(1<<16) + 192*(1<<8) + 203 },
+    { "light-pink"      , 255*(1<<16) + 182*(1<<8) + 193 },
+    { "dark-pink"       , 255*(1<<16) +  20*(1<<8) + 147 },
+    /* coral */
+    { "coral"           , 255*(1<<16) + 127*(1<<8) +  80 },
+    { "light-coral"     , 240*(1<<16) + 128*(1<<8) + 128 },
+    { "orange-red"      , 255*(1<<16) +  69*(1<<8) +   0 },
+    /* salmon */
+    { "salmon"          , 250*(1<<16) + 128*(1<<8) + 114 },
+    { "light-salmon"    , 255*(1<<16) + 160*(1<<8) + 122 },
+    { "dark-salmon"     , 233*(1<<16) + 150*(1<<8) + 122 },
+    /* some more */
+    { "aquamarine"      , 127*(1<<16) + 255*(1<<8) + 212 },
+    { "khaki"           , 240*(1<<16) + 230*(1<<8) + 140 },
+    { "dark-khaki"      , 189*(1<<16) + 183*(1<<8) + 107 },
+    { "gold"            , 255*(1<<16) + 215*(1<<8) +   0 },
+    { "goldenrod"       , 218*(1<<16) + 165*(1<<8) +  32 },
+    { "light-goldenrod" , 238*(1<<16) + 221*(1<<8) + 130 },
+    { "dark-goldenrod"  , 184*(1<<16) + 134*(1<<8) +  11 },
+    { "beige"           , 245*(1<<16) + 245*(1<<8) + 220 },
+    { "brown"           , 165*(1<<16) +  42*(1<<8) +  42 },
+    { "orange"          , 255*(1<<16) + 165*(1<<8) +   0 },
+    { "dark-orange"     , 255*(1<<16) + 140*(1<<8) +   0 },
+    { "violet"          , 238*(1<<16) + 130*(1<<8) + 238 },
+    { "dark-violet"     , 148*(1<<16) +   0*(1<<8) + 211 },
+    { "plum"            , 221*(1<<16) + 160*(1<<8) + 221 },
+    { "purple"          , 160*(1<<16) +  32*(1<<8) + 240 },
+    { NULL, -1 }
+};
+
 #endif
 
 const struct gen_table show_style_tbl[] =

@@ -1,5 +1,5 @@
 /*
- * $Id: tables.h,v 1.29 2002/03/30 13:15:21 broeker Exp $
+ * $Id: tables.h,v 1.30 2002/08/16 08:11:37 mikulik Exp $
  */
 
 /* GNUPLOT - tables.h */
@@ -144,7 +144,9 @@ enum set_palette_id {
     S_PALETTE_INVALID,
     S_PALETTE_POSITIVE, S_PALETTE_NEGATIVE,
     S_PALETTE_GRAY, S_PALETTE_COLOR, S_PALETTE_RGBFORMULAE,
-    S_PALETTE_NOPS_ALLCF, S_PALETTE_PS_ALLCF, S_PALETTE_MAXCOLORS
+    S_PALETTE_NOPS_ALLCF, S_PALETTE_PS_ALLCF, S_PALETTE_MAXCOLORS,
+    S_PALETTE_DEFINED, S_PALETTE_FILE, S_PALETTE_FUNCTIONS,
+    S_PALETTE_MODEL, S_PALETTE_GAMMA
 };
 
 enum set_pm3d_id {
@@ -192,6 +194,8 @@ extern const struct gen_table set_key_tbl[];
 extern const struct gen_table set_colorbox_tbl[];
 extern const struct gen_table set_palette_tbl[];
 extern const struct gen_table set_pm3d_tbl[];
+extern const struct gen_table color_model_tbl[];
+extern const struct gen_table pm3d_color_names_tbl[];
 #endif
 extern const struct gen_table set_hidden3d_tbl[];
 extern const struct gen_table show_style_tbl[];

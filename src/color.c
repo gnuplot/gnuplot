@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: color.c,v 1.35 2002/08/25 15:18:33 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: color.c,v 1.36 2002/08/27 19:33:36 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - color.c */
@@ -40,28 +40,10 @@ static char *RCSid() { return RCSid("$Id: color.c,v 1.35 2002/08/25 15:18:33 mik
 #include "alloc.h"
 
 /* COLOUR MODES - GLOBAL VARIABLES */
-
-t_sm_palette sm_palette = {
-    37,				/* colorFormulae---must be changed if changed GetColorValueFromFormula() */
-    SMPAL_COLOR_MODE_RGB,	/* colorMode */
-    7, 5, 15,			/* formulaR, formulaG, formulaB */
-    SMPAL_POSITIVE,		/* positive */
-    0, 0, 0,			/* use_maxcolors, colors, rgb_table */
-    0				/* ps_allcF */
-};
-
+t_sm_palette sm_palette;  /* initialized in init_color() */
 
 /* SMOOTH COLOUR BOX - GLOBAL VARIABLES */
-
-color_box_struct color_box = {
-    SMCOLOR_BOX_DEFAULT,	/* draw at default_pos */
-    'v',			/* vertical change (gradient) of colours */
-    1,				/* border is on by default */
-    -1,				/* use default border */
-
-    0.9, 0.2,			/* origin */
-    0.1, 0.63			/* size */
-};
+color_box_struct color_box; /* initialized in init_color() */
 
 #ifdef EXTENDED_COLOR_SPECS
 int supply_extended_color_specs = 0;
@@ -76,9 +58,43 @@ static void draw_inside_color_smooth_box_postscript __PROTO((FILE * out));
 static void draw_inside_color_smooth_box_bitmap __PROTO((FILE * out));
 void cbtick_callback __PROTO((AXIS_INDEX axis, double place, char *text, struct lp_style_type grid));
 
+
+
 /* *******************************************************************
   ROUTINES
  */
+
+
+void
+init_color()
+{
+  /* initialize global palette */
+  sm_palette.colorFormulae = 37;  /* const */
+  sm_palette.formulaR = 7;
+  sm_palette.formulaG = 5;
+  sm_palette.formulaB = 15;
+  sm_palette.positive = SMPAL_POSITIVE;
+  sm_palette.use_maxcolors = 0;
+  sm_palette.colors = 0;
+  sm_palette.color = NULL;
+  sm_palette.ps_allcF = 0;
+  sm_palette.gradient_num = 0;
+  sm_palette.gradient = NULL;
+  sm_palette.cmodel = C_MODEL_RGB;
+  sm_palette.Afunc.at = sm_palette.Bfunc.at = sm_palette.Cfunc.at = NULL;
+  sm_palette.gamma = 1.5;
+
+  /* initialisation of smooth color box */
+  color_box.where = SMCOLOR_BOX_DEFAULT;
+  color_box.rotation = 'v';
+  color_box.border = 1;
+  color_box.border_lt_tag = -1;
+  color_box.xorigin = 0.9;
+  color_box.yorigin = 0.2;
+  color_box.xsize = 0.1;
+  color_box.ysize = 0.63;
+}
+
 
 /*
    Make the colour palette. Return 0 on success
@@ -108,7 +124,6 @@ make_palette(void)
 
     /* ask for suitable number of colours in the palette */
     i = term->make_palette(NULL);
-
     if (i == 0) {
 	/* terminal with its own mapping (PostScript, for instance)
 	   It will not change palette passed below, but non-NULL has to be
@@ -129,7 +144,8 @@ make_palette(void)
 	|| sm_palette.formulaR != save_pal.formulaR
 	|| sm_palette.formulaG != save_pal.formulaG
 	|| sm_palette.formulaB != save_pal.formulaB
-	|| sm_palette.positive != save_pal.positive || sm_palette.colors != save_pal.colors) {
+	|| sm_palette.positive != save_pal.positive 
+	|| sm_palette.colors != save_pal.colors) {
 	/* print the message only if colors have changed */
 	if (interactive)
 	fprintf(stderr, "smooth palette in %s: available %i color positions; using %i of them\n", term->name, i, sm_palette.colors);
@@ -137,27 +153,19 @@ make_palette(void)
 
     save_pal = sm_palette;
 
-#if TODOSOMEHOW_OTHERWISE_MEMORY_LEAKS
-    if (sm_palette.color != NULL)
+    if (sm_palette.color != NULL) {
 	free(sm_palette.color);
-    /* is it sure that there is NULL in the beginning??!!
-       That should be released somewhen... after the whole plot
-       is there end_plot somewhere? Will there be several palettes
-       in the future, i.e. multiplots with various colour schemes?
-     */
-#endif
-    sm_palette.color = gp_alloc(sm_palette.colors * sizeof(rgb_color), "pm3d palette color");
+	sm_palette.color = NULL;
+    }
+    sm_palette.color = gp_alloc( sm_palette.colors * sizeof(rgb_color), 
+				 "pm3d palette color");
 
+    /*  fill sm_palette.color[]  */
     for (i = 0; i < sm_palette.colors; i++) {
 	gray = (double) i / (sm_palette.colors - 1);	/* rescale to [0;1] */
-	if (sm_palette.colorMode == SMPAL_COLOR_MODE_GRAY)	/* gray scale only */
-	    sm_palette.color[i].r = sm_palette.color[i].g = sm_palette.color[i].b = gray;
-	else {			/* i.e. sm_palette.colorMode == SMPAL_COLOR_MODE_RGB */
-	    sm_palette.color[i].r = GetColorValueFromFormula(sm_palette.formulaR, gray);
-	    sm_palette.color[i].g = GetColorValueFromFormula(sm_palette.formulaG, gray);
-	    sm_palette.color[i].b = GetColorValueFromFormula(sm_palette.formulaB, gray);
-	}
+	color_from_gray( gray, &(sm_palette.color[i]) );
     }
+    
     /* let the terminal make the palette from the supplied RGB triplets */
     term->make_palette(&sm_palette);
 
@@ -330,7 +338,8 @@ FILE * out;
     fputs("/y0 y0 ystep add def /ii ii 1 add def\n"
 	  "ii imax ge {exit} if } loop\n"
 	  "grestore 0 setgray\n", out);
-}				/* end of optimized PS output */
+}	
+
 
 
 /* plot the colour smooth box for from terminal's integer coordinates
@@ -616,6 +625,8 @@ draw_color_smooth_box()
     }
 
 }
+
+
 
 
 #endif /* PM3D */

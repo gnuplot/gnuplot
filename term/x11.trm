@@ -1,5 +1,5 @@
 /*
- * $Id: x11.trm,v 1.59 2002/07/26 16:42:29 mikulik Exp $
+ * $Id: x11.trm,v 1.60 2002/08/26 05:34:35 sfeam Exp $
  *
  */
 
@@ -111,6 +111,9 @@ TERM_PUBLIC void X11_filled_polygon __PROTO((int, gpiPoint *));
 #ifdef TERM_BODY
 
 #include <ctype.h>
+#ifdef PM3D
+# include "getcolor.h"
+#endif
 
 /* non-zero if '-display' found on command line */
 static int X11_Display = 0;
@@ -1053,25 +1056,66 @@ X11_set_clipboard(const char s[])
 
 #ifdef PM3D
 
+
+static void transmit_gradient( gradient_struct *gradient, int cnt )
+{
+    int i = 0;
+    fprintf( X11_ipc, "%d", cnt );
+    for( i=0; i<cnt; i++ ) {
+        /* this %50 *must* match the corresponding %50 in gplt_x11.c  */
+        if( i%50 == 0 ) { 
+	    fputs( "\n", X11_ipc ); 
+	    fflush( X11_ipc ); 
+	}
+	fprintf( X11_ipc, "%s", gradient_entry_to_str( &(gradient[i]) ) );
+    }
+    fputs( "\n", X11_ipc );
+}
+
+
 TERM_PUBLIC int
 X11_make_palette(t_sm_palette *palette)
 {
-    /* TODO: also a check for abs(formula[RGB]) < colorFormulae ?
-     *       or is this /certainly/ done here ? */
-    if (palette) {
-	if (X11_ipc) {
-	    fprintf(X11_ipc, "%c%c %d %d %d %c %d\n",
-		    X11_GR_MAKE_PALETTE, palette->colorMode, palette->formulaR,
-		    palette->formulaG, palette->formulaB, palette->positive, palette->use_maxcolors);
-	    /* we don't need the rest of the struct (joze) */
-	    fflush(X11_ipc);
-	} else {
+    if( !palette ) {
+        return 0;
+    }
+    
+    if( !X11_ipc ) {
 	    fprintf(stderr, "(X11_make_palette) 0 == X11_ipc\n");
 	    return -1;
 	}
+    
+    fprintf( X11_ipc, "%c %c %c %c %d\n",
+	     X11_GR_MAKE_PALETTE, (char)(palette->colorMode), 
+	     (char)(palette->positive), (char)(palette->cmodel),
+	     palette->use_maxcolors );
+    
+    switch( palette->colorMode ) {
+    case SMPAL_COLOR_MODE_GRAY:  
+        fprintf( X11_ipc,"%g\n", palette->gamma );
+        break;
+    case SMPAL_COLOR_MODE_RGB:
+        fprintf( X11_ipc, "%d %d %d\n", palette->formulaR,
+		 palette->formulaG, palette->formulaB );
+	break;
+    case SMPAL_COLOR_MODE_GRADIENT: 
+        transmit_gradient( palette->gradient, palette->gradient_num );
+	break;
+    case SMPAL_COLOR_MODE_FUNCTIONS: {
+        int cnt=0;
+	gradient_struct *gradient;
+	gradient = approximate_palette( palette, 500, 0.01, &cnt );
+	transmit_gradient( gradient, cnt );
+	break;
     }
+    default:
+        fprintf( stderr, "%s:%d ooops: Unknown colorMode '%c'.\n",
+		 __FILE__, __LINE__, (char)(palette->colorMode) );
+    }
+    fflush( X11_ipc );
     return 0;
 }
+
 
 TERM_PUBLIC void
 X11_set_color(double gray)

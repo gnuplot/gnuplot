@@ -1,3 +1,14 @@
+2002-08-30  Volker Dobler  <v.dobler@web.de>
+
+	* NEWS demo/all.dem demo/pm3dcolors.dem demo/pm3dgamma.dem
+	docs/gnuplot.doc src/Makefile.am src/color.c src/color.h src/getcolor.c
+	src/getcolor.h src/gplt_x11.c src/plot.c src/save.c src/set.c
+	src/show.c src/tables.c src/tables.h src/win/wgraph.c term/metapost.trm
+	term/pdf.trm term/post.trm term/svg.trm term/x11.trm: New color modes
+	for pm3d, see `help palette`: `defined`, `file`, `functions`, `model`,
+	`gamma`. Additions to `show palette ...`. New option `set terminal
+	postscript ... palfuncparam`.
+
 2002-08-28  Ethan Merritt <merritt@u.washington.edu>
 
 	* docs/gnuplot.doc term/hpgl.trm term/epslatex.trm:
@@ -1012,7 +1023,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/08/28 16:26:05 $).
+	last modification date (from the tag $Date: 2002/08/29 04:10:08 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 

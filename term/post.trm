@@ -1,5 +1,5 @@
 /*
- * $Id: post.trm,v 1.71 2002/08/15 20:33:56 mikulik Exp $
+ * $Id: post.trm,v 1.72 2002/08/24 21:11:35 sfeam Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -96,7 +96,6 @@ TERM_PUBLIC void PS_filled_polygon (int, gpiPoint *);
 
 #endif /* TERM_PROTO */
 
-
 #ifndef TERM_PROTO_ONLY
 
 #ifdef TERM_BODY
@@ -104,6 +103,7 @@ TERM_PUBLIC void PS_filled_polygon (int, gpiPoint *);
 #include "post.h"
 #ifdef PM3D
 # include "getcolor.h"
+# include <stdio.h>
 #endif
 
 #define PS_FLUSH_PATH \
@@ -114,6 +114,18 @@ static void ENHPS_put_text __PROTO((unsigned int x, unsigned int y, const char *
 static char *ENHPS_recurse __PROTO((char *p, TBOOLEAN brace, char *fontname, double fontsize, double base, TBOOLEAN widthflag, TBOOLEAN showflag, int overprint));
 static char ps_font[MAX_ID_LEN+1] = "Helvetica" ; /* name of font */
 static int ps_fontsize = 14;					 /* size of font in pts */
+
+#ifdef PM3D
+static int ps_palfunc_samples = 2000;        /* setable via "palf$uncparam" */
+static double ps_palfunc_deviation = 0.003;  /* terminal option */ 
+static void make_interpolation_code __PROTO(());
+static void make_color_model_code __PROTO(());
+static char * save_space __PROTO(( double gray ));
+static void write_component_array __PROTO(( const char *text, gradient_struct *grad, int cnt, int offset ));
+static void write_gradient_definition __PROTO(( gradient_struct *gradient, int cnt ));
+static void write_color_space __PROTO(( t_sm_palette *palette ));
+static void make_palette_formulae __PROTO(());
+#endif /* PM3D */
 
 /* for enhanced mode, we keep a separate font name and size, which
  * is restored to the default value on font of ""
@@ -147,6 +159,7 @@ static const char GPFAR * GPFAR PS_header[] = {
 "/R {rmoveto} bind def\n",
 "/V {rlineto} bind def\n",
 "/N {newpath moveto} bind def\n",
+"/C {setrgbcolor} bind def\n", 
 "/f {rlineto fill} bind def\n",
 "/vpt2 vpt 2 mul def\n",
 "/hpt2 hpt 2 mul def\n",
@@ -584,6 +597,9 @@ enum PS_id {
     PS_SOLIDE, PS_DASHED, PS_DASHLENGTH, PS_LINEWIDTH,
     PS_SIMPLEX, PS_DUPLEX, PS_DEFAULTPLEX,
     PS_ROUNDED, PS_NOROUNDED,
+#ifdef PM3D
+    PS_PALFUNCPARAM,
+#endif /* PM3D */
     PS_OTHER
 };
 
@@ -611,8 +627,12 @@ static struct gen_table PS_opts[] =
     { "defaultp$lex", PS_DEFAULTPLEX },
     { "butt", PS_NOROUNDED },
     { "rou$nded", PS_ROUNDED },
+#ifdef PM3D
+    { "palf$uncparam", PS_PALFUNCPARAM },
+#endif /* PM3D */
     { NULL, PS_OTHER }
 };
+
 
 TERM_PUBLIC void
 PS_options()
@@ -651,6 +671,10 @@ PS_options()
 	    term->v_char = (unsigned int)(ps_fontsize*PS_SC);
 	    term->h_char = (unsigned int)(ps_fontsize*PS_SC*6/10);
 	    term->put_text = PS_put_text;
+#ifdef PM3D
+	    ps_palfunc_samples = 2000;
+	    ps_palfunc_deviation = 0.003;
+#endif /* PM3D */
 	    c_token++;
 	    break;
 	case PS_ENHANCED:
@@ -721,6 +745,20 @@ PS_options()
 	    ps_rounded = FALSE;
 	    c_token++;
 	    break;
+#ifdef PM3D
+	case PS_PALFUNCPARAM:
+	    ++c_token;
+	    ps_palfunc_samples = (int)real(const_express(&a));
+	    if (ps_palfunc_samples < 2) ps_palfunc_samples = 2;
+	    if ( !END_OF_COMMAND && equals(c_token, ",") ) {
+	        ++c_token;
+		ps_palfunc_deviation = fabs(real(const_express(&a)));
+		if (ps_palfunc_deviation >= 1)
+		    int_error(c_token-1,"allowed deviation must be < 1");
+	    }
+	    ++c_token;
+	    break;
+#endif /* PM3D */
 	case PS_OTHER:
 	default:
 	    if (isstring(c_token)) {
@@ -746,6 +784,9 @@ PS_options()
      * loadable output' rule */
     sprintf(term_options,"%s %senhanced %s %s \\\n"
 	                 "   %s dashlength %.1f linewidth %.1f %s \\\n"
+#ifdef PM3D
+	                 "   palfuncparam %d,%g \\\n"
+#endif /* PM3D */
 	                 "   %s \"%s\" %d",
 	    ps_eps ? "eps" : (ps_portrait ? "portrait" : "landscape"),
 	    term->put_text == ENHPS_put_text ? "" : "no",
@@ -756,6 +797,9 @@ PS_options()
 	    ps_linewidth_factor,
 	    ps_duplex_option ? (ps_duplex_state ? "duplex" : "simplex")
 	    : "defaultplex",
+#ifdef PM3D
+	    ps_palfunc_samples, ps_palfunc_deviation,
+#endif /* PM3D */
 	    ps_rounded ? "rounded" : "butt",
 	    ps_font,ps_fontsize);
 }
@@ -2011,90 +2055,267 @@ ENHPS_put_text(x, y, str)
 
 #ifdef PM3D
 
-TERM_PUBLIC int PS_make_palette (t_sm_palette *palette)
+
+static void make_palette_formulae()
 {
 #define R sm_palette.formulaR
 #define G sm_palette.formulaG
 #define B sm_palette.formulaB
-if (palette == NULL)
-  /* postscript can do continuous number of colours */
-  return 0;
-/* write header for smooth colours */
-
-fputs("gsave %% colour palette begin\n", gpoutfile);
-fprintf(gpoutfile, "/maxcolors %i def\n", sm_palette.use_maxcolors);
-#if 0
-fputs("/pm3dround {maxcolors 0 gt {maxcolors mul floor maxcolors div} if} def\n", gpoutfile);
-#else
-/* 26.10.2001 PM set the colour of the last box to the terminating colour, as
-   all discrete palette devices are doing
-*/
-fputs("/maxcolorsLast {maxcolors 1 sub maxcolors div} def\n", gpoutfile);
-fputs("/pm3dround {maxcolors 0 gt {dup maxcolorsLast ge {pop 1} {maxcolors mul floor maxcolors div} ifelse} if} def\n", gpoutfile);
-#endif
 /* print the definition of R,G,B formulae */
+  fputs("/InterpolatedColor false def\n",gpoutfile);
 if (sm_palette.ps_allcF == 0) { /* print only those 3 used formulae */
-    fprintf(gpoutfile, "/cF%i {%s} bind def\t%% %s\n", abs(R), ps_math_color_formulae[ 2*abs(R) ], ps_math_color_formulae[ 2*abs(R)+1 ]);
+    fprintf( gpoutfile, "/cF%i {%s} bind def\t%% %s\n", 
+	     abs(R), ps_math_color_formulae[ 2*abs(R) ], 
+	     ps_math_color_formulae[ 2*abs(R)+1 ]);
     if (abs(G) != abs(R))
-    fprintf(gpoutfile, "/cF%i {%s} bind def\t%% %s\n", abs(G), ps_math_color_formulae[ 2*abs(G) ], ps_math_color_formulae[ 2*abs(G)+1 ]);
+      fprintf( gpoutfile, "/cF%i {%s} bind def\t%% %s\n", 
+	       abs(G), ps_math_color_formulae[ 2*abs(G) ], 
+	       ps_math_color_formulae[ 2*abs(G)+1 ]);
     if ((abs(B) != abs(R)) && (abs(B) != abs(G)))
-    fprintf(gpoutfile, "/cF%i {%s} bind def\t%% %s\n", abs(B), ps_math_color_formulae[ 2*abs(B) ], ps_math_color_formulae[ 2*abs(B)+1 ]);
+      fprintf( gpoutfile, "/cF%i {%s} bind def\t%% %s\n", 
+	       abs(B), ps_math_color_formulae[ 2*abs(B) ], 
+	       ps_math_color_formulae[ 2*abs(B)+1 ]);
     }
   else { /* all color formulae are written into the output PostScript file */
     int i = 0;
     while ( *(ps_math_color_formulae[2*i]) ) {
-      fprintf(gpoutfile, "/cF%i {%s} bind def\t%% %s\n", i, ps_math_color_formulae[ 2*i ], ps_math_color_formulae[ 2*i+1 ]);
+      fprintf( gpoutfile, "/cF%i {%s} bind def\t%% %s\n", 
+	       i, ps_math_color_formulae[ 2*i ], 
+	       ps_math_color_formulae[ 2*i+1 ]);
       i++;
       }
     }
-
-/* Now print something like
-/g {dup cF7 exch dup cF5 exch cF15 setrgbcolor} bind def
-*/
-fprintf(gpoutfile,"Color %s and { %% COLOUR vs. GRAY map\n",
-  (sm_palette.colorMode == SMPAL_COLOR_MODE_RGB) ? "true" : "false"
-  );
-fprintf(gpoutfile,"  /g {stroke pm3dround dup ");
-if (R < 0) fprintf(gpoutfile, "1 exch sub "); /* negate */
-fprintf(gpoutfile,"cF%i exch dup ", abs(R));
-if (G < 0) fprintf(gpoutfile, "1 exch sub "); /* negate */
-fprintf(gpoutfile,"cF%i exch ", abs(G));
-if (R<0 || G<0 || B<0) fprintf(gpoutfile,"\n\t");
-if (B < 0) fprintf(gpoutfile, "1 exch sub "); /* negate */
-fprintf(gpoutfile,"cF%i ", abs(B));
-fprintf(gpoutfile,"setrgbcolor} bind def\n");
-fprintf(gpoutfile, "  /h {rlineto rlineto rlineto fill} bind def\n");
-/*
-fprintf(gpoutfile, "%%  /G {currentrgbcolor 3 index stroke g} bind def\n");
-fprintf(gpoutfile, "%%  /H {h setrgbcolor pop} bind def\n");
-fprintf(gpoutfile, "  /F {rlineto fill setrgbcolor pop} bind def\n");
-*/
-fprintf(gpoutfile, "}{\n");
-fprintf(gpoutfile, "  /g {stroke pm3dround setgray} bind def\n");
-fprintf(gpoutfile, "  /h {rlineto rlineto rlineto fill} bind def\n");
-/*
-fprintf(gpoutfile, "%%  /g {currentgray exch stroke setgray} bind def\n");
-fprintf(gpoutfile, "%%  /G {currentgray exch stroke g} bind def\n");
-fprintf(gpoutfile, "%%  /H {h setgray} bind def\n");
-fprintf(gpoutfile, "  /F {rlineto fill setgray} bind def\n");
-*/
-fprintf(gpoutfile, "} ifelse\n");
-return 0;
 #undef R
 #undef G
 #undef B
 }
 
 
-#if 0 /* caching of color value removed; won't be so efficient for z=const
-	 surfaces/map, but will save a lot of headache (linetype changes
-	 color, for instance) */
-double pm3d_last_color;
-  /* last choosen colour */
 
-double pm3d_ps_color;
-  /* keep here the last set color */
-#endif
+static void make_interpolation_code()
+{
+  static const char *header[] = {
+    "/grayindex {/gidx 0 def\n",
+    "  {GrayA gidx get grayv ge {exit} if /gidx gidx 1 add def} loop} def\n",
+    "/dgdx {grayv GrayA gidx get sub GrayA gidx 1 sub get\n",
+    "  GrayA gidx get sub div} def \n",
+    "/redvalue {RedA gidx get RedA gidx 1 sub get\n",
+    "  RedA gidx get sub dgdxval mul add} def\n",
+    "/greenvalue {GreenA gidx get GreenA gidx 1 sub get\n",
+    "  GreenA gidx get sub dgdxval mul add} def\n",
+    "/bluevalue {BlueA gidx get BlueA gidx 1 sub get\n",
+    "  BlueA gidx get sub dgdxval mul add} def\n",
+    "/interpolate {\n",
+    "  grayindex grayv GrayA gidx get sub abs 1e-5 le\n",
+    "    {RedA gidx get GreenA gidx get BlueA gidx get}\n",
+    "    {/dgdxval dgdx def redvalue greenvalue bluevalue} ifelse} def\n",
+    NULL,
+  };
+  int i;
+  for( i=0; header[i]!=NULL; ++i ) {
+    fputs( header[i], gpoutfile );
+  }
+}
+
+
+static void make_color_model_code()
+{
+    /* Postscript version of the color space transformations in getcolor.c */
+    static const char *header[] = {
+"/HSV2RGB {",
+"  exch dup 0.0 eq {pop exch pop dup dup} % achromatic gray\n",
+"  { /HSVs exch def /HSVv exch def 6.0 mul dup floor dup 3 1 roll sub\n ",
+"    /HSVf exch def /HSVi exch cvi def /HSVp HSVv 1.0 HSVs sub mul def\n",
+"	 /HSVq HSVv 1.0 HSVs HSVf mul sub mul def \n",
+"	 /HSVt HSVv 1.0 HSVs 1.0 HSVf sub mul sub mul def\n",
+"	 /HSVi HSVi 6 mod def 0 HSVi eq {HSVv HSVt HSVp}\n",
+"	 {1 HSVi eq {HSVq HSVv HSVp}{2 HSVi eq {HSVp HSVv HSVt}\n",
+"	 {3 HSVi eq {HSVp HSVq HSVv}{4 HSVi eq {HSVt HSVp HSVv}\n",
+"	 {HSVv HSVp HSVq} ifelse} ifelse} ifelse} ifelse} ifelse\n",
+"  } ifelse} def\n",
+"/Constrain {\n",
+"  dup 0 lt {0 exch pop}{dup 1 gt {1 exch pop} if} ifelse} def\n",
+"/YIQ2RGB {\n",
+"  3 copy -1.702 mul exch -1.105 mul add add Constrain 4 1 roll\n",
+"  3 copy -0.647 mul exch -0.272 mul add add Constrain 5 1 roll\n",
+"  0.621 mul exch -0.956 mul add add Constrain 3 1 roll } def\n",
+"/CMY2RGB {",
+"  1 exch sub exch 1 exch sub 3 2 roll 1 exch sub 3 1 roll exch } def\n",
+"/XYZ2RGB {",
+"  3 copy -0.9017 mul exch -0.1187 mul add exch 0.0585 mul exch add\n",
+"  Constrain 4 1 roll 3 copy -0.0279 mul exch 1.999 mul add exch\n",
+"  -0.9844 mul add Constrain 5 1 roll -0.2891 mul exch -0.5338 mul add\n",
+"  exch 1.91 mul exch add Constrain 3 1 roll} def\n",
+"/SelectSpace {ColorSpace (HSV) eq {HSV2RGB}{ColorSpace (XYZ) eq {\n",
+"  XYZ2RGB}{ColorSpace (CMY) eq {CMY2RGB}{ColorSpace (YIQ) eq {YIQ2RGB}\n",
+"  if} ifelse} ifelse} ifelse} def\n",
+        NULL,
+    };
+    int i;
+    for( i=0; header[i]!=NULL; ++i ) {
+        fputs( header[i], gpoutfile );
+    }
+}
+
+
+static char *save_space( double gray )
+{
+    /* printing the gray with 4 digits and without the leading 0 
+     * ... saving space */
+    static char s[40];
+
+    gray = 0.0001*(int)(gray*10000+0.5); /* round it to 4 digits */
+    sprintf( s, "%.4g", gray );
+    if ( s[0] == '0' && s[1] == '.' ) 
+        return &(s[1]);  /* strip leading 0 */
+    else
+        return s;
+}
+
+
+static void write_color_space( t_sm_palette *palette )
+{
+    /* write something like
+     *   /ColorSpace (HSV) def
+     * depending on the selcted cmodel in palette */
+    fputs( "/ColorSpace ", gpoutfile );
+    switch( palette->cmodel ) {
+      case C_MODEL_RGB: fputs( "(RGB)", gpoutfile ); break;
+      case C_MODEL_HSV: fputs( "(HSV)", gpoutfile ); break;
+      case C_MODEL_CMY: fputs( "(CMY)", gpoutfile ); break;
+      case C_MODEL_YIQ: fputs( "(YIQ)", gpoutfile ); break;
+      case C_MODEL_XYZ: fputs( "(XYZ)", gpoutfile ); break;
+      default:  
+	fprintf(stderr,"%s:%d ooops: Unkown color model '%c'. Will be RGB\n",
+		__FILE__, __LINE__, (char)(palette->cmodel) );
+	fputs( "(RGB)", gpoutfile ); break;
+    }
+    fputs( " def\n", gpoutfile );
+}
+
+
+static void write_component_array( const char *text, gradient_struct *grad, 
+				   int cnt, int offset )
+{
+    /*  write someting like
+     *     /RedA [ 0 .1 .2 .3 .35 .3 .2 .1 0 0 0 ] def
+     *  nicely formated to gpoutfile 
+     */
+    int i=0, len=0;
+    char *val;
+    fprintf( gpoutfile, "/%s [", text );
+    len = strlen(text) + 4;
+    for( i=0; i<cnt; ++i) {
+        char *ref = (char*)(&(grad[i]));
+	ref += offset;
+        val = save_space( *((double*)(ref)) );
+	len += strlen(val)+1;
+	if( len>77 ) { fputs("\n  ",gpoutfile); len = strlen(val)+3; }
+	fprintf(gpoutfile, "%s ", val );
+    }
+    fputs("] def\n", gpoutfile);
+}
+
+
+static void write_gradient_definition( gradient_struct *gradient, int cnt )
+{
+    /* some strange pointer acrobatic here, but it seems to work... */
+    char *ref = (char*)(&(gradient[0]));
+    int p = (char*)(&(gradient[0].pos)) - ref;
+    int r = (char*)(&(gradient[0].col.r)) - ref;
+    int g = (char*)(&(gradient[0].col.g)) - ref;
+    int b = (char*)(&(gradient[0].col.b)) - ref;
+    
+    write_component_array( "GrayA", gradient, cnt, p );
+    write_component_array( "RedA", gradient, cnt, r );
+    write_component_array( "GreenA", gradient, cnt, g );
+    write_component_array( "BlueA", gradient, cnt, b );
+}
+
+
+static void 
+PS_make_header(t_sm_palette *palette)
+{
+    /* write header for smooth colors */
+    fputs("gsave %% colour palette begin\n", gpoutfile);
+    fprintf(gpoutfile, "/maxcolors %i def\n", sm_palette.use_maxcolors);
+    make_color_model_code();
+
+    switch( sm_palette.colorMode ) {
+      case SMPAL_COLOR_MODE_GRAY:
+	break;  /* nothing to do form gray */
+      case SMPAL_COLOR_MODE_RGB:
+	make_palette_formulae();
+	break;
+      case SMPAL_COLOR_MODE_FUNCTIONS: {
+	int cnt=0;
+	gradient_struct *gradient;
+	fputs("/InterpolatedColor true def\n",gpoutfile);
+	make_interpolation_code();
+	gradient = approximate_palette( palette, ps_palfunc_samples, 
+					ps_palfunc_deviation, &cnt );
+	write_gradient_definition( gradient, cnt );
+	free( gradient );
+	break;
+      }
+      case SMPAL_COLOR_MODE_GRADIENT:
+	fputs("/InterpolatedColor true def\n",gpoutfile);
+	make_interpolation_code();
+	write_gradient_definition( palette->gradient, palette->gradient_num );
+	break;
+      default:
+	fprintf( stderr, "%s:%d ooops: Unknown color mode '%c'\n",
+		 __FILE__, __LINE__, (char)(sm_palette.colorMode) );
+    }
+    fputs("/maxcolorsLast {maxcolors 1 sub maxcolors div} def\n", gpoutfile);
+    fputs("/pm3dround {maxcolors 0 gt {dup maxcolorsLast ge {pop 1}\n",
+	  gpoutfile);
+    fputs( "{maxcolors mul floor maxcolors div} ifelse} if} def\n", gpoutfile);
+    fprintf( gpoutfile, "/pm3dGamma 1.0 %g div def\n", sm_palette.gamma );
+    write_color_space( palette );
+
+/* Now print something like
+/g {dup cF7 exch dup cF5 exch cF15 setrgbcolor} bind def
+*/
+#define R sm_palette.formulaR
+#define G sm_palette.formulaG
+#define B sm_palette.formulaB
+fprintf(gpoutfile,"Color %s and { %% COLOUR vs. GRAY map\n",
+	    (sm_palette.colorMode!=SMPAL_COLOR_MODE_GRAY) ? "true":"false" );
+    fputs("  InterpolatedColor { %% Interpolation vs. RGB-Formula\n", gpoutfile);
+    fputs("    /g {stroke pm3dround /grayv exch def interpolate\n", gpoutfile);
+    fputs("        SelectSpace setrgbcolor} bind def\n", gpoutfile);
+    fputs("  }{\n", gpoutfile );
+    fputs("  /g {stroke pm3dround dup ", gpoutfile);
+    if (R < 0) fputs("1 exch sub ", gpoutfile); /* negate */
+    fprintf(gpoutfile,"cF%i Constrain exch dup ", abs(R));
+    if (G < 0) fputs("1 exch sub ", gpoutfile); /* negate */
+    fprintf(gpoutfile,"cF%i Constrain exch ", abs(G));
+    if (R<0 || G<0 || B<0) fputs("\n\t", gpoutfile);
+    if (B < 0) fputs("1 exch sub ", gpoutfile); /* negate */
+    fprintf(gpoutfile,"cF%i Constrain ", abs(B));
+    fputs("\n       SelectSpace setrgbcolor} bind def\n", gpoutfile);
+    fputs("  } ifelse\n", gpoutfile );
+    fputs("}{\n", gpoutfile);
+    fputs("  /g {stroke pm3dround pm3dGamma exp setgray} bind def\n", gpoutfile);
+    fputs("} ifelse\n", gpoutfile);
+    fputs("/h {rlineto rlineto rlineto fill} bind def\n", gpoutfile);
+#undef R
+#undef G
+#undef B
+}
+
+
+TERM_PUBLIC int PS_make_palette (t_sm_palette *palette)
+{
+    if (palette == NULL) {
+        return 0;  /* postscript can do continous colors */
+    }
+
+    PS_make_header(palette);
+    return 0;
+}
+
 
 TERM_PUBLIC void PS_set_color (double gray)
 {
@@ -2102,21 +2323,13 @@ TERM_PUBLIC void PS_set_color (double gray)
 /* Note: command G puts on stack current colour/gray values to be restored 
    afterwards!
 */
-#if 0
-pm3d_ps_color = gray;
-pm3d_last_color = gray;
-#endif
-/* printing the gray with 4 digits and without the leading 0 ... saving space */
-if (gray <= 0) fprintf(gpoutfile, "0 g "); else
-if (gray >= 1) fprintf(gpoutfile, "1 g "); else {
-   char s[15];
-   gray = 0.0001*(int)(gray*10000+0.5); /* round it to 4 digits */
-   sprintf(s,"%.4g g ",gray);
-   if (s[0] == '0' && s[1] == '.') fprintf(gpoutfile, "%s", &(s[1]));
-     else fprintf(gpoutfile, "%s", s);
-  }
+  
+    if (gray <= 0)  fputs( "0 g ", gpoutfile ); 
+    else if (gray >= 1) fputs( "1 g ", gpoutfile ); 
+    else fprintf( gpoutfile, "%s g ", save_space(gray) );
 PS_relative_ok = FALSE; /* "M" required because "g" forces stroke */
 }
+
 
 TERM_PUBLIC void PS_filled_polygon ( int points, gpiPoint *corners )
 {
@@ -2203,6 +2416,7 @@ START_HELP(post)
 "                               {linewidth | lw <LW>}",
 "                               {<duplexing>}",
 "                               {rounded | butt}",
+"                               {palfuncparam <samples>{,<maxdeviation>}}",
 "                               {\"<fontname>\"} {<fontsize>}",
 "",
 " where <mode> is `landscape`, `portrait`, `eps` or `default`;",
@@ -2228,6 +2442,16 @@ START_HELP(post)
 " `default` mode sets all options to their defaults: `landscape`, `monochrome`,",
 " `dashed`, `dl 1.0`, `lw 1.0`, `defaultplex`, `noenhanced`, \"Helvetica\" and",
 " 14pt.  Default size of a PostScript plot is 10 inches wide and 7 inches high.",
+"",
+" `palfuncparam` is only available if compiled with `pm3d` support.  It controls",
+" how `set palette functions` are encoded as gradients in the output.",
+" Analytic color component functions (set via `set palette functions`) are",
+" encoded as linear interpolated gradients in the postscript output:  The color",
+" component functions are sampled at <samples> points and all points are",
+" removed from this gradient which can be removed without changing the",
+" resulting colors by more than <maxdeviation>.  For almost every useful",
+" palette you may savely leave the defaults of <samples>=2000 and",
+" <maxdeviation>=0.003 untouched." ,
 "",
 " `eps` mode generates EPS (Encapsulated PostScript) output, which is just",
 " regular PostScript with some additional lines that allow the file to be",
@@ -2287,7 +2511,7 @@ START_HELP(post)
 "#\\verb~_~ & \\verb~a_x~ & subscript\\\\",
 "#\\verb~@~ & \\verb~@x or a@^b_c~ & phantom box (occupies no width)\\\\",
 "#\\verb~&~ & \\verb~&{space}~ & inserts space of specified length\\\\",
-"#\\verb*~* & \\verb*~a{.8-}* & overprints '-' on 'a', raised by .8\\\\",
+"#\\verb|~| & \\verb|~a{.8-}| & overprints '-' on 'a', raised by .8\\\\",
 "#\\verb~ ~ & \\verb~ ~ & times the current fontsize\\\\",
 "%c c l .",
 "%.TE", /* ugly - doc2ms uses @ for column separator, but here we */

@@ -1,5 +1,5 @@
 #
-# $Id: all.dem,v 1.6 2002/07/22 09:11:48 mikulik Exp $
+# $Id: all.dem,v 1.7 2002/07/26 16:42:27 mikulik Exp $
 #
 # Executes ALL demos in this directory, in functionality order.
 #
@@ -122,6 +122,14 @@ reset
 
 print "********************** file pm3d.dem *********************"
 load "pm3d.dem"
+reset
+
+print "********************** file pm3dcolors.dem *********************"
+load "pm3dcolors.dem"
+reset
+
+print "********************** file pm3dgamma.dem *********************"
+load "pm3gamma.dem"
 reset
 
 print "********************** file textcolor.dem *********************"
