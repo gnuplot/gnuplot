@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: doc2ipf.c,v 1.8 1999/06/14 19:17:08 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: doc2ipf.c,v 1.9 1999/07/09 20:59:41 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - doc2ipf.c */
@@ -40,7 +40,7 @@ static char *RCSid() { return RCSid("$Id: doc2ipf.c,v 1.8 1999/06/14 19:17:08 lh
  *
  * Modified by Roger Fearick from doc2rtf by M Castro 
  *
- * usage:  doc2ipf gnuplot.doc gnuplot.itl
+ * usage:  doc2ipf gnuplot.doc gnuplot.ipf
  *
  */
 
@@ -77,9 +77,11 @@ struct TABENTRY {		/* may have MAX_COL column tables */
 struct TABENTRY table = { NULL };
 struct TABENTRY *tableins = &table;
 int tablecols = 0;
-int tablewidth[MAX_COL] = {0, 0, 0, 0, 0, 0};	/* there must be the correct */
-int tablelines = 0;		/* number of zeroes here */
+int tablewidth[MAX_COL] = {0, 0, 0, 0, 0, 0};	/* there must be the correct
+	                        			   number of zeroes here */
+int tablelines = 0;
 
+#define TmpFileName "doc2ipf.tmp"
 static TBOOLEAN debug = FALSE;
 
 
@@ -166,8 +168,9 @@ FILE *b;
 
     line_count++;
 
-    if (introffheader)
+    if (debug && introffheader) {
 	fprintf(stderr, "%s\n", line);
+    }
     if (bo == NULL)
 	bo = b;
     i = 0;
@@ -327,7 +330,7 @@ FILE *b;
 		    while (get_line(str, sizeof(str), bt))
 			fputs(str, b);
 		    fclose(bt);
-		    remove("doc2ipf.tmp");
+		    remove(TmpFileName);
 		    bt = NULL;
 		    bo = b;
 		}
@@ -340,14 +343,18 @@ FILE *b;
     case '%':{			/* troff table entry */
 	    if (intable) {
 		if (introffheader) {
-		    fprintf(stderr, ">%s\n", line2);
-		    fprintf(stderr, "tablechar: %c\n", tablechar);
+		    if (debug) {
+		       fprintf(stderr, ">%s\n", line2);
+		       fprintf(stderr, "tablechar: %c\n", tablechar);
+		    }
 		    if (line2[1] == '.')
 			break;
 		    pt = strchr(line2, '(');
 		    if (pt != NULL)
 			tablechar = *(pt + 1);
-		    fprintf(stderr, "tablechar: %c\n", tablechar);
+		    if (debug) {
+		       fprintf(stderr, "tablechar: %c\n", tablechar);
+		    }
 		    pt = strchr(line2 + 2, '.');
 		    if (pt != NULL)
 			introffheader = FALSE;
@@ -396,9 +403,10 @@ FILE *b;
 				   a temp file meantime */
 		if (bt == NULL) {
 		    fflush(bo);
-		    bt = fopen("doc2ipf.tmp", "w+");
-		    if (bt == NULL)
-			fprintf(stderr, "cant open temp\n");
+		    bt = fopen(TmpFileName, "w+");
+		    if (bt == NULL) {
+			fprintf(stderr, "Can't open %s\n", TmpFileName);
+		    }
 		    else
 			bo = bt;
 		}
@@ -434,9 +442,10 @@ FILE *b;
 		    intablebut = TRUE;
 		    if (bt == NULL) {
 			fflush(bo);
-			bt = fopen("doc2ipf.tmp", "w+");
-			if (bt == NULL)
-			    fprintf(stderr, "cant open temp\n");
+			bt = fopen(TmpFileName, "w+");
+			if (bt == NULL) {
+			    fprintf(stderr, "Can't open %s\n", TmpFileName);
+			}
 			else
 			    bo = bt;
 		    }
@@ -449,7 +458,9 @@ FILE *b;
 		tabl = 0;
 		last_line = line_count;
 		startpage = 0;
-		fprintf(stderr, "%d: %s\n", line_count, &line2[1]);
+		if (debug) {
+		   fprintf(stderr, "%d: %s\n", line_count, &line2[1]);
+		}
 		klist = lookup(&line2[2]);
 		if (klist != NULL)
 		    k = klist->line;
