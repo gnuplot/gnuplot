@@ -3163,6 +3163,11 @@ straight line segments (if a line style is chosen).
 If @ref{autoscale} is in effect, the ranges will be computed such that the
 plotted curve lies within the borders of the graph.
 
+If @ref{autoscale} is not in effect, and the smooth option is either `acspline`
+or `cspline`, the sampling of the generated curve is
+done across the intersection of the x range covered by the input data and 
+the fixed abscissa range as defined by @ref{xrange}. 
+
 If too few points are available to allow the selected option to be applied,
 an error message is produced.  The minimum number is one for `unique`, four
 for `acsplines`, and three for the others.
@@ -7905,7 +7910,7 @@ If data are provided in an unsupported mixed form, the @ref{using} filter on the
 if the data are of the form (x,y,xdelta,ylow,yhigh), then you can use
 
 @example
-      plot 'data' using 1:2:($1-$3),($1+$3),4,5 with xyerrorbars
+      plot 'data' using 1:2:($1-$3):($1+$3):4:5 with xyerrorbars
 
 @end example
 
