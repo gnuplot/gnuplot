@@ -474,7 +474,21 @@ void PM_setup( void )
 */
     {
     char *envpath ;
-    if( PM_path[0]=='\0' ) _getcwd2( PM_path, 256 ) ;
+    PPIB pib ;
+    PTIB tib ;
+    char path[256], *p ;
+    DosGetInfoBlocks( &tib, &pib ) ;
+    DosQueryModuleName( pib->pib_hmte, 256, path ) ;
+    if( PM_path[0]=='\0' ) {
+        strcpy( PM_path, path ) ;
+        p = strrchr( PM_path, '\\' ) ;
+        if( p != NULL ) *p = '\0' ;
+        else {
+            p = strrchr( PM_path, ':' ) ;
+            if( p != NULL ) *(p+1) = '\0' ;
+            }
+        if( p == NULL ) _getcwd2( PM_path, 256 ) ;
+        }
     if( getenv( "GNUHELP" ) == NULL ) {
         int n = strlen("GNUHELP")+strlen(PM_path)+strlen("gnuplot.gih")+3 ;
         envpath = (char*)malloc(n) ;
