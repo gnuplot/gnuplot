@@ -333,6 +333,13 @@ START_HELP(windows)
 "",
 " Other options may be set with the graph-menu, the initialization file,",
 " and `set linestyle`.",
+/* Does this really belong here? If not, someone move it where it does. */
+"",
+" The Windows version normally terminates immediately as soon as the end of",
+" any files given as command line arguments is reached (i.e. in non-interactive",
+" mode). It will also not show the text-window at all, in this mode, only",
+" the plot. By giving the optional argument",
+" `/noend` or `-noend`, you can disable this behaviour.",
 "2 graph-menu",
 "?commands set terminal windows graph-menu",
 "?set terminal windows graph-menu",
