@@ -1,3 +1,9 @@
+2002-02-04  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* src/plot.c, src/stdfn.h, term/x11.trm: Clean up atextit() handling.
+
+	* src/specfun.c: More meaningful error messages for removed functions.
+
 2002-02-03  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/graph3d.c: For 'splot ... with ... palette', draw key as a line
