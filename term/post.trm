@@ -1,5 +1,5 @@
 /*
- * $Id: post.trm,v 1.64 2002/07/24 09:09:51 mikulik Exp $
+ * $Id: post.trm,v 1.65 2002/07/24 14:32:12 mikulik Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -138,6 +138,9 @@ static enum JUSTIFY ps_justify = LEFT;	/* text is flush left */
 static TBOOLEAN ps_duplex_state = FALSE;
 static TBOOLEAN ps_duplex_option = FALSE;
 
+/* added by Harald Harders <h.harders@tu-bs.de> */
+static TBOOLEAN ps_rounded = FALSE;	/* rounded linecaps and linejoins */
+
 static const char GPFAR * GPFAR PS_header[] = {
 "/M {moveto} bind def\n",
 "/L {lineto} bind def\n",
@@ -163,14 +166,17 @@ static const char GPFAR * GPFAR PS_header[] = {
 "/DL { Color {setrgbcolor Solid {pop []} if 0 setdash }\n",
 " {pop pop pop 0 setgray Solid {pop []} if 0 setdash} ifelse } def\n",
 /* Border Lines */
-"/BL { stroke userlinewidth 2 mul setlinewidth } def\n",
+"/BL { stroke userlinewidth 2 mul setlinewidth\n",
+"      Rounded { 1 setlinejoin 1 setlinecap } if } def\n",
 /* Axes Lines */
-"/AL { stroke userlinewidth 2 div setlinewidth } def\n",
+"/AL { stroke userlinewidth 2 div setlinewidth\n",
+"      Rounded { 1 setlinejoin 1 setlinecap } if } def\n",
 /* set user defined linewidth */
 "/UL { dup gnulinewidth mul /userlinewidth exch def\n",
 "      dup 1 lt {pop 1} if 10 mul /udl exch def } def\n",
 /* Plot Lines */
-"/PL { stroke userlinewidth setlinewidth } def\n",
+"/PL { stroke userlinewidth setlinewidth\n",
+"      Rounded { 1 setlinejoin 1 setlinecap } if } def\n",
 /* Line Types */
 "/LTb { BL [] 0 0 0 DL } def\n", /* border */
 "/LTa { AL [1 udl mul 2 udl mul] 0 setdash 0 0 0 setrgbcolor } def\n", /* axes */
@@ -577,6 +583,7 @@ enum PS_id {
     PS_MONOCHROME, PS_COLOR, PS_BLACKTEXT, PS_COLORTEXT,
     PS_SOLIDE, PS_DASHED, PS_DASHLENGTH, PS_LINEWIDTH,
     PS_SIMPLEX, PS_DUPLEX, PS_DEFAULTPLEX,
+    PS_ROUNDED, PS_NOROUNDED,
     PS_OTHER
 };
 
@@ -602,6 +609,8 @@ static struct gen_table PS_opts[] =
     { "si$mplex", PS_SIMPLEX },
     { "du$plex", PS_DUPLEX },
     { "defaultp$lex", PS_DEFAULTPLEX },
+    { "butt", PS_NOROUNDED },
+    { "rou$nded", PS_ROUNDED },
     { NULL, PS_OTHER }
 };
 
@@ -636,6 +645,7 @@ PS_options()
 	    ps_dash_length = 1.0;
 	    ps_linewidth_factor = 1.0;
 	    ps_duplex_option = FALSE;
+	    ps_rounded = FALSE;
 	    strcpy(ps_font,"Helvetica");
 	    ps_fontsize = 14;
 	    term->v_char = (unsigned int)(ps_fontsize*PS_SC);
@@ -703,6 +713,14 @@ PS_options()
 	    ps_duplex_option = FALSE;
 	    c_token++;
 	    break;
+	case PS_ROUNDED:
+	    ps_rounded = TRUE;
+	    c_token++;
+	    break;
+	case PS_NOROUNDED:
+	    ps_rounded = FALSE;
+	    c_token++;
+	    break;
 	case PS_OTHER:
 	default:
 	    if (isstring(c_token)) {
@@ -728,7 +746,7 @@ PS_options()
      * loadable output' rule */
     sprintf(term_options,"%s %senhanced %s %s \\\n"
 	                 "   %s dashlength %.1f linewidth %.1f %s \\\n"
-	                 "   \"%s\" %d",
+	                 "   %s \"%s\" %d",
 	    ps_eps ? "eps" : (ps_portrait ? "portrait" : "landscape"),
 	    term->put_text == ENHPS_put_text ? "" : "no",
 	    ps_color ? "color" : "monochrome",
@@ -738,6 +756,7 @@ PS_options()
 	    ps_linewidth_factor,
 	    ps_duplex_option ? (ps_duplex_state ? "duplex" : "simplex")
 	    : "defaultplex",
+	    ps_rounded ? "rounded" : "butt",
 	    ps_font,ps_fontsize);
 }
 
@@ -776,7 +795,8 @@ const char **dict; /* extra entries for the dictionary */
 /hpt_ %.1f def\n\
 /vpt_ %.1f def\n\
 /hpt hpt_ def\n\
-/vpt vpt_ def\n";
+/vpt vpt_ def\n\
+/Rounded %s def\n";
 
     static const char GPFAR * GPFAR PS_iso_8859_1_encoding[] = {
 "/reencodeISO {\n",
@@ -1047,7 +1067,8 @@ NULL };
 	    (int)(t->v_char)/(-3),	/* shift for vertical centring */
 	    PS_SC*ps_dash_length,	/* dash length */
 	    PS_HTIC/2.0,		/* half point width */
-	    PS_VTIC/2.0);		/* half point height */
+	    PS_VTIC/2.0,		/* half point height */
+	    ps_rounded ? "true" : "false");
 
     if (uses_fonts && (encoding == S_ENC_ISO8859_1)) {
 	for (i = 0; PS_iso_8859_1_encoding[i] != NULL; i++) {
@@ -2178,6 +2199,7 @@ START_HELP(post)
 "                               {solid | dashed} {dashlength | dl <DL>}",
 "                               {linewidth | lw <LW>}",
 "                               {<duplexing>}",
+"                               {rounded | butt}",
 "                               {\"<fontname>\"} {<fontsize>}",
 "",
 " where <mode> is `landscape`, `portrait`, `eps` or `default`;",
@@ -2192,6 +2214,8 @@ START_HELP(post)
 " <duplexing> is `defaultplex`, `simplex` or `duplex` (\"duplexing\" in",
 " PostScript is the ability of the printer to print on both sides of the same",
 " page---don't set this if your printer can't do it);",
+" `rounded` sets line caps and line joins to be rounded; `butt` is the",
+" default, butt caps and mitered joins;",
 " `\"<fontname>\"` is the name of a valid PostScript font; and `<fontsize>` is",
 " the size of the font in PostScript points.",
 "",
