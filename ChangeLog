@@ -1,3 +1,24 @@
+2002-12-13  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* docs/Makefile.in: Add DEFAULT_INCLUDES. Update CORETERM. Add
+	gnuplot.out to CLEANFILES. Prepend config.h to allterm.c
+
+	* docs/checkdoc.c, docs/doc2gih.c, docs/doc2hlp.c, docs/doc2ipf.c,
+	docs/doc2ms.c, docs/doc2rnh.c, docs/doc2rtf.c, docs/doc2tex.c,
+	docs/termdoc.c, docs/xref.c: Fix compiler warnings, ansify.
+
+	* docs/gnuplot.doc: Update copyright date.
+
+	* docs/psdoc/Makefile: Fix clean target.
+
+	* docs/psdoc/ps_fontfile_doc.tex: Harald Harders' patch to improve
+	ps fontfile documentation.
+
+2002-12-13  Shigeharu TAKENO  <shige@iee.niit.ac.jp>
+
+	* term/cgm.trm, term/eepic.trm, term/hpgl.trm: Another installment
+	of documentation fixes.
+
 2002-12-15  Ethan Merritt  <merritt@u.washington.edu>
 
 	* configure.in: If the TTF support routine in libgd is found under its
@@ -1602,7 +1623,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/12/15 17:17:33 $).
+	last modification date (from the tag $Date: 2002/12/15 20:12:38 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
