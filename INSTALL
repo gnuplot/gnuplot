@@ -50,16 +50,21 @@ gnuplot.gih and show.c. This is important if gnuplot is not installed by running
    The default path for the help library, gnuplot.gih, can be controlled in
 several different ways:
 
+ o use configure's --with-gihdir option to specify the full path to the
+   directory where gnuplot.gih is to be installed, e.g.
+   ./configure --with-gihdir=/opt/docs
+
+ o use configure's --datadir= option to specify a version and package
+   independent data dir prefix, e.g.
+   ./configure --datadir='/opt/docs'
+   gnuplot will look for the online help file, gnuplot.gih, in
+   /opt/docs/gnuplot/$VERSION.
+
  o with configure's --prefix= option, eg.
    ./configure --prefix=/gnuplot
    gnuplot will look for the online help file, gnuplot.gih, in
    /gnuplot/share/gnuplot/$VERSION.
    Attention: This option affects the location of *all* installed files!
-
- o with configure's --datadir= option, eg.
-   ./configure --datadir='/gnuplot/docs'
-   gnuplot will look for the online help file, gnuplot.gih, in
-   /gnuplot/docs/gnuplot/$VERSION.
 
  o at make time, eg.
    make HELPFILE='/gnuplot/docs/gnuplot.gih'

@@ -64,6 +64,7 @@ DEFS   = @DEFS@
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I.. -I$(top_builddir)
 CPPFLAGS = @CPPFLAGS@
 CFLAGS = @CFLAGS@
+GIHDIR = @GIHDIR@
 INCLUDES = -I$(top_srcdir)/src -I$(top_srcdir)/term
 LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
@@ -382,8 +383,8 @@ checkdoc.o: checkdoc.c $(BUILT_SOURCES)
 install: install-gih install-info
 
 install-gih: gnuplot.gih
-	$(top_srcdir)/mkinstalldirs $(DESTDIR)$(datadir)
-	$(INSTALL_DATA) gnuplot.gih $(DESTDIR)$(datadir)/gnuplot.gih
+	$(top_srcdir)/mkinstalldirs $(DESTDIR)$(GIHDIR)
+	$(INSTALL_DATA) gnuplot.gih $(DESTDIR)$(GIHDIR)/gnuplot.gih
 
 install-info: gnuplot.info
 	$(top_srcdir)/mkinstalldirs $(DESTDIR)$(infodir)

@@ -8,10 +8,10 @@ pkglibexecdir = $(libexecdir)/@PACKAGE@
 EMAIL = bug-gnuplot@dartmouth.edu
 
 # Default help file location
-HELPFILE=$(pkgdatadir)/$(PKG_MAJOR)/gnuplot.gih
+HELPFILE=@GIHDIR@/gnuplot.gih
 
 # Default X11 driver location
-X11_DRIVER_DIR=$(pkglibexecdir)/$(PKG_MAJOR)
+X11_DRIVER_DIR=$(pkglibexecdir)/@PKG_MAJOR@
 
 # There is probably no need to edit anything below this line
 
