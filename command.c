@@ -70,7 +70,6 @@ extern char HelpFile[];		/* patch for do_help  - DJL */
 #ifndef _Windows
 # include "help.h"
 #else
-# define MAXSTR 255
 static int winsystem __PROTO((char *));
 #endif /* _Windows */
 

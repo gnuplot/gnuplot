@@ -41,8 +41,6 @@ static char *RCSid = "$Id: plot2d.c,v 1.53 1998/06/18 14:55:14 ddenholm Exp $";
 
 #ifndef _Windows
 # include "help.h"
-#else
-# define MAXSTR 255
 #endif
 
 #ifndef STDOUT
