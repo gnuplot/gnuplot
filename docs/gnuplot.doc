@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.225 2004/06/21 03:54:49 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.226 2004/06/30 20:01:52 broeker Exp $
 C 18 September 2001
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -4148,8 +4148,7 @@ C ... and restart the table:
  integers in the range from 2 (linear) to 10.
 
  `levels`--- Selection of contour levels,  controlled by `auto` (default),
- `discrete`, `incremental`, and <n>, number of contour levels, limited to
-  MAX_DISCRETE_LEVELS as defined in plot.h (30 is standard.)
+ `discrete`, `incremental`, and <n>, number of contour levels.
 
  For `auto`, <n> specifies a nominal number of levels; the actual number will
  be adjusted to give simple labels. If the surface is bounded by zmin and zmax,
