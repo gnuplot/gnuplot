@@ -1,5 +1,5 @@
 /*
- * $Id: ggi.trm,v 1.3 2000/10/22 12:16:17 joze Exp $
+ * $Id: ggi.trm,v 1.4 2000/10/24 13:13:43 joze Exp $
  */
 
 /* GNUPLOT - ggi.trm */
@@ -1256,7 +1256,6 @@ START_HELP(ggi)
 "  - V800x600",
 "  - V640x480",
 "  - V320x200",
-" please refer to the ggi documentation for other modes",
-" "
+" please refer to the ggi documentation for other modes"
 END_HELP(ggi)
 #endif
