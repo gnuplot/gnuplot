@@ -221,18 +221,25 @@ AC_EGREP_CPP(yes,
 [#if __DJGPP__ && __DJGPP__ == 2
   yes
 #endif
-], AC_MSG_RESULT(yes)
-   LIBS="-lpc $LIBS"
-   AC_DEFINE(MSDOS)
-   AC_DEFINE(DOS32)
-   with_linux_vga=no
-   AC_CHECK_LIB(grx20,GrLine,dnl
-      LIBS="-lgrx20 $LIBS"
-      CFLAGS="$CFLAGS -fno-inline-functions"
-      AC_DEFINE(DJSVGA)
-      AC_CHECK_LIB(grx20,GrCustomLine,AC_DEFINE(GRX21))),dnl
-   AC_MSG_RESULT(no)
-   )dnl 
+],AC_MSG_RESULT(yes)
+  LIBS="-lpc $LIBS"
+  AC_DEFINE(MSDOS, 1,
+            [ Define if this is an MSDOS system. ])
+  AC_DEFINE(DOS32, 1,
+            [ Define if this system uses a 32-bit DOS extender (djgpp/emx). ])
+  with_linux_vga=no
+  AC_CHECK_LIB(grx20,GrLine,dnl
+    LIBS="-lgrx20 $LIBS"
+    CFLAGS="$CFLAGS -fno-inline-functions"
+    AC_DEFINE(DJSVGA, 1,
+              [ Define if you want to use libgrx20 with MSDOS/djgpp. ])
+    AC_CHECK_LIB(grx20,GrCustomLine,dnl
+      AC_DEFINE(GRX21, 1,
+                [ Define if you want to use a newer version of libgrx under MSDOS/djgpp. ])dnl
+    )dnl
+  ),dnl
+  AC_MSG_RESULT(no)
+  )dnl 
 ])
 
 
@@ -312,7 +319,8 @@ if test "$ac_cv_func_select" = yes; then
   fi
 
   AC_MSG_RESULT([select($ac_cv_type_fd_set_size_t,$ac_cv_type_fd_set *,...)])
-  AC_DEFINE_UNQUOTED(fd_set_size_t, $ac_cv_type_fd_set_size_t)
+  AC_DEFINE_UNQUOTED(fd_set_size_t, $ac_cv_type_fd_set_size_t,
+                     [ First arg for select(). ])
   ac_cast=
   if test "$ac_cv_type_fd_set" != fd_set; then
     # Arguments 2-4 are not fd_set.  Some weirdo systems use fd_set type for
@@ -340,9 +348,11 @@ changequote([,]),dnl
     # We found fd_set type in a header, need special cast
     ac_cast="($ac_cv_type_fd_set *)",dnl
     # No fd_set type; it is safe to define it
-    AC_DEFINE_UNQUOTED(fd_set,$ac_cv_type_fd_set))
+    AC_DEFINE_UNQUOTED(fd_set,$ac_cv_type_fd_set,
+                       [ Define if the type in arguments 2-4 to select() is fd_set. ]))
   fi
-  AC_DEFINE_UNQUOTED(SELECT_FD_SET_CAST,$ac_cast)
+  AC_DEFINE_UNQUOTED(SELECT_FD_SET_CAST,$ac_cast,
+                     [ Define if the type in arguments 2-4 to select() is fd_set. ])
 fi
 ])
 
