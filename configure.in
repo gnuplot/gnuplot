@@ -12,10 +12,10 @@ dnl  This reduced the size of configure by 30k!
 dnl
 dnl $Id: configure.in,v 1.90 1998/06/18 14:52:55 ddenholm Exp $
 dnl
-AC_PREREQ(2.12)
+AC_PREREQ(2.13)
 AC_REVISION($Revision: 1.90 $)
 AC_INIT(graphics.c)
-VERSION=`sed -n 's/.*patchlevel.*"\(.*\)".*/\1/p' $srcdir/version.c|tr -d ' '`
+VERSION=`sed -n 's/.*version.*"\(.*\)".*/\1/p' $srcdir/version.c|tr -d ' '`
 AM_INIT_AUTOMAKE(gnuplot, $VERSION)
 AC_CONFIG_HEADER(config.h:config.hin)
 
