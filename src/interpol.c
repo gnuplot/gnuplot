@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: interpol.c,v 1.12 1999/10/29 18:47:19 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: interpol.c,v 1.13 1999/11/08 19:24:31 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - interpol.c */
@@ -936,8 +936,9 @@ struct curve_points *cp;
     int first_point, num_points;
     int i, j, k;
     double x = 0., y = 0., sux = 0., slx = 0., suy = 0., sly = 0.;
-    enum coord_type dot;
-
+    int xaxis = cp->x_axis;                                                   
+    int yaxis = cp->y_axis;                                                   
+    TBOOLEAN all_inrange; /* HBB 20000401: use the right type for this flag */
 
     j = 0;
     first_point = 0;
@@ -951,9 +952,7 @@ struct curve_points *cp;
 		slx = cp->points[i].xlow;
 		suy = cp->points[i].yhigh;
 		sly = cp->points[i].ylow;
-		dot = INRANGE;
-		if (cp->points[i].type != INRANGE)
-		    dot = UNDEFINED;	/* This means something other than usual *//* just signal to check if INRANGE */
+		all_inrange = (cp->points[i].type == INRANGE);
 		k = 1;
 	    } else if (cp->points[i].x == x) {
 		y += cp->points[i].y;
@@ -962,24 +961,36 @@ struct curve_points *cp;
 		suy += cp->points[i].yhigh;
 		sly += cp->points[i].ylow;
 		if (cp->points[i].type != INRANGE)
-		    dot = UNDEFINED;
+		    all_inrange = FALSE;
 		k++;
 	    } else {
 		cp->points[j].x = x;
-		cp->points[j].y = y / (double) k;
+		cp->points[j].y = y /= (double) k;
 		cp->points[j].xhigh = sux / (double) k;
 		cp->points[j].xlow = slx / (double) k;
 		cp->points[j].yhigh = suy / (double) k;
 		cp->points[j].ylow = sly / (double) k;
+		/* HBB 20000405: I wanted to use STORE_AND_FIXUP_RANGE
+		 * here, but won't: it assumes we want to modify the
+		 * range, and that the range is given in 'input'
+		 * coordinates.  For logarithmic axes, the overhead
+		 * would be larger than the possible gain, so write it
+		 * out explicitly, instead:
+		 * */
 		cp->points[j].type = INRANGE;
-		if (dot != INRANGE) {
-		    if ((cp->points[j].x > xmax) || (cp->points[j].x < xmin))
+		if (! all_inrange) {
+		    if (log_array[xaxis])
+		    	x = exp(x * log_base_array[xaxis]);
+		    if (((x < min_array[xaxis]) && !(auto_array[xaxis] & 1))
+			|| ((x > max_array[xaxis]) && !(auto_array[xaxis] & 2)))
 			cp->points[j].type = OUTRANGE;
-		    else if (!autoscale_ly) {
-			if ((cp->points[j].y > ymax) || (cp->points[j].y < ymin))
+		    else {
+			if (log_array[yaxis])
+		    	    y = exp(y * log_base_array[yaxis]);
+			if (((y < min_array[yaxis]) && !(auto_array[yaxis] & 1))
+			    || ((y > max_array[yaxis]) && !(auto_array[yaxis] & 2)))
 			    cp->points[j].type = OUTRANGE;
-		    } else
-			cp->points[j].type = INRANGE;
+		    }
 		}
 		j++;		/* next valid entry */
 		k = 0;		/* to read */
@@ -988,20 +999,25 @@ struct curve_points *cp;
 	}
 	if (k) {
 	    cp->points[j].x = x;
-	    cp->points[j].y = y / (double) k;
+	    cp->points[j].y = y /= (double) k;
 	    cp->points[j].xhigh = sux / (double) k;
 	    cp->points[j].xlow = slx / (double) k;
 	    cp->points[j].yhigh = suy / (double) k;
 	    cp->points[j].ylow = sly / (double) k;
 	    cp->points[j].type = INRANGE;
-	    if (dot != INRANGE) {
-		if ((cp->points[j].x > xmax) || (cp->points[j].x < xmin))
+	    if (! all_inrange) {
+		if (log_array[xaxis])
+		    x = exp(x * log_base_array[xaxis]);
+		if (((x < min_array[xaxis]) && !(auto_array[xaxis] & 1))
+		    || ((x > max_array[xaxis]) && !(auto_array[xaxis] & 2)))
 		    cp->points[j].type = OUTRANGE;
-		else if (!autoscale_ly) {
-		    if ((cp->points[j].y > ymax) || (cp->points[j].y < ymin))
+		else {
+		    if (log_array[yaxis])
+			y = exp(y * log_base_array[yaxis]);
+		    if (((y < min_array[yaxis]) && !(auto_array[yaxis] & 1))
+			|| ((y > max_array[yaxis]) && !(auto_array[yaxis] & 2)))
 			cp->points[j].type = OUTRANGE;
-		} else
-		    cp->points[j].type = INRANGE;
+		}
 	    }
 	    j++;		/* next valid entry */
 	}
