@@ -1,3 +1,72 @@
+1999-10-01  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* docs/Makefile.in: Add pdf target.
+
+	* docs/doc2ms.c: Use TBOOLEAN instead of boolean.
+
+	* src/Makefile.am: Add new header files to gnuplot_SOURCES.
+
+	* src/bitmap.c, src/bitmap.h: Move struct rgb web_color_rgbs[] here
+	from term/gif.trm.
+
+	* src/readline.c: Minor cleanup.
+
+	* src/save.c: Start moving `save' output to new syntax.
+
+	* src/term.c: New function int termcount().
+
+	* term/gif.trm: Edit comments about gd library.
+
+	* tutorial/Makefile.am.in: Use the newly built gnuplot executable
+	in the .plt.tex rule.
+
+1999-10-01  "Eric S. Raymond"  <esr@thyrsus.com>
+
+        * term/gif.trm, term/png.trm: Remove RGB colour table from gif.trm,
+        let both drivers share the table in bitmap.c.
+
+        * term/png.trm: Add transparency support for color images. Update
+        for pnglib-1.0.3.
+
+1999-10-01  John Hasstedt  <manager@nuclear.physics.sunysb.edu>
+
+	* INSTALL, make_vms.com: Make VMS builds easier and add note
+	about make_vms.com to INSTALL.
+
+1999-10-01  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* config/makefile.dj2, config/makefile.mgw, config/makefile.tc,
+	config/makefile.win: Updated.
+
+	* docs/doc2x.h, docs/termdoc.c: Cleanups by HBB.
+
+	* src/bf_test.c, src/bitmap.c, src/bitmap.h, src/command.c,
+	src/command.h, src/datafile.c, src/datafile.h, src/eval.c, src/fit.c,
+	src/fit.h, src/graph3d.c, src/graphics.c, src/graphics.h, src/help.h,
+	src/hidden3d.c, src/internal.c, src/interpol.c, src/matrix.c,
+	src/matrix.h, src/misc.c, src/parse.c, src/plot.c, src/plot.h,
+	src/plot2d.c, src/plot3d.c, src/protos.h, src/save.c, src/scanner.c,
+	src/set.c, src/setshow.h, src/specfun.c, src/standard.c, src/stdfn.c,
+	src/stdfn.h, src/term.c, src/time.c, src/unset.c, src/util.c,
+	src/util3d.c, src/util3d.h, src/variable.c, src/variable.h,
+	src/win/pgnuplot.c, src/win/winmain.c: Include header files, move
+	declarations to header files, add static declarations, for better
+	modularisation. Minor fixes.
+
+	* src/contour.h, src/eval.h, src/gp_time.h, src/graph3d.h,
+	src/hidden3d.h, src/internal.h, src/interpol.h, src/misc.h,
+	src/plot2d.h, src/plot3d.h, src/readline.h, src/save.h, src/scanner.h,
+	src/specfun.h, src/standard.h, src/template.h, src/term_api.h:
+	New header files for better modularisation.
+
+	* term/ai.trm, term/cgm.trm, term/compact.c, term/corel.trm,
+	term/driver.h, term/dxf.trm, term/eepic.trm, term/epson.trm,
+	term/gif.trm, term/gpic.trm, term/hp26.trm, term/hpljii.trm,
+	term/imagen.trm, term/latex.trm, term/metapost.trm, term/mif.trm,
+	term/post.h, term/post.trm, term/pstricks.trm, term/t410x.trm,
+	term/texdraw.trm, term/tpic.trm, term/win.trm, term/x11.trm: Add
+ 	static qualifiers where required. Minor fixes.
+
 1999-09-24  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* FAQ: Latest version from Juergen.
@@ -115,9 +184,6 @@
 	replacement.
 
 	* src/plot.c: Fix off-by-one error in tilde expansion code.
-
-	* src/plot.h, src/show.c, src/version.c: Add new variable const
-	char *more_info[].
 
 	* src/set.c, src/setshow.h: Static prototype for set_lp_properties()
 	now in set.c.

@@ -6,19 +6,30 @@ Changes in release 4.0:
 * gnuplot now passes the correct return value back to
   the environment
 * FIXED buffering bug in gnuplot_x11
-* NEW 'system', 'unset' command
 * FIXED crash in 16bit Windows
-* UPDATED FAQ
+* FAQ updated
 * FIXED some inconsistencies in error messages and the manual
 * INCOMPATIBLE CHANGE: the 'set data style', 'set function style'
   and 'set linestyle' commands have been removed. They have been
   replaced with 'set style data|function|line'. The 'set nolinestyle'
   command, however, is still available for the time being.
+  The demos have been updated to reflect this change.
+* NEW 'system', 'unset' command
 * INCOMPATIBLE CHANGE: all 'set noVariable' commands have been
   replaced with the new 'unset Variable' command.
 * NEW the gpltconv program has been included to translate old
   gnuplot command files to the new syntax.
 * NEW 'save term' option
+* FIXED building on NeXT
+* NEW 'history' command, by Petr Mikulik. Currently works only
+  without GNU readline.
+* FIXED gnuplot now checks for minimum and maximum of required columns
+  in data plots
+* UPDATED VMS build procedures
+* gnuplot-mode updated to 0.5j
+* FIXED reversed 'set {x|y}zeroaxis' behaviour
+* FIXED plotting of test page before line properties are specified completely
+* UPDATED metapost driver
 
 [3.7.0.9]
 * moved some declarations to new header files
