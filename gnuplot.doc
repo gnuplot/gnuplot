@@ -145,9 +145,7 @@
 %Up Arrow@@same as ^P.
 %Down Arrow@@same as ^N.
 %_
-@end table
- (The readline function in gnuplot is not the same as the readline used
- in GNU BASH and GNU EMACS.  It is somewhat compatible however.) 
+@end table 
 2 comment
 ?comments
  Comments are supported as follows: a # may appear in most places in a line
@@ -701,36 +699,8 @@
 
  A simple example of plotting a 3-d data file is
  
-         set parametric
          splot 'glass.dat'
- 
- or
- 
-         set noparametric
-         splot 'datafile.dat'
- 
- where the file datafile.dat might contain:
- 
-         # The valley of the Gnu.
-         10
-         10
-         10
- 
-         10
-         5
-         10
- 
-         10
-         1
-         10
- 
-         10
-         0
-         10
- 
- Note datafile.dat defines a 4 by 3 grid ( 4 rows of 3 points each ).
- Rows are seperated by blank lines.
- 
+
  For more information about 3-d plotting, see `splot`.
 4 using
 ?plot datafile using
@@ -1302,7 +1272,7 @@
         set noclip
  `set clip` is synonymous with `set clip points`. `set noclip` turns
  off all three types of clipping.
-3 Cntrparam
+3 cntrparam
 ?set cntrparam
 ?show cntrparam
 ?cntrparam
@@ -1464,6 +1434,28 @@
          set grid
          set nogrid
          show grid
+3 hidden3d
+?set hidden3d
+?show hidden3d
+ The `set hidden3d` command enables hidden line removal for explicit
+ surface plotting (see `splot`).
+ Hidden line removal may be used for both explicit functions
+ and for explicit data where gnuplot plot is in nonparametric mode (see
+ `set parametric`).
+ 
+ When this flag is set both the surface hidden portion and possibly
+ its hidden contours (see `set contour`) as well as the hidden grid will be
+ removed. Labels and arrows are always visible and are unaffected by this
+ command.
+ 
+ Each surface has its hidden part removed with respect to itself, if more
+ than one surface is ploted. This mode is meaningfull when surfaces are
+ plotted using line style drawing only.
+
+ Syntax:
+         set hidden3d
+         set nohidden3d
+         show hidden3d
 3 isosamples
 ?set isosamples
 ?show isosamples
@@ -1658,6 +1650,18 @@
  
  The filename must be enclosed in quotes. If the filename is
  omitted, output will be sent to the standard output.
+
+ On machines with popen functions (UNIX), output can be piped
+ through a shell command if the first letter of the filename
+ is '|'.  For instance,
+ 
+ Syntax:
+         set output "|lpr -Plaser filename"
+         set output "|lp -dlaser filename"
+
+ (On MSDOS machines, set output "prn" will direct the output
+ to the default printer.)
+
 3 parametric
 ?set parametric
 ?set noparametric
@@ -1810,6 +1814,8 @@
          set size
  To make the plot half size use:
          set size 0.5,0.5
+ To make a landscape plot have a 1:1 aspect ratio in polar mode use:
+         set size 0.721,1.0
  To show the size use:
          show size
  
@@ -1950,6 +1956,32 @@
  This file has exactly 12 lines of RGB triples. No empty lines are
  allowed and anything after the third number in line is ignored.
  
+4 pbm
+?set terminal pbm
+?pbm
+ Several options may be set in the PBMplus driver.
+
+ Syntax:
+         set terminal pbm {<fontsize>}
+         set terminal pgm {<fontsize>}
+         set terminal ppm {<fontsize>}
+
+ where <fontsize> is `small`, `medium`, or `large`. 
+ Default size is 640 pixels wide and 480 pixels high.
+ The pbm output is a portable bitmap (one bit per pixel).
+ The pgm output is a portable graymap (three bits per pixel). 	
+ The ppm output is a portable pixmap (color, four bits per pixel).
+ The output of these drivers can be used with Jef Poskanzer's 
+ excellent PBMPLUS package which provides programs to convert
+ the above PBMPLUS formats to GIF, TIFF, MacPaint, Macintosh PICT,
+ PCX, X11 bitmap and many others. 
+
+ Examples:
+ 
+         set term pbm small
+         set size 2,2
+         set term ppm medium
+ 
 4 postscript
 ?set terminal postscript
 ?postscript
@@ -1959,8 +1991,8 @@
          set terminal postscript {<mode>} {<color>}
                                  {"<fontname>"} {<fontsize>}
 
- where <mode> is `landscape`, `portrait`, `eps` or `default`. 
- Selecting default sets all options to their defaults.
+ where <mode> is `landscape`, `portrait` or `default`. Selecting default
+ sets all options to their defaults.
  <color> is either `color` or `monochrome`.
  "<fontname>" is the name of a valid PostScript font.
  <fontsize> is the size of the font in PostScript points, before 
@@ -1969,47 +2001,24 @@
  Default size of PostScript plot is landscape mode 10 inches wide 
  and 7 inches high.
 
- To get EPS output, use the `eps` mode and make only one plot per file.
- In `eps` mode the whole plot is halved in size; the fonts are half the 
- given size, and the plot is 5 inches wide and 3.5 inches high.
-
  Examples:
  
+         set size 1,1
          set term postscript default       # old postscript
          set term postscript landscape 22  # old psbig
-         set term postscript eps 14   # old epsf1
-         set term postscript eps 22   # old epsf2
-         set size 0.7,1.4
-         set term post portrait color "Times-Roman" 14 
+         set size 0.5,0.5
+         set term postscript portrait 14   # old epsf1
+         set term postscript portrait 22   # old epsf2
+         set size 1,1; set term post landscape color "Times-Roman" 14 
  
-4 aifm
-?set terminal aifm
-?aifm
- Several options may be set in the Adobe Illustrator 3.0 driver.
+4 table
+?set terminal table
+?table
+ Instead of producing a picture, term type 'table' prints out
+ the evaluation results in a multicolumn ASCII table of X Y Z values.
+ For those times when you really want to see the numbers, now you
+ can see them on the screen or save to a file.
 
- Syntax:
-         set terminal aifm {<color>}
-                                 {"<fontname>"} {<fontsize>}
-
- Selecting default sets all options to their defaults.
- <color> is either `color` or `monochrome`.
- "<fontname>" is the name of a valid PostScript font.
- <fontsize> is the size of the font in PostScript points, before 
- scaling by the `set size` command.
- Defaults are `monochrome`, "Courier", and 14pt.
-
- Also, since AI does not really support multiple pages, multiple 
- graphs will be output directly on one another.  However, each graph 
- will be grouped individually, making it easy to separate them inside 
- AI (just pick them up and move them).
-
- Examples:
- 
-         set term aifm 
-         set term aifm 22  
-         set size 0.7,1.4
-         set term aifm color "Times-Roman" 14 
- 
 3 tics
 ?set tics
 ?show tics
@@ -2518,6 +2527,8 @@
  See `show functions` and `show variables`.
 2 bugs
 ?bugs
+ The atan() function does not work correctly for complex arguments.
+ 
  The bessel functions do not work for complex arguments.
  
  The gamma function does not work for complex arguments.
@@ -2581,5 +2592,10 @@
  system.  HUGE should be set to 1e38 in plot.h. This error has been
  corrected in the 2.1 version of NeXT OS.
 
- Please report any bugs to pixar!bug-gnuplot@sun.com or
- pixar!bug-gnuplot@ucbvax.berkeley.edu.
+ Some older models of HP plotters do not have a page eject command 'PG'.
+ The current HPGL driver uses this command in HPGL_reset.  This may need
+ to be removed for these plotters.  The current PCL5 driver uses HPGL/2
+ for text as well as graphics.  This should be modified to use scalable
+ PCL fonts.
+
+ Please report any bugs to bug-gnuplot@ames.arc.nasa.gov.

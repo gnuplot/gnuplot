@@ -1,4 +1,7 @@
 #
+# $Id: simple.demo,v 3.26 92/03/24 22:32:24 woo Exp Locker: woo $
+#
+#
 # Requires data files "[123].dat" from this directory,
 # so change current working directory to this directory before running.
 # gnuplot> set term <term-type>

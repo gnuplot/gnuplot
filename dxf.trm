@@ -1,6 +1,10 @@
+/*
+ * $Id: dxf.trm,v 3.26 92/03/24 22:34:49 woo Exp Locker: woo $
+ */
+
 /* GNUPLOT - dxf.trm */
 /*
- * Copyright (C) 1991
+ * Copyright (C) 1991, 1992
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted,
@@ -23,7 +27,7 @@
  * AUTHOR
  *   Florian Hiss  (fhis1231@w204zrz.zrz.tu-berlin.de)
  *
- * send your comments or suggestions to (pixar!info-gnuplot@sun.com).
+ * send your comments or suggestions to (info-gnuplot@ames.arc.nasa.gov).
 */
 
 #define DXF_UNIT 60.0

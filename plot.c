@@ -1,6 +1,10 @@
+#ifndef lint
+static char *RCSid = "$Id: plot.c,v 3.26 92/03/24 22:34:34 woo Exp Locker: woo $";
+#endif
+
 /* GNUPLOT - plot.c */
 /*
- * Copyright (C) 1986, 1987, 1990, 1991   Thomas Williams, Colin Kelley
+ * Copyright (C) 1986, 1987, 1990, 1991, 1992   Thomas Williams, Colin Kelley
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted, 
@@ -27,11 +31,11 @@
  *       Gershon Elber and many others.
  * 
  * Send your comments or suggestions to 
- *  pixar!info-gnuplot@sun.com.
+ *  info-gnuplot@ames.arc.nasa.gov.
  * This is a mailing list; to join it send a note to 
- *  pixar!info-gnuplot-request@sun.com.  
+ *  info-gnuplot-request@ames.arc.nasa.gov.  
  * Send bug reports to
- *  pixar!bug-gnuplot@sun.com.
+ *  bug-gnuplot@ames.arc.nasa.gov.
  */
 
 #include <stdio.h>
@@ -65,6 +69,7 @@ extern FILE *outfile;
 extern int term;
 
 BOOLEAN interactive = TRUE;	/* FALSE if stdin not a terminal */
+BOOLEAN noinputfiles = TRUE;	/* FALSE if there are script files */
 char *infile_name = NULL;	/* name of command file; NULL if terminal */
 
 #ifndef STDOUT
@@ -164,15 +169,11 @@ struct udft_entry *first_udf = NULL;
 #ifdef __TURBOC__
 void tc_interrupt()
 #else
-#ifdef _CRAY
+#if defined( _CRAY ) || defined( sgi )
 void inter(an_int)
 int an_int;
 #else
-#ifdef NEXT
-void inter(int an_int)
-#else
 inter()
-#endif
 #endif
 #endif
 {
@@ -217,6 +218,9 @@ registerfarbgidriver(ATT_driver_far);
 #endif
 
 	setbuf(stderr,(char *)NULL);
+#ifdef UNIX
+	setlinebuf(stdout);
+#endif
 	outfile = stdout;
 	(void) complex(&udv_pi.udv_value, Pi, 0.0);
 
@@ -230,7 +234,9 @@ registerfarbgidriver(ATT_driver_far);
      interactive = isatty(fileno(stdin));
 #endif
      if (argc > 1)
-	  interactive = FALSE;
+	  interactive = noinputfiles = FALSE;
+     else
+	  noinputfiles = TRUE;
 
      if (interactive)
 	  show_version();
@@ -265,7 +271,7 @@ registerfarbgidriver(ATT_driver_far);
 		   outfile = stdout;
 	    }
 #endif					/* VMS */
-	    if (!interactive)
+	    if (!interactive && !noinputfiles)
 		 done(IO_ERROR);			/* exit on non-interactive error */
 	}
 

@@ -1,4 +1,7 @@
 #
+# $Id: param.demo,v 3.26 92/03/24 22:32:22 woo Exp Locker: woo $
+#
+#
 # Show some of the new parametric capabilities.
 #
 set parametric

@@ -1,0 +1,284 @@
+/*
+ * $Id: pbm.trm,v 3.24 1992/02/29 16:23:41 woo Exp woo $
+ *
+ * $Log: pbm.trm,v $
+ * Revision 3.24  1992/02/29  16:23:41  woo
+ * gnuplot3.2, beta 4
+ *
+ * Revision 3.23  1992/02/21  20:18:16  woo
+ * gnuplot3.2, beta 3
+ *
+ */
+
+/* GNUPLOT - pbm.trm */
+/*
+ * Copyright (C) 1990, 1991, 1992   
+ *
+ * Permission to use, copy, and distribute this software and its
+ * documentation for any purpose with or without fee is hereby granted, 
+ * provided that the above copyright notice appear in all copies and 
+ * that both that copyright notice and this permission notice appear 
+ * in supporting documentation.
+ *
+ * Permission to modify the software is granted, but not the right to
+ * distribute the modified code.  Modifications are to be distributed 
+ * as patches to released version.
+ *  
+ * This software  is provided "as is" without express or implied warranty.
+ * 
+ * This file is included by ../term.c.
+ *
+ * This terminal driver supports:
+ *  pbm, pgm, ppm
+ *
+ * AUTHORS
+ *  Russell Lang
+ *
+ * send your comments or suggestions to (info-gnuplot@ames.arc.nasa.gov).
+ * 
+ */
+
+/* The following pbmplus drivers use the generic bit mapped graphics
+   routines from bitmap.c to build up a bit map in memory.  The driver
+   interchanges colomns and lines in order to access entire lines
+   easily and returns the lines to get bits in the right order :
+   (x,y) -> (y,XMAX-1-x). */
+/* This interchange is done by calling b_makebitmap() with reversed 
+   xmax and ymax, and then setting b_rastermode to TRUE.  b_setpixel()
+   will then perform the interchange before each pixel is plotted */
+/* See Jef Poskanzer's excellent PBMplus package for more details of
+   the Portable BitMap format and for programs to convert PBM files  
+   to other bitmap formats. */
+
+#ifdef PBM
+
+/* make XMAX and YMAX a multiple of 8 */
+#define PBM_XMAX (640)
+#define PBM_YMAX (480)
+#define PBM_VCHAR (FNT5X9_VCHAR)
+#define PBM_HCHAR (FNT5X9_VCHAR)
+#define PBM_VTIC FNT5X9_HBITS
+#define PBM_HTIC FNT5X9_HBITS
+
+static int pbm_font=1;	/* small font */
+/* 7=black, 0=white */
+static int pgm_gray[]={7,1,6,5,4,3,2,1,7};  /* grays  */
+/* bit3=!intensify, bit2=!red, bit1=!green, bit0=!blue */
+static int ppm_color[]={15,8,3,5,6,4,2,1,11,13,14}; /* colors */
+
+PBMoptions()
+{
+	if (!END_OF_COMMAND) {
+		if (almost_equals(c_token,"s$mall"))
+			pbm_font=1;
+		else if (almost_equals(c_token,"m$edium"))
+			pbm_font=2;
+		else if (almost_equals(c_token,"l$arge"))
+			pbm_font=3;
+		else
+			int_error("expecting: small, medium, large",c_token);
+		c_token++;
+	}
+}
+
+
+PBMinit()
+{
+#ifdef vms
+   reopen_binary();
+#endif /* vms */
+#ifdef PC
+   reopen_binary();
+#endif /* PC */
+}
+
+
+PBMreset()
+{
+#ifdef vms
+   fflush_binary();
+#endif /* vms */
+}
+
+
+PBMsetfont()
+{
+	switch(pbm_font) {
+		case 1:
+			b_charsize(FNT5X9);
+			term_tbl[term].v_char = FNT5X9_VCHAR;
+			term_tbl[term].h_char = FNT5X9_HCHAR;
+			term_tbl[term].v_tic = FNT5X9_HBITS;
+			term_tbl[term].h_tic = FNT5X9_HBITS;
+			break;
+		case 2:
+			b_charsize(FNT9X17);
+			term_tbl[term].v_char = FNT9X17_VCHAR;
+			term_tbl[term].h_char = FNT9X17_HCHAR;
+			term_tbl[term].v_tic = FNT9X17_HBITS;
+			term_tbl[term].h_tic = FNT9X17_HBITS;
+			break;
+		case 3:
+			b_charsize(FNT13X25);
+			term_tbl[term].v_char = FNT13X25_VCHAR;
+			term_tbl[term].h_char = FNT13X25_HCHAR;
+			term_tbl[term].v_tic = FNT13X25_HBITS;
+			term_tbl[term].h_tic = FNT13X25_HBITS;
+			break;
+	}
+}
+
+
+PBMgraphics()
+{
+	PBMsetfont();
+	/* rotate plot -90 degrees by reversing XMAX and YMAX and by 
+	setting b_rastermode to TRUE */
+	b_makebitmap((unsigned int)(PBM_YMAX*ysize),
+                     (unsigned int)(PBM_XMAX*xsize),1);
+	b_rastermode = TRUE;
+}
+
+
+PBMtext()
+{
+  register int x,j,row;
+
+   fprintf(outfile,"P4\n");
+   fprintf(outfile,"%u %u\n", b_ysize, b_xsize);
+
+   /* dump bitmap in raster mode */
+   for (x = b_xsize-1; x >= 0; x--) {
+      row = (b_ysize/8)-1;
+      for (j = row; j >= 0; j--) {
+         (void) fputc( (char)(*((*b_p)[j]+x)), outfile );
+      }
+   }
+
+   b_freebitmap();
+}
+
+#define PBMlinetype b_setlinetype
+#define PBMmove b_move
+#define PBMvector b_vector
+#define PBMtext_angle b_text_angle
+#define PBMtext_angle b_text_angle
+#define PBMput_text b_put_text
+
+/* PGM functions */
+PGMgraphics()
+{
+	PBMsetfont();
+	/* rotate plot -90 degrees by reversing XMAX and YMAX and by 
+	setting b_rastermode to TRUE */
+	b_makebitmap((unsigned int)(PBM_YMAX*ysize),
+                     (unsigned int)(PBM_XMAX*xsize),3);
+	b_rastermode = TRUE;
+        b_setlinetype(0); /* solid lines */
+}
+
+
+PGMtext()
+{
+  register int x,j,row;
+  register int i,value;
+  int mask, plane1, plane2, plane3;
+
+   fprintf(outfile,"P5\n");
+   fprintf(outfile,"%u %u\n", b_ysize, b_xsize);
+   fprintf(outfile,"%u\n",7);
+
+   /* dump bitmap in raster mode */
+   for (x = b_xsize-1; x >= 0; x--) {
+      row = (b_ysize/8)-1;
+      for (j = row; j >= 0; j--) {
+         mask = 0x80;
+         plane1=(*((*b_p)[j]+x));
+         plane2=(*((*b_p)[j+b_psize]+x));
+         plane3=(*((*b_p)[j+b_psize+b_psize]+x));
+         for (i=0; i<8; i++) {
+            value=7;
+            if (plane1 & mask)  value-=1;
+            if (plane2 & mask)  value-=2;
+            if (plane3 & mask)  value-=4;
+            (void) fputc( (char)(value), outfile );
+            mask>>=1;
+         }
+      }
+   }
+
+   b_freebitmap();
+}
+
+
+PGMlinetype(linetype)
+int linetype;
+{
+    if (linetype>=7)
+        linetype %= 7;
+    b_setvalue(pgm_gray[linetype+2]);
+}
+
+
+/* PPM functions */
+PPMgraphics()
+{
+	PBMsetfont();
+	/* rotate plot -90 degrees by reversing XMAX and YMAX and by 
+	setting b_rastermode to TRUE */
+	b_makebitmap((unsigned int)(PBM_YMAX*ysize),
+                     (unsigned int)(PBM_XMAX*xsize),4);
+	b_rastermode = TRUE;
+        b_setlinetype(0); /* solid lines */
+}
+
+
+
+PPMtext()
+{
+  register int x,j,row;
+  register int i;
+  int mask, plane1, plane2, plane3, plane4;
+  int red, green, blue;
+
+   fprintf(outfile,"P6\n");
+   fprintf(outfile,"%u %u\n", b_ysize, b_xsize);
+   fprintf(outfile,"%u\n",3);
+
+   /* dump bitmap in raster mode */
+   for (x = b_xsize-1; x >= 0; x--) {
+      row = (b_ysize/8)-1;
+      for (j = row; j >= 0; j--) {
+         mask = 0x80;
+         plane1=(*((*b_p)[j]+x));
+         plane2=(*((*b_p)[j+b_psize]+x));
+         plane3=(*((*b_p)[j+b_psize+b_psize]+x));
+         plane4=(*((*b_p)[j+b_psize+b_psize+b_psize]+x));
+         for (i=0; i<8; i++) {
+            red = (plane3 & mask) ? 1 : 3;
+            green = (plane2 & mask) ? 1 : 3;
+            blue = (plane1 & mask) ? 1 : 3;
+            if (plane4 & mask) {
+               red--; green--; blue--;
+            }
+            (void) fputc( (char)(red), outfile );
+            (void) fputc( (char)(green), outfile );
+            (void) fputc( (char)(blue), outfile );
+            mask>>=1;
+         }
+      }
+   }
+
+   b_freebitmap();
+}
+
+
+PPMlinetype(linetype)
+int linetype;
+{
+    if (linetype>=9)
+        linetype %= 9;
+    b_setvalue(ppm_color[linetype+2]);
+}
+
+#endif /* PBM */

@@ -1,4 +1,7 @@
 #
+# $Id: glass.dat,v 3.26 92/03/24 22:32:21 woo Exp Locker: woo $
+#
+#
 # 16x16 grid Glass shape. Created Using DRAWFN3D, Gershon Elber 1990.
 #
   0.568000   0.000000  -0.911000

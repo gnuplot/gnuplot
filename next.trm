@@ -1,0 +1,414 @@
+/*
+ * $Id$
+ *
+ * $Log$
+ */
+
+/* GNUPLOT - next.trm */
+/*
+ * Copyright (C) 1991, 1992   
+ *
+ * Permission to use, copy, and distribute this software and its
+ * documentation for any purpose with or without fee is hereby granted, 
+ * provided that the above copyright notice appear in all copies and 
+ * that both that copyright notice and this permission notice appear 
+ * in supporting documentation.
+ *
+ * Permission to modify the software is granted, but not the right to
+ * distribute the modified code.  Modifications are to be distributed 
+ * as patches to released version.
+ *  
+ * This software  is provided "as is" without express or implied warranty.
+ * 
+ * This file is included by ../term.c.
+ *
+ * This terminal driver supports:
+ *     next
+ *
+ * AUTHORS
+ *  Nick Strobel from Russell Lang's post.trm
+ * 
+ * send your comments or suggestions to (info-gnuplot@ames.arc.nasa.gov).
+ *
+ * The 'postscript' driver produces landscape output 10" wide and 7" high.  
+ * To get a smaller epsf output use 'set size 0.5,0.5', 
+ * 'set term postscript portrait', make only one plot per file
+ * and change the first line of the postscript file from
+ * '%!PS-Adobe-2.0' to '%!PS-Adobe-2.0 EPSF-2.0'
+ * To change font to Times-Roman and font size to 20pts use 
+ * 'set term postscript "Times-Roman" 20'.
+ */
+
+
+/* NeXT driver by Nick Strobel, strobel@phast.phys.washington.edu */
+#import <math.h>
+#import <dpsclient/dpsclient.h>
+#import <dpsclient/dpsNeXT.h>
+#import <stdlib.h>
+#import "../EpsViewer.h"
+
+DPSContext d;
+static void window_create(float width, float height);
+float width,height;	
+float xsize_orig,ysize_orig;  
+
+char next_font[MAX_ID_LEN+1] = "Courier" ; /* name of font */
+int next_fontsize = 14;					 /* size of font in pts */
+BOOLEAN next_portrait = FALSE;				 /* vertical page */
+BOOLEAN next_color = FALSE;
+BOOLEAN init_called = FALSE;
+BOOLEAN initframe_called = FALSE;
+
+int next_page=0;			/* page count */
+int next_path_count=0; 	/* count of lines in path */
+int next_ang=0;			/* text angle */
+enum JUSTIFY next_justify=LEFT;	/* text is flush left */
+
+char *NEXT_header[] = {
+"/vpt2 vpt 2 mul def\n",
+"/hpt2 hpt 2 mul def\n",
+/* flush left show */
+"/Lshow { currentpoint stroke moveto\n",
+"  0 vshift rmoveto show } def\n", 
+/* flush right show */
+"/Rshow { currentpoint stroke moveto\n",
+"  dup stringwidth pop neg vshift rmoveto show } def\n", 
+/* centred show */
+"/Cshow { currentpoint stroke moveto\n",
+"  dup stringwidth pop -2 div vshift rmoveto show } def\n", 
+/* Dash or Color Line */
+"/DL { Color {setrgbcolor [] 0 setdash pop}\n",
+" {pop pop pop 0 setdash} ifelse } def\n",
+/* Border Lines */
+"/BL { stroke gnulinewidth 2 mul setlinewidth } def\n",
+/* Axes Lines */
+"/AL { stroke gnulinewidth 2 div setlinewidth } def\n",
+/* Plot Lines */
+"/PL { stroke gnulinewidth setlinewidth } def\n",
+/* Line Types */
+"/LTb { BL [] 0 0 0 DL } def\n", /* border */
+"/LTa { AL [1 dl 2 dl] 0 setdash 0 0 0 setrgbcolor } def\n", /* axes */
+"/LT0 { PL [] 0 1 0 DL } def\n",
+"/LT1 { PL [4 dl 2 dl] 0 0 1 DL } def\n",
+"/LT2 { PL [2 dl 3 dl] 1 0 0 DL } def\n",
+"/LT3 { PL [1 dl 1.5 dl] 1 0 1 DL } def\n",
+"/LT4 { PL [5 dl 2 dl 1 dl 2 dl] 0 1 1 DL } def\n",
+"/LT5 { PL [4 dl 3 dl 1 dl 3 dl] 1 1 0 DL } def\n",
+"/LT6 { PL [2 dl 2 dl 2 dl 4 dl] 0 0 0 DL } def\n",
+"/LT7 { PL [2 dl 2 dl 2 dl 2 dl 2 dl 4 dl] 1 0.3 0 DL } def\n",
+"/LT8 { PL [2 dl 2 dl 2 dl 2 dl 2 dl 2 dl 2 dl 4 dl] 0.5 0.5 0.5 DL } def\n",
+"/M {moveto} def\n",
+"/L {lineto} def\n",
+"/P { stroke [] 0 setdash\n", /* Point */
+"  currentlinewidth 2 div sub moveto\n",
+"  0 currentlinewidth rlineto  stroke } def\n",
+"/D { stroke [] 0 setdash  2 copy  vpt add moveto\n", /* Diamond */
+"  hpt neg vpt neg rlineto  hpt vpt neg rlineto\n",
+"  hpt vpt rlineto  hpt neg vpt rlineto  closepath  stroke\n",
+"  P  } def\n",
+"/A { stroke [] 0 setdash  vpt sub moveto  0 vpt2 rlineto\n", /* Plus (Add) */
+"  currentpoint stroke moveto\n",
+"  hpt neg vpt neg rmoveto  hpt2 0 rlineto stroke\n",
+"  } def\n",
+"/B { stroke [] 0 setdash  2 copy  exch hpt sub exch vpt add moveto\n", /* Box */
+"  0 vpt2 neg rlineto  hpt2 0 rlineto  0 vpt2 rlineto\n",
+"  hpt2 neg 0 rlineto  closepath  stroke\n",
+"  P  } def\n",
+"/C { stroke [] 0 setdash  exch hpt sub exch vpt add moveto\n", /* Cross */
+"  hpt2 vpt2 neg rlineto  currentpoint  stroke  moveto\n",
+"  hpt2 neg 0 rmoveto  hpt2 vpt2 rlineto stroke  } def\n",
+"/T { stroke [] 0 setdash  2 copy  vpt 1.12 mul add moveto\n", /* Triangle */
+"  hpt neg vpt -1.62 mul rlineto\n",
+"  hpt 2 mul 0 rlineto\n",
+"  hpt neg vpt 1.62 mul rlineto  closepath  stroke\n",
+"  P  } def\n",
+"/S { 2 copy A C} def\n", /* Star */
+NULL
+};
+
+#define NEXT_XOFF	50	/* page offset in pts */
+#define NEXT_YOFF	50
+
+#define NEXT_XMAX 7200
+#define NEXT_YMAX 5040
+
+#define NEXT_XLAST (NEXT_XMAX - 1)
+#define NEXT_YLAST (NEXT_YMAX - 1)
+
+#define NEXT_VTIC (NEXT_YMAX/80)
+#define NEXT_HTIC (NEXT_YMAX/80)
+
+#define NEXT_SC (10)				/* scale is 1pt = 10 units */
+#define	NEXT_LW (0.5*NEXT_SC)		/* linewidth = 0.5 pts */
+
+#define NEXT_VCHAR (14*NEXT_SC)		/* default is 14 point characters */
+#define NEXT_HCHAR (14*NEXT_SC*6/10)
+
+NEXT_options()
+{
+	extern struct value *const_express();
+	extern double real();
+
+	if (!END_OF_COMMAND) {
+		if (almost_equals(c_token,"p$ortrait")) {
+			next_portrait=TRUE;
+			c_token++;
+		}
+		else if (almost_equals(c_token,"l$andscape")) {
+			next_portrait=FALSE;
+			c_token++;
+		}
+		else if (almost_equals(c_token,"d$efault")) {
+			next_portrait=FALSE;
+			next_color=FALSE;
+			strcpy(next_font,"Courier");
+			next_fontsize = 14;
+			c_token++;
+		}
+	}
+
+	if (!END_OF_COMMAND) {
+		if (almost_equals(c_token,"m$onochrome")) {
+			next_color=FALSE;
+			c_token++;
+		}
+		else if (almost_equals(c_token,"c$olor")) {
+			next_color=TRUE;
+			c_token++;
+		}
+	}
+
+	if (!END_OF_COMMAND && isstring(c_token)) {
+		quote_str(next_font,c_token);
+		c_token++;
+	}
+
+	if (!END_OF_COMMAND) {
+		/* We have font size specified */
+		struct value a;
+		next_fontsize = (int)real(const_express(&a));
+		c_token++;
+		term_tbl[term].v_char = (unsigned int)(next_fontsize*NEXT_SC);
+		term_tbl[term].h_char = (unsigned int)(next_fontsize*NEXT_SC*6/10);
+	}
+
+	sprintf(term_options,"%s %s \"%s\" %d",
+		next_portrait ? "portrait" : "landscape",
+		next_color ? "color" : "monochrome",next_font,next_fontsize);
+}
+
+
+NEXT_init()
+{
+struct termentry *t = &term_tbl[term];
+int i;
+float llx,lly,urx,ury;
+/* I commented out the postscript comment fields because they are not really 
+*  needed (even the bounding box). However, if you'd like to send all the
+*  postscript to the context d, they're still there for you
+*/
+
+		llx=NEXT_XOFF;
+		lly=NEXT_YOFF;
+
+	if(!initframe_called) {
+		if(!next_portrait){
+			urx=(xsize*(NEXT_XMAX)/NEXT_SC+0.5+NEXT_XOFF);
+			ury=(ysize*(NEXT_YMAX)/NEXT_SC+0.5+NEXT_YOFF);
+		} else {
+			urx=(ysize*(NEXT_YMAX)/NEXT_SC+0.5+NEXT_XOFF);
+			ury=(xsize*(NEXT_XMAX)/NEXT_SC+0.5+NEXT_YOFF);
+		}
+		  width=urx-llx;	
+		  height=ury-lly;
+		  xsize_orig=xsize;
+		  ysize_orig=ysize;	
+		  window_create(width,height);
+	   	  d=DPSGetCurrentContext();
+	   DPSPrintf(d,"/showpage {initgraphics} bind def\n");
+  	}
+		DPSPrintf(d,"1 setgray\n");
+		DPSPrintf(d,"0 1 %g %g rectfill\n",rint(width),rint(height));
+		DPSPrintf(d,"0 setgray\n");
+		DPSPrintf(d,"0 1 %g %g rectstroke\n",rint(width),rint(height));
+//       	DPSPrintf(d,"/_the_saved_vm_ save def\n");
+		DPSPrintf(d,"%g %g translate\n",-llx,-lly); /* KEEP this IN! */
+
+//		DPSPrintf(d,"%%!PS-ADOBE-2.0 EPSF-2.0\n");
+//		DPSPrintf(d,"%%%%Creator: gnuplot\n");
+//		DPSPrintf(d,"%%%%DocumentFonts: %s\n", next_font);
+//		DPSPrintf(d,"%%%%BoundingBox: %d %d ", NEXT_XOFF,NEXT_YOFF);
+//		if (!next_portrait)
+//			DPSPrintf(d,"%d %d\n",(int)width, (int)height);
+//		else 
+//			DPSPrintf(d,"%d %d\n",(int)width, (int)height);
+//		DPSPrintf(d,"%%%%Pages: (atend)\n");
+//		DPSPrintf(d,"%%%%EndComments\n");
+		DPSPrintf(d,"/gnudict 40 dict def\ngnudict begin\n");
+		DPSPrintf(d,"/Color %s def\n",next_color ? "true" : "false");
+		DPSPrintf(d,"/gnulinewidth %.3f def\n",NEXT_LW);
+		DPSPrintf(d,"/vshift %d def\n", (int)(t->v_char)/(-3));
+		DPSPrintf(d,"/dl {%d mul} def\n",NEXT_SC); /* dash length */
+		DPSPrintf(d,"/hpt %.1f def\n",NEXT_HTIC/2.0);
+		DPSPrintf(d,"/vpt %.1f def\n",NEXT_VTIC/2.0);
+		for ( i=0; NEXT_header[i] != NULL; i++)
+			DPSPrintf(d,"%s",NEXT_header[i]);
+		DPSPrintf(d,"end\n");
+//		DPSPrintf(d,"%%%%EndProlog\n");
+		init_called=TRUE;
+}
+
+static void window_create(float width, float height)
+{
+	initframe_called=TRUE;
+	
+	NXApp=[EpsViewer new];
+	[NXApp windowCreate:width Height:height];
+}
+
+NEXT_graphics()
+{
+struct termentry *t = &term_tbl[term];
+	next_page++;
+	if(!init_called)
+		NEXT_init();	/* set up the frame properly */
+	init_called=FALSE;
+//	DPSPrintf(d,"%%%%Page: %d %d\n",next_page,next_page);
+	DPSPrintf(d,"gnudict begin\n");
+	DPSPrintf(d,"gsave\n");
+	DPSPrintf(d,"%d %d translate\n",NEXT_XOFF,NEXT_YOFF);
+	if (!next_portrait) {
+/* keep plot entirely in the window */
+		if(xsize>xsize_orig)
+			xsize=xsize_orig;
+		if(ysize>ysize_orig)
+			ysize=ysize_orig;
+	    DPSPrintf(d,"%.3f %.3f scale\n", xsize/NEXT_SC, ysize/NEXT_SC);
+	}
+	else {
+		if(xsize>xsize_orig)
+			xsize=xsize_orig;
+		if(ysize>ysize_orig)
+			ysize=ysize_orig;
+	    DPSPrintf(d,"%.3f %.3f scale\n", ysize/NEXT_SC, xsize/NEXT_SC);
+	    DPSPrintf(d,"90 rotate\n0 %d translate\n", -NEXT_YMAX);
+	}
+	DPSPrintf(d,"0 setgray\n");
+	DPSPrintf(d,"/%s findfont %d ", next_font, (t->v_char) );
+	DPSPrintf(d,"scalefont setfont\n");
+	DPSPrintf(d,"newpath\n");
+	next_path_count = 0;	
+}
+
+
+NEXT_text()
+{
+	next_path_count = 0;
+	DPSPrintf(d,"stroke\ngrestore\nend\nshowpage\n");
+//	DPSPrintf(d,"\ngrestoreall _the_saved_vm_ restore\n");
+		
+	DPSFlushContext(d);
+	
+	
+}
+
+
+NEXT_reset()
+{	
+	DPSPrintf(d,"currentwindow termwindow\n");
+	DPSPrintf(d,"nulldevice\n");
+
+	DPSFlushContext(d);
+	initframe_called=FALSE;
+}
+
+
+NEXT_linetype(linetype)
+int linetype;
+{
+char *line = "ba012345678"; 
+	DPSPrintf(d,"LT%c\n", line[(linetype%9)+2]);
+	next_path_count = 0;
+}
+
+
+NEXT_move(x,y)
+unsigned int x,y;
+{
+	DPSPrintf(d,"%d %d M\n", x, y);
+	next_path_count += 1;
+}
+
+
+NEXT_vector(x,y)
+unsigned int x,y;
+{
+	DPSPrintf(d,"%d %d L\n", x, y);
+	next_path_count += 1;
+	if (next_path_count >= 400) {
+		DPSPrintf(d,"currentpoint stroke moveto\n");
+		next_path_count = 0;
+	}
+}
+
+
+NEXT_put_text(x,y,str)
+unsigned int x, y;
+char *str;
+{
+char ch;
+	NEXT_move(x,y);
+	if (next_ang != 0)
+		DPSPrintf(d,"currentpoint gsave translate %d rotate 0 0 moveto\n"
+			,next_ang*90);
+/*	NXPutc(psStream,'(');			*/
+	DPSPrintf(d,"%c",'(');
+	ch = *str++;
+	while(ch!='\0') {
+		if ( (ch=='(') || (ch==')') || (ch=='\\') )
+/*			NXPutc(psStream,'\\');
+		NXPutc(psStream,ch);			*/
+			DPSPrintf(d,"%c",'\\');
+		DPSPrintf(d,"%c",ch);
+		ch = *str++;
+	}
+	switch(next_justify) {
+		case LEFT : DPSPrintf(d,") Lshow\n");
+			break;
+		case CENTRE : DPSPrintf(d,") Cshow\n");
+			break;
+		case RIGHT : DPSPrintf(d,") Rshow\n");
+			break;
+	}
+	if (next_ang != 0)
+		DPSPrintf(d,"grestore\n");
+	next_path_count = 0;
+}
+
+int NEXT_text_angle(ang)
+int ang;
+{
+	next_ang=ang;
+	return TRUE;
+}
+
+int NEXT_justify_text(mode)
+enum JUSTIFY mode;
+{
+	next_justify=mode;
+	return TRUE;
+}
+
+/* postscript point routines */
+NEXT_point(x,y,number)
+int x,y;
+int number;
+{
+char *point = "PDABCTS";
+	number %= POINT_TYPES;
+ 	if (number < -1)
+		number = -1;		/* negative types are all 'dot' */
+	DPSPrintf(d,"%d %d %c\n", x, y, point[number+1]);
+	next_path_count = 0;
+}
+

@@ -1,6 +1,10 @@
+#ifndef lint
+static char *RCSid = "$Id: graph3d.c,v 3.26 92/03/24 22:34:27 woo Exp Locker: woo $";
+#endif
+
 /* GNUPLOT - graph3d.c */
 /*
- * Copyright (C) 1986, 1987, 1990, 1991   Thomas Williams, Colin Kelley
+ * Copyright (C) 1986, 1987, 1990, 1991, 1992   Thomas Williams, Colin Kelley
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted, 
@@ -21,11 +25,11 @@
  *       Gershon Elber and many others.
  *
  * Send your comments or suggestions to 
- *  pixar!info-gnuplot@sun.com.
+ *  info-gnuplot@ames.arc.nasa.gov.
  * This is a mailing list; to join it send a note to 
- *  pixar!info-gnuplot-request@sun.com.  
+ *  info-gnuplot-request@ames.arc.nasa.gov.  
  * Send bug reports to
- *  pixar!bug-gnuplot@sun.com.
+ *  bug-gnuplot@ames.arc.nasa.gov.
  */
 
 #include <stdio.h>
@@ -45,6 +49,27 @@ extern time_t dated,time();
 extern long dated,time();
 #endif
 #endif
+
+/*
+ * hidden_line_type_above, hidden_line_type_below - controls type of lines
+ *   for above and below parts of the surface.
+ * hidden_no_update - if TRUE lines will be hidden line removed but they
+ *   are not assumed to be part of the surface (i.e. grid) and therefore
+ *   do not influence the hidings.
+ * hidden_max_index - length of hidden_low_bound and hidden_high_bound vecs.
+ * hidden_first_row - TRUE if we are now drawing the first row of the surface.
+ * hidden_active - TRUE if hidden lines are to be removed.
+ * hidden_low_bound, hidden_high_bound - two vectors of size hidden_max_index
+ *   that hold the above and below floating horisons.
+ */
+static int hidden_line_type_above, hidden_line_type_below, hidden_no_update;
+static int hidden_max_index, hidden_first_row, hidden_active = FALSE;
+static int *hidden_low_bound, *hidden_high_bound;
+#define HIDDEN_BOUND(x)		(x < 0 ? 0 : x >= hidden_max_index ? \
+				             hidden_max_index - 1 : x)
+#define HIDDEN_LOW_BOUND(x) (hidden_low_bound[HIDDEN_BOUND(x)])
+#define HIDDEN_HIGH_BOUND(x) (hidden_high_bound[HIDDEN_BOUND(x)])
+#define SET_HIDDEN_BOUND(vec, x, y) (vec[HIDDEN_BOUND(x)] = y)
 
 static plot3d_impulses();
 static plot3d_lines();
@@ -70,6 +95,7 @@ static draw_set_3dztics();
 static xtick();
 static ytick();
 static ztick();
+static setlinestyle();
 
 #ifndef max		/* Lattice C has max() in math.h, but shouldn't! */
 #define max(a,b) ((a > b) ? a : b)
@@ -243,6 +269,271 @@ int *xt, *yt;
     *yt = ((int) (res[1] * yscaler / w)) + ymiddle;
 }
 
+/* And the functions to map from user 3D space to terminal z coordinate */
+static double map3d_z(x, y, z)
+double x, y, z;
+{
+    int i;
+    double v[4], res,			     /* Homogeneous coords. vectors. */
+	w = trans_mat[3][3];
+
+    v[0] = map_x3d(x); /* Normalize object space to -1..1 */
+    v[1] = map_y3d(y);
+    v[2] = map_z3d(z);
+    v[3] = 1.0;
+
+    res = trans_mat[3][2];     	      /* Initiate it with the weight factor. */
+    for (i = 0; i < 3; i++) res += v[i] * trans_mat[i][2];
+
+    return res;
+}
+
+/* Initialize the line style using the current device and set hidden styles  */
+/* to it as well if hidden line removal is enabled.			     */
+static setlinestyle(style)
+int style;
+{
+    register struct termentry *t = &term_tbl[term];
+
+    (*t->linetype)(style);
+    if (hidden3d) {
+	hidden_line_type_above = style;
+	hidden_line_type_below = style;
+    }
+}
+
+/* Initialize the necessary steps for hidden line removal. This algorithm    */
+/* is based on the "floating horizon" explicit surfaces hidden line removal. */
+static void init_hidden_line_removal()
+{
+    hidden_max_index = xright - xleft + 1;
+    hidden_low_bound = (int *) alloc(sizeof(int) * hidden_max_index, "hidden");
+    hidden_high_bound = (int *) alloc(sizeof(int) * hidden_max_index, "hidden");
+}
+
+/* Reset the hidden line data to a fresh start.				     */
+static void reset_hidden_line_removal()
+{
+    int i;
+
+    for (i = 0; i < hidden_max_index; i++) {
+    	hidden_low_bound[i] = ytop;
+    	hidden_high_bound[i] = ybot;
+    }
+}
+
+/* Terminates the hidden line removal process. Free any memory allocated by  */
+/* init_hidden_line_removal above.					     */
+static void term_hidden_line_removal()
+{
+    free(hidden_low_bound);
+    free(hidden_high_bound);
+}
+
+/* Given a list of parallel iso_curves, make sure the first one is closest   */
+/* to viewer or reverse in place the list otherwise.			     */
+/* Returns a pointer to the new ordered list.				     */
+static struct iso_curve *reorder_hidden_one_iso_list(orig_list)
+struct iso_curve *orig_list;
+{
+	double first_crv_first_ptz, first_crv_last_ptz,
+	       last_crv_first_ptz, last_crv_last_ptz;
+	struct iso_curve *first_crv = orig_list, *last_crv;
+
+	for (last_crv = first_crv; last_crv->next; last_crv = last_crv->next);
+
+	first_crv_first_ptz = map3d_z(first_crv->points[0].x,
+				      first_crv->points[0].y,
+				      0.0);
+	first_crv_last_ptz = map3d_z(first_crv->points[first_crv->p_count-1].x,
+				     first_crv->points[first_crv->p_count-1].y,
+				     0.0);
+
+	last_crv_first_ptz = map3d_z(last_crv->points[0].x,
+				     last_crv->points[0].y,
+				     0.0);
+	last_crv_last_ptz = map3d_z(last_crv->points[last_crv->p_count-1].x,
+				    last_crv->points[last_crv->p_count-1].y,
+				    0.0);
+
+	/* If first curve is in front of last - do nothing. */
+	if ((first_crv_first_ptz > last_crv_first_ptz &&
+	     first_crv_first_ptz > last_crv_last_ptz) ||
+	    (first_crv_last_ptz > last_crv_first_ptz &&
+	     first_crv_last_ptz > last_crv_last_ptz))
+	    return orig_list;
+	else {
+	    struct iso_curve *icrv1, *icrv2, *icrv3;
+
+	    /* Need to reverse the list order: */
+	    for (icrv1 = orig_list, icrv2 = icrv1->next; icrv2 != NULL; ) {
+		icrv3 = icrv2->next;
+		icrv2->next = icrv1;
+		icrv1 = icrv2;
+	    	icrv2 = icrv3;
+	    }
+
+	    orig_list->next = NULL; /* Now it is the last element. */
+
+	    return icrv1;
+	}
+}
+
+/* Reorder the list of iso_curves in the surface plot, so it will be drawn   */
+/* from near iso curve to far one in both direction.			     */
+/* Returned is a pointer to new order iso curve list.			     */
+static struct iso_curve *reorder_hidden_iso_curves(plot, num_iso_lines)
+	struct surface_points *plot;
+	int num_iso_lines;
+{
+	int i;
+	struct iso_curve *iso_list1 = plot->iso_crvs, *itmp = iso_list1, *iso_list2;
+
+	for (i = 1; i < num_iso_lines; i++) itmp = itmp->next;
+	iso_list2 = itmp->next;
+	itmp->next = NULL;
+
+	iso_list1 = reorder_hidden_one_iso_list(iso_list1);
+	iso_list2 = reorder_hidden_one_iso_list(iso_list2);
+	for (itmp = iso_list1; itmp->next; itmp = itmp->next);
+	itmp->next = iso_list2;
+
+	plot->iso_crvs = iso_list1;
+
+	return iso_list1;
+}
+
+/* Plot a line after removing is hidden part(s). */
+static void hidden_line_plot_aux(x1, y1, x2, y2, style)
+int x1, y1, x2, y2, style;
+{
+    register struct termentry *t = &term_tbl[term];
+
+    if (x2 < x1 || (x2 == x1 && y1 == y2)) return;
+
+    (*t->linetype)(style);
+    (*t->move)(x1,y1);
+    (*t->vector)(x2,y2);
+}
+
+/* Plot a line after removing is hidden part(s). */
+static void hidden_line_plot(x1, y1, x2, y2)
+int x1, y1, x2, y2;
+{
+    int x, last_x, last_y, visible_above, visible_below;
+    float dy, y;
+
+    if (x1 > x2) {
+	x = x1;
+	x1 = x2;
+	x2 = x;
+
+	y = y1;
+	y1 = y2;
+	y2 = y;
+    }
+
+    if (hidden_first_row) {
+	/* All is visible and drawn as visible above. */
+	dy = x1 != x2 ? ((float) (y2 - y1)) / ((float) (x2 - x1)) : VERYLARGE;
+
+	for (x = x1, y = y1; x <= x2; x++, y = y1 + (x - x1) * dy) {
+	    SET_HIDDEN_BOUND(hidden_high_bound, x, (int) y);
+	    SET_HIDDEN_BOUND(hidden_low_bound, x, (int) y);
+	}
+        hidden_line_plot_aux(x1, y1, x2, y2, hidden_line_type_above);
+    }
+    else {
+	if (x1 == x2) {
+	    if (y1 > y2) {
+		y = y1;
+		y1 = y2;
+		y2 = y;
+	    }
+
+	    /* Clip properly this verical line to right bounds. Note clipping
+	     * may produce upto two segments.
+	     */
+	    if (y1 <= HIDDEN_LOW_BOUND(x1) && y2 <= HIDDEN_LOW_BOUND(x1))
+		hidden_line_plot_aux(x1, y1, x2, y2, hidden_line_type_below);
+	    else if (y1 >= HIDDEN_HIGH_BOUND(x1) && y2 >= HIDDEN_HIGH_BOUND(x1))  
+		hidden_line_plot_aux(x1, y1, x2, y2, hidden_line_type_above);
+	    else {
+	        if (y1 < HIDDEN_LOW_BOUND(x1) && y2 > HIDDEN_LOW_BOUND(x1))
+		    hidden_line_plot_aux(x1, y1, x2, HIDDEN_LOW_BOUND(x1),
+				         hidden_line_type_below);
+	        if (y2 > HIDDEN_HIGH_BOUND(x1) && y1 < HIDDEN_HIGH_BOUND(x1))
+		    hidden_line_plot_aux(x1, HIDDEN_HIGH_BOUND(x1), x2, y2,
+				         hidden_line_type_above);
+	    }
+	    return;
+	}
+	else
+	    dy = ((float) (y2 - y1)) / ((float) (x2 - x1));
+
+	visible_above = y1 >= HIDDEN_HIGH_BOUND(x1);
+	visible_below = y1 <= HIDDEN_LOW_BOUND(x1);
+	if (visible_above || visible_below) {
+	    if (visible_above && visible_below) visible_below = FALSE;
+	    last_x = x1;
+	    last_y = y1;
+	}
+    	for (x = x1, y = y1; x < x2; x++, y += dy)
+	{
+	    if (y >= HIDDEN_HIGH_BOUND(x)) {
+		if (visible_below) {
+		    hidden_line_plot_aux(last_x, last_y, x - 1, (int) (y - dy),
+					 hidden_line_type_below);
+		    visible_below = FALSE;
+		}
+		if (!visible_above) {
+		    visible_above = TRUE;
+		    last_x = x;
+		    last_y = (int) y;
+		}
+		if (!hidden_no_update)
+		    SET_HIDDEN_BOUND(hidden_high_bound, x, (int) y);
+	    }
+	    else if (y <= HIDDEN_LOW_BOUND(x)) {
+		if (visible_above) {
+		    hidden_line_plot_aux(last_x, last_y, x - 1, (int) (y - dy),
+					 hidden_line_type_above);
+		    visible_above = FALSE;
+
+		}
+		if (!visible_below) {
+		    visible_below = TRUE;
+		    last_x = x;
+		    last_y = (int) y;
+		}
+		if (!hidden_no_update)
+		    SET_HIDDEN_BOUND(hidden_low_bound, x, (int) y);
+	    }
+	    else {
+		if (visible_above) {
+		    hidden_line_plot_aux(last_x, last_y, x - 1, (int) (y - dy),
+					 hidden_line_type_above);
+		    visible_above = visible_below = FALSE;
+		}
+		else if (visible_below) {
+		    hidden_line_plot_aux(last_x, last_y, x - 1, (int) (y - dy),
+					 hidden_line_type_below);
+		    visible_below = FALSE;
+		}
+	    }
+	}
+
+	if (visible_above) {
+	    hidden_line_plot_aux(last_x, last_y, x2, y2,
+				 hidden_line_type_above);
+	}
+	else if (visible_below) {
+	    hidden_line_plot_aux(last_x, last_y, x2, y2,
+				 hidden_line_type_below);
+	}
+    }
+}
+
 /* Test a single point to be within the xleft,xright,ybot,ytop bbox.
  * Sets the returned integers 4 l.s.b. as follows:
  * bit 0 if to the left of xleft.
@@ -251,7 +542,7 @@ int *xt, *yt;
  * bit 3 if below of ybot.
  * 0 is returned if inside.
  */
-static int clip_point(x, y)
+static int clip_point_for_clip_line(x, y)
 int x, y;
 {
     int ret_val = 0;
@@ -264,6 +555,19 @@ int x, y;
     return ret_val;
 }
 
+/* Test a single point to be within the xleft,xright,ybot,ytop bbox.
+ * and it is not hidden if hidden lines are to be removed.
+ */
+static int clip_point(x, y)
+int x, y;
+{
+    if (hidden_active &&
+	HIDDEN_LOW_BOUND(x) <= y && HIDDEN_HIGH_BOUND(x) >= y)
+	return FALSE;
+
+    return clip_point_for_clip_line(x, y);
+}
+
 /* Clip the given line to drawing coords defined as xleft,xright,ybot,ytop.
  *   This routine uses the cohen & sutherland bit mapping for fast clipping -
  * see "Principles of Interactive Computer Graphics" Newman & Sproull page 65.
@@ -274,8 +578,8 @@ int x1, y1, x2, y2;
     int x, y, dx, dy, x_intr[2], y_intr[2], count, pos1, pos2;
     register struct termentry *t = &term_tbl[term];
 
-    pos1 = clip_point(x1, y1);
-    pos2 = clip_point(x2, y2);
+    pos1 = clip_point_for_clip_line(x1, y1);
+    pos2 = clip_point_for_clip_line(x2, y2);
     if (pos1 || pos2) {
 	if (pos1 & pos2) return;		  /* segment is totally out. */
 
@@ -359,8 +663,13 @@ int x1, y1, x2, y2;
 	    return;
     }
 
-    (*t->move)(x1,y1);
-    (*t->vector)(x2,y2);
+    if (hidden_active) {
+	hidden_line_plot(x1, y1, x2, y2);
+    }
+    else {
+	(*t->move)(x1,y1);
+	(*t->vector)(x2,y2);
+    }
 }
 
 /* Two routine to emulate move/vector sequence using line drawing routine. */
@@ -569,6 +878,17 @@ transform_matrix mat;
     if (fabs(z_max3d - z_min3d) < zero)
 	int_error("z_min3d should not equal z_max3d!",NO_CARET);
 
+    if (hidden3d) {
+	struct surface_points *plot;
+	
+        /* Verify data is hidden line removable - nonparametric + grid based. */
+    	for (plot = plots; plot != NULL; plot = plot->next_sp) {
+	    if (parametric ||
+	        (plot->plot_type == DATA3D && !plot->has_grid_topology))
+	        int_error("Cannot hidden line remove parametric surface or non grid data\n", NO_CARET);
+        }
+    }
+
 /* INITIALIZE TERMINAL */
     if (!term_init) {
 	(*t->init)();
@@ -587,6 +907,7 @@ transform_matrix mat;
 	xscale3d = 2.0/(x_max3d - x_min3d);
 
 	(*t->linetype)(-2); /* border linetype */
+
 /* PLACE TITLE */
 	if (*title != 0) {
 		int x, y;
@@ -681,6 +1002,11 @@ transform_matrix mat;
 	(*t->arrow)(sx, sy, ex, ey, this_arrow->head);
     }
 
+    if (hidden3d) {
+	init_hidden_line_removal();
+	reset_hidden_line_removal();
+	hidden_active = TRUE;
+    }
 
 /* DRAW SURFACES AND CONTOURS */
 	real_z_min3d = min_z;
@@ -700,10 +1026,92 @@ transform_matrix mat;
 	for (surface = 0;
 	     surface < pcount;
 	     this_plot = this_plot->next_sp, surface++) {
-		(*t->linetype)(this_plot->line_type+1);
+		if ( hidden3d )
+		    hidden_no_update = FALSE;
+
+		if (draw_surface) {
+		    (*t->linetype)(this_plot->line_type);
+		    if (hidden3d) {
+			hidden_line_type_above = this_plot->line_type;
+			hidden_line_type_below = this_plot->line_type + 1;
+		    }
+		    
+		    if (key != 0) {
+			if ((*t->justify_text)(RIGHT)) {
+			    clip_put_text(xl,
+					  yl,this_plot->title);
+			}
+			else {
+			    if (inrange(xl-(t->h_char)*strlen(this_plot->title), 
+					xleft, xright))
+				clip_put_text(xl-(t->h_char)*strlen(this_plot->title),
+					      yl,this_plot->title);
+			}
+		    }
+		    
+		    switch(this_plot->plot_style) {
+		        case IMPULSES: {
+			    if (key != 0) {
+				clip_move(xl+(t->h_char),yl);
+				clip_vector(xl+4*(t->h_char),yl);
+			    }
+			    plot3d_impulses(this_plot);
+			    break;
+			}
+			case LINES: {
+			    if (key != 0) {
+				clip_move(xl+(int)(t->h_char),yl);
+				clip_vector(xl+(int)(4*(t->h_char)),yl);
+			    }
+			    plot3d_lines(this_plot);
+			    break;
+			}
+			case ERRORBARS:	/* ignored; treat like points */
+			case POINTS: {
+			    if (key != 0 && !clip_point(xl+2*(t->h_char),yl)) {
+				(*t->point)(xl+2*(t->h_char),yl,
+					    this_plot->point_type);
+			    }
+			    plot3d_points(this_plot);
+			    break;
+			}
+			case LINESPOINTS: {
+			    /* put lines */
+			    if (key != 0) {
+				clip_move(xl+(t->h_char),yl);
+				clip_vector(xl+4*(t->h_char),yl);
+			    }
+			    plot3d_lines(this_plot);
+			
+			    /* put points */
+			    if (key != 0 && !clip_point(xl+2*(t->h_char),yl)) {
+				(*t->point)(xl+2*(t->h_char),yl,
+					    this_plot->point_type);
+			    }
+			    plot3d_points(this_plot);
+			    break;
+			}
+			case DOTS: {
+			    if (key != 0 && !clip_point(xl+2*(t->h_char),yl)) {
+				(*t->point)(xl+2*(t->h_char),yl, -1);
+			    }
+			    plot3d_dots(this_plot);
+			    break;
+			}
+		    }
+		    yl = yl - (t->v_char);
+		}
+
+		if ( hidden3d ) {
+		    hidden_no_update = TRUE;
+		    hidden_line_type_above = this_plot->line_type + (hidden3d ? 2 : 1);
+		    hidden_line_type_below = this_plot->line_type + (hidden3d ? 2 : 1);
+		}
 
 		if (draw_contour && this_plot->contours != NULL) {
 			struct gnuplot_contours *cntrs = this_plot->contours;
+
+			(*t->linetype)(this_plot->line_type + (hidden3d ? 2 : 1));
 
 			if (key != 0) {
 				if ((*t->justify_text)(RIGHT)) {
@@ -769,79 +1177,16 @@ transform_matrix mat;
 			if (key != 0) yl = yl - (t->v_char);
 		}
 
-		if ( surface == 0 )
-			draw_bottom_grid(this_plot,real_z_min3d,real_z_max3d);
-
-		if (!draw_surface) continue;
-		(*t->linetype)(this_plot->line_type);
-
-		if (key != 0) {
-			if ((*t->justify_text)(RIGHT)) {
-				clip_put_text(xl,
-					yl,this_plot->title);
-			}
-			else {
-			    if (inrange(xl-(t->h_char)*strlen(this_plot->title), 
-						 xleft, xright))
-				 clip_put_text(xl-(t->h_char)*strlen(this_plot->title),
-							 yl,this_plot->title);
-			}
-		}
- 
-		switch(this_plot->plot_style) {
-		    case IMPULSES: {
-			   if (key != 0) {
-				  clip_move(xl+(t->h_char),yl);
-				  clip_vector(xl+4*(t->h_char),yl);
-			   }
-			   plot3d_impulses(this_plot);
-			   break;
-		    }
-		    case LINES: {
-			   if (key != 0) {
-				  clip_move(xl+(int)(t->h_char),yl);
-				  clip_vector(xl+(int)(4*(t->h_char)),yl);
-			   }
-			   plot3d_lines(this_plot);
-			   break;
-		    }
-		    case ERRORBARS:	/* ignored; treat like points */
-		    case POINTS: {
-			   if (key != 0 && !clip_point(xl+2*(t->h_char),yl)) {
-				  (*t->point)(xl+2*(t->h_char),yl,
-						    this_plot->point_type);
-			   }
-			   plot3d_points(this_plot);
-			   break;
-		    }
-		    case LINESPOINTS: {
-			   /* put lines */
-			   if (key != 0) {
-				  clip_move(xl+(t->h_char),yl);
-				  clip_vector(xl+4*(t->h_char),yl);
-			   }
-			   plot3d_lines(this_plot);
-
-			   /* put points */
-			   if (key != 0 && !clip_point(xl+2*(t->h_char),yl)) {
-				  (*t->point)(xl+2*(t->h_char),yl,
-						    this_plot->point_type);
-			   }
-			   plot3d_points(this_plot);
-			   break;
-		    }
-		    case DOTS: {
-			   if (key != 0 && !clip_point(xl+2*(t->h_char),yl)) {
-				  (*t->point)(xl+2*(t->h_char),yl, -1);
-			   }
-			   plot3d_dots(this_plot);
-			   break;
-		    }
-		}
-		yl = yl - (t->v_char);
+		if (surface == 0)
+		    draw_bottom_grid(this_plot,real_z_min3d,real_z_max3d);
 	}
 	(*t->text)();
 	(void) fflush(outfile);
+
+	if (hidden3d) {
+	    term_hidden_line_removal();
+	    hidden_active = FALSE;
+	}
 }
 
 /* plot3d_impulses:
@@ -881,15 +1226,55 @@ static plot3d_impulses(plot)
 static plot3d_lines(plot)
 	struct surface_points *plot;
 {
-    int i;
+    int i, iso_count, num_iso_lines;
     int x,y;				/* point in terminal coordinates */
     struct termentry *t = &term_tbl[term];
-    struct iso_curve *icrvs = plot->iso_crvs;
+    struct iso_curve *icrvs = plot->iso_crvs,
+	   *first_row_icrv, *last_row_icrv, *first_col_icrv, *icrv;
+    struct coordinate *points;
 
-    while ( icrvs ) {
-	struct coordinate *points = icrvs->points;
+    if (hidden3d) {
+	hidden_no_update = FALSE;
 
-	for (i = 0; i < icrvs->p_count; i++) {
+	if (plot->plot_type == FUNC3D)
+	    num_iso_lines = iso_samples;
+	else
+	    num_iso_lines = plot->num_iso_read;
+
+	icrvs = reorder_hidden_iso_curves(plot, num_iso_lines);
+
+	first_row_icrv = icrvs;
+	for (last_row_icrv = icrvs, i = 1;
+	     i++ < num_iso_lines;
+	     last_row_icrv = last_row_icrv->next);
+	first_col_icrv = last_row_icrv->next;
+	reset_hidden_line_removal();
+
+	iso_count = 1;
+    }
+
+    while (icrvs) {
+	if (hidden3d) {
+	    if (iso_count == 1 || iso_count == num_iso_lines + 1) {
+		hidden_first_row = TRUE;
+
+		/* Draw other boundary so low/high bounds will be complete: */
+		icrv = iso_count == 1 ? first_col_icrv : first_row_icrv;
+		for (i = 0, points = icrv->points; i < icrv->p_count; i++) {
+		    map3d_xy(points[i].x, points[i].y, points[i].z, &x, &y);
+
+		    if (i > 0)
+			clip_vector(x,y);
+		    else
+			clip_move(x,y);
+		}
+	    }
+	    else
+		hidden_first_row = FALSE;
+	    iso_count++;
+	}
+
+	for (i = 0, points = icrvs->points; i < icrvs->p_count; i++) {
 	    if (real_z_max3d<points[i].z)
 		real_z_max3d=points[i].z;
 	    if (real_z_min3d>points[i].z)
@@ -904,6 +1289,19 @@ static plot3d_lines(plot)
 	}
 
 	icrvs = icrvs->next;
+    }
+
+    if (hidden3d) {
+	/* Draw other boundary so low/high bounds will be complete: */
+	for (i = 0, points = last_row_icrv->points;
+	     i < last_row_icrv->p_count; i++) {
+	    map3d_xy(points[i].x, points[i].y, points[i].z, &x, &y);
+
+	    if (i > 0)
+		clip_vector(x,y);
+	    else
+		clip_move(x,y);
+	}
     }
 }
 
@@ -1165,10 +1563,10 @@ static draw_parametric_grid(plot)
 	dy = (y_max3d-y_min3d) / (grid_iso-1);
 
 	for (i = 0; i < grid_iso; i++) {
-	        if (i == 0 || i == grid_iso-1)
-		    (*t->linetype)(-2);
+	        if (i == 0 || i == grid_iso-1)	        
+		    setlinestyle(-2);
 		else
-		    (*t->linetype)(-1);
+		    setlinestyle(-1);
 		map3d_xy(x_min3d, y, z_min3d, &ix, &iy);
 		clip_move(ix,iy);
 		update_extrema_pts(ix,iy,&min_sx_x,&min_sx_y,
@@ -1184,9 +1582,9 @@ static draw_parametric_grid(plot)
 
 	for (i = 0; i < grid_iso; i++) {
 	        if (i == 0 || i == grid_iso-1)
-		    (*t->linetype)(-2);
+		    setlinestyle(-2);
 		else
-		    (*t->linetype)(-1);
+		    setlinestyle(-1);
 		map3d_xy(x, y_min3d, z_min3d, &ix, &iy);
 		clip_move(ix,iy);
 		update_extrema_pts(ix,iy,&min_sx_x,&min_sx_y,
@@ -1201,7 +1599,7 @@ static draw_parametric_grid(plot)
 	}
     }
     else {
-	(*t->linetype)(-2);
+	setlinestyle(-2);
 
 	map3d_xy(x_min3d, y_min3d, z_min3d, &ix, &iy);
 	clip_move(ix,iy);
@@ -1245,14 +1643,18 @@ static draw_non_param_grid(plot)
 
     while ( icrvs ) {
 	struct coordinate *points = icrvs->points;
+	int saved_hidden_active = hidden_active;
+	double z1 = map3d_z(points[0].x, points[0].y, 0.0),
+	       z2 = map3d_z(points[icrvs->p_count-1].x,
+                            points[icrvs->p_count-1].y, 0.0);
 
 	for (i = 0; i < icrvs->p_count; i += icrvs->p_count-1) {
 	    map3d_xy(points[i].x, points[i].y, z_min3d, &x, &y);
 	    if (is_boundary) {
-		(*t->linetype)(-2);
+		setlinestyle(-2);
 	    }
 	    else {
-	        (*t->linetype)(-1);
+	        setlinestyle(-1);
 	    }
 
 	    if (i > 0) {
@@ -1269,8 +1671,15 @@ static draw_non_param_grid(plot)
 
 		/* Draw a vertical line to surface corner from grid corner. */
 	    	map3d_xy(points[i].x, points[i].y, points[i].z, &x1, &y1);
+	    	if (hidden3d) {
+		    if ((i == 0 && z1 > z2) ||
+		        (i == icrvs->p_count-1 && z2 > z1)) {
+		        hidden_active = FALSE; /* This one is always visible. */
+		    }	    		
+	    	}
 	    	clip_vector(x1,y1);
 	    	clip_move(x,y);
+		hidden_active = saved_hidden_active;
 		update_extrema_pts(x,y,&min_sx_x,&min_sx_y, &min_sy_x,&min_sy_y,
 				   points[i].x,points[i].y);
 	    }
@@ -1324,7 +1733,7 @@ static draw_bottom_grid(plot, min_z, max_z)
 	else
 	    draw_non_param_grid(plot);
 
-    (*t->linetype)(-2); /* border linetype */
+    setlinestyle(-2); /* border linetype */
 
 /* label x axis tics */
     if (xtics && xtic > 0.0) {
@@ -1557,14 +1966,14 @@ static draw_3dztics(start, incr, end, xpos, ypos, z_min, z_max)
 	}
 
 	/* Make sure the vertical line is fully drawn. */
-	(*t->linetype)(-2);	/* axis line type */
+	setlinestyle(-2);	/* axis line type */
 
 	map3d_xy(xpos, ypos, z_min3d, &x, &y);
 	clip_move(x,y);
 	map3d_xy(xpos, ypos, min(end,z_max)+(log_z ? incr : 0.0), &x, &y);
 	clip_vector(x,y);
 
-	(*t->linetype)(-1); /* border linetype */
+	setlinestyle(-1); /* border linetype */
 }
 
 /* DRAW_SERIES_3DXTICS: draw a user tic series, x axis */
@@ -1651,14 +2060,14 @@ static draw_series_3dztics(start, incr, end, xpos, ypos, z_min, z_max)
 	}
 
 	/* Make sure the vertical line is fully drawn. */
-	(*t->linetype)(-2);	/* axis line type */
+	setlinestyle(-2);	/* axis line type */
 
 	map3d_xy(xpos, ypos, z_min3d, &x, &y);
 	clip_move(x,y);
 	map3d_xy(xpos, ypos, min(end,z_max)+(log_z ? incr : 0.0), &x, &y);
 	clip_vector(x,y);
 
-	(*t->linetype)(-1); /* border linetype */
+	setlinestyle(-1); /* border linetype */
 }
 
 /* DRAW_SET_3DXTICS: draw a user tic set, x axis */
@@ -1722,14 +2131,14 @@ static draw_set_3dztics(list, xpos, ypos, z_min, z_max)
     }
 
     /* Make sure the vertical line is fully drawn. */
-    (*t->linetype)(-2);	/* axis line type */
+    setlinestyle(-2);	/* axis line type */
 
     map3d_xy(xpos, ypos, z_min, &x, &y);
     clip_move(x,y);
     map3d_xy(xpos, ypos, z_max+(log_z ? incr : 0.0), &x, &y);
     clip_vector(x,y);
 
-    (*t->linetype)(-1); /* border linetype */
+    setlinestyle(-1); /* border linetype */
 }
 
 /* draw and label a x-axis ticmark */

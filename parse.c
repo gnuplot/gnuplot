@@ -1,6 +1,10 @@
+#ifndef lint
+static char *RCSid = "$Id: parse.c,v 3.26 92/03/24 22:34:33 woo Exp Locker: woo $";
+#endif
+
 /* GNUPLOT - parse.c */
 /*
- * Copyright (C) 1986, 1987, 1990, 1991   Thomas Williams, Colin Kelley
+ * Copyright (C) 1986, 1987, 1990, 1991, 1992   Thomas Williams, Colin Kelley
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted, 
@@ -27,11 +31,11 @@
  *       Gershon Elber and many others.
  * 
  * Send your comments or suggestions to 
- *  pixar!info-gnuplot@sun.com.
+ *  info-gnuplot@ames.arc.nasa.gov.
  * This is a mailing list; to join it send a note to 
- *  pixar!info-gnuplot-request@sun.com.  
+ *  info-gnuplot-request@ames.arc.nasa.gov.  
  * Send bug reports to
- *  pixar!bug-gnuplot@sun.com.
+ *  bug-gnuplot@ames.arc.nasa.gov.
  */
 
 #include <stdio.h>
@@ -66,16 +70,17 @@ static jmp_buf fpe_env;
 #ifdef __TURBOC__
 void fpe()
 #else
-#if defined( __ZTC__ ) || defined( _CRAY )
+#ifdef __ZTC__
 void fpe(an_int)
 int an_int;
 #else
-#ifdef NEXT
-void fpe(int an_int)
+#ifdef _CRAY
+void fpe(an_int)
+int an_int;
 #else
 fpe()
 #endif
-#endif /* __ZTC__ || _CRAY */
+#endif
 #endif
 {
 #ifdef PC	/* thanks to lotto@wjh12.UUCP for telling us about this  */
@@ -385,7 +390,7 @@ aterms()
 #if defined(AMIGA_LC_5_1) || defined(AMIGA_AC_5)
 		(void) add_action(ABOOL);
 #else
-		(void) add_action(BOOL);
+		(void) add_action(BOOLE);
 #endif
 	}
 }
@@ -405,7 +410,7 @@ bterms()
 #if defined(AMIGA_LC_5_1) || defined(AMIGA_AC_5)
 		(void) add_action(ABOOL);
 #else
-		(void) add_action(BOOL);
+		(void) add_action(BOOLE);
 #endif
 	}
 }

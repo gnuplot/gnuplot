@@ -91,11 +91,24 @@ provides two terminal types (\fIx11\fP and \fIX11\fP) for use
 with X servers. The \fIX11\fP terminal type provides differing colors as well 
 as shapes for the \fIpoints\fP plotting style. The two types are otherwise 
 identical.  When used with either of these terminal types, \fIgnuplot\fP
-honors all the standard X Toolkit options and resources such as geometry, font,
-foreground and background. See the X(1) man page for a description of
-the options. For color or grayscale displays \fIgnuplot\fP also honors 
+accepts all the standard X Toolkit options and resources such as geometry, font,
+and background. See the X(1) man page for a description of
+the options. 
+.PP
+In addition to the X Toolkit options, there are three more
+command line options. \fB\-mono\fP forces monochrome rendering on
+color displays.
+\fB\-gray\fP requests grayscale rendering on grayscale or color displays. 
+(Grayscale displays receive monochrome rendering by default.) 
+\fB\-clear\fP requests that the window be cleared momentarily before a
+new plot is displayed. These options may also be controlled with resources.
+For example: \fBgnuplot*gray: on\fP .
+
+For color displays \fIgnuplot\fP honors 
 the following resources (shown here with default values):
 .sp
+.B  "gnuplot*background: white"
+.br 
 .B  "gnuplot*textColor: black"
 .br 
 .B  "gnuplot*borderColor: black"
@@ -118,6 +131,36 @@ the following resources (shown here with default values):
 .br 
 .B  "gnuplot*line8Color: coral"
 .br 
+
+When \fB\-gray\fP is selected, \fIgnuplot\fP honors 
+the following resources for grayscale or color displays (shown here with 
+default values). Note that the default background is black.
+.sp
+.B  "gnuplot*background: black"
+.br 
+.B  "gnuplot*textGray: white"
+.br 
+.B  "gnuplot*borderGray: gray50"
+.br 
+.B  "gnuplot*axisGray: gray50"
+.br 
+.B  "gnuplot*line1Gray: gray100"
+.br 
+.B  "gnuplot*line2Gray: gray60"
+.br 
+.B  "gnuplot*line3Gray: gray80"
+.br 
+.B  "gnuplot*line4Gray: gray40"
+.br 
+.B  "gnuplot*line5Gray: gray90"
+.br 
+.B  "gnuplot*line6Gray: gray50"
+.br 
+.B  "gnuplot*line7Gray: gray70"
+.br 
+.B  "gnuplot*line8Gray: gray30"
+.br 
+
 .PP
 The size or aspect ratio of a plot may be changed by resizing the
 .I gnuplot
@@ -125,7 +168,7 @@ window.
 .SH AUTHORS
 Thomas Williams, Pixar Corporation, 
 .br
-(pixar!info-gnuplot@sun.com)
+(info-gnuplot@ames.arc.nasa.gov)
 .br
 and Colin Kelley.
 .PP

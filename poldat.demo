@@ -1,3 +1,6 @@
+#
+# $Id: poldat.demo,v 3.26 92/03/24 22:32:33 woo Exp Locker: woo $
+#
 set samples 361
 set size .757,1.0
 set time

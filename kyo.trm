@@ -1,3 +1,7 @@
+/*
+ * $Id: kyo.trm,v 3.26 92/03/24 22:35:36 woo Exp Locker: woo $
+ */
+
 /* Prescribe (KYOCERA) driver - Michael Waldor */
 /* Modified for gnuplot 2.0 sk@sun4 24-Apr-1990 13:23 */
 #ifdef PRESCRIBE

@@ -1,3 +1,7 @@
+#ifndef lint
+static char *RCSid = "$Id: doc2gih.c,v 3.26 92/03/25 04:53:29 woo Exp Locker: woo $";
+#endif
+
 /*
  * doc2gih.c  -- program to convert Gnuplot .DOC format to gnuplot
  * interactive help (.GIH) format.

@@ -1,6 +1,10 @@
+/*
+ * $Id: latex.trm,v 3.26 92/03/24 22:35:37 woo Exp Locker: woo $
+ */
+
 /* GNUPLOT - latex.trm */
 /*
- * Copyright (C) 1990   
+ * Copyright (C) 1990, 1991, 1992   
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted, 
@@ -23,7 +27,7 @@
  * AUTHORS
  *   David Kotz, Russell Lang
  *
- * send your comments or suggestions to (pixar!info-gnuplot@sun.com).
+ * send your comments or suggestions to (info-gnuplot@ames.arc.nasa.gov).
  * 
  */
 
@@ -128,7 +132,6 @@ LATEX_init()
     fprintf(outfile, 
 		  "\\ifx\\plotpoint\\undefined\\newsavebox{\\plotpoint}\\fi\n");
     LATEX_linetype(-1);
-	LATEX_size =0;
 }
 
 
@@ -404,7 +407,7 @@ LATEX_dot_line(x1,x2, y1,y2)
 	   /* first, figure out increments for x and y */
 	   if (x2 == x1) {
 		  xinc = 0.0;
-		  yinc = dotspace;
+		  yinc = (y2-y1>0)?dotspace:-dotspace;
 	   } else {
 		  slope = ((float)y2-y1)/((float)x2-x1);
 		  xinc = dotspace / sqrt(1 + slope*slope) * sign(x2-x1);

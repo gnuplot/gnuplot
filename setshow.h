@@ -1,6 +1,11 @@
+/*
+ * $Id: setshow.h,v 3.26 92/03/24 22:34:15 woo Exp Locker: woo $
+ *
+ */
+
 /* GNUPLOT - setshow.h */
 /*
- * Copyright (C) 1986, 1987, 1990, 1991   Thomas Williams, Colin Kelley
+ * Copyright (C) 1986, 1987, 1990, 1991, 1992   Thomas Williams, Colin Kelley
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted, 
@@ -27,11 +32,11 @@
  *       Gershon Elber and many others.
  * 
  * Send your comments or suggestions to 
- *  pixar!info-gnuplot@sun.com.
+ *  info-gnuplot@ames.arc.nasa.gov.
  * This is a mailing list; to join it send a note to 
- *  pixar!info-gnuplot-request@sun.com.  
+ *  info-gnuplot-request@ames.arc.nasa.gov.  
  * Send bug reports to
- *  pixar!bug-gnuplot@sun.com.
+ *  bug-gnuplot@ames.arc.nasa.gov.
  */
 
 /*
@@ -70,6 +75,7 @@ extern FILE*			outfile;
 extern char			outstr[];
 extern BOOLEAN			parametric;
 extern BOOLEAN			polar;
+extern BOOLEAN			hidden3d;
 extern int			angles_format;
 extern int			mapping3d;
 extern int			samples;

@@ -1,3 +1,6 @@
+#
+# $Id: surface1.demo,v 3.26 92/03/24 22:32:25 woo Exp Locker: woo $
+#
 set samples 21
 set isosample 11
 set xlabel "X axis" -3,-2

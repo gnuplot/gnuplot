@@ -1,6 +1,10 @@
+#ifndef lint
+static char *RCSid = "$Id: standard.c,v 3.26 92/03/24 22:34:37 woo Exp Locker: woo $";
+#endif
+
 /* GNUPLOT - standard.c */
 /*
- * Copyright (C) 1986, 1987, 1990, 1991   Thomas Williams, Colin Kelley
+ * Copyright (C) 1986, 1987, 1990, 1991, 1992   Thomas Williams, Colin Kelley
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted, 
@@ -27,11 +31,11 @@
  *       Gershon Elber and many others.
  * 
  * Send your comments or suggestions to 
- *  pixar!info-gnuplot@sun.com.
+ *  info-gnuplot@ames.arc.nasa.gov.
  * This is a mailing list; to join it send a note to 
- *  pixar!info-gnuplot-request@sun.com.  
+ *  info-gnuplot-request@ames.arc.nasa.gov.  
  * Send bug reports to
- *  pixar!bug-gnuplot@sun.com.
+ *  bug-gnuplot@ames.arc.nasa.gov.
  */
 
 #include <math.h>
@@ -368,7 +372,7 @@ register double alpha, beta, x, y;
 f_atan()
 {
 struct value a;
-register double x, y, u, v, w, z;
+register double x, y;
 	(void) pop(&a);
 	x = real(&a); y = imag(&a);
 	if (y == 0.0)
@@ -376,25 +380,9 @@ register double x, y, u, v, w, z;
 	else if (x == 0.0 && fabs(y) == 1.0) {
 		undefined = TRUE;
 		push(complex(&a,0.0, 0.0));
-	} else {
-	        if (x >= 0) {
-		        u = x;
-			v = y;
-		} else {
-		        u = -x;
-			v = -y;
-		}
-		
-	        z = atan(2*u/(1-u*u-v*v));
-		w = log((u*u+(v+1)*(v+1))/(u*u+(v-1)*(v-1)))/4;
-		if (z < 0)
-		        z = z + 2*PI_ON_TWO;
-		if (x < 0) {
-		        z = -z;
-			w = -w;
-		}
-		push( complex(&a,0.5*z, w) );
-	}
+	} else
+		push( complex(&a,atan(2*x/(1-x*x-y*y)),
+	    		log((x*x+(y+1)*(y+1))/(x*x+(y-1)*(y-1)))/4) );
 }
 
 f_sinh()

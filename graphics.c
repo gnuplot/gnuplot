@@ -1,6 +1,10 @@
+#ifndef lint
+static char *RCSid = "$Id: graphics.c,v 3.26 92/03/24 22:34:25 woo Exp Locker: woo $";
+#endif
+
 /* GNUPLOT - graphics.c */
 /*
- * Copyright (C) 1986, 1987, 1990, 1991   Thomas Williams, Colin Kelley
+ * Copyright (C) 1986, 1987, 1990, 1991, 1992   Thomas Williams, Colin Kelley
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted, 
@@ -27,11 +31,11 @@
  *       Gershon Elber and many others.
  * 
  * Send your comments or suggestions to 
- *  pixar!info-gnuplot@sun.com.
+ *  info-gnuplot@ames.arc.nasa.gov.
  * This is a mailing list; to join it send a note to 
- *  pixar!info-gnuplot-request@sun.com.  
+ *  info-gnuplot-request@ames.arc.nasa.gov.  
  * Send bug reports to
- *  pixar!bug-gnuplot@sun.com.
+ *  bug-gnuplot@ames.arc.nasa.gov.
  */
 
 #include <stdio.h>
@@ -1262,7 +1266,7 @@ draw_ytics(start, incr, end)
 		    }
 		    else if((end - start) >= 5)
 		    {
-			lstart = 4; /* 3 per decade */
+			lstart = 2; /* 4 per decade */
 			linc = 3;
 		    }
 		    else
@@ -1270,7 +1274,7 @@ draw_ytics(start, incr, end)
 			lstart = 2; /* 9 per decade */
 			linc = 1;
 		    }
-		    for (ltic = 2; ltic <= 9; ltic++) {
+		    for (ltic = lstart; ltic <= 9; ltic += linc) {
 				lticplace = ticplace+log10((double)ltic);
 				if ( inrange(lticplace,ticmin,ticmax) )
 					ytick(lticplace, "\0", incr, 0.5);
@@ -1313,7 +1317,7 @@ draw_xtics(start, incr, end)
 		    }
 		    else if((end - start) >= 5)
 		    {
-			lstart = 4; /* 3 per decade */
+			lstart = 2; /* 4 per decade */
 			linc = 3;
 		    }
 		    else

@@ -1,3 +1,7 @@
+#ifndef lint
+static char *RCSid = "$Id: doc2ms.c,v 3.26 1992/03/25 04:53:29 woo Exp woo $";
+#endif
+
 /*
  * doc2ms.c  -- program to convert Gnuplot .DOC format to *roff -ms document
  * From hlp2ms by Thomas Williams 
@@ -18,7 +22,7 @@
  *   doc2ms < gnuplot.doc | troff -ms
  */
 
-static char rcsid[] = "$Id: doc2ms.c,v 1.1 90/01/11 15:43:54 dfk Exp Locker: dfk $";
+static char rcsid[] = "$Id: doc2ms.c,v 3.26 1992/03/25 04:53:29 woo Exp woo $";
 
 #include <stdio.h>
 #include <ctype.h>
@@ -83,12 +87,12 @@ process_line(line, b)
 	   }
 	   case '@': {			/* start/end table */
 		  if (intable) {
-			 (void) fputs(".TE\n", b);
+			 (void) fputs(".TE\n.KE\n", b);
 			 (void) fputs(".EQ\ndelim off\n.EN\n\n",b);
 			 intable = FALSE;
 		  } else {
 			 (void) fputs("\n.EQ\ndelim $$\n.EN\n",b);
-			 (void) fputs(".TS\ncenter box tab (@) ;\n", b);
+			 (void) fputs(".KS\n.TS\ncenter box tab (@) ;\n", b);
 			 (void) fputs("c c l .\n", b);
 			 intable = TRUE;
 		  }

@@ -1,4 +1,7 @@
 #
+# $Id: bivariat.demo,v 3.26 92/03/24 22:32:38 woo Exp Locker: woo $
+#
+#
 # This demo is very slow and requires unusually large stack size.
 # Do not attempt to run this demo under MSDOS.
 #

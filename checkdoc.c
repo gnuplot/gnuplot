@@ -1,3 +1,7 @@
+#ifndef lint
+static char *RCSid = "$Id: checkdoc.c,v 3.26 1992/03/25 04:53:29 woo Exp woo $";
+#endif
+
 /*
  * checkdoc -- check a doc file for correctness of first column. 
  *

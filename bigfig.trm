@@ -1,6 +1,10 @@
+/*
+ * $Id: bigfig.trm,v 3.26 92/03/24 22:35:50 woo Exp Locker: woo $
+ */
+
 /* GNUPLOT - fig.trm */
 /*
- * Copyright (C) 1990
+ * Copyright (C) 1990, 1991, 1992
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted,
@@ -22,7 +26,7 @@
  * AUTHORS
  *  Micah Beck, David Kotz
  *
- * send your comments or suggestions to (pixar!info-gnuplot@sun.com).
+ * send your comments or suggestions to (info-gnuplot@ames.arc.nasa.gov).
  *
  */
  

@@ -1,3 +1,6 @@
+#
+# $Id: surface2.demo,v 3.26 92/03/24 22:32:26 woo Exp Locker: woo $
+#
 set parametric
 set samples 50
 

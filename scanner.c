@@ -1,6 +1,10 @@
+#ifndef lint
+static char *RCSid = "$Id: scanner.c,v 3.26 92/03/24 22:34:36 woo Exp Locker: woo $";
+#endif
+
 /* GNUPLOT - scanner.c */
 /*
- * Copyright (C) 1986, 1987, 1990, 1991   Thomas Williams, Colin Kelley
+ * Copyright (C) 1986, 1987, 1990, 1991, 1992   Thomas Williams, Colin Kelley
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted, 
@@ -27,11 +31,11 @@
  *       Gershon Elber and many others.
  * 
  * Send your comments or suggestions to 
- *  pixar!info-gnuplot@sun.com.
+ *  info-gnuplot@ames.arc.nasa.gov.
  * This is a mailing list; to join it send a note to 
- *  pixar!info-gnuplot-request@sun.com.  
+ *  info-gnuplot-request@ames.arc.nasa.gov.  
  * Send bug reports to
- *  pixar!bug-gnuplot@sun.com.
+ *  bug-gnuplot@ames.arc.nasa.gov.
  */
 
 #include <stdio.h>
@@ -84,22 +88,22 @@ char *strcat(), *strcpy(), *strncpy();
  *
  *	 Scanning is performed by following rules:
  *
- *	Current char	token should contain
+ *		Current char	token should contain
  *     -------------    -----------------------
- *	1.  alpha,_	all following alpha-numerics
- *	2.  digit	0 or more following digits, 0 or 1 decimal point,
- *				0 or more digits, 0 or 1 'e' or 'E',
- *				0 or more digits.
- *	3.  ^,+,-,/	only current char
- *	    %,~,(,)
- *	    [,],;,:,
- *	    ?,comma
- *	4.  &,|,=,*	current char; also next if next is same
- *	5.  !,<,>	current char; also next if next is =
- *	6.  ", '	all chars up until matching quote
- *	7.  #		this token cuts off scanning of the line (DFK).
+ *		1.  alpha		all following alpha-numerics
+ *		2.  digit		0 or more following digits, 0 or 1 decimal point,
+ *						  0 or more digits, 0 or 1 'e' or 'E',
+ *						  0 or more digits.
+ *		3.  ^,+,-,/		only current char
+ *		    %,~,(,)
+ *		    [,],;,:,
+ *		    ?,comma
+ *		4.  &,|,=,*		current char; also next if next is same
+ *		5.  !,<,>		current char; also next if next is =
+ *		6.  ", '		all chars up until matching quote
+ *        7.  #          this token cuts off scanning of the line (DFK).
  *
- *			white space between tokens is ignored
+ *		white space between tokens is ignored
  */
 scanner(expression)
 char expression[];
@@ -122,8 +126,7 @@ again:
 			substitute(&expression[current],MAX_LINE_LEN - current);
 			goto again;
 		}
-		/* allow _ to be the first character of an identifier */
-		if (isalpha(expression[current]) || expression[current] == '_') {
+		if (isalpha(expression[current])) {
 			SCAN_IDENTIFIER;
 		} else if (isdigit(expression[current]) || expression[current] == '.'){
 			token[t_num].is_token = FALSE;

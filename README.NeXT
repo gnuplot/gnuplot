@@ -1,0 +1,30 @@
+	This directory contains version 2 of the additional files
+you'll need to get gnuplot3.0 to display it's postscript directly to a
+window instead of going through the klunky process of writing the
+postscript to a file and launching Previewer to view the file.  Note
+that all input is still done at the shell level! Fancier NeXTStep
+interfaces will be a future project.
+
+	This version is faster and leaner than the old method.  It
+also does not eat up swap space like the older version (this was
+particularly noticeable when doing animation-like plots).  To do this
+I used DPS function calls instead of creating a NXImage and
+compositing the stream of commands. I based my code on the program
+called "epsview" in the hackkit tar file on the archive servers.
+
+	The next_dps.trm (next terminal) is basically the post.trm
+(postscript terminal) with the fprintf replaced by DPSPrintf and
+outfile by the DPSContext d.  You'll also see that I also used some
+code (with modifications) from David S. Joerg's MovieApp.  Using the
+DPS functions enabled me to slim down the EpsViewer.[hm] and
+EPSView.[hm] files.
+
+	No claim is made to code elegance or to it being a good example of
+objective-c coding.  This is my first (well, second, sort of) objective-c 
+program. It seems to work for me. Any constructive criticism would be 
+appreciated.  I can be reached at strobel@phast.phys.washington.edu
+
+cheers!
+
+nick strobel
+

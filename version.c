@@ -1,6 +1,10 @@
+#ifndef lint
+static char *RCSid = "$Id: version.c,v 3.26 92/03/24 22:34:44 woo Exp Locker: woo $";
+#endif
+
 /* GNUPLOT - version.c */
 /*
- * Copyright (C) 1986, 1987, 1990, 1991   Thomas Williams, Colin Kelley
+ * Copyright (C) 1986, 1987, 1990, 1991, 1992   Thomas Williams, Colin Kelley
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted, 
@@ -35,8 +39,8 @@
  */
 
 char version[] = "3.0 ";
-char patchlevel[] = "1, Dec 1 91";
-char date[] = "Sun Dec 1 16:56:36 1991";
+char patchlevel[] = "0, Sep 29 91";
+char date[] = "Sun Sep 29 16:56:36 1991";
 
 /* override in Makefile */
 #ifndef CONTACT

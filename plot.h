@@ -1,6 +1,11 @@
+/*
+ * $Id: plot.h,v 3.26 92/03/24 22:34:13 woo Exp Locker: woo $
+ *
+ */
+
 /* GNUPLOT - plot.h */
 /*
- * Copyright (C) 1986, 1987, 1990, 1991   Thomas Williams, Colin Kelley
+ * Copyright (C) 1986, 1987, 1990, 1991, 1992   Thomas Williams, Colin Kelley
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted, 
@@ -27,11 +32,11 @@
  *       Gershon Elber and many others.
  * 
  * Send your comments or suggestions to 
- *  pixar!info-gnuplot@sun.com.
+ *  info-gnuplot@ames.arc.nasa.gov.
  * This is a mailing list; to join it send a note to 
- *  pixar!info-gnuplot-request@sun.com.  
+ *  info-gnuplot-request@ames.arc.nasa.gov.  
  * Send bug reports to
- *  pixar!bug-gnuplot@sun.com.
+ *  bug-gnuplot@ames.arc.nasa.gov.
  */
 
 #define PROGRAM "G N U P L O T"
@@ -133,9 +138,6 @@
 #else
 #if defined( vms ) || defined( _CRAY ) || defined( NEXT )
 #include <float.h>
-#if defined ( NEXT )  /* bug in NeXT OS 2.0 */
-#define DBL_MAX 1.7976931348623157e+308 
-#endif
 #define VERYLARGE DBL_MAX
 #else
 #if defined(AMIGA_AC_5) || defined(AMIGA_LC_5_1)
@@ -234,7 +236,7 @@ enum operators {
 enum operators {
 	PUSH, PUSHC, PUSHD1, PUSHD2, CALL, CALL2, LNOT, BNOT, UMINUS, LOR, LAND,
 	BOR, XOR, BAND, EQ, NE, GT, LT, GE, LE, PLUS, MINUS, MULT, DIV,
-	MOD, POWER, FACTORIAL, BOOL, JUMP, JUMPZ, JUMPNZ, JTERN, SF_START
+	MOD, POWER, FACTORIAL, BOOLE, JUMP, JUMPZ, JUMPNZ, JTERN, SF_START
 };
 #endif
 

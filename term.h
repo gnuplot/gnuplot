@@ -1,6 +1,11 @@
+/*
+ * $Id: term.h,v 3.26 92/03/24 22:34:17 woo Exp Locker: woo $
+ *
+ */
+
 /* GNUPLOT - term.h */
 /*
- * Copyright (C) 1986, 1987, 1990, 1991   Thomas Williams, Colin Kelley
+ * Copyright (C) 1986, 1987, 1990, 1991, 1992   Thomas Williams, Colin Kelley
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted, 
@@ -27,11 +32,11 @@
  *       Gershon Elber and many others.
  * 
  * Send your comments or suggestions to 
- *  pixar!info-gnuplot@sun.com.
+ *  info-gnuplot@ames.arc.nasa.gov.
  * This is a mailing list; to join it send a note to 
- *  pixar!info-gnuplot-request@sun.com.  
+ *  info-gnuplot-request@ames.arc.nasa.gov.  
  * Send bug reports to
- *  pixar!bug-gnuplot@sun.com.
+ *  bug-gnuplot@ames.arc.nasa.gov.
  */
 
 /*
@@ -55,14 +60,16 @@
 #define AMIGASCREEN	/* Amiga custom screen */
 #endif
 #define AED		/* AED 512 and AED 767 */
+#define AIFM		/* Adobe Illustrator Format */
 #define BITGRAPH	/* BBN BitGraph */
 /* #define CGI		/* SCO CGI */
 /* #define IRIS4D	/* IRIS4D series computer */
 #define KERMIT		/* MS-Kermit Tektronix 4010 emulator */
 #define FIG 	  	/* Fig graphics language */
+/* #define NEXT		/* NeXT workstation console */
+/* #define SUN		/* Sun Microsystems Workstation */
 #define REGIS		/* ReGis graphics (vt125, vt220, vt240, Gigis...) */
 #define SELANAR		/* Selanar */
-/* #define SUN		/* Sun Microsystems Workstation */
 #define T410X		/* Tektronix 4106, 4107, 4109 and 420x terminals */
 #define TEK		/* Tektronix 4010, and probably others */
 /* #define UNIXPC	/* unixpc (ATT 3b1 or ATT 7300) */
@@ -72,6 +79,8 @@
 
 #endif /* AMIGA_LC_5_1 */
 
+#ifndef AMIGA_LC_5_1
+
 #define DXY800A		/* Roland DXY800A plotter */
 
 #define HP2648		/* HP2648, HP2647 */
@@ -79,9 +88,15 @@
 #define HP75		/* HP7580, and probably other HPs */
 #define IMAGEN  	/* Imagen laser printers (300dpi) (requires -Iterm also) */
 
-#define NEC		/* NEC CP6 pinwriter printer */
 #define PRESCRIBE	/* Kyocera Laser printer */
 #define QMS		/* QMS/QUIC laserprinter (Talaris 1200 and others) */
+
+#else /* AMIGA_LC_5_1 */
+#define FIG 	  	/* Fig graphics language */
+
+#endif /* AMIGA_LC_5_1 */
+
+#define NEC		/* NEC CP6 pinwriter printer */
 #define STARC		/* Star Color Printer */
 #define TANDY60		/* Tandy DMP-130 series 60-dot per inch graphics */
 #define V384		/* Vectrix 384 and tandy color printer */
@@ -93,6 +108,7 @@
 
 #define HPGL		/* HP7475, HP7220 plotters, and (hopefully) lots of others */
 
+#define PBM		/* PBMPLUS portable bitmap */
 #define POSTSCRIPT	/* Postscript */
 
 /* #define DXF		/* DXF format for use with AutoCad (Release 10.x) */
@@ -102,7 +118,6 @@
 #define EPS60		/* Epson-style 60-dot per inch printers */
 #define EPSONP		/* Epson LX-800, Star NL-10, NX-1000 and lots of others */
 #define HPLJII		/* HP LaserJet II */
-#define HPLJIII		/* HP LaserJet III */
 #define LATEX		/* LATEX picture environment */
 
 /* These are for MSDOS only */

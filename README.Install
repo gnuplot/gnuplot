@@ -16,11 +16,11 @@ The code is written with portability in mind.
 GNUPLOT has not been tested on Pyramid 90x and IBM PC Microsoft C.
 
 Send your comments, suggestions, or modifications to 
-  pixar!info-gnuplot@sun.com
+  info-gnuplot@ames.arc.nasa.gov
 This is a mailing list; to join it send a note to 
-  pixar!info-gnuplot-request@sun.com
+  info-gnuplot-request@ames.arc.nasa.gov
 Send bug reports to
-  pixar!bug-gnuplot@sun.com
+  bug-gnuplot@ames.arc.nasa.gov
 
                        PREPROCESSOR #DEFINES
 
@@ -54,6 +54,7 @@ TERMFLAGS   Makefile        the set of terminals you want, from below
             or term.h
 
    AED         AED 512 and AED 767
+   AIFM        Adobe Illustrator Format
    AMIGASCREEN Amiga custom screen
    APOLLO      Apollo Graphics Primitive Resource (resizable window)
    ATT6300     PC with AT&T 6300 graphics
@@ -76,11 +77,14 @@ TERMFLAGS   Makefile        the set of terminals you want, from below
    HP75        HP7580, and probably other HPs
    HPGL        HP7475 and (hopefully) lots of others
    HPLJII      HP Laserjet II
+   HPLJIII     HP Laserjet III (HPGL/2)
    IMAGEN      Imagen laser printers (300dpi) (requires -Iterm also)
    IRIS4D      IRIS4D series computer
    KERMIT      MS-Kermit Tektronix 4010 emulator
    LATEX       LATEX picture environment
+   LN03P       DEC LN03P laser printer
    NEC         NEC CP6 pinwriter printer
+   PBM         PBMPLUS pbm, pgm, ppm formats
    POSTSCRIPT  Postscript
    PRESCRIBE   Kyocera Laser printer
    QMS         QMS/QUIC laserprinter (Talaris 1200 and others)
@@ -195,7 +199,3 @@ plot.c) is used.
 
 The VMS version looks for the logical name GNUPLOT$HELP to locate 
 the help library.
-
-The CGI drivers need the CGIPATH environment variable to set the path
-to the CGI agents, and the CGIDISP and/or CGIPRNT environment
-variables to set the output devices.

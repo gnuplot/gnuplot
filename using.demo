@@ -1,4 +1,7 @@
 #
+# $Id: using.demo,v 3.26 92/03/24 22:32:27 woo Exp Locker: woo $
+#
+#
 # Requires data file "using.dat" from this directory,
 # so change current working directory to this directory before running.
 #

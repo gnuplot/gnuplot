@@ -1,4 +1,7 @@
 #
+# $Id: polar.demo,v 3.26 92/03/24 22:32:23 woo Exp Locker: woo $
+#
+#
 # Show some of the new polar capabilities.
 #
 set polar

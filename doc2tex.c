@@ -1,3 +1,7 @@
+#ifndef lint
+static char *RCSid = "$Id: doc2tex.c,v 3.26 1992/03/25 04:53:29 woo Exp woo $";
+#endif
+
 /*
  * doc2tex.c  -- program to convert Gnuplot .DOC format to LaTeX document
  * Also will work for VMS .HLP files. 
@@ -15,7 +19,7 @@
  *   latex gnuplot.tex ; latex gnuplot.tex
  */
 
-static char rcsid[] = "$Id: doc2tex.c,v 1.1 90/01/11 15:44:06 dfk Exp Locker: dfk $";
+static char rcsid[] = "$Id: doc2tex.c,v 3.26 1992/03/25 04:53:29 woo Exp woo $";
 
 #include <stdio.h>
 #include <ctype.h>

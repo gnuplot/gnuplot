@@ -1,3 +1,7 @@
+/*
+ * $Id: object.h,v 3.26 92/03/24 22:35:34 woo Exp Locker: woo $
+ */
+
 /* 
  *	FIG : Facility for Interactive Generation of figures
  *

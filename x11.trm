@@ -1,4 +1,8 @@
 /*
+ * $Id: x11.trm,v 3.26 92/03/24 22:35:49 woo Exp Locker: woo $
+ */
+
+/*
  *    x11.trm  --- inboard terminal driver for X11
  */
 
@@ -11,23 +15,24 @@
 #define X11_VTIC (X11_YMAX/100)
 #define X11_HTIC (X11_XMAX/150)
 
-#define X11_nopts 22
+#define X11_nopts 25
 char X11_opts[X11_nopts][20] = {
+   "-mono", "-gray", "-clear",
    "-iconic", "-rv", "-reverse", "+rv", "-synchronous", 
    "-display", "-geometry", "-bg", "-background", "-bd", "-bordercolor", "-bw",
    "-borderwidth", "-fg", "-foreground", "-fn", "-font", "-name", 
    "-selectionTimeout", "-title", "-xnllanguage", "-xrm" 
    };
 int X11_optarg[X11_nopts] = { 
+   0, 0, 0,
    0, 0, 0, 0, 0,
    1, 1, 1, 1, 1, 1, 1,
    1, 1, 1, 1, 1, 1, 
    1, 1, 1, 1
    };
 
-FILE *X11_pipe, *popen();
-char X11_command[1024]= "gnuplot_x11 -name gnuplot";
-
+FILE *X11_ipc; 
+char X11_command[1024]= "gnuplot_x11";
 
 /*   X11_args - scan gnuplot command line for standard X Toolkit options */
 
@@ -54,30 +59,72 @@ X11_args(argc, argv) int argc; char *argv[]; {
    return(nx11);
    }
 
+#ifndef CRIPPLED_SELECT
+/*-----------------------------------------------------------------------------
+ *   use pipe IPC on most platforms
+ *---------------------------------------------------------------------------*/
+FILE *popen();
+
+X11_init() { X11_ipc = popen(X11_command, "w"); }
+
+X11_graphics() { fprintf(X11_ipc, "G\n"); }
+
+X11_text() { 
+   fprintf(X11_ipc, "E\n"); fflush(X11_ipc);
 #ifdef ULTRIX_KLUDGE
-#define X11_ULTRIX_KLUDGE fprintf (X11_pipe, "E\n"); fflush (X11_pipe);
-#else
-#define X11_ULTRIX_KLUDGE 
+   fprintf(X11_ipc, "E\n"); fflush(X11_ipc);
 #endif
+   }
 
-X11_init() { X11_pipe = popen(X11_command, "w"); }
+X11_reset() { fprintf(X11_ipc, "R\n"); fflush(X11_ipc); pclose(X11_ipc); }
 
-X11_reset() { fprintf(X11_pipe, "R\n"); fflush(X11_pipe); pclose(X11_pipe); }
+#else   /* CRIPPLED_SELECT */
+/*-----------------------------------------------------------------------------
+ *   use file IPC on the others
+ *---------------------------------------------------------------------------*/
 
-X11_text() { fprintf(X11_pipe, "E\n"); fflush(X11_pipe); X11_ULTRIX_KLUDGE }
+char X11_tmp[32], X11_tmp0[32], X11_shutdown[32];
+int X11_pid;
 
-X11_graphics() { fprintf(X11_pipe, "G\n"); }
+X11_init() { 
+   if (!(X11_pid = fork())) {
+      execl("/bin/sh", "sh", "-c", X11_command, NULL);
+      _exit(1);
+      }
+   sprintf(X11_tmp, "/tmp/Gnuplot_%d", X11_pid);
+   sprintf(X11_tmp0, "%s-", X11_tmp);
+   sprintf(X11_shutdown,  "echo R >%s",X11_tmp);
+   }
 
-X11_move(x,y) unsigned int x,y; { fprintf(X11_pipe, "M%04d%04d\n", x, y); }
+X11_graphics() { 
+   X11_ipc = fopen(X11_tmp0, "w"); 
+   if (!X11_ipc) { perror(X11_tmp0); system(X11_shutdown); exit(1); }
+   fprintf(X11_ipc, "G\n"); 
+   }
 
-X11_vector(x,y) unsigned int x,y; { fprintf(X11_pipe, "V%04d%04d\n", x, y); }
+X11_text() { 
+   fprintf(X11_ipc, "E\n"); 
+#ifdef ULTRIX_KLUDGE
+   fprintf(X11_ipc, "E\n");
+#endif
+   fclose(X11_ipc);
+   rename(X11_tmp0, X11_tmp);
+   }
 
-X11_linetype(lt) int lt; { fprintf(X11_pipe, "L%04d\n", lt); }
+X11_reset() { system(X11_shutdown); }
+
+#endif  /* CRIPPLED_SELECT */ /*---------------------------------------------*/
+
+X11_move(x,y) unsigned int x,y; { fprintf(X11_ipc, "M%04d%04d\n", x, y); }
+
+X11_vector(x,y) unsigned int x,y; { fprintf(X11_ipc, "V%04d%04d\n", x, y); }
+
+X11_linetype(lt) int lt; { fprintf(X11_ipc, "L%04d\n", lt); }
 
 X11_put_text(x,y,str) unsigned int x,y; char str[]; {
-   fprintf(X11_pipe, "T%04d%04d%s\n", x, y, str);
+   fprintf(X11_ipc, "T%04d%04d%s\n", x, y, str);
    }
 X11_justify_text(mode) enum JUSTIFY mode; {
-   fprintf(X11_pipe, "J%04d\n", mode);
+   fprintf(X11_ipc, "J%04d\n", mode);
    return(TRUE);
    }

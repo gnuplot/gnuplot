@@ -1,6 +1,10 @@
+/*
+ * $Id: ai.trm,v 3.26 92/03/24 22:35:00 woo Exp Locker: woo $
+ */
+
 /* GNUPLOT - ai.trm */
 /*
- * Copyright (C) 1991   
+ * Copyright (C) 1991, 1992   
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted, 
@@ -22,7 +26,7 @@
  * AUTHORS
  *  Ray Ghanbari
  * 
- * send your comments or suggestions to (pixar!info-gnuplot@sun.com).
+ * send your comments or suggestions to (info-gnuplot@ames.arc.nasa.gov).
  *
  * The 'aifm' driver produces files editable by Adobe Illustrator 3.0
  * To change font to Courier and font size to 20pts use 

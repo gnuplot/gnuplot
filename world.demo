@@ -1,3 +1,6 @@
+#
+# $Id: world.demo,v 3.26 92/03/24 22:32:31 woo Exp Locker: woo $
+#
 set title "Gnuplot Correspondences"
 set nokey
 set noborder

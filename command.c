@@ -1,6 +1,10 @@
+#ifndef lint
+static char *RCSid = "$Id: command.c,v 3.26 92/03/24 22:34:17 woo Exp Locker: woo $";
+#endif
+
 /* GNUPLOT - command.c */
 /*
- * Copyright (C) 1986, 1987, 1990, 1991   Thomas Williams, Colin Kelley
+ * Copyright (C) 1986, 1987, 1990, 1991, 1992   Thomas Williams, Colin Kelley
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted, 
@@ -27,11 +31,11 @@
  *       Gershon Elber and many others.
  * 
  * Send your comments or suggestions to 
- *  pixar!info-gnuplot@sun.com.
+ *  info-gnuplot@ames.arc.nasa.gov.
  * This is a mailing list; to join it send a note to 
- *  pixar!info-gnuplot-request@sun.com.  
+ *  info-gnuplot-request@ames.arc.nasa.gov.  
  * Send bug reports to
- *  pixar!bug-gnuplot@sun.com.
+ *  bug-gnuplot@ames.arc.nasa.gov.
  */
 
 #include <stdio.h>
@@ -81,8 +85,8 @@ void sleep();
 #define HELPFILE "S:gnuplot.gih"
 #else
 #define HELPFILE "docs/gnuplot.gih" /* changed by makefile */
-#endif
-#endif
+#endif /* AMIGA_LC_5_1 */
+#endif /* HELPFILE */
 
 #define inrange(z,min,max) ((min<max) ? ((z>=min)&&(z<=max)) : ((z>=max)&&(z<=min)) )
 
@@ -111,6 +115,11 @@ extern char *getcwd();	/* Turbo C, MSC and VMS use getcwd */
 
 #ifdef vms
 int vms_vkid; /* Virtual keyboard id */
+#endif
+
+#ifdef unix
+extern FILE *popen();
+static BOOLEAN pipe_open=FALSE;
 #endif
 
 extern int chdir();
@@ -622,6 +631,16 @@ char *start_search;
 
 	quote_str(data_file, c_token);
 	this_plot->plot_type = DATA;
+	if( parametric)
+		int_error("Parametric data files not yet implemented",NO_CARET);
+#ifdef unix
+	if ( *data_file == '<' ) {
+	  	if ((fp = popen(data_file+1,"r")) == (FILE *)NULL)
+	    	os_error("cannot create pipe; output not changed",c_token);
+		else
+		    pipe_open = TRUE;
+	} else
+#endif
 	if ((fp = fopen(data_file, "r")) == (FILE *)NULL)
 		os_error("can't open data file", c_token);
 
@@ -633,9 +652,9 @@ char *start_search;
 		if (!END_OF_COMMAND && !isstring(c_token)) {
 			struct value a;
 			ycol = (int)magnitude(const_express(&a));
-			xcol = ycol;
 			if (equals(c_token,":")) {
 				c_token++;      /* skip ":" */
+				xcol = ycol;
 				ycol = (int)magnitude(const_express(&a));
 				if (equals(c_token,":")) {
 					c_token++;      /* skip ":" */
@@ -784,6 +803,13 @@ char *start_search;
 	}
 	this_plot->p_count = i;
 	cp_extend(this_plot, i);	/* shrink to fit */
+
+#ifdef unix
+	if ( pipe_open ) {
+		(void) pclose(fp);
+		pipe_open = FALSE;
+	} else
+#endif
 	(void) fclose(fp);
 }
 
@@ -869,16 +895,16 @@ adjust_yrange(curve)
     for (i = 0; i < npoints; i++) {
 	   cp = &(curve->points[i]);
 	   if (cp->type == INRANGE) {
-		  y = log_y ? pow(10.0,cp->y) : cp->y;
+		  y = cp->y;
 		  if ((autoscale_ly ||
-		       inrange(y, ymin, ymax) ||
+		       inrange(log_y ? pow(10.0, y) : y, ymin, ymax) ||
 		       polar)) {
 			 if (autoscale_ly) {
 				if (y < ymin) ymin = y;
 				if (y > ymax) ymax = y;
 				if (ebars) {
-				    ylow =  log_y ? pow(10.0,cp->ylow)  : cp->ylow;
-				    yhigh = log_y ? pow(10.0,cp->yhigh) : cp->yhigh;
+				    ylow = cp->ylow;
+				    yhigh = cp->yhigh;
 				    if (ylow < ymin) ymin = ylow;
 				    if (ylow > ymax) ymax = ylow;
 				    if (yhigh < ymin) ymin = yhigh;
@@ -913,6 +939,14 @@ char *start_search;
 	quote_str(data_file, c_token);
 	this_plot->plot_type = DATA3D;
 	this_plot->has_grid_topology = TRUE;
+#ifdef unix
+	if ( *data_file == '<' ) {
+		if ((fp = popen(data_file+1,"r")) == (FILE *)NULL)
+		    os_error("cannot create pipe; output not changed",c_token);
+	  	else
+		    pipe_open = TRUE;
+	} else
+#endif
 	if ((fp = fopen(data_file, "r")) == (FILE *)NULL)
 		os_error("can't open data file", c_token);
 
@@ -950,10 +984,6 @@ char *start_search;
 			quotel_str(format, c_token);
 			c_token++;	/* skip format */
 		}
-	}
-	else {
-	    if ( only_z = !parametric )
-		zcol = 1;
 	}
 
 	switch (mapping3d) {
@@ -1233,8 +1263,15 @@ char *start_search;
 		iso_free(this_iso);/* Free last allocation. */
 	}
 
+#ifdef unix
+	if ( pipe_open ) {
+		(void) pclose(fp);
+		pipe_open = FALSE;
+	} else
+#endif
 	(void) fclose(fp);
-
+      if (this_plot->num_iso_read <= 1)
+          this_plot->has_grid_topology = FALSE;
 	if (this_plot->has_grid_topology) {
 	        struct iso_curve *new_icrvs = NULL;
 		int num_new_iso = this_plot->iso_crvs->p_count,
@@ -1331,6 +1368,53 @@ print_points(curve)
     }    
 }
 
+print_table()
+{
+    register struct curve_points *this_plot;
+    int i, curve;
+
+   for (this_plot = first_plot, curve = 0; this_plot != NULL;
+       curve++, this_plot = this_plot->next_cp)
+   {
+	  fprintf(outfile,"Curve %d, %d points\n", curve, this_plot->p_count);
+	  for (i = 0; i < this_plot->p_count; i++) {
+		 fprintf(outfile,"%c x=%g y=%g\n",
+			   this_plot->points[i].type == INRANGE ? 'i'
+			   : this_plot->points[i].type == OUTRANGE ? 'o'
+			   : 'u',
+			   this_plot->points[i].x,
+			   this_plot->points[i].y);
+	  }
+	  fprintf(outfile,"\n");
+   }
+   fflush(outfile);
+}
+
+print_3dtable()
+{
+    register struct surface_points *this_3dplot;
+    int i, curve;
+    struct gnuplot_contours *contours;      /* Not NULL If have contours. */
+    struct iso_curve *isocrv;
+
+    for (this_3dplot = first_3dplot, curve = 0; this_3dplot != NULL;
+       curve++, this_3dplot = this_3dplot->next_sp)
+    {
+	  isocrv = this_3dplot->iso_crvs;
+	  fprintf(outfile,"Curve %d, %d points\n", curve, isocrv->p_count);
+	  for (i = 0; i < isocrv->p_count; i++) {
+		 fprintf(outfile,"%c x=%g y=%g z=%g\n",
+			   isocrv->points[i].type == INRANGE ? 'i'
+			   : isocrv->points[i].type == OUTRANGE ? 'o'
+			   : 'u',
+			   isocrv->points[i].x,
+			   isocrv->points[i].y,
+			   isocrv->points[i].z);
+	  }
+	  fprintf(outfile,"\n");
+   }
+   fflush(outfile);
+}
 
 /* This parses the plot command after any range specifications. 
  * To support autoscaling on the x axis, we want any data files to 
@@ -1704,7 +1788,10 @@ void parametric_fixup();
 		parametric_fixup (first_plot, &plot_num, &x_min, &x_max);
 	}
 
-	do_plot(first_plot,plot_num,x_min,x_max,y_min,y_max);
+	if (strcmp(term_tbl[term].name,"table") == 0)
+		print_table();
+	else
+		do_plot(first_plot,plot_num,x_min,x_max,y_min,y_max);
 	cp_free(first_plot);
 	first_plot = NULL;
 }
@@ -1869,9 +1956,11 @@ void parametric_3dfixup();
 				 (this_plot->plot_style == ERRORBARS) )
 					if (crnt_param == 0)
 						point_num +=
-						    1 + (draw_contour != 0);
+						    1 + (draw_contour != 0)
+						      + (hidden3d != 0);
 			if (crnt_param == 0)
-			    line_num += 1 + (draw_contour != 0);
+			    line_num += 1 + (draw_contour != 0)
+			                  + (hidden3d != 0);
 
 			tp_3d_ptr = &(this_plot->next_sp);
 		}
@@ -2257,7 +2346,10 @@ void parametric_3dfixup();
 		}
 	}
 
-	do_3dplot(first_3dplot,plot_num,x_min,x_max,y_min,y_max,z_min,z_max);
+	if (strcmp(term_tbl[term].name,"table") == 0)
+	   print_3dtable();
+	else
+	   do_3dplot(first_3dplot,plot_num,x_min,x_max,y_min,y_max,z_min,z_max);
 	sp_free(first_3dplot);
 	first_3dplot = NULL;
 }
@@ -2594,6 +2686,36 @@ double *x_min, *x_max, *y_min, *y_max, *z_min, *z_max;
 	while (new_list->next_sp != NULL)
 		new_list = new_list->next_sp;
 	new_list->next_sp = free_head;
+      if (lxmax - lxmin < zero) {
+          if (fabs(lxmax) < zero) {
+              lxmin = -1.0;
+              lxmax = 1.0;
+          }
+          else {
+              lxmin *= 0.9;
+              lxmax *= 1.1;
+          }
+      }
+      if (lymax - lymin < zero) {
+          if (fabs(lymax) < zero) {
+              lymin = -1.0;
+              lymax = 1.0;
+          }
+          else {
+              lymin *= 0.9;
+              lymax *= 1.1;
+          }
+      }
+      if (lzmax - lzmin < zero) {
+          if (fabs(lzmax) < zero) {
+              lzmin = -1.0;
+              lzmax = 1.0;
+          }
+          else {
+              lzmin *= 0.9;
+              lzmax *= 1.1;
+          }
+      }
 
 /* Report the overall graph mins and maxs. */
 	if (autoscale_lx) {
@@ -2739,7 +2861,7 @@ do_help()
 	help_desc.dsc$w_length = strlen(help);
 	if ((vaxc$errno = lbr$output_help(lib$put_output,0,&help_desc,
 		&helpfile_desc,0,lib$get_input)) != SS$_NORMAL)
-			os_error("can't open GNUPLOT$HELP");
+			os_error("can't open GNUPLOT$HELP",NO_CARET);
 }
 
 
@@ -2882,7 +3004,7 @@ do_system()
    if(fexecv(parms[0],parms) < 0)
 #else
    if (system(input_line + 1))
-#endif
+#endif /* AMIGA_AC_5 */
       os_error("system() failed",NO_CARET);
 }
 
@@ -3087,7 +3209,7 @@ read_line(prompt)
 			if (more && interactive)
 			fputs("> ", stderr);
 		} while(more);
-#ifndef __ZTC
+#ifndef __ZTC__
 	}
 #endif
 }

@@ -1,6 +1,10 @@
+/*
+ * $Id: cgi.trm,v 3.26 92/03/24 22:34:47 woo Exp Locker: woo $
+ */
+
 /* GNUPLOT - cgi.trm */
 /*
- * Copyright (C) 1990 Ronald Florence
+ * Copyright (C) 1990, 1991, 1992 Ronald Florence
  *
  * Permission is hereby granted for unlimited non-commercial
  * use of this code, on condition that the copyright

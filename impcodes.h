@@ -1,4 +1,8 @@
 /*
+ * $Id: impcodes.h,v 3.26 92/03/24 22:35:32 woo Exp Locker: woo $
+ */
+
+/*
  * Copyright (c) 1985 Regents of the University of California.
  * All rights reserved.  The Berkeley software License Agreement
  * specifies the terms and conditions for redistribution.

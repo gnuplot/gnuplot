@@ -1,4 +1,7 @@
 #
+# $Id: all.demo,v 3.26 92/03/24 22:32:37 woo Exp Locker: woo $
+#
+#
 # Executes ALL demos in this directory, in functionality order.
 #
 
@@ -34,6 +37,9 @@ load "surface2.demo"
 
 pause 0 "******************** file contours.demo ********************"
 load "contours.demo"
+
+pause 0 "******************** file hidden.demo ********************"
+load "hidden.demo"
 
 pause 0 "******************** file world.demo ********************"
 load "world.demo"

@@ -1,4 +1,43 @@
 
+		     GNUPLOT 3.2 RELEASE NOTES
+
+This describes changes to gnuplot since version 3.0.
+
+Highlights: 
+-----------
+Version 3.1 (also known as version 3.0, patchlevel 1) was a bugfix
+release.  In particular, it corrected the y logscale error.
+Version 3.2 also fixes a number of bugs but contains two major
+changes.  The X11 support, in particular, gnuplot_x11.c was completely
+rewritten to rely solely on X11 intrinsics and no widget libraries.
+This should hopefully make it more portable.  The other major change
+is hidden line removal for explicit 3D surfaces.  
+
+This release was deliberately limited in scope in order to
+release a new X11 driver and have some hidden line removal capability
+quickly.  Version 3.3 will be a much larger modification.
+
+
+                            ACKNOWLEDGEMENTS
+
+- New generic gnuplot_x11.c, Ed Kubatis <ejk@ux2.ncsa.uiuc.edu>
+- Hidden Line Removal for Explicit Surfaces and IRIX 4.0 fixes,
+  Gershon Elber <gershon@gr.utah.edu>
+- Table Terminal Driver, Kevin Russo <russo@rudedog.nrl.navy.mil>
+- PCL5 driver fixes (HPGL page eject),datafile pipe and README,
+  Alex Woo <woo@ames.arc.nasa.gov>
+- Pbmplus driver & fix to ylog tics, Put FAR pointers in bitmap.c and bitmap.h
+  Russell Lang <rjl@monu1.cc.monash.edu.au>
+- NeXT Console Driver, Nick Strobel <strobel@phast.phys.washington.edu>
+- Fix GNUTERM environment with disk resident BGI drivers,
+  Craig Johnston <johnston@maxwell.ee.washington.edu>
+- Fix tables for troff in doc2ms, Michael Schuh <schuh@ames.arc.nasa.gov>
+- Fix dump when GNUPLOT$HELP undefined, 
+  Wolfgang J. Moeller <moeller@gwdgv1.dnet.gwdg.de>
+- Fix AMIGA segment limits, Carsten Steger <stegerc@informatik.tu-muenchen.de>
+- Bug fix to latex.trm, Rob Cunningham <rkc@xn.ll.mit.edu>
+
+=========================================================================
 		     GNUPLOT 3.0 RELEASE NOTES
 
 This describes changes to gnuplot since version 2.02 (ie, 2.0
@@ -255,7 +294,7 @@ improvements were by David Kotz.
 (David.Kotz@Dartmouth.edu)
 And of course, the vast majority of the program is by Colin Kelley
 and Thomas Williams.
-(pixar!info-gnuplot@sun.com)
+(info-gnuplot@ames.arc.nasa.gov)
 
 =======================================================================
 

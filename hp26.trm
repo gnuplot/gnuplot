@@ -1,6 +1,10 @@
+/*
+ * $Id: hp26.trm,v 3.26 92/03/24 22:34:55 woo Exp Locker: woo $
+ */
+
 /* GNUPLOT - hp26.trm */
 /*
- * Copyright (C) 1990   
+ * Copyright (C) 1990, 1991, 1992   
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted, 
@@ -22,7 +26,7 @@
  * AUTHORS
  *   hplvlch!ch (Chuck Heller) 
  * 
- * send your comments or suggestions to (pixar!info-gnuplot@sun.com).
+ * send your comments or suggestions to (info-gnuplot@ames.arc.nasa.gov).
  * 
  */
 
@@ -107,7 +111,7 @@ HP26_put_text(x,y,str)
 int x, y;
 char *str;
 {
-	HP26_move(x,y + HP26_VCHAR/2);
+	HP26_move(x,y - HP26_VCHAR/2);
 	fputs("\033*dS",outfile);
 	fprintf(outfile,"\033*m3Q\033*l%s\n",str);
 	fputs("\033*dT",outfile);

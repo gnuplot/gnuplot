@@ -1,4 +1,6 @@
 #
+# $Id: Makefile.ami,v 3.26 1992/03/25 04:53:29 woo Exp woo $
+#
 # Makefile for GNUPLOT documentation (Aztec C v5.xx Version)
 #
 # Note that the top-level file for documentation is gnuplot.doc.
@@ -13,7 +15,7 @@
 #   or
 #    make "TROFF=itroff" troff    (for troff; use your troff for itroff here)
 #
-# $Id: Makefile,v 1.1 90/01/11 15:43:03 dfk Exp Locker: dfk $
+# $Id: Makefile.ami,v 3.26 1992/03/25 04:53:29 woo Exp woo $
 
 # usually overridden by ../Makefile
 HELPDEST = /usr/local/lib/

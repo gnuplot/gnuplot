@@ -1,6 +1,10 @@
+/*
+ * $Id: hpgl.trm,v 3.26 92/03/24 22:34:56 woo Exp Locker: woo $
+ */
+
 /* GNUPLOT - hpgl.trm */
 /*
- * Copyright (C) 1990   
+ * Copyright (C) 1990, 1991, 1992   
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted, 
@@ -22,12 +26,15 @@
  * AUTHORS
  *  Colin Kelley, Thomas Williams, Russell Lang
  * 
- * send your comments or suggestions to (pixar!info-gnuplot@sun.com).
+ * send your comments or suggestions to (info-gnuplot@ames.arc.nasa.gov).
  * 
  */
 
 #define HPGL_XMAX 15200
 #define HPGL_YMAX 10000
+
+#define PCL_XMAX 10000
+#define PCL_YMAX  7500
 
 #define HPGL_XLAST (HPGL_XMAX - 1)
 #define HPGL_YLAST (HPGL_XMAX - 1)
@@ -37,6 +44,11 @@
 #define HPGL_HCHAR	(HPGL_XMAX/100*12/10) /* 1.2% */
 #define HPGL_VTIC	(HPGL_YMAX/70)		
 #define HPGL_HTIC	(HPGL_YMAX/70)		
+
+#define PCL_VCHAR	(PCL_YMAX/100*32/10) /* 3.2% */
+#define PCL_HCHAR	(PCL_XMAX/100*12/10) /* 1.2% */
+#define PCL_VTIC	(PCL_YMAX/70)		
+#define PCL_HTIC	(PCL_YMAX/70)		
 
 int HPGL_ang = 0;
 
@@ -59,21 +71,6 @@ HPLJIII_LAND_init()
 }
 
 
-HPLJIII_graphics()
-{
-	fprintf(outfile,
-	"\033%0B\nIN;\nSC0,%d,0,%d;\nSR%f,%f;\n",
-		HPGL_XMAX,HPGL_YMAX,
-		((double)(HPGL_HCHAR)*200/3/HPGL_XMAX),
-		((double)(HPGL_VCHAR)*100/2/HPGL_YMAX) );
-/*	 1    2             3 
-	1. reset to power-up defaults
-	2. set SCaling
-	3. set character size
-*/
-	HPGL_ang = 0;
-}
-
 HPGL_graphics()
 {
 	fprintf(outfile,
@@ -89,17 +86,6 @@ HPGL_graphics()
 	HPGL_ang = 0;
 }
 
-
-HPLJIII_text()
-{
-	fputs("PU;\nSP0;\n\033.Z\0",outfile);
-/*	       1    2     3
-	1. pen up
-	2. park pen
-	3. disable eavesdropping
-*/
-	fputs("\033%0A\033E\n",outfile);
-}
 
 HPGL_text()
 {
@@ -156,6 +142,17 @@ char *str;
 	fprintf(outfile,"LB%s\003\n",str);
 }
 
+PCL_put_text(x,y,str)
+int x, y;
+char *str;
+{
+        if (HPGL_ang == 1)
+                HPGL_move(x + PCL_VCHAR/4,y);
+        else
+                HPGL_move(x,y - PCL_VCHAR/4);
+        fprintf(outfile,"LB%s\003\n",str);
+}
+
 
 int HPGL_text_angle(ang)
 int ang;
@@ -177,5 +174,5 @@ HPGL_reset()
 
 HPLJIII_reset()
 {
-	fputs("\033%0A\033E\n",outfile);
+	fputs("\033E\n",outfile);
 }

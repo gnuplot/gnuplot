@@ -1,4 +1,7 @@
 #
+# $Id: controls.demo,v 3.26 92/03/24 22:32:19 woo Exp Locker: woo $
+#
+#
 # warning:  this demo is SLOW on PCs without math coprocessors!
 #
 # From _Automatic_Control_Systems_, fourth ed., figure 6-14

@@ -1,3 +1,7 @@
+#ifndef lint
+static char *RCSid = "$Id: doc2hlp.c,v 3.26 1992/03/25 04:53:29 woo Exp woo $";
+#endif
+
 /*
  * doc2hlp.c  -- program to convert Gnuplot .DOC format to 
  * VMS help (.HLP) format.

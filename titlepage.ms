@@ -26,9 +26,9 @@ Thomas Williams & Colin Kelley
   Alex Woo
 
 .AI
-   Mailing list for comments: pixar!info-gnuplot@sun.com
+   Mailing list for comments: info-gnuplot@ames.arc.nasa.gov
 .br
-   Mailing list for bug reports: pixar!bug-gnuplot@sun.com
+   Mailing list for bug reports: bug-gnuplot@ames.arc.nasa.gov
 \*(DY
 .br
 
@@ -37,13 +37,13 @@ Thomas Williams & Colin Kelley
 
 
 
-This manual is for GNUPLOT version 3.0.
+This manual is for GNUPLOT version 3.2
 .AB no
 .AE
 .LP
 .nr HM 1.2i
 .ds CH
-.ds LH GNUPLOT 3.0
+.ds LH GNUPLOT 3.2
 .ds RH %
 .\".nr PS 12
 .\".nr VS 13

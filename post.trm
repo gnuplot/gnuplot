@@ -1,6 +1,10 @@
+/*
+ * $Id: post.trm,v 3.26 92/03/24 22:35:40 woo Exp Locker: woo $
+ */
+
 /* GNUPLOT - post.trm */
 /*
- * Copyright (C) 1990   
+ * Copyright (C) 1990, 1991, 1992   
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted, 
@@ -22,14 +26,15 @@
  * AUTHORS
  *  Russell Lang
  * 
- * send your comments or suggestions to (pixar!info-gnuplot@sun.com).
+ * send your comments or suggestions to (info-gnuplot@ames.arc.nasa.gov).
  *
  * The 'postscript' driver produces landscape output 10" wide and 7" high.  
+ * To get a smaller epsf output use 'set size 0.5,0.5', 
+ * 'set term postscript portrait', make only one plot per file
+ * and change the first line of the postscript file from
+ * '%!PS-Adobe-2.0' to '%!PS-Adobe-2.0 EPSF-2.0'
  * To change font to Times-Roman and font size to 20pts use 
  * 'set term postscript "Times-Roman" 20'.
- * To get a smaller (5" x 3.5") eps output use 'set term post eps'
- * and make only one plot per file.  Font size for eps will be half
- * the specified size.
  */
 
 
@@ -39,8 +44,6 @@ char ps_font[MAX_ID_LEN+1] = "Courier" ; /* name of font */
 int ps_fontsize = 14;					 /* size of font in pts */
 BOOLEAN ps_portrait = FALSE;				 /* vertical page */
 BOOLEAN ps_color = FALSE;
-BOOLEAN ps_eps = FALSE;	/* Is this for an eps file? */
-			/* Added by Robert Davis <davis@ecn.purdue.edu> */
 int ps_page=0;			/* page count */
 int ps_path_count=0; 	/* count of lines in path */
 int ps_ang=0;			/* text angle */
@@ -135,27 +138,17 @@ PS_options()
 	if (!END_OF_COMMAND) {
 		if (almost_equals(c_token,"p$ortrait")) {
 			ps_portrait=TRUE;
- 			ps_eps=FALSE;
 			c_token++;
 		}
 		else if (almost_equals(c_token,"l$andscape")) {
 			ps_portrait=FALSE;
- 			ps_eps=FALSE;
 			c_token++;
 		}
- 		else if (almost_equals(c_token,"e$psf")) {
- 			ps_portrait=TRUE;
- 			ps_eps = TRUE;
- 			c_token++;
- 		}
 		else if (almost_equals(c_token,"d$efault")) {
 			ps_portrait=FALSE;
- 			ps_eps=FALSE;
 			ps_color=FALSE;
 			strcpy(ps_font,"Courier");
 			ps_fontsize = 14;
-			term_tbl[term].v_char = (unsigned int)(ps_fontsize*PS_SC);
-			term_tbl[term].h_char = (unsigned int)(ps_fontsize*PS_SC*6/10);
 			c_token++;
 		}
 	}
@@ -180,12 +173,13 @@ PS_options()
 		/* We have font size specified */
 		struct value a;
 		ps_fontsize = (int)real(const_express(&a));
+		c_token++;
 		term_tbl[term].v_char = (unsigned int)(ps_fontsize*PS_SC);
 		term_tbl[term].h_char = (unsigned int)(ps_fontsize*PS_SC*6/10);
 	}
 
 	sprintf(term_options,"%s %s \"%s\" %d",
-		ps_eps ? "eps" : (ps_portrait ? "portrait" : "landscape"),
+		ps_portrait ? "portrait" : "landscape",
 		ps_color ? "color" : "monochrome",ps_font,ps_fontsize);
 }
 
@@ -195,23 +189,19 @@ PS_init()
 struct termentry *t = &term_tbl[term];
 int i;
 	ps_page = 0;
-	if (!ps_eps)
-		fprintf(outfile,"%%!PS-Adobe-2.0\n");
-	else
-		fprintf(outfile,"%%!PS-Adobe-2.0 EPSF-2.0\n");
+	fprintf(outfile,"%%!PS-Adobe-2.0\n");
 	fprintf(outfile,"%%%%Creator: gnuplot\n");
 	fprintf(outfile,"%%%%DocumentFonts: %s\n", ps_font);
 	fprintf(outfile,"%%%%BoundingBox: %d %d ", PS_XOFF,PS_YOFF);
 	if (ps_portrait)
 		fprintf(outfile,"%d %d\n", 
-			(int)(xsize*(ps_eps ? 0.5 : 1.0)*(PS_XMAX)/PS_SC+0.5+PS_XOFF), 
-			(int)(ysize*(ps_eps ? 0.5 : 1.0)*(PS_YMAX)/PS_SC+0.5+PS_YOFF) );
+			(int)(xsize*(PS_XMAX)/PS_SC+0.5+PS_XOFF), 
+			(int)(ysize*(PS_YMAX)/PS_SC+0.5+PS_YOFF) );
 	else 
 		fprintf(outfile,"%d %d\n", 
-			(int)(ysize*(ps_eps ? 0.5 : 1.0)*(PS_YMAX)/PS_SC+0.5+PS_XOFF), 
-			(int)(xsize*(ps_eps ? 0.5 : 1.0)*(PS_XMAX)/PS_SC+0.5+PS_YOFF) );
-	if (!ps_eps)
-		fprintf(outfile,"%%%%Pages: (atend)\n");
+			(int)(ysize*(PS_YMAX)/PS_SC+0.5+PS_XOFF), 
+			(int)(xsize*(PS_XMAX)/PS_SC+0.5+PS_YOFF) );
+	fprintf(outfile,"%%%%Pages: (atend)\n");
 	fprintf(outfile,"%%%%EndComments\n");
 	fprintf(outfile,"/gnudict 40 dict def\ngnudict begin\n");
 	fprintf(outfile,"/Color %s def\n",ps_color ? "true" : "false");
@@ -231,18 +221,19 @@ PS_graphics()
 {
 struct termentry *t = &term_tbl[term];
 	ps_page++;
-	if (!ps_eps)
-		fprintf(outfile,"%%%%Page: %d %d\n",ps_page,ps_page);
+	fprintf(outfile,"%%%%Page: %d %d\n",ps_page,ps_page);
 	fprintf(outfile,"gnudict begin\n");
 	fprintf(outfile,"gsave\n");
 	fprintf(outfile,"%d %d translate\n",PS_XOFF,PS_YOFF);
-	fprintf(outfile,"%.3f %.3f scale\n", (ps_eps ? 0.5 : 1.0)/PS_SC,
-	                                     (ps_eps ? 0.5 : 1.0)/PS_SC);
-	if (!ps_portrait) {
-	    fprintf(outfile,"90 rotate\n0 %d translate\n", (int)(-PS_YMAX*ysize));
+	if (ps_portrait) {
+	    fprintf(outfile,"%.3f %.3f scale\n", xsize/PS_SC, ysize/PS_SC);
+	}
+	else {
+	    fprintf(outfile,"%.3f %.3f scale\n", ysize/PS_SC, xsize/PS_SC);
+	    fprintf(outfile,"90 rotate\n0 %d translate\n", -PS_YMAX);
 	}
 	fprintf(outfile,"0 setgray\n");
-	fprintf(outfile,"/%s findfont %d ",ps_font, (t->v_char) );
+	fprintf(outfile,"/%s findfont %d ", ps_font, (t->v_char) );
 	fprintf(outfile,"scalefont setfont\n");
 	fprintf(outfile,"newpath\n");
 	ps_path_count = 0;
@@ -259,8 +250,7 @@ PS_text()
 PS_reset()
 {
 	fprintf(outfile,"%%%%Trailer\n");
-	if (!ps_eps)
-		fprintf(outfile,"%%%%Pages: %d\n",ps_page);
+	fprintf(outfile,"%%%%Pages: %d\n",ps_page);
 }
 
 

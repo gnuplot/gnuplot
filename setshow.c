@@ -1,6 +1,10 @@
+#ifndef lint
+static char *RCSid = "$Id: setshow.c,v 3.26 92/03/24 22:34:20 woo Exp Locker: woo $";
+#endif
+
 /* GNUPLOT - setshow.c */
 /*
- * Copyright (C) 1986, 1987, 1990, 1991   Thomas Williams, Colin Kelley
+ * Copyright (C) 1986, 1987, 1990, 1991, 1992   Thomas Williams, Colin Kelley
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted, 
@@ -27,11 +31,11 @@
  *       Gershon Elber and many others.
  * 
  * Send your comments or suggestions to 
- *  pixar!info-gnuplot@sun.com.
+ *  info-gnuplot@ames.arc.nasa.gov.
  * This is a mailing list; to join it send a note to 
- *  pixar!info-gnuplot-request@sun.com.  
+ *  info-gnuplot-request@ames.arc.nasa.gov.  
  * Send bug reports to
- *  pixar!bug-gnuplot@sun.com.
+ *  bug-gnuplot@ames.arc.nasa.gov.
  */
 
 #include <stdio.h>
@@ -81,6 +85,7 @@ FILE*			outfile;
 char			outstr[MAX_ID_LEN+1] = "STDOUT";
 BOOLEAN			parametric	= FALSE;
 BOOLEAN			polar		= FALSE;
+BOOLEAN			hidden3d	= FALSE;
 int			angles_format	= ANGLES_RADIANS;
 int			mapping3d	= MAP3D_CARTESIAN;
 int			samples		= SAMPLES;
@@ -190,7 +195,7 @@ static void show_label(), show_arrow(), show_grid(), show_key();
 static void show_polar(), show_parametric(), show_tics(), show_ticdef();
 static void show_time(), show_term(), show_plot(), show_autoscale(), show_clip();
 static void show_contour(), show_mapping(), show_format(), show_logscale();
-static void show_variables(), show_surface();
+static void show_variables(), show_surface(), show_hidden3d();
 static void delete_label();
 static int assign_label_tag();
 static void delete_arrow();
@@ -208,14 +213,14 @@ set_command()
 	int_error(
 	"valid set options:  'angles' '{no}arrow', {no}autoscale', \n\
 	'{no}border', '{no}clip', 'cntrparam', '{no}contour', 'data style', \n\
-	'dummy', 'format', 'function style', '{no}grid', 'isosamples', \n\
-	'{no}key', '{no}label', '{no}logscale', 'mapping', 'offsets', \n\
-	'output', '{no}parametric', '{no}polar', 'rrange', 'samples', \n\
-	'size', '{no}surface', 'terminal', 'tics', 'ticslevel', '{no}time', \n\
-	'title', 'trange', 'urange', 'view', 'vrange', 'xlabel', 'xrange', \n\
-	'{no}xtics', '{no}xzeroaxis', 'ylabel', 'yrange', '{no}ytics', \n\
-	'{no}yzeroaxis', 'zero', '{no}zeroaxis', 'zlabel', 'zrange', \n\
-	'{no}ztics'", c_token);
+	'dummy', 'format', 'function style', '{no}grid', '{no}hidden3d', \n\
+	'isosamples', '{no}key', '{no}label', '{no}logscale', 'mapping', \n\
+	'offsets', 'output', '{no}parametric', '{no}polar', 'rrange', \n\
+	'samples', 'size', '{no}surface', 'terminal', 'tics', 'ticslevel', \n\
+	'{no}time', 'title', 'trange', 'urange', 'view', 'vrange', 'xlabel', \n\
+	'xrange', '{no}xtics', '{no}xzeroaxis', 'ylabel', 'yrange', \n\
+	'{no}ytics', '{no}yzeroaxis', 'zero', '{no}zeroaxis', 'zlabel', \n\
+	'zrange', '{no}ztics'", c_token);
 }
 
 /* return TRUE if a command match, FALSE if not */
@@ -316,6 +321,14 @@ set_one()
 		 clip_lines2 = FALSE;
 	    else
 		 int_error("expecting 'points', 'one', or 'two'", c_token);
+	    c_token++;
+	}
+	else if (almost_equals(c_token,"hi$dden3d")) {
+	    hidden3d = TRUE;
+	    c_token++;
+	}
+	else if (almost_equals(c_token,"nohi$dden3d")) {
+	    hidden3d = FALSE;
 	    c_token++;
 	}
 	else if (almost_equals(c_token,"ma$pping3d")) {
@@ -1757,13 +1770,13 @@ show_command()
 	int_error(
 	"valid show options:  'action_table', 'all', 'angles', 'arrow', \n\
 	'autoscale', 'border', 'clip', 'contour', 'data', 'dummy', 'format', \n\
-	'function', 'grid', 'key', 'label', 'logscale', 'mapping', 'offsets', \n\
-	'output', 'plot', 'parametric', 'polar', 'rrange', 'samples', \n\
-	'isosamples', 'view', 'size', 'terminal', 'tics', 'ticslevel', \n\
-	'time', 'title', 'trange', 'urange', 'vrange', 'variables', \n\
-	'version', 'xlabel', 'xrange', 'xtics', 'xzeroaxis', 'ylabel', \n\
-	'yrange', 'ytics', 'yzeroaxis', 'zlabel', 'zrange', 'ztics', 'zero', \n\
-	'zeroaxis'", c_token);
+	'function', 'grid', 'hidden', 'key', 'label', 'logscale', 'mapping', \n\
+	'offsets', 'output', 'plot', 'parametric', 'polar', 'rrange', \n\
+	'samples', 'isosamples', 'view', 'size', 'terminal', 'tics', \n\
+	'ticslevel', 'time', 'title', 'trange', 'urange', 'vrange', \n\
+	'variables', 'version', 'xlabel', 'xrange', 'xtics', 'xzeroaxis', \n\
+	'ylabel', 'yrange', 'ytics', 'yzeroaxis', 'zlabel', 'zrange', \n\
+	'ztics', 'zero', 'zeroaxis'", c_token);
 	screen_ok = FALSE;
 	(void) putc('\n',stderr);
 }
@@ -1963,6 +1976,11 @@ show_two()
 		show_surface();
 		c_token++;
 	}
+	else if (almost_equals(c_token,"hi$dden3d")) {
+		(void) putc('\n',stderr);
+		show_hidden3d();
+		c_token++;
+	}
 	else if (almost_equals(c_token,"xti$cs")) {
 	    show_tics(TRUE,FALSE,FALSE);
 	    c_token++;
@@ -2075,6 +2093,7 @@ show_two()
 		show_isosamples();
 		show_view();
 		show_surface();
+		show_hidden3d();
 		show_size();
 		show_term();
 		show_tics(TRUE,TRUE,TRUE);
@@ -2172,6 +2191,12 @@ static void
 show_surface()
 {
 	fprintf(stderr,"\tsurface is %sdrawn\n", draw_surface ? "" : "not ");
+}
+
+static void
+show_hidden3d()
+{
+	fprintf(stderr,"\thidden surface is %s\n", hidden3d ? "removed" : "drawn");
 }
 
 static void
@@ -2587,15 +2612,7 @@ long time();
 		PROGRAM, OS, version); 
 	fprintf(stderr,"\tpatchlevel %s\n",patchlevel);
      fprintf(stderr, "\tlast modified %s\n", date);
-	fprintf(stderr,"\tCopyright (C) 1986, 1987, 1990, 1991  %s, %s\n",
+	fprintf(stderr,"\nCopyright(C) 1986, 1987, 1990, 1991, 1992  %s, %s\n",
 		authors[x],authors[1-x]);
     fprintf(stderr, "\n\tSend bugs and comments to %s\n", bug_email);
 }
-
-
-
-
-
-
-
-

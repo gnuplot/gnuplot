@@ -1,6 +1,10 @@
+#ifndef lint
+static char *RCSid = "$Id: term.c,v 3.26 92/03/24 22:34:41 woo Exp Locker: woo $";
+#endif
+
 /* GNUPLOT - term.c */
 /*
- * Copyright (C) 1986, 1987, 1990, 1991   Thomas Williams, Colin Kelley
+ * Copyright (C) 1986, 1987, 1990, 1991, 1992   Thomas Williams, Colin Kelley
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted, 
@@ -27,11 +31,11 @@
  *       Gershon Elber and many others.
  * 
  * Send your comments or suggestions to 
- *  pixar!info-gnuplot@sun.com.
+ *  info-gnuplot@ames.arc.nasa.gov.
  * This is a mailing list; to join it send a note to 
- *  pixar!info-gnuplot-request@sun.com.  
+ *  info-gnuplot-request@ames.arc.nasa.gov.  
  * Send bug reports to
- *  pixar!bug-gnuplot@sun.com.
+ *  bug-gnuplot@ames.arc.nasa.gov.
  */
 
 #include <stdio.h>
@@ -39,6 +43,10 @@
 #include "setshow.h"
 #include "term.h"
 #include "bitmap.h"
+#ifdef NEXT
+#include <stdlib.h>
+#include "EpsViewer.h"
+#endif /* NEXT */
 
 /* for use by all drivers */
 #define sign(x) ((x) >= 0 ? 1 : -1)
@@ -298,7 +306,7 @@ do_arrow(sx, sy, ex, ey, head)
 #include "term/hpljii.trm"
 #endif
 
-#ifdef HPLJIII /* HP LaserJet III in HPGL mode */
+#ifdef HPLJII /* HP LaserJet III in HPGL mode */
 #  ifndef HPGL
 #    define HPGL
 #  endif
@@ -338,6 +346,10 @@ do_arrow(sx, sy, ex, ey, head)
 #include "term/latex.trm"
 #endif
 
+#ifdef PBM		/* PBMPLUS portable bitmap */
+#include "term/pbm.trm"
+#endif
+
 #ifdef POSTSCRIPT	/* POSTSCRIPT type */
 #include "term/post.trm"
 #endif
@@ -353,10 +365,6 @@ do_arrow(sx, sy, ex, ey, head)
 #ifdef AED
 #include "term/aed.trm"
 #endif /* AED */
-
-#ifdef AIFM
-#include "term/ai.trm"
-#endif /* AIFM */
 
 #ifdef CGI
 #include "term/cgi.trm"
@@ -392,6 +400,10 @@ do_arrow(sx, sy, ex, ey, head)
 #include "term/iris4d.trm"
 #endif /* IRIS4D */
 
+#ifdef NEXT
+#include "term/next.trm"
+#endif /* NEXT */
+
 #ifdef QMS
 #include "term/qms.trm"
 #endif /* QMS */
@@ -426,7 +438,7 @@ do_arrow(sx, sy, ex, ey, head)
   
 #ifdef AMIGASCREEN
 #include "term/amiga.trm"
-#endif
+#endif /* AMIGASCREEN */
 
 
 /* Dummy functions for unavailable features */
@@ -477,6 +489,13 @@ static UNKNOWN_null()
  */
 struct termentry term_tbl[] = {
     {"unknown", "Unknown terminal type - not a plotting device",
+	  100, 100, 1, 1,
+	  1, 1, options_null, UNKNOWN_null, UNKNOWN_null, 
+	  UNKNOWN_null, null_scale, UNKNOWN_null, UNKNOWN_null, UNKNOWN_null, 
+	  UNKNOWN_null, UNKNOWN_null, null_text_angle, 
+	  null_justify_text, UNKNOWN_null, UNKNOWN_null}
+
+    ,{"table", "Dump ASCII table of X Y [Z] values to output",
 	  100, 100, 1, 1,
 	  1, 1, options_null, UNKNOWN_null, UNKNOWN_null, 
 	  UNKNOWN_null, null_scale, UNKNOWN_null, UNKNOWN_null, UNKNOWN_null, 
@@ -634,15 +653,6 @@ struct termentry term_tbl[] = {
 	   AED_text, null_scale, AED_graphics, AED_move, AED_vector, 
 	   AED_linetype, AED_put_text, null_text_angle, 
 	   null_justify_text, do_point, do_arrow}
-#endif
-
-#ifdef AIFM
-    ,{"aifm", "Adobe Illustrator 3.0 Format",
-	   AI_XMAX, AI_YMAX, AI_VCHAR, AI_HCHAR, 
-	   AI_VTIC, AI_HTIC, AI_options, AI_init, AI_reset, 
-	   AI_text, null_scale, AI_graphics, AI_move, AI_vector, 
-	   AI_linetype, AI_put_text, AI_text_angle, 
-	   AI_justify_text, do_point, do_arrow}
 #endif
 
 #ifdef APOLLO
@@ -812,13 +822,13 @@ struct termentry term_tbl[] = {
 #endif
 
 #ifdef HPLJIII
-    ,{"pcl5_port", "HP laserjet iii (using HPGL plot vectors), portrait mode",
+    ,{"hpljiii_port", "HP laserjet iii (using HPGL plot vectors), portrait mode",
 	HPGL_XMAX, HPGL_YMAX, HPGL_VCHAR, HPGL_HCHAR,
 	HPGL_VTIC, HPGL_HTIC, options_null, HPLJIII_PORT_init, HPLJIII_reset,
 	HPGL_text, null_scale, HPGL_graphics, HPGL_move, HPGL_vector,
 	HPGL_linetype, HPGL_put_text, HPGL_text_angle,
 	null_justify_text, do_point, do_arrow}
-     ,{"pcl5_land", "HP laserjet iii (using HPGL plot vectors), landscape mode",
+     ,{"hpljiii_land", "HP laserjet iii (using HPGL plot vectors), landscape mode",
 	HPGL_XMAX, HPGL_YMAX, HPGL_VCHAR, HPGL_HCHAR,
 	HPGL_VTIC, HPGL_HTIC, options_null, HPLJIII_LAND_init, HPLJIII_reset,
 	HPGL_text, null_scale, HPGL_graphics, HPGL_move, HPGL_vector,
@@ -898,11 +908,44 @@ struct termentry term_tbl[] = {
 	   null_justify_text, line_and_point, do_arrow}
 #endif
 
+#ifdef NEXT
+    ,{"next", "NeXTstep window system",
+	   NEXT_XMAX, NEXT_YMAX, NEXT_VCHAR, NEXT_HCHAR, 
+	   NEXT_VTIC, NEXT_HTIC, NEXT_options, NEXT_init, NEXT_reset, 
+	   NEXT_text, do_scale, NEXT_graphics, NEXT_move, NEXT_vector, 
+	   NEXT_linetype, NEXT_put_text, NEXT_text_angle, 
+	   NEXT_justify_text, NEXT_point, do_arrow}
+#endif /* The postscript driver with NXImage displaying the postscript on screen */
+
+#ifdef PBM
+    ,{"pbm", "Portable bitmap",
+       PBM_XMAX, PBM_YMAX, PBM_VCHAR,
+       PBM_HCHAR, PBM_VTIC, PBM_HTIC, PBMoptions,
+       PBMinit, PBMreset, PBMtext, null_scale,
+       PBMgraphics, PBMmove, PBMvector, PBMlinetype,
+       PBMput_text, PBMtext_angle, null_justify_text, line_and_point,
+       do_arrow}
+    ,{"pgm", "Portable graymap",
+       PBM_XMAX, PBM_YMAX, PBM_VCHAR,
+       PBM_HCHAR, PBM_VTIC, PBM_HTIC, PBMoptions,
+       PBMinit, PBMreset, PGMtext, null_scale,
+       PGMgraphics, PBMmove, PBMvector, PGMlinetype,
+       PBMput_text, PBMtext_angle, null_justify_text, do_point,
+       do_arrow}
+    ,{"ppm", "Portable pixmap (color)",
+       PBM_XMAX, PBM_YMAX, PBM_VCHAR,
+       PBM_HCHAR, PBM_VTIC, PBM_HTIC, PBMoptions,
+       PBMinit, PBMreset, PPMtext, null_scale,
+       PPMgraphics, PBMmove, PBMvector, PPMlinetype,
+       PBMput_text, PBMtext_angle, null_justify_text, do_point,
+       do_arrow}
+#endif
+
 #ifdef POSTSCRIPT
     ,{"postscript", "PostScript graphics language [mode \042fontname\042 font_size]",
 	   PS_XMAX, PS_YMAX, PS_VCHAR, PS_HCHAR, 
 	   PS_VTIC, PS_HTIC, PS_options, PS_init, PS_reset, 
-	   PS_text, null_scale, PS_graphics, PS_move, PS_vector, 
+	   PS_text, do_scale, PS_graphics, PS_move, PS_vector, 
 	   PS_linetype, PS_put_text, PS_text_angle, 
 	   PS_justify_text, PS_point, do_arrow}
 #endif
@@ -1157,8 +1200,12 @@ init_terminal()
 
     /* GNUTERM environment variable is primary */
     gnuterm = getenv("GNUTERM");
-    if (gnuterm != (char *)NULL)
+    if (gnuterm != (char *)NULL) {
 	 term_name = gnuterm;
+#ifdef __TURBOC__
+         get_path();   /* So *_init() can find the BGI driver */
+#endif
+    }
     else {
 #ifdef __TURBOC__
 	   term_name = turboc_init();
@@ -1168,6 +1215,13 @@ init_terminal()
 #ifdef vms
 	   term_name = vms_init();
 #endif
+
+#ifdef NEXT
+	term = getenv("TERM");
+	if (term_name == (char *)NULL
+		&& term != (char *)NULL && strcmp(term,"next") == 0)
+	      term_name = "next";
+#endif /* NeXT */
 	   
 #ifdef SUN
 	   term = getenv("TERM");	/* try $TERM */

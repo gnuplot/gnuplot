@@ -1,5 +1,8 @@
 #!/bin/csh -f
 #
+# $Id: lasergnu,v 3.26 92/03/24 22:37:01 woo Exp Locker: woo $
+#
+#
 # Print gnuplot output on an Imagen or Postscript laser printer.
 
 set print_banner = on	# Print a banner page unless told otherwise.

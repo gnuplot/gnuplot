@@ -1,6 +1,10 @@
+/*
+ * $Id: iris4d.trm,v 3.26 92/03/24 22:35:35 woo Exp Locker: woo $
+ */
+
 /* GNUPLOT - iris4d.trm */
 /*
- * Copyright (C) 1990   
+ * Copyright (C) 1990, 1991, 1992   
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted, 
@@ -24,7 +28,7 @@
  *           (Applied Research Corporation) 7/1/89
  *           INTERNET: merritt@iris613.gsfc.nasa.gov
  * 
- * send your comments or suggestions to (pixar!info-gnuplot@sun.com).
+ * send your comments or suggestions to (info-gnuplot@ames.arc.nasa.gov).
  * 
  */
 

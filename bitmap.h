@@ -1,8 +1,18 @@
+/*
+ * $Id: bitmap.h,v 3.26 92/03/24 22:34:16 woo Exp Locker: woo $
+ */
+
 /* bitmap.h */
+
+#ifdef __TURBOC__
+#define FAR far
+#else
+#define FAR
+#endif
 
 /* allow up to 16 bit width for character array */
 typedef unsigned int char_row;
-typedef char_row * char_box;
+typedef char_row * FAR char_box;
 
 #define FNT_CHARS   96      /* Number of characters in the font set */
 
@@ -11,21 +21,21 @@ typedef char_row * char_box;
 #define FNT5X9_VBITS 9 /* actual number of rows of bits per char */
 #define FNT5X9_HCHAR 7 /* horizontal spacing between characters */
 #define FNT5X9_HBITS 5 /* actual number of bits per row per char */
-extern char_row fnt5x9[FNT_CHARS][FNT5X9_VBITS];
+extern char_row FAR fnt5x9[FNT_CHARS][FNT5X9_VBITS];
 
 #define FNT9X17 1
 #define FNT9X17_VCHAR 21 /* vertical spacing between characters */
 #define FNT9X17_VBITS 17 /* actual number of rows of bits per char */
 #define FNT9X17_HCHAR 13 /* horizontal spacing between characters */
 #define FNT9X17_HBITS 9 /* actual number of bits per row per char */
-extern char_row fnt9x17[FNT_CHARS][FNT9X17_VBITS];
+extern char_row FAR fnt9x17[FNT_CHARS][FNT9X17_VBITS];
 
 #define FNT13X25 2
 #define FNT13X25_VCHAR 31 /* vertical spacing between characters */
 #define FNT13X25_VBITS 25 /* actual number of rows of bits per char */
 #define FNT13X25_HCHAR 19 /* horizontal spacing between characters */
 #define FNT13X25_HBITS 13 /* actual number of bits per row per char */
-extern char_row fnt13x25[FNT_CHARS][FNT13X25_VBITS];
+extern char_row FAR fnt13x25[FNT_CHARS][FNT13X25_VBITS];
 
 
 typedef unsigned char pixels;  /* the type of one set of 8 pixels in bitmap */

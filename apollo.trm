@@ -1,3 +1,7 @@
+/*
+ * $Id: apollo.trm,v 3.26 92/03/24 22:34:58 woo Exp Locker: woo $
+ */
+
 /* GNUPLOT - apollo.trm */
 /*
     Apollo terminal driver for GNUplot.
@@ -13,7 +17,6 @@
     Ray Lischner (uunet!mntgfx!lisch)
     4 October 1989	file created for GNUplot 1.1
     26 March 1990	updated for GNUplot 2.0
-    30 October 1991	fixed minor problem in apollo_tic_sizes
 */
 
 #include <apollo/base.h>
@@ -149,8 +152,8 @@ static void apollo_tic_sizes(struct termentry* tbl)
     if (tbl->v_tic < APOLLO_VTIC)
 	tbl->v_tic = APOLLO_VTIC;
     tbl->h_tic = tbl->xmax / 50;
-    if (tbl->h_tic < APOLLO_HTIC)
-	tbl->h_tic = APOLLO_HTIC;
+    if (tbl->v_tic < APOLLO_HTIC)
+	tbl->v_tic = APOLLO_HTIC;
 }
 
 /*

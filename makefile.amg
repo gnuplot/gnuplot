@@ -1,4 +1,8 @@
 # Makefile for SAS/C 5.10 on the Amiga
+#
+# $Id: makefile.amg,v 3.26 92/03/24 22:36:53 woo Exp Locker: woo $
+#
+#
 
 CC = lc
 
@@ -22,7 +26,7 @@ CSOURCE5 = term/aed.trm term/cgi.trm term/dumb.trm term/dxy.trm \
 	term/eepic.trm term/epson.trm term/fig.trm term/hp26.trm \
 	term/hp2648.trm term/hpgl.trm term/hpljii.trm term/vws.trm
 CSOURCE6 = term/impcodes.h term/imagen.trm term/object.h \
-	term/iris4d.trm term/kyo.trm term/latex.trm term/pc.trm \
+	term/iris4d.trm term/kyo.trm term/latex.trm term/pbm.trm term/pc.trm \
 	term/amiga.trm
 CSOURCE7 = term/post.trm term/qms.trm term/regis.trm term/sun.trm \
 	term/t410x.trm term/tek.trm term/unixpc.trm term/unixplot.trm \
