@@ -1,3 +1,7 @@
+2000-11-22  Alexander Mai <st002279@hrzpub.tu-darmstadt.de>
+        * src/gplt_x11.c: fix two crashes (segmentation fault
+	  and floating exception)
+
 2000-11-22  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/pm3d.h, tables.h, set.c, show.c, tables.c, unset.c 
