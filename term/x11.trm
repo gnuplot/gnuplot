@@ -1,5 +1,5 @@
 /*
- * $Id: x11.trm,v 1.82 2003/10/23 18:49:00 uid93776 Exp $
+ * $Id: x11.trm,v 1.83 2003/10/31 10:13:09 mikulik Exp $
  *
  */
 
@@ -980,22 +980,22 @@ X11_text()
 		axis_mask |= (1 << i);
 	}
 	PRINT2("S %2d %d\n", -1, axis_mask);
-	PRINT5("S %2d %14.3lg %14d %14.3lg %14.3lg\n", FIRST_X_AXIS,
+	PRINT5("S %2d %14.3g %14d %14.3g %14.3g\n", FIRST_X_AXIS,
 		axis_array[FIRST_X_AXIS].min, 
 		axis_array[FIRST_X_AXIS].term_lower,
 		axis_array[FIRST_X_AXIS].term_scale,
 		axis_array[FIRST_X_AXIS].log ? axis_array[FIRST_X_AXIS].log_base : 0);
-	PRINT5("S %2d %14.3lg %14d %14.3lg %14.3lg\n", FIRST_Y_AXIS,
+	PRINT5("S %2d %14.3g %14d %14.3g %14.3g\n", FIRST_Y_AXIS,
 		axis_array[FIRST_Y_AXIS].min, 
 		axis_array[FIRST_Y_AXIS].term_lower,
 		axis_array[FIRST_Y_AXIS].term_scale,
 		axis_array[FIRST_Y_AXIS].log ? axis_array[FIRST_Y_AXIS].log_base : 0);
-	PRINT5("S %2d %14.3lg %14d %14.3lg %14.3lg\n", SECOND_X_AXIS,
+	PRINT5("S %2d %14.3g %14d %14.3g %14.3g\n", SECOND_X_AXIS,
 		axis_array[SECOND_X_AXIS].min, 
 		axis_array[SECOND_X_AXIS].term_lower,
 		axis_array[SECOND_X_AXIS].term_scale,
 		axis_array[SECOND_X_AXIS].log ? axis_array[SECOND_X_AXIS].log_base : 0);
-	PRINT5("S %2d %14.3lg %14d %14.3lg %14.3lg\n", SECOND_Y_AXIS,
+	PRINT5("S %2d %14.3g %14d %14.3g %14.3g\n", SECOND_Y_AXIS,
 		axis_array[SECOND_Y_AXIS].min, 
 		axis_array[SECOND_Y_AXIS].term_lower,
 		axis_array[SECOND_Y_AXIS].term_scale,

@@ -1,3 +1,8 @@
+2003-11-01  Ethan Merritt <merritt@u.washington.edu>
+
+	* term/x11.trm: Do not use %lg to printf doubles. Some compilers
+	complain because it is not strict ANSIC.
+
 2003-10-31  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* term/x11.trm src/gplt_x11.c: Added  #ifdef PIPE_IPC  where missing
