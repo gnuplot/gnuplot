@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util.c,v 1.9 1999/06/11 11:18:59 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: util.c,v 1.10 1999/06/14 19:20:59 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - util.c */
@@ -69,7 +69,7 @@ int c;
 int
 equals(t_num, str)
 int t_num;
-char *str;
+const char *str;
 {
     register int i;
 
@@ -92,7 +92,7 @@ char *str;
 int
 almost_equals(t_num, str)
 int t_num;
-char *str;
+const char *str;
 {
     register int i;
     register int after = 0;
@@ -315,6 +315,30 @@ int start, end;
 }
 
 
+/* Our own version of strdup()
+ * Make copy of string into gp_alloc'd memory
+ * As with all conforming str*() functions,
+ * it is the caller's responsibility to pass
+ * valid parameters!
+ */
+char *
+gp_strdup(s)
+const char *s;
+{
+    char *d;
+
+#ifndef HAVE_STRDUP
+    d = gp_alloc(strlen(s) + 1, "gp_strdup");
+    memcpy (d, s, strlen(s) + 1);
+#else
+    d = strdup(s);
+#endif
+    if (!d)
+	int_error(NO_CARET, "Cannot strdup string");
+    return d;
+}
+
+
 void
 convert(val_ptr, t_num)
 struct value *val_ptr;
@@ -492,12 +516,12 @@ int i;
 
 #if defined(VA_START) && defined(ANSI_C)
 void
-os_error(int t_num, char *str,...)
+os_error(int t_num, const char *str,...)
 #else
 void
 os_error(t_num, str, va_alist)
 int t_num;
-char *str;
+const char *str;
 va_dcl
 #endif
 {
@@ -550,12 +574,12 @@ va_dcl
 
 #if defined(VA_START) && defined(ANSI_C)
 void
-int_error(int t_num, char *str,...)
+int_error(int t_num, const char *str,...)
 #else
 void
 int_error(t_num, str, va_alist)
 int t_num;
-char str[];
+const char str[];
 va_dcl
 #endif
 {
@@ -595,12 +619,12 @@ va_dcl
 /* Warn without bailing out to command line. Not a user error */
 #if defined(VA_START) && defined(ANSI_C)
 void
-int_warn(int t_num, char *str,...)
+int_warn(int t_num, const char *str,...)
 #else
 void
 int_warn(t_num, str, va_alist)
 int t_num;
-char str[];
+const char str[];
 va_dcl
 #endif
 {
