@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: bitmap.c,v 1.2 1998/11/04 14:52:55 lhecking Exp $";
+static char *RCSid = "$Id: bitmap.c,v 1.2.2.1 1999/09/29 13:48:23 lhecking Exp $";
 #endif
 
 /* GNUPLOT - bitmap.c */
@@ -683,7 +683,7 @@ struct rgb web_color_rgbs[] =
 {
     { 0xff, 0xff, 0xff },		/* background: white         */
     { 0x00, 0x00, 0x00 },		/*    borders: black         */
-    { 0x40, 0x40, 0x40 },		/* x & y axes: grey          */
+    { 0xa0, 0xa0, 0xa0 },		/* x & y axes: grey          */
     { 0xff, 0x00, 0x00 },		/*   color 01: red           */
     { 0x00, 0xc0, 0x00 },		/*   color 02: dark green    */
     { 0x00, 0x80, 0xff },		/*   color 03: dark blue     */
@@ -847,7 +847,7 @@ unsigned int x, y, value;
 
 
 /* Currently unused */
-#if 0
+#if 1 /* HBB 991008: used by PNG, now */
 /*
  * get pixel (x,y) value
  */

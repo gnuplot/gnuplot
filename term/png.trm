@@ -1,5 +1,5 @@
 /*
- * $Id: png.trm,v 1.11.2.2 1999/09/29 11:30:22 lhecking Exp $
+ * $Id: png.trm,v 1.11.2.3 1999/09/29 13:54:08 lhecking Exp $
  *
  */
 
@@ -45,6 +45,7 @@
  *  Alexander Lehmann	original code,
  *                      derived from pbm.trm by Russell Lang.
  *  Eric S. Raymond	update for pnglib-1.0.3; transparency.
+ *  H.-B. Broeker       fixes to Eric's changes
  *
  * send your comments or suggestions to (info-gnuplot@dartmouth.edu).
  *
@@ -112,12 +113,16 @@ PNG_options()
 {
     png_font = 1;	/* small */
     png_mode = 2;	/* color */
+    png_transparent = 0;	/* use opaque image background */
 
     term_options[0] = NUL;
 
     while (!END_OF_COMMAND) {
 	if (almost_equals(c_token, "t$ransparent"))
 	    png_transparent = 1;
+	/* HBB 991008: added this option, for completeness */ 
+	else if (almost_equals(c_token, "notr$ansparent"))
+	    png_transparent = 0;
 	else if (almost_equals(c_token, "s$mall"))
 	    png_font = 1;
 	else if (almost_equals(c_token, "me$dium"))
@@ -135,12 +140,20 @@ PNG_options()
 	    /* reset to default, since term is already set */
 	    png_font = 1;
 	    png_mode = 2;
-	    int_error("expecting: {small, medium, large}, transparent, and {monochrome, gray, color}", c_token);
+	    png_transparent = 0;
+	    int_error("expecting: {small, medium, large}, [no]transparent, or {monochrome, gray, color}", c_token);
 	}
 	c_token++;
     }
 
     /* setup options string */
+
+    /* HBB 991008: moved this block to here, so 'transparent' gets
+     * printed out first. Don't print 'notransparent', for now, to
+     * protect older gnuplots. Scripts with 'transparent' in them
+     * won't work as wanted, with older versions, so put it here. */
+    if (png_transparent)
+	strcat(term_options, " transparent");
 
     switch (png_font) {
     case 3:
@@ -168,8 +181,6 @@ PNG_options()
 	break;
     }
 
-    if (png_transparent)
-	strcat(term_options, " transparent");
 }
 
 
@@ -226,7 +237,7 @@ PNG_graphics()
 
     switch (png_mode) {
     case 2:
-	numplanes = 4;
+	numplanes = 8;
 	break;
     case 1:
 	numplanes = 3;
@@ -297,7 +308,7 @@ PNG_text()
     info_ptr->width = b_ysize;
     info_ptr->height = b_xsize;
 
-    info_ptr->bit_depth = png_mode == 0 ? 1 : 4;
+    info_ptr->bit_depth = png_mode == 0 ? 1 : 8;
     info_ptr->color_type = png_mode == 2 ? PNG_COLOR_TYPE_PALETTE :
 	PNG_COLOR_TYPE_GRAY;
     if (png_mode == 2) {
@@ -358,6 +369,7 @@ PNG_text()
 
     /* dump bitmap in raster mode */
     for (x = b_xsize - 1; x >= 0; x--) {
+#if 0
 	row = (b_ysize / 8) - 1;
 	for (j = row; j >= 0; j--) {
 	    mask = 0x80;
@@ -387,10 +399,14 @@ PNG_text()
 		if (png_mode == 1)
 		    value = 7 - value;
 
-		prow[(row - j) * 8 + i] = (png_byte) value;
+		prow[(row - j) * 8 + i] = (png_byte) (value & 0xFF) ;
 		mask >>= 1;
 	    }
 	}
+#else
+	for (j=b_ysize - 1; j>= 0; j--)
+	       prow[j] = (png_byte)b_getpixel(j, x);
+#endif							     
 	png_write_rows(png_ptr, &prow, 1);
     }
 
@@ -418,13 +434,27 @@ int linetype;
 {
     switch (png_mode) {
     case 2:
+      /* HBB 991008: this makes the grid lines and axes (-1) look the
+       * same as the borders (-2). That's ugly, IMHO. GIF uses a
+       * dashed line, for this, but libpng doesn't seem able to do
+       * that. But a look into the palette turns up that color 2
+       * is grey, and is currently unused... Let's see: */
+#if 0
 	if (linetype == -1 || linetype == -2)
 	    linetype = 1;
+#else
+	if (linetype == -2)
+	    linetype = 1;
+	else if (linetype == -1)
+	    linetype = 2;
+#endif
 	else
 	{
+	  /* HBB 991008: moved the += 3 down, so colors 0, 1, 2 are
+	   * _not_ used by the regular plots, as it should be */
+	    if (linetype >= (WEB_N_COLORS - 3))
+		linetype %= (WEB_N_COLORS - 3);
 	    linetype += 3;
-	    if (linetype >= WEB_N_COLORS)
-		linetype %= WEB_N_COLORS;
 	}
 	b_setvalue(linetype);
 	break;
