@@ -8,7 +8,7 @@
 # Authors:
 #   Roger Fearick, Rolf Niepraschk and Alexander Mai
 #
-# release: 19980820
+# release: 19980824
 #
 
 # SHELL=cmd
@@ -69,7 +69,7 @@ O3 = o
 # generic flags for compiler and linker under OS/2
 OS2FLAGS = -DOS2 -DHELPFILE=\"$(HELPFILE)\"
 # flags for compiling with EMX/GCC
-EMXSPECIFIC = -DREADLINE -DHAVE_STRNICMP -DPIPES -DHAVE_STRERROR -DHAVE_SYS_SELECT_H
+EMXSPECIFIC = -DREADLINE -DHAVE_STRNICMP -DPIPES -DHAVE_STRERROR -DHAVE_SYS_SELECT_H -DHAVE_SYS_STAT_H
 ifdef GNU_RL
   EMXSPECIFIC += -DGNU_READLINE
   LIBS = -lreadline -ltermcap
@@ -77,14 +77,14 @@ else
   LIBS =
 endif
 ifdef DEBUG
-CFLAGS  = $(OS2FLAGS) -g -Wall
+CFLAGS  = $(OS2FLAGS) -g -Wall  -Wno-comment -O0
 LFLAGS  = -Zcrtdll
-CFLAGS2 = $(OS2FLAGS) -Zomf -Zsys -Zmt -g -Wall
+CFLAGS2 = $(OS2FLAGS) -Zomf -Zsys -Zmt -g -Wall -O0
 LFLAGS2 = -Zomf -Zmt -Zcrtdll -Zlinker /debug
-CFLAGS3 = $(OS2FLAGS) $(EMXSPECIFIC) -g -Wall
+CFLAGS3 = $(OS2FLAGS) $(EMXSPECIFIC) -g -Wall -O0
 LFLAGS3 = 
 else
-CFLAGS  = $(OS2FLAGS) -O2 -Wall -Wno-unused
+CFLAGS  = $(OS2FLAGS) -O2 -Wall -Wno-unused -Wno-comment
 LFLAGS  = -s -Zcrtdll 
 CFLAGS2 = $(OS2FLAGS) -Zomf -Zcrtdll -Zmt -O2 -Wall -Wno-unused
 LFLAGS2 = -Zomf -Zmt -Zsys -s
@@ -202,7 +202,7 @@ gnuplot.tex:  $(D)gnuplot.doc doc2tex.exe
 gnuplot.ps: gnuplot.dvi
 	dvips -o gnuplot.ps gnuplot.dvi
 gnuplot.inf:  $(D)gnuplot.ipf
-	ipfc -i $(D)gnuplot.ipf gnuplot.inf
+	ipfc /inf $(D)gnuplot.ipf gnuplot.inf
 gnuplot.gih:  $(D)gnuplot.doc doc2gih.exe 
 	doc2gih $(D)gnuplot.doc gnuplot.gih
 gnuplot.html: $(D)gnuplot.doc doc2html.exe
