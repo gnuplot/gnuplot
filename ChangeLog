@@ -1,39 +1,50 @@
+2003-12-15  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/color.c (draw_color_smooth_box): Fixed position of color box
+	to what it is in default view orientation, to make it stop
+	rotating along with the plot.
+
 2003-12-12  Ethan Merritt  <merritt@u.washington.edu>
 
 	* docs/gnuplot.doc docs/gnuplot.texi term/post.trm term/x11.trm:
-	Update the "New in Version 4.0" section of the docs, and change all the
-	URLs for demos to point to the SourceForge web site rather than to
-	Alex Woo's old web site at nasa.gov.
+	Update the "New in Version 4.0" section of the docs, and change
+	all the URLs for demos to point to the SourceForge web site rather
+	than to Alex Woo's old web site at nasa.gov.
 
-	* docs/gnuplot.doc docs/gnuplot.texi docs/titlepag.tex src/Makefile.am
-	src/plot.c: Change references to mailing lists to 
-		gnuplot-info@lists.sourceforge.net
-		gnuplot-bugs@lists.sourceforge.net
-		gnuplot-beta@lists.sourceforge.net
-	There are many more explicit references to dartmouth.edu in the source
-	files and in the hard-wired Makefiles that I did not change.
+	* docs/gnuplot.doc docs/gnuplot.texi docs/titlepag.tex
+	src/Makefile.am src/plot.c: Change references to mailing lists to
+
+	gnuplot-info@lists.sourceforge.net
+	gnuplot-bugs@lists.sourceforge.net
+	gnuplot-beta@lists.sourceforge.net
+
+	There are many more explicit references to dartmouth.edu in the
+	source files and in the hard-wired Makefiles that I did not
+	change.
 
 	* demo/bivariat.dem: Fix key placement in final plot.
 
-	* demo/webify.pl: (New File) This is a perl script that converts a
-	single gnuplot demo script into a web page with associated png images.
-	I used it to generate a new set of demo pages for version 4 on
-		gnuplot.sourceforge.net/demo/index.html
+	* demo/webify.pl: New File. This is a perl script that converts a
+	single gnuplot demo script into a web page with associated png
+	images.  I used it to generate a new set of demo pages for version
+	4 on gnuplot.sourceforge.net/demo/index.html
 
 2003-12-05  Ethan Merritt  <merritt@u.washington.edu>
 
-	* term/x11.trm: Leave current window unchanged when closing old window
-	using the 'set term x11 <old> close' command.
+	* term/x11.trm: Leave current window unchanged when closing old
+	window using the 'set term x11 <old> close' command.
 
 2003-12-02  Ethan Merritt  <merritt@u.washington.edu>
 
-	* term/svg.trm: Add conditional code to make svg output compatible with
-	the Sodipodi svg viewer/editor. Sodipodi does not yet implement the full
-	svg syntax, including the "currentColor" attribute. This change was
-	checked for correctness using the Adobe svg viewer, which produces the
-	same display given either the original or the simplified output.
+	* term/svg.trm: Add conditional code to make svg output compatible
+	with the Sodipodi svg viewer/editor. Sodipodi does not yet
+	implement the full svg syntax, including the "currentColor"
+	attribute. This change was checked for correctness using the Adobe
+	svg viewer, which produces the same display given either the
+	original or the simplified output.
 
-	* term/svg.trm: Force a new graphics context whenever linewidth changes.
+	* term/svg.trm: Force a new graphics context whenever linewidth
+	changes.
 
 2003-12-01  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: color.c,v 1.41 2003/11/13 08:18:15 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: color.c,v 1.42 2003/11/18 09:36:04 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - color.c */
@@ -520,19 +520,33 @@ draw_color_smooth_box()
 	cb_x_to += cb_x_from;
 	cb_y_to += cb_y_from;
     } else {			/* color_box.where == SMCOLOR_BOX_DEFAULT */
+#if 0 
+	/* HBB 20031215: replaced this by view-independant placment method */
 	double dx = (X_AXIS.max - X_AXIS.min);
 	/* don't use CB_AXIS here, CB_AXIS might be completely
 	 * unrelated to the Z axis 26 Jan 2002 (joze) */
 	double dz = Z_AXIS.max - Z_AXIS.min;
+
 	/* note: [0.05 0.35; 0.20 0.00] were the values before cbaxis */
-	map3d_xy(X_AXIS.max + dx * 0.03, Y_AXIS.max, base_z + dz * 0.35, &cb_x_from, &cb_y_from);
-	map3d_xy(X_AXIS.max + dx * 0.11, Y_AXIS.max, ceiling_z - dz * 0, &cb_x_to, &cb_y_to);
+	map3d_xy(X_AXIS.max + dx * 0.03, Y_AXIS.max, base_z + dz * 0.35,
+		 &cb_x_from, &cb_y_from);
+	map3d_xy(X_AXIS.max + dx * 0.11, Y_AXIS.max, ceiling_z - dz * 0,
+		 &cb_x_to, &cb_y_to);
 	if (cb_y_from == cb_y_to || cb_x_from == cb_x_to) { /* map, i.e. plot with "set view 0,0 or 180,0" */
 	    dz = Y_AXIS.max - Y_AXIS.min;
 	    /* note: [0.04 0.25; 0.18 0.25] were the values before cbaxis */
 	    map3d_xy(X_AXIS.max + dx * 0.025, Y_AXIS.min, base_z, & cb_x_from, &cb_y_from);
 	    map3d_xy(X_AXIS.max + dx * 0.075, Y_AXIS.max, ceiling_z, &cb_x_to, &cb_y_to);
 	}
+#else
+	/* HBB 20031215: new code.  Constants fixed to what the result
+	 * of the old code in default view (set view 60,30,1,1)
+	 * happened to be. Somebody fix them if they're not right!*/
+	cb_x_from = xmiddle + 0.709 * xscaler;
+	cb_x_to   = xmiddle + 0.778 * xscaler;
+	cb_y_from = ymiddle - 0.147 * yscaler;
+	cb_y_to   = ymiddle + 0.497 * yscaler;
+#endif
 	/* now corrections for outer tics */
 	if (color_box.rotation == 'v') {
 	    int len = (tic_in ? -1 : 1) * ticscale * (term->h_tic); /* positive for outer tics */
