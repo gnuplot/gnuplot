@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.49 2000/12/20 19:49:23 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.50 2001/01/22 18:30:21 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -443,13 +443,17 @@ set_command()
 	    set_timedata(FIRST_X_AXIS);
 	    /* HBB 20000506: the old cod this this, too, although it
 	     * serves no useful purpose, AFAICS */
-	    set_timedata(T_AXIS);
-	    set_timedata(U_AXIS);
+	    /* HBB 20010201: Changed implementation to fix bug
+	     * (c_token advanced too far) */
+	    axis_array[T_AXIS].is_timedata
+	      = axis_array[U_AXIS].is_timedata
+	      = axis_array[FIRST_X_AXIS].is_timedata;
 	    break;
 	case S_YDATA:
 	    set_timedata(FIRST_Y_AXIS);
 	    /* dito */
-	    set_timedata(V_AXIS);
+	    axis_array[V_AXIS].is_timedata
+	      = axis_array[FIRST_X_AXIS].is_timedata;
 	    break;
 	case S_ZDATA:
 	    set_timedata(FIRST_Z_AXIS);

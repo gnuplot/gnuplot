@@ -1,3 +1,8 @@
+2001-02-01  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/set.c (set_command): Fix incorrect c_token movement in 'set
+ 	xdata {time}'.
+
 2001-01-30  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/show.c (show_command): Fix broken 'show ticslevel' and 'show
