@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.77 2002/10/21 10:24:18 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.78 2002/10/25 16:37:54 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -1840,7 +1840,6 @@ finish_filled_curve(points, corners, filledcurves_options)
     fprintf(stderr, "\n");
     }
 #endif
-    points = 0;
 }
 
 
@@ -1921,11 +1920,13 @@ struct curve_points *plot;
 		    /* from outrange to inrange */
 		    if (!clip_lines1) {
 			finish_filled_curve(points, corners, &plot->filledcurves_options);
+			points = 0;
 			/* move(x,y) */
 			corners[points].x = x;
 			corners[points++].y = y;
 		    } else {
 			finish_filled_curve(points, corners, &plot->filledcurves_options);
+			points = 0;
 			edge_intersect(plot->points, i, &ex, &ey);
 			/* move(map_x(ex),map_y(ey)); */
 			corners[points].x = map_x(ex);
@@ -1937,6 +1938,7 @@ struct curve_points *plot;
 		    }
 		} else {	/* prev == UNDEFINED */
 		    finish_filled_curve(points, corners, &plot->filledcurves_options);
+		    points = 0;
 		    /* move(x,y) */
 		    corners[points].x = x;
 		    corners[points++].y = y;
@@ -1960,6 +1962,7 @@ struct curve_points *plot;
 		    if (clip_lines2) {
 			if (two_edge_intersect(plot->points, i, lx, ly)) {
 			    finish_filled_curve(points, corners, &plot->filledcurves_options);
+			    points = 0;
 			    /* move(map_x(lx[0]),map_y(ly[0])); */
 			    corners[points].x = map_x(lx[0]);
 			    corners[points++].y = map_y(ly[0]);

@@ -1,3 +1,9 @@
+2002-12-02  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* src/graphics.c(plot_filledcurves): Added forgotten points=0; after
+	call to finish_filled_curve(). If fixes sequent drawing of closed curves
+	from one data file.
+
 2002-12-01  Ethan Merritt  <merritt@u.washington.edu>
 
         * term/cgm.trm: Tweak code so gcc3.2 does not complain about
@@ -1483,7 +1489,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/11/28 16:14:56 $).
+	last modification date (from the tag $Date: 2002/12/02 05:16:25 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
