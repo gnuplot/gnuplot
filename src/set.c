@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.168 2005/02/18 09:47:41 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.169 2005/03/02 20:35:36 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -130,6 +130,7 @@ static void set_samples __PROTO((void));
 static void set_size __PROTO((void));
 static void set_style __PROTO((void));
 static void set_surface __PROTO((void));
+static void set_table __PROTO((void));
 static void set_terminal __PROTO((void));
 static void set_termoptions __PROTO((void));
 static void set_tics __PROTO((void));
@@ -422,6 +423,9 @@ fprintf(stderr,"BLA \n");
 	    break;
 	case S_SURFACE:
 	    set_surface();
+	    break;
+	case S_TABLE:
+	    set_table();
 	    break;
 	case S_TERMINAL:
 	    set_terminal();
@@ -3148,6 +3152,31 @@ set_surface()
 }
 
 
+/* process 'set table' command */
+static void
+set_table()
+{
+    char *tablefile;
+
+    c_token++;
+
+    if (table_outfile) {
+	fclose(table_outfile);
+	table_outfile = NULL;
+    }
+
+    if ((tablefile = try_to_get_string())) {
+    /* 'set table "foo"' creates a new output file */
+	if (!(table_outfile = fopen(tablefile, "w")))
+	   os_error(c_token, "cannot open table output file");
+	free(tablefile);
+    }
+
+    table_mode = TRUE;
+
+}
+
+
 /* process 'set terminal' comamnd */
 static void
 set_terminal()
@@ -3162,6 +3191,13 @@ set_terminal()
 	screen_ok = FALSE;
 	return;
     }
+
+#ifdef BACKWARDS_COMPATIBLE
+    if (equals(c_token,"table")) {
+	set_table();
+	return;
+    }
+#endif
 
     /* `set term push' */
     if (equals(c_token,"push")) {
@@ -3184,6 +3220,9 @@ set_terminal()
     if (equals(c_token,"pop")) {
 	pop_terminal();
 	c_token++;
+#ifdef BACKWARDS_COMPATIBLE
+	table_mode = FALSE;
+#endif
 	return;
     } /* set term pop */
 

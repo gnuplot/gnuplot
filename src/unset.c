@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.76 2005/03/02 20:35:36 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.77 2005/03/03 04:09:49 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -133,6 +133,7 @@ static void unset_samples __PROTO((void));
 static void unset_size __PROTO((void));
 static void unset_style __PROTO((void));
 static void unset_surface __PROTO((void));
+static void unset_table __PROTO((void));
 static void unset_terminal __PROTO((void));
 static void unset_tics __PROTO((AXIS_INDEX));
 static void unset_ticscale __PROTO((void));
@@ -337,6 +338,9 @@ unset_command()
 	break;
     case S_SURFACE:
 	unset_surface();
+	break;
+    case S_TABLE:
+	unset_table();
 	break;
     case S_TERMINAL:
 	unset_terminal();
@@ -1290,6 +1294,17 @@ static void
 unset_surface()
 {
     draw_surface = FALSE;
+}
+
+
+/* process 'unset table' command */
+static void
+unset_table()
+{
+    if (table_outfile)
+	fclose(table_outfile);
+    table_outfile = NULL;
+    table_mode = FALSE;
 }
 
 

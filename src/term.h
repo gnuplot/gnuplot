@@ -1,5 +1,5 @@
 /*
- * $Id: term.h,v 1.28 2005/02/09 11:43:10 mikulik Exp $
+ * $Id: term.h,v 1.29 2005/03/02 19:44:57 sfeam Exp $
  */
 
 /* GNUPLOT - term.h */
@@ -55,7 +55,6 @@
 #ifdef SHORT_TERMLIST
 # include "dumb.trm"		/* dumb terminal */
 # include "post.trm"		/* postscript */
-# include "table.trm"		/* built-in, but used for the documentation */
 
 #ifdef GP_ENH_EST
 # include "estimate.trm"	/* used for enhanced text processing */
@@ -358,9 +357,6 @@
 
 /* W3C Scalable Vector Graphics file */
 #include "svg.trm"
-
-/* built-in, but used for the documentation */
-#include "table.trm"
 
 /* x11 tgif tool */
 #include "tgif.trm"

@@ -75,6 +75,9 @@ float rmargin = -1;
 /* space between top egde and ytop in chars (-1: computed) */
 float tmargin = -1;
 
+/* File descriptor for output during 'set table' mode */
+FILE *table_outfile = NULL;
+TBOOLEAN table_mode = FALSE;
 
 /* Pointer to the start of the linked list of 'set label' definitions */
 struct text_label *first_label = NULL;

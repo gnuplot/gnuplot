@@ -1,5 +1,32 @@
 2005-03-24  Ethan Merritt  <merritt@u.washington.edu>
 
+	* docs/gnuplot.doc src/set.c (set_table) src/unset.c (unset_table) 
+	src/tables.h src/tables.c:
+	New commands
+	    set table {"outfile"}
+	    unset table
+	These replace the old 'set term table', which never worked in general.
+
+	* src/gadgets.c src/gadgets.h:  TBOOLEAM table_mode and output file
+	pointer table_outfile shared by plot2d and plot3d in table mode.
+
+	* src/plot2d.c (print_table) src/plot3d.c (print_3dtable):
+	If table_mode is set we send tabular output to table_outfile, if it was
+	specified, otherwise send it to gpoutfile.
+
+	* src/set.c (set_terminal): Allow 'set term table' as a special case
+	backwards compatibility option.  It doesn't work all that well, but then
+	again the original didn't work either.
+
+	* demo/all.dem demo/vector.dem: Rework vector.dem to use the new
+	commands.  This makes it safe to include as part of all.dem because
+	unlike the old 'set term table' it doesn't trash the current state of
+	the output device.
+
+	* src/term.c src/term.h: Remove table.trm from the list of terminals.
+
+2005-03-24  Ethan Merritt  <merritt@u.washington.edu>
+
 	* term/post.trm: Initialize the data structure pointer ps_params to
 	point to the normal postscript mode values; without this, setting
 	environmental variable GNUTERM to any of the PostScript terminal modes

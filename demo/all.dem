@@ -1,5 +1,5 @@
 #
-# $Id: all.dem,v 1.16 2004/09/29 17:14:49 sfeam Exp $
+# $Id: all.dem,v 1.17 2004/10/19 03:26:13 sfeam Exp $
 #
 # Executes ALL demos in this directory, in functionality order.
 #
@@ -163,10 +163,9 @@ print "********************** file arrowstyle.dem *********************"
 load "arrowstyle.dem"
 reset
 
-# Currently broken because of 'push term / set output / pop term'
-# print "********************** file vector.dem *********************"
-# load "vector.dem"
-# reset
+print "********************** file vector.dem *********************"
+load "vector.dem"
+reset
 
 print "********************** file datastrings.dem *********************"
 load "datastrings.dem"

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.95 2005/03/21 08:49:20 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.96 2005/03/23 16:47:02 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -973,11 +973,12 @@ print_3dtable(int pcount)
     int i, surface;
     struct coordinate GPHUGE *point;
     char *buffer = gp_alloc(150, "print_3dtable output buffer");
+    FILE *outfile = (table_outfile) ? table_outfile : gpoutfile;
 
     for (surface = 0, this_plot = first_3dplot;
 	 surface < pcount;
 	 this_plot = this_plot->next_sp, surface++) {
-	fprintf(gpoutfile, "\n#Surface %d of %d surfaces\n", surface, pcount);
+	fprintf(outfile, "\n#Surface %d of %d surfaces\n", surface, pcount);
 
 	if (draw_surface) {
 	    struct iso_curve *icrvs;
@@ -987,7 +988,7 @@ print_3dtable(int pcount)
 	    for (curve = 0, icrvs = this_plot->iso_crvs;
 		 icrvs && curve < this_plot->num_iso_read;
 		 icrvs = icrvs->next, curve++) {
-		fprintf(gpoutfile, "\n#IsoCurve %d, %d points\n#x y z type\n",
+		fprintf(outfile, "\n#IsoCurve %d, %d points\n#x y z type\n",
 			curve, icrvs->p_count);
 		for (i = 0, point = icrvs->points;
 		     i < icrvs->p_count;
@@ -997,18 +998,18 @@ print_3dtable(int pcount)
 #define OUTPUT_NUMBER(field, axis)					\
 		    gprintf(buffer, 150, axis_array[axis].formatstring,	\
 			    1.0, point->field);				\
-		    fputs(buffer, gpoutfile);				\
-		    fputc(' ', gpoutfile);
+		    fputs(buffer, outfile);				\
+		    fputc(' ', outfile);
 		    OUTPUT_NUMBER(x, FIRST_X_AXIS);
 		    OUTPUT_NUMBER(y, FIRST_Y_AXIS);
 		    OUTPUT_NUMBER(z, FIRST_Z_AXIS);
-		    fprintf(gpoutfile, "%c\n",
+		    fprintf(outfile, "%c\n",
 			    point->type == INRANGE
 			    ? 'i' : point->type == OUTRANGE
 			    ? 'o' : 'u');
 		} /* for(point) */
 	    } /* for(icrvs) */
-	    putc('\n', gpoutfile);
+	    putc('\n', outfile);
 	} /* if(draw_surface) */
 
 	if (draw_contour) {
@@ -1023,24 +1024,24 @@ print_3dtable(int pcount)
 		    /* don't display count - contour split across chunks */
 		    /* put # in case user wants to use it for a plot */
 		    /* double blank line to allow plot ... index ... */
-		    fprintf(gpoutfile, "\n# Contour %d, label: %s\n",
+		    fprintf(outfile, "\n# Contour %d, label: %s\n",
 			    number++, c->label);
 
 		for (; --count >= 0; ++point) {
 		    OUTPUT_NUMBER(x, FIRST_X_AXIS);
 		    OUTPUT_NUMBER(y, FIRST_Y_AXIS);
 		    OUTPUT_NUMBER(z, FIRST_Z_AXIS);
-		    putc('\n', gpoutfile);
+		    putc('\n', outfile);
 		}
 
 		/* blank line between segments of same contour */
-		putc('\n', gpoutfile);
+		putc('\n', outfile);
 		c = c->next;
 #undef OUTPUT_NUMBER
 	    } /* while (contour) */
 	} /* if (draw_contour) */
     } /* for(surface) */
-    fflush(gpoutfile);
+    fflush(outfile);
 
     free(buffer);
 }
@@ -1902,9 +1903,8 @@ eval_3dplots()
     plot3d_num=plot_num;
 
     /* perform the plot */
-    if (strcmp(term->name, "table") == 0) {
+    if (table_mode)
 	print_3dtable(plot_num);
-    }
     else {
 	START_LEAK_CHECK();	/* assert no memory leaks here ! */
 	do_3dplot(first_3dplot, plot_num, 0);

@@ -256,6 +256,9 @@ extern float aspect_ratio;	/* 1.0 for square */
 /* plot border autosizing overrides, in characters (-1: autosize) */
 extern float lmargin, bmargin, rmargin, tmargin;
 
+extern FILE *table_outfile;
+extern TBOOLEAN table_mode;
+
 extern struct arrow_def *first_arrow;
 
 extern struct text_label *first_label;

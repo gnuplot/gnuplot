@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.95 2005/03/13 04:04:57 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.96 2005/03/23 16:47:02 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -1088,6 +1088,7 @@ print_table(struct curve_points *current_plot, int plot_num)
 {
     int i, curve;
     char *buffer = gp_alloc(150, "print_table: output buffer");
+    FILE *outfile = (table_outfile) ? table_outfile : gpoutfile;
 
     for (curve = 0; curve < plot_num;
 	 curve++, current_plot = current_plot->next) {
@@ -1095,30 +1096,30 @@ print_table(struct curve_points *current_plot, int plot_num)
 
 	/* two blank lines between plots in table output by prepending
 	 * a \n here */
-	fprintf(gpoutfile, "\n#Curve %d of %d, %d points\n#x y",
+	fprintf(outfile, "\n#Curve %d of %d, %d points\n#x y",
 		curve, plot_num, current_plot->p_count);
 	switch (current_plot->plot_style) {
 	case BOXES:
 	case XERRORBARS:
-	    fputs(" xlow xhigh", gpoutfile);
+	    fputs(" xlow xhigh", outfile);
 	    break;
 	case BOXERROR:
 	case YERRORBARS:
-	    fputs(" ylow yhigh", gpoutfile);
+	    fputs(" ylow yhigh", outfile);
 	    break;
 	case BOXXYERROR:
 	case XYERRORBARS:
-	    fputs(" xlow xhigh ylow yhigh", gpoutfile);
+	    fputs(" xlow xhigh ylow yhigh", outfile);
 	    break;
 	case FINANCEBARS:
 	case CANDLESTICKS:
-	    fputs("open ylow yhigh yclose", gpoutfile);
+	    fputs("open ylow yhigh yclose", outfile);
 	default:
 	    /* ? */
 	    break;
 	}
 
-	fputs(" type\n", gpoutfile);
+	fputs(" type\n", outfile);
 	for (i = 0, point = current_plot->points;
 	     i < current_plot->p_count;
 	     i++, point++) {
@@ -1128,8 +1129,8 @@ print_table(struct curve_points *current_plot, int plot_num)
 #define OUTPUT_NUMBER(field, axis)				\
 	    gprintf(buffer, 150, axis_array[axis].formatstring,	\
 		    1.0, point->field);				\
-	    fputs(buffer, gpoutfile);				\
-	    fputc(' ', gpoutfile);
+	    fputs(buffer, outfile);				\
+	    fputc(' ', outfile);
 
 	    /* FIXME HBB 20020405: had better use the real x/x2 axes
                of this plot */
@@ -1163,16 +1164,16 @@ print_table(struct curve_points *current_plot, int plot_num)
 		/* ? */
 		break;
 	    } /* switch(plot type) */
-	    fprintf(gpoutfile, " %c\n",
+	    fprintf(outfile, " %c\n",
 		    current_plot->points[i].type == INRANGE
 		    ? 'i' : current_plot->points[i].type == OUTRANGE
 		    ? 'o' : 'u');
 	} /* for(point i) */
 
-	putc('\n', gpoutfile);
+	putc('\n', outfile);
     } /* for(curve) */
 
-    fflush(gpoutfile);
+    fflush(outfile);
     free(buffer);
 }
 #undef OUTPUT_NUMBER
@@ -2119,7 +2120,7 @@ eval_plots()
 	plot_token = -1;
     }
 
-    if (strcmp(term->name, "table") == 0)
+    if (table_mode)
 	print_table(first_plot, plot_num);
     else {
 	START_LEAK_CHECK();	/* check for memory leaks in this routine */
