@@ -1,3 +1,46 @@
+1998-12-03  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* aclocal.m4, config.hin, configure: Regenerated.
+
+	* configure.in: Require autoconf 2.12.2. Add AC_PROG_CPP.
+
+	* contour.c(gen_bspline_approx): Remove unused variable i.
+
+	* graph3d.c(setlinestyle,ztick_callback): Remove unused variable t.
+
+	* help.c: Make StartOutput(), OutLine(), EndOutput() non-static.
+	Remove list_terms().
+
+	* hidden3d.c(draw): Remove unused vars cross1, cross2.
+
+	* protos.h: Add prototypes for help.c functions. Remove prototype
+	for term_count().
+
+	* show.c(show_version_long): Rename readline rdline, and gnu_readline
+	gnu_rdline to avoid compiler warnings.
+
+	* stdfn.h: Remove bcopy() prototype, may conflict with system headers.
+
+	* term.c: Remove term_count(), update list_terms() to Don Taber's
+	version.
+
+	* version.c: Patchlevel beta348.
+
+1998-12-03  Dick Crawford  <u600256@gamma.lanl.gov>
+
+	* docs/gnuplot.doc, docs/titlepag.ms, docs/titlepag.tex: Updated list
+	of contributors, documentation of Don's "-" patch.
+
+1998-12-03  Don Taber  <dtaber@blackrat.risc.rockwell.com>
+
+	* command.c, misc.c, plot.c: Patch to use "-" for stdin or load file.
+
+	* graphics.c: Patch to make all four [xy][12]labels symmetric about
+	plots and well spaced from axes regardless of tics or absence of tics,
+	move the title up a character height, and put half a character extra
+	space on left and right to help out some of the terminals which have
+	trouble with this.
+
 1998-12-02  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* Makefile.in: Clean out dist target.
