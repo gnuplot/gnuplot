@@ -1,5 +1,5 @@
 /*
- * $Id: term.h,v 1.9 2000/10/31 19:59:31 joze Exp $
+ * $Id: term.h,v 1.10 2000/11/02 19:12:45 lhecking Exp $
  */
 
 /* GNUPLOT - term.h */
@@ -336,6 +336,9 @@
 
 /* QMS laser printers */
 #include "qms.trm"
+
+/* W3C Scalable Vector Graphics file */
+#include "svg.trm"
 
 /* built-in, but used for the documentation */
 #include "table.trm"

@@ -1,6 +1,11 @@
+2000-12-05  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* term/svg.trm: new driver.
+	* src/term.h: #include it.
+
 2000-12-05  Petr Mikulik  <mikulik@physics.muni.cz>
 
-        * src/pm3d.c: take care about undefined points in PM3D_SCANS_AUTOMATIC
+        * src/pm3d.c: take care about undefined points in PM3D_SCANS_AUTOMATIC.
 
 2000-12-04  Johannes Zellner  <johannes@zellner.org>
 
