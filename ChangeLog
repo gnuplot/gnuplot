@@ -1,28 +1,36 @@
 2002-02-20  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
+	* config/makefile.dj2 (CFLAGS): Added -DHAVE_ATEXIT.  Changed
+ 	default compile flags to -O2 -g.
+	(EXENAME): Changed to gp38.
+
+	* config/makefile.nt (CFLAGS): added -DHAVE_ATEXIT
+
+2002-02-20  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
 	* src/axis.c (quantize_normal_tics): Changed name and meaning of
-	first argument: it's now the length of the range to be covered,
-	instead of the log10 of the length. All calls have to be changed!
-	Modified the calculations inside to reduce the risk of FP
-	inaccuracies biting in. In particular avoid possible differences
-	between pow10() and dbl_raise(10.0,).
+ 	first argument: it's now the length of the range to be covered,
+ 	instead of the log10 of the length. All calls have to be changed!
+  	Modified the calculations inside to reduce the risk of FP
+ 	inaccuracies biting in. In particular avoid possible differences
+ 	between pow10() and dbl_raise(10.0,).
 	(quantize_duodecimal_tics): New function, derived from
-	quantize_normal_tics.  Subdivides ranges with a base-12 rather
-	than a base-10 quantity (--> 60 seconds/minutes, 24 hours, 12
-	months). Uses a stepsize sequence of 1-2-3-6-12 instead of
-	1-2-5-10 in quantize_normal_tics.
+ 	quantize_normal_tics.  Subdivides ranges with a base-12 rather
+ 	than a base-10 quantity (--> 60 seconds/minutes, 24 hours, 12
+ 	months). Uses a stepsize sequence of 1-2-3-6-12 instead of
+ 	1-2-5-10 in quantize_normal_tics.
 	(quantize_time_tics): Calls to quantize_normal_tics changed. Some
-	just had the log10 removed (see above), others were commented out,
-	or replaced by calls to quantize_duodecimal_tics. This is a lot
-	saner than the previous code that piled lots of base-10
-	subdivision attempts on top of each other, and avoids problems
-	with rounding errors, too.
+ 	just had the log10 removed (see above), others were commented out,
+ 	or replaced by calls to quantize_duodecimal_tics. This is a lot
+ 	saner than the previous code that piled lots of base-10
+ 	subdivision attempts on top of each other, and avoids problems
+ 	with rounding errors, too.
 	(time_tic_just): Large parts of this function deactivated ---
-	their work is no longer necessary since the automatically placed
-	will now (almost) always be in the right position already.
+ 	their work is no longer necessary since the automatically placed
+ 	will now (almost) always be in the right position already.
 	
 	* src/contour.c (contour): Changed call of quantize_normal_tics
-	and added a comment what it does.
+ 	and added a comment what it does.
 
 2002-02-19  Lars Hecking  <lhecking@nmrc.ucc.ie>
 

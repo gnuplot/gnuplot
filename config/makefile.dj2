@@ -1,5 +1,5 @@
 # Hello, emacs: this is a -*- Makefile -*-
-# $Id: makefile.dj2,v 1.5 1999/11/08 19:20:58 lhecking Exp $
+# $Id: makefile.dj2,v 1.6 1999/11/15 22:23:25 lhecking Exp $
 #
 # GNUPLOT Makefile for DJGPP version 2 on DOS
 #
@@ -32,7 +32,7 @@ FINALDEST=c:\bin
 
 # here customize the name of the executable
 # exe file will be  gp36.exe:
-EXENAME = gp37
+EXENAME = gp38
 
 # where to place gnuplot.gih helpfile upon MAKE
 # note it will be built inside gnuplot\$(HELPDEST)
@@ -61,9 +61,9 @@ CFLAGS = -DMSDOS -DDOS32 \
 	-DHAVE_ERF -DHAVE_LGAMMA -DHAVE_GAMMA \
 	-DHAVE_GETCWD -DHAVE_SETLINEBUF -DHAVE_SLEEP \
 	-DHAVE_STRNCASECMP -DHAVE_STRNICMP -DHAVE_STRERROR \
-	-DHAVE_SETVBUF \
+	-DHAVE_SETVBUF -DHAVE_ATEXIT \
 	-DHAVE_TEMPNAM -DPIPES -DREADLINE \
-	-O $(OPTS)
+	-O2 -g $(OPTS)
 
 LINKOPT = $(LDFLAGS) -lm -lpc -lgrx20
 
