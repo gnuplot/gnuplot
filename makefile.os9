@@ -140,10 +140,10 @@ gnuplot: $(OBJS)
 include makefile.all
 
 command.$(O): command.c
-	$(CC) $(CFLAGS) -DHELPFILE="$(HELPFILE)" $(CCFLAGS) command.c
+	$(CC) $(CFLAGS) -DHELPFILE=\"$(HELPFILE)\" $(CCFLAGS) command.c
 
 show.$(O): show.c
-	$(CC) $(CFLAGS) -DHELPFILE="($HELPFILE)" $(CCFLAGS) show.c
+	$(CC) $(CFLAGS) -DHELPFILE=\"($HELPFILE)\" $(CCFLAGS) show.c
 
 term.$(O): term.c $(CORETERM)
 	$(CC) $(CFLAGS) $(TERMFLAGS) -v=TERM -v=$(SDIR) $(CCFLAGS) term.c

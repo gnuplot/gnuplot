@@ -108,10 +108,10 @@ $(OBJS): plot.h
 	$(CC) $(CFLAGS) $*.c
 
 command.o:
-	$(CC) $(CFLAGS) -c command.c -DHELPFILE="$(HELPFILE)"
+	$(CC) $(CFLAGS) -c command.c -DHELPFILE=\"$(HELPFILE)\"
 
 show.o:
-	$(CC) $(CFLAGS) -c show.c -DHELPFILE="$(HELPFILE)"
+	$(CC) $(CFLAGS) -c show.c -DHELPFILE=\"$(HELPFILE)\"
 
 command.o help.o misc.o: help.h
 

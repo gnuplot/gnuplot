@@ -137,7 +137,7 @@ bitmap.obj: bitmap.c bitmap.h plot.h
 
 command.obj: command.c plot.h setshow.h fit.h
 	$(BIN)$(CC) @&&!
-$(CFLAGS) -DHELPFILE="$(HELPFILE)"
+$(CFLAGS) -DHELPFILE=\"$(HELPFILE)\"
 ! command.c
 
 contour.obj: contour.c plot.h
@@ -180,7 +180,7 @@ set.obj: set.c plot.h setshow.h
 
 show.obj: show.c plot.h setshow.h
 	$(BIN)$(CC) @&&!
-$(CFLAGS) -DHELPFILE="$(HELPFILE)"
+$(CFLAGS) -DHELPFILE=\"$(HELPFILE)\"
 ! show.c
 
 specfun.obj: specfun.c
@@ -204,7 +204,7 @@ version.obj: version.c
 
 winmain.obj: win\winmain.c win\wgnuplib.h win\wtext.h plot.h
 	$(BIN)$(CC) @&&!
-$(CFLAGS) -DHELPFILE="$(HELPFILE)"
+$(CFLAGS) -DHELPFILE=\"$(HELPFILE)\"
 ! win\winmain.c
 
 wgnuplot.mnu: win\wgnuplot.mnu
