@@ -5,12 +5,17 @@ EXTRA_PROGRAMS = gnuplot_x11
 
 bin_PROGRAMS = gnuplot @GNUPLOT_X11@ bf_test
 
+# Where to send email about bugs and comments (locally)
+EMAIL = bug-gnuplot@dartmouth.edu
+
+# Help file location
+HELPFILE=$(datadir)/gnuplot.gih
+
+# There is probably no need to edit anything below this line
 TERMLIBS = @TERMLIBS@
 TERMXLIBS = @TERMXLIBS@
 XLIBS = @LIBRARIES_FOR_X@
-HELPFILE=$(datadir)/gnuplot.gih
-# Where to send email about bugs and comments (locally)
-EMAIL = bug-gnuplot@dartmouth.edu
+AM_CPPFLAGS = -I../term -I$(top_srcdir)/term -DBINDIR=\"$(bindir)\" -DCONTACT=\"$(EMAIL)\" -DHELPFILE=\"$(HELPFILE)\"
 
 gnuplot_SOURCES = alloc.c alloc.h ansichek.h binary.c binary.h bitmap.c \
 bitmap.h command.c command.h contour.c datafile.c eval.c fit.c fit.h \
@@ -50,37 +55,4 @@ T=$(top_srcdir)/term/
 # begin makefile.all
 include makefile.all
 # end makefile.all
-
-# explicit targets
-
-command.o: command.c plot.h ansichek.h stdfn.h syscfg.h protos.h alloc.h \
-	   setshow.h variable.h fit.h binary.h help.h
-	$(COMPILE) -DHELPFILE=\"$(HELPFILE)\" -c $<
-
-show.o: show.c plot.h ansichek.h stdfn.h syscfg.h protos.h alloc.h setshow.h \
-	variable.h
-	$(COMPILE) -DHELPFILE=\"$(HELPFILE)\" -DBINDIR=\"$(bindir)\" -c $<
-
-term.o: term.c plot.h ansichek.h stdfn.h syscfg.h protos.h alloc.h bitmap.h \
-	setshow.h variable.h ../term/driver.h term.h $(CORETERM)
-	$(COMPILE) -I../term -I$(top_srcdir)/term -c $<
-
-version.o: version.c plot.h ansichek.h stdfn.h syscfg.h protos.h alloc.h
-	$(COMPILE) -DCONTACT=\"$(EMAIL)\" -c $<
-
-# de-ANSIfy version
-command._o: command.c plot.h ansichek.h stdfn.h syscfg.h protos.h alloc.h \
-	   setshow.h variable.h fit.h binary.h help.h
-	$(COMPILE) -DHELPFILE=\"$(HELPFILE)\" -c $<
-
-show._o: show.c plot.h ansichek.h stdfn.h syscfg.h protos.h alloc.h setshow.h \
-	variable.h
-	$(COMPILE) -DHELPFILE=\"$(HELPFILE)\" -DBINDIR=\"$(bindir)\" -c $<
-
-term._o: term.c plot.h ansichek.h stdfn.h syscfg.h protos.h alloc.h bitmap.h \
-	setshow.h variable.h ../term/driver.h term.h $(CORETERM)
-	$(COMPILE) -I../term -I$(top_srcdir)/term -c $<
-
-version._o: version.c plot.h ansichek.h stdfn.h syscfg.h protos.h alloc.h
-	$(COMPILE) -DCONTACT=\"$(EMAIL)\" -c $<
 
