@@ -1,4 +1,4 @@
-2004-09-1%  Ethan Merritt  <merritt@u.washington.edu>
+2004-09-15  Ethan Merritt  <merritt@u.washington.edu>
 
 	* plot3d.c (get_3ddata) graphics.c (boundary) x11.trm:
 	Add #ifdefs so that ./configure --disable-pm3d will build successfully.
@@ -6,6 +6,8 @@
 	* term/fig.trm term/epslatex.trm term/pslatex.trm term/metapost.trm
 	term/tgif.trm term/pstricks.trm:  Disentangle the ordering of #ifdefs
 	in the TERM_TABLE entries (MOUSE is not a subset of PM3D).
+
+	* term/emf.trm: Remove unused label to quiet compiler warnings.
 
 2004-09-15  Konstantin Korikov  <lostclus@ua.fm>
 

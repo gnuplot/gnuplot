@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: emf.trm,v 1.21 2004/07/08 12:02:24 broeker Exp $
+ * $Id: emf.trm,v 1.22 2004/09/09 12:13:05 lhecking Exp $
  */
 
 /* GNUPLOT - emf.trm */
@@ -1014,7 +1014,7 @@ EMF_point(unsigned int x, unsigned int y, int number)
 	EMF_flush_polygon();
 	break;
     }
-  end_points:
+/* end_points: */
     EMF_dashtype(old_dashtype);
 }
 
