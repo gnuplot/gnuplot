@@ -444,7 +444,7 @@ char **argv;
 
 	if (interactive && term != 0) {  /* not unknown */
 #if defined(HAVE_LIBREADLINE) && defined(GNUPLOT_HISTORY)
-	    FPRINTF((stderr, "Before read_history\n));
+	    FPRINTF((stderr, "Before read_history\n"));
 	    expanded_history_filename = tilde_expand (GNUPLOT_HISTORY_FILE);
 	    FPRINTF((stderr, "expanded_history_filename = %s\n", expanded_history_filename));
 	    read_history (expanded_history_filename);
