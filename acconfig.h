@@ -17,9 +17,6 @@
 /* Define if compiler can handle ANSI prototypes.  */
 #undef ANSI_C
 
-/* Define if autoconf/configure has already been run.  */
-#undef AUTOCONF
-
 /* Define if this system uses a 32-bit DOS extender (djgpp/emx).  */
 #undef DOS32
 
@@ -29,20 +26,26 @@
 /* Define if you are using the GNU readline library.  */
 #undef GNU_READLINE
 
+/* Define if the C preprocessor understands ANSI stringification.  */
+#undef HAVE_CPP_STRINGIFY
+
+/* Define if you have the lgamma function.  */
+#undef HAVE_LGAMMA
+
 /* Define if you have Thomas Boutell's gd library.  */
 #undef HAVE_LIBGD
 
 /* Define if you have the png library.  */
 #undef HAVE_LIBPNG
 
+/* Define if you do not have the strncasecmp function.  */
+#undef HAVE_STRNCASECMP
+
 /* Define if this is a Linux system with SuperVGA library.  */
 #undef LINUXVGA
 
 /* Define if this is an MSDOS system with djgpp.  */
 #undef MSDOS
-
-/* Define if you do not have the bcopy function.  */
-#undef NOCOPY
 
 /* Define if you do not want to read .gnuplotrc in the current directory.  */
 #undef NOCWDRC
@@ -62,11 +65,17 @@
 /* Define if you do not have the <locale.h> header file.  */
 #undef NO_LOCALE_H
 
+/* Define if you do not have the <math.h> header file.  */
+#undef NO_MATH_H
+
 /* Define if you do not have the memcpy function.  */
 #undef NO_MEMCPY
 
 /* Define if you do not have the memset function.  */
 #undef NO_MEMSET
+
+/* Define if you do not have the setvbuf function.  */
+#undef NO_SETVBUF
 
 /* Define if you do not have the <stdlib.h> header file.  */
 #undef NO_STDLIB_H
@@ -74,17 +83,23 @@
 /* Define if you do not have the strchr function.  */
 #undef NO_STRCHR
 
+/* Define if you do not have the strerror function.  */
+#undef NO_STRERROR
+
 /* Define if you do not have the <string.h> header file.  */
 #undef NO_STRING_H
+
+/* Define if you do not have the strrchr function.  */
+#undef NO_STRRCHR
+
+/* Define if you do not have the strstr function.  */
+#undef NO_STRSTR
 
 /* Define if you do not have the <sys/types.h> header file.  */
 #undef NO_SYS_TYPES_H
 
 /* Define if you do not have the <time.h> header file.  */
 #undef NO_TIME_H
-
-/* Define if you do not have the <sys/select.h> header file.  */
-#undef OLD_SELECT
 
 /* Define if you do have the popen and pclose functions.  */
 #undef PIPES
