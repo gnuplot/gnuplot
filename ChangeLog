@@ -1,3 +1,8 @@
+2002-12-12  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* win/wpause.c (PauseBox): Nigel Nunn's change to the message
+ 	loop of the pause window to avoid CPU hogging.
+
 2002-12-11  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* 0FAQ, show.c, version.c: Get ready for 3.7.3 release.

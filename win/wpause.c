@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: wpause.c,v 1.8 1998/03/22 22:35:29 drd Exp $";
+static char *RCSid = "$Id: wpause.c,v 1.3 1998/12/04 15:16:46 lhecking Exp $";
 #endif
 
 /* GNUPLOT - win/wpause.c */
@@ -132,12 +132,16 @@ PauseBox(LPPW lppw)
 
 	lppw->bPause = TRUE;
 	lppw->bPauseCancel = IDCANCEL;
-	while (lppw->bPause)
-    		while (PeekMessage(&msg, 0, 0, 0, PM_REMOVE)) {
+	while (lppw->bPause) {
+		/* HBB 20021211: Nigel Nunn found a better way to avoid
+		 * 100% CPU load --> use it */
+		if (PeekMessage(&msg, 0, 0, 0, PM_REMOVE)) {
 			/* wait until window closed */
-        		TranslateMessage(&msg);
-        		DispatchMessage(&msg);
-        	}
+			TranslateMessage(&msg);
+			DispatchMessage(&msg);
+		} else
+			WaitMessage();
+	}
 	DestroyWindow(lppw->hWndPause);
 #ifndef WIN32
 #ifndef __DLL__
