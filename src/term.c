@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.16 1999/08/24 11:24:01 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.17 1999/09/21 18:29:20 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -75,10 +75,12 @@ static char *RCSid() { return RCSid("$Id: term.c,v 1.16 1999/08/24 11:24:01 lhec
   */
 
 #include "plot.h"
+#include "term_api.h"
 #include "tables.h"
 #include "bitmap.h"
 #include "setshow.h"
 #include "driver.h"
+#include "help.h"		/* HBB 990828: 'help term' support */
 
 #ifdef _Windows
 FILE *open_printer __PROTO((void));	/* in wprinter.c */
@@ -90,6 +92,8 @@ void close_printer __PROTO((FILE * outfile));
 # endif				/* MSC */
 #endif /* _Windows */
 
+/* the 'output' file handle */
+FILE *gpoutfile;
 
 /* true if terminal has been initialized */
 static TBOOLEAN term_initialised;
@@ -106,9 +110,6 @@ static TBOOLEAN opened_binary = FALSE;
 /* true if require terminal to be initialized */
 static TBOOLEAN term_force_init = FALSE;
 
-extern FILE *gpoutfile;
-extern char *outstr;
-
 /* internal pointsize for do_point */
 static double term_pointsize;
 
@@ -116,10 +117,23 @@ static void term_suspend __PROTO((void));
 static void term_close_output __PROTO((void));
 static void null_linewidth __PROTO((double));
 
-void do_point __PROTO((unsigned int x, unsigned int y, int number));
-void do_pointsize __PROTO((double size));
-void line_and_point __PROTO((unsigned int x, unsigned int y, int number));
-void do_arrow __PROTO((unsigned int sx, unsigned int sy, unsigned int ex, unsigned int ey, int head));
+static void do_point __PROTO((unsigned int x, unsigned int y, int number));
+static void do_pointsize __PROTO((double size));
+static void line_and_point __PROTO((unsigned int x, unsigned int y, int number));
+static void do_arrow __PROTO((unsigned int sx, unsigned int sy, unsigned int ex, unsigned int ey, int head));
+
+static struct termentry *change_term __PROTO((const char *name, int length));
+
+static void UP_redirect __PROTO((int called));
+
+static int null_text_angle __PROTO((int ang));
+static int null_justify_text __PROTO((enum JUSTIFY just));
+static int null_scale __PROTO((double x, double y));
+static void options_null __PROTO((void));
+static void UNKNOWN_null __PROTO((void));
+static void MOVE_null __PROTO((unsigned int, unsigned int));
+static void LINETYPE_null __PROTO((int));
+static void PUTTEXT_null __PROTO((unsigned int, unsigned int, const char *));
 
 
 #ifdef __ZTC__
@@ -516,7 +530,7 @@ TBOOLEAN f_interactive;
 	int_error(NO_CARET, "Must set output to a file or put all multiplot commands on one input line");
 }
 
-void
+static void
 do_point(x, y, number)
 unsigned int x, y;
 int number;
@@ -595,7 +609,7 @@ int number;
     }
 }
 
-void
+static void
 do_pointsize(size)
 double size;
 {
@@ -606,7 +620,7 @@ double size;
 /*
  * general point routine
  */
-void
+static void
 line_and_point(x, y, number)
 unsigned int x, y;
 int number;
@@ -639,7 +653,7 @@ int number;
 
 #define HEAD_COEFF  (0.3)	/* default value of head/line length ratio */
 
-void
+static void
 do_arrow(sx, sy, ex, ey, head)
 unsigned int sx, sy;		/* start point */
 unsigned int ex, ey;		/* end point (point of arrowhead) */
@@ -751,7 +765,7 @@ TBOOLEAN head;
 /* change angle of text.  0 is horizontal left to right.
    * 1 is vertical bottom to top (90 deg rotate)  
  */
-int
+static int
 null_text_angle(ang)
 int ang;
 {
@@ -761,7 +775,7 @@ int ang;
 /* change justification of text.  
  * modes are LEFT (flush left), CENTRE (centred), RIGHT (flush right)
  */
-int
+static int
 null_justify_text(just)
 enum JUSTIFY just;
 {
@@ -773,7 +787,7 @@ enum JUSTIFY just;
  * Parameters are x,y scaling factors for this plot.
  * Some terminals (eg latex) need to do scaling themselves.
  */
-int
+static int
 null_scale(x, y)
 double x;
 double y;
@@ -781,6 +795,8 @@ double y;
     return FALSE;		/* can't be done */
 }
 
+/* HBB 990829: unused --> commented out */
+#if 0
 int
 do_scale(x, y)
 double x;
@@ -788,31 +804,32 @@ double y;
 {
     return TRUE;		/* can be done */
 }
+#endif /* commented out */
 
-void
+static void
 options_null()
 {
     term_options[0] = '\0';	/* we have no options */
 }
 
-void
+static void
 UNKNOWN_null()
 {
 }
 
-void
+static void
 MOVE_null(x, y)
 unsigned int x, y;
 {
 }
 
-void
+static void
 LINETYPE_null(t)
 int t;
 {
 }
 
-void
+static void
 PUTTEXT_null(x, y, s)
 unsigned int x, y;
 const char *s;
@@ -851,7 +868,7 @@ typedef void (*void_fp) __PROTO((void));
  * term_tbl[] contains an entry for each terminal.  "unknown" must be the
  *   first, since term is initialized to 0.
  */
-struct termentry term_tbl[] =
+static struct termentry term_tbl[] =
 {
     {"unknown", "Unknown terminal type - not a plotting device",
      100, 100, 1, 1,
@@ -868,7 +885,14 @@ struct termentry term_tbl[] =
 
 };
 
-#define TERMCOUNT (sizeof(term_tbl)/sizeof(struct termentry))
+#define TERMCOUNT (sizeof(term_tbl)/sizeof(term_tbl[0]))
+
+/* mainly useful for external code */
+GP_INLINE int
+term_count()
+{
+    return TERMCOUNT;
+}
 
 void
 list_terms()
@@ -1164,7 +1188,7 @@ ztc_init()
    is there or not.
  */
 #if !(defined(UNIXPLOT) || defined(GNUGRAPH))
-void
+static void
 UP_redirect(caller)
 int caller;
 {
@@ -1173,7 +1197,7 @@ int caller;
 }
 
 #else /* UNIXPLOT || GNUGRAPH */
-void
+static void
 UP_redirect(caller)
 int caller;
 /*
