@@ -15,6 +15,10 @@
 	Remove configuration option --disable-defined-var.
 	Remove the #ifdef GP_ISVAR ... #endif bracketing the corresponding code.
 
+	* term/cgm.trm (CGM_linecolor): Force all line and point color requests
+	to black if the terminal is in monochrome mode. Bug fix courtesy of 
+	N Matsuda (Tokyo Denki University).
+
 2005-03-04  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/datafile.c: Introduce a defined constant MAX_TOKEN_LENGTH

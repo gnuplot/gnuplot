@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: cgm.trm,v 1.64 2005/02/01 11:28:52 broeker Exp $
+ * $Id: cgm.trm,v 1.65 2005/03/03 04:09:50 sfeam Exp $
  */
 
 /* GNUPLOT - cgm.trm */
@@ -895,7 +895,9 @@ CGM_linecolor(int linecolor)
 	    linecolor = 0;
     }
     linecolor += 3;
-    if (cgm_monochrome || linecolor == cgm_color)
+    if (cgm_monochrome)
+	cgm_color = linecolor = 1;
+    if (linecolor == cgm_color)
 	return;
     cgm_color = linecolor;
     cgm_next.fill_color = linecolor;
