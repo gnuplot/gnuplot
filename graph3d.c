@@ -655,7 +655,7 @@ char ss[MAX_LINE_LEN+1], *s, *e;
 		key_sample_left = 0;
   		key_sample_right = key_sample_width;
 		key_text_left = -(int)((t->h_char)*(max_ptitl_len+1));
-		key_text_right =- (int)(t->h_char);
+		key_text_right = -(int)(t->h_char);
 		key_size_left = (t->h_char)*(max_ptitl_len+2+key_width_fix);
   		key_size_right = (t->h_char)+key_sample_width;
 	}
