@@ -1,3 +1,22 @@
+1998-12-04  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* 0BUGS: Remove pslatex driver bug entry.
+
+	* TODO: Remove entry "allow load '-' or  gnuplot -  to mean
+	interactive".
+
+	* docs/Makefile.in: Fix for building outside source dir in all
+	targets using ALL_TERM_DOC.
+
+	* docs/doc2info.c: Remove static keyword in function declarations
+	to fix building with SunOS cc.
+
+1998-12-04  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* makefile.mgw, makefile.win, win/wgnuplib.h, win/wgraph.c,
+	win/winmain.c, win/wmenu.c, win/wpause.c: Fix bug with line width
+	scaling under Windows. Some cleanups.
+
 1998-12-03  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* aclocal.m4, config.hin, configure: Regenerated.
