@@ -1,3 +1,7 @@
+2002-07-26  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* term/cgm.trm: Fixed option parsing bugs.
+
 2002-05-17  Shigeharu TAKENO  <shige@iee.niit.ac.jp>
 
 	* docs/gnuplot.doc: Various misprint fixes.
