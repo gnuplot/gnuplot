@@ -26,6 +26,14 @@ Fri Feb  1 19:05:57 2002  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* 0INSTALL: Add --with-pdf, remove --enable-emf and --enable-epslatex.
 
+	* binary.c, bitmap.c, command.c, contour.c, eval.c, hidden3d.c, misc.c,
+	plot2d.c, plot3d.c, readline.c, set.c: Remove casts to size argument
+	from gp_alloc() calls.
+
+	* binary.h, bitmap.h, help.h: Prevent multiple inclusion.
+
+2002-01-31  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
 	* configure.in: Fix libpng test so that library is always searched for.
 
 	* configure.in: Add PDF driver support.
@@ -33,9 +41,17 @@ Fri Feb  1 19:05:57 2002  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 	* configure.in: Remove switches for emf and epslatex driver, they are
 	now included by default.
 
+	* fit.c, fit.h, matrix.c, matrix.h: Update copyright status.
+
+	* help.c: Replace malloc() calls with gp_alloc().
+
 	* specfunc.c: More descriptive error messages.
 
 	* term.h: Enable emf and epslatex driver unconditionally.
+
+	* time.c: Add support for reading EPOCH data.
+
+	* term/post.trm: Use gp_strdup() instead of gp_alloc/strcpy.
 
 2002-01-26  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
