@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.34 2002/10/21 10:24:18 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.35 2002/11/01 20:14:31 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -200,7 +200,7 @@ void
 axis_revert_and_unlog_range(axis)
     AXIS_INDEX axis;
 {
-  if (axis_array[axis].reverse_range) {
+  if (axis_array[axis].range_is_reverted) {
     double temp = axis_array[axis].min;
     axis_array[axis].min = axis_array[axis].max;
     axis_array[axis].max = temp;
@@ -774,35 +774,36 @@ round_outward(axis, upwards, input)
 
 void
 setup_tics(axis, max)
-     AXIS_INDEX axis;
-     int max;			/* approx max number of slots available */
+    AXIS_INDEX axis;
+    int max;			/* approx max number of slots available */
 {
     double tic = 0;
-
-    struct ticdef *ticdef = &(axis_array[axis].ticdef);
+    AXIS *this = axis_array + axis;
+    struct ticdef *ticdef = &(this->ticdef);
 
     /* HBB 20010703: New: allow _not_ to autoextend the axis endpoints
      * to an integer multiple of the ticstep, for autoscaled axes with
      * automatic tics */
-    TBOOLEAN fixmin = (axis_array[axis].autoscale & AUTOSCALE_MIN)
-      && ! (axis_array[axis].autoscale & AUTOSCALE_FIXMIN);
-    TBOOLEAN fixmax = (axis_array[axis].autoscale & AUTOSCALE_MAX)
-      && ! (axis_array[axis].autoscale & AUTOSCALE_FIXMAX);
+    TBOOLEAN autoextend_min = (this->autoscale & AUTOSCALE_MIN)
+	&& ! (this->autoscale & AUTOSCALE_FIXMIN);
+    TBOOLEAN autoextend_max = (this->autoscale & AUTOSCALE_MAX)
+	&& ! (this->autoscale & AUTOSCALE_FIXMAX);
 
     /* HBB 20000506: if no tics required for this axis, do
      * nothing. This used to be done exactly before each call of
      * setup_tics, anyway... */
-    if (! axis_array[axis].ticmode)
+    if (! this->ticmode)
 	return;
 
     if (ticdef->type == TIC_SERIES) {
 	ticstep[axis] = tic = ticdef->def.series.incr;
-	fixmin &= (ticdef->def.series.start == -VERYLARGE);
-	fixmax &= (ticdef->def.series.end == VERYLARGE);
+	autoextend_min &= (ticdef->def.series.start == -VERYLARGE);
+	autoextend_max &= (ticdef->def.series.end == VERYLARGE);
     } else if (ticdef->type == TIC_COMPUTED) {
 	ticstep[axis] = tic = make_tics(axis, max);
     } else {
-	fixmin = fixmax = FALSE; /* user-defined, day or month */
+	/* user-defined, day or month */
+	autoextend_min = autoextend_max = FALSE; 
     }
 
     /* BUGFIX HBB 20010831: for time/date axes, if an explicit
@@ -812,23 +813,15 @@ setup_tics(axis, max)
      * effect, it defines timelevel[axis]. */
     /* HBB 20011204: moved this up --- round_outward() needs
      * timelevel[axis], too */
-    if (axis_array[axis].is_timedata && ticdef->type == TIC_SERIES)
-	quantize_time_tics(axis, tic,
-			   axis_array[axis].max - axis_array[axis].min,
-			   20);
+    if (this->is_timedata && ticdef->type == TIC_SERIES)
+	quantize_time_tics(axis, tic, this->max - this->min, 20);
 
-    if (fixmin) {
-	axis_array[axis].min =
-	    round_outward(axis,
-			  ! (axis_array[axis].min < axis_array[axis].max),
-			  axis_array[axis].min);
-    }
-    if (fixmax) {
-	axis_array[axis].max =
-	    round_outward(axis, 
-			  axis_array[axis].min < axis_array[axis].max,
-			  axis_array[axis].max);
-    }
+    if (autoextend_min) 
+	this->min = round_outward(axis, ! (this->min < this->max), this->min);
+
+    if (autoextend_max) 
+	this->max = round_outward(axis, this->min < this->max, this->max);
+
 
     /* Set up ticfmt[axis] correctly. If necessary (time axis, but not
      * time/date output format), make up a formatstring that suits the
@@ -878,8 +871,9 @@ gen_tics(axis, callback)
 	 * be translated. I dont think it will work at all for
 	 * log scale, so I shan't worry about it !
 	 */
-	double polar_shift = (polar
-			      && !(axis_array[R_AXIS].autoscale & AUTOSCALE_MIN))
+	double polar_shift =
+	    (polar
+	     && ! (axis_array[R_AXIS].autoscale & AUTOSCALE_MIN))
 	    ? axis_array[R_AXIS].min : 0;
 
 	for (mark = def->def.user; mark; mark = mark->next) {
@@ -1415,6 +1409,7 @@ load_range(axis, a, b, autoscale)
 {
     if (equals(c_token, "]"))
 	return (autoscale);
+
     if (END_OF_COMMAND) {
 	int_error(c_token, "starting range value or ':' or 'to' expected");
     } else if (!equals(c_token, "to") && !equals(c_token, ":")) {
@@ -1426,9 +1421,11 @@ load_range(axis, a, b, autoscale)
 	    autoscale &= ~AUTOSCALE_MIN;
 	}
     }
+
     if (!equals(c_token, "to") && !equals(c_token, ":"))
 	int_error(c_token, "':' or keyword 'to' expected");
     c_token++;
+
     if (!equals(c_token, "]")) {
 	if (equals(c_token, "*")) {
 	    autoscale |= AUTOSCALE_MAX;
@@ -1438,6 +1435,14 @@ load_range(axis, a, b, autoscale)
 	    autoscale &= ~AUTOSCALE_MAX;
 	}
     }
+
+    /* HBB 20030127: If range input backwards, automatically turn on
+       the "reverse" option, too. */
+    if (((autoscale & AUTOSCALE_BOTH) == AUTOSCALE_NONE)
+	&& *b < *a) {
+	axis_array[axis].range_flags |= RANGE_REVERSE;
+    }
+
     return (autoscale);
 }
 

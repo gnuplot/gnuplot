@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.79 2002/12/02 10:55:12 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.80 2003/01/07 22:29:28 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -166,7 +166,9 @@ static int find_maxl_keys __PROTO((struct curve_points *plots, int count, int *k
 GP_INLINE static TBOOLEAN
 i_inrange(int z, int min, int max)
 {
-    return ((min < max) ? ((z >= min) && (z <= max)) : ((z >= max) && (z <= min)));
+    return ((min < max)
+	    ? ((z >= min) && (z <= max))
+	    : ((z >= max) && (z <= min)));
 }
 
 GP_INLINE static double
@@ -1634,8 +1636,8 @@ do_plot(plots, pcount)
 
 static void
 plot_impulses(plot, yaxis_x, xaxis_y)
-struct curve_points *plot;
-int yaxis_x, xaxis_y;
+    struct curve_points *plot;
+    int yaxis_x, xaxis_y;
 {
     int i;
     int x, y;
@@ -1652,11 +1654,9 @@ int yaxis_x, xaxis_y;
 		if (!inrange(plot->points[i].x, X_AXIS.min, X_AXIS.max))
 		    continue;
 		x = map_x(plot->points[i].x);
-		if ((Y_AXIS.min < Y_AXIS.max && plot->points[i].y < Y_AXIS.min)
-		    || (Y_AXIS.max < Y_AXIS.min && plot->points[i].y > Y_AXIS.min))
-		    y = map_y(Y_AXIS.min);
-		else
-		    y = map_y(Y_AXIS.max);
+		y = plot->points[i].y;
+		cliptorange(y, Y_AXIS.min, Y_AXIS.max);
+		y = map_y(y);
 
 		break;
 	    }
@@ -1875,6 +1875,7 @@ struct curve_points *plot;
     /* clip the "at" coordinate to the drawing area */
 #define MYNOMIN(x,ax) if (x<axis_array[ax].min) x=axis_array[ax].min;
 #define MYNOMAX(x,ax) if (x>axis_array[ax].max) x=axis_array[ax].max;
+    /* FIXME HBB 20030127: replace by cliptorange()!? */
     switch (plot->filledcurves_options.closeto) {
 	case FILLEDCURVES_ATX1:
 	    MYNOMIN(plot->filledcurves_options.at,FIRST_X_AXIS);
@@ -2641,24 +2642,9 @@ plot_boxes(plot, xaxis_y)
 		}
 
 		/* clip to border */
-		if ((Y_AXIS.min < Y_AXIS.max && dyt < Y_AXIS.min)
-		    || (Y_AXIS.max < Y_AXIS.min && dyt > Y_AXIS.min))
-		    dyt = Y_AXIS.min;
-		if ((Y_AXIS.min < Y_AXIS.max && dyt > Y_AXIS.max)
-		    || (Y_AXIS.max < Y_AXIS.min && dyt < Y_AXIS.max))
-		    dyt = Y_AXIS.max;
-		if ((X_AXIS.min < X_AXIS.max && dxr < X_AXIS.min)
-		    || (X_AXIS.max < X_AXIS.min && dxr > X_AXIS.min))
-		    dxr = X_AXIS.min;
-		if ((X_AXIS.min < X_AXIS.max && dxr > X_AXIS.max)
-		    || (X_AXIS.max < X_AXIS.min && dxr < X_AXIS.max))
-		    dxr = X_AXIS.max;
-		if ((X_AXIS.min < X_AXIS.max && dxl < X_AXIS.min)
-		    || (X_AXIS.max < X_AXIS.min && dxl > X_AXIS.min))
-		    dxl = X_AXIS.min;
-		if ((X_AXIS.min < X_AXIS.max && dxl > X_AXIS.max)
-		    || (X_AXIS.max < X_AXIS.min && dxl < X_AXIS.max))
-		    dxl = X_AXIS.max;
+		cliptorange(dyt, Y_AXIS.min, Y_AXIS.max);
+		cliptorange(dxr, X_AXIS.min, X_AXIS.max);
+		cliptorange(dxl, X_AXIS.min, X_AXIS.max);
 
 		xl = map_x(dxl);
 		xr = map_x(dxr);
@@ -3330,9 +3316,9 @@ double *ex, *ey;		/* the point where it crosses an edge */
  */
 static TBOOLEAN			/* any intersection? */
 two_edge_intersect_steps(points, i, lx, ly)
-struct coordinate GPHUGE *points;	/* the points array */
-int i;				/* line segment from point i-1 to point i */
-double *lx, *ly;		/* lx[2], ly[2]: points where it crosses edges */
+    struct coordinate GPHUGE *points; /* the points array */
+    int i;			/* line segment from point i-1 to point i */
+    double *lx, *ly;		/* lx[2], ly[2]: points where it crosses edges */
 {
     /* global X_AXIS.min, X_AXIS.max, Y_AXIS.min, X_AXIS.max */
     double ax = points[i - 1].x;
@@ -3340,34 +3326,37 @@ double *lx, *ly;		/* lx[2], ly[2]: points where it crosses edges */
     double bx = points[i].x;
     double by = points[i].y;
 
-    if (GPMAX(ax, bx) < X_AXIS.min || GPMIN(ax, bx) > X_AXIS.max ||
-	GPMAX(ay, by) < Y_AXIS.min || GPMIN(ay, by) > Y_AXIS.max || ((ay > Y_AXIS.max || ay < Y_AXIS.min) && (bx > X_AXIS.max || bx < X_AXIS.min))) {
+    if (GPMAX(ax, bx) < X_AXIS.min || GPMIN(ax, bx) > X_AXIS.max
+	|| GPMAX(ay, by) < Y_AXIS.min || GPMIN(ay, by) > Y_AXIS.max
+	|| (!inrange(ay, Y_AXIS.min, Y_AXIS.max)
+	    && !inrange(bx, X_AXIS.min, X_AXIS.max))
+	) {
 	return (FALSE);
-    } else if (inrange(ay, Y_AXIS.min, Y_AXIS.max) && inrange(bx, X_AXIS.min, X_AXIS.max)) {	/* corner of step inside plotspace */
+    } else if (inrange(ay, Y_AXIS.min, Y_AXIS.max)
+	       && inrange(bx, X_AXIS.min, X_AXIS.max)) {
+	/* corner of step inside plotspace */
+	cliptorange(ax, X_AXIS.min, X_AXIS.max);
+	*lx++ = ax;
 	*ly++ = ay;
-	if (ax < X_AXIS.min)
-	    *lx++ = X_AXIS.min;
-	else
-	    *lx++ = X_AXIS.max;
 
-	*lx++ = bx;
-	if (by < Y_AXIS.min)
-	    *ly++ = Y_AXIS.min;
-	else
-	    *ly++ = Y_AXIS.max;
+	cliptorange(by, Y_AXIS.min, Y_AXIS.max);
+	*lx = bx;
+	*ly = by;
 
 	return (TRUE);
-    } else if (inrange(ay, Y_AXIS.min, Y_AXIS.max)) {	/* cross plotspace in x-direction */
+    } else if (inrange(ay, Y_AXIS.min, Y_AXIS.max)) {
+	/* cross plotspace in x-direction */
 	*lx++ = X_AXIS.min;
 	*ly++ = ay;
-	*lx++ = X_AXIS.max;
-	*ly++ = ay;
+	*lx = X_AXIS.max;
+	*ly = ay;
 	return (TRUE);
-    } else if (inrange(ax, X_AXIS.min, X_AXIS.max)) {	/* cross plotspace in y-direction */
+    } else if (inrange(ax, X_AXIS.min, X_AXIS.max)) {
+	/* cross plotspace in y-direction */
 	*lx++ = bx;
 	*ly++ = Y_AXIS.min;
-	*lx++ = bx;
-	*ly++ = Y_AXIS.max;
+	*lx = bx;
+	*ly = Y_AXIS.max;
 	return (TRUE);
     } else
 	return (FALSE);
@@ -3390,9 +3379,9 @@ double *lx, *ly;		/* lx[2], ly[2]: points where it crosses edges */
  */
 static TBOOLEAN			/* any intersection? */
 two_edge_intersect_fsteps(points, i, lx, ly)
-struct coordinate GPHUGE *points;	/* the points array */
-int i;				/* line segment from point i-1 to point i */
-double *lx, *ly;		/* lx[2], ly[2]: points where it crosses edges */
+    struct coordinate GPHUGE *points; /* the points array */
+    int i;			/* line segment from point i-1 to point i */
+    double *lx, *ly;		/* lx[2], ly[2]: points where it crosses edges */
 {
     /* global X_AXIS.min, X_AXIS.max, Y_AXIS.min, X_AXIS.max */
     double ax = points[i - 1].x;
@@ -3400,30 +3389,33 @@ double *lx, *ly;		/* lx[2], ly[2]: points where it crosses edges */
     double bx = points[i].x;
     double by = points[i].y;
 
-    if (GPMAX(ax, bx) < X_AXIS.min || GPMIN(ax, bx) > X_AXIS.max ||
-	GPMAX(ay, by) < Y_AXIS.min || GPMIN(ay, by) > Y_AXIS.max || ((by > Y_AXIS.max || by < Y_AXIS.min) && (ax > X_AXIS.max || ax < X_AXIS.min))) {
+    if (GPMAX(ax, bx) < X_AXIS.min || GPMIN(ax, bx) > X_AXIS.max
+	|| GPMAX(ay, by) < Y_AXIS.min || GPMIN(ay, by) > Y_AXIS.max
+	|| (!inrange(by, Y_AXIS.min, Y_AXIS.max)
+	    && !inrange(ax, X_AXIS.min, X_AXIS.max))
+	) {
 	return (FALSE);
-    } else if (inrange(by, Y_AXIS.min, Y_AXIS.max) && inrange(ax, X_AXIS.min, X_AXIS.max)) {	/* corner of step inside plotspace */
+    } else if (inrange(by, Y_AXIS.min, Y_AXIS.max)
+	       && inrange(ax, X_AXIS.min, X_AXIS.max)) {
+	/* corner of step inside plotspace */
+	cliptorange(ay, Y_AXIS.min, Y_AXIS.max);
 	*lx++ = ax;
-	if (ay < Y_AXIS.min)
-	    *ly++ = Y_AXIS.min;
-	else
-	    *ly++ = Y_AXIS.max;
+	*ly++ = ay;
 
+	cliptorange(bx, X_AXIS.min, X_AXIS.max);
+	*lx = bx;
 	*ly = by;
-	if (bx < X_AXIS.min)
-	    *lx = X_AXIS.min;
-	else
-	    *lx = X_AXIS.max;
 
 	return (TRUE);
-    } else if (inrange(by, Y_AXIS.min, Y_AXIS.max)) {	/* cross plotspace in x-direction */
+    } else if (inrange(by, Y_AXIS.min, Y_AXIS.max)) {
+	/* cross plotspace in x-direction */
 	*lx++ = X_AXIS.min;
 	*ly++ = by;
 	*lx = X_AXIS.max;
 	*ly = by;
 	return (TRUE);
-    } else if (inrange(ax, X_AXIS.min, X_AXIS.max)) {	/* cross plotspace in y-direction */
+    } else if (inrange(ax, X_AXIS.min, X_AXIS.max)) {
+	/* cross plotspace in y-direction */
 	*lx++ = ax;
 	*ly++ = Y_AXIS.min;
 	*lx = ax;

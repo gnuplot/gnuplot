@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.76 2002/11/12 16:56:27 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.77 2003/01/07 22:29:25 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -166,7 +166,9 @@ static void map3d_position_r __PROTO((struct position* pos1, struct position* po
 GP_INLINE static TBOOLEAN
 i_inrange(int z, int min, int max)
 {
-    return ((min < max) ? ((z >= min) && (z <= max)) : ((z >= max) && (z <= min)));
+    return ((min < max)
+	    ? ((z >= min) && (z <= max))
+	    : ((z >= max) && (z <= min)));
 }
 
 GP_INLINE static double

@@ -1,5 +1,5 @@
 /* 
- * $Id: axis.h,v 1.27 2003/01/25 10:35:31 mikulik Exp $
+ * $Id: axis.h,v 1.28 2003/01/27 09:30:28 mikulik Exp $
  *
  */
 
@@ -189,7 +189,7 @@ typedef struct axis {
 #define RANGE_WRITEBACK 1	
     /* allow auto and reversed ranges */
 #define RANGE_REVERSE   2	
-    TBOOLEAN reverse_range;	/* range [high:low] silently reverted? */
+    TBOOLEAN range_is_reverted;	/* range [high:low] silently reverted? */
     double min;			/* 'transient' axis extremal values */
     double max;
     double set_min;		/* set/show 'permanent' values */
@@ -378,7 +378,8 @@ do {						\
 do {									\
     AXIS *this = axis_array + axis;					\
 									\
-    if ((this->autoscale = this->set_autoscale) == AUTOSCALE_NONE	\
+    this->autoscale = this->set_autoscale;				\
+    if ((this->autoscale & AUTOSCALE_BOTH) == AUTOSCALE_NONE		\
 	&& this->set_max < this->set_min) {				\
 	this->min = this->set_max;					\
 	this->max = this->set_min;					\
@@ -411,19 +412,18 @@ do {									\
 } while(0)
 
 /* handle reversed ranges */
-#define CHECK_REVERSE(axis)						\
-do {									\
+#define CHECK_REVERSE(axis) do {					\
     AXIS *this = axis_array + axis;					\
 									\
-    if ((this->autoscale == AUTOSCALE_NONE)				\
-	&& (this->max < this->min)					\
-	) {								\
+    if (((this->autoscale & AUTOSCALE_BOTH) == AUTOSCALE_NONE)		\
+	&& (this->max < this->min)) {					\
 	double temp = this->min;					\
+									\
 	this->min = this->max;						\
 	this->max = temp;						\
-	this->reverse_range = 1;					\
+	this->range_is_reverted = 1;					\
     } else								\
-	this->reverse_range = (this->range_flags & RANGE_REVERSE);	\
+	this->range_is_reverted = (this->range_flags & RANGE_REVERSE);	\
 } while(0)
 
 /* HBB 20000725: new macro, built upon ULIG's SAVE_WRITEBACK(axis),

@@ -1,5 +1,5 @@
 /*
- * $Id: stdfn.h,v 1.22 2002/03/07 16:22:37 lhecking Exp $
+ * $Id: stdfn.h,v 1.23 2002/10/08 17:53:02 lhecking Exp $
  */
 
 /* GNUPLOT - stdfn.h */
@@ -497,6 +497,25 @@ int gp_strnicmp __PROTO((const char *, const char *, size_t));
    (((min)<(max)) ? (((z)>=(min)) && ((z)<=(max))) : \
 	            (((z)>=(max)) && ((z)<=(min))))
 #endif
+
+/* HBB 20030117: new macro to simplify clipping operations in the
+ * presence of possibly reverted axes */
+#ifndef cliptorange
+# define cliptorange(z,min,max)			\
+    do {					\
+       if ((min) < (max)) {			\
+	   if ((z) > (max))			\
+	       (z) = (max);			\
+	   else if ((z) < (min))		\
+	       (z) = (min);			\
+       } else {					\
+	   if ((z) > (min))			\
+	       (z) = (min);			\
+	   else if ((z) < (max))		\
+	       (z) = (max);			\
+       }					\
+    } while (0)
+#endif	      
 
 /* both min/max and MIN/MAX are defined by some compilers.
  * we are now on GPMIN / GPMAX
