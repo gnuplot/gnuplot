@@ -3,6 +3,14 @@
 	* config/Makefile.am.in, demo/Makefile.am.in, tutorial/Makefile.am.in:
 	$< is not portable. Use Makefile.am.in explicitly.
 
+2001-03-07  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* docs/titlepag.tex: autodetect pdf output - use package hyperref.
+
+	* config/makefile.mgw: new targets: all, gnuplot.ps, gnuplot.tex.
+
+	* config/makefile.mgw config/term.c: support for pipes under Windows.
+
 2001-03-05  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/plot2d.c (get_data): Automatically revert to 'with points'
@@ -83,14 +91,6 @@
 
 	* src/command.c (com_line): Codestyle: #if's indented and
  	commented.
-
-2001-02-27  Petr Mikulik  <mikulik@physics.muni.cz>
-
-	* docs/titlepag.tex: autodetect pdf output - use package hyperref.
-
-	* config/makefile.mgw: new targets: all, gnuplot.ps, gnuplot.tex.
-
-	* config/makefile.mgw config/term.c: support for pipes under Windows.
 
 2001-02-27  Petr Mikulik  <mikulik@physics.muni.cz>
 
