@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot.c,v 1.14 1999/06/17 14:20:06 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot.c,v 1.15 1999/06/19 20:54:20 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - plot.c */
@@ -36,9 +36,7 @@ static char *RCSid() { return RCSid("$Id: plot.c,v 1.14 1999/06/17 14:20:06 lhec
 
 #include <signal.h>
 
-#define MAIN_C
 #include "plot.h"
-#undef MAIN_C
 
 #include "fit.h"
 #include "setshow.h"
@@ -48,16 +46,12 @@ static char *RCSid() { return RCSid("$Id: plot.c,v 1.14 1999/06/17 14:20:06 lhec
 # include <io.h>
 #endif
 
-/* HBB: for the control87 function, if used with DJGPP V1: */
-#if defined(DJGPP) && (DJGPP!=2)
-# include "ctrl87.h"
-#endif
-
 #ifdef VMS
 # ifndef __GNUC__
 #  include <unixio.h>
 # endif
 # include <smgdef.h>
+# include <ssdef.h>
 extern int vms_vkid;
 extern smg$create_virtual_keyboard();
 extern int vms_ktid;
@@ -251,6 +245,8 @@ static struct udvt_entry udv_pi = { NULL, "pi", FALSE };
 /* first in linked list */
 struct udvt_entry *first_udv = &udv_pi;
 struct udft_entry *first_udf = NULL;
+
+static int exit_status = EXIT_SUCCESS;
 
 #ifdef OS2
 # define INCL_DOS
@@ -536,6 +532,9 @@ char **argv;
 	}			/* if (interactive && term != 0) */
     } else {
 	/* come back here from int_error() */
+	if (interactive == FALSE)
+	    exit_status = EXIT_FAILURE;
+
 #ifdef AMIGA_SC_6_1
 	(void) rawcon(0);
 #endif
@@ -623,7 +622,7 @@ char **argv;
     if (aesid > -1)
 	atexit(appl_exit);
 #endif
-    exit(EXIT_SUCCESS);
+    exit(exit_status);
 }
 
 #if (defined(ATARI) || defined(MTOS)) && defined(__PUREC__)
