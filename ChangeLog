@@ -1,3 +1,8 @@
+2005-01-05  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/os2/gclient.c: Some more cleanup: Removed some unused variables
+	and unused code which eliminates a lot of compiler warnings.
+
 2005-01-04  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/term.c src/term_api.h: Instead of exporting ignore_enhanced_text

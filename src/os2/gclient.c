@@ -1,5 +1,5 @@
 #ifdef INCRCSDATA
-static char RCSid[]="$Id: gclient.c,v 1.34 2005/01/04 12:56:58 mikulik Exp $";
+static char RCSid[]="$Id: gclient.c,v 1.35 2005/01/04 13:02:58 mikulik Exp $";
 #endif
 
 /****************************************************************************
@@ -99,7 +99,7 @@ static char RCSid[]="$Id: gclient.c,v 1.34 2005/01/04 12:56:58 mikulik Exp $";
 #include <process.h>
 #include <signal.h>
 #include <time.h>
-
+#include "term_api.h"
 #include "gnupmdrv.h"
 
 #define GNUPMDRV
@@ -166,7 +166,6 @@ static SWCNTRL swGnu;
 static BOOL     bLineTypes = FALSE;    // true if use dashed linetypes
 static BOOL     bColours = TRUE;
 static BOOL     bShellPos = FALSE;
-static BOOL     bPlotPos = FALSE;
 static BOOL     bPopFront = TRUE;
 static BOOL     bKeepRatio = TRUE;	//PM
 static BOOL     bNewFont = FALSE;
@@ -190,8 +189,8 @@ struct {
 } zoombox = { 0 };
 
 
-int zooming = 0;  // set to 1 during zooming
-POINTL zoomrect_from, zoomrect_now;
+static int zooming = 0;  // set to 1 during zooming
+static POINTL zoomrect_from, zoomrect_now;
 
 static ULONG    ulPlotPos[4];
 static ULONG    ulShellPos[4];
@@ -276,6 +275,8 @@ int gpPMmenu_update_req = 0;
 #define COLOR_RULER    CLR_DARKPINK // colour of the ruler
 #define COLOR_ERROR    CLR_RED      // colour of error messages
 
+static enum JUSTIFY jmode;
+
 
 /*==== f u n c t i o n s =====================================================*/
 
@@ -288,13 +289,14 @@ BOOL            QueryIni(HAB);
 static void     SaveIni(HWND);
 static void     ThreadDraw(void*);
 static void     DoPaint(HWND, HPS);
-static void     Display(HPS);
 void            SelectFont(HPS, char *);
 void            SwapFont(HPS, char *);
 static void     CopyToClipBrd(HWND);
 static void     ReadGnu(void*);
 static void     EditLineTypes(HWND, HPS, BOOL);
+#if 0
 static void     EditCharCell(HPS, SIZEF*);
+#endif
 static HPS      InitScreenPS(void);
 static int      BufRead(HFILE, void*, int, PULONG);
 int             GetNewFont(HWND, HPS);
@@ -331,16 +333,10 @@ struct drop {
 /* Circular buffer of objects recently dropped.  */
 
 #define DROP_MAX 8
-static int drop_in = 0;
-static int drop_out = 0;
 static int drop_count = 0;
-static HMTX drop_mutex;
-static struct drop drop_list[DROP_MAX];
 
 /* Each drop action is assigned a number, for relating drop events
    with PMR_DROP requests. */
-
-static int drop_cookie = 0;
 
 /* Finally, include the common mousing declarations and routines: */
 #define GNUPMDRV
@@ -360,7 +356,6 @@ report_error(HWND hWnd, char* s)
       HPS hps;
       POINTL pt;
       RECTL rc;
-      double x,y;
 
       hps = WinGetPS(hWnd);
       GpiSetMix(hps, FM_OVERPAINT);
@@ -466,6 +461,7 @@ drag_drop(HWND hwnd, PDRAGINFO pDraginfo)
   return(0);
 }
 
+#if 0
 /* A color has been dropped on a frame(or the background color has
    been changed with WinSetPresParam). */
 
@@ -487,6 +483,7 @@ drop_color(HWND hwnd)
 #endif
     }
 }
+#endif
 
 /*
 **  Window proc for main window
@@ -496,13 +493,9 @@ drop_color(HWND hwnd)
 MRESULT
 EXPENTRY DisplayClientWndProc(HWND hWnd, ULONG message, MPARAM mp1, MPARAM mp2)
 {
-    static BOOL    bSw = FALSE;
-    static BOOL    bFirst = TRUE;
     static RECTL   rectlPaint = { 0, 0, 0, 0 };
     static int     iPaintCount = 0;
     static int     firstcall = 1;
-
-    char s[256];
     int mx, my;
 
 #if 1
@@ -978,6 +971,7 @@ EXPENTRY DisplayClientWndProc(HWND hWnd, ULONG message, MPARAM mp1, MPARAM mp2)
 	return  0L;
 #endif
 
+#if 0
     case WM_BUTTON1DBLCLK:
 	/* put the mouse coordinates to the clipboard */
 	if (!IGNORE_MOUSE) {
@@ -998,6 +992,7 @@ EXPENTRY DisplayClientWndProc(HWND hWnd, ULONG message, MPARAM mp1, MPARAM mp2)
 
 	}
 	return 0L; /* end of case WM_BUTTON1DBLCLK */
+#endif
 
     case WM_BUTTON2CLICK: /* WM_BUTTON2UP: */
 	/* make zoom */
@@ -1031,7 +1026,6 @@ EXPENTRY DisplayClientWndProc(HWND hWnd, ULONG message, MPARAM mp1, MPARAM mp2)
 	    SHORT my = MOUSEMSG(&message)->y;
 	    char s[256];
 	    POINTL pt;
-	    double x, y;
 	    HPS hps = WinGetPS(hWnd);
 
 	    GpiSetColor(hps, COLOR_ANNOTATE);    /* set color of the text */
@@ -1055,6 +1049,7 @@ EXPENTRY DisplayClientWndProc(HWND hWnd, ULONG message, MPARAM mp1, MPARAM mp2)
 	    drop_color(hWnd);
 	return 0;
 #endif
+
     case DM_DRAGOVER:
 	/* Determine whether the object can be dropped. */
 	return(drag_over(hWnd, (PDRAGINFO) mp1));
@@ -1108,7 +1103,6 @@ SetMouseCoords(HWND hWnd, MPARAM mp1, int n, char *f)
 MRESULT
 WmClientCmdProc(HWND hWnd, ULONG message, MPARAM mp1, MPARAM mp2)
 {
-    extern HWND hApp;
     static int ulPauseItem = IDM_PAUSEDLG;
     // static int ulMouseCoordItem = IDM_MOUSE_COORDINATES_REAL;
     int mx, my;
@@ -1306,12 +1300,8 @@ WmClientCmdProc(HWND hWnd, ULONG message, MPARAM mp1, MPARAM mp2)
 	return 0L;
 
     case IDM_MOUSE_HELP:
-    {
-	char s[80];
-
 	gp_exec_event(GE_keypress, mx, my, 'h', 1);
 	return 0L;
-    }
 
 #if 0
     case IDM_MOUSE_COORDINATES_REAL:
@@ -1387,33 +1377,20 @@ WmClientCmdProc(HWND hWnd, ULONG message, MPARAM mp1, MPARAM mp2)
 	return 0L;
 
     case IDM_MOUSE_ZOOMNEXT: /* zoom to next level */
-    {
-	char s[80];
-
 	gp_exec_event(GE_keypress, mx, my, 'n', 1);
 	return 0L;
-    }
 
     case IDM_MOUSE_UNZOOM: /* unzoom one level back */
-    {
-	char s[80];
-
 	gp_exec_event(GE_keypress, mx, my, 'p', 1);
 	return 0L;
-    }
 
     case IDM_MOUSE_UNZOOMALL: /* unzoom to the first level */
-    {
-	char s[80];
-
 	gp_exec_event(GE_keypress, mx, my, 'u', 1);
 	return 0L;
-    }
 
     case IDM_MOUSE_RULER:
     {
 	int mx, my;
-	char s[80];
 
 	GetMousePosViewport(hWnd,&mx,&my);
 	gp_exec_event(GE_keypress, mx, my, 'r', 1);
@@ -1426,14 +1403,12 @@ WmClientCmdProc(HWND hWnd, ULONG message, MPARAM mp1, MPARAM mp2)
 
     case IDM_SET_GRID:
     {
-	char s[80];
 	gp_exec_event(GE_keypress, mx, my, 'g', 1);
 	return 0L;
     }
 
     case IDM_SET_LINLOGY:
     {
-	char s[80];
 	gp_exec_event(GE_keypress, mx, my, 'l', 1);
 	return 0L;
     }
@@ -1552,13 +1527,10 @@ HBITMAP CopyToBitmap(HPS hps)
     HDC     hdcMem, hdcScr;
     SIZEL   sizel;
     BITMAPINFOHEADER2 bmp;
-    PBITMAPINFO2 pbmi;
     HBITMAP hbm;
-    BYTE    abBmp[80];
     LONG    alData[2];
     RECTL   rectl;
     POINTL  aptl[6];
-    HMF     hmf;
 
     hdcScr = GpiQueryDevice(hps);
     hwnd = WinWindowFromDC(hdcScr);
@@ -1730,10 +1702,6 @@ SaveIni(HWND hWnd)
     SWP     swp;
     HINI    hini;
     ULONG   ulOpts[5];
-    HFILE   hfile;
-    ULONG   ulAct;
-    ERRORID errid;
-    char    achErr[64];
     HAB     hab;
 
     hab = WinQueryAnchorBlock(hWnd);
@@ -1795,7 +1763,6 @@ SaveIni(HWND hWnd)
 static void
 DoPaint(HWND hWnd, HPS hps)
 {
-    ULONG ulCount;
     static RECTL rectl;
 
     if (tidDraw != 0) {
@@ -1822,9 +1789,6 @@ static void
 ThreadDraw(void* arg)
 {
     HAB     hab = WinInitialize(0);
-
-    /* Create a Mutex semaphore for protecting drop_list.  */
-    DosCreateMutexSem(NULL, &drop_mutex, 0, FALSE);
 
     InitScreenPS();
 
@@ -1915,9 +1879,6 @@ InitScreenPS()
     return hpsScreen;
 }
 
-/* HBB FIXME 20040630: redefinition of standard gnuplot datatype!? */
-enum JUSTIFY { LEFT, CENTRE, RIGHT } jmode;
-
 
 /*
 **  Get a font to use
@@ -1926,8 +1887,6 @@ enum JUSTIFY { LEFT, CENTRE, RIGHT } jmode;
 short
 ScalePS(HPS hps)
 {
-    RECTL rectView;		/* FIXME 20040630: unused? */
-
     SelectFont(hps, szFontNameSize);
     return 0;
 }
@@ -2043,7 +2002,6 @@ SwapFont(HPS hps, char *szFNS)
     FATTRS  fat;
     LONG   xDeviceRes, yDeviceRes;
     POINTL ptlFont;
-    SIZEF  sizfx;
     static LONG lcid = 0L;
     static int itab = 1;
     static char *szFontName;
@@ -2138,25 +2096,20 @@ ReadGnu(void* arg)
 {
     HPIPE    hRead = 0L;
     POINTL ptl;
-    POINTL aptl[4];
     long lCurCol;
     long lOldLine = 0;
     BOOL bBW = FALSE; /* passed from print.c ?? */
     BOOL bPath = FALSE;
     BOOL bDots = FALSE;
-    char *szEnv;
-    char *szFileBuf;
     ULONG rc;
     USHORT usErr;
     ULONG cbR;
     USHORT i;
-    PID ppid;
     unsigned char buff[2];
     HEV hev;
     static char *szPauseText = NULL;
     ULONG ulPause;
     char *pszPipeName, *pszSemName;
-    LONG  commands[4];
     HPS hps;
     HAB hab;
     int linewidth = DEFLW;
@@ -2250,8 +2203,6 @@ ReadGnu(void* arg)
             switch (*buff) {
 	    case 'G' :    /* enter graphics mode */
 	    {
-		ULONG ulCount;
-
 		if (tidDraw != 0) {
 		    /* already drawing - stop it */
 		    GpiSetStopDraw(hpsScreen, SDW_ON);
@@ -2319,7 +2270,6 @@ ReadGnu(void* arg)
 	    case 'r' :
 	    {
 		/* resume after multiplot */
-		ULONG ulCount;
 		DosRequestMutexSem(semHpsAccess,(ULONG) SEM_INDEFINITE_WAIT);
 		/* DosWaitEventSem(semDrawDone, SEM_INDEFINITE_WAIT); */
 		iSeg++;
@@ -2493,7 +2443,6 @@ ReadGnu(void* arg)
 	    {
 		int ta, t1;
 		GRADIENTL grdl;
-		SIZEF sizHor, sizVer;
 
 		if (bPath) {
 		    GpiEndPath(hps);
@@ -2511,7 +2460,8 @@ ReadGnu(void* arg)
 		    multLineHor = 1;
 		    multLineVert = 0;
 		    break;
-		case  90: grdl.x =  0L;
+		case  90: 
+		    grdl.x =  0L;
 		    grdl.y =  1L;
 		    multLineHor = 0;
 		    multLineVert = 1;
@@ -3025,7 +2975,6 @@ ReadGnu(void* arg)
 	    }
 	}
     }
-  exitserver:
     DosDisConnectNPipe(hRead);
     WinPostMsg(hApp, WM_CLOSE, 0L, 0L);
 }
@@ -3033,8 +2982,7 @@ ReadGnu(void* arg)
 static void
 EditLineTypes(HWND hwnd, HPS hps, BOOL bDashed)
 {
-    int i, rc;
-    char buf[64];
+    int i;
 
     GpiSetDrawingMode(hps, DM_RETAIN);
     GpiOpenSegment(hps, iSeg);
@@ -3050,6 +2998,7 @@ EditLineTypes(HWND hwnd, HPS hps, BOOL bDashed)
     GpiCloseSegment(hps);
 }
 
+#if 0
 /*
 ** Edit segment to change char cell(font size)
 */
@@ -3059,7 +3008,6 @@ EditCharCell(HPS hps, SIZEF *psize)
     int i;
     LONG rl, rc;
     SIZEF sizH, sizV;
-    char buf[64];
     int iVert = 0;
 
     sizH = *psize;
@@ -3090,6 +3038,7 @@ EditCharCell(HPS hps, SIZEF *psize)
     GpiSetEditMode(hps, SEGEM_INSERT);
     GpiCloseSegment(hps);
 }
+#endif
 
 /*
 ** pull next plot command out of buffer read from GNUPLOT
@@ -3130,7 +3079,6 @@ GetNewFont(HWND hwnd, HPS hps)
     static int iSize;
     char szPtList[64];
     HWND    hwndFontDlg;     /* Font dialog window handle */
-    char    *p;
     char szFamilyname[FACESIZE];
 
     if (i1) {
@@ -3301,7 +3249,6 @@ static char
 	    char localfontbuf[FONTBUF];
 	    int recode=1;
 	    int f=fontsize;
-	    BOOL bChangeFont = FALSE;
 	    char *q=localfontbuf;
 
 	    /*{{{  recurse(possibly with a new font) */
