@@ -167,7 +167,7 @@ int df_no_use_specs;  /* how many using columns were specified */
 int df_line_number;
 int df_datum;  /* suggested x value if none given */
 TBOOLEAN df_matrix = FALSE; /* is this a matrix splot */
-int df_eof=0;
+int df_eof = 0;
 int df_timecol[NCOL];
 TBOOLEAN df_binary = FALSE; /* this is a binary file */
 
@@ -176,10 +176,10 @@ TBOOLEAN df_binary = FALSE; /* this is a binary file */
 /* in order to allow arbitrary data line length, we need to use the heap
  * might consider free-ing it in df_close, especially for small systems
  */
-static char *line=NULL;
-static int max_line_len=0;
+static char *line = NULL;
+static int max_line_len = 0;
 
-static FILE *data_fp=NULL;
+static FILE *data_fp = NULL;
 static TBOOLEAN pipe_open = FALSE;
 static TBOOLEAN mixed_data_fp = FALSE;
 
@@ -192,21 +192,21 @@ static TBOOLEAN mixed_data_fp = FALSE;
 #endif
 
 /* stuff for implementing index */
-static int blank_count=0;      /* how many blank lines recently */
-static int df_lower_index=0;  /* first mesh required */
-static int df_upper_index=MAXINT;
-static int df_index_step=1;  /* 'every' for indices */
+static int blank_count = 0;      /* how many blank lines recently */
+static int df_lower_index = 0;  /* first mesh required */
+static int df_upper_index = MAXINT;
+static int df_index_step = 1;  /* 'every' for indices */
 static int df_current_index;   /* current mesh */
 
 /* stuff for every point:line */
-static int everypoint=1;
-static int firstpoint=0;
-static int lastpoint=MAXINT;
-static int everyline=1;
-static int firstline=0;
-static int lastline=MAXINT;
-static int point_count=-1;  /* point counter - preincrement and test 0 */
-static int line_count=0;  /* line counter */
+static int everypoint = 1;
+static int firstpoint = 0;
+static int lastpoint = MAXINT;
+static int everyline = 1;
+static int firstline = 0;
+static int lastline = MAXINT;
+static int point_count = -1;  /* point counter - preincrement and test 0 */
+static int line_count = 0;  /* line counter */
 
 /* parsing stuff */
 static struct use_spec_s use_spec[NCOL];
@@ -222,8 +222,8 @@ typedef struct df_column_struct {
 	char *position;
 } df_column_struct;
 
-static df_column_struct *df_column=NULL; /* we'll allocate space as needed */
-static int df_max_cols=0; /* space allocated */
+static df_column_struct *df_column = NULL; /* we'll allocate space as needed */
+static int df_max_cols = 0; /* space allocated */
 static int df_no_cols;    /* cols read */
 static int fast_columns;	/* corey@cac optimization */
 
@@ -246,7 +246,7 @@ extern double min_array[], max_array[];
 /*{{{  static char *df_gets()*/
 static char *df_gets()
 {
-	int len=0;
+	int len = 0;
 	
 	if (!fgets(line, max_line_len, data_fp))
 		return NULL;
@@ -258,12 +258,12 @@ static char *df_gets()
 	{
 		len += strlen(line+len);
 		
-		if (len > 0 && line[len-1]=='\n')
+		if (len > 0 && line[len-1] == '\n')
 		{
 			/* we have read an entire text-file line.
 			 * Strip the trailing linefeed and return
 			 */
-			line[len-1]=0;
+			line[len-1] = 0;
 			return line;
 		}
 
@@ -274,7 +274,7 @@ static char *df_gets()
 		 */
 
 		if ( (max_line_len-len) < 32)
-			line = gp_realloc(line, max_line_len*=2, "datafile line buffer");
+			line = gp_realloc(line, max_line_len *= 2, "datafile line buffer");
 
 		if (!fgets(line+len, max_line_len - len, data_fp))
 			return line; /* unexpected end of file, but we have something to do */
@@ -300,7 +300,7 @@ char *s;
 
 		/* check store - double max cols or add 20, whichever is greater */
 		if (df_max_cols <= df_no_cols)
-			df_column=(df_column_struct *)gp_realloc(df_column, (df_max_cols += (df_max_cols < 20 ? 20 : df_max_cols))*sizeof(df_column_struct), "datafile column");
+			df_column = (df_column_struct *)gp_realloc(df_column, (df_max_cols += (df_max_cols < 20 ? 20 : df_max_cols))*sizeof(df_column_struct), "datafile column");
 
 		/* have always skipped spaces at this point */
 		df_column[df_no_cols].position = s;
@@ -350,25 +350,25 @@ char *s;
 				while (isspace(*s)) ++s;
 				count = *s ? 1 : 0;
 				/* skip chars to end of column */
-				for (used=0; !isspace(*s) && (*s != '\0'); ++used, ++s) ;
+				for (used = 0; !isspace(*s) && (*s != '\0'); ++used, ++s) ;
 			    }
 
-			/* it might be a fortran double or quad precision. 'used'
-			 * is only safe if count is 1
+			/* it might be a fortran double or quad precision.
+			 * 'used' is only safe if count is 1
 			 */
 			 
 #ifndef NO_FORTRAN_NUMS
-			if (count==1 &&
-			    (s[used]=='d' || s[used]=='D' || s[used]=='q' || s[used]=='Q')
-			   ) {
+			if (count == 1 &&
+			    (s[used] == 'd' || s[used] == 'D' ||
+			     s[used] == 'q' || s[used] == 'Q')) {
 			   /* might be fortran double */
-				s[used]='e';
+				s[used] = 'e';
 				/* and try again */
 				count = sscanf(s, "%lf", &df_column[df_no_cols].datum);
 			}
 #endif /* NO_FORTRAN_NUMS */
 #endif /* OSK */
-			df_column[df_no_cols].good = count==1 ? DF_GOOD : DF_BAD;
+			df_column[df_no_cols].good = count == 1 ? DF_GOOD : DF_BAD;
 		}
 
 		++df_no_cols;
@@ -396,7 +396,7 @@ int *rows, *cols;
 {
 	int max_rows = 0;
 	int c;
-	float **matrix = NULL;
+	float **rmatrix = NULL;
 
 	char *s;
 
@@ -405,10 +405,10 @@ int *rows, *cols;
 
 	for (;;)
 	{
-		if (!(s=df_gets()))
+		if (!(s = df_gets()))
 		{
 			df_eof = 1;
-			return matrix; /* NULL if we have not read anything yet */
+			return rmatrix; /* NULL if we have not read anything yet */
 		}
 		
 		while (isspace(*s))
@@ -416,22 +416,22 @@ int *rows, *cols;
 
 		if (!*s || is_comment(*s))
 		{
-			if (matrix)
-				return matrix;
+			if (rmatrix)
+				return rmatrix;
 			else
 				continue;
 		}
 			
 		if (mixed_data_fp && is_EOF(*s))
 		{
-			df_eof=1;
-			return matrix;
+			df_eof = 1;
+			return rmatrix;
 		}
 
 		c = df_tokenise(s);
 
 		if (!c)
-			return matrix;
+			return rmatrix;
 
 		if (*cols && c != *cols)
 		{
@@ -443,15 +443,15 @@ int *rows, *cols;
 
 		if (*rows >= max_rows)
 		{
-			matrix = gp_realloc(matrix, (max_rows += 10)*sizeof(float *), "df_matrix");
+			rmatrix = gp_realloc(rmatrix, (max_rows += 10)*sizeof(float *), "df_matrix");
 		}
 
 		/* allocate a row and store data */
 		{
 			int i;
-			float *row = matrix[*rows] = (float *)gp_alloc(c*sizeof(float), "df_matrix row");
+			float *row = rmatrix[*rows] = (float *)gp_alloc(c*sizeof(float), "df_matrix row");
 
-			for (i=0; i<c; ++i)
+			for (i = 0; i<c; ++i)
 			{
 				if (df_column[i].good != DF_GOOD)
 					int_error("Bad number in matrix", NO_CARET);
@@ -475,7 +475,7 @@ int max_using;
  */
  
 {
-	static char filename[MAX_LINE_LEN+1]="";
+	static char filename[MAX_LINE_LEN+1] = "";
 	int i;
 	int name_token;
 	
@@ -491,8 +491,8 @@ int max_using;
 	
 	df_no_use_specs = 0;
 	
-	for (i=0; i<NCOL; ++i)
-	{	use_spec[i].column=i+1; /* default column */
+	for (i = 0; i<NCOL; ++i)
+	{	use_spec[i].column = i+1; /* default column */
 		use_spec[i].at = NULL;  /* no expression */
 	}
 	
@@ -500,25 +500,25 @@ int max_using;
 		max_using = NCOL;
 	
 	df_datum = -1; /* it will be preincremented before use */
-	df_line_number=0; /* ditto */
+	df_line_number = 0; /* ditto */
 	
 	df_lower_index = 0;
 	df_index_step = 1;
 	df_upper_index = MAXINT;
 	
-	df_current_index=0;
+	df_current_index = 0;
 	blank_count = 2;
 	/* by initialising blank_count, leading blanks will be ignored */
 	
-	everypoint = everyline=1;  /* unless there is an every spec */
-	firstpoint=firstline=0;
-	lastpoint=lastline=MAXINT;
+	everypoint = everyline = 1;  /* unless there is an every spec */
+	firstpoint = firstline = 0;
+	lastpoint = lastline = MAXINT;
 	
-	df_eof=0;
+	df_eof = 0;
 	
 	memset(df_timecol, 0, sizeof(df_timecol));
 	
-	df_binary=1;
+	df_binary = 1;
 	/*}}}*/
 
 	assert(max_using <= NCOL);
@@ -542,8 +542,8 @@ int max_using;
 	if (almost_equals(c_token, "bin$ary"))
 	{
 		++c_token;
-		df_binary=TRUE;
-		df_matrix=TRUE;
+		df_binary = TRUE;
+		df_matrix = TRUE;
 	}
 	else if (almost_equals(c_token, "mat$rix"))
 	{
@@ -677,7 +677,7 @@ int max_using;
 				else if (equals(c_token, "("))
 				{
 					fast_columns = 0;	/* corey@cac */
-					dummy_func=NULL;  /* no dummy variables active */
+					dummy_func = NULL;  /* no dummy variables active */
 					use_spec[df_no_use_specs++].at = perm_at();  /* it will match ()'s */
 				}
 				else
@@ -709,7 +709,7 @@ int max_using;
 	
 	/* here so it's not done for every line in df_readline */
 	if (max_line_len < 160)
-		line = (char *)gp_alloc(max_line_len=160, "datafile line buffer");
+		line = (char *)gp_alloc(max_line_len = 160, "datafile line buffer");
 	
 	
 	/*}}}*/
@@ -725,9 +725,9 @@ int max_using;
 	} else
 #endif /* PIPES */
 	if (*filename == '-'){
-		data_fp=lf_top();
-		if(!data_fp) data_fp=stdin;
-		mixed_data_fp=TRUE; /* don't close command file */
+		data_fp = lf_top();
+		if(!data_fp) data_fp = stdin;
+		mixed_data_fp = TRUE; /* don't close command file */
 	} else {
 	        char msg[MAX_LINE_LEN];
 #ifndef NO_SYS_STAT_H
@@ -767,7 +767,7 @@ void df_close()
 	}
 	
 	/*{{{  free any use expression storage*/
-	for (i=0; i<df_no_use_specs; ++i)
+	for (i = 0; i<df_no_use_specs; ++i)
 		if (use_spec[i].at)
 		{
 			free(use_spec[i].at);
@@ -784,8 +784,8 @@ void df_close()
 #endif /* PIPES */
 		(void) fclose(data_fp);
 	}
-		mixed_data_fp=FALSE;
-			data_fp=NULL;
+		mixed_data_fp = FALSE;
+			data_fp = NULL;
 }	
 /*}}}*/
 
@@ -811,11 +811,11 @@ int max;
 	if (df_eof)
 		return DF_EOF;
 
-	while ( (s=df_gets()) != NULL)	
+	while ( (s = df_gets()) != NULL)	
 		/*{{{  process line*/
 		{
 			int line_okay = 1;
-			int output=0;  /* how many numbers written to v[] */
+			int output = 0;  /* how many numbers written to v[] */
 			
 			++df_line_number;
 			df_no_cols = 0;
@@ -834,12 +834,12 @@ int max;
 			/*{{{  check EOF on mixed data*/
 			if (mixed_data_fp && is_EOF(*s))
 			{
-				df_eof=1;  /* trap attempts to read past EOF */
+				df_eof = 1;  /* trap attempts to read past EOF */
 				return DF_EOF;
 			}
 			/*}}}*/
 			
-			if (*s==0)
+			if (*s == 0)
 				/*{{{  its a blank line - update counters and continue or return*/
 				{
 					/* argh - this is complicated !  we need to
@@ -851,9 +851,9 @@ int max;
 					 * but its getting late
 					 */
 				
-					point_count=-1;  /* restart counter within line */
+					point_count = -1;  /* restart counter within line */
 				
-					if (++blank_count==1) {
+					if (++blank_count == 1) {
 						/* first blank line */
 						++line_count;
 					}
@@ -880,7 +880,7 @@ int max;
 								continue;
 							else
 							{
-								df_eof=1;
+								df_eof = 1;
 								return DF_EOF; /* no point continuing */
 							}
 						}
@@ -914,7 +914,7 @@ int max;
 			/*}}}*/
 			
 			/*{{{  reject points by every*/
-			/* accept only lines with (line_count%everyline)==0 */
+			/* accept only lines with (line_count%everyline) == 0 */
 			
 			if (line_count<firstline || line_count > lastline ||
 			    (line_count-firstline)%everyline != 0
@@ -937,11 +937,11 @@ int max;
 				{
 					int i;
 				
-					assert(NCOL==7);
+					assert(NCOL == 7);
 					
 					/* check we have room for at least 7 columns */
 					if (df_max_cols < 7)
-						df_column = (df_column_struct *)gp_realloc(df_column, (df_max_cols=7)*sizeof(df_column_struct), "datafile columns");
+						df_column = (df_column_struct *)gp_realloc(df_column, (df_max_cols = 7)*sizeof(df_column_struct), "datafile columns");
 				
 					df_no_cols = sscanf(line, df_format,
 					   &df_column[0].datum,
@@ -954,12 +954,12 @@ int max;
 				
 					if (df_no_cols == EOF)
 					{
-						df_eof=1;
+						df_eof = 1;
 						return DF_EOF;  /* tell client */
 					}
-					for (i=0; i < df_no_cols; ++i ) /* may be zero */
-					{	df_column[i].good=DF_GOOD;
-						df_column[i].position=NULL;  /* cant get a time */
+					for (i = 0; i < df_no_cols; ++i ) /* may be zero */
+					{	df_column[i].good = DF_GOOD;
+						df_column[i].position = NULL;  /* cant get a time */
 					}
 				}
 				/*}}}*/
@@ -968,14 +968,14 @@ int max;
 		
 			/*{{{  copy column[] to v[] via use[]*/
 			{
-				int limit=(df_no_use_specs ? df_no_use_specs : NCOL);
-				if (limit>max)
-					limit=max;
+				int limit = (df_no_use_specs ? df_no_use_specs : NCOL);
+				if (limit > max)
+					limit = max;
 				
-				for (output=0; output<limit; ++output)
+				for (output = 0; output<limit; ++output)
 				{
 					/* if there was no using spec, column is output+1 and at=NULL */
-					int column=use_spec[output].column;
+					int column = use_spec[output].column;
 			
 					if (use_spec[output].at)
 					{	struct  value a;
@@ -984,7 +984,7 @@ int max;
 						if (undefined)
 							return DF_UNDEFINED;  /* store undefined point in plot */
 							
-						v[output]=real(&a);
+						v[output] = real(&a);
 					}
 					else if (column == -2)
 					{
@@ -1010,7 +1010,7 @@ int max;
 						{
 							/* line bad only if user explicitly asked for this column */
 							if (df_no_use_specs)
-								line_okay=0;
+								line_okay = 0;
 			
 							/* return or ignore line depending on line_okay */
 							break;
@@ -1019,13 +1019,13 @@ int max;
 					}
 					else  /* column > 0 */
 					{
-						if ( (column <= df_no_cols) && df_column[column-1].good==DF_GOOD)
+						if ( (column <= df_no_cols) && df_column[column-1].good == DF_GOOD)
 							v[output] = df_column[column-1].datum;
 						else
 						{
 							/* line bad only if user explicitly asked for this column */
 							if (df_no_use_specs)
-								line_okay=0;
+								line_okay = 0;
 							break;  /* return or ignore depending on line_okay */ 
 						}
 					}
@@ -1039,7 +1039,7 @@ int max;
 			/* output == df_no_use_specs if using was specified
 			 * - actually, smaller of df_no_use_specs and max
 			 */
-			assert (df_no_use_specs==0 || output==df_no_use_specs || output==max);
+			assert (df_no_use_specs == 0 || output == df_no_use_specs || output == max);
 			
 			return output;
 		
@@ -1049,7 +1049,7 @@ int max;
 	/* get here => fgets failed */
 
 	df_no_cols = 0;  /* no longer needed - mark column(x) as invalid */
-	df_eof=1;
+	df_eof = 1;
 	return DF_EOF;
 }
 /*}}}*/
@@ -1123,7 +1123,7 @@ int
   df_3dmatrix(this_plot)
 struct surface_points *this_plot;
 {
-	float GPFAR * GPFAR *matrix, GPFAR *rt, GPFAR *ct;
+	float GPFAR * GPFAR *dmatrix, GPFAR *rt, GPFAR *ct;
 	int nr,nc;
 	int width,height;
 	int row,col;
@@ -1138,23 +1138,23 @@ struct surface_points *this_plot;
 
 	if (df_binary)
 	{
-		if(!fread_matrix(data_fp,&matrix,&nr,&nc,&rt,&ct))
+		if(!fread_matrix(data_fp,&dmatrix,&nr,&nc,&rt,&ct))
 			int_error("Binary file read error: format unknown!",NO_CARET);
 		/* fread_matrix() drains the file */
-		df_eof=1;
+		df_eof = 1;
 	}
 	else
 	{
-		if (!(matrix = df_read_matrix(&nr, &nc)))
+		if (!(dmatrix = df_read_matrix(&nr, &nc)))
 		{
-			df_eof=1;
+			df_eof = 1;
 			return 0;
 		}
-		rt=NULL;
-		ct=NULL;
+		rt = NULL;
+		ct = NULL;
 	}
 
-	if (nc==0 || nr==0)
+	if (nc == 0 || nr == 0)
 		int_error("Read grid of zero height or zero width", NO_CARET);
 	
 	this_plot->plot_type = DATA3D;
@@ -1164,60 +1164,60 @@ struct surface_points *this_plot;
 			int_error("Current implementation requires full using spec",NO_CARET);
 
 	if (df_max_cols < 3 &&
-	    !(df_column = (df_column_struct *)gp_realloc(df_column, (df_max_cols=3)*sizeof(df_column_struct), "datafile columns"))
+	    !(df_column = (df_column_struct *)gp_realloc(df_column, (df_max_cols = 3)*sizeof(df_column_struct), "datafile columns"))
 	   )
 	   int_error("Out of store in binary read", c_token);
 
-	df_no_cols=3;
-	df_column[0].good=df_column[1].good=df_column[2].good=DF_GOOD;
+	df_no_cols = 3;
+	df_column[0].good = df_column[1].good = df_column[2].good = DF_GOOD;
 	
 	assert(everyline > 0);
 	assert(everypoint > 0);
-	width=(nc-firstpoint+everypoint-1)/everypoint; /* ? ? ? ? ? */
-	height=(nr-firstline+everyline-1)/everyline; /* ? ? ? ? ? */
-	
-	for(row=firstline; row < nr; row+=everyline){
-		df_column[1].datum=rt ? rt[row] : row;
+	width = (nc-firstpoint+everypoint-1)/everypoint; /* ? ? ? ? ? */
+	height = (nr-firstline+everyline-1)/everyline; /* ? ? ? ? ? */
+
+	for(row = firstline; row < nr; row += everyline){
+		df_column[1].datum = rt ? rt[row] : row;
 
 		this_iso = iso_alloc(width);/*Allocate the correct number of entries*/
-		point=this_iso->points;
+		point = this_iso->points;
 
-		for(col = firstpoint; col< nc; col+=everypoint, ++point){/* Cycle through data */
+		for(col = firstpoint; col< nc; col += everypoint, ++point){/* Cycle through data */
 			/*{{{  process one point*/
 			int i;
 			
-			df_column[0].datum=ct ? ct[col] : col;
-			df_column[2].datum=matrix[row][col];
+			df_column[0].datum = ct ? ct[col] : col;
+			df_column[2].datum = dmatrix[row][col];
 			
 			/*{{{  pass through using spec*/
-			for (i=0; i<3; ++i)
+			for (i = 0; i<3; ++i)
 			{
-				int column=use_spec[i].column;
+				int column = use_spec[i].column;
 			
-				if (df_no_use_specs==0)
-					used[i]=df_column[i].datum;
+				if (df_no_use_specs == 0)
+					used[i] = df_column[i].datum;
 				else if (use_spec[i].at)
 				{
 					struct value a;
 					evaluate_at(use_spec[i].at, &a);
 					if (undefined)
 					{
-						point->type=UNDEFINED;
+						point->type = UNDEFINED;
 						goto skip;  /* continue _outer_ loop */
 					}
-					used[i]=real(&a);
+					used[i] = real(&a);
 				}
 				else if (column < 1 || column > df_no_cols)
 				{
-					point->type=UNDEFINED;
+					point->type = UNDEFINED;
 					goto skip;
 				}
 				else
-					used[i]=df_column[column-1].datum;
+					used[i] = df_column[column-1].datum;
 			}
 			/*}}}*/
 			
-			point->type=INRANGE; /* so far */
+			point->type = INRANGE; /* so far */
 			
 			/*{{{  autoscaling/clipping*/
 			/*{{{  autoscale/range-check x*/
@@ -1227,14 +1227,14 @@ struct surface_points *this_plot;
 				{	if (autoscale_lx & 1)
 						min_array[FIRST_X_AXIS] = used[0];
 					else
-						point->type=OUTRANGE;
+						point->type = OUTRANGE;
 				}
 			
 				if (used[0] > max_array[FIRST_X_AXIS])
 				{	if (autoscale_lx & 2)
 						max_array[FIRST_X_AXIS] = used[0];
 					else
-						point->type=OUTRANGE;
+						point->type = OUTRANGE;
 				}
 			}
 			/*}}}*/
@@ -1246,14 +1246,14 @@ struct surface_points *this_plot;
 				{	if (autoscale_ly & 1)
 						min_array[FIRST_Y_AXIS] = used[1];
 					else
-						point->type=OUTRANGE;
+						point->type = OUTRANGE;
 				}
 			
 				if (used[1] > max_array[FIRST_Y_AXIS])
 				{	if (autoscale_ly & 2)
 						max_array[FIRST_Y_AXIS] = used[1];
 					else
-						point->type=OUTRANGE;
+						point->type = OUTRANGE;
 				}
 			}
 			/*}}}*/
@@ -1265,14 +1265,14 @@ struct surface_points *this_plot;
 				{	if (autoscale_lz & 1)
 						min_array[FIRST_Z_AXIS] = used[2];
 					else
-						point->type=OUTRANGE;
+						point->type = OUTRANGE;
 				}
 			
 				if (used[2] > max_array[FIRST_Z_AXIS])
 				{	if (autoscale_lz & 2)
 						max_array[FIRST_Z_AXIS] = used[2];
 					else
-						point->type=OUTRANGE;
+						point->type = OUTRANGE;
 				}
 			}
 			/*}}}*/
@@ -1289,7 +1289,7 @@ struct surface_points *this_plot;
 				else if (used[0] == 0.0)
 				{
 					point->type = OUTRANGE;
-					used[0]=-VERYLARGE;
+					used[0] = -VERYLARGE;
 				}
 				else
 					used[0] = log(used[0])/log_base_log_x;
@@ -1306,8 +1306,8 @@ struct surface_points *this_plot;
 				}
 				else if (used[1] == 0.0)
 				{
-					point->type=OUTRANGE;
-					used[1]=-VERYLARGE;
+					point->type = OUTRANGE;
+					used[1] = -VERYLARGE;
 				}
 				else
 					used[1] = log(used[1])/log_base_log_y;
@@ -1322,10 +1322,10 @@ struct surface_points *this_plot;
 					point->type = UNDEFINED;
 					goto skip;
 				}
-				else if (used[2]==0.0)
+				else if (used[2] == 0.0)
 				{
 					point->type = OUTRANGE;
-					used[2]=-VERYLARGE;
+					used[2] = -VERYLARGE;
 				}
 				else
 					used[2] = log(used[2])/log_base_log_z;
@@ -1349,7 +1349,7 @@ struct surface_points *this_plot;
 		this_plot->num_iso_read++;
 	}
 	
-	free_matrix(matrix,0,nr-1,0,nc-1);
+	free_matrix(dmatrix,0,nr-1,0,nc-1);
 	if (rt) free_vector(rt,0,nr-1);
 	if (ct) free_vector(ct,0,nc-1);
 	return(nc);
@@ -1368,7 +1368,7 @@ union argument *x;
 		/* we checked it was an integer >= 0 at compile time */
 	struct value a;
 
-	if (column==-1)
+	if (column == -1)
 	{
 		push ( Gcomplex(&a, (double)df_datum, 0.0));  /* $0 */
 	}
@@ -1392,7 +1392,7 @@ void f_column()
 		push( Ginteger(&a, line_count) );
 	else if (column == -1) /* $0 = df_datum */
 		push( Gcomplex(&a, (double) df_datum, 0.0) );
-	else if (column < 0 || column >= df_no_cols || df_column[column].good!=DF_GOOD)
+	else if (column < 0 || column >= df_no_cols || df_column[column].good != DF_GOOD)
 	{	undefined = TRUE;
 		push (&a);  /* any objection to this ? */
 	}
@@ -1408,7 +1408,7 @@ void f_valid()
 	int column,good;
 	(void) pop(&a);
 	column = (int) magnitude(&a) - 1;
-	good = column >= 0 && column < df_no_cols && df_column[column].good==DF_GOOD;
+	good = column >= 0 && column < df_no_cols && df_column[column].good == DF_GOOD;
 	push (Ginteger(&a, good));
 }
 /*}}}*/
@@ -1449,7 +1449,7 @@ char *fmt; /* format string */
 	if ( ! strlen(p)) 
 		int_error("Empty time-data format",NO_CARET);
 	cnt ++;
-	for(i=0;i<strlen(p)-1;i++) {
+	for(i = 0;i<strlen(p)-1;i++) {
 		if ( isspace(p[i]) && !isspace(p[i+1]) )
 			cnt++;
 	}
@@ -1465,7 +1465,7 @@ int jump; /* no of columns in timefmt (time data) */
 {
 	int i;
 
-	for (i=specno+1; i<NCOL; ++i) 
+	for (i = specno+1; i<NCOL; ++i) 
 		use_spec[i].column += jump; /* add no of columns in time to the rest */
 	df_no_use_specs = 0;
 }

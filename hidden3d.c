@@ -60,7 +60,7 @@ static char *RCSid = "$Id: hidden3d.c,v 1.33 1998/06/18 14:55:10 ddenholm Exp $"
  *   into one, consistent scheme, possibly based on
  *   <float.h>. E.g., I'd say that for most applications,
  *   the best 'epsilon' is either DBL_EPS or its square root.
- * + redo all the profiling, esp. to find out if TEST_GRIDCHECK=1
+ * + redo all the profiling, esp. to find out if TEST_GRIDCHECK = 1
  *   actually gains some speed, and if it is worth the memory
  *   spent to store the bit masks
  *   -> seems not improve speed at all, at least for my standard
@@ -71,7 +71,7 @@ static char *RCSid = "$Id: hidden3d.c,v 1.33 1998/06/18 14:55:10 ddenholm Exp $"
  * + remove those of my comments that are now pointless
  * + indent all that code
  * + try to really understand that 'hl_buffer' stuff...
- * + get rid of hardcoded things like sizeof(short)==4,
+ * + get rid of hardcoded things like sizeof(short) == 4,
  *   those 0x7fff terms and all that.
  * + restructure the hl_buffer storing method to make it more efficient
  * + Try to cut the speed decrease of this code rel. to the old hidden
@@ -83,7 +83,7 @@ static char *RCSid = "$Id: hidden3d.c,v 1.33 1998/06/18 14:55:10 ddenholm Exp $"
 /* Configuration section */
 /*************************/
 
-/* HBB: if this module is compiled with TEST_GRIDCHECK=1 defined,
+/* HBB: if this module is compiled with TEST_GRIDCHECK = 1 defined,
  * it will store the information about {x|y}{min|max} in an
  * other (additional!) form: a bit mask, with each bit representing
  * one horizontal or vertical strip of the screen. The bits
@@ -96,12 +96,12 @@ static char *RCSid = "$Id: hidden3d.c,v 1.33 1998/06/18 14:55:10 ddenholm Exp $"
 
 /* HBB 961124; If you don't want the color-distinction between the
  * 'top' and 'bottom' sides of the surface, like I do, then just compile
- * with -DBACKSIDE_LINETYPE_OFFSET=0. */
+ * with -DBACKSIDE_LINETYPE_OFFSET = 0. */
 #ifndef BACKSIDE_LINETYPE_OFFSET
 #define BACKSIDE_LINETYPE_OFFSET 1
 #endif
 
-/* HBB 961127: defining FOUR_TRIANGLES=1 will separate each quadrangle
+/* HBB 961127: defining FOUR_TRIANGLES = 1 will separate each quadrangle
  * of data points into *four* triangles, by introducing an additional
  * point at the mean of the four corners. Status: experimental 
  */
@@ -123,14 +123,14 @@ static char *RCSid = "$Id: hidden3d.c,v 1.33 1998/06/18 14:55:10 ddenholm Exp $"
 #define TRIANGLE_LINESDRAWN_PATTERN 3L
 #endif
 
-/* HBB 970131: with HANDLE_UNDEFINED_POINTS=1, let's try to handle
+/* HBB 970131: with HANDLE_UNDEFINED_POINTS = 1, let's try to handle
  * UNDEFINED data points in the input we're given by the rest of
- * gnuplot. We do that by marking these points by giving them z=-2
+ * gnuplot. We do that by marking these points by giving them z = -2
  * (which normally never happens), and then refusing to build any
  * polygon if one of its vertices has this mark. Thus, there's now a
  * hole in the generated surface. */
 /* HBB 970322: some of this code is now hardwired (in
- * PREPARE_POLYGON), so HANDLE_UNDEFINED_POINTS=0 might have stopped
+ * PREPARE_POLYGON), so HANDLE_UNDEFINED_POINTS = 0 might have stopped
  * to be a useful setting. I doubt anyone will miss it, anyway. */
 /* drd : 2 means undefined only. 1 means outrange treated as undefined */
 #ifndef HANDLE_UNDEFINED_POINTS
@@ -164,7 +164,7 @@ static char *RCSid = "$Id: hidden3d.c,v 1.33 1998/06/18 14:55:10 ddenholm Exp $"
  * orientation of the splitting plane. I had disabled that code for I
  * assumed it might be the cause of some of the buggyness. I'm not yet
  * fully convinced on wether that assumption holds or not, so it's now
- * choosable.  OLD_SPLIT_PLANE==1 will enable it. Some older comments
+ * choosable.  OLD_SPLIT_PLANE == 1 will enable it. Some older comments
  * from the source:*/
 /* HBB 970325: re-inserted this from older versions. Finally, someone
  * came up with a test case where it is actually needed :-( */
@@ -238,12 +238,12 @@ static tp_pnt *pnt;
 
 /* Testroutine for the bitmap */
 /* HBB 961110: fixed slight problem indicated by lclint: 
- * calling IS_UNSET with pnt==0 (possible?) */
+ * calling IS_UNSET with pnt == 0 (possible?) */
 /* HBB 961111: changed for new t_pnt, let compiler take care of optimisation
  * `%' -> `&' */
 /* HBB 961124: switched semantics: as this was *always* called as !IS_SET(),
  * it's better to check for *unset* bits right away: */
-#define IS_UNSET(X,Y) ((!pnt || pnt[X]==0) ? 1 : !(((pnt[X])[(Y)/PNT_BITS] >> ((Y)%PNT_BITS)) & 0x01))
+#define IS_UNSET(X,Y) ((!pnt || pnt[X] == 0) ? 1 : !(((pnt[X])[(Y)/PNT_BITS] >> ((Y)%PNT_BITS)) & 0x01))
 
 /* Amount of space we need for one vertical row of bitmap, 
    and byte offset of first used element */
@@ -299,7 +299,7 @@ static struct Cross GPHUGE * GPHUGE *hl_buffer;
 
 #define CROSS_STORE_INCREASE 500 /* number of Cross'es to alloc at a time */
 static struct Cross *Cross_store = 0;
-static int last_Cross_store=0, free_Cross_store = 0;
+static int last_Cross_store = 0, free_Cross_store = 0;
 
 struct Vertex {
     coordval x, y, z;
@@ -367,7 +367,7 @@ static long pfirst;							/* Index on the first polygon */
  * polygons, 'plist[]' */
 #define EXTEND_PLIST() \
     plist = (struct Polygon GPHUGE *) gp_realloc(plist, \
-      (unsigned long)sizeof(struct Polygon)*(npoly+=10L), "hidden plist")
+      (unsigned long)sizeof(struct Polygon)*(npoly += 10L), "hidden plist")
 
 #define CHECK_PLIST() if (pfree >= npoly) EXTEND_PLIST()
 #define CHECK_PLIST_2() if (pfree+1 >= npoly) EXTEND_PLIST()
@@ -380,8 +380,8 @@ static long pfirst;							/* Index on the first polygon */
 
 /* Some inexact relations: == , > , >= */
 #define EQ(X,Y)  (fabs( (X) - (Y) ) < EPSILON)      /* X == Y */
-#define GR(X,Y)  ((X) > (Y) + EPSILON)      /* X >  Y */
-#define GE(X,Y)  ((X) >=(Y) - EPSILON)      /* X >= Y */
+#define GR(X,Y)  ((X) >  (Y) + EPSILON)      /* X >  Y */
+#define GE(X,Y)  ((X) >= (Y) - EPSILON)      /* X >= Y */
 
 /* Test, if two vertices are near each other */
 #define V_EQUAL(a,b) ( GE(0.0, fabs((a)->x - (b)->x) + \
@@ -409,7 +409,7 @@ print_polygon(p, pname)
 					pname, (int)(p-plist), p->n, p->id, p->next,
 					string_poly_tested[(int)(p->tested)]);
   fprintf(stderr,"#zmin:%g, zmax:%g\n", p->zmin, p->zmax);
-  for (i=0; i<p->n; i++, v++) {
+  for (i = 0; i<p->n; i++, v++) {
     v = vlist + p->vertex[i];
     fprintf(stderr,"%g %g %g \t%ld\n", v->x, v->y, v->z, p->vertex[i]);
   }
@@ -423,10 +423,10 @@ print_polygon(p, pname)
 /* Gets Minimum 'C' value of polygon, C is x, y, or z: */
 #define GET_MIN(p, C, min) do { \
   int i; \
-  long *v=p->vertex; \
+  long *v = p->vertex; \
                        \
   min = vlist[*v++].C; \
-  for (i=1; i< p->n; i++, v++) \
+  for (i = 1; i< p->n; i++, v++) \
     if (vlist[*v].C < min) \
       min = vlist[*v].C; \
 } while (0)
@@ -434,10 +434,10 @@ print_polygon(p, pname)
 /* Gets Maximum 'C' value of polygon, C is x, y, or z: */
 #define GET_MAX(p, C, max) do { \
   int i; \
-  long *v=p->vertex; \
+  long *v = p->vertex; \
                       \
   max = vlist[*v++].C; \
-  for (i=1; i< p->n; i++, v++) \
+  for (i = 1; i< p->n; i++, v++) \
     if (vlist[*v].C > max) \
       max = vlist[*v].C; \
 } while (0)
@@ -538,7 +538,7 @@ set_hidden3doptions()
 
     c_token++;
     tmp = (int) real(const_express(&t));
-		if (tmp<=0 || tmp > UNHANDLED)
+		if (tmp <= 0 || tmp > UNHANDLED)
 			tmp = UNHANDLED;
 		hiddenHandleUndefinedPoints = tmp;
   } else if (almost_equals(c_token, "nound$efined")) {
@@ -629,11 +629,11 @@ init_hidden_line_removal ()
 
 	/* Check for some necessary conditions to be set elsewhere: */
 	/* HandleUndefinedPoints mechanism depends on these: */
-	assert(OUTRANGE==1);					
-	assert(UNDEFINED==2);
+	assert(OUTRANGE == 1);					
+	assert(UNDEFINED == 2);
 	/* '3' makes the test easier in the critical section */
 	if (hiddenHandleUndefinedPoints<OUTRANGE)
-		hiddenHandleUndefinedPoints=UNHANDLED;
+		hiddenHandleUndefinedPoints = UNHANDLED;
 	
   /*  We want to keep the bitmap size less than 2048x2048, so we choose
    *  integer dividers for the x and y coordinates to keep the x and y
@@ -655,7 +655,7 @@ init_hidden_line_removal ()
       i = XREDUCE (xright) - XREDUCE (xleft) + 1;
       pnt = (tp_pnt *) gp_alloc (
         (unsigned long) (i * sizeof (tp_pnt)), "hidden pnt");
-      while (--i>=0)
+      while (--i >= 0)
         pnt[i] = (tp_pnt) 0;
     }
 }
@@ -723,7 +723,7 @@ map3d_xyz (x, y, z, v)
   V[1] = map_y3d (y);
   V[2] = map_z3d (z);
   V[3] = 1.0;
-  Res[0]=0; /*HBB 961110: lclint wanted this... Why? */
+  Res[0] = 0; /*HBB 961110: lclint wanted this... Why? */
   for (i = 0; i < 3; i++)
     {
       Res[i] = trans_mat[3][i];	/* Initiate it with the weight factor. */
@@ -825,26 +825,26 @@ build_polygon (p, n, v, line, style, lp, next, next_frag, id, tested)
   p->lp = lp;           /* line and point properties */
   p->style = style;
   CHECK_POINTER(vlist, (vlist + v[0]));
-  vert=vlist[v[0]];
+  vert = vlist[v[0]];
   p->xmin = p->xmax = vert.x;
   p->ymin = p->ymax = vert.y;
   p->zmin = p->zmax = vert.z;
   for (i = 1; i < n; i++)
     {
       CHECK_POINTER(vlist, (vlist + v[i]));
-      vert=vlist[v[i]];
+      vert = vlist[v[i]];
       if (vert.x < p->xmin)
-        p->xmin=vert.x;
+        p->xmin = vert.x;
       else if (vert.x > p->xmax)
-        p->xmax=vert.x;
+        p->xmax = vert.x;
       if (vert.y < p->ymin)
-        p->ymin=vert.y;
+        p->ymin = vert.y;
       else if (vert.y > p->ymax)
-        p->ymax=vert.y;
+        p->ymax = vert.y;
       if (vert.z < p->zmin)
-        p->zmin=vert.z;
+        p->zmin = vert.z;
       else if (vert.z > p->zmax)
-        p->zmax=vert.z;
+        p->zmax = vert.z;
     }
 
 #if TEST_GRIDCHECK
@@ -864,9 +864,9 @@ build_polygon (p, n, v, line, style, lp, next, next_frag, id, tested)
 
 /* get the amount of curves in a plot */
 #define GETNCRV(NCRV) do {\
-   if(this_plot->plot_type==FUNC3D)        \
-     for(icrvs=this_plot->iso_crvs,NCRV=0; \
-	 icrvs;icrvs=icrvs->next,NCRV++);  \
+   if(this_plot->plot_type == FUNC3D)        \
+     for(icrvs = this_plot->iso_crvs,NCRV = 0; \
+	 icrvs;icrvs = icrvs->next,NCRV++);  \
    else if(this_plot->plot_type == DATA3D) \
         NCRV = this_plot->num_iso_read;    \
     else {                                 \
@@ -899,8 +899,8 @@ maybe_build_polygon (p, n, v, line, style, lp,
 
   assert(v);
 
-	if (hiddenHandleUndefinedPoints!=UNHANDLED) 
-  for (i=0; i<n ; i++)
+	if (hiddenHandleUndefinedPoints != UNHANDLED) 
+  for (i = 0; i<n ; i++)
 			if (VERTEX_IS_UNDEFINED(vlist[v[i]])) {
 				free(v);								/* HBB 980213: free mem... */
 				v = 0;
@@ -923,8 +923,8 @@ maybe_build_polygon (p, n, v, line, style, lp,
       || VERTEX_IS_UNDEFINED(vlist[vert_free + (i1)]) \
       || VERTEX_IS_UNDEFINED(vlist[vert_free + (i2)])) { \
     /* These values avoid any further action on this polygon */\
-    (v)=0; /* flag this as undefined */ \
-    (c)=(border)=0; \
+    (v) = 0; /* flag this as undefined */ \
+    (c) = (border) = 0; \
   } else {\
   (v) = (long *) gp_alloc ((unsigned long) sizeof (long) * (n), "hidden PREPARE_POLYGON"); \
   (v)[0] = vert_free + (i0);\
@@ -954,7 +954,7 @@ init_polygons (plots, pcount)
   int n1, n2;                   /* number of vertices of a Polygon */
   long *v1, *v2;                /* the Vertices */
   long line1, line2;            /* which  lines should be drawn */
-  int above=-1, below, style1, style2;     /* the line color */
+  int above = -1, below, style1, style2;     /* the line color */
   struct lp_style_type *lp;     /* pointer to line and point properties */
   int c1, c2;                   /* do we see the front or the back */
   TBOOLEAN border1, border2;		/* is it at the border of the surface */
@@ -1037,8 +1037,8 @@ init_polygons (plots, pcount)
 			struct coordinate GPHUGE *points = icrvs->points;
 
 			for (i = 0; i < icrvs->p_count; i++) {
-				/* As long as the point types keep OUTRANGE==1 and
-				 * UNDEFINED==2, we can just compare
+				/* As long as the point types keep OUTRANGE == 1 and
+				 * UNDEFINED == 2, we can just compare
 				 * hiddenHandleUndefinedPoints to the type of the point. To
 				 * simplify this, let UNHANDLED := UNDEFINED+1 mean 'do not
 				 * handle undefined or outranged points at all' (dangerous
@@ -1092,7 +1092,7 @@ init_polygons (plots, pcount)
 						int n3, n4;
 						long line3, line4;
 						int c3, c4, style3, style4;
-						TBOOLEAN border3, border4, inc_id=FALSE;
+						TBOOLEAN border3, border4, inc_id = FALSE;
                   
 						/* Build medium vertex: */
 						vlist[vert_free+1].x = 
@@ -1173,7 +1173,7 @@ init_polygons (plots, pcount)
 						if (hiddenShowAlternativeDiagonal
 								&& !(v1)				/* HBB 980213: only try this in the case of */
 								&& !(v2)				/* undefined vertices -> *missing* trigs */
-								)
+								) {
 							if (VERTEX_IS_UNDEFINED(vlist[vert_free+1])) {
 								PREPARE_POLYGON(n1, v1, row_offset+1, row_offset, 0,
 																line1, c1, border1, 0, ncrv1 - 2,
@@ -1183,6 +1183,7 @@ init_polygons (plots, pcount)
 																c1, border1, icrvs->p_count - 2, 0,
 																style1);
 							}
+						}
 
 						/* HBB 970323: if visible sides of the two triangles
 						 * differs, make diagonal visible! */
@@ -1215,15 +1216,15 @@ init_polygons (plots, pcount)
 																					line2, style2, lp, -1L,
 																					-1L, id++, is_untested);
 								if (r1 && r2) {
-									plist[pfree].next_frag=pfree+1;
-									plist[pfree+1].next_frag=pfree;
+									plist[pfree].next_frag = pfree+1;
+									plist[pfree+1].next_frag = pfree;
 								}
 								pfree += r1 + r2;
 							} else {					/* P1 was ok, but P2 wasn't */
 /* HBB 980213: P2 is invisible, so free its vertex list: */
 								if (v2) {
 									free(v2);
-									v2=0;
+									v2 = 0;
 								}
 /* HBB 970323: if other polygon wasn't drawn, draw this polygon's
  * diagonal visibly (not only if it was 'on edge'). */
@@ -1238,7 +1239,7 @@ init_polygons (plots, pcount)
 /* HBB 980213: P1 is invisible, so free its vertex list: */
 							if (v1) {
 								free(v1);
-								v1=0;
+								v1 = 0;
 							}
 /* HBB 970323: if other polygon wasn't drawn, draw this polygon's
  * diagonal visibly (not only if it was 'on edge'). */
@@ -1344,7 +1345,7 @@ sort_by_zmax ()
 
 /* HBB: try if converting this code to unsigned int (from signed shorts)
  *  fixes any of the remaining bugs. In the same motion, remove
- *  hardcoded sizeof(short)=2 (09.10.1996) */
+ *  hardcoded sizeof(short) = 2 (09.10.1996) */
 
 #define LASTBITS (USHRT_BITS -1) /* ????? */
 static int 
@@ -1396,7 +1397,7 @@ obscured (p)
 	{
 	  if (~(*cpnt++) & mask1)
 	    return 0;
-          for (k=indx1+1; k<indx2; k++)
+          for (k = indx1+1; k<indx2; k++)
             if ((*cpnt++) != PNT_MAX)
               return 0;
           if (~(*cpnt++) & mask2)
@@ -1415,7 +1416,7 @@ void draw_line_hidden(x1, y1, x2, y2)
   register int xv, yv, errx, erry, err;
   register unsigned int xvr, yvr;
   int unsigned xve, yve;
-  register int dy, nstep=0, dyr;
+  register int dy, nstep = 0, dyr;
   int i;
 
   if (x1 > x2){
@@ -1452,14 +1453,14 @@ void draw_line_hidden(x1, y1, x2, y2)
   (*t->move)(xvr,yvr);
   flag = !IS_UNSET(xv,yv);
   if(!hidden_no_update){ /* Check first point */
-    assert(ymax_hl!=0);
-    assert(ymin_hl!=0);
+    assert(ymax_hl != 0);
+    assert(ymin_hl != 0);
     if (xv < xmin_hl) xmin_hl = xv;
     if (xv > xmax_hl) xmax_hl = xv;
     if (yv > ymax_hl[xv]) ymax_hl[xv] = yv;
     if (yv < ymin_hl[xv]) ymin_hl[xv] = yv;
   };
-  for (i=0;i<nstep;i++){
+  for (i = 0;i<nstep;i++){
     if (err < 0){
       xv ++;
       xvr += xfact;
@@ -1484,8 +1485,8 @@ void draw_line_hidden(x1, y1, x2, y2)
     };
     if(!hidden_no_update){
       /* HBB 961110: lclint wanted these: */
-      assert(ymax_hl!=0);
-      assert(ymin_hl!=0);
+      assert(ymax_hl != 0);
+      assert(ymin_hl != 0);
       if (xv < xmin_hl) xmin_hl = xv;
       if (xv > xmax_hl) xmax_hl = xv;
       if (yv > ymax_hl[xv]) ymax_hl[xv] = yv;
@@ -1587,23 +1588,23 @@ polygon_plane_intersection(p, a, b, c, d)
   
   v = vlist + p->vertex[0];
   max_sign = min_sign = SIGNOF (a * v->x + b * v->y + c * v->z + d);
-  for (i=1; i<p->n; i++) {
+  for (i = 1; i<p->n; i++) {
           v = vlist + p->vertex[i];
-    sign=SIGNOF (a * v->x + b * v->y + c * v->z + d);
+    sign = SIGNOF (a * v->x + b * v->y + c * v->z + d);
     if (sign > max_sign)
-      max_sign=sign;
+      max_sign = sign;
     else if (sign < min_sign)
-      min_sign=sign;
+      min_sign = sign;
 	}
 
   /* Yes, this is a bit tricky, but it's simpler for the computer... */
-  if (min_sign==-1) {
-    if (max_sign==1)
+  if (min_sign == -1) {
+    if (max_sign == 1)
       return (intersects);
     else
       return behind;
   } else {
-    if ((max_sign==0) && (min_sign==0))
+    if ((max_sign == 0) && (min_sign == 0))
       return (inside);
     else
       return infront;
@@ -1658,7 +1659,7 @@ intersect (v1, v2, v3, v4)
 	    return -2;
 	  return 0;
 	}
-      /* m2x==m1x || m2x==M1x */
+      /* m2x == m1x || m2x == M1x */
       if (GR (y, m2y) && GR (M2y, y))
 	return -2;
       if (EQ (y, m2y) || EQ (y, M2y))
@@ -1719,7 +1720,7 @@ v_intersect (v1, v2, v3, v4)
 	return -2;
       return 0;
     }
-  /* m1x==m2x || m1x==M2x */
+  /* m1x == m2x || m1x == M2x */
   if (GR (y, m1y) && GR (M1y, y))
     return -2;
   if (EQ (y, m1y) || EQ (y, M1y))
@@ -1729,13 +1730,13 @@ v_intersect (v1, v2, v3, v4)
 
 #define UPD_MINMAX(v1,v2,npar) do {    \
   if (v1->x< v2->x)                 \
-    CONCAT3(m,npar,x) =v1->x, CONCAT3(M,npar,x) =v2->x;   \
+    CONCAT3(m,npar,x) = v1->x, CONCAT3(M,npar,x) = v2->x;   \
   else                              \
-    CONCAT3(m,npar,x) =v2->x, CONCAT3(M,npar,x) =v1->x;   \
+    CONCAT3(m,npar,x) = v2->x, CONCAT3(M,npar,x) = v1->x;   \
   if (v1->y< v2->y)                 \
-    CONCAT3(m,npar,y)=v1->y, CONCAT3(M,npar,y)=v2->y;   \
+    CONCAT3(m,npar,y) = v1->y, CONCAT3(M,npar,y) = v2->y;   \
   else                              \
-    CONCAT3(m,npar,y)=v2->y, CONCAT3(M,npar,y)=v1->y;   \
+    CONCAT3(m,npar,y) = v2->y, CONCAT3(M,npar,y) = v1->y;   \
 } while (0)
 
 /* does the edge [v1,v2] intersect polygon p? */
@@ -1752,7 +1753,7 @@ intersect_polygon (v1, v2, p)
 
   /* Is [v1,v2] vertical? If, use v_intersect() */
   if (EQ (v1->x, v2->x))
-    which_intersect=v_intersect;
+    which_intersect = v_intersect;
 
   UPD_MINMAX(v1,v2,1);
 
@@ -1869,7 +1870,7 @@ build_new_vertex (V1, V2, w)
   /* We need a new Vertex */
   if (vert_free == nvert) /* Extend vlist, if necessary */
 		vlist = (struct Vertex GPHUGE *)
-			gp_realloc(vlist, (unsigned long)sizeof(struct Vertex)*(nvert+=10L),
+			gp_realloc(vlist, (unsigned long)sizeof(struct Vertex)*(nvert += 10L),
 								 "hidden vlist");
   V = vert_free++;
   v = vlist + V;
@@ -1918,7 +1919,7 @@ split_polygon_by_plane (P, a, b, c, d, f)
   int snew, stest;
   int in_plane;									/* what is about points in plane? */
   int cross1, cross2;           /* first vertices, after p crossed the plane */
-  double a1=0.0, b1, a2=0.0, b2; /* parameters of the crosses */
+  double a1 = 0.0, b1, a2 = 0.0, b2; /* parameters of the crosses */
   long Front;										/* the new Polygon */
   int n1, n2;
   long *v1, *v2;
@@ -2049,7 +2050,7 @@ split_polygon_by_plane (P, a, b, c, d, f)
     graph_error ("Logic Error 2 in split_polygon");
 
   /* Build the 2 new polygons : we are reusing one + making one new */
-  CHECK_PLIST_EXTRA(p=plist+P);
+  CHECK_PLIST_EXTRA(p = plist+P);
   Front = pfree++;
 
   if ((next_frag_temp = p->next_frag) <0) 
@@ -2158,8 +2159,8 @@ in_front (Last, Test)
   get_plane (test, &ta, &tb, &tc, &td);
 
   /* Compare Test with the following polygons, which overlap in z value */
-  for (Plast = Test, p=test;
-       ((P=p->next) >= 0) && (((p=plist+P)->zmax > zmin) || p->tested);
+  for (Plast = Test, p = test;
+       ((P = p->next) >= 0) && (((p = plist+P)->zmax > zmin) || p->tested);
 			 Plast = P) {
 		CHECK_POINTER(plist,p);
 		
@@ -2169,13 +2170,13 @@ in_front (Last, Test)
 		if (p->zmax <= zmin)
 			continue;
 		
-		p_rel_tplane=polygon_plane_intersection(p, ta, tb, tc, td);
-		if ((p_rel_tplane==behind) || (p_rel_tplane==inside))
+		p_rel_tplane = polygon_plane_intersection(p, ta, tb, tc, td);
+		if ((p_rel_tplane == behind) || (p_rel_tplane == inside))
 			continue;
 		
 		get_plane (p, &pa, &pb, &pc, &pd);
-		t_rel_pplane=polygon_plane_intersection(test, pa, pb, pc, pd);
-		if ((t_rel_pplane==infront) || (t_rel_pplane==inside))
+		t_rel_pplane = polygon_plane_intersection(test, pa, pb, pc, pd);
+		if ((t_rel_pplane == infront) || (t_rel_pplane == inside))
 			continue;
 		
 		if (!full_xy_overlap (test, p))
@@ -2214,14 +2215,14 @@ in_front (Last, Test)
 		if (loop)	{
 			/* if P isn't interesting for the loop, put P in front of Test */
 			if ((p->tested != is_tested)
-					|| (p_rel_tplane==infront)
-					|| (t_rel_pplane==behind)) /* HBB 970325: was infront (!?) */
+					|| (p_rel_tplane == infront)
+					|| (t_rel_pplane == behind)) /* HBB 970325: was infront (!?) */
 				PUT_P_IN_FRONT_TEST(is_moved_or_split); 
 
 			/* else, split either test or p */
-			if (t_rel_pplane==intersects)
+			if (t_rel_pplane == intersects)
 				SPLIT_TEST_BY_P;
-			if (p_rel_tplane==intersects)
+			if (p_rel_tplane == intersects)
 				SPLIT_P_BY_TEST;
 
 			/* HBB: if we ever come through here, something went severely wrong */
@@ -2234,16 +2235,16 @@ in_front (Last, Test)
 
 		/* No loop: if it makes sense, put P in front of Test */
 		if ((p->tested != is_tested)
-				&& ((t_rel_pplane==behind)
-						|| (p_rel_tplane==infront)))
+				&& ((t_rel_pplane == behind)
+						|| (p_rel_tplane == infront)))
 			PUT_P_IN_FRONT_TEST(is_moved_or_split);
 
 		/* If possible, split P */
-		if ((p->tested != is_tested) || (p_rel_tplane==intersects))
+		if ((p->tested != is_tested) || (p_rel_tplane == intersects))
 			SPLIT_P_BY_TEST;
 
 		/* if possible, split Test */
-		if (t_rel_pplane==intersects)
+		if (t_rel_pplane == intersects)
 			SPLIT_TEST_BY_P;
 
 		/* else, we have a loop: mark P as loop and put it in front of Test */
@@ -2289,7 +2290,7 @@ hl_buffer_set (xv, yv)
 {
   struct Cross GPHUGE *c;
   /*HBB 961110: lclint wanted this: */
-  assert (hl_buffer !=0);
+  assert (hl_buffer != 0);
   for (c = hl_buffer[xv]; c != NULL; c = c->next)
     if (c->a <= yv && c->b >= yv) {
       return TRUE;
@@ -2302,8 +2303,8 @@ static int hl_buff_xmin, hl_buff_xmax;
 
 /* HBB 961124: new routine. All this occured twice in
  * draw_clip_line_buffer */
-/* Store a line crossing the x interval around xv between y=ya and
- * y=yb in the hl_buffer */
+/* Store a line crossing the x interval around xv between y = ya and
+ * y = yb in the hl_buffer */
 static GP_INLINE void
 update_hl_buffer_column(xv, ya, yb) 
      int xv, ya, yb;
@@ -2437,7 +2438,7 @@ draw_clip_line_update (x1, y1, x2, y2, do_draw)
   register int xv, yv, errx, erry, err;
   register int xvr, yvr;
   int xve, yve;
-  register int dy, nstep=0, dyr;
+  register int dy, nstep = 0, dyr;
   int i;
   if (!clip_line (&x1, &y1, &x2, &y2)) {
     /*printf("dcl_update: clipped away!\n");*/
@@ -2474,8 +2475,8 @@ draw_clip_line_update (x1, y1, x2, y2, do_draw)
   is_drawn = (IS_UNSET (xv, yv) && (do_draw || hl_buffer_set (xv, yv)));
 
   /* HBB 961110: lclint wanted these: */
-  assert (ymin_hl !=0);
-  assert (ymax_hl !=0);
+  assert (ymin_hl != 0);
+  assert (ymax_hl != 0);
   /* Check first point in hl-buffer */
   if (xv < xmin_hl) xmin_hl = xv;
   if (xv > xmax_hl) xmax_hl = xv;
@@ -2528,11 +2529,11 @@ draw_clip_line_update (x1, y1, x2, y2, do_draw)
 }
 
 #define DRAW_VERTEX(v, x, y) do { \
-   if ((v)->style>=0 &&                                            \
+   if ((v)->style >= 0 &&                                            \
        !clip_point(x,y)  &&                                        \
        IS_UNSET(XREDUCE(x)-XREDUCE(xleft),YREDUCE(y)-YREDUCE(ybot))) \
      (*t->point)(x,y, v->style);                                   \
-   (v)->style=-1;                                                  \
+   (v)->style = -1;                                                  \
 } while (0)
 
 /* Two routine to emulate move/vector sequence using line drawing routine. */
@@ -2610,7 +2611,7 @@ draw (p)
   
   /* Write the lines of all polygons with the same id as p in the hl_buffer */
 	/* HBB 961201: use next_frag pointers to loop over fragments: */
-  for (q=p; (Q=q->next_frag) >= 0 && (q=plist+Q) != p; ) {
+  for (q = p; (Q = q->next_frag) >= 0 && (q = plist+Q) != p; ) {
 		if (q->id != p->id)
 			continue;
 
@@ -2669,7 +2670,7 @@ draw (p)
   /* reset the hl_buffer */
   /*HBB 961110: lclint wanted this: */
   assert (hl_buffer);
-  for (i = hl_buff_xmin ; i<=hl_buff_xmax ; i++) {
+  for (i = hl_buff_xmin ; i <= hl_buff_xmax ; i++) {
     /* HBB 980303: one part was removed here. It isn't needed any more,
      * with the global store for Cross structs. */
 		hl_buffer[i] = NULL;
@@ -2683,9 +2684,9 @@ draw (p)
   if (xmin_hl < 0 || xmax_hl > XREDUCE (xright) - XREDUCE (xleft))
     graph_error ("Logic error #3 in hidden line");
 	/* HBB 961110: lclint wanted these: */
-  assert (ymin_hl !=0);
-  assert (ymax_hl !=0);
-  assert (pnt !=0); 
+  assert (ymin_hl != 0);
+  assert (ymax_hl != 0);
+  assert (pnt != 0); 
   if (xmin_hl < xmax_hl)
     for (i = xmin_hl; i <= xmax_hl; i++) {
 			if (ymin_hl[i] == HL_EXTENT_Y_MAX)
@@ -2706,7 +2707,7 @@ draw (p)
 				*cpnt |= (mask1 & mask2);
 			else {
 				*cpnt++ |= mask1;
-				for (k=indx1+1; k<indx2; k++)
+				for (k = indx1+1; k<indx2; k++)
 					*cpnt++ = PNT_MAX;
 				*cpnt |= mask2;
 			}
@@ -2750,7 +2751,7 @@ plot3d_hidden (plots, pcount)
   hl_buffer =
     (struct Cross GPHUGE * GPHUGE *) gp_alloc ((unsigned long)(i*sizeof(struct Cross GPHUGE *)),
 																"hidden hl_buffer");
-  while (--i>=0)
+  while (--i >= 0)
     hl_buffer[i] = (struct Cross *) 0;
 
   init_polygons (plots, pcount);

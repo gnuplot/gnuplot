@@ -39,29 +39,25 @@ static char    *RCSid = "$Id: plot3d.c,v 1.36 1998/06/18 14:55:14 ddenholm Exp $
 #include "binary.h"
 
 #ifndef _Windows
-#include "help.h"
+# include "help.h"
 #else
-#define MAXSTR 255
+# define MAXSTR 255
 #endif
 
 #if defined(ATARI) || defined(MTOS)
-#ifdef __PUREC__
-#include <ext.h>
-#include <tos.h>
-#include <aes.h>
-#else
-#include <osbind.h>
-#include <aesbind.h>
-#endif /* __PUREC__ */
+# ifdef __PUREC__
+#  include <ext.h>
+#  include <tos.h>
+#  include <aes.h>
+# else /* !PUREC */
+#  include <osbind.h>
+#  include <aesbind.h>
+# endif /* !PUREC */
 #endif /* ATARI || MTOS */
 
 #ifndef STDOUT
 #define STDOUT 1
 #endif
-
-
-#define inrange(z,min,max) ((min<max) ? ((z>=min)&&(z<=max)) : ((z>=max)&&(z<=min)) )
-
 
 /* static prototypes */
 
@@ -85,8 +81,8 @@ extern int plot_token;
 /* in order to support multiple axes, and to
  * simplify ranging in parametric plots, we use
  * arrays to store some things. For 2d plots,
- * elements are  y1=0 x1=1 y2=2 x2=3
- * for 3d,  z=0, x=1, y=2
+ * elements are  y1 = 0 x1 = 1 y2 = 2 x2 = 3
+ * for 3d,  z = 0, x = 1, y = 2
  * these are given symbolic names in plot.h
  */
 
@@ -128,22 +124,22 @@ extern int reverse_range[];
  * it for now, then fix it at the end.
  */
 #define INIT_ARRAYS(axis, min, max, auto, is_log, base, log_base, infinite) \
-do{if ((auto_array[axis]=auto)==0 && max<min) {\
-	min_array[axis]=max;\
-   max_array[axis]=min; /* we will fix later */ \
+do{if ((auto_array[axis] = auto) == 0 && max<min) {\
+	min_array[axis] = max;\
+   max_array[axis] = min; /* we will fix later */ \
  } else { \
-	min_array[axis]=(infinite && (auto&1)) ? VERYLARGE : min; \
-	max_array[axis]=(infinite && (auto&2)) ? -VERYLARGE : max; \
+	min_array[axis] = (infinite && (auto&1)) ? VERYLARGE : min; \
+	max_array[axis] = (infinite && (auto&2)) ? -VERYLARGE : max; \
  } \
- log_array[axis]=is_log; base_array[axis]=base; log_base_array[axis]=log_base;\
+ log_array[axis] = is_log; base_array[axis] = base; log_base_array[axis] = log_base;\
 }while(0)
  
 /* handle reversed ranges */
 #define CHECK_REVERSE(axis) \
 do{\
- if (auto_array[axis]==0 && max_array[axis] < min_array[axis]) {\
-  double temp=min_array[axis]; min_array[axis]=max_array[axis]; max_array[axis]=temp;\
-  reverse_range[axis]=1; \
+ if (auto_array[axis] == 0 && max_array[axis] < min_array[axis]) {\
+  double temp = min_array[axis]; min_array[axis] = max_array[axis]; max_array[axis] = temp;\
+  reverse_range[axis] = 1; \
  } else reverse_range[axis] = (range_flags[axis]&RANGE_REVERSE); \
 }while(0)
 
@@ -168,15 +164,17 @@ do {\
  */
 
 #define STORE_WITH_LOG_AND_FIXUP_RANGE(STORE, VALUE, TYPE, AXIS, OUT_ACTION, UNDEF_ACTION)\
-do { if (log_array[AXIS]) { if (VALUE<0.0) {TYPE=UNDEFINED; UNDEF_ACTION; break;} \
-              else if (VALUE==0.0){STORE=-VERYLARGE; TYPE=OUTRANGE; OUT_ACTION; break;} \
-              else { STORE=log(VALUE)/log_base_array[AXIS]; } \
-     } else STORE=VALUE; \
+do { if (log_array[AXIS]) { if (VALUE<0.0) {TYPE = UNDEFINED; UNDEF_ACTION; break;} \
+              else if (VALUE == 0.0){STORE = -VERYLARGE; TYPE = OUTRANGE; OUT_ACTION; break;} \
+              else { STORE = log(VALUE)/log_base_array[AXIS]; } \
+     } else STORE = VALUE; \
      if (TYPE != INRANGE) break;  /* dont set y range if x is outrange, for example */ \
-     if ( VALUE<min_array[AXIS] ) \
-      if (auto_array[AXIS] & 1) min_array[AXIS]=VALUE; else { TYPE=OUTRANGE; OUT_ACTION; break; }  \
-     if ( VALUE>max_array[AXIS] ) \
-     if (auto_array[AXIS] & 2) max_array[AXIS]=VALUE; else { TYPE=OUTRANGE; OUT_ACTION; }   \
+     if ( VALUE<min_array[AXIS] ) { \
+      if (auto_array[AXIS] & 1) min_array[AXIS] = VALUE; else { TYPE = OUTRANGE; OUT_ACTION; break; }  \
+     } \
+     if ( VALUE>max_array[AXIS] ) { \
+      if (auto_array[AXIS] & 2) max_array[AXIS] = VALUE; else { TYPE = OUTRANGE; OUT_ACTION; }   \
+     } \
 } while(0)
      
 /* use this instead empty macro arguments to work around NeXT cpp bug */
@@ -195,17 +193,18 @@ do { if (log_array[AXIS]) { if (VALUE<0.0) {TYPE=UNDEFINED; UNDEF_ACTION; break;
 #endif
 
 #define FIXUP_RANGE(AXIS, WHICH) \
-do{if (fabs(max_array[AXIS] - min_array[AXIS]) < zero)    \
-    if (auto_array[AXIS]) { /* widen range */  \
-     fprintf(stderr, "Warning: empty %s range [%g:%g], ", STRINGIFY(WHICH), min_array[AXIS], max_array[AXIS]);      \
-     if (fabs(min_array[AXIS]) < zero) { \
-      if (auto_array[AXIS] & 1) min_array[AXIS] = -1.0; \
-      if (auto_array[AXIS] & 2) max_array[AXIS] = 1.0;   \
-     } else if (max_array[AXIS] < 0) { \
-      if (auto_array[AXIS] & 1) min_array[AXIS] *= 1.1; if (auto_array[AXIS] & 2) max_array[AXIS] *= 0.9;    \
-     } else { if (auto_array[AXIS] & 1) min_array[AXIS] *= 0.9; if (auto_array[AXIS] & 2) max_array[AXIS] *= 1.1;  }  \
-     fprintf(stderr, "adjusting to [%g:%g]\n", min_array[AXIS], max_array[AXIS]);          \
-    } else int_error(RANGE_MSG(WHICH), c_token);   \
+do { if (fabs(max_array[AXIS] - min_array[AXIS]) < zero) { \
+      if (auto_array[AXIS]) { /* widen range */  \
+       fprintf(stderr, "Warning: empty %s range [%g:%g], ", STRINGIFY(WHICH), min_array[AXIS], max_array[AXIS]);      \
+       if (fabs(min_array[AXIS]) < zero) { \
+        if (auto_array[AXIS] & 1) min_array[AXIS] = -1.0; \
+        if (auto_array[AXIS] & 2) max_array[AXIS] = 1.0;   \
+       } else if (max_array[AXIS] < 0) { \
+        if (auto_array[AXIS] & 1) min_array[AXIS] *= 1.1; if (auto_array[AXIS] & 2) max_array[AXIS] *= 0.9;    \
+       } else { if (auto_array[AXIS] & 1) min_array[AXIS] *= 0.9; if (auto_array[AXIS] & 2) max_array[AXIS] *= 1.1;  }  \
+       fprintf(stderr, "adjusting to [%g:%g]\n", min_array[AXIS], max_array[AXIS]);          \
+      } else int_error(RANGE_MSG(WHICH), c_token);   \
+     } \
 }while(0)
 
 /* check range and take logs of min and max if logscale
@@ -215,15 +214,16 @@ do{if (fabs(max_array[AXIS] - min_array[AXIS]) < zero)    \
 #define FIXUP_RANGE_FOR_LOG(AXIS, WHICH) \
 do { if (reverse_range[AXIS]) { \
       double temp = min_array[AXIS]; \
-      min_array[AXIS]=max_array[AXIS]; \
-      max_array[AXIS]=temp; \
+      min_array[AXIS] = max_array[AXIS]; \
+      max_array[AXIS] = temp; \
      }\
      if (log_array[AXIS]) { \
-      if (min_array[AXIS]<=0.0 || max_array[AXIS]<=0.0) \
+      if (min_array[AXIS] <= 0.0 || max_array[AXIS] <= 0.0) \
        int_error(RANGE_MSG(WHICH), NO_CARET); \
       min_array[AXIS] = log(min_array[AXIS])/log_base_array[AXIS]; \
       max_array[AXIS] = log(max_array[AXIS])/log_base_array[AXIS];  \
-} } while(0)
+    } \
+} while(0)
 
 
 
@@ -476,11 +476,11 @@ static void get_3ddata(this_plot)
  * will be moved passed title etc after we return
  */
 {
-	int xdatum=0;
-	int ydatum=0;
+	int xdatum = 0;
+	int ydatum = 0;
 	int i,j;
 	double v[3];
-	int pt_in_iso_crv=0;
+	int pt_in_iso_crv = 0;
 	struct iso_curve *this_iso;
 
 	if (mapping3d == MAP3D_CARTESIAN)
@@ -514,17 +514,17 @@ static void get_3ddata(this_plot)
 	/* data file is already open */
 
 	if (df_matrix)
-		xdatum=df_3dmatrix(this_plot);
+		xdatum = df_3dmatrix(this_plot);
 	else	{
 		/*{{{  read surface from text file*/
-		struct iso_curve *this_iso=iso_alloc(samples);
+		struct iso_curve *this_iso = iso_alloc(samples);
 		struct coordinate GPHUGE *cp;
 		double x,y,z;
 		
-		while ((j=df_readline(v,3)) != DF_EOF)  {
-			if (j==DF_SECOND_BLANK)
+		while ((j = df_readline(v,3)) != DF_EOF)  {
+			if (j == DF_SECOND_BLANK)
 				break;  /* two blank lines */
-			if (j==DF_FIRST_BLANK) {
+			if (j == DF_FIRST_BLANK) {
 				/* one blank line */
 				if (pt_in_iso_crv == 0) {
 				    if (xdatum == 0)
@@ -553,7 +553,7 @@ static void get_3ddata(this_plot)
 			/*
 			 * overflow about to occur. Extend size of points[] array. We
 			 * either double the size, or add 1000 points, whichever is a
-			 * smaller increment. Note i=p_max.
+			 * smaller increment. Note i = p_max.
 			 */
 			iso_extend(this_iso,
 				   xdatum + (xdatum < 1000 ? xdatum : 1000));
@@ -561,12 +561,12 @@ static void get_3ddata(this_plot)
 		
 		cp = this_iso->points + xdatum;
 		
-		if (j==DF_UNDEFINED) {
-			cp->type=UNDEFINED;
+		if (j == DF_UNDEFINED) {
+			cp->type = UNDEFINED;
 			continue;
 		}
 		
-		cp->type=INRANGE; /* unless we find out different */
+		cp->type = INRANGE; /* unless we find out different */
 		
 		switch(mapping3d) {
 			case MAP3D_CARTESIAN:
@@ -594,7 +594,7 @@ static void get_3ddata(this_plot)
 				if (j<2)
 					int_error("Need 2 or 3 columns", this_plot->token);
 				if (j<3)
-					v[2]=1; /* default radius */
+					v[2] = 1; /* default radius */
 				if (angles_format == ANGLES_DEGREES) {
 					v[0] *= DEG2RAD;	/* Convert to radians. */
 					v[1] *= DEG2RAD;
@@ -607,7 +607,7 @@ static void get_3ddata(this_plot)
 				if (j<2)
 					int_error("Need 2 or 3 columns", this_plot->token);
 				if (j<3)
-					v[2]=1; /* default radius */
+					v[2] = 1; /* default radius */
 				if (angles_format == ANGLES_DEGREES) {
 					v[0] *= DEG2RAD;	/* Convert to radians. */
 				}
@@ -621,7 +621,7 @@ static void get_3ddata(this_plot)
 		}
 		
 		/* adjust for logscales. Set min/max and point types. store in cp */
-		cp->type=INRANGE;
+		cp->type = INRANGE;
 		/* cannot use continue, as macro is wrapped in a loop. I regard this as correct goto use */
 		STORE_WITH_LOG_AND_FIXUP_RANGE(cp->x, x, cp->type, x_axis, NOOP, goto come_here_if_undefined );
 		STORE_WITH_LOG_AND_FIXUP_RANGE(cp->y, y, cp->type, y_axis, NOOP, goto come_here_if_undefined );
@@ -669,7 +669,7 @@ static void get_3ddata(this_plot)
 		/* copy whole point struct to get type too.
 		 * wasteful for windows, with padding */
 		/* more efficient would be extra pointer to same struct */
-		new_icrv->points[j]=this_iso->points[i];
+		new_icrv->points[j] = this_iso->points[i];
 	    }
 
 	    new_icrv->next = new_icrvs;
@@ -695,8 +695,8 @@ int pcount;
     struct iso_curve *icrvs;
 	struct coordinate GPHUGE *points;
 
-    for (surface=0, this_plot=first_3dplot ; surface < pcount; 
-		this_plot=this_plot->next_sp, surface++){
+    for (surface = 0, this_plot = first_3dplot ; surface < pcount; 
+		this_plot = this_plot->next_sp, surface++){
 		fprintf(outfile, "\n#Surface %d of %d surfaces\n", surface, pcount);
 		icrvs = this_plot->iso_crvs;
 		curve = 0;
@@ -705,7 +705,7 @@ int pcount;
 		    /* only the curves in one direction */
 		    while(icrvs && curve < this_plot->num_iso_read){
 			fprintf(outfile, "\n#IsoCurve %d, %d points\n#x y z type\n", curve, icrvs->p_count);
-			for(i=0, points = icrvs->points; i < icrvs->p_count; i++){
+			for(i = 0, points = icrvs->points; i < icrvs->p_count; i++){
 	    		fprintf(outfile, "%g %g %g %c\n",
 		    	points[i].x,
 		    	points[i].y,
@@ -721,11 +721,11 @@ int pcount;
 		}
 
 		if (draw_contour) {
-			int number=0;
-			struct gnuplot_contours *c=this_plot->contours;
+			int number = 0;
+			struct gnuplot_contours *c = this_plot->contours;
 			while (c) {
-				int count=c->num_pts;
-				struct coordinate GPHUGE *p=c->coords;
+				int count = c->num_pts;
+				struct coordinate GPHUGE *p = c->coords;
 				if (c->isNewLevel)
 					/* dont display count - contour split across chunks */
 					/* put # in case user wants to use it for a plot */
@@ -734,7 +734,7 @@ int pcount;
 				for ( ; --count >= 0 ; ++p)
 					fprintf(outfile, "%g %g %g\n", p->x, p->y, p->z);
 				putc('\n', outfile);  /* blank line between segments of same contour */
-				c=c->next;
+				c = c->next;
 			}
 		}			
 	}
@@ -774,8 +774,8 @@ static void eval_3dplots()
 	struct surface_points **tp_3d_ptr;
 	int    start_token, end_token;
 	int    begin_token;
-	TBOOLEAN        some_data_files = FALSE, some_functions=FALSE;
-	int             plot_num, line_num, point_num, crnt_param = 0;	/* 0=z, 1=y, 2=x */
+	TBOOLEAN        some_data_files = FALSE, some_functions = FALSE;
+	int             plot_num, line_num, point_num, crnt_param = 0;	/* 0 = z, 1 = y, 2 = x */
 	char           *xtitle;
 	char           *ytitle;
 	
@@ -783,16 +783,16 @@ static void eval_3dplots()
 	 * If there is an error within this function, the memory is left allocated,
 	 * since we cannot call sp_free if the list is incomplete
 	 */
-	first_3dplot=NULL;
+	first_3dplot = NULL;
 	
 	/* put stuff into arrays to simplify access */
 	INIT_ARRAYS(FIRST_X_AXIS, xmin, xmax, autoscale_lx, is_log_x, base_log_x, log_base_log_x, 0);
 	INIT_ARRAYS(FIRST_Y_AXIS, ymin, ymax, autoscale_ly, is_log_y, base_log_y, log_base_log_y, 0);
 	INIT_ARRAYS(FIRST_Z_AXIS, zmin, zmax, autoscale_lz, is_log_z, base_log_z, log_base_log_z, 1);
 	
-	x_axis=FIRST_X_AXIS;
-	y_axis=FIRST_Y_AXIS;
-	z_axis=FIRST_Z_AXIS;
+	x_axis = FIRST_X_AXIS;
+	y_axis = FIRST_Y_AXIS;
+	z_axis = FIRST_Z_AXIS;
 	
 	tp_3d_ptr = &(first_3dplot);
 	plot_num = 0;
@@ -866,26 +866,26 @@ static void eval_3dplots()
 				this_plot->token = end_token = c_token-1;  /* for capture to key */
 				/* this_plot->token is temporary, for errors in get_3ddata() */
 				
-				if (datatype[FIRST_X_AXIS]==TIME)
+				if (datatype[FIRST_X_AXIS] == TIME)
 				{
 					if (specs<3)
 						int_error("Need full using spec for x time data", c_token);
-					df_timecol[0]=1;
+					df_timecol[0] = 1;
 				}
 				
-				if (datatype[FIRST_Y_AXIS]==TIME)
+				if (datatype[FIRST_Y_AXIS] == TIME)
 				{
 					if (specs<3)
 						int_error("Need full using spec for y time data", c_token);
-					df_timecol[1]=1;
+					df_timecol[1] = 1;
 				}
 				
-				if (datatype[FIRST_Z_AXIS]==TIME)
+				if (datatype[FIRST_Z_AXIS] == TIME)
 				{
 					if (specs<3)
-						df_timecol[0]=1;
+						df_timecol[0] = 1;
 					else
-						df_timecol[2]=1;
+						df_timecol[2] = 1;
 				}
 				/*}}}*/
 
@@ -922,9 +922,9 @@ static void eval_3dplots()
 				this_plot->num_iso_read = iso_samples_2;
 				dummy_func = &plot_func;
 				plot_func.at = temp_at();
-				dummy_func=NULL;
+				dummy_func = NULL;
 				/* ignore it for now */
-				some_functions=TRUE;
+				some_functions = TRUE;
 				end_token = c_token - 1;
 				/*}}}*/
 
@@ -934,7 +934,7 @@ static void eval_3dplots()
 			/*{{{  title*/
 			if (this_plot->title) {
 				free(this_plot->title);
-				this_plot->title=NULL;
+				this_plot->title = NULL;
 			}
 				
 				
@@ -964,7 +964,7 @@ static void eval_3dplots()
 					xtitle[0] = '\0';
 				if (ytitle != NULL)
 					ytitle[0] = '\0';
-				/*   this_plot->title=NULL;   */
+				/*   this_plot->title = NULL;   */
 				++c_token;
 			} else {
 				m_capture(&(this_plot->title), start_token, end_token);
@@ -1034,9 +1034,9 @@ static void eval_3dplots()
 				/*{{{  read data*/
 				/* remember settings for second surface in file */
 				struct lp_style_type *these_props = &(this_plot->lp_properties);
-				enum PLOT_STYLE this_style=this_plot->plot_style;
+				enum PLOT_STYLE this_style = this_plot->plot_style;
 				
-				int this_token=this_plot->token;
+				int this_token = this_plot->token;
 				while (!df_eof)
 				{
 					this_plot = *tp_3d_ptr;
@@ -1045,11 +1045,11 @@ static void eval_3dplots()
 					/* dont move tp_3d_ptr until we are sure we
 					 * have read a surface
 					 */
-					this_plot->token=this_token; /* used by get_3ddata() */
+					this_plot->token = this_token; /* used by get_3ddata() */
 					get_3ddata(this_plot);
-					this_plot->token=c_token; /* for second pass */
+					this_plot->token = c_token; /* for second pass */
 							
-					if (this_plot->num_iso_read==0)
+					if (this_plot->num_iso_read == 0)
 						/* probably df_eof, in which case we
 						 * will leave loop. if not eof, then
 						 * how come we got no surface ? - retry
@@ -1069,7 +1069,7 @@ static void eval_3dplots()
 					 * no more surfaces to read
 					 */
 					 
-					if ( (this_plot=*tp_3d_ptr) != NULL ) {
+					if ( (this_plot = *tp_3d_ptr) != NULL ) {
 						if (this_plot->title) {
 							free(this_plot->title);
 							this_plot->title = NULL;
@@ -1079,8 +1079,8 @@ static void eval_3dplots()
 						this_plot = *tp_3d_ptr = sp_alloc(0, 0, 0, 0);
 					}
 					
-					this_plot->plot_type=DATA3D;
-					this_plot->plot_style=this_style;
+					this_plot->plot_type = DATA3D;
+					this_plot->plot_style = this_style;
 					this_plot->lp_properties = *these_props; /* struct copy */
 				}
 				df_close();
@@ -1161,10 +1161,10 @@ static void eval_3dplots()
 		}
 
 		if (parametric) {
-			u_min=umin;
-			u_max=umax;
-			v_min=vmin;
-			v_max=vmax;
+			u_min = umin;
+			u_max = umax;
+			v_min = vmin;
+			v_max = vmax;
  	   } else {
 			/*{{{  figure ranges, taking logs etc into account*/
 			if (is_log_x) {
@@ -1229,7 +1229,7 @@ static void eval_3dplots()
 					
 					dummy_func = &plot_func;
 					plot_func.at = temp_at();	/* reparse function */
-					dummy_func=NULL;
+					dummy_func = NULL;
 					num_iso_to_use = iso_samples_2;
 					
 					if (!(this_plot->has_grid_topology && hidden3d))
@@ -1269,7 +1269,7 @@ static void eval_3dplots()
 							}
 							temp = real(&a);
 					
-							points[i].type=INRANGE;
+							points[i].type = INRANGE;
 							STORE_WITH_LOG_AND_FIXUP_RANGE(points[i].z, temp, points[i].type,
 							    crnt_param, NOOP, NOOP);
 					
@@ -1312,7 +1312,7 @@ static void eval_3dplots()
 								}
 								temp = real(&a);
 						
-								points[j].type=INRANGE;
+								points[j].type = INRANGE;
 								STORE_WITH_LOG_AND_FIXUP_RANGE(points[j].z, temp, points[j].type,
 								    crnt_param, NOOP, NOOP);
 							}
@@ -1354,7 +1354,7 @@ static void eval_3dplots()
 	 * variable assignment
 	 */
 
-	if(plot_num == 0 || first_3dplot==NULL) {
+	if(plot_num == 0 || first_3dplot == NULL) {
 		int_error("no functions or data to plot", c_token);
 	}
 
@@ -1386,8 +1386,8 @@ static void eval_3dplots()
 
 #define WRITEBACK(axis,min,max) \
 if(range_flags[axis]&RANGE_WRITEBACK) \
-  {if (auto_array[axis]&1) min=min_array[axis]; \
-   if (auto_array[axis]&2) max=max_array[axis]; \
+  {if (auto_array[axis]&1) min = min_array[axis]; \
+   if (auto_array[axis]&2) max = max_array[axis]; \
   }
 
 	WRITEBACK(FIRST_X_AXIS,xmin,xmax)
@@ -1395,7 +1395,7 @@ if(range_flags[axis]&RANGE_WRITEBACK) \
 	WRITEBACK(FIRST_Z_AXIS,zmin,zmax)
 
 
-	if(plot_num==0 || first_3dplot==NULL) {
+	if(plot_num == 0 || first_3dplot == NULL) {
 		int_error("no functions or data to plot", c_token);
 	}
 
@@ -1494,7 +1494,7 @@ parametric_3dfixup(start_plot, plot_num)
  * x and y ranges now fixed in eval_3dplots
  */
     struct surface_points *xp, *new_list, *free_list = NULL;
-    struct surface_points **last_pointer=&new_list;
+    struct surface_points **last_pointer = &new_list;
 
     int             i, tlen, surface;
     char           *new_title;
@@ -1573,15 +1573,15 @@ parametric_3dfixup(start_plot, plot_num)
 	/* add zp to tail of new_list */
 	*last_pointer = zp;
 	last_pointer = &(zp->next_sp);
-	xp=zp->next_sp;
+	xp = zp->next_sp;
       } else {  /* its a data plot */
 	assert(*last_pointer == xp);  /* think this is true ! */
 	last_pointer = &(xp->next_sp);
-	xp=xp->next_sp;
+	xp = xp->next_sp;
       }
     }
 
     /* Ok, append free list and write first_plot */
     *last_pointer = free_list;
-    first_3dplot=new_list;
+    first_3dplot = new_list;
 }

@@ -121,7 +121,7 @@ static double x_max, y_max, z_max;          /* Maximum values of x, y, and z */
 static void add_cntr_point __PROTO((double x, double y));
 static void end_crnt_cntr __PROTO((void));
 static void gen_contours __PROTO((struct edge_struct *p_edges, double z_level,
-    double x_min, double x_max, double y_min, double y_max));
+    double xx_min, double xx_max, double yy_min, double yy_max));
 static int update_all_edges __PROTO((struct edge_struct *p_edges, 
     double z_level));
 static struct cntr_struct *gen_one_contour __PROTO((
@@ -140,8 +140,8 @@ static void gen_triangle __PROTO((int num_isolines,
     struct iso_curve *iso_lines, struct poly_struct **p_polys, 
     struct edge_struct **p_edges));
 static void calc_min_max __PROTO((int num_isolines,
-    struct iso_curve *iso_lines, double *x_min, double *y_min, double *z_min,
-    double *x_max, double *y_max, double *z_max));
+    struct iso_curve *iso_lines, double *xx_min, double *yy_min, double *zz_min,
+    double *xx_max, double *yy_max, double *zz_max));
 static struct edge_struct *add_edge __PROTO((struct coordinate GPHUGE *point0,
     struct coordinate GPHUGE *point1, struct edge_struct **p_edge, 
     struct edge_struct **pe_tail));
@@ -151,13 +151,16 @@ static struct poly_struct *add_poly __PROTO((struct edge_struct *edge0,
 
 
 static void put_contour __PROTO((struct cntr_struct *p_cntr, double z_level,
-    double x_min, double x_max, double y_min, double y_max, int contr_kind));
+    double xx_min, double xx_max, double yy_min, double yy_max,
+    int contr_kind));
 static void put_contour_nothing __PROTO((struct cntr_struct *p_cntr));
+static int chk_contour_kind __PROTO((struct cntr_struct *p_cntr, 
+    int contr_kind));
 static void put_contour_cubic __PROTO((struct cntr_struct *p_cntr, 
-    double z_level,
-    double x_min, double x_max, double y_min, double y_max, int contr_kind));
+    double z_level, double xx_min, double xx_max, double yy_min, double yy_max,
+    int contr_kind));
 static void put_contour_bspline __PROTO((struct cntr_struct *p_cntr, 
-    double z_level, double x_min, double x_max, double y_min, double y_max, 
+    double z_level, double xx_min, double xx_max, double yy_min, double yy_max, 
     int contr_kind));
 static void free_contour __PROTO((struct cntr_struct *p_cntr));
 static int count_contour __PROTO((struct cntr_struct *p_cntr));
@@ -314,8 +317,8 @@ static void end_crnt_cntr(void)
 static void gen_contours(
 			 struct edge_struct *p_edges,
 			 double z_level, 
-			 double x_min, double x_max, 
-			 double y_min, double y_max)
+			 double xx_min, double xx_max, 
+			 double yy_min, double yy_max)
 {
     int num_active,                        /* Number of edges marked ACTIVE. */
 	contr_kind;                  /* One of OPEN_CONTOUR, CLOSED_CONTOUR. */
@@ -329,7 +332,7 @@ static void gen_contours(
         /* Generate One contour (and update MumActive as needed): */
 	p_cntr = gen_one_contour(p_edges, z_level, &contr_kind, &num_active);
         /* Emit it in requested format: */
-	put_contour(p_cntr, z_level, x_min, x_max, y_min, y_max, contr_kind);
+	put_contour(p_cntr, z_level, xx_min, xx_max, yy_min, yy_max, contr_kind);
     }
 }
 
@@ -671,20 +674,20 @@ static void calc_min_max(
 
 int                  num_isolines,            /* number of iso-lines   input */
 struct iso_curve       *iso_lines,            /* iso-lines             input */
-double                     *x_min,            /* min/max values       in/out */
-double                     *y_min,
-double                     *z_min,
-double                     *x_max,
-double                     *y_max,
-double                     *z_max)
+double                     *xx_min,           /* min/max values       in/out */
+double                     *yy_min,
+double                     *zz_min,
+double                     *xx_max,
+double                     *yy_max,
+double                     *zz_max)
 {
     int i, j, grid_x_max;
     struct coordinate GPHUGE *vertex;
 
     grid_x_max = iso_lines->p_count;      /* number of vertices per iso_line */
 
-    (*x_min) = (*y_min) = (*z_min) = VERYLARGE;     /* clear min/max values */
-    (*x_max) = (*y_max) = (*z_max) = -VERYLARGE;
+    (*xx_min) = (*yy_min) = (*zz_min) = VERYLARGE;   /* clear min/max values */
+    (*xx_max) = (*yy_max) = (*zz_max) = -VERYLARGE;
 
     for (j = 0; j < num_isolines; j++) {
 
@@ -692,20 +695,20 @@ double                     *z_max)
 
 	for (i = 0; i < grid_x_max; i++) {
 	    if (vertex[i].type != UNDEFINED) {
-	        if (vertex[i].x > (*x_max)) (*x_max) = vertex[i].x;
-		if (vertex[i].y > (*y_max)) (*y_max) = vertex[i].y;
-		if (vertex[i].z > (*z_max)) (*z_max) = vertex[i].z;
-		if (vertex[i].x < (*x_min)) (*x_min) = vertex[i].x;
-		if (vertex[i].y < (*y_min)) (*y_min) = vertex[i].y;
-		if (vertex[i].z < (*z_min)) (*z_min) = vertex[i].z;
+	        if (vertex[i].x > (*xx_max)) (*xx_max) = vertex[i].x;
+		if (vertex[i].y > (*yy_max)) (*yy_max) = vertex[i].y;
+		if (vertex[i].z > (*zz_max)) (*zz_max) = vertex[i].z;
+		if (vertex[i].x < (*xx_min)) (*xx_min) = vertex[i].x;
+		if (vertex[i].y < (*yy_min)) (*yy_min) = vertex[i].y;
+		if (vertex[i].z < (*zz_min)) (*zz_min) = vertex[i].z;
 	    }
 	}
 	iso_lines = iso_lines -> next;
     }
     /* 
-     * fprintf(stderr," x: %g, %g\n", (*x_min), (*x_max));
-     * fprintf(stderr," y: %g, %g\n", (*y_min), (*y_max));
-     * fprintf(stderr," z: %g, %g\n", (*z_min), (*z_max));
+     * fprintf(stderr," x: %g, %g\n", (*xx_min), (*xx_max));
+     * fprintf(stderr," y: %g, %g\n", (*yy_min), (*yy_max));
+     * fprintf(stderr," z: %g, %g\n", (*zz_min), (*zz_max));
      */
 }
 
@@ -809,12 +812,13 @@ static void put_contour(
 
 struct cntr_struct   *p_cntr,           /* contour structure           input */
 double               z_level,           /* Z level of contour          input */
-double                 x_min,           /* minimum/maximum values      input */
-double                 x_max,
-double                 y_min,
-double                 y_max,
+double                 xx_min,          /* minimum/maximum values      input */
+double                 xx_max,
+double                 yy_min,
+double                 yy_max,
 int               contr_kind)           /* OPEN_ or CLOESED_CONTOUR    input */
 {
+
     if (!p_cntr) return;            /* Nothing to do if it is empty contour. */
 
     switch (interp_kind) {
@@ -822,12 +826,13 @@ int               contr_kind)           /* OPEN_ or CLOESED_CONTOUR    input */
             put_contour_nothing(p_cntr);
             break;
         case INTERP_CUBIC:                    /* Cubic spline interpolation. */
-            put_contour_cubic(p_cntr, z_level, x_min, x_max, y_min, y_max,
-                                                                contr_kind);
+            put_contour_cubic(p_cntr, z_level, xx_min, xx_max, yy_min, yy_max,
+                                    chk_contour_kind(p_cntr, contr_kind));
+
             break;
         case APPROX_BSPLINE:                       /* Bspline approximation. */
-            put_contour_bspline(p_cntr, z_level, x_min, x_max, y_min, y_max,
-                                                                contr_kind);
+            put_contour_bspline(p_cntr, z_level, xx_min, xx_max, yy_min, yy_max,
+                                    chk_contour_kind(p_cntr, contr_kind));
             break;
     }
     free_contour(p_cntr);
@@ -847,6 +852,36 @@ static void put_contour_nothing(struct cntr_struct *p_cntr)
 }
 
 /*
+ * for some reason contours are never flagged as CLOSED_CONTOUR
+ * if first point == last point, set flag accordingly
+ *
+ */
+
+static int chk_contour_kind(p_cntr, contr_kind)
+struct cntr_struct *p_cntr;
+int contr_kind;
+{
+    struct cntr_struct  *pc_tail=NULL;
+    int current_contr_kind;
+
+    FPRINTF(("check_contour_kind: current contr_kind value is %d\n",contr_kind));
+
+    current_contr_kind = contr_kind;
+
+    if (contr_kind != CLOSED_CONTOUR) {
+        pc_tail = p_cntr;
+        while (pc_tail -> next) pc_tail = pc_tail -> next;/* Find last point.*/
+
+        /* test if first and last point are equal */
+        if ( fuzzy_equal(pc_tail, p_cntr) ) {
+            current_contr_kind = CLOSED_CONTOUR;
+            FPRINTF(("check_contour_kind: contr_kind changed to %d\n",current_contr_kind));
+        }
+    }
+    return (current_contr_kind);
+}
+
+/*
  * Generate a cubic spline curve through the points (x_i,y_i) which are
  * stored in the linked list p_cntr.
  * The spline is defined as a 2d-function s(t) = (x(t),y(t)), where the
@@ -856,10 +891,10 @@ static void put_contour_cubic(
 
 struct cntr_struct  *p_cntr,
 double              z_level, 
-double                x_min,
-double                x_max, 
-double                y_min,
-double                y_max,
+double                xx_min,
+double                xx_max, 
+double                yy_min,
+double                yy_max,
 int              contr_kind)
 {
     int num_pts, num_intpol;
@@ -889,8 +924,8 @@ int              contr_kind)
         gp_alloc((unsigned long) (sizeof(double) * num_pts), "contour d2y");
 
     /* Width and hight of the grid is used at unit length (2d-norm) */
-    unit_x= x_max - x_min;
-    unit_y= y_max - y_min;
+    unit_x = xx_max - x_min;
+    unit_y = yy_max - y_min;
     unit_x = ( unit_x > zero ? unit_x : zero );   /* should not be zero */
     unit_y = ( unit_y > zero ? unit_y : zero );
 
@@ -942,8 +977,8 @@ int              contr_kind)
 static void put_contour_bspline(
 				struct cntr_struct *p_cntr,
 				double z_level, 
-				double x_min, double x_max,  
-				double y_min, double y_max,
+				double xx_min, double xx_max,  
+				double yy_min, double yy_max,
 				int contr_kind)
 {
     int num_pts, order = bspline_order;
@@ -1330,18 +1365,17 @@ static void gen_bspline_approx(
                                         contr_kind, &x, &y);   /* Next pt. */
         add_cntr_point(x, y);
         pts_count++;
-        /* As we might have some real number round off problems we must      */
-        /* test if we dont produce too many points here...                   */
-        if (pts_count + 1 == num_approx_pts * (num_of_points - order) + 1)
+        /* As we might have some real number round off problems we do      */
+        /* the last point outside the loop                                 */
+        if (pts_count  == num_approx_pts * (num_of_points - order) + 1)
                 break;
         t += dt;
     }
 
+    /* Now do the last point */
     eval_bspline(t_max - EPSILON, pc_temp, num_of_points, order, knot_index,
                 contr_kind, &x, &y);
-    /* If from round off errors we need more than one last point: */
-    for (i=pts_count; i<num_approx_pts * (num_of_points - order) + 1; i++)
-        add_cntr_point(x, y);                       /* Complete the contour. */
+    add_cntr_point(x, y);                       /* Complete the contour. */
 
     if (contr_kind == CLOSED_CONTOUR)     /* Update list - un-circular it. */
         pc_tail -> next = NULL;

@@ -151,7 +151,7 @@ static double CheckLog __PROTO((TBOOLEAN is_log, double base_log, double x));
 #ifdef AMIGA_SC_6_1
 GP_INLINE static TBOOLEAN i_inrange(int z,int min,int max)
 {
-  return((min<max) ? ((z>=min)&&(z<=max)) : ((z>=max)&&(z<=min)));
+  return((min<max) ? ((z >= min) && (z <= max)) : ((z >= max) && (z <= min)));
 }
 
 GP_INLINE static double f_max(double a,double b)
@@ -169,8 +169,6 @@ GP_INLINE static double f_min(double a,double b)
 #define f_min(a,b) GPMIN((a),(b))
 #define i_inrange(z,a,b) inrange((z),(a),(b))
 #endif
-
-#define inrange(z,min,max) ((min<max) ? ((z>=min)&&(z<=max)) : ((z>=max)&&(z<=min)) )
 
 /* True if a and b have the same sign or zero (positive or negative) */
 #define samesign(a,b) ((a) * (b) >= 0)
@@ -208,7 +206,7 @@ extern int auto_array[];
 extern int log_array[];
 extern double base_array[], log_base_array[];
 
-static int x_axis=FIRST_X_AXIS, y_axis=FIRST_Y_AXIS;  /* current axes */
+static int x_axis = FIRST_X_AXIS, y_axis = FIRST_Y_AXIS;  /* current axes */
 
 static double scale[AXIS_ARRAY_SIZE];  /* scale factors for mapping for each axis */
 
@@ -299,7 +297,7 @@ double place;
 char *text;
 struct lp_style_type grid;
 {
-	int len=label_width(text, NULL);
+	int len = label_width(text, NULL);
 	if (len>widest_tic)
 		widest_tic = len;
 }
@@ -333,11 +331,11 @@ static void boundary(scaling,plots,count)
 	int count;
 {
     int ytlen;
-    int yticlin=0, y2ticlin=0, timelin=0;
+    int yticlin = 0, y2ticlin = 0, timelin = 0;
 
     register struct termentry *t = term;
     int key_h, key_w;
-    int can_rotate=(*t->text_angle)(1);
+    int can_rotate = (*t->text_angle)(1);
 
     int xtic_textheight;     /* height of xtic labels */
     int x2tic_textheight;    /* height of x2tic labels */
@@ -530,7 +528,7 @@ static void boundary(scaling,plots,count)
 	/*  end of preliminary ybot calculation }}}*/
 	
 
-#define KEY_PANIC(x) if (x) { lkey=0; goto key_escape; }
+#define KEY_PANIC(x) if (x) { lkey = 0; goto key_escape; }
 
 	if (lkey) {
 		/*{{{  essential key features*/
@@ -555,10 +553,10 @@ static void boundary(scaling,plots,count)
 			key_sample_left= -key_sample_width;
 			key_sample_right= 0;
 			/* if key width is being used, adjust right-justified text */
-			key_text_left=t->h_char;
-			key_text_right=(t->h_char)*(max_ptitl_len+1+key_width_fix);
-			key_size_left=t->h_char - key_sample_left;  /* sample left is -ve */
-			key_size_right=key_text_right;
+			key_text_left = t->h_char;
+			key_text_right = (t->h_char)*(max_ptitl_len+1+key_width_fix);
+			key_size_left = t->h_char - key_sample_left;  /* sample left is -ve */
+			key_size_right = key_text_right;
 		} else {
 			key_sample_left= 0;
   			key_sample_right= key_sample_width;
@@ -566,7 +564,7 @@ static void boundary(scaling,plots,count)
 			key_text_left = -(int)((t->h_char)*(max_ptitl_len+1+key_width_fix));
 			key_text_right = -(int)(t->h_char);
 			key_size_left= - key_text_left;
-			key_size_right=key_sample_right + t->h_char;
+			key_size_right = key_sample_right + t->h_char;
 		}
 		key_point_offset = (key_sample_left + key_sample_right)/2;
 		
@@ -577,7 +575,7 @@ static void boundary(scaling,plots,count)
 		key_cols = 1;
 		
 		/* calculate rows and cols for key - if something goes wrong,
-		 * the tidiest way out is to  set lkey=0, and a goto
+		 * the tidiest way out is to  set lkey = 0, and a goto
 		 */
 		 
 		if (lkey == -1) {
@@ -586,10 +584,10 @@ static void boundary(scaling,plots,count)
 				key_cols = (int)(xright - xleft)/key_col_wth;
 				KEY_PANIC(key_cols == 0);
 				key_rows = (int)(ptitl_cnt+key_cols-1)/key_cols;
-				KEY_PANIC(key_rows==0);
+				KEY_PANIC(key_rows == 0);
 				/* now calculate actual no cols depending on no rows */
 				key_cols = (int)(ptitl_cnt+key_rows-1)/key_rows;
-				KEY_PANIC(key_cols==0);
+				KEY_PANIC(key_cols == 0);
 				key_col_wth = (int)(xright - xleft)/key_cols;
 		 		/* we divide into columns, then centre in column by considering ratio
 		 		 * of key_left_size to key_right_size
@@ -604,11 +602,11 @@ static void boundary(scaling,plots,count)
 			} else {
 				/* maximise no rows, limited by ytop-ybot */
 				int i = (int)(ytop-ybot-(ktitl_lines+1)*(t->v_char))/key_entry_height;
-				KEY_PANIC(i==0);
+				KEY_PANIC(i == 0);
 				if (ptitl_cnt > i) {
 					key_cols = (int)(ptitl_cnt+i-1)/i;
 					/* now calculate actual no rows depending on no cols */
-					KEY_PANIC(key_cols==0);
+					KEY_PANIC(key_cols == 0);
 					key_rows = (int)(ptitl_cnt+key_cols-1)/key_cols;
 				}
 			}
@@ -625,7 +623,7 @@ static void boundary(scaling,plots,count)
 		/* setup_tics allows max number of tics to be specified
 		 * but users dont like it to change with size and font,
 		 * so we use value of 20, which is 3.5 behaviour.
-		 * Note also that if format is '', yticlin=0, so this gives
+		 * Note also that if format is '', yticlin = 0, so this gives
 		 * division by zero. 
 		 * int guide = (ytop-ybot)/term->v_char;
 		 */
@@ -646,7 +644,7 @@ static void boundary(scaling,plots,count)
 			 * Same will be done to similar calc.'s elsewhere */
 			ytic_textwidth = (int)((t->v_char)*(yticlin+2));
 		else {
-			widest_tic=0; /* reset the global variable ... */
+			widest_tic = 0; /* reset the global variable ... */
 			/* get gen_tics to call widest2d_callback with all labels
 			 * the latter sets widest_tic to the length of the widest one
 			 * ought to consider tics on axis if axis near border...
@@ -707,7 +705,7 @@ static void boundary(scaling,plots,count)
 		if ( vertical_y2tics )
 			y2tic_textwidth = (int)((t->v_char)*(y2ticlin+2));
 		else {
-			widest_tic=0; /* reset the global variable ... */
+			widest_tic = 0; /* reset the global variable ... */
 			/* get gen_tics to call widest2d_callback with all labels
 			 * the latter sets widest_tic to the length of the widest one
 			 * ought to consider tics on axis if axis near border...
@@ -806,7 +804,7 @@ static void boundary(scaling,plots,count)
 	/*  adjust top and bottom margins for tic label rotation */
 
 	if (tmargin < 0 && x2tics&TICS_ON_BORDER && vertical_x2tics) {
-		widest_tic=0; /* reset the global variable ... */
+		widest_tic = 0; /* reset the global variable ... */
 		gen_tics(SECOND_X_AXIS, &x2ticdef, 0, 0, 0.0, widest2d_callback);
 /* HBB: redid this: remove rough guess value first. Among other reasons,
  * I suspected the '-4 lines' of the original code to be in error, as the
@@ -818,7 +816,7 @@ static void boundary(scaling,plots,count)
 	}
 
 	if (bmargin < 0 && xtics&TICS_ON_BORDER && vertical_xtics) {
-		widest_tic=0; /* reset the global variable ... */
+		widest_tic = 0; /* reset the global variable ... */
 		gen_tics(FIRST_X_AXIS, &xticdef, 0, 0, 0.0, widest2d_callback);
 /* HBB: same changes as for tmargin/ytop above */
 		ybot -= xtic_textheight;
@@ -916,7 +914,7 @@ static void boundary(scaling,plots,count)
 	scale[SECOND_X_AXIS] = (xright - xleft)/(max_array[SECOND_X_AXIS] - min_array[SECOND_X_AXIS]);
 
    /*{{{  calculate the window in the grid for the key*/
-   if (lkey==1 || (lkey==-1 && key_vpos != TUNDER)) {
+   if (lkey == 1 || (lkey == -1 && key_vpos != TUNDER)) {
    	/* calculate space for keys to prevent grid overwrite the keys */
    	/* do it even if there is no grid, as do_plot will use these to position key */
    	key_w = key_col_wth*key_cols;
@@ -960,8 +958,8 @@ static double dbl_raise(x,y)
 double x;
 int y;
 {
-register int i=abs(y);
-double val=1.0;
+register int i = abs(y);
+double val = 1.0;
 
 	while (--i >= 0)
 		val *= x;
@@ -979,7 +977,7 @@ double amin, amax;
 {
 	struct tm tmin, tmax;
 
-	*ticfmt[axis]=0;  /* make sure we strcat to empty string */
+	*ticfmt[axis] = 0;  /* make sure we strcat to empty string */
 
 	ggmtime(&tmin,(double)time_tic_just(timelevel[axis],amin));
 	ggmtime(&tmax,(double)time_tic_just(timelevel[axis],amax));
@@ -1048,7 +1046,7 @@ int guide;
 {
 	double xnorm, tics, posns;
 
-	int fl=(int)floor(l10);
+	int fl = (int)floor(l10);
 	xnorm = pow(10.0,l10-fl); /* approx number of decades */
 
 	posns = guide / xnorm;  /* approx number of tic posns per decade */
@@ -1091,7 +1089,7 @@ int axis,guide;
 	l10 = log10(xr);
 	tic = set_tic(l10, guide);
 	if (log_array[axis] && tic<1.0)
-		tic=1.0;
+		tic = 1.0;
 	if (datatype[axis] == TIME) {
 		struct tm ftm, etm;
 		/* this is not fun */
@@ -1165,8 +1163,8 @@ register struct termentry *t = term;
 register int curve;
 int axis_zero[AXIS_ARRAY_SIZE]; /* axes in terminal coords for FIRST_X_AXIS, etc */
 register struct curve_points *this_plot = NULL;
-register int xl=0, yl=0; /* avoid gcc -Wall warning */
-register int key_count=0;
+register int xl = 0, yl = 0; /* avoid gcc -Wall warning */
+register int key_count = 0;
 			/* only a Pyramid would have this many registers! */
 struct text_label *this_label;
 struct arrow_def *this_arrow;
@@ -1177,7 +1175,7 @@ char ss[MAX_LINE_LEN+1], *s, *e;
      * until this is done properly
      */
      
-    x_axis=FIRST_X_AXIS; y_axis=FIRST_Y_AXIS;
+    x_axis = FIRST_X_AXIS; y_axis = FIRST_Y_AXIS;
 
 /*	Apply the desired viewport offsets. */
      if (y_min < y_max) {
@@ -1220,35 +1218,35 @@ char ss[MAX_LINE_LEN+1], *s, *e;
 		
 /* DRAW TICS AND GRID */
         term_apply_lp_properties(&border_lp); /* border linetype */
-	largest_polar_circle=0;
+	largest_polar_circle = 0;
 
 	/* select first mapping */
-	x_axis=FIRST_X_AXIS; y_axis=FIRST_Y_AXIS;
+	x_axis = FIRST_X_AXIS; y_axis = FIRST_Y_AXIS;
 
 	/* label first y axis tics */
 	if (ytics) {
-		int axis=map_x(ZERO);
+		int axis = map_x(ZERO);
 		/* set the globals ytick2d_callback() needs */
 
 		if (rotate_ytics && (*t->text_angle)(1)) {
-			tic_hjust=CENTRE;
-			tic_vjust=JUST_BOT;
+			tic_hjust = CENTRE;
+			tic_vjust = JUST_BOT;
 			rotate_tics = 1; /* HBB 980629 */
 			ytic_x += t->v_char / 2;
 		} else {
-			tic_hjust=RIGHT;
-			tic_vjust=JUST_CENTRE;
+			tic_hjust = RIGHT;
+			tic_vjust = JUST_CENTRE;
 			rotate_tics = 0; /* HBB 980629 */
 		}
 
 		if (ytics&TICS_MIRROR)
-			tic_mirror=xright;
+			tic_mirror = xright;
 		else
 			tic_mirror= -1; /* no thank you */
 
 		if ( (ytics&TICS_ON_AXIS) && !log_array[FIRST_X_AXIS] && inrange(axis, xleft, xright)) {
 			tic_start = axis;
-			tic_direction=-1;
+			tic_direction = -1;
 			/* put text at boundary if axis is close to boundary */
 			tic_text = ( ( (tic_start-xleft) > (3*t->h_char) ) ? tic_start : xleft) - t->h_char;
 		} else {
@@ -1266,26 +1264,26 @@ char ss[MAX_LINE_LEN+1], *s, *e;
 
 	/* label first x axis tics */
 	if (xtics) {
-		int axis=map_y(ZERO);
+		int axis = map_y(ZERO);
 		/* set the globals xtick2d_callback() needs */
 
 		if (rotate_xtics && (*t->text_angle)(1)) {
-			tic_hjust=RIGHT;
-			tic_vjust=JUST_CENTRE;
+			tic_hjust = RIGHT;
+			tic_vjust = JUST_CENTRE;
 			rotate_tics = 1; /* HBB 980629 */
 		} else {
-			tic_hjust=CENTRE;
-			tic_vjust=JUST_TOP;
+			tic_hjust = CENTRE;
+			tic_vjust = JUST_TOP;
 			rotate_tics = 0; /* HBB 980629 */
 		}
 
 		if (xtics&TICS_MIRROR)
-			tic_mirror=ytop;
+			tic_mirror = ytop;
 		else
 			tic_mirror= -1; /* no thank you */
 		if ( (xtics&TICS_ON_AXIS) && !log_array[FIRST_Y_AXIS] && inrange(axis, ybot, ytop)) {
-			tic_start=axis;
-			tic_direction=-1;
+			tic_start = axis;
+			tic_direction = -1;
 			/* put text at boundary if axis is close to boundary */
 			if (tic_start - ybot > 2*t->v_char)
 				tic_text = tic_start - ticscale*t->v_tic - t->v_char;
@@ -1304,25 +1302,25 @@ char ss[MAX_LINE_LEN+1], *s, *e;
 	}
 
 	/* select second mapping */
-	x_axis=SECOND_X_AXIS; y_axis=SECOND_Y_AXIS;
+	x_axis = SECOND_X_AXIS; y_axis = SECOND_Y_AXIS;
 
 	/* label second y axis tics */
 	if (y2tics) {
 		/* set the globalss ytick2d_callback() needs */
-		int axis=map_x(ZERO);
+		int axis = map_x(ZERO);
 
 		if (rotate_y2tics && (*t->text_angle)(1)) {
-			tic_hjust=CENTRE;
-			tic_vjust=JUST_TOP;
+			tic_hjust = CENTRE;
+			tic_vjust = JUST_TOP;
 			rotate_tics = 1; /* HBB 980629 */
 		} else {
-			tic_hjust=LEFT;
-			tic_vjust=JUST_CENTRE;
+			tic_hjust = LEFT;
+			tic_vjust = JUST_CENTRE;
 			rotate_tics = 0; /* HBB 980629 */
 		}
 
 		if (y2tics&TICS_MIRROR)
-			tic_mirror=xleft;
+			tic_mirror = xleft;
 		else
 			tic_mirror= -1; /* no thank you */
 		if ((y2tics&TICS_ON_AXIS) && !log_array[FIRST_X_AXIS] && inrange(axis,xleft,xright)) {
@@ -1344,26 +1342,26 @@ char ss[MAX_LINE_LEN+1], *s, *e;
 
 	/* label second x axis tics */
 	if (x2tics) {
-		int axis=map_y(ZERO);
+		int axis = map_y(ZERO);
 		/* set the globals xtick2d_callback() needs */
 
 		if (rotate_x2tics && (*t->text_angle)(1)) {
-			tic_hjust=LEFT;
-			tic_vjust=JUST_CENTRE;
+			tic_hjust = LEFT;
+			tic_vjust = JUST_CENTRE;
 			rotate_tics = 1; /* HBB 980629 */
 		} else {
-			tic_hjust=CENTRE;
-			tic_vjust=JUST_BOT;
+			tic_hjust = CENTRE;
+			tic_vjust = JUST_BOT;
 			rotate_tics = 0; /* HBB 980629 */
 		}
 
 		if (x2tics&TICS_MIRROR)
-			tic_mirror=ybot;
+			tic_mirror = ybot;
 		else
 			tic_mirror= -1; /* no thank you */
 		if ( (x2tics&TICS_ON_AXIS) && !log_array[SECOND_Y_AXIS] && inrange(axis,ybot,ytop)) {
-			tic_start=axis;
-			tic_direction=1;
+			tic_start = axis;
+			tic_direction = 1;
 			/* put text at boundary if axis is close to boundary */
 			tic_text = ( ( (ytop - tic_start ) > (2*t->v_char) ) ? tic_start : ytop) + t->v_char;
 		} else {
@@ -1379,7 +1377,7 @@ char ss[MAX_LINE_LEN+1], *s, *e;
 	}
 
 	/* select first mapping */
-	x_axis=FIRST_X_AXIS; y_axis=FIRST_Y_AXIS;
+	x_axis = FIRST_X_AXIS; y_axis = FIRST_Y_AXIS;
 
 /* RADIAL LINES FOR POLAR GRID */
 
@@ -1388,11 +1386,11 @@ char ss[MAX_LINE_LEN+1], *s, *e;
 	 */
 	if (polar_grid_angle)
 	{
-		double theta=0;
-		int ox=map_x(0);
-		int oy=map_y(0);
+		double theta = 0;
+		int ox = map_x(0);
+		int oy = map_y(0);
 		term_apply_lp_properties(&grid_lp);
-		for (theta=0; theta<6.29; theta += polar_grid_angle)
+		for (theta = 0; theta<6.29; theta += polar_grid_angle)
 		{
 			/* copy ox in case it gets moved (but it shouldn't) */
 			int oox = ox;
@@ -1415,7 +1413,7 @@ char ss[MAX_LINE_LEN+1], *s, *e;
 
    /* after grid so that axes linetypes are on top */
 
-	x_axis=FIRST_X_AXIS; y_axis=FIRST_Y_AXIS; /* chose scaling */
+	x_axis = FIRST_X_AXIS; y_axis = FIRST_Y_AXIS; /* chose scaling */
 	axis_zero[FIRST_X_AXIS] = map_y(0.0);
 	axis_zero[FIRST_Y_AXIS] = map_x(0.0); 
 
@@ -1435,7 +1433,7 @@ char ss[MAX_LINE_LEN+1], *s, *e;
 		(*t->vector)(axis_zero[FIRST_Y_AXIS],ytop);
 	}
 
-	x_axis=SECOND_X_AXIS; y_axis=SECOND_Y_AXIS; /* chose scaling */
+	x_axis = SECOND_X_AXIS; y_axis = SECOND_Y_AXIS; /* chose scaling */
 	axis_zero[SECOND_X_AXIS] = map_y(0.0);
 	axis_zero[SECOND_Y_AXIS] = map_x(0.0); 
 
@@ -1488,15 +1486,15 @@ char ss[MAX_LINE_LEN+1], *s, *e;
 	strcpy(ss, ylabel.text);
 	/* we worked out x-posn in boundary() */
 	if ((*t->text_angle)(1)) {
-		unsigned int x=ylabel_x + (t->v_char / 2);
-		unsigned int y=(ytop+ybot)/2 + ylabel.yoffset*(t->h_char);
+		unsigned int x = ylabel_x + (t->v_char / 2);
+		unsigned int y = (ytop+ybot)/2 + ylabel.yoffset*(t->h_char);
 		write_multiline(x,y,ss,CENTRE, JUST_TOP, 1, ylabel.font);
 		(*t->text_angle)(0);
 	} else {
 		/* really bottom just, but we know number of lines 
                    so we need to adjust x-posn by one line */
-		unsigned int x=ylabel_x;
-                unsigned int y=ylabel_y;
+		unsigned int x = ylabel_x;
+                unsigned int y = ylabel_y;
 		write_multiline(x,y,ss,LEFT,JUST_TOP, 0, ylabel.font);
 	}
     }
@@ -1506,22 +1504,22 @@ char ss[MAX_LINE_LEN+1], *s, *e;
 	strcpy(ss, y2label.text);
 	/* we worked out coordinates in boundary() */
 	if ((*t->text_angle)(1)) {
-		unsigned int x=y2label_x + (t->v_char / 2) - 1;
-		unsigned int y=(ytop+ybot)/2 + y2label.yoffset*(t->h_char);
+		unsigned int x = y2label_x + (t->v_char / 2) - 1;
+		unsigned int y = (ytop+ybot)/2 + y2label.yoffset*(t->h_char);
 		write_multiline(x,y,ss,CENTRE, JUST_TOP, 1, y2label.font);
 		(*t->text_angle)(0);
 	} else {
 		/* really bottom just, but we know number of lines */
-		unsigned int x=y2label_x;
-		unsigned int y=y2label_y;
+		unsigned int x = y2label_x;
+		unsigned int y = y2label_y;
 		write_multiline(x,y,ss,RIGHT,JUST_TOP, 0, y2label.font);
 	}
     }
 
 /* XLABEL */
     if (*xlabel.text) {
-	unsigned int x=(xright+xleft)/2 + xlabel.xoffset*(t->h_char);
-	unsigned int y=xlabel_y - t->v_char/2; /* HBB */
+	unsigned int x = (xright+xleft)/2 + xlabel.xoffset*(t->h_char);
+	unsigned int y = xlabel_y - t->v_char/2; /* HBB */
 	strcpy(ss, xlabel.text);
 	write_multiline(x,y,ss,CENTRE,JUST_TOP, 0, xlabel.font);
     }
@@ -1538,8 +1536,8 @@ char ss[MAX_LINE_LEN+1], *s, *e;
 /* X2LABEL */
 	if (*x2label.text) {
 	        /* we worked out y-coordinate in boundary() */
-		unsigned int x=(xright+xleft)/2 + x2label.xoffset*(t->h_char);
-		unsigned int y=  x2label_y - t->v_char/2 - 1;
+		unsigned int x = (xright+xleft)/2 + x2label.xoffset*(t->h_char);
+		unsigned int y = x2label_y - t->v_char/2 - 1;
 		strcpy(ss, x2label.text);
 		write_multiline(x,y,ss,CENTRE,JUST_TOP, 0, x2label.font);
 	}
@@ -1572,8 +1570,8 @@ char ss[MAX_LINE_LEN+1], *s, *e;
   	}
 
 /* PLACE LABELS */
-    for (this_label = first_label; this_label!=NULL;
-			this_label=this_label->next ) {
+    for (this_label = first_label; this_label != NULL;
+			this_label = this_label->next ) {
 		unsigned int x,y;
 		map_position(&this_label->place, &x, &y, "label");
 		strcpy(ss, this_label->text);
@@ -1586,7 +1584,7 @@ char ss[MAX_LINE_LEN+1], *s, *e;
  	 }
 
 /* PLACE ARROWS */
-    for (this_arrow = first_arrow; this_arrow!=NULL;
+    for (this_arrow = first_arrow; this_arrow != NULL;
 	    this_arrow = this_arrow->next ) {
 	    	unsigned int sx,sy,ex,ey;
 	    	map_position(&this_arrow->start, &sx, &sy, "arrow");
@@ -1608,7 +1606,7 @@ char ss[MAX_LINE_LEN+1], *s, *e;
  			sprintf(ss,"%s\n",key_title);
  			s = ss;
  			yl -= t->v_char/2;
- 			while( (e=(char *)strchr(s,'\n')) != NULL ) {
+ 			while( (e = (char *)strchr(s,'\n')) != NULL ) {
  				*e = '\0';
  				if ( key_just == JLEFT) {
  					(*t->justify_text)(LEFT);
@@ -1617,7 +1615,7 @@ char ss[MAX_LINE_LEN+1], *s, *e;
  					if ((*t->justify_text)(RIGHT)) {
  						(*t->put_text)(xl+key_text_right,yl,s);
  					} else {
- 						int x=xl+key_text_right-(t->h_char)*strlen(s);
+ 						int x = xl+key_text_right-(t->h_char)*strlen(s);
  						if (key_hpos == TOUT || inrange(x, xleft, xright))
  							(*t->put_text)(x, yl,s);
  					}
@@ -1651,8 +1649,8 @@ char ss[MAX_LINE_LEN+1], *s, *e;
   		int localkey = lkey; /* a local copy */
 
 		/* set scaling for this plot's axes */
-		x_axis=this_plot->x_axis;
-		y_axis=this_plot->y_axis;
+		x_axis = this_plot->x_axis;
+		y_axis = this_plot->y_axis;
 		
 		term_apply_lp_properties(&(this_plot->lp_properties));
 		
@@ -1670,7 +1668,7 @@ char ss[MAX_LINE_LEN+1], *s, *e;
 						(*t->put_text)(xl+key_text_right,
 							yl,this_plot->title);
 					} else {
-						int x=xl+key_text_right-(t->h_char)*strlen(this_plot->title);
+						int x = xl+key_text_right-(t->h_char)*strlen(this_plot->title);
 						if (key_hpos == TOUT ||
 						     i_inrange(x, xleft, xright))
 				 		(*t->put_text)(x, yl,this_plot->title);
@@ -1679,7 +1677,7 @@ char ss[MAX_LINE_LEN+1], *s, *e;
 
 				/* draw sample depending on bits set in plot_style */
 				if ((this_plot->plot_style & 1) ||
-					 ( (this_plot->plot_style & 4) && this_plot->plot_type==DATA))
+					 ( (this_plot->plot_style & 4) && this_plot->plot_type == DATA))
 				{ /* errors for data plots only */
 					(*t->move)(xl+key_sample_left,yl);
 					(*t->vector)(xl+key_sample_right,yl);
@@ -1957,7 +1955,7 @@ struct curve_points *plot;
     enum coord_type prev = UNDEFINED;	/* type of previous point */
     double ex, ey;			/* an edge point */
     double lx[2], ly[2];		/* two edge points */
-    int yprev=0;                 /* previous point coordinates */
+    int yprev = 0;                 /* previous point coordinates */
 
     for (i = 0; i < plot->p_count; i++) {
 	   switch (plot->points[i].type) {
@@ -2101,7 +2099,7 @@ struct curve_points *plot;
 
 /* preliminary count of points inside array */ 
     goodcount = 0;
-    for(i=0; i < plot->p_count; i++)
+    for(i = 0; i < plot->p_count; i++)
       if ( plot->points[i].type == INRANGE ||
 	   plot->points[i].type == OUTRANGE)
 	++goodcount;
@@ -2112,7 +2110,7 @@ struct curve_points *plot;
 
 /* fill gl array with indexes of valid (non-undefined) points.  */
     goodcount = 0;
-    for(i=0; i < plot->p_count; i++)
+    for(i = 0; i < plot->p_count; i++)
       if ( plot->points[i].type == INRANGE ||
 	   plot->points[i].type == OUTRANGE) {
 	gl[goodcount] = i;
@@ -2382,14 +2380,14 @@ plot_boxes(plot,xaxis_y)
 				/* ASSERT(boxwidth <= 0.0); - else graphics.c provides width */
 				
 				/* calculate width */
-				if (prev!=UNDEFINED)
+				if (prev != UNDEFINED)
 					dxl = (plot->points[i-1].x - plot->points[i].x)/2.0;
 				else
 					dxl = 0.0;
 					
 				if (i < plot->p_count-1)
 				{
-					if (plot->points[i+1].type!=UNDEFINED)
+					if (plot->points[i+1].type != UNDEFINED)
 						dxr = (plot->points[i+1].x - plot->points[i].x)/2.0;
 					else
 						dxr = -dxl;
@@ -2399,13 +2397,13 @@ plot_boxes(plot,xaxis_y)
 					dxr = -dxl;
 				}
 				
-				if (prev==UNDEFINED)
+				if (prev == UNDEFINED)
 					dxl = -dxr;
 
 				dxl= plot->points[i].x+dxl;
 				dxr= plot->points[i].x+dxr;				
 			}
-			else /* z>=0 */
+			else /* z >= 0 */
 			{
 				dxr = plot->points[i].xhigh;
 				dxl = plot->points[i].xlow;
@@ -3472,9 +3470,9 @@ char *font; /* NULL or "" means use default */
 	char *p;
 	if (vert != JUST_TOP) {
 		/* count lines and adjust y */
-		int lines=0; /* number of linefeeds - one fewer than lines */
-		for (p=text; *p; ++p)
-			if (*p=='\n') ++lines;
+		int lines = 0; /* number of linefeeds - one fewer than lines */
+		for (p = text; *p; ++p)
+			if (*p == '\n') ++lines;
 		if (angle)
 			x -= (vert*lines*t->v_char)/2;
 		else
@@ -3487,13 +3485,13 @@ char *font; /* NULL or "" means use default */
 
 	for(;;) { /* we will explicitly break out */
 	
-		if ( (p=strchr(text, '\n')) != NULL )
-			*p=0; /* terminate the string */
+		if ( (p = strchr(text, '\n')) != NULL )
+			*p = 0; /* terminate the string */
 
 		if ((*t->justify_text)(hor)) {
 			(*t->put_text)(x, y, text);
 		} else {
-			int fix=hor*(t->h_char)*strlen(text)/2;
+			int fix = hor*(t->h_char)*strlen(text)/2;
 			if (angle)
 				(*t->put_text)(x, y-fix, text);
 			else
@@ -3525,26 +3523,26 @@ struct lp_style_type grid; /* linetype or -2 for no grid */
     register struct termentry *t = term;
     /* minitick if text is NULL - beware - h_tic is unsigned */
     int ticsize = tic_direction*(int)(t->v_tic)*(text ? ticscale : miniticscale);
-    unsigned int x=map_x(place);
+    unsigned int x = map_x(place);
 
   if (grid.l_type > -2) {
     term_apply_lp_properties(&grid);
     if (polar_grid_angle) {
-	double x=place, y=0, s=sin(0.1), c=cos(0.1);
+	double x = place, y = 0, s = sin(0.1), c = cos(0.1);
 	int i;
 	int ogx = map_x(x);
 	int ogy = map_y(0);
 	int tmpgx, tmpgy, gx, gy;
 	
-	if (place > largest_polar_circle) largest_polar_circle=place;
-	else if (-place > largest_polar_circle) largest_polar_circle=-place;
-	for (i=1;i<=63 /* 2pi/0.1*/; ++i) {
+	if (place > largest_polar_circle) largest_polar_circle = place;
+	else if (-place > largest_polar_circle) largest_polar_circle = -place;
+	for (i = 1;i <= 63 /* 2pi/0.1*/; ++i) {
 		{
-			/* cos(t+dt)=cos(t)cos(dt)-sin(t)cos(dt) */
-			double tx=x*c-y*s;
-			/* sin(t+dt)=sin(t)cos(dt)+cos(t)sin(dt) */
-			y=y*c+x*s;
-			x=tx;
+			/* cos(t+dt) = cos(t)cos(dt)-sin(t)cos(dt) */
+			double tx = x*c-y*s;
+			/* sin(t+dt) = sin(t)cos(dt)+cos(t)sin(dt) */
+			y = y*c+x*s;
+			x = tx;
 		}
 		tmpgx = gx = map_x(x);
 		tmpgy = gy = map_y(y);
@@ -3598,22 +3596,22 @@ struct lp_style_type grid; /* linetype or -2 */
     register struct termentry *t = term;
     /* minitick if text is NULL - v_tic is unsigned */
     int ticsize = tic_direction*(int)(t->h_tic)*(text ? ticscale : miniticscale);
-    unsigned int y=map_y(place);
+    unsigned int y = map_y(place);
   if (grid.l_type > -2) {
     term_apply_lp_properties(&grid);
     if (polar_grid_angle) {
-	double x=0, y=place, s=sin(0.1), c=cos(0.1);
+	double x = 0, y = place, s = sin(0.1), c = cos(0.1);
 	int i;
-	if (place > largest_polar_circle) largest_polar_circle=place;
-	else if (-place > largest_polar_circle) largest_polar_circle=-place;
+	if (place > largest_polar_circle) largest_polar_circle = place;
+	else if (-place > largest_polar_circle) largest_polar_circle = -place;
 	clip_move(map_x(x),map_y(y));
-	for (i=1;i<=63 /* 2pi/0.1*/; ++i) {
+	for (i = 1;i <= 63 /* 2pi/0.1*/; ++i) {
 		{
-			/* cos(t+dt)=cos(t)cos(dt)-sin(t)cos(dt) */
-			double tx=x*c-y*s;
-			/* sin(t+dt)=sin(t)cos(dt)+cos(t)sin(dt) */
-			y=y*c+x*s;
-			x=tx;
+			/* cos(t+dt) = cos(t)cos(dt)-sin(t)cos(dt) */
+			double tx = x*c-y*s;
+			/* sin(t+dt) = sin(t)cos(dt)+cos(t)sin(dt) */
+			y = y*c+x*s;
+			x = tx;
 		}
 		clip_vector( map_x(x), map_y(y) );
 	}
@@ -3660,14 +3658,14 @@ int *lines;
 	l = mlen = len = 0;
 	sprintf(lab,"%s\n",str);
 	s = lab;
-	while( (e=(char *)strchr(s,'\n')) != NULL ) { /* HBB 980308: quiet BC-3.1 warning */
+	while( (e = (char *)strchr(s,'\n')) != NULL ) { /* HBB 980308: quiet BC-3.1 warning */
 		*e = '\0';
 		len = strlen(s); /* = e-s ? */
 		if ( len > mlen ) mlen = len;
 		if ( len || l ) l++;
 		s = ++e;
 	}
-	/* lines=NULL => not interested - div */
+	/* lines = NULL => not interested - div */
 	if (lines) *lines = l;
 	return(mlen);
 }
@@ -3679,10 +3677,10 @@ struct ticdef *ticdef;
 char *format;
 int max; /* approx max number of slots available */
 {
-	double tic=0; /* HBB: shut up gcc -Wall */
+	double tic = 0; /* HBB: shut up gcc -Wall */
 
-	int fixmin=(auto_array[axis] & 1) != 0;
-	int fixmax=(auto_array[axis] & 2) != 0;
+	int fixmin = (auto_array[axis] & 1) != 0;
+	int fixmax = (auto_array[axis] & 2) != 0;
 
 	if (ticdef->type == TIC_SERIES) {
 		ticstep[axis] = tic = ticdef->def.series.incr;
@@ -3722,24 +3720,24 @@ int scientific; /* round to power of 3 */
 double *m;
 int *p; /* results */
 {
-	int sign=1;
+	int sign = 1;
 	double l10;
 	int power;
 	/*{{{  check 0*/
-	if (x==0) {
-		if (m) *m=0;
-		if (p) *p=0;
+	if (x == 0) {
+		if (m) *m = 0;
+		if (p) *p = 0;
 		return;
 	}
 	/*}}}*/
 	/*{{{  check -ve*/
 	if (x<0) {
-		sign=(-1);
-		x=(-x);
+		sign = (-1);
+		x = (-x);
 	}
 	/*}}}*/
 
-	l10=log10(x) / log_base;
+	l10 = log10(x) / log_base;
 	power = floor(l10);
 	if (scientific) {
 		power = 3*floor(power/3.0);
@@ -3781,7 +3779,7 @@ double log_base, x; /* we print one number in a number of different formats */
 		/*}}}*/
 
 		/*{{{  check for %%*/
-		if (format[1]=='%') {
+		if (format[1] == '%') {
 			*dest++ = '%';
 			format += 2;
 			continue;
@@ -3789,10 +3787,11 @@ double log_base, x; /* we print one number in a number of different formats */
 		/*}}}*/
 
 		/*{{{  copy format part to temp, excluding conversion character*/
-		t=temp;
+		t = temp;
 		*t++ = '%';
 		/* dont put isdigit first since sideeffect in macro is bad */
-		while (*++format=='.' || isdigit(*format) || *format=='-' || *format=='+' || *format==' ')
+		while (*++format == '.' || isdigit(*format) || 
+                       *format == '-' || *format == '+' || *format == ' ')
 			*t++ = *format;
 		/*}}}*/
 
@@ -3801,8 +3800,8 @@ double log_base, x; /* we print one number in a number of different formats */
 			/*{{{  x and o*/
 			case 'x': case 'X':
 			case 'o': case 'O':
-				t[0]=*format++;
-				t[1]=0;
+				t[0] = *format++;
+				t[1] = 0;
 				sprintf(dest, temp, (int) x);
 				dest += strlen(dest);
 				break;
@@ -3811,8 +3810,8 @@ double log_base, x; /* we print one number in a number of different formats */
 			case 'e': case 'E':
 			case 'f': case 'F':
 			case 'g': case 'G':
-				t[0]=*format++;
-				t[1]=0;
+				t[0] = *format++;
+				t[1] = 0;
 				sprintf(dest, temp, x);
 				dest += strlen(dest);
 				break;
@@ -3822,8 +3821,8 @@ double log_base, x; /* we print one number in a number of different formats */
 				{
 					double mantissa;
 					mant_exp(log_base, x, 0, &mantissa, NULL);
-					t[0]='f';
-					t[1]=0;
+					t[0] = 'f';
+					t[1] = 0;
 					sprintf(dest, temp, mantissa);
 					dest += strlen(dest);
 					++format;
@@ -3835,8 +3834,8 @@ double log_base, x; /* we print one number in a number of different formats */
 				{
 					double mantissa;
 					mant_exp(1.0, x, 0, &mantissa, NULL);
-					t[0]='f';
-					t[1]=0;
+					t[0] = 'f';
+					t[1] = 0;
 					sprintf(dest, temp, mantissa);
 					dest += strlen(dest);
 					++format;
@@ -3848,8 +3847,8 @@ double log_base, x; /* we print one number in a number of different formats */
 				{
 					double mantissa;
 					mant_exp(1.0, x, 1, &mantissa, NULL);
-					t[0]='f';
-					t[1]=0;
+					t[0] = 'f';
+					t[1] = 0;
 					sprintf(dest, temp, mantissa);
 					dest += strlen(dest);
 					++format;
@@ -3861,8 +3860,8 @@ double log_base, x; /* we print one number in a number of different formats */
 				{
 					int power;
 					mant_exp(log_base, x, 0, NULL, &power);
-					t[0]='d';
-					t[1]=0;
+					t[0] = 'd';
+					t[1] = 0;
 					sprintf(dest, temp, power);
 					dest += strlen(dest);
 					++format;
@@ -3874,8 +3873,8 @@ double log_base, x; /* we print one number in a number of different formats */
 				{
 					int power;
 					mant_exp(1.0, x, 0, NULL, &power);
-					t[0]='d';
-					t[1]=0;
+					t[0] = 'd';
+					t[1] = 0;
 					sprintf(dest, temp, power);
 					dest += strlen(dest);
 					++format;
@@ -3887,8 +3886,8 @@ double log_base, x; /* we print one number in a number of different formats */
 				{
 					int power;
 					mant_exp(1.0, x, 1, NULL, &power);
-					t[0]='d';
-					t[1]=0;
+					t[0] = 'd';
+					t[1] = 0;
 					sprintf(dest, temp, power);
 					dest += strlen(dest);
 					++format;
@@ -3900,10 +3899,10 @@ double log_base, x; /* we print one number in a number of different formats */
 				{
 					int power;
 					mant_exp(1.0, x, 1, NULL, &power);
-					t[0]='c';
-					t[1]=0;
+					t[0] = 'c';
+					t[1] = 0;
 					power = power / 3 + 6; /* -18 -> 0, 0 -> 6, +18 -> 12, ... */
-					if (power>=0 && power<=12)
+					if (power >= 0 && power <= 12)
 							sprintf(dest, temp, "afpnum kMGTPE"[power]);
 					else
 					{
@@ -3927,8 +3926,8 @@ double log_base, x; /* we print one number in a number of different formats */
 				}
 			case 'P':
 				{
-					t[0]='f';
-					t[1]=0;
+					t[0] = 'f';
+					t[1] = 0;
 					sprintf(dest, temp, x/LOC_PI);
 					dest += strlen(dest);
 					++format;
@@ -3973,12 +3972,12 @@ tic_callback callback;  /* fn to call to actually do the work */
     lgrd.l_type= (grid&(GRID_X|GRID_Y|GRID_X2|GRID_Y2|GRID_Z)) ? grid_lp.l_type : -2;
     mgrd.l_type= (grid&(GRID_MX|GRID_MY|GRID_MX2|GRID_MY2|GRID_MZ)) ? mgrid_lp.l_type : -2;
 
-    if (def->type==TIC_USER) {  /* special case */
+    if (def->type == TIC_USER) {  /* special case */
 	/*{{{  do user tics then return*/
 	struct ticmark *mark = def->def.user;
-	double uncertain=(max_array[axis]-min_array[axis])/10;
-	double ticmin=min_array[axis]-SIGNIF*uncertain;
-	double internal_max=max_array[axis]+SIGNIF*uncertain;
+	double uncertain = (max_array[axis]-min_array[axis])/10;
+	double ticmin = min_array[axis]-SIGNIF*uncertain;
+	double internal_max = max_array[axis]+SIGNIF*uncertain;
 	double log_base = log_array[axis] ? log10(base_array[axis]) : 1.0;
 	
 	/* polar labels always +ve, and if rmin has been set, they are
@@ -3988,7 +3987,7 @@ tic_callback callback;  /* fn to call to actually do the work */
 	 */
 	double polar_shift = (polar && !(autoscale_r & 1)) ? rmin : 0;
 	
-	for (mark=def->def.user; mark; mark=mark->next) {
+	for (mark = def->def.user; mark; mark = mark->next) {
 		char label[64];
 		double internal = log_array[axis] ? log(mark->position)/log_base_array[axis] : mark->position;
 	
@@ -4011,11 +4010,11 @@ tic_callback callback;  /* fn to call to actually do the work */
 
     /* series-tics
      * need to distinguish user co-ords from internal co-ords.
-     * - for logscale, internal=log(user), else internal=user
+     * - for logscale, internal = log(user), else internal = user
      *
      * The minitics are a bit of a drag - we need to distinuish
-     * the cases step>1 from step==1.
-     * If step=1, we are looking at 1,10,100,1000 for example, so
+     * the cases step>1 from step == 1.
+     * If step = 1, we are looking at 1,10,100,1000 for example, so
      * minitics are 2,5,8, ...  - done in user co-ordinates
      * If step>1, we are looking at 1,1e6,1e12 for example, so
      * minitics are 10,100,1000,... - done in internal co-ords
@@ -4026,58 +4025,58 @@ tic_callback callback;  /* fn to call to actually do the work */
 	double internal; /* in internal co-ords */
 	double user;     /* in user co-ords */
 	double start,step,end;
-	double lmin=min_array[axis], lmax=max_array[axis];
+	double lmin = min_array[axis], lmax = max_array[axis];
 	double internal_min, internal_max;	/* to allow for rounding errors */
-	double ministart=0, ministep=1, miniend=1; /* internal or user - depends on step */
+	double ministart = 0, ministep = 1, miniend = 1; /* internal or user - depends on step */
 
 	/* gprintf uses log10() of base - log_base_array is log() */
 	double log_base = log_array[axis] ? log10(base_array[axis]) : 1.0;
 
 	if (lmax < lmin) {
 		/* hmm - they have set reversed range for some reason */
-		double temp=lmin; lmin=lmax; lmax=temp;
+		double temp = lmin; lmin = lmax; lmax = temp;
 	}
 	
 	/*{{{  choose start, step and end*/
 	switch (def->type) {
 		case TIC_SERIES:
 			if (log_array[axis]) {
-				/* we can tolerate start<=0 if step and end > 0 */
+				/* we can tolerate start <= 0 if step and end > 0 */
 				if (def->def.series.end <= 0 ||
 				    def->def.series.incr <= 0)
 					return; /* just quietly ignore */
-				step=log(def->def.series.incr)/log_base_array[axis];
-				end=log(def->def.series.end)/log_base_array[axis];
-				start=def->def.series.start > 0 ?
+				step = log(def->def.series.incr)/log_base_array[axis];
+				end = log(def->def.series.end)/log_base_array[axis];
+				start = def->def.series.start > 0 ?
 				      log(def->def.series.start) / log_base_array[axis] :
 						step;
 			} else {
-				start=def->def.series.start;
-				step=def->def.series.incr;
-				end=def->def.series.end;
-				if (start==-VERYLARGE)
-					start=step*floor(lmin/step);
+				start = def->def.series.start;
+				step = def->def.series.incr;
+				end = def->def.series.end;
+				if (start == -VERYLARGE)
+					start = step*floor(lmin/step);
 				if (end == VERYLARGE)
-					end=step*ceil(lmax/step);
+					end = step*ceil(lmax/step);
 			}
 			break;
 		case TIC_COMPUTED:
 			/* round to multiple of step */
-			start=ticstep[axis]*floor(lmin/ticstep[axis]);
-			step=ticstep[axis];
-			end=ticstep[axis]*ceil(lmax/ticstep[axis]);
+			start = ticstep[axis]*floor(lmin/ticstep[axis]);
+			step = ticstep[axis];
+			end = ticstep[axis]*ceil(lmax/ticstep[axis]);
 			break;
 		case TIC_MONTH:
-			start=floor(lmin);
-			end=ceil(lmax);
-			step=floor((end-start)/12);
-			if (step<1) step=1;
+			start = floor(lmin);
+			end = ceil(lmax);
+			step = floor((end-start)/12);
+			if (step<1) step = 1;
 			break;
 		case TIC_DAY:
-			start=floor(lmin);
-			end=ceil(lmax);
-			step=floor((end-start)/14);
-			if (step<1) step=1;
+			start = floor(lmin);
+			end = ceil(lmax);
+			step = floor((end-start)/14);
+			if (step<1) step = 1;
 			break;
 		default:
 			graph_error("Internal error : unknown tic type");
@@ -4088,23 +4087,23 @@ tic_callback callback;  /* fn to call to actually do the work */
 	/*{{{  ensure ascending order*/
 	if (end < start) {
 		double temp;
-		temp=end; end=start; start=temp;
+		temp = end; end = start; start = temp;
 	}
-	step=fabs(step);
+	step = fabs(step);
 	/*}}}*/
 
 	if (minitics) {
 		/*{{{  figure out ministart, ministep, miniend*/
-		if (minitics==MINI_USER) {
+		if (minitics == MINI_USER) {
 			/* they have said what they want */
-			if (minifreq<=0)
-				minitics=0;  /* not much else we can do */
+			if (minifreq <= 0)
+				minitics = 0;  /* not much else we can do */
 			else if (log_array[axis]) {
-				ministart = ministep=step/minifreq * base_array[axis];
+				ministart = ministep = step/minifreq * base_array[axis];
 				miniend = step * base_array[axis];
 			}
 			else {
-				ministart = ministep=step/minifreq;
+				ministart = ministep = step/minifreq;
 				miniend = step;
 			}
 		} else if (log_array[axis]) {
@@ -4120,49 +4119,49 @@ tic_callback callback;  /* fn to call to actually do the work */
 				/*{{{  2,5,8 case*/
 				miniend = base_array[axis];
 				if (end-start >= 10)
-					minitics=0; /* none */
+					minitics = 0; /* none */
 				else if (end-start >= 5) {
-					ministart=2;
-					ministep=3;
+					ministart = 2;
+					ministep = 3;
 				} else {
-					ministart=2;
-					ministep=1;
+					ministart = 2;
+					ministep = 1;
 				}
 				/*}}}*/
 			}
-		} else if (datatype[axis]==TIME) {
-			ministart=ministep=make_ltic(timelevel[axis], step);
-			miniend=step*0.9;
-		} else if (minitics==MINI_AUTO) {
-			ministart=ministep=0.1*step;
-			miniend=step;
+		} else if (datatype[axis] == TIME) {
+			ministart = ministep = make_ltic(timelevel[axis], step);
+			miniend = step*0.9;
+		} else if (minitics == MINI_AUTO) {
+			ministart = ministep = 0.1*step;
+			miniend = step;
 		} else
-			minitics=0;
+			minitics = 0;
 		
-		if (ministep<=0)
-			minitics=0; /* dont get stuck in infinite loop */
+		if (ministep <= 0)
+			minitics = 0; /* dont get stuck in infinite loop */
 		/*}}}*/
 	}
 	
 	/*{{{  a few tweaks and checks*/
 	/* watch rounding errors */
 	end += SIGNIF*step;
-	internal_max=lmax + step*SIGNIF;
-	internal_min=lmin - step*SIGNIF;
+	internal_max = lmax + step*SIGNIF;
+	internal_min = lmin - step*SIGNIF;
 	
-	if (step==0)
+	if (step == 0)
 		return;  /* just quietly ignore them ! */
 	/*}}}*/
 	
-	for (tic=start; tic<=end; tic+=step) {
+	for (tic = start; tic <= end; tic += step) {
 		/*{{{  calc internal and user co-ords*/
 		if (!log_array[axis]) {
-			internal = datatype[axis]==TIME ? time_tic_just(timelevel[axis],tic): tic;
-			user=CheckZero(internal,step);
+			internal = datatype[axis] == TIME ? time_tic_just(timelevel[axis],tic): tic;
+			user = CheckZero(internal,step);
 		} else {
 			/* log scale => dont need to worry about zero ? */
-			internal=tic;
-			user=pow(base_array[axis], internal);
+			internal = tic;
+			user = pow(base_array[axis], internal);
 		}
 		/*}}}*/
 		if (internal > internal_max)
@@ -4174,13 +4173,13 @@ tic_callback callback;  /* fn to call to actually do the work */
 			switch(def->type) {
 				case TIC_DAY : {
 					int d = (long)floor(user+0.5) % 7;
-					if (d<0) d+=7;
+					if (d<0) d += 7;
 					(*callback)(axis,internal, abbrev_day_names[d], lgrd);
 					break;
 				}
 				case TIC_MONTH: {
 					int m = (long)floor(user+0.5) % 12;
-					if (m<0) m+=12;
+					if (m<0) m += 12;
 					(*callback)(axis, internal, abbrev_month_names[m], lgrd);
 					break;
 				}
@@ -4205,11 +4204,11 @@ tic_callback callback;  /* fn to call to actually do the work */
 		if (minitics) {
 			/*{{{  process minitics*/
 			double mplace, mtic;
-			for (mplace=ministart; mplace < miniend; mplace += ministep) {
+			for (mplace = ministart; mplace < miniend; mplace += ministep) {
 				if ( datatype[axis] == TIME )
 					mtic = time_tic_just(timelevel[axis]-1,internal+mplace);
 				else
-					mtic=internal + (log_array[axis]&&step<=1.5 ? log(mplace)/log_base_array[axis] : mplace);
+					mtic = internal + (log_array[axis] && step <= 1.5 ? log(mplace)/log_base_array[axis] : mplace);
 				if (inrange(mtic, internal_min, internal_max) &&
                 inrange(mtic, start-step*SIGNIF, end+step*SIGNIF))
 					 callback(axis, mtic, NULL, mgrd);
@@ -4230,19 +4229,19 @@ char *what;
 	switch (pos->scalex) {
 		case first_axes:
 			{
-				double xx=LogScale(pos->x, log_array[FIRST_X_AXIS], log_base_array[FIRST_X_AXIS], what, "x");
-				*x=xleft + (xx-min_array[FIRST_X_AXIS])*scale[FIRST_X_AXIS]+0.5;
+				double xx = LogScale(pos->x, log_array[FIRST_X_AXIS], log_base_array[FIRST_X_AXIS], what, "x");
+				*x = xleft + (xx-min_array[FIRST_X_AXIS])*scale[FIRST_X_AXIS]+0.5;
 				break;
 			}
 		case second_axes:
 			{
-				double xx=LogScale(pos->x, log_array[SECOND_X_AXIS], log_base_array[SECOND_X_AXIS], what, "x");
-				*x=xleft + (xx-min_array[SECOND_X_AXIS])*scale[SECOND_X_AXIS]+0.5;
+				double xx = LogScale(pos->x, log_array[SECOND_X_AXIS], log_base_array[SECOND_X_AXIS], what, "x");
+				*x = xleft + (xx-min_array[SECOND_X_AXIS])*scale[SECOND_X_AXIS]+0.5;
 				break;
 			}
 		case graph:
 			{
-				*x=xleft + pos->x*(xright-xleft) + 0.5;
+				*x = xleft + pos->x*(xright-xleft) + 0.5;
 				break;
 			}
 		case screen:
@@ -4255,19 +4254,19 @@ char *what;
 	switch (pos->scaley) {
 		case first_axes:
 			{
-				double yy=LogScale(pos->y, log_array[FIRST_Y_AXIS], log_base_array[FIRST_Y_AXIS], what, "y");
-				*y=ybot  + (yy-min_array[FIRST_Y_AXIS])*scale[FIRST_Y_AXIS]+0.5;
+				double yy = LogScale(pos->y, log_array[FIRST_Y_AXIS], log_base_array[FIRST_Y_AXIS], what, "y");
+				*y = ybot  + (yy-min_array[FIRST_Y_AXIS])*scale[FIRST_Y_AXIS]+0.5;
 				return;
 			}
 		case second_axes:
 			{
-				double yy=LogScale(pos->y, log_array[SECOND_Y_AXIS], log_base_array[SECOND_Y_AXIS], what, "y");
-				*y=ybot  + (yy-min_array[SECOND_Y_AXIS])*scale[SECOND_Y_AXIS]+0.5;
+				double yy = LogScale(pos->y, log_array[SECOND_Y_AXIS], log_base_array[SECOND_Y_AXIS], what, "y");
+				*y = ybot  + (yy-min_array[SECOND_Y_AXIS])*scale[SECOND_Y_AXIS]+0.5;
 				return;
 			}
 		case graph:
 			{
-				*y=ybot  + pos->y*(ytop-ybot) + 0.5;
+				*y = ybot  + pos->y*(ytop-ybot) + 0.5;
 				return;
 			}
 		case screen:

@@ -145,9 +145,9 @@ static FILE	    *log_f = NULL;
 static int	    num_data,
 		    num_params;
 static int	    columns; 
-static double	    *fit_x=0, 
-		    *fit_y=0,
-		    *fit_z=0,
+static double	    *fit_x = 0, 
+		    *fit_y = 0,
+		    *fit_z = 0,
 		    *err_data = 0,
 		    *a = 0;
 static TBOOLEAN	    ctrlc_flag = FALSE;
@@ -296,8 +296,8 @@ static void printmatrix (double **C, int m, int n)
 {
   int i, j;
   
-  for (i=0; i<m; i++) {
-    for (j=0; j<n-1; j++) 
+  for (i = 0; i<m; i++) {
+    for (j = 0; j<n-1; j++) 
       Dblf2("%.8g |", C[i][j]);
     Dblf2("%.8g\n", C[i][j]);
   }
@@ -312,8 +312,8 @@ static void print_matrix_and_vectors (double **C, double *d, double *r,
 {
   int i, j;
   
-  for (i=0; i<m; i++) {
-    for (j=0; j<n; j++) 
+  for (i = 0; i<m; i++) {
+    for (j = 0; j<n; j++) 
       Dblf2("%8g ", C[i][j]);
     Dblf3("| %8g | %8g\n", d[i], r[i]);
   }
@@ -331,12 +331,12 @@ double *chisq;
 double *lambda;
 {
     int 	    i, j;
-    static double   *da=0,	    /* delta-step of the parameter */ 
-		    *temp_a=0,	    /* temptative new params set   */
-		    *d=0,
-		    *tmp_d=0,
-		    **tmp_C=0, 
-		    *residues=0;
+    static double   *da = 0,	    /* delta-step of the parameter */ 
+		    *temp_a = 0,    /* temptative new params set   */
+		    *d = 0,
+		    *tmp_d = 0,
+		    **tmp_C = 0, 
+		    *residues = 0;
     double          tmp_chisq;		    
 
     /* Initialization when lambda == -1 */
@@ -359,16 +359,16 @@ double *lambda;
 	    *lambda = startup_lambda;
 	else {
 	    *lambda = 0;
-	    for (i=0; i<num_data; i++)
-		for (j=0; j<num_params; j++)
+	    for (i = 0; i<num_data; i++)
+		for (j = 0; j<num_params; j++)
 		    *lambda += C[i][j]*C[i][j];
 	    *lambda = sqrt(*lambda/num_data/num_params);
     }
 
  	/* Fill in the lower square part of C (the diagonal is filled in on
  	   each iteration, see below) */
- 	for (i=0; i<num_params; i++) 
-	    for (j=0; j<i;  j++) 
+ 	for (i = 0; i<num_params; i++) 
+	    for (j = 0; j<i;  j++) 
 	     	C[num_data+i][j] = 0, C[num_data+j][i] = 0;
         /*printmatrix(C, num_data+num_params, num_params); */
 	return analyze_ret ? OK : ERROR;
@@ -388,13 +388,13 @@ double *lambda;
 
     /* Givens calculates in-place, so make working copies of C and d */
 
-    for ( j=0 ; j<num_data+num_params ; j++ ) 
+    for ( j = 0 ; j<num_data+num_params ; j++ ) 
 	memcpy (tmp_C[j], C[j], num_params*sizeof(double));
     memcpy (tmp_d, d, num_data*sizeof(double));
 
     /* fill in additional parts of tmp_C, tmp_d */
 
-    for ( i=0; i<num_params ; i++) {	
+    for ( i = 0; i<num_params ; i++) {	
     	tmp_C[num_data+i][i] = *lambda; /* fill in low diag. of tmp_C ... */ 
     	tmp_d[num_data+i] = 0;          /* ... and low part of tmp_d */
     }
@@ -408,7 +408,7 @@ double *lambda;
     
     /* check if trial did ameliorate sum of squares */
 
-    for ( j=0 ; j<num_params ; j++ ) 
+    for ( j = 0 ; j<num_params ; j++ ) 
 	temp_a[j] = a[j] + da[j];
 
     if ( !analyze (temp_a, tmp_C, tmp_d, &tmp_chisq) )
@@ -420,11 +420,11 @@ double *lambda;
 	    *lambda /= lambda_down_factor;
         }
 	*chisq = tmp_chisq;
-	for ( j=0 ; j<num_data ; j++ ) {
+	for ( j = 0 ; j<num_data ; j++ ) {
 	    memcpy (C[j], tmp_C[j], num_params*sizeof(double));
 	    d[j] = tmp_d[j];
 	}
-	for ( j=0 ; j<num_params ; j++ ) 
+	for ( j = 0 ; j<num_params ; j++ ) 
 	    a[j] = temp_a[j];
 	return BETTER;
     }
@@ -460,10 +460,10 @@ double *chisq;
     *chisq = 0;
     calculate (d, C, a);
 
-    for (i=0; i<num_data; i++) {
+    for (i = 0; i<num_data; i++) {
         d[i] = (d[i] - fit_z[i]) / err_data[i];         /* note: order reversed, as used by Schwarz */
     	*chisq += d[i]*d[i];
-        for (j=0; j<num_params; j++)
+        for (j = 0; j<num_params; j++)
 	  C[i][j] /= err_data[i];
     }
 
@@ -502,9 +502,9 @@ double a[];
 
     /* then derivatives */
 
-    for ( p=0 ; p<num_params ; p++ )
+    for ( p = 0 ; p<num_params ; p++ )
 	tmp_pars[p] = a[p];
-    for ( p=0 ; p<num_params ; p++ ) {
+    for ( p = 0 ; p<num_params ; p++ ) {
 	tmp_a = fabs(a[p]) < NEARLY_ZERO ? NEARLY_ZERO : a[p];
 	tmp_pars[p] = tmp_a * (1+DELTA);
 	call_gnuplot (tmp_pars, tmp_high);
@@ -512,7 +512,7 @@ double a[];
 	tmp_pars[p] = tmp_a * (1-DELTA);
 	call_gnuplot (tmp_pars, tmp_low);  
 #endif
-	for ( k=0 ; k<num_data ; k++ )
+	for ( k = 0 ; k<num_data ; k++ )
 #ifdef TWO_SIDE_DIFFERENTIATION
 	    dzda[k][p] = (tmp_high[k] - tmp_low[k])/(2*tmp_a*DELTA); 
 #else
@@ -540,7 +540,7 @@ double *data;
     struct value v;
 
     /* set parameters first */
-    for ( i=0 ; i<num_params ; i++ ) {
+    for ( i = 0 ; i<num_params ; i++ ) {
 	(void) Gcomplex (&v, par[i], 0.0); 
 	setvar (par_name[i], v);
     }
@@ -581,10 +581,10 @@ static TBOOLEAN fit_interrupt ()
 			struct value v;
 			char *tmp;
 
-			tmp = (fit_script !=0 && *fit_script ) ? fit_script : DEFAULT_CMD;
+			tmp = (fit_script != 0 && *fit_script ) ? fit_script : DEFAULT_CMD;
 			fprintf (STANDARD, "executing: %s", tmp);
 			/* set parameters visible to gnuplot */
-			for ( i=0 ; i<num_params ; i++ ) {
+			for ( i = 0 ; i<num_params ; i++ ) {
 			    (void)Gcomplex (&v, a[i], 0.0); 
 			    setvar (par_name[i], v);
 			}
@@ -667,7 +667,7 @@ double a[];
 	    show_fit (iter, chisq, last_chisq, a, lambda, STANDARD);
     } while ( (res != ERROR)
 	      && (lambda < MAX_LAMBDA)
-	      && ((maxiter == 0) || (iter <=maxiter))
+	      && ((maxiter == 0) || (iter <= maxiter))
 	      && (res == WORSE
 		  || ( (chisq > NEARLY_ZERO)
 		       ? ((last_chisq-chisq)/chisq)
@@ -702,14 +702,14 @@ double a[];
 
     /* compute errors in the parameters */
 
-    if (num_data==num_params) {
+    if (num_data == num_params) {
       int i;
 
       Dblf("\nExactly as many data points as there are parameters.\n");
       Dblf("In this degenerate case, all errors are zero by definition.\n\n");
       Dblf ("Final set of parameters \n");
       Dblf ("======================= \n\n");
-      for ( i=0 ; i<num_params; i++ ) 
+      for ( i = 0 ; i<num_params; i++ ) 
         Dblf3 ("%-15.15s = %-15g\n", par_name[i], a[i]);
     } else if (chisq < NEARLY_ZERO) { 
       int i;
@@ -717,7 +717,7 @@ double a[];
       Dblf("\nHmmmm.... Sum of squared residuals is zero. Can't compute errors.\n\n");
       Dblf ("Final set of parameters \n");
       Dblf ("======================= \n\n");
-      for ( i=0 ; i<num_params; i++ ) 
+      for ( i = 0 ; i<num_params; i++ ) 
         Dblf3 ("%-15.15s = %-15g\n", par_name[i], a[i]);
     } else {
 
@@ -735,16 +735,16 @@ double a[];
 
     /* calculate unscaled parameter errors in dpar[]: */
       dpar = vec (num_params);
-    for (i=0; i<num_params; i++) {
+    for (i = 0; i<num_params; i++) {
       /* FIXME: can this still happen ? */
-      if (covar[i][i]<=0.0) /* HBB: prevent floating point exception later on */
+      if (covar[i][i] <= 0.0) /* HBB: prevent floating point exception later on */
 	Eex("Calculation error: non-positive diagonal element in covar. matrix");
-      dpar[i]=sqrt(covar[i][i]);
+      dpar[i] = sqrt(covar[i][i]);
     }
 
     /* transform covariances into correlations */
-    for (i=0; i<num_params; i++) 
-      for (j=0; j<=i; j++)   /* only lower triangle needs to be handled */
+    for (i = 0; i<num_params; i++) 
+      for (j = 0; j <= i; j++)   /* only lower triangle needs to be handled */
 	covar[i][j] /= dpar[i]*dpar[j];
 
     /* scale parameter errors based on chisq */
@@ -758,13 +758,13 @@ double a[];
         * (thanks to clegelan@physik.uni-bielefeld.de)
         * OTOH, this makes most of the demo's results simply
         * ridiculous... :-( */
-    for (i=0; i<num_params; i++)
+    for (i = 0; i<num_params; i++)
       dpar[i] *= chisq;
 #endif
 
       Dblf ("Final set of parameters            68.3%% confidence interval (one at a time)\n")
       Dblf ("=======================            =========================================\n\n")
-      for ( i=0 ; i<num_params; i++ ) {
+      for ( i = 0 ; i<num_params; i++ ) {
         double temp =
             (fabs(a[i]) < NEARLY_ZERO)? 0.0 : fabs(100.0*dpar[i]/a[i]);
 	Dblf6 ("%-15.15s = %-15g  %-3.3s %-15g (%g%%)\n", par_name[i], a[i],
@@ -773,13 +773,13 @@ double a[];
 
       Dblf ("\n\ncorrelation matrix of the fit parameters:\n\n")
       Dblf ("               ")
-      for ( j=0 ; j<num_params ; j++ )
+      for ( j = 0 ; j<num_params ; j++ )
 	Dblf2 ("%-6.6s ", par_name[j])
       Dblf ("\n")
 
-      for ( i=0 ; i<num_params; i++ ) {
+      for ( i = 0 ; i<num_params; i++ ) {
 	Dblf2 ("%-15.15s", par_name[i]) ;
-	for ( j=0 ; j<=i; j++ )   /* Only print lower triangle of symmetric matrix */
+	for ( j = 0 ; j <= i; j++ )   /* Only print lower triangle of symmetric matrix */
 	  Dblf2 ("%6.3f ", covar[i][j] ); 
 	Dblf ("\n")
       }
@@ -824,7 +824,7 @@ chisquare : %-15g   relative deltachi2 : %g\n\
 deltachi2 : %-15g   limit for stopping : %g\n\
 lambda	  : %g\n\nactual set of parameters\n\n",
 i, chisq, chisq > NEARLY_ZERO ? (chisq - last_chisq)/chisq : 0.0, chisq - last_chisq, epsilon, lambda);
-    for ( k=0 ; k<num_params ; k++ )
+    for ( k = 0 ; k<num_params ; k++ )
 	fprintf (device, "%-15.15s = %g\n", par_name[k], a[k]);
 }
 
@@ -851,9 +851,9 @@ char *subst;
 {
     char *tmp = *s;
 
-    while ( *tmp==' ' || *tmp=='\t' || *tmp=='=' )
+    while ( *tmp == ' ' || *tmp == '\t' || *tmp == '=' )
 	tmp++;
-    if ( *tmp=='\n' || *tmp=='\0' )                    /* not found */
+    if ( *tmp == '\n' || *tmp == '\0' )                    /* not found */
 	return NULL;
     if ( (*s = strpbrk (tmp, " =\t\n")) == NULL )
 	*s = tmp + strlen(tmp);
@@ -870,7 +870,7 @@ static TBOOLEAN is_variable (s)
 char *s;
 {
     while ( *s != '\0' ) { 
-	if ( !isalnum(*s) && *s!='_' )
+	if ( !isalnum(*s) && *s != '_' )
 	    return FALSE;
 	s++;
     }
@@ -961,8 +961,8 @@ char *varname;
 {
     register struct udvt_entry *udv_ptr = first_udv;
 
-    for ( ; udv_ptr ; udv_ptr=udv_ptr->next_udv)
-	    if ( strcmp (varname, udv_ptr->udv_name)==0)
+    for ( ; udv_ptr ; udv_ptr = udv_ptr->next_udv)
+	    if ( strcmp (varname, udv_ptr->udv_name) == 0)
 	      return real(&(udv_ptr->udv_value));
 
     /* get here => not found */
@@ -979,12 +979,12 @@ double value;
 {
     register struct udvt_entry *udv_ptr = first_udv;
 
-    for ( ; udv_ptr ; udv_ptr=udv_ptr->next_udv)
-	    if ( strcmp (varname, udv_ptr->udv_name)==0) {
+    for ( ; udv_ptr ; udv_ptr = udv_ptr->next_udv)
+	    if ( strcmp (varname, udv_ptr->udv_name) == 0) {
 	    	if (udv_ptr->udv_undef) {
-	    		udv_ptr->udv_undef=0;
+	    		udv_ptr->udv_undef = 0;
 	    		(void)Gcomplex(&udv_ptr->udv_value, value, 0.0); 
-	    	} else if (udv_ptr->udv_value.type==INTGR) {
+	    	} else if (udv_ptr->udv_value.type == INTGR) {
 	    		(void)Gcomplex(&udv_ptr->udv_value, (double)udv_ptr->udv_value.v.int_val, 0.0); 
 	    	}
 		   return real(&(udv_ptr->udv_value));
@@ -1219,14 +1219,14 @@ const char *fromfile;
 
 void do_fit ()
 {
-	TBOOLEAN autorange_x=3, autorange_y=3;  /* yes */ 
+	TBOOLEAN autorange_x = 3, autorange_y = 3;  /* yes */ 
 	/* HBB 980401: new: z range specification */
-	TBOOLEAN autorange_z=3;
+	TBOOLEAN autorange_z = 3;
 	double min_x, max_x;  /* range to fit */
 	double min_y, max_y;  /* range to fit */
 	/* HBB 980401: new: z range specification */
 	double min_z, max_z;  /* range to fit */
-	int dummy_x=-1, dummy_y=-1; /* eg  fit [u=...] [v=...] */
+	int dummy_x = -1, dummy_y = -1; /* eg  fit [u=...] [v=...] */
 
 	int 	i;
 	double	v[4];
@@ -1297,7 +1297,7 @@ void do_fit ()
 
 	if (func.at) {
 		free(func.at);
-		func.at=NULL;  /* in case perm_at() does int_error */
+		func.at = NULL;  /* in case perm_at() does int_error */
 	}
 
 	dummy_func = &func;
@@ -1325,12 +1325,12 @@ void do_fit ()
 	/* use datafile module to parse the datafile and qualifiers */
 
 	columns = df_open(4);  /* up to 4 using specs allowed */
-	if (columns==1)
+	if (columns == 1)
 		int_error("Need 2 to 4 using specs", c_token);
 
 	/* HBB 980401: if this is a single-variable fit, we shouldn't have
 	 * allowed a variable name specifier for 'y': */
-	if ((dummy_y >=0) && (columns<4))
+	if ((dummy_y >= 0) && (columns<4))
 		int_error("Can't re-name 'y' in a one-variable fit", dummy_y);
 
 	/* defer actually reading the data until we have parsed the rest of the line */
@@ -1391,8 +1391,8 @@ void do_fit ()
 	err_data = vec (max_data);
 	num_data = 0;
 
-	while ( (i=df_readline(v, 4)) != EOF ) {
-		if ( num_data>=max_data ) {
+	while ( (i = df_readline(v, 4)) != EOF ) {
+		if ( num_data >= max_data ) {
 			max_data = (max_data * 3) / 2; /* increase max_data by factor of 1.5 */
 			if ( 0
 					 || redim_vec (&fit_x, max_data)
@@ -1486,7 +1486,7 @@ void do_fit ()
 		fprintf (log_f, "        y-errors assumed equally distributed\n\n");
 
 	{
-		char *line=NULL;
+		char *line = NULL;
 		
 		m_capture(&line, token1, token2-1);		
 		fprintf (log_f, "function used for fitting: %s\n", line);
@@ -1561,7 +1561,7 @@ void do_fit ()
 				setvar (par_name[num_params], tempval);   /* use parname as temp */ 
 			}
 			else {
-				if (num_params>=max_params) {
+				if (num_params >= max_params) {
 					max_params = (max_params * 3) / 2;
 					if (0
 							|| !redim_vec(&a, max_params)
@@ -1610,7 +1610,7 @@ void do_fit ()
 		Eex("Number of data points smaller than number of parameters");
 	
 	/* avoid parameters being equal to zero */
-	for ( i=0 ; i<num_params ; i++ )
+	for ( i = 0 ; i<num_params ; i++ )
 		if ( a[i] == 0 )
 	    a[i] = NEARLY_ZERO;
 

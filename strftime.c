@@ -54,8 +54,6 @@ static char *RCSid="$Id: strftime.c,v 1.6 1998/04/14 00:16:24 drd Exp $";
 
 #ifdef TEST_STRFTIME /* test case */
 #define strftime _strftime
-#else
-#define const /**/
 #endif
 
 
@@ -66,11 +64,11 @@ static void fill(from, pto, pmaxsize)
 {
   strncpy(*pto, from, *pmaxsize);
   if(*pmaxsize<strlen(from)) {
-    (*pto)+=*pmaxsize;
-    *pmaxsize=0;
+    (*pto) += *pmaxsize;
+    *pmaxsize = 0;
   } else {
-    (*pto)+=strlen(from);
-    (*pmaxsize)-=strlen(from);
+    (*pto) += strlen(from);
+    (*pmaxsize) -= strlen(from);
   }
 }
 
@@ -92,37 +90,37 @@ size_t strftime(s, max, format, tp)
      const char *format;
      const struct tm *tp;
 {
-  char *start=s;
-  size_t maxsize=max;
+  char *start = s;
+  size_t maxsize = max;
 
   if(max>0) {
     while(*format && max>0) {
-      if(*format!='%') {
-      	*s++=*format++;
+      if(*format != '%') {
+      	*s++ = *format++;
 	max--;
       } else {
         format++;
 	switch(*format++) {
 	  case 'a': /* abbreviated weekday name */
-	    if(tp->tm_wday>=0 && tp->tm_wday<=6)
+	    if(tp->tm_wday >= 0 && tp->tm_wday <= 6)
 	      fill(abbrev_day_names[tp->tm_wday], &s, &max);
 	    break;
 	  case 'A': /* full name of the weekday */
-	    if(tp->tm_wday>=0 && tp->tm_wday<=6)
+	    if(tp->tm_wday >= 0 && tp->tm_wday <= 6)
 	      fill(full_day_names[tp->tm_wday], &s, &max);
 	    break;
 	  case 'b': /* abbreviated month name */
-	    if(tp->tm_mon>=0 && tp->tm_mon<=11)
+	    if(tp->tm_mon >= 0 && tp->tm_mon <= 11)
 	      fill(abbrev_month_names[tp->tm_mon], &s, &max);
 	    break;
 	  case 'B': /* full name of month */
-	    if(tp->tm_mon>=0 && tp->tm_mon<=11)
+	    if(tp->tm_mon >= 0 && tp->tm_mon <= 11)
 	      fill(full_month_names[tp->tm_mon], &s, &max);
 	    break;
 	  case 'c': /* locale's date and time reprensentation */
 	    strftime(s, max, "%a %b %X %Y", tp);
-	    max-=strlen(s);
-	    s+=strlen(s);
+	    max -= strlen(s);
+	    s += strlen(s);
 	    break;
 	  case 'd': /* day of the month (01-31) */
 	    number(tp->tm_mday, 2, &s, &max);
@@ -143,7 +141,7 @@ size_t strftime(s, max, format, tp)
 	    number(tp->tm_min, 2, &s, &max);
 	    break;
 	  case 'p': /* locale's version of AM or PM */
-	    fill(tp->tm_hour>=6 ? "PM" : "AM", &s, &max);
+	    fill(tp->tm_hour >= 6 ? "PM" : "AM", &s, &max);
 	    break;
 	  case 'S': /* seconds (00-59) */
 	    number(tp->tm_sec, 2, &s, &max);
@@ -151,7 +149,7 @@ size_t strftime(s, max, format, tp)
 	  case 'U': /* week number of the year (00-53) with Sunday as the first day of the week */
 	    number((tp->tm_yday-(tp->tm_yday-tp->tm_wday+7)%7+7)/7, 1, &s, &max);
 	    break;
-	  case 'w': /* weekday (Sunday=0 to Saturday=6) */
+	  case 'w': /* weekday (Sunday = 0 to Saturday = 6) */
 	    number(tp->tm_wday, 1, &s, &max);
 	    break;
 	  case 'W': /* week number of the year (00-53) with Monday as the first day of the week */
@@ -159,8 +157,8 @@ size_t strftime(s, max, format, tp)
 	    break;
 	  case 'x': /* locale's date representation */
 	    strftime(s, max, "%a %b %d %Y", tp);
-	    max-=strlen(s);
-	    s+=strlen(s);
+	    max -= strlen(s);
+	    s += strlen(s);
 	    break;
 	  case 'X': /* locale's time representation */
 #ifndef NOTIMEZONE
@@ -168,8 +166,8 @@ size_t strftime(s, max, format, tp)
 #else
 	    strftime(s, max, "%H:%M:%S", tp);
 #endif
-	    max-=strlen(s);
-	    s+=strlen(s);
+	    max -= strlen(s);
+	    s += strlen(s);
 	    break;
 	  case 'y': /* two-digit year representation (00-99) */
 	    number(tp->tm_year%100, 2, &s, &max);
@@ -184,16 +182,16 @@ size_t strftime(s, max, format, tp)
 #endif
 	  case '%': /* percent sign */
 	  default:
-	    *s++=*(format-1);
+	    *s++ = *(format-1);
 	    max--;
 	    break;
 	  }
       }
     }
     if(s-start<maxsize) {
-      *s++='\0';
+      *s++ = '\0';
     } else {
-      *(s-1)='\0';
+      *(s-1) = '\0';
     }
   }
   
@@ -217,9 +215,9 @@ int main()
   time_t t;
   int i;
 
-  t=time(NULL);
+  t = time(NULL);
 
-  ts=localtime(&t);
+  ts = localtime(&t);
 
   test("%c");
   test("test%%test");
@@ -228,13 +226,13 @@ int main()
   test("%A %B %U");
   test("%I:%M %p %j %w");
 
-  t-=245*24*60*60;
+  t -= 245*24*60*60;
 
-  for(i=0;i<366;i++) {
-    ts=localtime(&t);
+  for(i = 0;i<366;i++) {
+    ts = localtime(&t);
     printf("%03d: ", i);
     test("%a %d %m %W");
-    t+=24*60*60;
+    t += 24*60*60;
   }
 
   return 0;

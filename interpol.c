@@ -155,25 +155,24 @@ int_error ("Syntax error", c_token);
 #define STORE_AND_FIXUP_RANGE(STORE, VALUE, TYPE, MIN, MAX, AUTO, OUT_ACTION, UNDEF_ACTION)\
 do { STORE=VALUE; \
     if (TYPE != INRANGE) break;  /* dont set y range if x is outrange, for example */ \
-    if ( VALUE<MIN ) \
+    if ( VALUE<MIN ) { \
        if (AUTO & 1) MIN=VALUE; else { TYPE=OUTRANGE; OUT_ACTION; break; }  \
-    if ( VALUE>MAX ) \
+    } \
+    if ( VALUE>MAX ) {\
        if (AUTO & 2) MAX=VALUE; else { TYPE=OUTRANGE; OUT_ACTION; }   \
+    } \
 } while(0)
 
 #define UPDATE_RANGE(TEST,OLD,NEW,AXIS) \
-do { if (TEST) \
-     if (log_array[AXIS]) OLD = pow(base_array[AXIS], NEW); \
-     else OLD = NEW; \
+do { if (TEST) { \
+     if (log_array[AXIS]) OLD = pow(base_array[AXIS], NEW); else OLD = NEW; \
+     } \
 } while(0)
 
 /* use this instead empty macro arguments to work around NeXT cpp bug */
 /* if this fails on any system, we might use ((void)0) */
 
 #define NOOP			/* */
-
-
-#define inrange(z,min,max) ((min<max) ? ((z>=min)&&(z<=max)) : ((z>=max)&&(z<=min)) )
 
 #define spline_coeff_size 4
 typedef double spline_coeff[spline_coeff_size];

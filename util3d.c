@@ -74,9 +74,6 @@ extern double base_array[], log_base_array[];
 #define min3d_z min_array[FIRST_Z_AXIS]
 #define max3d_z max_array[FIRST_Z_AXIS]
 
-#define inrange(z,min,max) ((min<max) ? ((z>=min)&&(z<=max)) : ((z>=max)&&(z<=min)) )
-
-
 typedef double transform_matrix[4][4];
 
 void mat_unit(mat)
@@ -337,7 +334,7 @@ enum JUSTIFY just;
         register struct termentry *t = term;
 	if (clip_point(x,y)) return;
 	if (!(*t->justify_text)(just)) {
-		assert(CENTRE==1 && RIGHT==2);
+		assert(CENTRE == 1 && RIGHT == 2);
 		x -= (t->h_char * strlen(str) * just)/2;
 	}
 	(*t->put_text)(x,y,str);
@@ -394,13 +391,13 @@ int clip_line(x1, y1, x2, y2)
   }
   if (count < 2) return 0;
   if (*x1 < *x2)
-    x_min=*x1, x_max=*x2;
+    x_min = *x1, x_max = *x2;
   else
-    x_min=*x2, x_max=*x1;
+    x_min = *x2, x_max = *x1;
   if (*y1 < *y2)
-    y_min=*y1, y_max=*y2;
+    y_min = *y1, y_max = *y2;
   else
-    y_min=*y2, y_max=*y1;
+    y_min = *y2, y_max = *y1;
   if (pos1 && pos2) {		/* Both were out - update both */
     *x1 = x_intr[0];     
     *y1 = y_intr[0];
@@ -898,9 +895,9 @@ two_edge3d_intersect(points, i, lx, ly, lz)
 	if(iy == -VERYLARGE)
 	  {
 	    /* swap points so ix/iy/iz don't have a -VERYLARGE component */
-	    x = ix;ix = ox;ox = x;
-	    y = iy;iy = oy;oy = y;
-	    z = iz;iz = oz;oz = z;
+	    x = ix; ix = ox; ox = x;
+	    y = iy; iy = oy; oy = y;
+	    z = iz; iz = oz; oz = z;
 	  }
 
 	/* check actually passes through the 3D graph volume */
@@ -926,9 +923,9 @@ two_edge3d_intersect(points, i, lx, ly, lz)
 	if(iz == -VERYLARGE)
 	  {
 	    /* swap points so ix/iy/iz don't have a -VERYLARGE component */
-	    x = ix;ix = ox;ox = x;
-	    y = iy;iy = oy;oy = y;
-	    z = iz;iz = oz;oz = z;
+	    x = ix; ix = ox; ox = x;
+	    y = iy; iy = oy; oy = y;
+	    z = iz; iz = oz; oz = z;
 	  }
 
 	/* check actually passes through the 3D graph volume */

@@ -838,11 +838,13 @@ register double mag, ang;
 					} else {
 					  mag =
 					    pow(magnitude(&a),fabs(b.v.cmplx_val.real));
-					  if (b.v.cmplx_val.real < 0.0)
+					  if (b.v.cmplx_val.real < 0.0) {
 					    if (mag != 0.0)
 					      mag = 1.0/mag;
 					   else 
 					      undefined = TRUE;
+					  }
+
 					  mag *= gp_exp(-b.v.cmplx_val.imag*angle(&a));
 					  ang = b.v.cmplx_val.real*angle(&a) +
 					        b.v.cmplx_val.imag*log(magnitude(&a));
@@ -858,21 +860,25 @@ register double mag, ang;
 				case INTGR:
 					if (a.v.cmplx_val.imag == 0.0) {
 						mag = pow(a.v.cmplx_val.real,(double)abs(b.v.int_val));
-						if (b.v.int_val < 0)
+						if (b.v.int_val < 0) {
 						  if (mag != 0.0)
 						    mag = 1.0/mag;
 						  else 
 						    undefined = TRUE;
+						}
+
 						(void) Gcomplex(&result,mag,0.0);
 					}
 					else {
 						/* not so good, but...! */
 						mag = pow(magnitude(&a),(double)abs(b.v.int_val));
-						if (b.v.int_val < 0)
+						if (b.v.int_val < 0) {
 						  if (mag != 0.0)
 						    mag = 1.0/mag;
 						  else 
 						    undefined = TRUE;
+						}
+
 						ang = angle(&a)*b.v.int_val;
 						(void) Gcomplex(&result,mag*cos(ang),
 							mag*sin(ang));
@@ -887,11 +893,13 @@ register double mag, ang;
 					  Gcomplex(&result, b.v.cmplx_val.real==0 ? 1.0 : 0.0, 0.0);
 					} else {
 					  mag = pow(magnitude(&a),fabs(b.v.cmplx_val.real));
-					  if (b.v.cmplx_val.real < 0.0)
+					  if (b.v.cmplx_val.real < 0.0) {
 					    if (mag != 0.0)
 					      mag = 1.0/mag;
 					    else 
 					      undefined = TRUE;
+					  }
+
 					  mag *= gp_exp(-b.v.cmplx_val.imag*angle(&a));
 					  ang = b.v.cmplx_val.real*angle(&a) +
 					        b.v.cmplx_val.imag*log(magnitude(&a));

@@ -156,13 +156,13 @@ const char *cs, *ct;
     return NULL;
 
   if (!*ct)
-    return cs;
+    return (char *)cs;
   
   len = strlen(ct);
   while (*cs)
     {
       if (strncmp(cs, ct, len)==0)
-	return cs;
+	return (char *)cs;
       cs++;
     }
 

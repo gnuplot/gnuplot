@@ -295,7 +295,7 @@ char cur_locale[MAX_ID_LEN+1] = "C";
  */
 
 char full_month_names[12][32] = { FMON01, FMON02, FMON03, FMON04, FMON05, FMON06, FMON07, FMON08, FMON09, FMON10, FMON11, FMON12 };
-char abbrev_month_names[12][8] ={ AMON01, AMON02, AMON03, AMON04, AMON05, AMON06, AMON07, AMON08, AMON09, AMON10, AMON11, AMON12 };
+char abbrev_month_names[12][8] = { AMON01, AMON02, AMON03, AMON04, AMON05, AMON06, AMON07, AMON08, AMON09, AMON10, AMON11, AMON12 };
 
 char full_day_names[7][32] = { FDAY0, FDAY1, FDAY2, FDAY3, FDAY4, FDAY5, FDAY6 };
 char abbrev_day_names[7][8] = { ADAY0, ADAY1, ADAY2, ADAY3, ADAY4, ADAY5, ADAY6 };
@@ -336,7 +336,7 @@ static void set_locale __PROTO((char *));
 do{if ( datatype[axis] == TIME && isstring(c_token) ) { \
     char ss[80]; struct tm tm; \
     quote_str(ss,c_token, 80); ++c_token; \
-    if (gstrptime(ss,timefmt,&tm)) store = (double) gtimegm(&tm); else store=0;\
+    if (gstrptime(ss,timefmt,&tm)) store = (double) gtimegm(&tm); else store = 0;\
    } else {\
     struct value value; \
     store = real(const_express(&value));\
@@ -386,9 +386,9 @@ reset_command()
   strcpy(zformat,DEF_FORMAT);
   strcpy(x2format,DEF_FORMAT);
   strcpy(y2format,DEF_FORMAT);
-  format_is_numeric[FIRST_X_AXIS]=format_is_numeric[SECOND_X_AXIS]=1;
-  format_is_numeric[FIRST_Y_AXIS]=format_is_numeric[SECOND_Y_AXIS]=1;
-  format_is_numeric[FIRST_Z_AXIS]=format_is_numeric[SECOND_Z_AXIS]=1;
+  format_is_numeric[FIRST_X_AXIS] = format_is_numeric[SECOND_X_AXIS] = 1;
+  format_is_numeric[FIRST_Y_AXIS] = format_is_numeric[SECOND_Y_AXIS] = 1;
+  format_is_numeric[FIRST_Z_AXIS] = format_is_numeric[SECOND_Z_AXIS] = 1;
   autoscale_r	 = DTRUE;
   autoscale_t	 = DTRUE;
   autoscale_u	 = DTRUE;
@@ -417,7 +417,7 @@ reset_command()
   set_lp_properties(&work_grid,0,GRID_OFF,0,0.5,1.0);
   set_lp_properties( &grid_lp, 0,      -1,0,0.5,1.0);
   set_lp_properties(&mgrid_lp, 0,      -1,0,0.5,1.0);
-  polar_grid_angle=0;
+  polar_grid_angle = 0;
   key		 = -1;
   is_log_x	 = FALSE;
   is_log_y	 = FALSE;
@@ -571,7 +571,7 @@ reset_command()
 void
 set_command()
 {
-static char GPFAR setmess[] ="\
+static char GPFAR setmess[] = "\
 valid set options:  [] = choose one, {} means optional\n\n\
 \t'angles',  '{no}arrow',  '{no}autoscale',  'bars',  '{no}border',\n\
 \t'boxwidth', '{no}clabel', '{no}clip', 'cntrparam', '{no}contour',\n\
@@ -615,7 +615,7 @@ else if (almost_equals(c_token, MAX)) { AUTO |= 2;    ++c_token; }
      else if (almost_equals(c_token,"au$toscale")) {
 	    c_token++;
 	    if (END_OF_COMMAND) {
-		   autoscale_r=autoscale_t = autoscale_x = autoscale_y = autoscale_z = autoscale_x2 = autoscale_y2 = DTRUE;
+		   autoscale_r = autoscale_t = autoscale_x = autoscale_y = autoscale_z = autoscale_x2 = autoscale_y2 = DTRUE;
 	    } else if (equals(c_token, "xy") || equals(c_token, "yx")) {
 		   autoscale_x = autoscale_y = DTRUE;
 		   c_token++;
@@ -635,7 +635,7 @@ else if (almost_equals(c_token, MAX)) { AUTO |= 2;    ++c_token; }
 	else if (almost_equals(c_token,"noau$toscale")) {
 	    c_token++;
 	    if (END_OF_COMMAND) {
-		   autoscale_r=autoscale_t = autoscale_x = autoscale_y = autoscale_z = FALSE;
+		   autoscale_r = autoscale_t = autoscale_x = autoscale_y = autoscale_z = FALSE;
 	    } else if (equals(c_token, "xy") || equals(c_token, "tyx")) {
 		   autoscale_x = autoscale_y = FALSE;
 		   c_token++;
@@ -802,7 +802,7 @@ else if (almost_equals(c_token, MAX)) { AUTO |= 2;    ++c_token; }
 	    }
 
    		else if (almost_equals(c_token, "le$vels")) {
-   			int i=0;  /* local counter */
+   			int i = 0;  /* local counter */
    			c_token++;
 			/*  RKC: I have modified the next two:
 			 *   to use commas to separate list elements as in xtics
@@ -830,7 +830,7 @@ else if (almost_equals(c_token, MAX)) { AUTO |= 2;    ++c_token; }
  			   if (!equals(c_token, ","))
  			     int_error("expecting comma to separate start,incr levels", c_token);
  			   c_token++;
- 			   if((levels_list[i++] = real(const_express(&a)))==0)
+ 			   if((levels_list[i++] = real(const_express(&a))) == 0)
  			     int_error("increment cannot be 0", c_token);
   			   if(!END_OF_COMMAND){
  			     if (!equals(c_token, ","))
@@ -950,8 +950,8 @@ else if (almost_equals(c_token, MAX)) { AUTO |= 2;    ++c_token; }
 		}
 	}
 	else if (almost_equals(c_token,"fo$rmat")) {
-		TBOOLEAN setx=FALSE, sety=FALSE, setz=FALSE;
-		TBOOLEAN setx2=FALSE, sety2=FALSE;
+		TBOOLEAN setx = FALSE, sety = FALSE, setz = FALSE;
+		TBOOLEAN setx2 = FALSE, sety2 = FALSE;
 		c_token++;
 		if (equals(c_token,"x")) {
 			setx = TRUE;
@@ -984,23 +984,23 @@ else if (almost_equals(c_token, MAX)) { AUTO |= 2;    ++c_token; }
 		if (END_OF_COMMAND) {
 			if (setx) {
 				(void) strcpy(xformat,DEF_FORMAT);
-				format_is_numeric[FIRST_X_AXIS]=1;
+				format_is_numeric[FIRST_X_AXIS] = 1;
 			}
 			if (sety) {
 				(void) strcpy(yformat,DEF_FORMAT);
-				format_is_numeric[FIRST_Y_AXIS]=1;
+				format_is_numeric[FIRST_Y_AXIS] = 1;
 			}
 			if (setz) {
 				(void) strcpy(zformat,DEF_FORMAT);
-				format_is_numeric[FIRST_Z_AXIS]=1;
+				format_is_numeric[FIRST_Z_AXIS] = 1;
 			}
 			if (setx2) {
 				(void) strcpy(x2format,DEF_FORMAT);
-				format_is_numeric[SECOND_X_AXIS]=1;
+				format_is_numeric[SECOND_X_AXIS] = 1;
 			}
 			if (sety2) {
 				(void) strcpy(y2format,DEF_FORMAT);
-				format_is_numeric[SECOND_Y_AXIS]=1;
+				format_is_numeric[SECOND_Y_AXIS] = 1;
 			}
 		}
 		else {
@@ -1009,23 +1009,23 @@ else if (almost_equals(c_token, MAX)) { AUTO |= 2;    ++c_token; }
 			else {
 				if (setx) {
 				 quote_str(xformat,c_token, MAX_ID_LEN);
-				 format_is_numeric[FIRST_X_AXIS]=looks_like_numeric(xformat);
+				 format_is_numeric[FIRST_X_AXIS] = looks_like_numeric(xformat);
 				}
 				if (sety) {
 				 quote_str(yformat,c_token, MAX_ID_LEN);
-				 format_is_numeric[FIRST_Y_AXIS]=looks_like_numeric(yformat);
+				 format_is_numeric[FIRST_Y_AXIS] = looks_like_numeric(yformat);
 				}
 				if (setz) {
 				 quote_str(zformat,c_token, MAX_ID_LEN);
-				 format_is_numeric[FIRST_Z_AXIS]=looks_like_numeric(zformat);
+				 format_is_numeric[FIRST_Z_AXIS] =looks_like_numeric(zformat);
 				}
 				if (setx2) {
 				 quote_str(x2format,c_token, MAX_ID_LEN);
-				 format_is_numeric[SECOND_X_AXIS]=looks_like_numeric(x2format);
+				 format_is_numeric[SECOND_X_AXIS] = looks_like_numeric(x2format);
 				}
 				if (sety2) {
 				 quote_str(y2format,c_token, MAX_ID_LEN);
-				 format_is_numeric[SECOND_Y_AXIS]=looks_like_numeric(y2format);
+				 format_is_numeric[SECOND_Y_AXIS] = looks_like_numeric(y2format);
 				}
 				c_token++;
 			}
@@ -1065,7 +1065,7 @@ else if (almost_equals(c_token, MAX)) { AUTO |= 2;    ++c_token; }
 		TBOOLEAN change_z = FALSE;
 		TBOOLEAN change_x2 = FALSE;
 		TBOOLEAN change_y2 = FALSE;
-		double newbase=10, log_newbase;
+		double newbase = 10, log_newbase;
 
 		if (equals(c_token, "x2"))
 			change_x2 = TRUE;
@@ -1122,9 +1122,9 @@ else if (almost_equals(c_token, MAX)) { AUTO |= 2;    ++c_token; }
 	    if (END_OF_COMMAND) {
 		is_log_x = is_log_y = is_log_z = is_log_x2 = is_log_y2 = FALSE;
 	    } else if (equals(c_token, "x2")) {
-		is_log_x2=FALSE; ++c_token;
+		is_log_x2 = FALSE; ++c_token;
 	    } else if (equals(c_token, "y2")) {
-		is_log_y2=FALSE; ++c_token;
+		is_log_y2 = FALSE; ++c_token;
 	    } else {
 		if (chr_in_str(c_token, 'x')) {
 		    is_log_x = FALSE;
@@ -1160,20 +1160,20 @@ else if (almost_equals(c_token, MAX)) { AUTO |= 2;    ++c_token; }
         else if(almost_equals(c_token,"b$ars")){
            c_token++;
            if(END_OF_COMMAND){
-           		bar_size=1.0;
+           		bar_size = 1.0;
            } else if(almost_equals(c_token,"s$mall")){
-              bar_size=0.0;
+              bar_size = 0.0;
               ++c_token;
            } else if(almost_equals(c_token,"l$arge")){
-              bar_size=1.0;
+              bar_size = 1.0;
               ++c_token;
            } else {
            		struct value a;
-           		bar_size=real(const_express(&a));
+           		bar_size = real(const_express(&a));
            }
         } else if (almost_equals(c_token, "nob$ars")){
         		++c_token;
-        		bar_size=0.0;
+        		bar_size = 0.0;
         } else if (almost_equals(c_token, "enco$ding")){
 	    c_token++;
 	    if(END_OF_COMMAND) {
@@ -1219,13 +1219,13 @@ set_two()
  			if (outstr)
  			{
  				free(outstr);
- 				outstr=NULL; /* means STDOUT */
+ 				outstr = NULL; /* means STDOUT */
  			}
 		} else if (!isstring(c_token))
 			int_error("expecting filename",c_token);
 		else {
 			/* on int_error, we'd like to remember that this is allocated */
-			static char *testfile=NULL;
+			static char *testfile = NULL;
 			m_quote_capture(&testfile,c_token, c_token); /* reallocs store */
 			++c_token;
 			term_set_output(testfile);
@@ -1241,11 +1241,11 @@ set_two()
  			yoffset = 0.0;
  		} 
  		else {
- 				xoffset=real(const_express(&s));
+ 				xoffset = real(const_express(&s));
  				if (!equals(c_token,","))
  					int_error("',' expected",c_token);
  				c_token++;
- 				yoffset=real(const_express(&s));
+ 				yoffset = real(const_express(&s));
  		} 
  	} 
 	else if (almost_equals(c_token,"tit$le")) {
@@ -1281,7 +1281,7 @@ set_two()
 	}
 	else if (almost_equals(c_token, "nokeyt$itle")) {
 		++c_token;
-		*key_title=0;
+		*key_title = 0;
 	}
 	else if (almost_equals(c_token,"timef$mt")) {
 		c_token++;
@@ -1311,7 +1311,7 @@ set_two()
 
 #define DO_ZEROAX(variable, string,neg) \
 else if (almost_equals(c_token, string)) { \
-   ++c_token; if (END_OF_COMMAND) variable.l_type=-1; \
+   ++c_token; if (END_OF_COMMAND) variable.l_type = -1; \
    else { \
       struct value a; \
       int old_token = c_token;\
@@ -1320,7 +1320,7 @@ else if (almost_equals(c_token, string)) { \
          variable.l_type = real(const_express(&a)) - 1; \
    }\
 } else if (almost_equals(c_token, neg)) { \
-   ++c_token; variable.l_type=-3; \
+   ++c_token; variable.l_type = -3; \
 }
 
 
@@ -1371,7 +1371,7 @@ else if (almost_equals(c_token, string)) { \
 		    pointsize = 1.0;
 		else
 		    pointsize = real(const_express(&a));
-		if(pointsize<=0) pointsize=1;
+		if(pointsize <= 0) pointsize = 1;
 	}
 	else if (almost_equals(c_token,"pol$ar")) {
 	    if (!polar) {
@@ -1412,25 +1412,25 @@ else if (almost_equals(c_token, string)) { \
 	    if (END_OF_COMMAND) {
 		/* assuming same as defaults */
 		angles_format = ANGLES_RADIANS;
-		ang2rad=1;
+		ang2rad = 1;
 	    }
 	    else if (almost_equals(c_token, "r$adians")) {
 		angles_format = ANGLES_RADIANS;
 		c_token++;
-		ang2rad=1;
+		ang2rad = 1;
 	    }
 	    else if (almost_equals(c_token, "d$egrees")) {
 		angles_format = ANGLES_DEGREES;
 		c_token++;
-		ang2rad=DEG2RAD;
+		ang2rad = DEG2RAD;
 	    }
 	    else
 		 int_error("expecting 'radians' or 'degrees'", c_token);
 
 	    if (polar && autoscale_t) {
 		/* set trange if in polar mode and no explicit range */
-		tmin=0;
-		tmax=2*Pi/ang2rad;
+		tmin = 0;
+		tmax = 2*Pi/ang2rad;
 	    }
 	}
 
@@ -1454,17 +1454,17 @@ else if (almost_equals(c_token, neg)) { work_grid.l_type &= ~(mask); ++c_token; 
 			else GRID_MATCH("mx2$tics", "nomx2$tics", GRID_MX2)
 			else GRID_MATCH("my2$tics", "nomy2$tics", GRID_MY2)
 			else if (almost_equals(c_token,"po$lar")){
-				if (!work_grid.l_type) work_grid.l_type=GRID_X;
+				if (!work_grid.l_type) work_grid.l_type = GRID_X;
                                 c_token++;
                                 if (END_OF_COMMAND) {
-                                	polar_grid_angle=30*DEG2RAD;
+                                	polar_grid_angle = 30*DEG2RAD;
                                 } else {
 					/* get radial interval */
                                 	struct value a;
-                                	polar_grid_angle=ang2rad*real(const_express(&a));
+                                	polar_grid_angle = ang2rad*real(const_express(&a));
                                 }
 			} else if (almost_equals(c_token,"nopo$lar")){
-                                polar_grid_angle=0; /* not polar grid */
+                                polar_grid_angle = 0; /* not polar grid */
                                 c_token++;
 			} else break; /* might be a linetype */
 		}
@@ -1541,7 +1541,7 @@ else if (almost_equals(c_token, neg)) { work_grid.l_type &= ~(mask); ++c_token; 
                         key_swidth = 4;
                         key_vert_factor = 1;
                         key_width_fix = 0;
-			key_title[0]=0;
+			key_title[0] = 0;
 		} 
 		else {
 			while (!END_OF_COMMAND) {
@@ -1576,13 +1576,13 @@ else if (almost_equals(c_token, neg)) { work_grid.l_type &= ~(mask); ++c_token; 
 					key_just = JRIGHT;
 					/* key = -1; */
 				} else if (almost_equals(c_token,"rev$erse")) {
-					key_reverse=TRUE;
+					key_reverse = TRUE;
 				} else if (almost_equals(c_token,"norev$erse")) {
-					key_reverse=FALSE;
+					key_reverse = FALSE;
 				} else if (equals(c_token,"box")) {
 					++c_token;
 					if (END_OF_COMMAND)
-						key_box.l_type=-2;
+						key_box.l_type = -2;
 					else {
 						int old_token = c_token;
 						
@@ -1593,7 +1593,7 @@ else if (almost_equals(c_token, neg)) { work_grid.l_type &= ~(mask); ++c_token; 
 					}		
 					--c_token;  /* is incremented after loop */
 				} else if (almost_equals(c_token,"nob$ox")) {
-					key_box.l_type=-3;
+					key_box.l_type = -3;
 				} else if (almost_equals(c_token, "sa$mplen")) {
 					++c_token;
 					key_swidth = real(const_express(&a));
@@ -1614,7 +1614,7 @@ else if (almost_equals(c_token, neg)) { work_grid.l_type &= ~(mask); ++c_token; 
 						quote_str(key_title,++c_token, MAX_LINE_LEN);
 					}
 					else
-						key_title[0]=0;
+						key_title[0] = 0;
 				} else {
 					get_position(&key_user_pos);
 					key = 1;
@@ -1760,12 +1760,12 @@ else if (almost_equals(c_token, STRING)) { \
 } else if (almost_equals(c_token,MINISTRING)) { /* eg mxtics */\
  struct value freq;\
  c_token++; \
- if (END_OF_COMMAND) { MTICS=MINI_AUTO; }\
+ if (END_OF_COMMAND) { MTICS = MINI_AUTO; }\
  else if (almost_equals(c_token, "def$ault")) {\
-  MTICS=MINI_DEFAULT; ++c_token; \
+  MTICS = MINI_DEFAULT; ++c_token; \
  } else { \
-  FREQ=real(const_express(&freq)); FREQ=floor(FREQ);\
-  MTICS=MINI_USER; \
+  FREQ = real(const_express(&freq)); FREQ = floor(FREQ);\
+  MTICS = MINI_USER; \
 }} else if (almost_equals(c_token,NOMINI)) {\
   MTICS = FALSE;  c_token++;\
 }
@@ -1789,8 +1789,8 @@ PROCESS_TIC_COMMANDS(ztics, mztics, mztfreq, zticdef, FIRST_Z_AXIS,rotate_ztics,
 
 #define PROCESS_MARGIN(variable, string) \
 else if (almost_equals(c_token,string)) {\
- ++c_token; if (END_OF_COMMAND) variable=-1;\
- else { struct value a; variable=real(const_express(&a)); } \
+ ++c_token; if (END_OF_COMMAND) variable = -1;\
+ else { struct value a; variable = real(const_express(&a)); } \
 }
 
 	PROCESS_MARGIN(lmargin, "lmar$gin")
@@ -1888,12 +1888,12 @@ set_three()
 			}
 					
 			if (!END_OF_COMMAND) {
-				xsize=real(const_express(&s));
+				xsize = real(const_express(&s));
 				if (equals(c_token,",")) {
 					c_token++;
-					ysize=real(const_express(&s));
+					ysize = real(const_express(&s));
 				} else {
-					ysize=xsize;
+					ysize = xsize;
 				}
 			}
 		}
@@ -1905,11 +1905,11 @@ set_three()
                         ticscale = 1.0;
 			miniticscale = 0.5;
                 } else {
-                        ticscale=real(const_express(&tscl));
+                        ticscale = real(const_express(&tscl));
 			if (END_OF_COMMAND) {
-				miniticscale=ticscale*0.5;
+				miniticscale = ticscale*0.5;
 			} else {
-				miniticscale=real(const_express(&tscl));
+				miniticscale = real(const_express(&tscl));
 			}
                 }
         }
@@ -1925,7 +1925,7 @@ set_three()
 		}
 		else {
 			term_reset();
-			term=0; /* in case set_term() fails */
+			term = 0; /* in case set_term() fails */
 			term = set_term(c_token);
 			c_token++;
 
@@ -2142,10 +2142,10 @@ set_label()
     struct text_label *prev_label = NULL;
     struct position pos;
     char text[MAX_LINE_LEN+1],font[MAX_LINE_LEN+1];
-    enum JUSTIFY just=LEFT;
-    int rotate=0;
+    enum JUSTIFY just = LEFT;
+    int rotate = 0;
     int tag;
-    TBOOLEAN set_text, set_position, set_just=FALSE, set_rot=FALSE, set_font;
+    TBOOLEAN set_text, set_position, set_just = FALSE, set_rot = FALSE, set_font;
 
     /* get tag */
     if (!END_OF_COMMAND 
@@ -2203,7 +2203,7 @@ set_label()
 	   set_position = TRUE;
     } else {
 		pos.x = pos.y = pos.z = 0;
-		pos.scalex=pos.scaley=pos.scalez=first_axes;
+		pos.scalex = pos.scaley = pos.scalez = first_axes;
 	   set_position = FALSE;
     }
 
@@ -2242,7 +2242,7 @@ set_label()
     } 
 
     /* get font */
-    font[0]='\0'; set_font = FALSE;
+    font[0] = '\0'; set_font = FALSE;
     if (!END_OF_COMMAND && equals(c_token, "font")) {
 	   c_token++;
 	   if (END_OF_COMMAND)
@@ -2271,7 +2271,7 @@ set_label()
     if (this_label != NULL && tag == this_label->tag) {
 	   /* changing the label */
 	   if (set_position) {
-		  this_label->place=pos;
+		  this_label->place = pos;
 	   }
 	   if (set_text)
 		(void) strcpy(this_label->text, text);
@@ -2291,7 +2291,7 @@ set_label()
 		first_label = new_label; /* make it start of list */
 	   new_label->tag = tag;
 	   new_label->next = this_label;
-	   new_label->place=pos;
+	   new_label->place = pos;
 	   (void) strcpy(new_label->text, text);
 	   new_label->pos = just;
 	   new_label->rotate = rotate;
@@ -2359,8 +2359,8 @@ static void
 delete_label(prev,this)
 	struct text_label *prev, *this;
 {
-    if (this!=NULL)	{		/* there really is something to delete */
-	   if (prev!=NULL)		/* there is a previous label */
+    if (this != NULL)	{		/* there really is something to delete */
+	   if (prev != NULL)		/* there is a previous label */
 		prev->next = this->next; 
 	   else				/* this = first_label so change first_label */
 		first_label = this->next;
@@ -2382,11 +2382,11 @@ set_arrow()
 #ifndef ANSI_C
     struct lp_style_type loc_lp;
 #else
-    struct lp_style_type loc_lp=LP_DEFAULT;
+    struct lp_style_type loc_lp = LP_DEFAULT;
 #endif
-    int axes=FIRST_AXES;
+    int axes = FIRST_AXES;
     int tag;
-    TBOOLEAN set_start, set_end, head = 1, set_axes=0, set_line=0;
+    TBOOLEAN set_start, set_end, head = 1, set_axes = 0, set_line = 0;
 
 #ifndef ANSI_C
     loc_lp.pointflag = loc_lp.l_type = loc_lp.p_type = 0;
@@ -2407,12 +2407,12 @@ set_arrow()
 
 	if (!END_OF_COMMAND && equals(c_token, "first")) {
 		++c_token;
-		axes=FIRST_AXES;
-		set_axes=1;
+		axes = FIRST_AXES;
+		set_axes = 1;
 	} else if (!END_OF_COMMAND && equals(c_token, "second")) {
 		++c_token;
-		axes=SECOND_AXES;
-		set_axes=1;
+		axes = SECOND_AXES;
+		set_axes = 1;
 	}
     /* get start position */
     if (!END_OF_COMMAND && equals(c_token, "from")) {
@@ -2423,8 +2423,8 @@ set_arrow()
 		get_position(&spos);
 	   set_start = TRUE;
     } else {
-		spos.x=spos.y=spos.z=0;
-		spos.scalex=spos.scaley=spos.scalez=first_axes;
+		spos.x = spos.y = spos.z = 0;
+		spos.scalex = spos.scaley = spos.scalez = first_axes;
 	   set_start = FALSE;
     }
 
@@ -2437,8 +2437,8 @@ set_arrow()
 		get_position(&epos);
 	   set_end = TRUE;
     } else {
-    	epos.x=epos.y=epos.z=0;
-    	epos.scalex=epos.scaley=epos.scalez=first_axes;
+    	epos.x = epos.y = epos.z = 0;
+    	epos.scalex = epos.scaley = epos.scalez = first_axes;
 	   set_end = FALSE;
     }
 
@@ -2464,7 +2464,7 @@ set_arrow()
            head = 1;
     }
 
-    	set_line=1;
+    	set_line = 1;
 
 		/* pick up a line spec - allow ls, but no point. */
 		LP_PARSE(loc_lp, 1, 0, 0, 0);
@@ -2484,14 +2484,14 @@ set_arrow()
     if (this_arrow != NULL && tag == this_arrow->tag) {
 	   /* changing the arrow */
 	   if (set_start) {
-		  this_arrow->start=spos;
+		  this_arrow->start = spos;
 	   }
 	   if (set_end) {
-		  this_arrow->end=epos;
+		  this_arrow->end = epos;
 	   }
 	   this_arrow->head = head;
 	   if (set_line) {
-                  this_arrow->lp_properties=loc_lp;
+                  this_arrow->lp_properties = loc_lp;
            }
     } else {
 	   /* adding the arrow */
@@ -2503,10 +2503,10 @@ set_arrow()
 		first_arrow = new_arrow; /* make it start of list */
 	   new_arrow->tag = tag;
 	   new_arrow->next = this_arrow;
-	   new_arrow->start=spos;
-	   new_arrow->end=epos;
+	   new_arrow->start = spos;
+	   new_arrow->end = epos;
 	   new_arrow->head = head;
-	   new_arrow->lp_properties=loc_lp;
+	   new_arrow->lp_properties = loc_lp;
     }
 }
 
@@ -2570,8 +2570,8 @@ static void
 delete_arrow(prev,this)
 	struct arrow_def *prev, *this;
 {
-    if (this!=NULL)	{		/* there really is something to delete */
-	   if (prev!=NULL)		/* there is a previous arrow */
+    if (this != NULL)	{		/* there really is something to delete */
+	   if (prev != NULL)		/* there is a previous arrow */
 		prev->next = this->next; 
 	   else				/* this = first_arrow so change first_arrow */
 		first_arrow = this->next;
@@ -2592,7 +2592,7 @@ set_linestyle()
 #ifndef ANSI_C
     struct lp_style_type loc_lp;
 #else
-    struct lp_style_type loc_lp=LP_DEFAULT;
+    struct lp_style_type loc_lp = LP_DEFAULT;
 #endif
     int tag;
 
@@ -2627,7 +2627,7 @@ set_linestyle()
     }
     if (this_linestyle != NULL && tag == this_linestyle->tag) {
 	   /* changing the linestyle */
-           this_linestyle->lp_properties=loc_lp;
+           this_linestyle->lp_properties = loc_lp;
     } else {
 	   /* adding the linestyle */
 	   new_linestyle = (struct linestyle_def *) 
@@ -2638,7 +2638,7 @@ set_linestyle()
 		first_linestyle = new_linestyle; /* make it start of list */
 	   new_linestyle->tag = tag;
 	   new_linestyle->next = this_linestyle;
-	   new_linestyle->lp_properties=loc_lp;
+	   new_linestyle->lp_properties = loc_lp;
     }
 }
 
@@ -2700,8 +2700,8 @@ static void
 delete_linestyle(prev,this)
 	struct linestyle_def *prev, *this;
 {
-    if (this!=NULL)	{		/* there really is something to delete */
-	   if (prev!=NULL)		/* there is a previous linestyle */
+    if (this != NULL)	{		/* there really is something to delete */
+	   if (prev != NULL)		/* there is a previous linestyle */
 		prev->next = this->next; 
 	   else				/* this = first_linestyle so change first_linestyle */
 		first_linestyle = this->next;
@@ -2748,7 +2748,7 @@ lp_use_properties (lp,tag,pointflag)
 enum PLOT_STYLE			/* not static; used by command.c */
 get_style()
 {
-register enum PLOT_STYLE ps=LINES; /* HBB: initial value, for 'gcc -W} */
+register enum PLOT_STYLE ps = LINES; /* HBB: initial value, for 'gcc -W} */
 
 	c_token++;
 	if (almost_equals(c_token,"l$ines"))
@@ -3033,9 +3033,9 @@ TBOOLEAN autosc;
 static int looks_like_numeric(format)
 char *format;
 {
-	if (!(format=strchr(format,'%'))) return 0;
+	if (!(format = strchr(format,'%'))) return 0;
 	
-	while ( ++format, (*format >= '0' && *format <= '9') || *format=='.')
+	while ( ++format, (*format >= '0' && *format <= '9') || *format == '.')
 		;
 
 	return ( *format == 'f' || *format == 'g' || *format == 'e' );
@@ -3051,7 +3051,7 @@ char *format;
  */
 
 #define GET_NUMBER_OR_TIME(store,axes,axis) \
-do{if (axes>=0 && datatype[axes+axis] == TIME && isstring(c_token) ) { \
+do{if (axes >= 0 && datatype[axes+axis] == TIME && isstring(c_token) ) { \
     char ss[80]; struct tm tm; \
     quote_str(ss,c_token, 80); ++c_token; \
     if (gstrptime(ss,timefmt,&tm)) store = (double) gtimegm(&tm); \
@@ -3071,21 +3071,21 @@ int *axes;
 { 
 	if (almost_equals(c_token, "fir$st")) {
 		++c_token;
-		*type=first_axes;
+		*type = first_axes;
 	} else if (almost_equals(c_token, "sec$ond")) {
 		++c_token;
-		*type=second_axes;
+		*type = second_axes;
 	} else if (almost_equals(c_token, "gr$aph")) {
 		++c_token;
-		*type=graph;
+		*type = graph;
 	} else if (almost_equals(c_token, "sc$reen")) {
 		++c_token;
-		*type=screen;
+		*type = screen;
 	}
 
 	switch(*type) {
-		case first_axes: *axes=FIRST_AXES; return;
-		case second_axes: *axes=SECOND_AXES; return;
+		case first_axes: *axes = FIRST_AXES; return;
+		case second_axes: *axes = SECOND_AXES; return;
 		default: *axes = (-1); return;
 	}
 }
@@ -3116,7 +3116,7 @@ struct position *pos;
 		GET_NUMBER_OR_TIME(pos->z, axes, FIRST_Z_AXIS);
 	}
 	else {
-		pos->z=0;
+		pos->z = 0;
 		pos->scalez = type; /* same as y */
 	}
 }
@@ -3149,13 +3149,13 @@ char *lcl;
 	 * where available; create values on first use, etc
 	 */
 	memset(&tm, 0, sizeof(struct tm)); 
-	for (i=0; i<7; ++i)
+	for (i = 0; i<7; ++i)
 	{
 		tm.tm_wday = i;  /* hope this enough */
 		strftime(full_day_names[i], sizeof(full_day_names[i]), "%A", &tm);
 		strftime(abbrev_day_names[i], sizeof(abbrev_day_names[i]), "%a", &tm);
 	}
-	for (i=0; i<12; ++i)
+	for (i = 0; i<12; ++i)
 	{
 		tm.tm_mon = i;  /* hope this enough */
 		strftime(full_month_names[i], sizeof(full_month_names[i]), "%B", &tm);
