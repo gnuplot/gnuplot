@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.68 2002/07/23 18:53:12 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.69 2002/07/26 16:42:27 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -2448,7 +2448,7 @@ ytick_callback(axis, place, text, grid)
     }
     if (Y_AXIS.ticmode & TICS_ON_AXIS
 	&& !X_AXIS.log
-	&& inrange (0.0, X_AXIS.min, Y_AXIS.max)
+	&& inrange (0.0, X_AXIS.min, X_AXIS.max)
 	) {
 	map3d_xyz(0.0, place, base_z, &v1);
     }
