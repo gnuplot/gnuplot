@@ -153,7 +153,7 @@
 # include "apollo.trm"
 #  ifdef GPR
 /* with fixed windows */
-#   include "gpr.h"
+#   include "gpr.trm"
 #  endif
 #endif /* Apollo */
 
