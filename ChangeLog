@@ -1,3 +1,9 @@
+2004-10-05  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/gplt_x11.c (pr_font): Release previous font every time a new one
+	is requested. This feels wrong to me since we know the old font will be
+	used again very soon, but otherwise there is a serious memory leak.
+
 2004-10-05  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* config/config.cyg config/config.mgw config/config.os2: Added #defines

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.115 2004/10/03 19:08:34 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.116 2004/10/04 06:37:11 mikulik Exp $"); }
 #endif
 
 #define X11_POLYLINE 1
@@ -5080,6 +5080,13 @@ char *fontname;
 
     if (!fontname)
 	fontname = FallbackFont;
+
+    /* EAM DEBUG - Free previous font before searching for a new one. */
+    /* This doesn't seem right, since we will probably need it again  */
+    /* very soon. But if we don't free it, we gradually leak memory.  */
+    if (font)
+	XFreeFont(dpy, font);
+	
     font = XLoadQueryFont(dpy, fontname);
 
     if (!font) {
