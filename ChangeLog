@@ -1,3 +1,11 @@
+1999-01-14  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* Makefile.in, makefile.all: Add PGPKEYS to ETC.
+
+	* PGPKEYS: New file.
+
+	* term/apollo.trm: Add note about copyright status.
+
 1999-01-13  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* 0INSTALL: Add compile instructions for Cygwin.
