@@ -1274,7 +1274,7 @@ C ... and restart the table:
  blanks.
 
  Command-line substitution can be used anywhere on the `gnuplot` command
- line.
+ line, except inside strings delimited by single quotes.
 
  Example:
 
@@ -1284,6 +1284,11 @@ C ... and restart the table:
 
  or, in VMS
        f(x) = `run leastsq`
+
+ These will generate labels with the current time and userid:
+       set label "generated on `date +%Y-%m-%d`by `whoami`" at 1,1
+       set timestamp "generated on %Y-%m-%d by `whoami`"
+
 2 Syntax
 ?syntax
 ?specify
