@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: internal.c,v 1.11 2001/09/06 13:09:21 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: internal.c,v 1.12 2002/02/27 17:05:53 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - internal.c */
@@ -42,36 +42,30 @@ static char *RCSid() { return RCSid("$Id: internal.c,v 1.11 2001/09/06 13:09:21 
 #include "util.h"		/* for int_error() */
 
 #include <math.h>
+
 /*
- * System V and MSC 4.0 call this when they wants to print an error message.
- * Don't!
+ * Excerpt from the Solaris man page for matherr():
+ *
+ *   The The System V Interface Definition, Third Edition (SVID3)
+ *   specifies  that  certain  libm functions call matherr() when
+ *   exceptions are detected. Users may define their own  mechan-
+ *   isms  for handling exceptions, by including a function named
+ *   matherr() in their programs.
  */
-#ifndef _CRAY
-# ifdef AMIGA_SC_6_1
-#  define matherr __matherr
-#  define exception __exception
-# endif				/* AMIGA_SC_6_1 */
-# if (defined(__BORLANDC__) && __BORLANDC__ >= 0x450) || defined(__MSC__)
-#  define matherr _matherr
-# endif				/* Borland >=4.5, or MS VC */
-# ifdef __MSC__
-#  define exception _exception
-# endif
-# if (defined(MSDOS) || defined(DOS386)) && defined(__TURBOC__) || defined(VMS) || defined(__EMX__) || defined(__MINGW32__) || defined(linux)
-int
-matherr()
-#else
-int matherr __PROTO((struct exception *x));
+
+#define matherr GP_MATHERR
+#define exception GP_EXCEPTION_NAME
+
+#ifdef HAVE_STRUCT_EXCEPTION_IN_MATH_H
+# define STRUCT_EXCEPTION_P_X struct exception *x
+#endif
 
 int
-matherr(x)
-    struct exception *x;
-# endif				/* (MSDOS || DOS386) && __TURBOC__ */
+matherr(STRUCT_EXCEPTION_P_X)
 {
     return (undefined = TRUE);	/* don't print error message */
 }
-#endif /* not _CRAY */
-
+#undef matherr
 
 #define BAD_DEFAULT default: int_error(NO_CARET, "interal error : type neither INT or CMPLX"); return;
 
