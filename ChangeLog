@@ -1,3 +1,13 @@
+2002-12-13  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* FAQ: Regenerated and updated.
+
+	* docs/doc2texi.el: Add all terminal drivers to d2t-terminal-list.
+
+	* src/Makefile.am: Don't create temporary getcolor_x11.c.
+
+	* src/Makefile.maint: Fix logic for updating version.c.
+
 2002-12-13  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/set.c(set_terminal): Don't display messages of 'set term push'
@@ -22,6 +32,12 @@
 
 	* term/gd.trm term/gif.trm term/png.trm: Replaced typo "ingoring"
  	by "ignoring".
+
+2002-12-11  Shigeharu TAKENO  <shige@iee.niit.ac.jp>
+
+	* term/djsvga.trm, term/eepic.trm, term/epson.trm, term/fig.trm,
+	term/gif.trm, term/latex.trm, term/mif.trm, term/post.trm,
+	term/pslatex.trm, term/tpic.trm, term/xlib.trm: More of same.
 
 2002-12-11  Johannes Zellner  <johannes@zellner.org>
 
@@ -1551,7 +1567,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/12/13 13:25:28 $).
+	last modification date (from the tag $Date: 2002/12/13 14:11:17 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
