@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.14 2000/06/09 15:36:00 joze Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.15 2000/09/20 00:59:25 joze Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -371,8 +371,10 @@ set y2data%s\n",
 	    fprintf(fp, " font \"%s\"", this_label->font);
 	if (-1 == this_label->pointstyle)
 	    fprintf(fp, " nopointstyle");
-	else
-	    fprintf(fp, " pointstyle %d", this_label->pointstyle);
+	else {
+	    fprintf(fp, " pointstyle %d offset %f,%f",
+		this_label->pointstyle, this_label->hoffset, this_label->voffset);
+	}
 	/* Entry font added by DJL */
 	fputc('\n', fp);
     }

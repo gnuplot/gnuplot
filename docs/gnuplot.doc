@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.43 2000/09/20 00:59:24 joze Exp $
+C RCS $Id: gnuplot.doc,v 1.44 2000/09/20 01:21:08 joze Exp $
 C 3 December 1998
 C Copyright (C) 1986 - 1993, 1998   Thomas Williams, Colin Kelley
 C
@@ -4529,7 +4529,8 @@ C ... and restart the table:
  Syntax:
        set label {<tag>} {"<label_text>"} {at <position>}
                  {<justification>} {{no}rotate} {font "<name>{,<size>}"}
-                 {front | back} {pointstyle <style> | nopointstyle}
+                 {front | back}
+                 {pointstyle <style> {offset x, y}| nopointstyle}
        set nolabel {<tag>}
        show label
 
@@ -4559,10 +4560,14 @@ C ... and restart the table:
 
  If `pointstyle` is given, a point with the given style is plotted at
  the label position and the text of the label is displaced slightly.
- The size of the point depends on the setting of `pointsize`. This
- option is used by default for placing labels in mouse enhanced terminals.
- Use `nopointstyle` to turn off the drawing of a point near the label
- (this is the default).
+ The displacement defaults to 1, 1 in `pointsize` units and can be
+ controlled by the optional `offset x, y`. Example: `offset 2, -3` would
+ displace the labels 2 * pointsize horizontally and -3 * pointsize vertically
+ from the actual coordinate point as given by `position`.  The size of the
+ point depends also on the setting of `pointsize`.
+ This option is used by default for placing labels in mouse enhanced
+ terminals.  Use `nopointstyle` to turn off the drawing of a point near
+ the label (this is the default).
 
  If one (or more) axis is timeseries, the appropriate coordinate should be
  given as a quoted time string according to the `timefmt` format string.  See

@@ -1,3 +1,11 @@
+2000-10-06  Johannes Zellner <johannes@zellner.org>
+
+	* implemented finally configurable offsets for
+	set label "xy" at x, y pointsize 1 offset 2.0, 3.0
+	Useful for placing labels slightly offset from data
+	points. This was one of the points left from implementing
+	the mouse stuff.
+
 2000-09-21  Petr Mikulik <mikulik@physics.muni.cz>
 	* src/graphics.c src/graph3d.c: bugfix "if ((*t->pointsize))"
 	changed to "if (t->pointsize)

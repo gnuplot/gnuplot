@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.37 2000/08/02 13:53:10 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.38 2000/09/20 00:59:25 joze Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -2001,10 +2001,12 @@ set_label_tag()
     int rotate = 0;
     int tag;
     TBOOLEAN set_text, set_position, set_just = FALSE, set_rot = FALSE,
-     set_font;
+     set_font, set_offset;
     TBOOLEAN set_layer = FALSE;
     int layer = 0;
     int pointstyle = -2; /* untouched (this is /not/ -1) */
+    float hoff = 1.0;
+    float voff = 1.0;
 
     c_token++;
     /* get tag */
@@ -2156,6 +2158,23 @@ set_label_tag()
 	c_token++;
     }
 
+    if(!END_OF_COMMAND && almost_equals(c_token, "of$fset")) {
+	c_token++;
+	if (END_OF_COMMAND)
+	    int_error(c_token, "Expected horizontal offset");
+	hoff = real(const_express(&a));
+
+	/* c_token++; */
+	if (!equals(c_token, ","))
+	    int_error(c_token, "Expected comma");
+
+	c_token++;
+	if (END_OF_COMMAND)
+	    int_error(c_token, "Expected vertical offset");
+	voff = real(const_express(&a));
+	set_offset = TRUE;
+    }
+
     if (!END_OF_COMMAND)
 	int_error(c_token, "extraenous or out-of-order arguments in set label");
 
@@ -2184,6 +2203,10 @@ set_label_tag()
 	    this_label->font = font;
 	if (pointstyle != -2)
 	    this_label->pointstyle = pointstyle;
+	if (set_offset) {
+	    this_label->hoffset = hoff;
+	    this_label->voffset = voff;
+	}
     } else {
 	/* adding the label */
 	new_label = (struct text_label *)
@@ -2204,9 +2227,8 @@ set_label_tag()
 	    new_label->pointstyle = -1; /* unset */
 	else
 	    new_label->pointstyle = pointstyle;
-	/* TODO make this configurable (joze) */
-	new_label->hoffset = 1.0;
-	new_label->voffset = 1.0;
+	new_label->hoffset = hoff;
+	new_label->voffset = voff;
     }
     return tag;
 }				/* Entry font added by DJL */
