@@ -1,23 +1,43 @@
-Installation
-************
+Table of contents:
+==================
 
-   This document is divided into several parts: the first part (For the
-impatient) provides a quick overview of configuration and compilation
-instructions.  It also lists those options to the configure shell script
-which are unique to gnuplot.  Part two describes the environment variables
-used by gnuplot.  Part three explains in detail how --with-PACKAGE=PATH
-works, and how this option interacts with --libdir and --includedir.
+    * Installation from sources
+	- For the impatient provides a quick overview of configuration and
+	  compilation instructions. 
+	- Lists those options to the configure shell script which are
+	  unique to gnuplot.
+	- Compiling by config/makefile.* for specific platforms.
+    * More details about ./configure --with-PACKAGE[=OPTION]
+    * Platform compiler problems
+    * Environment variables
+	- The environment variables used by running gnuplot.
+    * How to test gnuplot
+    * Installing WPS object for gnuplot on OS/2
+	- How to install WPS icon for drag&drop.
+    * Front-ends for gnuplot
+	- Few notes about graphical front-ends for gnuplot.
+
+
+???????????
+Part three explains in detail how --with-PACKAGE=PATH works, and how
+this option interacts with --libdir and --includedir.
+???????????
 Part four addresses some platform specific problems and testing issues.
+???????????
 There are also some hints how to build gnuplot with pre-ANSI C compilers.
-Part five finally describes a few graphical front ends for gnuplot.
 
- The description of preprocessor options previously found here has been
-moved to a new file called PORTING. Generic installation instructions
-for `configure', such as distributed with FSF/GNU packages, have been
-moved to the file INSTALL.gnu.
+
+  The description of preprocessor options previously found here has been moved
+to a new file called PORTING. Generic installation instructions for `configure',
+such as distributed with FSF/GNU packages, have been moved to the file
+INSTALL.gnu.
+
+
+Installation from sources
+=========================
 
 For the impatient
-=================
+-----------------
 
    First, tune term.h to choose which terminal drivers you wish to enable.
 If you want to support gif output, you need to download, compile and
@@ -187,10 +207,10 @@ $ ./configure --help
   --enable-mgr            enable MGR terminal
   --enable-rgip           enable Redwood Graphics Interface Protocol
 
- Options marked with (*) are enabled by default, ie. these features or
-packages are used if configure detects them even if the corresponding
-option is not specified.  Please note that the `--with-PACKAGE' options
-can have additional arguments:
+Options marked with (*) are enabled by default, ie. these features or packages
+are used if configure detects them even if the corresponding option is not
+specified.  Please note that the `--with-PACKAGE' options can have additional
+arguments:
 
  o `--with-PACKAGE' is equivalent to `--with-PACKAGE=yes'
  o `--with-PACKAGE=no' disables checking for PACKAGE. It has the same
@@ -355,98 +375,38 @@ If the file gnuplot.gih is not in the default directory, then use:
 OS/2
 ----
 
-To compile under OS/2 (2.x and above) you need the development
-suite EMX 0.9 (including gcc). You should also have
-GNU Make and IBM's IPFC  (Information Presentation Facility Compiler,
-available from the Developer's Toolkit; nowadays it's accessible
-through an IBM website for free!).
+To compile under OS/2 (2.x and above) you need the development suite EMX 0.9
+(including gcc). You should also have GNU Make and IBM's IPFC  (Information
+Presentation Facility Compiler, available from the Developer's Toolkit;
+nowadays it's accessible through an IBM website for free!).
 
-At the beginning of Makefile.os2 you will find a configuration
-section where you have to adjust all settings which control the build
-process. Most important is probably to select the terminal devices
-which should be supported. You can create a version offering
-PM graphics as well as X11 support (to use with XFree86).
-Support for these two terminals is provided by additional
+At the beginning of makefile.os2 you will find a configuration section where
+you have to adjust all settings which control the build process. Most important
+is probably to select the terminal devices which should be supported. You can
+create a version offering PM graphics as well as X11 support (to use with
+XFree86). Support for these two terminals is provided by additional
 executables.
-Be sure to enable only those devices for which you have the 
-necessary software already installed. Also ensure that the
-libraries and the sources are all compiled (not) using
-the '-Zmt' flags.
+
+Be sure to enable only those devices for which you have the necessary software
+already installed. Also ensure that the libraries and the sources are all
+compiled (not) using the '-Zmt' flags.
 
 Executing 
-  make -f makefile.os2
+    make -f makefile.os2
 should create a default build while
-  make -f makefile.os2 help
+    make -f makefile.os2 help
 will show you all pre-defined targets.
 
-See other sections of the manuals for more information about
-installing/using gnuplot on OS/2.
+See other sections of the manuals for more information about installing/using
+gnuplot on OS/2.
 
 
-Environment Variables
-=====================
+More details about ./configure --with-PACKAGE[=OPTION]
+======================================================
 
-See 'help environment'.
-
-If the environment variable GNUTERM is found, it is used as the terminal
-type. Otherwise, in some cases the variable TERM will be used, or the
-hardware may be automatically detected.
-
-The PC version looks for the environment variable GNUPLOT to contain
-the name of the directory from which to load the initialization file
-GNUPLOT.INI.  See the help on 'start_up' for more information.
-
-HOME is examined as a directory where a .gnuplot startup file might be
-found. See help on "start-up". The Atari/MTOS version uses GNUPLOTPATH.
-
-If defined, the environment variable GNUHELP is used for the name
-of the .gih help file, otherwise HELPFILE (defined in makefile or
-command.c) is used.
-
-The VMS version looks for the logical name GNUPLOT$HELP to locate
-the help library.
-
-If gnuplot is configured to use its own, private history file, the size
-of this file can be set via GNUPLOT_HISTORY_SIZE. The default is 666
-(lines).
-
-If gnuplot is configured for the X11 window system, it looks for the X11
-driver program in GNUPLOT_DRIVER_DIR (default platform-dependent). This
-variable was introduced when the X11 driver program was moved into a
-platform-dependent location to allow concurrent use of drivers with
-different builtin features.
-
-GNUPLOT_FONTPATH is used by the postscript driver as search path for
-TrueType fonts.
-
-GNUPLOT_LIB may be used to define additional search directories for data
-and command files. The variable may contain a single directory name, or
-a list of directories separated by a platform-specific path separator,
-eg. ':' on Unix, or ';' on DOS/Windows/OS/2/Amiga platforms. The contents
-of GNUPLOT_LIB are appended to the `loadpath` variable, but not saved
-with the `save` and `save set` commands.
-
-GNUFITLOG holds the name of a file that saves fit results. The default is
-fit.log. If the name ends with a "/" or "\", it is treated as a directory
-name, and fit.log appended.
-
-The CGI drivers need the CGIPATH environment variable to set the path
-to the CGI agents, and the CGIDISP and/or CGIPRNT environment variables
-to set the output devices.
-
-If creating dynamically linked executables for the X11 Window System, it
-may be necessary to add flags to the LIBS variable in Makefile
-to make sure gnuplot finds all required libraries at runtime.  Systems like
-SunOS and Solaris use -R to specify the runtime library search path, whereas
-OSF/Dec Unix, Irix and Linux use -rpath. If this is not possible, the
-LD_LIBRARY_PATH environment variable should be set.
-
-About --with-PACKAGE[=DIR]
-***************************
-
- Every `--with-PACKAGE' option sets a `with_package' variable in
-configure.  Depending on how `--with-PACKAGE' was invoked, there are
-only three different possible values for the `with_package' variable:
+Every `--with-PACKAGE' option sets a `with_package' variable in configure.
+Depending on how `--with-PACKAGE' was invoked, there are only three different
+possible values for the `with_package' variable:
 
  Option                   $with_package
 ----------------------------------------
@@ -457,10 +417,9 @@ only three different possible values for the `with_package' variable:
 --with-package=DIR        DIR
 --without-package         no
 
- In gnuplot, the following --with-PACKAGE options are available.
-The --with-PACKAGE=DIR form is always required if a package is installed
-in a non-default location that is not searched by the preprocessor
-or linker.
+In gnuplot, the following --with-PACKAGE options are available. The
+--with-PACKAGE=DIR form is always required if a package is installed in a
+non-default location that is not searched by the preprocessor or linker.
 
   --with-readline
 
@@ -513,14 +472,15 @@ or linker.
     mainly for backwards compatibility with old plot scripts, and is
     off by default.
 
-Platform problems and testing
-*****************************
 
-   This section addresses trouble shooting and testing issues. Userland
-questions are answered in the FAQ.
+Platform compiler problems
+==========================
+
+This section addresses trouble shooting and testing issues. Userland questions
+are answered in the FAQ.
 
 Platform and compiler notes
-===========================
+---------------------------
 
    Generally, if you think that configure has made a mistake in detecting
 platform features, there are two ways to switch these off. 
@@ -616,49 +576,115 @@ should work, though).
   not necessary to "install" unproto, one can just create a subdirectory
   in gnuplot's source directory and use it from there.
 
+
+Environment variables
+=====================
+
+See 'help environment'.
+
+If the environment variable GNUTERM is found, it is used as the terminal
+type. Otherwise, in some cases the variable TERM will be used, or the
+hardware may be automatically detected.
+
+The PC version looks for the environment variable GNUPLOT to contain
+the name of the directory from which to load the initialization file
+GNUPLOT.INI.  See the help on 'start_up' for more information.
+
+HOME is examined as a directory where a .gnuplot startup file might be
+found. See help on "start-up". The Atari/MTOS version uses GNUPLOTPATH.
+
+If defined, the environment variable GNUHELP is used for the name
+of the .gih help file, otherwise HELPFILE (defined in makefile or
+command.c) is used.
+
+The VMS version looks for the logical name GNUPLOT$HELP to locate
+the help library.
+
+If gnuplot is configured to use its own, private history file, the size
+of this file can be set via GNUPLOT_HISTORY_SIZE. The default is 666
+(lines).
+
+If gnuplot is configured for the X11 window system, it looks for the X11
+driver program in GNUPLOT_DRIVER_DIR (default platform-dependent). This
+variable was introduced when the X11 driver program was moved into a
+platform-dependent location to allow concurrent use of drivers with
+different builtin features.
+
+GNUPLOT_FONTPATH is used by the postscript driver as search path for
+TrueType fonts.
+
+GNUPLOT_LIB may be used to define additional search directories for data
+and command files. The variable may contain a single directory name, or
+a list of directories separated by a platform-specific path separator,
+eg. ':' on Unix, or ';' on DOS/Windows/OS/2/Amiga platforms. The contents
+of GNUPLOT_LIB are appended to the `loadpath` variable, but not saved
+with the `save` and `save set` commands.
+
+GNUFITLOG holds the name of a file that saves fit results. The default is
+fit.log. If the name ends with a "/" or "\", it is treated as a directory
+name, and fit.log appended.
+
+The CGI drivers need the CGIPATH environment variable to set the path
+to the CGI agents, and the CGIDISP and/or CGIPRNT environment variables
+to the CGI agents, and the CGIDISP and/or CGIPRNT environment variables
+to set the output devices.
+
+If creating dynamically linked executables for the X11 Window System, it may
+be necessary to add flags to the LIBS variable in Makefile to make sure
+gnuplot finds all required libraries at runtime.  Systems like SunOS and
+Solaris use -R to specify the runtime library search path, whereas OSF/Dec
+Unix, Irix and Linux use -rpath. If this is not possible, the
+LD_LIBRARY_PATH environment variable should be set.
+
+
 How to test gnuplot
 ===================
 
-   No comprehensive test suite for gnuplot's features has been written
-to date. However, the supplied demo files provide a good method of
-testing commonly used features. All command line examples below assume
-Unix Bourne shell syntax.
+No comprehensive test suite for gnuplot's features has been written to date.
+However, the supplied demo files provide a good method of testing commonly
+used features. All command line examples below assume Unix Bourne shell
+syntax.
 
    The demo files can be run interactively by eg.
 
 $ cd gnuplot/demo
+$ gnuplot simple.dem
+    or
 $ GNUPLOT_DRIVER_DIR=../src ../src/gnuplot simple.dem
 
-and gnuplot prompts the user to "Hit return to continue" to cycle
-through all the plots (the GNUPLOT_DRIVER_DIR= part is only required
-if you are using the X11 or BeOS plotting device and the
-gnuplot_x11/gnuplot_be binary has not been installed yet, or if you
-want to test the external binaries you just compiled at the same
-time).
+and gnuplot prompts the user to "Hit return to continue" to cycle through
+all the plots (the GNUPLOT_DRIVER_DIR= part is only required if you are
+using the X11 or BeOS plotting device and the gnuplot_x11/gnuplot_be binary
+has not been installed yet, or if you want to test the external binaries you
+just compiled at the same time).
 
-   To run the demos in a specified file without interaction, one
-can use
+   To run the demos in a specified file without interaction, one can use
 
+$ gnuplot simple.dem </dev/null
 $ GNUPLOT_DRIVER_DIR=../src ../src/gnuplot simple.dem </dev/null
 
    To run all demos non-interactively, use
 
+$ gnuplot all.dem </dev/null
 $ GNUPLOT_DRIVER_DIR=../src ../src/gnuplot all.dem </dev/null
 
-   To use a different plotting device than the default (usually X11
-under Unix), use eg.
+   To use a different plotting device than the default (usually X11 under
+Unix), use eg.
 
 $ GNUTERM=dumb GNUPLOT_DRIVER_DIR=../src ../src/gnuplot all.dem </dev/null
+or
+gnuplot> set term dumb
+gnuplot> load 'all.dem'
 
-   To test the capabilities of the terminal you are using, there is
-the 'test' command:
+   To test the capabilities of the terminal you are using, there is the
+'test' command:
 
 $ gnuplot
 
         G N U P L O T
         Unix version 4.0
         patchlevel 0
-        last modified Mon Jan 21 21:21:20 GMT 2002
+        last modified Tue Apr 13 13:13:13 GMT 2004
 
         Copyright(C) 1986 - 1993, 1998
         Thomas Williams, Colin Kelley and many others
@@ -673,9 +699,8 @@ gnuplot> test
 appropriate for the terminal you are using.
 
 
-
-Running gnuplot on OS/2
-=======================
+Installing WPS object for gnuplot on OS/2
+=========================================
 
 GNUPLOT can be run from the command line of an OS/2 session, or can be set up
 as a program object in the WPS.
@@ -705,14 +730,12 @@ PM terminal is fully mouse-capable. Type 'm' to switch the mouse on/off (see
 (see also 'help bind').
 
 
-
-Front Ends for gnuplot
+Front-ends for gnuplot
 ======================
 
- o Xgfe by David Ishee <dmishee@jasper.he.net>, available from
-   http://von-mises.home.ml.org/xgfe/xgfe.html
-   To compile from source, you need Qt library from
-   http://www.troll.no/.
+ o See gnuplot web page
+	http://gnuplot.sourceforge.net/links.html
+   for an up-to-date version of gnuplot front-ends
 
  o Bruce Ravel <ravel@phys.washington.edu> has written a new version of
    gnuplot-mode for GNU emacs and XEmacs. This version is based on
