@@ -118,6 +118,8 @@ char *path;
 	 * elements of the loadpath until exhausted
 	 */
 	FPRINTF((stderr, "Get loadpath\n"));
+	if (!loadpath)
+	    return NULL;
 	if (!beenhere) {
 	    /* init section */
 	    beenhere = 1;
@@ -127,6 +129,7 @@ char *path;
 	    return p;
 	} else {
 	    p += strlen(p);
+	    /* skip over '\0' */
 	    p++;
 	    if (p < limit)
 		return p;
