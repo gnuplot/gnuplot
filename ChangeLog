@@ -1,3 +1,7 @@
+2004-10-03  Daniel Sebald  <daniel.sebald@ieee.org>
+
+	* src/gplt_x11.c (delete_plot): Fix small memory leak.
+
 2004-10-01  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/plot3d.c (get_3ddata): Allow explicit pm3d palette colors for line
