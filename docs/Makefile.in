@@ -86,7 +86,7 @@ TROFF = troff
 LATEX = @LATEX@
 
 # PDFLaTeX command
-PDFLATEX = pdflatex
+PDFLATEX = @PDFLATEX@
 
 # substitute your DVI to PostScript conversion program here
 DVIPS = dvips
