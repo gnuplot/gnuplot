@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.2 1999/10/01 14:54:37 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.3 1999/10/29 18:47:21 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -1142,6 +1142,9 @@ unset_style()
 	    delete_linestyle((struct linestyle_def *) NULL, first_linestyle);
     } else 
         int_error(c_token, "expecting 'data', 'function', or 'line'");
+
+    c_token++;
+
 }
 
 
