@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.25 2002/03/09 11:33:09 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.26 2002/03/10 18:54:52 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - win/wgraph.c */
@@ -1883,7 +1883,9 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	LPGW lpgw;
 	HMENU sysmenu;
 	int i;
+#ifdef USE_MOUSE
 	static unsigned int last_modifier_mask = -99;
+#endif
 
 	lpgw = (LPGW)GetWindowLong(hwnd, 0);
 
