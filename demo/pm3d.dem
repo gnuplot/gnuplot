@@ -1,5 +1,5 @@
 #
-# $Id: pm3d.dem,v 1.10 2003/10/28 05:35:54 sfeam Exp $
+# $Id: pm3d.dem,v 1.11 2003/12/15 09:58:33 mikulik Exp $
 #
 # demo for pm3d splotting
 #
@@ -384,6 +384,7 @@ f(x,y)=2*x+y
 set key off
 unset xtics
 unset ytics
+unset colorbox
 
 # Needed by terminals limited on colors:
 #set palette maxcolors 26

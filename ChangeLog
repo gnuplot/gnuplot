@@ -8,6 +8,8 @@
 
 	* src/util3d.h: map3d_xy_double is needed independent of WITH_IMAGE.
 
+	* demo/pm3d.dem: Turn off colorbox in the demo of corners2color.
+
 2004-11-13  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/specfun.c (f_erf f_erfc f_normal): Replace in-line rough
