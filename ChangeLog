@@ -1,3 +1,11 @@
+2004-11-12  Dietmar Warning  <warning@danalyse.de>
+
+	* src/specfun.c (inverse_error_func): Replace obsolete attribution of 
+	algorithm used for this function.
+
+	* src/util3d.c (map_xy_double): This function is needed independent of
+	the image code, so remove #ifdef WITH_IMAGE.
+
 2004-11-11  Ethan Merritt  <merritt@u.washington.edu>
 
 	* demo/datastrings.dem: Add example of using a column both as a 
