@@ -68,8 +68,9 @@ static unsigned char SVG_red = 0;
 static unsigned char SVG_green = 0;
 static unsigned char SVG_blue = 0;
 static unsigned char SVG_use_pm3d_color = 0;
-static TBOOLEAN SVG_groupPm3dIsOpen = FALSE; /* open pm3d group flag*/
 #endif
+
+static TBOOLEAN SVG_groupFilledIsOpen = FALSE; /* open pm3d group flag*/
 
 struct SVG_PEN
 {
@@ -145,9 +146,7 @@ SVG_Pen_RealID (inPenCode)
 static void
 SVG_GroupOpen ()
 {
-#ifdef PM3D
     SVG_GroupFilledClose();
-#endif
     if (!SVG_groupIsOpen)     {
 	fprintf (gpoutfile,
 		 "<g style=\"fill:none; color:%s; stroke:currentColor; stroke-width:%.2f\">\n",
@@ -178,9 +177,7 @@ SVG_GroupClose ()
 static void
 SVG_PathOpen ()
 {
-#ifdef PM3D
     SVG_GroupFilledClose();
-#endif
     if (!SVG_pathIsOpen) {
 #ifdef PM3D
 	if (SVG_use_pm3d_color) {
@@ -203,9 +200,7 @@ SVG_PathOpen ()
 static void
 SVG_PathClose ()
 {
-#ifdef PM3D
     SVG_GroupFilledClose();
-#endif
     if (SVG_pathIsOpen) {
 	fprintf (gpoutfile, "'></path>\n");
 	SVG_path_count = 0;
@@ -250,27 +245,29 @@ static void
 SVG_GroupFilledOpen(void)
 {
     SVG_PathClose();
-    if (!SVG_groupPm3dIsOpen) {
+    if (!SVG_groupFilledIsOpen) {
 	fprintf(gpoutfile, "\t<g style = 'stroke:none; shape-rendering:crispEdges'>\n");
-	SVG_groupPm3dIsOpen = TRUE;
+	SVG_groupFilledIsOpen = TRUE;
     }
 }
 
 static void
 SVG_GroupFilledClose(void)
 {
-    if (SVG_groupPm3dIsOpen) {
+    if (SVG_groupFilledIsOpen) {
 	fprintf(gpoutfile, "\t</g>\n");
-	SVG_groupPm3dIsOpen = FALSE;
+	SVG_groupFilledIsOpen = FALSE;
     }
 }
 
 static void
 SVG_StyleColor(const char* paint)
 {
+#ifdef PM3D
     if (SVG_use_pm3d_color)
 	fprintf(gpoutfile, "%s = 'rgb(%3d, %3d, %3d)'", paint, SVG_red, SVG_green, SVG_blue);
     else
+#endif
 	fprintf(gpoutfile, "%s = 'currentColor'", paint);
 }
 
@@ -550,7 +547,7 @@ SVG_graphics ()
     SVG_fillPattern = -1;
     SVG_fillPatternIndex = 0;
 #ifdef PM3D
-    SVG_groupPm3dIsOpen = FALSE;
+    SVG_groupFilledIsOpen = FALSE;
     SVG_use_pm3d_color = 0;
 #endif
     SVG_pathIsOpen = FALSE;
@@ -587,7 +584,9 @@ SVG_reset ()
 TERM_PUBLIC void
 SVG_linetype (int linetype)
 {
+#ifdef PM3D
     SVG_use_pm3d_color = 0;
+#endif
     if (linetype != SVG_LineType) {
 	SVG_PathClose ();
 	SVG_GroupClose ();

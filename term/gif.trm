@@ -1,5 +1,5 @@
 /*
- * $Id: gif.trm,v 1.35 2001/10/26 12:58:38 mikulik Exp $
+ * $Id: gif.trm,v 1.36 2002/04/29 13:37:02 broeker Exp $
  */
 
 /* GNUPLOT -- gif.trm */
@@ -688,9 +688,9 @@ TERM_TABLE_START(gif_driver)
     null_justify_text, do_point, do_arrow, GIF_set_font,
     0,				/* pointsize */
     TERM_CAN_MULTIPLOT | TERM_BINARY
-#ifdef PM3D
     , 0 /*suspend*/, 0 /*resume*/, 
     GIF_boxfill,   0 /*linewidth*/
+#ifdef PM3D
 #ifdef USE_MOUSE
     , 0, 0, 0, 0, 0 /* no mouse support for gif terminal */
 #endif

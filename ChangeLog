@@ -1,5 +1,11 @@
 2002-06-08  Johannes Zellner  <johannes@zellner.org>
 
+	* term/svg.trm: changes to make it compile w/o PM3D defined
+	* term/gif.trm: move boxfill out of the PM3D definition, so that
+	it is also available if PM3D is not defined.
+
+2002-06-08  Johannes Zellner  <johannes@zellner.org>
+
 	* term/fig.trm term/svg.trm: added ifdefs for USE_ULIG_FILLEDBOXES
 	* term/gd.trm: use gdImagePtr /after/ gd.h is included
 	* src/gplt_x11.c: removed unused functions
@@ -591,7 +597,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/06/07 21:25:16 $).
+	last modification date (from the tag $Date: 2002/06/07 22:52:36 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
