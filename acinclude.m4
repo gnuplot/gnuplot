@@ -256,7 +256,7 @@ case "$with_$1" in
     gp_lib_prefix=`echo $gp_lib_path | sed 's%/lib$%%'`
     gp_lib_list="$gp_lib_prefix $gp_lib_prefix/lib $gp_lib_path"
 esac
-for ac_dir in '' $gp_lib_list ; do
+for ac_dir in '' /usr/local/lib $gp_lib_list ; do
   TERMLIBS="`test x${ac_dir} != x && echo -L${ac_dir}` $gp_save_TERMLIBS"
   gp_CHECK_LIB_QUIET($1,$2,dnl
     TERMLIBS="$TERMLIBS -l$1"; break, dnl ACTION-IF-FOUND
@@ -281,7 +281,7 @@ dnl gp_CHECK_HEADER(HEADER-FILE, [ACTION-IF-FOUND [, ACTION-IF-NOT-FOUND]])
 AC_DEFUN(gp_CHECK_HEADER,
 [AC_MSG_CHECKING([for $1])
 gp_save_CPPFLAGS="$CPPFLAGS"
-for ac_dir in '' $gp_lib_prefix $gp_lib_prefix/include ; do
+for ac_dir in '' /usr/local/include $gp_lib_prefix $gp_lib_prefix/include ; do
   CPPFLAGS="$gp_save_CPPFLAGS `test x${ac_dir} != x && echo -I${ac_dir}`"
   gp_CHECK_HEADER_QUIET($1,break,CPPFLAGS="$ac_save_CPPFLAGS")
 done
