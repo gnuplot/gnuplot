@@ -44,9 +44,6 @@
 /* Define if you want to use a newer version of libgrx under MSDOS/djgpp.  */
 #undef GRX21
 
-/* Define if the C preprocessor understands ANSI stringification.  */
-#undef HAVE_STRINGIZE
-
 /* Define if you have Thomas Boutell's gd library.  */
 #undef HAVE_LIBGD
 
@@ -82,15 +79,6 @@
 
 /* Define if you want to use the Redwood Graphics Interface Protocol.  */
 #undef RGIP
-
-/* Define as the type of the first argument to select.  */
-#undef SELECT_TYPE_ARG1
-
-/* Define as the type of the second, third, and fourth argument to select.  */
-#undef SELECT_TYPE_ARG234
-
-/* Define as the type of the fifth argument to select.  */
-#undef SELECT_TYPE_ARG5
 
 /* Define if you want to use the sunview terminal (sun).  */
 #undef SUN
