@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.29 1999/11/03 16:06:11 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.30 1999/11/08 19:24:33 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -100,10 +100,10 @@ static void show_hidden3d __PROTO((void));
 static void show_size __PROTO((void));
 static void show_origin __PROTO((void));
 static void show_term __PROTO((void));
-static void show_tics __PROTO((int showx, int showy, int showz, int showx2, int showy2));
+static void show_tics __PROTO((TBOOLEAN showx, TBOOLEAN showy, TBOOLEAN showz, TBOOLEAN showx2, TBOOLEAN showy2));
 static void show_mtics __PROTO((int mini, double freq, const char *name));
 static void show_timestamp __PROTO((void));
-static void show_range __PROTO((int axis, double min, double max, int autosc, const char *text));
+static void show_range __PROTO((int axis, double min, double max, TBOOLEAN autosc, const char *text));
 static void show_xyzlabel __PROTO((const char *name, label_struct * label));
 static void show_title __PROTO((void));
 static void show_xlabel __PROTO((void));
@@ -140,29 +140,35 @@ static int var_show_all = 0;
 /* following code segment appears over and over again */
 
 #define SHOW_NUM_OR_TIME(x, axis) \
-do{if (datatype[axis]==TIME) { \
-  char s[80]; char *p; \
-  putc('"', stderr);   \
-  gstrftime(s,80,timefmt,(double)(x)); \
-  for(p=s; *p; ++p) {\
-   if ( *p == '\t' ) fputs("\\t",stderr);\
-   else if (*p == '\n') fputs("\\n",stderr); \
-   else if ( *p > 126 || *p < 32 ) fprintf(stderr,"\\%03o",*p);\
-   else putc(*p, stderr);\
-  }\
-  putc('"', stderr);\
- } else {\
-  fprintf(stderr,"%#g",x);\
-}} while(0)
+ do { \
+  if (datatype[axis]==TIME) { \
+   char s[80]; char *p; \
+   putc('"', stderr); \
+   gstrftime(s,80,timefmt,(double)(x)); \
+   for(p=s; *p; ++p) { \
+    if ( *p == '\t' ) \
+     fputs("\\t",stderr); \
+    else if (*p == '\n') \
+     fputs("\\n",stderr); \
+    else if ( *p > 126 || *p < 32 ) \
+     fprintf(stderr,"\\%03o",*p); \
+    else \
+     putc(*p, stderr); \
+   } \
+   putc('"', stderr); \
+  } else \
+   fprintf(stderr,"%#g",x); \
+ } while(0)
 
-#define SHOW_ALL_NL {if (!var_show_all) (void) putc('\n',stderr);}
+#define SHOW_ALL_NL { if (!var_show_all) (void) putc('\n',stderr); }
 
 #define CHECK_TAG_GT_ZERO \
-  c_token++; \
-  if (!END_OF_COMMAND) { \
-    tag = (int) real(const_express(&a)); \
-    if (tag <= 0) int_error(c_token, "tag must be > zero"); \
-  }
+ c_token++; \
+ if (!END_OF_COMMAND) { \
+  tag = (int) real(const_express(&a)); \
+  if (tag <= 0) \
+   int_error(c_token, "tag must be > zero"); \
+ }
 
 /******* The 'show' command *******/
 void
@@ -880,8 +886,8 @@ HELPMAIL     = <%s>\n", helpfile, bug_email, help_email);
 
 
 #define SHOW_AUTOSCALE(axis,scvar) \
-  fprintf(stderr, "\t%s: %s%s%s, ",\
-    axis, (scvar) ? "ON" : "OFF",\
+  fprintf(stderr, "\t%s: %s%s%s, ", \
+    axis, (scvar) ? "ON" : "OFF", \
     (scvar == 1) ? " (min)" : "", (scvar == 2) ? " (max)" : "");
 
 /* process 'show autoscale' command */
@@ -1501,7 +1507,7 @@ struct position *pos;
 
 #define SHOW_LOG(FLAG, BASE, TEXT) \
  if (FLAG) \
-   fprintf(stderr, "%s %s (base %g)", !count++ ? "\tlogscaling" : " and",\
+   fprintf(stderr, "%s %s (base %g)", !count++ ? "\tlogscaling" : " and", \
    TEXT,BASE)
 
 /* process 'show logscale' command */
