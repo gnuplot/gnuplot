@@ -19,7 +19,25 @@
     Also, writeback with log scales writes back the log of the min/max
     [Status: unknown]
 
- 4. 
+ 4. m[]tics bug when plotting time data
+    There is an initialization problem when plotting time data with an
+    interval calculation; an inordinate number of m[]tics are automatically
+    drawn, e.g., 
+
+      set xdata time; set ydata time
+      set timefmt "%d/%m"
+      set format x "%b %d"
+      set xrange ["01/12":"06/12"]
+      set xtics "01/12", 172800, "05/12"
+      plot x
+
+    The problem can be avoided by initializing via a plot before the 
+    interval calculation:
+      [...]
+      set xrange ["01/12":"06/12"]
+      plot x
+      set xtics "01/12", 172800, "05/12"
+      plot x
 
  5. "\n" does not work in the format for the tics in splot
 
@@ -163,6 +181,11 @@ plot '-' using 1:2 title 'Fitted IO' with lines 1
 950126 55
 e
 
+12. compiling help file with Visual C++ 4.0/Windows NT
+  The help compiler is unable to compile gnuplot.rtf, possibly because
+  it cannot handle the new RTF spec. There is no workaround, but
+  VC++ 5.0/6.0 users should have no problems.
+ 
 (Moved from old WhatsNew file, needs cleaning up)
 
 BUGS outstanding
