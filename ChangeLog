@@ -1,3 +1,9 @@
+2002-07-23  Harald Harders  <h.harders@tu-bs.de>
+
+	* NEWS docs/gnuplot.doc src/gadgets.h src/graph3d.c src/graphics.c
+	src/graphics.h src/set.c src/show.c src/term.c src/term_api.h:
+	New option 'set arrow ... filled | nofilled' for filled arrow heads.
+
 2002-07-23  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c docs/gnuplot.doc: Allow filled boxes in candlestick
@@ -783,7 +789,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/07/22 11:28:07 $).
+	last modification date (from the tag $Date: 2002/07/23 06:36:09 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.67 2002/07/21 12:32:53 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.68 2002/07/23 06:36:10 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -1006,8 +1006,9 @@ unsigned int* ey;
 /* FIXME HBB 20020225: this is shared with graph3d.c, so it shouldn't
  * be in this module */
 void
-apply_head_properties(struct position* headsize)
+apply_head_properties(struct position* headsize, TBOOLEAN filled)
 {
+    curr_arrow_headfilled = filled;
     curr_arrow_headlength = 0;
     if (headsize->x > 0) { /* set head length+angle for term->arrow */
 	unsigned int itmp, x1, x2;
@@ -1097,7 +1098,7 @@ place_arrows(layer)
 	get_arrow(this_arrow, &sx, &sy, &ex, &ey);
 
 	term_apply_lp_properties(&(this_arrow->lp_properties));
-	apply_head_properties(&(this_arrow->headsize));
+	apply_head_properties(&(this_arrow->headsize), this_arrow->filled);
 	(*t->arrow) (sx, sy, ex, ey, this_arrow->head);
     }
 }
@@ -2814,7 +2815,7 @@ plot_vectors(plot)
     int i;
     int x1, y1, x2, y2;
     struct termentry *t = term;
-    TBOOLEAN head;
+    TBOOLEAN head, filled;
     struct coordinate points[2];
     double ex, ey;
     double lx[2], ly[2];
@@ -2829,6 +2830,7 @@ plot_vectors(plot)
 	    x2 = map_x(points[1].x);
 	    y2 = map_y(points[1].y);
 	    head = TRUE;
+	    filled = FALSE;
 	    if (points[0].type == INRANGE) {
 		x1 = map_x(points[0].x);
 		y1 = map_y(points[0].y);
@@ -2846,6 +2848,7 @@ plot_vectors(plot)
 	    /* to outrange */
 	    points[1].type = OUTRANGE;
 	    head = FALSE;
+	    filled = FALSE;
 	    if (points[0].type == INRANGE) {
 		/* from inrange to outrange */
 		if (clip_lines1) {

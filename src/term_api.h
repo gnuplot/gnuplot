@@ -1,5 +1,5 @@
 /*
- * $Id: term_api.h,v 1.15 2001/08/22 14:15:34 broeker Exp $
+ * $Id: term_api.h,v 1.16 2002/02/25 03:10:41 broeker Exp $
  */
 
 /* GNUPLOT - term_api.h */
@@ -226,6 +226,8 @@ extern char term_options[];
 extern int curr_arrow_headlength;
 /* angle in degrees */
 extern double curr_arrow_headangle;
+/* arrow head filled or not */
+extern TBOOLEAN curr_arrow_headfilled;
 
 /* Current 'output' file: name and open filehandle */
 extern char *outstr;

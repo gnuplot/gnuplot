@@ -113,6 +113,7 @@ typedef struct arrow_def {
     int layer;			/* 0 = back, 1 = front */
     TBOOLEAN relative;		/* second coordinate is relative to first */
     struct lp_style_type lp_properties;
+    TBOOLEAN filled;            /* filled arrow heads or not */
 } arrow_def;
 
 /* Datastructure implementing 'set linestyle' */

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.79 2002/07/20 14:56:29 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.80 2002/07/21 12:32:53 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -1629,11 +1629,12 @@ int tag;			/* 0 means show all */
 	 this_arrow = this_arrow->next) {
 	if (tag == 0 || tag == this_arrow->tag) {
 	    showed = TRUE;
-	    fprintf(stderr, "\tarrow %d, linetype %d, linewidth %.3f %s %s\n\t  from ",
+	    fprintf(stderr, "\tarrow %d, linetype %d, linewidth %.3f %s %sfilled %s\n\t  from ",
 		    this_arrow->tag,
 		    this_arrow->lp_properties.l_type + 1,
 		    this_arrow->lp_properties.l_width,
 		    this_arrow->head ? (this_arrow->head==2 ? " both heads " : "") : " (nohead)",
+		    this_arrow->filled ? "" : "no",
 		    this_arrow->layer ? "front" : "back");
 	    show_position(&this_arrow->start);
 	    fputs(this_arrow->relative ? " rto " : " to ", stderr);

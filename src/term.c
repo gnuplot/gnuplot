@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.40 2002/02/25 03:10:41 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.41 2002/07/21 12:32:53 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -844,6 +844,7 @@ int number;
 
 int curr_arrow_headlength;    /* access head length + angle without changing API */
 double curr_arrow_headangle;  /* angle in degrees */
+TBOOLEAN curr_arrow_headfilled; /* arrow head filled or not */
 
 static void
 do_arrow(sx, sy, ex, ey, head)
@@ -858,34 +859,32 @@ TBOOLEAN head;
     double dx = (double) sx - (double) ex;
     double dy = (double) sy - (double) ey;
     double len_arrow = sqrt(dx * dx + dy * dy);
+#ifdef PM3D
+    gpiPoint filledhead[3];
+#endif
 
-    /* draw the line for the arrow. That's easy. */
-    (*t->move) (sx, sy);
-    (*t->vector) (ex, ey);
-
-    /* no head for arrows with length = 0
-     * or, to be more specific, length < DBL_EPSILON,
-     * because len_arrow will almost always be != 0
+    /* Calculate and draw arrow heads.
+     * Draw no head for arrows with length = 0, or, to be more specific,
+     * length < DBL_EPSILON, because len_arrow will almost always be != 0.
      */
     if (head && fabs(len_arrow) >= DBL_EPSILON) {
 	int x1, y1, x2, y2;
 	if (curr_arrow_headlength <= 0) {
 	    /* arrow head with the default size */
-	/* now calc the head_coeff */
-	double coeff_shortest = len_tic * HEAD_SHORT_LIMIT / len_arrow;
-	double coeff_longest = len_tic * HEAD_LONG_LIMIT / len_arrow;
-	double head_coeff = GPMAX(coeff_shortest,
-				  GPMIN(HEAD_COEFF, coeff_longest));
-	/* we put the arrowhead marks at 15 degrees to line */
+	    /* now calc the head_coeff */
+	    double coeff_shortest = len_tic * HEAD_SHORT_LIMIT / len_arrow;
+	    double coeff_longest = len_tic * HEAD_LONG_LIMIT / len_arrow;
+	    double head_coeff = GPMAX(coeff_shortest,
+				      GPMIN(HEAD_COEFF, coeff_longest));
+	    /* we put the arrowhead marks at 15 degrees to line */
 	    x1 = (int) ((COS15 * dx - SIN15 * dy) * head_coeff);
 	    y1 = (int) ((SIN15 * dx + COS15 * dy) * head_coeff);
 	    x2 = (int) ((COS15 * dx + SIN15 * dy) * head_coeff);
 	    y2 = (int) ((-SIN15 * dx + COS15 * dy) * head_coeff);
 	    (*t->move) (ex + x1, ey + y1);
-	(*t->vector) (ex, ey);
+	    (*t->vector) (ex, ey);
 	    (*t->vector) (ex + x2, ey + y2);
-	    }
-	else {
+	} else {
 	    /* the arrow head with the length + angle specified explicitly */
 	    double alpha = curr_arrow_headangle * DEG2RAD;
 	    double phi = atan2(-dy,-dx); /* azimuthal angle of the vector */
@@ -896,15 +895,53 @@ TBOOLEAN head;
 	    x2 = -(int)(curr_arrow_headlength * cos( phi + alpha ));
 	    y2 = -(int)(curr_arrow_headlength * sin( phi + alpha ));
 	}
-	(*t->move) ( ex + x1, ey + y1); /* forward arrow head */
+#ifdef PM3D
+	if (curr_arrow_headfilled) {
+	    /* draw filled forward arrow head */
+	    filledhead[0].x = ex + x1;
+	    filledhead[0].y = ey + y1;
+	    filledhead[1].x = ex;
+	    filledhead[1].y = ey;
+	    filledhead[2].x = ex + x2;
+	    filledhead[2].y = ey + y2;
+	    (*t->filled_polygon) (3, filledhead);
+	}
+#endif
+	/* draw outline of forward arrow head */
+	(*t->move) (ex + x1, ey + y1); /* forward arrow head */
 	(*t->vector) (ex, ey);
-	(*t->vector) ( ex + x2, ey + y2);
+	(*t->vector) (ex + x2, ey + y2);
+	if (curr_arrow_headfilled) {
+	    /* close outline */
+	    (*t->vector) (ex + x1, ey + y1);
+	}
 	if (head == 2) { /* backward arrow head */
+#ifdef PM3D
+	    if (curr_arrow_headfilled) {
+		/* draw filled backward arrow head */
+		filledhead[0].x = sx - x1;
+		filledhead[0].y = sy - y1;
+		filledhead[1].x = sx;
+		filledhead[1].y = sy;
+		filledhead[2].x = sx - x2;
+		filledhead[2].y = sy - y2;
+		(*t->filled_polygon) (3, filledhead);
+	    }
+#endif
+	    /* draw outline of backward arrow head */
 	    (*t->move) ( sx - x2, sy - y2);
 	    (*t->vector) (sx, sy);
-	    (*t->vector) ( sx - x1, sy - y1);
+	    (*t->vector) (sx - x1, sy - y1);
+	    if (curr_arrow_headfilled) {
+		/* close outline */
+		(*t->vector) (sx - x2, sy - y2);
+	    }
 	}
     }
+    /* Draw the line for the arrow. */
+    /* Must be here, because in postscript N does not force stroke. */
+    (*t->move) (sx, sy);
+    (*t->vector) (ex, ey);
 }
 
 #if 0				/* oiginal routine */

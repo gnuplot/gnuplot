@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.84 2002/03/30 13:15:21 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.85 2002/07/21 12:32:53 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -618,9 +618,10 @@ set_arrow()
     TBOOLEAN relative = FALSE;
     int tag = -999;
     int head = 1;
+    TBOOLEAN filled = FALSE;
     TBOOLEAN set_tag = FALSE, set_start = FALSE, set_end = FALSE;
     TBOOLEAN set_line = FALSE, set_headsize = FALSE, set_layer = FALSE;
-    TBOOLEAN set_head = FALSE;
+    TBOOLEAN set_head = FALSE, set_filled = FALSE;
     TBOOLEAN duplication = FALSE;
     int layer = 0;
     /* remember current token number to see because it can be a tag: */
@@ -679,6 +680,22 @@ set_arrow()
 	    c_token++;
 	    head = 2;
 	    set_head = TRUE;
+	    continue;
+	}
+
+	if (almost_equals(c_token, "fill$ed")) {
+	    if (set_filled) { duplication = TRUE; break; }
+	    c_token++;
+	    filled = TRUE;
+	    set_filled = TRUE;
+	    continue;
+	}
+
+	if (almost_equals(c_token, "nofill$ed")) {
+	    if (set_filled) { duplication = TRUE; break; }
+	    c_token++;
+	    filled = FALSE;
+	    set_filled = TRUE;
 	    continue;
 	}
 
@@ -765,6 +782,8 @@ set_arrow()
 	}
 	if (set_head) 
 	    this_arrow->head = head;
+	if (set_filled) 
+	    this_arrow->filled = filled;
 	if (set_layer) {
 	    this_arrow->layer = layer;
 	}
@@ -786,6 +805,7 @@ set_arrow()
 	new_arrow->start = spos;
 	new_arrow->end = epos;
 	new_arrow->head = head;
+	new_arrow->filled = filled;
 	new_arrow->headsize = headsize;
 	new_arrow->layer = layer;
 	new_arrow->relative = relative;

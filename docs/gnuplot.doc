@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.119 2002/07/23 06:36:10 mikulik Exp $
+C RCS $Id: gnuplot.doc,v 1.120 2002/07/23 16:05:03 mikulik Exp $
 C 18 September 2001
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001   Thomas Williams, Colin Kelley et al.
 C
@@ -3333,6 +3333,7 @@ C ... and restart the table:
        set arrow {<tag>} {from <position>} {to|rto <position>}
                  {nohead | head | heads}
                  {size <length>,<angle>}
+                 {filled | nofilled}
                  {front | back}
                  { {linestyle | ls <line_style>}
                    | {linetype | lt <line_type>}
@@ -3366,6 +3367,13 @@ C ... and restart the table:
  degrees) they make with the arrow. <Length> is in x-axis units; this can be
  changed by `first`, `second`, `graph` or `screen` before the <length>; 
  see `coordinates` for details.
+
+ Specifying `filled` produces filled arrow heads (if heads are used). 
+ Filling is supported on filled-polygon capable terminals, see `help pm3d`
+ for their list, otherwise the arrow heads are closed but not filled.
+ Further, filling is obviously not supported on terminals drawing arrows by
+ their own specific routines, like `fig`, `metafont`, `metapost`, `latex` or
+ `tgif`.
 
  The line style may be selected from a user-defined list of line styles 
  (see `set style line`) or may be defined here by providing values for 
@@ -6296,7 +6304,7 @@ C ... and restart the table:
      filledcurves y2=42    ... line y=42 (at y2 axis) ie parallel to x2, etc,
      filledcurves xy=10,20 ... point 10,20 of x1,y1 axes (arc-like shape).
 
- Note: filling is supported on filled-polygon capable terminals, see 
+ Note: filling is supported on filled-polygon capable terminals, see
  `help pm3d` for their list.
 
  Zoom of a filled curve drawn from a datafile may produce empty or incorrect
