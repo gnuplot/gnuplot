@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.105 2002/03/12 10:23:45 mikulik Exp $
+C RCS $Id: gnuplot.doc,v 1.106 2002/03/22 13:30:18 broeker Exp $
 C 18 September 2001
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001   Thomas Williams, Colin Kelley et al.
 C
@@ -2104,6 +2104,7 @@ C ... and restart the table:
 2 if
 ?commands if
 ?if
+?help if
  The `if` command allows commands to be executed conditionally.
 
  Syntax:
@@ -3791,6 +3792,10 @@ C ... and restart the table:
 
  `set clip` is synonymous with `set clip points`; `unset clip` turns off all
  three types of clipping.
+
+ This setting does not apply for clipping of the color filled quadrangles which
+ draw `pm3d` maps and surfaces. There, you can choose between the options 
+ `clip1in` and `clip4in`.
 3 cntrparam
 ?commands set cntrparam
 ?commands show cntrparam
@@ -4843,7 +4848,7 @@ C ... and restart the table:
                               {pointtype | pt <point_type>}
                               {pointsize | ps <point_size>}
                               {palette}
-       unset linestyle
+       unset style line
        show style line
 
  The line and point types are taken from the default types for the terminal
@@ -5401,6 +5406,7 @@ C ... and restart the table:
 ?set output
 ?show output
 ?output
+?output file
  By default, screens are displayed to the standard output. The `set output`
  command redirects the display to the specified file or device.
 

@@ -1,3 +1,11 @@
+2002-03-24  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* term/epslatex.trm term/pslatex.trm: Minor modifications of the
+	documentation section.
+
+	* docs/gnuplot.doc: Refer to pm3d clipping from	'set clip'. Other
+	minor modifications. 
+
 2002-03-23  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/axis.h src/axis.c src/datafile.c src/plot3d.c: Fixed color axis
@@ -154,7 +162,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/03/23 11:10:32 $).
+	last modification date (from the tag $Date: 2002/03/23 21:28:30 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
