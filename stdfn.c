@@ -51,9 +51,7 @@ static char *RCSid = "$Id: stdfn.c,v 1.1 1998/05/19 18:05:02 ddenholm Exp $";
 /* memcpy() */
 
 #ifdef NO_MEMCPY
-# ifdef HAVE_BCOPY
-#  define memcpy(dest,src,len) bcopy((src),(dest),(len))
-# else
+# ifndef HAVE_BCOPY
 /*
  * cheap and slow version of memcpy() in case you don't have one 
  */
@@ -67,9 +65,8 @@ memcpy (dest, src, len)
   while (len--)
     *dest++ = *src++;
 }
-# endif /* HAVE_BCOPY */
+# endif /* !HAVE_BCOPY */
 #endif /* NO_MEMCPY */
-
 
 /* strchr()
  * Simple and portable version, conforming to Plauger.
