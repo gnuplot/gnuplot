@@ -1,5 +1,5 @@
 /*
- * $Id: protos.h,v 1.18 1999/08/07 17:21:09 lhecking Exp $
+ * $Id: protos.h,v 1.19 1999/09/14 15:25:54 lhecking Exp $
  *
  */
 
@@ -53,7 +53,6 @@ int do_line __PROTO((void));
 void done __PROTO((int status));
 void define __PROTO((void));
 void bail_to_command_line __PROTO((void));
-void replotrequest __PROTO((void));
 
 
 /* Prototypes from file "contour.c" */
@@ -178,6 +177,10 @@ void plot3drequest __PROTO((void));
 char *readline __PROTO((const char *prompt));
 void add_history __PROTO((char *line));
 #endif /* HAVE_LIBREADLINE */
+
+void write_history_n __PROTO((int, char *));
+char *history_find __PROTO((char *));
+int history_find_all __PROTO((char *));
 
 #if defined(ATARI) || defined(MTOS)
 char tos_getch();
