@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.103 2002/11/26 18:50:00 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.104 2002/12/11 01:31:09 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -3213,9 +3213,12 @@ set_terminal()
 	    free(push_term_opts);
 	    push_term_name = gp_strdup(term->name);
 	    push_term_opts = gp_strdup(term_options);
-	    fprintf(stderr, "   pushed terminal %s %s\n", push_term_name, push_term_opts);
-	} else
-	    fputs("\tcurrent terminal type is unknown\n", stderr);
+	    if (interactive)
+		fprintf(stderr, "   pushed terminal %s %s\n", push_term_name, push_term_opts);
+	} else { 
+	    if (interactive)
+		fputs("\tcurrent terminal type is unknown\n", stderr);
+	}
 	c_token++;
 	return;
     } /* set term push */

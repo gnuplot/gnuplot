@@ -1,5 +1,10 @@
 2002-12-13  Petr Mikulik  <mikulik@physics.muni.cz>
 
+	* src/set.c(set_terminal): Don't display messages of 'set term push'
+	when in interactive mode.
+
+2002-12-13  Petr Mikulik  <mikulik@physics.muni.cz>
+
 	* src/term.c(term_end_multiplot): Remove c_token++. It fixes commands
 	like 'unset multiplot; another command;'.
 
@@ -1546,7 +1551,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/12/12 13:14:27 $).
+	last modification date (from the tag $Date: 2002/12/13 13:25:28 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
