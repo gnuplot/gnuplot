@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.20 2001/08/22 14:15:33 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.21 2001/08/31 17:56:35 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -1088,28 +1088,19 @@ gen_tics(axis, callback)
     double minifreq = axis_array[axis].mtic_freq;
      
 
-    memcpy(&lgrd, &grid_lp, sizeof(struct lp_style_type));
-    memcpy(&mgrd, &mgrid_lp, sizeof(struct lp_style_type));
-#if 0
-    lgrd.l_type = (grid & (GRID_X | GRID_Y | GRID_X2 |
-			   GRID_Y2 | GRID_Z | GRID_CB))
-      ? grid_lp.l_type : L_TYPE_NODRAW;
-    mgrd.l_type = (grid & (GRID_MX | GRID_MY | GRID_MX2 |
-			   GRID_MY2 | GRID_MZ | GRID_MCB))
-      ? mgrid_lp.l_type : L_TYPE_NODRAW;
-#else
+    memcpy(&lgrd, &grid_lp, sizeof(grid_lp));
+    memcpy(&mgrd, &mgrid_lp, sizeof(mgrid_lp));
     if (! axis_array[axis].gridmajor)
 	lgrd.l_type = L_TYPE_NODRAW;
     if (! axis_array[axis].gridminor)
 	mgrd.l_type = L_TYPE_NODRAW;
-#endif
     
 
     if (def->type == TIC_USER) {	/* special case */
 	/*{{{  do user tics then return */
 	struct ticmark *mark = def->def.user;
 	double uncertain = (axis_array[axis].max - axis_array[axis].min) / 10;
-	double ticmin = axis_array[axis].min - SIGNIF * uncertain;
+	double internal_min = axis_array[axis].min - SIGNIF * uncertain;
 	double internal_max = axis_array[axis].max + SIGNIF * uncertain;
 	double log10_base = axis_array[axis].log ? log10(axis_array[axis].base) : 1.0;
 
@@ -1128,7 +1119,7 @@ gen_tics(axis, callback)
 
 	    internal -= polar_shift;
 
-	    if (!inrange(internal, ticmin, internal_max))
+	    if (!inrange(internal, internal_min, internal_max))
 		continue;
 
 	    if (axis_array[axis].is_timedata)
@@ -1293,8 +1284,16 @@ gen_tics(axis, callback)
 	/*{{{  a few tweaks and checks */
 	/* watch rounding errors */
 	end += SIGNIF * step;
-	internal_max = lmax + step * SIGNIF;
-	internal_min = lmin - step * SIGNIF;
+	/* HBB 20011002: adjusting the endpoints doesn't make sense if
+	 * some oversmart user used a ticstep (much) larger than the
+	 * yrange itself */
+	if (step < (fabs(lmax) + fabs(lmin))) {
+	    internal_max = lmax + step * SIGNIF;
+	    internal_min = lmin - step * SIGNIF;
+	} else {
+	    internal_max = lmax;
+	    internal_min = lmin;
+	}
 
 	if (step == 0)
 	    return;		/* just quietly ignore them ! */
@@ -1339,8 +1338,9 @@ gen_tics(axis, callback)
 	    if (internal > internal_max)
 		break;		/* gone too far - end of series = VERYLARGE perhaps */
 	    if (internal >= internal_min) {
-/* continue; *//* maybe minitics!!!. user series starts below min ? */
-
+#if 0 /* maybe minitics!!!. user series starts below min ? */
+		continue;
+#endif
 		/*{{{  draw tick via callback */
 		switch (def->type) {
 		case TIC_DAY:{
