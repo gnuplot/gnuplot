@@ -1,12 +1,34 @@
 1999-06-11  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
-	* src/Makefile.am: Add ansi2knr stuff, include makefile.all.
+	* Makefile.maint: Add configure options to my-distcheck.
+
+	* docs/Makefile.in: Better way to build allterm.h.
+
+	* docs/doc2rnh.c: Remove nested comment.
+
+	* src/Makefile.am: Add ansi2knr stuff, include makefile.all. Add
+	new files command.h, graphics.h, remove fnproto.h.
 
 	* src/Makefile.maint: Add ansi2knr.
 
 	* src/ansi2knr.c, srcansi2knr.1: New files from automake distribution,
 	to prepare for transparent compilation of ANSI/ISO C with K&R
 	compilers.
+
+	* src/command.c, src/datafile.c, src/fit.c, src/graph3d.c,
+	src/graphics.c, src/hidden3d.c, src/interpol.c, src/misc.c, src/plot.h,
+	src/plot2d.c, src/plot3d.c, src/set.c, src/setshow.h, src/util3d.c:
+	Move some declarations to command.h and graphics.h.
+
+	* src/command.h, src/graphics.h: New header files.
+
+	* src/fnproto.h: Removed.
+
+	* src/internal.c, src/specfun.c, standard.c: Don't include fnproto.h.
+
+	* src/parse.c, src/plot.c, src/show.c, src/term.c: Include command.h.
+
+	* src/protos.h: Add contents of fnproto.h.
 
 1999-06-10  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
@@ -66,7 +88,7 @@
 	src/national.h, src/protos.h, src/setshow.h: Protect against multiple
 	inclusion.
 
-	* term/mac.trm: Rearange to match terminal layout guidelines.
+	* term/mac.trm: Rearrange to match terminal layout guidelines.
 
 	* tutorial/header.tex: Add comment about LaTeX warning.
 
