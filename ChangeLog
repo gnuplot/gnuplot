@@ -1,3 +1,8 @@
+2000-11-20  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/mouse.c (MousePosToGraphPosReal): fix typo in treatment of
+ 	logarithmic y axis values.
+
 2000-11-20  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/: color.c pm3d.c term.c term_api.h
