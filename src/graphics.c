@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.130 2004/10/20 20:14:18 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.131 2004/10/22 01:30:52 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -3123,8 +3123,8 @@ plot_vectors(struct curve_points *plot)
 		    edge_intersect(points, 1, &ex, &ey);
 		    x1 = map_x(ex);
 		    y1 = map_y(ey);
-		    if (plot->arrow_properties.head == 2)
-			(*t->arrow) (x1, y1, x2, y2, 1);
+		    if (plot->arrow_properties.head == BOTH_HEADS)
+			(*t->arrow) (x1, y1, x2, y2, END_HEAD);
 		    else
 			(*t->arrow) (x1, y1, x2, y2, plot->arrow_properties.head);
 		}
@@ -3140,10 +3140,10 @@ plot_vectors(struct curve_points *plot)
 		    edge_intersect(points, 1, &ex, &ey);
 		    x2 = map_x(ex);
 		    y2 = map_y(ey);
-		    if (plot->arrow_properties.head == 2)
-			(*t->arrow) (x2, y2, x1, y1, 1);
+		    if (plot->arrow_properties.head == BOTH_HEADS)
+			(*t->arrow) (x2, y2, x1, y1, END_HEAD);
 		    else
-			(*t->arrow) (x2, y2, x1, y1, plot->arrow_properties.head);
+			(*t->arrow) (x1, y1, x2, y2, NOHEAD);
 		}
 	    } else if (points[0].type == OUTRANGE) {
 		/* from outrange to outrange */
@@ -3153,7 +3153,7 @@ plot_vectors(struct curve_points *plot)
 			y1 = map_y(ly[0]);
 			x2 = map_x(lx[1]);
 			y2 = map_y(ly[1]);
-			(*t->arrow) (x1, y1, x2, y2, FALSE);
+			(*t->arrow) (x1, y1, x2, y2, NOHEAD);
 		    }
 		}
 	    }

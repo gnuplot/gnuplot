@@ -5,6 +5,9 @@
 	This breaks certain character sequences in Shift-JIS, but the 
 	alternative makes these characters unavailable for all other encodings.
 
+	* src/graphics.c (plot_vectors): Fix bug which drew a head on the tail
+	of arrows whose original heads were clipped. Bug #1062158.
+
 2004-11-07  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* docs/gnuplot.doc: Typos.
