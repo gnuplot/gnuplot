@@ -1,4 +1,16 @@
-/* $Id: matrix.h,v 1.4 1998/04/14 00:16:01 drd Exp $ */
+/* $Id: matrix.h,v 1.8 1998/06/30 16:42:24 lhecking Exp $ */
+
+/* GNUPLOT - matrix.h */
+
+/*  NOTICE: Change of Copyright Status
+ *
+ *  The author of this module, Carsten Grammes, has expressed in
+ *  personal email that he has no more interest in this code, and
+ *  doesn't claim any copyright. He has agreed to put this module
+ *  into the public domain.
+ *
+ *  Lars Hecking  15-02-1999
+ */
 
 /*
  *	Header file: public functions in matrix.c

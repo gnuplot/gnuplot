@@ -1,6 +1,16 @@
 #ifndef lint
-static char *RCSid = "$Id: matrix.c,v 1.15 1998/04/14 00:16:01 drd Exp $";
+static char *RCSid = "$Id: matrix.c,v 1.12 1998/11/19 10:40:31 lhecking Exp $";
 #endif
+
+/*  NOTICE: Change of Copyright Status
+ *
+ *  The author of this module, Carsten Grammes, has expressed in
+ *  personal email that he has no more interest in this code, and
+ *  doesn't claim any copyright. He has agreed to put this module
+ *  into the public domain.
+ *
+ *  Lars Hecking  15-02-1999
+ */
 
 /*
  *	Matrix algebra, part of
@@ -53,7 +63,7 @@ int n;
     double *dp;
     if( n < 1 )
 	return (double *) NULL;
-    dp = (double *) gp_alloc ( n * sizeof(double), "vec");
+    dp = (double *) gp_alloc (n * sizeof(double), "vec");
     return dp;
 }
 
@@ -69,8 +79,8 @@ int cols;
 
     if ( rows < 1  ||  cols < 1 )
         return NULL;
-    m = (double **) gp_alloc ( rows * sizeof(double *) , "matrix row pointers");
-    m[0] = (double *) gp_alloc ( rows * cols * sizeof(double), "matrix elements");
+    m = (double **) gp_alloc (rows * sizeof(double *) , "matrix row pointers");
+    m[0] = (double *) gp_alloc (rows * cols * sizeof(double), "matrix elements");
     for ( i = 1; i<rows ; i++ )
     	m[i] = m[i-1] + cols;
     return m;

@@ -1,6 +1,16 @@
 #ifndef lint
-static char *RCSid = "$Id: fit.c,v 1.23.2.3 1999/10/01 18:22:14 lhecking Exp $";
+static char *RCSid = "$Id: fit.c,v 1.23.2.4 2001/09/26 14:55:02 broeker Exp $";
 #endif
+
+/*  NOTICE: Change of Copyright Status
+ *
+ *  The author of this module, Carsten Grammes, has expressed in
+ *  personal email that he has no more interest in this code, and
+ *  doesn't claim any copyright. He has agreed to put this module
+ *  into the public domain.
+ *
+ *  Lars Hecking  15-02-1999
+ */
 
 /*
  *    Nonlinear least squares fit according to the

@@ -1,4 +1,16 @@
-/* $Id: fit.h,v 1.11 1998/04/14 00:15:21 drd Exp $ */
+/* $Id: fit.h,v 1.9 1998/10/28 21:08:54 lhecking Exp $ */
+
+/* GNUPLOT - fit.h */
+
+/*  NOTICE: Change of Copyright Status
+ *
+ *  The author of this module, Carsten Grammes, has expressed in
+ *  personal email that he has no more interest in this code, and
+ *  doesn't claim any copyright. He has agreed to put this module
+ *  into the public domain.
+ *
+ *  Lars Hecking  15-02-1999
+ */
 
 /*
  *	Header file: public functions in fit.c
@@ -19,8 +31,8 @@
  */
 
 
-#ifndef FIT_H		/* avoid multiple inclusions */
-#define FIT_H
+#ifndef GNUPLOT_FIT_H		/* avoid multiple inclusions */
+#define GNUPLOT_FIT_H
 
 #ifdef EXT
 #undef EXT
