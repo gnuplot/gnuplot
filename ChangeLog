@@ -1,3 +1,7 @@
+2002-09-23  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/set.c: Restore previous behavior of blank user tic marks.
+
 2002-09-16  Harald Harders  <h.harders@tu-bs.de>
 
 	* configure.in, src/misc.c, src/util.c, src/variable.c: Preliminary
@@ -1099,7 +1103,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/09/11 22:58:06 $).
+	last modification date (from the tag $Date: 2002/09/16 18:24:57 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 

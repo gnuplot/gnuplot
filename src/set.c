@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.94 2002/09/02 21:03:23 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.95 2002/09/11 15:31:43 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -4086,7 +4086,7 @@ add_tic_user(axis,label,position)
 
     /* Make a new ticmark */
     tic = gp_alloc(sizeof(struct ticmark), "add_tic_user: ticmark");
-    if (label && *label) {
+    if (label) {
 	tic->label = gp_alloc(strlen(label) + 1, "tic label");
 	(void) strcpy(tic->label, label);
     } else
