@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: cgm.trm,v 1.37 2002/02/25 03:10:41 broeker Exp $
+ * $Id: cgm.trm,v 1.38 2002/02/27 21:19:27 mikulik Exp $
  */
 
 /* GNUPLOT - cgm.trm */
@@ -174,7 +174,7 @@ static int cgm_step_index = 0;	/* index into cgm_step_sizes[] */
 static int cgm_step = 0;	/* amount of current dash not yet
 				   drawn, in plot units */
 static int cgm_tic, cgm_tic707, cgm_tic866, cgm_tic500, cgm_tic1241, cgm_tic1077, cgm_tic621;	/* marker dimensions */
-static struct cgm_properties {
+struct cgm_properties {
   double angle;			/* angle of text baseline (radians
                                    counter-clockwise from horizontal) */
   int font_index;		/* font index */
@@ -184,9 +184,12 @@ static struct cgm_properties {
   int edge_visibility;		/* nonzero if edge is visible */
   int edge_color;
   int fill_color;
-} cgm_current={-1,-1,-1,(enum JUSTIFY)-1,-1,-1,-1}, /* written to file */
- cgm_next={0,-2,-2,LEFT,-2,-2,-2}, /* needed for next text string/marker */
- cgm_reset={-1,-1,-1,(enum JUSTIFY)-1,-1,-1,-1}; /* invalid entries */
+};
+
+static struct cgm_properties
+    cgm_current={-1,-1,-1,(enum JUSTIFY)-1,-1,-1,-1}, /* written to file */
+    cgm_next={0,-2,-2,LEFT,-2,-2,-2}, /* needed for next text string/marker */
+    cgm_reset={-1,-1,-1,(enum JUSTIFY)-1,-1,-1,-1}; /* invalid entries */
 
 static int cgm_user_color_count[] = { 0 };
 static int cgm_user_color_max = 0;
@@ -982,7 +985,7 @@ TERM_PUBLIC void CGM_set_color(gray)
     /* map [0...1] to interval [0...cgm_smooth_colors-1], then add
        offset to get past the default colors */
     cgm_next.fill_color = 1 + CGM_COLORS + 
-	 (int)( gray * cgm_smooth_colors );
+	 (int)( gray * (cgm_smooth_colors - 1));
 }
 
 TERM_PUBLIC void CGM_filled_polygon(points, corner)

@@ -1,3 +1,10 @@
+2002-03-15  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* term/cgm.trm (struct cgm_properties, cgm_current, cgm_next,
+ 	cgm_reset): Separate type definition from that of variables.
+	(CGM_set_color): Fix off-by-one error in conversion.  Patch from
+ 	Mike Sutton.
+
 2002-03-12  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/util3d.c (draw3d_point_unconditional): New routine
@@ -57,7 +64,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/03/12 10:23:44 $).
+	last modification date (from the tag $Date: 2002/03/13 12:59:15 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
