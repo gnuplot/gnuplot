@@ -1,5 +1,5 @@
 /*
- * $Id: stdfn.h,v 1.7 1999/10/17 19:13:38 lhecking Exp $
+ * $Id: stdfn.h,v 1.8 1999/11/08 19:24:18 lhecking Exp $
  *
  */
 
@@ -261,6 +261,14 @@ int pclose __PROTO((FILE *));
 
 #ifndef NO_MATH_H
 # include <math.h>
+#endif
+
+#ifndef HAVE_STRCASECMP
+# ifdef HAVE_STRICMP
+#  define strcasecmp stricmp
+# else
+#  define strcasecmp gp_stricmp
+# endif
 #endif
 
 #ifndef HAVE_STRNCASECMP

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: stdfn.c,v 1.6 1999/10/01 14:54:36 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: stdfn.c,v 1.7 1999/11/08 19:24:34 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - stdfn.c */
@@ -347,6 +347,38 @@ unsigned int delay;
 /*
  * Other common functions
  */
+
+/*****************************************************************
+    portable implementation of strnicmp (hopefully)
+*****************************************************************/
+#ifndef HAVE_STRCASECMP
+# ifndef HAVE_STRICMP
+int gp_stricmp __PROTO((char *, char *));
+
+int
+gp_stricmp(s1, s2)
+char *s1;
+char *s2;
+{
+    char c1, c2;
+
+    do {
+	c1 = *s1++;
+	if (islower(c1))
+	    c1 = toupper(c1);
+	c2 = *s2++;
+	if (islower(c2))
+	    c2 = toupper(c2);
+    } while (c1 == c2 && c1 && c2);
+
+    if (c1 == c2)
+	return 0;
+    if (c1 == '\0' || c1 < c2)
+	return 1;
+    return -1;
+}
+# endif				/* !HAVE_STRCASECMP */
+#endif /* !HAVE_STRNICMP */
 
 /*****************************************************************
     portable implementation of strnicmp (hopefully)
