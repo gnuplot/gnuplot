@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.35 2002/01/26 17:55:08 joze Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.36 2002/01/26 21:44:51 joze Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -644,7 +644,7 @@ get_3ddata(this_plot)
 	struct coordinate GPHUGE *cp;
 	double x, y, z;
 #ifdef PM3D
-	double color = HUGE;
+	double color = VERYLARGE;
 	int pm3d_color_from_column = 0;
 #endif
 
