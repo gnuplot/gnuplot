@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.81 2003/01/27 20:39:32 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.82 2003/02/16 00:07:37 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -1099,7 +1099,7 @@ place_labels(listhead, layer)
 	/* EAM - Allow arbitrary rotation of label text */
 	if (this_label->rotate && (*t->text_angle) (this_label->rotate)) {
 	    write_multiline(x + htic, y + vtic, this_label->text, this_label->pos, JUST_TOP, 
-	    		    TEXT_VERTICAL, this_label->font);
+	    		    this_label->rotate, this_label->font);
 	    (*t->text_angle) (0);
 	} else {
 	    write_multiline(x + htic, y + vtic, this_label->text, this_label->pos, JUST_TOP, 
