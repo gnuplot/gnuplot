@@ -325,5 +325,6 @@
 #include "pstricks.trm"		/* LaTeX picture environment with PSTricks macros */
 #include "texdraw.trm"		/* TeXDraw drawing package for LaTeX */
 #include "metafont.trm"		/* METAFONT */
+#include "metapost.trm"		/* METAPOST */
 
 #endif /* !SHORT_TERMLIST */
