@@ -2591,7 +2591,7 @@ fi
 fi
 
 
-if test $ac_cv_lib_nsl_gethostbyname = no; then
+if test "$ac_cv_lib_nsl_gethostbyname" = no; then
   echo $ac_n "checking for gethostbyname in -lbsd""... $ac_c" 1>&6
 echo "configure:2597: checking for gethostbyname in -lbsd" >&5
 ac_lib_var=`echo bsd'_'gethostbyname | sed 'y%./+-%__p_%'`
