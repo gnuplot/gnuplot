@@ -583,20 +583,21 @@ Platform notes
 platform features, there are two ways to switch these off. 
 
    Example:
-configure has detected the memset() function, but the implementation on
-your platform is buggy. Now you can either edit config.cache and change
+configure was for some reason unable to detect the memset() function, but
+you are sure it is ok to use on your platform. Now you can either edit
+config.cache and change
 
- ac_cv_func_memset=${ac_cv_func_memset='yes'}  to
- ac_cv_func_memset=${ac_cv_func_memset='no'}  
+ ac_cv_func_memset=${ac_cv_func_memset='no'}  to
+ ac_cv_func_memset=${ac_cv_func_memset='yes'}  
 
 and rerun configure, or, edit config.h and change
 
-/* #undef NO_MEMSET */  to
-#define NO_MEMSET
+/* #undef HAVE_MEMSET */ to
+#define HAVE_MEMSET 1
 
    Note that changing such defines at compile time, eg. via
-'make DEFS=-DNO_MEMSET' is wrong, because the DEFS variable in Makefile
-may contain other defines (make DEFS='-DHAVE_CONFIG_H -DNO_MEMSET'
+'make DEFS=-DHAVE_MEMSET' is wrong, because the DEFS variable in Makefile
+may contain other defines (make DEFS='-DHAVE_CONFIG_H -DHAVE_MEMSET'
 may work, though).
 
  - HP-UX 9.x

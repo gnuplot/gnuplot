@@ -65,6 +65,10 @@ HAVE_SYS_SYSTEMINFO_H
 HAVE_TERMIOS_H
 HAVE_VALUES_H            needed if there is no limits.h
 
+ Note that configure use the HAVE_XXXX_H form, though. The transformation
+into NO_XXXX_H is done in syscfg.h. The same applies to function defines
+(see below).
+
 Function Availability
 =====================
 
@@ -103,7 +107,6 @@ HAVE_SYSINFO      sysinfo()      gplt_x11.c      SysV version of gethostname()
 HAVE_STRNCASECMP  strncasecmp()  stdfn.c
 HAVE_STRNICMP     strnicmp()     stdfn.c
 HAVE_TCGETATTR    tcgetattr()    readline.c
-
 
 Terminal Selection Options
 ==========================
