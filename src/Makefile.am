@@ -25,7 +25,7 @@ gp_types.h graph3d.c graph3d.h graphics.c graphics.h help.c help.h \
 hidden3d.c hidden3d.h history.c internal.c internal.h interpol.c \
 interpol.h ipc.h matrix.c matrix.h misc.c misc.h mouse.c mouse.h \
 mousecmn.h national.h parse.c parse.h plot.c plot.h plot2d.c plot2d.h \
-plot3d.c plot3d.h pm3d.c pm3d.h protos.h readline.c readline.h save.c \
+plot3d.c plot3d.h pm3d.c pm3d.h readline.c readline.h save.c \
 save.h scanner.c scanner.h set.c setshow.h show.c specfun.c specfun.h \
 standard.c standard.h stdfn.c stdfn.h syscfg.h tables.c tables.h \
 template.h term_api.h term.c term.h time.c unset.c util.c util.h \
