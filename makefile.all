@@ -27,7 +27,7 @@
 # D as the prefix for docs (eg docs/)
 # L as the prefix for latex tutorial (eg docs/latextut/ or [.docs.latextut])
 # Q as the prefix for old doc files (eg docs/old)
-# S as the prefix for postscript docs (eg docs/ps)
+# S as the prefix for postscript docs (eg docs/psdoc)
 # M as the prefix for demos (eg demo/)
 # E as the prefix for lisp (eg lisp/)
 # N as the prefix for NeXT (eg NeXT/)

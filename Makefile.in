@@ -151,7 +151,7 @@ T=$(srcdir)/term/
 D=$(srcdir)/docs/
 L=$(srcdir)/docs/latextut/
 Q=$(srcdir)/docs/old/
-S=$(srcdir)/docs/ps/
+S=$(srcdir)/docs/psdoc/
 M=$(srcdir)/demo/
 E=$(srcdir)/lisp/
 N=$(srcdir)/NeXT/
@@ -193,7 +193,7 @@ B=$(srcdir)/beos/
 # D as the prefix for docs (eg docs/)
 # L as the prefix for latex tutorial (eg docs/latextut/ or [.docs.latextut])
 # Q as the prefix for old doc files (eg docs/old)
-# S as the prefix for postscript docs (eg docs/ps)
+# S as the prefix for postscript docs (eg docs/psdoc)
 # M as the prefix for demos (eg demo/)
 # E as the prefix for lisp (eg lisp/)
 # N as the prefix for NeXT (eg NeXT/)
@@ -329,7 +329,7 @@ DOCS  = $(DOCS1) $(DOCS2) $(DOCS3) $(DOCS4) $(DOCS5)
 
 # Bruce Ravel's new gnuplot-mode for X/Emacs
 LISP =  $(E)ChangeLog $(E)Makefile.dst $(E)Makefile.in $(E)README \
-	$(E)aclocal.m4 $(E)configure $(E)/configure.in $(E)dot.el \
+	$(E)aclocal.m4 $(E)configure $(E)configure.in $(E)dot.el \
 	$(E)dotemacs $(E)gnuplot-gui.el $(E)gnuplot.el $(E)gpelcard.tex \
 	$(E)info-look.20.2.el $(E)info-look.20.3.el $(E)old/gnuplot.el
 
@@ -480,7 +480,7 @@ DISTFILES = $(ETC) $(SOURCES) $(DEMOS) $(DOCS) $(LISP)
 
 SUBDIRS = NeXT NeXT/English.lproj NeXT/English.lproj/GnuTerm.nib \
 	  NeXT/English.lproj/gnuview.nib beos demo docs docs/latextut \
-	docs/old docs/ps lisp lisp/old m4 os2 term win
+	docs/old docs/psdoc lisp lisp/old m4 os2 term win
 
 clean:
 	-rm -f gnuplot gnuplot_x11 bf_test *.o core *~
