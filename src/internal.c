@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: internal.c,v 1.8 1999/11/08 19:24:31 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: internal.c,v 1.9 2001/08/22 14:15:34 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - internal.c */
@@ -52,7 +52,7 @@ static char *RCSid() { return RCSid("$Id: internal.c,v 1.8 1999/11/08 19:24:31 l
 # if defined(__BORLANDC__) && __BORLANDC__ >= 0x450
 #  define matherr _matherr
 # endif				/* __BORLANDC__ >= 0x450 */
-# if (defined(MSDOS) || defined(DOS386)) && defined(__TURBOC__) || defined(VMS)
+# if (defined(MSDOS) || defined(DOS386)) && defined(__TURBOC__) || defined(VMS) || defined(__EMX__)
 int
 matherr()
 #else
