@@ -7,6 +7,11 @@
 	* demo/mousevariables.dem demo/keystroke.dem: Fix incorrect termination
 	logic in the keystroke demo.
 
+	* src/graphics.c (boundary): Rather than turning off the key altogether
+	if the contents seem to be too big to fit, fall back to something half
+	way plausible and also print an warning message. Fixes (or at least
+	addresses) bug #1058117.
+
 2005-01-11  Harald Harders  <h.harders@tu-bs.de>
 
 	Apply updated SourceForge patch #1023783

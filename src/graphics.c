@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.142 2005/01/04 20:12:45 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.143 2005/01/10 14:19:10 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -556,9 +556,8 @@ boundary(struct curve_points *plots, int count)
     /*  end of preliminary ybot calculation }}} */
 
 
-#define KEY_PANIC(x) if (x) { lkey = FALSE; goto key_escape; }
-
     if (lkey) {
+	TBOOLEAN key_panic = FALSE;
 	/*{{{  essential key features */
 	int ytlen;
 
@@ -607,20 +606,26 @@ boundary(struct curve_points *plots, int count)
 	key_rows = ptitl_cnt;
 	key_cols = 1;
 
-	/* calculate rows and cols for key - if something goes wrong,
-	 * the tidiest way out is to  set lkey = FALSE, and a goto
-	 */
+	/* calculate rows and cols for key */
 
 	if (key->flag == KEY_AUTO_PLACEMENT) {
 	    if (key->vpos == TUNDER) {
 		/* maximise no cols, limited by label-length */
 		key_cols = (int) (xright - xleft) / key_col_wth;
-		KEY_PANIC(key_cols == 0);
+		/* EAM Dec 2004 - Rather than turn off the key, try to squeeze */
+		if (key_cols == 0) {
+		    key_cols = 1;
+		    key_panic = TRUE;
+		    key_col_wth = (xright - xleft);
+		}
 		key_rows = (int) (ptitl_cnt + key_cols - 1) / key_cols;
-		KEY_PANIC(key_rows == 0);
+
 		/* now calculate actual no cols depending on no rows */
 		key_cols = (int) (ptitl_cnt + key_rows - 1) / key_rows;
-		KEY_PANIC(key_cols == 0);
+		if (key_cols == 0) {
+		    key_cols = 1;
+		    key_panic = TRUE;
+		}
 
 		/* we divide into columns, then centre in column by
 		 * considering ratio of * key_left_size to
@@ -631,10 +636,11 @@ boundary(struct curve_points *plots, int count)
 		 * maximise accuracy (hope we don't overflow !)
 		 */
 		keybox.xl = xleft - key_size_left
-		    + ((xright - xleft) * key_size_left)
-		    / (key_cols * (key_size_left + key_size_right));
+			+ ((xright - xleft) * key_size_left)
+			/ (key_cols * (key_size_left + key_size_right));
 		keybox.xr = keybox.xl + key_col_wth * (key_cols - 1)
-		    + key_size_left + key_size_right;
+			+ key_size_left + key_size_right;
+
 		keybox.yb = t->ymax * yoffset;
 		keybox.yt = keybox.yb + key_rows * key_entry_height
 		    + ktitl_lines * t->v_char;
@@ -651,18 +657,24 @@ boundary(struct curve_points *plots, int count)
 			       - (ktitl_lines + 1) * t->v_char)
 		    / key_entry_height;
 
-		KEY_PANIC(i == 0);
+		if (i == 0) {
+		    i = 1;
+		    key_panic = TRUE;
+		}
 		if (ptitl_cnt > i) {
 		    key_cols = (int) (ptitl_cnt + i - 1) / i;
 		    /* now calculate actual no rows depending on no cols */
-		    KEY_PANIC(key_cols == 0);
+		    if (key_cols == 0) {
+			key_cols = 1;
+			key_panic = TRUE;
+		    }
 		    key_rows = (int) (ptitl_cnt + key_cols - 1) / key_cols;
 		}
 	    }
 
-	    /* come here if we detect a division by zero in key calculations */
-	key_escape:
-	    ;			/* ansi requires this */
+	    /* warn if we had to punt on key size calculations */
+	    if (key_panic)
+		int_warn(NO_CARET, "Warning - difficulty fitting plot titles into key");
 	}
 	/*}}} */
     }
