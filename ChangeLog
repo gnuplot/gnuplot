@@ -1,7 +1,13 @@
+2003-12-29  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/util3d.c (polyline3d_next): Bugfix. The patch on 2003-12-19
+	broke contouring in hidden3d mode.  polyline3d_previous_vertex
+	wasn't updated.
+
 2003-12-26  Jim Van Zandt  <jrv@debian.org>
 
 	* src/set.c (load_tic_user): user tic definition can have 3rd
-	token specifying minitic 
+	token specifying minitic
 
 	* src/axis.h: ticmark.level specifies major or minitic
 
@@ -11,17 +17,18 @@
 
 2003-12-24  Ethan Merritt  <merritt@u.washington.edu>
 
-	* src/show.c: Fix buffer overflow in conv_text() if the text contains
-	many characters with the high bit set.
+	* src/show.c: Fix buffer overflow in conv_text() if the text
+	contains many characters with the high bit set.
 
 	* demo/enhancedtext.dem: Add demo for enhanced text mode.
 
-	* demo/charset.dem: Add demo that displays font and character encoding.
+	* demo/charset.dem: Add demo that displays font and character
+	encoding.
 
 2003-12-21  Ethan Merritt  <merritt@u.washington.edu>
 
-	* term/post.trm src/gplt_x11.c src/set.c src/term_api.h src/term.c: 
-	Add support for ISO-8859-15 character encoding.
+	* term/post.trm src/gplt_x11.c src/set.c src/term_api.h
+	src/term.c: Add support for ISO-8859-15 character encoding.
 
 	* docs/gnuplot.doc: Minor changes to What's New.
 
@@ -33,8 +40,9 @@
 
 2003-12-19  Ethan Merritt  <merritt@u.washington.edu>
 
-	* term/svg.trm: Sodipodi didn't care that the namespace URL was junk,
-	but the Adobe svg viewer doesn't like this. Give it the real URL.
+	* term/svg.trm: Sodipodi didn't care that the namespace URL was
+	junk, but the Adobe svg viewer doesn't like this. Give it the real
+	URL.
 
 2003-12-19  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util3d.c,v 1.17 2002/11/28 16:14:56 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: util3d.c,v 1.18 2003/12/19 01:31:04 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - util3d.c */
@@ -1136,6 +1136,11 @@ polyline3d_start (v1)
     unsigned int x1, y1;
 
     polyline3d_previous_vertex = *v1;
+#ifndef LITE
+    if (hidden3d && draw_surface)
+	return;
+#endif /* LITE */
+
     TERMCOORD(v1, x1, y1);
     /* HBB FIXME 20031219: no clipping!? */
     term->move(x1, y1);
@@ -1154,21 +1159,27 @@ polyline3d_next (v2, lp)
      * edges! */
     if (hidden3d && draw_surface) {
 	draw_line_hidden(&polyline3d_previous_vertex, v2, lp);
+	polyline3d_previous_vertex = *v2;
 	return;
-    }
+    } 
 #endif
     
+    /* Copied from draw3d_line_unconditional: */
 #ifdef PM3D
     /* If use_palette is active, polylines can't be used --> 
      * revert back to old method */
-    if (lp->use_palette)
+    if (lp->use_palette) {
 	draw3d_line_unconditional(&polyline3d_previous_vertex, v2,
 				  lp, lp->l_type);
+	polyline3d_previous_vertex = *v2;
+	return;
+
+    }
 #endif
 
     TERMCOORD(v2, x2, y2);
-
     /* FIXME HBB 20031219: no clipping?! */ 
     term->vector(x2, y2);
+
     polyline3d_previous_vertex = *v2;
 }
