@@ -7,7 +7,7 @@ EXTRA_DIST = BUGS CodeStyle Copyright FAQ GNUmakefile INSTALL INSTALL.gnu \
 Makefile.maint PATCHLEVEL PGPKEYS PORTING README README.1ST README.exp \
 VERSION configure.vms pm3d
 
-LISP_DISTCLEANFILES = gpelcard.dvi gpelcard.pdf gpelcard.ps install-sh missing mkinstalldirs
+LISP_DISTCLEANFILES = gpelcard.dvi gpelcard.pdf gpelcard.ps
 
 ACLOCAL_AMFLAGS = -I m4
 
@@ -16,4 +16,3 @@ dist-hook:
 	  rm -rf $$dir; done
 	@find $(distdir) -type f -name .cvsignore -print | xargs rm -f
 	@(cd $(distdir)/lisp && rm -f $(LISP_DISTCLEANFILES))
-
