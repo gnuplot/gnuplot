@@ -1,4 +1,3 @@
-
 /*
  * $Id: term.h,v 1.44 1998/04/14 00:16:25 drd Exp $
  *
@@ -55,189 +54,268 @@
  * Sample configuration for a Unix workstation
  */
 #ifdef SHORT_TERMLIST
-# include "dumb.trm"     /* dumb terminal */
-# include "post.trm"     /* postscript */
-# include "regis.trm"    /* regis graphics */
-# include "table.trm"    /* built-in, but used for the documentation */
-# include "tek.trm"      /* a Tek 4010 and others including VT-style */
+# include "dumb.trm"		/* dumb terminal */
+# include "post.trm"		/* postscript */
+# include "regis.trm"		/* regis graphics */
+# include "table.trm"		/* built-in, but used for the documentation */
+# include "tek.trm"		/* a Tek 4010 and others including VT-style */
 # ifdef X11
-#  include "x11.trm"      /* x windows */
-# endif /* X11 */
-#else  /* include all applicable terminals not commented out */
+#  include "x11.trm"		/* x Window system */
+# endif				/* X11 */
+#else /* include all applicable terminals not commented out */
 
-/* Platform dependent part */
+/****************************************************************************/
+/* Platform dependent part                                                  */
+/****************************************************************************/
 
-#ifdef AMIGA
-#include "amiga.trm"
-#endif
-
-#ifdef LINUXVGA 
-#include "linux.trm"   /* linux vga */
-#endif
-
-#ifdef OS2
-#include "pm.trm"  /* presentation manager */
-#ifdef EMXVESA
-#include "emxvga.trm" /* works with DOS and OS/2 (windowed/full screen) */
-#endif
+/* Amiga */
+#if AMIGA
+# include "amiga.trm"
 #endif
 
-#if defined(ATARI) || defined(MTOS)	/* ATARI-ST */
-#include "atarivdi.trm"
-#ifdef MTOS
-#include "multitos.trm"
-#endif
-#include "atariaes.trm"
+
+/* Atari ST and MTOS */
+#if ATARI || MTOS
+# include "atarivdi.trm"
+# if MTOS
+#  include "multitos.trm"
+# endif
+# include "atariaes.trm"
 #endif
 
-/******************************* MS-Dos Section **************************/
-#if defined(MSDOS) && defined(__EMX__) /* MsDos with emx-gcc compiler */
-#define EMXVESA           /* Vesa-Cards */
-#include "emxvga.trm"
+
+/* Apple Macintosh */
+#if _Macintosh
+# include "mac.trm"
 #endif
 
-/* HBB: as an aside: I think the several / * ... / * ... * / later in this file are _bad_ style */
-#ifdef DJGPP
-#include "djsvga.trm"               /* MsDos with djgpp compiler */
-#endif
 
-#ifdef __ZTC__
-#include "fg.trm"     /* MsDos with Zortech-C++ Compiler */
-#endif
+/****************************************************************************/
+/* MS-DOS and Windows */
+#if MSDOS || _Windows
+
+/* MSDOS with emx-gcc compiler */
+# if MSDOS && __EMX__
+   /* Vesa-Cards */
+#  define EMXVESA
+#  include "emxvga.trm"
+# endif				/* MSDOS && EMX */
+
+/* MSDOS with djgpp compiler */
+# if DJGPP
+#  include "djsvga.trm"
+# endif
+
+/* MSDOS with Zortech-C++ Compiler */
+# if __ZTC__
+#  include "fg.trm"
+# endif
 
 /* All other Compilers */
-#ifndef _Windows     
-#ifdef PC
+# ifndef _Windows
+#  if PC
 /* uncomment the next line to include SuperVGA support */
-#define BGI_NAME "svga256" /* the name of the SVGA.BGI for Borland C */
+#   define BGI_NAME "svga256"	/* the name of the SVGA.BGI for Borland C */
 /* this also triggers the inclusion of Super VGA support */
-#include "pc.trm"          /* all PC types except MS WINDOWS*/
-#endif
-#else
-#include "win.trm"         /* MS-Windows */
-#endif
-/********************** End of MS-Dos Section ****************************/
+#   include "pc.trm"		/* all PC types except MS WINDOWS */
+#  endif
+# else				/* _Windows */
+#  include "win.trm"		/* MS-Windows */
+# endif				/* _Windows */
+#endif /* MSDOS || _Windows */
+/****************************************************************************/
 
-#ifdef UNIXPC          /* AT&T Unix-PC */
-#include "unixpc.trm"
-#endif
 
-#ifdef SUN             /* Sunview */
-#include "sun.trm"
-#endif
-
-#ifdef IRIS          /* Iris */
-#include "iris4d.trm"
+/* NeXT */
+#if NEXT
+# include "next.trm"
 #endif
 
-#ifdef UIS           /* VAX Windowing System requires UIS libraries */
-#include "vws.trm"
+
+/* OS/2 */
+#if OS2
+/* presentation manager */
+# include "pm.trm"
+# ifdef EMXVESA
+/* works with DOS and OS/2 (windowed/full screen) */
+#  include "emxvga.trm"
+# endif
+#endif /* OS2 */
+
+
+/***************************************************************************/
+/* Terminals for various Unix platforms                                    */
+/***************************************************************************/
+
+/* Apollo Graphics Primitive Resource */
+#if APOLLO
+/* with resizeable windows */
+# include "apollo.trm"
+#  if GPR
+/* with fixed windows */
+#   include "gpr.h"
+#  endif
+#endif /* Apollo */
+
+/* Iris */
+#ifdef IRIS
+# include "iris4d.trm"
 #endif
 
-#ifdef SCO             /* SCO CGI drivers */
-#include "cgi.trm"
+
+/* Linux VGA */
+#if LINUXVGA
+# include "linux.trm"
 #endif
 
-#ifdef APOLLO
-#include "apollo.trm"  /* Apollo Graphics Primitive Resource */ 
-			  /* with resizeable windows */
-#include "gpr.h"       /* Apollo Graphics Primitive Resource fixed windows */ 
+
+/* MGR Window system */
+#if MGR
+# include "mgr.trm"
 #endif
 
-#ifdef NEXT
-#include "next.trm"
+/* Redwood Graphics Interface Protocol UNIPLEX */
+/* Metafile, requires POSIX */
+#ifdef RGIP
+# include "rgip.trm"
 #endif
 
-#ifdef _Macintosh
-#include "mac.trm"
+
+/* SCO CGI drivers */
+#if SCO
+# include "cgi.trm"
 #endif
 
-/* These terminals are not relevant for MSDOS, OS2, MS-Windows, ATARI or Amiga */
-#if !defined(MSDOS) && !defined(_Windows) && !defined(ATARI) && !defined(MTOS) && !defined(AMIGA)
-#include "aed.trm"     /* AED 512 and AED 767 */
+/* SunView */
+#if SUN
+# include "sun.trm"
+#endif
 
-#if UNIXPLOT || GNUGRAPH
-# if GNUGRAPH
-#  include "gnugraph.trm"
-# else
-#  include "unixplot.trm"
-# endif /* not GNUGRAPH */
-#endif /* UNIXPLOT || GNUGRAPH */
 
-#include "gpic.trm"    /* gpic for groff */
-/* #include "mgr.trm"     /* MGR Window Manager */
-#include "regis.trm"   /* regis graphics */
-/* #include "rgip.trm"    /* Metafile, requires POSIX */
-                       /* Redwood Graphics Interface Protocol UNIPLEX */ 
-#include "t410x.trm"   /* Tektronix 4106, 4107, 4109 and 420x terminals */
-#include "tek.trm"     /* a Tek 4010 and others including VT-style */
+/* VAX Windowing System requires UIS libraries */
+#ifdef UIS
+# include "vws.trm"
+#endif
 
-#include "xlib.trm"
+/* AT&T Unix-PC */
+#ifdef UNIXPC
+# include "unixpc.trm"
+#endif
+
+/****************************************************************************/
+/* Terminals not relevant for MSDOS, OS2, MS-Windows, ATARI or Amiga        */
+#if !MSDOS && !OS2 && !_Windows && !ATARI && !MTOS && !AMIGA
+
+/* AED 512 and AED 767 graphics terminals */
+# include "aed.trm"
+
+# if UNIXPLOT || GNUGRAPH
+#  if GNUGRAPH
+#   include "gnugraph.trm"
+#  else
+#   include "unixplot.trm"
+#  endif			/* !GNUGRAPH */
+# endif				/* UNIXPLOT || GNUGRAPH */
+
+/* gpic for groff */
+# include "gpic.trm"
+
+/* REGIS graphics language */
+# include "regis.trm"
+
+/* Tektronix 4106, 4107, 4109 and 420x terminals */
+# include "t410x.trm"
+/* a Tek 4010 and others including VT-style */
+# include "tek.trm"
+
+/* inboard terminal driver for X11 (dumps gnuplot_x11 commands) */
+# include "xlib.trm"
+
 #endif /* !MSDOS && !OS2 && !_Windows && !_ATARI && !_MTOS && !AMIGA */
+/****************************************************************************/
 
-#ifdef X11
-# include "x11.trm"     /* X Window System */
-#endif
 
+/****************************************************************************/
 /* These terminals can be used on any system */
 
-#include "ai.trm"           /* Adobe Illustrator Format */
-#include "cgm.trm"      /* Computer Graphics Metafile (eg ms office) */
-#include "corel.trm"    /* CorelDraw! eps format */
-/* #include "debug.trm" /* debugging terminal */
-#include "dumb.trm"     /* dumb terminal */
-#include "dxf.trm"          /* DXF format for use with AutoCad (Release 10.x) */
-/* #include "dxy.trm"      /* Roland DXY800A plotter */
-/* #include "excl.trm"         /* QMS/EXCL laserprinter (Talaris 1590 and others) */
-#include "fig.trm"      /* fig graphics */
+#ifdef X11
+# include "x11.trm"		/* X Window System */
+#endif
+
+/* Adobe Illustrator Format */
+#include "ai.trm"
+
+/* Computer Graphics Metafile (eg ms office) */
+#include "cgm.trm"
+
+/* CorelDraw! eps format */
+#include "corel.trm"
+
+/* debugging terminal */
+#ifdef DEBUG
+# include "debug.trm"
+#endif
+
+/* dumb terminal */
+#include "dumb.trm"
+
+/* DXF format for use with AutoCad (Release 10.x) */
+#include "dxf.trm"
+
+/* #include "dxy.trm"		/* Roland DXY800A plotter */
+/* #include "excl.trm"		/* QMS/EXCL laserprinter (Talaris 1590 and others) */
+
+/* fig graphics */
+#include "fig.trm"
 
 /* NOTE THAT GIF REQUIRES A SEPARATE LIBRARY : see term/gif.trm */
-#ifdef HAVE_LIBGD /* autoconf */
-#include "gif.trm"   /* GIF format. */
+/* GIF format. */
+#ifdef HAVE_LIBGD
+# include "gif.trm"
 #endif
 
 /* #include "grass.trm" /* geographical info system */
-#include "hp26.trm"     /* HP2623A and probably others */
-#include "hp2648.trm"   /* HP2647 and 2648 */
-#include "hp500c.trm"   /* HP DeskJet 500 C */
-#include "hpgl.trm"         /* HP7475, HP7220 plotters, and (hopefully) lots of others */
-#include "hpljii.trm"   /* HP Laserjet II */
-#include "hppj.trm"     /* HP PrintJet */
-#include "imagen.trm"   /* Imagen laser printers */
-/* #include "kyo.trm"      /* Kyocera Prescribe printer */
-#include "mif.trm"      /* Frame Maker MIF 3.00 format driver */
-#include "pbm.trm"      /* portable bit map */
+#include "hp26.trm"		/* HP2623A and probably others */
+#include "hp2648.trm"		/* HP2647 and 2648 */
+#include "hp500c.trm"		/* HP DeskJet 500 C */
+#include "hpgl.trm"		/* HP7475, HP7220 plotters, and (hopefully) lots of others */
+#include "hpljii.trm"		/* HP Laserjet II */
+#include "hppj.trm"		/* HP PrintJet */
+#include "imagen.trm"		/* Imagen laser printers */
+/* #include "kyo.trm"		/* Kyocera Prescribe printer */
+#include "mif.trm"		/* Frame Maker MIF 3.00 format driver */
+#include "pbm.trm"		/* portable bit map */
 
 /* NOTE THAT PNG REQUIRES A SEPARATE LIBRARY : see term/png.trm */
-#ifdef HAVE_LIBPNG /* autoconf */
-#include "png.trm"   /* png */
+#ifdef HAVE_LIBPNG
+# include "png.trm"
 #endif
 
-#include "post.trm"     /* postscript */
-#include "qms.trm"      /* QMS laser printers */
-#include "table.trm"    /* built-in, but used for the documentation */
-#include "tgif.trm"     /* x11 tgif tool */
-#include "tkcanvas.trm" /* tcl/tk */
-/* #include "v384.trm"     /* Vectrix 384 printer, also Tandy colour */
+#include "post.trm"		/* postscript */
+#include "qms.trm"		/* QMS laser printers */
+#include "table.trm"		/* built-in, but used for the documentation */
+#include "tgif.trm"		/* x11 tgif tool */
+#include "tkcanvas.trm"		/* tcl/tk */
+/* #include "v384.trm"		/* Vectrix 384 printer, also Tandy colour */
 
 /* wire printers */
-#define EPSONP          /* Epson LX-800, Star NL-10, NX-1000 and lots of others */
-#define EPS60           /* Epson-style 60-dot per inch printers */
-#define EPS180          /* Epson-style 180-dot per inch (24 pin) printers */
+#define EPSONP			/* Epson LX-800, Star NL-10, NX-1000 and lots of others */
+#define EPS60			/* Epson-style 60-dot per inch printers */
+#define EPS180			/* Epson-style 180-dot per inch (24 pin) printers */
 #define NEC
 #define OKIDATA
 #define STARC
-#define TANDY60         /* Tandy DMP-130 series 60-dot per inch graphics */
-#include "epson.trm" /* the common driver file for all of these */
+#define TANDY60			/* Tandy DMP-130 series 60-dot per inch graphics */
+#include "epson.trm"		/* the common driver file for all of these */
 
 /* TeX related terminals */
 #define EMTEX
-#include "latex.trm"    /* latex and emtex */
-#include "pslatex.trm"  /* latex/tex with picture in postscript */
-#include "eepic.trm"    /* EEPIC-extended LaTeX driver, for EEPIC users */
-#include "tpic.trm"     /* TPIC specials for TeX */
-#include "pstricks.trm" /* LaTeX picture environment with PSTricks macros */
-#include "texdraw.trm"  /* TeXDraw drawing package for LaTeX */
-#include "metafont.trm" /* METAFONT */
+#include "latex.trm"		/* latex and emtex */
+#include "pslatex.trm"		/* latex/tex with picture in postscript */
+#include "eepic.trm"		/* EEPIC-extended LaTeX driver, for EEPIC users */
+#include "tpic.trm"		/* TPIC specials for TeX */
+#include "pstricks.trm"		/* LaTeX picture environment with PSTricks macros */
+#include "texdraw.trm"		/* TeXDraw drawing package for LaTeX */
+#include "metafont.trm"		/* METAFONT */
 
-#endif /* not SHORT_TERMLIST */
+#endif /* !SHORT_TERMLIST */
