@@ -1,5 +1,5 @@
 /*
- * $Id: post.trm,v 1.59 2002/02/02 12:03:31 mikulik Exp $
+ * $Id: post.trm,v 1.60 2002/03/30 14:05:43 broeker Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -103,7 +103,7 @@ TERM_PUBLIC void PS_filled_polygon (int, gpiPoint *);
 
 #include "post.h"
 #ifdef PM3D
-#include "../src/getcolor.h"
+# include "getcolor.h"
 #endif
 
 #define PS_FLUSH_PATH \

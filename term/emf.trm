@@ -1,5 +1,5 @@
 		    /* Hey Emacs this is -*- C -*-
- * $Id: emf.trm,v 1.10 2002/01/17 21:20:00 joze Exp $
+ * $Id: emf.trm,v 1.11 2002/02/25 03:10:41 broeker Exp $
  */
 
 /* GNUPLOT - emf.trm */
@@ -552,11 +552,11 @@ EMF_text()
 
 TERM_PUBLIC void 
 EMF_linetype(linetype)
-int linetype;
+    int linetype;
 {
     /* Note : separating linetype and color would have not been futile, but anyway... */
 
-    assert(linetype >= -2);
+    assert(linetype > L_TYPE_NODRAW);
     if (linetype == emf_linetype)
 	return;
     emf_linetype = linetype;
@@ -567,7 +567,7 @@ int linetype;
 
 TERM_PUBLIC void 
 EMF_linecolor(linecolor)
-int linecolor;
+    int linecolor;
 {
     static long GPFAR color_table_data[] =
     {
@@ -588,7 +588,7 @@ int linecolor;
 	RGB(255, 255, 0),	/* yellow */
     };
 
-    assert(linecolor >= -2);
+    assert(linecolor > L_TYPE_NODRAW);
     linecolor = (linecolor < 0 || emf_monochrome) ? 7 : (linecolor % EMF_COLORS);
     if (color_table_data[linecolor] == emf_color)
 	return;
@@ -627,7 +627,7 @@ EMF_dashtype(dashtype)
     };
 
 
-    assert(dashtype >= -2);
+    assert(dashtype > L_TYPE_NODRAW);
     if (dashtype == emf_dashtype)
 	return;
 

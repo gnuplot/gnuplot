@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: cgm.trm,v 1.39 2002/03/15 13:32:44 broeker Exp $
+ * $Id: cgm.trm,v 1.40 2002/04/30 13:38:44 lhecking Exp $
  */
 
 /* GNUPLOT - cgm.trm */
@@ -831,9 +831,9 @@ CGM_text()
 
 TERM_PUBLIC void
 CGM_linetype(linetype)
-int linetype;
+    int linetype;
 {
-    assert(linetype >= -2);
+    assert(linetype > L_TYPE_NODRAW);
     if (linetype == cgm_linetype)
 	return;
     cgm_linetype = linetype;
@@ -851,9 +851,9 @@ int linetype;
 
 TERM_PUBLIC void
 CGM_linecolor(linecolor)
-int linecolor;
+    int linecolor;
 {
-    assert(linecolor >= -2);
+    assert(linecolor > L_TYPE_NODRAW);
     linecolor = (linecolor < 1) ? 1 : 
       linecolor % cgm_linetypes + 1;
     if (cgm_monochrome || linecolor == cgm_color)
@@ -866,7 +866,7 @@ int linecolor;
 
 TERM_PUBLIC void
 CGM_linewidth(width)
-double width;
+    double width;
 {
     int new_linewidth;
 
@@ -885,7 +885,7 @@ double width;
 
 TERM_PUBLIC void
 CGM_dashtype(dashtype)
-int dashtype;
+    int dashtype;
 {
     int i, j;
     /* Each group of 8 entries in dot_length[] defines a dash
@@ -904,7 +904,7 @@ int dashtype;
 	4, 10, 4, 10, 4, 1, 4, 1};	/* 8 - dash-dash-dot-dot */
 
 
-    assert(dashtype >= -2);
+    assert(dashtype > L_TYPE_NODRAW);
     if (dashtype == cgm_dashtype)
 	return;
     cgm_dashtype = dashtype;

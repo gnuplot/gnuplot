@@ -1,3 +1,25 @@
+2002-04-30  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* term/amiga.trm (AMIGA_linetype): Use mnemonic name L_TYPE_NODRAW
+ 	in checks for valid linetypes.
+
+	* term/cgm.trm (CGM_linetype, CGM_linecolor, CGM_dashtype): Dito.
+
+	* term/emf.trm (EMF_linetype, EMF_linecolor, EMF_dashtype): Dito.
+
+	* term/fig.trm (FIG_linetype): Dito.
+
+	* term/pdf.trm (PDF_Pen_RealID): Dito.
+
+	* term/svg.trm (SVG_Pen_RealID): Dito.
+
+	* term/svg.trm (SVG_init): Give SVG output a 'viewBox' attribute
+ 	to make it freely scalable.  This is essentially the same as an
+ 	PostScript's %%BoundingBox.
+
+	* term/post.trm: Remove explict path from #include of
+ 	"getcolor.h".
+
 2002-04-30  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* FAQ: Updated filename for gplotlib archive.
@@ -383,7 +405,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/04/29 13:37:00 $).
+	last modification date (from the tag $Date: 2002/04/30 13:42:07 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 

@@ -1,5 +1,5 @@
 /*
- * $Id: amiga.trm,v 1.12 2002/02/21 12:27:37 lhecking Exp $
+ * $Id: amiga.trm,v 1.13 2002/04/30 13:38:53 lhecking Exp $
  *
  */
 
@@ -579,13 +579,13 @@ unsigned int x, y;
  */
 TERM_PUBLIC void
 AMIGA_linetype(linetype)
-int linetype;
+    int linetype;
 {
     if (AMIGA_window_mode != TRUE) {
 	if (linetype >= 13)
 	    linetype %= 13;
 
-	if (linetype < -2)
+	if (linetype <= L_TYPE_NODRAW)
 	    linetype = -2;
 
 	AMIGA_slinetype = linetype + 3;

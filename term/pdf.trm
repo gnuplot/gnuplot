@@ -95,7 +95,7 @@ PDF_Pen_RealID (inPenCode)
 {
     if (inPenCode >= 13)
 	inPenCode %= 13;	/* normalize pen code*/
-    if (inPenCode < -2)
+    if (inPenCode <= L_TYPE_NODRAW)
 	inPenCode = -2;
 
     return (inPenCode + 2);
