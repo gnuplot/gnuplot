@@ -62,6 +62,11 @@ void gp_execute __PROTO((char *s));
 #ifdef PIPE_IPC
 
 extern int pipe_died;
+RETSIGTYPE pipe_died_handler __PROTO((int signum));
+
+#endif /* PIPE_IPC */
+
+#if defined(PIPE_IPC) || defined(WIN_IPC)
 
 typedef struct gpe_fifo_t {
     struct gpe_fifo_t* prev;
@@ -69,9 +74,8 @@ typedef struct gpe_fifo_t {
     struct gpe_fifo_t* next;
 } gpe_fifo_t;
 extern int buffered_output_pending;
-RETSIGTYPE pipe_died_handler __PROTO((int signum));
 
-#endif /* PIPE_IPC */
+#endif /* PIPE_IPC || WIN_IPC */
 
 
 void gp_exec_event __PROTO((char type, int mx, int my, int par1, int par2));

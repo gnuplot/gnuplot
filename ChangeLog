@@ -1,3 +1,9 @@
+2001-02-05  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* config/makefile.mgw, src/gpexecute.h, gpexecute.c, mousecmn.h,
+	src/win/wgraph.c: WIN_IPC, an IPC for Windows. Hotkeys in the
+	windows terminal are now working.
+
 2001-02-01  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/*.c, term/*.trm: Fixed incorrect usage of <ctype.h> macros.

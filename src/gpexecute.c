@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: $"); }
+static char *RCSid() { return RCSid("$Id: gpexecute.c,v 1.6 2000/11/24 19:17:22 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - gpexecute.c */
@@ -57,12 +57,19 @@ static char *RCSid() { return RCSid("$Id: $"); }
 # include <assert.h>
 # include <errno.h>
 int pipe_died = 0;
+#endif /* PIPE_IPC */
 
+#ifdef WIN_IPC
+# include <stdlib.h>
+# include <assert.h>
+#endif
+
+#if defined(PIPE_IPC) || defined(WIN_IPC)
 static gpe_fifo_t *gpe_init __PROTO((void));
 static void gpe_push __PROTO((gpe_fifo_t ** base, struct gp_event_t * ge));
 static struct gp_event_t *gpe_front __PROTO((gpe_fifo_t ** base));
 static int gpe_pop __PROTO((gpe_fifo_t ** base));
-#endif /* PIPE_IPC */
+#endif /* PIPE_IPC || WIN_IPC */
 
 /*
  * gp_execute functions
@@ -139,7 +146,7 @@ gp_execute(char *s)
 
 #endif /* OS2_IPC */
 
-#ifdef PIPE_IPC
+#if defined(PIPE_IPC) || defined(WIN_IPC)
 
 int buffered_output_pending = 0;
 
@@ -196,7 +203,9 @@ gpe_pop(gpe_fifo_t ** base)
 	return 1;
     }
 }
+#endif /* PIPE_IPC || WIN_IPC */
 
+#ifdef PIPE_IPC
 RETSIGTYPE
 pipe_died_handler(int signum)
 {
@@ -210,7 +219,7 @@ void
 gp_exec_event(char type, int mx, int my, int par1, int par2)
 {
     struct gp_event_t ge;
-#ifdef PIPE_IPC
+#if defined(PIPE_IPC) || defined(WIN_IPC)
     static struct gpe_fifo_t *base = (gpe_fifo_t *) 0;
 #endif
 #if 0
@@ -226,6 +235,8 @@ gp_exec_event(char type, int mx, int my, int par1, int par2)
 #ifdef PIPE_IPC
     if (pipe_died)
 	return;
+#endif
+#if defined(PIPE_IPC) || defined(WIN_IPC)
     if (!base) {
 	base = gpe_init();
     }
@@ -234,6 +245,12 @@ gp_exec_event(char type, int mx, int my, int par1, int par2)
     } else if (!buffered_output_pending) {
 	return;
     }
+#endif
+#ifdef WIN_IPC
+    do_event(&ge);
+    return;
+#endif
+#ifdef PIPE_IPC
     do {
 	int status = write(1, gpe_front(&base), sizeof(ge));
 	if (-1 == status) {

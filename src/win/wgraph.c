@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: wgraph.c,v 1.7 2000/12/05 18:00:19 broeker Exp $";
+static char *RCSid = "$Id: wgraph.c,v 1.8 2001/01/16 20:19:36 broeker Exp $";
 #endif
 
 /* GNUPLOT - win/wgraph.c */
@@ -62,6 +62,9 @@ static char *RCSid = "$Id: wgraph.c,v 1.7 2000/12/05 18:00:19 broeker Exp $";
 #include "wresourc.h"
 #include "wcommon.h"
 #include "term_api.h"         /* for enum JUSTIFY */
+#ifdef USE_MOUSE
+#include "gpexecute.h"
+#endif
 #ifdef PM3D
 #include "color.h"
 #include "getcolor.h"         /* HBB 20001204: use new header */
@@ -1633,14 +1636,18 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 					break;
 			}
 			break;
-/* HBB 20001023: implement the '<space> in graph returns to text window' 
- * feature already present in OS/2 and X11 */
 		case WM_CHAR:
 			if (wParam == VK_SPACE) {
+				/* HBB 20001023: implement the '<space> in graph returns to
+				 * text window' --- feature already present in OS/2 and X11 */
 				/* Make sure the text window is visible: */
 				ShowWindow(lpgw->lptw->hWndParent, SW_SHOW);
 				/* and activate it (--> Keyboard focus goes there */
 				BringWindowToTop(lpgw->lptw->hWndParent);
+#ifdef USE_MOUSE
+			} else {
+			    gp_exec_event ( GE_keypress, 0 /*mx*/, 0 /*my*/, wParam, 0);
+#endif
 			}
 			return 0;			
 		case WM_COMMAND:

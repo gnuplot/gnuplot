@@ -1,5 +1,5 @@
 #
-# $Id: makefile.mgw,v 1.4 1999/10/01 14:12:11 lhecking Exp $
+# $Id: makefile.mgw,v 1.5 2000/11/09 16:14:00 broeker Exp $
 #
 # GNUPLOT Makefile for Cygwin/MinGW32 on WinNT and Win95/98
 #
@@ -21,7 +21,7 @@ TOP = ..
 DESTDIR=/Progra~1/Gnuplot3.7
 
 # give here the path to your compiler (preferrably MinGW's one)
-GCCPATH=g:/mingw32/bin/
+#GCCPATH=g:/mingw32/bin/
 
 # -c  means don't link
 # -I  means extra include directory
@@ -34,7 +34,8 @@ CC = $(GCCPATH)gcc
 LD = $(GCCPATH)gcc
 CFLAGS = -g -O2 -I$(TOP) -I. -D_Windows -DNO_GIH -DHAVE_STRNICMP \
 	-DREADLINE -DGP_INLINE=inline -D_NO_OLDNAMES -DANSI_C \
-	-DHAVE_GETCWD -DNEAR= -DPM3D=1 -DUSE_MOUSE=1 $(OPTS) # -DHAVE_LIBPNG -DHAVE_LIBGD
+	-DHAVE_GETCWD -DNEAR= -DPM3D=1 -DUSE_MOUSE=1 -DWIN_IPC=1 \
+	$(OPTS) -DHAVE_LIBGD # -DHAVE_LIBPNG
 LDFLAGS = -g 
 
 RM = rm -f
@@ -50,7 +51,7 @@ CP = cp -p
 # the followind switches are for HCW 4.03
 #
 #HCWPATH=/Program\ Files/Help\ Workshop/
-HCWPATH=h:/mssdk/bin/
+#HCWPATH=h:/mssdk/bin/
 HCW = $(HCWPATH)hcw
 HCWFLAG=
 
@@ -80,7 +81,7 @@ RES2COFF=echo wgplt_res.o
 
 # see other terminal defines in term.h
 TERMFLAGS = -I$(TOP)/term
-TERMLIBS = # -lgd -lpng -lz
+TERMLIBS = -lgd # -lpng -lz
 
 # There shouldn't be anything to be changed below this line
 #=======================================================================
@@ -98,7 +99,7 @@ default: wgnuplot.exe $(HELPFILE) wgnuplot.mnu $(M)bf_test.exe
 # include the 'core makefile template'
 include makefile.all
 
-OBJS = $(COREOBJS) version.$(O)
+OBJS = $(COREOBJS) version.$(O) gpexecute.$(O)
 
 WINOBJS = winmain.$(O) wgnuplib.$(O) wgraph.$(O) wprinter.$(O) wtext.$(O) wpause.$(O) wmenu.$(O)
 
