@@ -1,3 +1,9 @@
+2001-09-18  Lars Hecking  <lhecking@nmrc.ucc.ie
+
+	* demo/prob.dem, demo.prob2.dem, demo/random.dem, demo/stat.inc:
+	Remove "non-commercial" clause by permission of the original author,
+	Jos van der Woude.
+
 2001-06-25  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/graphics.c (histeps_current_plot, histeps_compare): New

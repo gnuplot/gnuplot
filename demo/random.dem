@@ -1,13 +1,11 @@
 #
-# $Id: random.dem,v 1.3 1994/03/30 01:28:47 alex Exp $
+# $Id: random.dem,v 1.1.1.1 1998/04/15 19:16:42 lhecking Exp $
 #
 # random.dem
 #
 # Lattice test for random numbers;
 # If you can see any patterns in this plot, the random number generator
 # is not very good.
-#
-# Permission granted to distribute freely for non-commercial purposes only
 #
 # Copyright (c) 1991, Jos van der Woude, jvdwoude@hut.nl
 seed = 1317

@@ -1,9 +1,7 @@
 #
-# $Id: prob2.dem,v 1.1.1.1 1998/04/15 19:16:42 lhecking Exp $
+# $Id: prob2.dem,v 1.1.1.1.2.1 1999/10/11 13:24:36 lhecking Exp $
 #
 # Demo Statistical Approximations version 1.1
-#
-# Permission granted to distribute freely for non-commercial purposes only
 #
 # Copyright (c) 1991, Jos van der Woude, jvdwoude@hut.nl
 
@@ -17,8 +15,6 @@ pause  0 "                        Statistical Approximations, version 1.1"
 pause  0 ""
 pause  0 "        Copyright (c) 1991, 1992, Jos van de Woude, jvdwoude@hut.nl"
 pause  0 ""
-pause  0 ""
-pause  0 " Permission granted to distribute freely for non-commercial purposes only"
 pause  0 ""
 pause  0 ""
 pause  0 ""

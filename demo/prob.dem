@@ -1,15 +1,12 @@
 #
-# $Id: prob.dem,v 1.2 1998/12/02 18:35:48 lhecking Exp $
+# $Id: prob.dem,v 1.2.2.1 1999/10/11 13:24:41 lhecking Exp $
 #
 # Demo Statistical Functions version 2.3
-#
-# Permission granted to distribute freely for non-commercial purposes only
 #
 # Copyright (c) 1991, 1992 Jos van der Woude, jvdwoude@hut.nl
 
 print "                   Statistical Library Demo, version 2.3"
 print "\n          Copyright (c) 1991, 1992, Jos van de Woude, jvdwoude@hut.nl"
-print "Permission granted to distribute freely for non-commercial purposes only"
 print "\n\n\n\n\n\n\n"
 print "NOTE: contains 54 plots and consequently takes a lot of time to run"
 print "                      Press Ctrl-C to exit right now"
