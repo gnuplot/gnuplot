@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot.c,v 1.20 1999/08/24 11:22:32 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot.c,v 1.21 1999/09/21 18:24:39 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - plot.c */
@@ -429,7 +429,11 @@ char **argv;
 
 #ifdef HAVE_LIBREADLINE
     using_history();
-    rl_readline_name = argv[0];
+    /* argv[0] may include path; need to check whether
+     * there is a standard/convention for readline's
+     * ~/.inputrc files
+     */
+    rl_readline_name = "Gnuplot";
     rl_complete_with_tilde_expansion = 1;
 #endif
 
@@ -600,7 +604,7 @@ char **argv;
 
 		while (!com_line());
 
-/* interactive = FALSE; *//* should this be here? */
+		/* interactive = FALSE; *//* should this be here? */
 
 	    } else
 		load_file(loadpath_fopen(*argv, "r"), *argv, FALSE);
@@ -920,10 +924,22 @@ RexxInterface(PRXSTRING rxCmd, PUSHORT pusErr, PRXSTRING rxRc)
 static void
 wrapper_for_write_history()
 {
-    if (!write_history(expanded_history_filename)) {
-	/* if writing was successful, truncate history
-	 *  to HOSTORY_SIZE lines. */
+#if 1
+    /* Alternative code, saves one disk access */
+    if (history_is_stifled())
+	unstifle_history();
+    stifle_history (gnuplot_history_size);
+
+    if (!write_history (expanded_history_filename))
+	fprintf (stderr, "Warning:  Could not write history file !!!\n");
+
+    unstifle_history();
+#else
+    /* if writing was successful, truncate history
+     *  to HISTORY_SIZE lines
+     */
+    if (!write_history(expanded_history_filename))
 	history_truncate_file(expanded_history_filename, HISTORY_SIZE);
-    }
+#endif
 }
 #endif /* HAVE_LIBREADLINE && GNUPLOT_HISTORY */
