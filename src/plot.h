@@ -1,5 +1,5 @@
 /*
- * $Id: plot.h,v 1.13 1999/07/13 19:53:39 lhecking Exp $
+ * $Id: plot.h,v 1.14 1999/07/18 17:39:20 lhecking Exp $
  *
  */
 
@@ -712,6 +712,10 @@ struct ticmark {
 };
 
 /* Some key global variables */
+/* command.c */
+extern TBOOLEAN is_3d_plot;
+extern int plot_token;
+
 /* plot.c */
 extern TBOOLEAN interactive;
 extern TBOOLEAN noinputfiles;
