@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.166 2003/03/14 18:01:14 mikulik Exp $
+C RCS $Id: gnuplot.doc,v 1.167 2003/03/23 18:50:15 mikulik Exp $
 C 18 September 2001
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001   Thomas Williams, Colin Kelley et al.
 C
@@ -753,7 +753,7 @@ C
 %erf(x)@any@$erf ( roman real (x))$, error function of real ($x$)
  The `erf(x)` function returns the error function of the real part of its
  argument.  If the argument is a complex value, the imaginary component is
- ignored.
+ ignored.  See `erfc`, `inverf`, and `norm`.
 4 erfc
 ?expressions functions erfc
 ?functions erfc
@@ -762,7 +762,7 @@ C
 %erfc(x)@any@$erfc ( roman real (x))$, 1.0 - error function of real ($x$)
  The `erfc(x)` function returns 1.0 - the error function of the real part of
  its argument.  If the argument is a complex value, the imaginary component is
- ignored.
+ ignored.  See `erf`, `inverf`, and `norm`.
 4 exp
 ?expressions functions exp
 ?functions exp
@@ -808,7 +808,7 @@ C
 #inverf(x) & any &  inverse error function of real($x$)  \\
 %inverf(x)@any@inverse error function real($x$)
  The `inverf(x)` function returns the inverse error function of the real part
- of its argument.
+ of its argument.   See `erf` and `invnorm`.
 4 igamma
 ?expressions functions igamma
 ?functions igamma
@@ -833,7 +833,7 @@ C
 #invnorm(x) & any &  inverse normal distribution function of real($x$)  \\
 %invnorm(x)@any@inverse normal distribution function real($x$)
  The `invnorm(x)` function returns the inverse normal distribution function of
- the real part of its argument.
+ the real part of its argument.  See `norm`.
 4 int
 ?expressions functions int
 ?functions int
@@ -867,7 +867,7 @@ C
 #log(x) & any & $\log_{e} x$,  natural logarithm (base $e$) of $x$ \\
 %log(x)@any@$ln~x$, natural logarithm (base $e$) of $x$
  The `log(x)` function returns the natural logarithm (base `e`) of its
- argument.
+ argument.  See `log10`.
 4 log10
 ?expressions functions log10
 ?functions log10
@@ -882,7 +882,7 @@ C
 #norm(x) & any & normal distribution (Gaussian) function of real($x$) \\
 %norm(x)@any@$norm(x)$, normal distribution function of real($x$)
  The `norm(x)` function returns the normal distribution function (or Gaussian)
- of the real part of its argument.
+ of the real part of its argument.   See `invnorm`, `erf` and `erfc`.
 4 rand
 ?expressions functions rand
 ?functions rand
