@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: pdf.trm,v 1.45 2005/02/14 20:56:02 sfeam Exp $
+ * $Id: pdf.trm,v 1.46 2005/02/16 21:28:49 sfeam Exp $
  */
 
 /*------------------------------
@@ -93,12 +93,15 @@ static PDF *myPDF = NULL;
 static unsigned int PDF_xLast = UINT_MAX; /* current pen horizontal position*/
 static unsigned int PDF_yLast = UINT_MAX; /* current pen vertical position*/
 
-static int PDF_LineType = LT_UNDEFINED;	/* current line type*/
-static int PDF_LineCap = 0; /* Butt ends */
-static double PDF_LineWidth = 1.0; /* current line width*/
-static int PDF_TextAngle = 0;		/* current text orientation*/
-static enum JUSTIFY PDF_TextJust = LEFT; /* current text justification*/
-static double PDF_linewidth_factor = 1.0;/* multiplier for line width */
+static int PDF_LineType = LT_UNDEFINED;		/* current line type*/
+static int PDF_LineCap = 0;			/* Butt ends */
+static double PDF_LineWidth = 1.0;		/* current line width*/
+static int PDF_TextAngle = 0;			/* current text orientation*/
+static enum JUSTIFY PDF_TextJust = LEFT;	/* current text justification*/
+static double PDF_linewidth_factor = 1.0;	/* multiplier for line width */
+static double PDF_dashlength_factor = 1.0;	/* multiplier for dash length */
+static TBOOLEAN PDF_dashedlines = FALSE;	/* solid or dashed? */
+static TBOOLEAN PDF_monochrome = FALSE;		/* ignore all color requests */
 
 /* default text font family: */
 static char PDF_fontNameDef[MAX_ID_LEN + 1] = "Helvetica";
@@ -124,6 +127,17 @@ static void PDF_SetFont __PROTO ((void));
 static void PDF_DefinePatterns __PROTO((void));
 enum { PDF_patterns = 7 };
 static int PDF_patternHandles[PDF_patterns];
+#endif
+
+#ifndef HAVE_NODASH_LIBPDF
+/* Description of dash patterns (same as those in post.trm) */
+static int dash1[] = {8, 8};
+static int dash2[] = {4, 6};
+static int dash3[] = {2, 3};
+static int dash4[] = {12, 4, 2, 4};
+static int dash5[] = {6, 6, 2, 6};
+static int dash6[] = {4, 4, 4, 12};
+static int dash7[] = {1, 4, 12, 4, 1, 4};
 #endif
 
 /*------------------------ helper functions -------------------*/
@@ -346,15 +360,57 @@ PDF_options ()
 	    continue;
 	}
 
+	if (equals(c_token, "color") || almost_equals(c_token, "col$our")) {
+	    c_token++;
+	    PDF_monochrome = FALSE;
+	    continue;
+	}   
+
+	if (almost_equals(c_token, "mono$chrome")) {
+	    c_token++;
+	    PDF_monochrome = TRUE;
+	    continue;
+	}   
+
+	if (equals(c_token, "dl") || almost_equals(c_token, "dashl$ength")) {
+	    c_token++;
+	    if (END_OF_COMMAND)
+		int_error(c_token, "expecting dashlength multiplier");
+	    PDF_dashlength_factor = real(const_express(&a));
+	    if (PDF_dashlength_factor < 0.0)
+		PDF_dashlength_factor = 1.0;
+	    continue;
+	}
+
+	if (equals(c_token, "solid")) {
+	    c_token++;
+	    PDF_dashedlines = FALSE;
+	    continue;
+	}
+
+#ifdef HAVE_NODASH_LIBPDF
+	int_warn(NO_CARET,"gnuplot was linked against a version of pdflib with no dash or pattern support");
+#else
+	if (almost_equals(c_token, "dash$ed")) {
+	    c_token++;
+	    PDF_dashedlines = TRUE;
+	    continue;
+	}
+#endif
+
 	int_error(c_token, "unexpected text at end of command");
 
     }
 
     /* Save options back into options string in normalized format */
-    sprintf(term_options, "%s fname '%s'  fsize %g linewidth %3.1f %s ",
+    sprintf(term_options, "%s%s fname '%s'  fsize %g linewidth %3.1f %s ",
+	    PDF_monochrome ? "monochrome " : " ",
 	    term->put_text == ENHPDF_put_text ? "enhanced" : "noenhanced",
 	    PDF_fontNameDef, PDF_fontSizeDef, PDF_linewidth_factor,
 	    PDF_LineCap == 1 ? "rounded" : "");
+    if (PDF_dashedlines)
+	sprintf(&(term_options[strlen(term_options)]), "dashed dl %3.1f",
+		PDF_dashlength_factor);
 }
 
 
@@ -495,16 +551,56 @@ PDF_reset ()
 TERM_PUBLIC void
 PDF_linetype (int linetype)
 {
+    int dash = linetype % 8;
+
     linetype = PDF_Pen_RealID(linetype);
-    if (linetype != PDF_LineType) {
+    if (linetype == PDF_LineType)
+	return;
+	
+    PDF_PathClose ();
+    PDF_LineType = linetype;
+
+    if (!PDF_monochrome) {
 	struct rgb *this_color = web_color_rgbs + 1 + linetype;
-
-	PDF_PathClose ();
-	PDF_LineType = linetype;
-
 	PDF_setrgbcolor(myPDF, this_color->r / 255.0,
 			this_color->g / 255.0, this_color->b / 255.0);
     }
+
+#ifndef HAVE_NODASH_LIBPDF
+	if (PDF_dashedlines) {
+	    char dashtype[64];
+	    float dl = 8.0 * PDF_dashlength_factor;
+
+	    switch (dash) {
+	    default:
+	    case 0:	PDF_setdash(myPDF, 0.0, 0.0);
+			return;
+	    case 1:	sprintf(dashtype,"dasharray={%4.1f %4.1f}",
+			dl*dash1[0],dl*dash1[1]);
+			break;
+	    case 2:	sprintf(dashtype,"dasharray={%4.1f %4.1f}",
+			dl*dash2[0],dl*dash2[1]);
+			break;
+	    case 3:	sprintf(dashtype,"dasharray={%4.1f %4.1f}",
+			dl*dash3[0],dl*dash3[1]);
+			break;
+	    case 4:	sprintf(dashtype,"dasharray={%4.1f %4.1f %4.1f %4.1f}",
+			dl*dash4[0],dl*dash4[1],dl*dash4[2],dl*dash4[3]);
+			break;
+	    case 5:	sprintf(dashtype,"dasharray={%4.1f %4.1f %4.1f %4.1f}",
+			dl*dash5[0],dl*dash5[1],dl*dash5[2],dl*dash5[3]);
+			break;
+	    case 6:	sprintf(dashtype,"dasharray={%4.1f %4.1f %4.1f %4.1f}",
+			dl*dash6[0],dl*dash6[1],dl*dash6[2],dl*dash6[3]);
+			break;
+	    case 7:	sprintf(dashtype,"dasharray={%4.1f %4.1f %4.1f %4.1f %4.1f %4.1f}",
+			dl*dash7[0],dl*dash7[1],dl*dash7[2],dl*dash7[3],dl*dash7[4],dl*dash7[5]);
+			break;
+	    }
+	    PDF_setdashpattern(myPDF,dashtype);
+	}
+#endif
+	
 }
 
 
@@ -1512,8 +1608,15 @@ START_HELP(pdf)
 " (PDF), useable for printing or display with tools like Acrobat Reader",
 "",
 " Syntax:",
-"       set terminal pdf {fname \"<font>\"} {fsize <fontsize>}",
+"       set terminal pdf {monochrome|color|colour}",
+"                        {fname \"<font>\"} {fsize <fontsize>}",
 "                        {{no}enhanced} {linewidth <n>} {rounded|butt}",
+"                        {solid|dashed {dl <dashlength>}}",
+"",
+" The default is to use a different color for each line type. Selecting ",
+" `monochome` will use black for all linetypes, in which case you probably ",
+" want to select `dashed` to distinguish line types. Even in in mono mode ",
+" you can still use explicit colors for filled areas or linestyles.",
 "",
 " where <font> is the name of the default font to use (default Helvetica)",
 " and <fontsize> is the font size (in points, default 12).",
@@ -1524,7 +1627,9 @@ START_HELP(pdf)
 " (subscripts, superscripts and mixed fonts). See `enhanced`.",
 "",
 " The width of all lines in the plot can be increased by the factor <n>",
-" specified in `linewidth`.",
+" specified in `linewidth`. Similarly `dashlength` is a multiplier for the ",
+" default dash spacing.",
+"",
 " `rounded` sets line caps and line joins to be rounded; `butt` is the",
 " default, butt caps and mitered joins;"
 ""

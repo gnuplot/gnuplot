@@ -1,3 +1,15 @@
+2005-02-17  Ethan Merritt  <merritt@u.washington.edu>
+
+	* term/pdf.trm: Add terminal options for monochrome and for dashed
+	lines:
+	    set term pdf {mono|color|colour} {solid|dashed {dl dashlength}}
+
+	The defaults remain the same as before (color solid). The monochrome
+	option only affects linetypes; you can still use color explicitly
+	in filled areas or by using rgb specifications for line styles.
+
+	* configure.in: Check for dashed line support in pdflib.
+
 2005-02-16  Harald Harders  <h.harders@tu-bs.de>
 
 	* term/post.trm: Patch #1122014 "Improve dashed linetypes in Postscript
