@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.212 2004/04/13 17:23:31 broeker Exp $
+C RCS $Id: gnuplot.doc,v 1.213 2004/04/14 15:26:19 broeker Exp $
 C 18 September 2001
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -185,8 +185,8 @@ C
 
 2 What is New in Version 4.0
 ?new-features
- The previous official release of gnuplot was version 3.7, with subversions up to
- 3.7.3. Gnuplot version 4.0 contains many new features, which were gradually
+ The previous official release of gnuplot was version 3.7, with subversions up
+ to 3.7.3. Gnuplot version 4.0 contains many new features, which were gradually
  introduced into a series of development snapshots 3.8a through 3.8k. This
  section lists major additions and gives a partial list of changes and minor
  new features. Sample gnuplot scripts demonstrating many of these features are
@@ -194,10 +194,10 @@ C
 
 3 Mouse and hotkey support in interactive terminals
 
- Interaction with the current plot via mouse and hotkeys is supported for
- the X11, OS/2 Presentation Manager, ggi and windows terminals. See
- `mouse input` for more information on mousing. See help for `bind` for information
- on hotkeys. Also see the documentation for individual mousing terminals `ggi`,
+ Interaction with the current plot via mouse and hotkeys is supported for the
+ X11, OS/2 Presentation Manager, ggi and Windows terminals. See `mouse input`
+ for more information on mousing. See help for `bind` for information on
+ hotkeys. Also see the documentation for individual mousing terminals `ggi`,
  `pm`, `windows` and `x11`.
 
  Here are briefly some useful hotkeys.
@@ -219,7 +219,8 @@ C
 
  `aqua`: New terminal for Mac OS X. Requires AquaTerm 1.0 or later.
 
- `epslatex`: New terminal. Prepares eps figures for inclusion in LaTeX documents.
+ `epslatex`: New terminal. Prepares eps figures for inclusion in LaTeX
+ documents.
 
  `gif`: Support for this terminal has been dropped in favour of the `png`
  format for legal reasons; under usual configure conditions, old scripts that
