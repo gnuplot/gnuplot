@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.9 1999/06/14 19:19:45 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.10 1999/06/19 20:52:04 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -155,6 +155,12 @@ static int check_missing __PROTO((char *s));
 static char *df_gets __PROTO((void));
 static int df_tokenise __PROTO((char *s));
 static float **df_read_matrix __PROTO((int *rows, int *columns));
+static void plot_option_every __PROTO((void));
+static void plot_option_index __PROTO((void));
+static void plot_option_thru __PROTO((void));
+static void plot_option_using __PROTO((int));
+static TBOOLEAN valid_format __PROTO((const char *));
+
 /*}}} */
 
 /*{{{  variables */
@@ -520,7 +526,7 @@ int max_using;
 
     /* empty name means re-use last one */
     if (isstring(c_token) && token_len(c_token) == 2) {
-	if (!filename[0])
+	if (!filename || !*filename)
 	    int_error(c_token, "No previous filename");
     } else {
 	filename = gp_realloc(filename, token_len(c_token), "datafile name");
@@ -546,137 +552,31 @@ int max_using;
 
     /*{{{  deal with index */
     if (almost_equals(c_token, "i$ndex")) {
-	struct value a;
-
-	if (df_binary)
-	    int_error(c_token, "Binary file format does not allow more than one surface per file");
-
-	++c_token;
-	df_lower_index = (int) real(const_express(&a));
-	if (equals(c_token, ":")) {
-	    ++c_token;
-	    df_upper_index = (int) magnitude(const_express(&a));
-	    if (df_upper_index < df_lower_index)
-		int_error(c_token, "Upper index should be bigger than lower index");
-
-	    if (equals(c_token, ":")) {
-		++c_token;
-		df_index_step = (int) magnitude(const_express(&a));
-		if (df_index_step < 1)
-		    int_error(c_token, "Index step must be positive");
-	    }
-	} else
-	    df_upper_index = df_lower_index;
+	plot_option_index();
     }
     /*}}} */
 
     /*{{{  deal with every */
     if (almost_equals(c_token, "ev$ery")) {
-	struct value a;
-
-	fast_columns = 0;	/* corey@cac */
-	/* allow empty fields - every a:b:c::e
-	 * we have already established the defaults
-	 */
-
-	if (!equals(++c_token, ":")) {
-	    everypoint = (int) real(const_express(&a));
-	    if (everypoint < 1)
-		int_error(c_token, "Expected positive integer");
-	}
-	/* if it fails on first test, no more tests will succeed. If it
-	 * fails on second test, next test will succeed with correct c_token
-	 */
-	if (equals(c_token, ":") && !equals(++c_token, ":")) {
-	    everyline = (int) real(const_express(&a));
-	    if (everyline < 1)
-		int_error(c_token, "Expected positive integer");
-	}
-	if (equals(c_token, ":") && !equals(++c_token, ":")) {
-	    firstpoint = (int) real(const_express(&a));
-	    if (firstpoint < 0)
-		int_error(c_token, "Expected non-negative integer");
-	}
-	if (equals(c_token, ":") && !equals(++c_token, ":")) {
-	    firstline = (int) real(const_express(&a));
-	    if (firstline < 0)
-		int_error(c_token, "Expected non-negative integer");
-	}
-	if (equals(c_token, ":") && !equals(++c_token, ":")) {
-	    lastpoint = (int) real(const_express(&a));
-	    if (lastpoint < firstpoint)
-		int_error(c_token, "Last point must not be before first point");
-	}
-	if (equals(c_token, ":")) {
-	    ++c_token;
-	    lastline = (int) real(const_express(&a));
-	    if (lastline < firstline)
-		int_error(c_token, "Last line must not be before first line");
-	}
+	plot_option_every();
     }
     /*}}} */
 
     /*{{{  deal with thru */
     /* jev -- support for passing data from file thru user function */
 
+    if (ydata_func.at)
+	free(ydata_func.at);
+    ydata_func.at = NULL;
+    
     if (almost_equals(c_token, "thru$")) {
-	c_token++;
-	if (ydata_func.at)
-	    free(ydata_func.at);
-	strcpy(c_dummy_var[0], dummy_var[0]);
-	/* allow y also as a dummy variable.
-	 * during plot, c_dummy_var[0] and [1] are 'sacred'
-	 * ie may be set by  splot [u=1:2] [v=1:2], and these
-	 * names are stored only in c_dummy_var[]
-	 * so choose dummy var 2 - can anything vital be here ?
-	 */
-	dummy_func = &ydata_func;
-	strcpy(c_dummy_var[2], "y");
-	ydata_func.at = perm_at();
-	dummy_func = NULL;
-    } else {
-	if (ydata_func.at)
-	    free(ydata_func.at);
-	ydata_func.at = NULL;
+	plot_option_thru();
     }
     /*}}} */
 
     /*{{{  deal with using */
     if (almost_equals(c_token, "u$sing")) {
-	if (!END_OF_COMMAND && !isstring(++c_token)) {
-	    struct value a;
-
-	    do {		/* must be at least one */
-		if (df_no_use_specs >= max_using)
-		    int_error(c_token, "Too many columns in using specification");
-
-		if (equals(c_token, ":")) {
-		    /* empty specification - use default */
-		    use_spec[df_no_use_specs].column = df_no_use_specs;
-		    ++df_no_use_specs;
-		    /* do not increment c+token ; let while() find the : */
-		} else if (equals(c_token, "(")) {
-		    fast_columns = 0;	/* corey@cac */
-		    dummy_func = NULL;	/* no dummy variables active */
-		    use_spec[df_no_use_specs++].at = perm_at();		/* it will match ()'s */
-		} else {
-		    int col = (int) real(const_express(&a));
-		    if (col < -2)
-			int_error(c_token, "Column must be >= -2");
-		    use_spec[df_no_use_specs++].column = col;
-		}
-	    } while (equals(c_token, ":") && ++c_token);
-	}
-	if (!END_OF_COMMAND && isstring(c_token)) {
-	    if (df_binary)
-		int_error(NO_CARET, "Format string meaningless with binary data");
-
-	    quote_str(df_format, c_token, MAX_LINE_LEN);
-	    if (!valid_format(df_format))
-		int_error(c_token, "Please use a double conversion %lf");
-
-	    c_token++;		/* skip format */
-	}
+	plot_option_using(max_using);
     }
     /*}}} */
 
@@ -767,6 +667,140 @@ df_close()
 }
 
 /*}}} */
+
+
+static void
+plot_option_every()
+{
+    struct value a;
+
+    fast_columns = 0;	/* corey@cac */
+    /* allow empty fields - every a:b:c::e
+     * we have already established the defaults
+     */
+
+    if (!equals(++c_token, ":")) {
+	everypoint = (int) real(const_express(&a));
+	if (everypoint < 1)
+	    int_error(c_token, "Expected positive integer");
+    }
+    /* if it fails on first test, no more tests will succeed. If it
+     * fails on second test, next test will succeed with correct c_token
+     */
+    if (equals(c_token, ":") && !equals(++c_token, ":")) {
+	everyline = (int) real(const_express(&a));
+	if (everyline < 1)
+	    int_error(c_token, "Expected positive integer");
+    }
+    if (equals(c_token, ":") && !equals(++c_token, ":")) {
+	firstpoint = (int) real(const_express(&a));
+	if (firstpoint < 0)
+	    int_error(c_token, "Expected non-negative integer");
+    }
+    if (equals(c_token, ":") && !equals(++c_token, ":")) {
+	firstline = (int) real(const_express(&a));
+	if (firstline < 0)
+	    int_error(c_token, "Expected non-negative integer");
+    }
+    if (equals(c_token, ":") && !equals(++c_token, ":")) {
+	lastpoint = (int) real(const_express(&a));
+	if (lastpoint < firstpoint)
+	    int_error(c_token, "Last point must not be before first point");
+    }
+    if (equals(c_token, ":")) {
+	++c_token;
+	lastline = (int) real(const_express(&a));
+	if (lastline < firstline)
+	    int_error(c_token, "Last line must not be before first line");
+    }
+}
+
+
+static void
+plot_option_index()
+{
+    struct value a;
+
+    if (df_binary)
+	int_error(c_token, "Binary file format does not allow more than one surface per file");
+
+    ++c_token;
+    df_lower_index = (int) real(const_express(&a));
+    if (equals(c_token, ":")) {
+	++c_token;
+	df_upper_index = (int) magnitude(const_express(&a));
+	if (df_upper_index < df_lower_index)
+	    int_error(c_token, "Upper index should be bigger than lower index");
+
+	if (equals(c_token, ":")) {
+	    ++c_token;
+	    df_index_step = (int) magnitude(const_express(&a));
+	    if (df_index_step < 1)
+		int_error(c_token, "Index step must be positive");
+	}
+    } else
+	df_upper_index = df_lower_index;
+}
+
+
+static void
+plot_option_thru()
+{
+    c_token++;
+    strcpy(c_dummy_var[0], dummy_var[0]);
+    /* allow y also as a dummy variable.
+     * during plot, c_dummy_var[0] and [1] are 'sacred'
+     * ie may be set by  splot [u=1:2] [v=1:2], and these
+     * names are stored only in c_dummy_var[]
+     * so choose dummy var 2 - can anything vital be here ?
+     */
+    dummy_func = &ydata_func;
+    strcpy(c_dummy_var[2], "y");
+    ydata_func.at = perm_at();
+    dummy_func = NULL;
+}
+
+
+static void
+plot_option_using(max_using)
+int max_using;
+{
+    if (!END_OF_COMMAND && !isstring(++c_token)) {
+	struct value a;
+
+	do {		/* must be at least one */
+	    if (df_no_use_specs >= max_using)
+		int_error(c_token, "Too many columns in using specification");
+
+	    if (equals(c_token, ":")) {
+		/* empty specification - use default */
+		use_spec[df_no_use_specs].column = df_no_use_specs;
+		++df_no_use_specs;
+		/* do not increment c+token ; let while() find the : */
+	    } else if (equals(c_token, "(")) {
+		fast_columns = 0;	/* corey@cac */
+		dummy_func = NULL;	/* no dummy variables active */
+		use_spec[df_no_use_specs++].at = perm_at();		/* it will match ()'s */
+	    } else {
+		int col = (int) real(const_express(&a));
+		if (col < -2)
+		    int_error(c_token, "Column must be >= -2");
+		use_spec[df_no_use_specs++].column = col;
+	    }
+	} while (equals(c_token, ":") && ++c_token);
+    }
+    if (!END_OF_COMMAND && isstring(c_token)) {
+	if (df_binary)
+	    int_error(NO_CARET, "Format string meaningless with binary data");
+
+	quote_str(df_format, c_token, MAX_LINE_LEN);
+	if (!valid_format(df_format))
+	    int_error(c_token, "Please use a double conversion %lf");
+
+	c_token++;		/* skip format */
+    }
+}
+
 
 /*{{{  int df_readline(v, max) */
 /* do the hard work... read lines from file,
@@ -1067,21 +1101,22 @@ struct curve_points *this_plot;
  */
 
 /*
-   Here we keep putting new plots onto the end of the linked list
-
-   We assume the data's x,y values have x1<x2, x2<x3... and 
-   y1<y2, y2<y3... .
-   Actually, I think the assumption is less strong than that--it looks like
-   the direction just has to be the same.
-   This routine expects the following to be properly initialized:
-   is_log_x, is_log_y, and is_log_z 
-   base_log_x, base_log_y, and base_log_z 
-   log_base_log_x, log_base_log_y, and log_base_log_z 
-   xmin,ymin, and zmin
-   xmax,ymax, and zmax
-   autoscale_lx, autoscale_ly, and autoscale_lz
-
-   does the autoscaling into the array versions (min_array[], max_array[])
+ * Here we keep putting new plots onto the end of the linked list
+ *
+ * We assume the data's x,y values have x1<x2, x2<x3... and 
+ * y1<y2, y2<y3... .
+ * Actually, I think the assumption is less strong than that--it looks like
+ * the direction just has to be the same.
+ * This routine expects the following to be properly initialized:
+ * is_log_x, is_log_y, and is_log_z 
+ * base_log_x, base_log_y, and base_log_z 
+ * log_base_log_x, log_base_log_y, and log_base_log_z 
+ * xmin,ymin, and zmin
+ * xmax,ymax, and zmax
+ * autoscale_lx, autoscale_ly, and autoscale_lz
+ * [ all of these are now part of a struct axis_properties ]
+ *
+ * does the autoscaling into the array versions (min_array[], max_array[])
  */
 
 int
@@ -1180,7 +1215,7 @@ struct surface_points *this_plot;
 
 	    /*{{{  autoscaling/clipping */
 	    /*{{{  autoscale/range-check x */
-	    if (used[0] > 0 || !is_log_x) {
+	    if (used[0] > 0 || !x_props.is_log) {
 		if (used[0] < min_array[FIRST_X_AXIS]) {
 		    if (autoscale_lx & 1)
 			min_array[FIRST_X_AXIS] = used[0];
@@ -1197,7 +1232,7 @@ struct surface_points *this_plot;
 	    /*}}} */
 
 	    /*{{{  autoscale/range-check y */
-	    if (used[1] > 0 || !is_log_y) {
+	    if (used[1] > 0 || !y_props.is_log) {
 		if (used[1] < min_array[FIRST_Y_AXIS]) {
 		    if (autoscale_ly & 1)
 			min_array[FIRST_Y_AXIS] = used[1];
@@ -1214,7 +1249,7 @@ struct surface_points *this_plot;
 	    /*}}} */
 
 	    /*{{{  autoscale/range-check z */
-	    if (used[2] > 0 || !is_log_z) {
+	    if (used[2] > 0 || !z_props.is_log) {
 		if (used[2] < min_array[FIRST_Z_AXIS]) {
 		    if (autoscale_lz & 1)
 			min_array[FIRST_Z_AXIS] = used[2];
@@ -1232,7 +1267,7 @@ struct surface_points *this_plot;
 	    /*}}} */
 
 	    /*{{{  log x */
-	    if (is_log_x) {
+	    if (x_props.is_log) {
 		if (used[0] < 0.0) {
 		    point->type = UNDEFINED;
 		    goto skip;
@@ -1240,12 +1275,12 @@ struct surface_points *this_plot;
 		    point->type = OUTRANGE;
 		    used[0] = -VERYLARGE;
 		} else
-		    used[0] = log(used[0]) / log_base_log_x;
+		    used[0] = log(used[0]) / x_props.log_base_log;
 	    }
 	    /*}}} */
 
 	    /*{{{  log y */
-	    if (is_log_y) {
+	    if (y_props.is_log) {
 		if (used[1] < 0.0) {
 		    point->type = UNDEFINED;
 		    goto skip;
@@ -1253,12 +1288,12 @@ struct surface_points *this_plot;
 		    point->type = OUTRANGE;
 		    used[1] = -VERYLARGE;
 		} else
-		    used[1] = log(used[1]) / log_base_log_y;
+		    used[1] = log(used[1]) / y_props.log_base_log;
 	    }
 	    /*}}} */
 
 	    /*{{{  log z */
-	    if (is_log_z) {
+	    if (z_props.is_log) {
 		if (used[2] < 0.0) {
 		    point->type = UNDEFINED;
 		    goto skip;
@@ -1266,7 +1301,7 @@ struct surface_points *this_plot;
 		    point->type = OUTRANGE;
 		    used[2] = -VERYLARGE;
 		} else
-		    used[2] = log(used[2]) / log_base_log_z;
+		    used[2] = log(used[2]) / z_props.log_base_log;
 	    }
 	    /*}}} */
 
@@ -1429,3 +1464,32 @@ char *s;
     return (0);
 }
 /*}}} */
+
+/* formerly in misc.c, but only used here */
+/* check user defined format strings for valid double conversions */
+static TBOOLEAN
+valid_format(format)
+const char *format;
+{
+    for (;;) {
+	if (!(format = strchr(format, '%')))	/* look for format spec  */
+	    return TRUE;	/* passed Test           */
+	do {			/* scan format statement */
+	    format++;
+	} while (strchr("+-#0123456789.", *format));
+
+	switch (*format) {	/* Now at format modifier */
+	case '*':		/* Ignore '*' statements */
+	case '%':		/* Char   '%' itself     */
+	    format++;
+	    continue;
+	case 'l':		/* Now we found it !!! */
+	    if (!strchr("fFeEgG", format[1]))	/* looking for a valid format */
+		return FALSE;
+	    format++;
+	    break;
+	default:
+	    return FALSE;
+	}
+    }
+}
