@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.151 2002/12/13 20:47:35 mikulik Exp $
+C RCS $Id: gnuplot.doc,v 1.152 2002/12/13 21:02:47 mikulik Exp $
 C 18 September 2001
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001   Thomas Williams, Colin Kelley et al.
 C
@@ -30,7 +30,7 @@ C
 ^<li>  James R. Van Zandt
 ^<li>  Johannes Zellner
 ^</h3></ul> <p>
-^<h2>  Copyright (C) 1986 - 1993, 1998   Thomas Williams, Colin Kelley<p>
+^<h2>  Copyright (C) 1986 - 1993, 1998 - 2002   Thomas Williams, Colin Kelley<p>
 ^   Mailing list for comments: info-gnuplot@dartmouth.edu <p>
 ^   Mailing list for bug reports: bug-gnuplot@dartmouth.edu<p>
 ^</h2><p>
