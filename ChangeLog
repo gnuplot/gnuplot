@@ -1,4 +1,14 @@
+2004-05-21  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/util.c (mant_exp): Extend technique for rounding exponents
+	depending on the printf format precison of the mantissa to format
+	specifiers %l and %L used for log bases other than 10.  Fixes SF
+	bug #851685.
+
 2004-05-20  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* term/debug.trm (DEBUG_arrow): Fix type of 'head' argument
+	overlooked in earlier global change.
 
 	* src/plot2d.c (get_data): Fix mininum number of columnts for
 	boxerrorbars style.  Fixed handling of 4-column boxerrorbars in

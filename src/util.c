@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util.c,v 1.37 2002/10/11 16:26:49 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: util.c,v 1.38 2004/04/13 17:24:02 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - util.c */
@@ -395,16 +395,18 @@ mant_exp(log10_base, x, scientific, m, p, format)
 
     l10 = log10(x) / log10_base;
     power = floor(l10);
-    mantissa = pow(10.0, (l10 - power) * log10_base);
+    mantissa = pow(10.0, log10_base * (l10 - power));
 
     /* round power to an integer multiple of 3, to get what's
      * sometimes called 'scientific' or 'engineering' notation. Also
      * useful for handling metric unit prefixes like 'kilo' or 'micro'
      * */
-    /* HBB 20010121: avoid recalculation of mantissa via pow() */
     if (scientific) {
-	int temp_power  = 3 * floor(power / 3.0);
-	switch (power - temp_power) {
+	/* Scientific mode makes no sense whatsoever if the base of
+	 * the logarithmic axis is anything but 10.0 */
+	assert(log10_base == 1.0);
+
+	switch (power % 3) {
 	case 2:
 	    mantissa *= 100; break;
 	case 1:
@@ -414,19 +416,21 @@ mant_exp(log10_base, x, scientific, m, p, format)
 	default:
 	    int_error (NO_CARET, "Internal error in scientific number formatting");
 	}
-	power = temp_power;
+	power /= 3;
     }
 
     /* HBB 20010121: new code for decimal mantissa fixups.  Looks at
      * format string to see how many decimals will be put there.  Iff
-     * the number is so close to an exact power of ten that it will be
+     * the number is so close to an exact power of 10 that it will be
      * rounded up to 10.0e??? by an sprintf() with that many digits of
      * precision, increase the power by 1 to get a mantissa in the
      * region of 1.0.  If this handling is not wanted, pass NULL as
      * the format string */
+    /* HBB 20040521: extended to also work for bases other than 10.0 */
     if (format) {
-	double upper_border = scientific ? 1000 : 10;
+	double actual_base = (scientific ? 1000 : pow(10.0, log10_base));
 	int precision = 0;
+	double tolerance;
 
 	format = strchr (format, '.');
 	if (format != NULL)
@@ -434,16 +438,17 @@ mant_exp(log10_base, x, scientific, m, p, format)
 	     * precision. */
 	    precision = strtol(format + 1, NULL, 10);
 	
-	/* See if mantissa would be right on the border.  All numbers
-	 * greater than that will be rounded up to 10, by sprintf(), which
-	 * we want to avoid. */
-	if (mantissa > (upper_border - pow(10.0, -precision) / 2)
-	    ) {
-	    mantissa /= upper_border;
+	/* See if mantissa would be right on the border.  The
+	 * condition to watch out for is that the mantissa is within
+	 * one printing precision of the next power of the logarithm
+	 * base.  So add the 0.5*10^-precision to the mantissa, and
+	 * see if it's now larger than the base of the scale */
+	tolerance = pow(10.0, -precision) / 2;
+	if (mantissa + tolerance >= actual_base) {
+	    mantissa /= actual_base;
 	    power += (scientific ? 3 : 1);
 	}
     }
-
     if (m)
 	*m = sign * mantissa;
     if (p)
