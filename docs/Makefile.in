@@ -51,6 +51,9 @@ LINK = $(CC) $(CFLAGS) $(LDFLAGS) -o $@
 # The makeinfo command from GNU texinfo
 MAKEINFO = makeinfo
 
+# Required for the temporary .info file fix
+EMACS = emacs
+
 # substitute your troff command (and any flags) for this one
 TROFF=troff
 
@@ -179,6 +182,7 @@ info: gnuplot.info
 
 gnuplot.info: doc2info $(srcdir)/gnuplot.doc
 	./doc2info $(srcdir)/gnuplot.doc gnuplot.info
+	$(EMACS) --batch -l $(srcdir)/fixinfo.el
 
 doc2info: doc2info.o termdoc.o xref.o
 	$(LINK) doc2info.o termdoc.o xref.o $(LIBS)
