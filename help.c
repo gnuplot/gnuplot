@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: help.c,v 1.8.2.1 1999/10/11 17:11:16 lhecking Exp $";
+static char *RCSid = "$Id: help.c,v 1.8.2.2 1999/10/11 21:24:20 lhecking Exp $";
 #endif
 
 /* GNUPLOT - help.c */
@@ -35,8 +35,6 @@ static char *RCSid = "$Id: help.c,v 1.8.2.1 1999/10/11 17:11:16 lhecking Exp $";
 ]*/
 
 #include "plot.h"
-
-#define	SAME	0		/* for strcmp() */
 
 #include "help.h"		/* values passed back */
 
@@ -187,7 +185,7 @@ TBOOLEAN *subtopics;		/* (in) - subtopics only? */
      ** Calling routine may access errno to determine cause of H_ERROR.
      */
     errno = 0;
-    if (strncmp(oldpath, path, PATHSIZE) != SAME)
+    if (strncmp(oldpath, path, PATHSIZE) != 0)
 	FreeHelp();
     if (keys == NULL) {
 	status = LoadHelp(path);
@@ -290,15 +288,10 @@ char *text;
 {
     LINEBUF *new;
 
-    new = (LINEBUF *) malloc(sizeof(LINEBUF));
-    if (new == NULL)
-	int_error("not enough memory to store help file", -1);
-    if (text != NULL) {
-	new->line = (char *) malloc((unsigned int) (strlen(text) + 1));
-	if (new->line == NULL)
-	    int_error("not enough memory to store help file", -1);
-	(void) strcpy(new->line, text);
-    } else
+    new = (LINEBUF *) gp_alloc(sizeof(LINEBUF), "new line buffer");
+    if (text)
+	new->line = gp_strdup(text);
+    else
 	new->line = NULL;
 
     new->next = NULL;
@@ -315,13 +308,9 @@ char *key;
 
     key[strlen(key) - 1] = NUL;	/* cut off \n  */
 
-    new = (LINKEY *) malloc(sizeof(LINKEY));
-    if (new == NULL)
-	int_error("not enough memory to store help file", -1);
-    new->key = (char *) malloc((unsigned int) (strlen(key) + 1));
-    if (new->key == NULL)
-	int_error("not enough memory to store help file", -1);
-    (void) strcpy(new->key, key);
+    new = (LINKEY *) gp_alloc(sizeof(LINKEY), "new key list");
+    if (key)
+	new->key = gp_strdup(key);
 
     /* add to front of list */
     new->next = keylist;
@@ -341,9 +330,7 @@ static void sortkeys()
     int i;			/* index into key array */
 
     /* allocate the array */
-    keys = (KEY *) malloc((unsigned int) ((keycount + 1) * sizeof(KEY)));
-    if (keys == NULL)
-	int_error("not enough memory to store help file", -1);
+    keys = (KEY *) gp_alloc((keycount + 1) * sizeof(KEY), "key array");
 
     /* copy info from list to array, freeing list */
     for (p = keylist, i = 0; p != NULL; p = n, i++) {
@@ -366,9 +353,18 @@ static void sortkeys()
     qsort((char *) keys, keycount, sizeof(KEY), (sortfunc) keycomp);
 }
 
-static int keycomp(a, b)
-KEY *a, *b;
+/* HBB 20010720: changed to make this match the prototype qsort()
+ * really expects. Casting function pointers, as we did before, is
+ * illegal! */
+/* HBB 20010720: removed 'static' to avoid HP-sUX gcc bug */
+int
+keycomp(arg1, arg2)
+    SORTFUNC_ARGS arg1;
+    SORTFUNC_ARGS arg2;
 {
+    const KEY *a = arg1;
+    const KEY *b = arg2;
+
     return (strcmp(a->key, b->key));
 }
 
@@ -515,6 +511,7 @@ TBOOLEAN *subtopics;		/* (in) - subtopics only? */
 /* ShowSubtopics:
  *  Print a list of subtopic names
  */
+/* The maximum number of subtopics per line */
 #define PER_LINE 4
 
 static void ShowSubtopics(key, subtopics)
