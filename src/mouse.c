@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.38 2003/06/20 04:54:36 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.39 2003/06/25 18:01:25 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -1392,7 +1392,7 @@ event_buttonpress(struct gp_event_t *ge)
 	     * as zoom box. */
 	    int dist_x = setting_zoom_x - mouse_x;
 	    int dist_y = setting_zoom_y - mouse_y;
-	    int dist = sqrt(dist_x * dist_x + dist_y * dist_y);
+	    int dist = sqrt((double)(dist_x * dist_x + dist_y * dist_y));
 
 	    if (1 == b || 2 == b) {
 		/* zoom region is finished by the `wrong' button.

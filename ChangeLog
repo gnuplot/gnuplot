@@ -1,3 +1,8 @@
+2003-07-02  Ethan Merritt <merritt@u.washington.edu>
+
+	* src/mouse.c: DU4.0 cc compiler does not automatically promote
+	argument of sqrt to (double), so change it to double explicitly.
+
 2003-07-02  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/pm3d.c (pm3d_reset): Forgotten change of the default value from
