@@ -1,3 +1,8 @@
+2004-12-07  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* demo/pm3d.dem: Turn on colorbox in the demo of corners2color, and
+	position it at the bottom of the page.
+
 2004-12-05  Ethan Merritt  <merritt@u.washington.edu>
 
 	Run valgrind to find memory leaks.
