@@ -8,6 +8,10 @@
 
 	* src/makefile.all docs/Makefile.in: And remove them as make targets.
 
+	* src/command.h src/command.c (load_command): Remove macro that was
+	used in only one place; clean up code order as prep for applying
+	string variable patches.
+
 2004-08-01  Ethan Merritt  <merritt@u.washington.edu>
             Harald Harders  <h.harders@tu-bs.de>
 

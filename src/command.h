@@ -1,5 +1,5 @@
 /*
- * $Id: command.h,v 1.30 2004/07/01 17:10:04 broeker Exp $
+ * $Id: command.h,v 1.31 2004/07/27 09:08:49 broeker Exp $
  */
 
 /* GNUPLOT - command.h */
@@ -111,16 +111,6 @@ extern int num_tokens, c_token;
 #endif
 
 extern size_t input_line_len;
-
-/* used by load_command() and save_command() */
-
-/* Capture filename from unput_line and
- * fopen in `mode' ("r", "w" etc.)
- */
-#define CAPTURE_FILENAME_AND_FOPEN(mode) \
-  m_quote_capture(&save_file,c_token,c_token); \
-  gp_expand_tilde(&save_file); \
-  fp = strcmp(save_file, "-") ? loadpath_fopen(save_file, (mode)) : stdout;
 
 #ifdef USE_MOUSE
 void bind_command __PROTO((void));

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.98 2004/07/24 23:51:18 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.99 2004/07/27 09:08:49 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -859,22 +859,19 @@ void
 load_command()
 {
     FILE *fp;
-    char *save_file = NULL;
 
-    if (!isstring(++c_token))
-	int_error(c_token, "expecting filename");
-    else {
-	/* load_file(fp=fopen(save_file, "r"), save_file, FALSE); OLD
-	 * DBT 10/6/98 handle stdin as special case
-	 * passes it on to load_file() so that it gets
-	 * pushed on the stack and recursion will work, etc
-	 */
-	CAPTURE_FILENAME_AND_FOPEN("r");
+    if (isstring(++c_token)) {
+	char *save_file = NULL;
+	m_quote_capture(&save_file,c_token,c_token);
+	gp_expand_tilde(&save_file);
+	fp = strcmp(save_file, "-") ? loadpath_fopen(save_file, "r") : stdout;
+
 	load_file(fp, save_file, FALSE);
 	/* input_line[] and token[] now destroyed! */
 	c_token = num_tokens = 0;
 	free(save_file);
-    }
+    } else
+	int_error(c_token, "expecting filename");
 }
 
 
