@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: ggi.trm,v 1.19 2004/07/01 17:10:14 broeker Exp $
+ * $Id: ggi.trm,v 1.20 2004/12/21 19:59:24 sfeam Exp $
  */
 
 /* GNUPLOT - ggi.trm */
@@ -146,7 +146,7 @@ TERM_PUBLIC void GGI_set_clipboard __PROTO((const char[]));
 #ifdef PM3D
 TERM_PUBLIC int GGI_make_palette __PROTO((t_sm_palette*));
 TERM_PUBLIC void GGI_previous_palette __PROTO((void));
-TERM_PUBLIC void GGI_set_color __PROTO((double));
+TERM_PUBLIC void GGI_set_color __PROTO((struct t_colorspec *colorspec));
 #ifdef ENABLE_XMI
 TERM_PUBLIC void GGI_filled_polygon __PROTO((int, gpiPoint*));
 #endif
@@ -1430,8 +1430,12 @@ GGI_previous_palette()
 }
 
 TERM_PUBLIC void
-GGI_set_color(double gray)
+GGI_set_color(struct t_colorspec *colorspec)
 {
+    double gray = colorspec->value;
+    if (colorspec->type != TC_FRAC)
+	return;
+
     if (GGIvisual) {
 	int idx = (gray <= 0) ? 0 : (int)(gray * ggi_pm3d_colors);
 	if (idx >= ggi_pm3d_colors)
