@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot.c,v 1.84 2006/06/29 19:36:43 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot.c,v 1.85 2006/07/21 05:19:51 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot.c */
@@ -285,6 +285,9 @@ main(int argc, char **argv)
 #endif
 {
     int i;
+#ifdef WXWIDGETS
+    TBOOLEAN persist = FALSE;
+#endif /* WXWIDGETS */
 
 #ifdef LINUXVGA
     LINUX_setup();		/* setup VGA before dropping privilege DBT 4/5/99 */
@@ -380,6 +383,21 @@ main(int argc, char **argv)
 	    return 0;
 	}
     }
+
+#ifdef WXWIDGETS
+    /* the X11 terminal removes tokens that it recognizes from argv.
+     * We have to parse -persist for the wxWidgets terminal before it happens, and
+     * keep that value for later use */
+    for (i=0; i<argc; ++i) {
+	if (!argv[i])
+	    continue;
+	if (!strcmp(argv[i], "-persist")) {
+	    FPRINTF((stderr,"'persist' command line option recognized"));
+	    persist = TRUE;
+	    break;
+	}
+    }
+#endif /* WXWIDGETS */
 
 #ifdef X11
     {
@@ -642,7 +660,7 @@ main(int argc, char **argv)
 
 #ifdef WXWIDGETS
     /* handle persist setting */
-    wxt_atexit(argc,argv);
+    wxt_atexit(persist);
 #endif
 
 #if defined(HAVE_LIBREADLINE) && defined(GNUPLOT_HISTORY)

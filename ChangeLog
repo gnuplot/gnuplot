@@ -1,3 +1,14 @@
+2206-07-27  Timothee Lecomte  <timothee.lecomte@ens.fr>
+
+	* src/plot.c (main):
+	* src/wxt_gui.c (wxt_atexit):
+	* src/wxt_plot.h:
+	Move the code parsing **argv for "-persist" from wxt_atexit() to
+	main(). X11_args() parses it too in main() and removes the tokens that
+	it recognizes from **argv, so we need to do it before that happens.
+	Also avoid processing of the mouse events when the wxt terminal is not
+	the current active one at exit time.
+
 2006-07-27  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* docs/gnuplot-ja.doc docs/term-ja.diff:

@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.cpp,v 1.19 2006/07/07 00:33:18 tlecomte Exp $
+ * $Id: wxt_gui.cpp,v 1.20 2006/07/19 06:07:43 tlecomte Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -2850,7 +2850,7 @@ bool wxt_window_opened()
  * Handle the 'persist' setting, ie will continue
  * to handle events and will return when
  * all the plot windows are closed. */
-void wxt_atexit(int argc, char **argv)
+void wxt_atexit(TBOOLEAN persist)
 {
 	int i;
 	int persist_setting;
@@ -2862,17 +2862,8 @@ void wxt_atexit(int argc, char **argv)
 		return;
 
 	/* first look for command_line setting */
-	if (wxt_persist==UNSET) {
-		for (i=0; i<argc; ++i) {
-			if (!argv[i])
-				continue;
-			if (!strcmp(argv[i], "-persist")) {
-				FPRINTF((stderr,"'persist' command line option recognized"));
-				wxt_persist = yes;
-				break;
-			}
-		}
-	}
+	if (wxt_persist==UNSET && persist)
+		wxt_persist = TRUE;
 
 	wxConfigBase *pConfig = wxConfigBase::Get();
 
@@ -2902,7 +2893,8 @@ void wxt_atexit(int argc, char **argv)
 
 	while (wxt_window_opened()) {
 #ifdef USE_MOUSE
-		wxt_process_events();
+		if (!strcmp(term->name,"wxt"))
+			wxt_process_events();
 #endif /*USE_MOUSE*/
 #ifdef _Windows
 		/* continue to process gui messages */
