@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.11 1999/06/11 11:18:58 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.12 1999/06/11 18:54:37 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -42,7 +42,6 @@ static char *RCSid() { return RCSid("$Id: show.c,v 1.11 1999/06/11 11:18:58 lhec
 
 
 #include "plot.h"
-#include "command.h"
 #include "setshow.h"
 
 #define DEF_FORMAT   "%g"	/* default format for tic mark labels */
@@ -125,7 +124,6 @@ static void show_position __PROTO((struct position * pos));
 static TBOOLEAN show_one __PROTO((void));
 static TBOOLEAN show_two __PROTO((void));
 static void show_timefmt __PROTO((void));
-static void show_locale __PROTO((void));
 static void show_missing __PROTO((void));
 static void show_datatype __PROTO((char *name, int axis));
 
@@ -926,11 +924,6 @@ show_timefmt()
 	    conv_text(str, timefmt));
 }
 
-static void
-show_locale()
-{
-    fprintf(stderr, "\tlocale is \"%s\"\n", cur_locale);
-}
 
 static void
 show_xzeroaxis()

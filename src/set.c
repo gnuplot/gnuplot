@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.13 1999/06/11 11:18:57 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.14 1999/06/11 18:53:16 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -41,7 +41,6 @@ static char *RCSid() { return RCSid("$Id: set.c,v 1.13 1999/06/11 11:18:57 lheck
  */
 
 #include "plot.h"
-#include "command.h"
 #include "stdfn.h"
 #include "setshow.h"
 #include "national.h"
@@ -289,7 +288,17 @@ int key_hpos = TRIGHT;		/* place for curve-labels, corner or outside */
 int key_vpos = TTOP;		/* place for curve-labels, corner or below */
 int key_just = JRIGHT;		/* alignment of key labels, left or right */
 
-char cur_locale[MAX_ID_LEN+1] = "C";
+#ifndef TIMEFMT
+#define TIMEFMT "%d/%m/%y\n%H:%M"
+#endif
+/* format for date/time for reading time in datafile */
+char timefmt[25] = TIMEFMT;
+
+/* array of datatypes (x in 0,y in 1,z in 2,..(rtuv)) */
+/* not sure how rtuv come into it ?
+ * oh well, make first six compatible with FIRST_X_AXIS, etc
+ */
+int datatype[DATATYPE_ARRAY_SIZE];
 
 /* not set or shown directly, but controlled by 'set locale'
  * defined in national.h
@@ -334,7 +343,6 @@ static TBOOLEAN set_three __PROTO((void));
 static int looks_like_numeric __PROTO((char *));
 static void set_lp_properties __PROTO((struct lp_style_type * arg, int allow_points, int lt, int pt, double lw, double ps));
 static void reset_lp_properties __PROTO((struct lp_style_type *arg));
-static void set_locale __PROTO((char *));
 
 static int set_tic_prop __PROTO((int *TICS, int *MTICS, double *FREQ,
      struct ticdef * tdef, int AXIS, TBOOLEAN * ROTATE, char *tic_side));
@@ -571,7 +579,7 @@ reset_command()
     pointsize = 1.0;
     encoding = ENCODING_DEFAULT;
 
-    set_locale("C");		/* default */
+    init_locale();
     clear_loadpath();
 
 }
@@ -1240,7 +1248,7 @@ set_two()
     } else if (almost_equals(c_token,"loc$ale")) {
 	c_token++;
 	if (END_OF_COMMAND) {
-	    set_locale("C");
+	    init_locale();
 	} else if (isstring(c_token)) {
 	    char *ss = gp_alloc (token_len(c_token), "tmp locale");
 	    quote_str(ss,c_token,token_len(c_token));
@@ -3249,37 +3257,5 @@ struct lp_style_type *arg;
     /* See plot.h for struct lp_style_type */
     arg->pointflag = arg->l_type = arg->p_type = 0;
     arg->l_width = arg->p_size = 1.0;
-}
-
-static void
-set_locale(lcl)
-char *lcl;
-{
-#ifndef NO_LOCALE_H
-    int i;
-    struct tm tm;
-
-    if (setlocale(LC_TIME, lcl))
-	safe_strncpy(cur_locale, lcl, sizeof(cur_locale));
-    else
-	int_error(c_token, "Locale not available");
-
-    /* we can do a *lot* better than this ; eg use system functions
-     * where available; create values on first use, etc
-     */
-    memset(&tm, 0, sizeof(struct tm));
-    for (i = 0; i < 7; ++i) {
-	tm.tm_wday = i;		/* hope this enough */
-	strftime(full_day_names[i], sizeof(full_day_names[i]), "%A", &tm);
-	strftime(abbrev_day_names[i], sizeof(abbrev_day_names[i]), "%a", &tm);
-    }
-    for (i = 0; i < 12; ++i) {
-	tm.tm_mon = i;		/* hope this enough */
-	strftime(full_month_names[i], sizeof(full_month_names[i]), "%B", &tm);
-	strftime(abbrev_month_names[i], sizeof(abbrev_month_names[i]), "%b", &tm);
-    }
-#else
-    safe_strncpy(cur_locale, lcl, sizeof(cur_locale));
-#endif /* NO_LOCALE_H */
 }
 
