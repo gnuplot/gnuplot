@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.19 1999/07/30 19:36:35 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.20 1999/08/07 17:21:32 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -43,6 +43,7 @@ static char *RCSid() { return RCSid("$Id: show.c,v 1.19 1999/07/30 19:36:35 lhec
 
 #include "plot.h"
 #include "setshow.h"
+#include "tables.h"
 
 /* for show_version_long() */
 #ifdef HAVE_SYS_UTSNAME_H
@@ -51,109 +52,6 @@ static char *RCSid() { return RCSid("$Id: show.c,v 1.19 1999/07/30 19:36:35 lhec
 
 #define DEF_FORMAT   "%g"	/* default format for tic mark labels */
 #define SIGNIF (0.01)		/* less than one hundredth of a tic mark */
-
-static struct setshow_entry {
-    const char *setshow_name;
-    enum setshow_id id;
-} show_tbl[] =
-{
-    { "a$ll", S_ALL },
-    { "ac$tion_table", S_ACTIONTABLE },
-    { "at", S_ACTIONTABLE },
-    { "an$gles", S_ANGLES },
-    { "ar$row", S_ARROW },
-    { "au$toscale", S_AUTOSCALE },
-    { "b$ars", S_BARS },
-    { "bor$der", S_BORDER },
-    { "box$width", S_BOXWIDTH },
-    { "c$lip", S_CLIP },
-    { "cl$abel", S_CLABEL },
-    { "cn$trparam", S_CNTRPARAM },
-    { "co$ntour", S_CONTOUR },
-    { "da$ta", S_DATA },
-    { "dg$rid3d", S_DGRID3D },
-    { "du$mmy", S_DUMMY },
-    { "enc$oding", S_ENCODING },
-    { "fo$rmat", S_FORMAT },
-    { "fu$nctions", S_FUNCTIONS },
-    { "g$rid", S_GRID },
-    { "hi$dden3d", S_HIDDEN3D },
-    { "is$osamples", S_ISOSAMPLES },
-    { "k$ey", S_KEY },
-    { "keyt$itle", S_KEYTITLE },
-    { "la$bel", S_LABEL },
-    { "li$nestyle", S_LINESTYLE },
-    { "ls", S_LINESTYLE },
-    { "loa$dpath", S_LOADPATH },
-    { "loc$ale", S_LOCALE },
-    { "log$scale", S_LOGSCALE },
-    { "map$ping", S_MAPPING },
-    { "mar$gin", S_MARGIN },
-    { "mis$sing", S_MISSING },
-    { "mx2t$ics", S_MX2TICS },
-    { "mxt$ics", S_MXTICS },
-    { "my2t$ics", S_MY2TICS },
-    { "myt$ics", S_MYTICS },
-    { "mzt$ics", S_MZTICS },
-    { "o$utput", S_OUTPUT },
-    { "of$fsets", S_OFFSETS },
-    { "or$igin", S_ORIGIN },
-    { "p$lot", S_PLOT },
-    { "pa$rametric", S_PARAMETRIC },
-    { "poi$ntsize", S_POINTSIZE },
-    { "pol$ar", S_POLAR },
-    { "rr$ange", S_RRANGE },
-    { "sa$mples", S_SAMPLES },
-    { "si$ze", S_SIZE },
-    { "su$rface", S_SURFACE },
-    { "t$erminal", S_TERMINAL },
-    { "ti$cs", S_TICS },
-    { "tim$estamp", S_TIMESTAMP },
-    { "timef$mt", S_TIMEFMT },
-    { "tit$le", S_TITLE },
-    { "tr$ange", S_TRANGE },
-    { "ur$ange", S_URANGE },
-    { "v$ariables", S_VARIABLES },
-    { "ve$rsion", S_VERSION },
-    { "vi$ew", S_VIEW },
-    { "vr$ange", S_VRANGE },
-    { "xda$ta", S_XDATA },
-    { "yda$ta", S_YDATA },
-    { "zda$ta", S_ZDATA },
-    { "x2da$ta", S_X2DATA },
-    { "y2da$ta", S_Y2DATA },
-    { "xti$cs", S_XTICS },
-    { "yti$cs", S_YTICS },
-    { "zti$cs", S_ZTICS },
-    { "xdti$cs", S_XDTICS },
-    { "ydti$cs", S_YDTICS },
-    { "zdti$cs", S_ZDTICS },
-    { "xmti$cs", S_XMTICS },
-    { "ymti$cs", S_YMTICS },
-    { "zmti$cs", S_ZMTICS },
-    { "x2ti$cs", S_X2TICS },
-    { "y2ti$cs", S_Y2TICS },
-    { "x2dti$cs", S_X2DTICS },
-    { "y2dti$cs", S_Y2DTICS },
-    { "x2mti$cs", S_X2MTICS },
-    { "y2mti$cs", S_Y2MTICS },
-    { "xl$abel", S_XLABEL },
-    { "yl$abel", S_YLABEL },
-    { "zl$abel", S_ZLABEL },
-    { "x2l$abel", S_X2LABEL },
-    { "y2l$abel", S_Y2LABEL },
-    { "xr$ange", S_XRANGE },
-    { "yr$ange", S_YRANGE },
-    { "zr$ange", S_ZRANGE },
-    { "x2r$ange", S_X2RANGE },
-    { "y2r$ange", S_Y2RANGE },
-    { "xzeroa$xis", S_XZEROAXIS },
-    { "yzeroa$xis", S_YZEROAXIS },
-    { "zeroa$xis", S_ZEROAXIS },
-    { "z$ero", S_ZERO }
-};
-
-#define NSHOWS (sizeof(show_tbl) / sizeof(show_tbl[0]))
 
 /******** Local functions ********/
 
@@ -197,8 +95,6 @@ static void show_missing __PROTO((void));
 static void show_functions __PROTO((void));
 static void show_at __PROTO((void));
 static void disp_at __PROTO((struct at_type *, int));
-
-static enum setshow_id lookup_show __PROTO((int));
 
 /* Some defines for consistency */
 #define show_datatype(name,a) \
@@ -275,7 +171,7 @@ show_command()
 
     c_token++;
 
-    switch(lookup_show(c_token)) {
+    switch(lookup_table(&set_tbl[0],c_token)) {
     case S_INVALID:
 	int_error(c_token, showmess);
     case S_ACTIONTABLE:
@@ -1286,10 +1182,8 @@ int rotate_tics;
  */
 	    fputs("  list (", stderr);
 	    for (t = tdef->def.user; t != NULL; t = t->next) {
-		if (t->label) {
-		    char str[MAX_LINE_LEN+1];
+		if (t->label)
 		    fprintf(stderr, "\"%s\" ", conv_text(t->label));
-		}
 		SHOW_NUM_OR_TIME(t->position, axis);
 		if (t->next)
 		    fputs(", ", stderr);
@@ -1882,20 +1776,4 @@ show_missing()
 	fputs("\tNo string is interpreted as missing data\n", stderr);
     else
 	fprintf(stderr, "\t\"%s\" is interpreted as missing value\n", missing_val);
-}
-
-
-static enum setshow_id
-lookup_show(token)
-int token;
-{
-    int i = 0;
-
-    while (i < NSHOWS) {
-	if (almost_equals(token, show_tbl[i].setshow_name))
-	    return show_tbl[i].id;
-	i++;
-    }
-
-    return S_INVALID;
 }
