@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.126 2005/02/13 18:29:50 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.127 2005/02/22 01:14:49 sfeam Exp $"); }
 #endif
 
 #define X11_POLYLINE 1
@@ -2097,9 +2097,9 @@ exec_cmd(plot_struct *plot, char *command)
 	    switch (style & 0xf) {
 	    case FS_SOLID:
 		/* filldensity is from 0..100 percent */
-		dim = (double)(fillpar)/100.;
-		if (dim >= 100)
+		if (fillpar >= 100)
 		    break;
+		dim = (double)(fillpar)/100.;
 		/* retrieve current rgb color and shift it towards the background color */
 		xcolor.red = (double)(0xffff) * (double)((plot->current_rgb >> 16) & 0xff) /255.;
 		xcolor.green = (double)(0xffff) * (double)((plot->current_rgb >> 8) & 0xff) /255.;
@@ -2571,9 +2571,9 @@ exec_cmd(plot_struct *plot, char *command)
 		switch (style & 0xf) {
 		case FS_SOLID:
 		    /* filldensity is from 0..100 percent */
-		    dim = (double)(fillpar)/100.;
-		    if (dim >= 100)
+		    if (fillpar >= 100)
 			break;
+		    dim = (double)(fillpar)/100.;
 		    /* use halftone fill pattern according to filldensity */
 		    xcolor.red = (double)(0xffff) * (double)((plot->current_rgb >> 16) & 0xff) /255.;
 		    xcolor.green = (double)(0xffff) * (double)((plot->current_rgb >> 8) & 0xff) /255.;

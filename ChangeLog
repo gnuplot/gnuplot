@@ -1,3 +1,7 @@
+2005-02-22  Ethan Merritt  <merritt@u.washington.edu>
+
+	* term/x11.trm: Fix botched optimization in previous patch.
+
 2005-02-21  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/x11.trm: Implement solid fill rectangles and polygons as a
