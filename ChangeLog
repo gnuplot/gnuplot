@@ -1,3 +1,13 @@
+2004-09-07  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/gplt_x11.c (process_event) term/x11.trm: Provide a command line
+	option (-ctrlq) and an X resource (gnuplor*ctrlq: true) that disable
+	trapping the 'q' and '<space>' keystrokes in the plot window, instead
+	trap <ctrl>q and <ctrl><space>.  This option allows the 'q' and 
+	'<space>' keystrokes to be treated like all other keystrokes during 
+	"pause mouse key" and other mousing operations.
+
+
 2004-09-06  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* configure.in (AC_PREREQ): Bumped to 2.58, to avoid problems with
@@ -29,6 +39,7 @@
 	* demo/image.dem: Added endian=little where necessary.
 
 2004-09-02  Ethan Merritt  <merritt@u.washington.edu>
+
 	* demo/all.dem: Include demos for candlesticks, multiplot, and
 	enhanced text mode in the all.dem script used by "make check".
 

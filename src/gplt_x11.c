@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.110 2004/08/12 04:09:31 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.111 2004/09/01 15:53:47 mikulik Exp $"); }
 #endif
 
 #define X11_POLYLINE 1
@@ -446,6 +446,7 @@ static void ProcessEvents __PROTO((Window));
 static void pr_raise __PROTO((void));
 static void pr_persist __PROTO((void));
 static void pr_feedback __PROTO((void));
+static void pr_ctrlq __PROTO((void));
 
 #ifdef EXPORT_SELECTION
 static void export_graph __PROTO((plot_struct *));
@@ -524,6 +525,7 @@ static XFontStruct *font;
 enum { UNSET = -1, no = 0, yes = 1 };
 static int do_raise = yes, persist = no;
 static int feedback = yes;
+static int ctrlq = no;
 static Cursor cursor;
 static Cursor cursor_default;
 #ifdef USE_MOUSE
@@ -4126,8 +4128,6 @@ process_event(XEvent *event)
 
 #ifdef USE_MOUSE
 	update_modifiers(event->xkey.state);
-
-	if (!modifier_mask) {
 #endif
 	    switch (keysym) {
 #ifdef USE_MOUSE
@@ -4135,6 +4135,11 @@ process_event(XEvent *event)
 		static int cmd_tried = 0;
 		static char *cmd = NULL;
 		static unsigned long newGnuplotXID = 0;
+		
+		/* If the "-ctrlq" resource is set, ignore ' ' unless control key is also pressed */
+		if (ctrlq && !(modifier_mask & Mod_Ctrl))
+		    break;
+
 		if (!cmd_tried)
 		    cmd = getMultiTabConsoleSwitchCommand(&newGnuplotXID);
 		/* overwrite gnuplotXID (re)set after x11.trm:X11_options() */
@@ -4148,7 +4153,7 @@ process_event(XEvent *event)
 		}
 		return;
 	    case 'm': /* Toggle mouse display, but only if we control the window here */
-		if (plot != current_plot
+		if (plot != current_plot && (!modifier_mask)
 #ifdef PIPE_IPC
 		    || pipe_died
 #endif
@@ -4159,6 +4164,11 @@ process_event(XEvent *event)
 		break;
 #endif
 	    case 'q':
+		/* If the "-ctrlq" resource is set, ignore q unless control key is also pressed */
+		if (ctrlq && !(modifier_mask & Mod_Ctrl)) {
+		    FPRINTF((stderr,"ignoring q, modifier_mask = %o\n",modifier_mask));
+		    break;
+		}
 		/* close X window */
 		Remove_Plot_From_Linked_List(event->xkey.window);
 		return;
@@ -4166,7 +4176,6 @@ process_event(XEvent *event)
 		break;
 	    }			/* switch (keysym) */
 #ifdef USE_MOUSE
-	}
 
 	if (is_meta(keysym))
 	    return;
@@ -4588,6 +4597,7 @@ static XrmOptionDescRec options[] = {
     {"-noraise", "*raise", XrmoptionNoArg, (caddr_t) "off"},
     {"-feedback", "*feedback", XrmoptionNoArg, (caddr_t) "on"},
     {"-nofeedback", "*feedback", XrmoptionNoArg, (caddr_t) "off"},
+    {"-ctrlq", "*ctrlq", XrmoptionNoArg, (caddr_t) "on"},
     {"-persist", "*persist", XrmoptionNoArg, (caddr_t) "on"}
 };
 
@@ -4860,6 +4870,7 @@ gnuplot: X11 aborted.\n", ldisplay);
     pr_raise();
     pr_persist();
     pr_feedback();
+    pr_ctrlq();
 }
 
 /*-----------------------------------------------------------------------------
@@ -5414,6 +5425,15 @@ pr_feedback()
     if (pr_GetR(db, ".feedback"))
 	feedback = !(!strncasecmp(value.addr,"off",3) || !strncasecmp(value.addr,"false",5));
     FPRINTF((stderr,"gplt_x11: set feedback to %d (%s)\n",feedback,value.addr));
+}
+
+static void
+pr_ctrlq()
+{
+    if (pr_GetR(db, ".ctrlq")) {
+	ctrlq = (!strncasecmp(value.addr,"on",2) || !strncasecmp(value.addr,"true",4));
+	FPRINTF((stderr,"gplt_x11: require <ctrl>q and <ctrl><space>\n"));
+    }
 }
 
 /************ code to handle selection export *********************/

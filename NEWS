@@ -14,6 +14,7 @@ News, changes and fixes since gnuplot version 4.0
 * NEW png driver supports antialiasing and TrueColor images
 * CHANGE libgd versions 2.0.28+ support GIF images as well as PNG/JPEG
 * CHANGE remove old (non-libgd) GIF and PNG drivers
+* CHANGE X-resource gnuplot*ctrlq:on requires <ctrl>q to kill plot window
 * FIXED setenv GNUTERM now works for png, jpeg, and gif drivers
 * FIXED PostScript output can be restricted to Level 1 compatible features
 * FIXED emf output is compatible with MSWin XP SP 2

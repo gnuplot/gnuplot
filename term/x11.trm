@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: x11.trm,v 1.116 2004/07/13 14:11:25 broeker Exp $
+ * $Id: x11.trm,v 1.117 2004/09/01 15:53:51 mikulik Exp $
  *
  */
 
@@ -179,6 +179,7 @@ static struct x11opt {
 #ifdef USE_MOUSE
     , { "-nofeedback", hasNoArg}
     , { "-noevents", hasNoArg}
+    , { "-ctrlq", hasNoArg}
 #endif
 };
 
@@ -2050,6 +2051,7 @@ START_HELP(x11)
 "  `-noraise`  does not raise plot window after each plot",
 #ifdef USE_MOUSE
 "  `-noevents` does not process mouse and key events",
+"  `-ctrlq   ` closes window on ctrl-q rather than q",
 #endif
 "  `-persist`  plot windows survive after main gnuplot program exits",
 "#\\begin{tabular}{|cl|} \\hline",
@@ -2080,6 +2082,7 @@ START_HELP(x11)
 "%`-noraise`@does not raise plot window after each plot",
 #ifdef USE_MOUSE
 "%`-novevents`@does not process mouse and key events",
+"%`-ctrlq`@closes window on ctrl-q rather than q",
 #endif
 "%`-persist`@plot windows survive after main gnuplot program exits",
 "@end table",
@@ -2087,7 +2090,8 @@ START_HELP(x11)
 " resources in \".Xdefaults\", they require a different syntax.",
 "",
 " Example:",
-"       gnuplot*gray: on",
+"       gnuplot*gray:  on",
+"       gnuplot*ctrlq: on",
 "",
 " `gnuplot` also provides a command line option (`-pointsize <v>`) and a",
 " resource, `gnuplot*pointsize: <v>`, to control the size of points plotted",
@@ -2099,6 +2103,13 @@ START_HELP(x11)
 " The `-noevents` switch disables all mouse and key event processing (except",
 " for `q` and `<space>` for closing the window). This is useful for programs",
 " which use the x11 driver independent of the gnuplot main program.",
+"",
+" The `-ctrlq` switch changes the hot-key that closes a plot window from `q`",
+" to `<ctrl>q`. This is useful is you are using the keystroke-capture feature",
+" `pause mouse keystroke`, since it allows the character `q` to be captured",
+" just as all other alphanumeric characters. The `-ctrlq` switch similarly",
+" replaces the <space> hot-key with <ctrl><space> for the same reason.",
+"",
 "2 monochrome_options",
 "?commands set terminal x11 monochrome_options",
 "?set terminal x11 monochrome_options",
