@@ -1,5 +1,5 @@
 /*
- * $Id: cgm.trm,v 1.16.2.5 2002/03/11 12:27:57 broeker Exp $
+ * $Id: cgm.trm,v 1.16.2.6 2002/03/11 16:09:00 lhecking Exp $
  */
 
 /* GNUPLOT - cgm.trm */
@@ -364,31 +364,68 @@ CGM_options()
 	    if (!END_OF_COMMAND) {
 		cgm_linewidth_pt = (unsigned int) real(const_express(&a));
 		if (cgm_linewidth_pt == 0 || cgm_linewidth_pt > 10000) {
-		    fputs("gnuplot(cgm.trm): linewidth out of range\n",
-			  stderr);
+		    int_warn("linewidth out of range", c_token);
 		    cgm_linewidth_pt = 1;
 		}
+		c_token++;
+		continue;
+	    } else {
+		int_error("linewidth option needs an argument", c_token);
 	    }
-	    continue;
 	}
 	if (almost_equals(c_token, "wid$th")) {
 	    c_token++;
 	    if (!END_OF_COMMAND) {
 		cgm_plotwidth = (int) real(const_express(&a));
 		if (cgm_plotwidth < 0 || cgm_plotwidth > 10000) {
-		    fputs("gnuplot(cgm.trm): width out of range\n", stderr);
+		    int_warn("width out of range", c_token);
 		    cgm_plotwidth = 6 * 72;
 		}
+		continue;
+	    } else {
+		int_error("width option needs an argument", c_token);
 	    }
+	}
+	if (isstring(c_token)) {
+	    double relwidth;
+	    
+	    quote_str(cgm_font, c_token, MAX_ID_LEN);
+	    if (CGM_find_font(cgm_font, strlen(cgm_font),
+			      &relwidth) == 0) {
+		/* insert the font in the font table */
+		size_t l = strlen(cgm_font);
+		int n;
+
+		for (n=0; cgm_font_data[n].name; n++)
+		    ;	/* do nothing */
+		if (l <= 255) {
+		    struct fontdata *new_font_data;
+		    int i;
+
+		    new_font_data = gp_alloc((n + 2) * sizeof(struct fontdata),
+					     "CGM font list");
+		    new_font_data->name = gp_alloc(l+1,"CGM font list");
+		    strcpy(new_font_data->name, cgm_font);
+		    /* punt, since we don't know the real font width */
+		    new_font_data->width = 1.0;
+		    for (i = 0; i <= n; i++)
+			new_font_data[i+1] = cgm_font_data[i];
+		    cgm_font_data = new_font_data;
+		} /* if(name not too long */
+		c_token++;
+		continue;
+	    } /* if (font parsing successful) */
+	} /* if (string) --> font name */
+
+	if (isanumber(c_token)) {
+	    /* the user is specifying the font size */
+	    cgm_fontsize = (int) real(const_express(&a));
 	    continue;
 	}
-	break;
-    }
 
-    if (!END_OF_COMMAND && isstring(c_token)) {
-	char *string = input_line + token[c_token].start_index;
-
-	if (string[0] == 'x') { /* set color */
+	if (input_line[token[c_token].start_index] == 'x') {
+	    /* set color */
+	    char *string = input_line + token[c_token].start_index;
 	    unsigned short red, green, blue;
               
 	    if (sscanf(string, "x%2hx%2hx%2hx", &red, &green, &blue ) != 3)
@@ -396,9 +433,9 @@ CGM_options()
 	    if (cgm_user_color_count[0] >= cgm_user_color_max) {
 		cgm_user_color_max = cgm_user_color_max*2 + 4;
 		cgm_user_color_table = 
-                    gp_realloc(cgm_user_color_table, 
-                               (cgm_user_color_max*3+1)*sizeof(int),
-                               "CGM color table");
+		    gp_realloc(cgm_user_color_table, 
+			       (cgm_user_color_max*3+1)*sizeof(int),
+			       "CGM color table");
 		/* 1st table entry is the minimum color index value */
 		cgm_user_color_table[0] = 0;
 	    }
@@ -407,39 +444,11 @@ CGM_options()
 	    cgm_user_color_table[3 + 3*cgm_user_color_count[0]] = blue;
 	    cgm_user_color_count[0]++;
 	    ++c_token;
-	} else {
-	    if (isstring(c_token)) {
-		double relwidth;
-		quote_str(cgm_font, c_token, MAX_ID_LEN);
-		if (CGM_find_font(cgm_font, strlen(cgm_font),
-				  &relwidth) == 0) {
-		    /* insert the font in the font table */
-		    size_t l = strlen(cgm_font);
-		    int n;
-		    for (n=0; cgm_font_data[n].name; n++)
-			;
-		    if (l <= 255) {
-			struct fontdata *new_font_data;
-			int i;
-			new_font_data = 
-			    (struct fontdata *)gp_alloc((n + 2)*sizeof(struct fontdata),
-				     "CGM font list");
-			new_font_data->name = gp_alloc(l+1,"CGM font list");
-			strcpy(new_font_data->name, cgm_font);
-                                /* punt, since we don't know the real font width */
-			new_font_data->width = 1.0;
-			for (i = 0; i <= n; i++)
-			    new_font_data[i+1] = cgm_font_data[i];
-			cgm_font_data = new_font_data;
-		    }
-		}
-		c_token++;
-	    } else {
-		/* the user is specifying the font size */
-		cgm_fontsize = (int) real(const_express(&a));
-	    }
-	}
-    }
+	    continue;
+	} /* if (string begins with 'x') */
+
+	break;
+    } /* while(!END_OF_COMMAND) */
 
     if (cgm_portrait) {
 	term->xmax = CGM_SMALL - CGM_MARGIN;
