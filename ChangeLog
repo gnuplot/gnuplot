@@ -1,3 +1,9 @@
+2003-06-16  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* command.c do_string_replot(): Dynamically allocate temporary input
+	line buffer instead of using a fix-size one. Fixes crash when replotting
+	a long plot command by mouse/hotkey.
+
 2003-06-15  Ethan Merritt <merritt@u.washington.edu>
 
 	* src/graphics.c: Center key title over entire key box rather than
