@@ -1,3 +1,12 @@
+2005-04-01  Jürgen Wieferink <wieferink@web.de>
+
+	* docs/doc2tex.c: Handle levels 5 and 6 of documentation text as
+	paragraph and subparagraph, respectively.
+
+2005-04-01  Ethan Merritt  <merritt@u.washington.edu>
+
+	* docs/gnuplot.doc: Add help keyword for 'newhistogram'.
+
 2005-03-30  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/gplt_x11.c (process_event) [!USE_MOUSE]: don't refer to
