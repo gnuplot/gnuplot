@@ -1,5 +1,5 @@
 /*
- * $Id: wtext.h,v 1.4 2000/11/09 16:14:38 broeker Exp $
+ * $Id: wtext.h,v 1.5 2001/02/08 16:44:36 broeker Exp $
  */
 
 /* GNUPLOT - win/wtext.h */
@@ -96,7 +96,7 @@ int MyFPutC(int ch, FILE *file);
 int MyFPutS(const char *str, FILE *file);
 int MyPutS(char *str);
 int MyFPrintF(FILE *file, const char *fmt, ...);
-int MyVFPrintF(FILE *file, const char *fmt, va_list args)
+int MyVFPrintF(FILE *file, const char *fmt, va_list args);
 int MyPrintF(const char *fmt, ...);
 size_t MyFWrite(const void *ptr, size_t size, size_t n, FILE *stream);
 size_t MyFRead(void *ptr, size_t size, size_t n, FILE *stream);
