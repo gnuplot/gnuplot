@@ -1,4 +1,4 @@
-/* $Id: tables.c,v 1.6 1999/09/14 15:25:55 lhecking Exp $ */
+/* $Id: tables.c,v 1.7 1999/09/21 18:25:53 lhecking Exp $ */
 
 /* GNUPLOT - tables.c */
 
@@ -38,40 +38,40 @@
 /* gnuplot commands */
 
 /* the actual commands */
-struct gen_table command_tbl[] =
+struct gen_ftable command_ftbl[] =
 {
-    { "ca$ll", CMD_CALL },
-    { "cd", CMD_CD },
-    { "cl$ear", CMD_CLEAR },
-    { "ex$it", CMD_EXIT },
-    { "f$it", CMD_FIT },
-    { "h$elp", CMD_HELP },
-    { "?", CMD_HELP },
-    { "hi$story", CMD_HISTORY },
-    { "if", CMD_IF },
-    { "l$oad", CMD_LOAD },
-    { "pa$use", CMD_PAUSE },
-    { "p$lot", CMD_PLOT },
-    { "pr$int", CMD_PRINT },
-    { "pwd", CMD_PWD },
-    { "q$uit", CMD_EXIT },
-    { "rep$lot", CMD_REPLOT },
-    { "re$read", CMD_REREAD },
-    { "res$et", CMD_RESET },
-    { "sa$ve", CMD_SAVE },
-    { "scr$eendump", CMD_SCREENDUMP },
-    { "se$t", CMD_SET },
-    { "she$ll", CMD_SHELL },
-    { "sh$ow", CMD_SHOW },
-    { "sp$lot", CMD_SPLOT },
-    { "sy$stem", CMD_SYSTEM },
-    { "test", CMD_TEST },
-    { "testt$ime", CMD_TESTTIME },
-    { "uns$et", CMD_UNSET },
-    { "up$date", CMD_UPDATE },
-    { ";", CMD_NULL },
+    { "ca$ll", call_command },
+    { "cd", changedir_command },
+    { "cl$ear", clear_command },
+    { "ex$it", exit_command },
+    { "f$it", fit_command },
+    { "h$elp", help_command },
+    { "?", help_command },
+    { "hi$story", history_command },
+    { "if", if_command },
+    { "l$oad", load_command },
+    { "pa$use", pause_command },
+    { "p$lot", plot_command },
+    { "pr$int", print_command },
+    { "pwd", pwd_command },
+    { "q$uit", exit_command },
+    { "rep$lot", replot_command },
+    { "re$read", reread_command },
+    { "res$et", reset_command },
+    { "sa$ve", save_command },
+    { "scr$eendump", screendump_command },
+    { "se$t", set_command },
+    { "she$ll", do_shell },
+    { "sh$ow", show_command },
+    { "sp$lot", splot_command },
+    { "sy$stem", system_command },
+    { "test", test_term },
+    { "testt$ime", testtime_command },
+    { "uns$et", unset_command },
+    { "up$date", update_command },
+    { ";", null_command },
     /* last key must be NULL */
-    { NULL, CMD_INVALID }
+    { NULL, invalid_command }
 };
 
 /* 'plot' and 'splot' */
@@ -90,6 +90,17 @@ struct gen_table plot_tbl[] =
     { "u$sing", P_USING },
     { "w$ith", P_WITH },
     { NULL, P_INVALID }
+};
+
+/* 'plot smooth' parameter */
+struct gen_table plot_smooth_tbl[] =
+{
+    { "a$csplines", SMOOTH_ACSPLINES },
+    { "b$ezier", SMOOTH_BEZIER },
+    { "c$splines", SMOOTH_CSPLINES },
+    { "s$bezier", SMOOTH_SBEZIER },
+    { "u$nique", SMOOTH_UNIQUE },
+    { NULL, SMOOTH_NONE }
 };
 
 /* 'save' command */
@@ -325,4 +336,17 @@ int token;
 	tbl++;
     }
     return tbl->value; /* *_INVALID */
+}
+
+parsefuncp_t
+lookup_ftable(ftbl, token)
+struct gen_ftable *ftbl;
+int token;
+{
+    while (ftbl->key) {
+	if (almost_equals(token, ftbl->key))
+	    return ftbl->value;
+	ftbl++;
+    }
+    return ftbl->value;
 }

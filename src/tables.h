@@ -1,4 +1,4 @@
-/* $Id: tables.h,v 1.6 1999/09/14 15:25:55 lhecking Exp $ */
+/* $Id: tables.h,v 1.7 1999/09/21 18:25:53 lhecking Exp $ */
 
 /* GNUPLOT - tables.h */
 
@@ -35,21 +35,17 @@
 #ifndef GNUPLOT_TABLES_H
 #define GNUPLOT_TABLES_H
 
+typedef void (*parsefuncp_t) __PROTO((void));
+
+struct gen_ftable {
+    const char *key;
+    parsefuncp_t value;
+};
+
 /* The basic structure */
 struct gen_table {
     const char *key;
     int value;
-};
-
-/* gnuplot commands */
-enum command_id {
-    CMD_INVALID,
-    CMD_NULL,
-    CMD_CALL, CMD_CD, CMD_CLEAR, CMD_EXIT, CMD_FIT, CMD_HELP, CMD_HISTORY,
-    CMD_IF, CMD_LOAD, CMD_PAUSE, CMD_PLOT, CMD_PRINT, CMD_PWD, CMD_REPLOT,
-    CMD_REREAD, CMD_RESET, CMD_SAVE, CMD_SCREENDUMP, CMD_SET, CMD_SHELL,
-    CMD_SHOW, CMD_SPLOT, CMD_SYSTEM, CMD_TEST, CMD_TESTTIME, CMD_UNSET,
-    CMD_UPDATE
 };
 
 /* options for plot/splot */
@@ -58,6 +54,8 @@ enum plot_id {
     P_AXES, P_BINARY, P_EVERY, P_INDEX, P_MATRIX, P_SMOOTH, P_THRU,
     P_TITLE, P_NOTITLE, P_USING, P_WITH
 };
+
+/* plot smooth parameters in plot.h */
 
 /* options for 'save' command */
 enum save_id { SAVE_INVALID, SAVE_FUNCS, SAVE_TERMINAL, SAVE_SET, SAVE_VARS };
@@ -112,13 +110,17 @@ enum set_key_id {
 };
 
 extern struct gen_table command_tbl[];
+extern struct gen_table plot_smooth_tbl[];
 extern struct gen_table save_tbl[];
 extern struct gen_table set_tbl[];
 extern struct gen_table set_key_tbl[];
 extern struct gen_table set_hidden3d_tbl[];
 extern struct gen_table plotstyle_tbl[];
 
+extern struct gen_ftable command_ftbl[];
+
 /* Function prototypes */
 int lookup_table __PROTO((struct gen_table *, int));
+parsefuncp_t lookup_ftable __PROTO((struct gen_ftable *, int));
 
 #endif /* GNUPLT_TABLES_H */
