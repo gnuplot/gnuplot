@@ -1,3 +1,8 @@
+2000-11-15  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/command.c (help_command): [_Windows] fixed off-by-one error
+ 	in help topic determination.
+
 2000-11-15  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/color.h src/getcolor.c src/color.c src/show.c term/post.trm:

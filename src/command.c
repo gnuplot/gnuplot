@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.43 2000/11/01 18:57:27 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.44 2000/11/02 17:52:15 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -1535,7 +1535,7 @@ help_command()
 	WinHelp(textwin.hWndParent, (LPSTR) winhelpname, HELP_INDEX, (DWORD) NULL);
     else {
 	char buf[128];
-	int start = c_token++;
+	int start = ++c_token;
 	while (!(END_OF_COMMAND))
 	    c_token++;
 	capture(buf, start, c_token - 1, 128);
