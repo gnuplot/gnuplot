@@ -1,3 +1,16 @@
+2002-10-25  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* Makefile.in: Add stamp-h[0-9]* to distclean target.
+
+2002-10-18  Shigeharu TAKENO  <shige@iee.niit.ac.jp
+
+	* docs/gnuplot.doc, term/atariaes.trm, term/atarivdi.trm, term/be.trm,
+	term/x11.trm: Fix a number of misprints.
+
+2002-10-18  Don Taber  <dtaber@blackrat.risc.rockwell.com>
+
+	* term/linux.trm(LINUX_setup): Make driver work with devfs.
+
 2002-10-15  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* Makefile.in: Remove acconfig.h.
