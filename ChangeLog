@@ -8,6 +8,8 @@
 	* demo/enhancedtext.dem:  Use 'set termoption enhanced' (new command)
 	to force enhanced text mode sregardless of current terminal type.
 
+	* NEWS:  Update NEWS file to cover post-4.0 development work.
+
 2004-08-18  Volker Dobler  <v.dobler@web.de>
 
 	* src/term.c (term_end_plot term_start_multiplot term_end_multiplot):

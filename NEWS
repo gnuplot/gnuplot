@@ -1,4 +1,19 @@
-News, changes and fixes in gnuplot version 4.0
+News, changes and fixes since gnuplot version 4.0
+=================================================
+
+* NEW plot style "with labels" reads text data along with X/Y/Z coordinates
+* NEW plot style "with histograms" creates clustered or stacked histograms
+* NEW auto-layout of multiplot using "set multiplot layout <rows>, <cols>"
+* NEW variant of plot "with filledcurves" that fills the area between two curves
+* NEW variant of "with filledcurves" that fills only above or below the curve
+* NEW using options {x|y|z}ticlabels(<col>)
+* NEW option to read plot title from datafile: set key autotitle columnheader
+* NEW command 'set termoption <foo>' changes single property of current terminal
+* CHANGE libgd versions 2.0.28+ support GIF images as well as PNG/JPEG
+
+
+
+Changes between gnuplot versions 3.7.2 and 4.0
 ==============================================
 
 Below you find list of news, changes and fixes in gnuplot version 4.0
