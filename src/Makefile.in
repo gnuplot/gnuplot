@@ -101,14 +101,14 @@ AM_CPPFLAGS = -I../term -I$(top_srcdir)/term -DBINDIR=\"$(bindir)\" -DCONTACT=\"
 
 gnuplot_SOURCES = alloc.c alloc.h ansichek.h binary.c binary.h bitmap.c \
 bitmap.h command.c command.h contour.c contour.h datafile.c datafile.h \
-dynarray.c dynarray.h eval.c eval.h fit.c fit.h gp_time.h graph3d.c graph3d.h \
-graphics.c graphics.h help.c help.h hidden3d.c hidden3d.h internal.c \
-internal.h interpol.c interpol.h matrix.c matrix.h misc.c misc.h national.h \
-parse.c parse.h plot.c plot.h plot2d.c plot2d.h plot3d.c plot3d.h readline.c \
-readline.h save.c save.h scanner.c scanner.h set.c setshow.h show.c specfun.c \
-specfun.h standard.c standard.h stdfn.c stdfn.h syscfg.h tables.c tables.h \
-template.h term_api.h term.c term.h time.c unset.c util.c util.h util3d.c \
-util3d.h variable.c variable.h version.c
+dynarray.c dynarray.h eval.c eval.h fit.c fit.h gp_hist.h gp_time.h graph3d.c \
+graph3d.h graphics.c graphics.h help.c help.h hidden3d.c hidden3d.h history.c \
+internal.c internal.h interpol.c interpol.h matrix.c matrix.h misc.c misc.h \
+national.h parse.c parse.h plot.c plot.h plot2d.c plot2d.h plot3d.c plot3d.h \
+readline.c readline.h save.c save.h scanner.c scanner.h set.c setshow.h \
+show.c specfun.c specfun.h standard.c standard.h stdfn.c stdfn.h syscfg.h \
+tables.c tables.h template.h term_api.h term.c term.h time.c unset.c util.c \
+util.h util3d.c util3d.h variable.c variable.h version.c
 
 
 gnuplot_LDADD = $(TERMLIBS) $(TERMXLIBS)
@@ -135,8 +135,8 @@ O = o
 T = $(top_srcdir)/term/
 
 COREOBJS = alloc.$(O) binary.$(O) bitmap.$(O) command.$(O) contour.$(O) \
-datafile.$(O) dynarray.$(O) eval.$(O) file.$(O) fit.$(O) graph3d.$(O) \
-graphics.$(O) help.$(O) hidden3d.$(O) internal.$(O) interpol.$(O) \
+datafile.$(O) dynarray.$(O) eval.$(O) fit.$(O) graph3d.$(O) graphics.$(O) \
+help.$(O) hidden3d.$(O) history.$(O) internal.$(O) interpol.$(O) \
 matrix.$(O) misc.$(O) parse.$(O) plot.$(O) plot2d.$(O) plot3d.$(O) \
 readline.$(O) save.$(O) scanner.$(O) set.$(O) show.$(O) specfun.$(O) \
 standard.$(O) stdfn.$(O) tables.$(O) term.$(O) time.$(O) unset.$(O) \
@@ -183,11 +183,11 @@ bf_test_DEPENDENCIES =
 bf_test_LDFLAGS = 
 am_gnuplot_OBJECTS =  alloc$U.o binary$U.o bitmap$U.o command$U.o \
 contour$U.o datafile$U.o dynarray$U.o eval$U.o fit$U.o graph3d$U.o \
-graphics$U.o help$U.o hidden3d$U.o internal$U.o interpol$U.o matrix$U.o \
-misc$U.o parse$U.o plot$U.o plot2d$U.o plot3d$U.o readline$U.o save$U.o \
-scanner$U.o set$U.o show$U.o specfun$U.o standard$U.o stdfn$U.o \
-tables$U.o term$U.o time$U.o unset$U.o util$U.o util3d$U.o variable$U.o \
-version$U.o
+graphics$U.o help$U.o hidden3d$U.o history$U.o internal$U.o \
+interpol$U.o matrix$U.o misc$U.o parse$U.o plot$U.o plot2d$U.o \
+plot3d$U.o readline$U.o save$U.o scanner$U.o set$U.o show$U.o \
+specfun$U.o standard$U.o stdfn$U.o tables$U.o term$U.o time$U.o \
+unset$U.o util$U.o util3d$U.o variable$U.o version$U.o
 gnuplot_OBJECTS =  $(am_gnuplot_OBJECTS)
 gnuplot_DEPENDENCIES = 
 gnuplot_LDFLAGS = 
@@ -211,13 +211,13 @@ DIST_SUBDIRS =  beos
 DEP_FILES =  .deps/alloc.P .deps/bf_test.P .deps/binary.P .deps/bitmap.P \
 .deps/command.P .deps/contour.P .deps/datafile.P .deps/dynarray.P \
 .deps/eval.P .deps/fit.P .deps/gplt_x11.P .deps/graph3d.P \
-.deps/graphics.P .deps/help.P .deps/hidden3d.P .deps/internal.P \
-.deps/interpol.P .deps/matrix.P .deps/misc.P .deps/parse.P .deps/plot.P \
-.deps/plot2d.P .deps/plot3d.P .deps/readline.P .deps/save.P \
-.deps/scanner.P .deps/set.P .deps/show.P .deps/specfun.P \
-.deps/standard.P .deps/stdfn.P .deps/tables.P .deps/term.P .deps/time.P \
-.deps/unset.P .deps/util.P .deps/util3d.P .deps/variable.P \
-.deps/version.P
+.deps/graphics.P .deps/help.P .deps/hidden3d.P .deps/history.P \
+.deps/internal.P .deps/interpol.P .deps/matrix.P .deps/misc.P \
+.deps/parse.P .deps/plot.P .deps/plot2d.P .deps/plot3d.P \
+.deps/readline.P .deps/save.P .deps/scanner.P .deps/set.P .deps/show.P \
+.deps/specfun.P .deps/standard.P .deps/stdfn.P .deps/tables.P \
+.deps/term.P .deps/time.P .deps/unset.P .deps/util.P .deps/util3d.P \
+.deps/variable.P .deps/version.P
 SOURCES = $(bf_test_SOURCES) $(gnuplot_SOURCES) $(gnuplot_x11_SOURCES)
 OBJECTS = $(am_bf_test_OBJECTS) $(am_gnuplot_OBJECTS) $(am_gnuplot_x11_OBJECTS)
 
@@ -344,6 +344,8 @@ help_.c: help.c $(ANSI2KNR)
 	$(CPP) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/help.c; then echo $(srcdir)/help.c; else echo help.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > help_.c
 hidden3d_.c: hidden3d.c $(ANSI2KNR)
 	$(CPP) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/hidden3d.c; then echo $(srcdir)/hidden3d.c; else echo hidden3d.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > hidden3d_.c
+history_.c: history.c $(ANSI2KNR)
+	$(CPP) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/history.c; then echo $(srcdir)/history.c; else echo history.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > history_.c
 internal_.c: internal.c $(ANSI2KNR)
 	$(CPP) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/internal.c; then echo $(srcdir)/internal.c; else echo internal.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > internal_.c
 interpol_.c: interpol.c $(ANSI2KNR)
@@ -394,11 +396,11 @@ version_.c: version.c $(ANSI2KNR)
 	$(CPP) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/version.c; then echo $(srcdir)/version.c; else echo version.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > version_.c
 alloc_.o bf_test_.o binary_.o bitmap_.o command_.o contour_.o \
 datafile_.o dynarray_.o eval_.o fit_.o gplt_x11_.o graph3d_.o \
-graphics_.o help_.o hidden3d_.o internal_.o interpol_.o matrix_.o \
-misc_.o parse_.o plot_.o plot2d_.o plot3d_.o readline_.o save_.o \
-scanner_.o set_.o show_.o specfun_.o standard_.o stdfn_.o tables_.o \
-term_.o time_.o unset_.o util_.o util3d_.o variable_.o version_.o : \
-$(ANSI2KNR)
+graphics_.o help_.o hidden3d_.o history_.o internal_.o interpol_.o \
+matrix_.o misc_.o parse_.o plot_.o plot2d_.o plot3d_.o readline_.o \
+save_.o scanner_.o set_.o show_.o specfun_.o standard_.o stdfn_.o \
+tables_.o term_.o time_.o unset_.o util_.o util3d_.o variable_.o \
+version_.o : $(ANSI2KNR)
 
 # This directory's subdirectories are mostly independent; you can cd
 # into them and run `make' without going through this Makefile.
