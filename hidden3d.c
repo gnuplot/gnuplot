@@ -2758,8 +2758,30 @@ plot3d_hidden (plots, pcount)
 	/* HBB 970326: if no polygons survived the cutting away of undefined
 	 * and/or outranged vertices, bail out with a warning message.
 	 * Without this, sort_by_zmax gets a SegFault */
-	if (!pfree)
+	if (!pfree) {
+		/* HBB 980701: new code to deallocate all the structures allocated up
+		 * to this point. Should fix the core dump reported by 
+		 * Stefan A. Deutscher today  */
+    if (ymin_hl) {
+  		free (ymin_hl);
+  		ymin_hl = 0;
+  	}
+    if (ymax_hl) {
+  		free (ymax_hl);
+  		ymax_hl = 0;
+  	}
+    if (hl_buffer) {
+  		free (hl_buffer);
+  		hl_buffer = 0;
+  	}
+  	if (Cross_store) {
+  		free (Cross_store);
+  		Cross_store = 0;
+  		last_Cross_store = 0;
+  	}
+		 
 		graph_error("*All* polygons undefined or out of range, thus no plot.");
+	} 
 		
   sort_by_zmax ();
 
