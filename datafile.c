@@ -1,5 +1,5 @@
 #ifndef lint
-static char    *RCSid = "$Id: datafile.c,v 1.41 1998/03/22 23:31:06 drd Exp $";
+static char    *RCSid = "$Id: datafile.c,v 1.42 1998/04/14 00:15:17 drd Exp $";
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -225,6 +225,7 @@ typedef struct df_column_struct {
 static df_column_struct *df_column=NULL; /* we'll allocate space as needed */
 static int df_max_cols=0; /* space allocated */
 static int df_no_cols;    /* cols read */
+static int fast_columns;	/* corey@cac optimization */
 
 /* external variables we need */
 
@@ -321,12 +322,42 @@ char *s;
 #else
 			/* cannot trust strtod - eg strtod("-",&p) */
 			int used;
-			int count = sscanf(s, "%lf%n", &df_column[df_no_cols].datum, &used);
+			int count;
+			int dfncp1 = df_no_cols+1;
+
+/*
+ * optimizations by Corey Satten, corey@cac.washington.edu
+ */
+			if (fast_columns == 0 ||
+			    df_no_use_specs > 0 && (use_spec[0].column == dfncp1 ||
+			    df_no_use_specs > 1 && (use_spec[1].column == dfncp1 ||
+			    df_no_use_specs > 2 && (use_spec[2].column == dfncp1 ||
+			    df_no_use_specs > 3 && (use_spec[3].column == dfncp1 ||
+			    df_no_use_specs > 5 && (use_spec[5].column == dfncp1 ||
+			    df_no_use_specs > 5))))) ||
+			    df_no_use_specs == 0) {
+			
+#ifdef FORTRAN_NUMS
+				count = sscanf(s, "%lf%n", &df_column[df_no_cols].datum, &used);
+#else
+				while (isspace(*s)) ++s;
+				count = *s ? 1 : 0;
+				df_column[df_no_cols].datum = atof(s);
+#endif /* FORTRAN_NUMS */
+				}
+			else {
+				/* skip any space at start of column */
+				while (isspace(*s)) ++s;
+				count = *s ? 1 : 0;
+				/* skip chars to end of column */
+				for (used=0; !isspace(*s) && (*s != '\0'); ++used, ++s) ;
+			    }
 
 			/* it might be a fortran double or quad precision. 'used'
 			 * is only safe if count is 1
 			 */
 			 
+#ifdef FORTRAN_NUMS
 			if (count==1 &&
 			    (s[used]=='d' || s[used]=='D' || s[used]=='q' || s[used]=='Q')
 			   ) {
@@ -335,6 +366,7 @@ char *s;
 				/* and try again */
 				count = sscanf(s, "%lf", &df_column[df_no_cols].datum);
 			}
+#endif /* FORTRAN_NUMS */
 #endif
 			df_column[df_no_cols].good = count==1 ? DF_GOOD : DF_BAD;
 		}
@@ -447,6 +479,8 @@ int max_using;
 	int i;
 	int name_token;
 	
+	fast_columns = 1;		/* corey@cac */
+	
 	/*{{{  close file if necessary*/
 	if (data_fp)
 		df_close();
@@ -549,6 +583,7 @@ int max_using;
 	if (almost_equals(c_token, "ev$ery")) {
 		struct value a;
 	
+		fast_columns = 0; 	/* corey@cac */
 		/* allow empty fields - every a:b:c::e
 		 * we have already established the defaults
 		 */
@@ -641,6 +676,7 @@ int max_using;
 				}
 				else if (equals(c_token, "("))
 				{
+					fast_columns = 0;	/* corey@cac */
 					dummy_func=NULL;  /* no dummy variables active */
 					use_spec[df_no_use_specs++].at = perm_at();  /* it will match ()'s */
 				}

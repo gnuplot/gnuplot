@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: set.c,v 1.65 1998/03/22 23:31:24 drd Exp $";
+static char *RCSid = "$Id: set.c,v 1.66 1998/04/14 00:16:15 drd Exp $";
 #endif
 
 /* GNUPLOT - set.c */
@@ -79,6 +79,7 @@ double			boxwidth	= -1.0; /* box width (automatic) */
 TBOOLEAN 		clip_points	= FALSE;
 TBOOLEAN 		clip_lines1	= TRUE;
 TBOOLEAN 		clip_lines2	= FALSE;
+struct lp_style_type    border_lp       = {0,-2,0,2.0,1.0};
 int			draw_border	= 31;
 TBOOLEAN		draw_surface    = TRUE;
 char			dummy_var[MAX_NUM_VAR][MAX_ID_LEN+1] = { "x", "y" };
@@ -100,14 +101,14 @@ int format_is_numeric[AXIS_ARRAY_SIZE] = { 1,1,1,1,1,1,1,1,1,1 };
 enum PLOT_STYLE		data_style	= POINTSTYLE;
 enum PLOT_STYLE		func_style	= LINES;
 double		bar_size	= 1.0;
-int			grid		= GRID_OFF;
-int			grid_linetype   = -1;
-int			mgrid_linetype   = -1;
+struct lp_style_type	work_grid       = {0,GRID_OFF,0,1.0,1.0};
+struct lp_style_type	grid_lp         = {0,-1,0,1.0,1.0};
+struct lp_style_type	mgrid_lp        = {0,-1,0,1.0,1.0};
 double			polar_grid_angle= 0; /* nonzero means a polar grid */
 int			key		= -1;	/* default position */
 struct position key_user_pos;	/* user specified position for key */
 TBOOLEAN		key_reverse	= FALSE;  /* reverse text & sample ? */
-int			key_box		= -3; /* no linetype */
+struct lp_style_type	key_box		= {0,-3,0,1.0,1.0}; /* -3 = no linetype */
 double                  key_swidth      = 4.0;
 double                  key_vert_factor = 1.0;
 double                  key_width_fix   = 0.0;
@@ -204,10 +205,10 @@ int			dgrid3d_col_fineness = 10;
 int			dgrid3d_norm_value = 1;
 TBOOLEAN		dgrid3d		= FALSE;
 
-int 		xzeroaxis	= -3;
-int 		yzeroaxis	= -3;
-int 		x2zeroaxis	= -3;
-int 		y2zeroaxis	= -3;
+struct lp_style_type	xzeroaxis	= {0,-3,0,1.0,1.0};
+struct lp_style_type	yzeroaxis	= {0,-3,0,1.0,1.0};
+struct lp_style_type	x2zeroaxis	= {0,-3,0,1.0,1.0};
+struct lp_style_type	y2zeroaxis	= {0,-3,0,1.0,1.0};
 
 /* perhaps make these into an array one day */
 
@@ -326,7 +327,9 @@ static TBOOLEAN set_one __PROTO((void));
 static TBOOLEAN set_two __PROTO((void));
 static TBOOLEAN set_three __PROTO((void));
 static int looks_like_numeric __PROTO((char *));
+static void set_lp_properties __PROTO((struct lp_style_type *arg, int allow_points, int lt, int pt, double lw, double ps));
 static void set_locale __PROTO((char *));
+
 
 /* following code segment appears over and over again */
 #define GET_NUM_OR_TIME(store,axis) \
@@ -405,13 +408,15 @@ reset_command()
   clip_points	 = FALSE;
   clip_lines1	 = TRUE;
   clip_lines2	 = FALSE;
+  set_lp_properties(&border_lp,0,-2,0,2.0,1.0);
   draw_border	 = 31;
   draw_surface	 = TRUE;
   data_style	 = POINTSTYLE;
   func_style	 = LINES;
   bar_size		= 1.0;
-  grid		 = GRID_OFF;
-  grid_linetype  = mgrid_linetype = -1;
+  set_lp_properties(&work_grid,0,GRID_OFF,0,0.5,1.0);
+  set_lp_properties( &grid_lp, 0,      -1,0,0.5,1.0);
+  set_lp_properties(&mgrid_lp, 0,      -1,0,0.5,1.0);
   polar_grid_angle=0;
   key		 = -1;
   is_log_x	 = FALSE;
@@ -505,10 +510,10 @@ reset_command()
   dgrid3d_col_fineness = 10;
   dgrid3d_norm_value   = 1;
   dgrid3d	 = FALSE;
-  xzeroaxis	 =
-  yzeroaxis	 = -3;
-  x2zeroaxis	 =
-  y2zeroaxis	 = -3;
+  set_lp_properties(&xzeroaxis,0,-3,0,1.0,1.0);
+  set_lp_properties(&yzeroaxis,0,-3,0,1.0,1.0);
+  set_lp_properties(&x2zeroaxis,0,-3,0,1.0,1.0);
+  set_lp_properties(&y2zeroaxis,0,-3,0,1.0,1.0);
   xtics		 =
   ytics		 = TICS_ON_BORDER | TICS_MIRROR;
   ztics		 = TICS_ON_BORDER; /* no mirror by default */
@@ -541,7 +546,7 @@ reset_command()
   key_vpos	 = TTOP;
   key_just	 = JRIGHT;
   key_reverse	 = FALSE;
-  key_box	 = -3;
+  set_lp_properties(&key_box,0,-3,0,1.0,1.0);
   key_swidth     = 4;
   key_vert_factor = 1;
   key_width_fix   = 0;
@@ -1305,10 +1310,10 @@ set_two()
 
 #define DO_ZEROAX(variable, string,neg) \
 else if (almost_equals(c_token, string)) { \
-   ++c_token; if (END_OF_COMMAND) variable=-1; \
-   else { struct value a; variable=real(const_express(&a))-1; }\
+   ++c_token; if (END_OF_COMMAND) variable.l_type=-1; \
+   else LP_PARSE(variable,1,0,-1,0)\
 } else if (almost_equals(c_token, neg)) { \
-   ++c_token; variable=-3; \
+   ++c_token; variable.l_type=-3; \
 }
 
 
@@ -1318,21 +1323,16 @@ else if (almost_equals(c_token, string)) { \
 	DO_ZEROAX(y2zeroaxis, "y2zero$axis", "noy2zero$axis")
 
 	else if (almost_equals(c_token,"zeroa$xis")) {
-		int line=-1;
 		c_token++;
-		if (!END_OF_COMMAND) {
-			struct value a;
-			line=real(const_express(&a))-1;
-		}
-		xzeroaxis =
-		yzeroaxis = line;
+                LP_PARSE(xzeroaxis,1,0,-1,0);
+                memcpy(&yzeroaxis,&xzeroaxis,sizeof(struct lp_style_type));
 	}
 	else if (almost_equals(c_token,"nozero$axis")) {
 		c_token++;
-		xzeroaxis = -3;
-		yzeroaxis = -3;
-		x2zeroaxis = -3;
-		y2zeroaxis = -3;
+		xzeroaxis.l_type  = -3;
+		yzeroaxis.l_type  = -3;
+		x2zeroaxis.l_type = -3;
+		y2zeroaxis.l_type = -3;
 	} else if (almost_equals(c_token,"par$ametric")) {
 		if (!parametric) {
 		   parametric = TRUE;
@@ -1428,13 +1428,13 @@ else if (almost_equals(c_token, string)) { \
 	}
 
 #define GRID_MATCH(string, neg, mask) \
-if (almost_equals(c_token, string)) { grid |= mask; ++c_token; } \
-else if (almost_equals(c_token, neg)) { grid &= ~(mask); ++c_token; }
+if (almost_equals(c_token, string)) { work_grid.l_type |= mask; ++c_token; } \
+else if (almost_equals(c_token, neg)) { work_grid.l_type &= ~(mask); ++c_token; }
 
 	else if (almost_equals(c_token,"g$rid")) {
                 c_token++;
-		if (END_OF_COMMAND && !grid)
-			grid = GRID_X|GRID_Y;
+		if (END_OF_COMMAND && !work_grid.l_type)
+			work_grid.l_type = GRID_X|GRID_Y;
                 else while (!END_OF_COMMAND){
 			GRID_MATCH("x$tics", "nox$tics", GRID_X)
 			else GRID_MATCH("y$tics", "noy$tics", GRID_Y)
@@ -1447,7 +1447,7 @@ else if (almost_equals(c_token, neg)) { grid &= ~(mask); ++c_token; }
 			else GRID_MATCH("mx2$tics", "nomx2$tics", GRID_MX2)
 			else GRID_MATCH("my2$tics", "nomy2$tics", GRID_MY2)
 			else if (almost_equals(c_token,"po$lar")){
-				if (!grid) grid=GRID_X;
+				if (!work_grid.l_type) work_grid.l_type=GRID_X;
                                 c_token++;
                                 if (END_OF_COMMAND) {
                                 	polar_grid_angle=30*DEG2RAD;
@@ -1462,25 +1462,29 @@ else if (almost_equals(c_token, neg)) { grid &= ~(mask); ++c_token; }
 			} else break; /* might be a linetype */
 		}
 		if (!END_OF_COMMAND) {
-			struct value a;
-			grid_linetype=real(const_express(&a))-1;
-			if (!grid) grid = GRID_X|GRID_Y;
+                        LP_PARSE(grid_lp,1,0,-1,1);
+			if (!work_grid.l_type) work_grid.l_type = GRID_X|GRID_Y;
 				/* probably just  set grid <linetype> */
 
 			if (END_OF_COMMAND) {
-				mgrid_linetype=grid_linetype;
+                                memcpy(&mgrid_lp,&grid_lp,sizeof(struct lp_style_type));
 			} else {
-				mgrid_linetype=real(const_express(&a))-1;
+			  if (equals(c_token,",")) {
+			    c_token++;
+			  } else {
+			    int_error("',' expected",c_token);
+			  }
+			  LP_PARSE(mgrid_lp,1,0,-1,1);
 			}
 
-			if (!grid) grid = GRID_X|GRID_Y;
+			if (!work_grid.l_type) work_grid.l_type = GRID_X|GRID_Y;
 				/* probably just  set grid <linetype> */
 		}
 
 		
         }
 	else if (almost_equals(c_token,"nog$rid")) {
-		grid = GRID_OFF;
+		work_grid.l_type = GRID_OFF;
 		c_token++;
 	}
 	else if (almost_equals(c_token,"su$rface")) {
@@ -1509,7 +1513,7 @@ else if (almost_equals(c_token, neg)) { grid &= ~(mask); ++c_token; }
 			key_hpos = TRIGHT;
 			key_just = JRIGHT;
 			key_reverse = FALSE;
-                        key_box = -3;
+                        set_lp_properties(&key_box,0,-3,0,1.0,1.0);
                         key_swidth = 4;
                         key_vert_factor = 1;
                         key_width_fix = 0;
@@ -1554,11 +1558,12 @@ else if (almost_equals(c_token, neg)) { grid &= ~(mask); ++c_token; }
 				} else if (equals(c_token,"box")) {
 					++c_token;
 					if (END_OF_COMMAND)
-						key_box=-2;
+						key_box.l_type=-2;
 					else
-						key_box=real(const_express(&a))-1; --c_token;  /* is incremented after loop */
+						LP_PARSE(key_box,1,0,-2,0);
+					--c_token;  /* is incremented after loop */
 				} else if (almost_equals(c_token,"nob$ox")) {
-					key_box=-3;
+					key_box.l_type=-3;
 				} else if (almost_equals(c_token, "sa$mplen")) {
 					++c_token;
 					key_swidth = real(const_express(&a));
@@ -2351,7 +2356,6 @@ set_arrow()
     loc_lp.pointflag = loc_lp.l_type = loc_lp.p_type = 0;
     loc_lp.l_width   = loc_lp.p_size = 1.0;
 #endif
-
     /* get tag */
     if (!END_OF_COMMAND 
 	   && !equals(c_token, "from")
@@ -2560,7 +2564,6 @@ set_linestyle()
     loc_lp.pointflag = loc_lp.l_type = loc_lp.p_type = 0;
     loc_lp.l_width   = loc_lp.p_size = 1.0;
 #endif
-
     /* get tag */
     if (!END_OF_COMMAND) {
 	   /* must be a tag expression! */
@@ -3080,6 +3083,18 @@ struct position *pos;
 		pos->z=0;
 		pos->scalez = type; /* same as y */
 	}
+}
+
+static void set_lp_properties(arg,allow_points,lt,pt,lw,ps)
+struct lp_style_type *arg;
+int                  allow_points, lt, pt;
+double               lw, ps;
+{
+        arg->pointflag = allow_points;
+        arg->l_type    = lt;
+        arg->p_type    = pt;
+        arg->l_width   = lw;
+        arg->p_size    = ps;
 }
 
 static void set_locale(lcl)

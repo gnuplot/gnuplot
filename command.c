@@ -1,5 +1,5 @@
 #ifndef lint
-static char    *RCSid = "$Id: command.c,v 1.123 1998/03/22 23:31:00 drd Exp $";
+static char    *RCSid = "$Id: command.c,v 1.124 1998/04/14 00:14:57 drd Exp $";
 #endif
 
 /* GNUPLOT - command.c */
@@ -66,27 +66,27 @@ static char    *RCSid = "$Id: command.c,v 1.123 1998/03/22 23:31:00 drd Exp $";
 # ifdef __ZTC__
 #  define HAVE_SLEEP 1
 #  define P_WAIT 0
-# else /* __ZTC__ */
+# else
 
-# ifdef __TURBOC__
-#  ifndef _Windows
-#   define HAVE_SLEEP 1
-#   include <conio.h>
-#   include <dir.h>    /* setdisk() */
+#  ifdef __TURBOC__
+#   ifndef _Windows
+#    define HAVE_SLEEP 1
+#    include <conio.h>
+#    include <dir.h>    /* setdisk() */
 extern unsigned _stklen = 16394;/* increase stack size */
 extern char HelpFile[80] ;      /* patch for do_help  - DJL */
-#  endif /* _Windows */
+#   endif /* _Windows */
 
-# else				/* must be MSC */ 
-#  if !defined(__EMX__) && !defined(DJGPP)
-#   ifdef __MSC__
-#    include <direct.h>		/* for _chdrive() */
-#   endif /* __MSC__ */
-#  endif /* !__EMX__ && !DJGPP */
-# endif	/* TURBOC */
-#endif /* ZTC */
+#  else				/* must be MSC */
+#   if !defined(__EMX__) && !defined(DJGPP)
+#    ifdef __MSC__
+#     include <direct.h>		/* for _chdrive() */
+#    endif				/* __MSC__ */
 
-#endif /* MSDOS */
+#   endif				/* !__EMX__ && !DJGPP */
+#  endif				/* TURBOC */
+# endif				/* ZTC */
+#endif				/* MSDOS */
 
 #ifndef _Windows
 # include "help.h"
@@ -95,20 +95,20 @@ extern char HelpFile[80] ;      /* patch for do_help  - DJL */
 #endif /* _Windows */
 
 #if defined(ATARI) || defined(MTOS)
-#ifdef __PUREC__
-#include <ext.h>
-#include <tos.h>
-#include <aes.h>
+# ifdef __PUREC__
+#  include <ext.h>
+#  include <tos.h>
+#  include <aes.h>
 /* #include <float.h> - already in plot.h */
-#else
-#include <osbind.h>
-#include <aesbind.h>
-#include <support.h>
-#endif /* __PUREC__ */
+# else
+#  include <osbind.h>
+#  include <aesbind.h>
+#  include <support.h>
+# endif /* __PUREC__ */
 #endif /* ATARI || MTOS */
 
 #ifndef STDOUT
-#define STDOUT 1
+# define STDOUT 1
 #endif
 
 #ifndef HELPFILE
@@ -120,18 +120,18 @@ extern char HelpFile[80] ;      /* patch for do_help  - DJL */
 #  else
 #   define HELPFILE "docs/gnuplot.gih"	/* changed by makefile */
 #  endif /* AMIGA_SC_6_1 || AMIGA_AC_5 */
-# endif /* MSDOS || OS2 || DOS386 */ 
-#endif /* HELPFILE */
+# endif /* MSDOS || OS2 || DOS386 */
+#endif				/* HELPFILE */
 
 #ifdef _Windows
-#include <windows.h>
-#ifdef __MSC__
-#include <malloc.h>
-#else
-#include <alloc.h>
-#include <dir.h>    /* setdisk() */
-#endif
-#include "win/wgnuplib.h"
+# include <windows.h>
+# ifdef __MSC__
+#  include <malloc.h>
+# else
+#  include <alloc.h>
+#  include <dir.h>    /* setdisk() */
+# endif
+# include "win/wgnuplib.h"
 extern TW textwin;
 extern LPSTR winhelpname;
 extern void screen_dump(void);	/* in term/win.trm */
@@ -142,17 +142,19 @@ extern int Pause(LPSTR mess); /* in winmain.c */
 
 #ifdef OS2
  /* emx has getcwd, chdir that can handle drive names */
-#define chdir  _chdir2
+# define chdir  _chdir2
 #endif /* OS2 */
 
 #ifdef VMS
 int             vms_vkid;	/* Virtual keyboard id */
-#endif
+int             vms_ktid;       /* key table id, for translating keystrokes */
+#endif /* VMS */
+
+/* Used by vws.trm */
+void replotrequest __PROTO((void));
 
 
 /* static prototypes */
-
-static void replotrequest __PROTO((void));
 static int command __PROTO((void));
 static int read_line __PROTO((char *prompt));
 static void do_shell __PROTO((void));
@@ -212,9 +214,7 @@ void extend_input_line()
   } else {
     input_line=gp_realloc(input_line, input_line_len+MAX_LINE_LEN, "extend input line");
     input_line_len+=MAX_LINE_LEN;
-#ifdef DEBUG_STR
-    fprintf(stderr, "extending input line to %d chars\n", input_line_len);
-#endif
+    FPRINTF ((stderr, "extending input line to %d chars\n", input_line_len));
   }
 }
 
@@ -227,9 +227,7 @@ void extend_token_table()
   } else {
     token=gp_realloc(token, (token_table_size+MAX_TOKENS)*sizeof(struct lexical_unit), "extend token table");
     token_table_size+=MAX_TOKENS;
-#ifdef DEBUG_STR
-    fprintf(stderr, "extending token table to %d elements\n", token_table_size);
-#endif
+    FPRINTF ((stderr, "extending token table to %d elements\n", token_table_size));
   }
 }
 
@@ -746,7 +744,7 @@ char *path;
 }
 
 
-static void replotrequest()
+void replotrequest()
 {
     if (equals(c_token, "["))
 	int_error("cannot set range with replot", c_token);
@@ -835,7 +833,7 @@ static int read_line(prompt)
     do {
 	line_desc.dsc$w_length = MAX_LINE_LEN - start;
 	line_desc.dsc$a_pointer = &input_line[start];
-	switch (status[1] = smg$read_composed_line(&vms_vkid, 0, &line_desc, &prompt_desc, &vms_len)) {
+	switch (status[1] = smg$read_composed_line(&vms_vkid, &vms_ktid, &line_desc, &prompt_desc, &vms_len)) {
 	case SMG$_EOF:
 	    done(IO_SUCCESS);	/* ^Z isn't really an error */
 	    break;
@@ -871,6 +869,7 @@ static int read_line(prompt)
 }
 
 
+#ifdef NO_GIH
 static void do_help(toplevel)
 int toplevel; /* not used for VMS version */
 {
@@ -893,6 +892,7 @@ static void do_shell()
 	os_error("spawn error", NO_CARET);
     }
 }
+#endif /* NO_GIH */
 
 
 static void do_system()
@@ -905,9 +905,12 @@ static void do_system()
     (void) putc('\n', stderr);
 }
 
-#else				/* VMS */
+#endif /* VMS */
+
 
 #ifdef _Windows
+
+#ifdef NO_GIH
 static void do_help(toplevel)
 int toplevel; /* not used for windows */
 {
@@ -922,7 +925,8 @@ int toplevel; /* not used for windows */
 		WinHelp(textwin.hWndParent,(LPSTR)winhelpname,HELP_PARTIALKEY,(DWORD)buf);
 	}
 }
-#else
+#endif /* NO_GIH */
+#endif /* _Windows */
 
 /*
  * do_help: (not VMS, although it would work) Give help to the user. It
@@ -938,6 +942,7 @@ int toplevel; /* not used for windows */
  * whilst in the help.
  */
 
+#ifndef NO_GIH
 static void do_help(toplevel)
 int toplevel;
 {
@@ -1073,7 +1078,9 @@ int toplevel;
 
     helpbuf[base] = '\0';	/* cut it off where we started */
 }
-#endif  /* _Windows */
+#endif  /* !NO_GIH */
+
+#ifndef VMS
 
 #ifdef _Windows
 /* this function is used before its definition */
@@ -1418,7 +1425,7 @@ static int read_line(prompt)
     } while (more);
     return(0);
 }
-#endif				/* VMS */
+#endif/* !VMS */
 
 #ifdef _Windows
 /* there is a system like call on MS Windows but it is a bit difficult to 

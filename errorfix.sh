@@ -1,6 +1,6 @@
 #! /bin/sh
 #
-# $Id: errorfix.sh,v 1.3 1997/03/09 23:49:49 drd Exp $
+# $Id: errorfix.sh,v 1.4 1998/04/14 00:15:18 drd Exp $
 #
 # shell script to change #error and #warn cpp statements. This is necessary
 # for the crippled non-ANSI compiler that HP ships with it's standard

@@ -1,5 +1,5 @@
 /*
- * $Id: x11.trm,v 1.33 1998/03/22 22:35:14 drd Exp $
+ * $Id: x11.trm,v 1.34 1998/04/14 00:18:15 drd Exp $
  *
  */
 
@@ -223,13 +223,10 @@ TERM_PUBLIC void X11_init()
 	if (!X11_ipc)
 	{
 		/* first time through or after a reset*/
-#ifdef OSK
+#if defined(OSK) || defined(OS2)
 		/* OS-9 popen() does not block on close for child to end, so
 		 * we can safely use it here
 		 */
-		X11_ipc = popen(X11_command, "w");
-#else
-#ifdef OS2
 		X11_ipc = popen(X11_command, "w");
 #else
 		int fdes[2];
@@ -248,7 +245,6 @@ TERM_PUBLIC void X11_init()
 		/* parent */
 		close(fdes[0]); /* read end of pipe */
 		X11_ipc = fdopen(fdes[1], "w");
-#endif
 #endif
 	}
 

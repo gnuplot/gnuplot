@@ -1,4 +1,13 @@
-dnl $Id: acinclude.m4,v 1.1 1997/07/22 23:20:26 drd Exp $
+dnl $Id: acinclude.m4,v 1.2 1998/04/14 00:14:45 drd Exp $
+
+# a note to the uninitiated : the program aclocal (part of
+# GNU automake) generates the file aclocal.m4 from
+# the file acinclude.m4
+# Furthermore, configure.in invokes various AM_ macros
+# which I think are supplied as part of GNU automake.
+# aclocal also extracts these macros and adds them
+# to aclocal.m4
+
 
 ## ------------------------------- ##
 ## Check for function prototypes.  ##

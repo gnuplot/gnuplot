@@ -1,5 +1,5 @@
 /*
- * $Id: emxvga.trm,v 1.15 1998/03/22 22:34:37 drd Exp $
+ * $Id: emxvga.trm,v 1.16 1998/04/14 00:17:40 drd Exp $
  */
 
 /* GNUPLOT - emxvga.trm */
@@ -53,16 +53,15 @@
  * adapted to the new terminal layout by Stefan Bodewig (Dec. 1995)
  */
 
-
 #include "driver.h"
 
 #ifdef TERM_REGISTER
 #ifdef EMXVESA
 register_term(vesa)
 #endif /* EMXVESA */
-
 register_term(emxvga)
 #endif
+
 #ifdef TERM_PROTO
 TERM_PUBLIC void EMXVGA_init __PROTO((void));
 TERM_PUBLIC void EMXVGA_reset __PROTO((void));

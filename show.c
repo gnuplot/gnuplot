@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: show.c,v 1.48 1998/03/22 22:32:09 drd Exp $";
+static char *RCSid = "$Id: show.c,v 1.49 1998/04/14 00:16:19 drd Exp $";
 #endif
 
 /* GNUPLOT - show.c */
@@ -82,6 +82,7 @@ static void show_output __PROTO((void));
 static void show_view __PROTO((void));
 static void show_size __PROTO((void));
 static void show_origin __PROTO((void));
+static void show_title __PROTO((void));
 static void show_xyzlabel __PROTO((char *name, label_struct *label));
 static void show_angles __PROTO((void));
 static void show_boxwidth __PROTO((void));
@@ -855,6 +856,7 @@ show_hidden3d()
 	printf(" Hidden Line Removal Not Supported in LITE version\n");
 #else
 	fprintf(stderr,"\thidden surface is %s\n", hidden3d ? "removed" : "drawn");
+	show_hidden3doptions();
 #endif /* LITE */
 }
 
@@ -930,12 +932,12 @@ show_locale()
 static void
 show_xzeroaxis()
 {
-	if (xzeroaxis > -3)
-		fprintf(stderr,"\txzeroaxis is drawn with line %d\n",xzeroaxis+1);
+	if (xzeroaxis.l_type > -3)
+		fprintf(stderr,"\txzeroaxis is drawn with linestyle %d, linewidth %.3f\n",xzeroaxis.l_type+1, xzeroaxis.l_width);
 	else
 		fputs("\txzeroaxis is OFF\n", stderr);
-	if (x2zeroaxis > -3)
-		fprintf(stderr,"\tx2zeroaxis is drawn with line %d\n",x2zeroaxis+1);
+	if (x2zeroaxis.l_type > -3)
+		fprintf(stderr,"\tx2zeroaxis is drawn with linestyle %d, linewidth %.3f\n",x2zeroaxis.l_type+1, x2zeroaxis.l_width);
 	else
 		fputs("\tx2zeroaxis is OFF\n", stderr);
 }
@@ -943,12 +945,12 @@ show_xzeroaxis()
 static void
 show_yzeroaxis()
 {
-	if (yzeroaxis > -3)
-		fprintf(stderr,"\tyzeroaxis is drawn with line %d\n",yzeroaxis+1);
+	if (yzeroaxis.l_type > -3)
+		fprintf(stderr,"\tyzeroaxis is drawn with linestyle %d, linewidth %.3f\n",yzeroaxis.l_type+1, yzeroaxis.l_width);
 	else
 		fputs("\tyzeroaxis is OFF\n", stderr);
-	if (y2zeroaxis > -3)
-		fprintf(stderr,"\ty2zeroaxis is drawn with line %d\n",y2zeroaxis+1);
+	if (y2zeroaxis.l_type > -3)
+		fprintf(stderr,"\ty2zeroaxis is drawn with linestyle %d, linewidth %.3f\n",y2zeroaxis.l_type+1, y2zeroaxis.l_width);
 	else
 		fputs("\ty2zeroaxis is OFF\n", stderr);
 }
@@ -1045,25 +1047,26 @@ show_linestyle(tag)
 static void
 show_grid()
 {
-	if (!grid) {
+	if (!work_grid.l_type) {
 		fputs("\tgrid is OFF\n", stderr);
 		return;
 	}
 
 	fprintf(stderr, "\t%s grid drawn at%s%s%s%s%s%s%s%s%s%s tics\n",
 	  (polar_grid_angle != 0) ? "Polar" : "Rectangular",
-	  grid&GRID_X ? " x" : "",
-	  grid&GRID_Y ? " y" : "",
-	  grid&GRID_Z ? " z" : "",
-	  grid&GRID_X2 ? " x2" : "",
-	  grid&GRID_Y2 ? " y2" : "",
-	  grid&GRID_MX ? " mx" : "",
-	  grid&GRID_MY ? " my" : "",
-	  grid&GRID_MZ ? " mz" : "",
-	  grid&GRID_MX2 ? " mx2" : "",
-	  grid&GRID_MY2 ? " my2" : "");
+	  work_grid.l_type&GRID_X ? " x" : "",
+	  work_grid.l_type&GRID_Y ? " y" : "",
+	  work_grid.l_type&GRID_Z ? " z" : "",
+	  work_grid.l_type&GRID_X2 ? " x2" : "",
+	  work_grid.l_type&GRID_Y2 ? " y2" : "",
+	  work_grid.l_type&GRID_MX ? " mx" : "",
+	  work_grid.l_type&GRID_MY ? " my" : "",
+	  work_grid.l_type&GRID_MZ ? " mz" : "",
+	  work_grid.l_type&GRID_MX2 ? " mx2" : "",
+	  work_grid.l_type&GRID_MY2 ? " my2" : "");
 
-	fprintf(stderr, "\tGrid drawn with linetype %d %d\n", grid_linetype+1, mgrid_linetype+1);
+	fprintf(stderr, "\tMajor grid drawn with linetype %d, linewidth %.3f\n", grid_lp.l_type+1,  grid_lp.l_width);
+	fprintf(stderr, "\tMinor grid drawn with linetype %d, linewidth %.3f\n", mgrid_lp.l_type+1, mgrid_lp.l_width);
 
 	if (polar_grid_angle)
 		fprintf(stderr, "\tGrid radii drawn every %f %s\n",
@@ -1133,8 +1136,9 @@ show_key()
 		fprintf(stderr, "\tkey is %s justified, %s reversed and ",
 		  key_just==JLEFT ? "left" : "right",
 		  key_reverse ? "" : "not");
-		if (key_box>=-2)
-			fprintf(stderr, "boxed with linetype %d\n", key_box+1);
+		if (key_box.l_type>=-2)
+			fprintf(stderr, "boxed\n\twith linetype %d, linewidth %.3f\n",
+                                         key_box.l_type+1, key_box.l_width);
 		else
 			fprintf(stderr, "not boxed\n");
 	        fprintf(stderr,"\tsample length is %g characters\n",key_swidth);

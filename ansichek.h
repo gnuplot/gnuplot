@@ -1,4 +1,4 @@
-/* $Id: ansichek.h,v 1.12 1998/03/22 22:31:17 drd Exp $ */
+/* $Id: ansichek.h,v 1.13 1998/04/14 00:14:48 drd Exp $ */
 
 /* GNUPLOT - ansichek.h */
 
@@ -46,7 +46,7 @@
 
 #if defined(__STDC__) && __STDC__
 # ifndef ANSI_C
-#  define ANSI_C
+#define ANSI_C
 # endif /* ANSI_C */
 #endif /* __STDC__ */
 
@@ -56,13 +56,14 @@
 /* must encapsulate HAVE_CPP_STRINGIFY to avoid having it defined
  * on autoconfiscated platforms where it's unavailable
  */ 
+
 #if defined(ANSI_C) || defined(__TURBOC__) || defined (__PUREC__) || defined (__ZTC__) || defined (_MSC_VER) || (defined(OSK) && defined(_ANSI_EXT))
 # ifndef PROTOTYPES
 #  define PROTOTYPES
 # endif /* PROTOTYPES */
 # ifndef HAVE_CPP_STRINGIFY
 #  define HAVE_CPP_STRINGIFY
-#endif
+# endif
 #endif /* ANSI_C ... */
 
 /* used to be __P but it was just too difficult to guess whether

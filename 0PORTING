@@ -52,7 +52,7 @@ NO_SYS_TYPES_H  sys/types.h absent (not ANSI/ISO, but pretty standard)
  If non-standard header files are required, HAVE_XXX_H defines are used:
 
 HAVE_UNISTD_H
-HAVE_LIBC_H              (unistd.h alternative on NEXT)
+HAVE_LIBC_H    (unistd.h alternative on NEXT)
 HAVE_SGTTY_H             needed if there is no termios.h
 HAVE_SYS_BSDTYPES_H
 HAVE_SYS_SELECT_H        (needed for FD_* macros)
@@ -108,10 +108,10 @@ terminals, printers, and protocols that a given version of gnuplot can
 access and the description of such for the help file.  {T
 
 
-define         file            note
-------         ----            --------
-TERMFLAGS      Makefile        the set of terminals you want, from below
-               or term.h
+define      file            note
+------      ----            --------
+TERMFLAGS   Makefile        the set of terminals you want, from below
+            or term.h
 NO_ALL_TERM_H  term.h          edit term.h to specify desired devices at
                                the beginning (instead of to comment out, 
                                throughout the file, devices not desired.) 
@@ -203,7 +203,7 @@ Platform Related Defines
 ========================
 
  These #defines are defined automatically by various compilers or
-makefiles, some gnuplot routines check these defines to implement
+makefile, some gnuplot routines check these defines to implement
 features found in the various environments. This list is certainly
 incomplete.
 

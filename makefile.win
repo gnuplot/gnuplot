@@ -43,12 +43,13 @@ CAUXFLAGS = -ml -w-par -w-use -w-aus -f -N -M -y -v -d -I$(TC)\include -DMSDOS -
 OBJS = 	bitmap.obj command.obj contour.obj eval.obj graphics.obj graph3d.obj \
 	internal.obj misc.obj parse.obj plot.obj plot2d.obj plot3d.obj \
 	readline.obj scanner.obj set.obj show.obj specfun.obj standard.obj \
-	stdfn.obj term.obj util.obj version.obj \
-	binary.obj winmain.obj interpol.obj fit.obj matrix.obj \
-	datafile.obj alloc.obj util3d.obj hidden3d.obj time.obj
+	stdfn.obj term.obj util.obj version.obj binary.obj winmain.obj \
+	interpol.obj fit.obj matrix.obj datafile.obj alloc.obj util3d.obj \
+	hidden3d.obj time.obj
 DLLOBJS = wgnuplib.obj wtext.obj wmenu.obj wpause.obj wgraph.obj wprinter.obj 
 
-CSOURCE5 = term\aed.trm term\cgi.trm term\dumb.trm term\dxy.trm \
+CSOURCE5 = term\aed.trm term\cgi.trm term\cgm.trm term\debug.trm \
+	term\dumb.trm term\dxy.trm \
 	term\eepic.trm term\epson.trm term\fig.trm term\hp26.trm \
 	term\hp2648.trm term\hpgl.trm term\hpljii.trm 
 CSOURCE6 = term\impcodes.h term\imagen.trm term\object.h \
@@ -279,6 +280,7 @@ clean:
 	del wgnupl32.map
 	del wgnupl32.res
 	del win\gnuplot.rtf
+	del doc2rtf.map
 	del doc2rtf.exe
 	del win\wgnuplib.res
 	del wgnuplib.map

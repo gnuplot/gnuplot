@@ -1,5 +1,5 @@
 /*
- * $Id: vws.trm,v 1.13 1998/03/22 22:35:11 drd Exp $
+ * $Id: vws.trm,v 1.14 1998/04/14 00:18:14 drd Exp $
  *
  */
 
@@ -76,7 +76,7 @@ TERM_PUBLIC void VWS_point __PROTO((unsigned int x, unsigned int y, int point));
 TERM_PUBLIC void VWS_arrow __PROTO((unsigned int sx, unsigned int sy, unsigned int ex, unsigned int ey, int head));
  
 #define VWS_XMAX 1024
-#define VWS_YMAX 864		/* was 780, but VAXstation 2000 is 864 */
+#define VWS_YMAX 780		/* VAXstation 2000 is 864 */
 #define VWS_VCHAR 25
 #define VWS_HCHAR 15
 #define VWS_VTIC 10
@@ -87,9 +87,6 @@ TERM_PUBLIC void VWS_arrow __PROTO((unsigned int sx, unsigned int sy, unsigned i
 #ifdef TERM_BODY 
 void VWS_resize_ast __PROTO((void));
 
-#include <stdio.h>
-/*lph: the first two were commented out, but are needed for VAXC 2.4 */
-#include <math.h>
 #include <ssdef.h>
 /* */
 #include <descrip.h>
@@ -189,8 +186,8 @@ TERM_PUBLIC void VWS_init()
 /* by default,  color table index 0 is backgound, and 1 is foregound */
 /* a color {index into the color table} is assigned to the active line */
 /* in VWS_linetype */
-
-if (ws_type == UIS$C_DEV_MONO) {
+ 
+  if (ws_type == UIS$C_DEV_MONO) {
   uis$set_color(&vd_id, &i0, &p5, &p5, &p5);
   uis$set_color(&vd_id, &i1, &p0, &p0, &p0);
   uis$set_color(&vd_id, &i2, &p0, &p0, &p0);
@@ -200,7 +197,7 @@ if (ws_type == UIS$C_DEV_MONO) {
   uis$set_color(&vd_id, &i6, &p0, &p0, &p0);
   uis$set_color(&vd_id, &i7, &p0, &p0, &p0);
   }
-else if (ws_type == UIS$C_DEV_INTENSITY) { /* Intensity scale, untested */
+  else if (ws_type == UIS$C_DEV_INTENSITY) { /* Intensity scale, untested */
   uis$set_color(&vd_id, &i2, &p2, &p2, &p2);
   uis$set_color(&vd_id, &i3, &p3, &p3, &p3);
   uis$set_color(&vd_id, &i4, &p4, &p4, &p4);
@@ -209,24 +206,24 @@ else if (ws_type == UIS$C_DEV_INTENSITY) { /* Intensity scale, untested */
   uis$set_color(&vd_id, &i7, &p7, &p7, &p7);
   }
   /* ws: perhaps better for color terms (which I do not have) */
-   
-else if (ws_type == UIS$C_DEV_COLOR) {
+  
+  else if (ws_type == UIS$C_DEV_COLOR) {
 /* */
-     uis$set_color(&vd_id, &i0, &p0, &p0, &p0);
-     uis$set_color(&vd_id, &i1, &p9, &p0, &p0);
-     uis$set_color(&vd_id, &i2, &p0, &p9, &p0);
-     uis$set_color(&vd_id, &i3, &p9, &p9, &p0);
-     uis$set_color(&vd_id, &i4, &p0, &p0, &p9);
-     uis$set_color(&vd_id, &i5, &p9, &p0, &p9);
-     uis$set_color(&vd_id, &i6, &p0, &p9, &p9);
-     uis$set_color(&vd_id, &i7, &p9, &p9, &p9);
- /* 
-  * lph: Another way to set up the color table is to use arrays,
-  * which simplifies customizing the appearance.
-  *
+    uis$set_color(&vd_id, &i0, &p0, &p0, &p0);
+    uis$set_color(&vd_id, &i1, &p9, &p0, &p0);
+    uis$set_color(&vd_id, &i2, &p0, &p9, &p0);
+    uis$set_color(&vd_id, &i3, &p9, &p9, &p0);
+    uis$set_color(&vd_id, &i4, &p0, &p0, &p9);
+    uis$set_color(&vd_id, &i5, &p9, &p0, &p9);
+    uis$set_color(&vd_id, &i6, &p0, &p9, &p9);
+    uis$set_color(&vd_id, &i7, &p9, &p9, &p9);
+     /*
+     * lph: Another way to set up the color table is to use arrays,
+     * which simplifies customizing the appearance.
+     *
      uis$set_colors(&vd_id, &i0, &i8, &r_map, &g_map, &b_map);  
-  */
-   }
+      */
+  }
 
   uis$disable_display_list(&vd_id);
  
@@ -252,13 +249,13 @@ else if (ws_type == UIS$C_DEV_COLOR) {
  * the following BLOCKS
  *
 if (ws_type >=  UIS$C_DEV_INTENSITY) {
- for (i=0; i<8; i++) {
+  for (i=0; i<8; i++) {
   cattr = COLOR_ATTR+i;
   uis$set_writing_index(&vd_id, &default_attr, &cattr, &i);
   }
-}
+  }
  *
- */
+  */
 
 /* lph: default value for the background index into the virtual color
 /* table is 0, and the back_attr block is never used
@@ -326,16 +323,16 @@ int lt;
 			 0xffffff00,
 			 0xffff0000,
 			 0xf0f0f0f0,
-  			 0Xfff0fff0,
+			 0Xfff0fff0,
 			 0xf000f000,
 			 0xa5a5a5af,
 			 0xf00f00f0 };
   int line_attr = LINE_ATTR;
   /* use multiplier of normal line width; default is width in pixels */
   const int uis$c_width_world = UIS$C_WIDTH_WORLD;
-
+ 
   if (lt < 0) {
-    switch(lt) {
+  switch(lt) {
       case -1:			/* used for axis */
 	uis$set_line_style(&vd_id,&line_attr,&line_attr,&n1);
         uis$set_line_width(&vd_id,&line_attr,&line_attr,&p15,
@@ -351,7 +348,7 @@ int lt;
         if (ws_type >=  UIS$C_DEV_INTENSITY) {
         uis$set_writing_index(&vd_id, &line_attr, &line_attr,&i[1]);
         }
-	break;
+    break;
       default: 		/* else a thick line ? */
 	uis$set_line_style(&vd_id,&line_attr,&line_attr,&n1);
         uis$set_line_width(&vd_id,&line_attr,&line_attr,&p20,
@@ -360,7 +357,7 @@ int lt;
         uis$set_writing_index(&vd_id, &line_attr, &line_attr,
 			      &i[1+((-lt) % 7)]);
         }
-	break;
+    break;
     }
   } 
   else {
@@ -375,7 +372,7 @@ int lt;
  * types change appropriately, but has problems as pixels/line segment 
  * decreases.  Better with full screen display and "set samples" smaller
  * but start out with only solid lines
- */
+  */
     uis$set_line_style(&vd_id,&line_attr,&line_attr,&n1);
 
     uis$set_line_width(&vd_id,&line_attr,&line_attr,&p10,

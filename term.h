@@ -1,6 +1,6 @@
 
 /*
- * $Id: term.h,v 1.43 1998/03/22 23:31:28 drd Exp $
+ * $Id: term.h,v 1.44 1998/04/14 00:16:25 drd Exp $
  *
  */
 
@@ -114,6 +114,9 @@
 
 #ifdef IRIS          /* Iris */
 #include "iris4d.trm"
+#endif
+
+#ifdef UIS           /* VAX Windowing System requires UIS libraries */
 #include "vws.trm"
 #endif
 
@@ -134,6 +137,7 @@
 #ifdef _Macintosh
 #include "mac.trm"
 #endif
+
 /* These terminals are not relevant for MSDOS, OS2, MS-Windows, ATARI or Amiga */
 #if !defined(MSDOS) && !defined(_Windows) && !defined(ATARI) && !defined(MTOS) && !defined(AMIGA)
 #include "aed.trm"     /* AED 512 and AED 767 */
@@ -161,15 +165,15 @@
 
 /* These terminals can be used on any system */
 
-/* #include "ai.trm"           /* Adobe Illustrator Format */
-/* #include "cgm.trm"      /* Computer Graphics Metafile (eg ms office) */
-/* #include "corel.trm"    /* CorelDraw! eps format */
-#include "debug.trm" /* debugging terminal */
-/* #include "dumb.trm"     /* dumb terminal */
-/* #include "dxf.trm"          /* DXF format for use with AutoCad (Release 10.x) */
+#include "ai.trm"           /* Adobe Illustrator Format */
+#include "cgm.trm"      /* Computer Graphics Metafile (eg ms office) */
+#include "corel.trm"    /* CorelDraw! eps format */
+/* #include "debug.trm" /* debugging terminal */
+#include "dumb.trm"     /* dumb terminal */
+#include "dxf.trm"          /* DXF format for use with AutoCad (Release 10.x) */
 /* #include "dxy.trm"      /* Roland DXY800A plotter */
 /* #include "excl.trm"         /* QMS/EXCL laserprinter (Talaris 1590 and others) */
-/* #include "fig.trm"      /* fig graphics */
+#include "fig.trm"      /* fig graphics */
 
 /* NOTE THAT GIF REQUIRES A SEPARATE LIBRARY : see term/gif.trm */
 #ifdef HAVE_LIBGD /* autoconf */
@@ -177,15 +181,15 @@
 #endif
 
 /* #include "grass.trm" /* geographical info system */
-/* #include "hp26.trm"     /* HP2623A and probably others */
-/* #include "hp2648.trm"   /* HP2647 and 2648 */
-/* #include "hp500c.trm"   /* HP DeskJet 500 C */
-/* #include "hpgl.trm"         /* HP7475, HP7220 plotters, and (hopefully) lots of others */
-/* #include "hpljii.trm"   /* HP Laserjet II */
-/* #include "hppj.trm"     /* HP PrintJet */
-/* #include "imagen.trm"   /* Imagen laser printers */
+#include "hp26.trm"     /* HP2623A and probably others */
+#include "hp2648.trm"   /* HP2647 and 2648 */
+#include "hp500c.trm"   /* HP DeskJet 500 C */
+#include "hpgl.trm"         /* HP7475, HP7220 plotters, and (hopefully) lots of others */
+#include "hpljii.trm"   /* HP Laserjet II */
+#include "hppj.trm"     /* HP PrintJet */
+#include "imagen.trm"   /* Imagen laser printers */
 /* #include "kyo.trm"      /* Kyocera Prescribe printer */
-/* #include "mif.trm"      /* Frame Maker MIF 3.00 format driver */
+#include "mif.trm"      /* Frame Maker MIF 3.00 format driver */
 #include "pbm.trm"      /* portable bit map */
 
 /* NOTE THAT PNG REQUIRES A SEPARATE LIBRARY : see term/png.trm */
@@ -193,11 +197,11 @@
 #include "png.trm"   /* png */
 #endif
 
-/* #include "post.trm"     /* postscript */
-/* #include "qms.trm"      /* QMS laser printers */
+#include "post.trm"     /* postscript */
+#include "qms.trm"      /* QMS laser printers */
 #include "table.trm"    /* built-in, but used for the documentation */
-/* #include "tgif.trm"     /* x11 tgif tool */
-/* #include "tkcanvas.trm" /* tcl/tk */
+#include "tgif.trm"     /* x11 tgif tool */
+#include "tkcanvas.trm" /* tcl/tk */
 /* #include "v384.trm"     /* Vectrix 384 printer, also Tandy colour */
 
 /* wire printers */
@@ -208,15 +212,15 @@
 #define OKIDATA
 #define STARC
 #define TANDY60         /* Tandy DMP-130 series 60-dot per inch graphics */
-/* #include "epson.trm" /* the common driver file for all of these */
+#include "epson.trm" /* the common driver file for all of these */
 
 /* TeX related terminals */
 #define EMTEX
-/* #include "latex.trm"    /* latex and emtex */
-/* #include "pslatex.trm"  /* latex/tex with picture in postscript */
-/* #include "eepic.trm"    /* EEPIC-extended LaTeX driver, for EEPIC users */
-/* #include "tpic.trm"     /* TPIC specials for TeX */
-/* #include "pstricks.trm" /* LaTeX picture environment with PSTricks macros */
-/* #include "texdraw.trm"  /* TeXDraw drawing package for LaTeX */
-/* #include "metafont.trm" /* METAFONT */
+#include "latex.trm"    /* latex and emtex */
+#include "pslatex.trm"  /* latex/tex with picture in postscript */
+#include "eepic.trm"    /* EEPIC-extended LaTeX driver, for EEPIC users */
+#include "tpic.trm"     /* TPIC specials for TeX */
+#include "pstricks.trm" /* LaTeX picture environment with PSTricks macros */
+#include "texdraw.trm"  /* TeXDraw drawing package for LaTeX */
+#include "metafont.trm" /* METAFONT */
 

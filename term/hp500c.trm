@@ -1,5 +1,5 @@
 /*
- * $Id: hp500c.trm,v 1.16 1998/03/22 22:34:44 drd Exp $
+ * $Id: hp500c.trm,v 1.17 1998/04/14 00:17:48 drd Exp $
  *
  */
 
@@ -490,7 +490,7 @@ TERM_PUBLIC void HP500Ctext()
   
 #ifndef VMS  /* most vms spoolers add a formfeed character */
   fprintf(outfile,"\f");
-#endif /* not VMS */
+#endif /* !VMS */
 }
 
 #endif

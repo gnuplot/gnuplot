@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: misc.c,v 1.78 1998/03/22 23:31:21 drd Exp $";
+static char *RCSid = "$Id: misc.c,v 1.79 1998/04/14 00:16:02 drd Exp $";
 #endif
 
 /* GNUPLOT - misc.c */
@@ -546,26 +546,26 @@ char str[MAX_LINE_LEN+1];
 	fprintf(fp,"set format x2 \"%s\"\n", conv_text(str,x2format));
 	fprintf(fp,"set format y2 \"%s\"\n", conv_text(str,y2format));
 	fprintf(fp,"set format z \"%s\"\n", conv_text(str,zformat));
-	if (grid==0)
+	if (work_grid.l_type==0)
 		fputs("set nogrid\n", fp);
 	else {
 		if (polar_grid_angle) /* set angle already output */
 			fprintf(fp, "set grid polar %f\n", polar_grid_angle/ang2rad);
 		else
 			fputs("set grid nopolar\n", fp);
-		fprintf(fp,"set grid %sxtics %sytics %sztics %sx2tics %sy2tics %smxtics %smytics %smztics %smx2tics %smy2tics %d %d\n",
-		   grid&GRID_X ? "" : "no",
-		   grid&GRID_Y ? "" : "no",
-		   grid&GRID_Z ? "" : "no",
-		   grid&GRID_X2 ? "" : "no",
-		   grid&GRID_Y2 ? "" : "no",
-		   grid&GRID_MX ? "" : "no",
-		   grid&GRID_MY ? "" : "no",
-		   grid&GRID_MZ ? "" : "no",
-		   grid&GRID_MX2 ? "" : "no",
-		   grid&GRID_MY2 ? "" : "no",
-		   grid_linetype+1,
-		   mgrid_linetype+1);
+		fprintf(fp,"set grid %sxtics %sytics %sztics %sx2tics %sy2tics %smxtics %smytics %smztics %smx2tics %smy2tics lt %d lw %.3f, lt %d lw %.3f\n",
+		   work_grid.l_type&GRID_X ? "" : "no",
+		   work_grid.l_type&GRID_Y ? "" : "no",
+		   work_grid.l_type&GRID_Z ? "" : "no",
+		   work_grid.l_type&GRID_X2 ? "" : "no",
+		   work_grid.l_type&GRID_Y2 ? "" : "no",
+		   work_grid.l_type&GRID_MX ? "" : "no",
+		   work_grid.l_type&GRID_MY ? "" : "no",
+		   work_grid.l_type&GRID_MZ ? "" : "no",
+		   work_grid.l_type&GRID_MX2 ? "" : "no",
+		   work_grid.l_type&GRID_MY2 ? "" : "no",
+		   grid_lp.l_type+1,  grid_lp.l_width,
+		   mgrid_lp.l_type+1, mgrid_lp.l_width);
 	}
 	fprintf(fp,"set key title \"%s\"\n", conv_text(str,key_title));
 	switch (key) {
@@ -604,10 +604,10 @@ char str[MAX_LINE_LEN+1];
 			break;
 	}
 	if (key) {
-		fprintf(fp, " %s %sreverse box %d samplen %g spacing %g width %g\n",
+		fprintf(fp, " %s %sreverse box linetype %d linewidth %.3f samplen %g spacing %g width %g\n",
 			key_just==JLEFT ? "Left" : "Right", 
 		   key_reverse ? "" : "no",
-		   key_box+1, key_swidth, key_vert_factor, key_width_fix);
+		   key_box.l_type+1, key_box.l_width, key_swidth, key_vert_factor, key_width_fix);
 	}
 	fprintf(fp,"set nolabel\n");
 	for (this_label = first_label; this_label != NULL;
@@ -756,10 +756,10 @@ char str[MAX_LINE_LEN+1];
 		case CANDLESTICKS: fprintf(fp, "candlesticks\n"); break;
 		default:  fprintf(fp, "---error!---\n"); /* HBB: default case demanded by gcc, still needed ?? */
 	}
-        fprintf(fp,"set xzeroaxis %d\n", xzeroaxis+1);
-        fprintf(fp,"set x2zeroaxis %d\n", x2zeroaxis+1);
-        fprintf(fp,"set yzeroaxis %d\n", yzeroaxis+1);
-        fprintf(fp,"set y2zeroaxis %d\n", y2zeroaxis+1);
+        fprintf(fp,"set xzeroaxis lt %d lw %.3f\n", xzeroaxis.l_type+1,xzeroaxis.l_width);
+        fprintf(fp,"set x2zeroaxis lt %d lw %.3f\n", x2zeroaxis.l_type+1,x2zeroaxis.l_width);
+        fprintf(fp,"set yzeroaxis lt %d lw %.3f\n", yzeroaxis.l_type+1,yzeroaxis.l_width);
+        fprintf(fp,"set y2zeroaxis lt %d lw %.3f\n", y2zeroaxis.l_type+1,y2zeroaxis.l_width);
         fprintf(fp,"set tics %s\n", (tic_in)? "in" : "out");
         fprintf(fp,"set ticslevel %g\n", ticslevel);
 	fprintf(fp,"set ticscale %g %g\n", ticscale, miniticscale);

@@ -1,5 +1,5 @@
 /*
- * $Id: post.trm,v 1.44 1998/03/22 22:34:58 drd Exp $
+ * $Id: post.trm,v 1.45 1998/04/14 00:18:02 drd Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -666,7 +666,7 @@ static char GPFAR psi2[] = "%%%%EndComments\n\
 /vpt_ %.1f def\n\
 /hpt hpt_ def\n\
 /vpt vpt_ def\n";
-static char GPFAR *PS_iso_8859_1_encoding[] = {
+static char GPFAR * GPFAR PS_iso_8859_1_encoding[] = {
 "/reencodeISO {\n",
 "dup dup findfont dup length dict begin\n",
 "{ 1 index /FID ne { def }{ pop pop } ifelse } forall\n",
@@ -719,7 +719,7 @@ NULL };
 /*                                                                         */
 /*   version 1.1:  - added some more special characters                    */
 /*                                                                         */
-static char GPFAR *PS_cp_437_encoding[] = {
+static char GPFAR * GPFAR PS_cp_437_encoding[] = {
 "/reencodeCP437 {\n",
 "dup dup findfont dup length dict begin\n",
 "{ 1 index /FID ne { def }{ pop pop } ifelse } forall\n",
@@ -767,7 +767,7 @@ NULL };
 /*                   -- frame characters,                                  */
 /*                   -- a few special characters.                          */
 /*                                                                         */
-static char GPFAR *PS_cp_850_encoding[] = {
+static char GPFAR * GPFAR PS_cp_850_encoding[] = {
 "/reencodeCP850 {\n",
 "dup dup findfont dup length dict begin\n",
 "{ 1 index /FID ne { def }{ pop pop } ifelse } forall\n",
@@ -1184,25 +1184,24 @@ TERM_PUBLIC void PS_point(x,y,number)
 unsigned int x,y;
 int number;
 {
-static char *pointFNS[] = {"Pnt",   "Pls",   "Crs",    "Star",
-                           "Box",   "BoxF",  "Circle", "CircleF",
-                           "TriU",  "TriUF", "TriD",   "TriDF",
-                           "Dia",   "DiaF",  "Pent",   "PentF",
-        		   "C0",    "C1",    "C2",     "C3",
-			   "C4",    "C5",    "C6",     "C7",
-          		   "C8",    "C9",    "C10",    "C11",
-			   "C12",   "C13",   "C14",    "C15",
-                           "S0",    "S1",    "S2",     "S3",
-			   "S4",    "S5",    "S6",     "S7",
-                           "S8",    "S9",    "S10",    "S11",
-			   "S12",   "S13",   "S14",    "S15",
-          		   "D0",    "D1",    "D2",     "D3",
-			   "D4",    "D5",    "D6",     "D7",
-			   "D8",    "D9",    "D10",    "D11",
-			   "D12",   "D13",   "D14",    "D15",
-                           "BoxE",  "CircE", "TriUE",  "TriDE",
-                           "DiaE",  "PentE", "BoxW",   "CircW",
-                           "TriUW", "TriDW", "DiaW",   "PentW"
+static char GPFAR * GPFAR pointFNS[] = {"Pnt",  "Pls",   "Crs",    "Star",
+                           "Box",  "BoxF",  "Circle", "CircleF",
+                           "TriU", "TriUF", "TriD",   "TriDF",
+                           "Dia",  "DiaF",  "Pent",   "PentF",
+        		   "C0",   "C1",    "C2",     "C3",
+			   "C4",   "C5",    "C6",     "C7",
+          		   "C8",   "C9",    "C10",    "C11",
+			   "C12",  "C13",   "C14",    "C15",
+                           "S0",   "S1",    "S2",     "S3",
+			   "S4",   "S5",    "S6",     "S7",
+                           "S8",   "S9",    "S10",    "S11",
+			   "S12",  "S13",   "S14",    "S15",
+          		   "D0",   "D1",    "D2",     "D3",
+			   "D4",   "D5",    "D6",     "D7",
+			   "D8",   "D9",    "D10",    "D11",
+			   "D12",  "D13",   "D14",    "D15",
+                           "BoxE", "CircE", "TriUE",  "TriDE",
+                           "DiaE", "PentE"
 };
 	if (number < 0)
 		number = -1;		/* negative types are all 'dot' */

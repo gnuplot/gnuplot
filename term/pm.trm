@@ -34,7 +34,6 @@
  * to the extent permitted by applicable law.
 ]*/
 
-
 #include "driver.h"
 
 #ifdef TERM_REGISTER

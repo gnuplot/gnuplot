@@ -1,4 +1,4 @@
-/* $Id: driver.h,v 1.7 1998/03/22 22:34:34 drd Exp $ */
+/* $Id: driver.h,v 1.8 1998/04/14 00:17:36 drd Exp $ */
 
 /* GNUPLOT - driver.h  $Id: driver.h,v 1.7 1998/03/22 22:34:34 drd Exp $ */
 
@@ -39,6 +39,9 @@
 #include "plot.h"
 #include "bitmap.h"
 #include "setshow.h"
+
+/* corey@cac added the next line for efficiency */
+#define fputc putc
 
 /* functions provided by in term.c */
 

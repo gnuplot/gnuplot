@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: util.c,v 1.44 1998/03/22 22:32:19 drd Exp $";
+static char *RCSid = "$Id: util.c,v 1.45 1998/04/14 00:16:28 drd Exp $";
 #endif
 
 /* GNUPLOT - util.c */
@@ -133,7 +133,7 @@ int t_num;
 	
 	return(token[t_num].is_token &&
 		   (input_line[token[t_num].start_index] == '\'' ||
-		   input_line[token[t_num].start_index] == '\"'));
+		    input_line[token[t_num].start_index] == '"'));
 }
 
 

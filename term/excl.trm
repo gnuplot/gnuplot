@@ -1,5 +1,5 @@
 /*
- * $Id: excl.trm,v 1.8 1996/12/08 13:11:16 drd Exp $
+ * $Id: excl.trm,v 1.9 1998/04/14 00:17:41 drd Exp $
  *
  */
 
@@ -22,7 +22,7 @@
  * 
  * send your comments or suggestions to (info-gnuplot@dartmouth.edu).
  *
- ***     $Id: excl.trm,v 1.8 1996/12/08 13:11:16 drd Exp $
+ ***     $Id: excl.trm,v 1.9 1998/04/14 00:17:41 drd Exp $
      
   NAME
      quic

@@ -1,5 +1,5 @@
 /*
- * $Id: hpljii.trm,v 1.19 1998/03/22 22:34:47 drd Exp $
+ * $Id: hpljii.trm,v 1.20 1998/04/14 00:17:51 drd Exp $
  *
  */
 
@@ -232,7 +232,7 @@ TERM_PUBLIC void HPLJIItext()
 
 #ifndef VMS  /* most vms spoolers add a formfeed character */
    fprintf(outfile,"\f");
-#endif /* not VMS */
+#endif /* !VMS */
 }
 
 
@@ -360,7 +360,7 @@ TERM_PUBLIC void HPDJtext()
 
 #ifndef VMS  /* most vms spoolers add a formfeed character */
    fprintf(outfile,"\f");
-#endif /* not VMS */
+#endif /* !VMS */
 }
 
 #endif 

@@ -57,7 +57,8 @@ CFLAGS1 = -Ff=256 -f -m$(MODEL) -w- -Z -3 -f287 -d -G -n. -v -y
 #CFLAGS2 = -I$(TC)\include -DLITE -DMSDOS -DPC -DREADLINE -DHAVE_STRNICMP
 # HBB: try without -DLITE, to activate hidden-lining (for trying)
 #      and #define ANSI_C!
-CFLAGS2 = -I$(TC)\include -DMSDOS -DPC -DREADLINE -DHAVE_GETCWD -DHAVE_STRNICMP  -DANSI_C
+CFLAGS2 = -I$(TC)\include -DMSDOS -DPC -DREADLINE -DHAVE_GETCWD -DHAVE_STRNICMP
+CFLAGS3 = -DHAVE_SLEEP -DANSI_C -DLITE
 
 # separate set of FLAGS (both CFLAGS and LDFLAGS for the doc2xxx tools:
 DOC2XXX_FLAGS = -Idocs -Iterm @cflags.tc -ml -L$(TC)\lib
@@ -135,6 +136,7 @@ linkopt.tc: makefile.tc
 cflags.tc: makefile.tc
 	echo  >cflags.tc $(CFLAGS1) 
 	echo >>cflags.tc $(CFLAGS2)
+	echo >>cflags.tc $(CFLAGS3)
 
 # default rules
 

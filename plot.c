@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: plot.c,v 1.86 1998/03/22 22:31:55 drd Exp $";
+static char *RCSid = "$Id: plot.c,v 1.87 1998/04/14 00:16:05 drd Exp $";
 #endif
 
 /* GNUPLOT - plot.c */
@@ -262,7 +262,8 @@ int main(argc, argv)
 #if defined(MSDOS) && !defined(_Windows) && !defined(__GNUC__)
   PC_setup();
 #endif /* MSDOS !Windows */
-#if defined(DJGPP)       /* HBB: disable all floating point exceptions, just keep running... */
+/* HBB: Seems this isn't needed any more for DJGPP V2? */
+#if defined(DJGPP) && (DJGPP!=2)       /* HBB: disable all floating point exceptions, just keep running... */
   _control87(MCW_EM, MCW_EM); 
 #endif
 

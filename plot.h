@@ -1,5 +1,5 @@
 /*
- * $Id: plot.h,v 1.119 1998/03/22 22:31:56 drd Exp $
+ * $Id: plot.h,v 1.120 1998/04/14 00:16:06 drd Exp $
  *
  */
 
@@ -53,7 +53,7 @@
 #if defined(AMIGA_SC_6_1) || defined(AMIGA_AC_5) || defined(__amigaos__)
 # define OS "Amiga "
 # ifndef __amigaos__
-#  define SHELL "NewShell"
+#define SHELL "NewShell"
 # endif
 # ifndef AMIGA
 #  define AMIGA
@@ -62,7 +62,7 @@
 
 #ifdef ATARI
 # define OS "TOS "
-# define SHELL "gulam.prg"
+#define SHELL "gulam.prg"
 #endif /* Atari */
 
 #ifdef DOS386
@@ -79,18 +79,18 @@
 
 #ifdef OS2
 # define OS "OS/2 "
-# define SHELL "c:\\cmd.exe"
+#define SHELL "c:\\cmd.exe"
 #endif /* OS/2 */
 
 #ifdef OSK
 # define OS "OS-9 "
-# define SHELL "/dd/cmds/shell"
+#define SHELL "/dd/cmds/shell"
 #endif /* OS-9 */
 
 #if defined(vms) || defined(VMS)
 # ifndef VMS
 #  define VMS
-# endif
+#endif
 # define OS "VMS "
 # if !defined(VAXCRTL) && !defined(DECCRTL)
 #  error Please /define either VAXCRTL or DECCRTL
@@ -104,7 +104,7 @@
 #if defined(_WINDOWS) || defined(_Windows)
 # ifndef _Windows
 #  define _Windows
-# endif
+#endif
 # ifdef WIN32
 #  define OS "MS-Windows 32 bit "
 # else
@@ -115,7 +115,7 @@
 # endif /* WIN32 */
 #endif /* _WINDOWS */
 
-#ifdef MSDOS
+#if defined(MSDOS) && !defined(_Windows)
 # if !defined(DOS32) && !defined(DOS16)
 #  define DOS16
 # endif
@@ -150,18 +150,17 @@
 # define OS "Unix "
 #endif
 
-/* FIXME: OS might be empty for certain SCO and IBM AIX compilers. */
 #ifndef OS
 # define OS ""
 #endif
 
 #ifndef SHELL
-# define SHELL "/bin/sh"    /* used if SHELL env variable not set */
+#define SHELL "/bin/sh"    /* used if SHELL env variable not set */
 #endif
 
-/* End OS defines section */
-
-
+/* End OS section */
+  
+  
 #define SAMPLES 100		/* default number of samples for a plot */
 #define ISO_SAMPLES 10		/* default number of isolines per splot */
 #define ZERO	1e-8		/* default for 'zero' set option */
@@ -202,7 +201,7 @@
 #define STACK_DEPTH 100
 #define NO_CARET (-1)
 
-#if defined(MSDOS) && !defined(DOS32)
+#ifdef DOS16
 #define MAX_NUM_VAR	3	/* Ploting projection of func. of max. five vars. */
 #else
 #define MAX_NUM_VAR	5	/* Ploting projection of func. of max. five vars. */
@@ -308,7 +307,7 @@
 #define GPFAR
 #endif
 
-#if (defined(MSDOS) && !defined(DOS32)) || (defined(_Windows) && !defined(WIN32))
+#if defined(DOS16) || defined(WIN16)
 typedef float coordval;		/* memory is tight on PCs! */
 #define COORDVAL_FLOAT 1
 #else
@@ -779,18 +778,19 @@ struct ticmark {
 	decvax!minow
  */
 #ifdef VMS
-#include		<ssdef.h>
-#include		<stsdef.h>
-#define	IO_SUCCESS	(SS$_NORMAL | STS$M_INHIB_MSG)
-#define	IO_ERROR	SS$_ABORT
+# include		<ssdef.h>
+# include		<stsdef.h>
+# define	IO_SUCCESS	(SS$_NORMAL | STS$M_INHIB_MSG)
+# define	IO_ERROR	SS$_ABORT
 #endif /* VMS */
 
 
 #ifndef	IO_SUCCESS	/* DECUS or VMS C will have defined these already */
-#define	IO_SUCCESS	0
+# define	IO_SUCCESS	0
 #endif
+
 #ifndef	IO_ERROR
-#define	IO_ERROR	1
+# define	IO_ERROR	1
 #endif
 
 /* Some key global variables */
@@ -815,7 +815,7 @@ extern char dummy_var[MAX_NUM_VAR][MAX_ID_LEN+1];	/* from setshow.c */
 
 /* Windows needs to redefine stdin/stdout functions */
 #ifdef _Windows
-#include "win/wtext.h"
+# include "win/wtext.h"
 #endif
 
 #define TTOP 0
@@ -843,17 +843,19 @@ extern char dummy_var[MAX_NUM_VAR][MAX_ID_LEN+1];	/* from setshow.c */
 #define DF_FIRST_BLANK  (-3)
 #define DF_SECOND_BLANK (-4)
 
-/* if GP_INLINE has not yet been defined, set to __inline for gcc,
+/* HBB: changed to __inline__, which seems more usually
+ * understood by tools like, e.g., lclint */
+/* if GP_INLINE has not yet been defined, set to __inline__ for gcc,
  * nothing. I'd prefer that any other compilers have the defn in
  * the makefile, rather than having a huge list of compilers here.
  * But gcc is sufficiently ubiquitous that I'll allow it here !!!
  */
 #ifndef GP_INLINE
-#ifdef __GNUC__
-#define GP_INLINE __inline
-#else
-#define GP_INLINE /*nothing*/
-#endif
+# ifdef __GNUC__
+#  define GP_INLINE __inline__
+# else
+#  define GP_INLINE /*nothing*/
+# endif
 #endif
 
 #include "protos.h"
@@ -867,12 +869,12 @@ extern char dummy_var[MAX_NUM_VAR][MAX_ID_LEN+1];	/* from setshow.c */
  * We assume compiler will optimise away if(0) or if(1)
  */
 #if defined(ANSI_C) && defined(DEBUG_LP)
-#define LP_DUMP(lp) \
+# define LP_DUMP(lp) \
  fprintf(stderr, \
   "lp_properties at %s:%d : lt: %d, lw: %.3f, pt: %d, ps: %.3f\n", \
   __FILE__, __LINE__, lp.l_type, lp.l_width, lp.p_type, lp.p_size)
 #else
-#define LP_DUMP(lp)
+# define LP_DUMP(lp)
 #endif
 
 #define LP_PARSE(lp, allow_ls, allow_point, def_line, def_point) \

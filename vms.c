@@ -1,5 +1,5 @@
 #ifndef lint
-static char    *RCSid = "$Id: vms.c,v 1.3 1998/03/22 22:32:25 drd Exp $";
+static char    *RCSid = "$Id: vms.c,v 1.4 1998/04/14 00:16:30 drd Exp $";
 #endif
 
 /* GNUPLOT - vms.c */
@@ -38,7 +38,7 @@ static char    *RCSid = "$Id: vms.c,v 1.3 1998/03/22 22:32:25 drd Exp $";
  * (originally written by drd for port of perl to vms)
  */
 
-#include <stdfn.h>
+#include "stdfn.h"
 
 static int something_in_this_file;
 
@@ -60,20 +60,14 @@ static int something_in_this_file;
 #include <ssdef.h>
 #include <descrip.h>
 
-/*cant be bothered finding which include files define these */
-int lib$getsyi();
-int sys$crembx();
-int lib$getdvi();
-int sys$hiber();
-int sys$schdwk();
-int sys$wake();
-int sys$dassgn();
-int lib$spawn();
-int sys$forcex();
-int sys$delprc();
-int lib$getjpi();
-int sys$bintim();
+#ifdef __DECC             /* DECC does not automatically search */
+#include <lib$routines.h>
+#include <starlet.h>      /* for the sys$... routines */
+#endif  /* __DECC */
 
+#ifndef EXIT_FAILURE                  /* not in older VAXC <stdlib.h> */
+#define EXIT_FAILURE 0x10000002       /* (STS$K_ERROR | STS$M_INHIB_MSG */
+#endif
 
 #define _cksts(call) \
   if (!(sts=(call))&1) FATAL("Internal error") else {}
