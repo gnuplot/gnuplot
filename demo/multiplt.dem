@@ -28,14 +28,14 @@
 # Released to the public domain with no warranty of any kind
 #
 reset
-set style function lines
+set function style lines
 set size 1.0, 1.0
 set origin 0.0, 0.0
 set multiplot
 set size 0.5,0.5
 set origin 0.0,0.5
 set grid
-unset key
+set nokey
 set angles radians
 set samples 250
 #  Plot Magnitude Response
@@ -83,7 +83,7 @@ plot \
 set size 0.5,0.5
 set origin 0.5,0.5
 set dummy wnt
-unset logscale x
+set nologscale x
 set title "Second Order System - Unit Step Response"
 set ylabel "Amplitude y(wnt)" 1,0 
 set xlabel "Normalized Time (wnt)"
@@ -128,7 +128,7 @@ plot \
   zeta=.707,y(wnt), \
   zeta=1,y(wnt), \
   zeta=2,y(wnt)
-unset multiplot
+set nomultiplot
 #
 #  Clean up: reset parameter defaults
 #

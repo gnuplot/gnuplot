@@ -1,5 +1,5 @@
 #
-# $Id: contours.dem,v 1.4 1999/06/10 19:57:55 lhecking Exp $
+# $Id: contours.dem,v 1.5 1999/08/17 15:31:54 lhecking Exp $
 #
 set samples 20
 set isosamples 21
@@ -83,17 +83,17 @@ set xrange [0:15]
 set yrange [0:15]
 set auto
 set zrange [-1.0:1.0]
-set style data lines
+set data style lines
 set title "3D gnuplot demo - contour of data grid plotting"
 set parametric
 splot "glass.dat"
 pause -1 "Hit return to continue (19)"
 set zrange [-1.2:1.2]
-unset parametric
+set noparametric
 splot "glass.dat" using 1
 pause -1 "Hit return to continue (20)"
 set view 0,0,1
-unset surface
+set nosurface
 set title "3D gnuplot demo - 2D contour projection of last plot"
 replot
 pause -1 "Hit return to continue (21)"
@@ -120,7 +120,7 @@ pause -1 "Hit return to continue (21)"
 #
 set auto
 set surface
-unset contour
+set nocontour
 set cntrparam levels 5
 set cntrparam linear
 set samples 100
@@ -144,20 +144,20 @@ set ylabel "y"
 splot [-1.5:1.5] [-0.5:1.5] (1-x)**2 + 100*(y - x**2)**2
 pause -1 "Hit Return to Continue (23)"
 set contour
-unset surface
+set nosurface
 replot
 pause -1 "Hit Return to Continue (24)"
 #
 # Clean up:
 #
-unset log
+set nolog
 set surface
-unset contour
+set nocontour
 set cntrparam levels 5
 set cntrparam linear
 set samples 100
 set isosamples 10
-unset hidden3d
+set nohidden3d
 set view 60,30,1,1
 set xrange [-10:10]
 set yrange [-10:10]

@@ -3,10 +3,10 @@ set term latex
 set out "linepoin.tex"
 set clip points
 set dummy t,y
-unset key
+set nokey
 set parametric
 set samples 14	 # for trange 0:13, we get 14 points: 0, 1, ..., 13
-set style function lines
+set function style lines
 set xtics 1,1,12
 set ytics 1,1,6
 set title "Up to 6 line types and 12 point types"

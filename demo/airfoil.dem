@@ -1,5 +1,5 @@
 #
-# $Id: airfoil.dem,v 1.4 1999/08/17 15:31:53 lhecking Exp $
+# $Id: airfoil.dem,v 1.5 1999/10/17 19:16:58 lhecking Exp $
 #
 # This demo shows how to use bezier splines to define NACA four
 # series airfoils and complex variables to define Joukowski
@@ -120,8 +120,8 @@ airfoil_y1(t, thick) = mean_y(z_x(t)) + z_y(t, thick)
 airfoil_y2(t, thick) = mean_y(z_x(t)) - z_y(t, thick)
 airfoil_y(t) = mean_y(z_x(t))
 airfoil_x(t) = mean_x(z_x(t))
-unset grid
-unset zeroaxis
+set nogrid
+set nozeroaxis
 set parametric
 set xrange [-0.1:1.1]
 set yrange [-0.1:.7]
@@ -146,8 +146,8 @@ set key box
 set parametric
 set samples 100
 set isosamples 10
-set style data lines
-set style function lines
+set data style lines
+set function style lines
 pause 0  "Joukowski Airfoil using Complex Variables" 
 set title "Joukowski Airfoil using Complex Variables" 0,0
 set time

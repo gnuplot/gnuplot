@@ -1,5 +1,5 @@
 #
-# $Id: prob.dem,v 1.3 1999/08/17 15:31:55 lhecking Exp $
+# $Id: prob.dem,v 1.4 1999/10/17 19:17:00 lhecking Exp $
 #
 # Demo Statistical Functions version 2.3
 #
@@ -24,7 +24,7 @@ sigma = r / sqrt2
 xmin = -r
 xmax = r
 ymax = 1.1 * r #No mode
-unset key
+set nokey
 set zeroaxis
 set xrange [xmin : xmax]
 set yrange [0 : ymax]
@@ -84,8 +84,8 @@ xmax = int(mu + 4.0 * sigma)
 ymax = 1.1 * binom(mu) #Mode of normal PDF used
 xinc = ceil((xmax - xmin) / 10)
 xinc = xinc > 1 ? xinc : 1
-unset key
-unset zeroaxis
+set nokey
+set nozeroaxis
 set xrange [xmin : xmax]
 set yrange [0 : ymax]
 set xlabel "k ->"
@@ -291,8 +291,8 @@ xmax = int(mu + 4.0 * sigma)
 xinc = ceil((xmax - xmin) / 10)
 xinc = xinc > 1 ? xinc : 1
 ymax = 1.1 * geometric(mu - 1/p) #mode of gamma PDF used
-unset key
-unset zeroaxis
+set nokey
+set nozeroaxis
 set xrange [xmin : xmax]
 set yrange [0 : ymax]
 set xlabel "k ->"
@@ -318,7 +318,7 @@ s = sigma*sqrt(1.0 - 2.0/pi)
 xmin = 0.0
 xmax = mu + 4.0 * s
 ymax = 1.1 * halfnormal(0) #Mode of half normal PDF used
-unset key
+set nokey
 set zeroaxis
 set xrange [xmin: xmax]
 set yrange [0: ymax]
@@ -348,8 +348,8 @@ xmax = int(mu + 4.0 * sigma)
 xinc = ceil((xmax - xmin) / 10)
 xinc = xinc > 1 ? xinc : 1
 ymax = 1.1 * hypgeo(mu) #mode of binomial PDF used
-unset key
-unset zeroaxis
+set nokey
+set nozeroaxis
 set xrange [xmin : xmax]
 set yrange [0 : ymax]
 set xlabel "k ->"
@@ -375,7 +375,7 @@ sigma = sqrt(2.0) * b
 xmin = mu - 4.0 * sigma
 xmax = mu + 4.0 * sigma
 ymax = 1.1 * laplace(a) #Mode of laplace PDF used
-unset key
+set nokey
 set zeroaxis
 set xrange [xmin: xmax]
 set yrange [0: ymax]
@@ -401,11 +401,11 @@ sigma = pi / (sqrt(3.0) * lambda)
 xmin = mu - 4.0 * sigma
 xmax = mu + 4.0 * sigma
 ymax = 1.1 * logistic(mu) #Mode of logistic PDF used
-unset key
+set nokey
 set zeroaxis
 set xrange [xmin: xmax]
 set yrange [0: ymax]
-unset key
+set nokey
 set zeroaxis
 set xlabel "x ->"
 set ylabel "probability density ->"
@@ -430,7 +430,7 @@ xmin = m - 4.0 * s
 xmin = xmin < 0 ? 0 : xmin
 xmax = m + 4.0 * s
 ymax = 1.1 * lognormal(exp(mu - sigma**2)) #Mode of lognormal PDF used
-unset key
+set nokey
 set zeroaxis
 set xrange [xmin: xmax]
 set yrange [0: ymax]
@@ -490,8 +490,8 @@ xmax = int(mu + 4.0 * sigma)
 xinc = ceil((xmax - xmin) / 10)
 xinc = xinc > 1 ? xinc : 1
 ymax = 1.1 * negbin(mu - 1.0/p) #mode of gamma PDF used
-unset key
-unset zeroaxis
+set nokey
+set nozeroaxis
 set xrange [xmin : xmax]
 set yrange [0 : ymax]
 set xlabel "k ->"
@@ -516,7 +516,7 @@ mu = 1.0 / lambda
 sigma = 1.0 / lambda
 xmax =  mu + 4.0 * sigma
 ymax = lambda #No mode
-unset key
+set nokey
 set zeroaxis
 set xrange [0: xmax]
 set yrange [0: ymax]
@@ -571,7 +571,7 @@ xmin = mu - 4.0 * sigma
 xmin = xmin < 0 ? 0 : xmin
 xmax = mu + 4.0 * sigma
 ymax = 1.1 * pareto(a) #mode of pareto PDF used
-unset key
+set nokey
 set zeroaxis
 set xrange [xmin: xmax]
 set yrange [0: ymax]
@@ -599,8 +599,8 @@ xmax = int(mu + 4.0 * sigma)
 xinc = ceil((xmax - xmin) / 10)
 xinc = xinc > 1 ? xinc : 1
 ymax = 1.1 * poisson(mu) #mode of poisson PDF used
-unset key
-unset zeroaxis
+set nokey
+set nozeroaxis
 set xrange [xmin : xmax]
 set yrange [0 : ymax]
 set xlabel "k ->"
@@ -625,7 +625,7 @@ mu = 0.5 * sqrt(pi / lambda)
 sigma = sqrt((1.0 - pi / 4.0) / lambda)
 xmax = mu + 4.0 * sigma
 ymax = 1.1 * rayleigh(1.0 / sqrt(2.0 * lambda)) #Mode of rayleigh PDF used
-unset key
+set nokey
 set zeroaxis
 set xrange [0: xmax]
 set yrange [0: ymax]
@@ -679,7 +679,7 @@ sigma = df1 > 2.0 ? sqrt(df1 / (df1 - 2.0)) : 1.0
 xmin = mu - 4.0 * sigma
 xmax = mu + 4.0 * sigma
 ymax = 1.1 * t(mu) #Mode of t PDF used
-unset key
+set nokey
 set zeroaxis
 set xrange [xmin: xmax]
 set yrange [0: ymax]
@@ -707,7 +707,7 @@ sigma = g/sqrt(6.0)
 xmin = m - g
 xmax = m + g
 ymax = 1.1 * triangular(m) #Mode of triangular PDF used
-unset key
+set nokey
 set zeroaxis
 set xrange [xmin: xmax]
 set yrange [0: ymax]
@@ -733,7 +733,7 @@ sigma = (b - a) / sqrt(12.0)
 xmin = a
 xmax = b
 ymax = 1.1 * uniform(mu) #No mode
-unset key
+set nokey
 set zeroaxis
 set xrange [xmin: xmax]
 set yrange [0: ymax]

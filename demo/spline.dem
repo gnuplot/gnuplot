@@ -1,5 +1,5 @@
 #
-# $Id: spline.dem,v 1.2 1999/08/17 15:31:56 lhecking Exp $
+# $Id: spline.dem,v 1.3 1999/10/17 19:17:00 lhecking Exp $
 #
 # Some curve plotting using common cubic polynomial basis function for cagd.
 #
@@ -74,7 +74,7 @@ plot cub_bezier_x(t), cub_bezier_y(t) with lines 2,\
      cub_bsplin_x(t), cub_bsplin_y(t) with lines 3
 pause -1 "Press return to continue"
 
-unset arrow
+set noarrow
 #
 # Note the arrows here, scaled by 1/3 so they will fit into plotting area
 #

@@ -1,5 +1,5 @@
 #
-# $Id: electron.dem,v 1.2 1999/08/17 15:31:54 lhecking Exp $
+# $Id: electron.dem,v 1.3 1999/10/17 19:16:58 lhecking Exp $
 #
 # Electronics demo
 #
@@ -13,8 +13,8 @@ kT_q = 0.025
 set dummy Vbe
 set grid
 set offsets
-unset log
-unset polar
+set nolog
+set nopolar
 set samples 160
 set title "Mutual Characteristic of a Transistor"
 set xlabel "Vbe (base emmitter voltage)"
@@ -43,8 +43,8 @@ Vp = -1.25
 # gate voltage
 Vg = 0
 set dummy Vd
-unset grid
-unset key
+set nogrid
+set nokey
 set offsets 0, 1, 0, 0
 set title "JFET Mutual Characteristic"
 set xlabel "Drain voltage Vd (V)"
@@ -56,7 +56,7 @@ set label "-0.25 Vp" at 4.1,1.4
 set label "0" at 4.1,2.5
 set label "Vg = 0.5 Vp" at 4.1,3.9
 plot Vg=0.5*Vp,Id(Vd),Vg=0.25*Vp,Id(Vd),Vg=0,Id(Vd),Vg=-0.25*Vp,Id(Vd)
-unset label
+set nolabel
 
 pause -1 "Hit return to continue"
 
@@ -71,7 +71,7 @@ set grid x y2
 set key
 set logscale xy
 set log x2
-unset log y2
+set nolog y2
 set title "Amplitude and Phase Frequency Response"
 set xlabel "jw (radians)"
 set xrange [1.1 : 90000.0]

@@ -1,5 +1,5 @@
 #
-# $Id: hidden.dem,v 1.3 1999/08/17 15:31:54 lhecking Exp $
+# $Id: hidden.dem,v 1.4 1999/10/17 19:16:59 lhecking Exp $
 #
 #
 set samples 20
@@ -19,7 +19,7 @@ splot x*y / (x**2 + y**2 + 0.1)
 pause -1 "Hit return to continue (2)"
 
 set view 70,45
-unset contour
+set nocontour
 set xrange [-3:3]
 set yrange [-3:3]
 splot sin(x*x + y*y) / (x*x + y*y)
@@ -35,7 +35,7 @@ set border 4095
 splot sin(x) * cos(y)
 pause -1 "Hit return to continue (4)"
 
-unset grid
+set nogrid
 set ztics autofreq
 set border 31
 set view 75,230
@@ -44,7 +44,7 @@ replot
 pause -1 "Hit return to continue (5)"
 
 set view 80,30,1,1
-set style data lines
+set data style lines
 # autoranging loses the verticals
 set xrange [0:15]
 set yrange [0:15]
@@ -56,9 +56,9 @@ set grid
 replot
 pause -1 "Hit return to continue (7)"
 
-unset contour
-unset grid
-unset hidden3d
+set nocontour
+set nogrid
+set nohidden3d
 set samples 100
 set isosamples 10
 set view 60,30,1,1

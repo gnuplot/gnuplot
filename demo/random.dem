@@ -1,5 +1,5 @@
 #
-# $Id: random.dem,v 1.1.1.1 1998/04/15 19:16:42 lhecking Exp $
+# $Id: random.dem,v 1.2 1999/08/17 15:31:56 lhecking Exp $
 #
 # random.dem
 #
@@ -12,7 +12,7 @@
 # Copyright (c) 1991, Jos van der Woude, jvdwoude@hut.nl
 seed = 1317
 seed = rand(seed)
-unset key
+set nokey
 set xrange [0: 1]
 set yrange [0: 1]
 set zrange [0: 1]
@@ -25,7 +25,7 @@ set format y "%3.2f"
 set format z "%3.2f"
 set tics
 set sample 1000
-set style function dots
+set function style dots
 set parametric
 plot rand(1), rand(1)
 pause -1 "Hit return to continue"
