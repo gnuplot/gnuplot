@@ -1,26 +1,13 @@
-/* $Id: $ */
+/* $Id: tables.c,v 1.1 1999/08/07 17:19:50 lhecking Exp $ */
 
 /* GNUPLOT - tables.c */
 
 #include "plot.h"
 #include "tables.h"
 
-/* gnuplot commands
- * for reference only - original in tables.h
- */
-/*
-enum command_id {
-    CMD_INVALID,
-    CMD_NULL,
-    CMD_CALL, CMD_CD, CMD_CLEAR, CMD_EXIT, CMD_FIT, CMD_HELP, CMD_HISTORY,
-    CMD_IF, CMD_LOAD, CMD_PAUSE, CMD_PLOT, CMD_PRINT, CMD_PWD, CMD_REPLOT,
-    CMD_REREAD, CMD_RESET, CMD_SAVE, CMD_SCREENDUMP, CMD_SET, CMD_SHELL,
-    CMD_SHOW, CMD_SPLOT, CMD_SYSTEM, CMD_TEST, CMD_TESTTIME, CMD_UPDATE
-};
-*/
+/* gnuplot commands */
 
-/* the actual commands
- * should be in sync with above enum */
+/* the actual commands */
 struct gen_table command_tbl[] =
 {
     { "ca$ll", CMD_CALL },
@@ -56,7 +43,7 @@ struct gen_table command_tbl[] =
     { NULL, CMD_INVALID }
 };
 
-/* save command */
+/* 'save' command */
 struct gen_table save_tbl[] =
 {
     { "f$unctions", SAVE_FUNCS },
@@ -65,19 +52,165 @@ struct gen_table save_tbl[] =
     { NULL, SAVE_INVALID }
 };
 
+/* 'set' and 'show' commands */
+struct gen_table set_tbl[] =
+{
+    { "a$ll", S_ALL },
+    { "ac$tion_table", S_ACTIONTABLE },
+    { "at", S_ACTIONTABLE },
+    { "an$gles", S_ANGLES },
+    { "ar$row", S_ARROW },
+    { "ar$row", S_ARROW },
+    { "au$toscale", S_AUTOSCALE },
+    { "au$toscale", S_AUTOSCALE },
+    { "b$ars", S_BARS },
+    { "b$ars", S_BARS },
+    { "bor$der", S_BORDER },
+    { "bor$der", S_BORDER },
+    { "box$width", S_BOXWIDTH },
+    { "cl$abel", S_CLABEL },
+    { "cl$abel", S_CLABEL },
+    { "c$lip", S_CLIP },
+    { "c$lip", S_CLIP },
+    { "cn$trparam", S_CNTRPARAM },
+    { "co$ntour", S_CONTOUR },
+    { "co$ntour", S_CONTOUR },
+    { "da$ta", S_DATA },
+    { "dg$rid3d", S_DGRID3D },
+    { "dg$rid3d", S_DGRID3D },
+    { "du$mmy", S_DUMMY },
+    { "enc$oding", S_ENCODING },
+    { "fo$rmat", S_FORMAT },
+    { "fu$nction", S_FUNCTIONS },
+    { "fu$nctions", S_FUNCTIONS },
+    { "g$rid", S_GRID },
+    { "g$rid", S_GRID },
+    { "hi$dden3d", S_HIDDEN3D },
+    { "hi$dden3d", S_HIDDEN3D },
+    { "is$osamples", S_ISOSAMPLES },
+    { "k$ey", S_KEY },
+    { "k$ey", S_KEY },
+    { "keyt$itle", S_KEYTITLE },
+    { "keyt$itle", S_KEYTITLE },
+    { "la$bel", S_LABEL },
+    { "la$bel", S_LABEL },
+    { "li$nestyle", S_LINESTYLE },
+    { "li$nestyle", S_LINESTYLE },
+    { "ls", S_LINESTYLE },
+    { "ls", S_LINESTYLE },
+    { "loa$dpath", S_LOADPATH },
+    { "loa$dpath", S_LOADPATH },
+    { "loc$ale", S_LOCALE },
+    { "log$scale", S_LOGSCALE },
+    { "log$scale", S_LOGSCALE },
+    { "map$ping", S_MAPPING },
+    { "mar$gin", S_MARGIN },
+    { "mis$sing", S_MISSING },
+    { "mis$sing", S_MISSING },
+    { "mx2t$ics", S_MX2TICS },
+    { "mx2t$ics", S_MX2TICS },
+    { "mxt$ics", S_MXTICS },
+    { "mxt$ics", S_MXTICS },
+    { "my2t$ics", S_MY2TICS },
+    { "my2t$ics", S_MY2TICS },
+    { "myt$ics", S_MYTICS },
+    { "myt$ics", S_MYTICS },
+    { "mzt$ics", S_MZTICS },
+    { "mzt$ics", S_MZTICS },
+    { "of$fsets", S_OFFSETS },
+    { "of$fsets", S_OFFSETS },
+    { "or$igin", S_ORIGIN },
+    { "o$utput", S_OUTPUT },
+    { "pa$rametric", S_PARAMETRIC },
+    { "pa$rametric", S_PARAMETRIC },
+    { "p$lot", S_PLOT },
+    { "poi$ntsize", S_POINTSIZE },
+    { "pol$ar", S_POLAR },
+    { "pol$ar", S_POLAR },
+    { "rr$ange", S_RRANGE },
+    { "sa$mples", S_SAMPLES },
+    { "si$ze", S_SIZE },
+    { "su$rface", S_SURFACE },
+    { "su$rface", S_SURFACE },
+    { "t$erminal", S_TERMINAL },
+    { "ti$cs", S_TICS },
+    { "timef$mt", S_TIMEFMT },
+    { "tim$estamp", S_TIMESTAMP },
+    { "tim$estamp", S_TIMESTAMP },
+    { "tit$le", S_TITLE },
+    { "tr$ange", S_TRANGE },
+    { "ur$ange", S_URANGE },
+    { "v$ariables", S_VARIABLES },
+    { "ve$rsion", S_VERSION },
+    { "vi$ew", S_VIEW },
+    { "vr$ange", S_VRANGE },
+    { "xda$ta", S_XDATA },
+    { "yda$ta", S_YDATA },
+    { "zda$ta", S_YDATA },
+    { "x2da$ta", S_X2DATA },
+    { "y2da$ta", S_Y2DATA },
+    { "xti$cs", S_XTICS },
+    { "xti$cs", S_XTICS },
+    { "yti$cs", S_YTICS },
+    { "yti$cs", S_YTICS },
+    { "zti$cs", S_ZTICS },
+    { "zti$cs", S_ZTICS },
+    { "xdti$cs", S_XDTICS },
+    { "xdti$cs", S_XDTICS },
+    { "ydti$cs", S_YDTICS },
+    { "ydti$cs", S_YDTICS },
+    { "zdti$cs", S_ZDTICS },
+    { "zdti$cs", S_ZDTICS },
+    { "xmti$cs", S_XMTICS },
+    { "xmti$cs", S_XMTICS },
+    { "ymti$cs", S_YMTICS },
+    { "ymti$cs", S_YMTICS },
+    { "zmti$cs", S_ZMTICS },
+    { "zmti$cs", S_ZMTICS },
+    { "x2ti$cs", S_X2TICS },
+    { "x2ti$cs", S_X2TICS },
+    { "y2ti$cs", S_Y2TICS },
+    { "y2ti$cs", S_Y2TICS },
+    { "x2dti$cs", S_X2DTICS },
+    { "x2dti$cs", S_X2DTICS },
+    { "y2dti$cs", S_Y2DTICS },
+    { "y2dti$cs", S_Y2DTICS },
+    { "x2mti$cs", S_X2MTICS },
+    { "x2mti$cs", S_X2MTICS },
+    { "y2mti$cs", S_Y2MTICS },
+    { "y2mti$cs", S_Y2MTICS },
+    { "xl$abel", S_XLABEL },
+    { "yl$abel", S_YLABEL },
+    { "zl$abel", S_ZLABEL },
+    { "x2l$abel", S_X2LABEL },
+    { "y2l$abel", S_Y2LABEL },
+    { "xr$ange", S_XRANGE },
+    { "yr$ange", S_YRANGE },
+    { "zr$ange", S_ZRANGE },
+    { "x2r$ange", S_X2RANGE },
+    { "y2r$ange", S_Y2RANGE },
+    { "xzeroa$xis", S_XZEROAXIS },
+    { "xzeroa$xis", S_XZEROAXIS },
+    { "x2zeroa$xis", S_XZEROAXIS },
+    { "x2zeroa$xis", S_XZEROAXIS },
+    { "yzeroa$xis", S_YZEROAXIS },
+    { "yzeroa$xis", S_YZEROAXIS },
+    { "y2zeroa$xis", S_YZEROAXIS },
+    { "y2zeroa$xis", S_YZEROAXIS },
+    { "zeroa$xis", S_ZEROAXIS },
+    { "z$ero", S_ZERO },
+    { NULL, S_INVALID }
+};
+
 int
 lookup_table(tbl, token)
 struct gen_table *tbl;
 int token;
 {
-    c_token++;
-
     while (tbl->key) {
-	if (almost_equals(token, tbl->key)) {
+	if (almost_equals(token, tbl->key))
 	    return tbl->value;
-	}
 	tbl++;
     }
     return tbl->value; /* *_INVALID */
-
 }
