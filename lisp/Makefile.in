@@ -47,11 +47,11 @@ DISTFILES = $(DIST_COMMON) $(EXTRA_DIST)
 default: $(ELCS)
 
 gnuplot.elc: gnuplot.el
-	@test -f gnuplot.el || cp $(srcdir)/gnuplot.el .
+	test "$(srcdir)" = "$(top_builddir)" || cp $(srcdir)/gnuplot.el .
 	$(BYTEC) gnuplot.el
 
 gnuplot-gui.elc: gnuplot.elc gnuplot-gui.el
-	@test -f gnuplot-gui.el || cp $(srcdir)/gnuplot-gui.el .
+	test "$(srcdir)" = "$(top_builddir)" || cp $(srcdir)/gnuplot-gui.el .
 	$(BYTEC) gnuplot-gui.el
 
 ## There are many possibilities for info-look:
@@ -109,10 +109,10 @@ gpelcard.dvi: gpelcard.tex
 all: gnuplot.elc info-look.elc gnuplot-gui.elc
 
 install:
-	$(mkinstalldirs) $(lispdir)
-	@for p in *.elc; do \
-	  echo " $(INSTALL_DATA) $$p $(lispdir)/$$p"; \
-	  $(INSTALL_DATA) $$p $(lispdir)/$$p; \
+	$(mkinstalldirs) $(DESTDIR)$(lispdir)
+	@for p in gnuplot.el gnuplot-gui.el *.elc; do \
+	  echo " $(INSTALL_DATA) $$p $(DESTDIR)$(lispdir)/$$p"; \
+	  $(INSTALL_DATA) $$p $(DESTDIR)$(lispdir)/$$p; \
 	done
 
 # empty uninstall target; could be filled later
