@@ -942,9 +942,12 @@ char *text;
 	fprintf(fp, "set no%stics\n", text);
 	return;
     }
-    fprintf(fp, "set %stics %s %smirror %srotate ", text, (where & TICS_MASK) == TICS_ON_AXIS ? "axis" : "border", (where & TICS_MIRROR) ? "" : "no", rotate ? "" : "no");
+    fprintf(fp, "set %stics %s %smirror %srotate ", text,
+	    (where & TICS_MASK) == TICS_ON_AXIS ? "axis" : "border",
+	    (where & TICS_MIRROR) ? "" : "no", rotate ? "" : "no");
     switch (tdef->type) {
     case TIC_COMPUTED:{
+	    fputs("autofreq ", fp);
 	    break;
 	}
     case TIC_MONTH:{
