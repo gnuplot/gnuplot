@@ -206,8 +206,12 @@ doc2html.o: doc2html.c allterm.h
 pdf: gnuplot.pdf
 
 gnuplot.pdf: gnuplot.tex
-	$(PDFLATEX) gnuplot.tex
-	$(PDFLATEX) gnuplot.tex
+	@if test $(PDFLATEX) != no ; then \
+	  TEXINPUTS=.:$(srcdir):${TEXINPUTS}: $(PDFLATEX) gnuplot ; \
+	  TEXINPUTS=.:$(srcdir):${TEXINPUTS}: $(PDFLATEX) gnuplot ; \
+	else \
+	  echo pdflatex not found - cannot build pdf file ; \
+	fi
 
 ### LaTeX documentation
 tex: gnuplot.tex
