@@ -529,7 +529,7 @@ C
 #\mbox{imag}(x)^{2}}}$ \\
 %abs(x)@any@absolute value of $x$, $|x|$; same type
 %abs(x)@complex@length of $x$, $sqrt{roman real (x) sup 2 + roman imag (x) sup 2}$
- The `abs` function returns the absolute value of its argument.  The returned
+ The `abs(x)` function returns the absolute value of its argument.  The returned
  value is of the same type as the argument.
 
  For complex arguments, abs(x) is defined as the length of x in the complex
@@ -540,7 +540,7 @@ C
 ?acos
 #acos(x) & any  & $\cos^{-1} x$ (inverse cosine) \\
 %acos(x)@any@$cos sup -1 x$ (inverse cosine)
- The `acos` function returns the arc cosine (inverse cosine) of its argument.
+ The `acos(x)` function returns the arc cosine (inverse cosine) of its argument.
  `acos` returns its argument in radians or degrees, as selected by `set
  angles`.
 4 acosh
@@ -549,15 +549,15 @@ C
 ?acosh
 #acosh(x) & any  & $\cosh^{-1} x$ (inverse hyperbolic cosine) in radians \\
 %acosh(x)@any@$cosh sup -1 x$ (inverse hyperbolic cosine) in radians
- The `acosh` function returns the inverse hyperbolic cosine of its argument in
- radians.
+ The `acosh(x)` function returns the inverse hyperbolic cosine of its argument
+ in radians.
 4 arg
 ?expressions functions arg
 ?functions arg
 ?arg
 #arg(x) & complex & the phase of $x$ \\
 %arg(x)@complex@the phase of $x$
- The `arg` function returns the phase of a complex number in radians or
+ The `arg(x)` function returns the phase of a complex number in radians or
  degrees, as selected by `set angles`.
 4 asin
 ?expressions functions asin
@@ -565,7 +565,7 @@ C
 ?asin
 #asin(x) & any  & $\sin^{-1} x$ (inverse sin) \\
 %asin(x)@any@$sin sup -1 x$ (inverse sin)
- The `asin` function returns the arc sin (inverse sin) of its argument.
+ The `asin(x)` function returns the arc sin (inverse sin) of its argument.
  `asin` returns its argument in radians or degrees, as selected by `set
  angles`.
 4 asinh
@@ -574,7 +574,7 @@ C
 ?asinh
 #asinh(x) & any  & $\sinh^{-1} x$ (inverse hyperbolic sin) in radians \\
 %asinh(x)@any@$sinh sup -1 x$ (inverse hyperbolic sin) in radians
- The `asinh` function returns the inverse hyperbolic sin of its argument in
+ The `asinh(x)` function returns the inverse hyperbolic sin of its argument in
  radians.
 4 atan
 ?expressions functions atan
@@ -582,7 +582,7 @@ C
 ?atan
 #atan(x) & any  & $\tan^{-1} x$ (inverse tangent) \\
 %atan(x)@any@$tan sup -1 x$ (inverse tangent)
- The `atan` function returns the arc tangent (inverse tangent) of its
+ The `atan(x)` function returns the arc tangent (inverse tangent) of its
  argument.  `atan` returns its argument in radians or degrees, as selected by
  `set angles`.
 4 atan2
@@ -591,16 +591,16 @@ C
 ?atan2
 #atan2(y,x) & int or real & $\tan^{-1} (y/x)$ (inverse tangent) \\
 %atan2(y,x)@int or real@$tan sup -1 (y/x)$ (inverse tangent)
- The `atan2` function returns the arc tangent (inverse tangent) of the ratio
- of the real parts of its arguments.  `atan2` returns its argument in radians
- or degrees, as selected by `set angles`, in the correct quadrant.
+ The `atan2(y,x)` function returns the arc tangent (inverse tangent) of the
+ ratio of the real parts of its arguments.  `atan2` returns its argument in
+ radians or degrees, as selected by `set angles`, in the correct quadrant.
 4 atanh
 ?expressions functions atanh
 ?functions atanh
-?atan
+?atanh
 #atanh(x) & any  & $\tanh^{-1} x$ (inverse hyperbolic tangent) in radians \\
 %atanh(x)@any@$tanh sup -1 x$ (inverse hyperbolic tangent) in radians
- The `atanh` function returns the inverse hyperbolic tangent of its argument
+ The `atanh(x)` function returns the inverse hyperbolic tangent of its argument
  in radians.
 4 besj0
 ?expressions functions besj0
@@ -608,7 +608,7 @@ C
 ?besj0
 #besj0(x) & int or real &  $j_{0}$ Bessel function of $x$, in radians \\
 %besj0(x)@int or real@$j sub 0$ Bessel function of $x$, in radians
- The `besj0` function returns the j0th Bessel function of its argument.
+ The `besj0(x)` function returns the j0th Bessel function of its argument.
  `besj0` expects its argument to be in radians.
 4 besj1
 ?expressions functions besj1
@@ -616,7 +616,7 @@ C
 ?besj1
 #besj1(x) & int or real & $j_{1}$ Bessel function of $x$, in radians \\
 %besj1(x)@int or real@$j sub 1$ Bessel function of $x$, in radians
- The `besj1` function returns the j1st Bessel function of its argument.
+ The `besj1(x)` function returns the j1st Bessel function of its argument.
  `besj1` expects its argument to be in radians.
 4 besy0
 ?expressions functions besy0
@@ -632,7 +632,7 @@ C
 ?besy1
 #besy1(x) & int or real & $y_{1}$ Bessel function of $x$, in radians \\
 %besy1(x)@int or real@$y sub 1$ Bessel function of $x$, in radians
- The `besy1` function returns the y1st Bessel function of its argument.
+ The `besy1(x)` function returns the y1st Bessel function of its argument.
  `besy1` expects its argument to be in radians.
 4 ceil
 ?expressions functions ceil
@@ -641,7 +641,7 @@ C
 #ceil(x) & any & $\lceil x \rceil$, smallest integer not less than $x$
 #(real part) \\
 %ceil(x)@any@$left ceiling x right ceiling$, smallest integer not less than $x$ (real part)
- The `ceil` function returns the smallest integer that is not less than its
+ The `ceil(x)` function returns the smallest integer that is not less than its
  argument.  For complex numbers, `ceil` returns the smallest integer not less
  than the real part of its argument.
 4 cos
@@ -650,7 +650,7 @@ C
 ?cos
 #cos(x) & any & $\cos x$, cosine of $x$ \\
 %cos(x)@radians@$cos~x$, cosine of $x$
- The `cos` function returns the cosine of its argument.  `cos` accepts its
+ The `cos(x)` function returns the cosine of its argument.  `cos` accepts its
  argument in radians or degrees, as selected by `set angles`.
 4 cosh
 ?expressions functions cosh
@@ -658,7 +658,7 @@ C
 ?cosh
 #cosh(x) & any & $\cosh x$, hyperbolic cosine of $x$ in radians \\
 %cosh(x)@any@$cosh~x$, hyperbolic cosine of $x$ in radians
- The `cosh` function returns the hyperbolic cosine of its argument.  `cosh`
+ The `cosh(x)` function returns the hyperbolic cosine of its argument.  `cosh`
  expects its argument to be in radians.
 4 erf
 ?expressions functions erf
@@ -666,7 +666,7 @@ C
 ?erf
 #erf(x) & any & $\mbox{erf}(\mbox{real}(x))$,  error function of real($x$) \\
 %erf(x)@any@$erf ( roman real (x))$, error function of real ($x$)
- The `erf` function returns the error function of the real part of its
+ The `erf(x)` function returns the error function of the real part of its
  argument.  If the argument is a complex value, the imaginary component is
  ignored.
 4 erfc
@@ -675,8 +675,8 @@ C
 ?erfc
 #erfc(x) & any & $\mbox{erfc}(\mbox{real}(x))$,  1.0 - error function of real($x$) \\
 %erfc(x)@any@$erfc ( roman real (x))$, 1.0 - error function of real ($x$)
- The `erfc` function returns 1.0 - the error function of the real part of its
- argument.  If the argument is a complex value, the imaginary component is
+ The `erfc(x)` function returns 1.0 - the error function of the real part of
+ its argument.  If the argument is a complex value, the imaginary component is
  ignored.
 4 exp
 ?expressions functions exp
@@ -684,7 +684,7 @@ C
 ?exp
 #exp(x) & any & $e^{x}$,  exponential function of $x$ \\
 %exp(x)@any@$e sup x$, exponential function of $x$
- The `exp` function returns the exponential function of its argument (`e`
+ The `exp(x)` function returns the exponential function of its argument (`e`
  raised to the power of its argument).  On some implementations (notably
  suns), exp(-x) returns undefined for very large x.  A user-defined function
  like safe(x) = x<-100 ? 0 : exp(x) might prove useful in these cases.
@@ -695,7 +695,7 @@ C
 #floor(x) & any & $\lfloor x \rfloor$,  largest integer not greater
 #than $x$ (real part) \\
 %floor(x)@any@$left floor x right floor$, largest integer not greater than $x$ (real part)
- The `floor` function returns the largest integer not greater than its
+ The `floor(x)` function returns the largest integer not greater than its
  argument.  For complex numbers, `floor` returns the largest integer not
  greater than the real part of its argument.
 4 gamma
@@ -704,7 +704,7 @@ C
 ?gamma
 #gamma(x) & any & $\mbox{gamma}(\mbox{real}(x))$,  gamma function of real($x$) \\
 %gamma(x)@any@$GAMMA ( roman real (x))$, gamma function of real ($x$)
- The `gamma` function returns the gamma function of the real part of its
+ The `gamma(x)` function returns the gamma function of the real part of its
  argument.  For integer n, gamma(n+1) = n!.  If the argument is a complex
  value, the imaginary component is ignored.
 4 ibeta
@@ -713,16 +713,16 @@ C
 ?ibeta
 #ibeta(p,q,x) & any & $\mbox{ibeta}(\mbox{real}(p,q,x))$,  ibeta function of real($p$,$q$,$x$) \\
 %ibeta(p,q,x)@any@$ibeta ( roman real (p,q,x))$, ibeta function of real ($p$,$q$,$x$)
- The `ibeta` function returns the incomplete beta function of the real parts
- of its arguments. p, q > 0 and x in [0:1].  If the arguments are complex,
- the imaginary components are ignored.
+ The `ibeta(p,q,x)` function returns the incomplete beta function of the real
+ parts of its arguments. p, q > 0 and x in [0:1].  If the arguments are
+ complex, the imaginary components are ignored.
 4 inverf
 ?expressions functions inverf
 ?functions inverf
 ?inverf
 #inverf(x) & any &  inverse error function of real($x$)  \\
 %inverf(x)@any@inverse error function real($x$)
- The `inverf` function returns the inverse error function of the real part
+ The `inverf(x)` function returns the inverse error function of the real part
  of its argument.
 4 igamma
 ?expressions functions igamma
@@ -730,7 +730,7 @@ C
 ?igamma
 #igamma(a,x) & any & $\mbox{igamma}(\mbox{real}(a,x))$,  igamma function of real($a$,$x$) \\
 %igamma(a,x)@any@$igamma ( roman real (a,x))$, igamma function of real ($a$,$x$)
- The `igamma` function returns the incomplete gamma function of the real
+ The `igamma(a,x)` function returns the incomplete gamma function of the real
  parts of its arguments.  a > 0 and x >= 0.  If the arguments are complex,
  the imaginary components are ignored.
 4 imag
@@ -739,7 +739,7 @@ C
 ?imag
 #imag(x) & complex &  imaginary part of $x$ as a real number \\
 %imag(x)@complex@imaginary part of $x$ as a real number
- The `imag` function returns the imaginary part of its argument as a real
+ The `imag(x)` function returns the imaginary part of its argument as a real
  number.
 4 invnorm
 ?expressions functions invnorm
@@ -747,7 +747,7 @@ C
 ?invnorm
 #invnorm(x) & any &  inverse normal distribution function of real($x$)  \\
 %invnorm(x)@any@inverse normal distribution function real($x$)
- The `invnorm` function returns the inverse normal distribution function of
+ The `invnorm(x)` function returns the inverse normal distribution function of
  the real part of its argument.
 4 int
 ?expressions functions int
@@ -755,7 +755,7 @@ C
 ?int
 #int(x) & real &  integer part of $x$, truncated toward zero \\
 %int(x)@real@integer part of $x$, truncated toward zero
- The `int` function returns the integer part of its argument, truncated
+ The `int(x)` function returns the integer part of its argument, truncated
  toward zero.
 4 lgamma
 ?expressions functions lgamma
@@ -763,7 +763,7 @@ C
 ?lgamma
 #lgamma(x) & any & $\mbox{lgamma}(\mbox{real}(x))$,  lgamma function of real($x$) \\
 %lgamma(x)@any@$lgamma ( roman real (x))$, lgamma function of real ($x$)
- The `lgamma` function returns the natural logarithm of the gamma function
+ The `lgamma(x)` function returns the natural logarithm of the gamma function
  of the real part of its argument.  If the argument is a complex value, the
  imaginary component is ignored.
 4 log
@@ -772,21 +772,22 @@ C
 ?log
 #log(x) & any & $\log_{e} x$,  natural logarithm (base $e$) of $x$ \\
 %log(x)@any@$ln~x$, natural logarithm (base $e$) of $x$
- The `log` function returns the natural logarithm (base `e`) of its argument.
+ The `log(x)` function returns the natural logarithm (base `e`) of its
+ argument.
 4 log10
 ?expressions functions log10
 ?functions log10
 ?log10
 #log10(x) & any & $\log_{10} x$,  logarithm (base $10$) of $x$ \\
 %log10(x)@any@${log sub 10}~x$, logarithm (base $10$) of $x$
- The `log10` function returns the logarithm (base 10) of its argument.
+ The `log10(x)` function returns the logarithm (base 10) of its argument.
 4 norm
 ?expressions functions norm
 ?functions norm
 ?norm
 #norm(x) & any & normal distribution (Gaussian) function of real($x$) \\
 %norm(x)@any@$norm(x)$, normal distribution function of real($x$)
- The `norm` function returns the normal distribution function (or Gaussian)
+ The `norm(x)` function returns the normal distribution function (or Gaussian)
  of the real part of its argument.
 4 rand
 ?expressions functions rand
@@ -794,7 +795,7 @@ C
 ?rand
 #rand(x) & any & $\mbox{rand}(\mbox{real}(x))$,  pseudo random number generator \\
 %rand(x)@any@$rand ( roman real (x))$, pseudo random number generator
- The `rand` function returns a pseudo random number in the interval [0:1]
+ The `rand(x)` function returns a pseudo random number in the interval [0:1]
  using the real part of its argument as a seed.  If seed < 0, the sequence
  is (re)initialized.  If the argument is a complex value, the imaginary
  component is ignored.
@@ -804,23 +805,23 @@ C
 ?real
 #real(x) & any &  real part of $x$ \\
 %real(x)@any@real part of $x$
- The `real` function returns the real part of its argument.
+ The `real(x)` function returns the real part of its argument.
 4 sgn
 ?expressions functions sgn
 ?functions sgn
 ?sgn
 #sgn(x) & any & 1 if $x>0$, -1 if $x<0$, 0 if $x=0$. imag($x$) ignored \\
 %sgn(x)@any@1 if $x > 0$, -1 if $x < 0$, 0 if $x = 0$. $roman imag (x)$ ignored
- The `sgn` function returns 1 if its argument is positive, -1 if its argument
- is negative, and 0 if its argument is 0.  If the argument is a complex value,
- the imaginary component is ignored.
+ The `sgn(x)` function returns 1 if its argument is positive, -1 if its
+ argument is negative, and 0 if its argument is 0.  If the argument is a
+ complex value, the imaginary component is ignored.
 4 sin
 ?expressions functions sin
 ?functions sin
 ?sin
 #sin(x) & any & $\sin x$, sine of $x$ \\
 %sin(x)@any@$sin~x$, sine of $x$
- The `sin` function returns the sine of its argument.  `sin` expects its
+ The `sin(x)` function returns the sine of its argument.  `sin` expects its
  argument to be in radians or degrees, as selected by `set angles`.
 4 sinh
 ?expressions functions sinh
@@ -828,7 +829,7 @@ C
 ?sinh
 #sinh(x) & any & $\sinh x$, hyperbolic sine $x$ in radians \\
 %sinh(x)@any@$sinh~x$, hyperbolic sine $x$ in radians
- The `sinh` function returns the hyperbolic sine of its argument.  `sinh`
+ The `sinh(x)` function returns the hyperbolic sine of its argument.  `sinh`
  expects its argument to be in radians.
 4 sqrt
 ?expressions functions sqrt
@@ -836,14 +837,14 @@ C
 ?sqrt
 #sqrt(x) & any & $\sqrt{x}$,  square root of $x$ \\
 %sqrt(x)@any@$sqrt x $, square root of $x$
- The `sqrt` function returns the square root of its argument.
+ The `sqrt(x)` function returns the square root of its argument.
 4 tan
 ?expressions functions tan
 ?functions tan
 ?tan
 #tan(x) & any & $\tan x$,  tangent of $x$ \\
 %tan(x)@any@$tan~x$, tangent of $x$
- The `tan` function returns the tangent of its argument.  `tan` expects
+ The `tan(x)` function returns the tangent of its argument.  `tan` expects
  its argument to be in radians or degrees, as selected by `set angles`.
 4 tanh
 ?expressions functions tanh
@@ -851,7 +852,7 @@ C
 ?tanh
 #tanh(x) & any & $\tanh x$, hyperbolic tangent of $x$ in radians\\
 %tanh(x)@any@$tanh~x$, hyperbolic tangent of $x$ in radians
- The `tanh` function returns the hyperbolic tangent of its argument.  `tanh`
+ The `tanh(x)` function returns the hyperbolic tangent of its argument.  `tanh`
  expects its argument to be in radians.
 @end table
 
