@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.63 2002/03/18 18:19:10 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.64 2002/03/26 20:31:04 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -530,6 +530,7 @@ static int key_text_right;	/* offset from x for right-justified text */
 static int key_size_left;	/* distance from x to left edge of box */
 static int key_size_right;	/* distance from x to right edge of box */
 
+
 void
 do_3dplot(plots, pcount, quick)
     struct surface_points *plots;
@@ -647,7 +648,6 @@ do_3dplot(plots, pcount, quick)
 
 #ifdef PM3D
     /* DRAW PM3D ALL COLOR SURFACES */
-    can_pm3d = 0;
     if (!quick) {
 	can_pm3d = is_plot_with_palette() && !make_palette() && term->set_color;
 	if (can_pm3d) {
@@ -1241,6 +1241,17 @@ do_3dplot(plots, pcount, quick)
     }
 #endif
 
+#ifdef PM3D
+    /* Release the palette we have made use of. Actually, now it is used only
+     * in postscript terminals which write all pm3d plots in between 
+     * gsave/grestore. Thus, now I'm wondering whether term->previous_palette()
+     * is really needed anymore, for any terminal, or could this termentry
+     * be removed completely? Any future driver won't need it?
+     */
+    if (term->previous_palette)
+	term->previous_palette();
+#endif
+
     term_end_plot();
 
 #ifndef LITE
@@ -1248,8 +1259,8 @@ do_3dplot(plots, pcount, quick)
 	term_hidden_line_removal();
     }
 #endif /* not LITE */
-
 }
+
 
 /* plot3d_impulses:
  * Plot the surfaces in IMPULSES style

@@ -1,3 +1,12 @@
+2002-04-27  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* src/graph3d.c src/pm3d.c: Move term->previous_palette(); from
+	pm3d.c:pm3d_draw_one() to graph3d.c:do_3dplot(). Fixes plotting
+	several color surfaces to postscript files. Maybe the terminal entry
+	previous_palette() should be dropped completely as it is used only
+	for postscript files to write the palette and all its color surfaces
+	in between gsave/grestore.
+
 2002-04-21  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/save.c (save_set_all): Fix quoting of 'set missing' save text.
@@ -324,7 +333,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/04/16 11:02:11 $).
+	last modification date (from the tag $Date: 2002/04/21 13:50:28 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
