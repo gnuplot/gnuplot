@@ -1,3 +1,8 @@
+2003-12-19  Ethan Merritt  <merritt@u.washington.edu>
+
+	* term/svg.trm: Sodipodi didn't care that the namespace URL was junk,
+	but the Adobe svg viewer doesn't like this. Give it the real URL.
+
 2003-12-19  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/util3d.h (polyline3d_start, polyline3d_next): Prototypes
