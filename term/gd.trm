@@ -1,5 +1,5 @@
 /*
- * $Id: gd.trm,v 1.2 2002/05/16 21:29:18 joze Exp $
+ * $Id: gd.trm,v 1.3 2002/06/04 22:50:41 joze Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -121,10 +121,12 @@ TERM_PUBLIC void PNG_move __PROTO((unsigned int x, unsigned int y));
 TERM_PUBLIC void PNG_vector __PROTO((unsigned int x, unsigned int y));
 TERM_PUBLIC void PNG_put_text __PROTO((unsigned int x, unsigned int y, const char str[]));
 TERM_PUBLIC int PNG_justify_text __PROTO((enum JUSTIFY mode));
+TERM_PUBLIC void PNG_point __PROTO((unsigned int x, unsigned int y, int number));
 TERM_PUBLIC int PNG_text_angle __PROTO((int ang));
 TERM_PUBLIC void PNG_reset __PROTO((void));
 TERM_PUBLIC void JPEG_text __PROTO((void));
 TERM_PUBLIC int PNG_set_font __PROTO((const char *fontname));
+TERM_PUBLIC void PNG_pointsize __PROTO((double ptsize));
 TERM_PUBLIC void PNG_boxfill(int, unsigned int, unsigned int, unsigned int, unsigned int);
 #ifdef PM3D
 TERM_PUBLIC int PNG_make_palette (t_sm_palette *);
@@ -132,6 +134,13 @@ TERM_PUBLIC int PNG_make_palette (t_sm_palette *);
 TERM_PUBLIC void PNG_set_color (double);
 TERM_PUBLIC void PNG_filled_polygon (int, gpiPoint *);
 #endif
+
+static void PNG_PointX __PROTO((unsigned int, unsigned int));
+static void PNG_PointPlus __PROTO((unsigned int, unsigned int));
+static void PNG_Triangle(unsigned int x, unsigned int y, int direction,
+	void (*draw_func)(gdImagePtr, gdPointPtr, int, int));
+static void PNG_Diamond(unsigned int x, unsigned int y,
+	void (*draw_func)(gdImagePtr, gdPointPtr, int, int));
 
 #include "gd.h"
 
@@ -148,6 +157,8 @@ extern gdFontPtr gdFontTiny;  /* 5x8 */
 
 static int PNG_XMAX = GREG_XMAX;
 static int PNG_YMAX = GREG_YMAX;
+static const int PNG_POINT_SCALE = 3;
+static int PNG_ps = 3;
 
 
 #define PNG_FONT_SMALL 0
@@ -204,6 +215,11 @@ enum PNG_id {
     PNG_SIZE,
     PNG_OTHER
 };
+
+#ifdef Y
+#   undef Y
+#endif
+#define Y(y) (png_state.height - (y))
 
 static struct gen_table PNG_opts[] =
 {
@@ -336,6 +352,69 @@ PNG_FillPattern(int fillpar)
     return (int)gdTiled;
 }
 #endif
+
+static void
+PNG_PointX(x, y)
+    unsigned int x;
+    unsigned int y;
+{
+    gdImageLine(png_state.image, x - PNG_ps, y - PNG_ps,
+	    x + PNG_ps, y + PNG_ps, png_state.color);
+    gdImageLine(png_state.image, x + PNG_ps, y - PNG_ps,
+	    x - PNG_ps, y + PNG_ps, png_state.color);
+}
+
+static void
+PNG_PointPlus(x, y)
+    unsigned int x;
+    unsigned int y;
+{
+    gdImageLine(png_state.image, x - PNG_ps, y,
+	    x + PNG_ps, y, png_state.color);
+    gdImageLine(png_state.image, x, y - PNG_ps,
+	    x, y + PNG_ps, png_state.color);
+}
+
+static void
+PNG_Triangle(x, y, direction, draw_func)
+    unsigned int x;
+    unsigned int y;
+    int direction;
+    void (*draw_func)(gdImagePtr, gdPointPtr, int, int);
+{
+    int delta  = rint(1.33 * (double)PNG_ps);
+    int delta_ = rint(0.67 * (double)PNG_ps);
+    gdPoint points[4];
+    points[0].x = x;
+    points[0].y = y - direction * delta;
+    points[1].x = x - delta;
+    points[1].y = y + direction * delta_;
+    points[2].x = x + delta;
+    points[2].y = y + direction * delta_;
+    points[3].x = points[0].x;
+    points[3].y = points[0].y;
+    draw_func(png_state.image, points, 4, png_state.color);
+}
+
+static void
+PNG_Diamond(x, y, draw_func)
+    unsigned int x;
+    unsigned int y;
+    void (*draw_func)(gdImagePtr, gdPointPtr, int, int);
+{
+    gdPoint points[5];
+    points[0].x = x;
+    points[0].y = y - PNG_ps;
+    points[1].x = x + PNG_ps;
+    points[1].y = y;
+    points[2].x = x;
+    points[2].y = y + PNG_ps;
+    points[3].x = x - PNG_ps;
+    points[3].y = y;
+    points[4].x = points[0].x;
+    points[4].y = points[0].y;
+    draw_func(png_state.image, points, 5, png_state.color);
+}
 
 /*
  * _options()  Called when terminal type is selected.  
@@ -662,7 +741,7 @@ void PNG_filled_polygon(int points, gpiPoint *corners)
     }
     for (i = 0; i < points; i++) {
 	gd_corners[i].x = corners[i].x;
-	gd_corners[i].y = png_state.height - corners[i].y;
+	gd_corners[i].y = Y(corners[i].y);
     }
     gdImageFilledPolygon(png_state.image, gd_corners, points, png_state.color);
     /* easy, since gdPointPtr is the same as (gdiPoint*) */
@@ -670,7 +749,7 @@ void PNG_filled_polygon(int points, gpiPoint *corners)
        the following line to #if 1 */
 #if 0
     for (i = 0; i < points; i++)
-	corners[i].y = png_state.height - corners[i].y;
+	corners[i].y = Y(corners[i].y);
 #endif
     }
 
@@ -724,7 +803,7 @@ unsigned int x, y, width, height;
 
     x1 = x;
     x2 = x + width - 1;
-    y2 = png_state.height - y;
+    y2 = Y(y);
     y1 = y2 - height + 1;
     gdImageFilledRectangle(png_state.image, x1, y1, x2, y2, color);
 }
@@ -791,7 +870,7 @@ PNG_move(unsigned int x, unsigned int y)
 {
     png_state.x = x;
     png_state.y = y;
-    }
+}
 
 /* _vector(x,y)  Called when a line is to be drawn.  This should display a line
  * from the last (x,y) position given by _move() or _vector() to this new (x,y)
@@ -812,12 +891,12 @@ PNG_vector(unsigned int x, unsigned int y)
 	png_linetype_dotted[4] = png_state.color_table[0];
 
 	gdImageSetStyle(png_state.image, png_linetype_dotted, 5);
-	gdImageLine(png_state.image, png_state.x, png_state.height - png_state.y,
-		    x, png_state.height - y, gdStyled);
+	gdImageLine(png_state.image, png_state.x, Y(png_state.y),
+		    x, Y(y), gdStyled);
     } else {
     	if (png_state.linewidth == 1) {
-	gdImageLine(png_state.image, png_state.x, png_state.height - png_state.y,
-		    x, png_state.height - y, png_state.color);
+	gdImageLine(png_state.image, png_state.x, Y(png_state.y),
+		    x, Y(y), png_state.color);
 	} else {
 	/* EAM - Implement linewidth by selecting a pre-defined brush */
 	/* The tricky bit is re-coloring the brush to the current color */
@@ -831,8 +910,8 @@ PNG_vector(unsigned int x, unsigned int y)
 	}
     	gdImageFilledRectangle( PNG_brush[lw].im, 1, 1, lw, lw, PNG_brush[lw].fgnd );
 	gdImageSetBrush(png_state.image, PNG_brush[lw].im);
-	gdImageLine(png_state.image, png_state.x, png_state.height - png_state.y,
-		    x, png_state.height - y, gdBrushed );
+	gdImageLine(png_state.image, png_state.x, Y(png_state.y),
+		    x, Y(y), gdBrushed );
 	}
     }
     png_state.x = x;
@@ -893,7 +972,7 @@ PNG_put_text(unsigned int x, unsigned int y, const char *string)
 	err = gdImageStringFT(NULL, brect, png_state.color, 
 			png_state.ttffont, (double)png_state.ttfsize,
 			(png_state.angle == 1) ? M_PI_2 : 0.0,
-			x, png_state.height - y, (char *)string);
+			x, Y(y), (char *)string);
 	if (err) {
 	    fprintf(stderr,"gdImageStringFT: %s while printing string %s with font %s\n",
 	    	err,string,png_state.ttffont);
@@ -922,7 +1001,7 @@ PNG_put_text(unsigned int x, unsigned int y, const char *string)
 	    err = gdImageStringFT(png_state.image, brect, png_state.color, 
 			png_state.ttffont, (double)png_state.ttfsize,
 			(png_state.angle == 1) ? M_PI_2 : 0.0,
-			x, png_state.height - y, (char *)string);
+			x, Y(y), (char *)string);
 	    if (err) fprintf(stderr,"gdImageStringFT: %s\n",err);
 	}
     } else if (png_state.angle == 1) {
@@ -936,7 +1015,7 @@ PNG_put_text(unsigned int x, unsigned int y, const char *string)
 	    default:	break;
 	}
 	gdImageStringUp(png_state.image, png_state.font,
-			x, png_state.height - y,
+			x, Y(y),
 			(unsigned char *)string, png_state.color);
     } else {
 	y += png_state.charh / 2;
@@ -949,7 +1028,7 @@ PNG_put_text(unsigned int x, unsigned int y, const char *string)
 	    default:	break;
 	}
 	gdImageString(png_state.image, png_state.font,
-		      x, png_state.height - y,
+		      x, Y(y),
 		      (unsigned char *)string, png_state.color);
     }
 }
@@ -962,12 +1041,12 @@ PNG_put_text(unsigned int x, unsigned int y, const char *string)
     if (png_state.angle == 1) {
 	x -= png_state.charh / 2;
 	gdImageStringUp(png_state.image, png_state.font,
-			x, png_state.height - y,
+			x, Y(y),
 			(unsigned char *)string, png_state.color);
     } else {
 	y += png_state.charh / 2;
 	gdImageString(png_state.image, png_state.font,
-		      x, png_state.height - y,
+		      x, Y(y),
 		      (unsigned char *)string, png_state.color);
     }
 }
@@ -992,6 +1071,62 @@ enum JUSTIFY mode;
 {
     png_state.justify = mode;
     return TRUE;
+}
+
+TERM_PUBLIC void
+PNG_point(unsigned int x, unsigned int y, int number)
+{
+    if (number < 0) {
+	gdImageSetPixel(png_state.image, x, Y(y), png_state.color);
+	return;
+    }
+
+    y = Y(y);
+
+    switch (number % 13) {
+	case 0: /* plus */
+	default:
+	    PNG_PointPlus(x, y);
+	    break;
+	case 1: /* X */
+	    PNG_PointX(x, y);
+	    break;
+	case 2: /* star */
+	    PNG_PointPlus(x, y);
+	    PNG_PointX(x, y);
+	    break;
+	case 3: /* box */
+	    gdImageRectangle(png_state.image, x - PNG_ps, y - PNG_ps, x + PNG_ps, y + PNG_ps, png_state.color);
+	    break;
+	case 4: /* box                   filled */
+	    gdImageFilledRectangle(png_state.image, x - PNG_ps, y - PNG_ps, x + PNG_ps, y + PNG_ps, png_state.color);
+	    break;
+	case 5: /* circle */
+	    gdImageArc(png_state.image, x, y, 2 * PNG_ps, 2 * PNG_ps, 0, 360, png_state.color);
+	    break;
+	case 6: /* circle (disk)         filled */
+	    gdImageArc(png_state.image, x, y, 2 * PNG_ps, 2 * PNG_ps, 0, 360, png_state.color);
+	    gdImageFillToBorder(png_state.image, x, y, png_state.color, png_state.color);
+	    break;
+	case 7: /* triangle */
+	    PNG_Triangle(x, y, 1, gdImagePolygon);
+	    break;
+	case 8: /* triangle              filled */
+	    PNG_Triangle(x, y, 1, gdImageFilledPolygon);
+	    break;
+	case 9: /* upside down triangle */
+	    PNG_Triangle(x, y, -1, gdImagePolygon);
+	    break;
+	case 10: /* upside down triangle  filled */
+	    PNG_Triangle(x, y, -1, gdImageFilledPolygon);
+	    break;
+	case 11: /* diamond */
+	    PNG_Diamond(x, y, gdImagePolygon);
+	    break;
+	case 12: /* diamond               filled */
+	    PNG_Diamond(x, y, gdImageFilledPolygon);
+	    break;
+    }
 }
 
 TERM_PUBLIC int
@@ -1036,6 +1171,13 @@ PNG_set_font(const char *fontname)
     return TRUE;
 }
 
+TERM_PUBLIC void
+PNG_pointsize(ptsize)
+    double ptsize;
+{
+    PNG_ps = rint((double)PNG_POINT_SCALE * ptsize);
+}
+
 #endif /* TERM_BODY */
 #ifdef TERM_TABLE
 
@@ -1050,8 +1192,8 @@ TERM_TABLE_START(png_driver)
 #else
     null_justify_text,
 #endif
-    do_point, do_arrow, PNG_set_font,
-    0,				/* pointsize */
+    PNG_point, do_arrow, PNG_set_font,
+    PNG_pointsize,
     TERM_CAN_MULTIPLOT | TERM_BINARY,
     0 /*suspend*/, 0 /*resume*/, 
     PNG_boxfill /*EAM - fillbox*/,   
@@ -1183,8 +1325,8 @@ TERM_TABLE_START(jpeg_driver)
     PNG_VTIC, PNG_HTIC, PNG_options, PNG_init, PNG_reset,
     JPEG_text, null_scale, PNG_graphics, PNG_move, PNG_vector,
     PNG_linetype, PNG_put_text, PNG_text_angle,
-    PNG_justify_text, do_point, do_arrow, PNG_set_font,
-    0,				/* pointsize */
+    PNG_justify_text, PNG_point, do_arrow, PNG_set_font,
+    PNG_pointsize,
     TERM_CAN_MULTIPLOT | TERM_BINARY,
     0 /*suspend*/, 0 /*resume*/, 
     PNG_boxfill /*EAM - fillbox*/,   

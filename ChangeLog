@@ -1,5 +1,12 @@
 2002-06-05  Johannes Zellner  <johannes@zellner.org>
 
+	* term/gd.trm:
+	- macro Y(y)
+	- PNG_point plus related functions, implementing the pointtypes
+	  as in post / X11 ...
+
+2002-06-05  Johannes Zellner  <johannes@zellner.org>
+
 	* term/gd.trm: filledboxes
 
 2002-06-04  Johannes Zellner  <johannes@zellner.org>
@@ -564,7 +571,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/06/04 20:52:36 $).
+	last modification date (from the tag $Date: 2002/06/04 22:50:41 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
