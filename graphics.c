@@ -667,13 +667,13 @@ static void boundary(scaling,plots,count)
  
 	/* ylabel */
 	if (*ylabel.text && can_rotate)
-		ylabel_textwidth = (int)((ylablin + ylabel.yoffset)*(t->v_char));
+		ylabel_textwidth = (int)((ylablin + ylabel.xoffset)*(t->h_char));
 	else
 		ylabel_textwidth = 0;
 
 	/* timestamp */
 	if (*timelabel.text && vertical_timelabel)
-		timelabel_textwidth = (int)((timelin + timelabel.yoffset)*(t->v_char));
+		timelabel_textwidth = (int)((timelin + timelabel.xoffset)*(t->h_char));
 	else
 		timelabel_textwidth = 0;
  
@@ -693,6 +693,9 @@ static void boundary(scaling,plots,count)
 	} else
 		xleft += (int)(lmargin * (t->h_char));
  
+        /* make sure xleft is wide enough for a negatively x-offset horizontal timestamp */
+	if (!vertical_timelabel && xleft - ytic_width - ytic_textwidth < -(int)(timelabel.xoffset*(t->h_char)))
+		xleft = ytic_width + ytic_textwidth - (int)(timelabel.xoffset*(t->h_char));
 	/*  end of xleft calculation }}}*/
 
 
@@ -881,7 +884,7 @@ static void boundary(scaling,plots,count)
 		else
 			time_y = ytop + x2tic_height + x2tic_textheight + timetop_textheight;
 	}
-	time_x = xleft - ytic_width - ytic_textwidth;
+	time_x = xleft - ytic_width - ytic_textwidth + (int)(timelabel.xoffset*(t->h_char));
 	if (vertical_timelabel) {
 /* HBB: do we really want to move the timelabel to the right by
  * one line, so that it will fall in what was intended to be blank
