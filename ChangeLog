@@ -1,3 +1,8 @@
+2003-01-08  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* config/makefile.mgw config/makefile.cyg config/makefile.os2: Update
+	-D... symbols for the changed syntax of gd/png/jpeg/gif checks.
+	
 2003-01-07  Mike Kay <Mike.Kay@noaa.gov>
 
 	* src/axis.h src/color.c src/gadgets.c src/gadgets.h src/graph3d.c
@@ -1684,7 +1689,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/12/28 06:13:25 $).
+	last modification date (from the tag $Date: 2003/01/07 22:31:11 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 

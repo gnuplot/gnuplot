@@ -1,5 +1,5 @@
 #
-# $Id: makefile.mgw,v 1.24 2002/12/15 17:17:33 mikulik Exp $
+# $Id: makefile.mgw,v 1.25 2002/12/18 17:38:51 lhecking Exp $
 #
 # GNUPLOT Makefile for MinGW32 MinGW32 on WinNT and Win95/98/..
 #
@@ -171,11 +171,12 @@ ifdef GIF
 endif
 
 ifdef PNG
-  CFLAGS += -DHAVE_PNG
+  CFLAGS += -DHAVE_LIBPNG
   TERMLIBS += -lpng -lz
 endif
 
 ifdef NEWGD
+  CFLAGS += -DHAVE_GD_PNG
 ifdef FREETYPE
   CFLAGS += -DHAVE_TTF
   TERMLIBS += -lfreetype
