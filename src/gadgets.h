@@ -81,19 +81,6 @@ typedef struct position {
     double x,y,z;
 } t_position;
 
-/* Generalized pm3d-compatible color specifier,
- * currently used only for setting text color  */
-typedef struct t_colorspec {
-    int type;			/* TC_<type> definitions below */
-    int lt;			/* holds lt    if type==1 */
-    double value;		/* holds value if type>1  */
-} t_colorspec;
-#define	TC_DEFAULT	0
-#define	TC_LT		1
-#define	TC_CB		2
-#define	TC_FRAC		3
-#define	TC_Z		4
-
 /* Linked list of structures storing 'set label' information */
 typedef struct text_label {
     struct text_label *next;	/* pointer to next label in linked list */

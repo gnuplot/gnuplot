@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.133 2004/11/09 00:26:41 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.134 2004/11/12 07:14:52 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -40,12 +40,10 @@ static char *RCSid() { return RCSid("$Id: graphics.c,v 1.133 2004/11/09 00:26:41
 
 #include "graphics.h"
 
-#ifdef WITH_IMAGE
 #ifdef PM3D
 #include "color.h"
 #include "pm3d.h"
 #include "plot.h"
-#endif
 #endif
 
 #include "alloc.h"
@@ -473,16 +471,15 @@ boundary(struct curve_points *plots, int count)
     /*}}} */
 
 
-#ifdef WITH_IMAGE
 #ifdef PM3D
 #define COLORBOX_SCALE 0.125
 #define WIDEST_COLORBOX_TICTEXT 3
-    /* Make room for the color box if it will be seen for the IMAGE plot style. */
-    if ((plots->lp_properties.use_palette) && (color_box.where != SMCOLOR_BOX_NO) && (color_box.where != SMCOLOR_BOX_USER)) {
+    /* Make room for the color box if anything in the graph uses a palette. */
+    set_plot_with_palette(0, MODE_PLOT); /* EAM FIXME - 1st parameter is a dummy */
+    if (is_plot_with_palette() && (color_box.where != SMCOLOR_BOX_NO) && (color_box.where != SMCOLOR_BOX_USER)) {
 	xright -= (int) (xright-xleft)*COLORBOX_SCALE;
 	xright -= (int) ((t->h_char) * WIDEST_COLORBOX_TICTEXT);
     }
-#endif
 #endif
 
     /*{{{  preliminary ybot calculation
@@ -813,14 +810,12 @@ boundary(struct curve_points *plots, int count)
 
     xright = (int) (0.5 + t->xmax * (xsize + xoffset));
 
-#ifdef WITH_IMAGE
 #ifdef PM3D
-    /* Make room for the color box if it will be seen for the IMAGE plot style. */
-    if ((plots->lp_properties.use_palette) && (color_box.where != SMCOLOR_BOX_NO) && (color_box.where != SMCOLOR_BOX_USER)) {
+    /* Make room for the color box if needed. */
+    if (is_plot_with_palette() && (color_box.where != SMCOLOR_BOX_NO) && (color_box.where != SMCOLOR_BOX_USER)) {
 	xright -= (int) (xright-xleft)*COLORBOX_SCALE;
 	xright -= (int) ((t->h_char) * WIDEST_COLORBOX_TICTEXT);
     }
-#endif
 #endif
 
     if (rmargin < 0) {
@@ -1280,12 +1275,10 @@ do_plot(struct curve_points *plots, int pcount)
      */
     boundary(plots, pcount);
 
-#ifdef WITH_IMAGE
 #ifdef PM3D
     /* Add colorbox if appropriate. */
-    if (plots->lp_properties.use_palette && !make_palette() && term->set_color)
+    if (is_plot_with_palette() && !make_palette() && term->set_color)
 	draw_color_smooth_box(MODE_PLOT);
-#endif
 #endif
 
     screen_ok = FALSE;

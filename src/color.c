@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: color.c,v 1.49 2004/10/22 01:30:51 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: color.c,v 1.50 2004/11/01 01:17:59 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - color.c */
@@ -476,11 +476,7 @@ cbtick_callback(
    Finally the main colour smooth box drawing routine
  */
 void
-#ifdef WITH_IMAGE
 draw_color_smooth_box(int plot_mode)
-#else
-draw_color_smooth_box()
-#endif
 {
     double tmp;
     FILE *out = postscript_gpoutfile;	/* either gpoutfile or PSLATEX_auxfile */
@@ -534,7 +530,6 @@ draw_color_smooth_box()
 	cb_y_from = ymiddle - 0.147 * yscaler;
 	cb_y_to   = ymiddle + 0.497 * yscaler;
 #endif
-#ifdef WITH_IMAGE
 	/* EAM FIXME 15-Jan-2004: This code may want reworking similar to HBB's fix just above */
 	if (plot_mode != MODE_SPLOT) {
 	    double dx = (X_AXIS.max - X_AXIS.min);
@@ -543,7 +538,7 @@ draw_color_smooth_box()
 	    cb_y_from = map_y(Y_AXIS.min);
 	    cb_y_to = map_y(Y_AXIS.max);
 	}
-#endif
+
 	/* now corrections for outer tics */
 	if (color_box.rotation == 'v') {
 	    int len = (tic_in ? -1 : 1) * ticscale * (term->h_tic); /* positive for outer tics */

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.104 2004/11/01 01:17:59 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.105 2004/11/21 05:40:19 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -652,11 +652,7 @@ do_3dplot(
 	can_pm3d = is_plot_with_palette() && !make_palette()
 	    && term->set_color;
 	if (can_pm3d) {
-#ifdef WITH_IMAGE
 	    draw_color_smooth_box(MODE_SPLOT);
-#else
-	    draw_color_smooth_box();
-#endif
 	}
     }
 #endif /* PM3D */

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.155 2004/11/03 06:59:25 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.156 2004/11/06 21:18:45 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -152,7 +152,6 @@ static void load_tics __PROTO((AXIS_INDEX axis));
 static void load_tic_user __PROTO((AXIS_INDEX axis));
 static void load_tic_series __PROTO((AXIS_INDEX axis));
 static void load_offsets __PROTO((double *a, double *b, double *c, double *d));
-static void parse_colorspec __PROTO((struct t_colorspec *tc, int option));
 
 static void set_linestyle __PROTO((void));
 static int assign_linestyle_tag __PROTO((void));
@@ -4234,70 +4233,6 @@ fill_numbers_into_string(char *pattern)
     strcpy(output + output_end, pattern);
     free(pattern);
     return output;
-}
-
-/*
- * Parse the sub-options of text color specification
- *   { def$ault | lt <linetype> | pal$ette { cb <val> | frac$tion <val> | z }
- * The ordering of alternatives shown in the line above is kept in the symbol definitions
- * TC_DEFAULT TC_LT TC_CB TC_FRAC TC_Z  (0 1 2 3 4)
- * and the "options" parameter to parse_colorspec limits legal input to the
- * corresponding point in the series. So TC_LT allows only default or linetype
- * coloring, while TC_Z allows all coloring options up to and including pal z
- */
-static void
-parse_colorspec(struct t_colorspec *tc, int options)
-{
-    struct value a;
-
-    c_token++;
-    if (END_OF_COMMAND)
-    	int_error(c_token, "expected colorspec");
-    if (almost_equals(c_token,"def$ault")) {
-	c_token++;
-	tc->type = TC_DEFAULT;
-    } else if (equals(c_token,"lt")) {
-    	c_token++;
-    	if (END_OF_COMMAND)
-    	    int_error(c_token, "expected linetype");
-	tc->type = TC_LT;
-    	tc->lt = (int)real(const_express(&a))-1;
-	if (tc->lt < LT_NODRAW) {
-	    tc->type = TC_DEFAULT;
-	    int_warn(c_token,"illegal linetype");
-	}
-    } else if (options <= TC_LT) {
-	tc->type = TC_DEFAULT;
-	int_error(c_token, "only tc lt <n> possible here");
-    } else if (almost_equals(c_token,"pal$ette")) {
-    	c_token++;
-	if (END_OF_COMMAND || equals(c_token,"z")) {
-	    /* The actual z value is not yet known, fill it in later */
-	    if (options >= TC_Z) {
-		tc->type = TC_Z;
-	    } else {
-		tc->type = TC_DEFAULT;
-		int_error(c_token, "palette z not possible here");
-	    }
-    	    c_token++;
-	} else if (equals(c_token,"cb")) {
-	    tc->type = TC_CB;
-    	    c_token++;
-    	    if (END_OF_COMMAND)
-    		int_error(c_token, "expected cb value");
-    	    tc->value = real(const_express(&a));
-	} else if (almost_equals(c_token,"frac$tion")) {
-	    tc->type = TC_FRAC;
-    	    c_token++;
-    	    if (END_OF_COMMAND)
-    		int_error(c_token, "expected palette fraction");
-    	    tc->value = real(const_express(&a));
-	    if (tc->value < 0. || tc->value > 1.0)
-    		int_error(c_token, "palette fraction out of range");
-	}
-    } else {
-    	int_error(c_token, "textcolor colorspec not recognized");
-    }
 }
 
 /*

@@ -1,5 +1,5 @@
 /*
- * $Id: misc.h,v 1.17 2004/07/01 17:10:06 broeker Exp $
+ * $Id: misc.h,v 1.18 2004/07/13 14:11:23 broeker Exp $
  */
 
 /* GNUPLOT - misc.h */
@@ -74,7 +74,7 @@ void arrow_parse __PROTO((struct arrow_style_type *, int default_linetype, TBOOL
 
 void parse_fillstyle __PROTO((struct fill_style_type *fs, int def_style,
                               int def_density, int def_pattern, int def_border ));
-
+void parse_colorspec __PROTO((struct t_colorspec *tc, int option));
 
 
 /* State information for load_file(), to recover from errors

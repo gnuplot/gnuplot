@@ -1,5 +1,5 @@
 /*
- * $Id: plot3d.h,v 1.14 2004/04/13 17:23:59 broeker Exp $
+ * $Id: plot3d.h,v 1.15 2004/11/21 05:40:19 sfeam Exp $
  */
 
 /* GNUPLOT - plot3d.h */
@@ -63,10 +63,5 @@ extern TBOOLEAN	dgrid3d;
 
 void plot3drequest __PROTO((void));
 void sp_free __PROTO((struct surface_points *sp));
-
-#ifdef PM3D
-int is_plot_with_palette __PROTO((void));
-  /* return 1 if the current splot needs the color palette */
-#endif
 
 #endif /* GNUPLOT_PLOT3D_H */

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.47 2004/07/01 17:10:07 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.48 2004/07/02 23:58:39 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - pm3d.c */
@@ -24,8 +24,10 @@ static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.47 2004/07/01 17:10:07 broe
 
 #include "alloc.h"
 #include "axis.h"
+#include "graphics.h"
 #include "graph3d.h"
 #include "hidden3d.h"		/* p_vertex & map3d_xyz() */
+#include "plot2d.h"
 #include "plot3d.h"
 #include "setshow.h"		/* for surface_rot_z */
 #include "term_api.h"		/* for lp_use_properties() */
@@ -51,6 +53,7 @@ pm3d_struct pm3d = {
 };
 
 /* Internal prototypes for this module */
+static TBOOLEAN plot_has_palette;
 static double geomean4 __PROTO((double, double, double, double));
 static double median4 __PROTO((double, double, double, double));
 static void pm3d_plot __PROTO((struct surface_points *, int));
@@ -714,5 +717,76 @@ get_pm3d_at_option(char *pm3d_where)
     return 0;
 }
 
+/* Set flag plot_has_palette to TRUE if there is any element on the graph
+ * which requires palette of continuous colors.
+ */
+void
+set_plot_with_palette(int plot_num, int plot_mode)
+{
+    struct surface_points *this_3dplot = first_3dplot;
+    struct curve_points *this_2dplot = first_plot;
+    int surface = 0;
+    struct text_label *this_label = first_label;
+
+    plot_has_palette = TRUE;
+    /* Is pm3d switched on globally? */
+    if (pm3d.where[0])
+	return;
+
+    /* Check 2D plots */
+    if (plot_mode == MODE_PLOT) {
+	while (this_2dplot) {
+	    if (this_2dplot->lp_properties.use_palette)
+		return;
+#ifdef EAM_DATASTRINGS
+	    if (this_2dplot->labels &&
+		this_2dplot->labels->textcolor.type >= TC_CB)
+		return;
+#endif
+	    this_2dplot = this_2dplot->next;
+	}
+    }
+
+    /* Check 3D plots */
+    if (plot_mode == MODE_SPLOT) {
+    /* Any surface 'with pm3d' or 'with line|dot palette'? */
+	while (surface++ < plot_num) {
+	    if (this_3dplot->lp_properties.use_palette)
+		return;
+#ifdef EAM_DATASTRINGS
+	    if (this_3dplot->labels &&
+		this_3dplot->labels->textcolor.type >= TC_CB)
+		return;
+#endif
+	    this_3dplot = this_3dplot->next_sp;
+	}
+    }
+
+    /* Any label with 'textcolor palette'? */
+#define TC_USES_PALETTE(tctype) (tctype==TC_Z) || (tctype==TC_CB) || (tctype==TC_FRAC)
+    for (; this_label != NULL; this_label = this_label->next) {
+	if (TC_USES_PALETTE(this_label->textcolor.type))
+	    return;
+    }
+    /* Any of title, xlabel, ylabel, zlabel, ... with 'textcolor palette'? */
+    if (TC_USES_PALETTE(title.textcolor.type)) return;
+    if (TC_USES_PALETTE(axis_array[FIRST_X_AXIS].label.textcolor.type)) return;
+    if (TC_USES_PALETTE(axis_array[FIRST_Y_AXIS].label.textcolor.type)) return;
+    if (TC_USES_PALETTE(axis_array[SECOND_X_AXIS].label.textcolor.type)) return;
+    if (TC_USES_PALETTE(axis_array[SECOND_Y_AXIS].label.textcolor.type)) return;
+    if (plot_mode == MODE_SPLOT)
+	if (TC_USES_PALETTE(axis_array[FIRST_Z_AXIS].label.textcolor.type)) return;
+    if (TC_USES_PALETTE(axis_array[COLOR_AXIS].label.textcolor.type)) return;
+#undef TC_USES_PALETTE
+
+    /* Palette with continuous colors is not used. */
+    plot_has_palette = FALSE;
+}
+
+TBOOLEAN
+is_plot_with_palette()
+{
+    return plot_has_palette;
+}
 
 #endif

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.86 2004/10/26 04:30:51 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.87 2004/11/12 07:14:52 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -228,10 +228,8 @@ plotrequest()
     AXIS_INIT2D(SECOND_Y_AXIS, 1);
     AXIS_INIT2D(T_AXIS, 0);
     AXIS_INIT2D(R_AXIS, 1);
-#ifdef WITH_IMAGE
 #ifdef PM3D
     AXIS_INIT2D(COLOR_AXIS, 1);
-#endif
 #endif
 
     t_axis = (parametric || polar) ? T_AXIS : FIRST_X_AXIS;
@@ -1321,10 +1319,8 @@ eval_plots()
 		this_plot->plot_smooth = SMOOTH_NONE;
 #ifdef PM3D
 		this_plot->filledcurves_options.opt_given = 0;
-#ifdef WITH_IMAGE
 		/* default no palette */
 		this_plot->lp_properties.use_palette = 0;
-#endif
 #endif
 
 #ifdef BINARY_DATA_FILE
@@ -1359,10 +1355,8 @@ eval_plots()
 		this_plot->plot_style = func_style;
 #ifdef PM3D
 		this_plot->filledcurves_options.opt_given = 0;
-#ifdef WITH_IMAGE
 		/* default no palette */
 		this_plot->lp_properties.use_palette = 0;
-#endif
 #endif
 		dummy_func = &plot_func;
 		plot_func.at = temp_at();
@@ -1710,10 +1704,10 @@ eval_plots()
 #endif
 
 #ifdef WITH_IMAGE
-	    /* Styles that utilize palettes. */
+	    /* Styles that use palette */
 	    if (this_plot->plot_style == IMAGE)
 		this_plot->lp_properties.use_palette = 1;
-	    /* Styles that use colorbus. */
+	    /* Styles that use colorbus */
 	    if (this_plot->plot_style == IMAGE || this_plot->plot_style == RGBIMAGE)
 		is_cb_plot = TRUE;
 #endif

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.89 2004/10/26 04:30:52 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.90 2004/11/03 07:02:50 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -78,13 +78,8 @@ int dgrid3d_col_fineness = 10;
 int dgrid3d_norm_value = 1;
 TBOOLEAN dgrid3d = FALSE;
 
-int plot_has_palette = 0;
-
 /* static prototypes */
 
-#ifdef PM3D
-static void set_plot_with_palette __PROTO((int plot_num));
-#endif
 static void calculate_set_of_isolines __PROTO((AXIS_INDEX value_axis, TBOOLEAN cross, struct iso_curve **this_iso,
 					       AXIS_INDEX iso_axis, double iso_min, double iso_step, int num_iso_to_use,
 					       AXIS_INDEX sam_axis, double sam_min, double sam_step, int num_sam_to_use,
@@ -317,61 +312,6 @@ splines_kernel(double h)
     } else {
 	return 0;
     }
-}
-
-#endif
-
-#ifdef PM3D
-
-/* Set flag plot_has_palette to 1 if there is any element on the graph
- * which requires palette of continuous colors.
- */
-static void
-set_plot_with_palette(int plot_num)
-{
-    struct surface_points *this_plot = first_3dplot;
-    int surface = 0;
-    struct text_label *this_label = first_label;
-
-    plot_has_palette = 1;
-    /* Is pm3d switched on globally? */
-    if (pm3d.where[0])
-	return;
-    /* Any surface 'with pm3d' or 'with line|dot palette'? */
-    while (surface < plot_num) {
-	if (this_plot->lp_properties.use_palette)
-	    return;
-#ifdef EAM_DATASTRINGS
-	if (this_plot->labels &&
-	    this_plot->labels->textcolor.type >= TC_CB)
-	    return;
-#endif
-	this_plot = this_plot->next_sp;
-	surface++;
-    }
-    /* Any label with 'textcolor palette'? */
-#define TC_USES_PALETTE(tctype) (tctype==TC_Z) || (tctype==TC_CB) || (tctype==TC_FRAC)
-    for (; this_label != NULL; this_label = this_label->next) {
-	if (TC_USES_PALETTE(this_label->textcolor.type))
-	    return;
-    }
-    /* Any of title, xlabel, ylabel, zlabel, ... with 'textcolor palette'? */
-    if (TC_USES_PALETTE(title.textcolor.type)) return;
-    if (TC_USES_PALETTE(axis_array[FIRST_X_AXIS].label.textcolor.type)) return;
-    if (TC_USES_PALETTE(axis_array[FIRST_Y_AXIS].label.textcolor.type)) return;
-    if (TC_USES_PALETTE(axis_array[FIRST_Z_AXIS].label.textcolor.type)) return;
-    if (TC_USES_PALETTE(axis_array[COLOR_AXIS].label.textcolor.type)) return;
-    if (TC_USES_PALETTE(axis_array[SECOND_X_AXIS].label.textcolor.type)) return;
-    if (TC_USES_PALETTE(axis_array[SECOND_Y_AXIS].label.textcolor.type)) return;
-#undef TC_USES_PALETTE
-    /* Palette with continuous colors is not used. */
-    plot_has_palette = 0;
-}
-
-int
-is_plot_with_palette()
-{
-    return plot_has_palette;
 }
 
 #endif
@@ -1883,7 +1823,7 @@ eval_3dplots()
     setup_tics(FIRST_Z_AXIS, 20);
 
 #ifdef PM3D
-    set_plot_with_palette(plot_num);
+    set_plot_with_palette(plot_num, MODE_SPLOT);
     if (is_plot_with_palette()) {
 	set_cbminmax();
 	axis_checked_extend_empty_range(COLOR_AXIS, "All points of colorbox value undefined");

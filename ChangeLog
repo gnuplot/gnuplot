@@ -1,3 +1,32 @@
+2004-11-21  Ethan Merritt  <merritt@u.washington.edu>
+
+	Rearrange code so that pm3d support routines are available to both 2D
+	and 3D plots.  The addition of pm3d code to 2D plots began in portions
+	of the WITH_IMAGE patch; remove the dependence on WITH_IMAGE to prepare
+	for more general use of pm3d colorspecs in 2D plots.
+	Introduce general checking for pm3d colorspecs in 2D plots. This fixes
+	a bug that the colorbox could only be drawn for "with image" plots if
+	the *first* plot used pm3d; subsequent plots were not checked.
+	Also, pm3d colorspecs were already usable for text coloring in 2D, but
+	no colorbox was drawn if they were used.  Now it is.
+
+	* src/color.h src/gadgets.h  : Move definition of t_colorspec to color.h
+
+	* src/color.h src/color.c src/graph3d.c src/graphics.c plot2d.c: 
+	Remove #ifdef WITH_IMAGE from several code segments that are useful for
+	plot styles other than image.
+
+	* src/misc.c src/set.c src/misc.h: Move parse_colorspec from set.c
+	to misc.c and export it for use when parsing "with" options in both 
+	2D and 3D.
+
+	* src/plot3d.c src/pm3d.c src/pm3d.h src/graph3d.c: 
+	Move set_plot_with_palette and is_plot_with_palette from plot3d.c into 
+	pm3d.c so they can be shared by 2D and 3D code.
+
+	* src/graphics.c: Check for is_plot_with_palette() and modify layout of
+	2D plots to include colorbox if it returns TRUE.
+
 2004-11-20  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/datafile.c (add_key_entry): Make sure all fields of newly

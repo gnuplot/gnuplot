@@ -1,5 +1,5 @@
 /*
- * $Id: pm3d.h,v 1.19 2004/03/11 18:28:43 broeker Exp $
+ * $Id: pm3d.h,v 1.20 2004/07/01 17:10:07 broeker Exp $
  */
 
 /* GNUPLOT - pm3d.h */
@@ -141,6 +141,9 @@ pm3d_rearrange_scan_array __PROTO((struct surface_points* this_plot,
     struct iso_curve*** first_ptr, int* first_n, int* first_invert,
     struct iso_curve*** second_ptr, int* second_n, int* second_invert));
 
+void set_plot_with_palette __PROTO((int plot_num, int plot_mode));
+
+TBOOLEAN is_plot_with_palette __PROTO((void));
 
 #endif /* PM3D_H */
 

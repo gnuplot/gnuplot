@@ -1,5 +1,5 @@
 /*
- * $Id: color.h,v 1.17 2004/07/04 23:58:46 sfeam Exp $
+ * $Id: color.h,v 1.18 2004/09/01 15:53:46 mikulik Exp $
  */
 
 /* GNUPLOT - color.h */
@@ -31,6 +31,19 @@ of palettes between terminals and making palette routines.
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
+
+/* Generalized pm3d-compatible color specifier
+ * Supplements basic linetype choice */
+typedef struct t_colorspec {
+    int type;			/* TC_<type> definitions below */
+    int lt;			/* holds lt    if type==1 */
+    double value;		/* holds value if type>1  */
+} t_colorspec;
+#define	TC_DEFAULT	0
+#define	TC_LT		1
+#define	TC_CB		2
+#define	TC_FRAC		3
+#define	TC_Z		4
 
 /* EAM July 2004 - Disentangle polygon support and PM3D support  */
 /* a point (with integer coordinates) for use in polygon drawing */
@@ -279,11 +292,7 @@ void filled_polygon_3dcoords_zfixed __PROTO((int points, struct coordinate GPHUG
 /*
   Draw colour smooth box
 */
-#ifdef WITH_IMAGE
 void draw_color_smooth_box __PROTO((int plot_mode));
-#else
-void draw_color_smooth_box __PROTO((void));
-#endif
 
 
 #endif /* PM3D */
