@@ -47,7 +47,18 @@
 % To show a syntax for a gnutex command
 \newenvironment{syntax}{\begin{quote}\tt}{\end{quote}}
 
-\documentstyle[titlepage,11pt]{article}
+\ifx\LaTeXe\undefined
+% old LaTeX version
+% add `,a4' to `toc_entry' to load settings for A4-paper
+% see below if you add 11pt or 12pt
+\documentstyle[titlepage,a4]{article}
+\else
+% LaTeX2e version
+% add `[a4paper]' before `{article}' to load settings for A4-paper
+% see below if you add 11pt or 12pt
+\documentclass[titlepage,a4paper]{article} % DSL 24 May 1995
+\usepackage{latexsym}
+\fi
 
 % Margins
 \sloppy
