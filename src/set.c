@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.119 2003/08/20 17:48:47 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.120 2003/10/22 10:59:58 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -2214,10 +2214,16 @@ set_parametric()
 
 
 #ifdef PM3D
+/* is resetting palette enabled?
+ * note: reset_palette() is disabled within 'test palette'
+ */
+int enable_reset_palette = 1;
+
 /* default settings for palette */
 void
 reset_palette()
 {
+    if (!enable_reset_palette) return;
     sm_palette.colorMode = SMPAL_COLOR_MODE_RGB;
     sm_palette.formulaR = 7; sm_palette.formulaG = 5;
     sm_palette.formulaB = 15;

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.85 2003/11/28 08:06:53 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.86 2003/11/28 15:21:35 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -1338,6 +1338,8 @@ se tit'R,G,B profiles of the current color palette';";
     int can_pm3d = (term->make_palette && term->set_color);
     char default_order[] = "rgb";
     char *order = default_order;
+    char *save_replot_line;
+    TBOOLEAN save_is_3d_plot;
     FILE *f = tmpfile();
 
     c_token++;
@@ -1365,6 +1367,9 @@ se tit'R,G,B profiles of the current color palette';";
 	rgb1_from_gray(gray, &rgb1[i]);
     }
     /* commands to setup the test palette plot */
+    enable_reset_palette = 0;
+    save_replot_line = gp_strdup(replot_line);
+    save_is_3d_plot = is_3d_plot;
     fputs(pre1, f);
     if (can_pm3d) fputs(pre2, f);
     fputs(pre3, f);
@@ -1394,6 +1399,11 @@ se tit'R,G,B profiles of the current color palette';";
     /* execute all commands from the temporary file */
     rewind(f);
     load_file(f, NULL, FALSE); /* note: it does fclose(f) */
+    /* enable reset_palette() and restore replot line */
+    enable_reset_palette = 1;
+    free(replot_line);
+    replot_line = save_replot_line;
+    is_3d_plot = save_is_3d_plot;
     /* further, input_line[] and token[] now destroyed! */
     c_token = num_tokens = 0;
 #endif /* PM3D */

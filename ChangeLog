@@ -1,3 +1,11 @@
+2003-11-30  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* src/command.c (test_palette_subcommand): Don't forget the replot
+	command after 'test palette'.
+
+	* src/setshow.c src/set.c: Global variable enable_reset_palette to
+	enable/disable reset_palette(). Required by 'test palette'.
+
 2003-11-28  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/os2/gclient.c: Fixed vertical and horizontal shifts associated
