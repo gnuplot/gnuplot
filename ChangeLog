@@ -1,3 +1,51 @@
+2003-02-18  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* term/post.trm: Re-indented in several places.
+	(PS_vector): Implemented workaround for apparent ghostscript bug
+ 	causing accumulated precision loss in long sequences of relative
+ 	moves / lines.
+
+	* CodeStyle: Got rid of lots of // style comments all over the
+ 	source code, as well as some that look suspiciously like them.
+	
+2003-02-18  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	The patch for "fit error variables", SF patch #677470, contributed
+	by <reedjs@atm.ox.ac.uk>
+	
+	* configure.in: Add check --enable-fiterrorvars.  If set, #defines
+ 	GP_FIT_ERRVARS.
+
+	* src/fit.h (fit_errorvariables): Declare new global.
+
+	* src/fit.c (fit_errorvariables): New global status variable to
+ 	choose whether fit error variables should be used.
+	(regress): If enabled, set error variables to parameter errors
+ 	from the fit.
+	(setvarerr): New function to create error variable name from that
+ 	of the actual fitted parameter.
+
+	* src/tables.h (enum set_id): Renamed S_FITLOGFILE to S_FIT.
+	
+	* src/tables.c (set_tbl): Renamed S_FITLOGFILE to S_FIT.
+
+	* src/set.c (set_fit): Accept new option "err$orvariables" for
+ 	"set fit", renamed "set fitlogfile" to "set fit", and made
+ 	"logfile" its other option.  Renamed function from set_fitlogfile.
+	(set_command): Updated help text for 'set'.
+
+	* src/save.c (save_set_all): Save state of fit_errorvariables.
+  	Change option name to "fit".
+
+	* src/show.c (show_fit): Display state of fit_errorvariables.
+  	Renamed function from show_fitlogfile.
+	(show_command): Updated help text for 'show'.
+
+	* src/unset.c (unset_fit): Reset state of fit_errorvariables to
+ 	default == off.  Renamed function from unset_fitlogfile.
+	(unset_command): Updated help text for 'unset'.
+	(reset_command): Call unset_fit under its new name.
+
 2003-02-16  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c: Fix overlooked instance of general text
@@ -1937,7 +1985,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2003/02/16 00:07:28 $).
+	last modification date (from the tag $Date: 2003/02/16 23:51:43 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
