@@ -8,12 +8,12 @@ path-hdr.m4 path-lib.m4 select.m4
 
 Makefile.am: Makefile.am.in
 	rm -f $@ $@t
-	sed -n '1,/^##m4-files-begin/p' $< > $@t
+	sed -n '1,/^##m4-files-begin/p' Makefile.am.in > $@t
 	echo EXTRA_DIST = README Makefile.am.in *.m4 | fmt | \
 	  (tr '\012' @; echo ) \
 	  |sed 's/@$$/%/;s/@/ \\@/g' |tr @% '\012 ' \
 	  >> $@t
-	sed -n '/^##m4-files-end/,$$p' $< >> $@t
+	sed -n '/^##m4-files-end/,$$p' Makefile.am.in >> $@t
 	chmod a-w $@t
 	mv $@t $@
 

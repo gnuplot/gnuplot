@@ -21,11 +21,11 @@ v384.trm vws.trm win.trm x11.trm xlib.trm
 
 Makefile.am: Makefile.am.in
 	rm -f $@ $@t
-	sed -n '1,/^##trm-files-begin/p' $< > $@t
+	sed -n '1,/^##trm-files-begin/p' Makefile.am.in > $@t
 	echo CORETERM = *.trm | fmt | (tr '\012' @; echo) \
 	  |sed 's/@$$/%/;s/@/ \\@/g' | tr @% '\012 ' \
 	  >> $@t
-	sed -n '/^##trm-files-end/,$$p' $< >> $@t
+	sed -n '/^##trm-files-end/,$$p' Makefile.am.in >> $@t
 	chmod a-w $@t
 	mv $@t $@
 
