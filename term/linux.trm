@@ -1,5 +1,5 @@
 /*
- * $Id: linux.trm,v 1.21 1998/06/18 14:59:20 ddenholm Exp $
+ * $Id: linux.trm,v 1.8 1998/11/25 21:07:06 lhecking Exp $
  *
  */
 
@@ -80,7 +80,7 @@ TERM_PUBLIC void LINUX_linetype __PROTO((int linetype));
 TERM_PUBLIC void LINUX_move __PROTO((unsigned int x, unsigned int y));
 TERM_PUBLIC void LINUX_vector __PROTO((unsigned int x, unsigned int y));
 TERM_PUBLIC int LINUX_text_angle __PROTO((int ang));
-TERM_PUBLIC void LINUX_put_text __PROTO((unsigned int x, unsigned int y, char *str));
+TERM_PUBLIC void LINUX_put_text __PROTO((unsigned int x, unsigned int y, const char *str));
 TERM_PUBLIC void LINUX_suspend __PROTO((void));
 TERM_PUBLIC void LINUX_resume __PROTO((void));
 
@@ -98,6 +98,8 @@ vga_modeinfo *modeinfo;
 static int linux_startx, linux_starty, linux_lasty;
 static int linux_angle;
 int LINUX_graphics_allowed;
+extern void drop_privilege();
+extern void take_privilege();
 
 typedef (*linux_line_func_ptr) __PROTO((int x1, int y1, int x2, int y2));
 
@@ -109,7 +111,8 @@ static void LINUX_putc __PROTO((unsigned int x, unsigned int y, int c, int ang,
  * /dev/console and /dev/tty\d are considered graphic terminals, all other
  * don't support the linux terminal */
 
-void LINUX_setup(void)
+void
+LINUX_setup(void)
 {
     char line[256];
     FILE *pipe;
@@ -129,7 +132,9 @@ void LINUX_setup(void)
 	    LINUX_graphics_allowed = TRUE;
     }
     if (LINUX_graphics_allowed) {
+	take_privilege();
 	vga_init();
+	drop_privilege();
     } else {
 	/* err - shouldn't we give up root uid whatever happens ?
 	 * or perhaps vga_init() does it ?
@@ -138,15 +143,17 @@ void LINUX_setup(void)
     }
 }
 
-TERM_PUBLIC void LINUX_options()
+TERM_PUBLIC
+void LINUX_options()
 {
     if (!LINUX_graphics_allowed) {
-	int_error("Linux terminal driver not available", NO_CARET);
+	int_error("Linux terminal driver not available",NO_CARET);
     }
     fprintf(stderr, "%s\n", vga_getmodename(linux_vmode));
 }
 
-TERM_PUBLIC void LINUX_init()
+TERM_PUBLIC
+void LINUX_init()
 {
     /* vga_init () has been moved to immediately after main () for security */
     if (vga_getdefaultmode() != -1)
@@ -165,7 +172,8 @@ TERM_PUBLIC void LINUX_init()
     linux_lasty = modeinfo->height - 1;
 }
 
-TERM_PUBLIC void LINUX_reset()
+TERM_PUBLIC void
+LINUX_reset()
 {
     if (graphics_on) {
 	vga_setmode(TEXT);
@@ -173,7 +181,8 @@ TERM_PUBLIC void LINUX_reset()
     }
 }
 
-TERM_PUBLIC void LINUX_text()
+TERM_PUBLIC void
+LINUX_text()
 {
     if (graphics_on) {
 	vga_getch();
@@ -182,7 +191,8 @@ TERM_PUBLIC void LINUX_text()
     }
 }
 
-TERM_PUBLIC void LINUX_graphics()
+TERM_PUBLIC void
+LINUX_graphics()
 {
     if (!graphics_on) {
 	vga_setmode(linux_vmode);
@@ -190,17 +200,20 @@ TERM_PUBLIC void LINUX_graphics()
     }
 }
 
-TERM_PUBLIC void LINUX_suspend()
+TERM_PUBLIC void
+LINUX_suspend()
 {
     vga_flip();
 }
 
-TERM_PUBLIC void LINUX_resume()
+TERM_PUBLIC void
+LINUX_resume()
 {
     vga_flip();
 }
 
-TERM_PUBLIC void LINUX_linetype(linetype)
+TERM_PUBLIC void
+LINUX_linetype(linetype)
 int linetype;
 {
     if (linetype >= 13)
@@ -208,7 +221,8 @@ int linetype;
     vga_setcolor(vgacolor[linetype + 2]);
 }
 
-TERM_PUBLIC void LINUX_move(x, y)
+TERM_PUBLIC void
+LINUX_move(x, y)
 unsigned int x;
 unsigned int y;
 {
@@ -216,7 +230,8 @@ unsigned int y;
     linux_starty = y;
 }
 
-TERM_PUBLIC void LINUX_vector(x, y)
+TERM_PUBLIC void
+LINUX_vector(x, y)
 unsigned int x;
 unsigned int y;
 {
@@ -225,14 +240,16 @@ unsigned int y;
     linux_starty = y;
 }
 
-TERM_PUBLIC int LINUX_text_angle(ang)
+TERM_PUBLIC int
+LINUX_text_angle(ang)
 int ang;
 {
     linux_angle = ang;
     return TRUE;
 }
 
-static void LINUX_putc(x, y, c, ang, line_func)
+static void
+LINUX_putc(x, y, c, ang, line_func)
 unsigned int x, y;
 int c;
 int ang;
@@ -258,9 +275,10 @@ linux_line_func_ptr line_func;
     }
 }
 
-TERM_PUBLIC void LINUX_put_text(x, y, str)
+TERM_PUBLIC void
+LINUX_put_text(x, y, str)
 unsigned int x, y;
-char *str;
+const char *str;
 {
     int i;
     switch (linux_angle) {
