@@ -405,7 +405,10 @@ unsigned int x, y;
 void
 apply_textcolor(const struct t_colorspec *tc, const struct termentry *t)
 {
-    if (tc->type == TC_DEFAULT) return;
+    if (tc->type == TC_DEFAULT) {
+	(*t->linetype)(LT_BLACK);
+       return;
+    }
     if (tc->type == TC_LT) {
 	(*t->linetype)(tc->lt);
        return;
