@@ -18,7 +18,7 @@ top_srcdir = @top_srcdir@
 @SET_MAKE@
 EMACS = @EMACS@
 MAKEINFO = @MAKEINFO@
-LATEX = latex
+LATEX = @LATEX@
 DVIPS = dvips
 INSTALL = @INSTALL@
 INSTALL_DATA = @INSTALL_DATA@
@@ -40,12 +40,12 @@ DISTFILES = $(DIST_COMMON) $(EXTRA_DIST)
 default: $(ELCS)
 
 gnuplot.elc: gnuplot.el
-	test "$(srcdir)" = "$(top_builddir)" || cp $(srcdir)/gnuplot.el .
-	$(BYTEC) gnuplot.el
+	@test -f gnuplot.el || cp $(srcdir)/gnuplot.el .
+	@test "$(EMACS)" != no && $(BYTEC) gnuplot.el
 
 gnuplot-gui.elc: gnuplot.elc gnuplot-gui.el
-	test "$(srcdir)" = "$(top_builddir)" || cp $(srcdir)/gnuplot-gui.el .
-	$(BYTEC) gnuplot-gui.el
+	@test -f gnuplot-gui.el || cp $(srcdir)/gnuplot-gui.el .
+	@test "$(EMACS)" != no && $(BYTEC) gnuplot-gui.el
 
 ## There are many possibilities for info-look:
 ##
@@ -87,7 +87,8 @@ info-look.elc:  info-look.20.2.el info-look.20.3.el
 	  cp $(srcdir)/info-look.20.2.el info-look.el; \
 	fi ;\
 	if [ ! \( $(EMACS) = "emacs" -a $$version -ge 2030 \) ]; \
-	  then $(BYTEC) info-look.el; fi;
+	  then test "$(EMACS)" != no && $(BYTEC) info-look.el; fi;
+
 
 ps: gpelcard.ps
 
@@ -95,7 +96,8 @@ gpelcard.ps: gpelcard.dvi
 	$(DVIPS) -o gpelcard.ps gpelcard.dvi
 
 gpelcard.dvi: gpelcard.tex
-	$(LATEX) $(srcdir)/gpelcard.tex
+	@test -f gpelcard.tex || cp $(srcdir)/gpelcard.tex .
+	@test "$(LATEX)" != no && $(LATEX) gpelcard.tex
 
 all: gnuplot.elc info-look.elc gnuplot-gui.elc
 
@@ -122,27 +124,15 @@ distdir: $(DISTFILES)
 	    || cp -p $$d/$$file $(distdir)/$$file || :; \
 	  fi; \
 	done
-check-am: all-am
-check: check-am
-installcheck-am:
-installcheck: installcheck-am
-install-exec-am:
-install-exec: install-exec-am
-
-.PHONY: tags distdir info-am info dvi-am dvi check check-am \
-installcheck-am installcheck install-exec-am install-exec \
-install-data-am install-data install-am install uninstall-am uninstall \
-all-redirect all-am all installdirs mostlyclean-generic \
-distclean-generic clean-generic maintainer-clean-generic clean \
-mostlyclean distclean maintainer-clean
 
 clean:
 	-rm -f *.elc info-look.el gpelcard.ps gpelcard.dvi gpelcard.log \
 	  gpelcard.aux
-	test "$(srcdir)" = "$(top_builddir)" || rm -f gnuplot.el gnuplot-gui.el
+	@test "$(srcdir)" = "$(top_builddir)" || rm -f gnuplot.el \
+	  gnuplot-gui.el gpelcard.tex
 
 distclean: clean
-	rm -f Makefile config.status config.log config.cache
+	-rm -f Makefile config.status config.log config.cache
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
