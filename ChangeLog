@@ -1,3 +1,7 @@
+2002-02-19  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* demo/all.dem: Fix typo.
+
 2002-02-19  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* docs/gnuplot.doc: Updates for color axis, pm3d, palette and colorbox.
