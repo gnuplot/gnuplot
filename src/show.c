@@ -1342,6 +1342,12 @@ static void show_autoscale()
     fprintf(stderr, "y: %s%s%s, ", (autoscale_y) ? "ON" : "OFF",
 	    (autoscale_y == 1) ? " (min)" : "",
 	    (autoscale_y == 2) ? " (max)" : "");
+    fprintf(stderr, "x2: %s%s%s, ", (autoscale_x2) ? "ON" : "OFF",
+	    (autoscale_x2 == 1) ? " (min)" : "",
+	    (autoscale_x2 == 2) ? " (max)" : "");
+    fprintf(stderr, "y2: %s%s%s, ", (autoscale_y2) ? "ON" : "OFF",
+	    (autoscale_y2 == 1) ? " (min)" : "",
+	    (autoscale_y2 == 2) ? " (max)" : "");
     fprintf(stderr, "z: %s%s%s\n", (autoscale_z) ? "ON" : "OFF",
 	    (autoscale_z == 1) ? " (min)" : "",
 	    (autoscale_z == 2) ? " (max)" : "");
