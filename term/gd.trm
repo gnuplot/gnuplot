@@ -1,5 +1,5 @@
 /*
- * $Id: gd.trm,v 1.7 2002/06/10 18:53:00 mikulik Exp $
+ * $Id: gd.trm,v 1.8 2002/07/09 07:31:33 mikulik Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -174,6 +174,7 @@ static int PNG_ps = 3;
 
 static gdFontPtr PNG_font;
 static char      PNG_ttffont[64];
+static int       PNG_ttfsize;
 
 #define PNG_VTIC (GREG_YMAX/100)
 #define PNG_HTIC (GREG_XMAX/150)
@@ -437,8 +438,8 @@ PNG_options()
     png_font = 2;
     PNG_font = gdfont;
     png_state.ttffont[0] = '\0';
-    png_state.ttfsize = 8 + 2*png_font;
     PNG_ttffont[0] = '\0';
+    PNG_ttfsize = 0;
     png_state.justify = CENTRE;
 
     while (!END_OF_COMMAND) {
@@ -539,6 +540,15 @@ PNG_options()
 	    /* not "size" */
 	    string = input_line + token[c_token].start_index;
 
+#ifdef HAVE_TTF
+	    /* Check for explicit TTF font size */
+	    if (sscanf(string, "%d", &i) == 1 && i > 0 && i < 999) {
+		PNG_ttfsize = i;
+		++c_token;
+	        break;
+	    }
+#endif
+
 	    if (sscanf(string, "x%lx", &color) != 1) {
 		    int_error(c_token, "invalid color spec, must be xRRGGBB");
 	    } else if (png_state.n_colors == PNG_MAX_COLORS) {
@@ -552,6 +562,26 @@ PNG_options()
 	}
     }
 
+#ifdef HAVE_TTF
+    /* If no explicit TTF font size found, generate default */
+    if (PNG_ttfsize == 0) 
+	PNG_ttfsize = 8 + 2*png_font;
+    png_state.ttfsize = PNG_ttfsize;
+
+    /* Find approximate character width of selected TTF font   */
+    /* This is needed in order to set appropriate border width */
+    if (*PNG_ttffont) {
+    	int brect[8];
+	char *err;
+	err = gdImageStringFT(NULL, &brect[0], 0, 
+		PNG_ttffont, (double)PNG_ttfsize,
+		0.0, 0, 0, "f00000000g");
+	if (!err) {
+	    term->h_char = .11 * (float)(brect[2] - brect[0]) + 0.5;
+	    term->v_char = 1.1 * (float)(brect[1] - brect[7]) + 0.5;
+	}
+    }
+#endif
 
     /* now generate options string */
 
@@ -581,7 +611,7 @@ PNG_options()
 
     if (*png_state.ttffont) {
     	sprintf(term_options + strlen(term_options),
-		"font %s ",png_state.ttffont);
+		"font %s %d ", png_state.ttffont, png_state.ttfsize);
     }
     
     sprintf(term_options + strlen(term_options),
@@ -1139,28 +1169,35 @@ PNG_set_font(const char *fontname)
 {
     char name[32];
     int  sep;
+    int  size;
     gdFontPtr font = PNG_font;
 
     sep = strcspn(fontname,",");
     strncpy(name,fontname,sep);
     name[sep] = NUL;
+    size = PNG_ttfsize;
+    sscanf (&(fontname[sep+1]),"%d",&size);
 
     if (!strcmp(name,"small"))
 	font = gdFontSmall;
     else if (!strcmp(name,"medium"))
 	font = gdFontMediumBold;
-    else if(!strcmp(name,"large"))
+    else if (!strcmp(name,"large"))
 	font = gdFontLarge;
-    else if(!strcmp(name,"giant"))
+    else if (!strcmp(name,"giant"))
 	font = gdFontGiant;
-    else if(!strcmp(name,"tiny"))
+    else if (!strcmp(name,"tiny"))
 	font = gdFontTiny;
     /* New ttf font */
-    else if(*name)
-    	strncpy(png_state.ttffont,name,63);
+    else if (*name) {
+	strncpy(png_state.ttffont, name, 63);
+	png_state.ttfsize = size;
+    }
     /* Restore initial default font */
-    else 
+    else  {
 	strcpy(png_state.ttffont,PNG_ttffont);
+	png_state.ttfsize = PNG_ttfsize;
+    }
 
     /* DEBUG
     if (*png_state.ttffont)
@@ -1238,17 +1275,17 @@ START_HELP(png)
 " Syntax:",
 "       set terminal png {transparent} {interlace}",
 "                        {tiny | small | medium | large | giant}",
-"                        {font FACE}",
+"                        {font FACE {<pointsize>}}",
 "                        {size <x>,<y>}",
 "                        {<color0> <color1> <color2> ...}",
 "",
 " `transparent` instructs the driver to generate transparent PNGs.  The first",
 " color will be the transparent one.",
-    "",
+"",
 " `interlace` instructs the driver to generate interlaced PNGs.",
 "",
 " The choice of fonts is `tiny` (5x8 pixels), `small` (6x12 pixels), `medium`",
-" (7x13 Bold), `large` (8x16) or `giant` (9x15 pixels)",
+" (7x13 Bold), `large` (8x16) or `giant` (9x15 pixels).",
 "",
 " The font FACE is either the full pathname to a TrueType font file, or a",
 " font face name searched for using the GDFONTPATH environmental variable.",
@@ -1367,7 +1404,7 @@ START_HELP(jpeg)
 " Syntax:",
 "       set terminal jpeg ",
 "                        {tiny | small | medium | large | giant}",
-"                        {font FACE}",
+"                        {font FACE {<pointsize>}}",
 "                        {size <x>,<y>}",
 "                        {<color0> <color1> <color2> ...}",
 "",
@@ -1404,9 +1441,3 @@ START_HELP(jpeg)
 END_HELP(jpeg)
 #endif /* TERM_HELP */
 #endif /* HAVE_JPEG */
-
-/*
- * Local Variables:
- * mode:C
- * End:
- */
