@@ -1,3 +1,14 @@
+2001-09-04  James R. Van Zandt  <jrv@vanzandt.mv.com>
+
+	* src/util.c (int_error et al.): Optionally print bad line from
+	data file. 
+
+	* src/datafile.c: Export filename of data file and pointer to
+	current line, for error and warning messages.
+
+	* src/time.c (gstrptime): Before syntax errors and warnings, ask
+	for bad data string to be printed.
+
 2001-09-03  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/os2/gclient.c term/gif.trm docs/gnuplot.doc: Support for

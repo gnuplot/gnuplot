@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.25 2001/02/01 17:56:04 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.26 2001/08/22 14:15:33 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -188,6 +188,8 @@ struct use_spec_s {
 
 int df_no_use_specs;		/* how many using columns were specified */
 int df_line_number;
+char *df_string;		/* current data from data file */
+char *df_filename;		/* name of data file */
 int df_datum;			/* suggested x value if none given */
 TBOOLEAN df_matrix = FALSE;	/* is this a matrix splot */
 int df_eof = 0;
@@ -323,6 +325,7 @@ df_tokenise(s)
      */
 
     df_no_cols = 0;
+    df_string = s;		/* save for error messages */
 
     while (*s) {
 
@@ -523,7 +526,6 @@ int max_using;
 
 {
     /* now allocated dynamically */
-    static char *filename = NULL;
     int i;
     int name_token;
 
@@ -572,11 +574,12 @@ int max_using;
 
     /* empty name means re-use last one */
     if (isstring(c_token) && token_len(c_token) == 2) {
-	if (!filename || !*filename)
+	if (!df_filename || !*df_filename)
 	    int_error(c_token, "No previous filename");
     } else {
-	filename = gp_realloc(filename, token_len(c_token), "datafile name");
-	quote_str(filename, c_token, token_len(c_token));
+	df_filename = gp_realloc(df_filename, token_len(c_token),
+				 "datafile name");
+	quote_str(df_filename, c_token, token_len(c_token));
     }
 
     name_token = c_token++;
@@ -638,19 +641,19 @@ int max_using;
     /*}}} */
 
     /* filename cannot be static array! */
-    gp_expand_tilde(&filename);
+    gp_expand_tilde(&df_filename);
 
 /*{{{  open file */
 #if defined(PIPES)
-    if (*filename == '<') {
-	if ((data_fp = popen(filename + 1, "r")) == (FILE *) NULL)
+    if (*df_filename == '<') {
+	if ((data_fp = popen(df_filename + 1, "r")) == (FILE *) NULL)
 	    os_error(name_token, "cannot create pipe for data");
 	else
 	    df_pipe_open = TRUE;
     } else
 #endif /* PIPES */
 	/* I don't want to call strcmp(). Does it make a difference? */
-    if (*filename == '-' && strlen(filename) == 1) {
+    if (*df_filename == '-' && strlen(df_filename) == 1) {
 	plotted_data_from_stdin = TRUE;
 	data_fp = lf_top();
 	if (!data_fp)
@@ -660,13 +663,15 @@ int max_using;
 #ifdef HAVE_SYS_STAT_H
 	struct stat statbuf;
 
-	if ((stat(filename, &statbuf) > -1) &&
+	if ((stat(df_filename, &statbuf) > -1) &&
 	    !S_ISREG(statbuf.st_mode) && !S_ISFIFO(statbuf.st_mode)) {
-	    os_error(name_token, "\"%s\" is not a regular file or pipe", filename);
+	    os_error(name_token, "\"%s\" is not a regular file or pipe",
+		     df_filename);
 	}
 #endif /* HAVE_SYS_STAT_H */
-	if ((data_fp = loadpath_fopen(filename, df_binary ? "rb" : "r")) == (FILE *) NULL) {
-	    os_error(name_token, "can't read data file \"%s\"", filename);
+	if ((data_fp = loadpath_fopen(df_filename, df_binary ? "rb" : "r")) ==
+	    (FILE *) NULL) {
+	    os_error(name_token, "can't read data file \"%s\"", df_filename);
 	}
     }
 /*}}} */
