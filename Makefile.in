@@ -1,6 +1,6 @@
 ############################################################
 #
-# $Id: Makefile.in,v 1.42.2.7 1999/10/27 11:15:10 lhecking Exp $
+# $Id: Makefile.in,v 1.42.2.8 1999/11/30 15:07:22 lhecking Exp $
 #
 # GNUPLOT Makefile.in for autoconf (Unix X11 support)
 # Adapted from makefile.unx by djm@gnu.ai.mit.edu
@@ -165,7 +165,7 @@ W=$(srcdir)/win/
 #<<<makefile.all>>>
 ########################################################
 #
-# $Id: Makefile.in,v 1.42.2.7 1999/10/27 11:15:10 lhecking Exp $
+# $Id: Makefile.in,v 1.42.2.8 1999/11/30 15:07:22 lhecking Exp $
 #
 ########################################################
 #
@@ -223,7 +223,8 @@ CORETERM = $(T)aed.trm $(T)ai.trm $(T)amiga.trm $(T)apollo.trm \
 	   $(T)atariaes.trm $(T)atarivdi.trm $(T)be.trm $(T)cgi.trm \
 	   $(T)cgm.trm $(T)compact.c $(T)corel.trm $(T)debug.trm \
 	   $(T)djsvga.trm $(T)driver.h $(T)dumb.trm $(T)dxf.trm $(T)dxy.trm \
-	   $(T)eepic.trm $(T)emxvga.trm $(T)epson.trm $(T)excl.trm $(T)fg.trm \
+	   $(T)eepic.trm $(T)/emf.trm $(T)emxvga.trm $(T)epslatex.trm \
+	   $(T)epson.trm $(T)excl.trm $(T)fg.trm \
 	   $(T)fig.trm $(T)gif.trm $(T)gnugraph.trm $(T)gpic.trm $(T)gpr.trm \
 	   $(T)grass.trm $(T)hp26.trm $(T)hp2648.trm $(T)hp500c.trm \
 	   $(T)hpgl.trm $(T)hpljii.trm $(T)hppj.trm $(T)imagen.trm \
@@ -251,6 +252,10 @@ NEXTSRC  = $(N)Controller.h $(N)Controller.m $(N)GnuTerm.iconheader \
 	   $(N)English.lproj/gnuview.nib/data.classes \
 	   $(N)English.lproj/gnuview.nib/data.nib \
 	   $(N)English.lproj/gnuview.nib/smaller.tiff
+
+BESRC = GPApp.cpp GPApp.h GPBitmap.cpp GPBitmap.h GPView.cpp GPView.h \
+	GPWindow.cpp GPWindow.h Makefile XStringList.cpp XStringList.h \
+	constants.h
 
 OS2SRC = $(P)dialogs.c $(P)dialogs.h $(P)gclient.c $(P)gnuplot.ico \
 	 $(P)gnupmdrv.c $(P)gnupmdrv.def $(P)gnupmdrv.h $(P)gnupmdrv.ipf \
@@ -283,7 +288,7 @@ DEMOS = $(M)1.dat $(M)2.dat $(M)3.dat $(M)airfoil.dem $(M)all.dem \
 ETC =   0BUGS 0FAQ 0INSTALL 0PORTING 0README ChangeLog CodeStyle Copyright \
 	INSTALL.gnu Makefile.in NEWS PGPKEYS TODO acconfig.h $(ACLOCAL_M4) \
 	amiga.c buildvms.com commitvers $(CONFIG_HEADER_IN) configure \
-	configure.in corgraph.asm corplot.c ctrl87.c ctrl87.h \
+	configure.in configure.vms corgraph.asm corplot.c ctrl87.c ctrl87.h \
 	djconfig.sh errorfix.sh genopt.com gnuplot.def gnuplot.el gnuplot.opt \
 	gnuplot.prj header.mac hrcgraph.asm install-sh intergra.x11 lasergnu \
 	lineproc.mac linkopt.vms linkopt.ztc make_vms.com makefile.286 \
@@ -292,8 +297,9 @@ ETC =   0BUGS 0FAQ 0INSTALL 0PORTING 0README ChangeLog CodeStyle Copyright \
 	makefile.msw makefile.mto makefile.nt makefile.os2 makefile.os9 \
 	makefile.st makefile.tc makefile.unx makefile.vms makefile.wc \
 	makefile.win makefile.ztc missing mkinstalldirs os9.c pcgraph.asm \
-	rgipgnu stamp-h.in strftime.c vms.c x11.opt m4/msdos.m4 m4/next.m4 \
-	m4/path-hdr.m4 m4/path-lib.m4 m4/select.m4 $(T)README
+	rgipgnu stamp-h.in strftime.c vms.c x11.opt m4/apple.m4 m4/beos.m4 \
+	m4/msdos.m4 m4/next.m4 m4/path-hdr.m4 m4/path-lib.m4 m4/select.m4 \
+	$(T)README
 
 # Documentation and help files
 DOCS1 = $(D)Makefile.in $(D)README $(D)checkdoc.c $(D)doc2gih.c \
@@ -453,7 +459,7 @@ $(srcdir)/stamp-h.in: $(top_srcdir)/configure.in $(ACLOCAL_M4) acconfig.h
 # Miscellaneous targets
 
 SOURCES = $(HEADERS) $(CSOURCE) $(CSOURCE8) $(CORETERM) $(NEXTSRC) \
-	  $(OS2SRC) $(WINDOWS)
+	  $(BESRC) $(OS2SRC) $(WINDOWS)
 
 DISTFILES = $(ETC) $(SOURCES) $(DEMOS) $(DOCS)
 
