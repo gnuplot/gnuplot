@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.270 2005/01/05 00:41:41 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.271 2005/01/09 00:04:44 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -1540,7 +1540,7 @@ C ... and restart the table:
       plot sin(x) lt palette frac 0.3   # fractional value along the palette
 
  See `show palette colornames`, `set palette`, `cbrange`.
- 
+
  Lines can have additional properties such as linewidth.  You can associate
  these various properties, as well as equivalent properties for point symbols,
  into user-defined "line styles" using the command `set style line`.  Once
@@ -1590,12 +1590,12 @@ C ... and restart the table:
  the same palette using an arbitrary scale and range.  This mapping is set
  by the command `set cbrange`.  See also `set colorbox`.  You can use either
  of these mappings to assign a constant color from the current palette.
- 
+
  The final option, "palette z", is available only in 3d plots, and treats the
  z value of each plot segment or plot element as an index into the cbrange
  mapping of the palette. This allows smoothly-varying color along a 3d line
  or surface.
-       
+
 2 mouse input
 ?mouse input
  The `x11`, `pm`, `windows`, and `ggi` terminals allow interaction with the
@@ -5539,8 +5539,10 @@ C ... and restart the table:
        %B           full name of the month
        %d           day of the month, 1--31
        %D           shorthand for "%m/%d/%y"
-       %H or %k     hour, 0--24
-       %I or %l     hour, 0--12
+       %k           hour, 0--23 (one or two digits)
+       %H           hour, 00--23 (always two digits)
+       *l           hour, 1--12 (one or two digits)
+       %I           hour, 01--12 (always two digits)
        %j           day of the year, 1--366
        %m           month, 1--12
        %M           minute, 0--60
@@ -5564,8 +5566,10 @@ C ... and restart the table:
 #\verb@%B@ & full name of the month \\
 #\verb@%d@ & day of the month, 1--31 \\
 #\verb@%D@ & shorthand for \verb@"%m/%d/%y"@ \\
-#\verb@%H@ or \verb@%k@ & hour, 0--24 \\
-#\verb@%I@ or \verb@%l@ & hour, 0--12 \\
+#\verb@%k@ & hour, 0--23 (one or two digits)\\
+#\verb@%H@ & hour, 00--23 (always two digits)\\
+#\verb@%l@ & hour, 1--12  (one or two digits)\\
+#\verb@%I@ & hour, 01--12 (always two digits)\\
 #\verb@%j@ & day of the year, 1--366 \\
 #\verb@%m@ & month, 1--12 \\
 #\verb@%M@ & minute, 0--60 \\
@@ -5588,8 +5592,10 @@ C ... and restart the table:
 %%B@full name of the month
 %%d@day of the month, 1--31
 %%D@shorthand for "%m/%d/%y"
-%%H or %k@hour, 0--24
-%%I or %l@hour, 0--12
+%%k@hour, 0--23 (one or two digits)
+%%H@hour, 00--23 (always two digits)
+%%l@hour, 1--12 (one or two digits)
+%%I@hour, 01--12 (always two digits)
 %%j@day of the year, 1--366
 %%m@month, 1--12
 %%M@minute, 0--60

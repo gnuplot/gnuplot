@@ -7434,8 +7434,10 @@ In time/date mode, the acceptable formats are:
       %B           full name of the month
       %d           day of the month, 1--31
       %D           shorthand for "%m/%d/%y"
-      %H or %k     hour, 0--24
-      %I or %l     hour, 0--12
+      %k           hour, 0--23 (one or two digits)
+      %H           hour, 00--23 (always two digits)
+      *l           hour, 1--12 (one or two digits)
+      %I           hour, 01--12 (always two digits)
       %j           day of the year, 1--366
       %m           month, 1--12
       %M           minute, 0--60

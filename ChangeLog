@@ -3,6 +3,12 @@
 	* src/time.c (xstrftime): Shift reply range of %I and %l time
 	formats from [0:11] to [1:12].
 
+	* docs/gnuplot.doc (time/date specifiers): Fix descriptions of
+	hour format specifiers (explain 0-filled vs. non-filled default,
+	give correct output ranges).
+
+2005-02-01  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
 	* src/set.c (set_separator): Replace literal TAB character in
 	source by a \t.
 
