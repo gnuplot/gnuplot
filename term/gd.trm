@@ -1,5 +1,5 @@
 /*
- * $Id: gd.trm,v 1.1.2 2002/01/30 Ethan A Merritt Exp $
+ * $Id: gd.trm,v 1.1 2002/04/29 13:37:02 broeker Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -123,6 +123,7 @@ TERM_PUBLIC void PNG_put_text __PROTO((unsigned int x, unsigned int y, const cha
 TERM_PUBLIC int PNG_justify_text __PROTO((enum JUSTIFY mode));
 TERM_PUBLIC int PNG_text_angle __PROTO((int ang));
 TERM_PUBLIC void PNG_reset __PROTO((void));
+TERM_PUBLIC void JPEG_text __PROTO((void));
 TERM_PUBLIC int PNG_set_font __PROTO((const char *fontname));
 TERM_PUBLIC void PNG_boxfill(int, unsigned int, unsigned int, unsigned int, unsigned int);
 #ifdef PM3D
@@ -641,8 +642,6 @@ PNG_graphics()
 TERM_PUBLIC void
 PNG_text()
 {
-int i;
-
     if (png_state.flags & PNG_USE_INTERLACE)
 	gdImageInterlace(png_state.image, 1);
     gdImagePng(png_state.image, gpoutfile);

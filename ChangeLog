@@ -1,5 +1,10 @@
 2002-05-16  Johannes Zellner  <johannes@zellner.org>
 
+	* term/gd.trm, term/linux.trm: added prototypes, removed unused
+	variable
+
+2002-05-16  Johannes Zellner  <johannes@zellner.org>
+
 	* term/svg.trm: added shape-rendering:crispEdges to render
 	surfaces correctly, changed color spec to rgb() which is
 	more readable
@@ -442,7 +447,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/05/15 21:59:06 $).
+	last modification date (from the tag $Date: 2002/05/16 21:25:46 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 

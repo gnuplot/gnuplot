@@ -1,5 +1,5 @@
 /*
- * $Id: linux.trm,v 1.20 2001/02/01 17:56:05 broeker Exp $
+ * $Id: linux.trm,v 1.21 2002/02/25 03:10:42 broeker Exp $
  *
  */
 
@@ -101,8 +101,8 @@ static vga_modeinfo *modeinfo;
 static int linux_startx, linux_starty, linux_lasty;
 static int linux_angle;
 TERM_PUBLIC int LINUX_graphics_allowed = FALSE; /* also used in vgagl.trm */
-extern void drop_privilege();
-extern void take_privilege();
+extern void drop_privilege __PROTO((void));
+extern void take_privilege __PROTO((void));
 
 typedef int (*linux_line_func_ptr) __PROTO((int x1, int y1, int x2, int y2));
 
