@@ -1,3 +1,12 @@
+2003-12-24  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/show.c: Fix buffer overflow in conv_text() if the text contains
+	many characters with the high bit set.
+
+	* demo/enhancedtext.dem: Add demo for enhanced text mode.
+
+	* demo/charset.dem: Add demo that displays font and character encoding.
+
 2003-12-21  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/post.trm src/gplt_x11.c src/set.c src/term_api.h src/term.c: 
