@@ -1,3 +1,26 @@
+2004-11-11  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* docs/doc2texi.el (d2t-get-terminals): Fix search pattern for
+	point where to insert terminal drivers after change of indentation
+	level in gnuplot.doc.
+
+	* docs/Makefile.in (TERM_H): New variable, points to term.h file
+	in the src directory.
+	(term.h): Rule generating this file disabled.
+	(gnuplot.html, gnuplot.info): Removed superfluous dependencies on
+	gnuplot.doc.
+	(gnuplot.texi): Run Emacs inside source directory --- building
+	gnuplot.texi in an out-of-source build tree is futile, and never
+	really worked.
+	(doc2gih.o, doc2hlp.o, doc2ipf.o, doc2rnh.o, doc2rtf.o): Build
+	online documentation tailored to actual program by including the
+	real term.h, instead of a mangled copy.
+	(BUILT_SOURCES): Removed term.h from the list.
+
+	* docs/gnuplot.texi: Rebuilt.
+
+	* docs/gnuplot.doc: Cleared some whitespace-only lines.
+
 2004-11-10  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/stdfn.h
