@@ -2,6 +2,7 @@ alloc.obj
 axis.obj
 binary.obj
 bitmap.obj
+breaders.obj
 color.obj
 command.obj
 contour.obj

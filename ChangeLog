@@ -1,3 +1,7 @@
+2004-01-20  Dietmar Warning  <warning@danalyse.de>
+
+	* src/gnuplot.opt: Add breaders.obj to VMS *.opt file
+
 2004-01-19  Dietmar Warning  <warning@danalyse.de>
 
 	* src/util.c: Correct the GetUserName call for windows.
