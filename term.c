@@ -818,28 +818,24 @@ struct termentry term_tbl[] =
 };
 
 #define TERMCOUNT (sizeof(term_tbl)/sizeof(struct termentry))
-/* also make this be a function so we can get the number of
- *  terminals in help.c   DBT 10-7-98
- */
-int term_count()
-{
-    return TERMCOUNT;
-}
 
-#if 0
-/***** move list_terms() to help.c where paging functions are declared static */
 void list_terms()
 {
     register int i;
+    char line_buffer[BUFSIZ];
 
-    fprintf(stderr, "\nAvailable terminal types:\n");
-    for (i = 0; i < TERMCOUNT; i++)
-	fprintf(stderr, "  %15s  %s\n",
+    StartOutput();
+    sprintf(line_buffer,"\nAvailable terminal types:\n");
+    OutLine(line_buffer);
+
+    for (i = 0; i < TERMCOUNT; i++) {
+	sprintf(line_buffer,"  %15s  %s\n",
 		term_tbl[i].name, term_tbl[i].description);
-    (void) putc('\n', stderr);
-}
+	OutLine(line_buffer);
+    }
 
-#endif /* 0 */
+    EndOutput();
+}
 
 
 /* set_term: get terminal number from name on command line
