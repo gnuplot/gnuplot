@@ -517,13 +517,15 @@ int count;
 
     /* title */
     if (titlelin)
-	title_textheight = (int) ((titlelin + title.yoffset) * (t->v_char));
+	title_textheight = (int) ((titlelin + title.yoffset +1) * (t->v_char));
     else
 	title_textheight = 0;
 
     /* x2label */
-    if (x2lablin)
-	x2label_textheight = (int) ((x2lablin + x2label.yoffset + 0.5) * (t->v_char));
+    if (x2lablin) {
+	x2label_textheight = (int) ((x2lablin + x2label.yoffset) * (t->v_char));
+	if(!x2tics) x2label_textheight += 0.5 * t->v_char;
+    }
     else
 	x2label_textheight = 0;
 
@@ -628,16 +630,18 @@ int count;
 	xtic_height = 0;
 
     /* xlabel */
-    if (xlablin)
+    if (xlablin) {
 	/* offset is subtracted because if . 0, the margin is smaller */
 	xlabel_textheight = (int) ((xlablin - xlabel.yoffset) * (t->v_char));
+	if(!xtics) xlabel_textheight += 0.5 * t->v_char;
+    }
     else
 	xlabel_textheight = 0;
 
     /* timestamp */
     if (*timelabel.text && timelabel_bottom)	/* && !vertical_timelabel) DBT 11-18-98 resize plot for vertical timelabels too ! */
 	/* offset is subtracted because if . 0, the margin is smaller */
-	timebot_textheight = (int) ((timelin - timelabel.yoffset + 1) * (t->v_char));
+	timebot_textheight = (int) ((timelin - timelabel.yoffset + 1.5) * (t->v_char));
     else
 	timebot_textheight = 0;
 
@@ -796,16 +800,18 @@ int count;
 	ytic_width = 0;
 
     /* ylabel */
-    if (*ylabel.text && can_rotate)
-	/*ylabel_textwidth = (int) ((ylablin + ylabel.xoffset) * (t->v_char)); */
+    if (*ylabel.text && can_rotate) {
 	ylabel_textwidth = (int) ((ylablin - ylabel.xoffset) * (t->v_char));
+	if(!ytics) ylabel_textwidth += 0.5 * t->v_char;
+    }
+
     /* this should get large for NEGATIVE ylabel.xoffsets  DBT 11-5-98 */
     else
 	ylabel_textwidth = 0;
 
     /* timestamp */
     if (*timelabel.text && vertical_timelabel)
-	timelabel_textwidth = (int) ((timelin - timelabel.xoffset + 1) * (t->v_char));
+	timelabel_textwidth = (int) ((timelin - timelabel.xoffset + 1.5) * (t->v_char));
     else
 	timelabel_textwidth = 0;
 
@@ -822,6 +828,7 @@ int count;
 	    /* make room for end of xtic or x2tic label */
 	    xleft += (int) ((t->h_char) * 2);
 	}
+	xleft += 0.5 * t->v_char;  /* DBT 12-3-98  extra margin just in case */
     } else
 	xleft += (int) (lmargin * (t->h_char));
 
@@ -859,8 +866,10 @@ int count;
 	y2tic_width = 0;
 
     /* y2label */
-    if (can_rotate && *y2label.text)
-	y2label_textwidth = (int) ((y2lablin + y2label.xoffset + 0.5) * (t->v_char));
+    if (can_rotate && *y2label.text) {
+	y2label_textwidth = (int) ((y2lablin + y2label.xoffset) * (t->v_char));
+	if(!y2tics) y2label_textwidth += 0.5 * t->v_char;
+    }
     else
 	y2label_textwidth = 0;
 
@@ -884,6 +893,8 @@ int count;
 	    /* make room for end of xtic or x2tic label */
 	    xright -= (int) ((t->h_char) * 2);
 	}
+	xright -= 0.5 * t->v_char; /* DBT 12-3-98  extra margin just in case */
+
     } else
 	xright -= (int) (rmargin * (t->h_char));
 
@@ -966,8 +977,7 @@ int count;
 
     y2label_y = ytop + x2tic_height + x2tic_textheight + y2label_textheight;
 
-    xlabel_y = ybot - xtic_height - xtic_textheight + (int) (xlabel.yoffset * (t->v_char));
-
+    xlabel_y = ybot - xtic_height - xtic_textheight - xlabel_textheight + t->v_char; 
     ylabel_x = xleft - ytic_width - ytic_textwidth;
     if (*ylabel.text && can_rotate)
 	ylabel_x -= ylabel_textwidth;
