@@ -1,3 +1,5 @@
+#define INCL_WINMENUS
+#include <os2.h>
 #include "dialogs.h"
 
 ICON 1 "gnuplot.ico"
