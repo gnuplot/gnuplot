@@ -305,7 +305,14 @@
 
 
 /* Misc platforms */
-#if defined(apollo) || defined(alliant)
+#ifdef apollo
+# ifndef APOLLO
+#  define APOLLO
+# endif
+# define GPR
+#endif
+
+#if defined(APOLLO) || defined(alliant)
 # define NO_LIMITS_H
 #endif
 
@@ -314,6 +321,11 @@
 # define NO_STRCHR
 #endif
 
+#ifdef unixpc
+# ifndef UNIXPC
+#  define UNIXPC
+# endif
+#endif
 
 /* Autoconf related stuff
  * Transform autoconf defines to gnuplot coding standards
@@ -399,11 +411,5 @@
 
 #endif /* HAVE_CONFIG_H */
 /* End autoconf related stuff */
-
-/* GNU readline stuff */
-#ifdef GNU_READLINE
-# include <readline/readline.h>
-# include <readline/history.h>
-#endif
 
 #endif /* !SYSCFG_H */
