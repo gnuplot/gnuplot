@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: history.c,v 1.9 2003/02/18 16:38:09 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: history.c,v 1.10 2003/11/13 18:05:14 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - history.c */
@@ -113,15 +113,19 @@ char *line;
 /* write <n> last entries of the history to the file <filename>
  * Input parameters:
  *    n > 0 ... write only <n> last entries; otherwise all entries
- *    filename == NUL ... write to stdout; otherwise to the filename
+ *    filename == NULL ... write to stdout; otherwise to the filename
+ *    mode ... should be "w" or "a" to select write or append for file,
+ *	       ignored if history is written to a pipe
 */
 void
-write_history_n(n, filename)
+write_history_n(n, filename, mode)
 const int n;
 const char *filename;
+const char *mode;
 {
     struct hist *entry = history, *start = NULL;
     FILE *out = stdout;
+    int is_pipe = 0; /* not filename but pipe to an external program */
     int hist_entries = 0;
     int hist_index = 1;
 
@@ -140,8 +144,17 @@ const char *filename;
 	hist_index = hist_entries - n + 1;
     }
     /* now write the history */
-    if (filename != NULL)
-	out = fopen(filename, "w");
+    if (filename != NULL) {
+#ifdef PIPES
+	if (filename[0]=='|') {
+	    out = popen(filename+1, "w");
+	    is_pipe = 1;
+	} else
+#endif
+	out = fopen(filename, mode);
+    }
+    if (!out)
+	int_error(NO_CARET, "cannot open file for saving the history");
     while (entry != NULL) {
 	/* don't add line numbers when writing to file
 	 * to make file loadable */
@@ -151,8 +164,14 @@ const char *filename;
 	    fprintf(out, "%5i  %s\n", hist_index++, entry->line);
 	entry = entry->next;
     }
-    if (filename != NULL)
+    if (filename != NULL) {
+#ifdef PIPES
+	if (is_pipe)
+	    pclose(out);
+	else
+#endif
 	fclose(out);
+}
 }
 
 
@@ -163,7 +182,7 @@ void
 write_history(filename)
 char *filename;
 {
-    write_history_n(0, filename);
+    write_history_n(0, filename, "w");
 }
 
 

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.79 2003/11/13 18:05:14 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.80 2003/11/24 15:15:14 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -687,6 +687,7 @@ history_command()
     struct value a;
     char *name = NULL; /* name of the output file; NULL for stdout */
     int n = 0;         /* print only <last> entries */
+    int append = 0;    /* rewrite output file or append it */
 
     c_token++;
 
@@ -743,8 +744,12 @@ history_command()
 	if (!END_OF_COMMAND && isstring(c_token)) {
 	    m_quote_capture(&name, c_token, c_token);
 	    c_token++;
+	    if (!END_OF_COMMAND && almost_equals(c_token, "ap$pend")) {
+		append = 1;
+		c_token++;
+	    }
 	}
-	write_history_n(n, name);
+	write_history_n(n, name, (append ? "a" : "w"));
     }
 #else
     c_token++;
