@@ -254,7 +254,7 @@ extern float yoffset;		/* y origin setting */
 extern float aspect_ratio;	/* 1.0 for square */
 
 /* plot border autosizing overrides, in characters (-1: autosize) */
-extern int lmargin, bmargin,rmargin,tmargin;
+extern float lmargin, bmargin, rmargin, tmargin;
 
 extern struct arrow_def *first_arrow;
 

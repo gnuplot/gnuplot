@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.95 2004/12/21 08:09:34 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.96 2005/01/04 20:12:46 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -765,8 +765,8 @@ set ticscale %g %g\n",
 #undef SAVE_AXISLABEL_OR_TITLE
 
     fprintf(fp, "set zero %g\n", zero);
-    fprintf(fp, "set lmargin %d\nset bmargin %d\n"
-	    "set rmargin %d\nset tmargin %d\n",
+    fprintf(fp, "set lmargin %g\nset bmargin %g\n"
+	    "set rmargin %g\nset tmargin %g\n",
 	    lmargin, bmargin, rmargin, tmargin);
 
     fprintf(fp, "set locale \"%s\"\n", get_locale());

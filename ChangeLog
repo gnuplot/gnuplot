@@ -1,5 +1,11 @@
 2005-01-10  Daniel Sebald  <daniel.sebald@ieee.org>
 
+	* src/gadgets.c src/gadgets.h src/set.c (set_margin) src/show.c
+	(show_margin) src/unset.c (unset_margin): Specify and store plot
+	margins as float rather than int.
+
+2005-01-10  Daniel Sebald  <daniel.sebald@ieee.org>
+
 	* src/graphics.c demo/image.dem: Correct a problem with scaling of
 	images from 'with image'.
 

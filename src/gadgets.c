@@ -67,13 +67,13 @@ float yoffset = 0.0;		/* y origin */
 float aspect_ratio = 0.0;	/* don't attempt to force it */
 
 /* space between left edge and xleft in chars (-1: computed) */
-int lmargin = -1;
+float lmargin = -1;
 /* space between bottom and ybot in chars (-1: computed) */
-int bmargin = -1;
+float bmargin = -1;
 /* space between right egde and xright in chars (-1: computed) */
-int rmargin = -1;
+float rmargin = -1;
 /* space between top egde and ytop in chars (-1: computed) */
-int tmargin = -1;
+float tmargin = -1;
 
 
 /* Pointer to the start of the linked list of 'set label' definitions */
