@@ -1,5 +1,5 @@
 /*
- * $Id: x11.trm,v 1.67 2002/12/13 20:12:40 mikulik Exp $
+ * $Id: x11.trm,v 1.68 2003/01/31 15:28:36 lhecking Exp $
  *
  */
 
@@ -162,15 +162,24 @@ static FILE *X11_ipc = (FILE *) 0;
 static char **xargv = (char **) NULL;
 /* reserve a minimum 10 driver opts */
 static char *optvec[2 * X11_nopts + 1 + 10];
+
+/* gnuplot_x11 has extension .exe on OS/2 and Windows (and on RSX/VMS, but
+   these construct their own full path GNUPLOT_X11 in their build script).
+*/
 # if defined(OS2) || defined(_Windows)
+#   ifndef GNUPLOT_X11
 static char X11_default_command[] = "gnuplot_x11.exe";
-# else
-# ifndef GNUPLOT_X11
+#   else
+static char X11_default_command[] = GNUPLOT_X11 ".exe";
+#   endif
+# else  /* thus !OS/2 && !Windows */
+#   ifndef GNUPLOT_X11
 static char X11_default_command[] = "gnuplot_x11";
-# else
+#   else
 static char X11_default_command[] = GNUPLOT_X11;
-# endif
-# endif	/* !OS/2 */
+#   endif
+# endif	/* OS/2 || Windows */
+
 static char *X11_command = X11_default_command;
 static char *X11_command_parsed = NULL;
 static char *X11_full_command_path = NULL;

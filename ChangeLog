@@ -1,3 +1,9 @@
+2003-03-21  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* term/x11.trm: Allow to use both the default '"gnuplot_x11.exe"' and
+	optional 'GNUPLOT_X11 ".exe"' for initializing X11_default_command[]
+	under OS/2 and Windows.
+
 2003-03-21  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/graph3d.c (boundary3d): Avoid division by zero if graph too
