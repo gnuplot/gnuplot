@@ -57,23 +57,24 @@ TERM_PUBLIC void CGI_point __PROTO((unsigned int x, unsigned int y, int num));
 #ifdef TERM_BODY
 
 #ifdef VGA_MONO
-static short rgb[16][3] = {
-  0,    0,      0,      /* Black        */
-  1000,	1000,	1000,	/* White	*/
-  800,	800,	0,	/* Red		*/
-  0,	600,	0,	/* Green	*/
-  0,	800,	800,	/* Blue		*/
-  1000,	1000,	400,	/* Yellow	*/
-  0,	600,	600,	/* Cyan		*/
-  600,	600,	600,	/* Magenta	*/
-  800,	800,	0,	/* Brown	*/
-  600,	600,	600,	/* Lt. Grey	*/
-  400,	600,	400,	/* Dark Grey	*/
-  400,	600,	1000,	/* Lt. Blue	*/
-  400,	1000,	400,	/* Lt Green	*/
-  400,	1000,	1000,	/* Lt Cyan	*/
-  1000,	600,	400,	/* Lt Red	*/
-  600,	600,	1000	/* Lt Magenta	*/
+static short rgb[16][3] =
+{
+    0, 0, 0,			/* Black        */
+    1000, 1000, 1000,		/* White        */
+    800, 800, 0,		/* Red          */
+    0, 600, 0,			/* Green        */
+    0, 800, 800,		/* Blue         */
+    1000, 1000, 400,		/* Yellow       */
+    0, 600, 600,		/* Cyan         */
+    600, 600, 600,		/* Magenta      */
+    800, 800, 0,		/* Brown        */
+    600, 600, 600,		/* Lt. Grey     */
+    400, 600, 400,		/* Dark Grey    */
+    400, 600, 1000,		/* Lt. Blue     */
+    400, 1000, 400,		/* Lt Green     */
+    400, 1000, 1000,		/* Lt Cyan      */
+    1000, 600, 400,		/* Lt Red       */
+    600, 600, 1000		/* Lt Magenta   */
 };
 #endif
 
@@ -86,79 +87,78 @@ static short rgb[16][3] = {
 static short gout[66];
 static short cgidev;
 static short vect[4];
-static short gin[19] = {
- 0,	/* default aspect ratio */
- 1,	/* solid line */
- 1,	/* line color */
- 1,	/* marker type . */
- 1,	/* marker color */
- 1,	/* graphics text font */
- 1,	/* graphics text color */
- 0,	/* fill interior style */
- 0,	/* fill style index */
- 1,	/* fill color index */
- 1 	/* prompt for paper changes */
- };
+static short gin[19] =
+{
+    0,				/* default aspect ratio */
+    1,				/* solid line */
+    1,				/* line color */
+    1,				/* marker type . */
+    1,				/* marker color */
+    1,				/* graphics text font */
+    1,				/* graphics text color */
+    0,				/* fill interior style */
+    0,				/* fill style index */
+    1,				/* fill color index */
+    1				/* prompt for paper changes */
+};
 
-char	*cgidriver, *getenv();
+char *cgidriver, *getenv();
 
 
 TERM_PUBLIC void CGI_init()
 {
-  if (getenv(cgidriver = "CGIDISP") == NULL)
-    HCGI_init();
+    if (getenv(cgidriver = "CGIDISP") == NULL)
+	HCGI_init();
 }
 
 
 TERM_PUBLIC void HCGI_init()
 {
-  if (getenv(cgidriver = "CGIPRNT") == NULL)
-    int_error("no CGI driver", NO_CARET);
+    if (getenv(cgidriver = "CGIPRNT") == NULL)
+	int_error("no CGI driver", NO_CARET);
 }
 
 
 TERM_PUBLIC void CGI_graphics()
 {
-  int	i, aspect;
-  char *s;
-  short font_cap[9];
-  char	err_str[80];
+    int i, aspect;
+    char *s;
+    short font_cap[9];
+    char err_str[80];
 
-  if ( (s=getenv("ASPECT")) != NULL && (aspect=atoi(s)) >= 0 && aspect <= 3 )
-    gin[0] = aspect;
-  for (i = 0; cgidriver[i]; i++) 
-    gin[11+i] = cgidriver[i];
-  gin[18] = ' ';
+    if ((s = getenv("ASPECT")) != NULL && (aspect = atoi(s)) >= 0 && aspect <= 3)
+	gin[0] = aspect;
+    for (i = 0; cgidriver[i]; i++)
+	gin[11 + i] = cgidriver[i];
+    gin[18] = ' ';
 
-  if (v_opnwk(gin, &cgidev, gout) < 0) 
-    {
-      sprintf(err_str, "CGI error %d opening %s", -vq_error(), cgidriver);
-      int_error(err_str, NO_CARET);
+    if (v_opnwk(gin, &cgidev, gout) < 0) {
+	sprintf(err_str, "CGI error %d opening %s", -vq_error(), cgidriver);
+	int_error(err_str, NO_CARET);
     }
-  vqt_representation(cgidev, 9, font_cap);
-  CGI_VCHAR = font_cap[8] * 3 / 2;
-  CGI_HCHAR = font_cap[7];
-  CGI_HTIC = CGI_VTIC * ((double) gout[1] / (double) gout[4]) / 
-			((double) gout[0] / (double) gout[3]);
+    vqt_representation(cgidev, 9, font_cap);
+    CGI_VCHAR = font_cap[8] * 3 / 2;
+    CGI_HCHAR = font_cap[7];
+    CGI_HTIC = CGI_VTIC * ((double) gout[1] / (double) gout[4]) /
+	((double) gout[0] / (double) gout[3]);
 #ifdef VGA_MONO
-  if (CGICOLORS > 2)
-    vsc_table(cgidev, 0, CGICOLORS, rgb);
+    if (CGICOLORS > 2)
+	vsc_table(cgidev, 0, CGICOLORS, rgb);
 #endif
 }
 
 
 TERM_PUBLIC void CGI_text()
 {
-  if (CRT)  
-    {
-      short ptin[2];
-      char  strin[2];
-      
-      ptin[0] = 0;
-      ptin[1] = 0;
-      vrq_string(cgidev, 1, 0, ptin, strin);
+    if (CRT) {
+	short ptin[2];
+	char strin[2];
+
+	ptin[0] = 0;
+	ptin[1] = 0;
+	vrq_string(cgidev, 1, 0, ptin, strin);
     }
-  v_clswk(cgidev);
+    v_clswk(cgidev);
 }
 
 
@@ -168,35 +168,34 @@ TERM_PUBLIC void CGI_reset()
 
 
 TERM_PUBLIC void CGI_move(x, y)
-     unsigned int x, y;
+unsigned int x, y;
 {
-  vect[0] = x;
-  vect[1] = y;
+    vect[0] = x;
+    vect[1] = y;
 }
 
 TERM_PUBLIC void CGI_vector(x, y)
-     unsigned int x, y;
+unsigned int x, y;
 {
-  vect[2] = x;
-  vect[3] = y;
-  v_pline(cgidev, 2, vect);
-  vect[0] = x;
-  vect[1] = y;
+    vect[2] = x;
+    vect[3] = y;
+    v_pline(cgidev, 2, vect);
+    vect[0] = x;
+    vect[1] = y;
 }
 
 
 TERM_PUBLIC void CGI_linetype(linetype)
-     int linetype;
+int linetype;
 {
-  short lcolor;
+    short lcolor;
 
-  if (CGICOLORS > 2) 
-    {
-      lcolor = (linetype + 2) % CGICOLORS + 1;
-      vsl_color(cgidev, lcolor);
-      vsm_color(cgidev, lcolor);
+    if (CGICOLORS > 2) {
+	lcolor = (linetype + 2) % CGICOLORS + 1;
+	vsl_color(cgidev, lcolor);
+	vsm_color(cgidev, lcolor);
     }
-  vsl_type(cgidev, (linetype < 1) ? 1 : (linetype % CGILINES) + 1);
+    vsl_type(cgidev, (linetype < 1) ? 1 : (linetype % CGILINES) + 1);
 }
 
 
@@ -204,60 +203,62 @@ TERM_PUBLIC void CGI_put_text(x, y, str)
 unsigned int x, y;
 char *str;
 {
-  v_gtext(cgidev, (short) x, (short) y, str);
+    v_gtext(cgidev, (short) x, (short) y, str);
 }
 
 
 TERM_PUBLIC CGI_text_angle(ang)
-int	ang;
+int ang;
 {
-  if (!CGIROTATES)
-    return FALSE;
-				/* angles are 1/10 degree ccw */
-  vst_rotation(cgidev, (ang) ? 900 : 0);
-  return TRUE;
+    if (!CGIROTATES)
+	return FALSE;
+    /* angles are 1/10 degree ccw */
+    vst_rotation(cgidev, (ang) ? 900 : 0);
+    return TRUE;
 }
 
 
 TERM_PUBLIC CGI_justify_text(mode)
 enum JUSTIFY mode;
 {
-  short hor_in, hor_out, vert_out;
+    short hor_in, hor_out, vert_out;
 
-  if (!CGITEXTALIGN)
-    return FALSE;
+    if (!CGITEXTALIGN)
+	return FALSE;
 
-  switch (mode)
-    {
-    case LEFT:   hor_in = 0; break;
-    case CENTRE: hor_in = 1; break;
-    case RIGHT:  hor_in = 2; break;
+    switch (mode) {
+    case LEFT:
+	hor_in = 0;
+	break;
+    case CENTRE:
+	hor_in = 1;
+	break;
+    case RIGHT:
+	hor_in = 2;
+	break;
     }
-  vst_alignment(cgidev, hor_in, 1, &hor_out, &vert_out); 
-  return TRUE;
+    vst_alignment(cgidev, hor_in, 1, &hor_out, &vert_out);
+    return TRUE;
 }
 
 
 #define POINT_TYPES 6
 
-TERM_PUBLIC void CGI_point(x,y,num)
-     unsigned int x, y;
-     int num;
+TERM_PUBLIC void CGI_point(x, y, num)
+unsigned int x, y;
+int num;
 {
-  short  point[2];
-  static short cgimarker[POINT_TYPES] = {1, 2, 6, 4, 5, 3};
-			              /* .  +  <> [] X  * */
-  if (num < 0)
-    {
-      CGI_move(x, y);
-      CGI_vector(x, y);
-    }
-  else
-    {
-      vsm_type(cgidev, cgimarker[num % POINT_TYPES]);
-      point[0] = x;
-      point[1] = y;
-      v_pmarker(cgidev, 1, point);
+    short point[2];
+    static short cgimarker[POINT_TYPES] = { 1, 2, 6, 4, 5, 3 };
+    /* .  +  <> [] X  * */
+    if (num < 0) {
+	CGI_move(x, y);
+	CGI_vector(x, y);
+    } else {
+	vsm_type(cgidev, cgimarker[num % POINT_TYPES]);
+	point[0] = x;
+	point[1] = y;
+	v_pmarker(cgidev, 1, point);
     }
 }
 
@@ -267,11 +268,11 @@ TERM_PUBLIC void CGI_point(x,y,num)
 
 TERM_TABLE_START(cgi_driver)
     "cgi", "SCO CGI drivers (requires CGIDISP or CGIPRNT env variable)",
-	   CGI_XMAX, CGI_YMAX, 0, 0, 
-	   CGI_VTIC, 0, options_null, CGI_init, CGI_reset, 
-	   CGI_text, null_scale, CGI_graphics, CGI_move, CGI_vector, 
-	   CGI_linetype, CGI_put_text, CGI_text_angle, 
-	   CGI_justify_text, CGI_point, do_arrow, set_font_null
+    CGI_XMAX, CGI_YMAX, 0, 0,
+    CGI_VTIC, 0, options_null, CGI_init, CGI_reset,
+    CGI_text, null_scale, CGI_graphics, CGI_move, CGI_vector,
+    CGI_linetype, CGI_put_text, CGI_text_angle,
+    CGI_justify_text, CGI_point, do_arrow, set_font_null
 TERM_TABLE_END(cgi_driver)
 
 #undef LAST_TERM
@@ -279,11 +280,11 @@ TERM_TABLE_END(cgi_driver)
 
 TERM_TABLE_START(hcgi_driver)
     "hcgi", "SCO CGI drivers (hardcopy, requires CGIPRNT env variable)",
-	   CGI_XMAX, CGI_YMAX, 0, 0, 
-	   CGI_VTIC, 0, options_null, HCGI_init, CGI_reset, 
-	   CGI_text, null_scale, CGI_graphics, CGI_move, CGI_vector, 
-	   CGI_linetype, CGI_put_text, CGI_text_angle, 
-	   CGI_justify_text, CGI_point, do_arrow, set_font_null
+    CGI_XMAX, CGI_YMAX, 0, 0,
+    CGI_VTIC, 0, options_null, HCGI_init, CGI_reset,
+    CGI_text, null_scale, CGI_graphics, CGI_move, CGI_vector,
+    CGI_linetype, CGI_put_text, CGI_text_angle,
+    CGI_justify_text, CGI_point, do_arrow, set_font_null
 TERM_TABLE_END(hcgi_driver)
 
 #undef LAST_TERM
