@@ -1,5 +1,5 @@
 /*
- * $Id: epslatex.trm,v 1.9 2001/08/27 15:04:12 broeker Exp $
+ * $Id: epslatex.trm,v 1.10 2001/09/08 16:16:00 amai Exp $
  */
 
 /* GNUPLOT - epslatex.trm */
@@ -809,8 +809,8 @@ TBOOLEAN head;
 
 TERM_PUBLIC void
 EPSL_put_text(x, y, str)
-unsigned int x, y;
-const char *str;
+    unsigned int x, y;
+    const char *str;
 {
     if (EPSL_texfile) {
 	fprintf(EPSL_texfile, "\\put(%d,%d){", x, y);
@@ -818,7 +818,7 @@ const char *str;
 	    fputs("\\rotatebox{90}{", EPSL_texfile);
 	}
 	if (((str[0] == '{') || (str[0] == '['))) {
-	    fprintf(gpoutfile, "\\makebox(0,0)%s", str);
+	    fprintf(EPSL_texfile, "\\makebox(0,0)%s", str);
 	} else
 	    switch (EPSL_justify) {
 	    case LEFT:

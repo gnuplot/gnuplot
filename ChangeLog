@@ -1,25 +1,31 @@
+2001-12-18  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* term/epslatex.trm (EPSL_put_text): Fix bug that would output TeX
+ 	code into the PostScript file.  Report and bugfix by
+ 	<Ralf_Ahlbrink@web.de>.
+	
 2001-12-17  Petr Mikulik  <mikulik@physics.muni.cz>
 
-	* src/util.c: Fix graph_error() to avoid gnuplot crash for log axes
-	with negative min/max range value in splot.
+	* src/util.c: Fix graph_error() to avoid gnuplot crash for log
+ 	axes with negative min/max range value in splot.
 
 	* src/pm3d.c: More appropriate error message for negative cb range
-	and log z axis.
+ 	and log z axis.
 
 2001-12-16  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/color.c: Fine tuning of the default color box size and
-	position (take in/out/mirror/scale of tics into account). Remove
-	the obsolete code of PUT_ZMINMAX_AROUND used before the cb-axis
-	has been implemented.
+ 	position (take in/out/mirror/scale of tics into account). Remove
+ 	the obsolete code of PUT_ZMINMAX_AROUND used before the cb-axis
+ 	has been implemented.
 
 	* src/pm3d.c: Remove obsolete comments.
 
 2001-12-14  Petr Mikulik  <mikulik@physics.muni.cz>
 
-	* src/mouse.c: Routine do_event(): Disable event processing for 
-	undefined terminals (fixes crash when mouse is on and non-existing
-	terminal is set).
+	* src/mouse.c: Routine do_event(): Disable event processing for
+ 	undefined terminals (fixes crash when mouse is on and non-existing
+ 	terminal is set).
 
 2001-12-14  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
