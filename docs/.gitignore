@@ -4,7 +4,11 @@ doc2gih
 doc2rtf
 doc2tex
 gnuplot.gih
+gnuplot.html
+gnuplot.ms
+gnuplot.rtf
 gnuplot.tex
+gnuplot.texi
 *.aux
 *.dvi
 *.log
