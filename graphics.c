@@ -931,7 +931,7 @@ int count;
 	double current_aspect_ratio;
 
 	if (aspect_ratio < 0 && (max_array[x_axis] - min_array[x_axis]) != 0.0) {
-	    current_aspect_ratio = -aspect_ratio * (max_array[y_axis] - min_array[y_axis]) / (max_array[x_axis] - min_array[x_axis]);
+	    current_aspect_ratio = -aspect_ratio * fabs((max_array[y_axis] - min_array[y_axis]) / (max_array[x_axis] - min_array[x_axis]));
 	} else
 	    current_aspect_ratio = aspect_ratio;
 
