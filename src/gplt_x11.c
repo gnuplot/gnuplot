@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.100 2004/06/16 18:58:46 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.101 2004/06/17 20:44:37 sfeam Exp $"); }
 #endif
 
 #define X11_POLYLINE 1
@@ -3326,6 +3326,7 @@ process_event(XEvent *event)
 {
     plot_struct *plot;
     KeySym keysym;
+    char key_sequence[8];
 #if 0
     fprintf(stderr, "Event 0x%x\n", event->type);
 #endif
@@ -3406,7 +3407,12 @@ process_event(XEvent *event)
 	break;
     case KeyPress:
 	plot = Find_Plot_In_Linked_List_By_Window(event->xkey.window);
-	keysym = XKeycodeToKeysym(dpy, event->xkey.keycode, 0);
+
+	/* Unlike XKeycodeToKeysym, XLookupString applies the current */
+	/* shift, ctrl, alt, and meta modifiers to yield a character. */
+	/* keysym = XKeycodeToKeysym(dpy, event->xkey.keycode, 0); */
+	XLookupString((XKeyEvent *)event,key_sequence,sizeof(key_sequence),&keysym,NULL);
+	
 #ifdef USE_MOUSE
 	update_modifiers(event->xkey.state);
 
