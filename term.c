@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: term.c,v 1.19.2.2 1999/09/14 19:20:05 lhecking Exp $";
+static char *RCSid = "$Id: term.c,v 1.19.2.3 1999/10/01 10:37:23 lhecking Exp $";
 #endif
 
 /* GNUPLOT - term.c */
@@ -112,6 +112,7 @@ extern float xsize, ysize;
 /* internal pointsize for do_point */
 static double term_pointsize;
 
+static int termcomp __PROTO((const generic * a, const generic * b));
 static void term_suspend __PROTO((void));
 static void term_close_output __PROTO((void));
 static void null_linewidth __PROTO((double));
@@ -829,21 +830,39 @@ term_count()
 void list_terms()
 {
     register int i;
-    char line_buffer[BUFSIZ];
+    char *line_buffer = gp_alloc(BUFSIZ, "list_terms");
+    int sort_idxs[TERMCOUNT];
+
+    /* sort terminal types alphabetically */
+    for( i = 0; i < TERMCOUNT; i++ )
+	sort_idxs[i] = i;
+    qsort( sort_idxs, TERMCOUNT, sizeof(int), termcomp );
+    /* now sort_idxs[] contains the sorted indices */
 
     StartOutput();
-    sprintf(line_buffer,"\nAvailable terminal types:\n");
+    strcpy(line_buffer, "\nAvailable terminal types:\n");
     OutLine(line_buffer);
 
     for (i = 0; i < TERMCOUNT; i++) {
-	sprintf(line_buffer,"  %15s  %s\n",
-		term_tbl[i].name, term_tbl[i].description);
+	sprintf(line_buffer, "  %15s  %s\n",
+		term_tbl[sort_idxs[i]].name,
+		term_tbl[sort_idxs[i]].description);
 	OutLine(line_buffer);
     }
 
     EndOutput();
+    free(line_buffer);
 }
 
+static int
+termcomp(arga, argb)
+    const generic *arga, *argb;
+{
+    const int *a = arga;
+    const int *b = argb;
+
+    return( strcasecmp( term_tbl[*a].name, term_tbl[*b].name ) );
+}
 
 /* set_term: get terminal number from name on command line
  * will change 'term' variable if successful
