@@ -121,34 +121,28 @@ $ ./configure --help
   --libdir=DIR            object code libraries in DIR [EPREFIX/lib]
   --includedir=DIR        C header files in DIR [PREFIX/include]
   --mandir=DIR            Man documentation in DIR [PREFIX/man]
-  --without-readline      Do not use the included readline function
-  --with-gnu-readline     Use the GNU readline version  If you don't use this,
-                          you won't have file name completion.
-  --with-gnu-readline=PATH        Specify the location of libreadline.
-                          Use this form if your libreadline is not installed
-                          where your linker can find it.
+  --with-readline         use the builtin minimal readline function (default)
+  --without-readline      do not use the builtin readline function
+  --with-readline=gnu     use the GNU readline library
+  --with-readline=PATH            Specify the location of GNU readline
   --with-plot             use the Unix plot library
   --with-plot=PATH                Specify the location of GNU libplot
-  --with-gd (*)           Enable gif terminal with Tom Boutell's gd library
+  --with-gd (*)           enable gif terminal with Tom Boutell's gd library
                           (requires GD library)
   --with-gd=PATH                  Specify the location of libgd
-  --with-png (*)          Enable png terminal
+  --with-png (*)          enable png terminal
                           (requires libpng and libz)
   --with-png=PATH                 Specify the location of libpng
-  --with-cwdrc            Check current directory for .gnuplotrc file,
-                          normally disabled for security reasons. However,
-                          the home directory is always checked for a
-                          .gnuplotrc file.
-  --with-lasergnu         Install lasergnu printer script
-  --without-linux-vga (*) Do not use the Linux console driver
-                          (requires Linux SVGAlib /usr/lib/libvga)
-  --enable-apollo         Apollo Graphics Primitive Resource
-  --enable-gpr            Apollo Graphics Primitive Resource (fixed-size window)
-  --enable-cgi            enable CGI terminal (SCO only)
+  --with-cwdrc            check current directory for .gnuplot file,
+                          normally disabled for security reasons
+  --with-lasergnu         install lasergnu printer script
+  --with-linux-vga        use the Linux SVGA console driver
+                          (requires /usr/lib/libvga)
+  --enable-history        enable history (requires GNU readline)
+  --enable-thin-splines   enable thin plate splines (EXPERIMENTAL)
   --enable-iris           enable IRIS terminal (IRIS4D only)
-  --enable-sun            enable sunview terminal (Sun only)
-  --enable-unixpc         enable unixpc terminal (ATT 3b1 or ATT 7300)
-  --enable-system-time    use the system time routines in time.c
+  --enable-mgr            enable MGR terminal
+  --enable-rgip           enable Redwood Graphics Interface Protocol
   --with-x (*)            Use the X Window System
 
  Options marked with (*) are on by default, ie. these features or packages
