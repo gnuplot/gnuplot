@@ -1,5 +1,5 @@
 /*
- * $Id: doc2info.c,v 1.9 1998/12/04 15:18:04 lhecking Exp $
+ * $Id: doc2info.c,v 1.9.2.1 1999/08/19 14:31:53 lhecking Exp $
  *
  */
 
@@ -151,6 +151,7 @@ FILE *a, *b;
     fprintf(b, "\
 This file is %s created by doc2info from %s.\n\
 \n\
+INFO-DIR-SECTION Math\n\
 START-INFO-DIR-ENTRY\n\
 * Gnuplot: (gnuplot).           Gnuplot plotting program\n\
 END-INFO-DIR-ENTRY\n\n",
