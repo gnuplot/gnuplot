@@ -7,6 +7,8 @@
 
 	* syscfg.h: Add comment.
 
+	* version.c: Patchlevel pl6.
+
 1998-11-03  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* bf_test.c, binary.c, bitmap.c: Fix indentation.
