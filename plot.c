@@ -225,7 +225,7 @@ ULONG RexxInterface(PRXSTRING, PUSHORT, PRXSTRING);
 int ExecuteMacro(char *, int);
 void PM_intc_cleanup();
 void PM_setup();
-void set_input_line(char *, int);
+static void set_input_line(char *, int);
 #endif /* OS2 */
 
 #if defined(ATARI) || defined(MTOS)
@@ -321,12 +321,11 @@ char **argv;
 	    if (*s == DIRSEP1)
 		*s = DIRSEP2;	/* '\\' to '/' */
 	strcpy(strrchr(HelpFile, DIRSEP2), "/gnuplot.gih");
-    }				/* Add also some "paranoid" tests for '\\':  AP */
+    }			/* Add also some "paranoid" tests for '\\':  AP */
 #endif /* DJGPP */
 
 #ifdef VMS
-    unsigned int status[2] =
-    {1, 0};
+    unsigned int status[2] = {1, 0};
 #endif
 
 #ifdef GNU_READLINE
@@ -594,6 +593,14 @@ static void load_rcfile()
 }
 
 #ifdef OS2
+
+/* Moved from command.c */
+static void set_input_line(char *line, int nchar)
+{
+    safe_strncpy(input_line, line, nchar);
+    input_line[nchar] = NUL;
+}
+
 int ExecuteMacro(char *argv, int namelength)
 {
     RXSTRING rxRc;
