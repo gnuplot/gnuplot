@@ -19,6 +19,9 @@
 	Report an error if any of the <xxx>column() functions  are called
 	outside the context of a "using" specification.
 
+	* configure.in: Remove the "EXPERIMENTAL" warning from the histogram
+	and datastrings options; they've had 2 years of testing.
+
 2005-03-02  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/unset.c (unset_historysize): Rearrange #ifdefs for GNUPLOT_HISTORY
