@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.6 1999/06/22 12:00:48 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.7 1999/07/09 21:05:12 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - gplt_x11.c */
@@ -739,7 +739,7 @@ record()
     static plot_struct *plot = plot_array;
 
     while (1) {
-	int status = read_input (buf, Nbuf);
+	int status = read_input ();
 	if (status != 0)
 	    return status;
 
