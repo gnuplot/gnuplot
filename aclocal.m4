@@ -414,6 +414,7 @@ case "$with_$1" in
     gp_lib_list="$gp_lib_prefix $gp_lib_prefix/lib $gp_lib_path"
 esac
 for ac_dir in '' /usr/local/lib $gp_lib_list ; do
+  test x${ac_dir} != x && TERMLIBS="-L${ac_dir} $gp_save_TERMLIBS"
   TERMLIBS="`test x${ac_dir} != x && echo -L${ac_dir}` $gp_save_TERMLIBS"
   gp_CHECK_LIB_QUIET($1,$2,dnl
     TERMLIBS="$TERMLIBS -l$1"; break, dnl ACTION-IF-FOUND
@@ -438,7 +439,7 @@ AC_MSG_CHECKING([for $1])
 ac_safe=`echo "$1" | sed 'y%./+-%__p_%'`
 gp_save_CPPFLAGS="$CPPFLAGS"
 for ac_dir in '' /usr/local/include $gp_lib_prefix $gp_lib_prefix/include ; do
-  CPPFLAGS="$gp_save_CPPFLAGS `test x${ac_dir} != x && echo -I${ac_dir}`"
+  test x${ac_dir} != x && CPPFLAGS="$gp_save_CPPFLAGS -I${ac_dir}"
   AC_TRY_CPP([#include <$1>], eval "ac_cv_header_$ac_safe=yes",
     eval "ac_cv_header_$ac_safe=no")
   if eval "test \"`echo '$ac_cv_header_'$ac_safe`\" = yes"; then
