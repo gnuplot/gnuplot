@@ -279,7 +279,11 @@ void PNGtext()
 	return;
     }
     png_info_init(info_ptr);
-    png_write_init(png_ptr);
+    /* According the libpng documentation, this function
+     * is internal os of 0.95, and should not be used.
+     * The necessary initialisation is done by
+     * png_create_write_struct().
+    png_write_init(png_ptr); */
 
     png_init_io(png_ptr, gpoutfile);
 
