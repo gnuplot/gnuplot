@@ -9,7 +9,7 @@ used by gnuplot.  Part three (Basic Installation) describes generic
 installation instructions, which are common between most packages using
 GNU autoconf.  Part four explains in detail how --with-PACKAGE=PATH
 works, and how this option interacts with --libdir and --includedir.
-Part five address some platform specific problems and testing issues.
+Part five addresses some platform specific problems and testing issues.
 
  The description of preprocessor options previously found here has been
 moved to a new file called 0PORTING.
@@ -25,21 +25,21 @@ install the gd library : see term/gif.trm for details.
 png and z libraries : see term/png.trm for details.  Note that the
 png library might not compile without an ANSI/ISO C compiler.
 
-   A complete overview of configure options are below in the Basic
+   A complete overview of configure options is below in the Basic
 Installation section. On platforms which do not support GNU
 autoconf/configure, ie. most non-Unix platforms, look for a makefile
 that looks suitable, (makefile.emx for emx on dos, makefile.nt for
 MS VC++ 4.x on NT and probably win95, makefile.win for borland c on
-win95/nt, etc.)
+win95/nt, makefile.wc for DOS Watcom C etc.)
 
 File location defaults
 ----------------------
 
-PREFIX				/usr/local
-gnuplot				PREFIX/bin
-gnuplot_x11			PREFIX/bin
-gnuplot.1			PREFIX/man/man1
-gnuplot.gih			PREFIX/share
+PREFIX                          /usr/local
+gnuplot                         PREFIX/bin
+gnuplot_x11                     PREFIX/bin
+gnuplot.1                       PREFIX/man/man1
+gnuplot.gih                     PREFIX/share
 
    The only file where the runtime location is defined at compile time is
 gnuplot.gih. This is important if gnuplot is not installed by running
@@ -583,8 +583,8 @@ and rerun configure, or, edit config.h and change
 #define NO_MEMSET
 
    Note the changing such defines at compile time, eg. via
-'make DEF=-DNO_MEMSET' is wrong, because the DEF variable in Makefile
-may contain other defines (make DEF='-DHAVE_CONFIG_H -DNO_MEMSET'
+'make DEFS=-DNO_MEMSET' is wrong, because the DEFS variable in Makefile
+may contain other defines (make DEFS='-DHAVE_CONFIG_H -DNO_MEMSET'
 may work, though).
 
 (incomplete)
