@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.75 2002/02/13 22:58:18 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.76 2002/02/14 21:14:24 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -1333,39 +1333,7 @@ static void
 set_grid()
 {
     c_token++;
-    if (END_OF_COMMAND && !some_grid_selected()) {
-/*  	grid_selection = GRID_X|GRID_Y;  */
-	axis_array[FIRST_X_AXIS].gridmajor = TRUE;
-	axis_array[FIRST_Y_AXIS].gridmajor = TRUE;
-    } else
-	while (!END_OF_COMMAND) {
-#if 0
-            /* HBB 20010806: Old method of accessing grid choices */
-#define GRID_MATCH(string, neg, mask)			\
-	    if (almost_equals(c_token, string)) {	\
-		grid_selection |= mask;			\
-		++c_token;				\
-	    } else if (almost_equals(c_token, neg)) {	\
-		grid_selection &= ~(mask);		\
-		++c_token;				\
-	    }
-	    GRID_MATCH("x$tics", "nox$tics", GRID_X)
-	    else GRID_MATCH("y$tics", "noy$tics", GRID_Y)
-	    else GRID_MATCH("z$tics", "noz$tics", GRID_Z)
-	    else GRID_MATCH("x2$tics", "nox2$tics", GRID_X2)
-	    else GRID_MATCH("y2$tics", "noy2$tics", GRID_Y2)
-	    else GRID_MATCH("mx$tics", "nomx$tics", GRID_MX)
-	    else GRID_MATCH("my$tics", "nomy$tics", GRID_MY)
-	    else GRID_MATCH("mz$tics", "nomz$tics", GRID_MZ)
-	    else GRID_MATCH("mx2$tics", "nomx2$tics", GRID_MX2)
-	    else GRID_MATCH("my2$tics", "nomy2$tics", GRID_MY2)
-#ifdef PM3D
-	    else GRID_MATCH("cb$tics", "nocb$tics", GRID_CB)
-	    else GRID_MATCH("mcb$tics", "nomcb$tics", GRID_MCB)
-#endif
-#else  
-            /* HBB 20010806: new grid steering variable in axis struct */
-#define GRID_MATCH(axis, string)				\
+#define	GRID_MATCH(axis, string)				\
 	    if (almost_equals(c_token, string+2)) {		\
 		if (string[2] == 'm')				\
 		    axis_array[axis].gridminor = TRUE;		\
@@ -1379,49 +1347,49 @@ set_grid()
 		    axis_array[axis].gridmajor = FALSE;		\
 		++c_token;					\
 	    }
-	    GRID_MATCH(FIRST_X_AXIS, "nox$tics")
-	    else GRID_MATCH(FIRST_Y_AXIS, "noy$tics")
-	    else GRID_MATCH(FIRST_Z_AXIS, "noz$tics")
-	    else GRID_MATCH(SECOND_X_AXIS, "nox2$tics")
-	    else GRID_MATCH(SECOND_Y_AXIS, "noy2$tics")
-	    else GRID_MATCH(FIRST_X_AXIS, "nomx$tics")
-	    else GRID_MATCH(FIRST_Y_AXIS, "nomy$tics")
-	    else GRID_MATCH(FIRST_Z_AXIS, "nomz$tics")
-	    else GRID_MATCH(SECOND_X_AXIS, "nomx2$tics")
-	    else GRID_MATCH(SECOND_Y_AXIS, "nomy2$tics")
+    while (!END_OF_COMMAND) {
+	GRID_MATCH(FIRST_X_AXIS, "nox$tics")
+	else GRID_MATCH(FIRST_Y_AXIS, "noy$tics")
+	else GRID_MATCH(FIRST_Z_AXIS, "noz$tics")
+	else GRID_MATCH(SECOND_X_AXIS, "nox2$tics")
+	else GRID_MATCH(SECOND_Y_AXIS, "noy2$tics")
+	else GRID_MATCH(FIRST_X_AXIS, "nomx$tics")
+	else GRID_MATCH(FIRST_Y_AXIS, "nomy$tics")
+	else GRID_MATCH(FIRST_Z_AXIS, "nomz$tics")
+	else GRID_MATCH(SECOND_X_AXIS, "nomx2$tics")
+	else GRID_MATCH(SECOND_Y_AXIS, "nomy2$tics")
 #ifdef PM3D
-	    else GRID_MATCH(COLOR_AXIS, "nocb$tics")
-	    else GRID_MATCH(COLOR_AXIS, "nomcb$tics")
+	else GRID_MATCH(COLOR_AXIS, "nocb$tics")
+	else GRID_MATCH(COLOR_AXIS, "nomcb$tics")
 #endif
-#endif /* 1/0 */
-	    else if (almost_equals(c_token,"po$lar")) {
-		if (!some_grid_selected()) {
-		    /* grid_selection = GRID_X; */
-		    axis_array[FIRST_X_AXIS].gridmajor = TRUE;
-		}
-		c_token++;
-		if (END_OF_COMMAND) {
-		    polar_grid_angle = 30*DEG2RAD;
-		} else {
-		    /* get radial interval */
-		    struct value a;
-		    polar_grid_angle = ang2rad*real(const_express(&a));
-		}
-	    } else if (almost_equals(c_token,"nopo$lar")) {
-		polar_grid_angle = 0; /* not polar grid */
-		c_token++;
-	    } else if (equals(c_token,"back")) {
-		grid_layer = 0;
-		c_token++;
-	    } else if (equals(c_token,"front")) {
-		grid_layer = 1;
-		c_token++;
-	    } else if (almost_equals(c_token,"layerd$efault")) {
-		grid_layer = -1;
-		c_token++;
-	    } else
-		break; /* might be a linetype */
-	}
+	else if (almost_equals(c_token,"po$lar")) {
+	    if (!some_grid_selected()) {
+		/* grid_selection = GRID_X; */
+		axis_array[FIRST_X_AXIS].gridmajor = TRUE;
+	    }
+	    c_token++;
+	    if (END_OF_COMMAND) {
+		polar_grid_angle = 30*DEG2RAD;
+	    } else {
+		/* get radial interval */
+		struct value a;
+		polar_grid_angle = ang2rad*real(const_express(&a));
+	    }
+	} else if (almost_equals(c_token,"nopo$lar")) {
+	    polar_grid_angle = 0; /* not polar grid */
+	    c_token++;
+	} else if (equals(c_token,"back")) {
+	    grid_layer = 0;
+	    c_token++;
+	} else if (equals(c_token,"front")) {
+	    grid_layer = 1;
+	    c_token++;
+	} else if (almost_equals(c_token,"layerd$efault")) {
+	    grid_layer = -1;
+	    c_token++;
+	} else
+	    break; /* might be a linetype */
+    }
 
     if (!END_OF_COMMAND) {
 	struct value a;
@@ -1432,11 +1400,6 @@ set_grid()
 	    grid_lp.l_type = real(const_express(&a)) - 1;
 	}
 
-	if (! some_grid_selected()) {
-	    /* grid_selection = GRID_X|GRID_Y; */
-	    axis_array[FIRST_X_AXIS].gridmajor = TRUE;
-	    axis_array[FIRST_Y_AXIS].gridmajor = TRUE;
-	}
 	/* probably just  set grid <linetype> */
 
 	if (END_OF_COMMAND) {
@@ -1450,13 +1413,12 @@ set_grid()
 		mgrid_lp.l_type = real(const_express(&a)) -1;
 	    }
 	}
+    }
 
-	if (! some_grid_selected()) {
-	    /* grid_selection = GRID_X|GRID_Y; */
-	    axis_array[FIRST_X_AXIS].gridmajor = TRUE;
-	    axis_array[FIRST_Y_AXIS].gridmajor = TRUE;
-	}
-	/* probably just  set grid <linetype> */
+    if (! some_grid_selected()) {
+	/* no axis specified, thus select default grid */
+	axis_array[FIRST_X_AXIS].gridmajor = TRUE;
+	axis_array[FIRST_Y_AXIS].gridmajor = TRUE;
     }
 }
 
