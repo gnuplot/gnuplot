@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.55 2004/07/13 14:11:22 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.56 2004/09/01 15:53:46 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -483,7 +483,7 @@ int df_bin_filetype_default;
 df_endianess_type df_bin_file_endianess_default;
 /* Setting that is transferred to default upon reset. */
 int df_bin_filetype_reset = -1;
-df_endianess_type df_bin_file_endianess_reset = DF_LITTLE_ENDIAN;
+#define DF_BIN_FILE_ENDIANESS_RESET THIS_COMPILER_ENDIAN
 
 typedef struct df_bin_scan_table_2D_struct {
     char *string;
@@ -2653,7 +2653,7 @@ df_unset_datafile_binary(void)
 {
     clear_binary_records(DF_DEFAULT_RECORDS);
     df_bin_filetype_default = df_bin_filetype_reset;
-    df_bin_file_endianess_default = df_bin_file_endianess_reset;
+    df_bin_file_endianess_default = DF_BIN_FILE_ENDIANESS_RESET;
 }
 
 
@@ -2670,7 +2670,7 @@ df_set_datafile_binary()
 	memcpy(df_bin_record, df_bin_record_default, df_num_bin_records*sizeof(df_binary_file_record_struct));
     } else {
 	df_bin_filetype = df_bin_filetype_reset;
-	df_bin_file_endianess = df_bin_file_endianess_reset;
+	df_bin_file_endianess = DF_BIN_FILE_ENDIANESS_RESET;
 	df_add_binary_records(1, DF_CURRENT_RECORDS);
     }
     /* Process the binary tokens. */
@@ -2726,7 +2726,7 @@ initialize_binary_vars()
       memcpy(df_bin_record, df_bin_record_default, df_num_bin_records*sizeof(df_binary_file_record_struct));
     } else {
       df_bin_filetype = df_bin_filetype_reset;
-      df_bin_file_endianess = df_bin_file_endianess_reset;
+      df_bin_file_endianess = DF_BIN_FILE_ENDIANESS_RESET;
       df_add_binary_records(1, DF_CURRENT_RECORDS);
     }
 }

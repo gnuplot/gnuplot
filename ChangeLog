@@ -1,3 +1,9 @@
+2004-09-03  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* src/datafile.c: Changed default value of datafile endianess after
+	reset: from variable df_bin_file_endianess_reset = DF_LITTLE_ENDIAN to
+	#define DF_BIN_FILE_ENDIANESS_RESET THIS_COMPILER_ENDIAN.
+
 2004-09-03  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* demo/image.dem: Added endian=little where necessary.
