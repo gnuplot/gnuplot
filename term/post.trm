@@ -1,5 +1,5 @@
 /*
- * $Id: post.trm,v 1.29 1999/07/05 13:10:54 lhecking Exp $
+ * $Id: post.trm,v 1.30 1999/07/09 21:07:49 lhecking Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -93,10 +93,6 @@ TERM_PUBLIC void PS_pointsize __PROTO((double ptsize)); /* JFi [pointsize] */
 /* PostScript driver by Russell Lang, rjl@monu1.cc.monash.edu.au */
 
 #include "post.h"
-
-/* From version.c */
-extern char gnuplot_version[];
-extern char gnuplot_patchlevel[];
 
 #define PS_FLUSH_PATH \
     if (ps_path_count) { fprintf(gpoutfile, "stroke "); ps_path_count = 0; }

@@ -1,5 +1,5 @@
 /*
- * $Id: png.trm,v 1.17 1999/06/22 11:54:22 lhecking Exp $
+ * $Id: png.trm,v 1.18 1999/07/09 21:07:23 lhecking Exp $
  *
  */
 
@@ -97,10 +97,6 @@ TERM_PUBLIC void PNG_point __PROTO((unsigned int x, unsigned int y, int point));
  */
 
 /* png version test now in configure */
-
-/* From version.c */
-extern char gnuplot_version[];
-extern char gnuplot_patchlevel[];
 
 static int png_font = 1;	/* small font */
 static int png_mode = 0;	/* 0:monochrome 1:gray 2:color */

@@ -1,5 +1,5 @@
 /*
- * $Id: ai.trm,v 1.10 1999/06/19 20:30:44 lhecking Exp $
+ * $Id: ai.trm,v 1.11 1999/06/22 11:54:13 lhecking Exp $
  *
  */
 
@@ -107,10 +107,6 @@ TERM_PUBLIC int AI_set_font __PROTO((const char *font));
 
 #ifndef TERM_PROTO_ONLY
 #ifdef TERM_BODY
-
-/* From version.c */
-extern char gnuplot_version[];
-extern char gnuplot_patchlevel[];
 
 char ai_font[MAX_ID_LEN + 1] = "Times-Roman";	/* name of font */
 int ai_fontsize = 14;		/* size of font in pts */
