@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.136 2004/07/05 03:49:21 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.137 2004/07/13 14:11:24 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -1557,8 +1557,10 @@ set_key()
 		    int old_token = c_token;
 
 		    lp_parse(&key->box,1,0,-2,0);
-		    if (old_token == c_token)
-			key->box.l_type = real(const_express(&a)) -1;
+		    if (old_token == c_token && isanumber(c_token)) {
+			key->box.l_type = real(const_express(&a)) - 1;
+			c_token++;
+		    }
 		}
 		c_token--;  /* is incremented after loop */
 		break;
