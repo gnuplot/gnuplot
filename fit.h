@@ -32,7 +32,6 @@
 #define EXT extern
 #endif
 
-/*#include "type.h"*/  /*HBB 961110: unused now! */
 #include "plot.h"
 
 #include "ansichek.h"

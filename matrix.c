@@ -26,7 +26,6 @@ static char *RCSid = "$Id: matrix.c,v 1.15 1998/04/14 00:16:01 drd Exp $";
  */
 
 
-#include "type.h"
 #include "fit.h"
 #include "matrix.h"
 #include "stdfn.h"

@@ -58,7 +58,6 @@ static char *RCSid = "$Id: fit.c,v 1.58 1998/04/14 00:15:19 drd Exp $";
 #include <signal.h>
 
 #include "plot.h"
-#include "type.h"               /* own types */
 #include "matrix.h"
 #include "fit.h"
 #include "setshow.h"   /* for load_range */
