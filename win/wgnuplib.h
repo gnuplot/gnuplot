@@ -89,8 +89,6 @@ BOOL WDPROC CheckWGNUPLOTVersion(LPSTR str);
 typedef LOGPEN *LPLOGPEN;
 typedef HGLOBAL GLOBALHANDLE;
 #define WINVER 0x0400
-#define TMPF_VECTOR 0x02
-#define TMPF_TRUETYPE 0x04
 #define HFILE_ERROR ((HFILE)-1)
 
 /* the far mem/string function family: */
