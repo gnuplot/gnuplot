@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*- */
-/* $Id: tgif.trm,v 1.27 2004/09/30 23:01:25 sfeam Exp $ */
+/* $Id: tgif.trm,v 1.28 2004/10/19 00:24:09 sfeam Exp $ */
 
 /* GNUPLOT - tgif.trm */
 
@@ -394,7 +394,7 @@ TGIF_init()
 %%TGIF 2.15-p7\n\
 state(%d,30,%u,0,0,%u,16,1,9,1,1,0,0,0,0,1,0,'%s',0,%u,0,0,1,10,0,0,1,1,0,16,0,0,1,1,1).\n\
 %%\n\
-%% @(#)$Header: /cvsroot/gnuplot/gnuplot/term/tgif.trm,v 1.27 2004/09/30 23:01:25 sfeam Exp $\n\
+%% @(#)$Header: /cvsroot/gnuplot/gnuplot/term/tgif.trm,v 1.28 2004/10/19 00:24:09 sfeam Exp $\n\
 %% %%W%%\n\
 %%\n\
 page(1,\"\").\n",
@@ -1637,7 +1637,7 @@ START_HELP(tgif)
 "            ...",
 "       set origin x02,y02",
 "       plot ...",
-"       set nomultiplot",
+"       unset multiplot",
 "",
 " See `set multiplot` for further information.",
 "",
