@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.10 1999/06/22 11:58:38 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.11 1999/07/05 13:12:02 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -1232,6 +1232,8 @@ test_term()
     int key_entry_height;
     int p_width;
 
+    c_token++;
+
     term_start_plot();
     screen_ok = FALSE;
     xmax_t = (unsigned int) (t->xmax * xsize);
@@ -1298,16 +1300,24 @@ test_term()
     }
     (void) (*t->justify_text) (LEFT);
     (void) (*t->text_angle) (0);
+
     /* test tic size */
     (*t->move) ((unsigned int) (xmax_t / 2 + t->h_tic * (1 + ticscale)), (unsigned) 0);
-    (*t->vector) ((unsigned int) (xmax_t / 2 + t->h_tic * (1 + ticscale)), (unsigned int)
-		  (ticscale * t->v_tic));
+    (*t->vector) ((unsigned int) (xmax_t / 2 + t->h_tic * (1 + ticscale)),
+		  (unsigned int) (ticscale * t->v_tic));
     (*t->move) ((unsigned int) (xmax_t / 2), (unsigned int) (t->v_tic * (1 + ticscale)));
-    (*t->vector) ((unsigned int) (xmax_t / 2 + ticscale * t->h_tic), (unsigned int) (t->v_tic * (1
-												 + ticscale)));
-    (*t->put_text) ((unsigned int) (xmax_t / 2 - 10 * t->h_char), (unsigned int) (t->v_tic * 2 +
-										  t->v_char / 2),
+    (*t->vector) ((unsigned int) (xmax_t / 2 + ticscale * t->h_tic),
+                  (unsigned int) (t->v_tic * (1 + ticscale)));
+    /* HBB 19990530: changed this to use right-justification, if possible... */
+    if ((*t->justify_text) (RIGHT))
+	(*t->put_text) ((unsigned int) (xmax_t / 2 - 1* t->h_char),
+			(unsigned int) (t->v_tic * 2 + t->v_char / 2),
 		    "test tics");
+    else
+	(*t->put_text) ((unsigned int) (xmax_t / 2 - 10 * t->h_char),
+			(unsigned int) (t->v_tic * 2 + t->v_char / 2),
+			"test tics");
+    (void) (*t->justify_text) (LEFT);
 
     /* test line and point types */
     x = xmax_t - t->h_char * 6 - p_width;
