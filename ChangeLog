@@ -1,3 +1,32 @@
+1998-10-05  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* 0INSTALL: Document new configure options. Additions.
+
+	* 0PORTING: Fix typo.
+
+	* Makefile.in: Add -DGNUPLOT_BINDIR to show.o target.
+
+	* acinclude.m4: Add /usr/local/lib to gp_CHECK_LIB_PATH and
+	/usr/local/include to gp_CHECK_HEADER.
+
+	* aclocal.m4, configure: Regenerated.
+
+	* configure.in: Merge --with-gnugraph and --enable-unixplot into
+	--with-plot.
+
+	* graphics.c: Indentation.
+
+	* show.c: Final fixes for merger (see entry from 1990-10-03).
+
+	* version.c: Patchlevel pl4.
+
+	* term/gnugrph.trm: Code for GNU plotutils lib.
+
+1998-10-04  Jonathan Thornburg  <jthorn@galileo.thp.univie.ac.at>
+	* graphics.c, plot2d.c, plot3d.c, graph3d.c, protos.h,
+	docs/gnuplot.doc: Fix infinite loops when data range is empty,
+	also wrong plots when data range is smaller than 'zero' setting.
+
 1998-10-03  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* 0PORTING, buildvms.com, term.h: Rename NO_ALL_TERM to SHORT_TERMLIST.
@@ -29,9 +58,8 @@
 
 	* setshow.h: Remove outfile declaration. Fix show_version() prototpe.
 
-	* show.c: Add faq_location. Fix show_version() calls. Rewrite
-	show_version() to accept file pointer arg, add optional prefix to
-	output, and use one single call to fprintf(). In show_version_long(),
+	* show.c: Add faq_location. Fix show_version() calls. Merge
+	misc.c(save_version) into show_version(). In show_version_long(),
 	make all output to stderr instead of stdout, use one single call
 	to fprintf().
 
