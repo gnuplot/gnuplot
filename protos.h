@@ -105,6 +105,12 @@ void map3d_xy __PROTO((double x, double y, double z, unsigned int *xt, unsigned 
 int map3d_z __PROTO((double x, double y, double z));
 void do_3dplot __PROTO((struct surface_points *plots, int pcount));
 
+/* Prototypes from file "help.c" */
+
+int  help __PROTO((char *keyword, char *path, TBOOLEAN *subtopics));
+void FreeHelp __PROTO((void));
+void list_terms __PROTO((void));
+
 /* Prototypes from file "hidden3d.c" */
 
 void clip_move __PROTO((unsigned int x, unsigned int y));
@@ -219,7 +225,7 @@ void term_reset __PROTO((void));
 void term_apply_lp_properties __PROTO((struct lp_style_type *lp));
 void term_check_multiplot_okay __PROTO((TBOOLEAN));
 
-void list_terms __PROTO((void));
+int  term_count __PROTO((void));
 struct termentry *set_term __PROTO((int));
 struct termentry *change_term __PROTO((char *name, int length));
 void init_terminal __PROTO((void));
