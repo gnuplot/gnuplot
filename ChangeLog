@@ -1,3 +1,10 @@
+2004-02-18  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* configure.in (--disable-defined-var): Remove annotation as
+	EXPERIMENTAL.
+	(--disable-fiterrvars): Changed default to enabled, remved
+	annotation as EXPERIMENTAL.
+
 2004-02-18  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* config/makefile.cyg config/makefile.mgw config/makefile.os2: Added
