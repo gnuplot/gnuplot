@@ -143,6 +143,7 @@ static struct {
     int rgb_table[GIF_MAX_COLORS];
     int angle;
     int flags;
+    int linetype;
 } gif_state;
 
 #define GIF_USE_TRANSPARENT 1
@@ -270,6 +271,7 @@ TERM_PUBLIC void GIF_options()
  */
 TERM_PUBLIC void GIF_init()
 {
+    /*     gif_state.linetype=0;    */
 }
 
 /*
@@ -344,8 +346,25 @@ TERM_PUBLIC void GIF_move(unsigned int x, unsigned int y)
  */
 TERM_PUBLIC void GIF_vector(unsigned int x, unsigned int y)
 {
-    gdImageLine(gif_state.image, gif_state.x, gif_state.height - gif_state.y,
-		x, gif_state.height - y, gif_state.color);
+    int gif_linetype_dotted[5];
+
+    FPRINTF((stderr,"getting (linetype/linecolor) : %d/%d/%d:%d:%d:%d\n",gif_st
+ate.linetype,gif_state.color));
+
+    if (gif_state.linetype==-1) {
+        gif_linetype_dotted[0] = gif_state.color_table[2];
+	gif_linetype_dotted[1] = gif_state.color_table[2];
+	gif_linetype_dotted[2] = gif_state.color_table[0];
+	gif_linetype_dotted[3] = gif_state.color_table[0];
+	gif_linetype_dotted[4] = gif_state.color_table[0];
+
+	gdImageSetStyle(gif_state.image, gif_linetype_dotted,5);
+	gdImageLine(gif_state.image, gif_state.x, gif_state.height - gif_state.y,
+		    x, gif_state.height - y, gdStyled);
+    } else {
+      gdImageLine(gif_state.image, gif_state.x, gif_state.height - gif_state.y,
+		  x, gif_state.height - y, gif_state.color);
+    }
     gif_state.x = x;
     gif_state.y = y;
 }
@@ -366,6 +385,7 @@ TERM_PUBLIC void GIF_linetype(int type)
     if (type >= (gif_state.n_colors - 3))
 	type %= (gif_state.n_colors - 3);
     gif_state.color = gif_state.color_table[type + 3];
+    gif_state.linetype = type;
 }
  
 /* _put_text(x,y,str)  Called to display text at the (x,y) position, 
@@ -377,7 +397,7 @@ TERM_PUBLIC void GIF_linetype(int type)
 TERM_PUBLIC void GIF_put_text(unsigned int x, unsigned int y, char* string)
 {
     if (gif_state.angle == 1) {
-	x += gif_state.charw / 2;
+	x -= gif_state.charh / 2;
 	gdImageStringUp(gif_state.image, gif_state.font,
 			x, gif_state.height - y,
 			string, gif_state.color);
