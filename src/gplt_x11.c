@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.23 2000/11/21 11:48:16 joze Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.24 2000/11/22 10:40:00 amai Exp $"); }
 #endif
 
 /* GNUPLOT - gplt_x11.c */
@@ -1830,13 +1830,23 @@ PaletteMake(plot_struct* plot, t_sm_palette* tpal)
 {
     static int virgin = yes;
     static int recursion = 0;
-    int max_colors = tpal->use_maxcolors > 0 ?
-	tpal->use_maxcolors : maximal_possible_colors;
-    int min_colors = minimal_possible_colors < max_colors ?
-	minimal_possible_colors : max_colors / (num_colormaps > 1 ? 2 : 8);
+    int max_colors;
+    int min_colors;
     char* save_title = (char*) 0;
+    
+    if (tpal && tpal->use_maxcolors > 0)
+       max_colors = tpal->use_maxcolors;
+    else
+       max_colors = maximal_possible_colors;
+	 
+    min_colors = minimal_possible_colors < max_colors ?
+	 minimal_possible_colors : max_colors / (num_colormaps > 1 ? 2 : 8);
 
-    FPRINTF((stderr, "(PaletteMake) tpal->use_maxcolors = %d\n", tpal->use_maxcolors));
+    if (tpal)
+      FPRINTF((stderr, "(PaletteMake) tpal->use_maxcolors = %d\n", tpal->use_maxcolors));
+    else
+      FPRINTF((stderr, "(PaletteMake) tpal=NULL\n"));
+    
 
     /* reallocate the palette
      * only if it has changed.
