@@ -1,5 +1,5 @@
 #ifdef INCRCSDATA
-static char RCSid[]="$Id: gclient.c,v 1.10 2000/10/31 19:59:32 joze Exp $" ;
+static char RCSid[]="$Id: gclient.c,v 1.11 2000/11/15 11:18:11 mikulik Exp $" ;
 #endif
 
 /****************************************************************************
@@ -185,6 +185,8 @@ static BOOL     bPopFront = TRUE ;
 static BOOL     bKeepRatio = TRUE ;	//PM
 static BOOL     bNewFont = FALSE ;
 static BOOL     bHorz = TRUE ;
+
+static int	codepage = 0;
 
 static int 	ulMouseSprintfFormatItem = IDM_MOUSE_FORMAT_XcY;
 const  int	nMouseSprintfFormats = IDM_MOUSE_FORMAT_LABEL - IDM_MOUSE_FORMAT;
@@ -1842,7 +1844,7 @@ void SelectFont( HPS hps, char *szFontNameSize )
      fat.fsSelection     = 0 ;
      fat.lMatch          = 0 ;
      fat.idRegistry      = 0 ;
-     fat.usCodePage      = 0 ; //GpiQueryCp (hps) ;
+     fat.usCodePage      = codepage ; //GpiQueryCp (hps) ;
      fat.lMaxBaselineExt = 0 ;
      fat.lAveCharWidth   = 0 ;
      fat.fsType          = 0 ;
@@ -1947,7 +1949,7 @@ void SwapFont( HPS hps, char *szFNS )
         fat.fsSelection     = 0 ;
         fat.lMatch          = 0 ;
         fat.idRegistry      = 0 ;
-        fat.usCodePage      = 0 ; //GpiQueryCp (hps) ;
+        fat.usCodePage      = codepage ; //GpiQueryCp (hps) ;
         fat.lMaxBaselineExt = 0 ;
         fat.lAveCharWidth   = 0 ;
         fat.fsType          = 0 ;
@@ -2480,6 +2482,9 @@ lOldLine=lt ;
 					      break;
 				  }
 				  break;
+		        case 'c': // set codepage
+				  BufRead(hRead,&codepage, sizeof(codepage), &cbR) ;
+				  break;
 		    }
 		    }
 		    break ;
@@ -2788,7 +2793,7 @@ int GetNewFont( HWND hwnd, HPS hps )
         pfdFontdlg.clrFore = CLR_BLACK;
         pfdFontdlg.clrBack = CLR_WHITE;
         pfdFontdlg.usWeight = FWEIGHT_NORMAL ; //5 ;
-        pfdFontdlg.fAttrs.usCodePage = 0;
+        pfdFontdlg.fAttrs.usCodePage = codepage;
         pfdFontdlg.fAttrs.usRecordLength = sizeof(FATTRS) ;
         }
     sprintf( szPtList, "%d 8 10 12 14 18 24", iSize ) ;

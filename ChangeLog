@@ -1,6 +1,12 @@
+2000-11-30  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* term/pm.trm src/os2/gclient.c docs/gnuplot.doc: change PM terminal
+	codepage according to 'set encoding', and use codepage 912 for
+	iso_8859_2' (new routine PM_set_codepage() in pm.trm).
+
 2000-11-29  Petr Mikulik  <mikulik@physics.muni.cz>
 
-	*src/syscfg.h: #define FAQ_LOCATION "http://www.gnuplot.org/faq"
+	*src/syscfg.h: #define FAQ_LOCATION "http://www.gnuplot.org/faq".
 
 2000-11-29  Levente Novak  <novak@jaguar.dote.hu>
 
@@ -12,8 +18,7 @@
 2000-11-27  Alexander Mai  <st002279@hrzpub.tu-darmstadt.de>
 
         * src/readline.c: readline.c did not built with HAVE_LIBREADLINE.
-	                  So remove an #ifdef and - being here -
-			  make two symbols static
+	So remove an #ifdef and - being here - make two symbols static.
 
 2000-11-24  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
@@ -25,9 +30,8 @@
 
 2000-11-24  Alexander Mai  <st002279@hrzpub.tu-darmstadt.de>
 
-        * docs/gnuplot.doc: Update FAQ location.
-	                    Remove "'" characters from headers to
-			    make gnuplot.texi 'TeXable' again
+        * docs/gnuplot.doc: Update FAQ location. Remove "'" characters from
+	headers to make gnuplot.texi 'TeXable' again.
 
 2000-11-24  Petr Mikulik  <mikulik@physics.muni.cz>
 

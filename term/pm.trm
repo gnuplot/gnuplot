@@ -1,5 +1,5 @@
 /*
- * $Id: pm.trm,v 1.23 2000/10/31 19:59:32 joze Exp $
+ * $Id: pm.trm,v 1.24 2000/11/01 18:57:34 broeker Exp $
  */
 
 /* GNUPLOT - pm.trm */
@@ -442,6 +442,7 @@ PM_text()
 TERM_PUBLIC void
 PM_graphics()
 {
+    static int last_encoding = -999;
     putc(SET_GRAPHICS, PM_pipe);
     fflush(PM_pipe);
 #ifdef USE_MOUSE
@@ -450,6 +451,21 @@ PM_graphics()
 	send_gpPMmenu(PM_pipe);
     }
 #endif
+    if (encoding != last_encoding) {
+	int cp;
+	switch (encoding) {
+	    case S_ENC_ISO8859_2: cp = 912; break;
+	    case S_ENC_CP437: cp = 437; break;
+	    case S_ENC_CP850: cp = 850; break;
+	    default: // S_ENC_DEFAULT, S_ENC_ISO8859_1
+		     cp = 0; break;
+	};
+	putc(SET_SPECIAL, PM_pipe);
+	putc('c', PM_pipe); // set codepage
+	fwrite(&cp, sizeof(int), 1, PM_pipe);
+	fflush(PM_pipe);
+	last_encoding = encoding;
+    }
     PM_mode = SET_GRAPHICS;
 }
 
