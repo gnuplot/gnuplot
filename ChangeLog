@@ -1,3 +1,8 @@
+2002-03-23  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* src/term.h: Updates in SHORT_TERMLIST: do not include regis and tek
+	terminals for non-relevant platforms.
+
 2002-03-21  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* docs/gnuplot.doc (zeroaxis): Add some examples to make the
@@ -140,7 +145,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/03/21 21:46:13 $).
+	last modification date (from the tag $Date: 2002/03/22 13:30:17 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 

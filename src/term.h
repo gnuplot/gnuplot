@@ -1,5 +1,5 @@
 /*
- * $Id: term.h,v 1.14 2001/03/02 15:21:09 broeker Exp $
+ * $Id: term.h,v 1.15 2002/02/25 03:10:41 broeker Exp $
  */
 
 /* GNUPLOT - term.h */
@@ -55,14 +55,19 @@
 #ifdef SHORT_TERMLIST
 # include "dumb.trm"		/* dumb terminal */
 # include "post.trm"		/* postscript */
-# include "regis.trm"		/* regis graphics */
 # include "table.trm"		/* built-in, but used for the documentation */
-# include "tek.trm"		/* a Tek 4010 and others including VT-style */
+# if !(defined(OS2) || defined(MSDOS) || defined(_Windows) || defined(ATARI) || defined(MTOS) || defined(AMIGA))
+#  include "regis.trm"		/* regis graphics */
+#  include "tek.trm"		/* a Tek 4010 and others including VT-style */
+# endif
 # ifdef X11
 #  include "x11.trm"		/* X Window system */
 # endif				/* X11 */
 # ifdef OS2
 #  include "pm.trm"		/* OS/2 Presentation Manager */
+# endif
+# ifdef _Windows
+#  include "win.trm"		/* MS-Windows */
 # endif
 #else /* include all applicable terminals not commented out */
 
