@@ -1,4 +1,4 @@
-/* $Id: bitmap.h,v 1.1.1.2 1998/04/15 19:22:07 lhecking Exp $ */
+/* $Id: bitmap.h,v 1.1.1.2.2.1 1999/09/29 13:48:16 lhecking Exp $ */
 
 /* GNUPLOT - bitmap.h */
 
@@ -101,7 +101,7 @@ extern struct rgb web_color_rgbs[];
 void b_makebitmap __PROTO((unsigned int x, unsigned int y, unsigned int planes));
 void b_freebitmap __PROTO((void));
 void b_setpixel __PROTO((unsigned int x, unsigned int y, unsigned int value));
-/* unused unsigned int b_getpixel __PROTO((unsigned int x, unsigned int y)); */
+unsigned int b_getpixel __PROTO((unsigned int x, unsigned int y));
 void b_line __PROTO((unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2));
 void b_setmaskpixel __PROTO((unsigned int x, unsigned int y, unsigned int value));
 /* void b_putc __PROTO((unsigned int x, unsigned int y, char c, unsigned int angle)); */

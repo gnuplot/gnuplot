@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: bitmap.c,v 1.2.2.1 1999/09/29 13:48:23 lhecking Exp $";
+static char *RCSid = "$Id: bitmap.c,v 1.2.2.2 1999/10/11 17:10:54 lhecking Exp $";
 #endif
 
 /* GNUPLOT - bitmap.c */
@@ -846,8 +846,6 @@ unsigned int x, y, value;
 }
 
 
-/* Currently unused */
-#if 1 /* HBB 991008: used by PNG, now */
 /*
  * get pixel (x,y) value
  */
@@ -857,7 +855,7 @@ unsigned int x, y;
 {
   register unsigned int row;
   register unsigned char mask;
-  register unsigned char value;
+  register unsigned char value = 0;
   int i;
 
   if (b_rastermode) {
@@ -876,10 +874,10 @@ unsigned int x, y;
 		row -= b_psize;
 		value <<= 1;
 	}
-    return(value);
-  }
-  else
-  {
+/* HBB 991123: the missing '>>1' was the 'every second color' problem
+ * with PNG in 3.8a...*/
+	return(value>>1);
+  } else {
 #ifdef BITMAPDEBUG
     if (b_rastermode)
       fprintf(stderr, "Warning: getpixel(%d,%d) out of bounds\n",
@@ -890,7 +888,6 @@ unsigned int x, y;
     return(0);
   }
 }
-#endif /* 0 */
 
 
 /*
