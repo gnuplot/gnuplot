@@ -1,4 +1,7 @@
-/*Hello, Emacs, this is -*-C-*- ! */
+/*
+ * $Id: $
+ */
+
 /*------------------------------
 	GNUPLOT - pdf.trm
 
@@ -22,6 +25,7 @@
 /* CODEME: Add patterned lines (?). */
 
 /* PM3D support by Johannes Zellner <johannes@zellner.org>, May-15-2002 */
+/* set_color fixes by Petr Mikulik <mikulik@physics.muni.cz>, June-10-2002 */
 
 /* 'filledboxes' with patterns are really lousy,
    but I don't know why. 04 Jun 2002 (joze) */
@@ -1036,13 +1040,11 @@ TERM_PUBLIC int
 PDF_make_palette(t_sm_palette *palette)
 {
     if (palette == NULL) {
-	/* pdf can do continous colors */
+	/* pdf can do continuous colors */
 	return 0;
     }
 
-    /* save palette */
-
-    /* mapping formulae for SMPAL_COLOR_MODE_RGB */
+    /* save mapping formulae needed if SMPAL_COLOR_MODE_RGB */
     PDF_palette.colorMode = palette->colorMode;
     PDF_palette.formulaR = palette->formulaR;
     PDF_palette.formulaG = palette->formulaG;
@@ -1056,6 +1058,9 @@ TERM_PUBLIC void
 PDF_set_color(double gray)
 {
     double red, green, blue;
+    if (sm_palette.colors != 0) /* finite nb of colors explicitly requested */
+	gray = (gray >= ((double)(sm_palette.colors-1)) / sm_palette.colors) ?
+		1 : floor(gray * sm_palette.colors) / sm_palette.colors;
 
     switch (PDF_palette.colorMode) {
 	case SMPAL_COLOR_MODE_GRAY:

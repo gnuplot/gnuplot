@@ -1,4 +1,8 @@
-/*Hello, Emacs! this is -*-C-*- ! */
+/*
+ * $Id: $
+ *
+ */
+
 /*------------------------------------------------------------------------------------------------------------------------------------
 	GNUPLOT - svg.trm
 
@@ -20,6 +24,7 @@
 ------------------------------------------------------------------------------------------------------------------------------------*/
 
 /* PM3D support by Johannes Zellner <johannes@zellner.org>, May-16-2002 */
+/* set_color fixes by Petr Mikulik <mikulik@physics.muni.cz>, June-10-2002 */
 
 #include "driver.h"
 
@@ -861,21 +866,23 @@ SVG_set_font (const char *font)
     return (TRUE);
 }
 
+
 #ifdef PM3D
 
 
+/*------------------------------------------------------------------------------------------------------------------------------------
+	SVG_make_palette
+------------------------------------------------------------------------------------------------------------------------------------*/
 TERM_PUBLIC int
 SVG_make_palette(t_sm_palette *palette)
 {
     SVG_GroupFilledClose();
     if (palette == NULL) {
-	/* pdf can do continous colors */
+	/* svg can do continuous colors */
 	return 0;
     }
 
-    /* save palette */
-
-    /* mapping formulae for SMPAL_COLOR_MODE_RGB */
+    /* save mapping formulae needed if SMPAL_COLOR_MODE_RGB */
     SVG_palette.colorMode = palette->colorMode;
     SVG_palette.formulaR = palette->formulaR;
     SVG_palette.formulaG = palette->formulaG;
@@ -885,20 +892,31 @@ SVG_make_palette(t_sm_palette *palette)
     return 0;
 }
 
+
+/*------------------------------------------------------------------------------------------------------------------------------------
+	SVG_set_color
+------------------------------------------------------------------------------------------------------------------------------------*/
 TERM_PUBLIC void
 SVG_set_color(double gray)
 {
-    unsigned char red, green, blue;
-
+    int red, green, blue;
+    if (sm_palette.colors != 0) /* finite nb of colors explicitly requested */
+	gray = (gray >= ((double)(sm_palette.colors-1)) / sm_palette.colors) ?
+		1 : floor(gray * sm_palette.colors) / sm_palette.colors;
 
     switch (SVG_palette.colorMode) {
 	case SMPAL_COLOR_MODE_GRAY:
-	    red = green = blue = gray;
+	    red = (gray <= 0) ? 0 : (int)(256 * gray);
+	    if (red >= 256) red = 255;
+	    green = blue = red;
 	    break;
 	case SMPAL_COLOR_MODE_RGB:
-	    red   = (int)(255.0 * GetColorValueFromFormula(SVG_palette.formulaR, gray));
-	    green = (int)(255.0 * GetColorValueFromFormula(SVG_palette.formulaG, gray));
-	    blue  = (int)(255.0 * GetColorValueFromFormula(SVG_palette.formulaB, gray));
+	    red   = (int)(256 * GetColorValueFromFormula(SVG_palette.formulaR, gray));
+	    green = (int)(256 * GetColorValueFromFormula(SVG_palette.formulaG, gray));
+	    blue  = (int)(256 * GetColorValueFromFormula(SVG_palette.formulaB, gray));
+	    if (red < 0)   red = 0;   else if (red >= 256)   red = 255;
+	    if (green < 0) green = 0; else if (green >= 256) green = 255;
+	    if (blue < 0)  blue = 0;  else if (blue >= 256)  blue = 255;
 	    break;
 	default:
 	    fprintf(stderr, "** ERROR SVG_set_color (file %s, line %d)\n",
@@ -919,6 +937,9 @@ SVG_set_color(double gray)
     }
 }
 
+/*------------------------------------------------------------------------------------------------------------------------------------
+	SVG_filled_polygon
+------------------------------------------------------------------------------------------------------------------------------------*/
 TERM_PUBLIC void
 SVG_filled_polygon(int points, gpiPoint* corners)
 {
@@ -940,6 +961,9 @@ SVG_filled_polygon(int points, gpiPoint* corners)
 	    corners[3].x, term->ymax - corners[3].y);
 }
 
+/*------------------------------------------------------------------------------------------------------------------------------------
+	SVG_previous_palette
+------------------------------------------------------------------------------------------------------------------------------------*/
 TERM_PUBLIC void
 SVG_previous_palette(void)
 {
@@ -947,6 +971,7 @@ SVG_previous_palette(void)
 }
 
 #endif /* PM3D */
+
 
 #endif /* TERM_BODY */
 
@@ -958,7 +983,7 @@ TERM_TABLE_START (svg_driver)
     SVG_options, SVG_init, SVG_reset, SVG_text, null_scale, SVG_graphics,
     SVG_move, SVG_vector, SVG_linetype, SVG_put_text, SVG_text_angle,
     SVG_justify_text, SVG_point, do_arrow, SVG_set_font, do_pointsize,
-    TERM_CAN_MULTIPLOT,
+    TERM_CAN_MULTIPLOT | TERM_BINARY,
     0 /* suspend */, 0 /* resume */ , SVG_fillbox, SVG_linewidth
 #ifdef PM3D
 #   ifdef USE_MOUSE
