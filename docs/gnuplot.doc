@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.142 2002/10/21 22:37:35 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.143 2002/10/22 03:17:45 sfeam Exp $
 C 18 September 2001
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001   Thomas Williams, Colin Kelley et al.
 C
@@ -3078,8 +3078,8 @@ C ... and restart the table:
  This plots sin(x) with impulses:
        plot sin(x) with impulses
 
- This plots x*y with points, x**2 with the default:
-       plot x*y w points, x**2
+ This plots x with points, x**2 with the default:
+       plot x w points, x**2
 
  This plots tan(x) with the default function style, file "data.1" with lines:
        plot [ ] [-2:5] tan(x), 'data.1' with l
@@ -7841,7 +7841,7 @@ C ... and restart the table:
 ?set ydata
 ?show ydata
 ?ydata
- The `set ydata` commands ets y-axis data to timeseries (dates/times).
+ The `set ydata` commands sets y-axis data to timeseries (dates/times).
  Please see `set xdata`.
 3 ydtics
 ?commands set ydtics
@@ -7908,7 +7908,8 @@ C ... and restart the table:
 ?set zdata
 ?show zdata
 ?zdata
- Set zaxis date to timeseries (dates/times).  Please see `set xdata`.
+ The `set zdata` command sets zaxis data to timeseries (dates/times).
+ Please see `set xdata`.
 3 zdtics
 ?commands set zdtics
 ?commands unset zdtics

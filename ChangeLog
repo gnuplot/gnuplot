@@ -1,3 +1,8 @@
+2002-11-05  Shigeharu TAKENO  <shige@iee.niit.ac.jp>
+
+	* docs/gnuplot.doc, term/atariaes.trm, term/atarivdi.trm: Fix more
+	misprints.
+
 2002-11-04  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* fit.c (regress): Fix SF bug # 631323: spelling "occured" -->
@@ -84,7 +89,7 @@
 
         * src/gplt_x11.c: Fix crash if asked to draw rotated empty string.
 
-2002-10-18  Shigeharu TAKENO  <shige@iee.niit.ac.jp
+2002-10-18  Shigeharu TAKENO  <shige@iee.niit.ac.jp>
 
 	* docs/gnuplot.doc, term/atariaes.trm, term/atarivdi.trm, term/be.trm,
 	term/x11.trm: Fix a number of misprints.
@@ -1423,7 +1428,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/11/03 20:46:58 $).
+	last modification date (from the tag $Date: 2002/11/04 14:59:49 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
