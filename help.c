@@ -35,19 +35,9 @@ static char *RCSid = "$Id: help.c,v 1.29 1998/04/14 00:15:36 drd Exp $";
 ]*/
 
 #include "plot.h"
-
-#define	SAME	0		/* for strcmp() */
-
 #include "help.h"		/* values passed back */
 
 void int_error __PROTO((char str[], int t_num));
-
-#if defined(__EMX__) || defined(DJGPP) || defined(DOS386)
-/* we have plenty of memory under __EMX__ or DJGPP */
-# ifdef MSDOS
-#  undef MSDOS
-# endif
-#endif
 
 /* 
  ** help -- help subsystem that understands defined keywords
@@ -64,7 +54,7 @@ void int_error __PROTO((char str[], int t_num));
  ** to read helpfile into memory, avoiding reread of help file. 12/89.
  **
  ** Modified by Russell Lang to avoid reading completely into memory
- ** if MSDOS defined.  This uses much less memory.  6/91
+ ** if DOS16 defined.  This uses much less memory.  6/91
  **
  ** The help file looks like this (the question marks are really in column 1):
  **
@@ -187,7 +177,7 @@ TBOOLEAN *subtopics;		/* (in) - subtopics only? */
      ** Calling routine may access errno to determine cause of H_ERROR.
      */
     errno = 0;
-    if (strncmp(oldpath, path, PATHSIZE) != SAME)
+    if (!STREQN(oldpath, path, PATHSIZE))
 	FreeHelp();
     if (keys == NULL) {
 	status = LoadHelp(path);
@@ -211,7 +201,7 @@ TBOOLEAN *subtopics;		/* (in) - subtopics only? */
 }
 
 /* we only read the file once, into memory
- * except for MSDOS when we don't read all the file -
+ * except for DOS16 when we don't read all the file -
  * just the keys and location of the text
  */
 static int LoadHelp(path)
@@ -254,13 +244,13 @@ char *path;
 	 ** Now store the text for this entry.
 	 ** buf already contains the first line of text.
 	 */
-#ifndef MSDOS
+#ifndef DOS16
 	firsthead = storeline(buf);
 	head = firsthead;
 #endif
 	while ((fgets(buf, BUFSIZ - 1, helpfp) != (char *) NULL)
 	       && (buf[0] != KEYFLAG)) {
-#ifndef MSDOS
+#ifndef DOS16
 	    /* save text line */
 	    head->next = storeline(buf);
 	    head = head->next;
@@ -274,7 +264,7 @@ char *path;
 	    key = key->next;
 	} while (flag != TRUE && key != NULL);
     }
-#ifndef MSDOS
+#ifndef DOS16
     (void) fclose(helpfp);
 #endif
 
@@ -394,7 +384,7 @@ void FreeHelp()
     free((char *) keys);
     keys = NULL;
     keycount = 0;
-#ifdef MSDOS
+#ifdef DOS16
     (void) fclose(helpfp);
 #endif
 }
@@ -459,7 +449,7 @@ int len;
 	     * to bother printing it as a separate choice?
 	     */
 	    sublen = instring(prev + len, ' ');
-	    if (strncmp(key->key, prev, len + sublen) != 0) {
+	    if (!STREQN(key->key, prev, len + sublen)) {
 		/* yup, this is different up to the next space */
 		if (!status) {
 		    /* first one we have printed is special */
@@ -487,14 +477,14 @@ TBOOLEAN *subtopics;		/* (in) - subtopics only? */
 				/* (out) - are there subtopics? */
 {
     LINEBUF *t;
-#ifdef MSDOS
+#ifdef DOS16
     char buf[BUFSIZ];		/* line from help file */
 #endif
 
     StartOutput();
 
     if (subtopics == NULL || !*subtopics) {
-#ifdef MSDOS
+#ifdef DOS16
 	fseek(helpfp, key->pos, 0);
 	while ((fgets(buf, BUFSIZ - 1, helpfp) != (char *) NULL)
 	       && (buf[0] != KEYFLAG)) {
@@ -550,7 +540,7 @@ TBOOLEAN *subtopics;		/* (out) are there any subtopics */
 		    continue;	/* not a main topic */
 	    }
 	    sublen = instring(start, ' ');
-	    if (prev == NULL || strncmp(start, prev, sublen) != 0) {
+	    if (prev == NULL || !STREQN(start, prev, sublen)) {
 		if (subt == 0) {
 		    subt++;
 		    if (len)
