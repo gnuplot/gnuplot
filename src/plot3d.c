@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.32 2001/12/14 14:22:45 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.33 2002/01/25 18:02:09 joze Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -75,8 +75,9 @@ TBOOLEAN dgrid3d = FALSE;
 static void calculate_set_of_isolines __PROTO((AXIS_INDEX value_axis, TBOOLEAN cross, struct iso_curve **this_iso,
 					       AXIS_INDEX iso_axis, double iso_min, double iso_step, int num_iso_to_use,
 					       AXIS_INDEX sam_axis, double sam_min, double sam_step, int num_sam_to_use,
-					       TBOOLEAN is_pm3d));
-static void update_pm3d_zrange __PROTO((double value, TBOOLEAN is_pm3d));
+					       TBOOLEAN need_palette));
+static void update_pm3d_zrange __PROTO((double value, TBOOLEAN need_palette));
+#define NEED_PALETTE(plot) (PM3DSURFACE == (plot)->plot_style || 1 == (plot)->lp_properties.use_palette)
 #else
 static void calculate_set_of_isolines __PROTO((AXIS_INDEX value_axis, TBOOLEAN cross, struct iso_curve **this_iso,
 					       AXIS_INDEX iso_axis, double iso_min, double iso_step, int num_iso_to_use,
@@ -295,9 +296,9 @@ double h;
 
 #ifdef PM3D
 static void
-update_pm3d_zrange(double value, TBOOLEAN is_pm3d)
+update_pm3d_zrange(double value, TBOOLEAN pal)
 {
-    if (is_pm3d) {
+    if (pal) {
 	if (value < CB_AXIS.min) {
 	    /* if (axis_array[FIRST_Z_AXIS].autoscale & AUTOSCALE_MIN) // XXX ??? */
 	    if (CB_AXIS.set_autoscale & AUTOSCALE_MIN)
@@ -527,7 +528,7 @@ grid_nongrid_data(this_plot)
 #endif
 	    STORE_WITH_LOG_AND_UPDATE_RANGE(points->z, z, points->type, z_axis, NOOP, continue);
 #ifdef PM3D
-	    update_pm3d_zrange(z, PM3DSURFACE == this_plot->plot_style);
+	    update_pm3d_zrange(z, NEED_PALETTE(this_plot));
 #endif
 	}
     }
@@ -711,7 +712,7 @@ get_3ddata(this_plot)
 	    } else {
 		STORE_WITH_LOG_AND_UPDATE_RANGE(cp->z, z, cp->type, z_axis, NOOP, goto come_here_if_undefined);
 #ifdef PM3D
-		update_pm3d_zrange(z, PM3DSURFACE == this_plot->plot_style);
+		update_pm3d_zrange(z, NEED_PALETTE(this_plot));
 #endif
 	    }
 
@@ -859,7 +860,7 @@ calculate_set_of_isolines(value_axis, cross, this_iso,
 			  iso_axis, iso_min, iso_step, num_iso_to_use,
 			  sam_axis, sam_min, sam_step, num_sam_to_use
 #ifdef PM3D
-			  , is_pm3d
+			  , pal
 #endif
 			  )
     AXIS_INDEX iso_axis, sam_axis, value_axis;
@@ -868,7 +869,7 @@ calculate_set_of_isolines(value_axis, cross, this_iso,
     double iso_min, iso_step, sam_min, sam_step;
     int num_iso_to_use, num_sam_to_use;
 #ifdef PM3D
-    TBOOLEAN is_pm3d;
+    TBOOLEAN pal;
 #endif
 {
     int i, j;
@@ -911,7 +912,7 @@ calculate_set_of_isolines(value_axis, cross, this_iso,
 					    value_axis, NOOP, NOOP);
 #ifdef PM3D
 	    if (z_axis == value_axis)
-		update_pm3d_zrange(temp, is_pm3d);
+		update_pm3d_zrange(temp, pal);
 #endif
 	}
 	(*this_iso)->p_count = num_sam_to_use;
@@ -1457,7 +1458,7 @@ eval_3dplots()
 					      u_axis, u_min, u_step,
 					      num_sam_to_use
 #ifdef PM3D
-					      , PM3DSURFACE == this_plot->plot_style
+					      , NEED_PALETTE(this_plot)
 #endif
 					      );
 
@@ -1471,7 +1472,7 @@ eval_3dplots()
 						  v_axis, v_min, v_step,
 						  num_sam_to_use
 #ifdef PM3D
-						  , PM3DSURFACE == this_plot->plot_style
+						  , NEED_PALETTE(this_plot)
 #endif
 						  );
 		    }

@@ -1,4 +1,8 @@
 2002-01-25  Johannes Zellner  <johannes@zellner.org>
+	* src/plot3d.c: scaling for 'linetype palette' was broken after
+	the previous changes (at least for 'set pm3d explicit').
+
+2002-01-25  Johannes Zellner  <johannes@zellner.org>
 
 	* src/pm3d.h src/pm3d.c src/set.c src/show.c src/save.c
 	src/graph3d.c src/misc.c src/pm3d.c src/pm3d.h src/plot3d.c
