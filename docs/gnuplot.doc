@@ -1,10 +1,10 @@
-C RCS $Id: gnuplot.doc,v 1.255 2004/10/27 07:46:46 mikulik Exp $
-C 18 September 2001
+C RCS $Id: gnuplot.doc,v 1.256 2004/10/27 21:54:48 sfeam Exp $
+C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
 ^ <h2> An Interactive Plotting Program </h2><p>
 ^ <h2>  Thomas Williams & Colin Kelley</h2><p>
-^ <h2>   Version 4.1 organized by Hans-Bernhard Broeker and others</h2><p>
+^ <h2>  Version 4.1 organized by Hans-Bernhard Broeker and others</h2><p>
 ^ <h2>Major contributors (alphabetic order):</h2>
 ^<ul><h3>
 ^<li>  Hans-Bernhard Broeker
@@ -36,7 +36,7 @@ C
 ^   Mailing list for bug reports: gnuplot-bugs@lists.sourceforge.net <p>
 ^</h2><p>
 ^<h3> This manual was prepared by Dick Crawford</h3><p>
-^<h3> Last revised: 28 July 2003</h3><p>
+^<h3> Last revised: 31 October 2004</h3><p>
 ^<hr>
 1 gnuplot
 2 Copyright
@@ -6191,16 +6191,16 @@ C ... and restart the table:
  The command `set mouse` enables mouse actions. Currently the pm, x11, ggi and
  windows terminals are mouse enhanced. There are two mouse modes. The 2d-graph
  mode works for 2d graphs and for maps (i.e. splots with `set view` having
- z-rotation 0, 90, 180, 270 or 360 degrees) and it allows tracing the position
- over graph, zooming, annotating graph etc. For 3d graphs `splot`, the view
- and scaling of the graph can be changed with mouse buttons 1 and 2. If
- additionally to these buttons the modifier <ctrl> is hold down, the
- coordinate system only is rotated which is useful for large data sets. A
- vertical motion of Button 2 with the shift key hold down changes the
- ticslevel.
+ z-rotation 0, 90, 180, 270 or 360 degrees, including `set view map`) and it
+ allows tracing the position over graph, zooming, annotating graph etc. For 3d
+ graphs `splot`, the view and scaling of the graph can be changed with mouse
+ buttons 1 and 2. If additionally to these buttons the modifier <ctrl> is hold
+ down, the coordinate system only is rotated which is useful for large data
+ sets. A vertical motion of Button 2 with the shift key hold down changes the
+ `ticslevel`.
 
- Mousing is not available in multiplot mode. If multiplot is disabled using
- `unset multiplot` though,  the mouse will be turned on again and acts on the
+ Mousing is not available in multiplot mode. When multiplot is finished using
+ `unset multiplot`, then the mouse will be turned on again and acts on the
  last plot (like replot does).
 
  Syntax:
@@ -6365,10 +6365,8 @@ C ... and restart the table:
 
  Each plot can be scaled by `scale` and shifted with `offset`; if the y-values
  for scale or offset are omitted, the x-value will be used.  `unset multiplot`
- will turn off the automatic layout.  You should manually `set size` and
- `set origin` to useful values (i.e. 1,1 and 0,0) after `unset multiplot` if
- you wish to make more plots in non-multiplot-mode as `unset multiplot` will
- leave those values as they were in the automatic layout mode.
+ will turn off the automatic layout and restore the values of `set size` and
+ `set origin` as they were before `set multiplot layout`. 
 
  Example:
        set size 1,1

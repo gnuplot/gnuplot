@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.87 2004/09/21 08:09:20 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.88 2004/10/27 07:46:47 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -258,7 +258,8 @@ static const struct gen_table set_multiplot_tbl[] =
     TRUE,   /* downwards */           \
     0, 0,   /* act_row, act_col */    \
     1, 1,   /* xscale, yscale */      \
-    0, 0    /* xoffset, yoffset */    \
+    0, 0,   /* xoffset, yoffset */    \
+    0,0,0,0 /* prev_ sizes and offsets */ \
 }
 
 static struct {
@@ -273,6 +274,8 @@ static struct {
     double yscale;         /* factor for vertical scaling */
     double xoffset;        /* horizontal shift */
     double yoffset;        /* horizontal shift */
+    double prev_xsize, prev_ysize, prev_xoffset, prev_yoffset;
+			   /* values before 'set multiplot layout' */
 } mp_layout = MP_LAYOUT_DEFAULT;
 
 
@@ -482,7 +485,7 @@ term_init()
 	 */
 	char *temp = gp_alloc(strlen(outstr) + 1, "temp file string");
 	if (temp) {
-	    FPRINTF((stderr, "term_init : reopening \"%s\" as %s\n",
+	    FPRINTF((stderr, "term_init: reopening \"%s\" as %s\n",
 		     outstr, term->flags & TERM_BINARY ? "binary" : "text"));
 	    strcpy(temp, outstr);
 	    term_set_output(temp);	/* will free outstr */
@@ -619,6 +622,12 @@ term_start_multiplot()
 	}
 	mp_layout.num_cols = (int) real(const_express(&a));
 
+	/* remember current values of the plot size */
+	mp_layout.prev_xsize = xsize;
+	mp_layout.prev_ysize = ysize;
+	mp_layout.prev_xoffset = xoffset;
+	mp_layout.prev_yoffset = yoffset;
+
 	mp_layout.auto_layout = TRUE;
 	mp_layout.act_row = 0;
 	mp_layout.act_col = 0;
@@ -698,6 +707,13 @@ term_end_multiplot()
 	term_suspended = FALSE;
     }
     multiplot = FALSE;
+    /* reset plot size and origin to values before 'set multiplot layout' */
+    if (mp_layout.auto_layout) {
+	xsize = mp_layout.prev_xsize;
+	ysize = mp_layout.prev_ysize;
+	xoffset = mp_layout.prev_xoffset;
+	yoffset = mp_layout.prev_yoffset;
+    }
     /* reset automatic multiplot layout */
     mp_layout.auto_layout = FALSE;
     mp_layout.xscale = mp_layout.yscale = 1.0;
@@ -811,7 +827,7 @@ term_check_multiplot_okay(TBOOLEAN f_interactive)
 	term_suspend();
 	return;
     }
-    /* uh oh : they're not allowed to be in multiplot here */
+    /* uh oh: they're not allowed to be in multiplot here */
 
     term_end_multiplot();
 
@@ -1389,7 +1405,7 @@ change_term(const char *name, int length)
     name = term->name;
 
     if (term->scale != null_scale)
-	fputs("Warning : scale interface is not null_scale - may not work with multiplot\n", stderr);
+	fputs("Warning: scale interface is not null_scale - may not work with multiplot\n", stderr);
 
     /* check that optional fields are initialised to something */
     if (term->text_angle == 0)
