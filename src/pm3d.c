@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.5 2000/11/02 19:07:16 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.6 2000/11/03 01:15:05 joze Exp $"); }
 #endif
 
 /* GNUPLOT - pm3d.c */
@@ -473,11 +473,16 @@ void pm3d_draw_all(struct surface_points* plots, int pcount)
     struct surface_points *this_plot = NULL;
 
     /* for pm3dCompress.awk */
-    if (!strcmp(term->name,"postscript") || 
-	!strcmp(term->name,"pslatex") || !strcmp(term->name,"pstex")) {
+#ifndef GOT_PSLATEX_PROTO
+    if (!strcmp(term->name,"postscript") || !strcmp(term->name,"pstex")) 
+	fprintf(gpoutfile,"%%pm3d_map_begin\n");
+#else
+    if (!strcmp(term->name,"postscript") || !strcmp(term->name,"pstex") ||
+	!strcmp(term->name,"pslatex")) {
 	extern FILE *PSLATEX_auxfile;
 	fprintf(PSLATEX_auxfile ? PSLATEX_auxfile : gpoutfile,"%%pm3d_map_begin\n");
     }
+#endif
 
     for ( ; pm3d.where[i]; i++ ) {
 	this_plot = plots;
@@ -499,11 +504,16 @@ void pm3d_draw_all(struct surface_points* plots, int pcount)
 	}
 
     /* for pm3dCompress.awk */
-    if (!strcmp(term->name,"postscript") ||
-	!strcmp(term->name,"pslatex") || !strcmp(term->name,"pstex")) {
+#ifndef GOT_PSLATEX_PROTO
+    if (!strcmp(term->name,"postscript") || !strcmp(term->name,"tex")) 
+	fprintf(gpoutfile,"%%pm3d_map_end\n");
+#else
+    if (!strcmp(term->name,"postscript") || !strcmp(term->name,"pstex") ||
+	!strcmp(term->name,"pslatex")) {
 	extern FILE *PSLATEX_auxfile;
 	fprintf(PSLATEX_auxfile ? PSLATEX_auxfile : gpoutfile,"%%pm3d_map_end\n");
     }
+#endif
 
     /* release the palette we have made use of (some terminals may need this)
        ...no, remove this, also remove it from plot.h !!!!

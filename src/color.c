@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: color.c,v 1.5 2000/11/02 19:07:16 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: color.c,v 1.6 2000/11/03 01:15:04 joze Exp $"); }
 #endif
 
 /* GNUPLOT - color.c */
@@ -409,9 +409,13 @@ void draw_color_smooth_box ()
   double tmp;
   char s[64];
   extern double base_z, ceiling_z; /* defined in graph3d.c */
+#ifdef GOT_PSLATEX_PROTO
   extern FILE *PSLATEX_auxfile; /* defined in pslatex.trm */
   FILE *out = PSLATEX_auxfile ? PSLATEX_auxfile : gpoutfile;
-  
+#else
+  FILE *out = gpoutfile;
+#endif
+
   if (color_box.where == SMCOLOR_BOX_NO)
       return;
   if (!term->filled_polygon)
@@ -457,7 +461,7 @@ void draw_color_smooth_box ()
   */
   if (!strcmp(term->name,"postscript") ||
       !strcmp(term->name,"pslatex") || !strcmp(term->name,"pstex")
-#ifdef USE_EPSLATEX_DRIVER
+#ifdef GOT_PSLATEX_PROTO
       || !strcmp(term->name, "epslatex")
 #endif
       )
