@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: gd.trm,v 1.45 2004/07/13 14:11:25 broeker Exp $
+ * $Id: gd.trm,v 1.46 2004/08/02 18:36:43 sfeam Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -200,6 +200,7 @@ static struct {
     gdFontPtr default_font;
     char      default_ttffont[64];
     int       default_ttfsize;
+    TBOOLEAN  TrueColor;
 } png_state;
 
 #define PNG_USE_TRANSPARENT 1
@@ -216,6 +217,7 @@ enum PNG_id {
     PNG_FONT,
     PNG_SIZE,
     PNG_ENHANCED, PNG_NOENHANCED,
+    PNG_TRUECOLOR, PNG_NOTRUECOLOR,
     PNG_OTHER
 };
 
@@ -226,8 +228,8 @@ enum PNG_id {
 
 static struct gen_table PNG_opts[] =
 {
-    { "tr$ansparent", PNG_TRANSPARENT },
-    { "notr$ansparent", PNG_NOTRANSPARENT },
+    { "trans$parent", PNG_TRANSPARENT },
+    { "notran$sparent", PNG_NOTRANSPARENT },
     { "inter$lace", PNG_INTERLACE },
     { "nointer$lace", PNG_NOINTERLACE },
     { "crop", PNG_CROP },
@@ -241,6 +243,8 @@ static struct gen_table PNG_opts[] =
     { "si$ze", PNG_SIZE },
     { "enh$anced", PNG_ENHANCED },
     { "noenh$anced", PNG_NOENHANCED },
+    { "true$color", PNG_TRUECOLOR },
+    { "notrue$color", PNG_NOTRUECOLOR },
     { NULL, PNG_OTHER }
 };
 
@@ -317,7 +321,12 @@ PNG_FillPattern(int fillpar)
 	PNG_fill_tile.last_rgb = rgb;
 
 	/* create new tile */
-	PNG_fill_tile.im = gdImageCreate(8, 8);
+#ifdef GD2_VERS
+	if (png_state.TrueColor)
+	    PNG_fill_tile.im = gdImageCreateTrueColor(8, 8);
+	else
+#endif
+	    PNG_fill_tile.im = gdImageCreate(8, 8);
 
 	/* background */
 	background = gdImageColorAllocate(PNG_fill_tile.im, 255, 255, 255);
@@ -462,6 +471,7 @@ PNG_options()
 	png_state.default_ttffont[0] = '\0';
 	png_state.default_ttfsize = 0;
 	png_state.justify = CENTRE;
+	png_state.TrueColor = FALSE;
     } else {
 	/* FIXME EAM - these should never happen! */
 	if (!png_state.default_font) {
@@ -602,6 +612,14 @@ PNG_options()
 	    term->put_text = PNG_put_text;
 	    ++c_token;
 	    break;
+	case PNG_TRUECOLOR:
+	    png_state.TrueColor = TRUE;
+	    c_token++;
+	    break;
+	case PNG_NOTRUECOLOR:
+	    png_state.TrueColor = FALSE;
+	    c_token++;
+	    break;
 	case PNG_OTHER:
 	default:
 	    /* not "size" */
@@ -690,6 +708,12 @@ PNG_options()
     if (png_state.flags & PNG_USE_INTERLACE) {
 	strcat(term_options, "interlace ");
     }
+    /* JPEG files are always 24-bit color */
+    if (strcmp(term->name, "jpeg") == 0)
+	png_state.TrueColor = TRUE;
+    else if (png_state.TrueColor) {
+	strcat(term_options, "truecolor ");
+    }
     if (!(png_state.flags & PNG_USE_CROP)) {
 	strcat(term_options, "no");
     }
@@ -748,6 +772,7 @@ int i;
     for (i=2; i<=6; i++) {
     	PNG_brush[i].im = gdImageCreate(i,i);
     	PNG_brush[i].bgnd = gdImageColorAllocate( PNG_brush[i].im, 255, 255, 255 );
+	gdImageFill( PNG_brush[i].im, 1, 1, PNG_brush[i].bgnd );
     	gdImageColorTransparent( PNG_brush[i].im, PNG_brush[i].bgnd );
     	PNG_brush[i].fgnd = gdImageColorAllocate( PNG_brush[i].im, 0, 0, 0 );
 	PNG_brush[i].last_rgb = 0;
@@ -823,6 +848,10 @@ TERM_PUBLIC int PNG_make_palette (t_sm_palette *palette)
 {
     int i;
     if (palette == NULL) {
+	/* If the output format is TrueColor there in no color limit */
+	if (png_state.TrueColor)
+	    return(0);
+
 	/* return maximal number of colours in a PNG palette */
 	i = gdMaxColors /*256*/ - gdImageColorsTotal(png_state.image);
 	/* the latter is the number of currently allocated colours. We want
@@ -861,12 +890,19 @@ TERM_PUBLIC int PNG_make_palette (t_sm_palette *palette)
 TERM_PUBLIC
 void PNG_set_color (double gray)
 {
-    int png_color = (gray <= 0) ? 0 : (int)(gray * sm_palette.colors);
-    if (png_color >= sm_palette.colors)
-	png_color = sm_palette.colors - 1;
-    /* map [0;1] to interval [0;png_smooth_colors-1] */
-    png_state.color = png_smooth_color[ png_color ]; /* index to the palette */
-    /*fprintf(stderr,"PNG terminal sets color png_color=%i\n",png_color); */
+    if (png_state.TrueColor) {
+	rgb255_color color;
+	rgb255maxcolors_from_gray(gray, &color);
+	png_state.color = gdImageColorResolve(png_state.image,
+	    (int)color.r, (int)color.g, (int)color.b);
+	return;
+    } else {
+	int png_color = (gray <= 0) ? 0 : (int)(gray * sm_palette.colors);
+	if (png_color >= sm_palette.colors)
+	    png_color = sm_palette.colors - 1;
+	/* map [0;1] to interval [0;png_smooth_colors-1] */
+	png_state.color = png_smooth_color[ png_color ];
+    }
 }
 
 
@@ -984,13 +1020,23 @@ PNG_graphics()
     int i;
     unsigned int rgb;
 
-    png_state.font = png_state.default_font;
-    png_state.color = 0;
-    png_state.image = gdImageCreate((int) (xsize * PNG_XMAX),
-				    (int) (ysize * PNG_YMAX));
+#ifdef GD2_VERS
+    /* TrueColor images default to a black background; load white instead */
+    if (png_state.TrueColor) {
+	png_state.image = gdImageCreateTrueColor(
+			(int) (xsize * PNG_XMAX), (int) (ysize * PNG_YMAX));
+	rgb = gdImageColorAllocate(png_state.image, 255, 255, 255);
+	gdImageFill(png_state.image, 1, 1, rgb);
+    } else
+#endif
+	png_state.image = gdImageCreate(
+    			(int) (xsize * PNG_XMAX), (int) (ysize * PNG_YMAX));
+
     png_state.height = (int) (ysize * PNG_YMAX - 1);
     png_state.charw = term->h_char;	/* png_state.font->w; */
     png_state.charh = term->v_char;	/* png_state.font->h; */
+    png_state.font = png_state.default_font;
+    png_state.color = 0;
     for (i = png_state.n_colors; i < WEB_N_COLORS; i++)
 	png_state.rgb_table[i] =
 	    (web_color_rgbs[i].r << 16) |
@@ -1047,7 +1093,12 @@ PNG_text()
 	}
 	x = x2 - x1 + 1; /* width */
 	y = y2 - y1 + 1; /* height */
-	im_crop = gdImageCreate(x,y);
+#ifdef GD2_VERS
+	if (png_state.TrueColor)
+	    im_crop = gdImageCreateTrueColor(x,y);
+	else
+#endif
+	    im_crop = gdImageCreate(x,y);
 	gdImagePaletteCopy(im_crop, png_state.image);
 	gdImageCopy(im_crop, png_state.image, 0, 0, x1, y1, x, y);
 	gdImageDestroy(png_state.image);
@@ -1090,24 +1141,30 @@ PNG_vector(unsigned int x, unsigned int y)
 	gdImageLine(png_state.image, png_state.x, Y(png_state.y),
 		    x, Y(y), gdStyled);
     } else {
-    	if (png_state.linewidth == 1) {
-	gdImageLine(png_state.image, png_state.x, Y(png_state.y),
-		    x, Y(y), png_state.color);
+	if (png_state.linewidth == 1) {
+#ifdef GD2_VERS
+	    gdImageSetAntiAliased(png_state.image, png_state.color);
+	    gdImageLine(png_state.image, png_state.x, Y(png_state.y),
+			x, Y(y), gdAntiAliased);
+#else
+	    gdImageLine(png_state.image, png_state.x, Y(png_state.y),
+			x, Y(y), png_state.color);
+#endif
 	} else {
-	/* EAM - Implement linewidth by selecting a pre-defined brush */
-	/* The tricky bit is re-coloring the brush to the current color */
-	lw   = png_state.linewidth;
-	if (png_state.color != PNG_brush[lw].last_rgb) {
-	    PNG_brush[lw].fgnd = gdImageColorResolve(PNG_brush[lw].im,
-	    	gdImageRed(png_state.image,png_state.color),
-	    	gdImageGreen(png_state.image,png_state.color),
-	    	gdImageBlue(png_state.image,png_state.color) );
-	    PNG_brush[lw].last_rgb = png_state.color;
-	}
-    	gdImageFilledRectangle( PNG_brush[lw].im, 1, 1, lw, lw, PNG_brush[lw].fgnd );
-	gdImageSetBrush(png_state.image, PNG_brush[lw].im);
-	gdImageLine(png_state.image, png_state.x, Y(png_state.y),
-		    x, Y(y), gdBrushed );
+	    /* EAM - Implement linewidth by selecting a pre-defined brush */
+	    /* The tricky bit is re-coloring the brush to the current color */
+	    lw   = png_state.linewidth;
+	    if (png_state.color != PNG_brush[lw].last_rgb) {
+		PNG_brush[lw].fgnd = gdImageColorResolve(PNG_brush[lw].im,
+	    	    gdImageRed(png_state.image,png_state.color),
+	    	    gdImageGreen(png_state.image,png_state.color),
+	    	    gdImageBlue(png_state.image,png_state.color) );
+		PNG_brush[lw].last_rgb = png_state.color;
+	    }
+    	    gdImageFilledRectangle( PNG_brush[lw].im, 1, 1, lw, lw, PNG_brush[lw].fgnd );
+	    gdImageSetBrush(png_state.image, PNG_brush[lw].im);
+	    gdImageLine(png_state.image, png_state.x, Y(png_state.y),
+			x, Y(y), gdBrushed );
 	}
     }
     png_state.x = x;
@@ -1144,9 +1201,6 @@ PNG_linewidth(double linewidth)
     png_state.linewidth = (int)(linewidth+0.49);
     if (png_state.linewidth > 6) png_state.linewidth = 6;
     if (png_state.linewidth < 1) png_state.linewidth = 1;
-    /* DEBUG
-    fprintf(stderr,"Setting PNG linewidth to %d\n",png_state.linewidth);
-       DEBUG */
 }
 
 /* _put_text(x,y,str)  Called to display text at the (x,y) position,
@@ -1189,7 +1243,9 @@ PNG_put_text(unsigned int x, unsigned int y, const char *string)
 			png_state.ttffont, (double)png_state.ttfsize,
 			(double)png_state.angle * M_PI_2 / 90.,
 			x, Y(y), (char *)string);
-	    if (err) fprintf(stderr,"gdImageStringFT: %s\n",err);
+	    if (err)
+		fprintf(stderr,"gdImageStringFT: %s while printing string %s with font %s\n",
+	    	    err,string,png_state.ttffont);
 	}
     } else if (png_state.angle != 0) {
 	x -= png_state.charh / 2;
@@ -1484,7 +1540,10 @@ ENHGD_FLUSH()
 			ENHgd_font, ENHgd_fontsize,
 			(double)png_state.angle * M_PI_2/90.,
 			x, Y(y), enhanced_text);
-	    if (err) fprintf(stderr,"gdImageStringFT: %s\n",err);
+	    if (err) 
+		fprintf(stderr,"gdImageStringFT: %s while printing string %s with font %s\n",
+	    	    err,enhanced_text,ENHgd_font);
+
 	    FPRINTF(("outputstring: %s boundingbox: %d %d %d %d\n",
 			enhanced_text, brect[6], brect[7], brect[2], brect[3]));
 	    if (ENHgd_overprint == 1) {
@@ -1641,6 +1700,7 @@ START_HELP(png)
 " Syntax:",
 "       set terminal png ",
 "              {{no}transparent} {{no}interlace}",
+"              {{no}truecolor}",
 "              {tiny | small | medium | large | giant}",
 "              {font <face> {<pointsize>}}",
 "              {size <x>,<y>} {{no}crop}",
