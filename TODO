@@ -82,9 +82,9 @@ Lars' list
   gp_fopen() - to be implemented
 - fix bug which prints "DI,1DI,0" in the upper left corner of the plot when
   in pcl5 mode and printing to an HP Laserjet 4+ (J. Breeding, bug-gnuplot)
-- integrate gpltconv into gnuplot (convert command?), configure option
-- make history size configurable (set historysize)
-- port writeback fix to 3.8
+DONE - integrate gpltconv into gnuplot (convert command?), configure option
+DONE - make history size configurable (set historysize)
+DONE - port writeback fix to 3.8
 
 HBB:
 WIN16 compile (BC++3.1):
