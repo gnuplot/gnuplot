@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.142 2004/08/10 03:55:35 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.143 2004/08/10 20:03:36 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -3133,11 +3133,6 @@ set_terminal()
     term = 0; /* in case set_term() fails */
     term = set_term(c_token);
     c_token++;
-    /* FIXME
-     * handling of common terminal options before term specific options
-     * as per HBB's suggestion
-     * new `set termoptions' command
-     */
     /* get optional mode parameters
      * not all drivers reset the option string before
      * strcat-ing to it, so we reset it for them
@@ -3154,11 +3149,11 @@ set_terminal()
 static void
 set_termoptions()
 {
-    int_error(c_token,"Command not yet supported");
+    int save_end_of_line = num_tokens;
+    c_token++;
 
-    /* if called from term.c:
-     * scan input_line for common options
-     * filter out common options
+    /* What it really should do:
+     * scan input_line for allowed options
      * Then either
      * 1. reset input_line (num_tokens = scanner(&input_line, &input_line_len);
      *    c_token=0 (1 ? 2)
@@ -3167,6 +3162,21 @@ set_termoptions()
      *    above ... this can be joint into a new routine
      *    set_term_opts(char *term_name, char *term_opts)
      */
+
+    if (END_OF_COMMAND) {
+	return;
+    } else if (almost_equals(c_token,"enh$anced")
+           ||  almost_equals(c_token,"noenh$anced")) {
+	num_tokens = GPMIN(num_tokens,c_token+1);
+	(term->options)();
+    } else if (almost_equals(c_token,"font")
+           ||  almost_equals(c_token,"fname")) {
+	num_tokens = GPMIN(num_tokens,c_token+2);
+	(term->options)();
+    } else {
+	int_error(c_token,"This option can only be changed using 'set term'");
+    }
+    num_tokens = save_end_of_line;
 }
 
 

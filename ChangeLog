@@ -1,3 +1,13 @@
+2004-08-19  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/set.c (set_termoptions):  Fill in basic implementation of this
+	function that allows changing one characteristic of the current 
+	terminal. So far the only allowed changes are the default font and
+	{no}enhanced text mode.
+
+	* demo/enhancedtext.dem:  Use 'set termoption enhanced' (new command)
+	to force enhanced text mode sregardless of current terminal type.
+
 2004-08-18  Volker Dobler  <v.dobler@web.de>
 
 	* src/term.c (term_end_plot term_start_multiplot term_end_multiplot):

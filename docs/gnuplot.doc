@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.233 2004/08/13 22:39:44 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.234 2004/08/19 05:05:52 sfeam Exp $
 C 18 September 2001
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -7789,6 +7789,18 @@ C ... and restart the table:
  were not installed, or it may not describe all the drivers that are available
  to you, depending on its output format.
 <4 -- all terminal stuff is pulled from the .trm files
+3 termoption
+?commands set termoption
+?set termoption
+?termoption
+ The `set termoption` command allows you to change the behaviour of the 
+ current terminal without requiring a new `set terminal` command. Only one
+ option can be changed per command, and only a small number of options can
+ be changed this way. Currently the only options accepted are
+
+      set termoption {no}enhanced
+      set termoption font "<fontname>{,<fontsize>}"
+
 3 tics
 ?commands set tics
 ?commands show tics

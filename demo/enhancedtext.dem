@@ -7,6 +7,8 @@ print "    if enhanced text is selected and supported for the"
 print "    current terminal type.  E.g. 'set term post enh'"
 print "    ----------------------------------------------------"
 #
+set termoption enhanced
+#
 set title "Test page for enhanced text mode"
 set xrange [-1:1]
 set yrange [-0.5:1.1]
