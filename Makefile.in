@@ -219,7 +219,7 @@ CORETERM = $(T)aed.trm $(T)ai.trm $(T)amiga.trm $(T)apollo.trm \
 	   $(T)impcodes.h $(T)iris4d.trm $(T)kyo.trm $(T)latex.trm \
 	   $(T)linux.trm $(T)metafont.trm $(T)mgr.trm $(T)mif.trm \
 	   $(T)multitos.trm $(T)next.trm $(T)object.h \
-	   $(T)pbm.trm $(T)pc.trm $(T)pm.trm $(T)png.trm $(T)post.trm
+	   $(T)pbm.trm $(T)pc.trm $(T)pm.trm $(T)png.trm $(T)post.trm \
 	   $(T)pslatex.trm $(T)pstricks.trm $(T)qms.trm $(T)regis.trm \
 	   $(T)rgip.trm $(T)sun.trm $(T)t410x.trm $(T)table.trm \
 	   $(T)tek.trm $(T)texdraw.trm $(T)tgif.trm $(T)tkcanvas.trm \
@@ -435,9 +435,8 @@ $(srcdir)/stamp-h.in: $(top_srcdir)/configure.in $(ACLOCAL_M4) $(ACCONFIG)
 ################################################################
 # Miscellaneous targets
 
-SOURCES = HEADERS alloc.h ansichek.h binary.h bitmap.h fit.h fnproto.h help.h \
-	  matrix.h national.h plot.h protos.h setshow.h stdfn.h type.h \
-	  term.h $(CSOURCE) $(CSOURCE8) $(NEXTSRC) $(OS2SRC) $(WINDOWS)
+SOURCES = $(HEADERS) $(CSOURCE) $(CSOURCE8) $(CORETERM) $(NEXTSRC) \
+	  $(OS2SRC) $(WINDOWS)
 
 DOCS  = $(DOCS1) $(DOCS2) $(DOCS3)
 
@@ -473,7 +472,7 @@ realclean: distclean
 distdir = gnuplot
 top_distdir = $(distdir)
 
-# LGH: Need to change this if you do not use GNU tar
+# LGH: Need to change this if not using GNU tar
 dist: distdir
 	-mv $(distdir)/docs/makefile.dst $(distdir)/docs/makefile
 	-mv $(distdir)/docs/latextut/makefile.dst $(distdir)/docs/latextut/makefile
