@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.198 2003/12/22 05:13:18 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.199 2003/12/26 22:59:11 vanzandt Exp $
 C 18 September 2001
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001   Thomas Williams, Colin Kelley et al.
 C
@@ -217,7 +217,7 @@ C
 3 New terminal features
 
  `aqua`: New terminal for Mac OS X.
- 
+
  `epslatex`: New terminal. Prepares eps figures for inclusion in LaTeX documents.
 
  `gif`: Support for this terminal has been dropped in favour of the `png`
