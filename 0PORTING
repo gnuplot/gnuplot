@@ -203,7 +203,7 @@ Platform Related Defines
 ========================
 
  These #defines are defined automatically by various compilers or
-makefile, some gnuplot routines check these defines to implement
+makefiles, some gnuplot routines check these defines to implement
 features found in the various environments. This list is certainly
 incomplete.
 
@@ -237,7 +237,7 @@ GP_GETCWD         getwd()/getcwd() alikes    stdfn.h
 GP_FARMALLOC      faralloc()/malloc()        alloc.c     Windows environment
 GP_FARREALLOC     farrealloc()/realloc()     alloc.c     Windows environment
 GP_SLEEP          sleep()                    command.c
-GP_SYSTEMINFO     sysinfo()/gethostname()    gplt_X11.c
+GP_SYSTEMINFO     sysinfo()/gethostname()    gplt_x11.c
 GPFAR             `far' compiler directive   plot.h      MSDOS and Win16
 GPHUGE            `huge' compiler directive  plot.h      MSDOS and Win16
 GP_INLINE         `__inline' directive       plot.h
