@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.149 2002/12/11 20:37:42 joze Exp $
+C RCS $Id: gnuplot.doc,v 1.150 2002/12/13 20:12:57 mikulik Exp $
 C 18 September 2001
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001   Thomas Williams, Colin Kelley et al.
 C
@@ -22,6 +22,7 @@ C
 ^<li>  Russell Lang
 ^<li>  Alexander Lehmann
 ^<li>  Alexander Mai
+^<li>  Petr Mikulik
 ^<li>  Carsten Steger
 ^<li>  Tom Tkacik
 ^<li>  Jos Van der Woude

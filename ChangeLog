@@ -1,5 +1,10 @@
 2002-12-13  Petr Mikulik  <mikulik@physics.muni.cz>
 
+	* docs/titlepag.ms docs/titlepag.tex docs/gnuplot.doc: Added my name to
+	the authors section.
+
+2002-12-13  Petr Mikulik  <mikulik@physics.muni.cz>
+
 	* gnuplot.doc: Removed references to `help vgagl`.
 
 	* post.trm(START_HELP): Fixed broken reference to `postscript fontfile`.
@@ -1582,7 +1587,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/12/13 19:41:30 $).
+	last modification date (from the tag $Date: 2002/12/13 20:12:53 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
