@@ -1,3 +1,30 @@
+2005-02-09  Harald Harders  <h.harders@tu-bs.de>
+
+	SourceForge patch #1040192 "Merge post, epslatex, pslatex, pstex
+	terminals".
+
+	* NEWS demo/Makefile.am.in docs/Makefile.in docs/gnuplot.doc
+	src/graph3d.c src/graphics.c src/makefile.all src/term.c src/term.h
+	term/post.h term/post.trm: Miscellaneous changes.
+
+	* demo/epslatex.dem demo/gnuplot.cfg: New demo and its LaTeX
+	configuration file for usage with gnuplot-generated LaTeX files
+	(epslatex terminal with standalone option).
+
+	* term/pslatex.trm: Now includes code for all of the following
+	terminals:
+	  pslatex:  LaTeX with embedded postscript
+	  pstex:    plain TeX with embedded postscript
+	  epslatex: LaTeX using \includegraphics, postscript part in an external
+	  	    file
+
+	* term/epslatex.trm: Removed.
+
+	* share/: New directory.
+
+	* share/LaTeX/Makefile share/LaTeX/README share/LaTeX/gnuplot.cfg:
+	New directory LaTeX/. New files for supporting the epslatex terminal.
+
 2005-02-05  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/color.h src/save.c (save_textcolor) src/gadgets (apply_pm3dcolor)

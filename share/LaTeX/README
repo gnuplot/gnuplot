@@ -1,0 +1,11 @@
+This directory contains files that are useful for the epslatex terminal.
+The file 'gnuplot.cfg' is loaded by epslatex plots in 'standalone' mode
+if in the LaTeX search path.  Feel free to edit 'gnuplot.cfg' and put it
+somewhere into the LaTeX search path (normally,
+'$TEXMFLOCAL/tex/latex/gnuplot', '$TEXMFHOME/tex/latex/gnuplot', or the
+current working directory).  If your LaTeX distribution contains the 
+programme 'kpsexpand', the Makefile installes 'gnuplot.cfg' into 
+'$TEXMFLOCAL/tex/latex/gnuplot' and updates LaTeX's file database.
+
+Harald Harders
+2005-01-28

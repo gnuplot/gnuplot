@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: pslatex.trm,v 1.48 2005/01/08 16:09:01 mikulik Exp $
+ * $Id: pslatex.trm,v 1.49 2005/01/11 17:37:17 mikulik Exp $
  */
 
 /* GNUPLOT - pslatex.trm */
@@ -38,8 +38,10 @@
  * This file is included by ../term.c.
  *
  * This file supplies the terminal drivers:
- *     pslatex --latex with embedded postscript
- *     pstex   --plain TeX with embedded postscript
+ *     pslatex  -- LaTeX with embedded postscript
+ *     pstex    -- plain TeX with embedded postscript
+ *     epslatex -- LaTeX using \includegraphics, postscript part in an 
+ *                 external file
  *
  * AUTHORS
  *  George Phillips
@@ -50,7 +52,24 @@
  *
  *  Dan Sebald, 5 March 2003: terminal entry for image functionality
  *
- * send your comments or suggestions to (gnuplot-info@lists.sourceforge.net).
+ *  Theo Hopman
+ *  	23 May 2003:
+ *  		- added epslatex support. Replaces epslatex.trm; pointtype
+ *  		and linetypes for epslatex terminal are now identical to
+ *  		those of pslatex terminal.
+ *  		- added arbitrary text rotations to all [e]ps[la]tex
+ *  		terminals.
+ *  	27 May 2004:
+ *  		- epslatex patch updated for gnuplot 4.0
+ *	
+ *  Harald Harders (h.harders@tu-bs.de), 2005-02-08:
+ *  - Merged functionality of postscript, pslatex, pstex, and
+ *    epslatex terminals. Therefore deleted epslatex.trm.
+ *  - Added a standalone mode to the epslatex mode for standalone use without
+ *    an additional LaTeX document.
+ *  - Fixed text rotation of ps(la)tex terminals.
+ *
+ * Send your comments or suggestions to (gnuplot-info@lists.sourceforge.net).
  */
 
 #include "driver.h"
@@ -58,46 +77,30 @@
 #ifdef TERM_REGISTER
 register_term(pslatex)
 register_term(pstex)
+register_term(epslatex)
 #endif
 
 #ifdef TERM_PROTO
-TERM_PUBLIC void PSLATEX_options __PROTO((void));
-TERM_PUBLIC void PSLATEX_init __PROTO((void));
-TERM_PUBLIC void PSLATEX_graphics __PROTO((void));
-TERM_PUBLIC void PSLATEX_put_text __PROTO((unsigned int x, unsigned int y, const char str[]));
-TERM_PUBLIC int PSLATEX_justify_text __PROTO((enum JUSTIFY mode));
-TERM_PUBLIC int PSLATEX_text_angle __PROTO((int ang));
+/* Common functions for epslatex and ps(la)tex */
+/* All these routines begin with PSLATEX_ */
 TERM_PUBLIC void PSLATEX_reset __PROTO((void));
-TERM_PUBLIC void PSLATEX_text __PROTO((void));
-TERM_PUBLIC void PSLATEX_move __PROTO((unsigned int x, unsigned int y));
-TERM_PUBLIC void PSLATEX_vector __PROTO((unsigned int x, unsigned int y));
-TERM_PUBLIC void PSLATEX_linetype __PROTO((int lt));
-TERM_PUBLIC void PSLATEX_point __PROTO((unsigned int x, unsigned int y, int number));
-TERM_PUBLIC void PSLATEX_arrow __PROTO((unsigned int sx, unsigned int sy,
-              unsigned int ex, unsigned int ey, int head));
-TERM_PUBLIC void PSLATEX_pointsize __PROTO((double size));
-TERM_PUBLIC void PSLATEX_linewidth __PROTO((double width));
-TERM_PUBLIC void PSLATEX_fillbox __PROTO((int style, unsigned int x1, unsigned int y1, unsigned int width, unsigned int height));
-#ifdef PM3D
-TERM_PUBLIC int PSLATEX_make_palette (t_sm_palette *);
-TERM_PUBLIC void PSLATEX_previous_palette (void);
-TERM_PUBLIC void PSLATEX_set_color (t_colorspec *);
-TERM_PUBLIC void PSLATEX_filled_polygon (int, gpiPoint *);
-#endif
-#ifdef WITH_IMAGE
-TERM_PUBLIC void PSLATEX_image __PROTO((unsigned, unsigned, coordval *, gpiPoint *, t_imagecolor));
-#endif
 
-#define PSLATEX_XMAX (5*720)
-#define PSLATEX_YMAX (3*720)
+/* Functions for ps(la)tex */
+/* All these routines begin with PSTEX_ */
+TERM_PUBLIC void PSTEX_reopen_output __PROTO((void));
+TERM_PUBLIC void PSTEX_common_init __PROTO((void));
+TERM_PUBLIC void PSTEX_put_text __PROTO((unsigned int x, unsigned int y, const char *str));
+TERM_PUBLIC void PSTEX_text __PROTO((void));
 
-/* 10 pt char is about 10 pts high (say) */
-#define PSLATEX_VCHAR (100)
-/* 10 pt char is about 6 pts wide (say) */
-/* I find about 5 points (output from test) - div */
-#define PSLATEX_HCHAR (50)
-#define GOT_PSLATEX_PROTO
-#endif
+/* Functions for epslatex */
+/* All these routines begin with EPSLATEX_ */
+TERM_PUBLIC void EPSLATEX_reopen_output __PROTO((void));
+TERM_PUBLIC void EPSLATEX_common_init __PROTO((void));
+TERM_PUBLIC void EPSLATEX_put_text __PROTO((unsigned int x, unsigned int y, const char *str));
+TERM_PUBLIC void EPSLATEX_linetype __PROTO((int linetype));
+
+#endif /* TERM_PROTO */
+
 
 #ifndef TERM_PROTO_ONLY
 
@@ -105,598 +108,674 @@ TERM_PUBLIC void PSLATEX_image __PROTO((unsigned, unsigned, coordval *, gpiPoint
 
 #include "post.h"
 
-static int PSLATEX_angle;
-static int PSLATEX_justify;
-static int PSLATEX_rotate = TRUE;
-
-/* do we write two files? */
-static TBOOLEAN PSLATEX_useAuxFile = FALSE;
-/* name of auxiliary file */
-static char *PSLATEX_auxname;
-/* FILE * to auxiliary file */
-static FILE *PSLATEX_auxfile;
-
-static TBOOLEAN PSLATEX_output = TRUE;	/* do we write LaTeX? */
-static int PSLATEX_fontsize = 0;
-
-struct text_command {
+struct pstex_text_command {
     int x, y, angle, justify;
     char *label;
-    struct text_command *next;
+    struct pstex_text_command *next;
 };
 
-static struct text_command *PSLATEX_labels;
+static struct pstex_text_command *pstex_labels = NULL;
 
-enum PSLATEX_id {
-    PSLATEX_DEFAULT, PSLATEX_COLOR, PSLATEX_MONOCHROME,
-    PSLATEX_SOLID, PSLATEX_DASHED, PSLATEX_ROTATE, PSLATEX_NOROTATE,
-    PSLATEX_AUXFILE,
-    PSLATEX_OTHER
-};
+/* additional LaTeX header information for epslatex terminal */
+static char *epslatex_header = NULL;
 
-static struct gen_table PSLATEX_opts[] =
-{
-    { "d$efault", PSLATEX_DEFAULT },
-    { "c$olor", PSLATEX_COLOR },
-    { "c$olour", PSLATEX_COLOR },
-    { "m$onochrome", PSLATEX_MONOCHROME },
-    { "so$lid", PSLATEX_SOLID },
-    { "da$shed", PSLATEX_DASHED },
-    { "r$otate", PSLATEX_ROTATE },
-    { "n$orotate", PSLATEX_NOROTATE },
-    { "a$uxfile", PSLATEX_AUXFILE },
-    { NULL, PSLATEX_OTHER }
-};
+/* Common functions for epslatex and ps(la)tex */
 
 TERM_PUBLIC void
-PSLATEX_options()
+PSLATEX_reset()
 {
-    struct value a;
-
-    while (!END_OF_COMMAND) {
-	switch(lookup_table(&PSLATEX_opts[0],c_token)) {
-	case PSLATEX_DEFAULT:
-	    ps_params->color = FALSE;
-	    ps_params->solid = FALSE;
-	    PSLATEX_rotate = TRUE;
-	    PSLATEX_useAuxFile = FALSE;
-	    c_token++;
-	    break;
-	case PSLATEX_COLOR:
-	    ps_params->color = TRUE;
-	    c_token++;
-	    break;
-	case PSLATEX_MONOCHROME:
-	    ps_params->color = FALSE;
-	    c_token++;
-	    break;
-	case PSLATEX_SOLID:
-	    ps_params->solid = TRUE;
-	    c_token++;
-	    break;
-	case PSLATEX_DASHED:
-	    ps_params->solid = FALSE;
-	    c_token++;
-	    break;
-	case PSLATEX_ROTATE:
-	    PSLATEX_rotate = TRUE;
-	    c_token++;
-	    break;
-	case PSLATEX_NOROTATE:
-	    PSLATEX_rotate = FALSE;
-	    c_token++;
-	    break;
-	case PSLATEX_AUXFILE:
-	    PSLATEX_useAuxFile = TRUE;
-	    c_token++;
-	    break;
-	case PSLATEX_OTHER:
-	default:
-	    /* We have font size specified */
-	    /* Copied from latex.trm */
-	    PSLATEX_fontsize = (int) real(const_express(&a));
-	    term->v_char = (unsigned int) (PSLATEX_fontsize * DOTS_PER_INCH / 60);
-	    term->h_char = (unsigned int) (PSLATEX_fontsize * DOTS_PER_INCH / 120);
-	    break;
+    switch (ps_params->terminal) {
+    case PSTERM_EPSLATEX:
+	PS_reset();
+	if (gpoutfile) {
+	    fputs("\
+\\end{picture}%%\n\
+\\endgroup\n", gpoutfile);
+	    if (ps_params->epslatex_standalone)
+		fputs("\\end{document}\n", gpoutfile);
 	}
+	break;
+    case PSTERM_PSLATEX:
+	fputs("\
+\\end{picture}%\n\
+\\endgroup\n\
+\\endinput\n", gpoutfile);
+	break;
+    case PSTERM_PSTEX:
+	fputs("\
+\\endGNUPLOTpicture\n\
+\\endgroup\n\
+\\endinput\n", gpoutfile);
+	break;
     }
 
-    /* be sure to generate an options string that PSLATEX_init understands */
-
-    sprintf(term_options, "%s %s %s%s",
-	    ps_params->color ? "color" : "monochrome",
-	    ps_params->solid ? "solid" : "dashed",
-	    PSLATEX_rotate ? "rotate" : "norotate",
-	    PSLATEX_useAuxFile ? " auxfile" : "");
-    if (PSLATEX_fontsize) {
-      char fs[8] = "";
-      sprintf(fs," %d", PSLATEX_fontsize);
-      strcat(term_options, fs);
+    if (pslatex_auxname) {
+	free(pslatex_auxname);
+	pslatex_auxname = NULL;
+    }
+    if (gppsfile && (gppsfile != gpoutfile)) {
+	fclose(gppsfile);
+	gppsfile = NULL;
     }
 }
 
+
+/* Functions for ps(la)tex */
+
 TERM_PUBLIC void
-PSLATEX_init()
+PSTEX_reopen_output()
 {
-    char *dotIndex;
+    if (outstr) {
+	char *dotIndex;
 
-    if (strcmp(term->name, "pstex") == 0)
-	PSLATEX_output = FALSE;
+	/* if there's no extension, append ".ps" */
+	if ((dotIndex = strrchr(outstr, '.')) == NULL)
+	    dotIndex = strchr(outstr, NUL);
 
-    /* until we know otherwise */
-    /* this looks pretty fishy; what if the file _is_ open?? lh */
-    PSLATEX_auxfile = NULL;
-
-    /* Review this; lh */
-    /* dont tweak PSLATEX_useAuxFile if we decide we cannot comply
-     * since this affects subsequent plots even after a set out
-     * Instead, we will use PSLATEX_auxfile != NULL to indicate
-     * use of an aux file
-     */
-
-    /* if there's no extension, append ".ps" */
-    if (outstr && ((dotIndex = strrchr(outstr, '.')) == NULL))
-	dotIndex = strchr(outstr, NUL);
-
-    /* try to open the auxiliary file for the postscript parts. */
-    if (outstr && PSLATEX_useAuxFile == TRUE) {
-	/* length of outstr plus ('.' or '\0') plus "ps" plus '\0' */
-	PSLATEX_auxname = gp_realloc (PSLATEX_auxname,(dotIndex - outstr) + 4,
-				      "pslatex aux filename");
-	if (PSLATEX_auxname) {
-	    /* include period or '\0' */
-	    strncpy(PSLATEX_auxname, outstr, (dotIndex - outstr) + 1);
-	    /* period or '\0' is overwritten with period, and "ps" appended */
-	    strcpy(PSLATEX_auxname + (dotIndex - outstr), ".ps");
-
-	    PSLATEX_auxfile = fopen(PSLATEX_auxname, "w");
-	    if (PSLATEX_auxfile  == (FILE *) NULL) {
-		fprintf(stderr, "Cannot open aux file %s for output\n",
-			PSLATEX_auxname);
-		/* And what? Error handling????? */
+	/* try to open the auxiliary file for the postscript parts. */
+	if (ps_params->useauxfile) {
+	    /* length of outstr plus ('.' or '\0') plus "eps" plus '\0' */
+	    pslatex_auxname = gp_realloc(pslatex_auxname,dotIndex - outstr + 5,
+					  "pslatex aux filename");
+	    if (pslatex_auxname) {
+		/* include period or '\0' */
+		strncpy(pslatex_auxname, outstr, (dotIndex - outstr) + 1);
+		/* period or '\0' is overwritten with period, and "ps" appended */
+		strcpy(pslatex_auxname + (dotIndex - outstr), ".ps");
+		gppsfile = fopen(pslatex_auxname, "w");
+		if (gppsfile  == (FILE *) NULL) {
+		    fprintf(stderr, "Cannot open aux file %s for output. Switching off auxfile option.\n",
+			    pslatex_auxname);
+		    free(pslatex_auxname);
+		    pslatex_auxname = NULL;
+		    ps_params->useauxfile = FALSE;
+		    gppsfile = gpoutfile;
+		}
+	    } else {
+		fprintf(stderr, "Cannot make PostScript file name from %s\n",
+			outstr);
+		fprintf(stderr, "Turning off auxfile option\n");
+		ps_params->useauxfile = FALSE;
+		gppsfile = gpoutfile;
 	    }
-
-	} else {
-	    fprintf(stderr, "\
-Cannot make PostScript file name from %s\n\
-Turning off auxfile option\n", outstr);
-	    /* in the light of the comment above, is this correct? lh */
-	    PSLATEX_auxfile = NULL;
-	}
-    }
-    if (PSLATEX_output) {
-	fputs("\
-% GNUPLOT: LaTeX picture with Postscript\n\
-\\begingroup%\n\
-  \\makeatletter%\n\
-  \\newcommand{\\GNUPLOTspecial}{%\n\
-    \\@sanitize\\catcode`\\%=14\\relax\\special}%\n\
-  \\setlength{\\unitlength}{0.1bp}%\n", gpoutfile);
+	} else
+	    gppsfile = gpoutfile;
     } else {
+	if (ps_params->useauxfile) {
+	    fprintf(stderr, "Cannot use aux file on stdout. Switching off auxfile option.\n");
+	    ps_params->useauxfile = FALSE;
+	}
+	gppsfile = gpoutfile;
+    }
+}
+
+
+TERM_PUBLIC void
+PSTEX_common_init()
+{
+    switch (ps_params->terminal) {
+    case PSTERM_PSLATEX:
+	fprintf(gpoutfile,"\
+%% GNUPLOT: LaTeX picture with Postscript\n\
+\\begingroup%%\n\
+\\makeatletter%%\n\
+\\newcommand{\\GNUPLOTspecial}{%%\n\
+  \\@sanitize\\catcode`\\%%=14\\relax\\special}%%\n\
+\\setlength{\\unitlength}{%.4fbp}%%\n", 1.0 / (2*PS_SC));
+	fprintf(gpoutfile, "\\begin{picture}(%d,%d)(0,0)%%\n",
+		(int) (xsize * term->xmax), (int) (ysize * term->ymax));
+	break;
+    case PSTERM_PSTEX:
 	/* write plain TeX header */
-	fputs("\
-% GNUPLOT: plain TeX with Postscript\n\
+	fprintf(gpoutfile, "\
+%% GNUPLOT: plain TeX with Postscript\n\
 \\begingroup\n\
-  \\catcode`\\@=11\\relax\n\
-  \\def\\GNUPLOTspecial{%\n\
-    \\def\\do##1{\\catcode`##1=12\\relax}\\dospecials\n\
-    \\catcode`\\{=1\\catcode`\\}=2\\catcode\\%=14\\relax\\special}%\n\
-%\n\
+\\catcode`\\@=11\\relax\n\
+\\def\\GNUPLOTspecial{%%\n\
+  \\def\\do##1{\\catcode`##1=12\\relax}\\dospecials\n\
+  \\catcode`\\{=1\\catcode`\\}=2\\catcode\\%%=14\\relax\\special}%%\n\
+%%\n\
 \\expandafter\\ifx\\csname GNUPLOTpicture\\endcsname\\relax\n\
   \\csname newdimen\\endcsname\\GNUPLOTunit\n\
   \\gdef\\GNUPLOTpicture(#1,#2){\\vbox to#2\\GNUPLOTunit\\bgroup\n\
     \\def\\put(##1,##2)##3{\\unskip\\raise##2\\GNUPLOTunit\n\
-      \\hbox to0pt{\\kern##1\\GNUPLOTunit ##3\\hss}\\ignorespaces}%\n\
-    \\def\\ljust##1{\\vbox to0pt{\\vss\\hbox to0pt{##1\\hss}\\vss}}%\n\
-    \\def\\cjust##1{\\vbox to0pt{\\vss\\hbox to0pt{\\hss ##1\\hss}\\vss}}%\n\
-    \\def\\rjust##1{\\vbox to0pt{\\vss\\hbox to0pt{\\hss ##1}\\vss}}%\n\
-    \\def\\stack##1{\\let\\\\=\\cr\\tabskip=0pt\\halign{\\hfil ####\\hfil\\cr ##1\\crcr}}%\n\
-    \\def\\lstack##1{\\hbox to0pt{\\vbox to0pt{\\vss\\stack{##1}}\\hss}}%\n\
-    \\def\\cstack##1{\\hbox to0pt{\\hss\\vbox to0pt{\\vss\\stack{##1}}\\hss}}%\n\
-    \\def\\rstack##1{\\hbox to0pt{\\vbox to0pt{\\stack{##1}\\vss}\\hss}}%\n\
-    \\vss\\hbox to#1\\GNUPLOTunit\\bgroup\\ignorespaces}%\n\
-  \\gdef\\endGNUPLOTpicture{\\hss\\egroup\\egroup}%\n\
+      \\hbox to0pt{\\kern##1\\GNUPLOTunit ##3\\hss}\\ignorespaces}%%\n\
+    \\def\\ljust##1{\\vbox to0pt{\\vss\\hbox to0pt{##1\\hss}\\vss}}%%\n\
+    \\def\\cjust##1{\\vbox to0pt{\\vss\\hbox to0pt{\\hss ##1\\hss}\\vss}}%%\n\
+    \\def\\rjust##1{\\vbox to0pt{\\vss\\hbox to0pt{\\hss ##1}\\vss}}%%\n\
+    \\def\\stack##1{\\let\\\\=\\cr\\tabskip=0pt\\halign{\\hfil ####\\hfil\\cr ##1\\crcr}}%%\n\
+    \\def\\lstack##1{\\hbox to0pt{\\vbox to0pt{\\vss\\stack{##1}}\\hss}}%%\n\
+    \\def\\cstack##1{\\hbox to0pt{\\hss\\vbox to0pt{\\vss\\stack{##1}}\\hss}}%%\n\
+    \\def\\rstack##1{\\hbox to0pt{\\vbox to0pt{\\stack{##1}\\vss}\\hss}}%%\n\
+    \\vss\\hbox to#1\\GNUPLOTunit\\bgroup\\ignorespaces}%%\n\
+  \\gdef\\endGNUPLOTpicture{\\hss\\egroup\\egroup}%%\n\
 \\fi\n\
-\\GNUPLOTunit=0.1bp\n", gpoutfile);
+\\GNUPLOTunit=%.4fbp\n", 1.0 / (2*PS_SC));
+	fprintf(gpoutfile, "\\GNUPLOTpicture(%d,%d)\n",
+		(int) (xsize * term->xmax), (int) (ysize * term->ymax));
+	break;
     }
 
-    /* to optimize output for postscript terminals family */
-    gppsfile = (PSLATEX_auxfile == NULL) ? gpoutfile : PSLATEX_auxfile;
-
-    PSLATEX_angle = 0;
-    PSLATEX_justify = 0;
-    PSLATEX_labels = 0;
-}
-
-TERM_PUBLIC void
-PSLATEX_graphics()
-{
-    struct termentry *t = term;
-    unsigned int xmin_t = xoffset * PSLATEX_XMAX / PS_SC;
-    unsigned int xmax_t = (xoffset + xsize) * PSLATEX_XMAX / PS_SC;
-    unsigned int ymin_t = yoffset * PSLATEX_YMAX / PS_SC;
-    unsigned int ymax_t = (yoffset + ysize) * PSLATEX_YMAX / PS_SC;
-
-    if (PSLATEX_output)
-	fprintf(gpoutfile, "\\begin{picture}(%d,%d)(0,0)%%\n",
-		(int) (xsize * t->xmax), (int) (ysize * t->ymax));
-    else
-	fprintf(gpoutfile, "\\GNUPLOTpicture(%d,%d)\n",
-		(int) (xsize * t->xmax), (int) (ysize * t->ymax));
-
-    if (PSLATEX_auxfile) {
+    if (gppsfile != gpoutfile) {
 	FILE *tmp;
 	/* these are taken from the post.trm file computation
 	 * of the bounding box, but without the X_OFF and Y_OFF */
-	int urx = (int) (xsize * (PSLATEX_XMAX) / PS_SC + 0.5);
-	int ury = (int) (ysize * (PSLATEX_YMAX) / PS_SC + 0.5);
+	int urx = (int) (xsize * term->xmax / (2*PS_SC) + 0.5);
+	int ury = (int) (ysize * term->ymax / (2*PS_SC) + 0.5);
 	/* moved this code here from beginning of the function
-	 * PSLATEX_auxname is only != NULL with the `auxfile' option */
-	char *psfile_basename = strrchr(PSLATEX_auxname, DIRSEP1);
+	 * pslatex_auxname is only != NULL with the `auxfile' option */
+	char *psfile_basename = strrchr(pslatex_auxname, DIRSEP1);
 
-	/* If PSLATEX_auxname is not a simple file name, but a path,
+	/* If pslatex_auxname is not a simple file name, but a path,
 	 * we need to strip the path off the auxiliary file name,
 	 * because tex file and ps aux file end up in the same directory! */
 	if (psfile_basename)
 	    psfile_basename++;
 	else {
 	    if (DIRSEP2 != NUL) {
-		psfile_basename = strrchr(PSLATEX_auxname, DIRSEP2);
+		psfile_basename = strrchr(pslatex_auxname, DIRSEP2);
 		if (psfile_basename)
 		    psfile_basename++;
 		else
-		    psfile_basename = PSLATEX_auxname;
+		    psfile_basename = pslatex_auxname;
 	    } else
-		psfile_basename = PSLATEX_auxname;
+		psfile_basename = pslatex_auxname;
 	}
 
 	/* generate special which xdvi and dvips can handle */
 	fprintf(gpoutfile,
-		"\\special{psfile=%s llx=0 lly=0 urx=%d ury=%d rwi=%d}\n",
+		"  \\special{psfile=%s llx=0 lly=0 urx=%d ury=%d rwi=%d}\n",
 		psfile_basename, urx, ury, 10 * urx);
-	tmp = gpoutfile;
-	gpoutfile = PSLATEX_auxfile;
-	PS_common_init(FALSE, 0, 0, xmin_t, ymin_t, xmax_t, ymax_t, NULL);
-	PS_graphics();
-	gpoutfile = tmp;
-    } else {
-	fputs("{\\GNUPLOTspecial{\"\n", gpoutfile);
-	PS_common_init(FALSE, 0, 0, xmin_t, ymin_t, xmax_t, ymax_t, NULL);
-	PS_graphics();
-    }
+    } else
+	fputs("  {\\GNUPLOTspecial{\"\n", gpoutfile);
 
-    PSLATEX_labels = (struct text_command *) NULL;
+    /* HH: really necessary?
+    ps_ang = 0;
+    ps_justify = 0;
+    */
+    pstex_labels = (struct pstex_text_command *) NULL;
 }
 
+
 TERM_PUBLIC void
-PSLATEX_put_text(unsigned int x, unsigned int y, const char str[])
+PSTEX_put_text(unsigned int x, unsigned int y, const char *str)
 {
-    struct text_command *tc;
+    struct pstex_text_command *tc;
 
     /* ignore empty strings */
     if (str[0] == NUL)
 	return;
 
-    tc = (struct text_command *) gp_alloc(sizeof(struct text_command),
-					  term->name);
+    /* Save the text for later printing after the core graphics */
+    tc = (struct pstex_text_command *) gp_alloc(sizeof(struct pstex_text_command),
+						term->name);
     tc->x = x;
     tc->y = y;
     tc->label = (char *) gp_alloc(strlen(str) + 1, term->name);
     strcpy(tc->label, str);
-    tc->justify = PSLATEX_justify;
-    tc->angle = PSLATEX_angle;
+    tc->justify = ps_justify;
+    tc->angle = ps_ang;
 
-    tc->next = PSLATEX_labels;
-    PSLATEX_labels = tc;
-}
-
-TERM_PUBLIC int
-PSLATEX_justify_text(enum JUSTIFY mode)
-{
-    PSLATEX_justify = mode;
-    return TRUE;
-}
-
-TERM_PUBLIC int
-PSLATEX_text_angle(int ang)
-{
-    /* rotated text is put in a short stack, and optionally uses
-     * postscript specials depending on PSLATEX_rotate */
-    PSLATEX_angle = ang;
-    return TRUE;
-}
-
-
-TERM_PUBLIC void
-PSLATEX_reset()
-{
-    if (PSLATEX_auxfile) {
-	fclose(PSLATEX_auxfile);
-	PSLATEX_auxfile = NULL;
-    }
-    if (PSLATEX_auxname) {
-	free(PSLATEX_auxname);
-	PSLATEX_auxname = NULL;
-    }
+    tc->next = pstex_labels;
+    pstex_labels = tc;
 }
 
 TERM_PUBLIC void
-PSLATEX_text()
+PSTEX_text()
 {
-    struct text_command *tc;
+    struct pstex_text_command *tc;
 
-    if (PSLATEX_auxfile) {
-	FILE *tmp = gpoutfile;
-	gpoutfile = PSLATEX_auxfile;
-	PS_text();
-	gpoutfile = tmp;
-    } else {
-	PS_text();
-	fputs("}}%\n", gpoutfile);
+    PS_text();
+    if (gppsfile == gpoutfile)
+	fputs("  }}%\n", gpoutfile);
+
+    if (ps_params->fontsize) {
+	if (ps_params->terminal == PSTERM_PSLATEX)
+	    fprintf(gpoutfile, "\\fontsize{%d}{\\baselineskip}\\selectfont\n",
+		    ps_params->fontsize);
+	/* Should have an else clause here to handle pstex equivalent */
     }
 
-    if (PSLATEX_fontsize) {
-      if (PSLATEX_output)
-	fprintf(gpoutfile, "\\fontsize{%d}{\\baselineskip}\\selectfont\n",
-		PSLATEX_fontsize);
-      /* Should have an else clause here to handle pstex equivalent */
-    }
-
-    for (tc = PSLATEX_labels; tc != (struct text_command *) NULL; tc = tc->next) {
-	fprintf(gpoutfile, "\\put(%d,%d){", tc->x, tc->y);
-	if (PSLATEX_output &&
+    for (tc = pstex_labels;
+	 tc != (struct pstex_text_command *) NULL;
+	 tc = tc->next) {
+	fprintf(gpoutfile, "  \\put(%d,%d){", tc->x, tc->y);
+	if ((ps_params->rotate) && (tc->angle != 0))
+	    fprintf(gpoutfile, "\
+%%\n  \\special{ps: gsave currentpoint currentpoint translate\n\
+%d rotate neg exch neg exch translate}%%\n  ", 360 - tc->angle);
+	if ((ps_params->terminal == PSTERM_PSLATEX) &&
 	    ((tc->label[0] == '{') || (tc->label[0] == '['))) {
 	    fprintf(gpoutfile, "\\makebox(0,0)%s", tc->label);
 	} else
-	    switch (tc->angle) {
-	    case 0:
-		switch (tc->justify) {
-		case LEFT:
-		    fprintf(gpoutfile, (PSLATEX_output
-					? "\\makebox(0,0)[l]{%s}"
-					: "\\ljust{%s}"), tc->label);
-		    break;
-		case CENTRE:
-		    fprintf(gpoutfile, (PSLATEX_output
-					? "\\makebox(0,0){%s}"
-					: "\\cjust{%s}"), tc->label);
-		    break;
-		case RIGHT:
-		    fprintf(gpoutfile, (PSLATEX_output
-					? "\\makebox(0,0)[r]{%s}"
-					: "\\rjust{%s}"), tc->label);
-		    break;
-		}
+	    switch (tc->justify) {
+	    case LEFT:
+		fprintf(gpoutfile, (ps_params->terminal == PSTERM_PSLATEX
+				    ? "\\makebox(0,0)[l]{\\strut{}%s}"
+				    : "\\ljust{\\strut{}%s}"), tc->label);
 		break;
-
-	    default:
-	    case TEXT_VERTICAL:		/* put text in a short stack */
-		if (PSLATEX_rotate) {
-		    fprintf(gpoutfile, "\
-%%\n\\special{ps: gsave currentpoint currentpoint translate\n\
-%d rotate neg exch neg exch translate}%%\n", 360 - tc->angle);
-		}
-		switch (tc->justify) {
-		case LEFT:
-		    fprintf(gpoutfile, (PSLATEX_output
-					? "\\makebox(0,0)[lb]{\\shortstack{%s}}"
-					: "\\lstack{%s}"),
-			    tc->label);
-		    break;
-		case CENTRE:
-		    fprintf(gpoutfile, (PSLATEX_output
-					? "\\makebox(0,0)[b]{\\shortstack{%s}}"
-					: "\\cstack{%s}"),
-			    tc->label);
-		    break;
-		case RIGHT:
-		    fprintf(gpoutfile, (PSLATEX_output
-					? "\\makebox(0,0)[lt]{\\shortstack{%s}}"
-					: "\\rstack{%s}"),
-			    tc->label);
-		    break;
-		}
-		if (PSLATEX_rotate) {
-		    fputs("%\n\\special{ps: currentpoint grestore moveto}%\n", gpoutfile);
-		}
+	    case CENTRE:
+		fprintf(gpoutfile, (ps_params->terminal == PSTERM_PSLATEX
+				    ? "\\makebox(0,0){\\strut{}%s}"
+				    : "\\cjust{\\strut{}%s}"), tc->label);
+		break;
+	    case RIGHT:
+		fprintf(gpoutfile, (ps_params->terminal == PSTERM_PSLATEX
+				    ? "\\makebox(0,0)[r]{\\strut{}%s}"
+				    : "\\rjust{\\strut{}%s}"), tc->label);
+		break;
 	    }
+	if ((ps_params->rotate) && (tc->angle != 0))
+	    fputs("%\n  \\special{ps: currentpoint grestore moveto}%\n  ",
+		  gpoutfile);
 	fputs("}%\n", gpoutfile);
     }
 
-    while (PSLATEX_labels) {
-	tc = PSLATEX_labels->next;
-	free(PSLATEX_labels->label);
-	free(PSLATEX_labels);
-	PSLATEX_labels = tc;
+    while (pstex_labels) {
+	tc = pstex_labels->next;
+	free(pstex_labels->label);
+	free(pstex_labels);
+	pstex_labels = tc;
     }
 
-    if (PSLATEX_output) {
-	fputs("\
-\\end{picture}%\n\
-\\endgroup\n\
-\\endinput\n", gpoutfile);
-    } else {
-	fputs("\
-\\endGNUPLOTpicture\n\
-\\endgroup\n\
-\\endinput\n", gpoutfile);
+}
+
+
+/* Functions for epslatex */
+
+/* the common init function for the epslatex driver */
+TERM_PUBLIC void
+EPSLATEX_common_init()
+{
+    char *fontfamily = NULL;
+    char *fontseries = NULL;
+    char *fontshape = NULL;
+
+    if (!gpoutfile) {
+        char *temp = gp_alloc(strlen(outstr) + 1, "temp file string");
+        if (temp) {
+            strcpy(temp, outstr);
+	    term_set_output(temp);  /* will free outstr */
+            if (temp != outstr) {
+                if (temp)
+                    free(temp);
+                temp = outstr;
+            }
+        } else
+	    os_error(c_token, "Cannot reopen output files");
+    }
+    if (!outstr)
+        os_error(c_token,
+                 "epslatex terminal cannot write to standard output");
+    if (gpoutfile) {
+        char *inputenc = NULL;
+
+        fprintf(gpoutfile, "%% GNUPLOT: LaTeX picture with Postscript\n");
+
+        switch(encoding) {
+        case S_ENC_ISO8859_1:
+            inputenc = "\\usepackage[latin1]{inputenc}";
+            break;
+        case S_ENC_ISO8859_2:
+            inputenc = "\\usepackage[latin2]{inputenc}";
+            break;
+        case S_ENC_ISO8859_15:
+            inputenc = "\\usepackage[latin9]{inputenc}";
+            break;
+        case S_ENC_CP437:
+            inputenc = "\\usepackage[cp437de]{inputenc}";
+            break;
+        case S_ENC_CP850 :
+            inputenc = "\\usepackage[cp850]{inputenc}";
+            break;
+        case S_ENC_CP852 :
+            inputenc = "\\usepackage[cp852]{inputenc}";
+            break;
+        case S_ENC_KOI8_R :
+            inputenc = "\\usepackage[koi8-r]{inputenc}";
+            break;
+        case S_ENC_CP1250 :
+            inputenc = "\\usepackage[cp1250]{inputenc}";
+            break;
+        default:
+	    /* do nothing */
+            break;
+	}
+
+	/* Analyse LaTeX font name 'family,series,shape' */
+	if ((strlen(ps_params->font) > 0) &&
+	    (strcmp(ps_params->font,"default") != 0)) {
+	    char *comma = NULL;
+	    fontfamily = gp_alloc(strlen(ps_params->font)+1,
+				  "EPSLATEX_common_init");
+	    fontseries = gp_alloc(strlen(ps_params->font)+1,
+				  "EPSLATEX_common_init");
+	    fontshape = gp_alloc(strlen(ps_params->font)+1,
+				 "EPSLATEX_common_init");
+	    strcpy(fontfamily,ps_params->font);
+	    *fontseries = '\0';
+	    *fontshape = '\0';
+	    if ((comma = strchr(fontfamily, ',')) != NULL) {
+		*comma = '\0';
+		strcpy(fontseries,comma+1);
+		if ((comma = strchr(fontseries, ',')) != NULL) {
+		    *comma = '\0';
+		    strcpy(fontshape,comma+1);
+		}
+	    }
+	}
+	    
+        if (ps_params->epslatex_standalone) {
+            fprintf(gpoutfile, "\
+\\documentclass{minimal}\n\
+%% Set font size\n\
+\\makeatletter\n\
+\\def\\@ptsize{%d}\n\
+\\InputIfFileExists{size%d.clo}{}{%%\n\
+   \\GenericError{(gnuplot) \\space\\space\\space\\@spaces}{%%\n\
+      Gnuplot Error: File `size%d.clo' not found! Could not set font size%%\n\
+   }{See the gnuplot documentation for explanation.%%\n\
+   }{For using a font size a file `size<fontsize>.clo' has to exist.\n\
+        Falling back ^^Jto default fontsize 10pt.}%%\n\
+  \\def\\@ptsize{0}\n\
+  \\input{size10.clo}%%\n\
+}%%\n\
+\\makeatother\n",
+                    ps_params->fontsize-10,
+                    ps_params->fontsize,
+                    ps_params->fontsize);
+
+	    if (fontfamily && strlen(fontfamily) > 0)
+		fprintf(gpoutfile, "\\renewcommand*\\rmdefault{%s}%%\n",
+			fontfamily);
+	    if (fontseries && strlen(fontseries) > 0)
+		fprintf(gpoutfile, "\\renewcommand*\\mddefault{%s}%%\n",
+			fontseries);
+	    if (fontshape && strlen(fontshape) > 0)
+		fprintf(gpoutfile, "\\renewcommand*\\updefault{%s}%%\n",
+			fontshape);
+
+            fprintf(gpoutfile, "\
+%% Load packages\n\
+\\usepackage{graphicx}\n\
+\\usepackage{color}\n\
+%s\n\
+\\makeatletter\n\
+%% Select an appropriate default driver (from TeXLive graphics.cfg)\n\
+\\begingroup\n\
+  \\chardef\\x=0 %%\n\
+  %% check pdfTeX\n\
+  \\@ifundefined{pdfoutput}{}{%%\n\
+    \\ifcase\\pdfoutput\n\
+    \\else\n\
+      \\chardef\\x=1 %%\n\
+    \\fi\n\
+  }%%\n\
+  %% check VTeX\n\
+  \\@ifundefined{OpMode}{}{%%\n\
+    \\chardef\\x=2 %%\n\
+  }%%\n\
+\\expandafter\\endgroup\n\
+\\ifcase\\x\n\
+  %% default case\n\
+  \\PassOptionsToPackage{dvips}{geometry}\n\
+\\or\n\
+  %% pdfTeX is running in pdf mode\n\
+  \\PassOptionsToPackage{pdftex}{geometry}\n\
+\\else\n\
+  %% VTeX is running\n\
+  \\PassOptionsToPackage{vtex}{geometry}\n\
+\\fi\n\
+\\makeatother\n\
+%% Set papersize\n\
+\\usepackage[papersize={%.2fbp,%.2fbp},text={%.2fbp,%.2fbp}]{geometry}\n\
+%% No page numbers and no paragraph indentation\n\
+\\pagestyle{empty}\n\
+\\setlength{\\parindent}{0bp}%%\n\
+%% Load configuration file\n\
+\\InputIfFileExists{gnuplot.cfg}{%%\n\
+  \\typeout{Using configuration file gnuplot.cfg}%%\n\
+}{%%\n\
+ \\typeout{No configuration file gnuplot.cfg found.}%%\n\
+}\n\
+%s\n\
+\\begin{document}\n",
+                    inputenc!=NULL? inputenc : "%%",
+                    term->xmax * xsize / (2.0*PS_SC),
+                    term->ymax * ysize / (2.0*PS_SC),
+                    term->xmax * xsize / (2.0*PS_SC),
+                    term->ymax * ysize / (2.0*PS_SC),
+		    epslatex_header ? epslatex_header : "%" );
+        }
+
+        fprintf(gpoutfile, "\
+%% Encoding inside the plot:\n\
+%% %s\n\
+\\begingroup\n",
+                inputenc!=NULL? inputenc : "(none)");
+	
+        if (!ps_params->epslatex_standalone) {
+	    if (fontfamily && strlen(fontfamily) > 0)
+		fprintf(gpoutfile, "  \\fontfamily{%s}%%\n",
+			fontfamily);
+	    if (fontseries && strlen(fontseries) > 0)
+		fprintf(gpoutfile, "  \\fontseries{%s}%%\n",
+			fontseries);
+	    if (fontshape && strlen(fontshape) > 0)
+		fprintf(gpoutfile, "  \\fontshape{%s}%%\n",
+			fontshape);
+	    if (fontfamily || fontseries || fontshape)
+		fputs("  \\selectfont\n", gpoutfile);
+	    if (epslatex_header)
+		fprintf(gpoutfile, "%s\n", epslatex_header );
+	}
+
+        fprintf(gpoutfile, "\
+  \\makeatletter\n\
+  \\providecommand\\color[2][]{%%\n\
+    \\GenericError{(gnuplot) \\space\\space\\space\\@spaces}{%%\n\
+      Package color not loaded in conjunction with\n\
+      terminal option `colourtext'%%\n\
+    }{See the gnuplot documentation for explanation.%%\n\
+    }{Either use 'blacktext' in gnuplot or load the package\n\
+      color.sty in LaTeX.}%%\n\
+    \\renewcommand\\color[2][]{}%%\n\
+  }%%\n\
+  \\@ifundefined{ifGPcolor}{%%\n\
+    \\newif\\ifGPcolor\n\
+    \\GPcolor%s\n\
+  }{}%%\n\
+  \\@ifundefined{ifGPblacktext}{%%\n\
+    \\newif\\ifGPblacktext\n\
+    \\GPblacktext%s\n\
+  }{}%%\n\
+  \\makeatother\n",
+                (ps_params->color?"true":"false"),
+                (ps_params->blacktext?"true":"false") );
+
+	if (ps_params->oldstyle)
+	    fprintf(gpoutfile, "\
+  \\ifGPcolor\n\
+    \\ifGPblacktext\n\
+    \\else\n\
+      \\expandafter\\def\\csname LTw\\endcsname{\\color{white}}%%\n\
+      \\expandafter\\def\\csname LTb\\endcsname{\\color{black}}%%\n\
+      \\expandafter\\def\\csname LTa\\endcsname{\\color{black}}%%\n\
+      \\expandafter\\def\\csname LT0\\endcsname{\\color[rgb]{1,0,0}}%%\n\
+      \\expandafter\\def\\csname LT1\\endcsname{\\color[rgb]{0,1,0}}%%\n\
+      \\expandafter\\def\\csname LT2\\endcsname{\\color[rgb]{0,0,1}}%%\n\
+      \\expandafter\\def\\csname LT3\\endcsname{\\color[rgb]{1,0,1}}%%\n\
+      \\expandafter\\def\\csname LT4\\endcsname{\\color[rgb]{0,1,1}}%%\n\
+      \\expandafter\\def\\csname LT5\\endcsname{\\color[rgb]{1,1,0}}%%\n\
+      \\expandafter\\def\\csname LT6\\endcsname{\\color[rgb]{0,0,0}}%%\n\
+      \\expandafter\\def\\csname LT7\\endcsname{\\color[rgb]{1,0.3,0}}%%\n\
+      \\expandafter\\def\\csname LT8\\endcsname{\\color[rgb]{0.5,0.5,0.5}}%%\n\
+    \\fi\n\
+  \\fi\n");
+	else
+	    fprintf(gpoutfile, "\
+  \\ifGPcolor\n\
+    \\ifGPblacktext\n\
+    \\else\n\
+      \\expandafter\\def\\csname LTw\\endcsname{\\color{white}}%%\n\
+      \\expandafter\\def\\csname LTb\\endcsname{\\color{black}}%%\n\
+      \\expandafter\\def\\csname LTa\\endcsname{\\color{black}}%%\n\
+      \\expandafter\\def\\csname LT0\\endcsname{\\color[rgb]{1,0,0}}%%\n\
+      \\expandafter\\def\\csname LT1\\endcsname{\\color[rgb]{0,0,1}}%%\n\
+      \\expandafter\\def\\csname LT2\\endcsname{\\color[rgb]{0,1,1}}%%\n\
+      \\expandafter\\def\\csname LT3\\endcsname{\\color[rgb]{1,0,1}}%%\n\
+    \\fi\n\
+  \\fi\n");
+
+        fprintf(gpoutfile,"\
+  \\setlength{\\unitlength}{%.4fbp}%%\n\
+  \\begin{picture}(%.2f,%.2f)%%\n",
+                1.0 / (2*PS_SC), term->xmax * xsize, term->ymax * ysize);
+    }
+
+    if (fontfamily)
+	free(fontfamily);
+    if (fontseries)
+	free(fontseries);
+    if (fontshape)
+	free(fontshape);
+}
+
+
+TERM_PUBLIC void
+EPSLATEX_put_text(unsigned int x, unsigned int y, const char *str)
+{
+    if (gpoutfile) {
+	fprintf(gpoutfile, "    \\put(%d,%d){", x, y);
+	if (ps_ang)
+	    fprintf(gpoutfile,"\\rotatebox{%d}{", ps_ang);
+	if (((str[0] == '{') || (str[0] == '['))) {
+	    fprintf(gpoutfile, "\\makebox(0,0)%s", str);
+	} else
+	    switch (ps_justify) {
+	    case LEFT:
+		fprintf(gpoutfile, "\\makebox(0,0)[l]{\\strut{}%s}", str);
+		break;
+	    case CENTRE:
+		fprintf(gpoutfile, "\\makebox(0,0){\\strut{}%s}", str);
+		break;
+	    case RIGHT:
+		fprintf(gpoutfile, "\\makebox(0,0)[r]{\\strut{}%s}", str);
+		break;
+	    }
+	if (ps_ang) {
+	    fputs("}", gpoutfile);
+	}
+	fputs("}%\n", gpoutfile);
     }
 }
 
-TERM_PUBLIC void
-PSLATEX_move(unsigned int x, unsigned int y)
+
+/* assigns dest to outstr, so it must be allocated or NULL
+ * and it must not be outstr itself !
+ */
+void
+EPSLATEX_reopen_output()
 {
-    if (PSLATEX_auxfile) {
-	FILE *tmp = gpoutfile;
-	gpoutfile = PSLATEX_auxfile;
-	PS_move(x, y);
-	gpoutfile = tmp;
-    } else {
-	PS_move(x, y);
+    char *psoutstr = NULL;
+
+    if (outstr) {
+	unsigned int outstrlen = strlen(outstr);
+	if (strrchr(outstr, '.') != &outstr[outstrlen-4] ) {
+	    int_error(NO_CARET,
+		      "epslatex outputfile may not have dots inside %s",
+		      "their filenames before the extension .tex or .eps");
+	}
+
+	/* copy filename to postsript output */
+	psoutstr = gp_alloc(outstrlen+5, "epslatex eps filename");
+	strcpy( psoutstr, outstr);
+
+	if ((!strncmp( &outstr[outstrlen-4], ".eps", 4 )) ||
+	    (!strncmp( &outstr[outstrlen-4], ".EPS", 4 ))) {
+	    if (ps_params->epslatex_standalone)
+		int_error(NO_CARET,
+			  "For epslatex standalone mode, you have to %s",
+			  "give the tex filename as output");
+	    /* rename primary output (tex) */
+	    strncpy( &outstr[outstrlen-4], ".tex", 4);
+	    /* redirect FILE stream */
+	    gppsfile = gpoutfile;
+	    gpoutfile = fopen(outstr,"w");
+	    int_warn(NO_CARET, "Resetting primary output file to %s,\n\
+                  PostScript output to %s", outstr, psoutstr);
+	    if (!gpoutfile)
+		int_error(NO_CARET, "--- reopen failed");
+	} else {
+	    if (ps_params->epslatex_standalone)
+		strncpy( &psoutstr[outstrlen-4], "-inc.eps", 9);
+	    else
+		strncpy( &psoutstr[outstrlen-4], ".eps", 4);
+	    gppsfile = fopen(psoutstr,"w");
+	}
+	if (!gppsfile)
+	    int_error(NO_CARET, "open of postscipt output file %s failed",
+		      psoutstr);
+
+	/* set the name for the \includegraphics command */
+	pslatex_auxname = gp_alloc(strlen(psoutstr)-3,
+				   "epslatex TeX filename");
+	strncpy( pslatex_auxname, psoutstr, strlen(psoutstr)-4 );
+	pslatex_auxname[strlen(psoutstr)-4] = '\0';
+
+	free(psoutstr);
     }
 }
 
 
 TERM_PUBLIC void
-PSLATEX_vector(unsigned int x, unsigned int y)
+EPSLATEX_linetype(int linetype)
 {
+    PS_linetype(linetype);
 
-    if (PSLATEX_auxfile) {
-	FILE *tmp = gpoutfile;
-	gpoutfile = PSLATEX_auxfile;
-	PS_vector(x, y);
-	gpoutfile = tmp;
-    } else {
-	PS_vector(x, y);
+    if (gpoutfile) {
+        /* from PS_linetype, should better not be used in twice
+         * in source code */
+	if (ps_params->oldstyle)
+	    linetype = (linetype % 4) + 3;
+	else
+	    linetype = (linetype % 9) + 3;
+        if (linetype < 0)       /* LT_NODRAW, LT_BACKGROUND, LT_UNDEFINED */
+            linetype = 0;
+        fprintf(gpoutfile,"    \\csname LT%c\\endcsname\n",
+                "wba012345678"[linetype]);
     }
 }
 
 
 TERM_PUBLIC void
-PSLATEX_linetype(int lt)
+EPSLATEX_set_color(t_colorspec *colorspec)
 {
-    if (PSLATEX_auxfile) {
-	FILE *tmp = gpoutfile;
-	gpoutfile = PSLATEX_auxfile;
-	PS_linetype(lt);
-	gpoutfile = tmp;
-    } else {
-	PS_linetype(lt);
+    double gray;
+    PS_set_color(colorspec);
+
+    if (colorspec->type == TC_RGB) {
+	double r = (double)((colorspec->lt >> 16 ) & 255) / 255.;
+	double g = (double)((colorspec->lt >> 8 ) & 255) / 255.;
+	double b = (double)(colorspec->lt & 255) / 255.;
+	fprintf(gpoutfile, "    \\color[rgb]{%3.2f,%3.2f,%3.2f}%%\n",r,g,b);
+    }
+
+    if (colorspec->type != TC_FRAC)
+	return;
+
+/* map [0;1] to gray/colors */
+    gray = colorspec->value;
+    if (gray <= 0)
+	fputs("    \\color{black}%\n",gpoutfile);
+    else {
+	if (gray >= 1)
+	    fputs("    \\color{white}%\n",gpoutfile);
+	else
+	    fprintf(gpoutfile, "    \\color[gray]{%s}%%\n",save_space(gray));
     }
 }
 
-TERM_PUBLIC void
-PSLATEX_point(unsigned int x, unsigned int y, int number)
-{
-    if (PSLATEX_auxfile) {
-	FILE *tmp = gpoutfile;
-	gpoutfile = PSLATEX_auxfile;
-	PS_point(x, y, number);
-	gpoutfile = tmp;
-    } else
-	PS_point(x, y, number);
-}
-
-
-TERM_PUBLIC void
-PSLATEX_arrow(unsigned int sx, unsigned int sy,
-              unsigned int ex, unsigned int ey, int head)
-{
-    if (PSLATEX_auxfile) {
-	FILE *tmp = gpoutfile;
-	gpoutfile = PSLATEX_auxfile;
-	PS_arrow(sx, sy, ex, ey, head);
-	gpoutfile = tmp;
-    } else
-	PS_arrow(sx, sy, ex, ey, head);
-}
-
-
-TERM_PUBLIC void
-PSLATEX_pointsize(double ps)
-{
-    if (PSLATEX_auxfile) {
-	FILE *tmp = gpoutfile;
-	gpoutfile = PSLATEX_auxfile;
-	PS_pointsize(ps);
-	gpoutfile = tmp;
-    } else
-	PS_pointsize(ps);
-}
-
-
-TERM_PUBLIC void
-PSLATEX_linewidth(double ps)
-{
-    if (PSLATEX_auxfile) {
-	FILE *tmp = gpoutfile;
-	gpoutfile = PSLATEX_auxfile;
-	PS_linewidth(ps);
-	gpoutfile = tmp;
-    } else
-	PS_linewidth(ps);
-}
-
-TERM_PUBLIC void
-PSLATEX_fillbox(int style, unsigned int x1, unsigned int y1,
-                unsigned int width, unsigned int height)
-{
-    if (PSLATEX_auxfile) {
-	FILE *tmp = gpoutfile;
-	gpoutfile = PSLATEX_auxfile;
-	PS_fillbox(style, x1, y1, width, height);
-	gpoutfile = tmp;
-    } else
-	PS_fillbox(style, x1, y1, width, height);
-}
-
-
-#ifdef PM3D
-
-TERM_PUBLIC int
-PSLATEX_make_palette (t_sm_palette *palette)
-{
-    if (PSLATEX_auxfile) {
-	FILE *tmp = gpoutfile;
-	int res;
-	gpoutfile = PSLATEX_auxfile;
-	res = PS_make_palette(palette);
-	gpoutfile = tmp;
-	return res;
-    } else
-	return PS_make_palette(palette);
-}
-
-TERM_PUBLIC void
-PSLATEX_set_color (t_colorspec *colorspec)
-{
-    if (PSLATEX_auxfile) {
-	FILE *tmp = gpoutfile;
-	gpoutfile = PSLATEX_auxfile;
-	PS_set_color(colorspec);
-	gpoutfile = tmp;
-    } else
-	PS_set_color(colorspec);
-}
-
-TERM_PUBLIC void
-PSLATEX_filled_polygon(int points, gpiPoint *corners)
-{
-    if (PSLATEX_auxfile) {
-	FILE *tmp = gpoutfile;
-	gpoutfile = PSLATEX_auxfile;
-	PS_filled_polygon(points,corners);
-	gpoutfile = tmp;
-    } else
-	PS_filled_polygon(points,corners);
-}
-
-TERM_PUBLIC void
-PSLATEX_previous_palette ()
-{
-    if (PSLATEX_auxfile) {
-	FILE *tmp = gpoutfile;
-	gpoutfile = PSLATEX_auxfile;
-	PS_previous_palette();
-	gpoutfile = tmp;
-    } else
-	PS_previous_palette();
-}
-
-#endif /* PM3D */
-
-#ifdef WITH_IMAGE
-TERM_PUBLIC void PSLATEX_image (unsigned M, unsigned N, coordval *image, gpiPoint *corner, t_imagecolor color_mode)
-{
-    if (PSLATEX_auxfile) {
-	FILE *tmp = gpoutfile;
-	gpoutfile = PSLATEX_auxfile;
-	PS_image(M, N, image, corner, color_mode);
-	gpoutfile = tmp;
-    } else
-	PS_image(M, N, image, corner, color_mode);
-}
-#endif
 
 #endif /* TERM_BODY */
 
@@ -706,30 +785,53 @@ TERM_PUBLIC void PSLATEX_image (unsigned M, unsigned N, coordval *image, gpiPoin
 #define TERM_PROTO_ONLY
 #include "post.trm"
 #undef TERM_PROTO_ONLY
+#endif /* GOT_POST_PROTO */
+
+TERM_TABLE_START(epslatex_driver)
+    "epslatex", "LaTeX picture environment using graphicx package",
+    PS_XMAX, PS_YMAX, EPSLATEX_VCHAR, EPSLATEX_HCHAR,
+    PS_VTIC, PS_HTIC, PS_options, PS_init, PSLATEX_reset,
+    PS_text, null_scale, PS_graphics, PS_move,
+    PS_vector, EPSLATEX_linetype, EPSLATEX_put_text, PS_text_angle,
+    PS_justify_text, PS_point, do_arrow, PS_set_font,
+    PS_pointsize, TERM_BINARY|TERM_IS_POSTSCRIPT /*flags */,
+    0 /*suspend */, 0 /*resume */,
+    PS_fillbox, PS_linewidth,
+#ifdef USE_MOUSE
+    0, 0, 0, 0, 0, /* no mouse support for postscript */
 #endif
+#ifdef PM3D
+    PS_make_palette, PS_previous_palette,
+    EPSLATEX_set_color, PS_filled_polygon,
+#endif
+#ifdef WITH_IMAGE
+    PS_image,
+#endif
+TERM_TABLE_END(epslatex_driver)
+#undef LAST_TERM
+#define LAST_TERM epslatex_driver
 
 TERM_TABLE_START(pslatex_driver)
     "pslatex", "LaTeX picture environment with PostScript \\specials",
-    PSLATEX_XMAX, PSLATEX_YMAX, PSLATEX_VCHAR, PSLATEX_HCHAR,
-    PS_VTIC, PS_HTIC, PSLATEX_options, PSLATEX_init, PSLATEX_reset,
-    PSLATEX_text, null_scale, PSLATEX_graphics, PSLATEX_move,
-    PSLATEX_vector, PSLATEX_linetype, PSLATEX_put_text, PSLATEX_text_angle,
-    PSLATEX_justify_text, PSLATEX_point, PSLATEX_arrow, set_font_null,
-    PSLATEX_pointsize, 0 /*flags */ , 0 /*suspend */
+    PS_XMAX, PS_YMAX, PSTEX_VCHAR, PSTEX_HCHAR,
+    PS_VTIC, PS_HTIC, PS_options, PS_init, PSLATEX_reset,
+    PSTEX_text, null_scale, PS_graphics, PS_move,
+    PS_vector, PS_linetype, PSTEX_put_text, PS_text_angle,
+    PS_justify_text, PS_point, PS_arrow, set_font_null,
+    PS_pointsize, 0 /*flags */ , 0 /*suspend */
     , 0 /*resume */ ,
-    PSLATEX_fillbox ,
-    PSLATEX_linewidth
+    PS_fillbox, PS_linewidth
 #ifdef USE_MOUSE
    , 0, 0, 0, 0, 0 /* no mouse support for postscript */
 #endif
 #ifdef PM3D
-   , PSLATEX_make_palette,
-   PSLATEX_previous_palette, /* write grestore */
-   PSLATEX_set_color,
-   PSLATEX_filled_polygon
+   , PS_make_palette,
+   PS_previous_palette, /* write grestore */
+   PS_set_color,
+   PS_filled_polygon
 #endif
 #ifdef WITH_IMAGE
-    , PSLATEX_image
+    , PS_image
 #endif
 TERM_TABLE_END(pslatex_driver)
 #undef LAST_TERM
@@ -737,25 +839,25 @@ TERM_TABLE_END(pslatex_driver)
 
 TERM_TABLE_START(pstex_driver)
     "pstex", "plain TeX with PostScript \\specials",
-    PSLATEX_XMAX, PSLATEX_YMAX, PSLATEX_VCHAR, PSLATEX_HCHAR,
-    PS_VTIC, PS_HTIC, PSLATEX_options, PSLATEX_init, PSLATEX_reset,
-    PSLATEX_text, null_scale, PSLATEX_graphics, PSLATEX_move,
-    PSLATEX_vector, PSLATEX_linetype, PSLATEX_put_text, PSLATEX_text_angle,
-    PSLATEX_justify_text, PSLATEX_point, PSLATEX_arrow, set_font_null,
-    PSLATEX_pointsize, 0 /*flags */ , 0 /*suspend */
-    , 0 /*resume */ , 0 /*fillbox */ ,
-    PSLATEX_linewidth
+    PS_XMAX, PS_YMAX, PSTEX_VCHAR, PSTEX_HCHAR,
+    PS_VTIC, PS_HTIC, PS_options, PS_init, PSLATEX_reset,
+    PSTEX_text, null_scale, PS_graphics, PS_move,
+    PS_vector, PS_linetype, PSTEX_put_text, PS_text_angle,
+    PS_justify_text, PS_point, PS_arrow, set_font_null,
+    PS_pointsize, 0 /*flags */ , 0 /*suspend */
+    , 0 /*resume */ ,
+    PS_fillbox, PS_linewidth
 #ifdef USE_MOUSE
    , 0, 0, 0, 0, 0 /* no mouse support for postscript */
 #endif
 #ifdef PM3D
-   , PSLATEX_make_palette,
-   PSLATEX_previous_palette, /* write grestore */
-   PSLATEX_set_color,
-   PSLATEX_filled_polygon
+   , PS_make_palette,
+   PS_previous_palette, /* write grestore */
+   PS_set_color,
+   PS_filled_polygon
 #endif
 #ifdef WITH_IMAGE
-    , PSLATEX_image
+    , PS_image
 #endif
 TERM_TABLE_END(pstex_driver)
 #undef LAST_TERM
@@ -765,69 +867,3 @@ TERM_TABLE_END(pstex_driver)
 #endif /* TERM_PROTO_ONLY */
 
 
-#ifdef TERM_HELP
-START_HELP(pslatex)
-"1 pslatex and pstex",
-"?commands set terminal pslatex",
-"?set terminal pslatex",
-"?set term pslatex",
-"?terminal pslatex",
-"?term pslatex",
-"?pslatex",
-"?commands set terminal pstex",
-"?set terminal pstex",
-"?set term pstex",
-"?terminal pstex",
-"?term pstex",
-"?pstex",
-" The `pslatex` and `pstex` drivers generate output for further processing by",
-" LaTeX and TeX, respectively.  Figures generated by `pstex` can be included",
-" in any plain-based format (including LaTeX).",
-"",
-" Syntax:",
-"       set terminal [pslatex | pstex] {<color>} {<dashed>} {<rotate>}",
-"                                      {auxfile} {<font_size>}",
-"",
-" <color> is either `color` or `monochrome`.  <dashed> is either `dashed`",
-" or `solid`.  <rotate> is either `rotate` or `norotate` and determines",
-" if the y-axis label is rotated.  <font_size> is the size (in pts) of the",
-" desired font.",
-"",
-" If `auxfile` is specified, it directs the driver to put the PostScript",
-" commands into an auxiliary file instead of directly into the LaTeX file.",
-" This is useful if your pictures are large enough that dvips cannot handle",
-" them.  The name of the auxiliary PostScript file is derived from the name of",
-" the TeX file given on the `set output` command; it is determined by replacing",
-" the trailing `.tex` (actually just the final extent in the file name) with",
-" `.ps` in the output file name, or, if the TeX file has no extension, `.ps`",
-" is appended.  Remember to close the `output file` before leaving `gnuplot`.",
-" The `.ps` is included into the `.tex` file by a \\special{psfile=...} command.",
-" If you would rather prefer \\includegraphics{...}, then use the `epslatex`",
-" terminal.",
-"",
-" All drivers for LaTeX offer a special way of controlling text positioning: ",
-" (a) If any text string begins with '{', you also need to include a '}' at the",
-" end of the text, and the whole text will be centered both horizontally",
-" and vertically by LaTeX.  (b) If the text string begins with '[', you need",
-" to continue it with: a position specification (up to two out of t,b,l,r),",
-" ']{', the text itself, and finally, '}'. The text itself may be anything",
-" LaTeX can typeset as an LR-box. \\rule{}{}'s may help for best positioning.",
-"",
-" Examples:",
-"       set term pslatex monochrome dashed rotate       # set to defaults",
-" To write the PostScript commands into the file \"foo.ps\":",
-"       set term pslatex auxfile",
-"       set output \"foo.tex\"; plot ...; set output",
-" About label positioning:",
-" Use gnuplot defaults (mostly sensible, but sometimes not really best):",
-"        set title '\\LaTeX\\ -- $ \\gamma $'",
-" Force centering both horizontally and vertically:",
-"        set label '{\\LaTeX\\ -- $ \\gamma $}' at 0,0",
-" Specify own positioning (top here):",
-"        set xlabel '[t]{\\LaTeX\\ -- $ \\gamma $}'",
-" The other label -- account for long ticlabels:",
-"        set ylabel '[r]{\\LaTeX\\ -- $ \\gamma $\\rule{7mm}{0pt}}'",
-"",
-" Linewidths and pointsizes may be changed with `set style line`."
-END_HELP(pslatex)
-#endif /* TERM_HELP */

@@ -1,6 +1,7 @@
 News, changes and fixes since gnuplot version 4.0
 =================================================
 
+* NEW pstex, pslatex and epslatex terminals share functionality with postscript
 * NEW suboptions "set pm3d corners2color min|max"
 * NEW linetype colors via "lt {palette {frac <val> | cb <val>}}"
 * NEW linetype colors via "lt {rgbcolor {"name" | "#RRGGBB"}}"

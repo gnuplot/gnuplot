@@ -1,5 +1,5 @@
 /*
- * $Id: post.h,v 1.4 2004/04/13 17:24:36 broeker Exp $
+ * $Id: post.h,v 1.5 2005/01/11 17:37:16 mikulik Exp $
  */
 
 /* GNUPLOT - post.h */
@@ -41,9 +41,17 @@
  * (post.trm and pslatex.trm)
  */
 
+TERM_PUBLIC void PSTEX_common_init __PROTO((void));
+TERM_PUBLIC void PSTEX_reopen_output __PROTO((void));
+TERM_PUBLIC void EPSLATEX_common_init __PROTO((void));
+TERM_PUBLIC void EPSLATEX_reopen_output __PROTO((void));
+
+#define PS_POINT_TYPES 8
+
 /* assumes landscape */
 #define PS_XMAX (10*720)
 #define PS_YMAX (7*720)
+#define PS_YMAX_OLDSTYLE (6*720)
 
 /* These seem to be unnecessary, thus commented out */
 /*
@@ -64,5 +72,14 @@
 /* 14 pt for postscript */
 #define PS_VCHAR (14*PS_SC)
 #define PS_HCHAR (14*PS_SC*6/10)
+/* 10 pt for ps(la)tex */
+#define PSTEX_VCHAR (10*PS_SC)
+#define PSTEX_HCHAR (10*PS_SC*6/10)
+/* 11 pt for epslatex */
+#define EPSLATEX_VCHAR (11*PS_SC)
+#define EPSLATEX_HCHAR (11*PS_SC*6/10)
+
+/* additional LaTeX header information for epslatex terminal */
+extern char *epslatex_header;
 
 #endif /* TERM_POST_H */

@@ -2,7 +2,9 @@
 AUTOMAKE_OPTIONS = foreign 1.2h
 
 CLEANFILES = binary1 binary2 binary3 defaults.ini equipo2.dat field2xy.dat \
-fit.log soundfit.par temp.set fontfile.ps fontfile_latex.ps
+fit.log soundfit.par temp.set fontfile.ps fontfile_latex.ps epslatex-inc.eps \
+epslatex-inc.pdf epslatex.aux epslatex.dvi epslatex.log epslatex.pdf \
+epslatex.ps epslatex.tex
 
 BINARY_FILES = binary1 binary2 binary3
 
@@ -44,12 +46,26 @@ check-noninteractive: $(BINARY_FILES)
 
 #
 # Several of the demos need manual intervention:
-#	fontfile vector multiplt
+#	fontfile vector multiplt epslatex
 #
-html: airfoil.html arrowstyle.html binary.html bivariat.html candlesticks.html contours.html controls.html datastrings.html discrete.html electron.html enhancedtext.html fillbetween.html fillcrvs.html fillstyle.html fit.html hidden.html histograms.html histograms2.html layout.html mgr.html multimsh.html multiplt.html param.html pm3dcolors.html pm3d.html pm3dgamma.html pointsize.html polar.html poldat.html prob2.html prob.html rainbow.html random.html scatter.html simple.html singulr.html spline.html steps.html surface1.html surface2.html textcolor.html textrotate.html timedat.html using.html vector.html world.html world2.html
+html: airfoil.html arrowstyle.html binary.html bivariat.html candlesticks.html contours.html controls.html datastrings.html discrete.html electron.html enhancedtext.html epslatex.html fillbetween.html fillcrvs.html fillstyle.html fit.html hidden.html histograms.html histograms2.html layout.html mgr.html multimsh.html multiplt.html param.html pm3dcolors.html pm3d.html pm3dgamma.html pointsize.html polar.html poldat.html prob2.html prob.html rainbow.html random.html scatter.html simple.html singulr.html spline.html steps.html surface1.html surface2.html textcolor.html textrotate.html timedat.html using.html vector.html world.html world2.html
 
 %.html: %.dem webify.pl
 	./webify.pl $*
+
+epslatex:
+	@if test -z "$(GNUTERM)" ; then \
+	  ( bdir=`pwd` ; PATH=$$bdir/../src:$$PATH \
+	    GNUPLOT_DRIVER_DIR=$$bdir/../src \
+	    GNUPLOT_LIB=$(srcdir) $(GNUPLOT) epslatex.dem ); \
+	else \
+	  ( bdir=`pwd` ; PATH=$$bdir/../src:$$PATH \
+	    GNUPLOT_DRIVER_DIR=$$bdir/../src \
+	    GNUTERM=$(GNUTERM) \
+	    GNUPLOT_LIB=$(srcdir) $(GNUPLOT) epslatex.dem ); \
+	fi
+	latex epslatex
+	dvips epslatex
 
 ##m4-files-begin
 ##m4-files-end

@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.141 2005/01/11 17:37:16 mikulik Exp $
+ * $Id: post.trm,v 1.142 2005/01/12 00:05:43 sfeam Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -63,6 +63,9 @@
  *
  *  Harald Harders (h.harders@tu-bs.de), 2004-12-02:
  *  Moved all terminal settings into a single structure.
+ *
+ *  Harald Harders (h.harders@tu-bs.de), 2005-02-08:
+ *  Merged functionality of postscript, pslatex, pstex, and epslatex terminals.
  */
 
 #include "driver.h"
@@ -140,6 +143,11 @@ struct ps_fontfile_def {
     char *fontfile_fullname;
 };
 
+/* Terminal type of postscript dialect */
+enum PS_TERMINALTYPE {
+    PSTERM_PSTEX, PSTERM_PSLATEX, PSTERM_EPSLATEX, PSTERM_POSTSCRIPT
+};
+
 enum PS_PSFORMAT {
     PSTERM_EPS, PSTERM_PORTRAIT, PSTERM_LANDSCAPE
 };
@@ -147,6 +155,7 @@ enum PS_PSFORMAT {
 /* One struct that takes all terminal parameters
  * by Harald Harders <h.harders@tu-bs.de> */
 typedef struct ps_params_t {
+    enum PS_TERMINALTYPE terminal;
     int xoff;
     int yoff;
     enum PS_PSFORMAT psformat;
@@ -162,19 +171,50 @@ typedef struct ps_params_t {
     struct ps_fontfile_def *first_fontfile;
     char font[MAX_ID_LEN+1];          /* name of font */
     int fontsize;                     /* size of font in pts */
+    TBOOLEAN useauxfile;              /* only necessary for ps(la)tex */
+    TBOOLEAN rotate;                  /* only necessary for ps(la)tex */
     int palfunc_samples;              /* setable via "palf$uncparam" */
     double palfunc_deviation;         /* terminal option */
-    TBOOLEAN size5x3;
+    TBOOLEAN oldstyle;
+    TBOOLEAN epslatex_standalone;
 } ps_params_t;
 
 #define POST_PARAMS_DEFAULT { \
-    50, 50, \
+    PSTERM_POSTSCRIPT, 50, 50, \
     PSTERM_LANDSCAPE, FALSE, FALSE, FALSE, FALSE, 1.0, 1.0, FALSE, \
-    FALSE, FALSE, NULL, "Helvetica", 14, 2000, 0.003, FALSE \
+    FALSE, FALSE, NULL, "Helvetica", 14, FALSE, FALSE, 2000, 0.003, \
+    FALSE, FALSE \
 }
 
 static ps_params_t post_params = POST_PARAMS_DEFAULT;
 static const ps_params_t post_params_default = POST_PARAMS_DEFAULT;
+
+#define EPSLATEX_PARAMS_DEFAULT { \
+    PSTERM_EPSLATEX, 50, 50, \
+    PSTERM_EPS, FALSE, FALSE, FALSE, FALSE, 1.0, 1.0, FALSE, \
+    FALSE, FALSE, NULL, "", 11, TRUE, FALSE, 2000, 0.003, \
+    FALSE, FALSE \
+}
+static ps_params_t epslatex_params = EPSLATEX_PARAMS_DEFAULT;
+static const ps_params_t epslatex_params_default = EPSLATEX_PARAMS_DEFAULT;
+
+#define PSLATEX_PARAMS_DEFAULT { \
+    PSTERM_PSLATEX, 0, 0, \
+    PSTERM_EPS, FALSE, FALSE, FALSE, FALSE, 1.0, 1.0, FALSE, \
+    FALSE, FALSE, NULL, "", 0, FALSE, TRUE, 2000, 0.003, \
+    FALSE, FALSE \
+}
+static ps_params_t pslatex_params = PSLATEX_PARAMS_DEFAULT;
+static const ps_params_t pslatex_params_default = PSLATEX_PARAMS_DEFAULT;
+
+#define PSTEX_PARAMS_DEFAULT { \
+    PSTERM_PSTEX, 0, 0, \
+    PSTERM_EPS, FALSE, FALSE, FALSE, FALSE, 1.0, 1.0, FALSE, \
+    FALSE, FALSE, NULL, "", 0, FALSE, TRUE, 2000, 0.003, \
+    FALSE, FALSE \
+}
+static ps_params_t pstex_params = PSTEX_PARAMS_DEFAULT;
+static const ps_params_t pstex_params_default = PSTEX_PARAMS_DEFAULT;
 
 static ps_params_t *ps_params = NULL;
 
@@ -212,7 +252,10 @@ TERM_PUBLIC void PS_load_fontfiles __PROTO((TBOOLEAN));
 
 #define DOTS_PER_INCH (300)    /* resolution of printer we expect to use */
 
-static const char GPFAR * GPFAR PS_header[] = {
+/* name of auxiliary file */
+char *pslatex_auxname = NULL;
+
+static const char GPFAR * GPFAR PS_header1[] = {
 "/M {moveto} bind def\n",
 "/L {lineto} bind def\n",
 "/R {rmoveto} bind def\n",
@@ -249,6 +292,10 @@ static const char GPFAR * GPFAR PS_header[] = {
 /* Plot Lines */
 "/PL { stroke userlinewidth setlinewidth\n",
 "      Rounded { 1 setlinejoin 1 setlinecap } if } def\n",
+NULL
+};
+
+static const char GPFAR * GPFAR PS_linetypes[] = {
 /* Line Types */
 "/LTw { PL [] 1 setgray } def\n", /* background (assumed white) */
 "/LTb { BL [] 0 0 0 DL } def\n", /* border */
@@ -262,6 +309,22 @@ static const char GPFAR * GPFAR PS_header[] = {
 "/LT6 { PL [2 dl 2 dl 2 dl 4 dl] 0 0 0 DL } def\n",
 "/LT7 { PL [2 dl 2 dl 2 dl 2 dl 2 dl 4 dl] 1 0.3 0 DL } def\n",
 "/LT8 { PL [2 dl 2 dl 2 dl 2 dl 2 dl 2 dl 2 dl 4 dl] 0.5 0.5 0.5 DL } def\n",
+NULL
+};
+
+static const char GPFAR * GPFAR OldEPSL_linetypes[] = {
+/* Line Types */
+"/LTw { PL [] 1 setgray } def\n", /* background (assumed white) */
+"/LTb { BL [] 0 0 0 DL } def\n", /* border */
+"/LTa { AL [1 udl mul 2 udl mul] 0 setdash 0 0 0 setrgbcolor } def\n", /* axes */
+"/LT0 { PL [] 1 0 0 DL } def\n",
+"/LT1 { PL [8 dl 5 dl] 0 0 1 DL } def\n",
+"/LT2 { PL [4 dl 4 dl] 0 1 1 DL } def\n",
+"/LT3 { PL [8 dl 5 dl 0.5 dl 5 dl] 1 0 1 DL } def\n",
+NULL
+};
+
+static const char GPFAR * GPFAR PS_header2[] = {
 /* Point (Round) */	/* Matt Heffron make it round */
 "/Pnt { stroke [] 0 setdash\n",
 "   gsave 1 setlinecap M 0 0 V stroke grestore } def\n",
@@ -836,6 +899,7 @@ static TBOOLEAN PS_relative_ok;
 enum PS_id {
     PS_PORTRAIT, PS_LANDSCAPE,
     PS_EPSF, PS_DEFAULT, PS_ENHANCED, PS_NOENHANCED,
+    PS_LATEX, EPSLATEX_STANDALONE, EPSLATEX_INPUT,
     PS_MONOCHROME, PS_COLOR, PS_BLACKTEXT, PS_COLORTEXT,
     PS_SOLIDE, PS_DASHED, PS_DASHLENGTH, PS_LINEWIDTH,
     PS_SIMPLEX, PS_DUPLEX, PS_DEFAULTPLEX,
@@ -843,7 +907,9 @@ enum PS_id {
 #ifdef PM3D
     PS_PALFUNCPARAM,
 #endif /* PM3D */
-    PS_LEVEL1, PS_FONT,
+    PS_LEVEL1, PS_LEVELDEFAULT, PS_FONT,
+    PSLATEX_ROTATE, PSLATEX_NOROTATE, PSLATEX_AUXFILE, PSLATEX_NOAUXFILE,
+    PSLATEX_OLDSTYLE, PSLATEX_NEWSTYLE, EPSLATEX_HEADER, EPSLATEX_NOHEADER,
     PS_OTHER
 };
 
@@ -878,7 +944,18 @@ static struct gen_table PS_opts[] =
     { "palf$uncparam", PS_PALFUNCPARAM },
 #endif /* PM3D */
     { "level1", PS_LEVEL1 },
+    { "leveldefault", PS_LEVELDEFAULT },
     { "font", PS_FONT },
+    { "stand$alone", EPSLATEX_STANDALONE },
+    { "inp$ut", EPSLATEX_INPUT },
+    { "header", EPSLATEX_HEADER },
+    { "noheader", EPSLATEX_NOHEADER },
+    { "r$otate", PSLATEX_ROTATE },
+    { "n$orotate", PSLATEX_NOROTATE },
+    { "a$uxfile", PSLATEX_AUXFILE },
+    { "noa$uxfile", PSLATEX_NOAUXFILE },
+    { "old$style", PSLATEX_OLDSTYLE },
+    { "new$style", PSLATEX_NEWSTYLE },
     { NULL, PS_OTHER }
 };
 
@@ -891,20 +968,43 @@ PS_options()
     char *ps_fontfile_char = NULL;
     char tmp_term_options[MAX_LINE_LEN+1] = "";
 
-    ps_params = &post_params;
-    term->set_font = PS_set_font;
+    if (strcmp(term->name, "pstex") == 0)
+	ps_params = &pstex_params;
+    else if (strcmp(term->name, "pslatex") == 0)
+	ps_params = &pslatex_params;
+    else if (strcmp(term->name, "epslatex") == 0) {
+	ps_params = &epslatex_params;
+    } else
+	ps_params = &post_params;
+
+    if (ps_params->terminal == PSTERM_POSTSCRIPT) {
+	if (pslatex_auxname)
+	    free(pslatex_auxname);
+	pslatex_auxname = NULL;
+    } else {
+	term->set_font = PS_set_font;
+    }
 
     while (!END_OF_COMMAND) {
 	switch(lookup_table(&PS_opts[0],c_token)) {
 	case PS_PORTRAIT:
+	    if (ps_params->terminal != PSTERM_POSTSCRIPT)
+		int_error(c_token,
+			  "extraneous argument in set terminal %s",term->name);
 	    ps_params->psformat = PSTERM_PORTRAIT;
 	    c_token++;
 	    break;
 	case PS_LANDSCAPE:
+	    if (ps_params->terminal != PSTERM_POSTSCRIPT)
+		int_error(c_token,
+			  "extraneous argument in set terminal %s",term->name);
 	    ps_params->psformat = PSTERM_LANDSCAPE;
 	    c_token++;
 	    break;
 	case PS_EPSF:
+	    if (ps_params->terminal != PSTERM_POSTSCRIPT)
+		int_error(c_token,
+			  "extraneous argument in set terminal %s",term->name);
 	    ps_params->psformat = PSTERM_EPS;
 	    c_token++;
 	    break;
@@ -912,27 +1012,137 @@ PS_options()
 	    ps_params->level1 = TRUE;
 	    c_token++;
 	    break;
+	case PS_LEVELDEFAULT:
+	    ps_params->level1 = FALSE;
+	    c_token++;
+	    break;
 	case PS_DEFAULT:
-	    while (ps_params->first_fontfile != NULL) {
-		delete_ps_fontfile((struct ps_fontfile_def *) NULL,
-				   ps_params->first_fontfile);
-		ps_params->first_fontfile = NULL;
+	    switch (ps_params->terminal) {
+	    case PSTERM_POSTSCRIPT:
+		while (ps_params->first_fontfile != NULL) {
+		    delete_ps_fontfile((struct ps_fontfile_def *) NULL,
+				       ps_params->first_fontfile);
+		    ps_params->first_fontfile = NULL;
+		}
+		*ps_params = post_params_default;
+		break;
+	    case PSTERM_EPSLATEX:
+		*ps_params = epslatex_params_default;
+		break;
+	    case PSTERM_PSLATEX:
+		*ps_params = pslatex_params_default;
+		break;
+	    case PSTERM_PSTEX:
+		*ps_params = pstex_params_default;
+		break;
 	    }
-	    *ps_params = post_params_default;
 	    term->flags &= ~TERM_ENHANCED_TEXT;
 	    c_token++;
 	    break;
 	case PS_ENHANCED:
+	    if (ps_params->terminal != PSTERM_POSTSCRIPT)
+		int_error(c_token,
+			  "extraneous argument in set terminal %s",term->name);
 	    term->put_text = ENHPS_put_text;
 	    term->set_font = ENHPS_set_font;
 	    term->flags |= TERM_ENHANCED_TEXT;
 	    ++c_token;
 	    break;
 	case PS_NOENHANCED:
+            if (ps_params->terminal != PSTERM_POSTSCRIPT)
+                int_error(c_token,
+                          "extraneous argument in set terminal %s",term->name);
 	    term->put_text = PS_put_text;
 	    term->set_font = PS_set_font;
 	    term->flags &= ~TERM_ENHANCED_TEXT;
 	    ++c_token;
+	    break;
+	case EPSLATEX_STANDALONE:
+	    if (ps_params->terminal != PSTERM_EPSLATEX)
+		int_error(c_token,
+			  "extraneous argument in set terminal %s",term->name);
+	    ps_params->epslatex_standalone = TRUE;
+	    ++c_token;
+	    break;
+	case EPSLATEX_INPUT:
+	    if (ps_params->terminal != PSTERM_EPSLATEX)
+		int_error(c_token,
+			  "extraneous argument in set terminal %s",term->name);
+	    ps_params->epslatex_standalone = FALSE;
+	    ++c_token;
+	    break;
+	case EPSLATEX_HEADER:
+	    if (ps_params->terminal != PSTERM_EPSLATEX)
+		int_error(c_token,
+			  "extraneous argument in set terminal %s",term->name);
+	    ++c_token;
+            if (!isstring(c_token))
+		int_error(c_token,
+			  "String containing header information expected");
+	    if (epslatex_header)
+		free(epslatex_header);
+	    epslatex_header = gp_alloc (token_len(c_token),
+					"epslatex_header");
+	    quote_str(epslatex_header, c_token, token_len(c_token));
+	    if (strlen(epslatex_header) == 0)
+		free(epslatex_header);
+	    ++c_token;
+	    break;
+	case EPSLATEX_NOHEADER:
+	    if (ps_params->terminal != PSTERM_EPSLATEX)
+		int_error(c_token,
+			  "extraneous argument in set terminal %s",term->name);
+	    if (epslatex_header)
+		free(epslatex_header);
+	    ++c_token;
+	    break;
+	case PSLATEX_ROTATE:
+	    if ((ps_params->terminal != PSTERM_PSLATEX) &&
+		(ps_params->terminal != PSTERM_PSTEX))
+		int_error(c_token,
+			  "extraneous argument in set terminal %s",term->name);
+	    ps_params->rotate = TRUE;
+	    ++c_token;
+	    break;
+	case PSLATEX_NOROTATE:
+	    if ((ps_params->terminal != PSTERM_PSLATEX) &&
+		(ps_params->terminal != PSTERM_PSTEX))
+		int_error(c_token,
+			  "extraneous argument in set terminal %s",term->name);
+	    ps_params->rotate = FALSE;
+	    ++c_token;
+	    break;
+	case PSLATEX_AUXFILE:
+	    if ((ps_params->terminal == PSTERM_POSTSCRIPT) ||
+		(ps_params->terminal == PSTERM_EPSLATEX))
+		int_error(c_token,
+			  "extraneous argument in set terminal %s",term->name);
+	    ps_params->useauxfile = TRUE;
+	    c_token++;
+	    break;
+	case PSLATEX_NOAUXFILE:
+	    if ((ps_params->terminal == PSTERM_POSTSCRIPT) ||
+		(ps_params->terminal == PSTERM_EPSLATEX))
+		int_error(c_token,
+			  "extraneous argument in set terminal %s",term->name);
+	    ps_params->useauxfile = FALSE;
+	    c_token++;
+	    break;
+	case PSLATEX_OLDSTYLE:
+	    if (ps_params->terminal == PSTERM_POSTSCRIPT)
+		int_error(c_token,
+			  "extraneous argument in set terminal %s",term->name);
+	    ps_params->oldstyle = TRUE;
+	    if (ps_params->terminal == PSTERM_EPSLATEX)
+		ps_params->rounded = TRUE;
+	    c_token++;
+	    break;
+	case PSLATEX_NEWSTYLE:
+	    if (ps_params->terminal == PSTERM_POSTSCRIPT)
+		int_error(c_token,
+			  "extraneous argument in set terminal %s",term->name);
+	    ps_params->oldstyle = FALSE;
+	    c_token++;
 	    break;
 	case PS_MONOCHROME:
 	    ps_params->color = FALSE;
@@ -943,10 +1153,18 @@ PS_options()
 	    c_token++;
 	    break;
 	case PS_BLACKTEXT:
+	    if ((ps_params->terminal != PSTERM_POSTSCRIPT) &&
+		(ps_params->terminal != PSTERM_EPSLATEX))
+		int_error(c_token,
+			  "extraneous argument in set terminal %s",term->name);
 	    ps_params->blacktext = TRUE;
 	    c_token++;
 	    break;
 	case PS_COLORTEXT:
+	    if ((ps_params->terminal != PSTERM_POSTSCRIPT) &&
+		(ps_params->terminal != PSTERM_EPSLATEX))
+		int_error(c_token,
+			  "extraneous argument in set terminal %s",term->name);
 	    ps_params->blacktext = FALSE;
 	    c_token++;
 	    break;
@@ -971,16 +1189,25 @@ PS_options()
 		ps_params->linewidth_factor = 1.0;
 	    break;
 	case PS_SIMPLEX:
+	    if (ps_params->terminal != PSTERM_POSTSCRIPT)
+		int_error(c_token,
+			  "extraneous argument in set terminal %s",term->name);
 	    ps_params->duplex_state  = FALSE;
 	    ps_params->duplex_option = TRUE;
 	    c_token++;
 	    break;
 	case PS_DUPLEX:
+	    if (ps_params->terminal != PSTERM_POSTSCRIPT)
+		int_error(c_token,
+			  "extraneous argument in set terminal %s",term->name);
 	    ps_params->duplex_state  = TRUE;
 	    ps_params->duplex_option = TRUE;
 	    c_token++;
 	    break;
 	case PS_DEFAULTPLEX:
+	    if (ps_params->terminal != PSTERM_POSTSCRIPT)
+		int_error(c_token,
+			  "extraneous argument in set terminal %s",term->name);
 	    ps_params->duplex_option = FALSE;
 	    c_token++;
 	    break;
@@ -995,6 +1222,9 @@ PS_options()
         case PS_FONTFILE: {
             TBOOLEAN deleteentry = FALSE;
             c_token++;
+	    if (ps_params->terminal != PSTERM_POSTSCRIPT)
+		int_error(c_token,
+			  "extraneous argument in set terminal %s",term->name);
 
             if (!isstring(c_token)) {
                 if (equals(c_token, "add"))
@@ -1083,6 +1313,9 @@ PS_options()
             break;
         }
         case PS_NOFONTFILES:
+	    if (ps_params->terminal != PSTERM_POSTSCRIPT)
+		int_error(c_token,
+			  "extraneous argument in set terminal %s",term->name);
 	    while (ps_params->first_fontfile != NULL) {
 		delete_ps_fontfile((struct ps_fontfile_def *) NULL,
 				   ps_params->first_fontfile);
@@ -1117,8 +1350,14 @@ PS_options()
 	case PS_OTHER:
 	default:
 	    if (isstring(c_token)) {
-		quote_str(ps_params->font,c_token, MAX_ID_LEN);
-		c_token++;
+		if ((ps_params->terminal == PSTERM_POSTSCRIPT) ||
+		    (ps_params->terminal == PSTERM_EPSLATEX)) {
+		    quote_str(ps_params->font,c_token, MAX_ID_LEN);
+		    c_token++;
+		} else
+		    int_error(c_token,
+			      "terminal %s does not allow specification %s",
+			      term->name, "of font name");
 	    } else {
 		/* We have font size specified */
 		ps_params->fontsize = (int)real(const_express(&a));
@@ -1127,48 +1366,73 @@ PS_options()
 	}
     }
 
-    ps_fontsize = ps_params->fontsize;
+    switch (ps_params->terminal) {
+    case PSTERM_POSTSCRIPT:
+	ps_fontsize = ps_params->fontsize;
+	break;
+    case PSTERM_EPSLATEX:
+	ps_fontsize = 2 * ps_params->fontsize;
+	break;
+    case PSTERM_PSLATEX:
+    case PSTERM_PSTEX:
+	if (ps_params->fontsize > 0)
+	    ps_fontsize = 2 * ps_params->fontsize;
+	else
+	    ps_fontsize = 20; /* default: 10pt */
+	break;
+    }
     term->v_char = (unsigned int)(ps_fontsize*PS_SC);
-    term->h_char = (unsigned int)(ps_fontsize*PS_SC*6/10);
-
+    if (ps_params->oldstyle)
+	term->h_char = (unsigned int)(ps_fontsize*PS_SC*5/10);
+    else
+	term->h_char = (unsigned int)(ps_fontsize*PS_SC*6/10);
     sprintf(PS_default_font,"%s,%d",ps_params->font,ps_fontsize);
 
-    if (ps_params->first_fontfile) {
-	struct ps_fontfile_def *curr_ps_fontfile =
-	    ps_params->first_fontfile;
-	unsigned int totlength = 0;
-	char *running;
+    if (ps_params->terminal == PSTERM_POSTSCRIPT) {
+	if (ps_params->first_fontfile) {
+	    struct ps_fontfile_def *curr_ps_fontfile =
+		ps_params->first_fontfile;
+	    unsigned int totlength = 0;
+	    char *running;
 
-	while (curr_ps_fontfile) {
-	    totlength += strlen(curr_ps_fontfile->fontfile_name) +
-		strlen(" fontfile \"\"");
-	    curr_ps_fontfile = curr_ps_fontfile->next;
-	}
-	curr_ps_fontfile = ps_params->first_fontfile;
-	ps_fontfile_char = gp_alloc (totlength+1,"ps_fontfile_char");
-	running = ps_fontfile_char;
-	while (curr_ps_fontfile) {
-	    sprintf(running," fontfile \"%s\"",
-		    curr_ps_fontfile->fontfile_name);
-	    running += strlen(running);
-	    curr_ps_fontfile = curr_ps_fontfile->next;
+	    while (curr_ps_fontfile) {
+		totlength += strlen(curr_ps_fontfile->fontfile_name) +
+		    strlen(" fontfile \"\"");
+		curr_ps_fontfile = curr_ps_fontfile->next;
+	    }
+	    curr_ps_fontfile = ps_params->first_fontfile;
+	    ps_fontfile_char = gp_alloc (totlength+1,"ps_fontfile_char");
+	    running = ps_fontfile_char;
+	    while (curr_ps_fontfile) {
+		sprintf(running," fontfile \"%s\"",
+			curr_ps_fontfile->fontfile_name);
+		running += strlen(running);
+		curr_ps_fontfile = curr_ps_fontfile->next;
+	    }
 	}
     }
 
     /* HBB 19990823: fixed the options string. It violated the 'save
      * loadable output' rule */
-    sprintf(term_options,"%s %s %s \\\n",
-	    ps_params->psformat==PSTERM_EPS ? "eps" :
-	    (ps_params->psformat==PSTERM_PORTRAIT ?
-	     "portrait" : "landscape"),
-	    term->put_text == ENHPS_put_text ? "enhanced" : "noenhanced",
-	    ps_params->duplex_option ? (ps_params->duplex_state ?
-					"duplex" : "simplex")
-	    : "defaultplex");
+    if (ps_params->terminal == PSTERM_POSTSCRIPT)
+	sprintf(term_options,"%s %s %s \\\n",
+		ps_params->psformat==PSTERM_EPS ? "eps" :
+		(ps_params->psformat==PSTERM_PORTRAIT ?
+		 "portrait" : "landscape"),
+		term->put_text == ENHPS_put_text ? "enhanced" : "noenhanced",
+		ps_params->duplex_option ? (ps_params->duplex_state ?
+					    "duplex" : "simplex")
+		: "defaultplex");
+    else if (ps_params->terminal != PSTERM_EPSLATEX)
+	sprintf(term_options, "%s%s",
+		ps_params->rotate ? "rotate" : "norotate",
+		ps_params->useauxfile ? " auxfile" : "");
+    else
+	term_options[0] = '\0';
 
     sprintf(tmp_term_options,"   %s %s %s \\\n\
    %s dashlength %.1f linewidth %.1f %s \\\n",
-	    ps_params->level1 ? "level1" : "",
+	    ps_params->level1 ? "level1" : "leveldefault",
 	    ps_params->color ? "color" : "monochrome",
 	    ps_params->blacktext ? "blacktext" : "colortext",
 	    ps_params->solid ? "solid" : "dashed",
@@ -1183,9 +1447,37 @@ PS_options()
     strcat(term_options,tmp_term_options);
 #endif /* PM3D */
 
-    sprintf(tmp_term_options,"\"%s\" %d%s ",
-	    ps_params->font,ps_params->fontsize,
-	    ps_fontfile_char ? ps_fontfile_char : "");
+    if ((ps_params->terminal == PSTERM_PSTEX) ||
+	(ps_params->terminal == PSTERM_PSLATEX)) {
+	sprintf(tmp_term_options, "%s %s ",
+		ps_params->rotate ? "rotate" : "norotate",
+		ps_params->useauxfile ? "auxfile" : "noauxfile");
+	strcat(term_options,tmp_term_options);
+    }
+
+    if (ps_params->terminal == PSTERM_EPSLATEX) {
+	sprintf(tmp_term_options, "%s ",
+		ps_params->epslatex_standalone ? "standalone" : "input");
+	if (epslatex_header)
+	    sprintf(tmp_term_options, "header \"%s\" ", 
+		    conv_text(epslatex_header));
+	else
+	    sprintf(tmp_term_options, "noheader ");
+	strcat(term_options,tmp_term_options);
+    }
+
+    if (ps_params->terminal == PSTERM_POSTSCRIPT)
+	sprintf(tmp_term_options,"\"%s\" %d%s ",
+		ps_params->font,ps_params->fontsize,
+		ps_fontfile_char ? ps_fontfile_char : "");
+    else if (ps_params->terminal == PSTERM_EPSLATEX)
+	sprintf(tmp_term_options,"\"%s\" %d ",
+		ps_params->font,ps_params->fontsize);
+    else if (ps_params->fontsize)
+	sprintf(tmp_term_options,"%d ",ps_params->fontsize);
+    else
+	tmp_term_options[0]='\0';
+
     strcat(term_options,tmp_term_options);
 }
 
@@ -1415,7 +1707,7 @@ PS_load_fontfiles(TBOOLEAN doload)
 
 TERM_PUBLIC void
 PS_common_init(
-    TBOOLEAN uses_fonts,		/* 0 for ps(la)tex */
+    TBOOLEAN uses_fonts,		/* FALSE for (e)ps(la)tex */
     unsigned int xoff, unsigned int yoff, /* how much to translate by */
     unsigned int bb_xmin, unsigned int bb_ymin,
     unsigned int bb_xmax, unsigned int bb_ymax, /* bounding box */
@@ -1898,6 +2190,17 @@ NULL };
     timedate=asctime(localtime(&now));
     timedate[strlen(timedate)-1]='\0';
 
+    /* Set files for (e)ps(la)tex terminals */
+    switch (ps_params->terminal) {
+    case PSTERM_EPSLATEX:
+	EPSLATEX_common_init();
+	break;
+    case PSTERM_PSLATEX:
+    case PSTERM_PSTEX:
+	PSTEX_common_init();
+	break;
+    }
+
     if (ps_params->psformat == PSTERM_EPS)
 	fputs("%!PS-Adobe-2.0 EPSF-2.0\n", gppsfile);
     else
@@ -1911,9 +2214,11 @@ NULL };
     fprintf(gppsfile,"%%%%BoundingBox: %d %d %d %d\n",
 	    xoff + bb_xmin, yoff + bb_ymin, xoff + bb_xmax, yoff + bb_ymax);
 
-    fprintf(gppsfile,"%%%%Orientation: %s\n",
-	    ps_params->psformat == PSTERM_LANDSCAPE ?
-	    "Landscape" : "Portrait");
+    if ((ps_params->terminal == PSTERM_POSTSCRIPT) &&
+	(ps_params->psformat != PSTERM_EPS))
+	fprintf(gppsfile,"%%%%Orientation: %s\n",
+		ps_params->psformat == PSTERM_LANDSCAPE ?
+		"Landscape" : "Portrait");
 
     if (ps_params->psformat != PSTERM_EPS)
 	fputs("%%Pages: (atend)\n", gppsfile);
@@ -1970,8 +2275,17 @@ NULL };
 	}
     }
 
-    for (i = 0; PS_header[i] != NULL; i++)
-	fprintf(gppsfile,"%s",PS_header[i]);
+    for (i = 0; PS_header1[i] != NULL; i++)
+	fprintf(gppsfile,"%s",PS_header1[i]);
+    if ((ps_params->terminal == PSTERM_EPSLATEX) && ps_params->oldstyle) {
+	for (i = 0; OldEPSL_linetypes[i] != NULL; i++)
+	    fprintf(gppsfile,"%s",OldEPSL_linetypes[i]);
+    } else {
+	for (i = 0; PS_linetypes[i] != NULL; i++)
+	    fprintf(gppsfile,"%s",PS_linetypes[i]);
+    }
+    for (i = 0; PS_header2[i] != NULL; i++)
+	fprintf(gppsfile,"%s",PS_header2[i]);
     if (ps_params->duplex_option)
 	fprintf(gppsfile, "statusdict begin %s setduplexmode end\n",
 		ps_params->duplex_state ? "true" : "false");
@@ -1980,10 +2294,10 @@ NULL };
 	while (*dict)
 	    fputs(*(dict++), gppsfile);
 
-    PS_load_fontfiles(TRUE);
-
-    if (uses_fonts)
+    if (uses_fonts) {
+	PS_load_fontfiles(TRUE);
 	PS_RememberFont(ps_params->font, 1);
+    }
 
     fputs("end\n%%EndProlog\n", gppsfile);
 }
@@ -1997,7 +2311,10 @@ PS_init()
     switch (ps_params->psformat) {
     case PSTERM_EPS:
 	term->xmax = PS_XMAX;
-	term->ymax = PS_YMAX;
+	if (ps_params->oldstyle)
+	    term->ymax = PS_YMAX_OLDSTYLE;
+	else
+	    term->ymax = PS_YMAX;
 	xmin_t = term->xmax * xoffset / (2*PS_SC);
 	xmax_t = term->xmax * (xsize + xoffset) / (2*PS_SC);
 	ymin_t = term->ymax * yoffset / (2*PS_SC);
@@ -2027,10 +2344,18 @@ PS_init()
     strcpy(ps_enh_font, ps_params->font);
     ps_enh_fontsize = ps_fontsize;
 
-    /* to optimize output for postscript terminals family */
-    gppsfile = gpoutfile;
+    switch (ps_params->terminal) {
+    case PSTERM_POSTSCRIPT:
+	gppsfile = gpoutfile;
+	break;
+    case PSTERM_EPSLATEX:
+	EPSLATEX_reopen_output();
+	break;
+    default:
+	PSTEX_reopen_output();
+    }
 
-    PS_common_init(TRUE,
+    PS_common_init(ps_params->terminal == PSTERM_POSTSCRIPT,
 		   ps_params->xoff, ps_params->yoff,
 		   xmin_t, ymin_t, xmax_t, ymax_t,
 		   (term->put_text == ENHPS_put_text) ? ENHPS_header : NULL);
@@ -2120,7 +2445,10 @@ PS_reset()
 TERM_PUBLIC void
 PS_linetype(int linetype)
 {
-    linetype = (linetype % 9) + 3;
+    if ((ps_params->terminal == PSTERM_EPSLATEX) && ps_params->oldstyle)
+	linetype = (linetype % 4) + 3;
+    else
+	linetype = (linetype % 9) + 3;
     if (linetype < 0)	/* LT_NODRAW, LT_BACKGROUND, LT_UNDEFINED */
 	linetype = 0;
     PS_relative_ok = FALSE;
@@ -2401,13 +2729,26 @@ PS_point(unsigned int x, unsigned int y, int number)
 	"D12",  "D13",   "D14",    "D15",
 	"BoxE", "CircE", "TriUE",  "TriDE",
 	"DiaE", "PentE", "BoxW",   "CircW",
-	"TriUW", "TriDW", "DiaW",  "PentW"
-};
-    if (number < 0)
-	number = -1;		/* negative types are all 'dot' */
-    else
-	number %= sizeof(pointFNS)/sizeof(pointFNS[0]) -1;
-    fprintf(gppsfile, "%d %d %s\n", x, y, pointFNS[number+1]);
+	"TriUW","TriDW", "DiaW",   "PentW"
+    };
+    static const char GPFAR * GPFAR pointFNS_OldEPSL[] = {
+	"Pnt",  "Dia",   "Circle", "Pls",
+	"Crs",  "Box",   "DiaF",   "CircleF",
+	"BoxF"
+    };
+    if ((ps_params->terminal == PSTERM_EPSLATEX) && ps_params->oldstyle) {
+	if (number < 0)
+	    number = -1;		/* negative types are all 'dot' */
+	else
+	    number %= sizeof(pointFNS_OldEPSL)/sizeof(pointFNS_OldEPSL[0]) -1;
+	fprintf(gppsfile, "%d %d %s\n", x, y, pointFNS_OldEPSL[number+1]);
+    } else {
+	if (number < 0)
+	    number = -1;		/* negative types are all 'dot' */
+	else
+	    number %= sizeof(pointFNS)/sizeof(pointFNS[0]) -1;
+	fprintf(gppsfile, "%d %d %s\n", x, y, pointFNS[number+1]);
+    }
 
     PS_relative_ok = FALSE;
     ps_path_count = 0;
@@ -3383,6 +3724,306 @@ TERM_TABLE_END(post_driver)
 #endif /* TERM_PROTO_ONLY */
 
 #ifdef TERM_HELP
+/* This is a pseudo help section that is labeled with 00psglobal to be
+ * sure that it is sorted in before `post', `epslatex', and `pslatex'.
+ * This section just defines commonly used text snippets for all three
+ * help sections defined in this file. Defining PS_COMMON_OPTS1,
+ * PS_COMMON_OPTS2, and PS_COMMON_DOC1 outside START_HELP()...END_HELP()
+ * does not work.
+ * The last line before the END_HELP(00psglobal) contains one single line
+ * of "text" that is necessary to avoid errors.
+ */
+START_HELP(00psglobal)
+#define PS_COMMON_OPTS1 \
+"                               {default}",\
+"                               {level1 | leveldefault}",\
+"                               {color | colour | monochrome}",\
+"                               {solid | dashed}",\
+"                               {dashlength | dl <DL>}",\
+"                               {linewidth | lw <LW>}",\
+"                               {rounded | butt}",\
+"                               {palfuncparam <samples>{,<maxdeviation>}}",
+#define PS_COMMON_OPTS2 \
+"                               {blacktext | colortext | colourtext}",\
+"                               {\"<fontname>\"} {<fontsize>}",
+#define PS_COMMON_DOC1 \
+" The option `color` enables color;",\
+" `solid` draws all plots with solid lines, overriding any dashed patterns;",\
+" `dashlength` or `dl` scales the length of the dashed-line segments by <DL>",\
+" (which is a floating-point number greater than zero);",\
+" `linewidth` or `lw` scales all linewidths by <LW>;",\
+"",\
+" By default the generated PostScript code uses language features that were",\
+" introduced in PostScript Level 2, notably pattern-fill of irregular objects",\
+" such as filledcurves.  The `level1` option substitutes PostScript Level 1",\
+" approximations of these features. This may be required by some old printers",\
+" and by some old versions of Adobe Illustrator. This flag can be toggled",\
+" later by editing a single line in the PostScript output file.",\
+"",\
+" `rounded` sets line caps and line joins to be rounded; `butt` is the",\
+" default, butt caps and mitered joins;",\
+"",\
+" `palfuncparam` is only available if compiled with `pm3d` support.  It controls",\
+" how `set palette functions` are encoded as gradients in the output.",\
+" Analytic color component functions (set via `set palette functions`) are",\
+" encoded as linear interpolated gradients in the postscript output:  The color",\
+" component functions are sampled at <samples> points and all points are",\
+" removed from this gradient which can be removed without changing the",\
+" resulting colors by more than <maxdeviation>.  For almost every useful",\
+" palette you may savely leave the defaults of <samples>=2000 and",\
+" <maxdeviation>=0.003 untouched.",\
+"",
+""
+END_HELP(00psglobal)
+
+START_HELP(epslatex)
+"1 epslatex",
+"?commands set terminal epslatex",
+"?set terminal epslatex",
+"?set term epslatex",
+"?terminal epslatex",
+"?term epslatex",
+"?epslatex",
+" The `epslatex` driver generates output for further processing by LaTeX.",
+"",
+" Syntax:",
+"       set terminal epslatex   {standalone | input}",
+"                               {oldstyle | newstyle}",
+PS_COMMON_OPTS1
+"                               {header <header> | noheader}",
+PS_COMMON_OPTS2
+"",
+" The epslatex terminal prints a plot as `terminal postscript eps`",
+" but transfers the texts to LaTeX instead of including in the PostScript",
+" code. Thus, many options are the same as in the `postscript terminal`.",
+"",
+" From version 4.0 to 4.1, some changes have been invoked into the default ",
+" appearance of the epslatex terminal to reach better consistency with the",
+" postscript terminal:  The plot size has been changed from 5 x 3 inches to",
+" 5 x 3.5 inches;  the character width is now estimated to be 60% of the font",
+" size while the old epslatex terminal used 50%;  now, the larger number of",
+" postscript linetypes and symbols are used.  To reach an appearance that is",
+" nearly identical to the old one specify the option `oldstyle`. (In fact",
+" some small differences remain: the symbol sizes are slightly different, the",
+" tics are half as large as in the old terminal which can be changed using",
+" `set ticscale`, and the arrows have all features as in the postscript",
+" terminal.)",
+"",
+PS_COMMON_DOC1
+" `blacktext` forces all text to be written in black even in color mode;",
+"",
+" The epslatex driver offers a special way of controlling text positioning:",
+" (a) If any text string begins with '{', you also need to include a '}' at the",
+" end of the text, and the whole text will be centered both horizontally",
+" and vertically by LaTeX.  (b) If the text string begins with '[', you need",
+" to continue it with: a position specification (up to two out of t,b,l,r,c),",
+" ']{', the text itself, and finally, '}'. The text itself may be anything",
+" LaTeX can typeset as an LR-box. \\rule{}{}'s may help for best positioning.",
+" See also the documentation for the `pslatex` terminal driver.",
+" To create multiline labels, use \\shortstack, for example",
+"    set ylabel '[r]{\\shortstack{first line \\\\ second line}}' ",
+"",
+" The `back` option of `set label` commands is handled slightly different",
+" than in other terminals. Labels using 'back' are printed behind all other",
+" elements of the plot while labels using 'front' are printed above ",
+" everything else.",
+"",
+" The driver produces two different files, one for the eps part of the figure",
+" and one for the LaTeX part. The name of the LaTeX file is taken from the",
+" `set output` command. The name of the eps file is derived by replacing",
+" the file extension (normally `.tex`) with `.eps` instead.  There is no",
+" LaTeX output if no output file is given!  Remember to close the",
+" `output file` before next plot unless in `multiplot` mode.",
+"",
+" In your LaTeX documents use '\\input{filename}' to include the figure.",
+" The `.eps` file is included by the command \\includegraphics{...}, so you",
+" must also include \\usepackage{graphicx} in the LaTeX preamble.  If you",
+" want to use coloured text (option `textcolour`) you also have to include",
+" \\usepackage{color} in the LaTeX preamble.",
+"",
+" Pdf files can be made from the eps file using 'epstopdf'. If the graphics",
+" package is properly configured, the LaTeX files can also be processed by",
+" pdflatex without changes, using the pdf files instead of the eps files."
+"",
+" The behaviour concerning font selection depends on the header mode.",
+" In all cases, the given font size is used for the calculation of proper",
+" spacing. When not using the `standalone` mode the actual LaTeX font and",
+" font size at the point of inclusion is taken, so use LaTeX commands for",
+" changing fonts. If you use e.g. 12pt as font size for your LaTeX",
+" document, use '\"\" 12' as options. The font name is ignored. If using",
+" `standalone` the given font and font size are used, see below for a",
+" detailed description.",
+"",
+" If text is printed coloured is controlled by the TeX booleans \\ifGPcolor",
+" and \\ifGPblacktext. Only if \\ifGPcolor is true and \\ifGPblacktext is",
+" false, text is printed coloured. You may either change them in the",
+" generated TeX file or provide them globally in your TeX file, for example",
+" by using",
+"    \\newif\\ifGPblacktext",
+"    \\GPblacktexttrue",
+" in the preamble of your document. The local assignment is only done if no",
+" global value is given.",
+"",
+" When using the epslatex terminal give the name of the TeX file in the",
+" `set output` command including the file extension (normally \".tex\").",
+" The eps filename is generated by replacing the extension by \".eps\".",
+"",
+" If using the `standalone` mode a complete LaTeX header is added to the",
+" LaTeX file; and \"-inc\" is added to the filename of the eps file.",
+" The `standalone` mode generates a TeX file that produces",
+" output with the correct size when using dvips, pdfTeX, or VTeX.",
+" The default, `input`, generates a file that has to be included into a",
+" LaTeX document using the \\input command.",
+"",
+" If a font other than \"\" or \"default\" is given it is interpreted as",
+" LaTeX font name.  It contains up to three parts, separated by a comma:",
+" 'fontname,fontseries,fontshape'.  If the default fontshape or fontseries",
+" are requested, they can be omitted.  Thus, the real syntax for the fontname",
+" is '[fontname][,fontseries][,fontshape]'.  The naming convention for all",
+" parts is given by the LaTeX font scheme.  The fontname is 3 to 4 characters",
+" long and is built as follows: One character for the font vendor, two",
+" characters for the name of the font, and optionally one additional",
+" character for special fonts, e.g., 'j' for fonts with old-style numerals",
+" or 'x' for expert fonts. The names of many fonts is described in",
+"^ <a href=\"http://www.tug.org/fontname/fontname.pdf\">",
+"           http://www.tug.org/fontname/fontname.pdf",
+"^ </a>",
+" For example, 'cmr' stands for Computer Modern Roman, 'ptm' for Times-Roman,",
+" and 'phv' for Helvetica.  The font series denotes the thickness of the",
+" glyphs, in most cases 'm' for normal (\"medium\") and 'bx' or 'b' for bold",
+" fonts.  The font shape is 'n' for upright, 'it' for italics, 'sl' for",
+" slanted, or 'sc' for small caps, in general.  Some fonts may provide",
+" different font series or shapes.",
+"",
+" Examples:",
+"",
+" Use Times-Roman boldface (with the same shape as in the surrounding text):",
+"       set terminal epslatex 'ptm,bx'",
+" Use Helvetica, boldface, italics:",
+"       set terminal epslatex 'phv,bx,it'",
+" Continue to use the surrounding font in slanted shape:",
+"       set terminal epslatex ',,sl'",
+" Use small capitals:",
+"       set terminal epslatex ',,sc'",
+"",
+" By this method, only text fonts are changed. If you also want to change",
+" the math fonts you have to use the \"gnuplot.cfg\" file or the `header`",
+" option, described below.",
+"",
+" In standalone mode, the font size is taken from the given font size in the",
+" `set terminal` command. To be able to use a specified font size, a file",
+" \"size<size>.clo\" has to reside in the LaTeX search path.  By default,",
+" 10pt, 11pt, and 12pt are supported.  If the package \"extsizes\" is",
+" installed, 8pt, 9pt, 14pt, 17pt, and 20pt are added.",
+"",
+" The `header` option takes a string as argument.  This string is written",
+" into the generated LaTeX file.  If using the `standalone` mode, it is ",
+" written into the preamble, directly before the \\begin{document} command.",
+" In the `input` mode, it is placed directly after the \\begingroup command",
+" to ensure that all settings are local to the plot.",
+"",
+" Examples:",
+"",
+" Use T1 fontencoding, change the text and math font to Times-Roman as well",
+" as the sans-serif font to Helvetica:",
+"     set terminal epslatex standalone header \\",
+"     \"\\\\usepackage[T1]{fontenc}\\n\\\\usepackage{mathptmx}\\n\\\\usepackage{helvet}\"",
+" Use a boldface font in the plot, not influencing the text outside the plot:",
+"     set terminal epslatex input header \"\\\\bfseries\"",
+"",
+" If the file \"gnuplot.cfg\" is found by LaTeX it is input in the preamble",
+" the LaTeX document, when using `standalone` mode.  It can be used for",
+" further settings, e.g., changing the document font to Times-Roman,",
+" Helvetica, and Courier, including math fonts (handled by \"mathptmx.sty\"):",
+"       \\usepackage{mathptmx}",
+"       \\usepackage[scaled=0.92]{helvet}",
+"       \\usepackage{courier}"
+" The file \"gnuplot.cfg\" is loaded before the header information given",
+" by the `header` command.  Thus, you can use `header` to overwrite some of",
+" settings performed using \"gnuplot.cfg\"",
+""
+END_HELP(epslatex)
+
+START_HELP(pslatex)
+"1 pslatex and pstex",
+"?commands set terminal pslatex",
+"?set terminal pslatex",
+"?set term pslatex",
+"?terminal pslatex",
+"?term pslatex",
+"?pslatex",
+"?commands set terminal pstex",
+"?set terminal pstex",
+"?set term pstex",
+"?terminal pstex",
+"?term pstex",
+"?pstex",
+" The `pslatex` driver generates output for further processing by LaTeX,",
+" while the `pstex` driver generates output for further processing by",
+" TeX. `pslatex` uses \\specials understandable by dvips and xdvi. Figures",
+" generated by `pstex` can be included in any plain-based format (including",
+" LaTeX).",
+"",
+" Syntax:",
+"       set terminal [pslatex | pstex]",
+"                               {rotate | norotate}",
+"                               {oldstyle | newstyle}",
+"                               {auxfile | noauxfile}",
+PS_COMMON_OPTS1
+"                               {<font_size>}",
+"",
+PS_COMMON_DOC1
+" if `rotate` is specified, the y-axis label is rotated.",
+" <font_size> is the size (in pts) of the desired font.",
+"",
+" If `auxfile` is specified, it directs the driver to put the PostScript",
+" commands into an auxiliary file instead of directly into the LaTeX file.",
+" This is useful if your pictures are large enough that dvips cannot handle",
+" them.  The name of the auxiliary PostScript file is derived from the name of",
+" the TeX file given on the `set output` command; it is determined by replacing",
+" the trailing `.tex` (actually just the final extent in the file name) with",
+" `.ps` in the output file name, or, if the TeX file has no extension, `.ps`",
+" is appended.  The `.ps` is included into the `.tex` file by a",
+" \\special{psfile=...} command.  Remember to close the `output file` before",
+" next plot unless in `multiplot` mode.",
+"",
+" Gnuplot versions prior version 4.1 have generated plots of the size",
+" 5 x 3 inches using the ps(la)tex terminal while the current version generates",
+" 5 x 3.5 inches to be consistent with the postscript eps terminal.  In",
+" addition, the character width is now estimated to be 60% of the font size",
+" while the old epslatex terminal used 50%. To reach the old format specify",
+" the option `oldstyle`.",
+"",
+" The pslatex driver offers a special way of controlling text positioning: ",
+" (a) If any text string begins with '{', you also need to include a '}' at the",
+" end of the text, and the whole text will be centered both horizontally",
+" and vertically by LaTeX.  (b) If the text string begins with '[', you need",
+" to continue it with: a position specification (up to two out of t,b,l,r),",
+" ']{', the text itself, and finally, '}'. The text itself may be anything",
+" LaTeX can typeset as an LR-box. \\rule{}{}'s may help for best positioning.",
+"",
+" The options not described here are identical to the `Postscript terminal`.",
+" Look there if you want to know what they do.",
+"",
+" Examples:",
+"       set term pslatex monochrome dashed rotate       # set to defaults",
+" To write the PostScript commands into the file \"foo.ps\":",
+"       set term pslatex auxfile",
+"       set output \"foo.tex\"; plot ...; set output",
+" About label positioning:",
+" Use gnuplot defaults (mostly sensible, but sometimes not really best):",
+"        set title '\\LaTeX\\ -- $ \\gamma $'",
+" Force centering both horizontally and vertically:",
+"        set label '{\\LaTeX\\ -- $ \\gamma $}' at 0,0",
+" Specify own positioning (top here):",
+"        set xlabel '[t]{\\LaTeX\\ -- $ \\gamma $}'",
+" The other label -- account for long ticlabels:",
+"        set ylabel '[r]{\\LaTeX\\ -- $ \\gamma $\\rule{7mm}{0pt}}'",
+"",
+" Linewidths and pointsizes may be changed with `set style line`."
+""
+END_HELP(pslatex)
+
 START_HELP(post)
 "1 postscript",
 "?commands set terminal postscript",
@@ -3394,61 +4035,14 @@ START_HELP(post)
 " Several options may be set in the `postscript` driver.",
 "",
 " Syntax:",
-"       set terminal postscript {<mode>} {level1} {enhanced | noenhanced}",
-"                               {color | colour | monochrome}",
-"                               {blacktext | colortext | colourtext}",
-"                               {solid | dashed} {dashlength | dl <DL>}",
-"                               {linewidth | lw <LW>}",
-"                               {<duplexing>}",
-"                               {rounded | butt}",
+"       set terminal postscript {landscape | portrait | eps}",
+"                               {enhanced | noenhanced}",
+"                               {defaultplex | simplex | duplex}",
 "                               {fontfile [add | delete] \"<filename>\"}",
-"                               {palfuncparam <samples>{,<maxdeviation>}}",
-"                               {\"<fontname>\"} {<fontsize>}",
+PS_COMMON_OPTS1
+PS_COMMON_OPTS2
 "",
-" where <mode> is `landscape`, `portrait`, `eps` or `default`;",
-" `enhanced` enables enhanced text mode features (subscripts,",
-" superscripts and mixed fonts). See `enhanced` for more information.",
-" Option `color` enables color;",
-" `blacktext` forces all text to be written in black even in color mode;",
-" `solid` draws all plots with solid lines, overriding any dashed patterns;",
-" `dashlength` or `dl` scales the length of the dashed-line segments by <DL>",
-" (which is a floating-point number greater than zero);",
-" `linewidth` or `lw` scales all linewidths by <LW>;",
-"",
-" <duplexing> is `defaultplex`, `simplex` or `duplex` (\"duplexing\" in",
-" PostScript is the ability of the printer to print on both sides of the same",
-" page---don't set this if your printer can't do it);",
-"",
-" By default the generated PostScript code uses language features that were",
-" introduced in PostScript Level 2, notably pattern-fill of irregular objects",
-" such as filledcurves.  The `level1` option substitutes PostScript Level 1",
-" approximations of these features. This may be required by some old printers",
-" and by some old versions of Adobe Illustrator. This flag can be toggled",
-" later by editing a single line in the PostScript output file.",
-"",
-" `rounded` sets line caps and line joins to be rounded; `butt` is the",
-" default, butt caps and mitered joins;",
-"",
-" `\"<fontname>\"` is the name of a valid PostScript font; and `<fontsize>` is",
-" the size of the font in PostScript points.",
-" In addition to the standard postscript fonts, an oblique version of the",
-" Symbol font, useful for mathematics, is defined. It is called",
-" \"Symbol-Oblique\".",
-"",
-" `default` mode sets all options to their defaults: `landscape`, `monochrome`,",
-" `dashed`, `dl 1.0`, `lw 1.0`, `defaultplex`, `noenhanced`, \"Helvetica\" and",
-" 14pt.  Default size of a PostScript plot is 10 inches wide and 7 inches high.",
-"",
-" `palfuncparam` is only available if compiled with `pm3d` support.  It controls",
-" how `set palette functions` are encoded as gradients in the output.",
-" Analytic color component functions (set via `set palette functions`) are",
-" encoded as linear interpolated gradients in the postscript output:  The color",
-" component functions are sampled at <samples> points and all points are",
-" removed from this gradient which can be removed without changing the",
-" resulting colors by more than <maxdeviation>.  For almost every useful",
-" palette you may savely leave the defaults of <samples>=2000 and",
-" <maxdeviation>=0.003 untouched.",
-"",
+" `landscape` and `portrait` choose the plot orientation.",
 " `eps` mode generates EPS (Encapsulated PostScript) output, which is just",
 " regular PostScript with some additional lines that allow the file to be",
 " imported into a variety of other applications.  (The added lines are",
@@ -3457,6 +4051,25 @@ START_HELP(post)
 " mode the whole plot, including the fonts, is reduced to half of the default",
 " size.",
 "",
+" `enhanced` enables enhanced text mode features (subscripts,",
+" superscripts and mixed fonts). See `enhanced` for more information.",
+" `blacktext` forces all text to be written in black even in color mode;",
+"",
+" Duplexing in PostScript is the ability of the printer to print on both",
+" sides of the same sheet of paper.  With `defaultplex`, the default setting",
+" of the printer is used; with `simplex` only one side is printed; `duplex`",
+" prints on both sides (ignored if your printer can't do it).",
+"",
+" `\"<fontname>\"` is the name of a valid PostScript font; and `<fontsize>` is",
+" the size of the font in PostScript points.",
+" In addition to the standard postscript fonts, an oblique version of the",
+" Symbol font, useful for mathematics, is defined. It is called",
+" \"Symbol-Oblique\".",
+"",
+" `default` sets all options to their defaults: `landscape`, `monochrome`,",
+" `dashed`, `dl 1.0`, `lw 1.0`, `defaultplex`, `noenhanced`, \"Helvetica\" and",
+" 14pt.  Default size of a PostScript plot is 10 inches wide and 7 inches high.",
+PS_COMMON_DOC1
 " Fonts listed by `fontfile` or `fontfile add` encapsulate the font",
 " definitions of the listed font from a postscript Type 1 or TrueType font",
 " file directly into the gnuplot output postscript file. Thus, the enclosed",

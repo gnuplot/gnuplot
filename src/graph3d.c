@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.109 2005/01/04 19:44:49 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.110 2005/01/04 20:12:45 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -166,6 +166,9 @@ static TBOOLEAN get_arrow3d __PROTO((struct arrow_def*, int*, int*, int*, int*))
 static void place_arrows3d __PROTO((int));
 static void place_labels3d __PROTO((struct text_label * listhead, int layer));
 static int map3d_getposition __PROTO((struct position* pos, const char* what, double* xpos, double* ypos, double* zpos));
+
+/* for epslatex terminal */
+extern char *pslatex_auxname;
 
 /*
  * The Amiga SAS/C 6.2 compiler moans about macro envocations causing
@@ -736,6 +739,11 @@ do_3dplot(
 
     /* PLACE ARROWS */
     place_arrows3d(0);
+
+    /* Print \includegraphics here when using back option for text */
+    if (term->name=="epslatex" && gpoutfile)
+	fprintf(gpoutfile, "    \\put(0,0){\\includegraphics{%s}}%%\n",
+		pslatex_auxname);
 
 #ifndef LITE
     if (hidden3d && draw_surface && !quick) {

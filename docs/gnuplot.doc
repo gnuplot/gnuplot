@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.272 2005/02/01 11:55:05 broeker Exp $
+C RCS $Id: gnuplot.doc,v 1.273 2005/02/06 05:05:48 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -3292,7 +3292,9 @@ C ... and restart the table:
        plot 'file' index 4:5
 
 ^ See also web page
-^ <a href="http://www.gnuplot.info/demo/multimsh.html"> splot with indices demo. </a>
+^ <a href="http://www.gnuplot.info/demo/multimsh.html">
+^ splot with indices demo.
+^ </a>
 4 smooth
 ?commands plot datafile smooth
 ?plot datafile smooth
