@@ -1,3 +1,47 @@
+1999-09-24  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* FAQ: Latest version from Juergen.
+
+	* configure.in: Fixes for NeXT. Use AC_FUNC_SELECT unconditionally now.
+
+	* config/Makefile.am.in: Remove descrip.mms from EXTRA_DIST.
+
+	* m4/select.m4: Updated with suggestions from the autoconf mailing
+	list. Should now work with K&R compilers too.
+
+	* src/Makefile.am: Remove EXTRA_gnuplot_SOURCES = @NEXTOBJS@.
+
+	* src/command.c: Rewrite command() to directly call command parse
+	functions through lookup function pointer. Make parse functions non-
+	static. Move parse function prototypes to command.h.
+
+	* src/command.c, src/readline.c: Add Petr Mikulik's implementation
+ 	of the new `history' command for the builtin readline function.
+
+	* src/command.h: Parse function prototypes moved from command.c.
+
+	* src/gplt_x11.c(record): Too many args for read_input().
+
+	* src/interpol.c, src/plot.h, src/plot2d.c: Prefix 'plot smooth'
+	options with 'SMOOTH_'.
+
+	* src/plot.c: Update to GNU readline glue from Thomas Walter.
+
+	* src/plot2d.c(eval_plots): Table parser for 'plot smooth' options.
+
+	* src/protos.h: Update function prototypes.
+
+	* src/syscfg.h: Add new FAQ location.
+
+	* src/tables.c, src/tables.h: New table and lookup function for
+	tables with function address as value. New table for 'plot smooth'
+	options.
+	
+1999-09-24  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/plot2d.c(get_data): Check for minimum and maximum number of
+	required data columns.
+
 1999-09-21  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* FAQ: Latest version from Juergen.
@@ -85,7 +129,8 @@
 	term/fig.trm, term/fig.trm, term/gnugraph.trm, term/imagen.trm,
 	term/latex.trm, term/metapost.trm, term/mif.trm, term/next.trm,
 	term/openstep.trm, term/openstep.trm term/png.trm, term/post.trm,
-	term/pslatex.trm, term/tkcanvas.trm, term/win.trm, term/x11.trm.
+	term/pslatex.trm, term/tkcanvas.trm, term/win.trm, term/x11.trm:
+	Parser rewrite to use tables.
 
 1999-08-20  Lars Hecking  <lhecking@nmrc.ucc.ie>
 

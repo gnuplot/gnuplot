@@ -81,4 +81,3 @@ Lars' list
 - fix bug which prints "DI,1DI,0" in the upper left corner of the plot when
   in pcl5 mode and printing to an HP Laserjet 4+ (J. Breeding, bug-gnuplot)
 - integrate gpltconv into gnuplot (convert command?), configure option
-
