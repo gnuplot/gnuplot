@@ -1,3 +1,8 @@
+2005-02-16  Harald Harders  <h.harders@tu-bs.de>
+
+	* term/post.trm: Patch #1122014 "Improve dashed linetypes in Postscript
+	terminals".
+	
 2005-02-16  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/pdf.trm: Correct the driver docs to say font limitations

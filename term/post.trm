@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.144 2005/02/13 18:44:46 sfeam Exp $
+ * $Id: post.trm,v 1.145 2005/02/14 10:19:16 mikulik Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -297,14 +297,14 @@ static const char GPFAR * GPFAR PS_linetypes[] = {
 "/LTb { BL [] 0 0 0 DL } def\n", /* border */
 "/LTa { AL [1 udl mul 2 udl mul] 0 setdash 0 0 0 setrgbcolor } def\n", /* axes */
 "/LT0 { PL [] 1 0 0 DL } def\n",
-"/LT1 { PL [4 dl 2 dl] 0 1 0 DL } def\n",
-"/LT2 { PL [2 dl 3 dl] 0 0 1 DL } def\n",
-"/LT3 { PL [1 dl 1.5 dl] 1 0 1 DL } def\n",
-"/LT4 { PL [5 dl 2 dl 1 dl 2 dl] 0 1 1 DL } def\n",
-"/LT5 { PL [4 dl 3 dl 1 dl 3 dl] 1 1 0 DL } def\n",
-"/LT6 { PL [2 dl 2 dl 2 dl 4 dl] 0 0 0 DL } def\n",
-"/LT7 { PL [2 dl 2 dl 2 dl 2 dl 2 dl 4 dl] 1 0.3 0 DL } def\n",
-"/LT8 { PL [2 dl 2 dl 2 dl 2 dl 2 dl 2 dl 2 dl 4 dl] 0.5 0.5 0.5 DL } def\n",
+"/LT1 { PL [4 dl1 2 dl2] 0 1 0 DL } def\n",
+"/LT2 { PL [2 dl1 3 dl2] 0 0 1 DL } def\n",
+"/LT3 { PL [1 dl1 1.5 dl2] 1 0 1 DL } def\n",
+"/LT4 { PL [6 dl1 2 dl2 1 dl1 2 dl2] 0 1 1 DL } def\n",
+"/LT5 { PL [3 dl1 3 dl2 1 dl1 3 dl2] 1 1 0 DL } def\n",
+"/LT6 { PL [2 dl1 2 dl2 2 dl1 4 dl2] 0 0 0 DL } def\n",
+"/LT7 { PL [2 dl1 2 dl2 2 dl1 2 dl2 2 dl1 4 dl2] 1 0.3 0 DL } def\n",
+"/LT8 { PL [2 dl1 2 dl2 2 dl1 2 dl2 2 dl1 2 dl2 2 dl1 4 dl2] 0.5 0.5 0.5 DL } def\n",
 NULL
 };
 
@@ -1724,6 +1724,7 @@ PS_common_init(
 /Color %s def\n\
 /Blacktext %s def\n\
 /Solid %s def\n\
+/Dashlength %g def\n\
 /Landscape %s def\n\
 /Level1 %s def\n\
 /Rounded %s def\n\
@@ -1731,7 +1732,14 @@ PS_common_init(
 /userlinewidth gnulinewidth def\n\
 %%\n\
 /vshift %d def\n\
-/dl {%.1f mul} def\n\
+/dl1 {\n\
+  %.1f Dashlength mul mul\n\
+  Rounded { currentlinewidth 0.75 mul sub dup 0 le { pop 0.01 } if } if\n\
+} def\n\
+/dl2 {\n\
+  %.1f Dashlength mul mul\n\
+  Rounded { currentlinewidth 0.75 mul add } if\n\
+} def\n\
 /hpt_ %.1f def\n\
 /vpt_ %.1f def\n\
 /hpt hpt_ def\n\
@@ -2223,12 +2231,14 @@ NULL };
 	    ps_params->color ? "true" : "false",
 	    ps_params->blacktext ? "true" : "false",
 	    ps_params->solid ? "true" : "false",
+	    ps_params->dash_length,	/* dash length */
 	    ps_params->psformat == PSTERM_LANDSCAPE ? "true" : "false",
 	    ps_params->level1 ? "true" : "false",
 	    ps_params->rounded ? "true" : "false",
 	    PS_LW*ps_params->linewidth_factor,	/* line width */
 	    (int)(t->v_char)/(-3),	/* shift for vertical centring */
-	    PS_SC*ps_params->dash_length,	/* dash length */
+	    PS_SC*1.0,	/* dash length */
+	    PS_SC*1.0,	/* dash length */
 	    PS_HTIC/2.0,		/* half point width */
 	    PS_VTIC/2.0);		/* half point height */
 
