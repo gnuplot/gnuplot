@@ -1,5 +1,5 @@
 #
-# $Id: makefile.mgw,v 1.7 2001/02/27 16:05:53 mikulik Exp $
+# $Id: makefile.mgw,v 1.8 2001/03/07 08:40:05 mikulik Exp $
 #
 # GNUPLOT Makefile for MinGW32 and Cygwin/MinGW32 on WinNT and Win95/98/..
 #
@@ -150,6 +150,9 @@ M=../demo/
 
 default: wgnuplot.exe $(HELPFILE) wgnuplot.mnu $(M)bf_test.exe
 
+all:	 wgnuplot.exe $(HELPFILE) wgnuplot.mnu $(M)bf_test.exe gnuplot.ps gnuplot.pdf
+
+
 # include the 'core makefile template'
 include makefile.all
 
@@ -242,11 +245,36 @@ $(M)bf_test.exe : bf_test.c dbinary.$(O) alloc.$(O)
 dbinary.$(O): binary.c
 	$(CC) -c $(CFLAGS) -U_Windows -o $@ $^
 
+
+#
+# Create documentation in various formats
+#
+# Call LaTeX three times to get the toc right.
+gnuplot.tex: $(D)\gnuplot.doc doc2tex.exe
+	doc2tex $(D)\gnuplot.doc gnuplot.tex
+gnuplot.dvi: gnuplot.tex $(D)titlepag.tex
+	cp gnuplot.tex $(D)gp_tex2.tex
+	cd $(D) && latex gp_tex2.tex && latex gp_tex2.tex && latex gp_tex2.tex
+	mv $(D)gp_tex2.dvi gnuplot.dvi
+	rm -f $(D)gp_tex2.*
+gnuplot.ps: gnuplot.dvi
+	dvips -o gnuplot.ps gnuplot.dvi
+gnuplot.pdf: gnuplot.tex $(D)titlepag.tex
+	cp gnuplot.tex $(D)gp_tex2.tex
+	cd $(D) && pdflatex gp_tex2.tex && pdflatex gp_tex2.tex && pdflatex gp_tex2.tex
+	mv $(D)gp_tex2.pdf gnuplot.pdf
+	rm -f $(D)gp_tex2.*
+
+doc2tex.exe: $(D)doc2tex.c $(D)termdoc.c
+	$(LD) $(LDFLAGS) -o $@ -DWINDOWS_NO_GUI $(CFLAGS) -I. -I$(D) -I$(T) $^
+
+
 # clean up temporary files
 clean:
 	$(RM) *.$(O) wgnuplot.map wgnuplot.res win/gnuplot.rtf
 	$(RM) doc2rtf.exe win/wgnuplib.res wgnuplib.map wgnuplot.lib
 	$(RM) $(M)bf_test.exe *.ico geticon.exe
+	$(RM) gnuplot.tex gnuplot.dvi gnuplot.ps gnuplot.pdf
 
 realclean: veryclean
 veryclean: clean
