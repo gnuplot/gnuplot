@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.29 1999/09/24 15:35:45 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.30 1999/10/01 14:54:29 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -543,7 +543,7 @@ history_command()
 	    m_quote_capture(&name, c_token, c_token);
 	    c_token++;
 	}
-	write_history_n( n, name );
+	write_history_n(n, name);
     }
 #else
     int_error(c_token, "History not supported with GNU readline");
@@ -1183,6 +1183,11 @@ const char *prompt;
 	    prompt_desc.dsc$a_pointer = expand_prompt;
 	    more = 1;
 	    --start;
+	} else if (input_line[start - 1] == ',') {
+	   /* Allow for a continuation line. */
+	   prompt_desc.dsc$w_length = strlen(expand_prompt);
+	   prompt_desc.dsc$a_pointer = expand_prompt;
+	   more = 1;
 	} else {
 	    line_desc.dsc$w_length = strlen(input_line);
 	    line_desc.dsc$a_pointer = input_line;
@@ -1794,6 +1799,8 @@ const char *prompt;
 		}
 		if (input_line[last] == '\\') {		/* line continuation */
 		    start = last;
+		    more = TRUE;
+		} else if (input_line[last] == ',') {   /* line continuation */
 		    more = TRUE;
 		} else
 		    more = FALSE;

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.17 1999/07/30 19:34:28 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.18 1999/10/01 14:54:33 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -409,6 +409,10 @@ TBOOLEAN can_do_args;
 		    if (input_line[len] == '\\') {
 			/* line continuation */
 			start = len;
+			left = input_line_len - start;
+		    } else if (input_line[len] == ',') {
+			/* line continuation */
+			start = len+1;
 			left = input_line_len - start;
 		    } else
 			more = FALSE;
