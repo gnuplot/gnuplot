@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.17 1999/10/29 18:50:55 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.18 1999/11/08 19:24:29 lhecking Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -900,9 +900,10 @@ struct value data;
 	udv_ptr = udv_ptr->next_udv;
     }
 
-    if (!udv_ptr) {		/* generate new entry */
-	last->next_udv = udv_ptr = (struct udvt_entry *)
-	    gp_alloc(sizeof(struct udvt_entry), "fit setvar");
+    if (!udv_ptr) {             /* generate new entry */
+	udv_ptr = (struct udvt_entry *) gp_alloc(sizeof(struct udvt_entry), "fit setvar");
+	udv_ptr->udv_name = NULL;
+	last->next_udv = udv_ptr;
 	udv_ptr->next_udv = NULL;
     }
     udv_ptr->udv_name = gp_realloc(udv_ptr->udv_name, strlen(varname) + 1, "user var");
