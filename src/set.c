@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.24 1999/09/14 15:25:54 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.25 1999/10/01 14:54:35 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -41,10 +41,18 @@ static char *RCSid() { return RCSid("$Id: set.c,v 1.24 1999/09/14 15:25:54 lheck
  */
 
 #include "plot.h"
-#include "stdfn.h"
+#include "alloc.h"
+#include "command.h"
+#include "gp_time.h"
+#include "hidden3d.h"
+#include "misc.h"
+#include "parse.h"
+#include "plot2d.h"
+#include "plot3d.h"
 #include "setshow.h"
 #include "tables.h"
-#include "alloc.h"
+#include "term_api.h"
+#include "util.h"
 
 #define SIGNIF (0.01)		/* less than one hundredth of a tic mark */
 

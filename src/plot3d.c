@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.12 1999/08/11 18:09:41 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.13 1999/10/01 14:54:34 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -35,10 +35,19 @@ static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.12 1999/08/11 18:09:41 lh
 ]*/
 
 #include "plot.h"
-#include "plot3d.h"		/* HBB 990826: new file */
+#include "alloc.h"
+#include "command.h"
+#include "contour.h"
+#include "datafile.h"
+#include "graph3d.h"
+#include "graphics.h"
+#include "misc.h"
+#include "parse.h"
+#include "plot2d.h"
+#include "plot3d.h"
 #include "setshow.h"
-#include "binary.h"
-#include "matrix.h"
+#include "term_api.h"
+#include "util.h"
 
 #ifndef _Windows
 # include "help.h"
@@ -1105,10 +1114,6 @@ eval_3dplots()
 		this_plot->title = NULL;
 	    }
 	    if (almost_equals(c_token, "t$itle")) {
-		/*                      if (!isstring(++c_token))
-		   int_error(c_token, "Expected title");
-		   m_quote_capture(&(this_plot->title), c_token, c_token);
-		 */
 		if (parametric) {
 		    if (crnt_param != 0)
 			int_error(c_token, "\"title\" allowed only after parametric function fully specified");

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: bitmap.c,v 1.8 1999/10/01 14:50:07 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: bitmap.c,v 1.9 1999/10/17 19:10:22 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - bitmap.c */
@@ -62,7 +62,9 @@ static char *RCSid() { return RCSid("$Id: bitmap.c,v 1.8 1999/10/01 14:50:07 lhe
  */
 
 #include "plot.h"
+#include "alloc.h"
 #include "bitmap.h"
+#include "util.h"
 
 static void b_putc __PROTO((unsigned int, unsigned int, int, unsigned int));
 

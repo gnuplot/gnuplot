@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.18 1999/10/01 14:54:33 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.19 1999/10/17 19:11:14 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -35,8 +35,11 @@ static char *RCSid() { return RCSid("$Id: misc.c,v 1.18 1999/10/01 14:54:33 lhec
 ]*/
 
 #include "plot.h"
-#include "misc.h"		/* HBB 990826: new file */
+#include "alloc.h"
+#include "command.h"
+#include "misc.h"
 #include "setshow.h"
+#include "util.h"
 
 /* name of command file; NULL if terminal */
 char *infile_name = NULL;
@@ -665,5 +668,6 @@ const char *filename, *mode;
 	    free(fullname);
 
     }
+
     return fp;
 }

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.12 1999/08/07 17:21:30 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.13 1999/10/01 14:54:30 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -140,9 +140,17 @@ static char *RCSid() { return RCSid("$Id: datafile.c,v 1.12 1999/08/07 17:21:30 
 /*}}} */
 
 #include "plot.h"
-#include "datafile.h"
+#include "alloc.h"
 #include "binary.h"
+#include "command.h"
+#include "datafile.h"
+#include "gp_time.h"
+#include "graphics.h"
+#include "internal.h"
+#include "misc.h"
+#include "parse.h"
 #include "setshow.h"
+#include "util.h"
 
 /* if you change this, change the scanf in readline */
 #define NCOL   7		/* max using specs     */

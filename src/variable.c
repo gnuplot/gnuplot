@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: variable.c,v 1.9 1999/07/20 15:27:48 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: variable.c,v 1.10 1999/10/01 14:54:37 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - variable.c */
@@ -34,11 +34,14 @@ static char *RCSid() { return RCSid("$Id: variable.c,v 1.9 1999/07/20 15:27:48 l
  * to the extent permitted by applicable law.
 ]*/
 
-/* The Death of global variables - part one. */
+/* The Death of Global Variables - part one. */
 
 /* #define DEBUG */
 
 #include "plot.h"
+#include "alloc.h"
+#include "command.h"
+#include "util.h"
 #include "variable.h"
 
 #define PATHSEP_TO_NUL(arg) \

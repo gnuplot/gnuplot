@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: eval.c,v 1.6 1999/06/19 20:52:04 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: eval.c,v 1.7 1999/10/01 14:54:30 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - eval.c */
@@ -36,6 +36,14 @@ static char *RCSid() { return RCSid("$Id: eval.c,v 1.6 1999/06/19 20:52:04 lheck
 
 
 #include "plot.h"
+#include "alloc.h"
+#include "datafile.h"
+#include "eval.h"
+#include "internal.h"
+#include "parse.h"
+#include "specfun.h"
+#include "standard.h"
+#include "util.h"
 
 /* HBB 990829: the following was moved here, from plot.c, where is
  * wasn't used, anyway... */

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.20 1999/10/01 14:54:31 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.21 1999/10/17 19:11:54 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -36,7 +36,16 @@ static char *RCSid() { return RCSid("$Id: graphics.c,v 1.20 1999/10/01 14:54:31 
 
 
 #include "plot.h"
+#include "alloc.h"
+#include "command.h"
+#include "gp_time.h"
+#include "graphics.h"
+#include "hidden3d.h"
+#include "misc.h"
 #include "setshow.h"
+#include "term_api.h"
+#include "util.h"
+#include "util3d.h"
 
 /* key placement is calculated in boundary, so we need file-wide variables
  * To simplify adjustments to the key, we set all these once [depends on

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.30 1999/10/01 14:54:29 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.31 1999/10/17 19:11:14 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -64,10 +64,22 @@ static char *RCSid() { return RCSid("$Id: command.c,v 1.30 1999/10/01 14:54:29 l
  */
 
 #include "plot.h"
+#include "alloc.h"
+#include "command.h"
+#include "eval.h"
+#include "fit.h"
+#include "gp_time.h"
+#include "misc.h"
+#include "parse.h"
+#include "plot2d.h"
+#include "plot3d.h"
+#include "readline.h"
+#include "save.h"
+#include "scanner.h"
 #include "setshow.h"
 #include "tables.h"
-#include "fit.h"
-#include "binary.h"
+#include "term_api.h"
+#include "util.h"
 
 /* GNU readline
  * Only required by two files directly,

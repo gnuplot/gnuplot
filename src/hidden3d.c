@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.10 1999/08/11 18:14:24 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.11 1999/10/01 14:54:32 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - hidden3d.c */
@@ -50,8 +50,17 @@ static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.10 1999/08/11 18:14:24 
  */
 
 #include "plot.h"
+#include "alloc.h"
+#include "command.h"
+#include "graph3d.h"
+#include "graphics.h"
+#include "hidden3d.h"
+#include "parse.h"
 #include "setshow.h"
 #include "tables.h"
+#include "term_api.h"
+#include "util.h"
+#include "util3d.h"
 
 /* TODO (HBB's notes, just in case you're interested):
  * 990826: nothing left to do with this version. It's gonna be

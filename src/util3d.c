@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util3d.c,v 1.4 1999/06/11 18:53:17 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: util3d.c,v 1.5 1999/10/01 14:54:37 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - util3d.c */
@@ -46,8 +46,11 @@ static char *RCSid() { return RCSid("$Id: util3d.c,v 1.4 1999/06/11 18:53:17 lhe
  */
 
 #include "plot.h"
+#include "graphics.h"
+#include "graph3d.h"
+#include "hidden3d.h"
 #include "setshow.h"
-#include "graph3d.h"		/* HBB 990826: new file */
+#include "util3d.h"
 
 /* HBB 990826: all that stuff referenced from other modules is now
  * exported in graph3d.h, instead of being listed here */

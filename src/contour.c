@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: contour.c,v 1.5 1999/07/30 19:37:31 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: contour.c,v 1.6 1999/08/07 17:21:29 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - contour.c */
@@ -47,6 +47,9 @@ static char *RCSid() { return RCSid("$Id: contour.c,v 1.5 1999/07/30 19:37:31 lh
  */
 
 #include "plot.h"
+#include "alloc.h"
+#include "contour.h"
+#include "graphics.h"
 #include "setshow.h"
 
 #define DEFAULT_NUM_APPROX_PTS 5
