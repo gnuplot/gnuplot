@@ -1,5 +1,5 @@
 /* -*- objc -*-
- * $Id: aquaterm.trm,v 1.6 2004/08/25 10:25:24 persquare Exp $
+ * $Id: aquaterm.trm,v 1.7 2004/09/01 15:53:50 mikulik Exp $
  *
  */
 
@@ -71,6 +71,12 @@ TERM_PUBLIC void AQUA_filled_polygon __PROTO((int points, gpiPoint *corners));
 # ifdef WITH_IMAGE
 TERM_PUBLIC void AQUA_image __PROTO((unsigned, unsigned, coordval *, gpiPoint *, t_imagecolor));
 # endif
+TERM_PUBLIC void ENHAQUA_put_text __PROTO((unsigned int x, unsigned int y, const char str[]));
+TERM_PUBLIC void ENHAQUA_open __PROTO((char * fontname, double fontsize,
+				       double base, TBOOLEAN widthflag, TBOOLEAN showflag,
+				       int overprint));
+TERM_PUBLIC void ENHAQUA_flush __PROTO((void));
+TERM_PUBLIC void ENHAQUA_writec __PROTO((int c));
 /* End of entries */
 
 #define AQUA_RESOLUTION (20.0)                    /* Increase resolution */
@@ -94,6 +100,8 @@ TERM_PUBLIC void AQUA_image __PROTO((unsigned, unsigned, coordval *, gpiPoint *,
 
 #import <Foundation/NSAutoreleasePool.h>
 #import <Foundation/NSArray.h>
+#import <Foundation/NSDictionary.h>
+#import <Foundation/NSAttributedString.h>
 #import <stdarg.h>
 
 #ifdef PM3D
@@ -204,24 +212,35 @@ AQUA_options()
 	continue;
     }
 
+    if (almost_equals(c_token, "enh$anced")) {
+      term->put_text = ENHAQUA_put_text;
+      c_token++;
+      continue;
+    }
+
+    if (almost_equals(c_token, "noenh$anced")) {
+      term->put_text = AQUA_put_text;
+      c_token++;
+      continue;
+    }
+
     if (isanumber(c_token)) { /* plot ref number*/
 	AQUA_plotRef = (int) real (const_express (&a));
 	continue;
     }
 
     int_error(c_token, "unexpected text at end of command");
-
   }
 
   if (AQUA_title[0]=='\0') /* always set title */
     sprintf(AQUA_title, "Figure %d", AQUA_plotRef);
-
   /* Save options back into options string in normalized format */
-  sprintf(term_options, "%d title '%s' size %d %d fname '%s'  fsize %g",
+  sprintf(term_options, "%d title '%s' size %d %d fname '%s' fsize %g %s",
 	  AQUA_plotRef,
 	  AQUA_title,
 	  (unsigned int) (AQUA_xSize/AQUA_RESOLUTION), (unsigned int) (AQUA_ySize/AQUA_RESOLUTION),
-	  AQUA_fontNameCur, AQUA_fontSizeCur);
+	  AQUA_fontNameCur, AQUA_fontSizeCur,
+	  term->put_text == ENHAQUA_put_text?"enhanced":"noenhanced");
 }
 
 static void
@@ -585,6 +604,104 @@ AQUA_image (unsigned int M, unsigned int N, coordval *image, gpiPoint *corner, t
 
 #endif /* WITH_IMAGE */
 
+/*
+ * Per Persson 20041019
+ * Support for enhanced text mode
+ * 
+ * Known issues:
+ *   - Overprinting not implemented 
+ *   - The sub/superscript level is determined from relative fontsize,
+ *     it may break if fontsize is changed for individual characters.
+ */
+
+static NSMutableAttributedString *enhString;
+static NSMutableDictionary *attributes;
+
+TERM_PUBLIC void 
+ENHAQUA_put_text(unsigned int x, unsigned int y, const char str[])
+{
+  if (!strpbrk(str, "{}^_@&~"))
+    {
+      AQUA_put_text(x,y,str);
+      return;
+    }
+  /* set up the global variables needed by enhanced_recursion() */
+  enhanced_max_height = -1000;
+  enhanced_min_height = 1000;
+  enhanced_fontscale = 1;
+  strncpy(enhanced_escape_format,"%c",sizeof(enhanced_escape_format));
+  
+  /* Clear the attributed string */
+  [enhString release];
+  enhString = [[NSMutableAttributedString alloc] init];
+  [enhString setAttributedString:[[NSAttributedString alloc] initWithString:@""]];
+
+  while (*(str = enhanced_recursion((char *)str, TRUE, AQUA_fontNameCur,
+				    (double)(AQUA_fontSizeCur), 0.0, TRUE, TRUE, 0))) {
+    /* I think we can only get here if *str == '}' */
+    enh_err_check(str);
+
+    if (!*++str)
+      break; /* end of string */
+    /* else carry on and process the rest of the string */
+  }
+
+  /* Now, send the attributed string to the adapter */
+  [adapter  addLabel:enhString
+	    atPoint:NSMakePoint(x/AQUA_RESOLUTION, y/AQUA_RESOLUTION)
+	    angle:AQUA_TextAngle
+	    align:(AQUA_TextJust | AQTAlignMiddle)];
+
+}
+
+TERM_PUBLIC void 
+ENHAQUA_open(char * fontname, double fontsize,
+	     double base, TBOOLEAN widthflag, TBOOLEAN showflag,
+	     int overprint)
+{
+  LOG(@"%s %.1f %.1f %s %s %d", fontname, fontsize, base,
+      widthflag ? "true" : "false",
+      showflag ? "true" : "false",
+      overprint);
+  
+  if (overprint != 0)
+    return;
+  
+  [attributes release];
+  attributes = [[NSMutableDictionary alloc] initWithCapacity:16]; 
+  [attributes setObject:[NSString stringWithCString:fontname] forKey:@"AQTFontname"];
+
+  if (abs(base)>0.01) { 
+    /* consider this as super/subscript, and compute subscript level */
+    int n = (int)round(log(fontsize/AQUA_fontSizeCur)/log(0.8)); 
+    [attributes setObject:[NSNumber numberWithInt:(base > 0)?n:-n] 
+		   forKey:@"NSSuperScript"];
+  } else if (abs(fontsize - AQUA_fontSizeCur)>0.01) {
+    /* Fontsize was set explicitly */
+    [attributes setObject:[NSNumber numberWithFloat:fontsize] forKey:@"AQTFontsize"];
+  }
+
+  if (!showflag)
+    [attributes setObject:[NSNumber numberWithInt:1] 
+		   forKey:@"AQTNonPrintingChar"];
+}
+
+
+TERM_PUBLIC void 
+ENHAQUA_flush(void)
+{
+  LOG(@"ENHAQUA_flush");
+}
+
+TERM_PUBLIC void 
+ENHAQUA_writec(int c)
+{
+  NSAttributedString *aStr;
+  aStr = [[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@"%C", (c+0x100) & 0xFF]
+				         attributes:attributes];
+  [enhString appendAttributedString:aStr];
+  [aStr release];
+}
 #endif /* TERM_BODY */
 
 #ifdef TERM_TABLE
@@ -615,6 +732,7 @@ TERM_TABLE_START(aqua_driver)
 #ifdef WITH_IMAGE
   , AQUA_image
 #endif
+    , ENHAQUA_open, ENHAQUA_flush, ENHAQUA_writec
 TERM_TABLE_END(aqua_driver)
 
 #undef LAST_TERM
@@ -638,13 +756,17 @@ START_HELP(aqua)
 " Syntax:",
 "       set terminal aqua {<n>} {title \"<wintitle>\"} {size <x> <y>}",
 "                         {fname \"<fontface>\"} {fsize <fontsize>}",
+"                         {{no}enhanced}",
 "",
 " where <n> is the number of the window to draw in (default is 0),",
 " <wintitle> is the name shown in the title bar (default \"Figure <n>\"),",
 " <x> <y> is the size of the plot (default is 846x594 pt = 11.75x8.25 in).",
 "",
 " Use <fontface> to specify the font to use (default is \"Times-Roman\"),",
-" <fontzise> sets the font size (default is 14.0 pt)."
+" <fontzise> sets the font size (default is 14.0 pt).",
+"",
+" The aqua terminal support enhanced text mode (see `enhanced`), except for",
+" overprint. Font support is limited to the fonts available on the system."
 END_HELP(aqua)
 #endif /* TERM_HELP */
 

@@ -1,3 +1,12 @@
+2004-08-27  Per Persson <persquare@mac.com>
+
+	Adding enhanced text support to terminal aqua.
+
+	* term/aquaterm.trm (ENHAQUA_put_text, ENHAQUA_open, ENHAQUA_flush,
+	ENHAQUA_writec): Added.
+
+	* docs/gnuplot.doc Add aqua to list of terminals with enhanced option.
+	
 2004-10-18  Volker Dobler  <v.dobler@web.de> 
             Ethan Merritt  <merritt@u.washington.edu>
 
