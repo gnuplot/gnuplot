@@ -41,18 +41,18 @@
 EXT char    *fit_index;
 EXT char    fitbuf[256];
 
+/*****************************************************************
+    Useful macros
+    We avoid any use of varargs/stdargs (not good style but portable)
+*****************************************************************/
 
-/******* public functions ******/
-
-EXT char    *get_next_word __PROTO((char **s, char *subst)); 
-
-EXT void    init_fit __PROTO((void));
-EXT void    setvar __PROTO((char *varname, struct value data));
-EXT int     getivar __PROTO((char *varname));
-EXT void    update __PROTO((char *pfile, char *npfile));
-EXT void    do_fit __PROTO((void));
-
-/********* Macros *********/
+#define Dblf(a)         {fprintf (STANDARD,a); fprintf (log_f,a);}
+#define Dblf2(a,b)      {fprintf (STANDARD,a,b); fprintf (log_f,a,b);}
+#define Dblf3(a,b,c)    {fprintf (STANDARD,a,b,c); fprintf (log_f,a,b,c);}
+#define Dblf5(a,b,c,d,e) \
+                {fprintf (STANDARD,a,b,c,d,e); fprintf (log_f,a,b,c,d,e);}
+#define Dblf6(a,b,c,d,e,f) \
+                {fprintf (STANDARD,a,b,c,d,e,f); fprintf (log_f,a,b,c,d,e,f);}
 
 #define Eex(a)	    {sprintf (fitbuf+9, (a));         error_ex ();}
 #define Eex2(a,b)   {sprintf (fitbuf+9, (a),(b));     error_ex ();}

@@ -400,6 +400,11 @@ FILE *fp;
 	save_functions__sub(fp);
 	save_variables__sub(fp);
 	fprintf(fp, "%s\n", replot_line);
+        if (wri_to_fil_last_fit_cmd(NULL)) {
+           fputs("## ", fp);
+           wri_to_fil_last_fit_cmd(fp);
+           putc('\n', fp);
+        }
 	fprintf(fp, "#    EOF\n");
 	(void) fclose(fp);
     } else
