@@ -1,3 +1,11 @@
+2002-12-15  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* config/makefile.mgw config/makefile.cyg: Compile doc2tex with
+	allterm.h so that gnuplot.tex documents all terminal drivers, not only
+	those currently used.
+
+	* post.trm(START_HELP): Added label 'postscript fontfile'.
+
 2002-12-13  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* docs/titlepag.ms docs/titlepag.tex docs/gnuplot.doc: Added my name to
@@ -9,9 +17,9 @@
 
 	* post.trm(START_HELP): Fixed broken reference to `postscript fontfile`.
 
-	* x11.trm(START_HELP): Added label `help x11 pm3d`.
+	* x11.trm(START_HELP): Added label 'help x11 pm3d'.
 
-	* vgagl.trm(START_HELP): Added label `help vgagl`.
+	* vgagl.trm(START_HELP): Added label 'help vgagl'.
 
 2002-12-13  Petr Mikulik  <mikulik@physics.muni.cz>
 
@@ -1587,7 +1595,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/12/13 20:12:53 $).
+	last modification date (from the tag $Date: 2002/12/13 20:47:24 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
