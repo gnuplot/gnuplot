@@ -1,5 +1,5 @@
 /*
- * $Id: pslatex.trm,v 1.15 1999/01/12 19:16:59 lhecking Exp $
+ * $Id: pslatex.trm,v 1.15.2.1 1999/08/19 14:16:07 lhecking Exp $
  */
 
 /* GNUPLOT - pslatex.trm */
@@ -91,7 +91,7 @@ static int PSLATEX_justify;
 static int PSLATEX_rotate = TRUE;
 static char *PSLATEX_psfile = NULL;
 static TBOOLEAN PSLATEX_useAuxFile = FALSE;	/* do we write two files? */
-static FILE *PSLATEX_auxFile;
+static FILE *PSLATEX_auxFile = NULL;
 static TBOOLEAN PSLATEX_output = TRUE;	/* do we write LaTeX? */
 
 struct text_command {
@@ -176,7 +176,9 @@ TERM_PUBLIC void PSLATEX_init()
     if (strcmp(term->name, "pstex") == 0)
 	PSLATEX_output = FALSE;
 
-    PSLATEX_auxFile = NULL;	/* until we know otherwise */
+    /* until we know otherwise */
+    PSLATEX_auxFile = NULL;
+
     /* dont tweak PSLATEX_useAuxFile if we decide we cannot comply
      * since this affects subsequent plots even after a set out
      * Instead, we will use PSLATEX_auxFile != NULL to indicate
@@ -190,24 +192,25 @@ TERM_PUBLIC void PSLATEX_init()
     /* try to open the auxiliary file for the postscript parts. */
     if (outstr && PSLATEX_useAuxFile == TRUE) {
 
-	if (PSLATEX_psfile)
-	    free(PSLATEX_psfile);
 	/* length of outstr plus ('.' or '\0') plus "ps" plus '\0' */
-	PSLATEX_psfile = gp_alloc((dotIndex - outstr) + 4, "pslatex aux filename");
+	PSLATEX_psfile = gp_realloc (PSLATEX_psfile,(dotIndex - outstr) + 4,"pslatex aux filename");
 	if (PSLATEX_psfile) {
 	    /* include period or '\0' */
 	    strncpy(PSLATEX_psfile, outstr, (dotIndex - outstr) + 1);
 	    /* period or '\0' is overwritten with period, and "ps" appended */
 	    strcpy(PSLATEX_psfile + (dotIndex - outstr), ".ps");
-	    if ((PSLATEX_auxFile = fopen(PSLATEX_psfile, "w")) == (FILE *) NULL) {
+	    PSLATEX_auxFile = fopen(PSLATEX_psfile, "w");
+	    if (PSLATEX_auxFile  == (FILE *) NULL) {
 		fprintf(stderr, "Cannot open aux file %s for output\n",
 			PSLATEX_psfile);
+		/* And what? Error handling????? */
 	    }
 	} else {
 	    fprintf(stderr, "\
 Cannot make PostScript file name from %s\n\
 Turning off auxfile option\n", outstr);
 	    PSLATEX_auxFile = NULL;
+	    /* NEW! */ PSLATEX_useAuxFile = FALSE;
 	}
     }
     if (PSLATEX_output) {
@@ -274,20 +277,6 @@ Turning off auxfile option\n", outstr);
 TERM_PUBLIC void PSLATEX_graphics()
 {
     struct termentry *t = term;
-    char *psfile_basename = strrchr(PSLATEX_psfile, DIRSEP1);
-
-    if (psfile_basename)
-	psfile_basename++;
-    else {
-	if (DIRSEP2 != NUL) {
-	    psfile_basename = strrchr(PSLATEX_psfile, DIRSEP2);
-	    if (psfile_basename)
-		psfile_basename++;
-	    else
-		psfile_basename = PSLATEX_psfile;
-	} else
-	    psfile_basename = PSLATEX_psfile;
-    }
 
     if (PSLATEX_output)
 	fprintf(gpoutfile, "\\begin{picture}(%d,%d)(0,0)%%\n",
@@ -298,12 +287,26 @@ TERM_PUBLIC void PSLATEX_graphics()
 
     if (PSLATEX_auxFile) {
 	FILE *tmp;
-	/*
-	 * these are taken from the post.trm file computation
-	 * of the bounding box, but without the X_OFF and Y_OFF
-	 */
+	/* these are taken from the post.trm file computation
+	 * of the bounding box, but without the X_OFF and Y_OFF */
 	int urx = (int) (xsize * (PS_XMAX) / PS_SC + 0.5);
 	int ury = (int) (ysize * (PS_YMAX) / PS_SC + 0.5);
+	/* moved this code here from beginning of the function
+	 * PSLATEX_psfile is only != NULL with the `auxfile' option */
+	char *psfile_basename = strrchr(PSLATEX_psfile, DIRSEP1);
+
+	if (psfile_basename)
+	    psfile_basename++;
+	else {
+	    if (DIRSEP2 != NUL) {
+		psfile_basename = strrchr(PSLATEX_psfile, DIRSEP2);
+		if (psfile_basename)
+		    psfile_basename++;
+		else
+		    psfile_basename = PSLATEX_psfile;
+	    } else
+		psfile_basename = PSLATEX_psfile;
+	}
 
 	/* generate special which xdvi and dvips can handle */
 	fprintf(gpoutfile,
