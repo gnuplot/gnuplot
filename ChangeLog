@@ -1,3 +1,7 @@
+2000-11-06  Ian MacPhedran  <Ian_MacPhedran@engr.USask.Ca>
+
+	* term/tgif.trm: Add PM3D support.
+
 2000-11-06  Johannes Zellner  <johannes@zellner.org>
 
 	* src/gplt_x11.c: Patch from Pieter-Tjerk de Boer to make
