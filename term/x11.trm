@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: x11.trm,v 1.123 2004/11/27 02:38:39 sfeam Exp $
+ * $Id: x11.trm,v 1.124 2004/11/28 02:02:54 sfeam Exp $
  *
  */
 
@@ -2419,8 +2419,10 @@ START_HELP(x11)
 "  gnuplot*exportselection:  off",
 "#\\begin{tabular}{|cl|} \\hline",
 "#&gnuplot*exportselection:  off\\\\",
+"#&gnuplot*ctrlq:  off\\\\",
 "%c l .",
 "%@gnuplot*exportselection:  off",
+"%@gnuplot*ctrlq:  off",
 "@end table"
 
 END_HELP(x11)
