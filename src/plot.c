@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot.c,v 1.23 1999/10/01 14:54:34 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot.c,v 1.24 1999/10/17 19:12:42 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - plot.c */
@@ -37,9 +37,15 @@ static char *RCSid() { return RCSid("$Id: plot.c,v 1.23 1999/10/01 14:54:34 lhec
 #include <signal.h>
 
 #include "plot.h"
-
+#include "alloc.h"
+#include "command.h"
+#include "eval.h"
 #include "fit.h"
+#include "misc.h"
 #include "setshow.h"
+#include "term_api.h"
+#include "util.h"
+
 #include <setjmp.h>
 
 #if defined(MSDOS) || defined(DOS386) || defined(__EMX__)
@@ -632,7 +638,7 @@ static void
 get_user_env()
 {
     if (user_homedir == NULL) {
-	char *env_home;
+	const char *env_home;
 
 #ifndef VMS
 	if ((env_home = getenv(HOME)) || (env_home = getenv("HOME")))
@@ -645,7 +651,7 @@ get_user_env()
     }
     /* Hhm ... what about VMS? */
     if (user_shell == NULL) {
-	char *env_shell;
+	const char *env_shell;
 
 	if ((env_shell = getenv("SHELL")) == NULL)
 #if defined(MSDOS) || defined(_Windows) || defined(DOS386) || defined(OS2)
