@@ -1,3 +1,7 @@
+2000-11-21  Johannes Zellner  <johannes@zellner.org>
+
+	* src/gplt_x11.c: added a few ifdefs, so it compiles w/o mouse/pm3d.
+
 2000-11-20  Johannes Zellner  <johannes@zellner.org>
 
 	* term/x11.trm,src/gplt_x11.c: `set palette maxcolors' for x11

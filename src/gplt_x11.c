@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.21 2000/11/14 15:35:51 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.22 2000/11/20 20:31:36 joze Exp $"); }
 #endif
 
 /* GNUPLOT - gplt_x11.c */
@@ -504,7 +504,7 @@ main(argc, argv)
 int argc;
 char *argv[];
 {
-#if !defined(OS2)
+#if defined(USE_MOUSE) && !defined(OS2)
     int getfl;
 #endif
 
@@ -642,7 +642,7 @@ mainloop()
 	    FD_SET(in, &tset);
 	}
 
-#if !defined(OS2)
+#if defined(USE_MOUSE) && !defined(OS2)
 	if (buffered_output_pending && !pipe_died) {
 	    /* check, if stdout becomes writable */
 	    FD_SET(out, &tset);
@@ -684,7 +684,7 @@ mainloop()
 	    if (!record())	/* end of input */
 		return;
 	}
-#if !defined(OS2)
+#if defined(USE_MOUSE) && !defined(OS2)
 	if (!pipe_died && (FD_ISSET(out, &tset) || buffered_output_pending)) {
 	    gp_exec_event(GE_pending, 0, 0, 0, 0);
 	}
