@@ -1,3 +1,8 @@
+2005-01-26  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/win/pgnuplot.c (PostString): Fix transmission of 8-bit
+	characters to function taking ints by cast to unsigned char.
+
 2005-01-25  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/ai.trm (AI_reset) term/corel.trm (COREL_reset) term/epslatex.trm
@@ -10,7 +15,7 @@
 
 2005-01-20  Dietmar Warning  <warning@danalyse.de>
 
-	* src/gnuplot.opt: Add breaders.obj to VMS *.opt file
+	* src/gnuplot.opt: Add breaders.obj to the list.
 
 2005-01-19  Dietmar Warning  <warning@danalyse.de>
 
@@ -93,6 +98,15 @@
 	is too long for more often use.
 
 2005-01-05  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/util.h (try_to_get_string): Add missing 'void' to prototype
+	argument list.
+
+	* term/x11.trm: #include <sys/select.h>, if it exists.
+
+	* src/stdfn.h: #include <sys/param.h> before checking if PATH_MAX
+	is defined (definition may be in there...), rather than inside the
+	fallback definition only.
 
 	* term/svg.trm (SVG_init): Updated DOCTYPE name and reference to
 	current standard: SVG 1.1. Added an XMLNS namespace declaration to
