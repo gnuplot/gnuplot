@@ -1,3 +1,9 @@
+#ifndef lint
+static char *RCSid() { return RCSid("$Id: $"); }
+#endif
+
+/* GNUPLOT - dynarray.c */
+
 /* HBB: new code fragment for an 'OO-style' resizeable-array
  * container.  used in hidden3d, for now, but should be useful,
  * elsewhere (after extracting the header and removing the 'static'
