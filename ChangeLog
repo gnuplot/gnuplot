@@ -1,3 +1,8 @@
+2004-09-06  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* configure.in (AC_PREREQ): Bumped to 2.58, to avoid problems with
+	missing AC_HEADER_STDBOOL.
+	
 2004-09-06  Daniel Sebald  <daniel.sebald@ieee.org>
 
 	* configure.in: The --enable-image option requires general binary data
