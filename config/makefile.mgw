@@ -1,5 +1,5 @@
 #
-# $Id: makefile.mgw,v 1.6 2001/02/05 11:36:37 mikulik Exp $
+# $Id: makefile.mgw,v 1.7 2001/02/27 16:05:53 mikulik Exp $
 #
 # GNUPLOT Makefile for MinGW32 and Cygwin/MinGW32 on WinNT and Win95/98/..
 #
@@ -102,7 +102,7 @@ TERMLIBS =
 
 CFLAGS += -I$(TOP) -I. -D_Windows -DNO_GIH -DHAVE_STRNICMP \
 	-DREADLINE -DGP_INLINE=inline -D_NO_OLDNAMES -DANSI_C \
-	-DHAVE_GETCWD -DNEAR= \
+	-DHAVE_GETCWD -DPIPES -DNEAR= \
 	$(OPTS)
 
 ifdef MOUSE
@@ -173,7 +173,7 @@ WINDOWS = makefile.win makefile.nt README.win win/wcommon.h \
 LDLIBS = -lkernel32 -lgdi32 -lwinspool -lcomdlg32 -ladvapi32 -lshell32 -ladvapi32
 
 wgnuplot.exe: $(OBJS) $(WINOBJS) win/wgnuplot.def wgplt_res.o texticon.ico grpicon.ico
-	$(LD) $(LDFLAGS) -mwindows -o $@ $(OBJS) $(WINOBJS) wgplt_res.o $(LDLIBS) $(TERMLIBS)
+	$(LD) $(LDFLAGS) -mconsole -mwindows -o $@ $(OBJS) $(WINOBJS) wgplt_res.o $(LDLIBS) $(TERMLIBS)
 
 # rules
 
