@@ -1,3 +1,17 @@
+2001-10-11  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/graph3d.c (boundary) Add code to handle `set size square' or
+ 	`set size ratio <number>' for 3D plots, too. Code essentially
+ 	copied out of the one found in 2D equivalent function `boundary'.
+	(boundary3d): Remove stale argument `scaling' and code trying to
+ 	use it --- term->scale() was disallowed long ago.
+  	(do_3dplot): Remove local variable `scaling' and code
+ 	setting/using it.
+
+	* src/graphics.c (boundary): Remove unused argument 'scaling'
+	(do_plot): Remove local variable `scaling' which used to be passed
+ 	to boundary(), where it wasn't used anyway.
+
 2001-10-11  Dick Crawford <crawford@arete.com>
 
 	* term/post.trm (PS_header): Old PostScript linewidth patch for

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.55 2001/09/19 22:47:45 amai Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.56 2001/09/28 12:43:56 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -134,7 +134,7 @@ static void edge_intersect_fsteps __PROTO((struct coordinate GPHUGE * points, in
 static TBOOLEAN two_edge_intersect_steps __PROTO((struct coordinate GPHUGE * points, int i, double *lx, double *ly));	/* JG */
 static TBOOLEAN two_edge_intersect_fsteps __PROTO((struct coordinate GPHUGE * points, int i, double *lx, double *ly));
 
-static void boundary __PROTO((TBOOLEAN scaling, struct curve_points * plots, int count));
+static void boundary __PROTO((struct curve_points * plots, int count));
 
 /* widest2d_callback keeps longest so far in here */
 static int widest_tic;
@@ -278,8 +278,7 @@ widest2d_callback(axis, place, text, grid)
  */
 
 static void
-boundary(scaling, plots, count)
-    TBOOLEAN scaling;		/* TRUE if terminal is doing the scaling */
+boundary(plots, count)
     struct curve_points *plots;
     int count;
 {
@@ -1006,7 +1005,6 @@ do_plot(plots, pcount)
     /* only a Pyramid would have this many registers! */
     struct text_label *this_label;
     struct arrow_def *this_arrow;
-    TBOOLEAN scaling;
     char *s, *e;
 
     x_axis = FIRST_X_AXIS;
@@ -1050,10 +1048,7 @@ do_plot(plots, pcount)
      * depend on term->v_char etc, so terminal must be
      * initialised.
      */
-
-    scaling = (*t->scale) (xsize, ysize);
-
-    boundary(scaling, plots, pcount);
+    boundary(plots, pcount);
 
     /* inform axes about newly found values 'xleft' & Co. */
     axis_set_graphical_range(FIRST_X_AXIS, xleft, xright);

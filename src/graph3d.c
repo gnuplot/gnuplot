@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.45 2001/08/22 14:15:34 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.46 2001/08/27 15:02:14 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -135,8 +135,7 @@ void ztick_callback __PROTO((AXIS_INDEX, double place, char *text,
 
 static int find_maxl_cntr __PROTO((struct gnuplot_contours * contours, int *count));
 static int find_maxl_keys3d __PROTO((struct surface_points *plots, int count, int *kcnt));
-static void boundary3d __PROTO((TBOOLEAN scaling, struct surface_points * plots,
-				int count));
+static void boundary3d __PROTO((struct surface_points * plots, int count));
 
 /* put entries in the key */
 static void key_sample_line __PROTO((int xl, int yl));
@@ -303,10 +302,9 @@ find_maxl_cntr(contours, count)
 /* borders of plotting area */
 /* computed once on every call to do_plot */
 static void
-boundary3d(scaling, plots, count)
-TBOOLEAN scaling;		/* TRUE if terminal is doing the scaling */
-struct surface_points *plots;
-int count;
+boundary3d(plots, count)
+    struct surface_points *plots;
+    int count;
 {
     register struct termentry *t = term;
     int ytlen, i;
@@ -333,10 +331,10 @@ int count;
     /* luecken@udel.edu modifications
        sizes the plot to take up more of available resolution */
     if (lmargin >= 0)
-	xleft = (t->h_char) * lmargin;
+	xleft = t->h_char * lmargin;
     else
-	xleft = (t->h_char) * 2 + (t->h_tic);
-    xright = (scaling ? 1 : xsize) * (t->xmax) - (t->h_char) * 2 - (t->h_tic);
+	xleft = t->h_char * 2 + t->h_tic;
+    xright = xsize * t->xmax - t->h_char * 2 - t->h_tic;
     key_rows = ptitl_cnt;
     key_cols = 1;
     if (key == KEY_AUTO_PLACEMENT && key_vpos == TUNDER) {
@@ -370,7 +368,7 @@ int count;
 		titlelin++;
 	}
     }
-    ytop = (scaling ? 1 : ysize) * (t->ymax) - (t->v_char) * (titlelin + 1.5) - 1;
+    ytop = ysize * t->ymax - t->v_char * (titlelin + 1.5) - 1;
     if (key == KEY_AUTO_PLACEMENT && key_vpos != TUNDER) {
 	/* calculate max no rows, limited be ytop-ybot */
 	i = (int) (ytop - ybot) / (t->v_char) - 1 - ktitle_lines;
@@ -395,6 +393,34 @@ int count;
      * results if done in (16bit) ints */
     xscaler = ((xright - xleft) * 4L) / 7L;	/* HBB: Magic number alert! */
     yscaler = ((ytop - ybot) * 4L) / 7L;
+
+    /* HBB 20011011: 'set size {square|ratio}' for splots */
+    if (aspect_ratio != 0.0) {
+	double current_aspect_ratio;
+
+	if (aspect_ratio < 0
+	    && (X_AXIS.max - X_AXIS.min) != 0.0
+	    ) {
+	    current_aspect_ratio = - aspect_ratio
+		* fabs((Y_AXIS.max - Y_AXIS.min) /
+		       (X_AXIS.max - X_AXIS.min));
+	} else
+	    current_aspect_ratio = aspect_ratio;
+
+	/*{{{  set aspect ratio if valid and sensible */
+	if (current_aspect_ratio >= 0.01 && current_aspect_ratio <= 100.0) {
+
+	    double current = yscaler / xscaler;
+	    double required = (current_aspect_ratio * t->v_tic) / t->h_tic;
+	
+	    if (current > required)
+		/* too tall */
+		yscaler = xscaler * required;
+	    else
+		/* too wide */
+		xscaler = yscaler / required;
+	}
+    }
 }
 
 static void
@@ -453,7 +479,6 @@ do_3dplot(plots, pcount, quick)
     /* double ztemp, temp; unused */
     struct text_label *this_label;
     struct arrow_def *this_arrow;
-    TBOOLEAN scaling;
     transform_matrix mat;
     int key_count;
     char *s, *e;
@@ -536,10 +561,9 @@ do_3dplot(plots, pcount, quick)
     term_start_plot();
 
     screen_ok = FALSE;
-    scaling = (*t->scale) (xsize, ysize);
 
     /* now compute boundary for plot (xleft, xright, ytop, ybot) */
-    boundary3d(scaling, plots, pcount);
+    boundary3d(plots, pcount);
 
     axis_set_graphical_range(FIRST_X_AXIS, xleft, xright);
     axis_set_graphical_range(FIRST_Y_AXIS, ybot, ytop);
