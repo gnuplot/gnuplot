@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: doc2tex.c,v 1.10 1999/07/09 20:59:42 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: doc2tex.c,v 1.11 2001/12/19 09:14:55 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - doc2tex.c */
@@ -432,7 +432,7 @@ register char *str;
 		str++;
 		(void) fputs("\\/}", file);
 	    } else {
-		(void) fputs("{\\tt\\_}", file);
+		(void) fputs("\\_", file);
 	    }
 	    break;
         case 's':    /* find backquote after 'see' {see `} */

@@ -1,15 +1,19 @@
+2002-01-24  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* docs/doc2tex.c: Replace typesetting of _ from "{\tt\_}" to "\_".
+
 2002-01-24  Johannes Zellner  <johannes@zellner.org>
 
-	* src/readline.c term/x11.trm: implemented the non-buffered
+	* src/readline.c term/x11.trm: Implemented the non-buffered
 	stdin for the X11 driver (and ONLY for the X11 driver) to solve
 	problems with
-	   1) escape sequences (like the "up" arrow)
-	   2) pasting commands with the mouse
+	   1) escape sequences (like the "up" arrow),
+	   2) pasting commands with the mouse.
 
 2002-01-24  Johannes Zellner  <johannes@zellner.org>
 
-	* src/gplt_x11.c term/x11.trm:
-	implemented rotated text for the x11 driver
+	* src/gplt_x11.c term/x11.trm: Implemented rotated text for the x11
+	driver.
 
 2002-01-23  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
