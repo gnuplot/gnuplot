@@ -1,3 +1,8 @@
+2001-07-11  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* docs/gnuplot.doc (xyerrorbars): Replaced commas by colons, in
+ 	the example.
+
 2001-07-09  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/plot.c (get_user_env): Warn only if in interactive mode.
