@@ -1,3 +1,9 @@
+2004-12-10  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/command.c (update_command): Fixed handling of optional
+	second filename argument broken during introduction of
+	try_to_get_string().
+
 2004-12-08  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* term/tgif.trm: Update option parsing to be order-independent.

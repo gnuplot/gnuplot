@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.105 2004/09/11 17:46:02 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.106 2004/11/06 21:18:45 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -1550,7 +1550,7 @@ update_command()
     c_token++;
     if (!(opfname = try_to_get_string()))
 	int_error(c_token, "Parameter filename expected");
-    if ((END_OF_COMMAND) || !(npfname = try_to_get_string()))
+    if (!END_OF_COMMAND && !(npfname = try_to_get_string()))
 	int_error(c_token, "New parameter filename expected");
 
     update(opfname, npfname);
