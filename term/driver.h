@@ -1,6 +1,6 @@
-/* $Id: driver.h,v 1.8 1998/11/25 21:05:34 lhecking Exp $ */
+/* $Id: driver.h,v 1.9 1999/06/22 11:55:16 lhecking Exp $ */
 
-/* GNUPLOT - driver.h  $Id: driver.h,v 1.8 1998/11/25 21:05:34 lhecking Exp $ */
+/* GNUPLOT - driver.h  $Id: driver.h,v 1.9 1999/06/22 11:55:16 lhecking Exp $ */
 
 /*[
  * Copyright 1986 - 1993, 1998   Thomas Williams, Colin Kelley
@@ -58,7 +58,6 @@ void null_set_pointsize __PROTO((double size));
 
 extern FILE *gpoutfile;
 extern struct termentry *term;
-extern float xsize, ysize;
 
 /* for use by all drivers */
 #ifndef NEXT
