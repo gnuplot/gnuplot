@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot.c,v 1.11 1999/06/11 18:54:37 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot.c,v 1.12 1999/06/12 16:37:35 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - plot.c */
@@ -40,7 +40,6 @@ static char *RCSid() { return RCSid("$Id: plot.c,v 1.11 1999/06/11 18:54:37 lhec
 #include "plot.h"
 #undef MAIN_C
 
-#include "command.h"
 #include "fit.h"
 #include "setshow.h"
 #include <setjmp.h>
@@ -109,8 +108,6 @@ static void wrapper_for_write_history __PROTO((void));
 # endif				/* GNUPLOT_HISTORY */
 #endif /* HAVE_LIBREADLINE */
 
-extern FILE *gpoutfile;
-
 TBOOLEAN interactive = TRUE;	/* FALSE if stdin not a terminal */
 TBOOLEAN noinputfiles = TRUE;	/* FALSE if there are script files */
 
@@ -137,13 +134,9 @@ extern int X11_args __PROTO((int, char **));
 
 /* patch to get home dir, see command.c */
 #if (defined (__TURBOC__) && (defined (MSDOS) || defined(DOS386))) || defined(DJGPP)
-# include <dir.h>		/* MAXPATH */
+# include <dir.h>               /* MAXPATH */
 char HelpFile[MAXPATH];
 #endif /*   - DJL */
-
-#ifndef STDOUT
-# define STDOUT 1
-#endif
 
 /* a longjmp buffer to get back to the command line */
 #ifdef _Windows
@@ -508,8 +501,11 @@ char **argv;
     if (!setjmp(command_line_env)) {
 	/* first time */
 	interrupt_setup();
+	/* should move this stuff another initialisation routine,
+	 * something like init_set() maybe */
 	get_user_env();
 	init_loadpath();
+	init_locale();
 	load_rcfile();
 	init_fit();		/* Initialization of fitting module */
 
@@ -544,9 +540,7 @@ char **argv;
 	(void) rawcon(0);
 #endif
 	load_file_error();	/* if we were in load_file(), cleanup */
-#ifdef _Windows
-	SetCursor(LoadCursor((HINSTANCE) NULL, IDC_ARROW));
-#endif
+	SET_CURSOR_ARROW;
 
 #ifdef VMS
 	/* after catching interrupt */
@@ -777,6 +771,8 @@ get_user_env()
 
 /* expand tilde in path
  * path cannot be a static array!
+ * tilde must be the first character in *pathp;
+ * we may change that later
  */
 void
 gp_expand_tilde(pathp)
