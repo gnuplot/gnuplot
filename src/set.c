@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.150 2004/09/15 11:13:04 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.151 2004/09/17 05:01:14 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -4399,7 +4399,7 @@ parse_label_options( struct text_label *this_label )
 		int stored_token = ++c_token;
 	    struct lp_style_type tmp_lp;
 
-	    lp_parse(&tmp_lp, 0, 1, -2, -2);
+	    lp_parse(&tmp_lp, 1, 1, -2, -2);
 	    if (stored_token != c_token) {
 		loc_lp = tmp_lp;
 		loc_lp.pointflag = 1;

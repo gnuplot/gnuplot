@@ -1,4 +1,9 @@
-2004-08-27  Per Persson <persquare@mac.com>
+2004-10-19  Juergen Wieferink <wieferink@freenet.de>
+
+	* src/set.c (parse_label_options): If the label has an associated point,
+	allow its type to be specified by "linestyle <n>".
+
+2004-10-19  Per Persson <persquare@mac.com>
 
 	Adding enhanced text support to terminal aqua.
 
