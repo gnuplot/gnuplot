@@ -118,8 +118,10 @@ static void SVG_GroupFilledOpen __PROTO ((void));
 static void SVG_GroupFilledClose __PROTO ((void));
 static void SVG_StyleColor __PROTO((const char*));
 static void SVG_StyleFillColor __PROTO((void));
+#if USE_ULIG_FILLEDBOXES
 static void SVG_DefineFillPatternWithPath __PROTO((const char* path));
 static void SVG_DefineFillPattern __PROTO((int fillpat));
+#endif
 static void SVG_MoveForced __PROTO((unsigned int x, unsigned int y));
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -278,6 +280,7 @@ SVG_StyleFillColor(void)
     SVG_StyleColor("fill");
 }
 
+#if USE_ULIG_FILLEDBOXES
 static void
 SVG_DefineFillPatternWithPath(const char* path)
 {
@@ -331,6 +334,7 @@ SVG_DefineFillPattern(int fillpat)
 	}
     }
 }
+#endif
 
 static void
 SVG_MoveForced(unsigned int x, unsigned int y)

@@ -1,5 +1,5 @@
 /*
- * $Id: gd.trm,v 1.3 2002/06/04 22:50:41 joze Exp $
+ * $Id: gd.trm,v 1.4 2002/06/05 20:23:43 joze Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -135,14 +135,14 @@ TERM_PUBLIC void PNG_set_color (double);
 TERM_PUBLIC void PNG_filled_polygon (int, gpiPoint *);
 #endif
 
+#include "gd.h"
+
 static void PNG_PointX __PROTO((unsigned int, unsigned int));
 static void PNG_PointPlus __PROTO((unsigned int, unsigned int));
 static void PNG_Triangle(unsigned int x, unsigned int y, int direction,
 	void (*draw_func)(gdImagePtr, gdPointPtr, int, int));
 static void PNG_Diamond(unsigned int x, unsigned int y,
 	void (*draw_func)(gdImagePtr, gdPointPtr, int, int));
-
-#include "gd.h"
 
 extern gdFontPtr gdFontSmall;	/* 6x12 */
 extern gdFontPtr gdFontLarge;	/* 8x16 */

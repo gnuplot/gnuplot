@@ -1,5 +1,5 @@
 /*
- * $Id: fig.trm,v 1.26 2001/10/26 12:58:38 mikulik Exp $
+ * $Id: fig.trm,v 1.27 2002/04/30 14:08:53 broeker Exp $
  */
 
 /* GNUPLOT - fig.trm */
@@ -987,7 +987,9 @@ FIG_boxfill(style, x, y, w, h)   /* ULIG */
     int style;
     unsigned int x, y, w, h;
 {
+#if USE_ULIG_FILLEDBOXES
     int pen_color, fill_color, fill_style, fill_dens;
+#endif
     
     FIG_poly_clean(FIG_polyvec_stat);
 

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.40 2002/02/27 21:19:10 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.41 2002/05/29 10:41:06 joze Exp $"); }
 #endif
 
 /* GNUPLOT - gplt_x11.c */
@@ -325,15 +325,19 @@ static long int SetTime __PROTO((plot_struct * plot, Time t));
 static unsigned long AllocateXorPixel __PROTO((cmap_t * cmap_ptr));
 static void GetGCXor __PROTO((plot_struct * plot, GC * gc));
 static void GetGCXorDashed __PROTO((plot_struct * plot, GC * gc));
+#if 0
 static void GetGCBlackAndWhite __PROTO((plot_struct * plot, GC * ret, Pixmap pixmap, int mode));
 static int SplitAt __PROTO((char **args, int maxargs, char *buf, char splitchar));
 static void xfree __PROTO((void *fred));
+#endif
 static void EraseCoords __PROTO((plot_struct * plot));
 static void DrawCoords __PROTO((plot_struct * plot, const char *s));
 static void DisplayCoords __PROTO((plot_struct * plot, const char *s));
+#if 0
 static int is_control __PROTO((KeySym mod));
 static int is_meta __PROTO((KeySym mod));
 static int is_shift __PROTO((KeySym mod));
+#endif
 #endif
 
 static void DrawVerticalString __PROTO((Display *dpy, Drawable d, GC gc, int x, int y, const char *str, int len));
@@ -2447,6 +2451,7 @@ GetGCXorDashed(plot_struct * plot, GC * gc)
 		       JoinMiter /* also: JoinRound, JoinBevel */ );
 }
 
+#if 0
 /*
  * returns the newly created gc
  * pixmap: where the gc will be used
@@ -2524,6 +2529,7 @@ xfree(void *fred)
     if (fred)
 	free(fred);
 }
+#endif
 
 /* erase the last displayed position string */
 static void
@@ -2581,6 +2587,7 @@ DisplayCoords(plot_struct * plot, const char *s)
 }
 
 
+#if 0
 /* FIXME HBB 20020225: This function is not used anywhere ??? */
 static int
 is_control(KeySym mod)
@@ -2603,6 +2610,7 @@ is_shift(KeySym mod)
 {
     return (XK_Shift_R == mod || XK_Shift_L == mod);
 }
+#endif
 
 #endif
 
