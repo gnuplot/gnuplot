@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.17 1999/07/05 13:12:51 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.18 1999/07/09 21:05:56 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -111,6 +111,7 @@ int vms_ktid;			/* key table id, for translating keystrokes */
 
 /* static prototypes */
 static int command __PROTO((void));
+static enum command_id lookup_command __PROTO((int));
 static int read_line __PROTO((const char *prompt));
 static void do_shell __PROTO((void));
 static void do_help __PROTO((int toplevel));
@@ -156,6 +157,42 @@ __far int num_tokens, c_token;
 int num_tokens, c_token;
 #endif
 
+/* table of gnuplot commands */
+static struct cmd_entry {
+    const char *cmd_name;
+    enum command_id id;
+} command_tbl[] =
+{
+    { "ca$ll", CMD_CALL },
+    { "cd", CMD_CD },
+    { "cl$ear", CMD_CLEAR },
+    { "ex$it", CMD_EXIT },
+    { "fit", CMD_FIT },
+    { "h$elp", CMD_HELP },
+    { "if", CMD_IF },
+    { "l$oad", CMD_LOAD },
+    { "pa$use", CMD_PAUSE },
+    { "p$lot", CMD_PLOT },
+    { "pr$int", CMD_PRINT },
+    { "pwd", CMD_PWD },
+    { "q$uit", CMD_QUIT },
+    { "rep$lot", CMD_REPLOT },
+    { "re$read", CMD_REREAD },
+    { "res$et", CMD_RESET },
+    { "sa$ve", CMD_SAVE },
+    { "scr$eendump", CMD_SCREENDUMP },
+    { "scr$eendump", CMD_SCREENDUMP },
+    { "se$t", CMD_SET },
+    { "she$ll", CMD_SHELL },
+    { "sh$ow", CMD_SHOW },
+    { "sp$lot", CMD_SPLOT },
+    { "test", CMD_TEST },
+    { "testtime", CMD_TESTTIME },
+    { "up$date", CMD_UPDATE }
+};
+
+#define NCMDS (sizeof(command_tbl) / sizeof (command_tbl[0]))
+
 /* support for dynamic size of input line */
 void
 extend_input_line()
@@ -195,16 +232,6 @@ extend_token_table()
 	token_table_size += MAX_TOKENS;
 	FPRINTF((stderr, "extending token table to %d elements\n", token_table_size));
     }
-}
-
-
-void
-init_memory()
-{
-    extend_input_line();
-    extend_token_table();
-    replot_line = gp_alloc(1, "string");
-    *replot_line = NUL;
 }
 
 
@@ -337,350 +364,416 @@ command()
 
     if (is_definition(c_token))
 	define();
-    else if (almost_equals(c_token, "h$elp") || equals(c_token, "?")) {
-	c_token++;
-	do_help(1);
-    } else if (equals(c_token, "testtime")) {
-	/* given a format and a time string, exercise the time code */
-	char *format = NULL, *string = NULL;
-	struct tm tm;
-	double secs;
-	if (isstring(++c_token)) {
-	    m_quote_capture(&format, c_token, c_token);
+    else {
+	switch(lookup_command(c_token)) {
+	case CMD_HELP:
+	    c_token++;
+	    do_help(1);
+	    break;
+	case CMD_TESTTIME:
+	    /* given a format and a time string, exercise the time code */
 	    if (isstring(++c_token)) {
-		m_quote_capture(&string, c_token, c_token);
-		memset(&tm, 0, sizeof(tm));
-		gstrptime(string, format, &tm);
-		secs = gtimegm(&tm);
-		fprintf(stderr, "internal = %f - %d/%d/%d::%d:%d:%d , wday=%d, yday=%d\n",
-			secs, tm.tm_mday, tm.tm_mon + 1, tm.tm_year % 100,
-			tm.tm_hour, tm.tm_min, tm.tm_sec, tm.tm_wday,
-			tm.tm_yday);
-		memset(&tm, 0, sizeof(tm));
-		ggmtime(&tm, secs);
-		gstrftime(string, strlen(string), format, secs);
-		fprintf(stderr, "convert back \"%s\" - %d/%d/%d::%d:%d:%d , wday=%d, yday=%d\n",
-			string, tm.tm_mday, tm.tm_mon + 1, tm.tm_year % 100,
-			tm.tm_hour, tm.tm_min, tm.tm_sec, tm.tm_wday,
-			tm.tm_yday);
-		free(string);
-		++c_token;
+		char *format = NULL;
+
+		m_quote_capture(&format, c_token, c_token);
+		if (isstring(++c_token)) {
+		    char *string = NULL;
+		    struct tm tm;
+		    double secs;
+
+		    m_quote_capture(&string, c_token, c_token);
+		    memset(&tm, 0, sizeof(tm));
+		    gstrptime(string, format, &tm);
+		    secs = gtimegm(&tm);
+		    fprintf(stderr, "internal = %f - %d/%d/%d::%d:%d:%d , wday=%d, yday=%d\n",
+			    secs, tm.tm_mday, tm.tm_mon + 1, tm.tm_year % 100,
+			    tm.tm_hour, tm.tm_min, tm.tm_sec, tm.tm_wday,
+			    tm.tm_yday);
+		    memset(&tm, 0, sizeof(tm));
+		    ggmtime(&tm, secs);
+		    gstrftime(string, strlen(string), format, secs);
+		    fprintf(stderr, "convert back \"%s\" - %d/%d/%d::%d:%d:%d , wday=%d, yday=%d\n",
+			    string, tm.tm_mday, tm.tm_mon + 1, tm.tm_year % 100,
+			    tm.tm_hour, tm.tm_min, tm.tm_sec, tm.tm_wday,
+			    tm.tm_yday);
+		    free(string);
+		    ++c_token;
+		}
+		free(format);
 	    }
-	    free(format);
-	}
-    } else if (almost_equals(c_token, "test")) {
-	c_token++;
-	test_term();
-    } else if (almost_equals(c_token, "scr$eendump")) {
-	c_token++;
+	    break;
+	case CMD_TEST:
+	    c_token++;
+	    test_term();
+	    break;
+	case CMD_SCREENDUMP:
+	    c_token++;
 #ifdef _Windows
-	screen_dump();
+	    screen_dump();
 #else
-	fputs("screendump not implemented\n", stderr);
+	    fputs("screendump not implemented\n", stderr);
 #endif
-    } else if (almost_equals(c_token, "pa$use")) {
-	struct value a;
-	int sleep_time, text = 0;
-	char buf[MAX_LINE_LEN+1];
+	    break;
+	case CMD_PAUSE:	{
+	    struct value a;
+	    int sleep_time, text = 0;
+	    char buf[MAX_LINE_LEN+1];
 
-	c_token++;
-	sleep_time = (int) real(const_express(&a));
-	buf[0] = NUL;
-	if (!(END_OF_COMMAND)) {
-	    if (!isstring(c_token))
-		int_error(c_token, "expecting string");
-	    else {
-		quote_str(buf, c_token, MAX_LINE_LEN);
-		++c_token;
+	    c_token++;
+	    sleep_time = (int) real(const_express(&a));
+	    buf[0] = NUL;
+	    if (!(END_OF_COMMAND)) {
+		if (!isstring(c_token))
+		    int_error(c_token, "expecting string");
+		else {
+		    quote_str(buf, c_token, MAX_LINE_LEN);
+		    ++c_token;
 #ifdef _Windows
-		if (sleep_time >= 0)
+		    if (sleep_time >= 0)
 #elif defined(OS2)
-		if (strcmp(term->name, "pm") != 0 || sleep_time >= 0)
+			if (strcmp(term->name, "pm") != 0 || sleep_time >= 0)
 #elif defined(MTOS)
-		    if (strcmp(term->name, "mtos") != 0 || sleep_time >= 0)
+			    if (strcmp(term->name, "mtos") != 0 || sleep_time >= 0)
 #endif /* _Windows */
-			fputs(buf, stderr);
-		text = 1;
+				fputs(buf, stderr);
+		    text = 1;
+		}
 	    }
-	}
-	if (sleep_time < 0) {
+	    if (sleep_time < 0) {
 #ifdef _Windows
-	    if (!Pause(buf))
-		bail_to_command_line();
+		if (!Pause(buf))
+		    bail_to_command_line();
 #elif defined(OS2)
-	    if (strcmp(term->name, "pm") == 0 && sleep_time < 0) {
-		int rc;
-		if ((rc = PM_pause(buf)) == 0) {
-		    /* if (!CallFromRexx)
-		     * would help to stop REXX programs w/o raising an error message
-		     * in RexxInterface() ...
-		     */
-		    bail_to_command_line();
-		} else if (rc == 2) {
-		    fputs(buf, stderr);
-		    text = 1;
-		    (void) fgets(buf, MAX_LINE_LEN, stdin);
+		if (strcmp(term->name, "pm") == 0 && sleep_time < 0) {
+		    int rc;
+		    if ((rc = PM_pause(buf)) == 0) {
+			/* if (!CallFromRexx)
+			 * would help to stop REXX programs w/o raising an error message
+			 * in RexxInterface() ...
+			 */
+			bail_to_command_line();
+		    } else if (rc == 2) {
+			fputs(buf, stderr);
+			text = 1;
+			(void) fgets(buf, MAX_LINE_LEN, stdin);
+		    }
 		}
-	    }
 #elif defined(_Macintosh)
-	    if (strcmp(term->name, "macintosh") == 0 && sleep_time < 0)
-		Pause(sleep_time);
+		if (strcmp(term->name, "macintosh") == 0 && sleep_time < 0)
+		    Pause(sleep_time);
 #elif defined(MTOS)
-	    if (strcmp(term->name, "mtos") == 0) {
-		int MTOS_pause(char *buf);
-		int rc;
-		if ((rc = MTOS_pause(buf)) == 0)
-		    bail_to_command_line();
-		else if (rc == 2) {
-		    fputs(buf, stderr);
-		    text = 1;
+		if (strcmp(term->name, "mtos") == 0) {
+		    int MTOS_pause(char *buf);
+		    int rc;
+		    if ((rc = MTOS_pause(buf)) == 0)
+			bail_to_command_line();
+		    else if (rc == 2) {
+			fputs(buf, stderr);
+			text = 1;
+			(void) fgets(buf, MAX_LINE_LEN, stdin);
+		    }
+		} else if (strcmp(term->name, "atari") == 0) {
+		    char *readline(char *);
+		    char *line = readline("");
+		    if (line)
+			free(line);
+		} else
 		    (void) fgets(buf, MAX_LINE_LEN, stdin);
-		}
-	    } else if (strcmp(term->name, "atari") == 0) {
-		char *readline(char *);
-		char *line = readline("");
-		if (line)
-		    free(line);
-	    } else
-		(void) fgets(buf, MAX_LINE_LEN, stdin);
 #elif defined(ATARI)
-	    if (strcmp(term->name, "atari") == 0) {
-		char *readline(char *);
-		char *line = readline("");
-		if (line)
-		    free(line);
-	    } else
-		(void) fgets(buf, MAX_LINE_LEN, stdin);
+		if (strcmp(term->name, "atari") == 0) {
+		    char *readline(char *);
+		    char *line = readline("");
+		    if (line)
+			free(line);
+		} else
+		    (void) fgets(buf, MAX_LINE_LEN, stdin);
 #else /* !(_Windows || OS2 || _Macintosh || MTOS || ATARI) */
-	    (void) fgets(buf, MAX_LINE_LEN, stdin);
-	    /* Hold until CR hit. */
+		(void) fgets(buf, MAX_LINE_LEN, stdin);
+		/* Hold until CR hit. */
 #endif
-	}
-	if (sleep_time > 0)
-	    GP_SLEEP(sleep_time);
+	    }
+	    if (sleep_time > 0)
+		GP_SLEEP(sleep_time);
 
-	if (text != 0 && sleep_time >= 0)
-	    fputc('\n', stderr);
-	screen_ok = FALSE;
-    } else if (almost_equals(c_token, "pr$int")) {
-	int need_space = 0;	/* space printed between two expressions only */
-	screen_ok = FALSE;
-	do {
+	    if (text != 0 && sleep_time >= 0)
+		fputc('\n', stderr);
+	    screen_ok = FALSE;
+
+	    break;
+	} /* CMD_PAUSE */
+	case CMD_PRINT: {
+	    int need_space = 0;	/* space printed between two expressions only */
+	    screen_ok = FALSE;
+	    do {
+		++c_token;
+		if (isstring(c_token)) {
+		    char *s = NULL;
+		    m_quote_capture(&s, c_token, c_token);
+		    fputs(s, stderr);
+		    need_space = 0;
+		    free(s);
+		    ++c_token;
+		} else {
+		    struct value a;
+		    (void) const_express(&a);
+		    if (need_space)
+			putc(' ', stderr);
+		    need_space = 1;
+		    disp_value(stderr, &a);
+		}
+	    } while (!END_OF_COMMAND && equals(c_token, ","));
+
+	    (void) putc('\n', stderr);
+
+	    break;
+	}
+	case CMD_FIT:
 	    ++c_token;
-	    if (isstring(c_token)) {
-		char *s = NULL;
-		m_quote_capture(&s, c_token, c_token);
-		fputs(s, stderr);
-		need_space = 0;
-		free(s);
-		++c_token;
+	    do_fit();
+	    break;
+	case CMD_UPDATE: {
+	    char *opfname = NULL;  /* old parameter filename */
+	    char *npfname = NULL;  /* new parameter filename */
+
+	    if (!isstring(++c_token))
+		int_error(c_token, "Parameter filename expected");
+	    m_quote_capture(&opfname, c_token, c_token);
+	    ++c_token;
+	    if (!(END_OF_COMMAND)) {
+		if (!isstring(c_token))
+		    int_error(c_token, "New parameter filename expected");
+		else {
+		    m_quote_capture(&npfname, c_token, c_token);
+		    ++c_token;
+		}
+	    }
+	    update(opfname, npfname);
+	    free(npfname);
+	    free(opfname);
+	    
+	    break;
+	}
+	case CMD_PLOT:
+	    plot_token = c_token++;
+	    SET_CURSOR_WAIT;
+	    plotrequest();
+	    SET_CURSOR_ARROW;
+
+	    break;
+	case CMD_SPLOT:
+	    plot_token = c_token++;
+	    SET_CURSOR_WAIT;
+	    plot3drequest();
+	    SET_CURSOR_ARROW;
+
+	    break;
+	case CMD_REPLOT:
+	    if (replot_line[0] == NUL)
+		int_error(c_token, "no previous plot");
+	    c_token++;
+	    SET_CURSOR_WAIT;
+	    replotrequest();
+	    SET_CURSOR_ARROW;
+
+	    break;
+	case CMD_SET:
+	    set_command();
+	    break;
+	case CMD_RESET:
+	    reset_command();
+	    break;
+	case CMD_SHOW:
+	    show_command();
+	    break;
+	case CMD_CLEAR:
+	    term_start_plot();
+
+	    if (multiplot && term->fillbox) {
+		unsigned int xx1 = (unsigned int) (xoffset * term->xmax);
+		unsigned int yy1 = (unsigned int) (yoffset * term->ymax);
+		unsigned int width = (unsigned int) (xsize * term->xmax);
+		unsigned int height = (unsigned int) (ysize * term->ymax);
+		(*term->fillbox) (0, xx1, yy1, width, height);
+	    }
+	    term_end_plot();
+
+	    screen_ok = FALSE;
+	    c_token++;
+
+	    break;
+	case CMD_SHELL:
+	    do_shell();
+	    screen_ok = FALSE;
+	    c_token++;
+	    break;
+	case CMD_SAVE:
+	    if (almost_equals(++c_token, "f$unctions")) {
+		if (!isstring(++c_token))
+		    int_error(c_token, "expecting filename");
+		else {
+		    m_quote_capture(&sv_file, c_token, c_token);
+		    gp_expand_tilde(&sv_file);
+		    fp = strcmp(sv_file, "-") ? fopen(sv_file, "w") : stdout;
+		    save_functions(fp);
+		}
+	    } else if (almost_equals(c_token, "v$ariables")) {
+		if (!isstring(++c_token))
+		    int_error(c_token, "expecting filename");
+		else {
+		    m_quote_capture(&sv_file, c_token, c_token);
+		    gp_expand_tilde(&sv_file);
+		    fp = strcmp(sv_file, "-") ? fopen(sv_file, "w") : stdout;
+		    save_variables(fp);
+		}
+	    } else if (almost_equals(c_token, "s$et")) {
+		if (!isstring(++c_token))
+		    int_error(c_token, "expecting filename");
+		else {
+		    m_quote_capture(&sv_file, c_token, c_token);
+		    gp_expand_tilde(&sv_file);
+		    fp = strcmp(sv_file, "-") ? fopen(sv_file, "w") : stdout;
+		    save_set(fp);
+		}
+	    } else if (isstring(c_token)) {
+		m_quote_capture(&sv_file, c_token, c_token);
+		gp_expand_tilde(&sv_file);
+		fp = strcmp(sv_file, "-") ? fopen(sv_file, "w") : stdout;
+		save_all(fp);
 	    } else {
-		struct value a;
-		(void) const_express(&a);
-		if (need_space)
-		    putc(' ', stderr);
-		need_space = 1;
-		disp_value(stderr, &a);
-	    }
-	} while (!END_OF_COMMAND && equals(c_token, ","));
-
-	(void) putc('\n', stderr);
-    } else if (almost_equals(c_token, "fit")) {
-	++c_token;
-	do_fit();
-    } else if (almost_equals(c_token, "up$date")) {
-	char *opfname = NULL;  /* old parameter filename */
-	char *npfname = NULL;  /* new parameter filename */
-
-	if (!isstring(++c_token))
-	    int_error(c_token, "Parameter filename expected");
-	m_quote_capture(&opfname, c_token, c_token);
-	++c_token;
-	if (!(END_OF_COMMAND)) {
-	    if (!isstring(c_token))
-		int_error(c_token, "New parameter filename expected");
-	    else {
-		m_quote_capture(&npfname, c_token, c_token);
-		++c_token;
-	    }
-	}
-	update(opfname, npfname);
-	free(npfname);
-	free(opfname);
-    } else if (almost_equals(c_token, "p$lot")) {
-	plot_token = c_token++;
-	SET_CURSOR_WAIT;
-	plotrequest();
-	SET_CURSOR_ARROW;
-    } else if (almost_equals(c_token, "sp$lot")) {
-	plot_token = c_token++;
-	SET_CURSOR_WAIT;
-	plot3drequest();
-	SET_CURSOR_ARROW;
-    } else if (almost_equals(c_token, "rep$lot")) {
-	if (replot_line[0] == NUL)
-	    int_error(c_token, "no previous plot");
-	c_token++;
-	SET_CURSOR_WAIT;
-	replotrequest();
-	SET_CURSOR_ARROW;
-    } else if (almost_equals(c_token, "se$t"))
-	set_command();
-    else if (almost_equals(c_token, "res$et"))
-	reset_command();
-    else if (almost_equals(c_token, "sh$ow"))
-	show_command();
-    else if (almost_equals(c_token, "cl$ear")) {
-	term_start_plot();
-
-	if (multiplot && term->fillbox) {
-	    unsigned int xx1 = (unsigned int) (xoffset * term->xmax);
-	    unsigned int yy1 = (unsigned int) (yoffset * term->ymax);
-	    unsigned int width = (unsigned int) (xsize * term->xmax);
-	    unsigned int height = (unsigned int) (ysize * term->ymax);
-	    (*term->fillbox) (0, xx1, yy1, width, height);
-	}
-	term_end_plot();
-
-	screen_ok = FALSE;
-	c_token++;
-    } else if (almost_equals(c_token, "she$ll")) {
-	do_shell();
-	screen_ok = FALSE;
-	c_token++;
-    } else if (almost_equals(c_token, "sa$ve")) {
-	if (almost_equals(++c_token, "f$unctions")) {
-	    if (!isstring(++c_token))
-		int_error(c_token, "expecting filename");
-	    else {
-		m_quote_capture(&sv_file, c_token, c_token);
-		gp_expand_tilde(&sv_file);
-		fp = strcmp(sv_file, "-") ? fopen(sv_file, "w") : stdout;
-		save_functions(fp);
-	    }
-	} else if (almost_equals(c_token, "v$ariables")) {
-	    if (!isstring(++c_token))
-		int_error(c_token, "expecting filename");
-	    else {
-		m_quote_capture(&sv_file, c_token, c_token);
-		gp_expand_tilde(&sv_file);
-		fp = strcmp(sv_file, "-") ? fopen(sv_file, "w") : stdout;
-		save_variables(fp);
-	    }
-	} else if (almost_equals(c_token, "s$et")) {
-	    if (!isstring(++c_token))
-		int_error(c_token, "expecting filename");
-	    else {
-		m_quote_capture(&sv_file, c_token, c_token);
-		gp_expand_tilde(&sv_file);
-		fp = strcmp(sv_file, "-") ? fopen(sv_file, "w") : stdout;
-		save_set(fp);
-	    }
-	} else if (isstring(c_token)) {
-	    m_quote_capture(&sv_file, c_token, c_token);
-	    gp_expand_tilde(&sv_file);
-	    fp = strcmp(sv_file, "-") ? fopen(sv_file, "w") : stdout;
-	    save_all(fp);
-	} else {
-	    int_error(c_token, "filename or keyword 'functions', 'variables', or 'set' expected");
-	}
-	c_token++;
-    } else if (almost_equals(c_token, "l$oad")) {
-	if (!isstring(++c_token))
-	    int_error(c_token, "expecting filename");
-	else {
-	    m_quote_capture(&sv_file, c_token, c_token);
-	    gp_expand_tilde(&sv_file);
-	    /* load_file(fp=fopen(sv_file, "r"), sv_file, FALSE); OLD
-	     * DBT 10/6/98 handle stdin as special case
-	     * passes it on to load_file() so that it gets
-	     * pushed on the stack and recusion will work, etc
-	     */
-	    fp = strcmp(sv_file, "-") ? loadpath_fopen(sv_file, "r") : stdin;
-	    load_file(fp, sv_file, FALSE);
-	    /* input_line[] and token[] now destroyed! */
-	    c_token = num_tokens = 0;
-	}
-    } else if (almost_equals(c_token, "ca$ll")) {
-	if (!isstring(++c_token))
-	    int_error(c_token, "expecting filename");
-	else {
-	    m_quote_capture(&sv_file, c_token, c_token);
-	    gp_expand_tilde(&sv_file);
-	    /* Argument list follows filename */
-	    load_file(loadpath_fopen(sv_file, "r"), sv_file, TRUE);
-	    /* input_line[] and token[] now destroyed! */
-	    c_token = num_tokens = 0;
-	}
-    } else if (almost_equals(c_token, "if")) {
-	double exprval;
-	struct value t;
-	if (!equals(++c_token, "("))	/* no expression */
-	    int_error(c_token, "expecting (expression)");
-	exprval = real(const_express(&t));
-	if (exprval != 0.0) {
-	    /* fake the condition of a ';' between commands */
-	    int eolpos = token[num_tokens - 1].start_index + token[num_tokens - 1].length;
-	    --c_token;
-	    token[c_token].length = 1;
-	    token[c_token].start_index = eolpos + 2;
-	    input_line[eolpos + 2] = ';';
-	    input_line[eolpos + 3] = NUL;
-	} else
-	    c_token = num_tokens = 0;
-    } else if (almost_equals(c_token, "rer$ead")) {
-	fp = lf_top();
-	if (fp != (FILE *) NULL)
-	    rewind(fp);
-	c_token++;
-    } else if (almost_equals(c_token, "cd")) {
-	if (!isstring(++c_token))
-	    int_error(c_token, "expecting directory name");
-	else {
-	    m_quote_capture(&sv_file, c_token, c_token);
-	    gp_expand_tilde(&sv_file);
-	    if (changedir(sv_file)) {
-		int_error(c_token, "Can't change to this directory");
+		int_error(c_token, "filename or keyword 'functions', 'variables', or 'set' expected");
 	    }
 	    c_token++;
+	    break;
+	case CMD_LOAD:
+	    if (!isstring(++c_token))
+		int_error(c_token, "expecting filename");
+	    else {
+		m_quote_capture(&sv_file, c_token, c_token);
+		gp_expand_tilde(&sv_file);
+		/* load_file(fp=fopen(sv_file, "r"), sv_file, FALSE); OLD
+		 * DBT 10/6/98 handle stdin as special case
+		 * passes it on to load_file() so that it gets
+		 * pushed on the stack and recusion will work, etc
+		 */
+		fp = strcmp(sv_file, "-") ? loadpath_fopen(sv_file, "r") : stdin;
+		load_file(fp, sv_file, FALSE);
+		/* input_line[] and token[] now destroyed! */
+		c_token = num_tokens = 0;
+	    }
+	    break;
+	case CMD_CALL:
+	    if (!isstring(++c_token))
+		int_error(c_token, "expecting filename");
+	    else {
+		m_quote_capture(&sv_file, c_token, c_token);
+		gp_expand_tilde(&sv_file);
+		/* Argument list follows filename */
+		load_file(loadpath_fopen(sv_file, "r"), sv_file, TRUE);
+		/* input_line[] and token[] now destroyed! */
+		c_token = num_tokens = 0;
+	    }
+	    break;
+	case CMD_IF: {
+	    double exprval;
+	    struct value t;
+	    if (!equals(++c_token, "("))	/* no expression */
+		int_error(c_token, "expecting (expression)");
+	    exprval = real(const_express(&t));
+	    if (exprval != 0.0) {
+		/* fake the condition of a ';' between commands */
+		int eolpos = token[num_tokens - 1].start_index + token[num_tokens - 1].length;
+		--c_token;
+		token[c_token].length = 1;
+		token[c_token].start_index = eolpos + 2;
+		input_line[eolpos + 2] = ';';
+		input_line[eolpos + 3] = NUL;
+	    } else
+		c_token = num_tokens = 0;
+
+	    break;
 	}
-    } else if (almost_equals(c_token, "pwd")) {
-	sv_file = (char *) gp_alloc(PATH_MAX, "print current dir");
-	if (sv_file) {
-	    GP_GETCWD(sv_file, PATH_MAX);
-	    fprintf(stderr, "%s\n", sv_file);
-	    free(sv_file);
-	    sv_file = NULL;
-	}
-	c_token++;
-    } else if (almost_equals(c_token, "ex$it") ||
-	       almost_equals(c_token, "q$uit")) {
-	/* graphics will be tidied up in main */
-	return (1);
-#if 0
-    } else if(equals_alias(c_token) == 0) {
-	/* expand alias; set num_tokens to 0; reprocess */
-#endif
-    } else if (!equals(c_token, ";")) {		/* null statement */
+	case CMD_REREAD:
+	    fp = lf_top();
+	    if (fp != (FILE *) NULL)
+		rewind(fp);
+	    c_token++;
+	    break;
+	case CMD_CD:
+	    if (!isstring(++c_token))
+		int_error(c_token, "expecting directory name");
+	    else {
+		m_quote_capture(&sv_file, c_token, c_token);
+		gp_expand_tilde(&sv_file);
+		if (changedir(sv_file)) {
+		    int_error(c_token, "Can't change to this directory");
+		}
+		c_token++;
+	    }
+	    break;
+	case CMD_EXIT:
+	case CMD_QUIT:
+	    /* graphics will be tidied up in main */
+	    return (1);
+	    break;
+	case CMD_PWD:
+	    sv_file = (char *) gp_alloc(PATH_MAX, "print current dir");
+	    if (sv_file) {
+		GP_GETCWD(sv_file, PATH_MAX);
+		fprintf(stderr, "%s\n", sv_file);
+		free(sv_file);
+		sv_file = NULL;
+	    }
+	    c_token++;
+	    break;
+	case CMD_INVALID:
 #ifdef OS2
-	if (_osmode == OS2_MODE) {
-	    if (token[c_token].is_token) {
-		int rc;
-		rc = ExecuteMacro(input_line + token[c_token].start_index,
-				  token[c_token].length);
-		if (rc == 0) {
-		    c_token = num_tokens = 0;
-		    return (0);
+	    if (_osmode == OS2_MODE) {
+		if (token[c_token].is_token) {
+		    int rc;
+		    rc = ExecuteMacro(input_line + token[c_token].start_index,
+				      token[c_token].length);
+		    if (rc == 0) {
+			c_token = num_tokens = 0;
+			return (0);
+		    }
 		}
 	    }
-	}
 #endif
-	int_error(c_token, "invalid command");
-    }
+	    int_error(c_token, "invalid command");
+	case CMD_NULL:
+	default:
+	    break;
+	}
+    } /* else if(is_definition) */
+
     if (sv_file)
 	free(sv_file);
 
     return (0);
+}
+
+
+static enum command_id
+lookup_command(token)
+int token;
+{
+    int i = 0;
+
+    /* null statement */
+    if (equals(token, ";"))
+	return CMD_NULL;
+
+    /* help */
+    if (equals(token, "?"))
+	return CMD_HELP;
+
+    /* all others */
+    while (i++ < NCMDS) {
+	if (almost_equals(token, command_tbl[i].cmd_name))
+	    return command_tbl[i].id;
+    }
+
+    return CMD_INVALID;
 }
 
 
