@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.58 2003/05/09 21:44:49 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.59 2003/06/12 00:09:08 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -1639,11 +1639,11 @@ test_term()
 	else
 	    (*t->put_text) (t->v_char,
 			    ymax_t / 2 - strlen(str) * t->h_char / 2, str);
-	if ((*t->justify_text) (LEFT));
+	(*t->justify_text) (LEFT);
 	str = " rotated by +45 deg";
 	(*t->text_angle)(45);
 	(*t->put_text)(t->v_char * 3, ymax_t / 2, str);
-	if ((*t->justify_text) (LEFT));
+	(*t->justify_text) (LEFT);
 	str = " rotated by -45 deg";
 	(*t->text_angle)(-45);
 	(*t->put_text)(t->v_char * 2, ymax_t / 2, str);
