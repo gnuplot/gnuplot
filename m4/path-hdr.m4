@@ -16,9 +16,12 @@ changequote([, ])dnl
 AC_MSG_CHECKING([for $1])
 AC_CACHE_VAL(ac_cv_header_$ac_safe,
 [gp_save_CPPFLAGS="$CPPFLAGS"
-gp_h_path=`echo "$2" | sed -e 's%/lib$1\.a$%%'`
-gp_h_prfx=`echo "$gp_h_path" | sed -e 's%/lib$%%' -e 's%/include$%%'`
-for ac_dir in '' /usr/local/include $gp_h_prfx $gp_h_prfx/include $gp_h_path ; do
+if test "$2" != yes && test "$2" != no; then
+  gp_h_path=`echo "$2" | sed -e 's%/lib$1\.a$%%'`
+  gp_h_prfx=`echo "$gp_h_path" | sed -e 's%/lib$%%' -e 's%/include$%%'`
+  gp_h_list="$gp_h_prfx $gp_h_prfx/include $gp_h_path"
+fi
+for ac_dir in '' $gp_h_list /usr/local/include ; do
   test x${ac_dir} != x && CPPFLAGS="$gp_save_CPPFLAGS -I${ac_dir}"
   AC_TRY_CPP([#include <$1>], eval "ac_cv_header_$ac_safe=${ac_dir}",
     eval "ac_cv_header_$ac_safe=no")
