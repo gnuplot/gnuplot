@@ -247,6 +247,8 @@ static void X11_atexit HANDLER_DECL
 
 TERM_PUBLIC void X11_init()
 {
+    static int been_here = 0;
+
     if (!X11_ipc) {
 	/* first time through or after a reset */
 #if defined(OSK) || defined(OS2)
@@ -256,7 +258,9 @@ TERM_PUBLIC void X11_init()
 	X11_ipc = popen(X11_command, "w");
 #else /* !(OSK || OS/2) */
 	int fdes[2];
-	pipe(fdes);
+
+	if (pipe(fdes)) perror("pipe() failed:");
+
 	if (fork() == 0) {
 	    /* child */
 	    close(fdes[1]);
@@ -264,20 +268,18 @@ TERM_PUBLIC void X11_init()
 	    execvp(X11_command, optvec);
 	    /* if we get here, something went wrong */
 	    perror("exec failed");
-	    exit(1);
+	    exit(EXIT_FAILURE);
 	}
 	/* parent */
 	close(fdes[0]);		/* read end of pipe */
 	X11_ipc = fdopen(fdes[1], "w");
 #endif /* !(OSK || OS/2) */
-    } {
-	static int been_here = 0;
-	if (!been_here) {
-	    atexit(X11_atexit);
-	    been_here++;
-	}
     }
 
+    if (!been_here) {
+	atexit(X11_atexit);
+	been_here++;
+    }
 }
 
 TERM_PUBLIC void X11_reset()
@@ -312,7 +314,7 @@ static int X11_pid;
 TERM_PUBLIC void X11_init()
 {
     if (!(X11_pid = fork())) {
-	execl("/bin/sh", "sh", "-c", X11_command, NULL);
+	execvp(X11_command, optvec);
 	_exit(1);
     }
     sprintf(X11_tmp, "/tmp/Gnuplot_%d", X11_pid);
