@@ -1713,7 +1713,7 @@ test_term()
     (*t->linewidth) ((float)(1));
     (*t->linetype)(LT_BLACK);
     (*t->justify_text) (CENTRE);
-    (*t->put_text)(x+xl*7, yl+t->v_tic*5, "pattern fill");
+    (*t->put_text)(x+xl*7, yl+t->v_char*1.5, "pattern fill");
     for (i=0; i<10; i++) {
 	int style = ((i<<4) + FS_PATTERN);
 	(*t->fillbox) ( style, x, y, xl, yl );
@@ -1723,7 +1723,7 @@ test_term()
 	(*t->vector)(x+xl,y);
 	(*t->vector)(x,y);
 	sprintf(label,"%2d",i);
-	(*t->put_text)(x+xl/2, y+yl+t->v_tic*2, label);
+	(*t->put_text)(x+xl/2, y+yl+t->v_char*0.5, label);
 	x += xl * 1.5;
     }
 #endif
