@@ -1,6 +1,6 @@
 /* Hey Emacs this is -*- C -*-
  * 
- * $Id: pstricks.trm,v 1.16 1998/06/18 14:59:25 ddenholm Exp $
+ * $Id: pstricks.trm,v 1.12 1999/01/12 19:17:05 lhecking Exp $
  */
 
 /* GNUPLOT - pstricks.trm */
@@ -417,7 +417,7 @@ char s[];
 	 * is in scientific notation
 	 */
 
-	safe_strncpy(hack, s, ends - s);
+	safe_strncpy(hack, s, ends - s + 1);
 	/* hack[ends - s] = '\0'; */
 
 	ptr = strchr(hack, 'e');
