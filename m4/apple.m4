@@ -14,7 +14,6 @@ AC_EGREP_CPP(yes,
 ], AC_MSG_RESULT(yes)
    LIBS="$LIBS -framework Foundation -framework AppKit"
    CFLAGS="$CFLAGS -ObjC",dnl
-   LIBS="$LIBS -lm"
    AC_MSG_RESULT(no))
 ])
 
