@@ -1,3 +1,8 @@
+2001-10-11  Dick Crawford  <crawford@arete.com>
+
+	* term/post.trm (PS_header): Fix handling of linewidth zero for
+ 	axis linetype, by rejecting too small linewidth in the /UL macro.
+
 2001-10-01  Slaven Rezic  <slaven.rezic@berlin.de>
 
 	* term/tkcanvas.trm: No more warnings if running with perl -w. Take

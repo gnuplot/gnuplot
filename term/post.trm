@@ -1,5 +1,5 @@
 /*
- * $Id: post.trm,v 1.21.2.2 1999/11/20 17:59:46 lhecking Exp $
+ * $Id: post.trm,v 1.21.2.3 2000/02/04 15:20:42 lhecking Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -163,7 +163,7 @@ static char GPFAR * GPFAR PS_header[] = {
 "/AL { stroke userlinewidth 2 div setlinewidth } def\n",
 /* set user defined linewidth */
 "/UL { dup gnulinewidth mul /userlinewidth exch def\n",
-"      10 mul /udl exch def } def\n",
+"      dup 1 lt {pop 1} if 10 mul /udl exch def } def\n",
 /* Plot Lines */
 "/PL { stroke userlinewidth setlinewidth } def\n",
 /* Line Types */
@@ -651,13 +651,15 @@ static int ps_common_uses_fonts;
 static unsigned int ps_common_xoff, ps_common_yoff;
 
 
-TERM_PUBLIC void PS_common_init(encap, portrait, uses_fonts, xoff, yoff, bb_xmin, bb_ymin, bb_xmax, bb_ymax, dict)
-int encap; /* encapsulated or not - 1 for pslatex */
-int portrait; /* 1 for pslatex */
-int uses_fonts; /* 0 for ps(la)tex */
-unsigned int xoff, yoff; /* how much to translate by */
-unsigned int bb_xmin, bb_ymin, bb_xmax, bb_ymax; /* bounding box */
-char **dict; /* extra entries for the dictionary */
+TERM_PUBLIC void
+PS_common_init(encap, portrait, uses_fonts, xoff, yoff, bb_xmin, bb_ymin, bb_xmax, bb_ymax, dict)
+	int encap;		/* encapsulated or not - 1 for pslatex */
+	int portrait;		/* 1 for pslatex */
+	int uses_fonts;		/* 0 for ps(la)tex */
+	unsigned int xoff, yoff; /* how much to translate by */
+	unsigned int bb_xmin, bb_ymin,
+		bb_xmax, bb_ymax; /* bounding box */
+	char **dict;		/* extra entries for the dictionary */
 {
 static char GPFAR psi1[] = "%%%%Creator: gnuplot %s patchlevel %s\n\
 %%%%CreationDate: %s\
@@ -937,13 +939,14 @@ TERM_PUBLIC void PS_graphics()
 {
 static char GPFAR psg1[] = "0 setgray\nnewpath\n";
 struct termentry *t = term;
+
 	ps_page++;
 	if (!ps_common_encap)
 		fprintf(gpoutfile,"%%%%Page: %d %d\n",ps_page,ps_page);
 	fprintf(gpoutfile,"gnudict begin\ngsave\n");
 	fprintf(gpoutfile,"%d %d translate\n",ps_common_xoff, ps_common_yoff);
-	fprintf(gpoutfile,"%.3f %.3f scale\n", (ps_eps ? 0.5 : 1.0)/PS_SC,
-	                                     (ps_eps ? 0.5 : 1.0)/PS_SC);
+	fprintf(gpoutfile,"%.3f %.3f scale\n", (ps_common_encap ? 0.5 : 1.0)/PS_SC,
+	                                     (ps_common_encap ? 0.5 : 1.0)/PS_SC);
 	if (!ps_common_portrait) {
 	    fprintf(gpoutfile,"90 rotate\n0 %d translate\n", (int)(-PS_YMAX));
 	}
