@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: gd.trm,v 1.52 2004/09/30 16:43:38 sfeam Exp $
+ * $Id: gd.trm,v 1.53 2004/10/19 00:24:08 sfeam Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -127,7 +127,7 @@ TERM_PUBLIC void PNG_boxfill(int, unsigned int, unsigned int, unsigned int, unsi
 #ifdef PM3D
 TERM_PUBLIC int PNG_make_palette (t_sm_palette *);
 /* TERM_PUBLIC void PNG_previous_palette (void); */
-TERM_PUBLIC void PNG_set_color (double);
+TERM_PUBLIC void PNG_set_color (t_colorspec *);
 TERM_PUBLIC void PNG_filled_polygon (int, gpiPoint *);
 #endif
 #ifdef WITH_IMAGE
@@ -891,8 +891,13 @@ TERM_PUBLIC int PNG_make_palette (t_sm_palette *palette)
 
 
 TERM_PUBLIC
-void PNG_set_color (double gray)
+void PNG_set_color (t_colorspec *colorspec)
 {
+    double gray = colorspec->value;
+
+    if (colorspec->type != TC_FRAC)
+	return;
+
     if (png_state.TrueColor) {
 	rgb255_color color;
 	rgb255maxcolors_from_gray(gray, &color);

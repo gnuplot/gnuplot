@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: cgm.trm,v 1.61 2004/09/09 12:13:05 lhecking Exp $
+ * $Id: cgm.trm,v 1.62 2004/10/19 00:24:08 sfeam Exp $
  */
 
 /* GNUPLOT - cgm.trm */
@@ -105,7 +105,7 @@ TERM_PUBLIC void CGM_fillbox __PROTO((int style, unsigned int x1, unsigned int y
 #endif
 #ifdef PM3D
 TERM_PUBLIC int CGM_make_palette __PROTO((t_sm_palette *palette));
-TERM_PUBLIC void CGM_set_color __PROTO((double gray));
+TERM_PUBLIC void CGM_set_color __PROTO((t_colorspec *));
 #endif
 
 #if defined(USE_ULIG_FILLEDBOXES) || defined(PM3D)
@@ -1089,8 +1089,13 @@ CGM_make_palette(t_sm_palette *palette)
 }
 
 TERM_PUBLIC void
-CGM_set_color(double gray)
+CGM_set_color(t_colorspec *colorspec)
 {
+    double gray = colorspec->value;
+
+    if (colorspec->type != TC_FRAC)
+	return;
+
      /* map [0...1] to interval [0...cgm_smooth_colors-1], then add
 	offset to get past the default colors */
      cgm_next.fill_color = (gray <= 0) ? 0 : (int)(gray * cgm_smooth_colors);

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: color.c,v 1.51 2004/11/22 00:43:04 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: color.c,v 1.52 2004/11/22 01:38:01 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - color.c */
@@ -185,9 +185,12 @@ make_palette()
 void
 set_color(double gray)
 {
+    t_colorspec color;
     if (!(term->set_color))
 	return;
-    term->set_color(gray);
+    color.type = TC_FRAC;
+    color.value = gray;
+    term->set_color(&color);
 }
 
 

@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: svg.trm,v 1.44 2004/11/13 04:39:07 sfeam Exp $
+ * $Id: svg.trm,v 1.45 2004/11/25 04:33:54 sfeam Exp $
  */
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -60,7 +60,7 @@ TERM_PUBLIC void SVG_linewidth __PROTO ((double linewidth));
 #ifdef PM3D
 TERM_PUBLIC int SVG_make_palette __PROTO((t_sm_palette *));
 TERM_PUBLIC void SVG_previous_palette __PROTO((void));
-TERM_PUBLIC void SVG_set_color __PROTO((double));
+TERM_PUBLIC void SVG_set_color __PROTO((t_colorspec *));
 #endif /* PM3D */
 
 #if defined(PM3D) || defined(USE_ULIG_FILLEDBOXES)
@@ -987,11 +987,14 @@ SVG_make_palette(t_sm_palette *palette)
 	SVG_set_color
 ------------------------------------------------------------------------------------------------------------------------------------*/
 TERM_PUBLIC void
-SVG_set_color(double gray)
+SVG_set_color(t_colorspec *colorspec)
 {
     rgb255_color rgb255;
 
-    rgb255maxcolors_from_gray( gray, &rgb255 );
+    if (colorspec->type != TC_FRAC)
+	return;
+
+    rgb255maxcolors_from_gray( colorspec->value, &rgb255 );
     SVG_use_pm3d_color = 1;
 
     if (rgb255.r != SVG_red || rgb255.g != SVG_green || rgb255.b != SVG_blue) {

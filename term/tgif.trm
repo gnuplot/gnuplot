@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*- */
-/* $Id: tgif.trm,v 1.28 2004/10/19 00:24:09 sfeam Exp $ */
+/* $Id: tgif.trm,v 1.29 2004/11/07 10:27:03 mikulik Exp $ */
 
 /* GNUPLOT - tgif.trm */
 
@@ -93,7 +93,7 @@ TERM_PUBLIC void TGIF_set_pointsize __PROTO((double size));
 #ifdef PM3D
 TERM_PUBLIC int TGIF_make_palette (t_sm_palette *);
 /* TERM_PUBLIC void TGIF_previous_palette (void); */
-TERM_PUBLIC void TGIF_set_color (double);
+TERM_PUBLIC void TGIF_set_color (t_colorspec *);
 TERM_PUBLIC void TGIF_filled_polygon (int, gpiPoint *);
 #endif /* PM3D */
 /*}}}  */
@@ -394,7 +394,7 @@ TGIF_init()
 %%TGIF 2.15-p7\n\
 state(%d,30,%u,0,0,%u,16,1,9,1,1,0,0,0,0,1,0,'%s',0,%u,0,0,1,10,0,0,1,1,0,16,0,0,1,1,1).\n\
 %%\n\
-%% @(#)$Header: /cvsroot/gnuplot/gnuplot/term/tgif.trm,v 1.28 2004/10/19 00:24:09 sfeam Exp $\n\
+%% @(#)$Header: /cvsroot/gnuplot/gnuplot/term/tgif.trm,v 1.29 2004/11/07 10:27:03 mikulik Exp $\n\
 %% %%W%%\n\
 %%\n\
 page(1,\"\").\n",
@@ -1524,9 +1524,15 @@ TGIF_make_palette(t_sm_palette *palette)
 }
 
 TERM_PUBLIC void
-TGIF_set_color(double gray)
+TGIF_set_color(t_colorspec *colorspec)
 {
-    int color = (gray <= 0) ? 0 : (int)(gray * TGIF_palette_size);
+    double gray = colorspec->value;
+    int color;
+
+    if (colorspec->type != TC_FRAC)
+	return;
+
+    color = (gray <= 0) ? 0 : (int)(gray * TGIF_palette_size);
     if (color >= TGIF_palette_size)
 	color = TGIF_palette_size - 1;
     if (TGIF_palette_set == FALSE) {

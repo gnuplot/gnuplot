@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: pslatex.trm,v 1.44 2004/09/15 04:49:41 sfeam Exp $
+ * $Id: pslatex.trm,v 1.45 2004/09/16 00:22:30 sfeam Exp $
  */
 
 /* GNUPLOT - pslatex.trm */
@@ -81,7 +81,7 @@ TERM_PUBLIC void PSLATEX_fillbox __PROTO((int style, unsigned int x1, unsigned i
 #ifdef PM3D
 TERM_PUBLIC int PSLATEX_make_palette (t_sm_palette *);
 TERM_PUBLIC void PSLATEX_previous_palette (void);
-TERM_PUBLIC void PSLATEX_set_color (double);
+TERM_PUBLIC void PSLATEX_set_color (t_colorspec *);
 TERM_PUBLIC void PSLATEX_filled_polygon (int, gpiPoint *);
 #endif
 #ifdef WITH_IMAGE
@@ -650,15 +650,15 @@ PSLATEX_make_palette (t_sm_palette *palette)
 }
 
 TERM_PUBLIC void
-PSLATEX_set_color (double gray)
+PSLATEX_set_color (t_colorspec *colorspec)
 {
     if (PSLATEX_auxfile) {
 	FILE *tmp = gpoutfile;
 	gpoutfile = PSLATEX_auxfile;
-	PS_set_color(gray);
+	PS_set_color(colorspec);
 	gpoutfile = tmp;
     } else
-	PS_set_color(gray);
+	PS_set_color(colorspec);
 }
 
 TERM_PUBLIC void

@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: metapost.trm,v 1.28 2004/10/09 06:13:27 sfeam Exp $
+ * $Id: metapost.trm,v 1.29 2004/10/19 00:24:09 sfeam Exp $
  */
 
 /* GNUPLOT - metapost.trm */
@@ -85,7 +85,7 @@ TERM_PUBLIC void MP_boxfill __PROTO((int style, unsigned int x1,
 #ifdef PM3D
 TERM_PUBLIC int MP_make_palette __PROTO((t_sm_palette *));
 TERM_PUBLIC void MP_previous_palette __PROTO((void));
-TERM_PUBLIC void MP_set_color __PROTO((double));
+TERM_PUBLIC void MP_set_color __PROTO((t_colorspec *));
 TERM_PUBLIC void MP_filled_polygon __PROTO((int, gpiPoint *));
 #endif /* PM3D */
 
@@ -827,8 +827,13 @@ MP_make_palette(t_sm_palette *palette)
 
 
 TERM_PUBLIC void
-MP_set_color(double gray)
+MP_set_color(t_colorspec *colorspec)
 {
+    double gray = colorspec->value;
+
+    if (colorspec->type != TC_FRAC)
+	return;
+
     /* remeber that we changed the color, needed to reset color in MP_linetype()*/
     MP_color_changed = 1;
 

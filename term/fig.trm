@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: fig.trm,v 1.45 2004/09/16 00:22:29 sfeam Exp $
+ * $Id: fig.trm,v 1.46 2004/10/19 00:24:08 sfeam Exp $
  */
 
 /* GNUPLOT - fig.trm */
@@ -89,7 +89,7 @@ TERM_PUBLIC void FIG_boxfill __PROTO((int style, unsigned int x, unsigned int y,
 #ifdef PM3D
 TERM_PUBLIC int FIG_make_palette (t_sm_palette *);
 /* TERM_PUBLIC void FIG_previous_palette (void); */
-TERM_PUBLIC void FIG_set_color (double);
+TERM_PUBLIC void FIG_set_color (t_colorspec *);
 TERM_PUBLIC void FIG_filled_polygon (int, gpiPoint *);
 #endif
 
@@ -1104,8 +1104,13 @@ TERM_PUBLIC void FIG_previous_palette()
 }
 */
 
-TERM_PUBLIC void FIG_set_color(double gray)
+TERM_PUBLIC void FIG_set_color(t_colorspec *colorspec)
 {
+    double gray = colorspec->value;
+
+    if (colorspec->type != TC_FRAC)
+	return;
+
     int new_color = (gray <= 0) ? 0 : (int)(gray * sm_palette.colors);
     if (new_color >= FIG_palette_size)
 	new_color = FIG_palette_size - 1;

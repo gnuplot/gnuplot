@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: pdf.trm,v 1.38 2004/09/02 02:53:42 sfeam Exp $
+ * $Id: pdf.trm,v 1.39 2004/09/30 05:44:00 sfeam Exp $
  */
 
 /*------------------------------
@@ -58,7 +58,7 @@ TERM_PUBLIC void PDF_linewidth __PROTO ((double linewidth));
 #ifdef PM3D
 TERM_PUBLIC int PDF_make_palette __PROTO((t_sm_palette *));
 TERM_PUBLIC void PDF_previous_palette __PROTO((void));
-TERM_PUBLIC void PDF_set_color __PROTO((double));
+TERM_PUBLIC void PDF_set_color __PROTO((t_colorspec *));
 #endif /* PM3D */
 #ifdef WITH_IMAGE
 TERM_PUBLIC void PDF_image __PROTO((unsigned, unsigned, coordval *, gpiPoint *, t_imagecolor));
@@ -1131,11 +1131,14 @@ PDF_make_palette(t_sm_palette *palette)
 
 
 TERM_PUBLIC void
-PDF_set_color(double gray)
+PDF_set_color(t_colorspec *colorspec)
 {
     rgb_color color;
 
-    rgb1maxcolors_from_gray( gray, &color );
+    if (colorspec->type == TC_FRAC)
+	rgb1maxcolors_from_gray( colorspec->value, &color );
+    else
+	return;
 
     /* make sure that the path is stroked with the current color
      * before changing the color */

@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: x11.trm,v 1.121 2004/10/19 00:24:10 sfeam Exp $
+ * $Id: x11.trm,v 1.122 2004/10/29 19:26:21 sfeam Exp $
  *
  */
 
@@ -98,7 +98,7 @@ TERM_PUBLIC void X11_update_opts __PROTO((void));
 
 # ifdef PM3D
 TERM_PUBLIC int X11_make_palette __PROTO((t_sm_palette *));
-TERM_PUBLIC void X11_set_color __PROTO((double));
+TERM_PUBLIC void X11_set_color __PROTO((t_colorspec *));
 TERM_PUBLIC void X11_filled_polygon __PROTO((int, gpiPoint *));
 # endif
 
@@ -1398,10 +1398,13 @@ void dump_histogram(void) {
 #endif
 
 TERM_PUBLIC void
-X11_set_color(double gray)
+X11_set_color(t_colorspec *colorspec)
 {
-
 #ifndef BINARY_X11_POLYGON
+    double gray = colorspec->value;
+
+    if (colorspec->type != TC_FRAC)
+	return;
 
     fputc(X11_GR_SET_COLOR, X11_ipc);
     PRINT1("%f\n", gray);
@@ -1409,10 +1412,12 @@ X11_set_color(double gray)
     return;
 
 #else
-
     char *c_ptr;
     unsigned short byte_remaining;
-    float fgray = gray;
+    float fgray = colorspec->value;
+
+    if (colorspec->type != TC_FRAC)
+	return;
 
     fputc(X11_GR_SET_COLOR, X11_ipc);
     byte_remaining = sizeof(fgray);

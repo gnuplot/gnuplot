@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: win.trm,v 1.33 2004/07/01 17:10:34 broeker Exp $
+ * $Id: win.trm,v 1.34 2004/10/19 00:24:10 sfeam Exp $
  */
 
 /* GNUPLOT - win.trm */
@@ -89,7 +89,7 @@ TERM_PUBLIC void WIN_set_clipboard __PROTO((const char[]));
 #endif
 #ifdef PM3D
 TERM_PUBLIC int WIN_make_palette __PROTO((t_sm_palette *palette));
-TERM_PUBLIC void WIN_set_color __PROTO((double gray));
+TERM_PUBLIC void WIN_set_color __PROTO((t_colorspec *));
 TERM_PUBLIC void WIN_filled_polygon __PROTO((int points, gpiPoint *corners));
 #endif
 TERM_PUBLIC void WIN_boxfill __PROTO((int, unsigned int, unsigned int, unsigned int, unsigned int));
@@ -385,10 +385,13 @@ WIN_make_palette(t_sm_palette *palette)
 }
 
 TERM_PUBLIC void
-WIN_set_color(double gray)
+WIN_set_color(t_colorspec *colorspec)
 {
+    if (colorspec->type != TC_FRAC)
+	return;
+
     WIN_last_linetype = -3;      /* invalidate cached linetype */
-    GraphOp(&graphwin, W_pm3d_setcolor, (int)(256*gray), 0, NULL);
+    GraphOp(&graphwin, W_pm3d_setcolor, (int)(256*colorspec->value), 0, NULL);
 }
 
 TERM_PUBLIC void

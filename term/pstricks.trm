@@ -1,6 +1,6 @@
 /* Hey Emacs this is -*- C -*-
  *
- * $Id: pstricks.trm,v 1.26 2004/07/01 17:10:34 broeker Exp $
+ * $Id: pstricks.trm,v 1.27 2004/09/16 00:22:31 sfeam Exp $
  */
 
 /* GNUPLOT - pstricks.trm */
@@ -101,7 +101,7 @@ TERM_PUBLIC int PSTRICKS_text_angle __PROTO((int ang));
 TERM_PUBLIC void PSTRICKS_reset __PROTO((void));
 #ifdef PM3D
 TERM_PUBLIC int PSTRICKS_make_palette __PROTO((t_sm_palette *));
-TERM_PUBLIC void PSTRICKS_set_color __PROTO((double));
+TERM_PUBLIC void PSTRICKS_set_color __PROTO((t_colorspec *));
 TERM_PUBLIC void PSTRICKS_filled_polygon __PROTO((int, gpiPoint *));
 #endif
 
@@ -611,9 +611,15 @@ PSTRICKS_make_palette (t_sm_palette *palette)
 
 
 TERM_PUBLIC void
-PSTRICKS_set_color (double gray)
+PSTRICKS_set_color (t_colorspec *colorspec)
 {
-    int new_color = (gray <=0) ? 0 : (int)(gray*sm_palette.colors);
+    int new_color;
+    double gray = colorspec->value;
+
+    if (colorspec->type != TC_FRAC)
+	return;
+
+    new_color = (gray <=0) ? 0 : (int)(gray*sm_palette.colors);
     if (new_color >= PSTRICKS_palette_size)
 	new_color = PSTRICKS_palette_size - 1;
     if (PSTRICKS_palette_set == FALSE) {

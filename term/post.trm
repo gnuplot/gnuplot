@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.133 2004/09/17 19:21:46 sfeam Exp $
+ * $Id: post.trm,v 1.134 2004/09/30 05:44:00 sfeam Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -92,7 +92,7 @@ TERM_PUBLIC void PS_pointsize __PROTO((double ptsize)); /* JFi [pointsize] */
 #ifdef PM3D
 TERM_PUBLIC int PS_make_palette (t_sm_palette *);
 TERM_PUBLIC void PS_previous_palette (void);
-TERM_PUBLIC void PS_set_color (double);
+TERM_PUBLIC void PS_set_color (t_colorspec *);
 TERM_PUBLIC void PS_filled_polygon (int, gpiPoint *);
 #endif /* PM3D */
 #ifdef WITH_IMAGE
@@ -2892,9 +2892,15 @@ TERM_PUBLIC int PS_make_palette (t_sm_palette *palette)
 }
 
 
-TERM_PUBLIC void PS_set_color (double gray)
+TERM_PUBLIC void PS_set_color (t_colorspec *colorspec)
 {
+    double gray;
+
+    if (colorspec->type != TC_FRAC)
+	return;
+
 /* map [0;1] to gray/colors */
+    gray = colorspec->value;
     if (gray <= 0)
 	fputs("0 g ", gpoutfile);
     else {

@@ -1,3 +1,20 @@
+2004-11-26  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/term_api.h term/README: Change from term->set_color(double gray)
+	to term->set_color(struct t_colorspec *colorspec).  This sets the stage
+	for allowing color specification mechanisms other than a PM3D palette.
+	The immediate intent is to allow direct requests for RGB color values.
+	
+	* term/*.trm: Convert all terminal types providing set_color() to the
+	new API. No change in terminal behavior or capabilities.
+	Terminals affected:
+		aquaterm cgm fig gd metapost pdf post pslatex svg 
+		tgif vgagl win x11 pstricks
+
+	* src/color.c (set_color): This is the only routine that calls 
+	term->set_color. Convert it to pass a colorspec pointer rather than a
+	palette gray value.
+
 2004-11-25  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/util3d.h: map3d_xy_double is needed independent of WITH_IMAGE.
