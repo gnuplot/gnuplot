@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.16 1999/06/22 12:00:47 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.17 1999/07/05 13:12:51 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -76,10 +76,10 @@ extern int PM_pause(char *);            /* term/pm.trm */
 extern int ExecuteMacro(char *, int);   /* plot.c */
 extern TBOOLEAN CallFromRexx;           /* plot.c */
 # ifdef USE_MOUSE
-PVOID input_from_PM_Terminal = NULL;
-char mouseShareMemName[40] = "";
 #  define INCL_DOSMEMMGR
 #  include <os2.h>
+PVOID input_from_PM_Terminal = NULL;
+char mouseShareMemName[40] = "";
 # endif /* USE_MOUSE */
 #endif /* OS2 */
 
@@ -809,6 +809,7 @@ replotrequest()
 # include <rmsdef.h>
 # include <smgdef.h>
 # include <smgmsg.h>
+# include <ssdef.h>
 
 extern lib$get_input(), lib$put_output();
 extern smg$read_composed_line();
@@ -841,7 +842,7 @@ const char *prompt;
     char expand_prompt[40];
 
     prompt_desc.dsc$w_length = strlen(prompt);
-    prompt_desc.dsc$a_pointer = prompt;
+    prompt_desc.dsc$a_pointer = (char *)prompt;
     (void) strcpy(expand_prompt, "_");
     (void) strncat(expand_prompt, prompt, 38);
     do {
