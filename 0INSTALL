@@ -467,11 +467,13 @@ only a few possible values for the `with_package' variable:
 --with-package=yes        yes
 --with-package=no         no
 --with-package=PATH       PATH
+--without-package         no
 
  This means that configure will always (by default) try to locate PACKAGE
-unless `--with-package=no' was specified.  Examples for with-PACKAGE
-options used by gnuplot's configure are `--with-gd', `--with-png'. The
-corresponding package variables are `with_gd', and `with_png'.
+unless `--with-package=no' or `--without-package' was specified. Examples
+for with-PACKAGE options used by gnuplot's configure are `--with-gd',
+`--with-png'. The corresponding package variables are `with_gd',
+and `with_png'.
 
  For the gnuplot package, configure uses the macros `gp_CHECK_LIB_PATH'
 and `gp_CHECK_HEADER' to search for libraries and includes, resp.  These
