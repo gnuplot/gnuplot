@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: specfun.c,v 1.14 2002/01/24 13:48:21 lhecking Exp $";
+static char *RCSid = "$Id: specfun.c,v 1.15 2002/01/26 00:17:40 broeker Exp $";
 #endif
 
 /* GNUPLOT - specfun.c */
@@ -118,7 +118,7 @@ static double
 lngamma(z)
     double z;
 {
-    fprintf(stderr, "Sorry, your libc does not contain lgammma()...\n");
+    fprintf(stderr, "lngamma() removed due to license issues\n");
     return 0;
 }
 
@@ -646,7 +646,7 @@ static double
 inverse_normal_func(p)
     double p;
 {
-    fprintf(stderr, "Sorry, function removed due to license issues :(\n");
+    fprintf(stderr, "inverse_normal_func() removed due to license issues\n");
     return 0;
 }
 
@@ -655,7 +655,7 @@ static double
 inverse_error_func(p)
     double p;
 {
-    fprintf(stderr, "Sorry, function removed due to license issues :(\n");
+    fprintf(stderr, "inverse_error_func() removed due to license issues\n");
     return 0;
 }
 
