@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.96 2005/03/23 16:47:02 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.97 2005/03/25 05:01:10 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -1531,6 +1531,11 @@ eval_3dplots()
 		&& this_plot->plot_style != PM3DSURFACE
 		/* don't increment the default line/point properties if
 		 * this_plot is an EXPLICIT pm3d surface plot */
+#endif
+#ifdef WITH_IMAGE
+		&& this_plot->plot_style != IMAGE
+		&& this_plot->plot_style != RGBIMAGE
+		/* same as above, for an (rgb)image plot */
 #endif
 		) {
 		if (this_plot->plot_style & PLOT_STYLE_HAS_POINT)

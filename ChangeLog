@@ -1,3 +1,11 @@
+2005-03-25  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* src/plot2d.c (eval_plots) src/plot3d.c (eval_3dplots): Don't increment
+	the default line/point properties for line/point plots if this_plot is
+	an (rgb)image (the same is already happening for pm3d plots).
+	Otherwise, "splot 'a.dat' with image,x*y with line" and "... x*y w line,
+	'a.dat' with image" draw surface x*y in different colours.
+
 2005-03-24  Ethan Merritt  <merritt@u.washington.edu>
 
 	* docs/gnuplot.doc src/set.c (set_table) src/unset.c (unset_table) 

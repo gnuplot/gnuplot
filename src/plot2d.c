@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.96 2005/03/23 16:47:02 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.97 2005/03/25 05:01:09 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -1760,7 +1760,14 @@ eval_plots()
 		uses_axis[y_axis] |= USES_AXIS_FOR_FUNC;
 	    }
 
-	    if (!xparam) {
+	    if (!xparam
+#ifdef WITH_IMAGE
+		&& this_plot->plot_style != IMAGE
+		&& this_plot->plot_style != RGBIMAGE
+		/* don't increment the default line/point properties if
+		 * this_plot is an image */
+#endif
+	    ) {
 		if (this_plot->plot_style & PLOT_STYLE_HAS_POINT)
 		    ++point_num;
 		++line_num;
