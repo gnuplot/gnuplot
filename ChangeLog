@@ -1,3 +1,28 @@
+1999-05-14  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* demo/Makefile.am.in: Improved check-* targets. List *.par files
+	explicitly in EXTRA_DIST to avoid inclusion of generated .par files.
+
+	* src/datafile.c(df_open): Storage for data file name is now fully
+	dynamic. Remove temporary static array.
+
+	* src/misc.c, src/plot.c, src/set.c, src/show.c: Add and use new
+	loadpath variable, access_loadpath() function.
+
+	* src/protos.h, src/util.c: New function is_notempty().
+
+	* src/set.c, src/setshow.h, src/show.c: Turn identical setmess/showmess
+	string into #define'd symbol.
+
+	* src/syscfg.h: Add PATHSEP symbol.
+
+1999-05-14  Alexander Mai  <st002279@HRzpUB.tu-darmstadt.DE>
+
+	* BUGS: Remove duplicate entry.
+
+	* src/plot2d.c: Better handling of empty data files (no more
+	misleading "xrange is invalid" messages).
+
 1999-05-13  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* lisp/Makefile.in: Add empty check target.
@@ -36,7 +61,7 @@
 
 	* src/graphics.c: Fix for y-position of the timestamp.
 
-1999-05-10  Alexander Mai  <st002279@HRzpUB.tu-darmstadt.DE
+1999-05-10  Alexander Mai  <st002279@HRzpUB.tu-darmstadt.DE>
 
 	* config/makefile.os2: Minor updates and corrections.
 
