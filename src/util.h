@@ -1,5 +1,5 @@
 /*
- * $Id: util.h,v 1.22 2004/10/26 04:31:12 sfeam Exp $
+ * $Id: util.h,v 1.23 2005/01/12 00:05:42 sfeam Exp $
  */
 
 /* GNUPLOT - util.h */
@@ -77,7 +77,7 @@ void quote_str __PROTO((char *, int, int));
 void capture __PROTO((char *, int, int, int));
 void m_capture __PROTO((char **, int, int));
 void m_quote_capture __PROTO((char **, int, int));
-char *try_to_get_string __PROTO(());
+char *try_to_get_string __PROTO((void));
 void parse_esc __PROTO((char *));
 
 #ifdef GP_STRING_VARS
