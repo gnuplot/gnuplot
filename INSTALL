@@ -146,8 +146,12 @@ $ ./configure --help
   --with-lasergnu         install lasergnu printer script
   --with-linux-vga        use the Linux SVGA console driver
                           (requires /usr/lib/libvga)
+  --without-lisp-files    do not build emacs lisp files
+  --without-tutorial      do not build LaTeX tutorial
   --enable-history        enable history (requires GNU readline)
   --enable-thin-splines   enable thin plate splines (EXPERIMENTAL)
+  --with-row-help (*)     format help and subtopic tables by row (default)
+  --without-row-help      format help and subtopic tables by column
   --enable-iris           enable IRIS terminal (IRIS4D only)
   --enable-mgr            enable MGR terminal
   --enable-rgip           enable Redwood Graphics Interface Protocol
@@ -387,19 +391,23 @@ for with-PACKAGE options used by gnuplot's configure are `--with-gd',
 `--with-png'. The corresponding package variables are `with_gd',
 and `with_png'.
 
- For gnuplot, configure uses the macros `GP_SEARCH_LIBDIRS' and
-`GP_PATH_HEADER' to search for libraries and includes, resp.  These
-macros are different from the standard GNU autoconf macros for this purpose,
-`AC_CHECK_LIB' and `AC_CHECK_HEADER/S' (see autoconf manual). The
-GP_XXX macros are closely tied to gnuplot, and cannot be used for other
-packages without modification. [May change in the future]
+ For gnuplot, configure uses the macros `GP_PATH_LIB' and `GP_PATH_HEADER'
+to search for libraries and includes, resp.  These macros are different
+from the standard GNU autoconf macros for this purpose, `AC_CHECK_LIB' and
+`AC_CHECK_HEADER/S' (see autoconf manual). The GP_XXX macros are closely
+tied to gnuplot, and cannot be used for other packages without modification.
+[May change in the future]
 
  The difference between these package specific macros and standard
 autoconf macros is that they do search more than the default directories
 known to the compiler to determine the location of the specified file.
 
  Libraries will be searched in at least three, and up to five different
-directories, depending on the PATH specified with `--with-PACKAGE=PATH':
+directories, depending on the PATH specified with `--with-PACKAGE=PATH'.
+These directories are determined by the second argument to GP_PATH_LIB,
+which should normally be identical with the argument to the corresponding
+`--with-PACKAGE=PATH' configure option: GP_PATH_lib(lib, [$with_package]).
+Here's the list:
 
  o the default linker path (this is really more than one directory)
  o /usr/local/lib, which is a fairly common place for 3rd party libs
@@ -430,7 +438,7 @@ will search the following directories for libgd.a:
 
  Include files will be searched in the default location, /usr/local/include,
 and three additional directories. These directories are determined by the
-second argument to GP_PATH_HEADER, which should normaly be identical with
+second argument to GP_PATH_HEADER, which should normally be identical with
 the argument to the corresponding `--with-PACKAGE=PATH' configure option:
 GP_PATH_HEADER(header.h, [$with_package]). Here's the list:
 
