@@ -40,7 +40,10 @@ BEGIN
 
     SUBMENU  "~Mouse" , IDM_MOUSE,,MIA_DISABLED
     BEGIN
-        MENUITEM    "~Use mouse\tm,Ctrl-M", IDM_USEMOUSE,,MIA_CHECKED
+        MENUITEM   "~Use mouse\tm", IDM_USEMOUSE,,MIA_CHECKED
+        MENUITEM   "Mouse+key ~help\th", IDM_MOUSE_HELP
+/*
+
         SUBMENU    "Coordinates", IDM_MOUSE_COORDINATES
         BEGIN
             MENUITEM  "~real", IDM_MOUSE_COORDINATES_REAL,,MIA_CHECKED
@@ -51,6 +54,7 @@ BEGIN
             MENUITEM  "x ~time", IDM_MOUSE_COORDINATES_XTIME
             MENUITEM  "x date+time", IDM_MOUSE_COORDINATES_XDATETIME
         END
+*/
         MENUITEM  SEPARATOR
         SUBMENU   "By mouse...", -1
         BEGIN
@@ -60,24 +64,31 @@ BEGIN
         END
         SUBMENU   "Coords ~format", IDM_MOUSE_FORMAT
         BEGIN
-            MENUITEM  "x y", IDM_MOUSE_FORMAT_X_Y
             MENUITEM  "x,y", IDM_MOUSE_FORMAT_XcY,,MIA_CHECKED
-            MENUITEM  "x;y", IDM_MOUSE_FORMAT_XsY
+            MENUITEM  "[x,y]", IDM_MOUSE_FORMAT_pXcYp
+            MENUITEM  "x y", IDM_MOUSE_FORMAT_X_Y
             MENUITEM  SEPARATOR
+            MENUITEM  "timefmt", IDM_MOUSE_FORMAT_TIMEFMT
+            MENUITEM  "date", IDM_MOUSE_FORMAT_DATE
+            MENUITEM  "time", IDM_MOUSE_FORMAT_TIME
+            MENUITEM  "date / time", IDM_MOUSE_FORMAT_DATETIME
+/*
+            MENUITEM  SEPARATOR
+            MENUITEM  "x;y", IDM_MOUSE_FORMAT_XsY
             MENUITEM  "x,y,", IDM_MOUSE_FORMAT_XcYc
             MENUITEM  "x,y;", IDM_MOUSE_FORMAT_XcYs
             MENUITEM  SEPARATOR
             MENUITEM  "[x:y]", IDM_MOUSE_FORMAT_pXdYp
-            MENUITEM  "[x,y]", IDM_MOUSE_FORMAT_pXcYp
             MENUITEM  "[x;y]", IDM_MOUSE_FORMAT_pXsYp
             MENUITEM  SEPARATOR
             MENUITEM  "set label...", IDM_MOUSE_FORMAT_LABEL
+*/
         END
         MENUITEM  "Unzoom all\tu,F10", IDM_MOUSE_UNZOOMALL,,MIA_DISABLED
         MENUITEM  "Unzoom back\tp,F11", IDM_MOUSE_UNZOOM,,MIA_DISABLED
         MENUITEM  "Zoom next\tn,F12", IDM_MOUSE_ZOOMNEXT,,MIA_DISABLED
         MENUITEM  SEPARATOR
-        MENUITEM  "~Ruler\tr,Ctrl-R", IDM_MOUSE_RULER
+        MENUITEM  "~Ruler\tr", IDM_MOUSE_RULER
         MENUITEM  "~Polar distance\t5", IDM_MOUSE_POLAR_DISTANCE,,
     END
 
@@ -85,8 +96,8 @@ BEGIN
     BEGIN
 	MENUITEM "~Break drawing\tCtrl-C" , IDM_BREAK_DRAWING
         MENUITEM  SEPARATOR
-	MENUITEM  "~grid on/off\tg,Ctrl-G", IDM_SET_GRID
-	MENUITEM  "~lin/log y\tl,Ctrl-L", IDM_SET_LINLOGY
+	MENUITEM  "~grid on/off\tg", IDM_SET_GRID
+	MENUITEM  "~lin/log y\tl, L", IDM_SET_LINLOGY
 	SUBMENU "~set",IDM_SET
         BEGIN
             SUBMENU "~data style",IDM_SET_D_S
@@ -219,7 +230,7 @@ BEGIN
     BEGIN
         CTEXT           "GnuplotPM", -1, 8, 65, 128, 8
         CTEXT           "Gnuplot display for OS/2", -1, 8, 50, 128, 8
-        CTEXT           "$Revision: 1.2 $", -1, 8, 35, 128, 8
+        CTEXT           "$Revision: 1.8 $", -1, 8, 35, 128, 8
         DEFPUSHBUTTON   "OK", DID_OK, 56, 10, 32, 14, WS_GROUP
     END
 END

@@ -41,6 +41,7 @@
 
 #define IDM_MOUSE             600
 #define IDM_USEMOUSE          601
+/*
 #define IDM_MOUSE_COORDINATES 602
 #define IDM_MOUSE_COORDINATES_REAL    603
 #define IDM_MOUSE_COORDINATES_PIXELS  604
@@ -48,6 +49,7 @@
 #define IDM_MOUSE_COORDINATES_XDATE   606
 #define IDM_MOUSE_COORDINATES_XTIME   607
 #define IDM_MOUSE_COORDINATES_XDATETIME       608
+*/
 #define IDM_MOUSE_UNZOOM              610
 #define IDM_MOUSE_UNZOOMALL           611
 #define IDM_MOUSE_ZOOMNEXT            612
@@ -65,6 +67,11 @@
 #define IDM_MOUSE_FORMAT_pXcYp                627
 #define IDM_MOUSE_FORMAT_pXsYp                628
 #define IDM_MOUSE_FORMAT_LABEL                629
+#define IDM_MOUSE_FORMAT_TIMEFMT	630
+#define IDM_MOUSE_FORMAT_DATE		631
+#define IDM_MOUSE_FORMAT_TIME		632
+#define IDM_MOUSE_FORMAT_DATETIME	633
+#define IDM_MOUSE_HELP			640
 
 #define IDM_UTILS             650
 #define IDM_BREAK_DRAWING     651

@@ -1,5 +1,5 @@
 #ifdef INCRCSDATA
-static char RCSid[]="$Id: gclient.c,v 1.21 2002/09/26 19:19:28 mikulik Exp $" ;
+static char RCSid[]="$Id: gclient.c,v 1.22 2002/09/30 15:15:20 mikulik Exp $" ;
 #endif
 
 /****************************************************************************
@@ -193,13 +193,6 @@ static double   multLineVert = 0; /* for multiline prints.		    */
 static int	codepage = 0;
 
 static int 	ulMouseSprintfFormatItem = IDM_MOUSE_FORMAT_XcY;
-const  int	nMouseSprintfFormats = IDM_MOUSE_FORMAT_LABEL - IDM_MOUSE_FORMAT;
-const  char  *( MouseSprintfFormats[ /*nMouseSprintfFormats*/ ] ) = {
-		"%g %g","%g,%g","%g;%g",
-		"%g,%g,","%g,%g;",
-		"[%g:%g]","[%g,%g]","[%g;%g]",
-		"set label  at %g,%g"
-		 };
 static BOOL     bSend2gp = FALSE ;
 const  char  *( SetDataStyles[] ) = {
 		"boxes", "dots", "fsteps", "histeps", "impulses",
@@ -1050,6 +1043,20 @@ WinMapWindowPoints(HWND_DESKTOP, hWnd, p, 1);
 #endif
 
 
+/* passing either n (n>=0) or f (when n==-1) */
+void SetMouseCoords(HWND hWnd, MPARAM mp1, int n, char *f)
+{
+    char s[100];
+    ChangeCheck( hWnd, ulMouseSprintfFormatItem, SHORT1FROMMP( mp1 ) ) ;
+    ulMouseSprintfFormatItem = SHORT1FROMMP( mp1 );
+    if (n >= 0)
+	sprintf(s,"set mouse mouseformat %i clipboardformat %i", n, n);
+    else
+	sprintf(s,"set mouse mouseformat \"%s\" clipboardformat \"%s\"", f, f);
+    gp_execute(s);
+}
+
+
 MRESULT WmClientCmdProc(HWND hWnd, ULONG message, MPARAM mp1, MPARAM mp2)
 /*
 **   Handle client window command (menu) messages
@@ -1057,7 +1064,7 @@ MRESULT WmClientCmdProc(HWND hWnd, ULONG message, MPARAM mp1, MPARAM mp2)
     {
     extern HWND hApp ;
     static int ulPauseItem = IDM_PAUSEDLG ;
-    static int ulMouseCoordItem = IDM_MOUSE_COORDINATES_REAL ;
+//    static int ulMouseCoordItem = IDM_MOUSE_COORDINATES_REAL ;
 
 int mx, my;
 GetMousePosViewport(hWnd,&mx,&my);
@@ -1249,6 +1256,11 @@ GetMousePosViewport(hWnd,&mx,&my);
 #endif
 	    return 0L;
 
+	case IDM_MOUSE_HELP:
+	    { char s[80]; gp_exec_event ( GE_keypress, mx, my, 'h', 1); }
+	    return 0L;
+
+#if 0
 	case IDM_MOUSE_COORDINATES_REAL:
 	    ChangeCheck( hWnd, ulMouseCoordItem, IDM_MOUSE_COORDINATES_REAL ) ;
 	    ulMouseCoordItem = IDM_MOUSE_COORDINATES_REAL;
@@ -1278,30 +1290,40 @@ GetMousePosViewport(hWnd,&mx,&my);
 	    ChangeCheck( hWnd, ulMouseCoordItem, IDM_MOUSE_COORDINATES_XDATETIME ) ;
 	    ulMouseCoordItem = IDM_MOUSE_COORDINATES_XDATETIME;
 	    return 0L;
+#endif
 
 	case IDM_MOUSE_CMDS2CLIP:
 		/* toggle copying the command sent to gnuplot to clipboard */
 	    bSend2gp = !bSend2gp ;
 	    ChangeCheck( hWnd, IDM_MOUSE_CMDS2CLIP, bSend2gp?IDM_MOUSE_CMDS2CLIP:0 ) ;
-	    break ;
+	    return 0L ;
 
-	case IDM_MOUSE_FORMAT_X_Y:
-	case IDM_MOUSE_FORMAT_XcY:
-	case IDM_MOUSE_FORMAT_XsY:
-	case IDM_MOUSE_FORMAT_XcYc:
-	case IDM_MOUSE_FORMAT_XcYs:
-	case IDM_MOUSE_FORMAT_pXdYp:
 	case IDM_MOUSE_FORMAT_pXcYp:
-	case IDM_MOUSE_FORMAT_pXsYp:
-	case IDM_MOUSE_FORMAT_LABEL:
-	    {
-	    char s[100];
-	    ChangeCheck( hWnd, ulMouseSprintfFormatItem, SHORT1FROMMP( mp1 ) ) ;
-	    ulMouseSprintfFormatItem = SHORT1FROMMP( mp1 );
-	    sprintf(s,"set mouse mouseformat \"%s\"",MouseSprintfFormats[ulMouseSprintfFormatItem-IDM_MOUSE_FORMAT_X_Y]);
-	    sprintf(s,"set mouse clipboardformat \"%s\"",MouseSprintfFormats[ulMouseSprintfFormatItem-IDM_MOUSE_FORMAT_X_Y]);
-	    gp_execute(s);
-	    }
+	    SetMouseCoords(hWnd, mp1, 0, NULL);
+	    return 0L ;
+	case IDM_MOUSE_FORMAT_XcY:
+	    SetMouseCoords(hWnd, mp1, 1, NULL);
+	    return 0L ;
+	case IDM_MOUSE_FORMAT_TIMEFMT:
+	    SetMouseCoords(hWnd, mp1, 2, NULL);
+	    return 0L ;
+	case IDM_MOUSE_FORMAT_DATE:
+	    SetMouseCoords(hWnd, mp1, 3, NULL);
+	    return 0L ;
+	case IDM_MOUSE_FORMAT_TIME:
+	    SetMouseCoords(hWnd, mp1, 4, NULL);
+	    return 0L ;
+	case IDM_MOUSE_FORMAT_DATETIME:
+	    SetMouseCoords(hWnd, mp1, 5, NULL);
+	    return 0L ;
+	case IDM_MOUSE_FORMAT_X_Y:
+	    SetMouseCoords(hWnd, mp1, -1, "%g %g");
+	    return 0L ;
+	case IDM_MOUSE_FORMAT_XcYc:
+	    SetMouseCoords(hWnd, mp1, -1, "%g %g ");
+	    return 0L ;
+	case IDM_MOUSE_FORMAT_XcYs:
+	    SetMouseCoords(hWnd, mp1, -1, "%g %g, ");
 	    return 0L;
 
 	case IDM_MOUSE_POLAR_DISTANCE: /* toggle using/not using polar coords of distance */
