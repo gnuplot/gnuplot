@@ -1,8 +1,31 @@
+2000-03-30  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* Makefile.am, src/Makefile.am: Add missing files to EXTRA_DIST
+	target.
+
+	* configure.in, m4/path-hdr.m4, m4/path-lib.m4: Buffering directory
+	names in config.cache is bad style ...
+
+	* src/gplt_x11.c, src/graphics.c: Cleanups, indentation.
+
+	* src/plot.h: Don't include ansichek.h, already in syscfg.h.
+	Remove reference to TBOOLEAN noinputfiles, which is static
+	in plot.c.
+
+	* src/show.c(show_version): Add mouse support in version information.
+
+	* term/x11.trm: Remove C++ comment.
+
+2000-03-29  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* term/pslatex.trm: Amend help section as suggested by Pieter-Tjerk
+	de Boer.
+
 2000-03-28  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* configure.in: Cleanup after merge with Johannes' sources.
 
-	* unset.c: Change borders and label contours as sugegsted by
+	* unset.c: Change borders and label contours as suggested by
 	Johannes.
 
 	* configure.in, docs/gnuplot.doc, src/command.c, src/gpexecute.inc,
@@ -23,6 +46,11 @@
 
 	* src/graph3d.c(boundary3d): Change plot size if no key is set after
 	set key outside (part two).
+
+2000-03-20  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/graphics.c(gen_tics): Bugfixes for tics and mtics handling
+	in logscale.
 
 2000-03-18  Johannes Zellner <johannes@zellner.org>
 
@@ -143,6 +171,16 @@
 
         * removed some unused code in gplt_x11.c
 
+2000-02-15 Pieter-Tjerk de Boer <ptdeboer@cs.utwente.nl>
+
+	* term/pslatex.trm: Don't put pslatex's postscript code into
+	the preamble, otherwise, if several pictures are present, only
+	the settings for the last picture are present.
+
+2000-02-14 Pieter-Tjerk de Boer <ptdeboer@cs.utwente.nl>
+
+	* src/unset.c: Repair defunct 'unset [xyz]tics' commands.
+
 2000-02-12  Johannes Zellner <johannes@zellner.org>
 
         * changed the policy for allowing bidirectional ipc in X11:
@@ -234,6 +272,10 @@
 
 	* src/plot.c(wrapper_for_write_history): write_history() returns
 	zero on success.
+
+2000-01-14  Pieter-Tjerk de Boer  <ptdeboer@cs.utwente.nl>
+
+	* src/unset.c: The 'unset [xyz]tics' commans didn't work.
 
 1999-12-20  John Hasstedt  <manager@nuclear.physics.sunysb.edu>
 
