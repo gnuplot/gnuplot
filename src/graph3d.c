@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.79 2003/02/10 04:28:09 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.80 2003/02/16 00:07:37 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -357,9 +357,9 @@ boundary3d(plots, count)
 	    /* HBB 991019: fix division by zero problem */
 	    if (key_cols == 0)
 		key_cols = 1;
-	    key_rows = (int) (ptitl_cnt / key_cols) + ((ptitl_cnt % key_cols) > 0);
+	    key_rows = (int) ((ptitl_cnt - 1)/ key_cols) + 1;
 	    /* now calculate actual no cols depending on no rows */
-	    key_cols = (int) (ptitl_cnt / key_rows) + ((ptitl_cnt % key_rows) > 0);
+	    key_cols = (int) ((ptitl_cnt - 1)/ key_rows) + 1;
 	    key_col_wth = (int) (xright - xleft) / key_cols;
 	    /* key_rows += ktitle_lines; - messes up key - div */
 	} else {
@@ -385,11 +385,14 @@ boundary3d(plots, count)
     if (key->flag == KEY_AUTO_PLACEMENT && key->vpos != TUNDER) {
 	/* calculate max no rows, limited be ytop-ybot */
 	i = (int) (ytop - ybot) / (t->v_char) - 1 - ktitle_lines;
+	/* HBB 20030321: div by 0 fix like above */
+	if (i == 0)
+	    i = 1;
 	if (ptitl_cnt > i) {
-	    key_cols = (int) (ptitl_cnt / i) + ((ptitl_cnt % i) > 0);
+	    key_cols = (int) ((ptitl_cnt - 1)/ i) + 1;
 	    /* now calculate actual no rows depending on no cols */
-	    key_rows = (int) (ptitl_cnt / key_cols) + ((ptitl_cnt % key_cols) > 0);
-	}
+	    key_rows = (int) ((ptitl_cnt - 1) / key_cols) + 1;
+	} 
 	key_rows += ktitle_lines;
     }
     if (key->flag == KEY_AUTO_PLACEMENT && key->hpos == TOUT) {
