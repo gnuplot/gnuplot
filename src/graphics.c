@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.37 2000/10/31 19:59:31 joze Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.38 2000/11/01 18:57:28 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -3371,9 +3371,9 @@ const char *what;
 /*{{{  map_position_double */
 static void
 map_position_double(pos, x, y, what)
-struct position *pos;
-double *x, *y;
-const char *what;
+    struct position *pos;
+    double *x, *y;
+    const char *what;
 {
     switch (pos->scalex) {
     case first_axes:
@@ -3407,6 +3407,7 @@ const char *what;
 	{
 	    double yy = axis_log_value_checked(FIRST_Y_AXIS, pos->y, what);
 	    *y = AXIS_MAP(FIRST_Y_AXIS, yy);
+	    break;
 	}
     case second_axes:
 	{

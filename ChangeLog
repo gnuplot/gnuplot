@@ -1,5 +1,9 @@
 2000-11-15  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
+	* src/graphics.c (map_position_double): added back a missing 'break'.
+
+2000-11-15  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
 	* src/command.c (help_command): [_Windows] fixed off-by-one error
  	in help topic determination.
 
