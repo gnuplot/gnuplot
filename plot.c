@@ -518,6 +518,7 @@ static void load_rcfile()
 #else
     (void) strcpy (rcfile, PLOTRC);
     plotrc = fopen (rcfile,"r");
+#endif /* !NOCWDRC */
 
     if (plotrc == NULL) {
         if (tmp_home) {
@@ -534,7 +535,6 @@ static void load_rcfile()
 #endif /* ATARI || MTOS */
 	}
     }
-#endif /* !NOCWDRC */
 
     if (plotrc)
 	 load_file(plotrc, rcfile, FALSE);
@@ -548,7 +548,6 @@ int ExecuteMacro( char *argv, int namelength )
     char pszRc[256] ;
     char pszName[256] ;
     short sRc ;
-    HAB hab ;
     int rc ;
     
     strncpy( pszName, argv, namelength ) ;
@@ -573,7 +572,6 @@ ULONG RexxInterface( PRXSTRING rxCmd, PUSHORT pusErr, PRXSTRING rxRc )
 ** Rexx command line interface
 */
     {
-    int iCmd ;
     int rc ;
     static jmp_buf keepenv;
     memcpy( keepenv, command_line_env, sizeof(jmp_buf)) ;
