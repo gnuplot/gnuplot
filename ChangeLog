@@ -1,3 +1,7 @@
+2002-09-09  Johannes Zellner  <johannes@zellner.org>
+
+	* src/plot.c: reordering: init_color() must come BEFORE load_rcfile().
+
 2002-09-06  Harald Harders  <h.harders@tu-bs.de>
 
 	* demo/Makefile.am demo/Makefile.am.in docs/psdoc/ps_fontfile_doc.tex
@@ -1068,7 +1072,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/09/05 19:42:44 $).
+	last modification date (from the tag $Date: 2002/09/06 18:14:40 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
