@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.26 1999/09/14 15:27:15 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.27 1999/09/24 15:38:59 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -40,10 +40,17 @@ static char *RCSid() { return RCSid("$Id: show.c,v 1.26 1999/09/14 15:27:15 lhec
  * Added user-specified bases for log scaling.
  */
 
-
 #include "plot.h"
+#include "alloc.h"
+#include "command.h"
+#include "eval.h"
+#include "gp_time.h"
+#include "graphics.h"
+#include "hidden3d.h"
+#include "parse.h"
 #include "setshow.h"
 #include "tables.h"
+#include "util.h"
 
 /* for show_version_long() */
 #ifdef HAVE_SYS_UTSNAME_H
@@ -105,7 +112,7 @@ static void show_ylabel __PROTO((void));
 static void show_zlabel __PROTO((void));
 static void show_x2label __PROTO((void));
 static void show_y2label __PROTO((void));
-static void show_datatype __PROTO((char *, int));
+static void show_datatype __PROTO((const char *, int));
 static void show_xdata __PROTO((void));
 static void show_ydata __PROTO((void));
 static void show_zdata __PROTO((void));
@@ -760,7 +767,7 @@ FILE *fp;
 static void
 show_version_long()
 {
-    char *helpfile = NULL;
+    const char *helpfile = NULL;
 #ifdef HAVE_SYS_UTSNAME_H
     struct utsname uts;
 
@@ -1124,15 +1131,18 @@ show_style()
 
     c_token++;
 
-    if (almost_equals(c_token, "d$ata")) {
+    switch(lookup_table(&show_style_tbl[0],c_token)){
+    case SHOW_STYLE_DATA:
 	SHOW_ALL_NL;
 	show_styles("data",data_style);
 	c_token++;
-    } else if (almost_equals(c_token, "f$unction")) {
+	break;
+    case SHOW_STYLE_FUNCTION:
 	SHOW_ALL_NL;
 	show_styles("functions", func_style);
 	c_token++;
-    } else if (almost_equals(c_token, "l$ine")) {
+	break;
+    case SHOW_STYLE_LINE:
 	c_token++;
 	if (!END_OF_COMMAND) {
 	    tag = (int)real(const_express(&a));
@@ -1141,11 +1151,13 @@ show_style()
 	}
 	(void) putc('\n',stderr);
 	show_linestyle(tag);
-    } else {
+	break;
+    default:
 	/* show all styles */
 	show_styles("data",data_style);
 	show_styles("functions", func_style);
 	show_linestyle(tag);
+	break;
     }
 }
 
@@ -1934,7 +1946,7 @@ show_y2label()
 /* process 'show [xyzx2y2]data' commands */
 static void
 show_datatype(name, axis)
-char *name;
+const char *name;
 int axis;
 {
     c_token++;

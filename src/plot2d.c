@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.21 1999/10/17 19:12:58 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.22 1999/10/21 21:05:38 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -35,11 +35,18 @@ static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.21 1999/10/17 19:12:58 lh
 ]*/
 
 #include "plot.h"
-#include "plot2d.h"		/* HBB 990826: new file */
+#include "alloc.h"
+#include "command.h"
+#include "datafile.h"
+#include "graphics.h"
+#include "interpol.h"
+#include "misc.h"
+#include "parse.h"
+#include "plot2d.h"
 #include "setshow.h"
-#include "fit.h"
-#include "binary.h"
 #include "tables.h"
+#include "term_api.h"
+#include "util.h"
 
 #ifndef _Windows
 # include "help.h"
@@ -90,6 +97,7 @@ do{auto_array[axis] = auto; \
    max_array[axis] = (infinite && (auto&2)) ? -VERYLARGE : max; \
    log_array[axis] = is_log; base_array[axis] = base; log_base_array[axis] = log_base;\
 }while(0)
+
 /* handle reversed ranges */
 #define CHECK_REVERSE(axis) \
 do{\
@@ -98,7 +106,6 @@ do{\
   reverse_range[axis] = 1; \
  } else reverse_range[axis] = (range_flags[axis]&RANGE_REVERSE); \
 }while(0)
-
 
 /* get optional [min:max] */
 #define LOAD_RANGE(axis) \
@@ -843,66 +850,70 @@ eval_plots()
 		end_token = c_token - 1;
 	    }			/* end of IS THIS A FILE OR A FUNC block */
 
+	    /* axis defaults */
+	    x_axis = FIRST_X_AXIS;
+	    y_axis = FIRST_Y_AXIS;
 
 	    /*  deal with smooth */
 	    if (almost_equals(c_token, "s$mooth")) {
-
-		if (END_OF_COMMAND)
-		    int_error(c_token, "expecting smooth parameter");
-		else {
-		    c_token++;
-		    switch(lookup_table(&plot_smooth_tbl[0],c_token)) {
-		    case SMOOTH_ACSPLINES:
-			this_plot->plot_smooth = SMOOTH_ACSPLINES;
-			break;
-		    case SMOOTH_BEZIER:
-			this_plot->plot_smooth = SMOOTH_BEZIER;
-			break;
-		    case SMOOTH_CSPLINES:
-			this_plot->plot_smooth = SMOOTH_CSPLINES;
-			break;
-		    case SMOOTH_SBEZIER:
-			this_plot->plot_smooth = SMOOTH_SBEZIER;
-			break;
-		    case SMOOTH_UNIQUE:
-			this_plot->plot_smooth = SMOOTH_UNIQUE;
-			break;
-		    case SMOOTH_NONE:
-		    default:
-			int_error(c_token, "expecting 'unique', 'acsplines', 'csplines', 'bezier' or 'sbezier'");
-			break;
-		    }
+		c_token++;
+		switch(lookup_table(&plot_smooth_tbl[0],c_token)) {
+		case SMOOTH_ACSPLINES:
+		    this_plot->plot_smooth = SMOOTH_ACSPLINES;
+		    break;
+		case SMOOTH_BEZIER:
+		    this_plot->plot_smooth = SMOOTH_BEZIER;
+		    break;
+		case SMOOTH_CSPLINES:
+		    this_plot->plot_smooth = SMOOTH_CSPLINES;
+		    break;
+		case SMOOTH_SBEZIER:
+		    this_plot->plot_smooth = SMOOTH_SBEZIER;
+		    break;
+		case SMOOTH_UNIQUE:
+		    this_plot->plot_smooth = SMOOTH_UNIQUE;
+		    break;
+		case SMOOTH_NONE:
+		default:
+		    int_error(c_token, "expecting 'unique', 'acsplines', 'csplines', 'bezier' or 'sbezier'");
+		    break;
 		}
 		this_plot->plot_style = LINES;
 		c_token++;	/* skip format */
 	    }
+
 	    /* look for axes/axis */
-
-	    x_axis = FIRST_X_AXIS;
-	    y_axis = FIRST_Y_AXIS;
-
 	    if (almost_equals(c_token, "ax$es") || almost_equals(c_token, "ax$is")) {
 		if (parametric && xparam)
 		    int_error(c_token, "previous parametric function not fully specified");
 
-		if (equals(++c_token, "x1y1")) {
+		c_token++;
+		switch(lookup_table(&plot_axes_tbl[0],c_token)) {
+		case AXES_X1Y1:
 		    x_axis = FIRST_X_AXIS;
 		    y_axis = FIRST_Y_AXIS;
 		    ++c_token;
-		} else if (equals(c_token, "x2y2")) {
+		    break;
+		case AXES_X2Y2:
 		    x_axis = SECOND_X_AXIS;
 		    y_axis = SECOND_Y_AXIS;
 		    ++c_token;
-		} else if (equals(c_token, "x1y2")) {
+		    break;
+		case AXES_X1Y2:
 		    x_axis = FIRST_X_AXIS;
 		    y_axis = SECOND_Y_AXIS;
 		    ++c_token;
-		} else if (equals(c_token, "x2y1")) {
+		    break;
+		case AXES_X2Y1:
 		    x_axis = SECOND_X_AXIS;
 		    y_axis = FIRST_Y_AXIS;
 		    ++c_token;
-		} else
+		    break;
+		case AXES_NONE:
+		default:
 		    int_error(c_token, "axes must be x1y1, x1y2, x2y1 or x2y2");
+		    break;
+		}
 	    }
 
 	    if (almost_equals(c_token, "t$itle")) {
@@ -929,12 +940,12 @@ eval_plots()
 		    xtitle = this_plot->title;
 	    }
 
-
 	    if (almost_equals(c_token, "w$ith")) {
 		if (parametric && xparam)
 		    int_error(c_token, "\"with\" allowed only after parametric function fully specified");
 		this_plot->plot_style = get_style();
 	    }
+
 	    /* pick up line/point specs
 	     * - point spec allowed if style uses points, ie style&2 != 0
 	     * - keywords for lt and pt are optional
