@@ -607,13 +607,11 @@ int ExecuteMacro(char *argv, int namelength)
 {
     RXSTRING rxRc;
     RXSTRING rxArg;
-    char pszRc[256];
-    char pszName[256];
+    char pszName[CCHMAXPATH];
     short sRc;
     int rc;
 
     safe_strncpy(pszName, argv, sizeof(pszName));
-    MAKERXSTRING(rxRc, pszRc, 256);
     MAKERXSTRING(rxArg, argv, strlen(argv));
     rc = RexxStart(1,
 		   &rxArg,
@@ -625,7 +623,11 @@ int ExecuteMacro(char *argv, int namelength)
 		   &sRc,
 		   &rxRc);
     if (rc == -4)
-	rc = 0;			/*run was cancelled-don't give error message */
+	  rc = 0;			/* run was cancelled-don't give error message */
+
+/* We don't use this value ?
+   BTW, don't use free() instead since it's allocated inside RexxStart() */ 
+    DosFreeMem(rxRc.strptr);
     return rc;
 }
 

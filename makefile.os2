@@ -56,12 +56,14 @@ GNU_RL=1
 .PHONY: all runtime alldocs demo binaries infomin clean veryclean
 .SUFFIXES: .c .trm .o .obj .exe
 
+# seems to be a reasonable default ...
+default: runtime
 
-# Default target is just a help screen
-default:
+# a help screen
+help:
 	   @echo " Usage: $(MAKE) -f makefile.os2 target"
 	   @echo "   target is one of:"
-	   @echo "   all runtime alldocs demo binaries infomin clean veryclean"
+	   @echo "   all runtime alldocs demo binaries infomin help clean veryclean"
 
 #
 # Definitions of flags and symbols used by makefile.all and makefile.os2
@@ -124,15 +126,15 @@ endif
 # Choose flags suitable for a debugging or for a production build
 #
 ifdef DEBUG
-CFLAGS  = -g $(OS2FLAGS) $(EMXSPECIFIC) -Wall -Wno-comment -O0
-LFLAGS  = -g -Zcrtdll
+CFLAGS  = -g $(OS2FLAGS) $(EMXSPECIFIC) -Wall -Wno-comment -O0 -Zmt
+LFLAGS  = -g -Zcrtdll -Zmt
 CFLAGS2 = -g $(OS2FLAGS) $(EMXSPECIFIC) -Zomf -Zsys -Zmt -Wall -O0
 LFLAGS2 = -g -Zomf -Zmt -Zcrtdll
 CFLAGS3 = -g $(OS2FLAGS) $(EMXSPECIFIC) -Wall -Wno-comment -O0
 LFLAGS3 = -g
 else
-CFLAGS  = $(OS2FLAGS) $(EMXSPECIFIC) -O2 -Wall -Wno-unused -Wno-comment
-LFLAGS  = -s -Zcrtdll
+CFLAGS  = $(OS2FLAGS) $(EMXSPECIFIC) -O2 -Wall -Wno-unused -Wno-comment -Zmt
+LFLAGS  = -s -Zcrtdll -Zmt
 CFLAGS2 = $(OS2FLAGS) $(EMXSPECIFIC) -Zomf -Zcrtdll -Zmt -O2 -Wall -Wno-unused
 LFLAGS2 = -s -Zomf -Zmt -Zsys
 CFLAGS3 = $(OS2FLAGS) $(EMXSPECIFIC) -O2 -Wall -Wno-unused -Wno-comment
@@ -287,17 +289,17 @@ $(DOCDIR)\allterm.h: $(CORETERM)
 #   echo > $@
 	cd $(TERMDIR) & type *.trm > ..\$@
 doc2gih.exe:  $(DOCDIR)\doc2gih.c $(DOCDIR)\termdoc.c $(OS2TERMS)
-	$(CC3) $(CFLAGS3) $(TERMFLAGS) -o $@ $(DOCDIR)\doc2gih.c $(DOCDIR)\termdoc.c
+	$(CC3) $(CFLAGS3) $(TERMFLAGS) -DALL_TERM_DOC -o $@ $(DOCDIR)\doc2gih.c $(DOCDIR)\termdoc.c
 doc2ipf.exe:  $(DOCDIR)\doc2ipf.c $(DOCDIR)\termdoc.c $(DOCDIR)\xref.c $(OS2TERMS)
-	$(CC3) $(CFLAGS3) $(TERMFLAGS) -o $@ $(DOCDIR)\doc2ipf.c $(DOCDIR)\termdoc.c $(DOCDIR)\xref.c
+	$(CC3) $(CFLAGS3) $(TERMFLAGS) -DALL_TERM_DOC -o $@ $(DOCDIR)\doc2ipf.c $(DOCDIR)\termdoc.c $(DOCDIR)\xref.c
 doc2tex.exe:  $(DOCDIR)\doc2tex.c $(DOCDIR)\termdoc.c $(OS2TERMS) $(DOCDIR)\allterm.h
 	$(CC3) $(CFLAGS3) $(TERMFLAGS) -DALL_TERM_DOC -o $@ $(DOCDIR)\doc2tex.c $(DOCDIR)\termdoc.c
 doc2html.exe: $(DOCDIR)\doc2html.c $(DOCDIR)\termdoc.c $(DOCDIR)\xref.c $(OS2TERMS)
-	$(CC3) $(CFLAGS3) $(TERMFLAGS) -o $@ $(DOCDIR)\doc2html.c $(DOCDIR)\termdoc.c $(DOCDIR)\xref.c
+	$(CC3) $(CFLAGS3) $(TERMFLAGS) -DALL_TERM_DOC -o $@ $(DOCDIR)\doc2html.c $(DOCDIR)\termdoc.c $(DOCDIR)\xref.c
 doc2info.exe: $(DOCDIR)\doc2info.c $(DOCDIR)\termdoc.c $(DOCDIR)\xref.c $(OS2TERMS)
-	$(CC3) $(CFLAGS3) $(TERMFLAGS) -o $@ $(DOCDIR)\doc2info.c $(DOCDIR)\termdoc.c $(DOCDIR)\xref.c
+	$(CC3) $(CFLAGS3) $(TERMFLAGS) -DALL_TERM_DOC -o $@ $(DOCDIR)\doc2info.c $(DOCDIR)\termdoc.c $(DOCDIR)\xref.c
 doc2rtf.exe:  $(DOCDIR)\doc2rtf.c $(DOCDIR)\termdoc.c $(DOCDIR)\xref.c $(OS2TERMS)
-	$(CC3) $(CFLAGS3) $(TERMFLAGS) -o $@ $(DOCDIR)\doc2rtf.c $(DOCDIR)\termdoc.c $(DOCDIR)\xref.c
+	$(CC3) $(CFLAGS3) $(TERMFLAGS) -DALL_TERM_DOC -o $@ $(DOCDIR)\doc2rtf.c $(DOCDIR)\termdoc.c $(DOCDIR)\xref.c
 doc2ms.exe:   $(DOCDIR)\doc2ms.c $(DOCDIR)\termdoc.c $(OS2TERMS)
 	$(CC3) $(CFLAGS3) $(TERMFLAGS) -DALL_TERM_DOC -o $@ $(DOCDIR)\doc2ms.c $(DOCDIR)\termdoc.c
 #
