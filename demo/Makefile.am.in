@@ -3,6 +3,12 @@ AUTOMAKE_OPTIONS = foreign 1.2h
 
 CLEANFILES = binary1 binary2 binary3 defaults.ini fit.log soundfit.par temp.set
 
+all: binary1 binary2 binary3
+
+binary1 binary2 binary3: ../src/bf_test
+	@echo Creating binary data files
+	@../src/bf_test
+
 check-local: check-noninteractive
 
 check-interactive:
