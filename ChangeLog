@@ -1,4 +1,11 @@
-2004-04-10  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+2004-04-12  Hans-Bernhard Broeker  <broeker@accip02.physik.rwth-aachen.de>
+
+	* src/command.c (do_system) [!USE_OWN_WINSYSTEM_FUNCTION]: disable
+	usage of winsystem(), which apparently causes more trouble than
+	it's worth.  To re-enable this, manually #define the
+	USE_OWN_WINSYSTEM_FUNCTION macro.
+
+2003-04-10  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* INSTALL: Include a notice about the demise of 16-bit versions
 	on MS-DOS and Windows.  Updated the paragraph about the history

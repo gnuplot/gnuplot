@@ -1,11 +1,11 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.89 2004/01/07 14:31:08 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.90 2004/01/11 20:06:56 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
 
 /*[
- * Copyright 1986 - 1993, 1998   Thomas Williams, Colin Kelley
+ * Copyright 1986 - 1993, 1998, 2004   Thomas Williams, Colin Kelley
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted,
@@ -2089,7 +2089,7 @@ help_command()
 
 static void
 do_system(cmd)
-const char *cmd;
+    const char *cmd;
 {
 # ifdef AMIGA_AC_5
     static char *parms[80];
@@ -2115,7 +2115,7 @@ const char *cmd;
 	(*shell_p) (cmd);
     else
 	system(cmd);
-# elif defined(_Windows)
+# elif defined(_Windows) && defined(USE_OWN_WINSYSTEM_FUNCTION)
     if (!cmd)
 	return;
     winsystem(cmd);
