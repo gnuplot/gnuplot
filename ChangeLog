@@ -1,3 +1,13 @@
+2003-06-25  Ethan Merritt <merritt@u.washington.edu>
+
+	* src/term_api.h src/command.c term/x11.trm: Define a flag
+	TERM_INIT_ON_REPLOT by which a terminal driver can request that
+	term->init() be called at the start of a replot command.
+
+	* src/gplt_x11.c src/mouse.c: Send the current true size of the
+	x11 display window back from gnuplot_x11 to x11.trm during
+	term->init(). Use this information to update the aspect ratio.
+
 2003-06-21  Ethan Merritt <merritt@u.washington.edu>
 
 	* src/gplt_x11.c: gnuplot_x11<->x11.trm font info exchange is now

@@ -1,5 +1,5 @@
 /*
- * $Id: term_api.h,v 1.19 2002/10/21 10:24:19 mikulik Exp $
+ * $Id: term_api.h,v 1.20 2003/02/18 16:38:11 broeker Exp $
  */
 
 /* GNUPLOT - term_api.h */
@@ -126,6 +126,7 @@ typedef enum t_fillstyle { FS_EMPTY }
 #define TERM_CAN_MULTIPLOT    1  /* tested if stdout not redirected */
 #define TERM_CANNOT_MULTIPLOT 2  /* tested if stdout is redirected  */
 #define TERM_BINARY           4  /* open output file with "b"       */
+#define TERM_INIT_ON_REPLOT   8  /* call term->init() on replot     */
 
 /* The terminal interface structure --- heart of the terminal layer.
  *

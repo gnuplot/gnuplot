@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.66 2002/10/25 10:06:49 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.67 2003/06/16 07:30:55 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -1112,6 +1112,8 @@ replot_command()
     }
     c_token++;
     SET_CURSOR_WAIT;
+    if (term->flags & TERM_INIT_ON_REPLOT)
+	term->init();
     replotrequest();
     SET_CURSOR_ARROW;
 }
