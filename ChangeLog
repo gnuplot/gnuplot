@@ -1,3 +1,9 @@
+2004-10-17  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/plot2d.c (eval_plots) src/plot3d.c (eval_3dplots):
+	More stringent syntax test for bare numbers indicating line
+	type in backwards-compatibility mode.
+
 2004-10-17  Juergen Wieferink <wieferink@freenet.de>
 
 	* src/scanner.c (scanner): Terminate scan properly if an empty

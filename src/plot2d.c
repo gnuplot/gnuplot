@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.81 2004/09/28 06:05:20 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.82 2004/10/14 21:57:30 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -1614,13 +1614,13 @@ eval_plots()
 
 #ifdef BACKWARDS_COMPATIBLE
 		/* allow old-style syntax - ignore case lt 3 4 for example */
-		if (!equals(c_token, ",") && !END_OF_COMMAND) {
+		if (isanumber(c_token)) {
 		    struct value t;
 		    this_plot->lp_properties.l_type =
 			this_plot->lp_properties.p_type =
 			(int) real(const_express(&t)) - 1;
 
-		    if (!equals(c_token, ",") && !END_OF_COMMAND)
+		    if (isanumber(c_token))
 			this_plot->lp_properties.p_type =
 			    (int) real(const_express(&t)) - 1;
 		}
