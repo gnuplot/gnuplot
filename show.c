@@ -876,7 +876,7 @@ static void show_xyzlabel(name, label)
 char *name;
 label_struct *label;
 {
-    char str[MAX_LINE_LEN + 1];
+    char str[MAX_LINE_LEN+1];
     fprintf(stderr, "\t%s is \"%s\", offset at %f, %f",
       name, conv_text(str, label->text), label->xoffset, label->yoffset);
     if (*label->font)
@@ -932,7 +932,7 @@ int tag;			/* 0 means show all */
 {
     struct text_label *this_label;
     TBOOLEAN showed = FALSE;
-    char str[MAX_LINE_LEN + 1];
+    char str[MAX_LINE_LEN+1];
 
     for (this_label = first_label; this_label != NULL;
 	 this_label = this_label->next) {
