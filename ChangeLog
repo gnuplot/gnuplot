@@ -1,10 +1,45 @@
+1998-11-25  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* TODO: Add entry about float/double comparisons.
+
+	* command.c, plot2d.c, plot3d.c: Remove obsolete definition of MAXSTR.
+
+	* plot.c: Other small changes.
+
+	* term/table.trm, term/driver.h, term/xlib.trm, term/unixplot.trm,
+	term/hp2648.trm, term/dxy.trm, term/v384.trm, term/aed.trm,
+	term/tkcanvas.trm, term/mgr.trm, term/kyo.trm, term/qms.trm,
+	term/regis.trm, term/cgi.trm, term/debug.trm, term/excl.trm,
+	term/t410x.trm, term/linux.trm, term/hppj.trm: Indentation,
+	minor cleanups.
+
+1998-11-25  Don Taber  <dtaber@blackrat.risc.rockwell.com>
+
+	* term/cgm.trm: Solid line option for cgm terminal.
+
+1998-11-25  Alexander Mai  <st002279@hrzpub.tu-darmstadt.de>
+
+	* plot.c: Patch for OS/2.
+
+1998-11-24  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* TODO: Remove "clean up includes at top of files" entry. Add
+	some new entries.
+
+	* docs/gnuplot.1: Update X11 command line options.
+
+	* term/compact.c: Indentation, add RCS id.
+
+	* term/grass.trm: Remove duplicate header file inclusions.
+
 1998-11-23  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* graphics.c(gen_tics) Modified patch from Jochen Schuetze <jos@GBF.DE>
 	to avoid infinite loop during tic generation.
 
 	* term/aed.trm, term/ai.trm, term/apollo.trm, term/atariaes.trm,
-	term/atarivdi.trm: Indentation.
+	term/atarivdi.trm: Indentation. Replace fprintf'ing of plain strings
+	with fputs.
 
 1998-11-23  David Schooley <dcschooley@mediaone.net>
 
