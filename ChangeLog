@@ -1,3 +1,9 @@
+2004-03-23  Ethan Merritt  <merritt@u.washington.edu>
+	
+	* src/gplt_x11.c: If gnuplot exits while "x11 -persist" is active,
+	hand over mousing of last active plot to gnuplot_x11. This fixes the
+	test case provided with bug #921033.
+	
 2004-03-23  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* configure.in (AC_HEADER_STDBOOL): Added call to this macro.
@@ -6,8 +12,6 @@
 	from scratch, this time based on autoconf's recommendations.  The
 	previous version collided with a "#define bool _Bool" found
 	somewhere deep in the Mac OS X system headers.
-
-	
 	
 2004-03-23  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 

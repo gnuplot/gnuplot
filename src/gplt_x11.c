@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.87 2004/03/08 00:35:05 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.88 2004/03/23 05:40:47 sfeam Exp $"); }
 #endif
 
 #define X11_POLYLINE 1
@@ -3709,7 +3709,7 @@ process_event(XEvent *event)
 	    if (!XQueryPointer(dpy, event->xmotion.window, &root, &child, &root_x, &root_y, &pos_x, &pos_y, &keys_buttons))
 		break;
 
-	    if (plot == current_plot) {
+	    if (plot == current_plot && !pipe_died) {
 		Call_display(plot);
 		gp_exec_event(GE_motion, (int) RevX(pos_x), (int) RevY(pos_y), 0, 0);
 #if defined(USE_MOUSE) && defined(MOUSE_ALL_WINDOWS)
@@ -4327,7 +4327,7 @@ char *fontname;
     if (!fontname || !(*fontname)) {
 	if ((fontname = pr_GetR(db, ".font")))
 	    strncpy(default_font,fontname,sizeof(default_font)-1);
-	    FPRINTF(("gnuplot_x11: setting default font %s from Xresource\n",
+	    FPRINTF((stderr,"gnuplot_x11: setting default font %s from Xresource\n",
 		    fontname));
     }
 
@@ -4422,7 +4422,7 @@ char *fontname;
     
     if (font) {
         strncpy(previous_font_name, fontname, sizeof(previous_font_name)-1);
-        FPRINTF(("gnuplot_x11:saving current font name \"%s\"\n",previous_font_name));
+        FPRINTF((stderr,"gnuplot_x11:saving current font name \"%s\"\n",previous_font_name));
     } else {
 	if (!((font = XLoadQueryFont(dpy, default_font))))
 	    font = previous_font;
