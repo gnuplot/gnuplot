@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: wtext.c,v 1.2 1999/07/27 19:42:16 lhecking Exp $";
+static char *RCSid = "$Id: wtext.c,v 1.3 2001/06/25 08:15:22 mikulik Exp $";
 #endif
 
 /* GNUPLOT - win/wtext.c */
@@ -762,7 +762,7 @@ DragFunc(LPTW lptw, HDROP hdrop)
 	LPSTR p;
 	if ( (lptw->DragPre==(LPSTR)NULL) || (lptw->DragPost==(LPSTR)NULL) )
 		return;
-	cFiles = DragQueryFile(hdrop, 0xffff, (LPSTR)NULL, 0);
+	cFiles = DragQueryFile(hdrop, (UINT) -1, (LPSTR)NULL, 0);
 	for (i=0; i<cFiles; i++) {
 		DragQueryFile(hdrop, i, szFile, 80);
 		for (p=lptw->DragPre; *p; p++)
