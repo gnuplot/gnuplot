@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.117 2004/10/05 16:16:13 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.118 2004/10/05 16:21:16 sfeam Exp $"); }
 #endif
 
 #define X11_POLYLINE 1
@@ -5179,18 +5179,19 @@ char *fontname;
     if (font) {
         strncpy(previous_font_name, fontname, sizeof(previous_font_name)-1);
         FPRINTF((stderr,"gnuplot_x11:saving current font name \"%s\"\n",previous_font_name));
-    } else {
-	font = XLoadQueryFont(dpy, default_font);
-	FPRINTF((stderr,"Falling back to default_font %s\n",default_font));
     }
 
     /* By now we have tried everything we can to honor the specific request. */
-    /* Try two common scaleable fonts before falling back to a last resort   */
+    /* Try some common scaleable fonts before falling back to a last resort  */
     /* fixed font.                                                           */
     if (!font) {
-	sprintf(fontspec, "-*-arial-medium-r-*-*-%d-*-*-*-*-*-*-*", fontsize);
+	sprintf(fontspec, "-*-bitstream vera sans-bold-r-*-*-%d-*-*-*-*-*-*-*", fontsize);
 	font = XLoadQueryFont(dpy, fontspec);
 	fontname = fontspec;
+	if (!font) {
+	    sprintf(fontspec, "-*-arial-medium-r-*-*-%d-*-*-*-*-*-*-*", fontsize);
+	    font = XLoadQueryFont(dpy, fontspec);
+	}
 	if (!font) {
 	    sprintf(fontspec, "-*-helvetica-medium-r-*-*-%d-*-*-*-*-*-*", fontsize);
 	    font = XLoadQueryFont(dpy, fontspec);
@@ -5204,7 +5205,6 @@ char *fontname;
 	    EXIT(1);
 	}
 	FPRINTF((stderr, "\ngnuplot_x11: requested font not found, using '%s' instead.\n", fontname));
-	strncpy(default_font,fontname,sizeof(default_font)-1);
     }
 
     vchar = font->ascent + font->descent;

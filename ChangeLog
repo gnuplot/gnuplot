@@ -1,3 +1,9 @@
+2004-10-20  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/gplt_x11.c (pr_font): Fix bug that whatever fallback font was used
+	for an unrecognized font request, that fallback would become the default
+	font for all future requests.
+
 2004-10-19  Juergen Wieferink <wieferink@freenet.de>
 
 	* src/set.c (parse_label_options): If the label has an associated point,
