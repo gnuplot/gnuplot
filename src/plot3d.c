@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.16 1999/11/24 13:28:31 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.17 2000/02/11 19:17:20 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -115,7 +115,7 @@ do{\
  } else reverse_range[axis] = (range_flags[axis]&RANGE_REVERSE); \
 }while(0)
 
-int plot3d_num=0;
+int plot3d_num = 0;
 
 
 /* get optional [min:max] */
@@ -1646,6 +1646,28 @@ if(range_flags[axis]&RANGE_WRITEBACK) \
 	START_LEAK_CHECK();	/* assert no memory leaks here ! */
 	do_3dplot(first_3dplot, plot_num, 0);
 	END_LEAK_CHECK();
+
+        /* after do_3dplot(), min_array[] and max_array[]
+         * contain the plotting range actually used (rounded
+         * to tic marks, not only the min/max data values)
+         * --> save them now for writeback if requested
+	 */
+
+#define SAVE_WRITEBACK(axis) \
+  if(range_flags[axis]&RANGE_WRITEBACK) { \
+    set_writeback_min(axis,min_array[axis]); \
+    set_writeback_max(axis,max_array[axis]); \
+  }
+        SAVE_WRITEBACK(FIRST_X_AXIS);
+        SAVE_WRITEBACK(FIRST_Y_AXIS);
+        SAVE_WRITEBACK(FIRST_Z_AXIS);
+        SAVE_WRITEBACK(SECOND_X_AXIS);
+        SAVE_WRITEBACK(SECOND_Y_AXIS);
+        SAVE_WRITEBACK(SECOND_Z_AXIS);
+        SAVE_WRITEBACK(T_AXIS);
+        SAVE_WRITEBACK(R_AXIS);
+        SAVE_WRITEBACK(U_AXIS);
+	SAVE_WRITEBACK(V_AXIS);
     }
 
     /* if we get here, all went well, so record the line for replot */

@@ -1,6 +1,5 @@
 /*
- * $Id: setshow.h,v 1.22 1999/11/24 13:23:23 lhecking Exp $
- *
+ * $Id: setshow.h,v 1.23 1999/12/10 16:55:18 lhecking Exp $
  */
 
 /* GNUPLOT - setshow.h */
@@ -51,7 +50,7 @@
 #endif
 
 /* default format for tic mark labels */
-#define DEF_FORMAT "% g"
+#define DEF_FORMAT "%g"
 
 /* less than one hundredth of a tic mark */
 #define SIGNIF (0.01)
@@ -245,6 +244,13 @@ void show_version __PROTO((FILE *fp));
 char *conv_text __PROTO((const char *s));
 void lp_parse __PROTO((struct lp_style_type *, int, int, int, int));
 void delete_linestyle __PROTO((struct linestyle_def *, struct linestyle_def *));
+
+/* should be in set.h */
+int set_label_tag __PROTO((void));
+double get_writeback_min __PROTO((int axis));
+double get_writeback_max __PROTO((int axis));
+void set_writeback_min __PROTO((int axis, double val));
+void set_writeback_max __PROTO((int axis, double val));
 
 /* string representing missing values, ascii datafiles */
 extern char *missing_val;
