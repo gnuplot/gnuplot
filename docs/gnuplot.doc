@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.219 2004/04/20 08:45:23 broeker Exp $
+C RCS $Id: gnuplot.doc,v 1.220 2004/04/26 10:51:40 mikulik Exp $
 C 18 September 2001
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -4656,7 +4656,7 @@ C ... and restart the table:
  where <axes> is either `x`, `y`, `z`, `cb`, `xy`, `x2`, `y2` or nothing (which is
  the same as `xy`).  The length of the string representing a tic mark (after
  formatting with 'printf') is restricted to 100 characters.  If the format
- string is omitted, the format will be returned to the default "%g".  For
+ string is omitted, the format will be returned to the default "% g".  For
  LaTeX users, the format "$%g$" is often desirable.  If the empty string "" is
  used, no label will be plotted with each tic, though the tic mark will still
  be plotted.  To eliminate all tic marks, use `unset xtics` or `unset ytics`.
@@ -4664,7 +4664,7 @@ C ... and restart the table:
  Newline (\n) is accepted in the format string.  Use double-quotes rather than
  single-quotes to enable such interpretation.  See also `syntax`.
 
- The default format for both axes is "%g", but other formats such as "%.2f" or
+ The default format for both axes is "% g", but other formats such as "%.2f" or
  "%3.0em" are often desirable.  Anything accepted by 'printf' when given a
  double precision number, and accepted by the terminal, will work.  Some other
  options have been added.  If the format string looks like a floating point
@@ -4746,7 +4746,9 @@ C ... and restart the table:
 
  Other acceptable modifiers (which come after the "%" but before the format
  specifier) are "-", which left-justifies the number; "+", which forces all
- numbers to be explicitly signed; "#", which places a decimal point after
+ numbers to be explicitly signed; " " (a space), which makes positive numbers
+ have a space in front of them where negative numbers have "-";
+ "#", which places a decimal point after
  floats that have only zeroes following the decimal point; a positive integer,
  which defines the field width; "0" (the digit, not the letter) immediately
  preceding the field width, which indicates that leading zeroes are to be used
