@@ -1,13 +1,24 @@
+2004-04-05  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* BUGS: Removed lots of long-since fixed bugs.  Updated
+	descriptions of some others.  Got rid of numbering --- it was
+	completely mixed-up anyway.
+
+	* term/win.trm: Added a note regarding the limitation of no wide,
+	patterned lines in Windows terminal.
+
 2004-04-05  Petr Mikulik  <mikulik@physics.muni.cz>
 
-	* BUGS: Removed point "8. contour line clipping of 3D data plots": it
-	should go to FAQ or to gnuplot's web page => "Useful scripts". Removed
-	point "11. bug in OS/2 emx/gcc 2.7.x optimizer" (cite this in
-	makefile.os2). Added link to gnuplot's sourceforge bug tracker.
+	* BUGS: Removed point "8. contour line clipping of 3D data plots":
+	it should go to FAQ or to gnuplot's web page => "Useful
+	scripts". Removed point "11. bug in OS/2 emx/gcc 2.7.x optimizer"
+	(cite this in makefile.os2). Added link to gnuplot's sourceforge
+	bug tracker.
 
 	* config/README: Small update.
 
-	* config/makefile.os2: Mention compiler optimization problem from BUGS.
+	* config/makefile.os2: Mention compiler optimization problem from
+	BUGS.
 
 2004-04-04  Ethan Merritt  <merritt@u.washington.edu>
 

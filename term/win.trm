@@ -1,5 +1,5 @@
 /*
- * $Id: win.trm,v 1.29 2002/07/26 16:42:29 mikulik Exp $
+ * $Id: win.trm,v 1.30 2004/02/12 09:08:40 mikulik Exp $
  */
 
 /* GNUPLOT - win.trm */
@@ -498,7 +498,9 @@ START_HELP(windows)
 " points.",
 "",
 " Other options may be set with the graph-menu, the initialization file,",
-" and `set linestyle`.",
+" and `set linestyle`.  Note that there is one restriction imposed by",
+" the classic Windows GDI interface: modifiable linewidth only works with",
+" solid lines, not with dotted or dashed ones.",
 /* Does this really belong here? If not, someone move it where it does. */
 "",
 " The Windows version normally terminates immediately as soon as the end of",
