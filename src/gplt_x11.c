@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.127 2005/02/22 01:14:49 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.128 2005/02/23 01:32:36 sfeam Exp $"); }
 #endif
 
 #define X11_POLYLINE 1
@@ -458,6 +458,7 @@ static void pr_raise __PROTO((void));
 static void pr_persist __PROTO((void));
 static void pr_feedback __PROTO((void));
 static void pr_ctrlq __PROTO((void));
+static void pr_fastrotate __PROTO((void));
 
 #ifdef EXPORT_SELECTION
 static void export_graph __PROTO((plot_struct *));
@@ -556,6 +557,7 @@ static XFontSet mbfont = NULL;
  * header file between this file and term/x11.trm! */
 enum { UNSET = -1, no = 0, yes = 1 };
 static int do_raise = yes, persist = no;
+static TBOOLEAN fast_rotate = TRUE;
 static int feedback = yes;
 static int ctrlq = no;
 #ifdef EXPORT_SELECTION
@@ -1784,7 +1786,7 @@ DrawRotated(plot_struct *plot, Display *dpy, GC gc, int xdest, int ydest,
 	/* success */
 	fgpixel = gcValues.foreground;
 	gcCurrentFunction = gcValues.function; /* save current function */
-	gcValues.function = GXcopy; /* merge image_scr with drawable */
+	gcValues.function = fast_rotate ? GXand : GXcopy; /* merge image_scr with drawable */
 	XChangeGC(dpy, gc, gcFunctionMask, &gcValues);
     }
 
@@ -1846,41 +1848,46 @@ DrawRotated(plot_struct *plot, Display *dpy, GC gc, int xdest, int ydest,
 #undef RotateX
 #undef RotateY
 
-    /* grab the current screen area where the new text will go */
-    s = XGetWindowAttributes(dpy, w, &win_attrib);
-    /* compute screen coords that are within the current window */
-    xscr = (xdest<0)? 0 : xdest;
-    yscr = (ydest<0)? 0 : ydest;;
-    scr_width = dest_width; scr_height = dest_height;
-    if (xscr + dest_width > win_attrib.width){
-      scr_width = win_attrib.width - xscr;
-    }
-    if (yscr + dest_height > win_attrib.height){
-      scr_height = win_attrib.height - yscr;
-    }
-    xoff = xscr - xdest;
-    yoff = yscr - ydest;
-    scr_width -= xoff;
-    scr_height -= yoff;
-    prevErrorHandler = XSetErrorHandler(DrawRotatedErrorHandler);
+    /* This method is a *lot* faster, but may corrupt the color of objects underneath */
+    /* the rotated text. */
+    if (fast_rotate) {
+	XPutImage(dpy, d, gc, image_dest, 0, 0, xdest, ydest, dest_width, dest_height);
+    } else {
 
-    image_scr = XGetImage(dpy, d, xscr, yscr, scr_width,
+    /* Slow version - grab the current screen area where the new text will go */
+	s = XGetWindowAttributes(dpy, w, &win_attrib);
+	/* compute screen coords that are within the current window */
+	xscr = (xdest<0)? 0 : xdest;
+	yscr = (ydest<0)? 0 : ydest;;
+	scr_width = dest_width; scr_height = dest_height;
+	if (xscr + dest_width > win_attrib.width)
+	    scr_width = win_attrib.width - xscr;
+	if (yscr + dest_height > win_attrib.height)
+	    scr_height = win_attrib.height - yscr;
+	xoff = xscr - xdest;
+	yoff = yscr - ydest;
+	scr_width -= xoff;
+	scr_height -= yoff;
+	prevErrorHandler = XSetErrorHandler(DrawRotatedErrorHandler);
+
+	image_scr = XGetImage(dpy, d, xscr, yscr, scr_width,
 			  scr_height, AllPlanes, XYPixmap);
-    if (image_scr != 0){
-      /* copy from 1 bit bitmap image of text to the full depth image of screen*/
-      for (y = 0; y < scr_height; y++){
-	for (x = 0; x < scr_width; x++){
-	  if (XGetPixel(image_dest, x + xoff, y + yoff)){
-	    XPutPixel(image_scr, x, y, fgpixel);
-	  }
-	}
-      }
-      /* copy the rotated image to the drawable d */
-      XPutImage(dpy, d, gc, image_scr, 0, 0, xscr, yscr, scr_width, scr_height);
+	if (image_scr != 0){
+	    /* copy from 1 bit bitmap image of text to the full depth image of screen*/
+	    for (y = 0; y < scr_height; y++){
+		for (x = 0; x < scr_width; x++){
+		    if (XGetPixel(image_dest, x + xoff, y + yoff)){
+			XPutPixel(image_scr, x, y, fgpixel);
+		    }
+		}
+	    }
+	    /* copy the rotated image to the drawable d */
+	    XPutImage(dpy, d, gc, image_scr, 0, 0, xscr, yscr, scr_width, scr_height);
 
-      XDestroyImage(image_scr);
-    }
-    XSetErrorHandler(prevErrorHandler);
+	    XDestroyImage(image_scr);
+	}
+	XSetErrorHandler(prevErrorHandler);
+    } /* End slow rotatation code */
 
     /* free resources */
     XFreePixmap(dpy, pixmap_src);
@@ -4952,6 +4959,7 @@ gnuplot: X11 aborted.\n", ldisplay);
     pr_persist();
     pr_feedback();
     pr_ctrlq();
+    pr_fastrotate();
 #ifdef EXPORT_SELECTION
     pr_exportselection();
 #endif
@@ -5774,6 +5782,15 @@ pr_ctrlq()
     if (pr_GetR(db, ".ctrlq")) {
 	ctrlq = (!strncasecmp(value.addr,"on",2) || !strncasecmp(value.addr,"true",4));
 	FPRINTF((stderr,"gplt_x11: require <ctrl>q and <ctrl><space>\n"));
+    }
+}
+
+static void
+pr_fastrotate()
+{
+    if (pr_GetR(db, ".fastrotate")) {
+	fast_rotate = (!strncasecmp(value.addr,"on",2) || !strncasecmp(value.addr,"true",4));
+	FPRINTF((stderr,"gplt_x11: Use fast but imperfect text rotation\n"));
     }
 }
 

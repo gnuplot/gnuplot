@@ -3,8 +3,15 @@
 	* src/graphics.c(plot_c_bars) src/plot2d.c(eval_plots) docs/gnuplot.doc:
 	New keyword  '... with candlesticks {whiskerbars}' that draws horizontal
 	crossbars at the top and bottom of the whiskers. This is typical for
-	box-and-whisker plots.  The new keyword is preferable to addingt a 
+	box-and-whisker plots.  The new keyword is in lieu of adding a
 	separate "boxplots" plot style (patch #624000).
+
+	* src/gplt_x11.c (pr_fastrotate) term/x11.trm (documentation):
+	The fully general implementation of text rotation added in version 4.0
+	is *much* slower than it used to be. This patch adds a new X resource
+	gnuplot*fastrotate: {on|off} that reverts to the faster but imperfect
+	rotation method.  The default is "on", which favors fast rendering at
+	the cost of possibly corrupting colors of nearby plot elements.
 
 2005-02-22  Ethan Merritt  <merritt@u.washington.edu>
 

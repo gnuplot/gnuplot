@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: x11.trm,v 1.131 2005/02/13 18:29:51 sfeam Exp $
+ * $Id: x11.trm,v 1.132 2005/02/14 10:19:17 mikulik Exp $
  *
  */
 
@@ -2445,13 +2445,21 @@ START_HELP(x11)
 " clipboard in response to X events in the window. Setting the resource",
 " 'gnuplot*exportselection' to 'off' or 'false' will disable this.",
 "",
+" By default text rotation is done using a method that is fast, but can",
+" corrupt nearby colors depending on the background.  If this is a problem,",
+" you can set the resource 'gnuplot.fastrotate' to 'off'",
+"",
 "@start table - other x11 resources",
 "  gnuplot*exportselection:  off",
+"  gnuplot*fastrotate:  on",
+"  gnuplot*ctrlq:  off",
 "#\\begin{tabular}{|cl|} \\hline",
 "#&gnuplot*exportselection:  off\\\\",
+"#&gnuplot*fastrotate:  on\\\\",
 "#&gnuplot*ctrlq:  off\\\\",
 "%c l .",
 "%@gnuplot*exportselection:  off",
+"%@gnuplot*fastrotate:  on",
 "%@gnuplot*ctrlq:  off",
 "@end table"
 
