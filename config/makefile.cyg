@@ -1,6 +1,6 @@
 #
 #
-# $Id: makefile.cyg,v 1.22 2003/05/16 09:56:56 mikulik Exp $
+# $Id: makefile.cyg,v 1.23 2004/01/19 17:41:12 mikulik Exp $
 #
 # GNUPLOT Makefile for Cygwin on WinNT and Win95/98/2000
 #
@@ -385,6 +385,7 @@ gnuplot.tex: $(D)gnuplot.doc doc2tex.exe
 # Call LaTeX three times to get the toc right.
 gnuplot.dvi: gnuplot.tex $(D)titlepag.tex
 	cp gnuplot.tex $(D)gp_tex2.tex
+	cp $(D)../VERSION $(D)
 	cd $(D) && latex gp_tex2.tex && latex gp_tex2.tex && latex gp_tex2.tex
 	mv $(D)gp_tex2.dvi gnuplot.dvi
 	rm -f $(D)gp_tex2.*
