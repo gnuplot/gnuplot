@@ -1,5 +1,5 @@
 /*
- * $Id: x11.trm,v 1.101 2004/03/02 18:07:38 broeker Exp $
+ * $Id: x11.trm,v 1.102 2004/03/23 05:40:48 sfeam Exp $
  *
  */
 
@@ -1378,7 +1378,6 @@ static TBOOLEAN ENHx11_sizeonly = FALSE;
 static TBOOLEAN ENHx11_show = TRUE;
 static TBOOLEAN ENHx11_overprint = FALSE;
 static TBOOLEAN ENHx11_widthflag = TRUE;
-static unsigned int ENHx11_xsave, ENHx11_ysave;
 static double ENHx11_base;
 static double ENHx11_fontsize;
 static char  *ENHx11_font;

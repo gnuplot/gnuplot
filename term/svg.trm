@@ -1,5 +1,5 @@
 /*
- * $Id: svg.trm,v 1.31 2004/02/14 03:14:45 sfeam Exp $
+ * $Id: svg.trm,v 1.32 2004/03/22 00:21:24 sfeam Exp $
  *
  */
 
@@ -1122,7 +1122,7 @@ ENHsvg_put_text(unsigned int x, unsigned int y, const char *str)
     }
 
     /* Close the text section */
-    fprintf (gpoutfile, "</text>\n\t</g>\n", str);
+    fprintf (gpoutfile, "</text>\n\t</g>\n");
 
 }
 
