@@ -114,7 +114,7 @@ transform_matrix mat;
 {
     double cos_teta, sin_teta;
 
-    teta *= Pi / 180.0;
+    teta *= DEG2RAD;
     cos_teta = cos(teta);
     sin_teta = sin(teta);
 
@@ -131,7 +131,7 @@ transform_matrix mat;
 {
     double cos_teta, sin_teta;
 
-    teta *= Pi / 180.0;
+    teta *= DEG2RAD;
     cos_teta = cos(teta);
     sin_teta = sin(teta);
 
@@ -148,7 +148,7 @@ transform_matrix mat;
 {
     double cos_teta, sin_teta;
 
-    teta *= Pi / 180.0;
+    teta *= DEG2RAD;
     cos_teta = cos(teta);
     sin_teta = sin(teta);
 

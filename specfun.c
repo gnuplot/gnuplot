@@ -76,10 +76,6 @@ extern double zero;
  */
 #define LNPI 1.14472988584940016
 #define LNSQRT2PI 0.9189385332046727
-#ifdef PI
-# undef PI
-#endif
-#define PI 3.14159265358979323846
 #define PNT68 0.6796875
 #define SQRT_TWO 1.41421356237309504880168872420969809	/* JG */
 
@@ -155,7 +151,7 @@ static double lgampos __PROTO((double z));
  */
 
 /* Local data, not visible outside this file 
-   static double   a[] =
+static double   a[] =
    {
    0.9999999999995183E+00,
    0.6765203681218835E+03,
@@ -188,7 +184,7 @@ double z;
     double tmp;
 
     /* Use reflection formula, then call lgampos() */
-    tmp = sin(z * PI);
+    tmp = sin(z * M_PI);
 
     if (fabs(tmp) < MACHEPS) {
 	tmp = 0.0;

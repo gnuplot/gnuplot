@@ -4005,7 +4005,6 @@ char *dest, *format;
 size_t count;
 double log_base, x;		/* we print one number in a number of different formats */
 {
-#define LOC_PI 3.14159265358979323846	/* local definition of PI */
     char temp[MAX_LINE_LEN];
     char *t;
 
@@ -4170,7 +4169,7 @@ double log_base, x;		/* we print one number in a number of different formats */
 	    {
 		t[0] = 'f';
 		t[1] = 0;
-		sprintf(dest, temp, x / LOC_PI);
+		sprintf(dest, temp, x / M_PI);
 		dest += strlen(dest);
 		++format;
 		break;
@@ -4182,7 +4181,6 @@ double log_base, x;		/* we print one number in a number of different formats */
 	/*}}} */
     }
 }
-#undef LOC_PI			/* local definition of PI */
 /*}}} */
 #ifdef HAVE_SNPRINTF
 # undef sprintf

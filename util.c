@@ -410,13 +410,13 @@ struct value *val;
 {
     switch (val->type) {
     case INTGR:
-	return ((val->v.int_val >= 0) ? 0.0 : Pi);
+	return ((val->v.int_val >= 0) ? 0.0 : M_PI);
     case CMPLX:
 	if (val->v.cmplx_val.imag == 0.0) {
 	    if (val->v.cmplx_val.real >= 0.0)
 		return (0.0);
 	    else
-		return (Pi);
+		return (M_PI);
 	}
 	return (atan2(val->v.cmplx_val.imag,
 		      val->v.cmplx_val.real));

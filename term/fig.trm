@@ -653,7 +653,7 @@ TERM_PUBLIC int FIG_text_angle(ang)
 int ang;
 {
     if (ang)
-	FIG_angle = Pi / 2.0;	/* vertical is pi/2 radians */
+	FIG_angle = M_PI_2;	/* vertical is pi/2 radians */
     else
 	FIG_angle = 0.0;	/* horizontal */
     return (TRUE);

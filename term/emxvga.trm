@@ -280,8 +280,8 @@ char *s;
     k = 0;
     x = 0.5 + x0;
     y = 0.5 + y0;
-    sa = sin(-Pi * angle / 180);
-    ca = cos(Pi * angle / 180);
+    sa = sin(- DEG2RAD * angle);
+    ca = cos(DEG2RAD * angle);
     while (s[k]) {
 	for (i = 0; i < 8; i++)
 	    for (j = 0; j < 8; j++)
