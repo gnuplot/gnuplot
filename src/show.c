@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.116 2003/11/22 04:49:41 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.117 2003/12/01 16:15:52 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -3050,7 +3050,7 @@ const char *t;
 		    *s++ = *t;
 		else {
 		    *s++ = '\\';
-		    sprintf(s, "%03o", *t);
+		    sprintf(s, "%03o", (unsigned char)*t);
 		    while (*s != NUL)
 			s++;
 		}
