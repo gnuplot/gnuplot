@@ -1,5 +1,7 @@
 2003-11-28  Petr Mikulik  <mikulik@physics.muni.cz>
 
+	* tables.c: Moved definition of test_tbl[] out of #ifdef PM3D.
+
 	* command.c (test_palette_subcommand): Reworked 'test palette' to use
 	only one temporary file.
 

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: tables.c,v 1.46 2003/10/08 13:04:58 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: tables.c,v 1.47 2003/11/24 15:15:14 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - tables.c */
@@ -381,6 +381,15 @@ const struct gen_table set_key_tbl[] =
     { NULL, S_KEY_INVALID }
 };
 
+/* 'test' command */
+const struct gen_table test_tbl[] =
+{
+    { "term$inal", TEST_TERMINAL },
+    { "pal$ette", TEST_PALETTE },
+    { "time", TEST_TIME },
+    { NULL, TEST_INVALID }
+};
+
 #ifdef PM3D
 /* 'set colorbox' options */
 const struct gen_table set_colorbox_tbl[] =
@@ -453,16 +462,6 @@ const struct gen_table set_pm3d_tbl[] =
     { "corners2c$olor",S_PM3D_WHICH_CORNER },
     { NULL, S_PM3D_INVALID }
 };
-
-/* 'test' command */
-const struct gen_table test_tbl[] =
-{
-    { "term$inal", TEST_TERMINAL },
-    { "pal$ette", TEST_PALETTE },
-    { "time", TEST_TIME },
-    { NULL, TEST_INVALID }
-};
-
 
 /* fixed RGB color names for 'set palette defined' */
 const struct gen_table pm3d_color_names_tbl[] =
