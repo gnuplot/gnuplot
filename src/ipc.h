@@ -1,5 +1,5 @@
 /*
- * $Id: ipc.h,v 1.8 2000/11/23 18:23:01 lhecking Exp $
+ * $Id: ipc.h,v 1.9 2000/11/24 15:44:31 mikulik Exp $
  */
 
 /* GNUPLOT - ipc.h */
@@ -49,14 +49,8 @@
 
 
 /*
- * The following 'readline_ipc' routine is usual 'readline' for OS2_IPC,
- * and a special one for IPC communication.
- */
-char *readline_ipc __PROTO((const char*));
-
-/*
  * OS2_IPC: gnuplot's terminals communicate with it by shared memory + event
- * semaphores => the code in gpexecute.inc is used, and nothing more from here.
+ * semaphores => the code in gpexecute.c is used, and nothing more from here.
  */
 
 #ifdef PIPE_IPC

@@ -1,5 +1,5 @@
 /*
- * $Id: readline.h,v 1.6 2000/10/31 19:59:31 joze Exp $
+ * $Id: readline.h,v 1.7 2000/11/01 18:57:33 broeker Exp $
  */
 
 /* GNUPLOT - readline.h */
@@ -54,6 +54,12 @@
 #if defined(READLINE) && !defined(HAVE_LIBREADLINE)
 char *readline __PROTO((const char *));
 #endif
+
+/*
+ * The following 'readline_ipc' routine is usual 'readline' for OS2_IPC,
+ * and a special one for IPC communication.
+ */
+char *readline_ipc __PROTO((const char*));
 
 #if defined(ATARI) || defined(MTOS)
 char tos_getch __PROTO((void));
