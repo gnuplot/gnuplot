@@ -372,42 +372,34 @@ TERMLIBS="$VGAGLLIB $TERMLIBS"
 dnl check for ggi lib
 GGI_SUPPORT=no
 if test "$with_ggi" != no; then
-    GP_PATH_LIB(ggi,ggiInit,[$with_ggi])
-    if test "$ac_cv_lib_ggi_ggiInit" = yes; then
-	AC_DEFINE(USE_GGI_DRIVER, 1,
-	    [ Define if you want to use the experimental ggi driver. ])
-	GGI_SUPPORT=yes
-    fi
+  GP_PATH_LIB(ggi,ggiInit,[$with_ggi])
+  if test "$ac_cv_lib_ggi_ggiInit" = yes; then
+    TERMLIBS="$TERMLIBS $gp_ggi_libs"
+    AC_DEFINE(USE_GGI_DRIVER, 1,
+              [ Define if you want to use the experimental ggi driver. ])
+    GGI_SUPPORT=yes
+  fi
 fi
 
 dnl check if libggiwmh and ggi/wmh.h are found
 if test "$GGI_SUPPORT" = yes; then
-    AC_CHECK_LIB(ggiwmh, ggiWmhInit,
-	[dnl action if libggiwmh is found
-	    AC_CHECK_HEADER(ggi/wmh.h,
-		[dnl action if ggi/wmh.h is found
-		    TERMLIBS="$TERMLIBS -lggiwmh"
-		    AC_DEFINE(HAVE_GGI_WMH_H, 1,
-			[ Define if ggi/wmh.h is there. ]
-		    )
-		]
-	    )
-	]
-    )
+  AC_CHECK_LIB(ggiwmh, ggiWmhInit,
+   AC_CHECK_HEADER(ggi/wmh.h,
+    [TERMLIBS="$TERMLIBS -lggiwmh"
+     AC_DEFINE(HAVE_GGI_WMH_H, 1,
+               [ Define if ggi/wmh.h is there. ])
+    ]))
 fi
 
 dnl check for xmi lib
 if test "$GGI_SUPPORT" = yes -a "$with_xmi" != no; then
-    GP_PATH_LIB(xmi,xmiInit,[$with_xmi])
-    if test "$ac_cv_lib_xmi_xmiInit" = yes; then
-	AC_CHECK_HEADER(ggi/xmi.h,
-	    [dnl action if ggi/xmi.h is found
-		AC_DEFINE(HAVE_GGI_XMI_H, 1,
-		    [ Define if ggi/xmi.h is there. ]
-		)
-	    ]
-	)
-    fi
+  GP_PATH_LIB(xmi,xmiInit,[$with_xmi])
+  if test "$ac_cv_lib_xmi_xmiInit" = yes; then
+    TERMLIBS="$TERMLIBS $gp_xmi_libs"
+    AC_CHECK_HEADER(ggi/xmi.h,
+     AC_DEFINE(HAVE_GGI_XMI_H, 1,
+               [ Define if ggi/xmi.h is there. ]))
+  fi
 fi
 
 dnl GNU readline and the required terminal library
@@ -431,7 +423,7 @@ if test "$with_readline" != no; then
     else
       GP_PATH_LIB(readline,readline,[$with_readline],[${gp_tcap}])
       if test "$ac_cv_lib_readline_readline" = yes; then
-        TERMLIBS="$TERMLIBS $gp_tcap"
+        TERMLIBS="$TERMLIBS $gp_readline_libs $gp_tcap"
       fi
     fi
 
@@ -484,6 +476,8 @@ if test "$with_plot" != no; then
     if test "$ac_cv_lib_plot_pl_textangle" = no; then
       AC_MSG_WARN([GNU plotutils v2.2 or newer required -- disabling gnugraph terminal])
       with_plot=no
+    else
+      TERMLIBS="$TERMLIBS $gp_plot_libs"
     fi # GNU plotutils v2.2
 
     if test "$with_plot" != no; then
@@ -500,6 +494,7 @@ dnl check for Tom Boutell's gd library
 if test "$with_gd" != no; then
   GP_PATH_LIB(gd,gdImageGif,[$with_gd])
   if test "$ac_cv_lib_gd_gdImageGif" = yes; then
+    TERMLIBS="$TERMLIBS $gp_gd_libs"
     GP_PATH_HEADER(gd.h,[$with_gd],
       dnl ACTION-IF-FOUND
       AC_DEFINE(HAVE_LIBGD, 1,
@@ -518,7 +513,7 @@ dnl check for png and z library
 if test "$with_png" != no; then
   GP_PATH_LIB(png,png_init_io,[$with_png],[-lz])
   if test "$ac_cv_lib_png_png_init_io" = yes; then
-    TERMLIBS="$TERMLIBS -lz"
+    TERMLIBS="$TERMLIBS $gp_png_libs -lz"
     GP_PATH_HEADER(png.h,[$with_png],,
      AC_MSG_WARN([found png library but not png.h])
      AC_MSG_WARN([please add path to png.h to CPPFLAGS in Makefile])
@@ -555,7 +550,7 @@ dnl check for PDFlib and its support libraries --- experimental
 if test "$with_pdf" != no; then
   GP_PATH_LIB(pdf,PDF_get_majorversion,[$with_pdf],[-lz -ltiff])
   if test "$ac_cv_lib_pdf_PDF_get_majorversion" = yes; then
-    TERMLIBS="$TERMLIBS -lz -ltiff"
+    TERMLIBS="$TERMLIBS $gp_pdf_libs -lz -ltiff"
     GP_PATH_HEADER(pdflib.h,[$with_pdf],,
      AC_MSG_WARN([found pdf library but not pdflib.h])
      AC_MSG_WARN([please add path to pdflib.h to CPPFLAGS in Makefile])
