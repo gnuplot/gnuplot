@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.54 2002/01/25 18:02:08 joze Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.55 2002/01/26 17:55:07 joze Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -1540,12 +1540,12 @@ plot3d_lines_pm3d(plot)
 				    map3d_xy(lx[1], ly[1], lz[1], &xx0, &yy0);
 
 				    clip_move(x, y);
-				    z =  (points[i - step].z + points[i].z) * .5;
 #ifdef PM3D
 				    if (color_from_column)
 					z =  (points[i - step].ylow + points[i].ylow) * .5;
 				    else
 #endif
+				    z =  (points[i - step].z + points[i].z) * .5;
 				    set_color(z2gray(z));
 				    clip_vector(xx0, yy0);
 				}

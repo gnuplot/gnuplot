@@ -1,13 +1,18 @@
+2002-01-28  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/graph3d.c (plot3d_lines_pm3d): Fix line misordering in
+ 	color_axis handling.
+
 2002-01-27  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/plot3d.c (get_3ddata): Change usage of HUGE to VERYLARGE,
-	with is guaranteed to be defined.
+ 	with is guaranteed to be defined.
 
 2002-01-27  Johannes Zellner  <johannes@zellner.org>
 
 	* pm3d/demo/pm3dColumn.gpi: a 90 deg rotated 3d sinc which
-	demonstrates the difference between coloring according to
-	the z value and according to a specific data column.
+ 	demonstrates the difference between coloring according to the z
+ 	value and according to a specific data column.
 
 2002-01-26  Johannes Zellner  <johannes@zellner.org>
 
@@ -15,31 +20,31 @@
 
 2002-01-26  Johannes Zellner  <johannes@zellner.org>
 
-	* src/plot3d.c src/plot3d.h src/pm3d.c:
-	some bug fixes and improvements for the new pm3d functionality
+	* src/plot3d.c src/plot3d.h src/pm3d.c: some bug fixes and
+ 	improvements for the new pm3d functionality
 
 2002-01-26  Johannes Zellner  <johannes@zellner.org>
 
 	* src/plot3d.c src/graph3d.c src/graph3d.h src/gp_types.h
-	src/hidden3d.c src/pm3d.c src/pm3d.h src/color.c docs/gnuplot.doc:
-	pm3d coloring from an arbitrary data column for data splots
+ 	src/hidden3d.c src/pm3d.c src/pm3d.h src/color.c docs/gnuplot.doc:
+ 	pm3d coloring from an arbitrary data column for data splots
 	(column 2 or 4)
 
 2002-01-26  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* configure.in: Added 'exit 0' at end.  Without it make stops
-	after running "config.status --recheck".
+ 	after running "config.status --recheck".
 
 	* src/specfun.c: Removed prototypes of former static functions
-	lgampos, lgamneg.
+ 	lgampos, lgamneg.
 	(lngamma): Added missing return statement.
 	(lngamma, inverse_normal_func, inverse_error_func): Moved error
-	message to stderr.
+ 	message to stderr.
 
 2002-01-25  Johannes Zellner  <johannes@zellner.org>
 
 	* src/plot3d.c: scaling for 'linetype palette' was broken after
-	the previous changes (at least for 'set pm3d explicit').
+ 	the previous changes (at least for 'set pm3d explicit').
 
 2002-01-25  Johannes Zellner  <johannes@zellner.org>
 
