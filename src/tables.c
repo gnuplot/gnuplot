@@ -1,4 +1,4 @@
-/* $Id: tables.c,v 1.11 1999/11/08 19:24:34 lhecking Exp $ */
+/* $Id: tables.c,v 1.12 1999/12/10 16:56:00 lhecking Exp $ */
 
 /* GNUPLOT - tables.c */
 
@@ -45,6 +45,9 @@
 /* the actual commands */
 struct gen_ftable command_ftbl[] =
 {
+#ifdef USE_MOUSE
+    { "bi$nd", bind_command },
+#endif
     { "ca$ll", call_command },
     { "cd", changedir_command },
     { "cl$ear", clear_command },
@@ -54,6 +57,7 @@ struct gen_ftable command_ftbl[] =
     { "?", help_command },
     { "hi$story", history_command },
     { "if", if_command },
+    { "else", else_command },
     { "l$oad", load_command },
     { "pa$use", pause_command },
     { "p$lot", plot_command },
@@ -154,7 +158,10 @@ struct gen_table set_tbl[] =
     { "fu$nction", S_FUNCTIONS },
     { "fu$nctions", S_FUNCTIONS },
     { "g$rid", S_GRID },
-    { "hi$dden3d", S_HIDDEN3D },
+    { "hid$den3d", S_HIDDEN3D },
+#if defined(HAVE_LIBREADLINE) && defined(GNUPLOT_HISTORY)
+    { "his$torysize", S_HISTORYSIZE },
+#endif
     { "is$osamples", S_ISOSAMPLES },
     { "k$ey", S_KEY },
     { "keyt$itle", S_KEYTITLE },
@@ -174,6 +181,9 @@ struct gen_table set_tbl[] =
     { "bmar$gin", S_BMARGIN },
 
     { "mis$sing", S_MISSING },
+#ifdef USE_MOUSE
+    { "mo$use", S_MOUSE },
+#endif
     { "multi$plot", S_MULTIPLOT },
 
     { "mxt$ics", S_MXTICS },

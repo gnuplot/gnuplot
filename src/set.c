@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.29 1999/11/24 13:32:26 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.30 1999/12/10 16:54:51 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -53,6 +53,9 @@ static char *RCSid() { return RCSid("$Id: set.c,v 1.29 1999/11/24 13:32:26 lheck
 #include "tables.h"
 #include "term_api.h"
 #include "util.h"
+#ifdef USE_MOUSE
+# include "mouse.h"
+#endif
 
 #define BACKWARDS_COMPATIBLE
 
@@ -325,10 +328,14 @@ static void set_encoding __PROTO((void));
 static void set_format __PROTO((void));
 static void set_grid __PROTO((void));
 static void set_hidden3d __PROTO((void));
+#if defined(HAVE_LIBREADLINE) && defined(GNUPLOT_HISTORY)
+static void set_historysize __PROTO((void));
+#endif
 static void set_isosamples __PROTO((void));
 static void set_key __PROTO((void));
 static void set_keytitle __PROTO((void));
 static void set_label __PROTO((void));
+int set_label_tag __PROTO((void));
 static int assign_label_tag __PROTO((void));
 static void delete_label __PROTO((struct text_label * prev, struct text_label * this));
 static void set_loadpath __PROTO((void));
@@ -340,6 +347,9 @@ static void set_lmargin __PROTO((void));
 static void set_rmargin __PROTO((void));
 static void set_tmargin __PROTO((void));
 static void set_missing __PROTO((void));
+#ifdef USE_MOUSE
+static void set_mouse __PROTO((void));
+#endif
 static void set_offsets __PROTO((void));
 static void set_origin __PROTO((void));
 static void set_output __PROTO((void));
@@ -647,10 +657,10 @@ set_command()
 \t'angles',  'arrow',  'autoscale',  'bars',  'border', 'boxwidth',\n\
 \t'clabel', 'clip', 'cntrparam', 'contour', 'data style',  'dgrid3d',\n\
 \t'dummy',  'encoding',  'format', 'function style',   'grid',\n\
-\t'hidden3d',   'isosamples', 'key', 'label', 'linestyle', 'locale',\n\
-\t'logscale', '[blrt]margin', 'mapping', 'missing', 'multiplot',\n\
-\t'offsets', 'origin', 'output', 'parametric', 'pointsize', 'polar',\n\
-\t'[rtuv]range',  'samples',  'size',  'surface',  'terminal',\n\
+\t'hidden3d',  'historysize', 'isosamples', 'key', 'label', 'linestyle',\n\
+\t'locale',  'logscale', '[blrt]margin', 'mapping', 'missing', 'mouse',\n\
+\t'multiplot',  'offsets', 'origin', 'output', 'parametric', 'pointsize',\n\
+\t'polar',  '[rtuv]range',  'samples',  'size',  'surface',  'terminal',\n\
 \t'tics',  'ticscale',  'ticslevel',  'timestamp',  'timefmt',\n\
 \t'title', 'view', '[xyz]{2}data', '[xyz]{2}label', '[xyz]{2}range',\n\
 \t'{no}{m}[xyz]{2}tics', '[xyz]{2}[md]tics', '{[xyz]{2}}zeroaxis', 'zero'";
@@ -750,6 +760,11 @@ set_command()
 	case S_HIDDEN3D:
 	    set_hidden3d();
 	    break;
+#if defined(HAVE_LIBREADLINE) && defined(GNUPLOT_HISTORY)
+	case S_HISTORYSIZE:
+	    set_historysize();
+	    break;
+#endif
 	case S_ISOSAMPLES:
 	    set_isosamples();
 	    break;
@@ -789,6 +804,11 @@ set_command()
 	case S_MISSING:
 	    set_missing();
 	    break;
+#ifdef USE_MOUSE
+	case S_MOUSE:
+	    set_mouse();
+	    break;
+#endif
 	case S_MULTIPLOT:
 	    term_start_multiplot();
 	    break;
@@ -1715,6 +1735,23 @@ set_hidden3d()
 }
 
 
+#if defined(HAVE_LIBREADLINE) && defined(GNUPLOT_HISTORY)
+/* process 'set historysize' command */
+static void
+set_historysize()
+{
+    struct value a;
+
+    c_token++;
+
+    gnuplot_history_size = (int) real(const_express(&a));
+    if (gnuplot_history_size < 0) {
+	gnuplot_history_size = 0;
+    }
+}
+#endif
+
+
 /* process 'set isosamples' command */
 static void
 set_isosamples()
@@ -1889,12 +1926,17 @@ set_keytitle()
     }
 }
 
-
 /* process 'set label' command */
 /* set label {tag} {label_text} {at x,y} {pos} {font name,size} */
 /* Entry font added by DJL */
 static void
 set_label()
+{
+    set_label_tag(); /* discard return value */
+}
+
+int
+set_label_tag()
 {
     struct value a;
     struct text_label *this_label = NULL;
@@ -1909,6 +1951,7 @@ set_label()
      set_font;
     TBOOLEAN set_layer = FALSE;
     int layer = 0;
+    int pointstyle = -2; /* untouched (this is /not/ -1) */
 
     c_token++;
     /* get tag */
@@ -1973,7 +2016,9 @@ set_label()
     if (!END_OF_COMMAND
 	&& !almost_equals(c_token, "rot$ate") && !almost_equals(c_token, "norot$ate")
 	&& !equals(c_token, "front") && !equals(c_token, "back")
-	&& !equals(c_token, "font")) {
+	&& !equals(c_token, "font")
+	&& !almost_equals(c_token, "po$intstyle")
+	&& !almost_equals(c_token, "nopo$intstyle")) {
 	if (set_just)
 	    int_error(c_token, "only one justification is allowed");
 	if (almost_equals(c_token, "l$eft")) {
@@ -1991,7 +2036,9 @@ set_label()
     }
     /* get rotation (added by RCC) */
     if (!END_OF_COMMAND && !equals(c_token, "font")
-	&& !equals(c_token, "front") && !equals(c_token, "back")) {
+	&& !equals(c_token, "front") && !equals(c_token, "back")
+	&& !almost_equals(c_token, "po$intstyle")
+	&& !almost_equals(c_token, "nopo$intstyle")) {
 	if (almost_equals(c_token, "rot$ate")) {
 	    rotate = TRUE;
 	} else if (almost_equals(c_token, "norot$ate")) {
@@ -2005,7 +2052,9 @@ set_label()
     /* get font */
     set_font = FALSE;
     if (!END_OF_COMMAND && equals(c_token, "font") &&
-	!equals(c_token, "front") && !equals(c_token, "back")) {
+	!equals(c_token, "front") && !equals(c_token, "back")
+	&& !almost_equals(c_token, "po$intstyle")
+	&& !almost_equals(c_token, "nopo$intstyle")) {
 	c_token++;
 	if (END_OF_COMMAND)
 	    int_error(c_token, "font name and size expected");
@@ -2021,18 +2070,39 @@ set_label()
     }				/* Entry font added by DJL */
     /* get front/back (added by JDP) */
     set_layer = FALSE;
-    if (!END_OF_COMMAND && equals(c_token, "back") && !equals(c_token, "front")) {
+    if (!END_OF_COMMAND
+	&& equals(c_token, "back") && !equals(c_token, "front")
+	&& !almost_equals(c_token, "po$intstyle")
+	&& !almost_equals(c_token, "nopo$intstyle")) {
 	layer = 0;
 	c_token++;
 	set_layer = TRUE;
     }
-    if(!END_OF_COMMAND && equals(c_token, "front")) {
+    if(!END_OF_COMMAND && equals(c_token, "front")
+	&& !almost_equals(c_token, "po$intstyle")
+	&& !almost_equals(c_token, "nopo$intstyle")) {
 	if (set_layer)
 	    int_error(c_token, "only one of front or back expected");
 	layer = 1;
 	c_token++;
 	set_layer = TRUE;
     }
+
+    if(!END_OF_COMMAND && almost_equals(c_token, "po$intstyle")) {
+	c_token++;
+	pointstyle = (int) real(const_express(&a));
+	if (pointstyle < 0)
+	    pointstyle = -1; /* UNSET */
+	else
+#define POINT_TYPES 6 /* compare with term.c */
+	    pointstyle %= POINT_TYPES;
+    }
+
+    if(!END_OF_COMMAND && almost_equals(c_token, "nopo$intstyle")) {
+	pointstyle = -1; /* UNSET */
+	c_token++;
+    }
+
     if (!END_OF_COMMAND)
 	int_error(c_token, "extraenous or out-of-order arguments in set label");
 
@@ -2059,6 +2129,8 @@ set_label()
 	    this_label->layer = layer;
 	if (set_font)
 	    this_label->font = font;
+	if (pointstyle != -2)
+	    this_label->pointstyle = pointstyle;
     } else {
 	/* adding the label */
 	new_label = (struct text_label *)
@@ -2075,7 +2147,15 @@ set_label()
 	new_label->rotate = rotate;
 	new_label->layer = layer;
 	new_label->font = font;
+	if (pointstyle == -2)
+	    new_label->pointstyle = -1; /* unset */
+	else
+	    new_label->pointstyle = pointstyle;
+	/* TODO make this configurable (joze) */
+	new_label->hoffset = 1.0;
+	new_label->voffset = 1.0;
     }
+    return tag;
 }				/* Entry font added by DJL */
 
 
@@ -2330,6 +2410,157 @@ set_missing()
     }
 }
 
+#ifdef USE_MOUSE
+static void
+set_mouse()
+{
+    c_token++;
+    mouse_setting.on = 1;
+
+    while (!END_OF_COMMAND) {
+	if (almost_equals(c_token, "do$ubleclick")) {
+	    struct value a;
+	    ++c_token;
+	    mouse_setting.doubleclick = real(const_express(&a));
+	    if (mouse_setting.doubleclick < 0)
+		mouse_setting.doubleclick = 0;
+	} else if (almost_equals(c_token, "nodo$ubleclick")) {
+	    mouse_setting.doubleclick = 0; /* double click off */
+	    ++c_token;
+	} else if (almost_equals(c_token, "zoomco$ordinates")) {
+	    mouse_setting.annotate_zoom_box = 1;
+	    ++c_token;
+	} else if (almost_equals(c_token, "nozoomco$ordinates")) {
+	    mouse_setting.annotate_zoom_box = 0;
+	    ++c_token;
+	} else if (almost_equals(c_token, "po$lardistance")) {
+	    mouse_setting.polardistance = 1;
+	    ++c_token;
+	} else if (almost_equals(c_token, "nopo$lardistance")) {
+	    mouse_setting.polardistance = 0;
+	    ++c_token;
+	} else if (equals(c_token, "labels")) {
+	    mouse_setting.label = 1;
+	    ++c_token;
+	} else if (almost_equals(c_token, "nola$bels")) {
+	    mouse_setting.label = 0;
+	    ++c_token;
+	} else if (almost_equals(c_token, "labelop$tions")) {
+	    ++c_token;
+	    if (isstring(c_token)) {
+		if (token_len(c_token) >= sizeof(mouse_setting.labelopts)) {
+		    int_error(c_token, "option string too long");
+		} else {
+		    quote_str(mouse_setting.labelopts,
+			c_token, token_len(c_token));
+		}
+	    } else {
+		int_error(c_token, "expecting string format");
+	    }
+	    ++c_token;
+	} else if (almost_equals(c_token, "ve$rbose")) {
+	    mouse_setting.verbose = 1;
+	    ++c_token;
+	} else if (almost_equals(c_token, "nove$rbose")) {
+	    mouse_setting.verbose = 0;
+	    ++c_token;
+	} else if (almost_equals(c_token, "zoomju$mp")) {
+	    mouse_setting.warp_pointer = 1;
+	    ++c_token;
+	} else if (almost_equals(c_token, "nozoomju$mp")) {
+	    mouse_setting.warp_pointer = 0;
+	    ++c_token;
+	} else if (almost_equals(c_token, "fo$rmat")) {
+	    ++c_token;
+	    if (isstring(c_token)) {
+		if (token_len(c_token) >= sizeof(mouse_setting.fmt)) {
+		    int_error(c_token, "format string too long");
+		} else {
+		    quote_str(mouse_setting.fmt, c_token, token_len(c_token));
+		}
+	    } else {
+		int_error(c_token, "expecting string format");
+	    }
+	    ++c_token;
+	} else if (almost_equals(c_token, "cl$ipboardformat")) {
+	    ++c_token;
+	    if (isstring(c_token)) {
+		if (clipboard_alt_string)
+		    free(clipboard_alt_string);
+		clipboard_alt_string = gp_alloc
+		    (token_len(c_token), "set->mouse->clipboardformat");
+		quote_str(clipboard_alt_string, c_token, token_len(c_token));
+		if (clipboard_alt_string && !strlen(clipboard_alt_string)) {
+		    free(clipboard_alt_string);
+		    clipboard_alt_string = (char*) 0;
+		    if (MOUSE_COORDINATES_ALT == mouse_mode) {
+			mouse_mode = MOUSE_COORDINATES_REAL;
+		    }
+		} else {
+		    clipboard_mode = MOUSE_COORDINATES_ALT;
+		}
+		c_token++;
+	    } else {
+		struct value a;
+		int itmp = (int) real(const_express(&a));
+		if (itmp >= MOUSE_COORDINATES_REAL
+		    && itmp <= MOUSE_COORDINATES_XDATETIME) {
+		    if (MOUSE_COORDINATES_ALT == itmp
+			&& !clipboard_alt_string) {
+			fprintf(stderr,
+			    "please 'set mouse clipboard <fmt>' first.\n");
+		    } else {
+			clipboard_mode = itmp;
+		    }
+		} else {
+		    fprintf(stderr, "should be: %d <= clipboardformat <= %d\n",
+			MOUSE_COORDINATES_REAL, MOUSE_COORDINATES_XDATETIME);
+		}
+	    }
+	} else if (almost_equals(c_token, "mo$useformat")) {
+	    ++c_token;
+	    if (isstring(c_token)) {
+		if (mouse_alt_string)
+		    free(mouse_alt_string);
+		mouse_alt_string = gp_alloc
+		    (token_len(c_token), "set->mouse->mouseformat");
+		quote_str(mouse_alt_string, c_token, token_len(c_token));
+		if (mouse_alt_string && !strlen(mouse_alt_string)) {
+		    free(mouse_alt_string);
+		    mouse_alt_string = (char*) 0;
+		    if (MOUSE_COORDINATES_ALT == mouse_mode) {
+			mouse_mode = MOUSE_COORDINATES_REAL;
+		    }
+		} else {
+		    mouse_mode = MOUSE_COORDINATES_ALT;
+		}
+		c_token++;
+	    } else {
+		struct value a;
+		int itmp = (int) real(const_express(&a));
+		if (itmp >= MOUSE_COORDINATES_REAL
+		    && itmp <= MOUSE_COORDINATES_XDATETIME) {
+		    if (MOUSE_COORDINATES_ALT == itmp && !mouse_alt_string) {
+			fprintf(stderr,
+			    "please 'set mouse mouseformat <fmt>' first.\n");
+		    } else {
+			mouse_mode = itmp;
+		    }
+		} else {
+		    fprintf(stderr, "should be: %d <= mouseformat <= %d\n",
+			MOUSE_COORDINATES_REAL, MOUSE_COORDINATES_XDATETIME);
+		}
+	    }
+	} else {
+	    /* discard unknown options (joze) */
+	    break;
+	}
+    }
+#if defined(USE_MOUSE) && defined(OS2)
+    update_menu_items_PM_terminal();
+#endif
+}
+#endif
 
 /* process 'set offsets' command */
 static void

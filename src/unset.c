@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.5 1999/11/08 19:24:35 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.6 1999/12/10 16:57:12 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -44,6 +44,9 @@ static char *RCSid() { return RCSid("$Id: unset.c,v 1.5 1999/11/08 19:24:35 lhec
 #include "tables.h"
 #include "term_api.h"
 #include "util.h"
+#ifdef USE_MOUSE
+#   include "mouse.h"
+#endif
 
 static void unset_angles __PROTO((void));
 static void unset_arrow __PROTO((void));
@@ -63,6 +66,9 @@ static void unset_encoding __PROTO((void));
 static void unset_format __PROTO((void));
 static void unset_grid __PROTO((void));
 static void unset_hidden3d __PROTO((void));
+#if defined(HAVE_LIBREADLINE) && defined(GNUPLOT_HISTORY)
+static void unset_historysize __PROTO((void));
+#endif
 static void unset_isosamples __PROTO((void));
 static void unset_key __PROTO((void));
 static void unset_keytitle __PROTO((void));
@@ -77,6 +83,12 @@ static void unset_lmargin __PROTO((void));
 static void unset_rmargin __PROTO((void));
 static void unset_tmargin __PROTO((void));
 static void unset_missing __PROTO((void));
+#ifdef USE_MOUSE
+static void unset_mouse __PROTO((void));
+#endif
+#if 0
+static void unset_multiplot __PROTO((void));
+#endif
 
 static void unset_mxtics __PROTO((void));
 static void unset_mx2tics __PROTO((void));
@@ -138,12 +150,12 @@ unset_command()
     "valid unset options:  [] = choose one, {} means optional\n\n\
 \t'angles',  'arrow',  'autoscale',  'bar',  'border', 'boxwidth',\n\
 \t'clabel', 'clip', 'cntrparam', 'contour', 'dgrid3d',  'dummy',\n\
-\t'encoding',  'format', 'grid', 'hidden3d',   'isosamples', 'key',\n\
-\t'label', 'loadpath', 'locale', 'logscale', '[blrt]margin', 'mapping',\n\
-\t'missing', 'multiplot', 'offsets', 'origin', 'output', 'parametric',\n\
-\t'pointsize', 'polar', '[rtuv]range',  'samples',  'size', 'style',\n\
-\t'surface', 'terminal', 'tics',  'ticscale',  'ticslevel', 'timestamp',\n\
-\t'timefmt', 'title', 'view', '[xyz]{2}data', '[xyz]{2}label',\n\
+\t'encoding',  'format', 'grid', 'hidden3d',  'historysize',  'isosamples',\n\
+\t'key',  'label', 'loadpath', 'locale', 'logscale', '[blrt]margin',\n\
+\t'mapping',  'missing', 'mouse', 'multiplot', 'offsets', 'origin',\n\
+\t'output', 'parametric', 'pointsize', 'polar', '[rtuv]range',  'samples',\n\
+\t'size', 'style', 'surface', 'terminal', 'tics',  'ticscale', 'ticslevel',\n\
+\t'timestamp',  'timefmt', 'title', 'view', '[xyz]{2}data', '[xyz]{2}label',\n\
 \t'[xyz]{2}range', '{m}[xyz]{2}tics', '[xyz]{2}[md]tics',\n\
 \t'{[xyz]{2}}zeroaxis', 'zero'";
 
@@ -198,6 +210,11 @@ unset_command()
     case S_HIDDEN3D:
 	unset_hidden3d();
 	break;
+#if defined(HAVE_LIBREADLINE) && defined(GNUPLOT_HISTORY)
+    case S_HISTORYSIZE:
+	unset_historysize();
+	break;
+#endif
     case S_ISOSAMPLES:
 	unset_isosamples();
 	break;
@@ -237,6 +254,11 @@ unset_command()
     case S_MISSING:
 	unset_missing();
 	break;
+#ifdef USE_MOUSE
+    case S_MOUSE:
+	unset_mouse();
+	break;
+#endif
     case S_MULTIPLOT:
 /*	unset_multiplot(); */
 	term_end_multiplot();
@@ -720,6 +742,17 @@ unset_hidden3d()
 }
 
 
+#if defined(HAVE_LIBREADLINE) && defined(GNUPLOT_HISTORY)
+/* process 'unset historysize' command */
+static void
+unset_historysize()
+{
+    c_token++;
+    gnuplot_history_size = -1; /* don't ever truncate the history. */
+}
+#endif
+
+
 /* process 'unset isosamples' command */
 static void
 unset_isosamples()
@@ -913,6 +946,19 @@ unset_missing()
     missing_val = NULL;
 }
 
+#ifdef USE_MOUSE
+/* process 'unset mouse' command */
+static void
+unset_mouse()
+{
+    c_token++;
+    mouse_setting.on = 0;
+#if defined(USE_MOUSE) && defined(OS2)
+    update_menu_items_PM_terminal();
+#endif
+    UpdateStatusline(); /* wipe status line */
+}
+#endif
 
 /* process 'unset mxtics' command */
 static void

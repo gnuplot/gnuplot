@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.31 1999/11/15 21:59:30 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.32 1999/11/24 13:24:33 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -50,6 +50,9 @@ static char *RCSid() { return RCSid("$Id: show.c,v 1.31 1999/11/15 21:59:30 lhec
 #include "parse.h"
 #include "tables.h"
 #include "util.h"
+#ifdef USE_MOUSE
+# include "mouse.h"
+#endif
 
 /******** Local functions ********/
 
@@ -89,6 +92,9 @@ static void show_isosamples __PROTO((void));
 static void show_view __PROTO((void));
 static void show_surface __PROTO((void));
 static void show_hidden3d __PROTO((void));
+#if defined(HAVE_LIBREADLINE) && defined(GNUPLOT_HISTORY)
+static void show_historysize __PROTO((void));
+#endif
 static void show_size __PROTO((void));
 static void show_origin __PROTO((void));
 static void show_term __PROTO((void));
@@ -114,6 +120,9 @@ static void show_locale __PROTO((void));
 static void show_loadpath __PROTO((void));
 static void show_zero __PROTO((void));
 static void show_missing __PROTO((void));
+#ifdef USE_MOUSE
+static void show_mouse __PROTO((void));
+#endif
 static void show_plot __PROTO((void));
 static void show_variables __PROTO((void));
 
@@ -326,6 +335,11 @@ show_command()
     case S_HIDDEN3D:
 	show_hidden3d();
 	break;
+#if defined(HAVE_LIBREADLINE) && defined(GNUPLOT_HISTORY)
+    case S_HISTORYSIZE:
+	show_historysize();
+	break;
+#endif
     case S_SIZE:
 	show_size();
 	break;
@@ -432,6 +446,11 @@ show_command()
     case S_MISSING:
 	show_missing();
 	break;
+#ifdef USE_MOUSE
+    case S_MOUSE:
+	show_mouse();
+	break;
+#endif
     case S_PLOT:
 	show_plot();
 	break;
@@ -635,6 +654,9 @@ show_all()
     show_view();
     show_surface();
     show_hidden3d();
+#if defined(HAVE_LIBREADLINE) && defined(GNUPLOT_HISTORY)
+    show_historysize();
+#endif
     show_size();
     show_origin();
     show_term();
@@ -674,6 +696,9 @@ show_all()
     show_locale();
     show_zero();
     show_missing();
+#ifdef USE_MOUSE
+    show_mouse();
+#endif
     show_plot();
     show_variables();
     show_functions();
@@ -1344,6 +1369,10 @@ int tag;			/* 0 means show all */
 	    fprintf(stderr, " %s ", this_label->layer ? "front" : "back");
 	    if (this_label->font != NULL)
 		fprintf(stderr, " font \"%s\"", this_label->font);
+	    if (this_label->pointstyle < 0)
+		fprintf(stderr, "nopointstyle");
+	    else
+		fprintf(stderr, "pointstyle %d", this_label->pointstyle);
 	    /* Entry font added by DJL */
 	    fputc('\n', stderr);
 	}
@@ -1667,6 +1696,21 @@ show_hidden3d()
     show_hidden3doptions();
 #endif /* LITE */
 }
+
+
+#if defined(HAVE_LIBREADLINE) && defined(GNUPLOT_HISTORY)
+/* process 'show historysize' command */
+static void
+show_historysize()
+{
+    c_token++;
+    if (gnuplot_history_size >= 0) {
+	fprintf(stderr, "\thistory size: %d\n", gnuplot_history_size);
+    } else {
+	fprintf(stderr, "\thistory will not be truncated.\n");
+    }
+}
+#endif
 
 
 /* process 'show size' command */
@@ -2031,6 +2075,58 @@ show_missing()
 		missing_val);
 }
 
+#ifdef USE_MOUSE
+/* process 'show mouse' command */
+static void
+show_mouse()
+{
+    c_token++;
+    SHOW_ALL_NL;
+    if (mouse_setting.on) {
+	fprintf(stderr, "\tmouse is on\n");
+	if (mouse_setting.annotate_zoom_box) {
+	    fprintf(stderr, "\tzoom coordinates will be drawn\n");
+	} else {
+	    fprintf(stderr, "\tno zoom coordinates will be drawn\n");
+	}
+	if (mouse_setting.polardistance) {
+	    fprintf(stderr, "\tdistance to ruler will be show in polar coordinates\n");
+	} else {
+	    fprintf(stderr, "\tno polar distance to ruler will be shown\n");
+	}
+	if (mouse_setting.doubleclick > 0) {
+	    fprintf(stderr, "\tdouble click resolution is %d ms\n",
+		mouse_setting.doubleclick);
+	} else {
+	    fprintf(stderr, "\tdouble click resolution is off\n");
+	}
+	fprintf(stderr, "\tformatting numbers with \"%s\"\n",
+	    mouse_setting.fmt);
+	fprintf(stderr, "\tformat for Button 1 is %d\n", (int) clipboard_mode);
+	if (clipboard_alt_string) {
+	    fprintf(stderr, "\talternative format for Button 1 is '%s'\n",
+		clipboard_alt_string);
+	}
+	fprintf(stderr, "\tformat for Button 2 is %d\n", (int) mouse_mode);
+	if (mouse_alt_string) {
+	    fprintf(stderr, "\talternative format for Button 2 is '%s'\n",
+		mouse_alt_string);
+	}
+	if (mouse_setting.label) {
+	    fprintf(stderr, "\tButton 2 draws labes with options \"%s\"\n",
+		mouse_setting.labelopts);
+	} else {
+	    fprintf(stderr, "\tdrawing temporary annotation on Button 2\n");
+	}
+	fprintf(stderr, "\tzoomjump is %s\n",
+	    mouse_setting.warp_pointer ? "on" : "off");
+	fprintf(stderr, "\tcommunication commands will %sbe shown\n",
+	    mouse_setting.verbose ? "" : "not ");
+    } else {
+	fprintf(stderr, "\tmouse is off\n");
+    }
+}
+#endif
 
 /* process 'show plot' command */
 static void

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.9 1999/12/10 16:53:26 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.10 2000/01/22 16:49:56 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -364,6 +364,10 @@ set y2data%s\n",
 	fprintf(fp, " %srotate", this_label->rotate ? "" : "no");
 	if (this_label->font != NULL)
 	    fprintf(fp, " font \"%s\"", this_label->font);
+	if (-1 == this_label->pointstyle)
+	    fprintf(fp, " nopointstyle");
+	else
+	    fprintf(fp, " pointstyle %d", this_label->pointstyle);
 	/* Entry font added by DJL */
 	fputc('\n', fp);
     }
