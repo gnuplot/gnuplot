@@ -9155,9 +9155,10 @@ Syntax:
 
 @end example
 
-<color> is either `color` or `monochrome`.  <rotate> is either `rotate` or
-`norotate` and determines if the y-axis label is rotated.  <font_size> is
-used to scale the font from its usual size.
+<color> is either `color` or `monochrome`.  <dashed> is either `dashed`
+or `solid`.  <rotate> is either `rotate` or `norotate` and determines
+if the y-axis label is rotated.  <font_size> is used to scale the font
+from its usual size.
 
 If `auxfile` is specified, it directs the driver to put the PostScript
 commands into an auxiliary file instead of directly into the LaTeX file.
