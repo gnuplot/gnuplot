@@ -1,6 +1,9 @@
 2002-07-10  Petr Mikulik  <mikulik@physics.muni.cz>
 
-	* term/metapost.trm: Fix `something' => `something`.
+	* term/ggi.trm: Minor changes in the documentation.
+
+	* term/metapost.trm: Fix `something' => `something` in the
+	documentation section.
 
 2002-07-10  Ethan Merritt  <merritt@u.washington.edu>
 
@@ -734,7 +737,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/07/10 19:26:03 $).
+	last modification date (from the tag $Date: 2002/07/10 19:28:05 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 

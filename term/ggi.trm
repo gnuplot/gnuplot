@@ -1,5 +1,5 @@
 /*
- * $Id: ggi.trm,v 1.13 2002/01/29 20:39:30 joze Exp $
+ * $Id: ggi.trm,v 1.14 2002/06/10 18:53:00 mikulik Exp $
  */
 
 /* GNUPLOT - ggi.trm */
@@ -1545,7 +1545,7 @@ START_HELP(ggi)
 "?terminal ggi",
 "?term ggi",
 "?ggi",
-" The `ggi` driver can run on different targets as X or svgalib",
+" The `ggi` driver can run on different targets as X or svgalib.",
 "",
 " Syntax:",
 "    set terminal ggi [acceleration <integer>] [[mode] {mode}]",
@@ -1556,16 +1556,18 @@ START_HELP(ggi)
 "  - V800x600",
 "  - V640x480",
 "  - V320x200",
-" please refer to the ggi documentation for other modes. The 'mode' keyword",
+" Please refer to the ggi documentation for other modes. The 'mode' keyword",
 " is optional. It is recommended to select the target by environment variables",
-" as explained in the libggi manual page.  To get DGA on X, you should for",
+" as explained in the libggi manual page. To get DGA on X, you should for",
 " example",
 "    bash> export GGI_DISPLAY=DGA",
 "    csh>  setenv GGI_DISPLAY DGA",
+"",
 " 'acceleration' is only used for targets which report relative pointer",
 " motion events (e.g. DGA) and is a strictly positive integer multiplication",
 " factor for the relative distances.  The default for acceleration is 7.",
-" EXAMPLES:",
+"",
+" Examples:",
 "    set term ggi acc 10",
 "    set term ggi acc 1 mode V1024x768",
 "    set term ggi V1024x768"
