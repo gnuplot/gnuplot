@@ -1,3 +1,9 @@
+2004-08-25  Per Persson <persquare@mac.com>
+
+	* term/aquaterm.trm (AQUA_options): make options order-independent;
+	replace isstring+quote_str with try_to_get_string();
+	allow "font" as a synomym for "fname".
+	
 2004-08-23  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/xlib.trm (Xlib_text): Leave output file open so that it is
