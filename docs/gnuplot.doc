@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.156 2003/01/09 23:32:22 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.157 2003/01/24 08:26:53 mikulik Exp $
 C 18 September 2001
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001   Thomas Williams, Colin Kelley et al.
 C
@@ -2708,7 +2708,8 @@ C ... and restart the table:
  Examples:
 
  This creates a plot of the sum of the 2nd and 3rd data against the first:
- (The format string specifies comma- rather than space-separated columns.)
+ The format string specifies comma- rather than space-separated columns.
+ The same result could be achieved by specifying `set datafile separator ","`.
        plot 'file' using 1:($2+$3) '%lf,%lf,%lf'
 
  In this example the data are read from the file "MyData" using a more
@@ -4065,8 +4066,8 @@ C ... and restart the table:
 3 datafile 
 ?set datafile
  The `set datafile` command options control interpretation of fields read from
- input data files by the `plot`, `splot`, and `fit` commands.  Only one such
- option is currently implemented.
+ input data files by the `plot`, `splot`, and `fit` commands.  Two such
+ options are currently implemented.
 4 set datafile missing
 ?set datafile missing
 ?set missing
@@ -4079,6 +4080,7 @@ C ... and restart the table:
  Syntax:
        set datafile missing {"<string>"}
        show datafile missing
+       unset datafile
 
  Example:
        set datafile missing "?"
@@ -4120,6 +4122,24 @@ C ... and restart the table:
  non-parsible string of characters found where a numerical value is expected
  will be treated as missing data.
 
+4separator
+?set datafile separator
+?separator
+  The command `set datafile separator "<char>"` tell `gnuplot` that data fields
+  in subsequent input files are separated by <char> rather than by whitespace.
+  The most common use is to read in csv (comma-separated value) files written 
+  by spreadsheet or database programs. By default data fields are separated by 
+  whitespace.
+
+  Syntax:
+       set datafile separator {"<char>" | whitespace}
+
+  Examples:
+       # Input file contains tab-separated fields
+       set datafile separator "\t"
+
+       # Input file contains comma-separated values fields
+       set datafile separator ","
 3 decimalsign
 ?commands set decimalsign
 ?commands show decimalsign

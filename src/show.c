@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.98 2003/01/07 22:29:33 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.99 2003/01/25 11:27:37 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -149,7 +149,7 @@ static void show_locale __PROTO((void));
 static void show_loadpath __PROTO((void));
 static void show_fontpath __PROTO((void));
 static void show_zero __PROTO((void));
-static void show_missing __PROTO((void));
+static void show_datafile __PROTO((void));
 #ifdef USE_MOUSE
 static void show_mouse __PROTO((void));
 #endif
@@ -516,7 +516,7 @@ show_command()
 	show_zero();
 	break;
     case S_DATAFILE:
-	show_missing();
+	show_datafile();
 	break;
 #ifdef USE_MOUSE
     case S_MOUSE:
@@ -834,7 +834,7 @@ show_all()
     show_fontpath();
     show_locale();
     show_zero();
-    show_missing();
+    show_datafile();
 #ifdef USE_MOUSE
     show_mouse();
 #endif
@@ -2593,9 +2593,9 @@ show_zero()
 }
 
 
-/* process 'show missing' command */
+/* process 'show datafile' command */
 static void
-show_missing()
+show_datafile()
 {
     SHOW_ALL_NL;
 
@@ -2604,6 +2604,10 @@ show_missing()
     else
 	fprintf(stderr, "\t\"%s\" in datafile is interpreted as missing value\n",
 		missing_val);
+    if (df_separator != '\0')
+	fprintf(stderr, "\tdatafile fields separated by \"%c\"\n", df_separator);
+    else
+	fprintf(stderr, "\tdatafile fields separated by whitespace\n");
 }
 
 #ifdef USE_MOUSE

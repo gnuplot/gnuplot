@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.107 2003/01/07 22:29:31 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.108 2003/01/24 08:26:52 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -109,6 +109,7 @@ static void set_lmargin __PROTO((void));
 static void set_rmargin __PROTO((void));
 static void set_tmargin __PROTO((void));
 static void set_missing __PROTO((void));
+static void set_separator __PROTO((void));
 #ifdef USE_MOUSE
 static void set_mouse __PROTO((void));
 #endif
@@ -343,8 +344,10 @@ set_command()
 	case S_DATAFILE:
 	    if (almost_equals(++c_token,"miss$ing"))
 		set_missing();
+	    else if (almost_equals(c_token,"sep$arator"))
+		set_separator();
 	    else
-		int_error(c_token,"expecting `missing`");
+		int_error(c_token,"expecting datafile modifier");
 	    break;
 #ifdef USE_MOUSE
 	case S_MOUSE:
@@ -2073,6 +2076,26 @@ set_tmargin()
 }
 
 
+static void
+set_separator()
+{
+    c_token++;
+    if (END_OF_COMMAND)
+	df_separator = '\0';
+    else if (almost_equals(c_token,"white$space")) {
+	df_separator = '\0';
+	c_token++;
+    } else {
+	if (!isstring(c_token))
+	    int_error(c_token, "expected \"<separator_char>\"");
+	if (equals(c_token,"\"\\t\"") || equals(c_token,"\'\\t\'"))
+	    df_separator = '	';
+	else
+	    df_separator = input_line[token[c_token].start_index+1];
+	c_token++;
+    }
+}
+
 /* process 'set missing' command */
 static void
 set_missing()
@@ -2499,7 +2522,7 @@ set_palette_defined()
 
 
 /*  process 'set palette file' command  
- *  load a palette from file, honor datafile modiefiers
+ *  load a palette from file, honor datafile modifiers
  */
 static void
 set_palette_file()

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.43 2002/08/23 07:55:03 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.44 2002/10/05 02:59:33 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -200,6 +200,9 @@ struct udft_entry ydata_func;
 /* string representing missing values in ascii datafiles */
 char *missing_val = NULL;
 
+/* input field separator, NUL if whitespace is the separator */
+char df_separator = '\0';
+
 /* If any 'inline data' are in use for the current plot, flag this */
 TBOOLEAN plotted_data_from_stdin = FALSE;
 
@@ -324,6 +327,10 @@ df_tokenise(s)
      * and can understand fortran quad format
      */
 
+    TBOOLEAN in_string;
+
+#define NOTSEP (*s != df_separator)
+
     df_no_cols = 0;
 
     while (*s) {
@@ -335,11 +342,20 @@ df_tokenise(s)
 
 	/* have always skipped spaces at this point */
 	df_column[df_no_cols].position = s;
+	in_string = FALSE;
 
+	/* CSV files must accept numbers inside quotes also, so */
+	/* we step past the quote and any following whitespace. */
+	if (*s == '"' && df_separator != '\0') {
+	    in_string = TRUE;
+	    do ++s; while (isspace((unsigned char) *s));
+	    df_column[df_no_cols].position = s;
+	}
 	/* EAM - 19-Aug-2002 treat contents of a quoted string as single column */
-	if (*s == '"')
+	if (*s == '"') {
+	    in_string = !in_string;
 	    df_column[df_no_cols].good = DF_MISSING;
-	else
+	} else
 
 	if (check_missing(s))
 	    df_column[df_no_cols].good = DF_MISSING;
@@ -389,21 +405,25 @@ df_tokenise(s)
 #ifndef NO_FORTRAN_NUMS
 		count = sscanf(s, "%lf%n", &df_column[df_no_cols].datum, &used);
 #else
-		while (isspace((unsigned char) *s))
+		while (isspace((unsigned char) *s) && NOTSEP)
 		    ++s;
-		count = *s ? 1 : 0;
+		count = (*s && NOTSEP) ? 1 : 0;
 		df_column[df_no_cols].datum = atof(s);
 #endif /* NO_FORTRAN_NUMS */
 	    } else {
 		/* skip any space at start of column */
 		/* HBB tells me that the cast must be to
 		 * unsigned char instead of int. */
-		while (isspace((unsigned char) *s))
+		while (isspace((unsigned char) *s) && NOTSEP)
 		    ++s;
-		count = *s ? 1 : 0;
+		count = (*s && NOTSEP) ? 1 : 0;
 		/* skip chars to end of column */
 		used = 0;
-		while (!isspace((unsigned char) *s) && (*s != NUL))
+		if (df_separator != '\0' && in_string) {
+		    do ++s; while (*s && *s != '"');
+		    in_string = FALSE;
+		}
+		while (!isspace((unsigned char) *s) && (*s != NUL) && NOTSEP)
 		    ++s;
 	    }
 
@@ -434,21 +454,29 @@ df_tokenise(s)
 	++df_no_cols;
 
 	/* EAM - 19 Aug 2002 If we are in a quoted string, skip to end of quote */
-	if ((unsigned char) *s == '"') {
+	if (in_string) {
 	    do s++;  while (*s && (unsigned char) *s != '"');
 	}
-	
-	/*{{{  skip chars to end of column */
+
+	/* skip to 1st character past next separator */
+	if (df_separator != '\0') {
+	    while (*s && NOTSEP)
+		++s;
+	    if (*s == df_separator)
+		/* skip leading whitespace in next field */
+		do ++s; while (*s && isspace((unsigned char) *s) && NOTSEP);
+	} else {
+	/* skip chars to end of column */
 	while ((!isspace((unsigned char) *s)) && (*s != '\0'))
 	    ++s;
-	/*}}} */
-	/*{{{  skip spaces to start of next column */
+	/* skip spaces to start of next column */
 	while (isspace((unsigned char) *s))
 	    ++s;
-	/*}}} */
+	}
     }
 
     return df_no_cols;
+#undef NOTSEP
 }
 
 /*}}} */

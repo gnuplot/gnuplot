@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.47 2002/12/28 06:13:27 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.48 2003/01/07 22:29:35 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -268,8 +268,8 @@ unset_command()
 	unset_tmargin();
 	break;
     case S_DATAFILE:
-	/* EAM - in the future there will be more datafile settings to clear */
 	unset_missing();
+	df_separator = '\0';
 	break;
 #ifdef USE_MOUSE
     case S_MOUSE:
@@ -1014,7 +1014,7 @@ unset_tmargin()
 }
 
 
-/* process 'unset missing' command */
+/* process 'unset datafile' command */
 static void
 unset_missing()
 {
@@ -1561,6 +1561,8 @@ reset_command()
 #endif
 
     unset_missing();
+    df_separator = '\0';
+
     unset_locale();
     unset_loadpath();
     unset_fitlogfile();
