@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: cgm.trm,v 1.59 2004/07/02 23:58:40 sfeam Exp $
+ * $Id: cgm.trm,v 1.60 2004/07/04 23:58:47 sfeam Exp $
  */
 
 /* GNUPLOT - cgm.trm */
@@ -1733,7 +1733,7 @@ START_HELP(cgm)
 " Each color must be of the form 'xrrggbb', where x is the literal",
 " character 'x' and 'rrggbb' are the red, green and blue components in",
 " hex.  For example, 'x00ff00' is green.  The background color is set",
-" first, then the plotting colors."
+" first, then the plotting colors.",
 "",
 " Examples:",
 "       set terminal cgm landscape color rotate dashed width 432 \\",
@@ -1892,7 +1892,7 @@ START_HELP(cgm)
 "       plot ...",
 "       set output",
 "",
-" You cannot introduce a new font in a `set label` command."
+" You cannot introduce a new font in a `set label` command.",
 
 "2 fontsize",
 "?commands set terminal cgm fontsize",

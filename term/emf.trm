@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: emf.trm,v 1.20 2004/07/01 17:10:13 broeker Exp $
+ * $Id: emf.trm,v 1.21 2004/07/08 12:02:24 broeker Exp $
  */
 
 /* GNUPLOT - emf.trm */
@@ -1064,7 +1064,7 @@ START_HELP(emf)
 "?term emf",
 "?emf",
 " The `emf` terminal generates an Enhanced Metafile Format file.  This file",
-" format is the metafile standard on MS Win32 Systems"
+" format is the metafile standard on MS Win32 Systems.",
 "",
 " Syntax:",
 "       set terminal emf {<color>} {solid | dashed}",

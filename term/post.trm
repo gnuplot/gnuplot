@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.124 2004/09/01 15:53:50 mikulik Exp $
+ * $Id: post.trm,v 1.125 2004/09/02 02:53:42 sfeam Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -3184,12 +3184,13 @@ START_HELP(post)
 " Several options may be set in the `postscript` driver.",
 "",
 " Syntax:",
-"       set terminal postscript {<mode>} {ai} {enhanced | noenhanced}",
+"       set terminal postscript {<mode>} {enhanced | noenhanced}",
 "                               {color | colour | monochrome}",
 "                               {blacktext | colortext | colourtext}",
 "                               {solid | dashed} {dashlength | dl <DL>}",
 "                               {linewidth | lw <LW>}",
 "                               {<duplexing>}",
+"                               {level1}",
 "                               {rounded | butt}",
 "                               {fontfile [add | delete] \"<filename>\"}",
 "                               {palfuncparam <samples>{,<maxdeviation>}}",
@@ -3222,7 +3223,7 @@ START_HELP(post)
 " `\"<fontname>\"` is the name of a valid PostScript font; and `<fontsize>` is",
 " the size of the font in PostScript points.",
 " In addition to the standard postscript fonts, an oblique version of the",
-" Symbol font, useful for mathematics, is defined. It is called"
+" Symbol font, useful for mathematics, is defined. It is called",
 " \"Symbol-Oblique\".",
 "",
 " `default` mode sets all options to their defaults: `landscape`, `monochrome`,",

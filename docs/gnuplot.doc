@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.236 2004/08/23 09:41:06 lhecking Exp $
+C RCS $Id: gnuplot.doc,v 1.237 2004/09/01 15:53:45 mikulik Exp $
 C 18 September 2001
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -2636,7 +2636,7 @@ C ... and restart the table:
  There are global default settings for the various binary options which may
  be set using the same syntax as the options when used as part of the `(s)plot
  <filename> binary ...` command.  This syntax is `set datafile binary ...`.
- The general rule is that commen command-line specified parameters override
+ The general rule is that common command-line specified parameters override
  file-extracted parameters which override default parameters.
 
  Matrix binary is the default binary format when no keywords specific to
@@ -2665,6 +2665,7 @@ C ... and restart the table:
  for which details about the file must be given at the command line.
 
  See `binary matrix` or `binary general` for more details.
+4 binary general
 ?commands plot datafile binary general
 ?commands splot datafile binary general
 ?plot binary general
@@ -2906,7 +2907,7 @@ C ... and restart the table:
                  is inherently not three-dimensional, logical rules are
                  used to place the data in three-space.  (E.g., usually
                  setting the z-dimension value to zero and placing 2D
-                 data in the x-y plane.
+                 data in the x-y plane.)
  
  Examples:
 
@@ -2915,7 +2916,7 @@ C ... and restart the table:
        plot '<file_name>' binary format="%float%*float" using 1:2 with lines
 
        # The data file header contains all details necessary for creating
-       # coordinates from and EDF file.
+       # coordinates from an EDF file.
        plot '<file_name>' binary filetype=edf with image
        plot '<file_name>.edf' binary filetype=auto with image
 
@@ -7909,7 +7910,7 @@ C ... and restart the table:
  The coordinate of each data point of an image will lie at the center of a
  pixel.  That is, an M x N set of data will form an image with M x N pixels.
  This is slightly different than pm3d elements where an M x N set of data
- will form a surface of M-1 x N-1 elements.  The scan directions for the
+ will form a surface of (M-1) x (N-1) elements.  The scan directions for the
  image data grid can be any of eight possible combinations.
 
  Currently only the following terminal drivers support data matrix images:
@@ -9387,7 +9388,7 @@ C ... and restart the table:
 
  It is no longer necessary to specify `parametric` mode for three-column
  `splot`s.
-4 binary
+4 binary matrix
 ?commands plot datafile binary matrix
 ?commands splot datafile binary matrix
 ?plot datafile matrix binary
@@ -9518,7 +9519,7 @@ C ... and restart the table:
 ?datafile matrix
 ?matrix
  The `matrix` flag indicates that the file data (ASCII or binary) are stored
- in matrix format.  The formats are slightly different amonsgt these two.  For
+ in matrix format.  The formats are slightly different amongst these two.  For
  details, see `matrix ascii` or `matrix binary`.
 3 grid_data
 ?commands splot grid_data

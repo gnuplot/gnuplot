@@ -1,3 +1,8 @@
+2004-09-09  Shigeharu Takeno  <shige@iee.niit.ac.jp>
+
+	* docs/gnuplot.doc, term/cgm.trm, term/eepic.trm, term/emf.trm,
+	term/epslatex.trm, term/post.trm: Fix misprints in gnuplot manual (#15).
+
 2004-09-07  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/gplt_x11.c (process_event) term/x11.trm: Provide a command line
