@@ -62,30 +62,31 @@
 #    define PROTOTYPES
 #   endif
 #   ifndef HAVE_STRINGIZE
-#    define HAVE_STRINGIZE
+#    ifndef VAXC	   /* not quite ANSI_C */
+#     define HAVE_STRINGIZE
+#    endif
 #   endif
 #  endif /* ANSI_C ... */
-
-/* used to be __P but it was just too difficult to guess whether
- * standard headers define it. It's not as if the defn is
- * particularly difficult to do ourselves...
- */
-#  ifdef PROTOTYPES
-#   define __PROTO(proto) proto
-#  else
-#   define __PROTO(proto) ()
-#  endif
-
-
-/* generic pointer type. For old compilers this has to be changed to char *,
- * but I don't know if there are any CC's that support void and not void *
- */
-#  define generic void
 
 #  ifndef ANSI_C
 #   define const
 #  endif
 
 # endif /* !HAVE_CONFIG_H */
+
+/* used to be __P but it was just too difficult to guess whether
+ * standard headers define it. It's not as if the defn is
+ * particularly difficult to do ourselves...
+ */
+# ifdef PROTOTYPES
+#  define __PROTO(proto) proto
+# else
+#  define __PROTO(proto) ()
+# endif
+
+/* generic pointer type. For old compilers this has to be changed to char *,
+ * but I don't know if there are any CC's that support void and not void *
+ */
+#  define generic void
 
 #endif /* ANSI_CHECK_H */
