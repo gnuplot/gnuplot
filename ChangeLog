@@ -1,3 +1,89 @@
+2001-02-19  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/win/wgraph.c (ruler, zoombox): Gave anonymous structs a
+ 	name.
+	(zoombox): Added string pointers for texts to be shown at corners
+ 	of the rubberband rectangle while zooming.
+	(everywhere): Lots of prototypes for static functions
+ 	added. Flagged all internal functions as 'static'. Comments added
+ 	and cleaned up. Stylistic changes.
+	(GWOPMAX): Moved here, from wgnuplot.h; only used inside this
+ 	module.
+	(GraphOp, Graph_put_tmptext, Graph_set_clipboard): Turned string
+ 	argument into to LPCSTR, i.e. pointers to const char, in Windows
+ 	parlance.
+	(GraphEnd) [USE_MOUSE]: Don't call DrawRuler from here.
+	(MakePens): Removed code no longer needed since the PM3D stuff
+ 	forced dynamic pen creation.
+	(Wnd_GetTextSize): New function. Isolated fragment from
+ 	MakeFont(), for re-use by mouseing functions.
+	(MakeFonts): Call new Wnd_GetTextSize().
+	(MakeFonts): Use TRUE and FALSE instead of 1 and 0 to asssing
+ 	states of lpgw->rotate.
+	(DestroyCursors): Replaced missing implementation by single
+ 	'return;' statement: the function has nothing to do, as it turns
+ 	out.
+	(drawgraph): If 'hdc' is a handle of a Metafile, GetDeviceCaps()
+ 	reports wrong results, leading to monochrome-only clipboard
+ 	contents. Assume colored output unless 'color' element in LPGW is
+ 	FALSE, for Metafiles.
+	(Wnd_exec_event): Compute difference of GetMessageTime() results
+ 	from one call to the next, so we should be able to tell
+ 	doubleclicks from single ones. Removed now-pointless parameter
+ 	'par2'.
+	(WndGraphProc): Moved static variable last_modifier_mask up to
+ 	function scope. It has to be visible to from different message
+ 	handling cases.
+	(WndGraphProc) [USE_MOUSE + WM_KEYUP]: Handle key-up events of
+ 	modifier keys, too.
+	(WndGraphProc) [USE_MOUSE + WM_KEYDOWN]: <Shift> and <Ctrl>
+ 	checking repaired. I haven't tested <Alt> yet.
+	(WndGraphProc) [WM_COMMAND + USE_MOUSE]: Don't call DrawRuler()
+ 	from here.
+	(WndGraphProc) [WM_PAINT + USE_MOUSE]: Re-paint all mouse
+ 	decorations of the plotwindow here, directly after the call to
+ 	drawgraph() has overwritten window contents.
+	(Graph_put_tmptext): Implemented cases 1 and 2 of the 'where'
+ 	argument by strdup'ing the texts over into the zoombox struct.
+  	Update by calling DrawZoombox() before and after that.
+	(Graph_set_clipboard): Implemented.
+	(Draw_XOR_Text): New function. Implements true XOR text output via
+ 	a temporary bitmap, and an XOR-ing BitBlt() operation.
+	(DisplayStatusLine): Replaced previous, half-cooked version by
+ 	call of Draw_XOR_Text(). Removed argument 'erase'.
+	(UpdateStatusLine) [ENABLE_STATUS_LINE_RESIZE]: Threw out all the
+ 	chunks of this #ifdef version. This should be implemented in the
+ 	gnuplot core, instead.
+	(DrawZoomBox): Added implementation of corner label strings for
+ 	the zoom box. Uses Draw_XOR_Text() twice for each two-line string.
+  	Also found and implemented a way to draw the zoombox in dashed
+ 	lines --- actually: in 'linetype 0', which is normally used for
+ 	zeroaxes and gridlines.
+	
+	* src/win/wgnuplib.h (WGNUPLOTVERSION): Internal protocol version
+ 	number bumped by 0.1, with timestamp of yesterday, for all the
+ 	mouseing stuff and some other change I made while being at it.
+	(all over the place): Comments added and cleaned up.
+	(GWOPMAX): Moved out of here, over to wgraph.c.
+	(struct GW): Removed unused elements numsolid, hbpen, hpen[] and
+ 	hsolidpen[].
+	(GraphOp, Graph_put_tmptext, Graph_set_clipboard): Prototype
+ 	updated.
+
+	* src/gpexecute.c: Changed all PIPE_IPC || WIN_IPC conditionals
+ 	into PIPE_IPC, only. Windows doesn't actually use the stack of
+ 	mouse events implemented by these hungs.
+	(gp_exec_event) [WIN_IPC]: A big FIXME comment regarding
+ 	separation issues between wgnuplot.dll and wgnuplot.exe.
+
+	* src/command.c (winsystem) [_Windows] : made local variable 'p' a
+ 	pointer to constant char. That's LPCSTR, in Windows jargon.
+
+	* src/color.h (filled_polygon_3dcoords): GPHUGE attribute
+ 	specifier added to prototype
+
+	* term/svg.trm (SVG_PathLimit): Prototype added.
+
 2001-02-15  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/win/wtext.h: Added #include <stdarg.h> needed to declare
