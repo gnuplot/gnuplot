@@ -1,3 +1,23 @@
+2004-12-20  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* pm.trm (PM_set_color): Reflect recent changes of parameters in term
+	entries.
+
+	* gnupmdrv.h gclient.c: gnupmdrv.c and gclient.c both used to define
+	variable bWidelLines, but it should be the same one. This patch adds
+	an 'external' declaration in gnupmdrv.h, and removes the definition
+	from gclient.c.
+
+	* gclient.c: Within GnuplotPM  "Options->Gnuplot docs...", it did not
+	open gnuplot.inf when using NewView, a widely used view.exe
+	replacement. Replaced the fixed sized buffer solution with code using
+	a dynamic buffer.
+
+	* gclient.c: This fixes text rotation for the pm terminal. The
+	variable bHorz, which used to indicate horizontal text, has now been
+	removed completely. Now pm terminal behaves similar to the postscript
+	terminal.
+
 2004-12-15  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/parse.c (push_vars): Conditionalize definition on GP_ISVAR.
