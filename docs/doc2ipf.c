@@ -53,8 +53,8 @@ static char *RCSid = "$Id: doc2ipf.c,v 1.20 1998/04/14 00:16:59 drd Exp $";
 
 #include "ansichek.h"
 #include "stdfn.h"
+#include "xref.h"
 
-#define MAX_LINE_LEN    1023
 #define MAX_COL 6
 #ifdef TRUE
 # undef TRUE
@@ -63,8 +63,13 @@ static char *RCSid = "$Id: doc2ipf.c,v 1.20 1998/04/14 00:16:59 drd Exp $";
 #define TRUE 1
 #define FALSE 0
 
-#include "termdoc.c"
-#include "xref.c"
+/* Replase the previous #ifdef */
+int single_top_level = 0;
+
+/* We are using the fgets() replacement from termdoc.c */
+extern char *get_line __PROTO((char *, int, FILE *));
+/* From xref.c */
+extern void *xmalloc __PROTO((size_t));
 
 void convert __PROTO((FILE * a, FILE * b));
 void process_line __PROTO((char *line, FILE * b));
@@ -76,12 +81,10 @@ struct TABENTRY {		/* may have MAX_COL column tables */
     char col[MAX_COL][256];
 };
 
-struct TABENTRY table =
-{NULL};
+struct TABENTRY table = { NULL };
 struct TABENTRY *tableins = &table;
 int tablecols = 0;
-int tablewidth[MAX_COL] =
-{0, 0, 0, 0, 0, 0};		/* there must be the correct */
+int tablewidth[MAX_COL] = {0, 0, 0, 0, 0, 0};	/* there must be the correct */
 int tablelines = 0;		/* number of zeroes here */
 
 int debug = FALSE;
@@ -98,20 +101,22 @@ char **argv;
 
     if (argc != 3 && !debug) {
 	fprintf(stderr, "Usage: %s infile outfile\n", argv[0]);
-	return (1);
+	exit(EXIT_FAILURE);
     }
     if ((infile = fopen(argv[1], "r")) == (FILE *) NULL) {
 	fprintf(stderr, "%s: Can't open %s for reading\n",
 		argv[0], argv[1]);
-	return (1);
+	exit(EXIT_FAILURE);
     }
     if ((outfile = fopen(argv[2], "w")) == (FILE *) NULL) {
 	fprintf(stderr, "%s: Can't open %s for writing\n",
 		argv[0], argv[2]);
+	fclose(infile);
+	exit(EXIT_FAILURE);
     }
     parse(infile);
     convert(infile, outfile);
-    return (0);
+    exit(EXIT_SUCCESS);
 }
 
 void convert(a, b)
@@ -174,12 +179,12 @@ FILE *b;
     nblanks = 0;
     while (line[nblanks] == ' ')
 	++nblanks;
-    while (line[i] != '\0') {
+    while (line[i] != NUL) {
 	if (introffheader) {
 	    if (line[i] != '\n')
 		line2[j] = line[i];
 	    else
-		line2[j] = '\0';
+		line2[j] = NUL;
 	} else
 	    switch (line[i]) {
 	    case '$':
@@ -275,7 +280,7 @@ FILE *b;
 		fprintf(stderr, "Possible missing link character (`) near above line number\n");
 	    abort();
 	}
-	line2[j] = '\0';
+	line2[j] = NUL;
     }
 
     i = 1;
@@ -364,7 +369,7 @@ FILE *b;
 		tabledelim[1] = tablechar;
 		line2[0] = tablechar;
 		while ((pt = strtok(tablerow, tabledelim + 1)) != NULL) {
-		    if (*pt != '\0') {	/* ignore null columns */
+		    if (*pt != NUL) {	/* ignore null columns */
 			/* this fails on format line */
 			assert(j < MAX_COL);
 			strcpy(tableins->col[j], pt);
@@ -378,7 +383,7 @@ FILE *b;
 		    }
 		}
 		for (j; j < MAX_COL; j++)
-		    tableins->col[j][0] = '\0';
+		    tableins->col[j][0] = NUL;
 	    }
 	    break;		/* ignore */
 	}

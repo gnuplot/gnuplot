@@ -56,7 +56,7 @@
 #include "ansichek.h"
 #include "stdfn.h"
 
-#define MAX_LINE_LEN	256
+#define MAX_LINE_LEN	255
 #ifdef TRUE
 # undef TRUE
 # undef FALSE
@@ -77,7 +77,7 @@ int main(argc, argv)
 int argc;
 char **argv;
 {
-    char line[MAX_LINE_LEN + 1];
+    char line[MAX_LINE_LEN+1];
     FILE *infile;
     FILE *outfile;
 

@@ -56,10 +56,9 @@
 
 #include "ansichek.h"
 #include "stdfn.h"
-#include "xref.h"
 
-#undef MAX_LINE_LEN
 #define MAX_LINE_LEN    255
+#include "xref.h"
 
 struct BUFFER {			/* buffer to reformat paragraphs with xrefs */
     char *content;

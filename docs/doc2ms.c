@@ -285,7 +285,7 @@ FILE *file;
 {
     static boolean inquote = FALSE;
 
-    while (*s != '\0') {
+    while (*s != NUL) {
 	switch (*s) {
 	case '`':{		/* backquote -> boldface */
 		if (inquote) {
