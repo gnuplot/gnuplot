@@ -1,3 +1,10 @@
+2003-07-07  Ethan Merritt <merritt@u.washington.edu>
+
+	* src/gplt_x11.c: Detect request for illegal window number and
+	treat it as window number 0.
+
+	* term/x11.trm: Detect missing font name during "set term x11".
+
 2003-07-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/command.c (do_string_replot): Minor simplification: use

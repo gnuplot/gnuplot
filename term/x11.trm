@@ -1,5 +1,5 @@
 /*
- * $Id: x11.trm,v 1.74 2003/06/25 18:01:24 sfeam Exp $
+ * $Id: x11.trm,v 1.75 2003/07/05 02:51:23 sfeam Exp $
  *
  */
 
@@ -360,6 +360,8 @@ X11_options()
 	    break;
 	case X11_FONT:
 	    c_token++;
+	    if (END_OF_COMMAND)
+		int_error(c_token, "expecting font name");
 	    if (isstring(c_token))
 		quote_str( X11_default_font, c_token, sizeof(X11_default_font) );
 	    else
