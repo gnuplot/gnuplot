@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.70 2003/07/05 02:51:21 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.71 2003/07/07 11:36:56 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -371,18 +371,21 @@ do_line()
 
 void
 do_string(s)
-char *s;
+    char *s;
 {
-    char *orig_input_line = gp_alloc(strlen(input_line)+1, "do_string");
-    strcpy(orig_input_line, input_line);
-    while (input_line_len < strlen(s)+1)
+    char *orig_input_line = gp_strdup(input_line);
+
+    while (input_line_len < strlen(s) + 1)
 	extend_input_line();
+
 #ifdef USE_MOUSE
     if (display_ipc_commands())
 	fprintf(stderr, "%s\n", s);
 #endif
+
     do_line();
-    strcpy(input_line,orig_input_line);
+
+    strcpy(input_line, orig_input_line);
     free(orig_input_line);
 }
 

@@ -3,6 +3,7 @@
 	* src/command.c (do_string_replot): Minor simplification: use
  	gp_strdup() to duplicate current input_line string.  Add some
 	blanks as per CodeStyle document.
+	(do_string): Likewise.
 
 2003-07-04  Ethan Merritt <merritt@u.washington.edu>
 
