@@ -1,6 +1,6 @@
 ############################################################
 #
-# $Id: Makefile.in,v 1.42.2.15 2002/01/26 18:55:01 lhecking Exp $
+# $Id: Makefile.in,v 1.42.2.16 2002/02/25 19:39:05 lhecking Exp $
 #
 # GNUPLOT Makefile.in for autoconf (Unix X11 support)
 # Adapted from makefile.unx by djm@gnu.ai.mit.edu
@@ -166,7 +166,7 @@ W=$(srcdir)/win/
 #<<<makefile.all>>>
 ########################################################
 #
-# $Id: Makefile.in,v 1.42.2.15 2002/01/26 18:55:01 lhecking Exp $
+# $Id: Makefile.in,v 1.42.2.16 2002/02/25 19:39:05 lhecking Exp $
 #
 ########################################################
 #
@@ -289,7 +289,7 @@ DEMOS = $(M)1.dat $(M)2.dat $(M)3.dat $(M)airfoil.dem $(M)all.dem \
 	$(M)whale.dat $(M)world.cor $(M)world.dat $(M)world.dem
 
 ETC =   0BUGS 0FAQ 0INSTALL 0PORTING 0README ChangeLog CodeStyle Copyright \
-	INSTALL.gnu Makefile.in NEWS PGPKEYS TODO acconfig.h $(ACLOCAL_M4) \
+	INSTALL.gnu Makefile.in NEWS PGPKEYS TODO $(ACLOCAL_M4) \
 	amiga.c buildvms.com commitvers $(CONFIG_HEADER_IN) configure \
 	configure.in configure.vms corgraph.asm corplot.c ctrl87.c ctrl87.h \
 	djconfig.sh errorfix.sh genopt.com gnuplot.def gnuplot.el gnuplot.opt \
@@ -450,7 +450,7 @@ stamp-h: $(srcdir)/$(CONFIG_HEADER_IN) $(top_builddir)/config.status
 	@echo timestamp > stamp-h
 
 $(srcdir)/$(CONFIG_HEADER_IN): stamp-h.in
-$(srcdir)/stamp-h.in: $(top_srcdir)/configure.in $(ACLOCAL_M4) acconfig.h
+$(srcdir)/stamp-h.in: $(top_srcdir)/configure.in $(ACLOCAL_M4)
 	cd $(top_srcdir) && $(AUTOHEADER)
 	@echo timestamp > $(srcdir)/stamp-h.in
 
