@@ -124,7 +124,7 @@ static FILE *X11_ipc;
 #ifdef OS2
 static char X11_command[1024] = "gnuplot_x11.exe";
 #else
-static char X11_command[1024] = "gnuplot_x11";
+static char X11_command[1024] = "exec gnuplot_x11";
 #endif
 
 /*   X11_args - scan gnuplot command line for standard X Toolkit options
