@@ -1,4 +1,55 @@
+1999-05-31  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* aclocal.m4, configure: Regenerated.
+
+	* m4/apple.m4: Remove unnecessary line.
+
+	* src/Makefile.maint: Cosmetic changes.
+
+	* src/alloc.c, src/binary.c, src/bitmap.c, src/command.c,
+	src/datafile.c, src/eval.c, src/fit.c, src/graphics.c, src/hidden3d.c,
+	src/internal.c, src/interpol.c, src/misc.c, src/parse.c, src/plot.c,
+	src/plot2d.c, src/plot3d.c, src/readline.c, src/scanner.c, src/set.c,
+	src/show.c, src/standard.c, src/term.c, src/util.c, term/atariaes.trm,
+	term/atarivdi.trm, term/cgi.trm, term/emxvga.trm, term/epson.trm,
+	term/fig.trm, term/gif.trm, term/hp500c.trm, term/hpgl.trm,
+	term/hpljii.trm, term/hppj.trm, term/imagen.trm, term/iris4d.trm,
+	term/linux.trm, term/multitos.trm, term/pbm.trm, term/png.trm,
+	term/rgip.trm, term/tgif.trm, term/x11.trm: Adjust calls to
+	os_error(), int_error() and int_warn() to new prototype declaration.
+
+	* src/help.c: Replace calls to malloc() with gp_alloc().
+
+	* src/protos.h: New prototype declarations for os_error(), int_error()
+	and int_warn().
+
+	* src/util.c(is_notempty): Return FALSE if token is not a string.
+
+	* src/util.c: Error and warning functions os_error(), int_error()
+	and int_warn() are now variadic if supported by the runtime. This
+	eliminates about a dozen small static arrays throughout the sources.
+	Code more readable now with some new macros.
+
 1999-05-30  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* config.hin, configure: Regenerated.
+
+1999-05-30  "Mark K. Gardner"  <mkgardne@rtsl3.cs.uiuc.edu>
+
+	* README.exp, configure.in, src/help.c: Format help and subtopic
+	tables by row or column.
+
+1999-05-30  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* config/buildvms.com, config/makefile.286, config/makefile.amg,
+	config/makefile.ami, config/makefile.dj2, config/makefile.djg,
+	config/makefile.emx, config/makefile.g, config/makefile.msc,
+	config/makefile.msw, config/makefile.mto, config/makefile.st,
+	config/makefile.tc, config/makefile.unx, config/makefile.vms,
+	config/makefile.wc, config/makefile.win, config/makefile.ztc: Added
+	rules for new files variable.[ch].
+
+	* config/term_pc.h: Fix typo.
 
 	* demo/Makefile.am.in: Demonstrate use of GNUPLOT_LIB variable in
 	check-interactive and check-noninteractive targets.

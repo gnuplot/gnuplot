@@ -15,6 +15,10 @@ Changes in release 3.7.1:
   Newlines in the output produced by the spawned command are
   stripped. They are NOT replaced with blanks anymore. This is
   a possible source of incompatibility.
+* CHANGE gnuplot's error and warning functions now accept a
+  variable number of arguments. On platforms without vfprintf
+  or doprnt, the number of format-dependent arguments is
+  limited to 8.
 
 [3.7.0.6]
 * Petr Mikulik's OS/2 mouse patch integrated
