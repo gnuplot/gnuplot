@@ -1,3 +1,8 @@
+2005-03-16  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/datafile.c (df_readline): Allow for embedded whitespace in the
+	output of a string-valued expression inside a "using" spec.
+
 2005-03-16  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/axis.h (AXIS_ACTUAL_MAX, AXIS_ACTUAL_MIN): New macros to

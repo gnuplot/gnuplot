@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.73 2005/03/06 01:15:58 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.74 2005/03/06 23:35:01 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -1886,9 +1886,16 @@ df_readline(double v[], int max)
 			return DF_UNDEFINED;	/* store undefined point in plot */
 
 #if defined(GP_STRING_VARS) && defined(EAM_DATASTRINGS)
+		    /* This string value will get parsed as if it were a data column */
+		    /* so put it in quotes to allow embedded whitespace.             */
 		    if (use_spec[output].expected_type == CT_STRING && a.type == STRING) {
+			char *s = gp_alloc(strlen(a.v.string_val)+3,"quote");
+			*s = '"';
+			strcpy(s+1, a.v.string_val);
+			strcat(s, "\"");
+			free(a.v.string_val);
 			free(df_stringexpression[output]);
-			df_tokens[output] = df_stringexpression[output] = a.v.string_val;
+			df_tokens[output] = df_stringexpression[output] = s;
 		    } else
 #endif
 		    v[output] = real(&a);
