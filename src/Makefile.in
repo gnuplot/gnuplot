@@ -1,6 +1,6 @@
-# Makefile.in generated automatically by automake 1.4c from Makefile.am
+# Makefile.in generated automatically by automake 1.5 from Makefile.am.
 
-# Copyright 1994, 1995, 1996, 1997, 1998, 1999, 2000
+# Copyright 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001
 # Free Software Foundation, Inc.
 # This Makefile.in is free software; the Free Software Foundation
 # gives unlimited permission to copy and/or distribute it,
@@ -10,6 +10,13 @@
 # but WITHOUT ANY WARRANTY, to the extent permitted by law; without
 # even the implied warranty of MERCHANTABILITY or FITNESS FOR A
 # PARTICULAR PURPOSE.
+
+@SET_MAKE@
+
+
+# makefile.all generated automatically by GNU make
+
+# List of core object files except version.$(O)
 
 SHELL = @SHELL@
 
@@ -31,11 +38,9 @@ infodir = @infodir@
 mandir = @mandir@
 includedir = @includedir@
 oldincludedir = /usr/include
-
 pkgdatadir = $(datadir)/@PACKAGE@
 pkglibdir = $(libdir)/@PACKAGE@
 pkgincludedir = $(includedir)/@PACKAGE@
-
 top_builddir = ..
 
 ACLOCAL = @ACLOCAL@
@@ -47,33 +52,28 @@ INSTALL = @INSTALL@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
-INSTALL_STRIP_FLAG =
+INSTALL_HEADER = $(INSTALL_DATA)
 transform = @program_transform_name@
-
 NORMAL_INSTALL = :
 PRE_INSTALL = :
 POST_INSTALL = :
 NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
-
-@SET_MAKE@
-AMDEP = @AMDEP@
 AMTAR = @AMTAR@
 AWK = @AWK@
 CC = @CC@
 CPP = @CPP@
-CXX = @CXX@
-CXXCPP = @CXXCPP@
 DEPDIR = @DEPDIR@
 DVIPS = @DVIPS@
 EMACS = @EMACS@
-GNUPLOT_X11 = @GNUPLOT_X11@
+EXEEXT = @EXEEXT@
+INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
 LASERGNU = @LASERGNU@
 LATEX = @LATEX@
 LIBRARIES_FOR_X = @LIBRARIES_FOR_X@
 LINUXSUID = @LINUXSUID@
-MAKEINFO = @MAKEINFO@
+OBJEXT = @OBJEXT@
 PACKAGE = @PACKAGE@
 PDFLATEX = @PDFLATEX@
 PLAINTEX = @PLAINTEX@
@@ -83,13 +83,17 @@ TROFF = @TROFF@
 TUTORIAL = @TUTORIAL@
 U = @U@
 VERSION = @VERSION@
+X_CFLAGS = @X_CFLAGS@
+X_EXTRA_LIBS = @X_EXTRA_LIBS@
+X_LIBS = @X_LIBS@
+X_PRE_LIBS = @X_PRE_LIBS@
+am__include = @am__include@
+am__quote = @am__quote@
 install_sh = @install_sh@
 
 
-# makefile.all generated automatically by GNU make
-
-# List of core object files except version.$(O)
-
+# There is probably no need to edit anything below this line
+GNUPLOT_X11 = @GNUPLOT_X11@
 
 AUTOMAKE_OPTIONS = ansi2knr foreign 1.2h
 
@@ -98,10 +102,6 @@ EMAIL = bug-gnuplot@dartmouth.edu
 
 # Default help file location
 HELPFILE = $(datadir)/gnuplot.gih
-
-# There is probably no need to edit anything below this line
-
-GNUPLOT_X11 = @GNUPLOT_X11@
 EXTRA_PROGRAMS = gnuplot_x11
 bin_PROGRAMS = gnuplot $(GNUPLOT_X11)
 noinst_PROGRAMS = bf_test
@@ -132,7 +132,7 @@ gnuplot_x11_LDADD = $(XLIBS)
 
 bf_test_SOURCES = bf_test.c binary.c alloc.c
 
-@BUILD_SRC_BEOS_SUBDIR_TRUE@d_beos = @BUILD_SRC_BEOS_SUBDIR_TRUE@beos
+@BUILD_SRC_BEOS_SUBDIR_TRUE@d_beos = beos
 
 SUBDIRS = $(d_beos)
 
@@ -177,279 +177,344 @@ $(T)xlib.trm
 
 subdir = src
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
-CONFIG_HEADER = ../config.h
-CONFIG_CLEAN_FILES = 
-PROGRAMS =  $(bin_PROGRAMS) $(noinst_PROGRAMS)
+CONFIG_HEADER = $(top_builddir)/config.h
+CONFIG_CLEAN_FILES =
+EXTRA_PROGRAMS = gnuplot_x11$(EXEEXT)
+bin_PROGRAMS = gnuplot$(EXEEXT) @GNUPLOT_X11@
+noinst_PROGRAMS = bf_test$(EXEEXT)
+PROGRAMS = $(bin_PROGRAMS) $(noinst_PROGRAMS)
 
+am_bf_test_OBJECTS = bf_test$U.$(OBJEXT) binary$U.$(OBJEXT) \
+	alloc$U.$(OBJEXT)
+bf_test_OBJECTS = $(am_bf_test_OBJECTS)
+bf_test_LDADD = $(LDADD)
+bf_test_DEPENDENCIES =
+bf_test_LDFLAGS =
+am_gnuplot_OBJECTS = alloc$U.$(OBJEXT) axis$U.$(OBJEXT) \
+	binary$U.$(OBJEXT) bitmap$U.$(OBJEXT) color$U.$(OBJEXT) \
+	command$U.$(OBJEXT) contour$U.$(OBJEXT) datafile$U.$(OBJEXT) \
+	dynarray$U.$(OBJEXT) eval$U.$(OBJEXT) fit$U.$(OBJEXT) \
+	gadgets$U.$(OBJEXT) getcolor$U.$(OBJEXT) graph3d$U.$(OBJEXT) \
+	graphics$U.$(OBJEXT) help$U.$(OBJEXT) hidden3d$U.$(OBJEXT) \
+	history$U.$(OBJEXT) internal$U.$(OBJEXT) interpol$U.$(OBJEXT) \
+	matrix$U.$(OBJEXT) misc$U.$(OBJEXT) mouse$U.$(OBJEXT) \
+	parse$U.$(OBJEXT) plot$U.$(OBJEXT) plot2d$U.$(OBJEXT) \
+	plot3d$U.$(OBJEXT) pm3d$U.$(OBJEXT) readline$U.$(OBJEXT) \
+	save$U.$(OBJEXT) scanner$U.$(OBJEXT) set$U.$(OBJEXT) \
+	show$U.$(OBJEXT) specfun$U.$(OBJEXT) standard$U.$(OBJEXT) \
+	stdfn$U.$(OBJEXT) tables$U.$(OBJEXT) term$U.$(OBJEXT) \
+	time$U.$(OBJEXT) unset$U.$(OBJEXT) util$U.$(OBJEXT) \
+	util3d$U.$(OBJEXT) variable$U.$(OBJEXT) version$U.$(OBJEXT)
+gnuplot_OBJECTS = $(am_gnuplot_OBJECTS)
+gnuplot_DEPENDENCIES =
+gnuplot_LDFLAGS =
+am_gnuplot_x11_OBJECTS = gplt_x11$U.$(OBJEXT) getcolor$U.$(OBJEXT) \
+	gpexecute$U.$(OBJEXT)
+gnuplot_x11_OBJECTS = $(am_gnuplot_x11_OBJECTS)
+gnuplot_x11_DEPENDENCIES =
+gnuplot_x11_LDFLAGS =
 
-DEFS = @DEFS@ -I. -I$(srcdir) -I..
+DEFS = @DEFS@
+DEFAULT_INCLUDES =  -I. -I$(srcdir) -I$(top_builddir)
 CPPFLAGS = @CPPFLAGS@
 LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
-X_CFLAGS = @X_CFLAGS@
-X_LIBS = @X_LIBS@
-X_EXTRA_LIBS = @X_EXTRA_LIBS@
-X_PRE_LIBS = @X_PRE_LIBS@
-ANSI2KNR = @ANSI2KNR@
-am_bf_test_OBJECTS =  bf_test$U.o binary$U.o alloc$U.o
-bf_test_OBJECTS =  $(am_bf_test_OBJECTS)
-bf_test_LDADD = $(LDADD)
-bf_test_DEPENDENCIES = 
-bf_test_LDFLAGS = 
-am_gnuplot_OBJECTS =  alloc$U.o axis$U.o binary$U.o bitmap$U.o color$U.o \
-command$U.o contour$U.o datafile$U.o dynarray$U.o eval$U.o fit$U.o \
-gadgets$U.o getcolor$U.o graph3d$U.o graphics$U.o help$U.o hidden3d$U.o \
-history$U.o internal$U.o interpol$U.o matrix$U.o misc$U.o mouse$U.o \
-parse$U.o plot$U.o plot2d$U.o plot3d$U.o pm3d$U.o readline$U.o save$U.o \
-scanner$U.o set$U.o show$U.o specfun$U.o standard$U.o stdfn$U.o \
-tables$U.o term$U.o time$U.o unset$U.o util$U.o util3d$U.o variable$U.o \
-version$U.o
-gnuplot_OBJECTS =  $(am_gnuplot_OBJECTS)
-gnuplot_DEPENDENCIES = 
-gnuplot_LDFLAGS = 
-am_gnuplot_x11_OBJECTS =  gplt_x11$U.o getcolor$U.o gpexecute$U.o
-gnuplot_x11_OBJECTS =  $(am_gnuplot_x11_OBJECTS)
-gnuplot_x11_DEPENDENCIES = 
-gnuplot_x11_LDFLAGS = 
-COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
-CFLAGS = @CFLAGS@
+depcomp = $(SHELL) $(top_srcdir)/depcomp
+@AMDEP_TRUE@DEP_FILES = $(DEPDIR)/alloc$U.Po $(DEPDIR)/amiga$U.Po \
+@AMDEP_TRUE@	$(DEPDIR)/axis$U.Po $(DEPDIR)/bf_test$U.Po \
+@AMDEP_TRUE@	$(DEPDIR)/binary$U.Po $(DEPDIR)/bitmap$U.Po \
+@AMDEP_TRUE@	$(DEPDIR)/color$U.Po $(DEPDIR)/command$U.Po \
+@AMDEP_TRUE@	$(DEPDIR)/contour$U.Po $(DEPDIR)/corplot$U.Po \
+@AMDEP_TRUE@	$(DEPDIR)/datafile$U.Po $(DEPDIR)/dynarray$U.Po \
+@AMDEP_TRUE@	$(DEPDIR)/eval$U.Po $(DEPDIR)/fit$U.Po \
+@AMDEP_TRUE@	$(DEPDIR)/gadgets$U.Po $(DEPDIR)/getcolor$U.Po \
+@AMDEP_TRUE@	$(DEPDIR)/gpexecute$U.Po $(DEPDIR)/gplt_x11$U.Po \
+@AMDEP_TRUE@	$(DEPDIR)/graph3d$U.Po $(DEPDIR)/graphics$U.Po \
+@AMDEP_TRUE@	$(DEPDIR)/help$U.Po $(DEPDIR)/hidden3d$U.Po \
+@AMDEP_TRUE@	$(DEPDIR)/history$U.Po $(DEPDIR)/internal$U.Po \
+@AMDEP_TRUE@	$(DEPDIR)/interpol$U.Po $(DEPDIR)/matrix$U.Po \
+@AMDEP_TRUE@	$(DEPDIR)/misc$U.Po $(DEPDIR)/mouse$U.Po \
+@AMDEP_TRUE@	$(DEPDIR)/os9$U.Po $(DEPDIR)/parse$U.Po \
+@AMDEP_TRUE@	$(DEPDIR)/plot$U.Po $(DEPDIR)/plot2d$U.Po \
+@AMDEP_TRUE@	$(DEPDIR)/plot3d$U.Po $(DEPDIR)/pm3d$U.Po \
+@AMDEP_TRUE@	$(DEPDIR)/readline$U.Po $(DEPDIR)/save$U.Po \
+@AMDEP_TRUE@	$(DEPDIR)/scanner$U.Po $(DEPDIR)/set$U.Po \
+@AMDEP_TRUE@	$(DEPDIR)/show$U.Po $(DEPDIR)/specfun$U.Po \
+@AMDEP_TRUE@	$(DEPDIR)/standard$U.Po $(DEPDIR)/stdfn$U.Po \
+@AMDEP_TRUE@	$(DEPDIR)/strftime$U.Po $(DEPDIR)/tables$U.Po \
+@AMDEP_TRUE@	$(DEPDIR)/term$U.Po $(DEPDIR)/time$U.Po \
+@AMDEP_TRUE@	$(DEPDIR)/unset$U.Po $(DEPDIR)/util$U.Po \
+@AMDEP_TRUE@	$(DEPDIR)/util3d$U.Po $(DEPDIR)/variable$U.Po \
+@AMDEP_TRUE@	$(DEPDIR)/version$U.Po $(DEPDIR)/vms$U.Po
+COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
+	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 CCLD = $(CC)
 LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
-DIST_SOURCES =  $(bf_test_SOURCES) $(gnuplot_SOURCES) \
-$(EXTRA_gnuplot_SOURCES) $(gnuplot_x11_SOURCES)
-depcomp = $(SHELL) $(top_srcdir)/depcomp
-DEP_FILES =  @AMDEP@ $(DEPDIR)/alloc$U.Po $(DEPDIR)/amiga$U.Po \
-$(DEPDIR)/axis$U.Po $(DEPDIR)/bf_test$U.Po $(DEPDIR)/binary$U.Po \
-$(DEPDIR)/bitmap$U.Po $(DEPDIR)/color$U.Po $(DEPDIR)/command$U.Po \
-$(DEPDIR)/contour$U.Po $(DEPDIR)/corplot$U.Po $(DEPDIR)/datafile$U.Po \
-$(DEPDIR)/dynarray$U.Po $(DEPDIR)/eval$U.Po $(DEPDIR)/fit$U.Po \
-$(DEPDIR)/gadgets$U.Po $(DEPDIR)/getcolor$U.Po $(DEPDIR)/gpexecute$U.Po \
-$(DEPDIR)/gplt_x11$U.Po $(DEPDIR)/graph3d$U.Po $(DEPDIR)/graphics$U.Po \
-$(DEPDIR)/help$U.Po $(DEPDIR)/hidden3d$U.Po $(DEPDIR)/history$U.Po \
-$(DEPDIR)/internal$U.Po $(DEPDIR)/interpol$U.Po $(DEPDIR)/matrix$U.Po \
-$(DEPDIR)/misc$U.Po $(DEPDIR)/mouse$U.Po $(DEPDIR)/os9$U.Po \
-$(DEPDIR)/parse$U.Po $(DEPDIR)/plot$U.Po $(DEPDIR)/plot2d$U.Po \
-$(DEPDIR)/plot3d$U.Po $(DEPDIR)/pm3d$U.Po $(DEPDIR)/readline$U.Po \
-$(DEPDIR)/save$U.Po $(DEPDIR)/scanner$U.Po $(DEPDIR)/set$U.Po \
-$(DEPDIR)/show$U.Po $(DEPDIR)/specfun$U.Po $(DEPDIR)/standard$U.Po \
-$(DEPDIR)/stdfn$U.Po $(DEPDIR)/strftime$U.Po $(DEPDIR)/tables$U.Po \
-$(DEPDIR)/term$U.Po $(DEPDIR)/time$U.Po $(DEPDIR)/unset$U.Po \
-$(DEPDIR)/util$U.Po $(DEPDIR)/util3d$U.Po $(DEPDIR)/variable$U.Po \
-$(DEPDIR)/version$U.Po $(DEPDIR)/vms$U.Po
-DIST_COMMON =  README Makefile.am Makefile.in ansi2knr.1 ansi2knr.c \
-depcomp
+CFLAGS = @CFLAGS@
+DIST_SOURCES = $(bf_test_SOURCES) $(gnuplot_SOURCES) \
+	$(EXTRA_gnuplot_SOURCES) $(gnuplot_x11_SOURCES)
 
-
-DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
-
-GZIP_ENV = --best
-DIST_SUBDIRS =  beos
+RECURSIVE_TARGETS = info-recursive dvi-recursive install-info-recursive \
+	uninstall-info-recursive all-recursive install-data-recursive \
+	install-exec-recursive installdirs-recursive install-recursive \
+	uninstall-recursive check-recursive installcheck-recursive
+DIST_COMMON = README Makefile.am Makefile.in ansi2knr.1 ansi2knr.c \
+	depcomp
+DIST_SUBDIRS = beos
 SOURCES = $(bf_test_SOURCES) $(gnuplot_SOURCES) $(EXTRA_gnuplot_SOURCES) $(gnuplot_x11_SOURCES)
-OBJECTS = $(am_bf_test_OBJECTS) $(am_gnuplot_OBJECTS) $(am_gnuplot_x11_OBJECTS)
 
-all: all-redirect
+all: all-recursive
+
 .SUFFIXES:
-.SUFFIXES: .c .h .o
-$(srcdir)/Makefile.in: Makefile.am $(top_srcdir)/configure.in $(ACLOCAL_M4) $(srcdir)/makefile.all
-	cd $(top_srcdir) && $(AUTOMAKE) --foreign src/Makefile
-
-Makefile: $(srcdir)/Makefile.in  $(top_builddir)/config.status
-	cd $(top_builddir) \
-	  && CONFIG_FILES=$(subdir)/$@ CONFIG_HEADERS= $(SHELL) ./config.status
-
-
-mostlyclean-binPROGRAMS:
-
-clean-binPROGRAMS:
-	-test -z "$(bin_PROGRAMS)" || rm -f $(bin_PROGRAMS)
-
-distclean-binPROGRAMS:
-
-maintainer-clean-binPROGRAMS:
-
+.SUFFIXES: .c .o .obj
+$(srcdir)/Makefile.in:  Makefile.am $(srcdir)/makefile.all $(top_srcdir)/configure.in $(ACLOCAL_M4)
+	cd $(top_srcdir) && \
+	  $(AUTOMAKE) --foreign  src/Makefile
+Makefile:  $(srcdir)/Makefile.in  $(top_builddir)/config.status
+	cd $(top_builddir) && \
+	  CONFIG_HEADERS= CONFIG_LINKS= \
+	  CONFIG_FILES=$(subdir)/$@ $(SHELL) ./config.status
 install-binPROGRAMS: $(bin_PROGRAMS)
 	@$(NORMAL_INSTALL)
 	$(mkinstalldirs) $(DESTDIR)$(bindir)
 	@list='$(bin_PROGRAMS)'; for p in $$list; do \
-	  if test -f $$p; then \
-	    f="`echo $$p|sed -e 's/$(EXEEXT)$$//' -e '$(transform)' -e 's/$$/$(EXEEXT)/'`"; \
-	    echo "  $(INSTALL_PROGRAM) $(INSTALL_STRIP_FLAG) $$p $(DESTDIR)$(bindir)/$$f"; \
-	     $(INSTALL_PROGRAM) $(INSTALL_STRIP_FLAG) $$p $(DESTDIR)$(bindir)/$$f; \
+	  p1=`echo $$p|sed 's/$(EXEEXT)$$//'`; \
+	  if test -f $$p \
+	  ; then \
+	    f=`echo $$p1|sed '$(transform);s/$$/$(EXEEXT)/'`; \
+	   echo " $(INSTALL_PROGRAM_ENV) $(INSTALL_PROGRAM) $$p $(DESTDIR)$(bindir)/$$f"; \
+	   $(INSTALL_PROGRAM_ENV) $(INSTALL_PROGRAM) $$p $(DESTDIR)$(bindir)/$$f; \
 	  else :; fi; \
 	done
 
 uninstall-binPROGRAMS:
 	@$(NORMAL_UNINSTALL)
 	@list='$(bin_PROGRAMS)'; for p in $$list; do \
-	  f="`echo $$p|sed -e 's/$(EXEEXT)$$//' -e '$(transform)' -e 's/$$/$(EXEEXT)/'`"; \
+	  f=`echo $$p|sed 's/$(EXEEXT)$$//;$(transform);s/$$/$(EXEEXT)/'`; \
 	  echo " rm -f $(DESTDIR)$(bindir)/$$f"; \
 	  rm -f $(DESTDIR)$(bindir)/$$f; \
 	done
 
-mostlyclean-noinstPROGRAMS:
+clean-binPROGRAMS:
+	-test -z "$(bin_PROGRAMS)" || rm -f $(bin_PROGRAMS)
 
 clean-noinstPROGRAMS:
 	-test -z "$(noinst_PROGRAMS)" || rm -f $(noinst_PROGRAMS)
-
-distclean-noinstPROGRAMS:
-
-maintainer-clean-noinstPROGRAMS:
+bf_test$(EXEEXT): $(bf_test_OBJECTS) $(bf_test_DEPENDENCIES) 
+	@rm -f bf_test$(EXEEXT)
+	$(LINK) $(bf_test_LDFLAGS) $(bf_test_OBJECTS) $(bf_test_LDADD) $(LIBS)
+gnuplot$(EXEEXT): $(gnuplot_OBJECTS) $(gnuplot_DEPENDENCIES) 
+	@rm -f gnuplot$(EXEEXT)
+	$(LINK) $(gnuplot_LDFLAGS) $(gnuplot_OBJECTS) $(gnuplot_LDADD) $(LIBS)
+gnuplot_x11$(EXEEXT): $(gnuplot_x11_OBJECTS) $(gnuplot_x11_DEPENDENCIES) 
+	@rm -f gnuplot_x11$(EXEEXT)
+	$(LINK) $(gnuplot_x11_LDFLAGS) $(gnuplot_x11_OBJECTS) $(gnuplot_x11_LDADD) $(LIBS)
 
 mostlyclean-compile:
-	-rm -f *.o core *.core
-
-clean-compile:
+	-rm -f *.$(OBJEXT) core *.core
 
 distclean-compile:
 	-rm -f *.tab.c
 
-maintainer-clean-compile:
-
-mostlyclean-krextra:
+ANSI2KNR = @ANSI2KNR@
+ansi2knr: ansi2knr.$(OBJEXT)
+	$(LINK) ansi2knr.$(OBJEXT) $(LIBS)
+ansi2knr.$(OBJEXT): $(CONFIG_HEADER)
 
 clean-krextra:
 	-rm -f ansi2knr
 
-distclean-krextra:
-
-maintainer-clean-krextra:
-ansi2knr: ansi2knr.o
-	$(LINK) ansi2knr.o $(LIBS)
-ansi2knr.o: $(CONFIG_HEADER)
-
-
 mostlyclean-kr:
 	-rm -f *_.c
 
-clean-kr:
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/alloc$U.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/amiga$U.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/axis$U.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/bf_test$U.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/binary$U.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/bitmap$U.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/color$U.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/command$U.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/contour$U.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/corplot$U.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/datafile$U.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/dynarray$U.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/eval$U.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/fit$U.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/gadgets$U.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/getcolor$U.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/gpexecute$U.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/gplt_x11$U.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/graph3d$U.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/graphics$U.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/help$U.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/hidden3d$U.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/history$U.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/internal$U.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/interpol$U.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/matrix$U.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/misc$U.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/mouse$U.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/os9$U.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/parse$U.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/plot$U.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/plot2d$U.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/plot3d$U.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/pm3d$U.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/readline$U.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/save$U.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/scanner$U.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/set$U.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/show$U.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/specfun$U.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/standard$U.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/stdfn$U.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/strftime$U.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/tables$U.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/term$U.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/time$U.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/unset$U.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/util$U.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/util3d$U.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/variable$U.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/version$U.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/vms$U.Po@am__quote@
 
-distclean-kr:
+distclean-depend:
+	-rm -rf $(DEPDIR)
 
-maintainer-clean-kr:
+.c.o:
+@AMDEP_TRUE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@	depfile='$(DEPDIR)/$*.Po' tmpdepfile='$(DEPDIR)/$*.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+	$(COMPILE) -c `test -f $< || echo '$(srcdir)/'`$<
 
-bf_test: $(bf_test_OBJECTS) $(bf_test_DEPENDENCIES)
-	@rm -f bf_test
-	$(LINK) $(bf_test_LDFLAGS) $(bf_test_OBJECTS) $(bf_test_LDADD) $(LIBS)
-
-gnuplot: $(gnuplot_OBJECTS) $(gnuplot_DEPENDENCIES)
-	@rm -f gnuplot
-	$(LINK) $(gnuplot_LDFLAGS) $(gnuplot_OBJECTS) $(gnuplot_LDADD) $(LIBS)
-
-gnuplot_x11: $(gnuplot_x11_OBJECTS) $(gnuplot_x11_DEPENDENCIES)
-	@rm -f gnuplot_x11
-	$(LINK) $(gnuplot_x11_LDFLAGS) $(gnuplot_x11_OBJECTS) $(gnuplot_x11_LDADD) $(LIBS)
+.c.obj:
+@AMDEP_TRUE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@	depfile='$(DEPDIR)/$*.Po' tmpdepfile='$(DEPDIR)/$*.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+	$(COMPILE) -c `cygpath -w $<`
+CCDEPMODE = @CCDEPMODE@
 alloc_.c: alloc.c $(ANSI2KNR)
-	$(CPP) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/alloc.c; then echo $(srcdir)/alloc.c; else echo alloc.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > alloc_.c
+	$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/alloc.c; then echo $(srcdir)/alloc.c; else echo alloc.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > alloc_.c || rm -f alloc_.c
 amiga_.c: amiga.c $(ANSI2KNR)
-	$(CPP) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/amiga.c; then echo $(srcdir)/amiga.c; else echo amiga.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > amiga_.c
+	$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/amiga.c; then echo $(srcdir)/amiga.c; else echo amiga.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > amiga_.c || rm -f amiga_.c
 axis_.c: axis.c $(ANSI2KNR)
-	$(CPP) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/axis.c; then echo $(srcdir)/axis.c; else echo axis.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > axis_.c
+	$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/axis.c; then echo $(srcdir)/axis.c; else echo axis.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > axis_.c || rm -f axis_.c
 bf_test_.c: bf_test.c $(ANSI2KNR)
-	$(CPP) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/bf_test.c; then echo $(srcdir)/bf_test.c; else echo bf_test.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > bf_test_.c
+	$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/bf_test.c; then echo $(srcdir)/bf_test.c; else echo bf_test.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > bf_test_.c || rm -f bf_test_.c
 binary_.c: binary.c $(ANSI2KNR)
-	$(CPP) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/binary.c; then echo $(srcdir)/binary.c; else echo binary.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > binary_.c
+	$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/binary.c; then echo $(srcdir)/binary.c; else echo binary.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > binary_.c || rm -f binary_.c
 bitmap_.c: bitmap.c $(ANSI2KNR)
-	$(CPP) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/bitmap.c; then echo $(srcdir)/bitmap.c; else echo bitmap.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > bitmap_.c
+	$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/bitmap.c; then echo $(srcdir)/bitmap.c; else echo bitmap.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > bitmap_.c || rm -f bitmap_.c
 color_.c: color.c $(ANSI2KNR)
-	$(CPP) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/color.c; then echo $(srcdir)/color.c; else echo color.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > color_.c
+	$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/color.c; then echo $(srcdir)/color.c; else echo color.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > color_.c || rm -f color_.c
 command_.c: command.c $(ANSI2KNR)
-	$(CPP) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/command.c; then echo $(srcdir)/command.c; else echo command.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > command_.c
+	$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/command.c; then echo $(srcdir)/command.c; else echo command.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > command_.c || rm -f command_.c
 contour_.c: contour.c $(ANSI2KNR)
-	$(CPP) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/contour.c; then echo $(srcdir)/contour.c; else echo contour.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > contour_.c
+	$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/contour.c; then echo $(srcdir)/contour.c; else echo contour.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > contour_.c || rm -f contour_.c
 corplot_.c: corplot.c $(ANSI2KNR)
-	$(CPP) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/corplot.c; then echo $(srcdir)/corplot.c; else echo corplot.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > corplot_.c
+	$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/corplot.c; then echo $(srcdir)/corplot.c; else echo corplot.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > corplot_.c || rm -f corplot_.c
 datafile_.c: datafile.c $(ANSI2KNR)
-	$(CPP) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/datafile.c; then echo $(srcdir)/datafile.c; else echo datafile.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > datafile_.c
+	$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/datafile.c; then echo $(srcdir)/datafile.c; else echo datafile.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > datafile_.c || rm -f datafile_.c
 dynarray_.c: dynarray.c $(ANSI2KNR)
-	$(CPP) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/dynarray.c; then echo $(srcdir)/dynarray.c; else echo dynarray.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > dynarray_.c
+	$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/dynarray.c; then echo $(srcdir)/dynarray.c; else echo dynarray.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > dynarray_.c || rm -f dynarray_.c
 eval_.c: eval.c $(ANSI2KNR)
-	$(CPP) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/eval.c; then echo $(srcdir)/eval.c; else echo eval.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > eval_.c
+	$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/eval.c; then echo $(srcdir)/eval.c; else echo eval.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > eval_.c || rm -f eval_.c
 fit_.c: fit.c $(ANSI2KNR)
-	$(CPP) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/fit.c; then echo $(srcdir)/fit.c; else echo fit.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > fit_.c
+	$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/fit.c; then echo $(srcdir)/fit.c; else echo fit.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > fit_.c || rm -f fit_.c
 gadgets_.c: gadgets.c $(ANSI2KNR)
-	$(CPP) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/gadgets.c; then echo $(srcdir)/gadgets.c; else echo gadgets.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > gadgets_.c
+	$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/gadgets.c; then echo $(srcdir)/gadgets.c; else echo gadgets.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > gadgets_.c || rm -f gadgets_.c
 getcolor_.c: getcolor.c $(ANSI2KNR)
-	$(CPP) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/getcolor.c; then echo $(srcdir)/getcolor.c; else echo getcolor.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > getcolor_.c
+	$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/getcolor.c; then echo $(srcdir)/getcolor.c; else echo getcolor.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > getcolor_.c || rm -f getcolor_.c
 gpexecute_.c: gpexecute.c $(ANSI2KNR)
-	$(CPP) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/gpexecute.c; then echo $(srcdir)/gpexecute.c; else echo gpexecute.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > gpexecute_.c
+	$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/gpexecute.c; then echo $(srcdir)/gpexecute.c; else echo gpexecute.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > gpexecute_.c || rm -f gpexecute_.c
 gplt_x11_.c: gplt_x11.c $(ANSI2KNR)
-	$(CPP) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/gplt_x11.c; then echo $(srcdir)/gplt_x11.c; else echo gplt_x11.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > gplt_x11_.c
+	$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/gplt_x11.c; then echo $(srcdir)/gplt_x11.c; else echo gplt_x11.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > gplt_x11_.c || rm -f gplt_x11_.c
 graph3d_.c: graph3d.c $(ANSI2KNR)
-	$(CPP) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/graph3d.c; then echo $(srcdir)/graph3d.c; else echo graph3d.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > graph3d_.c
+	$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/graph3d.c; then echo $(srcdir)/graph3d.c; else echo graph3d.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > graph3d_.c || rm -f graph3d_.c
 graphics_.c: graphics.c $(ANSI2KNR)
-	$(CPP) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/graphics.c; then echo $(srcdir)/graphics.c; else echo graphics.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > graphics_.c
+	$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/graphics.c; then echo $(srcdir)/graphics.c; else echo graphics.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > graphics_.c || rm -f graphics_.c
 help_.c: help.c $(ANSI2KNR)
-	$(CPP) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/help.c; then echo $(srcdir)/help.c; else echo help.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > help_.c
+	$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/help.c; then echo $(srcdir)/help.c; else echo help.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > help_.c || rm -f help_.c
 hidden3d_.c: hidden3d.c $(ANSI2KNR)
-	$(CPP) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/hidden3d.c; then echo $(srcdir)/hidden3d.c; else echo hidden3d.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > hidden3d_.c
+	$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/hidden3d.c; then echo $(srcdir)/hidden3d.c; else echo hidden3d.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > hidden3d_.c || rm -f hidden3d_.c
 history_.c: history.c $(ANSI2KNR)
-	$(CPP) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/history.c; then echo $(srcdir)/history.c; else echo history.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > history_.c
+	$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/history.c; then echo $(srcdir)/history.c; else echo history.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > history_.c || rm -f history_.c
 internal_.c: internal.c $(ANSI2KNR)
-	$(CPP) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/internal.c; then echo $(srcdir)/internal.c; else echo internal.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > internal_.c
+	$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/internal.c; then echo $(srcdir)/internal.c; else echo internal.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > internal_.c || rm -f internal_.c
 interpol_.c: interpol.c $(ANSI2KNR)
-	$(CPP) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/interpol.c; then echo $(srcdir)/interpol.c; else echo interpol.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > interpol_.c
+	$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/interpol.c; then echo $(srcdir)/interpol.c; else echo interpol.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > interpol_.c || rm -f interpol_.c
 matrix_.c: matrix.c $(ANSI2KNR)
-	$(CPP) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/matrix.c; then echo $(srcdir)/matrix.c; else echo matrix.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > matrix_.c
+	$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/matrix.c; then echo $(srcdir)/matrix.c; else echo matrix.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > matrix_.c || rm -f matrix_.c
 misc_.c: misc.c $(ANSI2KNR)
-	$(CPP) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/misc.c; then echo $(srcdir)/misc.c; else echo misc.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > misc_.c
+	$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/misc.c; then echo $(srcdir)/misc.c; else echo misc.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > misc_.c || rm -f misc_.c
 mouse_.c: mouse.c $(ANSI2KNR)
-	$(CPP) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/mouse.c; then echo $(srcdir)/mouse.c; else echo mouse.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > mouse_.c
+	$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/mouse.c; then echo $(srcdir)/mouse.c; else echo mouse.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > mouse_.c || rm -f mouse_.c
 os9_.c: os9.c $(ANSI2KNR)
-	$(CPP) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/os9.c; then echo $(srcdir)/os9.c; else echo os9.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > os9_.c
+	$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/os9.c; then echo $(srcdir)/os9.c; else echo os9.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > os9_.c || rm -f os9_.c
 parse_.c: parse.c $(ANSI2KNR)
-	$(CPP) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/parse.c; then echo $(srcdir)/parse.c; else echo parse.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > parse_.c
+	$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/parse.c; then echo $(srcdir)/parse.c; else echo parse.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > parse_.c || rm -f parse_.c
 plot_.c: plot.c $(ANSI2KNR)
-	$(CPP) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/plot.c; then echo $(srcdir)/plot.c; else echo plot.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > plot_.c
+	$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/plot.c; then echo $(srcdir)/plot.c; else echo plot.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > plot_.c || rm -f plot_.c
 plot2d_.c: plot2d.c $(ANSI2KNR)
-	$(CPP) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/plot2d.c; then echo $(srcdir)/plot2d.c; else echo plot2d.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > plot2d_.c
+	$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/plot2d.c; then echo $(srcdir)/plot2d.c; else echo plot2d.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > plot2d_.c || rm -f plot2d_.c
 plot3d_.c: plot3d.c $(ANSI2KNR)
-	$(CPP) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/plot3d.c; then echo $(srcdir)/plot3d.c; else echo plot3d.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > plot3d_.c
+	$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/plot3d.c; then echo $(srcdir)/plot3d.c; else echo plot3d.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > plot3d_.c || rm -f plot3d_.c
 pm3d_.c: pm3d.c $(ANSI2KNR)
-	$(CPP) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/pm3d.c; then echo $(srcdir)/pm3d.c; else echo pm3d.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > pm3d_.c
+	$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/pm3d.c; then echo $(srcdir)/pm3d.c; else echo pm3d.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > pm3d_.c || rm -f pm3d_.c
 readline_.c: readline.c $(ANSI2KNR)
-	$(CPP) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/readline.c; then echo $(srcdir)/readline.c; else echo readline.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > readline_.c
+	$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/readline.c; then echo $(srcdir)/readline.c; else echo readline.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > readline_.c || rm -f readline_.c
 save_.c: save.c $(ANSI2KNR)
-	$(CPP) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/save.c; then echo $(srcdir)/save.c; else echo save.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > save_.c
+	$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/save.c; then echo $(srcdir)/save.c; else echo save.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > save_.c || rm -f save_.c
 scanner_.c: scanner.c $(ANSI2KNR)
-	$(CPP) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/scanner.c; then echo $(srcdir)/scanner.c; else echo scanner.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > scanner_.c
+	$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/scanner.c; then echo $(srcdir)/scanner.c; else echo scanner.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > scanner_.c || rm -f scanner_.c
 set_.c: set.c $(ANSI2KNR)
-	$(CPP) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/set.c; then echo $(srcdir)/set.c; else echo set.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > set_.c
+	$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/set.c; then echo $(srcdir)/set.c; else echo set.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > set_.c || rm -f set_.c
 show_.c: show.c $(ANSI2KNR)
-	$(CPP) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/show.c; then echo $(srcdir)/show.c; else echo show.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > show_.c
+	$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/show.c; then echo $(srcdir)/show.c; else echo show.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > show_.c || rm -f show_.c
 specfun_.c: specfun.c $(ANSI2KNR)
-	$(CPP) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/specfun.c; then echo $(srcdir)/specfun.c; else echo specfun.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > specfun_.c
+	$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/specfun.c; then echo $(srcdir)/specfun.c; else echo specfun.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > specfun_.c || rm -f specfun_.c
 standard_.c: standard.c $(ANSI2KNR)
-	$(CPP) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/standard.c; then echo $(srcdir)/standard.c; else echo standard.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > standard_.c
+	$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/standard.c; then echo $(srcdir)/standard.c; else echo standard.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > standard_.c || rm -f standard_.c
 stdfn_.c: stdfn.c $(ANSI2KNR)
-	$(CPP) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/stdfn.c; then echo $(srcdir)/stdfn.c; else echo stdfn.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > stdfn_.c
+	$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/stdfn.c; then echo $(srcdir)/stdfn.c; else echo stdfn.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > stdfn_.c || rm -f stdfn_.c
 strftime_.c: strftime.c $(ANSI2KNR)
-	$(CPP) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/strftime.c; then echo $(srcdir)/strftime.c; else echo strftime.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > strftime_.c
+	$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/strftime.c; then echo $(srcdir)/strftime.c; else echo strftime.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > strftime_.c || rm -f strftime_.c
 tables_.c: tables.c $(ANSI2KNR)
-	$(CPP) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/tables.c; then echo $(srcdir)/tables.c; else echo tables.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > tables_.c
+	$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/tables.c; then echo $(srcdir)/tables.c; else echo tables.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > tables_.c || rm -f tables_.c
 term_.c: term.c $(ANSI2KNR)
-	$(CPP) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/term.c; then echo $(srcdir)/term.c; else echo term.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > term_.c
+	$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/term.c; then echo $(srcdir)/term.c; else echo term.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > term_.c || rm -f term_.c
 time_.c: time.c $(ANSI2KNR)
-	$(CPP) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/time.c; then echo $(srcdir)/time.c; else echo time.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > time_.c
+	$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/time.c; then echo $(srcdir)/time.c; else echo time.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > time_.c || rm -f time_.c
 unset_.c: unset.c $(ANSI2KNR)
-	$(CPP) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/unset.c; then echo $(srcdir)/unset.c; else echo unset.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > unset_.c
+	$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/unset.c; then echo $(srcdir)/unset.c; else echo unset.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > unset_.c || rm -f unset_.c
 util_.c: util.c $(ANSI2KNR)
-	$(CPP) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/util.c; then echo $(srcdir)/util.c; else echo util.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > util_.c
+	$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/util.c; then echo $(srcdir)/util.c; else echo util.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > util_.c || rm -f util_.c
 util3d_.c: util3d.c $(ANSI2KNR)
-	$(CPP) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/util3d.c; then echo $(srcdir)/util3d.c; else echo util3d.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > util3d_.c
+	$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/util3d.c; then echo $(srcdir)/util3d.c; else echo util3d.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > util3d_.c || rm -f util3d_.c
 variable_.c: variable.c $(ANSI2KNR)
-	$(CPP) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/variable.c; then echo $(srcdir)/variable.c; else echo variable.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > variable_.c
+	$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/variable.c; then echo $(srcdir)/variable.c; else echo variable.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > variable_.c || rm -f variable_.c
 version_.c: version.c $(ANSI2KNR)
-	$(CPP) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/version.c; then echo $(srcdir)/version.c; else echo version.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > version_.c
+	$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/version.c; then echo $(srcdir)/version.c; else echo version.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > version_.c || rm -f version_.c
 vms_.c: vms.c $(ANSI2KNR)
-	$(CPP) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/vms.c; then echo $(srcdir)/vms.c; else echo vms.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > vms_.c
-alloc_.o amiga_.o axis_.o bf_test_.o binary_.o bitmap_.o color_.o \
-command_.o contour_.o corplot_.o datafile_.o dynarray_.o eval_.o fit_.o \
-gadgets_.o getcolor_.o gpexecute_.o gplt_x11_.o graph3d_.o graphics_.o \
-help_.o hidden3d_.o history_.o internal_.o interpol_.o matrix_.o \
-misc_.o mouse_.o os9_.o parse_.o plot_.o plot2d_.o plot3d_.o pm3d_.o \
-readline_.o save_.o scanner_.o set_.o show_.o specfun_.o standard_.o \
-stdfn_.o strftime_.o tables_.o term_.o time_.o unset_.o util_.o \
-util3d_.o variable_.o version_.o vms_.o : $(ANSI2KNR)
+	$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/vms.c; then echo $(srcdir)/vms.c; else echo vms.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > vms_.c || rm -f vms_.c
+alloc_.$(OBJEXT) amiga_.$(OBJEXT) axis_.$(OBJEXT) bf_test_.$(OBJEXT) \
+binary_.$(OBJEXT) bitmap_.$(OBJEXT) color_.$(OBJEXT) command_.$(OBJEXT) \
+contour_.$(OBJEXT) corplot_.$(OBJEXT) datafile_.$(OBJEXT) \
+dynarray_.$(OBJEXT) eval_.$(OBJEXT) fit_.$(OBJEXT) gadgets_.$(OBJEXT) \
+getcolor_.$(OBJEXT) gpexecute_.$(OBJEXT) gplt_x11_.$(OBJEXT) \
+graph3d_.$(OBJEXT) graphics_.$(OBJEXT) help_.$(OBJEXT) \
+hidden3d_.$(OBJEXT) history_.$(OBJEXT) internal_.$(OBJEXT) \
+interpol_.$(OBJEXT) matrix_.$(OBJEXT) misc_.$(OBJEXT) mouse_.$(OBJEXT) \
+os9_.$(OBJEXT) parse_.$(OBJEXT) plot_.$(OBJEXT) plot2d_.$(OBJEXT) \
+plot3d_.$(OBJEXT) pm3d_.$(OBJEXT) readline_.$(OBJEXT) save_.$(OBJEXT) \
+scanner_.$(OBJEXT) set_.$(OBJEXT) show_.$(OBJEXT) specfun_.$(OBJEXT) \
+standard_.$(OBJEXT) stdfn_.$(OBJEXT) strftime_.$(OBJEXT) \
+tables_.$(OBJEXT) term_.$(OBJEXT) time_.$(OBJEXT) unset_.$(OBJEXT) \
+util_.$(OBJEXT) util3d_.$(OBJEXT) variable_.$(OBJEXT) \
+version_.$(OBJEXT) vms_.$(OBJEXT) : $(ANSI2KNR)
+uninstall-info-am:
 
 # This directory's subdirectories are mostly independent; you can cd
 # into them and run `make' without going through this Makefile.
@@ -457,10 +522,7 @@ util3d_.o variable_.o version_.o vms_.o : $(ANSI2KNR)
 # (1) if the variable is set in `config.status', edit `config.status'
 #     (which will cause the Makefiles to be regenerated when you run `make');
 # (2) otherwise, pass the desired values on the `make' command line.
-
-all-recursive install-data-recursive install-exec-recursive \
-installdirs-recursive install-recursive uninstall-recursive  \
-check-recursive installcheck-recursive info-recursive dvi-recursive:
+$(RECURSIVE_TARGETS):
 	@set fnord $(MAKEFLAGS); amf=$$2; \
 	dot_seen=no; \
 	target=`echo $@ | sed s/-recursive//`; \
@@ -525,9 +587,9 @@ TAGS: tags-recursive $(HEADERS) $(SOURCES)  $(TAGS_DEPENDENCIES) \
 	tags=; \
 	here=`pwd`; \
 	list='$(SUBDIRS)'; for subdir in $$list; do \
-   if test "$$subdir" = .; then :; else \
+	  if test "$$subdir" = .; then :; else \
 	    test -f $$subdir/TAGS && tags="$$tags -i $$here/$$subdir/TAGS"; \
-   fi; \
+	  fi; \
 	done; \
 	list='$(SOURCES) $(HEADERS) $(TAGS_FILES)'; \
 	unique=`for i in $$list; do \
@@ -541,93 +603,23 @@ TAGS: tags-recursive $(HEADERS) $(SOURCES)  $(TAGS_DEPENDENCIES) \
 GTAGS:
 	here=`CDPATH=: && cd $(top_builddir) && pwd` \
 	  && cd $(top_srcdir) \
-	  && gtags -i $$here
-
-mostlyclean-tags:
-
-clean-tags:
+	  && gtags -i $(GTAGS_ARGS) $$here
 
 distclean-tags:
-	-rm -f TAGS ID
+	-rm -f TAGS ID GTAGS GRTAGS GSYMS GPATH
 
-maintainer-clean-tags:
+DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 
-@AMDEP@include $(DEPDIR)/alloc$U.Po
-@AMDEP@include $(DEPDIR)/amiga$U.Po
-@AMDEP@include $(DEPDIR)/axis$U.Po
-@AMDEP@include $(DEPDIR)/bf_test$U.Po
-@AMDEP@include $(DEPDIR)/binary$U.Po
-@AMDEP@include $(DEPDIR)/bitmap$U.Po
-@AMDEP@include $(DEPDIR)/color$U.Po
-@AMDEP@include $(DEPDIR)/command$U.Po
-@AMDEP@include $(DEPDIR)/contour$U.Po
-@AMDEP@include $(DEPDIR)/corplot$U.Po
-@AMDEP@include $(DEPDIR)/datafile$U.Po
-@AMDEP@include $(DEPDIR)/dynarray$U.Po
-@AMDEP@include $(DEPDIR)/eval$U.Po
-@AMDEP@include $(DEPDIR)/fit$U.Po
-@AMDEP@include $(DEPDIR)/gadgets$U.Po
-@AMDEP@include $(DEPDIR)/getcolor$U.Po
-@AMDEP@include $(DEPDIR)/gpexecute$U.Po
-@AMDEP@include $(DEPDIR)/gplt_x11$U.Po
-@AMDEP@include $(DEPDIR)/graph3d$U.Po
-@AMDEP@include $(DEPDIR)/graphics$U.Po
-@AMDEP@include $(DEPDIR)/help$U.Po
-@AMDEP@include $(DEPDIR)/hidden3d$U.Po
-@AMDEP@include $(DEPDIR)/history$U.Po
-@AMDEP@include $(DEPDIR)/internal$U.Po
-@AMDEP@include $(DEPDIR)/interpol$U.Po
-@AMDEP@include $(DEPDIR)/matrix$U.Po
-@AMDEP@include $(DEPDIR)/misc$U.Po
-@AMDEP@include $(DEPDIR)/mouse$U.Po
-@AMDEP@include $(DEPDIR)/os9$U.Po
-@AMDEP@include $(DEPDIR)/parse$U.Po
-@AMDEP@include $(DEPDIR)/plot$U.Po
-@AMDEP@include $(DEPDIR)/plot2d$U.Po
-@AMDEP@include $(DEPDIR)/plot3d$U.Po
-@AMDEP@include $(DEPDIR)/pm3d$U.Po
-@AMDEP@include $(DEPDIR)/readline$U.Po
-@AMDEP@include $(DEPDIR)/save$U.Po
-@AMDEP@include $(DEPDIR)/scanner$U.Po
-@AMDEP@include $(DEPDIR)/set$U.Po
-@AMDEP@include $(DEPDIR)/show$U.Po
-@AMDEP@include $(DEPDIR)/specfun$U.Po
-@AMDEP@include $(DEPDIR)/standard$U.Po
-@AMDEP@include $(DEPDIR)/stdfn$U.Po
-@AMDEP@include $(DEPDIR)/strftime$U.Po
-@AMDEP@include $(DEPDIR)/tables$U.Po
-@AMDEP@include $(DEPDIR)/term$U.Po
-@AMDEP@include $(DEPDIR)/time$U.Po
-@AMDEP@include $(DEPDIR)/unset$U.Po
-@AMDEP@include $(DEPDIR)/util$U.Po
-@AMDEP@include $(DEPDIR)/util3d$U.Po
-@AMDEP@include $(DEPDIR)/variable$U.Po
-@AMDEP@include $(DEPDIR)/version$U.Po
-@AMDEP@include $(DEPDIR)/vms$U.Po
-
-mostlyclean-depend:
-
-clean-depend:
-
-distclean-depend:
-	-rm -rf $(DEPDIR)
-
-maintainer-clean-depend:
-
-@AMDEP@CCDEPMODE = @CCDEPMODE@
-
-.c.o:
-@AMDEP@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
-@AMDEP@	depfile='$(DEPDIR)/$*.Po' tmpdepfile='$(DEPDIR)/$*.TPo' @AMDEPBACKSLASH@
-@AMDEP@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-	$(COMPILE) -c -o $@ `test -f $< || echo '$(srcdir)/'`$<
-
-
-distdir = $(top_builddir)/$(PACKAGE)-$(VERSION)/$(subdir)
+top_distdir = ..
+distdir = $(top_distdir)/$(PACKAGE)-$(VERSION)
 
 distdir: $(DISTFILES)
 	@for file in $(DISTFILES); do \
-	  d=$(srcdir); \
+	  if test -f $$file; then d=.; else d=$(srcdir); fi; \
+	  dir=`echo "$$file" | sed -e 's,/[^/]*$$,,'`; \
+	  if test "$$dir" != "$$file" && test "$$dir" != "."; then \
+	    $(mkinstalldirs) "$(distdir)/$$dir"; \
+	  fi; \
 	  if test -d $$d/$$file; then \
 	    cp -pR $$d/$$file $(distdir) \
 	    || exit 1; \
@@ -642,99 +634,101 @@ distdir: $(DISTFILES)
 	    test -d $(distdir)/$$subdir \
 	    || mkdir $(distdir)/$$subdir \
 	    || exit 1; \
-	    (cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) top_distdir=../$(top_distdir) distdir=../$(distdir)/$$subdir distdir) \
+	    (cd $$subdir && \
+	      $(MAKE) $(AM_MAKEFLAGS) \
+	        top_distdir="$(top_distdir)" \
+	        distdir=../$(distdir)/$$subdir \
+	        distdir) \
 	      || exit 1; \
 	  fi; \
 	done
-info-am:
-info: info-recursive
-dvi-am:
-dvi: dvi-recursive
 check-am: all-am
 check: check-recursive
-installcheck-am:
-installcheck: installcheck-recursive
-install-exec-am: install-binPROGRAMS
-install-exec: install-exec-recursive
+all-am: Makefile $(ANSI2KNR) $(PROGRAMS)
+installdirs: installdirs-recursive
+installdirs-am:
+	$(mkinstalldirs) $(DESTDIR)$(bindir)
 
-install-data-am:
+install: install-recursive
+install-exec: install-exec-recursive
 install-data: install-data-recursive
+uninstall: uninstall-recursive
 
 install-am: all-am
 	@$(MAKE) $(AM_MAKEFLAGS) install-exec-am install-data-am
-install: install-recursive
-uninstall-am: uninstall-binPROGRAMS
-uninstall: uninstall-recursive
-all-am: Makefile $(ANSI2KNR) $(PROGRAMS)
-all-redirect: all-recursive
+
+installcheck: installcheck-recursive
 install-strip:
-	$(MAKE) $(AM_MAKEFLAGS) INSTALL_STRIP_FLAG=-s install
-installdirs: installdirs-recursive
-installdirs-am:
-	$(mkinstalldirs)  $(DESTDIR)$(bindir)
-
-
+	$(MAKE) $(AM_MAKEFLAGS) INSTALL_PROGRAM="$(INSTALL_STRIP_PROGRAM)" \
+	  `test -z '$(STRIP)' || \
+	    echo "INSTALL_PROGRAM_ENV=STRIPPROG='$(STRIP)'"` install
 mostlyclean-generic:
 
 clean-generic:
 
 distclean-generic:
-	-rm -f Makefile $(CONFIG_CLEAN_FILES)
-	-rm -f config.cache config.log stamp-h stamp-h[0-9]*
+	-rm -f Makefile $(CONFIG_CLEAN_FILES) stamp-h stamp-h[0-9]*
 
 maintainer-clean-generic:
-	-rm -f Makefile.in
-mostlyclean-am:  mostlyclean-binPROGRAMS mostlyclean-noinstPROGRAMS \
-		mostlyclean-compile mostlyclean-krextra mostlyclean-kr \
-		mostlyclean-tags mostlyclean-depend mostlyclean-generic
-
-mostlyclean: mostlyclean-recursive
-
-clean-am:  clean-binPROGRAMS clean-noinstPROGRAMS clean-compile \
-		clean-krextra clean-kr clean-tags clean-depend \
-		clean-generic mostlyclean-am
-
+	@echo "This command is intended for maintainers to use"
+	@echo "it deletes files that may require special tools to rebuild."
 clean: clean-recursive
 
-distclean-am:  distclean-binPROGRAMS distclean-noinstPROGRAMS \
-		distclean-compile distclean-krextra distclean-kr \
-		distclean-tags distclean-depend distclean-generic \
-		clean-am
+clean-am: clean-binPROGRAMS clean-generic clean-krextra \
+	clean-noinstPROGRAMS mostlyclean-am
 
 distclean: distclean-recursive
 
-maintainer-clean-am:  maintainer-clean-binPROGRAMS \
-		maintainer-clean-noinstPROGRAMS \
-		maintainer-clean-compile maintainer-clean-krextra \
-		maintainer-clean-kr maintainer-clean-tags \
-		maintainer-clean-depend maintainer-clean-generic \
-		distclean-am
-	@echo "This command is intended for maintainers to use;"
-	@echo "it deletes files that may require special tools to rebuild."
+distclean-am: clean-am distclean-compile distclean-depend \
+	distclean-generic distclean-tags
+
+dvi: dvi-recursive
+
+dvi-am:
+
+info: info-recursive
+
+info-am:
+
+install-data-am:
+
+install-exec-am: install-binPROGRAMS
+
+install-info: install-info-recursive
+
+install-man:
+
+installcheck-am:
 
 maintainer-clean: maintainer-clean-recursive
 
-.PHONY: mostlyclean-binPROGRAMS distclean-binPROGRAMS clean-binPROGRAMS \
-maintainer-clean-binPROGRAMS uninstall-binPROGRAMS install-binPROGRAMS \
-mostlyclean-noinstPROGRAMS distclean-noinstPROGRAMS \
-clean-noinstPROGRAMS maintainer-clean-noinstPROGRAMS \
-mostlyclean-compile distclean-compile clean-compile \
-maintainer-clean-compile mostlyclean-krextra distclean-krextra \
-clean-krextra maintainer-clean-krextra mostlyclean-kr distclean-kr \
-clean-kr maintainer-clean-kr install-recursive uninstall-recursive \
-install-data-recursive uninstall-data-recursive install-exec-recursive \
-uninstall-exec-recursive installdirs-recursive uninstalldirs-recursive \
-all-recursive check-recursive installcheck-recursive info-recursive \
-dvi-recursive mostlyclean-recursive distclean-recursive clean-recursive \
-maintainer-clean-recursive tags tags-recursive mostlyclean-tags \
-distclean-tags clean-tags maintainer-clean-tags mostlyclean-depend \
-distclean-depend clean-depend maintainer-clean-depend distdir info-am \
-info dvi-am dvi check check-am installcheck-am installcheck \
-install-exec-am install-exec install-data-am install-data install-am \
-install uninstall-am uninstall all-redirect all-am all install-strip \
-installdirs-am installdirs mostlyclean-generic distclean-generic \
-clean-generic maintainer-clean-generic clean mostlyclean distclean \
-maintainer-clean
+maintainer-clean-am: distclean-am maintainer-clean-generic
+
+mostlyclean: mostlyclean-recursive
+
+mostlyclean-am: mostlyclean-compile mostlyclean-generic mostlyclean-kr
+
+uninstall-am: uninstall-binPROGRAMS uninstall-info-am
+
+uninstall-info: uninstall-info-recursive
+
+.PHONY: $(RECURSIVE_TARGETS) GTAGS all all-am check check-am clean \
+	clean-binPROGRAMS clean-generic clean-krextra \
+	clean-noinstPROGRAMS clean-recursive distclean \
+	distclean-compile distclean-depend distclean-generic \
+	distclean-recursive distclean-tags distdir dvi dvi-am \
+	dvi-recursive info info-am info-recursive install install-am \
+	install-binPROGRAMS install-data install-data-am \
+	install-data-recursive install-exec install-exec-am \
+	install-exec-recursive install-info install-info-am \
+	install-info-recursive install-man install-recursive \
+	install-strip installcheck installcheck-am installdirs \
+	installdirs-am installdirs-recursive maintainer-clean \
+	maintainer-clean-generic maintainer-clean-recursive mostlyclean \
+	mostlyclean-compile mostlyclean-generic mostlyclean-kr \
+	mostlyclean-recursive tags tags-recursive uninstall \
+	uninstall-am uninstall-binPROGRAMS uninstall-info-am \
+	uninstall-info-recursive uninstall-recursive
 
 
 @ALT_X11_DRIVER_TRUE@$(GNUPLOT_X11): gnuplot_x11
@@ -742,7 +736,6 @@ maintainer-clean
 # begin makefile.all
 # end makefile.all
 term$U.o: $(CORETERM)
-
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:
