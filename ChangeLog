@@ -1,3 +1,9 @@
+2001-09-18  Lars Hecking  <lhecking@nmrc.ucc.ie
+
+	* demo/prob.dem, demo.prob2.dem, demo/random.dem, demo/stat.inc:
+	Remove "non-commercial" clause by permission of the original author,
+	Jos van der Woude.
+
 2001-09-18  Alexander Mai <st002279@hrzpub.tu-darmstadt.de>
 
 	* lisp/Makefile.in lisp/configure.in lisp/configure:
@@ -712,6 +718,7 @@
 
 	* src/hidden3d.c (split_line_at_ratio) [PM3D]: Fill in field
  	`real_z', too.
+
 2001-06-28  Alexander Mai <st002279@hrzpub.tu-darmstadt.de>
 
 	* term/x11.trm: More verbose error message if X11 driver
