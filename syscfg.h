@@ -186,7 +186,7 @@
 #endif /* MSDOS */
 
 /* Note: may not catch all IBM AIX compilers or SCO compilers */
-#if __unix__ || unix || _AIX || SCO
+#if defined(__unix__)|| defined(unix) || defined(_AIX) || defined(SCO)
 # ifndef unix
 #  define unix
 # endif
@@ -240,39 +240,52 @@
 #endif
 /* End fall-through defaults */
 
+/* Atari stuff. Moved here from command.c, plot2d.c, readline.c */
+#if defined(ATARI) || defined(MTOS)
+# ifdef __PUREC__
+#  include <ext.h>
+#  include <tos.h>
+#  include <aes.h>
+# else
+#  include <osbind.h>
+#  include <aesbind.h>
+#  include <support.h>
+# endif                         /* __PUREC__ */
+#endif /* ATARI || MTOS */
+
+
 /* DOS/Windows stuff. Moved here from command.c */
 #if defined(MSDOS) || defined(DOS386)
+
 # ifdef DJGPP
 #  include <dos.h>
 #  include <dir.h>              /* HBB: for setdisk() */
 # else
 #  include <process.h>
-# endif                         /* DJGPP */
+# endif                         /* !DJGPP */
 
 # ifdef __ZTC__
 #  define HAVE_SLEEP 1
 #  define P_WAIT 0
-# else
 
-#  ifdef __TURBOC__
-#   include <dos.h>		/* for sleep() prototype */
-#   ifndef _Windows
-#    define HAVE_SLEEP 1
-#    include <conio.h>
-#    include <dir.h>            /* setdisk() */
-#   endif                       /* _Windows */
+# elif defined(__TURBOC__)
+#  include <dos.h>		/* for sleep() prototype */
+#  ifndef _Windows
+#   define HAVE_SLEEP 1
+#   include <conio.h>
+#   include <dir.h>            /* setdisk() */
+#  endif                       /* _Windows */
 
-#  else                         /* must be MSC */
-#   if !defined(__EMX__) && !defined(DJGPP)
-#    ifdef __MSC__
-#     include <direct.h>        /* for _chdrive() */
-#    endif                      /* __MSC__ */
+# else                         /* must be MSC */
+#  if !defined(__EMX__) && !defined(DJGPP)
+#   ifdef __MSC__
+#    include <direct.h>        /* for _chdrive() */
+#   endif                      /* __MSC__ */
+#  endif                       /* !__EMX__ && !DJGPP */
+# endif                        /* !ZTC */
 
-#   endif                       /* !__EMX__ && !DJGPP */
-#  endif                        /* TURBOC */
-# endif                         /* ZTC */
 #endif /* MSDOS */
-/**/
+
 
 /* Watcom's compiler; this should probably be somewhere
  * in the Windows section
