@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: parse.c,v 1.9 1998/11/19 10:41:13 lhecking Exp $";
+static char *RCSid = "$Id: parse.c,v 1.9.2.1 2000/05/07 16:48:37 lhecking Exp $";
 #endif
 
 /* GNUPLOT - parse.c */
@@ -448,61 +448,66 @@ static void factor()
 }
 
 
+/* HBB 20010309: Here and below: can't store pointers into the middle
+ * of at->actions[]. That array may be realloc()ed by add_action() or
+ * express() calls!. Access via index savepc1/savepc2, instead. */
 
-static void xterms()
+static void
+xterms()
 {
     /* create action code for ? : expressions */
 
     if (equals(c_token, "?")) {
 	register int savepc1, savepc2;
-	register union argument *argptr1, *argptr2;
+
 	c_token++;
 	savepc1 = at->a_count;
-	argptr1 = add_action(JTERN);
+	add_action(JTERN);
 	express();
 	if (!equals(c_token, ":"))
 	    int_error("expecting ':'", c_token);
+
 	c_token++;
 	savepc2 = at->a_count;
-	argptr2 = add_action(JUMP);
-	argptr1->j_arg = at->a_count - savepc1;
+	add_action(JUMP);
+	at->actions[savepc1].arg.j_arg = at->a_count - savepc1;
 	express();
-	argptr2->j_arg = at->a_count - savepc2;
+	at->actions[savepc2].arg.j_arg = at->a_count - savepc2;
     }
 }
 
-
-static void aterms()
+static void
+aterms()
 {
     /* create action codes for || operator */
 
     while (equals(c_token, "||")) {
 	register int savepc;
-	register union argument *argptr;
+
 	c_token++;
 	savepc = at->a_count;
-	argptr = add_action(JUMPNZ);	/* short-circuit if already
-					 * TRUE */
+	add_action(JUMPNZ);	/* short-circuit if already TRUE */
 	aterm();
-	argptr->j_arg = at->a_count - savepc;	/* offset for jump */
+	/* offset for jump */
+	at->actions[savepc].arg.j_arg = at->a_count - savepc;
 	(void) add_action(BOOLE);
     }
 }
 
 
-static void bterms()
+static void
+bterms()
 {
     /* create action code for && operator */
 
     while (equals(c_token, "&&")) {
 	register int savepc;
-	register union argument *argptr;
+
 	c_token++;
 	savepc = at->a_count;
-	argptr = add_action(JUMPZ);	/* short-circuit if already
-					 * FALSE */
+	add_action(JUMPZ);	/* short-circuit if already FALSE */
 	bterm();
-	argptr->j_arg = at->a_count - savepc;	/* offset for jump */
+	at->actions[savepc].arg.j_arg = at->a_count - savepc; /* offset for jump */
 	(void) add_action(BOOLE);
     }
 }

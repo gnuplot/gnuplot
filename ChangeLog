@@ -1,3 +1,11 @@
+2001-03-09  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* parse.c (xterms, aterms, bterms): Avoid storing pointers into
+ 	the dynamical array at->actions[]. They break if the action table
+ 	has to be reallocated. This caused a really strange endless loop
+ 	bug for a very complicated function using 8 nested levels of
+ 	conditional operators plus lots of function calls.
+
 2001-03-03  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* configure.in: Check for png_init_io() instead of deprecated
