@@ -1,5 +1,5 @@
 /*
- * $Id: gd.trm,v 1.32 2003/12/01 03:32:02 sfeam Exp $
+ * $Id: gd.trm,v 1.33 2004/01/26 04:30:42 sfeam Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -1598,6 +1598,8 @@ START_HELP(png)
 " 'set term png font \"Face\"' will look for a font file named either ",
 " <somedirectory>/Face.ttf or <somedirectory>/Face.pfa. Both TrueType and ",
 " Adobe Type 1 fonts are fully scalable and may be rotated through any angle.",
+" If no font is specified, gnuplot checks the environmental variable ",
+" GNUPLOT_DEFAULT_GDFONT to see if there is a preferred default font. ",
 "",
 " `enhanced` enables the enhanced text processing features, (subscripts, ",
 " superscripts and mixed fonts). See `enhanced` for more information. ",
@@ -1750,6 +1752,8 @@ START_HELP(jpeg)
 " 'set term jpeg font \"Face\"' will look for a font file named either ",
 " <somedirectory>/Face.ttf or <somedirectory>/Face.pfa. Both TrueType and ",
 " Adobe Type 1 fonts are fully scalable and may be rotated through any angle.",
+" If no font is specified, gnuplot checks the environmental variable ",
+" GNUPLOT_DEFAULT_GDFONT to see if there is a preferred default font. ",
 "",
 " `enhanced` enables the enhanced text processing features, (subscripts, ",
 " superscripts and mixed fonts). See `enhanced` for more information. ",
