@@ -187,7 +187,7 @@ CONFIG_HEADER = $(top_builddir)/config.h
 CONFIG_CLEAN_FILES =
 EXTRA_PROGRAMS = gnuplot_x11$(EXEEXT)
 bin_PROGRAMS = gnuplot$(EXEEXT)
-noinst_PROGRAMS = bf_test$(EXEEXT) @GNUPLOT_X11@
+noinst_PROGRAMS = bf_test$(EXEEXT) @GNUPLOT_X11@$(EXEEXT)
 PROGRAMS = $(bin_PROGRAMS) $(noinst_PROGRAMS)
 
 am_bf_test_OBJECTS = bf_test$U.$(OBJEXT) binary$U.$(OBJEXT) \
@@ -265,8 +265,7 @@ RECURSIVE_TARGETS = info-recursive dvi-recursive install-info-recursive \
 	uninstall-info-recursive all-recursive install-data-recursive \
 	install-exec-recursive installdirs-recursive install-recursive \
 	uninstall-recursive check-recursive installcheck-recursive
-DIST_COMMON = README Makefile.am Makefile.in ansi2knr.1 ansi2knr.c \
-	depcomp
+DIST_COMMON = README Makefile.am Makefile.in ansi2knr.1 ansi2knr.c
 DIST_SUBDIRS = beos
 SOURCES = $(bf_test_SOURCES) $(gnuplot_SOURCES) $(EXTRA_gnuplot_SOURCES) $(gnuplot_x11_SOURCES)
 
