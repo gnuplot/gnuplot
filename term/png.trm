@@ -1,5 +1,5 @@
 /*
- * $Id: png.trm,v 1.24 1999/10/17 19:06:51 lhecking Exp $
+ * $Id: png.trm,v 1.25 1999/11/24 12:34:01 lhecking Exp $
  *
  */
 
@@ -46,7 +46,8 @@
  *                      derived from pbm.trm by Russell Lang
  *
  *  Eric S. Raymond    update for pnglib-1.0.3; transparency.
- *  H.-B. Broeker      fixes to Eric's changes
+ *  Hartmut Freihofer  updates
+ *  H.-B. Broeker      fixes to Eric's and Hartmut's changes
  *
  * send your comments or suggestions to (info-gnuplot@dartmouth.edu).
  *
@@ -189,16 +190,14 @@ PNG_options()
 		/* HBB 991123: read in as *shorts*, not ints! */
 		if (sscanf(string, "x%2hx%2hx%2hx", &rgb_color[0], &rgb_color[1], &rgb_color[2] ) != 3) {
 		    int_error(c_token, "invalid color spec, must be xRRGGBB");
-		} 
-	    }
-	    else
+		}
+	    } else
 		int_error(c_token, "expecting: {small, medium, large},[no]transparent, or {monochrome, gray, color, [xRRGGBB] }");
 
 	    if (n_colors >= WEB_N_COLORS) {
 		int_warn(c_token, "too many colors, ingoring");
 		++c_token;
-	    } 
-	    else {
+	    } else {
 		web_color_rgbs[n_colors].r = rgb_color[0];
 		web_color_rgbs[n_colors].g = rgb_color[1];
 		web_color_rgbs[n_colors].b = rgb_color[2];
@@ -216,37 +215,37 @@ PNG_options()
      * protect older gnuplots. Scripts with 'transparent' in them
      * won't work as wanted, with older versions, so put it here. */
     if (png_transparent)
-	strcat(term_options, " transparent");
+	strcat(term_options, "transparent ");
 
     switch (png_font) {
     case 3:
-	strcat(term_options, "large");
+	strcat(term_options, "large ");
 	break;
     case 2:
-	strcat(term_options, "medium");
+	strcat(term_options, "medium ");
 	break;
     case 1:
     default:
-	strcat(term_options, "small");
+	strcat(term_options, "small ");
 	break;
     }
 
     switch (png_mode) {
     case 2:
-	strcat(term_options, " color");
+	strcat(term_options, "color ");
 	break;
     case 1:
-	strcat(term_options, " gray");
+	strcat(term_options, "gray ");
 	break;
     case 0:
     default:
-	strcat(term_options, " monochrome");
+	strcat(term_options, "monochrome ");
 	break;
     }
 
-    for (i=0; i < n_colors ; i++ ) {
-	sprintf(term_options,"%s x%02x%02x%02x",
-		term_options,
+    for (i = 0; i < n_colors ; i++ ) {
+	sprintf(term_options + strlen(term_options),
+		"x%02x%02x%02x ",
 		web_color_rgbs[i].r,
 		web_color_rgbs[i].g,
 		web_color_rgbs[i].b);
@@ -340,8 +339,6 @@ PNG_text()
     png_byte pal_trans[1];
     char text[100];
     register int x, i, j;
-/*    register int row, value; */
-/* int mask, plane1, plane2, plane3, plane4; */
 
     png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
     if (!png_ptr) {
@@ -368,7 +365,8 @@ PNG_text()
 	return;
     }
 
-#ifdef __OLD_PNGLIB__  /* deprecated and no longer necessary */ 
+#ifdef __OLD_PNGLIB__
+    /* deprecated and no longer necessary */ 
     png_info_init(info_ptr);
     png_write_init(png_ptr); */
 #endif /* __OLD_PNGLIB__ */
@@ -391,8 +389,7 @@ PNG_text()
 	if (png_mode == 1) {
 	    info_ptr->sig_bit.gray = 3;
 	    png_set_shift(png_ptr, &(info_ptr->sig_bit));
-	} 
-	else {
+	} else {
 	    /* HBB 991123: we're now using the full 8 bits per color
 	     * component... */
 	    info_ptr->sig_bit.red = 8;
@@ -590,18 +587,26 @@ START_HELP(png)
 "?png",
 " The `png` terminal driver supports Portable Network Graphics.  To compile it,",
 " you will need  the third-party libraries \"libpng\" and \"zlib\"; both are",
-" available at ftp://ftp.uu.net/graphics/png.  `png` has two options.",
+" available at http://www.cdrom.com/pub/png/.  `png` has four options.",
 "",
-" By default, the `gif` terminal driver uses a shared Web-friendy palette.",
+" By default, the `png` terminal driver uses a shared Web-friendy palette.",
+"",
 " Syntax:",
 "       set terminal png {small | medium | large}",
-"                        { transparent }",
+"                        {transparent|notransparent}",
 "                        {monochrome | gray | color}",
+"                        {<color0> <color1> <color2> ...}",
 "",
+" `transparent` instructs the driver to generate transparent PNGs.  The first",
+" color will be the transparent one.",
+    "",
 " The defaults are small (fontsize) and color.  Default size of the output",
 " is 640*480 pixel. ",
 "",
-" `transparent` instructs the driver to generate transparent PNGs.  The first",
-" color will be the transparent one."
+" Each color must be of the form 'xrrggbb', where x is the literal character",
+" 'x' and 'rrggbb' are the red, green and blue components in hex.  For example,",
+" 'x00ff00' is green.  The background color is set first, then the border",
+" colors, then the X & Y axis colors, then the plotting colors.  The maximum",
+" number of colors that can be set is currently 99."
 END_HELP(png)
 #endif /* TERM_HELP */
