@@ -1,3 +1,42 @@
+1999-10-29  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* config/makefile.amg: Updated.
+
+	* docs/Makefile.in: Cosmetic changes, add another html target
+	for makeinfo-4.0.
+
+	* docs/doc2texi.el: Latest version from Bruce.
+
+	* docs/gnuplot.texi: Regenerated.
+
+	* src/alloc.c, src/bf_test.c, src/binary.c, src/bitmap.c,
+	src/command.c, src/contour.c, src/datafile.c, src/eval.c, src/fit.c,
+	src/graph3d.c, src/graphics.c, src/help.c, src/hidden3d.c,
+	src/internal.c, src/interpol.c, src/matrix.c, src/misc.c,
+	src/parse.c, src/plot.c, src/plot2d.c, src/plot3d.c, src/readline.c,
+	src/save.c, src/scanner.c, src/set.c, src/show.c, src/specfun.c,
+	src/standard.c,	src/term.c, src/time.c, src/unset.c, src/util.c,
+	src/util3d.c, src/variable.c, src/version.c: Add include statements.
+
+	* src/bf_test.c, src/bitmap.h, src/command.h, src/gplt_x11.c,
+	src/graph3d.c, term/eepic.trm, term/gpic.trm, term/hp26.trm,
+	term/hpljii.trm, term/imagen.trm, term/latex.trm, term/t410x.trm:
+	Add or edit function prototypes.
+
+	* src/binary.h, src/gpltconv.c: Minor changes.
+
+	* src/fit.c, src/graph3d.c: Rename some local index variables to
+	eliminate variable shadowing.
+
+	* src/plot.h: Comment out most include statements.
+
+	* src/plot2d.c(eval_plots): Use table for smooth and axes option
+	parser.
+
+	* src/show.c(show_style): Use table for style options parser.
+
+	* src/tables.c, src/table.h: New tables and enums for new parser.
+
 1999-10-21  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* FAQ: Latest version.
