@@ -1711,12 +1711,12 @@ struct Polygon GPHUGE *p;
     if (EQ(v1->x, v2->x))
 	which_intersect = v_intersect;
 
-    UPD_MINMAX(v1, v2, 1);
+    UPD_MINMAX(v1,v2,1);
 
     /* test first edge of polygon p */
     v3 = vlist + p->vertex[p->n - 1];
     v4 = vlist + p->vertex[0];
-    UPD_MINMAX(v3, v4, 2);
+    UPD_MINMAX(v3,v4,2);
 
 
     if (MINIMAX) {
@@ -1728,7 +1728,7 @@ struct Polygon GPHUGE *p;
     for (i = 0; i < p->n - 1; i++) {
 	v3 = vlist + p->vertex[i];
 	v4 = vlist + p->vertex[i + 1];
-	UPD_MINMAX(v3, v4, 2);
+	UPD_MINMAX(v3,v4,2);
 	if (!MINIMAX)
 	    continue;
 	s = (*which_intersect) (v1, v2, v3, v4);
