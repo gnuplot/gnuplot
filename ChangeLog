@@ -1,3 +1,11 @@
+2004-01-11  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/command.c, src/term.c, term/x11.trm, docs/gnuplot.doc: 
+	Add sanity checks to 'pause mouse' command; give a warning if mousing
+	is not active.  For X11, do *not* terminate 'pause mouse' on normal
+	input from stdin. This is necessary to allow 'pause mouse' to work
+	from piped input since more commands may already be queued up in stdin.
+
 2004-01-10  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* pm3d.c (geomean4): Support negative values to help splot surfaces with

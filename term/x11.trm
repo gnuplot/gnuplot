@@ -1,5 +1,5 @@
 /*
- * $Id: x11.trm,v 1.94 2004/01/07 19:11:30 lhecking Exp $
+ * $Id: x11.trm,v 1.95 2004/01/08 05:08:26 sfeam Exp $
  *
  */
 
@@ -617,6 +617,12 @@ AGAIN:
 	    }
 	} while (!FD_ISSET(fd, &fds));
 
+    /* If ipc_back_fd is not open, we will never see any mouse clicks! */
+    else if (paused_for_mouse) {
+	paused_for_mouse = FALSE;
+	int_error(NO_CARET,"Mousing not active");
+    }
+
     /* IPC_LOCK indicates that we are specifically waiting for a reply on */
     /* the mousing channel.  If stdin unblocks first, defer reading it,   */
     /* wait a few microseconds, and try again.                            */
@@ -628,6 +634,14 @@ AGAIN:
 #endif
         if (repeat_count++ < 100000)
 	    goto AGAIN;
+    }
+
+    /* Same sort of thing if we are specifically waiting for mouse input. */
+    if (paused_for_mouse) {
+#ifdef HAVE_USLEEP
+	usleep(10);
+#endif
+    	goto AGAIN;
     }
 
 #endif /* PIPE_IPC */

@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.199 2003/12/26 22:59:11 vanzandt Exp $
+C RCS $Id: gnuplot.doc,v 1.200 2004/01/07 14:44:32 lhecking Exp $
 C 18 September 2001
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001   Thomas Williams, Colin Kelley et al.
 C
@@ -2366,8 +2366,8 @@ C ... and restart the table:
  platform.  `pause 0` is synonymous with `print`.
 
  If the current terminal supports mousing, then `pause mouse` will terminate
- on either a mouse click or on a carriage return.  For all other terminals
- `pause mouse` is equivalent to `pause -1`.
+ on either a mouse click or on ctrl-C.  For all other terminals, or if mousing
+ is not active, `pause mouse` is equivalent to `pause -1`.
 
  Note: Since `pause` communicates with the operating system rather than the
  graphics, it may behave differently with different device drivers (depending

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.88 2003/12/01 08:33:42 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.89 2004/01/07 14:31:08 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -903,7 +903,10 @@ pause_command()
     if (equals(c_token,"mouse")) {
 	sleep_time = -1;
 	c_token++;
-	paused_for_mouse = TRUE;
+	if (term_initialised)
+	    paused_for_mouse = TRUE;
+	else
+	    int_warn(NO_CARET,"Mousing not active");
     } else
 #endif
 	sleep_time = real(const_express(&a));

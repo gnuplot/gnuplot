@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.64 2003/12/22 05:13:19 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.65 2004/01/07 19:11:30 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -566,6 +566,11 @@ void
 term_reset()
 {
     FPRINTF((stderr, "term_reset()\n"));
+
+#ifdef USE_MOUSE
+    /* Make sure that ^C will break out of a wait for 'pause mouse' */
+    paused_for_mouse = FALSE;
+#endif
 
     if (!term_initialised)
 	return;
