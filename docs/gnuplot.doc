@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.185 2003/08/20 17:48:47 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.186 2003/08/22 12:36:17 lhecking Exp $
 C 18 September 2001
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001   Thomas Williams, Colin Kelley et al.
 C
@@ -3375,6 +3375,8 @@ C ... and restart the table:
  The filename must be enclosed in quotes.
 
  The special filename "-" may be used to `save` commands to standard output.
+ On systems which support a popen function (Unix), the output of save can be
+ piped through an external program by starting the file name with a '|'.
  This provides a consistent interface to `gnuplot`'s internal settings to
  programs which communicate with `gnuplot` through a pipe.  Please see
  "help batch/interactive" for more details.
@@ -3385,6 +3387,8 @@ C ... and restart the table:
        save var 'var.dat'
        save set 'options.dat'
        save term 'myterm.gnu'
+       save '-'
+       save '|grep title >t.gp'
 2 set-show
 ?commands set
 ?commands show

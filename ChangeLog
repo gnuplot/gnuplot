@@ -1,3 +1,18 @@
+2003-10-21  Petr Mikulik  <mikulik@physics.muni.cz> 
+
+	Changes allowing to save gnuplot session to a pipe, for example
+	save "|cat >a.gp".
+
+	* docs/gnuplot.doc: Documentation update.
+
+        * src/command.c capture_filename_and_pfopen(): New routine, like
+        CAPTURE_FILENAME_AND_FOPEN but with popen() in addition.
+
+	* src/command.c save_command(): Reorganized.
+
+        * save.c save_functions() save_variables() save_all() save_term():
+	Reorganized.
+
 2003-10-17  Petr Mikulik  <mikulik@physics.muni.cz> 
 
 	* docs/old/README.os2: File removed. Information therein were already

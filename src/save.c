@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.67 2003/05/17 05:59:00 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.68 2003/08/20 17:48:45 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -74,14 +74,11 @@ void
 save_functions(fp)
 FILE *fp;
 {
-    if (fp) {
-	show_version(fp);	/* I _love_ information written */
-	save_functions__sub(fp);	/* at the top and the end of an */
-	fputs("#    EOF\n", fp);	/* human readable ASCII file.   */
-	if (stdout != fp)
-	    (void) fclose(fp);	/*                        (JFi) */
-    } else
-	os_error(c_token, "Cannot open save file");
+    /* I _love_ information written at the top and the end
+     * of a human readable ASCII file. */
+    show_version(fp);
+    save_functions__sub(fp);
+    fputs("#    EOF\n", fp);
 }
 
 
@@ -89,14 +86,9 @@ void
 save_variables(fp)
 FILE *fp;
 {
-    if (fp) {
 	show_version(fp);
 	save_variables__sub(fp);
 	fputs("#    EOF\n", fp);
-	if (stdout != fp)
-	    (void) fclose(fp);	/*                        (JFi) */
-    } else
-	os_error(c_token, "Cannot open save file");
 }
 
 
@@ -104,14 +96,9 @@ void
 save_set(fp)
 FILE *fp;
 {
-    if (fp) {
 	show_version(fp);
 	save_set_all(fp);
 	fputs("#    EOF\n", fp);
-	if (stdout != fp)
-	    (void) fclose(fp);	/*                        (JFi) */
-    } else
-	os_error(c_token, "Cannot open save file");
 }
 
 
@@ -119,7 +106,6 @@ void
 save_all(fp)
 FILE *fp;
 {
-    if (fp) {
 	show_version(fp);
 	save_set_all(fp);
 	save_functions__sub(fp);
@@ -131,10 +117,6 @@ FILE *fp;
 	    putc('\n', fp);
 	}
 	fputs("#    EOF\n", fp);
-	if (stdout != fp)
-	    (void) fclose(fp);	/*                        (JFi) */
-    } else
-	os_error(c_token, "Cannot open save file");
 }
 
 /*
@@ -180,7 +162,6 @@ void
 save_term(fp)
 FILE *fp;
 {
-    if (fp) {
 	show_version(fp);
 
 	/* A possible gotcha: the default initialization often doesn't set
@@ -198,12 +179,7 @@ FILE *fp;
 	    fprintf(fp, "# set output '%s'\n", outstr);
 	else
 	    fputs("# set output\n", fp);
-		
 	fputs("#    EOF\n", fp);
-	if (stdout != fp)
-	    (void) fclose(fp);	/*                        (JFi) */
-    } else
-	os_error(c_token, "Cannot open save file");
 }
 
 

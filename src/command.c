@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.75 2003/07/22 19:34:42 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.76 2003/07/27 22:28:36 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -1159,6 +1159,25 @@ reread_command()
 
 /* reset_command() is in unset.c */
 
+/* This routine is similar to macro CAPTURE_FILENAME_AND_FOPEN,
+ * with an addition to popen() on systems supporting this.
+ */
+static FILE*
+capture_filename_and_pfopen (char **save_file, char *mode)
+{
+    FILE *fp;
+    m_quote_capture(save_file, c_token, c_token);
+#ifdef PIPES
+    if (*save_file && (*save_file)[0]=='|') {
+	fp = popen((*save_file)+1, (mode));
+	return fp;
+    }
+#endif
+    gp_expand_tilde(save_file);
+    fp = strcmp(*save_file, "-") ? loadpath_fopen(*save_file, mode) : stdout;
+    return fp;
+}
+
 
 /* process the 'save' command */
 void
@@ -1166,49 +1185,53 @@ save_command()
 {
     FILE *fp;
     char *save_file = NULL;
+    int what;
 
     c_token++;
+    what = lookup_table(&save_tbl[0], c_token);
 
-    switch(lookup_table(&save_tbl[0],c_token)) {
+    switch (what) {
     case SAVE_FUNCS:
-	if (!isstring(++c_token))
+	case SAVE_SET:
+	case SAVE_TERMINAL:
+	case SAVE_VARS:
+	    c_token++;
+	    break;
+	default:
+	    if (!isstring(c_token))
+		int_error(c_token, "filename or keyword 'functions', 'variables', 'terminal' or 'set' expected");
+    }
+    
+    if (!isstring(c_token))
 	    int_error(c_token, "expecting filename");
-	else {
-	    CAPTURE_FILENAME_AND_FOPEN("w");
+    fp = capture_filename_and_pfopen(&save_file, "w");
+    if (!fp)
+	os_error(c_token, "Cannot open save file");
+
+    switch (what) {
+	case SAVE_FUNCS:
 	    save_functions(fp);
-	}
 	break;
     case SAVE_SET:
-	if (!isstring(++c_token))
-	    int_error(c_token, "expecting filename");
-	else {
-	    CAPTURE_FILENAME_AND_FOPEN("w");
 	    save_set(fp);
-	}
 	break;
     case SAVE_TERMINAL:
-	if (!isstring(++c_token))
-	int_error(c_token, "expecting filename");
-	else {
-	    CAPTURE_FILENAME_AND_FOPEN("w");
 	    save_term(fp);
-	}
 	break;
     case SAVE_VARS:
-	if (!isstring(++c_token))
-	    int_error(c_token, "expecting filename");
-	else {
-	    CAPTURE_FILENAME_AND_FOPEN("w");
 	    save_variables(fp);
-	}
 	break;
     default:
-	if (isstring(c_token)) {
-	    CAPTURE_FILENAME_AND_FOPEN("w");
 	    save_all(fp);
-	} else
-	    int_error(c_token, "filename or keyword 'functions', 'variables', 'terminal' or 'set' expected");
-	break;
+    }
+
+    if (stdout != fp) {
+#ifdef PIPES
+	if (save_file[0] == '|')
+	    (void) pclose(fp);
+	else
+#endif
+	    (void) fclose(fp);
     }
 
     c_token++;
