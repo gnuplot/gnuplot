@@ -40,8 +40,11 @@
 #include "bitmap.h"
 #include "setshow.h"
 
+#if 0
+/* Dangerous; putc may already be defined as fputc */
 /* corey@cac added the next line for efficiency */
 #define fputc putc
+#endif
 
 /* functions provided by in term.c */
 
@@ -57,7 +60,7 @@ void UNKNOWN_null __PROTO((void));
 int set_font_null __PROTO((char *s));
 void null_set_pointsize __PROTO((double size));
 
-extern FILE *outfile;
+extern FILE *gpoutfile;
 extern struct termentry *term;
 extern float xsize, ysize;
 
