@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.35 2002/01/24 08:41:08 joze Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.36 2002/01/31 17:14:26 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - gplt_x11.c */
@@ -2138,7 +2138,7 @@ PaletteMake(plot_struct * plot, t_sm_palette * tpal)
 	}
     }
 
-    FPRINTF((stderr, "(PaletteMake) allocated = %d\n", plot->cmap.allocated));
+    FPRINTF((stderr, "(PaletteMake) allocated = %d\n", plot->cmap->allocated));
     FPRINTF((stderr, "(PaletteMake) max_colors = %d\n", max_colors));
     FPRINTF((stderr, "(PaletteMake) min_colors = %d\n", min_colors));
 
