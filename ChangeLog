@@ -1,3 +1,7 @@
+2000-04-30  Johannes Zellner <johannes@zellner.org>
+	* small patch such that zooming of map views works again.
+	This patch apparently got lost during setup of the CVS repository.
+
 2000-03-30  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* Makefile.am, src/Makefile.am: Add missing files to EXTRA_DIST

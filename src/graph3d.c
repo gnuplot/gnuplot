@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.21 2000/02/11 19:17:18 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.22 2000/03/28 21:18:11 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -1036,12 +1036,14 @@ int quick;			/* !=0 means plot only axes etc., for quick rotation */
     {
 	unsigned int o_x, o_y, x, y;
 	map3d_xy(x_min3d, y_min3d, base_z, &o_x, &o_y);
+	axis3d_o_x = (int)o_x;
+	axis3d_o_y = (int)o_y;
 	map3d_xy(x_max3d, y_min3d, base_z, &x, &y);
-	axis3d_x_dx = (int)x - (int)o_x;
-	axis3d_x_dy = (int)y - (int)o_y;
+	axis3d_x_dx = (int)x - axis3d_o_x;
+	axis3d_x_dy = (int)y - axis3d_o_y;
 	map3d_xy(x_min3d, y_max3d, base_z, &x, &y);
-	axis3d_y_dx = (int)x - (int)o_x;
-	axis3d_y_dy = (int)y - (int)o_y;
+	axis3d_y_dx = (int)x - axis3d_o_x;
+	axis3d_y_dy = (int)y - axis3d_o_y;
     }
 #endif
 }
