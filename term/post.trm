@@ -1,5 +1,5 @@
 /*
- * $Id: post.trm,v 1.87 2003/01/22 15:08:37 broeker Exp $
+ * $Id: post.trm,v 1.88 2003/02/11 06:08:01 sfeam Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -106,8 +106,13 @@ TERM_PUBLIC void PS_filled_polygon (int, gpiPoint *);
 # include <stdio.h>
 #endif
 
-#define PS_FLUSH_PATH \
-    if (ps_path_count) { fprintf(gpoutfile, "stroke "); ps_path_count = 0; }
+#define PS_FLUSH_PATH do {			\
+    if (ps_path_count) {			\
+	fprintf(gpoutfile, "stroke\n");		\
+	ps_path_count = 0;			\
+	PS_relative_ok = FALSE;			\
+    }						\
+} while (0)
 
 static char *PS_RememberFont __PROTO((char *fname, int reencode));
 static void ENHPS_put_text __PROTO((unsigned int x, unsigned int y, const char *str));
@@ -141,7 +146,7 @@ static float ps_dash_length = 1.0;   /*  scale factor for dash-dot patterns  */
 static float ps_linewidth_factor = 1.0;   /*  scale factor for linewidth  */
 static TBOOLEAN ps_eps = FALSE;	/* Is this for an eps file? */
 			/* Added by Robert Davis <davis@ecn.purdue.edu> */
-static int ps_page = 0;			/* page count */
+static int ps_page = 0;		/* page count */
 static int ps_path_count = 0; 	/* count of lines in path */
 static int ps_ang = 0;			/* text angle */
 static enum JUSTIFY ps_justify = LEFT;	/* text is flush left */
@@ -1636,10 +1641,11 @@ PS_reset()
 
 TERM_PUBLIC void
 PS_linetype(linetype)
-int linetype;
+    int linetype;
 {
     linetype = (linetype % 9) + 2;
-    if (linetype < 0) linetype = 0;
+    if (linetype < 0)
+	linetype = 0;
     PS_relative_ok = FALSE;
 #if 0
     /*  In order to make 'PS_linewidth' work properly, I need to comment
@@ -1718,16 +1724,17 @@ double ptsize;
 
 TERM_PUBLIC void
 PS_move(x,y)
-unsigned int x,y;
+    unsigned int x,y;
 {
-    int dx, dy;
     /* Make this semi-dynamic and independent of architecture */
     char abso[5+2*INT_STR_LEN], rel[5+2*INT_STR_LEN];
-    dx = x - PS_pen_x;
-    dy = y - PS_pen_y;
+    int dx = x - PS_pen_x;
+    int dy = y - PS_pen_y;
+
     /* can't cancel all null moves--need a move after stroke'ing */
     if (dx==0 && dy==0 && PS_relative_ok)
 	return;
+
     sprintf(abso, "%d %d M\n", x, y);
     sprintf(rel, "%d %d R\n", dx, dy);
 
@@ -1745,28 +1752,42 @@ unsigned int x,y;
 
 TERM_PUBLIC void
 PS_vector(x,y)
-unsigned int x,y;
+    unsigned int x,y;
 {
-    int dx, dy;
     char abso[5+2*INT_STR_LEN], rel[5+2*INT_STR_LEN];
+    int dx = x - PS_pen_x;
+    int dy = y - PS_pen_y;
 
-    dx = x - PS_pen_x;
-    dy = y - PS_pen_y;
-    if (dx==0 && dy==0) return;
+    if (dx==0 && dy==0)
+	return;
+
     sprintf(abso, "%d %d L\n", x, y);
     sprintf(rel, "%d %d V\n", dx, dy);
+
     if (strlen(rel) < strlen(abso) && PS_relative_ok) {
 	fputs(rel, gpoutfile);
 	PS_taken++;
-    }else
+    } else
 	fputs(abso, gpoutfile);
+
     PS_relative_ok = TRUE;
     ps_path_count += 1;
     PS_pen_x = x;
     PS_pen_y = y;
-    if (ps_path_count >= 400) {
+    /* HBB FIXME 20030218: the old default of 400 could lead to
+     * pile-up of rounding errors in ghostscript for very long
+     * sequences of optimized relative moves. 100 works around that,
+     * to some extent, but nobody seems to know why ;-( */
+    if (ps_path_count >= 100) {
+#if 0 /* HBB 20030218: older code */
 	fputs("currentpoint stroke M\n", gpoutfile);
 	ps_path_count = 0;
+#else
+	/* HBB NEW 20030218: use macro so the next path is guaranteed
+	 * to start with an absolute position, to reduce the problem
+	 * mentioned above. */
+	PS_FLUSH_PATH;
+#endif
     }
 }
 
@@ -1778,7 +1799,8 @@ PS_put_text(x,y,str)
 {
     char ch;
 
-    if (!str && !strlen(str)) return;
+    if (!str && !strlen(str))
+	return;
     PS_move(x,y);
     if (ps_blacktext)
 	fputs("gsave 0 setgray\n", gpoutfile);
@@ -1793,12 +1815,16 @@ PS_put_text(x,y,str)
 	putc(ch,gpoutfile);
 	ch = *str++;
     }
+
     switch(ps_justify) {
-    case LEFT : fputs(") Lshow\n", gpoutfile);
+    case LEFT :
+	fputs(") Lshow\n", gpoutfile);
 	break;
-    case CENTRE : fputs(") Cshow\n", gpoutfile);
+    case CENTRE :
+	fputs(") Cshow\n", gpoutfile);
 	break;
-    case RIGHT : fputs(") Rshow\n", gpoutfile);
+    case RIGHT :
+	fputs(") Rshow\n", gpoutfile);
 	break;
     }
     if (ps_ang != 0 || ps_blacktext)
@@ -1889,7 +1915,7 @@ int number;
 	number %= sizeof(pointFNS)/sizeof(pointFNS[0]) -1;
     fprintf(gpoutfile,"%d %d %s\n", x, y, pointFNS[number+1]);
 
-    PS_relative_ok = 0;
+    PS_relative_ok = FALSE;
     ps_path_count = 0;
     PS_linetype_last = -1; /* force next linetype change */
 }
@@ -1977,7 +2003,7 @@ PS_fillbox(style, x1,y1,width,height)
         fprintf(gpoutfile, "%d %d %d %d BoxFill\n", x1, y1, width, height);
 #endif /* USE_ULIG_FILLEDBOXES */
 
-    PS_relative_ok = 0;
+    PS_relative_ok = FALSE;
     PS_linetype_last = -1;
 }
 
@@ -2333,11 +2359,7 @@ ENHPS_put_text(x, y, str)
     if (!strlen(str))
 	return;
 
-    if (ps_path_count) {
-	fputs(" stroke\n",gpoutfile);
-	ps_path_count = 0;
-	PS_relative_ok = FALSE;
-    }
+    PS_FLUSH_PATH;
 
     /* if there are no magic characters, we should just be able
      * punt the string to PS_put_text(), which will give shorter
@@ -2403,11 +2425,14 @@ ENHPS_put_text(x, y, str)
     fprintf(gpoutfile, "] %.1f ", -ENHps_max_height/3);
 
     switch(ps_justify) {
-    case LEFT : fputs("MLshow\n", gpoutfile);
+    case LEFT :
+	fputs("MLshow\n", gpoutfile);
 	break;
-    case CENTRE : fputs("MCshow\n", gpoutfile);
+    case CENTRE :
+	fputs("MCshow\n", gpoutfile);
 	break;
-    case RIGHT : fputs("MRshow\n", gpoutfile);
+    case RIGHT :
+	fputs("MRshow\n", gpoutfile);
 	break;
     }
 
@@ -2701,6 +2726,7 @@ PS_relative_ok = FALSE; /* "M" required because "g" forces stroke */
 TERM_PUBLIC void PS_filled_polygon ( int points, gpiPoint *corners )
 {
     int i;
+
     /* Needed to stroke the previous graphic element. */
     PS_FLUSH_PATH;
     /* produce lines like:
