@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.122 2004/09/01 15:53:47 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.123 2004/09/15 20:25:41 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -1039,21 +1039,6 @@ boundary(struct curve_points *plots, int count)
 
 /*}}} */
 
-void
-get_offsets(
-    struct text_label *this_label,
-    struct termentry *t,
-    int *htic, int *vtic)
-{
-    if (this_label->lp_properties.pointflag) {
-	*htic = (pointsize * t->h_tic * 0.5 * this_label->hoffset);
-	*vtic = (pointsize * t->v_tic * 0.5 * this_label->voffset);
-    } else {
-	*htic = 0;
-	*vtic = 0;
-    }
-}
-
 
 static void
 get_arrow(
@@ -1202,42 +1187,18 @@ static void
 place_labels(struct text_label *listhead, int layer)
 {
     struct text_label *this_label;
-    struct termentry *t = term;
+    unsigned int x, y;
 
-    if (t->pointsize) {
-	(*t->pointsize) (pointsize);
-    }
-    for (this_label = listhead;
-	 this_label != NULL;
-	 this_label = this_label->next) {
-	unsigned int x, y;
-	int htic;
-	int vtic;
+    if (term->pointsize)
+	(*term->pointsize)(pointsize);
 
-	get_offsets(this_label, t, &htic, &vtic);
+    for (this_label = listhead; this_label != NULL; this_label = this_label->next) {
 
 	if (this_label->layer != layer)
 	    continue;
 	map_position(&this_label->place, &x, &y, "label");
 
-	/* EAM - textcolor support in progress */
-	apply_textcolor(&(this_label->textcolor),t);
-
-	/* EAM - Allow arbitrary rotation of label text */
-	if (this_label->rotate && (*t->text_angle) (this_label->rotate)) {
-	    write_multiline(x + htic, y + vtic, this_label->text, this_label->pos, JUST_TOP,
-			    this_label->rotate, this_label->font);
-	    (*t->text_angle) (0);
-	} else {
-	    write_multiline(x + htic, y + vtic, this_label->text, this_label->pos, JUST_TOP,
-			    0, this_label->font);
-	}
-	if (this_label->lp_properties.pointflag) {
-	    term_apply_lp_properties(&this_label->lp_properties);
-	    (*t->point) (x, y, this_label->lp_properties.p_type);
-	    /* the default label colour is that of border */
-	    term_apply_lp_properties(&border_lp);
-	}
+	write_label(x, y, this_label);
     }
 }
 

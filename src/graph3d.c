@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.96 2004/09/01 15:53:47 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.97 2004/09/19 23:42:24 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -485,22 +485,17 @@ get_arrow3d(
 static void
 place_labels3d(struct text_label *listhead, int layer)
 {
-    struct termentry *t = term;
     struct text_label *this_label;
-    if (t->pointsize) {
-	(*t->pointsize)(pointsize);
-    }
-    for (this_label = listhead; this_label != NULL;
-	 this_label = this_label->next) {
+    unsigned int x, y;
 
-	unsigned int x, y;
-	int htic;
-	int vtic;
+    if (term->pointsize)
+	(*term->pointsize)(pointsize);
 
-	get_offsets(this_label, t, &htic, &vtic);
+    for (this_label = listhead; this_label != NULL; this_label = this_label->next) {
 
 	if (this_label->layer != layer)
 	    continue;
+
 	map3d_position(&this_label->place, &x, &y, "label");
 
 	/* EAM  FIXME - This should really be a general test for out-of-bounds */
@@ -511,24 +506,7 @@ place_labels3d(struct text_label *listhead, int layer)
 	    continue;
 	}
 
-	apply_textcolor(&(this_label->textcolor),t);
-
-	/* EAM - Allow arbitrary rotation of label text */
-	if (this_label->rotate && (*t->text_angle) (this_label->rotate)) {
-	    write_multiline(x + htic, y + vtic, this_label->text,
-			    this_label->pos, CENTRE, this_label->rotate,
-			    this_label->font);
-	    (*t->text_angle) (0);
-	} else {
-	    write_multiline(x + htic, y + vtic, this_label->text,
-			    this_label->pos, CENTRE, 0, this_label->font);
-	}
-	if (this_label->lp_properties.pointflag) {
-	    term_apply_lp_properties(&this_label->lp_properties);
-	    (*t->point) (x, y, this_label->lp_properties.p_type);
-	    /* the default label color is that of border */
-	    term_apply_lp_properties(&border_lp);
-	}
+	write_label(x, y, this_label);
     }
 }
 

@@ -1,3 +1,15 @@
+2004-09-24  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/graphics.c (get_offsets place_labels) src/graphics.h:
+	Simplify place_labels by calling a new shared routine.
+	Move the support routine get_offsets into gadgets.c as well.
+
+	* src/graph3d.c (plot_labels3d): Simplify place_labels3d by calling
+	a new shared routine.
+	
+	src/gadgets.c (get_offsets write_label) src/gadgets.h:
+	New routine write_label that is shared by both the 2D and 3D code.
+
 2004-09-20  Ethan Merritt  <merritt@u.washington.edu>
 
 	* configure.in: --enable-with-image requires both pm3d and binary file

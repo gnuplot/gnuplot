@@ -360,4 +360,8 @@ void default_arrow_style __PROTO((struct arrow_style_type *arrow));
 void free_labels __PROTO((struct text_label *tl));
 #endif
 
+void get_offsets __PROTO((struct text_label *this_label,
+	struct termentry *t, int *htic, int *vtic));
+void write_label __PROTO((unsigned int x, unsigned int y, struct text_label *label));
+
 #endif /* GNUPLOT_GADGETS_H */

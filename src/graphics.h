@@ -1,5 +1,5 @@
 /*
- * $Id: graphics.h,v 1.27 2004/07/05 03:49:21 sfeam Exp $
+ * $Id: graphics.h,v 1.28 2004/09/01 15:53:48 mikulik Exp $
  */
 
 /* GNUPLOT - graphics.h */
@@ -99,8 +99,6 @@ extern double bar_size;
 
 /* function prototypes */
 
-void get_offsets __PROTO((struct text_label* this_label,
-	struct termentry* t, int* htic, int* vtic));
 void do_plot __PROTO((struct curve_points *, int));
 int label_width __PROTO((const char *, int *));
 void map_position __PROTO((struct position * pos, unsigned int *x,

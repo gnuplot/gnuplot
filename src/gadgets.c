@@ -450,3 +450,49 @@ char *master_font = label->font;
 
 }
 #endif
+
+void
+get_offsets(
+    struct text_label *this_label,
+    struct termentry *t,
+    int *htic, int *vtic)
+{
+    if (this_label->lp_properties.pointflag) {
+	*htic = (pointsize * t->h_tic * 0.5 * this_label->hoffset);
+	*vtic = (pointsize * t->v_tic * 0.5 * this_label->voffset);
+    } else {
+	*htic = 0;
+	*vtic = 0;
+    }
+}
+
+
+/*
+ * Write one label, with all the trimmings.
+ * This routine is used for both 2D and 3D plots.
+ */
+void
+write_label(unsigned int x, unsigned int y, struct text_label *this_label)
+{
+	int htic, vtic;
+	int justify = JUST_TOP;	/* This was the 2D default; 3D had CENTRE */
+
+	apply_textcolor(&(this_label->textcolor),term);
+
+	get_offsets(this_label, term, &htic, &vtic);
+	if (this_label->rotate && (*term->text_angle) (this_label->rotate)) {
+	    write_multiline(x + htic, y + vtic, this_label->text,
+			    this_label->pos, justify, this_label->rotate,
+			    this_label->font);
+	    (*term->text_angle) (0);
+	} else {
+	    write_multiline(x + htic, y + vtic, this_label->text,
+			    this_label->pos, justify, 0, this_label->font);
+	}
+	if (this_label->lp_properties.pointflag) {
+	    term_apply_lp_properties(&this_label->lp_properties);
+	    (*term->point) (x, y, this_label->lp_properties.p_type);
+	    /* the default label color is that of border */
+	    term_apply_lp_properties(&border_lp);
+	}
+}
