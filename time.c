@@ -56,10 +56,10 @@ static char *RCSid = "$Id: time.c,v 1.11 1998/04/14 00:16:27 drd Exp $";
 
 # ifdef HAVE_SYS_TIMEB_H
 #  include <sys/timeb.h>
-#else
+# else
 /* declare struct timeb */
 extern int ftime(struct timeb *);
-#endif
+# endif /* !HAVE_SYS_TIMEB_H */
 
 # define int_error(x,y) fprintf(stderr, "Error: " x "\n")
 # define int_warn(x,y) fprintf(stderr, "Warn: " x "\n")
@@ -120,8 +120,7 @@ int nr, *d;
  */
 
 
-static int mndday[12] =
-{31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+static int mndday[12] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
 
 static int xstrftime __PROTO((char *buf, int bufsz, char *fmt, struct tm * tm));
 
@@ -784,17 +783,22 @@ struct tm *tm;
 #ifdef TEST_TIME
 
 char *abbrev_month_names[] =
-{"jan", "feb", "mar", "apr", "may", "jun", "jul",
- "aug", "sep", "oct", "nov", "dec"};
+ { "jan", "feb", "mar", "apr", "may", "jun", "jul",
+   "aug", "sep", "oct", "nov", "dec"
+ };
+
 char *full_month_names[] =
-{"January", "February", "March", "April", "May",
-"June", "July", "August", "September", "October", "November", "December"};
+ { "January", "February", "March", "April", "May",
+   "June", "July", "August", "September", "October",
+   "November", "December"
+ };
 
-char *abbrev_day_names[] =
-{"sun", "mon", "tue", "wed", "thu", "fri", "sat"};
+char *abbrev_day_names[] = { "sun", "mon", "tue", "wed", "thu", "fri", "sat" };
+
 char *full_day_names[] =
-{"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
-
+ { "Sunday", "Monday", "Tuesday", "Wednesday",
+   "Thursday", "Friday", "Saturday"
+ };
 
 
 /* either print current time using supplied format, or read

@@ -693,8 +693,7 @@ TERM_PUBLIC void LATEX_put_text(x, y, str)
 unsigned int x, y;		/* reference point of string */
 char str[];			/* the text */
 {
-    static char *justify[] =
-    {"[l]", "", "[r]"};
+    static char *justify[] = { "[l]", "", "[r]" };
     int flag, i;
 
     /* ignore empty strings */
