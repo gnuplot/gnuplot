@@ -1,3 +1,12 @@
+2003-03-22  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* term/post.trm(PS_filled_polygon): Don't call PS_FLUSH_PATH but reset
+	ps_path_count instead (flush is automatic). Fixes broken pm3d map
+	layout (required by pm3dConvert*.awk scripts) due to "stroke\n" in
+	PS_FLUSH_PATH.
+
+	* demo/pm3d.dem: Replace "set view 180,..." by "set pm3d map".
+
 2003-03-21  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* term/x11.trm: Allow to use both the default '"gnuplot_x11.exe"' and
@@ -33,7 +42,6 @@
 	bug 696179. If the user provides new colors in 'set term', then
 	overwrite any previously specified colors (bug 702382).
 
-
 2003-03-18  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/plot2d.c (eval_plots): Initialize arrow_properties of plot
@@ -45,7 +53,6 @@
 	* demo/vector.dem: Use set term push/pop to avoid screen terminal
  	dependency.
 	
-
 2003-03-17  Leo Brewin <leo.brewin@sci.monash.edu.au>
 
 	* term/pdf.trm: Tell pdflib to use its built-in font metrics for

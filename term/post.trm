@@ -1,5 +1,5 @@
 /*
- * $Id: post.trm,v 1.90 2003/02/21 16:30:00 broeker Exp $
+ * $Id: post.trm,v 1.91 2003/02/23 22:46:17 mikulik Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -2722,24 +2722,24 @@ TERM_PUBLIC int PS_make_palette (t_sm_palette *palette)
 
 TERM_PUBLIC void PS_set_color (double gray)
 {
-/* map [0;1] to interval [16;255] */
-/* Note: command G puts on stack current colour/gray values to be restored 
-   afterwards!
-*/
-  
-    if (gray <= 0)  fputs( "0 g ", gpoutfile ); 
-    else if (gray >= 1) fputs( "1 g ", gpoutfile ); 
-    else fprintf( gpoutfile, "%s g ", save_space(gray) );
-PS_relative_ok = FALSE; /* "M" required because "g" forces stroke */
+/* map [0;1] to gray/colors */
+    if (gray <= 0)
+	fputs( "0 g ", gpoutfile ); 
+    else {
+	if (gray >= 1)
+	    fputs( "1 g ", gpoutfile ); 
+	else
+	    fprintf( gpoutfile, "%s g ", save_space(gray) );
+    }
+    PS_relative_ok = FALSE; /* "M" required because "g" forces stroke (??) */
 }
 
 
 TERM_PUBLIC void PS_filled_polygon ( int points, gpiPoint *corners )
 {
-    int i;
-
-    /* Needed to stroke the previous graphic element. */
-    PS_FLUSH_PATH;
+    /* Stroke of the previous graphic element is automatic. */
+    ps_path_count = 0;
+    PS_relative_ok = FALSE;
     /* produce lines like:
        9055 29350 N 695 0 V 0 564 V -695 0 h  ... for quadrangles
        9055 29350 N 695 0 V 0 564 f           ... otherwise
@@ -2752,6 +2752,7 @@ TERM_PUBLIC void PS_filled_polygon ( int points, gpiPoint *corners )
 	    corners[1].x-corners[0].x, corners[1].y-corners[0].y
 	       );
     else {  
+	int i;
 	for (i = 1; i < points-1; i++)
 	    fprintf(gpoutfile, " %i %i V",
 		corners[i].x-corners[i-1].x, corners[i].y-corners[i-1].y);
