@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.24 2000/11/22 10:40:00 amai Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.25 2000/11/22 11:15:16 amai Exp $"); }
 #endif
 
 /* GNUPLOT - gplt_x11.c */
@@ -2777,6 +2777,8 @@ XEvent *event;
 	 * expose events. (joze)
 	 */
 	plot = find_plot(event->xexpose.window);
+	if (!plot)
+	   break;
 	if (!event->xexpose.count) {
 	    /* XXX jitters display while resizing */
 	    UpdateWindow(plot);
@@ -2784,6 +2786,8 @@ XEvent *event;
 	break;
     case EnterNotify:
 	plot = find_plot(event->xcrossing.window);
+	if (!plot)
+	   break;
 	if (plot == current_plot) {
 	    Call_display(plot);
 	    gp_exec_event(GE_motion, (int) RevX(event->xcrossing.x), (int) RevY(event->xcrossing.y), 0, 0);
@@ -2798,6 +2802,8 @@ XEvent *event;
     case MotionNotify:
 	update_modifiers(event->xmotion.state);
 	plot = find_plot(event->xmotion.window);
+	if (!plot)
+	   break;
 	{
 	    Window root, child;
 	    int root_x, root_y, pos_x, pos_y;
@@ -2818,8 +2824,10 @@ XEvent *event;
 	}
 	break;
     case ButtonPress:
-	plot = find_plot(event->xbutton.window);
 	update_modifiers(event->xbutton.state);
+	plot = find_plot(event->xbutton.window);
+	if (!plot)
+	   break;
 	{
 	    if (plot == current_plot) {
 	        Call_display(plot);
@@ -2831,6 +2839,8 @@ XEvent *event;
 	break;
     case ButtonRelease:
 	plot = find_plot(event->xbutton.window);
+	if (!plot)
+	   break;
 	if (plot == current_plot) {
 
 	    long int doubleclick = SetTime(plot, event->xbutton.time);

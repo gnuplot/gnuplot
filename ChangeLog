@@ -1,3 +1,6 @@
+2000-11-22  Alexander Mai <st002279@hrzpub.tu-darmstadt.de>
+        * src/gplt_x11.c: fix some segmentation faults
+
 2000-11-23  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/pm3d.h graph3d.c mouse.c pm3d.c save.c set.c show.c unset.c
