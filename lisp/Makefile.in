@@ -27,7 +27,7 @@ EMACS = @EMACS@
 MAKEINFO = @MAKEINFO@
 mkinstalldirs = $(SHELL) $(top_srcdir)/../mkinstalldirs
 LATEX = @LATEX@
-# $Header$
+# $Header: /cvsroot/gnuplot/gnuplot/lisp/Makefile.in,v 1.13 2001/09/18 07:58:14 amai Exp $
 
 DVIPS = @DVIPS@
 INSTALL = @INSTALL@
@@ -36,13 +36,14 @@ INSTALL_DATA = @INSTALL_DATA@
 # Command to byte-compile
 BYTEC = $(EMACS) -batch -q -no-site-file -l $(srcdir)/dot.el -f batch-byte-compile
 
+ELS = gnuplot-gui.el gnuplot.el info-look.20.2.el info-look.20.3.el
+
 ELCS = info-look.elc gnuplot.elc gnuplot-gui.elc
 
 DIST_COMMON = ChangeLog Makefile.dst Makefile.in README aclocal.m4 \
 acinclude.m4 configure configure.in
 
-EXTRA_DIST = dot.el dotemacs gnuplot-gui.el gnuplot.el gnuplot.el.old \
-gpelcard.tex info-look.20.2.el info-look.20.3.el
+EXTRA_DIST = dot.el dotemacs gnuplot.el.old gpelcard.tex $(ELS)
 
 DISTFILES = $(DIST_COMMON) $(EXTRA_DIST)
 
@@ -115,11 +116,18 @@ gpelcard.dvi: gpelcard.tex
 
 all: $(ELCS)
 
-install: install-elcs
+install: install-els install-elcs
+
+install-els: $(ELS)
+	$(mkinstalldirs) $(DESTDIR)$(lispdir)
+	@for p in $(ELS) ; do \
+	  echo " $(INSTALL_DATA) $$p $(DESTDIR)$(lispdir)/$$p"; \
+	  $(INSTALL_DATA) $$p $(DESTDIR)$(lispdir)/$$p; \
+	done
 
 install-elcs: $(ELCS)
 	$(mkinstalldirs) $(DESTDIR)$(lispdir)
-	@for p in gnuplot.el gnuplot-gui.el *.elc; do \
+	@for p in $(ELCS) ; do \
 	  echo " $(INSTALL_DATA) $$p $(DESTDIR)$(lispdir)/$$p"; \
 	  $(INSTALL_DATA) $$p $(DESTDIR)$(lispdir)/$$p; \
 	done
