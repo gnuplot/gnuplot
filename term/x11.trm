@@ -1,5 +1,5 @@
 /*
- * $Id: x11.trm,v 1.66 2002/12/07 18:39:23 lhecking Exp $
+ * $Id: x11.trm,v 1.67 2002/12/13 20:12:40 mikulik Exp $
  *
  */
 
@@ -291,9 +291,6 @@ static unsigned int X11_plot_number;
 
 enum X11_id {
     X11_RESET,
-#ifdef USE_X11_DRIVER /* HBB 20020214: Disabled X11_DRIVER */
-    X11_DRIVER,
-#endif
     X11_PERSIST,
     X11_NOPERSIST,
     X11_RAISE,
@@ -304,9 +301,6 @@ enum X11_id {
 
 static struct gen_table X11_opts[] = {
     {"res$et", X11_RESET},
-#ifdef USE_X11_DRIVER /* HBB 20020214: Disabled X11_DRIVER */
-    {"dr$iver", X11_DRIVER},
-#endif
     {"per$sist", X11_PERSIST},
     {"noper$sist", X11_NOPERSIST},
     {"rai$se", X11_RAISE},
@@ -330,27 +324,6 @@ X11_options()
 	    X11_atexit();	/* tell gnuplot_x11 to shut down */
 	    ++c_token;
 	    break;
-#ifdef USE_X11_DRIVER /* HBB 20020214: Disabled X11_DRIVER */
-	case X11_DRIVER:
-	    ++c_token;
-	    if (isstring(c_token)) {
-		char *path;
-		/* get text */
-		path = gp_alloc(token_len(c_token), "x11->driver");
-		quote_str(path, c_token, token_len(c_token));
-		if (strcmp(path, X11_command)) {
-		    /* tell gnuplot_x11 to shut down
-		     * if the driver name has changed. */
-		    X11_atexit();
-		}
-		if (X11_command && X11_command != X11_default_command)
-		    free(X11_command);
-		X11_command = path;
-		parse_driver(X11_command);
-		c_token++;
-	    }
-	    break;
-#endif /* no X11_DRIVER */
 	case X11_PERSIST:
 	    persist = yes;
 	    c_token++;
@@ -390,11 +363,7 @@ X11_options()
 	    break;
 	}
     }
-#ifdef USE_X11_DRIVER /* HBB 20020214: Disabled X11_DRIVER */
-    sprintf(term_options, "%d driver \"%s\"", X11_plot_number, X11_command);
-#else
     sprintf(term_options, "%d", X11_plot_number);
-#endif
     if (UNSET != do_raise) {
 	strcat(term_options, (yes == do_raise ? " raise" : " noraise"));
     }
@@ -1227,11 +1196,7 @@ START_HELP(x11)
 " if the `-display` command line option is used.",
 "",
 " Syntax:",
-#ifdef USE_X11_DRIVER /* HBB 20020214: Disabled X11_DRIVER */
-"    set terminal x11 [reset] [<n>] [driver <path>] [[no]persist] [[no]raise]",
-#else
 "    set terminal x11 [reset] [<n>] [[no]persist] [[no]raise] [font <fontspec>]",
-#endif    
 "",
 " Multiple plot windows are supported: `set terminal x11 <n>` directs the",
 " output to plot window number n.  If n>0, the terminal number will be",
@@ -1264,13 +1229,6 @@ START_HELP(x11)
 " actually terminates the subprocess which maintains the windows (unless",
 " `-persist` was specified).",
 "",
-#ifdef USE_X11_DRIVER /* HBB 20020214: Disabled X11_DRIVER */
-" The option `driver` can be used to specify a driver different from the",
-" default driver `gnuplot_x11`. This options is thought mainly for developers",
-" who are working on new driver features. Note that changing the driver will",
-" shut down the connection to the previous driver. Example:",
-"     gnuplot> set term x11 driver \"gnuplot_x11_38a\"",
-#endif
 "",
 " The gnuplot outboard driver, gnuplot_x11, is searched in a default place",
 " chosen when the program is compiled.  You can override that by defining",
