@@ -596,6 +596,6 @@ START_HELP(apollo)
 " The `apollo` terminal driver supports the Apollo Graphics Primitive Resource",
 " with rescaling after window resizing.  It has no options.",
 "",
-" If a fixed-size window is used, the `gpr` terminal may be used instead."
+" If a fixed-size window is desired, the `gpr` terminal may be used instead."
 END_HELP(apollo)
 #endif
