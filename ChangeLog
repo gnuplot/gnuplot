@@ -1,3 +1,8 @@
+2004-08-06  Ethan Merritt  <merritt@u.washington.edu>
+
+	* term/graphics.c (place_arrows): Restore default text color after
+	drawing all the arrows. Fixes bug #1004765.
+
 2004-08-02  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/gd.trm src/term.h configure.in src/show.c (show_version):

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.118 2004/07/21 23:13:50 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.119 2004/07/25 12:22:31 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -1156,6 +1156,7 @@ place_arrows(int layer)
 	apply_head_properties(&(this_arrow->arrow_properties));
 	(*t->arrow) (sx, sy, ex, ey, this_arrow->arrow_properties.head);
     }
+    term_apply_lp_properties(&border_lp);
 }
 
 static void
