@@ -1,3 +1,13 @@
+1999-10-11  "Eric S. Raymond"  <esr@thyrsus.com>
+
+	* demo/airfoil.dem, demo/animate.dem, demo/binary.dem,
+	demo/controls.dem, demo/electron.dem, demo/fit.dem, demo/hidden.dem,
+	demo/mgr.dem, demo/param.dem, demo/polar.dem, demo/prob.dem,
+	demo/prob2.dem, demo/scatter.dem, demo/simple.dem, demo/spline.dem,
+	demo/steps.dem, demo/surface1.dem, demo/surface2.dem, demo/timedat.dem,
+	demo/using.dem: Demo directory cleanup patch. Box a bunch of legends
+	and use reset instead of ad-hoc set statements.
+
 1999-10-11  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* plot2d.c: Bugfix for logscale plots with unused y2 axis.
