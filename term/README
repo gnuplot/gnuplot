@@ -65,7 +65,19 @@ struct TERMENTRY {
    void (*boxfill) __PROTO((int style, unsigned int x1, unsigned int y1, unsigned int width, unsigned int height)); /* clear part of multiplot */
    void (*linewidth) __PROTO((double linewidth));
    void (*pointsize) __PROTO((double pointsize));
-   void (*waitforinput) __PROTO((void));
+#ifdef USE_MOUSE
+   int (*waitforinput) __PROTO((void));
+   void (*put_tmptext) __PROTO((int i, const char str[]));
+   void (*set_ruler) __PROTO((int x, int y));
+   void (*set_cursor) __PROTO((int c, int x, int y));
+   void (*set_clipboard) __PROTO((const char s[]));
+#endif
+#ifdef PM3D
+   int (*make_palette)__PROTO((t_sm_palette *palette));
+   void (*previous_palette) __PROTO(());
+   void (*set_color) __PROTO((double gray));
+   void (*filled_polygon) __PROTO((int points, gpiPoint *corners));
+#endif
 };
 
 One consequence of (1) is that we would like drivers to be backwards
@@ -282,6 +294,55 @@ _boxfill() - fills a box in given style (currently unimplemented - always
            support of inset graphs
 
 _linewidth() - sets the linewidth
+
+The next five functions are used for mouse support, and should be
+conditioned on USE_MOUSE:
+
+_waitforinput() - used for mouse input.  Return the next character
+   that can be read from stdin.  In the mean time, process any mouse
+   events.
+
+_put_tmptext(int i, const char str[]) - Display temporary text, after
+   erasing any temporary text displayed previously at this location.
+   The int determines where: 0=statusline, 1,2: at corners of zoom
+   box, with \r separating text above and below the point.
+
+_set_ruler(int x, int y) - Draw a ruler (crosshairs) centered at the
+   indicated screen coordinates.  If x<0, switch ruler off.
+
+_set_cursor(int c, int x, int y) - Set cursor style and corner of
+   rubber band rectangle.  c selects the action: -2=warp the cursor to
+   the given point, -1=start zooming, 0=standard cross-hair cursor,
+   1=cursor during rotation, 2=cursor during scaling, 3=cursor during
+   zooming.
+
+_set_clipboard(const char s[]) - Write a string to the clipboard.
+
+
+The following four functions should be conditioned on PM3D.  See also:
+pm3d/old-docs/README-pm3d.
+
+_make_palette(t_sm_palette *palette) - If argument is NULL, return
+   number of colors available.  If the number of colors is not limited
+   (continuously shaded colors can be generated), return 0.
+   Otherwise, allocate the palette.  (t_sm_palette is defined in
+   src/color.h.)
+
+_set_color(double value) - Set polygon fill color according to value,
+   where 0 <= value <= 1.  If using a palette, first map value to an
+   integer i in the interval [0...num_colors-1], then set to the ith
+   color in the palette.
+
+_filled_polygon(int points, gpiPoint *corners) - Draw a polygon with
+   the fill color set by set_color, and no border.  (gpiPoint is
+   defined in src/color.h.)
+
+_previous_palette() - Release the palette that the above routine
+   allocated and get back the palette that was active before.  Some
+   terminals, like displays, may draw parts of the figure using their
+   own palette. Terminals that use only one palette for the whole plot
+   don't need this routine.
+
 
 The following should illustrate the order in which calls to these
 routines are made:
