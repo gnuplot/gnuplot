@@ -1,3 +1,40 @@
+Changes in release 3.7.1:
+[3.7.0.2]
+* add pgp keys
+* new driver for BeOS
+* X11 driver now uses ececvp() instead of execl()
+  to eliminate intermediate shell process
+* new gnuplot-mode.el for X/Emacs
+* update to OS/2 REXX interface
+* more drivers enabled by default under OS/2
+* Bezier interpolation rewritten to prevent overflow
+* Windows linestyle fixed
+* introduce layers (front, back) for labels and arrows
+* tiny and giant fonts added to gif driver
+* tilde expansion; (does not for for "cd" and "set output")
+* GNU readline related:
+    new syntax for --with-readline option in configure
+    no more duplicate history entries
+    use gnuplot history file
+* SECURITY: --with-linux-vga=no is now default
+* SECURITY: better control when Linux executable with
+  SVGAlib access actually runs as root
+* SECURITY: potential risk fixed in iris4d terminal
+* EXPERIMENTAL: new --enable-thin-splines option in configure
+  to enable thin plate splines in plot3d.c
+* configuration: --enable-apollo, --enable-gpr and --enable-unixpc
+  options removed, related code is now in syscfg.h.
+  --enable-cgi and --enable-sun options removed, now automatically
+  detected at configure time. --enable-system-time option removed.
+
+[3.7.0.1]
+* bug fix for negative aspect ratio
+* bug fixes in the cgm, eepic, png, and pslatex driver
+* bug fix in the data fitting code
+* bug fixes for HP-UX, NEXT, and Windows
+* bug fixes for save and set lmargin commands
+* better makefile for Amiga SAS/c
+
 What's new in 3.7 ?
 
 from 315 to 348
