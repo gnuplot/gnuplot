@@ -1,3 +1,12 @@
+2004-02-12  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/specfun.c demo/random.dem docs/gnuplot.doc:
+	Modify behaviour of rand() function in response to bug report #870706
+	    rand(0) returns a pseudorandom number generated from current seeds
+	    rand(-1) resets both seeds to a standard value
+	    rand(x) for x>0 sets both 32-bit seeds to x
+	    rand({x,y}) for x>0 sets seed1 to x and seed2 to y
+
 2004-02-12  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/os2/gclient.c: Let the color sequence of the first 5 line types

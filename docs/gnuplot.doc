@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.201 2004/01/11 20:06:57 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.202 2004/01/26 04:30:42 sfeam Exp $
 C 18 September 2001
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001   Thomas Williams, Colin Kelley et al.
 C
@@ -344,6 +344,9 @@ C
 
  The `history` command (for gnuplot with its own readline, not with GNU
  readline) now includes several useful options.
+
+ The built-in function `rand(x)` has been modified to allow explicit seeding
+ of the pseudo-random number generator. See `random`.
 
  The MS Windows package includes an additional executable `pgnuplot.exe` to
  support piping command through standard input, which is otherwise not
@@ -941,12 +944,16 @@ C
 ?expressions functions rand
 ?functions rand
 ?rand
-#rand(x) & any & $\mbox{rand}(\mbox{real}(x))$,  pseudo random number generator \\
-%rand(x)@any@$rand ( roman real (x))$, pseudo random number generator
- The `rand(x)` function returns a pseudo random number in the interval [0:1]
- using the real part of its argument as a seed.  If seed < 0, the sequence
- is (re)initialized.  If the argument is a complex value, the imaginary
- component is ignored.
+#rand(x) & any & $\mbox{rand}(x)$,  pseudo random number generator \\
+%rand(x)@any@$rand (x)$, pseudo random number generator
+ `rand(0)`  returns a pseudo random number in the interval [0:1] generated
+            from the current value of two internal 32-bit seeds. 
+ `rand(-1)` resets both seeds to a standard value. 
+ `rand(x)`  for x>0 sets both seeds to a value based on the value of x.
+ `rand({x,y})` for x>0 sets seed1 to x and seed2 to y.
+ Note: This behavior has changed starting with gnuplot version 3.8l. Older
+ scripts that expected rand(x>0) to produce sequential pseudo-random numbers
+ from the same seeded sequence must be changed to call rand(0) instead.
 4 real
 ?expressions functions real
 ?functions real
@@ -1096,10 +1103,25 @@ C
  `valid(x)` may be used only in expressions as part of `using` manipulations
  to fits or datafile plots.  See `plot datafile using`.
 @end table
- See also
+ See also 
 ^ <a href="http://gnuplot.sourceforge.net/demo/airfoil.html">
  airfoil.dem: use of functions and complex variables for airfoils demo.
 ^ </a>
+
+4 Random number generator
+?random
+?expressions random
+
+ The behavior of the built-in function `rand(x)` has changed as of version 3.8l.
+ Older scripts that expected rand(x>0) to produce sequential pseudo-random
+ numbers from the same seeded sequence must be changed to call rand(0) instead.
+ The current behavior is as follows:
+  `rand(0)`  returns a pseudo random number in the interval [0:1] generated
+             from the current value of two internal 32-bit seeds. 
+  `rand(-1)` resets both seeds to a standard value. 
+  `rand(x)`  for x>0 sets both seeds to a value based on the value of x.
+  `rand({x,y})` for x>0 sets seed1 to x and seed2 to y.
+
 3 Operators
 ?expressions operators
 ?operators

@@ -1,5 +1,5 @@
 #
-# $Id: random.dem,v 1.6 2003/10/28 05:35:54 sfeam Exp $
+# $Id: random.dem,v 1.7 2004/01/13 07:01:10 sfeam Exp $
 #
 # random.dem
 #
@@ -8,8 +8,6 @@
 # is not very good.
 #
 # Copyright (c) 1991, Jos van der Woude, jvdwoude@hut.nl
-seed = 1317
-seed = rand(seed)
 unset key
 set xrange [0: 1]
 set yrange [0: 1]
@@ -25,12 +23,11 @@ set tics
 set sample 1000
 set style function dots
 set parametric
-plot rand(1), rand(1)
+plot rand(0), rand(0)
 pause -1 "Hit return to continue"
 print "3D plot ahead, one moment please ..."
 set sample 50
-splot rand(1), rand(1), rand(1)
+splot rand(0), rand(0), rand(0)
 pause -1 "Hit return to continue"
 
 reset
-

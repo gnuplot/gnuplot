@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: specfun.c,v 1.24 2003/11/18 19:57:39 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: specfun.c,v 1.25 2003/12/14 22:16:01 vanzandt Exp $"); }
 #endif
 
 /* GNUPLOT - specfun.c */
@@ -48,6 +48,7 @@ static char *RCSid() { return RCSid("$Id: specfun.c,v 1.24 2003/11/18 19:57:39 s
 
 #include "specfun.h"
 #include "stdfn.h"
+#include "util.h"
 
 #define ITMAX   200
 
@@ -103,7 +104,7 @@ static double p1evl __PROTO((double x, const double coef[], int N));
 static double confrac __PROTO((double a, double b, double x));
 static double ibeta __PROTO((double a, double b, double x));
 static double igamma __PROTO((double a, double x));
-static double ranf __PROTO((double init));
+static double ranf __PROTO((struct value * init));
 static double inverse_normal_func __PROTO((double p));
 static double inverse_error_func __PROTO((double p));
 static double lambertw __PROTO((double x));
@@ -693,7 +694,7 @@ void f_rand(arg)
     struct value a;
 
     (void) arg;				/* avoid -Wunused warning */
-    push(Gcomplex(&a, ranf(real(pop(&a))), 0.0));
+    push(Gcomplex(&a, ranf(pop(&a)), 0.0));
 }
 
 #else /* BADRAND */
@@ -961,11 +962,11 @@ igamma(a, x)
 ***********************************************************************/
 static double
 ranf(init)
-    double init;
+    struct value *init;
 {
     long k, z;
     static int firsttime = 1;
-    static long s1, s2;
+    static long seed1, seed2;
     static const long Xm1 = 2147483563L;
     static const long Xm2 = 2147483399L;
     static const long Xa1 = 40014L;
@@ -973,21 +974,36 @@ ranf(init)
 
 
     /* (Re)-Initialize seeds if necessary */
-    if (init < 0.0 || firsttime == 1) {
+    if ( real(init) < 0.0 || firsttime == 1) {
 	firsttime = 0;
-	s1 = 1234567890L;
-	s2 = 1234567890L;
+	seed1 = 1234567890L;
+	seed2 = 1234567890L;
     }
+
+    /* Construct new seed values from input parameter */
+    /* FIXME: Ideally we should allow all 64 bits of seed to be set */
+    if (real(init) > 0.0) {
+	if (real(init) >= (double)(017777777777UL))
+	    int_error(NO_CARET,"Illegal seed value");
+	if (imag(init) >= (double)(017777777777UL))
+	    int_error(NO_CARET,"Illegal seed value");
+	seed1 = (int)real(init);
+	seed2 = (int)imag(init);
+	if (seed2 == 0)
+	    seed2 = seed1;
+    }
+    FPRINTF((stderr,"ranf: seed = %lo %lo        %ld %ld\n", seed1,seed2));
+    
     /* Generate pseudo random integers */
-    k = s1 / 53668L;
-    s1 = Xa1 * (s1 - k * 53668L) - k * 12211;
-    if (s1 < 0)
-	s1 += Xm1;
-    k = s2 / 52774L;
-    s2 = Xa2 * (s2 - k * 52774L) - k * 3791;
-    if (s2 < 0)
-	s2 += Xm2;
-    z = s1 - s2;
+    k = seed1 / 53668L;
+    seed1 = Xa1 * (seed1 - k * 53668L) - k * 12211;
+    if (seed1 < 0)
+	seed1 += Xm1;
+    k = seed2 / 52774L;
+    seed2 = Xa2 * (seed2 - k * 52774L) - k * 3791;
+    if (seed2 < 0)
+	seed2 += Xm2;
+    z = seed1 - seed2;
     if (z < 1)
 	z += (Xm1 - 1);
 
