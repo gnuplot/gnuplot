@@ -1,8 +1,44 @@
+2003-01-27  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* term/emf.trm (min, max): Renamed internal macros to gnuplot
+ 	default names: GPMIN, GPMAX.
+
+	* src/graphics.c (i_inrange): Reformatted.
+	
+	* src/graph3d.c (i_inrange): Reformatted.
+
+2003-01-27  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	Fix some bugs in handling of reversed axes.
+	
+	* src/axis.h (struct AXIS): Renamed element "reverse_range" to
+ 	"range_is_reverted", which explains its usage more clearly.  All
+ 	usages of this element renamed, throughout the source.
+	(AXIS_INIT3D, CHECK_REVERSE): Mask "autoscale" by AUTOSCALE_BOTH
+ 	before comparison, to avoid disruption by AUTOSCALE_FIX{MIN|MAX}
+ 	bits stored in there, too.
+
+	* src/stdfn.h (cliptorange): New macro to simplify clipping values
+ 	to potentially reversed ranges.
+
+	* src/axis.c (setup_tics): Introduced local "this" pointer into
+ 	axis_array.  Locals fixmin,fixmax renamed to autoextend_{min|max},
+ 	to be more self-explanatory.
+	(load_range): If range input "backwards", e.g. '[5:-5]', turn on
+ 	the "reverse" flag for that axis.
+
+	* src/graphics.c (plot_impulses, plot_boxes): Replaced explicit
+ 	code by call to new macro "cliptorange".
+	(two_edge_intersect_steps, two_edge_intersect_fsteps): Replaced
+ 	explicit code by calls to macros "inrange" and "cliptorange".
+  	Removed some superfluous pointer increments.
+
 2003-01-27  Petr Mikulik  <mikulik@physics.muni.cz>
 
-	* src/axis.h: Removed patch 2003-01-25 about of the changed definition
-	of AUTOSCALE_FIXMIN and AUTOSCALE_FIXMAX. The bug of reversed y-axis,
-	"set autoscale fix" and mouse zooming seems to be more tricky.
+	* src/axis.h: Removed patch 2003-01-25 about of the changed
+ 	definition of AUTOSCALE_FIXMIN and AUTOSCALE_FIXMAX. The bug of
+ 	reversed y-axis, "set autoscale fix" and mouse zooming seems to be
+ 	more tricky.
 
 2003-01-25  Petr Mikulik  <mikulik@physics.muni.cz>
 
@@ -10,9 +46,10 @@
 
 2003-01-25  Petr Mikulik  <mikulik@physics.muni.cz>
 
-	* src/axis.h: Change the definition of AUTOSCALE_FIXMIN from 1<<2 to
-	AUTOSCALE_MIN | 1<<2. Similarly for AUTOSCALE_FIXMAX. Fixes a bug of
-	wrong z- and cb-ranges during mouse zooming of a pm3d splot. 
+	* src/axis.h: Change the definition of AUTOSCALE_FIXMIN from 1<<2
+ 	to AUTOSCALE_MIN | 1<<2. Similarly for AUTOSCALE_FIXMAX. Fixes a
+ 	bug of wrong z- and cb-ranges during mouse zooming of a pm3d
+ 	splot.
 
 2003-01-24  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
@@ -1793,7 +1830,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2003/01/25 11:27:37 $).
+	last modification date (from the tag $Date: 2003/01/27 09:30:27 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
