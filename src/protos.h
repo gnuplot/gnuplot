@@ -1,5 +1,5 @@
 /*
- * $Id: protos.h,v 1.7 1999/06/09 12:07:19 lhecking Exp $
+ * $Id: protos.h,v 1.8 1999/06/11 18:55:09 lhecking Exp $
  *
  */
 
@@ -54,6 +54,8 @@ int do_line __PROTO((void));
 void done __PROTO((int status));
 void define __PROTO((void));
 void bail_to_command_line __PROTO((void));
+void replotrequest __PROTO((void));
+
 
 /* Prototypes from file "contour.c" */
 typedef double tri_diag[3];         /* Used to allocate the tri-diag matrix. */
@@ -283,63 +285,6 @@ int gstrftime __PROTO((char *, int, char *, double)); /* *tm to string */
 double gtimegm __PROTO((struct tm *)); /* *tm to seconds */
 int ggmtime __PROTO((struct tm *, double)); /* seconds to *tm */
 
-
-/* Prototypes from file "util.c" */
-
-int chr_in_str __PROTO((int t_num, int c));
-int equals __PROTO((int t_num, char *str));
-int almost_equals __PROTO((int t_num, char *str));
-int isstring __PROTO((int t_num));
-int isanumber __PROTO((int t_num));
-int isletter __PROTO((int t_num));
-int is_definition __PROTO((int t_num));
-void copy_str __PROTO((char str[], int t_num, int max));
-int token_len __PROTO((int t_num));
-void quote_str __PROTO((char str[], int t_num, int max));
-void capture __PROTO((char str[], int start, int end, int max));
-void m_capture __PROTO((char **str, int start, int end));
-void m_quote_capture __PROTO((char **str, int start, int end));
-void convert __PROTO((struct value *val_ptr, int t_num));
-void disp_value __PROTO((FILE *fp, struct value *val));
-double real __PROTO((struct value *val));
-double imag __PROTO((struct value *val));
-double magnitude __PROTO((struct value *val));
-double angle __PROTO((struct value *val));
-struct value * Gcomplex __PROTO((struct value *a, double realpart, double imagpart));
-struct value * Ginteger __PROTO((struct value *a, int i));
-#if defined(VA_START) && defined(ANSI_C)
-void os_error __PROTO((int, char *, ...));
-void int_error __PROTO((int, char *, ...));
-void int_warn __PROTO((int, char *, ...));
-#else
-void os_error ();
-void int_error ();
-void int_warn ();
-#endif
-void lower_case __PROTO((char *s));
-void squash_spaces __PROTO((char *s));
-
-
-/* Prototypes from file "util3d.c" */
-
-void draw_clip_line __PROTO((unsigned int, unsigned int, unsigned int, unsigned int));
-/* HBB: these two are now in hidden3d.c : */
-/*void clip_move __PROTO((unsigned int x, unsigned int y));*/
-/*void clip_vector __PROTO((unsigned int x, unsigned int y));*/
-/* HBB: this one didn't have any prototype yet: */
-int clip_line __PROTO((int *, int *, int *, int *));
-void edge3d_intersect __PROTO((struct coordinate GPHUGE *points, int i, double *ex, double *ey, double *ez));
-TBOOLEAN two_edge3d_intersect __PROTO((struct coordinate GPHUGE *points, int i, double *lx, double *ly, double *lz));
-void mat_unit __PROTO((double mat[4][4]));
-void mat_trans __PROTO((double tx, double ty, double tz, double mat[4][4]));
-void mat_scale __PROTO((double sx, double sy, double sz, double mat[4][4]));
-void mat_rot_x __PROTO((double teta, double mat[4][4]));
-void mat_rot_y __PROTO((double teta, double mat[4][4]));
-void mat_rot_z __PROTO((double teta, double mat[4][4]));
-void mat_mult __PROTO((double mat_res[4][4], double mat1[4][4], double mat2[4][4]));
-int clip_point __PROTO((unsigned int x, unsigned int y));
-void clip_put_text __PROTO((unsigned int x, unsigned int y, char *str));
-void clip_put_text_just __PROTO((unsigned int x, unsigned int y, char *str, enum JUSTIFY just));
 
 /* contents of the old fnproto.h file */
 
