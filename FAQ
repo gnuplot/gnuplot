@@ -1,5 +1,3 @@
-[next_inactive] [up] [previous]
-
                                  Gnuplot FAQ
 
 Contents
@@ -107,8 +105,8 @@ via anonymous ftp from ftp.gnuplot.info in /pub/gnuplot/faq/gnuplot-faq.txt.
 If you have access to the WWW, you can get the newest version of this
 document from http://www.ucc.ie/gnuplot/gnuplot-faq.html.
 
-Today's version is version $Revision: 1.8 $, dated $Date: 2000/10/25
-08:31:23 $
+Today's version is version $Revision: 1.8 $, dated $Date: 2001/11/06
+19:12:16 $
 
 0.2 Where do I send comments about this document?
 
@@ -126,7 +124,7 @@ today's scientists for graphic data representation. gnuplot is copyrighted,
 but freely distributable; you don't have to pay for it.
 
 This document deals with gnuplot Version 3.7 which is the latest official
-release as of February 11, 2001. References to bug-fix versions or (recent)
+release as of November 6, 2001. References to bug-fix versions or (recent)
 beta versions are explicitly marked.
 
 1.2 How did it come about and why is it called gnuplot?
@@ -255,12 +253,11 @@ The following sites have more information about gnuplot.
      online documentation in html-format
    * http://www.usf.uni-osnabrueck.de/ breiter/tools/gnuplot/index.en.html
      has many links to many features and add-ons for gnuplot
-   * http://web.math-cs.uni.edu/cs/Help/gnuplot/TOC.html contains an online
-     tutorial
+   * http://web.cs.uni.edu/Help/gnuplot/ contains an online tutorial
    * http://brian.me.tufts.edu/GnuplotInLaTeX/ contains infos abount gnuplot
      and LATEX
-   * http://www.eso.org/ ndevilla/gnuplot/ explains the use of a gnuplot API
-     in ANSI C (commonly known as gnuplot_(pipes)
+   * http://ndevilla.free.fr/gnuplot/ explains the use of a gnuplot API in
+     ANSI C (commonly known as gnuplot_pipes
    * http://ricardo.ecn.wfu.edu/ cottrell/qplot/ on how to plot quarterly
      time data
    * http://monsoon.harvard.edu/ mhagger/download a Python interface for
@@ -290,8 +287,8 @@ should be aware that beta versions are not officially endorsed.
      for the 3.6 beta version, but also a web-gateway to the users'
      newsgroup
    * http://members.theglobe.com/gnuplot/ basically same as above.
-   * http://users.ece.gatech.edu/ schooley/gnuplot.html contains a Macintosh
-     version based on 3.6 beta 322
+   * http://homepage.mac.com/gnuplot/ is the new site for a Macintosh port
+     of gnuplot
 
 The following sites were said to exist, however they seem to be down right
 now.
@@ -1130,7 +1127,7 @@ University, Sydney.
 The command line arguments were:
 latex2html -split 0 -show_section_numbers -html_version 3.2 gnuplot-faq.tex
 
-The translation was initiated by Juergen von Hagen on 2001-02-11
+The translation was initiated by Juergen von Hagen on 2001-11-06
   ------------------------------------------------------------------------
 [next_inactive] [up] [previous]
-Juergen von Hagen 2001-02-11
+Juergen von Hagen 2001-11-06
