@@ -17,6 +17,15 @@
 /* Define if compiler can handle ANSI prototypes.  */
 #undef ANSI_C
 
+/* Define if you want to use the Apollo Graphics Primitive Resource.  */
+#undef APOLLO
+
+/* Define if you want to use the CGI terminal under SCO.  */
+#undef CGI
+
+/* Define if you want to use libgrx20 with MSDOS/djgpp.  */
+#undef DJSVGA
+
 /* Define if this system uses a 32-bit DOS extender (djgpp/emx).  */
 #undef DOS32
 
@@ -26,6 +35,18 @@
 /* Define if you are using the GNU readline library.  */
 #undef GNU_READLINE
 
+/* Define if your libplot.a is from GNU plotutils.  */
+#undef GNU_PLOTUTILS
+
+/* Define if you want to use the GNU version of the Unix plot library.  */
+#undef GNUGRAPH
+
+/* Define if you want to use the Apollo Graphics Primitive Resource (fixed-size window.  */
+#undef GPR
+
+/* Define if you want to use a newer version of libgrx under MSDOS/djgpp.  */
+#undef GRX21
+
 /* Define if the C preprocessor understands ANSI stringification.  */
 #undef HAVE_CPP_STRINGIFY
 
@@ -34,6 +55,9 @@
 
 /* Define if you have the png library.  */
 #undef HAVE_LIBPNG
+
+/* Define if you want to use the IRIS terminal on IRIS4D series computers.  */
+#undef IRIS
 
 /* Define if this is a Linux system with SuperVGA library.  */
 #undef LINUXVGA
@@ -118,6 +142,15 @@
 
 /* Define as the type of the fifth argument to select.  */
 #undef SELECT_ARGTYPE_5
+
+/* Define if you want to use the sunview terminal (sun).  */
+#undef SUN
+
+/* Define if you want to use the unixpc terminal (ATT 3b1 or ATT 7300.  */
+#undef UNIXPC
+
+/* Define if you want to use the standard Unix plot library.  */
+#undef UNIXPLOT
 
 /* Define to the version of the distribution.  */
 #undef VERSION
