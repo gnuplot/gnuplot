@@ -20,6 +20,8 @@ if test "$2" != yes && test "$2" != no; then
   gp_h_path=`echo "$2" | sed -e 's%/lib$1\.a$%%'`
   gp_h_prfx=`echo "$gp_h_path" | sed -e 's%/lib$%%' -e 's%/include$%%'`
   gp_h_list="$gp_h_prfx $gp_h_prfx/include $gp_h_path"
+else
+  gp_h_list=''
 fi
 for ac_dir in $gp_h_list '' /usr/local/include ; do
   test x${ac_dir} != x && CPPFLAGS="$gp_save_CPPFLAGS -I${ac_dir}"
