@@ -1,3 +1,20 @@
+2002-12-17  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* docs/Makefile.in: Adjust DEFAULT_INCLUDES and INCLUDES. Remove
+	jpeg.trm from CORETERM. New generated file term.h, used instead of
+	../src/term.h, and adjust dependencies accordingly. Better rule to
+	generated allterm.h.
+
+	* term/epslatex.trm: Fix typos in help section (was labeled as post
+	instead of epslatex).
+
+	* term/pdf.trm, term/svg.trm: Fix indentation of term help section.
+
+	* term/png.trm: Rename "png (OLD)" to "png_old" to allow for
+	alphabetical sorting of term help entries.
+
+	* term/vgagl.trm: Remove spaces-only line from end of term help.
+
 2002-12-13  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* docs/Makefile.in: Add DEFAULT_INCLUDES. Update CORETERM. Add
@@ -1623,7 +1640,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/12/15 20:12:38 $).
+	last modification date (from the tag $Date: 2002/12/16 14:20:55 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
