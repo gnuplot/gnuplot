@@ -1,3 +1,11 @@
+2004-04-17  Ethan Merritt  <merritt@u.washington.edu>
+
+	* term/x11.trm: Clear all I/O locks when X11_reset is called.
+	This is a more generic fix for the problem addressed by the patch
+	of 2004-04-13, and covers cases such as a remote X-server failing
+	to respond. Even without this patch the connection will eventually
+	timeout, but with the patch you can ctrl-C out rather than waiting.
+
 2004-04-15  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* README: Mention CTAN as a distributor.

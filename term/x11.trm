@@ -1,5 +1,5 @@
 /*
- * $Id: x11.trm,v 1.105 2004/04/13 17:24:39 broeker Exp $
+ * $Id: x11.trm,v 1.106 2004/04/14 05:53:42 sfeam Exp $
  *
  */
 
@@ -632,13 +632,11 @@ AGAIN:
     /* IPC_LOCK indicates that we are specifically waiting for a reply on */
     /* the mousing channel.  If stdin unblocks first, defer reading it,   */
     /* wait a few microseconds, and try again.                            */
-    /* FIXME EAM - Give up after 1.0 second.  This will drop input chars, */
-    /* but at least it won't hang forever if the X11 connection is bad.   */
+    /* FIXME EAM - Give up after 10 seconds.  This will drop input chars, */
+    /* but at least it won't hang forever if the X11 connection goes bad. */
     if (IPC_LOCK) {
-#ifdef HAVE_USLEEP
-	usleep(10);
-#endif
-        if (repeat_count++ < 100000)
+	sleep(1);
+        if (repeat_count++ < 10)
 	    goto AGAIN;
     }
 
@@ -782,7 +780,14 @@ X11_init()
 TERM_PUBLIC void
 X11_reset()
 {
-    /* leave the pipe alone, until exit or  set term x11 reset */
+    /* Leave the pipe alone, until exit or  set term x11 reset */
+    /* but make sure that all locks are cleared.               */
+#ifdef PIPE_IPC
+    IPC_LOCK = FALSE;
+#endif
+#ifdef USE_MOUSE
+    paused_for_mouse = FALSE;
+#endif
 }
 
 #define PRINT0(fmt)          fprintf(X11_ipc, fmt)
