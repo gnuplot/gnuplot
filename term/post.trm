@@ -1,5 +1,5 @@
 /*
- * $Id: post.trm,v 1.105 2004/04/13 17:24:36 broeker Exp $
+ * $Id: post.trm,v 1.106 2004/05/09 14:35:04 mikulik Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -1672,6 +1672,8 @@ NULL };
 	    case S_ENC_CP852:	    e = PS_cp_852_encoding; break;
 	    case S_ENC_CP1250:	    e = PS_cp_1250_encoding; break;
 	    case S_ENC_KOI8_R:	    e = PS_koi8r_encoding; break;
+	    case S_ENC_DEFAULT:
+	    default:		    break;
 	}
 	if (e) {
 	    for (i = 0; e[i] != NULL; i++) {

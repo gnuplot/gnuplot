@@ -3,6 +3,8 @@
 	* src/graphics.c (boundary): prevent plot from flipping upside-down
 	if the title or key take up too much vertical space.
 
+	* term/post.trm: Add explicit default case to encoding switch.
+
 2004-05-09  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/x11.trm: Reduce time delay in waitforinput() from 1 sec
