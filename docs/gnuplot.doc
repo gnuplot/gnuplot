@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.215 2004/04/16 02:22:59 cgaylord Exp $
+C RCS $Id: gnuplot.doc,v 1.216 2004/04/17 17:26:14 cgaylord Exp $
 C 18 September 2001
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -2564,7 +2564,18 @@ C ... and restart the table:
        every ::5::15    # selects points 5 through 15 in each block
 
  See
-^ <a href="http://www.gnuplot.info/demo/simple.html"> simple plot demos (simple.dem). </a>
+^ <a href="http://www.gnuplot.info/demo/simple.html">
+ simple plot demos (simple.dem)
+^ </a>
+,
+^ <a href="http://www.gnuplot.info/demo/surface1.html">
+ Non-parametric splot demos
+^ </a>
+, and 
+^ <a href="http://gnuplot.sourceforge.net/demo/surface2.html">
+ Parametric splot demos
+^ </a>
+.
 
 4 example datafile
 ?commands plot datafile example
@@ -3005,6 +3016,11 @@ C ... and restart the table:
  (see `set bars` for details).
 
  If autoscaling is on, the ranges will be adjusted to include the error bars.
+
+ See also
+^ <a href="http://gnuplot.sourceforge.net/demo/mgr.html">
+errorbar demos.
+^ </a>
 
  See `plot using`, `plot with`, and `set style` for more information.
 3 errorlines
@@ -3637,6 +3653,10 @@ C ... and restart the table:
 
  To show all arrows (in tag order), use:
        show arrow
+
+^ <a href="http://gnuplot.sourceforge.net/demo/arrowstyle.html">
+arrows demos.
+^ </a>
 
 3 autoscale
 ?commands set autoscale
@@ -5681,6 +5701,10 @@ C ... and restart the table:
  will depend on the screen size of the display device, e.g., perhaps quite
  different on a video display and a printer.
 
+ See also
+^ <a href="http://gnuplot.sourceforge.net/demo/multiplt.html">multiplot demo (multiplt.dem)</a>
+.
+
 3 mx2tics
 ?commands set mx2tics
 ?commands unset mx2tics
@@ -6967,7 +6991,7 @@ C ... and restart the table:
  the `yerrorbars` style---either from y-ydelta to y+ydelta or from ylow to
  yhigh, depending on how many data columns are provided.
  See also
-^ <a href="http://www.gnuplot.info/demo/errorbar.html">
+^ <a href="http://www.gnuplot.info/demo/mgr.html">
  errorbar demo.
 ^ </a>
 5 boxes
@@ -7108,7 +7132,11 @@ C ... and restart the table:
  By default the rectangle is empty if (open > close), and filled with three
  vertical bars if (close > open). If filled-boxes support is present, then
  the rectangle is colored according to `set style fill <fillstyle>`.
- See `set bars` and `financebars`.
+ See `set bars` and `financebars`.  See also
+^ <a href="http://gnuplot.sourceforge.net/demo/candlesticks.html">
+ finance demos
+^ </a>
+.
 
  Note: To place additional symbols, such as the median value, on a
  box-and-whisker plot requires additional plot commands as in this example:
@@ -7298,7 +7326,7 @@ C ... and restart the table:
  A tic mark is placed at the ends of the error bar (unless `set bars` is
  used---see `set bars` for details).
  See also
-^ <a href="http://www.gnuplot.info/demo/errorbar.html">
+^ <a href="http://www.gnuplot.info/demo/mgr.html">
  errorbar demo.
 ^ </a>
 5 xerrorlines
@@ -7351,7 +7379,7 @@ C ... and restart the table:
  ends of the error bar (unless `set bars` is used---see `set bars` for
  details).
  See also
-^ <a href="http://www.gnuplot.info/demo/errorbar.html">
+^ <a href="http://www.gnuplot.info/demo/mgr.html">
  errorbar demo.
 ^ </a>
 3 surface
