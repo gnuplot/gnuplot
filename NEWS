@@ -57,6 +57,7 @@ and the example script demo/mousevariables.dem.
 * NEW 'set palette palette <n>' options {float|int} and output to that of
   'set print'
 * NEW enhanced text mode for x11 gd pdf and dumb terminals
+* UPDATED aquaterm terminal driver (Mac OS X). Requires AquaTerm 1.0 or later.
 
 [3.8j]
 * NEW 'show palette fit2rgbformulae'
