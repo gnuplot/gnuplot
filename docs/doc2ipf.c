@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: doc2ipf.c,v 1.11 2001/09/29 09:45:00 amai Exp $"); }
+static char *RCSid() { return RCSid("$Id: doc2ipf.c,v 1.12 2002/03/07 16:11:25 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - doc2ipf.c */
@@ -74,7 +74,7 @@ struct TABENTRY {		/* may have MAX_COL column tables */
     char col[MAX_COL][256];
 };
 
-struct TABENTRY table = { NULL };
+struct TABENTRY table;
 struct TABENTRY *tableins = &table;
 int tablecols = 0;
 int tablewidth[MAX_COL] = {0, 0, 0, 0, 0, 0};	/* there must be the correct
@@ -86,9 +86,7 @@ static TBOOLEAN debug = FALSE;
 
 
 int
-main(argc, argv)
-int argc;
-char **argv;
+main (int argc, char **argv)
 {
     FILE *infile;
     FILE *outfile;
@@ -116,8 +114,7 @@ char **argv;
 }
 
 void
-convert(a, b)
-FILE *a, *b;
+convert( FILE *a, FILE *b)
 {
     static char line[MAX_LINE_LEN+1];
 
@@ -138,9 +135,7 @@ FILE *a, *b;
 }
 
 void
-process_line(line, b)
-char *line;
-FILE *b;
+process_line( char *line, FILE *b)
 {
     static int line_count = 0;
     static char line2[MAX_LINE_LEN+1];

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: xref.c,v 1.6 1999/11/03 16:06:47 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: xref.c,v 1.7 2002/03/07 16:11:25 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - xref.c */
@@ -70,12 +70,14 @@ struct LIST *head = NULL;
 struct LIST *keylist = NULL;
 struct LIST *keyhead = NULL;
 
+void dump_list __PROTO((void));
+
 int maxlevel = 0;		/* how deep are the topics nested? */
 int listitems = 0;		/* number of topics */
 
 /* for debugging (invoke from gdb !) */
 void
-dump_list()
+dump_list(void)
 {
     struct LIST *element = head;
     while (element) {
@@ -106,8 +108,7 @@ unsigned int size;
 
 /* scan the file and build a list of line numbers where particular levels are */
 void
-parse(a)
-FILE *a;
+parse(FILE *a)
 {
     static char line[MAX_LINE_LEN+1];
     char *c;
@@ -184,8 +185,7 @@ FILE *a;
  * of one to `splot`. Switched the search order -SB.
  */
 struct LIST *
-lookup(s)
-char *s;
+lookup(char *s)
 {
     char *c;
     char tokstr[MAX_LINE_LEN+1];
@@ -241,8 +241,7 @@ char *s;
  * find title-entry for keyword-entry
  */
 struct LIST *
-lkup_by_number(line)
-int line;
+lkup_by_number(int line)
 {
     struct LIST *run = head;
 
@@ -259,7 +258,7 @@ int line;
  * free the whole list (I never trust the OS -SB)
  */
 void
-list_free ()
+list_free (void)
 {
     struct LIST *run;
 
@@ -289,10 +288,7 @@ list_free ()
  * The whole menu is preceeded by start and gets the trailer end 
  */
 void
-refs(l, f, start, end, format)
-int l;
-FILE *f;
-char *start, *end, *format;
+refs( int l, FILE *f, char *start, char *end, char *format)
 {
     int curlevel, i;
     char *c;

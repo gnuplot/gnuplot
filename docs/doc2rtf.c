@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: doc2rtf.c,v 1.9 1999/07/09 20:59:42 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: doc2rtf.c,v 1.10 2002/03/07 16:11:25 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - doc2rtf.c */
@@ -66,9 +66,7 @@ void convert __PROTO((FILE *, FILE *));
 void process_line __PROTO((char *, FILE *));
 
 int
-main(argc, argv)
-int argc;
-char **argv;
+main (int argc, char **argv)
 {
     FILE *infile;
     FILE *outfile;
@@ -96,17 +94,13 @@ char **argv;
 
 /* generate an RTF footnote with reference char c and text s */
 void
-footnote(c, s, b)
-int c;
-char *s;
-FILE *b;
+footnote(int c, char *s, FILE *b)
 {
     fprintf(b, "%c{\\footnote %c %s}\n", c, c, s);
 }
 
 void
-convert(a, b)
-FILE *a, *b;
+convert(FILE *a, FILE *b)
 {
     static char line[MAX_LINE_LEN+1];
 
@@ -128,9 +122,7 @@ FILE *a, *b;
 }
 
 void
-process_line(line, b)
-char *line;
-FILE *b;
+process_line(char *line, FILE *b)
 {
     static int line_count = 0;
     static char line2[MAX_LINE_LEN+1];

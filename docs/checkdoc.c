@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: checkdoc.c,v 1.8 1999/06/14 19:17:07 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: checkdoc.c,v 1.9 2002/03/07 16:11:25 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - checkdoc.c */
@@ -61,9 +61,7 @@ void convert __PROTO((FILE *, FILE *));
 void process_line __PROTO((char *, FILE *));
 
 int
-main(argc, argv)
-int argc;
-char **argv;
+main (int argc, char **argv)
 {
     FILE *infile;
     infile = stdin;
@@ -83,8 +81,7 @@ char **argv;
 }
 
 void
-convert(a, b)
-FILE *a, *b;
+convert(FILE *a, FILE *b)
 {
     static char line[MAX_LINE_LEN+1];
 
@@ -94,9 +91,7 @@ FILE *a, *b;
 }
 
 void
-process_line(line, b)
-char *line;
-FILE *b;
+process_line(char *line, FILE *b)
 {
     /* check matching backticks within a paragraph */
 

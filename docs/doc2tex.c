@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: doc2tex.c,v 1.12 2002/01/24 12:28:59 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: doc2tex.c,v 1.13 2002/03/07 16:11:25 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - doc2tex.c */
@@ -75,9 +75,7 @@ static TBOOLEAN see = FALSE;
 static TBOOLEAN inhref = FALSE;
 
 int
-main(argc, argv)
-int argc;
-char **argv;
+main (int argc, char **argv)
 {
     FILE *infile;
     FILE *outfile;
@@ -111,16 +109,14 @@ char **argv;
 
 
 void
-init(b)
-FILE *b;
+init(FILE *b)
 {
     (void) fputs("\\input{titlepag.tex}\n", b);
 }
 
 
 void
-convert(a, b)
-FILE *a, *b;
+convert(FILE *a, FILE *b)
 {
     static char line[MAX_LINE_LEN+1];
 
@@ -130,9 +126,7 @@ FILE *a, *b;
 }
 
 void
-process_line(line, b)
-char *line;
-FILE *b;
+process_line( char *line, FILE *b)
 {
     char string[MAX_LINE_LEN+1], c;
     int i, initlen;
@@ -303,9 +297,7 @@ FILE *b;
 /* starts a new [sub]section */
 
 void
-section(line, b)
-char *line;
-FILE *b;
+section(char *line, FILE *b)
 {
     static char string[MAX_LINE_LEN+1];
     int sh_i;
@@ -347,9 +339,7 @@ FILE *b;
 
 /* put text in string str to file while buffering special TeX characters */
 void
-puttex(str, file)
-FILE *file;
-register char *str;
+puttex( char *str, FILE *file)
 {
     register char ch;
     char string[MAX_LINE_LEN+1], c;
@@ -453,8 +443,7 @@ register char *str;
 }
 
 
-void finish(b)
-FILE *b;
+void finish(FILE *b)
 {
     (void) fputs("\\end{document}\n", b);
 }

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: doc2gih.c,v 1.8 1999/06/14 19:17:07 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: doc2gih.c,v 1.9 2002/03/07 16:11:25 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - doc2gih.c */
@@ -60,9 +60,7 @@ void convert __PROTO((FILE *, FILE *));
 void process_line __PROTO((char *, FILE *));
 
 int
-main(argc, argv)
-int argc;
-char **argv;
+main (int argc, char **argv)
 {
     FILE *infile;
     FILE *outfile;
@@ -96,8 +94,7 @@ char **argv;
 
 
 void
-convert (inf, outf)
-FILE *inf, *outf;
+convert (FILE *inf, FILE *outf)
 {
     static char line[MAX_LINE_LEN+1];
 
@@ -107,9 +104,7 @@ FILE *inf, *outf;
 
 
 void
-process_line(line, b)
-char *line;
-FILE *b;
+process_line( char *line, FILE *b)
 {
     static int line_count = 0;
 

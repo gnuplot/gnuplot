@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: termdoc.c,v 1.11.4.1 2000/06/22 12:56:43 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: termdoc.c,v 1.12 2000/11/01 18:57:24 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - termdoc.c */
@@ -81,10 +81,7 @@ char termdoc_filename[80];
 TBOOLEAN single_top_level;
 
 char *
-get_line(buffer, max, fp)
-char *buffer;
-int max;
-FILE *fp;
+get_line( char *buffer, int max, FILE *fp)
 {
     static int line = -1;	/* not going yet */
     static int level = 0;	/* terminals are at level 1 - we add this */
@@ -189,10 +186,7 @@ FILE *fp;
  */
 
 char *
-safe_strncpy(d, s, n)
-char *d;
-const char *s;			/* HBB 990828: added 'const' */
-size_t n;
+safe_strncpy( char *d, const char *s, size_t n)
 {
     char *ret;
 
@@ -206,7 +200,7 @@ size_t n;
 
 #ifdef TEST_TERMDOC
 int
-main()
+main(void)
 {
     char line[256];
     while (get_line(line, sizeof(line), stdin))

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: doc2rnh.c,v 1.10 1999/07/09 20:59:42 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: doc2rnh.c,v 1.11 2002/03/07 16:11:25 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - doc2rnh.c */
@@ -87,9 +87,7 @@ static TBOOLEAN rnh_table = FALSE;
 static TBOOLEAN initial_entry = FALSE;
 
 int
-main(argc, argv)
-int argc;
-char **argv;
+main (int argc, char **argv)
 {
     FILE *infile;
     FILE *outfile;
@@ -124,8 +122,7 @@ char **argv;
 
 
 void
-init(b)
-FILE *b;
+init(FILE *b)
 {
     /*     */
     (void) fputs("\
@@ -138,8 +135,7 @@ FILE *b;
 
 
 void
-convert(a, b)
-FILE *a, *b;
+convert(FILE *a, FILE *b)
 {
     static char line[MAX_LINE_LEN+1];
 
@@ -149,9 +145,7 @@ FILE *a, *b;
 }
 
 void
-process_line(line, b)
-char *line;
-FILE *b;
+process_line(char *line, FILE *b)
 {
     switch (line[0]) {		/* control character */
     case '?':{			/* interactive help entry */
@@ -278,9 +272,7 @@ FILE *b;
 /* We want to retain section number, so its simpler than w/ TeX or roff */
 
 void
-section(line, b)
-char *line;
-FILE *b;
+section(char *line, FILE *b)
 {
     int sh_i;
     static int old = 1;
@@ -321,9 +313,7 @@ FILE *b;
  */
 
 void
-putrnh(s, file)
-char *s;
-FILE *file;
+putrnh(char *s, FILE *file)
 {
     (void) fputs(s, file);
 }
@@ -337,13 +327,11 @@ FILE *file;
  */
 
 void
-putrnh_(s, file)
-char *s;
-FILE *file;
+putrnh_(char *s, FILE *file)
 {
     int i, s_len, last_chr;
 
-    s_len = strlen(s);
+    last_chr = s_len = strlen(s);
 
     for (i = s_len - 1; i > 2; i--) {	/* any trailing spaces to drop? */
 	if (s[i] != ' ') {
@@ -371,8 +359,7 @@ FILE *file;
 }
 
 void
-finish(b)			/* not used */
-FILE *b;
+finish(FILE *b)
 {
     return;
 }

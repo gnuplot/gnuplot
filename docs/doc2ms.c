@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: doc2ms.c,v 1.12 1999/10/01 14:15:36 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: doc2ms.c,v 1.13 2002/03/07 16:11:25 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - doc2ms.c */
@@ -79,9 +79,7 @@ void finish __PROTO((FILE *));
 static TBOOLEAN intable = FALSE;
 
 int
-main(argc, argv)
-int argc;
-char **argv;
+main (int argc, char **argv)
 {
     FILE *infile;
     FILE *outfile;
@@ -113,8 +111,7 @@ char **argv;
 
 
 void
-init(b)
-FILE *b;
+init(FILE *b)
 {
     /* in nroff, increase line length by 8 and don't adjust lines */
     (void) fputs(".if n \\{.nr LL +8m\n.na \\}\n\
@@ -132,8 +129,7 @@ FILE *b;
 
 
 void
-convert(a, b)
-FILE *a, *b;
+convert( FILE *a, FILE *b)
 {
     static char line[MAX_LINE_LEN+1];
 
@@ -143,9 +139,7 @@ FILE *a, *b;
 }
 
 void
-process_line(line, b)
-char *line;
-FILE *b;
+process_line( char *line, FILE *b)
 {
     switch (line[0]) {		/* control character */
     case '?':{			/* interactive help entry */
@@ -230,9 +224,7 @@ FILE *b;
 /* starts a new [sub]section */
 
 void
-section(line, b)
-char *line;
-FILE *b;
+section( char *line, FILE *b)
 {
     static char string[MAX_LINE_LEN+1];
     int sh_i;
@@ -271,9 +263,7 @@ FILE *b;
 }
 
 void
-putms(s, file)
-char *s;
-FILE *file;
+putms( char *s, FILE *file)
 {
     static TBOOLEAN inquote = FALSE;
 
@@ -312,9 +302,7 @@ FILE *file;
  */
 
 void
-putms_verb(s, file)
-char *s;
-FILE *file;
+putms_verb( char *s, FILE *file)
 {
     while (*s != '\0') {
 	if (*s == '\\') {
@@ -327,8 +315,7 @@ FILE *file;
 
 /* spit out table of contents */
 void
-finish(b)
-FILE *b;
+finish(FILE *b)
 {
     fputs("\
 .pn 1\n\
