@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: graphics.c,v 1.24.2.6 1999/12/09 18:43:12 lhecking Exp $";
+static char *RCSid = "$Id: graphics.c,v 1.24.2.7 2000/05/07 16:54:14 lhecking Exp $";
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -4545,7 +4545,9 @@ char *what;
     case screen:
 	{
 	    register struct termentry *t = term;
-	    *x = pos->x * (t->xmax) + 0.5;
+	    /* HBB 20000914: Off-by-one bug. Max. allowable result is
+	     * t->xmax - 1, not t->xmax ! */
+	    *x = pos->x * (t->xmax - 1) + 0.5;
 	    break;
 	}
     }
@@ -4570,7 +4572,9 @@ char *what;
     case screen:
 	{
 	    register struct termentry *t = term;
-	    *y = pos->y * (t->ymax) + 0.5;
+	    /* HBB 20000914: Off-by-one bug. Max. allowable result is
+	     * t->ymax - 1, not t->ymax ! */
+	    *y = pos->y * (t->ymax -1) + 0.5;
 	    return;
 	}
     }

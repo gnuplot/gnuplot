@@ -1,3 +1,9 @@
+2000-09-14  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* graphics.c (map_position), graph3d.c (map_position): Fix
+ 	off-by-one bug in treatment of term->{x,y}max when translating
+ 	'screen' coordinates.
+
 2000-06-08  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* datafile.c(df_gets): prompt visibly for inline data if in
