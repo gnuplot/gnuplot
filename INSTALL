@@ -39,7 +39,7 @@ File location defaults
 
 PREFIX                          /usr/local
 gnuplot                         PREFIX/bin
-gnuplot_x11                     PREFIX/bin
+gnuplot_x11                     PREFIX/lib/gnuplot/$VERSION
 gnuplot.1                       PREFIX/man/man1
 gnuplot.gih                     PREFIX/share
 
@@ -66,8 +66,8 @@ several different ways:
  o at execution time by specifying the helpfile with the environment
    variable GNUHELP (see "Environment Variables" below).
 
-   The default location of the executables can be controlled in different
-ways:
+   The default location of the main executable can be controlled in 
+different ways:
 
  o with configure's --prefix= option, eg.
    ./configure --prefix=/gnuplot
@@ -81,6 +81,22 @@ ways:
  o at make time, eg.
    make BINDIR='/gnuplot/bin'
    gnuplot will be installed as /gnuplot/bin/gnuplot.
+
+   The default location of the additional executable, like gnuplot_x11, 
+can be controlled in different ways:
+
+ o with configure's --prefix= option, eg.
+   ./configure --prefix=/gnuplot
+   gnuplot_x11 will be installed as /gnuplot/lib/gnuplot/4.0/gnuplot_x11.
+   Attention: This affects the location of *all* installed files!
+
+ o with configure's --libdir= option, eg.
+   ./configure --libdir='/gnuplot/lib'
+   gnuplot_x11 will be installed as /gnuplot/lib/gnuplot/4.0/gnuplot_x11
+
+ o at make time, eg.
+   make X11_DRIVER_DIR='/gnuplot/lib/4.0'
+   gnuplot_x11 will be installed as /gnuplot/lib/4.0/gnuplot_x11
 
    If the executables are not installed in the default location, files
 written by the `save' command cannot be used as scripts on Un*x platforms.
@@ -119,16 +135,18 @@ $ ./configure --help
    The options relevant to gnuplot are listed below:
 
   --prefix=PREFIX         Install architecture-independent files in PREFIX
-                          [/usr/local]. The gnuplot (and gnuplot_x11) binary
-                          is installed in PREFIX/bin.
-  --bindir=DIR            user executables in DIR [PREFIX/bin]
+                          [/usr/local]
+  --exec-prefix=EPREFIX	  Install architecture-specific file in EPREFIX
+			  [PREFIX]
+  --bindir=DIR            user executables in DIR [EPREFIX/bin]
+			  The gnuplot binary is installed this directory
   --datadir=DIR           Read-only architecture-independent data in DIR
                           [PREFIX/share]. The gnuplot help file is installed
                           in this directory.
   --libdir=DIR            object code libraries in DIR [EPREFIX/lib]
+			  gnuplot_x11 goes into $libdir/gnuplot/<version>.
   --includedir=DIR        C header files in DIR [PREFIX/include]
   --mandir=DIR            Man documentation in DIR [PREFIX/man]
-  --with-x11-driver       specify an alternative X11 driver name (gnuplot_x11)
   --with-x          (*)   use the X Window System
   --with-lasergnu         install lasergnu printer script
   --with-linux-vga        use the Linux SVGA console driver
@@ -385,7 +403,7 @@ The CGI drivers need the CGIPATH environment variable to set the path
 to the CGI agents, and the CGIDISP and/or CGIPRNT environment variables
 to set the output devices.
 
- If creating dynamically linked executables for the X11 Window System, it
+If creating dynamically linked executables for the X11 Window System, it
 may be necessary to add flags to the LIBS variable in Makefile
 to make sure gnuplot finds all required libraries at runtime.  Systems like
 SunOS and Solaris use -R to specify the runtime library search path, whereas
@@ -566,27 +584,28 @@ Unix Bourne shell syntax.
    The demo files can be run interactively by eg.
 
 $ cd gnuplot/demo
-$ PATH=../src:$PATH gnuplot simple.dem
+$ GNUPLOT_DRIVER_DIR=../src ../src/gnuplot simple.dem
 
 and gnuplot prompts the user to "Hit return to continue" to cycle
-through all the plots (the PATH= statement is only required if you are 
-using the X11 or BeOS plotting device and the gnuplot_x11/gnuplot_be
-binary has not been installed yet, or you want to test the external
-binaries you just compiled at the same time).
+through all the plots (the GNUPLOT_DRIVER_DIR= part is only required
+if you are using the X11 or BeOS plotting device and the
+gnuplot_x11/gnuplot_be binary has not been installed yet, or if you
+want to test the external binaries you just compiled at the same
+time).
 
    To run the demos in a specified file without interaction, one
 can use
 
-$ PATH=../src:$PATH gnuplot simple.dem </dev/null
+$ GNUPLOT_DRIVER_DIR=../src ../src/gnuplot simple.dem </dev/null
 
    To run all demos non-interactively, use
 
-$ PATH=../src:$PATH gnuplot all.dem </dev/null
+$ GNUPLOT_DRIVER_DIR=../src ../src/gnuplot all.dem </dev/null
 
    To use a different plotting device than the default (usually X11
 under Unix), use eg.
 
-$ GNUTERM=dumb PATH=../src:$PATH gnuplot all.dem </dev/null
+$ GNUTERM=dumb GNUPLOT_DRIVER_DIR=../src ../src/gnuplot all.dem </dev/null
 
    To test the capabilities of the terminal you are using, there is
 the 'test' command:
