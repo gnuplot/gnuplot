@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.35 2002/06/05 21:58:51 joze Exp $"); }
+static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.36 2002/07/07 18:15:55 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - pm3d.c */
@@ -42,7 +42,12 @@ pm3d_struct pm3d = {
     PM3D_FLUSH_BEGIN,		/* flush */
     0,				/* no flushing triangles */
     PM3D_SCANS_AUTOMATIC,	/* scans direction is determined automatically */
-    PM3D_CLIP_1IN,		/* clipping: at least 1 point in the ranges */
+#if 0
+    /* PM 9.10.2002: default changed */
+    PM3D_CLIP_1IN,		/* clipping: at least 1 point in ranges */
+#else
+    PM3D_CLIP_4IN,		/* clipping: all 4 points in ranges */
+#endif
     0,				/* no pm3d hidden3d is drawn */
     0,				/* solid (off by default, that means `transparent') */
     PM3D_IMPLICIT		/* implicit */

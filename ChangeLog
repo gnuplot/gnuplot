@@ -1,3 +1,10 @@
+2002-10-09  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* src/pm3d.c: Changed default value from 'set pm3d clip1in' to
+	'set pm3d clip4in'.
+
+	* docs/gnuplot.doc: Pronounce 'set pm3d clip...' in 'help clip'.
+
 2002-09-09  Johannes Zellner  <johannes@zellner.org>
 
 	* src/plot.c: added --help / --version switches
@@ -1241,7 +1248,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/10/08 19:29:26 $).
+	last modification date (from the tag $Date: 2002/10/08 20:41:29 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
