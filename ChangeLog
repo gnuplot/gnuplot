@@ -1,3 +1,18 @@
+2004-04-14  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/version.c: Activate "RELEASE_VERSION" code by inserting a
+	#define.
+	(HELPMAIL, CONTACT): Provide fall-back definitions.
+
+	* src/show.c (show_version): Update splash text for better
+	formatting, and to get of the "pre-release" status.
+
+	* TODO: Lots of small updates.
+
+	* BUGS: Moved one bug from TODO to here.
+
+	* INSTALL.gnu: Updated to more current upstream (FSF) version.
+
 2004-04-13  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/x11.trm: If gnuplot_x11 dies, or fails to start, then make

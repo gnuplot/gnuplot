@@ -1,7 +1,6 @@
 [========================================================================]
-[========= TODO BEFORE RELEASING VERSION 4.0 (EXCEPT BUG FIXES) =========]
+[========= List of things to be done.  Plans, ideas, whatever... ========]
 [========================================================================]
-
 
 COMMANDS:
 =========
@@ -17,9 +16,6 @@ DOCUMENTATION:
 -- gnuplot.doc
 	- better document that you need a blank line in between scans
 	  for 3D (many people ask why pm3d plots nothing...)
-
--- titlepage.sty:
-	- update copyright dates
 
 Recently I've moved importants things from README.os2 into gnuplot.doc and
 INSTALL; those other README.{win, xli, nex} should be
@@ -87,12 +83,6 @@ Xlib:
      to gnuplot.
 
 
-OTHER BUGS:
-===========
-
--- INF number in gnuplot binary file crashes gnuplot
-
-
 TERMINALS, GENERAL COMMENTS:
 ============================
 
@@ -103,8 +93,8 @@ should be tested again)
 point type sequences for the main terminal drivers
 
 
-GNUPLOT LIBRARY:
-================
+GNUPLOT TOOLS LIBRARY:
+======================
 
 Make a library (e.g. usr/local/gnuplot/scripts/, .../gnuplot/bin) of 
 (a) gnuplot scripts, and (b) shell scripts relevant for gnuplot:
@@ -124,7 +114,7 @@ INSTALLATION --- LINUX:
 =======================
 
 -- add .spec file and a 'make' target to create RPM file?
-
+   [HBB: no.]
 
 INSTALLATION --- VMS:
 =====================
@@ -162,18 +152,11 @@ longer term
   so that even though the options are defined by layer 1, the
   actual parsing is implemented in level 3
 
-- group related 'set' variables into structures, particularly xaxis
-  stuff,etc. This will allow a move to table-driven parsing.
-  [PARTIALLY DONE] as of 3.8c
-  [DONE for the axis ones] in 'axis' branch on SourceForge [HBB]
-
 Lars' list
 
 - much-requested feature: read text/commands from data files
 - provide library of replacement functions instead of stdfn.c
-- possibly switch to automake
-  [PARTIALLY DONE] not done yet: docs lisp
-  [docs is next; won't do lisp]
+- fully switch to automake [docs left to do, won't do lisp]
 - completely rewrite the parser. Use yacc/bison if possible.
 - maybe rewrite the scanner in lex? The benefits are not so obvious,
   because the current scanner is extremely simple. This is probably
@@ -181,15 +164,12 @@ Lars' list
 - maybe use PD hash code for table-lookup (SNIPPETS code). Tables for
   builtin and user functions, variables, commands. What else? aliases
 - [Robert S. Maier] rewrite term.c to provide an interface to GNU plotutils
-- [HBB] rewrite hidden3d code 
-  [MAINLY DONE] needs fine-tuning to remove single-pixel errors
 - standardise float/double comparisons around the suggestion in the
   comp.lang.c FAQ (What's a good way to check for "close enough"
   floating-point equality?) and symbolic constants from standard header files.
   LOADS of errors throughout the code, especially in graphics.c
 - autogenerate term.h from config file in text format and/or configure?
 - parse "~" in filenames as $HOME
-  [PARTIALLY DONE] does not work for cd, set output
   [PARTIALLY DONE] works for all cmds now; plot key shows "~" instead
   of path (-> fix); does not accept "~" and "~user". Maybe implement
   former, latter requires reading passwd file (-> not!)
@@ -218,18 +198,9 @@ Lars' list
 - fix bug which prints "DI,1DI,0" in the upper left corner of the plot when
   in pcl5 mode and printing to an HP Laserjet 4+ (J. Breeding, bug-gnuplot)
   [HBB: reason known, but proper workaround path unclear]
-DONE - integrate gpltconv into gnuplot (convert command?), configure option
-DONE - make history size configurable (set historysize)
-DONE - port writeback fix to 3.8
 
 HBB:
-WIN16 compile (BC++3.1):
-DONE - no vfprintf simulation for the WText module, yet --> int_error problematic
--- graphics.c: too much global data?
-
-WIN32 compile (BC++4.52):
-DONE - problems with the 16bit helper programs doc2help, bf_test (local installation problem suspected)
--- test run fails: script execution stops as soon as first plot is done.
+[Optional:] See if 16-bit compilations can be made to work again.
 
 Petr:
 -- it would be very convenient to set values/formulae for columns in advance,

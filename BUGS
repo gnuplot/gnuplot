@@ -28,3 +28,8 @@ for an up-to-date bug tracking system.
  *) In pcl5 mode, the hpgl driver prints a spurious "DI,1DI,0" string in the
     upper left corner of the plot. 
     [Source code suggests this is solved.  Needs confirmation.]
+
+ *) Infinities and NaN binary data files may crash gnuplot. 
+    [Status unknown. Check later.]
+
+
