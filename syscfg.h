@@ -321,6 +321,7 @@ extern unsigned int lib$spawn();
 
 /* Autoconf related stuff
  * Transform autoconf defines to gnuplot coding standards
+ * This is only relevant for standard ANSI headers and functions
  */
 #ifdef HAVE_CONFIG_H
 
