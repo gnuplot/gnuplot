@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.35 2001/02/09 15:13:01 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.36 2001/03/07 08:40:05 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -108,6 +108,7 @@ void close_printer __PROTO((FILE * outfile));
 
 enum { UNSET = -1, no = 0, yes = 1 }; /* FIXME HBB 20001031: should this be here? */
 
+static int termcomp __PROTO((const generic * a, const generic * b));
 
 /* Externally visible variables */
 /* the central instance: the current terminal's interface structure */
@@ -1095,14 +1096,22 @@ list_terms()
 {
     register int i;
     char *line_buffer = gp_alloc(BUFSIZ, "list_terms");
+    int sort_idxs[TERMCOUNT];
 
+    /* sort terminal types alphabetically */
+    for( i = 0; i < TERMCOUNT; i++ )
+	sort_idxs[i] = i;
+    qsort( sort_idxs, TERMCOUNT, sizeof(int), termcomp );
+    /* now sort_idxs[] contains the sorted indices */
+    
     StartOutput();
     strcpy(line_buffer, "\nAvailable terminal types:\n");
     OutLine(line_buffer);
 
     for (i = 0; i < TERMCOUNT; i++) {
 	sprintf(line_buffer, "  %15s  %s\n",
-		term_tbl[i].name, term_tbl[i].description);
+		term_tbl[sort_idxs[i]].name,
+                term_tbl[sort_idxs[i]].description);
 	OutLine(line_buffer);
     }
 
@@ -1110,6 +1119,15 @@ list_terms()
     free(line_buffer);
 }
 
+static int
+termcomp(arga, argb)
+    const generic *arga, *argb;
+{
+    const int *a = arga;
+    const int *b = argb;
+
+    return( strcasecmp( term_tbl[*a].name, term_tbl[*b].name ) );
+}
 
 /* set_term: get terminal number from name on command line
  * will change 'term' variable if successful
