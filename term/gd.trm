@@ -1,5 +1,5 @@
 /*
- * $Id: gd.trm,v 1.16 2002/09/03 21:41:07 sfeam Exp $
+ * $Id: gd.trm,v 1.17 2002/09/27 00:12:26 sfeam Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -523,9 +523,9 @@ PNG_options()
 		int brect[8];
 		char *err;
 		if (isstring(c_token))
-		    quote_str(png_state.ttffont, c_token, MAX_LINE_LEN);
+		    quote_str(png_state.ttffont, c_token, sizeof(png_state.ttffont));
 	        else
-		    copy_str(png_state.ttffont, c_token, MAX_LINE_LEN);
+		    copy_str(png_state.ttffont, c_token, sizeof(png_state.ttffont));
 		c_token++;
 		strcpy(png_state.default_ttffont, png_state.ttffont);
 	        png_state.ttfsize = 2 * term->h_char - 2;
@@ -1240,7 +1240,7 @@ PNG_set_font(const char *fontname)
 	font = gdFontTiny;
     /* New ttf font */
     else if (*name) {
-	strncpy(png_state.ttffont, name, 63);
+	strncpy(png_state.ttffont, name, sizeof(png_state.ttffont));
 	png_state.ttfsize = size;
     }
     /* Restore initial default font */
