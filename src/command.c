@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.27 1999/09/14 15:25:54 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.28 1999/09/21 18:24:38 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -123,30 +123,9 @@ int vms_ktid;			/* key table id, for translating keystrokes */
 
 /* static prototypes */
 static void command __PROTO((void));
-static void call_command __PROTO((void));
-static void changedir_command __PROTO((void));
-static void clear_command __PROTO((void));
-static void exit_command __PROTO((void));
-static void help_command __PROTO((void));
-static void history_command __PROTO((void));
-static void if_command __PROTO((void));
-static void invalid_command __PROTO((void));
-static void load_command __PROTO((void));
-static void pause_command __PROTO((void));
-static void plot_command __PROTO((void));
-static void print_command __PROTO((void));
-static void pwd_command __PROTO((void));
-static void replot_command __PROTO((void));
-static void reread_command __PROTO((void));
-static void save_command __PROTO((void));
-static void screendump_command __PROTO((void));
-static void splot_command __PROTO((void));
-static void system_command __PROTO((void));
-static void testtime_command __PROTO((void));
-static void update_command __PROTO((void));
 static int changedir __PROTO((char *path));
+static void replotrequest __PROTO((void));
 static int read_line __PROTO((const char *prompt));
-static void do_shell __PROTO((void));
 static void do_system __PROTO((const char *));
 #ifdef AMIGA_AC_5
 static void getparms __PROTO((char *, char **));
@@ -417,104 +396,19 @@ command()
 
     if (is_definition(c_token))
 	define();
-    else {
-	switch(lookup_table(&command_tbl[0],c_token)) {
-	case CMD_CALL:
-	    call_command();
-	    break;
-	case CMD_CD:
-	    changedir_command();
-	    break;
-	case CMD_CLEAR:
-	    clear_command();
-	    break;
-	case CMD_EXIT:
-	    exit_command();
-	    break;
-	case CMD_FIT:
-	    fit_command();
-	    break;
-	case CMD_HELP:
-	    help_command();
-	    break;
-	case CMD_HISTORY:
-	    history_command();
-	    break;
-	case CMD_IF:
-	    if_command();
-	    break;
-	case CMD_LOAD:
-	    load_command();
-	    break;
-	case CMD_PAUSE:
-	    pause_command();
-	    break;
-	case CMD_PLOT:
-	    plot_command();
-	    break;
-	case CMD_PRINT:
-	    print_command();
-	    break;
-	case CMD_PWD:
-	    pwd_command();
-	    break;
-	case CMD_REPLOT:
-	    replot_command();
-	    break;
-	case CMD_REREAD:
-	    reread_command();
-	    break;
-	case CMD_RESET:
-	    reset_command();
-	    break;
-	case CMD_SAVE:
-	    save_command();
-	    break;
-	case CMD_SCREENDUMP:
-	    screendump_command();
-	    break;
-	case CMD_SET:
-	    set_command();
-	    break;
-	case CMD_SHELL:
-	    do_shell();
-	    break;
-	case CMD_SHOW:
-	    show_command();
-	    break;
-	case CMD_SPLOT:
-	    splot_command();
-	    break;
-	case CMD_SYSTEM:
-	    system_command();
-	    break;
-	case CMD_TEST:
-	    test_term();
-	    break;
-	case CMD_TESTTIME:
-	    testtime_command();
-	    break;
-	case CMD_UNSET:
-	    unset_command();
-	    break;
-	case CMD_UPDATE:
-	    update_command();
-	    break;
-	case CMD_INVALID:
-	    invalid_command();
-	    break;
-	case CMD_NULL:
-	default:
-	    break;
-	}
-    } /* else if(is_definition) */
+    else
+	(*lookup_ftable(&command_ftbl[0],c_token))();
 
     return;
 }
 
 
+/*
+ * Command parser functions
+ */
+
 /* process the 'call' command */
-static void
+void
 call_command()
 {
     char *save_file = NULL;
@@ -534,7 +428,7 @@ call_command()
 
 
 /* process the 'cd' command */
-static void
+void
 changedir_command()
 {
     char *save_file = NULL;
@@ -554,7 +448,7 @@ changedir_command()
 
 
 /* process the 'clear' command */
-static void
+void
 clear_command()
 {
 
@@ -576,7 +470,7 @@ clear_command()
 
 
 /* process the 'exit' and 'quit' commands */
-static void
+void
 exit_command()
 {
     /* graphics will be tidied up in main */
@@ -586,21 +480,79 @@ exit_command()
 
 /* fit_command() is in fit.c */
 
+
 /* help_command() is below */
 
 
 /* process the 'history' command
- * not implemented yet
  */
-static void
+void
 history_command()
 {
-    int_error(c_token, "Command not yet implemented");
+#if defined(READLINE) && !defined(HAVE_LIBREADLINE)
+    struct value a;
+    char *name = NULL; /* name of the output file; NULL for stdout */
+    int n = 0;         /* print only <last> entries */
+
+    c_token++;
+    if (!END_OF_COMMAND && equals(c_token,"?")) { /* find and show the entries */
+	c_token++;
+	m_capture(&name, c_token, c_token);
+	if (!history_find_all(name))
+	    int_error(c_token,"not in history");
+	c_token++;
+    }
+    else if (!END_OF_COMMAND && equals(c_token,"!")) { /* execute the entry */
+	static char flag = 0;
+	static char *save_input_line;
+	static int save_c_token, save_input_line_len;
+	if (flag) {
+	    flag = 0;
+	    input_line = save_input_line;
+	    c_token = save_c_token;
+	    input_line_len = save_input_line_len;
+	    num_tokens = scanner(&input_line, &input_line_len);
+	    int_error(c_token,"recurrency forbidden");
+	}
+	c_token++;
+	m_capture(&name, c_token, c_token);
+	name = history_find(name);
+	if (name == NULL)
+	    int_error(c_token,"not in history");
+	else { /* execute the command "name" */
+	    save_input_line = input_line;
+	    save_c_token = c_token;
+	    save_input_line_len = input_line_len;
+	    flag = 1;
+	    input_line = name;
+	    printf("  Executing:\n\t%s\n",name);
+	    do_line();
+	    input_line = save_input_line;
+	    c_token = save_c_token;
+	    input_line_len = save_input_line_len;
+	    num_tokens = scanner(&input_line, &input_line_len);
+	    flag = 0;
+	}
+	c_token++;
+    }
+    else { /* show history entries */
+	if (!END_OF_COMMAND && isanumber(c_token)) {
+	    n = (int)real(const_express(&a));
+	}
+	if (!END_OF_COMMAND && isstring(c_token)) {
+	    m_quote_capture(&name, c_token, c_token);
+	    c_token++;
+	}
+	write_history_n( n, name );
+    }
+#else
+    int_error(c_token, "History not supported with GNU readline");
+#endif
 }
 
 
 /* process the 'if' command */
-static void
+void
 if_command()
 {
     double exprval;
@@ -623,8 +575,29 @@ if_command()
 }
 
 
+/* process invalid commands and, on OS/2, REXX commands */
+void
+invalid_command()
+{
+#ifdef OS2
+    if (_osmode == OS2_MODE) {
+	if (token[c_token].is_token) {
+	    int rc;
+	    rc = ExecuteMacro(input_line + token[c_token].start_index,
+			      token[c_token].length);
+	    if (rc == 0) {
+		c_token = num_tokens = 0;
+		return (0);
+	    }
+	}
+    }
+#endif
+    int_error(c_token, "invalid command");
+}
+
+
 /* process the 'load' command */
-static void
+void
 load_command()
 {
     FILE *fp;
@@ -647,7 +620,8 @@ load_command()
 }
 
 
-static void
+/* null command */
+void
 null_command()
 {
     return;
@@ -655,7 +629,7 @@ null_command()
 
 
 /* process the 'pause' command */
-static void
+void
 pause_command()
 {
     struct value a;
@@ -751,7 +725,7 @@ pause_command()
 
 
 /* process the 'plot' command */
-static void
+void
 plot_command()
 {
     plot_token = c_token++;
@@ -762,7 +736,7 @@ plot_command()
 
 
 /* process the 'print' command */
-static void
+void
 print_command()
 {
     struct value a;
@@ -795,7 +769,7 @@ print_command()
 
 
 /* process the 'pwd' command */
-static void
+void
 pwd_command()
 {
     char *save_file = NULL;
@@ -811,7 +785,7 @@ pwd_command()
 
 
 /* process the 'replot' command */
-static void
+void
 replot_command()
 {
     if (!*replot_line)
@@ -824,7 +798,7 @@ replot_command()
 
 
 /* process the 'reread' command */
-static void
+void
 reread_command()
 {
     FILE *fp = lf_top();
@@ -839,7 +813,7 @@ reread_command()
 
 
 /* process the 'save' command */
-static void
+void
 save_command()
 {
     FILE *fp;
@@ -896,7 +870,7 @@ save_command()
 
 
 /* process the 'screendump' command */
-static void
+void
 screendump_command()
 {
     c_token++;
@@ -909,12 +883,14 @@ screendump_command()
 
 
 /* set_command() is in set.c */
+
 /* 'shell' command is processed by do_shell(), see below */
+
 /* show_command() is in show.c */
 
 
 /* process the 'splot' command */
-static void
+void
 splot_command()
 {
     plot_token = c_token++;
@@ -925,7 +901,7 @@ splot_command()
 
 
 /* process the 'system' command */
-static void
+void
 system_command()
 {
     if (!isstring(++c_token))
@@ -944,7 +920,7 @@ system_command()
 /* 'test' command is processed by test_term() in term.c */
 
 /* process the 'testtime' command */
-static void
+void
 testtime_command()
 {
     char *format = NULL;
@@ -980,8 +956,11 @@ testtime_command()
 }
 
 
+/* unset_command is in unset.c */
+
+
 /* process the 'update' command */
-static void
+void
 update_command()
 {
     /* old parameter filename */
@@ -1007,28 +986,9 @@ update_command()
 }
 
 
-/* process invalid commands and, on OS/2, REXX commands */
-static void
-invalid_command()
-{
-#ifdef OS2
-    if (_osmode == OS2_MODE) {
-	if (token[c_token].is_token) {
-	    int rc;
-	    rc = ExecuteMacro(input_line + token[c_token].start_index,
-			      token[c_token].length);
-	    if (rc == 0) {
-		c_token = num_tokens = 0;
-		return (0);
-	    }
-	}
-    }
-#endif
-    int_error(c_token, "invalid command");
-}
-
-
-/* Auxiliary routines */
+/*
+ * Auxiliary routines
+ */
 
 /* used by changedir_command() */
 static int
@@ -1082,7 +1042,8 @@ char *path;
 }
 
 
-void
+/* used by replot_command() */
+static void
 replotrequest()
 {
     if (equals(c_token, "["))
@@ -1223,7 +1184,7 @@ const char *prompt;
 
 
 # ifdef NO_GIH
-static void
+void
 help_command()
 {
     int first = c_token;
@@ -1241,7 +1202,7 @@ help_command()
 # endif				/* NO_GIH */
 
 
-static void
+void
 do_shell()
 {
     screen_ok = FALSE;
@@ -1278,7 +1239,7 @@ const char *cmd;
 
 #ifdef _Windows
 # ifdef NO_GIH
-static void
+void
 help_command()
 {
 
@@ -1316,7 +1277,7 @@ help_command()
  */
 
 #ifndef NO_GIH
-static void
+void
 help_command()
 {
     static char *helpbuf = NULL;
@@ -1606,7 +1567,7 @@ const char *prompt;
 
 
 # if defined(MSDOS) || defined(_Windows) || defined(DOS386)
-static void
+void
 do_shell()
 {
     screen_ok = FALSE;
@@ -1626,7 +1587,7 @@ do_shell()
 
 # elif defined(AMIGA_SC_6_1)
 
-static void
+void
 do_shell()
 {
     screen_ok = FALSE;
@@ -1641,7 +1602,7 @@ do_shell()
 
 #  elif defined(OS2)
 
-static void
+void
 do_shell()
 {
     screen_ok = FALSE;
@@ -1660,7 +1621,7 @@ do_shell()
 /* plain old Unix */
 
 #define EXEC "exec "
-static void
+void
 do_shell()
 {
     static char exec[100] = EXEC;
