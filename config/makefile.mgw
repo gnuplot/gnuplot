@@ -1,5 +1,5 @@
 #
-# $Id: makefile.mgw,v 1.27 2003/01/09 09:21:53 mikulik Exp $
+# $Id: makefile.mgw,v 1.28 2003/02/19 18:59:21 mikulik Exp $
 #
 # GNUPLOT Makefile for MinGW32 MinGW32 on WinNT and Win95/98/..
 #
@@ -113,10 +113,15 @@ ifndef GNU_RC
   MSSDK = c:/mssdk
 endif
 
+# GNU sort
+#GNUSORT = gsort.exe
+GNUSORT = c:/cygwin/bin/sort.exe
 
 #
 # *************** End of Configuration section *************************
 #
+
+
 #         There shouldn't be anything to be changed below this line
 # **********************************************************************
 #
@@ -354,11 +359,11 @@ ifdef ALL_TERMINALS_DOC
 # (gnuplot.tex should be the same on all platforms):
 SORT_TERMINALS=1
 ifdef SORT_TERMINALS
-# sort alphabetically all terminals (note: req. sort=cygwin's, not from MS)
+# sort alphabetically all terminals (note: req. GNU sort, not from MS)
 allterm.h: $(CORETERM)
 	@echo "Building allterm.h"
 	@for e in `egrep "^[ 	]*START_HELP" $(CORETERM) |\
-	     sort -f -t':' -k2` ; do \
+	     $(GNUSORT) -f -t':' -k2` ; do \
 	  f=`echo $$e |cut -d\: -f1` ; s=`echo $$e | cut -d\: -f2` ;\
 	  sed -n "/^[ 	]*$$s/,/^[ 	]*END_HELP/p" $$f ; \
 	done >$@

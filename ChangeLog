@@ -1,3 +1,8 @@
+2003-05-16  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* config/makefile.mgw config/makefile.cyg: New configuration define
+	GNUSORT.
+
 2003-05-10  Ethan Merritt <merritt@u.washington.edu>
 
 	* src/plot2d.c docs/gnuplot.doc: Apply current fill style to boxes 
