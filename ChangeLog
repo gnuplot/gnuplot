@@ -1,3 +1,8 @@
+2004-08-12  Ethan Merritt  <merritt@u.washington.edu>
+
+	* term/post.trm: Rename 'nolevel2' option to 'ai', since its primary
+	use may be to generate output compatible with Adobe Illustrator.
+
 2004-08-11  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/gplt_x11.c (exec_cmd): Set line properties to CapRound, JoinRound

@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.119 2004/08/02 03:57:27 sfeam Exp $
+ * $Id: post.trm,v 1.120 2004/08/10 04:21:22 sfeam Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -788,7 +788,7 @@ enum PS_id {
 #ifdef PM3D
     PS_PALFUNCPARAM,
 #endif /* PM3D */
-    PS_LEVEL2, PS_NOLEVEL2,
+    PS_AI,
     PS_OTHER
 };
 
@@ -821,8 +821,7 @@ static struct gen_table PS_opts[] =
 #ifdef PM3D
     { "palf$uncparam", PS_PALFUNCPARAM },
 #endif /* PM3D */
-    { "level2", PS_LEVEL2 },
-    { "nolevel2", PS_NOLEVEL2 },
+    { "ai", PS_AI },
     { NULL, PS_OTHER }
 };
 
@@ -846,11 +845,7 @@ PS_options()
 	    ps_eps = FALSE;
 	    c_token++;
 	    break;
-	case PS_LEVEL2:
-	    ps_level2 = TRUE;
-	    c_token++;
-	    break;
-	case PS_NOLEVEL2:
+	case PS_AI:
 	    ps_level2 = FALSE;
 	    c_token++;
 	    break;
@@ -1108,13 +1103,14 @@ PS_options()
 
     /* HBB 19990823: fixed the options string. It violated the 'save
      * loadable output' rule */
-    sprintf(term_options,"%s %senhanced %s %s \\\n"
+    sprintf(term_options,"%s %s %senhanced %s %s \\\n"
 	                 "   %s dashlength %.1f linewidth %.1f %s \\\n"
 #ifdef PM3D
 	                 "   palfuncparam %d,%g \\\n"
 #endif /* PM3D */
-	                 "   %s \"%s\" %d%s %s",
+	                 "   %s \"%s\" %d%s ",
 	    ps_eps ? "eps" : (ps_portrait ? "portrait" : "landscape"),
+	    ps_level2 ? "" : "ai",
 	    term->put_text == ENHPS_put_text ? "" : "no",
 	    ps_color ? "color" : "monochrome",
 	    ps_blacktext ? "blacktext" : "colortext",
@@ -1128,8 +1124,7 @@ PS_options()
 #endif /* PM3D */
 	    ps_rounded ? "rounded" : "butt",
 	    ps_font,ps_fontsize,
-	    ps_fontfile_char ? ps_fontfile_char : "",
-	    ps_level2 ? "level2" : "nolevel2"
+	    ps_fontfile_char ? ps_fontfile_char : ""
 	    );
 }
 
@@ -2952,12 +2947,12 @@ START_HELP(post)
 " Several options may be set in the `postscript` driver.",
 "",
 " Syntax:",
-"       set terminal postscript {<mode>} {enhanced | noenhanced}",
+"       set terminal postscript {<mode>} {ai} {enhanced | noenhanced}",
 "                               {color | colour | monochrome}",
 "                               {blacktext | colortext | colourtext}",
 "                               {solid | dashed} {dashlength | dl <DL>}",
 "                               {linewidth | lw <LW>}",
-"                               {<duplexing>} {{no}level2}",
+"                               {<duplexing>}",
 "                               {rounded | butt}",
 "                               {fontfile [add | delete] \"<filename>\"}",
 "                               {palfuncparam <samples>{,<maxdeviation>}}",
@@ -2980,10 +2975,9 @@ START_HELP(post)
 " By default the generated PostScript code uses language features that were",
 " introduced in PostScript Level 2, notably pattern-fill of irregular objects",
 " such as filledcurves.  However, not all PostScript viewers support these",
-" features. The `nolevel2` flag substitutes Level 1 compatible code instead.",
-" This flag can be toggled later by editing a single line of the PostScript",
-" output file itself, if necessary. Older versions of Adobe Illustrator may",
-" not accept gnuplot output generated with level2 set.",
+" features. In particular, older version of Adobe Illustrator may require",
+" the `ai` flag to be set. This flag can be toggled later by editing a single",
+" line in the PostScript output file.",
 "",
 " `rounded` sets line caps and line joins to be rounded; `butt` is the",
 " default, butt caps and mitered joins;",
