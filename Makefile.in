@@ -17,7 +17,7 @@ all: @ERRORFIX@ gnuplot @GNUPLOT_X11@ @GNUPLOT_BE@ doc demo/binary1
 # any variables are created, but after the default target
 .NOEXPORT:
 
-SHELL = /bin/sh
+SHELL = @SHELL@
 
 PACKAGE=@PACKAGE@
 VERSION=@VERSION@
@@ -76,7 +76,7 @@ TERMLIBS = @TERMLIBS@
 TERMXLIBS = @TERMXLIBS@
 
 LIBS = @LIBS@
-XLIBS = @X_LIBRARIES@
+XLIBS = @LIBRARIES_FOR_X@
 
 # Where to send email about bugs and comments (locally)
 EMAIL = bug-gnuplot@dartmouth.edu
@@ -483,9 +483,9 @@ SUBDIRS = NeXT NeXT/English.lproj NeXT/English.lproj/GnuTerm.nib \
 	docs/old docs/ps lisp lisp/old m4 os2 term win
 
 clean:
-	rm -f gnuplot gnuplot_x11 bf_test *.o core *~
-	rm -f gnuplot.exe gnuplot_x11.exe bf_test.exe
-	rm -f demo/binary? demo/temp.set demo/defaults.ini demo/fit.log \
+	-rm -f gnuplot gnuplot_x11 bf_test *.o core *~
+	-rm -f gnuplot.exe gnuplot_x11.exe bf_test.exe
+	-rm -f demo/binary? demo/temp.set demo/defaults.ini demo/fit.log \
 	  demo/soundfit.par
 	cd beos && $(MAKE) $(MFLAGS) clean
 	cd docs && $(MAKE) $(MFLAGS) clean
@@ -497,12 +497,12 @@ distclean: clean
 	cd beos && $(MAKE) $(MFLAGS) distclean
 	cd docs && $(MAKE) $(MFLAGS) distclean
 	cd lisp && $(MAKE) $(MFLAGS) distclean
-	rm -f Makefile config.status config.cache $(CONFIG_HEADER) \
+	-rm -f Makefile config.status config.cache $(CONFIG_HEADER) \
 	  config.log stamp-h
 	test "$(srcdir)" = "$(top_builddir)" || rm -rf docs term
 
 realclean: distclean
-	rm -f TAGS docs/TAGS
+	-rm -f TAGS docs/TAGS
 
 distdir = $(PACKAGE)-$(VERSION)
 top_distdir = $(distdir)
