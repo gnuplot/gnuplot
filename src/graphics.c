@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.146 2005/02/04 21:43:20 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.147 2005/02/09 11:43:10 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -831,7 +831,7 @@ boundary(struct curve_points *plots, int count)
 
 #ifdef PM3D
     /* Make room for the color box if needed. */
-    if (is_plot_with_palette() && (color_box.where != SMCOLOR_BOX_NO) && (color_box.where != SMCOLOR_BOX_USER)) {
+    if (is_plot_with_palette() && is_plot_with_colorbox() && (color_box.where != SMCOLOR_BOX_NO) && (color_box.where != SMCOLOR_BOX_USER)) {
 	xright -= (int) (xright-xleft)*COLORBOX_SCALE;
 	xright -= (int) ((t->h_char) * WIDEST_COLORBOX_TICTEXT);
     }
@@ -1297,7 +1297,7 @@ do_plot(struct curve_points *plots, int pcount)
 
 #ifdef PM3D
     /* Add colorbox if appropriate. */
-    if (is_plot_with_palette() && !make_palette() && term->set_color)
+    if (is_plot_with_palette() && !make_palette() && is_plot_with_colorbox() && term->set_color)
 	draw_color_smooth_box(MODE_PLOT);
 #endif
 

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.52 2005/01/08 16:08:59 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.53 2005/02/01 11:28:51 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - pm3d.c */
@@ -54,6 +54,7 @@ pm3d_struct pm3d = {
 
 /* Internal prototypes for this module */
 static TBOOLEAN plot_has_palette;
+static TBOOLEAN plot_wants_colorbox;
 static double geomean4 __PROTO((double, double, double, double));
 static double median4 __PROTO((double, double, double, double));
 static void pm3d_plot __PROTO((struct surface_points *, int));
@@ -752,8 +753,10 @@ set_plot_with_palette(int plot_num, int plot_mode)
     struct curve_points *this_2dplot = first_plot;
     int surface = 0;
     struct text_label *this_label = first_label;
+    TBOOLEAN want_palette_but_not_colorbox = FALSE;
 
     plot_has_palette = TRUE;
+    plot_wants_colorbox = TRUE;
     /* Is pm3d switched on globally? */
     if (pm3d.where[0])
 	return;
@@ -761,8 +764,13 @@ set_plot_with_palette(int plot_num, int plot_mode)
     /* Check 2D plots */
     if (plot_mode == MODE_PLOT) {
 	while (this_2dplot) {
-	    if (this_2dplot->lp_properties.use_palette)
-		return;
+	    if (this_2dplot->lp_properties.use_palette) {
+		if (this_2dplot->lp_properties.pm3d_color.type == TC_RGB)
+		    want_palette_but_not_colorbox = TRUE;
+		    /* don't return yet -- decide later whether showing color box is desirable */
+		else
+		    return;
+	    }
 #ifdef EAM_DATASTRINGS
 	    if (this_2dplot->labels &&
 		this_2dplot->labels->textcolor.type >= TC_CB)
@@ -776,8 +784,13 @@ set_plot_with_palette(int plot_num, int plot_mode)
     if (plot_mode == MODE_SPLOT) {
     /* Any surface 'with pm3d' or 'with line|dot palette'? */
 	while (surface++ < plot_num) {
-	    if (this_3dplot->lp_properties.use_palette)
-		return;
+	    if (this_3dplot->lp_properties.use_palette) {
+		if (this_3dplot->lp_properties.pm3d_color.type == TC_RGB)
+		    want_palette_but_not_colorbox = TRUE;
+		    /* don't return yet -- decide later whether showing color box is desirable */
+		else
+		    return;
+	    }
 #ifdef EAM_DATASTRINGS
 	    if (this_3dplot->labels &&
 		this_3dplot->labels->textcolor.type >= TC_CB)
@@ -805,13 +818,21 @@ set_plot_with_palette(int plot_num, int plot_mode)
 #undef TC_USES_PALETTE
 
     /* Palette with continuous colors is not used. */
-    plot_has_palette = FALSE;
+    if (want_palette_but_not_colorbox == FALSE)
+	plot_has_palette = FALSE; /* otherwise it stays TRUE */
+    plot_wants_colorbox = FALSE;
 }
 
 TBOOLEAN
 is_plot_with_palette()
 {
     return plot_has_palette;
+}
+
+TBOOLEAN
+is_plot_with_colorbox()
+{
+    return plot_wants_colorbox;
 }
 
 #endif
