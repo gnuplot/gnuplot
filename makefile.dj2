@@ -27,7 +27,7 @@ FINALDEST=c:\bin
 
 # here customize the name of the executable
 # exe file will be  gp36.exe:
-EXENAME = gp36
+EXENAME = gp37
 
 # where to place gnuplot.gih helpfile upon MAKE
 # note it will be built inside gnuplot\$(HELPDEST)
