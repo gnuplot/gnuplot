@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: binary.c,v 1.4 1999/06/11 11:18:52 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: binary.c,v 1.5 1999/06/19 20:52:03 lhecking Exp $"); }
 #endif
 
 /*
@@ -100,10 +100,10 @@ float GPFAR *GPFAR * GPFAR * ret_matrix, GPFAR * GPFAR * row_title, GPFAR * GPFA
 int *nr, *nc;
 {
     float GPFAR *GPFAR * m, GPFAR * rt, GPFAR * ct;
-    register int num_rows = START_ROWS;
-    register int num_cols;
-    register int current_row = 0;
-    register float GPFAR *GPFAR * temp_array;
+    int num_rows = START_ROWS;
+    int num_cols;
+    int current_row = 0;
+    float GPFAR *GPFAR * temp_array;
     float fdummy;
 
     if (fread(&fdummy, sizeof(fdummy), 1, fin) != 1)
