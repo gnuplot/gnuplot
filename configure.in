@@ -325,6 +325,7 @@ if test "$with_gd" != no; then
   gp_SEARCH_LIBDIRS(gd,gdImageCreate)
   if test "$ac_cv_lib_gd_gdImageCreate" = yes; then
     gp_SEARCH_HEADERDIRS(gd.h,,
+     AC_MSG_WARN([found gd library but not header file])
      AC_MSG_WARN([please add path to gd.h to INCLUDES in Makefile])
     )dnl gp_SEARCH_HEADERDIRS
     AC_DEFINE(HAVE_LIBGD)
@@ -340,17 +341,25 @@ if test "$with_png" != no; then
   if test "$ac_cv_lib_png_png_info_init" = yes; then
     TERMLIBS="$TERMLIBS -lz"
     gp_SEARCH_HEADERDIRS(png.h,,
+     AC_MSG_WARN([found png library but not header file])
      AC_MSG_WARN([please add path to png.h to INCLUDES in Makefile])
     )dnl gp_SEARCH_HEADERIRS
     gp_SEARCH_HEADERDIRS(zlib.h,,
+     AC_MSG_WARN([found z library but not header file])
      AC_MSG_WARN([please add path to zlib.h to INCLUDES in Makefile])
     )dnl gp_SEARCH_HEADERDIRS
-    AC_EGREP_CPP([You lose], [#include "png.h"
+    if test "$ac_cv_header_png_h" = yes; then
+      AC_EGREP_CPP([You lose], [#include "png.h"
 #if PNG_LIBPNG_VER < 89
 You lose.
 #endif
-], AC_MSG_WARN([- not using old libpng version]), AC_DEFINE(HAVE_LIBPNG)
-    )dnl AC_EGREP_CPP
+],dnl
+       AC_MSG_WARN([- libpng too old - not including png driver]),dnl
+       AC_DEFINE(HAVE_LIBPNG))
+    else
+      AC_MSG_WARN([- cannot check png version - compilation may fail])
+      AC_DEFINE(HAVE_LIBPNG)
+    fi
   else
     AC_MSG_RESULT([- see term/png.trm for download details])
   fi
@@ -358,7 +367,7 @@ fi
 dnl end png and z
 
 dnl create list of terminals
-AC_MSG_CHECKING([for terminal drivers])
+AC_MSG_CHECKING([terminal driver sources])
 ( cd $srcdir/term && for i in *.trm ; do echo '${srcdir}'/../term/$i ; done )\
  |fmt |(tr '\012' @; echo) |sed 's/@$/%/;s/@/ \\@/g'\
  |tr @% '\012\012' >termlist
