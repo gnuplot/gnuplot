@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.29 2002/02/15 15:40:58 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.30 2002/02/25 03:10:41 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -1764,17 +1764,19 @@ do_event(struct gp_event_t *ge)
 static void
 do_save_3dplot(struct surface_points *plots, int pcount, int quick)
 {
+#define M_TEST_AXIS(A) \
+     (A.log && ((!(A.set_autoscale & AUTOSCALE_MIN) && A.set_min <= 0) || \
+		(!(A.set_autoscale & AUTOSCALE_MAX) && A.set_max <= 0)))
+
     if (!plots) {
 	/* this might happen after the `reset' command for example
 	 * which was reported by Franz Bakan.  replotrequest()
 	 * should set up again everything. */
 	replotrequest();
     } else {
-	if ((X_AXIS.log && (X_AXIS.min <= 0 || X_AXIS.max <= 0))
-	    || (Y_AXIS.log && (Y_AXIS.min <= 0 || Y_AXIS.max <= 0))
-	    || (Z_AXIS.log && (Z_AXIS.min <= 0 || Z_AXIS.max <= 0))
+	if (M_TEST_AXIS(X_AXIS) || M_TEST_AXIS(Y_AXIS) || M_TEST_AXIS(Z_AXIS)
 #ifdef PM3D
-	    || (CB_AXIS.log && (CB_AXIS.min <= 0 || CB_AXIS.max <= 0))
+	    || M_TEST_AXIS(CB_AXIS)
 #endif
 	    ) {
 		graph_error("axis ranges must be above 0 for log scale!");
@@ -1782,6 +1784,8 @@ do_save_3dplot(struct surface_points *plots, int pcount, int quick)
 	}
 	do_3dplot(plots, pcount, quick);
     }
+
+#undef M_TEST_AXIS
 }
 
 
