@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.73 2003/07/07 23:09:58 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.74 2003/07/22 17:44:13 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -156,6 +156,10 @@ int plot_token;			/* start of 'plot' command */
 /* flag to disable `replot` when some data are sent through stdin;
  * used by mouse/hotkey capable terminals */
 TBOOLEAN replot_disabled = FALSE;
+
+#ifdef USE_MOUSE
+TBOOLEAN paused_for_mouse = FALSE;
+#endif
 
 /* If last plot was a 3d one. */
 TBOOLEAN is_3d_plot = FALSE;
@@ -875,7 +879,16 @@ pause_command()
 
     *buf = NUL;
 
-    sleep_time = real(const_express(&a));
+#ifdef USE_MOUSE
+    paused_for_mouse = FALSE;
+    if (equals(c_token,"mouse")) {
+	sleep_time = -1;
+	c_token++;
+	paused_for_mouse = TRUE;
+    } else
+#endif
+	sleep_time = real(const_express(&a));
+
     if (!(END_OF_COMMAND)) {
 	if (!isstring(c_token))
 	    int_error(c_token, "expecting string");

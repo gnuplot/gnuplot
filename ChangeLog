@@ -1,5 +1,10 @@
 2003-07-22  Ethan Merritt <merritt@u.washington.edu>
 
+	* src/command.c src/command.h src/mouse.c: 
+	Add a new user command 'pause mouse {"text"}.  On mouse-capable 
+	terminals the pause will terminate on either a mouse click or on i
+	a <cr>; for all other terminals it is treated as 'pause -1'.
+
 	* src/parse.c src/parse.h: Add a new function get_udv(key) that can
 	search for user-defined variables even if the key is not a token in
 	the current command line.

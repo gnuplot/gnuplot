@@ -3,10 +3,14 @@
 # MOUSE_BUTTON MOUSE_X MOUSE_Y MOUSE_X2 MOUSE_Y2
 # and built-in function defined(<varname>)
 #
-set grid
-set title "Demonstration of reading mouse variables from gnuplot input script"
-plot sin(x)
-pause -1 "Click on the plot, then hit <cr>"
+reset
+set title "Scripted zoom using exported MOUSE variables"
+set samples 200
+set label 3 at graph 0.1, graph 0.9 tc lt 3
+set label 3 "Click on one corner of desired zoom region"
+plot sin(13*besj0(x))/x
+#
+pause mouse "Click on one corner of desired zoom region"
 #
 if (defined(MOUSE_BUTTON)) \
     print "Mouse button ", MOUSE_BUTTON, " at ", MOUSE_X, " ", MOUSE_Y ;\
@@ -16,5 +20,48 @@ if (defined(MOUSE_BUTTON)) \
     replot ;\
 else \
     print "No mouse click?" ;\
+    exit ;
+#
+BOT_X = MOUSE_X
+BOT_Y = MOUSE_Y
+set label 3 "Click on diagonal corner of desired zoom region"
+replot
+#
+pause mouse "Click on diagonal corner of desired zoom region"
+#
+if (defined(MOUSE_BUTTON)) \
+    print "Mouse button ", MOUSE_BUTTON, " at ", MOUSE_X, " ", MOUSE_Y ;\
+    set label 2 "   Mouse button %.0s\n   clicked here!", MOUSE_BUTTON ;\
+    set label 2 at MOUSE_X, MOUSE_Y ;\
+    set label 2 point pt 6 ps 6 ;\
+    replot ;\
+else \
+    print "No mouse click?" ;\
+    exit ;
+#
+#
+TOP_X = MOUSE_X
+TOP_Y = MOUSE_Y
+#
+set label 3 "Plot will zoom in 3 seconds"
+replot
+pause 3
+#
+set xrange [ BOT_X : TOP_X ]
+set yrange [ BOT_Y : TOP_Y ]
+set grid
+# There seems to be a bug in the parameter parsing for label strings
+#set label 1 "zoom x range %.3f to %.3f",BOT_X,TOP_X
+#set label 2 "zoom y range %.3f to %.3f",BOT_Y,TOP_Y
+#set label 1 at graph 0.1, graph 0.1
+#set label 2 at graph 0.1, graph 0.05
+unset label 1
+unset label 2
+unset label 3
+replot
+#
+print "Zoomed to xrange ",BOT_X," ",TOP_X
+print "Zoomed to yrange ",BOT_Y," ",TOP_Y
 #
 pause -1
+

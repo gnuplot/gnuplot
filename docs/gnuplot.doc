@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.177 2003/06/30 18:51:14 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.178 2003/07/22 17:41:10 sfeam Exp $
 C 18 September 2001
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001   Thomas Williams, Colin Kelley et al.
 C
@@ -2207,12 +2207,17 @@ C ... and restart the table:
 
  Syntax:
        pause <time> {"<string>"}
+       pause mouse {"<string>"}
 
  <time> may be any constant or expression.  Choosing -1 will wait until a
  carriage return is hit, zero (0) won't pause at all, and a positive number
  will wait the specified number of seconds.  The time is rounded to an integer
  number of seconds if subsecond time resolution is not supported by the given
  platform.  `pause 0` is synonymous with `print`.
+
+ If the current terminal supports mousing, then `pause mouse` will terminate
+ on either a mouse click or on a carriage return.  For all other terminals
+ `pause mouse` is equivalent to `pause -1`.
 
  Note: Since `pause` communicates with the operating system rather than the
  graphics, it may behave differently with different device drivers (depending
@@ -2223,6 +2228,7 @@ C ... and restart the table:
        pause 3     # Wait three seconds
        pause -1  "Hit return to continue"
        pause 10  "Isn't this pretty?  It's a cubic spline."
+       pause mouse "Click mouse on selected data point"
 
 2 plot
 ?commands plot

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.41 2003/07/16 05:26:01 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.42 2003/07/22 17:41:10 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -1578,6 +1578,13 @@ event_buttonrelease(struct gp_event_t *ge)
 	    current->udv_value.v.cmplx_val.real = real_y2;
 	    current->udv_value.v.cmplx_val.imag = 0;
 	}
+    }
+    /* Terminate via replot is we are in 'pause mouse' */
+    /* FIXME EAM: untested for mouse devices other than X11 */
+    if (paused_for_mouse) {
+	paused_for_mouse = FALSE;
+	do_string("replot");
+	fputc('\n', stderr);
     }
 }
 
