@@ -1,5 +1,5 @@
 /*
- * $Id: gif.trm,v 1.31 2000/12/08 11:23:48 mikulik Exp $
+ * $Id: gif.trm,v 1.32 2001/09/03 19:41:16 mikulik Exp $
  */
 
 /* GNUPLOT -- gif.trm */
@@ -653,7 +653,7 @@ GIF_boxfill(style, x, y, w, h)
     int style;
     unsigned int x, y, w, h;
 {
-    // Only solid filling style is supported, i.e. no pattern nor density.
+    /* Only solid filling style is supported, i.e. no pattern nor density. */
     gdImageFilledRectangle(gif_state.image, x, gif_state.height-(y+h), 
 	    x+w, gif_state.height-y, gif_state.color);
 }

@@ -1,3 +1,7 @@
+2001-09-11  Alexander Mai <st002279@hrzpub.tu-darmstadt.de>
+
+	* term/gif.trm: Fix a C++ comment. We are still using C89!
+
 2001-09-05  Alexander Mai <st002279@hrzpub.tu-darmstadt.de>
 
 	* term/epslatex.trm term/svg.trm: Two no-op changes to
