@@ -1,6 +1,6 @@
-dnl aclocal.m4 generated automatically by aclocal 1.3d
+dnl aclocal.m4 generated automatically by aclocal 1.4a
 
-dnl Copyright (C) 1994, 1995, 1996, 1997, 1998 Free Software Foundation, Inc.
+dnl Copyright (C) 1994, 1995-8, 1999 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
 dnl with or without modifications, as long as this notice is preserved.
@@ -21,6 +21,8 @@ dnl AM_INIT_AUTOMAKE(package,version, [no-define])
 
 AC_DEFUN(AM_INIT_AUTOMAKE,
 [AC_REQUIRE([AC_PROG_INSTALL])
+dnl We require 2.13 because we rely on SHELL being computed by configure.
+AC_PREREQ([2.13])
 PACKAGE=[$1]
 AC_SUBST(PACKAGE)
 VERSION=[$2]
@@ -41,6 +43,23 @@ AM_MISSING_PROG(AUTOCONF, autoconf, $missing_dir)
 AM_MISSING_PROG(AUTOMAKE, automake, $missing_dir)
 AM_MISSING_PROG(AUTOHEADER, autoheader, $missing_dir)
 AM_MISSING_PROG(MAKEINFO, makeinfo, $missing_dir)
+dnl Set install_sh for make dist
+install_sh="$missing_dir/install-sh"
+test -f "$install_sh" || install_sh="$missing_dir/install.sh"
+AC_SUBST(install_sh)
+dnl We check for tar when the user configures the end package.
+dnl This is sad, since we only need this for "dist".  However,
+dnl there's no other good way to do it.  We prefer GNU tar if
+dnl we can find it.  If we can't find a tar, it doesn't really matter.
+AC_CHECK_PROGS(AMTAR, gnutar gtar tar)
+AMTARFLAGS=
+if test -n "$AMTAR"; then
+  if $SHELL -c "$AMTAR --version" > /dev/null 2>&1; then
+    dnl We have GNU tar.
+    AMTARFLAGS=o
+  fi
+fi
+AC_SUBST(AMTARFLAGS)
 AC_REQUIRE([AC_PROG_MAKE_SET])])
 
 #
@@ -160,9 +179,10 @@ ac_save_CC="$CC"
 # breaks some systems' header files.
 # AIX			-qlanglvl=ansi
 # Ultrix and OSF/1	-std1
-# HP-UX			-Aa -D_HPUX_SOURCE
+# HP-UX 10.20 and later	-Ae
+# HP-UX older versions	-Aa -D_HPUX_SOURCE
 # SVR4			-Xc -D__EXTENSIONS__
-for ac_arg in "" -qlanglvl=ansi -std1 "-Aa -D_HPUX_SOURCE" "-Xc -D__EXTENSIONS__"
+for ac_arg in "" -qlanglvl=ansi -std1 -Ae "-Aa -D_HPUX_SOURCE" "-Xc -D__EXTENSIONS__"
 do
   CC="$ac_save_CC $ac_arg"
   AC_TRY_COMPILE(
@@ -215,31 +235,38 @@ esac
 
 # serial 1
 
-AC_DEFUN(gp_MSDOS,
+AC_DEFUN(GP_MSDOS,
 [AC_MSG_CHECKING(for MS-DOS/djgpp/libGRX)
 AC_EGREP_CPP(yes,
 [#if __DJGPP__ && __DJGPP__ == 2
   yes
 #endif
-], AC_MSG_RESULT(yes)
-   LIBS="-lpc $LIBS"
-   AC_DEFINE(MSDOS)
-   AC_DEFINE(DOS32)
-   with_linux_vga=no
-   AC_CHECK_LIB(grx20,GrLine,dnl
-      LIBS="-lgrx20 $LIBS"
-      CFLAGS="$CFLAGS -fno-inline-functions"
-      AC_DEFINE(DJSVGA)
-      AC_CHECK_LIB(grx20,GrCustomLine,AC_DEFINE(GRX21))),dnl
-   AC_MSG_RESULT(no)
-   )dnl 
+],AC_MSG_RESULT(yes)
+  LIBS="-lpc $LIBS"
+  AC_DEFINE(MSDOS, 1,
+            [ Define if this is an MSDOS system. ])
+  AC_DEFINE(DOS32, 1,
+            [ Define if this system uses a 32-bit DOS extender (djgpp/emx). ])
+  with_linux_vga=no
+  AC_CHECK_LIB(grx20,GrLine,dnl
+    LIBS="-lgrx20 $LIBS"
+    CFLAGS="$CFLAGS -fno-inline-functions"
+    AC_DEFINE(DJSVGA, 1,
+              [ Define if you want to use libgrx20 with MSDOS/djgpp. ])
+    AC_CHECK_LIB(grx20,GrCustomLine,dnl
+      AC_DEFINE(GRX21, 1,
+                [ Define if you want to use a newer version of libgrx under MSDOS/djgpp. ])dnl
+    )dnl
+  ),dnl
+  AC_MSG_RESULT(no)
+  )dnl 
 ])
 
 
 
 # serial 1
 
-AC_DEFUN(gp_NEXT,
+AC_DEFUN(GP_NEXT,
 [AC_MSG_CHECKING(for NeXT)
 AC_EGREP_CPP(yes,
 [#if __NeXT__
@@ -255,12 +282,13 @@ AC_EGREP_CPP(yes,
 
 
 
-# serial 1
+# serial 2
 
-AC_DEFUN(gp_CHECK_LIB_QUIET,
+dnl AC_CHECK_LIB(LIBRARY, FUNCTION [, OTHER-LIBRARIES])
+AC_DEFUN(GP_CHECK_LIB_QUIET,
 [ac_lib_var=`echo $1['_']$2 | sed 'y%./+-%__p_%'`
 ac_save_LIBS="$LIBS"
-LIBS="$TERMLIBS $TERMXLIBS -l$1 $5 $LIBS"
+LIBS="$TERMLIBS $TERMXLIBS -l$1 $3 $LIBS"
 AC_TRY_LINK(dnl
 ifelse([$2], [main], , dnl Avoid conflicting decl of main.
 [/* Override any gcc2 internal prototype to avoid an error.  */
@@ -277,47 +305,47 @@ char $2();
             eval "ac_cv_lib_$ac_lib_var=no")
 LIBS="$ac_save_LIBS"
 if eval "test \"`echo '$ac_cv_lib_'$ac_lib_var`\" = yes"; then
-  ifelse([$3], ,
-[changequote(, )dnl
+changequote(, )dnl
   ac_tr_lib=HAVE_LIB`echo $1 | sed -e 's/[^a-zA-Z0-9_]/_/g' \
     -e 'y/abcdefghijklmnopqrstuvwxyz/ABCDEFGHIJKLMNOPQRSTUVWXYZ/'`
 changequote([, ])dnl
-  LIBS="$LIBS -l$1"
-], [$3])
-else
-  ifelse([$4], , , [$4
-])dnl
+dnl  LIBS="$LIBS -l$1"
 fi
 ])
 
 
-# serial 1
+# serial 2
 
-dnl gp_SEARCH_LIBDIRS(LIBRARY, FUNCTION [, OTHER-LIBRARIES])
-AC_DEFUN(gp_SEARCH_LIBDIRS,
-[AC_MSG_CHECKING([for $2 in -l$1])
-gp_save_TERMLIBS="$TERMLIBS"
+dnl GP_PATH_LIB(LIBRARY, FUNCTION, SEARCH-DIRS [, OTHER-LIBRARIES])
+AC_DEFUN(GP_PATH_LIB,
+[ac_lib_var=`echo $1['_']$2 | sed 'y%./+-%__p_%'`
 changequote(, )dnl
   gp_tr_lib=HAVE_LIB`echo $1 | sed -e 's/[^a-zA-Z0-9_]/_/g' \
     -e 'y/abcdefghijklmnopqrstuvwxyz/ABCDEFGHIJKLMNOPQRSTUVWXYZ/'`
 changequote([, ])dnl
-dnl The "no" case is just a safety net
-case "$with_$1" in
-  yes|no)
-    gp_lib_list="";;
-  *)
-    gp_lib_path=`echo $with_$1 | sed -e 's%/lib$1\.a$%%'`
-    gp_lib_prefix=`echo $gp_lib_path | sed 's%/lib$%%'`
-    gp_lib_list="$gp_lib_prefix $gp_lib_prefix/lib $gp_lib_path"
-esac
-for ac_dir in '' /usr/local/lib $gp_lib_list ; do
-  TERMLIBS="`test x${ac_dir} != x && echo -L${ac_dir}` $gp_save_TERMLIBS"
-  gp_CHECK_LIB_QUIET($1,$2,dnl
-    TERMLIBS="$TERMLIBS -l$1"; break, dnl ACTION-IF-FOUND
-    TERMLIBS="$gp_save_TERMLIBS",     dnl ACTION-IF-NOT-FOUND
-    $3)                               dnl OTHER-LIBRARIES
+AC_MSG_CHECKING([for $2 in -l$1])
+AC_CACHE_VAL(ac_cv_lib_$ac_lib_var,
+[gp_save_TERMLIBS="$TERMLIBS"
+if test "$3" != yes && test "$3" != no; then
+  gp_l_path=`echo "$3" | sed -e 's%/lib$1\.a$%%'`
+  gp_l_prfx=`echo $gp_l_path | sed -e 's%/lib$%%' -e 's%/include$%%'`
+  gp_l_list="$gp_l_prfx $gp_l_prfx/lib $gp_l_path"
+fi
+for ac_dir in $gp_l_list '' /usr/local/lib ; do
+  test x${ac_dir} != x && TERMLIBS="-L${ac_dir} $gp_save_TERMLIBS"
+  GP_CHECK_LIB_QUIET($1,$2,$4)
+  TERMLIBS="$gp_save_TERMLIBS"
+  if eval "test \"`echo '$ac_cv_lib_'$ac_lib_var`\" = yes"; then
+    eval "ac_cv_lib_$ac_lib_var=${ac_dir}"
+    break
+  fi
 done
-if eval "test \"`echo '$ac_cv_lib_'$ac_lib_var`\" = yes"; then
+])
+if eval "test \"`echo '$ac_cv_lib_'$ac_lib_var`\" != no"; then
+  if eval "test \"`echo x'$ac_cv_lib_'$ac_lib_var`\" != x" && eval "test \"`echo x'$ac_cv_lib_'$ac_lib_var`\" != xyes"; then
+    eval "TERMLIBS=\"$gp_save_TERMLIBS -L`echo '$ac_cv_lib_'$ac_lib_var`\""
+  fi
+  TERMLIBS="$TERMLIBS -l$1"
   AC_MSG_RESULT(yes)
 else
   AC_MSG_RESULT(no)
@@ -326,30 +354,44 @@ fi
 
 
 
-# serial 1
+# serial 2
 
-dnl gp_SEARCH_HEADERDIRS(HEADER-FILE [,ACTION-IF-FOUND [,ACTION-IF-NOT-FOUND]])
-AC_DEFUN(gp_SEARCH_HEADERDIRS,
-[AC_REQUIRE([gp_SEARCH_LIBDIRS])
+dnl GP_PATH_HEADER(HEADER-FILE, SEARCH-DIRS [,ACTION-IF-FOUND [,ACTION-IF-NOT-FOUND]])
+AC_DEFUN(GP_PATH_HEADER,
+[ac_safe=`echo "$1" | sed 'y%./+-%__p_%'`
+changequote(, )dnl
+  ac_tr_hdr=HAVE_`echo $1 | sed 'y%abcdefghijklmnopqrstuvwxyz./-%ABCDEFGHIJKLMNOPQRSTUVWXYZ___%'`
+changequote([, ])dnl
 AC_MSG_CHECKING([for $1])
-ac_safe=`echo "$1" | sed 'y%./+-%__p_%'`
-gp_save_CPPFLAGS="$CPPFLAGS"
-for ac_dir in '' /usr/local/include $gp_lib_prefix $gp_lib_prefix/include ; do
-  CPPFLAGS="$gp_save_CPPFLAGS `test x${ac_dir} != x && echo -I${ac_dir}`"
-  AC_TRY_CPP([#include <$1>], eval "ac_cv_header_$ac_safe=yes",
+AC_CACHE_VAL(ac_cv_header_$ac_safe,
+[gp_save_CPPFLAGS="$CPPFLAGS"
+if test "$2" != yes && test "$2" != no; then
+  gp_h_path=`echo "$2" | sed -e 's%/lib$1\.a$%%'`
+  gp_h_prfx=`echo "$gp_h_path" | sed -e 's%/lib$%%' -e 's%/include$%%'`
+  gp_h_list="$gp_h_prfx $gp_h_prfx/include $gp_h_path"
+else
+  gp_h_list=''
+fi
+for ac_dir in $gp_h_list '' /usr/local/include ; do
+  test x${ac_dir} != x && CPPFLAGS="$gp_save_CPPFLAGS -I${ac_dir}"
+  AC_TRY_CPP([#include <$1>], eval "ac_cv_header_$ac_safe=${ac_dir}",
     eval "ac_cv_header_$ac_safe=no")
-  if eval "test \"`echo '$ac_cv_header_'$ac_safe`\" = yes"; then
+  CPPFLAGS="$gp_save_CPPFLAGS"
+  if eval "test \"`echo '$ac_cv_header_'$ac_safe`\" != no"; then
     break
-  else
-    CPPFLAGS="${ac_save_CPPFLAGS}"
   fi
 done
-if eval "test \"`echo '$ac_cv_header_'$ac_safe`\" = yes"; then
+])
+if eval "test \"`echo '$ac_cv_header_'$ac_safe`\" != no"; then
+  if eval "test \"`echo x'$ac_cv_header_'$ac_safe`\" != x" && eval "test \"`echo x'$ac_cv_header_'$ac_safe`\" != xyes"; then
+    eval "CPPFLAGS=\"$gp_save_CPPFLAGS -I`echo '$ac_cv_header_'$ac_safe`\""
+  fi
+  AC_DEFINE_UNQUOTED($ac_tr_hdr)
   AC_MSG_RESULT(yes)
-  ifelse([$2], , :, [$2])
+  ifelse([$3], , :, [$3])
 else
   AC_MSG_RESULT(no)
-ifelse([$3], , , [$3
+ifelse([$4], , , [$4
 ])dnl
 fi
 ])
