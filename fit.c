@@ -68,7 +68,7 @@ static char *RCSid = "$Id: fit.c,v 1.58 1998/04/14 00:15:19 drd Exp $";
 #else /* !(MSDOS || DOS386) */
 # ifndef VMS
 #  include <fcntl.h>
-# endif /* !VMS */
+# endif				/* !VMS */
 #endif /* !(MSDOS || DOS386) */
 
 #if defined(ATARI) || defined(MTOS)
@@ -96,25 +96,31 @@ enum marq_res {
 typedef enum marq_res marq_res_t;
 
 #ifdef INFINITY
-#undef INFINITY
+# undef INFINITY
 #endif
+
 #define INFINITY    1e30
 #define NEARLY_ZERO 1e-30
-#define INITIAL_VALUE 1.0	/* create new variables with this value (was NEARLY_ZERO) */
-#define DELTA	    0.001	/* Relative change for derivatives */
+
+/* create new variables with this value (was NEARLY_ZERO) */
+#define INITIAL_VALUE 1.0
+
+/* Relative change for derivatives */
+#define DELTA	    0.001
+
 #define MAX_DATA    2048
 #define MAX_PARAMS  32
 #define MAX_LAMBDA  1e20
 #define MIN_LAMBDA  1e-20
 #define LAMBDA_UP_FACTOR 10
 #define LAMBDA_DOWN_FACTOR 10
-				      /*#define MAX_VALUES_PER_LINE   32 *//* HBB 971023: turned out to be unused! */
-				    /*#define MAX_VARLEN  32 *//* HBB 971023: use MAX_ID_LEN instead! */
+
 #if defined(MSDOS) || defined(OS2) || defined(DOS386)
-#define PLUSMINUS   "\xF1"	/* plusminus sign */
+# define PLUSMINUS   "\xF1"	/* plusminus sign */
 #else
-#define PLUSMINUS   "+/-"
+# define PLUSMINUS   "+/-"
 #endif
+
 #define LASTFITCMDLENGTH 511
 
 /* HBB 971023: new, allow for dynamic adjustment of these: */
@@ -143,10 +149,11 @@ static int num_data, num_params;
 static int columns;
 static double *fit_x = 0, *fit_y = 0, *fit_z = 0, *err_data = 0, *a = 0;
 static TBOOLEAN ctrlc_flag = FALSE;
+static TBOOLEAN user_stop = FALSE;
 
 static struct udft_entry func;
 
-typedef char fixstr[MAX_ID_LEN + 1];
+typedef char fixstr[MAX_ID_LEN+1];
 
 static fixstr *par_name;
 
@@ -173,9 +180,6 @@ static void show_fit __PROTO((int i, double chisq, double last_chisq, double *a,
 			      double lambda, FILE * device));
 static TBOOLEAN is_empty __PROTO((char *s));
 static TBOOLEAN is_variable __PROTO((char *s));
-#if 0
-static void copy_max __PROTO((char *d, char *s, unsigned int n));
-#endif
 static double getdvar __PROTO((char *varname));
 static double createdvar __PROTO((char *varname, double value));
 static void splitpath __PROTO((char *s, char *p, char *f));
@@ -191,10 +195,10 @@ static void backup_file __PROTO((char *, const char *));
 int wri_to_fil_last_fit_cmd(fp)
 FILE *fp;
 {
-   if (fp == NULL)
-      return strlen(last_fit_command);
-   else
-      return fprintf(fp, "%s", last_fit_command);
+    if (fp == NULL)
+	return strlen(last_fit_command);
+    else
+	return fprintf(fp, "%s", last_fit_command);
 }
 
 
@@ -389,10 +393,12 @@ double *lambda;
     /* fill in additional parts of tmp_C, tmp_d */
 
     for (i = 0; i < num_params; i++) {
-	tmp_C[num_data + i][i] = *lambda;	/* fill in low diag. of tmp_C ... */
-	tmp_d[num_data + i] = 0;	/* ... and low part of tmp_d */
+	/* fill in low diag. of tmp_C ... */
+	tmp_C[num_data + i][i] = *lambda;
+	/* ... and low part of tmp_d */
+	tmp_d[num_data + i] = 0;
     }
-    /*printmatrix(tmp_C, num_data+num_params, num_params); */
+    /* printmatrix(tmp_C, num_data+num_params, num_params); */
 
     /* FIXME: residues[] isn't used at all. Why? Should it be used? */
 
@@ -405,8 +411,10 @@ double *lambda;
     for (j = 0; j < num_params; j++)
 	temp_a[j] = a[j] + da[j];
 
-    if (!analyze(temp_a, tmp_C, tmp_d, &tmp_chisq))
-	return ERROR;		/* FIXME: will never be reached: always returns TRUE */
+    if (!analyze(temp_a, tmp_C, tmp_d, &tmp_chisq)) {
+	/* FIXME: will never be reached: always returns TRUE */
+	return ERROR;
+    }
 
     if (tmp_chisq < *chisq) {	/* Success, accept new solution */
 	if (*lambda > MIN_LAMBDA) {
@@ -454,13 +462,14 @@ double *chisq;
     calculate(d, C, a);
 
     for (i = 0; i < num_data; i++) {
-	d[i] = (d[i] - fit_z[i]) / err_data[i];		/* note: order reversed, as used by Schwarz */
+	/* note: order reversed, as used by Schwarz */
+	d[i] = (d[i] - fit_z[i]) / err_data[i];
 	*chisq += d[i] * d[i];
 	for (j = 0; j < num_params; j++)
 	    C[i][j] /= err_data[i];
     }
-
-    return TRUE;		/* FIXME: why return a value that is always TRUE ? */
+    /* FIXME: why return a value that is always TRUE ? */
+    return TRUE;
 }
 
 
@@ -555,13 +564,14 @@ double *data;
 static TBOOLEAN fit_interrupt()
 {
     while (TRUE) {
-	fprintf(STANDARD, "\n\n(S)top fit, (C)ontinue, (E)xecute:  ");
+	fprintf(STANDARD, "\n\n(S)top fit, (C)ontinue, (E)xecute FIT_SCRIPT:  ");
 	switch (getc(stdin)) {
 
 	case EOF:
 	case 's':
 	case 'S':
 	    fprintf(STANDARD, "Stop.");
+	    user_stop = TRUE;
 	    return FALSE;
 
 	case 'c':
@@ -615,10 +625,13 @@ double a[];
     res = BETTER;
 
     Dblf("\nInitial set of free parameters:\n");
-	show_fit(iter, chisq, chisq, a, lambda, STANDARD);
+    show_fit(iter, chisq, chisq, a, lambda, STANDARD);
     show_fit(iter, chisq, chisq, a, lambda, log_f);
 
     /* MAIN FIT LOOP: do the regression iteration */
+
+    /* HBB 981118: initialize new variable 'user_break' */
+    user_stop = FALSE;
 
     do {
 /*
@@ -675,12 +688,14 @@ double a[];
     /* HBB 970304: the maxiter patch: */
     if ((maxiter > 0) && (iter > maxiter)) {
 	Dblf2("\nMaximum iteration count (%d) reached. Fit stopped.\n", maxiter);
+    } else if (user_stop) {
+	Dblf2("\nThe fit was stopped by the user after %d iterations.\n", iter);
     } else {
 	Dblf2("\nAfter %d iterations the fit converged.\n", iter);
     }
 
-    Dblf2("final sum of squares residuals    : %g\n", chisq);
-	if (chisq > NEARLY_ZERO) {
+    Dblf2("final sum of squares of residuals : %g\n", chisq);
+    if (chisq > NEARLY_ZERO) {
 	Dblf2("rel. change during last iteration : %g\n\n", (chisq - last_chisq) / chisq);
     } else {
 	Dblf2("abs. change during last iteration : %g\n\n", (chisq - last_chisq));
@@ -709,15 +724,21 @@ double a[];
 	for (i = 0; i < num_params; i++)
 	    Dblf3("%-15.15s = %-15g\n", par_name[i], a[i]);
     } else {
-
-	Dblf2("chisquared / # degrees of freedom : %g\n", chisq / (num_data - num_params));
+	/* HBB 981117: change from L.Hart. I'm not yet fully convinced of this one */
+	if (columns < 3) {
+	    Dblf2("unit weights: stdfit  = sqrt(WSSR/ndf) = %g\n\n", sqrt(chisq / (num_data - num_params)));
+	} else {
+	    Dblf2("weighted fit: reduced chisquare = WSSR/ndf = %g\n\n", chisq / (num_data - num_params));
+	}
 	/* get covariance-, Korrelations- and Kurvature-Matrix */
 	/* and errors in the parameters                     */
 
 	/* compute covar[][] directly from C */
-	    Givens(C, 0, 0, 0, num_data, num_params, 0);
+	Givens(C, 0, 0, 0, num_data, num_params, 0);
 	/*printmatrix(C, num_params, num_params); */
-	covar = C + num_data;	/* Use lower square of C for covar */
+
+	/* Use lower square of C for covar */
+	covar = C + num_data;
 	Invert_RtR(C, covar, num_params);
 	/*printmatrix(covar, num_params, num_params); */
 
@@ -731,59 +752,45 @@ double a[];
 	}
 
 	/* transform covariances into correlations */
-	for (i = 0; i < num_params; i++)
-	    for (j = 0; j <= i; j++)	/* only lower triangle needs to be handled */
+	for (i = 0; i < num_params; i++) {
+	    /* only lower triangle needs to be handled */
+	    for (j = 0; j <= i; j++)
 		covar[i][j] /= dpar[i] * dpar[j];
+	}
 
 	/* scale parameter errors based on chisq */
-	if (columns == 2)
-	    /* FIXME: maybe it should be num_data - num_params here as well?  */
-	    chisq = sqrt(chisq / (num_data));
-	else
-	    chisq = sqrt(chisq / (num_data - num_params));
-#if 1
-	    /* HBB: For some I don't really understand yet, this seems to
-	     * be incorrect, at least for one demo case I know of
-	     * (thanks to clegelan@physik.uni-bielefeld.de)
-	     * OTOH, this makes most of the demo's results simply
-	     * ridiculous... :-(
-	     */
+	chisq = sqrt(chisq / (num_data - num_params));
 	for (i = 0; i < num_params; i++)
 	    dpar[i] *= chisq;
-#endif
 
-	Dblf("Final set of parameters            68.3%% confidence interval (one at a time)\n");
-	    Dblf("=======================            =========================================\n\n");
-	    for (i = 0; i < num_params; i++) {
+	Dblf("Final set of parameters            Asymptotic Standard Error\n");
+	Dblf("=======================            ==========================\n\n");
+
+	for (i = 0; i < num_params; i++) {
 	    double temp =
 	    (fabs(a[i]) < NEARLY_ZERO) ? 0.0 : fabs(100.0 * dpar[i] / a[i]);
-	    Dblf6("%-15.15s = %-15g  %-3.3s %-15g (%g%%)\n", par_name[i], a[i],
-		  PLUSMINUS, dpar[i], temp);
+	    Dblf6("%-15.15s = %-15g  %-3.3s %-12.4g (%.4g%%)\n",
+		  par_name[i], a[i], PLUSMINUS, dpar[i], temp);
 	}
 
 	Dblf("\n\ncorrelation matrix of the fit parameters:\n\n");
-	    Dblf("               ");
-	    for (j = 0; j < num_params; j++)
+	Dblf("               ");
+
+	for (j = 0; j < num_params; j++)
 	    Dblf2("%-6.6s ", par_name[j]);
-		Dblf("\n");
-		for (i = 0; i < num_params; i++) {
-		Dblf2("%-15.15s", par_name[i]);
-		for (j = 0; j <= i; j++)	/* Only print lower triangle of symmetric matrix */
-		    Dblf2("%6.3f ", covar[i][j]);
-		Dblf("\n");
+
+	Dblf("\n");
+	for (i = 0; i < num_params; i++) {
+	    Dblf2("%-15.15s", par_name[i]);
+	    for (j = 0; j <= i; j++) {
+		/* Only print lower triangle of symmetric matrix */
+		Dblf2("%6.3f ", covar[i][j]);
 	    }
+	    Dblf("\n");
+	}
 
 	free(dpar);
     }
-
-#if 0				/* FIXME: what is this for? Well, let's see what happens without it... */
-    /* restore last parameter's value (not done by calculate) */
-    {
-	struct value val;
-	Gcomplex(&val, a[num_params - 1], 0.0);
-	setvar(par_name[num_params - 1], val);
-    }
-#endif
 
     /* call destructor for allocated vars */
     lambda = -2;		/* flag value, meaning 'destruct!' */
@@ -809,10 +816,12 @@ FILE *device;
 
     fprintf(device, "\n\n\
 Iteration %d\n\
-chisquare : %-15g   relative deltachi2 : %g\n\
-deltachi2 : %-15g   limit for stopping : %g\n\
-lambda	  : %g\n\nactual set of parameters\n\n",
-	    i, chisq, chisq > NEARLY_ZERO ? (chisq - last_chisq) / chisq : 0.0, chisq - last_chisq, epsilon, lambda);
+WSSR        : %-15g   delta(WSSR)/WSSR   : %g\n\
+delta(WSSR) : %-15g   limit for stopping : %g\n\
+lambda	  : %g\n\n%s parameter values\n\n",
+      i, chisq, chisq > NEARLY_ZERO ? (chisq - last_chisq) / chisq : 0.0,
+	    chisq - last_chisq, epsilon, lambda,
+	    (i > 0 ? "resultant" : "initial"));
     for (k = 0; k < num_params; k++)
 	fprintf(device, "%-15.15s = %g\n", par_name[k], a[k]);
 }
@@ -859,27 +868,12 @@ static TBOOLEAN is_variable(s)
 char *s;
 {
     while (*s != '\0') {
-	if (!isalnum((int)*s) && *s != '_')
+	if (!isalnum((int) *s) && *s != '_')
 	    return FALSE;
 	s++;
     }
     return TRUE;
 }
-
-#if 0
-/*****************************************************************
-    safe, '\0'-terminated strncpy
-*****************************************************************/
-static void copy_max(d, s, n)
-char *d;
-char *s;
-unsigned int n;
-{
-    strncpy(d, s, (size_t) n);
-    if (strlen(s) >= (size_t) n)
-	d[n - 1] = NUL;
-}
-#endif
 
 /*****************************************************************
     first time settings
@@ -914,7 +908,6 @@ struct value data;
 	    gp_alloc((unsigned int) sizeof(struct udvt_entry), "fit setvar");
 	udv_ptr->next_udv = NULL;
     }
-    /* copy_max (udv_ptr->udv_name, varname, (int)sizeof(udv_ptr->udv_name)); */
     safe_strncpy(udv_ptr->udv_name, varname, sizeof(udv_ptr->udv_name));
     udv_ptr->udv_value = data;
     udv_ptr->udv_undef = FALSE;
@@ -958,10 +951,11 @@ char *varname;
     return 0;
 }
 
-/* like getdvar, but
- * - convert it from integer to real if necessary
- * - create it with value INITIAL_VALUE if not found or undefined
- */
+/*****************************************************************
+   like getdvar, but
+   - convert it from integer to real if necessary
+   - create it with value INITIAL_VALUE if not found or undefined
+*****************************************************************/
 static double createdvar(varname, value)
 char *varname;
 double value;
@@ -1054,7 +1048,6 @@ char *pfile, *npfile;
 	    continue;
 	}
 	if ((tmp = strchr(s, '#')) != NULL) {
-	    /* copy_max (tail, tmp, (int) sizeof(tail)); */
 	    safe_strncpy(tail, tmp, sizeof(tail));
 	    *tmp = NUL;
 	} else
@@ -1066,7 +1059,6 @@ char *pfile, *npfile;
 	    (void) fclose(of);
 	    Eex2("syntax error in parameter file %s", fnam);
 	}
-	/* copy_max (pname, tmp, (int)sizeof(pname)); */
 	safe_strncpy(pname, tmp, sizeof(pname));
 	/* next must be '=' */
 	if (c != '=') {
@@ -1277,8 +1269,6 @@ void do_fit()
 
     token2 = c_token;
 
-
-
     /* use datafile module to parse the datafile and qualifiers */
 
     columns = df_open(4);	/* up to 4 using specs allowed */
@@ -1290,7 +1280,8 @@ void do_fit()
     if ((dummy_y >= 0) && (columns < 4))
 	int_error("Can't re-name 'y' in a one-variable fit", dummy_y);
 
-    /* defer actually reading the data until we have parsed the rest of the line */
+    /* defer actually reading the data until we have parsed the rest
+     * of the line */
 
     token3 = c_token;
 
@@ -1301,17 +1292,22 @@ void do_fit()
     /* HBB 970304: maxiter patch */
     maxiter = getivar(FITMAXITER);
 
-    tmpd = getdvar(FITSTARTLAMBDA);	/* get startup value for lambda, if given */
+    /* get startup value for lambda, if given */
+    tmpd = getdvar(FITSTARTLAMBDA);
+
     if (tmpd > 0.0) {
 	startup_lambda = tmpd;
 	printf("Lambda Start value set: %g\n", startup_lambda);
     }
-    tmpd = getdvar(FITLAMBDAFACTOR);	/* get lambda up/down factor, if given */
+
+    /* get lambda up/down factor, if given */
+    tmpd = getdvar(FITLAMBDAFACTOR);
+
     if (tmpd > 0.0) {
 	lambda_up_factor = lambda_down_factor = tmpd;
 	printf("Lambda scaling factors reset:  %g\n", lambda_up_factor);
     }
-    *fit_script = '\0';
+    *fit_script = NUL;
     if ((tmp = getenv(FITSCRIPT)) != NULL)
 	strcpy(fit_script, tmp);
 
@@ -1348,7 +1344,8 @@ void do_fit()
 
     while ((i = df_readline(v, 4)) != EOF) {
 	if (num_data >= max_data) {
-	    max_data = (max_data * 3) / 2;	/* increase max_data by factor of 1.5 */
+	    /* increase max_data by factor of 1.5 */
+	    max_data = (max_data * 3) / 2;
 	    if (0
 		|| !redim_vec(&fit_x, max_data)
 		|| !redim_vec(&fit_y, max_data)
@@ -1436,7 +1433,7 @@ void do_fit()
     fprintf(log_f, "        #datapoints = %d\n", num_data);
 
     if (columns < 3)
-	fprintf(log_f, "        y-errors assumed equally distributed\n\n");
+	fprintf(log_f, "        residuals are weighted equally (unit weight)\n\n");
 
     {
 	char *line = NULL;
@@ -1468,20 +1465,20 @@ void do_fit()
 
 	/* get parameters and values out of file and ignore fixed ones */
 
-	fprintf(log_f, "take parameters from file: %s\n\n", sstr);
+	fprintf(log_f, "fitted parameters and initial values from file: %s\n\n", sstr);
 	if (!(f = fopen(sstr, "r")))
 	    Eex2("could not read parameter-file %s", sstr);
 	while (TRUE) {
 	    if (!fgets(s = sstr, (int) sizeof(sstr), f))	/* EOF found */
 		break;
 	    if ((tmp = strstr(s, FIXED)) != NULL) {	/* ignore fixed params */
-		*tmp = '\0';
+		*tmp = NUL;
 		fprintf(log_f, "FIXED:  %s\n", s);
 		fixed = TRUE;
 	    } else
 		fixed = FALSE;
 	    if ((tmp = strchr(s, '#')) != NULL)
-		*tmp = '\0';
+		*tmp = NUL;
 	    if (is_empty(s))
 		continue;
 	    tmp = get_next_word(&s, &c);
@@ -1489,7 +1486,6 @@ void do_fit()
 		(void) fclose(f);
 		Eex("syntax error in parameter file");
 	    }
-	    /* copy_max (par_name[num_params], tmp, (int)sizeof(fixstr)); */
 	    safe_strncpy(par_name[num_params], tmp, sizeof(fixstr));
 	    /* next must be '=' */
 	    if (c != '=') {
@@ -1509,7 +1505,8 @@ void do_fit()
 	    if (fixed) {
 		struct value tempval;
 		(void) Gcomplex(&tempval, tmp_par, 0.0);
-		setvar(par_name[num_params], tempval);	/* use parname as temp */
+		/* use parname as temp */
+		setvar(par_name[num_params], tempval);
 	    } else {
 		if (num_params >= max_params) {
 		    max_params = (max_params * 3) / 2;
@@ -1531,9 +1528,10 @@ void do_fit()
 	}
 	(void) fclose(f);
 
-    } else {			/* not a string after via: it's a variable listing */
+    } else {
+	/* not a string after via: it's a variable listing */
 
-	fprintf(log_f, "use actual parameter values\n\n");
+	fprintf(log_f, "fitted parameters initiallized with current variable values\n\n");
 	do {
 	    if (!isletter(c_token))
 		Eex("no parameter specified");
