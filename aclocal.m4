@@ -310,11 +310,24 @@ AC_EGREP_CPP(yes,
   yes
 #endif
 ], AC_MSG_RESULT(yes)
-   GNUPLOT_BE=gnuplot_be,dnl
-   GNUPLOT_BE=
+   build_src_beos_subdir=yes,dnl
+   build_src_beos_subdir=no
    AC_MSG_RESULT(no))
 ])
 
+
+# Define a conditional.
+
+AC_DEFUN(AM_CONDITIONAL,
+[AC_SUBST($1_TRUE)
+AC_SUBST($1_FALSE)
+if $2; then
+  $1_TRUE=
+  $1_FALSE='#'
+else
+  $1_TRUE='#'
+  $1_FALSE=
+fi])
 
 dnl testing new version of FUNC_SELECT
 
@@ -496,17 +509,4 @@ ifelse([$3], , , [$3
 fi
 ])
 
-
-# Define a conditional.
-
-AC_DEFUN(AM_CONDITIONAL,
-[AC_SUBST($1_TRUE)
-AC_SUBST($1_FALSE)
-if $2; then
-  $1_TRUE=
-  $1_FALSE='#'
-else
-  $1_TRUE='#'
-  $1_FALSE=
-fi])
 
