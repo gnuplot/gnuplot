@@ -1,5 +1,5 @@
 /*
- * $Id: svg.trm,v 1.20 2002/08/30 18:45:46 mikulik Exp $
+ * $Id: svg.trm,v 1.21 2002/09/27 00:12:27 sfeam Exp $
  *
  */
 
@@ -992,22 +992,22 @@ TERM_TABLE_END (svg_driver)
 #endif /* TERM_PROTO_ONLY */
 
 #ifdef TERM_HELP
-    START_HELP (svg)
-    "1 svg",
-    "?commands set terminal svg",
-    "?set terminal svg",
-    "?set term svg",
-    "?terminal svg",
-    "?term svg",
-    "?svg",
-    " This terminal produces files in the W3C Scalable Vector Graphics format.",
-    "",
-    " Syntax:",
-    "       set terminal svg {size <x> <y>}",
-    "                        {fname \"<font>\"} {fsize <fontsize>}",
-    "",
-    " where <x> and <y> are the size of the SVG plot to generate,",
-    " <font> is the name of the default font to use (default Arial) and",
-    " <fontsize> is the font size (in points, default 12)"
-    END_HELP (svg)
+START_HELP(svg)
+"1 svg",
+"?commands set terminal svg",
+"?set terminal svg",
+"?set term svg",
+"?terminal svg",
+"?term svg",
+"?svg",
+" This terminal produces files in the W3C Scalable Vector Graphics format.",
+"",
+" Syntax:",
+"       set terminal svg {size <x> <y>}",
+"                        {fname \"<font>\"} {fsize <fontsize>}",
+"",
+" where <x> and <y> are the size of the SVG plot to generate,",
+" <font> is the name of the default font to use (default Arial) and",
+" <fontsize> is the font size (in points, default 12)"
+END_HELP(svg)
 #endif

@@ -1,5 +1,5 @@
 /*
- * $Id: pdf.trm,v 1.15 2002/10/29 03:17:49 sfeam Exp $
+ * $Id: pdf.trm,v 1.16 2002/11/01 20:14:32 sfeam Exp $
  */
 
 /*------------------------------
@@ -1121,21 +1121,21 @@ TERM_TABLE_END (pdf_driver)
 #endif /* TERM_PROTO_ONLY */
 
 #ifdef TERM_HELP
-    START_HELP (pdf)
-    "1 pdf",
-    "?commands set terminal pdf",
-    "?set terminal pdf",
-    "?set term pdf",
-    "?terminal pdf",
-    "?term pdf",
-    "?pdf",
-    " This terminal produces files in the Adobe Portable Document Format",
-    " (PDF), useable for printing or display with tools like Acrobat Reader",
-    "",
-    " Syntax:",
-    "       set terminal pdf {fname \"<font>\"} {fsize <fontsize>}",
-    "",
-    " where <font> is the name of the default font to use (default Helvetica)",
-    " and <fontsize> is the font size (in points, default 12)"
-    END_HELP (pdf)
+START_HELP(pdf)
+"1 pdf",
+"?commands set terminal pdf",
+"?set terminal pdf",
+"?set term pdf",
+"?terminal pdf",
+"?term pdf",
+"?pdf",
+" This terminal produces files in the Adobe Portable Document Format",
+" (PDF), useable for printing or display with tools like Acrobat Reader",
+"",
+" Syntax:",
+"       set terminal pdf {fname \"<font>\"} {fsize <fontsize>}",
+"",
+" where <font> is the name of the default font to use (default Helvetica)",
+" and <fontsize> is the font size (in points, default 12)"
+END_HELP(pdf)
 #endif
