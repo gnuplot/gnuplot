@@ -89,14 +89,14 @@ char ifile[MAX_LINE_LEN+1];
 char ofile[MAX_LINE_LEN+1];
 struct XREFLIST *refhead = NULL;
 
-static void convert __PROTO((FILE *, FILE *));
-static void process_line __PROTO((char *, FILE *));
-static void node_head __PROTO((char *, char *, char *, char *, FILE *));
-static void name_free __PROTO((char **));
-static char **name_alloc __PROTO(());
-static void clear_buffer __PROTO((struct BUFFER *, FILE *));
-static int inxreflist __PROTO((struct LIST *));
-static void xref_free __PROTO((void));
+void convert __PROTO((FILE *, FILE *));
+void process_line __PROTO((char *, FILE *));
+void node_head __PROTO((char *, char *, char *, char *, FILE *));
+void name_free __PROTO((char **));
+char **name_alloc __PROTO(());
+void clear_buffer __PROTO((struct BUFFER *, FILE *));
+int inxreflist __PROTO((struct LIST *));
+void xref_free __PROTO((void));
 
 int main(argc, argv)
 int argc;
