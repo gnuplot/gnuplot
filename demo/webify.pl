@@ -1,0 +1,49 @@
+#!/usr/bin/perl -w
+#
+# Convert a single gnuplot demo script to a web page
+# Usage:
+#	webify xxx
+#
+# Reads xxx.dem and creates xxx.html along with associated png
+# images output to xxx.<n>.png
+#
+# Ethan A Merritt <merritt@u.washington.edu>
+# December 2003
+#
+use HTML::Entities;
+
+	my $plot = 1;
+
+# input and output files
+	open(IN,  "<$ARGV[0].dem") or die "can't open $ARGV[0].dem";
+	open(OUT, ">$ARGV[0].html") or die "can't open $ARGV[0].html";
+
+# open a pipe to gnuplot and set terminal type
+	open(GNUPLOT, "|gnuplot") or die "can't find gnuplot";
+	print GNUPLOT "set term png font arial 8 size 420,320\n";
+	print GNUPLOT "set output \"$ARGV[0].$plot.png\"\n";
+
+# Boiler plate header
+	print OUT "<html>\n<head>\n<title>$ARGV[0] gnuplot demo script</title></head>\n";
+	print OUT "<body>\n<h2>$ARGV[0] gnuplot demo script</h2>\n";
+	print OUT "<hr>\n";
+
+# Start processing
+	print OUT "<pre>\n";
+	print OUT "<img src=\"$ARGV[0].$plot.png\" align=right>\n";
+
+	while (<IN>) {
+		if (/^pause /) {
+			print OUT "<br clear=all>\n<hr>";
+			$plot++;
+			print OUT "<img src=\"$ARGV[0].$plot.png\" align=right>\n";
+			print GNUPLOT "set output \"$ARGV[0].$plot.png\"\n";
+		} else {
+			print OUT HTML::Entities::encode($_);
+			print GNUPLOT;
+		}
+	}
+
+# Amazingly enough, that's it
+	close GNUPLOT;
+	print OUT "</pre>\n</body>\n</html>\n";

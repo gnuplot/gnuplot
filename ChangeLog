@@ -15,6 +15,11 @@
 
 	* demo/bivariat.dem: Fix key placement in final plot.
 
+	* demo/webify.pl: (New File) This is a perl script that converts a
+	single gnuplot demo script into a web page with associated png images.
+	I used it to generate a new set of demo pages for version 4 on
+		gnuplot.sourceforge.net/demo/index.html
+
 2003-12-05  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/x11.trm: Leave current window unchanged when closing old window
