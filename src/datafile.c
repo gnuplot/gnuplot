@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.34 2002/02/27 21:18:54 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.35 2002/02/28 09:36:44 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -1323,8 +1323,13 @@ df_3dmatrix(this_plot)
 #ifdef PM3D
 	    /* there should be `color' instead of used[2], when this is
 	     * implemented for binary files */
+#if 1
+	    STORE_WITH_LOG_AND_UPDATE_RANGE(point->color, used[2], point->type, COLOR_AXIS, NOOP, goto skip);
+#else
 	    update_pm3d_zrange(used[2], NEED_PALETTE(this_plot));
 #endif
+#endif
+
 	    /* some of you won't like this, but I say goto is for this */
 
 	  skip:

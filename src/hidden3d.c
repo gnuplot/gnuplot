@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.32 2002/01/26 17:55:08 joze Exp $"); }
+static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.33 2002/02/01 16:05:08 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - hidden3d.c */
@@ -255,13 +255,8 @@ static dynarray qtree;
 #endif /* TEST_QUADTREE*/
 
 /* Prototypes for internal functions of this module. */
-#ifdef PM3D
 static long int store_vertex __PROTO((struct coordinate GPHUGE *point, 
-				      int pointtype, int color_from_column));
-#else
-static long int store_vertex __PROTO((struct coordinate GPHUGE *point, 
-				      int pointtype));
-#endif
+				      int pointtype, TBOOLEAN color_from_column));
 static long int make_edge __PROTO((long int vnum1, long int vnum2,
 				   struct lp_style_type *lp,
 				   int style, int next));
@@ -501,31 +496,27 @@ do {									\
 } while (0)
 
 static long int 
-store_vertex (point, pointtype
-#ifdef PM3D
-    , color_from_column
-#endif
-    )
-		 struct coordinate GPHUGE * point;
-		 int pointtype;
-#ifdef PM3D
-		 int color_from_column;
-#endif
+store_vertex (point, pointtype, color_from_column)
+    struct coordinate GPHUGE * point;
+    int pointtype;
+    TBOOLEAN color_from_column;
 {
-	p_vertex thisvert = nextfrom_dynarray(&vertices);
+    p_vertex thisvert = nextfrom_dynarray(&vertices);
 	
-	thisvert->style = pointtype;
-	if ((int)point->type >= hiddenHandleUndefinedPoints) {
-		FLAG_VERTEX_AS_UNDEFINED(*thisvert);
-		return (-1);
-	}
-	map3d_xyz(point->x, point->y,	point->z, thisvert);
+    thisvert->style = pointtype;
+    if ((int)point->type >= hiddenHandleUndefinedPoints) {
+	FLAG_VERTEX_AS_UNDEFINED(*thisvert);
+	return (-1);
+    }
+    map3d_xyz(point->x, point->y, point->z, thisvert);
 #ifdef PM3D
-	if (color_from_column)
-	    thisvert->real_z = point->ylow;
+    if (color_from_column)
+	thisvert->real_z = point->color;
+#else
+    (void) color_from_column; /* avoid -Wunused warning */
 #endif
 
-	return (thisvert - vlist);
+    return (thisvert - vlist);
 }
 
 /* A part of store_edge that does the actual storing. Used by
@@ -1019,8 +1010,10 @@ build_networks(plots, pcount)
 	 this_plot = this_plot->next_sp, surface++) {
 	long int crvlen = this_plot->iso_crvs->p_count;
 	int pointtype = -1;
+	TBOOLEAN color_from_column = FALSE;
+
 #ifdef PM3D
-	int color_from_column = this_plot->pm3d_color_from_column;
+	color_from_column = this_plot->pm3d_color_from_column;
 #endif
 
 	lp = &(this_plot->lp_properties);
@@ -1050,11 +1043,8 @@ build_networks(plots, pcount)
 		for (i = 0; i < icrvs->p_count; i++) {
 		    long int thisvertex, basevertex;
 		    
-		    thisvertex = store_vertex(points+i, pointtype
-#ifdef PM3D
-			, color_from_column
-#endif
-			);
+		    thisvertex = store_vertex(points+i, pointtype,
+					      color_from_column);
 		
 		    if (thisvertex < 0 || previousvertex < 0) {
 			previousvertex = thisvertex;
@@ -1082,11 +1072,8 @@ build_networks(plots, pcount)
 			    coordval remember_z = points[i].z;
 			    
 			    points[i].z = axis_array[FIRST_Z_AXIS].min;
-			    basevertex = store_vertex(points + i, pointtype
-#ifdef PM3D
-				, color_from_column
-#endif
-				);
+			    basevertex = store_vertex(points + i, pointtype,
+						      color_from_column);
 			    points[i].z = remember_z;
 			}
 			if (basevertex > 0)
@@ -1125,11 +1112,8 @@ build_networks(plots, pcount)
 		long int e1, e2, e3;
 		long int pnum;
 
-		thisvertex = store_vertex(points+i, pointtype
-#ifdef PM3D
-		    , color_from_column
-#endif
-		    );
+		thisvertex = store_vertex(points+i, pointtype,
+					  color_from_column);
 
 		/* Preset the pointers to the polygons and edges
 		 * belonging to this isoline */
@@ -1274,11 +1258,8 @@ build_networks(plots, pcount)
 			coordval remember_z = points[i].z;
 						
 			points[i].z = axis_array[FIRST_Z_AXIS].min;
-			basevertex = store_vertex(points + i, pointtype
-#ifdef PM3D
-			    , color_from_column
-#endif
-			    );
+			basevertex = store_vertex(points + i, pointtype,
+						  color_from_column);
 			points[i].z = remember_z;
 		    }
 		    if (basevertex > 0)

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.61 2002/02/18 23:39:29 amai Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.62 2002/02/25 03:10:41 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -243,7 +243,7 @@ int axis3d_o_x, axis3d_o_y, axis3d_x_dx, axis3d_x_dy, axis3d_y_dx, axis3d_y_dy;
  */
 
 /* unit vector (terminal coords) */
-static double tic_unitx, tic_unity;
+static double tic_unitx, tic_unity, tic_unitz;
 
 /* calculate the number and max-width of the keys for an splot.
  * Note that a blank line is issued after each set of contours
@@ -1507,7 +1507,7 @@ plot3d_lines_pm3d(plot)
 
 			if (prev == INRANGE) {
 			    if (color_from_column)
-				z =  (points[i - step].ylow + points[i].ylow) * 0.5;
+				z =  (points[i - step].color + points[i].color) * 0.5;
 			    else
 				z =  (z2cb(points[i - step].z) + z2cb(points[i].z)) * 0.5;
 			    set_color( cb2gray(z) );
@@ -1528,7 +1528,7 @@ plot3d_lines_pm3d(plot)
 
 				    clip_move(xx0, yy0);
 				    if (color_from_column)
-					z =  (points[i - step].ylow + points[i].ylow) * 0.5;
+					z =  (points[i - step].color + points[i].color) * 0.5;
 				    else
 					z =  (z2cb(points[i - step].z) + z2cb(points[i].z)) * 0.5;
 				    set_color( cb2gray(z) );
@@ -1554,7 +1554,7 @@ plot3d_lines_pm3d(plot)
 				map3d_xy(clip_x, clip_y, clip_z, &xx0, &yy0);
 
 				if (color_from_column)
-				    z =  (points[i - step].ylow + points[i].ylow) * 0.5;
+				    z =  (points[i - step].color + points[i].color) * 0.5;
 				else
 				    z =  (z2cb(points[i - step].z) + z2cb(points[i].z)) * 0.5;
 				set_color( cb2gray(z));
@@ -1575,7 +1575,7 @@ plot3d_lines_pm3d(plot)
 
 				    clip_move(x, y);
 				    if (color_from_column)
-					z =  (points[i - step].ylow + points[i].ylow) * 0.5;
+					z =  (points[i - step].color + points[i].color) * 0.5;
 				    else
 					z =  (z2cb(points[i - step].z) + z2cb(points[i].z)) * 0.5;
 				    set_color( cb2gray(z) );
@@ -1686,7 +1686,7 @@ plot3d_points_pm3d(plot, p_type)
 
 		    if (!clip_point(x, y)) {
 			if (color_from_column)
-			    set_color( cb2gray(points[i].ylow) );
+			    set_color( cb2gray(points[i].color) );
 			else
 			    set_color( cb2gray( z2cb(points[i].z) ) );
 			(*t->point) (x, y, p_type);
@@ -2161,18 +2161,11 @@ draw_3d_graphbox(plot, plot_num)
 
 	map3d_xyz(mid_x, xaxis_y, base_z, &v0);
 	map3d_xyz(mid_x, other_end, base_z, &v1);
-	{	
-	    double dx = v1.x - v0.x;
-	    double dy = v1.y - v0.y;
-	    double len = sqrt(dx * dx + dy * dy);
 
-	    if (len != 0) {
-		tic_unitx = dx / len / (double)xscaler;
-		tic_unity = dy / len / (double)yscaler;
-	    } else {
-		tic_unitx = tic_unity = 0;
-	    }
-	}
+	tic_unitx = (v1.x - v0.x) / (double)yscaler;
+	tic_unity = (v1.y - v0.y) / (double)yscaler;
+	tic_unitz = (v1.z - v0.z) / (double)yscaler;
+
 	if (X_AXIS.ticmode) {
 	    gen_tics(FIRST_X_AXIS, /* grid_selection & (GRID_X | GRID_MX), */
 		     xtick_callback);
@@ -2189,8 +2182,8 @@ draw_3d_graphbox(plot, plot_num)
 
 	    map3d_xyz(mid_x, xaxis_y + step, base_z, &v1);
 	    if (!tic_in) {
-		v1.x -= tic_unitx * ticscale * (t->h_tic);
-		v1.y -= tic_unity * ticscale * (t->v_tic);
+		v1.x -= tic_unitx * ticscale * t->v_tic;
+		v1.y -= tic_unity * ticscale * t->v_tic;
 	    }
 	    TERMCOORD(&v1, x1, y1);
 	    x1 += X_AXIS.label.xoffset * t->h_char;
@@ -2215,18 +2208,11 @@ draw_3d_graphbox(plot, plot_num)
 
 	map3d_xyz(yaxis_x, mid_y, base_z, &v0);
 	map3d_xyz(other_end, mid_y, base_z, &v1);
-	{			/* take care over unsigned quantities */
-	    double dx = v1.x - v0.x;
-	    double dy = v1.y - v0.y;
-	    double len = sqrt(dx * dx + dy * dy);
-	    
-	    if (len != 0) {
-		tic_unitx = dx / len / (double)xscaler;
-		tic_unity = dy / len / (double)yscaler;
-	    } else {
-		tic_unitx = tic_unity = 0;
-	    }
-	}
+
+	tic_unitx = (v1.x - v0.x) / (double)xscaler;
+	tic_unity = (v1.y - v0.y) / (double)xscaler;
+	tic_unitz = (v1.z - v0.z) / (double)xscaler;
+
 	if (Y_AXIS.ticmode) {
 	    gen_tics(FIRST_Y_AXIS, /* grid_selection & (GRID_Y | GRID_MY), */
 		     ytick_callback);
@@ -2241,8 +2227,8 @@ draw_3d_graphbox(plot, plot_num)
 
 		map3d_xyz(yaxis_x - step, mid_y, base_z, &v1);
 		if (!tic_in) {
-		    v1.x -= tic_unitx * ticscale * (t->h_tic);
-		    v1.y -= tic_unity * ticscale * (t->v_tic);
+		    v1.x -= tic_unitx * ticscale * t->h_tic;
+		    v1.y -= tic_unity * ticscale * t->h_tic;
 		}
 		TERMCOORD(&v1, x1, y1);
 		x1 += Y_AXIS.label.xoffset * t->h_char;
@@ -2333,10 +2319,9 @@ xtick_callback(axis, place, text, grid)
     struct lp_style_type grid;	/* linetype or -2 for none */
 {
     vertex v1, v2;
-    double scale = (text ? ticscale : miniticscale);
+    double scale = (text ? ticscale : miniticscale) * (tic_in ? 1 : -1);
     double other_end =
 	Y_AXIS.min + Y_AXIS.max - xaxis_y;
-    int dirn = tic_in ? 1 : -1;
     register struct termentry *t = term;
 
     (void) axis;		/* avoid -Wunused warning */
@@ -2357,11 +2342,9 @@ xtick_callback(axis, place, text, grid)
 	) {
 	map3d_xyz(place, 0.0, base_z, &v1);
     }
-    v2.x = v1.x + tic_unitx * scale * (t->h_tic) * dirn;
-    v2.y = v1.y + tic_unity * scale * (t->v_tic) * dirn;
-    /* FIXME HBB 20000617: I have no real idea whether this z value is
-     * correct... */
-    v2.z = v1.z;
+    v2.x = v1.x + tic_unitx * scale * t->v_tic ;
+    v2.y = v1.y + tic_unity * scale * t->v_tic ;
+    v2.z = v1.z + tic_unitz * scale * t->v_tic ;
 #ifdef PM3D
     v2.real_z = v1.real_z;
 #endif
@@ -2381,8 +2364,8 @@ xtick_callback(axis, place, text, grid)
 	v2.x = v1.x - tic_unitx * (t->h_char) * 1;
 	v2.y = v1.y - tic_unity * (t->v_char) * 1;
 	if (!tic_in) {
-	    v2.x -= tic_unitx * (t->h_tic) * ticscale;
-	    v2.y -= tic_unity * (t->v_tic) * ticscale;
+	    v2.x -= tic_unitx * t->v_tic * ticscale;
+	    v2.y -= tic_unity * t->v_tic * ticscale;
 	}
 	TERMCOORD(&v2, x2, y2);
 	clip_put_text_just(x2, y2, text, just, JUST_TOP);
@@ -2395,9 +2378,9 @@ xtick_callback(axis, place, text, grid)
 #endif
     if (X_AXIS.ticmode & TICS_MIRROR) {
 	map3d_xyz(place, other_end, base_z, &v1);
-	v2.x = v1.x - tic_unitx * scale * (t->h_tic) * dirn;
-	v2.y = v1.y - tic_unity * scale * (t->v_tic) * dirn;
-	v2.z = v1.z;
+	v2.x = v1.x - tic_unitx * scale * t->v_tic;
+	v2.y = v1.y - tic_unity * scale * t->v_tic;
+	v2.z = v1.z - tic_unitz * scale * t->v_tic;
 #ifdef PM3D
 	v2.real_z = v1.real_z;
 #endif
@@ -2413,10 +2396,9 @@ ytick_callback(axis, place, text, grid)
     struct lp_style_type grid;
 {
     vertex v1, v2;
-    double scale = (text ? ticscale : miniticscale);
+    double scale = (text ? ticscale : miniticscale) * (tic_in ? 1 : -1);
     double other_end =
 	X_AXIS.min + X_AXIS.max - yaxis_x;
-    int dirn = tic_in ? 1 : -1;
     register struct termentry *t = term;
 
     (void) axis;		/* avoid -Wunused warning */
@@ -2437,10 +2419,9 @@ ytick_callback(axis, place, text, grid)
 	map3d_xyz(0.0, place, base_z, &v1);
     }
     
-    v2.x = v1.x + tic_unitx * scale * dirn * (t->h_tic);
-    v2.y = v1.y + tic_unity * scale * dirn * (t->v_tic);
-    /* FIXME HBB 20000716: (see xtick_callback()) */
-    v2.z = v1.z;
+    v2.x = v1.x + tic_unitx * scale * t->h_tic;
+    v2.y = v1.y + tic_unity * scale * t->h_tic;
+    v2.z = v1.z + tic_unitz * scale * t->h_tic;
 #ifdef PM3D
     v2.real_z = v1.real_z;
 #endif
@@ -2473,9 +2454,9 @@ ytick_callback(axis, place, text, grid)
 #endif
     if (Y_AXIS.ticmode & TICS_MIRROR) {
 	map3d_xyz(other_end, place, base_z, &v1);
-	v2.x = v1.x - tic_unitx * scale * (t->h_tic) * dirn;
-	v2.y = v1.y - tic_unity * scale * (t->v_tic) * dirn;
-	v2.z = v1.z;
+	v2.x = v1.x - tic_unitx * scale * t->h_tic;
+	v2.y = v1.y - tic_unity * scale * t->h_tic;
+	v2.z = v1.z - tic_unitz * scale * t->h_tic;
 #ifdef PM3D
 	v2.real_z = v1.real_z;
 #endif
@@ -2736,10 +2717,10 @@ get_surface_cbminmax(plot, cbmin, cbmax)
     while (icrvs && curve < plot->num_iso_read) {
 	/* fprintf(stderr,"**** NEW ISOCURVE - nb of pts: %i ****\n", icrvs->p_count); */
         for (i = 0, points = icrvs->points; i < icrvs->p_count; i++) {
-		/* fprintf(stderr,"  point i=%i => x=%4g y=%4g z=%4lg cb=%4lg\n",i, points[i].x,points[i].y,points[i].z,points[i].ylow); */
+		/* fprintf(stderr,"  point i=%i => x=%4g y=%4g z=%4lg cb=%4lg\n",i, points[i].x,points[i].y,points[i].z,points[i].color); */
 		if (points[i].type == INRANGE) {
 		    /* ?? if (!clip_point(x, y)) ... */
-		    cb = color_from_column ? points[i].ylow : points[i].z;
+		    cb = color_from_column ? points[i].color : points[i].z;
 		    if (cb < *cbmin) *cbmin = cb;
 		    if (cb > *cbmax) *cbmax = cb;
 		}

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.45 2002/02/27 21:19:16 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.46 2002/02/28 09:36:44 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -77,15 +77,11 @@ TBOOLEAN dgrid3d = FALSE;
 #ifdef PM3D
 static int plot_has_palette; /* current plot needs the color palette */
 static void set_plot_with_palette __PROTO((int plot_num));
+#endif
 static void calculate_set_of_isolines __PROTO((AXIS_INDEX value_axis, TBOOLEAN cross, struct iso_curve **this_iso,
 					       AXIS_INDEX iso_axis, double iso_min, double iso_step, int num_iso_to_use,
 					       AXIS_INDEX sam_axis, double sam_min, double sam_step, int num_sam_to_use,
 					       TBOOLEAN need_palette));
-#else
-static void calculate_set_of_isolines __PROTO((AXIS_INDEX value_axis, TBOOLEAN cross, struct iso_curve **this_iso,
-					       AXIS_INDEX iso_axis, double iso_min, double iso_step, int num_iso_to_use,
-					       AXIS_INDEX sam_axis, double sam_min, double sam_step, int num_sam_to_use));
-#endif
 static void get_3ddata __PROTO((struct surface_points * this_plot));
 static void print_3dtable __PROTO((int pcount));
 static void eval_3dplots __PROTO((void));
@@ -113,7 +109,7 @@ int plot3d_num=0;
  */
 static struct surface_points *
 sp_alloc(num_samp_1, num_iso_1, num_samp_2, num_iso_2)
-int num_samp_1, num_iso_1, num_samp_2, num_iso_2;
+    int num_samp_1, num_iso_1, num_samp_2, num_iso_2;
 {
     struct surface_points *sp;
 
@@ -126,7 +122,7 @@ int num_samp_1, num_iso_1, num_samp_2, num_iso_2;
     sp->num_iso_read = 0;
 
 #ifdef PM3D
-    sp->pm3d_color_from_column = 0;
+    sp->pm3d_color_from_column = FALSE;
     sp->pm3d_where[0] = 0;
 #endif
 
@@ -551,9 +547,8 @@ grid_nongrid_data(this_plot)
 	    STORE_WITH_LOG_AND_UPDATE_RANGE(points->z, z, points->type, z_axis, NOOP, continue);
 	    /* TODO joze */
 #if 0
-#ifdef PM3D
+	    /* FIXME HBB 20020301: why is this not activated??? */
 	    update_pm3d_zrange(z, NEED_PALETTE(this_plot));
-#endif
 #endif
 	}
     }
@@ -606,7 +601,7 @@ get_3ddata(this_plot)
     this_plot->num_iso_read = 0;
     this_plot->has_grid_topology = TRUE;
 #ifdef PM3D
-    this_plot->pm3d_color_from_column = 0;
+    this_plot->pm3d_color_from_column = FALSE;
 #endif
 
     /* we ought to keep old memory - most likely case
@@ -634,7 +629,7 @@ get_3ddata(this_plot)
 	double x, y, z;
 #ifdef PM3D
 	double color = VERYLARGE;
-	int pm3d_color_from_column = 0;
+	int pm3d_color_from_column = FALSE;
 #endif
 
 	while ((j = df_readline(v,
@@ -700,7 +695,7 @@ get_3ddata(this_plot)
 				  df_line_number);
 			return;
 		    } else {
-			pm3d_color_from_column = 1;
+			pm3d_color_from_column = TRUE;
 			color = v[1];
 		    }
 		    /* FALLTHRU */
@@ -719,7 +714,7 @@ get_3ddata(this_plot)
 			return;
 		    } else {
 			/* TODO: could also specify the column number */
-			pm3d_color_from_column = 1;
+			pm3d_color_from_column = TRUE;
 			color = v[3];
 		    }
 		    /* FALLTHRU */
@@ -788,8 +783,8 @@ get_3ddata(this_plot)
 	    } else {
 		STORE_WITH_LOG_AND_UPDATE_RANGE(cp->z, z, cp->type, z_axis, NOOP, goto come_here_if_undefined);
 #ifdef PM3D
-		if (0 != pm3d_color_from_column) {
-		    cp->ylow = color; /* abuse ylow for storing the color value */
+		if (pm3d_color_from_column) {
+		    cp->color = color; 
 		    update_pm3d_zrange(color, NEED_PALETTE(this_plot));
 		} else {
 		    update_pm3d_zrange(z, NEED_PALETTE(this_plot));
@@ -805,7 +800,7 @@ get_3ddata(this_plot)
 	}			/* end of whileloop - end of surface */
 
 #ifdef PM3D
-	if (0 != pm3d_color_from_column) {
+	if (pm3d_color_from_column) {
 	    this_plot->pm3d_color_from_column = pm3d_color_from_column;
 	}
 #endif
@@ -945,23 +940,22 @@ int pcount;
 static void
 calculate_set_of_isolines(value_axis, cross, this_iso,
 			  iso_axis, iso_min, iso_step, num_iso_to_use,
-			  sam_axis, sam_min, sam_step, num_sam_to_use
-#ifdef PM3D
-			  , pal
-#endif
-			  )
+			  sam_axis, sam_min, sam_step, num_sam_to_use,
+			  need_palette)
     AXIS_INDEX iso_axis, sam_axis, value_axis;
     struct iso_curve **this_iso;
     TBOOLEAN cross;
     double iso_min, iso_step, sam_min, sam_step;
     int num_iso_to_use, num_sam_to_use;
-#ifdef PM3D
-    TBOOLEAN pal;
-#endif
+    TBOOLEAN need_palette;
 {
     int i, j;
     struct coordinate GPHUGE *points = (*this_iso)->points;
-    
+
+#ifndef PM3D
+    (void) need_palette;			/* Avoid -Wunused */
+#endif
+
     for (j = 0; j < num_iso_to_use; j++) {
 	double iso = iso_min + j * iso_step;
 	/* HBB 20000501: with the new code, it should
@@ -999,7 +993,7 @@ calculate_set_of_isolines(value_axis, cross, this_iso,
 					    value_axis, NOOP, NOOP);
 #ifdef PM3D
 	    if (z_axis == value_axis)
-		update_pm3d_zrange(temp, pal);
+		update_pm3d_zrange(temp, need_palette);
 #endif
 	}
 	(*this_iso)->p_count = num_sam_to_use;
@@ -1567,11 +1561,8 @@ eval_3dplots()
 					      v_axis, v_min, v_isostep,
 					      num_iso_to_use,
 					      u_axis, u_min, u_step,
-					      num_sam_to_use
-#ifdef PM3D
-					      , NEED_PALETTE(this_plot)
-#endif
-					      );
+					      num_sam_to_use,
+					      NEED_PALETTE(this_plot));
 
 		    if (!hidden3d) {
 			num_iso_to_use = iso_samples_1;
@@ -1581,11 +1572,8 @@ eval_3dplots()
 						  u_axis, u_min, u_isostep,
 						  num_iso_to_use,
 						  v_axis, v_min, v_step,
-						  num_sam_to_use
-#ifdef PM3D
-						  , NEED_PALETTE(this_plot)
-#endif
-						  );
+						  num_sam_to_use, 
+						  NEED_PALETTE(this_plot));
 		    }
 		    /*}}} */
 		}		/* end of ITS A FUNCTION TO PLOT */

@@ -1,5 +1,5 @@
 /*
- * $Id: gp_types.h,v 1.11 2002/01/25 18:02:08 joze Exp $
+ * $Id: gp_types.h,v 1.12 2002/01/26 17:55:07 joze Exp $
  */
 
 /* GNUPLOT - gp_types.h */
@@ -141,10 +141,11 @@ typedef enum coord_type {
 typedef struct coordinate {
     enum coord_type type;	/* see above */
     coordval x, y, z;
-    coordval ylow, yhigh;	/* ignored in 3d (ylow is used for the color
-				   coordinate if PM3D_COLUMN is defined) */
+    coordval ylow, yhigh;	/* ignored in 3d */
     coordval xlow, xhigh;	/* also ignored in 3d */
+    coordval color;		/* PM3D's color value to be used */
 #if defined(WIN16) || (defined(MSDOS) && defined(__TURBOC__))
+    /* FIXME HBB 20020301: addition of 'color' probably broke this */
     char pad[2];		/* pad to 32 byte boundary */
 #endif
 } coordinate;

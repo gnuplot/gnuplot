@@ -1,3 +1,61 @@
+2002-03-18  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/graph3d.c (tic_unitz): New variable for truly 3D ticmark
+ 	lines. Stores z component of tickmark direction routine.
+	(draw_3d_graphbox): Extend computation of tic line directions to
+ 	cover 3 dimensions.
+	(xtick_callback, ytick_callback): Make use of new tic_unitz
+ 	variable, and change all xticks to use term->v_tic, all yticks to
+ 	term->h_tic.  Fold local variable "dirn" into "scale".
+
+2002-03-16  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/os2/gclient.c: Weeded out all C++-style // comments.
+  	CodeStyle disallows them.
+	
+	* src/pm3d.c (pm3d_plot): Use coordinate field "color" instead of
+ 	"ylow", for PM3D.
+	(filled_color_contour_plot): Changed type of local variable
+ 	pm3d_color_from_column to TBOOLEAN.
+
+	* src/plot3d.c (get_3ddata): Use coordinate field "color" instead
+ 	of "ylow", for PM3D.
+
+	* src/graph3d.h (struct surface_points): Changed type of
+ 	pm3d_color_from_column to TBOOLEAN.
+
+	* src/graph3d.c (plot3d_lines_pm3d, plot3d_points_pm3d): Use
+ 	coordinate field "color" instead of "ylow", for PM3D.
+
+	* src/datafile.c (df_3dmatrix): Write to coordinate field "color"
+ 	instead of "ylow", for PM3D. Call STORE_WITH_LOG_AND_UPDATE_RANGE
+ 	instead of update_pm3d_range.
+
+	* src/gp_types.h (struct coordinate): Add separate element 'color'
+ 	to avoid the PM3D stuff having to abuse ylow for storing it.
+
+	* src/hidden3d.c (store_vertex): Made color_from_column available
+ 	in non-PM3D compiles, too. Changed its type to TBOOLEAN.  Use the
+ 	new "color" field instead of "ylow".
+	(build_networks): Have local variable color_from_column regardless
+ 	of PM3D. Change its type to TBOOLEAN, too.
+
+	* src/plot3d.c (grid_nongrid_data): Dito.
+
+	* src/axis.c (update_pm3d_zrange): Moved #ifdef PM3D inside the
+ 	function, so it's available, but a no-op, if PM3D is disabled.
+  	Put in hacks to avoid -Wunused.
+	
+	* src/axis.h (NEED_PALETTE) [!PM3D]: Make this #defined in
+ 	non-PM3D mode, too, for easier coding.
+	(update_pm3d_zrange): Moved prototype out of #ifdef PM3D block.
+ 	
+	* src/plot3d.c (calculate_set_of_isolines): Make the 'pal'
+ 	argument exist independently of PM3D.  Was making the code harder
+ 	to parse for no benefit.  Add hack to avoid -Wunused warning,
+ 	instead.
+	(eval_3dplots): Changed call accordingly.
+
 2002-03-15  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* term/cgm.trm (struct cgm_properties, cgm_current, cgm_next,
@@ -64,7 +122,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/03/13 12:59:15 $).
+	last modification date (from the tag $Date: 2002/03/15 13:32:44 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 

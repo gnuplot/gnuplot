@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.27 2002/02/25 03:10:40 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.28 2002/02/28 09:36:44 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -1822,7 +1822,6 @@ some_grid_selected()
 }
 
 
-#ifdef PM3D
 
 /* Needed for autoscaling of the color axis. */
 
@@ -1831,6 +1830,7 @@ update_pm3d_zrange(value, pal)
     double value;
     TBOOLEAN pal;
 {
+#ifdef PM3D
     if (CB_AXIS.log && value < 0.0)
 	/* ignore negative points on log axis */
 	return;
@@ -1853,9 +1853,15 @@ update_pm3d_zrange(value, pal)
 		g_non_pm3d_max = value;
 	}
     }
+#else  /* PM3D */
+    /* Nothing to do.  Just avoid warnings, and quit: */
+    (void) value;
+    (void) pal;
+#endif
 }
 
 
+#ifdef PM3D
 /*
    Check and set the cb-range for use by pm3d.
    Return 0 on wrong range, otherwise 1.
