@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.152 2004/10/19 23:32:38 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.153 2004/10/22 01:30:52 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -1649,13 +1649,16 @@ set_label()
     struct text_label *new_label = NULL;
     struct text_label *prev_label = NULL;
     struct value a;
-    char *text = NULL;
     int tag;
 
     c_token++;
+    
     /* get tag */
     if (!END_OF_COMMAND
 	&& !isstring(c_token)
+#ifdef GP_STRING_VARS
+	&& !isstringvar(c_token)
+#endif
 	&& !equals(c_token, "at")
 	&& !equals(c_token, "left")
 	&& !equals(c_token, "center")
@@ -1700,19 +1703,34 @@ set_label()
 	this_label = new_label;
     }
 
-    /* get text */
+#ifdef GP_STRING_VARS
+    if (!END_OF_COMMAND) {
+	struct value a = {STRING,{NULL}};
+	int save_token = c_token;
+	parse_label_options( this_label );
+	if (!END_OF_COMMAND) {
+	    (void) const_express(&a);
+	    if (a.type == STRING)
+		this_label->text = a.v.string_val;
+	    else
+		c_token = save_token;
+	}
+#else
+    /* get text from string */
     if (!END_OF_COMMAND && isstring(c_token)) {
-	text = gp_alloc (token_len(c_token), "text_label->text");
+	char *text = gp_alloc (token_len(c_token), "text_label->text");
 	quote_str(text, c_token, token_len(c_token));
 	c_token++;
-
+	this_label->text = text;
+#endif
 	/* HBB 20001021: new functionality. If next token is a ','
 	 * treat it as a numeric expression whose value is to be
 	 * sprintf()ed into the label string (which contains an
 	 * appropriate %f format string) */
+	/* EAM Oct 2004 - this is superseded by general string variable
+	 * handling, but left in for backward compatibility */
 	if (!END_OF_COMMAND && equals(c_token, ","))
-	    text = fill_numbers_into_string(text);
-	this_label->text = text;
+	    this_label->text = fill_numbers_into_string(this_label->text);
     }
 
     /* Now parse the label format and style options */
@@ -3680,11 +3698,21 @@ set_xyzlabel(label_struct *label)
 	*label->text = '\0';
 	return;
     }
+
+#ifdef GP_STRING_VARS
+    /* Allow creation of label text using sprintf() */
+    if (isstring(c_token) || equals(c_token,"sprintf") || isstringvar(c_token)) {
+	struct value a = {STRING,{NULL}};
+	(void) const_express(&a);
+	strncpy(label->text, a.v.string_val, MAX_LINE_LEN);
+    }
+#else
     if (isstring(c_token)) {
 	/* We have string specified - grab it. */
 	quote_str(label->text, c_token, MAX_LINE_LEN);
 	c_token++;
     }
+#endif
 
     while (!END_OF_COMMAND) {
 
@@ -4430,10 +4458,14 @@ parse_label_options( struct text_label *this_label )
 	 * line is forbidden by the 'set label' command syntax.
 	 * On the other hand, 'plot with labels' may have additional stuff coming up.
 	 */
+#ifdef GP_STRING_VARS
+	break;
+#else
 	if (this_label->tag == -1)
 	    break;
 	else
 	    int_error(c_token, "extraneous or contradicting arguments in label options");
+#endif
 
     } /* while(!END_OF_COMMAND) */
 

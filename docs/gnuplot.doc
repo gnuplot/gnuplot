@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.251 2004/10/24 02:59:56 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.252 2004/10/25 14:44:38 mikulik Exp $
 C 18 September 2001
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -683,6 +683,10 @@ C
  The real and imaginary parts of complex expressions are always real, whatever
  the form in which they are entered: in {3,2} the "3" and "2" are reals, not
  integers.
+
+ Gnuplot can also perform simple operations on strings and string variables.
+ For example, the expression ("A" . "B" eq "AB") evaluates as true, illustrating
+ the string concatenation operator and the string equality operator.
 3 Functions
 ?expressions functions
 ?functions
@@ -1051,7 +1055,34 @@ C
  expects its argument to be in radians.
 @end table
 
- A few additional functions are also available.
+@start table
+#\begin{tabular}{|ccl|} \hline
+#\multicolumn{3}{|c|}{String functions} \\ \hline \hline
+#Function & Arguments & Returns \\ \hline
+%c c l .
+%Function@Arguments@Returns
+%_
+4 gprintf
+?expressions functions gprintf
+?functions gprintf
+#gprintf("format",x) & any & string result from applying gnuplot's format parser \\
+%gprintf("format",x)@any@string result from applysing gnuplot's format parser
+ `gprintf("format",x)` applies gnuplot's own format specifiers to the single
+ variable x and returns the resulting string. If you want standard C-language
+ format specifiers, you must instead use `sprintf("format",x)`.
+ See `format specifiers`.
+4 sprintf
+?expressions functions sprintf
+?functions sprintf
+?sprintf
+#sprintf("format",x,...) & multiple & string result from C-language sprintf \\
+%sprintf("format",x,...)@multiple@string result from C-language sprintf
+ `sprintf("format",var1,var2,...)` applies standard C-language format specifiers
+ to multiple arguments (10 max) and returns the resulting string. If you want to
+ use gnuplot's own format specifiers, you must instead call `gprintf()`.
+ For information on sprintf format specifiers, please see standard C-language
+ documentation or the unix sprintf man page.
+@end table
 
 @start table
 #\begin{tabular}{|ccl|} \hline
@@ -1251,6 +1282,9 @@ C ... and restart the table:
        |           a|b         * bitwise inclusive OR
        &&          a&&b        * logical AND
        ||          a||b        * logical OR
+       .           A.B           string concatenation
+       eq          A eq B        string equality
+       ne          A ne B        string inequality
 #\begin{tabular}{|ccl|} \hline
 #\multicolumn{3}{|c|}{Binary Operators} \\ \hline \hline
 #Symbol & Example & Explanation \\ \hline
@@ -1271,6 +1305,9 @@ C ... and restart the table:
 #\verb~|~ & \verb~a|b~ & * bitwise inclusive OR\\
 #\verb~&&~ & \verb~a&&b~ & * logical AND\\
 #\verb~||~ & \verb~a||b~ & * logical OR\\
+#\verb~.~ & \verb~A.B~ & string concatenation\\
+#\verb~eq~ & \verb~A eq B~ & string equality\\
+#\verb~ne~ & \verb~A ne B~ & string inequality\\
 %c c l .
 %Symbol@Example@Explanation
 %_
@@ -1291,10 +1328,14 @@ C ... and restart the table:
 %|@a|b@* bitwise inclusive OR
 %&&@a&&b@* logical AND
 %||@a||b@* logical OR
+%.@a.b@string concatenation
+%eq@A eq B@string equality
+%ne@A ne B@string inequality
 
 @end table
  (*) Starred explanations indicate that the operator requires integer
  arguments.
+ Capital letters A and B indicate that the operator requires string arguments.
 
  Logical AND (&&) and OR (||) short-circuit the way they do in C.  That is,
  the second `&&` operand is not evaluated if the first is false; the second
@@ -1392,7 +1433,13 @@ C ... and restart the table:
        len3d(x,y,z) = sqrt(x*x+y*y+z*z)
        plot f(x) = sin(x*a), a = 0.2, f(x), a = 0.4, f(x)
 
+       file = "mydata.inp"
+       file(n) = sprintf("run_%d.dat",n)
+
 ^ <img align=bottom src="http://www.gnuplot.info/doc/userdefined.gif" alt="[userdefined.gif]" width=640 height=480>
+ The final two examples illustrate a user-defined string variable and a
+ user-defined string function.
+
  Note that the variable `pi` is already defined.  But it is in no way magic;
  you may redefine it to be whatever you like. Some other variables may be
  defined under various gnuplot operations like mousing in interactive terminals
@@ -1610,6 +1657,40 @@ C ... and restart the table:
  If the initialization file is found, `gnuplot` executes the commands in it.
  These may be any legal `gnuplot` commands, but typically they are limited to
  setting the terminal and defining frequently-used functions or variables.
+2 String constants and string variables
+?strings
+?string variables
+ A new feature in gnuplot 4.1 is the introduction of string variables and
+ string functions. Most gnuplot commands that previously required a string
+ constant will now also accept a string variable, a string expression, or a
+ function that returns a string.  For example, the following four methods of
+ creating a plot all result in the same plot title:
+
+       four = "4"
+       graph4 = "Title for plot #4"
+       graph(n) = sprintf("Title for plot #%d",n)
+
+       plot 'data.4' title "Title for plot #4"
+       plot 'data.4' title graph4
+       plot 'data.4' title "Title for plot #".four
+       plot 'data.4' title graph(4)
+
+ In general, elements on the command line will only be evaluated as possible
+ string variables if they are not otherwise recognizable as part of the normal
+ gnuplot syntax. So the following sequence of commands is legal, although
+ probably should be avoided so as not to cause confusion:
+
+       plot = "my_datafile.dat"
+       title = "My Title"
+       plot plot title title
+
+ There are three binary operators that require string operands: the string
+ concatenation operator ".", the string equality operator "eq" and the string
+ inequality operator "ne".  The following example will print TRUE.
+
+      if ("A"."B" eq "AB") print "TRUE"
+
+ See also the two string formatting functions `gprintf` and `sprintf`.
 2 Substitution
 ?substitution
  Command-line substitution is specified by a system command enclosed in
@@ -5171,6 +5252,13 @@ C ... and restart the table:
 ^ <a href="http://www.gnuplot.info/demo/electron.html">
  electron demo (electron.dem).
 ^ </a>
+4 gprintf
+?gprintf
+ The string function gprintf("format",x) uses gnuplot's own format specifiers,
+ as do the gnuplot commands `set format`, `set timestamp`, and others. These
+ format specifiers are not the same as those used by the standard C-language
+ routine sprintf(). Gnuplot also provides an sprintf("format",x,...) routine
+ if you prefer. For a list of gnuplot's format options, see `format specifiers`.
 4 format specifiers
 ?commands set format specifiers
 ?set format specifiers
@@ -5246,8 +5334,8 @@ C ... and restart the table:
  integer, which defines the precision (the minimum number of digits of an
  integer, or the number of digits following the decimal point of a float).
 
- Some releases of 'printf' may not support all of these modifiers but may also
- support others; in case of doubt, check the appropriate documentation and
+ Some systems may not support all of these modifiers but may also support
+ others; in case of doubt, check the appropriate documentation and
  then experiment.
 
  Examples:

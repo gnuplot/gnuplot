@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.in,v 1.150 2004/09/23 22:30:00 sfeam Exp $
+dnl $Id: configure.in,v 1.151 2004/10/05 20:02:26 sfeam Exp $
 dnl
 AC_INIT(src/graphics.c)
 AM_CONFIG_HEADER(config.h:config.hin)
@@ -765,14 +765,14 @@ AC_ARG_ENABLE(thin-splines,dnl
                [ Define to use thin plate spines. ])
    fi])
 
-dnl string variables
+dnl strings in datafile
 AC_ARG_ENABLE(datastrings,dnl
-[  --disable-datastrings   disable string-handling in datafiles],,
+[  --disable-datastrings   disable reading strings from datafiles],,
   test -z "$enable_datastrings" && enable_datastrings=yes)
 
   if test "$enable_datastrings" = yes; then
   AC_DEFINE(EAM_DATASTRINGS,1,
-               [ Define to allow string-handling in datafiles. EXPERIMENTAL ])
+               [ Define to allow reading strings from datafiles. EXPERIMENTAL ])
   fi
 
 dnl histograms
@@ -789,6 +789,15 @@ AC_ARG_ENABLE(histograms,dnl
       AC_MSG_WARN( [The --enable-histograms option requires --enable-datastrings. ])
     fi
 
+  fi
+
+dnl string variables
+AC_ARG_ENABLE(stringvariables,dnl
+[  --disable-stringvariables   disable string variables],,
+  test -z "$enable_stringvariables" && enable_stringvariables=yes)
+  if test "$enable_stringvariables" = yes; then
+  AC_DEFINE(GP_STRING_VARS,1,
+               [ Define to allow string variables. EXPERIMENTAL ])
   fi
 
 dnl IRIS terminal on IRIS4D series computer
@@ -1031,6 +1040,10 @@ fi
 
 if test "$enable_binary_x11_polygon" = yes; then
   AC_MSG_RESULT([  Enable X11 polygon info in binary, not ascii (EXPERIMENTAL)])
+fi
+
+if test "$enable_stringvariables" = yes; then
+  AC_MSG_RESULT([  Enable string variables (EXPERIMENTAL)])
 fi
 
 if test "$enable_iris" = yes; then

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: parse.c,v 1.25 2004/07/25 12:25:01 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: parse.c,v 1.26 2004/09/11 17:46:02 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - parse.c */
@@ -80,10 +80,8 @@ static int is_builtin_function __PROTO((int t_num));
 static struct at_type *at = NULL;
 static int at_size = 0;
 
-#ifdef GP_ISVAR
 /* isvar - When this variable is true PUSH operations become PUSHV */
 static TBOOLEAN push_vars = TRUE;
-#endif
 
 static void
 convert(struct value *val_ptr, int t_num)
@@ -285,9 +283,10 @@ parse_primary_expression()
 	 * argument list */
 	if ((c_token + 1 < num_tokens) && equals(c_token + 1, "(")) {
 	    enum operators whichfunc = is_builtin_function(c_token);
+	    struct value num_params;
+	    num_params.type = INTGR;
 
 	    if (whichfunc) {
-
 #ifdef GP_ISVAR
 		/* Check to see if it is isvar */
 		/* Is so then turn off normal variable pushing */
@@ -300,20 +299,27 @@ parse_primary_expression()
 		/* it's a standard function */
 		c_token += 2;	/* skip fnc name and '(' */
 		parse_expression(); /* parse fnc argument */
+		num_params.v.int_val = 1;
 		while (equals(c_token, ",")) {
-		    c_token += 1;
+		    c_token++;
+		    num_params.v.int_val++;
 		    parse_expression();
 		}
 
 		if (!equals(c_token, ")"))
 		    int_error(c_token, "')' expected");
 		c_token++;
+
+#ifdef GP_STRING_VARS
+		/* So far sprintf is the only built-in function */
+		/* with a variable number of arguments.         */
+		if (!strcmp(ft[whichfunc].f_name,"sprintf"))
+		    add_action(PUSHC)->v_arg = num_params;
+#endif
 		(void) add_action(whichfunc);
 
-#ifdef GP_ISVAR
 		 /* Turn normal variable pushing back on */
 		push_vars=TRUE;
-#endif  /*GP_ISVAR*/
 	    } else {
 		/* it's a call to a user-defined function */
 		enum operators call_type = (int) CALL;
@@ -322,9 +328,6 @@ parse_primary_expression()
 		c_token += 2;	/* skip func name and '(' */
 		parse_expression();
 		if (equals(c_token, ",")) { /* more than 1 argument? */
-		    struct value num_params;
-
-		    num_params.type = INTGR;
 		    num_params.v.int_val = 1;
 		    while (equals(c_token, ",")) {
 			num_params.v.int_val += 1;
@@ -369,17 +372,27 @@ parse_primary_expression()
 	    }
 	    /* its a variable, with no dummies active - div */
 	} else {
-#ifdef GP_ISVAR
             if (push_vars==FALSE)
 		add_action(PUSHV)->udv_arg = add_udv(c_token);
 	    else
-#endif  /* GP_ISVAR */
 		add_action(PUSH)->udv_arg = add_udv(c_token);
 
 	    c_token++;
 	}
     }
     /* end if letter */
+
+#ifdef GP_STRING_VARS
+    /* Maybe it's a string constant */
+    else if (isstring(c_token)) {
+	union argument *foo = add_action(PUSHC);
+	foo->v_arg.type = STRING;
+	foo->v_arg.v.string_val = NULL;
+	m_quote_capture(&(foo->v_arg.v.string_val), c_token, c_token);
+	c_token++;
+    }
+#endif
+
     else
 	int_error(c_token, "invalid expression ");
 
@@ -505,8 +518,8 @@ parse_AND_expression()
 static void
 parse_equality_expression()
 {
-    /* create action codes for == and !=
-     * operators */
+    /* create action codes for == and != numeric operators
+     * eq and ne string operators */
 
     while (TRUE) {
 	if (equals(c_token, "==")) {
@@ -517,6 +530,16 @@ parse_equality_expression()
 	    c_token++;
 	    accept_relational_expression();
 	    (void) add_action(NE);
+#ifdef GP_STRING_VARS
+	} else if (equals(c_token, "eq")) {
+	    c_token++;
+	    accept_relational_expression();
+	    (void) add_action(EQS);
+	} else if (equals(c_token, "ne")) {
+	    c_token++;
+	    accept_relational_expression();
+	    (void) add_action(NES);
+#endif
 	} else
 	    break;
     }
@@ -569,6 +592,12 @@ parse_additive_expression()
 	    c_token++;
 	    accept_multiplicative_expression();
 	    (void) add_action(MINUS);
+#ifdef GP_STRING_VARS
+	} else if (equals(c_token, ".")) {
+	    c_token++;
+	    accept_multiplicative_expression();
+	    (void) add_action(CONCATENATE);
+#endif
 	} else
 	    break;
     }

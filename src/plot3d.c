@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.87 2004/10/18 03:43:55 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.88 2004/10/19 03:26:19 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -1247,7 +1247,11 @@ eval_3dplots()
 	    TBOOLEAN set_labelstyle = FALSE;
 #endif
 
+#ifdef GP_STRING_VARS
+	    if (isstring(c_token) || isstringvar(c_token)) {
+#else
 	    if (isstring(c_token)) {	/* data file to plot */
+#endif
 
 		/*{{{  data file */
 		if (parametric && crnt_param != 0)

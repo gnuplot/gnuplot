@@ -1,5 +1,5 @@
 #
-# $Id: mousevariables.dem,v 1.4 2003/10/17 15:02:21 mikulik Exp $
+# $Id: mousevariables.dem,v 1.5 2004/05/03 18:22:59 sfeam Exp $
 #
 # Demonstrate use of user variables 
 # MOUSE_BUTTON MOUSE_X MOUSE_Y MOUSE_X2 MOUSE_Y2
@@ -16,7 +16,7 @@ pause mouse "Click on one corner of desired zoom region"
 #
 if (defined(MOUSE_BUTTON)) \
     print "Mouse button ", MOUSE_BUTTON, " at ", MOUSE_X, " ", MOUSE_Y ;\
-    set label 1 "   Mouse button %.0s\n   clicked here!", MOUSE_BUTTON ;\
+    set label 1 sprintf("   Mouse button %d\n   clicked here!", MOUSE_BUTTON) ;\
     set label 1 at MOUSE_X, MOUSE_Y ;\
     set label 1 point pt 6 ps 6 ;\
     replot ;\
@@ -33,7 +33,7 @@ pause mouse "Click on diagonal corner of desired zoom region"
 #
 if (defined(MOUSE_BUTTON)) \
     print "Mouse button ", MOUSE_BUTTON, " at ", MOUSE_X, " ", MOUSE_Y ;\
-    set label 2 "   Mouse button %.0s\n   clicked here!", MOUSE_BUTTON ;\
+    set label 2 sprintf("   Mouse button %d\n   clicked here!", MOUSE_BUTTON) ;\
     set label 2 at MOUSE_X, MOUSE_Y ;\
     set label 2 point pt 6 ps 6 ;\
     replot ;\
@@ -56,8 +56,8 @@ set grid
 unset label 1
 unset label 2
 unset label 3
-set label 4 "zoom x range %.3f ",BOT_X," to %.3f",TOP_X
-set label 5 "zoom y range %.3f ",BOT_Y," to %.3f",TOP_Y
+set label 4 sprintf("zoom x range %.3f to %.3f",BOT_X,TOP_X)
+set label 5 sprintf("zoom y range %.3f to %.3f",TOP_X,TOP_Y)
 set label 4 at graph 0.1, graph 0.95 tc lt 3
 set label 5 at graph 0.1, graph 0.90 tc lt 3
 replot
@@ -69,3 +69,8 @@ pause -1 "Type <cr> to continue"
 
 reset
 
+set title "Echo keystrokes in plot window\nTerminate with <enter> or <tab>"
+plot sin(13*besj0(x))/x
+load "keystroke.dem"
+
+reset

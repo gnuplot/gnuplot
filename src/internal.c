@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: internal.c,v 1.18 2004/04/13 17:23:58 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: internal.c,v 1.19 2004/07/01 17:10:06 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - internal.c */
@@ -52,6 +52,10 @@ static char *RCSid() { return RCSid("$Id: internal.c,v 1.18 2004/04/13 17:23:58 
  *   isms  for handling exceptions, by including a function named
  *   matherr() in their programs.
  */
+
+#ifdef GP_STRING_VARS
+static enum DATA_TYPES sprintf_specifier __PROTO((const char *format));
+#endif
 
 
 int
@@ -963,4 +967,277 @@ f_factorial(union argument *arg)
 
 }
 
+#ifdef GP_STRING_VARS
 
+void
+f_concatenate(union argument *arg)
+{
+    struct value a, b, result;
+
+    (void) arg;			/* avoid -Wunused warning */
+    (void) pop(&b);
+    (void) pop(&a);
+
+    if(a.type != STRING || b.type != STRING)
+	int_error(NO_CARET, "internal error : STRING operator applied to non-STRING type");
+
+    (void) Gstring(&result, gp_stradd(a.v.string_val, b.v.string_val));
+    free(a.v.string_val);
+    free(b.v.string_val);
+    push(&result);
+}
+
+void
+f_eqs(union argument *arg)
+{
+    struct value a, b, result;
+
+    (void) arg;			/* avoid -Wunused warning */
+    (void) pop(&b);
+    (void) pop(&a);
+
+    if(a.type != STRING || b.type != STRING)
+	int_error(NO_CARET, "internal error : STRING operator applied to non-STRING type");
+
+    (void) Ginteger(&result, !strcmp(a.v.string_val, b.v.string_val));
+    free(a.v.string_val);
+    free(b.v.string_val);
+    push(&result);
+}
+
+void
+f_nes(union argument *arg)
+{
+    struct value a, b, result;
+
+    (void) arg;			/* avoid -Wunused warning */
+    (void) pop(&b);
+    (void) pop(&a);
+
+    if(a.type != STRING || b.type != STRING)
+	int_error(NO_CARET, "internal error : STRING operator applied to non-STRING type");
+
+    (void) Ginteger(&result, (int)(strcmp(a.v.string_val, b.v.string_val)!=0));
+    free(a.v.string_val);
+    free(b.v.string_val);
+    push(&result);
+}
+
+
+/* EAM July 2004
+ * There are probably an infinite number of things that can
+ * go wrong if the user mis-matches arguments and format strings
+ * in the call to sprintf, but I hope none will do worse than
+ * result in a garbage output string.
+ * FIXME: 10 is a purely arbitrary upper limit on args
+ *        the resulting string is arbitrarily limited to 80 char
+ */
+void
+f_sprintf(union argument *arg)
+{
+    struct value a[10];
+    struct value num_params;
+    char buffer[80];
+    char *result;
+    char *next_start, *outpos, tempchar;
+    int next_length;
+    int i, remaining;
+    int nargs = 0;
+    enum DATA_TYPES spec_type;
+ 
+    /* Retrieve number of parameters from top of stack */
+    pop(&num_params);
+    nargs = num_params.v.int_val;
+    for (i=0; i<nargs; i++)
+	pop(&a[i]);  /* pop next argument */
+
+#ifdef DEBUG
+    fprintf(stderr,"----------\nGot %d args for sprintf\n",nargs);
+    for (i=0; i<nargs; i++) {
+	disp_value(stderr, &(a[i]));
+	fprintf(stderr,"   ");
+    } fprintf(stderr,"\n----------\n");
+#endif
+
+    /* Make sure we got a format string of some sort */
+    if (a[nargs-1].type != STRING)
+	int_error(NO_CARET,"First parameter to sprintf must be a format string");
+
+    /* Copy leading fragment of format into output buffer */
+    outpos = buffer;
+    next_start  = a[nargs-1].v.string_val;
+    next_length = strcspn(next_start,"%");
+    strncpy(outpos, next_start, next_length);
+
+    next_start += next_length;
+    outpos += next_length;
+
+    /* Format the remaining sprintf() parameters one by one */
+    remaining = nargs - 1;
+
+    /* Each time we start this loop we are pointing to a % character */
+    while (remaining-->0 && next_start[0] && next_start[1]) {
+	struct value *next_param = &a[remaining];
+
+	/* Check for %%; print as literal and don't consume a parameter */
+	if (!strncmp(next_start,"%%",2)) {
+	    next_start++;
+	    do {
+		*outpos++ = *next_start++;
+	    } while(*next_start && *next_start != '%');
+	    remaining++;
+	    continue;
+	}
+
+	next_length = strcspn(next_start+1,"%") + 1;
+	tempchar = next_start[next_length];
+	next_start[next_length] = '\0';
+
+	spec_type = sprintf_specifier(next_start);
+
+#ifdef DEBUG
+	fprintf(stderr,
+		"\tUsing format \"%s\" identified as %s to print %s\n",
+		next_start,
+		((next_param->type) == INTGR ? "INTGR" :
+		 (next_param->type) == STRING ? "STRING" : "CMPLX" ),
+		(spec_type == INTGR ? "INTGR" :
+		 spec_type == STRING ? "STRING" : "CMPLX"));
+
+#endif
+
+	/* string value <-> numerical value check */
+	if ( spec_type == STRING && next_param->type != STRING )
+	    int_error(NO_CARET,"f_sprintf: attempt to print numeric value with string format");
+	if ( spec_type != STRING && next_param->type == STRING )
+	    int_error(NO_CARET,"f_sprintf: attempt to print string value with numeric format");
+
+	/* Use the format to print next arg */
+	switch(spec_type) {
+	case INTGR:
+	    snprintf(outpos,sizeof(buffer)-(outpos-buffer),
+		     next_start, (int)real(next_param));
+	    break;
+	case CMPLX:
+	    snprintf(outpos,sizeof(buffer)-(outpos-buffer),
+		     next_start, real(next_param));
+	    break;
+	case STRING:
+	    snprintf(outpos,sizeof(buffer)-(outpos-buffer),
+		next_start, next_param->v.string_val);
+	    break;
+	default:
+	    int_error(NO_CARET,"internal error: invalid spec_type");
+	}
+
+	next_start[next_length] = tempchar;
+	next_start += next_length;
+	outpos = &buffer[strlen(buffer)];
+    }
+
+    /* Copy the trailing portion of the format, if any */
+    strncpy(outpos, next_start, sizeof(buffer)-(outpos-buffer));
+
+
+    result = gp_strdup(buffer);
+    FPRINTF((stderr," snprintf result = \"%s\"\n",result));
+
+    /* Free any strings from parameters we have now used */
+    for (i=0; i<nargs-1; i++)
+	if (a[i].type == STRING && a[i].v.string_val) {
+	    free(a[i].v.string_val);
+	    a[i].v.string_val = NULL;
+	}
+
+    /* Free the format string and replace it with the result */
+    push(Gstring(&a[nargs-1], result));
+
+}
+
+/* EAM July 2004 - Gnuplot's own string formatting conventions.
+ * Currently this routine assumes base 10 representation, because
+ * it is not clear where it could be specified to be anything else.
+ */
+void
+f_gprintf(union argument *arg)
+{
+    struct value fmt, val;
+    char buffer[80];
+    char *result;
+    double base;
+ 
+    /* Retrieve parameters from top of stack */
+    pop(&val);
+    pop(&fmt);
+
+#ifdef DEBUG
+    fprintf(stderr,"----------\nGot gprintf parameters\nfmt: ");
+	disp_value(stderr, &fmt);
+    fprintf(stderr,"\nval: ");
+	disp_value(stderr, &val);
+    fprintf(stderr,"\n----------\n");
+#endif
+
+    /* Make sure parameters are of the correct type */
+    if (fmt.type != STRING)
+	int_error(NO_CARET,"First parameter to gprintf must be a format string");
+
+    /* EAM FIXME - I have no idea where we would learn another base is wanted */
+    base = 10.;
+
+    /* Call the old internal routine */
+    gprintf(buffer, sizeof(buffer), fmt.v.string_val, base, real(&val));
+
+    result = gp_strdup(buffer);
+    FPRINTF((stderr," gprintf result = \"%s\"\n",result));
+
+    /* Free the format string and replace it with the result */
+    push(Gstring(&fmt, result));
+
+}
+
+
+/* Return which argument type sprintf will need for this format string:
+ *   char*       STRING
+ *   int         INTGR
+ *   double      CMPLX
+ * Should call int_err for any other type.
+ * format is expected to start with '%'
+ */
+static enum DATA_TYPES
+sprintf_specifier(const char* format)
+{
+    const char string_spec[]  = "s";
+    const char real_spec[]    = "aAeEfFgG";
+    const char int_spec[]     = "cdiouxX";
+    /* The following characters are used for use of invalid types */
+    const char illegal_spec[] = "hlLqjzZtCSpn";
+
+    int string_pos, real_pos, int_pos, illegal_pos;
+
+    /* check if really format specifier */
+    if (format[0] != '%')
+	int_error(NO_CARET,
+		  "internal error: sprintf_specifier called without '%'\n");
+
+    string_pos  = strcspn(format, string_spec);
+    real_pos    = strcspn(format, real_spec);
+    int_pos     = strcspn(format, int_spec);
+    illegal_pos = strcspn(format, illegal_spec);
+
+    if ( illegal_pos < int_pos && illegal_pos < real_pos
+	 && illegal_pos < string_pos )
+	int_error(NO_CARET,
+		  "sprintf_specifier: used with invalid format specifier\n");
+    else if ( string_pos < real_pos && string_pos < int_pos )
+	return STRING;
+    else if ( real_pos < int_pos )
+	return CMPLX;
+    else if ( int_pos < strlen(format) )
+	return INTGR;
+    else
+	int_error(NO_CARET,
+		  "sprintf_specifier: no format specifier\n");
+
+}
+#endif

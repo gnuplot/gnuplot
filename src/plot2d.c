@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.84 2004/10/19 03:26:17 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.85 2004/10/19 04:25:57 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -1300,7 +1300,11 @@ eval_plots()
 
 	    plot_num++;
 
+#ifdef GP_STRING_VARS
+	    if (isstring(c_token) || isstringvar(c_token)) {
+#else
 	    if (isstring(c_token)) {	/* data file to plot */
+#endif
 
 		if (parametric && xparam)
 		    int_error(c_token, "previous parametric function not fully specified");

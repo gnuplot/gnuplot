@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.89 2004/10/20 20:14:19 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.90 2004/10/22 01:30:52 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -138,7 +138,12 @@ save_variables__sub(FILE *fp)
     while (udv) {
 	if (!udv->udv_undef) {
 	    fprintf(fp, "%s = ", udv->udv_name);
-	    disp_value(fp, &(udv->udv_value));
+#ifdef GP_STRING_VARS
+	    if (udv->udv_value.type == STRING)
+		fprintf(fp, "\"%s\"", udv->udv_value.v.string_val);
+	    else
+#endif
+		disp_value(fp, &(udv->udv_value));
 	    (void) putc('\n', fp);
 	}
 	udv = udv->next_udv;

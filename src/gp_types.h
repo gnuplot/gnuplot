@@ -1,5 +1,5 @@
 /*
- * $Id: gp_types.h,v 1.26 2004/09/01 15:53:47 mikulik Exp $
+ * $Id: gp_types.h,v 1.27 2004/10/19 03:26:14 sfeam Exp $
  */
 
 /* GNUPLOT - gp_types.h */
@@ -48,6 +48,9 @@
  * converted most of them into enum's. */
 enum DATA_TYPES {
 	INTGR, CMPLX
+#ifdef GP_STRING_VARS
+	, STRING
+#endif
 };
 
 enum MODE_PLOT_TYPE {
@@ -138,6 +141,9 @@ typedef struct value {
     union {
 	int int_val;
 	struct cmplx cmplx_val;
+#ifdef GP_STRING_VARS
+	char *string_val;
+#endif
     } v;
 } t_value;
 

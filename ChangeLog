@@ -1,3 +1,49 @@
+2004-10-25  Ethan Merritt  <merritt@u.washington.edu>
+
+	String variables - basic functionality
+	--------------------------------------
+	Allow gnuplot variables to contain strings, and allow expressions
+	to operate on strings. Provide two pre-defined string-valued functions;
+	sprintf() is a wrapper for the the C language formatting routine of the
+	same name, gprintf() is a wrapper for the existing gnuplot-defined
+	format specifiers.  All changes are bracketed by #ifdef GP_STRING_VARS.
+	Most places where gnuplot previously required a string constant will
+	now also accept a string variable or a string-valued expression.
+
+	* docs/gnuplot.doc: 
+	* src/gp_types.h: STRING variable type
+
+	* src/internal.c src/internal.h src/eval.c src/eval.h src/parse.c
+	string operators (A . B) (A eq B) (A ne B) 
+	string functions sprintf() gprintf()
+	
+	* src/util.c (try_to_get_string) src/util.h: Modify the routine
+	try_to_get_string to accept string variables and functions. This one
+	place handles the syntax change for most gnuplot commands.
+	The main exceptions are 'plot', 'splot', and 'set label', which are
+	handled separately.
+
+	* src/scanner.c: accept . as a binary operator (string concatenation)
+
+	* src/datafile.c: evaluate string-valued functions in a 'using' spec
+
+	* src/mouse.c: set string variable MOUSE_CHAR when a key is pressed
+
+	* src/plot2d.c: accept a string variable 'plot <foo>'
+
+	* src/plot3d.c: accept a string variable 'splot <foo>'
+
+	* src/set.c: accept a string variable in 'set label <foo>'
+	
+	* src/standard.c: int_error if a unary arithmetic operator is
+	applied to a string.
+
+	* demo/mousevariables.dem demo/keystroke.dem: Demo use of MOUSE_CHAR
+	to treat keystrokes in the plot window as strings.
+
+	* demo/stringvariables.dem: Demo use of constant strings or string-
+	valued functions as plot symbols.
+
 2004-10-25  Harald Harders  <h.harders@tu-bs.de>
 
 	* docs/gnuplot.doc: Add labels for "set term push", "set term pop".

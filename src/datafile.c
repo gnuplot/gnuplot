@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.61 2004/10/14 22:57:53 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.62 2004/10/15 18:08:56 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -1071,6 +1071,26 @@ df_open(int max_using)
 
     if (END_OF_COMMAND)
 	int_error(c_token,"missing filename");
+
+    name_token = c_token;
+
+#ifdef GP_STRING_VARS
+    if (isstring(c_token) || isstringvar(c_token)) {
+	struct value a;
+	const_express(&a);
+	/* empty name means re-use last one */
+	if (!a.v.string_val || !a.v.string_val[0]) {
+	    if (!df_filename || !*df_filename)
+		int_error(c_token, "No previous filename");
+	    free(a.v.string_val);
+	} else {
+	    if (df_filename)
+		free(df_filename);
+	    df_filename = a.v.string_val;
+	}
+    } else
+	int_error(c_token,"missing filename");
+#else
     /* empty name means re-use last one */
     if (isstring(c_token) && token_len(c_token) == 2) {
 	if (!df_filename || !*df_filename)
@@ -1080,8 +1100,8 @@ df_open(int max_using)
 				 "datafile name");
 	quote_str(df_filename, c_token, token_len(c_token));
     }
-
-    name_token = c_token++;
+    c_token++;
+#endif
 
     /* defer opening until we have parsed the modifiers... */
 
@@ -1861,6 +1881,13 @@ df_readline(double v[], int max)
 		    if (undefined)
 			return DF_UNDEFINED;	/* store undefined point in plot */
 
+#if defined(GP_STRING_VARS) && defined(EAM_DATASTRINGS)
+		    if (use_spec[output].expected_type == CT_STRING && a.type == STRING) {
+			df_tokens[output] = a.v.string_val;
+			FPRINTF((stderr,"Copying %s into output column %d\n",
+				df_tokens[output],output));
+		    } else
+#endif
 		    v[output] = real(&a);
 		} else if (column == -2) {
 		    v[output] = df_current_index;

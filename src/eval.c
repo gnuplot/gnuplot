@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: eval.c,v 1.18 2004/07/25 12:25:01 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: eval.c,v 1.19 2004/08/17 21:21:25 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - eval.c */
@@ -117,6 +117,11 @@ const struct ft_entry GPFAR ft[] =
     {"factorial",  f_factorial},
     {"bool",  f_bool},
     {"dollars",  f_dollars},	/* for using extension */
+#ifdef GP_STRING_VARS
+    {"concatenate",  f_concatenate},	/* for string variables only */
+    {"eqs",  f_eqs},			/* for string variables only */
+    {"nes",  f_nes},			/* for string variables only */
+#endif
     {"jump",  f_jump},
     {"jumpz",  f_jumpz},
     {"jumpnz",  f_jumpnz},
@@ -181,6 +186,11 @@ const struct ft_entry GPFAR ft[] =
     {"tm_year",  f_tmyear},	/* for timeseries */
     {"tm_wday",  f_tmwday},	/* for timeseries */
     {"tm_yday",  f_tmyday},	/* for timeseries */
+
+#ifdef GP_STRING_VARS
+    {"sprintf",  f_sprintf},	/* for string variables only */
+    {"gprintf",  f_gprintf},	/* for string variables only */
+#endif
 
     {NULL, NULL}
 };
@@ -290,6 +300,12 @@ disp_value(FILE *fp, struct value *val)
 	    fprintf(fp, "%s",
 		    num_to_str(val->v.cmplx_val.real));
 	break;
+#ifdef GP_STRING_VARS
+    case STRING:
+    	if (val->v.string_val)
+	    fprintf(fp, "%s", val->v.string_val);
+	break;
+#endif
     default:
 	int_error(NO_CARET, "unknown type in disp_value()");
     }
@@ -304,6 +320,10 @@ real(struct value *val)
 	return ((double) val->v.int_val);
     case CMPLX:
 	return (val->v.cmplx_val.real);
+#ifdef GP_STRING_VARS
+    case STRING:              /* is this ever used? */
+	return (atof(val->v.string_val));
+#endif
     default:
 	int_error(NO_CARET, "unknown type in real()");
     }
@@ -321,6 +341,13 @@ imag(struct value *val)
 	return (0.0);
     case CMPLX:
 	return (val->v.cmplx_val.imag);
+#ifdef GP_STRING_VARS
+    case STRING:
+	/* FIXME: It would be better to catch this earlier and treat it */
+	/*        as a file name:   plot foo(x) using 1:2               */
+	int_warn(NO_CARET, "encountered a string when expecting a number");
+	int_error(NO_CARET, "NB: you cannot plot a string-valued function");
+#endif
     default:
 	int_error(NO_CARET, "unknown type in imag()");
     }
@@ -393,6 +420,17 @@ Ginteger(struct value *a, int i)
     return (a);
 }
 
+#ifdef GP_STRING_VARS
+struct value *
+Gstring(struct value *a, char *s)
+{
+    if (a->type == STRING && a->v.string_val)
+	free(a->v.string_val);
+    a->type = STRING;
+    a->v.string_val = s;
+    return (a);
+}
+#endif
 
 /* some machines have trouble with exp(-x) for large x
  * if MINEXP is defined at compile time, use gp_exp(x) instead,
@@ -432,6 +470,12 @@ warning:  internal error--stack not empty!\n\
           (function called with too many parameters?)\n");
 }
 
+TBOOLEAN
+more_on_stack()
+{
+    return (s_p >= 0);
+}
+
 struct value *
 pop(struct value *x)
 {
@@ -448,6 +492,11 @@ push(struct value *x)
     if (s_p == STACK_DEPTH - 1)
 	int_error(NO_CARET, "stack overflow");
     stack[++s_p] = *x;
+#ifdef GP_STRING_VARS
+    /* WARNING - This is a memory leak if the string is not later freed */
+    if (x->type == STRING && x->v.string_val)
+	stack[s_p].v.string_val = gp_strdup(x->v.string_val);
+#endif
 }
 
 
