@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.54 2001/09/18 17:49:05 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.55 2001/09/19 22:47:45 amai Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -2930,10 +2930,19 @@ plot_c_bars(plot)
 	high_inrange = inrange(yhigh, axis_array[y_axis].min, axis_array[y_axis].max);
 	low_inrange = inrange(ylow, axis_array[y_axis].min, axis_array[y_axis].max);
 
+	/* HBB 20010928: To make code match the documentation, ensure
+	 * yhigh is actually higher than ylow */
+	if (yhigh < ylow) {
+	    double temp = ylow;
+	    ylow = yhigh;
+	    yhigh = temp;
+	}
+
 	/* compute the plot position of yhigh */
 	if (high_inrange)
 	    yhighM = map_y(yhigh);
-	else if (samesign(yhigh - axis_array[y_axis].max, axis_array[y_axis].max - axis_array[y_axis].min))
+	else if (samesign(yhigh - axis_array[y_axis].max,
+			  axis_array[y_axis].max - axis_array[y_axis].min))
 	    yhighM = map_y(axis_array[y_axis].max);
 	else
 	    yhighM = map_y(axis_array[y_axis].min);
@@ -2941,7 +2950,8 @@ plot_c_bars(plot)
 	/* compute the plot position of ylow */
 	if (low_inrange)
 	    ylowM = map_y(ylow);
-	else if (samesign(ylow - axis_array[y_axis].max, axis_array[y_axis].max - axis_array[y_axis].min))
+	else if (samesign(ylow - axis_array[y_axis].max,
+			  axis_array[y_axis].max - axis_array[y_axis].min))
 	    ylowM = map_y(axis_array[y_axis].max);
 	else
 	    ylowM = map_y(axis_array[y_axis].min);

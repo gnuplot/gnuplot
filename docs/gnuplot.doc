@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.81 2001/09/19 11:26:50 amai Exp $
+C RCS $Id: gnuplot.doc,v 1.82 2001/09/27 19:52:50 mikulik Exp $
 C 18 September 2001
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001   Thomas Williams, Colin Kelley et al.
 C
@@ -3369,7 +3369,7 @@ C ... and restart the table:
  A keyword with `fixmin`, `fixmax` or `fix` appended tells gnuplot to disable
  extension of the axis range to the next tic mark position, for autoscaled
  axes using equidistant tics; `set autoscale fix` sets this for all axes.
- 
+
  When autoscaling, the axis range is automatically computed and the dependent
  axis (y for a `plot` and z for `splot`) is scaled to include the range of the
  function or data being plotted.
@@ -6062,9 +6062,10 @@ C ... and restart the table:
  coordinate and limited vertically by the opening and closing prices.  A
  vertical line segment at the x coordinate extends up from the top of the
  rectangle to the high price and another down to the low.  The width of the
- rectangle may be changed by `set bars`.  The symbol will be unchanged if the
- low and high prices are interchanged or if the opening and closing prices
- are interchanged.  See `set bars` and `financebars`.
+ rectangle may be changed by `set bars`.  The symbol will be unchanged
+ if the low and high prices are interchanged.  The rectangle is pseudo-filled 
+ by three vertical lines inside it, if the open value is larger than
+ the close. Otherwise it's left empty. See `set bars` and `financebars`.
 ^<a href="http://www.nas.nasa.gov/~woo/gnuplot/finance/finance.html"> See demos.</a>
 4 dots
 ?commands set style dots
@@ -7651,8 +7652,8 @@ C  The `lines` style connects adjacent points with straight line segments.
 ^<a href="ftp://ftp.ee.gatech.edu/pub/mac/gnuplot">
           ftp://ftp.ee.gatech.edu/pub/mac/gnuplot
 ^</a>
- 
- 
+
+
  Also several X11 interfaces exist.
  One of them is called xgfe. It uses the Qt library and can be found on
 ^<a href="http://www.flash.net/~dmishee/xgfe/xgfe.html">
@@ -7660,7 +7661,7 @@ C  The `lines` style connects adjacent points with straight line segments.
 ^</a> 
 
  In addition three Tcl/Tk located at the usual Tcl/Tk repositories exist.
- 
+
  Bruce Ravel (ravel@phys.washington.edu) has written a new version of
  gnuplot-mode for GNU emacs and XEmacs. This version is based on
  the gnuplot.el file by Gershon Elber.
@@ -7670,7 +7671,6 @@ C  The `lines` style connects adjacent points with straight line segments.
            http://feff.phys.washington.edu/~ravel/gnuplot
 ^</a>
 
- 
 1 Bugs
 ?bugs
  Floating point exceptions (floating point number too large/small, divide by

@@ -1,3 +1,13 @@
+2001-09-28  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/graphics.c (plot_c_bars): Changed candlesticks behaviour to
+ 	ignore order of high and low prices, as was long since claimed by
+ 	the docs, but not actually done in the code.
+
+	* docs/gnuplot.doc: Corrected documentation about candlesticks
+ 	behaviour if open and close prices are exchanged.  Some spurious
+ 	whitespace removed to please 'make check'
+
 2001-09-27  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/set.c docs/gnuplot.doc: new autoscale option:
