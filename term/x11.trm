@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: x11.trm,v 1.128 2004/12/31 18:41:45 sfeam Exp $
+ * $Id: x11.trm,v 1.129 2005/01/02 07:47:36 sfeam Exp $
  *
  */
 
@@ -597,6 +597,12 @@ X11_atexit()
 }
 
 #ifdef USE_MOUSE
+
+/* HBB 20050105: POSIX has this here, rather than in unistd.h & friends */
+#if HAVE_SYS_SELECT_H
+# include <sys/select.h>
+#endif
+
 TERM_PUBLIC int
 X11_waitforinput()
 {
