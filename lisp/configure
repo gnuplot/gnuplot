@@ -676,7 +676,7 @@ echo "configure:676: checking where .elc files should go" >&5
 if eval "test \"`echo '$''{'am_cv_lispdir'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
-  	am_cv_lispdir=`$EMACS -q -batch -eval '(while load-path (princ (concat (car load-path) "\n")) (setq load-path (cdr load-path)))' | sed -n -e 's,/$,,' -e '/.*\/lib\/\(x\?emacs\/site-lisp\)$/{s,,${libdir}/\1,;p;q;}' -e '/.*\/share\/\(x\?emacs\/site-lisp\)$/{s,,${datadir}/\1,;p;q;}'`
+  	am_cv_lispdir=`$EMACS -batch -q -eval '(while load-path (princ (concat (car load-path) "\n")) (setq load-path (cdr load-path)))' | sed -n -e 's,/$,,' -e '/.*\/lib\/\(x\?emacs\/site-lisp\)$/{s,,${libdir}/\1,;p;q;}' -e '/.*\/share\/\(x\?emacs\/site-lisp\)$/{s,,${datadir}/\1,;p;q;}'`
 	if test -z "$am_cv_lispdir"; then
 	  am_cv_lispdir='${datadir}/emacs/site-lisp'
 	fi

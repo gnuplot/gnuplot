@@ -1,4 +1,4 @@
-dnl aclocal.m4 generated automatically by aclocal 1.4
+dnl aclocal.m4 generated automatically by aclocal 1.4a
 
 dnl Copyright (C) 1994, 1995-8, 1999 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
@@ -21,7 +21,7 @@ AC_DEFUN(AM_PATH_LISPDIR,
   if test $EMACS != "no"; then
     if test x${lispdir+set} != xset; then
       AC_CACHE_CHECK([where .elc files should go], [am_cv_lispdir], [dnl
-	am_cv_lispdir=`$EMACS -q -batch -eval '(while load-path (princ (concat (car load-path) "\n")) (setq load-path (cdr load-path)))' | sed -n -e 's,/$,,' -e '/.*\/lib\/\(x\?emacs\/site-lisp\)$/{s,,${libdir}/\1,;p;q;}' -e '/.*\/share\/\(x\?emacs\/site-lisp\)$/{s,,${datadir}/\1,;p;q;}'`
+	am_cv_lispdir=`$EMACS -batch -q -eval '(while load-path (princ (concat (car load-path) "\n")) (setq load-path (cdr load-path)))' | sed -n -e 's,/$,,' -e '/.*\/lib\/\(x\?emacs\/site-lisp\)$/{s,,${libdir}/\1,;p;q;}' -e '/.*\/share\/\(x\?emacs\/site-lisp\)$/{s,,${datadir}/\1,;p;q;}'`
 	if test -z "$am_cv_lispdir"; then
 	  am_cv_lispdir='${datadir}/emacs/site-lisp'
 	fi
