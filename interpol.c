@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: interpol.c,v 1.29 1998/04/14 00:15:45 drd Exp $";
+static char *RCSid = "$Id: interpol.c,v 1.6 1998/11/16 13:09:51 lhecking Exp $";
 #endif
 
 /* GNUPLOT - interpol.c */
@@ -251,6 +251,15 @@ struct curve_points *plot;
  */
 
 
+/* HBB 990205: rewrote the 'bezier' interpolation routine,
+ * to prevent numerical overflow and other undesirable things happening
+ * for large data files (num_data about 1000 or so), where binomial
+ * coefficients would explode, and powers of 'sr' (0 < sr < 1) become
+ * extremely small. Method used: compute logarithms of these
+ * extremely large and small numbers, and only go back to the
+ * real numbers once they've cancelled out each other, leaving
+ * a reasonable-sized one. */
+
 /*
  * cp_binomial() computes the binomial coefficients needed for BEZIER stuff
  *   and stores them into an array which is hooked to sdat.
@@ -268,10 +277,12 @@ int points;
 
     n = points - 1;
     e = n / 2;
-    coeff[0] = 1.0;
+    /* HBB 990205: calculate these in 'logarithmic space',
+     * as they become _very_ large, with growing n (4^n) */
+    coeff[0] = 0.0;
 
     for (k = 0; k < e; k++) {
-	coeff[k + 1] = coeff[k] * ((double) (n - k)) / ((double) (k + 1));
+	coeff[k + 1] = coeff[k] + log(((double) (n-k)) / ((double) (k+1)));
     }
 
     for (k = n; k >= e; k--)
@@ -322,6 +333,7 @@ unsigned int exponent;
     return (y);
 }
 
+
 static void eval_bezier(cp, first_point, num_points, sr, px, py, c)
 struct curve_points *cp;
 int first_point;		/* where to start in plot->points (to find x-range) */
@@ -344,18 +356,20 @@ double *c;
 	*px = this_points[n].x;
 	*py = this_points[n].y;
     } else {
+        /* HBB 990205: do calculation in 'logarithmic space',
+         * to avoid over/underflow errors, which would exactly cancel
+         * out each other, anyway, in an exact calculation
+         */
 	unsigned int i;
 	double lx = 0.0, ly = 0.0;
-	double sr_to_the_i = 1.0;
-	double dsr_to_the_di = s_pow(1 - sr, n);
-	double reciprocal_dsr = 1.0 / (1 - sr);
+	double log_dsr_to_the_n = n * log(1 -sr);
+	double log_sr_over_dsr = log(sr) - log(1 - sr);
 
 	for (i = 0; i <= n; i++) {
-	    double u = c[i] * sr_to_the_i * s_pow(1 - sr, n - i);
+            double u = exp(c[i] + log_dsr_to_the_n + i * log_sr_over_dsr);
+
 	    lx += this_points[i].x * u;
 	    ly += this_points[i].y * u;
-	    sr_to_the_i *= sr;
-	    dsr_to_the_di *= reciprocal_dsr;
 	}
 
 	*px = lx;
