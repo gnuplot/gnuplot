@@ -1,3 +1,27 @@
+1998-12-16  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* configure: Regenerated.
+
+	* configure.in: More meaningful warning messages.
+
+	* protos.h: GNU libreadline prototypes.
+
+	* show.c(show_command,show_one): Add cntrparam to showmess,
+	show cntrparam can now be abbreviated with show cn.
+
+	* term/tgif.trm: Fix undefined behaviour.
+
+1998-12-16  Lucas Hart  <hartl@ucs.orst.edu>
+
+	* term/gif.trm: Fix 'set terminal' info for gif driver.
+
+1998-12-16  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* 0BUGS: Add entry for 16bit Windows and Borland C++ 3.1.
+
+	* makefiule.mgw: Call compiled programs via ./ because under
+	CygWin-BASH, the current directory is not in PATH.
+
 1998-12-15  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* gplt_x11.c, term/hpljii.trm, term/latex.trm, term/metafont.trm,
