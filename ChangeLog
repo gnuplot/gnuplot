@@ -1,3 +1,11 @@
+2003-04-08  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/readline.c: Revert patch from 2003-05-10 
+	"Allow <tab> characters in input stream." This broke filename auto-
+	completion by gnu libreadline. Reversion re-introduces the problem that
+	gnuplot's own readline makes it impossible to enter <tabs> in a command
+	line.
+
 2004-04-08  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* TODO: Updated.
