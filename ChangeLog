@@ -1,3 +1,12 @@
+1999-08-20  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* configure.in: Change check for plotcompat.h in configuration report.
+
+	* docs/Makefile.in: Add existing TEXINPUTS variable to latex calls.
+
+	* m4/path-hdr.m4, m4/path-lib.m4: Add 'else' part in if statement to
+	avoid side effects.
+
 1999-08-17  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* demo/*.dem, tutorial/*.plt: Updated to new command syntax.
@@ -1361,7 +1370,7 @@
 1999-03-19  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* Makefile.in, makefile.all: Rename docs/ps docs/psdoc. Old directory
-	interferes with ps traget in docs/Makefile.in.
+	interferes with ps target in docs/Makefile.in.
 
 	* TODO: Typo fixed.
 
