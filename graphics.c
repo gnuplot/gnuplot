@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: graphics.c,v 1.24.2.2 1999/09/15 15:30:29 lhecking Exp $";
+static char *RCSid = "$Id: graphics.c,v 1.24.2.3 1999/11/17 18:14:12 lhecking Exp $";
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -244,7 +244,6 @@ static double scale[AXIS_ARRAY_SIZE];	/* scale factors for mapping for each axis
 
 /* (DFK) Watch for cancellation error near zero on axes labels */
 /* less than one hundredth of a tic mark */
-#define SIGNIF (0.01)
 #define CheckZero(x,tic) (fabs(x) < ((tic) * SIGNIF) ? 0.0 : (x))
 #define NearlyEqual(x,y,tic) (fabs((x)-(y)) < ((tic) * SIGNIF))
 /*}}} */

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: graph3d.c,v 1.13.2.3 1999/09/15 15:30:29 lhecking Exp $";
+static char *RCSid = "$Id: graph3d.c,v 1.13.2.4 1999/10/19 13:31:49 lhecking Exp $";
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -231,7 +231,6 @@ static double back_x, back_y;
 static double tic_unitx, tic_unity;
 
 /* (DFK) Watch for cancellation error near zero on axes labels */
-#define SIGNIF (0.01)		/* less than one hundredth of a tic mark */
 #define CheckZero(x,tic) (fabs(x) < ((tic) * SIGNIF) ? 0.0 : (x))
 #define NearlyEqual(x,y,tic) (fabs((x)-(y)) < ((tic) * SIGNIF))
 
