@@ -36,10 +36,6 @@
 #ifndef TERM_DRIVER_H
 #define TERM_DRIVER_H
 
-#include "plot.h"
-#include "bitmap.h"
-#include "setshow.h"
-
 #if 0
 /* Dangerous; putc may already be defined as fputc */
 /* corey@cac added the next line for efficiency */
