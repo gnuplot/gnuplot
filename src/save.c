@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.85 2004/09/01 15:53:48 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.86 2004/09/17 05:01:13 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -481,8 +481,6 @@ set y2data%s\n",
 	case HT_STACKED_IN_TOWERS:
 	    fprintf(fp,"columnstacked "); break;
     }
-    fprintf(fp,"title %g,%g ",histogram_opts.title.hoffset,histogram_opts.title.voffset);
-    save_textcolor(fp, &histogram_opts.title.textcolor);
     fprintf(fp, "\n");
 #endif
 

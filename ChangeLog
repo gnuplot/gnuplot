@@ -1,3 +1,9 @@
+2004-10-15  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/save.c (save_set_all):  Do not try to save the current title and
+	text properties of histograms.  This is not part of the permanent style.
+	Fixes strangeness with "test palette".
+
 2004-10-14  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/plot2d.c (get_data eval_plots): Defer adjustment of histogram 
