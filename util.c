@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: util.c,v 1.10 1998/12/09 15:26:04 lhecking Exp $";
+static char *RCSid = "$Id: util.c,v 1.10.2.1 1999/09/14 20:46:26 lhecking Exp $";
 #endif
 
 /* GNUPLOT - util.c */
@@ -308,6 +308,27 @@ int start, end;
 
 }
 
+/* Our own version of strdup()
+ * Make copy of string into gp_alloc'd memory
+ * As with all conforming str*() functions,
+ * it is the caller's responsibility to pass
+ * valid parameters!
+ */
+char *
+gp_strdup(s)
+char *s;
+{
+    char *d;
+
+#ifndef HAVE_STRDUP
+    d = gp_alloc(strlen(s) + 1, "gp_strdup");
+    if (d)
+	memcpy (d, s, strlen(s) + 1);
+#else
+    d = strdup(s);
+#endif
+    return d;
+}
 
 void convert(val_ptr, t_num)
 struct value *val_ptr;
