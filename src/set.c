@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.54 2001/02/28 16:41:09 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.55 2001/03/19 14:52:23 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -2959,13 +2959,15 @@ static void
 set_range(axis)
     AXIS_INDEX axis;
 {
+    c_token++;
+
     if(almost_equals(c_token,"re$store")) { /* ULIG */
 	c_token++;
 	axis_array[axis].set_min = get_writeback_min(axis);
 	axis_array[axis].set_max = get_writeback_max(axis);
 	axis_array[axis].set_autoscale = 0;
     } else {
-	if (!equals(++c_token,"["))
+	if (!equals(c_token,"["))
 	    int_error(c_token, "expecting '[' or 'restore'");
 	c_token++;
 	axis_array[axis].set_autoscale =
@@ -2989,8 +2991,8 @@ set_range(axis)
 	    ++c_token;
 	    axis_array[axis].range_flags &= ~RANGE_WRITEBACK;
 	}
+    }
 }
-  }
 
 /* process 'set xzeroaxis' command */
 static void

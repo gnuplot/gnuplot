@@ -1,3 +1,7 @@
+2001-03-27  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/set.c (set_range): Bugfix in parsing 'set xrange restore'.
+
 2001-03-27  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/save.c: save color axis properties.
