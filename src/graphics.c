@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.23 1999/11/08 19:24:29 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.24 1999/11/15 22:22:28 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -252,8 +252,6 @@ static double scale[AXIS_ARRAY_SIZE];	/* scale factors for mapping for each axis
 #define map_y(y) (int)(ybot +(y-min_array[y_axis])*scale[y_axis]+0.5)
 
 /* (DFK) Watch for cancellation error near zero on axes labels */
-/* less than one hundredth of a tic mark */
-#define SIGNIF (0.01)
 #define CheckZero(x,tic) (fabs(x) < ((tic) * SIGNIF) ? 0.0 : (x))
 #define NearlyEqual(x,y,tic) (fabs((x)-(y)) < ((tic) * SIGNIF))
 /*}}} */

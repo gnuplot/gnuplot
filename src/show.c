@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.30 1999/11/08 19:24:33 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.31 1999/11/15 21:59:30 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -50,14 +50,6 @@ static char *RCSid() { return RCSid("$Id: show.c,v 1.30 1999/11/08 19:24:33 lhec
 #include "parse.h"
 #include "tables.h"
 #include "util.h"
-
-/* for show_version_long() */
-#ifdef HAVE_SYS_UTSNAME_H
-# include <sys/utsname.h>
-#endif
-
-#define DEF_FORMAT   "%g"	/* default format for tic mark labels */
-#define SIGNIF (0.01)		/* less than one hundredth of a tic mark */
 
 /******** Local functions ********/
 
@@ -131,8 +123,6 @@ static void show_arrow __PROTO((int tag));
 static void show_ticdef __PROTO((int tics, int axis, struct ticdef * tdef, const char *text, int rotate_tics, const char *ticfmt));
 static void show_position __PROTO((struct position * pos));
 static void show_functions __PROTO((void));
-
-static void show_version_long __PROTO((void));
 
 static int var_show_all = 0;
 
@@ -723,16 +713,16 @@ FILE *fp;
     }
     fprintf(fp, "%s\n\
 %s\t%s\n\
-%s\t%sversion %s\n\
-%s\tpatchlevel %s\n\
+%s\tVersion %s patchlevel %s\n\
 %s\tlast modified %s\n\
+%s\tSystem: %s %s\n\
 %s\n\
 %s\t%s\n\
 %s\tThomas Williams, Colin Kelley and many others\n\
 %s\n\
-%s\tThis is a pre-version of gnuplot 4.0. The syntax for some commands\n\
-%s\thas changed, please use the provided `gpltconv' tool to convert\n\
-%s\tyour old scripts.\n\
+%s\tThis is a pre-version of gnuplot 4.0. Please refer to the documentation\n\
+%s\tfor command syntax changes. The old syntax will be accepted throughout\n\
+%s\tthe 4.0 series, but all save files use the new syntax.\n\
 %s\n\
 %s\tType `help` to access the on-line reference manual\n\
 %s\tThe gnuplot FAQ is available from\n\
@@ -743,9 +733,9 @@ FILE *fp;
 %s\n",
 	    p,			/* empty line */
 	    p, PROGRAM,
-	    p, OS, gnuplot_version,
-	    p, gnuplot_patchlevel,
+	    p, gnuplot_version, gnuplot_patchlevel,
 	    p, gnuplot_date,
+	    p, os_name, os_rel,
 	    p,			/* empty line */
 	    p, gnuplot_copyright,
 	    p,			/* authors */
@@ -754,7 +744,7 @@ FILE *fp;
 	    p,			/* 4.0 info */
 	    p,			/* 4.0 info */
 	    p,			/* empty line */
-	    p,			/* Type help */
+	    p,			/* Type `help` */
 	    p,			/* FAQ is at */
 	    p, faq_location,
 	    p,			/* empty line */
@@ -762,126 +752,102 @@ FILE *fp;
 	    p, bug_email,
 	    p);			/* empty line */
 
+
+    /* show version long */
     if (almost_equals(c_token, "l$ong")) {
+	char *helpfile = NULL;
+
 	c_token++;
-	show_version_long();
-    }
-}
 
+	fputs("Compile options:\n", stderr);
 
-/* process 'show version long' command */
-static void
-show_version_long()
-{
-    const char *helpfile = NULL;
-#ifdef HAVE_SYS_UTSNAME_H
-    struct utsname uts;
+	{
+	    /* The following code could be a lot simpler if
+	     * it wasn't for Borland's broken compiler ...
+	     */
+	    const char *rdline, *gnu_rdline, *libgd, *libpng, *linuxvga, *nocwdrc, *x11, *unixplot, *gnugraph;
 
-    /* something is fundamentally wrong if this fails ... */
-    if (uname(&uts) > -1) {
-# ifdef _AIX
-	fprintf(stderr, "\nSystem: %s %s.%s", uts.sysname, uts.version, uts.release);
-# elif defined (SCO)
-	fprintf(stderr, "\nSystem: SCO %s", uts.release);
-# else
-	fprintf(stderr, "\nSystem: %s %s", uts.sysname, uts.release);
-# endif
-    } else {
-	fprintf(stderr, "\n%s\n", OS);
-    }
-
-#else /* ! HAVE_SYS_UTSNAME_H */
-
-    fprintf(stderr, "\n%s\n", OS);
-
-#endif /* HAVE_SYS_UTSNAME_H */
-
-    fputs("\nCompile options:\n", stderr);
-
-    {
-	/* The following code could be a lot simpler if
-	 * it wasn't for Borland's broken compiler ...
-	 */
-	const char *rdline, *gnu_rdline, *libgd, *libpng, *linuxvga, *nocwdrc, *x11, *unixplot, *gnugraph;
-
-	rdline =
+	    rdline =
 #ifdef READLINE
-	    "+READLINE  "
+		"+READLINE  "
 #else
-	    "-READLINE  "
+		"-READLINE  "
 #endif
-	    ,gnu_rdline =
+		,gnu_rdline =
 #ifdef HAVE_LIBREADLINE
-	    "+LIBREADLINE  "
+		"+LIBREADLINE  "
 # ifdef GNUPLOT_HISTORY
-	    "+HISTORY  "
+		"+HISTORY  "
 #else
-	    "-HISTORY  "
+		"-HISTORY  "
 # endif
 #else
-	    "-LIBREADLINE  "
+		"-LIBREADLINE  "
 #endif
-	    ,libgd =
+		,libgd =
 #ifdef HAVE_LIBGD
-	    "+LIBGD  "
+		"+LIBGD  "
 #else
-	    "-LIBGD  "
+		"-LIBGD  "
 #endif
-	    ,libpng =
+		,libpng =
 #ifdef HAVE_LIBPNG
-	    "+LIBPNG  "
+		"+LIBPNG  "
 #else
-	    "-LIBPNG  "
+		"-LIBPNG  "
 #endif
-	    ,linuxvga =
+		,linuxvga =
 #ifdef LINUXVGA
-	    "+LINUXVGA  "
+		"+LINUXVGA  "
 #else
-	    ""
+		""
 #endif
-	    ,nocwdrc =
+		,nocwdrc =
 #ifdef NOCWDRC
-	    "+NOCWDRC  "
+		"+NOCWDRC  "
 #else
-	    "-NOCWDRC  "
+		"-NOCWDRC  "
 #endif
-	    ,x11 =
+		,x11 =
 
 #ifdef X11
-	    "+X11  "
+		"+X11  "
 #else
-	    ""
+		""
 #endif
-	    ,unixplot =
+		,unixplot =
 #ifdef UNIXPLOT
-	    "+UNIXPLOT  "
+		"+UNIXPLOT  "
 #else
-	    ""
+		""
 #endif
-	    ,gnugraph =
+		,gnugraph =
 #ifdef GNUGRAPH
-	    "+GNUGRAPH  "
+		"+GNUGRAPH  "
 #else
-	    ""
+		""
 #endif
-	    ;
-	fprintf(stderr, "%s%s%s%s%s%s%s%s%s\n\n", rdline, gnu_rdline,
-		libgd, libpng, linuxvga, nocwdrc, x11, unixplot, gnugraph);
-    }
-
-    if ((helpfile = getenv("GNUHELP")) == NULL) {
-#if defined(ATARI) || defined(MTOS)
-	if ((helpfile = user_gnuplotpath) == NULL) {
-	    helpfile = HELPFILE;
+		;
+	    fprintf(stderr, "%s%s%s%s%s%s%s%s%s\n\n", rdline, gnu_rdline,
+		    libgd, libpng, linuxvga, nocwdrc, x11, unixplot, gnugraph);
 	}
+
+	if ((helpfile = getenv("GNUHELP")) == NULL) {
+#if defined(ATARI) || defined(MTOS)
+	    if ((helpfile = user_gnuplotpath) == NULL) {
+		helpfile = HELPFILE;
+	    }
 #else
-	helpfile = HELPFILE;
+	    helpfile = HELPFILE;
 #endif
-    }
-    fprintf(stderr, "HELPFILE     = \"%s\"\n\
+	}
+
+	fprintf(stderr, "\
+HELPFILE     = \"%s\"\n\
 CONTACT      = <%s>\n\
 HELPMAIL     = <%s>\n", helpfile, bug_email, help_email);
 
+    }
 }
 
 
