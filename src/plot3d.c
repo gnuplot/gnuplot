@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.25 2001/03/19 14:52:23 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.26 2001/04/24 18:43:09 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -358,7 +358,7 @@ grid_nongrid_data(this_plot)
 	struct coordinate GPHUGE *opoints = oicrv->points;
 	for (k = 0; k < oicrv->p_count; k++, opoints++) {
 	    /* HBB 20010424: avoid crashing for undefined input */
-	    if (points->type == UNDEFINED)
+	    if (opoints->type == UNDEFINED)
 		continue;
 	    xx[numpoints] = opoints->x;
 	    yy[numpoints] = opoints->y;
@@ -950,16 +950,16 @@ eval_3dplots()
 		    int_error(c_token, "previous parametric function not fully specified");
 
 		if (!some_data_files) {
-		    if (axis_array[FIRST_X_AXIS].autoscale & 1) {
+		    if (axis_array[FIRST_X_AXIS].autoscale & AUTOSCALE_MIN) {
 			axis_array[FIRST_X_AXIS].min = VERYLARGE;
 		    }
-		    if (axis_array[FIRST_X_AXIS].autoscale & 2) {
+		    if (axis_array[FIRST_X_AXIS].autoscale & AUTOSCALE_MAX) {
 			axis_array[FIRST_X_AXIS].max = -VERYLARGE;
 		    }
-		    if (axis_array[FIRST_Y_AXIS].autoscale & 1) {
+		    if (axis_array[FIRST_Y_AXIS].autoscale & AUTOSCALE_MIN) {
 			axis_array[FIRST_Y_AXIS].min = VERYLARGE;
 		    }
-		    if (axis_array[FIRST_Y_AXIS].autoscale & 2) {
+		    if (axis_array[FIRST_Y_AXIS].autoscale & AUTOSCALE_MAX) {
 			axis_array[FIRST_Y_AXIS].max = -VERYLARGE;
 		    }
 		    some_data_files = TRUE;
@@ -1094,7 +1094,7 @@ eval_3dplots()
 	    if (almost_equals(c_token, "w$ith")) {
 		this_plot->plot_style = get_style();
 	        if ((this_plot->plot_type == FUNC3D)
-                    && (this_plot->plot_style & 4))
+                    && (this_plot->plot_style & PLOT_STYLE_HAS_ERRORBAR))
                     {
                         int_warn(c_token, "This plot style is only for datafiles , reverting to \"points\"");
                         this_plot->plot_style = POINTSTYLE;
@@ -1104,7 +1104,8 @@ eval_3dplots()
 	     * - point spec allowed if style uses points, ie style&2 != 0
 	     * - keywords are optional
 	     */
-	    lp_parse(&this_plot->lp_properties, 1, this_plot->plot_style & 2,
+	    lp_parse(&this_plot->lp_properties, 1,
+		     this_plot->plot_style & PLOT_STYLE_HAS_POINT,
 		     line_num, point_num);
 
 	    /* allow old-style syntax too - ignore case lt 3 4 for example */
@@ -1116,7 +1117,7 @@ eval_3dplots()
 		if (!equals(c_token, ",") && !END_OF_COMMAND)
 		    this_plot->lp_properties.p_type = (int) real(const_express(&t)) - 1;
 	    }
-	    if (this_plot->plot_style & 2)	/* lines, linesp, ... */
+	    if (this_plot->plot_style & PLOT_STYLE_HAS_POINT)	/* lines, linesp, ... */
 		if (crnt_param == 0)
 		    point_num +=
 			1 + (draw_contour != 0)
@@ -1264,13 +1265,13 @@ eval_3dplots()
 	if (parametric && !some_data_files) {
 	    /*{{{  set ranges */
 	    /* parametric fn can still change x/y range */
-	    if (axis_array[FIRST_X_AXIS].autoscale & 1)
+	    if (axis_array[FIRST_X_AXIS].autoscale & AUTOSCALE_MIN)
 		axis_array[FIRST_X_AXIS].min = VERYLARGE;
-	    if (axis_array[FIRST_X_AXIS].autoscale & 2)
+	    if (axis_array[FIRST_X_AXIS].autoscale & AUTOSCALE_MAX)
 		axis_array[FIRST_X_AXIS].max = -VERYLARGE;
-	    if (axis_array[FIRST_Y_AXIS].autoscale & 1)
+	    if (axis_array[FIRST_Y_AXIS].autoscale & AUTOSCALE_MIN)
 		axis_array[FIRST_Y_AXIS].min = VERYLARGE;
-	    if (axis_array[FIRST_Y_AXIS].autoscale & 2)
+	    if (axis_array[FIRST_Y_AXIS].autoscale & AUTOSCALE_MAX)
 		axis_array[FIRST_Y_AXIS].max = -VERYLARGE;
 	    /*}}} */
 	}

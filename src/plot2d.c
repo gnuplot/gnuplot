@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.37 2001/02/15 17:02:56 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.38 2001/03/05 11:52:08 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -582,10 +582,10 @@ store2d_point(current_plot, i, x, y, xlow, xhigh, ylow, yhigh, width)
 
     if (polar) {
 	double newx, newy;
-	if (!(axis_array[R_AXIS].autoscale & 2) && y > axis_array[R_AXIS].max) {
+	if (!(axis_array[R_AXIS].autoscale & AUTOSCALE_MAX) && y > axis_array[R_AXIS].max) {
 	    cp->type = OUTRANGE;
 	}
-	if (!(axis_array[R_AXIS].autoscale & 1)) {
+	if (!(axis_array[R_AXIS].autoscale & AUTOSCALE_MIN)) {
 	    /* we store internally as if plotting r(t)-rmin */
 	    y -= axis_array[R_AXIS].min;
 	}
@@ -599,10 +599,10 @@ store2d_point(current_plot, i, x, y, xlow, xhigh, ylow, yhigh, width)
 	y = newy;
 	x = newx;
 
-	if (!(axis_array[R_AXIS].autoscale & 2) && yhigh > axis_array[R_AXIS].max) {
+	if (!(axis_array[R_AXIS].autoscale & AUTOSCALE_MAX) && yhigh > axis_array[R_AXIS].max) {
 	    cp->type = OUTRANGE;
 	}
-	if (!(axis_array[R_AXIS].autoscale & 1)) {
+	if (!(axis_array[R_AXIS].autoscale & AUTOSCALE_MIN)) {
 	    /* we store internally as if plotting r(t)-rmin */
 	    yhigh -= axis_array[R_AXIS].min;
 	}
@@ -611,10 +611,10 @@ store2d_point(current_plot, i, x, y, xlow, xhigh, ylow, yhigh, width)
 	yhigh = newy;
 	xhigh = newx;
 
-	if (!(axis_array[R_AXIS].autoscale & 2) && ylow > axis_array[R_AXIS].max) {
+	if (!(axis_array[R_AXIS].autoscale & AUTOSCALE_MAX) && ylow > axis_array[R_AXIS].max) {
 	    cp->type = OUTRANGE;
 	}
-	if (!(axis_array[R_AXIS].autoscale & 1)) {
+	if (!(axis_array[R_AXIS].autoscale & AUTOSCALE_MIN)) {
 	    /* we store internally as if plotting r(t)-rmin */
 	    ylow -= axis_array[R_AXIS].min;
 	}
@@ -824,6 +824,12 @@ int plot_num;
     free(table_format);
 }
 
+/* HBB 20010610: mnemonic names for the bits stored in 'uses_axis' */
+typedef enum e_uses_axis {
+    USES_AXIS_FOR_DATA = 1,
+    USES_AXIS_FOR_FUNC = 2
+} t_uses_axis;
+
 /*
  * This parses the plot command after any range specifications. To support
  * autoscaling on the x axis, we want any data files to define the x range,
@@ -839,7 +845,7 @@ eval_plots()
 {
     register int i;
     register struct curve_points *this_plot, **tp_ptr;
-    int uses_axis[AXIS_ARRAY_SIZE];
+    t_uses_axis uses_axis[AXIS_ARRAY_SIZE];
     int some_functions = 0;
     int plot_num, line_num, point_num, xparam = 0;
     char *xtitle = NULL;
@@ -1027,7 +1033,7 @@ eval_plots()
 		    int_error(c_token, "\"with\" allowed only after parametric function fully specified");
 		this_plot->plot_style = get_style();
 		if ((this_plot->plot_type == FUNC)
-		    && (this_plot->plot_style & 4))
+		    && (this_plot->plot_style & PLOT_STYLE_HAS_ERRORBAR))
 		    {
 			int_warn(c_token, "This plot style is only for datafiles, reverting to \"points\"");
 			this_plot->plot_style = POINTSTYLE;
@@ -1038,7 +1044,8 @@ eval_plots()
 	     * - point spec allowed if style uses points, ie style&2 != 0
 	     * - keywords for lt and pt are optional
 	     */
-	    lp_parse(&(this_plot->lp_properties), 1, this_plot->plot_style & 2,
+	    lp_parse(&(this_plot->lp_properties), 1,
+		     this_plot->plot_style & PLOT_STYLE_HAS_LINE,
 		     line_num, point_num);
 
 	    /* allow old-style syntax too - ignore case lt 3 4 for example */
@@ -1058,10 +1065,11 @@ eval_plots()
 	    /* we can now do some checks that we deferred earlier */
 
 	    if (this_plot->plot_type == DATA) {
-		if (!(uses_axis[x_axis] & 1) && X_AXIS.autoscale) {
-		    if (X_AXIS.autoscale & 1)
+		if (! (uses_axis[x_axis] & USES_AXIS_FOR_DATA)
+		    && X_AXIS.autoscale) {
+		    if (X_AXIS.autoscale & AUTOSCALE_MIN)
 			X_AXIS.min = VERYLARGE;
-		    if (X_AXIS.autoscale & 2)
+		    if (X_AXIS.autoscale & AUTOSCALE_MAX)
 			X_AXIS.max = -VERYLARGE;
 		}
 		if (X_AXIS.is_timedata) {
@@ -1077,18 +1085,18 @@ eval_plots()
 		df_axis[1] = y_axis;
 
 		/* separate record of datafile and func */
-		uses_axis[x_axis] |= 1;
-		uses_axis[y_axis] |= 1;
+		uses_axis[x_axis] |= USES_AXIS_FOR_DATA;
+		uses_axis[y_axis] |= USES_AXIS_FOR_DATA;
 	    } else if (!parametric || !xparam) {
 		/* for x part of a parametric function, axes are
 		 * possibly wrong */
 		/* separate record of data and func */
-		uses_axis[x_axis] |= 2;
-		uses_axis[y_axis] |= 2;
+		uses_axis[x_axis] |= USES_AXIS_FOR_FUNC;
+		uses_axis[y_axis] |= USES_AXIS_FOR_FUNC;
 	    }
 
 	    if (!xparam) {
-		if (this_plot->plot_style & 2)	/* style includes points */
+		if (this_plot->plot_style & PLOT_STYLE_HAS_POINT)
 		    ++point_num;
 		++line_num;
 	    }
@@ -1164,14 +1172,14 @@ eval_plots()
 	/* check that xmin -> xmax is not too small */
 	axis_checked_extend_empty_range(FIRST_X_AXIS, "x range is invalid");
 
-	if (uses_axis[SECOND_X_AXIS] & 1) {
+	if (uses_axis[SECOND_X_AXIS] & USES_AXIS_FOR_DATA) {
 	    /* check that x2min -> x2max is not too small */
 	    axis_checked_extend_empty_range(SECOND_X_AXIS, "x2 range is invalid");
 	} else if (axis_array[SECOND_X_AXIS].autoscale) {
 	    /* copy x1's range */
-	    if (axis_array[SECOND_X_AXIS].autoscale & 1)
+	    if (axis_array[SECOND_X_AXIS].autoscale & AUTOSCALE_MIN)
 		axis_array[SECOND_X_AXIS].min = axis_array[FIRST_X_AXIS].min;
-	    if (axis_array[SECOND_X_AXIS].autoscale & 2)
+	    if (axis_array[SECOND_X_AXIS].autoscale & AUTOSCALE_MAX)
 		axis_array[SECOND_X_AXIS].max = axis_array[FIRST_X_AXIS].max;
 	}
     }
@@ -1182,17 +1190,17 @@ eval_plots()
 	double t_min = 0., t_max = 0., t_step = 0.;
 
 	if (parametric || polar) {
-	    if (!(uses_axis[FIRST_X_AXIS] & 1)) {
+	    if (! (uses_axis[FIRST_X_AXIS] & USES_AXIS_FOR_DATA)) {
 		/* these have not yet been set to full width */
-		if (axis_array[FIRST_X_AXIS].autoscale & 1)
+		if (axis_array[FIRST_X_AXIS].autoscale & AUTOSCALE_MIN)
 		    axis_array[FIRST_X_AXIS].min = VERYLARGE;
-		if (axis_array[FIRST_X_AXIS].autoscale & 2)
+		if (axis_array[FIRST_X_AXIS].autoscale & AUTOSCALE_MAX)
 		    axis_array[FIRST_X_AXIS].max = -VERYLARGE;
 	    }
-	    if (!(uses_axis[SECOND_X_AXIS] & 1)) {
-		if (axis_array[SECOND_X_AXIS].autoscale & 1)
+	    if (! (uses_axis[SECOND_X_AXIS] & USES_AXIS_FOR_DATA)) {
+		if (axis_array[SECOND_X_AXIS].autoscale & AUTOSCALE_MIN)
 		    axis_array[SECOND_X_AXIS].min = VERYLARGE;
-		if (axis_array[SECOND_X_AXIS].autoscale & 2)
+		if (axis_array[SECOND_X_AXIS].autoscale & AUTOSCALE_MAX)
 		    axis_array[SECOND_X_AXIS].max = -VERYLARGE;
 	    }
 	}
@@ -1269,9 +1277,9 @@ eval_plots()
 			    this_plot->points[i].y = temp;
 			} else if (polar) {
 			    double y;
-			    if (!(axis_array[R_AXIS].autoscale & 2) && temp > axis_array[R_AXIS].max)
+			    if (!(axis_array[R_AXIS].autoscale & AUTOSCALE_MAX) && temp > axis_array[R_AXIS].max)
 				this_plot->points[i].type = OUTRANGE;
-			    if (!(axis_array[R_AXIS].autoscale & 1))
+			    if (!(axis_array[R_AXIS].autoscale & AUTOSCALE_MIN))
 				temp -= axis_array[R_AXIS].min;
 			    y = temp * sin(x * ang2rad);
 			    x = temp * cos(x * ang2rad);
@@ -1345,18 +1353,18 @@ eval_plots()
 	axis_revert_and_unlog_range(SECOND_X_AXIS);
     } else {
 	assert(uses_axis[FIRST_X_AXIS]);
-	if (axis_array[SECOND_X_AXIS].autoscale & 1)
+	if (axis_array[SECOND_X_AXIS].autoscale & AUTOSCALE_MIN)
 	    axis_array[SECOND_X_AXIS].min = axis_array[FIRST_X_AXIS].min;
-	if (axis_array[SECOND_X_AXIS].autoscale & 2)
+	if (axis_array[SECOND_X_AXIS].autoscale & AUTOSCALE_MAX)
 	    axis_array[SECOND_X_AXIS].max = axis_array[FIRST_X_AXIS].max;
 	if (! axis_array[SECOND_X_AXIS].autoscale)
 	    axis_revert_and_unlog_range(SECOND_X_AXIS);
     }
-    if (!uses_axis[FIRST_X_AXIS]) {
+    if (! uses_axis[FIRST_X_AXIS]) {
 	assert(uses_axis[SECOND_X_AXIS]);
-	if (axis_array[FIRST_X_AXIS].autoscale & 1)
+	if (axis_array[FIRST_X_AXIS].autoscale & AUTOSCALE_MIN)
 	    axis_array[FIRST_X_AXIS].min = axis_array[SECOND_X_AXIS].min;
-	if (axis_array[FIRST_X_AXIS].autoscale & 2)
+	if (axis_array[FIRST_X_AXIS].autoscale & AUTOSCALE_MAX)
 	    axis_array[FIRST_X_AXIS].max = axis_array[SECOND_X_AXIS].max;
     }
 
@@ -1371,20 +1379,20 @@ eval_plots()
     } else {
         /* else we want to copy y2 range */
         assert(uses_axis[FIRST_Y_AXIS]);
-	if (axis_array[SECOND_Y_AXIS].autoscale & 1)
+	if (axis_array[SECOND_Y_AXIS].autoscale & AUTOSCALE_MIN)
 	    axis_array[SECOND_Y_AXIS].min = axis_array[FIRST_Y_AXIS].min;
-	if (axis_array[SECOND_Y_AXIS].autoscale & 2)
+	if (axis_array[SECOND_Y_AXIS].autoscale & AUTOSCALE_MAX)
 	    axis_array[SECOND_Y_AXIS].max = axis_array[FIRST_Y_AXIS].max;
 	/* Log() fixup is only necessary if the range was *not* copied from
 	 * the (already logarithmized) yrange */
 	if (! axis_array[SECOND_Y_AXIS].autoscale)
 	    axis_revert_and_unlog_range(SECOND_Y_AXIS);
     }
-    if (!uses_axis[FIRST_Y_AXIS]) {
+    if (! uses_axis[FIRST_Y_AXIS]) {
 	assert(uses_axis[SECOND_Y_AXIS]);
-	if (axis_array[FIRST_Y_AXIS].autoscale & 1)
+	if (axis_array[FIRST_Y_AXIS].autoscale & AUTOSCALE_MIN)
 	    axis_array[FIRST_Y_AXIS].min = axis_array[SECOND_Y_AXIS].min;
-	if (axis_array[FIRST_Y_AXIS].autoscale & 2)
+	if (axis_array[FIRST_Y_AXIS].autoscale & AUTOSCALE_MAX)
 	    axis_array[FIRST_Y_AXIS].max = axis_array[SECOND_Y_AXIS].max;
     }
 
@@ -1495,9 +1503,9 @@ int *plot_num;
 		    double r = yp->points[i].y;
 		    double t = xp->points[i].y * ang2rad;
 		    double x, y;
-		    if (!(axis_array[R_AXIS].autoscale & 2) && r > axis_array[R_AXIS].max)
+		    if (!(axis_array[R_AXIS].autoscale & AUTOSCALE_MAX) && r > axis_array[R_AXIS].max)
 			yp->points[i].type = OUTRANGE;
-		    if (!(axis_array[R_AXIS].autoscale & 1)) {
+		    if (!(axis_array[R_AXIS].autoscale & AUTOSCALE_MIN)) {
 			/* store internally as if plotting r(t)-rmin */
 			r -= axis_array[R_AXIS].min;
 		    }

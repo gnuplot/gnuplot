@@ -1,5 +1,5 @@
 /* 
- * $Id: axis.h,v 1.5 2001/01/16 20:56:09 broeker Exp $
+ * $Id: axis.h,v 1.6 2001/03/19 14:52:23 mikulik Exp $
  *
  */
 
@@ -46,9 +46,6 @@
 
 /* typedefs / #defines */
 
-/* double true, used in autoscale: 1=autoscale ?min, 2=autoscale ?max */
-#define DTRUE 3
-
 /* give some names to some array elements used in command.c and grap*.c
  * maybe one day the relevant items in setshow will also be stored
  * in arrays. 
@@ -73,14 +70,14 @@ typedef enum AXIS_INDEX {
 #ifdef PM3D
     COLOR_AXIS
 #endif
+} AXIS_INDEX;
 
 #ifdef PM3D
- #define AXIS_ARRAY_SIZE 11
+# define AXIS_ARRAY_SIZE 11
 #else
-#define AXIS_ARRAY_SIZE 10
+# define AXIS_ARRAY_SIZE 10
 #endif
 
-} AXIS_INDEX;
 
 /* What kind of ticmarking is wanted? */
 typedef enum en_ticseries_type {
@@ -164,17 +161,25 @@ typedef void (*tic_callback) __PROTO((AXIS_INDEX, double, char *, struct lp_styl
 #define GRID_CB     (1<<10)
 #define GRID_MCB    (1<<11)
 
+/* HBB 20010610: new type for storing autoscale activity. Effectively
+ * two booleans (bits) in a single variable, so I'm using an enum with
+ * all 4 possible bit masks given readable names. */
+typedef enum e_autoscale {
+    AUTOSCALE_NONE = 0,
+    AUTOSCALE_MIN,
+    AUTOSCALE_MAX,
+    AUTOSCALE_BOTH
+} t_autoscale;
+
+
 /* HBB 20000725: gather all per-axis variables into a struct, and set up
  * a single large array of such structs */
-/* FIXME 20000725: autoscale and set_autoscale may need their own
- * typedef, as they're neither really ints, nor TBOOLEAN, but some
- * kind of 'TWOBITS' instead */
 /* FIXME 20000725: collect some of those various TBOOLEAN fields into
  * a larger int (or -- shudder -- a bitfield?) */
 typedef struct axis {
 /* range of this axis */
-    int autoscale;		/* Which end(s) are autoscaled? */
-    int set_autoscale;		/* what does 'set' think autoscale to be? */
+    t_autoscale autoscale;	/* Which end(s) are autoscaled? */
+    t_autoscale set_autoscale;	/* what does 'set' think autoscale to be? */
     int range_flags;		/* flag bits about autoscale/writeback: */
     /* write auto-ed ranges back to variables for autoscale */
 #define RANGE_WRITEBACK 1	
@@ -224,19 +229,20 @@ typedef struct axis {
 #else
 # define DEFAULT_AXIS_ZEROAXIS {0, -3, 0, 1.0, 1.0}
 #endif
-#define DEFAULT_AXIS_STRUCT {       					     \
-    DTRUE, DTRUE, 0, FALSE,	/* auto, set_auto, range_flags, rev_range */ \
-	-10.0, 10.0,		/* 3 pairs of min/max */		     \
-	-10.0, 10.0,							     \
-	-10.0, 10.0,							     \
-	0, 0, 0, 0,		/* terminal dependents */		     \
-	FALSE, 0.0, 0.0,	/* log, base, log(base) */		     \
-	0, 1,			/* is_timedata, format_numeric */	     \
-	DEF_FORMAT, TIMEFMT,	/* output format, timefmt */		     \
-	NO_TICS,		/* tic output positions (border, mirror) */  \
-	DEFAULT_AXIS_TICDEF,	/* tic series definition */		     \
-	FALSE, MINI_DEFAULT, 10, /* tic_rotate, minitics, mtic_freq */	     \
-	EMPTY_LABELSTRUCT,	/* axis label */			     \
+#define DEFAULT_AXIS_STRUCT {						    \
+	AUTOSCALE_BOTH, AUTOSCALE_BOTH, /* auto, set_auto */		    \
+	0, FALSE,		/* range_flags, rev_range */		    \
+	-10.0, 10.0,		/* 3 pairs of min/max */		    \
+	-10.0, 10.0,							    \
+	-10.0, 10.0,							    \
+	0, 0, 0, 0,		/* terminal dependents */		    \
+	FALSE, 0.0, 0.0,	/* log, base, log(base) */		    \
+	0, 1,			/* is_timedata, format_numeric */	    \
+	DEF_FORMAT, TIMEFMT,	/* output format, timefmt */		    \
+	NO_TICS,		/* tic output positions (border, mirror) */ \
+	DEFAULT_AXIS_TICDEF,	/* tic series definition */		    \
+	FALSE, MINI_DEFAULT, 10, /* tic_rotate, minitics, mtic_freq */	    \
+	EMPTY_LABELSTRUCT,	/* axis label */			    \
 	DEFAULT_AXIS_ZEROAXIS}	/* zeroaxis line style */
 
 /* Table of default behaviours --- a subset of the struct above. Only
@@ -326,9 +332,9 @@ extern AXIS_INDEX x_axis, y_axis, z_axis;
 #define AXIS_WRITEBACK(axis)					\
 do {								\
     if (axis_array[axis].range_flags & RANGE_WRITEBACK) {	\
-	if (axis_array[axis].autoscale & 1)			\
+	if (axis_array[axis].autoscale & AUTOSCALE_MIN)		\
 	    axis_array[axis].set_min = axis_array[axis].min;	\
-	if (axis_array[axis].autoscale & 2)			\
+	if (axis_array[axis].autoscale & AUTOSCALE_MAX)		\
 	    axis_array[axis].set_max = axis_array[axis].max;	\
     }								\
 } while(0)
@@ -349,40 +355,40 @@ do {								\
  * versions is: dont know we have to support ranges [10:-10] - lets
  * reverse it for now, then fix it at the end.  */
 /* FIXME HBB 20000426: unknown if this distinction makes any sense... */
-#define AXIS_INIT3D(axis, islog_override, infinite)		\
-do {								\
-    AXIS *this = axis_array + axis;				\
-								\
-    if ((this->autoscale = this->set_autoscale) == 0		\
-	&& this->set_max < this->set_min) {			\
-	this->min = this->set_max;				\
-	this->max = this->set_min;				\
-        /* we will fix later */					\
-    } else {							\
-	this->min = (infinite && (this->set_autoscale & 1))	\
-	    ? VERYLARGE : this->set_min;			\
-	this->max = (infinite && (this->set_autoscale & 2))	\
-	    ? -VERYLARGE : this->set_max;			\
-    }								\
-    if (islog_override) {					\
-	this->log = 0;						\
-	this->base = 1;						\
-	this->log_base = 0;					\
-    } else {							\
-	this->log_base = this->log ? log(this->base) : 0;	\
-    }								\
+#define AXIS_INIT3D(axis, islog_override, infinite)			\
+do {									\
+    AXIS *this = axis_array + axis;					\
+									\
+    if ((this->autoscale = this->set_autoscale) == AUTOSCALE_NONE	\
+	&& this->set_max < this->set_min) {				\
+	this->min = this->set_max;					\
+	this->max = this->set_min;					\
+        /* we will fix later */						\
+    } else {								\
+	this->min = (infinite && (this->set_autoscale & AUTOSCALE_MIN))	\
+	    ? VERYLARGE : this->set_min;				\
+	this->max = (infinite && (this->set_autoscale & AUTOSCALE_MAX))	\
+	    ? -VERYLARGE : this->set_max;				\
+    }									\
+    if (islog_override) {						\
+	this->log = 0;							\
+	this->base = 1;							\
+	this->log_base = 0;						\
+    } else {								\
+	this->log_base = this->log ? log(this->base) : 0;		\
+    }									\
 } while(0)
 
-#define AXIS_INIT2D(axis, infinite)			\
-do {							\
-    AXIS *this = axis_array + axis;			\
-							\
-    this->autoscale = this->set_autoscale;		\
-    this->min = (infinite && (this->set_autoscale&1))	\
-	? VERYLARGE : this->set_min;			\
-    this->max = (infinite && (this->set_autoscale&2))	\
-	? -VERYLARGE : this->set_max;			\
-    this->log_base = this->log ? log(this->base) : 0;	\
+#define AXIS_INIT2D(axis, infinite)					\
+do {									\
+    AXIS *this = axis_array + axis;					\
+									\
+    this->autoscale = this->set_autoscale;				\
+    this->min = (infinite && (this->set_autoscale & AUTOSCALE_MIN))	\
+	? VERYLARGE : this->set_min;					\
+    this->max = (infinite && (this->set_autoscale & AUTOSCALE_MAX))	\
+	? -VERYLARGE : this->set_max;					\
+    this->log_base = this->log ? log(this->base) : 0;			\
 } while(0)
 
 /* handle reversed ranges */
@@ -390,7 +396,9 @@ do {							\
 do {									\
     AXIS *this = axis_array + axis;					\
 									\
-    if ((this->autoscale == 0) && (this->max < this->min)) {		\
+    if ((this->autoscale == AUTOSCALE_NONE)				\
+	&& (this->max < this->min)					\
+	) {								\
 	double temp = this->min;					\
 	this->min = this->max;						\
 	this->max = temp;						\
@@ -514,7 +522,7 @@ do {									  \
     if ((int)AXIS < 0)							  \
 	break;	/* HBB 20000507: don't check range if not a coordinate */ \
     if ( VALUE<axis_array[AXIS].min ) {					  \
-	if (axis_array[AXIS].autoscale & 1)				  \
+	if (axis_array[AXIS].autoscale & AUTOSCALE_MIN)			  \
 	    axis_array[AXIS].min = VALUE;				  \
 	else {								  \
 	    TYPE = OUTRANGE;						  \
@@ -523,7 +531,7 @@ do {									  \
 	}								  \
     }									  \
     if ( VALUE>axis_array[AXIS].max ) {					  \
-	if (axis_array[AXIS].autoscale & 2)				  \
+	if (axis_array[AXIS].autoscale & AUTOSCALE_MAX)			  \
 	    axis_array[AXIS].max = VALUE;				  \
 	else {								  \
 	    TYPE = OUTRANGE;						  \
@@ -548,11 +556,13 @@ do {						\
 /* HBB 20000506: new macro to automatically build intializer lists
  * for arrays of AXIS_ARRAY_SIZE equal elements */
 #ifdef PM3D
-#define AXIS_ARRAY_INITIALIZER(value) 				\
-	{ value, value, value, value, value, value, value, value, value, value, value }
+#define AXIS_ARRAY_INITIALIZER(value) {			\
+    value, value, value, value, value,			\
+	value, value, value, value, value, value }
 #else
-#define AXIS_ARRAY_INITIALIZER(value) 					 \
-{ value, value, value, value, value, value, value, value, value, value }
+#define AXIS_ARRAY_INITIALIZER(value) {		\
+    value, value, value, value, value,		\
+	value, value, value, value, value }
 #endif
 
 

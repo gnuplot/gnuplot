@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.25 2001/02/01 17:56:04 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.26 2001/02/07 18:14:36 broeker Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -1290,9 +1290,9 @@ fit_command()
 	else {
 	    /* 2D fit, 2 ranges: second range is for *z*, not y: */
 	    Z_AXIS.autoscale = Y_AXIS.autoscale;
-	    if (!(Y_AXIS.autoscale & 1))
+	    if (!(Y_AXIS.autoscale & AUTOSCALE_MIN))
 		Z_AXIS.min = Y_AXIS.min;
-	    if (!(Y_AXIS.autoscale & 2))
+	    if (!(Y_AXIS.autoscale & AUTOSCALE_MAX))
 		Z_AXIS.max = Y_AXIS.max;
 	}
     }
@@ -1409,25 +1409,25 @@ fit_command()
 	}
 
 	/* skip this point if it is out of range */
-	if (!(X_AXIS.autoscale & 1)
+	if (!(X_AXIS.autoscale & AUTOSCALE_MIN)
 	    && (v[0] < X_AXIS.min))
 	    continue;
-	if (!(X_AXIS.autoscale & 2)
+	if (!(X_AXIS.autoscale & AUTOSCALE_MAX)
 	    && (v[0] > X_AXIS.max))
 	    continue;
 	if (is_a_3d_fit) {
-	    if (!(Y_AXIS.autoscale & 1)
+	    if (!(Y_AXIS.autoscale & AUTOSCALE_MIN)
 		&& (v[1] < Y_AXIS.min))
 		continue;
-	    if (!(Y_AXIS.autoscale & 2)
+	    if (!(Y_AXIS.autoscale & AUTOSCALE_MAX)
 		&& (v[1] > Y_AXIS.max))
 		continue;
 	}
 	/* HBB 980401: check *z* range for all fits */
-	if (!(Z_AXIS.autoscale & 1)
+	if (!(Z_AXIS.autoscale & AUTOSCALE_MIN)
 	    && (v[2] < Z_AXIS.min))
 	    continue;
-	if (!(Z_AXIS.autoscale & 2)
+	if (!(Z_AXIS.autoscale & AUTOSCALE_MAX)
 	    && (v[2] > Z_AXIS.max))
 	    continue;
 

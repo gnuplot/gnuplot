@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.22 2001/03/19 14:52:23 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.23 2001/03/27 09:15:17 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -902,13 +902,13 @@ AXIS_INDEX axis;
 
     i = axis;
     fprintf(fp, "set %srange [ ", axis_defaults[axis].name);
-    if (axis_array[axis].set_autoscale & 1) {
+    if (axis_array[axis].set_autoscale & AUTOSCALE_MIN) {
 	putc('*', fp);
     } else {
 	SAVE_NUM_OR_TIME(fp, axis_array[axis].set_min, axis);
     }
     fputs(" : ", fp);
-    if (axis_array[axis].set_autoscale & 2) {
+    if (axis_array[axis].set_autoscale & AUTOSCALE_MAX) {
 	putc('*', fp);
     } else {
 	SAVE_NUM_OR_TIME(fp, axis_array[axis].set_max, axis);
@@ -921,11 +921,11 @@ AXIS_INDEX axis;
     if (axis_array[axis].set_autoscale) {
 	/* add current (hidden) range as comments */
 	fputs("  # (currently [", fp);
-	if (axis_array[axis].set_autoscale & 1) {
+	if (axis_array[axis].set_autoscale & AUTOSCALE_MIN) {
 	    SAVE_NUM_OR_TIME(fp, axis_array[axis].set_min, axis);
 	}
 	putc(':', fp);
-	if (axis_array[axis].set_autoscale & 2) {
+	if (axis_array[axis].set_autoscale & AUTOSCALE_MAX) {
 	    SAVE_NUM_OR_TIME(fp, axis_array[axis].set_max, axis);
 	}
 	fputs("] )", fp);

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: interpol.c,v 1.18 2000/11/01 18:57:33 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: interpol.c,v 1.19 2001/01/16 20:56:09 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - interpol.c */
@@ -143,21 +143,36 @@ static char *RCSid() { return RCSid("$Id: interpol.c,v 1.18 2000/11/01 18:57:33 
  */
 
 
-/* store VALUE or log(VALUE) in STORE, set TYPE as appropriate
- * Do OUT_ACTION or UNDEF_ACTION as appropriate
- * adjust range provided type is INRANGE (ie dont adjust y if x is outrange
- * VALUE must not be same as STORE
- */
-
-#define STORE_AND_FIXUP_RANGE(STORE, VALUE, TYPE, MIN, MAX, AUTO, OUT_ACTION, UNDEF_ACTION)\
-do { STORE=VALUE; \
-    if (TYPE != INRANGE) break;  /* dont set y range if x is outrange, for example */ \
-    if ( VALUE<MIN ) { \
-       if (AUTO & 1) MIN=VALUE; else { TYPE=OUTRANGE; OUT_ACTION; break; }  \
-    } \
-    if ( VALUE>MAX ) {\
-       if (AUTO & 2) MAX=VALUE; else { TYPE=OUTRANGE; OUT_ACTION; }   \
-    } \
+/* store VALUE or log(VALUE) in STORE, set TYPE as appropriate Do
+ * OUT_ACTION or UNDEF_ACTION as appropriate. Adjust range provided
+ * type is INRANGE (ie dont adjust y if x is outrange). VALUE must not
+ * be same as STORE */
+/* FIXME 20010610: UNDEF_ACTION is completely unused ??? Furthermore,
+ * this is so similar to STORE_WITH_LOG_AND_UPDATE_RANGE() from axis.h
+ * that the two should probably be merged.  */
+#define STORE_AND_FIXUP_RANGE(store, value, type, min, max, auto,	\
+			      out_action, undef_action)			\
+do {									\
+    store=value;							\
+    if (type != INRANGE)						\
+	break;  /* don't set y range if x is outrange, for example */	\
+    if ((value) < (min)) {						\
+       if ((auto) & AUTOSCALE_MIN)					\
+	   (min) = (value);						\
+       else {								\
+	   (type) = OUTRANGE;						\
+	   out_action;							\
+	   break;							\
+       }								\
+    }									\
+    if ((value) > (max)) {						\
+       if ((auto) & AUTOSCALE_MAX)					\
+	   (max) = (value);						\
+       else {								\
+	   (type) = OUTRANGE;						\
+	   out_action;							\
+       }								\
+    }									\
 } while(0)
 
 #define UPDATE_RANGE(TEST,OLD,NEW,AXIS)		\
@@ -944,13 +959,13 @@ struct curve_points *cp;
 		cp->points[j].type = INRANGE;
 		if (! all_inrange) {
 		    x = AXIS_DE_LOG_VALUE(x_axis, x);
-		    if (((x < X_AXIS.min) && !(X_AXIS.autoscale & 1))
-			|| ((x > X_AXIS.max) && !(X_AXIS.autoscale & 2)))
+		    if (((x < X_AXIS.min) && !(X_AXIS.autoscale & AUTOSCALE_MIN))
+			|| ((x > X_AXIS.max) && !(X_AXIS.autoscale & AUTOSCALE_MAX)))
 			cp->points[j].type = OUTRANGE;
 		    else {
 			y = AXIS_DE_LOG_VALUE(y_axis, y);
-			if (((y < Y_AXIS.min) && !(Y_AXIS.autoscale & 1))
-			    || ((y > Y_AXIS.max) && !(Y_AXIS.autoscale & 2)))
+			if (((y < Y_AXIS.min) && !(Y_AXIS.autoscale & AUTOSCALE_MIN))
+			    || ((y > Y_AXIS.max) && !(Y_AXIS.autoscale & AUTOSCALE_MAX)))
 			    cp->points[j].type = OUTRANGE;
 		    }
 		}
@@ -969,13 +984,13 @@ struct curve_points *cp;
 	    cp->points[j].type = INRANGE;
 	    if (! all_inrange) {
 		x = AXIS_DE_LOG_VALUE(x_axis, x);
-		if (((x < X_AXIS.min) && !(X_AXIS.autoscale & 1))
-		    || ((x > X_AXIS.max) && !(X_AXIS.autoscale & 2)))
+		if (((x < X_AXIS.min) && !(X_AXIS.autoscale & AUTOSCALE_MIN))
+		    || ((x > X_AXIS.max) && !(X_AXIS.autoscale & AUTOSCALE_MAX)))
 		    cp->points[j].type = OUTRANGE;
 		else {
 		    x = AXIS_DE_LOG_VALUE(y_axis, y);
-		    if (((y < Y_AXIS.min) && !(Y_AXIS.autoscale & 1))
-			|| ((y > Y_AXIS.max) && !(Y_AXIS.autoscale & 2)))
+		    if (((y < Y_AXIS.min) && !(Y_AXIS.autoscale & AUTOSCALE_MIN))
+			|| ((y > Y_AXIS.max) && !(Y_AXIS.autoscale & AUTOSCALE_MAX)))
 			cp->points[j].type = OUTRANGE;
 		}
 	    }

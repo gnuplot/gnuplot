@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.17 2001/02/28 16:41:09 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.18 2001/03/19 14:52:24 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -560,14 +560,14 @@ unset_autoscale()
 	INIT_AXIS_ARRAY(set_autoscale, FALSE);
     } else if (equals(c_token, "xy") || equals(c_token, "tyx")) {
 	axis_array[FIRST_X_AXIS].set_autoscale
-	    = axis_array[FIRST_Y_AXIS].set_autoscale = FALSE;
+	    = axis_array[FIRST_Y_AXIS].set_autoscale = AUTOSCALE_NONE;
 	c_token++;
     } else {
 	/* HBB 20000506: parse axis name, and unset the right element
 	 * of the array: */
 	int axis = lookup_table(axisname_tbl, c_token);
 	if (axis >= 0) {
-	    axis_array[axis].set_autoscale = FALSE;
+	    axis_array[axis].set_autoscale = AUTOSCALE_NONE;
 	c_token++;
     }
 }
@@ -1347,7 +1347,7 @@ reset_command()
 	unset_range(axis);
 	unset_axislabel(axis);
 
-	axis_array[axis].set_autoscale = DTRUE;
+	axis_array[axis].set_autoscale = AUTOSCALE_BOTH;
 	axis_array[axis].writeback_min = axis_array[axis].set_min
 	    = axis_defaults[axis].min;
 	axis_array[axis].writeback_max = axis_array[axis].set_max

@@ -1,5 +1,27 @@
 2001-06-11  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
+	I went on a little crusade against magic numbers in the source
+ 	code:
+	
+	* src/axis.h (t_autoscale): Define and use new enum type for the
+ 	two-bit fields autoscale and set_autoscale in struct axis. This
+ 	affects tons of other places using these variables, too, so I
+ 	won't list them individually, here.
+
+	* src/gp_types.h (PLOT_STYLE_FLAGS): New enum to name flags stored
+ 	as part of the plot style numbers in enum PLOT_STYLE. Use these
+ 	names instead of magic numbers.
+
+	* src/plot2d.c (t_uses_asis): New enum to define names for the two
+	bits stored per axis uses_axis[]. 
+	(eval_plots): Use the new mnemonics instead of magic numbers.
+
+	* src/interpol.c (STORE_AND_FIXUP_RANGE): Macro arguments renamed
+ 	to lowercase, properly guarded by parentheses inside the
+ 	body. Body reindented for readability.
+
+2001-06-11  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
 	* term/tgif.trm: Changed type of TGIF_colurs to array of plain
  	char, from unsigned char.
 

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.24 2000/11/08 15:38:57 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.25 2000/12/05 18:00:18 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - hidden3d.c */
@@ -1005,7 +1005,7 @@ build_networks(plots, pcount)
 	below = this_plot->lp_properties.l_type + hiddenBacksideLinetypeOffset;
 
 	/* calculate the point symbol type: */
-	if (this_plot->plot_style & 2) {
+	if (this_plot->plot_style & PLOT_STYLE_HAS_POINT) {
 	    /* Plot style contains point symbols */
 	    /* FIXME: would be easier if the p_style field of
 	     * lp_properties were always filled with a usable value

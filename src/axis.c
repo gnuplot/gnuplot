@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.12 2001/04/11 14:40:18 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.13 2001/05/25 13:56:25 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -960,8 +960,8 @@ setup_tics(axis, max)
 
     struct ticdef *ticdef = &(axis_array[axis].ticdef);
 
-    int fixmin = (axis_array[axis].autoscale & 1) != 0;
-    int fixmax = (axis_array[axis].autoscale & 2) != 0;
+    TBOOLEAN fixmin = ! (axis_array[axis].autoscale & AUTOSCALE_MIN);
+    TBOOLEAN fixmax = ! (axis_array[axis].autoscale & AUTOSCALE_MAX);
 
     /* HBB 20000506: if no tics required for this axis, do
      * nothing. This used to be done exactly before each call of
@@ -976,7 +976,7 @@ setup_tics(axis, max)
     } else if (ticdef->type == TIC_COMPUTED) {
 	ticstep[axis] = tic = make_tics(axis, max);
     } else {
-	fixmin = fixmax = 0;	/* user-defined, day or month */
+	fixmin = fixmax = FALSE; /* user-defined, day or month */
     }
 
     if (fixmin) {
@@ -1043,7 +1043,7 @@ gen_tics(axis, grid, callback)
 	 * log scale, so I shan't worry about it !
 	 */
 	double polar_shift = (polar
-			      && !(axis_array[R_AXIS].autoscale & 1))
+			      && !(axis_array[R_AXIS].autoscale & AUTOSCALE_MIN))
 	    ? axis_array[R_AXIS].min : 0;
 
 	for (mark = def->def.user; mark; mark = mark->next) {
@@ -1284,10 +1284,14 @@ gen_tics(axis, grid, callback)
 			    /* if rmin is set, we stored internally with r-rmin */
 			    /* HBB 990327: reverted to 'pre-Igor' version... */
 #if 1				/* Igor's polar-grid patch */
-			    double r = fabs(user) + (axis_array[R_AXIS].autoscale & 1 ? 0 : axis_array[R_AXIS].min);
+			    double r = fabs(user) +
+				((axis_array[R_AXIS].autoscale & AUTOSCALE_MIN)
+				 ? 0 : axis_array[R_AXIS].min);
 #else
 			    /* Igor removed fabs to allow -ve labels */
-			    double r = user + (axis_array[R_AXIS].autoscale & 1 ? 0 : axis_array[R_AXIS].min);
+			    double r = user +
+				((axis_array[R_AXIS].autoscale & AUTOSCALE_MIN)
+				 ? 0 : axis_array[R_AXIS].min);
 #endif
 			    gprintf(label, sizeof(label), ticfmt[axis], log10_base, r);
 			} else {

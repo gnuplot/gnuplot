@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.14 2000/12/05 11:29:44 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.15 2001/03/19 14:52:23 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - pm3d.c */
@@ -60,7 +60,7 @@ pm3d_struct pm3d = {
 int
 set_pm3d_zminmax()
 {
-    if (CB_AXIS.set_autoscale & 0x1)
+    if (CB_AXIS.set_autoscale & AUTOSCALE_MIN)
 	CB_AXIS.min = axis_array[FIRST_Z_AXIS].min;
     else {
 	/* FIXME 20001031 from merge: this will call graph_error() on
@@ -70,7 +70,7 @@ set_pm3d_zminmax()
 				   CB_AXIS.set_min, 
 				   "pm3d z-min");
     }
-    if (CB_AXIS.set_autoscale & 0x2)
+    if (CB_AXIS.set_autoscale & AUTOSCALE_MAX)
 	CB_AXIS.max = axis_array[FIRST_Z_AXIS].max;
     else {
 	/* FIXME 20001031: see above */

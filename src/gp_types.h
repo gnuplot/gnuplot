@@ -1,5 +1,5 @@
 /*
- * $Id: gp_types.h,v 1.3 2000/11/01 18:57:28 broeker Exp $
+ * $Id: gp_types.h,v 1.4 2001/02/15 17:02:40 broeker Exp $
  */
 
 /* GNUPLOT - gp_types.h */
@@ -60,30 +60,38 @@ enum PLOT_TYPE {
  * This allows rapid decisions about the sample drawn into the key,
  * for example.
  */
+/* HBB 20010610: new enum, to make mnemonic names for these flags
+ * accessible everywhere */
+typedef enum e_PLOT_STYLE_FLAGS {
+    PLOT_STYLE_HAS_LINE      = (1<<0),
+    PLOT_STYLE_HAS_POINT     = (1<<1),
+    PLOT_STYLE_HAS_ERRORBAR  = (1<<2)
+} PLOT_STYLE_FLAGS;
+
 typedef enum PLOT_STYLE {
-	LINES        =  0*8 + 1,
-	POINTSTYLE   =  1*8 + 2,
-	IMPULSES     =  2*8 + 1,
-	LINESPOINTS  =  3*8 + 3,
-	DOTS         =  4*8 + 0,
-	XERRORBARS   =  5*8 + 6,
-	YERRORBARS   =  6*8 + 6,
-	XYERRORBARS  =  7*8 + 6,
-	BOXXYERROR   =  8*8 + 1,
-	BOXES        =  9*8 + 1,
-	BOXERROR     = 10*8 + 1,
-	STEPS        = 11*8 + 1,
-	FSTEPS       = 12*8 + 1,
-	HISTEPS      = 13*8 + 1,
-	VECTOR       = 14*8 + 1,
-	CANDLESTICKS = 15*8 + 4,
-	/* FIXME HBB 20010214: shouldn't fincancebars have 4 or 5?
-	 * They behave very much like errorbars, with the sole
-	 * exception of the key entry ... */
-	FINANCEBARS  = 16*8 + 1,
-	XERRORLINES  = 17*8 + 7,
-	YERRORLINES  = 18*8 + 7,
-	XYERRORLINES = 19*8 + 7
+    LINES        =  0*(1<<3) + PLOT_STYLE_HAS_LINE,
+    POINTSTYLE   =  1*(1<<3) + PLOT_STYLE_HAS_POINT,
+    IMPULSES     =  2*(1<<3) + PLOT_STYLE_HAS_LINE,
+    LINESPOINTS  =  3*(1<<3) + PLOT_STYLE_HAS_POINT | PLOT_STYLE_HAS_LINE,
+    DOTS         =  4*(1<<3) + 0,
+    XERRORBARS   =  5*(1<<3) + PLOT_STYLE_HAS_POINT | PLOT_STYLE_HAS_ERRORBAR,
+    YERRORBARS   =  6*(1<<3) + PLOT_STYLE_HAS_POINT | PLOT_STYLE_HAS_ERRORBAR,
+    XYERRORBARS  =  7*(1<<3) + PLOT_STYLE_HAS_POINT | PLOT_STYLE_HAS_ERRORBAR,
+    BOXXYERROR   =  8*(1<<3) + PLOT_STYLE_HAS_LINE,
+    BOXES        =  9*(1<<3) + PLOT_STYLE_HAS_LINE,
+    BOXERROR     = 10*(1<<3) + PLOT_STYLE_HAS_LINE,
+    STEPS        = 11*(1<<3) + PLOT_STYLE_HAS_LINE,
+    FSTEPS       = 12*(1<<3) + PLOT_STYLE_HAS_LINE,
+    HISTEPS      = 13*(1<<3) + PLOT_STYLE_HAS_LINE,
+    VECTOR       = 14*(1<<3) + PLOT_STYLE_HAS_LINE,
+    CANDLESTICKS = 15*(1<<3) + PLOT_STYLE_HAS_ERRORBAR,
+    /* FIXME HBB 20010214: shouldn't fincancebars have 4 or 5?
+     * They behave very much like errorbars, with the sole
+     * exception of the key entry ... */
+    FINANCEBARS  = 16*(1<<3) + PLOT_STYLE_HAS_LINE,
+    XERRORLINES  = 17*(1<<3) + PLOT_STYLE_HAS_LINE | PLOT_STYLE_HAS_POINT | PLOT_STYLE_HAS_ERRORBAR,
+    YERRORLINES  = 18*(1<<3) + PLOT_STYLE_HAS_LINE | PLOT_STYLE_HAS_POINT | PLOT_STYLE_HAS_ERRORBAR,
+    XYERRORLINES = 19*(1<<3) + PLOT_STYLE_HAS_LINE | PLOT_STYLE_HAS_POINT | PLOT_STYLE_HAS_ERRORBAR
 } PLOT_STYLE;
 
 typedef enum PLOT_SMOOTH { 

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.53 2001/04/03 16:14:46 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.54 2001/05/25 13:56:25 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -988,12 +988,12 @@ show_autoscale()
 {
     SHOW_ALL_NL;
 
-#define SHOW_AUTOSCALE(axis)					\
-    fprintf(stderr, "\t%s: %s%s%s, ",				\
-	    axis_defaults[axis].name,				\
-	    (axis_array[axis].set_autoscale) ? "ON" : "OFF",		\
-	    (axis_array[axis].set_autoscale == 1) ? " (min)" : "",	\
-	    (axis_array[axis].set_autoscale == 2) ? " (max)" : "");
+#define SHOW_AUTOSCALE(axis)							\
+    fprintf(stderr, "\t%s: %s%s%s, ",						\
+	    axis_defaults[axis].name,						\
+	    (axis_array[axis].set_autoscale) ? "ON" : "OFF",			\
+	    (axis_array[axis].set_autoscale == AUTOSCALE_MIN) ? " (min)" : "",	\
+	    (axis_array[axis].set_autoscale == AUTOSCALE_MAX) ? " (max)" : "");
 
     fputs("\tautoscaling is ", stderr);
     if (parametric) {
@@ -2082,13 +2082,13 @@ AXIS_INDEX axis;
     if (axis_array[axis].is_timedata)
 	fprintf(stderr, "\tset %sdata time\n", axis_defaults[axis].name);
     fprintf(stderr, "\tset %srange [", axis_defaults[axis].name);
-    if (axis_array[axis].set_autoscale & 1) {
+    if (axis_array[axis].set_autoscale & AUTOSCALE_MIN) {
 	fputc('*', stderr);
     } else {
 	SHOW_NUM_OR_TIME(axis_array[axis].set_min, axis);
     }
     fputs(" : ", stderr);
-    if (axis_array[axis].set_autoscale & 2) {
+    if (axis_array[axis].set_autoscale & AUTOSCALE_MAX) {
 	fputc('*', stderr);
     } else {
 	SHOW_NUM_OR_TIME(axis_array[axis].set_max, axis);
@@ -2100,11 +2100,11 @@ AXIS_INDEX axis;
     if (axis_array[axis].set_autoscale) {
 	/* add current (hidden) range as comments */
 	fputs("  # (currently [", stderr);
-	if (axis_array[axis].set_autoscale & 1) {
+	if (axis_array[axis].set_autoscale & AUTOSCALE_MIN) {
 	    SHOW_NUM_OR_TIME(axis_array[axis].set_min, axis);
 	}
 	putc(':', stderr);
-	if (axis_array[axis].set_autoscale & 2) {
+	if (axis_array[axis].set_autoscale & AUTOSCALE_MAX) {
 	    SHOW_NUM_OR_TIME(axis_array[axis].set_max, axis);
 	}
 	fputs("] )\n", stderr);

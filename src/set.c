@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.56 2001/03/27 12:23:01 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.57 2001/04/03 16:14:46 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -196,7 +196,7 @@ set_command()
 	else {
 	    enum PLOT_STYLE temp_style = get_style();
 	
-	    if (temp_style & 4)
+	    if (temp_style & PLOT_STYLE_HAS_ERRORBAR)
 		int_error(c_token, "style not usable for function plots, left unchanged");
 	    else
 		func_style = temp_style;
@@ -792,35 +792,35 @@ set_autoscale()
 
     c_token++;
     if (END_OF_COMMAND) {
-	INIT_AXIS_ARRAY(set_autoscale , DTRUE);
+	INIT_AXIS_ARRAY(set_autoscale , AUTOSCALE_BOTH);
 	return;
     } else if (equals(c_token, "xy") || equals(c_token, "yx")) {
 	axis_array[FIRST_X_AXIS].set_autoscale =
-	    axis_array[FIRST_Y_AXIS].set_autoscale =  DTRUE;
+	    axis_array[FIRST_Y_AXIS].set_autoscale =  AUTOSCALE_BOTH;
 	c_token++;
 	return;
     }
 
     /* save on replication with a macro */
-#define PROCESS_AUTO_LETTER(axis)				\
-    do {							\
+#define PROCESS_AUTO_LETTER(axis)					\
+    do {								\
 	if (equals(c_token, axis_defaults[axis].name)) {		\
-	    axis_array[axis].set_autoscale = DTRUE;			\
-	    ++c_token;						\
-	    return;						\
-	}							\
+	    axis_array[axis].set_autoscale = AUTOSCALE_BOTH;		\
+	    ++c_token;							\
+	    return;							\
+	}								\
 	sprintf(min_string, "%smi$n", axis_defaults[axis].name);	\
-	if (almost_equals(c_token, min_string)) {		\
-	    axis_array[axis].set_autoscale |= 1;			\
-	    ++c_token;						\
-	    return;						\
-	}							\
+	if (almost_equals(c_token, min_string)) {			\
+	    axis_array[axis].set_autoscale |= AUTOSCALE_MIN;		\
+	    ++c_token;							\
+	    return;							\
+	}								\
 	sprintf(max_string, "%sma$x", axis_defaults[axis].name);	\
-	if (almost_equals(c_token, max_string)) {		\
-	    axis_array[axis].set_autoscale |= 2;			\
-	    ++c_token;						\
-	    return;						\
-	}							\
+	if (almost_equals(c_token, max_string)) {			\
+	    axis_array[axis].set_autoscale |= AUTOSCALE_MAX;		\
+	    ++c_token;							\
+	    return;							\
+	}								\
     } while(0)
 
     PROCESS_AUTO_LETTER(R_AXIS);
@@ -2635,7 +2635,7 @@ set_style()
     else if (almost_equals(c_token, "f$unction")) {
 	enum PLOT_STYLE temp_style = get_style();
 
-	if (temp_style & 4)
+	if (temp_style & PLOT_STYLE_HAS_ERRORBAR)
 	    int_error(c_token, "style not usable for function plots, left unchanged");
 	else 
 	    func_style = temp_style;
@@ -2965,7 +2965,7 @@ set_range(axis)
 	c_token++;
 	axis_array[axis].set_min = get_writeback_min(axis);
 	axis_array[axis].set_max = get_writeback_max(axis);
-	axis_array[axis].set_autoscale = 0;
+	axis_array[axis].set_autoscale = AUTOSCALE_NONE;
     } else {
 	if (!equals(c_token,"["))
 	    int_error(c_token, "expecting '[' or 'restore'");

@@ -1,5 +1,5 @@
 /*
- * $Id: setshow.h,v 1.28 2000/11/01 18:57:33 broeker Exp $
+ * $Id: setshow.h,v 1.29 2001/02/28 16:41:09 broeker Exp $
  */
 
 /* GNUPLOT - setshow.h */
@@ -43,7 +43,7 @@
 #include "gadgets.h"
 #include "term_api.h"
 
-#define PROGRAM "G N U P L O T"
+#define PROGRAM "G N U P L O T"  /* FIXME: move to show.c! */
 
 /* activate backwards compatible syntax */
 #define BACKWARDS_COMPATIBLE
@@ -73,7 +73,6 @@ void show_command __PROTO((void));
 void show_version __PROTO((FILE *fp));
 char *conv_text __PROTO((const char *s));
 void delete_linestyle __PROTO((struct linestyle_def *, struct linestyle_def *));
-int set_label_tag __PROTO((void));
 void reset_key __PROTO((void));
 
 #endif /* GNUPLOT_SETSHOW_H */

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.46 2001/02/19 17:12:14 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.47 2001/04/03 16:14:46 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -1356,7 +1356,9 @@ do_plot(plots, pcount)
 		}
 
 		/* draw sample depending on bits set in plot_style */
-		if ((this_plot->plot_style & 1) || ((this_plot->plot_style & 4) && this_plot->plot_type == DATA)) {
+		if ((this_plot->plot_style & PLOT_STYLE_HAS_LINE)
+		    || ((this_plot->plot_style & PLOT_STYLE_HAS_ERRORBAR)
+			&& this_plot->plot_type == DATA)) {
 		    /* errors for data plots only */
 		    (*t->move) (xl + key_sample_left, yl);
 		    (*t->vector) (xl + key_sample_right, yl);
@@ -1368,7 +1370,7 @@ do_plot(plots, pcount)
 		 */
 
 		if ((this_plot->plot_type == DATA)
-		    && (this_plot->plot_style & 4)
+		    && (this_plot->plot_style & PLOT_STYLE_HAS_ERRORBAR)
 		    && (bar_size > 0.0)) {
 		    (*t->move) (xl + key_sample_left, yl + ERRORBARTIC);
 		    (*t->vector) (xl + key_sample_left, yl - ERRORBARTIC);
@@ -1508,7 +1510,7 @@ do_plot(plots, pcount)
 
 	if (localkey && this_plot->title) {
 	    /* we deferred point sample until now */
-	    if (this_plot->plot_style & 2)
+	    if (this_plot->plot_style & PLOT_STYLE_HAS_POINT)
 		(*t->point) (xl + key_point_offset, yl, this_plot->lp_properties.p_type);
 
 	    if (key_count >= key_rows) {
