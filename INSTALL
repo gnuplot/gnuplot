@@ -189,6 +189,12 @@ Unix, no configure
 VMS
 ---
 
+   John Hasstedt <John.Hasstedt@sunysb.edu> has written configure.vms,
+a command file that creates the necessary make and option files to build
+gnuplot.  See the file for instructions on using it.  If you have problems
+with it, the old build files are still included; instructions for using
+them follow.
+
    On VMS, you can use MMS, MMK, or another make utility, or you can
 use BUILDVMS.COM.  The supplied files work with Alpha/VMS V6.2 and
 DECC V5.7; you may get warnings or more serious errors depending on
