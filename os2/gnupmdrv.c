@@ -259,8 +259,9 @@ static HWND InitHelp( HAB hab, HWND hwnd )
     HWND hwndHelp ;
     /* should be bigger or dynamic */
     static char helppath[256] ;
-    if( user_homedir != NULL ) {
-        strcpy( helppath, user_homedir ) ;
+    char *p;
+    if( (p=getenv("GNUPLOT")) != NULL ) {
+	strcpy( helppath, p ) ;
         strcat( helppath, "/" ) ;
         strcat( helppath, helpinit.pszHelpLibraryName ) ;
         helpinit.pszHelpLibraryName = helppath ;

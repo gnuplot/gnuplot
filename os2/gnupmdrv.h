@@ -156,7 +156,4 @@ void WinSetDlgItemFloat( HWND, USHORT, float ) ;
 void WinSetDlgItemFloatF( HWND, USHORT, int, float ) ;
 void WinQueryDlgItemFloat( HWND, USHORT, float* ) ;
 
-/* extern declarations */
-/* plot.c */
-extern const char *user_homedir;
 
