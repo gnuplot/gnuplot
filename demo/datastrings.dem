@@ -61,10 +61,10 @@ plot 'table.dat' using ($0-0.2):2 title 2 with boxes, \
      ''          using ($0):5:xtic(1) title 5 with linespoints
 #
 pause -1 "<cr> to show double use of y values"
-plot 'table.dat' using 0:2 title 2 with boxes, \
-     ''          using 0:2:2 with labels center offset 0,1 notitle
 #
 set title "Plot actual y-value as a label"
+plot 'table.dat' using 0:2 title 2 with boxes, \
+     ''          using 0:2:2 with labels center offset 0,1 notitle
 #
 pause -1 "<cr> continue"
 #

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.132 2004/11/08 07:41:59 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.133 2004/11/09 00:26:41 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -235,7 +235,7 @@ find_maxl_keys(struct curve_points *plots, int count, int *kcnt)
     mlen = cnt = 0;
     this_plot = plots;
     for (curve = 0; curve < count; this_plot = this_plot->next, curve++) {
-	if (this_plot->title
+	if (this_plot->title && !this_plot->title_is_suppressed
 	    && ((len = /*assign */ strlen(this_plot->title)) != 0)	/* HBB 980308: quiet BCC warning */
 	    ) {
 	    cnt++;
@@ -1549,7 +1549,7 @@ do_plot(struct curve_points *plots, int pcount)
 	} else {
 	    ignore_enhanced_text = this_plot->title_no_enhanced == 1;
 		/* don't write filename or function enhanced */
-	    if (localkey && this_plot->title) {
+	    if (localkey && this_plot->title && !this_plot->title_is_suppressed) {
 		key_count++;
 		if (key->invert)
 		    yl = keybox.yb + yl_ref + key_entry_height/2 - yl;
@@ -1585,7 +1585,7 @@ do_plot(struct curve_points *plots, int pcount)
 	    plot_points(this_plot);
 	    break;
 	case DOTS:
-	    if (localkey && this_plot->title) {
+	    if (localkey && this_plot->title && !this_plot->title_is_suppressed) {
 		(*t->point) (xl + key_point_offset, yl, -1);
 	    }
 	    plot_dots(this_plot);
@@ -1654,7 +1654,7 @@ do_plot(struct curve_points *plots, int pcount)
 	}
 
 
-	if (localkey && this_plot->title) {
+	if (localkey && this_plot->title && !this_plot->title_is_suppressed) {
 	    /* we deferred point sample until now */
 	    if (this_plot->plot_style & PLOT_STYLE_HAS_POINT) {
 		if (this_plot->lp_properties.p_size < 0)

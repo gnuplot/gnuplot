@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.85 2004/10/19 04:25:57 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.86 2004/10/26 04:30:51 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -119,6 +119,7 @@ cp_alloc(int num)
 	cp->points = (struct coordinate GPHUGE *) NULL;
     cp->next = NULL;
     cp->title = NULL;
+    cp->title_is_suppressed = FALSE;
 #ifdef EAM_DATASTRINGS
     cp->labels = NULL;	/* Will be allocated later if plot_style == LABELPOINTS */
 #endif
@@ -1474,6 +1475,7 @@ eval_plots()
 			duplication=TRUE;
 			break;
 		    }
+		    this_plot->title_is_suppressed = TRUE;
 		    if (xtitle != NULL)
 			xtitle[0] = '\0';
 		    c_token++;

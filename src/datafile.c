@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.65 2004/11/01 00:06:46 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.66 2004/11/01 21:20:45 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -2539,6 +2539,8 @@ df_set_key_title(struct curve_points *plot)
 
     /* What if there was already a title specified? */
     if (plot->title && !plot->title_is_filename)
+	return;
+    if (plot->title_is_suppressed)
 	return;
     if (plot->title)
 	free(plot->title);
