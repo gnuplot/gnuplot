@@ -1,5 +1,5 @@
 %
-% $Id: titlepag.tex,v 1.14 2003/07/28 22:57:49 sfeam Exp $
+% $Id: titlepag.tex,v 1.15 2003/12/13 00:56:28 sfeam Exp $
 %
 
 \ifx\LaTeXe\undefined
@@ -78,8 +78,8 @@
 
 % Read the gnuplot version into macro \gnuplotVersion 
 \newread\fileGpVersion
-\openin\fileGpVersion ../VERSION
-\ifeof\fileGpVersion\openin\fileGpVersion ../VERSION.
+\openin\fileGpVersion VERSION
+\ifeof\fileGpVersion\openin\fileGpVersion VERSION.
 \ifeof\fileGpVersion\error FATAL: Cannot read file "VERSION"
 \fi\fi
 \read\fileGpVersion to \gpVersion
@@ -163,7 +163,7 @@
 \else {
   \catcode`\$=10 \let\$\relax
   \def\ignoredate#1Date: #2{#2}
-  Last edited: \ignoredate $Date: 2003/12/12 16:25:34 $
+  Last edited: \ignoredate $Date: 2003/12/13 00:56:28 $
   }
 \fi
 
