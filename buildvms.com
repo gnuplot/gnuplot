@@ -149,7 +149,6 @@ version.obj,util3d.obj,hidden3d.obj,time.obj'extralib''LINKOPT'
 $!
 $ cc 'CFLAGS' bf_test.c
 $ link /exe=bf_test bf_test,binary,alloc 'extralib''LINKOPT'
-$ ren bf_test.exe [.demo]
 $ if .NOT. its_decw  then goto do_docs 
 $!
 $ CC 'CFLAGS' GPLT_X11
@@ -170,7 +169,9 @@ $ doc2rnh [.docs]gnuplot.doc [.docs]gnuplot.rnh
 $ RUNOFF [.docs]gnuplot.rnh
 $ library/create/help sys$disk:[]gnuplot.hlb gnuplot.hlp
 $!
-$ run [.demo]bf_test
+$ set default [.demo]
+$ run [-]bf_test
+$ set default [-]
 $ if its_decw then -
   write sys$output "%define GNUPLOT_X11 :== $Disk:[directory]GNUPLOT_X11"
 $!

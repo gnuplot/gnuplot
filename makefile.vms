@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vms,v 1.4 1998/10/09 14:31:37 lhecking Exp $
+# $Id: makefile.vms,v 1.4.2.1 1999/08/25 16:16:10 lhecking Exp $
 #
 # GNUPLOT Makefile for VMS
 #
@@ -84,7 +84,7 @@ CSOURCE7 = [.term]post.trm [.term]qms.trm [.term]regis.trm [.term]sun.trm \
 	[.term]v384.trm [.term]x11.trm gplt_x11.c
 CSOURCE8 = contour.c specfun.c interpol.c vms.c
 
-all :   gnuplot.$(X) gnuplot_x11.$(X) gnuplot.hlp gnuplot.hlb
+all :   gnuplot.$(X) gnuplot_x11.$(X) gnuplot.hlp gnuplot.hlb [.demo]binary1.
 
 gnuplot.$(X) : $(OBJS) $(EXTRAOBJ)
 	link /exe=gnuplot.$(X) vms.$(O),gnuplot.opt/opt$(EXTRAOBJ)$(EXTRALIB)$(CRTL_SHARE)
@@ -94,6 +94,14 @@ gnuplot_x11.$(X) : gplt_x11.$(O) stdfn.$(O)
 
 gplt_x11.o : gplt_x11.c
 	$(CC) $(CFLAGS) $(X11FLAGS)
+
+[.demo]binary1. [.demo]binary2. [.demo]binary3. : bf_test.$(X)
+	set default [.demo]
+	run [-]bf_test.$(X)
+	set default [-]
+       
+bf_test.$(X) : bf_test.$(O) binary.$(O) alloc.$(O)
+	link /exe=bf_test.exe bf_test.$(O),binary.$(O),alloc.$(O)
 
 gnuplot.hlp : doc2hlp.$(X) [.docs]gnuplot.doc
 	define/user sys$input [.docs]gnuplot.doc
@@ -124,4 +132,5 @@ bitmap.$(O) term.$(O) : bitmap.h
 
 clean :
 	purge/log
-	del/log *.$(O);*
+	delete/log *.$(O);*
+	delete/log [.demo]binary1.;*,binary2.;*,binary3.;*
