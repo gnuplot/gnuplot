@@ -1,5 +1,5 @@
 /*
- * $Id: plot.h,v 1.7 1999/06/10 19:54:11 lhecking Exp $
+ * $Id: plot.h,v 1.8 1999/06/11 18:53:16 lhecking Exp $
  *
  */
 
@@ -762,7 +762,10 @@ struct ticmark {
 #endif
 
 /* Some key global variables */
-extern TBOOLEAN screen_ok;		/* from util.c */
+/* plot.c */
+extern TBOOLEAN interactive;
+extern TBOOLEAN noinputfiles;
+
 extern struct termentry *term;/* from term.c */
 extern TBOOLEAN undefined;		/* from internal.c */
 extern char *input_line;		/* from command.c */
@@ -776,6 +779,12 @@ extern struct udft_entry *first_udf;
 extern struct udvt_entry *first_udv;
 extern TBOOLEAN interactive;
 extern char *infile_name;
+extern FILE *gpoutfile;
+extern const char *user_homedir;
+extern const char *user_shell;
+#if defined(ATARI) || defined(MTOS)
+extern const char *user_gnuplotpath;
+#endif
 
 /* Windows needs to redefine stdin/stdout functions */
 #ifdef _Windows
@@ -823,16 +832,10 @@ extern char *infile_name;
 #endif
 
 #include "protos.h"
-/* nifty trick I stole from ELM 2.5alpha. */
-/* and I, in turn, stole it from mutt ...*/
-#ifdef MAIN_C
-# define WHERE 
-# define INITVAL(x) = x
-#else
-# define WHERE extern
-# define INITVAL(x) 
-# endif
+#include "command.h"
 #include "graphics.h"
+#include "util.h"
+#include "util3d.h"
 
 /* line/point parsing...
  *
