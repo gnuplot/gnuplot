@@ -3,6 +3,10 @@
 	* plot3d.c (get_3ddata) graphics.c (boundary) x11.trm:
 	Add #ifdefs so that ./configure --disable-pm3d will build successfully.
 
+	* term/fig.trm term/epslatex.trm term/pslatex.trm term/metapost.trm
+	term/tgif.trm term/pstricks.trm:  Disentangle the ordering of #ifdefs
+	in the TERM_TABLE entries (MOUSE is not a subset of PM3D).
+
 2004-09-15  Konstantin Korikov  <lostclus@ua.fm>
 
 	* NEWS docs/gnuplot.doc src/gplt_x11.c src/set.c src/term_api.h
