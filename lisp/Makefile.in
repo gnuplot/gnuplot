@@ -118,6 +118,9 @@ install:
 # empty uninstall target; could be filled later
 uninstall:
 
+# empty check target; could be filled later
+check:
+
 distdir = $(top_builddir)/$(PACKAGE)-$(VERSION)/$(subdir)
 
 subdir = lisp
