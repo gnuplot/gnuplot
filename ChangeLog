@@ -1,3 +1,8 @@
+2002-10-08  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/unset.c (unset_tics): Change condition that triggers freeing
+ 	of the list of user-defined tics to fix crash in surface1.dem.
+
 2002-10-08  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* configure.in, config/config.amg, src/stdfn.h: Change test for time_t
@@ -1227,7 +1232,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/10/05 15:18:57 $).
+	last modification date (from the tag $Date: 2002/10/08 17:53:52 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
