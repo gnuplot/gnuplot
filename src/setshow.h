@@ -249,6 +249,22 @@ void show_version __PROTO((FILE *fp));
 void show_version_long __PROTO((void));
 char * conv_text __PROTO((char *s, char *t));
 void lp_use_properties __PROTO((struct lp_style_type *lp, int tag, int pointflag ));
+char *access_loadpath __PROTO((char *));
 
 /* string representing missing values, ascii datafiles */
 extern char *missing_val;
+
+/* */
+#define SETSHOWMSG \
+"valid set options:  [] = choose one, {} means optional 'all',\n\n\
+\t'all',  'angles',  'arrow',  'autoscale',  'bar', 'border',\n\
+\t'boxwidth', 'clip', 'cntrparam', 'contour',  'data',  'dgrid3d',\n\
+\t'dummy', 'encoding', 'format', 'function',  'grid',  'hidden',\n\
+\t'isosamples', 'key', 'label', 'linestyle', 'loadpath', 'locale',\n\
+\t'logscale', 'mapping', 'margin', 'missing', 'offsets', 'origin',\n\
+\t'output', 'plot', 'parametric', 'pointsize', 'polar', '[rtuv]range',\n\
+\t'samples', 'size', 'terminal', 'tics', 'timestamp', 'timefmt', 'title',\n\
+\t'variables', 'version', 'view', '[xyz]{2}label', '[xyz]{2}range',\n\
+\t'{m}[xyz]{2}tics', '[xyz]{2}[md]tics', '[xyz]{2}zeroaxis',\n\
+\t'[xyz]data',   'zero', 'zeroaxis'"
+
