@@ -1177,6 +1177,9 @@ set_two()
 	    /* on int_error, we'd like to remember that this is allocated */
 	    static char *testfile = NULL;
 	    m_quote_capture(&testfile,c_token, c_token); /* reallocs store */
+	    /* Skip leading whitespace */
+	    while (isspace((int)*testfile))
+		testfile++;
 	    ++c_token;
 	    term_set_output(testfile);
 	    /* if we get here then it worked, and outstr now = testfile */
