@@ -1,3 +1,21 @@
+1999-01-13  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* 0INSTALL: Add compile instructions for Cygwin.
+
+	* 0README: Add Windows 95/98 to platform list.
+
+	* Makefile.in, makefile.all: Add makefile.cyg to ETC.
+
+	* term/ai.trm: Removed 3.6ism, noted by Andy Dougherty
+	<doughera@lafayette.edu>.
+
+	* term/grass.trm: Switched to new gnuplot copyright. Permission
+	granted by original author.
+
+1999-01-13  William D Kirby  <wdkirby@ix.netcom.com>
+
+	* makefile.cyg: New makefile for Cygwin environment.
+	
 1999-01-12  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* 0INSTALL: Update to 3.7.
