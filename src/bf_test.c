@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: bf_test.c,v 1.1 1999/03/26 21:47:25 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: bf_test.c,v 1.2 1999/06/10 19:59:18 lhecking Exp $"); }
 #endif
 
 
@@ -26,8 +26,7 @@ static char *RCSid() { return RCSid("$Id: bf_test.c,v 1.1 1999/03/26 21:47:25 lh
 #include "binary.h"
 #include "alloc.h"
 
-void int_error __PROTO((char *error_text, int dummy));
-void FreeHelp __PROTO((void));
+void int_error __PROTO((int dummy, const char *error_text));
 float function __PROTO((int p, double x, double y));
 
 
@@ -43,9 +42,9 @@ range TheRange[] = {{-3,3,-2,2},
 
 /*---- Stubs to make this work without including huge libraries ----*/
 void
-int_error(error_text, dummy)
-char *error_text;
+int_error(dummy, error_text)
 int dummy;
+const char *error_text;
 {
     fprintf(stderr, "Fatal error..\n%s\n...now exiting to system ...\n",
 	    error_text);
@@ -125,7 +124,7 @@ main()
 
 	sprintf(buf, "binary%d", plot + 1);
 	if (!(fout = fopen(buf, "wb")))
-	    int_error("Could not open file", 0);
+	    int_error(0, "Could not open file");
 	else {
 	    fwrite_matrix(fout, m, 0, xsize - 1, 0, ysize - 1, rt, ct);
 	}
@@ -154,7 +153,7 @@ main()
 
     sprintf(buf, "binary%d", plot + 1);
     if (!(fout = fopen(buf, "wb")))
-	int_error("Could not open file", 0);
+	int_error(0, "Could not open file");
     else {
 	fwrite_matrix(fout, m, 0, xsize - 1, 0, ysize - 1, rt, ct);
     }
