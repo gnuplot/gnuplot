@@ -39,7 +39,7 @@ static char *RCSid = "$Id: version.c,v 1.347 1998/06/22 12:24:56 ddenholm Exp $"
 char version[] = "3.5 (pre 3.6)";
 /* char version[] = "3.7"; */
 char patchlevel[] = "beta 349";
-char date[] = "Wed Dec 16 19:36:25 BST 1998"; 
+char date[] = "Tue Dec 22 19:41:30 BST 1998"; 
 char gnuplot_copyright[] = "Copyright(C) 1986 - 1993, 1998";
 
 char faq_location[] = FAQ_LOCATION;
