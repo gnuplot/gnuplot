@@ -1,3 +1,43 @@
+2003-10-06  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* configure.in (AC_PREREQ): Requirement raised to version 2.52 of
+ 	autoconf.
+	(HAVE_DECL_SIGNGAM): New test, searches for declaration of signgam
+ 	variable in <math.h>.
+
+	* src/specfun.c : General cleanup, adapting to gnuplot CodeStyle
+ 	conventions.  Changed function definitions to K&R style (keeping
+ 	ANSI prototypes).  Moved all prototypes to central place at head
+ 	of sourcefile.
+	(signgam): Only activate own extern declaration if system provides
+ 	none --- might cause conflicts on strange systems.  This needs the
+ 	new autoconf test for HAVE_DECL_SIGNGAM.
+	(ermsg): Message array marked const, moved into only routine using
+ 	it: mtherr().
+	(polevl, p1evl): Marked argument coef and local pointer p const.
+	(A, B, C, LS2PI, MAXLGM, LOGPI): Marked const; moved into the only
+ 	function using them: lngamma().
+	(f_erf, f_erfc): Sanitized handling of local variable fsign.
+	(f_erfc): Fix check for error-return from igamma().
+	(f_gamma): Replace magic number 88.0 by negative of macro MINEXP.
+	(pn1, pn2, pn3, pn4, pn5, pn6): Moved into single function using
+ 	them: igamma();
+	(igamma): Remove spurious check of argument against MINEXP ---
+ 	gp_exp() already does that, if necessary.  This should fix SF bug
+ 	#806455.
+	(Xm1, Xm2, Xa2, Xa2): Marked const; moved into only function using
+ 	them: ranf().
+	(P0, Q0, P1, Q1, P2, Q2): Marked const; moved into only function
+ 	using them: inverse_normal_func().
+	(UTHRESH, SQRTH, ndtr): Unused --- removed.
+	(P, Q, R, S): Marked const, moved into only function using them:
+ 	erfc().
+	(erfc): Only compile this if !defined(HAVE_ERFC).
+	(T, U): Marked const, moved into only function using them: erf().
+	(erf): Only compile this if !defined(HAVE_ERF).
+	(inverse_error_func): Marked local parameter arrays a, b, c, d
+ 	static and const.
+
 2003-09-12  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	Part II of portability glitches reported by Scott Marovich from HP
