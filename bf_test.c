@@ -46,7 +46,7 @@ int dummy;
 }
 
 
-void FreeHelp(void)
+void FreeHelp()
 {
 }
 /*---- End of stubs ----*/
