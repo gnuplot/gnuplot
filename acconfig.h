@@ -14,9 +14,6 @@
    Leave the following blank line there!!  Autoheader needs it.  */
 
 
-/* Define if compiler can handle ANSI prototypes.  */
-#undef ANSI_C
-
 /* Define if you want to use the Apollo Graphics Primitive Resource.  */
 #undef APOLLO
 
