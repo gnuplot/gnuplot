@@ -203,6 +203,11 @@ your system.
   To compile using MMS on Alpha:
      MMS/DESCRIPTION=MAKEFILE.VMS/MACRO=__ALPHA__=1
 
+  Alternatively, you can use MAKE_VMS.COM.  This command file will run
+MMK or MMS to build gnuplot.  If you don't have either one installed, it
+will use the command file.  The first parameter on the command line is
+the compiler you want to use (default DECC).
+
   It may sometimes be useful to add  `/IGNORE=WARNING' to the `MMS' call.
 
   To compile using GNUC or VAXC:
