@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: time.c,v 1.4 1999/06/10 19:53:17 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: time.c,v 1.5 1999/06/11 11:18:59 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - time.c */
@@ -122,7 +122,7 @@ int nr, *d;
 
 static int mndday[12] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
 
-static int xstrftime __PROTO((char *buf, int bufsz, char *fmt, struct tm * tm));
+static int xstrftime __PROTO((char *buf, size_t bufsz, const char *fmt, struct tm * tm));
 
 /* days in year */
 static int
@@ -335,8 +335,8 @@ struct tm *tm;
 int
 gstrftime(s, bsz, fmt, l_clock)
 char *s;
-int bsz;
-char *fmt;
+size_t bsz;
+const char *fmt;
 double l_clock;
 {
     struct tm tm;
@@ -375,11 +375,11 @@ double l_clock;
 static int
 xstrftime(str, bsz, fmt, tm)
 char *str;			/* output buffer */
-int bsz;			/* space available */
-char *fmt;
+size_t bsz;			/* space available */
+const char *fmt;
 struct tm *tm;
 {
-    int l = 0;			/* chars written so far */
+    size_t l = 0;			/* chars written so far */
 
     char *s = str;
 
