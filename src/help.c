@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: help.c,v 1.5 1999/06/11 11:18:55 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: help.c,v 1.6 1999/06/17 14:21:05 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - help.c */
@@ -142,7 +142,7 @@ static int keycomp __PROTO((struct key_s * a, struct key_s * b));
 static LINEBUF *storeline __PROTO((char *text));
 static LINKEY *storekey __PROTO((char *key));
 static KEY *FindHelp __PROTO((char *keyword));
-static TBOOLEAN Ambiguous __PROTO((struct key_s * key, int len));
+static TBOOLEAN Ambiguous __PROTO((struct key_s * key, size_t len));
 
 /* Help output */
 static void PrintHelp __PROTO((struct key_s * key, int *subtopics));
@@ -396,7 +396,7 @@ FindHelp(keyword)
 char *keyword;			/* string we look for */
 {
     KEY *key;
-    int len = strlen(keyword);
+    size_t len = strlen(keyword);
     int compare;
 
     for (key = keys, compare = 1; key->key != NULL && compare > 0; key++) {
@@ -421,7 +421,7 @@ char *keyword;			/* string we look for */
 static TBOOLEAN
 Ambiguous(key, len)
 KEY *key;
-int len;
+size_t len;
 {
     char *first;
     char *prev;
@@ -440,14 +440,14 @@ int len;
 	     * But is it different enough from the previous one
 	     * to bother printing it as a separate choice?
 	     */
-	    sublen = instring(prev + len, ' ');
+	    sublen = strcspn(prev + len, " ");
 	    if (strncmp(key->key, prev, len + sublen) != 0) {
 		/* yup, this is different up to the next space */
 		if (!status) {
 		    /* first one we have printed is special */
 		    fprintf(stderr,
 			    "Ambiguous request '%.*s'; possible matches:\n",
-			    len, first);
+			    (int)len, first);
 		    fprintf(stderr, "\t%s\n", prev);
 		    status = TRUE;
 		}
@@ -507,7 +507,7 @@ TBOOLEAN *subtopics;		/* (out) are there any subtopics */
 {
     int subt = 0;		/* printed any subtopics yet? */
     KEY *subkey;		/* subtopic key */
-    int len;			/* length of key name */
+    size_t len;			/* length of key name */
     char line[BUFSIZ];		/* subtopic output line */
     char *start;		/* position of subname in key name */
     int sublen;			/* length of subname */
@@ -534,7 +534,7 @@ TBOOLEAN *subtopics;		/* (out) are there any subtopics */
 		if (!subkey->primary)
 		    continue;	/* not a main topic */
 	    }
-	    sublen = instring(start, ' ');
+	    sublen = strcspn(start, " ");
 	    if (prev == NULL || strncmp(start, prev, sublen) != 0) {
 		if (subt == 0) {
 		    subt++;
@@ -563,10 +563,12 @@ TBOOLEAN *subtopics;		/* (out) are there any subtopics */
 	int ispacelen;
 	int subtopic;
 	int spacelen = 0;
-	int pos = FIRSTCOL;
+	int pos = 0;
 	for (subtopic = 0; subtopic < stopics; subtopic++) {
 	    start = starts[subtopic];
-	    sublen = instring(start, ' ');
+	    sublen = strcspn(start, " ");
+	    if (pos == 0)
+		spacelen = FIRSTCOL;
 	    /* adapted by DvdSchaaf */
 	    for (ispacelen = 0; ispacelen < spacelen; ispacelen++)
 		(void) strcat(line, " ");
@@ -579,7 +581,7 @@ TBOOLEAN *subtopics;		/* (out) are there any subtopics */
 		(void) strcat(line, "\n");
 		OutLine(line);
 		*line = NUL;
-		pos = FIRSTCOL;
+		pos = 0;
 	    }
 	}
 	/* put out the last line */
@@ -587,12 +589,6 @@ TBOOLEAN *subtopics;		/* (out) are there any subtopics */
 	    (void) strcat(line, "\n");
 	    OutLine(line);
 	}
-	/*
-	   if (subt == 0) {
-	   OutLine("\n");
-	   OutLine("No subtopics available\n");
-	   }
-	 */
     }
 #else /* COLUMN_HELP */
     {
@@ -603,7 +599,7 @@ TBOOLEAN *subtopics;		/* (out) are there any subtopics */
 	int row, col;
 	int rows = (int) (stopics / PER_LINE + 0.5);
 	for (row = 0; row < rows; row++) {
-	    line[0] = '\0';
+	    *line = NUL;
 	    for (ispacelen = 0; ispacelen < FIRSTCOL; ispacelen++)
 		(void) strcat(line, " ");
 	    for (col = 0; col < PER_LINE; col++) {
@@ -612,7 +608,7 @@ TBOOLEAN *subtopics;		/* (out) are there any subtopics */
 		    break;
 		} else {
 		    start = starts[subtopic];
-		    sublen = instring(start, ' ');
+		    sublen = strcspn(start, " ");
 		    (void) strncat(line, start, sublen);
 		    spacelen = COLLENGTH - sublen;
 		    for (ispacelen = 0; ispacelen < spacelen; ispacelen++)
