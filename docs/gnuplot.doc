@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.176 2003/06/25 12:47:51 lhecking Exp $
+C RCS $Id: gnuplot.doc,v 1.177 2003/06/30 18:51:14 sfeam Exp $
 C 18 September 2001
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001   Thomas Williams, Colin Kelley et al.
 C
@@ -970,6 +970,13 @@ C
 %column(x)@int@ column $x$ during datafile manipulation.
  `column(x)` may be used only in expressions as part of `using` manipulations
  to fits or datafile plots.  See `plot datafile using`.
+4 defined
+?expressions functions defined
+?functions defined
+#defined(X) & variable name & returns 1 if a variable X is defined, 0 otherwise. \\
+%defined(X)@variable name@ returns 1 if a variable X is defined, 0 otherwise.
+ `defined(X)` returns 1 if a variable named X has been defined, otherwise 
+ it returns 0.
 4 tm_hour
 ?expressions tm_hour
 ?functions tm_hour
@@ -5346,15 +5353,6 @@ C ... and restart the table:
  `unset multiplot` though,  the mouse will be turned on again and acts on the
  last plot (like replot does).
 
- X11 specific implementation details: Mouse support is turned on by default if
- standard input comes from a terminal (tty). Mouse support is turned off if
- standard input does not come from a tty, e.g. a pipe. If you want to use mouse
- support while writing to gnuplot from a pipe, the mouse must be turned on
- *before* starting the x11 driver, e.g. immediately after startup with the
- explicit command `set mouse`. Beware: on some UNIX flavours, special input
- devices as /dev/null might not be `select-able`; turning on the mouse when
- using such devices will hang gnuplot.
-
  Syntax:
        set mouse [doubleclick <ms>] [nodoubleclick] \
                  [[no]zoomcoordinates] \
@@ -5429,6 +5427,34 @@ C ... and restart the table:
  overridden with the `bind` command.
 
  See also `help bind` and `help label`.
+4 x11_mouse
+?x11_mouse
+?help x11_mouse
+?mouse x11_mouse
+ X11 mouse support is turned on by default if standard input comes from a 
+ terminal (tty). Mouse support is turned off if standard input does not 
+ come from a tty, e.g. a pipe. If you want to use mouse support while writing
+ to gnuplot from a pipe, the mouse must be turned on *before* starting the x11
+ driver, e.g. immediately after startup with the explicit command `set mouse`.
+ Beware: on some UNIX flavours, special input devices as /dev/null might not 
+ be `select-able`; turning on the mouse when using such devices will hang 
+ gnuplot.
+
+ If multiple X11 plot windows have been opened using the `set term x11 <n>`
+ terminal option, then only the current plot window supports the entire 
+ range of mouse commands and hotkeys.  The other windows will, however,
+ continue to display mouse coordinates at the lower left.
+4 mouse_variables
+?help mouse variables
+?help mouse mouse_variables
+?mouse variables
+ When mousing is active, clicking in the active window will, in addition to
+ the effects described above, set several user variables that can be 
+ accessed from the gnuplot command line. These are MOUSE_X MOUSE_Y MOUSE_X2
+ MOUSE_Y2 and MOUSE_BUTTON.  These variables are set to undefined at the
+ start of every plot, and only become defined in the event of a mouse click
+ in the active plot window. MOUSE_BUTTON tells which button was clicked
+ most recently; the others hold the mouse coordinates at that time.
 3 multiplot
 ?commands set multiplot
 ?commands unset multiplot

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.40 2003/07/02 22:11:41 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.41 2003/07/16 05:26:01 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -1544,6 +1544,41 @@ event_buttonrelease(struct gp_event_t *ge)
 
     MousePosToGraphPosReal(mouse_x, mouse_y, &real_x, &real_y, &real_x2, &real_y2);
     UpdateStatusline();
+
+    /* Export current mouse coords to user-accessible variables also
+     * FIXME EAM: Maybe don't export if axis ticmode == NO_TICS     */
+    {
+	struct udvt_entry *current;
+	if ((current = get_udv("MOUSE_BUTTON"))) {
+	    current->udv_undef = FALSE;
+	    current->udv_value.type = INTGR;
+	    current->udv_value.v.int_val = b;
+	}
+	if ((current = get_udv("MOUSE_X"))) {
+	    current->udv_undef = FALSE;
+	    current->udv_value.type = CMPLX;
+	    current->udv_value.v.cmplx_val.real = real_x;
+	    current->udv_value.v.cmplx_val.imag = 0;
+	}
+	if ((current = get_udv("MOUSE_Y"))) {
+	    current->udv_undef = FALSE;
+	    current->udv_value.type = CMPLX;
+	    current->udv_value.v.cmplx_val.real = real_y;
+	    current->udv_value.v.cmplx_val.imag = 0;
+	}
+	if ((current = get_udv("MOUSE_X2"))) {
+	    current->udv_undef = FALSE;
+	    current->udv_value.type = CMPLX;
+	    current->udv_value.v.cmplx_val.real = real_x2;
+	    current->udv_value.v.cmplx_val.imag = 0;
+	}
+	if ((current = get_udv("MOUSE_Y2"))) {
+	    current->udv_undef = FALSE;
+	    current->udv_value.type = CMPLX;
+	    current->udv_value.v.cmplx_val.real = real_y2;
+	    current->udv_value.v.cmplx_val.imag = 0;
+	}
+    }
 }
 
 static void

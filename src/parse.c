@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: parse.c,v 1.16 2001/08/22 14:15:34 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: parse.c,v 1.17 2003/07/22 17:22:47 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - parse.c */
@@ -696,4 +696,28 @@ is_builtin_function(t_num)		/* return standard function index or 0 */
 	    return (i);
     }
     return (0);
+}
+
+/* EAM July 2003 - get_udv() is like add_udv except that it does not require
+ * that the udv key be a token in the current command line. */
+struct udvt_entry *
+get_udv(key)		
+    char *key;
+{
+    register struct udvt_entry **udv_ptr = &first_udv;
+
+    /* check if it's already in the table... */
+
+    while (*udv_ptr) {
+	if (!strcmp(key, (*udv_ptr)->udv_name))
+	    return (*udv_ptr);
+	udv_ptr = &((*udv_ptr)->next_udv);
+    }
+
+    *udv_ptr = (struct udvt_entry *)
+	gp_alloc(sizeof(struct udvt_entry), "value");
+    (*udv_ptr)->next_udv = NULL;
+    (*udv_ptr)->udv_name = gp_strdup(key);
+    (*udv_ptr)->udv_undef = TRUE;
+    return (*udv_ptr);
 }

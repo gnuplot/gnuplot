@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.72 2003/07/07 11:40:28 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.73 2003/07/07 23:09:58 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -979,6 +979,11 @@ plot_command()
     SET_CURSOR_WAIT;
 #ifdef USE_MOUSE
     plot_mode(MODE_PLOT);
+    get_udv("MOUSE_X")->udv_undef = TRUE;
+    get_udv("MOUSE_Y")->udv_undef = TRUE;
+    get_udv("MOUSE_X2")->udv_undef = TRUE;
+    get_udv("MOUSE_Y2")->udv_undef = TRUE;
+    get_udv("MOUSE_BUTTON")->udv_undef = TRUE;
 #endif
     plotrequest();
     SET_CURSOR_ARROW;
@@ -1225,6 +1230,11 @@ splot_command()
     SET_CURSOR_WAIT;
 #ifdef USE_MOUSE
     plot_mode(MODE_SPLOT);
+    get_udv("MOUSE_X")->udv_undef = TRUE;
+    get_udv("MOUSE_Y")->udv_undef = TRUE;
+    get_udv("MOUSE_X2")->udv_undef = TRUE;
+    get_udv("MOUSE_Y2")->udv_undef = TRUE;
+    get_udv("MOUSE_BUTTON")->udv_undef = TRUE;
 #endif
     plot3drequest();
     SET_CURSOR_ARROW;

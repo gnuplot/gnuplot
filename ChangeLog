@@ -4,11 +4,11 @@
 	search for user-defined variables even if the key is not a token in
 	the current command line.
 
-	* src/mouse.c: When mousing is active, each mouse click in the current
-	plot window will update the current value of user-defined variables
-	MOUSE_BUTTON MOUSE_X MOUSE_Y MOUSE_X2 MOUSE_Y2. In combination with
-	Jaime Reed's patch below, this allows gnuplot scripts to test for the
-	presence and result of mouse input.
+	* src/mouse.c src/command.c: When mousing is active, each mouse click 
+	in the current plot window will update the current value of user-defined
+	variables MOUSE_BUTTON MOUSE_X MOUSE_Y MOUSE_X2 MOUSE_Y2. In combination
+	with Jaime Reed's patch below, this allows gnuplot scripts to test for
+	the presence and result of mouse input.
 
 	* src/gplt_x11.c term/x11.trm: Continue processing mouse activity for
 	all displayed X11 windows.  This is necessarily done in gnuplot_x11,
