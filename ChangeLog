@@ -1,3 +1,27 @@
+2003-01-28  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* INSTALL: Updated.
+
+	* Makefile.am: Tighter integration with gnuplot-mode.
+
+	* configure.in: Restore --with-gif=png option. Use pdflib-config if
+	available. Remove conditional building of lisp/ files. Move file copy
+	operation out of tutorial Makefile. Cosmetics.
+
+	* lisp/COPYING, lisp/INSTALL, lisp/Makefile.am: New files.
+
+	* lisp/configure.in: Updated for better integration with gnuplot as
+	well as comfortable building in standalone mode.
+
+	* lisp/gnuplot.el, lisp/gpelcard.tex: Updated to 0.6.0.
+
+	* src/win/pgnuplot.c: Add RCS id.
+
+	* term/gd.trm: Fix "missing initializer" compiler warning.
+
+	* tutorial/Makefile.am.in: Move file copy operation into top level
+	configure.
+
 2003-01-27  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* term/emf.trm (min, max): Renamed internal macros to gnuplot
@@ -32,6 +56,11 @@
 	(two_edge_intersect_steps, two_edge_intersect_fsteps): Replaced
  	explicit code by calls to macros "inrange" and "cliptorange".
   	Removed some superfluous pointer increments.
+
+2003-01-27  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* configure.in: Work around png/freetype detection problems with
+	cygwin.
 
 2003-01-27  Petr Mikulik  <mikulik@physics.muni.cz>
 
@@ -1830,7 +1859,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2003/01/27 09:30:27 $).
+	last modification date (from the tag $Date: 2003/01/27 20:40:10 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
