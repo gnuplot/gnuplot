@@ -1,3 +1,7 @@
+2004-07-04  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/term.c (test_term): Fix broken test of filled_polygon.
+
 2004-07-04  Hans-Bernhard Broeker  <broeker@accip02.physik.rwth-aachen.de>
 
 	* src/set.c (set_arrow): Fix parsing of 'rto' vs. 'to'.  Thanks to
@@ -32,7 +36,7 @@
 	that string data from a datafile column is to be used for tic labels,
 	or that string data from a datafile row is to be used for plot key
 	titles. E.g.:
-	    plot '-' using 0:2:xticlabels(1) title 1 with boxes
+	    plot '-' using 0:2:xticlabels(1) title 2 with boxes
 	    xxx  "2001"
 	    Jan	  123
 	    Feb	  456

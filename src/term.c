@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.76 2004/07/01 17:10:08 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.77 2004/07/02 23:58:40 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -385,9 +385,9 @@ term_set_output(char *dest)
 		term_close_output();
 	    }
 #endif
-            if (term && (term->flags & TERM_BINARY))
+	    if (term && (term->flags & TERM_BINARY))
 		f = FOPEN_BINARY(dest);
-            else
+	    else
 		f = fopen(dest, "w");
 
 	    if (f == (FILE *) NULL)
@@ -934,7 +934,7 @@ do_arrow(
 	    filledhead[3].y = ey + y2;
 	    filledhead[4].x = ex + xm;
 	    filledhead[4].y = ey + ym;
-	    filledhead->style = FS_DEFAULT;
+	    filledhead->style = FS_OPAQUE;
 	    (*t->filled_polygon) (5, filledhead);
 	}
 #endif
@@ -964,7 +964,7 @@ do_arrow(
 		filledhead[3].y = sy - y2;
 		filledhead[4].x = sx - xm;
 		filledhead[4].y = sy - ym;
-		filledhead->style = FS_DEFAULT;
+		filledhead->style = FS_OPAQUE;
 		(*t->filled_polygon) (5, filledhead);
 	    }
 #endif
@@ -1162,7 +1162,7 @@ list_terms()
     for (i = 0; i < TERMCOUNT; i++) {
 	sprintf(line_buffer, "  %15s  %s\n",
 		term_tbl[sort_idxs[i]].name,
-                term_tbl[sort_idxs[i]].description);
+	        term_tbl[sort_idxs[i]].description);
 	OutLine(line_buffer);
     }
 
@@ -1613,7 +1613,7 @@ test_term()
 		  (unsigned int) (ymax_t - ticscale * t->v_tic));
     (*t->move) ((unsigned int) (xmax_t / 2), (unsigned int) (ymax_t - t->v_tic * (1 + ticscale)));
     (*t->vector) ((unsigned int) (xmax_t / 2 + ticscale * t->h_tic),
-                  (unsigned int) (ymax_t - t->v_tic * (1 + ticscale)));
+	          (unsigned int) (ymax_t - t->v_tic * (1 + ticscale)));
     /* HBB 19990530: changed this to use right-justification, if possible... */
     str = "show ticscale";
     if ((*t->justify_text) (RIGHT))
@@ -1710,6 +1710,7 @@ test_term()
 	int cen_y = (int)(0.83 * ymax_t);
 	int radius = xmax_t / 20;
 
+	(*t->linetype)(2);
 	/* test pm3d -- filled_polygon(), but not set_color() */
 	if (t->filled_polygon) {
 #define NUMBER_OF_VERTICES 6
@@ -1724,6 +1725,7 @@ test_term()
 	    }
 	    corners[n].x = corners[0].x;
 	    corners[n].y = corners[0].y;
+	    corners->style = FS_OPAQUE;
 	    term->filled_polygon(n+1, corners);
 	    str = "(color) filled polygon:";
 	} else
