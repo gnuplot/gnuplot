@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.21 2002/01/26 21:44:51 joze Exp $"); }
+static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.22 2002/02/13 22:58:18 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - pm3d.c */
@@ -63,6 +63,10 @@ set_pm3d_zminmax()
     if (CB_AXIS.set_autoscale & AUTOSCALE_MIN) {
 	if (PM3D_IMPLICIT == pm3d.implicit) {
 	    CB_AXIS.min = get_non_pm3d_min();
+	    if (CB_AXIS.min >= VERYLARGE)
+		/* fallback, currently happens for "splot ... binary" and 
+		 * "splot ... with ... palette" */
+		CB_AXIS.min = axis_array[FIRST_Z_AXIS].min;
 	    CB_AXIS.min = axis_log_value_checked(COLOR_AXIS, CB_AXIS.min, "color axis");
 	}
     } else {
@@ -79,6 +83,10 @@ set_pm3d_zminmax()
 	 * in plot3d.c:plot3drequest() */
 	if (PM3D_IMPLICIT == pm3d.implicit) {
 	    CB_AXIS.max = get_non_pm3d_max();
+	    if (CB_AXIS.max <= -VERYLARGE)
+		/* fallback, currently happens for "splot ... binary" and 
+		 * "splot ... with ... palette" */
+		CB_AXIS.max = axis_array[FIRST_Z_AXIS].max;
 	    CB_AXIS.max = axis_log_value_checked(COLOR_AXIS, CB_AXIS.max, "color axis");
 	}
     } else {
@@ -97,6 +105,7 @@ set_pm3d_zminmax()
 	CB_AXIS.min = tmp;
     }
 #if 0
+    printf("set_pm3d_zminmax:  Z_AXIS.min=%g\t Z_AXIS.max=%g\n",Z_AXIS.min,Z_AXIS.max);
     printf("set_pm3d_zminmax: CB_AXIS.min=%g\tCB_AXIS.max=%g\n",CB_AXIS.min,CB_AXIS.max);
 #endif
     return 1;

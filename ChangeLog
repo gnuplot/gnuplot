@@ -1,3 +1,8 @@
+2002-02-15  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* src/pm3d.c: Fix of cb-axis autoscale for binary and with palette
+	splots.
+
 2002-02-15  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/show.c (show_version): Have "show version long" display the
