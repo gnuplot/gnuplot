@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: emf.trm,v 1.6 2000/11/02 19:13:50 lhecking Exp $
+ * $Id: emf.trm,v 1.7 2000/11/03 11:44:04 broeker Exp $
  */
 
 /* GNUPLOT - emf.trm */
@@ -137,6 +137,11 @@ TERM_PUBLIC int EMF_set_font __PROTO((const char *));
 #define EMF_HANDLE_BRUSH	3
 #define EMF_HANDLE_MAX		4
 
+#define EMF_STOCK_OBJECT_FLAG	0x80000000
+#define EMF_STOCK_OBJECT_WHITE_BRUSH 	(EMF_STOCK_OBJECT_FLAG + 0x00)
+#define EMF_STOCK_OBJECT_BLACK_PEN   	(EMF_STOCK_OBJECT_FLAG + 0x07)
+#define EMF_STOCK_OBJECT_DEFAULT_FONT	(EMF_STOCK_OBJECT_FLAG + 0x0A)
+
 #define EMF_write_emr(type,size) {EMF_write_long(type);EMF_write_long(size);emf_record_count++;}
 #define EMF_write_sizel(width,height) {EMF_write_long(width);EMF_write_long(height);}
 #define EMF_write_points(x,y) {EMF_write_short(x);EMF_write_short(y);}
@@ -254,7 +259,7 @@ EMF_setfont()
     }
     strncpy(font, emf_fontname, count);
 
-    EMF_SelectObject(0x8000000A);
+    EMF_SelectObject(EMF_STOCK_OBJECT_DEFAULT_FONT);
     EMF_DeleteObject(EMF_HANDLE_FONT);
 
     EMF_write_emr(82, 104);
@@ -523,11 +528,11 @@ EMF_text()
     EMF_flush_polyline();
 
     /* writing end of metafile */
-    EMF_SelectObject(0x8000000A);
+    EMF_SelectObject(EMF_STOCK_OBJECT_DEFAULT_FONT);
     EMF_DeleteObject(EMF_HANDLE_FONT);
-    EMF_SelectObject(0x80000007);
+    EMF_SelectObject(EMF_STOCK_OBJECT_BLACK_PEN);
     EMF_DeleteObject(EMF_HANDLE_PEN);
-    EMF_SelectObject(0x80000000);
+    EMF_SelectObject(EMF_STOCK_OBJECT_WHITE_BRUSH);
     EMF_DeleteObject(EMF_HANDLE_BRUSH);
     EMF_EOF();
 
@@ -536,6 +541,9 @@ EMF_text()
     fseek(gpoutfile, 48, SEEK_SET);
     EMF_write_long(pos);
     EMF_write_long(emf_record_count);
+    /* HBB 20010228: have to make known that we're no longer in graphics
+     * status. */
+    emf_graphics = FALSE;
 }
 
 TERM_PUBLIC void 
@@ -599,7 +607,7 @@ double width;
 
 TERM_PUBLIC void 
 EMF_dashtype(dashtype)
-int dashtype;
+    int dashtype;
 {
     int i, j;
     /* Each group of 8 entries in dot_length[] defines a dash
@@ -627,14 +635,14 @@ int dashtype;
 	dashtype = (dashtype / EMF_COLORS) % EMF_LINE_TYPES;
 
     if (dashtype < 1 || !emf_dashed) {	/* solid mode */
-	EMF_SelectObject(0x80000007);
+	EMF_SelectObject(EMF_STOCK_OBJECT_BLACK_PEN);
 	EMF_DeleteObject(EMF_HANDLE_PEN);
 	EMF_CreatePen(EMF_HANDLE_PEN, 0, emf_linewidth * EMF_PX2HM, emf_color);
 	EMF_SelectObject(EMF_HANDLE_PEN);
 
 	term->vector = EMF_solid_vector;
     } else {			/* Since win32 dashed lines works only with 1 pixel linewith we must emulate */
-	EMF_SelectObject(0x80000007);
+	EMF_SelectObject(EMF_STOCK_OBJECT_BLACK_PEN);
 	EMF_DeleteObject(EMF_HANDLE_PEN);
 	EMF_CreatePen(EMF_HANDLE_PEN, 0, emf_linewidth * EMF_PX2HM, emf_color);
 	EMF_SelectObject(EMF_HANDLE_PEN);
@@ -811,6 +819,7 @@ TERM_PUBLIC void
 EMF_reset()
 {
     emf_posx = emf_posy = 0;
+    emf_graphics = FALSE;
 }
 
 TERM_PUBLIC void 
