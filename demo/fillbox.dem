@@ -1,0 +1,31 @@
+## a little demonstration of the 'filledboxes' plot style
+
+reset
+
+set samples 25
+
+set style filling solid 1.0
+
+set title "A demonstration of filled boxes with default widths"
+plot [-10:10] 100/(1.0+x*x) title 'distribution' with filledboxes
+
+
+pause -1 "Now make the boxes a little less wide...<Return>"
+
+set title "Filled boxes of reduced width"
+set boxwidth 0.8 relative
+replot
+
+pause -1 "And now let's try a different fill density:<Return>"
+
+set title "Filled boxes at 50% fill density"
+set style filling solid 0.5
+replot
+
+pause -1 "Or maybe a hatch pattern, instead? <Return>"
+
+set title "Boxes filled with a hatch pattern"
+set style filling pattern 1
+replot
+
+pause -1 "Finished this demo. <Return>"
