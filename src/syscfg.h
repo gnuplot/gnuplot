@@ -1,5 +1,5 @@
 /*
- * $Id: syscfg.h,v 1.16 2000/11/29 14:42:49 mikulik Exp $
+ * $Id: syscfg.h,v 1.17 2001/02/23 18:09:25 broeker Exp $
  */
 
 /* GNUPLOT - syscfg.h */
@@ -293,7 +293,6 @@
 # endif                        /* !ZTC */
 
 #endif /* MSDOS */
-
 
 /* Watcom's compiler; this should probably be somewhere
  * in the Windows section

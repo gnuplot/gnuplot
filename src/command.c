@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.50 2001/02/08 16:44:36 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.51 2001/02/19 17:10:36 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -239,6 +239,7 @@ com_line()
 {
 #ifdef OS2_IPC
 static char *input_line_SharedMem = NULL;
+
     if (input_line_SharedMem == NULL) {  /* get shared mem only once */
     if (DosGetNamedSharedMem((PVOID) &input_line_SharedMem,
 		mouseSharedMemName, PAG_WRITE | PAG_READ))
@@ -260,7 +261,7 @@ static char *input_line_SharedMem = NULL;
 	if (read_line(PROMPT))
 	    return (1);
 #else
-#ifdef OS2_IPC
+# ifdef OS2_IPC
 	ULONG u;
         if (thread_rl_Running == 0) {
 	    int res = _beginthread(thread_read_line,NULL,32768,NULL);
@@ -288,20 +289,20 @@ static char *input_line_SharedMem = NULL;
 		input_line_SharedMem[0] = 0; /* discard the whole command line */
 		return (0);
 	    }
-#if 0
+#  if 0
 	    fprintf(stderr,"shared mem received: |%s|\n",input_line_SharedMem);
 	    if (*input_line_SharedMem && input_line_SharedMem[strlen(input_line_SharedMem)-1] != '\n') fprintf(stderr,"\n");
-#endif
+#  endif
 	    strcpy(input_line, input_line_SharedMem);
 	    input_line_SharedMem[0] = 0;
 	    thread_rl_RetCode = 0;
 	}
 	if (thread_rl_RetCode)
 	    return (1);
-#else
+# else /* OS2_IPC */
 	if (read_line(PROMPT))
 	    return (1);
-#endif /* OS2_IPC */
+# endif /* OS2_IPC */
 #endif /* USE_MOUSE */
     }
 
@@ -2060,6 +2061,7 @@ const char *prompt;
     if (interactive)
 	PUT_STRING(prompt);
 # endif				/* no READLINE */
+
     do {
 	/* grab some input */
 # if defined(READLINE) || defined(HAVE_LIBREADLINE)
