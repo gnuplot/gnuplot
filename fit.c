@@ -625,7 +625,6 @@ double a[];
 	Eex("FIT: error occured during fit");
     res = BETTER;
 
-    Dblf("\nInitial set of free parameters:\n");
     show_fit(iter, chisq, chisq, a, lambda, STANDARD);
     show_fit(iter, chisq, chisq, a, lambda, log_f);
 
@@ -725,12 +724,10 @@ double a[];
 	for (i = 0; i < num_params; i++)
 	    Dblf3("%-15.15s = %-15g\n", par_name[i], a[i]);
     } else {
-	/* HBB 981117: change from L.Hart. I'm not yet fully convinced of this one */
-	if (columns < 3) {
-	    Dblf2("unit weights: stdfit  = sqrt(WSSR/ndf) = %g\n\n", sqrt(chisq / (num_data - num_params)));
-	} else {
-	    Dblf2("weighted fit: reduced chisquare = WSSR/ndf = %g\n\n", chisq / (num_data - num_params));
-	}
+	    Dblf2("degrees of freedom (ndf) : %d\n",  num_data - num_params);
+	    Dblf2("rms of residuals      (stdfit) = sqrt(WSSR/ndf)      : %g\n", sqrt(chisq / (num_data - num_params)));
+ 	    Dblf2("variance of residuals (reduced chisquare) = WSSR/ndf : %g\n\n", chisq / (num_data - num_params));
+ 
 	/* get covariance-, Korrelations- and Kurvature-Matrix */
 	/* and errors in the parameters                     */
 
@@ -822,7 +819,7 @@ delta(WSSR) : %-15g   limit for stopping : %g\n\
 lambda	  : %g\n\n%s parameter values\n\n",
       i, chisq, chisq > NEARLY_ZERO ? (chisq - last_chisq) / chisq : 0.0,
 	    chisq - last_chisq, epsilon, lambda,
-	    (i > 0 ? "resultant" : "initial"));
+	    (i > 0 ? "resultant" : "initial set of free"));
     for (k = 0; k < num_params; k++)
 	fprintf(device, "%-15.15s = %g\n", par_name[k], a[k]);
 }
@@ -1532,7 +1529,7 @@ void do_fit()
     } else {
 	/* not a string after via: it's a variable listing */
 
-	fputs("fitted parameters initiallized with current variable values\n\n", log_f);
+	fputs("fitted parameters initialized with current variable values\n\n", log_f);
 	do {
 	    if (!isletter(c_token))
 		Eex("no parameter specified");
