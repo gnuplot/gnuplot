@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.47 2004/05/03 18:22:58 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.48 2004/05/17 10:18:18 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -575,6 +575,7 @@ static struct t_zoom *zoom_head = NULL, *zoom_now = NULL;
 /* Applies the zoom rectangle of  z  by sending the appropriate command
    to gnuplot
 */
+
 static void
 apply_zoom(struct t_zoom *z)
 {
@@ -584,14 +585,14 @@ apply_zoom(struct t_zoom *z)
     static t_autoscale autoscale_copies[AXIS_ARRAY_SIZE];
 
     if (zoom_now != NULL) {	/* remember the current zoom */
-	zoom_now->xmin = AXIS_DE_LOG_VALUE(FIRST_X_AXIS, axis_array[FIRST_X_AXIS].set_min);
-	zoom_now->ymin = AXIS_DE_LOG_VALUE(FIRST_Y_AXIS, axis_array[FIRST_Y_AXIS].set_min);
-	zoom_now->x2min = AXIS_DE_LOG_VALUE(SECOND_X_AXIS, axis_array[SECOND_X_AXIS].set_min);
-	zoom_now->y2min = AXIS_DE_LOG_VALUE(SECOND_Y_AXIS, axis_array[SECOND_Y_AXIS].set_min);
-	zoom_now->xmax = AXIS_DE_LOG_VALUE(FIRST_X_AXIS, axis_array[FIRST_X_AXIS].set_max);
-	zoom_now->ymax = AXIS_DE_LOG_VALUE(FIRST_Y_AXIS, axis_array[FIRST_Y_AXIS].set_max);
-	zoom_now->x2max = AXIS_DE_LOG_VALUE(SECOND_X_AXIS, axis_array[SECOND_X_AXIS].set_max);
-	zoom_now->y2max = AXIS_DE_LOG_VALUE(SECOND_Y_AXIS, axis_array[SECOND_Y_AXIS].set_max);
+	zoom_now->xmin = axis_array[FIRST_X_AXIS].set_min;
+	zoom_now->ymin = axis_array[FIRST_Y_AXIS].set_min;
+	zoom_now->x2min = axis_array[SECOND_X_AXIS].set_min;
+	zoom_now->y2min = axis_array[SECOND_Y_AXIS].set_min;
+	zoom_now->xmax = axis_array[FIRST_X_AXIS].set_max;
+	zoom_now->ymax = axis_array[FIRST_Y_AXIS].set_max;
+	zoom_now->x2max = axis_array[SECOND_X_AXIS].set_max;
+	zoom_now->y2max = axis_array[SECOND_Y_AXIS].set_max;
     }
 
     /* HBB 20011004: implement save/restore of autoscaling if returning to

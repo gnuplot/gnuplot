@@ -1,3 +1,7 @@
+2004-05-19  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* src/mouse.c: Fix broken zoom history with a log axis.
+
 2004-05-17  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/mouse.c src/win/wpause.c: Support for "pause mouse" in Windows
