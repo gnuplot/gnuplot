@@ -1,3 +1,17 @@
+1999-11-30  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* bitmap.c, bitmap.h: Enable b_getpixel(), required by updated
+	png driver, and bugfixes.
+
+	* term/png.trm: Backported from development version. Now shares a
+	subset of a web-friendly palette with the gif driver, can create
+	transparent images, and allows specifying explicit colour specs.
+
+1999-11-30  Albert Chin-A-Young  <china@thewrittenword.com>
+
+	* Makefile.in: Add missing mkinstalldirs commands in lasergnu_install
+	target.
+
 1999-11-21  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* configure.in: Bugfix in configuration summary.
