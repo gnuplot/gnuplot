@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: show.c,v 1.23.2.2 1999/09/29 17:17:26 lhecking Exp $";
+static char *RCSid = "$Id: show.c,v 1.23.2.3 1999/11/18 20:42:54 lhecking Exp $";
 #endif
 
 /* GNUPLOT - show.c */
@@ -47,16 +47,6 @@ static char *RCSid = "$Id: show.c,v 1.23.2.2 1999/09/29 17:17:26 lhecking Exp $"
 /* input data, parsing variables */
 
 extern TBOOLEAN is_3d_plot;
-
-/* From version.c, used in show_version () */
-extern char version[];
-extern char patchlevel[];
-extern char date[];
-extern char gnuplot_copyright[];
-extern char faq_location[];
-extern char bug_email[];
-extern char help_email[];
-
 
 #ifndef TIMEFMT
 #define TIMEFMT "%d/%m/%y,%H:%M"
@@ -532,11 +522,6 @@ static TBOOLEAN
 	c_token++;
     } else if (almost_equals(c_token, "ve$rsion")) {
 	show_version(stderr);
-	c_token++;
-	if (almost_equals(c_token, "l$ong")) {
-	    show_version_long();
-	    c_token++;
-	}
     } else if (almost_equals(c_token, "xr$ange")) {
 	(void) putc('\n', stderr);
 	show_range(FIRST_X_AXIS, xmin, xmax, autoscale_x, "x");
@@ -1514,25 +1499,25 @@ FILE *fp;
     }
     fprintf(fp, "%s\n\
 %s\t%s\n\
-%s\t%sversion %s\n\
-%s\tpatchlevel %s\n\
+%s\tVersion %s patchlevel %s\n\
 %s\tlast modified %s\n\
+%s\tSystem: %s %s\n\
 %s\n\
 %s\t%s\n\
 %s\tThomas Williams, Colin Kelley and many others\n\
 %s\n\
 %s\tType `help` to access the on-line reference manual\n\
 %s\tThe gnuplot FAQ is available from\n\
-%s\t<%s>\n\
+%s\t%s\n\
 %s\n\
 %s\tSend comments and requests for help to <%s>\n\
 %s\tSend bugs, suggestions and mods to <%s>\n\
 %s\n",
 	    p,			/* empty line */
 	    p, PROGRAM,
-	    p, OS, version,
-	    p, patchlevel,
-	    p, date,
+	    p, gnuplot_version, gnuplot_patchlevel,
+	    p, gnuplot_date,
+	    p, os_name, os_rel,
 	    p,			/* empty line */
 	    p, gnuplot_copyright,
 	    p,			/* authors */
@@ -1544,32 +1529,17 @@ FILE *fp;
 	    p, help_email,
 	    p, bug_email,
 	    p);			/* empty line */
+
+    c_token++;
+    if (almost_equals(c_token, "l$ong")) {
+	show_version_long();
+	c_token++;
+    }
 }
 
 void show_version_long()
 {
     char *helpfile = NULL;
-#ifdef HAVE_SYS_UTSNAME_H
-    struct utsname uts;
-
-    /* something is fundamentally wrong if this fails ... */
-    if (uname(&uts) > -1) {
-# ifdef _AIX
-	fprintf(stderr, "\nSystem: %s %s.%s", uts.sysname, uts.version, uts.release);
-# elif defined (SCO)
-	fprintf(stderr, "\nSystem: SCO %s", uts.release);
-# else
-	fprintf(stderr, "\nSystem: %s %s", uts.sysname, uts.release);
-# endif
-    } else {
-	fprintf(stderr, "\n%s\n", OS);
-    }
-
-#else /* ! HAVE_SYS_UTSNAME_H */
-
-    fprintf(stderr, "\n%s\n", OS);
-
-#endif /* HAVE_SYS_UTSNAME_H */
 
     fputs("\nCompile options:\n", stderr);
 
