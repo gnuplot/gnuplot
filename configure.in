@@ -1,12 +1,12 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot 3.7 on Unix.
 dnl
-dnl $Id: configure.in,v 1.73 1999/07/27 19:45:16 lhecking Exp $
+dnl $Id: configure.in,v 1.74 1999/08/20 17:50:06 lhecking Exp $
 dnl
 AC_INIT(src/graphics.c)
 AM_CONFIG_HEADER(config.h:config.hin)
 AC_PREREQ(2.13)
-AC_REVISION($Revision: 1.73 $)
+AC_REVISION($Revision: 1.74 $)
 
 VERSION="`cat $srcdir/VERSION`.`cat $srcdir/PATCHLEVEL`"
 AM_INIT_AUTOMAKE(gnuplot, $VERSION)
@@ -473,7 +473,6 @@ AC_SUBST(PACKAGE)
 AC_SUBST(VERSION)
 AC_SUBST(LASERGNU)
 AC_SUBST(LINUXSUID)
-AC_SUBST(NEXTOBJS)
 AC_SUBST(TERMLIBS)
 AC_SUBST(TERMXLIBS)
 
