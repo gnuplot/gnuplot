@@ -1,3 +1,21 @@
+2002-07-02  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* NEWS src/plot3d.c docs/gnuplot.doc: Support plotting surfaces with
+	color lines or points with color according to explicitly given 4th
+	column, e.g. "splot ... using 1:2:3:4 with [line|point] palette".
+
+	* src/plot3d.c: The color for the color value of lines, colors, pm3d
+	vertices is taken from the 3rd data column unless the 4th column is 
+	explicitly stated by "using"; thus, the same splot is obtained
+	regardless whether the input data file has 3 or 4 columns.
+
+	* src/axis.h: Added condition "|| PM3D_IMPLICIT == pm3d.implicit" into
+	macro NEED_PALETTE(plot).
+
+	* src/datafile.h src/datafile.c: Routine df_3dmatrix(): don't use
+	macro NEED_PALETTE(plot), but take parameter input_palette() --- this
+	avoids #include "pm3d.h" in datafile.c.
+
 2002-06-16  James R. Van Zandt  <jrv@debian.org>
 
 	* term/cgm.trm: silently drop any labels outside the CGM plot
@@ -659,7 +677,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/06/11 07:59:09 $).
+	last modification date (from the tag $Date: 2002/06/16 12:07:40 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 

@@ -40,6 +40,8 @@ off with the hotkey 'm'. See 'help mouse' and 'help bind' for more details.
 
 
 [3.8i]
+* NEW explicit coloring of splots ... with lines|points palette according to
+  the 4th column in the data file
 * NEW pm3d option {no}ftriangles
 * NEW splot ... with pm3d {at option}
 * CHANGE pause supports subsecond time resolution (on systems supporting it)

@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.114 2002/05/15 21:59:05 joze Exp $
+C RCS $Id: gnuplot.doc,v 1.115 2002/05/22 11:35:43 lhecking Exp $
 C 18 September 2001
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001   Thomas Williams, Colin Kelley et al.
 C
@@ -3043,11 +3043,12 @@ C ... and restart the table:
  with `set style line`, one of these may be selected by setting <line_style> to
  the index of the desired style.
 
- If gnuplot was built with `pm3d` support, the special keyword 'palette' is
+ If gnuplot was built with `pm3d` support, the special keyword `palette` is
  allowed for smooth color change of lines, points and dots in splots. The
  color is choosen from a smooth palette which was set previously with the
  command `set palette`. The color value corresponds to the z-value of the
- point coordinates. The 2d `plot` command ignores this option.
+ point coordinates or to the color coordinate if specified by the 4th parameter
+ in `using`. The 2d `plot` command ignores this option.
 
  The keywords may be abbreviated as indicated.
 
@@ -3101,7 +3102,7 @@ C ... and restart the table:
  This plots two color surfaces at different altitudes:
        splot x*x-y*y with pm3d, x*x+y*y with pm3d at t
 
- See `set style` to change the default styles. See also 
+ See `set style` to change the default styles. See also
 ^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/styles/styles.html">
  styles demos.
 ^ </a>

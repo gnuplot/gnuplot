@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.49 2002/03/26 20:31:04 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.50 2002/04/05 17:15:51 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -618,7 +618,7 @@ get_3ddata(this_plot)
     /* data file is already open */
 
     if (df_matrix)
-	xdatum = df_3dmatrix(this_plot);
+	xdatum = df_3dmatrix(this_plot, NEED_PALETTE(this_plot));
     else {
 	/*{{{  read surface from text file */
 	struct iso_curve *local_this_iso = iso_alloc(samples_1);
@@ -631,9 +631,10 @@ get_3ddata(this_plot)
 
 	while ((j = df_readline(v,
 #ifdef PM3D
-		    /* currently pm3d mapping is only implemented
-		     * for MAP3D_CARTESIAN */
-		    (MAP3D_CARTESIAN == mapping3d) ? 4 : 3
+		    /* currently pm3d mapping is only implemented for
+		     * MAP3D_CARTESIAN; and it is used if the 4th column is 
+		     * explicitly given */
+		    (MAP3D_CARTESIAN == mapping3d && df_no_use_specs==4) ? 4 : 3
 #else
 		    3
 #endif
@@ -704,27 +705,27 @@ get_3ddata(this_plot)
 		    break;
 #ifdef PM3D
 		case 4:
-		    if (PM3DSURFACE != this_plot->plot_style) {
-			int_error(this_plot->token,
-				  "4 columns only possible with explicit pm3d style (line %d)",
-				  df_line_number);
-			return;
-		    } else {
-			/* TODO: could also specify the column number */
+		    if (df_no_use_specs==4) {
+			/* getting color from an explicitly given 4th column */
 			pm3d_color_from_column = TRUE;
+			x = v[0];
+			y = v[1];
+			z = v[2];
 			color = v[3];
+			break;
 		    }
-		    /* FALLTHRU */
-#endif
+		    /* else FALLTHRU into the error message in default: */
+#endif /* PM3D */
 		case 3:
 		    x = v[0];
 		    y = v[1];
 		    z = v[2];
-		    break;
+		    if (df_no_use_specs==0 || df_no_use_specs==3) /* because of FALLTHRU from case 4 */
+			break;
 		default:
 		    {
 			int_error(this_plot->token,
-				  "Need 1 or 3 columns - line %d",
+				  "Wrong number of columns in input data - line %d",
 				  df_line_number);
 			return;	/* avoid gcc -Wuninitialised for x,y,z */
 		    }
