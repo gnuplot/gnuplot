@@ -1,3 +1,61 @@
+1999-06-17  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* configure.in: Add check for strdup().
+
+	* src/ansichek.h: ANSI_C was only defined for non-autoconf platforms.
+
+	* src/graph3d.c: Remove duplicate functions CheckLog() and LogScale().
+
+	* src/graph3d.c(do_3dplot), src/graphics.c(do_plot): Remove static
+	array char ss[]. Replace with malloc'd memory where necessary, and
+	use write_multiline() without temporary strings (see change in
+	graphics.c(write_multiline) below).
+
+	* src/graphics.c: Make CheckLog() and LogScale() global. Make
+	graph_error() variadic.
+
+	* src/graphics.c(boundary): Make other necessary changes to complete
+	HBB's floating point inaccuracy patch.
+
+	* src/graphics.c(write_multiline): Do not mangle the char *text
+	argument. With this change, write_multiline() can operate on text
+	strings directly without the need to use temporary storage.
+
+	* src/graphics.c(label_width): Make char lab[] dynamic.
+
+	* src/help.c, src/misc.c, src/plot.c, src/variable.c: Use new
+	gp_strdup() function.
+
+	* src/util.c: New gp_strdup() function, uses strdup() if available.
+
+1999-06-16  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* src/Makefile.am: Add new header file datafile.h.
+
+	* src/alloc.c, src/alloc.h, src/fit.c, src/graph3d.c, src/graphics.c,
+	src/misc.c, src/set.c, src/util.c, src/util.h: Add const qualifier to
+	function and variable declarations.
+
+	* src/bf_test.c: Fix int_error() calls.
+
+	* src/datafile.h: New header.
+	
+	* src/graphics.h: Move graphics.c function prototypes from protos.h.
+
+	* src/plot.h: Include datafile.h.
+
+	* src/plot2d.c, src/plot3d.c, src/scanner.c: Remove duplicate STDOUT
+	define.
+
+	* src/protos.h: Move graphics.c function prototypes to graphics.h.
+
+	* src/variable.h: Remove superflous ';'.
+
+1999-06-16  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/graphics.c(boundary): Fix bug introduced by floating point
+	inaccuracy ("Postscript Multiplot bug" thread on bug-gnupot).
+
 1999-06-14  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* CodeStyle, TODO: Updated.
