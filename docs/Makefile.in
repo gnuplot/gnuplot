@@ -34,7 +34,7 @@
 #
 
 # default is what is needed for interactive gnuplot
-all: gnuplot.gih
+all: gnuplot.gih gnuplot.info
 
 # this tells GNU make not to export variables into the environment
 # But other makes dont understand its significance, so it must
@@ -49,6 +49,7 @@ exec_prefix = @exec_prefix@
 bindir = @bindir@
 datadir = @datadir@
 infodir = @infodir@
+mandir = @mandir@
 srcdir = @srcdir@
 top_builddir = ..
 top_srcdir = @top_srcdir@
@@ -102,7 +103,7 @@ $(T)/hp26.trm $(T)/hp2648.trm $(T)/hp500c.trm $(T)/hpgl.trm $(T)/hpljii.trm \
 $(T)/hppj.trm $(T)/imagen.trm $(T)/iris4d.trm $(T)/kyo.trm $(T)/latex.trm \
 $(T)/linux.trm $(T)/mac.trm $(T)/metafont.trm $(T)/metapost.trm $(T)/mgr.trm \
 $(T)/mif.trm $(T)/multitos.trm $(T)/next.trm $(T)/openstep.trm $(T)/pbm.trm \
-$(T)/pc.trm $(T)pdf.trm $(T)/pm.trm $(T)/png.trm $(T)/post.trm \
+$(T)/pc.trm $(T)/pdf.trm $(T)/pm.trm $(T)/png.trm $(T)/post.trm \
 $(T)/pslatex.trm $(T)/pstricks.trm $(T)/qms.trm $(T)/regis.trm $(T)/rgip.trm \
 $(T)/svg.trm $(T)/sun.trm \
 $(T)/t410x.trm $(T)/table.trm $(T)/tek.trm $(T)/texdraw.trm $(T)/tgif.trm \
@@ -349,12 +350,39 @@ checkdoc.o: checkdoc.c allterm.h
 	$(COMPILE) -DALL_TERM_DOC -c $(srcdir)/checkdoc.c
 
 # For Unix and MSDOS only
-install: gnuplot.gih
-	$(top_srcdir)/mkinstalldirs $(datadir)
-	$(INSTALL_DATA) gnuplot.gih $(datadir)/gnuplot.gih
+install: install-gih install-info install-man
 
-uninstall:
-	rm -f $(datadir)/gnuplot.gih
+install-gih: gnuplot.gih
+	$(top_srcdir)/mkinstalldirs $(DESTDIR)$(datadir)
+	$(INSTALL_DATA) gnuplot.gih $(DESTDIR)$(datadir)/gnuplot.gih
+
+install-info: gnuplot.info
+	$(top_srcdir)/mkinstalldirs $(DESTDIR)$(infodir)
+	$(INSTALL_DATA) gnuplot.info $(DESTDIR)$(infodir)/gnuplot.info
+	@if (install-info --version && \
+	     install-info --version | fgrep -i -v debian) >/dev/null 2>&1; then \
+	  echo "install-info --info-dir=$(DESTDIR)$(infodir) $(DESTDIR)$(infodir)/gnuplot.info";\
+	  install-info --info-dir=$(DESTDIR)$(infodir) $(DESTDIR)$(infodir)/gnuplot.info || :;\
+	else : ; fi
+
+install-man: gnuplot.1
+	$(top_srcdir)/mkinstalldirs $(DESTDIR)$(mandir)/man1
+	$(INSTALL_DATA) gnuplot.1 $(DESTDIR)$(mandir)/man1/gnuplot.1
+
+uninstall: uninstall-gih uninstall-info uninstall-man
+
+uninstall-gih:
+	rm -f $(DESTDIR)$(datadir)/gnuplot.gih
+
+uninstall-info:
+	@if (install-info --version && \
+	     install-info --version | fgrep -i -v debian) >/dev/null 2>&1; then \
+	  install-info --info-dir=$(DESTDIR)$(infodir) --remove $(DESTDIR)$(infodir)/gnuplot.info; \
+	else : ; fi
+	rm -f $(DESTDIR)$(infodir)/gnuplot.info
+
+uninstall-man:
+	rm -f $(DESTDIR)$(mandir)/man1/gnuplot.1
 
 # for VMS only
 install-vms: gnuplot.hlp
