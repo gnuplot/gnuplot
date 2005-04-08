@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.285 2005/04/01 22:16:25 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.286 2005/04/03 15:28:52 broeker Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -9684,11 +9684,16 @@ C ... and restart the table:
 ?set cbrange
 ?show cbrange
 ?cbrange
- The `set cbrange` command sets the range of z-values which are colored by
- `pm3d` mode of `splot`. If the cb-axis is autoscaled, then the `pm3d` /
- `palette` range is taken from `zrange`.
+ The `set cbrange` command sets the range of values which are colored according
+ to the current `palette` by styles `with pm3d`, `with image` and `with ...
+ palette`. Values outside of the color range use color of the nearest extreme.
 
- Please see `set xrange` for details on `set cbrange` syntax.
+ If the cb-axis is autoscaled in `splot`, then the range is taken from `zrange`.
+ Points drawn in `splot ... pm3d|palette` can be filtered by using different
+ `zrange` and `cbrange`.
+
+ Please see `set xrange` for details on `set cbrange` syntax. See also
+ `set palette` and `set colorbox`.
 3 cbtics
 ?commands set cbtics
 ?commands unset cbtics
