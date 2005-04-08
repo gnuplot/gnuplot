@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.in,v 1.164 2005/03/28 04:19:30 sfeam Exp $
+dnl $Id: configure.in,v 1.165 2005/04/02 00:34:48 sfeam Exp $
 dnl
 AC_INIT(src/graphics.c)
 AM_CONFIG_HEADER(config.h:config.hin)
@@ -897,8 +897,12 @@ fi
 
 dnl build lisp files
 if test "$with_lisp_files" != no; then
-AC_CONFIG_SUBDIRS(lisp)
+  AC_CONFIG_SUBDIRS(lisp)
+  LISPDIR=lisp
+else
+  LISPDIR=
 fi
+AC_SUBST(LISPDIR)
 
 dnl Substitute variables
 AC_SUBST(PACKAGE)
