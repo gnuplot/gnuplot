@@ -1,3 +1,9 @@
+2005-04-10  Ethan Merritt  <merritt@u.washington.edu>
+
+	* demo/histograms.dem:  Correct behaviour of the demo depended
+	on a bug in the xrange code.  Now that the bug is fixed (26-Mar-05)
+	the demo needs to be fixed also (don't set xrange to [0:*]).
+
 2005-04-08  Ethan Merritt  <merritt@u.washington.edu>
 
 	* Makefile.am configure.in:  Continued attempts to make configure

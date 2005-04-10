@@ -122,7 +122,6 @@ set title "Immigration from Northern Europe\n(columstacked histogram)"
 set style histogram columnstacked
 set key noinvert box
 set yrange [0:*]
-set xrange [0:*]
 set ylabel "Immigration by decade"
 set xlabel "Country of Origin"
 set ticscale 0.0
