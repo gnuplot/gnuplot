@@ -1,3 +1,8 @@
+2005-04-11  Ethan Merritt  <merritt@u.washington.edu>
+
+	* term/post.trm: Fix for bug #1180853, arrowheads drawn in wrong
+	color if the arrow body has a specific line style or color.
+
 2005-04-10  Ethan Merritt  <merritt@u.washington.edu>
 
 	* demo/histograms.dem:  Correct behaviour of the demo depended

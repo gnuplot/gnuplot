@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.151 2005/03/09 18:26:45 sfeam Exp $
+ * $Id: post.trm,v 1.152 2005/03/25 00:54:12 sfeam Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -3480,11 +3480,11 @@ TERM_PUBLIC void PS_arrow (
 {
     do_arrow( sx, sy, ex, ey, head );
     if (!ps_params->solid && head != 0) {
-	fputs("/SaveState Solid def /Solid true def\n", gppsfile);
-	PS_linetype(PS_linetype_last-3);
+	PS_FLUSH_PATH;
+	fputs("gsave [] 0 setdash\n", gppsfile);
 	do_arrow( sx, sy, ex, ey, -head );
-	fputs("/Solid SaveState def\n", gppsfile);
-	PS_linetype(PS_linetype_last-3);
+	PS_FLUSH_PATH;
+	fputs("grestore\n", gppsfile);
     }
 }
 
