@@ -1,5 +1,9 @@
 2005-04-14  Ethan Merritt  <merritt@u.washington.edu>
 
+	* src/set.c (set_border): Fix bug in new parsing loop.
+
+2005-04-14  Ethan Merritt  <merritt@u.washington.edu>
+
 	* docs/gnuplot.doc src/gadgets.c src/gadgets.h
 	src/graphics.c (do_plot) src/save.c (save_set_all) 
 	src/set.c (set_border) src/show.c (show_border):
