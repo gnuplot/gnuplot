@@ -110,6 +110,7 @@ double pointsize = 1.0;
 
 /* set border */
 int draw_border = 31;
+int border_layer = 1;
 #ifdef PM3D
 # define DEFAULT_BORDER_LP { 0, -2, 0, 1.0, 1.0, 0 }
 #else

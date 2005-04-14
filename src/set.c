@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.172 2005/03/30 17:18:31 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.173 2005/04/03 22:41:54 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -922,18 +922,25 @@ set_border()
     c_token++;
     if(END_OF_COMMAND){
 	draw_border = 31;
-    } else {
-	draw_border = (int)real(const_express(&a));
-    }
-    /* HBB 980609: add linestyle handling for 'set border...' */
-    /* For now, you have to give a border bitpattern to be able to specify
-     * a linestyle. Sorry for this, but the gnuplot parser really is too messy
-     * for any other solution, currently */
-    /* not for long, I hope. Lars */
-    if(END_OF_COMMAND) {
+	border_layer = 1;
 	border_lp = default_border_lp;
-    } else {
-	lp_parse(&border_lp, 1, 0, -2, 0);
+    }
+    
+    while (!END_OF_COMMAND) {
+	if (equals(c_token,"front")) {
+	    border_layer = 1;
+	    c_token++;
+	} else if (equals(c_token,"back")) {
+	    border_layer = 0;
+	    c_token++;
+	} else {
+	    int save_token = c_token;
+	    lp_parse(&border_lp, TRUE, FALSE, border_lp.l_type, 0);
+	    if (save_token != c_token)
+		continue;
+	    draw_border = (int)real(const_express(&a));
+	    c_token++;
+	}
     }
 }
 

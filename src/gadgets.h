@@ -293,6 +293,7 @@ extern double pointsize;
 #define border_south	(draw_border & SOUTH)
 #define border_north	(draw_border & NORTH)
 extern int draw_border;
+extern int border_layer;
 
 extern struct lp_style_type border_lp;
 extern const struct lp_style_type default_border_lp;

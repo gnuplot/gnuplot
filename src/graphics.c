@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.152 2005/03/02 20:35:34 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.153 2005/03/03 04:09:48 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -1712,7 +1712,7 @@ do_plot(struct curve_points *plots, int pcount)
 	place_grid();
 
     /* REDRAW PLOT BORDER */
-    if (draw_border)
+    if (draw_border && border_layer == 1)
 	plot_border();
 
     /* PLACE LABELS */

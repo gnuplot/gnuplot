@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.286 2005/04/03 15:28:52 broeker Exp $
+C RCS $Id: gnuplot.doc,v 1.287 2005/04/08 11:15:34 mikulik Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -4617,9 +4617,8 @@ C ... and restart the table:
  `splot` they usually do not.
 
  Syntax:
-       set border {<integer> { {linestyle | ls <line_style>}
-                               | {linetype | lt <line_type> }
-                                 {linewidth | lw <line_width>} } }
+       set border {<integer>} {front | back} {linewidth | lw <line_width>}
+                  {{linestyle | ls <line_style>} | {linetype | lt <line_type>}}
        unset border
        show border
 
@@ -4687,6 +4686,10 @@ C ... and restart the table:
 
  The default is 31, which is all four sides for `plot`, and base and z axis
  for `splot`.
+
+ In 2D plots the border is normally drawn on top of all plots elements 
+ (`front`). If you want the border to be drawn behind the plot elements,
+ use `set border back`.
 
  Using the optional <line_style>, <line_type> and <line_width> specifiers, the
  way the border lines are drawn can be influenced (limited by what the current

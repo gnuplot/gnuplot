@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.150 2005/03/29 08:07:17 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.151 2005/03/30 17:18:35 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -1136,6 +1136,8 @@ show_border()
     /* HBB 980609: added facilities to specify border linestyle */
     fprintf(stderr, "\tBorder drawn with linetype %d, linewidth %.3f\n",
 	    border_lp.l_type + 1, border_lp.l_width);
+    fprintf(stderr, "\tBorder is drawn in %s of the plot elements\n",
+	    border_layer == 0 ? "back" : "front");
 }
 
 

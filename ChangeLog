@@ -1,3 +1,11 @@
+2005-04-14  Ethan Merritt  <merritt@u.washington.edu>
+
+	* docs/gnuplot.doc src/gadgets.c src/gadgets.h
+	src/graphics.c (do_plot) src/save.c (save_set_all) 
+	src/set.c (set_border) src/show.c (show_border):
+	Make parsing of 'set border' options independent of their order.
+	New option 'set border {front|back}'.
+
 2005-04-11  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/post.trm: Fix for bug #1180853, arrowheads drawn in wrong
