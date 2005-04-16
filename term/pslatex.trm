@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: pslatex.trm,v 1.52 2005/02/14 09:36:48 mikulik Exp $
+ * $Id: pslatex.trm,v 1.53 2005/02/28 19:34:56 sfeam Exp $
  */
 
 /* GNUPLOT - pslatex.trm */
@@ -550,7 +550,7 @@ EPSLATEX_common_init()
   \\typeout{Using configuration file gnuplot.cfg}%%\n\
 }{%%\n\
  \\typeout{No configuration file gnuplot.cfg found.}%%\n\
-}\n\
+}%%\n\
 %s\n\
 \\begin{document}\n",
                     term->xmax * xsize / (2.0*PS_SC),
@@ -616,39 +616,62 @@ EPSLATEX_common_init()
                 (ps_params->color?"true":"false"),
                 (ps_params->blacktext?"true":"false") );
 
-	if (ps_params->oldstyle)
-	    fprintf(gpoutfile, "\
-  \\ifGPcolor\n\
-    \\ifGPblacktext\n\
+	/* use \expandafter\def\csname LT0\endcsname{...} 
+	 * instead of \def\LT0{...} because digits may not be part of
+         * \... sequences */
+	fputs("\
+  \\ifGPblacktext\n\
+    % no textcolor at all\n\
+    \\def\\colorrgb#1{}%\n\
+    \\def\\colorgray#1{}%\n\
+  \\else\n\
+    % gray or color?\n\
+    \\ifGPcolor\n\
+      \\def\\colorrgb#1{\\color[rgb]{#1}}%\n\
+      \\def\\colorgray#1{\\color[gray]{#1}}%\n\
+      \\expandafter\\def\\csname LTw\\endcsname{\\color{white}}%\n\
+      \\expandafter\\def\\csname LTb\\endcsname{\\color{black}}%\n\
+      \\expandafter\\def\\csname LTa\\endcsname{\\color{black}}%\n",
+	      gpoutfile);
+	if (ps_params->oldstyle) {
+	    fputs("\
+      \\expandafter\\def\\csname LT0\\endcsname{\\color[rgb]{1,0,0}}%\n\
+      \\expandafter\\def\\csname LT1\\endcsname{\\color[rgb]{0,0,1}}%\n\
+      \\expandafter\\def\\csname LT2\\endcsname{\\color[rgb]{0,1,1}}%\n\
+      \\expandafter\\def\\csname LT3\\endcsname{\\color[rgb]{1,0,1}}%\n",
+		  gpoutfile);
+	} else {
+	    fputs("\
+      \\expandafter\\def\\csname LT0\\endcsname{\\color[rgb]{1,0,0}}%\n\
+      \\expandafter\\def\\csname LT1\\endcsname{\\color[rgb]{0,1,0}}%\n\
+      \\expandafter\\def\\csname LT2\\endcsname{\\color[rgb]{0,0,1}}%\n\
+      \\expandafter\\def\\csname LT3\\endcsname{\\color[rgb]{1,0,1}}%\n\
+      \\expandafter\\def\\csname LT4\\endcsname{\\color[rgb]{0,1,1}}%\n\
+      \\expandafter\\def\\csname LT5\\endcsname{\\color[rgb]{1,1,0}}%\n\
+      \\expandafter\\def\\csname LT6\\endcsname{\\color[rgb]{0,0,0}}%\n\
+      \\expandafter\\def\\csname LT7\\endcsname{\\color[rgb]{1,0.3,0}}%\n\
+      \\expandafter\\def\\csname LT8\\endcsname{\\color[rgb]{0.5,0.5,0.5}}%\n",
+		  gpoutfile);
+	}
+	fputs("\
     \\else\n\
-      \\expandafter\\def\\csname LTw\\endcsname{\\color{white}}%%\n\
-      \\expandafter\\def\\csname LTb\\endcsname{\\color{black}}%%\n\
-      \\expandafter\\def\\csname LTa\\endcsname{\\color{black}}%%\n\
-      \\expandafter\\def\\csname LT0\\endcsname{\\color[rgb]{1,0,0}}%%\n\
-      \\expandafter\\def\\csname LT1\\endcsname{\\color[rgb]{0,1,0}}%%\n\
-      \\expandafter\\def\\csname LT2\\endcsname{\\color[rgb]{0,0,1}}%%\n\
-      \\expandafter\\def\\csname LT3\\endcsname{\\color[rgb]{1,0,1}}%%\n\
-      \\expandafter\\def\\csname LT4\\endcsname{\\color[rgb]{0,1,1}}%%\n\
-      \\expandafter\\def\\csname LT5\\endcsname{\\color[rgb]{1,1,0}}%%\n\
-      \\expandafter\\def\\csname LT6\\endcsname{\\color[rgb]{0,0,0}}%%\n\
-      \\expandafter\\def\\csname LT7\\endcsname{\\color[rgb]{1,0.3,0}}%%\n\
-      \\expandafter\\def\\csname LT8\\endcsname{\\color[rgb]{0.5,0.5,0.5}}%%\n\
+      % gray\n\
+      \\def\\colorrgb#1{\\color{black}}%\n\
+      \\def\\colorgray#1{\\color[gray]{#1}}%\n\
+      \\expandafter\\def\\csname LTw\\endcsname{\\color{white}}%\n\
+      \\expandafter\\def\\csname LTb\\endcsname{\\color{black}}%\n\
+      \\expandafter\\def\\csname LTa\\endcsname{\\color{black}}%\n\
+      \\expandafter\\def\\csname LT0\\endcsname{\\color{black}}%\n\
+      \\expandafter\\def\\csname LT1\\endcsname{\\color{black}}%\n\
+      \\expandafter\\def\\csname LT2\\endcsname{\\color{black}}%\n\
+      \\expandafter\\def\\csname LT3\\endcsname{\\color{black}}%\n\
+      \\expandafter\\def\\csname LT4\\endcsname{\\color{black}}%\n\
+      \\expandafter\\def\\csname LT5\\endcsname{\\color{black}}%\n\
+      \\expandafter\\def\\csname LT6\\endcsname{\\color{black}}%\n\
+      \\expandafter\\def\\csname LT7\\endcsname{\\color{black}}%\n\
+      \\expandafter\\def\\csname LT8\\endcsname{\\color{black}}%\n\
     \\fi\n\
-  \\fi\n");
-	else
-	    fprintf(gpoutfile, "\
-  \\ifGPcolor\n\
-    \\ifGPblacktext\n\
-    \\else\n\
-      \\expandafter\\def\\csname LTw\\endcsname{\\color{white}}%%\n\
-      \\expandafter\\def\\csname LTb\\endcsname{\\color{black}}%%\n\
-      \\expandafter\\def\\csname LTa\\endcsname{\\color{black}}%%\n\
-      \\expandafter\\def\\csname LT0\\endcsname{\\color[rgb]{1,0,0}}%%\n\
-      \\expandafter\\def\\csname LT1\\endcsname{\\color[rgb]{0,0,1}}%%\n\
-      \\expandafter\\def\\csname LT2\\endcsname{\\color[rgb]{0,1,1}}%%\n\
-      \\expandafter\\def\\csname LT3\\endcsname{\\color[rgb]{1,0,1}}%%\n\
-    \\fi\n\
-  \\fi\n");
+  \\fi\n", gpoutfile);
 
         fprintf(gpoutfile,"\
   \\setlength{\\unitlength}{%.4fbp}%%\n\
@@ -781,7 +804,18 @@ EPSLATEX_set_color(t_colorspec *colorspec)
 	double r = (double)((colorspec->lt >> 16 ) & 255) / 255.;
 	double g = (double)((colorspec->lt >> 8 ) & 255) / 255.;
 	double b = (double)(colorspec->lt & 255) / 255.;
-	fprintf(gpoutfile, "    \\color[rgb]{%3.2f,%3.2f,%3.2f}%%\n",r,g,b);
+	fprintf(gpoutfile, "    \\colorrgb{%3.2f,%3.2f,%3.2f}%%\n",r,g,b);
+    }
+
+    if (colorspec->type == TC_LT) {
+	int linetype = colorspec->lt;
+	if (ps_params->oldstyle)
+	    linetype = (linetype % 4) + 3;
+	else
+	    linetype = (linetype % 9) + 3;
+
+	fprintf(gpoutfile, "    \\csname LT%c\\endcsname\n",
+		"wba012345678"[linetype]);
     }
 
     if (colorspec->type != TC_FRAC)
@@ -790,12 +824,12 @@ EPSLATEX_set_color(t_colorspec *colorspec)
 /* map [0;1] to gray/colors */
     gray = colorspec->value;
     if (gray <= 0)
-	fputs("    \\color{black}%\n",gpoutfile);
+	fputs("    \\colorgray{black}%\n",gpoutfile);
     else {
 	if (gray >= 1)
-	    fputs("    \\color{white}%\n",gpoutfile);
+	    fputs("    \\colorgray{white}%\n",gpoutfile);
 	else
-	    fprintf(gpoutfile, "    \\color[gray]{%s}%%\n",save_space(gray));
+	    fprintf(gpoutfile, "    \\colorgray{%s}%%\n",save_space(gray));
     }
 }
 #endif

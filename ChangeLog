@@ -1,3 +1,9 @@
+2005-04-16  Juergen Wieferink <wieferink@freenet.de>
+
+	* term/pslatex.trm: Clean up macro definitions written to
+	output file of 'set term epslatex'. 
+	Fixes bug #1162038 "Wrong textcolor in epslatex terminal".
+
 2005-04-14  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/set.c (set_border): Fix bug in new parsing loop.
