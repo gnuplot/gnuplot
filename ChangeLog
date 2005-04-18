@@ -7,6 +7,9 @@
 	extensions to line types in general.  The grid linetypes were not being
 	saved at all.
 
+	* src/set.c (set_key): Fix parsing bug that caused next item after
+	'set key title "Foo"' to be ignored.
+
 2005-04-18  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* term/fig.trm (FIG_set_color): Support for "textcolor lt".
