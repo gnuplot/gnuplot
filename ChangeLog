@@ -1,3 +1,7 @@
+2005-04-18  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* term/fig.trm (FIG_set_color): Support for "textcolor lt".
+
 2005-04-16  Juergen Wieferink <wieferink@freenet.de>
 
 	* term/pslatex.trm: Clean up macro definitions written to
