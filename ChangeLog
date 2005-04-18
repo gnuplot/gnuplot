@@ -1,3 +1,12 @@
+2005-04-18  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/save.c (save_linetype) src/save.h src/show.c:    Code cleanup.
+	Provide a single routine to handle all the places that dump information
+	from a structure of type lp_style_type. This cleans up 9 call sites in
+	save.c and 9 more in show.c, many of which were not handling the recent
+	extensions to line types in general.  The grid linetypes were not being
+	saved at all.
+
 2005-04-18  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* term/fig.trm (FIG_set_color): Support for "textcolor lt".

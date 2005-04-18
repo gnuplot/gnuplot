@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.104 2005/03/29 08:07:16 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.105 2005/04/14 20:04:43 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -209,12 +209,11 @@ set bar %f\n",
 	    (clip_lines2) ? "" : "un",
 	    bar_size);
 
-    if (draw_border)
-	/* HBB 980609: handle border linestyle, too */
-	fprintf(fp, "set border %d lt %d lw %.3f %s\n",
-		draw_border, border_lp.l_type + 1, border_lp.l_width,
-		border_layer == 0 ? "back" : "front");
-    else
+    if (draw_border) {
+	fprintf(fp, "set border %d %s", draw_border, border_layer == 0 ? "back" : "front");
+	save_linetype(fp, &border_lp, FALSE);
+	fprintf(fp, "\n");
+    } else
 	fputs("unset border\n", fp);
 
     fprintf(fp, "\
@@ -230,8 +229,8 @@ set y2data%s\n",
 	    axis_array[SECOND_Y_AXIS].is_timedata ? " time" : "");
 
 #define SAVE_TIMEFMT(axis)						\
-    if (strlen(axis_array[axis].timefmt)) 						\
-	fprintf(fp, "set timefmt %s \"%s\"\n", axis_defaults[axis].name,	\
+    if (strlen(axis_array[axis].timefmt)) 				\
+	fprintf(fp, "set timefmt %s \"%s\"\n", axis_defaults[axis].name,\
 		conv_text(axis_array[axis].timefmt));
     SAVE_TIMEFMT(FIRST_X_AXIS);
     SAVE_TIMEFMT(FIRST_Y_AXIS);
@@ -303,7 +302,11 @@ set y2data%s\n",
 	fputs("\n", fp);
 #undef SAVE_GRID
 
-	fprintf(fp, "set grid %s\n", (grid_layer==-1) ? "layerdefault" : ((grid_layer==0) ? "back" : "front"));
+	fprintf(fp, "set grid %s  ", (grid_layer==-1) ? "layerdefault" : ((grid_layer==0) ? "back" : "front"));
+	save_linetype(fp, &grid_lp, FALSE);
+	fprintf(fp, ", ");
+	save_linetype(fp, &mgrid_lp, FALSE);
+	fputc('\n', fp);
     }
 
     fprintf(fp, "set key title \"%s\"\n", conv_text(key->title));
@@ -341,16 +344,17 @@ set y2data%s\n",
 	    save_position(fp, &key->user_pos);
 	    break;
 	}
-	fprintf(fp, " %s %sreverse %sinvert %senhanced box linetype %d linewidth %.3f samplen %g spacing %g width %g height %g %s\n",
+	fprintf(fp, " %s %sreverse %sinvert %senhanced samplen %g spacing %g width %g height %g %s box",
 		key->just == JLEFT ? "Left" : "Right",
 		key->reverse ? "" : "no",
 		key->invert ? "" : "no",
 		key->enhanced ? "" : "no",
-		key->box.l_type + 1, key->box.l_width,
 		key->swidth, key->vert_factor, key->width_fix, key->height_fix,
 		key->auto_titles == COLUMNHEAD_KEYTITLES ? "autotitles columnhead"
 		: key->auto_titles == FILENAME_KEYTITLES ? "autotitles"
 		: "noautotitles" );
+	save_linetype(fp, &(key->box), FALSE);
+	fputc('\n', fp);
     }
 
     fputs("unset label\n", fp);
@@ -383,10 +387,8 @@ set y2data%s\n",
 	if (this_label->lp_properties.pointflag == 0)
 	    fprintf(fp, " nopoint");
 	else {
-	    fprintf(fp, " point linetype %d pointtype %d pointsize %g",
-		this_label->lp_properties.l_type+1,
-		this_label->lp_properties.p_type+1,
-		this_label->lp_properties.p_size);
+	    fprintf(fp, " point");
+	    save_linetype(fp, &(this_label->lp_properties), TRUE);
 	}
 	fprintf(fp," offset ");
 	save_position(fp, &this_label->offset);
@@ -399,14 +401,13 @@ set y2data%s\n",
 	save_position(fp, &this_arrow->start);
 	fputs(this_arrow->relative ? " rto " : " to ", fp);
 	save_position(fp, &this_arrow->end);
-	fprintf(fp, " %s %s %s linetype %d linewidth %.3f",
+	fprintf(fp, " %s %s %s",
 		arrow_head_names[this_arrow->arrow_properties.head],
 		(this_arrow->arrow_properties.layer==0) ? "back" : "front",
 		( (this_arrow->arrow_properties.head_filled==2) ? "filled" :
 		  ( (this_arrow->arrow_properties.head_filled==1) ? "empty" :
-		    "nofilled" )),
-		this_arrow->arrow_properties.lp_properties.l_type + 1,
-		this_arrow->arrow_properties.lp_properties.l_width);
+		    "nofilled" )) );
+	save_linetype(fp, &(this_arrow->arrow_properties.lp_properties), FALSE);
 	if (this_arrow->arrow_properties.head_length > 0) {
 	    static char *msg[] = {"first", "second", "graph", "screen",
 				  "character"};
@@ -422,37 +423,20 @@ set y2data%s\n",
     for (this_linestyle = first_linestyle; this_linestyle != NULL;
 	 this_linestyle = this_linestyle->next) {
 	fprintf(fp, "set style line %d ", this_linestyle->tag);
-	fprintf(fp, " linetype %d", this_linestyle->lp_properties.l_type + 1);
-#ifdef PM3D
-	if (this_linestyle->lp_properties.use_palette) {
-	    fprintf(fp, " linecolor");
-	    if (this_linestyle->lp_properties.pm3d_color.type == TC_LT)
-		fprintf(fp, " %d", this_linestyle->lp_properties.pm3d_color.lt+1);
-	    else
-		save_pm3dcolor(fp,&this_linestyle->lp_properties.pm3d_color);
-	}
-#endif
-	fprintf(fp, " linewidth %.3f pointtype %d",
-		this_linestyle->lp_properties.l_width,
-		this_linestyle->lp_properties.p_type + 1);
-	if (this_linestyle->lp_properties.p_size < 0)
-	    fprintf(fp, " pointsize variable\n");
-	else
-	    fprintf(fp, " pointsize %.3f\n",
-		this_linestyle->lp_properties.p_size);
+	save_linetype(fp, &(this_linestyle->lp_properties), TRUE);
+	fprintf(fp, "\n");
     }
     fputs("unset style arrow\n", fp);
     for (this_arrowstyle = first_arrowstyle; this_arrowstyle != NULL;
 	 this_arrowstyle = this_arrowstyle->next) {
 	fprintf(fp, "set style arrow %d", this_arrowstyle->tag);
-	fprintf(fp, " %s %s %s linetype %d linewidth %.3f",
+	fprintf(fp, " %s %s %s",
 		arrow_head_names[this_arrowstyle->arrow_properties.head],
 		(this_arrowstyle->arrow_properties.layer==0)?"back":"front",
 		( (this_arrowstyle->arrow_properties.head_filled==2)?"filled":
 		  ( (this_arrowstyle->arrow_properties.head_filled==1)?"empty":
-		    "nofilled" )),
-		this_arrowstyle->arrow_properties.lp_properties.l_type + 1,
-		this_arrowstyle->arrow_properties.lp_properties.l_width);
+		    "nofilled" )) );
+	save_linetype(fp, &(this_arrowstyle->arrow_properties.lp_properties), FALSE);
 	if (this_arrowstyle->arrow_properties.head_length > 0) {
 	    static char *msg[] = {"first", "second", "graph", "screen",
 				  "character"};
@@ -1004,10 +988,9 @@ save_range(FILE *fp, AXIS_INDEX axis)
 static void
 save_zeroaxis(FILE *fp, AXIS_INDEX axis)
 {
-    fprintf(fp, "set %szeroaxis lt %d lw %.3f\n", axis_defaults[axis].name,
-	    axis_array[axis].zeroaxis.l_type + 1,
-	    axis_array[axis].zeroaxis.l_width);
-
+    fprintf(fp, "set %szeroaxis", axis_defaults[axis].name);
+    save_linetype(fp, &(axis_array[axis].zeroaxis), FALSE);
+    putc('\n', fp);
 }
 
 void
@@ -1173,4 +1156,30 @@ save_data_func_style(FILE *fp, const char *which, enum PLOT_STYLE style)
     default:
 	fputs("---error!---\n", fp);
     }
+}
+
+void
+save_linetype(FILE *fp, lp_style_type *lp, TBOOLEAN show_point)
+{
+
+    fprintf(fp, " linetype %d", lp->l_type + 1);
+#ifdef PM3D
+    if (lp->use_palette) {
+	fprintf(fp, " linecolor");
+	if (lp->pm3d_color.type == TC_LT)
+    	    fprintf(fp, " %d", lp->pm3d_color.lt+1);
+	else
+    	    save_pm3dcolor(fp,&(lp->pm3d_color));
+    }
+#endif
+    fprintf(fp, " linewidth %.3f", lp->l_width);
+
+    if (show_point && lp->pointflag) {
+	fprintf(fp, " pointtype %d", lp->p_type + 1);
+	if (lp->p_size < 0)
+	    fprintf(fp, " pointsize variable");
+	else
+	    fprintf(fp, " pointsize %.3f", lp->p_size);
+    }
+	
 }

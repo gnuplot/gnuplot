@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.151 2005/03/30 17:18:35 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.152 2005/04/14 20:04:45 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -1131,13 +1131,14 @@ show_border()
 {
     SHOW_ALL_NL;
 
-    fprintf(stderr, "\tborder is %sdrawn %d\n", draw_border ? "" : "not ",
-	    draw_border);
-    /* HBB 980609: added facilities to specify border linestyle */
-    fprintf(stderr, "\tBorder drawn with linetype %d, linewidth %.3f\n",
-	    border_lp.l_type + 1, border_lp.l_width);
-    fprintf(stderr, "\tBorder is drawn in %s of the plot elements\n",
-	    border_layer == 0 ? "back" : "front");
+    if (!draw_border)
+	fprintf(stderr, "\tborder is not drawn\n");
+    else {
+	fprintf(stderr, "\tborder %d is drawn in %s of the plot elements with\n\t ",
+	    draw_border, border_layer == 0 ? "back" : "front");
+	save_linetype(stderr, &border_lp, FALSE);
+	fputc('\n',stderr);
+    }
 }
 
 
@@ -1498,12 +1499,11 @@ show_grid()
     fputs(" tics\n", stderr);
 #endif /* 0/1 */
 
-    fprintf(stderr, "\
-\tMajor grid drawn with linetype %d, linewidth %.3f\n\
-\tMinor grid drawn with linetype %d, linewidth %.3f\n",
-	    grid_lp.l_type + 1, grid_lp.l_width,
-	    mgrid_lp.l_type + 1, mgrid_lp.l_width);
-
+    fprintf(stderr, "\tMajor grid drawn with");
+    save_linetype(stderr, &(grid_lp), FALSE);
+    fprintf(stderr, "\n\tMinor grid drawn with");
+    save_linetype(stderr, &(mgrid_lp), FALSE);
+    fputc('\n', stderr);
     if (polar_grid_angle)
 	fprintf(stderr, "\tGrid radii drawn every %f %s\n",
 		polar_grid_angle / ang2rad,
@@ -1519,13 +1519,11 @@ show_zeroaxis(AXIS_INDEX axis)
 {
     SHOW_ALL_NL;
 
-    if (axis_array[axis].zeroaxis.l_type > L_TYPE_NODRAW)
-	fprintf(stderr, "\
-\t%szeroaxis is drawn with linestyle %d, linewidth %.3f\n",
-		axis_defaults[axis].name,
-		axis_array[axis].zeroaxis.l_type + 1,
-		axis_array[axis].zeroaxis.l_width);
-    else
+    if (axis_array[axis].zeroaxis.l_type > L_TYPE_NODRAW) {
+	fprintf(stderr, "\t%szeroaxis is drawn with", axis_defaults[axis].name);
+	save_linetype(stderr, &(axis_array[axis].zeroaxis), FALSE);
+	fputc('\n',stderr);
+    } else
 	fprintf(stderr, "\t%szeroaxis is OFF\n", axis_defaults[axis].name);
 
     if ((axis / SECOND_AXES) == 0) {
@@ -1576,10 +1574,8 @@ show_label(int tag)
 	    if (this_label->lp_properties.pointflag == 0)
 		fprintf(stderr, " nopoint");
 	    else {
-		fprintf(stderr, " point with color of linetype %d pointtype %d pointsize %g offset ",
-		    this_label->lp_properties.l_type+1,
-		    this_label->lp_properties.p_type+1,
-		    this_label->lp_properties.p_size);
+		fprintf(stderr, " point with color of");
+		save_linetype(stderr, &(this_label->lp_properties), TRUE);
 		show_position(&this_label->offset);
 	    }
 
@@ -1603,15 +1599,15 @@ show_arrow(int tag)
 	 this_arrow = this_arrow->next) {
 	if (tag == 0 || tag == this_arrow->tag) {
 	    showed = TRUE;
-	    fprintf(stderr, "\tarrow %d, linetype %d, linewidth %.3f %s %s %s\n\t  from ",
+	    fprintf(stderr, "\tarrow %d, %s %s %s",
 		    this_arrow->tag,
-		    this_arrow->arrow_properties.lp_properties.l_type + 1,
-		    this_arrow->arrow_properties.lp_properties.l_width,
 		    this_arrow->arrow_properties.head ? (this_arrow->arrow_properties.head==2 ? " both heads " : "") : " (nohead)",
 		    ( (this_arrow->arrow_properties.head_filled==2) ? "filled" :
 		      ( (this_arrow->arrow_properties.head_filled==1) ? "empty" :
 			"nofilled" )),
 		    this_arrow->arrow_properties.layer ? "front" : "back");
+	    save_linetype(stderr, &(this_arrow->arrow_properties.lp_properties), FALSE);
+	    fprintf(stderr, "\n\t  from ");
 	    show_position(&this_arrow->start);
 	    fputs(this_arrow->relative ? " rto " : " to ", stderr);
 	    show_position(&this_arrow->end);
@@ -1698,10 +1694,11 @@ show_key()
 	    key->reverse ? "" : "not ",
 	    key->invert ? "" : "not ",
 	    key->enhanced ? "" : "not ");
-    if (key->box.l_type > L_TYPE_NODRAW)
-	fprintf(stderr, "boxed\n\twith linetype %d, linewidth %.3f\n",
-		key->box.l_type + 1, key->box.l_width);
-    else
+    if (key->box.l_type > L_TYPE_NODRAW) {
+	fprintf(stderr, "boxed\n\twith ");
+	save_linetype(stderr, &(key->box), FALSE);
+	fputc('\n', stderr);
+    } else
 	fprintf(stderr, "not boxed\n");
 
     fprintf(stderr, "\
@@ -2798,26 +2795,8 @@ show_linestyle(int tag)
 	if (tag == 0 || tag == this_linestyle->tag) {
 	    showed = TRUE;
 	    fprintf(stderr, "\tlinestyle %d, ", this_linestyle->tag);
-
-	    fprintf(stderr, "linetype %d ", this_linestyle->lp_properties.l_type + 1);
-#ifdef PM3D
-	    if (this_linestyle->lp_properties.use_palette) {
-	    	fprintf(stderr, " linecolor");
-		if (this_linestyle->lp_properties.pm3d_color.type == TC_LT)
-		    fprintf(stderr, " %d", this_linestyle->lp_properties.pm3d_color.lt+1);
-		else
-		    save_pm3dcolor(stderr, &this_linestyle->lp_properties.pm3d_color);
-	    }
-#endif
-
-	    fprintf(stderr, " linewidth %.3f, pointtype %d ",
-		    this_linestyle->lp_properties.l_width,
-		    this_linestyle->lp_properties.p_type + 1);
-	    if (this_linestyle->lp_properties.p_size < 0)
-	        fprintf(stderr, "pointsize variable\n");
-	    else
-		fprintf(stderr, "pointsize %.3f\n",
-		    this_linestyle->lp_properties.p_size);
+	    save_linetype(stderr, &(this_linestyle->lp_properties), TRUE);
+	    fputc('\n', stderr);
 	}
     }
     if (tag > 0 && !showed)
@@ -2839,13 +2818,14 @@ show_arrowstyle(int tag)
 	    fprintf(stderr, "\tarrowstyle %d, ", this_arrowstyle->tag);
 	    fflush(stderr);
 
-	    fprintf(stderr, "\tlinetype %d, linewidth %.3f %s %s\n",
-		    this_arrowstyle->arrow_properties.lp_properties.l_type+1,
-		    this_arrowstyle->arrow_properties.lp_properties.l_width,
+	    fprintf(stderr, "\t %s %s",
 		    this_arrowstyle->arrow_properties.head ?
 		    (this_arrowstyle->arrow_properties.head==2 ?
 		     " both heads " : " one head ") : " nohead",
 		    this_arrowstyle->arrow_properties.layer ? "front" : "back");
+	    save_linetype(stderr, &(this_arrowstyle->arrow_properties.lp_properties), FALSE);
+	    fputc('\n', stderr);
+
 	    if (this_arrowstyle->arrow_properties.head > 0) {
 		fprintf(stderr, "\t  arrow heads: %s, ",
 		  ( (this_arrowstyle->arrow_properties.head_filled==2) ? "filled" :
