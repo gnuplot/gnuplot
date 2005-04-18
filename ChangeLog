@@ -10,6 +10,9 @@
 	* src/set.c (set_key): Fix parsing bug that caused next item after
 	'set key title "Foo"' to be ignored.
 
+	* src/graphics.c (boundary): Fix for bug #1184989. Explicitly test for
+	absence of any plot titles when sizing the key (avoid divide-by-zero).
+
 2005-04-18  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* term/fig.trm (FIG_set_color): Support for "textcolor lt".

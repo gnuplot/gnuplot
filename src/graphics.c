@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.153 2005/03/03 04:09:48 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.154 2005/04/14 20:04:41 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -631,7 +631,8 @@ boundary(struct curve_points *plots, int count)
 		key_rows = (int) (ptitl_cnt + key_cols - 1) / key_cols;
 
 		/* now calculate actual no cols depending on no rows */
-		key_cols = (int) (ptitl_cnt + key_rows - 1) / key_rows;
+		key_cols = (key_rows == 0) ? 1
+			 : (int) (ptitl_cnt + key_rows - 1) / key_rows;
 		if (key_cols == 0) {
 		    key_cols = 1;
 		    key_panic = TRUE;
