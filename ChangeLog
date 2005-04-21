@@ -1,3 +1,15 @@
+2005-04-21  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/command.c (pause_command) src/command.h docs/gnuplot.doc:
+	Modify syntax of pause mouse command:
+	    pause mouse {<end_condition>}{,<end_condition>}... {"prompt"}
+	where <end_condition> is one of
+	    keystroke, button1, button2, button3, any
+
+	* src/mouse.c (event_keypress event_buttonpress event_bottonrelease
+	event_reset) src/term (term_reset) src/win/wpause.c term/x11.trm:
+	Test individually for specific end conditions for `pause mouse`.
+
 2005-04-18  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/save.c (save_linetype) src/save.h src/show.c:    Code cleanup.

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wpause.c,v 1.6 2004/05/17 10:18:18 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: wpause.c,v 1.7 2004/07/01 17:10:11 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - win/wpause.c */
@@ -64,7 +64,7 @@ LRESULT CALLBACK WINEXPORT PauseButtonProc(HWND, UINT, WPARAM, LPARAM);
 #ifndef TBOOLEAN
 #define TBOOLEAN unsigned char
 #endif
-extern TBOOLEAN paused_for_mouse;
+extern int paused_for_mouse;
 
 /* Create Pause Class */
 /* called from PauseBox the first time a pause window is created */
@@ -199,7 +199,7 @@ WndPauseProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 					lppw->bPauseCancel = LOWORD(wParam);
 					lppw->bPause = FALSE;
 				    }
-					break;
+				    break;
 			}
 			return(0);
 		case WM_SETFOCUS:

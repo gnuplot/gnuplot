@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.68 2004/12/29 19:47:49 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.69 2005/03/26 22:06:50 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -1317,9 +1317,21 @@ event_keypress(struct gp_event_t *ge, TBOOLEAN current)
     keypress.key = c;
     keypress.modifier = modifier_mask;
 
-    /* Key bindings take precedence over generic actions like
-     * 'pause mouse key'.
+    /*
+     * On 'pause mouse keypress' in active window export current keypress 
+     * and mouse coords to user variables. A key with 'bind all' terminates 
+     * a pause even from non-active windows.
+     * Ignore NULL keypress.
+     *
+     * If we are paused for a keystroke, this takes precendence over normal
+     * key bindings. Otherwise, for example typing 'm' would turn off mousing,
+     * which is a bad thing if you are in the  middle of a mousing operation.
      */
+
+    if ((paused_for_mouse & PAUSE_KEYSTROKE) && (c > '\0') && current) {
+	load_mouse_variables(x, y, FALSE, c);
+	return;
+    }
 
     for (ptr = bindings; ptr; ptr = ptr->next) {
 	if (bind_matches(&keypress, ptr)) {
@@ -1355,15 +1367,6 @@ event_keypress(struct gp_event_t *ge, TBOOLEAN current)
 	}
     }
 
-    /* On 'pause mouse keypress' in active window
-     * export current keypress and mouse coords to user variables.
-     * A key with 'bind all' terminates a pause even from non-active windows.
-     * Ignore NULL keypress
-     */
-    if (paused_for_mouse && paused_for_mousekeys && (c > '\0') && current) {
-	load_mouse_variables(x, y, FALSE, c);
-	return;
-    }
 }
 
 
@@ -1428,8 +1431,7 @@ event_buttonpress(struct gp_event_t *ge)
 		/* not bound in 2d graphs */
 	    } else if (2 == b) {
 		/* not bound in 2d graphs */
-	    } else if (3 == b && !replot_disabled 
-		   &&  !(paused_for_mouse && !paused_for_mousekeys)) {
+	    } else if (3 == b && !replot_disabled && !(paused_for_mouse & PAUSE_CLICK)) {
 		/* start zoom; but ignore it when
 		 *   - replot is disabled, e.g. with inline data, or
 		 *   - during 'pause mouse'
@@ -1632,9 +1634,9 @@ event_buttonrelease(struct gp_event_t *ge)
     UpdateStatusline();
 
 #ifdef _Windows
-    if (paused_for_mouse && !paused_for_mousekeys) {
+    if (paused_for_mouse & PAUSE_CLICK) {
 	/* remove pause message box after 'pause mouse' */
-	paused_for_mouse = FALSE;
+	paused_for_mouse = 0;
 	kill_pending_Pause_dialog();
     }
 #endif
@@ -1785,8 +1787,7 @@ event_reset(struct gp_event_t *ge)
     }
 
     if (paused_for_mouse) {
-	paused_for_mouse = FALSE;
-	paused_for_mousekeys = FALSE;
+	paused_for_mouse = 0;
 #ifdef _Windows
 	/* remove pause message box after 'pause mouse' */
 	kill_pending_Pause_dialog();

@@ -1,5 +1,5 @@
 /*
- * $Id: command.h,v 1.34 2004/11/06 21:18:45 sfeam Exp $
+ * $Id: command.h,v 1.35 2005/02/01 11:28:50 broeker Exp $
  */
 
 /* GNUPLOT - command.h */
@@ -64,8 +64,13 @@ extern char *replot_line;
 extern TBOOLEAN replot_disabled;
 
 #ifdef USE_MOUSE
-extern TBOOLEAN paused_for_mouse;
-extern TBOOLEAN paused_for_mousekeys;
+extern int paused_for_mouse;	/* Flag the end condition we are paused until */
+#define PAUSE_BUTTON1   001		/* Mouse button 1 */
+#define PAUSE_BUTTON2   002		/* Mouse button 2 */
+#define PAUSE_BUTTON3   004		/* Mouse button 3 */
+#define PAUSE_CLICK	007		/* Any button click */
+#define PAUSE_KEYSTROKE 010		/* Any keystroke */
+#define PAUSE_ANY       077		/* Terminate on any of the above */
 #endif
 
 extern TBOOLEAN is_3d_plot;

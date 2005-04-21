@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.110 2005/02/18 09:47:41 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.111 2005/03/26 22:06:49 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -168,8 +168,7 @@ int plot_token;			/* start of 'plot' command */
 TBOOLEAN replot_disabled = FALSE;
 
 #ifdef USE_MOUSE
-TBOOLEAN paused_for_mouse = FALSE;
-TBOOLEAN paused_for_mousekeys = FALSE;
+int paused_for_mouse = 0;
 #endif
 
 /* If last plot was a 3d one. */
@@ -914,8 +913,7 @@ pause_command()
     *buf = NUL;
 
 #ifdef USE_MOUSE
-    paused_for_mouse = FALSE;
-    paused_for_mousekeys = FALSE;
+    paused_for_mouse = 0;
     if (equals(c_token,"mouse")) {
 	sleep_time = -1;
 	c_token++;
@@ -925,13 +923,35 @@ pause_command()
 /*	if (term_initialised) { */
 	if (mouse_setting.on && term) {
 	    struct udvt_entry *current;
-	    paused_for_mouse = TRUE;
-	    if (!(END_OF_COMMAND)) {
+	    int end_condition = 0;
+	    
+	    while (!(END_OF_COMMAND)) {
 		if (almost_equals(c_token,"key$press")) {
-		paused_for_mousekeys = TRUE;
-		c_token++;
-		}
+		    end_condition |= PAUSE_KEYSTROKE;
+		    c_token++;
+		} else if (equals(c_token,",")) {
+		    c_token++;
+		} else if (equals(c_token,"any")) {
+		    end_condition |= PAUSE_ANY;
+		    c_token++;
+		} else if (equals(c_token,"button1")) {
+		    end_condition |= PAUSE_BUTTON1;
+		    c_token++;
+		} else if (equals(c_token,"button2")) {
+		    end_condition |= PAUSE_BUTTON2;
+		    c_token++;
+		} else if (equals(c_token,"button3")) {
+		    end_condition |= PAUSE_BUTTON3;
+		    c_token++;
+		} else
+		    break;
 	    }
+
+	    if (end_condition)
+	        paused_for_mouse = end_condition;
+	    else
+	        paused_for_mouse = PAUSE_CLICK;
+
 	    /* Set the pause mouse return codes to -1 */
 	    current = add_udv_by_name("MOUSE_KEY");
 	    current->udv_undef = FALSE;

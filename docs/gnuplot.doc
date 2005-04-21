@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.287 2005/04/08 11:15:34 mikulik Exp $
+C RCS $Id: gnuplot.doc,v 1.288 2005/04/14 20:04:27 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -2753,8 +2753,8 @@ C ... and restart the table:
 
  Syntax:
        pause <time> {"<string>"}
-       pause mouse {keypress} {"<string>"}
-
+       pause mouse {<endcondition>}{, <endcondition>} {"<string>"}
+       
  <time> may be any constant or expression.  Choosing -1 will wait until a
  carriage return is hit, zero (0) won't pause at all, and a positive number
  will wait the specified number of seconds.  The time is rounded to an integer
@@ -2765,9 +2765,12 @@ C ... and restart the table:
  on either a mouse click or on ctrl-C.  For all other terminals, or if mousing
  is not active, `pause mouse` is equivalent to `pause -1`.
 
- The variant command `pause mouse keypress` will terminate on a keypress in the
- plot window.  The ascii value of the key pressed is returned in MOUSE_KEY.
- The character itself is returned as a one character string in MOUSE_CHAR.
+ If one or more end conditions are given after `pause mouse`, then any one of
+ the conditions will terminate the pause. The possible end conditions are 
+ `keypress`, `button1`, `button2`, `button3`, and `any`.
+ If the pause terminates on a keypress, then the ascii value of the key pressed
+ is returned in MOUSE_KEY.  The character itself is returned as a one character
+ string in MOUSE_CHAR.
 
  In all cases the coordinates of the mouse are returned in variables MOUSE_X,
  MOUSE_Y, MOUSE_X2, MOUSE_Y2.
@@ -2782,7 +2785,10 @@ C ... and restart the table:
        pause 3     # Wait three seconds
        pause -1  "Hit return to continue"
        pause 10  "Isn't this pretty?  It's a cubic spline."
-       pause mouse "Click mouse on selected data point"
+       pause mouse "Click any mouse button on selected data point"
+       pause mouse keypress "Type a letter from A-F in the active window"
+       pause mouse button1,keypress
+       pause mouse any "Any key or button will terminate"
 
  The variant "pause mouse key" will resume after any keypress in the active
  plot window. If you want to wait for a particular key to be pressed, you can

@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: x11.trm,v 1.135 2005/03/09 18:26:46 sfeam Exp $
+ * $Id: x11.trm,v 1.136 2005/03/26 22:06:53 sfeam Exp $
  *
  */
 
@@ -646,14 +646,21 @@ AGAIN:
 			}
 			return(GE_fontprops);
 		    }
-		    if (ge.type == GE_buttonrelease && paused_for_mouse && !paused_for_mousekeys) {
-			paused_for_mouse = FALSE;
-			return '\0';
+		    if (ge.type == GE_buttonrelease && (paused_for_mouse & PAUSE_CLICK)) {
+			int button = ge.par1;
+			if (button == 1 && (paused_for_mouse & PAUSE_BUTTON1))
+			    paused_for_mouse = 0;
+			if (button == 2 && (paused_for_mouse & PAUSE_BUTTON2))
+			    paused_for_mouse = 0;
+			if (button == 3 && (paused_for_mouse & PAUSE_BUTTON3))
+			    paused_for_mouse = 0;
+			if (paused_for_mouse == 0)
+			    return '\0';
 		    }
-		    if (ge.type == GE_keypress && paused_for_mouse && paused_for_mousekeys) {
+		    if (ge.type == GE_keypress && (paused_for_mouse & PAUSE_KEYSTROKE)) {
 			/* Ignore NULL keycode */
 			if (ge.par1 > '\0') {
-			    paused_for_mouse = FALSE;
+			    paused_for_mouse = 0;
 			    return '\0';
 			}
 		    }
@@ -661,9 +668,9 @@ AGAIN:
 	    }
 	} while (!FD_ISSET(fd, &fds));
 
-    /* If ipc_back_fd is not open, we will never see any mouse clicks! */
+    /* If ipc_back_fd is not open, we will never see any mouse events! */
     else if (paused_for_mouse) {
-	paused_for_mouse = FALSE;
+	paused_for_mouse = 0;
 	int_error(NO_CARET,"Mousing not active");
     }
 
@@ -829,7 +836,7 @@ X11_reset()
     IPC_LOCK = FALSE;
 #endif
 #ifdef USE_MOUSE
-    paused_for_mouse = FALSE;
+    paused_for_mouse = 0;
 #endif
 }
 
