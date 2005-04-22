@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: winmain.c,v 1.14 2004/04/13 17:24:14 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: winmain.c,v 1.15 2004/07/01 17:10:10 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - win/winmain.c */
@@ -60,11 +60,13 @@ static char *RCSid() { return RCSid("$Id: winmain.c,v 1.14 2004/04/13 17:24:14 b
 #include <stdarg.h>
 #include <ctype.h>
 #ifdef __MSC__
-#include <malloc.h>
-#else
-# ifdef __TURBOC__ /* HBB 981201: MinGW32 doesn't have this */
-#include <alloc.h>
+# include <malloc.h>
 #endif
+#ifdef __TURBOC__ /* HBB 981201: MinGW32 doesn't have this */
+# include <alloc.h>
+#endif
+#ifdef __WATCOMC__
+# define mktemp _mktemp
 #endif
 #include <io.h>
 #include "plot.h"
@@ -182,6 +184,11 @@ int PASCAL WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 		_argv[++_argc] = _fstrtok( NULL, " ");
 # endif /* WIN32 */
 #endif /* __MSC__ */
+
+#ifdef	__WATCOMC__
+# define _argv __argv
+# define _argc __argc
+#endif
 
 	szModuleName = (LPSTR)farmalloc(MAXSTR+1);
 	CheckMemory(szModuleName);

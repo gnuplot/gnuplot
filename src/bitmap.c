@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: bitmap.c,v 1.22 2004/07/01 17:10:03 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: bitmap.c,v 1.23 2005/03/03 04:09:46 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - bitmap.c */
@@ -99,7 +99,6 @@ static unsigned int b_pattern[] = { 0xffff, 0x1111, 0xffff, 0x5555,
 static unsigned int b_lastx;
 static unsigned int b_lasty;	/* last pixel set - used by b_line */
 
-#define IN(i,size)  ((unsigned)i < (unsigned)size)
 
 /* 5x9 font, bottom row first, left pixel in lsb */
 const char_row GPFAR fnt5x9[FNT_CHARS][FNT5X9_VBITS] = {
@@ -861,7 +860,7 @@ b_setpixel(unsigned int x, unsigned int y, unsigned int value)
 	x = y;
 	y = b_ysize - 1 - row;
     }
-    if (IN(x, b_xsize) && IN(y, b_ysize)) {
+    if ((x < b_xsize) && (y < b_ysize)) {
 	row = y / 8;
 	mask = 1 << (y % 8);
 
@@ -903,7 +902,7 @@ b_getpixel(unsigned int x, unsigned int y)
 	x = y;
 	y = b_ysize-1-row;
     }
-    if (IN(x, b_xsize) && IN(y, b_ysize)) {
+    if ((x < b_xsize) && (y < b_ysize)) {
 	row = y/8 + (b_planes-1)*b_psize;
 	mask = 1<<(y%8);
 

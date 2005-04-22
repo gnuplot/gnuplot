@@ -1,5 +1,5 @@
 /*
- * $Id: syscfg.h,v 1.28 2004/04/13 17:24:01 broeker Exp $
+ * $Id: syscfg.h,v 1.29 2004/07/01 17:10:08 broeker Exp $
  */
 
 /* GNUPLOT - syscfg.h */
@@ -301,6 +301,7 @@
  */
 #ifdef __WATCOMC__
 # include <direct.h>
+# include <dos.h>
 # define HAVE_GETCWD 1
 #endif
 

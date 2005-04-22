@@ -1,0 +1,202 @@
+#
+# $Id: makefile.oww,v 1.0 2004/02/13 12:48:30 broeker Exp $
+#
+# GNUPLOT Makefile OpenWatcom for 32-bit Window
+# (derived from makefile.nt)
+
+# FIXME/TODO:
+#       add support for PNG, GD etc. libraries
+
+# To compile:
+#	From src directory: wmake -f ..\config\makefile.oww
+
+
+# where to place gnuplot.gih helpfile
+HELPFILE = wgnuplot.hlp
+
+TOP = .
+
+
+CC = wcc386
+CL = wcl386
+LD = link -showwopts
+WLD = wlink
+HCW = "c:\program files\help workshop\hcw.exe"
+
+!ifdef __LOADDLL__
+! loaddll wcc386 wccd386
+! loaddll wlink wlink
+!endif
+
+# compiler flags
+# -I  means extra include directory
+# -5s 	: optimize for P5, stack-based calling convention
+# -bm 	: include multi-thread support
+CFLAGS = -zq -bm -5s -bt=winnt -otexan -I$(TOP) &
+ -DHAVE_CONFIG_H -DUSE_MOUSE -DPM3D
+# -DHAVE_LIBPNG -DHAVE_LIBPDF
+
+
+# paths for external libs added here... 
+# /NODEFAULTLIBs to avoid MSC multi-thread conflicts 
+LDFLAGS = -subsystem:windows 
+
+# ...and here.
+# see other terminal defines in term.h
+TERMFLAGS = -I..\term 
+#-I..\src\libpng -I..\src\zlib -I..\src\pdflib\pdflib
+
+# macros for makefile.all
+O=obj
+T=..\term\
+D=..\docs\
+M=..\demo\
+
+BINFILES = $(M)binary1 $(M)binary2 $(M)binary3
+
+default: wgnuplot.exe $(HELPFILE) wgnuplot.mnu pgnuplot.exe $(BINFILES) .SYMBOLIC
+
+!INCLUDE makefile.awc
+
+OBJS = $(COREOBJS) version.obj
+
+WINOBJS = winmain.obj wgnuplib.obj wgraph.obj wprinter.obj wtext.obj &
+	wpause.obj wmenu.obj gpexecute.obj
+
+WINDOWS = makefile.win makefile.oww README.win win\wcommon.h &
+	win\wgnuplib.c win\wgnuplib.def win\wgnuplib.h win\wgnuplib.rc &
+	win\wgnuplot.def win\wgnuplot.hpj win\wgnuplot.mnu win\wgraph.c &
+	win\winmain.c win\wmenu.c win\wpause.c win\wprinter.c &
+	win\wresourc.h win\wtext.c win\wtext.h win\geticon.c &
+	$(D)doc2rtf.c $(T)win.trm win\grpicon.ico win\texticon.ico
+
+# default rules
+.c.obj: .AUTODEPEND
+	$(CC) $(CFLAGS) $*.c
+
+$(OBJS) $(WINOBJS): config.h
+
+linkopt1.msw: makefile.oww
+	copy gnuplot.opt linkopt1.msw
+	echo winmain >> linkopt1.msw
+	echo gpexecute >> linkopt1.msw
+	echo readline >> linkopt1.msw
+	echo wgnuplib >> linkopt1.msw
+	echo wtext >> linkopt1.msw
+	echo wmenu >> linkopt1.msw
+	echo wpause >> linkopt1.msw
+	echo wgraph >> linkopt1.msw
+	echo wprinter >> linkopt1.msw
+	echo kernel32.lib >> linkopt1.msw
+	echo user32.lib >> linkopt1.msw
+	echo gdi32.lib >> linkopt1.msw
+	echo winspool.lib >> linkopt1.msw
+	echo comdlg32.lib >> linkopt1.msw
+	echo advapi32.lib >> linkopt1.msw
+	echo shell32.lib >> linkopt1.msw
+#	echo pdflib.lib >> linkopt1.msw
+#	echo libpng.lib >> linkopt1.msw
+#	echo zlib.lib >> linkopt1.msw
+	echo wgnuplot.res >> linkopt1.msw
+
+makefile.oww: ..\config\makefile.oww
+	copy ..\config\makefile.oww makefile.oww
+
+config.h: ..\config\config.oww
+	copy ..\config\config.oww config.h
+
+wgnuplot.exe: $(OBJS) $(WINOBJS) win\wgnuplot.def wgnuplot.res linkopt1.msw texticon.ico grpicon.ico
+	$(LD) $(LDFLAGS) /out:wgnuplot.exe @linkopt1.msw
+
+# rules
+
+wgnuplot.res :  win\wgnuplot.rc win\wgnuplib.rc win\wresourc.h texticon.ico grpicon.ico
+	rc /l 0x409 /fowgnuplot.res /i "win" /d "NDEBUG" /d WIN32 /d MSRC win\wgnuplot.rc
+
+term.obj: term.c term.h plot.h setshow.h bitmap.h $(CORETERM) .AUTODEPEND
+	$(CC) $(CFLAGS) $(TERMFLAGS) term.c
+
+winmain.obj: win\winmain.c win\wgnuplib.h win\wtext.h plot.h .AUTODEPEND
+	$(CC) $(CFLAGS) win\winmain.c
+
+WINDEPS = win\wgnuplib.h win\wcommon.h win\wresourc.h
+
+wgnuplib.obj: win\wgnuplib.c $(WINDEPS) .AUTODEPEND
+	$(CC) $(CFLAGS) win\wgnuplib.c
+
+wmenu.obj: win\wmenu.c $(WINDEPS) .AUTODEPEND
+	$(CC) $(CFLAGS) win\wmenu.c
+
+wtext.obj: win\wtext.c $(WINDEPS) .AUTODEPEND
+	$(CC) $(CFLAGS) win\wtext.c
+
+wpause.obj: win\wpause.c $(WINDEPS) .AUTODEPEND
+	$(CC) $(CFLAGS) win\wpause.c
+
+wprinter.obj: win\wprinter.c $(WINDEPS) .AUTODEPEND
+	$(CC) $(CFLAGS) win\wprinter.c
+
+wgraph.obj: win\wgraph.c $(WINDEPS) .AUTODEPEND
+	$(CC) $(CFLAGS) win\wgraph.c
+
+wgnuplot.mnu: win\wgnuplot.mnu
+	copy win\wgnuplot.mnu wgnuplot.mnu
+
+pgnuplot.exe: win\pgnuplot.c version.obj .AUTODEPEND
+	$(CL) -5s win\pgnuplot.c -fe=pgnuplot.exe -I. version.obj user32.lib
+
+# extract icons from wgnuplot.rc
+texticon.ico grpicon.ico: geticon.exe win\wgnuplot.rc
+	geticon win\wgnuplot.rc
+
+geticon.exe: win\geticon.c .AUTODEPEND
+	$(CL) -zq -bt=nt -fe=geticon.exe win\geticon.c
+
+# convert gnuplot.doc to gnuplot.rtf
+$(HELPFILE): doc2rtf.exe $(D)gnuplot.doc win\wgnuplot.hpj
+	doc2rtf $(D)gnuplot.doc win\gnuplot.rtf
+	$(HCW) /c /e win\wgnuplot.hpj
+	if exist win\wgnuplot.hlp copy win\wgnuplot.hlp .
+
+doc2rtf.exe: $(D)doc2rtf.c $(D)termdoc.c $(D)xref.c .AUTODEPEND
+	$(CL) $(CFLAGS) -I. -DWINDOWS_NO_GUI -w1 -I$(D);$(T) -fedoc2rtf.exe $(D)doc2rtf.c $(D)termdoc.c $(D)xref.c
+
+#make binary demo files
+bf_test.exe : bf_test.c dbinary.obj alloc.obj
+	$(CL) $(CFLAGS) -w1 -DWINDOWS_NO_GUI -febf_test.exe bf_test.c dbinary.obj alloc.obj
+
+$(BINFILES): bf_test.exe
+	bf_test
+	copy binary? $M.
+	
+# _Windows causes wtext.h to define fread() etc
+dbinary.obj: binary.c .AUTODEPEND
+	$(CC) $(CFLAGS) /U_Windows -DWINDOWS_NO_GUI -w1 -fodbinary.obj binary.c
+
+# clean up temporary files
+clean: .SYMBOLIC
+	if exist *.obj del *.obj
+	if exist *.err del *.err
+	if exist *.ico del *.ico
+	if exist wgnuplot.res del wgnuplot.res
+	if exist win\gnuplot.rtf del win\gnuplot.rtf
+	if exist win\wgnuplot.hlp del win\wgnuplot.hlp
+	if exist bf_test.exe del bf_test.exe
+	if exist binary? del binary?
+	if exist linkopt1.msw del linkopt1.msw
+	if exist doc2rtf.exe del doc2rtf.exe
+	if exist geticon.exe del geticon.exe
+	if exist GNUPLOT del GNUPLOT
+
+veryclean: clean .SYMBOLIC
+	if exist wgnuplot.exe del wgnuplot.exe
+	if exist wgnuplot.hlp del wgnuplot.hlp
+	if exist wgnuplot.mnu del wgnuplot.mnu
+	if exist pgnuplot.exe del pgnuplot.exe
+	if exist ..\demo\binary1 del ..\demo\binary1
+	if exist ..\demo\binary2 del ..\demo\binary2
+	if exist ..\demo\binary3 del ..\demo\binary3
+	if exist ..\demo\fit.log del ..\demo\fit.log
+	if exist ..\demo\soundfit.par del ..\demo\soundfit.par
+	if exist config.h del config.h
+	if exist makefile.oww del makefile.oww

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.48 2004/09/11 17:46:02 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.49 2005/02/01 11:28:50 broeker Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -90,7 +90,7 @@ static int kbhit(void);
 #endif
 
 enum marq_res {
-    OK, ERROR, BETTER, WORSE
+    OK, ML_ERROR, BETTER, WORSE
 };
 typedef enum marq_res marq_res_t;
 
@@ -151,7 +151,7 @@ static char fit_script[256];
 static const char fitlogfile_default[] = "fit.log";
 static const char GNUFITLOG[] = "FIT_LOG";
 
-static const char *FIXED = "# FIXED";
+static const char *GP_FIXED = "# FIXED";
 static const char *FITLIMIT = "FIT_LIMIT";
 static const char *FITSTARTLAMBDA = "FIT_START_LAMBDA";
 static const char *FITLAMBDAFACTOR = "FIT_LAMBDA_FACTOR";
@@ -352,7 +352,7 @@ marquardt(double a[], double **C, double *chisq, double *lambda)
 	for (i = 0; i < num_params; i++)
 	    for (j = 0; j < i; j++)
 		C[num_data + i][j] = 0, C[num_data + j][i] = 0;
-	return analyze_ret ? OK : ERROR;
+	return analyze_ret ? OK : ML_ERROR;
     }
     /* once converged, free dynamic allocated vars */
 
@@ -391,7 +391,7 @@ marquardt(double a[], double **C, double *chisq, double *lambda)
 
     if (!analyze(temp_a, tmp_C, tmp_d, &tmp_chisq)) {
 	/* FIXME: will never be reached: always returns TRUE */
-	return ERROR;
+	return ML_ERROR;
     }
     if (tmp_chisq < *chisq) {	/* Success, accept new solution */
 	if (*lambda > MIN_LAMBDA) {
@@ -588,7 +588,7 @@ regress(double a[])
     ctrlc_setup();
 
     /* Initialize internal variables and 1st chi-square check */
-    if ((res = marquardt(a, C, &chisq, &lambda)) == ERROR)
+    if ((res = marquardt(a, C, &chisq, &lambda)) == ML_ERROR)
 	Eex("FIT: error occurred during fit");
     res = BETTER;
 
@@ -635,7 +635,7 @@ regress(double a[])
 	}
 	if ((res = marquardt(a, C, &chisq, &lambda)) == BETTER)
 	    show_fit(iter, chisq, last_chisq, a, lambda, STANDARD);
-    } while ((res != ERROR)
+    } while ((res != ML_ERROR)
 	     && (lambda < MAX_LAMBDA)
 	     && ((maxiter == 0) || (iter <= maxiter))
 	     && (res == WORSE
@@ -668,7 +668,7 @@ regress(double a[])
 	Dblf2("abs. change during last iteration : %g\n\n", (chisq - last_chisq));
     }
 
-    if (res == ERROR)
+    if (res == ML_ERROR)
 	Eex("FIT: error occurred during fit");
 
     /* compute errors in the parameters */
@@ -1519,7 +1519,7 @@ fit_command()
 	while (TRUE) {
 	    if (!fgets(s = sstr, (int) sizeof(sstr), f))	/* EOF found */
 		break;
-	    if ((tmp = strstr(s, FIXED)) != NULL) {	/* ignore fixed params */
+	    if ((tmp = strstr(s, GP_FIXED)) != NULL) {	/* ignore fixed params */
 		*tmp = NUL;
 		fprintf(log_f, "FIXED:  %s\n", s);
 		fixed = TRUE;

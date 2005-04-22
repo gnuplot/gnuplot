@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: xref.c,v 1.9 2004/04/13 17:23:36 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: xref.c,v 1.10 2004/07/01 17:10:03 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - xref.c */
@@ -93,10 +93,11 @@ xmalloc(size_t size)
 {
     generic *p = malloc(size);
 
-    if (p)
-	return p;
-    fprintf(stderr, "Malloc failed\n");
-    exit(EXIT_FAILURE);
+    if (!p) {
+        fprintf(stderr, "Malloc failed\n");
+	exit(EXIT_FAILURE);
+    }
+    return p;
 }
 
 /* scan the file and build a list of line numbers where particular levels are */

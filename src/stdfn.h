@@ -1,5 +1,5 @@
 /*
- * $Id: stdfn.h,v 1.28 2004/11/10 23:30:30 sfeam Exp $
+ * $Id: stdfn.h,v 1.29 2005/01/26 16:16:06 broeker Exp $
  */
 
 /* GNUPLOT - stdfn.h */
@@ -330,6 +330,10 @@ int gp_strnicmp __PROTO((const char *, const char *, size_t));
 # else
 #  define GP_GETCWD(path,len) getwd (path)
 # endif
+#endif
+
+#ifdef WIN32
+# include <windows.h>
 #endif
 
 /* sleep delay time, where delay is a double value */

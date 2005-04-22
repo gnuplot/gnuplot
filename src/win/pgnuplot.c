@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: pgnuplot.c,v 1.12 2004/07/01 17:10:10 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: pgnuplot.c,v 1.13 2005/01/26 16:19:10 broeker Exp $"); }
 #endif
 
 /*
@@ -142,6 +142,9 @@ static char *RCSid() { return RCSid("$Id: pgnuplot.c,v 1.12 2004/07/01 17:10:10 
 # define _O_BINARY O_BINARY
 #endif
 #if (__BORLANDC__ >= 0x450) /* about BCBuilder 1.0 */
+# define _setmode setmode
+#endif
+#ifdef __WATCOMC__
 # define _setmode setmode
 #endif
 

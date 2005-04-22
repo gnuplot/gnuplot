@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: specfun.c,v 1.32 2004/11/12 18:12:34 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: specfun.c,v 1.33 2004/11/14 01:42:48 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - specfun.c */
@@ -134,13 +134,6 @@ static double erfc __PROTO((double a));
  * (Sun SPARCstation)
  */
 #define UNK 1
-
-/* If you define UNK, then be sure to set BIGENDIAN properly. */
-#ifdef FLOAT_WORDS_BIGENDIAN
-#define BIGENDIAN 1
-#else
-#define BIGENDIAN 0
-#endif
 
 /* Define to support tiny denormal numbers, else undefine. */
 #define DENORMAL 1

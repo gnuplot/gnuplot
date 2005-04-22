@@ -1,5 +1,5 @@
 /*
- * $Id: wgnuplib.h,v 1.17 2004/07/01 17:10:10 broeker Exp $
+ * $Id: wgnuplib.h,v 1.18 2005/01/27 23:21:12 mikulik Exp $
  */
 
 /* GNUPLOT - win/wgnuplib.h */
@@ -41,6 +41,8 @@
  */
 
 /* this file contains items to be visible outside wgnuplot.dll */
+
+#include <windows.h>
 
 #ifdef _WINDOWS
 #define _Windows

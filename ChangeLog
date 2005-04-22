@@ -1,3 +1,45 @@
+2005-04-22  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* config/makefile.oww, config/config.oww, src/makefile.awc: New
+	build files for Win32 build using OpenWatcom compiler.
+
+	* src/win/winmain.c (mktemp) [__WATCOMC__]: Added name override to
+	_mktemp.
+	(_argv, _argc) [__WATCOMC__]: Added name overrides to __argc and
+	__argv.
+
+	* src/win/wgnuplib.h: Added #include <windows.h>
+
+	* src/win/pgnuplot.c (_setmode) [__WATCOMC__]: Added name override
+	to setmode.
+	
+	* src/term.c [__WATCOMC__]: Added #include <io.h>.
+
+	* src/syscfg.h [__WATCOMC__]: Added #include <dos.h>.
+
+	* src/stdfn.h [WIN32]: Added #include <windows.h> for necessary
+	type declarations like DWORD.
+
+	* src/specfun.c (BIGENDIAN): Removed unused definition conflicting
+	with system headers.
+
+	* src/mouse.c [_Windows]: Added #include "win/winmain.h" for
+	kill_pending_Pause_dialog() prototype.
+
+	* src/fit.c (ERROR): Renamed to GP_ERROR to avoid conflict with
+	some system headers.
+	(FIXED): Renamed to GP_FIXED to avoid conflicts with system
+	headers.
+
+	* src/command.c [__WATCOMC__]: Don't #include <dir.h>.
+
+	* src/bitmap.c (IN) Macro conflicts with names used by some system
+	headers.  Removed.
+	(b_setpixel): Replace usage of macro IN by simplified expansion.
+
+	* docs/xref.c (xmalloc): Fixed missing return from non-void
+	function.
+
 2005-04-21  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/command.c (pause_command) src/command.h docs/gnuplot.doc:
