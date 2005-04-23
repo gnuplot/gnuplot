@@ -12,6 +12,9 @@
 	Mark the labels making up a 'with labels' plot as belonging to 
 	LAYER_PLOTLABELS rather than to front or back layers.
 
+	* src/gplt_x11.c (exec_cmd): When setting a new font, set it for
+	both the normal and pm3d graphics contexts.
+
 2005-04-22  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* config/makefile.oww, config/config.oww, src/makefile.awc: New
