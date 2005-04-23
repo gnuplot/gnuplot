@@ -317,6 +317,13 @@ extern TBOOLEAN parametric;
 extern TBOOLEAN suppressMove;
 #endif 
 
+/* Plot layer definitions are collected here. */
+/* Someday they might actually be used.       */
+#define LAYER_BEHIND     -1
+#define LAYER_BACK        0
+#define LAYER_FRONT       1
+#define LAYER_PLOTLABELS 99
+
 /* Functions exported by gadgets.c */
 
 /* moved here from util3d: */

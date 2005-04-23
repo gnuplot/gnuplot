@@ -1,3 +1,17 @@
+2005-04-23  Ethan Merritt  <merritt@u.washington.edu>
+
+	Bug fix: Do not apply axis mapping (e.g. log scale) twice to the
+	label coordinates in plot style 'with labels'.
+
+	* src/gadgets.h: Define a new "layer" LAYER_PLOTLABELS, which 
+	allows the label-processing code to distinguish labels whose coords
+	have already been axis-mapped from those where they have not.
+
+	* src/graphics.c (place_labels do_plot) src/plot2d.c (eval_plots) 
+	src/graph3d.c (place_labels3d do_3dplot) src/plot3d.c (eval_3dplots):
+	Mark the labels making up a 'with labels' plot as belonging to 
+	LAYER_PLOTLABELS rather than to front or back layers.
+
 2005-04-22  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* config/makefile.oww, config/config.oww, src/makefile.awc: New

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.154 2005/04/14 20:04:41 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.155 2005/04/18 22:04:13 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -1221,7 +1221,12 @@ place_labels(struct text_label *listhead, int layer, TBOOLEAN clip)
 
 	if (this_label->layer != layer)
 	    continue;
-	map_position(&this_label->place, &x, &y, "label");
+
+	if (layer == LAYER_PLOTLABELS) {
+	    x = map_x(this_label->place.x);
+	    y = map_y(this_label->place.y);
+	} else
+	    map_position(&this_label->place, &x, &y, "label");
 
 	if (clip) {
 	    if (this_label->place.scalex == first_axes)
@@ -1675,7 +1680,7 @@ do_plot(struct curve_points *plots, int pcount)
 
 #ifdef EAM_DATASTRINGS
 	case LABELPOINTS:
-	    place_labels( this_plot->labels->next, 1, TRUE);
+	    place_labels( this_plot->labels->next, LAYER_PLOTLABELS, TRUE);
 	    break;
 #endif
 #ifdef WITH_IMAGE

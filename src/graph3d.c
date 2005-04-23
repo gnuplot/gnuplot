@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.116 2005/03/17 20:43:02 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.117 2005/03/21 08:38:14 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -484,7 +484,10 @@ place_labels3d(struct text_label *listhead, int layer)
 	if (this_label->layer != layer)
 	    continue;
 
-	map3d_position(&this_label->place, &x, &y, "label");
+	if (layer == LAYER_PLOTLABELS) {
+	    map3d_xy(this_label->place.x, this_label->place.y, this_label->place.z, &x, &y);
+	} else
+	    map3d_position(&this_label->place, &x, &y, "label");
 
 	/* EAM FIXME - Is this a sufficient test for out-of-bounds? */
 	if (x < 0 || x > term->xmax || y < 0 || y > term->ymax) {
@@ -1038,7 +1041,7 @@ do_3dplot(
 #ifdef EAM_DATASTRINGS
 	    case LABELPOINTS:
 		if (!(hidden3d && draw_surface))
-		    place_labels3d(this_plot->labels->next, 1);
+		    place_labels3d(this_plot->labels->next, LAYER_PLOTLABELS);
 		break;
 #endif
 #ifdef EAM_HISTOGRAMS
