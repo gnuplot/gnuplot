@@ -1,3 +1,8 @@
+2005-04-24  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* src/pm3d.c (set_plot_with_palette): Show colorbox for 'splot ... with
+	... palette'.
+
 2005-04-23  Ethan Merritt  <merritt@u.washington.edu>
 
 	Bug fix: Do not apply axis mapping (e.g. log scale) twice to the

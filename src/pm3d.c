@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.59 2005/03/29 08:07:16 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.60 2005/04/06 11:28:48 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - pm3d.c */
@@ -797,10 +797,12 @@ set_plot_with_palette(int plot_num, int plot_mode)
 	/* Any surface 'with pm3d' or 'with line|dot palette'? */
 	while (surface++ < plot_num) {
 	    if (this_3dplot->lp_properties.use_palette) {
-		if (this_3dplot->lp_properties.pm3d_color.type <= TC_RGB)
+		if (this_3dplot->lp_properties.pm3d_color.type != TC_DEFAULT)
+		    /* can this really happen? for which syntax? */
 		    want_palette_but_not_colorbox = TRUE;
 		    /* don't return yet -- decide later whether showing color box is desirable */
 		else
+		    /* TC_DEFAULT: splot x with line|lp|dot palette */
 		    return;
 	    }
 #ifdef EAM_DATASTRINGS
