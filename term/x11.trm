@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: x11.trm,v 1.136 2005/03/26 22:06:53 sfeam Exp $
+ * $Id: x11.trm,v 1.137 2005/04/22 05:25:35 sfeam Exp $
  *
  */
 
@@ -1973,10 +1973,10 @@ START_HELP(x11)
 " example below will work as expected, but the second will not.",
 "",
 "    set term x11 enhanced font \"arial,15\" ",
-"    set title '{\\=20 Big} Medium {\\=5 Small}' ",
+"    set title '{/=20 Big} Medium {/=5 Small}' ",
 "",
 "    set term x11 enhanced font \"terminal-14\" ",
-"    set title '{\\=20 Big} Medium {\\=5 Small}' ",
+"    set title '{/=20 Big} Medium {/=5 Small}' ",
 "",
 " Plot windows remain open even when the `gnuplot` driver is changed to a",
 " different device.  A plot window can be closed by pressing the letter q",
