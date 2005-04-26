@@ -1,3 +1,14 @@
+2005-04-26  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/win/wgraph.c (drawgraph): Initialize local variable to avoid
+	a -Wuninitialized.
+
+	* src/history.c (write_history_n): Only define local is_pipe if
+	PIPES enabled.  Avoids a -Wunused.
+
+	* src/command.c (winsystem): Define this function only if
+	USE_OWN_WINSYSTEM_FUNCTION is set.  Removes a -Wunused.
+
 2005-04-24  Ethan Merritt  <merritt@u.washington.edu>
 
 	term/x11.trm: Fix a typo in the example using enhanced text font sizes.

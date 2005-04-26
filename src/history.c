@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: history.c,v 1.13 2004/04/13 17:23:58 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: history.c,v 1.14 2004/07/01 17:10:06 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - history.c */
@@ -122,7 +122,9 @@ write_history_n(const int n, const char *filename, const char *mode)
 {
     struct hist *entry = history, *start = NULL;
     FILE *out = stdout;
+#ifdef PIPES
     int is_pipe = 0; /* not filename but pipe to an external program */
+#endif
     int hist_entries = 0;
     int hist_index = 1;
 

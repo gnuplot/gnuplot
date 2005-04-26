@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.40 2005/03/03 04:09:49 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.41 2005/03/26 22:06:52 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - win/wgraph.c */
@@ -1073,7 +1073,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 	    {
 		POINT p[6];
 		int i;
-		int shape;
+		int shape = 0;
 		int filled = 0;
 		static float pointshapes[5][10] = {
 		    {-1, -1, +1, -1, +1, +1, -1, +1, 0, 0}, /* box */
@@ -1105,8 +1105,8 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 		case W_fbox:
 		case W_fdiamond:
 		case W_fitriangle:
-		case W_ftriangle:
-		case W_fpentagon:
+		    case W_ftriangle:
+		    case W_fpentagon:
 		    shape = curptr->op-W_fbox;
 		    filled = 1;
 		    break;
