@@ -1,3 +1,10 @@
+2005-04-27  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/set.c (set_label): If the first option after 'set label' is an
+	expression, handle it appropriately whether it is a numerical expression
+	that provides the label id tag or a string expression that provides the
+	label itself.
+
 2005-04-27  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/command.c (call_kill_pending_Pause_dialog): Fix accidental
@@ -16,7 +23,7 @@
 
 2005-04-24  Ethan Merritt  <merritt@u.washington.edu>
 
-	term/x11.trm: Fix a typo in the example using enhanced text font sizes.
+	* term/x11.trm: Fix a typo in the example using enhanced text font sizes.
 
 2005-04-24  Petr Mikulik  <mikulik@physics.muni.cz>
 

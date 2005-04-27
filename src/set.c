@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.175 2005/04/15 23:15:59 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.176 2005/04/18 21:25:46 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -1691,12 +1691,26 @@ set_label()
 	&& !equals(c_token, "tc")
 	&& !almost_equals(c_token, "text$color")
 	&& !equals(c_token, "font")) {
-	/* must be a tag expression! */
+
+	/* must be an expression, but is it a tag or is it the label itself? */
+#ifdef GP_STRING_VARS
+	int save_token = c_token;
+	const_express(&a);
+	if (a.type == STRING) {
+	    free(a.v.string_val);
+	    c_token = save_token;
+	    tag = assign_label_tag();
+	} else
+	    tag = (int) real(&a);
+#else
 	tag = (int) real(const_express(&a));
-	if (tag <= 0)
-	    int_error(c_token, "tag must be > zero");
+#endif
+
     } else
 	tag = assign_label_tag();	/* default next tag */
+
+    if (tag <= 0)
+	int_error(c_token, "tag must be > zero");
 
     if (first_label != NULL) {	/* skip to last label */
 	for (this_label = first_label; this_label != NULL;
