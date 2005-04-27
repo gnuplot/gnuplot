@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.113 2005/04/22 21:40:37 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.114 2005/04/26 14:06:54 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -2535,7 +2535,8 @@ read_line(const char *prompt)
 
 #endif /* !VMS */
 
-#if defined(_Windows) && defined(USE_OWN_WINSYSTEM_FUNCTION)
+#if defined(_Windows)
+# if defined(USE_OWN_WINSYSTEM_FUNCTION)
 /* there is a system like call on MS Windows but it is a bit difficult to
    use, so we will invoke the command interpreter and use it to execute the
    commands */
@@ -2547,14 +2548,14 @@ winsystem(const char *s)
     LPCSTR p;
 
     /* get COMSPEC environment variable */
-# ifdef WIN32
+#  ifdef WIN32
     char envbuf[81];
     GetEnvironmentVariable("COMSPEC", envbuf, 80);
     if (*envbuf == NUL)
 	comspec = "\\command.com";
     else
 	comspec = envbuf;
-# else
+#  else
     p = GetDOSEnvironment();
     comspec = "\\command.com";
     while (*p) {
@@ -2564,7 +2565,7 @@ winsystem(const char *s)
 	}
 	p += strlen(p) + 1;
     }
-# endif
+#  endif
     /* if the command is blank we must use command.com */
     p = s;
     while ((*p == ' ') || (*p == '\n') || (*p == '\r'))
@@ -2589,6 +2590,7 @@ winsystem(const char *s)
     /* failure include shutting down Windows */
     return (0);			/* success */
 }
+# endif /* USE_OWN_WINSYSTEM_FUNCTION */
 
 void
 call_kill_pending_Pause_dialog()
