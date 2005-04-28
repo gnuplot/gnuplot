@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.117 2005/03/21 08:38:14 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.118 2005/04/23 18:16:31 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -479,19 +479,26 @@ place_labels3d(struct text_label *listhead, int layer)
     if (term->pointsize)
 	(*term->pointsize)(pointsize);
 
-    for (this_label = listhead; this_label != NULL; this_label = this_label->next) {
+    for (this_label = listhead;
+	 this_label != NULL;
+	 this_label = this_label->next) {
 
 	if (this_label->layer != layer)
 	    continue;
 
-	if (layer == LAYER_PLOTLABELS) {
-	    map3d_xy(this_label->place.x, this_label->place.y, this_label->place.z, &x, &y);
-	} else
+	/* HBB FIXME 20050428: conflicting types for &x,&y in these
+	 * two routines.  One takes pointers to unsigned, the other to
+	 * signed ints. */
+	if (layer == LAYER_PLOTLABELS)
+	    map3d_xy(this_label->place.x, this_label->place.y,
+		     this_label->place.z, &x, &y);
+	else
 	    map3d_position(&this_label->place, &x, &y, "label");
 
 	/* EAM FIXME - Is this a sufficient test for out-of-bounds? */
 	if (x < 0 || x > term->xmax || y < 0 || y > term->ymax) {
-	    FPRINTF((stderr,"place_labels3d: skipping out-of-bounds label\n"));
+	    FPRINTF((stderr,
+	             "place_labels3d: skipping out-of-bounds label\n"));
 	    continue;
 	}
 

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: readline.c,v 1.37 2004/04/13 17:23:59 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: readline.c,v 1.38 2004/07/01 17:10:07 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - readline.c */
@@ -266,7 +266,7 @@ static char msdos_getch __PROTO((void));	/* HBB 980308: PROTO'ed it */
 #  ifdef DJGPP
 #   include <pc.h>
 #  endif			/* DJGPP */
-#  ifdef __EMX__
+#  if defined(__EMX__) || defined (__WATCOMC__)
 #   include <conio.h>
 #  endif			/* __EMX__ */
 #  define special_getc() msdos_getch()

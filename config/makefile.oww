@@ -1,50 +1,86 @@
+# 
+# $Id$
 #
-# $Id: makefile.oww,v 1.0 2004/02/13 12:48:30 broeker Exp $
+# GNUPLOT Makefile OpenWatcom 1.3 on Win32
+
+# To compile: 
+#       Then from ..\src:
+#         wmake -f ..\config\makefile.oww
+# 
+# History of this file:
+# 2004-02-23: Created by massive editing of makefile.nt (and config.nt)
+# 2004-04-25: Removed all remaining MS-isms (by peeking at how OW's
+#  MS namesake replacement tools generate their command lines)
 #
-# GNUPLOT Makefile OpenWatcom for 32-bit Window
-# (derived from makefile.nt)
-
-# FIXME/TODO:
-#       add support for PNG, GD etc. libraries
-
-# To compile:
-#	From src directory: wmake -f ..\config\makefile.oww
-
 
 # where to place gnuplot.gih helpfile
+# NOTE: compiled-in location governed by config.oww!
 HELPFILE = wgnuplot.hlp
 
 TOP = .
 
-
-CC = wcc386
-CL = wcl386
-LD = link -showwopts
-WLD = wlink
+# Programs: 
+# The Microsoft Help compiler:
 HCW = "c:\program files\help workshop\hcw.exe"
 
+# OpenWatcom programs:
+WCL = wcl386
+WCC = wcc386
+WLD = wlink
+WRC = wrc
+
+# Speed up compilation a bit by running the compiler as a DLL from
+# inside wmake:
 !ifdef __LOADDLL__
-! loaddll wcc386 wccd386
-! loaddll wlink wlink
+!  loaddll wcc      wccd
+!  loaddll wccaxp   wccdaxp
+!  loaddll wcc386   wccd386
+!  loaddll wpp      wppdi86
+!  loaddll wppaxp   wppdaxp
+!  loaddll wpp386   wppd386
+!  loaddll wlink    wlink
+!  loaddll wlib     wlibd
 !endif
 
-# compiler flags
-# -I  means extra include directory
-# -5s 	: optimize for P5, stack-based calling convention
-# -bm 	: include multi-thread support
-CFLAGS = -zq -bm -5s -bt=winnt -otexan -I$(TOP) &
- -DHAVE_CONFIG_H -DUSE_MOUSE -DPM3D
-# -DHAVE_LIBPNG -DHAVE_LIBPDF
+
+
+# compiler flags: 
+#
+# Defines
+
+CPPFLAGS =  -D_Windows -DHAVE_CONFIG_H -DUSE_MOUSE -DPM3D
+# library-dependent ones may have to be added, like:
+# -DHAVE_LIBPNG -DHAVE_LIBPDF 
+
+
+# compiler flags, determined from MS ones by OW's "cl /showwopts"
+
+# -c  : don't link
+# -I  : add directory to include search path
+# -zq : don't show a version banner message
+# -5r : P5-optimized, 386-compatible code, register calling convention
+# -zm : put each function in its own section to improve dead code elimination
+# -bm : target multi-threaded environment
+# -sg : grow the stack if needed
+# -zlf: store library usage in .obj files
+# -ei : force sizeof(enum) >= sizeof(int)
+# -o  : optimization options:   
+#    r:   reorder for pipelining
+#    i:   inline intrinsics
+#    l:   loop optimizations
+#    t:   optimize for speed
+# -j  : char is signed
+# -aa : allow non-const initializers for locals
+# -d2 : debug information
+        
+WCFLAGS = -zlf -ei -zq -I. -zm -bm -5r -sg -orilt -j -aa -d2 $(CPPFLAGS)
 
 
 # paths for external libs added here... 
-# /NODEFAULTLIBs to avoid MSC multi-thread conflicts 
-LDFLAGS = -subsystem:windows 
-
+LDLIBS = 
 # ...and here.
 # see other terminal defines in term.h
 TERMFLAGS = -I..\term 
-#-I..\src\libpng -I..\src\zlib -I..\src\pdflib\pdflib
 
 # macros for makefile.all
 O=obj
@@ -52,151 +88,148 @@ T=..\term\
 D=..\docs\
 M=..\demo\
 
-BINFILES = $(M)binary1 $(M)binary2 $(M)binary3
+BINARYFILES=$(M)binary1 $(M)binary2 $(M)binary3
 
-default: wgnuplot.exe $(HELPFILE) wgnuplot.mnu pgnuplot.exe $(BINFILES) .SYMBOLIC
-
+# Note: like makefile.wc, this need the special Watcom-style version of
+# makefile.all, because line continuation in WMake is different...
 !INCLUDE makefile.awc
+
+default: wgnuplot.exe $(HELPFILE) wgnuplot.mnu $(BINARYFILES) pgnuplot.exe
 
 OBJS = $(COREOBJS) version.obj
 
 WINOBJS = winmain.obj wgnuplib.obj wgraph.obj wprinter.obj wtext.obj &
-	wpause.obj wmenu.obj gpexecute.obj
+        wpause.obj wmenu.obj gpexecute.obj
 
-WINDOWS = makefile.win makefile.oww README.win win\wcommon.h &
-	win\wgnuplib.c win\wgnuplib.def win\wgnuplib.h win\wgnuplib.rc &
-	win\wgnuplot.def win\wgnuplot.hpj win\wgnuplot.mnu win\wgraph.c &
-	win\winmain.c win\wmenu.c win\wpause.c win\wprinter.c &
-	win\wresourc.h win\wtext.c win\wtext.h win\geticon.c &
-	$(D)doc2rtf.c $(T)win.trm win\grpicon.ico win\texticon.ico
 
-# default rules
+# default rule
 .c.obj: .AUTODEPEND
-	$(CC) $(CFLAGS) $*.c
+        $(WCC) $(WCFLAGS) $*.c
 
-$(OBJS) $(WINOBJS): config.h
+$(OBJS): config.h .AUTODEPEND
 
-linkopt1.msw: makefile.oww
-	copy gnuplot.opt linkopt1.msw
-	echo winmain >> linkopt1.msw
-	echo gpexecute >> linkopt1.msw
-	echo readline >> linkopt1.msw
-	echo wgnuplib >> linkopt1.msw
-	echo wtext >> linkopt1.msw
-	echo wmenu >> linkopt1.msw
-	echo wpause >> linkopt1.msw
-	echo wgraph >> linkopt1.msw
-	echo wprinter >> linkopt1.msw
-	echo kernel32.lib >> linkopt1.msw
-	echo user32.lib >> linkopt1.msw
-	echo gdi32.lib >> linkopt1.msw
-	echo winspool.lib >> linkopt1.msw
-	echo comdlg32.lib >> linkopt1.msw
-	echo advapi32.lib >> linkopt1.msw
-	echo shell32.lib >> linkopt1.msw
-#	echo pdflib.lib >> linkopt1.msw
-#	echo libpng.lib >> linkopt1.msw
-#	echo zlib.lib >> linkopt1.msw
-	echo wgnuplot.res >> linkopt1.msw
-
+# file-specific rules
 makefile.oww: ..\config\makefile.oww
-	copy ..\config\makefile.oww makefile.oww
+        copy ..\config\makefile.oww makefile.oww
 
 config.h: ..\config\config.oww
-	copy ..\config\config.oww config.h
+        copy ..\config\config.oww config.h
 
-wgnuplot.exe: $(OBJS) $(WINOBJS) win\wgnuplot.def wgnuplot.res linkopt1.msw texticon.ico grpicon.ico
-	$(LD) $(LDFLAGS) /out:wgnuplot.exe @linkopt1.msw
+wgnuplot.exe: $(OBJS) $(WINOBJS) wgnuplot.res texticon.ico grpicon.ico
+        $(WLD) @<<linkopt1.oww $(LDLIBS)
+RUNTIME windows=4.0
+SYSTEM nt_win
+DEBUG WATCOM ALL
+OPTION quiet
+FILE {
+ $(OBJS)
+ $(WINOBJS)
+}
+LIBRARY kernel32.lib,user32.lib,gdi32.lib,winspool.lib,comdlg32.lib
+LIBRARY advapi32.lib,shell32.lib
+OPTION map
+OPTION SYMFILE
+NAME wgnuplot.exe
+OPTION stack=1M
+OPTION resource=wgnuplot.res
+OPTION ELIMINATE
+REFERENCE _wstart_ 
+OPTION START=_wstart_
+<<
 
-# rules
+# NOTE: Unknown what /l 0x409 does in MS RC call --- seems to work without, though
+wgnuplot.res :  win\wgnuplot.rc win\wgnuplib.rc &
+  win\wresourc.h texticon.ico grpicon.ico
+        $(WRC) -r -q -bt=nt -fowgnuplot.res -i=win &
+	   -d_WIN32 -dNDEBUG -dWIN32 -dMSRC win\wgnuplot.rc
 
-wgnuplot.res :  win\wgnuplot.rc win\wgnuplib.rc win\wresourc.h texticon.ico grpicon.ico
-	rc /l 0x409 /fowgnuplot.res /i "win" /d "NDEBUG" /d WIN32 /d MSRC win\wgnuplot.rc
+term.obj: term.c term.h plot.h setshow.h bitmap.h $(CORETERM)
+        $(WCC) $(WCFLAGS) $(TERMFLAGS) term.c
 
-term.obj: term.c term.h plot.h setshow.h bitmap.h $(CORETERM) .AUTODEPEND
-	$(CC) $(CFLAGS) $(TERMFLAGS) term.c
+winmain.obj: win\winmain.c win\wgnuplib.h win\wtext.h plot.h
+        $(WCC) $(WCFLAGS) win\winmain.c
 
-winmain.obj: win\winmain.c win\wgnuplib.h win\wtext.h plot.h .AUTODEPEND
-	$(CC) $(CFLAGS) win\winmain.c
+wgnuplib.obj: win\wgnuplib.c .AUTODEPEND
+        $(WCC) $(WCFLAGS) win\wgnuplib.c
 
-WINDEPS = win\wgnuplib.h win\wcommon.h win\wresourc.h
+wmenu.obj: win\wmenu.c .AUTODEPEND
+        $(WCC) $(WCFLAGS) win\wmenu.c
 
-wgnuplib.obj: win\wgnuplib.c $(WINDEPS) .AUTODEPEND
-	$(CC) $(CFLAGS) win\wgnuplib.c
+wtext.obj: win\wtext.c .AUTODEPEND
+        $(WCC) $(WCFLAGS) win\wtext.c
 
-wmenu.obj: win\wmenu.c $(WINDEPS) .AUTODEPEND
-	$(CC) $(CFLAGS) win\wmenu.c
+wpause.obj: win\wpause.c .AUTODEPEND
+        $(WCC) $(WCFLAGS) win\wpause.c
 
-wtext.obj: win\wtext.c $(WINDEPS) .AUTODEPEND
-	$(CC) $(CFLAGS) win\wtext.c
+wprinter.obj: win\wprinter.c .AUTODEPEND
+        $(WCC) $(WCFLAGS) win\wprinter.c
 
-wpause.obj: win\wpause.c $(WINDEPS) .AUTODEPEND
-	$(CC) $(CFLAGS) win\wpause.c
-
-wprinter.obj: win\wprinter.c $(WINDEPS) .AUTODEPEND
-	$(CC) $(CFLAGS) win\wprinter.c
-
-wgraph.obj: win\wgraph.c $(WINDEPS) .AUTODEPEND
-	$(CC) $(CFLAGS) win\wgraph.c
+wgraph.obj: win\wgraph.c .AUTODEPEND .AUTODEPEND
+        $(WCC) $(WCFLAGS) win\wgraph.c
 
 wgnuplot.mnu: win\wgnuplot.mnu
-	copy win\wgnuplot.mnu wgnuplot.mnu
+        copy win\wgnuplot.mnu wgnuplot.mnu
 
 pgnuplot.exe: win\pgnuplot.c version.obj .AUTODEPEND
-	$(CL) -5s win\pgnuplot.c -fe=pgnuplot.exe -I. version.obj user32.lib
+        $(WCL) -5r -zq win\pgnuplot.c -fe=pgnuplot.exe -I. &
+	  version.obj user32.lib
+
 
 # extract icons from wgnuplot.rc
-texticon.ico grpicon.ico: geticon.exe win\wgnuplot.rc
-	geticon win\wgnuplot.rc
+texticon.ico: grpicon.ico .SYMBOLIC
 
-geticon.exe: win\geticon.c .AUTODEPEND
-	$(CL) -zq -bt=nt -fe=geticon.exe win\geticon.c
+grpicon.ico: geticon.exe win\wgnuplot.rc
+        geticon win\wgnuplot.rc
+
+geticon.exe: win\geticon.c
+        $(WCL) -zq -bt=nt -fe=geticon.exe win\geticon.c
 
 # convert gnuplot.doc to gnuplot.rtf
 $(HELPFILE): doc2rtf.exe $(D)gnuplot.doc win\wgnuplot.hpj
-	doc2rtf $(D)gnuplot.doc win\gnuplot.rtf
-	$(HCW) /c /e win\wgnuplot.hpj
-	if exist win\wgnuplot.hlp copy win\wgnuplot.hlp .
+        doc2rtf $(D)gnuplot.doc win\gnuplot.rtf
+        $(HCW) /c /e win\wgnuplot.hpj
+        if exist win\wgnuplot.hlp copy win\wgnuplot.hlp .
 
-doc2rtf.exe: $(D)doc2rtf.c $(D)termdoc.c $(D)xref.c .AUTODEPEND
-	$(CL) $(CFLAGS) -I. -DWINDOWS_NO_GUI -w1 -I$(D);$(T) -fedoc2rtf.exe $(D)doc2rtf.c $(D)termdoc.c $(D)xref.c
+doc2rtf.exe: $(D)doc2rtf.c $(D)termdoc.c $(D)xref.c
+        $(WCL) $(WCFLAGS) -w1 -DWINDOWS_NO_GUI /I..\docs;..\term -fedoc2rtf.exe $(D)doc2rtf.c $(D)termdoc.c $(D)xref.c
 
 #make binary demo files
 bf_test.exe : bf_test.c dbinary.obj alloc.obj
-	$(CL) $(CFLAGS) -w1 -DWINDOWS_NO_GUI -febf_test.exe bf_test.c dbinary.obj alloc.obj
+        $(WCL) $(WCFLAGS) -w1 -DWINDOWS_NO_GUI -febf_test.exe bf_test.c dbinary.obj alloc.obj
 
-$(BINFILES): bf_test.exe
-	bf_test
-	copy binary? $M.
-	
+$(BINARYFILES): bf_test.exe
+        .\bf_test
+        move binary? $(M).
+        
 # _Windows causes wtext.h to define fread() etc
-dbinary.obj: binary.c .AUTODEPEND
-	$(CC) $(CFLAGS) /U_Windows -DWINDOWS_NO_GUI -w1 -fodbinary.obj binary.c
+dbinary.obj: binary.c
+        $(WCC) $(WCFLAGS) /U_Windows -w1 -fodbinary.obj binary.c
 
 # clean up temporary files
 clean: .SYMBOLIC
-	if exist *.obj del *.obj
-	if exist *.err del *.err
-	if exist *.ico del *.ico
-	if exist wgnuplot.res del wgnuplot.res
-	if exist win\gnuplot.rtf del win\gnuplot.rtf
-	if exist win\wgnuplot.hlp del win\wgnuplot.hlp
-	if exist bf_test.exe del bf_test.exe
-	if exist binary? del binary?
-	if exist linkopt1.msw del linkopt1.msw
-	if exist doc2rtf.exe del doc2rtf.exe
-	if exist geticon.exe del geticon.exe
-	if exist GNUPLOT del GNUPLOT
+        if exist *.obj del *.obj
+        if exist *.err del *.err
+        if exist *.ico del *.ico
+        if exist wgnuplot.res del wgnuplot.res
+        if exist win\gnuplot.rtf del win\gnuplot.rtf
+        if exist win\wgnuplot.hlp del win\wgnuplot.hlp
+        if exist bf_test.exe del bf_test.exe
+        if exist linkopt1.oww del linkopt1.oww
+        if exist doc2rtf.exe del doc2rtf.exe
+        if exist geticon.exe del geticon.exe
+        if exist wgnuplot.map del wgnuplot.map
+        if exist wgnuplot.sym del wgnuplot.sym
+        
 
-veryclean: clean .SYMBOLIC
-	if exist wgnuplot.exe del wgnuplot.exe
-	if exist wgnuplot.hlp del wgnuplot.hlp
-	if exist wgnuplot.mnu del wgnuplot.mnu
-	if exist pgnuplot.exe del pgnuplot.exe
-	if exist ..\demo\binary1 del ..\demo\binary1
-	if exist ..\demo\binary2 del ..\demo\binary2
-	if exist ..\demo\binary3 del ..\demo\binary3
-	if exist ..\demo\fit.log del ..\demo\fit.log
-	if exist ..\demo\soundfit.par del ..\demo\soundfit.par
-	if exist config.h del config.h
-	if exist makefile.oww del makefile.oww
+realclean: clean .SYMBOLIC
+        if exist wgnuplot.exe del wgnuplot.exe
+        if exist wgnuplot.hlp del wgnuplot.hlp
+        if exist wgnuplot.mnu del wgnuplot.mnu
+        if exist pgnuplot.exe del pgnuplot.exe
+        if exist ..\demo\binary1 del ..\demo\binary1
+        if exist ..\demo\binary2 del ..\demo\binary2
+        if exist ..\demo\binary3 del ..\demo\binary3
+        if exist ..\demo\fit.log del ..\demo\fit.log
+        if exist ..\demo\soundfit.par del ..\demo\soundfit.par
+        if exist config.h del config.h
+        if exist makefile.oww del makefile.oww

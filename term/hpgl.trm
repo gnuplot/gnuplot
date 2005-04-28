@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: hpgl.trm,v 1.17 2004/04/13 17:24:33 broeker Exp $
+ * $Id: hpgl.trm,v 1.18 2004/07/01 17:10:15 broeker Exp $
  */
 
 /* GNUPLOT - hpgl.trm */
@@ -222,7 +222,7 @@ struct HPGL2_font_str {
 
 struct PCL_mode_str {
     const char *compare, *name, *command;
-    int xmax, ymax;
+    unsigned int xmax, ymax;
 };
 
 /*

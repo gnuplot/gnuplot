@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: pc.trm,v 1.18 2004/04/13 17:24:36 broeker Exp $
+ * $Id: pc.trm,v 1.19 2004/07/01 17:10:33 broeker Exp $
  *
  */
 
@@ -107,13 +107,14 @@ static int huge detect_svga __PROTO((void));
 #include <dos.h>
 #endif /* __TURBOC__ */
 #ifdef __WATCOMC__
-#include <graph.h>
+# include <conio.h>		/* for getch() */
+# include <graph.h>
 #endif /* WATCOMC */
 #ifdef MSC
 #include "mcega.h"
 #endif /* MSC */
 
-static int pattern[] ={ 0xffff, 0x0f0f, 0xffff, 0xaaaa, 0x3333, 0x3f3f, 0x0f0f };
+static unsigned int pattern[] ={ 0xffff, 0x0f0f, 0xffff, 0xaaaa, 0x3333, 0x3f3f, 0x0f0f };
 static int vga_color[] ={ 7, 8, 2, 3, 4, 5, 9, 14, 12, 15, 13, 10, 11, 1, 6 };
 
 static int pc_driver, pc_mode;

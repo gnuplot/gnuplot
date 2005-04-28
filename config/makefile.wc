@@ -1,5 +1,5 @@
 #
-# $Id: makefile.wc,v 1.5 1999/12/01 22:07:58 lhecking Exp $
+# $Id: makefile.wc,v 1.6 2004/02/23 13:59:37 broeker Exp $
 #
 # GNUPLOT Makefile for Watcom C
 #
@@ -11,14 +11,22 @@
 
 # where to place gnuplot.gih helpfile
 HELPFILE = gnuplot.gih
-# location of Watcom C compiler
-WC = $(%WATCOM)
-# name of C compiler
+
+# names of C compiler & tools
 CC = wcc386
-# name of C compiler/linker
 CL = wcl386
-# name of linker
 LINK = wlink
+
+!ifdef __LOADDLL__
+!  loaddll wcc      wccd
+!  loaddll wccaxp   wccdaxp
+!  loaddll wcc386   wccd386
+!  loaddll wpp      wppdi86
+!  loaddll wppaxp   wppdaxp
+!  loaddll wpp386   wppd386
+!  loaddll wlink    wlink
+!  loaddll wlib     wlibd
+!endif
 
 # the memory model to use (f = flat)
 MODEL = f
@@ -31,12 +39,19 @@ M=..\demo\
 
 !include makefile.awc
 
+# -DHAVE_CONFIG_H: do the configuration #defines the (now) usual way
+# -DREADLINE to use the history/line editing capability. If you want this
+#    capability add -DREADLINE to CFLAGS
+# -DLITE means no hiddenline removal to conserve memory
+CPPFLAGS=-DHAVE_CONFIG_H -UMSDOS -DDOS386 -DDOS386 -DDOS32 -DPC
+
 # -w0 means ignore warnings and do not report them
 # -d1{+} means include line numbers for debugger
 # -d2 means full symbolic debug info
 # -fpi means inline 80x87 instructions with emulation
 # -fpi87 means inline 80x87 instructions
 # -zq avoids all the version banners being printed
+# -zm puts each function in a separate section to allow dead code elimination
 # -o{x} controls optimization
 #      a           -> relax aliasing constraints
 #      f           -> generate traceable stack frames as needed
@@ -45,83 +60,87 @@ M=..\demo\
 #           errors.
 #      m           -> generate inline 80x87 code for math functions
 #      d           -> disable all optimizations (Watch out!)
-# -DREADLINE to use the history/line editing capability. If you want this
-#    capability add -DREADLINE to CFLAGS
-# -DLITE means no hiddenline removal to conserve memory
 # option {stack=n} sets stack size to n
-# do the configuration #defines the (now) usual way
-CPPFLAGS=-DHAVE_CONFIG_H -UMSDOS -DDOS386 -DDOS386 -DDOS32 -DPC
-CFLAGS = -zq -m$(MODEL) -d2 -omaf -fpi -fp3 -I. $(CPPFLAGS)
+CFLAGS = -zq -m$(MODEL) -d2 -zm -omaf -fpi -fp3 -I. $(CPPFLAGS)
 DOC2XXX_FLAGS = -I$(D) -I$(T) $(CFLAGS) 
 TERMFLAGS =
-LNKOPT = option{stack=100000}
 
 OBJS = $(COREOBJS) version.$(O)
 
-all: gnuplot.exe $(HELPFILE) binfiles .SYMBOLIC
-     @%null
+BINFILES = $(M)binary1 $(M)binary2 $(M)binary3
+
+all: gnuplot.exe $(HELPFILE) $(BINFILES) .SYMBOLIC
+	@%null
 
 # use linkopt.wc to avoid command-line overflow
 
-gnuplot.exe: $(OBJS) linkopt.wc .PRECIOUS
-        $(LINK) $(LNKOPT) system dos4g name gnuplot file @linkopt.wc
-
-# create linker options file
-# note that when you change the model or switch overlaying,
-# you will have to execute 'make clean'
-
-
-linkopt.wc: makefile.wc makefile.awc
-        %write $^@ {$(OBJS)}
+gnuplot.exe: config.h $(OBJS) .PRECIOUS
+	$(LINK) @<<linkopt.wc
+system dos4g 
+OPTION stack=100000
+DEBUG WATCOM ALL
+OPTION SYMFILE
+OPTION MAP
+OPTION ELIMINATE
+OPTION QUIET
+NAME gnuplot 
+file {
+$(OBJS)
+}
+<<
 
 # default rules
 
 .c.obj: .AUTODEPEND
-        $(CC) $^& $(CFLAGS)
+	$(CC) $^& $(CFLAGS)
 
-$(OBJS): config.h
+$(OBJS): config.h .AUTODEPEND
 
 config.h: ..\config\config.wc
-        copy $< $^@
+	copy $< $^@
 
-term.obj: term.c term.h plot.h bitmap.h $(CORETERM)
-        $(CC) $(CFLAGS) $(TERMFLAGS) -DDEFAULTTERM="dospc" -I$(T) term.c
+makefile.wc: ..\config\makefile.wc
+	copy $< $^@
 
+term.obj: term.c term.h plot.h bitmap.h $(CORETERM) .AUTODEPEND
+	$(CC) $(CFLAGS) $(TERMFLAGS) -DDEFAULTTERM="dospc" -I$(T) term.c
 
 # convert gnuplot.doc to gnuplot.gih
 $(HELPFILE): doc2gih.exe $(D)gnuplot.doc
-        doc2gih $(D)gnuplot.doc $(HELPFILE)
+	doc2gih $(D)gnuplot.doc $(HELPFILE)
 
-doc2gih.exe: $(D)doc2gih.c $(D)termdoc.c
-    $(CL) $(DOC2XXX_FLAGS) -fe=doc2gih $(D)doc2gih.c $(D)termdoc.c
+doc2gih.exe: $(D)doc2gih.c $(D)termdoc.c .AUTODEPEND
+	$(CL) $(DOC2XXX_FLAGS) -fe=$^@ $<
 
-doc2tex.exe: $(D)doc2tex.c $(D)termdoc.c
-    $(CL) -w0 -m$(MODEL) $(DOC2XXX_FLAGS) -DALL_TERM_DOC &
-        -fe= doc2tex $(D)doc2tex.c $(D)termdoc.c
+doc2tex.exe: $(D)doc2tex.c $(D)termdoc.c .AUTODEPEND
+	$(CL) -w0 -m$(MODEL) $(DOC2XXX_FLAGS) -DALL_TERM_DOC -fe=$^@ $<
 
-bf_test.exe: bf_test.c binary.obj alloc.obj
-    $(CC) $(CPPFLAGS) -m$(MODEL) bf_test.c
-    $(LINK) system dos4g name bf_test file {bf_test binary alloc}
-    
-binfiles: bf_test.exe .SYMBOLIC
-    .\bf_test
-    move binary? ..\demo
+bf_test.exe: bf_test.c binary.obj alloc.obj .AUTODEPEND
+	$(CC) $(CPPFLAGS) -m$(MODEL) bf_test.c
+	$(LINK) system dos4g name bf_test file {bf_test binary alloc}
+
+$(BINFILES): bf_test.exe
+	.\bf_test
+	move binary? ..\demo
 
 # clean target - remove all temp files, but leave executable intact
 # needed when changing configuration (model or overlaying)
 
 clean: .SYMBOLIC
-        del *.obj
-        del linkopt.wc
-        del doc2gih.exe
+	if exist *.obj del *.obj
+	if exist *.err del *.err
+	if exist linkopt.wc del linkopt.wc
+	if exist doc2gih.exe del doc2gih.exe
+	if exist doc2tex.exe del doc2tex.exe
+	if exist bf_test.exe del bf_test.exe
+	if exist gnuplot.map del gnuplot.map
+	if exist gnuplot.sym del gnuplot.sym
 
 # realclean target - remove all files created by the makefile
 
 realclean: clean .SYMBOLIC
-        del gnuplot.exe
-        del gnuplot.gih
-        del $(M)bf_test.exe
-        del $(M)binary1
-        del $(M)binary2
-        del $(M)binary3
-        del config.h
+	if exist gnuplot.exe del gnuplot.exe
+	if exist gnuplot.gih del gnuplot.gih
+	if exist $(M)binary? del $(M)binary?
+	if exist config.h del config.h
+	if exist makefile.wc del makefile.wc

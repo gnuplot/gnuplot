@@ -1,3 +1,16 @@
+2005-04-28  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* config/makefile.wc: Update for more Watcom-like usage of tools.
+
+	* config/config.wc: New file.  Promised long ago, when I added
+	makefile.wc, finally got round to doing it.
+	
+	* config/config.oww, config/makefile.oww: Rewrite for more
+	features and more Watcom-like usage of tools.
+
+	* src/readline.c [__WATCOMC__]: Add #include <conio.h> for getch()
+	function.
+
 2005-04-27  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/set.c (set_label): If the first option after 'set label' is an
