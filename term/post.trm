@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.152 2005/03/25 00:54:12 sfeam Exp $
+ * $Id: post.trm,v 1.153 2005/04/11 20:04:21 sfeam Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -1371,11 +1371,12 @@ PS_options()
 
 	case PS_OTHER:
 	default:
-	    if (isstring(c_token)) {
+	    if (isstring(c_token) || isstringvar(c_token)) {
 		if ((ps_params->terminal == PSTERM_POSTSCRIPT) ||
 		    (ps_params->terminal == PSTERM_EPSLATEX)) {
-		    quote_str(ps_params->font,c_token, MAX_ID_LEN);
-		    c_token++;
+		    s = try_to_get_string();
+		    strncpy(ps_params->font, s, sizeof(ps_params->font));
+		    free(s);
 		} else
 		    int_error(c_token,
 			      "terminal %s does not allow specification %s",

@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: x11.trm,v 1.137 2005/04/22 05:25:35 sfeam Exp $
+ * $Id: x11.trm,v 1.138 2005/04/25 04:40:41 sfeam Exp $
  *
  */
 
@@ -423,11 +423,14 @@ X11_options()
 	    c_token++;
 	    if (END_OF_COMMAND)
 		int_error(c_token, "expecting font name");
-	    if (isstring(c_token))
-		quote_str(X11_default_font, c_token, sizeof(X11_default_font));
-	    else
+	    if (isstring(c_token) || isstringvar(c_token)) {
+		char *s = try_to_get_string();
+		strncpy(X11_default_font, s, sizeof(X11_default_font));
+		free(s);
+	    } else {
  		copy_str(X11_default_font, c_token, sizeof(X11_default_font));
-	    c_token++;
+		c_token++;
+	    }
 	    if (strchr(X11_default_font,','))
 		sscanf(strchr(X11_default_font,',')+1, "%d",
 			&X11_default_fontsize);
@@ -504,11 +507,15 @@ X11_options()
     }
     if (set_title) {
 	char *title;
+	int save_token = c_token;
+	c_token = c_title_token;
 	strncat(term_options, " title \"", MAX_LINE_LEN-strlen(term_options));
 	title = term_options + strlen(term_options);
-	if (isstring(c_title_token))
-	    quote_str(term_options+strlen(term_options), c_title_token, MAX_LINE_LEN-strlen(term_options));
-	else
+	if (isstring(c_title_token) || isstringvar(c_title_token)) {
+	    char *s = try_to_get_string();
+	    strncat(term_options, s, MAX_LINE_LEN-strlen(term_options));
+	    free(s);
+	} else
  	    copy_str(term_options+strlen(term_options), c_title_token, MAX_LINE_LEN-strlen(term_options));
 #define X11_COMMAND_BUFFER_LENGTH 1024
 /* #include "gplt_x11.h" X11_COMMAND_BUFFER_LENGTH defined in here in future */
@@ -525,6 +532,7 @@ X11_options()
 	    fflush(X11_ipc);
 	}
 	strncat(term_options, "\"", MAX_LINE_LEN-strlen(term_options));
+	c_token = save_token;
     }
 #ifdef USE_MOUSE
     X11_update_opts();

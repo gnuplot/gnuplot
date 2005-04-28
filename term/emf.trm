@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: emf.trm,v 1.28 2005/02/18 21:39:50 sfeam Exp $
+ * $Id: emf.trm,v 1.29 2005/03/09 18:26:44 sfeam Exp $
  */
 
 /* GNUPLOT - emf.trm */
@@ -539,9 +539,10 @@ EMF_options()
 	}
 	break;
     } /* while(!end of command) */
-    if (!END_OF_COMMAND && isstring(c_token)) {
-	quote_str(emf_defaultfontname, c_token, MAX_ID_LEN);
-	c_token++;
+    if (!END_OF_COMMAND && (isstring(c_token) || isstringvar(c_token))) {
+	char *s = try_to_get_string();
+	strncpy(emf_defaultfontname, s, sizeof(emf_defaultfontname));
+	free(s);
     }
     if (!END_OF_COMMAND) {
 	/* We have font size specified */
