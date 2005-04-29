@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.133 2005/03/30 20:52:47 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.134 2005/04/24 04:42:58 sfeam Exp $"); }
 #endif
 
 #define X11_POLYLINE 1
@@ -101,7 +101,7 @@ static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.133 2005/03/30 20:52:47
 
 /* Shigeharu Takeno <shige@iee.niit.ac.jp> February 2005
  * Support for multi-byte fonts based, with permission, on the "gnuplot+"
- * patches by Masahito Yamaga <ma@yama-ga.com> 
+ * patches by Masahito Yamaga <ma@yama-ga.com>
  */
 
 #include "syscfg.h"
@@ -1043,7 +1043,7 @@ delete_plot(plot_struct *plot)
 	free(plot->commands);
     plot->commands = NULL;
     plot->max_commands = 0;
-    
+
 
     /* Free up memory for window title. */
     if (plot->titlestring) {
@@ -1959,7 +1959,7 @@ exec_cmd(plot_struct *plot, char *command)
 		/* Strip out just the font name */
 		c = &(buffer[strlen(buffer)-1]);
 		while (*c <= ' ') *c-- = '\0';
-	    	pr_font(&buffer[2]);
+		pr_font(&buffer[2]);
 		if (font)
 		  gpXSetFont(dpy,gc,font->fid);
 #ifdef PM3D
@@ -2041,7 +2041,7 @@ exec_cmd(plot_struct *plot, char *command)
 	sl = strlen(str) - 1;
 	sw = gpXTextWidth(font, str, sl);
 
-/*	EAM - May 2002 	Modify to allow colored text.
+/*	EAM - May 2002	Modify to allow colored text.
  *	1) do not force foreground of gc to be black
  *	2) write text to (*current_gc), rather than to gc, so that text color can be set
  *	   using pm3d mappings.
@@ -2257,21 +2257,21 @@ exec_cmd(plot_struct *plot, char *command)
 		break;
 	    case 3:		/* do box */
 		XDrawRectangle(dpy, plot->pixmap, *current_gc, X(x) - delta, Y(y) - delta,
-		       	(delta + delta), (delta + delta));
+			(delta + delta), (delta + delta));
 		XDrawPoint(dpy, plot->pixmap, *current_gc, X(x), Y(y));
 		break;
 	    case 4:		/* filled box */
 		XFillRectangle(dpy, plot->pixmap, *current_gc, X(x) - delta, Y(y) - delta,
-		       	(delta + delta), (delta + delta));
+			(delta + delta), (delta + delta));
 		break;
 	    case 5:		/* circle */
 		XDrawArc(dpy, plot->pixmap, *current_gc, X(x) - delta, Y(y) - delta,
-		       	2 * delta, 2 * delta, 0, 23040 /* 360 * 64 */);
+			2 * delta, 2 * delta, 0, 23040 /* 360 * 64 */);
 		XDrawPoint(dpy, plot->pixmap, *current_gc, X(x), Y(y));
 		break;
 	    case 6:		/* filled circle */
 		XFillArc(dpy, plot->pixmap, *current_gc, X(x) - delta, Y(y) - delta,
-		       	2 * delta, 2 * delta, 0, 23040 /* 360 * 64 */);
+			2 * delta, 2 * delta, 0, 23040 /* 360 * 64 */);
 		break;
 	    case 10:		/* filled upside-down triangle */
 		upside_down_fill = 1;
@@ -3764,7 +3764,7 @@ GetGCXor(plot_struct * plot, GC * ret)
     values.foreground = AllocateXorPixel(plot->cmap);
 
 #ifdef USE_X11_MULTIBYTE
-    if (usemultibyte) { 
+    if (usemultibyte) {
 	mask = GCForeground | GCFunction;
 	values.function = GXxor;
     } else
@@ -4215,7 +4215,7 @@ process_event(XEvent *event)
 		    cmd_tried = 1;
 		}
 		/* overwrite gnuplotXID (re)set after x11.trm:X11_options() */
-	    	if (newGnuplotXID) gnuplotXID = newGnuplotXID;
+		if (newGnuplotXID) gnuplotXID = newGnuplotXID;
 		if (cmd) system(cmd);
 		}
 		if (gnuplotXID) {
@@ -5064,7 +5064,7 @@ pr_color(cmap_t * cmap_ptr)
 		if (XAllocColor(dpy, cmap_ptr->colormap, &xcolor)) {
 		    cmap_ptr->colors[n] = xcolor.pixel;
 		    cmap_ptr->rgbcolors[n] = ((xcolor.red>>8 & 0xff) << 16)
-		    			   + ((xcolor.green>>8 & 0xff) << 8)
+					   + ((xcolor.green>>8 & 0xff) << 8)
 					   + (xcolor.blue>>8);
 		} else {
 		    fprintf(stderr, "\ngnuplot: can't allocate '%s'. Using black.\n", v);
@@ -5199,7 +5199,7 @@ void gpXDrawString (Display *disp,Drawable d,GC gc,int x,int y,
 void gpXFreeFont(Display *disp,XFontStruct *cfont)
 {
 #ifndef USE_X11_MULTIBYTE
-    if (cfont) 
+    if (cfont)
       XFreeFont(disp,cfont);
 #else
     if (font) {
@@ -5221,7 +5221,7 @@ XFontStruct *gpXLoadQueryFont (Display *disp,char *fontname)
     static char **miss, *def;
     int n_miss;
     char tmpfname[256];
-    
+
     if (!usemultibyte)
       return XLoadQueryFont(disp, fontname);
     else {
@@ -5242,7 +5242,7 @@ XFontStruct *gpXLoadQueryFont (Display *disp,char *fontname)
 char *gpFallbackFont(void)
 {
 #ifdef USE_X11_MULTIBYTE
-    if (usemultibyte) 
+    if (usemultibyte)
 	return FallbackFontMB;
     else
 #endif
@@ -5439,20 +5439,20 @@ char *fontname;
 			"-*-arial narrow-bold-r-*-*-%d-*-*-*-*-*-%s", fontsize, fontencoding);
 	    }
 #ifdef USE_X11_MULTIBYTE
-	    /* Japanese standard PostScript font names 
+	    /* Japanese standard PostScript font names
 	     * (adviced from N.Matsuda).
 	     */
-	    else if (usablemb 
-	      && (!strncmp("Ryumin-Light",shortname,strlen("Ryumin-Light")) 
+	    else if (usablemb
+	      && (!strncmp("Ryumin-Light",shortname,strlen("Ryumin-Light"))
 	       || !strncmp("ryumin-light",shortname,strlen("ryumin-light")))) {
 		if (!usemultibyte) {
 		    usemultibyte = 1;
 		    orgfontname = fontname;
 		}
 		sprintf(fontspec,"-*-mincho-medium-%c-*--%d-*", slant,fontsize);
-	    } 
-	    else if (usablemb 
-	      && (!strncmp("GothicBBB-Medium",shortname,strlen("GothicBBB-Medium")) 
+	    }
+	    else if (usablemb
+	      && (!strncmp("GothicBBB-Medium",shortname,strlen("GothicBBB-Medium"))
 	       || !strncmp("gothicbbb-medium",shortname,strlen("gothicbbb-medium")))) {
 		if (!usemultibyte) {
 		    usemultibyte = 1;
@@ -5467,7 +5467,7 @@ char *fontname;
 
 #ifdef USE_X11_MULTIBYTE
 	    if (usemultibyte && !mbfont) {
-		/* But (mincho|gothic) X fonts are not provided 
+		/* But (mincho|gothic) X fonts are not provided
 		 * on some X servers even in Japan
 		 */
 		sprintf(fontspec,"*-%s-%c-*--%d-*", weight,slant,fontsize);

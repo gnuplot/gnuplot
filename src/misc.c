@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.67 2005/03/09 19:05:44 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.68 2005/03/09 21:47:16 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -172,11 +172,11 @@ load_file(FILE *fp, char *name, TBOOLEAN can_do_args)
 	infile_name = name;
 
 	if (can_do_args) {
- 	    while (c_token < num_tokens && argc <= 9) {
+	    while (c_token < num_tokens && argc <= 9) {
 		if (isstring(c_token))
- 		    m_quote_capture(&call_args[argc++], c_token, c_token);
+		    m_quote_capture(&call_args[argc++], c_token, c_token);
 		else
- 		    m_capture(&call_args[argc++], c_token, c_token);
+		    m_capture(&call_args[argc++], c_token, c_token);
 		c_token++;
 	    }
 	    /* Gnuplot "call" command can have up to 10 arguments named "$0"
@@ -184,7 +184,7 @@ load_file(FILE *fp, char *name, TBOOLEAN can_do_args)
 	       variable 'argc' equals 10.
 	       Also, "call" must be the last command on the command line.
 	    */
- 	    if (c_token < num_tokens)
+	    if (c_token < num_tokens)
 		int_error(++c_token, "too many arguments for 'call <file>'");
 	}
 	while (!stop) {		/* read all commands in file */
@@ -779,7 +779,7 @@ lp_parse(struct lp_style_type *lp, TBOOLEAN allow_ls, TBOOLEAN allow_point, int 
 			break;
 		    c_token--;
 		    parse_colorspec(&lp->pm3d_color, TC_RGB);
- 		    lp->use_palette = 1;
+		    lp->use_palette = 1;
 		} else
 		/* both syntaxes allowed: 'with lt pal' as well as 'with pal' */
 		if (almost_equals(c_token, "pal$ette")) {
@@ -971,16 +971,16 @@ parse_colorspec(struct t_colorspec *tc, int options)
 
     c_token++;
     if (END_OF_COMMAND)
-    	int_error(c_token, "expected colorspec");
+	int_error(c_token, "expected colorspec");
     if (almost_equals(c_token,"def$ault")) {
 	c_token++;
 	tc->type = TC_DEFAULT;
     } else if (equals(c_token,"lt")) {
-    	c_token++;
-    	if (END_OF_COMMAND)
-    	    int_error(c_token, "expected linetype");
+	c_token++;
+	if (END_OF_COMMAND)
+	    int_error(c_token, "expected linetype");
 	tc->type = TC_LT;
-    	tc->lt = (int)real(const_express(&a))-1;
+	tc->lt = (int)real(const_express(&a))-1;
 	if (tc->lt < LT_NODRAW) {
 	    tc->type = TC_DEFAULT;
 	    int_warn(c_token,"illegal linetype");
@@ -989,7 +989,7 @@ parse_colorspec(struct t_colorspec *tc, int options)
 	tc->type = TC_DEFAULT;
 	int_error(c_token, "only tc lt <n> possible here");
     } else if (equals(c_token,"ls") || almost_equals(c_token,"lines$tyle")) {
-    	c_token++;
+	c_token++;
 	tc->type = TC_LINESTYLE;
 	tc->lt = (int)real(const_express(&a));
 #ifdef PM3D
@@ -1010,7 +1010,7 @@ parse_colorspec(struct t_colorspec *tc, int options)
 	tc->lt = rgbtriple;
 #endif
     } else if (almost_equals(c_token,"pal$ette")) {
-    	c_token++;
+	c_token++;
 	if (END_OF_COMMAND || equals(c_token,"z")) {
 	    /* The actual z value is not yet known, fill it in later */
 	    if (options >= TC_Z) {
@@ -1019,24 +1019,24 @@ parse_colorspec(struct t_colorspec *tc, int options)
 		tc->type = TC_DEFAULT;
 		int_error(c_token, "palette z not possible here");
 	    }
-    	    c_token++;
+	    c_token++;
 	} else if (equals(c_token,"cb")) {
 	    tc->type = TC_CB;
-    	    c_token++;
-    	    if (END_OF_COMMAND)
-    		int_error(c_token, "expected cb value");
-    	    tc->value = real(const_express(&a));
+	    c_token++;
+	    if (END_OF_COMMAND)
+		int_error(c_token, "expected cb value");
+	    tc->value = real(const_express(&a));
 	} else if (almost_equals(c_token,"frac$tion")) {
 	    tc->type = TC_FRAC;
-    	    c_token++;
-    	    if (END_OF_COMMAND)
-    		int_error(c_token, "expected palette fraction");
-    	    tc->value = real(const_express(&a));
+	    c_token++;
+	    if (END_OF_COMMAND)
+		int_error(c_token, "expected palette fraction");
+	    tc->value = real(const_express(&a));
 	    if (tc->value < 0. || tc->value > 1.0)
-    		int_error(c_token, "palette fraction out of range");
+		int_error(c_token, "palette fraction out of range");
 	}
     } else {
-    	int_error(c_token, "colorspec option not recognized");
+	int_error(c_token, "colorspec option not recognized");
     }
 }
 

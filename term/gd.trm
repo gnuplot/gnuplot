@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: gd.trm,v 1.65 2005/03/28 04:21:26 sfeam Exp $
+ * $Id: gd.trm,v 1.66 2005/04/03 22:41:55 sfeam Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -767,7 +767,7 @@ PNG_options()
     /* Find approximate character width of selected TTF font   */
     /* This is needed in order to set appropriate border width */
     if (png_state.default_ttffont[0]) {
-    	int brect[8];
+	int brect[8];
 	char *err;
 	err = gdImageStringFT(NULL, &brect[0], 0,
 		png_state.default_ttffont, (double)png_state.default_ttfsize,
@@ -807,7 +807,7 @@ PNG_options()
     }
 
     if (png_state.ttffont[0]) {
-    	sprintf(term_options + strlen(term_options),
+	sprintf(term_options + strlen(term_options),
 		"font %s %d ", png_state.ttffont, png_state.ttfsize);
     } else switch (term->h_char) {
     case 5:
@@ -865,18 +865,18 @@ int i;
     png_state.linewidth = 1;
     /* EAM - pre-define brushes to implement linewidth */
     for (i=2; i<=MAXLINEWIDTH; i++) {
-    	PNG_brush[i].im = gdImageCreate(i,i);
-    	PNG_brush[i].bgnd = gdImageColorAllocate( PNG_brush[i].im, 255, 255, 255 );
+	PNG_brush[i].im = gdImageCreate(i,i);
+	PNG_brush[i].bgnd = gdImageColorAllocate( PNG_brush[i].im, 255, 255, 255 );
 	gdImageFill( PNG_brush[i].im, 1, 1, PNG_brush[i].bgnd );
-    	gdImageColorTransparent( PNG_brush[i].im, PNG_brush[i].bgnd );
-    	PNG_brush[i].fgnd = gdImageColorAllocate( PNG_brush[i].im, 0, 0, 0 );
+	gdImageColorTransparent( PNG_brush[i].im, PNG_brush[i].bgnd );
+	PNG_brush[i].fgnd = gdImageColorAllocate( PNG_brush[i].im, 0, 0, 0 );
 	PNG_brush[i].last_rgb = 0;
     }
     /* EAM - quick and dirty is to fill the entire brush (square nib).    */
     /*       might be better to approximate a circular nib by selectively */
     /*       coloring the individual pixels of the brush image.           */
     for (i=2; i<=MAXLINEWIDTH; i++) {
-    	gdImageFilledRectangle( PNG_brush[i].im, 1, 1, i, i, PNG_brush[i].fgnd );
+	gdImageFilledRectangle( PNG_brush[i].im, 1, 1, i, i, PNG_brush[i].fgnd );
     }
 
 }
@@ -969,7 +969,7 @@ TERM_PUBLIC int PNG_make_palette (t_sm_palette *palette)
 	return i;
     }
     if (0 == gdMaxColors /*256*/ - gdImageColorsTotal(png_state.image))
-    	return 0; /* reuse previous palette (without warning) */
+	return 0; /* reuse previous palette (without warning) */
     for (i = 0; i < sm_palette.colors; i++) {
 	png_smooth_color[i] = gdImageColorAllocate(png_state.image,
 	    (int)( palette->color[i].r * 255 + 0.5 ), /* r,g,b values for png */
@@ -1153,7 +1153,7 @@ PNG_graphics()
     } else
 #endif
 	png_state.image = gdImageCreate(
-    			(int) (xsize * PNG_XMAX), (int) (ysize * PNG_YMAX));
+			(int) (xsize * PNG_XMAX), (int) (ysize * PNG_YMAX));
 
     png_state.height = (int) (ysize * PNG_YMAX - 1);
     png_state.charw = term->h_char;	/* png_state.font->w; */
@@ -1294,7 +1294,7 @@ PNG_vector(unsigned int x, unsigned int y)
 	    	    gdImageBlue(png_state.image,png_state.color) );
 		PNG_brush[lw].last_rgb = png_state.color;
 	    }
-    	    gdImageFilledRectangle( PNG_brush[lw].im, 1, 1, lw, lw, PNG_brush[lw].fgnd );
+	    gdImageFilledRectangle( PNG_brush[lw].im, 1, 1, lw, lw, PNG_brush[lw].fgnd );
 	    gdImageSetBrush(png_state.image, PNG_brush[lw].im);
 	    gdImageLine(png_state.image, png_state.x, Y(png_state.y),
 			x, Y(y), gdBrushed );
@@ -1347,7 +1347,7 @@ TERM_PUBLIC void
 PNG_put_text(unsigned int x, unsigned int y, const char *string)
 {
     if (*png_state.ttffont) {
-    	int brect[8]; char *err;
+	int brect[8]; char *err;
 	/* Draw once with a NULL image to get the bounding rectangle */
 	/* then draw it again, centered.                             */
 	err = gdImageStringFT(NULL, brect, png_state.color,
@@ -1465,7 +1465,7 @@ PNG_point(unsigned int x, unsigned int y, int number)
 	    	gdImageBlue(png_state.image,png_state.color) );
 	    PNG_brush[lw].last_rgb = png_state.color;
 	}
-    	gdImageFilledRectangle( PNG_brush[lw].im, 1, 1, lw, lw, PNG_brush[lw].fgnd );
+	gdImageFilledRectangle( PNG_brush[lw].im, 1, 1, lw, lw, PNG_brush[lw].fgnd );
 	gdImageSetBrush(png_state.image, PNG_brush[lw].im);
 	png_state.color = gdBrushed;
     }
@@ -1569,7 +1569,7 @@ PNG_set_font(const char *fontname)
 #ifdef HAVE_GD_TTF
     /* Find approximate character width and height of selected TTF font */
     if (*png_state.ttffont) {
-    	int brect[8];
+	int brect[8];
 	char *err;
 	err = gdImageStringFT(NULL, &brect[0], 0,
 		png_state.ttffont, (double)png_state.ttfsize,
@@ -1743,7 +1743,7 @@ ENHGD_put_text(unsigned int x, unsigned int y, const char *str)
      * we get stuck in an infinite loop) and try again.
      */
     while (*(str = enhanced_recursion((char *)str, TRUE,
-    			ENHgd_font, ENHgd_fontsize,
+			ENHgd_font, ENHgd_fontsize,
 			0.0, TRUE, TRUE, 0))) {
 	(term->enhanced_flush)();
 
@@ -1836,7 +1836,7 @@ PNG_image (unsigned M, unsigned N, coordval * image, gpiPoint * corner, t_imagec
     mout = abs( (int)corner[1].x - (int)corner[0].x );
     nout = abs( (int)corner[1].y - (int)corner[0].y );
     gdImageCopyResized(png_state.image, im,
-    	(corner[0].x), Y(corner[0].y),	/* Destination X, Y */
+	(corner[0].x), Y(corner[0].y),	/* Destination X, Y */
 	0, 0, 				/* Source X, Y */
 	mout, nout,			/* Destination Width, Height */
 	M, N				/* Source Width, Height */

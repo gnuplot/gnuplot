@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: pdf.trm,v 1.49 2005/03/03 04:09:51 sfeam Exp $
+ * $Id: pdf.trm,v 1.50 2005/03/09 18:26:44 sfeam Exp $
  */
 
 /*------------------------------
@@ -1140,12 +1140,12 @@ PDF_put_text (unsigned int x, unsigned int y, const char *str)
 	PDF_save(myPDF);
 	PDF_translate(myPDF, h, v);
 	PDF_rotate(myPDF, PDF_TextAngle);
- 	/* vertical justification*/
+	/* vertical justification*/
 	PDF_translate(myPDF, 0, -(PDF_fontAscent-PDF_fontDescent)/2);
 	PDF_show_boxed(myPDF, str, 0,0, 0, 0, alignment, NULL);
 	PDF_restore(myPDF);
     } else {
- 	/* vertical justification*/
+	/* vertical justification*/
 	v -= (PDF_fontAscent - PDF_fontDescent) / 2;
 	PDF_show_boxed(myPDF, str, h , v, 0, 0, alignment, NULL);
     }
@@ -1313,7 +1313,7 @@ PDF_image (unsigned M, unsigned N, coordval * image, gpiPoint * corner, t_imagec
 
     /* Convert the input image into raw RGB 24-bit color representation */
     if (color_mode == IC_RGB) {
-    	for (i=0, pixel=rawrgb; i<N*M*3;) {
+	for (i=0, pixel=rawrgb; i<N*M*3;) {
 	    rgb_color rgb1;
 	    rgb255_color rgb255;
 	    rgb1.r = image[i++];
@@ -1519,7 +1519,7 @@ ENHPDF_put_text(unsigned int x, unsigned int y, const char *str)
      * we get stuck in an infinite loop) and try again.
      */
     while (*(str = enhanced_recursion((char *)str, TRUE,
-    			PDF_fontNameDef, PDF_fontSizeDef,
+			PDF_fontNameDef, PDF_fontSizeDef,
 			0.0, TRUE, TRUE, 0))) {
 	(term->enhanced_flush)();
 
