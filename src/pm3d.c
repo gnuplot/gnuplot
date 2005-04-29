@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.60 2005/04/06 11:28:48 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.61 2005/04/24 14:44:34 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - pm3d.c */
@@ -786,16 +786,16 @@ set_plot_with_palette(int plot_num, int plot_mode)
 
     /* Check 3D plots */
     if (plot_mode == MODE_SPLOT) {
+	/* Any surface 'with pm3d', 'with image' or 'with line|dot palette'? */
+	while (surface++ < plot_num) {
 #ifdef PM3D
-	if (this_3dplot->plot_style == PM3DSURFACE)
-    	    return;
+	    if (this_3dplot->plot_style == PM3DSURFACE)
+		return;
 #endif
 #ifdef WITH_IMAGE
-	if (this_3dplot->plot_style == IMAGE)
-    	    return;
+	    if (this_3dplot->plot_style == IMAGE)
+		return;
 #endif
-	/* Any surface 'with pm3d' or 'with line|dot palette'? */
-	while (surface++ < plot_num) {
 	    if (this_3dplot->lp_properties.use_palette) {
 		if (this_3dplot->lp_properties.pm3d_color.type != TC_DEFAULT)
 		    /* can this really happen? for which syntax? */

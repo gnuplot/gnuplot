@@ -1,3 +1,7 @@
+2005-04-29  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* pm3d.c (set_plot_with_palette): Fix for 'splot x, y with pm3d'.
+
 2005-04-28  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/x11.trm (X11_options): Accept string variables for terminal
