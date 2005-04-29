@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.288 2005/04/14 20:04:27 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.289 2005/04/22 05:25:34 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -4743,18 +4743,23 @@ C ... and restart the table:
        set boxwidth {<width>} {absolute|relative}
        show boxwidth
 
- If a data file is plotted without the width being specified in the third,
- fourth, or fifth column (or `using` entry), or if a function is plotted, the
- width of each box is set by the `set boxwidth` command.  (If a width is given
- both in the file and by the `set boxwidth` command, the one in the file is
- used.)  If the width is not specified in one of these ways, the width of each
- box will be calculated automatically so that it touches the adjacent boxes.
- `relative` indicates, that the specified boxwidth is a scaling factor for
- the automatically calculated boxwidth, otherwise the boxwidth is taken as an
- `absolute` value (which is the default). In a four-column data set, the fourth
- column will be interpreted as the box width unless the width is set to -2.0,
- in which case the width will be calculated automatically.  See
- `set style boxerrorbars` for more details.
+ By default, adjacent boxes are extended in width until they touch each other.
+ A different default width may be specified using the `set boxwidth` command.
+ `Relative` widths are interpreted as being a fraction of this default width.
+
+ An explicit value for the boxwidth is interpreted as being a number of units
+ along the current x axis (`absolute`) unless the modifier `relative` is given.
+ If the x axis is a log-scale (see `set log`) then the value of boxwidth is
+ truly "absolute" only at x=1; this physical width is maintained everywhere
+ along the axis (i.e. the boxes do not become narrower the value of x
+ increases). If the range spanned by a log scale x axis is far from x=1,
+ some experimentation may be required to find a useful value of boxwidth.
+
+ The default is superseded by explicit width information taken from an extra
+ data column in styles `boxes` or `boxerrorbars`.  In a four-column data set,
+ the fourth column will be interpreted as the box width unless the width is set
+ to -2.0, in which case the width will be calculated automatically.
+ See ` style boxes` and `style boxerrorbars` for more details.
 
  To set the box width to automatic use the command
        set boxwidth
@@ -4770,9 +4775,6 @@ C ... and restart the table:
 
  To set the box width to an absolute value of 2 use
        set boxwidth 2 absolute
-
- or, if you didn't specify a relative boxwidth before,
-       set boxwidth 2
 3 clabel
 ?commands set clabel
 ?commands unset clabel

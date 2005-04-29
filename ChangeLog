@@ -5,6 +5,14 @@
 
 	* term/gd.trm (PNG_options): Accept string variable for font name.
 
+	* src/plot2d.c (get_data eval_plots): If the x-axis is in log mode,
+	treat boxwidth as a constant visual width rather than as a constant
+	number of units along x, which would produce narrower boxes as x
+	increases.  Issue an error message if the x-axis is in log mode
+	when the plot style is histograms.
+
+	* docs/gnuplot.doc: Document behaviour of 'set boxwidth' for log axes.
+
 2005-04-29  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* pm3d.c (set_plot_with_palette): Fix for 'splot x, y with pm3d'.

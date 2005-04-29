@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.102 2005/03/30 20:23:16 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.103 2005/04/23 18:16:34 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -495,10 +495,16 @@ get_data(struct curve_points *current_plot)
 
 	    if ( (current_plot->plot_style == BOXES)
                  && boxwidth > 0 && boxwidth_is_absolute) {
-		/* calc width now */
-		store2d_point(current_plot, i++, v[0], v[1],
-			      v[0] - boxwidth / 2, v[0] + boxwidth / 2,
-			      v[1], v[1], 0.0);
+		/* calculate width now */
+		if (axis_array[current_plot->x_axis].log) {
+		    double base = axis_array[current_plot->x_axis].base;
+		    store2d_point(current_plot, i++, v[0], v[1],
+			v[0] * pow(base, -boxwidth/2.), v[0] * pow(base, boxwidth/2.),
+			v[1], v[1], 0.0);
+		} else
+		    store2d_point(current_plot, i++, v[0], v[1],
+			v[0] - boxwidth / 2, v[0] + boxwidth / 2,
+			v[1], v[1], 0.0);
 #ifdef EAM_HISTOGRAMS
 	    } else if (current_plot->plot_style == HISTOGRAMS) {
 		if (histogram_opts.type == HT_STACKED_IN_TOWERS) {
@@ -1695,9 +1701,12 @@ eval_plots()
 #ifdef EAM_HISTOGRAMS
 	    /* Initialize histogram data structure */
 	    if (this_plot->plot_style == HISTOGRAMS) {
+		if (axis_array[x_axis].log)
+		    int_error(c_token, "Log scale on X is incompatible with histogram plots\n");
+
 		if ((histogram_opts.type == HT_STACKED_IN_LAYERS
 		||   histogram_opts.type == HT_STACKED_IN_TOWERS)
-		&&  axis_array[FIRST_Y_AXIS].log)
+		&&  axis_array[y_axis].log)
 		    int_error(c_token, "Log scale on Y is incompatible with stacked histogram plot\n");
 		this_plot->histogram_sequence = ++histogram_sequence;
 		/* Current histogram always goes at the front of the list */
@@ -1989,11 +1998,20 @@ eval_plots()
 			    y = temp * sin(x * ang2rad);
 			    x = temp * cos(x * ang2rad);
                             if (boxwidth >= 0 &&  boxwidth_is_absolute) {
+				double xlow, xhigh;
                                 int dmy_type = INRANGE;
                                 this_plot->points[i].z = 0;
-                                STORE_WITH_LOG_AND_UPDATE_RANGE( this_plot->points[i].xlow, x - boxwidth/2, dmy_type, x_axis, NOOP, NOOP );
+				if (axis_array[this_plot->x_axis].log) {
+				    double base = axis_array[this_plot->x_axis].base;
+				    xlow = x * pow(base, -boxwidth/2.);
+				    xhigh = x * pow(base, boxwidth/2.);
+				} else {
+				    xlow = x - boxwidth/2;
+				    xhigh = x + boxwidth/2;
+				}
+                                STORE_WITH_LOG_AND_UPDATE_RANGE( this_plot->points[i].xlow, xlow, dmy_type, x_axis, NOOP, NOOP );
                                 dmy_type = INRANGE;
-                                STORE_WITH_LOG_AND_UPDATE_RANGE( this_plot->points[i].xhigh, x + boxwidth/2, dmy_type, x_axis, NOOP, NOOP );
+                                STORE_WITH_LOG_AND_UPDATE_RANGE( this_plot->points[i].xhigh, xhigh, dmy_type, x_axis, NOOP, NOOP );
                             }
 			    temp = y;
 			    STORE_WITH_LOG_AND_UPDATE_RANGE(this_plot->points[i].x, x, this_plot->points[i].type, x_axis, NOOP, goto come_here_if_undefined);
@@ -2003,11 +2021,20 @@ eval_plots()
 			    /* logscale ? log(x) : x */
 			    this_plot->points[i].x = t;
                             if (boxwidth >= 0 && boxwidth_is_absolute) {
+				double xlow, xhigh;
                                 int dmy_type = INRANGE;
                                 this_plot->points[i].z = 0;
-                                STORE_WITH_LOG_AND_UPDATE_RANGE( this_plot->points[i].xlow, x - boxwidth/2, dmy_type, x_axis, NOOP, NOOP );
+				if (axis_array[this_plot->x_axis].log) {
+				    double base = axis_array[this_plot->x_axis].base;
+				    xlow = x * pow(base, -boxwidth/2.);
+				    xhigh = x * pow(base, boxwidth/2.);
+				} else {
+				    xlow = x - boxwidth/2;
+				    xhigh = x + boxwidth/2;
+				}
+                                STORE_WITH_LOG_AND_UPDATE_RANGE( this_plot->points[i].xlow, xlow, dmy_type, x_axis, NOOP, NOOP );
                                 dmy_type = INRANGE;
-                                STORE_WITH_LOG_AND_UPDATE_RANGE( this_plot->points[i].xhigh, x + boxwidth/2, dmy_type, x_axis, NOOP, NOOP );
+                                STORE_WITH_LOG_AND_UPDATE_RANGE( this_plot->points[i].xhigh, xhigh, dmy_type, x_axis, NOOP, NOOP );
                             }
 			    STORE_WITH_LOG_AND_UPDATE_RANGE(this_plot->points[i].y, temp, this_plot->points[i].type, y_axis + (x_axis - y_axis) * xparam, NOOP, goto come_here_if_undefined);
 
