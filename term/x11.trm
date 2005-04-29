@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: x11.trm,v 1.139 2005/04/28 21:43:51 sfeam Exp $
+ * $Id: x11.trm,v 1.140 2005/04/29 16:36:07 sfeam Exp $
  *
  */
 
@@ -2055,7 +2055,7 @@ START_HELP(x11)
 "  <size> is the point size (defaults to 12 if not specified)",
 "  <s> is `i` if <slant>==\"italic\" `o` if <slant>==\"oblique\" `r` otherwise",
 "  <weight> is `medium` or `bold` if explicitly requested, otherwise `*`",
-"  <encoding> is set based on the current character set (see help for `set encoding`).",
+"  <encoding> is set based on the current character set (see `set encoding`).",
 " So `set term x11 font \"arial,15,italic\"` will be translated to",
 " -*-arial-*-i-*-*-15-*-*-*-*-*-iso8859-1 (assuming default encoding).",
 " The <size>, <slant>, and <weight> specifications are all optional.",
@@ -2344,8 +2344,8 @@ START_HELP(x11)
 "",
 " `gnuplot` honors the following resources for setting the dash style used for",
 " plotting lines.  0 means a solid line.  A two-digit number `jk` (`j` and `k`",
-" are >= 1  and <= 9) means a dashed line with a repeated pattern of `j` pixels",
-" on followed by `k` pixels off.  For example, '16' is a \"dotted\" line with one",
+" are >= 1 and <= 9) means a dashed line with a repeated pattern of `j` pixels",
+" on followed by `k` pixels off.  For example, '16' is a dotted line with one",
 " pixel on followed by six pixels off.  More elaborate on/off patterns can be",
 " specified with a four-digit value.  For example, '4441' is four on, four off,",
 " four on, one off.  The default values shown below are for monochrome displays",

@@ -13,6 +13,9 @@
 
 	* docs/gnuplot.doc: Document behaviour of 'set boxwidth' for log axes.
 
+	* docs/gnuplot.doc term/x11.trm term/post.trm: Clean up line length
+	and other issues that cause errors during creation of TeX docs.
+
 2005-04-29  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* pm3d.c (set_plot_with_palette): Fix for 'splot x, y with pm3d'.

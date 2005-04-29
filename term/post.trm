@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.153 2005/04/11 20:04:21 sfeam Exp $
+ * $Id: post.trm,v 1.154 2005/04/28 21:43:50 sfeam Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -3986,7 +3986,7 @@ PS_COMMON_DOC1
 " Helvetica, and Courier, including math fonts (handled by \"mathptmx.sty\"):",
 "       \\usepackage{mathptmx}",
 "       \\usepackage[scaled=0.92]{helvet}",
-"       \\usepackage{courier}"
+"       \\usepackage{courier}",
 " The file \"gnuplot.cfg\" is loaded before the header information given",
 " by the `header` command.  Thus, you can use `header` to overwrite some of",
 " settings performed using \"gnuplot.cfg\"",

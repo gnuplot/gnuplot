@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.289 2005/04/22 05:25:34 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.290 2005/04/29 21:12:57 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -4759,7 +4759,7 @@ C ... and restart the table:
  data column in styles `boxes` or `boxerrorbars`.  In a four-column data set,
  the fourth column will be interpreted as the box width unless the width is set
  to -2.0, in which case the width will be calculated automatically.
- See ` style boxes` and `style boxerrorbars` for more details.
+ See `style boxes` and `style boxerrorbars` for more details.
 
  To set the box width to automatic use the command
        set boxwidth
