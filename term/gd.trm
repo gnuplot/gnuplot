@@ -137,7 +137,7 @@ TERM_PUBLIC void PNG_image __PROTO((unsigned, unsigned, coordval *, gpiPoint *, 
 /* To support "set term png enhanced" */
 TERM_PUBLIC void ENHGD_put_text __PROTO((unsigned int x, unsigned int y, const char str[]));
 TERM_PUBLIC void ENHGD_OPEN __PROTO((char * fontname, double fontsize,
-	    		double base, TBOOLEAN widthflag, TBOOLEAN showflag,
+			double base, TBOOLEAN widthflag, TBOOLEAN showflag,
 			int overprint));
 TERM_PUBLIC void ENHGD_FLUSH __PROTO((void));
 
@@ -597,20 +597,22 @@ PNG_options()
 	    c_token++;
 #ifdef HAVE_GD_TTF
 	    if (END_OF_COMMAND) {
-	    	png_state.ttffont[0] = '\0';
+		png_state.ttffont[0] = '\0';
 	    } else {
 		int brect[8];
 		char *err;
 
-		if (isstring(c_token))
-		    quote_str(png_state.ttffont, c_token,
-			      sizeof(png_state.ttffont));
-	        else
+		if (isstring(c_token) || isstringvar(c_token)) {
+		    char *s = try_to_get_string();
+		    strncpy(png_state.ttffont, s, sizeof(png_state.ttffont));
+		    free(s);
+		} else {
 		    copy_str(png_state.ttffont, c_token,
 			     sizeof(png_state.ttffont));
-		c_token++;
+		    c_token++;
+		}
 		strcpy(png_state.default_ttffont, png_state.ttffont);
-	        png_state.ttfsize = 2 * term->h_char - 2;
+		png_state.ttfsize = 2 * term->h_char - 2;
 		err = gdImageStringFT(NULL, &brect[0], 0,
 			png_state.ttffont, (double)png_state.ttfsize,
 			0.0, 0, 0, "test");
@@ -1289,9 +1291,9 @@ PNG_vector(unsigned int x, unsigned int y)
 	    lw   = png_state.linewidth;
 	    if (png_state.color != PNG_brush[lw].last_rgb) {
 		PNG_brush[lw].fgnd = gdImageColorResolve(PNG_brush[lw].im,
-	    	    gdImageRed(png_state.image,png_state.color),
-	    	    gdImageGreen(png_state.image,png_state.color),
-	    	    gdImageBlue(png_state.image,png_state.color) );
+		    gdImageRed(png_state.image,png_state.color),
+		    gdImageGreen(png_state.image,png_state.color),
+		    gdImageBlue(png_state.image,png_state.color) );
 		PNG_brush[lw].last_rgb = png_state.color;
 	    }
 	    gdImageFilledRectangle( PNG_brush[lw].im, 1, 1, lw, lw, PNG_brush[lw].fgnd );
@@ -1356,18 +1358,18 @@ PNG_put_text(unsigned int x, unsigned int y, const char *string)
 			x, Y(y), (char *)string);
 	if (err) {
 	    fprintf(stderr,"gdImageStringFT: %s while printing string %s with font %s\n",
-	    	err,string,png_state.ttffont);
+		err,string,png_state.ttffont);
 	} else {
 	    x += sin((double)png_state.angle * M_PI_2/90.) * (double)png_state.charh/4.;
 	    y -= cos((double)png_state.angle * M_PI_2/90.) * (double)png_state.charh/4.;
 	    switch (png_state.justify) {
 		case RIGHT:
-		    		x -= (brect[2]-brect[0]);
-		    		y += (brect[3]-brect[1]);
-		    		break;
+				x -= (brect[2]-brect[0]);
+				y += (brect[3]-brect[1]);
+				break;
 		case CENTRE:
-		    		x -= (brect[2]-brect[0]) / 2.;
-		    		y += (brect[3]-brect[1]) / 2.;
+				x -= (brect[2]-brect[0]) / 2.;
+				y += (brect[3]-brect[1]) / 2.;
 				break;
 		case LEFT:
 		default:	break;
@@ -1378,13 +1380,13 @@ PNG_put_text(unsigned int x, unsigned int y, const char *string)
 			x, Y(y), (char *)string);
 	    if (err)
 		fprintf(stderr,"gdImageStringFT: %s while printing string %s with font %s\n",
-	    	    err,string,png_state.ttffont);
+		    err,string,png_state.ttffont);
 	}
     } else if (png_state.angle != 0) {
 	x -= png_state.charh / 2;
 	switch (png_state.justify) {
 	    case RIGHT:	y -= png_state.charw * strlen(string);
-	    		break;
+			break;
 	    case CENTRE:y -= png_state.charw * strlen(string) / 2;
 			break;
 	    case LEFT:
@@ -1397,7 +1399,7 @@ PNG_put_text(unsigned int x, unsigned int y, const char *string)
 	y += png_state.charh / 2;
 	switch (png_state.justify) {
 	    case RIGHT:	x -= png_state.charw * strlen(string);
-	    		break;
+			break;
 	    case CENTRE:x -= png_state.charw * strlen(string) / 2;
 			break;
 	    case LEFT:
@@ -1460,9 +1462,9 @@ PNG_point(unsigned int x, unsigned int y, int number)
 	int lw   = png_state.linewidth;
 	if (png_state.color != PNG_brush[lw].last_rgb) {
 	    PNG_brush[lw].fgnd = gdImageColorResolve(PNG_brush[lw].im,
-	    	gdImageRed(png_state.image,png_state.color),
-	    	gdImageGreen(png_state.image,png_state.color),
-	    	gdImageBlue(png_state.image,png_state.color) );
+		gdImageRed(png_state.image,png_state.color),
+		gdImageGreen(png_state.image,png_state.color),
+		gdImageBlue(png_state.image,png_state.color) );
 	    PNG_brush[lw].last_rgb = png_state.color;
 	}
 	gdImageFilledRectangle( PNG_brush[lw].im, 1, 1, lw, lw, PNG_brush[lw].fgnd );
@@ -1671,13 +1673,13 @@ ENHGD_FLUSH()
 	    y -= cos((double)png_state.angle * M_PI_2/90.) * (double)png_state.charh/4.;
 	    err = gdImageStringFT(
 			(ENHgd_show && !ENHgd_sizeonly) ? png_state.image : NULL,
-	    		brect, png_state.color,
+			brect, png_state.color,
 			ENHgd_font, ENHgd_fontsize,
 			(double)png_state.angle * M_PI_2/90.,
 			x, Y(y), enhanced_text);
 	    if (err) 
 		fprintf(stderr,"gdImageStringFT: %s while printing string %s with font %s\n",
-	    	    err,enhanced_text,ENHgd_font);
+		    err,enhanced_text,ENHgd_font);
 
 	    FPRINTF((stderr,"outputstring: %s boundingbox: %d %d %d %d\n",
 			enhanced_text, brect[6], brect[7], brect[2], brect[3]));

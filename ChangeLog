@@ -3,6 +3,8 @@
 	* term/x11.trm term/gd.trm term/pdf.trm src/misc.c src/gplt_x11.c:
 	Whitespace cleanup.
 
+	* term/gd.trm (PNG_options): Accept string variable for font name.
+
 2005-04-29  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* pm3d.c (set_plot_with_palette): Fix for 'splot x, y with pm3d'.
