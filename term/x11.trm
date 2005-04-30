@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: x11.trm,v 1.140 2005/04/29 16:36:07 sfeam Exp $
+ * $Id: x11.trm,v 1.141 2005/04/30 03:05:19 sfeam Exp $
  *
  */
 
@@ -2045,10 +2045,10 @@ START_HELP(x11)
 " A new default font may be specified to the x11 driver from inside",
 " gnuplot using",
 "      `set term x11 font \"<fontspec>\"`",
-" The driver first queries the X-server for a font of the exact name given,",
-" for example `set term x11 font \"lucidasans-10\"`. If this query fails, then",
-" it tries to interpret <fontspec> as \"<font>,<size>,<slant>,<weight>\" ",
-" and to construct a full X11 font name of the form",
+" The driver first queries the X-server for a font of the exact name given.",
+" If this query fails, then it tries to interpret <fontspec> as",
+" \"<font>,<size>,<slant>,<weight>\" and to construct a full X11 font name",
+" of the form",
 "       -*-<font>-<weight>-<s>-*-*-<size>-*-*-*-*-*-<encoding>",
 "",
 "  <font> is the base name of the font (e.g. Times or Symbol)",
