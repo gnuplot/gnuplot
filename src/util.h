@@ -1,5 +1,5 @@
 /*
- * $Id: util.h,v 1.23 2005/01/12 00:05:42 sfeam Exp $
+ * $Id: util.h,v 1.24 2005/01/26 16:11:43 broeker Exp $
  */
 
 /* GNUPLOT - util.h */
@@ -80,8 +80,8 @@ void m_quote_capture __PROTO((char **, int, int));
 char *try_to_get_string __PROTO((void));
 void parse_esc __PROTO((char *));
 
-#ifdef GP_STRING_VARS
 TBOOLEAN isstringvar __PROTO((int));
+#ifdef GP_STRING_VARS
 char *gp_stradd __PROTO((const char *, const char *));
 #endif
 
