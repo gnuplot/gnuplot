@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*- */
-/* $Id: tgif.trm,v 1.32 2005/01/12 01:27:33 sfeam Exp $ */
+/* $Id: tgif.trm,v 1.33 2005/05/02 19:37:28 sfeam Exp $ */
 
 /* GNUPLOT - tgif.trm */
 
@@ -169,7 +169,7 @@ static unsigned int uXshift;	/* actual shift x                          */
 static unsigned int uYshift;	/* actual shift y                          */
 static unsigned int uTgifPlotCount;	/* counts number of plots          */
 static unsigned int uTgifPlotRow=1, uTgifPlotCol=1;		/* actual plot row and col   */
-static unsigned int uTgif_win_horiz=1, /* number of plots in x and  */ 
+static unsigned int uTgif_win_horiz=1, /* number of plots in x and  */
     uTgif_win_verti=1;	/*      y direction [x,y]         */
 
 
@@ -354,7 +354,7 @@ TGIF_options()
 	    break;
 	case TGIF_LANDSCAPE:
 	    TgifPortrait = FALSE;
-	    /* uActResolution = 140; 
+	    /* uActResolution = 140;
 	    */
 	    c_token++;
 	    break;
@@ -482,7 +482,7 @@ TGIF_init()
 %%TGIF 2.15-p7\n\
 state(%d,30,%u,0,0,%u,16,1,9,1,1,0,0,0,0,1,0,'%s',0,%u,0,0,1,10,0,0,1,1,0,16,0,0,1,1,1).\n\
 %%\n\
-%% @(#)$Header: /cvsroot/gnuplot/gnuplot/term/tgif.trm,v 1.32 2005/01/12 01:27:33 sfeam Exp $\n\
+%% @(#)$Header: /cvsroot/gnuplot/gnuplot/term/tgif.trm,v 1.33 2005/05/02 19:37:28 sfeam Exp $\n\
 %% %%W%%\n\
 %%\n\
 page(1,\"\").\n",
@@ -1625,10 +1625,10 @@ TGIF_make_palette(t_sm_palette *palette)
 
     if (TGIF_palette_set == FALSE) {
 #ifdef USE_MONO_MODE
-	if (TgifUseColor == FALSE 
+	if (TgifUseColor == FALSE
 	    || sm_palette.colorMode == SMPAL_COLOR_MODE_GRAY) {
             /* Gray palette */
-	    if (TgifUseColor == FALSE 
+	    if (TgifUseColor == FALSE
 		&& sm_palette.colorMode == SMPAL_COLOR_MODE_RGB){
 		fprintf(stderr, "Monochrome Tgif file: ");
 		fprintf(stderr, "using gray palette instead of color\n");
@@ -1638,7 +1638,7 @@ TGIF_make_palette(t_sm_palette *palette)
                 sprintf(TGIF_colours[i],"#%.2x%.2x%.2x",j,j,j);
             }
 	} else {
-#endif    
+#endif
 	/* Create new palette */
 	for (i = 0; i < sm_palette.colors; i++) {
 	    sprintf(TGIF_colours[i],"#%.2x%.2x%.2x",
@@ -1758,7 +1758,7 @@ START_HELP(tgif)
 "                         {monochrome | color}",
 "                         {{linewidth | lw} <LW>}",
 "                         {solid | dashed}",
-"                         {\"<fontname>\"} {<fontsize>}",
+"                         {font \"<fontname>\"} {<fontsize>}",
 "",
 " where <[x,y]> specifies the number of graphs in the x and y directions on the",
 " page, `color` enables color, `linewidth` scales all linewidths by <LW>,",
