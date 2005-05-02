@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*- */
-/* $Id: tgif.trm,v 1.31 2004/12/08 22:06:30 sfeam Exp $ */
+/* $Id: tgif.trm,v 1.32 2005/01/12 01:27:33 sfeam Exp $ */
 
 /* GNUPLOT - tgif.trm */
 
@@ -295,9 +295,11 @@ TGIF_options()
 
     struct value a, b;
     double dscaleH, dscaleV;
+    int option;
 
     while (!END_OF_COMMAND) {
-	switch(lookup_table(&TGIF_opts[0],c_token)) {
+	option = lookup_table(&TGIF_opts[0],c_token);
+	switch(option) {
 	case TGIF_DEFAULT:
 	    strcpy(sActFont, "Helvetica");
 	    strcpy(sDefaultFont, "Helvetica");
@@ -383,12 +385,17 @@ TGIF_options()
 	    c_token++;
 	    break;
 	case TGIF_FONT:
+	    c_token++;
+	    /* Fall through */
 	case TGIF_OTHER:
 	default:
-	    if (isstring(c_token)) {
-		quote_str(sActFont, c_token, MAX_LINE_LEN);
+	    if (isstring(c_token) || isstringvar(c_token)) {
+		char *s = try_to_get_string();
+		strncpy(sActFont, s, sizeof(sActFont));
 		strcpy(sDefaultFont, sActFont);
-		c_token++;
+		free(s);
+	    } else if (option == TGIF_FONT) {
+		int_error(c_token,"Expecting font name ");
 	    } else {
 		/* We have font size specified */
 		uActFontSize = (unsigned int) real(const_express(&b));
@@ -475,7 +482,7 @@ TGIF_init()
 %%TGIF 2.15-p7\n\
 state(%d,30,%u,0,0,%u,16,1,9,1,1,0,0,0,0,1,0,'%s',0,%u,0,0,1,10,0,0,1,1,0,16,0,0,1,1,1).\n\
 %%\n\
-%% @(#)$Header: /cvsroot/gnuplot/gnuplot/term/tgif.trm,v 1.31 2004/12/08 22:06:30 sfeam Exp $\n\
+%% @(#)$Header: /cvsroot/gnuplot/gnuplot/term/tgif.trm,v 1.32 2005/01/12 01:27:33 sfeam Exp $\n\
 %% %%W%%\n\
 %%\n\
 page(1,\"\").\n",
