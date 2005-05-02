@@ -5,6 +5,10 @@
 
 	* term/tgif.trm (TGIF_options): Accept string variable for font name.
 
+	* src/hidden3d.c (build_networks): If vertex has previously been flagged
+	as invalid, do not pass it on for further processing.
+	Fixes bug #1194035 / #1194055
+
 2005-04-29  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/x11.trm term/gd.trm term/pdf.trm src/misc.c src/gplt_x11.c:
