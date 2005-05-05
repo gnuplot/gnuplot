@@ -1,3 +1,11 @@
+2005-05-05  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* docs/gnuplot.doc (timecolumn): New documentation entry for this
+	old "secret" function.
+
+	* src/datafile.c (f_timecolumn): Major brush-over, and lots of
+	comments explaining just how broken this function currently is.
+
 2005-05-02  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/util.c (isstringvar) src/util.h: Have this function always

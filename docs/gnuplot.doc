@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.290 2005/04/29 21:12:57 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.291 2005/04/30 03:05:17 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -1124,6 +1124,23 @@ C
  `stringcolumn(x)` may be used only in expressions as part of `using` manipulations
  to fits or datafile plots.  It returns the content of column x as a string variable.
  See `plot datafile using`.
+4 timecolumn
+?expressions functions timecolumn
+?functions timecolumn
+?timecolumn
+#timecolumn(x) & int & timecolumn $x$ during datafile manipulation. \\
+%timecolumn(x)@int@ timecolumn $x$ during datafile manipulation.
+ `timecolumn(x)` may be used only in expressions as part of `using`
+ manipulations to fits or datafile plots.   See `plot datafile using`.
+
+ It reads the data starting at that column as a time/date value and
+ returns its value in gnuplot's internal time representation of
+ "seconds since the millennium".
+
+ To find the right `timefmt` string to use, `timecolumn` searches for a
+ `using` specification with the same column number as its argument.
+ If one is found, `timefmt` pattern of the target axis for this specifier
+ is used.  Otherwise, `timecolumn` chooses the x axis `timefmt` per default.
 4 tm_hour
 ?expressions tm_hour
 ?functions tm_hour
@@ -2754,7 +2771,7 @@ C ... and restart the table:
  Syntax:
        pause <time> {"<string>"}
        pause mouse {<endcondition>}{, <endcondition>} {"<string>"}
-       
+
  <time> may be any constant or expression.  Choosing -1 will wait until a
  carriage return is hit, zero (0) won't pause at all, and a positive number
  will wait the specified number of seconds.  The time is rounded to an integer

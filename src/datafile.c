@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.74 2005/03/06 23:35:01 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.75 2005/03/17 01:27:20 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -2409,42 +2409,60 @@ f_valid(union argument *arg)
     (void) arg;			/* avoid -Wunused warning */
     (void) pop(&a);
     column = (int) magnitude(&a) - 1;
-    good = column >= 0 && column < df_no_cols && df_column[column].good == DF_GOOD;
+    good = column >= 0
+	&& column < df_no_cols
+	&& df_column[column].good == DF_GOOD;
     push(Ginteger(&a, good));
 }
 
 /*}}} */
 
 /*{{{  void f_timecolumn() */
+/* HBB NOTE 20050505: this job is excessively tricky.  We have one
+ * timefmt string per axis.  Back then, that was essentially the only
+ * possibility, but it now poses a severe limitation.  For simple
+ * using specs, the time parsing format should be a function of the
+ * column number in the datafile, not of the axis the data will be
+ * used for.  For extended using specs, the value to go on a given
+ * axis could conceivably be built from multiple time/date entries in
+ * the datafile, each with its own format. */
+/* HBB FIXME 20050505: this really should take two arguments, at
+ * least.  First, the datafile column number.  Second either a timefmt
+ * string (variable), or an axis index.  For now, we have to try to
+ * guess the right axis index */
 void
 f_timecolumn(union argument *arg)
 {
     struct value a;
-    int column, output;
+    int column, spec;
+    AXIS_INDEX whichaxis;
     struct tm tm;
     int limit = (df_no_use_specs ? df_no_use_specs : MAXDATACOLS);
 
     (void) arg;			/* avoid -Wunused warning */
     (void) pop(&a);
-    column = (int) magnitude(&a) - 1;
+    column = (int) magnitude(&a); /* HBB 20050505: removed - 1*/
 
     if (!evaluate_inside_using)
 	int_error(c_token-1, "timecolumn() called from invalid context");
 
-    /* try to match datafile column with output field number */
-    for (output=0; output<limit; output++)
-	if(use_spec[output].column == column)
+    /* try to match datafile column with spec field number */
+    whichaxis = FIRST_X_AXIS;
+    for (spec=0; spec<limit; spec++)
+	if(use_spec[spec].column == column) {
+	    /* Found a 'using' specifier whose (default) column number
+	     * is the same as the column being referred to here.  So
+	     * assume this spec's output axis is the one that we want
+	     * to use the timefmt of. */
+	    whichaxis = df_axis[spec];
 	    break;
+	}
 
-    if (column < 0 || column >= df_no_cols ||
-	!df_column[column].position ||
-	/* FIXME HBB 20000507: what's the correct _output_ column
-	 * number?  This is where my design error of associating time
-	 * parsing formats with the axes (output quantities!), instead
-	 * of the input fields, raises its ugly head. */
-	output == limit ||
-	!gstrptime(df_column[column].position,
-		   axis_array[df_axis[output]].timefmt, &tm)) {
+    if (column < 1
+	|| column > df_no_cols
+	|| !df_column[column - 1].position
+	|| !gstrptime(df_column[column - 1].position,
+		      axis_array[whichaxis].timefmt, &tm)) {
 	undefined = TRUE;
 	push(&a);		/* any objection to this ? */
     } else

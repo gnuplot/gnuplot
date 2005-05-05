@@ -1045,6 +1045,7 @@ defaults to radians.
 * column::                      
 * defined::                     
 * stringcolumn::                
+* timecolumn::                  
 * tm_hour::                     
 * tm_mday::                     
 * tm_min::                      
@@ -1613,7 +1614,7 @@ of column x. See @ref{using}.
 `defined(X)` returns 1 if a variable named X has been defined, otherwise 
 it returns 0.
 
-@node stringcolumn, tm_hour, defined, Functions
+@node stringcolumn, timecolumn, defined, Functions
 @subsubsection stringcolumn
 
 @c ?expressions functions stringcolumn
@@ -1626,7 +1627,28 @@ it returns 0.
 to fits or datafile plots.  It returns the content of column x as a string variable.
 See @ref{using}.
 
-@node tm_hour, tm_mday, stringcolumn, Functions
+@node timecolumn, tm_hour, stringcolumn, Functions
+@subsubsection timecolumn
+
+@c ?expressions functions timecolumn
+@c ?functions timecolumn
+@cindex timecolumn
+@findex timecolumn
+
+
+`timecolumn(x)` may be used only in expressions as part of @ref{using}
+manipulations to fits or datafile plots.   See @ref{using}.
+
+It reads the data starting at that column as a time/date value and
+returns its value in gnuplot's internal time representation of
+"seconds since the millennium".
+
+To find the right @ref{timefmt} string to use, @ref{timecolumn} searches for a
+@ref{using} specification with the same column number as its argument.
+If one is found, @ref{timefmt} pattern of the target axis for this specifier
+is used.  Otherwise, @ref{timecolumn} chooses the x axis @ref{timefmt} per default.
+
+@node tm_hour, tm_mday, timecolumn, Functions
 @subsubsection tm_hour
 
 @c ?expressions tm_hour
@@ -3711,7 +3733,7 @@ waits a specified amount of time or until the carriage return is pressed.
 Syntax:
 @example
       pause <time> @{"<string>"@}
-      pause mouse @{keypress@} @{"<string>"@}
+      pause mouse @{<endcondition>@}@{, <endcondition>@} @{"<string>"@}
 
 @end example
 
@@ -3725,9 +3747,12 @@ If the current terminal supports mousing, then `pause mouse` will terminate
 on either a mouse click or on ctrl-C.  For all other terminals, or if mousing
 is not active, `pause mouse` is equivalent to `pause -1`.
 
-The variant command `pause mouse keypress` will terminate on a keypress in the
-plot window.  The ascii value of the key pressed is returned in MOUSE_KEY.
-The character itself is returned as a one character string in MOUSE_CHAR.
+If one or more end conditions are given after `pause mouse`, then any one of
+the conditions will terminate the pause. The possible end conditions are 
+`keypress`, `button1`, `button2`, `button3`, and `any`.
+If the pause terminates on a keypress, then the ascii value of the key pressed
+is returned in MOUSE_KEY.  The character itself is returned as a one character
+string in MOUSE_CHAR.
 
 In all cases the coordinates of the mouse are returned in variables MOUSE_X,
 MOUSE_Y, MOUSE_X2, MOUSE_Y2.
@@ -3743,7 +3768,10 @@ Examples:
       pause 3     # Wait three seconds
       pause -1  "Hit return to continue"
       pause 10  "Isn't this pretty?  It's a cubic spline."
-      pause mouse "Click mouse on selected data point"
+      pause mouse "Click any mouse button on selected data point"
+      pause mouse keypress "Type a letter from A-F in the active window"
+      pause mouse button1,keypress
+      pause mouse any "Any key or button will terminate"
 
 @end example
 
@@ -6293,9 +6321,8 @@ necessarily coincide with the axes; with `plot` they often do, but with
 
 Syntax:
 @example
-      set border @{<integer> @{ @{linestyle | ls <line_style>@}
-                              | @{linetype | lt <line_type> @}
-                                @{linewidth | lw <line_width>@} @} @}
+      set border @{<integer>@} @{front | back@} @{linewidth | lw <line_width>@}
+                 @{@{linestyle | ls <line_style>@} | @{linetype | lt <line_type>@}@}
       unset border
       show border
 
@@ -6338,6 +6365,10 @@ Various bits or combinations of bits may be added together in the command.
 
 The default is 31, which is all four sides for `plot`, and base and z axis
 for `splot`.
+
+In 2D plots the border is normally drawn on top of all plots elements 
+(`front`). If you want the border to be drawn behind the plot elements,
+use `set border back`.
 
 Using the optional <line_style>, <line_type> and <line_width> specifiers, the
 way the border lines are drawn can be influenced (limited by what the current
@@ -6409,18 +6440,23 @@ Syntax:
 
 @end example
 
-If a data file is plotted without the width being specified in the third,
-fourth, or fifth column (or @ref{using} entry), or if a function is plotted, the
-width of each box is set by the @ref{boxwidth} command.  (If a width is given
-both in the file and by the @ref{boxwidth} command, the one in the file is
-used.)  If the width is not specified in one of these ways, the width of each
-box will be calculated automatically so that it touches the adjacent boxes.
-`relative` indicates, that the specified boxwidth is a scaling factor for
-the automatically calculated boxwidth, otherwise the boxwidth is taken as an
-`absolute` value (which is the default). In a four-column data set, the fourth
-column will be interpreted as the box width unless the width is set to -2.0,
-in which case the width will be calculated automatically.  See
-`set style boxerrorbars` for more details.
+By default, adjacent boxes are extended in width until they touch each other.
+A different default width may be specified using the @ref{boxwidth} command.
+`Relative` widths are interpreted as being a fraction of this default width.
+
+An explicit value for the boxwidth is interpreted as being a number of units
+along the current x axis (`absolute`) unless the modifier `relative` is given.
+If the x axis is a log-scale (see `set log`) then the value of boxwidth is
+truly "absolute" only at x=1; this physical width is maintained everywhere
+along the axis (i.e. the boxes do not become narrower the value of x
+increases). If the range spanned by a log scale x axis is far from x=1,
+some experimentation may be required to find a useful value of boxwidth.
+
+The default is superseded by explicit width information taken from an extra
+data column in styles `boxes` or `boxerrorbars`.  In a four-column data set,
+the fourth column will be interpreted as the box width unless the width is set
+to -2.0, in which case the width will be calculated automatically.
+See `style boxes` and `style boxerrorbars` for more details.
 
 To set the box width to automatic use the command
 @example
@@ -6449,12 +6485,6 @@ To set the box width to half of the automatic size use
 To set the box width to an absolute value of 2 use
 @example
       set boxwidth 2 absolute
-
-@end example
-
-or, if you didn't specify a relative boxwidth before,
-@example
-      set boxwidth 2
 
 @end example
 
@@ -12755,11 +12785,15 @@ year. Please see @ref{xmtics} for details.
 @opindex cbrange
 
 
-The @ref{cbrange} command sets the range of z-values which are colored by
-@ref{pm3d} mode of `splot`. If the cb-axis is autoscaled, then the @ref{pm3d} /
-@ref{palette} range is taken from @ref{zrange}.
+The @ref{cbrange} command sets the range of values which are colored according
+to the current @ref{palette} by styles @ref{pm3d}, `with image` and @ref{palette}. Values outside of the color range use color of the nearest extreme.
 
-Please see @ref{xrange} for details on @ref{cbrange} syntax.
+If the cb-axis is autoscaled in `splot`, then the range is taken from @ref{zrange}.
+Points drawn in `splot ... pm3d|palette` can be filtered by using different
+@ref{zrange} and @ref{cbrange}.
+
+Please see @ref{xrange} for details on @ref{cbrange} syntax. See also
+@ref{palette} and `set colorbox`.
 
 @node cbtics,  , cbrange, set-show
 @subsection cbtics
@@ -16580,7 +16614,7 @@ Syntax:
                         @{monochrome | color@}
                         @{@{linewidth | lw@} <LW>@}
                         @{solid | dashed@}
-                        @{"<fontname>"@} @{<fontsize>@}
+                        @{font "<fontname>"@} @{<fontsize>@}
 
 @end example
 
@@ -16668,7 +16702,7 @@ Syntax:
                         @{monochrome | color@}
                         @{@{linewidth | lw@} <LW>@}
                         @{solid | dashed@}
-                        @{"<fontname>"@} @{<fontsize>@}
+                        @{font "<fontname>"@} @{<fontsize>@}
 
 @end example
 
@@ -17265,13 +17299,13 @@ example below will work as expected, but the second will not.
 
 @example
    set term x11 enhanced font "arial,15" 
-   set title '@{\\=20 Big@} Medium @{\\=5 Small@}' 
+   set title '@{/=20 Big@} Medium @{/=5 Small@}' 
 
 @end example
 
 @example
    set term x11 enhanced font "terminal-14" 
-   set title '@{\\=20 Big@} Medium @{\\=5 Small@}' 
+   set title '@{/=20 Big@} Medium @{/=5 Small@}' 
 
 @end example
 
@@ -17344,10 +17378,10 @@ gnuplot using
      `set term x11 font "<fontspec>"`
 @end example
 
-The driver first queries the X-server for a font of the exact name given,
-for example `set term x11 font "lucidasans-10"`. If this query fails, then
-it tries to interpret <fontspec> as "<font>,<size>,<slant>,<weight>" 
-and to construct a full X11 font name of the form
+The driver first queries the X-server for a font of the exact name given.
+If this query fails, then it tries to interpret <fontspec> as
+"<font>,<size>,<slant>,<weight>" and to construct a full X11 font name
+of the form
 @example
       -*-<font>-<weight>-<s>-*-*-<size>-*-*-*-*-*-<encoding>
 
@@ -17358,7 +17392,7 @@ and to construct a full X11 font name of the form
  <size> is the point size (defaults to 12 if not specified)
  <s> is `i` if <slant>=="italic" `o` if <slant>=="oblique" `r` otherwise
  <weight> is `medium` or `bold` if explicitly requested, otherwise `*`
- <encoding> is set based on the current character set (see help for @ref{encoding}).
+ <encoding> is set based on the current character set (see @ref{encoding}).
 @end example
 
 So `set term x11 font "arial,15,italic"` will be translated to
@@ -17589,8 +17623,8 @@ some plots.
 
 `gnuplot` honors the following resources for setting the dash style used for
 plotting lines.  0 means a solid line.  A two-digit number `jk` (`j` and `k`
-are >= 1  and <= 9) means a dashed line with a repeated pattern of `j` pixels
-on followed by `k` pixels off.  For example, '16' is a "dotted" line with one
+are >= 1 and <= 9) means a dashed line with a repeated pattern of `j` pixels
+on followed by `k` pixels off.  For example, '16' is a dotted line with one
 pixel on followed by six pixels off.  More elaborate on/off patterns can be
 specified with a four-digit value.  For example, '4441' is four on, four off,
 four on, one off.  The default values shown below are for monochrome displays
@@ -17737,13 +17771,13 @@ example below will work as expected, but the second will not.
 
 @example
    set term x11 enhanced font "arial,15" 
-   set title '@{\\=20 Big@} Medium @{\\=5 Small@}' 
+   set title '@{/=20 Big@} Medium @{/=5 Small@}' 
 
 @end example
 
 @example
    set term x11 enhanced font "terminal-14" 
-   set title '@{\\=20 Big@} Medium @{\\=5 Small@}' 
+   set title '@{/=20 Big@} Medium @{/=5 Small@}' 
 
 @end example
 
@@ -17816,10 +17850,10 @@ gnuplot using
      `set term x11 font "<fontspec>"`
 @end example
 
-The driver first queries the X-server for a font of the exact name given,
-for example `set term x11 font "lucidasans-10"`. If this query fails, then
-it tries to interpret <fontspec> as "<font>,<size>,<slant>,<weight>" 
-and to construct a full X11 font name of the form
+The driver first queries the X-server for a font of the exact name given.
+If this query fails, then it tries to interpret <fontspec> as
+"<font>,<size>,<slant>,<weight>" and to construct a full X11 font name
+of the form
 @example
       -*-<font>-<weight>-<s>-*-*-<size>-*-*-*-*-*-<encoding>
 
@@ -17830,7 +17864,7 @@ and to construct a full X11 font name of the form
  <size> is the point size (defaults to 12 if not specified)
  <s> is `i` if <slant>=="italic" `o` if <slant>=="oblique" `r` otherwise
  <weight> is `medium` or `bold` if explicitly requested, otherwise `*`
- <encoding> is set based on the current character set (see help for @ref{encoding}).
+ <encoding> is set based on the current character set (see @ref{encoding}).
 @end example
 
 So `set term x11 font "arial,15,italic"` will be translated to
@@ -18061,8 +18095,8 @@ some plots.
 
 `gnuplot` honors the following resources for setting the dash style used for
 plotting lines.  0 means a solid line.  A two-digit number `jk` (`j` and `k`
-are >= 1  and <= 9) means a dashed line with a repeated pattern of `j` pixels
-on followed by `k` pixels off.  For example, '16' is a "dotted" line with one
+are >= 1 and <= 9) means a dashed line with a repeated pattern of `j` pixels
+on followed by `k` pixels off.  For example, '16' is a dotted line with one
 pixel on followed by six pixels off.  More elaborate on/off patterns can be
 specified with a four-digit value.  For example, '4441' is four on, four off,
 four on, one off.  The default values shown below are for monochrome displays
