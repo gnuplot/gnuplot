@@ -1,3 +1,10 @@
+2005-05-06  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/plot2d.c (get_data histogram_range_fiddling): Treat all boxwidths
+	as absolute when in HISTOGRAM plot mode. Be more thorough in checking
+	for histogram entries that extend the X range in auto-scale mode.
+	Fixes bugs reported by Andrew J Caird.
+
 2005-05-05  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* docs/gnuplot.doc (timecolumn): New documentation entry for this

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.103 2005/04/23 18:16:34 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.104 2005/04/29 21:12:58 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -515,14 +515,15 @@ get_data(struct curve_points *current_plot)
 		    histogram_rightmost = v[0] + current_plot->histogram->start;
 		    current_plot->histogram->end = histogram_rightmost;
 		}
-		if (boxwidth > 0 && boxwidth_is_absolute)
+		/* Histogram boxwidths are always absolute */
+		if (boxwidth > 0)
 		    store2d_point(current_plot, i++, v[0], v[1],
 			      v[0] - boxwidth / 2, v[0] + boxwidth / 2,
 			      v[1], v[1], 0.0);
 		else
 		    store2d_point(current_plot, i++, v[0], v[1], 
-			      v[0], v[0], v[1],
-			      v[1], -1.0);
+			      v[0] - 0.5, v[0] + 0.5,
+			      v[1], v[1], 0.0);
 #endif
 	    } else {
 		if (current_plot->plot_style == CANDLESTICKS
@@ -912,6 +913,14 @@ histogram_range_fiddling(struct curve_points *plot)
 		    xhigh += plot->histogram->start + 1.0;
 		    if (axis_array[FIRST_X_AXIS].max < xhigh)
 			axis_array[FIRST_X_AXIS].max = xhigh;
+		    /* EAM FIXME - this is covering up mis-handling of blank lines  */
+		    /*             in histogram mode, but what should we really do? */
+		    for (i=0; i<stack_count; i++) {
+			xhigh = plot->points[i].x;
+			xhigh += plot->histogram->start + 1.0;
+			if (axis_array[FIRST_X_AXIS].max < xhigh)
+			    axis_array[FIRST_X_AXIS].max = xhigh;
+		    }
 		}
 		break;
 	case HT_STACKED_IN_TOWERS:
