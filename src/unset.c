@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.79 2005/03/29 08:07:17 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.80 2005/03/30 17:18:36 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -1555,10 +1555,6 @@ reset_command()
 
     unset_angles();
     unset_mapping();
-
-#ifdef GP_MACROS
-    unset_macros();
-#endif
 
     unset_size();
     aspect_ratio = 0.0;		/* don't force it */

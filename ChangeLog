@@ -1,3 +1,9 @@
+2005-05-07  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/unset.c (reset_command): Don't include macro setting in general
+	`reset`;  macro expansion is more likely to be chosen per-input-file
+	than per-plot.
+
 2005-05-06  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/plot2d.c (get_data histogram_range_fiddling): Treat all boxwidths
