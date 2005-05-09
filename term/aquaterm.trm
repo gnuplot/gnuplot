@@ -1,5 +1,5 @@
 /* -*- objc -*-
- * $Id: aquaterm.trm,v 1.13 2005/02/14 10:19:08 mikulik Exp $
+ * $Id: aquaterm.trm,v 1.14 2005/03/03 04:09:50 sfeam Exp $
  *
  */
 
@@ -393,16 +393,17 @@ AQUA_text_angle (int angle)
 TERM_PUBLIC int
 AQUA_set_font(const char *font) /* "font,size" */
 {
+  /* Obtain default fontname and fontsize. If these are invalid, AquaTerm will handle it. */
   NSString *fontFace = [NSString stringWithCString:AQUA_fontNameCur];
   float fontSize = AQUA_fontSizeCur;
-  if (strlen(font)>0) {
+  
+  if (strlen(font) > 0) {
+    /* Try to split the non-empty string into array parts (as string objects) */
     NSArray *parts = [[NSString stringWithCString:font] componentsSeparatedByString:@","];
-    if ([parts count] < 2) {
-      /* FIXME: Issue warning here? */
-	  LOG(@"Error: %@", [NSString stringWithCString:font]);
-    } else {
-      fontSize = [[parts objectAtIndex:1] floatValue];
-      fontFace = [parts objectAtIndex:0];
+    /* Check that we have both non-empty name and size, otherwise stay with defaults */
+    if ([parts count] > 1 && ![[parts objectAtIndex:0] isEqualToString:@""] ) {
+      fontSize = [[parts objectAtIndex:1] floatValue]; /* Convert 2nd string object (fontsize) to float */ 
+      fontFace = [parts objectAtIndex:0]; /* fontname */
     }
   }
 
