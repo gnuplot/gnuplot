@@ -6,6 +6,10 @@
 
 	* docs/gnuplot.doc: Correct typo referring to 'set pause mouse'.
 
+	* term/post.trm term/pslatex.trm (PSTEX_text): Allow postscript-based
+	terminals to use fractional font sizes; change ps_fontsize from int to
+	float, and change relevant format statements from %d to %g.
+
 2005-05-07  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/unset.c (reset_command): Don't include macro setting in general

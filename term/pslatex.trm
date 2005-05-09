@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: pslatex.trm,v 1.53 2005/02/28 19:34:56 sfeam Exp $
+ * $Id: pslatex.trm,v 1.54 2005/04/17 03:21:27 sfeam Exp $
  */
 
 /* GNUPLOT - pslatex.trm */
@@ -332,7 +332,7 @@ PSTEX_text()
 
     if (ps_params->fontsize) {
 	if (ps_params->terminal == PSTERM_PSLATEX)
-	    fprintf(gpoutfile, "\\fontsize{%d}{\\baselineskip}\\selectfont\n",
+	    fprintf(gpoutfile, "\\fontsize{%g}{\\baselineskip}\\selectfont\n",
 		    ps_params->fontsize);
 	/* Should have an else clause here to handle pstex equivalent */
     }
@@ -490,9 +490,9 @@ EPSLATEX_common_init()
   \\input{size10.clo}%%\n\
 }%%\n\
 \\makeatother\n",
-                    ps_params->fontsize-10,
-                    ps_params->fontsize,
-                    ps_params->fontsize);
+                    (int)(ps_params->fontsize-10),
+                    (int)(ps_params->fontsize),
+                    (int)(ps_params->fontsize));
 
 	    if (fontfamily && strlen(fontfamily) > 0)
 		fprintf(gpoutfile, "\\renewcommand*\\rmdefault{%s}%%\n",

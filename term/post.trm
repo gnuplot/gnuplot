@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.154 2005/04/28 21:43:50 sfeam Exp $
+ * $Id: post.trm,v 1.155 2005/04/30 03:05:18 sfeam Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -166,7 +166,7 @@ typedef struct ps_params_t {
     TBOOLEAN rounded;                 /* rounded linecaps and linejoins */
     struct ps_fontfile_def *first_fontfile;
     char font[MAX_ID_LEN+1];          /* name of font */
-    int fontsize;                     /* size of font in pts */
+    float fontsize;                     /* size of font in pts */
     TBOOLEAN useauxfile;              /* only necessary for ps(la)tex */
     TBOOLEAN rotate;                  /* only necessary for ps(la)tex */
     int palfunc_samples;              /* setable via "palf$uncparam" */
@@ -227,13 +227,13 @@ static void make_palette_formulae __PROTO((void));
 static void PS_make_header __PROTO((t_sm_palette *palette));
 #endif /* PM3D */
 
-static int ps_fontsize;
+static float ps_fontsize;
 
 /* for enhanced mode, we keep a separate font name and size, which
  * is restored to the default value on font of ""
  */
 static char ps_enh_font[MAX_ID_LEN+1];
-static int  ps_enh_fontsize;
+static float ps_enh_fontsize;
 static int  ENHPS_initialized;
 
 static int ps_page = 0;		/* page count */
@@ -1383,7 +1383,7 @@ PS_options()
 			      term->name, "of font name");
 	    } else {
 		/* We have font size specified */
-		ps_params->fontsize = (int)real(const_express(&a));
+		ps_params->fontsize = real(const_express(&a));
 	    }
 	    break;
 	}
@@ -1409,7 +1409,7 @@ PS_options()
 	term->h_char = (unsigned int)(ps_fontsize*PS_SC*5/10);
     else
 	term->h_char = (unsigned int)(ps_fontsize*PS_SC*6/10);
-    sprintf(PS_default_font,"%s,%d",ps_params->font,ps_fontsize);
+    sprintf(PS_default_font,"%s,%g",ps_params->font,ps_fontsize);
 
     if (ps_params->terminal == PSTERM_POSTSCRIPT) {
 	if (ps_params->first_fontfile) {
@@ -1492,14 +1492,14 @@ PS_options()
 #endif
 
     if (ps_params->terminal == PSTERM_POSTSCRIPT)
-	sprintf(tmp_term_options,"\"%s\" %d%s ",
+	sprintf(tmp_term_options,"\"%s\" %g%s ",
 		ps_params->font,ps_params->fontsize,
 		ps_fontfile_char ? ps_fontfile_char : "");
     else if (ps_params->terminal == PSTERM_EPSLATEX)
-	sprintf(tmp_term_options,"\"%s\" %d ",
+	sprintf(tmp_term_options,"\"%s\" %g ",
 		ps_params->font,ps_params->fontsize);
     else if (ps_params->fontsize)
-	sprintf(tmp_term_options,"%d ",ps_params->fontsize);
+	sprintf(tmp_term_options,"%g ",ps_params->fontsize);
     else
 	tmp_term_options[0]='\0';
 
@@ -2737,11 +2737,11 @@ PS_set_font(const char *font)
     if (font[sep] == ',')
 	sscanf (&(font[sep+1]),"%f",&size);
     if (sep == 0) {
-	fprintf(gppsfile,"currentfont %d selectfont\n",(int)(size*PS_SC));
+	fprintf(gppsfile, "currentfont %g selectfont\n", size*PS_SC);
     } else {
 	PS_RememberFont(name,1);
-	fprintf(gppsfile, "/%s findfont %d scalefont setfont\n",
-		name, (int)(size*PS_SC));
+	fprintf(gppsfile, "/%s findfont %g scalefont setfont\n",
+		name, size*PS_SC);
     }
     term->v_char = (unsigned int)(size*PS_SC);
     term->h_char = (unsigned int)(size*PS_SC*6/10);
@@ -2951,7 +2951,7 @@ ENHPS_set_font(const char *font)
 	    PS_RememberFont(ps_enh_font, 1);
 	}
 	ps_enh_fontsize = ps_fontsize;
-	sscanf (font+sep+1,"%d",&ps_enh_fontsize);
+	sscanf (font+sep+1,"%f",&ps_enh_fontsize);
     } else {
 	/* return to defaults */
 	strcpy(ps_enh_font, ps_params->font);
