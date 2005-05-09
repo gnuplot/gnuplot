@@ -1,3 +1,11 @@
+2005-05-09  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/gplt_x11.c: Rename static arrays Class[] -> X_Class[]  and
+	Name[] -> X_Name[] to avoid conflict with gcc 4 build environment
+	under OSX 10.4 as reported by Per Persson.
+
+	* docs/gnuplot.doc: Correct typo referring to 'set pause mouse'.
+
 2005-05-07  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/unset.c (reset_command): Don't include macro setting in general
