@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.291 2005/04/30 03:05:17 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.292 2005/05/05 14:25:15 broeker Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -1728,7 +1728,7 @@ C ... and restart the table:
  sufficient to test for any one of these variables being defined.
 
        plot 'something'
-       set pause mouse
+       pause mouse
        if (defined(MOUSE_BUTTON)) call 'something_else'; \
        else print "No mouse click." 
 
