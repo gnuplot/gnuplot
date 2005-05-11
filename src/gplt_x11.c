@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.135 2005/04/29 16:36:06 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.136 2005/05/09 18:23:09 sfeam Exp $"); }
 #endif
 
 #define X11_POLYLINE 1
@@ -2468,6 +2468,8 @@ exec_cmd(plot_struct *plot, char *command)
 	    if (i >= npoints) {
 		/* only do the call if list is complete by now */
 		int fillpar, idx;
+		XColor xcolor, bgnd;
+		float dim;
 
 #else /* BINARY_X11_POLYGON */
 

@@ -1,3 +1,8 @@
+2005-05-11  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/gplt_x11.c (exec_cmd): Reorder variable declarations to allow
+	building without binary-polygon support.
+
 2005-05-09  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/gplt_x11.c: Rename static arrays Class[] -> X_Class[]  and
