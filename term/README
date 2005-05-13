@@ -297,7 +297,8 @@ draw arrows using the _move() and _vector() functions.
 Drivers should use do_arrow unless it causes problems.
 
 _set_font() is called to set the font of labels, etc. [new 3.7 feature]
-fonts are selected as strings "name,size"
+  - fonts are selected as strings "name,size".
+  - _set_font("") restores the terminal's default font.
 
 _pointsize() is used to set the pointsize for subsequent points
 

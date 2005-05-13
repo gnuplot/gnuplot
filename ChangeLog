@@ -1,3 +1,12 @@
+2005-05-13  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/term.c (ignore_enhanced): Force a return to the default font.
+	 Fixes bug #1194516.
+
+	* term/README: Document the fact that term->set_font("") is expected
+	to restore the terminal's default font. This was already true, but
+	not mentioned in README.
+
 2005-05-13  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* term/fig.trm (FIG_linetype): Use the postscript sequence of linetype

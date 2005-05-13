@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.107 2005/04/22 21:40:37 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.108 2005/04/28 20:33:23 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -2576,5 +2576,11 @@ int len;
 void
 ignore_enhanced(TBOOLEAN flag)
 {
+    /* Force a return to the default font */
+    if (flag && !ignore_enhanced_text) {
+	ignore_enhanced_text = TRUE;
+	if (term->set_font)
+	    term->set_font("");
+    }
     ignore_enhanced_text = flag;
 }
