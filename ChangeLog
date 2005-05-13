@@ -1,3 +1,8 @@
+2005-05-13  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* term/fig.trm (FIG_linetype): Use the postscript sequence of linetype
+	colors.
+
 2005-05-11  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/gplt_x11.c (exec_cmd): Reorder variable declarations to allow

@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: fig.trm,v 1.50 2005/03/03 04:09:51 sfeam Exp $
+ * $Id: fig.trm,v 1.51 2005/04/18 06:41:42 mikulik Exp $
  */
 
 /* GNUPLOT - fig.trm */
@@ -661,6 +661,16 @@ FIG_linetype(int linetype)		/* expect linetype >= -2 */
     int last_FIG_depth = FIG_linedepth;
     int last_FIG_thickness = FIG_thickness;
 
+    /* mapping of fig color codes to color sequence as in the postscript terminal */
+#define npscolors 9
+    int fig2pscolors[npscolors] = {
+	4 /*red*/, 2 /*green*/, 1 /*blue*/,
+	5 /*magenta*/, 3 /*cyan*/, 6 /*yellow*/,
+	0 /*black*/, 26 /*brown*/,
+	11 /*use LtBlue instead of light gray*/
+	/* note: black=1, white=8 */
+    };
+
     FIG_linedepth = FIG_depth;
     FIG_thickness = FIG_current_linewidth * FIG_default_thickness;
     if (FIG_thickness < 1)
@@ -676,7 +686,11 @@ FIG_linetype(int linetype)		/* expect linetype >= -2 */
 	    FIG_type = SOLID_LINE;
 	    FIG_spacing = 0.0;
 	    if (FIG_use_color)
+#if 0 /* fig's old color sequence */
 		FIG_color = BLACK;
+#else /* color sequence compatible to the postscript terminal */
+		if (linetype==0) FIG_color = fig2pscolors[0]; /* red */
+#endif
 	    break;
 	}
     case -1:{
@@ -701,9 +715,15 @@ FIG_linetype(int linetype)		/* expect linetype >= -2 */
 		FIG_thickness = 1;
 	    linetype %= 100;
 	    if (FIG_use_color) {
+#if 0 /* fig's old color sequence */
 		FIG_type = (linetype >= WHITE);		/* dashed line */
 		FIG_color = linetype % WHITE;
 		FIG_spacing = (linetype / WHITE) * 3;
+#else /* color sequence compatible to the postscript terminal */
+		FIG_type = (linetype >= npscolors);		/* dashed line */
+		FIG_color = fig2pscolors[linetype % npscolors];
+		FIG_spacing = (linetype / npscolors) * 3;
+#endif
 	    } else {		/* monochrome */
 		FIG_type = (linetype)? linetype%2 + 1 : SOLID_LINE; /* dotted, dashed, ... */
 		FIG_spacing = (linetype + 1) / 2 * 3;
