@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.176 2005/04/18 21:25:46 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.177 2005/04/27 22:38:25 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -3216,12 +3216,10 @@ set_terminal()
 	return;
     }
 
-#ifdef BACKWARDS_COMPATIBLE
     if (equals(c_token,"table")) {
-	set_table();
+	int_error(NO_CARET,"The command 'set term table' is obsolete.\n\t Please use 'set table \"outfile\"' instead.\n");
 	return;
     }
-#endif
 
     /* `set term push' */
     if (equals(c_token,"push")) {

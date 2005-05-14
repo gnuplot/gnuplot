@@ -1,3 +1,9 @@
+2005-05-14  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/set.c (set_terminal): Give up on trying to provide backward
+	compatibility for the old 'set term table' command; just issue a
+	warning and leave the current terminal unchanged.
+
 2005-05-13  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/term.c (ignore_enhanced): Force a return to the default font.
