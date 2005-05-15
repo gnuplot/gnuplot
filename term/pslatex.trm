@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: pslatex.trm,v 1.54 2005/04/17 03:21:27 sfeam Exp $
+ * $Id: pslatex.trm,v 1.55 2005/05/10 05:51:37 sfeam Exp $
  */
 
 /* GNUPLOT - pslatex.trm */
@@ -99,6 +99,9 @@ TERM_PUBLIC void EPSLATEX_common_init __PROTO((void));
 TERM_PUBLIC void EPSLATEX_put_text __PROTO((unsigned int x, unsigned int y, const char *str));
 TERM_PUBLIC void EPSLATEX_linetype __PROTO((int linetype));
 
+/* additional LaTeX header information for epslatex terminal */
+TERM_PUBLIC char *epslatex_header = NULL;
+
 #endif /* TERM_PROTO */
 
 
@@ -115,9 +118,6 @@ struct pstex_text_command {
 };
 
 static struct pstex_text_command *pstex_labels = NULL;
-
-/* additional LaTeX header information for epslatex terminal */
-static char *epslatex_header = NULL;
 
 /* Common functions for epslatex and ps(la)tex */
 

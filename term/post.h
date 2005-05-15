@@ -1,5 +1,5 @@
 /*
- * $Id: post.h,v 1.6 2005/02/09 11:43:11 mikulik Exp $
+ * $Id: post.h,v 1.7 2005/03/02 19:44:57 sfeam Exp $
  */
 
 /* GNUPLOT - post.h */
@@ -85,6 +85,6 @@ TERM_PUBLIC void EPSLATEX_reopen_output __PROTO((void));
 #define EPSLATEX_HCHAR (11*PS_SC*6/10)
 
 /* additional LaTeX header information for epslatex terminal */
-extern char *epslatex_header;
+TERM_PUBLIC char *epslatex_header;
 
 #endif /* TERM_POST_H */
