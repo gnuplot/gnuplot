@@ -4,6 +4,8 @@
 	infinite loop when parsing 'splot with vectors' and no additional
 	options (bug #1203139).
 
+	* src/graph3d.c (do_3dplot): Show key sample for 'splot with vectors'.
+
 2005-05-15  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/set.c (set_terminal): That last change wasn't popular.

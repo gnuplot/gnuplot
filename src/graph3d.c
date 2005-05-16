@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.118 2005/04/23 18:16:31 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.119 2005/04/28 20:33:22 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -1035,6 +1035,14 @@ do_3dplot(
 
 	    case VECTOR:
 		plot3d_vectors(this_plot);
+		if (lkey) {
+#ifdef PM3D
+		    if (this_plot->lp_properties.use_palette)
+			key_sample_line_pm3d(this_plot, xl, yl);
+		    else
+#endif
+			key_sample_line(xl, yl);
+		}
 		break;
 
 #ifdef PM3D
