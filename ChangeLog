@@ -1,3 +1,9 @@
+2005-05-16  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/plot3d.c (eval_3dplots): Prevent parser from getting into an
+	infinite loop when parsing 'splot with vectors' and no additional
+	options (bug #1203139).
+
 2005-05-15  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/set.c (set_terminal): That last change wasn't popular.

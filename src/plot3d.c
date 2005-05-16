@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.100 2005/03/30 20:23:37 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.101 2005/04/23 18:16:34 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -1432,15 +1432,15 @@ eval_3dplots()
 		    struct arrow_style_type arrow;
 		    arrow_parse(&arrow, line_num, TRUE);
 		    checked_once = TRUE;
-
-		    if (set_lpstyle) {
-			duplication = TRUE;
-			break;
-		    } else {
-			this_plot->arrow_properties = arrow;
-			if (stored_token != c_token)
+		    if (stored_token != c_token) {
+			 if (set_lpstyle) {
+			    duplication = TRUE;
+			    break;
+			 } else {
+			    this_plot->arrow_properties = arrow;
 			    set_lpstyle = TRUE;
-			continue;
+			    continue;
+			}
 		    }
 		} else {
 		    int stored_token = c_token;
@@ -1503,7 +1503,10 @@ eval_3dplots()
 	     * the defaults for linewidth and pointsize, call it now
 	     * to define them. */
 	    if (! set_lpstyle) {
-		lp_parse(&this_plot->lp_properties, 1,
+		if (this_plot->plot_style == VECTOR)
+		    arrow_parse(&this_plot->arrow_properties, line_num, TRUE);
+		else
+		    lp_parse(&this_plot->lp_properties, 1,
 			 this_plot->plot_style & PLOT_STYLE_HAS_POINT,
 			 line_num, point_num);
 
