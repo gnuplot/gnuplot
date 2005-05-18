@@ -1,3 +1,7 @@
+2005-05-18  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/set.c (set_allzeroaxis): Fix parsing error (bug #1204444).
+
 2005-05-16  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/plot3d.c (eval_3dplots): Prevent parser from getting into an
