@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.152 2005/04/14 20:04:45 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.153 2005/04/18 19:48:08 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -2382,6 +2382,9 @@ show_histogram()
     if (histogram_opts.type == HT_CLUSTERED)
 	fprintf(stderr, "\tHistogram style is clustered with gap %d ", 
 		histogram_opts.gap);
+    else if (histogram_opts.type == HT_ERRORBARS)
+	fprintf(stderr, "\tHistogram style is errorbars with gap %d lw %g ",
+		histogram_opts.gap, histogram_opts.bar_lw);
     else if (histogram_opts.type == HT_STACKED_IN_LAYERS)
 	fprintf(stderr, "\tHistogram style is rowstacked ");
     else if (histogram_opts.type == HT_STACKED_IN_TOWERS)

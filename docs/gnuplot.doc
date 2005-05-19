@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.292 2005/05/05 14:25:15 broeker Exp $
+C RCS $Id: gnuplot.doc,v 1.293 2005/05/09 18:22:00 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -4613,12 +4613,17 @@ C ... and restart the table:
  financebars.
 
  Syntax:
-       set bars {small | large | <size>}
+       set bars {small | large | fullwidth | <size>}
        unset bars
        show bars
 
  `small` is a synonym for 0.0, and `large` for 1.0.
  The default is 1.0 if no size is given.
+
+ The keyword `fullwidth` is relevant only to histograms with errorbars.
+ It sets the width of the errorbar ends to be the same as the width of the
+ associated box in the histogram.  It does not change the width of the box
+ itself.
 3 bmargin
 ?commands set bmargin
 ?set bmargin
@@ -8178,19 +8183,20 @@ C ... and restart the table:
  chart from a sequence of data columns in parallel. Each element of the 
  `plot` command must specify a single input data source (e.g. one column of 
  the input file), possibly with associated tic values or key titles.
- Three styles of histogram layout are currently supported. 
+ Four styles of histogram layout are currently supported. 
 
        set style histogram clustered {gap <gapsize>}
+       set style histogram errorbars {gap <gapsize>} {<linewidth>}
        set style histogram rowstacked
        set style histogram columnstacked
 
- The default style corresponds to `set style histogram clustered gap 2`. 
- Each set of parallel data values is collected into a group of boxes clustered
- at the x-axis coordinate corresponding to their sequential position (row #)
- in the selected datafile columns.  Thus if <n> datacolumns are selected, the
- first cluster is centered about x=1, and contains <n> boxes whose heights are
- taken from the first entry in the corresponding <n> data columns. This
- is followed by a gap and then a second cluster of boxes centered about x=2
+ The default style corresponds to `set style histogram clustered gap 2`.
+ In this style, each set of parallel data values is collected into a group of
+ boxes clustered at the x-axis coordinate corresponding to their sequential
+ position (row #) in the selected datafile columns.  Thus if <n> datacolumns are
+ selected, the first cluster is centered about x=1, and contains <n> boxes whose
+ heights are taken from the first entry in the corresponding <n> data columns.
+ This is followed by a gap and then a second cluster of boxes centered about x=2
  corresponding to the second entry in the respective data columns, and so on.
  The default gap width of 2 indicates that the empty space between clusters is
  equivalent to the width of 2 boxes.  All boxes derived from any one column
@@ -8200,6 +8206,14 @@ C ... and restart the table:
  It is common in such input files that the first element of each row is a
  label. Labels from this column may be placed along the x-axis underneath
  the appropriate cluster of boxes with the `xticlabels` option to `using`.
+
+ The `errorbars` style is very similar to the `clustered` style, except that
+ it requires two columns of input for each entry. The first column is treated
+ as the height (y-value) of that box, exactly as for the `clustered` style. 
+ The second column is treated as an error magnitude, and used to generate a
+ vertical error bar at the top of the box. The appearance of the error bar is
+ controlled by the current value of `set bars` and by the optional <linewidth>
+ specification.
 
  Two styles of stacked histogram are supported, chosen by the command
  `set style histogram {rowstacked|columnstacked}`.  In these styles the data
@@ -8233,18 +8247,28 @@ C ... and restart the table:
        set boxwidth 0.9 relative
        set style data histograms
        set style fill solid 1.0 border -1
-       plot 'file.dat' using 2, '' using 4, '' using 3 
+       plot 'file.dat' using 2, '' using 4, '' using 6 
 
  This will produce a plot with clusters of three boxes (vertical bars) centered
- at each integral value on the x axis. If the first column of the input file
+ at each integral value on the x axis.  If the first column of the input file
  contains labels, they may be placed along the x-axis using the variant command
 
-       plot 'file.dat' using 2, '' using 4, '' using 3:xticlabels(1) 
+       plot 'file.dat' using 2, '' using 4, '' using 6:xticlabels(1) 
+
+ If the file contains both a magnitude and an error estimate for each value,
+ then error bars can be added to the plot.  The following commands will add
+ error bars extending from (y-<error>) to (y+<error>), capped by horizontal bar
+ ends drawn the same width as the box itself. The error bars and bar ends are
+ drawn in black with linewidth 2.
+
+       set bars fullwidth
+       set style histogram errorbars gap 2 lt -1 lw 2
+       plot 'file.dat' using 2:3, '' using 4:5, '' using 6:7:xticlabels(1) 
 
  To plot the same data as a rowstacked histogram:
 
        set style histogram rows
-       plot 'file.dat' using 2, '' using 4, '' using 3:xtic(1) 
+       plot 'file.dat' using 2, '' using 4, '' using 6:xtic(1) 
 
  This will produce a plot in which each vertical bar contains a stack of three
  segments, corresponding in height to the values found in columns 2, 4 and 3
@@ -8253,7 +8277,7 @@ C ... and restart the table:
  Finally, the commands
 
        set style histogram columnstacked
-       plot 'file.dat' using 2, '' using 4, '' using 3 
+       plot 'file.dat' using 2, '' using 4, '' using 6 
 
  will produce three vertical stacks. The stack at x=1 will contain a box for
  each entry in column 2 of the datafile.  The stack at x=2 will contain a box

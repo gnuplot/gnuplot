@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.104 2005/04/29 21:12:58 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.105 2005/05/07 05:48:04 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -329,7 +329,7 @@ get_data(struct curve_points *current_plot)
 #ifdef EAM_HISTOGRAMS
     case HISTOGRAMS:
 	min_cols = 1;
-	max_cols = 1;
+	max_cols = 2;
 	break;
 #endif
 
@@ -490,6 +490,37 @@ get_data(struct curve_points *current_plot)
 	    }
 
 	case 2:
+#ifdef EAM_HISTOGRAMS
+	    if (current_plot->plot_style == HISTOGRAMS) {
+		if (histogram_opts.type == HT_ERRORBARS) {
+		    if (j == 1)
+			int_error(c_token, "Not enough columns in using specification");
+		    v[2] = v[1];
+		    v[1] = v[0];
+		    v[0] = df_datum;
+		} else if (j == 2)
+		    int_error(c_token, "Too many columns in using specification");
+		else v[2] = 0.0;
+
+		if (histogram_opts.type == HT_STACKED_IN_TOWERS) {
+		    histogram_rightmost = current_plot->histogram_sequence
+					+ current_plot->histogram->start;
+		    current_plot->histogram->end = histogram_rightmost;
+		} else if (v[0] + current_plot->histogram->start > histogram_rightmost) {
+		    histogram_rightmost = v[0] + current_plot->histogram->start;
+		    current_plot->histogram->end = histogram_rightmost;
+		}
+		/* Histogram boxwidths are always absolute */
+		if (boxwidth > 0)
+		    store2d_point(current_plot, i++, v[0], v[1],
+			      v[0] - boxwidth / 2, v[0] + boxwidth / 2,
+			      v[1]-v[2], v[1]+v[2], 0.0);
+		else
+		    store2d_point(current_plot, i++, v[0], v[1], 
+			      v[0] - 0.5, v[0] + 0.5,
+			      v[1]-v[2], v[1]+v[2], 0.0);	/* EAM DEBUG -1.0 ?? */
+	    } else
+#endif
 	    /* x, y */
 	    /* ylow and yhigh are same as y */
 
@@ -505,26 +536,6 @@ get_data(struct curve_points *current_plot)
 		    store2d_point(current_plot, i++, v[0], v[1],
 			v[0] - boxwidth / 2, v[0] + boxwidth / 2,
 			v[1], v[1], 0.0);
-#ifdef EAM_HISTOGRAMS
-	    } else if (current_plot->plot_style == HISTOGRAMS) {
-		if (histogram_opts.type == HT_STACKED_IN_TOWERS) {
-		    histogram_rightmost = current_plot->histogram_sequence
-					+ current_plot->histogram->start;
-		    current_plot->histogram->end = histogram_rightmost;
-		} else if (v[0] + current_plot->histogram->start > histogram_rightmost) {
-		    histogram_rightmost = v[0] + current_plot->histogram->start;
-		    current_plot->histogram->end = histogram_rightmost;
-		}
-		/* Histogram boxwidths are always absolute */
-		if (boxwidth > 0)
-		    store2d_point(current_plot, i++, v[0], v[1],
-			      v[0] - boxwidth / 2, v[0] + boxwidth / 2,
-			      v[1], v[1], 0.0);
-		else
-		    store2d_point(current_plot, i++, v[0], v[1], 
-			      v[0] - 0.5, v[0] + 0.5,
-			      v[1], v[1], 0.0);
-#endif
 	    } else {
 		if (current_plot->plot_style == CANDLESTICKS
 		    || current_plot->plot_style == FINANCEBARS) {
@@ -901,6 +912,7 @@ histogram_range_fiddling(struct curve_points *plot)
 	    }
 		/* fall through to checks on x range */
 	case HT_CLUSTERED:	
+	case HT_ERRORBARS:	
 		if (!axis_array[FIRST_X_AXIS].autoscale)
 		    break;
 		if (axis_array[FIRST_X_AXIS].autoscale & AUTOSCALE_MIN) {

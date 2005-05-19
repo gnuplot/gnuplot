@@ -1,3 +1,19 @@
+2005-05-19  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/datafile.c (df_readline) src/gadgets.h src/save.c (save_set_all)
+	src/set.c (set_bars parse_histogramstyle) src/show.c (show_histogram) 
+	src/plot2d.c (get_data histogram_range_fiddling) 
+	src/graphics.c (do_plot plot_bars plot_boxes): New histogram plot mode
+
+	    set style histogram errorbars {gap <g>} {linewidth {lw}}
+
+	Identical to 'set style histogram clustered' except that a second
+	column of input data (required) is used to generate error bars at the
+	top of each box belonging to the histogram.
+	
+	* docs/gnuplot.doc: Document the addition of a new histogram
+	plot mode and associated options for 'set bars'.
+	
 2005-05-18  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/set.c (set_allzeroaxis): Fix parsing error (bug #1204444).

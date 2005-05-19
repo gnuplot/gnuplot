@@ -175,6 +175,7 @@ typedef struct histogram_style {
     double end;		/* X-coord of last histogram entry */
     int startcolor;	/* LT_UNDEFINED or explicit color for first entry */
     int startpattern;	/* LT_UNDEFINED or explicit pattern for first entry */
+    double bar_lw;	/* linewidth for error bars */
     struct histogram_style *next;
     struct text_label title;
 } histogram_style;
@@ -182,9 +183,10 @@ typedef enum histogram_type {
 	HT_NONE,
 	HT_STACKED_IN_LAYERS,
 	HT_STACKED_IN_TOWERS,
-	HT_CLUSTERED
+	HT_CLUSTERED,
+	HT_ERRORBARS
 } t_histogram_type;
-#define DEFAULT_HISTOGRAM_STYLE { HT_NONE, 2, 1, 0.0, 0.0, LT_UNDEFINED, LT_UNDEFINED, NULL, { 0 } }
+#define DEFAULT_HISTOGRAM_STYLE { HT_NONE, 2, 1, 0.0, 0.0, LT_UNDEFINED, LT_UNDEFINED, 0, NULL, { 0 } }
 
 #endif
 

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.155 2005/04/18 22:04:13 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.156 2005/04/23 18:16:32 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -1646,11 +1646,25 @@ do_plot(struct curve_points *plots, int pcount)
 	    break;
 	case BOXXYERROR:
 	case BOXES:
-#ifdef EAM_HISTOGRAMS
-	case HISTOGRAMS:
-#endif
 	    plot_boxes(this_plot, Y_AXIS.term_zero);
 	    break;
+
+#ifdef EAM_HISTOGRAMS
+	case HISTOGRAMS:
+	    /* Draw the bars first, so that the box will cover the bottom half */
+	    if (histogram_opts.type == HT_ERRORBARS) {
+		(term->linewidth)(histogram_opts.bar_lw);
+		if (default_fillstyle.border_linetype > LT_NODRAW)
+		    (term->linetype)(default_fillstyle.border_linetype);
+		else
+		    (term->linetype)(this_plot->lp_properties.l_type);
+		plot_bars(this_plot);
+		term_apply_lp_properties(&(this_plot->lp_properties));
+	    }
+	    plot_boxes(this_plot, Y_AXIS.term_zero);
+	    break;
+#endif
+
 	case BOXERROR:
 	    plot_boxes(this_plot, Y_AXIS.term_zero);
 	    plot_bars(this_plot);
@@ -2635,6 +2649,9 @@ plot_bars(struct curve_points *plot)
     unsigned int yM, xlowM, xhighM;
     TBOOLEAN low_inrange, high_inrange;
     int tic = ERRORBARTIC;
+#ifdef EAM_HISTOGRAMS
+    double halfwidth;		/* Used to calculate full box width */
+#endif
 
     /* Limitation: no boxes with x errorbars */
 
@@ -2643,6 +2660,9 @@ plot_bars(struct curve_points *plot)
 	|| (plot->plot_style == BOXERROR)
 	|| (plot->plot_style == YERRORLINES)
 	|| (plot->plot_style == XYERRORLINES)
+#ifdef EAM_HISTOGRAMS
+	|| (plot->plot_style == HISTOGRAMS)
+#endif
 	|| (plot->plot_style == FILLEDCURVES) /* Only if term has no filled_polygon! */
 	) {
 	/* Draw the vertical part of the bar */
@@ -2653,6 +2673,22 @@ plot_bars(struct curve_points *plot)
 
 	    /* check to see if in xrange */
 	    x = plot->points[i].x;
+#ifdef EAM_HISTOGRAMS
+	    if (plot->plot_style == HISTOGRAMS) {
+		/* Shrink each cluster to fit within one unit along X axis,   */
+		/* centered about the integer representing the cluster number */
+		/* 'start' is reset to 0 at the top of eval_plots(), and then */
+		/* incremented if 'plot new histogram' is encountered.        */
+		int clustersize = plot->histogram->clustersize + histogram_opts.gap;
+		x  += (i-1) * (clustersize - 1) + plot->histogram_sequence;
+		x  += histogram_opts.gap/2;
+		x  /= clustersize;
+		x  += plot->histogram->start + 0.5;
+		/* Calculate width also */
+		halfwidth = (plot->points[i].xhigh - plot->points[i].xlow)
+			  / (2. * clustersize);
+	    }
+#endif
 	    if (!inrange(x, X_AXIS.min, X_AXIS.max))
 		continue;
 	    xM = map_x(x);
@@ -2694,6 +2730,12 @@ plot_bars(struct curve_points *plot)
 	    xhigh = plot->points[i].xhigh;
 	    xlow = plot->points[i].xlow;
 
+#ifdef EAM_HISTOGRAMS
+	    if (plot->plot_style == HISTOGRAMS) {
+		xlowM = map_x(x-halfwidth);
+		xhighM = map_x(x+halfwidth);
+	    } else {
+#endif
 	    high_inrange = inrange(xhigh, X_AXIS.min, X_AXIS.max);
 	    low_inrange = inrange(xlow, X_AXIS.min, X_AXIS.max);
 
@@ -2716,6 +2758,9 @@ plot_bars(struct curve_points *plot)
 	    if (!high_inrange && !low_inrange && xlowM == xhighM)
 		/* both out of range on the same side */
 		continue;
+#ifdef EAM_HISTOGRAMS
+	    }
+#endif
 
 	    /* by here everything has been mapped */
 	    if (!polar) {
@@ -2723,7 +2768,14 @@ plot_bars(struct curve_points *plot)
 		(*t->move) (xM, ylowM);
 		/* draw the main bar */
 		(*t->vector) (xM, yhighM);
-		if (bar_size > 0.0) {
+		if (bar_size < 0.0) {
+		    /* draw the bottom tic same width as box */
+		    (*t->move) ((unsigned int) (xlowM), ylowM);
+		    (*t->vector) ((unsigned int) (xhighM), ylowM);
+		    /* draw the top tic same width as box */
+		    (*t->move) ((unsigned int) (xlowM), yhighM);
+		    (*t->vector) ((unsigned int) (xhighM), yhighM);
+		} else if (bar_size > 0.0) {
 		    /* draw the bottom tic */
 		    (*t->move) ((unsigned int) (xM - bar_size * tic), ylowM);
 		    (*t->vector) ((unsigned int) (xM + bar_size * tic), ylowM);
@@ -2942,7 +2994,8 @@ plot_boxes(struct curve_points *plot, int xaxis_y)
 		    /* centered about the integer representing the cluster number */
 		    /* 'start' is reset to 0 at the top of eval_plots(), and then */
 		    /* incremented if 'plot new histogram' is encountered.        */
-		    if (histogram_opts.type == HT_CLUSTERED) {
+		    if (histogram_opts.type == HT_CLUSTERED 
+		    ||  histogram_opts.type == HT_ERRORBARS) {
 			int clustersize = plot->histogram->clustersize + histogram_opts.gap;
 			dxl  += (i-1) * (clustersize - 1) + plot->histogram_sequence;
 			dxr  += (i-1) * (clustersize - 1) + plot->histogram_sequence;
@@ -2979,6 +3032,7 @@ plot_boxes(struct curve_points *plot, int xaxis_y)
 			    dyb = Y_AXIS.max;
 			break;
 		    case HT_CLUSTERED:
+		    case HT_ERRORBARS:
 			stackheight[i].y = plot->points[i].y;
 			break;
 		    }

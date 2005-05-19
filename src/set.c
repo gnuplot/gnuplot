@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.179 2005/05/15 23:44:43 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.180 2005/05/18 19:56:45 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -906,6 +906,9 @@ set_bars()
 	++c_token;
     } else if(almost_equals(c_token,"l$arge")) {
 	bar_size = 1.0;
+	++c_token;
+    } else if(almost_equals(c_token,"full$width")) {
+	bar_size = -1.0;
 	++c_token;
     } else {
 	bar_size = real(const_express(&a));
@@ -4559,8 +4562,9 @@ parse_label_options( struct text_label *this_label )
 
 
 #ifdef EAM_HISTOGRAMS
-/* <histogramstyle> = {clustered {gap <n>} | rowstacked | columnstacked} */
-/*                    {title <title_options>}                            */
+/* <histogramstyle> = {clustered {gap <n>} | rowstacked | columnstacked */
+/*                     errorbars {gap <n>} {linewidth <lw>}}            */
+/*                    {title <title_options>}                           */
 static void
 parse_histogramstyle( histogram_style *hs, 
 		t_histogram_type def_type,
@@ -4583,6 +4587,9 @@ parse_histogramstyle( histogram_style *hs,
 	if (almost_equals(c_token, "clust$ered")) {
 	    hs->type = HT_CLUSTERED;
 	    c_token++;
+	} else if (almost_equals(c_token, "error$bars")) {
+	    hs->type = HT_ERRORBARS;
+	    c_token++;
 	} else if (almost_equals(c_token, "rows$tacked")) {
 	    hs->type = HT_STACKED_IN_LAYERS;
 	    c_token++;
@@ -4601,6 +4608,12 @@ parse_histogramstyle( histogram_style *hs,
 	    hs->title.offset = title_specs.offset;
 	    /* EAM FIXME - could allocate space and copy parsed font instead */
 	    hs->title.font = &(axis_array[FIRST_X_AXIS].label.font[0]);
+	} else if ((equals(c_token,"lw") || almost_equals(c_token,"linew$idth"))
+		  && (hs->type == HT_ERRORBARS)) {
+	    c_token++;
+	    hs->bar_lw = real(const_express(&a));
+	    if (hs->bar_lw < 0)
+		hs->bar_lw = 0;
 	} else
 	    /* We hit something unexpected */
 	    break;

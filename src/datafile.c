@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.75 2005/03/17 01:27:20 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.76 2005/05/05 14:25:41 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -1863,7 +1863,11 @@ df_readline(double v[], int max)
 		    else
 			xpos = v[axcol];
 #ifdef EAM_HISTOGRAMS
-		    if (df_current_plot) xpos += df_current_plot->histogram->start;
+		    if (df_current_plot && df_current_plot->plot_style == HISTOGRAMS) {
+			if (output == 2) /* Can only happen for HT_ERRORBARS */
+			    xpos = (axcol == 0) ? df_datum : v[axcol-1];
+			xpos += df_current_plot->histogram->start;
+		    }
 #endif
 
 		    df_parse_string_field(temp_string,df_tokens[output]);
