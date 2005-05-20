@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util.c,v 1.54 2005/02/01 11:28:51 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: util.c,v 1.55 2005/05/02 19:26:11 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - util.c */
@@ -765,6 +765,13 @@ gprintf(
 /* some macros for the error and warning functions below
  * may turn this into a utility function later
  */
+#define PRINT_MESSAGE_TO_STDERR				\
+do {							\
+    fprintf(stderr, "\n%s%s\n",				\
+	    current_prompt ? current_prompt : "",	\
+	    gp_input_line);				\
+} while (0)
+    
 #define PRINT_SPACES_UNDER_PROMPT		\
 do {						\
     const char *p;				\
@@ -819,7 +826,7 @@ os_error(int t_num, const char *str, va_dcl)
 	df_showdata();
     } else if (t_num != NO_CARET) {	/* put caret under error */
 	if (!screen_ok)
-	    fprintf(stderr, "\n%s%s\n", current_prompt, gp_input_line);
+	    PRINT_MESSAGE_TO_STDERR;
 
 	PRINT_SPACES_UNDER_PROMPT;
 	PRINT_SPACES_UPTO_TOKEN;
@@ -874,7 +881,7 @@ int_error(int t_num, const char str[], va_dcl)
         df_showdata();
     } else if (t_num != NO_CARET) { /* put caret under error */
 	if (!screen_ok)
-	    fprintf(stderr, "\n%s%s\n", current_prompt, gp_input_line);
+	    PRINT_MESSAGE_TO_STDERR;
 
 	PRINT_SPACES_UNDER_PROMPT;
 	PRINT_SPACES_UPTO_TOKEN;
@@ -918,7 +925,7 @@ int_warn(int t_num, const char str[], va_dcl)
         df_showdata();
     } else if (t_num != NO_CARET) { /* put caret under error */
 	if (!screen_ok)
-	    fprintf(stderr, "\n%s%s\n", current_prompt, gp_input_line);
+	    PRINT_MESSAGE_TO_STDERR;
 
 	PRINT_SPACES_UNDER_PROMPT;
 	PRINT_SPACES_UPTO_TOKEN;

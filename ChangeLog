@@ -1,3 +1,9 @@
+2005-05-20  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/util.c (PRINT_MESSAGE_TO_STDERR): New macro: invokes printf
+	while protecting itself from current_prompt == NULL.
+	(os_error, int_error, int_warn): Use new macro.
+
 2005-05-20  Peter Weilbacher <paepse@users.sourceforge.net>
 
 	SF Patch [981476] "Get history functions working with GNU readline"
