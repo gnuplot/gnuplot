@@ -1,3 +1,14 @@
+2005-05-20  Peter Weilbacher <paepse@users.sourceforge.net>
+
+	SF Patch [981476] "Get history functions working with GNU readline"
+
+	* command.c (history_command): Let the "history" command be available
+	also for GNU readline, i.e. HAVE_LIBREADLINE.
+
+	* history.c: Make routines for GNU readline compatible to those of
+	gnuplot readline.
+
+
 2005-05-19  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/datafile.c (df_readline) src/gadgets.h src/save.c (save_set_all)

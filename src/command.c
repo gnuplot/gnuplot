@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.114 2005/04/26 14:06:54 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.115 2005/04/27 17:21:01 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -709,7 +709,7 @@ exit_command()
 void
 history_command()
 {
-#if defined(READLINE) && !defined(HAVE_LIBREADLINE)
+#if defined(READLINE) || defined(HAVE_LIBREADLINE)
     struct value a;
     char *name = NULL; /* name of the output file; NULL for stdout */
     int n = 0;         /* print only <last> entries */
@@ -784,8 +784,8 @@ history_command()
     }
 #else
     c_token++;
-    int_warn(NO_CARET, "Command 'history' is supported only by gnuplot's default readline. This gnuplot was configured with GNU readline. You are welcome to contribute.");
-#endif /* READLINE && !HAVE_LIBREADLINE */
+    int_warn(NO_CARET, "You have to compile gnuplot with builtin readline or GNU readline to enable history support.");
+#endif /* defined(READLINE) || defined(HAVE_LIBREADLINE) */
 }
 
 #define REPLACE_ELSE(tok)             \

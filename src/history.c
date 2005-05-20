@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: history.c,v 1.14 2004/07/01 17:10:06 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: history.c,v 1.15 2005/04/26 14:07:08 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - history.c */
@@ -171,7 +171,7 @@ write_history_n(const int n, const char *filename, const char *mode)
 	else
 #endif
 	fclose(out);
-}
+    }
 }
 
 
@@ -268,202 +268,146 @@ history_find_all(char *cmd)
 
 #elif defined(HAVE_LIBREADLINE)
 
-/*
- * Interface between 'gnuplot' and GNU 'readline-4.0'.
- * NOTE:  'show_version()' should report the used readline version too.
- *        There are more version around. '2.0, 2.1, 2.2, 4.0'
- */
-/*
- * Copyright (C) 1999, 2004 Thomas Walter
+/* Save history to file, or write to stdout or pipe.
+ * For pipes, only "|" works, pipes starting with ">" get a strange 
+ * filename like in the non-readline version.
  *
- * This can be used by anybody
- *
- * But you cannot / may not put it under another Copyright
+ * Peter Weilbacher, 28Jun2004
  */
 
-static void do_history_list(FILE * out_stream);
-static int history_list_save(const int quantity, const char *const place);
-
-static int
-history_list_save(const int quantity, const char *const place)
-{
-    /*
-     * Input:
-     * ======
-     * quantity = 0   : list the complete history
-     * quantity > 0   : list the recent 'quantity' of elements
-     *                  if it is <= total size
-     *
-     * place = NULL   : write to 'stdout'.
-     * place = STRING : write into a file with the name given by 'place'
-     *
-     * Output:
-     * =======
-     *  nothing
-     *
-     * Return:
-     * =======
-     *  error code : 0 == no error
-     */
-
-#if UNIX_LIKE
-#define WRITE_MODE "w"
-#else
-#define WRITE_MODE "wb"
-#endif
-
-    int error_code = 0;
-    FILE *place_fp = stdout;
-
-    if (place != NULL) {
-	place_fp = fopen(place, WRITE_MODE);
-	if (place_fp == NULL) {
-	    /* Fall back to 'stdout' */
-	    place_fp = stdout;
-	    error_code = 1;
-	}
-    }
-
-    /* if (place != NULL) */
-    /*
-       * Real code goes here
-     */
-    if (history_is_stifled()) {
-	unstifle_history();
-    }
-
-    if (quantity > 0) {
-	stifle_history(quantity);
-    }
-
-    do_history_list(place_fp);
-
-    /* Always leave with an unstifled history */
-    if (history_is_stifled()) {
-	unstifle_history();
-    }
-    /*
-     * End fo real code
-     */
-
-    if (!error_code) {
-	if (place != NULL) {
-	    fclose(place_fp);
-	}
-    }
-    /* if (!error_code) */
-    return (error_code);
-}
-
-static void
-do_history_list(FILE * out_stream)
-{
-    HIST_ENTRY **the_list;
-    int i;
-
-    the_list = history_list();
-    if (the_list) {
-	for (i = 0; the_list[i]; i++) {
-	    fprintf(out_stream, "%d: %s\n", i + history_base, the_list[i]->line);
-	}
-    }				/* if (the_list) */
-}
-
-/*
- * Callable interfaces:
- */
 void
-write_history_n(const int n, const char *filename)
+write_history_list(num, filename, mode)
+const int num;
+const char *const filename;
+const char *mode;
 {
-    /* dicard error code */
-    (void) history_list_save(n, filename);
-}
+    HIST_ENTRY **the_list = history_list();
+    FILE *out = stdout;
+    int is_pipe = 0;
+    int is_file = 0;
+    int is_quiet = 0;
+    int i,istart;
 
-char *
-history_find(char *cmd)
-{
-    int found;
-    char *ret_val = NULL;
-    int current_idx = where_history() + history_base;;
-
-    printf("h_f: Hi user, read the manual of 'GNU readline-4.0'.  Better use 'CONTROL-R'.\n");
-
-    /* printf ("searching for '%s'\n", cmd); */
-    /*
-     * 'cmd' may be quoted, kill them brute force
-     * better would be to call 'm_quote_capture' or 'm_capture' in 'command.c', but
-     * equals(c_token, "\"") does not what I want.
-     */
-    if (cmd[0] == '"') {
-	int len = strlen(cmd);
-	cmd[len - 1] = '\0';
-	cmd++;
-    }
-    /* printf ("searching for '%s'\n", cmd); */
-
-    do {
-	/* idx = history_search_prefix (cmd, 1); */ /* Anchored forward search */
-	found = history_search_prefix(cmd, -1);	/* Anchored backward search */
-	if (found == 0) {
-	    int idx = where_history() + history_base;
-	    HIST_ENTRY *he_found = current_history();
-	    ret_val = he_found->line;
-	    /* fprintf (stdout, "c_idx = %d  %d: %s\n", current_idx, idx, ret_val); */
-	    replace_history_entry(current_idx, ret_val, NULL);
-	    if (idx > 0) {
-		break;		/* finished */
-	    }			/* !(idx > 0) */
-	}			/* if (found == 0) */
-    }
-    while (found > -1);
-    /*  add_history (ret_val); */
-
-    return (ret_val);
-}
-
-int
-history_find_all(char *cmd)
-{
-    int found;
-    int ret_val = 0;		/* each found entry increases this */
-
-    printf("h_f_a: Hi user, read the manual of 'GNU readline-4.0'.  Better use 'CONTROL-R'.\n");
-
-    /* printf ("searching for '%s'\n", cmd); */
-    /*
-     * 'cmd' may be quoted, kill them brute force
-     * better would be to call 'm_quote_capture' or 'm_capture' in 'command.c', but
-     * euqals(c_token, "\"") does not what I want.
-     */
-    if (cmd[0] == '"') {
-	int len = strlen(cmd);
-	cmd[len - 1] = '\0';
-	cmd++;
-    }
-    /* printf ("searching for '%s'\n", cmd); */
-
-    do {
-	/* idx = history_search_prefix (cmd, 1); */ /* Anchored forward search */
-	found = history_search_prefix(cmd, -1);	/* Anchored backward search */
-	/* fprintf (stdout, "Was gefunden %d\n", found); */
-	if (found == 0) {
-	    int idx = where_history() + history_base;
-#if 0
-	    HIST_ENTRY *he_found = current_history();
+    if (filename && filename[0] ) {
+        /* good filename given and not quiet */
+#ifdef PIPES
+        if (filename[0]=='|') {
+            out = popen(filename+1, "w");
+            is_pipe = 1;
+        } else {
 #endif
-	    ret_val++;		/* DEBUG if (ret_val > 5) return (ret_val); */
-	    /* fprintf (stdout, "%d: %s\n", idx, he_found->line); */
-	    if (idx > 0) {
-		history_set_pos(idx - 1);	/* go one step back or you find always the same entry. */
-	    } else {		/* !(idx > 0) */
+            if (! (out = fopen(filename, mode) ) ) {
+                /* Fall back to 'stdout' */
+                int_warn(NO_CARET, "Cannot open file to save history, using standard output.\n");
+                out = stdout;
+            } else is_file = 1;
+#ifdef PIPES
+        }
+#endif
+    } else if (filename && !filename[0])
+        is_quiet = 1;
 
-		break;		/* finished */
-	    }			/* !(idx > 0) */
-	}			/* if (found == 0) */
-    }
-    while (found > -1);
+    /* Determine starting point and output in loop.
+     * For some reason the readline functions append_history() 
+     * and write_history() do not work they way I thought they did...
+     */
+    if (num > 0) {
+        istart = history_length - num;
+        if (istart < 0 || istart > history_length)
+            istart = 0;
+    } else istart = 0;
+    if (the_list)
+        for (i = istart; the_list[i]; i++) {
+            /* don't add line numbers when writing to file to make file loadable */
+            if (is_file)
+                fprintf(out, "%s\n", the_list[i]->line);
+            else {
+                if (!is_quiet) fprintf(out, "%5i", i + history_base);
+                fprintf(out, "  %s\n", the_list[i]->line);
+            }
+        }
 
-    return (ret_val);
+    /* close if something was opened */
+#ifdef PIPES
+    if (is_pipe) pclose(out);
+#endif
+    if (is_file) fclose(out);
+}
+
+/* This is the function getting called in command.c */
+void
+write_history_n(n, filename, mode)
+const int n;
+const char *filename;
+const char *mode;
+{
+    write_history_list(n, filename, mode);
+}
+
+/* finds and returns a command from the history which starts with <cmd>
+ * Returns NULL if nothing found
+ *
+ * Peter Weilbacher, 28Jun2004
+ */
+char *
+history_find(cmd)
+char *cmd;
+{
+    int len;
+
+    /* quote removal, copied from non-readline version */
+    if (*cmd == '"') cmd++;
+    if (!*cmd) return 0;
+    len = strlen(cmd);
+    if (cmd[len - 1] == '"') cmd[--len] = 0;
+    if (!*cmd) return 0;
+    /* printf ("searching for '%s'\n", cmd); */
+
+    /* Anchored backward search for prefix */
+    if (history_search_prefix(cmd, -1) == 0)
+        return current_history()->line;
+    return NULL;
+}
+
+/* finds and print all occurencies of commands from the history which
+ * start with <cmd>
+ * Returns the number of found entries on success,
+ * and 0 if no such entry exists
+ *
+ * Peter Weilbacher 28Jun2004
+ */
+int
+history_find_all(cmd)
+char *cmd;
+{
+    int len;
+    int found;
+    int number = 0; /* each found entry increases this */
+
+    /* quote removal, copied from non-readline version */
+    if (*cmd == '"') cmd++;
+    if (!*cmd) return 0;
+    len = strlen(cmd);
+    if (cmd[len - 1] == '"') cmd[--len] = 0;
+    if (!*cmd) return 0;
+    /* printf ("searching for all occurrences of '%s'\n", cmd); */
+
+    /* Output matching history entries in chronological order (not backwards
+     * so we have to start at the beginning of the history list.
+     */
+    history_set_pos(0);
+    do {
+        found = history_search_prefix(cmd, 1); /* Anchored backward search for prefix */
+        if (found == 0) {
+            number++;
+            printf("%5i  %s\n", where_history() + history_base, current_history()->line);
+            /* go one step back or you find always the same entry. */
+            if (!history_set_pos(where_history() + 1))
+                break; /* finished if stepping didn't work */
+        } /* (found == 0) */
+    } while (found > -1);
+
+    return number;
 }
 
 #endif /* READLINE && !HAVE_LIBREADLINE */
