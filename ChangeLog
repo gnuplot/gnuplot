@@ -1,3 +1,9 @@
+2005-05-22  Peter Weilbacher <paepse@users.sourceforge.net>
+
+	* src/gp_hist.h src/readline.c: Fix conditional dependencies on
+	READLINE and HAVE_LIBREADLINE so that ./configure + build is
+	clean with all three readline options.
+
 2005-05-22  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/gd.trm term/mif.trm term/pdf.trm: Code cleanup - remove static

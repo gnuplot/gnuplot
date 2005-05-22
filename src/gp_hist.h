@@ -1,5 +1,5 @@
 /*
- * $Id: gp_hist.h,v 1.5 2003/11/24 16:22:31 mikulik Exp $
+ * $Id: gp_hist.h,v 1.6 2004/04/13 17:23:53 broeker Exp $
  */
 
 /* GNUPLOT - gp_hist.h */
@@ -66,6 +66,10 @@ extern struct hist *cur_entry;
 void add_history __PROTO((char *line));
 void write_history_n __PROTO((const int, const char *, const char *));
 void write_history __PROTO((char *));
+char *history_find __PROTO((char *));
+int history_find_all __PROTO((char *));
+#elif defined(HAVE_LIBREADLINE)
+void write_history_n __PROTO((const int, const char *, const char *));
 char *history_find __PROTO((char *));
 int history_find_all __PROTO((char *));
 #endif /* READLINE && !HAVE_LIBREADLINE */

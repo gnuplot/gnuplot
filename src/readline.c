@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: readline.c,v 1.38 2004/07/01 17:10:07 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: readline.c,v 1.39 2005/04/28 20:33:23 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - readline.c */
@@ -98,6 +98,7 @@ getc_wrapper(FILE* fp /* should be stdin, supplied by readline */)
 
 #endif /* HAVE_LIBREADLINE */
 
+#if defined(HAVE_LIBREADLINE) || defined(READLINE)
 char*
 readline_ipc(const char* prompt)
 {
@@ -117,6 +118,7 @@ readline_ipc(const char* prompt)
     return readline((const char*) prompt);
 #endif
 }
+#endif  /* defined(HAVE_LIBREADLINE) || define(READLINE) */
 
 
 #if defined(READLINE) && !defined(HAVE_LIBREADLINE)
