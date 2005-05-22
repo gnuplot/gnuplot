@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: mif.trm,v 1.27 2004/07/01 17:10:33 broeker Exp $
+ * $Id: mif.trm,v 1.28 2005/03/03 04:09:51 sfeam Exp $
  */
 
 /* GNUPLOT -- mif.trm */
@@ -138,6 +138,11 @@ static void put_mif_line __PROTO((void));
 static void MIF_set_font __PROTO((const char *));
 static void mif_put_point __PROTO((unsigned int x, unsigned int y, int np));
 
+#endif
+
+#ifndef TERM_PROTO_ONLY
+#ifdef TERM_BODY
+
 #ifndef cfree
 # define cfree free
 #endif
@@ -235,12 +240,6 @@ static struct mpt mpt[POINT_TYPES + 1] =
 
 /* diamond is offset 0, dot is offset -1 */
 static struct mpt *mif_point = &(mpt[1]);
-
-#endif
-
-
-#ifndef TERM_PROTO_ONLY
-#ifdef TERM_BODY
 
 
 /** Declaration of routine/s for internal use **/

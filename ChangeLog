@@ -1,3 +1,10 @@
+2005-05-22  Ethan Merritt  <merritt@u.washington.edu>
+
+	* term/gd.trm term/mif.trm term/pdf.trm: Code cleanup - remove static
+	initializers from the TERM_PROTO code block. ggi.trm has these also,
+	but I can't test for correctness after a change so I don't want to 
+	change it. Remove obsolete comments.
+
 2005-05-20  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/util.c (PRINT_MESSAGE_TO_STDERR): New macro: invokes printf
@@ -13,7 +20,6 @@
 
 	* history.c: Make routines for GNU readline compatible to those of
 	gnuplot readline.
-
 
 2005-05-19  Ethan Merritt  <merritt@u.washington.edu>
 

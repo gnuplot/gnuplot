@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: gd.trm,v 1.66 2005/04/03 22:41:55 sfeam Exp $
+ * $Id: gd.trm,v 1.68 2005/04/29 17:03:36 sfeam Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -157,15 +157,8 @@ extern gdFontPtr gdFontMediumBold;	/* 7x13 */
 extern gdFontPtr gdFontGiant;  /* 9x15 */
 extern gdFontPtr gdFontTiny;  /* 5x8 */
 
-
 #define GREG_XMAX 640
 #define GREG_YMAX 480
-
-
-static int PNG_XMAX = GREG_XMAX;
-static int PNG_YMAX = GREG_YMAX;
-static const int PNG_POINT_SCALE = 3;
-static int PNG_ps = 3;
 
 /* This will be the default font */
 # define gdfont gdFontMediumBold
@@ -243,6 +236,11 @@ enum PNG_id {
 #   undef Y
 #endif
 #define Y(y) (png_state.height - (y))
+
+static int PNG_XMAX = GREG_XMAX;
+static int PNG_YMAX = GREG_YMAX;
+static const int PNG_POINT_SCALE = 3;
+static int PNG_ps = 3;
 
 static struct gen_table PNG_opts[] =
 {
@@ -1703,8 +1701,6 @@ ENHGD_put_text(unsigned int x, unsigned int y, const char *str)
 	return;
     }
 
-    /* flush any pending graphics (all the XShow routines do this...) */
-
     if (!strlen(str))
 	return;
 
@@ -1712,7 +1708,7 @@ ENHGD_put_text(unsigned int x, unsigned int y, const char *str)
      * punt the string to PNG_put_text()
      */
     if (!strpbrk(str, "{}^_@&~")) {
-	/* do something to ensure default font is selected */
+	/* FIXME: do something to ensure default font is selected */
 	PNG_put_text(x,y,str);
 	return;
     }

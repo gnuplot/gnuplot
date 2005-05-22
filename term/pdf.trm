@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: pdf.trm,v 1.50 2005/03/09 18:26:44 sfeam Exp $
+ * $Id: pdf.trm,v 1.51 2005/04/29 16:36:07 sfeam Exp $
  */
 
 /*------------------------------
@@ -1475,8 +1475,6 @@ ENHPDF_put_text(unsigned int x, unsigned int y, const char *str)
 	PDF_put_text(x,y,str);
 	return;
     }
-
-    /* flush any pending graphics (all the XShow routines do this...) */
 
     if (!str || !strlen(str))
 	return;
