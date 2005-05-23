@@ -1,3 +1,8 @@
+2005-05-23  Ethan Merritt  <merritt@u.washington.edu>
+
+	* term/estimate.trm (ENHest_put_text): Track estimated limits on
+	string y extent also.
+
 2005-05-22  Peter Weilbacher <paepse@users.sourceforge.net>
 
 	* src/gp_hist.h src/readline.c: Fix conditional dependencies on

@@ -4,7 +4,11 @@
  * This file is included by ../src/term.c via term.h.
  *
  * This terminal driver supports:
- *   estimation of eventual string width in enhanced text mode
+ *   On return from ENHest_put_text()
+ *	(*term)->xmax = estimated string width
+ *	(*term)->ymax = estimated string height
+ *	enhanced_min_height = lowest baseline used
+ *	enhanced_max_height = highest (baseline + fontsize) used
  *
  * AUTHORS
  *
@@ -98,15 +102,17 @@ ENHest_FLUSH()
 TERM_PUBLIC void
 ENHest_put_text(unsigned int x, unsigned int y, const char *str)
 {
+    /* Set up global variables needed by enhanced_recursion() */
+    ENHest_fontsize  = 1.0;
+    ENHest_opened_string = FALSE;
+    enhanced_max_height = 1;
+    enhanced_min_height = 0;
+
     /* If no enhanced text processing is needed, strlen() is sufficient */
     if (ignore_enhanced_text || !strpbrk(str, "{}^_@&~")) {
 	term->xmax = strlen(str);
 	return;
     }
-
-    /* Set up global variables needed by enhanced_recursion() */
-    ENHest_fontsize  = 1.0;
-    ENHest_opened_string = FALSE;
 
     ENHest_x = x;
     ENHest_y = y;
@@ -122,6 +128,7 @@ ENHest_put_text(unsigned int x, unsigned int y, const char *str)
     }
 
     term->xmax = ENHest_x;
+    term->ymax = enhanced_max_height - enhanced_min_height;
 }
 
 TERM_PUBLIC void
