@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: win.trm,v 1.35 2004/11/27 02:38:39 sfeam Exp $
+ * $Id: win.trm,v 1.36 2005/03/03 04:09:52 sfeam Exp $
  */
 
 /* GNUPLOT - win.trm */
@@ -432,7 +432,7 @@ TERM_TABLE_START(win_driver)
     WIN_text, null_scale, WIN_graphics, WIN_move, WIN_vector,
     WIN_linetype, WIN_put_text, WIN_text_angle,
     WIN_justify_text, WIN_point, do_arrow, set_font_null,
-    WIN_set_pointsize, TERM_CAN_MULTIPLOT,
+    WIN_set_pointsize, TERM_CAN_MULTIPLOT|TERM_NO_OUTPUTFILE,
     WIN_text /* suspend */ , WIN_resume,
     WIN_boxfill, WIN_linewidth
 #ifdef USE_MOUSE

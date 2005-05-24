@@ -310,6 +310,7 @@ _flags stores various flags describing driver capabilities.
   is redirected.
   - TERM_BINARY - output file must be opened in binary mode
   - TERM_ENHANCED_TEXT - terminal is currently in enhanced text mode
+  - TERM_NO_OUTPUTFILE - terminal does not use gpoutfile
 
 _suspend() - called before gnuplot issues a prompt in multiplot mode
    linux VGA driver uses this entry point to flip from graphics to

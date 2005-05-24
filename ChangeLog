@@ -2,6 +2,18 @@
 
 	* src/tables.c: Allow shorthand for "set macros".
 
+	* src/term_api.h term/README: Add new terminal flag TERM_NO_OUTPUTFILE.
+
+	* src/term.c (term_init): As per discussion on gnuplot-beta, when
+	changing to a new terminal type, check flags for TERM_NO_OUTPUTFILE
+	associated with the new type.  If present, then close current output
+	file cleanly rather than reopening and overwriting it.
+	Fixes bug #1182499.
+
+	* term/x11.trm term/win.trm term/pm.trm term/be.trm term/aquaterm.trm:
+	Mark terminal as TERM_NO_OUTPUTFILE.
+
+
 2005-05-23  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/estimate.trm (ENHest_put_text): Track estimated limits on

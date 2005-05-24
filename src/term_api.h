@@ -1,5 +1,5 @@
 /*
- * $Id: term_api.h,v 1.42 2005/01/08 16:08:59 mikulik Exp $
+ * $Id: term_api.h,v 1.43 2005/03/03 04:09:49 sfeam Exp $
  */
 
 /* GNUPLOT - term_api.h */
@@ -139,6 +139,7 @@ typedef enum t_imagecolor { IC_PALETTE, IC_RGB }
 #define TERM_INIT_ON_REPLOT   8  /* call term->init() on replot     */
 #define TERM_IS_POSTSCRIPT   16  /* post, next, pslatex, etc        */
 #define TERM_ENHANCED_TEXT   32  /* enhanced text mode is enabled   */
+#define TERM_NO_OUTPUTFILE   64  /* terminal doesnt write to a file */
 
 /* The terminal interface structure --- heart of the terminal layer.
  *

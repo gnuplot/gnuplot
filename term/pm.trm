@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: pm.trm,v 1.40 2004/12/31 06:12:56 sfeam Exp $
+ * $Id: pm.trm,v 1.41 2005/03/09 18:26:45 sfeam Exp $
  */
 
 /* GNUPLOT - pm.trm */
@@ -811,7 +811,8 @@ TERM_TABLE_START(PM_driver)
     PM_text, null_scale, PM_graphics, PM_move, PM_vector,
     PM_linetype, PM_put_text, PM_text_angle,
     PM_justify_text, PM_point, do_arrow, PM_set_font,
-    0 /*pointsize */ , TERM_CAN_MULTIPLOT, PM_suspend, PM_resume,
+    0 /*pointsize */ , TERM_CAN_MULTIPLOT|TERM_NO_OUTPUTFILE, 
+    PM_suspend, PM_resume,
     PM_fillbox, PM_linewidth
 #ifdef USE_MOUSE
     , 0 /* PM_waitforinput */,

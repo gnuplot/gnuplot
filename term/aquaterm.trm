@@ -1,5 +1,5 @@
 /* -*- objc -*-
- * $Id: aquaterm.trm,v 1.14 2005/03/03 04:09:50 sfeam Exp $
+ * $Id: aquaterm.trm,v 1.15 2005/05/09 20:58:57 persquare Exp $
  *
  */
 
@@ -721,7 +721,7 @@ TERM_TABLE_START(aqua_driver)
   /* optionals */
   AQUA_text_angle,
   AQUA_justify_text, AQUA_point, do_arrow, AQUA_set_font,
-  AQUA_pointsize, TERM_CAN_MULTIPLOT,
+  AQUA_pointsize, TERM_CAN_MULTIPLOT|TERM_NO_OUTPUTFILE,
   AQUA_suspend, AQUA_resume,
   AQUA_boxfill, AQUA_linewidth
 #ifdef USE_MOUSE
