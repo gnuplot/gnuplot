@@ -1,3 +1,7 @@
+2005-05-24  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/tables.c: Allow shorthand for "set macros".
+
 2005-05-23  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/estimate.trm (ENHest_put_text): Track estimated limits on
