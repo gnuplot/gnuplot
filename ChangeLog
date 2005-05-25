@@ -1,3 +1,10 @@
+2005-05-25  Daniel Sebald  <daniel.sebald@ieee.org>
+
+	SF Patch [ 1117060 ] Mod to post.trm for PostScript Level 1 images.
+
+	* term/post.trm: New routine PS_encode_image(), new postscript variable
+	InterpretLevel1 and some other changes.
+
 2005-05-24  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/tables.c: Allow shorthand for "set macros".

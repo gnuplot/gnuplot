@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.155 2005/04/30 03:05:18 sfeam Exp $
+ * $Id: post.trm,v 1.156 2005/05/10 05:51:36 sfeam Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -649,17 +649,18 @@ static const char GPFAR * GPFAR PS_header2[] = {
 
 #define EAM_PSLEVEL2
 /*
- * If we can trust the PostScript interpreter to know its own language level
- * support, the following code fragment can replace use of the 
- * "set term post ... level1" option.
- *
- * /languagelevel where
- *   {pop languagelevel} {1} ifelse
- *   2 lt
- *      {/Level1 true def}
- *      {/Level1 false def}
- *   ifelse
+ * Check what level of PostScript the interpretter reads.  By definition,
+ * the interpretter will define LanguageLevel as 2 or 3 for level 2 or 3
+ * PostScript.  LanguageLevel will be defined as 1, or undefined if the
+ * interpretter only supports level 1. /languagelevel is a function to
+ * access LanguageLevel in the dictionaries.
  */
+"/languagelevel where\n",
+"   {pop languagelevel} {1} ifelse\n",
+"   2 lt\n",
+"      {/InterpretLevel1 true def}\n",
+"      {/InterpretLevel1 Level1 def}\n",
+"   ifelse\n",
 #ifdef EAM_PSLEVEL2
 "%\n",
 "% PostScript level 2 pattern fill definitions\n",
@@ -3508,7 +3509,7 @@ delete_ps_fontfile(struct ps_fontfile_def *prev, struct ps_fontfile_def *this)
 
 #ifdef WITH_IMAGE
 
-static void 
+static void
 PS_encode85(unsigned long tuple4, unsigned char *tuple5)
 {
     /* The compiler should know to carry out the powers of
@@ -3523,6 +3524,192 @@ PS_encode85(unsigned long tuple4, unsigned char *tuple5)
     tuple5[3] = tuple4/(85);
     tuple4 -= ((unsigned long)tuple5[3])*(85);
     tuple5[4] = tuple4;
+}
+
+enum PS_ENCODING {
+    PS_ASCII_HEX,
+    PS_ASCII85
+} PS_ENCODING;
+
+/* Returns pointer to encoded image, allocated on heap that the
+ * caller must free.  Can error to command line so make sure all
+ * heap memory is recorded in static pointers when calling this
+ * routine.
+ */
+static char *
+PS_encode_image(unsigned M, unsigned N, coordval *image, t_imagecolor color_mode, int bits_per_component, enum PS_ENCODING encoding, int *return_num_bytes)
+{
+    unsigned coord_remaining;
+    coordval *coord_ptr;
+    unsigned short i_line;
+    unsigned i_element;
+    unsigned end_of_line;
+    unsigned short bits_remaining, bits_start;
+
+    unsigned long tuple4;
+    unsigned char tuple5[5];
+    int max_encoded_bytes;
+    char *encoded_image, *encoded_image_ptr;
+    unsigned long total_bits;
+    int max_colors;
+
+#define ASCII_PER_LINE 78
+
+#define DEFAULT_BITS_PER_COMPONENT 8
+#define DEFAULT_COMPONENT_MAX (1<<DEFAULT_BITS_PER_COMPONENT)
+
+    if (sm_palette.use_maxcolors > 0)
+	max_colors = sm_palette.use_maxcolors;
+    else
+	max_colors = DEFAULT_COMPONENT_MAX;
+
+    total_bits = bits_per_component*M*N*((color_mode == IC_RGB && ps_params->color) ? 3 : 1);
+
+    /* Compute max number of ascii characters encoding will require.
+     */
+    if (encoding == PS_ASCII_HEX) {
+	/* Straight hex encoding */
+	max_encoded_bytes = (total_bits/4 + 1);
+	max_encoded_bytes += max_encoded_bytes / ASCII_PER_LINE; /* newline characters */
+    } else {
+	/* ASCII85 encoding */
+	max_encoded_bytes = (total_bits/32 + 1)*5 + 2; /* 5 tuples and additional ~> */
+	max_encoded_bytes += max_encoded_bytes / ASCII_PER_LINE; /* newline characters */
+    }
+
+    /* Reserve enough memory. */
+    if (!(encoded_image = gp_alloc(max_encoded_bytes, "encoded image")))
+	int_error(NO_CARET, "GNUPLOT (post.trm):  Error allocating memory.\n");
+    encoded_image_ptr = encoded_image;
+
+    coord_ptr = image;
+    i_line = ASCII_PER_LINE;
+    i_element = 0;
+    end_of_line = M;
+    coord_remaining = M*N;
+    if (color_mode == IC_RGB && ps_params->color) {
+	end_of_line *= 3;
+	coord_remaining *= 3;
+    }
+    bits_remaining = 32;
+    bits_start = 0;
+    tuple4 = 0;
+
+    while (coord_remaining) {
+	unsigned short us_tmp;
+	if (color_mode == IC_RGB && !ps_params->color) {
+	    coordval c_tmp;
+	    c_tmp = *coord_ptr++;
+	    c_tmp += *coord_ptr++;
+	    c_tmp += *coord_ptr++;
+	    us_tmp = (unsigned short) (c_tmp*(max_colors-1)/3.0 + 0.5);
+	} else
+	    us_tmp = (unsigned short) ((*coord_ptr++)*(max_colors-1) + 0.5);
+	if (us_tmp > (max_colors-1)) us_tmp = max_colors-1;
+	if (bits_remaining < bits_per_component) {
+	    tuple4 <<= bits_remaining;
+	    bits_start = bits_per_component - bits_remaining;
+	    bits_remaining = 0;
+	    tuple4 |= (us_tmp >> bits_start);
+	} else {
+	    tuple4 <<= bits_per_component;
+	    tuple4 |= us_tmp;
+	    bits_remaining -= bits_per_component;
+	}
+
+	/* If this is last pixel in line, pad to nearest 8 bits. */
+	i_element++;
+	if (i_element == end_of_line) {
+	    register unsigned short bit_align = (bits_remaining & 0x7);
+	    tuple4 <<= bit_align;
+	    bits_remaining -= bit_align;
+	    i_element = 0;
+	}
+
+	/* Check if another 4-tuple is complete. */
+	if (!bits_remaining) {
+	    if (ps_params->level1) {
+		/* A straight hex encoding for every 4 bits. */
+		unsigned char tuple8[8];
+		int i;
+		for (i=7; i >= 0; i--) {
+		    tuple8[i] = tuple4 & 0xf;
+		    tuple4 >>= 4;
+		}
+		for (i=0; i < 8; i++) {
+		    sprintf(encoded_image_ptr++, "%1x", tuple8[i]);
+		    i_line--;
+		    if (!i_line) {i_line = ASCII_PER_LINE; *encoded_image_ptr++ = '\n';}
+		}
+	    } else {
+		/* Convert to ASCII85 representation. */
+		if (tuple4) {
+		    int i;
+		    PS_encode85(tuple4, tuple5);
+		    tuple4 = 0;
+		    for (i=0; i < 5; i++) {
+			sprintf(encoded_image_ptr++, "%c", tuple5[i]+'!');
+			i_line--;
+			if (!i_line) {i_line = ASCII_PER_LINE; *encoded_image_ptr++ = '\n';}
+		    }
+		} else {
+		    *encoded_image_ptr++ = 'z';
+		    i_line--;
+		    if (!i_line) {i_line = ASCII_PER_LINE; *encoded_image_ptr++ = '\n';}
+		}
+	    }
+
+	    /* Now pick up any bits that may have not made it into the 4-tuple. */
+	    if (bits_start) {tuple4 = us_tmp - ((us_tmp>>bits_start)<<bits_start);}
+	    bits_remaining = 32 - bits_start;
+	    bits_start = 0;
+
+	}
+
+	coord_remaining--;
+
+    }
+
+    if (bits_remaining < 32) {
+	int i;
+	int n = 4 - bits_remaining/8;
+	if (ps_params->level1) {
+	    /* A straight hex encoding for every 4 bits. */
+	    unsigned char tuple8[8];
+	    for (i=2*n-1; i >= 0; i--) {
+		tuple8[i] = tuple4 & 0xf;
+		tuple4 >>= 4;
+	    }
+	    for (i=0; i < 2*n; i++) {
+		sprintf(encoded_image_ptr++, "%1x", tuple8[i]);
+		i_line--;
+		if (!i_line) {i_line = ASCII_PER_LINE; *encoded_image_ptr++ = '\n';}
+	    }
+	} else {
+	    /* Convert to ASCII85 representation.
+	     *
+	     * The case where not all bytes in a tuple are used is slightly different.
+	     * There is no use of 'z' as a special character and the remaining bytes
+	     * need to be filled.  Then use only a portion of the final 5-tuple.
+	     */
+	    tuple4 <<= bits_remaining;
+	    PS_encode85(tuple4, tuple5);
+	    /* Write first n+1 bytes. */
+	    for (i=0; i <= n; i++) {
+		sprintf(encoded_image_ptr++, "%c", tuple5[i]+'!');
+		i_line--;
+		if (!i_line) {i_line = ASCII_PER_LINE; *encoded_image_ptr++ = '\n';}
+	    }
+	}
+    }
+
+    if (!ps_params->level1) {
+	sprintf(encoded_image_ptr, "~>");
+	encoded_image_ptr += 2;
+    }
+
+    *return_num_bytes = (encoded_image_ptr - encoded_image);
+    return encoded_image;
 }
 
 TERM_PUBLIC void
@@ -3546,18 +3733,10 @@ PS_image (unsigned M, unsigned N, coordval *image, gpiPoint *corner, t_imagecolo
      * file?
      */
 
-    unsigned coord_remaining;
-    coordval *coord_ptr;
-    unsigned short i_line;
-    unsigned i_pixel;
-    unsigned short bits_remaining, bits_start;
-    unsigned long tuple4;
-    unsigned char tuple5[5];
-    int max_colors, i_tmp;
+    char *encoded_image;
+    int num_encoded_bytes;
     unsigned short bits_per_component = 0;
-
-#define DEFAULT_BITS_PER_COMPONENT 8
-#define DEFAULT_COMPONENT_MAX (1<<DEFAULT_BITS_PER_COMPONENT)
+    int max_colors, i_tmp;
 
     if (sm_palette.use_maxcolors > 0)
 	max_colors = sm_palette.use_maxcolors;
@@ -3582,22 +3761,60 @@ PS_image (unsigned M, unsigned N, coordval *image, gpiPoint *corner, t_imagecolo
     else if (bits_per_component > 2)
         bits_per_component = 4;
 
+    encoded_image = PS_encode_image(M, N, image, color_mode, bits_per_component, (ps_params->level1 ? PS_ASCII_HEX : PS_ASCII85), &num_encoded_bytes);
+
     fputs("%%%%BeginImage\n", gppsfile);
-    fputs("gsave\n", gppsfile);
-    fprintf(gppsfile, "%d %d translate\n", corner[0].x, corner[0].y);
-    fprintf(gppsfile, "%d %d scale\n", (corner[1].x - corner[0].x), (corner[1].y - corner[0].y));
 
     /* Color and gray scale images do not need a palette and can use
      * the 5 operand form of the image routine.  For other types of
      * palettes, the 1 operand form of the image routine must be used
      * and an indexed palette needs to be constructed.
      */
-    if ((color_mode == IC_RGB) || (sm_palette.colorMode == SMPAL_COLOR_MODE_GRAY)) {
+    if ((color_mode == IC_RGB) || (sm_palette.colorMode == SMPAL_COLOR_MODE_GRAY) || !ps_params->color) {
 
-	fprintf(gppsfile, "%d %d %d\n", M, N, bits_per_component);
-	fprintf(gppsfile, "[ %d 0 0 %d 0 0 ]\n", M, N);
-	fprintf(gppsfile, "currentfile /ASCII85Decode filter\n");
-	if (color_mode == IC_RGB) {fprintf(gppsfile, "false 3\n");}
+	if (ps_params->level1) {
+	    fputs("gsave\n", gppsfile);
+	    fprintf(gppsfile, "%d %d translate\n", corner[0].x, corner[0].y);
+	    fprintf(gppsfile, "%d %d scale\n", (corner[1].x - corner[0].x), (corner[1].y - corner[0].y));
+	    fprintf(gppsfile, "%d %d %d\n", M, N, bits_per_component);
+	    fprintf(gppsfile, "[ %d 0 0 %d 0 0 ]\n", M, N);
+	    fprintf(gppsfile, "/imagebuf %d string def\n", (M*N*bits_per_component*((color_mode == IC_RGB && ps_params->color) ? 3 : 1) + 7)/8);
+	    fputs("{currentfile imagebuf readhexstring pop}\n", gppsfile);
+	    if (color_mode == IC_RGB && ps_params->color) {
+		fputs("false 3\n"
+		      "colorimage\n", gppsfile);
+	    } else
+		fputs("image\n", gppsfile);
+	} else {
+	    fputs("InterpretLevel1 {\n"
+		  "  %% Construct a box instead of image\n"
+		  "  LTb\n", gppsfile);
+	    fprintf(gppsfile, "  %d %d M\n", corner[0].x, corner[0].y);
+	    fprintf(gppsfile, "  %d 0 V\n", (corner[1].x - corner[0].x));
+	    fprintf(gppsfile, "  0 %d V\n", (corner[1].y - corner[0].y));
+	    fprintf(gppsfile, "  %d 0 V\n", -(corner[1].x - corner[0].x));
+	    fprintf(gppsfile, "  %d %d L\n", corner[0].x, corner[0].y);
+	    fputs("  40 -110 R\n"
+		  "  Blacktext { gsave 0 setgray } if\n"
+		  "  (PS level 2 image) Lshow\n"
+		  "  Blacktext { grestore } if\n"
+		  "  %% Read data but ignore it\n", gppsfile);
+	    fprintf(gppsfile, "  /imagebuf %d string def\n", num_encoded_bytes);
+	    fputs("  currentfile imagebuf readstring\n"
+		  "} {\n"
+		  "  gsave\n", gppsfile);
+	    fprintf(gppsfile, "  %d %d translate\n", corner[0].x, corner[0].y);
+	    fprintf(gppsfile, "  %d %d scale\n", (corner[1].x - corner[0].x), (corner[1].y - corner[0].y));
+	    fprintf(gppsfile, "  %d %d %d\n", M, N, bits_per_component);
+	    fprintf(gppsfile, "  [ %d 0 0 %d 0 0 ]\n", M, N);
+	    fprintf(gppsfile, "  currentfile /ASCII85Decode filter\n", num_encoded_bytes);
+	    if (color_mode == IC_RGB && ps_params->color) {
+		fputs("  false 3\n"
+		      "  colorimage\n", gppsfile);
+	    } else
+		fputs("  image\n", gppsfile);
+	    fputs("} ifelse\n", gppsfile);
+	}
 
     }
     else {
@@ -3605,7 +3822,27 @@ PS_image (unsigned M, unsigned N, coordval *image, gpiPoint *corner, t_imagecolo
 	int allocated;
 	unsigned short i_tuple;
 	double fact = 1.0 / (double)(max_colors-1);
-
+	if (!ps_params->level1) {
+	    fputs("InterpretLevel1 {\n"
+		  "  %% Construct a box instead of image\n"
+		  "  LTb\n", gppsfile);
+	    fprintf(gppsfile, "  %d %d M\n", corner[0].x, corner[0].y);
+	    fprintf(gppsfile, "  %d 0 V\n", (corner[1].x - corner[0].x));
+	    fprintf(gppsfile, "  0 %d V\n", (corner[1].y - corner[0].y));
+	    fprintf(gppsfile, "  %d 0 V\n", -(corner[1].x - corner[0].x));
+	    fprintf(gppsfile, "  %d %d L\n", corner[0].x, corner[0].y);
+	    fprintf(gppsfile, "  40 -110 R\n"
+		    "  Blacktext { gsave 0 setgray } if\n"
+		    "  (PS level 2 image) Lshow\n"
+		    "  Blacktext { grestore } if\n"
+		    "  %% Read data but ignore it\n"
+		    "  /imagebuf %d string def\n"
+		    "  currentfile imagebuf readstring\n", num_encoded_bytes);
+	    fputs("} {\n", gppsfile);
+	}
+	fputs("gsave\n", gppsfile);
+	fprintf(gppsfile, "%d %d translate\n", corner[0].x, corner[0].y);
+	fprintf(gppsfile, "%d %d scale\n", (corner[1].x - corner[0].x), (corner[1].y - corner[0].y));
 	fputs("%%%%BeginPalette\n", gppsfile);
 	fprintf(gppsfile, "[ /Indexed\n  /DeviceRGB %d\n  <", (max_colors-1));
 
@@ -3621,115 +3858,40 @@ PS_image (unsigned M, unsigned N, coordval *image, gpiPoint *corner, t_imagecolo
 
 	fputs("\n  >\n] setcolorspace\n", gppsfile);
 	fputs("%%%%EndPalette\n", gppsfile);
-	fprintf(gppsfile, "<<\n  /ImageType 1\n  /Width %d\n  /Height %d", M, N);
-	fprintf(gppsfile,
-		"\n  /BitsPerComponent %d\n  /ImageMatrix [ %d 0 0 %d 0 0 ]",
-		bits_per_component, M, N);
-	fprintf(gppsfile, "\n  /Decode [ 0 %d ]", ((1<<bits_per_component)-1));
-	fputs("\n  /DataSource currentfile /ASCII85Decode filter", gppsfile);
-	fputs("\n  /MultipleDataSources false", gppsfile);
-	fputs("\n  /Interpolate false\n>>\n", gppsfile);
-
-    }
-
-    fputs("%%%%BeginData\n", gppsfile);
-    if (color_mode == IC_RGB)
-	fputs("colorimage\n", gppsfile);
-    else
-	fputs("image\n", gppsfile);
-
-#define ASCII_PER_LINE 78
-
-    coord_ptr = image;
-    coord_remaining = M*N;
-    if (color_mode == IC_RGB) coord_remaining *= 3;
-    i_line = ASCII_PER_LINE;
-    i_pixel = 0;
-    bits_remaining = 32;
-    bits_start = 0;
-    tuple4 = 0;
-
-    while (coord_remaining) {
-	unsigned short us_tmp = (unsigned short) ((*coord_ptr++)*(max_colors-1) + 0.5);
-	if (us_tmp > (max_colors-1)) us_tmp = max_colors-1;
-	if (bits_remaining < bits_per_component) {
-	    tuple4 <<= bits_remaining;
-	    bits_start = bits_per_component - bits_remaining;
-	    bits_remaining = 0;
-	    tuple4 |= (us_tmp >> bits_start);
+	fprintf(gppsfile, "<<\n  /ImageType 1\n  /Width %d\n  /Height %d\n", M, N);
+	fprintf(gppsfile, "  /BitsPerComponent %d\n  /ImageMatrix [ %d 0 0 %d 0 0 ]\n", bits_per_component, M, N);
+	fprintf(gppsfile, "  /Decode [ 0 %d ]\n", ((1<<bits_per_component)-1));
+	if (ps_params->level1) {
+	    fprintf(gppsfile, "  /imagebuf %d string def\n", (M*N*bits_per_component + 7)/8);
+	    fputs("  /DataSource {currentfile imagebuf readhexstring pop}\n", gppsfile);
 	} else {
-	    tuple4 <<= bits_per_component;
-	    tuple4 |= us_tmp;
-	    bits_remaining -= bits_per_component;
+	    fputs("  /DataSource currentfile /ASCII85Decode filter\n", gppsfile);
 	}
-
-	/* If this is last pixel in line, pad to nearest 8 bits. */
-	i_pixel++;
-	if (i_pixel == M) {
-	    register unsigned short bit_align = (bits_remaining & 0x7);
-	    tuple4 <<= bit_align;
-	    bits_remaining -= bit_align;
-	    i_pixel = 0;
-	}
-
-	/* Check if another 4-tuple is complete. */
-	if (!bits_remaining) {
-	    /* Convert to ASCII85 representation. */
-	    if (tuple4) {
-		int i;
-		PS_encode85(tuple4, tuple5);
-		tuple4 = 0;
-		for (i=0; i < 5; i++) {
-		    fprintf(gppsfile, "%c", tuple5[i]+'!');
-		    i_line--;
-		    if (!i_line) {
-			i_line = ASCII_PER_LINE;
-			fputc('\n', gppsfile);
-		    }
-		}
-	    } else {
-		fputc('z',gppsfile);
-		i_line--;
-		if (!i_line) {
-		    i_line = ASCII_PER_LINE;
-		    fputc('\n', gppsfile);
-		}
-	    }
-
-	    /* Now pick up any bits that may have not made it into the 4-tuple. */
-	    if (bits_start) {tuple4 = us_tmp - ((us_tmp>>bits_start)<<bits_start);}
-	    bits_remaining = 32 - bits_start;
-	    bits_start = 0;
-
-	}
-
-	coord_remaining--;
+	fputs("  /MultipleDataSources false\n", gppsfile);
+	fputs("  /Interpolate false\n"
+	      ">>\n"
+	      "image\n", gppsfile);
+	if (!ps_params->level1)
+	    fputs("} ifelse\n", gppsfile);
 
     }
 
-    /* The case where not all bytes in a tuple are used is slightly different.
-     * There is no use of 'z' as a special character and the remaining bytes
-     * need to be filled.  Then use only a portion of the final 5-tuple.
-     */
-    if (bits_remaining < 32) {
-	int i;
-	int n = 4 - bits_remaining/8;
-	tuple4 <<= bits_remaining;
-	PS_encode85(tuple4, tuple5);
-	/* Write first n+1 bytes. */
-	for (i=0; i <= n; i++) {
-	    fprintf(gppsfile,"%c",tuple5[i]+'!');
-	    i_line--;
-	    if (!i_line) {
-		i_line = ASCII_PER_LINE;
-		fputc('\n',gppsfile);
-	    }
-	}
+    /* Send encoded image to file. */
+    {
+    char *encoded_image_ptr;
+    for (i_tmp=0, encoded_image_ptr = encoded_image; i_tmp < num_encoded_bytes; i_tmp++)
+	fputc(*encoded_image_ptr++, gppsfile);
     }
 
-    fputs("~>\n%%%%EndData\n", gppsfile);
-    fputs("grestore\n", gppsfile);
+    if (ps_params->level1)
+	fputs("\ngrestore\n", gppsfile);
+    else
+	fputs("\nInterpretLevel1 not {\n"
+	      "  grestore\n"
+	      "} if\n", gppsfile);
     fputs("%%%%EndImage\n", gppsfile);
+
+    free(encoded_image);
 
     return;
 }
@@ -3803,11 +3965,18 @@ START_HELP(00psglobal)
 " `linewidth` or `lw` scales all linewidths by <LW>;",\
 "",\
 " By default the generated PostScript code uses language features that were",\
-" introduced in PostScript Level 2, notably pattern-fill of irregular objects",\
-" such as filledcurves.  The `level1` option substitutes PostScript Level 1",\
-" approximations of these features. This may be required by some old printers",\
-" and by some old versions of Adobe Illustrator. This flag can be toggled",\
-" later by editing a single line in the PostScript output file.",\
+" introduced in PostScript Level 2, notably filters and pattern-fill of",\
+" irregular objects such as filledcurves.  PostScript Level 2 features are",\
+" conditionally protected so that PostScript Level 1 interpreters do not issue",\
+" errors but, rather, display a message or a PostScript Level 1 approximation.",\
+" The `level1` option substitutes PostScript Level 1 approximations of these",\
+" features and uses no PostScript Level 2 code.  This may be required by some",\
+" old printers and old versions of Adobe Illustrator.  The flag `Level1` can be",\
+" toggled later by editing a single line in the PostScript output file to force",\
+" PostScript Level 1 interpretation.  In the case of files containing level 2",\
+" code, the above features will not appear or will be replaced by a note when",\
+" this flag is set or when the interpreting program does not indicate that it",\
+" understands level 2 PostScript or higher.",\
 "",\
 " `rounded` sets line caps and line joins to be rounded; `butt` is the",\
 " default, butt caps and mitered joins;",\
