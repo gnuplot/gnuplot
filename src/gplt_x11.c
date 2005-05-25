@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.136 2005/05/09 18:23:09 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.137 2005/05/11 21:35:04 sfeam Exp $"); }
 #endif
 
 #define X11_POLYLINE 1
@@ -164,7 +164,7 @@ Error. Incompatible options.
 # define FD_SET(n, p)    ((p)->fds_bits[0] |= (1 << ((n) % 32)))
 # define FD_CLR(n, p)    ((p)->fds_bits[0] &= ~(1 << ((n) % 32)))
 # define FD_ISSET(n, p)  ((p)->fds_bits[0] & (1 << ((n) % 32)))
-# define FD_ZERO(p)      memset((char *)(p),'\0',sizeof(*(p)))
+# define FD_ZERO(p)      memset((char *)(p), '\0', sizeof(*(p)))
 #endif /* not FD_SET */
 
 #if defined(HAVE_SYS_SYSTEMINFO_H) && defined(HAVE_SYSINFO)
@@ -214,7 +214,7 @@ typedef struct axis_scale_t {
 # ifdef __DECC
 #  include <starlet.h>
 # endif
-# define EXIT(status) sys$delprc(0,0)	/* VMS does not drop itself */
+# define EXIT(status) sys$delprc(0, 0)	/* VMS does not drop itself */
 #else /* !VMS */
 # ifdef PIPE_IPC
 #  define EXIT(status)                         \
@@ -474,19 +474,20 @@ static double mouse_to_axis __PROTO((int, axis_scale_t *));
 
 static char *FallbackFont = "fixed";
 #ifdef USE_X11_MULTIBYTE
-static char *FallbackFontMB = "mbfont:*-medium-r-normal--14-*;*-medium-r-normal--16-*";
+static char *FallbackFontMB =
+    "mbfont:*-medium-r-normal--14-*;*-medium-r-normal--16-*";
 # define FontSetSep ';'
 static int usemultibyte = 0;
-static int usablemb=1;
-static int fontset_transsep __PROTO((char *,char *,int));
+static int multibyte_fonts_usable=1;
+static int fontset_transsep __PROTO((char *, char *, int));
 #endif /* USE_X11_MULTIBYTE */
-static int gpXTextWidth __PROTO((XFontStruct *,const char *,int));
+static int gpXTextWidth __PROTO((XFontStruct *, const char *, int));
 static int gpXTextHeight __PROTO((XFontStruct *));
-static void gpXSetFont __PROTO((Display *,GC,Font));
-static void gpXDrawImageString __PROTO((Display *,Drawable,GC,int,int,const char *,int));
-static void gpXDrawString __PROTO((Display *,Drawable,GC,int,int,const char *,int));
-static void gpXFreeFont __PROTO((Display *,XFontStruct *));
-static XFontStruct *gpXLoadQueryFont __PROTO((Display *,char *));
+static void gpXSetFont __PROTO((Display *, GC, Font));
+static void gpXDrawImageString __PROTO((Display *, Drawable, GC, int, int, const char *, int));
+static void gpXDrawString __PROTO((Display *, Drawable, GC, int, int, const char *, int));
+static void gpXFreeFont __PROTO((Display *, XFontStruct *));
+static XFontStruct *gpXLoadQueryFont __PROTO((Display *, char *));
 static char *gpFallbackFont __PROTO((void));
 static int gpXGetFontascent __PROTO((XFontStruct *cfont));
 
@@ -593,7 +594,7 @@ static char X_Class[64] = "Gnuplot";
 static int cx = 0, cy = 0;
 
 /* Font characteristics held locally but sent back via pipe to x11.trm */
-static int vchar,hchar;
+static int vchar, hchar;
 
 /* Speficy negative values as indicator of uninitialized state */
 static double xscale = -1.;
@@ -638,13 +639,13 @@ static XSegment Plus[2], Cross[2], Star[4];
 #define stipple_pattern_num 8
 static const char stipple_pattern_bits[stipple_pattern_num][8] = {
     { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 } /* no fill */
-   ,{ 0x81, 0x42, 0x24, 0x18, 0x18, 0x24, 0x42, 0x41 } /* cross-hatch      (1) */
-   ,{ 0x88, 0x55, 0x22, 0x55, 0x88, 0x55, 0x22, 0x55 } /* double crosshatch(2) */
-   ,{ 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff } /* solid fill       (3) */
-   ,{ 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80 } /* diagonal stripes (4) */
-   ,{ 0x80, 0x40, 0x20, 0x10, 0x08, 0x04, 0x02, 0x01 } /* diagonal stripes (5) */
-   ,{ 0x11, 0x11, 0x22, 0x22, 0x44, 0x44, 0x88, 0x88 } /* diagonal stripes (6) */
-   ,{ 0x88, 0x88, 0x44, 0x44, 0x22, 0x22, 0x11, 0x11 } /* diagonal stripes (7) */
+   , { 0x81, 0x42, 0x24, 0x18, 0x18, 0x24, 0x42, 0x41 } /* cross-hatch      (1) */
+   , { 0x88, 0x55, 0x22, 0x55, 0x88, 0x55, 0x22, 0x55 } /* double crosshatch(2) */
+   , { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff } /* solid fill       (3) */
+   , { 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80 } /* diagonal stripes (4) */
+   , { 0x80, 0x40, 0x20, 0x10, 0x08, 0x04, 0x02, 0x01 } /* diagonal stripes (5) */
+   , { 0x11, 0x11, 0x22, 0x22, 0x44, 0x44, 0x88, 0x88 } /* diagonal stripes (6) */
+   , { 0x88, 0x88, 0x44, 0x44, 0x22, 0x22, 0x11, 0x11 } /* diagonal stripes (7) */
 };
 
 static Pixmap stipple_pattern[stipple_pattern_num];
@@ -678,7 +679,8 @@ main(int argc, char *argv[])
 
 #ifdef USE_X11_MULTIBYTE
     if (setlocale(LC_ALL, "")==NULL || XSupportsLocale()==False)
-      usablemb=0;
+      multibyte_fonts_usable=0;
+    setlocale(LC_NUMERIC, "C");	/* HBB 20050525 */
 #endif /* USE_X11_MULTIBYTE */
     preset(argc, argv);
 
@@ -709,7 +711,7 @@ main(int argc, char *argv[])
 #ifdef X11_POLYLINE
     polyline_space = 100;
     polyline = calloc(polyline_space, sizeof(XPoint));
-    if (!polyline) fprintf(stderr,"Panic: cannot allocate polyline\n");
+    if (!polyline) fprintf(stderr, "Panic: cannot allocate polyline\n");
 #endif
 
     mainloop();
@@ -1400,7 +1402,7 @@ record()
 	case 'N':		/* just update the plot number */
 	    {
 		int itmp;
-		if (strcspn(buf+1," \n") && sscanf(buf, "N%d", &itmp))
+		if (strcspn(buf+1, " \n") && sscanf(buf, "N%d", &itmp))
 		    current_plot = Add_Plot_To_Linked_List(itmp);
 		return 1;
 	    }
@@ -1408,7 +1410,7 @@ record()
 	case 'C':		/* close the plot with given number */
 	    {
 		int itmp;
-		if (strcspn(buf+1," \n") && sscanf(buf, "C%d", &itmp)) {
+		if (strcspn(buf+1, " \n") && sscanf(buf, "C%d", &itmp)) {
 		  plot_struct *psp;
 		  if ((psp = Find_Plot_In_Linked_List_By_Number(itmp)))
 		    Remove_Plot_From_Linked_List(psp->window);
@@ -1637,7 +1639,7 @@ record()
 		int scaled_hchar, scaled_vchar;
 		char *c = &(buf[strlen(buf)-1]);
 		while (*c <= ' ') *c-- = '\0';
-		strncpy(default_font,&buf[2],strlen(&buf[2])+1);
+		strncpy(default_font, &buf[2], strlen(&buf[2])+1);
 		pr_font(NULL);
 		if (plot) {
 		    /* EAM FIXME - this is all out of order; initialization doesnt */
@@ -1646,7 +1648,7 @@ record()
 		    yscale = (plot->height > 0) ? plot->height / 4096. : gH / 4096.;
 		    scaled_hchar = (1.0/xscale) * hchar;
 		    scaled_vchar = (1.0/yscale) * vchar;
-		    FPRINTF((stderr,"gplt_x11: preset default font to %s hchar = %d vchar = %d \n",
+		    FPRINTF((stderr, "gplt_x11: preset default font to %s hchar = %d vchar = %d \n",
 			     default_font, scaled_hchar, scaled_vchar));
 		    gp_exec_event(GE_fontprops, plot->width, plot->height,
 				  scaled_hchar, scaled_vchar, 0);
@@ -1908,7 +1910,7 @@ exec_cmd(plot_struct *plot, char *command)
     FPRINTF((stderr, "(display) buffer = |%s|\n", buffer));
 
 #ifdef X11_POLYLINE
-    /*   X11_vector(x,y) - draw vector  */
+    /*   X11_vector(x, y) - draw vector  */
     if (*buffer == 'V') {
 	sscanf(buffer, "V%4d%4d", &x, &y);
 	if (polyline_size == 0) {
@@ -1918,7 +1920,7 @@ exec_cmd(plot_struct *plot, char *command)
 	if (++polyline_size >= polyline_space) {
 	    polyline_space += 100;
 	    polyline = realloc(polyline, polyline_space * sizeof(XPoint));
-	    if (!polyline) fprintf(stderr,"Panic: cannot realloc polyline\n");
+	    if (!polyline) fprintf(stderr, "Panic: cannot realloc polyline\n");
 	}
 	polyline[polyline_size].x = X(x);
 	polyline[polyline_size].y = Y(y);
@@ -1926,20 +1928,20 @@ exec_cmd(plot_struct *plot, char *command)
 	cy = y;
 	/* Limit the number of vertices in any single polyline */
 	if (polyline_size > max_request_size) {
-	    FPRINTF((stderr, "(display) dumping polyline size %d\n",polyline_size));
+	    FPRINTF((stderr, "(display) dumping polyline size %d\n", polyline_size));
 	    XDrawLines(dpy, plot->pixmap, *current_gc,
 			polyline, polyline_size+1, CoordModeOrigin);
 	    polyline_size = 0;
 	}
 	return;
     } else if (polyline_size > 0) {
-	FPRINTF((stderr, "(display) dumping polyline size %d\n",polyline_size));
+	FPRINTF((stderr, "(display) dumping polyline size %d\n", polyline_size));
 	XDrawLines(dpy, plot->pixmap, *current_gc,
 			polyline, polyline_size+1, CoordModeOrigin);
 	polyline_size = 0;
     }
 #else
-    /*   X11_vector(x,y) - draw vector  */
+    /*   X11_vector(x, y) - draw vector  */
     if (*buffer == 'V') {
 	sscanf(buffer, "V%4d%4d", &x, &y);
 	XDrawLine(dpy, plot->pixmap, *current_gc, X(cx), Y(cy), X(x), Y(y));
@@ -1947,7 +1949,7 @@ exec_cmd(plot_struct *plot, char *command)
 	cy = y;
     } else
 #endif
-    /*   X11_move(x,y) - move  */
+    /*   X11_move(x, y) - move  */
     if (*buffer == 'M')
 	sscanf(buffer, "M%4d%4d", &cx, &cy);
 
@@ -1961,32 +1963,32 @@ exec_cmd(plot_struct *plot, char *command)
 		while (*c <= ' ') *c-- = '\0';
 		pr_font(&buffer[2]);
 		if (font)
-		  gpXSetFont(dpy,gc,font->fid);
+		  gpXSetFont(dpy, gc, font->fid);
 #ifdef PM3D
 		if (font && gc_pm3d)
-		  gpXSetFont(dpy,gc_pm3d,font->fid);
+		  gpXSetFont(dpy, gc_pm3d, font->fid);
 #endif
 		break;
 	case 'E':
 		/* Save the requested font encoding */
 		{
 		    int tmp;
-		    sscanf(buffer,"QE%d", &tmp);
+		    sscanf(buffer, "QE%d", &tmp);
 		    encoding = (enum set_encoding_id)tmp;
 		}
-		FPRINTF((stderr,"gnuplot_x11: changing encoding to %d\n",encoding));
+		FPRINTF((stderr, "gnuplot_x11: changing encoding to %d\n", encoding));
 		break;
 	case 'D':
 		/* Save the request default font */
 		c = &(buffer[strlen(buffer)-1]);
 		while (*c <= ' ') *c-- = '\0';
-		strncpy(default_font,&buffer[2],strlen(&buffer[2])+1);
-		FPRINTF((stderr,"gnuplot_x11: exec_cmd() set default_font to \"%s\"\n",default_font));
+		strncpy(default_font, &buffer[2], strlen(&buffer[2])+1);
+		FPRINTF((stderr, "gnuplot_x11: exec_cmd() set default_font to \"%s\"\n", default_font));
 		break;
 	}
     }
 
-    /*   X11_put_text(x,y,str) - draw text   */
+    /*   X11_put_text(x, y, str) - draw text   */
     else if (*buffer == 'T') {
 	/* Enhanced text mode added November 2003 - Ethan A Merritt */
 	int x_offset=0, y_offset=0, v_offset=0;
@@ -2356,7 +2358,7 @@ exec_cmd(plot_struct *plot, char *command)
 	    xcolor.red = (double)(0xffff) * (double)((rgb255color >> 16) & 0xff) /255.;
 	    xcolor.green = (double)(0xffff) * (double)((rgb255color >> 8) & 0xff) /255.;
 	    xcolor.blue = (double)(0xffff) * (double)(rgb255color & 0xff) /255.;
-	    FPRINTF((stderr,"gplt_x11: got request for color %d %d %d\n",
+	    FPRINTF((stderr, "gplt_x11: got request for color %d %d %d\n",
 		    xcolor.red, xcolor.green, xcolor.blue));
 	    if (XAllocColor(dpy, plot->cmap->colormap, &xcolor)) {
 		XSetForeground(dpy, gc_pm3d, xcolor.pixel);
@@ -2548,7 +2550,7 @@ exec_cmd(plot_struct *plot, char *command)
 		if (swap_endian) {
 		    i = 2*npoints;
 		    for (i--; i >= 0; i--) {
-			byteswap((char *)&((int *)points)[i],sizeof(int));
+			byteswap((char *)&((int *)points)[i], sizeof(int));
 		    }
 		}
 
@@ -2564,7 +2566,7 @@ exec_cmd(plot_struct *plot, char *command)
 
 		/* Load selected pattern or fill into a separate gc */
 		if (!fill_gc)
-		    fill_gc = XCreateGC(dpy,plot->window,0,0);
+		    fill_gc = XCreateGC(dpy, plot->window, 0, 0);
 		XCopyGC(dpy, *current_gc, ~0, fill_gc);
 		current_gc = &fill_gc;
 
@@ -2793,16 +2795,16 @@ exec_cmd(plot_struct *plot, char *command)
 
 			    /* Graphics info in case strange behavior occurs in a particular system.
 			     */
-			    FPRINTF((stderr,"\n\nvis->visualid: 0x%x   vis->class: %d   vis->bits_per_rgb: %d\n",
+			    FPRINTF((stderr, "\n\nvis->visualid: 0x%x   vis->class: %d   vis->bits_per_rgb: %d\n",
 				(int)vis->visualid, vis->class, vis->bits_per_rgb));
-			    FPRINTF((stderr,"vis->red_mask: %lx   vis->green_mask: %lx   vis->blue_mask: %lx\n",
-				vis->red_mask,vis->green_mask,vis->blue_mask));
-			    FPRINTF((stderr,"ImageByteOrder:  %d\n\n",ImageByteOrder(dpy)));
+			    FPRINTF((stderr, "vis->red_mask: %lx   vis->green_mask: %lx   vis->blue_mask: %lx\n",
+				vis->red_mask, vis->green_mask, vis->blue_mask));
+			    FPRINTF((stderr, "ImageByteOrder:  %d\n\n", ImageByteOrder(dpy)));
 
 			    R_bits = 32-R_rshift-R_lshift;
 			    G_bits = 32-G_rshift-G_lshift;
 			    B_bits = 32-B_rshift-B_lshift;
-			    min_bits = GPMIN(GPMIN(R_bits,G_bits),B_bits);
+			    min_bits = GPMIN(GPMIN(R_bits, G_bits), B_bits);
 			    if (R_bits > min_bits) {
 				R_msb_mask >>= (R_bits-min_bits);
 				R_lshift += (R_bits-min_bits);
@@ -3077,7 +3079,7 @@ exec_cmd(plot_struct *plot, char *command)
 	    sscanf(&buffer[1], "%d %lg %d %lg %lg", &axis,
 		&(plot->axis_scale[axis].min), &(plot->axis_scale[axis].term_lower),
 		&(plot->axis_scale[axis].term_scale), &(plot->axis_scale[axis].logbase));
-	    FPRINTF((stderr,"gnuplot_x11: axis %d scaling %14.3lg %14d %14.3lg %14.3lg\n",
+	    FPRINTF((stderr, "gnuplot_x11: axis %d scaling %14.3lg %14d %14.3lg %14.3lg\n",
 		axis, plot->axis_scale[axis].min, plot->axis_scale[axis].term_lower,
 		plot->axis_scale[axis].term_scale, plot->axis_scale[axis].logbase));
 	}
@@ -3449,7 +3451,7 @@ PaletteMake(plot_struct * plot, t_sm_palette * tpal)
 	  sm_palette.gradient = tpal->gradient;
 	  break;
 	default:
-	  fprintf(stderr,"%s:%d ooops: Unknown color mode '%c'.\n",
+	  fprintf(stderr, "%s:%d ooops: Unknown color mode '%c'.\n",
 		  __FILE__, __LINE__, (char)(sm_palette.colorMode) );
 	}
     }
@@ -3990,7 +3992,7 @@ getMultiTabConsoleSwitchCommand(unsigned long *newGnuplotXID)
 	    unsigned long w;
 	    FILE *p;
 	    ptr = strchr(ptr, '(');
-	    /* the string for tab nb 4 looks like 'DCOPRef(konsole-2866,session-4)' */
+	    /* the string for tab nb 4 looks like 'DCOPRef(konsole-2866, session-4)' */
 	    if (!ptr) return NULL;
 	    konsole_name = strdup(ptr+1);
 	    konsole_tab = strchr(konsole_name, ',');
@@ -4111,7 +4113,7 @@ process_configure_notify_event(XEvent *event)
 	/* but: don't do this if both x and y are 0, since some
 	 * (all?) systems set these to zero when only resizing
 	 * (not moving) the window. This does mean that a move to
-	 * (0,0) won't be registered: can we solve that? */
+	 * (0, 0) won't be registered: can we solve that? */
 	if (event->xconfigure.x != 0 || event->xconfigure.y != 0) {
 	    plot->x = event->xconfigure.x;
 	    plot->y = event->xconfigure.y;
@@ -4196,7 +4198,7 @@ process_event(XEvent *event)
 	/* Unlike XKeycodeToKeysym, XLookupString applies the current */
 	/* shift, ctrl, alt, and meta modifiers to yield a character. */
 	/* keysym = XKeycodeToKeysym(dpy, event->xkey.keycode, 0); */
-	XLookupString((XKeyEvent *)event,key_sequence,sizeof(key_sequence),&keysym,NULL);
+	XLookupString((XKeyEvent *)event, key_sequence, sizeof(key_sequence), &keysym, NULL);
 
 #ifdef USE_MOUSE
 	update_modifiers(event->xkey.state);
@@ -4233,7 +4235,7 @@ process_event(XEvent *event)
 #endif
 		   ) {
 		    plot->mouse_on = !(plot->mouse_on);
-		    DisplayCoords(plot,plot->mouse_on ? " " : "");
+		    DisplayCoords(plot, plot->mouse_on ? " " : "");
 		}
 		break;
 #endif
@@ -4241,7 +4243,7 @@ process_event(XEvent *event)
 #ifdef USE_MOUSE
 		/* If the "-ctrlq" resource is set, ignore q unless control key is also pressed */
 		if (ctrlq && !(modifier_mask & Mod_Ctrl)) {
-		    FPRINTF((stderr,"ignoring q, modifier_mask = %o\n",modifier_mask));
+		    FPRINTF((stderr, "ignoring q, modifier_mask = %o\n", modifier_mask));
 		    break;
 		}
 #endif
@@ -4538,24 +4540,24 @@ process_event(XEvent *event)
 		*m = '\0';
 		mouse_to_coords(plot, event, &x, &y, &x2, &y2);
 		if (plot->axis_mask & (1<<FIRST_X_AXIS)) {
-		    sprintf(m,"x=  %10g %c",x,'\0');
+		    sprintf(m, "x=  %10g %c", x, '\0');
 		    m += 15;
 		}
 		if (plot->axis_mask & (1<<SECOND_X_AXIS)) {
-		    sprintf(m,"x2= %10g %c",x2,'\0');
+		    sprintf(m, "x2= %10g %c", x2, '\0');
 		    m += 15;
 		}
 		if (plot->axis_mask & (1<<FIRST_Y_AXIS)) {
-		    sprintf(m,"y=  %10g %c",y,'\0');
+		    sprintf(m, "y=  %10g %c", y, '\0');
 		    m += 15;
 		}
 		if (plot->axis_mask & (1<<SECOND_Y_AXIS)) {
-		    sprintf(m,"y2= %10g %c",y2,'\0');
+		    sprintf(m, "y2= %10g %c", y2, '\0');
 		    m += 15;
 		}
 		DisplayCoords(plot, mouse_format);
 	    } else if (!plot->mouse_on) {
-		DisplayCoords(plot,"");
+		DisplayCoords(plot, "");
 #endif
 	    }
 
@@ -4631,11 +4633,11 @@ process_event(XEvent *event)
  *   preset - determine options, open display, create window
  *---------------------------------------------------------------------------*/
 /*
-#define On(v) ( !strcmp(v,"on") || !strcmp(v,"true") || \
-                !strcmp(v,"On") || !strcmp(v,"True") || \
-                !strcmp(v,"ON") || !strcmp(v,"TRUE") )
+#define On(v) ( !strcmp(v, "on") || !strcmp(v, "true") || \
+                !strcmp(v, "On") || !strcmp(v, "True") || \
+                !strcmp(v, "ON") || !strcmp(v, "TRUE") )
 */
-#define On(v) ( !strncasecmp(v,"on",2) || !strncasecmp(v,"true",4) )
+#define On(v) ( !strncasecmp(v, "on", 2) || !strncasecmp(v, "true", 4) )
 
 #define AppDefDir "/usr/lib/X11/app-defaults"
 #ifndef MAXHOSTNAMELEN
@@ -5042,11 +5044,11 @@ pr_color(cmap_t * cmap_ptr)
 	    strcat(option, color_keys[n]);
 	    if (n > 1)
 		strcat(option, ctype);
-	    v = pr_GetR(db, option)
-		? (char *) value.addr : ((Gray) ? gray_values[n]
-					 : (Rv ? color_values_rv[n] : color_values[n]));
+	    v = pr_GetR(db, option) ? (char *) value.addr
+		: ((Gray) ? gray_values[n]
+		   : (Rv ? color_values_rv[n] : color_values[n]));
 
-	    if (sscanf(v, "%30[^,],%lf", color, &intensity) == 2) {
+	    if (sscanf(v, "%30[^, ], %lf", color, &intensity) == 2) {
 		if (intensity < 0 || intensity > 1) {
 		    fprintf(stderr, "\ngnuplot: invalid color intensity in '%s'\n", color);
 		    intensity = 1;
@@ -5130,7 +5132,8 @@ pr_dashes()
 		ok++;
 	}
 	if (ok != l || (ok != 2 && ok != 4)) {
-	    fprintf(stderr, "gnuplot: illegal dashes value %s:%s\n", option, v);
+	    fprintf(stderr, "gnuplot: illegal dashes value %s:%s\n",
+		    option, v);
 	    dashes[n][0] = (unsigned char) 0;
 	    continue;
 	}
@@ -5146,14 +5149,13 @@ pr_dashes()
  *---------------------------------------------------------------------------*/
 
 /* wrapper functions */
-int gpXTextWidth (XFontStruct *cfont,const char *str,int count)
+int gpXTextWidth (XFontStruct *cfont, const char *str, int count)
 {
 #ifdef USE_X11_MULTIBYTE
     if (usemultibyte)
-	return XmbTextEscapement(mbfont,str,count);
-    else
+	return XmbTextEscapement(mbfont, str, count);
 #endif
-	return XTextWidth(cfont,str,count);
+    return XTextWidth(cfont, str, count);
 }
 
 int gpXTextHeight (XFontStruct *cfont)
@@ -5168,41 +5170,43 @@ int gpXTextHeight (XFontStruct *cfont)
 	return cfont->ascent + cfont->descent;
 }
 
-void gpXSetFont (Display *disp,GC gc,Font fontid)
+void gpXSetFont (Display *disp, GC gc, Font fontid)
 {
 #ifdef USE_X11_MULTIBYTE
     if (!usemultibyte)
 #endif
-	XSetFont(disp,gc,fontid);
+	XSetFont(disp, gc, fontid);
 }
 
-void gpXDrawImageString (Display *disp,Drawable d,GC gc,int x,int y,
-			 const char *str,int len)
+void gpXDrawImageString (Display *disp, Drawable d, GC gc, int x, int y,
+			 const char *str, int len)
 {
 #ifdef USE_X11_MULTIBYTE
-    if (usemultibyte)
-	XmbDrawImageString(disp,d,mbfont,gc,x,y,str,len);
-    else
+    if (usemultibyte) {
+	XmbDrawImageString(disp, d, mbfont, gc, x, y, str, len);
+	return;
+    }
 #endif
-	XDrawImageString(disp,d,gc,x,y,str,len);
+    XDrawImageString(disp, d, gc, x, y, str, len);
 }
 
-void gpXDrawString (Display *disp,Drawable d,GC gc,int x,int y,
-		    const char *str,int len)
+void gpXDrawString (Display *disp, Drawable d, GC gc, int x, int y,
+		    const char *str, int len)
 {
 #ifdef USE_X11_MULTIBYTE
-    if (usemultibyte)
-	XmbDrawString(disp,d,mbfont,gc,x,y,str,len);
-    else
+    if (usemultibyte) {
+	XmbDrawString(disp, d, mbfont, gc, x, y, str, len);
+	return;
+    }
 #endif
-	XDrawString(disp,d,gc,x,y,str,len);
+    XDrawString(disp, d, gc, x, y, str, len);
 }
 
-void gpXFreeFont(Display *disp,XFontStruct *cfont)
+void gpXFreeFont(Display *disp, XFontStruct *cfont)
 {
 #ifndef USE_X11_MULTIBYTE
     if (cfont)
-      XFreeFont(disp,cfont);
+	XFreeFont(disp, cfont);
 #else
     if (font) {
 	XFreeFont(disp, font);
@@ -5215,19 +5219,19 @@ void gpXFreeFont(Display *disp,XFontStruct *cfont)
 #endif
 }
 
-XFontStruct *gpXLoadQueryFont (Display *disp,char *fontname)
+XFontStruct *gpXLoadQueryFont (Display *disp, char *fontname)
 {
 #ifndef USE_X11_MULTIBYTE
-    return XLoadQueryFont(disp,fontname);
+    return XLoadQueryFont(disp, fontname);
 #else
     static char **miss, *def;
     int n_miss;
     char tmpfname[256];
 
     if (!usemultibyte)
-      return XLoadQueryFont(disp, fontname);
+	return XLoadQueryFont(disp, fontname);
     else {
-	fontset_transsep(tmpfname,fontname,256-1);
+	fontset_transsep(tmpfname, fontname, 256-1);
 	mbfont = XCreateFontSet(disp, tmpfname, &miss, &n_miss, &def);
 	if (n_miss>0) {
 	    if (mbfont) {
@@ -5246,9 +5250,8 @@ char *gpFallbackFont(void)
 #ifdef USE_X11_MULTIBYTE
     if (usemultibyte)
 	return FallbackFontMB;
-    else
 #endif
-	return FallbackFont;
+    return FallbackFont;
 }
 
 int gpXGetFontascent(XFontStruct *cfont)
@@ -5272,15 +5275,17 @@ int gpXGetFontascent(XFontStruct *cfont)
 }
 
 #ifdef USE_X11_MULTIBYTE
-int fontset_transsep(char *nfname,char *ofname,int n)
+int fontset_transsep(char *nfname, char *ofname, int n)
 {
     char *s;
 
-    strncpy(nfname,ofname,n);
-    if(nfname[n-1]!='\0') nfname[n]='\0';
-    if (strchr(nfname,',')) return 1;
+    strncpy(nfname, ofname, n);
+    if (nfname[n-1]!='\0')
+	nfname[n]='\0';
+    if (strchr(nfname, ','))
+	return 1;
     s = nfname;
-    while ((s = strchr(nfname,FontSetSep)) != NULL){
+    while ((s = strchr(nfname, FontSetSep)) != NULL){
 	*s = ',';
 	nfname = s;
     }
@@ -5304,14 +5309,14 @@ char *fontname;
 
     if (!fontname || !(*fontname)) {
 	if ((fontname = pr_GetR(db, ".font")))
-	    strncpy(default_font,fontname,sizeof(default_font)-1);
-	    FPRINTF((stderr,"gnuplot_x11: setting default font %s from Xresource\n",
+	    strncpy(default_font, fontname, sizeof(default_font)-1);
+	    FPRINTF((stderr, "gnuplot_x11: setting default font %s from Xresource\n",
 		    fontname));
     }
 
 #ifdef USE_X11_MULTIBYTE
-    if (fontname && strncmp(fontname,"mbfont:",7) == 0) {
-	if (usablemb) {
+    if (fontname && strncmp(fontname, "mbfont:", 7) == 0) {
+	if (multibyte_fonts_usable) {
 	    usemultibyte = 1;
 	    orgfontname = fontname;
 	    fontname = &fontname[7];
@@ -5327,17 +5332,17 @@ char *fontname;
     /* EAM DEBUG - Free previous font before searching for a new one. */
     /* This doesn't seem right, since we will probably need it again  */
     /* very soon. But if we don't free it, we gradually leak memory.  */
-    gpXFreeFont(dpy,font);
+    gpXFreeFont(dpy, font);
 
-    font = gpXLoadQueryFont(dpy,fontname);
+    font = gpXLoadQueryFont(dpy, fontname);
 
 #ifndef USE_X11_MULTIBYTE
     if (!font) {
 #else
-    if (!font && !mbfont && !strchr(fontname,FontSetSep)) {
+    if (!font && !mbfont && !strchr(fontname, FontSetSep)) {
 #endif
 	/* EAM 19-Aug-2002 Try to construct a plausible X11 full font spec */
-	/* We are passed "font<,size><,slant>"                             */
+	/* We are passed "font<, size><, slant>"                             */
 	char shortname[64], *fontencoding, slant, *weight;
 	int  sep;
 #ifdef USE_X11_MULTIBYTE
@@ -5347,47 +5352,47 @@ char *fontname;
 	/* Enhanced font processing wants a method of requesting a new size  */
 	/* for whatever the previously selected font was, so we have to save */
 	/* and reuse the previous font name to construct the new spec.       */
-	if (!strncmp(fontname,"DEFAULT",7)) {
-	    sscanf(&fontname[8],"%d",&fontsize);
+	if (!strncmp(fontname, "DEFAULT", 7)) {
+	    sscanf(&fontname[8], "%d", &fontsize);
 	    fontname = default_font;
 #ifdef USE_X11_MULTIBYTE
 	    backfont = 1;
 #endif
 	} else if (*fontname == ',') {
-	    sscanf(&fontname[1],"%d",&fontsize);
+	    sscanf(&fontname[1], "%d", &fontsize);
 	    fontname = previous_font_name;
 #ifdef USE_X11_MULTIBYTE
 	    backfont = 1;
 #endif
 	}
 #ifdef USE_X11_MULTIBYTE
-	if (backfont && fontname && strncmp(fontname,"mbfont:",7) == 0
-	    && usablemb) {
+	if (backfont && fontname && strncmp(fontname, "mbfont:", 7) == 0
+	    && multibyte_fonts_usable) {
 	    usemultibyte = 1;
 	    orgfontname = fontname;
 	    fontname = &fontname[7];
 	}
 #endif
 
-	sep = strcspn(fontname,",");
+	sep = strcspn(fontname, ",");
 	if (sep >= sizeof(shortname))
 	    sep = sizeof(shortname) - 1;
-	strncpy(shortname,fontname,sep);
+	strncpy(shortname, fontname, sep);
 	shortname[sep] = '\0';
 	if (!fontsize)
-	    sscanf( &(fontname[sep+1]),"%d",&fontsize);
+	    sscanf( &(fontname[sep+1]), "%d", &fontsize);
 	if (fontsize > 99 || fontsize < 1)
 	    fontsize = 12;
 
-	slant = strstr(&fontname[sep+1],"italic")  ? 'i' :
-		strstr(&fontname[sep+1],"oblique") ? 'o' :
+	slant = strstr(&fontname[sep+1], "italic")  ? 'i' :
+		strstr(&fontname[sep+1], "oblique") ? 'o' :
 		                                     'r' ;
 
-	weight = strstr(&fontname[sep+1],"bold")   ? "bold" :
-		 strstr(&fontname[sep+1],"medium") ? "medium" :
+	weight = strstr(&fontname[sep+1], "bold")   ? "bold" :
+		 strstr(&fontname[sep+1], "medium") ? "medium" :
 		                                     "*" ;
 
-	if (!strncmp("Symbol",shortname,6) || !strncmp("symbol",shortname,6))
+	if (!strncmp("Symbol", shortname, 6) || !strncmp("symbol", shortname, 6))
 	    fontencoding = "*-*";
 #ifdef USE_X11_MULTIBYTE
 	else if (usemultibyte)
@@ -5415,56 +5420,68 @@ char *fontname;
 	if (!font && !mbfont) {
 #endif
 	    /* Try to decode some common PostScript font names */
-	    if (!strcmp("Times-Bold",shortname) || !strcmp("times-bold",shortname)) {
-		sprintf(fontspec,
-			"-*-times-bold-r-*-*-%d-*-*-*-*-*-%s", fontsize, fontencoding);
-	    } else if (!strcmp("Times-Roman",shortname) || !strcmp("times-roman",shortname)) {
-		sprintf(fontspec,
-			"-*-times-medium-r-*-*-%d-*-*-*-*-*-%s", fontsize, fontencoding);
-	    } else if (!strcmp("Times-Italic",shortname) || !strcmp("times-italic",shortname)) {
-		sprintf(fontspec,
-			"-*-times-medium-i-*-*-%d-*-*-*-*-*-%s", fontsize, fontencoding);
-	    } else if (!strcmp("Times-BoldItalic",shortname) || !strcmp("times-bolditalic",shortname)) {
-		sprintf(fontspec,
-			"-*-times-bold-i-*-*-%d-*-*-*-*-*-%s", fontsize, fontencoding);
-	    } else if (!strcmp("Helvetica-Bold",shortname) || !strcmp("helvetica-bold",shortname)) {
-		sprintf(fontspec,
-			"-*-helvetica-bold-r-*-*-%d-*-*-*-*-*-%s", fontsize, fontencoding);
-	    } else if (!strcmp("Helvetica-Oblique",shortname) || !strcmp("helvetica-oblique",shortname)) {
-		sprintf(fontspec,
-			"-*-helvetica-medium-o-*-*-%d-*-*-*-*-*-%s", fontsize, fontencoding);
-	    } else if (!strcmp("Helvetica-BoldOblique",shortname) || !strcmp("helvetica-boldoblique",shortname)) {
-		sprintf(fontspec,
-			"-*-helvetica-bold-o-*-*-%d-*-*-*-*-*-%s", fontsize, fontencoding);
-	    } else if (!strcmp("Helvetica-Narrow-Bold",shortname) || !strcmp("helvetica-narrow-bold",shortname)) {
-		sprintf(fontspec,
-			"-*-arial narrow-bold-r-*-*-%d-*-*-*-*-*-%s", fontsize, fontencoding);
+	    if (!strcmp("Times-Bold", shortname)
+		|| !strcmp("times-bold", shortname)) {
+		sprintf(fontspec, "-*-times-bold-r-*-*-%d-*-*-*-*-*-%s",
+			fontsize, fontencoding);
+	    } else if (!strcmp("Times-Roman", shortname)
+		       || !strcmp("times-roman", shortname)) {
+		sprintf(fontspec, "-*-times-medium-r-*-*-%d-*-*-*-*-*-%s",
+			fontsize, fontencoding);
+	    } else if (!strcmp("Times-Italic", shortname)
+		       || !strcmp("times-italic", shortname)) {
+		sprintf(fontspec, "-*-times-medium-i-*-*-%d-*-*-*-*-*-%s",
+			fontsize, fontencoding);
+	    } else if (!strcmp("Times-BoldItalic", shortname)
+		       || !strcmp("times-bolditalic", shortname)) {
+		sprintf(fontspec, "-*-times-bold-i-*-*-%d-*-*-*-*-*-%s",
+			fontsize, fontencoding);
+	    } else if (!strcmp("Helvetica-Bold", shortname) ||
+		       !strcmp("helvetica-bold", shortname)) {
+		sprintf(fontspec, "-*-helvetica-bold-r-*-*-%d-*-*-*-*-*-%s",
+			fontsize, fontencoding);
+	    } else if (!strcmp("Helvetica-Oblique", shortname)
+		       || !strcmp("helvetica-oblique", shortname)) {
+		sprintf(fontspec, "-*-helvetica-medium-o-*-*-%d-*-*-*-*-*-%s",
+			fontsize, fontencoding);
+	    } else if (!strcmp("Helvetica-BoldOblique", shortname)
+		       || !strcmp("helvetica-boldoblique", shortname)) {
+		sprintf(fontspec, "-*-helvetica-bold-o-*-*-%d-*-*-*-*-*-%s",
+			fontsize, fontencoding);
+	    } else if (!strcmp("Helvetica-Narrow-Bold", shortname)
+		       || !strcmp("helvetica-narrow-bold", shortname)) {
+		sprintf(fontspec, "-*-arial narrow-bold-r-*-*-%d-*-*-*-*-*-%s",
+			fontsize, fontencoding);
 	    }
 #ifdef USE_X11_MULTIBYTE
-	    /* Japanese standard PostScript font names
-	     * (adviced from N.Matsuda).
-	     */
-	    else if (usablemb
-	      && (!strncmp("Ryumin-Light",shortname,strlen("Ryumin-Light"))
-	       || !strncmp("ryumin-light",shortname,strlen("ryumin-light")))) {
+	    /* Japanese standard PostScript font names (adviced from
+	     * N.Matsuda). */
+	    else if (multibyte_fonts_usable
+		     && (!strncmp("Ryumin-Light", shortname,
+				  strlen("Ryumin-Light"))
+			 || !strncmp("ryumin-light", shortname,
+				     strlen("ryumin-light")))) {
 		if (!usemultibyte) {
 		    usemultibyte = 1;
 		    orgfontname = fontname;
 		}
-		sprintf(fontspec,"-*-mincho-medium-%c-*--%d-*", slant,fontsize);
+		sprintf(fontspec, "-*-mincho-medium-%c-*--%d-*",
+			slant, fontsize);
 	    }
-	    else if (usablemb
-	      && (!strncmp("GothicBBB-Medium",shortname,strlen("GothicBBB-Medium"))
-	       || !strncmp("gothicbbb-medium",shortname,strlen("gothicbbb-medium")))) {
+	    else if (multibyte_fonts_usable
+		     && (!strncmp("GothicBBB-Medium", shortname,
+				  strlen("GothicBBB-Medium"))
+			 || !strncmp("gothicbbb-medium", shortname,
+				     strlen("gothicbbb-medium")))) {
 		if (!usemultibyte) {
 		    usemultibyte = 1;
 		    orgfontname = fontname;
 		}
-	    /* FIXME: Doesn't work on most non-japanese setups, because */
-	    /* many purely Western fonts are gothic-bold.               */
-		sprintf(fontspec,"-*-gothic-bold-%c-*--%d-*", slant,fontsize);
+		/* FIXME: Doesn't work on most non-japanese setups, because */
+		/* many purely Western fonts are gothic-bold.               */
+		sprintf(fontspec, "-*-gothic-bold-%c-*--%d-*", slant, fontsize);
 	    }
-#endif
+#endif /* USE_X11_MULTIBYTE */
 	    font = gpXLoadQueryFont(dpy, fontspec);
 
 #ifdef USE_X11_MULTIBYTE
@@ -5472,10 +5489,10 @@ char *fontname;
 		/* But (mincho|gothic) X fonts are not provided
 		 * on some X servers even in Japan
 		 */
-		sprintf(fontspec,"*-%s-%c-*--%d-*", weight,slant,fontsize);
-		font = gpXLoadQueryFont(dpy,fontspec);
+		sprintf(fontspec, "*-%s-%c-*--%d-*", weight, slant, fontsize);
+		font = gpXLoadQueryFont(dpy, fontspec);
 	    }
-#endif
+#endif /* USE_X11_MULTIBYTE */
 	}
 
     }
@@ -5488,7 +5505,7 @@ char *fontname;
 	  fontname = orgfontname;
 #endif
         strncpy(previous_font_name, fontname, sizeof(previous_font_name)-1);
-        FPRINTF((stderr,"gnuplot_x11:saving current font name \"%s\"\n",previous_font_name));
+        FPRINTF((stderr, "gnuplot_x11:saving current font name \"%s\"\n", previous_font_name));
     }
 
     /* By now we have tried everything we can to honor the specific request. */
@@ -5538,8 +5555,8 @@ char *fontname;
     vchar = gpXTextHeight(font);
     hchar = gpXTextWidth(font, "0123456789", 10) / 10;
 
-    FPRINTF((stderr,"gnuplot_x11: pr_font() set font %s, vchar %d hchar %d\n",
-		fontname,vchar,hchar));
+    FPRINTF((stderr, "gnuplot_x11: pr_font() set font %s, vchar %d hchar %d\n",
+		fontname, vchar, hchar));
 
 }
 
@@ -5766,16 +5783,16 @@ static void
 pr_feedback()
 {
     if (pr_GetR(db, ".feedback"))
-	feedback = !(!strncasecmp(value.addr,"off",3) || !strncasecmp(value.addr,"false",5));
-    FPRINTF((stderr,"gplt_x11: set feedback to %d (%s)\n",feedback,value.addr));
+	feedback = !(!strncasecmp(value.addr, "off", 3) || !strncasecmp(value.addr, "false", 5));
+    FPRINTF((stderr, "gplt_x11: set feedback to %d (%s)\n", feedback, value.addr));
 }
 
 static void
 pr_ctrlq()
 {
     if (pr_GetR(db, ".ctrlq")) {
-	ctrlq = (!strncasecmp(value.addr,"on",2) || !strncasecmp(value.addr,"true",4));
-	FPRINTF((stderr,"gplt_x11: require <ctrl>q and <ctrl><space>\n"));
+	ctrlq = (!strncasecmp(value.addr, "on", 2) || !strncasecmp(value.addr, "true", 4));
+	FPRINTF((stderr, "gplt_x11: require <ctrl>q and <ctrl><space>\n"));
     }
 }
 
@@ -5783,8 +5800,8 @@ static void
 pr_fastrotate()
 {
     if (pr_GetR(db, ".fastrotate")) {
-	fast_rotate = (!strncasecmp(value.addr,"on",2) || !strncasecmp(value.addr,"true",4));
-	FPRINTF((stderr,"gplt_x11: Use fast but imperfect text rotation\n"));
+	fast_rotate = (!strncasecmp(value.addr, "on", 2) || !strncasecmp(value.addr, "true", 4));
+	FPRINTF((stderr, "gplt_x11: Use fast but imperfect text rotation\n"));
     }
 }
 
@@ -5794,9 +5811,9 @@ pr_exportselection()
 {
     /* Allow export selection to be turned on or off using X resource *exportselection */
     if (pr_GetR(db, ".exportselection")) {
-	if (!strncmp((char *)value.addr,"off",3) || !strncmp((char *)value.addr,"false",5)) {
+	if (!strncmp((char *)value.addr, "off", 3) || !strncmp((char *)value.addr, "false", 5)) {
 	    exportselection = FALSE;
-	    FPRINTF((stderr,"gnuplot_x11: exportselection is disabled\n"));
+	    FPRINTF((stderr, "gnuplot_x11: exportselection is disabled\n"));
 	}
     }
 }
@@ -5899,14 +5916,14 @@ mouse_to_coords(plot_struct *plot, XEvent *event,
     int xx =         4096. * (event->xbutton.x + 0.5)/ plot->width;
     int yy = 4095. - 4096. * (event->xbutton.y + 0.5)/ plot->gheight;
 
-    FPRINTF((stderr,"gnuplot_x11 %d: mouse at %d %d\t", __LINE__, xx, yy));
+    FPRINTF((stderr, "gnuplot_x11 %d: mouse at %d %d\t", __LINE__, xx, yy));
 
     *x  = mouse_to_axis(xx, &(plot->axis_scale[FIRST_X_AXIS]));
     *y  = mouse_to_axis(yy, &(plot->axis_scale[FIRST_Y_AXIS]));
     *x2 = mouse_to_axis(xx, &(plot->axis_scale[SECOND_X_AXIS]));
     *y2 = mouse_to_axis(yy, &(plot->axis_scale[SECOND_Y_AXIS]));
 
-    FPRINTF((stderr,"mouse x y %10g %10g x2 y2 %10g %10g\n", *x, *y, *x2, *y2 ));
+    FPRINTF((stderr, "mouse x y %10g %10g x2 y2 %10g %10g\n", *x, *y, *x2, *y2 ));
 }
 
 static double
@@ -6066,13 +6083,13 @@ Add_Plot_To_Remove_FIFO_Queue(Window plot_window)
 {
     /* Clean up any processed links. */
     plot_remove_struct *prsp = remove_fifo_queue_start;
-    FPRINTF((stderr,"Add plot to remove FIFO queue called.\n"));
+    FPRINTF((stderr, "Add plot to remove FIFO queue called.\n"));
     while (prsp != NULL) {
 	if (prsp->processed) {
 	    remove_fifo_queue_start = prsp->next_remove;
 	    free(prsp);
 	    prsp = remove_fifo_queue_start;
-	    FPRINTF((stderr,"  -> Removed a processed element from FIFO queue.\n"));
+	    FPRINTF((stderr, "  -> Removed a processed element from FIFO queue.\n"));
 	} else {
 	    break;
 	}
@@ -6105,7 +6122,7 @@ Add_Plot_To_Remove_FIFO_Queue(Window plot_window)
 	else
 	    remove_fifo_queue_start = prsp_new;
 	process_remove_fifo_queue = 1; /* Indicate to main loop that there is a plot to remove. */
-	FPRINTF((stderr,"  -> Added an element to FIFO queue.\n"));
+	FPRINTF((stderr, "  -> Added an element to FIFO queue.\n"));
     }
     else {
 	fprintf(stderr, ERROR_NOTICE("Could not allocate memory for plot remove queue.\n\n"));

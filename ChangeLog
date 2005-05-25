@@ -1,3 +1,11 @@
+2005-05-25  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/gplt_x11.c: Lots of coding style changes, mainly missing
+	blanks after commas.
+	(main) [USE_X11_MULTIBYTE]: Reset LC_NUMERIC locale to "C", after
+	all others have been set to the user's selection for purposes of
+	multi-byte font support.
+	
 2005-05-25  Daniel Sebald  <daniel.sebald@ieee.org>
 
 	SF Patch [ 1117060 ] Mod to post.trm for PostScript Level 1 images.
