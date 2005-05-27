@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.156 2005/05/10 05:51:36 sfeam Exp $
+ * $Id: post.trm,v 1.157 2005/05/25 12:00:36 mikulik Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -3807,7 +3807,7 @@ PS_image (unsigned M, unsigned N, coordval *image, gpiPoint *corner, t_imagecolo
 	    fprintf(gppsfile, "  %d %d scale\n", (corner[1].x - corner[0].x), (corner[1].y - corner[0].y));
 	    fprintf(gppsfile, "  %d %d %d\n", M, N, bits_per_component);
 	    fprintf(gppsfile, "  [ %d 0 0 %d 0 0 ]\n", M, N);
-	    fprintf(gppsfile, "  currentfile /ASCII85Decode filter\n", num_encoded_bytes);
+	    fprintf(gppsfile, "  currentfile /ASCII85Decode filter\n");
 	    if (color_mode == IC_RGB && ps_params->color) {
 		fputs("  false 3\n"
 		      "  colorimage\n", gppsfile);
