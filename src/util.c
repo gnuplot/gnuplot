@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util.c,v 1.55 2005/05/02 19:26:11 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: util.c,v 1.56 2005/05/20 18:48:33 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - util.c */
@@ -339,8 +339,8 @@ m_quote_capture(char **str, int start, int end)
 }
 
 /*
- * Wrapper for isstring + m_quote_capture that can later be replaced
- * by a function handling also string variables and expressions.
+ * Wrapper for isstring + m_quote_capture that can be used with
+ * or without GP_STRING_VARS enabled.
  * EAM Aug 2004
  */
 char *

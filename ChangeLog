@@ -1,3 +1,8 @@
+2005-06-01  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/util.c docs/gnuplot.doc src/graphics.c: Update old comments and
+	documentation; quiet compiler warnings about uninitialized variable.
+
 2005-05-27  Daniel Sebald  <daniel.sebald@ieee.org>
 
 	* term/post.trm: Fix incorrect fprintf statement that was causing

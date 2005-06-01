@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.293 2005/05/09 18:22:00 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.294 2005/05/19 20:31:35 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -568,12 +568,12 @@ C
  expression, which will be interpreted as seconds from 1 January 2000.
 2 Datastrings
 ?datastrings
- The configuration option --enable-datastrings (currently EXPERIMENTAL) allows
- gnuplot to read and process text fields in datafiles. A text field consists 
- of either an arbitrary string of printable characters containing no whitespace
- or an arbitrary string of characters, possibly including whitespace, delimited
- by double quotes. The following sample line from a datafile is interpreted to
- contain four columns, with a text field in column 3:
+ The configuration option --enable-datastrings allows gnuplot to read and
+ process text fields in datafiles. A text field consists of either an arbitrary
+ string of printable characters containing no whitespace or an arbitrary string
+ of characters, possibly including whitespace, delimited by double quotes.
+ The following sample line from a datafile is interpreted to contain four
+ columns, with a text field in column 3:
 
    1.000 2.000 "Third column is all of this text" 4.00
 

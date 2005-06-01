@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.156 2005/04/23 18:16:32 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.157 2005/05/19 20:31:38 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -1578,7 +1578,6 @@ do_plot(struct curve_points *plots, int pcount)
 			do_key_sample(this_plot, key, key_entry->text, t, xl, yl);
 		    yl = yl - key_entry_height;
 		}
-		/* EAM FIXME - where/when should this be freed again?  Here? */
 		free_labels(this_plot->labels);
 		this_plot->labels = NULL;
 	    }
@@ -2650,7 +2649,7 @@ plot_bars(struct curve_points *plot)
     TBOOLEAN low_inrange, high_inrange;
     int tic = ERRORBARTIC;
 #ifdef EAM_HISTOGRAMS
-    double halfwidth;		/* Used to calculate full box width */
+    double halfwidth = 0;		/* Used to calculate full box width */
 #endif
 
     /* Limitation: no boxes with x errorbars */
