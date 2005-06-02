@@ -1,3 +1,14 @@
+2005-06-02  Juergen Wieferink <wieferink@freenet.de>
+
+	* src/eval.c (Gstring gpfree_string) src/eval.h: Separate the freeing
+	of an old string variable from the creation of a new one. New function
+	gpfree_string().
+
+	* src/mouse.c src/internal.c (f_gprintf f_sprintf f_concatenate)
+	src/command.c (define) src/mouse.c (load_mouse_variables): Convert to
+	use new gpfree_string() function.  Fix memory leaks from re-use of
+	string variable names.
+
 2005-06-01  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/util.c docs/gnuplot.doc src/graphics.c: Update old comments and

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: eval.c,v 1.24 2005/03/05 04:52:14 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: eval.c,v 1.25 2005/03/06 02:20:21 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - eval.c */
@@ -426,11 +426,25 @@ Ginteger(struct value *a, int i)
 struct value *
 Gstring(struct value *a, char *s)
 {
-    if (a->type == STRING && a->v.string_val)
-	free(a->v.string_val);
     a->type = STRING;
     a->v.string_val = s;
     return (a);
+}
+
+/* It is always safe to call gpfree_string with a->type is INTGR or CMPLX.
+ * However it would be fatal to call it with a->type = STRING if a->string_val
+ * was not obtained by a previous call to gp_alloc(), or has already been freed.
+ * Thus 'a->type' is set to INTGR afterwards to make subsequent calls safe.
+ */
+struct value *
+gpfree_string(struct value *a)
+{
+    if (a->type == STRING) {
+	free(a->v.string_val);
+	/* I would have set it to INVALID if such a type existed */
+	a->type = INTGR;
+    }
+    return a;
 }
 #endif
 

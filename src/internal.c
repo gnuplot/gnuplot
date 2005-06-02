@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: internal.c,v 1.23 2004/11/03 07:27:03 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: internal.c,v 1.24 2005/03/06 02:20:21 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - internal.c */
@@ -1014,9 +1014,10 @@ f_concatenate(union argument *arg)
 	int_error(NO_CARET, "internal error : STRING operator applied to non-STRING type");
 
     (void) Gstring(&result, gp_stradd(a.v.string_val, b.v.string_val));
-    free(a.v.string_val);
-    free(b.v.string_val);
+    gpfree_string(&a);
+    gpfree_string(&b);
     push(&result);
+    gpfree_string(&result); /* free string allocated within gp_stradd() */
 }
 
 void
@@ -1069,8 +1070,8 @@ f_sprintf(union argument *arg)
 {
     struct value a[10];
     struct value num_params;
+    struct value result;
     char buffer[80];
-    char *result;
     char *next_start, *outpos, tempchar;
     int next_length;
     int i, remaining;
@@ -1187,20 +1188,12 @@ f_sprintf(union argument *arg)
     /* Copy the trailing portion of the format, if any */
     strncpy(outpos, next_start, sizeof(buffer)-(outpos-buffer));
 
-
-    result = gp_strdup(buffer);
-    FPRINTF((stderr," snprintf result = \"%s\"\n",result));
+    FPRINTF((stderr," snprintf result = \"%s\"\n",buffer));
+    push(Gstring(&result, buffer));
 
     /* Free any strings from parameters we have now used */
-    for (i=0; i<nargs-1; i++)
-	if (a[i].type == STRING && a[i].v.string_val) {
-	    free(a[i].v.string_val);
-	    a[i].v.string_val = NULL;
-	}
-
-    /* Free the format string and replace it with the result */
-    push(Gstring(&a[nargs-1], result));
-
+    for (i=0; i<nargs; i++)
+	gpfree_string(&a[i]);
 }
 
 /* EAM July 2004 - Gnuplot's own string formatting conventions.
@@ -1210,9 +1203,8 @@ f_sprintf(union argument *arg)
 void
 f_gprintf(union argument *arg)
 {
-    struct value fmt, val;
+    struct value fmt, val, result;
     char buffer[80];
-    char *result;
     double base;
  
     /* Retrieve parameters from top of stack */
@@ -1237,12 +1229,10 @@ f_gprintf(union argument *arg)
     /* Call the old internal routine */
     gprintf(buffer, sizeof(buffer), fmt.v.string_val, base, real(&val));
 
-    result = gp_strdup(buffer);
-    FPRINTF((stderr," gprintf result = \"%s\"\n",result));
+    FPRINTF((stderr," gprintf result = \"%s\"\n",buffer));
+    push(Gstring(&result, buffer));
 
-    /* Free the format string and replace it with the result */
-    push(Gstring(&fmt, result));
-
+    gpfree_string(&fmt);
 }
 
 

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.115 2005/04/27 17:21:01 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.116 2005/05/20 13:47:47 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -481,6 +481,7 @@ define()
     int start_token;	/* the 1st token in the function definition */
     struct udvt_entry *udv;
     struct udft_entry *udf;
+    struct value result;
 
     if (equals(c_token + 1, "(")) {
 	/* function ! */
@@ -512,7 +513,13 @@ define()
 	start_token = c_token;
 	c_token += 2;
 	udv = add_udv(start_token);
-	(void) const_express(&(udv->udv_value));
+	(void) const_express(&result);
+#ifdef GP_STRING_VARS
+	/* Prevents memory leak if the variable name is re-used */
+	if (udv->udv_value.type == STRING)
+	    gpfree_string(&udv->udv_value);
+#endif
+	udv->udv_value = result;
 	udv->udv_undef = FALSE;
     }
 }
