@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: gd.trm,v 1.68 2005/04/29 17:03:36 sfeam Exp $
+ * $Id: gd.trm,v 1.69 2005/05/22 18:49:39 sfeam Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -1922,6 +1922,7 @@ START_HELP(png)
 " `large` (8x16) or `giant` (9x15 pixels). These fonts cannot be scaled",
 " or rotated (pure horizontal or vertical text only).",
 "",
+"=fonts",
 " If gnuplot was built with support for TrueType (*.ttf) or Adobe Type 1 ",
 " (*.pfa) fonts, they may be selected using the 'font <face> {<pointsize>}' ",
 " option. <face> is either the full pathname to the font file, or a font ",
@@ -2079,6 +2080,7 @@ START_HELP(jpeg)
 " `large` (8x16) or `giant` (9x15 pixels). These fonts cannot be scaled",
 " or rotated (pure horizontal or vertical text only).",
 "",
+"=fonts",
 " If gnuplot was built with support for TrueType (*.ttf) or Adobe Type 1 ",
 " (*.pfa) fonts, they may be selected using the 'font <face> {<pointsize>}' ",
 " option. <face> is either the full pathname to the font file, or a font ",
@@ -2253,6 +2255,7 @@ START_HELP(gif)
 " but some of these features are dependent on which version of the ",
 " underlying libgd library is present, and which fonts are available.",
 "",
+"=fonts",
 " If your local gd library was built with support for TrueType  and Adobe",
 " Type 1 fonts, they may be selected using the 'font <face> {<pointsize>}' ",
 " option. <face> is either the full pathname to the font file, or a font ",

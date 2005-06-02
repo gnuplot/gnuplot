@@ -1,3 +1,26 @@
+2005-06-02  Ethan Merritt  <merritt@u.washington.edu>
+
+	* docs/README docs/titlepag.tex docs/doc2tex.c docs/doc2texi.el:
+
+	Add a mechanism to auto-generate an index for the documentation via the
+	TeX package "makeindex". All TeX-derived documentation formats will
+	include the index. Juergen Wieferink has similarly modified the
+	generation of gnuplot.info.  A keyword is inserted in the index if
+	it is found on a line of gnuplot.doc beginning with with '?' or '=',
+	or if it appears as the final word of a phrase wrapped in backtics.
+	This latter rule picks up cross-reference sites, but may be disabled
+	by compiling doc2tex with -DNO_CROSSREFS.
+
+	* docs/doc2.gih.c docs/doc2hlp.c docs/doc2ipf.c docs/doc2ms.c docs/doc2rnh.c
+	docs/doc2rtf.c: Ignore leading '=' character in input stream. These
+	conversion tools do not know how to generate an index.
+
+	* docs/gnuplot.doc term/gd.trm term/x11.trm: Add some explicit indexing
+	entries (keywords with a '=' in the first column of the line).
+
+	* docs/Makefile.in: Switch generation of html documentation to use
+	latex2html toolchain rather than going via gnuplot.texi
+
 2005-06-02  Juergen Wieferink <wieferink@freenet.de>
 
 	* src/eval.c (Gstring gpfree_string) src/eval.h: Separate the freeing

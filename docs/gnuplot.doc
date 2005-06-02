@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.294 2005/05/19 20:31:35 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.295 2005/06/02 06:08:29 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -1252,6 +1252,10 @@ C
        !           !a        * logical negation
        !           a!        * factorial
        $           $3        * call arg/column during `using` manipulation
+=factorial
+=negation
+=one's complement
+=operator precedence
 #\begin{tabular}{|ccl|} \hline
 #\multicolumn{3}{|c|}{Unary Operators}\\ \hline \hline
 #Symbol & Example & Explanation \\ \hline
@@ -1320,6 +1324,10 @@ C ... and restart the table:
        .           A.B           string concatenation
        eq          A eq B        string equality
        ne          A ne B        string inequality
+=bitwise operators
+=string operators
+=modulo
+=exponentiation
 #\begin{tabular}{|ccl|} \hline
 #\multicolumn{3}{|c|}{Binary Operators} \\ \hline \hline
 #Symbol & Example & Explanation \\ \hline
@@ -1555,6 +1563,7 @@ C ... and restart the table:
       plot sin(x) linetype 4            # terminal-specific linetype color 4
       plot sin(x) lt -1                 # black
 
+=colors
  For many terminal types it is also possible to assign user-defined colors
  using explicit rgb (red, green, blue) values, named colors, or color values
  that refer to the current PM3D palette.
@@ -1598,6 +1607,7 @@ C ... and restart the table:
 3 colorspec
 ?colorspec
 ?rgbcolor
+=colors
  Many commands allow you to specify a linetype with an explicit color.
  This option is only available if your gnuplot has been built with pm3d support,
  and only for terminals that support RGB color and/or pm3d palettes.
@@ -7186,6 +7196,7 @@ C ... and restart the table:
 ?set palette rgbformulae
 ?palette rgbformulae
 ?rgbformulae
+=colors
  For `rgbformulae` three suitable mapping functions have
  to be chosen.  This is done via `rgbformulae <r>,<g>,<b>`.  The available
  mapping functions are listed by `show palette rgbformulae`.  Default is
@@ -7219,6 +7230,7 @@ C ... and restart the table:
 ?commands set palette defined
 ?set palette defined
 ?palette defined
+=colors
  Gray-to-rgb mapping can be manually set by use of `palette defined`:  A color gradient
  is defined and used to give the rgb values.  Such a  gradient is a piecewise
  linear mapping from gray values in [0,1] to the RGB space [0,1]x[0,1]x[0,1].

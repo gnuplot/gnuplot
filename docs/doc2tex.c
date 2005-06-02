@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: doc2tex.c,v 1.17 2004/07/01 17:10:03 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: doc2tex.c,v 1.18 2005/04/01 22:16:25 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - doc2tex.c */
@@ -130,18 +130,35 @@ process_line( char *line, FILE *b)
 {
     char string[MAX_LINE_LEN+1], c;
     int i, initlen;
+    char *ind;
     static TBOOLEAN parsed = FALSE;
 
     initlen = strlen(line);
     switch (line[0]) {		/* control character */
-    case '?':{			/* interactive help entry */
+    case '?':			/* interactive help entry */
                                 /* convert '?xxx' to '\label{xxx}' */
 	    line[strlen(line)-1]=NUL;
             (void) fputs("\\label{",b);
 	    fputs(line+1, b);
             (void) fputs("}\n",b);
+	    if (!strpbrk(line+1," ")) {	/* Make an index entry also */
+		(void) fputs("\\index{",b);
+		while ((ind = strpbrk(line+1,"-_")))
+		    *ind = ' ';
+		fputs(line+1, b);
+		(void) fputs("}\n",b);
+	    }
 	    break;		/* ignore */ /* <- don't ignore */
-	}
+
+    case '=':			/* explicit index entry */
+	    line[strlen(line)-1]=NUL;
+	    (void) fputs("\\index{",b);
+	    while ((ind = strpbrk(line+1,"-_")))
+		*ind = ' ';
+	    fputs(line+1, b);
+	    (void) fputs("}\n",b);
+	    break;
+
     case '@':{			/* start/end table */
 	    if (intable) {
 		(void) fputs("\\hline\n\\end{tabular}\n", b);
@@ -395,9 +412,22 @@ puttex( char *str, FILE *file)
 	case '`':    /* backquotes mean boldface */
 	    if (inquote) {
                 if (see){
+		    char *index = string;
                     (void) fputs(" (p.~\\pageref{", file);
                     (void) fputs(string, file);
 		    (void) fputs("})", file);
+#ifndef NO_CROSSREFS
+		    /* Make the final word an index entry also */
+		    fputs(" \\index{",file);
+		    if (strrchr(index,'-'))
+			index = strrchr(index,'-')+1;
+		    if (strrchr(index,'_'))
+			index = strrchr(index,'_')+1;
+		    if (strrchr(index,' '))
+			index = strrchr(index,' ')+1;
+		    fputs(index,file);
+		    fputs("} ",file);
+#endif
                     /* see = FALSE; */
                 }
                 (void) fputs("}", file);
@@ -445,19 +475,8 @@ puttex( char *str, FILE *file)
 
 void finish(FILE *b)
 {
+    (void) fputs("\\part{Index}\n", b);
+    (void) fputs("\\printindex\n", b);
     (void) fputs("\\end{document}\n", b);
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
 

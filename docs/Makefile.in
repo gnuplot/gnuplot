@@ -224,19 +224,29 @@ doc2ms.o: doc2ms.c $(BUILT_SOURCES)
 	$(COMPILE) -DALL_TERM_DOC -c $(srcdir)/doc2ms.c
 
 ### html
-html: gnuplot.html
+html: htmldocs/gnuplot.html
 
 # requires makeinfo (GNU texinfo) 4.0 or better
-gnuplot.html: $(srcdir)/gnuplot.texi 
-	$(MAKEINFO) --html -I$(srcdir) $(srcdir)/gnuplot.texi --no-split --output=$@
+# htmldocs/gnuplot.html: $(srcdir)/gnuplot.texi 
+#	$(MAKEINFO) --html -I$(srcdir) $(srcdir)/gnuplot.texi --no-split --output=$@
+
+# TeX itself does a better job these days, and doesn't depend on having
+# emacs around to do lisp pre-processing
+htmldocs/gnuplot.html: $(srcdir)/gnuplot.tex
+	mkdir -p htmldocs
+	latex2html -dir htmldocs -local_icons gnuplot
 
 ### PDF documentation
 pdf: gnuplot.pdf
 
 gnuplot.pdf: gnuplot.tex
 	@if test $(PDFLATEX) != no ; then \
+	  rm -f gnuplot.idx ; \
+	  touch gnuplot.idx ; \
 	  TEXINPUTS=.:$(srcdir):$(top_srcdir):${TEXINPUTS}: $(PDFLATEX) gnuplot ; \
 	  TEXINPUTS=.:$(srcdir):$(top_srcdir):${TEXINPUTS}: $(PDFLATEX) gnuplot ; \
+	  TEXINPUTS=.:$(srcdir):$(top_srcdir):${TEXINPUTS}: $(PDFLATEX) gnuplot ; \
+	  makeindex gnuplot ; \
 	  TEXINPUTS=.:$(srcdir):$(top_srcdir):${TEXINPUTS}: $(PDFLATEX) gnuplot ; \
 	else \
 	  echo pdflatex not found - cannot build pdf file ; \
@@ -259,8 +269,12 @@ dvi: gnuplot.dvi gpcard.dvi
 
 gnuplot.dvi: gnuplot.tex titlepag.tex toc_entr.sty
 	@if test $(LATEX) != no ; then \
+	  rm -f gnuplot.idx ; \
+	  touch gnuplot.idx ; \
 	  TEXINPUTS=.:$(srcdir):$(top_srcdir):${TEXINPUTS}: $(LATEX) gnuplot ; \
 	  TEXINPUTS=.:$(srcdir):$(top_srcdir):${TEXINPUTS}: $(LATEX) gnuplot ; \
+	  TEXINPUTS=.:$(srcdir):$(top_srcdir):${TEXINPUTS}: $(LATEX) gnuplot ; \
+	  makeindex gnuplot ; \
 	  TEXINPUTS=.:$(srcdir):$(top_srcdir):${TEXINPUTS}: $(LATEX) gnuplot ; \
 	else \
 	  echo "latex not found - cannot build dvi file" ; \

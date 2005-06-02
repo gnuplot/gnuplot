@@ -636,9 +636,10 @@ comment out the multi-word ? entries."
   (and d2t-verbose (message "  Doing d2t-indexing ..."))
   (save-excursion
     (while (not (eobp))
-      (re-search-forward "^\\\?\\([^ \n]+\\) *$" (point-max) "to_end")
+      (re-search-forward "^\\(\\\?\\([^ \n]+\\)\\|=\\([^\n]+\\)\\) *$" 
+			 (point-max) "to_end")
       (unless (eobp)
-	(let ((word (match-string 1))
+	(let ((word (or (match-string 2) (match-string 3)))
 	      (eol  (save-excursion (end-of-line) (point-marker))))
 	  (beginning-of-line)
 	  (delete-region (point-marker) eol)

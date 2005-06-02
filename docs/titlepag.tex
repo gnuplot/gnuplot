@@ -1,5 +1,5 @@
 %
-% $Id: titlepag.tex,v 1.16 2004/01/14 17:33:46 lhecking Exp $
+% $Id: titlepag.tex,v 1.17 2004/04/13 17:23:36 broeker Exp $
 %
 
 \ifx\LaTeXe\undefined
@@ -41,6 +41,9 @@
   ]{hyperref}
 
   \usepackage{fancyhdr}
+
+  \usepackage{makeidx}
+  \makeindex
 
 \fi
 
@@ -163,7 +166,7 @@
 \else {
   \catcode`\$=10 \let\$\relax
   \def\ignoredate#1Date: #2{#2}
-  Last edited: \ignoredate $Date: 2004/01/14 17:33:46 $
+  Last edited: \ignoredate $Date: 2004/04/13 17:23:36 $
   }
 \fi
 

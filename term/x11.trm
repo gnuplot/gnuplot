@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: x11.trm,v 1.142 2005/04/30 03:31:57 sfeam Exp $
+ * $Id: x11.trm,v 1.143 2005/05/24 20:54:03 sfeam Exp $
  *
  */
 
@@ -2026,6 +2026,7 @@ START_HELP(x11)
 " command line arguments or a configuration file.  See the X(1) man page",
 " (or its equivalent) for a description of such options.",
 "",
+"=X resources",
 " A number of other `gnuplot` options are available for the `x11` terminal.",
 " These may be specified either as command-line options when `gnuplot` is",
 " invoked or as resources in the configuration file \".Xdefaults\".  They are",
@@ -2037,6 +2038,7 @@ START_HELP(x11)
 "?set term x11 x11_fonts",
 "?x11 x11_fonts",
 "?x11_fonts",
+"=fonts",
 " Upon initial startup, the default font is taken from the X11 resources",
 " as set in the system or user .Xdefaults file or on the command line.",
 "",
@@ -2147,6 +2149,7 @@ START_HELP(x11)
 #endif
 "%`-persist`@plot windows survive after main gnuplot program exits",
 "@end table",
+"=X resources",
 " The options are shown above in their command-line syntax.  When entered as",
 " resources in \".Xdefaults\", they require a different syntax.",
 "",
@@ -2177,6 +2180,7 @@ START_HELP(x11)
 "?set term x11 monochrome_options",
 "?x11 monochrome_options",
 "?monochrome_options",
+"=X resources",
 " For monochrome displays, `gnuplot` does not honor foreground or background",
 " colors.  The default is black-on-white.  `-rv` or `gnuplot*reverseVideo: on`",
 " requests white-on-black.",
@@ -2187,6 +2191,7 @@ START_HELP(x11)
 "?set term x11 color_resources",
 "?x11 color_resources",
 "?color_resources",
+"=X resources",
 " For color displays, `gnuplot` honors the following resources (shown here",
 " with their default values) or the greyscale resources.  The values may be",
 " color names as listed in the X11 rgb.txt file on your system, hexadecimal",
@@ -2253,6 +2258,7 @@ START_HELP(x11)
 "?set term x11 grayscale_resources",
 "?x11 grayscale_resources",
 "?grayscale_resources",
+"=X resources",
 " When `-gray` is selected, `gnuplot` honors the following resources for",
 " grayscale or color displays (shown here with their default values).  Note",
 " that the default background is black.",
@@ -2303,6 +2309,7 @@ START_HELP(x11)
 "?set term x11 line_resources",
 "?x11 line_resources",
 "?line_resources",
+"=X resources",
 " `gnuplot` honors the following resources for setting the width (in pixels) of",
 " plot lines (shown here with their default values.)  0 or 1 means a minimal",
 " width line of 1 pixel width.  A value of 2 or 3 may improve the appearance of",
@@ -2395,6 +2402,7 @@ START_HELP(x11)
 "?x11 pm3d_resources",
 "?pm3d_resources",
 "?x11 pm3d",
+"=X resources",
 " Choosing the appropriate visual class and number of colors is a crucial",
 " point in X11 applications and a bit awkward, since X11 supports six visual",
 " types in different depths.",
@@ -2456,6 +2464,7 @@ START_HELP(x11)
 "?set terminal x11 other_resources",
 "?set term x11 other_resources",
 "?x11 other_resources",
+"=X resources",
 " By default the contents of the current plot window are exported to the X11",
 " clipboard in response to X events in the window. Setting the resource",
 " 'gnuplot*exportselection' to 'off' or 'false' will disable this.",
