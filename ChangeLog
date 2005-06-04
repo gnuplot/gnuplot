@@ -1,3 +1,12 @@
+2005-06-04  Juergen Wieferink <wieferink@freenet.de>
+
+	* src/parse.c eval.c eval.h internal.c command.c set.c:
+	Code clean up: replace explicit test-and-free of string values with a
+	call to gpfree_string().
+
+	* src/datafile.c (df_open): Clean up parsing of data file name,
+	using generic functions try_to_get_string() and gpfree_string().
+
 2005-06-04  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/eval.c src/eval.h src/show.c src/setshow.h: Move the routine

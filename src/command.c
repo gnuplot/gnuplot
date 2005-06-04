@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.117 2005/06/02 17:18:44 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.118 2005/06/05 04:55:15 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -516,7 +516,7 @@ define()
 	(void) const_express(&result);
 #ifdef GP_STRING_VARS
 	/* Prevents memory leak if the variable name is re-used */
-	if (udv->udv_value.type == STRING)
+	if (!udv->udv_undef)
 	    gpfree_string(&udv->udv_value);
 #endif
 	udv->udv_value = result;

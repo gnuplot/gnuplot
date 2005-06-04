@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: eval.c,v 1.26 2005/06/02 17:18:45 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: eval.c,v 1.27 2005/06/05 04:55:15 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - eval.c */
@@ -378,6 +378,7 @@ Gstring(struct value *a, char *s)
     a->v.string_val = s;
     return (a);
 }
+#endif
 
 /* It is always safe to call gpfree_string with a->type is INTGR or CMPLX.
  * However it would be fatal to call it with a->type = STRING if a->string_val
@@ -387,14 +388,15 @@ Gstring(struct value *a, char *s)
 struct value *
 gpfree_string(struct value *a)
 {
+#ifdef GP_STRING_VARS
     if (a->type == STRING) {
 	free(a->v.string_val);
 	/* I would have set it to INVALID if such a type existed */
 	a->type = INTGR;
     }
+#endif
     return a;
 }
-#endif
 
 /* some machines have trouble with exp(-x) for large x
  * if E_MINEXP is defined at compile time, use gp_exp(x) instead,
@@ -460,7 +462,7 @@ pop_or_convert_from_string(struct value *v)
     (void) pop(v);
     if (v->type == STRING && !STRING_RESULT_ONLY) {
 	double d = atof(v->v.string_val);
-	free(v->v.string_val);
+	gpfree_string(v);
 	Gcomplex(v, d, 0.);
 	FPRINTF((stderr,"converted string to CMPLX value %g\n",real(v)));
     }

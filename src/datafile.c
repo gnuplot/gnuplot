@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.76 2005/05/05 14:25:41 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.77 2005/05/19 20:31:38 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -1017,6 +1017,7 @@ df_open(int max_using)
 {
     /* now allocated dynamically */
     int name_token = 0;
+    char *cmd_filename;
 
     TBOOLEAN duplication = FALSE;
     TBOOLEAN set_index = FALSE, set_every = FALSE, set_thru = FALSE;
@@ -1075,34 +1076,16 @@ df_open(int max_using)
 
     name_token = c_token;
 
-#ifdef GP_STRING_VARS
-    if (isstring(c_token) || isstringvar(c_token)) {
-	struct value a;
-	const_express(&a);
-	/* empty name means re-use last one */
-	if (!a.v.string_val || !a.v.string_val[0]) {
-	    if (!df_filename || !*df_filename)
-		int_error(c_token, "No previous filename");
-	    free(a.v.string_val);
-	} else {
-	    if (df_filename)
-		free(df_filename);
-	    df_filename = a.v.string_val;
-	}
-    } else
-	int_error(c_token,"missing filename");
-#else
-    /* empty name means re-use last one */
-    if (isstring(c_token) && token_len(c_token) == 2) {
+    cmd_filename = try_to_get_string();
+    if (!cmd_filename)
+	int_error(name_token, "missing filename");
+    if (!cmd_filename[0]) {
 	if (!df_filename || !*df_filename)
 	    int_error(c_token, "No previous filename");
     } else {
-	df_filename = gp_realloc(df_filename, token_len(c_token),
-				 "datafile name");
-	quote_str(df_filename, c_token, token_len(c_token));
+	free(df_filename);
+	df_filename = cmd_filename;
     }
-    c_token++;
-#endif
 
     /* defer opening until we have parsed the modifiers... */
 
@@ -1897,12 +1880,12 @@ df_readline(double v[], int max)
 			*s = '"';
 			strcpy(s+1, a.v.string_val);
 			strcat(s, "\"");
-			free(a.v.string_val);
 			free(df_stringexpression[output]);
 			df_tokens[output] = df_stringexpression[output] = s;
 		    } else
 #endif
 		    v[output] = real(&a);
+		    gpfree_string(&a);
 		} else if (column == -2) {
 		    v[output] = df_current_index;
 		} else if (column == -1) {

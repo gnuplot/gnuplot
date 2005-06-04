@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: internal.c,v 1.25 2005/06/02 17:18:45 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: internal.c,v 1.26 2005/06/05 04:55:15 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - internal.c */
@@ -1033,8 +1033,8 @@ f_eqs(union argument *arg)
 	int_error(NO_CARET, "internal error : STRING operator applied to non-STRING type");
 
     (void) Ginteger(&result, !strcmp(a.v.string_val, b.v.string_val));
-    free(a.v.string_val);
-    free(b.v.string_val);
+    gpfree_string(&a);
+    gpfree_string(&b);
     push(&result);
 }
 
@@ -1051,8 +1051,8 @@ f_nes(union argument *arg)
 	int_error(NO_CARET, "internal error : STRING operator applied to non-STRING type");
 
     (void) Ginteger(&result, (int)(strcmp(a.v.string_val, b.v.string_val)!=0));
-    free(a.v.string_val);
-    free(b.v.string_val);
+    gpfree_string(&a);
+    gpfree_string(&b);
     push(&result);
 }
 

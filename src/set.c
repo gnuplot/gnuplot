@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.180 2005/05/18 19:56:45 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.181 2005/05/19 20:31:40 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -1700,9 +1700,9 @@ set_label()
 	int save_token = c_token;
 	const_express(&a);
 	if (a.type == STRING) {
-	    free(a.v.string_val);
 	    c_token = save_token;
 	    tag = assign_label_tag();
+	    gpfree_string(&a);
 	} else
 	    tag = (int) real(&a);
 #else
@@ -3816,7 +3816,7 @@ set_xyzlabel(label_struct *label)
 	STRING_RESULT_ONLY = FALSE;
 	if (a.type == STRING) {
 	    strncpy(label->text, a.v.string_val, MAX_LINE_LEN);
-	    free(a.v.string_val);
+	    gpfree_string(&a);
 	} else
 	    int_warn(NO_CARET,"String parsing error");
     }
