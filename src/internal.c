@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: internal.c,v 1.24 2005/03/06 02:20:21 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: internal.c,v 1.25 2005/06/02 17:18:45 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - internal.c */
@@ -1087,7 +1087,7 @@ f_sprintf(union argument *arg)
 #ifdef DEBUG
     fprintf(stderr,"----------\nGot %d args for sprintf\n",nargs);
     for (i=0; i<nargs; i++) {
-	disp_value(stderr, &(a[i]));
+	disp_value(stderr, &(a[i]), TRUE);
 	fprintf(stderr,"   ");
     } fprintf(stderr,"\n----------\n");
 #endif
@@ -1213,9 +1213,9 @@ f_gprintf(union argument *arg)
 
 #ifdef DEBUG
     fprintf(stderr,"----------\nGot gprintf parameters\nfmt: ");
-	disp_value(stderr, &fmt);
+	disp_value(stderr, &fmt, TRUE);
     fprintf(stderr,"\nval: ");
-	disp_value(stderr, &val);
+	disp_value(stderr, &val, TRUE);
     fprintf(stderr,"\n----------\n");
 #endif
 

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: eval.c,v 1.25 2005/03/06 02:20:21 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: eval.c,v 1.26 2005/06/02 17:18:45 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - eval.c */
@@ -53,7 +53,6 @@ static char *RCSid() { return RCSid("$Id: eval.c,v 1.25 2005/03/06 02:20:21 sfea
 #include <setjmp.h>
 
 /* Internal prototypes */
-static char *num_to_str __PROTO((double r));
 static RETSIGTYPE fpe __PROTO((int an_int));
 #ifdef APOLLO
 static pfm_$fh_func_val_t apollo_sigfpe(pfm_$fault_rec_t & fault_rec)
@@ -256,62 +255,11 @@ apollo_pfm_catch()
 }
 #endif /* APOLLO */
 
-/* Helper for disp_value(): display a single number in decimal
- * format. Rotates through 4 buffers 's[j]', and returns pointers to
- * them, to avoid execution ordering problems if this function is
- * called more than once between sequence points. */
-static char *
-num_to_str(double r)
-{
-    static int i = 0;
-    static char s[4][25];
-    int j = i++;
-
-    if (i > 3)
-	i = 0;
-
-    sprintf(s[j], "%.15g", r);
-    if (strchr(s[j], '.') == NULL &&
-	strchr(s[j], 'e') == NULL &&
-	strchr(s[j], 'E') == NULL)
-	strcat(s[j], ".0");
-
-    return s[j];
-}
-
 /* Exported functions */
 
 /* First, some functions tha help other modules use 'struct value' ---
  * these might justify a separate module, but I'll stick with this,
  * for now */
-
-/* Display a value in human-readable form. */
-void
-disp_value(FILE *fp, struct value *val)
-{
-    switch (val->type) {
-    case INTGR:
-	fprintf(fp, "%d", val->v.int_val);
-	break;
-    case CMPLX:
-	if (val->v.cmplx_val.imag != 0.0)
-	    fprintf(fp, "{%s, %s}",
-		    num_to_str(val->v.cmplx_val.real),
-		    num_to_str(val->v.cmplx_val.imag));
-	else
-	    fprintf(fp, "%s",
-		    num_to_str(val->v.cmplx_val.real));
-	break;
-#ifdef GP_STRING_VARS
-    case STRING:
-    	if (val->v.string_val)
-	    fprintf(fp, "%s", val->v.string_val);
-	break;
-#endif
-    default:
-	int_error(NO_CARET, "unknown type in disp_value()");
-    }
-}
 
 /* returns the real part of val */
 double

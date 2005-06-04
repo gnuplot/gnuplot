@@ -1,3 +1,22 @@
+2005-06-04  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/eval.c src/eval.h src/show.c src/setshow.h: Move the routine
+	disp_value() and its helper num_to_str() from eval.c to show.c. This
+	reduces the need for mutual cross-referenced #includes, and anyway the
+	routine belongs in either show.c or save.c because that's what it does.
+
+2005-06-04  Juergen Wieferink <wieferink@freenet.de>
+
+	* src/show.c (disp_value) src/setshow.h: Introduce an additional
+	parameter to disp_value() that controls whether or not quotes are
+	printed around strings on output.  This allows simplification of the
+	code at all call sites.
+
+	* src/command.c (print_command) src/internal.c (DEBUG code only)
+	save.c (save_variables__sum) show.c (disp_at show_variables):
+	Modify call sites of disp_value() to explicitly request quoted strings
+	if necessary.
+
 2005-06-02  Ethan Merritt  <merritt@u.washington.edu>
 
 	* docs/README docs/titlepag.tex docs/doc2tex.c docs/doc2texi.el:

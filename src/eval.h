@@ -1,5 +1,5 @@
 /*
- * $Id: eval.h,v 1.15 2005/03/06 02:20:21 sfeam Exp $
+ * $Id: eval.h,v 1.16 2005/06/02 17:18:45 sfeam Exp $
  */
 
 /* GNUPLOT - eval.h */
@@ -138,7 +138,6 @@ extern TBOOLEAN STRING_RESULT_ONLY;
 double gp_exp __PROTO((double x));
 
 /* HBB 20010726: Moved these here, from util.h. */
-void disp_value __PROTO((FILE *, struct value *));
 double real __PROTO((struct value *));
 double imag __PROTO((struct value *));
 double magnitude __PROTO((struct value *));

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.153 2005/04/18 19:48:08 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.154 2005/05/19 20:31:40 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -169,6 +169,8 @@ static void show_arrow __PROTO((int tag));
 static void show_ticdef __PROTO((AXIS_INDEX));
 static void show_position __PROTO((struct position * pos));
 static void show_functions __PROTO((void));
+
+static char *num_to_str __PROTO((double r));
 
 static int var_show_all = 0;
 
@@ -698,7 +700,7 @@ disp_at(struct at_type *curr_at, int level)
 	    break;
 	case PUSHC:
 	    (void) putc(' ', stderr);
-	    disp_value(stderr, &(arg->v_arg));
+	    disp_value(stderr, &(arg->v_arg), TRUE);
 	    (void) putc('\n', stderr);
 	    break;
 	case PUSHD1:
@@ -2778,7 +2780,7 @@ show_variables()
 	} else {
 	    fprintf(stderr, "\t%-*s ", len, udv->udv_name);
 	    fputs("= ", stderr);
-	    disp_value(stderr, &(udv->udv_value));
+	    disp_value(stderr, &(udv->udv_value), TRUE);
 	    (void) putc('\n', stderr);
 	}
 	udv = udv->next_udv;
@@ -2954,6 +2956,61 @@ show_ticdef(AXIS_INDEX axis)
     if (axis_array[axis].ticdef.font && *axis_array[axis].ticdef.font) {
         fprintf(stderr,"\t  font \"%s\"\n", axis_array[axis].ticdef.font);
     }
+}
+
+/* Display a value in human-readable form. */
+void
+disp_value(FILE *fp, struct value *val, TBOOLEAN need_quotes)
+{
+    switch (val->type) {
+    case INTGR:
+	fprintf(fp, "%d", val->v.int_val);
+	break;
+    case CMPLX:
+	if (val->v.cmplx_val.imag != 0.0)
+	    fprintf(fp, "{%s, %s}",
+		    num_to_str(val->v.cmplx_val.real),
+		    num_to_str(val->v.cmplx_val.imag));
+	else
+	    fprintf(fp, "%s",
+		    num_to_str(val->v.cmplx_val.real));
+	break;
+#ifdef GP_STRING_VARS
+    case STRING:
+    	if (val->v.string_val) {
+	    if (need_quotes)
+		fprintf(fp, "\"%s\"", conv_text(val->v.string_val));
+	    else
+		fprintf(fp, "%s", val->v.string_val);
+	}
+	break;
+#endif
+    default:
+	int_error(NO_CARET, "unknown type in disp_value()");
+    }
+}
+
+/* Helper for disp_value(): display a single number in decimal
+ * format. Rotates through 4 buffers 's[j]', and returns pointers to
+ * them, to avoid execution ordering problems if this function is
+ * called more than once between sequence points. */
+static char *
+num_to_str(double r)
+{
+    static int i = 0;
+    static char s[4][25];
+    int j = i++;
+
+    if (i > 3)
+	i = 0;
+
+    sprintf(s[j], "%.15g", r);
+    if (strchr(s[j], '.') == NULL &&
+	strchr(s[j], 'e') == NULL &&
+	strchr(s[j], 'E') == NULL)
+	strcat(s[j], ".0");
+
+    return s[j];
 }
 
 

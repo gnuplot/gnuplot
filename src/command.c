@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.116 2005/05/20 13:47:47 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.117 2005/06/02 17:18:44 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -1177,7 +1177,7 @@ print_command()
 	    if (need_space)
 		putc(' ', print_out);
 	    need_space = 1;
-	    disp_value(print_out, &a);
+	    disp_value(print_out, &a, FALSE);
 	}
     } while (!END_OF_COMMAND && equals(c_token, ","));
 
