@@ -1,3 +1,9 @@
+2005-06-13  Frank Maas / Ethan Merritt
+
+	* docs/gnuplot.doc: Clarify histogram documentation to explain that
+	histograms always use x1 axis coordinates, but other plot elements on
+	the same plot may freely use either x1 or x2.
+
 2005-06-13  KITA Toshihiro <t-kita@cc.kumamoto-u.ac.jp>
 
 	* docs/gnuplot.doc: Update `set xlabel` example to use the `offset`

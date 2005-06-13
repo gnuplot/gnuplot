@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.296 2005/06/03 05:11:55 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.297 2005/06/13 19:13:27 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -8250,6 +8250,10 @@ C ... and restart the table:
 
  Box widths may be modified using the `set boxwidth` command.
  Box fill styles may be set using the `set style fill` command.
+
+ Histograms always use the x1 axis, but may use either y1 or y2.
+ If a plot contains both histograms and other plot styles, the non-histogram
+ plot elements may use either the x1 or the x2 axis.
 
  Examples:
 
