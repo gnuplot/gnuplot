@@ -1,3 +1,8 @@
+2005-06-13  KITA Toshihiro <t-kita@cc.kumamoto-u.ac.jp>
+
+	* docs/gnuplot.doc: Update `set xlabel` example to use the `offset`
+	keyword.
+
 2005-06-04  Juergen Wieferink <wieferink@freenet.de>
 
 	* src/parse.c eval.c eval.h internal.c command.c set.c:

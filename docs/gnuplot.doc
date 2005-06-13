@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.295 2005/06/02 06:08:29 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.296 2005/06/03 05:11:55 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -9144,7 +9144,7 @@ C ... and restart the table:
  <offset> is specified by either x,y or x,y,z, and may be preceded by
  `first`, `second`, `graph`, `screen`, or `character` to select the
  coordinate system.  See `coordinates` for details.  By default, the
- `character` coordinate system is used.  For example, "`set xlabel -1,0`"
+ `character` coordinate system is used.  For example, "`set xlabel offset -1,0`"
  will change only the x offset of the title, moving the label roughly one
  character width to the left.  The size of a character depends on both the
  font and the terminal.
