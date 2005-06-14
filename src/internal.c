@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: internal.c,v 1.26 2005/06/05 04:55:15 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: internal.c,v 1.27 2005/06/05 06:17:14 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - internal.c */
@@ -1054,6 +1054,53 @@ f_nes(union argument *arg)
     gpfree_string(&a);
     gpfree_string(&b);
     push(&result);
+}
+
+void
+f_strlen(union argument *arg)
+{
+    struct value a, result;
+
+    (void) arg;
+    (void) pop(&a);
+
+    if (a.type != STRING)
+	int_error(NO_CARET, "internal error : strlen of non-STRING argument");
+
+    (void) Ginteger(&result, (int)strlen(a.v.string_val));
+    gpfree_string(&a);
+    push(&result);
+}
+
+void
+f_range(union argument *arg)
+{
+    struct value beg, end, full;
+    struct value substr = {0};
+
+    (void) arg;			/* avoid -Wunused warning */
+    (void) pop(&end);
+    (void) pop(&beg);
+    (void) pop(&full);
+
+    if (end.type != INTGR || beg.type != INTGR)
+	int_error(NO_CARET, "internal error: substring range specifiers must have integer values");
+
+    if (full.type != STRING)
+	int_error(NO_CARET, "internal error: substring range operator applied to non-STRING type");
+
+    FPRINTF(("f_range( \"%s\", %d, %d)\n", full.v.string_val, beg.v.int_val, end.v.int_val));
+
+    if (end.v.int_val > strlen(full.v.string_val)-1)
+	end.v.int_val = strlen(full.v.string_val)-1;
+    if (beg.v.int_val < 0)
+	beg.v.int_val = 0;
+    if (beg.v.int_val > end.v.int_val)
+	beg.v.int_val = strlen(full.v.string_val);
+
+    full.v.string_val[end.v.int_val+1] = '\0';
+    push(Gstring(&substr, &full.v.string_val[beg.v.int_val]));
+    gpfree_string(&full);
 }
 
 

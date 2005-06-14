@@ -1,3 +1,25 @@
+2005-06-14  Ethan Merritt  <merritt@u.washington.edu>
+
+	New functions related to string variables:
+	 sub = "ABCDEF"[beg:end]
+	 sub = substring("ABCDEF",beg,end)
+	 len = strlen("ABCDEF")
+
+	* src/parse.c (parse_primary_expression): Check for a postfixed
+	range specifier at the end of parsing an expression.
+
+	* src/internal.c (f_range) src/internal.h: New internal function
+	f_range() that applies a range specifier to a string in order to
+	extract a substring.  Used both by substring() and by [*:*]
+
+	* src/eval.c src/eval.h: Define an index code for the internal
+	function f_range().  Make it accessible also as a function
+	substring("string",beg,end). Also define a function strlen("string").
+
+	* demo/stringvar.dem demo/all.dem docs/gnuplot.doc:
+	Document and provide examples of substring syntax.
+	Add string variable demo to all.dem
+
 2005-06-13  Frank Maas / Ethan Merritt
 
 	* docs/gnuplot.doc: Clarify histogram documentation to explain that

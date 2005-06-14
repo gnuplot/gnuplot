@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.297 2005/06/13 19:13:27 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.298 2005/06/13 19:20:58 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -695,6 +695,12 @@ C
  complex value, is promoted to a string if used in string concatenation.
  A typical case is the use of integers to construct file names or other strings;
  e.g. ("file" . 4 eq "file4") is true.
+
+ Substrings can be specified using a postfixed range descriptor [beg:end].
+ For example, "ABCDEF"[2:3] == "CD"   and   "ABCDEF"[3:*] == "DEF"
+ The syntax "string"[beg:end] is exactly equivalent to calling the built-in
+ string-valued function substring("string",beg,end), except that you cannot
+ omit either beg or end from the function call.
 3 Functions
 ?expressions functions
 ?functions
@@ -1090,6 +1096,23 @@ C
  use gnuplot's own format specifiers, you must instead call `gprintf()`.
  For information on sprintf format specifiers, please see standard C-language
  documentation or the unix sprintf man page.
+4 strlen
+?expressions functions strlen
+?functions strlen
+?strlen
+#strlen("string") & string & int length of string \\
+%strlen("string")@string@int length of string
+ `strlen("string")` returns the number of characters in the string.
+4 substring
+?expressions functions substring
+?functions substring
+?substring
+#substring("string",beg,end) & multiple & string "string"[beg:end] \\
+%substring("string",beg,end)@multiple@string "string"[beg:end]
+ `substring("string",beg,end)` returns the substring consisting of characters
+ beg through end of the original string. This is exactly equivalent to the
+ expressiong "string"[beg:end] except that you do not have the option of
+ ommitting beg or end.
 @end table
 
 @start table
@@ -1847,6 +1870,16 @@ C ... and restart the table:
       if ("A"."B" eq "AB") print "TRUE"
 
  See also the two string formatting functions `gprintf` and `sprintf`.
+
+=substring
+ Substrings can be specified by appending a range specifier to any string,
+ string variable, or string-valued function.  The range specifier has the
+ form [begin:end], where begin is the index of the first character of the
+ substring and end is the index of the last character of the substring.
+ These follow C-language indexing conventions; the first character has index 0.
+ The begin or end fields may be empty, or contain '*', to indicate the true
+ start or end of the original string.  E.g.  str[:] and str[*:*] both describe
+ the full string str.
 2 Substitution and Command line macros
 ?substitution
  When a command line to gnuplot is first read, i.e. before it is interpreted

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: parse.c,v 1.33 2005/03/06 02:20:21 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: parse.c,v 1.34 2005/06/05 06:17:14 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - parse.c */
@@ -420,6 +420,38 @@ parse_primary_expression()
 	parse_unary_expression();
 	(void) add_action(POWER);
     }
+#ifdef GP_STRING_VARS
+    /* Parse and add actions for range specifier applying to previous entity.
+     * Currently only used to generate substrings, but could also be used to
+     * extract vector slices.
+     */
+    if (equals(c_token, "[")) {
+	/* handle '*' or empty start of range */
+	if (equals(++c_token,"*") || equals(c_token,":")) {
+	    union argument *empty = add_action(PUSHC);
+	    empty->v_arg.type = INTGR;
+	    empty->v_arg.v.int_val = 0;
+	    if (equals(c_token,"*"))
+		c_token++;
+	} else
+	    parse_expression();
+	if (!equals(c_token, ":"))
+	    int_error(c_token, "':' expected");
+	/* handle '*' or empty end of range */
+	if (equals(++c_token,"*") || equals(c_token,"]")) {
+	    union argument *empty = add_action(PUSHC);
+	    empty->v_arg.type = INTGR;
+	    empty->v_arg.v.int_val = 65535; /* should be MAXINT */
+	    if (equals(c_token,"*"))
+		c_token++;
+	} else
+	    parse_expression();
+	if (!equals(c_token, "]"))
+	    int_error(c_token, "']' expected");
+	c_token++;
+	(void) add_action(RANGE);
+    }
+#endif
 }
 
 
