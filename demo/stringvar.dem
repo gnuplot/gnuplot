@@ -1,0 +1,52 @@
+#
+# Miscellaneous neat things you can do using the string variables code
+#
+print "Exercise substring handling"
+beg = 1
+end = 3
+print "beg = ",beg," end = ",end
+foo = "ABCDEF"
+print "foo          = ",foo
+print "foo[2:4]     = ",foo[2:4]
+print "foo[0:0]     = ",foo[0:0]
+print "foo[4:2]     = ",foo[4:2]
+print "foo[beg:end] = ",foo[beg:end]
+print "foo[end:beg] = ",foo[end:beg]
+print "foo[4:]      = ",foo[4:]
+print "foo[4:*]     = ",foo[4:*]
+print "foo[:]       = ",foo[:]
+print "foo[*:*]     = ",foo[*:*]
+print "strlen(foo)  = ",strlen(foo)
+#
+pause -1 "Hit return to continue"
+#
+set xrange [300:400]
+set title "String-valued expression in using spec"
+plot 'silver.dat' using 1:2 with linespoints notitle, \
+     '' using 1:2:(sprintf("[%.0f,%.0f]",$1,$2)) with labels
+#
+pause -1 "Hit return to continue"
+#
+set xrange [0:1]
+set yrange [0:1]
+set title "Constant string expressions as plot symbols"
+set xrange [250:500]
+set auto y
+set style data lines
+plot 'silver.dat' u 1:2:($3+$1/50.) w filledcurves above title 'Above', \
+     '' u 1:2:($3+$1/50.) w filledcurves below title 'Below', \
+     '' u 1:2 lt -1 lw 0 notitle, \
+     '' u 1:($3+$1/50.) lt 3 lw 0 notitle, \
+     '' using 1:2:( ($2>($3+$1/50.)) ? "Up" : "Dn" ) with labels \
+        title 'plot <foo> using 1:2:( ($3>$2) ? "Up" : "Dn" ) with labels'
+#
+pause -1 "Hit return to continue"
+#
+plot 'silver.dat' \
+        u 1:2 lt -1 lw 0 notitle, \
+     '' u 1:($3+$1/50.) lt 3 lw 0 notitle, \
+     '' using 1:2:( ($2>($3+$1/50.)) ? "J" : "D" ) with labels font "WingDings,28"\
+        title 'Same thing using character glyphs from WingDings font'
+#
+pause -1 "Hit return to continue"
+#
