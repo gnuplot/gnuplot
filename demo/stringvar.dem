@@ -1,7 +1,9 @@
 #
 # Miscellaneous neat things you can do using the string variables code
 #
+print ""
 print "Exercise substring handling"
+print ""
 beg = 1
 end = 3
 print "beg = ",beg," end = ",end
@@ -16,7 +18,12 @@ print "foo[4:]      = ",foo[4:]
 print "foo[4:*]     = ",foo[4:*]
 print "foo[:]       = ",foo[:]
 print "foo[*:*]     = ",foo[*:*]
+print ""
+print "Exercise string handling functions"
+print ""
 print "strlen(foo)  = ",strlen(foo)
+print "substr(foo,2,3) = ",substr(foo,2,3)
+print ""
 #
 pause -1 "Hit return to continue"
 #

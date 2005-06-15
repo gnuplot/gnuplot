@@ -1,3 +1,8 @@
+2005-06-15  Ethan Merritt  <merritt@u.washington.edu>
+
+	* demo/stringvar.dem docs/gnuplot.doc src/eval.c: Rename substring
+	built-in function to substr(string,beg,end).
+
 2005-01-15  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* term/pm.trm src/os2/gclient.c src/os/pm_msgs.h: Move definition of

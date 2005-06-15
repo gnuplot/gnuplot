@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.298 2005/06/13 19:20:58 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.299 2005/06/14 19:13:44 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -699,7 +699,7 @@ C
  Substrings can be specified using a postfixed range descriptor [beg:end].
  For example, "ABCDEF"[2:3] == "CD"   and   "ABCDEF"[3:*] == "DEF"
  The syntax "string"[beg:end] is exactly equivalent to calling the built-in
- string-valued function substring("string",beg,end), except that you cannot
+ string-valued function substr("string",beg,end), except that you cannot
  omit either beg or end from the function call.
 3 Functions
 ?expressions functions
@@ -1103,13 +1103,14 @@ C
 #strlen("string") & string & int length of string \\
 %strlen("string")@string@int length of string
  `strlen("string")` returns the number of characters in the string.
-4 substring
-?expressions functions substring
-?functions substring
-?substring
-#substring("string",beg,end) & multiple & string "string"[beg:end] \\
-%substring("string",beg,end)@multiple@string "string"[beg:end]
- `substring("string",beg,end)` returns the substring consisting of characters
+4 substr
+?expressions functions substr
+?functions substr
+?substr
+=substring
+#substr("string",beg,end) & multiple & string "string"[beg:end] \\
+%substr("string",beg,end)@multiple@string "string"[beg:end]
+ `substr("string",beg,end)` returns the substring consisting of characters
  beg through end of the original string. This is exactly equivalent to the
  expressiong "string"[beg:end] except that you do not have the option of
  ommitting beg or end.
