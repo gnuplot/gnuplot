@@ -26,12 +26,12 @@
 	histograms always use x1 axis coordinates, but other plot elements on
 	the same plot may freely use either x1 or x2.
 
-2005-06-13  KITA Toshihiro <t-kita@cc.kumamoto-u.ac.jp>
+2005-06-13  KITA Toshihiro  <t-kita@cc.kumamoto-u.ac.jp>
 
 	* docs/gnuplot.doc: Update `set xlabel` example to use the `offset`
 	keyword.
 
-2005-06-04  Juergen Wieferink <wieferink@freenet.de>
+2005-06-04  Juergen Wieferink  <wieferink@freenet.de>
 
 	* src/parse.c eval.c eval.h internal.c command.c set.c:
 	Code clean up: replace explicit test-and-free of string values with a
@@ -47,7 +47,7 @@
 	reduces the need for mutual cross-referenced #includes, and anyway the
 	routine belongs in either show.c or save.c because that's what it does.
 
-2005-06-04  Juergen Wieferink <wieferink@freenet.de>
+2005-06-04  Juergen Wieferink  <wieferink@freenet.de>
 
 	* src/show.c (disp_value) src/setshow.h: Introduce an additional
 	parameter to disp_value() that controls whether or not quotes are
@@ -82,7 +82,7 @@
 	* docs/Makefile.in: Switch generation of html documentation to use
 	latex2html toolchain rather than going via gnuplot.texi
 
-2005-06-02  Juergen Wieferink <wieferink@freenet.de>
+2005-06-02  Juergen Wieferink  <wieferink@freenet.de>
 
 	* src/eval.c (Gstring gpfree_string) src/eval.h: Separate the freeing
 	of an old string variable from the creation of a new one. New function
@@ -110,7 +110,7 @@
 	(main) [USE_X11_MULTIBYTE]: Reset LC_NUMERIC locale to "C", after
 	all others have been set to the user's selection for purposes of
 	multi-byte font support.
-	
+
 2005-05-25  Daniel Sebald  <daniel.sebald@ieee.org>
 
 	SF Patch [ 1117060 ] Mod to post.trm for PostScript Level 1 images.
@@ -180,10 +180,10 @@
 	Identical to 'set style histogram clustered' except that a second
 	column of input data (required) is used to generate error bars at the
 	top of each box belonging to the histogram.
-	
+
 	* docs/gnuplot.doc: Document the addition of a new histogram
 	plot mode and associated options for 'set bars'.
-	
+
 2005-05-18  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/set.c (set_allzeroaxis): Fix parsing error (bug #1204444).
@@ -308,7 +308,7 @@
 
 	* config/config.wc: New file.  Promised long ago, when I added
 	makefile.wc, finally got round to doing it.
-	
+
 	* config/config.oww, config/makefile.oww: Rewrite for more
 	features and more Watcom-like usage of tools.
 
@@ -378,7 +378,7 @@
 
 	* src/win/pgnuplot.c (_setmode) [__WATCOMC__]: Added name override
 	to setmode.
-	
+
 	* src/term.c [__WATCOMC__]: Added #include <io.h>.
 
 	* src/syscfg.h [__WATCOMC__]: Added #include <dos.h>.
@@ -437,7 +437,7 @@
 
 	* term/fig.trm (FIG_set_color): Support for "textcolor lt".
 
-2005-04-16  Juergen Wieferink <wieferink@freenet.de>
+2005-04-16  Juergen Wieferink  <wieferink@freenet.de>
 
 	* term/pslatex.trm: Clean up macro definitions written to
 	output file of 'set term epslatex'. 
@@ -500,7 +500,7 @@
 
 	* docs/gnuplot.doc: Remove blanks from whitespace-only lines.
 
-2005-04-01  Juergen Wieferink <wieferink@freenet.de>
+2005-04-01  Juergen Wieferink  <wieferink@freenet.de>
 
 	* docs/doc2tex.c: Handle levels 5 and 6 of documentation text as
 	paragraph and subparagraph, respectively.
@@ -571,7 +571,7 @@
 
 	* src/gpexecute.c (gp_exec_event) src/gpexecute.h:
 	New parameter holds ID of window from which this event was triggered.
-	
+
 	* src/gplt_x11.c (process_event): Pass ID of originating window to
 	gp_exec_event() along with the x,y coordinates and keystroke.
 	Distinguish between active and inactive window by using event code
@@ -599,7 +599,7 @@
 2005-03-26  Ethan Merritt  <merritt@u.washington.edu>
 
 	SourceForge patch #1120626 (contributed by Frank Maas).
-	
+
 	* src/plot2d.c (histogram_range_fiddling): When processing
 	histograms, allow auto-scaling of either end of the X-range
 	individually.
@@ -712,7 +712,7 @@
 	'set view map' reversed ranges, by using new axis.h macros.
 	(two_edge3d_intersect): Use new macro IN_AXIS_RANGE, reindent, for
 	readability.
-	
+
 2005-03-15  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/pm3d.c (set_plot_with_palette): Fix displaying colorbox also for
@@ -910,7 +910,7 @@
 
 	* term/post.trm: Patch #1122014 "Improve dashed linetypes in Postscript
 	terminals".
-	
+
 2005-02-16  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/pdf.trm: Correct the driver docs to say font limitations
@@ -971,7 +971,7 @@
 	* configure.in: New configuration option --enable-x11-mbfonts
 	(enabled by default).  Interpretation of character encodings
 	is determined at run time by the LC_CTYPE locale setting.
-	
+
 	* src/gplt_x11.c: All calls to x11 font handling routines are
 	conditionally substituted by the equivalent calls to multi-byte
 	routines if --enable-x11-mbfonts is configured, and a multi-byte
@@ -1144,7 +1144,7 @@
 2005-01-11  Harald Harders  <h.harders@tu-bs.de>
 
 	Apply updated SourceForge patch #1023783
- 
+
 	* configure.in: Check for which libpdf version is present; check
 	whether <pwd.h> is present.
 
@@ -1261,7 +1261,7 @@
 
 	* src/os2/gclient.c src/os2/dialogs.c src/os2/print.c: Clean up by
 	removing some unused variables and code (some put into #if 0/#endif);
-	some minor  changes to  layout - this basically removes anoying warning
+	some minor changes to layout - this basically removes anoying warning
 	messages during compilation.
 
 2004-12-31  Ethan Merritt  <merritt@u.washington.edu>
@@ -1284,7 +1284,7 @@
 	call the new routine estimate_strlen(text) instead.  This allows more
 	accurate plot layout in enhanced text mode. The improvement is 
 	particularly noticible if the y-axis tic format uses enhanced text mode.
-	
+
 	* term/x11.trm (X11_options ENHX11_put_text): Try harder to determine
 	what the default fontsize is so that string lengths can be estimated.
 
@@ -1403,10 +1403,10 @@
 
 	* term/x11.trm (X11_make_palette): Free palette gradient after sending
 	it to gnuplot_x11.  Do other drivers have similar leaks?
-	
+
 	* src/set.c (set_cntrparam): Free old dynamic contour level array before
 	getting a new one.
-	
+
 	* src/set.c (set_xyzlabel): Free dynamic label string after copying it
 	to a static label structure.
 
@@ -1553,7 +1553,7 @@
 	to term->set_color(struct t_colorspec *colorspec).  This sets the stage
 	for allowing color specification mechanisms other than a PM3D palette.
 	The immediate intent is to allow direct requests for RGB color values.
-	
+
 	* term/*.trm: Convert all terminal types providing set_color() to the
 	new API. No change in terminal behavior or capabilities.
 	Terminals affected:
@@ -1832,7 +1832,7 @@
 	New routine pop_or_convert_from_string(), aliased to pop() during
 	numerical evaluation. Treat INTGR operand to f_concatenate as a
 	special case, promoting it to STRING.
-	
+
 	* src/parse.c (const_express):
 	Suppress possible autoconversion to a number if the caller specifically
 	expects a string value to be returned.
@@ -1865,7 +1865,7 @@
 	* src/internal.c src/internal.h src/eval.c src/eval.h src/parse.c
 	string operators (A . B) (A eq B) (A ne B) 
 	string functions sprintf() gprintf()
-	
+
 	* src/util.c (try_to_get_string) src/util.h: Modify the routine
 	try_to_get_string to accept string variables and functions. This one
 	place handles the syntax change for most gnuplot commands.
@@ -1883,7 +1883,7 @@
 	* src/plot3d.c: accept a string variable 'splot <foo>'
 
 	* src/set.c: accept a string variable in 'set label <foo>'
-	
+
 	* src/standard.c: int_error if a unary arithmetic operator is
 	applied to a string.
 
@@ -1917,9 +1917,9 @@
 	title, and labels can be moved by an offset given in 'character',
 	'screen', 'graph', 'first', or 'second' coordinate system.
 	SourceForge patch #993422.
-	
+
 	* docs/gnuplot.doc
-	
+
 	* src/axis.c (get_position get_position_default):
 	New routine that accepts a default coordinate type when parsing offsets.
 
@@ -1942,7 +1942,7 @@
 	The intended use is for setting label and text offsets in terms of 
 	character size, and generalizing this to all places where an offset is
 	legal.
-	
+
 	* NEWS docs/gnuplot.doc:
 	* src/axis.h src/axis.c (get_position_type) src/gadgets.h:
 	New coordinate system "character".
@@ -1962,12 +1962,12 @@
 	for an unrecognized font request, that fallback would become the default
 	font for all future requests.
 
-2004-10-19  Juergen Wieferink <wieferink@freenet.de>
+2004-10-19  Juergen Wieferink  <wieferink@freenet.de>
 
 	* src/set.c (parse_label_options): If the label has an associated point,
 	allow its type to be specified by "linestyle <n>".
 
-2004-10-19  Per Persson <persquare@mac.com>
+2004-10-19  Per Persson  <persquare@mac.com>
 
 	Adding enhanced text support to terminal aqua.
 
@@ -2028,7 +2028,7 @@
 	More stringent syntax test for bare numbers indicating line
 	type in backwards-compatibility mode.
 
-2004-10-17  Juergen Wieferink <wieferink@freenet.de>
+2004-10-17  Juergen Wieferink  <wieferink@freenet.de>
 
 	* src/scanner.c (scanner): Terminate scan properly if an empty
 	substitution occurs at the end of a line. bug #1045695 
@@ -2215,7 +2215,7 @@
 
 	* src/graph3d.c (plot_labels3d): Simplify place_labels3d by calling
 	a new shared routine.
-	
+
 	* src/gadgets.c (get_offsets write_label) src/gadgets.h:
 	New routine write_label that is shared by both the 2D and 3D code.
 
@@ -2360,7 +2360,7 @@
 	* src/plot3d.c (get_3ddata set_plot_with_palette) 
 	src/plot2d.h src/plot2d.c (store_label): Allow palette color options
 	for text in "{s}plot with labels textcolor palette ...".
-	
+
 	* src/set.c (parse_colorspec): If "tc palette" is specified with no
 	further suboptions, default to "tc palette z".
 
@@ -2874,7 +2874,7 @@
 
 	Bugfix: caret position of error messages in multiplot modes was
 	wrong.
-	
+
 	* src/util.c (current_prompt): New variable holding the currently
 	used prompt string.
 	(PRINT_SPACES_UNDER_PROMPT): Use current_prompt instead of global
@@ -2896,10 +2896,10 @@
 
 	Code style changes: get rid of register keywords. Don't put
 	parens around simple variables or term->element names.
-	
+
 	* src/graphics.c (boundary): If bmargin was set by user, key below
 	should not modify ybot.  Reindented.
-	
+
 	(key_cols): Made local to boundary(), the only function using it.
 
 2004-07-24  Ethan Merritt  <merritt@u.washington.edu>
@@ -3017,7 +3017,7 @@
 	* src/misc.c (recursivefullname): Added missing prototypes.
 	(arrow_use_properties): Made static. Moved prototype here, from
 	misc.h.
-	
+
 	* src/graphics.c (place_histogram_titles, style_from_fill): Made
 	static.
 
@@ -3043,7 +3043,7 @@
 	(draw_clip_line): Usage of suppressMove commented out.
 
 	* src.fit.c(log_axis_restriction): Added missing prototype.
-	
+
 	* src/datafile.c (df_no_tic_specsm, df_column,
 	df_parse_string_field): Made static.
 
@@ -3098,7 +3098,7 @@
 
 	Integrated SF patch #976546 by Stephane Barbaray, with some
 	additional changes by me.
-	
+
 	* term/emf.trm: Reindented.  Ancient hacks for NeXT and <assert.h>
 	purged.
 	(EMF_PX2HM): Changed to 26.37.
@@ -3291,7 +3291,7 @@
 	* INSTALL: removed pointless copy of startup banner screen.
 
 	* docs/gnuplot.texi: Regenerated.
-	
+
 	* term/post.trm (PS_linewidth_last): New variable.
 	(PS_graphics, PS_point, PS_fillbox): Initialize it.
 	(PS_linetype): Call PS_FLUSH_PATH here, too.
@@ -3401,7 +3401,7 @@
 	but treat it the same as DF_UNDEFINED.
 	* plot3d.c (get_3ddata): Explicitly test for data marked DF_MISSING 
 	but treat it the same as DF_UNDEFINED.
-	
+
 	These are trivial changes that do not affect the existing behavior of
 	gnuplot. However, the core routines in plot2d and plot3d now have the
 	information needed to treat missing data differently depending on the
@@ -3549,7 +3549,7 @@
 	* docs/doc2texi.el (d2t-handle-html): Handle anchor-only <a> tags
 	more sensibly: output them to the texinfo file as a @c comment.
 	Patch from Shigharu Takeno.
-	
+
 	* docs/gnuplot.texi: Regenerated.
 
 2004-05-19  Petr Mikulik  <mikulik@physics.muni.cz>
