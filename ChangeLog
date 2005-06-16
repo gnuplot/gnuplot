@@ -1,3 +1,7 @@
+2005-06-16  Harald Harders  <h.harders@tu-bs.de>
+
+	* docs/gnuplot.doc: Document `set style line <n> linecolor <colorspec>`
+
 2005-06-15  Ethan Merritt  <merritt@u.washington.edu>
 
 	* demo/stringvar.dem docs/gnuplot.doc src/eval.c: Rename substring

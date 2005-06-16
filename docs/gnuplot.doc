@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.299 2005/06/14 19:13:44 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.300 2005/06/16 04:19:45 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -7837,6 +7837,7 @@ C ... and restart the table:
 
  Syntax:
        set style line <index> {{linetype  | lt} <line_type> | <colorspec>}
+                              {{linecolor | lc} <colorspec>}
                               {{linewidth | lw} <line_width>}
                               {{pointtype | pt} <point_type>}
                               {{pointsize | ps} <point_size>}
@@ -7858,22 +7859,23 @@ C ... and restart the table:
  Not all terminals support the `linewidth` and `pointsize` features; if
  not supported, the option will be ignored.
 
- Note that this feature is not completely implemented; linestyles defined by
- this mechanism may be used with `plot`, `splot`, `replot`, and `set arrow`,
- but not by other commands that allow the default index to be used, such as
- `set grid`.
-
  If gnuplot was built with pm3d support, terminal-independent colors may be
- assigned using the <colorspec>.  This requires giving a RGB color triple,
- a known palette color name, a fractional index into the current palette, or
- a constant value from the current mapping of the palette onto cbrange.
+ assigned using either `linecolor <colorspec>` or `linetype <colorspec>`.
+ This requires giving a RGB color triple, a known palette color name,
+ a fractional index into the current palette, or a constant value from the
+ current mapping of the palette onto cbrange.
  See `colors`, `colorspec`, `set palette`, `colornames`, `cbrange`.
+
+ `set style line <n> linetype <lt>` will set both a terminal-dependent dot/dash
+ pattern and color. The commands`set style line <n> linecolor <colorspec>` or
+ `set style line <n> linetype <colorspec>` will set a new line color while
+ leaving the existing dot-dash pattern unchanged.
 
  In 3d mode (`splot` command), the special keyword `palette` is allowed as a
  shorthand for "linetype palette z".  The color value corresponds to the
  z-value (elevation) of the splot, and varies smoothly along a line or surface.
 
- Example:
+ Examples:
  Suppose that the default lines for indices 1, 2, and 3 are red, green, and
  blue, respectively, and the default point shapes for the same indices are a
  square, a cross, and a triangle, respectively.  Then
@@ -7898,9 +7900,12 @@ C ... and restart the table:
        splot sin(sqrt(x*x+y*y))/sqrt(x*x+y*y) w l pal
 
  creates a surface plot using smooth colors according to `palette`. Note,
- that this works only on some terminals.
+ that this works only on some terminals. See also `set palette`, `set pm3d`.
 
- See also `set palette`, `set pm3d`.
+       set style line 10 linetype 1 linecolor rgb "cyan"
+ 
+ will assign linestyle 10 to be a solid cyan line on any terminal that
+ supports rgb colors.
 
 4 plotting styles
 ?plotting styles
