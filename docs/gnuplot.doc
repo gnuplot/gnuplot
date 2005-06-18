@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.301 2005/06/16 18:30:58 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.302 2005/06/18 16:34:33 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -207,8 +207,11 @@ C
 4 Vectors
  See `vectors`.
 
-3 String and text data read from datafiles
+3 String handling
+4 String and text data read from datafiles
  See `datastrings`
+4 String variables, operators, and functions
+ See `string variables`
 
 3 Auto-layout of multiple plots on a page
  See `multiplot`.
@@ -220,6 +223,7 @@ C
 4 Consolidated gif/jpeg/png driver
 4 New Enhanced MetaFile (EMF) driver
 4 Adobe Illustrator (ai) driver deprecated
+4 epslatex, pslatex support consolidated into the main postscript driver
 
 2 Features introduced in version 4.0
 ?version 4 features
