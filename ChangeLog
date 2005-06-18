@@ -1,3 +1,7 @@
+2005-06-18  Harald Harders  <h.harders@tu-bs.de>
+
+	* docs/gnuplot.doc: Revise the section on "set arrow".
+
 2005-06-16  Harald Harders  <h.harders@tu-bs.de>
 
 	* docs/gnuplot.doc: Document `set style line <n> linecolor <colorspec>`

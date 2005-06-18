@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.300 2005/06/16 04:19:45 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.301 2005/06/16 18:30:58 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -4411,13 +4411,14 @@ C ... and restart the table:
  Syntax:
        set arrow {<tag>} {from <position>} {to|rto <position>}
                  { {arrowstyle | as <arrow_style>}
-                   | {nohead | head | heads}
-                     {size <length>,<angle>}
-                     {filled | nofilled}
-                     {front | back}
-                     { {linestyle | ls <line_style>}
-                       | {linetype | lt <line_type>}
-                         {linewidth | lw <line_width} } }
+                   | { {nohead | head | heads}
+                       {size <length>,<angle>{,<backangle>}}
+                       {filled | empty | nofilled}
+                       {front | back}
+                       { {linestyle | ls <line_style>}
+                         | {linetype | lt <line_type>}
+                           {linewidth | lw <line_width} } } }
+       
        unset arrow {<tag>}
        show arrow {<tag>}
 
@@ -4447,18 +4448,26 @@ C ... and restart the table:
  default, arrows have heads. Specifying `heads` draws arrow heads on both
  ends of the line.  Not all terminal types support double-ended arrows.
 
- Head size can be controlled by `size <length>,<angle>`, where <length>
- defines length of each branch of the arrow head and <angle> the angle (in
- degrees) they make with the arrow. <Length> is in x-axis units; this can be
- changed by `first`, `second`, `graph`, `screen`, or `character` before the
- <length>;  see `coordinates` for details.
+ Head size can be controlled by `size <length>,<angle>` or 
+ `size <length>,<angle>,<backangle>`, where `<length>` defines length of each 
+ branch of the arrow head and `<angle>` the angle (in degrees) they make with 
+ the arrow.  `<Length>` is in x-axis units; this can be changed by `first`,
+ `second`, `graph`, `screen`, or `character` before the <length>;  see
+ `coordinates` for details.  `<Backangle>` only takes effect when `filled`
+ or `empty` is also used.  Then, `<backangle>` is the angle (in degrees) the
+ back branches make with the arrow (in the same direction as `<angle>`).
+ The `fig` terminal has a restricted backangle function. It supports three
+ different angles. There are two thresholds: Below 70 degrees, the arrow head
+ gets an indented back angle. Above 110 degrees, the arrow head has an acute
+ back angle. Between these thresholds, the back line is straight.
 
- Specifying `filled` produces filled arrow heads (if heads are used).
+ Specifying `filled` produces filled arrow heads (if heads are used). 
  Filling is supported on filled-polygon capable terminals, see help of `pm3d`
  for their list, otherwise the arrow heads are closed but not filled.
- Further, filling is obviously not supported on terminals drawing arrows by
- their own specific routines, like `fig`, `metafont`, `metapost`, `latex` or
- `tgif`.
+ The same result (closed but not filled arrow head) is reached by specifying
+ `empty`.  Further, filling and outline is obviously not supported on
+ terminals drawing arrows by their own specific routines, like `metafont`,
+ `metapost`, `latex` or `tgif`.
 
  The line style may be selected from a user-defined list of line styles
  (see `set style line`) or may be defined here by providing values for
@@ -7713,10 +7722,10 @@ C ... and restart the table:
  ends of the line.
 
  Head size can be controlled by `size <length>,<angle>` or 
- `size <length>,<angle>,<backangle>` where `<length>` defines length of each 
+ `size <length>,<angle>,<backangle>`, where `<length>` defines length of each 
  branch of the arrow head and `<angle>` the angle (in degrees) they make with 
- the arrow. `<Length>` is in x-axis units; this can be changed by `first`,
- `second`, `graph`, `screen`, `character` before the <length>;  see
+ the arrow.  `<Length>` is in x-axis units; this can be changed by `first`,
+ `second`, `graph`, `screen`, or `character` before the <length>;  see
  `coordinates` for details.  `<Backangle>` only takes effect when `filled`
  or `empty` is also used.  Then, `<backangle>` is the angle (in degrees) the
  back branches make with the arrow (in the same direction as `<angle>`).
@@ -7729,10 +7738,9 @@ C ... and restart the table:
  Filling is supported on filled-polygon capable terminals, see help of `pm3d`
  for their list, otherwise the arrow heads are closed but not filled.
  The same result (closed but not filled arrow head) is reached by specifying
- `empty`.
- Further, filling and outline is obviously not supported on terminals drawing
- arrows by their own specific routines, like `metafont`, `metapost`, `latex` 
- or `tgif`. 
+ `empty`.  Further, filling and outline is obviously not supported on
+ terminals drawing arrows by their own specific routines, like `metafont`,
+ `metapost`, `latex` or `tgif`.
 
  The line style may be selected from a user-defined list of line styles 
  (see `set style line`) or may be defined here by providing values for 
