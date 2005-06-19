@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.154 2005/05/19 20:31:40 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.155 2005/06/05 04:55:15 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -3006,6 +3006,9 @@ num_to_str(double r)
 
     sprintf(s[j], "%.15g", r);
     if (strchr(s[j], '.') == NULL &&
+#ifdef HAVE_LOCALE_H
+	strchr(s[j], ',') == NULL &&
+#endif
 	strchr(s[j], 'e') == NULL &&
 	strchr(s[j], 'E') == NULL)
 	strcat(s[j], ".0");

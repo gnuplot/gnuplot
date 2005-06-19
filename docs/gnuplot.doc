@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.302 2005/06/18 16:34:33 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.303 2005/06/18 16:57:01 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -5285,21 +5285,44 @@ C ... and restart the table:
  into tic labels or `set label` strings.
 
  Syntax:
-       set decimalsign {<value>}
+       set decimalsign {<value> | locale {"<locale>"}}
        unset decimalsign
        show decimalsign
 
- The argument <value> is the string to be used in place of the usual
+ The argument <value> is a string to be used in place of the usual
  decimal point. Typical choices include the period, '.', and the comma,
  ',', but others may be useful, too.  If you omit the <value> argument,
  the decimal separator is not modified from the usual default, which is
- a period.  Unsetting decimalsign has the same effect as omitting
- <value>.
+ a period.  Unsetting decimalsign has the same effect as omitting <value>.
 
  Example:
 
  Correct typesetting in most European countries requires:
        set decimalsign ','
+
+ Please note: If you set an explicit string, this affects only numbers that
+ are printed using gnuplot's gprintf() formatting routine, include axis tics.
+ It does not affect the format expected for input data, and it does not affect
+ numbers printed with the sprintf() formatting routine. To change the behavior
+ of both input and output formatting, instead use the form
+ 
+       set decimalsign locale
+ 
+ This instructs the program to use both input and output formats in accordance
+ with the current setting of the LC_ALL, LC_NUMERIC, or LANG environmental
+ variables.
+ 
+       set decimalsign locale "foo"
+ 
+ This instructs the program to format all input and output in accordance with
+ locale "foo", which must already installed.  If locale "foo" is not found
+ then an error message is printed and the decimal sign setting is unchanged.
+
+       set decimalsign locale; set decimalsign "."
+
+ This sets all input and output to use whatever decimal sign is correct for
+ the current locale, but over-rides this with an explicit '.' in numbers
+ formatted using gnuplot's internal gprintf() function.
 3 dgrid3d
 ?commands set dgrid3d
 ?commands unset dgrid3d
@@ -6339,7 +6362,9 @@ C ... and restart the table:
 
  <locale> may be any language designation acceptable to your installation.
  See your system documentation for the available options.  The default value
- is determined from the LANG environment variable.
+ is determined from the LC_TIME, LC_ALL, or LANG environment variables.
+
+ To change the decimal point locale, see `set decimalsign`.
 3 logscale
 ?commands set logscale
 ?commands unset logscale

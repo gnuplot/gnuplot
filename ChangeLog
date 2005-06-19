@@ -1,3 +1,23 @@
+2005-06-19  Ethan Merritt  <merritt@u.washington.edu>
+
+	* docs/gnuplot.doc src src/set.c (set_decimalsign): New command option
+	    `set decimalsign {locale {"locale_spec"}}`
+	 takes the decimal sign character from the locale specified for the
+	 locale "locale_spec" or from the locale specified in the enviromental
+	 variables LC_NUMERIC, LC_ALL, or LANG.
+
+	* src/save.c (save_set_all): Save the current locale for LC_NUMERIC
+	as well as the actual current value of decimalsign.
+
+	 * src/show.c (num_to_str) src/util.c (gprintf): Allow for the
+	 possibility that the current decimal sign is a comma rather than a dot.
+
+	 * src/variable.c (locale_handler): Expand output by `show locale` to
+	 show the current values of LC_NUMERIC LC_CTYPE and LC_TIME.
+
+	 * src/unset.c (unset_decimalsign): If the decimalsign is reset using
+	 `unset decimalsign`, then set the internal locale to C.
+
 2005-06-18  Harald Harders  <h.harders@tu-bs.de>
 
 	* docs/gnuplot.doc: Revise the section on "set arrow".

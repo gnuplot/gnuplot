@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util.c,v 1.56 2005/05/20 18:48:33 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: util.c,v 1.57 2005/06/02 06:08:30 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - util.c */
@@ -731,9 +731,17 @@ gprintf(
 	if (decimalsign != NULL) {
 	    char *dotpos1 = dest, *dotpos2;
 	    size_t newlength = strlen(decimalsign);
+	    int dot;
 
-	    /* replace every `.' by the contents of decimalsign */
-	    while ((dotpos2 = strchr(dotpos1,'.')) != NULL) {
+	    /* dot is the default decimalsign we will be replacing */
+#ifdef HAVE_LOCALE_H
+	    dot = *(localeconv()->decimal_point);
+#else
+	    dot = '.';
+#endif
+
+	    /* replace every dot by the contents of decimalsign */
+	    while ((dotpos2 = strchr(dotpos1,dot)) != NULL) {
 		size_t taillength = strlen(dotpos2);
 
 		dotpos1 = dotpos2 + newlength;

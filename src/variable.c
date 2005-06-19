@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: variable.c,v 1.22 2004/07/13 14:11:25 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: variable.c,v 1.23 2005/02/16 11:47:28 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - variable.c */
@@ -573,7 +573,13 @@ locale_handler(int action, char *newlocale)
 #endif /* HAVE_LOCALE_H */
 	break;
     case ACTION_SHOW:
+#ifdef HAVE_LOCALE_H
+	fprintf(stderr, "\tLC_CTYPE is %s\n", setlocale(LC_CTYPE,NULL));
+	fprintf(stderr, "\tLC_NUMERIC is %s\n", setlocale(LC_NUMERIC,NULL));
+	fprintf(stderr, "\tLC_TIME is %s\n", setlocale(LC_TIME,NULL));
+#else
 	fprintf(stderr, "\tlocale is \"%s\"\n", current_locale);
+#endif
 	break;
     case ACTION_SAVE:
     case ACTION_GET:

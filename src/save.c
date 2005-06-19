@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.107 2005/05/19 20:31:39 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.108 2005/06/05 04:55:15 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -489,9 +489,12 @@ set encoding %s\n\
 	    encoding_names[encoding],
 	    (polar) ? "" : "un",
 	    (parametric) ? "" : "un");
-    if (decimalsign != NULL)
+    if (decimalsign != NULL) {
+#ifdef HAVE_LOCALE_H
+	fprintf(fp, "set decimalsign locale \"%s\"\n", setlocale(LC_NUMERIC,NULL));
+#endif
 	fprintf(fp, "set decimalsign '%s'\n", decimalsign);
-    else
+    } else
         fprintf(fp, "unset decimalsign\n");
 
     fputs("set view ", fp);
