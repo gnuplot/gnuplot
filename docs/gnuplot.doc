@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.303 2005/06/18 16:57:01 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.304 2005/06/19 22:03:44 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -210,7 +210,7 @@ C
 3 String handling
 4 String and text data read from datafiles
  See `datastrings`
-4 String variables, operators, and functions
+4 User-defined string variables, operators, and functions
  See `string variables`
 
 3 Auto-layout of multiple plots on a page
