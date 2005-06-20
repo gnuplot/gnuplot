@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.182 2005/06/05 06:17:14 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.183 2005/06/19 22:03:50 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -3843,10 +3843,11 @@ set_xyzlabel(label_struct *label)
     while (!END_OF_COMMAND) {
 
 	if (almost_equals(c_token, "f$ont"))  {
+	    char *newfont;
 	    ++c_token;
-	    if (isstring(c_token)) {
-		quote_str(label->font, c_token, MAX_LINE_LEN);
-		c_token++;
+	    if ((newfont = try_to_get_string())) {
+		strncpy(label->font,newfont,sizeof(label->font));
+		free(newfont);
 	    } else
 		int_error(c_token,"expecting font");
 	    continue;

@@ -1,3 +1,8 @@
+2005-06-20  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/set.c (set_xyzlabel): Allow string variable or expression for
+	font name. This is a variant of a patch from Shigeharu TAKENO.
+
 2005-06-19  Ethan Merritt  <merritt@u.washington.edu>
 
 	* docs/gnuplot.doc src src/set.c (set_decimalsign): New command option
