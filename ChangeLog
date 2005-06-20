@@ -3,6 +3,10 @@
 	* src/set.c (set_xyzlabel): Allow string variable or expression for
 	font name. This is a variant of a patch from Shigeharu TAKENO.
 
+	* src/plot2d.c (get_data histogram_range_fiddling): Clean up histogram
+	code dealing with missing data or blank lines. Fixes an autoscaling bug
+	if a data file ends with blank lines.
+
 2005-06-19  Ethan Merritt  <merritt@u.washington.edu>
 
 	* docs/gnuplot.doc src src/set.c (set_decimalsign): New command option

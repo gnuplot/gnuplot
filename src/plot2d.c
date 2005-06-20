@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.105 2005/05/07 05:48:04 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.106 2005/05/19 20:31:39 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -429,13 +429,6 @@ get_data(struct curve_points *current_plot)
 	case DF_UNDEFINED:
 	    /* bad result from extended using expression, */
 	    /* or data field contains missing-data symbol */
-#ifdef EAM_HISTOGRAMS
-	    /* HISTOGRAMS need to reserve a slot for this x-coord value even  */
-	    /* if the point is missing or undefined.                          */
-	    if (current_plot->plot_style == HISTOGRAMS)
-		store2d_point(current_plot, i, df_datum, 0, 
-			df_datum-boxwidth/2, df_datum+boxwidth/2, 0, 0, 0.0);
-#endif
 	    current_plot->points[i].type = UNDEFINED;
 	    i++;
 	    continue;
@@ -905,7 +898,8 @@ histogram_range_fiddling(struct curve_points *plot)
 			stackheight[stack_count].y = 0;
 		}
 		for (i=0; i<stack_count; i++) {
-		    stackheight[i].y += plot->points[i].y;
+		    if (plot->points[i].type != UNDEFINED)
+			stackheight[i].y += plot->points[i].y;
 		    if (axis_array[plot->y_axis].max < stackheight[i].y)
 			axis_array[plot->y_axis].max = stackheight[i].y;
 		}
@@ -921,18 +915,16 @@ histogram_range_fiddling(struct curve_points *plot)
 			axis_array[FIRST_X_AXIS].min = xlow;
 		}
 		if (axis_array[FIRST_X_AXIS].autoscale & AUTOSCALE_MAX) {
+		    /* FIXME - why did we increment p_count on UNDEFINED points? */
+		    while (plot->points[plot->p_count-1].type == UNDEFINED) {
+			plot->p_count--;
+			if (!plot->p_count)
+			    int_error(NO_CARET,"All points in histogram UNDEFINED");
+		    }
 		    xhigh = plot->points[plot->p_count-1].x;
 		    xhigh += plot->histogram->start + 1.0;
 		    if (axis_array[FIRST_X_AXIS].max < xhigh)
 			axis_array[FIRST_X_AXIS].max = xhigh;
-		    /* EAM FIXME - this is covering up mis-handling of blank lines  */
-		    /*             in histogram mode, but what should we really do? */
-		    for (i=0; i<stack_count; i++) {
-			xhigh = plot->points[i].x;
-			xhigh += plot->histogram->start + 1.0;
-			if (axis_array[FIRST_X_AXIS].max < xhigh)
-			    axis_array[FIRST_X_AXIS].max = xhigh;
-		    }
 		}
 		break;
 	case HT_STACKED_IN_TOWERS:
