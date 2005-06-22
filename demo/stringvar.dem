@@ -24,6 +24,17 @@ print ""
 print "strlen(foo)  = ",strlen(foo)
 print "substr(foo,2,3) = ",substr(foo,2,3)
 print ""
+haystack = "`date`"
+needle = ":"
+S = strstrt(haystack,needle)
+print "haystack     = \`date\`"
+print "haystack     = ",haystack
+print "needle       = ",needle
+print "S = strstrt(haystack,needle) = ",S
+print "haystack[S-2:S+2] = ",haystack[S-2:S+2]
+print "It is now " . haystack[S-2:S+2]
+#
+print ""
 #
 pause -1 "Hit return to continue"
 #

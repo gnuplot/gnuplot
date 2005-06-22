@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: internal.c,v 1.27 2005/06/05 06:17:14 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: internal.c,v 1.28 2005/06/14 19:13:45 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - internal.c */
@@ -1069,6 +1069,26 @@ f_strlen(union argument *arg)
 
     (void) Ginteger(&result, (int)strlen(a.v.string_val));
     gpfree_string(&a);
+    push(&result);
+}
+
+void
+f_strstrt(union argument *arg)
+{
+    struct value needle, haystack, result;
+    char *start;
+
+    (void) arg;
+    (void) pop(&needle);
+    (void) pop(&haystack);
+
+    if (needle.type != STRING || haystack.type != STRING)
+	int_error(NO_CARET, "internal error : non-STRING argument to strstrt");
+
+    start = strstr(haystack.v.string_val, needle.v.string_val);
+    (void) Ginteger(&result, (int)(start ? start-haystack.v.string_val : -1));
+    gpfree_string(&needle);
+    gpfree_string(&haystack);
     push(&result);
 }
 

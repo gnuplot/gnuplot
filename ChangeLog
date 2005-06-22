@@ -1,3 +1,14 @@
+2005-06-22  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/eval.c src/internal.h src/internal.c (f_strstrt): New built-in
+	string function that searches for a substring within a longer string.
+	Equivalent to C library function strstr(haystack,needle) except that
+	rather than returning a pointer, it returns an index.  Example:
+	    n = strstrt("haystaneedleck","needle")
+	sets n to 6.
+	
+	* demo/stringvar.dem docs/gnuplot.doc: Document and add to string demo.
+
 2005-06-20  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/set.c (set_xyzlabel): Allow string variable or expression for

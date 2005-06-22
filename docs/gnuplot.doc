@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.304 2005/06/19 22:03:44 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.305 2005/06/19 22:39:15 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -1107,6 +1107,16 @@ C
 #strlen("string") & string & int length of string \\
 %strlen("string")@string@int length of string
  `strlen("string")` returns the number of characters in the string.
+4 strstrt
+?expressions functions strstrt
+?functions strstrt
+?strstrt
+#strstrt("string","key") & strings & int index of first character of substring "key" \\
+%strstrt("string","key")@strings@int index of first character of substring "key"
+ `strstrt("string","key")` searches for the character string "key" in "string"
+ and returns the index to the first character of "key". If "key" is not found,
+ returns -1. Similar to C library function strstr except that it returns an
+ index rather than a string pointer. strstrt("hayneedlestack","needle") = 3.
 4 substr
 ?expressions functions substr
 ?functions substr
