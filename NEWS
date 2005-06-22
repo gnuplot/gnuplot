@@ -4,6 +4,7 @@ News, changes and fixes since gnuplot version 4.0
 * NEW store a sequence of plots to an animated gif (requires libgd > 2.0.28)
 * NEW let the string in '{s}plot ... notitle "string"' be silently ignored
 * NEW multi-byte font support in x11, control by the locale setting LC_CTYPE
+* NEW contol decimal sign conventions using locale setting LC_NUMERIC
 * NEW pstex, pslatex and epslatex terminals share functionality with postscript
 * NEW suboptions "set pm3d corners2color min|max"
 * NEW linetype colors via "lt {palette {frac <val> | cb <val>}}"
@@ -11,6 +12,7 @@ News, changes and fixes since gnuplot version 4.0
 * NEW palette and rgb linetype colors apply to all 2D and 3D plot elements
 * NEW user defined variables can contain strings
 * NEW expression evaluation can manipulate and return strings
+* NEW built-in string functions sprintf, gprintf, substr, strstrt
 * NEW command line macro expansion   @<stringvariablename>
 * NEW automatic variable $# expanded to number of arguments after "call"
 * NEW reading of (almost) arbitrary image binary files

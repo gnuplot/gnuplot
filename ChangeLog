@@ -9,6 +9,8 @@
 	
 	* demo/stringvar.dem docs/gnuplot.doc: Document and add to string demo.
 
+	* NEWS: Update list of new features.
+
 2005-06-20  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/set.c (set_xyzlabel): Allow string variable or expression for
