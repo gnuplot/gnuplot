@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.305 2005/06/19 22:39:15 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.306 2005/06/22 20:32:54 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -105,7 +105,7 @@ C
  processed first.  Each file is loaded with the `load` command, in the order
  specified.  `gnuplot` exits after the last file is processed.  When no load
  files are named, `gnuplot` enters into an interactive mode.  The special
- filename "-" is used to denote standard input.  See "help batch/interactive"
+ filename "-" is used to denote standard input.  See help for `batch/interactive`
  for more details.
 
  Many `gnuplot` commands have multiple options. Version 4 is less sensitive
@@ -2223,12 +2223,15 @@ C ... and restart the table:
 2 exit
 ?commands exit
 ?exit
- The commands `exit` and `quit` and the END-OF-FILE character will exit the
- current `gnuplot` command file and `load` the next one.  See "help
- batch/interactive" for more details.
+ The commands `exit` and `quit`, as well as the END-OF-FILE character (usually
+ Ctrl-D) terminate input from the current input stream: terminal session, pipe,
+ and file input (pipe).
 
- Each of these commands will clear the output device (as does the `clear`
- command) before exiting.
+ If input streams are nested (inherited `load` scripts), then reading will
+ continue in the parent stream. When the top level stream is closed, the
+ program itself will exit.
+
+ See help for `batch/interactive` for more details.
 2 fit
 ?commands fit
 ?fit
@@ -2805,7 +2808,7 @@ C ... and restart the table:
 
  The special filename "-" may be used to `load` commands from standard input.
  This allows a `gnuplot` command file to accept some commands from standard
- input.  Please see "help batch/interactive" for more details.
+ input.  Please see help for `batch/interactive` for more details.
 
  On some systems which support a popen function (Unix), the load file can be
  read from a pipe by starting the file name with a '<'.
@@ -4337,7 +4340,7 @@ C ... and restart the table:
  piped through an external program by starting the file name with a '|'.
  This provides a consistent interface to `gnuplot`'s internal settings to
  programs which communicate with `gnuplot` through a pipe.  Please see
- "help batch/interactive" for more details.
+ help for `batch/interactive` for more details.
 
  Examples:
        save 'work.gnu'
