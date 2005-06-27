@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: internal.c,v 1.28 2005/06/14 19:13:45 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: internal.c,v 1.29 2005/06/22 20:32:55 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - internal.c */
@@ -200,10 +200,10 @@ f_calln(union argument *x)
     (void) pop(&num_params);
 
     if (num_params.v.int_val > MAX_NUM_VAR) {
-	/* pop the dummies that there is no room for */
+	/* pop and discard the dummies that there is no room for */
 	num_pop = num_params.v.int_val - MAX_NUM_VAR;
 	for (i = 0; i < num_pop; i++)
-	    (void) pop(&(udf->dummy_values[i]));
+	    (void) pop(&(udf->dummy_values[0]));
 
 	num_pop = MAX_NUM_VAR;
     } else {

@@ -3,6 +3,11 @@
 	* src/set.c (parse_label_options): Allow string variable or expression
 	for font name.
 
+2005-06-27  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/internal.c (f_calln): Prevent buffer overflow if more parameters
+	than expected are passed to a function.
+
 2005-06-26  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* docs/Makefile.in: Replace "sort" by "LC_ALL=C sort" when building
