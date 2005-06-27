@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.183 2005/06/19 22:03:50 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.184 2005/06/20 18:29:16 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -4391,8 +4391,8 @@ new_text_label(int tag)
 
 /*
  * Parse the sub-options for label style and placement.
- * This is called from set_label, and will eventually be called from
- * plot2d and plot3d to handle options for 'plot with labels'
+ * This is called from set_label, and from plot2d and plot3d 
+ * to handle options for 'plot with labels'
  */
 void
 parse_label_options( struct text_label *this_label )
@@ -4464,14 +4464,8 @@ parse_label_options( struct text_label *this_label )
 	/* get font (added by DJL) */
 	if (! set_font && equals(c_token, "font")) {
 	    c_token++;
-	    if (END_OF_COMMAND)
-		int_error(c_token, "font name and size expected");
-	    if (isstring(c_token)) {
-		font = gp_alloc (token_len(c_token), "text_label->font");
-		quote_str(font, c_token, token_len(c_token));
-		/* get 'name,size', no further check */
+	    if ((font = try_to_get_string())) {
 		set_font = TRUE;
-		c_token++;
 		continue;
 	    } else
 		int_error(c_token, "'fontname,fontsize' expected");

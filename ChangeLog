@@ -1,3 +1,8 @@
+2005-06-27  Shigeharu Takeno  <shige@iee.niit.ac.jp>
+
+	* src/set.c (parse_label_options): Allow string variable or expression
+	for font name.
+
 2005-06-26  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* docs/Makefile.in: Replace "sort" by "LC_ALL=C sort" when building
