@@ -1,3 +1,8 @@
+2005-06-28  Ethan Merritt  <merritt@u.washington.edu>
+
+	* docs/checkdoc.c: Allow for lines beginning with '=' in gnuplot.doc
+	(now used to indicated an explicit index entry).
+
 2005-06-27  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* src/set.c (parse_label_options): Allow string variable or expression
