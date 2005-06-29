@@ -1,3 +1,24 @@
+2005-06-29  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/util.c src/util.h: #define isstringvalue(c_token) to include both
+	isstring() and, if enabled, isstringvar().
+
+	*src/plot2d.c src/plot3d.c src/set.c term/emf.trm term/gd.trm
+	term/post.trm term/tgif.trm term/x11.trm: Modify all callers of
+	isstring+isstringvar to either use the new combined routine or to call
+	try_to_get_string() directly and handle both string and non-string
+	returns.
+
+	Fixes the following bugs:
+	+ `plot func(x), FILENAME` gave an error
+	+ `set term pslatex font FONTNAME` should not have been legal
+	+ `set title "foo" -1,-1`  (old style syntax with no "offset" keyword)
+	  caused a parsing error
+	+ fixes order-dependence of options to `set term emf`
+
+	There are 60 odd instances of isstring() remaining, many of which are
+	tests for format strings (e.g. `set format xy "format_string"`).
+
 2005-06-28  Ethan Merritt  <merritt@u.washington.edu>
 
 	* docs/checkdoc.c: Allow for lines beginning with '=' in gnuplot.doc

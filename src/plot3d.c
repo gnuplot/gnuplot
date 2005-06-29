@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.101 2005/04/23 18:16:34 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.102 2005/05/17 05:42:33 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -1192,13 +1192,8 @@ eval_3dplots()
 	    TBOOLEAN set_labelstyle = FALSE;
 #endif
 
-#ifdef GP_STRING_VARS
-	    if (isstring(c_token) || isstringvar(c_token)) {
-#else
-	    if (isstring(c_token)) {	/* data file to plot */
-#endif
-
-		/*{{{  data file */
+	    if (isstringvalue(c_token)) {
+		/*{{{  data file to plot */
 		if (parametric && crnt_param != 0)
 		    int_error(c_token, "previous parametric function not fully specified");
 
@@ -1350,12 +1345,7 @@ eval_3dplots()
 			break;
 		    }
 		    c_token++;
-#ifdef GP_STRING_VARS
-		    if (isstring(c_token) || isstringvar(c_token))
-#else
-		    if (isstring(c_token))
-#endif
-		    
+		    if (isstringvalue(c_token))
 			try_to_get_string(); /* ignore optionally given title string */
 		    if (xtitle != NULL)
 			xtitle[0] = '\0';
@@ -1753,8 +1743,7 @@ eval_3dplots()
 	    if (is_definition(c_token)) {
 		define();
 	    } else {
-
-		if (!isstring(c_token)) {	/* func to plot */
+		if (!isstringvalue(c_token)) {	/* func to plot */
 		    /*{{{  evaluate function */
 		    struct iso_curve *this_iso = this_plot->iso_crvs;
 		    int num_sam_to_use, num_iso_to_use;

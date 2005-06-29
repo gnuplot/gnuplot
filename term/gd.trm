@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: gd.trm,v 1.69 2005/05/22 18:49:39 sfeam Exp $
+ * $Id: gd.trm,v 1.70 2005/06/03 05:11:55 sfeam Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -600,7 +600,7 @@ PNG_options()
 		int brect[8];
 		char *err;
 
-		if (isstring(c_token) || isstringvar(c_token)) {
+		if (isstringvalue(c_token)) {
 		    char *s = try_to_get_string();
 		    strncpy(png_state.ttffont, s, sizeof(png_state.ttffont));
 		    free(s);

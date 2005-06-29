@@ -1,5 +1,5 @@
 /*
- * $Id: util.h,v 1.24 2005/01/26 16:11:43 broeker Exp $
+ * $Id: util.h,v 1.25 2005/05/02 19:26:12 sfeam Exp $
  */
 
 /* GNUPLOT - util.h */
@@ -80,9 +80,12 @@ void m_quote_capture __PROTO((char **, int, int));
 char *try_to_get_string __PROTO((void));
 void parse_esc __PROTO((char *));
 
-TBOOLEAN isstringvar __PROTO((int));
 #ifdef GP_STRING_VARS
 char *gp_stradd __PROTO((const char *, const char *));
+TBOOLEAN isstringvar __PROTO((int));
+#define isstringvalue(c_token) (isstring(c_token) || isstringvar(c_token))
+#else
+#define isstringvalue(c_token) isstring(c_token)
 #endif
 
 /* HBB 20010726: IMHO this one belongs into alloc.c: */

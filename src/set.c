@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.184 2005/06/20 18:29:16 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.185 2005/06/27 22:21:17 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -1686,10 +1686,7 @@ set_label()
     
     /* get tag */
     if (!END_OF_COMMAND
-	&& !isstring(c_token)
-#ifdef GP_STRING_VARS
-	&& !isstringvar(c_token)
-#endif
+	&& !isstringvalue(c_token)
 	&& !equals(c_token, "at")
 	&& !equals(c_token, "left")
 	&& !equals(c_token, "center")
@@ -3812,6 +3809,8 @@ static void
 set_xyzlabel(label_struct *label)
 {
     TBOOLEAN got_offsets = FALSE;
+    TBOOLEAN got_font = FALSE;
+    char *text = NULL;
 
     c_token++;
     if (END_OF_COMMAND) {	/* no label specified */
@@ -3820,18 +3819,17 @@ set_xyzlabel(label_struct *label)
     }
 
 #ifdef GP_STRING_VARS
-    /* Allow creation of label text using sprintf() */
-    if (isstring(c_token) || equals(c_token,"sprintf") || isstringvar(c_token)) {
-	struct value a;
+    /* Protect against attempted string arithmetic triggered by */
+    /* old syntax  "set xlabel 'foo' -1,1" */
 	STRING_RESULT_ONLY = TRUE;
-	(void) const_express(&a);
+	text = try_to_get_string();
 	STRING_RESULT_ONLY = FALSE;
-	if (a.type == STRING) {
-	    strncpy(label->text, a.v.string_val, MAX_LINE_LEN);
-	    gpfree_string(&a);
-	} else
-	    int_warn(NO_CARET,"String parsing error");
-    }
+	if (text) {
+	    strncpy(label->text, text, MAX_LINE_LEN);
+	    free(text);
+	}
+	if (equals(c_token,","))
+	    c_token -= 2;
 #else
     if (isstring(c_token)) {
 	/* We have string specified - grab it. */
@@ -3843,11 +3841,11 @@ set_xyzlabel(label_struct *label)
     while (!END_OF_COMMAND) {
 
 	if (almost_equals(c_token, "f$ont"))  {
-	    char *newfont;
 	    ++c_token;
-	    if ((newfont = try_to_get_string())) {
-		strncpy(label->font,newfont,sizeof(label->font));
-		free(newfont);
+	    if ((text = try_to_get_string())) {
+		strncpy(label->font,text,sizeof(label->font));
+		free(text);
+		got_font = TRUE;
 	    } else
 		int_error(c_token,"expecting font");
 	    continue;
@@ -3855,9 +3853,10 @@ set_xyzlabel(label_struct *label)
 
 #ifdef BACKWARDS_COMPATIBLE
 	/* You didn't used to have to say "font" before giving a fontspec */
-	    if (isstring(c_token)) {
+	    if (!got_font && isstring(c_token)) {
 		int_warn(c_token,"deprecated syntax - please use 'font' keyword");
 		quote_str(label->font, c_token, MAX_LINE_LEN);
+		got_font = TRUE;
 		c_token++;
 	    continue;
 	    }
@@ -3867,11 +3866,6 @@ set_xyzlabel(label_struct *label)
 	if (equals(c_token,"tc") || almost_equals(c_token,"text$color")) {
 	    parse_colorspec( &(label->textcolor), TC_RGB );
 	    continue;
-	}
-
-	if (almost_equals(c_token,"off$set")) {
-	    c_token++;
-	/* You didn't used to have to say "offset" before giving the values */
 	}
 
 	if (almost_equals(c_token,"noenh$anced")) {
@@ -3884,7 +3878,11 @@ set_xyzlabel(label_struct *label)
 	    continue;
 	}
 
-	if (!isstring(c_token) && !got_offsets) {
+	if (almost_equals(c_token,"off$set")) {
+	    c_token++;
+	/* You didn't used to have to say "offset" before giving the values */
+	}
+	if (!got_offsets) {
 	    /* We have x,y offsets specified */
 	    get_position_default(&(label->offset),character);
 	    got_offsets = TRUE;

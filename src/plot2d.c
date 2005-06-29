@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.106 2005/05/19 20:31:39 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.107 2005/06/21 04:50:29 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -1320,12 +1320,7 @@ eval_plots()
 
 	    plot_num++;
 
-#ifdef GP_STRING_VARS
-	    if (isstring(c_token) || isstringvar(c_token)) {
-#else
-	    if (isstring(c_token)) {	/* data file to plot */
-#endif
-
+	    if (isstringvalue(c_token)) { /* data file to plot */
 		if (parametric && xparam)
 		    int_error(c_token, "previous parametric function not fully specified");
 
@@ -1491,11 +1486,7 @@ eval_plots()
 			break;
 		    }
 		    c_token++;
-#ifdef GP_STRING_VARS
-		    if (isstring(c_token) || isstringvar(c_token))
-#else
-		    if (isstring(c_token))
-#endif
+		    if (isstringvalue(c_token))
 			try_to_get_string(); /* ignore optionally given title string */
 		    this_plot->title_is_suppressed = TRUE;
 		    if (xtitle != NULL)
@@ -1956,7 +1947,7 @@ eval_plots()
 		y_axis = this_plot->y_axis;
 
 		plot_num++;
-		if (!isstring(c_token)) {	/* function to plot */
+		if (!isstringvalue(c_token)) {	/* function to plot */
 		    if (parametric) {	/* toggle parametric axes */
 			xparam = 1 - xparam;
 		    }

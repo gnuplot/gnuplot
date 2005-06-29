@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*- */
-/* $Id: tgif.trm,v 1.33 2005/05/02 19:37:28 sfeam Exp $ */
+/* $Id: tgif.trm,v 1.34 2005/05/02 19:53:33 sfeam Exp $ */
 
 /* GNUPLOT - tgif.trm */
 
@@ -389,8 +389,9 @@ TGIF_options()
 	    /* Fall through */
 	case TGIF_OTHER:
 	default:
-	    if (isstring(c_token) || isstringvar(c_token)) {
-		char *s = try_to_get_string();
+	{
+	    char *s;
+	    if ((s = try_to_get_string())) {
 		strncpy(sActFont, s, sizeof(sActFont));
 		strcpy(sDefaultFont, sActFont);
 		free(s);
@@ -404,6 +405,7 @@ TGIF_options()
 		term->h_char = (unsigned int) (uActFontSize * 6 / 10);
 	    }
 	    break;
+	}
 	}
     }
     if (TgifPortrait) {
@@ -482,7 +484,7 @@ TGIF_init()
 %%TGIF 2.15-p7\n\
 state(%d,30,%u,0,0,%u,16,1,9,1,1,0,0,0,0,1,0,'%s',0,%u,0,0,1,10,0,0,1,1,0,16,0,0,1,1,1).\n\
 %%\n\
-%% @(#)$Header: /cvsroot/gnuplot/gnuplot/term/tgif.trm,v 1.33 2005/05/02 19:37:28 sfeam Exp $\n\
+%% @(#)$Header: /cvsroot/gnuplot/gnuplot/term/tgif.trm,v 1.34 2005/05/02 19:53:33 sfeam Exp $\n\
 %% %%W%%\n\
 %%\n\
 page(1,\"\").\n",

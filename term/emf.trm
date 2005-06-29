@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: emf.trm,v 1.29 2005/03/09 18:26:44 sfeam Exp $
+ * $Id: emf.trm,v 1.30 2005/04/28 21:43:50 sfeam Exp $
  */
 
 /* GNUPLOT - emf.trm */
@@ -496,6 +496,8 @@ EMF_write_float(double value)
 TERM_PUBLIC void 
 EMF_options()
 {
+    char *s;
+
     term->xmax = EMF_XMAX;
     term->ymax = EMF_YMAX;
     emf_dashed = TRUE;
@@ -537,15 +539,23 @@ EMF_options()
 		emf_linewidth_factor = 1.0;
 	    continue;
 	}
+	if (equals(c_token, "font"))
+	    c_token++;
+	/* Fall through to old-style bare font name */
+	if ((s = try_to_get_string())) {
+	    strncpy(emf_defaultfontname, s, sizeof(emf_defaultfontname));
+	    free(s);
+	    if (isanumber(c_token)) {
+		struct value a;
+		emf_defaultfontsize = (int) real(const_express(&a));
+	    }
+	    continue;
+	}
 	break;
     } /* while(!end of command) */
-    if (!END_OF_COMMAND && (isstring(c_token) || isstringvar(c_token))) {
-	char *s = try_to_get_string();
-	strncpy(emf_defaultfontname, s, sizeof(emf_defaultfontname));
-	free(s);
-    }
+
     if (!END_OF_COMMAND) {
-	/* We have font size specified */
+	/* We have old-style bare font size specified */
 	struct value a;
 	emf_defaultfontsize = (int) real(const_express(&a));
     }

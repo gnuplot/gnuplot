@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.157 2005/05/25 12:00:36 mikulik Exp $
+ * $Id: post.trm,v 1.158 2005/05/27 17:24:52 sfeam Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -1364,22 +1364,16 @@ PS_options()
 
 	case PS_FONT:
 	    c_token++;
-	    if (!(s = try_to_get_string()))
-		int_error(c_token,"expecting font name");
-	    strncpy(ps_params->font,s,sizeof(ps_params->font));
-	    free(s);
-	    break;
-
+	    /* Fall through to attempt to read font name */
 	case PS_OTHER:
 	default:
-	    if (isstring(c_token) || isstringvar(c_token)) {
+	    if ((s = try_to_get_string())) {
 		if ((ps_params->terminal == PSTERM_POSTSCRIPT) ||
 		    (ps_params->terminal == PSTERM_EPSLATEX)) {
-		    s = try_to_get_string();
 		    strncpy(ps_params->font, s, sizeof(ps_params->font));
 		    free(s);
 		} else
-		    int_error(c_token,
+		    int_error(c_token-1,
 			      "terminal %s does not allow specification %s",
 			      term->name, "of font name");
 	    } else {
