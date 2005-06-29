@@ -3,11 +3,13 @@
 	* src/util.c src/util.h: #define isstringvalue(c_token) to include both
 	isstring() and, if enabled, isstringvar().
 
-	*src/plot2d.c src/plot3d.c src/set.c term/emf.trm term/gd.trm
+	* src/plot2d.c src/plot3d.c src/set.c term/emf.trm term/gd.trm
 	term/post.trm term/tgif.trm term/x11.trm: Modify all callers of
 	isstring+isstringvar to either use the new combined routine or to call
 	try_to_get_string() directly and handle both string and non-string
 	returns.
+
+	* src/axis.h: And one caller was hiding in a macro.
 
 	Fixes the following bugs:
 	+ `plot func(x), FILENAME` gave an error

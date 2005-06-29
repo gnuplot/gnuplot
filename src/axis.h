@@ -1,5 +1,5 @@
 /*
- * $Id: axis.h,v 1.40 2004/10/22 01:30:51 sfeam Exp $
+ * $Id: axis.h,v 1.41 2005/03/16 19:31:29 broeker Exp $
  *
  */
 
@@ -499,13 +499,12 @@ do {									     \
 #define GET_NUMBER_OR_TIME(store,axes,axis)				\
 do {									\
     if (((axes) >= 0) && (axis_array[(axes)+(axis)].is_timedata)	\
-	&& isstring(c_token)) {						\
-	char ss[80];							\
+	&& isstringvalue(c_token)) {					\
 	struct tm tm;							\
-	quote_str(ss,c_token, 80);					\
-	++c_token;							\
+	char *ss = try_to_get_string();					\
 	if (gstrptime(ss,axis_array[axis].timefmt,&tm))			\
 	    (store) = (double) gtimegm(&tm);				\
+	free(ss);							\
     } else {								\
 	struct value value;						\
 	(store) = real(const_express(&value));				\
