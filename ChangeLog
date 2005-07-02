@@ -1,3 +1,14 @@
+2005-07-02  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/eval.c src/internal.c src/internal.h src/parse.c:
+	New string-related functions:
+	+ words("string") returns the number of whitespace-separated words in
+	  the string.  For example, words("A B C D") = 4
+	+ word("string",N) returns the Nth word in the string. For example,
+	  word("A B C D",3) = "C"
+
+	* docs/gnuplot.doc: Document new functions word() and words().
+
 2005-06-29  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/util.c src/util.h: #define isstringvalue(c_token) to include both

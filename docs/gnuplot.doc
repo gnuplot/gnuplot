@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.306 2005/06/22 20:32:54 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.307 2005/06/24 16:35:07 mikulik Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -1128,6 +1128,24 @@ C
  beg through end of the original string. This is exactly equivalent to the
  expressiong "string"[beg:end] except that you do not have the option of
  ommitting beg or end.
+4 word
+?expressions functions word
+?functions word
+?word
+=word
+#word("string",n) & string, int & returns the nth word in "string" \\
+%word("string",n)@string, int@returns the nth word in "string"
+ `word("string",n)` returns the nth word in string. For example,
+ `word("one two three",2)` returns the string "two".
+4 words
+?expressions functions words
+?functions words
+?words
+=words
+#words("string") & string & returns the number of words in "string" \\
+%words("string")@string@returns the number of words in "string"
+ `word("string")` returns the number of words in string. For example,
+ `word(" a b c d")` returns the 4.
 @end table
 
 @start table

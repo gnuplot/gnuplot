@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: internal.c,v 1.29 2005/06/22 20:32:55 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: internal.c,v 1.30 2005/06/27 23:10:23 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - internal.c */
@@ -1123,6 +1123,47 @@ f_range(union argument *arg)
     gpfree_string(&full);
 }
 
+void
+f_words(union argument *arg)
+{
+    struct value a, b, result;
+    int nwords = 0;
+    int ntarget;
+    char *s;
+
+    (void) arg;
+    if (pop(&b)->type != INTGR)
+	int_error(NO_CARET, "internal error : non-INTGR argument");
+    ntarget = b.v.int_val;
+
+    if (pop(&a)->type != STRING)
+	int_error(NO_CARET, "internal error : non-STRING argument");
+    s = a.v.string_val;
+
+    Gstring(&result, "");
+    while (*s) {
+	while (isspace(*s)) s++;
+	if (!*s)
+	    break;
+	nwords++;
+	if (nwords == ntarget) { /* Found the one we wanted */
+	    Gstring(&result,s);
+	    s = result.v.string_val;
+	}
+	while (*s && !isspace(*s)) s++;
+	if (nwords == ntarget) { /* Terminate this word cleanly */
+	    *s = '\0';
+	    break;
+	}
+    }
+
+    if (ntarget < 0)
+	/* words(s) = word(s,-1) = # of words in string */
+	Ginteger(&result, nwords);
+
+    push(&result);
+    gpfree_string(&a);
+}
 
 /* EAM July 2004
  * There are probably an infinite number of things that can
