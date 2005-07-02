@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.107 2005/06/21 04:50:29 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.108 2005/06/29 22:31:13 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -1798,11 +1798,10 @@ eval_plots()
 	    if (this_plot->plot_type == DATA) {
 		/* actually get the data now */
 		if (get_data(this_plot) == 0) {
-		    /* am: not a single line of data (point to be more precise)
-		     * has been found. So don't issue a misleading warning like
-		     * "x range is invalid" but stop here!
-		     */
-		    int_error(c_token, "no valid data points found in specified file");
+		    /* EAM 2005 - warn, but keep going */
+		    int_warn(c_token-1,"Skipping data file with no valid points");
+		    this_plot->plot_type = NODATA;
+		    goto SKIPPED_EMPTY_FILE;
 		}
 
 #ifdef EAM_HISTOGRAMS
@@ -1856,9 +1855,11 @@ eval_plots()
 #endif
 
 	    }
-	    /* save end of plot for second pass */
-	    this_plot->token = c_token;
-	    tp_ptr = &(this_plot->next);
+
+	    SKIPPED_EMPTY_FILE:
+	    /* Note position in command line for second pass */
+		this_plot->token = c_token;
+		tp_ptr = &(this_plot->next);
 
 	} /* !is_defn */
 

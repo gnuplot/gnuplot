@@ -1,3 +1,16 @@
+2005-07-02  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/gp_types.h: Provide a pseudo-plot type NODATA to indicate that
+	this plot is being skipped because the datafile was empty.
+
+	* src/plot2d.c (eval_plots): When no valid points are found in a data
+	file, issue a warning message, mark the current plot as NODATA, but then
+	process the rest of the command line as normal rather than bailing to 
+	command line. This is a return to the behavior of 3.7.2, except that now
+	there is an explicit warning message for each empty file. If other code
+	sections code are sensitive to lack of data, they can test for NODATA.
+	Addresses enhancement requests #1063873 and #1204125.
+
 2005-07-06  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/internal.c (f_sprintf): Switch from using a fixed length output
