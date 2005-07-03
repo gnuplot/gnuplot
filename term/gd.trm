@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: gd.trm,v 1.70 2005/06/03 05:11:55 sfeam Exp $
+ * $Id: gd.trm,v 1.71 2005/06/29 22:31:14 sfeam Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -1917,6 +1917,15 @@ START_HELP(png)
 " `interlace` instructs the driver to generate interlaced PNGs.",
 " Default is `nointerlace`.",
 "",
+" PNG plots may be conveniently viewed by piping the output to the",
+" 'display' program from the ImageMagick package as follows:",
+"                set term png",
+"                set output '| display png:-'",
+"",
+" View the output from successive plot commands interactively by hitting",
+" <space> in the display window.  To save a particular one to disk, left",
+" click in the display window and choose `save`.",
+"",
 " Five basic fonts are supported directly by the gd library. These are",
 " `tiny` (5x8 pixels), `small` (6x12 pixels), `medium`, (7x13 Bold), ",
 " `large` (8x16) or `giant` (9x15 pixels). These fonts cannot be scaled",
@@ -2240,6 +2249,15 @@ START_HELP(gif)
 "",
 " GIF images are created using libgd, with optional support for TrueType",
 " fonts via libfreetype.",
+"",
+" GIF plots may be conveniently viewed by piping the output to the",
+" 'display' program from the ImageMagick package as follows:",
+"                set term gif",
+"                set output '| display gif:-'",
+"",
+" View the output from successive plot commands interactively by hitting",
+" <space> in the display window.  To save a particular one to disk, left",
+" click in the display window and choose `save`.",
 "",
 " Five basic fonts are supported directly by the gd library. These are",
 " `tiny` (5x8 pixels), `small` (6x12 pixels), `medium`, (7x13 Bold), ",
