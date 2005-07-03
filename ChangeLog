@@ -1,3 +1,8 @@
+2005-07-03  Juergen Wieferink  <wieferink@freenet.de>
+
+	* src/command.c (system_command): Simplify code by using 
+	try_to_get_string() to extract the command string from input line.
+
 2005-07-03  James R. Van Zandt  <jrv@debian.org>
 
 	* term/gd.trm: Document "set output '| display png:-'".

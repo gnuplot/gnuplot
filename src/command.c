@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.118 2005/06/05 04:55:15 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.119 2005/06/05 06:17:13 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -1353,15 +1353,11 @@ splot_command()
 void
 system_command()
 {
-    if (!isstring(++c_token))
-	int_error(c_token, "expecting command");
-    else {
-	char *e = gp_input_line + token[c_token].start_index + token[c_token].length - 1;
-	char c = *e;
-	*e = NUL;
-	do_system(gp_input_line + token[c_token].start_index + 1);
-	*e = c;
-    }
+    char *cmd;
+    ++c_token;
+    cmd = try_to_get_string();
+    do_system(cmd);
+    free(cmd);
     c_token++;
 }
 
