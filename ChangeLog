@@ -4,6 +4,7 @@
 	try_to_get_string() to extract the command string from input line.
 
 	* docs/gnuplot.doc: Fix typo in the documentation for words(string).
+	Add mention that `set style fill` applies to filledcurves.
 
 2005-07-03  James R. Van Zandt  <jrv@debian.org>
 

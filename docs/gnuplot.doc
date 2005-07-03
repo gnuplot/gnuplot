@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.308 2005/07/02 20:01:50 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.309 2005/07/04 18:41:49 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -7845,7 +7845,7 @@ C ... and restart the table:
 ?show style fill
 ?fillstyle
  The `set style fill` command is used to set the style of boxes,
- histograms or candlesticks.
+ histograms, candlesticks and filledcurves.
 
  Syntax:
        set style fill {empty | solid {<density>} | pattern {<n>}}
