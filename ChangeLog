@@ -3,7 +3,7 @@
 	* src/command.c (system_command): Simplify code by using 
 	try_to_get_string() to extract the command string from input line.
 
-	* docs/gnuplot.doc: Fix typo in the documentation for word(string,n).
+	* docs/gnuplot.doc: Fix typo in the documentation for words(string).
 
 2005-07-03  James R. Van Zandt  <jrv@debian.org>
 
