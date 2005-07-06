@@ -6,6 +6,10 @@
 
 	* demo/stringvar.dem: Test dynamic extension of sprintf output buffer.
 
+	* src/readline.c (df_readline): Only call add_key_entry() if the current
+	plot is really a histogram; otherwise specifying 'using key(<n>)'
+	causes a segfault on non-histogram plots.
+
 2005-07-03  Juergen Wieferink  <wieferink@freenet.de>
 
 	* src/command.c (system_command): Simplify code by using 

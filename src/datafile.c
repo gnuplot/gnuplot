@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.77 2005/05/19 20:31:38 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.78 2005/06/05 06:17:13 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -1859,7 +1859,8 @@ df_readline(double v[], int max)
 		} else if (use_spec[output].expected_type == CT_KEYLABEL) {
 		    char temp_string[MAX_TOKEN_LENGTH];
 		    df_parse_string_field(temp_string,df_tokens[output]);
-		    add_key_entry(temp_string,df_datum);
+		    if (df_current_plot)
+			add_key_entry(temp_string,df_datum);
 #endif
 		} else
 #endif
