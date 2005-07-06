@@ -1,3 +1,11 @@
+2005-07-06  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/internal.c (f_sprintf): Switch from using a fixed length output
+	buffer to a dynamically-allocated one. The string output by sprintf is
+	no longer limited to 80 characters.
+
+	* demo/stringvar.dem: Test dynamic extension of sprintf output buffer.
+
 2005-07-03  Juergen Wieferink  <wieferink@freenet.de>
 
 	* src/command.c (system_command): Simplify code by using 

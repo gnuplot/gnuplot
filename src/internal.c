@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: internal.c,v 1.30 2005/06/27 23:10:23 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: internal.c,v 1.31 2005/07/02 20:01:51 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - internal.c */
@@ -1165,13 +1165,12 @@ f_words(union argument *arg)
     gpfree_string(&a);
 }
 
-/* EAM July 2004
+/* EAM July 2004  (revised to dynamic buffer July 2005)
  * There are probably an infinite number of things that can
  * go wrong if the user mis-matches arguments and format strings
  * in the call to sprintf, but I hope none will do worse than
  * result in a garbage output string.
  * FIXME: 10 is a purely arbitrary upper limit on args
- *        the resulting string is arbitrarily limited to 80 char
  */
 void
 f_sprintf(union argument *arg)
@@ -1179,30 +1178,30 @@ f_sprintf(union argument *arg)
     struct value a[10];
     struct value num_params;
     struct value result;
-    char buffer[80];
+    char *buffer;
+    int bufsize;
     char *next_start, *outpos, tempchar;
     int next_length;
+    char *prev_start;
+    int prev_pos;
     int i, remaining;
     int nargs = 0;
     enum DATA_TYPES spec_type;
- 
+
     /* Retrieve number of parameters from top of stack */
     pop(&num_params);
     nargs = num_params.v.int_val;
     for (i=0; i<nargs; i++)
 	pop(&a[i]);  /* pop next argument */
 
-#ifdef DEBUG
-    fprintf(stderr,"----------\nGot %d args for sprintf\n",nargs);
-    for (i=0; i<nargs; i++) {
-	disp_value(stderr, &(a[i]), TRUE);
-	fprintf(stderr,"   ");
-    } fprintf(stderr,"\n----------\n");
-#endif
-
     /* Make sure we got a format string of some sort */
     if (a[nargs-1].type != STRING)
 	int_error(NO_CARET,"First parameter to sprintf must be a format string");
+
+    /* Allocate space for the output string. If this isn't */
+    /* long enough we can reallocate a larger space later. */
+    bufsize = 80 + strlen(a[nargs-1].v.string_val);
+    buffer = gp_alloc(bufsize, "f_sprintf");
 
     /* Copy leading fragment of format into output buffer */
     outpos = buffer;
@@ -1214,6 +1213,8 @@ f_sprintf(union argument *arg)
     outpos += next_length;
 
     /* Format the remaining sprintf() parameters one by one */
+    prev_start = next_start;
+    prev_pos = next_length;
     remaining = nargs - 1;
 
     /* Each time we start this loop we are pointing to a % character */
@@ -1236,17 +1237,6 @@ f_sprintf(union argument *arg)
 
 	spec_type = sprintf_specifier(next_start);
 
-#ifdef DEBUG
-	fprintf(stderr,
-		"\tUsing format \"%s\" identified as %s to print %s\n",
-		next_start,
-		((next_param->type) == INTGR ? "INTGR" :
-		 (next_param->type) == STRING ? "STRING" : "CMPLX" ),
-		(spec_type == INTGR ? "INTGR" :
-		 spec_type == STRING ? "STRING" : "CMPLX"));
-
-#endif
-
 	/* string value <-> numerical value check */
 	if ( spec_type == STRING && next_param->type != STRING )
 	    int_error(NO_CARET,"f_sprintf: attempt to print numeric value with string format");
@@ -1257,15 +1247,15 @@ f_sprintf(union argument *arg)
 	/* Use the format to print next arg */
 	switch(spec_type) {
 	case INTGR:
-	    snprintf(outpos,sizeof(buffer)-(outpos-buffer),
+	    snprintf(outpos,bufsize-(outpos-buffer),
 		     next_start, (int)real(next_param));
 	    break;
 	case CMPLX:
-	    snprintf(outpos,sizeof(buffer)-(outpos-buffer),
+	    snprintf(outpos,bufsize-(outpos-buffer),
 		     next_start, real(next_param));
 	    break;
 	case STRING:
-	    snprintf(outpos,sizeof(buffer)-(outpos-buffer),
+	    snprintf(outpos,bufsize-(outpos-buffer),
 		next_start, next_param->v.string_val);
 	    break;
 	default:
@@ -1291,13 +1281,29 @@ f_sprintf(union argument *arg)
 	next_start[next_length] = tempchar;
 	next_start += next_length;
 	outpos = &buffer[strlen(buffer)];
+
+	/* Check whether previous parameter output hit the end of the buffer */
+	/* If so, reallocate a larger buffer, go back and try it again.      */
+	if (strlen(buffer) >= bufsize-2) {
+	    bufsize *= 2;
+	    buffer = gp_realloc(buffer, bufsize, "f_sprintf");
+	    next_start = prev_start;
+	    outpos = buffer + prev_pos;
+	    remaining++;
+	    continue;
+	} else {
+	    prev_start = next_start;
+	    prev_pos = outpos - buffer;
+	}
+
     }
 
     /* Copy the trailing portion of the format, if any */
-    strncpy(outpos, next_start, sizeof(buffer)-(outpos-buffer));
+    strncpy(outpos, next_start, bufsize-(outpos-buffer));
 
     FPRINTF((stderr," snprintf result = \"%s\"\n",buffer));
     push(Gstring(&result, buffer));
+    free(buffer);
 
     /* Free any strings from parameters we have now used */
     for (i=0; i<nargs; i++)
