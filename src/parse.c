@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: parse.c,v 1.35 2005/06/14 19:13:45 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: parse.c,v 1.36 2005/07/02 20:01:51 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - parse.c */
@@ -110,29 +110,16 @@ const_express(struct value *valptr)
 }
 
 
-/* if dummy_dunc == NULL on entry, do not attempt to compile dummy variables
- * - div
+/* build an action table and return its pointer, but keep a pointer in at
+ * so that we can free it later if the caller hasn't taken over management
+ * of this table.
  */
+
 struct at_type *
 temp_at()
 {
-    /* build a static action table and return its pointer */
-
-    if (at != NULL) {
-#ifdef GP_STRING_VARS
-	/* EAM - Dec 2004
-	 * Garbage collection of dynamically allocated strings that may
-	 * have been created during evaluation of the previous action table.
-	 * WARNING: This is an empirical fix to a memory leak found by valgrind;
-	 * I do not truly understand why these are guaranteed to be orphan
-	 * strings, but testing has so far not produced any double-free errors.
-	 */
-	int i;
-	for (i=0; i<at->a_count; i++)
-	    gpfree_string(&at->actions[i].arg.v_arg);
-#endif
-	free(at);
-    }
+    if (at != NULL)
+	free_at(at);
     
     at = (struct at_type *) gp_alloc(sizeof(struct at_type), "action table");
 
@@ -405,7 +392,7 @@ parse_primary_expression()
 	union argument *foo = add_action(PUSHC);
 	foo->v_arg.type = STRING;
 	foo->v_arg.v.string_val = NULL;
-	/* WARNING - This is a memory leak if the string is not later freed */
+	/* this dynamically allocated string will be freed by free_at() */
 	m_quote_capture(&(foo->v_arg.v.string_val), c_token, c_token);
 	c_token++;
     }

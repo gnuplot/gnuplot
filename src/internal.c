@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: internal.c,v 1.31 2005/07/02 20:01:51 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: internal.c,v 1.32 2005/07/06 20:07:23 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - internal.c */
@@ -173,6 +173,7 @@ f_call(union argument *x)
     (void) pop(&(udf->dummy_values[0]));
 
     execute_at(udf->at);
+    gpfree_string(&udf->dummy_values[0]);
     udf->dummy_values[0] = save_dummy;
 }
 
@@ -215,8 +216,10 @@ f_calln(union argument *x)
 	(void) pop(&(udf->dummy_values[i]));
 
     execute_at(udf->at);
-    for (i = 0; i < MAX_NUM_VAR; i++)
+    for (i = 0; i < MAX_NUM_VAR; i++) {
+	gpfree_string(&udf->dummy_values[i]);
 	udf->dummy_values[i] = save_dummy[i];
+    }
 }
 
 

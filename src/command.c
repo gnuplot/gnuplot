@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.119 2005/06/05 06:17:13 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.120 2005/07/04 04:22:37 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -503,7 +503,7 @@ define()
 	if ((at_tmp = perm_at()) == (struct at_type *) NULL)
 	    int_error(start_token, "not enough memory for function");
 	if (udf->at)		/* already a dynamic a.t. there */
-	    free((char *) udf->at);	/* so free it first */
+	    free_at(udf->at);	/* so free it first */
 	udf->at = at_tmp;	/* before re-assigning it. */
 	memcpy(c_dummy_var, save_dummy, sizeof(save_dummy));
 	m_capture(&(udf->definition), start_token, c_token - 1);

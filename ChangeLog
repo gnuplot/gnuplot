@@ -1,4 +1,19 @@
-2005-07-02  Ethan Merritt  <merritt@u.washington.edu>
+2005-07-08  Juergen Wieferink  <wieferink@freenet.de>
+
+	* src/internal.c (f_call f_calln): Free all strings used as dummy
+	variables; fixes memory leak.
+
+	* src/eval.h src/eval.c: New function free_at() that frees all strings
+	stored in an old action table so that there is no memory leak when the
+	table is re-used.
+
+	* src/command.c (define): Free old action table if a function is 
+	redefined; fixes memory leak.
+
+	* src/parse.c (temp_at parse_primary_expression): Recode to use new
+	free_at() routine.
+	
+2005-07-07  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/gp_types.h: Provide a pseudo-plot type NODATA to indicate that
 	this plot is being skipped because the datafile was empty.
