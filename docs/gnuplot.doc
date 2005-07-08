@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.310 2005/07/04 20:17:55 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.311 2005/07/06 22:01:00 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -701,7 +701,7 @@ C
  e.g. ("file" . 4 eq "file4") is true.
 
  Substrings can be specified using a postfixed range descriptor [beg:end].
- For example, "ABCDEF"[2:3] == "CD"   and   "ABCDEF"[3:*] == "DEF"
+ For example, "ABCDEF"[3:4] == "CD"   and   "ABCDEF"[4:*] == "DEF"
  The syntax "string"[beg:end] is exactly equivalent to calling the built-in
  string-valued function substr("string",beg,end), except that you cannot
  omit either beg or end from the function call.
@@ -1115,8 +1115,8 @@ C
 %strstrt("string","key")@strings@int index of first character of substring "key"
  `strstrt("string","key")` searches for the character string "key" in "string"
  and returns the index to the first character of "key". If "key" is not found,
- returns -1. Similar to C library function strstr except that it returns an
- index rather than a string pointer. strstrt("hayneedlestack","needle") = 3.
+ returns 0. Similar to C library function strstr except that it returns an
+ index rather than a string pointer. strstrt("hayneedlestack","needle") = 4.
 4 substr
 ?expressions functions substr
 ?functions substr
@@ -1909,10 +1909,9 @@ C ... and restart the table:
  string variable, or string-valued function.  The range specifier has the
  form [begin:end], where begin is the index of the first character of the
  substring and end is the index of the last character of the substring.
- These follow C-language indexing conventions; the first character has index 0.
- The begin or end fields may be empty, or contain '*', to indicate the true
- start or end of the original string.  E.g.  str[:] and str[*:*] both describe
- the full string str.
+ The first character has index 1.  The begin or end fields may be empty, or
+ contain '*', to indicate the true start or end of the original string.
+ E.g.  str[:] and str[*:*] both describe the full string str.
 2 Substitution and Command line macros
 ?substitution
  When a command line to gnuplot is first read, i.e. before it is interpreted

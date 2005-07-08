@@ -4,25 +4,29 @@
 print ""
 print "Exercise substring handling"
 print ""
-beg = 1
-end = 3
+beg = 2
+end = 4
 print "beg = ",beg," end = ",end
 foo = "ABCDEF"
-print "foo          = ",foo
-print "foo[2:4]     = ",foo[2:4]
-print "foo[0:0]     = ",foo[0:0]
-print "foo[4:2]     = ",foo[4:2]
-print "foo[beg:end] = ",foo[beg:end]
-print "foo[end:beg] = ",foo[end:beg]
-print "foo[4:]      = ",foo[4:]
-print "foo[4:*]     = ",foo[4:*]
-print "foo[:]       = ",foo[:]
-print "foo[*:*]     = ",foo[*:*]
+print "foo           = ",foo
+print "foo[3:5]      = ",foo[3:5]
+print "foo[1:1]      = ",foo[1:1]
+print "foo[5:3]      = ",foo[5:3]
+print "foo[beg:end]  = ",foo[beg:end]
+print "foo[end:beg]  = ",foo[end:beg]
+print "foo[5:]       = ",foo[5:]
+print "foo[5:*]      = ",foo[5:*]
+print "foo[:]        = ",foo[:]
+print "foo[*:*]      = ",foo[*:*]
+print "foo.foo[2:2]  = ",foo.foo[2:2]
+print "(foo.foo)[2:2]= ",(foo.foo)[2:2]
 print ""
+pause -1 "Hit return to continue"
 print "Exercise string handling functions"
 print ""
+print "foo          = ",foo
 print "strlen(foo)  = ",strlen(foo)
-print "substr(foo,2,3) = ",substr(foo,2,3)
+print "substr(foo,3,4) = ",substr(foo,3,4)
 print ""
 haystack = "`date`"
 needle = ":"
@@ -33,6 +37,10 @@ print "needle       = ",needle
 print "S = strstrt(haystack,needle) = ",S
 print "haystack[S-2:S+2] = ",haystack[S-2:S+2]
 print "It is now " . haystack[S-2:S+2]
+#
+print ""
+print "words(haystack)   = ",words(haystack)
+print "word(haystack,5)  = ",word(haystack,5)
 #
 print ""
 #

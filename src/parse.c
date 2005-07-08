@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: parse.c,v 1.36 2005/07/02 20:01:51 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: parse.c,v 1.37 2005/07/08 17:13:46 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - parse.c */
@@ -422,7 +422,7 @@ parse_primary_expression()
 	if (equals(++c_token,"*") || equals(c_token,":")) {
 	    union argument *empty = add_action(PUSHC);
 	    empty->v_arg.type = INTGR;
-	    empty->v_arg.v.int_val = 0;
+	    empty->v_arg.v.int_val = 1;
 	    if (equals(c_token,"*"))
 		c_token++;
 	} else

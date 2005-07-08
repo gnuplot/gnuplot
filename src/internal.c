@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: internal.c,v 1.32 2005/07/06 20:07:23 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: internal.c,v 1.33 2005/07/08 17:13:46 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - internal.c */
@@ -1089,7 +1089,7 @@ f_strstrt(union argument *arg)
 	int_error(NO_CARET, "internal error : non-STRING argument to strstrt");
 
     start = strstr(haystack.v.string_val, needle.v.string_val);
-    (void) Ginteger(&result, (int)(start ? start-haystack.v.string_val : -1));
+    (void) Ginteger(&result, (int)(start ? (start-haystack.v.string_val)+1 : 0));
     gpfree_string(&needle);
     gpfree_string(&haystack);
     push(&result);
@@ -1114,15 +1114,15 @@ f_range(union argument *arg)
 
     FPRINTF(("f_range( \"%s\", %d, %d)\n", full.v.string_val, beg.v.int_val, end.v.int_val));
 
-    if (end.v.int_val > strlen(full.v.string_val)-1)
-	end.v.int_val = strlen(full.v.string_val)-1;
-    if (beg.v.int_val < 0)
-	beg.v.int_val = 0;
+    if (end.v.int_val > strlen(full.v.string_val))
+	end.v.int_val = strlen(full.v.string_val);
+    if (beg.v.int_val < 1)
+	beg.v.int_val = 1;
     if (beg.v.int_val > end.v.int_val)
-	beg.v.int_val = strlen(full.v.string_val);
+	beg.v.int_val = strlen(full.v.string_val)+1;
 
-    full.v.string_val[end.v.int_val+1] = '\0';
-    push(Gstring(&substr, &full.v.string_val[beg.v.int_val]));
+    full.v.string_val[end.v.int_val] = '\0';
+    push(Gstring(&substr, &full.v.string_val[beg.v.int_val-1]));
     gpfree_string(&full);
 }
 
