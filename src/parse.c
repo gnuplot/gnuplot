@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: parse.c,v 1.37 2005/07/08 17:13:46 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: parse.c,v 1.38 2005/07/08 18:39:01 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - parse.c */
@@ -693,24 +693,9 @@ parse_unary_expression()
 struct udvt_entry *
 add_udv(int t_num)
 {
-    struct udvt_entry **udv_ptr = &first_udv;
-
-    /* check if it's already in the table... */
-
-    while (*udv_ptr) {
-	if (equals(t_num, (*udv_ptr)->udv_name))
-	    return (*udv_ptr);
-	udv_ptr = &((*udv_ptr)->next_udv);
-    }
-
-    *udv_ptr = (struct udvt_entry *)
-	gp_alloc(sizeof(struct udvt_entry), "value");
-    (*udv_ptr)->next_udv = NULL;
-    (*udv_ptr)->udv_name = gp_alloc (token_len(t_num)+1, "user var");
-    copy_str((*udv_ptr)->udv_name, t_num, token_len(t_num)+1);
-    (*udv_ptr)->udv_value.type = INTGR;		/* not necessary, but safe! */
-    (*udv_ptr)->udv_undef = TRUE;
-    return (*udv_ptr);
+    char varname[MAX_ID_LEN+1];
+    copy_str(varname, t_num, MAX_ID_LEN);
+    return add_udv_by_name(varname);
 }
 
 
@@ -759,29 +744,6 @@ is_builtin_function(int t_num)
 	    return (i);
     }
     return (0);
-}
-
-/* EAM July 2003 - add_udv_by_name() is like add_udv except that it does not
- * require that the udv key be a token in the current command line. */
-struct udvt_entry *
-add_udv_by_name(char *key)
-{
-    struct udvt_entry **udv_ptr = &first_udv;
-
-    /* check if it's already in the table... */
-
-    while (*udv_ptr) {
-	if (!strcmp(key, (*udv_ptr)->udv_name))
-	    return (*udv_ptr);
-	udv_ptr = &((*udv_ptr)->next_udv);
-    }
-
-    *udv_ptr = (struct udvt_entry *)
-	gp_alloc(sizeof(struct udvt_entry), "value");
-    (*udv_ptr)->next_udv = NULL;
-    (*udv_ptr)->udv_name = gp_strdup(key);
-    (*udv_ptr)->udv_undef = TRUE;
-    return (*udv_ptr);
 }
 
 void

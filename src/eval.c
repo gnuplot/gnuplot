@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: eval.c,v 1.32 2005/07/02 20:01:51 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: eval.c,v 1.33 2005/07/08 17:13:46 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - eval.c */
@@ -664,3 +664,25 @@ free_at(struct at_type *at_ptr)
     free(at_ptr);
 }
 
+/* EAM July 2003 - Return pointer to udv with this name; if the key does not
+ * match any existing udv names, create a new one and return a pointer to it.
+struct udvt_entry *
+add_udv_by_name(char *key)
+{
+    struct udvt_entry **udv_ptr = &first_udv;
+
+    /* check if it's already in the table... */
+
+    while (*udv_ptr) {
+	if (!strcmp(key, (*udv_ptr)->udv_name))
+	    return (*udv_ptr);
+	udv_ptr = &((*udv_ptr)->next_udv);
+    }
+
+    *udv_ptr = (struct udvt_entry *)
+	gp_alloc(sizeof(struct udvt_entry), "value");
+    (*udv_ptr)->next_udv = NULL;
+    (*udv_ptr)->udv_name = gp_strdup(key);
+    (*udv_ptr)->udv_undef = TRUE;
+    return (*udv_ptr);
+}

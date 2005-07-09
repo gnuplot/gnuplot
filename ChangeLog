@@ -1,3 +1,10 @@
+2005-07-09  Juergen Wieferink  <wieferink@freenet.de>
+
+	* src/eval.c src/eval.h src/parse.c src/parse.h: Consolidate code
+	in add_udv() and add_udv_by_name(). Move add_udv_by_name() from parse.c
+	to eval.c so that lower level routines in internal.c and eval.c do not
+	have to include parse.h.
+
 2005-07-08  Juergen Wieferink  <wieferink@freenet.de>
 
 	* src/internal.c (f_call f_calln): Free all strings used as dummy
