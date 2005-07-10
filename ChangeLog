@@ -1,3 +1,7 @@
+2005-07-10  Shigeharu Takeno  <shige@iee.niit.ac.jp>
+
+	* docs/gnuplot.doc: Fix typos.
+
 2005-07-10  Juergen Wieferink  <wieferink@freenet.de>
 
 	* src/command.c (do_system_func) src/command.h src/eval.c

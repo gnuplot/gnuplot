@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.312 2005/07/08 18:39:00 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.313 2005/07/10 18:24:00 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -8406,7 +8406,7 @@ C ... and restart the table:
        plot 'file.dat' using 2, '' using 4, '' using 6:xtic(1) 
 
  This will produce a plot in which each vertical bar contains a stack of three
- segments, corresponding in height to the values found in columns 2, 4 and 3
+ segments, corresponding in height to the values found in columns 2, 4 and 6
  of the datafile.
 
  Finally, the commands
@@ -8417,7 +8417,7 @@ C ... and restart the table:
  will produce three vertical stacks. The stack at x=1 will contain a box for
  each entry in column 2 of the datafile.  The stack at x=2 will contain a box
  for each parallel entry in column 4 of the datafile, and the stack at x=3 a
- box for each entry of column 3.  Because this interchanges gnuplot's usual
+ box for each entry of column 6.  Because this interchanges gnuplot's usual
  interpretation of input rows and columns, the specification of key titles and
  x-axis tic labels must also be modified.
 
