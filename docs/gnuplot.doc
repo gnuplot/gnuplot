@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.311 2005/07/06 22:01:00 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.312 2005/07/08 18:39:00 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -1128,6 +1128,19 @@ C
  beg through end of the original string. This is exactly equivalent to the
  expressiong "string"[beg:end] except that you do not have the option of
  ommitting beg or end.
+4 system
+?expressions functions system
+?functions system
+?system function
+=system
+#system("command") & string & string containing output stream of shell command \\
+%system("command")@string@stdout containing output stream of shell command
+ `system("command")` executes "command" using the standard shell and returns
+ the resulting character stream from stdout as string variable.
+ One optional trailing newline is ignored.
+
+ This can be used to import external functions into gnuplot scripts using
+ 'f(x) = real(system(sprintf("somecommand %f", x)))'.
 4 word
 ?expressions functions word
 ?functions word

@@ -1,3 +1,14 @@
+2005-07-10  Juergen Wieferink  <wieferink@freenet.de>
+
+	* src/command.c (do_system_func) src/command.h src/eval.c
+	src/internal.c (f_system) src/internal.h src/scanner.c (substitute):
+	New built-in string function system("command") which executes a shell
+	command and returns the resulting output stream as a string variable.
+	Consolidate this code with existing shell escape code (backticks) via
+	a new routine do_system_func().
+
+	* docs/gnuplot.doc: Document new system("command") function.
+
 2005-07-09  Juergen Wieferink  <wieferink@freenet.de>
 
 	* src/eval.c src/eval.h src/parse.c src/parse.h: Consolidate code

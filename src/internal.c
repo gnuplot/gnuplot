@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: internal.c,v 1.33 2005/07/08 17:13:46 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: internal.c,v 1.34 2005/07/08 18:39:01 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - internal.c */
@@ -40,6 +40,7 @@ static char *RCSid() { return RCSid("$Id: internal.c,v 1.33 2005/07/08 17:13:46 
 #include "stdfn.h"
 #include "alloc.h"
 #include "util.h"		/* for int_error() */
+#include "command.h"            /* for do_system_func */
 
 #include <math.h>
 
@@ -1396,5 +1397,43 @@ sprintf_specifier(const char* format)
 		  "sprintf_specifier: no format specifier\n");
 
     return INTGR; /* Can't happen, but the compiler doesn't realize that */
+}
+
+
+/* execute a system call and return stream from STDOUT */
+void
+f_system(union argument *arg)
+{
+    struct value val, result;
+    struct udvt_entry *errno_var;
+    char *output;
+    int output_len, ierr;
+
+    /* Retrieve parameters from top of stack */
+    pop(&val);
+
+    /* Make sure parameters are of the correct type */
+    if (val.type != STRING)
+	int_error(NO_CARET, "non-string argument to system()");
+
+    FPRINTF((stderr," f_system input = \"%s\"\n", val.v.string_val));
+
+    ierr = do_system_func(val.v.string_val, &output);
+    if ((errno_var = add_udv_by_name("ERRNO"))) {
+	errno_var->udv_undef = FALSE;
+	Ginteger(&errno_var->udv_value, ierr);
+    }
+    output_len = strlen(output);
+
+    /* chomp result */
+    if ( output_len > 0 && output[output_len-1] == '\n' )
+	output[output_len-1] = NUL;
+
+    FPRINTF((stderr," f_system result = \"%s\"\n", output));
+
+    push(Gstring(&result, output));
+
+    gpfree_string(&result); /* free output */
+    gpfree_string(&val);    /* free command string */
 }
 #endif

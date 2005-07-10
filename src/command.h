@@ -1,5 +1,5 @@
 /*
- * $Id: command.h,v 1.35 2005/02/01 11:28:50 broeker Exp $
+ * $Id: command.h,v 1.36 2005/04/22 05:25:34 sfeam Exp $
  */
 
 /* GNUPLOT - command.h */
@@ -183,5 +183,7 @@ char *print_show_output __PROTO((void)); /* show print output file */
  */
 void splot_map_activate __PROTO((void));
 void splot_map_deactivate __PROTO((void));
+
+int do_system_func __PROTO((const char *cmd, char **output));
 
 #endif /* GNUPLOT_COMMAND_H */

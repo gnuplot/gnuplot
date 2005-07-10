@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: scanner.c,v 1.19 2004/10/17 19:45:31 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: scanner.c,v 1.20 2004/10/26 04:30:58 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - scanner.c */
@@ -290,22 +290,12 @@ get_num(char str[])
 static void
 substitute(char **strp, size_t *str_lenp, int current)
 {
-#if defined(VMS) || defined(PIPES) || (defined(ATARI) || defined(MTOS)) && defined(__PUREC__)
     char *last;
-    int c;
-    FILE *f;
-# ifdef AMIGA_AC_5
-    int fd;
-# elif (defined(ATARI) || defined(MTOS)) && defined(__PUREC__)
-    char *atari_tmpfile;
-# endif				/* !AMIGA_AC_5 */
+    char c;
     char *str, *pgm, *rest = NULL;
+    char *output;
     size_t pgm_len, rest_len = 0;
-# ifdef VMS
-    int chan, one = 1;
-    struct dsc$descriptor_s pgmdsc = {0, DSC$K_DTYPE_T, DSC$K_CLASS_S, 0};
-    static $DESCRIPTOR(lognamedsc, MAILBOX);
-# endif /* VMS */
+    int output_pos;
 
     /* forgive missing closing backquote at end of line */
     str = *strp + current;
@@ -316,7 +306,7 @@ substitute(char **strp, size_t *str_lenp, int current)
     }
     pgm_len = last - str;
     pgm = gp_alloc(pgm_len, "command string");
-    safe_strncpy(pgm, str + 1, pgm_len);	/* omit ` to leave room for NUL */
+    safe_strncpy(pgm, str + 1, pgm_len); /* omit ` to leave room for NUL */
 
     /* save rest of line, if any */
     if (*last) {
@@ -327,61 +317,21 @@ substitute(char **strp, size_t *str_lenp, int current)
 	    strcpy(rest, last);
 	}
     }
-# ifdef VMS
-    pgmdsc.dsc$a_pointer = pgm;
-    pgmdsc.dsc$w_length = pgm_len;
-    if (!((vaxc$errno = sys$crembx(0, &chan, 0, 0, 0, 0, &lognamedsc)) & 1))
-	os_error(NO_CARET, "sys$crembx failed");
 
-    if (!((vaxc$errno = lib$spawn(&pgmdsc, 0, &lognamedsc, &one)) & 1))
-	os_error(NO_CARET, "lib$spawn failed");
-
-    if ((f = fopen(MAILBOX, "r")) == NULL)
-	os_error(NO_CARET, "mailbox open failed");
-# elif (defined(ATARI) || defined(MTOS)) && defined(__PUREC__)
-    if (system(NULL) == 0)
-	os_error(NO_CARET, "no command shell");
-    atari_tmpfile = tmpnam(NULL);
-    gp_realloc(pgm, pgm_len + 5 + strlen(atari_tmpfile), "command string");
-    strcat(pgm, " >> ");
-    strcat(pgm, atari_tmpfile);
-    system(pgm);
-    if ((f = fopen(atari_tmpfile, "r")) == NULL)
-# elif defined(AMIGA_AC_5)
-	if ((fd = open(pgm, "O_RDONLY")) == -1)
-# else				/* everyone else */
-	    if ((f = popen(pgm, "r")) == NULL)
-		os_error(NO_CARET, "popen failed");
-# endif				/* !VMS */
-
+    /* do system call */
+    (void) do_system_func(pgm, &output);
     free(pgm);
 
     /* now replace ` ` with output */
-    while (1) {
-# if defined(AMIGA_AC_5)
-	char ch;
-	if (read(fd, &ch, 1) != 1)
-	    break;
-	c = ch;
-# else
-	if ((c = getc(f)) == EOF)
-	    break;
-# endif				/* !AMIGA_AC_5 */
+    output_pos = 0;
+    while ((c = output[output_pos++])) {
 	if (c != '\n' && c != '\r')
 	    (*strp)[current++] = c;
 	if (current == *str_lenp)
 	    extend_input_line();
     }
     (*strp)[current] = 0;
-
-# ifdef AMIGA_AC_5
-    (void) close(fd);
-# elif (defined(ATARI) || defined(MTOS)) && defined(__PUREC__)
-    (void) fclose(f);
-    (void) unlink(atari_tmpfile);
-# else				/* Rest of the world */
-    (void) pclose(f);
-# endif
+    free(output);
 
     /* tack on rest of line to output */
     if (rest) {
@@ -392,11 +342,6 @@ substitute(char **strp, size_t *str_lenp, int current)
     }
     screen_ok = FALSE;
 
-#else /* VMS || PIPES || ATARI && PUREC */
-
-    int_error(t_num, "substitution not supported by %s", OS);
-
-#endif /* VMS || PIPES || ATARI && PUREC */
 }
 
 

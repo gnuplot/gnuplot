@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.120 2005/07/04 04:22:37 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.121 2005/07/08 17:13:46 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -2683,3 +2683,113 @@ string_expand()
     return(nfound);
 }
 #endif
+
+/* much more than what can be useful */
+#define MAX_TOTAL_LINE_LEN (1024 * MAX_LINE_LEN)
+
+int
+do_system_func(const char *cmd, char **output)
+{
+
+#if defined(VMS) || defined(PIPES) || (defined(ATARI) || defined(MTOS)) && defined(__PUREC__)
+    int c;
+    FILE *f;
+    size_t cmd_len;
+    int result_allocated, result_pos;
+    char* result;
+    int ierr = 0;
+# ifdef AMIGA_AC_5
+    int fd;
+# elif (defined(ATARI) || defined(MTOS)) && defined(__PUREC__)
+    char *atari_tmpfile, *atari_cmd;
+# elif defined(VMS)
+    int chan, one = 1;
+    struct dsc$descriptor_s pgmdsc = {0, DSC$K_DTYPE_T, DSC$K_CLASS_S, 0};
+    static $DESCRIPTOR(lognamedsc, MAILBOX);
+# endif /* VMS */
+
+    cmd_len = strlen(cmd);
+
+    /* open stream */
+# ifdef VMS
+    pgmdsc.dsc$a_pointer = cmd;
+    pgmdsc.dsc$w_length = cmd_len;
+    if (!((vaxc$errno = sys$crembx(0, &chan, 0, 0, 0, 0, &lognamedsc)) & 1))
+	os_error(NO_CARET, "sys$crembx failed");
+
+    if (!((vaxc$errno = lib$spawn(&pgmdsc, 0, &lognamedsc, &one)) & 1))
+	os_error(NO_CARET, "lib$spawn failed");
+
+    if ((f = fopen(MAILBOX, "r")) == NULL)
+	os_error(NO_CARET, "mailbox open failed");
+# elif (defined(ATARI) || defined(MTOS)) && defined(__PUREC__)
+    if (system(NULL) == 0)
+	os_error(NO_CARET, "no command shell");
+    atari_tmpfile = tmpnam(NULL);
+    atari_cmd = gp_alloc(cmd_len + 5 + strlen(atari_tmpfile),
+			 "command string");
+    strcpy(atari_cmd, cmd);
+    strcat(atari_cmd, " >> ");
+    strcat(atari_cmd, atari_tmpfile);
+    system(atari_cmd);
+    free(atari_cmd);
+    if ((f = fopen(atari_tmpfile, "r")) == NULL)
+# elif defined(AMIGA_AC_5)
+	if ((fd = open(cmd, "O_RDONLY")) == -1)
+# else	/* everyone else */
+	    if ((f = popen(cmd, "r")) == NULL)
+		os_error(NO_CARET, "popen failed");
+# endif	/* everyone else */
+
+    /* get output */
+    result_pos = 0;
+    result_allocated = MAX_LINE_LEN;
+    result = gp_alloc(MAX_LINE_LEN, "do_system_func");
+    result[0] = NUL;
+    while (1) {
+# if defined(AMIGA_AC_5)
+	char ch;
+	if (read(fd, &ch, 1) != 1)
+	    break;
+	c = ch;
+# else
+	if ((c = getc(f)) == EOF)
+	    break;
+# endif				/* !AMIGA_AC_5 */
+	/* result <- c */
+	result[result_pos++] = c;
+	if ( result_pos == result_allocated ) {
+	    if ( result_pos >= MAX_TOTAL_LINE_LEN ) {
+		result_pos--;
+		int_warn(NO_CARET,
+			 "*very* long system call output has been truncated");
+		break;
+	    } else {
+		result = gp_realloc(result, result_allocated + MAX_LINE_LEN,
+				    "extend in do_system_func");
+		result_allocated += MAX_LINE_LEN;
+	    }
+	}
+    }
+    result[result_pos] = NUL;
+
+    /* close stream */
+# ifdef AMIGA_AC_5
+    (void) close(fd);
+# elif (defined(ATARI) || defined(MTOS)) && defined(__PUREC__)
+    (void) fclose(f);
+    (void) unlink(atari_tmpfile);
+# else				/* Rest of the world */
+    ierr = pclose(f);
+# endif
+
+#else /* VMS || PIPES || ATARI && PUREC */
+
+    int_error(NO_CARET, "system evaluation not supported by %s", OS);
+
+#endif /* VMS || PIPES || ATARI && PUREC */
+
+    result = gp_realloc(result, strlen(result)+1, "do_system_func");
+    *output = result;
+    return ierr;
+}
