@@ -2,6 +2,11 @@
 
 	* docs/gnuplot.doc: Fix typos.
 
+2005-07-10  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/command.c src/graph3d.c src/graphics.c src/term.c:
+	Whitespace cleanup.
+
 2005-07-10  Juergen Wieferink  <wieferink@freenet.de>
 
 	* src/command.c (do_system_func) src/command.h src/eval.c

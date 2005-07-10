@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.109 2005/05/13 20:12:03 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.110 2005/05/24 20:54:02 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -238,7 +238,7 @@ static void mp_layout_size_and_offset __PROTO((void));
 
 enum set_multiplot_id {
     S_MULTIPLOT_COLUMNSFIRST, S_MULTIPLOT_ROWSFIRST, S_MULTIPLOT_SCALE,
-    S_MULTIPLOT_DOWNWARDS, S_MULTIPLOT_UPWARDS, 
+    S_MULTIPLOT_DOWNWARDS, S_MULTIPLOT_UPWARDS,
     S_MULTIPLOT_OFFSET, S_MULTIPLOT_INVALID
 };
 
@@ -579,7 +579,7 @@ term_end_plot()
 			mp_layout.act_col = 0;
 		    }
 		}
-	    } else { /* column-major */ 
+	    } else { /* column-major */
 		mp_layout.act_col++;
 		if (mp_layout.act_col == mp_layout.num_cols ) {
 		    mp_layout.act_col = 0;
@@ -611,7 +611,7 @@ void
 term_start_multiplot()
 {
     FPRINTF((stderr, "term_start_multiplot()\n"));
-    
+
     c_token++;
     if (multiplot)
 	term_end_multiplot();
@@ -620,7 +620,7 @@ term_start_multiplot()
 
     multiplot = TRUE;
     mp_layout.auto_layout = FALSE;
-    
+
     /* check for optional multiplot layout */
     if (!END_OF_COMMAND && almost_equals(c_token,"lay$out")) {
 	struct value a;
@@ -1190,7 +1190,7 @@ do_arrow(
 
     if (headstyle < 0)
 	return;
-    
+
     /* Draw the line for the arrow. */
     if ( (head == BOTH_HEADS) &&
 	 (fabs(len_arrow) >= DBL_EPSILON) && (curr_arrow_headfilled!=0) )
@@ -1533,7 +1533,7 @@ init_terminal()
 #if defined(__APPLE__) && defined(__MACH__) && defined(HAVE_LIBAQUATERM)
 	/* Mac OS X with AquaTerm installed */
 	term_name = "aqua";
-#endif 
+#endif
 
 #ifdef X11
 	env_term = getenv("TERM");	/* try $TERM */
@@ -2442,7 +2442,7 @@ enhanced_recursion(
 		(term->enhanced_writec)('\\');
 
 	    /*{{{  The enhanced mode always uses \xyz as an octal character representation
-	    	   but each terminal type must give us the actual output format wanted.
+		   but each terminal type must give us the actual output format wanted.
 		   pdf.trm wants the raw character code, which is why we use strtol();
 		   most other terminal types want some variant of "\\%o". */
 	    } else if (p[1] >= '0' && p[1] <= '7') {
@@ -2522,11 +2522,11 @@ enh_err_check(const char *str)
 }
 
 /* Helper function for multiplot auto layout to issue size and offest cmds */
-static void 
+static void
 mp_layout_size_and_offset(void)
 {
     if (!mp_layout.auto_layout) return;
-    
+
     /* fprintf(stderr,"col==%d row==%d\n",mp_layout.act_col,mp_layout.act_row); */
     /* the 'set size' command */
     xsize = mp_layout.xscale / mp_layout.num_cols;
@@ -2535,11 +2535,11 @@ mp_layout_size_and_offset(void)
     /* the 'set origin' command */
     xoffset = (double)(mp_layout.act_col) / mp_layout.num_cols;
     if (mp_layout.downwards)
-    	yoffset = 1.0 - (double)(mp_layout.act_row+1) / mp_layout.num_rows;
+	yoffset = 1.0 - (double)(mp_layout.act_row+1) / mp_layout.num_rows;
     else
 	yoffset = (double)(mp_layout.act_row) / mp_layout.num_rows;
     /* fprintf(stderr,"xoffset==%g  yoffset==%g\n", xoffset,yoffset); */
-    
+
     /* corrected for x/y-scaling factors and user defined offsets */
     xoffset -= (mp_layout.xscale-1)/(2*mp_layout.num_cols);
     yoffset -= (mp_layout.yscale-1)/(2*mp_layout.num_rows);
@@ -2556,7 +2556,7 @@ mp_layout_size_and_offset(void)
  * (e.g. in the key box) must be reserved to hold them.  To approximate
  * the eventually length we switch briefly to the dummy terminal driver
  * "estimate.trm" and then switch back to the current terminal.
- * If better, perhaps terminal-specific methods of estimation are 
+ * If better, perhaps terminal-specific methods of estimation are
  * developed later they can be slotted into this one call site.
  */
 int

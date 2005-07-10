@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.157 2005/05/19 20:31:38 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.158 2005/06/02 06:08:29 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -249,7 +249,7 @@ find_maxl_keys(struct curve_points *plots, int count, int *kcnt)
 	}
 #ifdef EAM_HISTOGRAMS
 	/* Check for new histogram here and save space for divider */
-	if (this_plot->plot_style == HISTOGRAMS 
+	if (this_plot->plot_style == HISTOGRAMS
 	&&  this_plot->histogram_sequence == 0 && cnt > 1)
 	    cnt++;
 	/* Check for column-stacked histogram with key entries */
@@ -760,7 +760,7 @@ boundary(struct curve_points *plots, int count)
 
     if (lmargin < 0) {
        double tmpx, tmpy;
- 
+
 	xleft += (timelabel_textwidth > ylabel_textwidth
 		  ? timelabel_textwidth : ylabel_textwidth)
 	    + ytic_width + ytic_textwidth;
@@ -1555,7 +1555,7 @@ do_plot(struct curve_points *plots, int pcount)
 
 #ifdef EAM_HISTOGRAMS
 	/* Skip a line in the key between histogram clusters */
-	if (this_plot->plot_style == HISTOGRAMS 
+	if (this_plot->plot_style == HISTOGRAMS
 	&&  this_plot->histogram_sequence == 0 && yl != yl_ref) {
 	    if (++key_count >= key_rows) {
 		yl = yl_ref;
@@ -1968,7 +1968,7 @@ finish_filled_curve(
     fprintf(stderr, "List of %i corners:\n", points);
     for (i=0; i<points; i++)
 	fprintf(stderr, "%2i: %3i,%3i | ", i, corners[i].x, corners[i].y);
-    fprintf(stderr, " side = %ld",side); 
+    fprintf(stderr, " side = %ld",side);
     fprintf(stderr, "\n");
     }
 #endif
@@ -2056,7 +2056,7 @@ plot_filledcurves(struct curve_points *plot)
 
 		if (prev == INRANGE) {
 		    /* Split this segment if it crosses a bounding line */
-		    if (bound_intersect(plot->points, i, &ex, &ey, 
+		    if (bound_intersect(plot->points, i, &ex, &ey,
 					&plot->filledcurves_options)) {
 			corners[points].x = map_x(ex);
 			corners[points++].y = map_y(ey);
@@ -2917,14 +2917,14 @@ plot_boxes(struct curve_points *plot, int xaxis_y)
 	if (histogram_opts.type == HT_STACKED_IN_LAYERS && plot->histogram_sequence == 0)
 	    stack_count = 0;
 	if (!stackheight) {
-	    stackheight = gp_alloc( 
+	    stackheight = gp_alloc(
 				newsize * sizeof(struct coordinate GPHUGE),
 				"stackheight array");
 	    for (i = 0; i < newsize; i++)
 		stackheight[i].y = 0;
 	    stack_count = newsize;
 	} else if (stack_count < newsize) {
-	    stackheight = gp_realloc( stackheight, 
+	    stackheight = gp_realloc( stackheight,
 				newsize * sizeof(struct coordinate GPHUGE),
 				"stackheight array");
 	    for (i = stack_count; i < newsize; i++)
@@ -2993,7 +2993,7 @@ plot_boxes(struct curve_points *plot, int xaxis_y)
 		    /* centered about the integer representing the cluster number */
 		    /* 'start' is reset to 0 at the top of eval_plots(), and then */
 		    /* incremented if 'plot new histogram' is encountered.        */
-		    if (histogram_opts.type == HT_CLUSTERED 
+		    if (histogram_opts.type == HT_CLUSTERED
 		    ||  histogram_opts.type == HT_ERRORBARS) {
 			int clustersize = plot->histogram->clustersize + histogram_opts.gap;
 			dxl  += (i-1) * (clustersize - 1) + plot->histogram_sequence;
@@ -4253,7 +4253,7 @@ ytick2d_callback(
 	    }
 	} else {
 	    /* Make the grid avoid the key box */
-	    if (lkey && y < keybox.yt && y > keybox.yb 
+	    if (lkey && y < keybox.yt && y > keybox.yb
 	    &&  keybox.xl < xright && keybox.xr > xleft) {
 		if (keybox.xl > xleft) {
 		    (*t->move) (xleft, y);
@@ -4287,7 +4287,7 @@ ytick2d_callback(
 	/* User-specified different color for the tics text */
 	if (axis_array[axis].ticdef.textcolor.lt != TC_DEFAULT)
 	    apply_pm3dcolor(&(axis_array[axis].ticdef.textcolor), t);
-	write_multiline(tic_text+(int)offsetx_d, y+(int)offsety_d, text, 
+	write_multiline(tic_text+(int)offsetx_d, y+(int)offsety_d, text,
 			tic_hjust, tic_vjust, rotate_tics,
 			axis_array[axis].ticdef.font);
 	term_apply_lp_properties(&border_lp);	/* reset to border linetype */
@@ -4411,7 +4411,7 @@ map_position_double(
     case character:
 	{
 	    register struct termentry *t = term;
-	    *y = pos->y * t->v_char; 
+	    *y = pos->y * t->v_char;
 	    break;
 	}
     }
@@ -4488,7 +4488,7 @@ map_position_r(
     case character:
 	{
 	    register struct termentry *t = term;
-	    *y = pos->y * t->v_char; 
+	    *y = pos->y * t->v_char;
 	    break;
 	}
     }
@@ -4532,7 +4532,7 @@ init_histogram(struct histogram_style *histogram, char *title)
     stackheight = NULL;
     if (histogram) {
 	memcpy(histogram,&histogram_opts,sizeof(histogram_opts));
-	memset(&(histogram->title), 0, sizeof(text_label)); 
+	memset(&(histogram->title), 0, sizeof(text_label));
 	/* Insert in linked list */
 	histogram_opts.next = histogram;
 	histogram->title.text = title;
@@ -4542,7 +4542,7 @@ init_histogram(struct histogram_style *histogram, char *title)
 void
 free_histlist(struct histogram_style *hist)
 {
-    if (!hist) 
+    if (!hist)
 	return;
     if (hist->title.text)
 	free(hist->title.text);
@@ -4568,7 +4568,7 @@ place_histogram_titles()
 	    x += (int)xoffset_d;
 	    y += (int)yoffset_d + 0.25 * term->v_char;
 	    apply_pm3dcolor(&hist->title.textcolor,term);
-	    write_multiline(x, y, hist->title.text, 
+	    write_multiline(x, y, hist->title.text,
 			    CENTRE, JUST_BOT, 0, hist->title.font);
 	    reset_textcolor(&hist->title.textcolor,term);
 	}

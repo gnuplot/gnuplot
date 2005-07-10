@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.121 2005/07/08 17:13:46 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.122 2005/07/10 18:24:00 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -212,9 +212,7 @@ extend_input_line()
 #ifdef OS2_IPC
 	sprintf( mouseSharedMemName, "\\SHAREMEM\\GP%i_Mouse_Input", getpid() );
 	if (DosAllocSharedMem((PVOID) & input_from_PM_Terminal,
-	    	mouseSharedMemName,
-			      MAX_LINE_LEN,
-			      PAG_WRITE | PAG_COMMIT))
+		mouseSharedMemName, MAX_LINE_LEN, PAG_WRITE | PAG_COMMIT))
 	    fputs("command.c: DosAllocSharedMem ERROR\n",stderr);
 #endif /* OS2_IPC */
 
@@ -641,7 +639,7 @@ call_command()
 
     c_token++;
     save_file = try_to_get_string();
-    
+
     if (!save_file)
 	int_error(c_token, "expecting filename");
 
@@ -935,7 +933,7 @@ pause_command()
 	if (mouse_setting.on && term) {
 	    struct udvt_entry *current;
 	    int end_condition = 0;
-	    
+
 	    while (!(END_OF_COMMAND)) {
 		if (almost_equals(c_token,"key$press")) {
 		    end_condition |= PAUSE_KEYSTROKE;
@@ -1275,7 +1273,7 @@ save_command()
     gp_expand_tilde(&save_file);
     fp = strcmp(save_file,"-") ? loadpath_fopen(save_file,"w") : stdout;
     }
-    
+
     if (!fp)
 	os_error(c_token, "Cannot open save file");
 
@@ -2644,15 +2642,15 @@ string_expand()
 		    /* Look up the key and restore the original following char */
 		    udv = add_udv_by_name(m);
 		    if (udv && udv->udv_value.type == STRING) {
-		    	nfound++;
-		    	m = udv->udv_value.v.string_val;
+			nfound++;
+			m = udv->udv_value.v.string_val;
 			FPRINTF((stderr,"Replacing @%s with \"%s\"\n",udv->udv_name,m));
 			if (strlen(m) + o + len > gp_input_line_len)
 			    extend_input_line();
 			while (*m)
 			    gp_input_line[o++] = (*m++);
 		    } else {
-		    	int_warn( NO_CARET, "%s is not a string variable",m);
+			int_warn( NO_CARET, "%s is not a string variable",m);
 		    }
 		    *c-- = temp_char;
 		} else

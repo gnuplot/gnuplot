@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.119 2005/04/28 20:33:22 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.120 2005/05/17 18:32:15 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -520,7 +520,7 @@ place_arrows3d(int layer)
 	if (get_arrow3d(this_arrow, &sx, &sy, &ex, &ey)) {
 	    term_apply_lp_properties(&(this_arrow->arrow_properties.lp_properties));
 	    apply_head_properties(&(this_arrow->arrow_properties));
-	    (*t->arrow) ((unsigned int)sx, (unsigned int)sy, (unsigned int)ex, (unsigned int)ey, 
+	    (*t->arrow) ((unsigned int)sx, (unsigned int)sy, (unsigned int)ex, (unsigned int)ey,
 		this_arrow->arrow_properties.head);
 	} else {
 	    FPRINTF((stderr,"place_arrows3d: skipping out-of-bounds arrow\n"));
@@ -661,7 +661,7 @@ do_3dplot(
     if (!quick) {
 	can_pm3d = is_plot_with_palette() && !make_palette()
 	    && term->set_color;
-	if (can_pm3d && is_plot_with_colorbox()) 
+	if (can_pm3d && is_plot_with_colorbox())
 	    draw_color_smooth_box(MODE_SPLOT);
     }
 #endif /* PM3D */
@@ -698,7 +698,7 @@ do_3dplot(
 	    map3d_position_r(&(title.offset), &tmpx, &tmpy, "3dplot");
 	    x = (unsigned int) ((xleft + xright) / 2 + tmpx);
 	    y = (unsigned int) (ytop + tmpy + titlelin * (t->h_char));
-    	}
+	}
 	ignore_enhanced(title.noenhanced);
 	apply_pm3dcolor(&(title.textcolor),t);
 	/* PM: why there is JUST_TOP and not JUST_BOT? We should draw above baseline!
@@ -912,7 +912,7 @@ do_3dplot(
 
 
 	    if (lkey) {
-	    	/* EAM - force key text to black, then restore */
+		/* EAM - force key text to black, then restore */
 		(*t->linetype)(LT_BLACK);
 		ignore_enhanced(this_plot->title_no_enhanced);
 		key_text(xl, yl, this_plot->title);
@@ -1168,7 +1168,7 @@ do_3dplot(
 		}
 		while (cntrs) {
 		    if (label_contours && cntrs->isNewLevel) {
-		    	if (key->visible) {
+			if (key->visible) {
 			    (*t->linetype)(LT_BLACK);
 			    key_text(xl, yl, cntrs->label);
 			}
@@ -1294,7 +1294,7 @@ do_3dplot(
 		    case RGBIMAGE:
 			break;
 #endif
-#ifdef EAM_HISTOGRAMS 
+#ifdef EAM_HISTOGRAMS
 		    case HISTOGRAMS: /* ignored */
 			break;
 #endif
@@ -2281,7 +2281,7 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid)
 		y1 -= (unsigned int) ((1 + DEFAULT_Y_DISTANCE) * t->v_char);
 #undef DEFAULT_Y_DISTANCE
 	    } else { /* usual 3d set view ... */
-    		double step = (xaxis_y - other_end) / 4;
+		double step = (xaxis_y - other_end) / 4;
 
 		map3d_xyz(mid_x, xaxis_y + step, base_z, &v1);
 		if (!tic_in) {
@@ -2352,14 +2352,14 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid)
 		    }
 		    v2.x = v1.x - tic_unitx * t->h_char * 1;
 		    v2.y = v1.y;
-	    	    if (!tic_in)
+		    if (!tic_in)
 			v2.x -= tic_unitx * t->h_tic * ticscale;
 		    TERMCOORD(&v2, x1, y1);
 		    /* calculate max length of y-tics labels */
 		    widest_tic_strlen = 0;
 		    if (Y_AXIS.ticmode & TICS_ON_BORDER) {
 			widest_tic_strlen = 0; /* reset the global variable */
-		      	gen_tics(FIRST_Y_AXIS, widest_tic_callback);
+			gen_tics(FIRST_Y_AXIS, widest_tic_callback);
 		    }
 		    /* DEFAULT_Y_DISTANCE is with respect to baseline of tics labels */
 #define DEFAULT_X_DISTANCE 0.
@@ -2377,7 +2377,7 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid)
 		    map3d_xy(X_AXIS.max, Y_AXIS.max, base_z, &map_x2, &map_y2);
 		    y1 = (unsigned int)((map_y1 + map_y2) * 0.5);
 		    /* Distance between the title base line and graph top line or the upper part of
-	 	       tics is as given by character height: */
+		       tics is as given by character height: */
 #define DEFAULT_X_DISTANCE 0
 		    x1 += (unsigned int) (tics_len + (-0.5 + Y_AXIS.label.xoffset) * t->h_char);
 		    y1 += (unsigned int) ((DEFAULT_X_DISTANCE + Y_AXIS.label.yoffset) * t->v_char);
@@ -2631,7 +2631,7 @@ ytick_callback(
 	if (axis_array[axis].ticdef.textcolor.lt != TC_DEFAULT)
 	    apply_pm3dcolor(&(axis_array[axis].ticdef.textcolor), t);
 	TERMCOORD(&v2, x2, y2);
-	clip_put_text_just(x2+offsetx, y2+offsety, text, 
+	clip_put_text_just(x2+offsetx, y2+offsety, text,
 			   just, JUST_TOP,
 			   axis_array[axis].ticdef.font);
 	term_apply_lp_properties(&border_lp);
@@ -2793,8 +2793,8 @@ map3d_position(
     double xpos = pos->x;
     double ypos = pos->y;
     double zpos = pos->z;
-    
-    
+
+
     if (map3d_getposition(pos, what, &xpos, &ypos, &zpos) == 0) {
 	double xx, yy;
 	map3d_xy_double(xpos, ypos, zpos, &xx, &yy);
