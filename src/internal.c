@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: internal.c,v 1.34 2005/07/08 18:39:01 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: internal.c,v 1.35 2005/07/10 18:24:00 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - internal.c */
@@ -1322,7 +1322,8 @@ void
 f_gprintf(union argument *arg)
 {
     struct value fmt, val, result;
-    char buffer[80];
+    char *buffer;
+    int length;
     double base;
  
     /* Retrieve parameters from top of stack */
@@ -1344,13 +1345,18 @@ f_gprintf(union argument *arg)
     /* EAM FIXME - I have no idea where we would learn another base is wanted */
     base = 10.;
 
+    /* Make sure we have at least as much space in the output as the format itself */
+    length = 80 + strlen(fmt.v.string_val);
+    buffer = gp_alloc(length, "f_gprintf");
+
     /* Call the old internal routine */
-    gprintf(buffer, sizeof(buffer), fmt.v.string_val, base, real(&val));
+    gprintf(buffer, length, fmt.v.string_val, base, real(&val));
 
     FPRINTF((stderr," gprintf result = \"%s\"\n",buffer));
     push(Gstring(&result, buffer));
 
     gpfree_string(&fmt);
+    free(buffer);
 }
 
 

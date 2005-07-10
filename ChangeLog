@@ -7,6 +7,8 @@
 	* src/command.c src/graph3d.c src/graphics.c src/term.c:
 	Whitespace cleanup.
 
+	* src/internal.c (f_gprintf): Use dynamic allocation for output buffer.
+
 2005-07-10  Juergen Wieferink  <wieferink@freenet.de>
 
 	* src/command.c (do_system_func) src/command.h src/eval.c
