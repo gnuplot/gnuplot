@@ -1,3 +1,8 @@
+2005-07-10  Harald Harders  <h.harders@tu-bs.de>
+
+	* docs/psdoc/ps_symbols.gpi: Spiffed up sample page for PostScript
+	symbols and linetypes.
+
 2005-07-10  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* docs/gnuplot.doc: Fix typos.
