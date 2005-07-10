@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: eval.c,v 1.33 2005/07/08 17:13:46 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: eval.c,v 1.34 2005/07/10 04:24:42 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - eval.c */
@@ -666,6 +666,7 @@ free_at(struct at_type *at_ptr)
 
 /* EAM July 2003 - Return pointer to udv with this name; if the key does not
  * match any existing udv names, create a new one and return a pointer to it.
+ */
 struct udvt_entry *
 add_udv_by_name(char *key)
 {
