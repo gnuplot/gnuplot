@@ -80,3 +80,4 @@ plot 'silver.dat' \
 #
 pause -1 "Hit return to continue"
 #
+reset
