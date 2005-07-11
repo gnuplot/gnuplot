@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.102 2005/05/17 05:42:33 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.103 2005/06/29 22:31:13 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -1223,13 +1223,11 @@ eval_3dplots()
 		this_plot->plot_type = DATA3D;
 		this_plot->plot_style = data_style;
 
+		df_set_plot_mode(MODE_SPLOT);
+		specs = df_open(MAXDATACOLS);
 #ifdef BINARY_DATA_FILE
-		specs = df_open(MAXDATACOLS, MODE_SPLOT);
-
 		if (df_matrix)
 		    this_plot->has_grid_topology = TRUE;
-#else
-		specs = df_open(MAXDATACOLS);
 #endif
 
 		/* parses all datafile-specific modifiers */

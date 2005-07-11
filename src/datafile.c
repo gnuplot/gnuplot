@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.78 2005/06/05 06:17:13 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.79 2005/07/06 21:56:33 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -157,7 +157,6 @@ static char *RCSid() { return RCSid("$Id: datafile.c,v 1.78 2005/06/05 06:17:13 
 #include "plot.h"
 #include "util.h"
 #ifdef BINARY_DATA_FILE
-#include <string.h>
 #include "breaders.h"
 #endif
 
@@ -196,15 +195,6 @@ static void add_key_entry __PROTO((char *temp_string, int df_datum));
 /*}}} */
 
 /*{{{  variables */
-#ifndef BINARY_DATA_FILE
-struct use_spec_s {
-    int column;
-#ifdef EAM_DATASTRINGS
-    int expected_type;
-#endif
-    struct at_type *at;
-};
-#endif
 
 #ifdef EAM_DATASTRINGS
 enum COLUMN_TYPE { CT_DEFAULT, CT_STRING, CT_KEYLABEL,
@@ -220,13 +210,9 @@ struct curve_points *df_current_plot; /* set before calling df_readline() */
 #endif
 int df_line_number;
 int df_datum;			/* suggested x value if none given */
-#ifdef BINARY_DATA_FILE
-TBOOLEAN df_matrix = FALSE;	/* indicates if data originated from a 2D format */
-#else
-TBOOLEAN df_matrix = FALSE;	/* is this a matrix splot */
-#endif
 int df_eof = 0;
 AXIS_INDEX df_axis[MAXDATACOLS];
+TBOOLEAN df_matrix = FALSE;	/* indicates if data originated from a 2D or 3D format */
 TBOOLEAN df_binary = FALSE;	/* this is a binary file */
 
 /* jev -- the 'thru' function --- NULL means no dummy vars active */
@@ -335,6 +321,7 @@ static char df_key_title[MAX_TOKEN_LENGTH];	/* filled in from <col> in 1st row b
  */
 TBOOLEAN df_read_binary;
 TBOOLEAN df_matrix_binary;
+int df_plot_mode;
 
 /* Define the following true of binary is to have it's own format string. */
 #define BINARY_HAS_OWN_FORMAT_STRING 1
@@ -349,7 +336,7 @@ static void df_insert_scanned_use_spec __PROTO((int));
 static void adjust_binary_use_spec __PROTO((void));
 static void clear_binary_records __PROTO((df_records_type));
 static void plot_option_binary_format __PROTO((void));
-static void plot_option_binary __PROTO((int, TBOOLEAN));
+static void plot_option_binary __PROTO((TBOOLEAN));
 static void plot_option_array __PROTO((void));
 static TBOOLEAN rotation_matrix_2D __PROTO((double R[][2], double));
 static TBOOLEAN rotation_matrix_3D __PROTO((double P[][3], double *));
@@ -404,7 +391,7 @@ static long long_0x2468 = 0x2468;
 #define TEST_BIG_PDP         ( (((char *)&long_0x2468)[0] < 3) ? DF_BIG_ENDIAN : DF_PDP_ENDIAN )
 #define THIS_COMPILER_ENDIAN ( (((char *)&long_0x2468)[0] < 5) ? TEST_BIG_PDP : DF_LITTLE_ENDIAN )
 
-#else
+#else /* ifdef BINARY_DATA_FILE */
 
 typedef enum df_byte_read_order_type {
     DF_01,
@@ -414,12 +401,10 @@ typedef enum df_byte_read_order_type {
 static int int_1 = 1;
 #define THIS_COMPILER_ENDIAN ( ((char *)&int_1)[0] ? DF_LITTLE_ENDIAN : DF_BIG_ENDIAN )
 
-#endif
+#endif /* ifdef BINARY_DATA_FILE */
 
 /* Argument is file's endianess type. */
 static df_byte_read_order_type byte_read_order __PROTO((df_endianess_type));
-
-int df_plot_mode;
 
 /* Logical variables indicating information about data file. */
 TBOOLEAN df_binary_file;
@@ -596,6 +581,9 @@ df_binary_tables_struct df_binary_tables[] = {
  */
 static df_column_bininfo_struct *df_column_bininfo = NULL;	/* allocate space as needed */
 static int df_max_bininfo_cols = 0;	/* space allocated */
+
+static char *matrix_general_binary_conflict_msg
+    = "Conflict between some matrix binary and general binary keywords";
 
 #endif
 
@@ -998,22 +986,13 @@ initialize_use_spec()
 }
 
 
-#ifdef BINARY_DATA_FILE
-char *matrix_general_binary_conflict_msg = "Conflict between some matrix binary and general binary keywords";
-#endif
-
-
 /*{{{  int df_open(max_using) */
 
 /* open file, parsing using/thru/index stuff return number of using
  * specs [well, we have to return something !]
  */
 int
-#ifdef BINARY_DATA_FILE
-df_open(int max_using, int plot_mode)
-#else
 df_open(int max_using)
-#endif
 {
     /* now allocated dynamically */
     int name_token = 0;
@@ -1059,7 +1038,6 @@ df_open(int max_using)
 
 #ifdef BINARY_DATA_FILE
     df_binary_file = df_matrix_file = FALSE;
-    df_plot_mode = plot_mode;
 #endif
 
     df_eof = 0;
@@ -1099,28 +1077,34 @@ df_open(int max_using)
     while (!END_OF_COMMAND) {
 
 	/* look for binary / matrix */
-    if (almost_equals(c_token, "bin$ary")) {
-#ifdef BINARY_DATA_FILE
-	if (df_binary_file) { duplication=TRUE; break; }
-	c_token++;
-	df_binary_file = TRUE;
-	/* Up to the time of adding the general binary code, only matrix
-	 * binary for 3d was defined.  So, use matrix binary by default.
-	 */
-	df_matrix_file = TRUE;
-	initialize_binary_vars();
-	plot_option_binary(plot_mode, set_matrix);
-#else
-	    if (df_matrix) { duplication=TRUE; break; }
+	if (almost_equals(c_token, "bin$ary")) {
 	    c_token++;
-	df_binary = TRUE;
-	df_matrix = TRUE;
+#ifdef BINARY_DATA_FILE
+	    if (df_binary_file) {
+		duplication=TRUE;
+		break;
+	    }
+	    df_binary_file = TRUE;
+	    /* Up to the time of adding the general binary code, only matrix
+	     * binary for 3d was defined.  So, use matrix binary by default.
+	     */
+	    df_matrix_file = TRUE;
+	    initialize_binary_vars();
+	    plot_option_binary(set_matrix);
+#else
+	    if (df_matrix) {
+		duplication=TRUE;
+		break;
+	    }
+	    df_binary = TRUE;
+	    df_matrix = TRUE;
 #endif
 	    continue;
 	}
 
 	/* deal with matrix */
 	if (almost_equals(c_token, "mat$rix")) {
+	    c_token++;
 #ifdef BINARY_DATA_FILE
 	    if (set_matrix) { duplication=TRUE; break; }
 	    /* `binary` default is both df_matrix_file and df_binary_file.
@@ -1129,13 +1113,11 @@ df_open(int max_using)
 	     */
 	    if (!df_matrix_file && df_binary_file)
 		int_error(c_token, matrix_general_binary_conflict_msg);
-	    c_token++;
 	    df_matrix_file = TRUE;
 	    set_matrix = TRUE;
 #else
 	    if (df_matrix) { duplication=TRUE; break; }
-	    c_token++;
-	df_matrix = TRUE;
+	    df_matrix = TRUE;
 #endif
 	    continue;
     }
@@ -1456,15 +1438,15 @@ plot_option_thru()
 static void
 plot_option_using(int max_using)
 {
-#ifdef BINARY_DATA_FILE
 
+#ifdef BINARY_DATA_FILE
     int no_cols = 0;  /* For general binary only. */
 
     /* The filetype function may have set the using specs, so reset them before processing tokens. */
     if (df_binary_file)
 	initialize_use_spec();
-
 #endif
+
     if (!END_OF_COMMAND && !isstring(++c_token)) {
 	struct value a;
 
@@ -1592,28 +1574,25 @@ void plot_ticlabel_using(int axis)
 #endif
 
 
-#ifdef BINARY_DATA_FILE
 /*{{{  int df_readline(v, max) */
 
 int
 df_readline(double v[], int max)
 {
+#ifdef BINARY_DATA_FILE
     if (df_read_binary)
 	/* General binary, matrix binary or matrix ascii
 	 * that's been converted to binary.
 	 */
 	return df_readbinary(v, max);
     else
+#endif
 	return df_readascii(v, max);
 }
 
 /*}}} */
 
 
-/*{{{  int df_readascii(v, max) */
-#else
-/*{{{  int df_readline(v, max) */
-#endif
 /* do the hard work... read lines from file,
  * - use blanks to get index number
  * - ignore lines outside range of indices required
@@ -1621,11 +1600,7 @@ df_readline(double v[], int max)
  */
 
 int
-#ifdef BINARY_DATA_FILE
 df_readascii(double v[], int max)
-#else
-df_readline(double v[], int max)
-#endif
 {
     char *s;
 
@@ -2752,7 +2727,8 @@ df_set_datafile_binary()
 	df_add_binary_records(1, DF_CURRENT_RECORDS);
     }
     /* Process the binary tokens. */
-    plot_option_binary(MODE_QUERY, FALSE);
+    df_set_plot_mode(MODE_QUERY);
+    plot_option_binary(FALSE);
     /* Copy the modified settings as the new default settings. */
     df_bin_filetype_default = df_bin_filetype;
     df_bin_file_endianess_default = df_bin_file_endianess;
@@ -3065,7 +3041,7 @@ char *equal_symbol_msg = "Equal ('=') symbol required";
 
 
 static void
-plot_option_binary(int plot_mode, TBOOLEAN set_matrix)
+plot_option_binary(TBOOLEAN set_matrix)
 {
     int item_count = -1;
 #define MAX_FILE_EXT_LEN 10
@@ -3141,7 +3117,7 @@ plot_option_binary(int plot_mode, TBOOLEAN set_matrix)
 	     * could be changed to the temporary file name and, again, just let
 	     * gnuplot continue.  Other approaches are possible.
 	     */
-	    if (!strcasecmp("auto", df_bin_filetype_table[df_bin_filetype].extension) && (plot_mode != MODE_QUERY)) {
+	    if (!strcasecmp("auto", df_bin_filetype_table[df_bin_filetype].extension) && (df_plot_mode != MODE_QUERY)) {
 		int i;
 		char *ext_start = strrchr (df_filename, '.');
 		if (!ext_start)
@@ -3160,7 +3136,7 @@ plot_option_binary(int plot_mode, TBOOLEAN set_matrix)
 	    }
 
 	    /* Unless only querying settings, call the routine to prep binary data parameters. */
-	    if (plot_mode != MODE_QUERY)
+	    if (df_plot_mode != MODE_QUERY)
 		df_bin_filetype_table[df_bin_filetype].function();
 
 	    /* Now, at this point anything that was filled in for "scan" should
@@ -3371,7 +3347,7 @@ plot_option_binary(int plot_mode, TBOOLEAN set_matrix)
 		int_error(c_token, origin_and_center_conflict_message);
 	    if (set_origin) { duplication=TRUE; break; }
 	    c_token++;
-	    plot_option_comma_separated(DF_ORIGIN, plot_mode);
+	    plot_option_comma_separated(DF_ORIGIN, df_plot_mode);
 	    set_origin = TRUE;
 	    continue;
 	}
@@ -3382,7 +3358,7 @@ plot_option_binary(int plot_mode, TBOOLEAN set_matrix)
 		int_error(c_token, origin_and_center_conflict_message);
 	    if (set_center) { duplication=TRUE; break; }
 	    c_token++;
-	    plot_option_comma_separated(DF_CENTER, plot_mode);
+	    plot_option_comma_separated(DF_CENTER, df_plot_mode);
 	    set_center = TRUE;
 	    continue;
 	}
@@ -3398,7 +3374,7 @@ plot_option_binary(int plot_mode, TBOOLEAN set_matrix)
 
 	/* deal with rotation angle */
 	if (almost_equals(c_token, "perp$endicular")) {
-	    if (plot_mode == MODE_PLOT)
+	    if (df_plot_mode == MODE_PLOT)
 		int_error(c_token, "Key word `perpendicular` is not allowed with `plot` command");
 	    if (set_perpendicular) { duplication=TRUE; break; }
 	    c_token++;
@@ -4879,6 +4855,12 @@ df_readbinary(double v[], int max)
     df_eof = 1;
     return DF_EOF;
 
+}
+
+void
+df_set_plot_mode(int mode)
+{
+    df_plot_mode = mode;
 }
 #endif /* BINARY_DATA_FILE */
 

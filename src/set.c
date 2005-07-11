@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.185 2005/06/27 22:21:17 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.186 2005/06/29 22:31:13 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -2456,11 +2456,9 @@ set_palette_file()
     if (END_OF_COMMAND || !isstring(c_token) )
       int_error( c_token, "Expected file name" );
 
-#ifdef BINARY_DATA_FILE
-    specs = df_open( 4, MODE_QUERY );
-#else
+    df_set_plot_mode(MODE_QUERY);	/* Needed only for binary datafiles */
     specs = df_open( 4 );
-#endif
+
     if (df_binary)
 	int_error( c_token, "Binary palette files not implemented");
 

@@ -1,3 +1,14 @@
+2005-07-11  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/breaders.h src/datafile.c src/datafile.h src/fit.c src/plot2d.c
+	src/plot3d.c src/set.c: Simplify conditional compilation controlled by
+	--enable-binary-data-file. Instead of having a different number of 
+	parameters to df_readline() and plot_option_binary(), expost a uniform
+	definition but add an auxilliary routine df_set_plot_mode() in the
+	BINARY_DATA_FILE case. Also clean up the general coding style and remove
+	redundant structure definitions. This prepares for easier implementation
+	of Juergen Wieferink's "plot string or expression" patch.
+
 2005-07-10  Harald Harders  <h.harders@tu-bs.de>
 
 	* docs/psdoc/ps_symbols.gpi: Spiffed up sample page for PostScript

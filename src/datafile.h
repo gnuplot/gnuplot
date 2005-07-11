@@ -1,5 +1,5 @@
 /*
- * $Id: datafile.h,v 1.15 2004/09/01 15:53:47 mikulik Exp $
+ * $Id: datafile.h,v 1.16 2005/03/05 04:52:14 sfeam Exp $
  */
 
 /* GNUPLOT - datafile.h */
@@ -108,11 +108,7 @@ extern TBOOLEAN plotted_data_from_stdin;
 
 /* Prototypes of functions exported by datafile.c */
 
-#ifdef BINARY_DATA_FILE
-int df_open __PROTO((int, int));
-#else
 int df_open __PROTO((int));
-#endif
 int df_readline __PROTO((double [], int));
 void df_close __PROTO((void));
 void df_showdata __PROTO((void));
@@ -131,8 +127,19 @@ void f_timecolumn   __PROTO((union argument *x));
 void f_stringcolumn   __PROTO((union argument *x));
 #endif
 
+struct use_spec_s {
+    int column;
+#ifdef EAM_DATASTRINGS
+    int expected_type;
+#endif
+    struct at_type *at;
+};
 
-#if BINARY_DATA_FILE
+#ifndef BINARY_DATA_FILE
+#define df_set_plot_mode(mode)	/* Not needed except for binary data files */
+#endif
+
+#ifdef BINARY_DATA_FILE
 /* Details about the records contained in a binary data file. */
 
 typedef enum df_translation_type {
@@ -239,14 +246,6 @@ typedef struct df_binary_file_record_struct {
 extern df_binary_file_record_struct *df_bin_record;
 extern int df_num_bin_records;
 
-struct use_spec_s {
-    int column;
-#ifdef EAM_DATASTRINGS
-    int expected_type;
-#endif
-    struct at_type *at;
-};
-
 extern struct use_spec_s use_spec[];
 
 /* Prototypes of functions exported by datafile.c */
@@ -254,7 +253,6 @@ extern struct use_spec_s use_spec[];
 void df_show_binary __PROTO((FILE *fp));
 void df_show_datasizes __PROTO((FILE *fp));
 void df_show_filetypes __PROTO((FILE *fp));
-int df_open __PROTO((int, int));
 void df_set_datafile_binary __PROTO((void)); 
 void df_unset_datafile_binary __PROTO((void));
 void df_add_binary_records __PROTO((int, df_records_type));
@@ -265,6 +263,7 @@ void df_set_read_type __PROTO((int col, df_data_type type));          /* Type of
 df_data_type df_get_read_type __PROTO((int col));                     /* Type of data in the binary column. */
 int df_get_read_size __PROTO((int col));                              /* Size of data in the binary column. */
 int df_get_num_matrix_cols __PROTO((void));
-#endif
+void df_set_plot_mode __PROTO((int));
+#endif /* BINARY_DATA_FILE */
 
 #endif /* GNUPLOT_DATAFILE_H */

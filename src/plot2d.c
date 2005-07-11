@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.108 2005/06/29 22:31:13 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.109 2005/07/07 20:35:12 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -1339,17 +1339,15 @@ eval_plots()
 		this_plot->lp_properties.use_palette = 0;
 #endif
 
-#ifdef BINARY_DATA_FILE
-		specs = df_open(MAXDATACOLS, MODE_PLOT);	/* up to MAXDATACOLS cols */
-#else
+		df_set_plot_mode(MODE_PLOT);	/* Needed for binary datafiles */
 		specs = df_open(MAXDATACOLS);	/* up to MAXDATACOLS cols */
 
+#ifndef BINARY_DATA_FILE
 		/* this parses data-file-specific modifiers only */
 		/* we'll sort points when we know style, if necessary */
 		if (df_binary)
-		    int_error(c_token, "2d binary files not yet supported");
+		    int_error(c_token, "This copy of gnuplot was not built with support for 2d binary files");
 #endif
-
 		/* include modifiers in default title */
 		this_plot->token = end_token = c_token - 1;
 
