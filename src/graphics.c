@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.158 2005/06/02 06:08:29 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.159 2005/07/10 19:18:30 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -169,9 +169,6 @@ static void do_key_sample __PROTO((struct curve_points *this_plot, legend_key *k
 				   char *title,  struct termentry *t, int xl, int yl));
 
 static int style_from_fill __PROTO((struct fill_style_type *));
-
-/* for epslatex terminal */
-extern char *pslatex_auxname;
 
 /* for plotting error bars
  * half the width of error bar tic mark
@@ -1487,11 +1484,6 @@ do_plot(struct curve_points *plots, int pcount)
 
     /* PLACE ARROWS */
     place_arrows( 0 );
-
-    /* Print \includegraphics here when using back option for text */
-    if (term->name=="epslatex" && gpoutfile)
-	fprintf(gpoutfile, "    \\put(0,0){\\includegraphics{%s}}%%\n",
-		pslatex_auxname);
 
     /* WORK OUT KEY SETTINGS AND DO KEY TITLE / BOX */
     if (lkey) {			/* may have been cancelled if something went wrong */

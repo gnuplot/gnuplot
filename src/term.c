@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.110 2005/05/24 20:54:02 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.111 2005/07/10 19:18:31 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -1942,11 +1942,6 @@ test_term()
 	(*t->linetype)(LT_BLACK);
     }
 #endif /* PM3D */
-
-    /* Print \includegraphics here when using back option for text */
-    if (t->name=="epslatex" && gpoutfile)
-	fprintf(gpoutfile, "    \\put(0,0){\\includegraphics{%s}}%%\n",
-		pslatex_auxname);
 
     term_end_plot();
 }

@@ -1,7 +1,17 @@
 2005-07-13  Ethan Merritt  <merritt@u.washington.edu>
-	* src/command.c (do_system_func): Fix incorrect placement of final return
-	code outside of the main conditional code segment. Fixes compilation error
-	under mingw reported by Dietmar Warning.
+
+	* src/command.c (do_system_func): Fix incorrect placement of final
+	return code outside of the main conditional code segment.
+	Fixes compilation error under mingw reported by Dietmar Warning.
+
+	* src/graph3d.c (do_3dplot) src/graphics.c (do_plot) 
+	src/term.c (test_term) term/post.trm term/pslatex.trm:
+	Remove all epslatex-specific code from the gnuplot core routines.
+	It was not working anyhow. This reverts the epslatex driver to
+	the old behaviour of ignoring any distinction between "front" and
+	"back" text labels.  It also clears the deck for a different
+	approach that adds a terminal API routine to handle this sort of
+	terminal-specific requirement (SourceForge patchset #1191202).
 
 2005-07-11  Ethan Merritt  <merritt@u.washington.edu>
 

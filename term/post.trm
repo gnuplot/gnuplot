@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.158 2005/05/27 17:24:52 sfeam Exp $
+ * $Id: post.trm,v 1.159 2005/06/29 22:31:14 sfeam Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -249,7 +249,7 @@ TERM_PUBLIC void PS_load_fontfiles __PROTO((TBOOLEAN));
 #define DOTS_PER_INCH (300)    /* resolution of printer we expect to use */
 
 /* name of auxiliary file */
-char *pslatex_auxname = NULL;
+static char *pslatex_auxname = NULL;
 
 static const char GPFAR * GPFAR PS_header1[] = {
 "/M {moveto} bind def\n",

@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: pslatex.trm,v 1.55 2005/05/10 05:51:37 sfeam Exp $
+ * $Id: pslatex.trm,v 1.56 2005/05/15 19:46:58 persquare Exp $
  */
 
 /* GNUPLOT - pslatex.trm */
@@ -678,6 +678,12 @@ EPSLATEX_common_init()
   \\begin{picture}(%.2f,%.2f)%%\n",
                 1.0 / (2*PS_SC), term->xmax * xsize, term->ymax * ysize);
     }
+
+    /* FIXME (Harald Harders) - it would be prefered that this code be written */
+    /* after the core plot routines have finished placing all objects with     */
+    /* attribute "back". But this would seem to require a new driver entry.    */
+    fprintf(gpoutfile, "    \\put(0,0){\\includegraphics{%s}}%%\n",
+	    pslatex_auxname);
 
     if (fontfamily)
 	free(fontfamily);
