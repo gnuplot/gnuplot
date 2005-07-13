@@ -1,3 +1,8 @@
+2005-07-13  Ethan Merritt  <merritt@u.washington.edu>
+	* src/command.c (do_system_func): Fix incorrect placement of final return
+	code outside of the main conditional code segment. Fixes compilation error
+	under mingw reported by Dietmar Warning.
+
 2005-07-11  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/breaders.h src/datafile.c src/datafile.h src/fit.c src/plot2d.c

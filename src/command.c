@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.122 2005/07/10 18:24:00 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.123 2005/07/10 19:18:29 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -2781,13 +2781,16 @@ do_system_func(const char *cmd, char **output)
     ierr = pclose(f);
 # endif
 
-#else /* VMS || PIPES || ATARI && PUREC */
-
-    int_error(NO_CARET, "system evaluation not supported by %s", OS);
-
-#endif /* VMS || PIPES || ATARI && PUREC */
-
     result = gp_realloc(result, strlen(result)+1, "do_system_func");
     *output = result;
     return ierr;
+
+#else /* VMS || PIPES || ATARI && PUREC */
+
+    int_warn(NO_CARET, "system evaluation not supported by %s", OS);
+    *output = gp_strdup("");
+    return 0;
+
+#endif /* VMS || PIPES || ATARI && PUREC */
+
 }
