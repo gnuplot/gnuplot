@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: internal.c,v 1.35 2005/07/10 18:24:00 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: internal.c,v 1.36 2005/07/11 01:58:39 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - internal.c */
@@ -1113,7 +1113,7 @@ f_range(union argument *arg)
     if (full.type != STRING)
 	int_error(NO_CARET, "internal error: substring range operator applied to non-STRING type");
 
-    FPRINTF(("f_range( \"%s\", %d, %d)\n", full.v.string_val, beg.v.int_val, end.v.int_val));
+    FPRINTF((stderr,"f_range( \"%s\", %d, %d)\n", full.v.string_val, beg.v.int_val, end.v.int_val));
 
     if (end.v.int_val > strlen(full.v.string_val))
 	end.v.int_val = strlen(full.v.string_val);

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.137 2005/05/11 21:35:04 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.138 2005/05/25 12:15:46 broeker Exp $"); }
 #endif
 
 #define X11_POLYLINE 1
@@ -2116,7 +2116,7 @@ exec_cmd(plot_struct *plot, char *command)
 		xcolor.red   = dim*xcolor.red   + (1.-dim)*bgnd.red;
 		xcolor.green = dim*xcolor.green + (1.-dim)*bgnd.green;
 		xcolor.blue  = dim*xcolor.blue  + (1.-dim)*bgnd.blue;
-		FPRINTF(("Dimming box color %.6x by %.2f to %2d %2d %2d\n",
+		FPRINTF((stderr,"Dimming box color %.6x by %.2f to %2d %2d %2d\n",
 				(unsigned long)(plot->current_rgb), dim, xcolor.red, xcolor.green, xcolor.blue));
 		if (XAllocColor(dpy, plot->cmap->colormap, &xcolor))
 		    XSetForeground(dpy, gc, xcolor.pixel);
@@ -2587,7 +2587,7 @@ exec_cmd(plot_struct *plot, char *command)
 		    xcolor.red   = dim*xcolor.red   + (1.-dim)*bgnd.red;
 		    xcolor.green = dim*xcolor.green + (1.-dim)*bgnd.green;
 		    xcolor.blue  = dim*xcolor.blue  + (1.-dim)*bgnd.blue;
-		    FPRINTF(("Dimming poly color %.6x by %.2f to %2d %2d %2d\n",
+		    FPRINTF((stderr,"Dimming poly color %.6x by %.2f to %2d %2d %2d\n",
 				(unsigned long)(plot->current_rgb), dim, xcolor.red, xcolor.green, xcolor.blue));
 		    if (XAllocColor(dpy, plot->cmap->colormap, &xcolor))
 			XSetForeground(dpy, *current_gc, xcolor.pixel);

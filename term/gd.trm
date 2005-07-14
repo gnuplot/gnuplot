@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: gd.trm,v 1.71 2005/06/29 22:31:14 sfeam Exp $
+ * $Id: gd.trm,v 1.72 2005/07/03 16:21:15 vanzandt Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -510,7 +510,7 @@ PNG_options()
     /* Annoying hack to handle the case of 'set termoption' after */
     /* we are already in animation mode.                          */
     if (c_token == 2)
-	FPRINTF(("gif: Maintaining animation state\n"));
+	FPRINTF((stderr,"gif: Maintaining animation state\n"));
     else {
 	/* Otherwise reset animation */
 	png_state.animate = FALSE;
@@ -1862,7 +1862,7 @@ TERM_TABLE_START(png_driver)
 #endif
     PNG_point, do_arrow, PNG_set_font,
     PNG_pointsize,
-    TERM_CAN_MULTIPLOT | TERM_BINARY,
+    TERM_BINARY,
     0 /*suspend*/, 0 /*resume*/,
     PNG_boxfill /*EAM - fillbox*/,
     PNG_linewidth /*EAM - linewidth*/

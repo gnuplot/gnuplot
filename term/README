@@ -303,21 +303,22 @@ _set_font() is called to set the font of labels, etc. [new 3.7 feature]
 _pointsize() is used to set the pointsize for subsequent points
 
 _flags stores various flags describing driver capabilities.
-  - TERM_CAN_MULTIPLOT - driver can do multiplot
-  fully-interactively when output is not redirected. I.e. text and graphics
-  go to different places, or driver can flip using suspend.
-  - TERM_CANT_MULTIPLOT - driver cannot multiplot, even if output
-  is redirected.
+  - TERM_CAN_MULTIPLOT - driver can do multiplot in interactive mode,
+  - TERM_CANNOT_MULTIPLOT - driver cannot multiplot, even if output
+    is redirected. (not used by any current driver)
   - TERM_BINARY - output file must be opened in binary mode
   - TERM_ENHANCED_TEXT - terminal is currently in enhanced text mode
   - TERM_NO_OUTPUTFILE - terminal does not use gpoutfile
 
-_suspend() - called before gnuplot issues a prompt in multiplot mode
-   linux VGA driver uses this entry point to flip from graphics to
-   text mode. X11 driver will take this opportunity to paint the window
-   on the display.
+_suspend() - Called before gnuplot issues a prompt in multiplot mode.
+   Called only in interactive mode, and only for drivers that have set the
+   flag TERM_CAN_MULTIPLOT.  Some of these must flip between text/graphics
+   mode (e.g. linuxvga).  X11 driver will take this opportunity to paint
+   the window on the display.
 
 _resume() - called after suspend(), before subsequent plots of a multiplot.
+   Called only in interactive mode, and only for drivers that have set the
+   flag TERM_CAN_MULTIPLOT.
 
 _fillbox() - draws a filled axis-aligned rectangular box. The first
    argument controls the type of fill-in: either a solid color at some
