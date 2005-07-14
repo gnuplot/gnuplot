@@ -2,9 +2,8 @@ News, changes and fixes since gnuplot version 4.0
 =================================================
 * NEW 'splot x*y with pm3d' no longer requires prior 'set pm3d'
 * NEW store a sequence of plots to an animated gif (requires libgd > 2.0.28)
-* NEW let the string in '{s}plot ... notitle "string"' be silently ignored
 * NEW multi-byte font support in x11, control by the locale setting LC_CTYPE
-* NEW contol decimal sign conventions using locale setting LC_NUMERIC
+* NEW control decimal sign conventions using locale setting LC_NUMERIC
 * NEW pstex, pslatex and epslatex terminals share functionality with postscript
 * NEW suboptions "set pm3d corners2color min|max"
 * NEW linetype colors via "lt {palette {frac <val> | cb <val>}}"
@@ -30,12 +29,14 @@ News, changes and fixes since gnuplot version 4.0
 * NEW encoding koi8-u
 * NEW plot style "with vectors" applies to both 2D and 3D plots
 * NEW plot style "with points" can read variable point size from input file
+* CHANGE let the string in '{s}plot ... notitle "string"' be silently ignored
 * CHANGE libgd versions 2.0.28+ support GIF images as well as PNG/JPEG
 * CHANGE remove old (non-libgd) GIF and PNG drivers
 * CHANGE X-resource gnuplot*ctrlq:on requires <ctrl>q to kill plot window
 * CHANGE X-resource gnuplot*exportselection:off disables plot->clipboard export
 * CHANGE prefer use of offset keyword in 'set [xyz]label "foo" offset -1,-1'
 * CHANGE 'set table "outfile"; ...; unset table' replaces 'set term table'
+* FIXED empty datafiles are not a fatal error
 * FIXED setenv GNUTERM now works for png, jpeg, and gif drivers
 * FIXED PostScript output can be restricted to Level 1 compatible features
 * FIXED emf output is compatible with MSWin XP SP 2
