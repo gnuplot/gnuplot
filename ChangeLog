@@ -1,5 +1,21 @@
 2005-07-15  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
+	* src/term.c (enhanced_recursion) [POSTSCRIPT_DRIVER]: added
+	a conditional to allow builds without PostScript/pslatex drivers
+	again.
+
+	* term/pslatex.trm (PSLATEX_DRIVER): Define this macro here, where
+	it belongs.
+
+	* term/post.trm (POSTSCRIPT_DRIVER): Likewise.
+
+	* term/post.h: Remove #define PSLATEX_DRIVER --- it had no
+	business sitting in here.
+
+	* src/term_api.h (PC_setup) [PC]: Add missing prototype.
+
+	* src/gadgets.c: Add missing #include "graph3d.h".
+
 	* src/datafile.c: Re-indented almost the entire file.  Was
 	violating CodeStyle all over the place.
 
