@@ -1,3 +1,20 @@
+2005-07-15  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/datafile.c: Re-indented almost the entire file.  Was
+	violating CodeStyle all over the place.
+
+	* src/term.h [DJGPP, DJSVGA]: Allow build without GRX (by setting
+	DJSVGA to zero).
+
+	* config/makefile.dj2 (EXENAME): Removed version number from name.
+	(TERMFLAGS): DJSVGA definition moved to front, explain that
+	setting this to zero has a different effect now.
+	(TERMLIBS): Renamed to usual name (was LDFLAGS).
+	(CFLAGS): Updated to support build of current source.
+	(LINKOPT): Removed entry for GRX library.
+
+	* src/breaders.h: Added missing HAVE_CONFIG_H conditional.
+
 2005-07-14  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/internal.c src/term.c src/gplt_x11.c term/gd.trm: Fix mangled use
