@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.80 2005/07/12 03:37:42 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.81 2005/07/15 15:53:58 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -4465,31 +4465,32 @@ df_show_filetypes(FILE *fp)
 void
 df_swap_bytes_by_endianess(char *data, int read_order, int read_size)
 {
+    if ((read_order == DF_3210) 
 #if SUPPORT_MIDDLE_ENDIAN
-    if ((read_order == DF_3210) || (read_order == DF_2301)) {
-#else
-    if (read_order == DF_3210) {
+	|| (read_order == DF_2301)
 #endif
-        int j = 0;
-        int k = read_size - 1;
+	) {
+	int j = 0;
+	int k = read_size - 1;
         
-        for (; j < k; j++, k--) {
-            char temp = data[j];
+	for (; j < k; j++, k--) {
+	    char temp = data[j];
             
-            data[j] = data[k];
-            data[k] = temp;
-        }
+	    data[j] = data[k];
+	    data[k] = temp;
+	}
     }
+    
 #if SUPPORT_MIDDLE_ENDIAN
     if ((read_order == DF_1032) || (read_order == DF_2301)) {
-        int j= read_size - 1;
+	int j= read_size - 1;
         
-        for (; j > 0; j -= 2) {
-            char temp = data[j-1];
+	for (; j > 0; j -= 2) {
+	    char temp = data[j-1];
             
-            data[j-1] = data[j];
-            data[j] = temp;
-        }
+	    data[j-1] = data[j];
+	    data[j] = temp;
+	}
     }
 #endif
 }
@@ -4504,580 +4505,574 @@ df_swap_bytes_by_endianess(char *data, int read_order, int read_size)
 
 int
 df_readbinary(double v[], int max)
-    {
-        /* For general column structured binary. */
-        static int scan_size[3];
-        static double delta[3];      /* sampling periods */
-        static double o[3];          /* add after rotations */
-        static double c[3];          /* subtract before doing rotations */
-        static double P[3][3];       /* 3D rotation matrix (perpendicular) */
-        static double R[2][2];       /* 2D rotation matrix (rotate) */
-        static int read_order;
-        static int record_skip;
-        static int end_of_scan_line;
-        static int end_of_block;
-        static TBOOLEAN translation_required;
-        static char *memory_data;
+{
+    /* For general column structured binary. */
+    static int scan_size[3];
+    static double delta[3];      /* sampling periods */
+    static double o[3];          /* add after rotations */
+    static double c[3];          /* subtract before doing rotations */
+    static double P[3][3];       /* 3D rotation matrix (perpendicular) */
+    static double R[2][2];       /* 2D rotation matrix (rotate) */
+    static int read_order;
+    static int record_skip;
+    static int end_of_scan_line;
+    static int end_of_block;
+    static TBOOLEAN translation_required;
+    static char *memory_data;
 
-        /* For matrix data structure (i.e., gnuplot binary). */
-        static double first_matrix_column;
-        static float *scanned_matrix_row = 0;
-        static int first_matrix_row_col_count;
-        TBOOLEAN saved_first_matrix_column = FALSE;
+    /* For matrix data structure (i.e., gnuplot binary). */
+    static double first_matrix_column;
+    static float *scanned_matrix_row = 0;
+    static int first_matrix_row_col_count;
+    TBOOLEAN saved_first_matrix_column = FALSE;
 
-        assert(data_fp != NULL);
-        assert(max <= MAXDATACOLS);
-        assert(df_max_bininfo_cols > df_no_bin_cols);
-        assert(df_no_bin_cols);
+    assert(data_fp != NULL);
+    assert(max <= MAXDATACOLS);
+    assert(df_max_bininfo_cols > df_no_bin_cols);
+    assert(df_no_bin_cols);
 
-        /* catch attempt to read past EOF on mixed-input */
-        if (df_eof)
-            return DF_EOF;
+    /* catch attempt to read past EOF on mixed-input */
+    if (df_eof)
+	return DF_EOF;
 
-        /* Check if we have room for at least df_no_bin_cols columns */
-        if (df_max_cols < df_no_bin_cols) {
-            df_column = gp_realloc(df_column,
-                                   df_no_bin_cols * sizeof(df_column_struct),
-                                   "datafile columns");
-            df_max_cols = df_no_bin_cols;
-        }
+    /* Check if we have room for at least df_no_bin_cols columns */
+    if (df_max_cols < df_no_bin_cols) {
+	df_column = gp_realloc(df_column,
+			       df_no_bin_cols * sizeof(df_column_struct),
+			       "datafile columns");
+	df_max_cols = df_no_bin_cols;
+    }
 
-        /* In binary mode, the number of user specs was increased by the
-         * number of dimensions in the underlying uniformly sampled grid
-         * previously.  Fill in those values.  Also, compute elements of
-         * formula x' = P*R*(x - c) + o */
-        if (!df_M_count && !df_N_count && !df_O_count) {
-            int i;
-            df_binary_file_record_struct *this_record
-                = df_bin_record + df_bin_record_count;
+    /* In binary mode, the number of user specs was increased by the
+     * number of dimensions in the underlying uniformly sampled grid
+     * previously.  Fill in those values.  Also, compute elements of
+     * formula x' = P*R*(x - c) + o */
+    if (!df_M_count && !df_N_count && !df_O_count) {
+	int i;
+	df_binary_file_record_struct *this_record
+	    = df_bin_record + df_bin_record_count;
 
-            translation_required = FALSE;
-            scan_size[0] = scan_size[1] = scan_size[2] = 0;
+	translation_required = FALSE;
+	scan_size[0] = scan_size[1] = scan_size[2] = 0;
 
-            /* P */
-            translation_required |=
-                rotation_matrix_3D(P, this_record->cart_p);
+	/* P */
+	translation_required |=
+	    rotation_matrix_3D(P, this_record->cart_p);
 
-            /* R */
-            translation_required |=
-                rotation_matrix_2D(R, this_record->cart_alpha);
+	/* R */
+	translation_required |=
+	    rotation_matrix_2D(R, this_record->cart_alpha);
 
-            if (df_matrix_file) {
-                /* Dimensions */
-                scan_size[0] = this_record->scan_dim[0];
-                scan_size[1] = this_record->scan_dim[1];
+	if (df_matrix_file) {
+	    /* Dimensions */
+	    scan_size[0] = this_record->scan_dim[0];
+	    scan_size[1] = this_record->scan_dim[1];
 
-                if (scan_size[0] == 0)
-                    int_error(NO_CARET, "Scan size of matrix is zero");
+	    if (scan_size[0] == 0)
+		int_error(NO_CARET, "Scan size of matrix is zero");
 
-                /* To accomplish flipping in this case, multiply the
-                 * appropriate column of the rotation matrix by -1.  */
-                for (i = 0; i < 2; i++) {
-                    int j;
+	    /* To accomplish flipping in this case, multiply the
+	     * appropriate column of the rotation matrix by -1.  */
+	    for (i = 0; i < 2; i++) {
+		int j;
                 
-                    for (j = 0; j < 2; j++) {
-                        R[i][j] *= this_record->cart_dir[i];
-                    }
-                }
-                /* o */
-                for (i = 0; i < 3; i++) {
-                    if (this_record->cart_trans != DF_TRANSLATE_DEFAULT) {
-                        o[i] = this_record->cart_cen_or_ori[i];
-                    } else {
-                        /* Default is translate by center. */
-                        if (i < 2)
-                            o[i] = (df_matrix_corner[1][i]
-                                    + df_matrix_corner[0][i]) / 2;
-                        else
-                            o[i] = 0;
-                    }
-                }
-                /* c */
-                for (i = 0; i < 3; i++) {
-                    if (this_record->cart_trans == DF_TRANSLATE_VIA_ORIGIN) {
-                        if (i < 2)
-                            c[i] = df_matrix_corner[0][i];
-                        else
-                            c[i] = 0;
-                    } else {
-                        if (i < 2)
-                            c[i] = (df_matrix_corner[1][i]
-                                    + df_matrix_corner[0][i]) / 2;
-                        else
-                            c[i] = 0;
-                    }
-                }
+		for (j = 0; j < 2; j++) {
+		    R[i][j] *= this_record->cart_dir[i];
+		}
+	    }
+	    /* o */
+	    for (i = 0; i < 3; i++) {
+		if (this_record->cart_trans != DF_TRANSLATE_DEFAULT) {
+		    o[i] = this_record->cart_cen_or_ori[i];
+		} else {
+		    /* Default is translate by center. */
+		    if (i < 2)
+			o[i] = (df_matrix_corner[1][i]
+				+ df_matrix_corner[0][i]) / 2;
+		    else
+			o[i] = 0;
+		}
+	    }
+	    /* c */
+	    for (i = 0; i < 3; i++) {
+		if (this_record->cart_trans == DF_TRANSLATE_VIA_ORIGIN) {
+		    if (i < 2)
+			c[i] = df_matrix_corner[0][i];
+		    else
+			c[i] = 0;
+		} else {
+		    if (i < 2)
+			c[i] = (df_matrix_corner[1][i]
+				+ df_matrix_corner[0][i]) / 2;
+		    else
+			c[i] = 0;
+		}
+	    }
 
-                first_matrix_row_col_count = 0;
-            } else { /* general binary */
-                for (i = 0; i < 3; i++) {
-                    int map;
+	    first_matrix_row_col_count = 0;
+	} else { /* general binary */
+	    for (i = 0; i < 3; i++) {
+		int map;
                 
-                    /* How to direct the generated coordinates in regard
-                     * to scan direction */
-                    if (this_record->cart_dim[i] || this_record->scan_dim[i]) {
-                        if (this_record->scan_generate_coord)
-                            use_spec[i].column = this_record->cart_scan[i];
+		/* How to direct the generated coordinates in regard
+		 * to scan direction */
+		if (this_record->cart_dim[i] || this_record->scan_dim[i]) {
+		    if (this_record->scan_generate_coord)
+			use_spec[i].column = this_record->cart_scan[i];
                     
-                    }
-                    /* Dimensions */
-                    map = DF_SCAN_POINT - this_record->cart_scan[i];
-                    if (this_record->cart_dim[i] > 0)
-                        scan_size[map] = this_record->cart_dim[i];
-                    else
-                        scan_size[map]
-                            = this_record->scan_dim[map];
-                    /* Sample periods */
-                    if (this_record->cart_delta[i])
-                        delta[map] = this_record->cart_delta[i];
-                    else
-                        delta[map] = this_record->scan_delta[map];
-                    delta[map] = delta[map]
-                        * this_record->scan_dir[map]
-                        * this_record->cart_dir[i];
-                    /* o */
-                    if (this_record->cart_trans
-                        != DF_TRANSLATE_DEFAULT)
-                        o[i] = this_record->cart_cen_or_ori[i];
-                    else if (this_record->scan_trans != DF_TRANSLATE_DEFAULT)
-                        o[i] = this_record->scan_cen_or_ori[map];
-                    else if (scan_size[map] > 0)
-                        o[i] = (scan_size[map] - 1)*fabs(delta[map])/2;
-                    else
-                        o[i] = 0;
-                    /* c */
-                    if (this_record->cart_trans == DF_TRANSLATE_VIA_ORIGIN
-                        || (this_record->cart_trans == DF_TRANSLATE_DEFAULT
-                            && this_record->scan_trans == DF_TRANSLATE_VIA_ORIGIN)
-                        ) {
-                        if ((scan_size[map] > 0) && (delta[map] < 0))
-                            c[i] = (scan_size[map] - 1)*delta[map];
-                        else
-                            c[i] = 0;
-                    } else {
-                        if (scan_size[map] > 0)
-                            c[i] = (scan_size[map] - 1)*(delta[map]/2);
-                        else
-                            c[i] = 0;
-                    }
-                }
-            }
+		}
+		/* Dimensions */
+		map = DF_SCAN_POINT - this_record->cart_scan[i];
+		if (this_record->cart_dim[i] > 0)
+		    scan_size[map] = this_record->cart_dim[i];
+		else
+		    scan_size[map]
+			= this_record->scan_dim[map];
+		/* Sample periods */
+		if (this_record->cart_delta[i])
+		    delta[map] = this_record->cart_delta[i];
+		else
+		    delta[map] = this_record->scan_delta[map];
+		delta[map] = delta[map]
+		    * this_record->scan_dir[map]
+		    * this_record->cart_dir[i];
+		/* o */
+		if (this_record->cart_trans
+		    != DF_TRANSLATE_DEFAULT)
+		    o[i] = this_record->cart_cen_or_ori[i];
+		else if (this_record->scan_trans != DF_TRANSLATE_DEFAULT)
+		    o[i] = this_record->scan_cen_or_ori[map];
+		else if (scan_size[map] > 0)
+		    o[i] = (scan_size[map] - 1)*fabs(delta[map])/2;
+		else
+		    o[i] = 0;
+		/* c */
+		if (this_record->cart_trans == DF_TRANSLATE_VIA_ORIGIN
+		    || (this_record->cart_trans == DF_TRANSLATE_DEFAULT
+			&& this_record->scan_trans == DF_TRANSLATE_VIA_ORIGIN)
+		    ) {
+		    if ((scan_size[map] > 0) && (delta[map] < 0))
+			c[i] = (scan_size[map] - 1)*delta[map];
+		    else
+			c[i] = 0;
+		} else {
+		    if (scan_size[map] > 0)
+			c[i] = (scan_size[map] - 1)*(delta[map]/2);
+		    else
+			c[i] = 0;
+		}
+	    }
+	}
 
-            /* Check if c and o are the same. */
-            for (i = 0; i < 3; i++)
-                translation_required |= (c[i] != o[i]);
+	/* Check if c and o are the same. */
+	for (i = 0; i < 3; i++)
+	    translation_required |= (c[i] != o[i]);
 
-            /* Should data come from memory? */
-            memory_data = this_record->memory_data;
+	/* Should data come from memory? */
+	memory_data = this_record->memory_data;
 
-            /* byte read order */
-            read_order = byte_read_order(df_bin_file_endianess);
+	/* byte read order */
+	read_order = byte_read_order(df_bin_file_endianess);
 
-            /* amount to skip before record */
-            record_skip = this_record->scan_skip[0];
+	/* amount to skip before record */
+	record_skip = this_record->scan_skip[0];
 
-            end_of_scan_line = FALSE;
-            end_of_block = FALSE;
-            point_count = -1;
-            line_count = 0;
-            df_current_index = df_bin_record_count;
-        }
+	end_of_scan_line = FALSE;
+	end_of_block = FALSE;
+	point_count = -1;
+	line_count = 0;
+	df_current_index = df_bin_record_count;
+    }
 
-        while (!df_eof) {
-            /*{{{  process line */
-            int line_okay = 1;
-            int output = 0;             /* how many numbers written to v[] */
-            int i, fread_ret = 0;
-            int m_value, n_value, o_value;
-            union io_val {
-                char ch;
-                unsigned char uc;
-                short sh;
-                unsigned short us;
-                int in;
-                unsigned int ui;
-                long lo;
-                unsigned long ul;
-                float fl;
-                double db;
-            } io_val;
+    while (!df_eof) {
+	/*{{{  process line */
+	int line_okay = 1;
+	int output = 0;             /* how many numbers written to v[] */
+	int i, fread_ret = 0;
+	int m_value, n_value, o_value;
+	union io_val {
+	    char ch;
+	    unsigned char uc;
+	    short sh;
+	    unsigned short us;
+	    int in;
+	    unsigned int ui;
+	    long lo;
+	    unsigned long ul;
+	    float fl;
+	    double db;
+	} io_val;
 
-            /* Scan in a number of floats based upon the largest index in
-             * the use_specs array.  If the largest index in the array is
-             * greater than maximum columns then issue an error.
-             */
+	/* Scan in a number of floats based upon the largest index in
+	 * the use_specs array.  If the largest index in the array is
+	 * greater than maximum columns then issue an error.
+	 */
 
-            /* Handle end of line or end of block on previous read. */
-            if (end_of_scan_line) {
-                end_of_scan_line = FALSE;
-                point_count = -1;
-                line_count++;
-                return DF_FIRST_BLANK;
-            }
-            if (end_of_block) {
-                end_of_block = FALSE;
-                line_count = 0;
-                return DF_SECOND_BLANK;
-            }
+	/* Handle end of line or end of block on previous read. */
+	if (end_of_scan_line) {
+	    end_of_scan_line = FALSE;
+	    point_count = -1;
+	    line_count++;
+	    return DF_FIRST_BLANK;
+	}
+	if (end_of_block) {
+	    end_of_block = FALSE;
+	    line_count = 0;
+	    return DF_SECOND_BLANK;
+	}
 
-            /* Possibly skip bytes before starting to read record. */
-            while (record_skip) {
-                if (memory_data) {
-                    memory_data++;
-                } else if ((fread_ret = fread(&io_val.ch,
-                                              sizeof(io_val.ch),
-                                              1, data_fp))
-                           != 1) {
-                    if (feof(data_fp)) {
-                        df_eof = 1;
-                        return DF_EOF;
-                    } else
-                        int_error(NO_CARET, read_error_msg);
-                }
-                record_skip--;
-            } /* while(record_skip) */
+	/* Possibly skip bytes before starting to read record. */
+	while (record_skip) {
+	    if (memory_data) {
+		memory_data++;
+	    } else if ((fread_ret = fread(&io_val.ch,
+					  sizeof(io_val.ch),
+					  1, data_fp))
+		       != 1) {
+		if (feof(data_fp)) {
+		    df_eof = 1;
+		    return DF_EOF;
+		} else
+		    int_error(NO_CARET, read_error_msg);
+	    }
+	    record_skip--;
+	} /* while(record_skip) */
 
-            /* Bring in variables as described by the field parameters.
-             * If less than than the appropriate number of bytes have been
-             * read, issue an error stating not enough columns were found.  */
-            for (i = 0; ; i++) {
-                int skip_bytes = df_column_bininfo[i].skip_bytes;
+	/* Bring in variables as described by the field parameters.
+	 * If less than than the appropriate number of bytes have been
+	 * read, issue an error stating not enough columns were found.  */
+	for (i = 0; ; i++) {
+	    int skip_bytes = df_column_bininfo[i].skip_bytes;
 
-                if (skip_bytes) {
-                    if (memory_data) {
-                        memory_data += skip_bytes;
-                    } else if ((fread_ret = fread(&io_val.ch, sizeof(io_val.ch),
-                                                  skip_bytes, data_fp))
-                               != skip_bytes) {
-                        if (feof(data_fp)) {
-                            df_eof = 1;
-                            return DF_EOF;
-                        } else
-                            int_error(NO_CARET, read_error_msg);
-                    }
-                }
+	    if (skip_bytes) {
+		if (memory_data) {
+		    memory_data += skip_bytes;
+		} else if ((fread_ret = fread(&io_val.ch, sizeof(io_val.ch),
+					      skip_bytes, data_fp))
+			   != skip_bytes) {
+		    if (feof(data_fp)) {
+			df_eof = 1;
+			return DF_EOF;
+		    } else
+			int_error(NO_CARET, read_error_msg);
+		}
+	    }
 
-                /* Last entry only has skip bytes, no data. */
-                if (i == df_no_bin_cols)
-                    break;
+	    /* Last entry only has skip bytes, no data. */
+	    if (i == df_no_bin_cols)
+		break;
 
-                /* Read in a "column", i.e., a binary value of various types. */
-                if (memory_data) {
-                    for (fread_ret = 0;
-                         fread_ret < df_column_bininfo[i].column.read_size;
-                         fread_ret++)
-                        (&io_val.ch)[fread_ret] = *memory_data++;
-                } else {
-                    fread_ret = fread(&io_val.ch,
-                                      df_column_bininfo[i].column.read_size,
-                                      1, data_fp);
-                    if (fread_ret != 1) {
-                        df_eof = 1;
-                        return DF_EOF;
-                    }
-                }
+	    /* Read in a "column", i.e., a binary value of various types. */
+	    if (memory_data) {
+		for (fread_ret = 0;
+		     fread_ret < df_column_bininfo[i].column.read_size;
+		     fread_ret++)
+		    (&io_val.ch)[fread_ret] = *memory_data++;
+	    } else {
+		fread_ret = fread(&io_val.ch,
+				  df_column_bininfo[i].column.read_size,
+				  1, data_fp);
+		if (fread_ret != 1) {
+		    df_eof = 1;
+		    return DF_EOF;
+		}
+	    }
 
-                df_swap_bytes_by_endianess(&io_val.ch, read_order,
-                                           df_column_bininfo[i].column.read_size);
+	    df_swap_bytes_by_endianess(&io_val.ch, read_order,
+				       df_column_bininfo[i].column.read_size);
 
-                switch (df_column_bininfo[i].column.read_type) {
-                    case DF_CHAR:
-                        df_column[i].datum = io_val.ch;
-                        break;
-                    case DF_UCHAR:
-                        df_column[i].datum = io_val.uc;
-                        break;
-                    case DF_SHORT:
-                        df_column[i].datum = io_val.sh;
-                        break;
-                    case DF_USHORT:
-                        df_column[i].datum = io_val.us;
-                        break;
-                    case DF_INT:
-                        df_column[i].datum = io_val.in;
-                        break;
-                    case DF_UINT:
-                        df_column[i].datum = io_val.ui;
-                        break;
-                    case DF_LONG:
-                        df_column[i].datum = io_val.lo;
-                        break;
-                    case DF_ULONG:
-                        df_column[i].datum = io_val.ul;
-                        break;
-                    case DF_FLOAT:
-                        df_column[i].datum = io_val.fl;
-                        break;
-                    case DF_DOUBLE:
-                        df_column[i].datum = io_val.db;
-                        break;
-                    default:
-                        int_error(NO_CARET, "Binary data type unknown");
-                }
+	    switch (df_column_bininfo[i].column.read_type) {
+		case DF_CHAR:
+		    df_column[i].datum = io_val.ch;
+		    break;
+		case DF_UCHAR:
+		    df_column[i].datum = io_val.uc;
+		    break;
+		case DF_SHORT:
+		    df_column[i].datum = io_val.sh;
+		    break;
+		case DF_USHORT:
+		    df_column[i].datum = io_val.us;
+		    break;
+		case DF_INT:
+		    df_column[i].datum = io_val.in;
+		    break;
+		case DF_UINT:
+		    df_column[i].datum = io_val.ui;
+		    break;
+		case DF_LONG:
+		    df_column[i].datum = io_val.lo;
+		    break;
+		case DF_ULONG:
+		    df_column[i].datum = io_val.ul;
+		    break;
+		case DF_FLOAT:
+		    df_column[i].datum = io_val.fl;
+		    break;
+		case DF_DOUBLE:
+		    df_column[i].datum = io_val.db;
+		    break;
+		default:
+		    int_error(NO_CARET, "Binary data type unknown");
+	    }
 
-                df_column[i].good = DF_GOOD;
-                df_column[i].position = NULL;   /* cant get a time */
+	    df_column[i].good = DF_GOOD;
+	    df_column[i].position = NULL;   /* cant get a time */
 
-                /* Matrix file data is a special case. After reading
-                 * in just one binary value, stop then decide on what
-                 * to do with it. */
-                if (df_matrix_file)
-                    break;
+	    /* Matrix file data is a special case. After reading
+	     * in just one binary value, stop then decide on what
+	     * to do with it. */
+	    if (df_matrix_file)
+		break;
 
-            } /* for(i) */
+	} /* for(i) */
 
-            if (df_matrix_file) {
-                if (df_matrix_binary) {
-                    /* Store just first column? */
-                    if (!df_M_count && !saved_first_matrix_column) {
-                        first_matrix_column = df_column[i].datum;
-                        saved_first_matrix_column = TRUE;
-                        continue;
-                    }
+	if (df_matrix_file) {
+	    if (df_matrix_binary) {
+		/* Store just first column? */
+		if (!df_M_count && !saved_first_matrix_column) {
+		    first_matrix_column = df_column[i].datum;
+		    saved_first_matrix_column = TRUE;
+		    continue;
+		}
 
-                    /* Read reset of first row? */
-                    if (!df_M_count && !df_N_count && !df_O_count
-                        && first_matrix_row_col_count < scan_size[0]) {
-                        if (!first_matrix_row_col_count
-                            && ! (scanned_matrix_row =
-                                  gp_realloc(scanned_matrix_row,
-                                             scan_size[0]*sizeof(float),
-                                             "gpbinary matrix row")))
-                            int_error(NO_CARET, "not enough memory to create vector");
-                        scanned_matrix_row[first_matrix_row_col_count]
-                            = df_column[i].datum;
-                        first_matrix_row_col_count++;
-                        if (first_matrix_row_col_count == scan_size[0]) {
+		/* Read reset of first row? */
+		if (!df_M_count && !df_N_count && !df_O_count
+		    && first_matrix_row_col_count < scan_size[0]) {
+		    if (!first_matrix_row_col_count
+			&& ! (scanned_matrix_row =
+			      gp_realloc(scanned_matrix_row,
+					 scan_size[0]*sizeof(float),
+					 "gpbinary matrix row")))
+			int_error(NO_CARET, "not enough memory to create vector");
+		    scanned_matrix_row[first_matrix_row_col_count]
+			= df_column[i].datum;
+		    first_matrix_row_col_count++;
+		    if (first_matrix_row_col_count == scan_size[0]) {
                                 /* Start of the second row. */
-                            saved_first_matrix_column = FALSE;
-                        }
-                        continue;
-                    }
+			saved_first_matrix_column = FALSE;
+		    }
+		    continue;
+		}
 
-                }
+	    }
 
-                /* Update all the binary columns.  Matrix binary and
-                 * matrix ASCII is a slight abuse of notation.  At the
-                 * command line, 1 means first row, 2 means first
-                 * column.  There can only be one column of data input
-                 * because it is a matrix of data, not columns.  */
-                {
-                    int j;
+	    /* Update all the binary columns.  Matrix binary and
+	     * matrix ASCII is a slight abuse of notation.  At the
+	     * command line, 1 means first row, 2 means first
+	     * column.  There can only be one column of data input
+	     * because it is a matrix of data, not columns.  */
+	    {
+		int j;
 
-                    df_datum = df_column[i].datum;
+		df_datum = df_column[i].datum;
 
-                    /* Fill backward so that current read value is not
-                     * overwritten. */
-                    for (j = df_no_bin_cols-1; j >= 0; j--) {
-                        if (j == 0)
-                            df_column[j].datum
-                                = df_matrix_binary
-                                ? scanned_matrix_row[df_M_count]
-                                : df_M_count;
-                        else if (j == 1)
-                            df_column[j].datum
-                                = df_matrix_binary
-                                ? first_matrix_column
-                                : df_N_count;
-                        else
-                            df_column[j].datum = df_column[i].datum;
-                        df_column[j].good = DF_GOOD;
-                        df_column[j].position = NULL;
-                    }
-                }
-            } else { /* Not matrix file, general binray. */
-                df_datum = point_count;
-                if (i != df_no_bin_cols) {
-                    if (feof(data_fp)) {
-                        if (i != 0) 
-                            int_error(NO_CARET, "\
+		/* Fill backward so that current read value is not
+		 * overwritten. */
+		for (j = df_no_bin_cols-1; j >= 0; j--) {
+		    if (j == 0)
+			df_column[j].datum
+			    = df_matrix_binary
+			    ? scanned_matrix_row[df_M_count]
+			    : df_M_count;
+		    else if (j == 1)
+			df_column[j].datum
+			    = df_matrix_binary
+			    ? first_matrix_column
+			    : df_N_count;
+		    else
+			df_column[j].datum = df_column[i].datum;
+		    df_column[j].good = DF_GOOD;
+		    df_column[j].position = NULL;
+		}
+	    }
+	} else { /* Not matrix file, general binray. */
+	    df_datum = point_count;
+	    if (i != df_no_bin_cols) {
+		if (feof(data_fp)) {
+		    if (i != 0) 
+			int_error(NO_CARET, "\
 Last point in the binary file did not match the specified `using` columns");
-                        df_eof = 1;
-                        return DF_EOF;
-                    } else {
-                        int_error(NO_CARET, read_error_msg);
-                    }
-                }
-            }
+		    df_eof = 1;
+		    return DF_EOF;
+		} else {
+		    int_error(NO_CARET, read_error_msg);
+		}
+	    }
+	}
 
-            m_value = df_M_count;
-            n_value = df_N_count;
-            o_value = df_O_count;
-            df_M_count++;
-            if ((scan_size[0] > 0) && (df_M_count >= scan_size[0])) {
-                /* This is a new "line". */
-                df_M_count = 0;
-                df_N_count++;
-                end_of_scan_line = TRUE;
-                if ((scan_size[1] >= 0) && (df_N_count >= scan_size[1])) {
-                    /* This is a "block". */
-                    df_N_count = 0;
-                    df_O_count++;
-                    if ((scan_size[2] >= 0) && (df_O_count >= scan_size[2])) {
-                        df_O_count = 0;
-                        end_of_block = TRUE;
-                        if (++df_bin_record_count >= df_num_bin_records) {
-                            df_eof = 1;
-                        }
-                    }
-                }
-            }
+	m_value = df_M_count;
+	n_value = df_N_count;
+	o_value = df_O_count;
+	df_M_count++;
+	if ((scan_size[0] > 0) && (df_M_count >= scan_size[0])) {
+	    /* This is a new "line". */
+	    df_M_count = 0;
+	    df_N_count++;
+	    end_of_scan_line = TRUE;
+	    if ((scan_size[1] >= 0) && (df_N_count >= scan_size[1])) {
+		/* This is a "block". */
+		df_N_count = 0;
+		df_O_count++;
+		if ((scan_size[2] >= 0) && (df_O_count >= scan_size[2])) {
+		    df_O_count = 0;
+		    end_of_block = TRUE;
+		    if (++df_bin_record_count >= df_num_bin_records) {
+			df_eof = 1;
+		    }
+		}
+	    }
+	}
 
-            /*{{{  ignore points outside range of index */
-            /* we try to return end-of-file as soon as we pass upper
-             * index, but for mixed input stream, we must skip garbage */
+	/*{{{  ignore points outside range of index */
+	/* we try to return end-of-file as soon as we pass upper
+	 * index, but for mixed input stream, we must skip garbage */
 
-            if (df_current_index < df_lower_index
-                || df_current_index > df_upper_index
-                || ((df_current_index - df_lower_index) % df_index_step) != 0)
-                continue;
-            /*}}} */
+	if (df_current_index < df_lower_index
+	    || df_current_index > df_upper_index
+	    || ((df_current_index - df_lower_index) % df_index_step) != 0)
+	    continue;
+	/*}}} */
 
-            /*{{{  reject points by every */
-            /* accept only lines with (line_count%everyline) == 0 */
-            if (line_count < firstline
-                || line_count > lastline
-                || (line_count - firstline) % everyline != 0)
-                continue;
+	/*{{{  reject points by every */
+	/* accept only lines with (line_count%everyline) == 0 */
+	if (line_count < firstline
+	    || line_count > lastline
+	    || (line_count - firstline) % everyline != 0)
+	    continue;
 
-            /* update point_count. ignore point if
-               point_count%everypoint != 0 */
-            if (++point_count < firstpoint
-                || point_count > lastpoint
-                || (point_count - firstpoint) % everypoint != 0)
-                continue;
-            /*}}} */
+	/* update point_count. ignore point if
+	   point_count%everypoint != 0 */
+	if (++point_count < firstpoint
+	    || point_count > lastpoint
+	    || (point_count - firstpoint) % everypoint != 0)
+	    continue;
+	/*}}} */
 
-            /* At this point the binary columns have been read
-             * successfully.  Set df_no_cols to df_no_bin_cols for use
-             * in the interpretation code.  */
-            df_no_cols = df_no_bin_cols;
+	/* At this point the binary columns have been read
+	 * successfully.  Set df_no_cols to df_no_bin_cols for use
+	 * in the interpretation code.  */
+	df_no_cols = df_no_bin_cols;
 
-            /*{{{  copy column[] to v[] via use[] */
-            {
-                int limit = (df_no_use_specs ? df_no_use_specs : MAXDATACOLS);
+	/*{{{  copy column[] to v[] via use[] */
+	{
+	    int limit = (df_no_use_specs ? df_no_use_specs : MAXDATACOLS);
                 
-                if (limit > max)
-                    limit = max;
+	    if (limit > max)
+		limit = max;
 
-                for (output = 0; output < limit; ++output) {
-                    int column = use_spec[output].column;
+	    for (output = 0; output < limit; ++output) {
+		int column = use_spec[output].column;
 
-                    /* if there was no using spec, column is output+1
-                     * and at=NULL */
-                    if (use_spec[output].at) {
-                        struct value a;
+		/* if there was no using spec, column is output+1
+		 * and at=NULL */
+		if (use_spec[output].at) {
+		    struct value a;
                         
-                        /* no dummy values to set up prior to... */
-                        evaluate_inside_using = TRUE;
-                        evaluate_at(use_spec[output].at, &a);
-                        evaluate_inside_using = FALSE;
-                        if (undefined)
-                            /* store undefined point in plot */
-                            return DF_UNDEFINED; 
+		    /* no dummy values to set up prior to... */
+		    evaluate_inside_using = TRUE;
+		    evaluate_at(use_spec[output].at, &a);
+		    evaluate_inside_using = FALSE;
+		    if (undefined)
+			/* store undefined point in plot */
+			return DF_UNDEFINED; 
 
-                        v[output] = real(&a);
-                    } else if (column == -5) {
-                        /* Perhaps try using a switch statement to
-                         * avoid so many tests. */
-                        v[output] = o_value*delta[2];
-                    } else if (column == -4) {
-                        v[output] = n_value*delta[1];
-                    } else if (column == -3) {
-                        v[output] = m_value*delta[0];
-                    } else if (column == -2) {
-                        v[output] = df_current_index;
-                    } else if (column == -1) {
-                        v[output] = line_count;
-                    } else if (column == 0) {
-                        v[output] = df_datum;
-                    } else if (column <= 0)
-                        int_error(NO_CARET, "\
+		    v[output] = real(&a);
+		} else if (column == -5) {
+		    /* Perhaps try using a switch statement to
+		     * avoid so many tests. */
+		    v[output] = o_value*delta[2];
+		} else if (column == -4) {
+		    v[output] = n_value*delta[1];
+		} else if (column == -3) {
+		    v[output] = m_value*delta[0];
+		} else if (column == -2) {
+		    v[output] = df_current_index;
+		} else if (column == -1) {
+		    v[output] = line_count;
+		} else if (column == 0) {
+		    v[output] = df_datum;
+		} else if (column <= 0)
+		    int_error(NO_CARET, "\
 internal error: unkown column type");
-                    else if ((df_axis[output] != -1)
-                             && (axis_array[df_axis[output]].is_timedata)) {
-                        struct tm tm;
+		else if ((df_axis[output] != -1)
+			 && (axis_array[df_axis[output]].is_timedata)) {
+		    struct tm tm;
                         
-                        if (column > df_no_cols
-                            || df_column[column - 1].good == DF_MISSING
-                            || !df_column[column - 1].position
-                            || !gstrptime(df_column[column - 1].position,
-                                          axis_array[df_axis[output]].timefmt,
-                                          &tm)) {
-                            /* line bad only if user explicitly asked
-                             * for this column */
-                            if (df_no_use_specs)
-                                line_okay = 0;
+		    if (column > df_no_cols
+			|| df_column[column - 1].good == DF_MISSING
+			|| !df_column[column - 1].position
+			|| !gstrptime(df_column[column - 1].position,
+				      axis_array[df_axis[output]].timefmt,
+				      &tm)) {
+			/* line bad only if user explicitly asked
+			 * for this column */
+			if (df_no_use_specs)
+			    line_okay = 0;
                         
-                            /* return or ignore line depending on line_okay */
-                            break;
-                        }
-                        v[output] = (double) gtimegm(&tm);
-                    } else if ((column <= df_no_cols)
-                            && df_column[column - 1].good == DF_GOOD)
-                            v[output] = df_column[column - 1].datum;
+			/* return or ignore line depending on line_okay */
+			break;
+		    }
+		    v[output] = (double) gtimegm(&tm);
+		} else if ((column <= df_no_cols)
+			   && df_column[column - 1].good == DF_GOOD)
+		    v[output] = df_column[column - 1].datum;
                         
-                    /* EAM - Oct 2002 Distinguish between DF_MISSING
-                     * and DF_BAD.  Previous versions would never
-                     * notify caller of either case.  Now missing data
-                     * will be noted. Bad data should arguably be
-                     * noted also, but that would change existing
-                     * default behavior.  */
-                    else if ((column <= df_no_cols)
-                             && (df_column[column - 1].good == DF_MISSING))
-                        return DF_MISSING;
-                    else {
-                        /* line bad only if user explicitly asked
-                         * for this column */
-                        if (df_no_use_specs)
-                            line_okay = 0;
-                        break;  /* return or ignore depending on line_okay */
-                    }
-                }
+		/* EAM - Oct 2002 Distinguish between DF_MISSING
+		 * and DF_BAD.  Previous versions would never
+		 * notify caller of either case.  Now missing data
+		 * will be noted. Bad data should arguably be
+		 * noted also, but that would change existing
+		 * default behavior.  */
+		else if ((column <= df_no_cols)
+			 && (df_column[column - 1].good == DF_MISSING))
+		    return DF_MISSING;
+		else {
+		    /* line bad only if user explicitly asked
+		     * for this column */
+		    if (df_no_use_specs)
+			line_okay = 0;
+		    break;  /* return or ignore depending on line_okay */
+		}
+	    }
 
-                /* Linear translation. */
-                if (translation_required) {
-                    double x, y, z;
+	    /* Linear translation. */
+	    if (translation_required) {
+		double x, y, z;
 
-                    x = v[0] - c[0];
-                    y = v[1] - c[1];
+		x = v[0] - c[0];
+		y = v[1] - c[1];
 
-                    v[0] = R[0][0] * x + R[0][1] * y;
-                    v[1] = R[1][0] * x + R[1][1] * y;
-                    if (df_plot_mode == MODE_SPLOT) {
-                        x = v[0];
-                        y = v[1];
-                        z = v[2] - c[2];
-                        v[0] = P[0][0] * x + P[0][1] * y + P[0][2] * z;
-                        v[1] = P[1][0] * x + P[1][1] * y + P[1][2] * z;
-                        v[2] = P[2][0] * x + P[2][1] * y + P[2][2] * z;
-                    }
+		v[0] = R[0][0] * x + R[0][1] * y;
+		v[1] = R[1][0] * x + R[1][1] * y;
+		if (df_plot_mode == MODE_SPLOT) {
+		    x = v[0];
+		    y = v[1];
+		    z = v[2] - c[2];
+		    v[0] = P[0][0] * x + P[0][1] * y + P[0][2] * z;
+		    v[1] = P[1][0] * x + P[1][1] * y + P[1][2] * z;
+		    v[2] = P[2][0] * x + P[2][1] * y + P[2][2] * z;
+		}
 
-                    v[0] += o[0];
-                    v[1] += o[1];
-                    if (df_plot_mode == MODE_SPLOT)
-                        v[2] += o[2];
-                }
+		v[0] += o[0];
+		v[1] += o[1];
+		if (df_plot_mode == MODE_SPLOT)
+		    v[2] += o[2];
+	    }
 
-            }
-            /*}}} */
+	}
+	/*}}} */
 
-            if (!line_okay)
-                continue;
+	if (!line_okay)
+	    continue;
 
-            /* output == df_no_use_specs if using was specified -
-             * actually, smaller of df_no_use_specs and max */
-            assert(df_no_use_specs == 0
-                   || output == df_no_use_specs
-                   || output == max);
+	/* output == df_no_use_specs if using was specified -
+	 * actually, smaller of df_no_use_specs and max */
+	assert(df_no_use_specs == 0
+	       || output == df_no_use_specs
+	       || output == max);
 
-            return output;
-
-        }
-        /*}}} */
-
-        df_eof = 1;
-        return DF_EOF;
+	return output;
 
     }
     /*}}} */
