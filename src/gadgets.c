@@ -36,6 +36,7 @@ static char *RCSid() { return RCSid("gadgets.c,v 1.1.3.1 2000/05/03 21:47:15 hbb
 
 #include "gadgets.h"
 #include "command.h"
+#include "graph3d.h" /* for map3d_position_r() */
 #include "graphics.h"
 #include "plot3d.h" /* For is_plot_with_palette() */
 
