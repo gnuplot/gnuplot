@@ -1,5 +1,5 @@
 /*
- * $Id: post.h,v 1.7 2005/03/02 19:44:57 sfeam Exp $
+ * $Id: post.h,v 1.8 2005/05/15 19:46:58 persquare Exp $
  */
 
 /* GNUPLOT - post.h */
@@ -41,9 +41,6 @@
  * (post.trm and pslatex.trm)
  */
 
-/* Define to include merged pslatex/epslatex drivers */
-#define PSLATEX_DRIVER
- 
 #ifdef PSLATEX_DRIVER
 TERM_PUBLIC void PSTEX_common_init __PROTO((void));
 TERM_PUBLIC void PSTEX_reopen_output __PROTO((void));
