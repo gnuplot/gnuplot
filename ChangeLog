@@ -1,5 +1,11 @@
 2005-07-16  Juergen Wieferink  <wieferink@freenet.de>
 
+	src/command.c (load_command): Issue an error message if any
+	tokens or further commands follow a "load <file>" command.
+	Sourceforge patch #1210835.
+
+2005-07-16  Juergen Wieferink  <wieferink@freenet.de>
+
 	Allow a single plot or splot command to contain a mixture of 
 	functions, e.g. sin(x), and constant expressions including
 	string-valued constant expressions, e.g. sprintf("file.%d",n).

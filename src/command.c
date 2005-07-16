@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.123 2005/07/10 19:18:29 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.124 2005/07/13 17:45:17 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -889,6 +889,12 @@ load_command()
     save_file = try_to_get_string();
     if (!save_file)
 	int_error(c_token, "expecting filename");
+    if (c_token < num_tokens) { /* not EOL */
+	if (!equals(c_token, ";"))
+	    int_error(c_token, "expecting end of line");
+	else if ( c_token + 1 < num_tokens ) /* not EOL even after ';' */
+	    int_warn(c_token + 1, "ignoring rest of line");
+    }
 
     gp_expand_tilde(&save_file);
     fp = strcmp(save_file, "-") ? loadpath_fopen(save_file, "r") : stdout;
