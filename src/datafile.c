@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.81 2005/07/15 15:53:58 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.82 2005/07/15 17:14:07 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -83,7 +83,7 @@ static char *RCSid() { return RCSid("$Id: datafile.c,v 1.81 2005/07/15 15:53:58 
  *    int df_timecol[]    - client controls which cols read as time
  *
  * functions
- *   int df_open(int max_using)
+ *   int df_open(char *file_name, int max_using)
  *      parses thru / index / using on command line
  *      max_using is max no of 'using' columns allowed
  *      returns number of 'using' cols specified, or -1 on error (?)
@@ -1011,18 +1011,15 @@ initialize_use_spec()
 }
 
 
-/*{{{  int df_open(max_using) */
+/*{{{  int df_open(char *file_name, max_using) */
 
 /* open file, parsing using/thru/index stuff return number of using
  * specs [well, we have to return something !]
  */
 int
-df_open(int max_using)
+df_open(const char *cmd_filename, int max_using)
 {
-    /* now allocated dynamically */
-    int name_token = 0;
-    char *cmd_filename;
-
+    int name_token = c_token - 1;
     TBOOLEAN duplication = FALSE;
     TBOOLEAN set_index = FALSE, set_every = FALSE, set_thru = FALSE;
     TBOOLEAN set_using = FALSE;
@@ -1074,20 +1071,14 @@ df_open(int max_using)
 
     assert(max_using <= MAXDATACOLS);
 
-    if (END_OF_COMMAND)
-        int_error(c_token,"missing filename");
-
-    name_token = c_token;
-
-    cmd_filename = try_to_get_string();
     if (!cmd_filename)
-        int_error(name_token, "missing filename");
+	int_error(c_token, "missing filename");
     if (!cmd_filename[0]) {
         if (!df_filename || !*df_filename)
             int_error(c_token, "No previous filename");
     } else {
         free(df_filename);
-        df_filename = cmd_filename;
+	df_filename = gp_strdup(cmd_filename);
     }
 
     /* defer opening until we have parsed the modifiers... */

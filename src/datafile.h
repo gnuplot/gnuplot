@@ -1,5 +1,5 @@
 /*
- * $Id: datafile.h,v 1.16 2005/03/05 04:52:14 sfeam Exp $
+ * $Id: datafile.h,v 1.17 2005/07/12 03:37:42 sfeam Exp $
  */
 
 /* GNUPLOT - datafile.h */
@@ -108,7 +108,7 @@ extern TBOOLEAN plotted_data_from_stdin;
 
 /* Prototypes of functions exported by datafile.c */
 
-int df_open __PROTO((int));
+int df_open __PROTO((const char *, int));
 int df_readline __PROTO((double [], int));
 void df_close __PROTO((void));
 void df_showdata __PROTO((void));

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.50 2005/04/22 21:40:37 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.51 2005/07/12 03:37:42 sfeam Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -1208,7 +1208,7 @@ fit_command()
     double tmpd;
     time_t timer;
     int token1, token2, token3;
-    char *tmp;
+    char *tmp, *file_name;
 
     c_token++;
 
@@ -1261,10 +1261,15 @@ fit_command()
 
     token2 = c_token;
 
-    /* use datafile module to parse the datafile and qualifiers */
+    /* get filename */
+    file_name = try_to_get_string();
+    if (!file_name)
+	int_error(c_token, "missing filename");
 
+    /* use datafile module to parse the datafile and qualifiers */
     df_set_plot_mode(MODE_QUERY);  /* Does nothing except for binary datafiles */
-    columns = df_open(4);	/* up to 4 using specs allowed */
+    columns = df_open(file_name, 4);	/* up to 4 using specs allowed */
+    free(file_name);
     if (columns == 1)
 	int_error(c_token, "Need 2 to 4 using specs");
     is_a_3d_fit = (columns == 4);

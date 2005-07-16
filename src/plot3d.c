@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.103 2005/06/29 22:31:13 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.104 2005/07/12 03:37:42 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -1184,6 +1184,7 @@ eval_3dplots()
 	    int specs;
 	    struct surface_points *this_plot;
 
+	    char *name_str;
 	    TBOOLEAN duplication = FALSE;
 	    TBOOLEAN set_title = FALSE, set_with = FALSE;
 	    TBOOLEAN set_lpstyle = FALSE;
@@ -1192,7 +1193,12 @@ eval_3dplots()
 	    TBOOLEAN set_labelstyle = FALSE;
 #endif
 
-	    if (isstringvalue(c_token)) {
+	    dummy_func = &plot_func;
+	    /* WARNING: do NOT free name_str */
+	    /* FIXME: could also be saved in this_plot */
+	    name_str = string_or_express(NULL);
+	    dummy_func = NULL;
+	    if (name_str) {
 		/*{{{  data file to plot */
 		if (parametric && crnt_param != 0)
 		    int_error(c_token, "previous parametric function not fully specified");
@@ -1224,7 +1230,7 @@ eval_3dplots()
 		this_plot->plot_style = data_style;
 
 		df_set_plot_mode(MODE_SPLOT);
-		specs = df_open(MAXDATACOLS);
+		specs = df_open(name_str, MAXDATACOLS);
 #ifdef BINARY_DATA_FILE
 		if (df_matrix)
 		    this_plot->has_grid_topology = TRUE;
@@ -1286,9 +1292,6 @@ eval_3dplots()
 		this_plot->has_grid_topology = TRUE;
 		this_plot->plot_style = func_style;
 		this_plot->num_iso_read = iso_samples_2;
-		dummy_func = &plot_func;
-		plot_func.at = temp_at();
-		dummy_func = NULL;
 		/* ignore it for now */
 		some_functions = TRUE;
 		end_token = c_token - 1;
@@ -1741,7 +1744,13 @@ eval_3dplots()
 	    if (is_definition(c_token)) {
 		define();
 	    } else {
-		if (!isstringvalue(c_token)) {	/* func to plot */
+		struct at_type *at_ptr;
+		char *name_str;
+
+		dummy_func = &plot_func;
+		name_str = string_or_express(&at_ptr);
+
+		if (!name_str) {                /* func to plot */
 		    /*{{{  evaluate function */
 		    struct iso_curve *this_iso = this_plot->iso_crvs;
 		    int num_sam_to_use, num_iso_to_use;
@@ -1754,9 +1763,7 @@ eval_3dplots()
 		    if (parametric)
 			crnt_param = (crnt_param + 2) % 3;
 
-		    dummy_func = &plot_func;
-		    plot_func.at = temp_at();	/* reparse function */
-		    dummy_func = NULL;
+		    plot_func.at = at_ptr;
 
 		    num_iso_to_use = iso_samples_2;
 		    num_sam_to_use = hidden3d ? iso_samples_1 : samples_1;

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: eval.c,v 1.35 2005/07/10 05:06:59 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: eval.c,v 1.36 2005/07/10 18:24:00 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - eval.c */
@@ -300,10 +300,10 @@ imag(struct value *val)
 	return (val->v.cmplx_val.imag);
 #ifdef GP_STRING_VARS
     case STRING:
-	/* FIXME: It would be better to catch this earlier and treat it */
-	/*        as a file name:   plot foo(x) using 1:2               */
+	/* This is where we end up if the user tries: */
+	/*     x = 2;  plot sprintf(format,x)         */
 	int_warn(NO_CARET, "encountered a string when expecting a number");
-	int_error(NO_CARET, "NB: you cannot plot a string-valued function");
+	int_error(NO_CARET, "Did you try to generate a file name using dummy variable x or y?");
 #endif
     default:
 	int_error(NO_CARET, "unknown type in imag()");

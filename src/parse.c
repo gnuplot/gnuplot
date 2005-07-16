@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: parse.c,v 1.38 2005/07/08 18:39:01 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: parse.c,v 1.39 2005/07/10 04:24:42 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - parse.c */
@@ -107,6 +107,70 @@ const_express(struct value *valptr)
 	int_error(tkn, "undefined value");
     }
     return (valptr);
+}
+
+/* Used by plot2d/plot3d/fit:
+ * Parse an expression that may return a string or may return a constant or may
+ * be a dummy function using dummy variables x, y, ...
+ * If any dummy variables are present, set (*atptr) to point to an action table
+ * corresponding to the parsed expression, and return NULL.
+ * Otherwise evaluate the expression and return a string if there is one.
+ * The return value "str" and "*atptr" both point to locally-managed memory,
+ * which must not be freed by the caller!
+ */
+char*
+string_or_express(struct at_type **atptr)
+{
+    int i;
+    TBOOLEAN has_dummies;
+    int start_tkn = c_token;
+
+    static char* str = NULL;
+    free(str);
+    str = NULL;
+
+    if (END_OF_COMMAND)
+	int_error(c_token, "expression expected");
+
+#ifndef GP_STRING_VARS
+    if (isstring(c_token)) {
+	if (atptr)
+	    *atptr = NULL;
+	str = try_to_get_string();
+	return str;
+    }
+#endif
+
+    /* parse expression */
+    temp_at();
+
+    /* check if any dummy variables are used */
+    has_dummies = FALSE;
+    for (i = 0; i < at->a_count; i++) {
+	enum operators op_index = at->actions[i].index;
+	if ( op_index == PUSHD1 || op_index == PUSHD2 || op_index == PUSHD ) {
+	    has_dummies = TRUE;
+	    break;
+	}
+    }
+
+    if (!has_dummies) {
+	/* no dummy variables: evaluate expression */
+	struct value val;
+
+	evaluate_at(at, &val);
+	if (undefined)
+	    int_error(start_tkn, "invalid expression");
+#ifdef GP_STRING_VARS
+	if (val.type == STRING)
+	    str = val.v.string_val;
+#endif
+    }
+
+    /* prepare return */
+    if (atptr)
+	*atptr  = at;
+    return str;
 }
 
 

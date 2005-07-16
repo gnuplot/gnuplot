@@ -1,3 +1,29 @@
+2005-07-16  Juergen Wieferink  <wieferink@freenet.de>
+
+	Allow a single plot or splot command to contain a mixture of 
+	functions, e.g. sin(x), and constant expressions including
+	string-valued constant expressions, e.g. sprintf("file.%d",n).
+
+	* src/datafile.c (df_open) src/datafile.h src/plot2d.c
+	src/plot3d.c src/fit.c src/set.c:
+	Parse filename from plot/splot/fit command before calling df_open(),
+	and pass the resulting string to df_open() as a new argument.
+
+	* src/parse.c (string_or_expression) src/parse.h:
+	New function that can safely parse either a constant expression
+	or a dummy function.  string_or_expression() will return a pointer
+	to a string if it successfully parsed a string-valued expression.
+	It will return a pointer to an action table if it successfully
+	parsed a dummy function. If it parsed a non-string expression, both
+	the string pointer and the action table pointer will be NULL.
+
+	* src/eval.c (imag):
+	The use of string_or_expression() by splot/plot/fit allows one to
+	mix string-valued functions and "true" functions in the same command.
+	However, a string-valued function containing what looks like a dummy
+	variable (normally x or y) is not parsed correctly. This error is
+	eventually discovered and reported in imag().
+
 2005-07-16  John Bollinger <bbands@yahoo.com>
 
 	* demo/finance.dem demo/finance.dat: New demo illustrating

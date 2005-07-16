@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.109 2005/07/07 20:35:12 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.110 2005/07/12 03:37:42 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -1309,6 +1309,7 @@ eval_plots()
 
 	    /* for datafile plot, record datafile spec for title */
 	    int start_token = c_token, end_token;
+	    char* name_str;
 
 	    TBOOLEAN duplication = FALSE;
 	    TBOOLEAN set_smooth = FALSE, set_axes = FALSE, set_title = FALSE;
@@ -1320,7 +1321,12 @@ eval_plots()
 
 	    plot_num++;
 
-	    if (isstringvalue(c_token)) { /* data file to plot */
+	    dummy_func = &plot_func;
+	    /* should this be saved in "this_plot"? */
+	    name_str = string_or_express(NULL);
+	    dummy_func = NULL;
+
+	    if (name_str) { /* data file to plot */
 		if (parametric && xparam)
 		    int_error(c_token, "previous parametric function not fully specified");
 
@@ -1339,8 +1345,9 @@ eval_plots()
 		this_plot->lp_properties.use_palette = 0;
 #endif
 
+		/* up to MAXDATACOLS cols */
 		df_set_plot_mode(MODE_PLOT);	/* Needed for binary datafiles */
-		specs = df_open(MAXDATACOLS);	/* up to MAXDATACOLS cols */
+		specs = df_open(name_str, MAXDATACOLS);
 
 #ifndef BINARY_DATA_FILE
 		/* this parses data-file-specific modifiers only */
@@ -1372,10 +1379,6 @@ eval_plots()
 		/* default no palette */
 		this_plot->lp_properties.use_palette = 0;
 #endif
-		dummy_func = &plot_func;
-		plot_func.at = temp_at();
-		dummy_func = NULL;
-		/* ignore it for now */
 		end_token = c_token - 1;
 	    }			/* end of IS THIS A FILE OR A FUNC block */
 
@@ -1941,17 +1944,25 @@ eval_plots()
 	    if (is_definition(c_token)) {
 		define();
 	    } else {
+		struct at_type *at_ptr;
+		char *name_str;
+
 		/* HBB 20000820: now globals in 'axis.c' */
 		x_axis = this_plot->x_axis;
 		y_axis = this_plot->y_axis;
 
 		plot_num++;
-		if (!isstringvalue(c_token)) {	/* function to plot */
+
+		dummy_func = &plot_func;
+		/* WARNING: do NOT free name_str */
+		/* FIXME: should this be saved in "this_plot"? */
+		name_str = string_or_express(&at_ptr);
+
+		if (!name_str) {            /* function to plot */
 		    if (parametric) {	/* toggle parametric axes */
 			xparam = 1 - xparam;
 		    }
-		    dummy_func = &plot_func;
-		    plot_func.at = temp_at();	/* reparse function */
+		    plot_func.at = at_ptr;
 
 		    if (!parametric && !polar) {
 			t_min = X_AXIS.min;
