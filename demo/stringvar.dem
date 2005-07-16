@@ -81,3 +81,14 @@ plot 'silver.dat' \
 pause -1 "Hit return to continue"
 #
 reset
+set title "String-valued functions to generate datafile names"
+set key title 'file(i) = sprintf("%1d.dat",i); N=2; M=3'
+set key left width 25 Left reverse
+N = 2
+M = 3
+file(i) = sprintf("%1d.dat",i)
+plot 5*sin(x)/x, file(N), file(M)
+#
+pause -1 "Hit return to continue"
+#
+reset

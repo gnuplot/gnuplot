@@ -4,6 +4,12 @@
 	tokens or further commands follow a "load <file>" command.
 	Sourceforge patch #1210835.
 
+2005-07-16  Ethan Merritt  <merritt@u.washington.edu
+
+	demo/stringvar.dem: Add a demo showing a plot command that
+	generates datafile names via a string-valued function, now possible
+	because of the new string_or_expression code.
+
 2005-07-16  Juergen Wieferink  <wieferink@freenet.de>
 
 	Allow a single plot or splot command to contain a mixture of 
