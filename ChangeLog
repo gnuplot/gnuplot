@@ -1,3 +1,8 @@
+2005-07-16  John Bollinger <bbands@yahoo.com>
+
+	* demo/finance.dem demo/finance.dat: New demo illustrating
+	various gnuplot features applied to display of financial data.
+
 2005-07-15  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/term.c (enhanced_recursion) [POSTSCRIPT_DRIVER]: added
