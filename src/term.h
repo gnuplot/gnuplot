@@ -1,5 +1,5 @@
 /*
- * $Id: term.h,v 1.31 2005/07/15 16:08:09 broeker Exp $
+ * $Id: term.h,v 1.32 2005/07/18 18:24:00 sfeam Exp $
  */
 
 /* GNUPLOT - term.h */
@@ -55,9 +55,9 @@
  * post.trm and pslatex.trm.  You cannot build pslatex without post.
  * Both drivers are selected by default, but you can disable them below.
  */
-#define GP_ENH_EST		/* string length estimates of enhanced text */
-#define POSTSCRIPT_DRIVER
-#define PSLATEX_DRIVER
+#define GP_ENH_EST 1		/* estimate string length of enhanced text */
+#define POSTSCRIPT_DRIVER 1	/* include post.trm */
+#define PSLATEX_DRIVER 1	/* include pslatex.trm */
 
 #if defined(PSLATEX_DRIVER) && !defined(POSTSCRIPT_DRIVER)
 #define POSTSCRIPT_DRIVER
