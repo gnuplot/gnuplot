@@ -1,3 +1,8 @@
+2005-07-16  Ethan Merritt  <merritt@u.washington.edu
+
+	src/datafile.c (df_parse_string_field): Fix tab-containing string
+	constant which was broken when indent replaced tabs with spaces.
+
 2005-07-16  Juergen Wieferink  <wieferink@freenet.de>
 
 	src/command.c (load_command): Issue an error message if any
@@ -192,7 +197,7 @@
 
 	* demo/stringvar.dem: Test dynamic extension of sprintf output buffer.
 
-	* src/readline.c (df_readline): Only call add_key_entry() if the current
+	* src/datafile.c (df_readline): Only call add_key_entry() if the current
 	plot is really a histogram; otherwise specifying 'using key(<n>)'
 	causes a segfault on non-histogram plots.
 
