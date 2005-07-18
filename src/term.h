@@ -1,5 +1,5 @@
 /*
- * $Id: term.h,v 1.30 2005/03/25 05:01:12 sfeam Exp $
+ * $Id: term.h,v 1.31 2005/07/15 16:08:09 broeker Exp $
  */
 
 /* GNUPLOT - term.h */
@@ -48,13 +48,31 @@
  * Stefan Bodewig Dec. 1995
  */
 
+/*
+ * >>> CONFIGURATION OPTIONS FOLLOW <<<  PLEASE READ
+ *
+ * pslatex and epslatex support is now provided by the combination of
+ * post.trm and pslatex.trm.  You cannot build pslatex without post.
+ * Both drivers are selected by default, but you can disable them below.
+ */
+#define GP_ENH_EST		/* string length estimates of enhanced text */
+#define POSTSCRIPT_DRIVER
+#define PSLATEX_DRIVER
+
+#if defined(PSLATEX_DRIVER) && !defined(POSTSCRIPT_DRIVER)
+#define POSTSCRIPT_DRIVER
+#endif
+
+
 /* Define SHORT_TERMLIST to select a few terminals. It is easier
  * to define the macro and list desired terminals in this section.
  * Sample configuration for a Unix workstation
  */
 #ifdef SHORT_TERMLIST
 # include "dumb.trm"		/* dumb terminal */
+#ifdef POSTSCRIPT_DRIVER
 # include "post.trm"		/* postscript */
+#endif
 
 #ifdef GP_ENH_EST
 # include "estimate.trm"	/* used for enhanced text processing */
@@ -350,7 +368,9 @@
 #endif
 
 /* postscript */
+#ifdef POSTSCRIPT_DRIVER
 #include "post.trm"
+#endif
 
 /* QMS laser printers */
 #include "qms.trm"
@@ -396,7 +416,7 @@
 #include "latex.trm"
 
 /* latex/tex with picture in postscript */
-#ifdef PSLATEX_DRIVER	/* set in post.h */
+#ifdef PSLATEX_DRIVER
 #include "pslatex.trm"
 #endif
 

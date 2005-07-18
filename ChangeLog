@@ -1,17 +1,23 @@
-2005-07-16  Ethan Merritt  <merritt@u.washington.edu
+2005-07-18  Ethan Merritt  <merritt@u.washington.edu
 
-	src/datafile.c (df_parse_string_field): Fix tab-containing string
+	* src/datafile.c (df_parse_string_field): Fix tab-containing string
 	constant which was broken when indent replaced tabs with spaces.
+
+	* configure.in src/term.h term/post.h term/post.trm term/pslatex.trm:
+	Repair the ordering of configuration options for building the post,
+	epslatex, and pslatex terminals.  This selection is now made at the top
+	of term.h, as is selection of the enhanced text stringlength estimation
+	pseudo-terminal.
 
 2005-07-16  Juergen Wieferink  <wieferink@freenet.de>
 
-	src/command.c (load_command): Issue an error message if any
+	* src/command.c (load_command): Issue an error message if any
 	tokens or further commands follow a "load <file>" command.
 	Sourceforge patch #1210835.
 
 2005-07-16  Ethan Merritt  <merritt@u.washington.edu
 
-	demo/stringvar.dem: Add a demo showing a plot command that
+	* demo/stringvar.dem: Add a demo showing a plot command that
 	generates datafile names via a string-valued function, now possible
 	because of the new string_or_expression code.
 

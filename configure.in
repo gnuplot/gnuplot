@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.in,v 1.165 2005/04/02 00:34:48 sfeam Exp $
+dnl $Id: configure.in,v 1.166 2005/04/08 20:04:04 sfeam Exp $
 dnl
 AC_INIT(src/graphics.c)
 AM_CONFIG_HEADER(config.h:config.hin)
@@ -820,15 +820,6 @@ AC_ARG_ENABLE(macros,dnl
 
   fi
 
-dnl estimate length of enhanced text mode strings using dummy terminal driver
-AC_ARG_ENABLE(enhest,dnl
-[  --disable-strlen_estimation disable estimation of strlen for enhance text mode],,
-  test -z "$enable_strlen_estimation" && enable_strlen_estimation=yes)
-  if test "$enable_strlen_estimation" = yes; then
-    AC_DEFINE(GP_ENH_EST,1,
-               [ Define to estimate strlen of enhanced text more strings ])
-  fi
-
 dnl IRIS terminal on IRIS4D series computer
 AC_ARG_ENABLE(iris,dnl
 [  --enable-iris           enable IRIS terminal (IRIS4D only)],
@@ -1075,10 +1066,6 @@ fi
 
 if test "$enable_macros" = yes; then
   AC_MSG_RESULT([  Enable command line macros (EXPERIMENTAL)])
-fi
-
-if test "$enable_strlen_estimation" = yes; then
-  AC_MSG_RESULT([  Enable estimation of strlen for enhanced text mode])
 fi
 
 if test "$enable_iris" = yes; then
