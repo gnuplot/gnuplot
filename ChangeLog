@@ -1,3 +1,8 @@
+2005-07-19  Ethan Merritt  <merritt@u.washington.edu
+
+	* term/cgm.trm: Add a warning that Win2000 cannot handle filled
+	polygons with more than 50 vertices. Not our fault! Bug #955074.
+
 2005-07-18  Ethan Merritt  <merritt@u.washington.edu
 
 	* src/datafile.c (df_parse_string_field): Fix tab-containing string

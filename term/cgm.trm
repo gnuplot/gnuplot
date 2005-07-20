@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: cgm.trm,v 1.65 2005/03/03 04:09:50 sfeam Exp $
+ * $Id: cgm.trm,v 1.66 2005/03/06 05:52:23 sfeam Exp $
  */
 
 /* GNUPLOT - cgm.trm */
@@ -1113,6 +1113,10 @@ TERM_PUBLIC void
 CGM_filled_polygon(int points, gpiPoint *corner)
 {
     int i;
+
+    /* Note:  The CGM_flush_polygon stack in Win2000 cannot handle polygons  */
+    /* with more than about 50 edges.  We can't fix it, but we can put this  */
+    /* explaination here in case you wonder why some filledcurves are flaky. */
 
     if (cgm_current.interior_style != cgm_next.interior_style){
       cgm_current.interior_style = cgm_next.interior_style;
