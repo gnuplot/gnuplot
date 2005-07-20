@@ -1,6 +1,7 @@
 2005-07-20  Juergen Wieferink  <wieferink@freenet.de>
 
-	* src/parse.c (string_or_express): Fix for "1/0" not being a string.
+	* src/parse.c (string_or_express): Do not call int_error() for invalid
+	expressions. Fixes "(s)plot 1/0".
 
 2005-07-19  Ethan Merritt  <merritt@u.washington.edu
 
@@ -177,12 +178,12 @@
 
 	* src/parse.c (temp_at parse_primary_expression): Recode to use new
 	free_at() routine.
-	
+
 2005-07-08  Ethan Merritt  <merritt@u.washington.edu>
 
 	* docs/gnuplot.doc src/internal.c (f_range f_strstrt) 
 	src/parse.c (parse_primary_expression):
-	
+
 	Switch convention of substring indexing from C-like (first character has
 	index 0) to Fortran-like (first character has index 1).  This makes the
 	routines strstrt() and word() consistent with each other, and makes the
@@ -190,7 +191,7 @@
 
 	* demo/stringvar.dem: Expand demo to illustrate use of the substring
 	operator and the various string string functions.
-	
+
 2005-07-07  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/gp_types.h: Provide a pseudo-plot type NODATA to indicate that
@@ -297,7 +298,7 @@
 	rather than returning a pointer, it returns an index.  Example:
 	    n = strstrt("haystaneedleck","needle")
 	sets n to 6.
-	
+
 	* demo/stringvar.dem docs/gnuplot.doc: Document and add to string demo.
 
 	* NEWS: Update list of new features.
