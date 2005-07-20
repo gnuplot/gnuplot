@@ -1,3 +1,7 @@
+2005-07-20  Juergen Wieferink  <wieferink@freenet.de>
+
+	* src/parse.c (string_or_express): Fix for "1/0" not being a string.
+
 2005-07-19  Ethan Merritt  <merritt@u.washington.edu
 
 	* term/cgm.trm: Add a warning that Win2000 cannot handle filled

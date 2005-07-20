@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: parse.c,v 1.39 2005/07/10 04:24:42 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: parse.c,v 1.40 2005/07/16 21:01:45 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - parse.c */
@@ -159,10 +159,8 @@ string_or_express(struct at_type **atptr)
 	struct value val;
 
 	evaluate_at(at, &val);
-	if (undefined)
-	    int_error(start_tkn, "invalid expression");
 #ifdef GP_STRING_VARS
-	if (val.type == STRING)
+	if (!undefined && val.type == STRING)
 	    str = val.v.string_val;
 #endif
     }
