@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.114 2005/07/15 16:58:55 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.115 2005/07/23 04:08:35 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -915,7 +915,7 @@ write_multiline(
         if ((*t->justify_text) (hor)) {
             (*t->put_text) (x, y, text);
         } else {
-            int fix = hor * t->h_char * strlen(text) / 2;
+	    int fix = hor * t->h_char * estimate_strlen(text) / 2;
             if (angle)
                 (*t->put_text) (x, y - fix, text);
             else

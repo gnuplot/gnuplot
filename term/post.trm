@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.161 2005/07/15 16:56:00 broeker Exp $
+ * $Id: post.trm,v 1.162 2005/07/18 18:24:00 sfeam Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -213,8 +213,6 @@ static ps_params_t pstex_params = PSTEX_PARAMS_DEFAULT;
 static const ps_params_t pstex_params_default = PSTEX_PARAMS_DEFAULT;
 
 static ps_params_t *ps_params = &post_params;
-
-static void ENHPS_put_text __PROTO((unsigned int x, unsigned int y, const char *str));
 
 #ifdef PM3D
 static void make_interpolation_code __PROTO((void));
@@ -781,8 +779,16 @@ static const char GPFAR * GPFAR ENHPS_header[] = {
 "     pop aload pop M} ifelse }ifelse }ifelse }\n",
 "     ifelse }\n", /* EAM */
 "   forall} bind def\n",
-"/MFwidth {0 exch {dup 3 get{dup dup 0 get findfont exch 1 get scalefont\n",
-"     setfont 6 get stringwidth pop add} {pop} ifelse} forall} bind def\n",
+
+/* get the width of the text */
+/* HH 2005-07-24 - Add in a special case overprint 3 = save, 4 = restore
+ * also for estimation of string width. This is done by interposing an 
+ * additional value on the stack. between XYsave and XYrestore,
+ * this number is increased by the strings. By pop'ing this number, all
+ * strings between XYsave and XYrestore are ignored. */
+"/MFwidth {0 exch { dup 5 get 3 ge { 5 get 3 eq { 0 } { pop } ifelse }\n",
+" {dup 3 get{dup dup 0 get findfont exch 1 get scalefont setfont\n",
+"     6 get stringwidth pop add} {pop} ifelse} ifelse} forall} bind def\n",
 
 /* flush left show */
 "/MLshow { currentpoint stroke M\n",

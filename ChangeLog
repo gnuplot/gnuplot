@@ -1,3 +1,10 @@
+2005-07-23  Harald Harders  <h.harders@tu-bs.de>
+
+	* src/term.c (write_multiline): Use estimate_strlen rather than strlen.
+
+	* term/post.trm: Use a more foolproof method of estimating the width of
+	strings containing overprint characters.
+
 2005-07-22  Ethan Merritt  <merritt@u.washington.edu
 
 	src/parse.c (string_or_express): Remove unused variable.
