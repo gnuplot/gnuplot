@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.113 2005/07/14 23:10:38 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.114 2005/07/15 16:58:55 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -553,6 +553,10 @@ term_start_plot()
         }
         term_suspended = FALSE;
     }
+
+    /* Sync point for epslatex text positioning */
+    if (term->layer)
+	(term->layer)(TERM_LAYER_RESET);
 }
 
 void
@@ -563,6 +567,10 @@ term_end_plot()
     if (!term_initialised)
         return;
 
+    /* Sync point for epslatex text positioning */
+    if (term->layer)
+	(term->layer)(TERM_LAYER_END_TEXT);
+    
     if (!multiplot) {
         FPRINTF((stderr, "- calling term->text()\n"));
         (*term->text) ();
@@ -1723,6 +1731,10 @@ test_term()
     key_entry_height = pointsize * t->v_tic * 1.25;
     if (key_entry_height < t->v_char)
         key_entry_height = t->v_char;
+
+    /* Sync point for epslatex text positioning */
+    if (term->layer)
+	(term->layer)(TERM_LAYER_FRONTTEXT);
 
     /* border linetype */
     (*t->linewidth) (1.0);

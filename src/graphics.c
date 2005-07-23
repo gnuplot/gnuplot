@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.159 2005/07/10 19:18:30 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.160 2005/07/13 20:08:50 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -1313,6 +1313,10 @@ do_plot(struct curve_points *plots, int pcount)
 
     screen_ok = FALSE;
 
+    /* Sync point for epslatex text positioning */
+    if (term->layer)
+	(term->layer)(TERM_LAYER_BACKTEXT);
+
     /* DRAW TICS AND GRID */
     if (grid_layer == 0 || grid_layer == -1)
 	place_grid();
@@ -1484,6 +1488,10 @@ do_plot(struct curve_points *plots, int pcount)
 
     /* PLACE ARROWS */
     place_arrows( 0 );
+
+    /* Sync point for epslatex text positioning */
+    if (term->layer)
+	(term->layer)(TERM_LAYER_FRONTTEXT);
 
     /* WORK OUT KEY SETTINGS AND DO KEY TITLE / BOX */
     if (lkey) {			/* may have been cancelled if something went wrong */

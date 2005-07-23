@@ -1,5 +1,5 @@
 /*
- * $Id: term_api.h,v 1.44 2005/05/24 20:54:02 sfeam Exp $
+ * $Id: term_api.h,v 1.45 2005/07/15 17:02:49 broeker Exp $
  */
 
 /* GNUPLOT - term_api.h */
@@ -99,6 +99,14 @@ typedef struct arrow_style_type {    /* contains all Arrow properties */
     unsigned int head_filled;        /* filled heads: 0=not, 1=empty, 2=filled */
     /* ... more to come ? */
 } arrow_style_type;
+
+/* Operations used by the terminal entry point term->layer(). */
+typedef enum termlayer {
+	TERM_LAYER_RESET,
+	TERM_LAYER_BACKTEXT,
+	TERM_LAYER_FRONTTEXT,
+	TERM_LAYER_END_TEXT,
+} t_termlayer;
 
 
 #define L_TYPE_NODRAW -3	/* use if line is not to be drawn */
@@ -224,6 +232,13 @@ typedef struct TERMENTRY {
 		int overprint));
     void (*enhanced_flush) __PROTO((void));
     void (*enhanced_writec) __PROTO((int c));
+
+/* Driver-specific synchronization or other layering commands.
+ * Introduced as an alternative to the ugly sight of
+ * driver-specific code strewn about in the core routines.
+ * As of this point (July 2005) used only by pslatex.trm
+ */
+    void (*layer) __PROTO((t_termlayer));
 
 } TERMENTRY;
 

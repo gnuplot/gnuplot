@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: pslatex.trm,v 1.58 2005/07/15 16:56:01 broeker Exp $
+ * $Id: pslatex.trm,v 1.59 2005/07/18 18:24:02 sfeam Exp $
  */
 
 /* GNUPLOT - pslatex.trm */
@@ -98,6 +98,7 @@ TERM_PUBLIC void EPSLATEX_reopen_output __PROTO((void));
 TERM_PUBLIC void EPSLATEX_common_init __PROTO((void));
 TERM_PUBLIC void EPSLATEX_put_text __PROTO((unsigned int x, unsigned int y, const char *str));
 TERM_PUBLIC void EPSLATEX_linetype __PROTO((int linetype));
+TERM_PUBLIC void EPSLATEX_layer __PROTO((t_termlayer syncpoint));
 
 /* additional LaTeX header information for epslatex terminal */
 TERM_PUBLIC char *epslatex_header = NULL;
@@ -118,6 +119,7 @@ struct pstex_text_command {
 };
 
 static struct pstex_text_command *pstex_labels = NULL;
+static int epslatex_text_layer = 0;
 
 /* Common functions for epslatex and ps(la)tex */
 
@@ -128,9 +130,12 @@ PSLATEX_reset()
     case PSTERM_EPSLATEX:
         PS_reset();
         if (gpoutfile) {
-            fputs("\
-\\end{picture}%%\n\
-\\endgroup\n", gpoutfile);
+	    fprintf(gpoutfile, "\
+    \\gplbacktext\n\
+    \\put(0,0){\\includegraphics{%s}}%%\n\
+    \\gplfronttext\n\
+  \\end{picture}%%\n\
+\\endgroup\n", pslatex_auxname);
             if (ps_params->epslatex_standalone)
                 fputs("\\end{document}\n", gpoutfile);
         }
@@ -451,6 +456,9 @@ EPSLATEX_common_init()
             break;
         }
 
+	/* Clear any leftover text-layering state */
+	EPSLATEX_layer(TERM_LAYER_RESET);
+
         /* Analyse LaTeX font name 'family,series,shape' */
         if ((strlen(ps_params->font) > 0) &&
             (strcmp(ps_params->font,"default") != 0)) {
@@ -612,6 +620,11 @@ EPSLATEX_common_init()
     \\newif\\ifGPblacktext\n\
     \\GPblacktext%s\n\
   }{}%%\n\
+  %% define a \\g@addto@macro without @ in the name:\n\
+  \\let\\gplgaddtomacro\\g@addto@macro\n\
+  %% define empty templates for all commands taking text:\n\
+  \\gdef\\gplbacktext{}%%\n\
+  \\gdef\\gplfronttext{}%%\n\
   \\makeatother\n",
                 (ps_params->color?"true":"false"),
                 (ps_params->blacktext?"true":"false") );
@@ -679,12 +692,6 @@ EPSLATEX_common_init()
                 1.0 / (2*PS_SC), term->xmax * xsize, term->ymax * ysize);
     }
 
-    /* FIXME (Harald Harders) - it would be prefered that this code be written */
-    /* after the core plot routines have finished placing all objects with     */
-    /* attribute "back". But this would seem to require a new driver entry.    */
-    fprintf(gpoutfile, "    \\put(0,0){\\includegraphics{%s}}%%\n",
-            pslatex_auxname);
-
     if (fontfamily)
         free(fontfamily);
     if (fontseries)
@@ -698,7 +705,7 @@ TERM_PUBLIC void
 EPSLATEX_put_text(unsigned int x, unsigned int y, const char *str)
 {
     if (gpoutfile) {
-        fprintf(gpoutfile, "      \\put(%d,%d){", x, y);
+	fprintf(gpoutfile, "      \\put(%d,%d){", x, y);
         if (ps_ang)
             fprintf(gpoutfile,"\\rotatebox{%d}{", ps_ang);
         if (((str[0] == '{') || (str[0] == '['))) {
@@ -794,8 +801,8 @@ EPSLATEX_linetype(int linetype)
             linetype = (linetype % 9) + 3;
         if (linetype < 0)       /* LT_NODRAW, LT_BACKGROUND, LT_UNDEFINED */
             linetype = 0;
-        fprintf(gpoutfile,"      \\csname LT%c\\endcsname\n",
-                "wba012345678"[linetype]);
+	fprintf(gpoutfile,"      \\csname LT%c\\endcsname\n",
+		"wba012345678"[linetype]);
     }
 }
 
@@ -810,7 +817,7 @@ EPSLATEX_set_color(t_colorspec *colorspec)
         double r = (double)((colorspec->lt >> 16 ) & 255) / 255.;
         double g = (double)((colorspec->lt >> 8 ) & 255) / 255.;
         double b = (double)(colorspec->lt & 255) / 255.;
-        fprintf(gpoutfile, "      \\colorrgb{%3.2f,%3.2f,%3.2f}%%\n",r,g,b);
+	fprintf(gpoutfile, "      \\colorrgb{%3.2f,%3.2f,%3.2f}%%\n",r,g,b);
     }
 
     if (colorspec->type == TC_LT) {
@@ -820,7 +827,7 @@ EPSLATEX_set_color(t_colorspec *colorspec)
         else
             linetype = (linetype % 9) + 3;
 
-        fprintf(gpoutfile, "      \\csname LT%c\\endcsname\n",
+	fprintf(gpoutfile, "      \\csname LT%c\\endcsname\n",
                 "wba012345678"[linetype]);
     }
 
@@ -840,6 +847,47 @@ EPSLATEX_set_color(t_colorspec *colorspec)
 }
 #endif
 
+/*
+ * The TERM_LAYER mechanism is used here to signal a difference between
+ * "front" text and "back" text.
+ */
+TERM_PUBLIC void
+EPSLATEX_layer(t_termlayer syncpoint)
+{
+    switch (syncpoint) {
+
+    case TERM_LAYER_RESET:        /* Start of plot; reset flag */
+	epslatex_text_layer = 0;
+	break;
+
+    case TERM_LAYER_BACKTEXT: /* Start of "back" text layer */
+	if (epslatex_text_layer == 1)
+	    break;
+	if (epslatex_text_layer == 2)
+	    fputs("    }%\n", gpoutfile);
+	epslatex_text_layer = 1;
+	fputs("    \\gplgaddtomacro\\gplbacktext{%\n", gpoutfile);
+	break;
+
+    case TERM_LAYER_FRONTTEXT:/* Start of "front" text layer */
+	if (epslatex_text_layer == 2)
+	    break;
+	if (epslatex_text_layer == 1)
+	    fputs("    }%\n", gpoutfile);
+	epslatex_text_layer = 2;
+	fputs("    \\gplgaddtomacro\\gplfronttext{%\n", gpoutfile);
+	break;
+
+    case TERM_LAYER_END_TEXT:     /* Close off front or back macro before leaving */
+	if (epslatex_text_layer == 1 || epslatex_text_layer == 2)
+	    fputs("    }%\n", gpoutfile);
+	epslatex_text_layer = 0;
+	break;
+
+    default:
+	break;
+    }
+}
 
 #endif /* TERM_BODY */
 
@@ -871,6 +919,8 @@ TERM_TABLE_START(epslatex_driver)
 #ifdef WITH_IMAGE
     PS_image,
 #endif
+    0, 0, 0, /* Enhanced text mode not used */
+    EPSLATEX_layer /* Used to signal front/back text */
 TERM_TABLE_END(epslatex_driver)
 #undef LAST_TERM
 #define LAST_TERM epslatex_driver

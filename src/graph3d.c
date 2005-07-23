@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.121 2005/07/10 19:18:30 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.122 2005/07/13 20:08:50 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -630,6 +630,10 @@ do_3dplot(
 
     screen_ok = FALSE;
 
+    /* Sync point for epslatex text positioning */
+    if (term->layer)
+	(term->layer)(TERM_LAYER_BACKTEXT);
+
     /* now compute boundary for plot (xleft, xright, ytop, ybot) */
     boundary3d(plots, pcount);
 
@@ -742,6 +746,10 @@ do_3dplot(
 
     /* PLACE ARROWS */
     place_arrows3d(0);
+
+    /* Sync point for epslatex text positioning */
+    if (term->layer)
+	(term->layer)(TERM_LAYER_FRONTTEXT);
 
 #ifndef LITE
     if (hidden3d && draw_surface && !quick) {

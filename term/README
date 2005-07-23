@@ -86,6 +86,8 @@ struct TERMENTRY {
                int overprint));
     void (*enhanced_flush) __PROTO((void));
     void (*enhanced_writec) __PROTO((int c));
+/* Driver-specific synchronization or other layering commands */
+    void (*layer) __PROTO((t_termlayer syncpoint));
 };
 
 One consequence of (1) is that we would like drivers to be backwards
@@ -425,6 +427,11 @@ _image(unsigned M, unsigned N, coordval *image, gpiPoint *corner, t_imagecolor c
    part of the image.  The information is provided in this way because
    often it is necessary to clip a portion of the outer pixels of the
    image.
+
+
+_layer(t_termlayer syncpoint)
+   Driver-specific synchronization or other layering commands.
+   As of this point (July 2005) used only by pslatex.trm
 
 
 The following should illustrate the order in which calls to these

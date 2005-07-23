@@ -1,3 +1,23 @@
+2005-07-22  Ethan Merritt  <merritt@u.washington.edu
+
+	Introduce a new terminal API routine (term->layer)(int layer). This 
+	is used by the epslatex terminal (pslatex.trm) to handle the
+	"front" or "back" text attribute. In the future it might be used to
+	toggle other layering effects (transparency? contour levels?).
+
+	* src/term_api.h term/README: Define new entry point and a set of
+	layer names to pass into it.
+
+	* src/graph3d.c (do_3dplot) src/graphics.c (do_plot):
+	Call t->layer(TERM_LAYER_FRONTTEXT) and t->layer(TERM_LAYER_BACKTEXT)
+	at the relevant stages of plot generation.
+
+	* src/term.c (term_start_plot term_end_plot):
+	Call t->layer(TERM_LAYER_RESET) and t->layer(TERM_LAYER_END_TEXT)
+	at start and end of each plot, respectively.
+
+	* term/pslatex.trm: Implement EPSLATEX_layer() mechanism.
+
 2005-07-20  Juergen Wieferink  <wieferink@freenet.de>
 
 	* src/parse.c (string_or_express): Do not call int_error() for invalid
