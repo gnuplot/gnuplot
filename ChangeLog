@@ -1,5 +1,9 @@
 2005-07-22  Ethan Merritt  <merritt@u.washington.edu
 
+	src/parse.c (string_or_express): Remove unused variable.
+
+2005-07-22  Ethan Merritt  <merritt@u.washington.edu
+
 	Introduce a new terminal API routine (term->layer)(int layer). This 
 	is used by the epslatex terminal (pslatex.trm) to handle the
 	"front" or "back" text attribute. In the future it might be used to
