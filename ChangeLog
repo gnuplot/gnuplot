@@ -1,3 +1,9 @@
+2005-07-23  Ethan Merritt  <merritt@u.washington.edu
+
+	src/command.c (print_command): Re-arrange code so that an expression
+	being printed is only evaluated once, rather than twice.
+	Fixes bug #1173508.
+
 2005-07-23  Harald Harders  <h.harders@tu-bs.de>
 
 	* src/term.c (write_multiline): Use estimate_strlen rather than strlen.

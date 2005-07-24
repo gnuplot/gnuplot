@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.124 2005/07/13 17:45:17 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.125 2005/07/17 03:33:27 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -1161,7 +1161,6 @@ void
 print_command()
 {
     struct value a;
-    char *s;
     /* space printed between two expressions only */
     int need_space = 0;
 
@@ -1170,19 +1169,35 @@ print_command()
     }
     screen_ok = FALSE;
     do {
+#ifdef GP_STRING_VARS
+	++c_token;
+	const_express(&a);
+	if (a.type == STRING) {
+	    fputs(a.v.string_val, print_out);
+	    gpfree_string(&a);
+	    need_space = 0;
+	} else {
+	    if (need_space)
+		putc(' ', print_out);
+	    disp_value(print_out, &a, FALSE);
+	    need_space = 1;
+	}
+#else
+	char *s;
 	++c_token;
 	s = try_to_get_string();
 	if (s) {
 	    fputs(s, print_out);
-	    need_space = 0;
 	    free(s);
+	    need_space = 0;
 	} else {
 	    (void) const_express(&a);
 	    if (need_space)
 		putc(' ', print_out);
-	    need_space = 1;
 	    disp_value(print_out, &a, FALSE);
+	    need_space = 1;
 	}
+#endif
     } while (!END_OF_COMMAND && equals(c_token, ","));
 
     (void) putc('\n', print_out);
