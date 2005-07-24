@@ -241,7 +241,7 @@ Any command-line arguments are assumed to be names of files containing
 processed first.  Each file is loaded with the `load` command, in the order
 specified.  `gnuplot` exits after the last file is processed.  When no load
 files are named, `gnuplot` enters into an interactive mode.  The special
-filename "-" is used to denote standard input.  See "help batch/interactive"
+filename "-" is used to denote standard input.  See help for `batch/interactive`
 for more details.
 
 Many `gnuplot` commands have multiple options. Version 4 is less sensitive
@@ -346,13 +346,13 @@ list of changes and minor new features.
 
 @menu
 * New_plot_styles::             
-* String_and_text_data_read_from_datafiles::  
+* String_handling::             
 * Auto-layout_of_multiple_plots_on_a_page::  
 * Input_from_binary_data_files::  
 * New_or_revised_terminal_drivers::  
 @end menu
 
-@node New_plot_styles, String_and_text_data_read_from_datafiles, New_Features, New_Features
+@node New_plot_styles, String_handling, New_Features, New_Features
 @subsection New plot styles
 
 
@@ -395,13 +395,27 @@ See `filledcurves`.
 See `vectors`.
 
 
-@node String_and_text_data_read_from_datafiles, Auto-layout_of_multiple_plots_on_a_page, New_plot_styles, New_Features
-@subsection String and text data read from datafiles
+@node String_handling, Auto-layout_of_multiple_plots_on_a_page, New_plot_styles, New_Features
+@subsection String handling
+
+
+@menu
+* String_and_text_data_read_from_datafiles::  
+* User-defined_string_variables::  
+@end menu
+
+@node String_and_text_data_read_from_datafiles, User-defined_string_variables, String_handling, String_handling
+@subsubsection String and text data read from datafiles
 
 See `datastrings`
 
+@node User-defined_string_variables,  , String_and_text_data_read_from_datafiles, String_handling
+@subsubsection User-defined string variables, operators, and functions
 
-@node Auto-layout_of_multiple_plots_on_a_page, Input_from_binary_data_files, String_and_text_data_read_from_datafiles, New_Features
+See @ref{variables}
+
+
+@node Auto-layout_of_multiple_plots_on_a_page, Input_from_binary_data_files, String_handling, New_Features
 @subsection Auto-layout of multiple plots on a page
 
 See @ref{multiplot}.
@@ -421,6 +435,7 @@ See `binary`.
 * Consolidated_gif/jpeg/png_driver::  
 * New_Enhanced_MetaFile_(EMF)_driver::  
 * Adobe_Illustrator_(ai)_driver_deprecated::  
+* epslatex::                    
 @end menu
 
 @node Consolidated_gif/jpeg/png_driver, New_Enhanced_MetaFile_(EMF)_driver, New_or_revised_terminal_drivers, New_or_revised_terminal_drivers
@@ -431,8 +446,12 @@ See `binary`.
 @subsubsection New Enhanced MetaFile (EMF) driver
 
 
-@node Adobe_Illustrator_(ai)_driver_deprecated,  , New_Enhanced_MetaFile_(EMF)_driver, New_or_revised_terminal_drivers
+@node Adobe_Illustrator_(ai)_driver_deprecated, epslatex, New_Enhanced_MetaFile_(EMF)_driver, New_or_revised_terminal_drivers
 @subsubsection Adobe Illustrator (ai) driver deprecated
+
+
+@node epslatex,  , Adobe_Illustrator_(ai)_driver_deprecated, New_or_revised_terminal_drivers
+@subsubsection epslatex, pslatex support consolidated into the main postscript driver
 
 
 
@@ -822,12 +841,12 @@ expression, which will be interpreted as seconds from 1 January 2000.
 
 @cindex datastrings
 
-The configuration option --enable-datastrings (currently EXPERIMENTAL) allows
-gnuplot to read and process text fields in datafiles. A text field consists 
-of either an arbitrary string of printable characters containing no whitespace
-or an arbitrary string of characters, possibly including whitespace, delimited
-by double quotes. The following sample line from a datafile is interpreted to
-contain four columns, with a text field in column 3:
+The configuration option --enable-datastrings allows gnuplot to read and
+process text fields in datafiles. A text field consists of either an arbitrary
+string of printable characters containing no whitespace or an arbitrary string
+of characters, possibly including whitespace, delimited by double quotes.
+The following sample line from a datafile is interpreted to contain four
+columns, with a text field in column 3:
 
 @example
   1.000 2.000 "Third column is all of this text" 4.00
@@ -973,6 +992,12 @@ complex value, is promoted to a string if used in string concatenation.
 A typical case is the use of integers to construct file names or other strings;
 e.g. ("file" . 4 eq "file4") is true.
 
+Substrings can be specified using a postfixed range descriptor [beg:end].
+For example, "ABCDEF"[3:4] == "CD"   and   "ABCDEF"[4:*] == "DEF"
+The syntax "string"[beg:end] is exactly equivalent to calling the built-in
+string-valued function substr("string",beg,end), except that you cannot
+omit either beg or end from the function call.
+
 @menu
 * Functions::                   
 * Operators::                   
@@ -1042,6 +1067,12 @@ defaults to radians.
 * tanh::                        
 * gprintf::                     
 * sprintf::                     
+* strlen::                      
+* strstrt::                     
+* substr::                      
+* system::                      
+* word::                        
+* words::                       
 * column::                      
 * defined::                     
 * stringcolumn::                
@@ -1575,7 +1606,7 @@ variable x and returns the resulting string. If you want standard C-language
 format specifiers, you must instead use `sprintf("format",x)`.
 See `format specifiers`.
 
-@node sprintf, column, gprintf, Functions
+@node sprintf, strlen, gprintf, Functions
 @subsubsection sprintf
 
 @c ?expressions functions sprintf
@@ -1590,10 +1621,100 @@ use gnuplot's own format specifiers, you must instead call `gprintf()`.
 For information on sprintf format specifiers, please see standard C-language
 documentation or the unix sprintf man page.
 
+@node strlen, strstrt, sprintf, Functions
+@subsubsection strlen
+
+@c ?expressions functions strlen
+@c ?functions strlen
+@cindex strlen
+@findex strlen
+
+
+`strlen("string")` returns the number of characters in the string.
+
+@node strstrt, substr, strlen, Functions
+@subsubsection strstrt
+
+@c ?expressions functions strstrt
+@c ?functions strstrt
+@cindex strstrt
+@findex strstrt
+
+
+`strstrt("string","key")` searches for the character string "key" in "string"
+and returns the index to the first character of "key". If "key" is not found,
+returns 0. Similar to C library function strstr except that it returns an
+index rather than a string pointer. strstrt("hayneedlestack","needle") = 4.
+
+@node substr, system, strstrt, Functions
+@subsubsection substr
+
+@c ?expressions functions substr
+@c ?functions substr
+@cindex substr
+@findex substr
+
+
+@cindex substring
+
+`substr("string",beg,end)` returns the substring consisting of characters
+beg through end of the original string. This is exactly equivalent to the
+expressiong "string"[beg:end] except that you do not have the option of
+ommitting beg or end.
+
+@node system, word, substr, Functions
+@subsubsection system
+
+@c ?expressions functions system
+@c ?functions system
+@c ?system function
+@cindex system
+@cmindex system
+
+
+`system("command")` executes "command" using the standard shell and returns
+the resulting character stream from stdout as string variable.
+One optional trailing newline is ignored.
+
+This can be used to import external functions into gnuplot scripts using
+'f(x) = real(system(sprintf("somecommand %f", x)))'.
+
+@node word, words, system, Functions
+@subsubsection word
+
+@c ?expressions functions word
+@c ?functions word
+@cindex word
+@findex word
+
+
+@cindex word
+@findex word
+
+
+`word("string",n)` returns the nth word in string. For example,
+`word("one two three",2)` returns the string "two".
+
+@node words, column, word, Functions
+@subsubsection words
+
+@c ?expressions functions words
+@c ?functions words
+@cindex words
+@findex words
+
+
+@cindex words
+@findex words
+
+
+`words("string")` returns the number of words in string. For example,
+`words(" a b c d")` returns the 4.
 
 
 
-@node column, defined, sprintf, Functions
+
+@node column, defined, words, Functions
 @subsubsection column
 
 @c ?expressions functions column
@@ -1799,8 +1920,16 @@ The following is a list of all the unary operators and their usages:
       !           !a        * logical negation
       !           a!        * factorial
       $           $3        * call arg/column during @ref{using} manipulation
-
 @end example
+
+@cindex factorial
+
+@cindex negation
+
+@cindex one's complement
+
+@cindex operator precedence
+
 
 (*) Starred explanations indicate that the operator requires an integer
 argument.
@@ -1841,8 +1970,16 @@ The following is a list of all the binary operators and their usages:
       .           A.B           string concatenation
       eq          A eq B        string equality
       ne          A ne B        string inequality
-
 @end example
+
+@cindex bitwise operators
+
+@cindex string operators
+
+@cindex modulo
+
+@cindex exponentiation
+
 
 
 (*) Starred explanations indicate that the operator requires integer
@@ -2077,6 +2214,8 @@ Examples:
 
 @end example
 
+@cindex colors
+
 For many terminal types it is also possible to assign user-defined colors
 using explicit rgb (red, green, blue) values, named colors, or color values
 that refer to the current PM3D palette.
@@ -2137,6 +2276,8 @@ See `linestyle`, `set style line`.
 @cindex colorspec
 
 @cindex rgbcolor
+
+@cindex colors
 
 Many commands allow you to specify a linetype with an explicit color.
 This option is only available if your gnuplot has been built with pm3d support,
@@ -2320,7 +2461,7 @@ sufficient to test for any one of these variables being defined.
 
 @example
       plot 'something'
-      set pause mouse
+      pause mouse
       if (defined(MOUSE_BUTTON)) call 'something_else'; \
       else print "No mouse click." 
 
@@ -2463,6 +2604,16 @@ inequality operator "ne".  The following example will print TRUE.
 @end example
 
 See also the two string formatting functions `gprintf` and @ref{sprintf}.
+
+@cindex substring
+
+Substrings can be specified by appending a range specifier to any string,
+string variable, or string-valued function.  The range specifier has the
+form [begin:end], where begin is the index of the first character of the
+substring and end is the index of the last character of the substring.
+The first character has index 1.  The begin or end fields may be empty, or
+contain '*', to indicate the true start or end of the original string.
+E.g.  str[:] and str[*:*] both describe the full string str.
 
 @node Substitution_and_Command_line_macros, Syntax, String_constants_and_string_variables, gnuplot
 @section Substitution and Command line macros
@@ -2820,7 +2971,7 @@ vertical bar (|) separates mutually exclusive choices.
 * set-show::                    
 * shell::                       
 * splot::                       
-* system::                      
+* system_::                     
 * test::                        
 * unset::                       
 * update::                      
@@ -2960,12 +3111,15 @@ commands.
 @cmindex exit
 
 
-The commands @ref{exit} and @ref{quit} and the END-OF-FILE character will exit the
-current `gnuplot` command file and `load` the next one.  See "help
-batch/interactive" for more details.
+The commands @ref{exit} and @ref{quit}, as well as the END-OF-FILE character (usually
+Ctrl-D) terminate input from the current input stream: terminal session, pipe,
+and file input (pipe).
 
-Each of these commands will clear the output device (as does the @ref{clear}
-command) before exiting.
+If input streams are nested (inherited `load` scripts), then reading will
+continue in the parent stream. When the top level stream is closed, the
+program itself will exit.
+
+See help for `batch/interactive` for more details.
 
 @node fit, help, exit, Commands
 @section fit
@@ -3700,7 +3854,7 @@ The name of the input file must be enclosed in quotes.
 
 The special filename "-" may be used to `load` commands from standard input.
 This allows a `gnuplot` command file to accept some commands from standard
-input.  Please see "help batch/interactive" for more details.
+input.  Please see help for `batch/interactive` for more details.
 
 On some systems which support a popen function (Unix), the load file can be
 read from a pipe by starting the file name with a '<'.
@@ -5714,7 +5868,7 @@ On systems which support a popen function (Unix), the output of save can be
 piped through an external program by starting the file name with a '|'.
 This provides a consistent interface to `gnuplot`'s internal settings to
 programs which communicate with `gnuplot` through a pipe.  Please see
-"help batch/interactive" for more details.
+help for `batch/interactive` for more details.
 
 Examples:
 @example
@@ -5953,13 +6107,14 @@ Syntax:
 @example
       set arrow @{<tag>@} @{from <position>@} @{to|rto <position>@}
                 @{ @{arrowstyle | as <arrow_style>@}
-                  | @{nohead | head | heads@}
-                    @{size <length>,<angle>@}
-                    @{filled | nofilled@}
-                    @{front | back@}
-                    @{ @{linestyle | ls <line_style>@}
-                      | @{linetype | lt <line_type>@}
-                        @{linewidth | lw <line_width@} @} @}
+                  | @{ @{nohead | head | heads@}
+                      @{size <length>,<angle>@{,<backangle>@}@}
+                      @{filled | empty | nofilled@}
+                      @{front | back@}
+                      @{ @{linestyle | ls <line_style>@}
+                        | @{linetype | lt <line_type>@}
+                          @{linewidth | lw <line_width@} @} @} @}
+      
       unset arrow @{<tag>@}
       show arrow @{<tag>@}
 
@@ -5991,18 +6146,26 @@ This gives you yet another way to draw a line segment on the plot.  By
 default, arrows have heads. Specifying `heads` draws arrow heads on both
 ends of the line.  Not all terminal types support double-ended arrows.
 
-Head size can be controlled by `size <length>,<angle>`, where <length>
-defines length of each branch of the arrow head and <angle> the angle (in
-degrees) they make with the arrow. <Length> is in x-axis units; this can be
-changed by `first`, `second`, `graph`, `screen`, or `character` before the
-<length>;  see `coordinates` for details.
+Head size can be controlled by `size <length>,<angle>` or 
+`size <length>,<angle>,<backangle>`, where `<length>` defines length of each 
+branch of the arrow head and `<angle>` the angle (in degrees) they make with 
+the arrow.  `<Length>` is in x-axis units; this can be changed by `first`,
+`second`, `graph`, `screen`, or `character` before the <length>;  see
+`coordinates` for details.  `<Backangle>` only takes effect when `filled`
+or `empty` is also used.  Then, `<backangle>` is the angle (in degrees) the
+back branches make with the arrow (in the same direction as `<angle>`).
+The `fig` terminal has a restricted backangle function. It supports three
+different angles. There are two thresholds: Below 70 degrees, the arrow head
+gets an indented back angle. Above 110 degrees, the arrow head has an acute
+back angle. Between these thresholds, the back line is straight.
 
-Specifying `filled` produces filled arrow heads (if heads are used).
+Specifying `filled` produces filled arrow heads (if heads are used). 
 Filling is supported on filled-polygon capable terminals, see help of @ref{pm3d}
 for their list, otherwise the arrow heads are closed but not filled.
-Further, filling is obviously not supported on terminals drawing arrows by
-their own specific routines, like `fig`, `metafont`, `metapost`, `latex` or
-`tgif`.
+The same result (closed but not filled arrow head) is reached by specifying
+`empty`.  Further, filling and outline is obviously not supported on
+terminals drawing arrows by their own specific routines, like `metafont`,
+`metapost`, `latex` or `tgif`.
 
 The line style may be selected from a user-defined list of line styles
 (see `set style line`) or may be defined here by providing values for
@@ -6278,7 +6441,7 @@ financebars.
 
 Syntax:
 @example
-      set bars @{small | large | <size>@}
+      set bars @{small | large | fullwidth | <size>@}
       unset bars
       show bars
 
@@ -6286,6 +6449,11 @@ Syntax:
 
 `small` is a synonym for 0.0, and `large` for 1.0.
 The default is 1.0 if no size is given.
+
+The keyword `fullwidth` is relevant only to histograms with errorbars.
+It sets the width of the errorbar ends to be the same as the width of the
+associated box in the histogram.  It does not change the width of the box
+itself.
 
 @node bmargin, border, bars, set-show
 @subsection bmargin
@@ -7066,18 +7234,17 @@ into tic labels or @ref{label} strings.
 
 Syntax:
 @example
-      set decimalsign @{<value>@}
+      set decimalsign @{<value> | locale @{"<locale>"@}@}
       unset decimalsign
       show decimalsign
 
 @end example
 
-The argument <value> is the string to be used in place of the usual
+The argument <value> is a string to be used in place of the usual
 decimal point. Typical choices include the period, '.', and the comma,
 ',', but others may be useful, too.  If you omit the <value> argument,
 the decimal separator is not modified from the usual default, which is
-a period.  Unsetting decimalsign has the same effect as omitting
-<value>.
+a period.  Unsetting decimalsign has the same effect as omitting <value>.
 
 Example:
 
@@ -7086,6 +7253,39 @@ Correct typesetting in most European countries requires:
       set decimalsign ','
 
 @end example
+
+Please note: If you set an explicit string, this affects only numbers that
+are printed using gnuplot's gprintf() formatting routine, include axis tics.
+It does not affect the format expected for input data, and it does not affect
+numbers printed with the sprintf() formatting routine. To change the behavior
+of both input and output formatting, instead use the form
+
+@example
+      set decimalsign locale
+
+@end example
+
+This instructs the program to use both input and output formats in accordance
+with the current setting of the LC_ALL, LC_NUMERIC, or LANG environmental
+variables.
+
+@example
+      set decimalsign locale "foo"
+
+@end example
+
+This instructs the program to format all input and output in accordance with
+locale "foo", which must already installed.  If locale "foo" is not found
+then an error message is printed and the decimal sign setting is unchanged.
+
+@example
+      set decimalsign locale; set decimalsign "."
+
+@end example
+
+This sets all input and output to use whatever decimal sign is correct for
+the current locale, but over-rides this with an explicit '.' in numbers
+formatted using gnuplot's internal gprintf() function.
 
 @node dgrid3d, dummy, decimalsign, set-show
 @subsection dgrid3d
@@ -8285,7 +8485,9 @@ Syntax:
 
 <locale> may be any language designation acceptable to your installation.
 See your system documentation for the available options.  The default value
-is determined from the LANG environment variable.
+is determined from the LC_TIME, LC_ALL, or LANG environment variables.
+
+To change the decimal point locale, see @ref{decimalsign}.
 
 @node logscale, macros, locale, set-show
 @subsection logscale
@@ -9406,6 +9608,8 @@ and
 @c ?palette rgbformulae
 @cindex rgbformulae
 
+@cindex colors
+
 For @ref{rgbformulae} three suitable mapping functions have
 to be chosen.  This is done via `rgbformulae <r>,<g>,<b>`.  The available
 mapping functions are listed by @ref{rgbformulae}.  Default is
@@ -9451,6 +9655,8 @@ other color scheme by the command
 @c ?commands set palette defined
 @c ?set palette defined
 @c ?palette defined
+@cindex colors
+
 Gray-to-rgb mapping can be manually set by use of `palette defined`:  A color gradient
 is defined and used to give the rgb values.  Such a  gradient is a piecewise
 linear mapping from gray values in [0,1] to the RGB space [0,1]x[0,1]x[0,1].
@@ -10059,10 +10265,10 @@ default, arrows have one head. Specifying `heads` draws arrow heads on both
 ends of the line.
 
 Head size can be controlled by `size <length>,<angle>` or 
-`size <length>,<angle>,<backangle>` where `<length>` defines length of each 
+`size <length>,<angle>,<backangle>`, where `<length>` defines length of each 
 branch of the arrow head and `<angle>` the angle (in degrees) they make with 
-the arrow. `<Length>` is in x-axis units; this can be changed by `first`,
-`second`, `graph`, `screen`, `character` before the <length>;  see
+the arrow.  `<Length>` is in x-axis units; this can be changed by `first`,
+`second`, `graph`, `screen`, or `character` before the <length>;  see
 `coordinates` for details.  `<Backangle>` only takes effect when `filled`
 or `empty` is also used.  Then, `<backangle>` is the angle (in degrees) the
 back branches make with the arrow (in the same direction as `<angle>`).
@@ -10075,10 +10281,9 @@ Specifying `filled` produces filled arrow heads (if heads are used).
 Filling is supported on filled-polygon capable terminals, see help of @ref{pm3d}
 for their list, otherwise the arrow heads are closed but not filled.
 The same result (closed but not filled arrow head) is reached by specifying
-`empty`.
-Further, filling and outline is obviously not supported on terminals drawing
-arrows by their own specific routines, like `metafont`, `metapost`, `latex` 
-or `tgif`. 
+`empty`.  Further, filling and outline is obviously not supported on
+terminals drawing arrows by their own specific routines, like `metafont`,
+`metapost`, `latex` or `tgif`.
 
 The line style may be selected from a user-defined list of line styles 
 (see `set style line`) or may be defined here by providing values for 
@@ -10139,7 +10344,7 @@ listed.  `show style data` shows the current default data plotting style.
 @cindex fillstyle
 
 The `set style fill` command is used to set the style of boxes,
-histograms or candlesticks.
+histograms, candlesticks and filledcurves.
 
 Syntax:
 @example
@@ -10213,6 +10418,7 @@ an index instead of repeating all the information at each invocation.
 Syntax:
 @example
       set style line <index> @{@{linetype  | lt@} <line_type> | <colorspec>@}
+                             @{@{linecolor | lc@} <colorspec>@}
                              @{@{linewidth | lw@} <line_width>@}
                              @{@{pointtype | pt@} <point_type>@}
                              @{@{pointsize | ps@} <point_size>@}
@@ -10236,22 +10442,23 @@ both may be used.
 Not all terminals support the `linewidth` and @ref{pointsize} features; if
 not supported, the option will be ignored.
 
-Note that this feature is not completely implemented; linestyles defined by
-this mechanism may be used with `plot`, `splot`, @ref{replot}, and @ref{arrow},
-but not by other commands that allow the default index to be used, such as
-`set grid`.
-
 If gnuplot was built with pm3d support, terminal-independent colors may be
-assigned using the <colorspec>.  This requires giving a RGB color triple,
-a known palette color name, a fractional index into the current palette, or
-a constant value from the current mapping of the palette onto cbrange.
+assigned using either `linecolor <colorspec>` or `linetype <colorspec>`.
+This requires giving a RGB color triple, a known palette color name,
+a fractional index into the current palette, or a constant value from the
+current mapping of the palette onto cbrange.
 See `colors`, @ref{colorspec}, @ref{palette}, @ref{colornames}, @ref{cbrange}.
+
+`set style line <n> linetype <lt>` will set both a terminal-dependent dot/dash
+pattern and color. The commands`set style line <n> linecolor <colorspec>` or
+`set style line <n> linetype <colorspec>` will set a new line color while
+leaving the existing dot-dash pattern unchanged.
 
 In 3d mode (`splot` command), the special keyword @ref{palette} is allowed as a
 shorthand for "linetype palette z".  The color value corresponds to the
 z-value (elevation) of the splot, and varies smoothly along a line or surface.
 
-Example:
+Examples:
 Suppose that the default lines for indices 1, 2, and 3 are red, green, and
 blue, respectively, and the default point shapes for the same indices are a
 square, a cross, and a triangle, respectively.  Then
@@ -10288,9 +10495,15 @@ line and q(x) using small triangles connected by a green line.
 @end example
 
 creates a surface plot using smooth colors according to @ref{palette}. Note,
-that this works only on some terminals.
+that this works only on some terminals. See also @ref{palette}, @ref{pm3d}.
 
-See also @ref{palette}, @ref{pm3d}.
+@example
+      set style line 10 linetype 1 linecolor rgb "cyan"
+
+@end example
+
+will assign linestyle 10 to be a solid cyan line on any terminal that
+supports rgb colors.
 
 
 @node plotting_styles,  , set_style_line, style
@@ -10691,22 +10904,23 @@ The `histograms` style is only relevant to 2-d plotting.  It produces a bar
 chart from a sequence of data columns in parallel. Each element of the 
 `plot` command must specify a single input data source (e.g. one column of 
 the input file), possibly with associated tic values or key titles.
-Three styles of histogram layout are currently supported. 
+Four styles of histogram layout are currently supported. 
 
 @example
       set style histogram clustered @{gap <gapsize>@}
+      set style histogram errorbars @{gap <gapsize>@} @{<linewidth>@}
       set style histogram rowstacked
       set style histogram columnstacked
 
 @end example
 
-The default style corresponds to `set style histogram clustered gap 2`. 
-Each set of parallel data values is collected into a group of boxes clustered
-at the x-axis coordinate corresponding to their sequential position (row #)
-in the selected datafile columns.  Thus if <n> datacolumns are selected, the
-first cluster is centered about x=1, and contains <n> boxes whose heights are
-taken from the first entry in the corresponding <n> data columns. This
-is followed by a gap and then a second cluster of boxes centered about x=2
+The default style corresponds to `set style histogram clustered gap 2`.
+In this style, each set of parallel data values is collected into a group of
+boxes clustered at the x-axis coordinate corresponding to their sequential
+position (row #) in the selected datafile columns.  Thus if <n> datacolumns are
+selected, the first cluster is centered about x=1, and contains <n> boxes whose
+heights are taken from the first entry in the corresponding <n> data columns.
+This is followed by a gap and then a second cluster of boxes centered about x=2
 corresponding to the second entry in the respective data columns, and so on.
 The default gap width of 2 indicates that the empty space between clusters is
 equivalent to the width of 2 boxes.  All boxes derived from any one column
@@ -10716,6 +10930,14 @@ Each cluster of boxes is derived from a single row of the input data file.
 It is common in such input files that the first element of each row is a
 label. Labels from this column may be placed along the x-axis underneath
 the appropriate cluster of boxes with the `xticlabels` option to @ref{using}.
+
+The @ref{errorbars} style is very similar to the `clustered` style, except that
+it requires two columns of input for each entry. The first column is treated
+as the height (y-value) of that box, exactly as for the `clustered` style. 
+The second column is treated as an error magnitude, and used to generate a
+vertical error bar at the top of the box. The appearance of the error bar is
+controlled by the current value of @ref{bars} and by the optional <linewidth>
+specification.
 
 Two styles of stacked histogram are supported, chosen by the command
 `set style histogram @{rowstacked|columnstacked@}`.  In these styles the data
@@ -10741,6 +10963,10 @@ number, of the corresponding data field.
 Box widths may be modified using the @ref{boxwidth} command.
 Box fill styles may be set using the `set style fill` command.
 
+Histograms always use the x1 axis, but may use either y1 or y2.
+If a plot contains both histograms and other plot styles, the non-histogram
+plot elements may use either the x1 or the x2 axis.
+
 Examples:
 
 To plot a data file containing multiple columns of data as a histogram
@@ -10750,16 +10976,29 @@ of clustered boxes (the default style):
       set boxwidth 0.9 relative
       set style data histograms
       set style fill solid 1.0 border -1
-      plot 'file.dat' using 2, '' using 4, '' using 3 
+      plot 'file.dat' using 2, '' using 4, '' using 6 
 
 @end example
 
 This will produce a plot with clusters of three boxes (vertical bars) centered
-at each integral value on the x axis. If the first column of the input file
+at each integral value on the x axis.  If the first column of the input file
 contains labels, they may be placed along the x-axis using the variant command
 
 @example
-      plot 'file.dat' using 2, '' using 4, '' using 3:xticlabels(1) 
+      plot 'file.dat' using 2, '' using 4, '' using 6:xticlabels(1) 
+
+@end example
+
+If the file contains both a magnitude and an error estimate for each value,
+then error bars can be added to the plot.  The following commands will add
+error bars extending from (y-<error>) to (y+<error>), capped by horizontal bar
+ends drawn the same width as the box itself. The error bars and bar ends are
+drawn in black with linewidth 2.
+
+@example
+      set bars fullwidth
+      set style histogram errorbars gap 2 lt -1 lw 2
+      plot 'file.dat' using 2:3, '' using 4:5, '' using 6:7:xticlabels(1) 
 
 @end example
 
@@ -10767,26 +11006,35 @@ To plot the same data as a rowstacked histogram:
 
 @example
       set style histogram rows
-      plot 'file.dat' using 2, '' using 4, '' using 3:xtic(1) 
+      plot 'file.dat' using 2, '' using 4, '' using 6:xtic(1) 
 
 @end example
 
 This will produce a plot in which each vertical bar contains a stack of three
-segments, corresponding in height to the values found in columns 2, 4 and 3
+segments, corresponding in height to the values found in columns 2, 4 and 6
 of the datafile.
 
 Finally, the commands
 
 @example
       set style histogram columnstacked
-      plot 'file.dat' using 2, '' using 4, '' using 3 
+      plot 'file.dat' using 2, '' using 4, '' using 6
 
 @end example
 
 will produce three vertical stacks. The stack at x=1 will contain a box for
 each entry in column 2 of the datafile.  The stack at x=2 will contain a box
 for each parallel entry in column 4 of the datafile, and the stack at x=3 a
-box for each entry of column 3.  
+box for each entry of column 6.  Because this interchanges gnuplot's usual
+interpretation of input rows and columns, the specification of key titles and
+x-axis tic labels must also be modified.
+
+@example
+      set style histogram columnstacked
+      plot '' u 5:key(1)            # uses first column to generate key titles
+      plot '' u 5 title columnhead  # uses first row to generate xtic labels
+
+@end example
 
 
 @noindent --- NEWHISTOGRAM ---
@@ -11918,7 +12166,7 @@ If <offset> is specified the label is moved by the given offset where
 <offset> is specified by either x,y or x,y,z, and may be preceded by
 `first`, `second`, `graph`, `screen`, or `character` to select the
 coordinate system.  See `coordinates` for details.  By default, the
-`character` coordinate system is used.  For example, "`set xlabel -1,0`"
+`character` coordinate system is used.  For example, "`set xlabel offset -1,0`"
 will change only the x offset of the title, moving the label roughly one
 character width to the left.  The size of a character depends on both the
 font and the terminal.
@@ -12825,7 +13073,7 @@ The @ref{shell} command spawns an interactive shell.  To return to `gnuplot`,
 type `logout` if using VMS, @ref{exit} or the END-OF-FILE character if using
 Unix, `endcli` if using AmigaOS, or @ref{exit} if using MS-DOS or OS/2.
 
-There are two ways of spawning a shell command: using @ref{system} command
+There are two ways of spawning a shell command: using `system` command
 or via `!` ($ if using VMS). The former command takes a string as a
 parameter and thus it can be used anywhere among other gnuplot commands,
 while the latter syntax requires to be the only command on the line. Control
@@ -12857,7 +13105,7 @@ On an Atari, the `!` command first checks whether a shell is already loaded
 and uses it, if available.  This is practical if `gnuplot` is run from
 `gulam`, for example.
 
-@node splot, system, shell, Commands
+@node splot, system_, shell, Commands
 @section splot
 
 @c ?commands splot
@@ -13213,7 +13461,7 @@ base.  The base projections of the contour lines may be written to a
 file, and then read with `plot`, to take advantage of `plot`'s additional
 formatting capabilities.
 
-@node system, test, splot, Commands
+@node system_, test, splot, Commands
 @section system
 
 @c ?commands system
@@ -13221,10 +13469,10 @@ formatting capabilities.
 @cmindex system
 
 
-@ref{system} spawns shell to execute a command. Please type @ref{shell} for
+`system` spawns shell to execute a command. Please type @ref{shell} for
 more details.
 
-@node test, unset, system, Commands
+@node test, unset, system_, Commands
 @section test
 
 @c ?commands test
@@ -14814,10 +15062,24 @@ color will be the transparent one. Default is `notransparent`.
 `interlace` instructs the driver to generate interlaced PNGs.
 Default is `nointerlace`.
 
+PNG plots may be conveniently viewed by piping the output to the
+'display' program from the ImageMagick package as follows:
+@example
+               set term png
+               set output '| display png:-'
+
+@end example
+
+View the output from successive plot commands interactively by hitting
+<space> in the display window.  To save a particular one to disk, left
+click in the display window and choose @ref{save}.
+
 Five basic fonts are supported directly by the gd library. These are
 `tiny` (5x8 pixels), `small` (6x12 pixels), `medium`, (7x13 Bold), 
 `large` (8x16) or `giant` (9x15 pixels). These fonts cannot be scaled
 or rotated (pure horizontal or vertical text only).
+
+@cindex fonts
 
 If gnuplot was built with support for TrueType (*.ttf) or Adobe Type 1 
 (*.pfa) fonts, they may be selected using the 'font <face> @{<pointsize>@}' 
@@ -17349,6 +17611,8 @@ X Toolkit options and resources such as geometry, font, and name from the
 command line arguments or a configuration file.  See the X(1) man page
 (or its equivalent) for a description of such options.
 
+@cindex X resources
+
 A number of other `gnuplot` options are available for the `x11` terminal.
 These may be specified either as command-line options when `gnuplot` is
 invoked or as resources in the configuration file ".Xdefaults".  They are
@@ -17363,6 +17627,8 @@ set upon initialization and cannot be altered during a `gnuplot` session.
 @c ?set term x11 x11_fonts
 @c ?x11 x11_fonts
 @cindex x11_fonts
+
+@cindex fonts
 
 Upon initial startup, the default font is taken from the X11 resources
 as set in the system or user .Xdefaults file or on the command line.
@@ -17466,6 +17732,8 @@ later by `set term x11 [no]raise [no]persist)`:
 
 @end example
 
+@cindex X resources
+
 The options are shown above in their command-line syntax.  When entered as
 resources in ".Xdefaults", they require a different syntax.
 
@@ -17503,6 +17771,8 @@ replaces the <space> hot-key with <ctrl><space> for the same reason.
 @c ?x11 monochrome_options
 @cindex monochrome_options
 
+@cindex X resources
+
 For monochrome displays, `gnuplot` does not honor foreground or background
 colors.  The default is black-on-white.  `-rv` or `gnuplot*reverseVideo: on`
 requests white-on-black.
@@ -17516,6 +17786,8 @@ requests white-on-black.
 @c ?set term x11 color_resources
 @c ?x11 color_resources
 @cindex color_resources
+
+@cindex X resources
 
 For color displays, `gnuplot` honors the following resources (shown here
 with their default values) or the greyscale resources.  The values may be
@@ -17570,6 +17842,8 @@ to override the first linetype color.
 @c ?x11 grayscale_resources
 @cindex grayscale_resources
 
+@cindex X resources
+
 When `-gray` is selected, `gnuplot` honors the following resources for
 grayscale or color displays (shown here with their default values).  Note
 that the default background is black.
@@ -17600,6 +17874,8 @@ that the default background is black.
 @c ?set term x11 line_resources
 @c ?x11 line_resources
 @cindex line_resources
+
+@cindex X resources
 
 `gnuplot` honors the following resources for setting the width (in pixels) of
 plot lines (shown here with their default values.)  0 or 1 means a minimal
@@ -17658,6 +17934,8 @@ to a '16' dotted line.
 @cindex pm3d_resources
 
 @c ?x11 pm3d
+@cindex X resources
+
 Choosing the appropriate visual class and number of colors is a crucial
 point in X11 applications and a bit awkward, since X11 supports six visual
 types in different depths.
@@ -17716,6 +17994,8 @@ by specifying `gnuplot*maxcolors: 240` and `gnuplot*mincolors: 240`.
 @c ?set terminal x11 other_resources
 @c ?set term x11 other_resources
 @c ?x11 other_resources
+@cindex X resources
+
 By default the contents of the current plot window are exported to the X11
 clipboard in response to X events in the window. Setting the resource
 'gnuplot*exportselection' to 'off' or 'false' will disable this.
@@ -17821,6 +18101,8 @@ X Toolkit options and resources such as geometry, font, and name from the
 command line arguments or a configuration file.  See the X(1) man page
 (or its equivalent) for a description of such options.
 
+@cindex X resources
+
 A number of other `gnuplot` options are available for the `x11` terminal.
 These may be specified either as command-line options when `gnuplot` is
 invoked or as resources in the configuration file ".Xdefaults".  They are
@@ -17835,6 +18117,8 @@ set upon initialization and cannot be altered during a `gnuplot` session.
 @c ?set term x11 x11_fonts
 @c ?x11 x11_fonts
 @cindex x11_fonts
+
+@cindex fonts
 
 Upon initial startup, the default font is taken from the X11 resources
 as set in the system or user .Xdefaults file or on the command line.
@@ -17938,6 +18222,8 @@ later by `set term x11 [no]raise [no]persist)`:
 
 @end example
 
+@cindex X resources
+
 The options are shown above in their command-line syntax.  When entered as
 resources in ".Xdefaults", they require a different syntax.
 
@@ -17975,6 +18261,8 @@ replaces the <space> hot-key with <ctrl><space> for the same reason.
 @c ?x11 monochrome_options
 @cindex monochrome_options
 
+@cindex X resources
+
 For monochrome displays, `gnuplot` does not honor foreground or background
 colors.  The default is black-on-white.  `-rv` or `gnuplot*reverseVideo: on`
 requests white-on-black.
@@ -17988,6 +18276,8 @@ requests white-on-black.
 @c ?set term x11 color_resources
 @c ?x11 color_resources
 @cindex color_resources
+
+@cindex X resources
 
 For color displays, `gnuplot` honors the following resources (shown here
 with their default values) or the greyscale resources.  The values may be
@@ -18042,6 +18332,8 @@ to override the first linetype color.
 @c ?x11 grayscale_resources
 @cindex grayscale_resources
 
+@cindex X resources
+
 When `-gray` is selected, `gnuplot` honors the following resources for
 grayscale or color displays (shown here with their default values).  Note
 that the default background is black.
@@ -18072,6 +18364,8 @@ that the default background is black.
 @c ?set term x11 line_resources
 @c ?x11 line_resources
 @cindex line_resources
+
+@cindex X resources
 
 `gnuplot` honors the following resources for setting the width (in pixels) of
 plot lines (shown here with their default values.)  0 or 1 means a minimal
@@ -18130,6 +18424,8 @@ to a '16' dotted line.
 @cindex pm3d_resources
 
 @c ?x11 pm3d
+@cindex X resources
+
 Choosing the appropriate visual class and number of colors is a crucial
 point in X11 applications and a bit awkward, since X11 supports six visual
 types in different depths.
@@ -18188,6 +18484,8 @@ by specifying `gnuplot*maxcolors: 240` and `gnuplot*mincolors: 240`.
 @c ?set terminal x11 other_resources
 @c ?set term x11 other_resources
 @c ?x11 other_resources
+@cindex X resources
+
 By default the contents of the current plot window are exported to the X11
 clipboard in response to X events in the window. Setting the resource
 'gnuplot*exportselection' to 'off' or 'false' will disable this.
