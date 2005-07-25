@@ -1,6 +1,6 @@
 2005-07-23  Ethan Merritt  <merritt@u.washington.edu
 
-	src/command.c (print_command): Re-arrange code so that an expression
+	* src/command.c (print_command): Re-arrange code so that an expression
 	being printed is only evaluated once, rather than twice.
 	Fixes bug #1173508.
 
@@ -13,7 +13,7 @@
 
 2005-07-22  Ethan Merritt  <merritt@u.washington.edu
 
-	src/parse.c (string_or_express): Remove unused variable.
+	* src/parse.c (string_or_express): Remove unused variable.
 
 2005-07-22  Ethan Merritt  <merritt@u.washington.edu
 
