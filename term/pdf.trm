@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: pdf.trm,v 1.51 2005/04/29 16:36:07 sfeam Exp $
+ * $Id: pdf.trm,v 1.52 2005/05/22 18:49:39 sfeam Exp $
  */
 
 /*------------------------------
@@ -340,8 +340,8 @@ PDF_options ()
 	    if (END_OF_COMMAND)
 		int_error(c_token, "expecting line width");
 	    PDF_linewidth_factor = real (const_express (&a));
-	    if (PDF_linewidth_factor < 0.0)
-		PDF_linewidth_factor = 1.0;
+	    if (PDF_linewidth_factor <= 0)
+		PDF_linewidth_factor = 0.1;
 	    continue;
 	}
 
@@ -605,6 +605,8 @@ PDF_linewidth (double linewidth)
 {
     PDF_PathClose();
     PDF_LineWidth = PDF_RESOLUTION * PDF_linewidth_factor * linewidth / 4.0;
+    if (PDF_LineWidth < 0.1)
+	PDF_LineWidth = 0.1;
     PDF_setlinewidth(myPDF, PDF_LineWidth);
 }
 
