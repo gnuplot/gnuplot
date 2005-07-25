@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.84 2005/07/18 17:46:55 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.85 2005/07/18 18:37:01 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -230,6 +230,10 @@ char *df_commentschars = 0;
 
 /* If any 'inline data' are in use for the current plot, flag this */
 TBOOLEAN plotted_data_from_stdin = FALSE;
+
+/* Setting this allows the parser to recognize Fortran D or Q   */
+/* format constants in the input file. But it slows things down */
+TBOOLEAN df_fortran_constants = FALSE;
 
 /* private variables */
 
@@ -751,15 +755,9 @@ df_tokenise(char *s)
                         )
                     )
                 ) {
-#ifndef NO_FORTRAN_NUMS
-                count = sscanf(s, "%lf%n",
-                               &df_column[df_no_cols].datum, &used);
-#else
-                while (isspace((unsigned char) *s) && NOTSEP)
-                    ++s;
-                count = (*s && NOTSEP) ? 1 : 0;
-                df_column[df_no_cols].datum = atof(s);
-#endif /* NO_FORTRAN_NUMS */
+
+                count = sscanf(s, "%lf%n", &df_column[df_no_cols].datum, &used);
+
             } else {
                 /* skip any space at start of column */
                 /* HBB tells me that the cast must be to
@@ -783,9 +781,7 @@ df_tokenise(char *s)
             /* it might be a fortran double or quad precision.
              * 'used' is only safe if count is 1
              */
-
-#ifndef NO_FORTRAN_NUMS
-            if (count == 1 &&
+            if (df_fortran_constants && count == 1 &&
                 (s[used] == 'd' || s[used] == 'D' ||
                  s[used] == 'q' || s[used] == 'Q')) {
                 /* HBB 20001221: avoid breaking parsing of time/date
@@ -799,8 +795,8 @@ df_tokenise(char *s)
                 count = sscanf(s, "%lf", &df_column[df_no_cols].datum);
                 s[used] = save_char;
             }
-#endif /* NO_FORTRAN_NUMS */
 #endif /* OSK */
+
             df_column[df_no_cols].good = count == 1 ? DF_GOOD : DF_BAD;
         }
 

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.155 2005/06/05 04:55:15 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.156 2005/06/19 22:03:51 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -2679,6 +2679,8 @@ show_datafile()
     if (END_OF_COMMAND || almost_equals(c_token,"com$ments")) {
 	fprintf(stderr, "\tComments chars are \"%s\"\n", df_commentschars);
     }
+    if (df_fortran_constants)
+	fputs("\tdatafile parsing will accept Fortran D or Q constants\n",stderr);
 #if BINARY_DATA_FILE
     if (END_OF_COMMAND || almost_equals(c_token,"bin$ary")) {
 	if (!END_OF_COMMAND)

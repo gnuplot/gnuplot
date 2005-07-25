@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.313 2005/07/10 18:24:00 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.314 2005/07/10 19:05:02 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -5198,8 +5198,16 @@ C ... and restart the table:
 ?set datafile
 ?show datafile
  The `set datafile` command options control interpretation of fields read from
- input data files by the `plot`, `splot`, and `fit` commands.  Three such
+ input data files by the `plot`, `splot`, and `fit` commands.  Four such
  options are currently implemented.
+4 set datafile fortran
+?set datafile fortran
+?fortran
+ The `set datafile fortran` command enables a special check for values in the
+ input file expressed as Fortran D or Q constants. This extra check slows down
+ the input process, and should only be selected if you do in fact have datafiles
+ containing Fortran D or Q constants. The option can be disabled again using
+ `unset datafile fortran`.
 4 set datafile missing
 ?set datafile missing
 ?set missing

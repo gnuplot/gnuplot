@@ -1,3 +1,14 @@
+2005-07-25  Ethan Merritt  <merritt@u.washington.edu
+
+	* src/datafile.c src/datafile.h src/save.c src/set.c src/show.c
+	src/unset.c docs/gnuplot.doc: 
+	New command 'set datafile fortran' to enable parsing of input files
+	containing Fortran D or Q floating constants. This was the default
+	until now, but it requires a second pass through every value parsed,
+	which obviously slows down the input procedure. Now the second pass
+	is disabled by default, and only occurs if the fortran parsing option
+	is selected.  Addresses complaints of slow input from large files.
+
 2005-07-23  Ethan Merritt  <merritt@u.washington.edu
 
 	* src/command.c (print_command): Re-arrange code so that an expression

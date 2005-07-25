@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.187 2005/07/12 03:37:43 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.188 2005/07/16 21:01:47 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -369,7 +369,13 @@ fprintf(stderr,"BLA \n");
 	    else if (almost_equals(c_token,"bin$ary"))
 		df_set_datafile_binary();
 #endif
-	    else
+	    else if (almost_equals(c_token,"fort$ran")) {
+		df_fortran_constants = TRUE;
+		c_token++;
+	    } else if (almost_equals(c_token,"nofort$ran")) {
+		df_fortran_constants = FALSE;
+		c_token++;
+	    } else
 		int_error(c_token,"expecting datafile modifier");
 	    break;
 #ifdef USE_MOUSE
