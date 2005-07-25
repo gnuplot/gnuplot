@@ -29,6 +29,7 @@ News, changes and fixes since gnuplot version 4.0
 * NEW encoding koi8-u
 * NEW plot style "with vectors" applies to both 2D and 3D plots
 * NEW plot style "with points" can read variable point size from input file
+* CHANGE 'set datafile fortran' is now required in order to read D or Q constants
 * CHANGE let the string in '{s}plot ... notitle "string"' be silently ignored
 * CHANGE libgd versions 2.0.28+ support GIF images as well as PNG/JPEG
 * CHANGE remove old (non-libgd) GIF and PNG drivers
