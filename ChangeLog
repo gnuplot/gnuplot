@@ -3,6 +3,12 @@
 	* term/pdf.trm (PDF_options PDF_linewidth): libpdf does not like zero
 	linewidth. Limit linewidths to 0.1 or greater.
 
+	* src/command.c (exit_command) docs/gnuplot.doc:
+	New command 'exit gnuplot' will unconditionally exit gnuplot immediately
+	even if invoked from within several nested layers of input stream. This
+	allows, for instance, binding a hotkey that can terminate gnuplot in
+	response to a keystroke in the plot window.
+
 2005-07-25  Ethan Merritt  <merritt@u.washington.edu
 
 	* src/datafile.c src/datafile.h src/save.c src/set.c src/show.c

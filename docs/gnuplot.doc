@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.314 2005/07/10 19:05:02 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.315 2005/07/25 17:31:59 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -2260,6 +2260,12 @@ C ... and restart the table:
  If input streams are nested (inherited `load` scripts), then reading will
  continue in the parent stream. When the top level stream is closed, the
  program itself will exit.
+
+ The command `exit gnuplot` will immediately and unconditionally cause gnuplot
+ to exit even if the input stream is multiply nested.  In this case any open
+ output files may not be completed cleanly. Example of use:
+
+       bind "ctrl-x" "unset output; exit gnuplot"
 
  See help for `batch/interactive` for more details.
 2 fit
