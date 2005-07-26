@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.188 2005/07/16 21:01:47 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.189 2005/07/25 17:32:05 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -1692,6 +1692,7 @@ set_label()
     
     /* get tag */
     if (!END_OF_COMMAND
+	/* FIXME - Are these tests really still needed? */
 	&& !isstringvalue(c_token)
 	&& !equals(c_token, "at")
 	&& !equals(c_token, "left")
@@ -3825,9 +3826,17 @@ set_xyzlabel(label_struct *label)
 	return;
     }
 
+    /* FIXME - These tests wouldn't be needed if try_to_get_string() returned */
+    /* cleanly when the next token is a keyword rather than an expression.    */
+    if (!almost_equals(c_token, "f$ont")
+    &&  !almost_equals(c_token, "off$set")
+    &&  !almost_equals(c_token, "text$color") && !equals(c_token, "tc")
+    &&  !almost_equals(c_token, "enh$anced")
+    &&  !almost_equals(c_token, "noenh$anced")) {
+
 #ifdef GP_STRING_VARS
-    /* Protect against attempted string arithmetic triggered by */
-    /* old syntax  "set xlabel 'foo' -1,1" */
+	/* Protect against attempted string arithmetic triggered by */
+	/* old syntax  "set xlabel 'foo' -1,1" */
 	STRING_RESULT_ONLY = TRUE;
 	text = try_to_get_string();
 	STRING_RESULT_ONLY = FALSE;
@@ -3838,12 +3847,12 @@ set_xyzlabel(label_struct *label)
 	if (equals(c_token,","))
 	    c_token -= 2;
 #else
-    if (isstring(c_token)) {
-	/* We have string specified - grab it. */
-	quote_str(label->text, c_token, MAX_LINE_LEN);
-	c_token++;
-    }
+	if (isstring(c_token)) {
+	    quote_str(label->text, c_token, MAX_LINE_LEN);
+	    c_token++;
+	}
 #endif
+    }
 
     while (!END_OF_COMMAND) {
 

@@ -1,7 +1,16 @@
+2005-07-26  Ethan Merritt  <merritt@u.washington.edu
+
+	* src/set.c (set_xyzlabel): Check to see if next token is a valid
+	keyword before trying to parse it as a string. Fixes bug on, e.g.
+	'set title offset 1,1'
+
+	* src/save.c (save_set_all): Write out keyword "offset" where 
+	appropriate.
+
 2005-07-25  Ethan Merritt  <merritt@u.washington.edu
 
-	* stdfn.c stdfn.h: Add a private function gp_strtod() in case there
-	are platforms that do not have a working strtod().
+	* src/stdfn.c src/stdfn.h: Add a private function gp_strtod() in case
+	there are platforms that do not have a working strtod().
 
 	* src/datafile.c (df_tokenise):  Use strtod(), via gp_strtod(),
 	to parse values read from a data file.  On long input lines, this is
