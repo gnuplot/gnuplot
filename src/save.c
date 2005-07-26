@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.110 2005/07/25 17:32:04 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.111 2005/07/26 18:15:26 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -675,6 +675,7 @@ set ticscale %g %g\n",
 	    "timestamp", conv_text(timelabel.text),
 	    (timelabel_bottom ? "bottom" : "top"),
 	    (timelabel_rotate ? "" : "no"));
+    fprintf(fp, "offset ");
     save_position(fp, &(timelabel.offset));
     fprintf(fp, " \"%s\"\n", conv_text(timelabel.font));
 
