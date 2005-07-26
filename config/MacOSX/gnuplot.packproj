@@ -952,7 +952,7 @@
 							<key>Path Type</key>
 							<integer>2</integer>
 							<key>Status</key>
-							<true/>
+							<false/>
 						</dict>
 						<dict>
 							<key>Path</key>
@@ -960,7 +960,7 @@
 							<key>Path Type</key>
 							<integer>2</integer>
 							<key>Status</key>
-							<true/>
+							<false/>
 						</dict>
 					</array>
 				</dict>
@@ -1068,7 +1068,7 @@
 					<key>IFPkgFlagIsRequired</key>
 					<true/>
 					<key>IFPkgFlagOverwritePermissions</key>
-					<false/>
+					<true/>
 					<key>IFPkgFlagRelocatable</key>
 					<false/>
 					<key>IFPkgFlagRestartAction</key>
