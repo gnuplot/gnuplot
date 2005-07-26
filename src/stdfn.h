@@ -1,5 +1,5 @@
 /*
- * $Id: stdfn.h,v 1.29 2005/01/26 16:16:06 broeker Exp $
+ * $Id: stdfn.h,v 1.30 2005/04/22 21:40:37 broeker Exp $
  */
 
 /* GNUPLOT - stdfn.h */
@@ -528,5 +528,7 @@ char *safe_strncpy __PROTO((char *, const char *, size_t));
 #ifndef HAVE_SLEEP
 unsigned int sleep __PROTO((unsigned int));
 #endif
+
+double gp_strtod __PROTO((const char *str, char **endptr));
 
 #endif /* STDFN_H */

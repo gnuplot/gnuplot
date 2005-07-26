@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: stdfn.c,v 1.15 2004/04/13 17:24:01 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: stdfn.c,v 1.16 2004/07/01 17:10:08 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - stdfn.c */
@@ -443,3 +443,20 @@ gp_strcspn(const char *str1, const char *str2)
     return (pos);
 }
 #endif /* !HAVE_STRCSPN */
+
+double
+gp_strtod(const char *str, char **endptr)
+{
+#if (0)  /* replace with test for platforms with broken strtod() */
+    int used;
+    double d;
+    int n = sscanf(str, "%lf%n", &d, &used);
+    if (n < 1)
+	*endptr = (char *)str;
+    else
+	*endptr = (char *)(str + used);
+    return d;
+#else
+    return strtod(str,endptr);
+#endif
+}

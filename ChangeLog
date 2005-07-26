@@ -1,5 +1,16 @@
 2005-07-25  Ethan Merritt  <merritt@u.washington.edu
 
+	* stdfn.c stdfn.h: Add a private function gp_strtod() in case there
+	are platforms that do not have a working strtod().
+
+	* src/datafile.c (df_tokenise):  Use strtod(), via gp_strtod(),
+	to parse values read from a data file.  On long input lines, this is
+	substantially faster than using sscanf(). The previous fast path
+	(non-Fortran) used atof() rather than strtod(), but that does not
+	give a status return or character length consumed.
+
+2005-07-25  Ethan Merritt  <merritt@u.washington.edu
+
 	* term/pdf.trm (PDF_options PDF_linewidth): libpdf does not like zero
 	linewidth. Limit linewidths to 0.1 or greater.
 
@@ -15,7 +26,7 @@
 	src/unset.c docs/gnuplot.doc: 
 	New command 'set datafile fortran' to enable parsing of input files
 	containing Fortran D or Q floating constants. This was the default
-	until now, but it requires a second pass through every value parsed,
+	until now, but it requires a second check of every value parsed,
 	which obviously slows down the input procedure. Now the second pass
 	is disabled by default, and only occurs if the fortran parsing option
 	is selected.  Addresses complaints of slow input from large files.

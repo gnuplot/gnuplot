@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.85 2005/07/18 18:37:01 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.86 2005/07/25 17:32:02 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -712,20 +712,6 @@ df_tokenise(char *s)
         } else if (check_missing(s))
             df_column[df_no_cols].good = DF_MISSING;
         else {
-#ifdef OSK
-            /* apparently %n does not work. This implementation
-             * is just as good as the non-OSK one, but close
-             * to a release (at last) we make it os-9 specific
-             */
-            int count;
-            char *p = strpbrk(s, "dqDQ");
-            
-            if (p != NULL)
-                *p = 'e';
-
-            count = sscanf(s, "%lf", &df_column[df_no_cols].datum);
-#else
-            /* cannot trust strtod - eg strtod("-",&p) */
             int used;
             int count;
             int dfncp1 = df_no_cols + 1;
@@ -756,7 +742,16 @@ df_tokenise(char *s)
                     )
                 ) {
 
-                count = sscanf(s, "%lf%n", &df_column[df_no_cols].datum, &used);
+		/* Use strtod() because
+		 *  - it is faster than sscanf()
+		 *  - sscanf(... %n ...) may not be portable
+		 *  - it allows error checking
+		 *  - atod() does not return a count or new position
+		 */
+		 char *next;
+		 df_column[df_no_cols].datum = gp_strtod(s, &next);
+		 used = next - s;
+		 count = (used) ? 1 : 0;
 
             } else {
                 /* skip any space at start of column */
@@ -787,15 +782,16 @@ df_tokenise(char *s)
                 /* HBB 20001221: avoid breaking parsing of time/date
                  * strings like 01Dec2000 that would be caused by
                  * overwriting the 'D' with an 'e'... */
+		char *endptr;
                 char save_char = s[used];
 
                 /* might be fortran double */
                 s[used] = 'e';
                 /* and try again */
-                count = sscanf(s, "%lf", &df_column[df_no_cols].datum);
+                df_column[df_no_cols].datum = gp_strtod(s, &endptr);
+		count = (endptr == s) ? 0 : 1;
                 s[used] = save_char;
             }
-#endif /* OSK */
 
             df_column[df_no_cols].good = count == 1 ? DF_GOOD : DF_BAD;
         }
