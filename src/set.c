@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.189 2005/07/25 17:32:05 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.190 2005/07/26 18:15:26 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -3425,46 +3425,62 @@ set_timefmt()
 static void
 set_timestamp()
 {
+    TBOOLEAN got_format = FALSE;
+
     c_token++;
-    if (END_OF_COMMAND || !isstring(c_token))
+
+    /* For backwards compatibility */
+    if (!(*timelabel.text))
 	strcpy(timelabel.text, DEFAULT_TIMESTAMP_FORMAT);
 
-    if (!END_OF_COMMAND) {
-	if (isstring(c_token)) {
+    /* Version 4.1 - accept options in any order */
+    while (!END_OF_COMMAND) {
+	if (!got_format && isstring(c_token)) {
 	    /* we have a format string */
 	    quote_str(timelabel.text, c_token, MAX_LINE_LEN);
-	    ++c_token;
-	} else {
-	    strcpy(timelabel.text, DEFAULT_TIMESTAMP_FORMAT);
+	    got_format = TRUE;
+	    c_token++;
+	    continue;
 	}
-	if (almost_equals(c_token,"t$op")) {
-	    timelabel_bottom = FALSE;
-	    ++c_token;
-	} else if (almost_equals(c_token, "b$ottom")) {
-	    timelabel_bottom = TRUE;
-	    ++c_token;
-	}
-	if (almost_equals(c_token,"r$otate")) {
-	    timelabel_rotate = TRUE;
-	    ++c_token;
-	} else if (almost_equals(c_token, "n$orotate")) {
-	    timelabel_rotate = FALSE;
-	    ++c_token;
-	}
-	/* The "offset" keyword is new (v4.1), for backward compatibility we don't enforce it */
-	if (almost_equals(c_token,"off$set")) {
-	     ++c_token;
-	}
-	/* We have x,y offsets specified */
-	if (!END_OF_COMMAND && !equals(c_token,",")) {
-	    get_position_default(&(timelabel.offset),character);
+
+	/* The "font" keyword is new (v4.1), for backward compatibility we don't enforce it */
+	if (equals(c_token,"font")) {
+	     c_token++;
 	}
 	if (!END_OF_COMMAND && isstring(c_token)) {
 	    quote_str(timelabel.font, c_token, MAX_LINE_LEN);
-	    ++c_token;
-	} else {
-	    *timelabel.font = 0;
+	    c_token++;
+	    continue;
 	}
+
+	if (almost_equals(c_token,"t$op")) {
+	    timelabel_bottom = FALSE;
+	    c_token++;
+	    continue;
+	} else if (almost_equals(c_token, "b$ottom")) {
+	    timelabel_bottom = TRUE;
+	    c_token++;
+	    continue;
+	}
+
+	if (almost_equals(c_token,"r$otate")) {
+	    timelabel_rotate = TRUE;
+	    c_token++;
+	    continue;
+	} else if (almost_equals(c_token, "n$orotate")) {
+	    timelabel_rotate = FALSE;
+	    c_token++;
+	    continue;
+	}
+
+	/* The only remaining possibility is x,y offsets specified
+	 * The "offset" keyword is new (v4.1); 
+	 * for backward compatibility we don't enforce it
+	 */
+	if (almost_equals(c_token,"off$set"))
+	     c_token++;
+	get_position_default(&(timelabel.offset),character);
+
     }
 }
 

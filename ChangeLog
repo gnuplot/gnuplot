@@ -1,3 +1,11 @@
+2005-07-27  Ethan Merritt  <merritt@u.washington.edu
+
+	* src/set.c (set_timestamp) docs/gnuplot.doc:
+	Drag the "set timestamp" code into the modern era by accepting options
+	in any order. Add keyword "font" in front of the optional font string,
+	but for backwards compatibility do not require it.  Update the
+	documentation to reflect current treatment of offset and font options.
+
 2005-07-26  Ethan Merritt  <merritt@u.washington.edu
 
 	* src/set.c (set_xyzlabel): Check to see if next token is a valid

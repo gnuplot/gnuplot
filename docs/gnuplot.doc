@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.315 2005/07/25 17:31:59 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.316 2005/07/25 21:04:52 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -8901,7 +8901,7 @@ C ... and restart the table:
 
  Syntax:
        set timestamp {"<format>"} {top|bottom} {{no}rotate}
-                     {<xoff>}{,<yoff>} {"<font>"}
+                     {offset {<xoff>}{,<yoff>}} {font "<fontspec>"}
        unset timestamp
        show timestamp
 
@@ -8911,14 +8911,13 @@ C ... and restart the table:
  year).  With `top` or `bottom` you can place the timestamp at the top or
  bottom of the left margin (default: bottom).  `rotate` lets you write the
  timestamp vertically, if your terminal supports vertical text.  The constants
- <xoff> and <yoff> are offsets from the default position given in character
- screen coordinates.  <font> is used to specify the font with which the time
- is to be written.
+ <xoff> and <yoff> are offsets that let you adjust the position more finely.
+ <font> is used to specify the font with which the time is to be written.
 
  The abbreviation `time` may be used in place of `timestamp`.
 
  Example:
-       set timestamp "%d/%m/%y %H:%M" 80,-2 "Helvetica"
+       set timestamp "%d/%m/%y %H:%M" offset 80,-2 font "Helvetica"
 
  See `set timefmt` for more information about time format strings.
 3 timefmt
