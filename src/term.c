@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.115 2005/07/23 04:08:35 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.116 2005/07/24 00:28:55 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -237,31 +237,35 @@ static void do_enh_writec __PROTO((int c));
 static void mp_layout_size_and_offset __PROTO((void));
 
 enum set_multiplot_id {
+    S_MULTIPLOT_LAYOUT,
     S_MULTIPLOT_COLUMNSFIRST, S_MULTIPLOT_ROWSFIRST, S_MULTIPLOT_SCALE,
     S_MULTIPLOT_DOWNWARDS, S_MULTIPLOT_UPWARDS,
-    S_MULTIPLOT_OFFSET, S_MULTIPLOT_INVALID
+    S_MULTIPLOT_OFFSET, S_MULTIPLOT_TITLE, S_MULTIPLOT_INVALID
 };
 
 static const struct gen_table set_multiplot_tbl[] =
 {
+    { "lay$out", S_MULTIPLOT_LAYOUT },
     { "col$umnsfirst", S_MULTIPLOT_COLUMNSFIRST },
     { "row$sfirst", S_MULTIPLOT_ROWSFIRST },
     { "down$wards", S_MULTIPLOT_DOWNWARDS },
     { "up$wards", S_MULTIPLOT_UPWARDS },
     { "sca$le", S_MULTIPLOT_SCALE },
     { "off$set", S_MULTIPLOT_OFFSET },
+    { "ti$tle", S_MULTIPLOT_TITLE },
     { NULL, S_MULTIPLOT_INVALID }
 };
 
 # define MP_LAYOUT_DEFAULT {          \
-    FALSE,  /* auto_layout */         \
-    0, 0,   /* num_rows, num_cols */  \
-    FALSE,  /* row_major */           \
-    TRUE,   /* downwards */           \
-    0, 0,   /* act_row, act_col */    \
-    1, 1,   /* xscale, yscale */      \
-    0, 0,   /* xoffset, yoffset */    \
-    0,0,0,0 /* prev_ sizes and offsets */ \
+    FALSE,	/* auto_layout */         \
+    0, 0,	/* num_rows, num_cols */  \
+    FALSE,	/* row_major */           \
+    TRUE,	/* downwards */           \
+    0, 0,	/* act_row, act_col */    \
+    1, 1,	/* xscale, yscale */      \
+    0, 0,	/* xoffset, yoffset */    \
+    0,0,0,0,	/* prev_ sizes and offsets */ \
+    EMPTY_LABELSTRUCT, 0.0 \
 }
 
 static struct {
@@ -278,6 +282,8 @@ static struct {
     double yoffset;        /* horizontal shift */
     double prev_xsize, prev_ysize, prev_xoffset, prev_yoffset;
                            /* values before 'set multiplot layout' */
+    label_struct title;    /* goes above complete set of plots */
+    double title_height;   /* fractional height reserved for title */
 } mp_layout = MP_LAYOUT_DEFAULT;
 
 
@@ -626,90 +632,139 @@ term_start_multiplot()
 
     term_start_plot();
 
-    multiplot = TRUE;
     mp_layout.auto_layout = FALSE;
 
-    /* check for optional multiplot layout */
-    if (!END_OF_COMMAND && almost_equals(c_token,"lay$out")) {
+    /* Parse options (new in version 4.1 */
+    while (!END_OF_COMMAND) {
         struct value a;
+	char *s;
 
-        c_token++;
-        if (END_OF_COMMAND) {
-            int_error(c_token,"expecting '<num_cols>,<num_rows>'");
-        }
-        
-        /* read row,col */
-        mp_layout.num_rows = (int) real(const_express(&a));
-        if (END_OF_COMMAND || !equals(c_token,",") ) {
-            int_error(c_token, "expecting ', <num_cols>'");
-        }
-        c_token++;
-        if (END_OF_COMMAND) {
-            int_error(c_token, "expecting <num_cols>");
-        }
-        mp_layout.num_cols = (int) real(const_express(&a));
+	if (almost_equals(c_token, "ti$tle")) {
+	    c_token++;
+	    if ((s = try_to_get_string())) {
+		strncpy(mp_layout.title.text, s, sizeof(mp_layout.title.text));
+		free(s);
+	    }
+	    continue;
+	}
 
-        /* remember current values of the plot size */
-        mp_layout.prev_xsize = xsize;
-        mp_layout.prev_ysize = ysize;
-        mp_layout.prev_xoffset = xoffset;
-        mp_layout.prev_yoffset = yoffset;
+	if (almost_equals(c_token, "lay$out")) {
+	    if (mp_layout.auto_layout)
+		int_error(c_token, "too many layout commands");
+	    else
+		mp_layout.auto_layout = TRUE;
 
-        mp_layout.auto_layout = TRUE;
-        mp_layout.act_row = 0;
-        mp_layout.act_col = 0;
+	    c_token++;
+	    if (END_OF_COMMAND) {
+	        int_error(c_token,"expecting '<num_cols>,<num_rows>'");
+	    }
+	    
+	    /* read row,col */
+	    mp_layout.num_rows = (int) real(const_express(&a));
+	    if (END_OF_COMMAND || !equals(c_token,",") )
+	        int_error(c_token, "expecting ', <num_cols>'");
 
-        while (!END_OF_COMMAND) {
-            switch(lookup_table(&set_multiplot_tbl[0],c_token)) {
-                case S_MULTIPLOT_COLUMNSFIRST:
-                    mp_layout.row_major = TRUE;
-                    c_token++;
-                    break;
-                case S_MULTIPLOT_ROWSFIRST:
-                    mp_layout.row_major = FALSE;
-                    c_token++;
-                    break;
-                case S_MULTIPLOT_DOWNWARDS:
-                    mp_layout.downwards = TRUE;
-                    c_token++;
-                    break;
-                case S_MULTIPLOT_UPWARDS:
-                    mp_layout.downwards = FALSE;
-                    c_token++;
-                    break;
-                case S_MULTIPLOT_SCALE:
-                    c_token++;
-                    mp_layout.xscale = real(const_express(&a));
-                    mp_layout.yscale = mp_layout.xscale;
-                    if (!END_OF_COMMAND && equals(c_token,",") ) {
-                        c_token++;
-                        if (END_OF_COMMAND) {
-                            int_error(c_token, "expecting <yscale>");
-                        }
-                        mp_layout.yscale = real(const_express(&a));
-                    }
-                    break;
-                case S_MULTIPLOT_OFFSET:
-                    c_token++;
-                    mp_layout.xoffset = real(const_express(&a));
-                    mp_layout.yoffset = mp_layout.xoffset;
-                    if (!END_OF_COMMAND && equals(c_token,",") ) {
-                        c_token++;
-                        if (END_OF_COMMAND) {
-                            int_error(c_token, "expecting <yoffset>");
-                        }
-                        mp_layout.yoffset = real(const_express(&a));
-                    }
-                    break;
-                default:
-                    int_error(c_token,"invalid option");
-                    break;
-            }
-        }
-        mp_layout_size_and_offset();
-    } else {
-        mp_layout.auto_layout = FALSE;
+	    c_token++;
+	    if (END_OF_COMMAND)
+	        int_error(c_token, "expecting <num_cols>");
+	    mp_layout.num_cols = (int) real(const_express(&a));
+	
+	    /* remember current values of the plot size */
+	    mp_layout.prev_xsize = xsize;
+	    mp_layout.prev_ysize = ysize;
+	    mp_layout.prev_xoffset = xoffset;
+	    mp_layout.prev_yoffset = yoffset;
+	
+	    mp_layout.act_row = 0;
+	    mp_layout.act_col = 0;
+
+	    continue;
+	}
+
+	/* The remaining options are only valid for auto-layout mode */
+	if (!mp_layout.auto_layout)
+	    int_error(c_token, "only valid as part of an auto-layout command");
+
+	switch(lookup_table(&set_multiplot_tbl[0],c_token)) {
+	    case S_MULTIPLOT_COLUMNSFIRST:
+		mp_layout.row_major = TRUE;
+		c_token++;
+		break;
+	    case S_MULTIPLOT_ROWSFIRST:
+		mp_layout.row_major = FALSE;
+		c_token++;
+		break;
+	    case S_MULTIPLOT_DOWNWARDS:
+		mp_layout.downwards = TRUE;
+		c_token++;
+		break;
+	    case S_MULTIPLOT_UPWARDS:
+		mp_layout.downwards = FALSE;
+		c_token++;
+		break;
+	    case S_MULTIPLOT_SCALE:
+		c_token++;
+		mp_layout.xscale = real(const_express(&a));
+		mp_layout.yscale = mp_layout.xscale;
+		if (!END_OF_COMMAND && equals(c_token,",") ) {
+		    c_token++;
+		    if (END_OF_COMMAND) {
+		        int_error(c_token, "expecting <yscale>");
+		    }
+		    mp_layout.yscale = real(const_express(&a));
+		}
+		break;
+	    case S_MULTIPLOT_OFFSET:
+		c_token++;
+		mp_layout.xoffset = real(const_express(&a));
+		mp_layout.yoffset = mp_layout.xoffset;
+		if (!END_OF_COMMAND && equals(c_token,",") ) {
+		    c_token++;
+		    if (END_OF_COMMAND) {
+		        int_error(c_token, "expecting <yoffset>");
+		    }
+		    mp_layout.yoffset = real(const_express(&a));
+		}
+		break;
+	    default:
+		int_error(c_token,"invalid or duplicate option");
+		break;
+	}
     }
+
+    /* If we reach here, then the command has been successfully parsed */
+    multiplot = TRUE;
+
+    /* Place overall title before doing anything else */
+    if (*mp_layout.title.text) {
+	double tmpx, tmpy;
+	unsigned int x, y;
+	char *p = mp_layout.title.text;
+
+	map_position_r(&(mp_layout.title.offset), &tmpx, &tmpy, "mp title");
+	x = term->xmax  / 2 + tmpx;
+	y = term->ymax - term->v_char + tmpy;;
+
+	ignore_enhanced(mp_layout.title.noenhanced);
+	apply_pm3dcolor(&(mp_layout.title.textcolor), term);
+	write_multiline(x, y, mp_layout.title.text,
+			CENTRE, JUST_TOP, 0, mp_layout.title.font);
+	reset_textcolor(&(mp_layout.title.textcolor), term);
+	ignore_enhanced(FALSE);
+
+	/* Calculate fractional height of title compared to entire page */
+	/* If it would fill the whole page, forget it! */
+	for (y=2; *p; p++)
+            if (*p == '\n')
+                y++;
+	mp_layout.title_height = (double)(y * term->v_char) / (double)term->ymax;
+	if (mp_layout.title_height > 0.9)
+	    mp_layout.title_height = 0.05;
+    } else {
+	mp_layout.title_height = 0.0;
+    }
+    
+    mp_layout_size_and_offset();
 
 #ifdef USE_MOUSE
     /* save the state of mouse_setting.on and
@@ -2548,6 +2603,12 @@ mp_layout_size_and_offset(void)
     else
         yoffset = (double)(mp_layout.act_row) / mp_layout.num_rows;
     /* fprintf(stderr,"xoffset==%g  yoffset==%g\n", xoffset,yoffset); */
+
+    /* Allow a little space at the top for a title */
+    if (*mp_layout.title.text) {
+	ysize *= (1.0 - mp_layout.title_height);
+	yoffset *= (1.0 - mp_layout.title_height);
+    }
 
     /* corrected for x/y-scaling factors and user defined offsets */
     xoffset -= (mp_layout.xscale-1)/(2*mp_layout.num_cols);

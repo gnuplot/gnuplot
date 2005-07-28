@@ -1,3 +1,13 @@
+2005-07-28  Ethan Merritt  <merritt@u.washington.edu
+
+	* src/term.c (term_start_multiplot mp_layout_size_and_offset):
+	`set multiplot {title "string"} {layout ... }`
+	Add a page title option for multiplots.  In auto-layout mode,
+	reserve space at the top of the page for this title, and scale
+	all the component plots accordingly.  RFE #992349
+
+	* demo/layout.dem: Add sample titles to the plots in this demo.
+
 2005-07-28  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* config/config.cyg config/config.mgw config/config.os2: Added #defines
