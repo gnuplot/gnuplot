@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.160 2005/07/13 20:08:50 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.161 2005/07/23 04:08:34 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -4561,7 +4561,7 @@ place_histogram_titles()
     while ((hist = hist->next)) {
 	if (hist->title.text && *(hist->title.text)) {
 	    double xoffset_d, yoffset_d;
-	    map_position_r(&(hist->title.offset), &xoffset_d, &yoffset_d,
+	    map_position_r(&(histogram_opts.title.offset), &xoffset_d, &yoffset_d,
 			   "histogram");
 	    x = map_x((hist->start + hist->end) / 2.);
 	    y = xlabel_y;
